@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.8 2002-02-12 12:35:25 sparky909_uk Exp $
+ * $Id: ui_main.c,v 1.9 2002-02-14 11:48:40 sparky909_uk Exp $
 */
 /*
 =======================================================================
@@ -1028,7 +1028,7 @@ void UI_LoadMenus(const char *menuFile, qboolean reset) {
 		}
 	}
 
-	Com_Printf("UI menu load time = %d milli seconds\n", trap_Milliseconds() - start);
+	//Com_Printf("UI menu load time = %d milli seconds\n", trap_Milliseconds() - start);
 
 	trap_PC_FreeSource( handle );
 }
