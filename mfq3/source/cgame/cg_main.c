@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.33 2002-02-21 09:56:57 sparky909_uk Exp $
+ * $Id: cg_main.c,v 1.34 2002-02-23 19:31:55 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -66,6 +66,7 @@ int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int a
 cg_t				cg;
 cgs_t				cgs;
 centity_t			cg_entities[MAX_GENTITIES];
+completeLoadout_t	cg_loadouts[MAX_GENTITIES];
 weaponInfo_t		cg_weapons[WI_MAX];
 itemInfo_t			cg_items[MAX_ITEMS];
 
@@ -981,6 +982,12 @@ static void CG_RegisterGraphics( void ) {
 	}
 	for( i = 1; i < bg_numberOfWeapons; i++ ) {
 		availableWeapons[i].iconHandle = trap_R_RegisterShaderNoMip(availableWeapons[i].iconName);
+		if( availableWeapons[i].modelName && strlen(availableWeapons[i].modelName) ) {
+			availableWeapons[i].modelHandle = trap_R_RegisterModel(availableWeapons[i].modelName);
+		}
+		if( availableWeapons[i].vwepName && strlen(availableWeapons[i].vwepName) ) {
+			availableWeapons[i].vwepHandle = trap_R_RegisterModel(availableWeapons[i].vwepName);
+		}
 	}
 	for ( i=0 ; i< RD_MAX_ICONS ; i++) {
 		cgs.media.radarIcons[i] = trap_R_RegisterShaderNoMip( rd_icons[i] );
@@ -1943,6 +1950,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	memset( &cgs, 0, sizeof( cgs ) );
 	memset( &cg, 0, sizeof( cg ) );
 	memset( cg_entities, 0, sizeof(cg_entities) );
+	memset( cg_loadouts, 0, sizeof(cg_loadouts) );
 	memset( cg_weapons, 0, sizeof(cg_weapons) );
 	memset( cg_items, 0, sizeof(cg_items) );
 
@@ -2079,6 +2087,8 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 
 	trap_S_ClearLoopingSounds( qtrue );
 
+	// MFQ3 vehicles
+	MF_calculateAllDefaultLoadouts();
 }
 
 /*

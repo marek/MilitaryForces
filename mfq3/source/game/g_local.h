@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.15 2002-02-22 11:39:40 thebjoern Exp $
+ * $Id: g_local.h,v 1.16 2002-02-23 19:31:55 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -178,6 +178,7 @@ struct gentity_s {
 	int			 lastDist;
 	qboolean	 updateGear;
 	qboolean	 updateBay;
+	completeLoadout_t loadout;
 };
 
 

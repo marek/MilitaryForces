@@ -1,5 +1,5 @@
 /*
- * $Id: g_missile.c,v 1.11 2002-02-22 11:39:40 thebjoern Exp $
+ * $Id: g_missile.c,v 1.12 2002-02-23 19:31:55 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -343,6 +343,9 @@ void fire_antiair (gentity_t *self) {
 	vec3_t		dir, right, up, temp, forward;
 	vec3_t		start, offset;
 	int			mult;
+	char		tagname[16];
+
+	MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, tagname );
 
 	VectorCopy( availableVehicles[self->client->vehicle].gunoffset, offset );
 	VectorCopy( self->s.pos.trBase, start );
@@ -420,6 +423,9 @@ void fire_antiground (gentity_t *self) {
 	vec3_t		dir, right, up;
 	vec3_t		start, offset, forward, temp;
 	int			mult;
+	char		tagname[16];
+
+	MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, tagname );
 
 	VectorCopy( availableVehicles[self->client->vehicle].gunoffset, offset );
 	VectorCopy( self->s.pos.trBase, start );
@@ -497,6 +503,9 @@ void fire_ffar (gentity_t *self) {
 	vec3_t		dir, right, up;
 	vec3_t		start, offset, forward, temp;
 	int			mult;
+	char		tagname[16];
+
+	MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, tagname );
 
 	VectorCopy( availableVehicles[self->client->vehicle].gunoffset, offset );
 	VectorCopy( self->s.pos.trBase, start );
@@ -562,6 +571,9 @@ void fire_ironbomb (gentity_t *self) {
 	vec3_t		dir, right, up;
 	vec3_t		start;
 	int			mult;
+	char		tagname[16];
+
+	MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, tagname );
 
 	AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
 	VectorCopy( self->s.pos.trBase, start );

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_event.c,v 1.9 2002-02-22 11:39:40 thebjoern Exp $
+ * $Id: cg_event.c,v 1.10 2002-02-23 19:31:55 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -260,6 +260,11 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		break;
 
 	// MFQ3 events
+	case EV_GET_DEFAULT_LOADOUT:
+		CG_VehicleLoadout( cent );
+		DEBUGNAME("EV_GET_DEFAULT_LOADOUT");
+		break;
+
 	case EV_VEHICLE_HIT:
 		DEBUGNAME("EV_VEHICLE_HIT");
 		CG_VehicleHit( position, es->eventParm );

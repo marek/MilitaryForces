@@ -1,5 +1,5 @@
 /*
- * $Id: bg_weapondata.c,v 1.11 2002-02-21 13:14:20 thebjoern Exp $
+ * $Id: bg_weapondata.c,v 1.12 2002-02-23 19:31:55 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -17,6 +17,9 @@ completeWeaponData_t availableWeapons[] =
 		"",									// shortName
 		"",									// shortName2 (GVs)
 		"",									// modelName
+		0,									// handle
+		"",									// vwepName
+		0,									// handle
 		"",									// iconName
 		0,									// iconHandle
 		0,									// cat
@@ -39,6 +42,9 @@ completeWeaponData_t availableWeapons[] =
 		0,									// turret
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
+		0,									// number per package
+		PT_NA,								// fits on pylon
+		0,									// flags
 	},
 
 	// machinegun: WW1, cal .303, 2 barrels
@@ -49,6 +55,9 @@ completeWeaponData_t availableWeapons[] =
 		"MG",								// shortName
 		"MG",								// shortName2 (GVs)
 		"",									// modelName
+		0,									// handle
+		"",									// vwepName
+		0,									// handle
 		"hud/iconw_mg.tga",					// iconName
 		0,									// iconHandle
 		CAT_ANY,							// cat
@@ -71,6 +80,9 @@ completeWeaponData_t availableWeapons[] =
 		0,									// turret
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
+		0,									// number per package
+		PT_NA,								// fits on pylon
+		0,									// flags
 	},
 
 	// machinegun: WW1, cal .312, 2 barrels
@@ -81,6 +93,9 @@ completeWeaponData_t availableWeapons[] =
 		"MG",								// shortName
 		"MG",								// shortName2 (GVs)
 		"",									// modelName
+		0,									// handle
+		"",									// vwepName
+		0,									// handle
 		"hud/iconw_mg.tga",					// iconName
 		0,									// iconHandle
 		CAT_ANY,							// cat
@@ -103,6 +118,9 @@ completeWeaponData_t availableWeapons[] =
 		0,									// turret
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
+		0,									// number per package
+		PT_NA,								// fits on pylon
+		0,									// flags
 	},
 
 	// machinegun: WW2, cal 50, 8 barrels
@@ -113,6 +131,9 @@ completeWeaponData_t availableWeapons[] =
 		"MG",								// shortName
 		"MG",								// shortName2 (GVs)
 		"",									// modelName
+		0,									// handle
+		"",									// vwepName
+		0,									// handle
 		"hud/iconw_mg.tga",					// iconName
 		0,									// iconHandle
 		CAT_ANY,							// cat
@@ -135,6 +156,9 @@ completeWeaponData_t availableWeapons[] =
 		0,									// turret
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
+		0,									// number per package
+		PT_NA,								// fits on pylon
+		0,									// flags
 	},
 
 	// machinegun: WW2, cal 50, 6 barrels
@@ -145,6 +169,9 @@ completeWeaponData_t availableWeapons[] =
 		"MG",								// shortName
 		"MG",								// shortName2 (GVs)
 		"",									// modelName
+		0,									// handle
+		"",									// vwepName
+		0,									// handle
 		"hud/iconw_mg.tga",					// iconName
 		0,									// iconHandle
 		CAT_ANY,							// cat
@@ -167,6 +194,9 @@ completeWeaponData_t availableWeapons[] =
 		0,									// turret
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
+		0,									// number per package
+		PT_NA,								// fits on pylon
+		0,									// flags
 	},
 
 	// machinegun: any set, 12.7mm, 1 barrel
@@ -177,6 +207,9 @@ completeWeaponData_t availableWeapons[] =
 		"MG",								// shortName
 		"MG",								// shortName2 (GVs)
 		"",									// modelName
+		0,									// handle
+		"",									// vwepName
+		0,									// handle
 		"hud/iconw_mg.tga",					// iconName
 		0,									// iconHandle
 		CAT_ANY,							// cat
@@ -199,6 +232,9 @@ completeWeaponData_t availableWeapons[] =
 		0,									// turret
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
+		0,									// number per package
+		PT_NA,								// fits on pylon
+		0,									// flags
 	},
 
 	// machinegun: any set, 14.5mm, 1 barrel
@@ -209,6 +245,9 @@ completeWeaponData_t availableWeapons[] =
 		"MG",								// shortName
 		"MG",								// shortName2 (GVs)
 		"",									// modelName
+		0,									// handle
+		"",									// vwepName
+		0,									// handle
 		"hud/iconw_mg.tga",					// iconName
 		0,									// iconHandle
 		CAT_ANY,							// cat
@@ -231,6 +270,9 @@ completeWeaponData_t availableWeapons[] =
 		0,									// turret
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
+		0,									// number per package
+		PT_NA,								// fits on pylon
+		0,									// flags
 	},
 
 	// machinegun: modern, 20mm, 1 barrel
@@ -241,6 +283,9 @@ completeWeaponData_t availableWeapons[] =
 		"GUN",								// shortName
 		"MG",								// shortName2 (GVs)
 		"",									// modelName
+		0,									// handle
+		"",									// vwepName
+		0,									// handle
 		"hud/iconw_mg.tga",					// iconName
 		0,									// iconHandle
 		CAT_ANY,							// cat
@@ -263,6 +308,9 @@ completeWeaponData_t availableWeapons[] =
 		0,									// turret
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
+		0,									// number per package
+		PT_NA,								// fits on pylon
+		0,									// flags
 	},
 
 	// machinegun: modern, 20mm, 2 barrel
@@ -273,6 +321,9 @@ completeWeaponData_t availableWeapons[] =
 		"GUN",								// shortName
 		"MG",								// shortName2 (GVs)
 		"",									// modelName
+		0,									// handle
+		"",									// vwepName
+		0,									// handle
 		"hud/iconw_mg.tga",					// iconName
 		0,									// iconHandle
 		CAT_ANY,							// cat
@@ -295,6 +346,9 @@ completeWeaponData_t availableWeapons[] =
 		0,									// turret
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
+		0,									// number per package
+		PT_NA,								// fits on pylon
+		0,									// flags
 	},
 
 	// machinegun: modern, 30mm, 2 barrel
@@ -305,6 +359,9 @@ completeWeaponData_t availableWeapons[] =
 		"GUN",								// shortName
 		"MG",								// shortName2 (GVs)
 		"",									// modelName
+		0,									// handle
+		"",									// vwepName
+		0,									// handle
 		"hud/iconw_mg.tga",					// iconName
 		0,									// iconHandle
 		CAT_ANY,							// cat
@@ -327,6 +384,9 @@ completeWeaponData_t availableWeapons[] =
 		1,									// turret
 		{5,120,0},							// max turret angles
 		{-75,-120,0},							// min turret angles
+		0,									// number per package
+		PT_NA,								// fits on pylon
+		0,									// flags
 	},
 
 	// machinegun: modern, 12.7mm turret
@@ -337,6 +397,9 @@ completeWeaponData_t availableWeapons[] =
 		"GUN",								// shortName
 		"MG",								// shortName2 (GVs)
 		"",									// modelName
+		0,									// handle
+		"",									// vwepName
+		0,									// handle
 		"hud/iconw_mg.tga",					// iconName
 		0,									// iconHandle
 		CAT_ANY,							// cat
@@ -359,6 +422,9 @@ completeWeaponData_t availableWeapons[] =
 		1,									// turret
 		{5,-60,0},							// max turret angles
 		{-75,60,0},							// min turret angles
+		0,									// number per package
+		PT_NA,								// fits on pylon
+		0,									// flags
 	},
 
 	// FFAR
@@ -369,6 +435,9 @@ completeWeaponData_t availableWeapons[] =
 		"FFAR",								// shortName
 		"FFAR",								// shortName2 (GVs)
 		"models/weapons/missile_sr.md3",	// modelName
+		0,									// handle
+		"models/weapons/vwep_FFAR.md3",		// vwepName
+		0,									// handle
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
 		CAT_ANY,							// cat
@@ -391,6 +460,9 @@ completeWeaponData_t availableWeapons[] =
 		0,									// turret
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
+		19,									// number per package
+		PT_WING_M|PT_WING_H,				// fits on pylon
+		WF_NON_REMOVABLE_VWEP,				// flags
 	},
 
 	// tank gun
@@ -401,6 +473,9 @@ completeWeaponData_t availableWeapons[] =
 		"GUN",								// shortName
 		"GUN",								// shortName2 (GVs)
 		"models/weapons/ffar.md3",			// modelName
+		0,									// handle
+		"",									// vwepName
+		0,									// handle
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
 		CAT_ANY,							// cat
@@ -423,6 +498,9 @@ completeWeaponData_t availableWeapons[] =
 		0,									// turret
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
+		0,									// number per package
+		PT_NA,								// fits on pylon
+		0,									// flags
 	},
 
 	// tank gun
@@ -433,6 +511,9 @@ completeWeaponData_t availableWeapons[] =
 		"GUN",								// shortName
 		"GUN",								// shortName2 (GVs)
 		"models/weapons/ffar.md3",			// modelName
+		0,									// handle
+		"",									// vwepName
+		0,									// handle
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
 		CAT_ANY,							// cat
@@ -455,6 +536,9 @@ completeWeaponData_t availableWeapons[] =
 		0,									// turret
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
+		0,									// number per package
+		PT_NA,								// fits on pylon
+		0,									// flags
 	},
 
 	// iron bombs
@@ -465,6 +549,9 @@ completeWeaponData_t availableWeapons[] =
 		"IRON BOMBS",						// shortName
 		"BAD SHIT",							// shortName2 (GVs)
 		"models/weapons/ag_800_d.md3",		// modelName
+		0,									// handle
+		"models/weapons/vwep_ag_800_d.md3",	// vwepName
+		0,									// handle
 		"hud/iconw_bmb.tga",				// iconName
 		0,									// iconHandle
 		CAT_ANY,							// cat
@@ -487,6 +574,9 @@ completeWeaponData_t availableWeapons[] =
 		0,									// turret
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
+		1,									// number per package
+		PT_H,								// fits on pylon
+		0,									// flags
 	},
 
 	// Sidewinder
@@ -497,6 +587,9 @@ completeWeaponData_t availableWeapons[] =
 		"SR-AAM",							// shortName
 		"SR-SAM",							// shortName2 (GVs)
 		"models/weapons/missile_sr.md3",	// modelName
+		0,									// handle
+		"models/weapons/vwep_missile_SR.md3",// vwepName
+		0,									// handle
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
 		CAT_PLANE|CAT_HELO,					// cat
@@ -519,6 +612,9 @@ completeWeaponData_t availableWeapons[] =
 		0,									// turret
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
+		1,									// number per package
+		PT_ALL,								// fits on pylon
+		0,									// flags
 	},
 
 	// AMRAAM
@@ -529,6 +625,9 @@ completeWeaponData_t availableWeapons[] =
 		"MR-AAM",							// shortName
 		"MR-SAM",							// shortName2 (GVs)
 		"models/weapons/missile_mr.md3",	// modelName
+		0,									// handle
+		"models/weapons/vwep_missile_MR.md3",// vwepName
+		0,									// handle
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
 		CAT_PLANE|CAT_HELO,					// cat
@@ -551,6 +650,9 @@ completeWeaponData_t availableWeapons[] =
 		0,									// turret
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
+		1,									// number per package
+		PT_ALL,								// fits on pylon
+		0,									// flags
 	},
 
 	// Sparrow
@@ -561,6 +663,9 @@ completeWeaponData_t availableWeapons[] =
 		"MR-AAM",							// shortName
 		"MR_SAM",							// shortName2 (GVs)
 		"models/weapons/missile_mr.md3",	// modelName
+		0,									// handle
+		"models/weapons/vwep_missile_SR.md3",// vwepName
+		0,									// handle
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
 		CAT_PLANE|CAT_HELO,					// cat
@@ -583,6 +688,9 @@ completeWeaponData_t availableWeapons[] =
 		0,									// turret
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
+		1,									// number per package
+		PT_ALL,								// fits on pylon
+		0,									// flags
 	},
 
 	// Phoenix
@@ -593,6 +701,9 @@ completeWeaponData_t availableWeapons[] =
 		"LR-AAM",							// shortName
 		"LR_SAM",							// shortName2 (GVs)
 		"models/weapons/missile_mr.md3",	// modelName
+		0,									// handle
+		"models/weapons/vwep_missile_MR.md3",// vwepName
+		0,									// handle
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
 		CAT_PLANE|CAT_HELO,					// cat
@@ -615,6 +726,9 @@ completeWeaponData_t availableWeapons[] =
 		0,									// turret
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
+		1,									// number per package
+		PT_M|PT_H,							// fits on pylon
+		0,									// flags
 	},
 
 	// Stinger
@@ -625,6 +739,9 @@ completeWeaponData_t availableWeapons[] =
 		"SR-AAM",							// shortName
 		"SR-SAM",							// shortName2 (GVs)
 		"models/weapons/missile_sr.md3",	// modelName
+		0,									// handle
+		"models/weapons/vwep_missile_SR.md3",// vwepName
+		0,									// handle
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
 		CAT_PLANE|CAT_HELO,					// cat
@@ -647,6 +764,9 @@ completeWeaponData_t availableWeapons[] =
 		0,									// turret
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
+		1,									// number per package
+		PT_ALL,								// fits on pylon
+		0,									// flags
 	},
 
 	// Atoll
@@ -657,6 +777,9 @@ completeWeaponData_t availableWeapons[] =
 		"SR-AAM",							// shortName
 		"SR_SAM",							// shortName2 (GVs)
 		"models/weapons/missile_sr.md3",	// modelName
+		0,									// handle
+		"models/weapons/vwep_missile_SR.md3",// vwepName
+		0,									// handle
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
 		CAT_PLANE|CAT_HELO,					// cat
@@ -679,6 +802,9 @@ completeWeaponData_t availableWeapons[] =
 		0,									// turret
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
+		1,									// number per package
+		PT_ALL,								// fits on pylon
+		0,									// flags
 	},
 
 	// Archer
@@ -689,6 +815,9 @@ completeWeaponData_t availableWeapons[] =
 		"MR-AAM",							// shortName
 		"MR_SAM",							// shortName2 (GVs)
 		"models/weapons/missile_mr.md3",	// modelName
+		0,									// handle
+		"models/weapons/vwep_missile_SR.md3",// vwepName
+		0,									// handle
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
 		CAT_PLANE|CAT_HELO,					// cat
@@ -711,6 +840,9 @@ completeWeaponData_t availableWeapons[] =
 		0,									// turret
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
+		1,									// number per package
+		PT_ALL,								// fits on pylon
+		0,									// flags
 	},
 
 	// Alamo
@@ -721,6 +853,9 @@ completeWeaponData_t availableWeapons[] =
 		"MR-AAM",							// shortName
 		"MR-SAM",							// shortName2 (GVs)
 		"models/weapons/missile_mr.md3",	// modelName
+		0,									// handle
+		"models/weapons/vwep_missile_MR.md3",// vwepName
+		0,									// handle
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
 		CAT_PLANE|CAT_HELO,					// cat
@@ -743,6 +878,9 @@ completeWeaponData_t availableWeapons[] =
 		0,									// turret
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
+		1,									// number per package
+		PT_ALL,								// fits on pylon
+		0,									// flags
 	},
 
 	// Hellfire
@@ -753,6 +891,9 @@ completeWeaponData_t availableWeapons[] =
 		"AGM",								// shortName
 		"SSM",								// shortName2 (GVs)
 		"models/weapons/missile_sr.md3",	// modelName
+		0,									// handle
+		"models/weapons/vwep_missile_MR.md3",// vwepName
+		0,									// handle
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
 		CAT_GROUND,							// cat
@@ -775,6 +916,9 @@ completeWeaponData_t availableWeapons[] =
 		0,									// turret
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
+		1,									// number per package
+		PT_M|PT_L,							// fits on pylon
+		0,									// flags
 	},
 
 	// Maverick
@@ -785,6 +929,9 @@ completeWeaponData_t availableWeapons[] =
 		"AGM",								// shortName
 		"SSM",								// shortName2 (GVs)
 		"models/weapons/missile_sr.md3",	// modelName
+		0,									// handle
+		"models/weapons/vwep_missile_MR.md3",// vwepName
+		0,									// handle
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
 		CAT_GROUND,							// cat
@@ -807,6 +954,9 @@ completeWeaponData_t availableWeapons[] =
 		0,									// turret
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
+		1,									// number per package
+		PT_M|PT_H,							// fits on pylon
+		0,									// flags
 	},
 
 	// flares
@@ -817,6 +967,9 @@ completeWeaponData_t availableWeapons[] =
 		"Flares",							// shortName
 		"Flares",							// shortName2 (GVs)
 		"models/weapons/ffar.md3",			// modelName
+		0,									// handle
+		"",									// vwepName
+		0,									// handle
 		"",									// iconName
 		0,									// iconHandle
 		0,									// cat
@@ -839,6 +992,9 @@ completeWeaponData_t availableWeapons[] =
 		0,									// turret
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
+		0,									// number per package
+		PT_NA,								// fits on pylon
+		0,									// flags
 	}
 };
 

@@ -1,5 +1,5 @@
 /*
- * $Id: mf_client.c,v 1.10 2002-02-22 11:39:40 thebjoern Exp $
+ * $Id: mf_client.c,v 1.11 2002-02-23 19:31:55 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -487,4 +487,8 @@ void MF_ClientSpawn(gentity_t *ent) {
 
 	// clear entity state values
 	BG_PlayerStateToEntityState( &client->ps, &ent->s, qtrue );
+
+	// distribute the weapons
+	MF_getDefaultLoadoutForVehicle( vehIndex, &ent->loadout );
+	G_AddEvent( ent, EV_GET_DEFAULT_LOADOUT, 0 );
 }
