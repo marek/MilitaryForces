@@ -1,5 +1,5 @@
 /*
- * $Id: cg_effects.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: cg_effects.c,v 1.2 2002-02-05 14:37:53 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -88,44 +88,49 @@ CG_MakeExplosion
 ====================
 */
 localEntity_t *CG_MakeExplosion( vec3_t origin, vec3_t dir, 
-								qhandle_t hModel, qhandle_t shader,
-								int msec, qboolean isSprite ) {
+								qhandle_t hModel, qhandle_t shader, int offset,
+								int duration, qboolean isSprite ) {
 	float			ang;
 	localEntity_t	*ex;
-	int				offset;
 	vec3_t			tmpVec, newOrigin;
 
-	if ( msec <= 0 ) {
-		CG_Error( "CG_MakeExplosion: msec = %i", msec );
+	if ( duration <= 0 ) {
+		CG_Error( "CG_MakeExplosion: duration = %i", duration );
 	}
 
 	// skew the time a bit so they aren't all in sync
-	offset = rand() & 63;
+	offset += rand() & 63;
 
 	ex = CG_AllocLocalEntity();
-	if ( isSprite ) {
+	if ( isSprite )
+	{
 		ex->leType = LE_SPRITE_EXPLOSION;
 
 		// randomly rotate sprite orientation
 		ex->refEntity.rotation = rand() % 360;
 		VectorScale( dir, 16, tmpVec );
 		VectorAdd( tmpVec, origin, newOrigin );
-	} else {
+	}
+	else
+	{
 		ex->leType = LE_EXPLOSION;
 		VectorCopy( origin, newOrigin );
 
 		// set axis with random rotate
-		if ( !dir ) {
+		if ( !dir )
+		{
 			AxisClear( ex->refEntity.axis );
-		} else {
+		} else
+		{
 			ang = rand() % 360;
 			VectorCopy( dir, ex->refEntity.axis[0] );
 			RotateAroundDirection( ex->refEntity.axis, ang );
 		}
 	}
 
-	ex->startTime = cg.time - offset;
-	ex->endTime = ex->startTime + msec;
+	// calc the timings
+ 	ex->startTime = cg.time + offset;
+	ex->endTime = ex->startTime + duration;
 
 	// bias the time so all shader effects start correctly
 	ex->refEntity.shaderTime = ex->startTime / 1000.0f;
@@ -137,7 +142,7 @@ localEntity_t *CG_MakeExplosion( vec3_t origin, vec3_t dir,
 	VectorCopy( newOrigin, ex->refEntity.origin );
 	VectorCopy( newOrigin, ex->refEntity.oldorigin );
 
-	ex->color[0] = ex->color[1] = ex->color[2] = 1.0;
+	ex->color[0] = ex->color[1] = ex->color[2] = 1;
 
 	return ex;
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_weapons.c,v 1.7 2002-01-25 15:53:46 sparky909_uk Exp $
+ * $Id: cg_weapons.c,v 1.8 2002-02-05 14:37:51 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -49,6 +49,11 @@ void CG_RegisterWeapons() {
 	weaponInfo_t	*weaponInfo;
 	gitem_t			*ammo;
 	int				i;
+	
+	// common
+	cgs.media.grenadeExplosionShader = trap_R_RegisterShader( "grenadeExplosion" );
+	cgs.media.rocketExplosionShader[0] = trap_R_RegisterShader( "rocketExplosion" );
+	cgs.media.rocketExplosionShader[1] = trap_R_RegisterShader( "quakeRocketExplosion" );
 
 	// for all weapon indexes in cg_weapons[]
 	for( i = 0; i < WI_MAX; i++ )
@@ -98,7 +103,6 @@ void CG_RegisterWeapons() {
 				// MFQ3: old quake3 sound (backup)
 				weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/rocket/rocklf1a.wav", qfalse );
 			}
-			cgs.media.rocketExplosionShader = trap_R_RegisterShader( "rocketExplosion" );
 			break;
 
 		case WT_IRONBOMB:
@@ -107,7 +111,6 @@ void CG_RegisterWeapons() {
 			weaponInfo->missileModel = trap_R_RegisterModel( availableWeapons[i].modelName );
 			weaponInfo->missileSound = trap_S_RegisterSound( "sound/weapons/rocket/rockfly.wav", qfalse );
 			weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/rocket/rocklf1a.wav", qfalse );
-			cgs.media.rocketExplosionShader = trap_R_RegisterShader( "rocketExplosion" );
 			break;
 
 		case WT_MACHINEGUN:
@@ -165,7 +168,6 @@ void CG_RegisterWeapons() {
 			//MAKERGB( weaponInfo->flashDlightColor, 1, 0.75f, 0 );
 
 			weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/rocket/rocklf1a.wav", qfalse );
-			cgs.media.rocketExplosionShader = trap_R_RegisterShader( "rocketExplosion" );
 			break;
 
 		case WT_FLARE:
@@ -440,20 +442,21 @@ void CG_MissileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_t di
 	case WI_HELLFIRE:
 	case WI_MAVERICK:
 		mod = cgs.media.dishFlashModel;
-		shader = cgs.media.rocketExplosionShader;
+		shader = cgs.media.grenadeExplosionShader;
 		sfx = cgs.media.sfx_rockexp;
 		mark = cgs.media.burnMarkShader;
 		radius = 50;
 		light = 200;
 		isSprite = qtrue;
-		duration = 1000;
+		duration = 600;
 		lightColor[0] = 1;
 		lightColor[1] = 0.75;
 		lightColor[2] = 0.0;
 		break;
+
 	case WI_MK82:
 		mod = cgs.media.dishFlashModel;
-		shader = cgs.media.rocketExplosionShader;
+		shader = cgs.media.rocketExplosionShader[1];
 		sfx = cgs.media.sfx_rockexp;
 		mark = cgs.media.burnMarkShader;
 		radius = 150;
@@ -464,6 +467,7 @@ void CG_MissileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_t di
 		lightColor[1] = 0.75;
 		lightColor[2] = 0.0;
 		break;
+
 	case WI_MG_2XCAL303:
 	case WI_MG_2XCAL312:
 	case WI_MG_8XCAL50:
@@ -487,9 +491,10 @@ void CG_MissileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_t di
 
 		radius = 8;
 		break;
+
 	case WI_125MM_GUN:
 		mod = cgs.media.dishFlashModel;
-		shader = cgs.media.rocketExplosionShader;
+		shader = cgs.media.rocketExplosionShader[0];
 		sfx = cgs.media.sfx_rockexp;
 		mark = cgs.media.burnMarkShader;
 		radius = 50;
@@ -502,17 +507,29 @@ void CG_MissileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_t di
 		break;
 	}
 
-	if ( sfx ) {
+	//
+	// explosion sound fx
+	//
+	if( sfx )
+	{
 		trap_S_StartSound( origin, ENTITYNUM_WORLD, CHAN_AUTO, sfx );
 	}
+
+	// MFQ3: disable dynamic lighting? (it makes MF looks much too quakey)
+	light = 0;
 
 	//
 	// create the explosion
 	//
-	if ( mod ) {
+	if( mod )
+	{
 		le = CG_MakeExplosion( origin, dir, 
-							   mod,	shader,
-							   duration, isSprite );
+							   mod,
+							   shader,
+							   0, duration,
+							   isSprite );
+
+		// dynamic light the explosion
 		le->light = light;
 		VectorCopy( lightColor, le->lightColor );
 	}
@@ -528,36 +545,67 @@ void CG_MissileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_t di
 CG_VehicleExplosion
 =================
 */
-void CG_VehicleExplosion( vec3_t origin, int type ) {
-	localEntity_t	*le;
-	vec3_t			up = {0, 0, 1};
-	int soundIdx = -1;
+#define MAX_ADJUST	16
 
-	// explosion effect for both
-	le = CG_MakeExplosion( origin, 
-						   up, 
-						   cgs.media.dishFlashModel,	
-						   cgs.media.rocketExplosionShader,
-						   700, 
-						   qtrue );
-	le->light = 300;
+void CG_VehicleExplosion( vec3_t origin, int type )
+{
+	localEntity_t	*le = NULL;
+	vec3_t			up = {0, 0, 1};
+	vec3_t			adjust = {0, 0, 0};
+	int				soundIdx = -1;
+	int				i, offset = 0;
+	int				density = 3;	// TODO: maybe control this with a cg_x cVar
+	
+	// explosion effect for both types
+	for( i = 0; i<density; i++ )
+	{
+		// adjust origin
+		if( density > 1 )
+		{
+			VectorCopy( origin, adjust );
+			adjust[0] = origin[0] + (random()*MAX_ADJUST)-(MAX_ADJUST/2);
+			adjust[1] = origin[1] + (random()*MAX_ADJUST)-(MAX_ADJUST/2);
+		}
+
+		// make explosion
+		le = CG_MakeExplosion( adjust, up, 
+							   cgs.media.dishFlashModel,	
+							   cgs.media.rocketExplosionShader[ rand() & 0x01 ],
+							   offset, 900, 
+							   qtrue );
+
+		// adjust timing offset
+		offset += 250;
+
+	// MFQ3: disable dynamic lighting? (it makes MF looks much too quakey)
+//	le->light = 300;
+	}
+
 	VectorSet( le->lightColor, 1, 0.75, 0 );
 
 	// and also smoke for gib explosion
-	if( type == 1 ) {
-		localEntity_t	*smoke;
+	if( type == 1 )
+	{
+		localEntity_t	*smoke = NULL;
 
-		smoke = CG_SmokePuff( origin, up, 
-					  50, 
-					  0.8f, 0.8f, 0.8f, 1.00f,
-					  3000, 
-					  cg.time, 0,
-					  0, 
-					  cgs.media.smokePuffShader );
-		smoke->leType = LE_MOVE_SCALE_FADE;
+		for( i = 1; i<=density; i++ )
+		{
+			// adjust origin
+			if( density > 1 )
+			{
+				VectorCopy( origin, adjust );
+				adjust[0] = origin[0] + (random()*MAX_ADJUST)-(MAX_ADJUST/2);
+				adjust[1] = origin[1] + (random()*MAX_ADJUST)-(MAX_ADJUST/2);
+			}
+
+			// make smoke
+			smoke = CG_SmokePuff( adjust, up, 75, 0.8f, 0.8f, 0.8f, 1.00f, (i * 2000), cg.time,
+								  0, 0, 
+								  cgs.media.smokePuffShader );
+		}
 	}
 
-	// play 1 of x explosion sounds
+	// play 1 of the x explosion sounds
 	soundIdx = rand() % NUM_EXPLOSION_SOUNDS;
 	trap_S_StartSound( origin, ENTITYNUM_WORLD, CHAN_AUTO, cgs.media.planeDeath[ soundIdx ] );
 }
@@ -567,10 +615,12 @@ void CG_VehicleExplosion( vec3_t origin, int type ) {
 CG_VehicleHit
 =================
 */
-void CG_VehicleHit( vec3_t origin, int damage ) {
+void CG_VehicleHit( vec3_t origin, int damage )
+{
 	vec3_t			up = {0, 0, 1};
-	localEntity_t	*smoke;
+	localEntity_t	*smoke = NULL;
 
+	// make smoke
 	smoke = CG_SmokePuff( origin, up, 
 				  damage, 
 				  0.8f, 0.8f, 0.8f, 1.00f,
@@ -578,6 +628,7 @@ void CG_VehicleHit( vec3_t origin, int damage ) {
 				  cg.time, 0,
 				  0, 
 				  cgs.media.smokePuffShader );
+
 	smoke->leType = LE_MOVE_SCALE_FADE;
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: g_cmds.c,v 1.5 2002-01-31 02:34:33 thebjoern Exp $
+ * $Id: g_cmds.c,v 1.6 2002-02-05 14:36:32 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -47,8 +47,8 @@ void DeathmatchScoreboardMessage( gentity_t *ent ) {
 		}
 		perfect = ( cl->ps.persistant[PERS_RANK] == 0 && cl->ps.persistant[PERS_KILLED] == 0 ) ? 1 : 0;
 
-		Com_sprintf (entry, sizeof(entry),
-			" %i %i %i %i %i %i %i %i %i %i %i %i %i %i", level.sortedClients[i],
+		Com_sprintf( entry, sizeof(entry),
+			" %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i", level.sortedClients[i],
 			cl->ps.persistant[PERS_SCORE], ping, (level.time - cl->pers.enterTime)/60000,
 			scoreFlags, g_entities[level.sortedClients[i]].s.objectives, accuracy, 
 			cl->ps.persistant[PERS_IMPRESSIVE_COUNT],
@@ -57,7 +57,9 @@ void DeathmatchScoreboardMessage( gentity_t *ent ) {
 			cl->ps.persistant[PERS_DEFEND_COUNT], 
 			cl->ps.persistant[PERS_ASSIST_COUNT], 
 			perfect,
-			cl->ps.persistant[PERS_CAPTURES]);
+			cl->ps.persistant[PERS_CAPTURES],
+			cl->ps.persistant[PERS_DEATHS] );
+
 		j = strlen(entry);
 		if (stringlength + j > 1024)
 			break;

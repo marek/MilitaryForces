@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.23 2002-02-04 09:38:06 thebjoern Exp $
+ * $Id: cg_local.h,v 1.24 2002-02-05 14:37:53 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -275,7 +275,8 @@ typedef struct {
 	int				defendCount;
 	int				assistCount;
 	int				captures;
-	qboolean	perfect;
+	int				deaths;
+	qboolean		perfect;
 	int				team;
 } score_t;
 
@@ -675,7 +676,8 @@ typedef struct {
 
 	// weapon effect shaders
 	qhandle_t	bulletExplosionShader;
-	qhandle_t	rocketExplosionShader;
+	qhandle_t	rocketExplosionShader[2];
+	qhandle_t	grenadeExplosionShader;
 
 	// scoreboard headers
 	qhandle_t	scoreboardName;
@@ -1234,7 +1236,7 @@ localEntity_t *CG_SmokePuff( const vec3_t p,
 				   qhandle_t hShader );
 
 localEntity_t *CG_MakeExplosion( vec3_t origin, vec3_t dir,
-								qhandle_t hModel, qhandle_t shader, int msec,
+								qhandle_t hModel, qhandle_t shader, int offset, int duration,
 								qboolean isSprite );
 
 //
