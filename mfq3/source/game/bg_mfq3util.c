@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.5 2002-01-25 13:26:52 thebjoern Exp $
+ * $Id: bg_mfq3util.c,v 1.6 2002-01-29 12:10:54 sparky909_uk Exp $
 */
 
 #include "q_shared.h"
@@ -67,12 +67,57 @@ unsigned long MF_GetGameset( void )
 
 /*
 =================
+MF_getIndexOfVehicleEx
+=================
+*/
+
+int MF_getIndexOfVehicleEx( int start, int vehicleCat, int vehicleClass, unsigned long team, unsigned long gameset )
+{
+	// NOTE: vehicleClass & vehicleCat are enum indexed
+	// team & gameset are bitmapped MFQ3
+
+	unsigned long what = 0x00000000;
+
+	// add components (in LB -> HB order in DWORD)
+	
+	// CATAGORY
+	if( vehicleCat < 0 )
+	{
+		// any catagory
+		what |= CAT_ANY;
+	}
+	else
+	{
+		// specific catagory
+		what |= (1 << vehicleCat) << 8;		// (convert from enum)
+	}
+
+	// CLASS
+	if( vehicleClass < 0 )
+	{
+		// any class
+		what |= CLASS_ANY;
+	}
+	else
+	{
+		// specific class
+		what |= (1 << vehicleClass);		// (convert from enum)
+	}
+
+	what |= team;		// as bitmapped
+	what |= gameset;	// as bitmapped
+
+	return MF_getIndexOfVehicle( start, what );
+}
+
+/*
+=================
 MF_getIndexOfVehicle
 =================
 */
 
 int MF_getIndexOfVehicle( int start,			// where to start in list
-					   unsigned long what)	// what (team|cat|cls)
+						  unsigned long what)	// what (team|cat|cls)
 {
     int				i;
 	qboolean		done = qfalse;

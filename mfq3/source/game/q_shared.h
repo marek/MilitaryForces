@@ -1,5 +1,5 @@
 /*
- * $Id: q_shared.h,v 1.4 2002-01-19 02:24:02 thebjoern Exp $
+ * $Id: q_shared.h,v 1.5 2002-01-29 12:10:54 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -285,7 +285,7 @@ typedef enum {
 
 #define PROP_GAP_WIDTH			3
 #define PROP_SPACE_WIDTH		8
-#define PROP_HEIGHT				27
+#define PROP_HEIGHT				24
 #define PROP_SMALL_SIZE_SCALE	0.75
 
 #define BLINK_DIVISOR			200
