@@ -1,5 +1,5 @@
 /*
- * $Id: cg_draw.c,v 1.14 2002-02-11 12:20:42 sparky909_uk Exp $
+ * $Id: cg_draw.c,v 1.15 2002-02-11 16:29:42 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -2840,6 +2840,7 @@ void CG_OwnerDraw( float x, float y, float w, float h, float text_x, float text_
     CG_DrawAreaTeamChat(&rect, scale, color, shader);
     break;
   case CG_AREA_CHAT:
+	CG_DrawTeamScore( item, -1 );
     CG_DrawAreaChat(&rect, scale, color, shader);
     break;
 */

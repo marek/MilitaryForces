@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.25 2002-02-11 12:20:42 sparky909_uk Exp $
+ * $Id: cg_main.c,v 1.26 2002-02-11 16:29:42 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -233,7 +233,6 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_showmiss, "cg_showmiss", "0", 0 },
 	{ &cg_thirdPersonRange, "cg_thirdPersonRange", "0", 0 },
 	{ &cg_thirdPersonHeight, "cg_thirdPersonHeight", "0", 0 },
-	{ &cg_thirdPersonAngle, "cg_thirdPersonAngle", "0", CVAR_CHEAT },
 	{ &cg_thirdPerson, "cg_thirdPerson", "1", 0 },	// MFQ3: changed default from 0
 	{ &cg_teamChatTime, "cg_teamChatTime", "3000", CVAR_ARCHIVE  },
 	{ &cg_teamChatHeight, "cg_teamChatHeight", "0", CVAR_ARCHIVE  },
@@ -429,11 +428,13 @@ void QDECL CG_Printf( const char *msg, ... ) {
 	vsprintf (text, msg, argptr);
 	va_end (argptr);
 
-//#ifdef _MENU_SCOREBOARD
-//	CG_Add_Console_Line( text );
-//#else
+#ifdef _MENU_SCOREBOARD
+	// add the text into the custom consol
+	CG_Add_Console_Line( text );
+#endif 
+
+	// write the text into the console (only displayed if the cVar 'con_notifytime' is not -1)
 	trap_Print( text );
-//#endif
 }
 
 void QDECL CG_Error( const char *msg, ... ) {
@@ -1939,6 +1940,13 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	CG_RegisterCvars();
 
 	CG_InitConsoleCommands();
+
+	// this has the effect of stopping the usual Q3 console text being displayed (because
+	// we want to custom handle this textual display - but still retain the history that
+	// gets written to the "drop-down" console)
+#ifdef _MENU_SCOREBOARD
+	trap_Cvar_Set( "con_notifytime", "-1" );
+#endif
 
 	cg.weaponSelect = WP_WEAPON1;
 
