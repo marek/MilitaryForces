@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.62 2002-02-18 09:51:28 thebjoern Exp $
+ * $Id: bg_public.h,v 1.63 2002-02-18 16:23:25 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -826,7 +826,7 @@ typedef enum
 void MF_SetGameset(unsigned long gs);
 unsigned long MF_GetGameset(qboolean asEnum);
 int MF_getIndexOfVehicle( int start, int gameset, int team, int cat, int cls );
-//int MF_getIndexOfVehicleEx( int start, int vehicleCat, int vehicleClass, unsigned long team, unsigned long gameset );
+int MF_getIndexOfVehicleEx( int start, int gameset, int team, int cat, int cls );
 int MF_getItemIndexFromHex(int hexValue);
 int MF_getNumberOfItems(const char **itemlist);
 char * MF_CreateModelPathname( int vehicle, char * pFormatString );
