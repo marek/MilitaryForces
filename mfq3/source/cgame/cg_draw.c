@@ -1,5 +1,5 @@
 /*
- * $Id: cg_draw.c,v 1.33 2003-08-06 18:10:20 thebjoern Exp $
+ * $Id: cg_draw.c,v 1.34 2003-09-05 00:42:01 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -967,10 +967,10 @@ static void CG_DrawLagometer( float y )
 	
 	// is the new HUD active?
 	if( CG_NewHUDActive() )
-	{
+	{	// location changed by minkis
 		// fit around the new HUD
 		x = 80;
-		y = 300;
+		y = 250;
 	}
 	else
 	{
