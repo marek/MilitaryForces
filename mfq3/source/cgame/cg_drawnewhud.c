@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.5 2002-01-27 15:41:28 thebjoern Exp $
+ * $Id: cg_drawnewhud.c,v 1.6 2002-01-29 13:03:36 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -727,10 +727,12 @@ CG_Draw_MFD
 
 ================
 */
-static void CG_Draw_MFD(int mfdnum, int vehicle, int onoff, int fuel, int flares, 
-						int ammo[16], int selweap, int targetrange) {
+static void CG_Draw_MFD(int mfdnum, int vehicle, centity_t * cent, 
+						int targetrange, int targetheading, int altitude, playerState_t *ps) {
 	float		x, y, width, height;
 	int			mode = cg.Mode_MFD[mfdnum];
+	int			onoff = cent->currentState.ONOFF;
+	int			selweap = cent->currentState.weaponNum;
 
 		// draw mfd screen
 	if( mfdnum == MFD_1 ) {
@@ -749,10 +751,18 @@ static void CG_Draw_MFD(int mfdnum, int vehicle, int onoff, int fuel, int flares
 	if( mode == MFD_RWR ) {
 		char mode[4];
 		int radarmode = onoff & OO_RADAR;
+		int flares;
 
 		// current range
 		int range = 0;
 		
+		// flares (for MFD)
+		if( ps->ammo[WP_FLARE+8] > 0 ) {
+			flares = ps->ammo[WP_FLARE];
+		} else {
+			flares = -1;
+		}
+
 		if( radarmode & OO_RADAR_AIR ) range = availableVehicles[vehicle].radarRange;
 		else if( radarmode & OO_RADAR_GROUND ) range = availableVehicles[vehicle].radarRange2;
 
@@ -761,83 +771,67 @@ static void CG_Draw_MFD(int mfdnum, int vehicle, int onoff, int fuel, int flares
 		}
 
 		// draw background
-		trap_R_SetColor( HUDColors[HUD_GREEN] );
+		trap_R_SetColor( HUDColors[cg.MFDColor] );
 		CG_DrawPic( x, y, width, height, cgs.media.HUDrwr );
 		trap_R_SetColor( NULL );
-/*		
-		if( mfdnum == MFD_1 ) {
-			x = 0;
-		} else {
-			x = 512;
-		}
-		y = 352;
-*/
 		// draw contents
 		if( radarmode & OO_RADAR_AIR ) {
 			CG_DrawRadarSymbols_AIR_new(vehicle, range, x+64, y+64);
-			CG_MFQ3HUD_Numbers( x+86, y+14, 5, range, qfalse, HUDColors[HUD_GREEN] );
+			CG_MFQ3HUD_Numbers( x+86, y+14, 5, range, qfalse, HUDColors[cg.MFDColor] );
 			strcpy( mode, "AIR" );
 		} else if( radarmode & OO_RADAR_GROUND ) {
 			CG_DrawRadarSymbols_GROUND_new(vehicle, range, x+64, y+64);
-			CG_MFQ3HUD_Numbers( x+86, y+14, 5, range, qfalse, HUDColors[HUD_GREEN] );
+			CG_MFQ3HUD_Numbers( x+86, y+14, 5, range, qfalse, HUDColors[cg.MFDColor] );
 			strcpy( mode, "GND" );
 		} else if( availableVehicles[vehicle].radarRange || 
 				   availableVehicles[vehicle].radarRange2 ) {
 			strcpy( mode, "OFF" );
 		}
-		CG_DrawString_MFQ3( x+4, y+14, mode, HUDColors[HUD_GREEN], 0);
+		CG_DrawString_MFQ3( x+4, y+14, mode, HUDColors[cg.MFDColor], 0);
 		// draw flares
-		CG_MFQ3HUD_Numbers( x+86, y+114, 5, flares, qfalse, HUDColors[HUD_GREEN] );
+		if( flares >= 0 ) {
+			CG_MFQ3HUD_Numbers( x+86, y+114, 5, flares, qfalse, HUDColors[cg.MFDColor] );
+		}
 	} else if( mode == MFD_STATUS ) {
 		char	statusline[33];
-/*
-		if( mfdnum == MFD_1 ) {
-			x = 0;
-		} else {
-			x = 512;
+		int		fuel;
+		// fuel (for MFD)
+		fuel = ps->stats[STAT_FUEL];
+		if( (availableVehicles[vehicle].id&CAT_ANY) & CAT_PLANE ) {
+			fuel *= 100;
 		}
-		y = 352;
-*/
-		CG_DrawString_MFQ3( x+4, y+14, "STATUS:", HUDColors[HUD_GREEN], 0);
-		CG_DrawString_MFQ3( x+4, y+20, "-------", HUDColors[HUD_GREEN], 0);
+		CG_DrawString_MFQ3( x+4, y+14, "STATUS:", HUDColors[cg.MFDColor], 0);
+		CG_DrawString_MFQ3( x+4, y+20, "-------", HUDColors[cg.MFDColor], 0);
 		Com_sprintf( statusline, 32, "GEAR:      %s", (onoff & OO_GEAR ? "DOWN" : "UP") );
-		CG_DrawString_MFQ3( x+4, y+30, statusline, HUDColors[HUD_GREEN], 0);
+		CG_DrawString_MFQ3( x+4, y+30, statusline, HUDColors[cg.MFDColor], 0);
 		Com_sprintf( statusline, 32, "BRAKES:    %s", (onoff & OO_SPEEDBRAKE ? "ON" : "OFF") );
-		CG_DrawString_MFQ3( x+4, y+40, statusline, HUDColors[HUD_GREEN], 0);
+		CG_DrawString_MFQ3( x+4, y+40, statusline, HUDColors[cg.MFDColor], 0);
 		Com_sprintf( statusline, 32, "WPNBAYS:   O/S" );
-		CG_DrawString_MFQ3( x+4, y+50, statusline, HUDColors[HUD_GREEN], 0);
+		CG_DrawString_MFQ3( x+4, y+50, statusline, HUDColors[cg.MFDColor], 0);
 		Com_sprintf( statusline, 32, "AUTOPILOT: O/S" );
-		CG_DrawString_MFQ3( x+4, y+60, statusline, HUDColors[HUD_GREEN], 0);
+		CG_DrawString_MFQ3( x+4, y+60, statusline, HUDColors[cg.MFDColor], 0);
 		Com_sprintf( statusline, 32, "FUEL:" );
-		CG_DrawString_MFQ3( x+4, y+80, statusline, HUDColors[HUD_GREEN], 0);
-		CG_MFQ3HUD_Numbers( x+86, y+80, 5, fuel, qfalse, HUDColors[HUD_GREEN] );
+		CG_DrawString_MFQ3( x+4, y+80, statusline, HUDColors[cg.MFDColor], 0);
+		CG_MFQ3HUD_Numbers( x+86, y+80, 5, fuel, qfalse, HUDColors[cg.MFDColor] );
 	} else if( mode == MFD_INVENTORY ) {
 		char	invline[33];
 		int		i;
-/*	
-		if( mfdnum == MFD_1 ) {
-			x = 0;
-		} else {
-			x = 512;
-		}
-		y = 352;
-*/
-		CG_DrawString_MFQ3( x+4, y+14, "INVENTORY:", HUDColors[HUD_GREEN], 0);
-		CG_DrawString_MFQ3( x+4, y+20, "----------", HUDColors[HUD_GREEN], 0);
+		CG_DrawString_MFQ3( x+4, y+14, "INVENTORY:", HUDColors[cg.MFDColor], 0);
+		CG_DrawString_MFQ3( x+4, y+20, "----------", HUDColors[cg.MFDColor], 0);
 
 		y = 382;
 
 		for( i = 0; i < 8; i++ ) {
 			// if weapon available
-			if( ammo[i+8] ) {
+			if( ps->ammo[i+8] ) {
 				char* actualstring;
 				if( availableVehicles[vehicle].id&CAT_ANY & CAT_GROUND ) 
 					actualstring = availableWeapons[availableVehicles[vehicle].weapons[i]].shortName2;
 				else
 					actualstring = availableWeapons[availableVehicles[vehicle].weapons[i]].shortName;
-				CG_MFQ3HUD_Numbers( x+12, y, 3, ammo[i], qfalse, HUDColors[HUD_GREEN] );
+				CG_MFQ3HUD_Numbers( x+12, y, 3, ps->ammo[i], qfalse, HUDColors[cg.MFDColor] );
 				Com_sprintf( invline, 32, "%c    %s", (i == selweap ? '*' : ' '), actualstring );
-				CG_DrawString_MFQ3( x+4, y, invline, HUDColors[HUD_GREEN], 0);
+				CG_DrawString_MFQ3( x+4, y, invline, HUDColors[cg.MFDColor], 0);
 				y += 10;
 			}
 			if( i == 0 || i == 6 ) y+=4; 
@@ -845,12 +839,41 @@ static void CG_Draw_MFD(int mfdnum, int vehicle, int onoff, int fuel, int flares
 	} else if( mode == MFD_CAMERA ) {
 		CG_HUD_Camera(mfdnum, vehicle);
 		if( targetrange >= 0 ) {
-			CG_DrawString_MFQ3( x+6, y+16, "RANGE:", HUDColors[HUD_GREEN], 0);
-			CG_MFQ3HUD_Numbers( x+48, y+16, 6, targetrange, qfalse, HUDColors[HUD_GREEN] );
+			CG_DrawString_MFQ3( x+6, y+16, "RANGE:", HUDColors[cg.MFDColor], 0);
+			CG_MFQ3HUD_Numbers( x+48, y+16, 6, targetrange, qfalse, HUDColors[cg.MFDColor] );
 			CG_DrawHUDPic( x+48, y+48, 32, 32, cgs.media.HUDreticles[HR_GUIDED_ENEMY], HUDColors[HUD_RED] );
 		} else {
 			CG_DrawHUDPic( x+48, y+48, 32, 32, cgs.media.HUDreticles[HR_GUIDED_ENEMY], HUDColors[HUD_GREEN] );
 		}
+	} else if( mode == MFD_INFO ) {
+		int			value;
+		CG_DrawString_MFQ3( x+4, y+14, "FLIGHTDATA:", HUDColors[cg.MFDColor], 0);
+		CG_DrawString_MFQ3( x+4, y+20, "-----------", HUDColors[cg.MFDColor], 0);
+		CG_DrawString_MFQ3( x+4, y+30, "HEADING:", HUDColors[cg.MFDColor], 0);
+		CG_DrawString_MFQ3( x+4, y+40, "TGT HDG:", HUDColors[cg.MFDColor], 0);
+		CG_DrawString_MFQ3( x+4, y+54, "SPEED:", HUDColors[cg.MFDColor], 0);
+		CG_DrawString_MFQ3( x+4, y+64, "ALTITUDE:", HUDColors[cg.MFDColor], 0);
+		CG_DrawString_MFQ3( x+4, y+78, "POS X:", HUDColors[cg.MFDColor], 0);
+		CG_DrawString_MFQ3( x+4, y+88, "POS Y:", HUDColors[cg.MFDColor], 0);
+		CG_DrawString_MFQ3( x+4, y+102, "THROTTLE:", HUDColors[cg.MFDColor], 0);
+		CG_DrawString_MFQ3( x+4, y+112, "HEALTH:", HUDColors[cg.MFDColor], 0);
+		value = 360 - (int)ps->vehicleAngles[1];
+		if( value <= 0 ) value += 360;
+		CG_MFQ3HUD_Numbers( x+98, y+30, 3, value, qfalse, HUDColors[cg.MFDColor] );
+		if( targetheading >= 0 ) {
+			CG_MFQ3HUD_Numbers( x+98, y+40, 3, targetheading, qfalse, HUDColors[cg.MFDColor] );
+		} else {
+			CG_DrawString_MFQ3( x+98, y+40, "---", HUDColors[cg.MFDColor], 0);
+		}
+		value = ps->speed/10;
+		CG_MFQ3HUD_Numbers( x+90, y+54, 4, value, qfalse, HUDColors[cg.MFDColor] );
+		CG_MFQ3HUD_Numbers( x+82, y+64, 5, altitude, qfalse, HUDColors[cg.MFDColor] );
+		CG_MFQ3HUD_Numbers( x+74, y+78, 6, (int)ps->origin[0], qfalse, HUDColors[cg.MFDColor] );
+		CG_MFQ3HUD_Numbers( x+74, y+88, 6, (int)ps->origin[1], qfalse, HUDColors[cg.MFDColor] );
+		value = (100*ps->stats[STAT_HEALTH]/ps->stats[STAT_MAX_HEALTH]);
+		if( value > 100 ) value = 100;	
+		CG_MFQ3HUD_Numbers( x+98, y+102, 3, value, qfalse, HUDColors[cg.MFDColor] );
+		CG_MFQ3HUD_Numbers( x+98, y+112, 3, ps->throttle*10, qfalse, HUDColors[cg.MFDColor] );
 	}
 }
 
@@ -1136,7 +1159,7 @@ void CG_DrawStatusBar_MFQ3_new( void ) {
 	playerState_t	*ps;
 	int			value, value2;
 	int			vehicle = cgs.clientinfo[cg.predictedPlayerState.clientNum].vehicle;
-	int			targetheading, targetrange;
+	int			targetheading, targetrange, altitude;
 
 	static vec4_t colors[] = { 
 //		{ 0.2, 1.0, 0.2, 1.0 } , { 1.0, 0.2, 0.2, 1.0 }, {0.5, 0.5, 0.5, 1} };
@@ -1188,7 +1211,7 @@ void CG_DrawStatusBar_MFQ3_new( void ) {
 	}
 
 	// altitude
-	if( hud_altitude.integer ) {
+	if( hud_altitude.integer || cg.Mode_MFD[MFD_1] == MFD_INFO || cg.Mode_MFD[MFD_2] == MFD_INFO ) {
 		trace_t	tr;
 		vec3_t	start, end;
 		VectorCopy( ps->origin, start );
@@ -1196,31 +1219,18 @@ void CG_DrawStatusBar_MFQ3_new( void ) {
 		VectorCopy( start, end );
 		end[2] -= 20000;
 		CG_Trace( &tr, start, vec3_origin, vec3_origin, end, cg.snap->ps.clientNum, MASK_SOLID|MASK_WATER );
-		value = (int)(tr.fraction * 20000);
-		CG_Draw_AltTape(value);
-	}
-
-	// flares (for MFD)
-	if( ps->ammo[WP_FLARE+8] > 0 ) {
-		value = ps->ammo[WP_FLARE];
-	} else {
-		value = -1;
-	}
-
-	// fuel (for MFD)
-	value2 = ps->stats[STAT_FUEL];
-	if( (availableVehicles[vehicle].id&CAT_ANY) & CAT_PLANE ) {
-		value2 *= 100;
+		altitude = (int)(tr.fraction * 20000);
+		CG_Draw_AltTape(altitude);
 	}
 
 	// mfd 1
 	if( hud_mfd.integer ) {
-		CG_Draw_MFD(MFD_1, vehicle, cent->currentState.ONOFF, value2, value, ps->ammo, cent->currentState.weaponNum, targetrange);
+		CG_Draw_MFD(MFD_1, vehicle, cent, targetrange, targetheading, altitude, ps);
 	}
 
 	// mfd 2
 	if( hud_mfd2.integer ) {
-		CG_Draw_MFD(MFD_2, vehicle, cent->currentState.ONOFF, value2, value, ps->ammo, cent->currentState.weaponNum, targetrange);
+		CG_Draw_MFD(MFD_2, vehicle, cent, targetrange, targetheading, altitude, ps);
 	}
 
 	// solid middle section

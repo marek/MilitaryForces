@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.15 2002-01-27 15:41:28 thebjoern Exp $
+ * $Id: cg_main.c,v 1.16 2002-01-29 13:03:36 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -163,6 +163,7 @@ vmCvar_t	hud_throttle;
 vmCvar_t	hud_weapons;
 
 vmCvar_t	hud_color;
+vmCvar_t	mfd_color;
 
 
 typedef struct {
@@ -260,6 +261,7 @@ cvarTable_t		cvarTable[] = {
 	{ &hud_weapons, "hud_weapons", "1", CVAR_ARCHIVE },
 
 	{ &hud_color, "hud_color", "0", CVAR_ARCHIVE },
+	{ &mfd_color, "mfd_color", "0", CVAR_ARCHIVE },
 
 	{ &pmove_fixed, "pmove_fixed", "1", CVAR_ROM},
 	{ &pmove_msec, "pmove_msec", "8", 0},
@@ -1841,6 +1843,14 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 		cg.HUDColor = 0;
 		trap_Cvar_Set( "hud_color", va("%d", cg.HUDColor) );
 	}
+
+	// MFQ3: MFD color
+	cg.MFDColor = hud_color.integer;
+	if( cg.MFDColor >= HUD_MAX || cg.MFDColor < 0 ) {
+		cg.MFDColor = 0;
+		trap_Cvar_Set( "mfd_color", va("%d", cg.MFDColor) );
+	}
+
 
 	CG_ParseServerinfo();
 

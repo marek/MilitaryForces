@@ -1,5 +1,5 @@
 /*
- * $Id: cg_consolecmds.c,v 1.8 2002-01-28 22:34:30 thebjoern Exp $
+ * $Id: cg_consolecmds.c,v 1.9 2002-01-29 13:03:36 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -126,6 +126,21 @@ static void CG_Cycle_HUD_Color_f( void ) {
 
 	cg.HUDColorTime = cg.time + 100;
 }
+
+static void CG_Cycle_MFD_Color_f( void ) {
+	if( cg.time < cg.MFDColorTime ) {
+		return;
+	}
+	cg.MFDColor = mfd_color.integer;
+	cg.MFDColor++;
+	if( cg.MFDColor >= HUD_MAX || cg.MFDColor < 0 ) {
+		cg.MFDColor = 0;
+	}
+	trap_Cvar_Set( "mfd_color", va("%d", cg.MFDColor) );
+
+	cg.MFDColorTime = cg.time + 100;
+}
+
 /*
 ==================
 MFQ3 INFO
@@ -354,6 +369,7 @@ static consoleCommand_t	commands[] = {
 	{ "mfd1_page", CG_Set_MFD1_Page_f },
 	{ "mfd2_page", CG_Set_MFD2_Page_f },
 	{ "cycle_hud_color", CG_Cycle_HUD_Color_f },
+	{ "cycle_mfd_color", CG_Cycle_MFD_Color_f },
 };
 
 
