@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawtools.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: cg_drawtools.c,v 1.2 2002-01-31 10:09:40 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -743,3 +743,106 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 	UI_DrawProportionalString2( x, y, str, color, sizeScale, cgs.media.charsetProp );
 }
 
+/*
+===============
+CG_GenericShadow
+===============
+*/
+qboolean CG_GenericShadow( centity_t *cent, float *shadowPlane )
+{
+	vec3_t		start, end, mins = {-15, -15, 0}, maxs = {15, 15, 2};
+	trace_t		trace;
+	float		alpha;
+	float		xRad, yRad;
+	float		xAlter, yAlter;
+	clientInfo_t * ci = NULL;
+	int			shaderIndex = -1;
+	qhandle_t	shaderHandle = -1;
+
+	*shadowPlane = 0;
+
+	// don't do anything if shadows disabled
+	if ( cg_shadows.integer == 0 )
+	{
+		return qfalse;
+	}
+
+	// send a trace down from the player to the ground
+	VectorCopy( cent->lerpOrigin, start );
+	VectorCopy( cent->lerpOrigin, end );
+	start[2] += 64;	// move start-point's Z upwards a little
+	end[2] -= 256;	// move end-point's Z downwards somewhat
+	trap_CM_BoxTrace( &trace, start, end, mins, maxs, 0, MASK_PLAYERSOLID );
+
+	// no shadow if too high from the ground
+	if ( trace.fraction == 1.0 )
+	{
+		return qfalse;
+	}
+
+	// set the shadow plane value
+	*shadowPlane = trace.endpos[2] + 1;
+
+	// no mark for stencil or projection shadows
+	if ( cg_shadows.integer != 1 )
+	{
+		return qtrue;
+	}
+
+	// fade the shadow out with height
+	alpha = 1.0f - trace.fraction;
+	MF_LimitFloat( &alpha, 0.0f, 1.0f );
+
+	// get client information
+	ci = &cgs.clientinfo[ cent->currentState.clientNum ];
+
+	// no shadow shader specfied?
+	if( availableVehicles[ ci->vehicle ].shadowShader == SHADOW_NONE )
+	{
+		return qtrue;
+	}
+	
+	// assign the x/y radius values based on the vehicle bounding box
+	// NOTE: we might need to setup dedicated values in availableVehicles[] for this later
+	xRad = availableVehicles[ ci->vehicle ].maxs[ 0 ];
+	yRad = availableVehicles[ ci->vehicle ].maxs[ 1 ];
+
+	// PLANES ONLY: alter the radius values based upon the vehicles pitch & roll
+	if( (availableVehicles[ ci->vehicle ].id & CAT_ANY) & CAT_PLANE )
+	{
+		xAlter = fabs( cent->lerpAngles[0] / 30.0f );
+		yAlter = fabs( cent->lerpAngles[2] / 90.0f );
+		MF_LimitFloat( &xAlter, 0.0f, 1.0f );
+		MF_LimitFloat( &yAlter, 0.0f, 1.0f );
+		xRad *= 1.0f - ( 0.9f * xAlter );
+		yRad *= 1.0f - ( 0.5f * yAlter );
+	}
+
+	// get the shader index
+
+	// custom shader specfied?
+	if( availableVehicles[ ci->vehicle ].shadowShader != SHADOW_DEFAULT )
+	{
+		// use the handle of the custom shader
+		shaderHandle = availableVehicles[ ci->vehicle ].shadowShader;
+	}
+	else
+	{
+		// use the generic shadow for the vehicle catagory
+		shaderIndex = MF_ExtractEnumFromId( ci->vehicle, CAT_ANY ) - 1;
+		if( shaderIndex >= 0 && shaderIndex < MF_MAX_CATEGORIES )
+		{
+			shaderHandle = cgs.media.shadowMarkShader[ shaderIndex ];
+		}
+	}
+	
+	// add the mark as a temporary, so it goes directly to the renderer
+	// without taking a spot in the cg_marks array
+	if( shaderHandle >= 0 )
+	{
+		CG_ImpactMarkEx( shaderHandle, trace.endpos, trace.plane.normal, 
+						 (cent->currentState.angles[1]-180), alpha, alpha, alpha, 1, qfalse, xRad, yRad, qtrue );
+	}
+
+	return qtrue;
+}

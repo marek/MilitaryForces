@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.35 2002-01-31 02:34:33 thebjoern Exp $
+ * $Id: bg_public.h,v 1.36 2002-01-31 10:12:05 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -557,6 +557,7 @@ qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTim
 // strings for categories and classes
 extern const char *gameset_items[MF_MAX_GAMESETS+1];
 extern const char *team_items[MF_MAX_GAMESETS][MF_MAX_TEAMS+1];
+extern const char *cat_fileRef[MF_MAX_CATEGORIES+1];
 extern const char *cat_items[MF_MAX_CATEGORIES+1];
 extern const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1];
 
@@ -593,12 +594,17 @@ extern const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1];
 // total max parts (no cat may exceed this!)
 #define BP_MAX_PARTS			11
 
+// fallback modes if no custom shader can be found for a vehicle
+#define	SHADOW_DEFAULT	-1
+#define	SHADOW_NONE		-2
+
 // list of vehicles (data)
 typedef struct completeVehicleData_s
 {
     char		    *descriptiveName;	// long descriptive name
 	char			*tinyName;			// small ident name
-    char		    *modelName;		// just the directory of the model
+    char		    *modelName;			// just the directory of the model
+	qhandle_t		shadowShader;	// the shadow shader (use SHADOW_DEFAULT to use the default shader or SHADOW_NONE for no shadow)
     unsigned long   id;				// gameset, team, cat and class
 	unsigned int	flags;			// special flags
 	unsigned int	caps;			// capabilities
@@ -722,6 +728,9 @@ int MF_getIndexOfVehicleEx( int start, int vehicleCat, int vehicleClass, unsigne
 int MF_getItemIndexFromHex(int hexValue);
 int MF_getNumberOfItems(const char **itemlist);
 char * MF_CreateModelPathname( int vehicle, char * pFormatString );
+void MF_LimitFloat( float * value, float min, float max );
+void MF_LimitInt( int * value, int min, int max );
+int MF_ExtractEnumFromId( int vehicle, unsigned int op );
 
 #define MF_THROTTLE_IDLE		0
 #define MF_THROTTLE_MILITARY	10

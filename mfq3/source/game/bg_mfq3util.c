@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.6 2002-01-29 12:10:54 sparky909_uk Exp $
+ * $Id: bg_mfq3util.c,v 1.7 2002-01-31 10:12:05 sparky909_uk Exp $
 */
 
 #include "q_shared.h"
@@ -213,4 +213,52 @@ char * MF_CreateModelPathname( int vehicle, char * pFormatString )
 	return pReturnString;
 }
 
+/*
+=================
+MF_LimitFloat
+=================
+*/
 
+// generic float limiting
+void MF_LimitFloat( float * value, float min, float max )
+{
+	// min & max
+	if( *value < min ) *value = min;
+	if( *value > max ) *value = max;
+}
+
+// generic int limiting
+void MF_LimitInt( int * value, int min, int max )
+{
+	// min & max
+	if( *value < min ) *value = min;
+	if( *value > max ) *value = max;
+}
+
+/*
+=================
+MF_ExtractEnumFromId
+
+Get the catagory/class enum from the vehicle index (use CAT_ANY & CLASS_ANY to decide operation done)
+=================
+*/
+
+int MF_ExtractEnumFromId( int vehicle, unsigned int op )
+{
+	int daEnum = -1;
+
+	// which op?
+	if( op & CAT_ANY )
+	{
+		// catagory
+		daEnum = availableVehicles[ vehicle ].id & CAT_ANY;
+		daEnum >>= 8;
+	}
+	else if( op & CLASS_ANY )
+	{
+		// class
+		daEnum = availableVehicles[ vehicle ].id & CLASS_ANY;
+	}
+
+	return daEnum;
+}

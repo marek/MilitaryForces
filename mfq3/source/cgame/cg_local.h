@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.20 2002-01-31 02:34:33 thebjoern Exp $
+ * $Id: cg_local.h,v 1.21 2002-01-31 10:09:40 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -603,7 +603,7 @@ typedef struct {
 
 	qhandle_t	numberShaders[11];
 
-	qhandle_t	shadowMarkShader;
+	qhandle_t	shadowMarkShader[MF_MAX_CATEGORIES];
 
 	// wall mark shaders
 	qhandle_t	bulletMarkShader;
@@ -1038,6 +1038,7 @@ void CG_DrawRect( float x, float y, float width, float height, float size, const
 void CG_DrawSides(float x, float y, float w, float h, float size);
 void CG_DrawTopBottom(float x, float y, float w, float h, float size);
 
+qboolean CG_GenericShadow( centity_t *cent, float *shadowPlane );
 
 //
 // cg_draw.c, cg_newDraw.c
@@ -1174,12 +1175,17 @@ void CG_Bullet( vec3_t origin, int sourceEntityNum, vec3_t normal, int fleshEnti
 //
 void	CG_InitMarkPolys( void );
 void	CG_AddMarks( void );
+
 void	CG_ImpactMark( qhandle_t markShader, 
 				    const vec3_t origin, const vec3_t dir, 
 					float orientation, 
 				    float r, float g, float b, float a, 
 					qboolean alphaFade, 
 					float radius, qboolean temporary );
+
+void	CG_ImpactMarkEx( qhandle_t markShader, const vec3_t origin, const vec3_t dir, 
+						 float orientation, float red, float green, float blue, float alpha,
+						 qboolean alphaFade, float xRadius, float yRadius, qboolean temporary );
 
 //
 // cg_localents.c

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.17 2002-01-31 02:34:33 thebjoern Exp $
+ * $Id: cg_main.c,v 1.18 2002-01-31 10:09:40 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -886,14 +886,19 @@ static void CG_RegisterGraphics( void ) {
 	// wall marks
 	cgs.media.bulletMarkShader = trap_R_RegisterShader( "gfx/damage/bullet_mrk" );
 	cgs.media.burnMarkShader = trap_R_RegisterShader( "gfx/damage/burn_med_mrk" );
-	cgs.media.shadowMarkShader = trap_R_RegisterShader( "markShadow" );
+
+	// default shadows (one per class of vehicle - remember that vehicles can specify their own shadows if perferred)
+	for( i = 0; i < MF_MAX_CATEGORIES; i ++ )
+	{
+		cgs.media.shadowMarkShader[i] = trap_R_RegisterShader( va( "%sshadow", cat_fileRef[i] ) );
+	}
 
 	// register the inline models
 	cgs.numInlineModels = trap_CM_NumInlineModels();
 	for ( i = 1 ; i < cgs.numInlineModels ; i++ ) {
-		char	name[10];
-		vec3_t			mins, maxs;
-		int				j;
+		char name[10];
+		vec3_t mins, maxs;
+		int	j;
 
 		Com_sprintf( name, sizeof(name), "*%i", i );
 		cgs.inlineDrawModel[i] = trap_R_RegisterModel( name );

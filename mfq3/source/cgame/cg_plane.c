@@ -1,10 +1,11 @@
 /*
- * $Id: cg_plane.c,v 1.13 2002-01-30 19:26:02 thebjoern Exp $
+ * $Id: cg_plane.c,v 1.14 2002-01-31 10:09:40 sparky909_uk Exp $
 */
 
 
 #include "cg_local.h"
 
+// make sure the tags are named properly!
 char *plane_tags[BP_PLANE_MAX_PARTS] =
 {
 	"<no tag>",		// plane body
@@ -20,60 +21,6 @@ char *plane_tags[BP_PLANE_MAX_PARTS] =
 	"tag_prop2"		// prop
 };
 
-
-/*
-===============
-CG_PlaneShadow
-
-Returns the Z component of the surface being shadowed
-
-  should it return a full plane instead of a Z?
-===============
-*/
-static qboolean CG_PlaneShadow( centity_t *cent, float *shadowPlane ) {
-	vec3_t		end, mins = {-15, -15, 0}, maxs = {15, 15, 2};
-	trace_t		trace;
-	float		alpha;
-
-return qfalse;
-
-	*shadowPlane = 0;
-
-	if ( cg_shadows.integer == 0 ) {
-		return qfalse;
-	}
-
-	// send a trace down from the player to the ground
-	VectorCopy( cent->lerpOrigin, end );
-	end[2] -= 256;
-
-	trap_CM_BoxTrace( &trace, cent->lerpOrigin, end, mins, maxs, 0, MASK_PLAYERSOLID );
-
-	// no shadow if too high
-	if ( trace.fraction == 1.0 ) {
-		return qfalse;
-	}
-
-	*shadowPlane = trace.endpos[2] + 1;
-
-	if ( cg_shadows.integer != 1 ) {	// no mark for stencil or projection shadows
-		return qtrue;
-	}
-
-	// fade the shadow out with height
-	alpha = 1.0 - trace.fraction;
-
-	// add the mark as a temporary, so it goes directly to the renderer
-	// without taking a spot in the cg_marks array
-	CG_ImpactMark( cgs.media.shadowMarkShader, trace.endpos, trace.plane.normal, 
-		(cent->currentState.angles[1]-180), alpha,alpha,alpha,1, qfalse, 24, qtrue ); // for a correct shadow use: cent->currentState.angles[1]-180
-
-	return qtrue;
-}
-
-
-
-
 /*
 ==========================
 CG_RegisterPlane
@@ -83,20 +30,22 @@ void CG_RegisterPlane( clientInfo_t *ci )
 {
 	int i;
 
-	for( i = 0; i < BP_PLANE_MAX_PARTS; i++ ) {
+	for( i = 0; i < BP_PLANE_MAX_PARTS; i++ ) 
+	{
 		ci->parts[i] = availableVehicles[ci->vehicle].handle[i];
-//		if( !ci->parts[i] ) {
-//			CG_Printf( "Informational: RegisterPlane failed register part %d of vehicle %d (id %x)\n", i, 
-//				ci->vehicle, availableVehicles[ci->vehicle].id );
-//		}
+/*
+		if( !ci->parts[i] )
+		{
+			CG_Printf( "Informational: RegisterPlane failed register part %d of vehicle %d (id %x)\n", i, 
+				ci->vehicle, availableVehicles[ci->vehicle].id );
+		}
+*/
 	}
 }
-
 
 /*
 =============
 CG_PlanePilot
-
 =============
 */
 void CG_PlanePilot( centity_t *cent, const refEntity_t *parent, qhandle_t parentModel, int idx ) {
@@ -130,7 +79,8 @@ void CG_PlanePilot( centity_t *cent, const refEntity_t *parent, qhandle_t parent
 CG_PlaneMuzzleFlash
 
 =============
-*//*
+*/
+/*
 static void CG_PlaneMuzzleFlash( centity_t *cent, const refEntity_t *parent, qhandle_t parentModel, int idx ) {
 
 	refEntity_t		flash[MAX_MUZZLEFLASHES];
@@ -168,7 +118,8 @@ static void CG_PlaneMuzzleFlash( centity_t *cent, const refEntity_t *parent, qha
 		CG_PositionRotatedEntityOnTag( &flash[i], parent, parentModel, tag);
 		trap_R_AddRefEntityToScene( &flash[i] );
 	}
-}*/
+}
+*/
 
 /*
 ===============
@@ -185,6 +136,7 @@ static void CG_PlaneFlags( centity_t *cent ) {
 	}
 
 	ci = &cgs.clientinfo[ cent->currentState.clientNum ];
+
 	// redflag
 	if ( powerups & OB_REDFLAG ) {
 		CG_TrailItem( cent, cgs.media.redFlagModel );
@@ -196,7 +148,6 @@ static void CG_PlaneFlags( centity_t *cent ) {
 		CG_TrailItem( cent, cgs.media.blueFlagModel );
 //		trap_R_AddLightToScene( cent->lerpOrigin, 200 + (rand()&31), 0.2f, 0.2f, 1.0 );
 	}
-
 }
 
 /*
@@ -232,10 +183,12 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 	memset( &reticle, 0, sizeof(reticle) );	
 
     // make sure cockpit view wont show vehicle
-//    if( cent == &cg.predictedPlayerEntity && !cg.renderingThirdPerson ) {
-//		renderfx |= RF_THIRD_PERSON;
-//	}
-
+/*
+    if( cent == &cg.predictedPlayerEntity && !cg.renderingThirdPerson )
+	{
+		renderfx |= RF_THIRD_PERSON;
+	}
+*/
     // get the rotation information
     VectorCopy( cent->currentState.angles, cent->lerpAngles );
     AnglesToAxis( cent->lerpAngles, part[BP_PLANE_BODY].axis );
@@ -244,7 +197,7 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
     CG_PlayerSprites( cent );
     
     // add the shadow
-    shadow = CG_PlaneShadow( cent, &shadowPlane );
+    shadow = CG_GenericShadow( cent, &shadowPlane );
 
     if ( cg_shadows.integer == 3 && shadow ) {
     	renderfx |= RF_SHADOW_PLANE;
@@ -254,9 +207,11 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 	//
 	// animations
 	//
-		// control surfaces
+	
+	// control surfaces
 	part[BP_PLANE_CONTROLS].frame = cent->currentState.vehicleAnim;
-		// gear
+	
+	// gear
 	if( availableVehicles[ci->vehicle].caps & HC_GEAR ) {
 		int timediff = cg.time - cent->gearAnimStartTime;
 		if( ONOFF & OO_GEAR ) {
@@ -280,7 +235,8 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 		}
 		part[BP_PLANE_GEAR].frame = cent->gearAnimFrame;
 	}
-		// speedbrakes
+	
+	// speedbrakes
 	if( availableVehicles[ci->vehicle].caps & HC_SPEEDBRAKE ) {
 		if( ONOFF & OO_SPEEDBRAKE ) {
 			part[BP_PLANE_BRAKES].frame = 1;
@@ -289,7 +245,8 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 			part[BP_PLANE_BRAKES].frame = 0;
 		}
 	}
-		// swing wings
+	
+	// swing wings
 	if( availableVehicles[ci->vehicle].caps & HC_SWINGWING ) {
 		if( ps->stats[STAT_HEALTH] > 0 ) {
 			float speed = ps->speed/10;
@@ -363,6 +320,7 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 		trap_R_AddRefEntityToScene( &part[i] );
 	}
 	CG_PlanePilot( cent, &part[BP_PLANE_BODY], ci->parts[BP_PLANE_BODY], ci->vehicle );
+	
 	// vapor
 	if( ONOFF & (OO_VAPOR|OO_VAPOR_BIG) ) {
 		vapor.hModel = (availableVehicles[ci->vehicle].renderFlags & MFR_BIGVAPOR) ?
@@ -377,6 +335,7 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 		trap_R_AddRefEntityToScene( &vapor );
 //		CG_Printf( "Vapor frame %d\n", vapor.frame );
 	}
+	
 	// throttle/afterburner
 	if( cent->currentState.frame > 10 ) {
 		burner.hModel = cgs.media.afterburner[availableVehicles[ci->vehicle].effectModel];
@@ -514,6 +473,7 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 			trap_S_AddLoopingSound( cent->currentState.number, cent->lerpOrigin, velocity, cgs.media.engineJet );
 		}
 	}
+	
 	// smoke
 	if( cent->currentState.generic1 && cg_smoke.integer ) {
 		localEntity_t	*smoke;
@@ -568,6 +528,8 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 /*
 =============
 CG_PlaneObituary
+
+General ugly function, needs to be made prettier some day...
 =============
 */
 void CG_PlaneObituary( entityState_t *ent, clientInfo_t *ci ) 
@@ -696,46 +658,48 @@ void CG_PlaneObituary( entityState_t *ent, clientInfo_t *ci )
 	    }
     }
 
-    if ( attacker != ENTITYNUM_WORLD ) {
-	switch (mod) {
-	case MOD_FFAR:
-		message = "couldn't evade";
-		message2 = "'s rocket attack";
-		break;
-	case MOD_FFAR_SPLASH:
-		message = "was shredded by";
-		message2 = "'s rocket shrapnel";
-		break;
-	case MOD_IRONBOMB:
-	case MOD_IRONBOMB_SPLASH:
-		message = "was bombed to smithereens by";
-		message2 = "'s iron bombs";
-		break;
-	case MOD_AUTOCANNON:
-		message = "was blown out of the sky by";
-		message2 = "'s bullets";
-		break;
-	case MOD_MAINGUN:
-		message = "was shelled by";
-		break;
-	case MOD_VEHICLEEXPLOSION:
-		message = "died in";
-		message2 = "'s explosion";
-		break;
-	case MOD_TELEFRAG:
-		message = "tried to invade";
-		message2 = "'s personal space";
-		break;
-	default:
-		message = "was killed by";
-		break;
-	}
+    if( attacker != ENTITYNUM_WORLD )
+	{
+		switch (mod)
+		{
+		case MOD_FFAR:
+			message = "couldn't evade";
+			message2 = "'s rocket attack";
+			break;
+		case MOD_FFAR_SPLASH:
+			message = "was shredded by";
+			message2 = "'s rocket shrapnel";
+			break;
+		case MOD_IRONBOMB:
+		case MOD_IRONBOMB_SPLASH:
+			message = "was bombed to smithereens by";
+			message2 = "'s iron bombs";
+			break;
+		case MOD_AUTOCANNON:
+			message = "was blown out of the sky by";
+			message2 = "'s bullets";
+			break;
+		case MOD_MAINGUN:
+			message = "was shelled by";
+			break;
+		case MOD_VEHICLEEXPLOSION:
+			message = "died in";
+			message2 = "'s explosion";
+			break;
+		case MOD_TELEFRAG:
+			message = "tried to invade";
+			message2 = "'s personal space";
+			break;
+		default:
+			message = "was killed by";
+			break;
+		}
 
-	if (message) {
-		CG_Printf( "%s %s %s%s\n", 
-			targetName, message, attackerName, message2);
-		return;
-	}
+		if (message)
+		{
+			CG_Printf( "%s %s %s%s\n", targetName, message, attackerName, message2);
+			return;
+		}
     }
 
     // we don't know what it was
