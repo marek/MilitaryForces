@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.46 2002-02-27 14:20:38 sparky909_uk Exp $
+ * $Id: cg_local.h,v 1.47 2002-06-08 17:05:08 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -705,7 +705,6 @@ typedef struct {
 
 	// MFQ3 NEW HUD
 	qhandle_t	HUDheading;
-	qhandle_t	HUDnumbers[14];
 	qhandle_t	HUDvaluebox;
 	qhandle_t	HUDind_h;
 	qhandle_t	HUDind_v;
@@ -729,6 +728,7 @@ typedef struct {
 	qhandle_t	HUDhealthtext;
 	qhandle_t	HUDthrottletext;
 	qhandle_t	HUDalphabet;
+	qhandle_t	HUDnumberline;
 	qhandle_t	HUDreticles[HR_MAX];
 	
 	// weapon effect models
