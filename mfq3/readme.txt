@@ -7,6 +7,20 @@ History:
 
 
 
++++v0.76+++
+-----------
+- make flares work, they now drop from planes and are launched up from GVs
+  NOTE: most effective when your throttle is low and they are closer to missile 
+  than your vehicle
+- make ground installations spawn ingame
+- make ground installations appear on radar and lockable
+- make ground installations detect, track and launch at targets
+- ground installations can reload their missiles (slowly) after using them all up
+- fix vehicle info on crosshair, and add groundinstallations 
+- dont spawn mission vehicles in the mission editor
+- do initial experiments with cg_advanced
+- minor changes
+
 +++v0.75+++ 
 -----------
 - vehicles from mission scripts spawned ingame, but not yet checking for gameset or
