@@ -1,5 +1,5 @@
 /*
- * $Id: cg_draw.c,v 1.7 2002-01-22 16:15:58 thebjoern Exp $
+ * $Id: cg_draw.c,v 1.8 2002-01-22 22:29:30 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -328,6 +328,40 @@ static void CG_MFQ3HUD_Numbers (int x, int y, int width, int value) {
 		l--;
 	}
 }
+
+
+/*
+==============
+CG_MFQ3HUD_DecNumbers
+
+prints a number with a '.' in it; ie divides this number by 10^decimals
+
+width = total width
+==============
+*/
+static void CG_MFQ3HUD_DecNumbers (int x, int y, int width, int decimals, int invalue) {
+	int		div = 10;
+	int		pre, post;
+	int		prewid, 
+			postwid = decimals;
+
+	while( --decimals ) div *= 10;
+
+	pre = invalue/div;
+	post = invalue%div;
+
+	prewid = width-decimals-1;
+
+	CG_MFQ3HUD_Numbers( x, y, prewid, pre );
+	x += (HUDNUM_WIDTH-1)*prewid;
+
+	CG_DrawPic( x+2,y+2, HUDNUM_WIDTH, HUDNUM_HEIGHT, cgs.media.HUDnumbers[STAT_POINT] );
+	x += HUDNUM_WIDTH-1;
+
+	CG_MFQ3HUD_Numbers( x, y, postwid, post );
+}
+
+
 
 
 /*
@@ -764,11 +798,11 @@ static void CG_Draw_MFD(int mfdnum) {
 
 		// draw mfd screen
 	if( mfdnum == MFD_1 ) {
-		x = 1;
+		x = 0;
 	} else {
-		x = 511;		
+		x = 512;		
 	}
-	y = 351;
+	y = 352;
 	width = height = 128;
 	CG_AdjustFrom640( &x, &y, &width, &height );
 	trap_R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, cgs.media.HUDmfd );
@@ -782,6 +816,82 @@ static void CG_Draw_MFD(int mfdnum) {
 	} 
 }
 
+
+/*
+================
+CG_Draw_AltTape
+
+================
+*/
+static void CG_Draw_AltTape( int value ) {
+	int			scale = 500;
+	int			value2, visible1, visible2, visible3, visible4, visible5;
+	float		offset;
+	float		x, y, width, height;
+	float		scaledmaxoff = 0.125f/scale;
+	qboolean	top, bottom;
+
+		// find offset on alt tape
+	value2 = value - scale * 2;
+	value2 = value2%scale;
+	if( value2 < 0 ) value2 += scale;
+	offset = 0.125f - scaledmaxoff*value2;
+		// draw alt tape
+	x = 584;
+	y = 46;
+	width = 16;
+	height = 256;
+	CG_AdjustFrom640( &x, &y, &width, &height );
+	trap_R_DrawStretchPic( x, y, width, height, 0, 0.125f+offset, 1, 0.625f+offset, cgs.media.HUDalt );
+		// speed indicater
+	x = 578;
+	y = 171;
+	width = height = 8;
+	CG_AdjustFrom640( &x, &y, &width, &height );
+	trap_R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, cgs.media.HUDind_v_r );
+		// draw alt value box
+	x = 586;
+	y = 28;
+	width = 32;
+	height = 16;
+	CG_AdjustFrom640( &x, &y, &width, &height );
+	trap_R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, cgs.media.HUDvaluebox );
+		// draw alt
+	CG_MFQ3HUD_Numbers( 586, 32, 4, value );
+		// find visible alt numbers
+	visible3 = (int)((value+(scale/2))/scale);
+	visible3 *= scale;
+	visible2 = visible3 - scale;
+	visible1 = visible2 - scale;
+	visible4 = visible3 + scale;
+	visible5 = visible4 + scale;
+	value2 = value - visible3;
+	if( value2 < 0 && value2 >= -scale/2 ) {
+		top = qfalse;
+		bottom = qtrue;
+	} else if( value2 > 0 && value2 <= scale/2 ) {
+		top = qtrue;
+		bottom = qfalse;
+	} else {
+		top = bottom = qfalse;
+	}
+		// draw visible alt numbers
+	CG_MFQ3HUD_DecNumbers( 588, 171+(value2*64/scale), 4, 1, visible3/100 );
+	if( visible2 >= 0 ) {
+		value2 = value - visible2;
+		CG_MFQ3HUD_DecNumbers( 588, 171+(value2*64/scale), 4, 1, visible2/100 );
+		if( bottom && visible1 >= 0 ) {
+			value2 = value - visible1;
+			CG_MFQ3HUD_DecNumbers( 588, 171+(value2*64/scale), 4, 1, visible1/100 );
+		}
+	}
+	value2 = value - visible4;
+	CG_MFQ3HUD_DecNumbers( 588, 171+(value2*64/scale), 4, 1, visible4/100 );
+	if( top ) {
+		value2 = value - visible5;
+		CG_MFQ3HUD_DecNumbers( 588, 171+(value2*64/scale), 4, 1, visible5/100 );
+	}
+}
 
 /*
 ================
@@ -802,7 +912,7 @@ static void CG_Draw_SpeedTape( int value, int stallspeed, int gearspeed, int sca
 	if( value2 < 0 ) value2 += scale;
 	offset = 0.125f - scaledmaxoff*value2;
 		// draw speed tape
-	x = 40;
+	x = 41;
 	y = 46;
 	width = 16;
 	height = 256;
@@ -1015,6 +1125,19 @@ static void CG_DrawStatusBar_MFQ3_new( void ) {
 		else value = 50;
 		CG_Draw_SpeedTape( ps->speed/10, availableVehicles[vehicle].stallspeed,
 				availableVehicles[vehicle].stallspeed * SPEED_GREEN_ARC, value );
+	}
+
+	// altitude
+	if( hud_altitude.integer ) {
+		trace_t	tr;
+		vec3_t	start, end;
+		VectorCopy( ps->origin, start );
+		start[2] += availableVehicles[vehicle].mins[2];
+		VectorCopy( start, end );
+		end[2] -= 20000;
+		CG_Trace( &tr, start, vec3_origin, vec3_origin, end, cg.snap->ps.clientNum, MASK_SOLID|MASK_WATER );
+		value = (int)(tr.fraction * 20000);
+		CG_Draw_AltTape(value);
 	}
 
 	// mfd 1
