@@ -1,5 +1,5 @@
 /*
- * $Id: bg_loadouts.c,v 1.2 2002-02-27 09:42:10 thebjoern Exp $
+ * $Id: bg_loadouts.c,v 1.3 2002-02-27 09:51:12 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -62,6 +62,10 @@ qboolean MF_distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout )
 
 	num = MF_getTagsContaining(modelname, "tag_mt", tags, MAX_MOUNTS_PER_VEHICLE );
 	if( !num ) return qfalse;
+
+	for( i = 0; i < num; ++i ) {
+		memcpy( &loadout->mounts[i].tag, &tags[i], sizeof(md3Tag_t) );
+	}
 
 #ifdef _DEBUG
 	Com_Printf( "%s has %d mounts\n", modelname, num );
