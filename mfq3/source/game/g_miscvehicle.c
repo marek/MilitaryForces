@@ -1,5 +1,5 @@
 /*
- * $Id: g_miscvehicle.c,v 1.12 2003-02-24 01:24:10 thebjoern Exp $
+ * $Id: g_miscvehicle.c,v 1.13 2003-08-06 18:10:21 thebjoern Exp $
 */
 
 
@@ -317,8 +317,8 @@ void SP_misc_vehicle( gentity_t *sp_ent )
 {
 	char modelname[128];
 	int i;
-	unsigned long gameset = G_GetGameset();
-	qboolean found = qfalse;
+//	unsigned long gameset = G_GetGameset();
+//	qboolean found = qfalse;
 	unsigned long cat;
 	gentity_t* ent = G_Spawn();
 
@@ -444,8 +444,8 @@ void SP_misc_groundinstallation( gentity_t *sp_ent )
 {
 	char modelname[128];
 	int i;
-	unsigned long gameset = G_GetGameset();
-	qboolean found = qfalse;
+//	unsigned long gameset = G_GetGameset();
+//	qboolean found = qfalse;
 	gentity_t* ent = G_Spawn();
 
 	ent->model = sp_ent->model;

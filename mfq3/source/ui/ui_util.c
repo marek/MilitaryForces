@@ -1,5 +1,5 @@
 /*
- * $Id: ui_util.c,v 1.6 2002-02-25 15:22:58 sparky909_uk Exp $
+ * $Id: ui_util.c,v 1.7 2003-08-06 18:10:21 thebjoern Exp $
 */
 //
 // origin: rad
@@ -55,8 +55,8 @@ unsigned long MF_UI_GetGameset( qboolean asEnum )
 {
 	char * pGameSet = NULL;
 	char info[MAX_INFO_STRING];
-	char * pInfo = NULL;
-	unsigned long returnValue = MF_GAMESET_MODERN;
+//	char * pInfo = NULL;
+//	unsigned long returnValue = MF_GAMESET_MODERN;
 
 	// get info
 	trap_GetConfigString( CS_SERVERINFO, info, sizeof(info) );

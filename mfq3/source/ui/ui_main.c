@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.29 2002-06-09 20:09:41 thebjoern Exp $
+ * $Id: ui_main.c,v 1.30 2003-08-06 18:10:21 thebjoern Exp $
 */
 /*
 =======================================================================
@@ -2056,7 +2056,7 @@ static void UI_DrawVehiclePreview( rectDef_t *rect, float scale, vec4_t color, i
 #else
 	// DRAW VEHICLE ICON CODE
 	int vehicle = -1;
-	char * dir = NULL;
+//	char * dir = NULL;
 	char * pIconString = NULL;
 	static qhandle_t pictureHandle = -1;
 	static int lastVehicle = -1;
@@ -3431,7 +3431,7 @@ static void UI_InitialiseUI( void )
 	fileSize = trap_FS_FOpenFile( "ui\\credits.txt", &creditsFile, FS_READ );	
 	if( fileSize )
 	{
-		int index = 0;
+//		int index = 0;
 		char * pCredits = NULL;
 		char * pLineEnd = NULL;
 
@@ -3485,8 +3485,8 @@ static void UI_RefreshVehicleSelect( void )
 	const char * pCat = NULL;
 	const char * pClass = NULL;
 	const char * pVehicle = NULL;
-	qboolean currentVehicleValid = qtrue;
-	unsigned long what = 0x00000000;
+//	qboolean currentVehicleValid = qtrue;
+//	unsigned long what = 0x00000000;
 	int levelCats = 0;
 	char info[MAX_INFO_STRING];
 

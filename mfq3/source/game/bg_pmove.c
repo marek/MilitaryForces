@@ -1,5 +1,5 @@
 /*
- * $Id: bg_pmove.c,v 1.14 2003-04-25 00:02:23 thebjoern Exp $
+ * $Id: bg_pmove.c,v 1.15 2003-08-06 18:10:21 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -567,9 +567,11 @@ static void PM_Weapon( void ) {
 	// check for change
 	if( pm->ps->weaponNum != pm->cmd.weapon && availableVehicles[pm->vehicle].weapons[pm->cmd.weapon] != WI_NONE ) {
 		pm->ps->weaponNum = pm->cmd.weapon;
-		pm->ps->weaponIndex = availableVehicles[pm->vehicle].weapons[pm->ps->weaponNum];
 		pm->ps->timers[TIMER_WEAPON] += 100;
 	}
+
+	// moved this out from the above if{} to see if that fixes the droptank problem
+	pm->ps->weaponIndex = availableVehicles[pm->vehicle].weapons[pm->ps->weaponNum];
 
 	// make weapon function
 	if( pm->ps->timers[TIMER_MACHINEGUN] > 0 ) {
@@ -589,7 +591,7 @@ static void PM_Weapon( void ) {
 		}
 	}
 
-	// allow firing with of primary with MG button when no MG is available
+	// allow firing of primary with MG button when no MG is available
 	if( (pm->cmd.buttons & BUTTON_ATTACK) && !availableVehicles[pm->vehicle].weapons[0] ) {
 		pm->cmd.buttons |= BUTTON_ATTACK_MAIN;
 	}
@@ -614,8 +616,14 @@ static void PM_Weapon( void ) {
 	}
 
 	// fueltank override
-	if( availableWeapons[pm->ps->weaponIndex].type == WT_FUELTANK )
+	if( availableWeapons[pm->ps->weaponIndex].type == WT_FUELTANK &&
+		pm->ps->timers[TIMER_WEAPON] <= 0 )
 		canShoot = qtrue;
+
+//#ifndef QAGAME
+//	Com_Printf("Weaponindex: %d\n", pm->ps->weaponIndex);
+//#endif
+
 
 	// check for MG primary fire
 	if( (pm->cmd.buttons & BUTTON_ATTACK_MAIN) && pm->ps->weaponNum == WP_MACHINEGUN ) {

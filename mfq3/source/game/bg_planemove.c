@@ -1,5 +1,5 @@
 /*
- * $Id: bg_planemove.c,v 1.9 2003-04-25 00:02:23 thebjoern Exp $
+ * $Id: bg_planemove.c,v 1.10 2003-08-06 18:10:21 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -507,7 +507,7 @@ void PM_PlaneMoveAdvanced( void )
     qboolean	dead = (pm->ps->stats[STAT_HEALTH] <= 0);
 	qboolean	verydead = (pm->ps->stats[STAT_HEALTH] <= GIB_HEALTH);
     int		i;
-	int		anim = 0;
+//	int		anim = 0;
 	float	ratepitch, rateroll, rateyaw;
 
 	if( verydead ) return;

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_misc.c,v 1.13 2003-03-19 11:37:31 thebjoern Exp $
+ * $Id: bg_misc.c,v 1.14 2003-08-06 18:10:21 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -619,6 +619,7 @@ void BG_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, qboolean 
 	}
 
 	s->weaponIndex = ps->weaponIndex;
+//	Com_Printf("weaponIndex: %d\n", ps->weaponIndex);
 	s->weaponNum = ps->weaponNum;
 	s->groundEntityNum = ps->groundEntityNum;
 	s->objectives = ps->objectives;
@@ -705,6 +706,7 @@ void BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s
 	}
 
 	s->weaponIndex = ps->weaponIndex;
+//	Com_Printf("weaponIndex: %d\n", ps->weaponIndex);
 	s->weaponNum = ps->weaponNum;
 	s->groundEntityNum = ps->groundEntityNum;
 	s->objectives = ps->objectives;

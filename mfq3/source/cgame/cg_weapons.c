@@ -1,5 +1,5 @@
 /*
- * $Id: cg_weapons.c,v 1.25 2003-04-25 00:02:23 thebjoern Exp $
+ * $Id: cg_weapons.c,v 1.26 2003-08-06 18:10:20 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -397,6 +397,8 @@ void CG_FireWeapon( centity_t *cent ) {
 	}
 
 	if( availableWeapons[ent->weaponIndex].type == WT_FUELTANK ) {
+		while( MF_findWeaponsOfType(ent->weaponIndex, &cg_loadouts[ent->number]) )
+			MF_removeWeaponFromLoadout(ent->weaponIndex, &cg_loadouts[ent->number], 0, 0, 0 );
 		return;
 	}
 
