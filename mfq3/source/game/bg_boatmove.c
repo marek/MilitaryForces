@@ -1,5 +1,5 @@
 /*
- * $Id: bg_boatmove.c,v 1.3 2002-02-21 13:14:20 thebjoern Exp $
+ * $Id: bg_boatmove.c,v 1.4 2002-02-22 11:39:40 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -223,6 +223,7 @@ void PM_BoatMove( void )
 	}
 
 	if( !(pm->cmd.buttons & BUTTON_FREELOOK) ) {
+		float min, max;
 		// get the angle difference
 		for( i = PITCH; i <= YAW; i++ ) {
 			diff[i] = viewdir[i] - turretdir[i];
@@ -233,20 +234,32 @@ void PM_BoatMove( void )
 		if( diff[YAW] < -turnspeed[TURRET_YAW] ) turret_yaw -= turnspeed[TURRET_YAW];
 		else if( diff[YAW] > turnspeed[TURRET_YAW] ) turret_yaw += turnspeed[TURRET_YAW];
 		else turret_yaw += diff[YAW];
-		if( turret_yaw < 0 ) turret_yaw += 360;
+		if( turret_yaw > 180 ) turret_yaw -= 360;// limit to +- 180
+		min = availableWeapons[pm->ps->weaponIndex].minturns[1];
+		max = availableWeapons[pm->ps->weaponIndex].maxturns[1];
+		if( max > min ) {
+			if( turret_yaw > max ) turret_yaw = max;
+			else if( turret_yaw < min ) turret_yaw = min;
+		} else {
+			if( turret_yaw > 0 && turret_yaw < min ) turret_yaw = min;
+			else if( turret_yaw < 0 && turret_yaw > max ) turret_yaw = max;
+		}
+		if( turret_yaw < 0 ) turret_yaw += 360;// clamp back to pos
 		else if( turret_yaw > 360 ) turret_yaw -= 360;
+
 
 		// turn the gun
 		if( diff[PITCH] < -turnspeed[GUN_PITCH] ) gun_pitch -= turnspeed[GUN_PITCH];
 		else if( diff[PITCH] > turnspeed[GUN_PITCH] ) gun_pitch += turnspeed[GUN_PITCH];
 		else gun_pitch += diff[PITCH];
-		if( gun_pitch < 0 ) gun_pitch += 360;
+		min = availableWeapons[pm->ps->weaponIndex].minturns[0];
+		max = availableWeapons[pm->ps->weaponIndex].maxturns[0];
+		if( gun_pitch > 180 ) gun_pitch -= 360;// limit to +-180 to make it easier
+		if( gun_pitch > max ) gun_pitch = max;
+		else if( gun_pitch < min ) gun_pitch = min;
+		if( gun_pitch < 0 ) gun_pitch += 360;// clamp it back to pos
 		else if( gun_pitch > 360 ) gun_pitch -= 360;
-//		if( gun_pitch < 90 && gun_pitch > availableVehicles[pm->vehicle].tailangle ) {
-//			gun_pitch = availableVehicles[pm->vehicle].tailangle;
-//		} else if ( gun_pitch > 90 && gun_pitch < availableVehicles[pm->vehicle].gearheight ) {
-//			gun_pitch = availableVehicles[pm->vehicle].gearheight;
-//		}
+
 //		Com_Printf( "gun %.1f (d %.1f)\n", gun_pitch, diff[PITCH] );
 	}
 

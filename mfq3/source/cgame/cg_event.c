@@ -1,5 +1,5 @@
 /*
- * $Id: cg_event.c,v 1.8 2002-02-20 12:05:29 thebjoern Exp $
+ * $Id: cg_event.c,v 1.9 2002-02-22 11:39:40 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -215,7 +215,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 	case EV_FIRE_MG:
 		DEBUGNAME("EV_FIRE_WEAPON");
-		CG_FireMachinegun( cent );
+		CG_FireMachinegun( cent, qfalse );
 		break;
 
 	case EV_FIRE_WEAPON:

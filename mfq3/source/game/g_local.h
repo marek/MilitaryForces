@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.14 2002-02-21 12:25:44 sparky909_uk Exp $
+ * $Id: g_local.h,v 1.15 2002-02-22 11:39:40 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -621,7 +621,7 @@ void fire_antiair (gentity_t *self);
 void fire_antiground (gentity_t *self);
 void fire_ffar (gentity_t *self);
 void fire_ironbomb (gentity_t *self);
-void fire_autocannon (gentity_t *self);
+void fire_autocannon (gentity_t *self, qboolean main);
 void fire_maingun (gentity_t *self);
 
 
@@ -667,7 +667,7 @@ void radio_comply( gentity_t *ent );
 qboolean LogAccuracyHit( gentity_t *target, gentity_t *attacker );
 void CalcMuzzlePoint ( gentity_t *ent, vec3_t forward, vec3_t right, vec3_t up, vec3_t muzzlePoint );
 void SnapVectorTowards( vec3_t v, vec3_t to );
-void Weapon_Autocannon_Fire (gentity_t *ent);
+void Weapon_Autocannon_Fire (gentity_t *ent, qboolean main);
 
 //
 // g_client.c

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.38 2002-02-21 16:41:25 sparky909_uk Exp $
+ * $Id: cg_local.h,v 1.39 2002-02-22 11:39:40 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -209,6 +209,8 @@ typedef struct centity_s {
 	int				bayAnim;
 	int				bayAnimFrame;
 	int				bayAnimStartTime;
+
+	int				muzzleFlashWeapon;
 
 } centity_t;
 
@@ -1286,7 +1288,7 @@ void CG_RegisterWeapons();
 void CG_RegisterItemVisuals( int itemNum );
 
 void CG_FireWeapon( centity_t *cent );
-void CG_FireMachinegun( centity_t *cent );
+void CG_FireMachinegun( centity_t *cent, qboolean main );
 void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType );
 void CG_GenericExplosion( vec3_t origin, int type );
 void CG_VehicleHit( vec3_t origin, int damage );

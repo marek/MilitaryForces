@@ -1,5 +1,5 @@
 /*
- * $Id: g_active.c,v 1.10 2002-02-18 09:51:28 thebjoern Exp $
+ * $Id: g_active.c,v 1.11 2002-02-22 11:39:40 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -452,7 +452,7 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 
 		switch ( event ) {
 		case EV_FIRE_MG:
-			Weapon_Autocannon_Fire( ent );
+			Weapon_Autocannon_Fire( ent, qfalse );
 			break;
 
 		case EV_FIRE_WEAPON:

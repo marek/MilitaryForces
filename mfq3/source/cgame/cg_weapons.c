@@ -1,5 +1,5 @@
 /*
- * $Id: cg_weapons.c,v 1.12 2002-02-21 13:14:20 thebjoern Exp $
+ * $Id: cg_weapons.c,v 1.13 2002-02-22 11:39:40 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -315,7 +315,7 @@ CG_FireWeapon
 Caused by an EV_FIRE_MG event
 ================
 */
-void CG_FireMachinegun( centity_t *cent )
+void CG_FireMachinegun( centity_t *cent, qboolean main )
 {
 	entityState_t * ent;
 	weaponInfo_t * weap;
@@ -324,10 +324,22 @@ void CG_FireMachinegun( centity_t *cent )
 	// get the current entity state and weapon info
 	ent = &cent->currentState;
 
-/* awaiting fixes to the way the machine gun is hacked in
-	weap = &cg_weapons[ ent->weaponIndex ];
-*/
-	weap = &cg_weapons[ WI_MG_20MM ];
+	if( main ) {
+		weap = &cg_weapons[ ent->weaponIndex ];
+		cent->muzzleFlashWeapon = ent->weaponIndex;
+	} else {
+		int	clientNum;
+	    clientNum = cent->currentState.clientNum;
+		if ( clientNum < 0 || clientNum >= MAX_CLIENTS ) {
+			weap = &cg_weapons[ WI_MG_20MM ];// hacky
+			cent->muzzleFlashWeapon = WI_MG_20MM;// very hacky
+		} else {
+			clientInfo_t * ci;
+			ci = &cgs.clientinfo[ clientNum ];
+			weap = &cg_weapons[availableVehicles[ci->vehicle].weapons[0]];
+			cent->muzzleFlashWeapon = availableVehicles[ci->vehicle].weapons[0];
+		}
+	}
 
 	// mark the entity as muzzle flashing, so when it is added it will
 	// append the flash to the weapon model
@@ -375,6 +387,10 @@ void CG_FireWeapon( centity_t *cent ) {
 	ent = &cent->currentState;
 	if ( ent->weaponIndex == WI_NONE ) {
 		return;
+	}
+	if( availableWeapons[ent->weaponIndex].type == WT_MACHINEGUN ) {
+		CG_FireMachinegun(cent, qtrue);
+		return;	
 	}
 	weap = &cg_weapons[ent->weaponIndex];
 

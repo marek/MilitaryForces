@@ -1,5 +1,5 @@
 /*
- * $Id: bg_pmove.c,v 1.8 2002-02-21 13:14:20 thebjoern Exp $
+ * $Id: bg_pmove.c,v 1.9 2002-02-22 11:39:40 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -543,6 +543,11 @@ static void PM_Weapon( void ) {
 		} else {
 			pm->ps->timers[TIMER_WEAPON] = 0;
 		}
+	}
+
+	// allow firing with of primary with MG button when no MG is available
+	if( (pm->cmd.buttons & BUTTON_ATTACK) && !availableVehicles[pm->vehicle].weapons[0] ) {
+		pm->cmd.buttons |= BUTTON_ATTACK_MAIN;
 	}
 
 	// weaponbays
