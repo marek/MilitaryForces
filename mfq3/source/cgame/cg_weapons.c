@@ -1,5 +1,5 @@
 /*
- * $Id: cg_weapons.c,v 1.6 2002-01-25 14:25:12 sparky909_uk Exp $
+ * $Id: cg_weapons.c,v 1.7 2002-01-25 15:53:46 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -19,17 +19,15 @@ static void CG_FFARTrail( centity_t * cent, const weaponInfo_t *wi )
 	vec3_t			pos, velocity;
 
 	VectorCopy( cent->lerpOrigin, pos );
-	AngleVectors( cent->lerpAngles, velocity, NULL, NULL );
+
+	// draw smoke slightly behind the entitiy position (using -velocity of the entity)
+	VectorCopy( cent->currentState.pos.trDelta, velocity );
 	VectorNormalize( velocity );
 
-#pragma message("enable correct CG_FFARTrail when entity supports angles (.lerpAngles)")
-
-	// draw smoke slightly behind the entitiy position (using -velocity)
-/*
-	// calc vectors & adjusted position
-	VectorScale( velocity, -8.0f, velocity );
+	// calc adjusted position
+	VectorScale( velocity, -24.0f, velocity );		// -24.0f is just an arbitary distance which works OK with all current rocket models
 	VectorAdd( pos, velocity, pos );
-*/
+
 	// draw trail
 	smoke = CG_SmokePuff( pos, up, 
 						  4, 
