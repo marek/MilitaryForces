@@ -103,6 +103,10 @@ call ..\compile  ../bg_boatmove.c
 @if errorlevel 1 goto quit
 call ..\compile  ../bg_mfq3util.c
 @if errorlevel 1 goto quit
+call ..\compile  ../bg_md3util.c
+@if errorlevel 1 goto quit
+call ..\compile  ../bg_loadouts.c
+@if errorlevel 1 goto quit
 
 q3asm -f ../game
 :quit

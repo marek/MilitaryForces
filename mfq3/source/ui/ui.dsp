@@ -109,6 +109,14 @@ SOURCE=..\game\bg_lib.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\game\bg_loadouts.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\game\bg_md3util.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\game\bg_mfq3util.c
 # End Source File
 # Begin Source File

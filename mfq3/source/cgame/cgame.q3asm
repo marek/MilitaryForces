@@ -41,6 +41,8 @@ bg_helomove
 bg_lqmmove
 bg_boatmove
 bg_mfq3util
+bg_md3util
+bg_loadouts
 q_math
 q_shared
 ui_shared

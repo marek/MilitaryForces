@@ -1,5 +1,5 @@
 /*
- * $Id: g_missile.c,v 1.14 2002-02-24 16:52:12 thebjoern Exp $
+ * $Id: g_missile.c,v 1.15 2002-02-25 12:48:26 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -358,6 +358,7 @@ void fire_antiair (gentity_t *self) {
 	vec3_t		start, offset;
 	char		tagname[16];
 	qboolean	active = ( self->client->ps.stats[STAT_LOCKINFO] & LI_LOCKING );
+	qboolean	wingtip = qfalse;
 
 	VectorCopy( self->s.pos.trBase, start );
 
@@ -372,6 +373,7 @@ void fire_antiair (gentity_t *self) {
 	} else {
 		self->left = (self->left ? qfalse : qtrue);
 		MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, tagname, offset, self->left );
+		if( strcmp( tagname, "tag_tip_l" ) == 0 || strcmp( tagname, "tag_tip_r" ) == 0 ) wingtip = qtrue;
 		AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
 		VectorInverse( right );
 	}
@@ -383,21 +385,31 @@ void fire_antiair (gentity_t *self) {
 	bolt = G_Spawn();
 	bolt->classname = "aam";
 	if( active ) {
-//		bolt->wait = level.time + availableWeapons[self->client->ps.weaponIndex].fuelrange;
-//		bolt->think = follow_target;
-//		bolt->nextthink = level.time + 50;
 		bolt->tracktarget = self->tracktarget;
 		// update target
 		if( self->tracktarget->client ) {
 			self->tracktarget->client->ps.stats[STAT_LOCKINFO] |= LI_BEING_LAUNCHED;
 		}
 		bolt->followcone = availableWeapons[self->client->ps.weaponIndex].followcone;
-//	} else {
-//		bolt->think = G_ExplodeMissile;
-//		bolt->nextthink = level.time + availableWeapons[self->client->ps.weaponIndex].fuelrange;
 	}
-	bolt->think = drop_to_normal_transition;
-	bolt->nextthink = level.time + 400;
+	bolt->speed = availableWeapons[self->client->ps.weaponIndex].muzzleVelocity;
+	if( wingtip ) {
+		if( active ) {
+			bolt->wait = level.time + availableWeapons[self->client->ps.weaponIndex].fuelrange;
+			bolt->think = follow_target;
+			bolt->nextthink = level.time + 50;
+		} else {
+			bolt->think = G_ExplodeMissile;
+			bolt->nextthink = level.time + availableWeapons[self->client->ps.weaponIndex].fuelrange;
+		}
+		bolt->s.pos.trType = TR_LINEAR;
+		VectorScale( dir, bolt->speed, bolt->s.pos.trDelta );
+	} else {
+		bolt->think = drop_to_normal_transition;
+		bolt->nextthink = level.time + 400;
+		bolt->s.pos.trType = TR_GRAVITY;
+		VectorScale( dir, self->client->ps.speed/10, bolt->s.pos.trDelta );
+	}
 	bolt->s.eType = ET_MISSILE;
 	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
 	bolt->s.weaponIndex = self->client->ps.weaponIndex;
@@ -412,13 +424,9 @@ void fire_antiair (gentity_t *self) {
 	bolt->splashMethodOfDeath = MOD_FFAR_SPLASH;
 	bolt->clipmask = MASK_SHOT|MASK_WATER;
 	bolt->target_ent = NULL;
-	bolt->speed = availableWeapons[self->client->ps.weaponIndex].muzzleVelocity;
 
-	bolt->s.pos.trType = TR_GRAVITY;
 	bolt->s.pos.trTime = level.time;// - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
 	VectorCopy( start, bolt->s.pos.trBase );
-//	VectorScale( dir, bolt->speed, bolt->s.pos.trDelta );
-	VectorScale( dir, self->client->ps.speed/10, bolt->s.pos.trDelta );
 	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
 	VectorCopy (start, bolt->r.currentOrigin);
 }
@@ -433,7 +441,6 @@ void fire_antiground (gentity_t *self) {
 	gentity_t	*bolt;
 	vec3_t		dir, right, up;
 	vec3_t		start, offset, forward, temp;
-	char		tagname[16];
 	qboolean	active = ( self->client->ps.stats[STAT_LOCKINFO] & LI_LOCKING );
 
 	VectorCopy( self->s.pos.trBase, start );
@@ -448,7 +455,7 @@ void fire_antiground (gentity_t *self) {
 
 	} else {
 		self->left = (self->left ? qfalse : qtrue);
-		MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, tagname, offset, self->left );
+		MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, 0, offset, self->left );
 		AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
 		VectorInverse( right );
 	}
@@ -511,12 +518,11 @@ void fire_ffar (gentity_t *self) {
 	gentity_t	*bolt;
 	vec3_t		dir, right, up;
 	vec3_t		start, offset;
-	char		tagname[16];
 
 	VectorCopy( self->s.pos.trBase, start );
 
 	self->left = (self->left ? qfalse : qtrue);
-	MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, tagname, offset, self->left );
+	MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, 0, offset, self->left );
 	AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
 	VectorInverse( right );
 	VectorMA( start, offset[0], dir, start );
@@ -559,10 +565,9 @@ void fire_ironbomb (gentity_t *self) {
 	gentity_t	*bolt;
 	vec3_t		dir, right, up, offset;
 	vec3_t		start;
-	char		tagname[16];
 
 //	self->left = (self->left ? qfalse : qtrue);
-	MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, tagname, offset, 0 );
+	MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, 0, offset, 0 );
 	AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
 	VectorInverse( right );
 	VectorCopy( self->s.pos.trBase, start );

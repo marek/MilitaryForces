@@ -28,6 +28,10 @@ call ..\compile ../../game/bg_weapondata.c
 @if errorlevel 1 goto quit
 call ..\compile ../../game/bg_mfq3util.c
 @if errorlevel 1 goto quit
+call ..\compile ../../game/bg_md3util.c
+@if errorlevel 1 goto quit
+call ..\compile ../../game/bg_loadouts.c
+@if errorlevel 1 goto quit
 
 q3asm -f ../ui
 :quit
