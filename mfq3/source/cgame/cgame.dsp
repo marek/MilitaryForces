@@ -1,5 +1,5 @@
 # Microsoft Developer Studio Project File - Name="cgame" - Package Owner=<4>
-# Microsoft Developer Studio Generated Build File, Format Version 6.00
+# Microsoft Developer Studio Generated Build File, Format Version 60000
 # ** DO NOT EDIT **
 
 # TARGTYPE "Win32 (x86) Dynamic-Link Library" 0x0102
@@ -228,6 +228,10 @@ SOURCE=..\game\q_math.c
 # Begin Source File
 
 SOURCE=..\game\q_shared.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\ui\ui_shared.c
 # End Source File
 # End Group
 # Begin Group "Header Files"

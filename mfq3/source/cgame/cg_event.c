@@ -1,5 +1,5 @@
 /*
- * $Id: cg_event.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: cg_event.c,v 1.2 2002-01-16 19:29:36 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -29,11 +29,11 @@ const char	*CG_PlaceString( int rank ) {
 	}
 
 	if ( rank == 1 ) {
-		s = S_COLOR_BLUE "1st" S_COLOR_WHITE;		// draw in blue
+		s = /* S_COLOR_BLUE */"1st"/* S_COLOR_WHITE */;		// draw in blue
 	} else if ( rank == 2 ) {
-		s = S_COLOR_RED "2nd" S_COLOR_WHITE;		// draw in red
+		s = /* S_COLOR_RED */"2nd"/*S_COLOR_WHITE*/;		// draw in red
 	} else if ( rank == 3 ) {
-		s = S_COLOR_YELLOW "3rd" S_COLOR_WHITE;		// draw in yellow
+		s = /* S_COLOR_YELLOW */"3rd"/*S_COLOR_WHITE*/;		// draw in yellow
 	} else if ( rank == 11 ) {
 		s = "11th";
 	} else if ( rank == 12 ) {
