@@ -1,5 +1,5 @@
 /*
- * $Id: ui_gameinfo.c,v 1.4 2002-02-22 18:05:22 sparky909_uk Exp $
+ * $Id: ui_gameinfo.c,v 1.5 2002-02-22 18:33:53 sparky909_uk Exp $
 */
 //
 // gameinfo.c
@@ -118,7 +118,7 @@ Used to sort the maps into alphabetic order
 int UI_AlphabeticMapNameQsortCompare( const void * arg1, const void * arg2 )
 {
    /* Compare all of both strings: */
-   return _stricmp( ((mapInfo *) arg1)->mapName, ((mapInfo *) arg2)->mapName );
+   return Q_stricmp( ((mapInfo *) arg1)->mapName, ((mapInfo *) arg2)->mapName );
 }
 
 /*
