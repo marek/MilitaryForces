@@ -1,5 +1,5 @@
 /*
- * $Id: q_shared.c,v 1.2 2002-01-25 13:26:52 thebjoern Exp $
+ * $Id: q_shared.c,v 1.3 2002-02-27 09:42:10 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1203,4 +1203,33 @@ void Info_SetValueForKey_Big( char *s, const char *key, const char *value ) {
 
 //====================================================================
 
+// convert a string containing a unsigned hex number to int
+int ahextoi( const char* string ) {
+	int value = 0;
+	int	c;
 
+	// skip whitespace
+	while ( *string <= ' ' ) {
+		if ( !*string ) {
+			return 0;
+		}
+		string++;
+	}
+	if( string[0] == '0' && string[1] == 'x' ) {
+		string += 2;
+	} else return 0;
+
+	do {
+		c = *string++;
+		if( c >= '0' && c <= '9' ) {
+			c -= '0';
+		} else if( c >= 'A' && c <= 'F') {
+			c = (c - 'A') + 10;
+		} else if( c >= 'a' && c <= 'f') {
+			c = (c - 'a') + 10;
+		} else break;
+		value = value * 16 + c;
+	} while ( 1 );
+
+	return value;
+}

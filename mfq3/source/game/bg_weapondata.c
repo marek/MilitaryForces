@@ -1,5 +1,5 @@
 /*
- * $Id: bg_weapondata.c,v 1.14 2002-02-24 19:39:51 thebjoern Exp $
+ * $Id: bg_weapondata.c,v 1.15 2002-02-27 09:42:10 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -43,7 +43,7 @@ completeWeaponData_t availableWeapons[] =
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
 		0,									// number per package
-		PT_NA,								// fits on pylon
+		PF_NA,								// fits on pylon
 		0,									// flags
 	},
 
@@ -81,7 +81,7 @@ completeWeaponData_t availableWeapons[] =
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
 		0,									// number per package
-		PT_NA,								// fits on pylon
+		PF_NA,								// fits on pylon
 		0,									// flags
 	},
 
@@ -119,7 +119,7 @@ completeWeaponData_t availableWeapons[] =
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
 		0,									// number per package
-		PT_NA,								// fits on pylon
+		PF_NA,								// fits on pylon
 		0,									// flags
 	},
 
@@ -157,7 +157,7 @@ completeWeaponData_t availableWeapons[] =
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
 		0,									// number per package
-		PT_NA,								// fits on pylon
+		PF_NA,								// fits on pylon
 		0,									// flags
 	},
 
@@ -195,7 +195,7 @@ completeWeaponData_t availableWeapons[] =
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
 		0,									// number per package
-		PT_NA,								// fits on pylon
+		PF_NA,								// fits on pylon
 		0,									// flags
 	},
 
@@ -233,7 +233,7 @@ completeWeaponData_t availableWeapons[] =
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
 		0,									// number per package
-		PT_NA,								// fits on pylon
+		PF_NA,								// fits on pylon
 		0,									// flags
 	},
 
@@ -271,7 +271,7 @@ completeWeaponData_t availableWeapons[] =
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
 		0,									// number per package
-		PT_NA,								// fits on pylon
+		PF_NA,								// fits on pylon
 		0,									// flags
 	},
 
@@ -309,7 +309,7 @@ completeWeaponData_t availableWeapons[] =
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
 		0,									// number per package
-		PT_NA,								// fits on pylon
+		PF_NA,								// fits on pylon
 		0,									// flags
 	},
 
@@ -347,7 +347,7 @@ completeWeaponData_t availableWeapons[] =
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
 		0,									// number per package
-		PT_NA,								// fits on pylon
+		PF_NA,								// fits on pylon
 		0,									// flags
 	},
 
@@ -385,7 +385,7 @@ completeWeaponData_t availableWeapons[] =
 		{5,120,0},							// max turret angles
 		{-75,-120,0},							// min turret angles
 		0,									// number per package
-		PT_NA,								// fits on pylon
+		PF_NA,								// fits on pylon
 		0,									// flags
 	},
 
@@ -423,7 +423,7 @@ completeWeaponData_t availableWeapons[] =
 		{5,-60,0},							// max turret angles
 		{-75,60,0},							// min turret angles
 		0,									// number per package
-		PT_NA,								// fits on pylon
+		PF_NA,								// fits on pylon
 		0,									// flags
 	},
 
@@ -461,7 +461,7 @@ completeWeaponData_t availableWeapons[] =
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
 		19,									// number per package
-		PT_WING_M|PT_WING_H,				// fits on pylon
+		PF_FFAR,							// fits on pylon
 		WF_NON_REMOVABLE_VWEP,				// flags
 	},
 
@@ -499,7 +499,7 @@ completeWeaponData_t availableWeapons[] =
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
 		0,									// number per package
-		PT_NA,								// fits on pylon
+		PF_NA,								// fits on pylon
 		0,									// flags
 	},
 
@@ -537,7 +537,7 @@ completeWeaponData_t availableWeapons[] =
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
 		0,									// number per package
-		PT_NA,								// fits on pylon
+		PF_NA,								// fits on pylon
 		0,									// flags
 	},
 
@@ -575,7 +575,7 @@ completeWeaponData_t availableWeapons[] =
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
 		1,									// number per package
-		PT_H|PT_M,							// fits on pylon
+		PF_AG_LT,							// fits on pylon
 		0,									// flags
 	},
 
@@ -614,7 +614,7 @@ completeWeaponData_t availableWeapons[] =
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
 		1,									// number per package
-		PT_H,								// fits on pylon
+		PF_AG_HVY,							// fits on pylon
 		0,									// flags
 	},
 
@@ -652,7 +652,7 @@ completeWeaponData_t availableWeapons[] =
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
 		1,									// number per package
-		PT_ALL,								// fits on pylon
+		PF_AA_LT,							// fits on pylon
 		0,									// flags
 	},
 
@@ -690,7 +690,7 @@ completeWeaponData_t availableWeapons[] =
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
 		1,									// number per package
-		PT_ALL,								// fits on pylon
+		PF_AA_MED,							// fits on pylon
 		0,									// flags
 	},
 
@@ -728,7 +728,7 @@ completeWeaponData_t availableWeapons[] =
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
 		1,									// number per package
-		PT_ALL,								// fits on pylon
+		PF_AA_HVY,							// fits on pylon
 		0,									// flags
 	},
 
@@ -766,7 +766,7 @@ completeWeaponData_t availableWeapons[] =
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
 		1,									// number per package
-		PT_M|PT_H,							// fits on pylon
+		PF_AA_PHX,							// fits on pylon
 		0,									// flags
 	},
 
@@ -804,7 +804,7 @@ completeWeaponData_t availableWeapons[] =
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
 		1,									// number per package
-		PT_ALL,								// fits on pylon
+		PF_AA_LT,							// fits on pylon
 		0,									// flags
 	},
 
@@ -842,7 +842,7 @@ completeWeaponData_t availableWeapons[] =
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
 		1,									// number per package
-		PT_ALL,								// fits on pylon
+		PF_AA_LT,							// fits on pylon
 		0,									// flags
 	},
 
@@ -880,7 +880,7 @@ completeWeaponData_t availableWeapons[] =
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
 		1,									// number per package
-		PT_ALL,								// fits on pylon
+		PF_AA_MED,							// fits on pylon
 		0,									// flags
 	},
 
@@ -918,7 +918,7 @@ completeWeaponData_t availableWeapons[] =
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
 		1,									// number per package
-		PT_ALL,								// fits on pylon
+		PF_AA_HVY,							// fits on pylon
 		0,									// flags
 	},
 
@@ -956,7 +956,7 @@ completeWeaponData_t availableWeapons[] =
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
 		1,									// number per package
-		PT_M|PT_L,							// fits on pylon
+		PF_AG_MED,							// fits on pylon
 		0,									// flags
 	},
 
@@ -994,7 +994,7 @@ completeWeaponData_t availableWeapons[] =
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
 		1,									// number per package
-		PT_M|PT_H,							// fits on pylon
+		PF_AG_MED,							// fits on pylon
 		0,									// flags
 	},
 
@@ -1032,7 +1032,7 @@ completeWeaponData_t availableWeapons[] =
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
 		0,									// number per package
-		PT_NA,								// fits on pylon
+		PF_FLAREPOD,						// fits on pylon
 		0,									// flags
 	}
 };

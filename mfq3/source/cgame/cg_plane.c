@@ -1,5 +1,5 @@
 /*
- * $Id: cg_plane.c,v 1.28 2002-02-25 12:13:36 sparky909_uk Exp $
+ * $Id: cg_plane.c,v 1.29 2002-02-27 09:42:09 thebjoern Exp $
 */
 
 
@@ -347,8 +347,22 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 	// vwep
 	if( availableVehicles[ci->vehicle].renderFlags & MFR_VWEP ) {
 		refEntity_t			vwep;
-		int					ii = 0, num;
 		completeLoadout_t*	loadout = &cg_loadouts[cent->currentState.number];
+
+		for( i = 0; i < loadout->usedMounts; ++i ) {
+			if( loadout->mounts[i].weapon && loadout->mounts[i].num ) {
+				memset( &vwep, 0, sizeof(vwep) );		
+				vwep.hModel = availableWeapons[loadout->mounts[i].weapon].vwepHandle;
+				VectorCopy( cent->lerpOrigin, vwep.lightingOrigin );
+				AxisCopy( axisDefault, vwep.axis );
+				CG_PositionEntityOnTag( &vwep, &part[BP_PLANE_BODY], ci->parts[BP_PLANE_BODY], 
+						loadout->mounts[i].tag.name );
+				vwep.shadowPlane = shadowPlane;
+				vwep.renderfx = renderfx;
+				trap_R_AddRefEntityToScene( &vwep );
+			}
+		}
+/*
 		for( i = 0; i < MAX_WEAPONS_PER_VEHICLE; ++i ) {
 			num = loadout->mountedWeapons[i];
 			if( loadout->type[i] && num ) {
@@ -365,6 +379,7 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 				}
 			}
 		}
+		*/
 	}
 
 	// vapor
