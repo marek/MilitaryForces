@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicle.c,v 1.12 2002-02-19 13:55:58 sparky909_uk Exp $
+ * $Id: cg_vehicle.c,v 1.13 2002-02-21 13:14:20 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -292,6 +292,24 @@ static void CG_CacheBoat(int index)
 			break;
 		case BP_BOAT_GUNBARREL:
 			Com_sprintf( name, sizeof(name), "%s_gun.md3", basename );
+			break;
+		case BP_BOAT_TURRET2:
+			Com_sprintf( name, sizeof(name), "%s_tur2.md3", basename );
+			break;
+		case BP_BOAT_GUNBARREL2:
+			Com_sprintf( name, sizeof(name), "%s_gun2.md3", basename );
+			break;
+		case BP_BOAT_TURRET3:
+			Com_sprintf( name, sizeof(name), "%s_tur3.md3", basename );
+			break;
+		case BP_BOAT_GUNBARREL3:
+			Com_sprintf( name, sizeof(name), "%s_gun3.md3", basename );
+			break;
+		case BP_BOAT_TURRET4:
+			Com_sprintf( name, sizeof(name), "%s_tur4.md3", basename );
+			break;
+		case BP_BOAT_GUNBARREL4:
+			Com_sprintf( name, sizeof(name), "%s_gun4.md3", basename );
 			break;
 		}
 		availableVehicles[index].handle[i] = trap_R_RegisterModel( name );

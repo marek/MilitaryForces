@@ -1,5 +1,5 @@
 /*
- * $Id: cg_weapons.c,v 1.11 2002-02-06 13:09:27 sparky909_uk Exp $
+ * $Id: cg_weapons.c,v 1.12 2002-02-21 13:14:20 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -476,6 +476,8 @@ void CG_MissileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_t di
 	case WI_MG_14_5MM:
 	case WI_MG_20MM:
 	case WI_MG_2X20MM:
+	case WI_MGT_2X30MM:
+	case WI_MGT_12_7MM:
 		mod = cgs.media.bulletFlashModel;
 		shader = cgs.media.bulletExplosionShader;
 		mark = cgs.media.bulletMarkShader;

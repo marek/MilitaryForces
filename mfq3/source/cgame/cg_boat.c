@@ -1,5 +1,5 @@
 /*
- * $Id: cg_boat.c,v 1.3 2002-02-19 16:32:47 sparky909_uk Exp $
+ * $Id: cg_boat.c,v 1.4 2002-02-21 13:14:20 thebjoern Exp $
 */
 
 
@@ -10,6 +10,12 @@ char *boat_tags[BP_BOAT_MAX_PARTS] =
 {
 	"<no tag>",		// vehicle body
 	"tag_turret",	// turret
+	"tag_weap",		// gun
+	"tag_turret2",	// turret
+	"tag_weap2",		// gun
+	"tag_turret3",	// turret
+	"tag_weap",		// gun
+	"tag_turret4",	// turret
 	"tag_weap"		// gun
 };
 
@@ -86,30 +92,51 @@ void CG_Boat( centity_t *cent, clientInfo_t *ci )
     trap_R_AddRefEntityToScene( &part[BP_BOAT_BODY] );
 
     //
-    // turret
+    // turrets
     //
-    part[BP_BOAT_TURRET].hModel = ci->parts[BP_BOAT_TURRET];
-    VectorCopy( cent->lerpOrigin, part[BP_BOAT_TURRET].lightingOrigin );
-	AxisCopy( axisDefault, part[BP_BOAT_TURRET].axis );
-	RotateAroundYaw( part[BP_BOAT_TURRET].axis, cent->currentState.angles2[ROLL] );
-	CG_PositionRotatedEntityOnTag( &part[BP_BOAT_TURRET], &part[BP_BOAT_BODY], ci->parts[BP_BOAT_BODY], boat_tags[BP_BOAT_TURRET] );
-	part[BP_BOAT_TURRET].shadowPlane = shadowPlane;
-    part[BP_BOAT_TURRET].renderfx = renderfx;
-    VectorCopy (part[BP_BOAT_TURRET].origin, part[BP_BOAT_TURRET].oldorigin);
-    trap_R_AddRefEntityToScene( &part[BP_BOAT_TURRET] );
+	for( i = 0; i < 4; ++i ) {
+		int j = 2*i;
+		float yaw = cent->currentState.angles2[ROLL];
+		float pitch = cent->currentState.angles2[PITCH];
+		float max, min;
+		if( yaw > 180 ) yaw -= 360;
+		max = availableWeapons[availableVehicles[ci->vehicle].weapons[i]].maxturns[1];
+		min = availableWeapons[availableVehicles[ci->vehicle].weapons[i]].minturns[1];
+		if( max > min ) {
+			if( yaw > max ) yaw = max;
+			else if( yaw < min ) yaw = min;
+		} else {
+			if( yaw > 0 && yaw < min ) yaw = min;
+			else if( yaw < 0 && yaw > max ) yaw = max;
+		}
+		if( pitch > 180 ) pitch -= 360;
+		max = availableWeapons[availableVehicles[ci->vehicle].weapons[i]].maxturns[0];
+		min = availableWeapons[availableVehicles[ci->vehicle].weapons[i]].minturns[0];
+		if( pitch > max ) pitch = max;
+		else if( pitch < min ) pitch = min;
+		// turret
+		part[BP_BOAT_TURRET+j].hModel = ci->parts[BP_BOAT_TURRET+j];
+		if( !part[BP_BOAT_TURRET+j].hModel ) break;
+		VectorCopy( cent->lerpOrigin, part[BP_BOAT_TURRET+j].lightingOrigin );
+		AxisCopy( axisDefault, part[BP_BOAT_TURRET+j].axis );
+		RotateAroundYaw( part[BP_BOAT_TURRET+j].axis, yaw );
+		CG_PositionRotatedEntityOnTag( &part[BP_BOAT_TURRET+j], &part[BP_BOAT_BODY], ci->parts[BP_BOAT_BODY], boat_tags[BP_BOAT_TURRET+j] );
+		part[BP_BOAT_TURRET+j].shadowPlane = shadowPlane;
+		part[BP_BOAT_TURRET+j].renderfx = renderfx;
+		VectorCopy (part[BP_BOAT_TURRET+j].origin, part[BP_BOAT_TURRET+j].oldorigin);
+		trap_R_AddRefEntityToScene( &part[BP_BOAT_TURRET+j] );
+		// gun
+		part[BP_BOAT_GUNBARREL+j].hModel = ci->parts[BP_BOAT_GUNBARREL+j];
+		VectorCopy( cent->lerpOrigin, part[BP_BOAT_GUNBARREL+j].lightingOrigin );
+		AxisCopy( axisDefault, part[BP_BOAT_GUNBARREL+j].axis );
+		RotateAroundPitch( part[BP_BOAT_GUNBARREL+j].axis, pitch );
+		CG_PositionRotatedEntityOnTag( &part[BP_BOAT_GUNBARREL+j], &part[BP_BOAT_TURRET+j], ci->parts[BP_BOAT_TURRET+j], boat_tags[BP_BOAT_GUNBARREL+j] );
+		part[BP_BOAT_GUNBARREL+j].shadowPlane = shadowPlane;
+		part[BP_BOAT_GUNBARREL+j].renderfx = renderfx;
+		VectorCopy (part[BP_BOAT_GUNBARREL+j].origin, part[BP_BOAT_GUNBARREL+j].oldorigin);
+		trap_R_AddRefEntityToScene( &part[BP_BOAT_GUNBARREL+j] );
 
-    //
-    // gun
-    //
-    part[BP_BOAT_GUNBARREL].hModel = ci->parts[BP_BOAT_GUNBARREL];
-    VectorCopy( cent->lerpOrigin, part[BP_BOAT_GUNBARREL].lightingOrigin );
-	AxisCopy( axisDefault, part[BP_BOAT_GUNBARREL].axis );
-	RotateAroundPitch( part[BP_BOAT_GUNBARREL].axis, cent->currentState.angles2[PITCH] );
-	CG_PositionRotatedEntityOnTag( &part[BP_BOAT_GUNBARREL], &part[BP_BOAT_TURRET], ci->parts[BP_BOAT_TURRET], boat_tags[BP_BOAT_GUNBARREL] );
-	part[BP_BOAT_GUNBARREL].shadowPlane = shadowPlane;
-    part[BP_BOAT_GUNBARREL].renderfx = renderfx;
-    VectorCopy (part[BP_BOAT_GUNBARREL].origin, part[BP_BOAT_GUNBARREL].oldorigin);
-    trap_R_AddRefEntityToScene( &part[BP_BOAT_GUNBARREL] );
+	}
 
 	// reticles
 	if( cent == &cg.predictedPlayerEntity )

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_weapondata.c,v 1.10 2002-02-14 11:51:40 sparky909_uk Exp $
+ * $Id: bg_weapondata.c,v 1.11 2002-02-21 13:14:20 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -36,6 +36,9 @@ completeWeaponData_t availableWeapons[] =
 		0,									// crosshair
 		0,									// crosshair track
 		0,									// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
 	},
 
 	// machinegun: WW1, cal .303, 2 barrels
@@ -65,6 +68,9 @@ completeWeaponData_t availableWeapons[] =
 		CH_GUNMODE,							// crosshair
 		CH_GUNMODE,							// crosshair track
 		CH_GUNMODE,							// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
 	},
 
 	// machinegun: WW1, cal .312, 2 barrels
@@ -94,6 +100,9 @@ completeWeaponData_t availableWeapons[] =
 		CH_GUNMODE,							// crosshair
 		CH_GUNMODE,							// crosshair track
 		CH_GUNMODE,							// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
 	},
 
 	// machinegun: WW2, cal 50, 8 barrels
@@ -123,6 +132,9 @@ completeWeaponData_t availableWeapons[] =
 		CH_GUNMODE,							// crosshair
 		CH_GUNMODE,							// crosshair track
 		CH_GUNMODE,							// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
 	},
 
 	// machinegun: WW2, cal 50, 6 barrels
@@ -152,6 +164,9 @@ completeWeaponData_t availableWeapons[] =
 		CH_GUNMODE,							// crosshair
 		CH_GUNMODE,							// crosshair track
 		CH_GUNMODE,							// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
 	},
 
 	// machinegun: any set, 12.7mm, 1 barrel
@@ -181,6 +196,9 @@ completeWeaponData_t availableWeapons[] =
 		CH_GUNMODE,							// crosshair
 		CH_GUNMODE,							// crosshair track
 		CH_GUNMODE,							// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
 	},
 
 	// machinegun: any set, 14.5mm, 1 barrel
@@ -210,6 +228,9 @@ completeWeaponData_t availableWeapons[] =
 		CH_GUNMODE,							// crosshair
 		CH_GUNMODE,							// crosshair track
 		CH_GUNMODE,							// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
 	},
 
 	// machinegun: modern, 20mm, 1 barrel
@@ -239,6 +260,9 @@ completeWeaponData_t availableWeapons[] =
 		CH_GUNMODE,							// crosshair
 		CH_GUNMODE,							// crosshair track
 		CH_GUNMODE,							// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
 	},
 
 	// machinegun: modern, 20mm, 2 barrel
@@ -268,6 +292,73 @@ completeWeaponData_t availableWeapons[] =
 		CH_GUNMODE,							// crosshair
 		CH_GUNMODE,							// crosshair track
 		CH_GUNMODE,							// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
+	},
+
+	// machinegun: modern, 30mm, 2 barrel
+	{ 
+		WT_MACHINEGUN,						// type
+		MF_GAMESET_MODERN,					// gameset
+		"Dual 30mm MG",						// descriptiveName
+		"GUN",								// shortName
+		"MG",								// shortName2 (GVs)
+		"",									// modelName
+		"hud/iconw_mg.tga",					// iconName
+		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
+		3000,								// muzzleVelocity
+		0,									// range
+		0,									// fuelrange
+		100,								// fire interval
+		30,									// damage
+		0,									// damageRadius
+		10,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
+		2,									// barrels
+		0,									// barrelDistance
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_GUNMODE,							// crosshair
+		CH_GUNMODE,							// crosshair track
+		CH_GUNMODE,							// crosshair lock
+		1,									// turret
+		{5,120,0},							// max turret angles
+		{-75,-120,0},							// min turret angles
+	},
+
+	// machinegun: modern, 12.7mm turret
+	{ 
+		WT_MACHINEGUN,						// type
+		MF_GAMESET_MODERN,					// gameset
+		"12.7mm MG",						// descriptiveName
+		"GUN",								// shortName
+		"MG",								// shortName2 (GVs)
+		"",									// modelName
+		"hud/iconw_mg.tga",					// iconName
+		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
+		3000,								// muzzleVelocity
+		0,									// range
+		0,									// fuelrange
+		100,								// fire interval
+		10,									// damage
+		0,									// damageRadius
+		10,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
+		1,									// barrels
+		0,									// barrelDistance
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_GUNMODE,							// crosshair
+		CH_GUNMODE,							// crosshair track
+		CH_GUNMODE,							// crosshair lock
+		1,									// turret
+		{5,-60,0},							// max turret angles
+		{-75,60,0},							// min turret angles
 	},
 
 	// FFAR
@@ -297,6 +388,9 @@ completeWeaponData_t availableWeapons[] =
 		CH_ROCKETMODE,						// crosshair
 		CH_ROCKETMODE,						// crosshair track
 		CH_ROCKETMODE,						// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
 	},
 
 	// tank gun
@@ -326,6 +420,9 @@ completeWeaponData_t availableWeapons[] =
 		CH_ROCKETMODE,						// crosshair
 		CH_ROCKETMODE,						// crosshair track
 		CH_ROCKETMODE,						// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
 	},
 
 	// tank gun
@@ -355,6 +452,9 @@ completeWeaponData_t availableWeapons[] =
 		CH_ROCKETMODE,						// crosshair
 		CH_ROCKETMODE,						// crosshair track
 		CH_ROCKETMODE,						// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
 	},
 
 	// iron bombs
@@ -384,6 +484,9 @@ completeWeaponData_t availableWeapons[] =
 		CH_BOMBMODE,						// crosshair
 		CH_BOMBMODE,						// crosshair track
 		CH_BOMBMODE,						// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
 	},
 
 	// Sidewinder
@@ -413,6 +516,9 @@ completeWeaponData_t availableWeapons[] =
 		CH_MISSILEMODE,						// crosshair
 		CH_MISSILEMODETRACK,				// crosshair track
 		CH_MISSILEMODELOCK,					// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
 	},
 
 	// AMRAAM
@@ -442,6 +548,9 @@ completeWeaponData_t availableWeapons[] =
 		CH_MISSILEMODE,						// crosshair
 		CH_MISSILEMODETRACK,				// crosshair track
 		CH_MISSILEMODELOCK,					// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
 	},
 
 	// Sparrow
@@ -471,6 +580,9 @@ completeWeaponData_t availableWeapons[] =
 		CH_MISSILEMODE,						// crosshair
 		CH_MISSILEMODETRACK,				// crosshair track
 		CH_MISSILEMODELOCK,					// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
 	},
 
 	// Phoenix
@@ -500,6 +612,9 @@ completeWeaponData_t availableWeapons[] =
 		CH_MISSILEMODE,						// crosshair
 		CH_MISSILEMODETRACK,				// crosshair track
 		CH_MISSILEMODELOCK,					// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
 	},
 
 	// Stinger
@@ -529,6 +644,9 @@ completeWeaponData_t availableWeapons[] =
 		CH_MISSILEMODE,						// crosshair
 		CH_MISSILEMODETRACK,				// crosshair track
 		CH_MISSILEMODELOCK,					// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
 	},
 
 	// Atoll
@@ -558,6 +676,9 @@ completeWeaponData_t availableWeapons[] =
 		CH_MISSILEMODE,						// crosshair
 		CH_MISSILEMODETRACK,				// crosshair track
 		CH_MISSILEMODELOCK,					// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
 	},
 
 	// Archer
@@ -587,6 +708,9 @@ completeWeaponData_t availableWeapons[] =
 		CH_MISSILEMODE,						// crosshair
 		CH_MISSILEMODETRACK,				// crosshair track
 		CH_MISSILEMODELOCK,					// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
 	},
 
 	// Alamo
@@ -616,6 +740,9 @@ completeWeaponData_t availableWeapons[] =
 		CH_MISSILEMODE,						// crosshair
 		CH_MISSILEMODETRACK,				// crosshair track
 		CH_MISSILEMODELOCK,					// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
 	},
 
 	// Hellfire
@@ -645,6 +772,9 @@ completeWeaponData_t availableWeapons[] =
 		CH_MISSILEMODE,						// crosshair
 		CH_MISSILEMODETRACK,				// crosshair track
 		CH_MISSILEMODELOCK,					// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
 	},
 
 	// Maverick
@@ -674,6 +804,9 @@ completeWeaponData_t availableWeapons[] =
 		CH_MISSILEMODE,						// crosshair
 		CH_MISSILEMODETRACK,				// crosshair track
 		CH_MISSILEMODELOCK,					// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
 	},
 
 	// flares
@@ -703,6 +836,9 @@ completeWeaponData_t availableWeapons[] =
 		0,									// crosshair
 		0,									// crosshair track
 		0,									// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
 	}
 };
 
