@@ -1,5 +1,5 @@
 /*
- * $Id: cg_marks.c,v 1.2 2002-01-31 10:09:40 sparky909_uk Exp $
+ * $Id: cg_marks.c,v 1.3 2002-02-04 12:59:14 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -138,6 +138,7 @@ void CG_ImpactMarkEx( qhandle_t markShader, const vec3_t origin, const vec3_t di
 	markFragment_t	markFragments[MAX_MARK_FRAGMENTS], *mf;
 	vec3_t			markPoints[MAX_MARK_POINTS];
 	vec3_t			projection;
+	qboolean		flip = qfalse;
 
 	// client marks disabled?
 	if( !cg_addMarks.integer )
@@ -158,17 +159,13 @@ void CG_ImpactMarkEx( qhandle_t markShader, const vec3_t origin, const vec3_t di
 	// create the texture axis
 	VectorNormalize2( dir, axis[0] );
 
-	// HACK: to prevent axis flipping and incorrect orientation rotations just fudge the
-	// axis[0] vector for now
-#pragma message ("CG_ImpactMarkEx() - 'straight up' axis hack in (for shadows - may impact other marks)")
-	axis[0][0]=0;
-	axis[0][1]=0;
-	axis[0][2]=1;
-	
+#pragma message ("CG_ImpactMarkEx() - the shadow orientation problem (when using CG_MarkGeneratedShadow()) is here...")
+
+	// work our projection axis
 	PerpendicularVector( axis[1], axis[0] );
 	RotatePointAroundVector( axis[2], axis[0], axis[1], orientation );
 	CrossProduct( axis[0], axis[2], axis[1] );
-
+	
 	xTexCoordScale = 0.5 * 1.0 / xRadius;
 	yTexCoordScale = 0.5 * 1.0 / yRadius;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_plane.c,v 1.15 2002-02-04 09:38:06 thebjoern Exp $
+ * $Id: cg_plane.c,v 1.16 2002-02-04 12:59:14 sparky909_uk Exp $
 */
 
 
@@ -162,7 +162,6 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 	refEntity_t		burner;
 	refEntity_t		burner2;
 	refEntity_t		reticle;
-	qboolean	    shadow;
 	float			shadowPlane = 0;
 	int				renderfx = 0;
 	int				i;
@@ -194,13 +193,19 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
     // add the talk baloon or disconnect icon
     CG_PlayerSprites( cent );
     
-    // add the shadow
-    shadow = CG_GenericShadow( cent, &shadowPlane );
-
-    if ( cg_shadows.integer == 3 && shadow ) {
-    	renderfx |= RF_SHADOW_PLANE;
-    }
-    renderfx |= RF_LIGHTING_ORIGIN;			// use the same origin for all
+   // add the shadow
+	switch( cg_shadows.integer )
+	{
+	case 1:
+		CG_GenericShadow( cent, &shadowPlane );
+		break;
+	case 3:
+		renderfx |= RF_SHADOW_PLANE;
+		break;
+	}
+	
+	// use the same origin for all
+    renderfx |= RF_LIGHTING_ORIGIN;
 
 	//
 	// animations
