@@ -267,6 +267,10 @@ SOURCE=.\cg_vehicle.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\cg_vehicledraw.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\cg_view.c
 # End Source File
 # Begin Source File

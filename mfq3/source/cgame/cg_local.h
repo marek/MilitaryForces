@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.52 2002-06-15 18:37:13 thebjoern Exp $
+ * $Id: cg_local.h,v 1.53 2002-07-13 12:04:40 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -887,6 +887,34 @@ typedef struct {
 
 // end IGME
 
+// MFQ3 vehicle drawing
+typedef struct {
+    int					vehicleIndex;
+} BasicDrawInfo_t;
+
+typedef struct {
+    BasicDrawInfo_t		basicInfo;
+} DrawInfo_Plane_t;
+
+typedef struct {
+    BasicDrawInfo_t		basicInfo;
+} DrawInfo_GV_t;
+
+typedef struct {
+    BasicDrawInfo_t		basicInfo;
+} DrawInfo_Boat_t;
+
+typedef struct {
+    BasicDrawInfo_t		basicInfo;
+} DrawInfo_Helo_t;
+
+typedef struct {
+    BasicDrawInfo_t		basicInfo;
+} DrawInfo_LQM_t;
+
+
+// end MFQ3 vehicle drawing
+
 // The client game static (cgs) structure hold everything
 // loaded or calculated from the gamestate.  It will NOT
 // be cleared when a tournement restart is done, allowing
@@ -1266,6 +1294,16 @@ void CG_Misc_Vehicle( centity_t *cent );
 void CG_VehicleLoadout( centity_t* cent );
 void CG_AddToVehicleLoadout( centity_t* cent, int weaponIndex );
 void CG_InitShadows( void );
+
+
+//
+// cg_vehicledraw.c
+//
+void CG_DrawPlane(DrawInfo_Plane_t* drawInfo);
+void CG_DrawGV(DrawInfo_GV_t* drawInfo);
+void CG_DrawBoat(DrawInfo_Boat_t* drawInfo);
+void CG_DrawHelo(DrawInfo_Helo_t* drawInfo);
+void CG_DrawLQM(DrawInfo_LQM_t* drawInfo);
 
 //
 // cg_plane.c
