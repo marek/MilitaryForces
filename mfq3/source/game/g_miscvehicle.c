@@ -1,5 +1,5 @@
 /*
- * $Id: g_miscvehicle.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: g_miscvehicle.c,v 1.2 2001-12-22 02:28:44 thebjoern Exp $
 */
 
 
@@ -32,7 +32,7 @@ void misc_vehicle_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacke
 	ExplodeVehicle(self);
 	self->freeAfterEvent = qtrue;
 
-	G_RadiusDamage( self->r.currentOrigin, self, 150, 150, self, MOD_VEHICLEEXPLOSION );
+	G_RadiusDamage( self->r.currentOrigin, self, 150, 150, self, MOD_VEHICLEEXPLOSION, CAT_ANY );
 
 	trap_LinkEntity( self );
 	

@@ -1,5 +1,5 @@
 /*
- * $Id: g_utils.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: g_utils.c,v 1.2 2001-12-22 02:28:44 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -524,7 +524,7 @@ void G_KillBox (gentity_t *ent) {
 
 		// nail it
 		G_Damage ( hit, ent, ent, NULL, NULL,
-			100000, DAMAGE_NO_PROTECTION, MOD_TELEFRAG);
+			100000, DAMAGE_NO_PROTECTION, MOD_TELEFRAG, CAT_ANY);
 	}
 
 }

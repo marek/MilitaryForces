@@ -1,5 +1,5 @@
 /*
- * $Id: q_shared.h,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: q_shared.h,v 1.2 2001-12-22 02:28:44 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -916,7 +916,7 @@ typedef struct playerState_s {
 
 	vec3_t		origin;
 	vec3_t		velocity;
-	int			MFQ3_unused2;	// --- unused (ex weaponTime) ---
+	int			tracktarget;
 	int			gunAngle;
 	int			speed;
 	int			delta_angles[3];	// add to command angles to get view direction
@@ -1042,7 +1042,7 @@ typedef struct entityState_s {
 	trajectory_t	apos;	// for calculating angles
 
 	int		time;
-	int		mfq3_unused;
+	int		tracktarget;
 
 	vec3_t	origin;
 	vec3_t	origin2;

@@ -1,5 +1,5 @@
 /*
- * $Id: g_active.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: g_active.c,v 1.2 2001-12-22 02:28:44 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -117,7 +117,7 @@ void P_WorldEffects( gentity_t *ent ) {
 				ent->pain_debounce_time = level.time + 200;
 
 				G_Damage (ent, NULL, NULL, NULL, NULL, 
-					ent->damage, DAMAGE_NO_PROTECTION, MOD_WATER);
+					ent->damage, DAMAGE_NO_PROTECTION, MOD_WATER, CAT_ANY);
 			}
 		}
 	} else {
@@ -135,12 +135,12 @@ void P_WorldEffects( gentity_t *ent ) {
 
 			if (ent->watertype & CONTENTS_LAVA) {
 				G_Damage (ent, NULL, NULL, NULL, NULL, 
-					30*waterlevel, 0, MOD_LAVA);
+					30*waterlevel, 0, MOD_LAVA, CAT_ANY);
 			}
 
 			if (ent->watertype & CONTENTS_SLIME) {
 				G_Damage (ent, NULL, NULL, NULL, NULL, 
-					10*waterlevel, 0, MOD_SLIME);
+					10*waterlevel, 0, MOD_SLIME, CAT_ANY);
 			}
 		}
 	}
@@ -648,9 +648,10 @@ void ClientThink_real( gentity_t *ent ) {
 
 	// first the general functionality, then the cat-specific one
 	// category specific actions if any
+	updateTargetTracking(ent);
 	if( (availableVehicles[client->vehicle].id&CAT_ANY) & CAT_PLANE ) {
 		// takeoff/landing
-		Check_Takeoff_Landing( ent );
+		checkTakeoffLanding( ent );
 	}
 	// don't forget to update flags!
 	ent->ONOFF = ent->client->ps.ONOFF;
@@ -706,7 +707,7 @@ void ClientThink_real( gentity_t *ent ) {
 	if( (availableVehicles[client->vehicle].id&CAT_ANY) & CAT_GROUND ) {
 		if( client->ps.ONOFF & OO_VAPOR ) {
 			client->ps.ONOFF &= ~OO_VAPOR;
-			G_Damage( ent, 0, ent, 0, 0, client->ps.speed/5, DAMAGE_NO_PROTECTION, MOD_CRASH );
+			G_Damage( ent, 0, ent, 0, 0, client->ps.speed/5, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 		}
 	}
 
@@ -731,7 +732,7 @@ void ClientThink_real( gentity_t *ent ) {
 	ent->watertype = pm.watertype;
 
 	if( client->vehicle >= 0 && ent->waterlevel ) {
-	    G_Damage( ent, NULL, ent, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH );
+	    G_Damage( ent, NULL, ent, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 	}
 
 	// execute client events

@@ -1,5 +1,5 @@
 /*
- * $Id: g_mover.c,v 1.2 2001-12-03 12:02:10 thebjoern Exp $
+ * $Id: g_mover.c,v 1.3 2001-12-22 02:28:44 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -244,7 +244,7 @@ qboolean G_MoverPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **
 
 		// bobbing entities are instant-kill and never get blocked
 		if ( pusher->s.pos.trType == TR_SINE || pusher->s.apos.trType == TR_SINE ) {
-			G_Damage( check, pusher, pusher, NULL, NULL, 99999, 0, MOD_CRUSH );
+			G_Damage( check, pusher, pusher, NULL, NULL, 99999, 0, MOD_CRUSH, CAT_ANY );
 			continue;
 		}
 
@@ -670,7 +670,7 @@ void Blocked_Door( gentity_t *ent, gentity_t *other ) {
 	}
 
 	if ( ent->damage ) {
-		G_Damage( other, ent, ent, NULL, NULL, ent->damage, 0, MOD_CRUSH );
+		G_Damage( other, ent, ent, NULL, NULL, ent->damage, 0, MOD_CRUSH, CAT_ANY );
 	}
 	if ( ent->spawnflags & 4 ) {
 		return;		// crushers don't reverse
@@ -1358,7 +1358,7 @@ static void func_bobbing_touch( gentity_t *self, gentity_t *other, trace_t *trac
 {
 	if( !other->client ) return;
 
-    G_Damage( other, NULL, other, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH );
+    G_Damage( other, NULL, other, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 
 }
 

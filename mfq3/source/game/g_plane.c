@@ -1,12 +1,12 @@
 /*
- * $Id: g_plane.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: g_plane.c,v 1.2 2001-12-22 02:28:44 thebjoern Exp $
 */
 
 
 #include "g_local.h"
 
 // ugly first-cut function!
-void Check_Takeoff_Landing( gentity_t *self )
+void checkTakeoffLanding( gentity_t *self )
 {
 	trace_t	trace;
 	vec3_t	startpos;
@@ -46,10 +46,10 @@ void Check_Takeoff_Landing( gentity_t *self )
 					self->client->ps.ONOFF |= OO_LANDED;
 				}
 				else {
-				    G_Damage( self, NULL, self, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH );
+				    G_Damage( self, NULL, self, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 				}
 			} else if ( self->client->ps.vehicleAngles[0] >= 30 ) {
-			    G_Damage( self, NULL, self, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH );
+			    G_Damage( self, NULL, self, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 			}
 		}
 	}
@@ -58,11 +58,11 @@ void Check_Takeoff_Landing( gentity_t *self )
 void Touch_Plane( gentity_t *self, gentity_t *other, trace_t *trace ) 
 {
 //	G_Printf( "You crashed into a %s\n", other->classname );
-    G_Damage( self, NULL, self, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH );
+    G_Damage( self, NULL, self, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 
 /*	if( self->ONOFF & OO_LANDED ) {
 		if( !other->client ) {
-			G_Damage( self, NULL, self, NULL, NULL, self->client->ps.speed/10, DAMAGE_NO_PROTECTION, MOD_CRASH );
+			G_Damage( self, NULL, self, NULL, NULL, self->client->ps.speed/10, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 			self->client->ps.speed = self->speed = 0;
 		} else {
 			if( (availableVehicles[other->client->vehicle].id&CAT_ANY) & CAT_PLANE ) {
@@ -74,16 +74,16 @@ void Touch_Plane( gentity_t *self, gentity_t *other, trace_t *trace )
 				VectorScale( f2, other->client->ps.speed/10, f2 );
 				VectorSubtract( f1, f2, diff);
 				speed = VectorNormalize(diff);
-				G_Damage( self, NULL, self, NULL, NULL, speed/20, DAMAGE_NO_PROTECTION, MOD_CRASH );
-				G_Damage( other, NULL, self, NULL, NULL, speed/20, DAMAGE_NO_PROTECTION, MOD_CRASH );
+				G_Damage( self, NULL, self, NULL, NULL, speed/20, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
+				G_Damage( other, NULL, self, NULL, NULL, speed/20, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 				self->client->ps.speed = self->speed = 0;
 			} else {
-				G_Damage( self, NULL, self, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH );
+				G_Damage( self, NULL, self, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 			}
 		}
 	} else {
 		if( !other->client ) {
-			G_Damage( self, NULL, self, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH );
+			G_Damage( self, NULL, self, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 		} else {
 			if( (availableVehicles[other->client->vehicle].id&CAT_ANY) & CAT_PLANE ) {
 				vec3_t	diff, f1, f2;
@@ -94,11 +94,11 @@ void Touch_Plane( gentity_t *self, gentity_t *other, trace_t *trace )
 				VectorScale( f2, other->client->ps.speed/10, f2 );
 				VectorSubtract( f1, f2, diff);
 				speed = VectorNormalize(diff);
-				G_Damage( self, NULL, self, NULL, NULL, speed/20, DAMAGE_NO_PROTECTION, MOD_CRASH );
-				G_Damage( other, NULL, self, NULL, NULL, speed/20, DAMAGE_NO_PROTECTION, MOD_CRASH );
+				G_Damage( self, NULL, self, NULL, NULL, speed/20, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
+				G_Damage( other, NULL, self, NULL, NULL, speed/20, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 				self->client->ps.speed = other->client->ps.speed;
 			} else {
-				G_Damage( self, NULL, self, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH );
+				G_Damage( self, NULL, self, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 			}
 		}
 	}*/

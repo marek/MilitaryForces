@@ -1,5 +1,5 @@
 /*
- * $Id: g_missile.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: g_missile.c,v 1.2 2001-12-22 02:28:44 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -67,7 +67,7 @@ void G_ExplodeMissile( gentity_t *ent ) {
 	// splash damage
 	if ( ent->splashDamage ) {
 		if( G_RadiusDamage( ent->r.currentOrigin, ent->parent, ent->splashDamage, ent->splashRadius, ent
-			, ent->splashMethodOfDeath ) ) {
+			, ent->splashMethodOfDeath, ent->targetcat ) ) {
 			g_entities[ent->r.ownerNum].client->accuracy_hits++;
 		}
 	}
@@ -88,11 +88,11 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 	other = &g_entities[trace->entityNum];
 
 	// check for bounce
-	if ( !other->takedamage &&
-		( ent->s.eFlags & ( EF_BOUNCE | EF_BOUNCE_HALF ) ) ) {
-		G_BounceMissile( ent, trace );
-		return;
-	}
+//	if ( !other->takedamage &&
+//		( ent->s.eFlags & ( EF_BOUNCE | EF_BOUNCE_HALF ) ) ) {
+//		G_BounceMissile( ent, trace );
+//		return;
+//	}
 
 	// impact damage
 	if (other->takedamage) {
@@ -110,7 +110,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 			}
 			G_Damage (other, ent, &g_entities[ent->r.ownerNum], velocity,
 				ent->s.origin, ent->damage, 
-				0, ent->methodOfDeath);
+				0, ent->methodOfDeath, ent->targetcat);
 		}
 	}
 
@@ -138,7 +138,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 	// splash damage (doesn't apply to person directly hit)
 	if ( ent->splashDamage ) {
 		if( G_RadiusDamage( trace->endpos, ent->parent, ent->splashDamage, ent->splashRadius, 
-			other, ent->splashMethodOfDeath ) ) {
+			other, ent->splashMethodOfDeath, ent->targetcat ) ) {
 			if( !hitClient ) {
 				g_entities[ent->r.ownerNum].client->accuracy_hits++;
 			}
@@ -203,6 +203,200 @@ void G_RunMissile( gentity_t *ent ) {
 
 //=============================================================================
 
+static void no_fuel_flight( gentity_t *missile ) {
+	missile->s.pos.trType = TR_GRAVITY;
+	missile->think = G_ExplodeMissile;
+	missile->nextthink = level.time + 5000;
+}
+
+static void on_target_lost( gentity_t *missile ) {
+	missile->tracktarget = 0;
+	missile->think = no_fuel_flight;
+	missile->nextthink = missile->wait + 50;
+}
+
+/*
+================
+follow your target
+================
+*/
+static void follow_target( gentity_t *missile ) {
+	vec3_t	dir, targdir;
+	float	dist, dot;
+	trace_t	tr;
+
+	// target invalid
+	if( !missile->tracktarget ) {
+		on_target_lost(missile);
+		return;
+	} else if( !missile->tracktarget->inuse ) {
+		on_target_lost(missile);
+		return;
+	}
+
+	// out of fuel
+	if( level.time >= missile->wait ) {
+		on_target_lost(missile);
+		return;
+	}
+
+	// direction vector and range
+	VectorSubtract( missile->tracktarget->r.currentOrigin, missile->r.currentOrigin, targdir );
+	dist = VectorNormalize(dir);
+
+	// out of range (if ever possible)
+	if( dist > missile->range ) {
+		on_target_lost(missile);
+		return;
+	}
+
+	// out of seeker cone
+	VectorCopy( missile->s.pos.trDelta, dir );
+	VectorNormalize( dir );
+	dot = DotProduct( dir, targdir );
+	if( dot < 0.996f ) { // roughly 5 degrees
+		on_target_lost(missile);
+		return;
+	}
+
+	// LOS
+	trap_Trace( &tr, missile->r.currentOrigin, 0, 0, missile->tracktarget->r.currentOrigin, missile->tracktarget->s.number, MASK_SOLID );
+	if( tr.fraction < 1.0f ) {
+		on_target_lost(missile);
+		return;
+	}
+
+	// adjust course/speed
+	VectorMA( dir, 0.05f, targdir, targdir );
+	VectorNormalize( targdir );
+	VectorScale( targdir, missile->speed, dir );
+	
+	vectoangles( dir, targdir );
+	VectorCopy( targdir, missile->s.angles );
+	VectorCopy( missile->s.angles, missile->s.apos.trBase );
+	VectorCopy( missile->s.angles, missile->r.currentAngles );
+	missile->s.apos.trTime = level.time;
+
+	VectorCopy( missile->r.currentOrigin, missile->s.pos.trBase );
+	VectorCopy( dir, missile->s.pos.trDelta );
+	missile->s.pos.trTime = level.time;
+
+	missile->nextthink = level.time + 100;
+
+	trap_LinkEntity( missile );
+}
+
+
+
+
+
+
+//=============================================================================
+
+/*
+=================
+fire_antiair MFQ3
+=================
+*/
+void fire_antiair (gentity_t *self) {
+	gentity_t	*bolt;
+	vec3_t		dir, right, up;
+	vec3_t		start;
+	int			mult;
+
+	AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
+	VectorCopy( self->s.pos.trBase, start );
+	if( (availableVehicles[self->client->vehicle].id&CAT_ANY) & CAT_PLANE ) {
+		self->left = (self->left ? qfalse : qtrue);
+		mult = (self->left ? 1 : -1);
+		VectorMA( start, availableVehicles[self->client->vehicle].mins[2], up, start );
+		VectorMA( start, availableVehicles[self->client->vehicle].maxs[1]*mult/2, right, start );
+	}
+	SnapVector( start );
+
+	bolt = G_Spawn();
+	bolt->classname = "aam";
+	bolt->nextthink = level.time + 50;
+	bolt->wait = level.time + availableWeapons[self->client->ps.weaponIndex].fuelrange;
+	bolt->think = follow_target;
+	bolt->tracktarget = self->tracktarget;
+	bolt->s.eType = ET_MISSILE;
+	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
+	bolt->s.weaponIndex = self->client->ps.weaponIndex;
+	bolt->r.ownerNum = self->s.number;
+	bolt->parent = self;
+	bolt->damage = bolt->splashDamage = availableWeapons[self->client->ps.weaponIndex].damage;
+	bolt->splashRadius = availableWeapons[self->client->ps.weaponIndex].damageRadius;
+	bolt->targetcat = availableWeapons[self->client->ps.weaponIndex].category;
+	bolt->catmodifier = availableWeapons[self->client->ps.weaponIndex].noncatmod;
+	bolt->range = availableWeapons[self->client->ps.weaponIndex].range;
+	bolt->methodOfDeath = MOD_FFAR;
+	bolt->splashMethodOfDeath = MOD_FFAR_SPLASH;
+	bolt->clipmask = MASK_SHOT;
+	bolt->target_ent = NULL;
+	bolt->speed = availableWeapons[self->client->ps.weaponIndex].muzzleVelocity;
+
+	bolt->s.pos.trType = TR_LINEAR;
+	bolt->s.pos.trTime = level.time;// - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
+	VectorCopy( start, bolt->s.pos.trBase );
+	VectorScale( dir, bolt->speed, bolt->s.pos.trDelta );
+	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
+	VectorCopy (start, bolt->r.currentOrigin);
+}
+
+
+/*
+=================
+fire_antiground MFQ3
+=================
+*/
+void fire_antiground (gentity_t *self) {
+	gentity_t	*bolt;
+	vec3_t		dir, right, up;
+	vec3_t		start;
+	int			mult;
+
+	AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
+	VectorCopy( self->s.pos.trBase, start );
+	if( (availableVehicles[self->client->vehicle].id&CAT_ANY) & CAT_PLANE ) {
+		self->left = (self->left ? qfalse : qtrue);
+		mult = (self->left ? 1 : -1);
+		VectorMA( start, availableVehicles[self->client->vehicle].mins[2], up, start );
+		VectorMA( start, availableVehicles[self->client->vehicle].maxs[1]*mult/2, right, start );
+	}
+	SnapVector( start );
+
+	bolt = G_Spawn();
+	bolt->classname = "agm";
+	bolt->nextthink = level.time + 50;
+	bolt->wait = level.time + availableWeapons[self->client->ps.weaponIndex].fuelrange;
+	bolt->think = follow_target;
+	bolt->tracktarget = self->tracktarget;
+	bolt->s.eType = ET_MISSILE;
+	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
+	bolt->s.weaponIndex = self->client->ps.weaponIndex;
+	bolt->r.ownerNum = self->s.number;
+	bolt->parent = self;
+	bolt->damage = bolt->splashDamage = availableWeapons[self->client->ps.weaponIndex].damage;
+	bolt->splashRadius = availableWeapons[self->client->ps.weaponIndex].damageRadius;
+	bolt->targetcat = availableWeapons[self->client->ps.weaponIndex].category;
+	bolt->catmodifier = availableWeapons[self->client->ps.weaponIndex].noncatmod;
+	bolt->range = availableWeapons[self->client->ps.weaponIndex].range;
+	bolt->methodOfDeath = MOD_FFAR;
+	bolt->splashMethodOfDeath = MOD_FFAR_SPLASH;
+	bolt->clipmask = MASK_SHOT;
+	bolt->target_ent = NULL;
+	bolt->speed = availableWeapons[self->client->ps.weaponIndex].muzzleVelocity;
+
+	bolt->s.pos.trType = TR_LINEAR;
+	bolt->s.pos.trTime = level.time;// - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
+	VectorCopy( start, bolt->s.pos.trBase );
+	VectorScale( dir, bolt->speed, bolt->s.pos.trDelta );
+	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
+	VectorCopy (start, bolt->r.currentOrigin);
+}
+
+
 /*
 =================
 fire_ffar MFQ3
@@ -226,8 +420,8 @@ void fire_ffar (gentity_t *self) {
 
 	bolt = G_Spawn();
 	bolt->classname = "ffar";
-	bolt->nextthink = level.time + 10000;
-	bolt->think = G_ExplodeMissile;
+	bolt->nextthink = level.time + availableWeapons[self->client->ps.weaponIndex].fuelrange;
+	bolt->think = no_fuel_flight;
 	bolt->s.eType = ET_MISSILE;
 	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
 	bolt->s.weaponIndex = self->client->ps.weaponIndex;
@@ -235,6 +429,8 @@ void fire_ffar (gentity_t *self) {
 	bolt->parent = self;
 	bolt->damage = bolt->splashDamage = availableWeapons[self->client->ps.weaponIndex].damage;
 	bolt->splashRadius = availableWeapons[self->client->ps.weaponIndex].damageRadius;
+	bolt->targetcat = availableWeapons[self->client->ps.weaponIndex].category;
+	bolt->catmodifier = availableWeapons[self->client->ps.weaponIndex].noncatmod;
 	bolt->methodOfDeath = MOD_FFAR;
 	bolt->splashMethodOfDeath = MOD_FFAR_SPLASH;
 	bolt->clipmask = MASK_SHOT;
@@ -280,6 +476,8 @@ void fire_ironbomb (gentity_t *self) {
 	bolt->parent = self;
 	bolt->damage = bolt->splashDamage = availableWeapons[self->client->ps.weaponIndex].damage;
 	bolt->splashRadius = availableWeapons[self->client->ps.weaponIndex].damageRadius;
+	bolt->targetcat = availableWeapons[self->client->ps.weaponIndex].category;
+	bolt->catmodifier = availableWeapons[self->client->ps.weaponIndex].noncatmod;
 	bolt->methodOfDeath = MOD_IRONBOMB;
 	bolt->splashMethodOfDeath = MOD_IRONBOMB_SPLASH;
 	bolt->clipmask = MASK_SHOT;
@@ -355,6 +553,8 @@ void fire_autocannon (gentity_t *self) {
 	bolt->r.ownerNum = self->s.number;
 	bolt->parent = self;
 	bolt->damage = availableWeapons[availableVehicles[self->client->vehicle].weapons[WP_MACHINEGUN]].damage;
+	bolt->targetcat = availableWeapons[self->client->ps.weaponIndex].category;
+	bolt->catmodifier = availableWeapons[self->client->ps.weaponIndex].noncatmod;
 	bolt->methodOfDeath = MOD_AUTOCANNON;
 	bolt->clipmask = MASK_SHOT;
 	bolt->target_ent = NULL;
@@ -406,6 +606,8 @@ void fire_maingun( gentity_t *self ) {
 	bolt->parent = self;
 	bolt->damage = bolt->splashDamage = availableWeapons[self->client->ps.weaponIndex].damage;
 	bolt->splashRadius = availableWeapons[self->client->ps.weaponIndex].damageRadius;
+	bolt->targetcat = availableWeapons[self->client->ps.weaponIndex].category;
+	bolt->catmodifier = availableWeapons[self->client->ps.weaponIndex].noncatmod;
 	bolt->methodOfDeath = MOD_MAINGUN;
 	bolt->splashMethodOfDeath = MOD_MAINGUN;
 	bolt->clipmask = MASK_SHOT;
