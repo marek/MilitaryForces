@@ -1,5 +1,5 @@
 /*
- * $Id: cg_servercmds.c,v 1.3 2002-02-05 14:37:52 sparky909_uk Exp $
+ * $Id: cg_servercmds.c,v 1.4 2002-02-11 12:20:42 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -445,6 +445,29 @@ static void CG_RemoveChatEscapeChar( char *text ) {
 
 /*
 =================
+CG_PrintExtractExtra
+=================
+*/
+static void CG_PrintExtractExtra( void )
+{
+	const char	*extraCmd = CG_Argv(2);
+
+	// intercepts 'print' commands and forwards the text onto other parts if need be
+
+	// any second parameter?
+	if( strlen( extraCmd ) > 0 )
+	{
+		// compare with known extra-commands
+		if( strcmp( extraCmd, "<scoreboard>" ) == 0 )
+		{
+			// copy the first parameter into the information chars
+			strcpy( cg.scoreboardMisc, CG_Argv(1) );
+		}
+	}
+}
+
+/*
+=================
 CG_ServerCommand
 
 The string has been tokenized and can be retrieved with
@@ -473,6 +496,7 @@ static void CG_ServerCommand( void ) {
 	}
 
 	if ( !strcmp( cmd, "print" ) ) {
+		CG_PrintExtractExtra( );
 		CG_Printf( "%s", CG_Argv(1) );
 		return;
 	}

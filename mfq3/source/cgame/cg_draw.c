@@ -1,5 +1,5 @@
 /*
- * $Id: cg_draw.c,v 1.13 2002-02-06 13:07:40 sparky909_uk Exp $
+ * $Id: cg_draw.c,v 1.14 2002-02-11 12:20:42 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -21,8 +21,13 @@
 	extern displayContextDef_t *DC;
 #endif
 
-int drawTeamOverlayModificationCount = -1;
+/*
+===============================================================================
+VARS
+===============================================================================
+*/
 
+int drawTeamOverlayModificationCount = -1;
 int sortedTeamPlayers[TEAM_MAXOVERLAY];
 int	numSortedTeamPlayers;
 
@@ -30,9 +35,32 @@ char systemChat[256];
 char teamChat1[256];
 char teamChat2[256];
 
-// console
+/*
+===============================================================================
+CUSTOM CONSOLE
+===============================================================================
+*/
+
 struct strConsoleLine consoleLine[ MAX_CONSOLE_LINES ];	// our custom console buffer
 int consoleIdx = 0;
+
+/*
+===============================================================================
+LAGOMETER
+===============================================================================
+*/
+
+#define	LAG_SAMPLES		128
+
+typedef struct {
+	int		frameSamples[LAG_SAMPLES];
+	int		frameCount;
+	int		snapshotFlags[LAG_SAMPLES];
+	int		snapshotSamples[LAG_SAMPLES];
+	int		snapshotCount;
+} lagometer_t;
+
+lagometer_t		lagometer;
 
 #ifdef _MENU_SCOREBOARD
 
@@ -498,9 +526,15 @@ static float CG_DrawSnapshot( float y ) {
 		cg.latestSnapshotNum, cgs.serverCommandSequence );
 	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 
+#ifdef _MENU_SCOREBOARD
+	CG_DrawStringNew( 320, 430, 0.35f, colorWhite, s, 0, 0, ITEM_TEXTSTYLE_SHADOWED, CENTRE_JUSTIFY );
+
+	return y;
+#else
 	CG_DrawBigString( 635 - w, y + 2, s, 1.0F);
 
 	return y + BIGCHAR_HEIGHT + 4;
+#endif
 }
 
 /*
@@ -528,12 +562,15 @@ vec4_t * CG_CreateColour( float r, float g, float b, float a )
 CG_DrawFPS
 ==================
 */
+
 #define	FPS_FRAMES	4
+#define	FPS_STROBE	50	// only show every x computes because we can't read the damn this otherwise
+
 static float CG_DrawFPS( float y ) {
 	char		*s;
 	int			w;
 	static int	previousTimes[FPS_FRAMES];
-	static int	index;
+	static int	index, strobe = 0, lFps = 0;
 	int		i, total;
 	int		fps;
 	static	int	previous;
@@ -558,6 +595,20 @@ static float CG_DrawFPS( float y ) {
 		}
 		fps = 1000 * FPS_FRAMES / total;
 
+		// show this one?
+		if( strobe > 0 )
+		{
+			// use old fps
+			fps = lFps;
+		}
+		else
+		{
+			// store persistant strobe value
+			lFps = fps;
+		}
+		strobe++;
+		if( strobe >= FPS_STROBE ) strobe = 0;
+
 		s = va( "%ifps", fps );
 		w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 
@@ -576,14 +627,20 @@ static float CG_DrawFPS( float y ) {
 CG_DrawTimer
 =================
 */
+
+#define TIMER_WIDTH		60
+#define	TIMER_HEIGHT	20
+
 static float CG_DrawTimer( float y ) {
 	char		*s;
-	int			w;
+	int			dx = 0, dy = 0, w = 0;
 	int			mins, seconds, tens;
 	int			msec;
 
+	// calc milliseconds
 	msec = cg.time - cgs.levelStartTime;
 
+	// convert msec to time components
 	seconds = msec / 1000;
 	mins = seconds / 60;
 	seconds -= mins * 60;
@@ -598,20 +655,107 @@ static float CG_DrawTimer( float y ) {
 	if( CG_NewHUDActive() )
 	{
 		// fit around the new HUD (draw bottom middle-right)
-		CG_DrawStringNewAlpha( 524, 32, s, 1.0f, LEFT_JUSTIFY );
+		dx = 480;
+		dy = 460;
 	}
 	else
 	{
 		// draw top right
-		CG_DrawStringNewAlpha( 574, 32, s, 1.0f, LEFT_JUSTIFY );
+		dx = 604;
+		dy = y + 8;
 	}
+
+	// draw the timer background (TODO: possibly replace this with HUD when near/in the HUD)
+	DC->fillRect( dx-(TIMER_WIDTH/2), dy-4, TIMER_WIDTH, TIMER_HEIGHT, *CG_CreateColour( 0,0.5f,0,0.75f) );
+	DC->drawRect( dx-(TIMER_WIDTH/2), dy-4, TIMER_WIDTH, TIMER_HEIGHT, 1, *CG_CreateColour( 0,0,0,1.0f ) );
+
+	// draw timer string
+	CG_DrawStringNew( dx, dy, 0.35f, colorWhite, s, 0, 0, ITEM_TEXTSTYLE_SHADOWED, CENTRE_JUSTIFY );
+
+	return y + TIMER_HEIGHT + 4;
 #else
 	CG_DrawBigString( 635 - w, y + 2, s, 1.0F);
-#endif
 
 	return y + BIGCHAR_HEIGHT + 4;
+#endif
 }
 
+/*
+=================
+CG_DrawCountdownTimer
+=================
+*/
+
+#define TIMER_WIDTH		60
+#define	TIMER_HEIGHT	20
+
+static float CG_DrawCountdownTimer( float y ) {
+	char		*s;
+	int			dx = 0, dy = 0, w = 0;
+	int			mins, seconds, tens;
+	int			msec;
+	qboolean	flash = qfalse;
+
+	// no need for the countdown timer?
+	if( cgs.timelimit == 0 )
+	{
+		return y;
+	}
+
+	// calc milliseconds
+	msec = (cgs.timelimit * 60 * 1000) - (cg.time - cgs.levelStartTime) + 1000;	// the +1000 is just a correction offset
+	
+	// rubbish msec value? (i.e. negative)
+	if( msec < 0 ) msec = 0;
+	
+	// convert msec to time components
+	seconds = msec / 1000;
+	mins = seconds / 60;
+	seconds -= mins * 60;
+	tens = seconds / 10;
+	seconds -= tens * 10;
+
+	// flashing countdown? (within last minute of play)
+	if( msec <= (60*1000) && (msec & 0x100) )
+	{
+		flash = qtrue;
+	}
+
+	s = va( "%i:%i%i", mins, tens, seconds );
+	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
+
+#ifdef _MENU_SCOREBOARD
+	// alter the draw position?
+	if( CG_NewHUDActive() )
+	{
+		// fit around the new HUD (draw bottom middle-left)
+		dx = 160;
+		dy = 460;
+	}
+	else
+	{
+		// draw top right
+		dx = 604;
+		dy = y + 8;
+	}
+
+	// draw the timer background (TODO: possibly replace this with HUD when near/in the HUD)
+	DC->fillRect( dx-(TIMER_WIDTH/2), dy-4, TIMER_WIDTH, TIMER_HEIGHT, *CG_CreateColour( 0.7f,0,0,0.75f) );
+	DC->drawRect( dx-(TIMER_WIDTH/2), dy-4, TIMER_WIDTH, TIMER_HEIGHT, 1, *CG_CreateColour( 0,0,0,1.0f ) );
+
+	// draw timer string
+	if( !flash )
+	{
+		CG_DrawStringNew( dx, dy, 0.35f, colorWhite, s, 0, 0, ITEM_TEXTSTYLE_SHADOWED, CENTRE_JUSTIFY );
+	}
+
+	return y + TIMER_HEIGHT + 4;
+#else
+	CG_DrawBigString( 635 - w, y + 2, s, 1.0F);
+
+	return y + BIGCHAR_HEIGHT + 4;
+#endif
+}
 
 /*
 =================
@@ -773,6 +917,174 @@ static float CG_DrawTeamOverlay( float y, qboolean right, qboolean upper ) {
 //#endif
 }
 
+/*
+==============
+CG_DrawDisconnect
+
+Should we draw something differnet for long lag vs no packets?
+==============
+*/
+static void CG_DrawDisconnect( void ) {
+	float		x, y;
+	int			cmdNum;
+	usercmd_t	cmd;
+	const char	*s;
+	int			w;
+
+	// draw the phone jack if we are completely past our buffers
+	cmdNum = trap_GetCurrentCmdNumber() - CMD_BACKUP + 1;
+	trap_GetUserCmd( cmdNum, &cmd );
+	if ( cmd.serverTime <= cg.snap->ps.commandTime
+		|| cmd.serverTime > cg.time ) {	// special check for map_restart
+		return;
+	}
+
+	// also add text in center of screen
+	s = "Connection Interrupted";
+	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
+
+#ifdef _MENU_SCOREBOARD
+	CG_DrawStringNewAlpha( 320, 100, s, 1.0f, CENTRE_JUSTIFY );
+#else
+	CG_DrawBigString( 320 - w/2, 100, s, 1.0F);
+#endif
+
+	// blink the icon
+	if ( ( cg.time >> 9 ) & 1 ) {
+		return;
+	}
+
+	x = 640 - 48;
+	y = 480 - 48;
+
+	CG_DrawPic( x, y, 48, 48, trap_R_RegisterShader("gfx/2d/net.tga" ) );
+}
+
+#define	MAX_LAGOMETER_PING	900
+#define	MAX_LAGOMETER_RANGE	300
+
+/*
+==============
+CG_DrawLagometer
+==============
+*/
+static void CG_DrawLagometer( float y )
+{
+	int		a, x, i;
+	float	v;
+	float	ax, ay, aw, ah, mid, range;
+	int		color;
+	float	vscale;
+
+	// just draw the disconnect?
+	if ( !cg_lagometer.integer || cgs.localServer )
+	{
+		CG_DrawDisconnect();
+		return;
+	}
+
+	//
+	// draw the graph
+	//
+	
+	// is the new HUD active?
+	if( CG_NewHUDActive() )
+	{
+		// fit around the new HUD
+		x = 80;
+		y = 300;
+	}
+	else
+	{
+		// top right
+		x = 640 - 48 - 12;
+		y += 2;
+	}
+
+	trap_R_SetColor( NULL );
+	CG_DrawPic( x, y, 48, 48, cgs.media.lagometerShader );
+
+	ax = x;
+	ay = y;
+	aw = 48;
+	ah = 48;
+	CG_AdjustFrom640( &ax, &ay, &aw, &ah );
+
+	color = -1;
+	range = ah / 3;
+	mid = ay + range;
+
+	vscale = range / MAX_LAGOMETER_RANGE;
+
+	// draw the frame interpoalte / extrapolate graph
+	for ( a = 0 ; a < aw ; a++ ) {
+		i = ( lagometer.frameCount - 1 - a ) & (LAG_SAMPLES - 1);
+		v = lagometer.frameSamples[i];
+		v *= vscale;
+		if ( v > 0 ) {
+			if ( color != 1 ) {
+				color = 1;
+				trap_R_SetColor( g_color_table[ColorIndex(COLOR_YELLOW)] );
+			}
+			if ( v > range ) {
+				v = range;
+			}
+			trap_R_DrawStretchPic ( ax + aw - a, mid - v, 1, v, 0, 0, 0, 0, cgs.media.whiteShader );
+		} else if ( v < 0 ) {
+			if ( color != 2 ) {
+				color = 2;
+				trap_R_SetColor( g_color_table[ColorIndex(COLOR_BLUE)] );
+			}
+			v = -v;
+			if ( v > range ) {
+				v = range;
+			}
+			trap_R_DrawStretchPic( ax + aw - a, mid, 1, v, 0, 0, 0, 0, cgs.media.whiteShader );
+		}
+	}
+
+	// draw the snapshot latency / drop graph
+	range = ah / 2;
+	vscale = range / MAX_LAGOMETER_PING;
+
+	for ( a = 0 ; a < aw ; a++ ) {
+		i = ( lagometer.snapshotCount - 1 - a ) & (LAG_SAMPLES - 1);
+		v = lagometer.snapshotSamples[i];
+		if ( v > 0 ) {
+			if ( lagometer.snapshotFlags[i] & SNAPFLAG_RATE_DELAYED ) {
+				if ( color != 5 ) {
+					color = 5;	// YELLOW for rate delay
+					trap_R_SetColor( g_color_table[ColorIndex(COLOR_YELLOW)] );
+				}
+			} else {
+				if ( color != 3 ) {
+					color = 3;
+					trap_R_SetColor( g_color_table[ColorIndex(COLOR_GREEN)] );
+				}
+			}
+			v = v * vscale;
+			if ( v > range ) {
+				v = range;
+			}
+			trap_R_DrawStretchPic( ax + aw - a, ay + ah - v, 1, v, 0, 0, 0, 0, cgs.media.whiteShader );
+		} else if ( v < 0 ) {
+			if ( color != 4 ) {
+				color = 4;		// RED for dropped snapshots
+				trap_R_SetColor( g_color_table[ColorIndex(COLOR_RED)] );
+			}
+			trap_R_DrawStretchPic( ax + aw - a, ay + ah - range, 1, range, 0, 0, 0, 0, cgs.media.whiteShader );
+		}
+	}
+
+	trap_R_SetColor( NULL );
+
+	if ( cg_nopredict.integer || cg_synchronousClients.integer ) {
+		CG_DrawBigString( ax, ay, "snc", 1.0 );
+	}
+
+	CG_DrawDisconnect();
+}
+
 #ifdef _MENU_SCOREBOARD
 
 /*
@@ -787,7 +1099,7 @@ static qboolean CG_NewHUDActive( void )
 {
 	// definatley not active?
 	if ( cg.snap->ps.pm_type == PM_DEAD || cg.snap->ps.pm_type == PM_SPECTATOR || 
-		 cg.snap->ps.stats[STAT_HEALTH] <= 0 )
+		 cg.snap->ps.stats[STAT_HEALTH] <= 0 || cg.scoreBoardShowing )
 	{
 		return qfalse;
 	}
@@ -911,24 +1223,41 @@ CG_DrawUpperRight
 
 =====================
 */
-static void CG_DrawUpperRight( void ) {
-	float	y;
+static void CG_DrawUpperRight( qboolean scoreboard )
+{
+	float y = 2;
 
-	y = 0;
-
+/* MFQ3: no room for this because of our extensive HUD!
 	if ( cgs.gametype >= GT_TEAM && cg_drawTeamOverlay.integer == 1 ) {
 		y = CG_DrawTeamOverlay( y, qtrue, qtrue );
-	} 
-	if ( cg_drawSnapshot.integer ) {
-		y = CG_DrawSnapshot( y );
 	}
-	if ( cg_drawFPS.integer ) {
-		y = CG_DrawFPS( y );
+*/
+	// NOT in scoreboard draw?
+	if( !scoreboard )
+	{
+		// snapshot
+		if ( cg_drawSnapshot.integer ) {
+			y = CG_DrawSnapshot( y );
+		}
+
+		// framerate
+		if ( cg_drawFPS.integer ) {
+			y = CG_DrawFPS( y );
+		}
 	}
-	if ( cg_drawTimer.integer ) {
+
+	// countdown timer
+	if ( cg_drawTimer.integer || scoreboard ) {
+		y = CG_DrawCountdownTimer( y );
+	}
+
+	// elapsed timer
+	if ( cg_drawTimer.integer || scoreboard ) {
 		y = CG_DrawTimer( y );
 	}
 
+	// the lagometer
+	CG_DrawLagometer( y );
 }
 
 /*
@@ -1275,28 +1604,6 @@ static void CG_DrawReward( void ) {
 	trap_R_SetColor( NULL );
 }
 
-
-/*
-===============================================================================
-
-LAGOMETER
-
-===============================================================================
-*/
-
-#define	LAG_SAMPLES		128
-
-
-typedef struct {
-	int		frameSamples[LAG_SAMPLES];
-	int		frameCount;
-	int		snapshotFlags[LAG_SAMPLES];
-	int		snapshotSamples[LAG_SAMPLES];
-	int		snapshotCount;
-} lagometer_t;
-
-lagometer_t		lagometer;
-
 /*
 ==============
 CG_AddLagometerFrameInfo
@@ -1335,162 +1642,6 @@ void CG_AddLagometerSnapshotInfo( snapshot_t *snap ) {
 	lagometer.snapshotFlags[ lagometer.snapshotCount & ( LAG_SAMPLES - 1) ] = snap->snapFlags;
 	lagometer.snapshotCount++;
 }
-
-/*
-==============
-CG_DrawDisconnect
-
-Should we draw something differnet for long lag vs no packets?
-==============
-*/
-static void CG_DrawDisconnect( void ) {
-	float		x, y;
-	int			cmdNum;
-	usercmd_t	cmd;
-	const char	*s;
-	int			w;
-
-	// draw the phone jack if we are completely past our buffers
-	cmdNum = trap_GetCurrentCmdNumber() - CMD_BACKUP + 1;
-	trap_GetUserCmd( cmdNum, &cmd );
-	if ( cmd.serverTime <= cg.snap->ps.commandTime
-		|| cmd.serverTime > cg.time ) {	// special check for map_restart
-		return;
-	}
-
-	// also add text in center of screen
-	s = "Connection Interrupted";
-	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
-
-#ifdef _MENU_SCOREBOARD
-	CG_DrawStringNewAlpha( 320, 100, s, 1.0f, CENTRE_JUSTIFY );
-#else
-	CG_DrawBigString( 320 - w/2, 100, s, 1.0F);
-#endif
-
-	// blink the icon
-	if ( ( cg.time >> 9 ) & 1 ) {
-		return;
-	}
-
-	x = 640 - 48;
-	y = 480 - 48;
-
-	CG_DrawPic( x, y, 48, 48, trap_R_RegisterShader("gfx/2d/net.tga" ) );
-}
-
-
-#define	MAX_LAGOMETER_PING	900
-#define	MAX_LAGOMETER_RANGE	300
-
-/*
-==============
-CG_DrawLagometer
-==============
-*/
-static void CG_DrawLagometer( void ) {
-	int		a, x, y, i;
-	float	v;
-	float	ax, ay, aw, ah, mid, range;
-	int		color;
-	float	vscale;
-
-	if ( !cg_lagometer.integer || cgs.localServer ) {
-		CG_DrawDisconnect();
-		return;
-	}
-
-	//
-	// draw the graph
-	//
-	x = 640 - 48;
-	y = 480 - 48;
-
-	trap_R_SetColor( NULL );
-	CG_DrawPic( x, y, 48, 48, cgs.media.lagometerShader );
-
-	ax = x;
-	ay = y;
-	aw = 48;
-	ah = 48;
-	CG_AdjustFrom640( &ax, &ay, &aw, &ah );
-
-	color = -1;
-	range = ah / 3;
-	mid = ay + range;
-
-	vscale = range / MAX_LAGOMETER_RANGE;
-
-	// draw the frame interpoalte / extrapolate graph
-	for ( a = 0 ; a < aw ; a++ ) {
-		i = ( lagometer.frameCount - 1 - a ) & (LAG_SAMPLES - 1);
-		v = lagometer.frameSamples[i];
-		v *= vscale;
-		if ( v > 0 ) {
-			if ( color != 1 ) {
-				color = 1;
-				trap_R_SetColor( g_color_table[ColorIndex(COLOR_YELLOW)] );
-			}
-			if ( v > range ) {
-				v = range;
-			}
-			trap_R_DrawStretchPic ( ax + aw - a, mid - v, 1, v, 0, 0, 0, 0, cgs.media.whiteShader );
-		} else if ( v < 0 ) {
-			if ( color != 2 ) {
-				color = 2;
-				trap_R_SetColor( g_color_table[ColorIndex(COLOR_BLUE)] );
-			}
-			v = -v;
-			if ( v > range ) {
-				v = range;
-			}
-			trap_R_DrawStretchPic( ax + aw - a, mid, 1, v, 0, 0, 0, 0, cgs.media.whiteShader );
-		}
-	}
-
-	// draw the snapshot latency / drop graph
-	range = ah / 2;
-	vscale = range / MAX_LAGOMETER_PING;
-
-	for ( a = 0 ; a < aw ; a++ ) {
-		i = ( lagometer.snapshotCount - 1 - a ) & (LAG_SAMPLES - 1);
-		v = lagometer.snapshotSamples[i];
-		if ( v > 0 ) {
-			if ( lagometer.snapshotFlags[i] & SNAPFLAG_RATE_DELAYED ) {
-				if ( color != 5 ) {
-					color = 5;	// YELLOW for rate delay
-					trap_R_SetColor( g_color_table[ColorIndex(COLOR_YELLOW)] );
-				}
-			} else {
-				if ( color != 3 ) {
-					color = 3;
-					trap_R_SetColor( g_color_table[ColorIndex(COLOR_GREEN)] );
-				}
-			}
-			v = v * vscale;
-			if ( v > range ) {
-				v = range;
-			}
-			trap_R_DrawStretchPic( ax + aw - a, ay + ah - v, 1, v, 0, 0, 0, 0, cgs.media.whiteShader );
-		} else if ( v < 0 ) {
-			if ( color != 4 ) {
-				color = 4;		// RED for dropped snapshots
-				trap_R_SetColor( g_color_table[ColorIndex(COLOR_RED)] );
-			}
-			trap_R_DrawStretchPic( ax + aw - a, ay + ah - range, 1, range, 0, 0, 0, 0, cgs.media.whiteShader );
-		}
-	}
-
-	trap_R_SetColor( NULL );
-
-	if ( cg_nopredict.integer || cg_synchronousClients.integer ) {
-		CG_DrawBigString( ax, ay, "snc", 1.0 );
-	}
-
-	CG_DrawDisconnect();
-}
-
-
 
 /*
 ===============================================================================
@@ -1852,69 +2003,93 @@ static void CG_DrawTeamVote(void) {
 CG_DrawScoreboard
 =================
 */
-static qboolean CG_DrawScoreboard() {
+static qboolean CG_DrawScoreboard()
+{
 #ifdef _MENU_SCOREBOARD
 	static qboolean firstTime = qtrue;
 	float fade, *fadeColor;
 
-	if (menuScoreboard) {
+	if( menuScoreboard )
+	{
 		menuScoreboard->window.flags &= ~WINDOW_FORCED;
 	}
 
-	if (cg_paused.integer) {
+	if( cg_paused.integer )
+	{
 		cg.deferredPlayerLoading = 0;
 		firstTime = qtrue;
 		return qfalse;
 	}
 
 	// should never happen in Team Arena
-	if (cgs.gametype == GT_SINGLE_PLAYER && cg.predictedPlayerState.pm_type == PM_INTERMISSION ) {
+	if (cgs.gametype == GT_SINGLE_PLAYER && cg.predictedPlayerState.pm_type == PM_INTERMISSION )
+	{
 		cg.deferredPlayerLoading = 0;
 		firstTime = qtrue;
 		return qfalse;
 	}
 
 	// don't draw scoreboard during death while warmup up
-	if ( cg.warmup && !cg.showScores ) {
+	if ( cg.warmup && !cg.showScores )
+	{
 		return qfalse;
 	}
 
-	if ( cg.showScores || cg.predictedPlayerState.pm_type == PM_DEAD || cg.predictedPlayerState.pm_type == PM_INTERMISSION ) {
+	// only PM_INTERMISSION is a valid state for a non-user-requested scoreboard
+	if( !cg.showScores && !(cg.predictedPlayerState.pm_type == PM_INTERMISSION) )
+	{
+		return qfalse;
+	}
+
+	// fading... (MFQ3: probably not used any more)
+	if ( cg.showScores || cg.predictedPlayerState.pm_type == PM_INTERMISSION )
+	{
 		fade = 1.0;
 		fadeColor = colorWhite;
-	} else {
+	}
+	else
+	{
 		fadeColor = CG_FadeColor( cg.scoreFadeTime, FADE_TIME );
-		if ( !fadeColor ) {
+		if( !fadeColor )
+		{
 			// next time scoreboard comes up, don't print killer
 			cg.deferredPlayerLoading = 0;
 			cg.killerName[0] = 0;
 			firstTime = qtrue;
+
 			return qfalse;
 		}
 		fade = *fadeColor;
 	}																					  
 
 	// this is where we load the correct scoreboard script
-	if (menuScoreboard == NULL) {
-		if ( cgs.gametype >= GT_TEAM ) {
+	if (menuScoreboard == NULL)
+	{
+		if ( cgs.gametype >= GT_TEAM )
+		{
 			menuScoreboard = Menus_FindByName("teamscore_menu");
-		} else {
+		}
+		else
+		{
 			menuScoreboard = Menus_FindByName("score_menu");
 		}
 	}
 
-	if (menuScoreboard) {
-		if (firstTime) {
-			CG_SetScoreSelection(menuScoreboard);
+	if( menuScoreboard )
+	{
+		if( firstTime )
+		{
+			CG_SetScoreSelection( menuScoreboard );
 			firstTime = qfalse;
 		}
 
 		// draw
-		Menu_Paint(menuScoreboard, qtrue);
+		Menu_Paint( menuScoreboard, qtrue );
 	}
 
 	// load any models that have been deferred
-	if ( ++cg.deferredPlayerLoading > 10 ) {
+	if ( ++cg.deferredPlayerLoading > 10 )
+	{
 //		CG_LoadDeferredPlayers();	// CG_LoadDeferredPlayers - not yet implemented - MM
 	}
 
@@ -1929,11 +2104,14 @@ static qboolean CG_DrawScoreboard() {
 CG_DrawIntermission
 =================
 */
-static void CG_DrawIntermission( void ) {
-	if ( cgs.gametype == GT_SINGLE_PLAYER ) {
+static void CG_DrawIntermission( void )
+{
+	if( cgs.gametype == GT_SINGLE_PLAYER )
+	{
 		CG_DrawCenterString();
 		return;
 	}
+
 	cg.scoreFadeTime = cg.time;
 	cg.scoreBoardShowing = CG_DrawScoreboard();
 }
@@ -2219,14 +2397,26 @@ static void CG_Draw2D_MFQ3( void ) {
 		return;
 	}
 
+	// global 2D enable/disable var
 	if ( cg_draw2D.integer == 0 )
 	{
 		return;
 	}
 
+	// only draw intermission stuff?
 	if ( cg.snap->ps.pm_type == PM_INTERMISSION )
 	{
 		CG_DrawIntermission();
+		return;
+	}
+
+	// don't draw any HUD if scoreboard is up
+	cg.scoreBoardShowing = CG_DrawScoreboard();
+	if( cg.scoreBoardShowing )
+	{
+		// draw the timers
+		CG_DrawUpperRight( qtrue );
+
 		return;
 	}
 
@@ -2241,8 +2431,8 @@ static void CG_Draw2D_MFQ3( void ) {
 	{
 		// don't draw any status if dead
 		if ( cg.snap->ps.pm_type != PM_DEAD &&
-			 cg.snap->ps.stats[STAT_HEALTH] > 0 )
-//			 !(cg.snap->ps.pm_flags & PMF_VEHICLESELECT) )
+			 cg.snap->ps.stats[STAT_HEALTH] > 0 &&
+			 !(cg.snap->ps.pm_flags & PMF_VEHICLESELECT) )
 		{
 			// old or new HUD?
 			if( cg_oldHUD.integer )
@@ -2264,24 +2454,16 @@ static void CG_Draw2D_MFQ3( void ) {
 	CG_DrawVote();
 	CG_DrawTeamVote();
 
-	CG_DrawLagometer();
-
 #ifdef _MENU_SCOREBOARD
 	CG_DrawUpperLeft();
 #endif
-	CG_DrawUpperRight();
+	CG_DrawUpperRight( qfalse );
 
 	if( !CG_DrawFollow() )
 	{
 		CG_DrawWarmup();
 	}
-
-	// don't draw center string if scoreboard is up
-	cg.scoreBoardShowing = CG_DrawScoreboard();
-	if( !cg.scoreBoardShowing )
-	{
-		CG_DrawCenterString();
-	}
+	CG_DrawCenterString();
 }
 
 /*
@@ -2296,7 +2478,7 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 	vec3_t		baseOrg;
 
 	// optionally draw the info screen instead
-	if ( !cg.snap ) {
+	if( !cg.snap ) {
 		CG_DrawInformation();
 		return;
 	}
@@ -2355,23 +2537,72 @@ CG_GetGameStatusText
 */
 const char *CG_GetGameStatusText()
 {
-	const char *s = "";
-	if ( cgs.gametype < GT_TEAM) {
-		if (cg.snap->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR ) {
+	const char * s = "";
+	char * pFormatStringDraw = NULL;
+	char * pFormatStringRedWin = NULL;
+	char * pFormatStringBlueWin = NULL;
+	
+	// which gametype?
+	if ( cgs.gametype == GT_FFA )
+	{
+		// Deathmatch
+		if (cg.snap->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR )
+		{
 			s = va("%s place with %i",CG_PlaceString( cg.snap->ps.persistant[PERS_RANK] + 1 ),cg.snap->ps.persistant[PERS_SCORE] );
 		}
-	} else {
-		if ( cg.teamScores[0] == cg.teamScores[1] ) {
-			s = va("Teams are tied at %i", cg.teamScores[0] );
-		} else if ( cg.teamScores[0] >= cg.teamScores[1] ) {
-			s = va("Red leads Blue, %i to %i", cg.teamScores[0], cg.teamScores[1] );
-		} else {
-			s = va("Blue leads Red, %i to %i", cg.teamScores[1], cg.teamScores[0] );
+	}
+	else if ( cgs.gametype == GT_TEAM || cgs.gametype == GT_CTF )
+	{
+		// Team Deathmatch / Capture-The-Flag
+
+		// NOT intermission?
+		if ( cg.snap->ps.pm_type != PM_INTERMISSION )
+		{
+			pFormatStringDraw = "Teams tied at %i";
+			pFormatStringRedWin = "Red leads Blue, by %i to %i";
+			pFormatStringBlueWin = "Blue leads Red, by %i to %i";
+		}
+		else
+		{
+			pFormatStringDraw = "Match is drawn";
+			pFormatStringRedWin = "Red wins by %i to %i!";
+			pFormatStringBlueWin = "Blue wins by %i to %i!";
+		}
+
+		// team deathmatch / capture-the-flag
+		if ( cg.teamScores[0] == cg.teamScores[1] )
+		{
+			s = va( pFormatStringDraw, cg.teamScores[0] );
+		}
+		else if ( cg.teamScores[0] >= cg.teamScores[1] )
+		{
+			s = va( pFormatStringRedWin, cg.teamScores[0], cg.teamScores[1] );
+		}
+		else 
+		{
+			s = va( pFormatStringBlueWin, cg.teamScores[1], cg.teamScores[0] );
 		}
 	}
+
 	return s;
 }
 	
+/*
+=====================
+CG_GameMiscString
+=====================
+*/
+const char *CG_GameMiscString() {
+		
+	// intermission?
+	if ( cg.snap->ps.pm_type == PM_INTERMISSION && strlen( cg.scoreboardMisc ) > 0 )
+	{
+		return cg.scoreboardMisc;
+	}
+
+	return "";
+}
+
 /*
 =====================
 CG_GameTypeString
@@ -2406,6 +2637,47 @@ static void CG_DrawGameType(rectDef_t *rect, float scale, vec4_t color, qhandle_
 
 /*
 =====================
+CG_DrawGameMisc
+=====================
+*/
+static void CG_DrawGameMisc( itemDef_t * item )
+{
+	// setup text
+	item->text = CG_GameMiscString();
+
+	// draw
+	Item_Text_AutoWrapped_Paint( item );
+}
+
+/*
+=====================
+CG_DrawTeamScore
+=====================
+*/
+static void CG_DrawTeamScore( itemDef_t * item, int team )
+{
+	// setup text
+	switch( team )
+	{
+	case CG_GAME_REDSCORE:
+		item->text = va( "%i", cg.teamScores[0] );
+		break;
+
+	case CG_GAME_BLUESCORE:
+		item->text = va( "%i", cg.teamScores[1] );
+		break;
+
+	default:
+		item->text = "";
+		break;
+	}
+
+	// draw
+	Item_Text_AutoWrapped_Paint( item );
+}
+
+/*
+=====================
 CG_DrawGameStatus
 =====================
 */
@@ -2419,7 +2691,7 @@ static void CG_DrawGameStatus(rectDef_t *rect, float scale, vec4_t color, qhandl
 CG_OwnerDraw
 =====================
 */
-void CG_OwnerDraw( float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, int ownerDrawFlags, int align, float special, float scale, vec4_t color, qhandle_t shader, int textStyle )
+void CG_OwnerDraw( float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, int ownerDrawFlags, int align, float special, float scale, vec4_t color, qhandle_t shader, int textStyle, itemDef_t * item )
 {
 	rectDef_t rect;
 
@@ -2437,6 +2709,7 @@ void CG_OwnerDraw( float x, float y, float w, float h, float text_x, float text_
   rect.w = w;
   rect.h = h;
 
+  // which owner draw ID?
   switch (ownerDraw)
   {
 /*
@@ -2570,12 +2843,25 @@ void CG_OwnerDraw( float x, float y, float w, float h, float text_x, float text_
     CG_DrawAreaChat(&rect, scale, color, shader);
     break;
 */
-  case CG_GAME_TYPE:
-    CG_DrawGameType(&rect, scale, color, shader, textStyle);
+  case CG_GAME_MISC:
+    CG_DrawGameMisc( item );
+	break;
+
+  case CG_GAME_REDSCORE:
+    CG_DrawTeamScore( item, CG_GAME_REDSCORE );
+	break;
+
+  case CG_GAME_BLUESCORE:
+    CG_DrawTeamScore( item, CG_GAME_BLUESCORE );
     break;
+
+  case CG_GAME_TYPE:
+    CG_DrawGameType( &rect, scale, color, shader, textStyle );
+    break;
+
   case CG_GAME_STATUS:
-    CG_DrawGameStatus(&rect, scale, color, shader, textStyle);
-		break;
+    CG_DrawGameStatus( &rect, scale, color, shader, textStyle );
+	break;
 /*
   case CG_KILLER:
     CG_DrawKiller(&rect, scale, color, shader, textStyle);

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.27 2002-02-08 21:43:56 thebjoern Exp $
+ * $Id: cg_local.h,v 1.28 2002-02-11 12:20:42 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -8,6 +8,7 @@
 #include "tr_types.h"
 #include "../game/bg_public.h"
 #include "cg_public.h"
+#include "../ui/ui_shared.h"
 
 // global client enumerations
 
@@ -487,6 +488,7 @@ typedef struct {
 	int				spectatorLen;												// length of list
 	float			spectatorWidth;											// width in device units
 	int				spectatorTime;											// next time to offset
+	char		scoreboardMisc[MAX_STRING_CHARS];	// scoreboard extra info
 
 	// centerprinting
 	int			centerPrintTime;
@@ -1113,7 +1115,7 @@ void CG_CenterPrint( const char *str, int y, int charWidth );
 void CG_DrawActive( stereoFrame_t stereoView );
 void CG_DrawFlagModel( float x, float y, float w, float h, int team, qboolean force2D );
 void CG_DrawTeamBackground( int x, int y, int w, int h, float alpha, int team );
-void CG_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, int ownerDrawFlags, int align, float special, float scale, vec4_t color, qhandle_t shader, int textStyle);
+void CG_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, int ownerDrawFlags, int align, float special, float scale, vec4_t color, qhandle_t shader, int textStyle, itemDef_t * item );
 void CG_Text_Paint(float x, float y, float scale, vec4_t color, const char *text, float adjust, int limit, int style);
 int CG_Text_Width(const char *text, float scale, int limit);
 int CG_Text_Height(const char *text, float scale, int limit);

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_view.c,v 1.5 2002-01-29 13:03:36 thebjoern Exp $
+ * $Id: cg_view.c,v 1.6 2002-02-11 12:20:42 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -502,7 +502,8 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 
 	// if we are only updating the screen as a loading
 	// pacifier, don't even try to read snapshots
-	if ( cg.infoScreenText[0] != 0 ) {
+	if ( cg.infoScreenText[0] != 0 )
+	{
 		CG_DrawInformation();
 		return;
 	}
@@ -594,7 +595,5 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	if ( cg_stats.integer ) {
 		CG_Printf( "cg.clientFrame:%i\n", cg.clientFrame );
 	}
-
-
 }
 
