@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicle.c,v 1.9 2002-02-18 09:51:27 thebjoern Exp $
+ * $Id: cg_vehicle.c,v 1.10 2002-02-18 17:31:28 sparky909_uk Exp $
 */
 
 #include "cg_local.h"
@@ -11,6 +11,25 @@ CG_CachePlane
 On startup cache it
 ===============
 */
+
+/*
+===============
+CG_Cache_Error
+
+Wrapper for model errors, so that don't always have to prevent loading because
+one (or more) model(s) may be missing.
+===============
+*/
+void trap_Cache_Error( char * pString )
+{
+#ifdef _DEBUG
+	// just notify in console when developing
+	Com_Printf( pString );
+#else
+	// (release builds, VM builds, ...)
+	trap_Error( pString );
+#endif
+}
 
 static void CG_CachePlane(int index)
 {
@@ -62,7 +81,7 @@ static void CG_CachePlane(int index)
 
 	// only thing that always has to be there is body
 	if( !availableVehicles[index].handle[BP_PLANE_BODY] ) {
-		trap_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
+		trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
 	}
 }
 
@@ -121,7 +140,7 @@ static void CG_CacheGroundVehicle(int index)
 
 	// only thing that always has to be there is body
 	if( !availableVehicles[index].handle[BP_PLANE_BODY] ) {
-		trap_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
+		trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
 	}
 }
 
@@ -181,7 +200,7 @@ static void CG_CacheHelo(int index)
 
 	// only thing that always has to be there is body
 	if( !availableVehicles[index].handle[BP_PLANE_BODY] ) {
-		trap_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
+		trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
 	}*/
 }
 
@@ -241,7 +260,7 @@ static void CG_CacheLQM(int index)
 
 	// only thing that always has to be there is body
 	if( !availableVehicles[index].handle[BP_PLANE_BODY] ) {
-		trap_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
+		trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
 	}*/
 }
 
@@ -301,7 +320,7 @@ static void CG_CacheBoat(int index)
 
 	// only thing that always has to be there is body
 	if( !availableVehicles[index].handle[BP_PLANE_BODY] ) {
-		trap_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
+		trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
 	}*/
 }
 
