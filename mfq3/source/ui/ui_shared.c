@@ -1,5 +1,5 @@
 /*
- * $Id: ui_shared.c,v 1.8 2002-02-15 17:43:57 sparky909_uk Exp $
+ * $Id: ui_shared.c,v 1.9 2002-02-19 13:57:58 sparky909_uk Exp $
 */
 // 
 // string allocation/managment
@@ -5914,6 +5914,18 @@ void DrawStringNewColour( int x, int y, const char * pText, vec4_t colour, textJ
 {
 	// just use default extra parameters
 	DrawStringNew( x, y, 0.5f, colour, pText, 0, 0, 3, formatting );
+}
+
+/*
+=================
+DrawStringNewBasic
+=================
+*/
+
+void DrawStringNewBasic( int x, int y, float scale, const char * pText )
+{
+	// fill in a few parameters for us
+	DrawStringNew( x, y, scale, *CreateColourVector(1,1,1,1,NULL), pText, 0, 0, ITEM_TEXTSTYLE_SHADOWED, LEFT_JUSTIFY );
 }
 
 /*
