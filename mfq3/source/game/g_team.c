@@ -1,5 +1,5 @@
 /*
- * $Id: g_team.c,v 1.2 2002-02-15 09:58:31 thebjoern Exp $
+ * $Id: g_team.c,v 1.3 2002-02-16 10:16:32 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -969,7 +969,7 @@ Only in CTF games.  Red players spawn here at game start.
 */
 void SP_team_CTF_redplayer( gentity_t *ent ) {
 	if( !ent->ent_category ) ent->ent_category = CAT_ANY;
-	else ent->ent_category <<= 8;
+//	else ent->ent_category <<= 8;
 	
 	// update level information
 	level.ent_category |= ent->ent_category;
@@ -983,7 +983,7 @@ Only in CTF games.  Blue players spawn here at game start.
 */
 void SP_team_CTF_blueplayer( gentity_t *ent ) {
 	if( !ent->ent_category ) ent->ent_category = CAT_ANY;
-	else ent->ent_category <<= 8;
+//	else ent->ent_category <<= 8;
 	
 	// update level information
 	level.ent_category |= ent->ent_category;
@@ -998,7 +998,7 @@ Targets will be fired when someone spawns in on them.
 */
 void SP_team_CTF_redspawn(gentity_t *ent) {
 	if( !ent->ent_category ) ent->ent_category = CAT_ANY;
-	else ent->ent_category <<= 8;
+//	else ent->ent_category <<= 8;
 	
 	// update level information
 	level.ent_category |= ent->ent_category;
@@ -1012,7 +1012,7 @@ Targets will be fired when someone spawns in on them.
 */
 void SP_team_CTF_bluespawn(gentity_t *ent) {
 	if( !ent->ent_category ) ent->ent_category = CAT_ANY;
-	else ent->ent_category <<= 8;
+//	else ent->ent_category <<= 8;
 	
 	// update level information
 	level.ent_category |= ent->ent_category;
