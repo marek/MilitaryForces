@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.7 2002-01-23 18:49:20 sparky909_uk Exp $
+ * $Id: bg_vehicledata.c,v 1.8 2002-01-23 22:28:13 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -196,7 +196,7 @@ completeVehicleData_t availableVehicles[] =
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
-	HC_VAPOR,					// capabilities
+	HC_VAPOR|HC_DUALENGINE,		// capabilities
 	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
 	{-26, -25, -5},				// mins (bounding box)
 	{44, 25, 10},				// max (bounding box)

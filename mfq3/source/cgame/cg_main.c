@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.10 2002-01-23 18:46:15 sparky909_uk Exp $
+ * $Id: cg_main.c,v 1.11 2002-01-23 22:28:13 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -155,6 +155,10 @@ vmCvar_t	hud_speed;
 vmCvar_t	hud_altitude;
 vmCvar_t	hud_mfd;
 vmCvar_t	hud_mfd2;
+vmCvar_t	hud_center;
+vmCvar_t	hud_health;
+vmCvar_t	hud_throttle;
+
 
 typedef struct {
 	vmCvar_t	*vmCvar;
@@ -243,6 +247,9 @@ cvarTable_t		cvarTable[] = {
 	{ &hud_altitude, "hud_altitude", "1", CVAR_ARCHIVE },
 	{ &hud_mfd, "hud_mfd", "1", CVAR_ARCHIVE },
 	{ &hud_mfd2, "hud_mfd2", "1", CVAR_ARCHIVE },
+	{ &hud_center, "hud_center", "1", CVAR_ARCHIVE },
+	{ &hud_health, "hud_health", "1", CVAR_ARCHIVE },
+	{ &hud_throttle, "hud_throttle", "1", CVAR_ARCHIVE },
 
 	{ &pmove_fixed, "pmove_fixed", "1", CVAR_ROM},
 	{ &pmove_msec, "pmove_msec", "8", 0},
@@ -660,6 +667,36 @@ static void CG_RegisterGraphics( void ) {
 		"newhud/numbers/percent",
 		"newhud/numbers/point"
 	};
+	static char		*mfq3_health[10] = {
+		"newhud/hlth/1",
+		"newhud/hlth/2",
+		"newhud/hlth/3",
+		"newhud/hlth/4",
+		"newhud/hlth/5",
+		"newhud/hlth/6",
+		"newhud/hlth/7",
+		"newhud/hlth/8",
+		"newhud/hlth/9",
+		"newhud/hlth/10"
+	};
+	static char		*mfq3_throttle[15] = {
+		"newhud/thr/1",
+		"newhud/thr/2",
+		"newhud/thr/3",
+		"newhud/thr/4",
+		"newhud/thr/5",
+		"newhud/thr/6",
+		"newhud/thr/7",
+		"newhud/thr/8",
+		"newhud/thr/9",
+		"newhud/thr/10",
+		"newhud/thr/11",
+		"newhud/thr/12",
+		"newhud/thr/13",
+		"newhud/thr/14",
+		"newhud/thr/15"
+	};
+
 
 	// clear any references to old media
 	memset( &cg.refdef, 0, sizeof( cg.refdef ) );
@@ -770,6 +807,15 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.HUDspeed = trap_R_RegisterShaderNoMip( "newhud/speed_tape.tga" );
 	cgs.media.HUDrwr = trap_R_RegisterShaderNoMip( "newhud/rwr.tga" );
 	cgs.media.HUDalt = trap_R_RegisterShaderNoMip( "newhud/alt_tape.tga" );
+	cgs.media.HUDsolid = trap_R_RegisterShaderNoMip( "newhud/solid.tga" );
+	for ( i=0 ; i<10 ; i++) {
+		cgs.media.HUDhealth[i] = trap_R_RegisterShader( mfq3_health[i] );
+	}
+	for ( i=0 ; i<15 ; i++) {
+		cgs.media.HUDthrottle[i] = trap_R_RegisterShader( mfq3_throttle[i] );
+	}
+	cgs.media.HUDhealthtext = trap_R_RegisterShaderNoMip( "newhud/text/hlth.tga" );
+	cgs.media.HUDthrottletext = trap_R_RegisterShaderNoMip( "newhud/text/thr.tga" );
 	// end MFQ3 new HUD
 
 
