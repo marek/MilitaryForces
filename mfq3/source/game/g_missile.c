@@ -1,5 +1,5 @@
 /*
- * $Id: g_missile.c,v 1.10 2002-02-18 09:51:28 thebjoern Exp $
+ * $Id: g_missile.c,v 1.11 2002-02-22 11:39:40 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -606,12 +606,14 @@ void fire_ironbomb (gentity_t *self) {
 fire_autocannon MFQ3
 =================
 */
-void fire_autocannon (gentity_t *self) {
+void fire_autocannon (gentity_t *self, qboolean main) {
 	gentity_t	*bolt;
 	vec3_t		dir, forward, right, up, temp;
 	vec3_t		start, offset;
 	vec3_t		spreadangle;
-	float		spreadX = availableWeapons[availableVehicles[self->client->vehicle].weapons[0]].spread; 
+	int			weapIdx = (main ? self->client->ps.weaponIndex : availableVehicles[self->client->vehicle].weapons[0]);
+//	float		spreadX = availableWeapons[availableVehicles[self->client->vehicle].weapons[0]].spread; 
+	float		spreadX = availableWeapons[weapIdx].spread; 
 	float		spreadY = spreadX;
 
 	// used for spread
@@ -659,12 +661,14 @@ void fire_autocannon (gentity_t *self) {
 	bolt->nextthink = level.time + 4000;
 	bolt->think = G_FreeEntity;
 	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
-	bolt->s.weaponIndex = availableVehicles[self->client->vehicle].weapons[WP_MACHINEGUN];
+	bolt->s.weaponIndex = weapIdx;
+	//availableVehicles[self->client->vehicle].weapons[WP_MACHINEGUN];
 	bolt->r.ownerNum = self->s.number;
 	bolt->parent = self;
-	bolt->damage = availableWeapons[availableVehicles[self->client->vehicle].weapons[WP_MACHINEGUN]].damage;
-	bolt->targetcat = availableWeapons[self->client->ps.weaponIndex].category;
-	bolt->catmodifier = availableWeapons[self->client->ps.weaponIndex].noncatmod;
+	bolt->damage = availableWeapons[weapIdx].damage;
+	//availableWeapons[availableVehicles[self->client->vehicle].weapons[WP_MACHINEGUN]].damage;
+	bolt->targetcat = availableWeapons[weapIdx].category;
+	bolt->catmodifier = availableWeapons[weapIdx].noncatmod;
 	bolt->methodOfDeath = MOD_AUTOCANNON;
 	bolt->clipmask = MASK_SHOT;
 	bolt->target_ent = NULL;
@@ -676,7 +680,8 @@ void fire_autocannon (gentity_t *self) {
 	bolt->s.eType = ET_BULLET;
 	bolt->s.generic1 = self->tracerindex;
 	VectorCopy( start, bolt->s.pos.trBase );
-	VectorScale( dir, availableWeapons[availableVehicles[self->client->vehicle].weapons[WP_MACHINEGUN]].muzzleVelocity, bolt->s.pos.trDelta );
+//	VectorScale( dir, availableWeapons[availableVehicles[self->client->vehicle].weapons[WP_MACHINEGUN]].muzzleVelocity, bolt->s.pos.trDelta );
+	VectorScale( dir, availableWeapons[weapIdx].muzzleVelocity, bolt->s.pos.trDelta );
 	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
 	VectorCopy (start, bolt->r.currentOrigin);
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: g_weapon.c,v 1.2 2001-12-22 02:28:44 thebjoern Exp $
+ * $Id: g_weapon.c,v 1.3 2002-02-22 11:39:40 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -116,12 +116,12 @@ Autocannon
 ======================================================================
 */
 
-void Weapon_Autocannon_Fire (gentity_t *ent) {
-	fire_autocannon(ent);
+void Weapon_Autocannon_Fire (gentity_t *ent, qboolean main) {
+	fire_autocannon(ent, main);
 
 #pragma message("later add proper code for #barrels (also for other weapons (for ripples))")
 	if( availableVehicles[ent->client->vehicle].caps & HC_DUALGUNS ) {
-		fire_autocannon(ent);
+		fire_autocannon(ent, main);
 	}
 }
 
@@ -205,7 +205,7 @@ void FireWeapon( gentity_t *ent ) {
 		Weapon_IronBomb_Fire( ent );
 		break;
 	case WT_MACHINEGUN:
-		Weapon_Autocannon_Fire( ent );
+		Weapon_Autocannon_Fire( ent, qtrue );
 		break;
 	case WT_BALLISTICGUN:
 		Weapon_Maingun_Fire( ent );

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_boat.c,v 1.5 2002-02-21 16:41:25 sparky909_uk Exp $
+ * $Id: cg_boat.c,v 1.6 2002-02-22 11:39:40 thebjoern Exp $
 */
 
 
@@ -100,8 +100,8 @@ void CG_Boat( centity_t *cent, clientInfo_t *ci )
 		float pitch = cent->currentState.angles2[PITCH];
 		float max, min;
 		if( yaw > 180 ) yaw -= 360;
-		max = availableWeapons[availableVehicles[ci->vehicle].weapons[i]].maxturns[1];
-		min = availableWeapons[availableVehicles[ci->vehicle].weapons[i]].minturns[1];
+		max = availableWeapons[availableVehicles[ci->vehicle].weapons[i+1]].maxturns[1];
+		min = availableWeapons[availableVehicles[ci->vehicle].weapons[i+1]].minturns[1];
 		if( max > min ) {
 			if( yaw > max ) yaw = max;
 			else if( yaw < min ) yaw = min;
@@ -110,8 +110,8 @@ void CG_Boat( centity_t *cent, clientInfo_t *ci )
 			else if( yaw < 0 && yaw > max ) yaw = max;
 		}
 		if( pitch > 180 ) pitch -= 360;
-		max = availableWeapons[availableVehicles[ci->vehicle].weapons[i]].maxturns[0];
-		min = availableWeapons[availableVehicles[ci->vehicle].weapons[i]].minturns[0];
+		max = availableWeapons[availableVehicles[ci->vehicle].weapons[i+1]].maxturns[0];
+		min = availableWeapons[availableVehicles[ci->vehicle].weapons[i+1]].minturns[0];
 		if( pitch > max ) pitch = max;
 		else if( pitch < min ) pitch = min;
 		// turret
@@ -333,7 +333,6 @@ void CG_Boat( centity_t *cent, clientInfo_t *ci )
 					  LEF_PUFF_DONT_SCALE, 
 					  cgs.media.smokePuffShader );	
 	}
-#pragma message("maybe use the hastePuffShader for a dust trail when tanks drive ?")
 	// muzzleflash
 	CG_VehicleMuzzleFlash( cent, &part[BP_BOAT_GUNBARREL], ci->parts[BP_BOAT_GUNBARREL], ci->vehicle );
 

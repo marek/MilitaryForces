@@ -1,5 +1,5 @@
 /*
- * $Id: mf_client.c,v 1.9 2002-02-20 12:05:29 thebjoern Exp $
+ * $Id: mf_client.c,v 1.10 2002-02-22 11:39:40 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -393,16 +393,16 @@ void MF_ClientSpawn(gentity_t *ent) {
 			}
 		}
 
-			// old
 		// select the first weapon
-//		for( i = WP_WEAPON1; i <= WP_WEAPON6; i++ ) {
-//			if( availableVehicles[vehIndex].weapons[i] != WI_NONE ) {
-//				client->ps.weaponIndex = availableVehicles[vehIndex].weapons[i];
-//				break;
-//			}
-//		}
-			// new
-		client->ps.weaponIndex = availableVehicles[vehIndex].weapons[0];
+		for( i = WP_MACHINEGUN; i <= WP_FLARE; i++ ) {
+			if( availableVehicles[vehIndex].weapons[i] != WI_NONE ) {
+				client->ps.weaponIndex = availableVehicles[vehIndex].weapons[i];
+				break;
+			}
+		}
+		if( client->ps.weaponIndex = WI_NONE ) {
+			client->ps.weaponIndex = availableVehicles[vehIndex].weapons[0];
+		}
 
 	} else { // spectator only stuff
 		VectorSet( ent->r.mins, -8, -8, -8 );
@@ -474,6 +474,16 @@ void MF_ClientSpawn(gentity_t *ent) {
 
 	// run the presend to set anything else
 	ClientEndFrame( ent );
+
+	// temp
+//	{
+//		md3Tag_t tag;
+//		if( MF_findTag("models/vehicles/sea/pbr31mk2/pbr31mk2.md3", "tag_turret", &tag) ) {
+//			G_Printf( "server found tag_turret in boat: %.1f %.1f %.1f\n", 
+//				tag.origin[0], tag.origin[1], tag.origin[2] );
+//		}
+//	}
+	// end temp
 
 	// clear entity state values
 	BG_PlayerStateToEntityState( &client->ps, &ent->s, qtrue );

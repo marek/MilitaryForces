@@ -1,16 +1,11 @@
 /*
- * $Id: cg_vehicle.c,v 1.13 2002-02-21 13:14:20 thebjoern Exp $
+ * $Id: cg_vehicle.c,v 1.14 2002-02-22 11:39:40 thebjoern Exp $
 */
 
 #include "cg_local.h"
 
-/*
-===============
-CG_CachePlane
 
-On startup cache it
-===============
-*/
+
 
 /*
 ===============
@@ -286,6 +281,16 @@ static void CG_CacheBoat(int index)
 		switch(i) {
 		case BP_BOAT_BODY:
 			Com_sprintf( name, sizeof(name), "%s.md3", basename );
+			// temp
+//			{
+//				md3Tag_t tag;
+//				if( MF_findTag(name, "tag_turret", &tag) ) {
+//					CG_Printf( "found tag_turret in %s: %.1f %.1f %.1f\n", name,
+//						tag.origin[0], tag.origin[1], tag.origin[2] );
+//				}
+//			}
+			// end temp
+
 			break;
 		case BP_BOAT_TURRET:
 			Com_sprintf( name, sizeof(name), "%s_tur.md3", basename );
@@ -313,6 +318,7 @@ static void CG_CacheBoat(int index)
 			break;
 		}
 		availableVehicles[index].handle[i] = trap_R_RegisterModel( name );
+
 //		if( !availableVehicles[index].handle[i] ) {
 //			CG_Printf( "MFQ3 Warning: Unable to load model '%s'\n", name );
 //		}
@@ -592,7 +598,8 @@ void CG_VehicleMuzzleFlash( centity_t *cent, const refEntity_t *parent, qhandle_
 		return;
 	}
 
-	flashes = availableWeapons[availableVehicles[idx].weapons[0]].barrels;
+//	flashes = availableWeapons[availableVehicles[idx].weapons[0]].barrels;
+	flashes = availableWeapons[cent->muzzleFlashWeapon].barrels;
 
 	if( flashes > MAX_MUZZLEFLASHES ) flashes = MAX_MUZZLEFLASHES;
 

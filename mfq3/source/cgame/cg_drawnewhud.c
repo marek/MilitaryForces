@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.25 2002-02-21 16:41:25 sparky909_uk Exp $
+ * $Id: cg_drawnewhud.c,v 1.26 2002-02-22 11:39:40 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -776,7 +776,7 @@ static void CG_Draw_Center(int vehicle, int health, int throttle) {
 				CG_DrawPic( 320, 448, 128, height, cgs.media.HUDthrottle_1_ab[throttlepic] ); 
 			} else {
 				if( ( (availableVehicles[vehicle].cat & CAT_GROUND) ||
-					(availableVehicles[vehicle].cat & CAT_GROUND) ) &&
+					(availableVehicles[vehicle].cat & CAT_BOAT) ) &&
 					throttlepic >= MF_THROTTLE_MILITARY ) {
 					CG_DrawPic( 320, 448, 128, 32, cgs.media.HUDthrottle_rev[throttlepic-10] ); 
 				} else {

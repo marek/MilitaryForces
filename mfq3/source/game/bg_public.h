@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.69 2002-02-21 13:19:16 thebjoern Exp $
+ * $Id: bg_public.h,v 1.70 2002-02-22 11:39:40 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.63"
+#define	GAME_VERSION		"mfq3 v0.63b"
 
 #define	DEFAULT_GRAVITY		800
 
@@ -495,8 +495,45 @@ qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTim
 #define MAX_BOTS			1024
 #define MAX_BOTS_TEXT		8192
 
-// MFQ3 globals
+// MFQ3 
 // (everything below)
+
+
+// MD3 related stuff
+typedef struct {
+	int			ident;
+	int			version;
+
+	char		name[MAX_QPATH];	// model name
+
+	int			flags;
+
+	int			numFrames;
+	int			numTags;			
+	int			numSurfaces;
+
+	int			numSkins;
+
+	int			ofsFrames;			// offset for first frame
+	int			ofsTags;			// numFrames * numTags
+	int			ofsSurfaces;		// first surface, others follow
+
+	int			ofsEnd;				// end of file
+} md3Header_t;
+
+typedef struct md3Frame_s {
+	vec3_t		bounds[2];
+	vec3_t		localOrigin;
+	float		radius;
+	char		name[16];
+} md3Frame_t;
+
+typedef struct md3Tag_s {
+	char		name[MAX_QPATH];	// tag name
+	vec3_t		origin;
+	vec3_t		axis[3];
+} md3Tag_t;
+
 
 // number of sounds for things
 #define NUM_TANKSOUNDS			9
@@ -510,23 +547,6 @@ qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTim
 #define MF_MAX_CATEGORIES		8
 #define MF_MAX_CLASSES			8
 
-// NOTE:	The id of a vehice is made of 32 bit:
-//			8 bit 0x0000000f are the class  (8 possibilities)
-//			8 bit 0x000000f0 are the category (8 possibilities)
-//			8 bit 0x0000ff00 are the team (8 possibilities, may be in more than one team)
-//			8 bit 0xffff0000 are the gameset (8 possibilities, may be in more than one gameset)
-
-// gamesets	
-/*						//  xx------
-#define	MF_GAMESET_MIN				  0x01000000 
-#define	MF_GAMESET_MODERN			  0x01000000 
-#define	MF_GAMESET_WW2				  0x02000000 
-#define	MF_GAMESET_WW1				  0x04000000 
-#define	MF_GAMESET_MAX				  0x04000000 
-#define	MF_GAMESET_VIETNAM			  0x08000000 
-#define	MF_GAMESET_FUTURE			  0x10000000 
-#define	MF_GAMESET_ANY				  0xFF000000
-*/
 // can now be any number of gamesets (full 8 byte)
 // just expand list as needed and make sure ANY is set properly
 #define	MF_GAMESET_MIN				  0x0001
@@ -536,39 +556,12 @@ qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTim
 #define	MF_GAMESET_MAX				  0x0004 
 #define	MF_GAMESET_ANY				  0xFFFF
 
-
-// teams							//  --xx----
-/*
-#define	MF_TEAM_MIN					  0x00010000 
-#define	MF_TEAM_1					  0x00010000 
-#define	MF_TEAM_2					  0x00020000 
-#define	MF_TEAM_3					  0x00040000 
-#define	MF_TEAM_4					  0x00080000 
-#define	MF_TEAM_5					  0x00100000 
-#define	MF_TEAM_6					  0x00200000  
-#define	MF_TEAM_7					  0x00400000 
-#define	MF_TEAM_8					  0x00800000 
-#define	MF_TEAM_MAX					  0x00020000 
-#define	MF_TEAM_ANY					  0x00FF0000
-*/
 #define	MF_TEAM_MIN					  0x0001
 #define	MF_TEAM_1					  0x0001 
 #define	MF_TEAM_2					  0x0002 
 #define	MF_TEAM_MAX					  0x0002 
 #define	MF_TEAM_ANY					  0xFFFF
 
-
-// vehicle categories				//  ----xx--
-/*
-#define CAT_MIN						  0x00000100
-#define	CAT_PLANE					  0x00000100 
-#define	CAT_GROUND					  0x00000200 
-#define	CAT_HELO					  0x00000400 
-#define	CAT_LQM						  0x00000800
-#define	CAT_BOAT					  0x00001000 
-#define CAT_MAX						  0x00000200 
-#define	CAT_ANY						  0x0000FF00
-*/
 #define CAT_MIN						  0x0001
 #define	CAT_PLANE					  0x0001 
 #define	CAT_GROUND					  0x0002 
@@ -577,36 +570,6 @@ qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTim
 #define	CAT_BOAT					  0x0010 
 #define CAT_MAX						  0x0010 
 #define	CAT_ANY						  0xFFFF
-
-/*
-#define CLASS_MIN					  0x00000001
-#define CLASS_MAX					  0x00000002
-#define CLASS_ANY					  0x000000FF
-
-// plane classes					//  ------xx
-#define	CLASS_PLANE_FIGHTER			  0x00000001 
-#define	CLASS_PLANE_BOMBER			  0x00000002 
-#define	CLASS_PLANE_TRANSPORT		  0x00000004 
-#define	CLASS_PLANE_MAX				  0x00000004
-
-// helo classes						//  ------xx
-#define	CLASS_HELO_ATTACK			  0x00000001 
-#define	CLASS_HELO_RECON			  0x00000002 
-#define	CLASS_HELO_TRANSPORT		  0x00000004 
-#define	CLASS_HELO_MAX				  0x00000004
-
-// ground vehicle classes			//  ------xx
-#define CLASS_GROUND_MBT			  0x00000001 
-#define	CLASS_GROUND_RECON			  0x00000002 
-#define	CLASS_GROUND_APC			  0x00000004 
-#define	CLASS_GROUND_SAM			  0x00000008 
-#define	CLASS_GROUND_MAX			  0x00000008
-
-// LQM classes						//  ------xx
-#define CLASS_LQM_SPECIAL			  0x00000001 
-#define CLASS_LQM_MAX				  0x00000001 
-
-*/
 
 #define CLASS_MIN					  0x0001
 #define CLASS_MAX					  0x0002
@@ -864,6 +827,7 @@ char * MF_CreateModelPathname( int vehicle, char * pFormatString );
 void MF_LimitFloat( float * value, float min, float max );
 void MF_LimitInt( int * value, int min, int max );
 int MF_ExtractEnumFromId( int vehicle, unsigned int op );
+qboolean MF_findTag(const char* fileName, const char* tagname, md3Tag_t* tag);
 
 #define MF_THROTTLE_REVERSE		-5
 #define MF_THROTTLE_IDLE		0
@@ -946,4 +910,5 @@ typedef enum {
 #define BAY_ANIM_STOP			0
 #define BAY_ANIM_UP				1
 #define BAY_ANIM_DOWN			2
+
 

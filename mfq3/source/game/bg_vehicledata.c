@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.28 2002-02-21 13:14:20 thebjoern Exp $
+ * $Id: bg_vehicledata.c,v 1.29 2002-02-22 11:39:40 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -41,7 +41,7 @@ completeVehicleData_t availableVehicles[] =
 	60,							// max fuel
 	3,							// gearheight
 	0,							// tailangle
-	WI_MG_20MM, WI_AMRAAM, WI_SIDEWINDER, WI_MAVERICK, WI_FFAR, 0, 0, WI_FLARE,	// weapons
+	WI_MG_20MM, WI_AMRAAM, WI_SIDEWINDER, WI_MAVERICK, WI_FFAR, 0, 0, WI_FLARE,	// weapons  WI_MG_20MM
 	450, 4, 2, 2, 38, 0, 0, 30,		// ammo
 	0,0,0,0,0,0,0,0,			// turret
 	{19, 0, 5},					// cameraposition for cockpit view
@@ -129,7 +129,7 @@ completeVehicleData_t availableVehicles[] =
 	200,						// stallspeed
 	720,						// maxspeed
 	0,							// min throttle
-	15,							// max throttle
+	10,							// max throttle
 	1,							// engines
 	0,							// wheels
 	0,							// wheel circumference
@@ -1128,8 +1128,8 @@ completeVehicleData_t availableVehicles[] =
 	150,						// max fuel
 	8,							// max angle to lean when turning <- gearheight
 	-5,							// bowangle (depends on speeed) <-tailangle 
-	WI_MGT_2X30MM, WI_MGT_12_7MM, 0, 0, 0, 0, 0, WI_FLARE,// weapons
-	500, 300, 0, 0, 0, 0, 0, 20,	// ammo
+	0, WI_MGT_2X30MM, WI_MGT_12_7MM, 0, 0, 0, 0, WI_FLARE,// weapons
+	0, 500, 300, 0, 0, 0, 0, 20,	// ammo
 	1,2,0,0,0,0,0,0,			// turret
 	{0, 0, 6},					// cameraposition for cockpit view
 	0,							// effect model
