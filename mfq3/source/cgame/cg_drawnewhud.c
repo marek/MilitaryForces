@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.13 2002-02-08 10:00:59 thebjoern Exp $
+ * $Id: cg_drawnewhud.c,v 1.14 2002-02-08 21:43:56 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -677,7 +677,7 @@ static void CG_Draw_Redundant(int vehicle, int health, int throttle, int ammo[16
 		height = 8;
 		CG_DrawHUDPic( x, y, width, height, cgs.media.HUDthrottletext, HUDColors[cg.HUDColor] ); 
 
-		if( availableVehicles[vehicle].caps & HC_DUALENGINE ) {
+		if( availableVehicles[vehicle].engines > 1 ) {
 			CG_MFQ3HUD_Numbers( 585, 330, 3, throttle*10, qfalse, HUDColors[cg.HUDColor], qtrue );
 			trap_R_SetColor( HUDColors[cg.HUDColor] );
 			CG_DrawChar_MFQ3( 585, 330, '/', qfalse );
@@ -758,11 +758,13 @@ static void CG_Draw_Center(int vehicle, int health, int throttle) {
 		y = 448;
 		width = 128;
 		height = 32;
-		if( availableVehicles[vehicle].caps & HC_DUALENGINE ) {
+		if( availableVehicles[vehicle].engines > 1 ) {
 			if( availableVehicles[vehicle].maxthrottle > MF_THROTTLE_MILITARY ) {
-				CG_DrawPic( x, y, width, height, cgs.media.HUDthrottle_2_ab[throttlepic] ); 
+				CG_DrawPic( x, y, width, height, cgs.media.HUDthrottle_2_1_ab[throttlepic] ); 
+				CG_DrawPic( x, y, width, height, cgs.media.HUDthrottle_2_2_ab[throttlepic] ); 
 			} else {
-				CG_DrawPic( x, y, width, height, cgs.media.HUDthrottle_2[throttlepic] ); 
+				CG_DrawPic( x, y, width, height, cgs.media.HUDthrottle_2_1[throttlepic] ); 
+				CG_DrawPic( x, y, width, height, cgs.media.HUDthrottle_2_2[throttlepic] ); 
 			}
 		} else {
 			if( availableVehicles[vehicle].maxthrottle > MF_THROTTLE_MILITARY ) {
@@ -1473,7 +1475,9 @@ void CG_DrawStatusBar_MFQ3_new( void ) {
 	}
 
 	// solid middle section
-	value = (100*ps->stats[STAT_HEALTH]/ps->stats[STAT_MAX_HEALTH]);
+	if( ps->stats[STAT_MAX_HEALTH] ) {
+		value = (100*ps->stats[STAT_HEALTH]/ps->stats[STAT_MAX_HEALTH]);
+	} else value = 0;
 	if( value > 100 ) value = 100;
 	if( hud_center.integer ) {
 		CG_Draw_Center(vehicle, value, ps->throttle);

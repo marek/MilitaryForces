@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.46 2002-02-08 10:00:59 thebjoern Exp $
+ * $Id: bg_public.h,v 1.47 2002-02-08 21:43:57 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.58d"
+#define	GAME_VERSION		"mfq3 v0.58e"
 
 #define	DEFAULT_GRAVITY		800
 
@@ -584,8 +584,7 @@ extern const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1];
 #define BP_PLANE_WINGRIGHT		7
 #define BP_PLANE_SPECIAL		8
 #define BP_PLANE_PROP			9
-#define BP_PLANE_PROP2			10
-#define BP_PLANE_MAX_PARTS		11
+#define BP_PLANE_MAX_PARTS		10
 
 // 2.helos
 
@@ -596,7 +595,7 @@ extern const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1];
 #define BP_GV_MAX_PARTS			3
 
 // total max parts (no cat may exceed this!)
-#define BP_MAX_PARTS			11
+#define BP_MAX_PARTS			10
 
 // fallback modes if no custom shader can be found for a vehicle
 #define	SHADOW_DEFAULT	-1
@@ -622,6 +621,7 @@ typedef struct completeVehicleData_s
     unsigned int    maxspeed;	    // max speed at military thrust
     int			    minthrottle;    // can be less than 0 for ground vehicles
     int			    maxthrottle;    // if > 10 means afterburner
+	int				engines;		// how many engines does it actually have
     unsigned int    accel;			// vehicle dependent acceleration
     unsigned int    maxhealth;	    // health
 	vec3_t			gunoffset;		// guntag
@@ -751,10 +751,9 @@ int MF_ExtractEnumFromId( int vehicle, unsigned int op );
 #define HC_VAPOR				8
 #define HC_TAILDRAGGER			16
 #define HC_DUALGUNS				32	// will be removed 
-#define HC_DUALENGINE			64
-#define HC_SWINGWING			128
-#define HC_AMPHIBIOUS			256
-#define	HC_WHEELS				512	// vehicle has wheels (rather than tracks)
+#define HC_SWINGWING			64
+#define HC_AMPHIBIOUS			128
+#define	HC_WHEELS				256	// vehicle has wheels (rather than tracks)
 
 // this is for the PW_ONOFF_FLAGS
 #define OO_NOTHING_ON			0

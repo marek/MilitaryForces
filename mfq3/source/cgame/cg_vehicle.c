@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicle.c,v 1.4 2002-01-31 10:09:40 sparky909_uk Exp $
+ * $Id: cg_vehicle.c,v 1.5 2002-02-08 21:43:57 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -51,9 +51,6 @@ static void CG_CachePlane(int index)
 			Com_sprintf( name, sizeof(name), "%s_special.md3", basename );
 			break;
 		case BP_PLANE_PROP:
-			Com_sprintf( name, sizeof(name), "%s_prop.md3", basename );
-			break;
-		case BP_PLANE_PROP2:
 			Com_sprintf( name, sizeof(name), "%s_prop.md3", basename );
 			break;
 		}

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_miscvehicle.c,v 1.4 2002-02-04 09:38:06 thebjoern Exp $
+ * $Id: cg_miscvehicle.c,v 1.5 2002-02-08 21:43:57 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -137,10 +137,10 @@ static void CG_Misc_Plane( centity_t *cent )
 		AxisCopy( axisDefault, part[i].axis );
 		if( i == BP_PLANE_PROP && (availableVehicles[cent->currentState.modelindex].caps & HC_PROP) ) {
 			RotateAroundDirection( part[i].axis, cg.time );
-		} else if( i == BP_PLANE_PROP2 && (availableVehicles[cent->currentState.modelindex].caps & HC_PROP) ) {
-			if( availableVehicles[cent->currentState.modelindex].caps & HC_DUALENGINE ) {
-				RotateAroundDirection( part[i].axis, cg.time );
-			} else continue;
+//		} else if( i == BP_PLANE_PROP2 && (availableVehicles[cent->currentState.modelindex].caps & HC_PROP) ) {
+//			if( availableVehicles[cent->currentState.modelindex].caps & HC_DUALENGINE ) {
+//				RotateAroundDirection( part[i].axis, cg.time );
+//			} else continue;
 		}
 		CG_PositionRotatedEntityOnTag( &part[i], &part[BP_PLANE_BODY], 
 				availableVehicles[cent->currentState.modelindex].handle[BP_PLANE_BODY], plane_tags[i] );
@@ -178,7 +178,7 @@ static void CG_Misc_Plane( centity_t *cent )
 		burner.renderfx = renderfx;
 		burner.frame = ( cent->currentState.frame > 12 ? 0 : 1 );
 		trap_R_AddRefEntityToScene( &burner );
-		if( availableVehicles[cent->currentState.modelindex].caps & HC_DUALENGINE ) {
+		if( availableVehicles[cent->currentState.modelindex].engines > 1 ) {
 			burner2.hModel = cgs.media.afterburner[availableVehicles[cent->currentState.modelindex].effectModel];
 			VectorCopy( cent->lerpOrigin, burner2.lightingOrigin );
 			AxisCopy( axisDefault, burner2.axis );

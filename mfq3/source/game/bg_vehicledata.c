@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.15 2002-02-06 15:44:59 sparky909_uk Exp $
+ * $Id: bg_vehicledata.c,v 1.16 2002-02-08 21:43:57 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -31,6 +31,7 @@ completeVehicleData_t availableVehicles[] =
 	700,						// maxspeed
 	0,							// min throttle
 	15,							// max throttle
+	1,							// engines
 	260,						// acceleration
 	130,						// health
 	{16.65f, -3.391f, 0.378f},	// gun tag
@@ -71,6 +72,7 @@ completeVehicleData_t availableVehicles[] =
 	720,						// maxspeed
 	0,							// min throttle
 	15,							// max throttle
+	1,							// engines
 	250,						// acceleration
 	130,						// health
 	{19.698f, -1.328f, -3.016f},// gun tag
@@ -101,7 +103,7 @@ completeVehicleData_t availableVehicles[] =
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
-	HC_VAPOR|HC_DUALENGINE|HC_DUALGUNS,	// capabilities
+	HC_VAPOR|HC_DUALGUNS,		// capabilities
 	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
 	{-24, -16, -1.5},				// mins (bounding box)
 	{36, 16, 11},				// max (bounding box)
@@ -111,6 +113,7 @@ completeVehicleData_t availableVehicles[] =
 	620,						// maxspeed
 	0,							// min throttle
 	15,							// max throttle
+	2,							// engines
 	270,						// acceleration
 	100,						// health
 	{26.25f, -0.94f, 1.811f},	// gun tag
@@ -141,7 +144,7 @@ completeVehicleData_t availableVehicles[] =
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
-	HC_VAPOR|HC_DUALENGINE,		// capabilities
+	HC_VAPOR,					// capabilities
 	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
 	{-31, -28, -5},				// mins (bounding box)
 	{54, 28, 14},				// max (bounding box)
@@ -151,6 +154,7 @@ completeVehicleData_t availableVehicles[] =
 	880,						// maxspeed
 	0,							// min throttle
 	15,							// max throttle
+	2,							// engines
 	260,						// acceleration
 	150,						// health
 	{19.1f,7.87f,-0.112f},		// gun tag
@@ -181,7 +185,7 @@ completeVehicleData_t availableVehicles[] =
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
-	HC_VAPOR|HC_DUALENGINE|HC_SWINGWING,		// capabilities
+	HC_VAPOR|HC_SWINGWING,		// capabilities
 	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
 	{-29, -28, -3},				// mins (bounding box)
 	{46, 28, 14},				// max (bounding box)
@@ -191,6 +195,7 @@ completeVehicleData_t availableVehicles[] =
 	840,						// maxspeed
 	0,							// min throttle
 	15,							// max throttle
+	2,							// engines
 	260,						// acceleration
 	150,						// health
 	{37.8f,2.4f,-1.3f},			// gun tag
@@ -221,7 +226,7 @@ completeVehicleData_t availableVehicles[] =
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
-	HC_VAPOR|HC_DUALENGINE,		// capabilities
+	HC_VAPOR,					// capabilities
 	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
 	{-26, -25, -5},				// mins (bounding box)
 	{44, 25, 10},				// max (bounding box)
@@ -231,6 +236,48 @@ completeVehicleData_t availableVehicles[] =
 	720,						// maxspeed
 	0,							// min throttle
 	15,							// max throttle
+	2,							// engines
+	260,						// acceleration
+	130,						// health
+	{40.3f, 0, 0.478f},			// gun tag
+	60,							// max fuel
+	3,							// gearheight
+	0,							// tailangle
+	WI_MG_20MM, WI_FFAR, WI_MK82, WI_SIDEWINDER, WI_AMRAAM, WI_PHOENIX, WI_HELLFIRE, WI_FLARE,	// weapons
+	450, 24, 8, 4, 4, 4, 8, 30,		// ammo
+	{19, 0, 5},					// cameraposition for cockpit view
+	AB_BALL,					// effect model
+	7500,						// radar range
+	6500,						// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
+	0,							// swingangle
+	1400,						// geartime
+	47,							// max gear frame
+	0							// renderflags
+    },
+
+    {	"F-22 Raptor",		    // descriptiveName
+	"F-22",						// tinyName
+	"f-22",						// modelName
+	SHADOW_NONE,				// alpha shadow
+	MF_GAMESET_MODERN|			// id
+	MF_TEAM_1|
+	CAT_PLANE|
+	CLASS_PLANE_FIGHTER,
+	0,							// flags
+	HC_GEAR|HC_SPEEDBRAKE|
+	HC_VAPOR,					// capabilities
+	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
+	{-26, -25, -5},				// mins (bounding box)
+	{44, 25, 10},				// max (bounding box)
+	{80, 80, 260},				// turnspeed around the three axis
+	70, 18,						// camera distance and height
+	200,						// stallspeed
+	720,						// maxspeed
+	0,							// min throttle
+	15,							// max throttle
+	2,							// engines
 	260,						// acceleration
 	130,						// health
 	{40.3f, 0, 0.478f},			// gun tag
@@ -271,6 +318,7 @@ completeVehicleData_t availableVehicles[] =
 	700,						// maxspeed
 	0,							// min throttle
 	10,							// max throttle
+	2,							// engines
 	260,						// acceleration
 	130,						// health
 	{16.65f, -3.391f, 0.378f},	// gun tag
@@ -312,6 +360,7 @@ completeVehicleData_t availableVehicles[] =
 	600,					    // maxspeed
 	0,							// min throttle
 	10,						    // max throttle
+	1,							// engines
 	220,						// acceleration
 	100,						// health
 	{3.5f, -9.2f, 0.136f},		// gun tag
@@ -353,6 +402,7 @@ completeVehicleData_t availableVehicles[] =
 	500,					    // maxspeed
 	0,							// min throttle
 	10,						    // max throttle
+	1,							// engines
 	220,						// acceleration
 	100,						// health
 	{2.518f, -7.371f, -0.155f},	// gun tag
@@ -394,6 +444,7 @@ completeVehicleData_t availableVehicles[] =
 	500,					    // maxspeed
 	0,							// min throttle
 	10,						    // max throttle
+	1,							// engines
 	220,						// acceleration
 	100,						// health
 	{2.518f, -7.371f, -0.155f},	// gun tag
@@ -435,6 +486,7 @@ completeVehicleData_t availableVehicles[] =
 	500,					    // maxspeed
 	0,							// min throttle
 	10,						    // max throttle
+	1,							// engines
 	220,						// acceleration
 	100,						// health
 	{2.518f, -7.371f, -0.155f},	// gun tag
@@ -443,6 +495,49 @@ completeVehicleData_t availableVehicles[] =
 	-14,							// tailangle
 	WI_MG_8XCAL50, 0, 0, 0, 0, 0, 0, 0,		// weapons
 	450, 0, 0, 0, 0, 0, 0, 0,	// ammo
+	{-4, 0, 6},					// cameraposition for cockpit view
+	0,							// effect model
+	0,							// radar range
+	0,							// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
+	0,							// swingangle
+	1400,						// geartime
+	47,							// max gear frame
+	0							// renderflags
+    },
+
+
+    {	"B-17g",				// descriptiveName
+	"B-17",						// tinyName
+	"b17g",						// modelName
+	SHADOW_NONE,				// alpha shadow
+	MF_GAMESET_WW2|				// id
+	MF_TEAM_1|
+	CAT_PLANE|
+	CLASS_PLANE_BOMBER,
+	0,							// flags
+	HC_GEAR|HC_PROP|
+	HC_TAILDRAGGER|
+	HC_DUALGUNS,				// capabilities
+	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
+	{-21, -20, -1},				// mins (bounding box)
+	{10, 20, 6},				// max (bounding box)
+	{70, 80, 300},				// turnspeed around the three axis
+	60, 16,						// camera distance and height
+	120,					    // stallspeed
+	500,					    // maxspeed
+	0,							// min throttle
+	10,						    // max throttle
+	4,							// engines
+	220,						// acceleration
+	100,						// health
+	{2.518f, -7.371f, -0.155f},	// gun tag
+	60,							// max fuel
+	3,							// gearheight
+	-14,							// tailangle
+	WI_MG_8XCAL50, WI_MK82, 0, 0, 0, 0, 0, 0,		// weapons
+	450, 10, 0, 0, 0, 0, 0, 0,	// ammo
 	{-4, 0, 6},					// cameraposition for cockpit view
 	0,							// effect model
 	0,							// radar range
@@ -476,6 +571,7 @@ completeVehicleData_t availableVehicles[] =
 	150,					    // maxspeed
 	0,							// min throttle
 	10,						    // max throttle
+	1,							// engines
 	220,						// acceleration
 	100,						// health
 	{2.518f, -1.371f, -0.155f},	// gun tag
@@ -517,6 +613,7 @@ completeVehicleData_t availableVehicles[] =
 	150,					    // maxspeed
 	0,							// min throttle
 	10,						    // max throttle
+	1,							// engines
 	220,						// acceleration
 	100,						// health
 	{2.518f, -1.371f, -0.155f},	// gun tag
@@ -560,6 +657,7 @@ completeVehicleData_t availableVehicles[] =
 	60,						    // maxspeed
 	-5,							// min throttle
 	10,						    // max throttle
+	1,							// engines
 	15,							// acceleration
 	400,						// health
 	{5, 0, 8},					// gun tag
@@ -599,6 +697,7 @@ completeVehicleData_t availableVehicles[] =
 	65,						    // maxspeed
 	-5,							// min throttle
 	10,						    // max throttle
+	1,							// engines
 	15,							// acceleration
 	450,						// health
 	{25, 0, 2},					// gun tag
@@ -638,6 +737,7 @@ completeVehicleData_t availableVehicles[] =
 	75,						    // maxspeed
 	-5,							// min throttle
 	10,						    // max throttle
+	1,							// engines
 	18,							// acceleration
 	240,						// health
 	{8, 1, 2},					// gun tag
@@ -677,6 +777,7 @@ completeVehicleData_t availableVehicles[] =
 	90,						    // maxspeed
 	-5,							// min throttle
 	10,						    // max throttle
+	1,							// engines
 	18,							// acceleration
 	180,						// health
 	{3, 1, 6},					// gun tag
