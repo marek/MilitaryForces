@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.2 2002-01-26 03:02:38 thebjoern Exp $
+ * $Id: cg_drawnewhud.c,v 1.3 2002-01-26 19:27:30 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -221,7 +221,7 @@ static void CG_MFQ3HUD_DecNumbers (int x, int y, int width, int decimals, int in
 	CG_MFQ3HUD_Numbers( x, y, prewid, pre, qfalse, HUDColors[cg.HUDColor] );
 	x += (HUDNUM_WIDTH-1)*prewid;
 
-	CG_DrawPic( x+2,y+2, HUDNUM_WIDTH, HUDNUM_HEIGHT, cgs.media.HUDnumbers[STAT_POINT] );
+	CG_DrawHUDPic( x+2,y+2, HUDNUM_WIDTH, HUDNUM_HEIGHT, cgs.media.HUDnumbers[STAT_POINT] );
 	x += HUDNUM_WIDTH-1;
 
 	CG_MFQ3HUD_Numbers( x, y, postwid, post, qfalse, HUDColors[cg.HUDColor] );
@@ -547,9 +547,14 @@ static void CG_Draw_Redundant(int vehicle, int health, int throttle, int ammo[16
 	if( hud_weapons.integer ) {
 		char	ammostring[33];
 		int		len;
+		char*	actualstring;
 			// mg
 		if( ammo[8] ) {
-			Com_sprintf( ammostring, 32, "%s:", availableWeapons[availableVehicles[vehicle].weapons[0]].shortName );
+			if( availableVehicles[vehicle].id&CAT_ANY & CAT_GROUND ) 
+				actualstring = availableWeapons[availableVehicles[vehicle].weapons[0]].shortName2;
+			else
+				actualstring = availableWeapons[availableVehicles[vehicle].weapons[0]].shortName;
+			Com_sprintf( ammostring, 32, "%s:", actualstring );
 			len = strlen(ammostring);
 			CG_DrawString_MFQ3( 4, 318, ammostring, HUDColors[cg.HUDColor], 0);
 			CG_MFQ3HUD_Numbers( 4 + len * 8, 318, 3, ammo[0], qfalse, HUDColors[cg.HUDColor] );
@@ -557,7 +562,11 @@ static void CG_Draw_Redundant(int vehicle, int health, int throttle, int ammo[16
 
 			// selected weapon
 		if( ammo[selweap+8] && selweap != 0 ) {
-			Com_sprintf( ammostring, 32, "%s:", availableWeapons[availableVehicles[vehicle].weapons[selweap]].shortName );
+			if( availableVehicles[vehicle].id&CAT_ANY & CAT_GROUND ) 
+				actualstring = availableWeapons[availableVehicles[vehicle].weapons[selweap]].shortName2;
+			else
+				actualstring = availableWeapons[availableVehicles[vehicle].weapons[selweap]].shortName;
+			Com_sprintf( ammostring, 32, "%s:", actualstring );
 			len = strlen(ammostring);
 			CG_DrawString_MFQ3( 4, 330, ammostring, HUDColors[cg.HUDColor], 0);
 			CG_MFQ3HUD_Numbers( 4 + len * 8, 330, 3, ammo[selweap], qfalse, HUDColors[cg.HUDColor] );
@@ -605,6 +614,112 @@ static void CG_Draw_Center(int health, int throttle) {
 	}
 }
 
+/*
+================
+CG_Draw_MFD
+
+================
+*/
+static void CG_HUD_Camera(int mfdnum, int vehicle) {
+
+	// this is probably very dirty and ugly
+	// but so far I haven't found another way to do it...
+	// any ideas anyone ?n		
+	centity_t *cent = &cg.predictedPlayerEntity;
+	float x, y, w, h;
+	vec3_t v;
+	float	zoomFov;
+	float	f;		
+	float	fov_x;
+	playerState_t *ps = &cg.predictedPlayerState;
+
+		// prepare refdef
+	memcpy( &cg.HUDCamera, &cg.refdef, sizeof( cg.HUDCamera) );
+	if( mfdnum == MFD_1 ) {
+		x = 5;
+	} else {
+		x = 517;
+	}
+	y = 366;
+	w = 118;
+	h = 108;
+	CG_AdjustFrom640( &x, &y, &w, &h );
+	cg.HUDCamera.x = x;
+	cg.HUDCamera.y = y;
+	cg.HUDCamera.width = w;
+	cg.HUDCamera.height = h;
+		// zoomed ?
+	fov_x = cg_fov.value/4;
+	if ( fov_x < 1 ) {
+		fov_x = 1;
+	} else if ( fov_x > 160 ) {
+		fov_x = 160;
+	}
+	zoomFov = cg_zoomFov.value/4;
+	if ( zoomFov < 1 ) {
+		zoomFov = 1;
+	} else if ( zoomFov > 160 ) {
+		zoomFov = 160;
+	}
+	if ( cg.zoomed ) {
+		f = ( cg.time - cg.zoomTime ) / (float)ZOOM_TIME;
+		if ( f > 1.0 ) {
+			fov_x = zoomFov;
+		} else {
+			fov_x = fov_x + f * ( zoomFov - fov_x );
+		}
+	} else {
+		f = ( cg.time - cg.zoomTime ) / (float)ZOOM_TIME;
+		if ( f > 1.0 ) {
+			fov_x = fov_x;
+		} else {
+			fov_x = zoomFov + f * ( fov_x - zoomFov );
+		}
+	}
+	cg.HUDCamera.fov_x = fov_x;
+	cg.HUDCamera.fov_y = fov_x;
+
+		// angles
+	if( ps->stats[STAT_LOCKINFO] & LI_TRACKING ) {
+		vec3_t a;
+		centity_t* target = &cg_entities[cent->currentState.tracktarget];
+		qboolean building = qfalse;
+
+		if( target->currentState.eType == ET_EXPLOSIVE ) building = qtrue;
+		if( building ) {
+			VectorSubtract( cgs.inlineModelMidpoints[target->currentState.modelindex], cent->lerpOrigin, v );
+		} else {
+			VectorSubtract( target->lerpOrigin, cent->lerpOrigin, v );
+		}
+		VectorNormalize( v );
+		vectoangles( v, a );
+		AnglesToAxis( a, cg.HUDCamera.viewaxis );
+	} else {
+		if( availableVehicles[vehicle].id&CAT_ANY & CAT_GROUND ) {
+			vec3_t right, up, temp;
+			AngleVectors( cent->currentState.angles, v, right, up );
+			RotatePointAroundVector( temp, up, v, cent->currentState.angles2[ROLL] );
+			CrossProduct( up, temp, right );
+			RotatePointAroundVector( v, right, temp, cent->currentState.angles2[PITCH] );
+			vectoangles( v, temp );
+			AnglesToAxis( temp, cg.HUDCamera.viewaxis );
+		} else {
+			AnglesToAxis( cent->currentState.angles, cg.HUDCamera.viewaxis );
+			AngleVectors( cent->currentState.angles, v, 0, 0 );
+		}
+	}
+		// position
+	VectorScale( v, availableVehicles[vehicle].maxs[0], v );
+	VectorAdd( cent->lerpOrigin, v, cg.HUDCamera.vieworg );
+
+		// ummm shall I really do this ???
+	CG_AddPacketEntities();
+	CG_AddMarks();
+	CG_AddLocalEntities();
+
+		// render
+	trap_R_RenderScene( &cg.HUDCamera );
+}
 
 /*
 ================
@@ -714,13 +829,20 @@ static void CG_Draw_MFD(int mfdnum, int vehicle, int onoff, int fuel, int flares
 		for( i = 0; i < 8; i++ ) {
 			// if weapon available
 			if( ammo[i+8] ) {
+				char* actualstring;
+				if( availableVehicles[vehicle].id&CAT_ANY & CAT_GROUND ) 
+					actualstring = availableWeapons[availableVehicles[vehicle].weapons[i]].shortName2;
+				else
+					actualstring = availableWeapons[availableVehicles[vehicle].weapons[i]].shortName;
 				CG_MFQ3HUD_Numbers( x+12, y, 3, ammo[i], qfalse, HUDColors[HUD_GREEN] );
-				Com_sprintf( invline, 32, "%c    %s", (i == selweap ? '*' : ' '), availableWeapons[availableVehicles[vehicle].weapons[i]].shortName );
+				Com_sprintf( invline, 32, "%c    %s", (i == selweap ? '*' : ' '), actualstring );
 				CG_DrawString_MFQ3( x+4, y, invline, HUDColors[HUD_GREEN], 0);
 				y += 10;
 			}
 			if( i == 0 || i == 6 ) y+=4; 
 		}
+	} else if( mode == MFD_CAMERA ) {
+		CG_HUD_Camera(mfdnum, vehicle);
 	}
 }
 

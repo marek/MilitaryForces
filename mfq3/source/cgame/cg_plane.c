@@ -1,5 +1,5 @@
 /*
- * $Id: cg_plane.c,v 1.10 2002-01-25 13:26:52 thebjoern Exp $
+ * $Id: cg_plane.c,v 1.11 2002-01-26 19:27:30 thebjoern Exp $
 */
 
 
@@ -316,7 +316,7 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 		part[BP_PLANE_BODY].frame = ( cent->currentState.frame > 12 ? 2 : 1 );
 	}
     trap_R_AddRefEntityToScene( &part[BP_PLANE_BODY] );
-
+	
 	// if the model failed, allow the default nullmodel to be displayed
 	if (!part[BP_PLANE_BODY].hModel) {
 		return;
