@@ -1,5 +1,5 @@
 /*
- * $Id: cg_public.h,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: cg_public.h,v 1.2 2002-06-08 17:05:08 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -203,4 +203,4 @@ typedef enum {
 //	void (*CG_EventHandling)(int type);
 } cgameExport_t;
 
-//----------------------------------------------
+// ----------------------------------------------
