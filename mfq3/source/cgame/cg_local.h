@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.61 2003-02-15 13:04:54 thebjoern Exp $
+ * $Id: cg_local.h,v 1.62 2003-09-05 00:37:49 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -183,6 +183,8 @@ typedef struct centity_s {
 	int				trailTime;		// so missile trails can handle dropped initial packets
 	int				dustTrailTime;
 	int				miscTime;
+	int				TimeSinceLastTrail;	// Time since last trail was drawn
+
 
 	int				snapShotTime;	// last time this entity was found in a snapshot
 
@@ -197,7 +199,8 @@ typedef struct centity_s {
 	vec3_t			rawAngles;
 
 	vec3_t			beamEnd;
-
+	vec3_t			lastDrawnTrailPos;		// Position of last drawn trail
+	vec3_t			lastDrawnTrailAngles;	// Angles of last drawn trail (helps reduce a few stuff)
 	// exact interpolated position of entity on this frame
 	vec3_t			lerpOrigin;
 	vec3_t			lerpAngles;
@@ -239,13 +242,16 @@ typedef enum {
 	LE_FRAGMENT,
 	LE_MOVE_SCALE_FADE,
 	LE_FADE_RGB,
-	LE_SCALE_FADE
+	LE_SCALE_FADE,
+	LE_NUKE
 } leType_t;
 
 typedef enum {
 	LEF_PUFF_DONT_SCALE  = 0x0001,			// do not scale size over time
 	LEF_TUMBLE			 = 0x0002,			// tumble over time, used for ejecting shells
 	LEF_NO_RADIUS_KILL	 = 0x0004,			// don't CG_FreeLocalEntity() just because the camera is 'inside' the radius of a sprite (e.g. smoke puffs)
+	LEF_SOUND1			 = 0x0004,			// sound 1 for nuke
+	LEF_SOUND2			 = 0x0008			// sound 2 for nuke
 } leFlag_t;
 
 typedef enum {
@@ -690,6 +696,11 @@ typedef struct {
 	qhandle_t	pilotWW2;
 	qhandle_t	pilotHeadWW2;
 	qhandle_t	pilotSeatWW2;
+	qhandle_t	missilePuffShader;
+	qhandle_t	flarePuffShader;
+	qhandle_t   railCoreShader;
+	qhandle_t	missileTrail2Shader;
+	qhandle_t	nukePuffShader;
 
 	qhandle_t	reticle[CH_NUMCROSSHAIRS];
 
@@ -745,6 +756,13 @@ typedef struct {
 	qhandle_t	bulletExplosionShader;
 	qhandle_t	rocketExplosionShader[2];
 	qhandle_t	grenadeExplosionShader;
+
+	// Nuke
+	qhandle_t	nukeEffectModel;
+	qhandle_t	nukeShockWave;
+	sfxHandle_t nukeExplodeSound;
+	sfxHandle_t nukeImplodeSound;
+	sfxHandle_t nukeFarSound;
 
 	// scoreboard headers
 	qhandle_t	scoreboardName;
@@ -1463,6 +1481,9 @@ localEntity_t *CG_SmokePuff( const vec3_t p,
 localEntity_t *CG_MakeExplosion( vec3_t origin, vec3_t dir,
 								qhandle_t hModel, qhandle_t shader, int offset, int duration,
 								qboolean isSprite );
+
+void CG_NukeEffect(  centity_t * cent, entityState_t * es );
+
 
 //
 // cg_snapshot.c
