@@ -1,5 +1,5 @@
 /*
- * $Id: g_client.c,v 1.5 2002-02-21 11:25:13 sparky909_uk Exp $
+ * $Id: g_client.c,v 1.6 2002-02-21 12:25:44 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -395,22 +395,51 @@ PickTeam
 
 ================
 */
-team_t PickTeam( int ignoreClientNum ) {
-	int		counts[TEAM_NUM_TEAMS];
+team_t PickTeam( int ignoreClientNum )
+{
+	int	counts[TEAM_NUM_TEAMS];
 
+	// find out how many players are on each team
 	counts[TEAM_BLUE] = TeamCount( ignoreClientNum, TEAM_BLUE );
 	counts[TEAM_RED] = TeamCount( ignoreClientNum, TEAM_RED );
 
-	if ( counts[TEAM_BLUE] > counts[TEAM_RED] ) {
+	// more on blue team?
+	if( counts[TEAM_BLUE] > counts[TEAM_RED] )
+	{
+		// join red
 		return TEAM_RED;
 	}
-	if ( counts[TEAM_RED] > counts[TEAM_BLUE] ) {
+	
+	// more on red team?
+	if( counts[TEAM_RED] > counts[TEAM_BLUE] )
+	{
+		// join blue
 		return TEAM_BLUE;
 	}
-	// equal team count, so join the team with the lowest score
-	if ( level.teamScores[TEAM_BLUE] > level.teamScores[TEAM_RED] ) {
+	
+	// equal team count, so equal score?
+	if( level.teamScores[TEAM_BLUE] == level.teamScores[TEAM_RED] )
+	{
+		// scores equal, just pick a random team (change random number generation if ever more than two teams)
+		if( rand() & 0x01 )
+		{
+			// join red
+			return TEAM_RED;
+		}
+		else
+		{
+			// join blue
+			return TEAM_BLUE;
+		}
+	}
+	// unequal scores, so join the team with the lowest score
+	else if( level.teamScores[TEAM_BLUE] > level.teamScores[TEAM_RED] )
+	{
+		// join red, blue in the lead
 		return TEAM_RED;
 	}
+
+	// join blue, red in the lead
 	return TEAM_BLUE;
 }
 

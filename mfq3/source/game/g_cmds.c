@@ -1,5 +1,5 @@
 /*
- * $Id: g_cmds.c,v 1.10 2002-02-21 11:18:33 sparky909_uk Exp $
+ * $Id: g_cmds.c,v 1.11 2002-02-21 12:25:44 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -430,8 +430,11 @@ void BroadcastTeamChange( gclient_t *client, int oldTeam )
 	}
 
 	// send centre print and console trace
-	trap_SendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE " joined the %s\n\"", client->pers.netname, pTeam) );
-	trap_SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " joined the %s\n\"", client->pers.netname, pTeam) );
+	if( pTeam )
+	{
+		trap_SendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE " joined the %s\n\"", client->pers.netname, pTeam) );
+		trap_SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " joined the %s\n\"", client->pers.netname, pTeam) );
+	}
 }
 
 /*
@@ -447,82 +450,149 @@ void SetTeam( gentity_t *ent, char *s ) {
 	int					specClient;
 	int					teamLeader;
 	char				userinfo[MAX_INFO_STRING];
+	qboolean			dontBalance = qfalse;
+	int					balanceNum = 0;
+	const char *		pTeam = NULL;
 
 	//
 	// see what change is requested
 	//
 	client = ent->client;
+	oldTeam = client->sess.sessionTeam;
 
 	clientNum = client - level.clients;
 	specClient = 0;
 	specState = SPECTATOR_NOT;
-	if ( !Q_stricmp( s, "scoreboard" ) || !Q_stricmp( s, "score" )  ) {
+
+	if ( !Q_stricmp( s, "scoreboard" ) || !Q_stricmp( s, "score" )  )
+	{
 		team = TEAM_SPECTATOR;
 		specState = SPECTATOR_SCOREBOARD;
-	} else if ( !Q_stricmp( s, "follow1" ) ) {
+	}
+	else if ( !Q_stricmp( s, "follow1" ) )
+	{
 		team = TEAM_SPECTATOR;
 		specState = SPECTATOR_FOLLOW;
 		specClient = -1;
-	} else if ( !Q_stricmp( s, "follow2" ) ) {
+	}
+	else if ( !Q_stricmp( s, "follow2" ) )
+	{
 		team = TEAM_SPECTATOR;
 		specState = SPECTATOR_FOLLOW;
 		specClient = -2;
-	} else if ( !Q_stricmp( s, "spectator" ) || !Q_stricmp( s, "s" ) ) {
+	}
+	else if ( !Q_stricmp( s, "spectator" ) || !Q_stricmp( s, "s" ) )
+	{
 		team = TEAM_SPECTATOR;
 		specState = SPECTATOR_FREE;
-	} else if ( g_gametype.integer >= GT_TEAM ) {
+	}
+	else if ( g_gametype.integer >= GT_TEAM )
+	{
 		// if running a team game, assign player to one of the teams
 		specState = SPECTATOR_NOT;
-		if ( !Q_stricmp( s, "red" ) || !Q_stricmp( s, "r" ) ) {
+		
+		// request to join red?
+		if ( !Q_stricmp( s, "red" ) || !Q_stricmp( s, "r" ) )
+		{
 			team = TEAM_RED;
-		} else if ( !Q_stricmp( s, "blue" ) || !Q_stricmp( s, "b" ) ) {
+		}
+		// request to join blue?
+		else if ( !Q_stricmp( s, "blue" ) || !Q_stricmp( s, "b" ) )
+		{
 			team = TEAM_BLUE;
-		} else {
-			// pick the team with the least number of players
+		}
+		else
+		{
+			// AUTOJOIN: pick a best team for the player
+
+			// have we already joined the game? (i.e. are on a playable team?)
+			if( oldTeam == TEAM_RED || oldTeam == TEAM_BLUE )
+			{
+				trap_SendServerCommand( ent->client->ps.clientNum, "cp \"Can't auto-join, you are already on a team!\n\"" );
+				
+				return; // ignore the request
+			}
+
 			team = PickTeam( clientNum );
+
+			// since we asked the server to 'auto-join' us, we should not do a balance check
+			dontBalance = qtrue;
 		}
 
-		if ( g_teamForceBalance.integer  ) {
-			int		counts[TEAM_NUM_TEAMS];
+		// force team balance? (stop very uneven teams for being allowed)
+		if( g_teamForceBalance.integer && !dontBalance )
+		{
+			int counts[TEAM_NUM_TEAMS];
 
 			counts[TEAM_BLUE] = TeamCount( ent->client->ps.clientNum, TEAM_BLUE );
 			counts[TEAM_RED] = TeamCount( ent->client->ps.clientNum, TEAM_RED );
 
-			// We allow a spread of two
-			if ( team == TEAM_RED && counts[TEAM_RED] - counts[TEAM_BLUE] > 1 ) {
-				trap_SendServerCommand( ent->client->ps.clientNum, 
-					"cp \"Red team has too many players.\n\"" );
-				return; // ignore the request
-			}
-			if ( team == TEAM_BLUE && counts[TEAM_BLUE] - counts[TEAM_RED] > 1 ) {
-				trap_SendServerCommand( ent->client->ps.clientNum, 
-					"cp \"Red team has too many players.\n\"" );
+			// work out the balanceNum
+			balanceNum = g_teamForceBalanceNum.integer - 1;
+			if( balanceNum < 0 ) balanceNum = 0;
+
+			// we allow a spread of g_teamForceBalanceNum, so if the value is 1 then there can never be
+			// a spread of more than 1, this would allow 3-2 - but if another player joined then that player
+			// would be forced to join the team with 2.
+			if( team == TEAM_RED && counts[TEAM_RED] - counts[TEAM_BLUE] > balanceNum )
+			{
+				trap_SendServerCommand( ent->client->ps.clientNum,"cp \"Red team has too many players.\n\"" );
+
 				return; // ignore the request
 			}
 
-			// It's ok, the team we are switching to has less or same number of players
+			if( team == TEAM_BLUE && counts[TEAM_BLUE] - counts[TEAM_RED] > balanceNum )
+			{
+				trap_SendServerCommand( ent->client->ps.clientNum, "cp \"Red team has too many players.\n\"" );
+				return; // ignore the request
+			}
+
+			// if we get here it's ok, the team we are switching to has less or same number of players,
+			// permit the joining of requested team
 		}
 
-	} else {
+	}
+	else
+	{
 		// force them to spectators if there aren't any spots free
 		team = TEAM_FREE;
 	}
 
 	// override decision if limiting the players
-	if ( (g_gametype.integer == GT_TOURNAMENT)
-		&& level.numNonSpectatorClients >= 2 ) {
+	if ( (g_gametype.integer == GT_TOURNAMENT) && level.numNonSpectatorClients >= 2 )
+	{
 		team = TEAM_SPECTATOR;
-	} else if ( g_maxGameClients.integer > 0 && 
-		level.numNonSpectatorClients >= g_maxGameClients.integer ) {
+	}
+	else if ( g_maxGameClients.integer > 0 && level.numNonSpectatorClients >= g_maxGameClients.integer )
+	{
 		team = TEAM_SPECTATOR;
 	}
 
 	//
 	// decide if we will allow the change
 	//
-	oldTeam = client->sess.sessionTeam;
-	if ( team == oldTeam && team != TEAM_SPECTATOR ) {
-		return;
+	if( team == oldTeam )
+	{
+		// decided what to say
+		switch( team )
+		{
+		case TEAM_SPECTATOR:
+			pTeam = " a spectator.";
+			break;
+		case TEAM_RED:
+			pTeam = " on red.";
+			break;
+		case TEAM_BLUE:
+			pTeam = " on blue.";
+			break;
+		}
+
+		// say something?
+		if( pTeam )
+		{
+			trap_SendServerCommand( ent->client->ps.clientNum, va( "cp \"You are already %s\n\"", pTeam ) );
+		}
+		return; // ignore the request
 	}
 
 	//
@@ -605,9 +675,11 @@ void Cmd_Team_f( gentity_t *ent ) {
 	int			oldTeam;
 	char		s[MAX_TOKEN_CHARS];
 
-	if ( trap_Argc() != 2 ) {
+	if ( trap_Argc() != 2 )
+	{
 		oldTeam = ent->client->sess.sessionTeam;
-		switch ( oldTeam ) {
+		switch ( oldTeam )
+		{
 		case TEAM_BLUE:
 			trap_SendServerCommand( ent-g_entities, "print \"Blue team\n\"" );
 			break;
@@ -624,21 +696,25 @@ void Cmd_Team_f( gentity_t *ent ) {
 		return;
 	}
 
-	if ( ent->client->switchTeamTime > level.time ) {
-		trap_SendServerCommand( ent-g_entities, "print \"May not switch teams more than once per 5 seconds.\n\"" );
+	// stop people changing teams too much
+	if( ent->client->switchTeamTime > level.time )
+	{
+		trap_SendServerCommand( ent-g_entities, "print \"May not request to switch teams more than once per 5 seconds.\n\"" );
 		return;
 	}
 
 	// if they are playing a tournement game, count as a loss
-	if ( (g_gametype.integer == GT_TOURNAMENT )
-		&& ent->client->sess.sessionTeam == TEAM_FREE ) {
+	if ( (g_gametype.integer == GT_TOURNAMENT ) && ent->client->sess.sessionTeam == TEAM_FREE )
+	{
 		ent->client->sess.losses++;
 	}
 
 	trap_Argv( 1, s, sizeof( s ) );
 
+	// set team
 	SetTeam( ent, s );
 
+	// set the time when the next request will be allowed (level time plus 5 seconds)
 	ent->client->switchTeamTime = level.time + 5000;
 }
 

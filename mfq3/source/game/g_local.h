@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.13 2002-02-20 12:05:29 thebjoern Exp $
+ * $Id: g_local.h,v 1.14 2002-02-21 12:25:44 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -836,6 +836,7 @@ extern	vmCvar_t	g_doWarmup;
 extern	vmCvar_t	g_allowVote;
 extern	vmCvar_t	g_teamAutoJoin;
 extern	vmCvar_t	g_teamForceBalance;
+extern	vmCvar_t	g_teamForceBalanceNum;
 extern	vmCvar_t	g_banIPs;
 extern	vmCvar_t	g_filterBan;
 extern	vmCvar_t	g_redteam;

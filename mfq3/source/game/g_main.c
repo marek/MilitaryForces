@@ -1,5 +1,5 @@
 /*
- * $Id: g_main.c,v 1.5 2002-02-20 12:05:29 thebjoern Exp $
+ * $Id: g_main.c,v 1.6 2002-02-21 12:25:44 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -54,6 +54,7 @@ vmCvar_t	g_logSync;
 vmCvar_t	g_allowVote;
 vmCvar_t	g_teamAutoJoin;
 vmCvar_t	g_teamForceBalance;
+vmCvar_t	g_teamForceBalanceNum;
 vmCvar_t	g_banIPs;
 vmCvar_t	g_filterBan;
 vmCvar_t	g_smoothClients;
@@ -100,6 +101,7 @@ cvarTable_t		gameCvarTable[] = {
 
 	{ &g_teamAutoJoin, "g_teamAutoJoin", "0", CVAR_ARCHIVE  },
 	{ &g_teamForceBalance, "g_teamForceBalance", "0", CVAR_ARCHIVE  },
+	{ &g_teamForceBalanceNum, "g_teamForceBalanceNum", "1", CVAR_ARCHIVE  },	// allowed spread when g_teamForceBalance == 1
 
 	{ &g_warmup, "g_warmup", "20", CVAR_ARCHIVE, 0, qtrue  },
 	{ &g_doWarmup, "g_doWarmup", "0", 0, 0, qtrue  },
