@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.14 2002-02-18 17:20:18 sparky909_uk Exp $
+ * $Id: ui_main.c,v 1.15 2002-02-20 09:44:43 sparky909_uk Exp $
 */
 /*
 =======================================================================
@@ -3257,8 +3257,8 @@ static void UI_RefreshVehicleSelect( void )
 	int vehicleCat = -1;
 	int vehicleClass = -1;
 	int vehicle = -1;
-	unsigned long gameset = -1;
-	unsigned long team = -1;
+	int gameset = -1;
+	int team = -1;
 	const char * pCat = NULL;
 	const char * pClass = NULL;
 	const char * pVehicle = NULL;
@@ -3266,10 +3266,14 @@ static void UI_RefreshVehicleSelect( void )
 	unsigned long what = 0x00000000;
 	int levelCats = 0;
 
+	// ----------> GAMESET & TEAM <-----------
+
 	// get gameset & team (as MF_GAMESET_x and MF_TEAM_x)
 	gameset = MF_GetGameset( qfalse );
 	team = MF_UI_GetTeam();
 	
+	// ----------> CATAGORY <-----------
+
 	// find out the current UI vehicle (based upon the known catagory+class)
 	vehicle = trap_Cvar_VariableValue("ui_vehicle");
 
@@ -3284,7 +3288,9 @@ tryCatAgain:
 	// is this catagory valid for the current gameset+team+catagory?
 
 	// check
-	vehicle = MF_getIndexOfVehicleEx( (vehicle-1), team, gameset, vehicleCat, -1 );
+	vehicle = MF_getIndexOfVehicleEx( (vehicle-1), gameset, team, vehicleCat, -1 );
+
+	// ----------> LEVEL SPAWNS <-----------
 
 	// level check (don't allow selection of vehicles that can't spawn on the current level)
 	levelCats = trap_Cvar_VariableValue( "mf_lvcat" );
@@ -3302,12 +3308,14 @@ tryCatAgain:
 		// wrap?
 		if( vehicleCat >= MF_MAX_CATEGORIES )
 		{
-			trap_Cvar_Set( "ui_vehicleCat", "0" );
 			vehicleCat = 0;
 		}
 
 		goto tryCatAgain;
 	}
+	trap_Cvar_Set( "ui_vehicleCat", va( "%d", vehicleCat ) );
+
+	// ----------> CLASS <-----------
 
 	// find out the current UI class (based upon the known catagory)
 	vehicleClass = trap_Cvar_VariableValue("ui_vehicleClass");
@@ -3333,12 +3341,14 @@ tryClassAgain:
 		// wrap?
 		if( vehicleClass >= MF_MAX_CLASSES )
 		{
-			trap_Cvar_Set( "ui_vehicleClass", "0" );
 			vehicleClass = 0;
 		}
 
 		goto tryClassAgain;
 	}
+	trap_Cvar_Set( "ui_vehicleClass", va( "%d", vehicleClass ) );
+
+	// ----------> VEHICLE <-----------
 
 	// is the vehicle valid for the current gameset+team+catagory+class?
 
@@ -3349,7 +3359,7 @@ tryClassAgain:
 	if( vehicle == -1 )
 	{
 		// prevent change & say so
-		trap_Cvar_Set( "ui_vehicle", va( "%d", -1 ));
+		trap_Cvar_Set( "ui_vehicle", "-1" );
 		trap_Cvar_Set( "ui_vehicleTxt", "<Nothing Available>" );
 
 		return;
