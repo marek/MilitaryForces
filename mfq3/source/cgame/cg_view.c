@@ -1,5 +1,5 @@
 /*
- * $Id: cg_view.c,v 1.8 2002-02-14 12:02:19 sparky909_uk Exp $
+ * $Id: cg_view.c,v 1.9 2002-02-18 16:30:45 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -615,7 +615,7 @@ CG_WorldToScreenCoords
 Converts a world vector point into screen coords
 =================
 */
-qboolean CG_WorldToScreenCoords( vec3_t worldPoint, int * pX, int * pY )
+qboolean CG_WorldToScreenCoords( vec3_t worldPoint, int * pX, int * pY, qboolean virtualXY )
 {
 	vec3_t v, dp, n, p;
 	float tanthetah, tanthetav;
@@ -651,6 +651,14 @@ qboolean CG_WorldToScreenCoords( vec3_t worldPoint, int * pX, int * pY )
 	// work out viewport
 	w = cg.refdef.width;
 	h = cg.refdef.height;
+
+	// use 640x480 instead of our current viewport?
+	if( virtualXY )
+	{
+		w = 640;
+		h = 480;
+	}
+
 	cv = h * 0.5f;
 	ch = w * 0.5f;
 		
