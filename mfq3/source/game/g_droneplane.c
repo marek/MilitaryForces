@@ -1,11 +1,20 @@
 /*
- * $Id: g_droneplane.c,v 1.3 2001-12-03 21:33:46 thebjoern Exp $
+ * $Id: g_droneplane.c,v 1.4 2002-01-31 02:34:33 thebjoern Exp $
 */
 
 #include "g_local.h"
 
 
 void Drone_Plane_Think( gentity_t* ent ) {
+
+	if( ent->updateGear ) {
+		if( ent->s.ONOFF & OO_GEAR ) {
+			G_AddEvent( ent, EV_GEAR_DOWN_FULL, 0 );
+		} else {
+			G_AddEvent( ent, EV_GEAR_UP_FULL, 0 );
+		}
+		ent->updateGear = qfalse;
+	}
 
 	if( ent->s.ONOFF & OO_LANDED ) {
 

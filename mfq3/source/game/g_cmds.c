@@ -1,5 +1,5 @@
 /*
- * $Id: g_cmds.c,v 1.4 2002-01-27 15:41:28 thebjoern Exp $
+ * $Id: g_cmds.c,v 1.5 2002-01-31 02:34:33 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -370,6 +370,8 @@ void Cmd_Radar_f( gentity_t *ent ) {
 	}
 	untrack(ent);
 	ent->radartime = level.time + 200;
+
+	ent->client->pers.lastRadar = (ent->client->ps.ONOFF & OO_RADAR);
 }
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.19 2002-01-30 19:26:02 thebjoern Exp $
+ * $Id: cg_local.h,v 1.20 2002-01-31 02:34:33 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -955,6 +955,8 @@ extern	vmCvar_t		hud_weapons;
 
 extern	vmCvar_t		hud_color;
 extern	vmCvar_t		mfd_color;
+extern	vmCvar_t		mfd1_defaultpage;
+extern	vmCvar_t		mfd2_defaultpage;
 
 //
 // cg_main.c

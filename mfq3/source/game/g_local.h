@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.8 2002-01-30 19:26:02 thebjoern Exp $
+ * $Id: g_local.h,v 1.9 2002-01-31 02:34:33 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -254,6 +254,7 @@ typedef struct {
 	int			voteCount;			// to prevent people from constantly calling votes
 	int			teamVoteCount;		// to prevent people from constantly calling votes
 	qboolean	teamInfo;			// send team overlay updates?
+	int			lastRadar;			// MFQ3 to remember radar setting
 } clientPersistant_t;
 
 

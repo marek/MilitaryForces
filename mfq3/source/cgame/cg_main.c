@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.16 2002-01-29 13:03:36 thebjoern Exp $
+ * $Id: cg_main.c,v 1.17 2002-01-31 02:34:33 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -164,6 +164,8 @@ vmCvar_t	hud_weapons;
 
 vmCvar_t	hud_color;
 vmCvar_t	mfd_color;
+vmCvar_t	mfd1_defaultpage;
+vmCvar_t	mfd2_defaultpage;
 
 
 typedef struct {
@@ -262,6 +264,9 @@ cvarTable_t		cvarTable[] = {
 
 	{ &hud_color, "hud_color", "0", CVAR_ARCHIVE },
 	{ &mfd_color, "mfd_color", "0", CVAR_ARCHIVE },
+
+	{ &mfd1_defaultpage, "mfd1_defaultpage", "1", CVAR_ARCHIVE },
+	{ &mfd2_defaultpage, "mfd2_defaultpage", "2", CVAR_ARCHIVE },
 
 	{ &pmove_fixed, "pmove_fixed", "1", CVAR_ROM},
 	{ &pmove_msec, "pmove_msec", "8", 0},
@@ -1851,6 +1856,17 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 		trap_Cvar_Set( "mfd_color", va("%d", cg.MFDColor) );
 	}
 
+	// MFQ3: MFD pages
+	cg.Mode_MFD[MFD_1] = mfd1_defaultpage.integer;
+	if( cg.Mode_MFD[MFD_1] >= MFD_MAX ) {
+		cg.Mode_MFD[MFD_1] = MFD_OFF;
+		trap_Cvar_Set( "mfd1_defaultpage", va("%d", cg.Mode_MFD[MFD_1]) );
+	}
+	cg.Mode_MFD[MFD_2] = mfd2_defaultpage.integer;
+	if( cg.Mode_MFD[MFD_2] >= MFD_MAX ) {
+		cg.Mode_MFD[MFD_2] = MFD_OFF;
+		trap_Cvar_Set( "mfd2_defaultpage", va("%d", cg.Mode_MFD[MFD_2]) );
+	}
 
 	CG_ParseServerinfo();
 

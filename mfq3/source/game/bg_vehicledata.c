@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.10 2002-01-30 19:26:02 thebjoern Exp $
+ * $Id: bg_vehicledata.c,v 1.11 2002-01-31 02:34:33 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -313,7 +313,7 @@ completeVehicleData_t availableVehicles[] =
 	"Spitfire",					// tinyName
 	"spitfire_mk5b",			// modelName
 	MF_GAMESET_WW2|				// id
-	MF_TEAM_2|
+	MF_TEAM_1|
 	CAT_PLANE|
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
@@ -348,8 +348,46 @@ completeVehicleData_t availableVehicles[] =
     },
 
     {	"Messerschmitt Bf-109g",// descriptiveName
-	"Bf-109g",					// tinyName
+	"Bf-109",					// tinyName
 	"bf-109g",					// modelName
+	MF_GAMESET_WW2|				// id
+	MF_TEAM_2|
+	CAT_PLANE|
+	CLASS_PLANE_FIGHTER,
+	0,							// flags
+	HC_GEAR|HC_PROP|
+	HC_TAILDRAGGER|
+	HC_DUALGUNS,				// capabilities
+	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
+	{-21, -20, -1},				// mins (bounding box)
+	{10, 20, 6},				// max (bounding box)
+	{70, 80, 300},				// turnspeed around the three axis
+	60, 16,						// camera distance and height
+	120,					    // stallspeed
+	500,					    // maxspeed
+	0,							// min throttle
+	10,						    // max throttle
+	220,						// acceleration
+	100,						// health
+	{2.518f, -7.371f, -0.155f},	// gun tag
+	60,							// max fuel
+	3,							// gearheight
+	-14,							// tailangle
+	WI_MG_8XCAL50, 0, 0, 0, 0, 0, 0, 0,		// weapons
+	450, 0, 0, 0, 0, 0, 0, 0,	// ammo
+	{-4, 0, 6},					// cameraposition for cockpit view
+	0,							// effect model
+	0,							// radar range
+	0,							// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
+	0,							// swingangle
+	0							// renderflags
+    },
+
+    {	"Focke-Wulf Fw190 A8",// descriptiveName
+	"Fw-190",					// tinyName
+	"fw190a8",					// modelName
 	MF_GAMESET_WW2|				// id
 	MF_TEAM_2|
 	CAT_PLANE|
