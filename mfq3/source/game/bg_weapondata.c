@@ -1,5 +1,5 @@
 /*
- * $Id: bg_weapondata.c,v 1.23 2003-01-11 13:08:51 thebjoern Exp $
+ * $Id: bg_weapondata.c,v 1.24 2003-03-19 12:53:13 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -45,6 +45,7 @@ completeWeaponData_t availableWeapons[] =
 		0,									// number per package
 		0,									// fits on category
 		PF_NA,								// fits on pylon
+		0,									// basicECMVulnerability
 		0,									// flags
 	},
 
@@ -84,6 +85,7 @@ completeWeaponData_t availableWeapons[] =
 		1,									// number per package
 		CAT_ANY,							// fits on category
 		PF_NA,								// fits on pylon
+		0,									// basicECMVulnerability
 		0,									// flags
 	},
 
@@ -123,6 +125,7 @@ completeWeaponData_t availableWeapons[] =
 		1,									// number per package
 		CAT_ANY,							// fits on category
 		PF_NA,								// fits on pylon
+		0,									// basicECMVulnerability
 		0,									// flags
 	},
 
@@ -162,6 +165,7 @@ completeWeaponData_t availableWeapons[] =
 		1,									// number per package
 		CAT_ANY,							// fits on category
 		PF_NA,								// fits on pylon
+		0,									// basicECMVulnerability
 		0,									// flags
 	},
 
@@ -201,6 +205,7 @@ completeWeaponData_t availableWeapons[] =
 		1,									// number per package
 		CAT_ANY,							// fits on category
 		PF_NA,								// fits on pylon
+		0,									// basicECMVulnerability
 		0,									// flags
 	},
 
@@ -240,6 +245,7 @@ completeWeaponData_t availableWeapons[] =
 		1,									// number per package
 		CAT_ANY,							// fits on category
 		PF_NA,								// fits on pylon
+		0,									// basicECMVulnerability
 		0,									// flags
 	},
 
@@ -279,6 +285,7 @@ completeWeaponData_t availableWeapons[] =
 		1,									// number per package
 		CAT_ANY,							// fits on category
 		PF_NA,								// fits on pylon
+		0,									// basicECMVulnerability
 		0,									// flags
 	},
 
@@ -318,6 +325,7 @@ completeWeaponData_t availableWeapons[] =
 		1,									// number per package
 		CAT_ANY,							// fits on category
 		PF_NA,								// fits on pylon
+		0,									// basicECMVulnerability
 		0,									// flags
 	},
 
@@ -358,6 +366,7 @@ completeWeaponData_t availableWeapons[] =
 		1,									// number per package
 		CAT_ANY,							// fits on category
 		PF_NA,								// fits on pylon
+		0,									// basicECMVulnerability
 		0,									// flags
 	},
 
@@ -397,6 +406,7 @@ completeWeaponData_t availableWeapons[] =
 		1,									// number per package
 		CAT_ANY,							// fits on category
 		PF_NA,								// fits on pylon
+		0,									// basicECMVulnerability
 		0,									// flags
 	},
 
@@ -436,6 +446,7 @@ completeWeaponData_t availableWeapons[] =
 		1,									// number per package
 		CAT_ANY,							// fits on category
 		PF_NA,								// fits on pylon
+		0,									// basicECMVulnerability
 		0,									// flags
 	},
 
@@ -475,6 +486,7 @@ completeWeaponData_t availableWeapons[] =
 		1,									// number per package
 		CAT_ANY,							// fits on category
 		PF_NA,								// fits on pylon
+		0,									// basicECMVulnerability
 		0,									// flags
 	},
 
@@ -514,6 +526,7 @@ completeWeaponData_t availableWeapons[] =
 		19,									// number per package
 		CAT_PLANE|CAT_HELO,					// fits on category
 		PF_FFAR,							// fits on pylon
+		0,									// basicECMVulnerability
 		WF_HAS_FIRE_FRAME,					// flags
 	},
 
@@ -553,6 +566,7 @@ completeWeaponData_t availableWeapons[] =
 		7,									// number per package
 		CAT_PLANE|CAT_HELO,					// fits on category
 		PF_FFAR,							// fits on pylon
+		0,									// basicECMVulnerability
 		WF_HAS_FIRE_FRAME,					// flags
 	},
 
@@ -593,6 +607,7 @@ completeWeaponData_t availableWeapons[] =
 		6,									// number per package
 		CAT_PLANE|CAT_HELO,					// fits on category
 		PF_FFAR,							// fits on pylon  !! PF_FFAR&PF_AG_HVY !!
+		0,									// basicECMVulnerability
 		WF_HAS_FIRE_FRAME,					// flags
 	},
 
@@ -633,6 +648,7 @@ completeWeaponData_t availableWeapons[] =
 		1,									// number per package
 		CAT_GROUND,							// fits on category
 		PF_NA,								// fits on pylon
+		0,									// basicECMVulnerability
 		0,									// flags
 	},
 
@@ -672,6 +688,7 @@ completeWeaponData_t availableWeapons[] =
 		1,									// number per package
 		CAT_GROUND,							// fits on category
 		PF_NA,								// fits on pylon
+		0,									// basicECMVulnerability
 		0,									// flags
 	},
 
@@ -711,6 +728,7 @@ completeWeaponData_t availableWeapons[] =
 		1,									// number per package
 		CAT_PLANE,							// fits on category
 		PF_AG_LT,							// fits on pylon
+		0,									// basicECMVulnerability
 		0,									// flags
 	},
 
@@ -751,6 +769,7 @@ completeWeaponData_t availableWeapons[] =
 		1,									// number per package
 		CAT_PLANE,							// fits on category
 		PF_AG_LT,							// fits on pylon
+		0,									// basicECMVulnerability
 		WF_HAS_FIRE_FRAME,					// flags
 	},
 
@@ -791,6 +810,7 @@ completeWeaponData_t availableWeapons[] =
 		1,									// number per package
 		CAT_PLANE,							// fits on category
 		PF_AG_MED,							// fits on pylon
+		0,									// basicECMVulnerability
 		0,									// flags
 	},
 
@@ -831,6 +851,7 @@ completeWeaponData_t availableWeapons[] =
 		1,									// number per package
 		CAT_PLANE,							// fits on category
 		PF_AG_MED,							// fits on pylon
+		0,									// basicECMVulnerability
 		WF_HAS_FIRE_FRAME,					// flags
 	},
 
@@ -872,6 +893,7 @@ completeWeaponData_t availableWeapons[] =
 		1,									// number per package
 		CAT_PLANE,							// fits on category
 		PF_AG_HVY,							// fits on pylon
+		0,									// basicECMVulnerability
 		0,									// flags
 	},
 
@@ -911,6 +933,7 @@ completeWeaponData_t availableWeapons[] =
 		1,									// number per package
 		CAT_PLANE,							// fits on category
 		PF_AG_HVY,							// fits on pylon  !! PF_AG_HVY&PF_AG_GDA !!
+		0,									// basicECMVulnerability
 		WF_HAS_FIRE_FRAME,					// flags
 	},
 
@@ -950,6 +973,7 @@ completeWeaponData_t availableWeapons[] =
 		1,									// number per package
 		CAT_PLANE,							// fits on category
 		PF_AG_MED,							// fits on pylon
+		0,									// basicECMVulnerability
 		WF_HAS_FIRE_FRAME,					// flags
 	},
 
@@ -989,6 +1013,7 @@ completeWeaponData_t availableWeapons[] =
 		1,									// number per package
 		CAT_PLANE|CAT_HELO,					// fits on category
 		PF_AA_LT,							// fits on pylon
+		25,									// basicECMVulnerability
 		WF_HAS_FIRE_FRAME,					// flags
 	},
 
@@ -1028,6 +1053,7 @@ completeWeaponData_t availableWeapons[] =
 		1,									// number per package
 		CAT_PLANE,							// fits on category
 		PF_AA_MED,							// fits on pylon
+		25,									// basicECMVulnerability
 		WF_HAS_FIRE_FRAME,					// flags
 	},
 
@@ -1067,6 +1093,7 @@ completeWeaponData_t availableWeapons[] =
 		1,									// number per package
 		CAT_PLANE,							// fits on category
 		PF_AA_HVY,							// fits on pylon
+		25,									// basicECMVulnerability
 		WF_HAS_FIRE_FRAME,					// flags
 	},
 
@@ -1106,6 +1133,7 @@ completeWeaponData_t availableWeapons[] =
 		1,									// number per package
 		CAT_PLANE,							// fits on category
 		PF_AA_PHX,							// fits on pylon
+		25,									// basicECMVulnerability
 		WF_HAS_FIRE_FRAME,					// flags
 	},
 
@@ -1145,6 +1173,7 @@ completeWeaponData_t availableWeapons[] =
 		1,									// number per package
 		CAT_ANY,							// fits on category
 		PF_AA_LT,							// fits on pylon
+		25,									// basicECMVulnerability
 		WF_HAS_FIRE_FRAME,					// flags
 	},
 
@@ -1184,6 +1213,7 @@ completeWeaponData_t availableWeapons[] =
 		1,									// number per package
 		CAT_PLANE,							// fits on category
 		PF_AA_LT,							// fits on pylon
+		25,									// basicECMVulnerability
 		WF_HAS_FIRE_FRAME,					// flags
 	},
 
@@ -1223,6 +1253,7 @@ completeWeaponData_t availableWeapons[] =
 		1,									// number per package
 		CAT_PLANE|CAT_HELO,					// fits on category
 		PF_AA_MED,							// fits on pylon
+		25,									// basicECMVulnerability
 		WF_HAS_FIRE_FRAME,					// flags
 	},
 
@@ -1262,6 +1293,7 @@ completeWeaponData_t availableWeapons[] =
 		1,									// number per package
 		CAT_PLANE,							// fits on category
 		PF_AA_HVY,							// fits on pylon
+		25,									// basicECMVulnerability
 		WF_HAS_FIRE_FRAME,					// flags
 	},
 
@@ -1303,6 +1335,7 @@ completeWeaponData_t availableWeapons[] =
 		1,									// number per package
 		CAT_HELO|CAT_GROUND|CAT_BOAT,		// fits on category
 		PF_AG_MED,							// fits on pylon
+		25,									// basicECMVulnerability
 		WF_HAS_FIRE_FRAME,					// flags
 	},
 
@@ -1342,6 +1375,7 @@ completeWeaponData_t availableWeapons[] =
 		1,									// number per package
 		CAT_PLANE,							// fits on category
 		PF_AG_MED,							// fits on pylon  !! PF_AG_MED&PF_AG_GDA !!
+		25,									// basicECMVulnerability
 		WF_HAS_FIRE_FRAME,					// flags
 	},
 
@@ -1381,6 +1415,7 @@ completeWeaponData_t availableWeapons[] =
 		1,									// number per package
 		CAT_PLANE,							// fits on category
 		PF_HARM,							// fits on pylon
+		25,									// basicECMVulnerability
 		WF_HAS_FIRE_FRAME,					// flags
 	},
 
@@ -1420,6 +1455,7 @@ completeWeaponData_t availableWeapons[] =
 		200,								// number per package
 		CAT_PLANE,							// fits on category
 		PF_JAMMER,							// fits on pylon
+		0,									// basicECMVulnerability
 		0,									// flags
 	},
 
@@ -1460,6 +1496,7 @@ completeWeaponData_t availableWeapons[] =
 		200,								// number per package
 		CAT_PLANE,							// fits on category
 		PF_JAMMER,							// fits on pylon
+		0,									// basicECMVulnerability
 		0,									// flags
 	},
 
@@ -1500,6 +1537,7 @@ completeWeaponData_t availableWeapons[] =
 		200,								// number per package
 		CAT_PLANE,							// fits on category
 		PF_JAMMER,							// fits on pylon
+		0,									// basicECMVulnerability
 		0,									// flags
 	},
 
@@ -1540,6 +1578,7 @@ completeWeaponData_t availableWeapons[] =
 		200,								// number per package
 		CAT_PLANE,							// fits on category
 		PF_TANK_HVY,						// fits on pylon
+		0,									// basicECMVulnerability
 		0,									// flags
 	},
 
@@ -1579,6 +1618,7 @@ completeWeaponData_t availableWeapons[] =
 		100,								// number per package
 		CAT_PLANE,							// fits on category
 		PF_TANK_LT,							// fits on pylon
+		0,									// basicECMVulnerability
 		0,									// flags
 	},
 
@@ -1618,6 +1658,7 @@ completeWeaponData_t availableWeapons[] =
 		1,									// number per package
 		CAT_ANY,							// fits on category
 		PF_FLAREPOD,						// fits on pylon
+		0,									// basicECMVulnerability
 		0,									// flags
 	}
 

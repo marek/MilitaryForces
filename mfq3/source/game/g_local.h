@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.33 2003-03-18 22:06:05 thebjoern Exp $
+ * $Id: g_local.h,v 1.34 2003-03-19 12:53:13 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -191,6 +191,7 @@ struct gentity_s {
 	int			 gi_nextScanTime;
 	float		 gi_lockangle;
 	int			 gi_reloadTime;
+	int			 basicECMVulnerability;
 };
 
 
