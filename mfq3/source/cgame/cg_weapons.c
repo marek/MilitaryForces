@@ -1,5 +1,5 @@
 /*
- * $Id: cg_weapons.c,v 1.8 2002-02-05 14:37:51 sparky909_uk Exp $
+ * $Id: cg_weapons.c,v 1.9 2002-02-05 16:09:01 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -415,7 +415,7 @@ void CG_MissileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_t di
 	int				duration;
 
 	mark = 0;
-	radius = 32;
+	radius = 1;
 	sfx = 0;
 	mod = 0;
 	shader = 0;
@@ -445,7 +445,7 @@ void CG_MissileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_t di
 		shader = cgs.media.grenadeExplosionShader;
 		sfx = cgs.media.sfx_rockexp;
 		mark = cgs.media.burnMarkShader;
-		radius = 50;
+		radius = 0.75;
 		light = 200;
 		isSprite = qtrue;
 		duration = 600;
@@ -459,7 +459,7 @@ void CG_MissileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_t di
 		shader = cgs.media.rocketExplosionShader[1];
 		sfx = cgs.media.sfx_rockexp;
 		mark = cgs.media.burnMarkShader;
-		radius = 150;
+		radius = 2;
 		light = 400;
 		isSprite = qtrue;
 		duration = 1000;
@@ -497,7 +497,7 @@ void CG_MissileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_t di
 		shader = cgs.media.rocketExplosionShader[0];
 		sfx = cgs.media.sfx_rockexp;
 		mark = cgs.media.burnMarkShader;
-		radius = 50;
+		radius = 1;
 		light = 200;
 		isSprite = qtrue;
 		duration = 1000;
@@ -532,6 +532,9 @@ void CG_MissileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_t di
 		// dynamic light the explosion
 		le->light = light;
 		VectorCopy( lightColor, le->lightColor );
+
+		// create radius override
+		le->radius = radius;
 	}
 
 	//
@@ -545,17 +548,28 @@ void CG_MissileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_t di
 CG_VehicleExplosion
 =================
 */
-#define MAX_ADJUST	16
-
 void CG_VehicleExplosion( vec3_t origin, int type )
 {
-	localEntity_t	*le = NULL;
+	localEntity_t	* le = NULL;
 	vec3_t			up = {0, 0, 1};
 	vec3_t			adjust = {0, 0, 0};
 	int				soundIdx = -1;
 	int				i, offset = 0;
 	int				density = 3;	// TODO: maybe control this with a cg_x cVar
+	float			radiusModifier = 1.0f;
+	float			maxAdjust = 16;
 	
+	// building explosion?
+	if( type == 2 )
+	{
+		// x5 size explosions for buildings
+		radiusModifier = 5.0f;
+
+		// and more density and area
+		density *= 2;
+		maxAdjust *= 2;
+	}
+
 	// explosion effect for both types
 	for( i = 0; i<density; i++ )
 	{
@@ -563,8 +577,8 @@ void CG_VehicleExplosion( vec3_t origin, int type )
 		if( density > 1 )
 		{
 			VectorCopy( origin, adjust );
-			adjust[0] = origin[0] + (random()*MAX_ADJUST)-(MAX_ADJUST/2);
-			adjust[1] = origin[1] + (random()*MAX_ADJUST)-(MAX_ADJUST/2);
+			adjust[0] = origin[0] + (random()*maxAdjust)-(maxAdjust/2);
+			adjust[1] = origin[1] + (random()*maxAdjust)-(maxAdjust/2);
 		}
 
 		// make explosion
@@ -573,6 +587,9 @@ void CG_VehicleExplosion( vec3_t origin, int type )
 							   cgs.media.rocketExplosionShader[ rand() & 0x01 ],
 							   offset, 900, 
 							   qtrue );
+
+		// apply radius modifier
+		le->radius = radiusModifier;
 
 		// adjust timing offset
 		offset += 250;
@@ -583,10 +600,10 @@ void CG_VehicleExplosion( vec3_t origin, int type )
 
 	VectorSet( le->lightColor, 1, 0.75, 0 );
 
-	// and also smoke for gib explosion
-	if( type == 1 )
+	// and also smoke for gib/building explosion
+	if( type > 0 )
 	{
-		localEntity_t	*smoke = NULL;
+		localEntity_t * smoke = NULL;
 
 		for( i = 1; i<=density; i++ )
 		{
@@ -594,8 +611,8 @@ void CG_VehicleExplosion( vec3_t origin, int type )
 			if( density > 1 )
 			{
 				VectorCopy( origin, adjust );
-				adjust[0] = origin[0] + (random()*MAX_ADJUST)-(MAX_ADJUST/2);
-				adjust[1] = origin[1] + (random()*MAX_ADJUST)-(MAX_ADJUST/2);
+				adjust[0] = origin[0] + (random()*maxAdjust)-(maxAdjust/2);
+				adjust[1] = origin[1] + (random()*maxAdjust)-(maxAdjust/2);
 			}
 
 			// make smoke

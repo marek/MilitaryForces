@@ -1,5 +1,5 @@
 /*
- * $Id: g_mfq3ents.c,v 1.4 2001-12-03 21:33:46 thebjoern Exp $
+ * $Id: g_mfq3ents.c,v 1.5 2002-02-05 16:09:32 sparky909_uk Exp $
 */
 
 
@@ -34,7 +34,7 @@ void explosive_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, 
 	}
 
 	// broadcast the death event to everyone
-	ent = G_TempEntity( pos, EV_VEHICLE_GIB );
+	ent = G_TempEntity( pos, EV_BUILDING_EXPLODE );
 	ent->r.svFlags = SVF_BROADCAST;	// send to everyone
 	ent->s.eventParm = 1;
 

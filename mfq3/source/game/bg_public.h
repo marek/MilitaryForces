@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.41 2002-02-05 14:36:32 sparky909_uk Exp $
+ * $Id: bg_public.h,v 1.42 2002-02-05 16:09:32 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -300,6 +300,8 @@ typedef enum {
 	EV_VEHICLE_HIT,			// smoke puff when hit
 	EV_VEHICLE_DIE,			// explosion when dying
 	EV_VEHICLE_GIB,			// even bigger explosion when gibbed
+
+	EV_BUILDING_EXPLODE,	// building explosion
 
 	EV_GEAR_UP,				// start gear up anim
 	EV_GEAR_DOWN,			// start gear down anim
