@@ -1,5 +1,5 @@
 /*
- * $Id: g_mover.c,v 1.3 2001-12-22 02:28:44 thebjoern Exp $
+ * $Id: g_mover.c,v 1.4 2002-07-15 18:23:07 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -431,7 +431,7 @@ void ReturnToPos1( gentity_t *ent ) {
 
 	// starting sound
 	if ( ent->sound2to1 ) {
-		G_AddEvent( ent, EV_GENERAL_SOUND, ent->sound2to1 );
+		G_AddEvent( ent, EV_GENERAL_SOUND, ent->sound2to1, qtrue );
 	}
 }
 
@@ -452,7 +452,7 @@ void Reached_BinaryMover( gentity_t *ent ) {
 
 		// play sound
 		if ( ent->soundPos2 ) {
-			G_AddEvent( ent, EV_GENERAL_SOUND, ent->soundPos2 );
+			G_AddEvent( ent, EV_GENERAL_SOUND, ent->soundPos2, qtrue );
 		}
 
 		// return to pos1 after a delay
@@ -470,7 +470,7 @@ void Reached_BinaryMover( gentity_t *ent ) {
 
 		// play sound
 		if ( ent->soundPos1 ) {
-			G_AddEvent( ent, EV_GENERAL_SOUND, ent->soundPos1 );
+			G_AddEvent( ent, EV_GENERAL_SOUND, ent->soundPos1, qtrue );
 		}
 
 		// close areaportals
@@ -507,7 +507,7 @@ void Use_BinaryMover( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 
 		// starting sound
 		if ( ent->sound1to2 ) {
-			G_AddEvent( ent, EV_GENERAL_SOUND, ent->sound1to2 );
+			G_AddEvent( ent, EV_GENERAL_SOUND, ent->sound1to2, qtrue );
 		}
 
 		// looping sound
@@ -537,7 +537,7 @@ void Use_BinaryMover( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 		MatchTeam( ent, MOVER_1TO2, level.time - ( total - partial ) );
 
 		if ( ent->sound1to2 ) {
-			G_AddEvent( ent, EV_GENERAL_SOUND, ent->sound1to2 );
+			G_AddEvent( ent, EV_GENERAL_SOUND, ent->sound1to2, qtrue );
 		}
 		return;
 	}
@@ -553,7 +553,7 @@ void Use_BinaryMover( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 		MatchTeam( ent, MOVER_2TO1, level.time - ( total - partial ) );
 
 		if ( ent->sound2to1 ) {
-			G_AddEvent( ent, EV_GENERAL_SOUND, ent->sound2to1 );
+			G_AddEvent( ent, EV_GENERAL_SOUND, ent->sound2to1, qtrue );
 		}
 		return;
 	}

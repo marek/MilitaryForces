@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.23 2002-06-12 14:35:33 thebjoern Exp $
+ * $Id: g_local.h,v 1.24 2002-07-15 18:23:07 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -47,6 +47,13 @@ typedef struct gclient_s gclient_t;
 
 typedef struct waypoint_s waypoint_t;
 
+#define MAX_EVENT_QUEUE_SIZE	20
+
+typedef struct {
+	int			event;
+	int			eventParm;
+	qboolean	used;
+} event_t;
 
 struct gentity_s {
 	entityState_t	s;				// communicated by server to clients
@@ -177,6 +184,10 @@ struct gentity_s {
 	qboolean	 updateBay;
 	completeLoadout_t loadout;
 	qboolean	 loadoutUpdated;
+	qboolean	 eventSent;
+	int			 currentEventToSend;
+	int			 currentEventToAdd;
+	event_t		 eventQueue[MAX_EVENT_QUEUE_SIZE];
 };
 
 
@@ -547,7 +558,8 @@ char	*vtos( const vec3_t v );
 float vectoyaw( const vec3_t vec );
 
 void G_AddPredictableEvent( gentity_t *ent, int event, int eventParm );
-void G_AddEvent( gentity_t *ent, int event, int eventParm );
+void G_AddEvent( gentity_t *ent, int event, int eventParm, qboolean addToQueue );
+void G_SendEventFromQueue( gentity_t* ent );
 void G_SetOrigin( gentity_t *ent, vec3_t origin );
 void AddRemap(const char *oldShader, const char *newShader, float timeOffset);
 const char *BuildShaderStateConfig();

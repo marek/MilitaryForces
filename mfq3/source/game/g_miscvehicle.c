@@ -1,5 +1,5 @@
 /*
- * $Id: g_miscvehicle.c,v 1.7 2002-02-18 09:51:28 thebjoern Exp $
+ * $Id: g_miscvehicle.c,v 1.8 2002-07-15 18:23:07 thebjoern Exp $
 */
 
 
@@ -98,7 +98,7 @@ static void SP_misc_plane( gentity_t *ent )
 			ent->s.pos.trType = TR_LINEAR;//TR_INTERPOLATE;
 			ent->s.apos.trType = TR_LINEAR;//TR_INTERPOLATE;
 			ent->think = Drone_Plane_Think;
-			ent->nextthink = level.time + 100;
+			ent->nextthink = level.time + 1000;
 		} else {
 			ent->idxScriptBegin = ent->idxScriptEnd = -1;
 		}
@@ -167,7 +167,7 @@ static void SP_misc_gv( gentity_t *ent )
 			ent->s.pos.trType = TR_LINEAR;//TR_INTERPOLATE;
 			ent->s.apos.trType = TR_LINEAR;//TR_INTERPOLATE;
 			ent->think = Drone_Plane_Think;
-			ent->nextthink = level.time + 100;
+			ent->nextthink = level.time + 1000;
 		} else {
 			ent->idxScriptBegin = ent->idxScriptEnd = -1;
 		}
@@ -220,7 +220,7 @@ static void SP_misc_helo( gentity_t *ent )
 			ent->s.pos.trType = TR_LINEAR;//TR_INTERPOLATE;
 			ent->s.apos.trType = TR_LINEAR;//TR_INTERPOLATE;
 			ent->think = Drone_Plane_Think;
-			ent->nextthink = level.time + 100;
+			ent->nextthink = level.time + 1000;
 		} else {
 			ent->idxScriptBegin = ent->idxScriptEnd = -1;
 		}
@@ -273,7 +273,7 @@ static void SP_misc_boat( gentity_t *ent )
 			ent->s.pos.trType = TR_LINEAR;//TR_INTERPOLATE;
 			ent->s.apos.trType = TR_LINEAR;//TR_INTERPOLATE;
 			ent->think = Drone_Plane_Think;
-			ent->nextthink = level.time + 100;
+			ent->nextthink = level.time + 1000;
 		} else {
 			ent->idxScriptBegin = ent->idxScriptEnd = -1;
 		}

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_helomove.c,v 1.1 2002-02-18 11:06:31 thebjoern Exp $
+ * $Id: bg_helomove.c,v 1.2 2002-07-15 18:23:07 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -116,7 +116,7 @@ static void PM_HeloAccelerate()
 
 /*
 ===================
-PM_PlaneMove
+PM_HeloMove
 
 ===================
 */

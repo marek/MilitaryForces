@@ -1,5 +1,5 @@
 /*
- * $Id: g_main.c,v 1.12 2002-06-09 20:09:41 thebjoern Exp $
+ * $Id: g_main.c,v 1.13 2002-07-15 18:23:07 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -432,6 +432,9 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 	ClearRegisteredItems();
 
+	// MFQ3 data
+	MF_LoadAllVehicleData();
+
 	// parse the key/value pairs and spawn gentities
 	G_SpawnEntitiesFromString();
 
@@ -459,9 +462,6 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 //	}
 
 	G_RemapTeamShaders();
-
-	// MFQ3 data
-	MF_LoadAllVehicleData();
 
 	// init some MFQ3 stuff
 	DroneInit();
