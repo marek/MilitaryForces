@@ -1,5 +1,5 @@
 /*
- * $Id: cg_info.c,v 1.6 2002-02-22 14:22:11 sparky909_uk Exp $
+ * $Id: cg_info.c,v 1.7 2002-02-26 10:47:30 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -72,12 +72,12 @@ Draw all the status / pacifier stuff during level loading
 ====================
 */
 void CG_DrawInformation( void ) {
-	const char	*s;
-	const char	*info;
-	const char	*sysInfo;
+	const char	* s = NULL, * pGameset = NULL;
+	const char	* info = NULL;
+	const char	* sysInfo = NULL;
 	int			x, y;
 	int			value;
-	qhandle_t	background, loadingshot;
+	qhandle_t	background = 0, loadingshot = 0;
 	char		buf[1024] = { 0 } ;
 	char		flagBuf[64] = { 0 };
 
@@ -103,7 +103,18 @@ void CG_DrawInformation( void ) {
 	trap_R_SetColor( NULL );
 	CG_DrawPic( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, background );
 
-	// alpha blend the 1024x256 loading shot over the picture frame if we have it
+	// alpha blend the 1024x256 loading shot (or gameset artwork) over the picture frame
+	if( !loadingshot )
+	{
+		// if no loading shot, display the correct gameset artwork
+		pGameset = Info_ValueForKey( info, "mf_gameset" );
+		if( pGameset[0] )
+		{
+			loadingshot = trap_R_RegisterShaderNoMip( va( "ui\\assets\\mid-%s", pGameset ) );
+		}
+	}
+
+	// something to display?
 	if( loadingshot )
 	{
 		CG_DrawPic( 0, 160, 640, 160, loadingshot );
