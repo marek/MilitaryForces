@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicle.c,v 1.20 2002-02-25 18:08:26 sparky909_uk Exp $
+ * $Id: cg_vehicle.c,v 1.21 2002-02-26 14:59:53 sparky909_uk Exp $
 */
 
 #include "cg_local.h"
@@ -387,7 +387,7 @@ void CG_InitShadows( void )
 		if( availableVehicles[ vehicle ].shadowAdjusts[ SHO_PITCHMOD ] == 0 &&
 			availableVehicles[ vehicle ].shadowAdjusts[ SHO_ROLLMOD ] == 0 )
 		{
-			availableVehicles[ vehicle ].shadowAdjusts[ SHO_PITCHMOD ] = 0.8f;
+			availableVehicles[ vehicle ].shadowAdjusts[ SHO_PITCHMOD ] = 0.2f;
 			availableVehicles[ vehicle ].shadowAdjusts[ SHO_ROLLMOD ] = 0.8f;
 		}
 	}
