@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.22 2002-06-09 20:09:41 thebjoern Exp $
+ * $Id: g_local.h,v 1.23 2002-06-12 14:35:33 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -177,9 +177,6 @@ struct gentity_s {
 	qboolean	 updateBay;
 	completeLoadout_t loadout;
 	qboolean	 loadoutUpdated;
-	gentity_t*	 selector;			// mission editor
-	int			 meangles[3];		// mission editor
-
 };
 
 
@@ -783,13 +780,6 @@ qboolean CheckObeliskAttack( gentity_t *obelisk, gentity_t *attacker );
 void *G_Alloc( int size );
 void G_InitMemory( void );
 void Svcmd_GameMem_f( void );
-
-//
-// g_missioneditor.c
-//
-void Cmd_ME_Spawn_f( gentity_t* editor );
-void ME_Find( gentity_t* ent );
-void ME_MoveObject(gentity_t* editor, usercmd_t *ucmd );
 
 //
 // g_session.c

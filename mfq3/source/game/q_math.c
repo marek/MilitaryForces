@@ -1,5 +1,5 @@
 /*
- * $Id: q_math.c,v 1.6 2002-02-25 12:11:06 sparky909_uk Exp $
+ * $Id: q_math.c,v 1.7 2002-06-12 14:35:33 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1402,4 +1402,115 @@ float RandomFloat( float min, float max )
 	float result = min + (float)(range * modifier);
 
 	return result;
+}
+
+/*
+===============
+MakeBoxFromExtents
+
+Create a box3_t
+===============
+*/
+void MakeBoxFromExtents( box3_t* box, const vec3_t mins, const vec3_t maxs, const vec3_t angles )
+{
+	vec3_t temp;
+	
+	if( !box ) return;
+
+	VectorCopy( mins, box->edgePoints[BOX3_MIN]);// min point
+	VectorCopy( maxs, box->edgePoints[BOX3_MAX]);// max point
+
+	VectorSubtract( box->edgePoints[BOX3_MIN], box->edgePoints[BOX3_MAX], temp );
+	VectorScale( temp, 0.5f, temp );
+	VectorAdd( box->edgePoints[BOX3_MAX], temp, box->center );
+
+	AnglesToAxis( angles, box->axis );
+	VectorSet( box->extents,
+			   (box->edgePoints[BOX3_MAX][0]-box->edgePoints[BOX3_MIN][0])/2,
+			   (box->edgePoints[BOX3_MAX][1]-box->edgePoints[BOX3_MIN][1])/2, 
+			   (box->edgePoints[BOX3_MAX][2]-box->edgePoints[BOX3_MIN][2])/2);
+
+	VectorSet( box->edgePoints[0], box->edgePoints[BOX3_MAX][0], box->edgePoints[BOX3_MIN][1], box->edgePoints[BOX3_MIN][2]);
+	VectorSet( box->edgePoints[1], box->edgePoints[BOX3_MAX][0], box->edgePoints[BOX3_MAX][1], box->edgePoints[BOX3_MIN][2]);
+	VectorSet( box->edgePoints[3], box->edgePoints[BOX3_MAX][0], box->edgePoints[BOX3_MIN][1], box->edgePoints[BOX3_MAX][2]);
+
+	VectorSet( box->edgePoints[5], box->edgePoints[BOX3_MIN][0], box->edgePoints[BOX3_MAX][1], box->edgePoints[BOX3_MIN][2]);
+	VectorSet( box->edgePoints[6], box->edgePoints[BOX3_MIN][0], box->edgePoints[BOX3_MAX][1], box->edgePoints[BOX3_MAX][2]);
+	VectorSet( box->edgePoints[7], box->edgePoints[BOX3_MIN][0], box->edgePoints[BOX3_MIN][1], box->edgePoints[BOX3_MAX][2]);
+
+}
+
+void MakeRay( ray3_t* ray, const vec3_t start, const vec3_t dir )
+{
+	VectorCopy( start, ray->start );
+	VectorCopy( dir, ray->dir );
+}
+
+qboolean RayIntersectBox( const ray3_t* ray, const box3_t* bbox )
+{
+	vec3_t dir, midpoint, md, projAxis;
+	float box, seg, dist;
+
+	VectorScale( ray->dir, 0.5f, dir );
+	VectorAdd( ray->start, dir, midpoint );
+	VectorSubtract( midpoint, bbox->center, md );
+
+	// first axis
+	VectorCopy( bbox->axis[0], projAxis );
+	box = bbox->extents[0];
+	seg = Q_fabs(DotProduct(projAxis, dir));
+	dist = Q_fabs(DotProduct(projAxis, md));
+	if( dist > box + seg ) {
+		return qfalse;
+	}
+
+	// sec. axis
+	VectorCopy( bbox->axis[1], projAxis );
+	box = bbox->extents[1];
+	seg = Q_fabs(DotProduct(projAxis, dir));
+	dist = Q_fabs(DotProduct(projAxis, md));
+	if( dist > box + seg ) {
+		return qfalse;
+	}
+
+	// third. axis
+	VectorCopy( bbox->axis[2], projAxis );
+	box = bbox->extents[2];
+	seg = Q_fabs(DotProduct(projAxis, dir));
+	dist = Q_fabs(DotProduct(projAxis, md));
+	if( dist > box + seg ) {
+		return qfalse;
+	}
+
+	// first separating axis
+	CrossProduct( ray->dir, bbox->axis[0], projAxis );
+	VectorNormalize( projAxis );
+	dist = Q_fabs(DotProduct(projAxis, md));
+	box = bbox->extents[1]*Q_fabs(DotProduct(bbox->axis[1], projAxis)) + 
+		  bbox->extents[2]*Q_fabs(DotProduct(bbox->axis[2], projAxis));
+	if( dist > box ) {
+		return qfalse;
+	}
+
+	// second separating axis
+	CrossProduct( ray->dir, bbox->axis[1], projAxis );
+	VectorNormalize( projAxis );
+	dist = Q_fabs(DotProduct(projAxis, md));
+	box = bbox->extents[0]*Q_fabs(DotProduct(bbox->axis[0], projAxis)) + 
+		  bbox->extents[2]*Q_fabs(DotProduct(bbox->axis[2], projAxis));
+	if( dist > box ) {
+		return qfalse;
+	}
+
+	// third separating axis
+	CrossProduct( ray->dir, bbox->axis[2], projAxis );
+	VectorNormalize( projAxis );
+	dist = Q_fabs(DotProduct(projAxis, md));
+	box = bbox->extents[0]*Q_fabs(DotProduct(bbox->axis[0], projAxis)) + 
+		  bbox->extents[1]*Q_fabs(DotProduct(bbox->axis[1], projAxis));
+	if( dist > box ) {
+		return qfalse;
+	}
+
+	return qtrue;
 }

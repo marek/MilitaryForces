@@ -1,5 +1,5 @@
 /*
- * $Id: g_cmds.c,v 1.14 2002-06-09 20:09:41 thebjoern Exp $
+ * $Id: g_cmds.c,v 1.15 2002-06-12 14:35:33 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1390,6 +1390,25 @@ void Cmd_Stats_f( gentity_t *ent ) {
 	//trap_SendServerCommand( ent-g_entities, va("print \"visited %d of %d areas\n\"", n, max));
 	trap_SendServerCommand( ent-g_entities, va("print \"%d%% level coverage\n\"", n * 100 / max));
 */
+}
+
+/*
+=================
+Cmd_Stats_f
+=================
+*/
+void Cmd_ME_Spawn_f( gentity_t *ent ) {
+
+	int		idx;
+	char	arg1[MAX_STRING_TOKENS];
+
+	trap_Argv( 1, arg1, sizeof( arg1 ) );
+
+	idx = atoi(arg1);
+	if( idx < 0 || idx >= bg_numberOfVehicles ) return;
+
+
+	trap_SendServerCommand( -1, va("me_spawnvehicle %d\n", idx) );
 }
 
 /*

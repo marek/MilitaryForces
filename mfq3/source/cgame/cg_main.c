@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.41 2002-06-09 20:09:41 thebjoern Exp $
+ * $Id: cg_main.c,v 1.42 2002-06-12 14:35:33 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1016,6 +1016,12 @@ static void CG_RegisterGraphics( void ) {
 		cgs.media.HUDreticles[i] = trap_R_RegisterShaderNoMip( mfq3_hudrets[i] );
 	}
 	// end MFQ3 new HUD
+
+	// MFQ3 IGME
+	if( cgs.gametype == GT_MISSION_EDITOR ) {
+		cgs.media.IGME_selector = trap_R_RegisterModel("models/effects/selector.md3");
+	}
+	// end MFQ3 IGME
 
 	// MFQ3: precache the vehicle icons here (they are used by the UI, but registered models
 	// are engine-global)
@@ -2114,16 +2120,6 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	// init all the vehicle's shadow system
 	CG_InitShadows();
 
-	// in missioneditor load selector box
-	if( cgs.gametype == GT_MISSION_EDITOR ) {
-		gitem_t* item;
-		int i = 1;
-		for ( item=bg_itemlist+1 ; item->classname ; item++, i++ ) {
-			if ( !strcmp(item->classname, "ME_Selector") ) {
-				CG_RegisterItemVisuals(i);
-			}
-		}
-	}
 }
 
 /*
@@ -2136,6 +2132,9 @@ Called before every level change or subsystem restart
 void CG_Shutdown( void ) {
 	// some mods may need to do cleanup work here,
 	// like closing files or archiving session data
+
+	// clean up missioneditor
+	memset( &cgs.IGME, 0, sizeof( cgs.IGME ) );
 }
 
 /*

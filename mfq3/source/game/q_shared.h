@@ -1,5 +1,5 @@
 /*
- * $Id: q_shared.h,v 1.9 2002-02-27 09:42:10 thebjoern Exp $
+ * $Id: q_shared.h,v 1.10 2002-06-12 14:35:33 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -549,6 +549,30 @@ void MatrixMultiply(float in1[3][3], float in2[3][3], float out[3][3]);
 void AngleVectors( const vec3_t angles, vec3_t forward, vec3_t right, vec3_t up);
 void PerpendicularVector( vec3_t dst, const vec3_t src );
 
+// MFQ3
+#define BOX3_MAX	2
+#define BOX3_MIN	4
+
+typedef struct {
+	vec3_t		edgePoints[8];	// 8 edge-points
+	
+	vec3_t		center;		// center of the box
+	vec3_t		axis[3];		// columns are the x,y,z axis
+	vec3_t		extents;		// extents along axis	
+} box3_t;
+
+void MakeBoxFromExtents( box3_t* box, const vec3_t mins, const vec3_t maxs, const vec3_t angles );
+
+typedef struct {
+	vec3_t		start;
+	vec3_t		dir;
+} ray3_t;
+
+void MakeRay( ray3_t* ray, const vec3_t start, const vec3_t dir );
+
+qboolean RayIntersectBox( const ray3_t* ray, const box3_t* bbox );
+
+// end MFQ3
 
 //=============================================
 

@@ -231,10 +231,6 @@ SOURCE=.\g_missile.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\g_missioneditor.c
-# End Source File
-# Begin Source File
-
 SOURCE=.\g_mover.c
 # End Source File
 # Begin Source File

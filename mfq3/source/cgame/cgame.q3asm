@@ -28,6 +28,7 @@ cg_helo
 cg_boat
 cg_lqm
 cg_groundvehicle
+cg_missioneditor
 cg_util
 bg_slidemove
 bg_pmove
