@@ -1,5 +1,5 @@
 /*
- * $Id: ui_shared.c,v 1.9 2002-02-19 13:57:58 sparky909_uk Exp $
+ * $Id: ui_shared.c,v 1.10 2002-02-22 17:03:06 sparky909_uk Exp $
 */
 // 
 // string allocation/managment
@@ -3131,10 +3131,14 @@ static bind_t g_bindings[] =
 	{"+button2", 		"Fire Main Weapon",	ID_ATTACK2,		-1,				-1,		-1, -1},
 	{"weapprev",		"Previous Weapon",	ID_WEAPPREV,	'[',			-1,		-1, -1},
 	{"weapnext", 		"Next Weapon",		ID_WEAPNEXT,	']',			-1,		-1, -1},
-	{"messagemode", 	"Chat",				ID_CHAT,		't',			-1,		-1, -1},
+	{"messagemode", 	"Chat",				ID_CHAT,		-1,				-1,		-1, -1},
 	{"messagemode2", 	"Chat - Team",		ID_CHAT2,		-1,				-1,		-1, -1},
 	{"messagemode3", 	"Chat - Target",	ID_CHAT3,		-1,				-1,		-1, -1},
 	{"messagemode4", 	"Chat - Attacker",	ID_CHAT4,		-1,				-1,		-1, -1},
+	{"cmessagemode", 	"MFQ3 Chat",			ID_CHAT,	't',			-1,		-1, -1},
+	{"cmessagemode2", 	"MFQ3 Chat - Team",		ID_CHAT2,	-1,				-1,		-1, -1},
+	{"cmessagemode3", 	"MFQ3 Chat - Target",	ID_CHAT3,	-1,				-1,		-1, -1},
+	{"cmessagemode4", 	"MFQ3 Chat - Attacker",	ID_CHAT4,	-1,				-1,		-1, -1},
 
 	{"+button7",		"Landing Gear",		ID_GEAR,		-1,				-1,		-1, -1},
 	{"+button8",	 	"(Speed)Brakes",	ID_BRAKE,		-1,				-1,		-1, -1},

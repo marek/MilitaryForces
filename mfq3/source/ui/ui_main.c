@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.19 2002-02-22 16:13:12 sparky909_uk Exp $
+ * $Id: ui_main.c,v 1.20 2002-02-22 17:03:06 sparky909_uk Exp $
 */
 /*
 =======================================================================
@@ -3276,6 +3276,22 @@ static void UI_RefreshVehicleSelect( void )
 	gameset = MF_UI_GetGameset( qfalse );
 	team = MF_UI_GetTeam();
 	
+	// ----------> AVAILABLE VEHICLES <-----------
+
+	switch( team )
+	{
+	default:
+	case MF_TEAM_ANY:
+		trap_Cvar_Set( "ui_availableVehicleTxt", "ALL" );
+		break;
+	case MF_TEAM_1:
+		trap_Cvar_Set( "ui_availableVehicleTxt", "RED TEAM" );
+		break;
+	case MF_TEAM_2:
+		trap_Cvar_Set( "ui_availableVehicleTxt", "BLUE TEAM" );
+		break;
+	}
+
 	// ----------> CATAGORY <-----------
 
 	// find out the current UI vehicle (based upon the known catagory+class)
@@ -5436,10 +5452,29 @@ UI_CustomChatEnd
 
 void UI_CustomChatEnd( qboolean sendText )
 {
-	// send the text?
-	if( sendText )
+	char * pMode = NULL;
+
+	// work out which say
+	switch( uiInfo.customChat.mode )
 	{
-		trap_Cmd_ExecuteText( EXEC_APPEND, va( "say %s", uiInfo.customChat.text ) );
+	case CCHAT_ALL:
+		pMode = "say";
+		break;
+	case CCHAT_TEAM:
+		pMode = "say_team";
+		break;
+	case CCHAT_TARGET:
+		// not sure what to do here
+		break;
+	case CCHAT_ATTACK:
+		// not sure what to do here
+		break;
+	}
+
+	// send the text?
+	if( sendText && pMode )
+	{
+		trap_Cmd_ExecuteText( EXEC_APPEND, va( "%s %s", pMode, uiInfo.customChat.text ) );
 	}
 
 	// disable chat
@@ -6263,6 +6298,8 @@ vmCvar_t	ui_vehicleCatTxt;	// vehicle catagory text
 vmCvar_t	ui_vehicleClassTxt;	// vehicle class text
 vmCvar_t	ui_vehicleTxt;		// vehicle text
 
+vmCvar_t	ui_availableVehiclesTxt;	// available vehicles text
+
 vmCvar_t	ui_mfq3Version;		// version text
 
 // bk001129 - made static to avoid aliasing
@@ -6317,6 +6354,8 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_vehicleClass, "ui_vehicleClassTxt", "<Class>", CVAR_ROM },
 	{ &ui_vehicle, "ui_vehicleTxt", "<Vehicle>", CVAR_ROM },
 
+	{ &ui_availableVehiclesTxt, "ui_availableVehiclesTxt", "<Available Vehicles>", CVAR_ROM },
+	
 	// (misc)
 	{ &ui_mfq3Version, "ui_mfq3Version", "<MFQ3 Version>", CVAR_ROM },
 
