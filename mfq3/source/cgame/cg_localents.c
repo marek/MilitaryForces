@@ -1,5 +1,5 @@
 /*
- * $Id: cg_localents.c,v 1.2 2002-02-05 14:37:53 sparky909_uk Exp $
+ * $Id: cg_localents.c,v 1.3 2002-02-05 16:09:01 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -382,6 +382,12 @@ static void CG_AddSpriteExplosion( localEntity_t *le ) {
 
 	re.reType = RT_SPRITE;
 	re.radius = 42 * ( 1.0 - c ) + 30;
+
+	// use the radius parameter of the localEntity_t as a scale modifier (0.0f or 1.0f will give no change)
+	if( le->radius )
+	{
+		re.radius *= le->radius;
+	}
 
 	trap_R_AddRefEntityToScene( &re );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_event.c,v 1.4 2002-02-04 09:38:06 thebjoern Exp $
+ * $Id: cg_event.c,v 1.5 2002-02-05 16:09:01 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -277,6 +277,11 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 	case EV_VEHICLE_GIB:
 		DEBUGNAME("EV_VEHICLE_GIB");
 		CG_VehicleExplosion( position, 1 );
+		break;
+
+	case EV_BUILDING_EXPLODE:
+		DEBUGNAME("EV_BUILDING_EXPLODE");
+		CG_VehicleExplosion( position, 2 );
 		break;
 
 	case EV_GEAR_UP_FULL:

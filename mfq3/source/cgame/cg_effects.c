@@ -1,5 +1,5 @@
 /*
- * $Id: cg_effects.c,v 1.2 2002-02-05 14:37:53 sparky909_uk Exp $
+ * $Id: cg_effects.c,v 1.3 2002-02-05 16:09:01 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -88,8 +88,9 @@ CG_MakeExplosion
 ====================
 */
 localEntity_t *CG_MakeExplosion( vec3_t origin, vec3_t dir, 
-								qhandle_t hModel, qhandle_t shader, int offset,
-								int duration, qboolean isSprite ) {
+								 qhandle_t hModel, qhandle_t shader,
+								 int offset, int duration, qboolean isSprite )
+{
 	float			ang;
 	localEntity_t	*ex;
 	vec3_t			tmpVec, newOrigin;
