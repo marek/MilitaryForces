@@ -1,5 +1,5 @@
 /*
- * $Id: g_combat.c,v 1.5 2002-02-15 09:58:31 thebjoern Exp $
+ * $Id: g_combat.c,v 1.6 2002-02-18 09:51:28 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -731,7 +731,7 @@ void vehicle_death( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, 
 		self->health = GIB_HEALTH - 1;
 	}
 
-	if( availableVehicles[self->client->vehicle].cat & CAT_GROUND ) {
+	if( (availableVehicles[self->client->vehicle].cat & CAT_GROUND) ) {
 		self->health = GIB_HEALTH - 1;
 	}
 

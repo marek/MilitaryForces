@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.22 2002-02-17 18:10:54 thebjoern Exp $
+ * $Id: cg_drawnewhud.c,v 1.23 2002-02-18 09:51:27 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -398,7 +398,8 @@ static void CG_DrawRadarSymbols_AIR_new( int vehicle, float range, int x, int y 
 	scale = range/54;
 
 	// ground vehicle adjustment for angle
-	if( availableVehicles[vehicle].cat & CAT_GROUND ) {
+	if( (availableVehicles[vehicle].cat & CAT_GROUND) ||
+		(availableVehicles[vehicle].cat & CAT_BOAT) ) {
 		hdg += self->currentState.angles2[ROLL];
 		if( hdg > 360 ) hdg -= 360;
 		else if( hdg < 0 ) hdg += 360;
@@ -502,7 +503,8 @@ static void CG_DrawRadarSymbols_GROUND_new( int vehicle, float range, int x, int
 	scale = range/54;
 
 	// ground vehicle adjustment for angle
-	if( availableVehicles[vehicle].cat & CAT_GROUND ) {
+	if( (availableVehicles[vehicle].cat & CAT_GROUND) ||
+		(availableVehicles[vehicle].cat & CAT_BOAT) ) {
 		hdg += self->currentState.angles2[ROLL];
 		if( hdg > 360 ) hdg -= 360;
 		else if( hdg < 0 ) hdg += 360;
@@ -563,7 +565,8 @@ static void CG_DrawRadarSymbols_GROUND_new( int vehicle, float range, int x, int
 				if( res.fraction < 1.0f ) continue;
 			}
 			// which icon (if at all, dont show lqms)
-			if( availableVehicles[otherveh].cat & CAT_GROUND ) {
+			if( (availableVehicles[otherveh].cat & CAT_GROUND) ||
+				(availableVehicles[otherveh].cat & CAT_BOAT) ) {
 				icon = RD_GROUND_ENEMY;
 			} else {
 				continue;
@@ -592,9 +595,11 @@ static void CG_DrawRadarSymbols_GROUND_new( int vehicle, float range, int x, int
 			angle = angles[1]-hdg;
 			if( angle > 360 ) angle -= 360;
 			else if( angle < 0 ) angle += 360;
-			if( (availableVehicles[vehicle].cat & CAT_GROUND ) &&
+			if( ( (availableVehicles[vehicle].cat & CAT_GROUND) || 
+				  (availableVehicles[vehicle].cat & CAT_BOAT) ) &&
 				angle >= 90 && angle <= 270 ) continue;
-			else if( (availableVehicles[vehicle].cat & CAT_PLANE ) &&
+			else if( ( (availableVehicles[vehicle].cat & CAT_PLANE) ||
+					   (availableVehicles[vehicle].cat & CAT_HELO) ) &&
 				angle >= 45 && angle <= 315 ) continue;
 			angles[1] -= hdg - 90;
 			if( angles[1] > 360 ) angles[1] -= 360;
@@ -700,10 +705,12 @@ static void CG_Draw_Redundant(int vehicle, int health, int throttle, int ammo[16
 		char*	actualstring;
 			// mg
 		if( ammo[8] ) {
-			if( availableVehicles[vehicle].cat & CAT_GROUND ) 
+			if( (availableVehicles[vehicle].cat & CAT_GROUND) || 
+				(availableVehicles[vehicle].cat & CAT_BOAT) ) {
 				actualstring = availableWeapons[availableVehicles[vehicle].weapons[0]].shortName2;
-			else
+			} else {
 				actualstring = availableWeapons[availableVehicles[vehicle].weapons[0]].shortName;
+			}
 			Com_sprintf( ammostring, 32, "%s:", actualstring );
 			len = CG_DrawString_MFQ3( 4, 318, ammostring, HUDColors[cg.HUDColor], 0);
 			CG_MFQ3HUD_Numbers( 4 + len, 318, 3, ammo[0], qfalse, HUDColors[cg.HUDColor], qfalse );
@@ -711,10 +718,12 @@ static void CG_Draw_Redundant(int vehicle, int health, int throttle, int ammo[16
 
 			// selected weapon
 		if( ammo[selweap+8] && selweap != 0 ) {
-			if( availableVehicles[vehicle].cat & CAT_GROUND ) 
+			if( (availableVehicles[vehicle].cat & CAT_GROUND) || 
+				(availableVehicles[vehicle].cat & CAT_BOAT) ) {
 				actualstring = availableWeapons[availableVehicles[vehicle].weapons[selweap]].shortName2;
-			else
+			} else {
 				actualstring = availableWeapons[availableVehicles[vehicle].weapons[selweap]].shortName;
+			}
 			Com_sprintf( ammostring, 32, "%s:", actualstring );
 			len = CG_DrawString_MFQ3( 4, 330, ammostring, HUDColors[cg.HUDColor], 0);
 			CG_MFQ3HUD_Numbers( 4 + len, 330, 3, ammo[selweap], qfalse, HUDColors[cg.HUDColor], qfalse );
@@ -766,7 +775,8 @@ static void CG_Draw_Center(int vehicle, int health, int throttle) {
 			if( availableVehicles[vehicle].maxthrottle > MF_THROTTLE_MILITARY ) {
 				CG_DrawPic( 320, 448, 128, height, cgs.media.HUDthrottle_1_ab[throttlepic] ); 
 			} else {
-				if( (availableVehicles[vehicle].cat & CAT_GROUND) &&
+				if( ( (availableVehicles[vehicle].cat & CAT_GROUND) ||
+					(availableVehicles[vehicle].cat & CAT_GROUND) ) &&
 					throttlepic >= MF_THROTTLE_MILITARY ) {
 					CG_DrawPic( 320, 448, 128, 32, cgs.media.HUDthrottle_rev[throttlepic-10] ); 
 				} else {
@@ -845,10 +855,12 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 	cg.HUDCamera.fov_y = fov_x;
 	cammode = cg.CameraMode;
 
-	if( availableVehicles[vehicle].cat & CAT_GROUND ) cammode = CAMERA_TARGET;
+	if( (availableVehicles[vehicle].cat & CAT_GROUND) ||
+		(availableVehicles[vehicle].cat & CAT_BOAT) ) cammode = CAMERA_TARGET;
 
 	if( cammode == CAMERA_DOWN ) {
-		if( availableVehicles[vehicle].cat & CAT_GROUND ) {
+		if( (availableVehicles[vehicle].cat & CAT_GROUND) ||
+			(availableVehicles[vehicle].cat & CAT_BOAT) ) {
 			// nothing to be done here...
 		} else {
 			vec3_t a;
@@ -860,7 +872,8 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 		VectorScale( v, availableVehicles[vehicle].mins[2], v );
 		VectorAdd( cent->lerpOrigin, v, cg.HUDCamera.vieworg );
 	} else if( cammode == CAMERA_BACK ) {
-		if( availableVehicles[vehicle].cat & CAT_GROUND ) {
+		if( (availableVehicles[vehicle].cat & CAT_GROUND) ||
+			(availableVehicles[vehicle].cat & CAT_BOAT) ) {
 			vec3_t right, up, temp;
 			AngleVectors( cent->currentState.angles, v, right, up );
 			RotatePointAroundVector( temp, up, v, cent->currentState.angles2[ROLL] );
@@ -927,7 +940,8 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 			vectoangles( v, a );
 			AnglesToAxis( a, cg.HUDCamera.viewaxis );
 		} else {
-			if( availableVehicles[vehicle].cat & CAT_GROUND ) {
+			if( (availableVehicles[vehicle].cat & CAT_GROUND) ||
+				(availableVehicles[vehicle].cat & CAT_BOAT) ) {
 				vec3_t right, up, temp;
 				AngleVectors( cent->currentState.angles, v, right, up );
 				RotatePointAroundVector( temp, up, v, cent->currentState.angles2[ROLL] );
@@ -1035,7 +1049,9 @@ static void CG_Draw_MFD(int mfdnum, int vehicle, centity_t * cent, int targetran
 		int		fuel;
 		// fuel (for MFD)
 		fuel = ps->stats[STAT_FUEL];
-		if( availableVehicles[vehicle].cat & CAT_PLANE ) {
+		if( (availableVehicles[vehicle].cat & CAT_PLANE) ||
+			(availableVehicles[vehicle].cat & CAT_HELO) ||
+			(availableVehicles[vehicle].cat & CAT_BOAT) ) {
 			fuel *= 100;
 		}
 		CG_DrawString_MFQ3( x+4, y+14, "STATUS:", HUDColors[cg.MFDColor], 0);
@@ -1062,7 +1078,8 @@ static void CG_Draw_MFD(int mfdnum, int vehicle, centity_t * cent, int targetran
 			// if weapon available
 			if( ps->ammo[i+8] ) {
 				char* actualstring;
-				if( availableVehicles[vehicle].cat & CAT_GROUND ) 
+				if( (availableVehicles[vehicle].cat & CAT_GROUND) ||
+					(availableVehicles[vehicle].cat & CAT_BOAT) ) 
 					actualstring = availableWeapons[availableVehicles[vehicle].weapons[i]].shortName2;
 				else
 					actualstring = availableWeapons[availableVehicles[vehicle].weapons[i]].shortName;
@@ -1448,7 +1465,8 @@ void CG_DrawStatusBar_MFQ3_new( void ) {
 
 	// speed
 	if( hud_speed.integer ) {
-		if( availableVehicles[vehicle].cat & CAT_GROUND ) value = 10;
+		if( (availableVehicles[vehicle].cat & CAT_GROUND) || 
+			(availableVehicles[vehicle].cat & CAT_BOAT) ) value = 10;
 		else value = 50;
 		CG_Draw_SpeedTape( ps->speed/10, availableVehicles[vehicle].stallspeed,
 				availableVehicles[vehicle].stallspeed * SPEED_GREEN_ARC, value );
@@ -1456,7 +1474,7 @@ void CG_DrawStatusBar_MFQ3_new( void ) {
 
 	// altitude (not for ground-vehicles)
 	if( (hud_altitude.integer || cg.Mode_MFD[MFD_1] == MFD_INFO || cg.Mode_MFD[MFD_2] == MFD_INFO) &&
-		!(availableVehicles[vehicle].cat & CAT_GROUND) )
+		!(availableVehicles[vehicle].cat & CAT_GROUND) && !(availableVehicles[vehicle].cat & CAT_BOAT) )
 	{
 		trace_t	tr;
 		vec3_t	start, end;

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicle.c,v 1.8 2002-02-15 09:58:31 thebjoern Exp $
+ * $Id: cg_vehicle.c,v 1.9 2002-02-18 09:51:27 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -125,6 +125,187 @@ static void CG_CacheGroundVehicle(int index)
 	}
 }
 
+
+/*
+===============
+CG_CacheGroundVehicle
+
+On startup cache it
+===============
+*/
+
+static void CG_CacheHelo(int index)
+{/*
+	char name[128];
+	char basename[128];
+	int i;
+
+	Com_sprintf( basename, sizeof(basename), "models/vehicles/ground/%s/%s", availableVehicles[index].modelName,
+			availableVehicles[index].modelName );
+// changed mg
+	for( i = 0; i < BP_GV_MAX_PARTS; i++ ) {
+		switch(i) {
+		case BP_GV_BODY:
+			Com_sprintf( name, sizeof(name), "%s.md3", basename );
+			break;
+		case BP_GV_TURRET:
+			Com_sprintf( name, sizeof(name), "%s_tur.md3", basename );
+			break;
+		case BP_GV_GUNBARREL:
+			Com_sprintf( name, sizeof(name), "%s_gun.md3", basename );
+			break;
+		case BP_GV_WHEEL:
+			Com_sprintf( name, sizeof(name), "%s_w1.md3", basename );
+			break;
+		case BP_GV_WHEEL2:
+			Com_sprintf( name, sizeof(name), "%s_w2.md3", basename );
+			break;
+		case BP_GV_WHEEL3:
+			Com_sprintf( name, sizeof(name), "%s_w3.md3", basename );
+			break;
+		case BP_GV_WHEEL4:
+			Com_sprintf( name, sizeof(name), "%s_w4.md3", basename );
+			break;
+		case BP_GV_WHEEL5:
+			Com_sprintf( name, sizeof(name), "%s_w5.md3", basename );
+			break;
+		case BP_GV_WHEEL6:
+			Com_sprintf( name, sizeof(name), "%s_w6.md3", basename );
+			break;
+		}
+		availableVehicles[index].handle[i] = trap_R_RegisterModel( name );
+//		if( !availableVehicles[index].handle[i] ) {
+//			CG_Printf( "MFQ3 Warning: Unable to load model '%s'\n", name );
+//		}
+	}
+
+	// only thing that always has to be there is body
+	if( !availableVehicles[index].handle[BP_PLANE_BODY] ) {
+		trap_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
+	}*/
+}
+
+
+/*
+===============
+CG_CacheGroundVehicle
+
+On startup cache it
+===============
+*/
+
+static void CG_CacheLQM(int index)
+{/*
+	char name[128];
+	char basename[128];
+	int i;
+
+	Com_sprintf( basename, sizeof(basename), "models/vehicles/ground/%s/%s", availableVehicles[index].modelName,
+			availableVehicles[index].modelName );
+// changed mg
+	for( i = 0; i < BP_GV_MAX_PARTS; i++ ) {
+		switch(i) {
+		case BP_GV_BODY:
+			Com_sprintf( name, sizeof(name), "%s.md3", basename );
+			break;
+		case BP_GV_TURRET:
+			Com_sprintf( name, sizeof(name), "%s_tur.md3", basename );
+			break;
+		case BP_GV_GUNBARREL:
+			Com_sprintf( name, sizeof(name), "%s_gun.md3", basename );
+			break;
+		case BP_GV_WHEEL:
+			Com_sprintf( name, sizeof(name), "%s_w1.md3", basename );
+			break;
+		case BP_GV_WHEEL2:
+			Com_sprintf( name, sizeof(name), "%s_w2.md3", basename );
+			break;
+		case BP_GV_WHEEL3:
+			Com_sprintf( name, sizeof(name), "%s_w3.md3", basename );
+			break;
+		case BP_GV_WHEEL4:
+			Com_sprintf( name, sizeof(name), "%s_w4.md3", basename );
+			break;
+		case BP_GV_WHEEL5:
+			Com_sprintf( name, sizeof(name), "%s_w5.md3", basename );
+			break;
+		case BP_GV_WHEEL6:
+			Com_sprintf( name, sizeof(name), "%s_w6.md3", basename );
+			break;
+		}
+		availableVehicles[index].handle[i] = trap_R_RegisterModel( name );
+//		if( !availableVehicles[index].handle[i] ) {
+//			CG_Printf( "MFQ3 Warning: Unable to load model '%s'\n", name );
+//		}
+	}
+
+	// only thing that always has to be there is body
+	if( !availableVehicles[index].handle[BP_PLANE_BODY] ) {
+		trap_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
+	}*/
+}
+
+
+/*
+===============
+CG_CacheGroundVehicle
+
+On startup cache it
+===============
+*/
+
+static void CG_CacheBoat(int index)
+{/*
+	char name[128];
+	char basename[128];
+	int i;
+
+	Com_sprintf( basename, sizeof(basename), "models/vehicles/ground/%s/%s", availableVehicles[index].modelName,
+			availableVehicles[index].modelName );
+// changed mg
+	for( i = 0; i < BP_GV_MAX_PARTS; i++ ) {
+		switch(i) {
+		case BP_GV_BODY:
+			Com_sprintf( name, sizeof(name), "%s.md3", basename );
+			break;
+		case BP_GV_TURRET:
+			Com_sprintf( name, sizeof(name), "%s_tur.md3", basename );
+			break;
+		case BP_GV_GUNBARREL:
+			Com_sprintf( name, sizeof(name), "%s_gun.md3", basename );
+			break;
+		case BP_GV_WHEEL:
+			Com_sprintf( name, sizeof(name), "%s_w1.md3", basename );
+			break;
+		case BP_GV_WHEEL2:
+			Com_sprintf( name, sizeof(name), "%s_w2.md3", basename );
+			break;
+		case BP_GV_WHEEL3:
+			Com_sprintf( name, sizeof(name), "%s_w3.md3", basename );
+			break;
+		case BP_GV_WHEEL4:
+			Com_sprintf( name, sizeof(name), "%s_w4.md3", basename );
+			break;
+		case BP_GV_WHEEL5:
+			Com_sprintf( name, sizeof(name), "%s_w5.md3", basename );
+			break;
+		case BP_GV_WHEEL6:
+			Com_sprintf( name, sizeof(name), "%s_w6.md3", basename );
+			break;
+		}
+		availableVehicles[index].handle[i] = trap_R_RegisterModel( name );
+//		if( !availableVehicles[index].handle[i] ) {
+//			CG_Printf( "MFQ3 Warning: Unable to load model '%s'\n", name );
+//		}
+	}
+
+	// only thing that always has to be there is body
+	if( !availableVehicles[index].handle[BP_PLANE_BODY] ) {
+		trap_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
+	}*/
+}
+
+
 /*
 ===============
 CG_CacheVehicles
@@ -146,6 +327,15 @@ void CG_CacheVehicles()
 			}
 			else if( availableVehicles[i].cat & CAT_GROUND ) {
 					CG_CacheGroundVehicle(i);
+			}
+			else if( availableVehicles[i].cat & CAT_HELO ) {
+					CG_CacheHelo(i);
+			}
+			else if( availableVehicles[i].cat & CAT_LQM ) {
+					CG_CacheLQM(i);
+			}
+			else if( availableVehicles[i].cat & CAT_BOAT ) {
+					CG_CacheBoat(i);
 			}
 			else {
 				trap_Error( va("Invalid Vehicle type in CG_CacheVehicles (%d,%d)", 
@@ -181,6 +371,15 @@ void CG_RegisterVehicle( clientInfo_t *ci )
 	}
 	else if( availableVehicles[ci->vehicle].cat & CAT_GROUND ) {
 		CG_RegisterGroundVehicle(ci);
+	}
+	else if( availableVehicles[ci->vehicle].cat & CAT_HELO ) {
+		CG_RegisterHelo(ci);
+	}
+	else if( availableVehicles[ci->vehicle].cat & CAT_LQM ) {
+		CG_RegisterLQM(ci);
+	}
+	else if( availableVehicles[ci->vehicle].cat & CAT_BOAT ) {
+		CG_RegisterBoat(ci);
 	}
 	else
 		CG_Error( "Invalid vehicle type in register vehicle" );
@@ -235,6 +434,29 @@ void CG_Vehicle( centity_t *cent )
 		}
 		CG_GroundVehicle( cent, ci );
 	}
+	// helo?
+	else if( availableVehicles[ci->vehicle].cat & CAT_HELO )
+	{
+		if( cg.radarTargets < MAX_RADAR_TARGETS && (cg.predictedPlayerEntity.currentState.ONOFF & OO_RADAR_AIR))
+		{
+			cg.radarEnts[cg.radarTargets++] = cent;
+		}
+		CG_Helo( cent, ci );
+	}
+	// lqm?
+	else if( availableVehicles[ci->vehicle].cat & CAT_LQM )
+	{
+		CG_LQM( cent, ci );
+	}
+	// boat ?
+	else if( availableVehicles[ci->vehicle].cat & CAT_BOAT )
+	{
+		if( cg.radarTargets < MAX_RADAR_TARGETS && (cg.predictedPlayerEntity.currentState.ONOFF & OO_RADAR_GROUND))
+		{
+			cg.radarEnts[cg.radarTargets++] = cent;
+		}
+		CG_Boat( cent, ci );
+	}
 	else
 	{
 		trap_Error( "Error: CG_Vehicle got wrong CAT!\n" );
@@ -267,6 +489,15 @@ void CG_VehicleObituary( entityState_t *ent )
 	}
 	else if( availableVehicles[ci->vehicle].cat & CAT_GROUND ) {
 		CG_GroundVehicleObituary( ent, ci );
+	}
+	else if( availableVehicles[ci->vehicle].cat & CAT_HELO ) {
+		CG_HeloObituary( ent, ci );
+	}
+	else if( availableVehicles[ci->vehicle].cat & CAT_LQM ) {
+		CG_LQMObituary( ent, ci );
+	}
+	else if( availableVehicles[ci->vehicle].cat & CAT_BOAT ) {
+		CG_BoatObituary( ent, ci );
 	}
 	else {
 		CG_PlaneObituary( ent, ci );

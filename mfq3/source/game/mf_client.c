@@ -1,5 +1,5 @@
 /*
- * $Id: mf_client.c,v 1.6 2002-02-15 09:58:31 thebjoern Exp $
+ * $Id: mf_client.c,v 1.7 2002-02-18 09:51:28 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -352,6 +352,12 @@ void MF_ClientSpawn(gentity_t *ent) {
 					spawn_origin[2] = trace.endpos[2] - availableVehicles[vehIndex].mins[2] + 1;
 			}
 			MF_Spawn_GroundVehicle( ent, vehIndex );
+		} else if( availableVehicles[vehIndex].cat & CAT_HELO ) {
+			MF_Spawn_Helo( ent, vehIndex, qfalse );
+		} else if( availableVehicles[vehIndex].cat & CAT_LQM ) {
+			MF_Spawn_LQM( ent, vehIndex );
+		} else if( availableVehicles[vehIndex].cat & CAT_BOAT ) {
+			MF_Spawn_Boat( ent, vehIndex );
 		}
 
 		VectorCopy (availableVehicles[vehIndex].mins, ent->r.mins);

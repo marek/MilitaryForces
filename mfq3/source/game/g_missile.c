@@ -1,5 +1,5 @@
 /*
- * $Id: g_missile.c,v 1.9 2002-02-17 18:10:54 thebjoern Exp $
+ * $Id: g_missile.c,v 1.10 2002-02-18 09:51:28 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -347,7 +347,8 @@ void fire_antiair (gentity_t *self) {
 	VectorCopy( availableVehicles[self->client->vehicle].gunoffset, offset );
 	VectorCopy( self->s.pos.trBase, start );
 
-	if( availableVehicles[self->client->vehicle].cat & CAT_GROUND ) {
+	if( (availableVehicles[self->client->vehicle].cat & CAT_GROUND) ||
+		(availableVehicles[self->client->vehicle].cat & CAT_BOAT) ) {
 		// use this to make it shoot where the player looks
 //		AngleVectors( self->client->ps.viewangles, dir, 0, 0 );
 //		VectorCopy( self->s.pos.trBase, start );
@@ -423,7 +424,8 @@ void fire_antiground (gentity_t *self) {
 	VectorCopy( availableVehicles[self->client->vehicle].gunoffset, offset );
 	VectorCopy( self->s.pos.trBase, start );
 
-	if( availableVehicles[self->client->vehicle].cat & CAT_GROUND ) {
+	if( (availableVehicles[self->client->vehicle].cat & CAT_GROUND) ||
+		(availableVehicles[self->client->vehicle].cat & CAT_BOAT) ) {
 		// use this to make it shoot where the player looks
 //		AngleVectors( self->client->ps.viewangles, dir, 0, 0 );
 //		VectorCopy( self->s.pos.trBase, start );
@@ -499,7 +501,8 @@ void fire_ffar (gentity_t *self) {
 	VectorCopy( availableVehicles[self->client->vehicle].gunoffset, offset );
 	VectorCopy( self->s.pos.trBase, start );
 
-	if( availableVehicles[self->client->vehicle].cat & CAT_GROUND ) {
+	if( (availableVehicles[self->client->vehicle].cat & CAT_GROUND) ||
+		(availableVehicles[self->client->vehicle].cat & CAT_BOAT) ) {
 		// use this to make it shoot where the player looks
 //		AngleVectors( self->client->ps.viewangles, dir, 0, 0 );
 //		VectorCopy( self->s.pos.trBase, start );
@@ -622,7 +625,8 @@ void fire_autocannon (gentity_t *self) {
 	VectorCopy( availableVehicles[self->client->vehicle].gunoffset, offset );
 	VectorCopy( self->s.pos.trBase, start );
 
-	if( availableVehicles[self->client->vehicle].cat & CAT_GROUND ) {
+	if( (availableVehicles[self->client->vehicle].cat & CAT_GROUND) ||
+		(availableVehicles[self->client->vehicle].cat & CAT_BOAT) ) {
 		// use this to make it shoot where the player looks
 //		AngleVectors( self->client->ps.viewangles, dir, 0, 0 );
 //		VectorCopy( self->s.pos.trBase, start );

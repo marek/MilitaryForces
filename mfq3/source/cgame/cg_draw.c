@@ -1,5 +1,5 @@
 /*
- * $Id: cg_draw.c,v 1.18 2002-02-15 18:10:42 sparky909_uk Exp $
+ * $Id: cg_draw.c,v 1.19 2002-02-18 09:51:27 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1076,7 +1076,7 @@ Is the new HUD actually being draw?
 =====================
 */
 
-static qboolean CG_NewHUDActive( void )
+qboolean CG_NewHUDActive( void )
 {
 	// definatley not active?
 	if ( cg.snap->ps.pm_type == PM_DEAD || cg.snap->ps.pm_type == PM_SPECTATOR || 

@@ -1,5 +1,5 @@
 /*
- * $Id: g_miscvehicle.c,v 1.6 2002-02-17 18:10:54 thebjoern Exp $
+ * $Id: g_miscvehicle.c,v 1.7 2002-02-18 09:51:28 thebjoern Exp $
 */
 
 
@@ -181,6 +181,113 @@ static void SP_misc_gv( gentity_t *ent )
 //	ent->pain = Plane_Pain;
 }
 
+
+static void SP_misc_helo( gentity_t *ent )
+{
+	unsigned int vehIndex = ent->s.modelindex;
+	trace_t	trace;
+	vec3_t	startpos, endpos;
+	gentity_t *test;
+
+	VectorCopy( ent->s.origin, startpos );
+	startpos[2] += 64;
+	VectorCopy( ent->s.origin, endpos );
+	endpos[2] -= 512;
+	trap_Trace (&trace, startpos, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_SOLID );
+	if( trace.entityNum != ENTITYNUM_NONE ) {
+		test = &g_entities[trace.entityNum];
+		ent->s.origin[2] = trace.endpos[2] - availableVehicles[vehIndex].mins[2] + 1;
+	}
+
+	// set flags
+	ent->s.ONOFF = OO_LANDED;
+
+	ent->speed = 0;
+	ent->s.frame = 0;// throttle
+	
+	VectorCopy( ent->s.origin, ent->s.pos.trBase );
+	VectorCopy( ent->s.origin, ent->r.currentOrigin );
+
+	// check if it is a drone
+	if( ent->targetname ) {
+		char filename[MAX_FILEPATH];
+		char buffer[33];
+		trap_Cvar_VariableStringBuffer("mapname", buffer, 32);
+		Com_sprintf( filename, MAX_FILEPATH, "dronefiles/%s/%s.drone", buffer, ent->targetname );
+		if( LoadVehicleScripts( ent, filename ) ) {
+			faceFirstWaypoint(ent);
+			ent->s.eFlags |= EF_PILOT_ONBOARD;
+			ent->s.pos.trType = TR_LINEAR;//TR_INTERPOLATE;
+			ent->s.apos.trType = TR_LINEAR;//TR_INTERPOLATE;
+			ent->think = Drone_Plane_Think;
+			ent->nextthink = level.time + 100;
+		} else {
+			ent->idxScriptBegin = ent->idxScriptEnd = -1;
+		}
+
+	} 
+
+	trap_LinkEntity (ent);
+
+	// set functions
+//	ent->touch = Touch_Plane;
+//	ent->pain = Plane_Pain;
+}
+
+
+static void SP_misc_boat( gentity_t *ent )
+{
+	unsigned int vehIndex = ent->s.modelindex;
+	trace_t	trace;
+	vec3_t	startpos, endpos;
+	gentity_t *test;
+
+	VectorCopy( ent->s.origin, startpos );
+	startpos[2] += 64;
+	VectorCopy( ent->s.origin, endpos );
+	endpos[2] -= 512;
+	trap_Trace (&trace, startpos, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_SOLID );
+	if( trace.entityNum != ENTITYNUM_NONE ) {
+		test = &g_entities[trace.entityNum];
+		ent->s.origin[2] = trace.endpos[2] - availableVehicles[vehIndex].mins[2] + 1;
+	}
+
+	// set flags
+	ent->s.ONOFF = OO_LANDED;
+
+	ent->speed = 0;
+	ent->s.frame = 0;// throttle
+	
+	VectorCopy( ent->s.origin, ent->s.pos.trBase );
+	VectorCopy( ent->s.origin, ent->r.currentOrigin );
+
+	// check if it is a drone
+	if( ent->targetname ) {
+		char filename[MAX_FILEPATH];
+		char buffer[33];
+		trap_Cvar_VariableStringBuffer("mapname", buffer, 32);
+		Com_sprintf( filename, MAX_FILEPATH, "dronefiles/%s/%s.drone", buffer, ent->targetname );
+		if( LoadVehicleScripts( ent, filename ) ) {
+			faceFirstWaypoint(ent);
+			ent->s.eFlags |= EF_PILOT_ONBOARD;
+			ent->s.pos.trType = TR_LINEAR;//TR_INTERPOLATE;
+			ent->s.apos.trType = TR_LINEAR;//TR_INTERPOLATE;
+			ent->think = Drone_Plane_Think;
+			ent->nextthink = level.time + 100;
+		} else {
+			ent->idxScriptBegin = ent->idxScriptEnd = -1;
+		}
+
+	} 
+
+	trap_LinkEntity (ent);
+
+	// set functions
+//	ent->touch = Touch_Plane;
+//	ent->pain = Plane_Pain;
+}
+
+
 void DroneInit()
 {
 	unsigned int i;
@@ -192,6 +299,10 @@ void DroneInit()
 			cat = availableVehicles[(&g_entities[i])->s.modelindex].cat;
 			if( cat & CAT_PLANE ) {
 				SP_misc_plane( &g_entities[i] );
+			} else if( cat & CAT_HELO ) {
+				SP_misc_helo( &g_entities[i] );
+			} else if( cat & CAT_BOAT ) {
+				SP_misc_boat( &g_entities[i] );
 			} else {
 				SP_misc_gv( &g_entities[i] );
 			}
@@ -218,10 +329,14 @@ void SP_misc_vehicle( gentity_t *sp_ent )
 
 	// is it a random one ?
 	if( strcmp( ent->model, "randomplane" ) == 0 ||
+		strcmp( ent->model, "randomhelo" ) == 0 ||
+		strcmp( ent->model, "randomboat" ) == 0 ||
 		strcmp( ent->model, "randomground" ) == 0 ) {
 		int j = 0;
 		if( strcmp( ent->model, "randomplane" ) == 0 ) cat = CAT_PLANE;
-		else /*if( strcmp( ent->model, "randomground" ) == 0 )*/ cat = CAT_GROUND;
+		else if( strcmp( ent->model, "randomhelo" ) == 0 ) cat = CAT_HELO;
+		else if( strcmp( ent->model, "randomboat" ) == 0 ) cat = CAT_BOAT;
+		else if( strcmp( ent->model, "randomground" ) == 0 ) cat = CAT_GROUND;
 		j = 0;
 		for( i = 0; i < bg_numberOfVehicles; ++i ) {
 			if( (availableVehicles[i].cat & cat) &&
@@ -261,6 +376,15 @@ void SP_misc_vehicle( gentity_t *sp_ent )
 	cat = (availableVehicles[i].cat);
 	if( cat & CAT_PLANE ) {
 		Com_sprintf(modelname, 127, "models/vehicles/planes/%s/%s.md3", availableVehicles[i].modelName,
+			availableVehicles[i].modelName );
+	} else if( cat & CAT_HELO ) {
+		Com_sprintf(modelname, 127, "models/vehicles/helos/%s/%s.md3", availableVehicles[i].modelName,
+			availableVehicles[i].modelName );
+	} else if( cat & CAT_LQM ) {
+		Com_sprintf(modelname, 127, "models/vehicles/lqms/%s/%s.md3", availableVehicles[i].modelName,
+			availableVehicles[i].modelName );
+	} else if( cat & CAT_BOAT ) {
+		Com_sprintf(modelname, 127, "models/vehicles/boats/%s/%s.md3", availableVehicles[i].modelName,
 			availableVehicles[i].modelName );
 	} else {
 		Com_sprintf(modelname, 127, "models/vehicles/ground/%s/%s.md3", availableVehicles[i].modelName,

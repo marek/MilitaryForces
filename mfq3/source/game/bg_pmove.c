@@ -1,5 +1,5 @@
 /*
- * $Id: bg_pmove.c,v 1.6 2002-02-17 18:10:54 thebjoern Exp $
+ * $Id: bg_pmove.c,v 1.7 2002-02-18 09:51:28 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -810,11 +810,18 @@ static void PM_VehicleMove( void )
 	if( availableVehicles[pm->vehicle].cat & CAT_PLANE ) {
 		PM_PlaneMove();
 	}
-//	else if( availableVehicles[pm->vehicle].id & CAT_HELO )
+	else if( availableVehicles[pm->vehicle].cat & CAT_HELO ) {
+		PM_HeloMove();
+	}
+	else if( availableVehicles[pm->vehicle].cat & CAT_LQM ) {
+		PM_LQMMove();
+	}
+	else if( availableVehicles[pm->vehicle].cat & CAT_BOAT ) {
+		PM_BoatMove();
+	}
 	else if( availableVehicles[pm->vehicle].cat & CAT_GROUND ) {
 		PM_GroundVehicleMove();
 	}
-//	else if( availableVehicles[pm->vehicle].id & CAT_LQM )
 	else {
 #ifdef QAGAME
 		Com_Error( ERR_DROP, "Server: Invalid vehicle type in PM_VehicleMove" );

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_local.h,v 1.2 2002-02-17 18:10:54 thebjoern Exp $
+ * $Id: bg_local.h,v 1.3 2002-02-18 09:51:27 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -53,6 +53,9 @@ void PM_AddEvent( int newEvent );
 void PM_PlaneMove( void );
 void PM_Toggle_Bay();
 void PM_GroundVehicleMove( void );
+void PM_HeloMove( void );
+void PM_LQMMove( void );
+void PM_BoatMove( void );
 
 qboolean	PM_SlideMove( qboolean gravity );
 void		PM_StepSlideMove( qboolean gravity );

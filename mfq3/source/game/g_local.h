@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.11 2002-02-17 18:10:54 thebjoern Exp $
+ * $Id: g_local.h,v 1.12 2002-02-18 09:51:28 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -580,6 +580,25 @@ void Plane_Pain( gentity_t *self, gentity_t *attacker, int damage );
 void Touch_GroundVehicle( gentity_t *ent, gentity_t *other, trace_t *trace );
 void GroundVehicle_Pain( gentity_t *self, gentity_t *attacker, int damage );
 
+// MFQ3
+// g_helo.c
+//
+void Touch_Helo( gentity_t *ent, gentity_t *other, trace_t *trace );
+void Helo_Pain( gentity_t *self, gentity_t *attacker, int damage );
+
+// MFQ3
+// g_lqm.c
+//
+void Touch_LQM( gentity_t *ent, gentity_t *other, trace_t *trace );
+void LQM_Pain( gentity_t *self, gentity_t *attacker, int damage );
+
+// MFQ3
+// g_boat.c
+//
+void Touch_Boat( gentity_t *ent, gentity_t *other, trace_t *trace );
+void Boat_Pain( gentity_t *self, gentity_t *attacker, int damage );
+
+
 //
 // MFQ3
 //
@@ -679,6 +698,9 @@ void MF_ClientSpawn( gentity_t *ent );
 //
 void MF_Spawn_Plane(gentity_t *ent, int idx, qboolean landed);
 void MF_Spawn_GroundVehicle(gentity_t *ent, int idx);
+void MF_Spawn_Helo(gentity_t *ent, int idx, qboolean landed);
+void MF_Spawn_LQM(gentity_t *ent, int idx);
+void MF_Spawn_Boat(gentity_t *ent, int idx);
 
 // mfq3
 // g_scripts.c
