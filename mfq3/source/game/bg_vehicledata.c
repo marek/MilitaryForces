@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.2 2001-12-22 02:28:44 thebjoern Exp $
+ * $Id: bg_vehicledata.c,v 1.3 2001-12-22 22:16:01 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -239,8 +239,8 @@ completeVehicleData_t availableVehicles[] =
 	150,						// max fuel
 	310,						// max gun pitch (upwards = negative) <- gearheight
 	3,							// min gun pitch (downwards = positive) <- tailangle
-	WI_MG_12_7MM, WI_125MM_GUN, 0, 0, 0, 0, 0, WI_FLARE,// weapons
-	500, 40, 0, 0, 0, 0, 0, 20,	// ammo
+	WI_MG_12_7MM, WI_125MM_GUN, WI_STINGER, 0, 0, 0, 0, WI_FLARE,// weapons
+	500, 40, 10, 0, 0, 0, 0, 20,	// ammo
 	{0, 0, 14},					// cameraposition for cockpit view
 	0,							// effect model
 	8000,						// radar range
