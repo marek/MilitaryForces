@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.24 2002-02-19 13:54:02 sparky909_uk Exp $
+ * $Id: bg_vehicledata.c,v 1.25 2002-02-20 18:38:21 sparky909_uk Exp $
 */
 
 #include "q_shared.h"
@@ -55,7 +55,7 @@ completeVehicleData_t availableVehicles[] =
 	1000,						// baytime
 	47,							// max bay frame
 	0,							// renderflags
-	{0,0,0,0},					// shadow coordinates
+	{2,0,34,24},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
     },
 
@@ -103,7 +103,7 @@ completeVehicleData_t availableVehicles[] =
 	1000,						// baytime
 	47,							// max bay frame
 	0,							// renderflags
-	{0,0,0,0},					// shadow coordinates
+	{2,0,36,20},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
     },
 
@@ -199,7 +199,7 @@ completeVehicleData_t availableVehicles[] =
 	1000,						// baytime
 	47,							// max bay frame
 	0,							// renderflags
-	{0,0,0,0},					// shadow coordinates
+	{5,0,34,26},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
     },
 
@@ -247,7 +247,7 @@ completeVehicleData_t availableVehicles[] =
 	1000,						// baytime
 	47,							// max bay frame
 	MFR_DUALPILOT|MFR_BIGVAPOR,	// renderflags
-	{0,0,0,0},					// shadow coordinates
+	{4,0,48,34},					// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
     },
 
@@ -343,7 +343,7 @@ completeVehicleData_t availableVehicles[] =
 	1000,						// baytime
 	47,							// max bay frame
 	0,							// renderflags
-	{0,0,0,0},					// shadow coordinates
+	{2,0,38,42},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
     },
 
@@ -439,7 +439,7 @@ completeVehicleData_t availableVehicles[] =
 	1000,						// baytime
 	47,							// max bay frame
 	0,							// renderflags
-	{0,0,0,0},					// shadow coordinates
+	{0,0,76,42},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
     },
 
@@ -488,7 +488,7 @@ completeVehicleData_t availableVehicles[] =
 	1000,						// baytime
 	47,							// max bay frame
 	0,							// renderflags
-	{0,0,0,0},					// shadow coordinates
+	{2,0,30,26},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
     },
 
@@ -537,7 +537,7 @@ completeVehicleData_t availableVehicles[] =
 	1000,						// baytime
 	47,							// max bay frame
 	0,							// renderflags
-	{0,0,0,0},					// shadow coordinates
+	{-4,0,22,20},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
     },
 
@@ -586,7 +586,7 @@ completeVehicleData_t availableVehicles[] =
 	1000,						// baytime
 	47,							// max bay frame
 	0,							// renderflags
-	{0,0,0,0},					// shadow coordinates
+	{-3,0,18,16},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
     },
 
@@ -635,7 +635,7 @@ completeVehicleData_t availableVehicles[] =
 	1000,						// baytime
 	47,							// max bay frame
 	0,							// renderflags
-	{0,0,0,0},					// shadow coordinates
+	{-2,0,18,18},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
     },
 
@@ -685,7 +685,7 @@ completeVehicleData_t availableVehicles[] =
 	500,						// baytime
 	19,							// max bay frame
 	0,							// renderflags
-	{0,0,0,0},					// shadow coordinates
+	{-12,0,60,60},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
 	},
 
@@ -734,7 +734,7 @@ completeVehicleData_t availableVehicles[] =
 	1000,						// baytime
 	47,							// max bay frame
 	0,							// renderflags
-	{0,0,0,0},					// shadow coordinates
+	{-3,0,15,12},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
     },
 
@@ -783,7 +783,7 @@ completeVehicleData_t availableVehicles[] =
 	1000,						// baytime
 	47,							// max bay frame
 	0,							// renderflags
-	{0,0,0,0},					// shadow coordinates
+	{-1,0,15,14},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
     },
 
