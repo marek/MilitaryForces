@@ -1,5 +1,5 @@
 /*
- * $Id: cg_consolecmds.c,v 1.17 2002-02-19 13:55:58 sparky909_uk Exp $
+ * $Id: cg_consolecmds.c,v 1.18 2002-02-20 11:12:58 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -572,7 +572,7 @@ qboolean CG_ExtractDeveloper( void )
 	}
 	else if( !Q_stricmp( CG_Argv(0), "pmod" ) )
 	{
-		availableVehicles[ ci->vehicle ].shadowAdjusts[ SHO_PITCHMAX ] = value;
+		availableVehicles[ ci->vehicle ].shadowAdjusts[ SHO_PITCHMOD ] = value;
 		return qtrue;
 	}
 	else if( !Q_stricmp( CG_Argv(0), "rmod" ) )
