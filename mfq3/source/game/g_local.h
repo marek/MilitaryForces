@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.3 2001-12-22 02:28:44 thebjoern Exp $
+ * $Id: g_local.h,v 1.4 2001-12-22 17:54:13 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -620,6 +620,7 @@ void trigger_teleporter_touch (gentity_t *self, gentity_t *other, trace_t *trace
 // g_mfq3util.c
 //
 int canLandOnIt( gentity_t *ent );
+void unlock( gentity_t *ent );
 void updateTargetTracking( gentity_t *ent );
 
 //

@@ -1,5 +1,5 @@
 /*
- * $Id: g_mfq3util.c,v 1.4 2001-12-22 02:28:44 thebjoern Exp $
+ * $Id: g_mfq3util.c,v 1.5 2001-12-22 17:54:13 thebjoern Exp $
 */
 
 
@@ -21,7 +21,7 @@ int canLandOnIt( gentity_t *ent )
 }
 
 
-static void unlock( gentity_t* ent )
+void unlock( gentity_t* ent )
 {
 	ent->locktime = 0;
 	ent->tracktarget = 0;

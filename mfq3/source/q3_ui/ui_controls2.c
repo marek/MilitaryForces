@@ -1,5 +1,5 @@
 /*
- * $Id: ui_controls2.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: ui_controls2.c,v 1.2 2001-12-22 17:54:13 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -108,14 +108,15 @@ typedef struct
 #define ID_RADAR		42
 #define ID_EXTINFO		43
 #define ID_RADARRANGE	44
+#define ID_UNLOCK		45
 
 // all others
-#define ID_INVERTMOUSE	45
-#define ID_MOUSESPEED	46
-#define ID_JOYENABLE	47
-#define ID_JOYTHRESHOLD	48
-#define ID_SMOOTHMOUSE	49
-#define ID_ADVANCEDCTRL	50
+#define ID_INVERTMOUSE	46
+#define ID_MOUSESPEED	47
+#define ID_JOYENABLE	48
+#define ID_JOYTHRESHOLD	49
+#define ID_SMOOTHMOUSE	50
+#define ID_ADVANCEDCTRL	51
 
 
 typedef struct
@@ -186,6 +187,7 @@ typedef struct
 	menuaction_s		contacttower;
 	menuradiobutton_s	advancedctrl;
 	menuaction_s		radarrange;
+	menuaction_s		unlock;
 
 	menubitmap_s		back;
 	menutext_s			name;
@@ -235,7 +237,7 @@ static bind_t g_bindings[] =
 	{"encyclopedia",	"Encyclopedia",		ID_ENCYC,		-1,				-1,		-1, -1},
 	{"vehicleselect",	"Vehicle Selection",ID_VEHSEL,		-1,				-1,		-1, -1},
 	{"gps",				"GPS on/off",		ID_GPS,			-1,				-1,		-1, -1},
-	{"toggleview",		"Toggle Camera",	ID_TOGGLEVIEW,-1,			-1,		-1, -1},
+	{"toggleview",		"Toggle Camera",	ID_TOGGLEVIEW,	-1,			-1,		-1, -1},
 	{"cameraup",		"Camera Up",		ID_CAMERAUP,	-1,				-1,		-1, -1},
 	{"cameradown",		"Camera Down",		ID_CAMERADOWN,	-1,				-1,		-1, -1},
 	{"zoomin",			"Zoom In",			ID_ZOOMIN,		-1,				-1,		-1, -1},
@@ -244,6 +246,7 @@ static bind_t g_bindings[] =
 	{"radar",			"RADAR on/off",		ID_RADAR,		-1,				-1,		-1, -1},
 	{"extinfo",			"Ext.Info on/off",	ID_EXTINFO,		-1,				-1,		-1, -1},
 	{"radarrange",		"Toggle RADAR Range",ID_RADARRANGE,	-1,				-1,		-1, -1},
+	{"unlock",			"Unlock Target",	ID_UNLOCK,		-1,				-1,		-1, -1},
 	
 	{(char*)NULL,		(char*)NULL,		0,				-1,				-1,		-1,	-1},
 };
@@ -310,6 +313,7 @@ static menucommon_s *g_misc_controls[] = {
 	(menucommon_s *)&s_controls.gps,
 	(menucommon_s *)&s_controls.radar,
 	(menucommon_s *)&s_controls.radarrange,
+	(menucommon_s *)&s_controls.unlock,
 	(menucommon_s *)&s_controls.extinfo,
 	(menucommon_s *)&s_controls.contacttower,
 	(menucommon_s *)&s_controls.showscores, 
@@ -1374,6 +1378,12 @@ static void Controls_MenuInit( void )
 	s_controls.radarrange.generic.ownerdraw	= Controls_DrawKeyBinding;
 	s_controls.radarrange.generic.id		= ID_RADARRANGE;
 
+	s_controls.unlock.generic.type			= MTYPE_ACTION;
+	s_controls.unlock.generic.flags			= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
+	s_controls.unlock.generic.callback		= Controls_ActionEvent;
+	s_controls.unlock.generic.ownerdraw		= Controls_DrawKeyBinding;
+	s_controls.unlock.generic.id			= ID_UNLOCK;
+
 	s_controls.extinfo.generic.type			= MTYPE_ACTION;
 	s_controls.extinfo.generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
 	s_controls.extinfo.generic.callback		= Controls_ActionEvent;
@@ -1488,6 +1498,7 @@ static void Controls_MenuInit( void )
 	Menu_AddItem( &s_controls.menu, &s_controls.contacttower );
 	Menu_AddItem( &s_controls.menu, &s_controls.advancedctrl );
 	Menu_AddItem( &s_controls.menu, &s_controls.radarrange );
+	Menu_AddItem( &s_controls.menu, &s_controls.unlock );
 
 	Menu_AddItem( &s_controls.menu, &s_controls.back );
 

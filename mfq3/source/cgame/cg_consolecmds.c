@@ -1,5 +1,5 @@
 /*
- * $Id: cg_consolecmds.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: cg_consolecmds.c,v 1.2 2001-12-22 17:54:13 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -316,4 +316,5 @@ void CG_InitConsoleCommands( void ) {
 	trap_AddCommand ("loaddefered");	// spelled wrong, but not changing for demo
 	trap_AddCommand ("contact_tower");
 	trap_AddCommand ("radar");
+	trap_AddCommand ("unlock");
 }

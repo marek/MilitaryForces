@@ -1,5 +1,5 @@
 /*
- * $Id: g_cmds.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: g_cmds.c,v 1.2 2001-12-22 17:54:13 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -369,6 +369,18 @@ void Cmd_Radar_f( gentity_t *ent ) {
 		ent->client->ps.ONOFF &= ~OO_RADAR;
 	}
 	ent->radartime = level.time + 200;
+}
+
+/*
+=================
+Cmd_Unlock_f
+=================
+*/
+void Cmd_Unlock_f( gentity_t *ent ) {
+	if( ent->health <= 0 ) {
+		return;
+	}
+	unlock(ent);
 }
 
 /*
@@ -1316,6 +1328,8 @@ void ClientCommand( int clientNum ) {
 		Cmd_Tower_f (ent);
 	else if (Q_stricmp (cmd, "radar") == 0)
 		Cmd_Radar_f (ent);
+	else if (Q_stricmp (cmd, "unlock") == 0)
+		Cmd_Unlock_f (ent);
 	else if (Q_stricmp (cmd, "teamtask") == 0)
 		Cmd_TeamTask_f (ent);
 	else if (Q_stricmp (cmd, "levelshot") == 0)
