@@ -1,5 +1,5 @@
 /*
- * $Id: cg_draw.c,v 1.23 2002-02-20 17:49:32 sparky909_uk Exp $
+ * $Id: cg_draw.c,v 1.24 2002-02-20 19:58:08 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -2704,7 +2704,7 @@ const char *CG_GameTypeString()
 	} */
 
 	// get game set
-	pGameSet = gameset_items[ MF_GetGameset( qtrue ) ];
+	pGameSet = gameset_items[ MF_CG_GetGameset( qtrue ) ];
 
 	// return the string as "<gametype> (<gameset>)"
 	return va( "%s - %s", pGameType, pGameSet );

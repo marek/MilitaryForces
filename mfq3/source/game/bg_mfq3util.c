@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.15 2002-02-18 16:23:25 sparky909_uk Exp $
+ * $Id: bg_mfq3util.c,v 1.16 2002-02-20 20:03:01 sparky909_uk Exp $
 */
 
 #include "q_shared.h"
@@ -8,80 +8,6 @@
 // externals
 extern void	trap_Cvar_Set( const char *var_name, const char *value );
 extern void	trap_Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize );
-
-/*
-=================
-MF_SetGameset
-=================
-*/
-
-// sets the mf_gameset variable based on the given MF_GAMESET_x parameter
-void MF_SetGameset(unsigned long gs)
-{
-	switch( gs )
-	{
-	case MF_GAMESET_WW1:
-		trap_Cvar_Set("mf_gameset", "ww1");
-		break;
-	case MF_GAMESET_WW2:
-		trap_Cvar_Set("mf_gameset", "ww2");
-		break;
-	case MF_GAMESET_MODERN:
-	default:
-		trap_Cvar_Set("mf_gameset", "modern");
-		break;
-	}
-}
-
-/*
-=================
-MF_GetGameset
-=================
-*/
-
-// gets the mf_gameset variable into the correct a MF_GAMESET_x return
-unsigned long MF_GetGameset( qboolean asEnum )
-{
-	char tmpGamesetStr[ 32 ];
-	unsigned long returnValue = MF_GAMESET_MODERN;
-
-	// get the gameset text
-	trap_Cvar_VariableStringBuffer( "mf_gameset", tmpGamesetStr, sizeof(tmpGamesetStr) );
-
-	// compare
-	if( Q_stricmp( tmpGamesetStr, "ww1" ) == 0 )
-	{
-		returnValue = MF_GAMESET_WW1;
-	}
-	else if( Q_stricmp( tmpGamesetStr, "ww2" ) == 0 )
-	{
-		returnValue = MF_GAMESET_WW2;
-	}
-	else if( Q_stricmp( tmpGamesetStr, "modern" ) == 0 )
-	{
-		returnValue = MF_GAMESET_MODERN;
-	}
-
-	// convert to enum?
-	if( asEnum )
-	{
-		switch( returnValue )
-		{
-		case MF_GAMESET_WW1:
-			returnValue = 2;
-			break;
-		case MF_GAMESET_WW2:
-			returnValue = 1;
-			break;
-		case MF_GAMESET_MODERN:
-			returnValue = 0;
-			break;
-		}
-	}
-
-	// return the result (as either flag mask or enum)
-	return returnValue;
-}
 
 /*
 =================
