@@ -1,5 +1,5 @@
 /*
- * $Id: cg_consolecmds.c,v 1.3 2002-01-19 02:24:02 thebjoern Exp $
+ * $Id: cg_consolecmds.c,v 1.4 2002-01-22 16:15:58 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -47,6 +47,35 @@ static void CG_ToggleRadarRange_f( void ) {
 	if( cg.RADARRangeSetting > 2 ) cg.RADARRangeSetting = 0;
 
 	cg.RADARTime = cg.time + 100;
+}
+
+/*
+==================
+MFQ3 MFD
+==================
+*/
+static void CG_Set_MFD_Mode( int num ) {
+	cg.Mode_MFD[num]++;
+	if( cg.Mode_MFD[num] >= MFD_MAX ) cg.Mode_MFD[num] = MFD_OFF;
+}
+
+static void CG_Set_MFD1_Mode_f( void ) {
+
+	if( cg.time < cg.MFDTime ) {
+		return;
+	}
+	CG_Set_MFD_Mode(MFD_1);
+
+	cg.MFDTime = cg.time + 100;
+}
+
+static void CG_Set_MFD2_Mode_f( void ) {
+	if( cg.time < cg.MFDTime ) {
+		return;
+	}
+	CG_Set_MFD_Mode(MFD_2);
+
+	cg.MFDTime = cg.time + 100;
 }
 
 /*
@@ -252,6 +281,8 @@ static consoleCommand_t	commands[] = {
 	{ "cameraup", CG_CameraUp_f },
 	{ "cameradown", CG_CameraDown_f },
 	{ "radarrange", CG_ToggleRadarRange_f },
+	{ "mfd1_mode", CG_Set_MFD1_Mode_f },
+	{ "mfd2_mode", CG_Set_MFD2_Mode_f }
 };
 
 
@@ -326,4 +357,5 @@ void CG_InitConsoleCommands( void ) {
 	trap_AddCommand ("contact_tower");
 	trap_AddCommand ("radar");
 	trap_AddCommand ("unlock");
+
 }
