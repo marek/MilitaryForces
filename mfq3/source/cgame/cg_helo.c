@@ -1,5 +1,5 @@
 /*
- * $Id: cg_helo.c,v 1.1 2002-02-18 11:06:31 thebjoern Exp $
+ * $Id: cg_helo.c,v 1.2 2002-02-19 16:32:47 sparky909_uk Exp $
 */
 
 
@@ -323,8 +323,6 @@ void CG_Helo( centity_t *cent, clientInfo_t *ci )
 		}
 	}
 
-	CG_ResetReticles();
-
 	// reticles
 	if( cent == &cg.predictedPlayerEntity )
 	{
@@ -333,6 +331,8 @@ void CG_Helo( centity_t *cent, clientInfo_t *ci )
 		playerState_t * ps = &cg.snap->ps;
 		float len;
 		float mindist = cg_thirdPersonRange.integer + availableVehicles[ci->vehicle].cam_dist[ CAMERA_V_DEFAULT ] + availableVehicles[ci->vehicle].maxs[0] + 20;
+
+		CG_ResetReticles();
 
 		// are we tracking a target?
 		if( ps->stats[STAT_LOCKINFO] & LI_TRACKING )

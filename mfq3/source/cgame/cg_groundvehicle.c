@@ -1,5 +1,5 @@
 /*
- * $Id: cg_groundvehicle.c,v 1.13 2002-02-19 13:28:53 thebjoern Exp $
+ * $Id: cg_groundvehicle.c,v 1.14 2002-02-19 16:32:47 sparky909_uk Exp $
 */
 
 
@@ -191,8 +191,6 @@ void CG_GroundVehicle( centity_t *cent, clientInfo_t *ci )
 		RotatePointAroundVector( dir, right, temp, ((float)self->client->ps.gunAngle)/10 );
 */
 
-	CG_ResetReticles();
-
 	// reticles
 	if( cent == &cg.predictedPlayerEntity )
 	{
@@ -201,6 +199,8 @@ void CG_GroundVehicle( centity_t *cent, clientInfo_t *ci )
 		float len;
 		playerState_t* ps = &cg.snap->ps;
 		float mindist = cg_thirdPersonRange.integer + availableVehicles[ci->vehicle].cam_dist[ CAMERA_V_DEFAULT ] + availableVehicles[ci->vehicle].maxs[0] + 20;
+
+		CG_ResetReticles();
 
 		// are we tracking a target?
 		if( ps->stats[STAT_LOCKINFO] & LI_TRACKING )
