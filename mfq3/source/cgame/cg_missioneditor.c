@@ -1,5 +1,5 @@
 /*
- * $Id: cg_missioneditor.c,v 1.9 2003-01-14 00:24:10 thebjoern Exp $
+ * $Id: cg_missioneditor.c,v 1.10 2003-01-16 00:27:43 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -833,7 +833,7 @@ void ME_ExportToScript( const char* scriptname )
 	const char		*info, *mapname;
 	fileHandle_t	f;
 	static char		buf[MAX_MENUDEFFILE];
-	int				i;
+	int				i, j;
 	IGME_vehicle_t* veh;
 
 	if( !scriptname )
@@ -862,6 +862,9 @@ void ME_ExportToScript( const char* scriptname )
 	Com_sprintf( outstring, sizeof(outstring), "Overview\n{\n\tmap\t%s\n", mapname );
 	trap_FS_Write( outstring, strlen(outstring), f );
 
+	Com_sprintf( outstring, sizeof(outstring), "\tgameset\t%d\n", cgs.gameset );
+	trap_FS_Write( outstring, strlen(outstring), f );
+
 	Com_sprintf( outstring, sizeof(outstring), "\tmission\t%s\n", scriptname );
 	trap_FS_Write( outstring, strlen(outstring), f );
 
@@ -888,8 +891,16 @@ void ME_ExportToScript( const char* scriptname )
 			Com_sprintf( outstring, sizeof(outstring), "\t\tName\tSAM Turret\n" );
 			trap_FS_Write( outstring, strlen(outstring), f );
 
+			Com_sprintf( outstring, sizeof(outstring), "\t\tTeam\t?\n" ); // ADD TEAM HERE!
+			trap_FS_Write( outstring, strlen(outstring), f );
 
+			Com_sprintf( outstring, sizeof(outstring), "\t\tOrigin\t%f;%f;%f\n", veh->origin[0],
+				veh->origin[1], veh->origin[2]);
+			trap_FS_Write( outstring, strlen(outstring), f );
 
+			Com_sprintf( outstring, sizeof(outstring), "\t\tAngles\t%f;%f;%f\n", veh->angles[0],
+				veh->angles[1], veh->angles[2]);
+			trap_FS_Write( outstring, strlen(outstring), f );
 
 			Com_sprintf( outstring, sizeof(outstring), "\t}\n\n", mapname );
 			trap_FS_Write( outstring, strlen(outstring), f );
@@ -905,10 +916,30 @@ void ME_ExportToScript( const char* scriptname )
 			Com_sprintf( outstring, sizeof(outstring), "\t\tName\t%s\n", availableVehicles[veh->vehidx].descriptiveName );
 			trap_FS_Write( outstring, strlen(outstring), f );
 
+			Com_sprintf( outstring, sizeof(outstring), "\t\tTeam\t%d\n", availableVehicles[veh->vehidx].team ); 
+			trap_FS_Write( outstring, strlen(outstring), f );
 
+			Com_sprintf( outstring, sizeof(outstring), "\t\tOrigin\t%f;%f;%f\n", veh->origin[0],
+				veh->origin[1], veh->origin[2]);
+			trap_FS_Write( outstring, strlen(outstring), f );
 
+			Com_sprintf( outstring, sizeof(outstring), "\t\tAngles\t%f;%f;%f\n", veh->angles[0],
+				veh->angles[1], veh->angles[2]);
+			trap_FS_Write( outstring, strlen(outstring), f );
 
-			Com_sprintf( outstring, sizeof(outstring), "\t}\n\n", mapname );
+			Com_sprintf( outstring, sizeof(outstring), "\t\tWaypoints\n\t\t{\n" );
+			trap_FS_Write( outstring, strlen(outstring), f );
+
+			for( j = 0; j < IGME_MAX_WAYPOINTS; ++j ) 
+			{
+				if( !veh->waypoints[j].active ) break;//as they are in a row
+				Com_sprintf( outstring, sizeof(outstring), "\t\t\tOrigin\t%f;%f;%f\n", veh->waypoints[j].origin[0],
+					veh->waypoints[j].origin[1], veh->waypoints[j].origin[2]);
+				trap_FS_Write( outstring, strlen(outstring), f );
+
+			}
+
+			Com_sprintf( outstring, sizeof(outstring), "\t\t}\n\t}\n\n", mapname );
 			trap_FS_Write( outstring, strlen(outstring), f );
 		}
 	}
