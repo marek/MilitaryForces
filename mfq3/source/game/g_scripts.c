@@ -1,5 +1,5 @@
 /*
- * $Id: g_scripts.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: g_scripts.c,v 1.2 2002-02-23 23:07:08 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -207,3 +207,4 @@ int LoadVehicleScripts( gentity_t* ent, char *filename ) {
 
 	return 1;
 }
+
