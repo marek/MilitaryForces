@@ -5,14 +5,43 @@ Military Forces Q3
 History:
 ========
 
-+++v0.52+++ in progress...
++++v0.54+++ in progress...
 -----------
 
+
+
++++v0.53+++
+-----------
+- new HUD: added GPS coords to HUD (can still be toggled by old GPS command)
+- new HUD: added weaponinfo to HUD and cvar "hud_weapons" to turn it on/off
+- new HUD: added Inventory page to MFDs
+- new HUD: color can now be set by user, cmd to cycle through colors is "cycle_hud_color",
+- new HUD color is saved to a cvar, so it doesn't have to be set every time
+- new sounds from Mark
+- more UI enhancements from Mark
+- using different weapons models now (also done by Mark)
+- and lots of other changes by Mark to make it all look and feel better
+- new HUD: added Status page to MFDs
+- new HUD: displaying radarmode on MFD using new "font"
+- new HUD: displayig flare info on RWR screen
+- minor changes
+
++++v0.52+++
+-----------
+- fixed a problem when displaying '%' on the HUD
+- added cvar cg_oldHUD, if set to 1 it displays the old instead of the new HUD
+- new HUD: added RWR info
+- new HUD: added HUD throttle info (and cvar hud_throttle)
+- new HUD: added HUD health info (and cvar hud_health)
+- new HUD: added center bottom section and cvar hud_center to turn it on/off
+- more UI code from Mark
+- new HUD: added altitude tape and cvar hud_altitude to turn it on/off
+- minor fixes
 
 +++v0.51+++
 -----------
 - added cmds "mfd1_mode" and "mfd2_mode" to cycle through MFD modes
-- new HUD: added MFD2 and cvar hud_mfd to turn it on/off
+- new HUD: added MFD2 and cvar hud_mfd2 to turn it on/off
 - new HUD: added MFD and cvar hud_mfd to turn it on/off
 - new HUD: implemented speed tape and cvar hud_speed to turn it on/off
   NOTE: red caret indicates stall speed, green caret indicates gearspeed
