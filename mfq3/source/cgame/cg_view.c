@@ -1,5 +1,5 @@
 /*
- * $Id: cg_view.c,v 1.6 2002-02-11 12:20:42 sparky909_uk Exp $
+ * $Id: cg_view.c,v 1.7 2002-02-12 11:08:10 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -50,7 +50,6 @@ static void CG_CalcVrect (void) {
 
 //==============================================================================
 
-
 /*
 ===============
 CG_OffsetVehicleView
@@ -58,6 +57,7 @@ CG_OffsetVehicleView
 ===============
 */
 #define	FOCUS_DISTANCE	512
+//#define	_VIEW_SETTING_DISPLAY
 
 // MFQ3
 static void CG_OffsetVehicleView( qboolean spectator ) 
@@ -67,31 +67,41 @@ static void CG_OffsetVehicleView( qboolean spectator )
     vec3_t	    view;
     trace_t	    trace;
     vec3_t		mins, maxs, start; 
-	float		dist = cg_thirdPersonRange.value;
-	float		height = cg_thirdPersonHeight.value;
+	float		dist, height;
+	static int	lastVehicle = -1;
 
-	// this might be expensive ? trap_Cvar_Set ? dont do it, you dumb user! 
-	if( dist < -availableVehicles[cg_vehicle.integer].cam_dist )
+#ifdef _VIEW_SETTING_DISPLAY
+	char test[ 64 ];
+#endif
+	// reset 3rd person camera distance and height to vehicle default (only when valid)
+	if( cg_vehicle.integer != lastVehicle )
 	{
-		dist = -availableVehicles[cg_vehicle.integer].cam_dist;
-		trap_Cvar_Set("cg_thirdPersonRange", va("%i",-availableVehicles[cg_vehicle.integer].cam_dist));
-	}
-	else if( dist > 50 )
-	{
-		dist = 50;
-		trap_Cvar_Set("cg_thirdPersonRange", va("%i",50));
+		// reset
+		cg_thirdPersonRange.value = availableVehicles[ cg_vehicle.integer ].cam_dist[ CAMERA_V_DEFAULT ];
+		cg_thirdPersonHeight.value = availableVehicles[ cg_vehicle.integer ].cam_height[ CAMERA_V_DEFAULT ];
+
+		// save vehicle we reset for
+		lastVehicle = cg_vehicle.integer;
 	}
 
-	if( height < -2*availableVehicles[cg_vehicle.integer].cam_height )
-	{
-		height = -2*availableVehicles[cg_vehicle.integer].cam_height;
-		trap_Cvar_Set("cg_thirdPersonHeight", va("%i",-2*availableVehicles[cg_vehicle.integer].cam_height));
-	}
-	else if( height > 50 )
-	{
-		height = 50;
-		trap_Cvar_Set("cg_thirdPersonHeight", va("%i",50));
-	}
+	// get vars
+	dist = cg_thirdPersonRange.value;
+	height = cg_thirdPersonHeight.value;
+
+	// clamp distance
+	MF_LimitFloat( &dist,
+					availableVehicles[cg_vehicle.integer].cam_dist[ CAMERA_V_MIN ],
+					availableVehicles[cg_vehicle.integer].cam_dist[ CAMERA_V_MAX ] );
+
+	// clamp height
+	MF_LimitFloat( &height,
+					availableVehicles[cg_vehicle.integer].cam_height[ CAMERA_V_MIN ],
+					availableVehicles[cg_vehicle.integer].cam_height[ CAMERA_V_MAX ] );
+
+#ifdef _VIEW_SETTING_DISPLAY
+	sprintf( test,"d=%f h=%f", dist, height );
+	CG_CenterPrint( test, 100, 10 );
+#endif
 
 	// update vars
 	cg_thirdPersonRange.value = dist;
@@ -120,9 +130,8 @@ static void CG_OffsetVehicleView( qboolean spectator )
     VectorCopy( cg.refdef.vieworg, view );
 
 	if( !spectator ) {
-		VectorMA( view, -(availableVehicles[cg_vehicle.integer].cam_dist + 
-				dist), forward, view );
-		view[2] += (availableVehicles[cg_vehicle.integer].cam_height + height );
+		VectorMA( view, /*-(availableVehicles[cg_vehicle.integer].cam_dist[ CAMERA_V_DEFAULT ]*/ - dist/*)*/, forward, view );
+		view[2] += /*(availableVehicles[cg_vehicle.integer].cam_height[ CAMERA_V_DEFAULT ]*/ + height /*)*/;
 	}
 
     CG_Trace( &trace, start, mins, maxs, view, cg.predictedPlayerState.clientNum, MASK_SOLID );

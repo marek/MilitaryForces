@@ -1,5 +1,5 @@
 /*
- * $Id: cg_groundvehicle.c,v 1.10 2002-02-09 17:07:03 thebjoern Exp $
+ * $Id: cg_groundvehicle.c,v 1.11 2002-02-12 11:08:54 sparky909_uk Exp $
 */
 
 
@@ -204,7 +204,7 @@ void CG_GroundVehicle( centity_t *cent, clientInfo_t *ci )
 		trace_t	tr;
 		float len;
 		playerState_t* ps = &cg.snap->ps;
-		float mindist = cg_thirdPersonRange.integer + availableVehicles[ci->vehicle].cam_dist + 
+		float mindist = cg_thirdPersonRange.integer + availableVehicles[ci->vehicle].cam_dist[ CAMERA_V_DEFAULT ] + 
 			availableVehicles[ci->vehicle].maxs[0] + 20;
 
 		if( ps->stats[STAT_LOCKINFO] & LI_TRACKING ) {

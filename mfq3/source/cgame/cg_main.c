@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.26 2002-02-11 16:29:42 sparky909_uk Exp $
+ * $Id: cg_main.c,v 1.27 2002-02-12 11:08:11 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -110,7 +110,6 @@ vmCvar_t	cg_fov;
 vmCvar_t	cg_zoomFov;
 vmCvar_t	cg_thirdPerson;
 vmCvar_t	cg_thirdPersonRange;
-vmCvar_t	cg_thirdPersonAngle;
 vmCvar_t	cg_stereoSeparation;
 vmCvar_t	cg_lagometer;
 vmCvar_t	cg_synchronousClients;

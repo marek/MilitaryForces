@@ -1,5 +1,5 @@
 /*
- * $Id: cg_plane.c,v 1.19 2002-02-10 19:18:19 thebjoern Exp $
+ * $Id: cg_plane.c,v 1.20 2002-02-12 11:08:11 sparky909_uk Exp $
 */
 
 
@@ -363,7 +363,7 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 		trace_t	tr;
 		float len;
 		playerState_t*	ps = &cg.snap->ps;
-		float mindist = cg_thirdPersonRange.integer + availableVehicles[ci->vehicle].cam_dist + 
+		float mindist = cg_thirdPersonRange.integer + availableVehicles[ci->vehicle].cam_dist[ CAMERA_V_DEFAULT ] + 
 			availableVehicles[ci->vehicle].maxs[0] + 20;
 
 		if( ps->stats[STAT_LOCKINFO] & LI_TRACKING ) {
