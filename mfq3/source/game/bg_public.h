@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.29 2002-01-27 15:41:28 thebjoern Exp $
+ * $Id: bg_public.h,v 1.30 2002-01-28 22:34:30 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.54"
+#define	GAME_VERSION		"mfq3 v0.54c"
 
 #define	DEFAULT_GRAVITY		800
 #define	GIB_HEALTH			-50
@@ -571,7 +571,8 @@ extern const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1];
 #define BP_PLANE_WINGRIGHT		7
 #define BP_PLANE_SPECIAL		8
 #define BP_PLANE_PROP			9
-#define BP_PLANE_MAX_PARTS		10
+#define BP_PLANE_PROP2			10
+#define BP_PLANE_MAX_PARTS		11
 
 // 2.helos
 
@@ -581,8 +582,8 @@ extern const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1];
 #define BP_GV_GUNBARREL			2
 #define BP_GV_MAX_PARTS			3
 
-// total max parts (not cat may exceed this!)
-#define BP_MAX_PARTS			10
+// total max parts (no cat may exceed this!)
+#define BP_MAX_PARTS			11
 
 // list of vehicles (data)
 typedef struct completeVehicleData_s

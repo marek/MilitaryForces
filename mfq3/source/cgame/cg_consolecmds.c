@@ -1,5 +1,5 @@
 /*
- * $Id: cg_consolecmds.c,v 1.7 2002-01-26 03:02:38 thebjoern Exp $
+ * $Id: cg_consolecmds.c,v 1.8 2002-01-28 22:34:30 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -51,7 +51,8 @@ static void CG_ToggleRadarRange_f( void ) {
 
 /*
 ==================
-MFQ3 MFD
+MFQ3 MFD 
+umm ugly :-)
 ==================
 */
 static void CG_Set_MFD_Mode( int num ) {
@@ -74,6 +75,39 @@ static void CG_Set_MFD2_Mode_f( void ) {
 		return;
 	}
 	CG_Set_MFD_Mode(MFD_2);
+
+	cg.MFDTime = cg.time + 100;
+}
+
+static void CG_Set_MFD_Page( int num ) {
+	int page;
+
+	if( trap_Argc() < 2 ) {
+		return;
+	}
+
+	page = atoi( CG_Argv(1) );
+
+	if( page < 0 ) page = 0;
+	else if( page >= MFD_MAX ) page = MFD_MAX - 1;
+
+	cg.Mode_MFD[num] = page;
+}
+
+static void CG_Set_MFD1_Page_f( void ) {
+	if( cg.time < cg.MFDTime ) {
+		return;
+	}
+	CG_Set_MFD_Page(MFD_1);
+
+	cg.MFDTime = cg.time + 100;
+}
+
+static void CG_Set_MFD2_Page_f( void ) {
+	if( cg.time < cg.MFDTime ) {
+		return;
+	}
+	CG_Set_MFD_Page(MFD_2);
 
 	cg.MFDTime = cg.time + 100;
 }
@@ -317,6 +351,8 @@ static consoleCommand_t	commands[] = {
 	{ "radarrange", CG_ToggleRadarRange_f },
 	{ "mfd1_mode", CG_Set_MFD1_Mode_f },
 	{ "mfd2_mode", CG_Set_MFD2_Mode_f },
+	{ "mfd1_page", CG_Set_MFD1_Page_f },
+	{ "mfd2_page", CG_Set_MFD2_Page_f },
 	{ "cycle_hud_color", CG_Cycle_HUD_Color_f },
 };
 
