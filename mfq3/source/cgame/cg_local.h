@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.29 2002-02-14 12:02:19 sparky909_uk Exp $
+ * $Id: cg_local.h,v 1.30 2002-02-14 12:41:48 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1124,6 +1124,7 @@ unsigned char * CG_CreateColourChar( unsigned char r, unsigned char g, unsigned 
 
 void CG_ResetReticles( void );
 void CG_AddReticleEntityToScene( refEntity_t * pReticle, qboolean targetRecticle );
+void CG_Draw_Reticles();
 
 //
 // cg_draw.c, cg_newDraw.c

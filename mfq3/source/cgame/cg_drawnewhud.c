@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.18 2002-02-14 12:02:19 sparky909_uk Exp $
+ * $Id: cg_drawnewhud.c,v 1.19 2002-02-14 12:41:48 sparky909_uk Exp $
 */
 
 #include "cg_local.h"
@@ -1387,30 +1387,6 @@ static void CG_Draw_HeadingTape( int value, int targetheading ) {
 		y = 24;
 		width = height = 8;
 		CG_DrawHUDPic( x, y, width, height, cgs.media.HUDcaret_h, HUDColors[cg.HUDColor] );
-	}
-}
-
-/*
-================
-CG_Draw_Reticles
-
-================
-*/
-void CG_Draw_Reticles( void )
-{
-	int i = 0;
-
-	// get pointer to the reticles
-	reticle_t * pR = &cg.HUDReticle[0];
-
-	// for all valid
-	for( i = 0; i< cg.reticleIdx; i++ )
-	{
-		// draw?
-		if( pR[i].shader )
-		{
-			CG_DrawPic( pR[i].x, pR[i].y, pR[i].w, pR[i].h, pR[i].shader );
-		}
 	}
 }
 
