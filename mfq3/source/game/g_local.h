@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.29 2003-02-11 00:25:11 thebjoern Exp $
+ * $Id: g_local.h,v 1.30 2003-02-22 17:58:57 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -620,6 +620,7 @@ void Boat_Pain( gentity_t *self, gentity_t *attacker, int damage );
 void DroneInit();
 void G_LoadMissionScripts();
 void SP_misc_vehicle (gentity_t *ent);
+void SP_misc_groundinstallation (gentity_t *ent);
 
 
 // damage flags
