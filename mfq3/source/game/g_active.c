@@ -1,5 +1,5 @@
 /*
- * $Id: g_active.c,v 1.20 2003-02-11 00:25:10 thebjoern Exp $
+ * $Id: g_active.c,v 1.21 2003-09-05 00:55:46 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -502,7 +502,10 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 			break;
 
 		case EV_FIRE_FLARE:
-			fire_flare( ent );
+				if(ent->client->ps.weaponIndex == WI_CFLARE || availableVehicles[ent->client->vehicle].weapons[7] == WI_CFLARE)
+					fire_cflare( ent );
+				else
+					fire_flare( ent );
 			break;
 
 		default:
