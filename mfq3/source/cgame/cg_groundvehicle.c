@@ -1,5 +1,5 @@
 /*
- * $Id: cg_groundvehicle.c,v 1.8 2002-01-31 10:09:40 sparky909_uk Exp $
+ * $Id: cg_groundvehicle.c,v 1.9 2002-02-04 12:59:14 sparky909_uk Exp $
 */
 
 
@@ -105,7 +105,6 @@ void CG_GroundVehicle( centity_t *cent, clientInfo_t *ci )
 {
 	refEntity_t	    part[BP_PLANE_MAX_PARTS];
 	refEntity_t		reticle;
-	qboolean	    shadow;
 	float			shadowPlane = 0;
 	int				renderfx = 0;
 	int				i, tanksound;
@@ -136,11 +135,16 @@ void CG_GroundVehicle( centity_t *cent, clientInfo_t *ci )
     CG_PlayerSprites( cent );
     
     // add the shadow
-    shadow = CG_GenericShadow( cent, &shadowPlane );
+	switch( cg_shadows.integer )
+	{
+	case 1:
+		CG_GenericShadow( cent, &shadowPlane );
+		break;
+	case 3:
+		renderfx |= RF_SHADOW_PLANE;
+		break;
+	}
 
-    if ( cg_shadows.integer == 3 && shadow ) {
-    	renderfx |= RF_SHADOW_PLANE;
-    }
 	// use the same origin for all
     renderfx |= RF_LIGHTING_ORIGIN;
 

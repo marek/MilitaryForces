@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawtools.c,v 1.2 2002-01-31 10:09:40 sparky909_uk Exp $
+ * $Id: cg_drawtools.c,v 1.3 2002-02-04 12:59:14 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -746,26 +746,58 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 /*
 ===============
 CG_GenericShadow
+
+Uses polygons to alpha blend a shadow texture onto the terrain
 ===============
 */
-qboolean CG_GenericShadow( centity_t *cent, float *shadowPlane )
+
+int CG_GetVehicleShadowShader( int vehicle )
+{
+	int			shaderIndex = -1;
+	qhandle_t	shaderHandle = -1;
+
+	// no shadow shader specfied?
+	if( availableVehicles[ vehicle ].shadowShader == SHADOW_NONE )
+	{
+		return qtrue;
+	}
+	
+	// custom shader specfied?
+	if( availableVehicles[ vehicle ].shadowShader != SHADOW_DEFAULT )
+	{
+		// use the handle of the custom shader
+		shaderHandle = availableVehicles[ vehicle ].shadowShader;
+	}
+	else
+	{
+		// use the generic shadow for the vehicle catagory
+		shaderIndex = MF_ExtractEnumFromId( vehicle, CAT_ANY ) - 1;
+		if( shaderIndex >= 0 && shaderIndex < MF_MAX_CATEGORIES )
+		{
+			shaderHandle = cgs.media.shadowMarkShader[ shaderIndex ];
+		}
+	}
+
+	return shaderHandle;
+}
+
+/*
+===============
+CG_MarkGeneratedShadow
+
+Uses the wall-marks system of Q3 to draw shadows
+===============
+*/
+qboolean CG_MarkGeneratedShadow( centity_t *cent, clientInfo_t * ci, float *shadowPlane )
 {
 	vec3_t		start, end, mins = {-15, -15, 0}, maxs = {15, 15, 2};
 	trace_t		trace;
 	float		alpha;
 	float		xRad, yRad;
 	float		xAlter, yAlter;
-	clientInfo_t * ci = NULL;
-	int			shaderIndex = -1;
 	qhandle_t	shaderHandle = -1;
 
 	*shadowPlane = 0;
-
-	// don't do anything if shadows disabled
-	if ( cg_shadows.integer == 0 )
-	{
-		return qfalse;
-	}
 
 	// send a trace down from the player to the ground
 	VectorCopy( cent->lerpOrigin, start );
@@ -775,7 +807,7 @@ qboolean CG_GenericShadow( centity_t *cent, float *shadowPlane )
 	trap_CM_BoxTrace( &trace, start, end, mins, maxs, 0, MASK_PLAYERSOLID );
 
 	// no shadow if too high from the ground
-	if ( trace.fraction == 1.0 )
+	if( trace.fraction == 1.0 )
 	{
 		return qfalse;
 	}
@@ -783,25 +815,17 @@ qboolean CG_GenericShadow( centity_t *cent, float *shadowPlane )
 	// set the shadow plane value
 	*shadowPlane = trace.endpos[2] + 1;
 
-	// no mark for stencil or projection shadows
-	if ( cg_shadows.integer != 1 )
-	{
-		return qtrue;
-	}
-
 	// fade the shadow out with height
 	alpha = 1.0f - trace.fraction;
 	MF_LimitFloat( &alpha, 0.0f, 1.0f );
 
-	// get client information
-	ci = &cgs.clientinfo[ cent->currentState.clientNum ];
-
-	// no shadow shader specfied?
-	if( availableVehicles[ ci->vehicle ].shadowShader == SHADOW_NONE )
+	// get the shader handle
+	shaderHandle = CG_GetVehicleShadowShader( ci->vehicle );
+	if( !shaderHandle )
 	{
 		return qtrue;
 	}
-	
+
 	// assign the x/y radius values based on the vehicle bounding box
 	// NOTE: we might need to setup dedicated values in availableVehicles[] for this later
 	xRad = availableVehicles[ ci->vehicle ].maxs[ 0 ];
@@ -818,31 +842,156 @@ qboolean CG_GenericShadow( centity_t *cent, float *shadowPlane )
 		yRad *= 1.0f - ( 0.5f * yAlter );
 	}
 
-	// get the shader index
-
-	// custom shader specfied?
-	if( availableVehicles[ ci->vehicle ].shadowShader != SHADOW_DEFAULT )
-	{
-		// use the handle of the custom shader
-		shaderHandle = availableVehicles[ ci->vehicle ].shadowShader;
-	}
-	else
-	{
-		// use the generic shadow for the vehicle catagory
-		shaderIndex = MF_ExtractEnumFromId( ci->vehicle, CAT_ANY ) - 1;
-		if( shaderIndex >= 0 && shaderIndex < MF_MAX_CATEGORIES )
-		{
-			shaderHandle = cgs.media.shadowMarkShader[ shaderIndex ];
-		}
-	}
-	
 	// add the mark as a temporary, so it goes directly to the renderer
 	// without taking a spot in the cg_marks array
-	if( shaderHandle >= 0 )
+	CG_ImpactMarkEx( shaderHandle, trace.endpos, trace.plane.normal, 
+					 (cent->currentState.angles[1]-180), alpha, alpha, alpha, 1, qfalse, xRad, yRad, qtrue );
+
+	return qtrue;
+}
+	
+/*
+===============
+CG_PolyMeshGeneratedShadow
+
+Uses a X/Y axis of a polygon-mesh to draw shadows
+===============
+*/
+
+qboolean CG_PolyMeshGeneratedShadow( centity_t *cent, clientInfo_t * ci, float *shadowPlane )
+{
+	int x, y, iMod;
+	float xRad, yRad;
+	float xAlter, yAlter;
+	float u, v, mod;
+	int midPoint = 3;
+	polyVert_t verts[5][5];
+	polyVert_t vertBuff[4];
+	qhandle_t shaderHandle = -1;
+	vec3_t start, end, mins = {-1, -1, 0}, maxs = {1, 1, 0}, up = {0,0,1}, tmpVec;
+	trace_t	trace;
+
+#pragma message ("CG_PolyMeshGeneratedShadow() - fix problem when projecting over high buildings etc..")
+
+	// assign the x/y radius values based on the vehicle bounding box
+	// NOTE: we might need to setup dedicated values in availableVehicles[] for this later.  also if min/max
+	// boxes are quite different then we may need to allow for the offset nature of the vehicle's origin
+	xRad = availableVehicles[ ci->vehicle ].maxs[ 0 ];
+	yRad = availableVehicles[ ci->vehicle ].maxs[ 1 ];
+	xRad -= availableVehicles[ ci->vehicle ].mins[ 0 ];
+	yRad -= availableVehicles[ ci->vehicle ].mins[ 1 ];
+	xRad *= 0.5f;
+	yRad *= 0.5f;
+
+	// PLANES ONLY: alter the radius values based upon the vehicles pitch & roll
+	if( (availableVehicles[ ci->vehicle ].id & CAT_ANY) & CAT_PLANE )
 	{
-		CG_ImpactMarkEx( shaderHandle, trace.endpos, trace.plane.normal, 
-						 (cent->currentState.angles[1]-180), alpha, alpha, alpha, 1, qfalse, xRad, yRad, qtrue );
+		xAlter = fabs( cent->lerpAngles[PITCH] / 30.0f );
+		yAlter = fabs( cent->lerpAngles[ROLL] / 90.0f );
+		MF_LimitFloat( &xAlter, 0.0f, 1.0f );
+		MF_LimitFloat( &yAlter, 0.0f, 1.0f );
+		xRad *= 1.0f - ( 0.8f * xAlter );
+		yRad *= 1.0f - ( 0.8f * yAlter );
+	}
+
+	// get the shader handle
+	shaderHandle = CG_GetVehicleShadowShader( ci->vehicle );
+	if( !shaderHandle )
+	{
+		return qtrue;
+	}
+
+	// create the mesh
+	memset( verts, 0, sizeof( verts ) );
+
+	// create the verts
+	for( y = 0; y<5; y++ )
+	{
+		for( x = 0; x<5; x++ )
+		{
+			u = (float)x/4;
+			v = (float)y/4;
+
+			// coords
+
+			// calc the x/y first
+			verts[y][x].xyz[ 0 ] = ((xRad * 2.0f * u) - xRad);
+			verts[y][x].xyz[ 1 ] = ((yRad * 2.0f * v) - yRad);
+			verts[y][x].xyz[ 2 ] = 0;
+
+			// rotate the grid around the required yaw (local origin)
+			RotatePointAroundVector( tmpVec, up, verts[y][x].xyz, (cent->lerpAngles[YAW]-180) );
+			VectorCopy( tmpVec, verts[y][x].xyz );
+
+			// convert to global origin
+			verts[y][x].xyz[ 0 ] += cent->lerpOrigin[ 0 ];
+			verts[y][x].xyz[ 1 ] += cent->lerpOrigin[ 1 ];
+
+			// trace a ray down from the x/y to get the z
+			VectorCopy( verts[y][x].xyz, start );
+			VectorCopy( verts[y][x].xyz, end );
+			start[2] = cent->lerpOrigin[2] + 64;
+			end[2] = cent->lerpOrigin[2] - 256;
+			CG_Trace( &trace, start, mins, maxs, end, 0, MASK_PLAYERSOLID );
+
+			// do z
+			verts[y][x].xyz[ 2 ] = trace.endpos[ 2 ];
+
+			// texture (NOTE: u & v flipped, because that's how it works fine with)
+			verts[y][x].st[ 0 ] = v;
+			verts[y][x].st[ 1 ] = u;
+
+			// calc mod
+			mod = 1.0f - trace.fraction;
+			MF_LimitFloat( &mod, 0.0f, 1.0f );
+			iMod = mod * 255;
+
+			// modulate (black <-> white)
+			verts[y][x].modulate[0] = iMod;
+			verts[y][x].modulate[1] = iMod;
+			verts[y][x].modulate[2] = iMod;
+			verts[y][x].modulate[3] = iMod;
+		}
+	}
+
+	// adjust the verts X/Y position here
+	// ...
+
+	// add the polys
+	for( y = 0; y<4; y++ )
+	{
+		for( x = 0; x<4; x++ )
+		{
+			// copy vertex data into our temporary verts buffer
+			memcpy( &vertBuff[3], &verts[y][x], sizeof( polyVert_t ) );
+			memcpy( &vertBuff[2], &verts[y][x+1], sizeof( polyVert_t ) );
+			memcpy( &vertBuff[1], &verts[y+1][x+1], sizeof( polyVert_t ) );
+			memcpy( &vertBuff[0], &verts[y+1][x], sizeof( polyVert_t ) );
+	
+			// add the current temporary verts as a polygon
+			trap_R_AddPolyToScene( shaderHandle, 4, vertBuff );
+		}
 	}
 
 	return qtrue;
+}
+
+
+/*
+===============
+CG_GenericShadow
+
+Uses polygons to alpha blend a shadow texture onto the terrain
+===============
+*/
+qboolean CG_GenericShadow( centity_t *cent, float *shadowPlane )
+{
+	clientInfo_t * ci = NULL;
+
+	// get client information
+	ci = &cgs.clientinfo[ cent->currentState.clientNum ];
+
+	// NOTE: uncomment which ever system you want to run
+//	return CG_MarkGeneratedShadow( cent, ci, shadowPlane );
+	return CG_PolyMeshGeneratedShadow( cent, ci, shadowPlane );
 }
