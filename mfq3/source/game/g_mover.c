@@ -1,5 +1,5 @@
 /*
- * $Id: g_mover.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: g_mover.c,v 1.2 2001-12-03 12:02:10 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -778,8 +778,9 @@ void SP_func_door (gentity_t *ent) {
 	ent->blocked = Blocked_Door;
 
 	// default speed of 400
-	if (!ent->speed)
-		ent->speed = 400;
+	if (!ent->speed || ent->speed > 20 ) {
+		ent->speed = 20;
+	}
 
 	// default wait of 2 seconds
 	if (!ent->wait)
@@ -944,12 +945,14 @@ void SP_func_plat (gentity_t *ent) {
 
 	VectorClear (ent->s.angles);
 
-	G_SpawnFloat( "speed", "200", &ent->speed );
+	G_SpawnFloat( "speed", "20", &ent->speed );
 	G_SpawnInt( "dmg", "2", &ent->damage );
 	G_SpawnFloat( "wait", "1", &ent->wait );
 	G_SpawnFloat( "lip", "8", &lip );
 
 	ent->wait = 1000;
+
+	if( ent->speed > 20 ) ent->speed = 20;
 
 	// create second position
 	trap_SetBrushModel( ent, ent->model );
@@ -1237,8 +1240,8 @@ void SP_func_train (gentity_t *self) {
 		}
 	}
 
-	if ( !self->speed ) {
-		self->speed = 100;
+	if ( !self->speed || self->speed > 20 ) {
+		self->speed = 20;
 	}
 
 	if ( !self->target ) {
