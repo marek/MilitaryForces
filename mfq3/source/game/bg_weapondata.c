@@ -1,5 +1,5 @@
 /*
- * $Id: bg_weapondata.c,v 1.3 2001-12-23 02:02:14 thebjoern Exp $
+ * $Id: bg_weapondata.c,v 1.4 2001-12-24 02:17:35 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -28,7 +28,14 @@ completeWeaponData_t availableWeapons[] =
 		0,									// spread
 		0,									// barrels
 		0,									// barrelDistance
-		0									// crosshair
+		0,									// trackcone
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		0,									// crosshair
+		0,									// crosshair track
+		0,									// crosshair lock
+		0									// crosshair lock friend
 	},
 
 	// machinegun: WW2, cal 50, 8 barrels
@@ -50,7 +57,14 @@ completeWeaponData_t availableWeapons[] =
 		8,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
 		8,									// barrels
 		0,									// barrelDistance
-		CH_GUNMODE							// crosshair
+		0,									// trackcone
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_GUNMODE,							// crosshair
+		CH_GUNMODE,							// crosshair track
+		CH_GUNMODE,							// crosshair lock
+		CH_GUNMODE							// crosshair lock friend
 	},
 
 	// machinegun: WW2, cal 50, 6 barrels
@@ -72,7 +86,14 @@ completeWeaponData_t availableWeapons[] =
 		8,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
 		6,									// barrels
 		0,									// barrelDistance
-		CH_GUNMODE							// crosshair
+		0,									// trackcone
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_GUNMODE,							// crosshair
+		CH_GUNMODE,							// crosshair track
+		CH_GUNMODE,							// crosshair lock
+		CH_GUNMODE							// crosshair lock friend
 	},
 
 	// machinegun: any set, 12.7mm, 1 barrel
@@ -94,7 +115,14 @@ completeWeaponData_t availableWeapons[] =
 		14,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
 		1,									// barrels
 		0,									// barrelDistance
-		CH_GUNMODE							// crosshair
+		0,									// trackcone
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_GUNMODE,							// crosshair
+		CH_GUNMODE,							// crosshair track
+		CH_GUNMODE,							// crosshair lock
+		CH_GUNMODE							// crosshair lock friend
 	},
 
 	// machinegun: any set, 14.5mm, 1 barrel
@@ -116,7 +144,14 @@ completeWeaponData_t availableWeapons[] =
 		14,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
 		2,									// barrels
 		0,									// barrelDistance
-		CH_GUNMODE							// crosshair
+		0,									// trackcone
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_GUNMODE,							// crosshair
+		CH_GUNMODE,							// crosshair track
+		CH_GUNMODE,							// crosshair lock
+		CH_GUNMODE							// crosshair lock friend
 	},
 
 	// machinegun: modern, 20mm, 1 barrel
@@ -138,7 +173,14 @@ completeWeaponData_t availableWeapons[] =
 		14,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
 		1,									// barrels
 		0,									// barrelDistance
-		CH_GUNMODE							// crosshair
+		0,									// trackcone
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_GUNMODE,							// crosshair
+		CH_GUNMODE,							// crosshair track
+		CH_GUNMODE,							// crosshair lock
+		CH_GUNMODE							// crosshair lock friend
 	},
 
 	// machinegun: modern, 20mm, 2 barrel
@@ -160,7 +202,14 @@ completeWeaponData_t availableWeapons[] =
 		10,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
 		2,									// barrels
 		0,									// barrelDistance
-		CH_GUNMODE							// crosshair
+		0,									// trackcone
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_GUNMODE,							// crosshair
+		CH_GUNMODE,							// crosshair track
+		CH_GUNMODE,							// crosshair lock
+		CH_GUNMODE							// crosshair lock friend
 	},
 
 	// FFAR
@@ -182,7 +231,14 @@ completeWeaponData_t availableWeapons[] =
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
-		CH_ROCKETMODE						// crosshair
+		0,									// trackcone
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_ROCKETMODE,						// crosshair
+		CH_ROCKETMODE,						// crosshair track
+		CH_ROCKETMODE,						// crosshair lock
+		CH_ROCKETMODE						// crosshair lock friend
 	},
 
 	// tank gun
@@ -204,7 +260,14 @@ completeWeaponData_t availableWeapons[] =
 		1,									// spread
 		1,									// barrels
 		0,									// barrelDistance
-		CH_ROCKETMODE						// crosshair
+		0,									// trackcone
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_ROCKETMODE,						// crosshair
+		CH_ROCKETMODE,						// crosshair track
+		CH_ROCKETMODE,						// crosshair lock
+		CH_ROCKETMODE						// crosshair lock friend	
 	},
 
 	// tank gun
@@ -226,7 +289,14 @@ completeWeaponData_t availableWeapons[] =
 		1,									// spread
 		1,									// barrels
 		0,									// barrelDistance
-		CH_ROCKETMODE						// crosshair
+		0,									// trackcone
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_ROCKETMODE,						// crosshair
+		CH_ROCKETMODE,						// crosshair track
+		CH_ROCKETMODE,						// crosshair lock
+		CH_ROCKETMODE						// crosshair lock friend	
 	},
 
 	// iron bombs
@@ -248,7 +318,14 @@ completeWeaponData_t availableWeapons[] =
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
-		CH_BOMBMODE							// crosshair
+		0,									// trackcone
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_BOMBMODE,						// crosshair
+		CH_BOMBMODE,						// crosshair track
+		CH_BOMBMODE,						// crosshair lock
+		CH_BOMBMODE							// crosshair lock friend
 	},
 
 	// Sidewinder
@@ -270,7 +347,14 @@ completeWeaponData_t availableWeapons[] =
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
-		CH_MISSILEMODE						// crosshair
+		0.7f,								// trackcone (dot)
+		0.985f,								// lockcone (dot)
+		0.996f,								// followcone (dot)
+		1500,								// locktime
+		CH_MISSILEMODE,						// crosshair
+		CH_MISSILEMODE,						// crosshair track
+		CH_MISSILEMODELOCK,					// crosshair lock
+		CH_MISSILEMODE						// crosshair lock friend
 	},
 
 	// AMRAAM
@@ -292,7 +376,14 @@ completeWeaponData_t availableWeapons[] =
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
-		CH_MISSILEMODE						// crosshair
+		0.7f,								// trackcone (dot)
+		0.985f,								// lockcone (dot)
+		0.996f,								// followcone (dot)
+		1500,								// locktime
+		CH_MISSILEMODE,						// crosshair
+		CH_MISSILEMODE,						// crosshair track
+		CH_MISSILEMODELOCK,					// crosshair lock
+		CH_MISSILEMODE						// crosshair lock friend
 	},
 
 	// Sparrow
@@ -314,7 +405,14 @@ completeWeaponData_t availableWeapons[] =
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
-		CH_MISSILEMODE						// crosshair
+		0.7f,								// trackcone (dot)
+		0.985f,								// lockcone (dot)
+		0.996f,								// followcone (dot)
+		1500,								// locktime
+		CH_MISSILEMODE,						// crosshair
+		CH_MISSILEMODE,						// crosshair track
+		CH_MISSILEMODELOCK,					// crosshair lock
+		CH_MISSILEMODE						// crosshair lock friend
 	},
 
 	// Phoenix
@@ -336,7 +434,14 @@ completeWeaponData_t availableWeapons[] =
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
-		CH_MISSILEMODE						// crosshair
+		0.7f,								// trackcone (dot)
+		0.985f,								// lockcone (dot)
+		0.996f,								// followcone (dot)
+		1500,								// locktime
+		CH_MISSILEMODE,						// crosshair
+		CH_MISSILEMODE,						// crosshair track
+		CH_MISSILEMODELOCK,					// crosshair lock
+		CH_MISSILEMODE						// crosshair lock friend
 	},
 
 	// Stinger
@@ -358,7 +463,14 @@ completeWeaponData_t availableWeapons[] =
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
-		CH_MISSILEMODE						// crosshair
+		0.7f,								// trackcone (dot)
+		0.985f,								// lockcone (dot)
+		0.996f,								// followcone (dot)
+		1500,								// locktime
+		CH_MISSILEMODE,						// crosshair
+		CH_MISSILEMODE,						// crosshair track
+		CH_MISSILEMODELOCK,					// crosshair lock
+		CH_MISSILEMODE						// crosshair lock friend
 	},
 
 	// Atoll
@@ -380,7 +492,14 @@ completeWeaponData_t availableWeapons[] =
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
-		CH_MISSILEMODE						// crosshair
+		0.7f,								// trackcone (dot)
+		0.985f,								// lockcone (dot)
+		0.996f,								// followcone (dot)
+		1500,								// locktime
+		CH_MISSILEMODE,						// crosshair
+		CH_MISSILEMODE,						// crosshair track
+		CH_MISSILEMODELOCK,					// crosshair lock
+		CH_MISSILEMODE						// crosshair lock friend
 	},
 
 	// Archer
@@ -402,7 +521,14 @@ completeWeaponData_t availableWeapons[] =
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
-		CH_MISSILEMODE						// crosshair
+		0.7f,								// trackcone (dot)
+		0.985f,								// lockcone (dot)
+		0.996f,								// followcone (dot)
+		1500,								// locktime
+		CH_MISSILEMODE,						// crosshair
+		CH_MISSILEMODE,						// crosshair track
+		CH_MISSILEMODELOCK,					// crosshair lock
+		CH_MISSILEMODE						// crosshair lock friend
 	},
 
 	// Alamo
@@ -424,7 +550,14 @@ completeWeaponData_t availableWeapons[] =
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
-		CH_MISSILEMODE						// crosshair
+		0.7f,								// trackcone (dot)
+		0.985f,								// lockcone (dot)
+		0.996f,								// followcone (dot)
+		1500,								// locktime
+		CH_MISSILEMODE,						// crosshair
+		CH_MISSILEMODE,						// crosshair track
+		CH_MISSILEMODELOCK,					// crosshair lock
+		CH_MISSILEMODE						// crosshair lock friend
 	},
 
 	// Hellfire
@@ -446,7 +579,14 @@ completeWeaponData_t availableWeapons[] =
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
-		CH_MISSILEMODE						// crosshair
+		0.7f,								// trackcone (dot)
+		0.985f,								// lockcone (dot)
+		0.996f,								// followcone (dot)
+		1500,								// locktime
+		CH_MISSILEMODE,						// crosshair
+		CH_MISSILEMODE,						// crosshair track
+		CH_MISSILEMODELOCK,					// crosshair lock
+		CH_MISSILEMODE						// crosshair lock friend
 	},
 
 	// flares
@@ -468,7 +608,14 @@ completeWeaponData_t availableWeapons[] =
 		1,									// spread
 		0,									// barrels
 		0,									// barrelDistance
-		0									// crosshair
+		0,									// trackcone (dot)
+		0,									// lockcone (dot)
+		0,									// followcone (dot)
+		0,									// locktime
+		0,									// crosshair
+		0,									// crosshair track
+		0,									// crosshair lock
+		0									// crosshair lock friend
 	}
 };
 

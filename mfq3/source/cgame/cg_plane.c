@@ -1,5 +1,5 @@
 /*
- * $Id: cg_plane.c,v 1.5 2001-12-23 22:46:37 thebjoern Exp $
+ * $Id: cg_plane.c,v 1.6 2001-12-24 02:17:35 thebjoern Exp $
 */
 
 
@@ -361,7 +361,7 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 			qboolean		building = qfalse;
 			centity_t* target = &cg_entities[cent->currentState.tracktarget];
 			if( target->currentState.eType == ET_EXPLOSIVE ) building = qtrue;
-			reticle.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshair];
+			reticle.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshairtrack];
 			if( building ) {
 				VectorSubtract( cgs.inlineModelMidpoints[target->currentState.modelindex], cent->lerpOrigin, forward );
 			} else {
@@ -391,11 +391,11 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 			trap_R_AddRefEntityToScene( &reticle );
 			if( ps->stats[STAT_LOCKINFO] & LI_LOCKING ) {
 				memcpy( &reticlelock, &reticle, sizeof(reticle) );
-				reticlelock.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshair+1];
+				reticlelock.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshairlock];
 				reticlelock.frame = 1;
 			} else {
 				memset( &reticlelock, 0, sizeof(reticlelock) );	
-				reticlelock.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshair+1];
+				reticlelock.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshairlock];
 				VectorSet( ang, cent->currentState.angles[0], cent->currentState.angles[1], 0 );
 				AnglesToAxis( ang, reticlelock.axis );
 				VectorScale( reticlelock.axis[0], 0.5f, reticlelock.axis[0] );
