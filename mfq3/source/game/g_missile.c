@@ -1,5 +1,5 @@
 /*
- * $Id: g_missile.c,v 1.23 2003-04-25 00:02:23 thebjoern Exp $
+ * $Id: g_missile.c,v 1.24 2003-09-05 00:45:24 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -51,6 +51,7 @@ void G_ExplodeMissile( gentity_t *ent ) {
 	vec3_t		dir;
 	vec3_t		origin;
 
+
 	// update target
 	if( ent->tracktarget && ent->tracktarget->client ) {
 		ent->tracktarget->client->ps.stats[STAT_LOCKINFO] &= ~LI_BEING_LAUNCHED;
@@ -83,6 +84,303 @@ void G_ExplodeMissile( gentity_t *ent ) {
 
 /*
 ================
+G_ExplodeCFlare
+
+spawns other flares
+changed by minkis
+================
+*/
+void G_ExplodeCFlare( gentity_t *ent ) {
+	vec3_t		dir;
+	vec3_t		origin;
+	static int	seed = 0x92;
+
+	// update target
+	if( ent->tracktarget && ent->tracktarget->client ) {
+		ent->tracktarget->client->ps.stats[STAT_LOCKINFO] &= ~LI_BEING_LAUNCHED;
+	}
+
+	BG_EvaluateTrajectory( &ent->s.pos, level.time, origin );
+	SnapVector( origin );
+	G_SetOrigin( ent, origin );
+
+	// we don't have a valid direction, so just point straight up
+	dir[0] = dir[1] = 0;
+	dir[2] = 1;
+
+	ent->s.eType = ET_GENERAL;
+	G_AddEvent( ent, EV_MISSILE_MISS, DirToByte( dir ), qtrue );
+
+	ent->freeAfterEvent = qtrue;
+
+	// splash damage
+	if ( ent->splashDamage ) {
+		if( G_RadiusDamage( ent->r.currentOrigin, ent->parent, ent->splashDamage, ent->splashRadius, ent
+			, ent->splashMethodOfDeath, ent->targetcat ) ) {
+			g_entities[ent->r.ownerNum].client->accuracy_hits++;
+		}
+	}
+	
+	// Launch flares
+	VectorSet(dir, 70 * Q_random(&seed),	70 * Q_random(&seed),		80 * Q_random(&seed));
+	fire_flare2(ent->parent, ent->r.currentOrigin, dir, 2000 + 1000 * Q_random(&seed) );
+	VectorSet(dir, -70  * Q_random(&seed),	70 * Q_random(&seed),		80 * Q_random(&seed));
+	fire_flare2(ent->parent, ent->r.currentOrigin, dir, 2000 + 1000 * Q_random(&seed) );
+	VectorSet(dir, 70 * Q_random(&seed),	-70 * Q_random(&seed),		80 * Q_random(&seed));
+	fire_flare2(ent->parent, ent->r.currentOrigin, dir, 2000 + 1000 * Q_random(&seed) );
+	VectorSet(dir, -70 * Q_random(&seed),	-70  * Q_random(&seed),		80 * Q_random(&seed));
+	fire_flare2(ent->parent, ent->r.currentOrigin, dir, 2000 + 1000 * Q_random(&seed) );
+	VectorSet(dir, 0 + 5 * Q_random(&seed),	0 + 5 * Q_random(&seed),	120 * Q_random(&seed));
+	fire_flare2(ent->parent, ent->r.currentOrigin, dir, 2000 + 1000 * Q_random(&seed) );
+
+	trap_LinkEntity( ent );
+}
+
+/*
+===============
+NukeRadiusDamage
+===============
+*/
+static void NukeRadiusDamage( vec3_t origin, gentity_t *attacker, float damage, float radius ) {
+	float		dist;
+	gentity_t	*ent;
+	int			entityList[MAX_GENTITIES];
+	int			numListedEntities;
+	vec3_t		mins, maxs;
+	vec3_t		v;
+	vec3_t		dir;
+	int			i, e;
+
+	if ( radius < 1 ) {
+		radius = 1;
+	}
+
+	for ( i = 0 ; i < 3 ; i++ ) {
+		mins[i] = origin[i] - radius;
+		maxs[i] = origin[i] + radius;
+	}
+
+	numListedEntities = trap_EntitiesInBox( mins, maxs, entityList, MAX_GENTITIES );
+
+	for ( e = 0 ; e < numListedEntities ; e++ ) {
+		ent = &g_entities[entityList[ e ]];
+
+		if (!ent->takedamage) {
+			continue;
+		}
+
+		// dont hit things we have already hit
+		if( ent->nukeTime > level.time ) {
+			continue;
+		}
+
+		// find the distance from the edge of the bounding box
+		for ( i = 0 ; i < 3 ; i++ ) {
+			if ( origin[i] < ent->r.absmin[i] ) {
+				v[i] = ent->r.absmin[i] - origin[i];
+			} else if ( origin[i] > ent->r.absmax[i] ) {
+				v[i] = origin[i] - ent->r.absmax[i];
+			} else {
+				v[i] = 0;
+			}
+		}
+
+		dist = VectorLength( v );
+		if ( dist >= radius ) {
+			continue;
+		}
+
+//		if( CanDamage (ent, origin) ) {
+			VectorSubtract (ent->r.currentOrigin, origin, dir);
+			// push the center of mass higher than the origin so players
+			// get knocked into the air more
+			dir[2] += 24;
+			//G_Damage( ent, NULL, attacker, dir, origin, damage, DAMAGE_RADIUS|DAMAGE_NO_TEAM_PROTECTION, MOD_NUKE, CAT_ANY );
+			G_Damage( ent, NULL, attacker, dir, origin, damage, DAMAGE_RADIUS, MOD_NUKE, CAT_ANY );
+			ent->nukeTime = level.time + 3000;
+//		}
+	}
+}
+
+/*
+===============
+NukeShockWave
+===============
+*/
+static void NukeShockWave( vec3_t origin, gentity_t *attacker, float damage, float push, float radius ) {
+	float		dist;
+	gentity_t	*ent;
+	int			entityList[MAX_GENTITIES];
+	int			numListedEntities;
+	vec3_t		mins, maxs;
+	vec3_t		v;
+	vec3_t		dir;
+	int			i, e;
+
+	if ( radius < 1 )
+		radius = 1;
+
+	for ( i = 0 ; i < 3 ; i++ ) {
+		mins[i] = origin[i] - radius;
+		maxs[i] = origin[i] + radius;
+	}
+
+	numListedEntities = trap_EntitiesInBox( mins, maxs, entityList, MAX_GENTITIES );
+
+	for ( e = 0 ; e < numListedEntities ; e++ ) {
+		ent = &g_entities[entityList[ e ]];
+
+		// dont hit things we have already hit
+		if( ent->nukeShockTime > level.time ) {
+			continue;
+		}
+
+		// find the distance from the edge of the bounding box
+		for ( i = 0 ; i < 3 ; i++ ) {
+			if ( origin[i] < ent->r.absmin[i] ) {
+				v[i] = ent->r.absmin[i] - origin[i];
+			} else if ( origin[i] > ent->r.absmax[i] ) {
+				v[i] = origin[i] - ent->r.absmax[i];
+			} else {
+				v[i] = 0;
+			}
+		}
+
+		dist = VectorLength( v );
+		if ( dist >= radius ) {
+			continue;
+		}
+
+//		if( CanDamage (ent, origin) ) {
+			VectorSubtract (ent->r.currentOrigin, origin, dir);
+			dir[2] += 24;
+		//	G_Damage( ent, NULL, attacker, dir, origin, damage, DAMAGE_RADIUS|DAMAGE_NO_TEAM_PROTECTION, MOD_NUKE, CAT_ANY );
+			G_Damage( ent, NULL, attacker, dir, origin, damage, DAMAGE_RADIUS, MOD_NUKE, CAT_ANY );
+			//
+			dir[2] = 0;
+			VectorNormalize(dir);
+			if ( ent->client ) {
+				ent->client->ps.velocity[0] = dir[0] * push;
+				ent->client->ps.velocity[1] = dir[1] * push;
+				ent->client->ps.velocity[2] = 100;
+			}
+			ent->nukeShockTime = level.time + 3000;
+//		}
+	}
+}
+
+/*
+===============
+NukeDamage
+by minkis
+===============
+*/
+static void NukeDamage( gentity_t *self ) {
+	int i;
+	float t;
+	gentity_t *ent;
+	vec3_t newangles;
+
+	self->count += 100;
+
+	if (self->count >= NUKE_SHOCKWAVE_STARTTIME) {
+		// shockwave push back
+		t = self->count - NUKE_SHOCKWAVE_STARTTIME;
+		NukeShockWave(self->s.pos.trBase, self->activator, 25, 700,	(int) (float) t * self->splashRadius / (NUKE_SHOCKWAVE_ENDTIME - NUKE_SHOCKWAVE_STARTTIME) );
+	}
+	//
+	if (self->count >= NUKE_EXPLODE_STARTTIME) {
+		// do our damage
+		t = self->count - NUKE_EXPLODE_STARTTIME;
+		NukeRadiusDamage( self->s.pos.trBase, self->activator, 700,	(int) (float) t * self->splashRadius / (NUKE_IMPLODE_STARTTIME - NUKE_EXPLODE_STARTTIME) );
+	}
+
+	// either cycle or kill self
+	if( self->count >= NUKE_SHOCKWAVE_ENDTIME ) {
+		G_FreeEntity( self );
+		return;
+	}
+	self->nextthink = level.time + 100;
+	
+	// add earth quake effect
+	newangles[0] = crandom() * 2;
+	newangles[1] = crandom() * 2;
+	newangles[2] = 0;
+	for (i = 0; i < MAX_CLIENTS; i++)
+	{
+		ent = &g_entities[i];
+		if (!ent->inuse)
+			continue;
+		if (!ent->client)
+			continue;
+
+		if (ent->client->ps.groundEntityNum != ENTITYNUM_NONE) {
+			ent->client->ps.velocity[0] += crandom() * 120;
+			ent->client->ps.velocity[1] += crandom() * 120;
+			ent->client->ps.velocity[2] = 30 + random() * 25;
+		}
+
+		ent->client->ps.delta_angles[0] += ANGLE2SHORT(newangles[0] - self->movedir[0]);
+		ent->client->ps.delta_angles[1] += ANGLE2SHORT(newangles[1] - self->movedir[1]);
+		ent->client->ps.delta_angles[2] += ANGLE2SHORT(newangles[2] - self->movedir[2]);
+
+	}
+	VectorCopy(newangles, self->movedir);
+}
+
+/*
+================
+G_ExplodeNuke
+by minkis
+just *guess* what it does
+================
+*/
+void G_ExplodeNuke( gentity_t *ent ) {
+	gentity_t	*explosion;
+	gentity_t	*te;
+	vec3_t		snapped;
+
+
+
+	// start up the explosion logic
+	explosion = G_Spawn();
+
+	explosion->s.eType = ET_EVENTS + EV_NUKE;
+	explosion->eventTime = level.time;
+
+	VectorCopy( ent->r.currentOrigin, snapped );
+
+	SnapVector( snapped );		// save network bandwidth
+	G_SetOrigin( explosion, snapped );
+
+	explosion->classname = "nuke";
+	explosion->s.pos.trType = TR_STATIONARY;
+
+	explosion->nukeTime = level.time;
+
+	explosion->think = NukeDamage;
+	explosion->nextthink = level.time + 100;
+	explosion->count = 0;
+	explosion->s.weaponIndex = ent->s.weaponIndex;
+	explosion->splashRadius = ent->splashRadius;
+
+	VectorClear(explosion->movedir);
+
+	trap_LinkEntity( explosion );
+
+	explosion->activator = ent->parent;		// Activator is the owner of the bomb/missile 
+
+	ent->freeAfterEvent = qtrue;
+
+	// play global sound at all clients
+	te = G_TempEntity(snapped, EV_GLOBAL_TEAM_SOUND );
+	te->r.svFlags |= SVF_BROADCAST;
+	te->s.eventParm = GTS_NUKE;
+
+}
+
+/*
+================
 G_MissileImpact
 ================
 */
@@ -103,7 +401,6 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 	if( ent->tracktarget && ent->tracktarget->client ) {
 		ent->tracktarget->client->ps.stats[STAT_LOCKINFO] &= ~LI_BEING_LAUNCHED;
 	}
-
 
 	// impact damage
 	if (other->takedamage) {
@@ -138,6 +435,16 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 	} else {
 		G_AddEvent( ent, EV_MISSILE_MISS, DirToByte( trace->plane.normal ), qtrue );
 	}
+
+	// Nuke specifics to execute its detonation anyways
+	if(availableWeapons[ent->s.weaponIndex].type == WT_NUKEBOMB || availableWeapons[ent->s.weaponIndex].type == WT_NUKEMISSILE)
+	{
+		if (!ent->think)
+			G_Error ( "NULL ent->think");
+		else
+			ent->think (ent);
+	}
+
 
 	ent->freeAfterEvent = qtrue;
 
@@ -196,15 +503,16 @@ void G_RunMissile( gentity_t *ent ) {
 
 	trap_LinkEntity( ent );
 
-	if ( tr.fraction != 1 ) {
+	if ( tr.fraction != 1) {
 		// never explode or bounce on sky
 		if ( tr.surfaceFlags & SURF_NOIMPACT ) {
 			G_FreeEntity( ent );
 			return;
 		}
 		G_MissileImpact( ent, &tr );
+
 		if ( ent->s.eType != ET_MISSILE &&
-			 ent->s.eType != ET_BULLET ) {
+			 ent->s.eType != ET_BULLET) {
 			return;		// exploded
 		}
 	}
@@ -792,11 +1100,12 @@ void fire_maingun( gentity_t *self ) {
 =================
 fire_flare MFQ3
 =================
+changes by minkis
 */
 void fire_flare( gentity_t *self ) {
 	gentity_t	*bolt;
 	vec3_t		start, up;
-
+	
 	VectorSet( up, 0, 0, 1 );
 	VectorCopy( self->s.pos.trBase, start );
 	if( (availableVehicles[self->client->vehicle].cat & CAT_GROUND) ||
@@ -813,6 +1122,93 @@ void fire_flare( gentity_t *self ) {
 	bolt->s.eType = ET_MISSILE;
 	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
 	bolt->s.weaponIndex = WI_FLARE;
+		
+	bolt->parent = self;
+	bolt->r.ownerNum = self->s.number;
+
+	bolt->damage = bolt->splashDamage = 0;
+	bolt->splashRadius = 0;
+	bolt->clipmask = MASK_SHOT;
+	bolt->ONOFF = 1;// not used
+
+	bolt->s.pos.trType = TR_GRAVITY_10;
+	bolt->s.pos.trTime = level.time;// - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
+	VectorCopy( start, bolt->s.pos.trBase );
+	if( (availableVehicles[self->client->vehicle].cat & CAT_GROUND) ||
+		(availableVehicles[self->client->vehicle].cat & CAT_BOAT) ) 
+		VectorScale( up, 300, bolt->s.pos.trDelta );
+	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
+	VectorCopy (start, bolt->r.currentOrigin);
+
+}
+
+/*
+=================
+fire_flare2 MFQ3
+fire flare with direction
+=================
+changes by minkis
+*/
+void fire_flare2( gentity_t *self, vec3_t start, vec3_t up, int age ) {
+	gentity_t	*bolt;
+	
+	bolt = G_Spawn();
+	bolt->classname = "flare";
+	bolt->nextthink = level.time + age;
+	bolt->think = G_ExplodeMissile;
+	bolt->s.eType = ET_MISSILE;
+	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
+	bolt->s.weaponIndex = WI_FLARE;
+		
+	bolt->parent = self;
+	bolt->r.ownerNum = self->s.number;
+
+	bolt->damage = bolt->splashDamage = 0;
+	bolt->splashRadius = 0;
+	bolt->clipmask = MASK_SHOT;
+	bolt->ONOFF = 1;// not used
+
+	bolt->s.pos.trType = TR_GRAVITY_10;
+	bolt->s.pos.trTime = level.time;// - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
+	VectorCopy( start, bolt->s.pos.trBase );
+	VectorScale( up, 1, bolt->s.pos.trDelta );
+	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
+	VectorCopy (start, bolt->r.currentOrigin);
+}
+
+/*
+=================
+fire_cflare
+fire flare cluster
+=================
+changes by minkis
+*/
+void fire_cflare( gentity_t *self) {
+	gentity_t	*bolt;
+	vec3_t		start, up;
+	int age;
+	
+	VectorSet( up, 0, 0, 1 );
+	VectorCopy( self->s.pos.trBase, start );
+	if( (availableVehicles[self->client->vehicle].cat & CAT_GROUND) ||
+		(availableVehicles[self->client->vehicle].cat & CAT_BOAT) )  {
+		VectorMA( start, self->r.maxs[2]+3, up, start );
+		age = 1600;
+	}
+	else {
+		VectorMA( start, self->r.mins[2]-3, up, start );
+		age = 800;
+	}
+	SnapVector( start );
+
+	
+	bolt = G_Spawn();
+	bolt->classname = "cflare";
+	bolt->nextthink = level.time + age;
+	bolt->think = G_ExplodeCFlare;
+	bolt->s.eType = ET_MISSILE;
+	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
+	bolt->s.weaponIndex = WI_CFLARE;
 	bolt->r.ownerNum = self->s.number;
 	bolt->parent = self;
 	bolt->damage = bolt->splashDamage = 0;
@@ -825,7 +1221,7 @@ void fire_flare( gentity_t *self ) {
 	VectorCopy( start, bolt->s.pos.trBase );
 	if( (availableVehicles[self->client->vehicle].cat & CAT_GROUND) ||
 		(availableVehicles[self->client->vehicle].cat & CAT_BOAT) ) 
-		VectorScale( up, 300, bolt->s.pos.trDelta );
+			VectorScale( up, 300, bolt->s.pos.trDelta );
 	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
 	VectorCopy (start, bolt->r.currentOrigin);
 }
@@ -936,4 +1332,122 @@ void LaunchMissile_GI( gentity_t* ent )
 	VectorCopy (start, bolt->r.currentOrigin);
 }
 
+/*
+=================
+fire_nukebomb MFQ3
+by minkis
+=================
+*/
+void fire_nukebomb (gentity_t *self) {
+	gentity_t	*bolt;
+	vec3_t		dir, right, up, offset;
+	vec3_t		start;
 
+//	self->left = (self->left ? qfalse : qtrue);
+	MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, 0, offset, 0 );
+	AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
+	VectorInverse( right );
+	VectorCopy( self->s.pos.trBase, start );
+	VectorMA( start, offset[0], dir, start );
+	VectorMA( start, offset[1], right, start );
+	VectorMA( start, offset[2], up, start );
+	SnapVector( start );
+
+	bolt = G_Spawn();
+	bolt->classname = "nukebomb";
+	bolt->nextthink = level.time + 10000;
+	bolt->think = G_ExplodeNuke;
+	bolt->s.eType = ET_MISSILE;
+	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
+	bolt->s.weaponIndex = self->client->ps.weaponIndex;
+	bolt->r.ownerNum = self->s.number;
+	bolt->parent = self;
+	bolt->damage = 1;
+	bolt->splashDamage = 1;
+//	bolt->damage = bolt->splashDamage = availableWeapons[self->client->ps.weaponIndex].damage;
+	bolt->splashRadius = availableWeapons[self->client->ps.weaponIndex].damageRadius;
+	bolt->targetcat = availableWeapons[self->client->ps.weaponIndex].category;
+	bolt->catmodifier = availableWeapons[self->client->ps.weaponIndex].noncatmod;
+	bolt->methodOfDeath = MOD_NUKE;
+	bolt->splashMethodOfDeath = MOD_NUKE;
+	bolt->clipmask = MASK_SHOT|MASK_WATER;
+	bolt->target_ent = NULL;
+
+	bolt->s.pos.trType = TR_GRAVITY;
+	bolt->s.pos.trTime = level.time;// - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
+	VectorCopy( start, bolt->s.pos.trBase );
+	VectorScale( dir, self->client->ps.speed/10, bolt->s.pos.trDelta );
+	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
+	VectorCopy (start, bolt->r.currentOrigin);
+}
+
+/*
+=================
+fire_nukemissile MFQ3
+by minkis
+=================
+*/
+void fire_nukemissile (gentity_t *self) {
+	gentity_t	*bolt;
+	vec3_t		dir, right, up;
+	vec3_t		start, offset, forward, temp;
+	qboolean	wingtip = qfalse;
+
+	VectorCopy( self->s.pos.trBase, start );
+
+	if( (availableVehicles[self->client->vehicle].cat & CAT_GROUND) ||
+		(availableVehicles[self->client->vehicle].cat & CAT_BOAT) ) {
+		VectorCopy( availableVehicles[self->client->vehicle].gunoffset, offset );
+		AngleVectors( self->client->ps.vehicleAngles, forward, right, up );
+		RotatePointAroundVector( temp, up, forward, ((float)self->client->ps.turretAngle)/10 );
+		CrossProduct( up, temp, right );
+		RotatePointAroundVector( dir, right, temp, ((float)self->client->ps.gunAngle)/10 );
+		wingtip = qtrue; // dont drop
+	} else {
+		self->left = (self->left ? qfalse : qtrue);
+		MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, 0, offset, 0 );
+		AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
+		VectorInverse( right );
+	}
+	VectorMA( start, offset[0], dir, start );
+	VectorMA( start, offset[1], right, start );
+	VectorMA( start, offset[2], up, start );
+	SnapVector( start );
+
+	bolt = G_Spawn();
+	bolt->classname = "nukemissile";
+
+	bolt->speed = availableWeapons[self->client->ps.weaponIndex].muzzleVelocity;
+
+	bolt->think = G_ExplodeNuke;
+	bolt->nextthink = level.time + availableWeapons[self->client->ps.weaponIndex].fuelrange;
+
+	bolt->s.pos.trType = TR_LINEAR;
+	VectorScale( dir, bolt->speed, bolt->s.pos.trDelta );
+
+
+	bolt->s.eType = ET_MISSILE;
+	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
+	bolt->s.weaponIndex = self->client->ps.weaponIndex;
+	bolt->r.ownerNum = self->s.number;
+	bolt->parent = self;
+
+	bolt->damage = 0;
+	bolt->splashDamage = 0;
+	bolt->splashRadius = availableWeapons[self->client->ps.weaponIndex].damageRadius;
+
+	bolt->targetcat = availableWeapons[self->client->ps.weaponIndex].category;
+	bolt->catmodifier = availableWeapons[self->client->ps.weaponIndex].noncatmod;
+	bolt->range = availableWeapons[self->client->ps.weaponIndex].range;
+	bolt->methodOfDeath = MOD_NUKE;
+	bolt->splashMethodOfDeath = MOD_NUKE;
+	bolt->clipmask = MASK_SHOT|MASK_WATER;
+	bolt->target_ent = NULL;
+	bolt->basicECMVulnerability = availableWeapons[self->client->ps.weaponIndex].basicECMVulnerability;
+
+	bolt->s.pos.trTime = level.time;// - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
+	VectorCopy( start, bolt->s.pos.trBase );
+	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
+	VectorCopy (start, bolt->r.currentOrigin);
+	
+}
