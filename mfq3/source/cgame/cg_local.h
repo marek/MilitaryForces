@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.49 2002-06-12 21:12:46 thebjoern Exp $
+ * $Id: cg_local.h,v 1.50 2002-06-13 14:46:34 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -877,6 +877,7 @@ typedef struct {
 	int				numWptSelections;
 	qboolean		dragmode;
 	qboolean		waypointmode;
+	qboolean		showAllWaypoints;
 } IGME_data_t;
 
 // end IGME
