@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.12 2002-02-07 09:55:27 thebjoern Exp $
+ * $Id: cg_drawnewhud.c,v 1.13 2002-02-08 10:00:59 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -661,22 +661,36 @@ static void CG_Draw_Redundant(int vehicle, int health, int throttle, int ammo[16
 
 		// draw health
 	if( hud_health.integer ) {
-		x = 556;
+		x = 526;
 		y = 318;
 		width = 32;
 		height = 8;
 		CG_DrawHUDPic( x, y, width, height, cgs.media.HUDhealthtext, HUDColors[cg.HUDColor] ); 
-		CG_MFQ3HUD_Numbers( 594, 318, 4, health, qtrue, HUDColors[cg.HUDColor], qfalse );
+		CG_MFQ3HUD_Numbers( 564, 318, 4, health, qtrue, HUDColors[cg.HUDColor], qfalse );
 	}
 
 		// draw throttle
 	if( hud_throttle.integer ) {
-		x = 556;
+		x = 526;
 		y = 330;
 		width = 32;
 		height = 8;
 		CG_DrawHUDPic( x, y, width, height, cgs.media.HUDthrottletext, HUDColors[cg.HUDColor] ); 
-		CG_MFQ3HUD_Numbers( 594, 330, 4, throttle*10, qtrue, HUDColors[cg.HUDColor], qfalse );
+
+		if( availableVehicles[vehicle].caps & HC_DUALENGINE ) {
+			CG_MFQ3HUD_Numbers( 585, 330, 3, throttle*10, qfalse, HUDColors[cg.HUDColor], qtrue );
+			trap_R_SetColor( HUDColors[cg.HUDColor] );
+			CG_DrawChar_MFQ3( 585, 330, '/', qfalse );
+			trap_R_SetColor( NULL );
+			CG_MFQ3HUD_Numbers( 594, 330, 3, throttle*10, qtrue, HUDColors[cg.HUDColor], qfalse );
+		} else {
+			if( (availableVehicles[vehicle].id&CAT_ANY & CAT_GROUND) &&
+				throttle > MF_THROTTLE_MILITARY ) {
+				CG_MFQ3HUD_Numbers( 574, 330, 3, (10-throttle)*10, qtrue, HUDColors[cg.HUDColor], qfalse );
+			} else {
+				CG_MFQ3HUD_Numbers( 574, 330, 3, throttle*10, qtrue, HUDColors[cg.HUDColor], qfalse );
+			}
+		}
 	}
 
 		// draw ammo
