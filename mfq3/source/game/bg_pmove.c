@@ -1,5 +1,5 @@
 /*
- * $Id: bg_pmove.c,v 1.13 2003-02-11 00:25:10 thebjoern Exp $
+ * $Id: bg_pmove.c,v 1.14 2003-04-25 00:02:23 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -613,6 +613,10 @@ static void PM_Weapon( void ) {
 		} 
 	}
 
+	// fueltank override
+	if( availableWeapons[pm->ps->weaponIndex].type == WT_FUELTANK )
+		canShoot = qtrue;
+
 	// check for MG primary fire
 	if( (pm->cmd.buttons & BUTTON_ATTACK_MAIN) && pm->ps->weaponNum == WP_MACHINEGUN ) {
 		pm->cmd.buttons |= BUTTON_ATTACK;
@@ -636,10 +640,24 @@ static void PM_Weapon( void ) {
 		}
 		if( pm->ps->weaponNum == WP_MACHINEGUN ) return;
 
-		pm->ps->ammo[pm->ps->weaponNum]--;
-		PM_AddEvent( EV_FIRE_WEAPON );
+		// check for droptank
+		if( availableWeapons[pm->ps->weaponIndex].type == WT_FUELTANK )
+		{
+			if( pm->ps->stats[STAT_FUEL] < pm->ps->stats[STAT_MAX_FUEL] )
+			{
+				pm->ps->ammo[pm->ps->weaponNum]--;
+				pm->ps->stats[STAT_FUEL]++;
+				if( !pm->ps->ammo[pm->ps->weaponNum] )
+					PM_AddEvent( EV_FIRE_WEAPON );
+			}
+		}
+		else
+		{
+			pm->ps->ammo[pm->ps->weaponNum]--;
+			PM_AddEvent( EV_FIRE_WEAPON );
+			pm->ps->timers[TIMER_BAYCLOSE] = pm->cmd.serverTime + 5000;
+		}
 		pm->ps->timers[TIMER_WEAPON] += availableWeapons[pm->ps->weaponIndex].fireInterval;
-		pm->ps->timers[TIMER_BAYCLOSE] = pm->cmd.serverTime + 5000;
 	}
 }
 
