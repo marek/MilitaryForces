@@ -1,5 +1,5 @@
 /*
- * $Id: ui_local.h,v 1.2 2002-01-19 02:24:03 thebjoern Exp $
+ * $Id: ui_local.h,v 1.3 2002-01-23 18:47:22 sparky909_uk Exp $
 */
 //
 #ifndef __UI_LOCAL_H__
@@ -1107,6 +1107,8 @@ typedef struct postGameInfo_s {
 	int baseScore;
 } postGameInfo_t;
 
+// MFQ3 util
 
+unsigned int MF_UI_GetTeam( void );
 
 #endif

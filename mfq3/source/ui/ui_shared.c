@@ -1,5 +1,5 @@
 /*
- * $Id: ui_shared.c,v 1.2 2002-01-19 02:24:03 thebjoern Exp $
+ * $Id: ui_shared.c,v 1.3 2002-01-23 18:47:22 sparky909_uk Exp $
 */
 // 
 // string allocation/managment
@@ -3095,6 +3095,7 @@ void Item_Multi_Paint(itemDef_t *item) {
 
 typedef struct {
 	char	*command;
+	char	*label;		// MFQ3: new
 	int		id;
 	int		defaultbind1;
 	int		defaultbind2;
@@ -3109,7 +3110,67 @@ typedef struct
 	float	value;	
 } configcvar_t;
 
+// MFQ3: military forces bindings (imported from old q3_ui project)
 
+static bind_t g_bindings[] = 
+{
+	{"+scores",			"Show Scoreboard",	ID_SHOWSCORES,	K_TAB,			-1,		-1, -1},
+	{"+forward", 		"Forward (Max)",	ID_FORWARD,		K_UPARROW,		-1,		-1, -1},
+	{"+back", 			"Back/Stop (Min)",	ID_BACKPEDAL,	K_DOWNARROW,	-1,		-1, -1},
+	{"+moveleft", 		"Turn left (tank)",	ID_MOVELEFT,	',',			-1,		-1, -1},
+	{"+moveright", 		"Turn right (tank)",ID_MOVERIGHT,	'.',			-1,		-1, -1},
+	{"+moveup",			"up / jump",		ID_MOVEUP,		K_SPACE,		-1,		-1, -1},
+	{"+movedown",		"down / crouch",	ID_MOVEDOWN,	'c',			-1,		-1, -1},
+	{"+left", 			"Left (view)",		ID_LEFT,		K_LEFTARROW,	-1,		-1, -1},
+	{"+right", 			"Right (view)", 	ID_RIGHT,		K_RIGHTARROW,	-1,		-1, -1},
+	{"+lookup", 		"Up (view)",		ID_LOOKUP,		K_PGUP,			-1,		-1, -1},
+	{"+lookdown", 		"Down (view)",		ID_LOOKDOWN,	K_PGDN,			-1,		-1, -1},
+	{"+zoom", 			"Zoom View",		ID_ZOOMVIEW,	-1,				-1,		-1, -1},
+
+	{"+attack", 		"Fire MG",			ID_ATTACK,		K_CTRL,			-1,		-1, -1},
+	{"+button2", 		"Fire Main Weapon",	ID_ATTACK2,		-1,				-1,		-1, -1},
+	{"weapprev",		"Previous Weapon",	ID_WEAPPREV,	'[',			-1,		-1, -1},
+	{"weapnext", 		"Next Weapon",		ID_WEAPNEXT,	']',			-1,		-1, -1},
+	{"messagemode", 	"Chat",				ID_CHAT,		't',			-1,		-1, -1},
+	{"messagemode2", 	"Chat - Team",		ID_CHAT2,		-1,				-1,		-1, -1},
+	{"messagemode3", 	"Chat - Target",	ID_CHAT3,		-1,				-1,		-1, -1},
+	{"messagemode4", 	"Chat - Attacker",	ID_CHAT4,		-1,				-1,		-1, -1},
+
+	{"+button7",		"Landing Gear",		ID_GEAR,		-1,				-1,		-1, -1},
+	{"+button8",	 	"(Speed)Brakes",	ID_BRAKE,		-1,				-1,		-1, -1},
+	{"+button9",	 	"Freelook Camera",	ID_FREECAM,		-1,				-1,		-1, -1},
+	{"+button5", 		"Throttle Up",		ID_INCREASE,	-1,				-1,		-1, -1},
+	{"+button6", 		"Throttle Down",	ID_DECREASE,	-1,				-1,		-1, -1},
+	{"weapon 0",		"Select MG",		ID_WEAPON_MG,	'0',			-1,		-1, -1},
+	{"weapon 1",		"Select Weapon 1",	ID_WEAPON_1,	'1',			-1,		-1, -1},
+	{"weapon 2",		"Select Weapon 2",	ID_WEAPON_2,	'2',			-1,		-1, -1},
+	{"weapon 3",		"Select Weapon 3",	ID_WEAPON_3,	'3',			-1,		-1, -1},
+	{"weapon 4",		"Select Weapon 4",	ID_WEAPON_4,	'4',			-1,		-1, -1},
+	{"weapon 5",		"Select Weapon 5",	ID_WEAPON_5,	'5',			-1,		-1, -1},
+	{"weapon 6",		"Select Weapon 6",	ID_WEAPON_6,	'6',			-1,		-1, -1},
+	{"+button10",		"Fire Flare",		ID_WEAPON_FLARE,'7',			-1,		-1, -1},
+	{"encyclopedia",	"Encyclopedia",		ID_ENCYC,		-1,				-1,		-1, -1},
+	{"teamselect",		"Team Selection",	ID_TEAMSEL,		-1,				-1,		-1, -1},
+	{"vehicleselect",	"Vehicle Selection",ID_VEHSEL,		-1,				-1,		-1, -1},
+	{"gps",				"GPS on/off",		ID_GPS,			-1,				-1,		-1, -1},
+	{"toggleview",		"Toggle Camera",	ID_TOGGLEVIEW,	-1,				-1,		-1, -1},
+	{"cameraup",		"Camera Up",		ID_CAMERAUP,	-1,				-1,		-1, -1},
+	{"cameradown",		"Camera Down",		ID_CAMERADOWN,	-1,				-1,		-1, -1},
+	{"zoomin",			"Zoom In",			ID_ZOOMIN,		-1,				-1,		-1, -1},
+	{"zoomout",			"Zoom Out",			ID_ZOOMOUT,		-1,				-1,		-1, -1},
+	{"+speedup",		"Zoom/Move Speed-Up", ID_SPEEDUP,	K_SHIFT,		-1,		-1, -1},
+	{"contact_tower",	"Contact Tower",	ID_CONTACTTOWER,-1,				-1,		-1, -1},
+	{"radar",			"RADAR on/off",		ID_RADAR,		-1,				-1,		-1, -1},
+	{"extinfo",			"Ext.Info on/off",	ID_EXTINFO,		-1,				-1,		-1, -1},
+	{"radarrange",		"Toggle RADAR Range",ID_RADARRANGE,	-1,				-1,		-1, -1},
+	{"unlock",			"Unlock Target",	ID_UNLOCK,		-1,				-1,		-1, -1},
+	
+	{(char*)NULL,		(char*)NULL,		0,				-1,				-1,		-1,	-1},
+};
+
+/*
+
+// MFQ3: orignal MISSIONPACK bindings
 static bind_t g_bindings[] = 
 {
 	{"+scores",			 K_TAB,				-1,		-1, -1},
@@ -3174,7 +3235,7 @@ static bind_t g_bindings[] =
 	{"messagemode3", -1,						-1,		-1, -1},
 	{"messagemode4", -1,						-1,		-1, -1}
 };
-
+*/
 
 static const int g_bindCount = sizeof(g_bindings) / sizeof(bind_t);
 

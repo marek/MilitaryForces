@@ -1,5 +1,5 @@
 /*
- * $Id: ui_shared.h,v 1.2 2002-01-19 02:24:03 thebjoern Exp $
+ * $Id: ui_shared.h,v 1.3 2002-01-23 18:47:22 sparky909_uk Exp $
 */
 #ifndef __UI_SHARED_H
 #define __UI_SHARED_H
@@ -10,6 +10,66 @@
 #include "keycodes.h"
 
 #include "menudef.h"
+
+enum CursorEnum 
+{
+	CURSOR_NORMAL,
+	CURSOR_WAIT,
+	MAX_CURSORS
+};
+
+
+// bindable actions
+#define ID_SHOWSCORES	0
+#define ID_FORWARD		1	
+#define ID_BACKPEDAL	2
+#define ID_MOVELEFT		3
+#define ID_MOVERIGHT	4
+#define ID_MOVEUP		5	
+#define ID_MOVEDOWN		6
+#define ID_LEFT			7	
+#define ID_RIGHT		8	
+#define ID_LOOKUP		9	
+#define ID_LOOKDOWN		10
+#define ID_ZOOMVIEW		11
+#define ID_ATTACK		12
+#define ID_ATTACK2		13
+#define ID_WEAPPREV		14
+#define ID_WEAPNEXT		15
+#define ID_CHAT			16
+#define ID_CHAT2		17
+#define ID_CHAT3		18
+#define ID_CHAT4		19
+
+// mfq3 specific bindable actions
+#define ID_GEAR			20
+#define ID_BRAKE		21
+#define ID_FREECAM		22
+#define ID_INCREASE		23
+#define ID_DECREASE		24
+#define ID_WEAPON_MG	25
+#define ID_WEAPON_1		26
+#define ID_WEAPON_2		27
+#define ID_WEAPON_3		28
+#define ID_WEAPON_4		29
+#define ID_WEAPON_5		30
+#define ID_WEAPON_6		31
+#define ID_WEAPON_FLARE	32
+#define ID_ENCYC		33
+#define ID_VEHSEL		34
+#define ID_GPS			35
+#define ID_TOGGLEVIEW	36
+#define ID_CAMERAUP		37
+#define ID_CAMERADOWN	38
+#define ID_ZOOMIN		39
+#define ID_ZOOMOUT		40
+#define ID_CONTACTTOWER 41
+#define ID_RADAR		42
+#define ID_EXTINFO		43
+#define ID_RADARRANGE	44
+#define ID_UNLOCK		45
+#define ID_TEAMSEL		46
+#define	ID_SPEEDUP		47
 
 #define MAX_MENUNAME 32
 #define MAX_ITEMTEXT 64
@@ -256,11 +316,13 @@ typedef struct {
 typedef struct {
   const char *fontStr;
   const char *cursorStr;
+  const char *cursorStrWait;
   const char *gradientStr;
   fontInfo_t textFont;
   fontInfo_t smallFont;
   fontInfo_t bigFont;
   qhandle_t cursor;
+  qhandle_t cursorWait;
   qhandle_t gradientBar;
   qhandle_t verticalGradient;
   qhandle_t scrollBarArrowUp;
@@ -357,6 +419,7 @@ typedef struct {
   int				frameTime;
 	int				cursorx;
 	int				cursory;
+	int				cursorEnum;
 	qboolean	debug;
 
   cachedAssets_t Assets;

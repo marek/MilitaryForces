@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.9 2002-01-22 22:29:30 thebjoern Exp $
+ * $Id: cg_main.c,v 1.10 2002-01-23 18:46:15 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -203,8 +203,8 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_errorDecay, "cg_errordecay", "100", 0 },
 	{ &cg_nopredict, "cg_nopredict", "0", 0 },
 	{ &cg_showmiss, "cg_showmiss", "0", 0 },
-	{ &cg_thirdPersonRange, "cg_thirdPersonRange", "0", 0 },
-	{ &cg_thirdPersonHeight, "cg_thirdPersonHeight", "0", 0 },
+	{ &cg_thirdPersonRange, "cg_thirdPersonRange", "0", CVAR_ARCHIVE },
+	{ &cg_thirdPersonHeight, "cg_thirdPersonHeight", "0", CVAR_ARCHIVE },
 	{ &cg_thirdPersonAngle, "cg_thirdPersonAngle", "0", CVAR_CHEAT },
 	{ &cg_thirdPerson, "cg_thirdPerson", "1", 0 },// MFQ3 changed from 0
 	{ &cg_teamChatTime, "cg_teamChatTime", "3000", CVAR_ARCHIVE  },
@@ -287,7 +287,7 @@ static void CG_ForceModelChange( void ) {
 	int		i;
 
 	for (i=0 ; i<MAX_CLIENTS ; i++) {
-		const char		*clientInfo;
+		const char *clientInfo;
 
 		clientInfo = CG_ConfigString( CS_PLAYERS+i );
 		if ( !clientInfo[0] ) {
@@ -571,7 +571,21 @@ static void CG_RegisterSounds( void ) {
 	cgs.media.engineJet = trap_S_RegisterSound("sound/engines/jet.wav", qfalse );
 	cgs.media.engineProp = trap_S_RegisterSound("sound/engines/prop.wav", qfalse );
 	cgs.media.engineJetAB = trap_S_RegisterSound( "sound/engines/afterburner.wav", qfalse );
-	cgs.media.planeDeath = trap_S_RegisterSound( "sound/death/planedeath.wav", qfalse );
+
+	// MFQ3: new sounds
+	cgs.media.planeDeath[0] = trap_S_RegisterSound( "sound/explosions/explode1.wav", qfalse );	
+	cgs.media.planeDeath[1] = trap_S_RegisterSound( "sound/explosions/explode2.wav", qfalse );	
+	cgs.media.planeDeath[2] = trap_S_RegisterSound( "sound/explosions/explode3.wav", qfalse );	
+	cgs.media.planeDeath[3] = trap_S_RegisterSound( "sound/explosions/explode4.wav", qfalse );	
+	if( !cgs.media.planeDeath[0] )
+	{
+		// MFQ3: old quake3 sound (backup)
+		cgs.media.planeDeath[0] = trap_S_RegisterSound( "sound/death/planedeath.wav", qfalse );	
+		cgs.media.planeDeath[1] = cgs.media.planeDeath[0];
+		cgs.media.planeDeath[2] = cgs.media.planeDeath[0];
+		cgs.media.planeDeath[3] = cgs.media.planeDeath[0];
+	}
+
 	// added mg
 	cgs.media.engineTank[0] = trap_S_RegisterSound("sound/engines/tank0.wav", qfalse );
 	cgs.media.engineTank[1] = trap_S_RegisterSound("sound/engines/tank1.wav", qfalse );
@@ -977,6 +991,14 @@ qboolean CG_Asset_Parse(int handle) {
 			continue;
 		}
 
+		if (Q_stricmp(token.string, "cursorWait") == 0) {
+			if (!PC_String_Parse(handle, &cgDC.Assets.cursorStrWait)) {
+				return qfalse;
+			}
+			cgDC.Assets.cursorWait = trap_R_RegisterShaderNoMip( cgDC.Assets.cursorStrWait );
+			continue;
+		}
+
 		if (Q_stricmp(token.string, "fadeClamp") == 0) {
 			if (!PC_Float_Parse(handle, &cgDC.Assets.fadeClamp)) {
 				return qfalse;
@@ -1272,12 +1294,14 @@ CG_FeederItemText
 */
 static const char *CG_FeederItemText(float feederID, int index, int column, qhandle_t *handle) {
 	//gitem_t *item;
-	int scoreIndex = 0;
 	clientInfo_t *info = NULL;
+	int scoreIndex = 0;
 	int team = -1;
-	score_t *sp = NULL;
-	static char test[ 16 ];
+	int vehicleIndex = -1;
 	qboolean spectator = qfalse;
+	qboolean dontShowVehicle = qfalse;
+	score_t *sp = NULL;
+	centity_t *self = &cg.predictedPlayerEntity;
 
 	*handle = -1;
 
@@ -1295,16 +1319,6 @@ static const char *CG_FeederItemText(float feederID, int index, int column, qhan
 	{
 		spectator = qtrue;
 	}
-
-// debug +
-/*
-	if( column > 1 )
-	{
-		sprintf( test, "%d--------------------------------------------------------", column );
-		return test;
-	}
-*/
-// debug -
 
 	if (info && info->infoValid)
 	{
@@ -1352,14 +1366,20 @@ static const char *CG_FeederItemText(float feederID, int index, int column, qhan
 
 				if (team == -1)
 				{
-					if (cgs.gametype == GT_TOURNAMENT) {
+					if (cgs.gametype == GT_TOURNAMENT)
+					{
 						return va("%i/%i", info->wins, info->losses);
-					} else if (info->infoValid && info->team == TEAM_SPECTATOR ) {
+					}
+					else if (info->infoValid && info->team == TEAM_SPECTATOR )
+					{
 						return "Spectator";
-					} else {
+					} 
+					else
+					{
 						return "";
 					}
-				} else
+				}
+				else
 				{
 					if (info->teamLeader)
 					{
@@ -1370,11 +1390,50 @@ static const char *CG_FeederItemText(float feederID, int index, int column, qhan
 
 			// Name
 			case 3:
+				// return name
 				return info->name;
 			break;
 
-			// Score
+			// Vehicle
 			case 4:
+
+				// team game being played?
+				if( cgs.gametype >= GT_TEAM )
+				{
+					// enemy? (different team identifier than us)
+					if( info->team != cgs.clientinfo[ self->currentState.clientNum ].team )
+					{
+						// don't show vehicles for our enemies
+						dontShowVehicle = qtrue;
+					}
+				}
+
+				// get vehicle index
+				vehicleIndex = info->vehicle;
+
+				// is it valid?
+				if( vehicleIndex >= 0 && !spectator && !dontShowVehicle )
+				{
+					// use name + vehicle description
+					return availableVehicles[ vehicleIndex ].tinyName;
+				}
+				else
+				{
+					// was the information blocked?
+					if( dontShowVehicle )
+					{
+						return "n/a";
+					}
+					else
+					{
+						// null
+						return "-";
+					}
+				}
+				break;
+
+			// Score
+			case 5:
 				if( spectator )
 				{
 					return "-";
@@ -1384,7 +1443,7 @@ static const char *CG_FeederItemText(float feederID, int index, int column, qhan
 			break;
 
 			// Deaths
-			case 5:
+			case 6:
 				if( spectator )
 				{
 					return "-";
@@ -1393,14 +1452,15 @@ static const char *CG_FeederItemText(float feederID, int index, int column, qhan
 			break;
 
 			// Time
-			case 6:
+			case 7:
 				return va("%4i", sp->time);
 			break;
 
 			// Ping
-			case 7:
-				if ( sp->ping == -1 ) {
-					return "Connecting...";
+			case 8:
+				if ( sp->ping == -1 )
+				{
+					return "Connect";
 				} 
 				return va("%4i", sp->ping);
 			break;
@@ -1469,11 +1529,24 @@ void CG_StartMusic( void ) {
 	trap_S_StartBackgroundTrack( parm1, parm2 );
 }
 
-static float CG_Cvar_Get(const char *cvar) {
+/*
+=================
+CG_Cvar_Get
+
+Generic get value from Cvar
+=================
+*/
+float CG_Cvar_Get( const char * cvar )
+{
+	// allocate temp string buffer
 	char buff[128];
-	memset(buff, 0, sizeof(buff));
-	trap_Cvar_VariableStringBuffer(cvar, buff, sizeof(buff));
-	return atof(buff);
+	memset( buff, 0, sizeof(buff) );
+
+	// get variable as string
+	trap_Cvar_VariableStringBuffer( cvar, buff, sizeof(buff) );
+
+	// return converted value as float
+	return atof( buff );
 }
 
 #ifdef _MENU_SCOREBOARD	// NOTE: functions copied from v1.29h code to enable new scoreboard method
@@ -1631,6 +1704,10 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	memset( cg_items, 0, sizeof(cg_items) );
 
 	cg.clientNum = clientNum;
+	
+	// misc
+	cg.speedup = qfalse;
+	cg.speedupamount = 1.0f;
 
 	cgs.processedSnapshotNum = serverMessageNum;
 	cgs.serverCommandSequence = serverCommandSequence;

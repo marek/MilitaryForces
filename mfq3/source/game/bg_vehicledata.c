@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.6 2002-01-07 00:06:02 thebjoern Exp $
+ * $Id: bg_vehicledata.c,v 1.7 2002-01-23 18:49:20 sparky909_uk Exp $
 */
 
 #include "q_shared.h"
@@ -13,6 +13,7 @@ completeVehicleData_t availableVehicles[] =
 	// Planes
 	// ---------------------------------------------
     {	"F-16 Falcon",		    // descriptiveName
+	"F-16",						// tinyName
 	"f-16",						// modelName
 	MF_GAMESET_MODERN|			// id
 	MF_TEAM_2|
@@ -47,6 +48,7 @@ completeVehicleData_t availableVehicles[] =
     },
 
     {	"Saab JAS 39 Gripen",    // descriptiveName
+	"Jas-39",					// tinyName
 	"jas-39",					// modelName
 	MF_GAMESET_MODERN|			// id
 	MF_TEAM_1|
@@ -81,6 +83,7 @@ completeVehicleData_t availableVehicles[] =
     },
 
     {	"F-5 Tiger",		    // descriptiveName
+	"F-5",						// tinyName
 	"f-5",						// modelName
 	MF_GAMESET_MODERN|			// id
 	MF_TEAM_2|
@@ -115,6 +118,7 @@ completeVehicleData_t availableVehicles[] =
     },
 
     {	"F-15 Eagle",		    // descriptiveName
+	"F-15",						// tinyName
 	"f-15",						// modelName
 	MF_GAMESET_MODERN|			// id
 	MF_TEAM_1|
@@ -149,6 +153,7 @@ completeVehicleData_t availableVehicles[] =
     },
 
     {	"F-14 Tomcat",		    // descriptiveName
+	"F-14",						// tinyName
 	"f-14",						// modelName
 	MF_GAMESET_MODERN|			// id
 	MF_TEAM_2|
@@ -183,6 +188,7 @@ completeVehicleData_t availableVehicles[] =
     },
 
     {	"F-18 Hornet",		    // descriptiveName
+	"F-18",						// tinyName
 	"f-18",						// modelName
 	MF_GAMESET_MODERN|			// id
 	MF_TEAM_1|
@@ -217,6 +223,7 @@ completeVehicleData_t availableVehicles[] =
     },
 
     {	"B-2 Spirit",		    // descriptiveName
+	"B-2",						// tinyName
 	"b-2",						// modelName
 	MF_GAMESET_MODERN|			// id
 	MF_TEAM_1|
@@ -251,6 +258,7 @@ completeVehicleData_t availableVehicles[] =
     },
 
     {	"P-51d Mustang",		// descriptiveName
+	"P-51d",					// tinyName
 	"p-51d",					// modelName
 	MF_GAMESET_WW2|				// id
 	MF_TEAM_1|
@@ -286,6 +294,7 @@ completeVehicleData_t availableVehicles[] =
     },
 
     {	"Spitfire Mk 5b",		// descriptiveName
+	"Spitfire",					// tinyName
 	"spitfire_mk5b",			// modelName
 	MF_GAMESET_WW2|				// id
 	MF_TEAM_2|
@@ -322,6 +331,7 @@ completeVehicleData_t availableVehicles[] =
 
 
     {	"Fokker Dr.1",			// descriptiveName
+	"Fokker",					// tinyName
 	"dr1",						// modelName
 	MF_GAMESET_WW1|				// id
 	MF_TEAM_1|
@@ -357,6 +367,7 @@ completeVehicleData_t availableVehicles[] =
     },
 
     {	"Sopwith camel",		// descriptiveName
+	"Camel",					// tinyName
 	"camel",					// modelName
 	MF_GAMESET_WW1|				// id
 	MF_TEAM_2|
@@ -396,6 +407,7 @@ completeVehicleData_t availableVehicles[] =
 	// ---------------------------------------------
 
     {	"M1A1i Abrams",			// descriptiveName
+	"M1",						// tinyName
 	"m1",						// modelName
 	MF_GAMESET_MODERN|			// id
 	MF_TEAM_1|
@@ -429,6 +441,7 @@ completeVehicleData_t availableVehicles[] =
     },
 
     {	"T-90",					// descriptiveName
+	"T-90",						// tinyName
 	"t-90",						// modelName
 	MF_GAMESET_MODERN|			// id
 	MF_TEAM_2|
@@ -462,6 +475,7 @@ completeVehicleData_t availableVehicles[] =
     },
 
     {	"BMP 3",				// descriptiveName
+	"BMP-3",					// tinyName
 	"bmp-3",					// modelName
 	MF_GAMESET_MODERN|			// id
 	MF_TEAM_1|
@@ -495,6 +509,7 @@ completeVehicleData_t availableVehicles[] =
     },
 
     {	"BRDM 2",				// descriptiveName
+	"BRDM2",					// tinyName
 	"brdm2",					// modelName
 	MF_GAMESET_MODERN|			// id
 	MF_TEAM_2|

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.3 2002-01-18 16:48:26 sparky909_uk Exp $
+ * $Id: bg_mfq3util.c,v 1.4 2002-01-23 18:49:20 sparky909_uk Exp $
 */
 
 #include "q_shared.h"
@@ -8,6 +8,12 @@
 // externals
 extern void	trap_Cvar_Set( const char *var_name, const char *value );
 extern void	trap_Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize );
+
+/*
+=================
+MF_SetGameset
+=================
+*/
 
 // sets the mf_gameset variable based on the given MF_GAMESET_x parameter
 void MF_SetGameset(unsigned long gs)
@@ -26,6 +32,12 @@ void MF_SetGameset(unsigned long gs)
 		break;
 	}
 }
+
+/*
+=================
+MF_GetGameset
+=================
+*/
 
 // gets the mf_gameset variable into the correct a MF_GAMESET_x return
 unsigned long MF_GetGameset( void )
@@ -52,6 +64,12 @@ unsigned long MF_GetGameset( void )
 	// wasn't found, but to be safe
 	return MF_GAMESET_MODERN;
 }
+
+/*
+=================
+MF_getIndexOfVehicle
+=================
+*/
 
 int MF_getIndexOfVehicle( int start,			// where to start in list
 					   unsigned long what)	// what (team|cat|cls)
@@ -90,6 +108,12 @@ int MF_getIndexOfVehicle( int start,			// where to start in list
 
 }
 
+/*
+=================
+MF_getNumberOfItems
+=================
+*/
+
 // returns the number of items in a stringlist
 int MF_getNumberOfItems(const char **itemlist)
 {
@@ -97,6 +121,12 @@ int MF_getNumberOfItems(const char **itemlist)
 	for( i = 0; itemlist[i] != 0; i++ );
 	return i;
 }
+
+/*
+=================
+MF_getItemIndexFromHex
+=================
+*/
 
 // takes an already properly right-shifted hex value (with only 1 bit set!)
 // and returns the item index for it
@@ -107,3 +137,33 @@ int MF_getItemIndexFromHex(int hexValue)
 	return i;
 }
 
+/*
+=================
+MF_CreateModelPathname
+=================
+*/
+
+// creates a model pathname (e.g. pFormatString = "models/vehicles/%s/%s/%s_icon")
+char * MF_CreateModelPathname( int vehicle, char * pFormatString )
+{
+	char * pReturnString = NULL;
+	char catDir[ 32 ];
+	unsigned long cat = 0;
+
+	// find catagory
+	cat = availableVehicles[ vehicle ].id & CAT_ANY;
+	if( cat & CAT_PLANE ) {
+		strcpy( catDir, "planes" );
+	}
+	else if( cat & CAT_GROUND ) {
+		strcpy( catDir, "ground" );
+	}
+	else if( cat & CAT_HELO ) {
+		strcpy( catDir, "helicopters" );
+	}
+
+	// create filename string
+	pReturnString = va( pFormatString, catDir, availableVehicles[ vehicle ].modelName, availableVehicles[ vehicle ].modelName );
+
+	return pReturnString;
+}

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_consolecmds.c,v 1.4 2002-01-22 16:15:58 thebjoern Exp $
+ * $Id: cg_consolecmds.c,v 1.5 2002-01-23 18:46:15 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -111,18 +111,33 @@ static void CG_ToggleView_f( void ) {
 	cg.toggleViewTime = cg.time + 500;
 }
 
+/*
+==================
+MFQ3 camera speed-up
+==================
+*/
+
+static void CG_SpeedUpToggle_f( void )
+{
+	// on/off
+	cg.speedup ^= qtrue;
+	if( cg.speedup )
+		cg.speedupamount = 4.0f;
+	else
+		cg.speedupamount = 1.0f;
+}
 
 /*
 ==================
-MFQ3 zoom
+MFQ3 camera zoom in/out
 ==================
 */
 static void CG_ZoomIn_f( void ) {
-	trap_Cvar_Set("cg_thirdPersonRange", va("%i",(int)(cg_thirdPersonRange.integer-1)));
+	trap_Cvar_Set("cg_thirdPersonRange", va("%i",(int)(cg_thirdPersonRange.integer-cg.speedupamount)));
 }
 
 static void CG_ZoomOut_f( void ) {
-	trap_Cvar_Set("cg_thirdPersonRange", va("%i",(int)(cg_thirdPersonRange.integer+1)));
+	trap_Cvar_Set("cg_thirdPersonRange", va("%i",(int)(cg_thirdPersonRange.integer+cg.speedupamount)));
 }
 
 /*
@@ -131,11 +146,11 @@ MFQ3 camera up/down
 ==================
 */
 static void CG_CameraUp_f( void ) {
-	trap_Cvar_Set("cg_thirdPersonHeight", va("%i",(int)(cg_thirdPersonHeight.integer+1)));
+	trap_Cvar_Set("cg_thirdPersonHeight", va("%i",(int)(cg_thirdPersonHeight.integer+cg.speedupamount)));
 }
 
 static void CG_CameraDown_f( void ) {
-	trap_Cvar_Set("cg_thirdPersonHeight", va("%i",(int)(cg_thirdPersonHeight.integer-1)));
+	trap_Cvar_Set("cg_thirdPersonHeight", va("%i",(int)(cg_thirdPersonHeight.integer-cg.speedupamount)));
 }
 
 
@@ -276,6 +291,7 @@ static consoleCommand_t	commands[] = {
 	{ "gps", CG_ToggleGps_f },
 	{ "extinfo", CG_ToggleInfo_f },
 	{ "toggleview", CG_ToggleView_f },
+	{ "+speedup", CG_SpeedUpToggle_f },
 	{ "zoomin", CG_ZoomIn_f },
 	{ "zoomout", CG_ZoomOut_f },
 	{ "cameraup", CG_CameraUp_f },
