@@ -1,5 +1,5 @@
 /*
- * $Id: cg_groundvehicle.c,v 1.15 2002-02-21 16:41:25 sparky909_uk Exp $
+ * $Id: cg_groundvehicle.c,v 1.16 2002-02-25 12:13:36 sparky909_uk Exp $
 */
 
 
@@ -82,8 +82,8 @@ void CG_GroundVehicle( centity_t *cent, clientInfo_t *ci )
 	float			shadowPlane = 0;
 	int				renderfx = 0;
 	int				i, tanksound;
-	vec3_t			velocity;
 	float			speed;
+	vec3_t			velocity;
 
 	// get velocity
 	VectorCopy( cent->currentState.pos.trDelta, velocity );
@@ -367,25 +367,9 @@ void CG_GroundVehicle( centity_t *cent, clientInfo_t *ci )
 							velocity, 
 							cgs.media.engineTank[tanksound] );
 
-	// smoke 
-	if( cent->currentState.generic1 && cg_smoke.integer ) {
-		localEntity_t	*smoke;
-		vec3_t			up = {0, 0, 20};
-		vec3_t			pos;
-		vec3_t			forward;
-
-		AngleVectors( cent->lerpAngles, forward, NULL, NULL );
-		VectorCopy( cent->lerpOrigin, pos );
-		pos[2] += 12;
-
-		smoke = CG_SmokePuff( pos, up, 
-					  cent->currentState.generic1, 
-					  0.5, 0.5, 0.5, 0.66f,
-					  200*cent->currentState.generic1, 
-					  cg.time, 0,
-					  LEF_PUFF_DONT_SCALE, 
-					  cgs.media.smokePuffShader );	
-	}
+	// smoke
+	CG_Generic_Smoke( cent, cent->lerpOrigin, 100 );
+	
 #pragma message("maybe use the hastePuffShader for a dust trail when tanks drive ?")
 	// muzzleflash
 	CG_VehicleMuzzleFlash( cent, &part[BP_GV_GUNBARREL], ci->parts[BP_GV_GUNBARREL], ci->vehicle );

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawtools.c,v 1.16 2002-02-25 09:56:57 sparky909_uk Exp $
+ * $Id: cg_drawtools.c,v 1.17 2002-02-25 12:13:36 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1376,3 +1376,35 @@ void CG_Draw_HUD_Label( int x, int y, char * pText, float alpha )
 	DrawStringNew( x, (y+1), HUD_LABEL_SCALE, *CreateColourVector( 0,0,0,(1.0f * alpha),NULL ), pText, 0, 0, ITEM_TEXTSTYLE_NORMAL, CENTRE_JUSTIFY );
 }
 
+/*
+================
+CG_Generic_Smoke
+
+Draws generic smoke puffs (e.g. or vehicles on fire)
+================
+*/
+localEntity_t * CG_Generic_Smoke( centity_t * cent, vec3_t smokePosition, int density )
+{
+	localEntity_t * smoke = NULL;
+
+	// valid state to add a smoke puff local entity?
+	if( cent->currentState.generic1 && cg_smoke.integer && cent->miscTime < cg.time )
+	{
+		vec3_t			up = {0, 0, 20};					// direction of smoke
+		float			lifeTime = RandomInt( 50, 150 );	// general life-frames of smoke
+
+		// create puff entity
+		smoke = CG_SmokePuff( smokePosition, up, 
+							  cent->currentState.generic1,				// radius 
+							  0.5, 0.5, 0.5, 0.33f,						// colour & alpha
+							  lifeTime * cent->currentState.generic1,	// actual duration
+							  cg.time, 0,
+							  LEF_NO_RADIUS_KILL, 
+							  cgs.media.smokePuffShader );	
+
+		// lock-out x frames
+		cent->miscTime = cg.time + density;
+	}
+
+	return smoke;
+}

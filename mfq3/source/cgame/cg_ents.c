@@ -1,5 +1,5 @@
 /*
- * $Id: cg_ents.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: cg_ents.c,v 1.2 2002-02-25 12:13:36 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -327,7 +327,16 @@ static void CG_Missile( centity_t *cent ) {
 	// add trails
 	if ( weapon->missileTrailFunc ) 
 	{
-		weapon->missileTrailFunc( cent, weapon );
+		// only ever call the missile-trail function once per NEW-frame
+		// NOTE: this assumes that we don't use the ->miscTime variable of centity_t (missiles) for anything else
+		if( cent->miscTime != cg.time )
+		{
+			// call the trail func
+			weapon->missileTrailFunc( cent, weapon );
+
+			// lock-out the frame
+			cent->miscTime = cg.time;
+		}
 	}
 
 	// add dynamic light
