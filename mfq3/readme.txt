@@ -5,11 +5,44 @@ Military Forces Q3
 History:
 ========
 
-
-
-
-+++v0.62+++ in progress...
++++v0.64+++
 -----------
+- some more work on turret code (for boat turrets)
+- some more work on boat code
+- made weapons launch from their vwep positions
+- first cut vwep (only supported by Harrier model atm)
+- code to put weapon loadouts on pylons automatically (needed for vwep)
+- Mark: more work on custom chat console
+- allow reading out md3 files (esp. tags) from all three modules, which will be needed
+  for vwep
+- if no primary MG is available weapons can also be fired by other fire button
+- fixing some problems in the weaponcode
+- fixed throttle problem on HUD (for boats)
+- various minor fixes from Mark and me
+
++++v0.63+++ in progress
+-----------
+- more work on turret code (for boat-turrets)
+- Mark: allow balanced teams (g_teamForceBalance)
+- Mark: fixes to team and vehicle selection
+- Mark: more work on HUD
+- boats shouldn't be able to drive on land anymore
+- more work on boat driving-code 
+- Mark: more shadow work
+- fix a bug that could cause the game to hang on spawning
+- Mark: fixing vehicle selection
+- Mark: scoreboard and crosshair fixes
+- minor fixes
+
++++v0.62+++ 
+-----------
+- added Matt's Pbr31Mk2
+- Mark: more work on custom chat console
+- Mark: more work on shadow code
+- added first cut boat code
+- Mark: only vehicles with spawnpoints in the current map are selectable
+- Mark: fixed shadow bug
+- Mark: fixed crosshair positioning bug
 - stage 1 code preparation for helos, lqms and boats
 - added weaponbay code, they autoclose after the primary weapon hasn't been used
   for 5 seconds
