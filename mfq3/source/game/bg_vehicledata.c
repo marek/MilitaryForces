@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.55 2004-12-16 19:22:17 minkis Exp $
+ * $Id: bg_vehicledata.c,v 1.56 2004-12-23 11:29:21 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -14,6 +14,55 @@ completeVehicleData_t availableVehicles[] =
 	// ---------------------------------------------
 	// Planes
 	// ---------------------------------------------
+    {	"F-16 Fuckon",			// descriptiveName
+	"F-16",						// tinyName
+	"f-16",						// modelName
+	SHADOW_DEFAULT,				// alpha shadow
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_2,
+	CAT_PLANE,
+	CLASS_PLANE_FIGHTER,
+	0,							// flags
+	HC_GEAR|HC_SPEEDBRAKE|
+	HC_VAPOR,					// capabilities
+	{0,0,0,0,0,0,0,0,0,0},		// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
+	{85, 60, 280},				// turnspeed around the three axis
+	{0, 100, 70},				// camera distance {min,max,default}
+	{0, 100, 20},				// camera height {min,max,default}
+	200,						// stallspeed
+	700,						// maxspeed
+	0,							// min throttle
+	15,							// max throttle
+	1,							// engines
+	0,							// wheels
+	0,							// wheel circumference
+	260,						// acceleration
+	120,						// health
+	{16.65f, -3.391f, 0.378f},	// gun tag
+	60,							// max fuel
+	0,							// gearheight - SET AUTOMATICALLY
+	0,							// tailangle
+	WI_MG_20MM, WI_SIDEWINDER, WI_AMRAAM, 0, 0, 0, 0, WI_FLARE,	// weapons  WI_MG_20MM
+	450, 4, 4, 0, 0, 0, 0, 30,		// ammo
+	0,0,0,0,0,0,0,0,			// turret - useful ??
+	{19, 0, 5},					// cameraposition for cockpit view
+	AB_BALL,					// effect model
+	12000,						// radar range
+	9000,						// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
+	0,							// swingangle
+	1400,						// geartime
+	0,							// max gear frame
+	1000,						// baytime
+	0,							// max bay frame
+	0,							// renderflags
+	{4,0,34,24},				// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
+    },
+
     {	"F-16 Falcon",			// descriptiveName
 	"F-16",						// tinyName
 	"f-16",						// modelName

@@ -22,9 +22,10 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				OptimizeForProcessor="1"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;UI_EXPORTS"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="1"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;UI_EXPORTS;_USRDLL"
+				ExceptionHandling="FALSE"
+				BasicRuntimeChecks="0"
+				RuntimeLibrary="3"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderFile=".\Debug/ui.pch"
 				AssemblerListingLocation=".\Debug/"
@@ -33,7 +34,8 @@
 				BrowseInformation="1"
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
-				DebugInformationFormat="4"/>
+				DebugInformationFormat="4"
+				CompileAs="1"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -47,6 +49,7 @@
 				ProgramDatabaseFile=".\Debug/uix86.pdb"
 				GenerateMapFile="TRUE"
 				MapFileName=".\Debug/uix86.map"
+				SubSystem="2"
 				BaseAddress="0x40000000"
 				ImportLibrary=".\Debug/uix86.lib"
 				TargetMachine="1"/>
@@ -157,7 +160,8 @@
 			<File
 				RelativePath="..\game\bg_lib.c">
 				<FileConfiguration
-					Name="Debug|Win32">
+					Name="Debug|Win32"
+					ExcludedFromBuild="TRUE">
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="0"
