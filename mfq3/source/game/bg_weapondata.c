@@ -1,5 +1,5 @@
 /*
- * $Id: bg_weapondata.c,v 1.24 2003-03-19 12:53:13 thebjoern Exp $
+ * $Id: bg_weapondata.c,v 1.25 2003-04-24 10:56:50 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -348,9 +348,9 @@ completeWeaponData_t availableWeapons[] =
 		2500,								// muzzleVelocity
 		0,									// range
 		0,									// fuelrange
-		150,								// fire interval
-		25,									// damage
-		0,									// damageRadius
+		100,								// fire interval
+		35,									// damage
+		30,									// damageRadius
 		16,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
 		1,									// barrels
 		0,									// barrelDistance
@@ -507,8 +507,8 @@ completeWeaponData_t availableWeapons[] =
 		0,									// non cat mod
 		1500,								// muzzleVelocity
 		0,									// range
-		8000,								// fuelrange
-		200,								// fire interval
+		5000,								// fuelrange
+		180,								// fire interval
 		40,									// damage
 		50,									// damageRadius
 		1,									// spread
@@ -547,8 +547,8 @@ completeWeaponData_t availableWeapons[] =
 		0,									// non cat mod
 		1500,								// muzzleVelocity
 		0,									// range
-		8000,								// fuelrange
-		200,								// fire interval
+		5000,								// fuelrange
+		180,								// fire interval
 		40,									// damage
 		50,									// damageRadius
 		1,									// spread
@@ -588,7 +588,7 @@ completeWeaponData_t availableWeapons[] =
 		0,									// non cat mod
 		1500,								// muzzleVelocity
 		0,									// range
-		8000,								// fuelrange
+		5000,								// fuelrange
 		200,								// fire interval
 		80, 								// damage
 		80,									// damageRadius
@@ -631,8 +631,8 @@ completeWeaponData_t availableWeapons[] =
 		0,									// range
 		0,									// fuelrange
 		1500,								// fire interval
-		140,								// damage
-		80,									// damageRadius
+		110,								// damage
+		60,									// damageRadius
 		1,									// spread
 		1,									// barrels
 		0,									// barrelDistance
@@ -671,8 +671,8 @@ completeWeaponData_t availableWeapons[] =
 		0,									// range
 		0,									// fuelrange
 		1500,								// fire interval
-		200,								// damage
-		100,								// damageRadius
+		150,								// damage
+		80,									// damageRadius
 		1,									// spread
 		1,									// barrels
 		0,									// barrelDistance
@@ -710,8 +710,8 @@ completeWeaponData_t availableWeapons[] =
 		0,									// muzzleVelocity
 		0,									// range
 		0,									// fuelrange
-		200,								// fire interval
-		100,								// damage
+		100,								// fire interval
+		50,								// damage
 		150,								// damageRadius
 		1,									// spread
 		2,									// barrels
@@ -751,8 +751,8 @@ completeWeaponData_t availableWeapons[] =
 		0,									// muzzleVelocity
 		0,									// range
 		0,									// fuelrange
-		200,								// fire interval
-		100,								// damage
+		100,								// fire interval
+		50,									// damage
 		150,								// damageRadius
 		1,									// spread
 		2,									// barrels
@@ -793,8 +793,8 @@ completeWeaponData_t availableWeapons[] =
 		0,									// range
 		0,									// fuelrange
 		200,								// fire interval
-		150,								// damage
-		200,								// damageRadius
+		120,								// damage
+		230,								// damageRadius
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
@@ -834,8 +834,8 @@ completeWeaponData_t availableWeapons[] =
 		0,									// range
 		0,									// fuelrange
 		200,								// fire interval
-		150,								// damage
-		200,								// damageRadius
+		120,								// damage
+		230,								// damageRadius
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
@@ -875,9 +875,9 @@ completeWeaponData_t availableWeapons[] =
 		0,									// muzzleVelocity
 		0,									// range
 		0,									// fuelrange
-		200,								// fire interval
-		250,								// damage
-		250,								// damageRadius
+		300,								// fire interval
+		260,								// damage
+		330,								// damageRadius
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
@@ -899,7 +899,7 @@ completeWeaponData_t availableWeapons[] =
 
 	// gbu15
 	{ 
-		WT_ANTIGROUNDMISSILE,						// type
+		WT_GUIDEDBOMB,						// type
 		MF_GAMESET_ANY,						// gameset
 		"GBU-15",							// descriptiveName
 		"GBU-15",							// shortName
@@ -910,13 +910,13 @@ completeWeaponData_t availableWeapons[] =
 		0,									// vwephandle
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
-		CAT_GROUND,							// cat
-		0.3f,								// non cat mod
-		1000,								// muzzleVelocity
-		8000,								// range
-		5000,								// fuelrange
-		500,								// fire interval
-		400,								// damage
+		CAT_ANY,							// cat
+		0,									// non cat mod
+		0,									// muzzleVelocity
+		0,									// range
+		0,									// fuelrange
+		3000,								// fire interval
+		300,								// damage
 		50,									// damageRadius
 		1,									// spread
 		2,									// barrels
@@ -934,7 +934,7 @@ completeWeaponData_t availableWeapons[] =
 		CAT_PLANE,							// fits on category
 		PF_AG_HVY,							// fits on pylon  !! PF_AG_HVY&PF_AG_GDA !!
 		0,									// basicECMVulnerability
-		WF_HAS_FIRE_FRAME,					// flags
+		0,									// flags
 	},
 
 		// durandal
@@ -961,9 +961,9 @@ completeWeaponData_t availableWeapons[] =
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
-		0.985f,								// lockcone (dot)
-		0.996f,								// followcone (dot)
-		1500,								// locktime
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
 		CH_MISSILEMODE,						// crosshair
 		CH_MISSILEMODETRACK,				// crosshair track
 		CH_MISSILEMODELOCK,					// crosshair lock
@@ -993,17 +993,17 @@ completeWeaponData_t availableWeapons[] =
 		CAT_PLANE|CAT_HELO,					// cat
 		0.3f,								// non cat mod
 		1000,								// muzzleVelocity
-		2500,								// range
-		8000,								// fuelrange
+		1800,								// range
+		2500,								// fuelrange
 		400,								// fire interval
-		80,									// damage
+		70,									// damage
 		40,									// damageRadius
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
-		0.985f,								// lockcone (dot)
-		0.985f,								// followcone (dot) (0.996)
-		1500,								// locktime
+		0.5f,								// lockcone (dot)
+		0.5f,								// followcone (dot) (0.996)
+		1000,								// locktime
 		CH_MISSILEMODE,						// crosshair
 		CH_MISSILEMODETRACK,				// crosshair track
 		CH_MISSILEMODELOCK,					// crosshair lock
@@ -1013,7 +1013,7 @@ completeWeaponData_t availableWeapons[] =
 		1,									// number per package
 		CAT_PLANE|CAT_HELO,					// fits on category
 		PF_AA_LT,							// fits on pylon
-		25,									// basicECMVulnerability
+		30,									// basicECMVulnerability
 		WF_HAS_FIRE_FRAME,					// flags
 	},
 
@@ -1033,16 +1033,16 @@ completeWeaponData_t availableWeapons[] =
 		CAT_PLANE|CAT_HELO,					// cat
 		0.3f,								// non cat mod
 		1500,								// muzzleVelocity
-		5000,								// range
-		8000,								// fuelrange
+		4500,								// range
+		6500,								// fuelrange
 		600,								// fire interval
-		100,								// damage
+		90,									// damage
 		60,									// damageRadius
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
-		0.985f,								// lockcone (dot)
-		0.996f,								// followcone (dot)
+		0.7f,								// lockcone (dot)
+		0.7f,								// followcone (dot)
 		1500,								// locktime
 		CH_MISSILEMODE,						// crosshair
 		CH_MISSILEMODETRACK,				// crosshair track
@@ -1073,16 +1073,16 @@ completeWeaponData_t availableWeapons[] =
 		CAT_PLANE|CAT_HELO,					// cat
 		0.3f,								// non cat mod
 		2200,								// muzzleVelocity
-		10000,								// range
-		8000,								// fuelrange
+		8000,								// range
+		11000,								// fuelrange
 		900,								// fire interval
 		120,								// damage
 		90,									// damageRadius
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
-		0.985f,								// lockcone (dot)
-		0.996f,								// followcone (dot)
+		0.9f,								// lockcone (dot)
+		0.9f,								// followcone (dot)
 		1500,								// locktime
 		CH_MISSILEMODE,						// crosshair
 		CH_MISSILEMODETRACK,				// crosshair track
@@ -1093,7 +1093,7 @@ completeWeaponData_t availableWeapons[] =
 		1,									// number per package
 		CAT_PLANE,							// fits on category
 		PF_AA_HVY,							// fits on pylon
-		25,									// basicECMVulnerability
+		20,									// basicECMVulnerability
 		WF_HAS_FIRE_FRAME,					// flags
 	},
 
@@ -1112,11 +1112,11 @@ completeWeaponData_t availableWeapons[] =
 		0,									// iconHandle
 		CAT_PLANE|CAT_HELO,					// cat
 		0.3f,								// non cat mod
-		3300,								// muzzleVelocity
-		20000,								// range
-		8000,								// fuelrange
+		3500,								// muzzleVelocity
+		18000,								// range
+		20000,								// fuelrange
 		1200,								// fire interval
-		150,								// damage
+		300,								// damage
 		120,								// damageRadius
 		1,									// spread
 		2,									// barrels
@@ -1133,7 +1133,7 @@ completeWeaponData_t availableWeapons[] =
 		1,									// number per package
 		CAT_PLANE,							// fits on category
 		PF_AA_PHX,							// fits on pylon
-		25,									// basicECMVulnerability
+		15,									// basicECMVulnerability
 		WF_HAS_FIRE_FRAME,					// flags
 	},
 
@@ -1152,17 +1152,17 @@ completeWeaponData_t availableWeapons[] =
 		0,									// iconHandle
 		CAT_ANY,							// cat
 		0.3f,								// non cat mod
-		1500,								// muzzleVelocity
-		8000,								// range
-		8000,								// fuelrange
-		1500,								// fire interval
-		80,									// damage
-		50,									// damageRadius
+		1100,								// muzzleVelocity
+		4500,								// range
+		9000,								// fuelrange
+		500,								// fire interval
+		60,									// damage
+		40,									// damageRadius
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
-		0.985f,								// lockcone (dot)
-		0.996f,								// followcone (dot)
+		0.7f,								// lockcone (dot)
+		0.7f,								// followcone (dot)
 		1500,								// locktime
 		CH_MISSILEMODE,						// crosshair
 		CH_MISSILEMODETRACK,				// crosshair track
@@ -1313,11 +1313,11 @@ completeWeaponData_t availableWeapons[] =
 		CAT_GROUND,							// cat
 		0.3f,								// non cat mod
 		1000,								// muzzleVelocity
-		6000,								// range
-		5000,								// fuelrange
+		4500,								// range
+		6500,								// fuelrange
 		500,								// fire interval
-		300,								// damage
-		50,									// damageRadius
+		110,								// damage
+		40,									// damageRadius
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
@@ -1355,16 +1355,16 @@ completeWeaponData_t availableWeapons[] =
 		CAT_GROUND,							// cat
 		0.3f,								// non cat mod
 		1000,								// muzzleVelocity
-		8000,								// range
-		5000,								// fuelrange
-		500,								// fire interval
-		400,								// damage
+		4500,								// range
+		6500,								// fuelrange
+		2000,								// fire interval
+		150,								// damage
 		50,									// damageRadius
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
-		0.985f,								// lockcone (dot)
-		0.996f,								// followcone (dot)
+		0.5f,								// lockcone (dot)
+		0.5f,								// followcone (dot)
 		1500,								// locktime
 		CH_MISSILEMODE,						// crosshair
 		CH_MISSILEMODETRACK,				// crosshair track
@@ -1394,18 +1394,18 @@ completeWeaponData_t availableWeapons[] =
 		0,									// iconHandle
 		CAT_GROUND,							// cat
 		0.3f,								// non cat mod
-		1000,								// muzzleVelocity
-		8000,								// range
-		5000,								// fuelrange
+		3000,								// muzzleVelocity
+		5000,								// range
+		6000,								// fuelrange
 		500,								// fire interval
-		400,								// damage
-		50,									// damageRadius
+		500,								// damage
+		70,									// damageRadius
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
 		0.985f,								// lockcone (dot)
 		0.996f,								// followcone (dot)
-		1500,								// locktime
+		700,								// locktime
 		CH_MISSILEMODE,						// crosshair
 		CH_MISSILEMODETRACK,				// crosshair track
 		CH_MISSILEMODELOCK,					// crosshair lock
@@ -1418,6 +1418,50 @@ completeWeaponData_t availableWeapons[] =
 		25,									// basicECMVulnerability
 		WF_HAS_FIRE_FRAME,					// flags
 	},
+
+
+
+	// AA SAM
+	{ 
+		WT_ANTIAIRMISSILE,					// type
+		MF_GAMESET_ANY,						// gameset
+		"SAM",								// descriptiveName
+		"SAM",								// shortName
+		"THE-SAM",							// shortName2 (GVs)
+		"models/weapons/missile_sam.md3",	// modelName
+		0,									// handle
+		"models/weapons/missile_sam.md3",	// vwepName
+		0,									// vwephandle
+		"hud/iconw_rkt.tga",				// iconName
+		0,									// iconHandle
+		CAT_PLANE|CAT_HELO,					// cat
+		0.3f,								// non cat mod
+		1000,								// muzzleVelocity
+		4500,								// range
+		13000,								// fuelrange
+		3200,								// fire interval
+		100,								// damage
+		100,								// damageRadius
+		1,									// spread
+		2,									// barrels
+		0,									// barrelDistance
+		0.7f,								// lockcone (dot)
+		0.7f,								// followcone (dot)
+		1500,								// locktime
+		CH_MISSILEMODE,						// crosshair
+		CH_MISSILEMODETRACK,				// crosshair track
+		CH_MISSILEMODELOCK,					// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
+		1,									// number per package
+		CAT_PLANE,							// fits on category
+		PF_AA_MED,							// fits on pylon
+		40,									// basicECMVulnerability
+		WF_HAS_FIRE_FRAME,					// flags
+	},
+
+
 
 	// ECM
 	{ 
