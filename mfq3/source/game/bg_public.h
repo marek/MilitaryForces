@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.71 2002-02-22 11:43:26 thebjoern Exp $
+ * $Id: bg_public.h,v 1.72 2002-02-23 19:31:55 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.63c"
+#define	GAME_VERSION		"mfq3 v0.63e"
 
 #define	DEFAULT_GRAVITY		800
 
@@ -325,6 +325,8 @@ typedef enum {
 	EV_BAY_UP_FULL,			// close fully
 	EV_BAY_DOWN_FULL,		// open fully
 	EV_BAY_STOP,			// stop bay anim as it is
+
+	EV_GET_DEFAULT_LOADOUT,	// weapon loadout
 
 	EV_DEBUG_LINE
 
@@ -678,6 +680,44 @@ enum ShadowOrientationAdjusts {
 	SHO_ROLLMOD
 };
 
+
+// all the pylons come in pairs
+#define PT_NA				0x0000
+#define	PT_WINGTIP			0x0001			// wingtip, paired, one AAM
+#define	PT_WING_L			0x0002			// outer wing, paired, one AAM, or AGM, FFAR
+#define	PT_BODY_L			0x0004			// body, paired, single
+#define	PT_BODY_CENTER_L	0x0008			// body center, single
+#define	PT_WING_M			0x0010			// outer wing, paired, one AAM, or AGM, FFAR
+#define	PT_BODY_M			0x0020			// body, paired, single
+#define	PT_BODY_CENTER_M	0x0040			// body center, single
+#define	PT_WING_H			0x0080			// innter wing, paired, several AAM/AGM/BOMBS/etc
+#define	PT_BODY_H			0x0100			// body, paired, several
+#define	PT_BODY_CENTER_H	0x0200			// body center, several
+#define	PT_BAY				0x0400			// bay, paired
+#define	PT_BAY_CENTER		0x0800			// bay center, single
+#define PT_H				0x0380
+#define PT_L				0x000E
+#define PT_M				0x0070
+#define PT_WING				0x0092
+#define	PT_ALL				0xFFFF
+
+#define MAX_LOADOUTS			50
+#define MAX_TAG_LENGTH			16
+#define MAX_MOUNTS_PER_PYLON	3
+
+typedef struct pylonTags_s 
+{
+	char				tagname[MAX_MOUNTS_PER_PYLON*2][MAX_TAG_LENGTH];
+} pylonTags_t;
+
+typedef struct completeLoadout_s
+{
+	unsigned int		type[MAX_WEAPONS_PER_VEHICLE];			// type of mount
+	unsigned int		weaponType[MAX_WEAPONS_PER_VEHICLE];	// which weapontype is on it
+	unsigned int		mountedWeapons[MAX_WEAPONS_PER_VEHICLE];// how many actually on
+	pylonTags_t			tags[MAX_WEAPONS_PER_VEHICLE];
+} completeLoadout_t;
+
 // list of vehicles (data)
 typedef struct completeVehicleData_s
 {
@@ -714,6 +754,7 @@ typedef struct completeVehicleData_s
 	unsigned int	weapons[MAX_WEAPONS_PER_VEHICLE];// use index from available Weapons
 	unsigned int	ammo[MAX_WEAPONS_PER_VEHICLE];// how much of them (is also max_ammo)
 	unsigned int	turret[MAX_WEAPONS_PER_VEHICLE];// on which turret is this weapon
+	unsigned int	pylons[MAX_WEAPONS_PER_VEHICLE];// which pylons do we have
 	vec3_t			cockpitview;	// to place the camera
 	unsigned int	effectModel;	// num of afterburner model (for planes)
 	unsigned int	radarRange;		// how far goes the radar AIR
@@ -735,6 +776,9 @@ extern completeVehicleData_t availableVehicles[];
 // number of available vehicles
 extern int bg_numberOfVehicles;
 
+extern completeLoadout_t defaultLoadout;
+extern completeLoadout_t availableLoadouts[MAX_LOADOUTS];
+
 // types of weapons
 typedef enum {
 	WT_MACHINEGUN,
@@ -748,6 +792,10 @@ typedef enum {
 	WT_FLARE
 }weaponType_t;
 
+// weaponflags
+#define	WF_NONE						0
+#define WF_NON_REMOVABLE_VWEP		1
+
 // list of weapons
 typedef struct completeWeaponData_s
 {
@@ -757,6 +805,9 @@ typedef struct completeWeaponData_s
 	char			*shortName;			// displayed in-game, short form
 	char			*shortName2;		// displayed in-game, short form, but for GVs
 	char			*modelName;			// model
+	qhandle_t		modelHandle;		// handle
+	char			*vwepName;			// model
+	qhandle_t		vwepHandle;			// handle
 	char			*iconName;			// icon for HUD
 	qhandle_t		iconHandle;			// handle for icon
 	unsigned int	category;			// which category can it damage
@@ -779,7 +830,11 @@ typedef struct completeWeaponData_s
 	unsigned int	turret;				// is it a turret
 	vec3_t			maxturns;			// max turn angles if turret
 	vec3_t			minturns;			// min turn angles if turret
+	unsigned int	numberPerPackage;	// for example how many rockets in FFAR etc (per mount)
+	unsigned int	fitsPylon;			// on which type of pylon does this go 
+	unsigned int	flags;
 }completeWeaponData_t;
+
 
 // list of weapons...
 extern completeWeaponData_t	availableWeapons[];
@@ -828,6 +883,11 @@ void MF_LimitFloat( float * value, float min, float max );
 void MF_LimitInt( int * value, int min, int max );
 int MF_ExtractEnumFromId( int vehicle, unsigned int op );
 qboolean MF_findTag(const char* fileName, const char* tagname, md3Tag_t* tag);
+qboolean MF_distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout );
+void MF_calculateAllDefaultLoadouts();
+void MF_getDefaultLoadoutForVehicle( int idx, completeLoadout_t* loadout );
+qboolean MF_removeWeaponFromLoadout( int weaponIndex, completeLoadout_t* loadout, char* usedTag );
+void MF_addWeaponToLoadout( int weaponIndex, completeLoadout_t* loadout );
 
 #define MF_THROTTLE_REVERSE		-5
 #define MF_THROTTLE_IDLE		0
@@ -869,6 +929,7 @@ qboolean MF_findTag(const char* fileName, const char* tagname, md3Tag_t* tag);
 // render flags
 #define MFR_DUALPILOT			1
 #define MFR_BIGVAPOR			2
+#define MFR_VWEP				4
 
 // misc
 #define MAX_MUZZLEFLASHES		8

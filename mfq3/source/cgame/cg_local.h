@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.39 2002-02-22 11:39:40 thebjoern Exp $
+ * $Id: cg_local.h,v 1.40 2002-02-23 19:31:55 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -211,7 +211,6 @@ typedef struct centity_s {
 	int				bayAnimStartTime;
 
 	int				muzzleFlashWeapon;
-
 } centity_t;
 
 
@@ -938,6 +937,10 @@ extern	weaponInfo_t	cg_weapons[WI_MAX];
 extern	itemInfo_t		cg_items[MAX_ITEMS];
 extern	markPoly_t		cg_markPolys[MAX_MARK_POLYS];
 
+// MFQ3
+extern	completeLoadout_t cg_loadouts[MAX_GENTITIES];
+// -MFQ3
+
 extern	vmCvar_t		cg_centertime;
 extern	vmCvar_t		cg_runpitch;
 extern	vmCvar_t		cg_runroll;
@@ -1203,6 +1206,8 @@ void CG_RegisterVehicle( clientInfo_t *ci );
 void CG_VehicleObituary( entityState_t *ent );
 void CG_VehicleMuzzleFlash( centity_t *cent, const refEntity_t *parent, qhandle_t parentModel, int idx );
 void CG_Misc_Vehicle( centity_t *cent );
+void CG_VehicleLoadout( centity_t* cent );
+
 //
 // cg_plane.c
 //

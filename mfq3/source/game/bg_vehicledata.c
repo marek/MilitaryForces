@@ -1,9 +1,26 @@
 /*
- * $Id: bg_vehicledata.c,v 1.29 2002-02-22 11:39:40 thebjoern Exp $
+ * $Id: bg_vehicledata.c,v 1.30 2002-02-23 19:31:55 thebjoern Exp $
 */
 
 #include "q_shared.h"
 #include "bg_public.h"
+
+completeLoadout_t defaultLoadout =
+{
+	{0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0},
+	{{"","","","","",""},
+	 {"","","","","",""},
+	 {"","","","","",""},
+	 {"","","","","",""},
+	 {"","","","","",""},
+	 {"","","","","",""},
+	 {"","","","","",""},
+	{"","","","","",""}}
+};
+
+completeLoadout_t availableLoadouts[MAX_LOADOUTS];
 
 // just contains data of all the available vehicles
 completeVehicleData_t availableVehicles[] = 
@@ -43,7 +60,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// tailangle
 	WI_MG_20MM, WI_AMRAAM, WI_SIDEWINDER, WI_MAVERICK, WI_FFAR, 0, 0, WI_FLARE,	// weapons  WI_MG_20MM
 	450, 4, 2, 2, 38, 0, 0, 30,		// ammo
-	0,0,0,0,0,0,0,0,			// turret
+	0,0,0,0,0,0,0,0,			// turret - useful ??
+	0,0,0,0,0,0,0,0,			// pylons
 	{19, 0, 5},					// cameraposition for cockpit view
 	AB_BALL,					// effect model
 	8000,						// radar range
@@ -93,6 +111,7 @@ completeVehicleData_t availableVehicles[] =
 	WI_MG_20MM, WI_AMRAAM, WI_SIDEWINDER, 0, 0, 0, 0, WI_FLARE,		// weapons
 	450, 5, 4, 0, 0, 0, 0, 28,	// ammo
 	0,0,0,0,0,0,0,0,			// turret
+	0,0,0,0,0,0,0,0,			// pylons
 	{19, 0, 5},					// cameraposition for cockpit view
 	AB_BALL,					// effect model
 	10000,						// radar range
@@ -139,9 +158,10 @@ completeVehicleData_t availableVehicles[] =
 	60,							// max fuel
 	3,							// gearheight
 	0,							// tailangle
-	WI_MG_20MM, WI_AMRAAM, WI_SIDEWINDER, 0, 0, 0, 0, WI_FLARE,		// weapons
-	450, 5, 4, 0, 0, 0, 0, 28,	// ammo
+	WI_MG_20MM, WI_SIDEWINDER, WI_AMRAAM, WI_FFAR, 0, 0, 0, WI_FLARE,		// weapons
+	450, 4, 2, 38, 0, 0, 0, 28,	// ammo
 	0,0,0,0,0,0,0,0,			// turret
+	PT_WING_L,PT_WING_L,PT_WING_H,PT_WING_H,0,0,0,0,// pylons
 	{19, 0, 5},					// cameraposition for cockpit view
 	AB_BALL,					// effect model
 	10000,						// radar range
@@ -191,6 +211,7 @@ completeVehicleData_t availableVehicles[] =
 	WI_MG_2X20MM, WI_AMRAAM, WI_SIDEWINDER, WI_FFAR, 0, 0, 0, WI_FLARE,	// weapons
 	500, 2, 2, 38, 0, 0, 0, 32,		// ammo
 	0,0,0,0,0,0,0,0,			// turret
+	0,0,0,0,0,0,0,0,			// pylons
 	{11, 0, 5},					// cameraposition for cockpit view
 	AB_RED_SMALL,				// effect model
 	6000,						// radar range
@@ -240,6 +261,7 @@ completeVehicleData_t availableVehicles[] =
 	WI_MG_20MM, WI_AMRAAM, WI_SIDEWINDER, WI_MK82, 0, 0, 0, WI_FLARE,	// weapons
 	450, 2, 4, 16, 0, 0, 0, 35,		// ammo
 	0,0,0,0,0,0,0,0,			// turret
+	0,0,0,0,0,0,0,0,			// pylons
 	{28, 0, 6},					// cameraposition for cockpit view
 	AB_RED,						// effect model
 	12000,						// radar range
@@ -289,6 +311,7 @@ completeVehicleData_t availableVehicles[] =
 	WI_MG_20MM, WI_PHOENIX, WI_SIDEWINDER, 0, 0, 0, 0, WI_FLARE,	// weapons
 	450, 6, 2, 0, 0, 0, 0, 35,		// ammo
 	0,0,0,0,0,0,0,0,			// turret
+	0,0,0,0,0,0,0,0,			// pylons
 	{28, 0, 6},					// cameraposition for cockpit view
 	AB_RED,						// effect model
 	16000,						// radar range
@@ -338,6 +361,7 @@ completeVehicleData_t availableVehicles[] =
 	WI_MG_20MM, WI_FFAR, WI_MK82, WI_SIDEWINDER, WI_AMRAAM, WI_PHOENIX, WI_HELLFIRE, WI_FLARE,	// weapons
 	450, 24, 8, 4, 4, 4, 8, 30,		// ammo
 	0,0,0,0,0,0,0,0,			// turret
+	0,0,0,0,0,0,0,0,			// pylons
 	{19, 0, 5},					// cameraposition for cockpit view
 	AB_BALL,					// effect model
 	7500,						// radar range
@@ -387,6 +411,7 @@ completeVehicleData_t availableVehicles[] =
 	WI_MG_20MM, WI_FFAR, WI_MK82, WI_SIDEWINDER, WI_AMRAAM, WI_PHOENIX, WI_HELLFIRE, WI_FLARE,	// weapons
 	450, 24, 8, 4, 4, 4, 8, 30,		// ammo
 	0,0,0,0,0,0,0,0,			// turret
+	0,0,0,0,0,0,0,0,			// pylons
 	{19, 0, 5},					// cameraposition for cockpit view
 	AB_BALL,					// effect model
 	7500,						// radar range
@@ -436,6 +461,7 @@ completeVehicleData_t availableVehicles[] =
 	WI_MG_20MM, WI_MK82, WI_MAVERICK, 0, 0, 0, 0, WI_FLARE,	// weapons
 	450, 16, 4, 0, 0, 0, 0, 30,		// ammo
 	0,0,0,0,0,0,0,0,			// turret
+	0,0,0,0,0,0,0,0,			// pylons
 	{19, 0, 5},					// cameraposition for cockpit view
 	AB_BALL,					// effect model
 	8000,						// radar range
@@ -486,6 +512,7 @@ completeVehicleData_t availableVehicles[] =
 	WI_MG_6XCAL50, 0, 0, 0, 0, 0, 0, 0,		// weapons
 	450, 0, 0, 0, 0, 0, 0, 0,	// ammo
 	0,0,0,0,0,0,0,0,			// turret
+	0,0,0,0,0,0,0,0,			// pylons
 	{-4, 0, 8},					// cameraposition for cockpit view
 	0,							// effect model
 	0,							// radar range
@@ -536,6 +563,7 @@ completeVehicleData_t availableVehicles[] =
 	WI_MG_8XCAL50, 0, 0, 0, 0, 0, 0, 0,		// weapons
 	450, 0, 0, 0, 0, 0, 0, 0,	// ammo
 	0,0,0,0,0,0,0,0,			// turret
+	0,0,0,0,0,0,0,0,			// pylons
 	{-4, 0, 6},					// cameraposition for cockpit view
 	0,							// effect model
 	0,							// radar range
@@ -586,6 +614,7 @@ completeVehicleData_t availableVehicles[] =
 	WI_MG_8XCAL50, 0, 0, 0, 0, 0, 0, 0,		// weapons
 	450, 0, 0, 0, 0, 0, 0, 0,	// ammo
 	0,0,0,0,0,0,0,0,			// turret
+	0,0,0,0,0,0,0,0,			// pylons
 	{-4, 0, 6},					// cameraposition for cockpit view
 	0,							// effect model
 	0,							// radar range
@@ -636,6 +665,7 @@ completeVehicleData_t availableVehicles[] =
 	WI_MG_8XCAL50, 0, 0, 0, 0, 0, 0, 0,		// weapons
 	450, 0, 0, 0, 0, 0, 0, 0,	// ammo
 	0,0,0,0,0,0,0,0,			// turret
+	0,0,0,0,0,0,0,0,			// pylons
 	{-4, 0, 6},					// cameraposition for cockpit view
 	0,							// effect model
 	0,							// radar range
@@ -687,6 +717,7 @@ completeVehicleData_t availableVehicles[] =
 	WI_MG_8XCAL50, WI_MK82, 0, 0, 0, 0, 0, 0,		// weapons
 	450, 10, 0, 0, 0, 0, 0, 0,	// ammo
 	0,0,0,0,0,0,0,0,			// turret
+	0,0,0,0,0,0,0,0,			// pylons
 	{-4, 0, 6},					// cameraposition for cockpit view
 	0,							// effect model
 	0,							// radar range
@@ -737,6 +768,7 @@ completeVehicleData_t availableVehicles[] =
 	WI_MG_2XCAL312, 0, 0, 0, 0, 0, 0, 0,		// weapons
 	450, 0, 0, 0, 0, 0, 0, 0,	// ammo
 	0,0,0,0,0,0,0,0,			// turret
+	0,0,0,0,0,0,0,0,			// pylons
 	{-4, 0, 6},					// cameraposition for cockpit view
 	0,							// effect model
 	0,							// radar range
@@ -787,6 +819,7 @@ completeVehicleData_t availableVehicles[] =
 	WI_MG_2XCAL303, 0, 0, 0, 0, 0, 0, 0,		// weapons
 	450, 0, 0, 0, 0, 0, 0, 0,	// ammo
 	0,0,0,0,0,0,0,0,			// turret
+	0,0,0,0,0,0,0,0,			// pylons
 	{-4, 0, 6},					// cameraposition for cockpit view
 	0,							// effect model
 	0,							// radar range
@@ -839,6 +872,7 @@ completeVehicleData_t availableVehicles[] =
 	WI_MG_12_7MM, WI_125MM_GUN, WI_STINGER, WI_HELLFIRE, 0, 0, 0, WI_FLARE,// weapons
 	500, 40, 4, 2, 0, 0, 0, 20,	// ammo
 	0,0,0,0,0,0,0,0,			// turret
+	0,0,0,0,0,0,0,0,			// pylons
 	{0, 0, 14},					// cameraposition for cockpit view
 	0,							// effect model
 	8000,						// radar range
@@ -887,6 +921,7 @@ completeVehicleData_t availableVehicles[] =
 	WI_MG_12_7MM, WI_125MM_GUN, WI_STINGER, WI_HELLFIRE, 0, 0, 0, WI_FLARE,// weapons
 	500, 40, 4, 2, 0, 0, 0, 20,	// ammo
 	0,0,0,0,0,0,0,0,			// turret
+	0,0,0,0,0,0,0,0,			// pylons
 	{0, 0, 14},					// cameraposition for cockpit view
 	0,							// effect model
 	8000,						// radar range
@@ -935,6 +970,7 @@ completeVehicleData_t availableVehicles[] =
 	WI_MG_14_5MM, WI_100MM_GUN, WI_STINGER, WI_HELLFIRE, 0, 0, 0, WI_FLARE,// weapons
 	500, 35, 2, 2, 0, 0, 0, 20,	// ammo
 	0,0,0,0,0,0,0,0,			// turret
+	0,0,0,0,0,0,0,0,			// pylons
 	{0, 0, 10},					// cameraposition for cockpit view
 	0,							// effect model
 	8000,						// radar range
@@ -983,6 +1019,7 @@ completeVehicleData_t availableVehicles[] =
 	WI_MG_12_7MM, 0, 0, 0, 0, 0, 0, WI_FLARE,// weapons
 	500, 0, 0, 0, 0, 0, 0, 20,	// ammo
 	0,0,0,0,0,0,0,0,			// turret
+	0,0,0,0,0,0,0,0,			// pylons
 	{0, 0, 10},					// cameraposition for cockpit view
 	0,							// effect model
 	8000,						// radar range
@@ -1031,6 +1068,7 @@ completeVehicleData_t availableVehicles[] =
 	WI_MG_14_5MM, WI_STINGER, WI_HELLFIRE, 0, 0, 0, 0, WI_FLARE,// weapons
 	600, 2, 4, 0, 0, 0, 0, 20,	// ammo
 	0,0,0,0,0,0,0,0,			// turret
+	0,0,0,0,0,0,0,0,			// pylons
 	{0, 0, 10},					// cameraposition for cockpit view
 	0,							// effect model
 	8000,						// radar range
@@ -1079,6 +1117,7 @@ completeVehicleData_t availableVehicles[] =
 	WI_MG_12_7MM, WI_125MM_GUN, 0, 0, 0, 0, 0, WI_FLARE,// weapons
 	500, 40, 0, 0, 0, 0, 0, 20,	// ammo
 	0,0,0,0,0,0,0,0,			// turret
+	0,0,0,0,0,0,0,0,			// pylons
 	{0, 0, 14},					// cameraposition for cockpit view
 	0,							// effect model
 	8000,						// radar range
@@ -1131,6 +1170,7 @@ completeVehicleData_t availableVehicles[] =
 	0, WI_MGT_2X30MM, WI_MGT_12_7MM, 0, 0, 0, 0, WI_FLARE,// weapons
 	0, 500, 300, 0, 0, 0, 0, 20,	// ammo
 	1,2,0,0,0,0,0,0,			// turret
+	0,0,0,0,0,0,0,0,			// pylons
 	{0, 0, 6},					// cameraposition for cockpit view
 	0,							// effect model
 	8000,						// radar range

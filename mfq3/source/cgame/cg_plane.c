@@ -1,5 +1,5 @@
 /*
- * $Id: cg_plane.c,v 1.24 2002-02-21 16:41:25 sparky909_uk Exp $
+ * $Id: cg_plane.c,v 1.25 2002-02-23 19:31:55 thebjoern Exp $
 */
 
 
@@ -343,6 +343,29 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 	}
 	CG_PlanePilot( cent, &part[BP_PLANE_BODY], ci->parts[BP_PLANE_BODY], ci->vehicle );
 	
+	// vwep
+	if( availableVehicles[ci->vehicle].renderFlags & MFR_VWEP ) {
+		refEntity_t			vwep;
+		int					ii = 0, num;
+		completeLoadout_t*	loadout = &cg_loadouts[cent->currentState.number];
+		for( i = 0; i < MAX_WEAPONS_PER_VEHICLE; ++i ) {
+			num = loadout->mountedWeapons[i];
+			if( loadout->type[i] && num ) {
+				for( ii = 0; ii < MAX_MOUNTS_PER_PYLON*2, num; ++ii, --num ) {
+					memset( &vwep, 0, sizeof(vwep) );		
+					vwep.hModel = availableWeapons[loadout->weaponType[i]].vwepHandle;
+					VectorCopy( cent->lerpOrigin, vwep.lightingOrigin );
+					AxisCopy( axisDefault, vwep.axis );
+					CG_PositionEntityOnTag( &vwep, &part[BP_PLANE_BODY], ci->parts[BP_PLANE_BODY], 
+							loadout->tags[i].tagname[ii] );
+					vwep.shadowPlane = shadowPlane;
+					vwep.renderfx = renderfx;
+					trap_R_AddRefEntityToScene( &vwep );
+				}
+			}
+		}
+	}
+
 	// vapor
 	if( ONOFF & OO_VAPOR ) {
 		vapor.hModel = (availableVehicles[ci->vehicle].renderFlags & MFR_BIGVAPOR) ?
@@ -354,7 +377,7 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 		}
 		VectorCopy( cent->lerpOrigin, vapor.lightingOrigin );
 		AxisCopy( axisDefault, vapor.axis );
-		CG_PositionRotatedEntityOnTag( &vapor, &part[BP_PLANE_BODY], ci->parts[BP_PLANE_BODY], "tag_vapor1" );
+		CG_PositionEntityOnTag( &vapor, &part[BP_PLANE_BODY], ci->parts[BP_PLANE_BODY], "tag_vapor1" );
 		vapor.shadowPlane = shadowPlane;
 		vapor.renderfx = renderfx;
 		trap_R_AddRefEntityToScene( &vapor );
@@ -366,7 +389,7 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 		burner.hModel = cgs.media.afterburner[availableVehicles[ci->vehicle].effectModel];
 		VectorCopy( cent->lerpOrigin, burner.lightingOrigin );
 		AxisCopy( axisDefault, burner.axis );
-		CG_PositionRotatedEntityOnTag( &burner, &part[BP_PLANE_BODY], ci->parts[BP_PLANE_BODY], "tag_ab1" );
+		CG_PositionEntityOnTag( &burner, &part[BP_PLANE_BODY], ci->parts[BP_PLANE_BODY], "tag_ab1" );
 		burner.shadowPlane = shadowPlane;
 		burner.renderfx = renderfx;
 		burner.frame = ( cent->currentState.frame > 12 ? 0 : 1 );

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.17 2002-02-22 11:39:40 thebjoern Exp $
+ * $Id: bg_mfq3util.c,v 1.18 2002-02-23 19:31:55 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -295,3 +295,200 @@ qboolean MF_findTag(const char* fileName, const char* tagname, md3Tag_t* tag)
 	}
 	return found;
 }
+
+
+
+/*
+=================
+MF_distributeWeaponsOnPylons
+
+weapon mount info
+=================
+*/
+
+qboolean MF_distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout )
+{
+	int	i, j, numPylons = 0, numWeaps = 0;
+	int	weaps[MAX_WEAPONS_PER_VEHICLE-2];
+	int ammos[MAX_WEAPONS_PER_VEHICLE-2];
+	int pyls[MAX_WEAPONS_PER_VEHICLE];
+	qboolean done;
+
+	if( idx < 0 ) return qfalse;
+
+	Com_Printf( "Calculating weapon stations for %s\n", availableVehicles[idx].tinyName );
+
+	for( i = 0; i < MAX_WEAPONS_PER_VEHICLE; ++i ) {
+		pyls[i] = availableVehicles[idx].pylons[i];
+		if( availableVehicles[idx].pylons[i] ) numPylons++;
+	}
+
+	if( !numPylons ) {
+		Com_Printf( "No weapon stations available for this vehicle!\n" );
+		return qfalse;
+	}
+
+	Com_Printf( "%d weapon stations available for this vehicle!\n", numPylons );
+
+	for( i = WP_WEAPON1; i < WP_FLARE; ++i ) {
+		weaps[i-1] = availableVehicles[idx].weapons[i];
+		ammos[i-1] = availableVehicles[idx].ammo[i];
+		if( availableVehicles[idx].weapons[i] ) numWeaps++;
+	}
+
+	for( i = 0; i < numPylons; ++i ) {
+		int mounts = 0;
+		char temp[16];
+		switch( pyls[i] ) {
+		case PT_WINGTIP:
+			strcpy( loadout->tags[i].tagname[0], "tag_tip_l" );
+			strcpy( loadout->tags[i].tagname[1], "tag_tip_r" );
+			mounts = 2;
+			break;
+		case PT_WING_L:
+		case PT_BODY_L:
+		case PT_WING_M:
+		case PT_BODY_M:
+			Com_sprintf(temp, 15, "tag_mt%d_l", i+1 );
+			strcpy( loadout->tags[i].tagname[0], temp );
+			Com_sprintf(temp, 15, "tag_mt%d_r", i+1 );
+			strcpy( loadout->tags[i].tagname[1], temp );
+			mounts = 2;
+			break;
+		case PT_WING_H:
+		case PT_BODY_H:
+		case PT_BODY_CENTER_H:
+			Com_sprintf(temp, 15, "tag_mt%d_1_l", i+1 );
+			strcpy( loadout->tags[i].tagname[0], temp );
+			Com_sprintf(temp, 15, "tag_mt%d_1_r", i+1 );
+			strcpy( loadout->tags[i].tagname[1], temp );
+			Com_sprintf(temp, 15, "tag_mt%d_2_r", i+1 );
+			strcpy( loadout->tags[i].tagname[2], temp );
+			Com_sprintf(temp, 15, "tag_mt%d_2_l", i+1 );
+			strcpy( loadout->tags[i].tagname[3], temp );
+			Com_sprintf(temp, 15, "tag_mt%d_3_l", i+1 );
+			strcpy( loadout->tags[i].tagname[4], temp );
+			Com_sprintf(temp, 15, "tag_mt%d_3_r", i+1 );
+			strcpy( loadout->tags[i].tagname[5], temp );
+			mounts = 6;
+			break;
+		case PT_BODY_CENTER_L:
+		case PT_BODY_CENTER_M:
+		case PT_BAY:
+		case PT_BAY_CENTER:
+			Com_sprintf(temp, 15, "tag_mt%d_l", i+1 );
+			strcpy( loadout->tags[i].tagname[0], temp );
+			Com_sprintf(temp, 15, "tag_mt%d_r", i+1 );
+			strcpy( loadout->tags[i].tagname[1], temp );
+			mounts = 1;
+			break;
+		}
+		loadout->type[i] = pyls[i];
+		done = qfalse;
+		for( j = 0; j < numWeaps; ++j ) {
+			if( !ammos[j] ) continue;
+			if( availableWeapons[weaps[j]].fitsPylon & pyls[i] ) {
+				int num;
+				if( mounts * availableWeapons[weaps[j]].numberPerPackage > ammos[j] ) {
+					num = ammos[j];
+				} else {
+					num = mounts * availableWeapons[weaps[j]].numberPerPackage;
+				}
+				ammos[j] -= num;
+				loadout->weaponType[i] = weaps[j];
+				loadout->mountedWeapons[i] = num / availableWeapons[weaps[j]].numberPerPackage;
+				done = qtrue;
+			}
+			if( done ) break;
+		}
+	}
+
+	// print out
+	Com_Printf( "Loadout is:\n" );
+	for( i = 0; i < numPylons; ++i ) {
+		Com_Printf( "Pylon %d (type: %d): %d * %s\n", i, loadout->type[i],
+				loadout->mountedWeapons[i], availableWeapons[loadout->weaponType[i]].descriptiveName );
+		Com_Printf( "Tags are:\n" );
+		for( j = 0; j < MAX_MOUNTS_PER_PYLON*2; ++j ) {
+			Com_Printf( "%s\n", loadout->tags[i].tagname[j] );
+		}
+	}
+
+	return qtrue;
+}
+
+
+
+/*
+=================
+MF_calculateAllDefaultLoadouts
+
+weapon mount info
+=================
+*/
+
+void MF_calculateAllDefaultLoadouts()
+{
+	int i;
+
+	for( i = 0; i < bg_numberOfVehicles; ++i ) {
+		if( !MF_distributeWeaponsOnPylons( i, &availableLoadouts[i] ) ) {
+			memcpy( &availableLoadouts[i], &defaultLoadout, sizeof(completeLoadout_t) );
+		} else {
+			availableVehicles[i].renderFlags |= MFR_VWEP;
+		}
+	}
+}
+
+/*
+=================
+MF_getDefaultLoadoutForVehicle
+
+weapon mount info
+=================
+*/
+
+void MF_getDefaultLoadoutForVehicle( int idx, completeLoadout_t* loadout )
+{
+	if( idx < 0 ) return;
+	memcpy( loadout, &availableLoadouts[idx], sizeof(completeLoadout_t) );
+}
+
+
+/*
+=================
+MF_removeWeaponFromLoadout
+
+firing
+=================
+*/
+
+qboolean MF_removeWeaponFromLoadout( int weaponIndex, completeLoadout_t* loadout, char* usedTag )
+{
+	int i, num;
+
+	for( i = 0; i < MAX_WEAPONS_PER_VEHICLE; ++i ) {
+		if( loadout->weaponType[i] == weaponIndex &&
+			loadout->mountedWeapons[i] &&
+			!(availableWeapons[weaponIndex].flags & WF_NON_REMOVABLE_VWEP) ) {
+			num = --loadout->mountedWeapons[i];
+			if( usedTag ) strcpy( usedTag, loadout->tags[i].tagname[num] );
+			return qtrue;
+		}
+	}
+	return qfalse;
+}
+
+
+/*
+=================
+MF_addWeaponToLoadout
+
+reloading
+=================
+*/
+
+void MF_addWeaponToLoadout( int weaponIndex, completeLoadout_t* loadout )
+{
+}
+
