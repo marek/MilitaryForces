@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.7 2002-02-12 11:40:47 sparky909_uk Exp $
+ * $Id: ui_main.c,v 1.8 2002-02-12 12:35:25 sparky909_uk Exp $
 */
 /*
 =======================================================================
@@ -3262,7 +3262,7 @@ static void UI_RefreshVehicleSelect( void )
 	unsigned long what = 0x00000000;
 
 	// get gameset & team (as MF_GAMESET_x and MF_TEAM_x)
-	gameset = MF_GetGameset();
+	gameset = MF_GetGameset( qfalse );
 	team = MF_UI_GetTeam();
 	
 	// find out the current UI vehicle (based upon the known catagory+class)
