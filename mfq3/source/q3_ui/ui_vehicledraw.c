@@ -1,5 +1,5 @@
 /*
- * $Id: ui_vehicledraw.c,v 1.2 2001-12-04 13:36:47 sparky909_uk Exp $
+ * $Id: ui_vehicledraw.c,v 1.3 2001-12-22 02:01:55 thebjoern Exp $
 */
 
 /*
@@ -588,7 +588,7 @@ static void VehShow_ResetVidiPrint( void ) {
 	} else if( availableVehicles[show_vehicle].id&CAT_ANY & CAT_GROUND ) {
 		strcpy( filename, "models/vehicles/ground" );
 	}
-	sprintf( filename, "%s/%s/%s.info", filename, availableVehicles[show_vehicle].modelName, availableVehicles[show_vehicle].modelName );
+	Com_sprintf( filename, sizeof(filename), "%s/%s/%s.info", filename, availableVehicles[show_vehicle].modelName, availableVehicles[show_vehicle].modelName );
 
 	// open vidi description file
 	fileLength = trap_FS_FOpenFile( filename, &fileHandle, FS_READ );
