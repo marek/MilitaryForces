@@ -1,5 +1,5 @@
 /*
- * $Id: cg_missioneditor.c,v 1.4 2002-06-13 20:08:13 thebjoern Exp $
+ * $Id: cg_missioneditor.c,v 1.5 2002-06-15 18:37:13 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -135,8 +135,17 @@ void ME_PasteSelection()
 
 void ME_ToggleWaypointMode()
 {
+	IGME_vehicle_t* veh = 0;
+
 	if( cgs.IGME.numSelections != 1 ) {
 		CG_Printf( "You have to select a single vehicle to enter WAYPOINTMODE\n" );
+		return;
+	}
+
+	veh = ME_GetSelectedVehicle();
+	if( !veh ) return;
+	if( veh->groundInstallation ) {
+		CG_Printf( "Static units dont really need waypoints, do they ?\n" );
 		return;
 	}
 
@@ -269,7 +278,9 @@ void ME_DeleteSelection()
 			}
 		}
 	} else {
-		IGME_vehicle_t* veh = 0;
+		IGME_vehicle_t*		veh = 0;
+		IGME_waypoint_t*	wpt = 0;
+		int					j;
 		if( !cgs.IGME.numSelections ) return;
 		for( i = 0; i < IGME_MAX_VEHICLES; ++i ) {
 			veh = &cgs.IGME.vehicles[i];
@@ -280,6 +291,13 @@ void ME_DeleteSelection()
 				VectorClear( veh->angles );
 				VectorClear( veh->origin );
 				VectorClear( veh->selectorScale );
+				for( j = 0; j < IGME_MAX_WAYPOINTS; ++j ) {
+					wpt = &veh->waypoints[j];
+					if( !wpt->active ) break; // as they are all in a row
+					wpt->active = qfalse;
+					wpt->selected = qfalse;
+					VectorClear( wpt->origin );
+				}
 			}
 		}
 	}
@@ -379,8 +397,13 @@ IGME_vehicle_t* ME_GetVehicleUnderCrosshair()
 		dist = VectorNormalize( dir );
 		// too far away
 		if( dist > closestDist ) continue;
-		VectorAdd( availableVehicles[veh->vehidx].mins, veh->origin, mins );
-		VectorAdd( availableVehicles[veh->vehidx].maxs, veh->origin, maxs );
+		if( veh->groundInstallation ) {
+			VectorAdd( availableGroundInstallations[veh->vehidx].mins, veh->origin, mins );
+			VectorAdd( availableGroundInstallations[veh->vehidx].maxs, veh->origin, maxs );
+		} else {
+			VectorAdd( availableVehicles[veh->vehidx].mins, veh->origin, mins );
+			VectorAdd( availableVehicles[veh->vehidx].maxs, veh->origin, maxs );
+		}
 		MakeBoxFromExtents(&bbox, mins, maxs, veh->angles);
 		if( RayIntersectBox(&ray, &bbox) ) {
 			closestDist = dist;
@@ -627,140 +650,180 @@ void ME_SpawnVehicle( int vehidx )
 	veh->vehidx = vehidx;
 	veh->active = qtrue;
 	veh->selected = qfalse;
+	veh->groundInstallation = qfalse;
 
 	for( i = 0; i < 3; ++i ) {
 		float wid = availableVehicles[veh->vehidx].maxs[i] - 
 					availableVehicles[veh->vehidx].mins[i];
 		veh->selectorScale[i] = wid/200.0f;
 	}
+}
 
+void ME_SpawnGroundInstallation( int idx )
+{
+	IGME_vehicle_t*	 veh = 0;
+	int i;
+
+	if( cgs.IGME.waypointmode ) {
+		CG_Printf( "You are in waypoint mode, spawning ground installations not allowed now!\n" );
+		return;
+	}
+
+	for( i = 0; i < IGME_MAX_VEHICLES; ++i ) {
+		if( !cgs.IGME.vehicles[i].active ) {
+			veh = &cgs.IGME.vehicles[i];
+			break;
+		}
+	}
+	if( !veh ) {
+		CG_Printf( "Too many vehicles spawned! Please delete one first!\n" );
+		return;
+	}
+
+	VectorCopy( cg.predictedPlayerState.origin, veh->origin );
+	VectorCopy( cg.predictedPlayerState.viewangles, veh->angles );
+	veh->angles[0] = veh->angles[2] = 0;
+	veh->vehidx = idx;
+	veh->active = qtrue;
+	veh->selected = qfalse;
+	veh->groundInstallation = qtrue;
+
+	for( i = 0; i < 3; ++i ) {
+		float wid = availableGroundInstallations[veh->vehidx].maxs[i] - 
+					availableGroundInstallations[veh->vehidx].mins[i];
+		veh->selectorScale[i] = wid/200.0f;
+	}
 }
 
 void ME_DrawVehicle( IGME_vehicle_t* veh ) 
 {
 	if( !veh ) return;
 
-	switch( availableVehicles[veh->vehidx].cat ) {
-	case CAT_PLANE:
-		{
-			refEntity_t part[BP_PLANE_MAX_PARTS];
-			int i;
-			for( i = 0; i < BP_PLANE_MAX_PARTS; i++ ) {
-				memset( &part[i], 0, sizeof(part[0]) );	
-			}	
-			// body
-		    AnglesToAxis( veh->angles, part[BP_PLANE_BODY].axis );
-			part[BP_PLANE_BODY].hModel = availableVehicles[veh->vehidx].handle[BP_PLANE_BODY];		
-			VectorCopy( veh->origin, part[BP_PLANE_BODY].origin );	
-			VectorCopy( veh->origin, part[BP_PLANE_BODY].oldorigin);
-			trap_R_AddRefEntityToScene( &part[BP_PLANE_BODY] );
-			// other parts
-			for( i = 1; i < BP_PLANE_MAX_PARTS; i++ ) {
-				part[i].hModel = availableVehicles[veh->vehidx].handle[i];
-				if( !part[i].hModel ) continue;
-				VectorCopy( veh->origin, part[i].lightingOrigin );
-				AxisCopy( axisDefault, part[i].axis );
-				if( i == BP_PLANE_PROP && (availableVehicles[veh->vehidx].caps & HC_PROP) ) {
-					int ii;
-					for( ii = 1; ii < availableVehicles[veh->vehidx].engines; ++ii ) {
-						refEntity_t engine;
-						memcpy( &engine, &part[i], sizeof(engine) );
-						CG_PositionRotatedEntityOnTag( &engine, &part[BP_PLANE_BODY], 
-							availableVehicles[veh->vehidx].handle[BP_PLANE_BODY], engine_tags[ii-1] );
-						trap_R_AddRefEntityToScene( &engine );
+	if( veh->groundInstallation ) {
+
+	} else {
+		switch( availableVehicles[veh->vehidx].cat ) {
+		case CAT_PLANE:
+			{
+				refEntity_t part[BP_PLANE_MAX_PARTS];
+				int i;
+				for( i = 0; i < BP_PLANE_MAX_PARTS; i++ ) {
+					memset( &part[i], 0, sizeof(part[0]) );	
+				}	
+				// body
+				AnglesToAxis( veh->angles, part[BP_PLANE_BODY].axis );
+				part[BP_PLANE_BODY].hModel = availableVehicles[veh->vehidx].handle[BP_PLANE_BODY];		
+				VectorCopy( veh->origin, part[BP_PLANE_BODY].origin );	
+				VectorCopy( veh->origin, part[BP_PLANE_BODY].oldorigin);
+				trap_R_AddRefEntityToScene( &part[BP_PLANE_BODY] );
+				// other parts
+				for( i = 1; i < BP_PLANE_MAX_PARTS; i++ ) {
+					part[i].hModel = availableVehicles[veh->vehidx].handle[i];
+					if( !part[i].hModel ) continue;
+					VectorCopy( veh->origin, part[i].lightingOrigin );
+					AxisCopy( axisDefault, part[i].axis );
+					if( i == BP_PLANE_PROP && (availableVehicles[veh->vehidx].caps & HC_PROP) ) {
+						int ii;
+						for( ii = 1; ii < availableVehicles[veh->vehidx].engines; ++ii ) {
+							refEntity_t engine;
+							memcpy( &engine, &part[i], sizeof(engine) );
+							CG_PositionRotatedEntityOnTag( &engine, &part[BP_PLANE_BODY], 
+								availableVehicles[veh->vehidx].handle[BP_PLANE_BODY], engine_tags[ii-1] );
+							trap_R_AddRefEntityToScene( &engine );
+						}
 					}
-				}
-				CG_PositionRotatedEntityOnTag( &part[i], &part[BP_PLANE_BODY], 
-						availableVehicles[veh->vehidx].handle[BP_PLANE_BODY], plane_tags[i] );
-				trap_R_AddRefEntityToScene( &part[i] );
-			}
-		}
-		break;
-	case CAT_GROUND:
-		{
-			refEntity_t part[BP_GV_MAX_PARTS];
-			int i;
-			for( i = 0; i < BP_GV_MAX_PARTS; i++ ) {
-				memset( &part[i], 0, sizeof(part[0]) );	
-			}	
-			// body
-		    AnglesToAxis( veh->angles, part[BP_GV_BODY].axis );
-			part[BP_GV_BODY].hModel = availableVehicles[veh->vehidx].handle[BP_GV_BODY];		
-			VectorCopy( veh->origin, part[BP_GV_BODY].origin );	
-			VectorCopy( veh->origin, part[BP_GV_BODY].oldorigin);
-			trap_R_AddRefEntityToScene( &part[BP_GV_BODY] );
-			// other parts
-			for( i = 1; i < BP_GV_MAX_PARTS; i++ ) {
-				part[i].hModel = availableVehicles[veh->vehidx].handle[i];
-				if( !part[i].hModel ) continue;
-				VectorCopy( veh->origin, part[i].lightingOrigin );
-				AxisCopy( axisDefault, part[i].axis );
-				if( i == BP_GV_GUNBARREL ) {
-					CG_PositionRotatedEntityOnTag( &part[i], &part[BP_GV_TURRET], 
-						availableVehicles[veh->vehidx].handle[BP_GV_TURRET], gv_tags[i] );
-				} else {
 					CG_PositionRotatedEntityOnTag( &part[i], &part[BP_PLANE_BODY], 
-						availableVehicles[veh->vehidx].handle[BP_GV_BODY], gv_tags[i] );
+							availableVehicles[veh->vehidx].handle[BP_PLANE_BODY], plane_tags[i] );
+					trap_R_AddRefEntityToScene( &part[i] );
 				}
-				trap_R_AddRefEntityToScene( &part[i] );
 			}
-		}
-		break;
-	case CAT_BOAT:
-		{
-			refEntity_t part[BP_BOAT_MAX_PARTS];
-			int i;
-			for( i = 0; i < BP_BOAT_MAX_PARTS; i++ ) {
-				memset( &part[i], 0, sizeof(part[0]) );	
-			}	
-			// body
-		    AnglesToAxis( veh->angles, part[BP_BOAT_BODY].axis );
-			part[BP_BOAT_BODY].hModel = availableVehicles[veh->vehidx].handle[BP_BOAT_BODY];		
-			VectorCopy( veh->origin, part[BP_BOAT_BODY].origin );	
-			VectorCopy( veh->origin, part[BP_BOAT_BODY].oldorigin);
-			trap_R_AddRefEntityToScene( &part[BP_BOAT_BODY] );
-			// other parts
-			for( i = 1; i < BP_BOAT_MAX_PARTS; i++ ) {
-				part[i].hModel = availableVehicles[veh->vehidx].handle[i];
-				if( !part[i].hModel ) continue;
-				VectorCopy( veh->origin, part[i].lightingOrigin );
-				AxisCopy( axisDefault, part[i].axis );
-				if( i == BP_GV_GUNBARREL ) {
-					CG_PositionRotatedEntityOnTag( &part[i], &part[BP_GV_TURRET], 
-						availableVehicles[veh->vehidx].handle[BP_GV_TURRET], boat_tags[i] );
-				} else {
-					CG_PositionRotatedEntityOnTag( &part[i], &part[BP_PLANE_BODY], 
-						availableVehicles[veh->vehidx].handle[BP_GV_BODY], boat_tags[i] );
+			break;
+		case CAT_GROUND:
+			{
+				refEntity_t part[BP_GV_MAX_PARTS];
+				int i;
+				for( i = 0; i < BP_GV_MAX_PARTS; i++ ) {
+					memset( &part[i], 0, sizeof(part[0]) );	
+				}	
+				// body
+				AnglesToAxis( veh->angles, part[BP_GV_BODY].axis );
+				part[BP_GV_BODY].hModel = availableVehicles[veh->vehidx].handle[BP_GV_BODY];		
+				VectorCopy( veh->origin, part[BP_GV_BODY].origin );	
+				VectorCopy( veh->origin, part[BP_GV_BODY].oldorigin);
+				trap_R_AddRefEntityToScene( &part[BP_GV_BODY] );
+				// other parts
+				for( i = 1; i < BP_GV_MAX_PARTS; i++ ) {
+					part[i].hModel = availableVehicles[veh->vehidx].handle[i];
+					if( !part[i].hModel ) continue;
+					VectorCopy( veh->origin, part[i].lightingOrigin );
+					AxisCopy( axisDefault, part[i].axis );
+					if( i == BP_GV_GUNBARREL ) {
+						CG_PositionRotatedEntityOnTag( &part[i], &part[BP_GV_TURRET], 
+							availableVehicles[veh->vehidx].handle[BP_GV_TURRET], gv_tags[i] );
+					} else {
+						CG_PositionRotatedEntityOnTag( &part[i], &part[BP_PLANE_BODY], 
+							availableVehicles[veh->vehidx].handle[BP_GV_BODY], gv_tags[i] );
+					}
+					trap_R_AddRefEntityToScene( &part[i] );
 				}
-				trap_R_AddRefEntityToScene( &part[i] );
 			}
-			// turrets
-			for( i = 0; i < 4; ++i ) {
-				int j = 2*i;
-				// turret
-				part[BP_BOAT_TURRET+j].hModel = availableVehicles[veh->vehidx].handle[BP_BOAT_TURRET+j];
-				if( !part[BP_BOAT_TURRET+j].hModel ) break;
-				VectorCopy( veh->origin, part[BP_BOAT_TURRET+j].lightingOrigin );
-				AxisCopy( axisDefault, part[BP_BOAT_TURRET+j].axis );
-				CG_PositionRotatedEntityOnTag( &part[BP_BOAT_TURRET+j], &part[BP_BOAT_BODY], 
-					availableVehicles[veh->vehidx].handle[BP_BOAT_BODY], boat_tags[BP_BOAT_TURRET+j] );
-				VectorCopy (part[BP_BOAT_TURRET+j].origin, part[BP_BOAT_TURRET+j].oldorigin);
-				trap_R_AddRefEntityToScene( &part[BP_BOAT_TURRET+j] );
-				// gun
-				part[BP_BOAT_GUNBARREL+j].hModel = availableVehicles[veh->vehidx].handle[BP_BOAT_GUNBARREL+j];
-				VectorCopy( veh->origin, part[BP_BOAT_GUNBARREL+j].lightingOrigin );
-				AxisCopy( axisDefault, part[BP_BOAT_GUNBARREL+j].axis );
-				CG_PositionRotatedEntityOnTag( &part[BP_BOAT_GUNBARREL+j], &part[BP_BOAT_TURRET+j], 
-					availableVehicles[veh->vehidx].handle[BP_BOAT_TURRET+j], boat_tags[BP_BOAT_GUNBARREL+j] );
-				VectorCopy (part[BP_BOAT_GUNBARREL+j].origin, part[BP_BOAT_GUNBARREL+j].oldorigin);
-				trap_R_AddRefEntityToScene( &part[BP_BOAT_GUNBARREL+j] );
+			break;
+		case CAT_BOAT:
+			{
+				refEntity_t part[BP_BOAT_MAX_PARTS];
+				int i;
+				for( i = 0; i < BP_BOAT_MAX_PARTS; i++ ) {
+					memset( &part[i], 0, sizeof(part[0]) );	
+				}	
+				// body
+				AnglesToAxis( veh->angles, part[BP_BOAT_BODY].axis );
+				part[BP_BOAT_BODY].hModel = availableVehicles[veh->vehidx].handle[BP_BOAT_BODY];		
+				VectorCopy( veh->origin, part[BP_BOAT_BODY].origin );	
+				VectorCopy( veh->origin, part[BP_BOAT_BODY].oldorigin);
+				trap_R_AddRefEntityToScene( &part[BP_BOAT_BODY] );
+				// other parts
+				for( i = 1; i < BP_BOAT_MAX_PARTS; i++ ) {
+					part[i].hModel = availableVehicles[veh->vehidx].handle[i];
+					if( !part[i].hModel ) continue;
+					VectorCopy( veh->origin, part[i].lightingOrigin );
+					AxisCopy( axisDefault, part[i].axis );
+					if( i == BP_GV_GUNBARREL ) {
+						CG_PositionRotatedEntityOnTag( &part[i], &part[BP_GV_TURRET], 
+							availableVehicles[veh->vehidx].handle[BP_GV_TURRET], boat_tags[i] );
+					} else {
+						CG_PositionRotatedEntityOnTag( &part[i], &part[BP_PLANE_BODY], 
+							availableVehicles[veh->vehidx].handle[BP_GV_BODY], boat_tags[i] );
+					}
+					trap_R_AddRefEntityToScene( &part[i] );
+				}
+				// turrets
+				for( i = 0; i < 4; ++i ) {
+					int j = 2*i;
+					// turret
+					part[BP_BOAT_TURRET+j].hModel = availableVehicles[veh->vehidx].handle[BP_BOAT_TURRET+j];
+					if( !part[BP_BOAT_TURRET+j].hModel ) break;
+					VectorCopy( veh->origin, part[BP_BOAT_TURRET+j].lightingOrigin );
+					AxisCopy( axisDefault, part[BP_BOAT_TURRET+j].axis );
+					CG_PositionRotatedEntityOnTag( &part[BP_BOAT_TURRET+j], &part[BP_BOAT_BODY], 
+						availableVehicles[veh->vehidx].handle[BP_BOAT_BODY], boat_tags[BP_BOAT_TURRET+j] );
+					VectorCopy (part[BP_BOAT_TURRET+j].origin, part[BP_BOAT_TURRET+j].oldorigin);
+					trap_R_AddRefEntityToScene( &part[BP_BOAT_TURRET+j] );
+					// gun
+					part[BP_BOAT_GUNBARREL+j].hModel = availableVehicles[veh->vehidx].handle[BP_BOAT_GUNBARREL+j];
+					VectorCopy( veh->origin, part[BP_BOAT_GUNBARREL+j].lightingOrigin );
+					AxisCopy( axisDefault, part[BP_BOAT_GUNBARREL+j].axis );
+					CG_PositionRotatedEntityOnTag( &part[BP_BOAT_GUNBARREL+j], &part[BP_BOAT_TURRET+j], 
+						availableVehicles[veh->vehidx].handle[BP_BOAT_TURRET+j], boat_tags[BP_BOAT_GUNBARREL+j] );
+					VectorCopy (part[BP_BOAT_GUNBARREL+j].origin, part[BP_BOAT_GUNBARREL+j].oldorigin);
+					trap_R_AddRefEntityToScene( &part[BP_BOAT_GUNBARREL+j] );
+				}
 			}
+			break;
+		case CAT_HELO:
+			break;
+		case CAT_LQM:
+			break;
 		}
-		break;
-	case CAT_HELO:
-		break;
-	case CAT_LQM:
-		break;
 	}
 
 	// draw selectors

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_consolecmds.c,v 1.19 2002-02-22 16:14:07 sparky909_uk Exp $
+ * $Id: cg_consolecmds.c,v 1.20 2002-06-15 18:37:12 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -496,6 +496,19 @@ static void CG_TestGV_f( void ) {
 	CG_TestVehicle(CAT_GROUND);
 }
 
+static void CG_Spawn_GI_f( void ) {
+	int idx;
+
+	if( trap_Argc() < 2 ) return;
+
+	idx = atoi( CG_Argv(1) );
+
+	if( idx < 0 || idx >= bg_numberOfGroundInstallations ) return;
+
+	ME_SpawnGroundInstallation(idx);
+
+}
+
 /*
 =================
 CG_ExtractDeveloper
@@ -628,7 +641,8 @@ static consoleCommand_t	commands[] = {
 	{ "toggle_mfd1", CG_Toggle_MFD1_f },
 	{ "toggle_mfd2", CG_Toggle_MFD2_f },
 	{ "update_hud_color", CG_Update_HUD_Color_f },
-	{ "update_mfd_color", CG_Update_MFD_Color_f }
+	{ "update_mfd_color", CG_Update_MFD_Color_f },
+	{ "me_spawn_gi", CG_Spawn_GI_f },
 };
 
 /*
