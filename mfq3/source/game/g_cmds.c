@@ -1,5 +1,5 @@
 /*
- * $Id: g_cmds.c,v 1.8 2002-02-18 09:51:28 thebjoern Exp $
+ * $Id: g_cmds.c,v 1.9 2002-02-19 17:51:38 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -47,10 +47,16 @@ void DeathmatchScoreboardMessage( gentity_t *ent ) {
 		}
 		perfect = ( cl->ps.persistant[PERS_RANK] == 0 && cl->ps.persistant[PERS_KILLED] == 0 ) ? 1 : 0;
 
+		// SCORE_BLOCK = 15 parameters (make sure this ties with the value used in CG_ParseScores())
 		Com_sprintf( entry, sizeof(entry),
-			" %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i", level.sortedClients[i],
-			cl->ps.persistant[PERS_SCORE], ping, (level.time - cl->pers.enterTime)/60000,
-			scoreFlags, g_entities[level.sortedClients[i]].s.objectives, accuracy, 
+			" %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i",
+			level.sortedClients[i],
+			cl->ps.persistant[PERS_SCORE],
+			ping,
+			(level.time - cl->pers.enterTime)/60000,
+			scoreFlags,
+			g_entities[level.sortedClients[i]].s.objectives,
+			accuracy, 
 			cl->ps.persistant[PERS_IMPRESSIVE_COUNT],
 			cl->ps.persistant[PERS_EXCELLENT_COUNT],
 			0,
