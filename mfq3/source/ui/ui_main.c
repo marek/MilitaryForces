@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.30 2003-08-06 18:10:21 thebjoern Exp $
+ * $Id: ui_main.c,v 1.31 2003-09-05 01:01:35 minkis Exp $
 */
 /*
 =======================================================================
@@ -13,6 +13,7 @@ USER INTERFACE MAIN
 //#define PRE_RELEASE_TADEMO
 
 #include "ui_local.h"
+
 
 uiInfo_t uiInfo;
 
@@ -3471,14 +3472,16 @@ static void UI_InitialiseUI( void )
 ===============
 UI_RefreshVehicleSelect
 ===============
+changed by Minkis
 */
 
 #pragma message( "UI_RefreshVehicleSelect() should possibly not be setting values directly using trap_x everytime" )
 
-static void UI_RefreshVehicleSelect( void )
+static void UI_RefreshVehicleSelect( int change_vehicle )
 {
 	int vehicleCat = -1;
 	int vehicleClass = -1;
+	static int vehicleType = -1;
 	int vehicle = -1;
 	int gameset = -1;
 	int team = -1;
@@ -3528,7 +3531,7 @@ tryCatAgain:
 	// is this catagory valid for the current gameset+team+catagory?
 
 	// check
-	vehicle = MF_getIndexOfVehicleEx( (vehicle-1), gameset, team, vehicleCat, -1 );
+	vehicle = MF_getIndexOfVehicleEx( (vehicle-1), gameset, team, vehicleCat, -1, -1, 0);
 
 	// ----------> LEVEL SPAWNS <-----------
 
@@ -3567,7 +3570,7 @@ tryClassAgain:
 	pClass = class_items[ vehicleCat ][ vehicleClass ];
 
 	// check
-	vehicle = MF_getIndexOfVehicleEx( (vehicle-1), gameset, team, vehicleCat, vehicleClass );
+	vehicle = MF_getIndexOfVehicleEx( (vehicle-1), gameset, team, vehicleCat, vehicleClass, -1, 0);
 	
 	if( pClass && vehicle >= 0 )
 	{
@@ -3589,29 +3592,35 @@ tryClassAgain:
 	}
 	trap_Cvar_Set( "ui_vehicleClass", va( "%d", vehicleClass ) );
 
+
 	// ----------> VEHICLE <-----------
-
+		
 	// is the vehicle valid for the current gameset+team+catagory+class?
-
 	// check
-	vehicle = MF_getIndexOfVehicleEx( (vehicle-1), gameset, team, vehicleCat, vehicleClass );
-	
+	vehicle = MF_getIndexOfVehicleEx( (vehicle-1), gameset, team, vehicleCat, vehicleClass, vehicleType, change_vehicle);
+
 	// -1 means this is not a suitable combination
 	if( vehicle == -1 )
 	{
 		// prevent change & say so
 		trap_Cvar_Set( "ui_vehicle", "-1" );
 		trap_Cvar_Set( "ui_vehicleTxt", "<Nothing Available>" );
+		trap_Cvar_Set( "ui_vehicleLoadout", "-1" );
+		trap_Cvar_Set( "ui_vehicleLoadoutTxt", "<Nothing Available>" );
 
 		return;
 	}
 
 	// get the text
-	pVehicle = availableVehicles[ vehicle ].descriptiveName;
+	pVehicle = availableVehicles[ vehicle ].tinyName;
 	if( pVehicle )
 	{
 		// update the text in the dialog for the UI vehicle
 		trap_Cvar_Set( "ui_vehicleTxt", pVehicle );
+		
+		// If it wasnt rejected in the first place its safe to update vehicleType
+		vehicleType = vehicle;
+
 	}
 	else
 	{
@@ -3622,16 +3631,34 @@ tryClassAgain:
 
 	// always set back the vehicle index
 	trap_Cvar_Set( "ui_vehicle", va( "%d", vehicle ));
+	
+
+	// get the text
+	pVehicle = availableVehicles[ vehicle ].descriptiveName;
+	if( pVehicle )
+	{
+		// update the text in the dialog for the UI vehicle
+		trap_Cvar_Set( "ui_vehicleLoadoutTxt", pVehicle );
+	}
+	else
+	{
+		// the 'ui_vehicleLoadout' must be invalid, reset
+		trap_Cvar_Set( "ui_vehicleLoadout", "0" );
+		vehicle = 0;
+	}
+		
 }
 
 /*
 ===============
 UI_CycleVehicleSelect
 ===============
+Changed By Minkis
 */
 static void UI_CycleVehicleSelect( int cycleIdx )
 {
 	int idx = -1;
+	int operation = 0;
 	const char * pVar = NULL;
 
 	// switch on what was asked to cycle
@@ -3653,20 +3680,30 @@ static void UI_CycleVehicleSelect( int cycleIdx )
 
 	// Vehicle
 	case 2:
+		// Nothing will be done here
 		pVar = "ui_vehicle";
+		operation = 1;
 		break;
-
+	// Loadout
+	case 3:
+		pVar = "ui_vehicle";
+		operation = 2;
+		break;
 	default:
 		return;
 	}
 
-	// cycle numeric var
-	idx = trap_Cvar_VariableValue( pVar );
-	idx++;
-	trap_Cvar_Set( pVar, va( "%d", idx ));
 
+	if(cycleIdx != 2)
+	{
+		// cycle numeric var
+		idx = trap_Cvar_VariableValue( pVar );
+		idx++;
+		trap_Cvar_Set( pVar, va( "%d", idx ));
+	}
 	// update the dialog
-	UI_RefreshVehicleSelect();
+	UI_RefreshVehicleSelect(operation);
+
 }
 
 /*
@@ -4080,7 +4117,7 @@ static void UI_RunMenuScript(char **args) {
 		else if( Q_stricmp(name, "refreshVehicleSelect") == 0 )
 		{
 			// MFQ3: refresh the vehicle select dialog
-			UI_RefreshVehicleSelect();
+			UI_RefreshVehicleSelect(0);
 		}
 		else if( Q_stricmp(name, "cycleVehicleSelect") == 0 )
 		{
@@ -4089,7 +4126,7 @@ static void UI_RunMenuScript(char **args) {
 			// MFQ3: cycle through catagory/class/vehicle
 			if( Int_Parse(args, &cycleIdx) )
 			{
-				UI_CycleVehicleSelect( cycleIdx );
+				 UI_CycleVehicleSelect ( cycleIdx );
 			}
 		}
 		else if( Q_stricmp(name, "normalCursor") == 0 )
@@ -6643,13 +6680,15 @@ vmCvar_t	ui_serverStatusTimeOut;
 vmCvar_t	ui_gameset;			// UI copy of the gameset var (not sure were going to need this - MM)
 
 // (vehicle select dialog)
-vmCvar_t	ui_vehicleCat;		// vehicle catagory value
-vmCvar_t	ui_vehicleClass;	// vehicle class value
-vmCvar_t	ui_vehicle;			// vehicle value
+vmCvar_t	ui_vehicleCat;			// vehicle catagory value
+vmCvar_t	ui_vehicleClass;		// vehicle class value
+vmCvar_t	ui_vehicleLoadout;		// vehicle loadout value
+vmCvar_t	ui_vehicle;				// vehicle value
 
-vmCvar_t	ui_vehicleCatTxt;	// vehicle catagory text
-vmCvar_t	ui_vehicleClassTxt;	// vehicle class text
-vmCvar_t	ui_vehicleTxt;		// vehicle text
+vmCvar_t	ui_vehicleCatTxt;		// vehicle catagory text
+vmCvar_t	ui_vehicleClassTxt;		// vehicle class text
+vmCvar_t	ui_vehicleLoadoutTxt;	// vehicle loadout text
+vmCvar_t	ui_vehicleTxt;			// vehicle text
 
 vmCvar_t	ui_availableVehiclesTxt;	// available vehicles text
 
@@ -6701,10 +6740,12 @@ static cvarTable_t		cvarTable[] = {
 	// (vehicle select dialog)
 	{ &ui_vehicleCat, "ui_vehicleCat", "1", CVAR_ARCHIVE | CVAR_ROM },
 	{ &ui_vehicleClass, "ui_vehicleClass", "1", CVAR_ARCHIVE | CVAR_ROM },
+	{ &ui_vehicleClass, "ui_vehicleLoadout", "1", CVAR_ARCHIVE | CVAR_ROM },
 	{ &ui_vehicle, "ui_vehicle", "0", CVAR_ARCHIVE | CVAR_ROM },
 
 	{ &ui_vehicleCat, "ui_vehicleCatTxt", "<Catagory>", CVAR_ROM },
 	{ &ui_vehicleClass, "ui_vehicleClassTxt", "<Class>", CVAR_ROM },
+	{ &ui_vehicleClass, "ui_vehicleLoadoutTxt", "<Loadout>", CVAR_ROM },
 	{ &ui_vehicle, "ui_vehicleTxt", "<Vehicle>", CVAR_ROM },
 
 	{ &ui_availableVehiclesTxt, "ui_availableVehiclesTxt", "<Available Vehicles>", CVAR_ROM },
