@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.38 2002-02-26 13:29:28 sparky909_uk Exp $
+ * $Id: cg_main.c,v 1.39 2002-04-16 11:28:17 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1015,17 +1015,17 @@ static void CG_RegisterGraphics( void ) {
 		cgs.media.HUDhealth[i] = trap_R_RegisterShaderNoMip( mfq3_health[i] );
 	}
 	for ( i=0 ; i<15 ; i++) {
-		cgs.media.HUDthrottle_1_ab[i] = trap_R_RegisterShader( mfq3_throttle_1_ab[i] );
-		cgs.media.HUDthrottle_2_1_ab[i] = trap_R_RegisterShader( mfq3_throttle_2_1_ab[i] );
-		cgs.media.HUDthrottle_2_2_ab[i] = trap_R_RegisterShader( mfq3_throttle_2_2_ab[i] );
+		cgs.media.HUDthrottle_1_ab[i] = trap_R_RegisterShaderNoMip( mfq3_throttle_1_ab[i] );
+		cgs.media.HUDthrottle_2_1_ab[i] = trap_R_RegisterShaderNoMip( mfq3_throttle_2_1_ab[i] );
+		cgs.media.HUDthrottle_2_2_ab[i] = trap_R_RegisterShaderNoMip( mfq3_throttle_2_2_ab[i] );
 	}
 	for ( i=0 ; i<10 ; i++) {
-		cgs.media.HUDthrottle_1[i] = trap_R_RegisterShader( mfq3_throttle_1[i] );
-		cgs.media.HUDthrottle_2_1[i] = trap_R_RegisterShader( mfq3_throttle_2_1[i] );
-		cgs.media.HUDthrottle_2_2[i] = trap_R_RegisterShader( mfq3_throttle_2_2[i] );
+		cgs.media.HUDthrottle_1[i] = trap_R_RegisterShaderNoMip( mfq3_throttle_1[i] );
+		cgs.media.HUDthrottle_2_1[i] = trap_R_RegisterShaderNoMip( mfq3_throttle_2_1[i] );
+		cgs.media.HUDthrottle_2_2[i] = trap_R_RegisterShaderNoMip( mfq3_throttle_2_2[i] );
 	}
 	for ( i=0 ; i<5 ; i++) {
-		cgs.media.HUDthrottle_rev[i] = trap_R_RegisterShader( mfq3_throttle_rev[i] );
+		cgs.media.HUDthrottle_rev[i] = trap_R_RegisterShaderNoMip( mfq3_throttle_rev[i] );
 	}
 	cgs.media.HUDhealthtext = trap_R_RegisterShaderNoMip( "newhud/text/hlth.tga" );
 	cgs.media.HUDthrottletext = trap_R_RegisterShaderNoMip( "newhud/text/thr.tga" );

@@ -1,5 +1,5 @@
 /*
- * $Id: g_droneplane.c,v 1.4 2002-01-31 02:34:33 thebjoern Exp $
+ * $Id: g_droneplane.c,v 1.5 2002-04-16 11:28:18 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -101,7 +101,6 @@ void Drone_Plane_Think( gentity_t* ent ) {
 		VectorCopy( tr.endpos, ent->s.pos.trBase );
 		ent->s.pos.trTime = level.time;
 	}
-
 }
 
 

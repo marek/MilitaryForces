@@ -1,5 +1,5 @@
 /*
- * $Id: g_missile.c,v 1.17 2002-03-03 15:23:06 thebjoern Exp $
+ * $Id: g_missile.c,v 1.18 2002-04-16 11:28:18 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -242,9 +242,12 @@ follow your target
 ================
 */
 static void follow_target( gentity_t *missile ) {
-	vec3_t	dir, targdir, mid;
+	vec3_t	dir, targdir, mid, mins, maxs;
 	float	dist, dot;
 	trace_t	tr;
+	int		i, prob, num, touch[MAX_GENTITIES];
+	static vec3_t range = { 300, 300, 300 };
+	gentity_t* hit;
 
 	// target invalid
 	if( !missile->tracktarget ) {
@@ -275,6 +278,27 @@ static void follow_target( gentity_t *missile ) {
 	if( dist > missile->range ) {
 		on_target_lost(missile);
 		return;
+	}
+
+	// check for flares
+	VectorSubtract( missile->r.currentOrigin, range, mins );
+	VectorAdd( missile->r.currentOrigin, range, maxs );
+	num = trap_EntitiesInBox( mins, maxs, touch, MAX_GENTITIES );
+
+	for ( i=0 ; i<num ; i++ ) {
+		hit = &g_entities[touch[i]];
+		if( hit->s.eType != ET_MISSILE ) continue;
+		if( strcmp( hit->classname, "flare" ) != 0 ) continue;
+		if( !hit->ONOFF ) continue;
+		if( hit->r.ownerNum == missile->r.ownerNum ) continue; 
+		hit->ONOFF = 0; // disable the flare
+		prob = rand() % 100;
+		if( prob < 5 ) {
+			missile->tracktarget = hit;
+			missile->lastDist = 0;
+			missile->nextthink = level.time + 10;
+			return;
+		}
 	}
 
 	// close miss
@@ -751,6 +775,44 @@ void fire_maingun( gentity_t *self ) {
 	bolt->s.pos.trTime = level.time;// - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
 	VectorCopy( start, bolt->s.pos.trBase );
 	VectorScale( dir, availableWeapons[self->client->ps.weaponIndex].muzzleVelocity, bolt->s.pos.trDelta );
+	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
+	VectorCopy (start, bolt->r.currentOrigin);
+}
+
+
+
+/*
+=================
+fire_flare MFQ3
+=================
+*/
+void fire_flare( gentity_t *self ) {
+	gentity_t	*bolt;
+	vec3_t		start, up;
+
+	VectorSet( up, 0, 0, 1 );
+	VectorCopy( self->s.pos.trBase, start );
+	VectorMA( start, self->r.maxs[2]+3, up, start );
+	SnapVector( start );
+
+	bolt = G_Spawn();
+	bolt->classname = "flare";
+	bolt->nextthink = level.time + 1600;
+	bolt->think = G_ExplodeMissile;
+	bolt->s.eType = ET_MISSILE;
+	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
+	bolt->s.weaponIndex = WI_FLARE;
+	bolt->r.ownerNum = self->s.number;
+	bolt->parent = self;
+	bolt->damage = bolt->splashDamage = 0;
+	bolt->splashRadius = 0;
+	bolt->clipmask = MASK_SHOT;
+	bolt->ONOFF = 1;// not used
+
+	bolt->s.pos.trType = TR_GRAVITY;
+	bolt->s.pos.trTime = level.time;// - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
+	VectorCopy( start, bolt->s.pos.trBase );
+	VectorScale( up, 700, bolt->s.pos.trDelta );
 	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
 	VectorCopy (start, bolt->r.currentOrigin);
 }

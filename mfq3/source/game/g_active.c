@@ -1,5 +1,5 @@
 /*
- * $Id: g_active.c,v 1.15 2002-03-03 15:23:06 thebjoern Exp $
+ * $Id: g_active.c,v 1.16 2002-04-16 11:28:18 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -466,6 +466,10 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 			FireWeapon( ent );
 			break;
 
+		case EV_FIRE_FLARE:
+			fire_flare( ent );
+			break;
+
 		default:
 			break;
 		}
@@ -755,6 +759,8 @@ void ClientThink_real( gentity_t *ent ) {
 	} else {
 		pm.ps->generic1 = 0;
 	}
+	if( ent->rechargetime > level.time ) pm.ps->pm_flags |= PMF_RECHARGING;
+	else pm.ps->pm_flags &= ~PMF_RECHARGING;
 
 	Pmove (&pm);
 

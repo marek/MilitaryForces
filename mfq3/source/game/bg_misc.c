@@ -1,5 +1,5 @@
 /*
- * $Id: bg_misc.c,v 1.9 2002-02-27 14:21:59 sparky909_uk Exp $
+ * $Id: bg_misc.c,v 1.10 2002-04-16 11:28:17 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -459,6 +459,7 @@ char *eventnames[] = {
 
 	"EV_FIRE_WEAPON",
 	"EV_FIRE_MG",
+	"EV_FIRE_FLARE",
 
 	"EV_ITEM_RESPAWN",
 	"EV_ITEM_POP",

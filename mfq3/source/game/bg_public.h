@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.86 2002-03-05 12:51:06 thebjoern Exp $
+ * $Id: bg_public.h,v 1.87 2002-04-16 11:28:18 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.67"
+#define	GAME_VERSION		"mfq3 v0.67b"
 #define	GAME_IDENTIFIER		"mfq3"			// use to identify mfq3 servers
 
 #define	DEFAULT_GRAVITY		800
@@ -105,7 +105,7 @@ typedef enum {
 
 // pmove->pm_flags
 #define	PMF_DUCKED			1
-#define	PMF_MFQ3_FREE4		2
+#define	PMF_RECHARGING		2		// set when recharging
 #define PMF_VEHICLESPAWN	4		// spawning vehicle
 #define	PMF_MFQ3_FREE2		8		// --- unused ---
 #define	PMF_MFQ3_FREE3		16		// --- unused ---
@@ -192,7 +192,8 @@ typedef enum {
 	TIMER_WEAPON,
 	TIMER_BAY,
 	TIMER_BAYANIM,
-	TIMER_BAYCLOSE
+	TIMER_BAYCLOSE,
+	TIMER_FLARE
 } timerIndex_t;
 
 // player_state->persistant[] indexes
@@ -292,6 +293,7 @@ typedef enum {
 
 	EV_FIRE_WEAPON,
 	EV_FIRE_MG,
+	EV_FIRE_FLARE,
 
 	EV_ITEM_RESPAWN,
 	EV_ITEM_POP,

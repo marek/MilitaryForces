@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.20 2002-02-27 23:11:18 thebjoern Exp $
+ * $Id: g_local.h,v 1.21 2002-04-16 11:28:18 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -623,6 +623,7 @@ void fire_ffar (gentity_t *self);
 void fire_ironbomb (gentity_t *self);
 void fire_autocannon (gentity_t *self, qboolean main);
 void fire_maingun (gentity_t *self);
+void fire_flare (gentity_t *self);
 
 
 //

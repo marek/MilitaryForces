@@ -1,5 +1,5 @@
 /*
- * $Id: bg_pmove.c,v 1.10 2002-02-24 16:52:12 thebjoern Exp $
+ * $Id: bg_pmove.c,v 1.11 2002-04-16 11:28:17 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -496,6 +496,50 @@ static void PM_WaterEvents( void ) {		// FIXME?
 
 /*
 ==============
+PM_Flare
+
+Generates flare events and modifes the flare counter
+==============
+*/
+static void PM_Flare( void ) {
+
+	if( pm->ps->pm_flags & PMF_RESPAWNED ) {
+		return;
+	}
+
+	// ignore if spectator
+	if( pm->ps->persistant[PERS_TEAM] == TEAM_SPECTATOR ) {
+		return;
+	}
+
+	// check for dead player
+	if( pm->ps->stats[STAT_HEALTH] <= 0 ) {
+		return;
+	}
+
+	// make weapon function
+	if( pm->ps->timers[TIMER_FLARE] > 0 ) {
+		pm->ps->timers[TIMER_FLARE] -= pml.msec;
+		if( pm->ps->timers[TIMER_FLARE] > 0 ) {
+			return;
+		} else {
+			pm->ps->timers[TIMER_FLARE] = 0;
+		}
+	}
+
+	// fire machinegun
+	if( pm->cmd.buttons & BUTTON_FLARE ) {
+		// check for out of ammo
+		if ( pm->ps->ammo[WP_FLARE] > 0 ) {
+			pm->ps->ammo[WP_FLARE]--;
+			PM_AddEvent( EV_FIRE_FLARE );
+			pm->ps->timers[TIMER_FLARE] += availableWeapons[availableVehicles[pm->vehicle].weapons[WP_FLARE]].fireInterval;;
+		}
+	} 
+}
+
+/*
+==============
 PM_Weapon
 
 Generates weapon events and modifes the weapon counter
@@ -505,8 +549,8 @@ static void PM_Weapon( void ) {
 	qboolean	canShoot = qtrue,
 				canShootMG = qtrue;
 
-	// don't allow attack until all buttons are up
-	if( pm->ps->pm_flags & PMF_RESPAWNED ) {
+	// don't allow attack until all buttons are up and dont attack while recharging
+	if( pm->ps->pm_flags & (PMF_RESPAWNED|PMF_RECHARGING) ) {
 		return;
 	}
 
@@ -969,6 +1013,9 @@ void PmoveSingle (pmove_t *pmove) {
 
 	// weapons
 	PM_Weapon();
+
+	// flares
+	PM_Flare();
 
 	// entering / leaving water splashes
 	PM_WaterEvents();
