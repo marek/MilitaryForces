@@ -6,8 +6,16 @@ History:
 ========
 
 
-+++v0.69+++ in progress...
+
++++v0.70+++ in progress...
 -----------
+
++++v0.69+++
+-----------
+- added cvar g_spectSpeed to control spectator speed
+- attack2 button selects/deselects vehicle
+- vehicle selection menu spawns entities in mission editor now
+- started preparational work for missioneditor (gametype 3)
 - improve the code that displays numbers on the HUD
 - make use of Abbo's "numberline" for displaying numbers
 - update a couple of pk3s with newer artwork/models/etc
