@@ -1,5 +1,5 @@
 /*
- * $Id: q_math.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: q_math.c,v 1.2 2002-02-09 17:07:04 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -386,7 +386,7 @@ void RotateAroundPitch( vec3_t axis[3], float angle ) {
 	}
 
 	// cross to get axis[2]
-	CrossProduct( axis[1], axis[0], axis[2] );
+	CrossProduct( axis[0], axis[1], axis[2] );
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.47 2002-02-08 21:43:57 thebjoern Exp $
+ * $Id: bg_public.h,v 1.48 2002-02-09 17:07:04 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.58e"
+#define	GAME_VERSION		"mfq3 v0.59b"
 
 #define	DEFAULT_GRAVITY		800
 
@@ -592,7 +592,13 @@ extern const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1];
 #define BP_GV_BODY				0
 #define BP_GV_TURRET			1
 #define BP_GV_GUNBARREL			2
-#define BP_GV_MAX_PARTS			3
+#define BP_GV_WHEEL				3
+#define BP_GV_WHEEL2			4
+#define BP_GV_WHEEL3			5
+#define BP_GV_WHEEL4			6
+#define BP_GV_WHEEL5			7
+#define BP_GV_WHEEL6			8
+#define BP_GV_MAX_PARTS			9
 
 // total max parts (no cat may exceed this!)
 #define BP_MAX_PARTS			10
@@ -622,6 +628,8 @@ typedef struct completeVehicleData_s
     int			    minthrottle;    // can be less than 0 for ground vehicles
     int			    maxthrottle;    // if > 10 means afterburner
 	int				engines;		// how many engines does it actually have
+	int				wheels;			// how many wheels does it have 
+	float			wheelCF;		// circumference
     unsigned int    accel;			// vehicle dependent acceleration
     unsigned int    maxhealth;	    // health
 	vec3_t			gunoffset;		// guntag

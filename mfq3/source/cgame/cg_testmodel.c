@@ -1,5 +1,5 @@
 /*
- * $Id: cg_testmodel.c,v 1.3 2002-02-08 21:43:57 thebjoern Exp $
+ * $Id: cg_testmodel.c,v 1.4 2002-02-09 17:07:03 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -218,6 +218,24 @@ static void registerTestVehicle()
 					break;
 				case BP_GV_GUNBARREL:
 					Com_sprintf( name, sizeof(name), "%s_gun.md3", basename );
+					break;
+				case BP_GV_WHEEL:
+					Com_sprintf( name, sizeof(name), "%s_w1.md3", basename );
+					break;
+				case BP_GV_WHEEL2:
+					Com_sprintf( name, sizeof(name), "%s_w2.md3", basename );
+					break;
+				case BP_GV_WHEEL3:
+					Com_sprintf( name, sizeof(name), "%s_w3.md3", basename );
+					break;
+				case BP_GV_WHEEL4:
+					Com_sprintf( name, sizeof(name), "%s_w4.md3", basename );
+					break;
+				case BP_GV_WHEEL5:
+					Com_sprintf( name, sizeof(name), "%s_w5.md3", basename );
+					break;
+				case BP_GV_WHEEL6:
+					Com_sprintf( name, sizeof(name), "%s_w6.md3", basename );
 					break;
 				}
 				cg.testVehicleParts[i].hModel = trap_R_RegisterModel( name );

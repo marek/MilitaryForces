@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.16 2002-02-08 21:43:57 thebjoern Exp $
+ * $Id: bg_vehicledata.c,v 1.17 2002-02-09 17:07:04 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -32,6 +32,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// min throttle
 	15,							// max throttle
 	1,							// engines
+	0,							// wheels
+	0,							// wheel circumference
 	260,						// acceleration
 	130,						// health
 	{16.65f, -3.391f, 0.378f},	// gun tag
@@ -73,6 +75,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// min throttle
 	15,							// max throttle
 	1,							// engines
+	0,							// wheels
+	0,							// wheel circumference
 	250,						// acceleration
 	130,						// health
 	{19.698f, -1.328f, -3.016f},// gun tag
@@ -114,6 +118,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// min throttle
 	15,							// max throttle
 	2,							// engines
+	0,							// wheels
+	0,							// wheel circumference
 	270,						// acceleration
 	100,						// health
 	{26.25f, -0.94f, 1.811f},	// gun tag
@@ -137,7 +143,7 @@ completeVehicleData_t availableVehicles[] =
     {	"F-15 Eagle",		    // descriptiveName
 	"F-15",						// tinyName
 	"f-15",						// modelName
-	SHADOW_NONE,				// alpha shadow
+	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN|			// id
 	MF_TEAM_1|
 	CAT_PLANE|
@@ -155,6 +161,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// min throttle
 	15,							// max throttle
 	2,							// engines
+	0,							// wheels
+	0,							// wheel circumference
 	260,						// acceleration
 	150,						// health
 	{19.1f,7.87f,-0.112f},		// gun tag
@@ -178,7 +186,7 @@ completeVehicleData_t availableVehicles[] =
     {	"F-14 Tomcat",		    // descriptiveName
 	"F-14",						// tinyName
 	"f-14",						// modelName
-	SHADOW_NONE,				// alpha shadow
+	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN|			// id
 	MF_TEAM_2|
 	CAT_PLANE|
@@ -196,6 +204,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// min throttle
 	15,							// max throttle
 	2,							// engines
+	0,							// wheels
+	0,							// wheel circumference
 	260,						// acceleration
 	150,						// health
 	{37.8f,2.4f,-1.3f},			// gun tag
@@ -219,7 +229,7 @@ completeVehicleData_t availableVehicles[] =
     {	"F-18 Hornet",		    // descriptiveName
 	"F-18",						// tinyName
 	"f-18",						// modelName
-	SHADOW_NONE,				// alpha shadow
+	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN|			// id
 	MF_TEAM_1|
 	CAT_PLANE|
@@ -237,6 +247,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// min throttle
 	15,							// max throttle
 	2,							// engines
+	0,							// wheels
+	0,							// wheel circumference
 	260,						// acceleration
 	130,						// health
 	{40.3f, 0, 0.478f},			// gun tag
@@ -260,7 +272,7 @@ completeVehicleData_t availableVehicles[] =
     {	"F-22 Raptor",		    // descriptiveName
 	"F-22",						// tinyName
 	"f-22",						// modelName
-	SHADOW_NONE,				// alpha shadow
+	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN|			// id
 	MF_TEAM_1|
 	CAT_PLANE|
@@ -278,6 +290,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// min throttle
 	15,							// max throttle
 	2,							// engines
+	0,							// wheels
+	0,							// wheel circumference
 	260,						// acceleration
 	130,						// health
 	{40.3f, 0, 0.478f},			// gun tag
@@ -301,7 +315,7 @@ completeVehicleData_t availableVehicles[] =
     {	"B-2 Spirit",		    // descriptiveName
 	"B-2",						// tinyName
 	"b-2",						// modelName
-	SHADOW_NONE,				// alpha shadow
+	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN|			// id
 	MF_TEAM_1|
 	CAT_PLANE|
@@ -319,6 +333,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// min throttle
 	10,							// max throttle
 	2,							// engines
+	0,							// wheels
+	0,							// wheel circumference
 	260,						// acceleration
 	130,						// health
 	{16.65f, -3.391f, 0.378f},	// gun tag
@@ -342,7 +358,7 @@ completeVehicleData_t availableVehicles[] =
     {	"P-51d Mustang",		// descriptiveName
 	"P-51d",					// tinyName
 	"p-51d",					// modelName
-	SHADOW_NONE,				// alpha shadow
+	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_WW2|				// id
 	MF_TEAM_1|
 	CAT_PLANE|
@@ -361,6 +377,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// min throttle
 	10,						    // max throttle
 	1,							// engines
+	0,							// wheels
+	0,							// wheel circumference
 	220,						// acceleration
 	100,						// health
 	{3.5f, -9.2f, 0.136f},		// gun tag
@@ -384,7 +402,7 @@ completeVehicleData_t availableVehicles[] =
     {	"Spitfire Mk 5b",		// descriptiveName
 	"Spitfire",					// tinyName
 	"spitfire_mk5b",			// modelName
-	SHADOW_NONE,				// alpha shadow
+	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_WW2|				// id
 	MF_TEAM_1|
 	CAT_PLANE|
@@ -403,6 +421,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// min throttle
 	10,						    // max throttle
 	1,							// engines
+	0,							// wheels
+	0,							// wheel circumference
 	220,						// acceleration
 	100,						// health
 	{2.518f, -7.371f, -0.155f},	// gun tag
@@ -426,7 +446,7 @@ completeVehicleData_t availableVehicles[] =
     {	"Messerschmitt Bf-109g",// descriptiveName
 	"Bf-109",					// tinyName
 	"bf-109g",					// modelName
-	SHADOW_NONE,				// alpha shadow
+	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_WW2|				// id
 	MF_TEAM_2|
 	CAT_PLANE|
@@ -445,6 +465,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// min throttle
 	10,						    // max throttle
 	1,							// engines
+	0,							// wheels
+	0,							// wheel circumference
 	220,						// acceleration
 	100,						// health
 	{2.518f, -7.371f, -0.155f},	// gun tag
@@ -468,7 +490,7 @@ completeVehicleData_t availableVehicles[] =
     {	"Focke-Wulf Fw190 A8",// descriptiveName
 	"Fw-190",					// tinyName
 	"fw190a8",					// modelName
-	SHADOW_NONE,				// alpha shadow
+	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_WW2|				// id
 	MF_TEAM_2|
 	CAT_PLANE|
@@ -487,6 +509,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// min throttle
 	10,						    // max throttle
 	1,							// engines
+	0,							// wheels
+	0,							// wheel circumference
 	220,						// acceleration
 	100,						// health
 	{2.518f, -7.371f, -0.155f},	// gun tag
@@ -511,7 +535,7 @@ completeVehicleData_t availableVehicles[] =
     {	"B-17g",				// descriptiveName
 	"B-17",						// tinyName
 	"b17g",						// modelName
-	SHADOW_NONE,				// alpha shadow
+	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_WW2|				// id
 	MF_TEAM_1|
 	CAT_PLANE|
@@ -521,15 +545,17 @@ completeVehicleData_t availableVehicles[] =
 	HC_TAILDRAGGER|
 	HC_DUALGUNS,				// capabilities
 	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
-	{-21, -20, -1},				// mins (bounding box)
-	{10, 20, 6},				// max (bounding box)
-	{70, 80, 300},				// turnspeed around the three axis
-	60, 16,						// camera distance and height
+	{-31, -30, -1},				// mins (bounding box)
+	{20, 30, 6},				// max (bounding box)
+	{40, 50, 120},				// turnspeed around the three axis
+	90, 20,						// camera distance and height
 	120,					    // stallspeed
 	500,					    // maxspeed
 	0,							// min throttle
 	10,						    // max throttle
 	4,							// engines
+	0,							// wheels
+	0,							// wheel circumference
 	220,						// acceleration
 	100,						// health
 	{2.518f, -7.371f, -0.155f},	// gun tag
@@ -553,7 +579,7 @@ completeVehicleData_t availableVehicles[] =
     {	"Fokker Dr.1",			// descriptiveName
 	"Fokker",					// tinyName
 	"dr1",						// modelName
-	SHADOW_NONE,				// alpha shadow
+	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_WW1|				// id
 	MF_TEAM_1|
 	CAT_PLANE|
@@ -572,6 +598,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// min throttle
 	10,						    // max throttle
 	1,							// engines
+	0,							// wheels
+	0,							// wheel circumference
 	220,						// acceleration
 	100,						// health
 	{2.518f, -1.371f, -0.155f},	// gun tag
@@ -595,7 +623,7 @@ completeVehicleData_t availableVehicles[] =
     {	"Sopwith camel",		// descriptiveName
 	"Camel",					// tinyName
 	"camel",					// modelName
-	SHADOW_NONE,				// alpha shadow
+	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_WW1|				// id
 	MF_TEAM_2|
 	CAT_PLANE|
@@ -614,6 +642,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// min throttle
 	10,						    // max throttle
 	1,							// engines
+	0,							// wheels
+	0,							// wheel circumference
 	220,						// acceleration
 	100,						// health
 	{2.518f, -1.371f, -0.155f},	// gun tag
@@ -658,6 +688,8 @@ completeVehicleData_t availableVehicles[] =
 	-5,							// min throttle
 	10,						    // max throttle
 	1,							// engines
+	0,							// wheels
+	0,							// wheel circumference
 	15,							// acceleration
 	400,						// health
 	{5, 0, 8},					// gun tag
@@ -698,6 +730,8 @@ completeVehicleData_t availableVehicles[] =
 	-5,							// min throttle
 	10,						    // max throttle
 	1,							// engines
+	0,							// wheels
+	0,							// wheel circumference
 	15,							// acceleration
 	450,						// health
 	{25, 0, 2},					// gun tag
@@ -738,6 +772,50 @@ completeVehicleData_t availableVehicles[] =
 	-5,							// min throttle
 	10,						    // max throttle
 	1,							// engines
+	0,							// wheels
+	0,							// wheel circumference
+	18,							// acceleration
+	240,						// health
+	{8, 1, 2},					// gun tag
+	160,						// max fuel
+	300,						// max gun pitch (upwards = negative) <- gearheight
+	6,							// min gun pitch (downwards = positive) <- tailangle
+	WI_MG_14_5MM, WI_100MM_GUN, WI_STINGER, WI_HELLFIRE, 0, 0, 0, WI_FLARE,// weapons
+	500, 35, 2, 2, 0, 0, 0, 20,	// ammo
+	{0, 0, 10},					// cameraposition for cockpit view
+	0,							// effect model
+	8000,						// radar range
+	4000,						// radar range ground
+	-1,							// trackcone
+	0,							// trackcone ground
+	0,							// swingangle
+	1400,						// geartime
+	47,							// max gear frame
+	0							// renderflags
+    },
+
+    {	"Hummer",				// descriptiveName
+	"HMV",						// tinyName
+	"humvee_50cal",				// modelName
+	SHADOW_DEFAULT,				// alpha shadow
+	MF_GAMESET_MODERN|			// id
+	MF_TEAM_1|
+	CAT_GROUND|
+	CLASS_GROUND_RECON,
+	0,							// flags
+	HC_DUALGUNS|HC_WHEELS,		// capabilities
+	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
+	{-10, -5, -2},				// mins (bounding box)
+	{11, 5, 4.5},				// max (bounding box)
+	{50, 100, 100},				// turnspeed around the three axis
+	38, 14,						// camera distance and height
+	0,							// stallspeed
+	75,						    // maxspeed
+	-5,							// min throttle
+	10,						    // max throttle
+	1,							// engines
+	4,							// wheels
+	8,							// wheel circumference
 	18,							// acceleration
 	240,						// health
 	{8, 1, 2},					// gun tag
@@ -778,6 +856,8 @@ completeVehicleData_t availableVehicles[] =
 	-5,							// min throttle
 	10,						    // max throttle
 	1,							// engines
+	4,							// wheels
+	9,							// wheel circumference
 	18,							// acceleration
 	180,						// health
 	{3, 1, 6},					// gun tag
@@ -787,6 +867,48 @@ completeVehicleData_t availableVehicles[] =
 	WI_MG_14_5MM, WI_STINGER, WI_HELLFIRE, 0, 0, 0, 0, WI_FLARE,// weapons
 	600, 2, 4, 0, 0, 0, 0, 20,	// ammo
 	{0, 0, 10},					// cameraposition for cockpit view
+	0,							// effect model
+	8000,						// radar range
+	4000,						// radar range ground
+	-1,							// trackcone
+	0,							// trackcone ground
+	0,							// swingangle
+	1400,						// geartime
+	47,							// max gear frame
+	0							// renderflags
+    },
+
+    {	"Panzer III",			// descriptiveName
+	"Pz 3",						// tinyName
+	"panzeriii",				// modelName
+	SHADOW_DEFAULT,				// alpha shadow
+	MF_GAMESET_WW2|				// id
+	MF_TEAM_1|
+	CAT_GROUND|
+	CLASS_GROUND_MBT,
+	0,							// flags
+	0,							// capabilities
+	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
+	{-12, -6, -1},				// mins (bounding box)
+	{12, 6, 9},					// max (bounding box)
+	{50, 100, 100},				// turnspeed around the three axis
+	44, 14,						// camera distance and height
+	0,							// stallspeed
+	60,						    // maxspeed
+	-5,							// min throttle
+	10,						    // max throttle
+	1,							// engines
+	0,							// wheels
+	0,							// wheel circumference
+	15,							// acceleration
+	400,						// health
+	{5, 0, 8},					// gun tag
+	150,						// max fuel
+	310,						// max gun pitch (upwards = negative) <- gearheight
+	3,							// min gun pitch (downwards = positive) <- tailangle
+	WI_MG_12_7MM, WI_125MM_GUN, 0, 0, 0, 0, 0, WI_FLARE,// weapons
+	500, 40, 0, 0, 0, 0, 0, 20,	// ammo
+	{0, 0, 14},					// cameraposition for cockpit view
 	0,							// effect model
 	8000,						// radar range
 	4000,						// radar range ground
