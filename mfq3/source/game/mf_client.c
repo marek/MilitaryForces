@@ -1,5 +1,5 @@
 /*
- * $Id: mf_client.c,v 1.20 2004-12-14 16:25:10 minkis Exp $
+ * $Id: mf_client.c,v 1.21 2004-12-16 19:22:17 minkis Exp $
 */
 
 #include "g_local.h"
@@ -208,7 +208,6 @@ void MF_ClientSpawn(gentity_t *ent) {
 
 
 		// If nukes are banned, disallow loadouts with any nukebombs or nukemissiles
-		// Why does this get called before ClientUserinfoChanged()?
 	
 		if(mf_allowNukes.integer == 0 && vehIndex >= 0)
 		{

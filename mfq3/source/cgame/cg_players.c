@@ -1,5 +1,5 @@
 /*
- * $Id: cg_players.c,v 1.5 2003-02-11 00:25:09 thebjoern Exp $
+ * $Id: cg_players.c,v 1.9 2005-06-26 05:08:11 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -133,9 +133,11 @@ void CG_NewClientInfo( int clientNum ) {
 	// team
 	v = Info_ValueForKey( configstring, "t" );
 	newInfo.team = atoi( v );
-	if( ci->team != newInfo.team )
+	if(cg.clientNum == clientNum && ci->team != newInfo.team ) // use cg.predictedPlayerEntity.currentState.clientNum instead?
 	{
 		// MFQ3: team changed so reset the vehicle trigger
+		// Make sure it only happens to the playing changing teams, otherwise all vehicle's reset 
+		// (UserInfoChanged on g will reset all players)
 		trap_Cvar_Set( "cg_nextVehicle", va( "%d", -1 ) );
 	}
 
