@@ -1,5 +1,5 @@
 /*
- * $Id: bg_weapondata.c,v 1.5 2002-01-07 00:06:02 thebjoern Exp $
+ * $Id: bg_weapondata.c,v 1.6 2002-01-25 14:26:12 sparky909_uk Exp $
 */
 
 #include "q_shared.h"
@@ -275,7 +275,7 @@ completeWeaponData_t availableWeapons[] =
 		WT_ROCKET,							// type
 		MF_GAMESET_ANY,						// gameset
 		"FFAR",								// descriptiveName
-		"models/weapons/ffar.md3",			// modelName
+		"models/weapons/missile_sr.md3",	// modelName
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
 		CAT_ANY,							// cat
@@ -391,7 +391,7 @@ completeWeaponData_t availableWeapons[] =
 		WT_ANTIAIRMISSILE,					// type
 		MF_GAMESET_ANY,						// gameset
 		"AIM-9 Sidewinder",					// descriptiveName
-		"models/weapons/ffar.md3",			// modelName
+		"models/weapons/missile_sr.md3",	// modelName
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
 		CAT_PLANE|CAT_HELO,					// cat
@@ -419,8 +419,8 @@ completeWeaponData_t availableWeapons[] =
 	{ 
 		WT_ANTIAIRMISSILE,					// type
 		MF_GAMESET_ANY,						// gameset
-		"AIM-120 AMRAMM",							// descriptiveName
-		"models/weapons/ffar.md3",			// modelName
+		"AIM-120 AMRAMM",					// descriptiveName
+		"models/weapons/missile_mr.md3",	// modelName
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
 		CAT_PLANE|CAT_HELO,					// cat
@@ -449,7 +449,7 @@ completeWeaponData_t availableWeapons[] =
 		WT_ANTIAIRMISSILE,					// type
 		MF_GAMESET_ANY,						// gameset
 		"AIM-7 Sparrow",					// descriptiveName
-		"models/weapons/ffar.md3",			// modelName
+		"models/weapons/missile_mr.md3",	// modelName
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
 		CAT_PLANE|CAT_HELO,					// cat
@@ -478,7 +478,7 @@ completeWeaponData_t availableWeapons[] =
 		WT_ANTIAIRMISSILE,					// type
 		MF_GAMESET_ANY,						// gameset
 		"AIM-54 Phoenix",					// descriptiveName
-		"models/weapons/ffar.md3",			// modelName
+		"models/weapons/missile_mr.md3",	// modelName
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
 		CAT_PLANE|CAT_HELO,					// cat
@@ -507,7 +507,7 @@ completeWeaponData_t availableWeapons[] =
 		WT_ANTIAIRMISSILE,					// type
 		MF_GAMESET_ANY,						// gameset
 		"Stinger",							// descriptiveName
-		"models/weapons/ffar.md3",			// modelName
+		"models/weapons/missile_sr.md3",	// modelName
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
 		CAT_PLANE|CAT_HELO,					// cat
@@ -536,7 +536,7 @@ completeWeaponData_t availableWeapons[] =
 		WT_ANTIAIRMISSILE,					// type
 		MF_GAMESET_ANY,						// gameset
 		"AA-2 Atoll",						// descriptiveName
-		"models/weapons/ffar.md3",			// modelName
+		"models/weapons/missile_sr.md3",	// modelName
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
 		CAT_PLANE|CAT_HELO,					// cat
@@ -565,7 +565,7 @@ completeWeaponData_t availableWeapons[] =
 		WT_ANTIAIRMISSILE,					// type
 		MF_GAMESET_ANY,						// gameset
 		"AA-11 Archer",						// descriptiveName
-		"models/weapons/ffar.md3",			// modelName
+		"models/weapons/missile_mr.md3",	// modelName
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
 		CAT_PLANE|CAT_HELO,					// cat
@@ -594,7 +594,7 @@ completeWeaponData_t availableWeapons[] =
 		WT_ANTIAIRMISSILE,					// type
 		MF_GAMESET_ANY,						// gameset
 		"AA-10 Alamo",						// descriptiveName
-		"models/weapons/ffar.md3",			// modelName
+		"models/weapons/missile_mr.md3",	// modelName
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
 		CAT_PLANE|CAT_HELO,					// cat
@@ -623,7 +623,7 @@ completeWeaponData_t availableWeapons[] =
 		WT_ANTIGROUNDMISSILE,				// type
 		MF_GAMESET_ANY,						// gameset
 		"Hellfire",							// descriptiveName
-		"models/weapons/ffar.md3",			// modelName
+		"models/weapons/missile_sr.md3",	// modelName
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
 		CAT_GROUND,							// cat
@@ -652,7 +652,7 @@ completeWeaponData_t availableWeapons[] =
 		WT_ANTIGROUNDMISSILE,				// type
 		MF_GAMESET_ANY,						// gameset
 		"Maverick",							// descriptiveName
-		"models/weapons/ffar.md3",			// modelName
+		"models/weapons/missile_sr.md3",	// modelName
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
 		CAT_GROUND,							// cat

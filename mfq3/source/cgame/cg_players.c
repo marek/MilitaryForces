@@ -1,5 +1,5 @@
 /*
- * $Id: cg_players.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: cg_players.c,v 1.2 2002-01-25 14:25:12 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -134,6 +134,7 @@ void CG_NewClientInfo( int clientNum ) {
 	v = Info_ValueForKey( configstring, "t" );
 	newInfo.team = atoi( v );
 	if( ci->team != newInfo.team ) {
+		// MFQ3: team changed so reset the vehicle trigger
 		trap_Cvar_Set( "cg_nextVehicle", va( "%d", -1 ) );
 	}
 
@@ -151,17 +152,28 @@ void CG_NewClientInfo( int clientNum ) {
 	v = Info_ValueForKey( configstring, "g_blueteam" );
 	Q_strncpyz(newInfo.blueTeam, v, MAX_TEAMNAME);
 
-	// mfq3 - vehicle
+	// MFQ3: vehicle
 	v = Info_ValueForKey( configstring, "v" );
 	newInfo.vehicle = atoi( v );
-	if( newInfo.vehicle >= 0 && clientNum == cg.predictedPlayerEntity.currentState.clientNum ) {
+	if( newInfo.vehicle >= 0 && clientNum == cg.predictedPlayerEntity.currentState.clientNum )
+	{
 		trap_Cvar_Set( "cg_vehicle", va( "%d", newInfo.vehicle ) );
+		
+		// only set "cg_nextvehicle" to the same as "cg_vehicle" when we currently don't have
+		// a vehicle index in it.
+		if( CG_Cvar_Get( "cg_nextvehicle" ) == -1 )
+		{
+			trap_Cvar_Set( "cg_nextvehicle", va( "%d", newInfo.vehicle ) );
+		}
 	}
 
-	if( newInfo.vehicle >= 0 ) {
+	// makes sure vehicle is registered
+	if( newInfo.vehicle >= 0 )
+	{
 	    CG_RegisterVehicle(&newInfo);
 	    newInfo.infoValid = qtrue;
 	    *ci = newInfo;
+
 //		Com_Printf( "new info received, it is a vehicle (%s)\n", newInfo.name );
 	    return;
 	}

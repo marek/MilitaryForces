@@ -1,5 +1,5 @@
 /*
- * $Id: cg_draw.c,v 1.11 2002-01-25 13:26:52 thebjoern Exp $
+ * $Id: cg_draw.c,v 1.12 2002-01-25 14:25:12 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -2026,7 +2026,7 @@ static void CG_Draw2D_MFQ3( void ) {
 
 	// are we in spectator mode, or awaiting vehicle selection?
 	if( cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR ||
-		CG_Cvar_Get( "cg_nextVehicle" ) == -1 )
+		CG_Cvar_Get( "cg_Vehicle" ) == -1 )
 	{
 		CG_DrawSpectator();
 //		CG_DrawCrosshair();

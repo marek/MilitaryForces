@@ -1,5 +1,5 @@
 /*
- * $Id: cg_consolecmds.c,v 1.5 2002-01-23 18:46:15 sparky909_uk Exp $
+ * $Id: cg_consolecmds.c,v 1.6 2002-01-25 14:25:12 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -113,19 +113,16 @@ static void CG_ToggleView_f( void ) {
 
 /*
 ==================
-MFQ3 camera speed-up
+MFQ3 camera
 ==================
 */
 
-static void CG_SpeedUpToggle_f( void )
-{
-	// on/off
-	cg.speedup ^= qtrue;
-	if( cg.speedup )
-		cg.speedupamount = 4.0f;
-	else
-		cg.speedupamount = 1.0f;
+static void CG_AdjustReset_f( void ) {
+	cg.cameraAdjustEnum = CAMADJ_NONE;
+	cg.cameraAdjustAmount = 0;
 }
+
+#define MOVE_BASIC	0.4f
 
 /*
 ==================
@@ -133,11 +130,13 @@ MFQ3 camera zoom in/out
 ==================
 */
 static void CG_ZoomIn_f( void ) {
-	trap_Cvar_Set("cg_thirdPersonRange", va("%i",(int)(cg_thirdPersonRange.integer-cg.speedupamount)));
+	cg.cameraAdjustEnum = CAMADJ_INOUT;
+	cg.cameraAdjustAmount = +MOVE_BASIC;
 }
 
 static void CG_ZoomOut_f( void ) {
-	trap_Cvar_Set("cg_thirdPersonRange", va("%i",(int)(cg_thirdPersonRange.integer+cg.speedupamount)));
+	cg.cameraAdjustEnum = CAMADJ_INOUT;
+	cg.cameraAdjustAmount = -MOVE_BASIC;
 }
 
 /*
@@ -146,11 +145,13 @@ MFQ3 camera up/down
 ==================
 */
 static void CG_CameraUp_f( void ) {
-	trap_Cvar_Set("cg_thirdPersonHeight", va("%i",(int)(cg_thirdPersonHeight.integer+cg.speedupamount)));
+	cg.cameraAdjustEnum = CAMADJ_UPDOWN;
+	cg.cameraAdjustAmount = +MOVE_BASIC;
 }
 
 static void CG_CameraDown_f( void ) {
-	trap_Cvar_Set("cg_thirdPersonHeight", va("%i",(int)(cg_thirdPersonHeight.integer-cg.speedupamount)));
+	cg.cameraAdjustEnum = CAMADJ_UPDOWN;
+	cg.cameraAdjustAmount = -MOVE_BASIC;
 }
 
 
@@ -291,11 +292,14 @@ static consoleCommand_t	commands[] = {
 	{ "gps", CG_ToggleGps_f },
 	{ "extinfo", CG_ToggleInfo_f },
 	{ "toggleview", CG_ToggleView_f },
-	{ "+speedup", CG_SpeedUpToggle_f },
-	{ "zoomin", CG_ZoomIn_f },
-	{ "zoomout", CG_ZoomOut_f },
-	{ "cameraup", CG_CameraUp_f },
-	{ "cameradown", CG_CameraDown_f },
+	{ "+zoomin", CG_ZoomIn_f },
+	{ "-zoomin", CG_AdjustReset_f },
+	{ "+zoomout", CG_ZoomOut_f },
+	{ "-zoomout", CG_AdjustReset_f },
+	{ "+cameraup", CG_CameraUp_f },
+	{ "-cameraup", CG_AdjustReset_f },
+	{ "+cameradown", CG_CameraDown_f },
+	{ "-cameradown", CG_AdjustReset_f },
 	{ "radarrange", CG_ToggleRadarRange_f },
 	{ "mfd1_mode", CG_Set_MFD1_Mode_f },
 	{ "mfd2_mode", CG_Set_MFD2_Mode_f }

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_weapons.c,v 1.5 2002-01-23 18:46:15 sparky909_uk Exp $
+ * $Id: cg_weapons.c,v 1.6 2002-01-25 14:25:12 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -7,31 +7,38 @@
 // cg_weapons.c -- events and effects dealing with weapons
 #include "cg_local.h"
 
-
 /*
 ==========================
 CG_FFARTrail
 ==========================
 */
-static void CG_FFARTrail( centity_t *ent, const weaponInfo_t *wi ) {
-	localEntity_t	*smoke;
+static void CG_FFARTrail( centity_t * cent, const weaponInfo_t *wi )
+{
+	localEntity_t	* smoke;
 	vec3_t			up = {0, 0, 1};
 	vec3_t			pos, velocity;
 
+	VectorCopy( cent->lerpOrigin, pos );
+	AngleVectors( cent->lerpAngles, velocity, NULL, NULL );
+	VectorNormalize( velocity );
 
-	AngleVectors( ent->lerpAngles, velocity, NULL, NULL );
-	VectorCopy( ent->lerpOrigin, pos );
+#pragma message("enable correct CG_FFARTrail when entity supports angles (.lerpAngles)")
 
+	// draw smoke slightly behind the entitiy position (using -velocity)
+/*
+	// calc vectors & adjusted position
+	VectorScale( velocity, -8.0f, velocity );
+	VectorAdd( pos, velocity, pos );
+*/
+	// draw trail
 	smoke = CG_SmokePuff( pos, up, 
-				  8, 
-				  0.5, 0.5, 0.5, 0.66f,
-				  400, 
-				  cg.time, 0,
-				  LEF_PUFF_DONT_SCALE, 
-				  cgs.media.smokePuffShader );	
-
+						  4, 
+						  0.5, 0.5, 0.5, 0.66f,
+						  400, 
+						  cg.time, 0,
+						  LEF_PUFF_DONT_SCALE, 
+						  cgs.media.smokePuffShader );	
 }
-
 
 /*
 =================
@@ -61,12 +68,14 @@ void CG_RegisterWeapons() {
 			weaponInfo->ammoModel = trap_R_RegisterModel( ammo->world_model[0] );
 		}
 
-		switch( availableWeapons[i].type ) {
-
+		// switch on weapon type
+		switch( availableWeapons[i].type )
+		{
 		case WT_ROCKET:
 		case WT_ANTIAIRMISSILE:
 		case WT_ANTIGROUNDMISSILE:
 		case WT_ANTIRADARMISSILE:
+			// find out which model to use
 			weaponInfo->missileModel = trap_R_RegisterModel( availableWeapons[i].modelName );
 			
 			// MFQ3: new sound
@@ -77,11 +86,12 @@ void CG_RegisterWeapons() {
 				weaponInfo->missileSound = trap_S_RegisterSound( "sound/weapons/rocket/rockfly.wav", qfalse );
 			}
 
+			// FFAR trail with no dynamic lighting
 			weaponInfo->missileTrailFunc = CG_FFARTrail;
-			weaponInfo->missileDlight = 200;
+			weaponInfo->missileDlight = 0;
 			
 			MAKERGB( weaponInfo->missileDlightColor, 1, 0.75f, 0 );
-			MAKERGB( weaponInfo->flashDlightColor, 1, 0.75f, 0 );
+			//MAKERGB( weaponInfo->flashDlightColor, 1, 0.75f, 0 );
 
 			// MFQ3: new sound
 			weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/rocket/rocketFire1.wav", qfalse );
@@ -95,15 +105,15 @@ void CG_RegisterWeapons() {
 
 		case WT_IRONBOMB:
 		case WT_GUIDEDBOMB:
+			// find out which model to use
 			weaponInfo->missileModel = trap_R_RegisterModel( availableWeapons[i].modelName );
 			weaponInfo->missileSound = trap_S_RegisterSound( "sound/weapons/rocket/rockfly.wav", qfalse );
-
 			weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/rocket/rocklf1a.wav", qfalse );
 			cgs.media.rocketExplosionShader = trap_R_RegisterShader( "rocketExplosion" );
 			break;
 
 		case WT_MACHINEGUN:
-	//		MAKERGB( weaponInfo->flashDlightColor, 1, 1, 0 );
+			// MAKERGB( weaponInfo->flashDlightColor, 1, 1, 0 );
 
 			// MFQ3: new sounds
 			switch( i )
@@ -146,14 +156,15 @@ void CG_RegisterWeapons() {
 			cgs.media.bulletExplosionShader = trap_R_RegisterShader( "bulletExplosion" );
 			break;
 
-
 		case WT_BALLISTICGUN:
 			weaponInfo->missileModel = trap_R_RegisterModel( availableWeapons[i].modelName );
 			weaponInfo->missileSound = trap_S_RegisterSound( "sound/weapons/rocket/rockfly.wav", qfalse );
-			weaponInfo->missileDlight = 200;
+
+			// no dynamic lighting
+			weaponInfo->missileDlight = 0;
 			
 			MAKERGB( weaponInfo->missileDlightColor, 1, 0.75f, 0 );
-			MAKERGB( weaponInfo->flashDlightColor, 1, 0.75f, 0 );
+			//MAKERGB( weaponInfo->flashDlightColor, 1, 0.75f, 0 );
 
 			weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/rocket/rocklf1a.wav", qfalse );
 			cgs.media.rocketExplosionShader = trap_R_RegisterShader( "rocketExplosion" );
@@ -163,8 +174,8 @@ void CG_RegisterWeapons() {
 			weaponInfo->missileModel = trap_R_RegisterModel( availableWeapons[i].modelName );
 			break;
 
-		 default:
-			MAKERGB( weaponInfo->flashDlightColor, 1, 1, 1 );
+		default:
+			//MAKERGB( weaponInfo->flashDlightColor, 1, 1, 1 );
 			weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/rocket/rocklf1a.wav", qfalse );
 			break;
 		}

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.12 2002-01-25 13:26:52 thebjoern Exp $
+ * $Id: cg_main.c,v 1.13 2002-01-25 14:25:12 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -209,10 +209,10 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_errorDecay, "cg_errordecay", "100", 0 },
 	{ &cg_nopredict, "cg_nopredict", "0", 0 },
 	{ &cg_showmiss, "cg_showmiss", "0", 0 },
-	{ &cg_thirdPersonRange, "cg_thirdPersonRange", "0", CVAR_ARCHIVE },
-	{ &cg_thirdPersonHeight, "cg_thirdPersonHeight", "0", CVAR_ARCHIVE },
+	{ &cg_thirdPersonRange, "cg_thirdPersonRange", "0", 0 },
+	{ &cg_thirdPersonHeight, "cg_thirdPersonHeight", "0", 0 },
 	{ &cg_thirdPersonAngle, "cg_thirdPersonAngle", "0", CVAR_CHEAT },
-	{ &cg_thirdPerson, "cg_thirdPerson", "1", 0 },// MFQ3 changed from 0
+	{ &cg_thirdPerson, "cg_thirdPerson", "1", 0 },	// MFQ3: changed default from 0
 	{ &cg_teamChatTime, "cg_teamChatTime", "3000", CVAR_ARCHIVE  },
 	{ &cg_teamChatHeight, "cg_teamChatHeight", "0", CVAR_ARCHIVE  },
 	{ &cg_forceModel, "cg_forceModel", "0", CVAR_ARCHIVE  },
@@ -1757,8 +1757,9 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	cg.clientNum = clientNum;
 	
 	// misc
-	cg.speedup = qfalse;
-	cg.speedupamount = 1.0f;
+	cg.cameraAdjustAmount = 0.0f;
+	cg.cameraAdjustCount = 0;
+	cg.cameraAdjustEnum = CAMADJ_NONE;
 
 	cgs.processedSnapshotNum = serverMessageNum;
 	cgs.serverCommandSequence = serverCommandSequence;
@@ -1797,7 +1798,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	s = CG_ConfigString( CS_LEVEL_START_TIME );
 	cgs.levelStartTime = atoi( s );
 
-	// MFQ3 vehicle needs to be reset
+	// MFQ3: vehicle needs to be reset
 	if( cg_vehicle.integer != -1 ) {
 		trap_Cvar_Set( "cg_vehicle", "-1" );
 	}
