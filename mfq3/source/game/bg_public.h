@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.80 2002-02-27 09:42:10 thebjoern Exp $
+ * $Id: bg_public.h,v 1.81 2002-02-27 14:21:59 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -222,6 +222,7 @@ typedef enum {
 #define	EF_DEAD				0x00000001		// don't draw a foe marker over players with EF_DEAD
 #define	EF_TELEPORT_BIT		0x00000004		// toggled every time the origin abruptly changes
 #define	EF_AWARD_EXCELLENT	0x00000008		// draw an excellent sprite
+#define EF_PLAYER_EVENT		0x00000010
 #define	EF_BOUNCE			0x00000010		// for missiles
 #define	EF_BOUNCE_HALF		0x00000020		// for missiles
 #define	EF_PILOT_ONBOARD	0x00000040		// MFQ3 to see if pilots are in this vehicle
@@ -275,6 +276,8 @@ typedef enum {
 #define	EV_EVENT_BIT1		0x00000100
 #define	EV_EVENT_BIT2		0x00000200
 #define	EV_EVENT_BITS		(EV_EVENT_BIT1|EV_EVENT_BIT2)
+
+#define	EVENT_VALID_MSEC	300
 
 typedef enum {
 	EV_NONE,

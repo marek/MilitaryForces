@@ -1,5 +1,5 @@
 /*
- * $Id: g_public.h,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: g_public.h,v 1.2 2002-02-27 14:21:59 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -20,6 +20,12 @@
 #define	SVF_USE_CURRENT_ORIGIN	0x00000080	// entity->r.currentOrigin instead of entity->s.origin
 											// for link position (missiles and movers)
 #define SVF_SINGLECLIENT		0x00000100	// only send to a single client
+#define SVF_NOSERVERINFO		0x00000200	// don't send CS_SERVERINFO updates to this client
+											// so that it can be updated for ping tools without
+											// lagging clients
+#define SVF_CAPSULE				0x00000400	// use capsule for collision detection instead of bbox
+#define SVF_NOTSINGLECLIENT		0x00000800	// send entity to everyone but one client
+											// (entityShared_t->singleClient)
 
 //===============================================================
 

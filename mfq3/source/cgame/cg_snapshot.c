@@ -1,5 +1,5 @@
 /*
- * $Id: cg_snapshot.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: cg_snapshot.c,v 1.2 2002-02-27 14:20:38 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -16,15 +16,24 @@
 CG_ResetEntity
 ==================
 */
-static void CG_ResetEntity( centity_t *cent ) {
-	// if an event is set, assume it is new enough to use
-	// if the event had timed out, it would have been cleared
-	cent->previousEvent = 0;
+static void CG_ResetEntity( centity_t *cent )
+{
+	// if the previous snapshot this entity was updated in is at least
+	// an event window back in time then we can reset the previous event
+	if ( cent->snapShotTime < cg.time - EVENT_VALID_MSEC )
+	{
+		cent->previousEvent = 0;
+	}
 
 	cent->trailTime = cg.snap->serverTime;
 
 	VectorCopy (cent->currentState.origin, cent->lerpOrigin);
 	VectorCopy (cent->currentState.angles, cent->lerpAngles);
+
+	if ( cent->currentState.eType == ET_PLAYER )
+	{
+		//CG_ResetPlayerEntity( cent );
+	}
 }
 
 /*
@@ -139,6 +148,9 @@ static void CG_TransitionSnapshot( void ) {
 	for ( i = 0 ; i < cg.snap->numEntities ; i++ ) {
 		cent = &cg_entities[ cg.snap->entities[ i ].number ];
 		CG_TransitionEntity( cent );
+
+		// remember time of snapshot this entity was last updated in
+		cent->snapShotTime = cg.snap->serverTime;
 	}
 
 	cg.nextSnap = NULL;

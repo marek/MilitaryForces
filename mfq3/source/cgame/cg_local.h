@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.45 2002-02-26 13:29:28 sparky909_uk Exp $
+ * $Id: cg_local.h,v 1.46 2002-02-27 14:20:38 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -183,6 +183,8 @@ typedef struct centity_s {
 	int				trailTime;		// so missile trails can handle dropped initial packets
 	int				dustTrailTime;
 	int				miscTime;
+
+	int				snapShotTime;	// last time this entity was found in a snapshot
 
 	playerEntity_t	pe;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_playerstate.c,v 1.2 2002-02-24 16:52:12 thebjoern Exp $
+ * $Id: cg_playerstate.c,v 1.3 2002-02-27 14:20:38 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -367,6 +367,7 @@ CG_TransitionPlayerState
 ===============
 */
 void CG_TransitionPlayerState( playerState_t *ps, playerState_t *ops ) {
+
 	// check for changing follow mode
 	if ( ps->clientNum != ops->clientNum ) {
 		cg.thisFrameTeleport = qtrue;
