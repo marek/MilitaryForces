@@ -1,5 +1,5 @@
 /*
- * $Id: g_spawn.c,v 1.6 2003-02-08 15:20:18 thebjoern Exp $
+ * $Id: g_spawn.c,v 1.7 2003-02-22 17:58:57 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -195,7 +195,7 @@ spawn_t	spawns[] = {
 	// MFQ3
 	{"func_runway", SP_func_runway},
 //	{"misc_waypoint", SP_misc_waypoint},
-	{"misc_vehicle", SP_misc_vehicle},
+//	{"misc_vehicle", SP_misc_vehicle},
 	{"func_explosive", SP_func_explosive},
 	{"trigger_recharge", SP_trigger_recharge},
 	{"trigger_radio", SP_trigger_radio},

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_miscvehicle.c,v 1.11 2002-07-15 18:23:07 thebjoern Exp $
+ * $Id: cg_miscvehicle.c,v 1.12 2003-02-22 17:58:56 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -144,7 +144,7 @@ static void CG_Misc_Plane( centity_t *cent )
 //	CG_PlaneFlags( cent );
 
 	// smoke
-	if( cent->currentState.generic1 && cent->miscTime > cg.time ) {
+/*	if( cent->currentState.generic1 && cent->miscTime > cg.time ) {
 		localEntity_t	*smoke;
 		vec3_t			up = {0, 0, 1};
 		vec3_t			pos;
@@ -161,7 +161,7 @@ static void CG_Misc_Plane( centity_t *cent )
 					  LEF_PUFF_DONT_SCALE, 
 					  cgs.media.smokePuffShader );	
 		cent->miscTime = cg.time + 10;
-	}
+	}*/
 }
 
 
@@ -230,9 +230,9 @@ static void CG_Misc_GV( centity_t *cent )
 
 
 	// smoke
-	if( cent->currentState.generic1 ) {
-		CG_Generic_Smoke( cent, cent->lerpOrigin, 100 );
-	}
+//	if( cent->currentState.generic1 ) {
+//		CG_Generic_Smoke( cent, cent->lerpOrigin, 100 );
+//	}
 	
 	// draw plane
 	CG_DrawGV(&drawInfo);
@@ -292,9 +292,79 @@ static void CG_Misc_Boat( centity_t *cent )
 }
 
 
+
+/*
+===============
+CG_Misc_GI
+===============
+*/
+
+static void CG_Misc_GI( centity_t *cent ) 
+{
+	DrawInfo_GI_t	drawInfo;
+
+	memset( &drawInfo, 0, sizeof(drawInfo) );
+	drawInfo.basicInfo.vehicleIndex = cent->currentState.modelindex2;
+	drawInfo.basicInfo.ONOFF = cent->currentState.ONOFF;
+
+	// entitynum
+	drawInfo.basicInfo.entityNum = cent->currentState.number;
+
+    // get the rotation information
+    VectorCopy( cent->currentState.angles, cent->lerpAngles );
+    AnglesToAxis( cent->lerpAngles, drawInfo.basicInfo.axis );
+
+	// position and orientation
+	VectorCopy( cent->lerpOrigin, drawInfo.basicInfo.origin );
+	VectorCopy( cent->lerpAngles, drawInfo.basicInfo.angles );
+
+	// turret/gun angle
+	drawInfo.gunAngle = cent->currentState.angles2[PITCH];
+	drawInfo.turretAngle = cent->currentState.angles2[ROLL];
+
+	// upgrades
+	drawInfo.upgrades = availableGroundInstallations[drawInfo.basicInfo.vehicleIndex].upgrades;
+
+	// draw plane
+	CG_DrawGI(&drawInfo);
+
+	// smoke 
+	if( cent->currentState.generic1 ) {
+		localEntity_t	*smoke;
+		vec3_t			up = {0, 0, 20};
+		vec3_t			pos;
+		vec3_t			forward;
+
+		AngleVectors( cent->lerpAngles, forward, NULL, NULL );
+		VectorCopy( cent->lerpOrigin, pos );
+		pos[2] += 12;
+
+		smoke = CG_SmokePuff( pos, up, 
+					  cent->currentState.generic1, 
+					  0.5, 0.5, 0.5, 0.66f,
+					  200*cent->currentState.generic1, 
+					  cg.time, 0,
+					  LEF_PUFF_DONT_SCALE, 
+					  cgs.media.smokePuffShader );	
+	}
+}
+
+
+
+
+
+
 void CG_Misc_Vehicle( centity_t *cent ) 
 {
-	if( availableVehicles[cent->currentState.modelindex].cat & CAT_PLANE ) {
+	// check for ground installation
+	if( cent->currentState.modelindex == 255 &&
+		cent->currentState.modelindex2 >= 0 &&
+		cent->currentState.modelindex2 < bg_numberOfGroundInstallations )
+	{
+		CG_Misc_GI( cent );
+	}
+	// otherwise normal vehicle
+	else if( availableVehicles[cent->currentState.modelindex].cat & CAT_PLANE ) {
 		if( cg.radarTargets < MAX_RADAR_TARGETS && (cg.predictedPlayerEntity.currentState.ONOFF & OO_RADAR_AIR)) {
 			cg.radarEnts[cg.radarTargets++] = cent;
 		}

@@ -1,5 +1,5 @@
 /*
- * $Id: g_miscvehicle.c,v 1.9 2003-02-08 15:20:18 thebjoern Exp $
+ * $Id: g_miscvehicle.c,v 1.10 2003-02-22 17:58:57 thebjoern Exp $
 */
 
 
@@ -414,6 +414,72 @@ void SP_misc_vehicle( gentity_t *sp_ent )
 
 	VectorCopy(availableVehicles[i].mins, ent->r.mins);
 	VectorCopy(availableVehicles[i].maxs, ent->r.maxs);
+	G_SetOrigin( ent, ent->s.origin );
+	VectorCopy( ent->s.angles, ent->s.apos.trBase );
+	VectorCopy( ent->s.origin, ent->s.pos.trBase );
+	VectorCopy( ent->s.origin, ent->r.currentOrigin );
+
+	ent->s.groundEntityNum = ENTITYNUM_NONE;
+	ent->r.svFlags = SVF_USE_CURRENT_ORIGIN;
+	ent->s.pos.trType = TR_STATIONARY;
+	ent->s.apos.trType = TR_STATIONARY;
+	if( ent->health <= 0 ) ent->health = availableVehicles[i].maxhealth;
+	ent->takedamage = qtrue;
+	ent->inuse = qtrue;
+	ent->die = misc_vehicle_die;
+	if( !ent->score ) ent->score = 1;
+	ent->classname = "misc_vehicle";
+	ent->r.contents = CONTENTS_SOLID;//CONTENTS_BODY;
+	ent->clipmask = MASK_PLAYERSOLID;
+
+	ent->idxScriptBegin = ent->idxScriptEnd = -1;
+
+	trap_LinkEntity (ent);
+
+	G_FreeEntity(sp_ent);
+}
+
+void SP_misc_groundinstallation( gentity_t *sp_ent ) 
+{
+	char modelname[128];
+	int i;
+	unsigned long gameset = G_GetGameset();
+	qboolean found = qfalse;
+	gentity_t* ent = G_Spawn();
+
+	ent->model = sp_ent->model;
+	ent->targetname = sp_ent->targetname;
+	VectorCopy( sp_ent->s.origin, ent->s.origin );
+	VectorCopy( sp_ent->s.angles, ent->s.angles );
+	ent->health = sp_ent->health;
+	i = sp_ent->s.modelindex2;
+
+	if( i < 0 || i >= bg_numberOfGroundInstallations ) 
+	{
+		G_Printf ("%s (%s) cannot be spawned - index out of range\n", ent->classname, ent->model);
+		G_FreeEntity(ent);
+		G_FreeEntity(sp_ent);
+		return;
+	}
+
+	Com_sprintf(modelname, 127, "models/vehicles/npc/%s/%s.md3", availableGroundInstallations[i].modelName,
+		availableGroundInstallations[i].modelName );
+	G_Printf( "Spawning a %s\n", modelname );
+
+	ent->s.eType = ET_MISC_VEHICLE;
+	ent->s.modelindex = 255;
+	ent->s.modelindex2 = i;
+
+	if( ent->team && g_gametype.integer >= GT_TEAM ) {
+		if ( Q_stricmp( ent->team, "red" ) == 0 ) {
+			ent->s.generic1 = TEAM_RED;
+		} else if ( Q_stricmp( ent->team, "blue" ) == 0 ) {
+			ent->s.generic1 = TEAM_BLUE;	
+		}
+	}
+
+	VectorCopy(availableGroundInstallations[i].mins, ent->r.mins);
+	VectorCopy(availableGroundInstallations[i].maxs, ent->r.maxs);
 	G_SetOrigin( ent, ent->s.origin );
 	VectorCopy( ent->s.angles, ent->s.apos.trBase );
 	VectorCopy( ent->s.origin, ent->s.pos.trBase );

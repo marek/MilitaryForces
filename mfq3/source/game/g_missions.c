@@ -1,5 +1,5 @@
 /*
- * $Id: g_missions.c,v 1.5 2003-02-08 15:20:18 thebjoern Exp $
+ * $Id: g_missions.c,v 1.6 2003-02-22 17:58:57 thebjoern Exp $
  */
 
  
@@ -36,6 +36,25 @@ static void G_SpawnMissionVehicles(mission_vehicle_t* vehs)
 		}
 	}
 */
+}
+
+static void G_SpawnMissionGroundInstallations(mission_groundInstallation_t* gis)
+{
+	int			i;
+	gentity_t*	ent;
+
+
+	for( i = 0; i < IGME_MAX_VEHICLES/4; ++i )
+	{
+		if( !gis[i].used ) break;
+		ent = G_Spawn();
+		ent->classname = "misc_vehicle";
+		VectorCopy(gis[i].origin, ent->s.origin);
+		VectorCopy(gis[i].angles, ent->s.angles);
+		ent->s.modelindex = -1;
+		ent->s.modelindex2 = gis[i].index;
+		SP_misc_groundinstallation(ent);
+	}
 }
 
 
@@ -107,6 +126,8 @@ void G_LoadMissionScripts()
 		return;
 
 	G_SpawnMissionVehicles(vehicles);
+
+	G_SpawnMissionGroundInstallations(installations);
 
 //	trap_Printf( va("Loaded: %s\n", inbuffer) );
 }
