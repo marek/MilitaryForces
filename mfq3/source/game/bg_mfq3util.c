@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.29 2003-02-06 11:59:00 thebjoern Exp $
+ * $Id: bg_mfq3util.c,v 1.30 2003-02-06 14:40:10 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -751,11 +751,11 @@ static void MF_ParseEntities( char **buf,
 }
 
 void MF_ParseMissionScripts( char *buf,
-									mission_overview_t* overview,
-									mission_vehicle_t* vehs, 
-									mission_groundInstallation_t* gis) 
+							 mission_overview_t* overview,
+							 mission_vehicle_t* vehs, 
+							 mission_groundInstallation_t* gis) 
 {
-	char				*token;
+	char *token;
 
 	MF_SetMissionScriptOverviewDefaults(overview);
 
