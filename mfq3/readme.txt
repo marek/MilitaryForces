@@ -5,8 +5,72 @@ Military Forces Q3
 History:
 ========
 
-+++v0.46+++ in progress...
++++v0.51+++ in progress...
 -----------
+
+
++++v0.50+++
+-----------
+- fix up new ui code and make it compile to qvms
+- added cmd "tesetGVCmd" to test certain stuff on a test GV (not yet used though)
+- added cmd "testPlaneCmd" to test certain stuff on a test plane, current options are:
+  "cockpit" - toggle cockpit opened/closed
+  "speedbrakes" - toggle speedbrakes
+  "gear" - toggle gear
+  "controls" - cycles through the availabe control frames
+  "throttle" - cycles through the body anims for the exhaust nozzle
+  "burnermodel" - cycles through the available burner models
+  "burnernum" - switches between 1 and 2 burners
+  "vapormodel" - cycles through available vapor models
+  "vapor" - cycles between vapor states
+  NOTE: The test commands are used for example like this: "\testPlaneCmd cockpit"
+- added cmd "testGV" to add a new test model for a ground vehicle
+- added cmd "testPlane" to add a new test model for a plane
+  NOTE: If you want to add a GV or Plane
+- fix smoke bug
+- minor changes
+
++++v0.49+++
+-----------
+- Mark: wrote TA compliant NEW main menu system
+- Mark: wrote TA compliant NEW ingame menu system
+- made BRDM2 amphibious
+- added support for amphibian vehicles, still a bit buggy
+- added basic ground vehicle water-movement code
+- minor fixes
+
++++v0.48+++
+-----------
+- changed vehicle loadouts using the new weapons (note however
+  that these are not the final loadouts because I haven't implemented
+  all the weapons yet)
+- added Maverick missile
+- changed missile data for better gameplay (please test!)
+- added two new MGs, the 0.303 and 0.312, both WW1
+- added Sopwith Camel
+- corrected F-18 data
+- corrected F-14 data
+- minor changes
+
++++v0.47+++
+-----------
+- fixed a bug that retracted the gear on fixed-gear planes
+- added Sopwith Camel (at the moment using the Dr.1 model)
+- added Fokker Dr.1
+- added WW1 gameset
+- introduced Bomber class
+- using updated F16 canopy
+- minor fixes
+
++++v0.46+++
+-----------
+- added B-2 to the game
+- added updated Spitfire
+- added F-18 Hornet to the game
+- made swingwings actually work
+- added F-14 Tomcat to the game
+- fixed a bug that allowed targetting invincible objects
+- minor changes
 
 +++v0.45+++
 -----------
