@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.104 2003-02-02 02:52:03 thebjoern Exp $
+ * $Id: bg_public.h,v 1.105 2003-02-05 23:42:05 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.74h"
+#define	GAME_VERSION		"mfq3 v0.74j"
 #define	GAME_IDENTIFIER		"mfq3"			// use to identify mfq3 servers
 
 #define	DEFAULT_GRAVITY		800
@@ -941,8 +941,14 @@ typedef enum
 }weaponIndex_t;
 
 
+// IGME
+#define IGME_MAX_VEHICLES		128
+#define IGME_MAX_WAYPOINTS		64
 
-
+typedef struct mission_waypoint_s {
+	qboolean		used;
+	vec3_t			origin;
+}mission_waypoint_t;
 
 // mission scripts
 typedef struct mission_overview_s {
@@ -954,6 +960,25 @@ typedef struct mission_overview_s {
 	qboolean		valid;
 }mission_overview_t;
 
+typedef struct mission_groundInstallation_s {
+	qboolean		used;
+	int				index;
+	char			objectname[MAX_NAME_LENGTH];
+	char			teamname[MAX_NAME_LENGTH];
+	vec3_t			origin;
+	vec3_t			angles;
+}mission_groundInstallation_t;
+
+
+typedef struct mission_vehicle_s {
+	qboolean		used;
+	int				index;
+	char			objectname[MAX_NAME_LENGTH];
+	int				team;
+	vec3_t			origin;
+	vec3_t			angles;
+	mission_waypoint_t waypoints[IGME_MAX_WAYPOINTS];
+}mission_vehicle_t;
 
 
 
@@ -961,6 +986,13 @@ typedef struct mission_overview_s {
 
 
 
+
+
+
+
+
+void MF_ParseMissionScripts( char *buf, mission_overview_t* overview, 
+		mission_vehicle_t* vehs, mission_groundInstallation_t* gis);
 void MF_CheckMissionScriptOverviewValid( mission_overview_t* overview, qboolean updateFormat );
 void MF_SetMissionScriptOverviewDefaults( mission_overview_t* overview );
 int MF_getIndexOfVehicle( int start, int gameset, int team, int cat, int cls );
