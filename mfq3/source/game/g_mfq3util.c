@@ -1,5 +1,5 @@
 /*
- * $Id: g_mfq3util.c,v 1.8 2001-12-24 02:17:35 thebjoern Exp $
+ * $Id: g_mfq3util.c,v 1.9 2001-12-27 19:14:46 thebjoern Exp $
 */
 
 
@@ -105,7 +105,7 @@ void updateTargetTracking( gentity_t *ent )
 			track(ent, test);
 		} else {
 			if( buildings ) {
-				if( test->s.eType == ET_EXPLOSIVE ) {
+				if( test->s.eType == ET_EXPLOSIVE && test->takedamage ) {
 					track(ent, test);
 				}
 			} else {

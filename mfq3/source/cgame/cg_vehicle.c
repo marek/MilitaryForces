@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicle.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: cg_vehicle.c,v 1.2 2001-12-27 19:14:46 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -41,8 +41,11 @@ static void CG_CachePlane(int index)
 		case BP_PLANE_BAY:
 			Com_sprintf( name, sizeof(name), "%s_bay.md3", basename );
 			break;
-		case BP_PLANE_SWING:
-			Com_sprintf( name, sizeof(name), "%s_swing.md3", basename );
+		case BP_PLANE_WINGLEFT:
+			Com_sprintf( name, sizeof(name), "%s_wingL.md3", basename );
+			break;
+		case BP_PLANE_WINGRIGHT:
+			Com_sprintf( name, sizeof(name), "%s_wingR.md3", basename );
 			break;
 		case BP_PLANE_SPECIAL:
 			Com_sprintf( name, sizeof(name), "%s_special.md3", basename );

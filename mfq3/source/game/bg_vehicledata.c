@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.4 2001-12-23 02:02:14 thebjoern Exp $
+ * $Id: bg_vehicledata.c,v 1.5 2001-12-27 19:14:46 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -42,6 +42,7 @@ completeVehicleData_t availableVehicles[] =
 	AB_BALL,					// effect model
 	8000,						// radar range
 	4000,						// radar range ground
+	0,							// swingangle
 	0							// renderflags
     },
 
@@ -75,6 +76,7 @@ completeVehicleData_t availableVehicles[] =
 	AB_BALL,					// effect model
 	10000,						// radar range
 	3000,						// radar range ground
+	0,							// swingangle
 	0							// renderflags
     },
 
@@ -108,6 +110,7 @@ completeVehicleData_t availableVehicles[] =
 	AB_RED_SMALL,				// effect model
 	6000,						// radar range
 	2000,						// radar range ground
+	0,							// swingangle
 	0							// renderflags
     },
 
@@ -141,7 +144,110 @@ completeVehicleData_t availableVehicles[] =
 	AB_RED,						// effect model
 	12000,						// radar range
 	6000,						// radar range ground
+	0,							// swingangle
 	MFR_DUALPILOT|MFR_BIGVAPOR	// renderflags
+    },
+
+    {	"F-14 Tomcat",		    // descriptiveName
+	"f-14",						// modelName
+	MF_GAMESET_MODERN|			// id
+	MF_TEAM_2|
+	CAT_PLANE|
+	CLASS_PLANE_FIGHTER,
+	0,							// flags
+	HC_GEAR|HC_SPEEDBRAKE|
+	HC_VAPOR|HC_DUALENGINE|HC_SWINGWING,		// capabilities
+	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
+	{-31, -28, -5},				// mins (bounding box)
+	{54, 28, 14},				// max (bounding box)
+	{60, 80, 200},				// turnspeed around the three axis
+	80, 18,						// camera distance and height
+	220,						// stallspeed
+	880,						// maxspeed
+	0,							// min throttle
+	15,							// max throttle
+	260,						// acceleration
+	150,						// health
+	{19.1f,7.87f,-0.112f},		// gun tag
+	80,							// max fuel
+	3,							// gearheight
+	0,							// tailangle
+	WI_MG_20MM, WI_FFAR, WI_MK82, 0, 0, 0, 0, WI_FLARE,	// weapons
+	450, 12, 12, 0, 0, 0, 0, 35,		// ammo
+	{28, 0, 6},					// cameraposition for cockpit view
+	AB_RED,						// effect model
+	12000,						// radar range
+	6000,						// radar range ground
+	50,							// swingangle
+	MFR_DUALPILOT|MFR_BIGVAPOR	// renderflags
+    },
+
+    {	"F-18 Hornet",		    // descriptiveName
+	"f-18",						// modelName
+	MF_GAMESET_MODERN|			// id
+	MF_TEAM_1|
+	CAT_PLANE|
+	CLASS_PLANE_FIGHTER,
+	0,							// flags
+	HC_GEAR|HC_SPEEDBRAKE|
+	HC_VAPOR,					// capabilities
+	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
+	{-26, -21, -4},				// mins (bounding box)
+	{36, 21, 15},				// max (bounding box)
+	{80, 80, 260},				// turnspeed around the three axis
+	70, 18,						// camera distance and height
+	200,						// stallspeed
+	700,						// maxspeed
+	0,							// min throttle
+	15,							// max throttle
+	260,						// acceleration
+	130,						// health
+	{16.65f, -3.391f, 0.378f},	// gun tag
+	60,							// max fuel
+	3,							// gearheight
+	0,							// tailangle
+	WI_MG_20MM, WI_FFAR, WI_MK82, WI_SIDEWINDER, WI_AMRAAM, WI_PHOENIX, WI_HELLFIRE, WI_FLARE,	// weapons
+	450, 24, 8, 4, 4, 4, 8, 30,		// ammo
+	{19, 0, 5},					// cameraposition for cockpit view
+	AB_BALL,					// effect model
+	8000,						// radar range
+	4000,						// radar range ground
+	0,							// swingangle
+	0							// renderflags
+    },
+
+    {	"B-2 Shadow",		    // descriptiveName
+	"b-2",						// modelName
+	MF_GAMESET_MODERN|			// id
+	MF_TEAM_1|
+	CAT_PLANE|
+	CLASS_PLANE_FIGHTER,
+	0,							// flags
+	HC_GEAR|HC_SPEEDBRAKE|
+	HC_VAPOR,					// capabilities
+	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
+	{-26, -21, -4},				// mins (bounding box)
+	{36, 21, 15},				// max (bounding box)
+	{80, 80, 260},				// turnspeed around the three axis
+	70, 18,						// camera distance and height
+	200,						// stallspeed
+	700,						// maxspeed
+	0,							// min throttle
+	10,							// max throttle
+	260,						// acceleration
+	130,						// health
+	{16.65f, -3.391f, 0.378f},	// gun tag
+	60,							// max fuel
+	3,							// gearheight
+	0,							// tailangle
+	WI_MG_20MM, WI_FFAR, WI_MK82, WI_SIDEWINDER, WI_AMRAAM, WI_PHOENIX, WI_HELLFIRE, WI_FLARE,	// weapons
+	450, 24, 8, 4, 4, 4, 8, 30,		// ammo
+	{19, 0, 5},					// cameraposition for cockpit view
+	AB_BALL,					// effect model
+	8000,						// radar range
+	4000,						// radar range ground
+	0,							// swingangle
+	0							// renderflags
     },
 
     {	"P-51d Mustang",		// descriptiveName
@@ -175,6 +281,7 @@ completeVehicleData_t availableVehicles[] =
 	0,							// effect model
 	0,							// radar range
 	0,							// radar range ground
+	0,							// swingangle
 	0							// renderflags
     },
 
@@ -209,6 +316,7 @@ completeVehicleData_t availableVehicles[] =
 	0,							// effect model
 	0,							// radar range
 	0,							// radar range ground
+	0,							// swingangle
 	0							// renderflags
     },
 
@@ -245,6 +353,7 @@ completeVehicleData_t availableVehicles[] =
 	0,							// effect model
 	8000,						// radar range
 	4000,						// radar range ground
+	0,							// swingangle
 	0							// renderflags
     },
 
@@ -277,6 +386,7 @@ completeVehicleData_t availableVehicles[] =
 	0,							// effect model
 	8000,						// radar range
 	4000,						// radar range ground
+	0,							// swingangle
 	0							// renderflags
     },
 
@@ -309,6 +419,7 @@ completeVehicleData_t availableVehicles[] =
 	0,							// effect model
 	8000,						// radar range
 	4000,						// radar range ground
+	0,							// swingangle
 	0							// renderflags
     },
 
@@ -341,6 +452,7 @@ completeVehicleData_t availableVehicles[] =
 	0,							// effect model
 	8000,						// radar range
 	4000,						// radar range ground
+	0,							// swingangle
 	0							// renderflags
     }
 };

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_plane.c,v 1.6 2001-12-24 02:17:35 thebjoern Exp $
+ * $Id: cg_plane.c,v 1.7 2001-12-27 19:14:46 thebjoern Exp $
 */
 
 
@@ -13,10 +13,12 @@ char *plane_tags[BP_PLANE_MAX_PARTS] =
 	"tag_gear",		// gear
 	"tag_breaks",	// brakes
 	"tag_bay",		// bay
-	"tag_swing",	// swing
+	"tag_wingL",	// wing left
+	"tag_wingR",	// wing right
 	"tag_special",	// special
 	"tag_prop1"		// prop
 };
+
 
 /*
 ===============
@@ -212,6 +214,8 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 	int				i;
 	int				ONOFF = cent->currentState.ONOFF;
 	vec3_t			velocity;	
+	playerState_t*	ps = &cg.snap->ps;
+	float			swingangle = 0;
 
 	// get velocity
 	BG_EvaluateTrajectoryDelta( &cent->currentState.pos, cg.time, velocity );
@@ -268,9 +272,25 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 			part[BP_PLANE_BRAKES].frame = 0;
 		}
 	}
+		// swing wings
+	if( availableVehicles[ci->vehicle].caps & HC_SWINGWING ) {
+		float speed = ps->speed/10;
+		float min = availableVehicles[ci->vehicle].stallspeed * 1.5f;
+		float max = availableVehicles[ci->vehicle].maxspeed * 0.8f;
+		float diff = max - min;
+		float maxangle = availableVehicles[ci->vehicle].swingangle;
+		if( speed >= min ) {
+			if( speed < max ) {
+				swingangle = (speed - min) * (maxangle / diff);
+			} else {
+				swingangle = maxangle;
+			}
+		}
+	}
+		// cockpit
 	if( ONOFF & OO_COCKPIT ) {
 		part[BP_PLANE_COCKPIT].frame = 1;
-	}
+	} 
 //	CG_Printf( "CG Anim is %d\n", part[BP_PLANE_CONTROLS].frame );
 
     //
@@ -305,6 +325,12 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 		if( i == BP_PLANE_PROP && (availableVehicles[ci->vehicle].caps & HC_PROP) ) {
 			RotateAroundDirection( part[BP_PLANE_PROP].axis, cg.time );
 		}
+		if( (i == BP_PLANE_WINGLEFT || i == BP_PLANE_WINGRIGHT) &&
+			(availableVehicles[ci->vehicle].caps & HC_SWINGWING) ) {
+			RotateAroundYaw( part[BP_PLANE_WINGLEFT].axis, swingangle );
+			RotateAroundYaw( part[BP_PLANE_WINGRIGHT].axis, -swingangle );
+		}
+
 		CG_PositionRotatedEntityOnTag( &part[i], &part[BP_PLANE_BODY], ci->parts[BP_PLANE_BODY], plane_tags[i] );
 		part[i].shadowPlane = shadowPlane;
 		part[i].renderfx = renderfx;
@@ -352,7 +378,6 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 		vec3_t	forward, ang, end;
 		trace_t	tr;
 		float len;
-		playerState_t* ps = &cg.snap->ps;
 		float mindist = cg_thirdPersonRange.integer + availableVehicles[ci->vehicle].cam_dist + 
 			availableVehicles[ci->vehicle].maxs[0] + 20;
 

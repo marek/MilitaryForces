@@ -1,5 +1,5 @@
 /*
- * $Id: cg_groundvehicle.c,v 1.6 2001-12-24 02:17:35 thebjoern Exp $
+ * $Id: cg_groundvehicle.c,v 1.7 2001-12-27 19:14:46 thebjoern Exp $
 */
 
 
@@ -21,12 +21,6 @@ CG_GroundVehicleShadow
 ===============
 */
 static qboolean CG_GroundVehicleShadow( centity_t *cent, float *shadowPlane ) {
-
-	// shadows for ground vehicles are only needed when the ground vehicle
-	// is "airborne", ie for example it is falling down a cliff or bridge
-	// - by default the flag OO_LANDED is set for ground vehicles and it
-	// only gets removed when the vehicle is falling
-
 
 	return qfalse;	// temp to make it compile
 
