@@ -1,5 +1,5 @@
 /*
- * $Id: cg_weapons.c,v 1.14 2002-02-23 19:31:55 thebjoern Exp $
+ * $Id: cg_weapons.c,v 1.15 2002-02-23 23:07:07 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -407,7 +407,7 @@ void CG_FireWeapon( centity_t *cent ) {
 			trap_S_StartSound( NULL, ent->number, CHAN_WEAPON, weap->flashSound[c] );
 		}
 	}
-	MF_removeWeaponFromLoadout(ent->weaponIndex, &cg_loadouts[ent->number], 0 );
+	MF_removeWeaponFromLoadout(ent->weaponIndex, &cg_loadouts[ent->number], 0, 0, 0 );
 }
 
 

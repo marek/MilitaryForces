@@ -1,5 +1,5 @@
 /*
- * $Id: g_missile.c,v 1.12 2002-02-23 19:31:55 thebjoern Exp $
+ * $Id: g_missile.c,v 1.13 2002-02-23 23:07:08 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -345,7 +345,7 @@ void fire_antiair (gentity_t *self) {
 	int			mult;
 	char		tagname[16];
 
-	MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, tagname );
+	MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, tagname,0,0 );
 
 	VectorCopy( availableVehicles[self->client->vehicle].gunoffset, offset );
 	VectorCopy( self->s.pos.trBase, start );
@@ -425,7 +425,7 @@ void fire_antiground (gentity_t *self) {
 	int			mult;
 	char		tagname[16];
 
-	MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, tagname );
+	MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, tagname,0,0 );
 
 	VectorCopy( availableVehicles[self->client->vehicle].gunoffset, offset );
 	VectorCopy( self->s.pos.trBase, start );
@@ -502,16 +502,14 @@ void fire_ffar (gentity_t *self) {
 	gentity_t	*bolt;
 	vec3_t		dir, right, up;
 	vec3_t		start, offset, forward, temp;
-	int			mult;
+//	int			mult;
 	char		tagname[16];
 
-	MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, tagname );
-
-	VectorCopy( availableVehicles[self->client->vehicle].gunoffset, offset );
 	VectorCopy( self->s.pos.trBase, start );
 
 	if( (availableVehicles[self->client->vehicle].cat & CAT_GROUND) ||
 		(availableVehicles[self->client->vehicle].cat & CAT_BOAT) ) {
+		VectorCopy( availableVehicles[self->client->vehicle].gunoffset, offset );
 		// use this to make it shoot where the player looks
 //		AngleVectors( self->client->ps.viewangles, dir, 0, 0 );
 //		VectorCopy( self->s.pos.trBase, start );
@@ -523,15 +521,15 @@ void fire_ffar (gentity_t *self) {
 		RotatePointAroundVector( dir, right, temp, ((float)self->client->ps.gunAngle)/10 );
 
 	} else {
-		// planes and helos for now just shoot along their direction of flight
-		AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
 		self->left = (self->left ? qfalse : qtrue);
-		mult = (self->left ? 1 : -1);
-		VectorMA( start, availableVehicles[self->client->vehicle].mins[2], up, start );
-		VectorMA( start, availableVehicles[self->client->vehicle].maxs[1]*mult/2, right, start );
+		MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, tagname, offset, self->left );
+		AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
+//		mult = (self->left ? 1 : -1);
+//		VectorMA( start, availableVehicles[self->client->vehicle].mins[2], up, start );
+//		VectorMA( start, availableVehicles[self->client->vehicle].maxs[1]*mult/2, right, start );
 	}
 	VectorMA( start, offset[0], dir, start );
-	VectorMA( start, offset[1], right, start );
+	VectorMA( start, -offset[1], right, start );
 	VectorMA( start, offset[2], up, start );
 	SnapVector( start );
 
@@ -573,7 +571,7 @@ void fire_ironbomb (gentity_t *self) {
 	int			mult;
 	char		tagname[16];
 
-	MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, tagname );
+	MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, tagname,0,0 );
 
 	AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
 	VectorCopy( self->s.pos.trBase, start );

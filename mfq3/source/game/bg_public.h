@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.72 2002-02-23 19:31:55 thebjoern Exp $
+ * $Id: bg_public.h,v 1.73 2002-02-23 23:07:08 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.63e"
+#define	GAME_VERSION		"mfq3 v0.64"
 
 #define	DEFAULT_GRAVITY		800
 
@@ -708,6 +708,7 @@ enum ShadowOrientationAdjusts {
 typedef struct pylonTags_s 
 {
 	char				tagname[MAX_MOUNTS_PER_PYLON*2][MAX_TAG_LENGTH];
+	vec3_t				pos[MAX_MOUNTS_PER_PYLON*2];
 } pylonTags_t;
 
 typedef struct completeLoadout_s
@@ -886,7 +887,7 @@ qboolean MF_findTag(const char* fileName, const char* tagname, md3Tag_t* tag);
 qboolean MF_distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout );
 void MF_calculateAllDefaultLoadouts();
 void MF_getDefaultLoadoutForVehicle( int idx, completeLoadout_t* loadout );
-qboolean MF_removeWeaponFromLoadout( int weaponIndex, completeLoadout_t* loadout, char* usedTag );
+qboolean MF_removeWeaponFromLoadout( int weaponIndex, completeLoadout_t* loadout, char* usedTag, vec3_t pos, qboolean nextMount );
 void MF_addWeaponToLoadout( int weaponIndex, completeLoadout_t* loadout );
 
 #define MF_THROTTLE_REVERSE		-5

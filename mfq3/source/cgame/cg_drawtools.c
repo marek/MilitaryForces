@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawtools.c,v 1.14 2002-02-22 11:43:26 thebjoern Exp $
+ * $Id: cg_drawtools.c,v 1.15 2002-02-23 23:07:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1285,6 +1285,10 @@ void CG_Parse_Reticle_Target( reticle_t * pR )
 	if( pR->pTarget->currentState.eType == ET_EXPLOSIVE )
 	{
 		pText = "^7Building";
+	} 
+	else if( pR->pTarget->currentState.eType == ET_MISC_VEHICLE )
+	{
+		pText = "^7Drone";
 	}
 	else
 	{

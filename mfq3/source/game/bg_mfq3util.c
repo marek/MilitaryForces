@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.18 2002-02-23 19:31:55 thebjoern Exp $
+ * $Id: bg_mfq3util.c,v 1.19 2002-02-23 23:07:07 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -297,6 +297,26 @@ qboolean MF_findTag(const char* fileName, const char* tagname, md3Tag_t* tag)
 }
 
 
+/*
+=================
+MF_setPylonTag
+
+providing the file and tagname this functions returns the taginfo
+=================
+*/
+void MF_setPylonTag(const char* fileName, const char* tagname, pylonTags_t* pT, unsigned int mount)
+{
+	md3Tag_t tag;
+
+	if( !fileName || !tagname || !pT ) return;
+
+	if( MF_findTag(fileName, tagname, &tag) ) {
+		VectorCopy( tag.origin, pT->pos[mount] );
+	} else {
+		VectorClear( pT->pos[mount] );
+	}
+	strcpy( pT->tagname[mount], tagname );
+}
 
 /*
 =================
@@ -313,6 +333,7 @@ qboolean MF_distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout )
 	int ammos[MAX_WEAPONS_PER_VEHICLE-2];
 	int pyls[MAX_WEAPONS_PER_VEHICLE];
 	qboolean done;
+	char* modelname = MF_CreateModelPathname( idx, "models/vehicles/%s/%s/%s.md3" );
 
 	if( idx < 0 ) return qfalse;
 
@@ -336,13 +357,15 @@ qboolean MF_distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout )
 		if( availableVehicles[idx].weapons[i] ) numWeaps++;
 	}
 
+
+
 	for( i = 0; i < numPylons; ++i ) {
 		int mounts = 0;
 		char temp[16];
 		switch( pyls[i] ) {
 		case PT_WINGTIP:
-			strcpy( loadout->tags[i].tagname[0], "tag_tip_l" );
-			strcpy( loadout->tags[i].tagname[1], "tag_tip_r" );
+			MF_setPylonTag(modelname, "tag_tip_l", &loadout->tags[i], 0);
+			MF_setPylonTag(modelname, "tag_tip_r", &loadout->tags[i], 1);
 			mounts = 2;
 			break;
 		case PT_WING_L:
@@ -350,26 +373,26 @@ qboolean MF_distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout )
 		case PT_WING_M:
 		case PT_BODY_M:
 			Com_sprintf(temp, 15, "tag_mt%d_l", i+1 );
-			strcpy( loadout->tags[i].tagname[0], temp );
+			MF_setPylonTag(modelname, temp, &loadout->tags[i], 0);
 			Com_sprintf(temp, 15, "tag_mt%d_r", i+1 );
-			strcpy( loadout->tags[i].tagname[1], temp );
+			MF_setPylonTag(modelname, temp, &loadout->tags[i], 1);
 			mounts = 2;
 			break;
 		case PT_WING_H:
 		case PT_BODY_H:
 		case PT_BODY_CENTER_H:
 			Com_sprintf(temp, 15, "tag_mt%d_1_l", i+1 );
-			strcpy( loadout->tags[i].tagname[0], temp );
+			MF_setPylonTag(modelname, temp, &loadout->tags[i], 0);
 			Com_sprintf(temp, 15, "tag_mt%d_1_r", i+1 );
-			strcpy( loadout->tags[i].tagname[1], temp );
+			MF_setPylonTag(modelname, temp, &loadout->tags[i], 1);
 			Com_sprintf(temp, 15, "tag_mt%d_2_r", i+1 );
-			strcpy( loadout->tags[i].tagname[2], temp );
+			MF_setPylonTag(modelname, temp, &loadout->tags[i], 2);
 			Com_sprintf(temp, 15, "tag_mt%d_2_l", i+1 );
-			strcpy( loadout->tags[i].tagname[3], temp );
+			MF_setPylonTag(modelname, temp, &loadout->tags[i], 3);
 			Com_sprintf(temp, 15, "tag_mt%d_3_l", i+1 );
-			strcpy( loadout->tags[i].tagname[4], temp );
+			MF_setPylonTag(modelname, temp, &loadout->tags[i], 4);
 			Com_sprintf(temp, 15, "tag_mt%d_3_r", i+1 );
-			strcpy( loadout->tags[i].tagname[5], temp );
+			MF_setPylonTag(modelname, temp, &loadout->tags[i], 5);
 			mounts = 6;
 			break;
 		case PT_BODY_CENTER_L:
@@ -377,9 +400,9 @@ qboolean MF_distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout )
 		case PT_BAY:
 		case PT_BAY_CENTER:
 			Com_sprintf(temp, 15, "tag_mt%d_l", i+1 );
-			strcpy( loadout->tags[i].tagname[0], temp );
+			MF_setPylonTag(modelname, temp, &loadout->tags[i], 0);
 			Com_sprintf(temp, 15, "tag_mt%d_r", i+1 );
-			strcpy( loadout->tags[i].tagname[1], temp );
+			MF_setPylonTag(modelname, temp, &loadout->tags[i], 1);
 			mounts = 1;
 			break;
 		}
@@ -410,7 +433,8 @@ qboolean MF_distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout )
 				loadout->mountedWeapons[i], availableWeapons[loadout->weaponType[i]].descriptiveName );
 		Com_Printf( "Tags are:\n" );
 		for( j = 0; j < MAX_MOUNTS_PER_PYLON*2; ++j ) {
-			Com_Printf( "%s\n", loadout->tags[i].tagname[j] );
+			Com_Printf( "%s (%.2f %.2f %.2f)\n", loadout->tags[i].tagname[j], loadout->tags[i].pos[j][0],
+				loadout->tags[i].pos[j][1], loadout->tags[i].pos[j][2] );
 		}
 	}
 
@@ -463,16 +487,21 @@ firing
 =================
 */
 
-qboolean MF_removeWeaponFromLoadout( int weaponIndex, completeLoadout_t* loadout, char* usedTag )
+qboolean MF_removeWeaponFromLoadout( int weaponIndex, completeLoadout_t* loadout, char* usedTag, 
+									vec3_t pos, qboolean nextMount )
 {
 	int i, num;
 
 	for( i = 0; i < MAX_WEAPONS_PER_VEHICLE; ++i ) {
-		if( loadout->weaponType[i] == weaponIndex &&
-			loadout->mountedWeapons[i] &&
-			!(availableWeapons[weaponIndex].flags & WF_NON_REMOVABLE_VWEP) ) {
-			num = --loadout->mountedWeapons[i];
+		if( loadout->weaponType[i] == weaponIndex && loadout->mountedWeapons[i] ) {
+			if( availableWeapons[weaponIndex].flags & WF_NON_REMOVABLE_VWEP ) {
+				num = loadout->mountedWeapons[i] - (nextMount ? 2 : 1);
+				if( num < 0 ) num = 0;
+			} else {
+				num = --loadout->mountedWeapons[i];
+			}
 			if( usedTag ) strcpy( usedTag, loadout->tags[i].tagname[num] );
+			if( pos ) VectorCopy( loadout->tags[i].pos[num], pos );
 			return qtrue;
 		}
 	}
@@ -491,4 +520,58 @@ reloading
 void MF_addWeaponToLoadout( int weaponIndex, completeLoadout_t* loadout )
 {
 }
+
+
+
+
+/*
+
+  		int mounts = 0;
+		char temp[16];
+		switch( pyls[i] ) {
+		case PT_WINGTIP:
+			strcpy( loadout->tags[i].tagname[0], "tag_tip_l" );
+			MF_setPylonTag(modelname, "tag_turret", &loadout->tags[i], 0);
+			strcpy( loadout->tags[i].tagname[1], "tag_tip_r" );
+			mounts = 2;
+			break;
+		case PT_WING_L:
+		case PT_BODY_L:
+		case PT_WING_M:
+		case PT_BODY_M:
+			Com_sprintf(temp, 15, "tag_mt%d_l", i+1 );
+			strcpy( loadout->tags[i].tagname[0], temp );
+			Com_sprintf(temp, 15, "tag_mt%d_r", i+1 );
+			strcpy( loadout->tags[i].tagname[1], temp );
+			mounts = 2;
+			break;
+		case PT_WING_H:
+		case PT_BODY_H:
+		case PT_BODY_CENTER_H:
+			Com_sprintf(temp, 15, "tag_mt%d_1_l", i+1 );
+			strcpy( loadout->tags[i].tagname[0], temp );
+			Com_sprintf(temp, 15, "tag_mt%d_1_r", i+1 );
+			strcpy( loadout->tags[i].tagname[1], temp );
+			Com_sprintf(temp, 15, "tag_mt%d_2_r", i+1 );
+			strcpy( loadout->tags[i].tagname[2], temp );
+			Com_sprintf(temp, 15, "tag_mt%d_2_l", i+1 );
+			strcpy( loadout->tags[i].tagname[3], temp );
+			Com_sprintf(temp, 15, "tag_mt%d_3_l", i+1 );
+			strcpy( loadout->tags[i].tagname[4], temp );
+			Com_sprintf(temp, 15, "tag_mt%d_3_r", i+1 );
+			strcpy( loadout->tags[i].tagname[5], temp );
+			mounts = 6;
+			break;
+		case PT_BODY_CENTER_L:
+		case PT_BODY_CENTER_M:
+		case PT_BAY:
+		case PT_BAY_CENTER:
+			Com_sprintf(temp, 15, "tag_mt%d_l", i+1 );
+			strcpy( loadout->tags[i].tagname[0], temp );
+			Com_sprintf(temp, 15, "tag_mt%d_r", i+1 );
+			strcpy( loadout->tags[i].tagname[1], temp );
+			mounts = 1;
+			break;
+
+  */
 
