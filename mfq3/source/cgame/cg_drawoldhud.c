@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawoldhud.c,v 1.4 2002-02-18 09:51:27 thebjoern Exp $
+ * $Id: cg_drawoldhud.c,v 1.5 2002-02-21 16:41:25 sparky909_uk Exp $
 */
 
 #include "cg_local.h"
@@ -340,6 +340,9 @@ void CG_DrawStatusBar_MFQ3( void ) {
 	cent = &cg_entities[cg.snap->ps.clientNum];
 	ps = &cg.snap->ps;
 
+	// aiming/targetting reticles
+	CG_Draw_Reticles();
+
 	// main background
 	CG_DrawPic( 0, 430, 640, 50, cgs.media.HUDmain );
 	
@@ -513,7 +516,4 @@ void CG_DrawStatusBar_MFQ3( void ) {
 			CG_DrawPic( 200, 440, 24, 45, availableWeapons[availableVehicles[vehicle].weapons[0]].iconHandle );
 		}
 	}
-
-	// aiming/targetting reticles
-	CG_Draw_Reticles();
 }

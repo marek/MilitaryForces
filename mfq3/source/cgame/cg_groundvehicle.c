@@ -1,5 +1,5 @@
 /*
- * $Id: cg_groundvehicle.c,v 1.14 2002-02-19 16:32:47 sparky909_uk Exp $
+ * $Id: cg_groundvehicle.c,v 1.15 2002-02-21 16:41:25 sparky909_uk Exp $
 */
 
 
@@ -256,7 +256,7 @@ void CG_GroundVehicle( centity_t *cent, clientInfo_t *ci )
 			reticle.shadowPlane = shadowPlane;
 			reticle.renderfx = renderfx;
 
-			CG_AddReticleEntityToScene( &reticle, qtrue );
+			CG_AddReticleEntityToScene( &reticle, target );
 
 			// are we locked onto this target?
 			if( ps->stats[STAT_LOCKINFO] & LI_LOCKING )
@@ -310,7 +310,7 @@ void CG_GroundVehicle( centity_t *cent, clientInfo_t *ci )
 				reticlelock.renderfx = renderfx;
 			}
 
-			CG_AddReticleEntityToScene( &reticlelock, qfalse );
+			CG_AddReticleEntityToScene( &reticlelock, NULL );
 		}
 		else
 		{
@@ -354,7 +354,7 @@ void CG_GroundVehicle( centity_t *cent, clientInfo_t *ci )
 			reticle.shadowPlane = shadowPlane;
 			reticle.renderfx = renderfx;
 			
-			CG_AddReticleEntityToScene( &reticle, qfalse );
+			CG_AddReticleEntityToScene( &reticle, NULL );
 		}
 	}
 

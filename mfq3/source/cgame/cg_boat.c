@@ -1,5 +1,5 @@
 /*
- * $Id: cg_boat.c,v 1.4 2002-02-21 13:14:20 thebjoern Exp $
+ * $Id: cg_boat.c,v 1.5 2002-02-21 16:41:25 sparky909_uk Exp $
 */
 
 
@@ -203,7 +203,7 @@ void CG_Boat( centity_t *cent, clientInfo_t *ci )
 			reticle.shadowPlane = shadowPlane;
 			reticle.renderfx = renderfx;
 
-			CG_AddReticleEntityToScene( &reticle, qtrue );
+			CG_AddReticleEntityToScene( &reticle, target );
 
 			// are we locked onto this target?
 			if( ps->stats[STAT_LOCKINFO] & LI_LOCKING )
@@ -257,7 +257,7 @@ void CG_Boat( centity_t *cent, clientInfo_t *ci )
 				reticlelock.renderfx = renderfx;
 			}
 
-			CG_AddReticleEntityToScene( &reticlelock, qfalse );
+			CG_AddReticleEntityToScene( &reticlelock, NULL );
 		}
 		else
 		{
@@ -301,7 +301,7 @@ void CG_Boat( centity_t *cent, clientInfo_t *ci )
 			reticle.shadowPlane = shadowPlane;
 			reticle.renderfx = renderfx;
 			
-			CG_AddReticleEntityToScene( &reticle, qfalse );
+			CG_AddReticleEntityToScene( &reticle, NULL );
 		}
 	}
 

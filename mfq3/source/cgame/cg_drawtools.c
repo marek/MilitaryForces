@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawtools.c,v 1.12 2002-02-20 18:08:09 sparky909_uk Exp $
+ * $Id: cg_drawtools.c,v 1.13 2002-02-21 16:41:25 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1122,7 +1122,7 @@ Adds a reticle, either as a 2D sprite or as pending HUD gfx
 
 #pragma message ("CG_AddReticleEntityToScene() FRIEND tracking/lock NOT implemented")
 
-void CG_AddReticleEntityToScene( refEntity_t * pReticle, qboolean targetRecticle )
+void CG_AddReticleEntityToScene( refEntity_t * pReticle, centity_t * pTarget )
 {
 	float offsetx, offsety, scaling = 1.0f;
 
@@ -1165,7 +1165,7 @@ void CG_AddReticleEntityToScene( refEntity_t * pReticle, qboolean targetRecticle
 	}
 
 	// override if target reticle
-	if( targetRecticle )
+	if( pTarget )
 	{
 		pReticle->customShader = cgs.media.HUDreticles[ HR_TARGET_ENEMY ];
 		
@@ -1232,13 +1232,20 @@ void CG_AddReticleEntityToScene( refEntity_t * pReticle, qboolean targetRecticle
 		// if HUD image
 		if( CG_WorldToScreenCoords( pReticle->origin, &cg.HUDReticle[cg.reticleIdx].x, &cg.HUDReticle[cg.reticleIdx].y, qtrue ) )
 		{
+			// set origin
+			cg.HUDReticle[cg.reticleIdx].ox = cg.HUDReticle[cg.reticleIdx].x;
+			cg.HUDReticle[cg.reticleIdx].oy = cg.HUDReticle[cg.reticleIdx].y;
+
 			// apply centering offset
 			cg.HUDReticle[cg.reticleIdx].x -= offsetx;
 			cg.HUDReticle[cg.reticleIdx].y -= offsety;
 
-			// draw
+			// gfx
 			cg.HUDReticle[cg.reticleIdx].shader = pReticle->customShader;
 			
+			// set any target
+			cg.HUDReticle[cg.reticleIdx].pTarget = pTarget;
+
 			// this was valid, move to next
 			cg.reticleIdx++;
 		}
@@ -1253,8 +1260,56 @@ void CG_AddReticleEntityToScene( refEntity_t * pReticle, qboolean targetRecticle
 
 /*
 ================
+CG_Parse_Reticle_Target
+
+Parses and draws (if appropriate) reticle labels
+================
+*/
+
+#define HUD_LABEL_OFFSET 12
+
+void CG_Parse_Reticle_Target( reticle_t * pR )
+{
+	char * pText = NULL;
+	int client = 0;
+
+	// if no target pointer do nothing
+	if( pR->pTarget == NULL )
+	{
+		return;
+	}
+
+	// interpret the pointer
+
+	// just a building?
+	if( pR->pTarget->currentState.eType == ET_EXPLOSIVE )
+	{
+		pText = "^7Building";
+	}
+	else
+	{
+		// assume everthing else is a player for now
+		client = pR->pTarget->currentState.number;
+
+#pragma message( "CG_Parse_Reticle_Target() FRIEND label colouring NOT implemented" )
+
+		// create the text
+		pText = va( "^2%s ^3%s", cgs.clientinfo[ client ].name, 
+					availableVehicles[ client ].tinyName );
+	}
+
+	// draw label?
+	if( pText )
+	{
+		CG_Draw_HUD_Label( pR[0].ox, pR[0].y - HUD_LABEL_OFFSET, pText, 0.80f );
+	}
+}
+
+/*
+================
 CG_Draw_Reticles
 
+Draws all pending 2D reticles
 ================
 */
 void CG_Draw_Reticles( void )
@@ -1270,8 +1325,45 @@ void CG_Draw_Reticles( void )
 		// draw?
 		if( pR[i].shader )
 		{
+			// draw gfx
 			CG_DrawPic( pR[i].x, pR[i].y, pR[i].w, pR[i].h, pR[i].shader );
+
+			// draw associated label (if any)
+			CG_Parse_Reticle_Target( &pR[i] );
 		}
 	}
 }
 
+/*
+================
+CG_Draw_HUD_Label
+
+Draws a HUD label (x & y defines the centre point)
+================
+*/
+
+#define HUD_LABEL_SCALE		0.25f
+#define	HUD_LABEL_TL		2
+#define	HUD_LABEL_BR		(HUD_LABEL_TL*2)
+
+void CG_Draw_HUD_Label( int x, int y, char * pText, float alpha )
+{
+	int labelWidth = 0;
+	int labelHeight = 0;
+
+	// get dimensions
+	labelWidth = DC->textWidth( pText, HUD_LABEL_SCALE, 0 );
+	labelHeight = DC->textHeight( pText, HUD_LABEL_SCALE, 0 );
+
+	// draw background
+	DC->fillRect( x-(labelWidth/2)-HUD_LABEL_TL, y-HUD_LABEL_TL,
+		labelWidth+HUD_LABEL_BR, labelHeight+HUD_LABEL_BR,
+		*CreateColourVector( 0,0,0,(0.5f * alpha),NULL ) );
+
+	DC->drawRect( x-(labelWidth/2)-HUD_LABEL_TL, y-HUD_LABEL_TL,
+		labelWidth+HUD_LABEL_BR, labelHeight+HUD_LABEL_BR,
+		1, *CreateColourVector( 0,0,0,(0.75f * alpha),NULL ) );
+
+	// draw timer string
+	DrawStringNew( x, (y+1), HUD_LABEL_SCALE, *CreateColourVector( 0,0,0,(1.0f * alpha),NULL ), pText, 0, 0, ITEM_TEXTSTYLE_NORMAL, CENTRE_JUSTIFY );
+}

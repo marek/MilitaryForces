@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.24 2002-02-20 12:05:29 thebjoern Exp $
+ * $Id: cg_drawnewhud.c,v 1.25 2002-02-21 16:41:25 sparky909_uk Exp $
 */
 
 #include "cg_local.h"
@@ -1430,6 +1430,9 @@ void CG_DrawStatusBar_MFQ3_new( void ) {
 		return;
 	}
 
+	// aiming/targetting reticles
+	CG_Draw_Reticles();
+
 	cent = &cg_entities[cg.snap->ps.clientNum];
 	ps = &cg.snap->ps;
 	speed = ps->speed/10;
@@ -1534,8 +1537,5 @@ void CG_DrawStatusBar_MFQ3_new( void ) {
 
 	// cleanup
 	cg.radarTargets = 0;
-
-	// aiming/targetting reticles
-	CG_Draw_Reticles();
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.37 2002-02-21 09:56:57 sparky909_uk Exp $
+ * $Id: cg_local.h,v 1.38 2002-02-21 16:41:25 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,6 +9,9 @@
 #include "../game/bg_public.h"
 #include "cg_public.h"
 #include "../ui/ui_shared.h"
+
+// used for 2D drawing using the shared UI code
+extern displayContextDef_t * DC;
 
 // global client enumerations
 
@@ -391,11 +394,14 @@ typedef struct {
 
 // reticle structure passed to the HUD code for rendering
 typedef struct {
-	int x;
+	int ox;	// real x & y
+	int oy;
+	int x;	// draw x & y
 	int y;
-	int w;
+	int w;	// width & height
 	int h;
-	qhandle_t shader;
+	qhandle_t shader;		// shader index (gfx)
+	centity_t * pTarget;	// target entity pointer (can be NULL)
 } reticle_t;
 
 #define MAX_REWARDSTACK		10
@@ -1129,8 +1135,9 @@ void CG_DrawTopBottom(float x, float y, float w, float h, float size);
 qboolean CG_GenericShadow( centity_t *cent, float *shadowPlane );
 
 void CG_ResetReticles( void );
-void CG_AddReticleEntityToScene( refEntity_t * pReticle, qboolean targetRecticle );
+void CG_AddReticleEntityToScene( refEntity_t * pReticle, centity_t * pTarget );
 void CG_Draw_Reticles();
+void CG_Draw_HUD_Label( int x, int y, char * pText, float alpha );
 
 //
 // cg_draw.c, cg_newDraw.c

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_draw.c,v 1.26 2002-02-21 13:42:02 sparky909_uk Exp $
+ * $Id: cg_draw.c,v 1.27 2002-02-21 16:41:25 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -17,9 +17,6 @@
 	extern displayContextDef_t cgDC;
 	menuDef_t *menuScoreboard = NULL;
 	menuDef_t *menuSpectator = NULL;
-
-	// used for general drawing
-	extern displayContextDef_t *DC;
 #endif
 
 /*
