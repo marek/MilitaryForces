@@ -1,5 +1,5 @@
 /*
- * $Id: bg_weapondata.c,v 1.18 2002-03-03 15:23:06 thebjoern Exp $
+ * $Id: bg_weapondata.c,v 1.19 2002-04-16 11:28:18 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -1382,7 +1382,7 @@ completeWeaponData_t availableWeapons[] =
 		"Flares",							// descriptiveName
 		"Flares",							// shortName
 		"Flares",							// shortName2 (GVs)
-		"models/weapons/ffar.md3",			// modelName
+		"models/weapons/vwep_flarechaff.md3",// modelName
 		0,									// handle
 		"",									// vwepName
 		0,									// vwephandle
@@ -1393,7 +1393,7 @@ completeWeaponData_t availableWeapons[] =
 		0,									// muzzleVelocity
 		0,									// range
 		2000,								// fuelrange
-		100,								// fire interval
+		200,								// fire interval
 		0,									// damage
 		0,									// damageRadius
 		1,									// spread

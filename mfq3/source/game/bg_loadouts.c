@@ -1,5 +1,5 @@
 /*
- * $Id: bg_loadouts.c,v 1.4 2002-02-27 23:11:18 thebjoern Exp $
+ * $Id: bg_loadouts.c,v 1.5 2002-04-16 11:28:17 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -81,12 +81,13 @@ qboolean MF_distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout )
 			}
 		}
 	}
-
+#ifdef _DEBUG
 	for( i = 0; i < num; ++i ) {
 		Com_Printf( "Mount %d: %d %x %c %d x %s\n", i, loadout->mounts[i].pos, loadout->mounts[i].flags,
 			(loadout->mounts[i].left ? 'L' : 'R'), loadout->mounts[i].num, 
 			availableWeapons[loadout->mounts[i].weapon].descriptiveName );
 	}
+#endif
 
 	return qtrue;
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: g_mfq3ents.c,v 1.9 2002-02-27 23:11:18 thebjoern Exp $
+ * $Id: g_mfq3ents.c,v 1.10 2002-04-16 11:28:18 thebjoern Exp $
 */
 
 
@@ -151,14 +151,6 @@ void recharge_touch( gentity_t *self, gentity_t *other, trace_t *trace ) {
 	if( !other->client ) {
 		return;
 	}
-	// no (q3)bots, flying oe dead stuff; speed and throttle have to be zero
-	if( other->client->vehicle < 0 ||
-		other->client->ps.speed > 0 ||
-		other->client->ps.throttle != 0 ||
-		other->health <= 0 || 
-		!(other->ONOFF & OO_LANDED) ) {
-		return;
-	}
 	
 	// are we the proper category ?
 	if( !(availableVehicles[other->client->vehicle].cat&self->ent_category) ) {
@@ -167,6 +159,17 @@ void recharge_touch( gentity_t *self, gentity_t *other, trace_t *trace ) {
 
 	// can we already recharge ?
 	if( level.time < other->rechargetime ) {
+		return;
+	}
+
+	other->rechargetime = level.time + ( g_gametype.integer >= GT_TEAM ? 1500 : 1000);
+
+	// no (q3)bots, flying oe dead stuff; speed and throttle have to be zero
+	if( other->client->vehicle < 0 ||
+		other->client->ps.speed > 0 ||
+		other->client->ps.throttle != 0 ||
+		other->health <= 0 || 
+		!(other->ONOFF & OO_LANDED) ) {
 		return;
 	}
 
@@ -204,7 +207,6 @@ void recharge_touch( gentity_t *self, gentity_t *other, trace_t *trace ) {
 		}
 	}
 
-	other->rechargetime = level.time + ( g_gametype.integer >= GT_TEAM ? 1500 : 1000);
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_weapons.c,v 1.19 2002-03-03 15:23:06 thebjoern Exp $
+ * $Id: cg_weapons.c,v 1.20 2002-04-16 11:28:17 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -172,6 +172,8 @@ void CG_RegisterWeapons() {
 
 		case WT_FLARE:
 			weaponInfo->missileModel = trap_R_RegisterModel( availableWeapons[i].modelName );
+			weaponInfo->missileDlight = 100;			
+			MAKERGB( weaponInfo->missileDlightColor, 1, 0.75f, 0 );
 			break;
 
 		default:
