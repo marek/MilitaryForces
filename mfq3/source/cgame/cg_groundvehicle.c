@@ -1,5 +1,5 @@
 /*
- * $Id: cg_groundvehicle.c,v 1.4 2001-12-22 22:16:01 thebjoern Exp $
+ * $Id: cg_groundvehicle.c,v 1.5 2001-12-23 02:02:14 thebjoern Exp $
 */
 
 
@@ -294,11 +294,11 @@ void CG_GroundVehicle( centity_t *cent, clientInfo_t *ci )
 				VectorMA( start, availableVehicles[ci->vehicle].gunoffset[2], up, start );
 				VectorMA( start, 2000, forward, end );
 				vectoangles( forward, ang );
-				ang[2] = 0;
+//				ang[2] = 0;
 				AnglesToAxis( ang, reticlelock.axis );
-				VectorScale( reticlelock.axis[0], 2.0f, reticlelock.axis[0] );
-				VectorScale( reticlelock.axis[1], 2.0f, reticlelock.axis[1] );
-				VectorScale( reticlelock.axis[2], 2.0f, reticlelock.axis[2] );
+				VectorScale( reticlelock.axis[0], 10.0f, reticlelock.axis[0] );
+				VectorScale( reticlelock.axis[1], 10.0f, reticlelock.axis[1] );
+				VectorScale( reticlelock.axis[2], 10.0f, reticlelock.axis[2] );
 				reticlelock.nonNormalizedAxes = qtrue;
 				CG_Trace( &tr, start, 0, 0, end, cg.snap->ps.clientNum, MASK_ALL ); 
 				VectorCopy( tr.endpos, end );

@@ -1,5 +1,5 @@
 /*
- * $Id: g_missile.c,v 1.2 2001-12-22 02:28:44 thebjoern Exp $
+ * $Id: g_missile.c,v 1.3 2001-12-23 02:02:14 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -300,18 +300,35 @@ fire_antiair MFQ3
 */
 void fire_antiair (gentity_t *self) {
 	gentity_t	*bolt;
-	vec3_t		dir, right, up;
-	vec3_t		start;
+	vec3_t		dir, right, up, temp, forward;
+	vec3_t		start, offset;
 	int			mult;
 
-	AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
+	VectorCopy( availableVehicles[self->client->vehicle].gunoffset, offset );
 	VectorCopy( self->s.pos.trBase, start );
-	if( (availableVehicles[self->client->vehicle].id&CAT_ANY) & CAT_PLANE ) {
+
+	if( (availableVehicles[self->client->vehicle].id&CAT_ANY) & CAT_GROUND ) {
+		// use this to make it shoot where the player looks
+//		AngleVectors( self->client->ps.viewangles, dir, 0, 0 );
+//		VectorCopy( self->s.pos.trBase, start );
+//		start[2] += availableVehicles[self->client->vehicle].maxs[2];
+		// otherwise use this
+		AngleVectors( self->client->ps.vehicleAngles, forward, right, up );
+		RotatePointAroundVector( temp, up, forward, ((float)self->client->ps.turretAngle)/10 );
+		CrossProduct( up, temp, right );
+		RotatePointAroundVector( dir, right, temp, ((float)self->client->ps.gunAngle)/10 );
+
+	} else {
+		// planes and helos for now just shoot along their direction of flight
+		AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
 		self->left = (self->left ? qfalse : qtrue);
 		mult = (self->left ? 1 : -1);
 		VectorMA( start, availableVehicles[self->client->vehicle].mins[2], up, start );
 		VectorMA( start, availableVehicles[self->client->vehicle].maxs[1]*mult/2, right, start );
 	}
+	VectorMA( start, offset[0], dir, start );
+	VectorMA( start, offset[1], right, start );
+	VectorMA( start, offset[2], up, start );
 	SnapVector( start );
 
 	bolt = G_Spawn();
@@ -353,17 +370,34 @@ fire_antiground MFQ3
 void fire_antiground (gentity_t *self) {
 	gentity_t	*bolt;
 	vec3_t		dir, right, up;
-	vec3_t		start;
+	vec3_t		start, offset, forward, temp;
 	int			mult;
 
-	AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
+	VectorCopy( availableVehicles[self->client->vehicle].gunoffset, offset );
 	VectorCopy( self->s.pos.trBase, start );
-	if( (availableVehicles[self->client->vehicle].id&CAT_ANY) & CAT_PLANE ) {
+
+	if( (availableVehicles[self->client->vehicle].id&CAT_ANY) & CAT_GROUND ) {
+		// use this to make it shoot where the player looks
+//		AngleVectors( self->client->ps.viewangles, dir, 0, 0 );
+//		VectorCopy( self->s.pos.trBase, start );
+//		start[2] += availableVehicles[self->client->vehicle].maxs[2];
+		// otherwise use this
+		AngleVectors( self->client->ps.vehicleAngles, forward, right, up );
+		RotatePointAroundVector( temp, up, forward, ((float)self->client->ps.turretAngle)/10 );
+		CrossProduct( up, temp, right );
+		RotatePointAroundVector( dir, right, temp, ((float)self->client->ps.gunAngle)/10 );
+
+	} else {
+		// planes and helos for now just shoot along their direction of flight
+		AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
 		self->left = (self->left ? qfalse : qtrue);
 		mult = (self->left ? 1 : -1);
 		VectorMA( start, availableVehicles[self->client->vehicle].mins[2], up, start );
 		VectorMA( start, availableVehicles[self->client->vehicle].maxs[1]*mult/2, right, start );
 	}
+	VectorMA( start, offset[0], dir, start );
+	VectorMA( start, offset[1], right, start );
+	VectorMA( start, offset[2], up, start );
 	SnapVector( start );
 
 	bolt = G_Spawn();
@@ -405,17 +439,34 @@ fire_ffar MFQ3
 void fire_ffar (gentity_t *self) {
 	gentity_t	*bolt;
 	vec3_t		dir, right, up;
-	vec3_t		start;
+	vec3_t		start, offset, forward, temp;
 	int			mult;
 
-	AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
+	VectorCopy( availableVehicles[self->client->vehicle].gunoffset, offset );
 	VectorCopy( self->s.pos.trBase, start );
-	if( (availableVehicles[self->client->vehicle].id&CAT_ANY) & CAT_PLANE ) {
+
+	if( (availableVehicles[self->client->vehicle].id&CAT_ANY) & CAT_GROUND ) {
+		// use this to make it shoot where the player looks
+//		AngleVectors( self->client->ps.viewangles, dir, 0, 0 );
+//		VectorCopy( self->s.pos.trBase, start );
+//		start[2] += availableVehicles[self->client->vehicle].maxs[2];
+		// otherwise use this
+		AngleVectors( self->client->ps.vehicleAngles, forward, right, up );
+		RotatePointAroundVector( temp, up, forward, ((float)self->client->ps.turretAngle)/10 );
+		CrossProduct( up, temp, right );
+		RotatePointAroundVector( dir, right, temp, ((float)self->client->ps.gunAngle)/10 );
+
+	} else {
+		// planes and helos for now just shoot along their direction of flight
+		AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
 		self->left = (self->left ? qfalse : qtrue);
 		mult = (self->left ? 1 : -1);
 		VectorMA( start, availableVehicles[self->client->vehicle].mins[2], up, start );
 		VectorMA( start, availableVehicles[self->client->vehicle].maxs[1]*mult/2, right, start );
 	}
+	VectorMA( start, offset[0], dir, start );
+	VectorMA( start, offset[1], right, start );
+	VectorMA( start, offset[2], up, start );
 	SnapVector( start );
 
 	bolt = G_Spawn();

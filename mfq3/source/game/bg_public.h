@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.10 2001-12-22 22:16:01 thebjoern Exp $
+ * $Id: bg_public.h,v 1.11 2001-12-23 02:02:14 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.43e"
+#define	GAME_VERSION		"mfq3 v0.44"
 
 #define	DEFAULT_GRAVITY		800
 #define	GIB_HEALTH			-50
@@ -686,6 +686,7 @@ typedef enum
 	WI_ATOLL,
 	WI_ARCHER,
 	WI_ALAMO,
+	WI_HELLFIRE,
 	WI_FLARE,
 	WI_MAX
 }weaponIndex_t;
