@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.24 2002-07-15 18:23:07 thebjoern Exp $
+ * $Id: g_local.h,v 1.25 2003-01-27 00:49:42 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -383,7 +383,7 @@ struct waypoint_s {
 	unsigned int	index;					// index in waypoint list
 };
 
-#define MAX_WAYPOINTS	256		// might need to be increased
+#define MAX_WAYPOINTS	2048		// might need to be increased
 
 typedef struct waypointList_s waypointList_t;
 
@@ -615,6 +615,7 @@ void Boat_Pain( gentity_t *self, gentity_t *attacker, int damage );
 // MFQ3
 //
 void DroneInit();
+void MF_LoadMissionScripts();
 
 
 // damage flags

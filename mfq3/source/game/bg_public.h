@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.101 2003-01-16 00:27:43 thebjoern Exp $
+ * $Id: bg_public.h,v 1.102 2003-01-27 00:49:42 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.74e"
+#define	GAME_VERSION		"mfq3 v0.74f"
 #define	GAME_IDENTIFIER		"mfq3"			// use to identify mfq3 servers
 
 #define	DEFAULT_GRAVITY		800
@@ -504,6 +504,7 @@ qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTim
 
 #define MAX_BOTS			1024
 #define MAX_BOTS_TEXT		8192
+#define MAX_MISSION_TEXT	32768
 
 // MFQ3 
 // (everything below)

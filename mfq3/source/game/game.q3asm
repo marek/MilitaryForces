@@ -40,6 +40,7 @@ mf_vehiclespawn
 g_mfq3ents
 g_miscvehicle
 g_mfq3util
+g_missions
 bg_vehicledata
 bg_weapondata
 bg_planemove
