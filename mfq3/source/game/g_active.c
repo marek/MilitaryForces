@@ -1,5 +1,5 @@
 /*
- * $Id: g_active.c,v 1.13 2002-02-27 14:21:59 sparky909_uk Exp $
+ * $Id: g_active.c,v 1.14 2002-02-27 16:07:29 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -54,12 +54,19 @@ void P_DamageFeedback( gentity_t *player ) {
 	}
 
 	// play an apropriate pain sound
-	if ( (level.time > player->pain_debounce_time) && !(player->flags & FL_GODMODE) ) {
+	if( (level.time > player->pain_debounce_time) && !(player->flags & FL_GODMODE) )
+	{
 		player->pain_debounce_time = level.time + 700;
+
+#pragma message( "Possible future <client> event loss from calling G_AddEvent()!" )
+/* MFQ3: don't create this event because (1) we don't need it and (2) it masks out our EV_VEHICLE_GIB event
+         approximatley 15% of the time (for some reason, possibly that the previous G_AddEvent( EV_VEHICLE_GIB ) has not
+		 yet been processed and we therefore overwrite that event with this one)
+
 		G_AddEvent( player, EV_PAIN, player->health );
 		client->ps.damageEvent++;
+*/
 	}
-
 
 	client->ps.damageCount = count;
 

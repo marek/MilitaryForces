@@ -1,5 +1,5 @@
 /*
- * $Id: g_utils.c,v 1.3 2002-01-07 00:06:02 thebjoern Exp $
+ * $Id: g_utils.c,v 1.4 2002-02-27 16:07:29 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -555,8 +555,9 @@ G_AddEvent
 Adds an event+parm and twiddles the event counter
 ===============
 */
-void G_AddEvent( gentity_t *ent, int event, int eventParm ) {
-	int		bits;
+void G_AddEvent( gentity_t *ent, int event, int eventParm )
+{
+	int bits = 0;
 
 	if ( !event ) {
 		G_Printf( "G_AddEvent: zero event added for entity %i\n", ent->s.number );
@@ -564,13 +565,16 @@ void G_AddEvent( gentity_t *ent, int event, int eventParm ) {
 	}
 
 	// clients need to add the event in playerState_t instead of entityState_t
-	if ( ent->client ) {
+	if ( ent->client )
+	{
 		bits = ent->client->ps.externalEvent & EV_EVENT_BITS;
 		bits = ( bits + EV_EVENT_BIT1 ) & EV_EVENT_BITS;
 		ent->client->ps.externalEvent = event | bits;
 		ent->client->ps.externalEventParm = eventParm;
 		ent->client->ps.externalEventTime = level.time;
-	} else {
+	}
+	else
+	{
 		bits = ent->s.event & EV_EVENT_BITS;
 		bits = ( bits + EV_EVENT_BIT1 ) & EV_EVENT_BITS;
 		ent->s.event = event | bits;

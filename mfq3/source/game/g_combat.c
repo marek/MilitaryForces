@@ -1,5 +1,5 @@
 /*
- * $Id: g_combat.c,v 1.7 2002-02-27 11:24:09 sparky909_uk Exp $
+ * $Id: g_combat.c,v 1.8 2002-02-27 16:07:29 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -65,7 +65,6 @@ void ExplodeVehicle( gentity_t *self )
 		{
 			self->client->ps.persistant[PERS_DEATHS]++;
 		}
-		self->r.contents = CONTENTS_CORPSE;
 
 		// enable vehicle selection
 		self->client->ps.pm_flags |= PMF_VEHICLESELECT;
@@ -759,6 +758,7 @@ void Vehicle_Death( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, 
 	}
 
 	self->takedamage = qtrue;	// can still be gibbed
+	self->r.contents = CONTENTS_CORPSE;
 	self->s.objectives = 0;
 	self->s.loopSound = 0;
 	self->r.maxs[2] = -8;
