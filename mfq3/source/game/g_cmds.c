@@ -1,5 +1,5 @@
 /*
- * $Id: g_cmds.c,v 1.9 2002-02-19 17:51:38 sparky909_uk Exp $
+ * $Id: g_cmds.c,v 1.10 2002-02-21 11:18:33 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -404,19 +404,34 @@ Let everyone know about a team change
 */
 void BroadcastTeamChange( gclient_t *client, int oldTeam )
 {
-	if ( client->sess.sessionTeam == TEAM_RED ) {
-		trap_SendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE " joined the red team.\n\"",
-			client->pers.netname) );
-	} else if ( client->sess.sessionTeam == TEAM_BLUE ) {
-		trap_SendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE " joined the blue team.\n\"",
-		client->pers.netname));
-	} else if ( client->sess.sessionTeam == TEAM_SPECTATOR && oldTeam != TEAM_SPECTATOR ) {
-		trap_SendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE " joined the spectators.\n\"",
-		client->pers.netname));
-	} else if ( client->sess.sessionTeam == TEAM_FREE ) {
-		trap_SendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE " joined the battle.\n\"",
-		client->pers.netname));
+	const char * pTeam = NULL;
+
+	// work out what to shout
+	switch( client->sess.sessionTeam )
+	{
+	case TEAM_RED:
+		pTeam = "red team";
+		break;
+
+	case TEAM_BLUE:
+		pTeam = "blue team";
+		break;
+
+	case TEAM_SPECTATOR:
+		// make sure we are changing TO spectator mode
+		if( oldTeam != TEAM_SPECTATOR )
+		{
+			pTeam = "spectators";
+		}
+		break;
+	case TEAM_FREE:
+		pTeam = "the battle";
+		break;
 	}
+
+	// send centre print and console trace
+	trap_SendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE " joined the %s\n\"", client->pers.netname, pTeam) );
+	trap_SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " joined the %s\n\"", client->pers.netname, pTeam) );
 }
 
 /*
@@ -555,6 +570,7 @@ void SetTeam( gentity_t *ent, char *s ) {
 		CheckTeamLeader( oldTeam );
 	}
 
+	// tell everyone about the team change for this client
 	BroadcastTeamChange( client, oldTeam );
 
 	// get and distribute relevent paramters
