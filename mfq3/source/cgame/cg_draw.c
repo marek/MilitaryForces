@@ -1,5 +1,5 @@
 /*
- * $Id: cg_draw.c,v 1.25 2002-02-21 11:17:15 sparky909_uk Exp $
+ * $Id: cg_draw.c,v 1.26 2002-02-21 13:42:02 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -2743,15 +2743,20 @@ CG_DrawTeamScore
 */
 static void CG_DrawTeamScore( itemDef_t * item, int team )
 {
+	static char redScore[32] = { 0 };
+	static char blueScore[32] = { 0 };
+
 	// setup text
 	switch( team )
 	{
 	case CG_GAME_REDSCORE:
-		item->text = va( "%i", cg.teamScores[0] );
+		sprintf( redScore, "%d", cg.teamScores[0] );
+		item->text = redScore; 
 		break;
 
 	case CG_GAME_BLUESCORE:
-		item->text = va( "%i", cg.teamScores[1] );
+		sprintf( blueScore, "%d", cg.teamScores[1] );
+		item->text = blueScore; 
 		break;
 
 	default:
