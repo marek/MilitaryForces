@@ -1,5 +1,5 @@
 /*
- * $Id: cg_boat.c,v 1.2 2002-02-19 13:28:53 thebjoern Exp $
+ * $Id: cg_boat.c,v 1.3 2002-02-19 16:32:47 sparky909_uk Exp $
 */
 
 
@@ -111,8 +111,6 @@ void CG_Boat( centity_t *cent, clientInfo_t *ci )
     VectorCopy (part[BP_BOAT_GUNBARREL].origin, part[BP_BOAT_GUNBARREL].oldorigin);
     trap_R_AddRefEntityToScene( &part[BP_BOAT_GUNBARREL] );
 
-	CG_ResetReticles();
-
 	// reticles
 	if( cent == &cg.predictedPlayerEntity )
 	{
@@ -121,6 +119,8 @@ void CG_Boat( centity_t *cent, clientInfo_t *ci )
 		float len;
 		playerState_t* ps = &cg.snap->ps;
 		float mindist = cg_thirdPersonRange.integer + availableVehicles[ci->vehicle].cam_dist[ CAMERA_V_DEFAULT ] + availableVehicles[ci->vehicle].maxs[0] + 20;
+
+		CG_ResetReticles();
 
 		// are we tracking a target?
 		if( ps->stats[STAT_LOCKINFO] & LI_TRACKING )
