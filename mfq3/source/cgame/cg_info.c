@@ -1,5 +1,5 @@
 /*
- * $Id: cg_info.c,v 1.5 2002-02-12 11:30:22 sparky909_uk Exp $
+ * $Id: cg_info.c,v 1.6 2002-02-22 14:22:11 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -90,11 +90,6 @@ void CG_DrawInformation( void ) {
 	// try to load the loading shot for this map
 	// NOTE: changed from 'levelshots', because only use now use the levelshots for small map previews (MM)
 	loadingshot = trap_R_RegisterShaderNoMip( va( "loadingshots/%s.jpg", s ) );	
-	if( !loadingshot )
-	{
-		// use default
-		loadingshot = trap_R_RegisterShaderNoMip( "ui/assets/noLoadingPicture.jpg" );
-	}
 
 	// load background
 	background = trap_R_RegisterShaderNoMip( "ui/assets/backscreen.jpg" );	
@@ -108,7 +103,7 @@ void CG_DrawInformation( void ) {
 	trap_R_SetColor( NULL );
 	CG_DrawPic( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, background );
 
-	// alpha blend the 1024x256 loading shot over the picture frame
+	// alpha blend the 1024x256 loading shot over the picture frame if we have it
 	if( loadingshot )
 	{
 		CG_DrawPic( 0, 160, 640, 160, loadingshot );
