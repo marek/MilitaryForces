@@ -5,8 +5,55 @@ Military Forces Q3
 History:
 ========
 
+gunturret angle limitation on patrol boat (twin 30mm)
+gunturrets on b17, helos and patrol boats
+use schez's vehicle data!
+add locational damage
+HUD: add CAUTION lights and locational damage and damage page
+increase fuelrange of vehicles and new fuel system from schez ?
+check why STALL flashes on when crashing into the ground
+gv water survival
+use SVF_NOCLIENT for bullet tracers
+muzzleflashes also for mainguns
+check why gear is not down when spawning landed
+droptanks (press fire to refuel, press fire twice in quick succession to drop)
+
+MAKE ONLY TURRET OF SELECTED WEAPON TURN - possible ? or turn all turrets
+make muzzleflash for actually fired turret
+remember angle of all the turrets, and when not used turn them back to neutral?
+turrets are weapon models and not part of vehicle model ?
+allow tailangle not only from taildraggers
+check vwep code on GVs and boats
+make vwep/tags work with MGs
+check landing gear - might conflict with loadout event
+place cockpit cam at pilot tag
+dont show vwep when not visible to player ? (ie when no LOS etc)
+
+make maneuverability depend on mass (and mass depend on loadout)
+make maneuverability depend on speed
+
+think about dual weapons per mount (mk82!)
+
+make custom loadout part of userinfo ? can be six ints each 0xFFFF with the first two the type and the second two the amount ?
+
+make rwr icons white and set their color ingame
+show misisles on rwr - as planes but in another color ?
+make rwr/air/gnd modes
+possible to remove one radar OO_* flag ? and handle it differently ?
+IF CROSSHAIR CLOSER THAN CERTAIN DISTANCE THEN TURN IT OFF
+
+collision detection for dragging ?
+make properties sheet for current selection ?
+make script exporting
+
+testmodel code needs to be rewritten to allow using the new CG_Plane code
+
+add event queuing to allow sending events on the next frame( done for server, now for   PM_AddEvent)
+
 +++v0.75+++ in progress...
 -----------
+- fix crosshair-in-fog bug (#664632)
+- minor fixes
 
 +++v0.74+++
 -----------
