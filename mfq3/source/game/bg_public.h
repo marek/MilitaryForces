@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.126 2003-10-07 23:15:57 minkis Exp $
+ * $Id: bg_public.h,v 1.128 2004-12-16 19:22:16 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.77d"
+#define	GAME_VERSION		"mfq3 v0.78"
 #define	GAME_IDENTIFIER		"mfq3"			// use to identify mfq3 servers
 
 #define	DEFAULT_GRAVITY		800
@@ -955,13 +955,13 @@ typedef enum
 	WI_DROPTANK_SMALL_PAIR,
 	WI_FLARE,	
 	WI_CFLARE,
+	WI_BURNINGMAN,
 	WI_NB10MT,
 	WI_NB5MT,
 	WI_NB1MT,
 	WI_NM10MT,
 	WI_NM5MT,
 	WI_NM1MT,
-	WI_NM100MT,
 	WI_MAX
 }weaponIndex_t;
 

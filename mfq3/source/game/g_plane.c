@@ -1,5 +1,5 @@
 /*
- * $Id: g_plane.c,v 1.3 2002-07-15 18:23:07 thebjoern Exp $
+ * $Id: g_plane.c,v 1.8 2005-06-26 05:08:12 minkis Exp $
 */
 
 
@@ -33,8 +33,11 @@ void checkTakeoffLanding( gentity_t *self )
 //			self->client->ps.origin[2] = g_entities[trace.entityNum].r.maxs[2] + 
 //				fabs(self->r.mins[2]) + ( (self->client->ps.powerups[PW_ONOFF]&OO_GEAR) ?
 //				self->gearheight : 0 );
+
 			self->client->ps.origin[2] = trace.endpos[2] + 1 + fabs(self->r.mins[2]) + 
 				( (self->client->ps.ONOFF&OO_GEAR) ? self->gearheight : 0 );
+
+
 		}
 	} else { // check for landing
 		if( trace.fraction == 1.0 ) return;
@@ -42,6 +45,7 @@ void checkTakeoffLanding( gentity_t *self )
 			(self->client->ps.ONOFF & OO_GEAR) ) {
 			if( self->client->ps.vehicleAngles[0] < 30 &&
 				self->client->ps.vehicleAngles[0] >= 0 ) {
+
 				if( fabs( self->client->ps.vehicleAngles[2] ) < 20 ) {
 					self->client->ps.ONOFF |= OO_LANDED;
 				}

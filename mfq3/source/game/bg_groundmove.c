@@ -1,5 +1,5 @@
 /*
- * $Id: bg_groundmove.c,v 1.8 2003-10-07 23:15:57 minkis Exp $
+ * $Id: bg_groundmove.c,v 1.13 2005-06-26 05:08:12 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -74,7 +74,6 @@ static void PM_GroundVehicle_FuelFlow( int throttle )
 /*
 ===================
 PM_GroundVehicleAccelerate
-GV speed modified by minkis slightly
 ===================
 */
 static void PM_GroundVehicleAccelerate()
@@ -336,6 +335,7 @@ void PM_GroundVehicleMove( void )
 	float		gun_pitch = ((float)pm->ps->gunAngle)/10;
 	float		speed;
     float		topSpeed, currSpeed, turnModifier;
+	int anim = 0;
 
 	// brake
 	if( pm->cmd.buttons & BUTTON_BRAKE ) {
@@ -417,22 +417,19 @@ void PM_GroundVehicleMove( void )
 
 	// turn the hull
 	if( pm->ps->ONOFF & OO_LANDED ) {
-		// *******************
-		// Changes By: Minkis
-		// *******************
-		// Adjusted turning
-		// *******************
 		if(pm->ps->ONOFF & OO_STALLED)
 		{
 			turnModifier *= -1;
 		}
-		// *******************
 
 		if( smove > 0 ) {
 			vehdir[YAW] -= turnspeed[HULL_YAW] * turnModifier;
+			anim = 1;
 		} else if( smove < 0 ) {
 			vehdir[YAW] += turnspeed[HULL_YAW] * turnModifier;
+			anim = 2;
 		}
+		pm->ps->vehicleAnim = anim;
 	}
 
 	if( !(pm->cmd.buttons & BUTTON_FREELOOK) ) {

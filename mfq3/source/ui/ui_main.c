@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.31 2003-09-05 01:01:35 minkis Exp $
+ * $Id: ui_main.c,v 1.33 2004-12-16 19:22:17 minkis Exp $
 */
 /*
 =======================================================================
@@ -2761,9 +2761,9 @@ static qboolean UI_NetSource_HandleKey(int flags, float *special, int key) {
 		}
     
 		if (ui_netSource.integer >= numNetSources) {
-      ui_netSource.integer = 0;
-    } else if (ui_netSource.integer < 0) {
-      ui_netSource.integer = numNetSources - 1;
+			ui_netSource.integer = 0;
+		} else if (ui_netSource.integer < 0) {
+			ui_netSource.integer = numNetSources - 1;
 		}
 
 		UI_BuildServerDisplayList(qtrue);
@@ -3472,7 +3472,6 @@ static void UI_InitialiseUI( void )
 ===============
 UI_RefreshVehicleSelect
 ===============
-changed by Minkis
 */
 
 #pragma message( "UI_RefreshVehicleSelect() should possibly not be setting values directly using trap_x everytime" )
@@ -3653,7 +3652,6 @@ tryClassAgain:
 ===============
 UI_CycleVehicleSelect
 ===============
-Changed By Minkis
 */
 static void UI_CycleVehicleSelect( int cycleIdx )
 {

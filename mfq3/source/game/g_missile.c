@@ -1,5 +1,5 @@
 /*
- * $Id: g_missile.c,v 1.25 2003-10-07 23:15:57 minkis Exp $
+ * $Id: g_missile.c,v 1.27 2004-12-16 19:22:17 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -85,9 +85,7 @@ void G_ExplodeMissile( gentity_t *ent ) {
 /*
 ================
 G_ExplodeCFlare
-
 spawns other flares
-changed by minkis
 ================
 */
 void G_ExplodeCFlare( gentity_t *ent ) {
@@ -150,6 +148,8 @@ static void NukeRadiusDamage( vec3_t origin, gentity_t *attacker, float damage, 
 	vec3_t		v;
 	vec3_t		dir;
 	int			i, e;
+	trace_t		trace, trace2;
+	vec3_t		temp;
 
 	if ( radius < 1 ) {
 		radius = 1;
@@ -189,16 +189,36 @@ static void NukeRadiusDamage( vec3_t origin, gentity_t *attacker, float damage, 
 		if ( dist >= radius ) {
 			continue;
 		}
-
-//		if( CanDamage (ent, origin) ) {
+		
+		// Do trace only for players only, save cpu
+		if(strcmp(ent->classname, "player") == 0)
+		{
+			// Try a trace
+			// trap_Trace (&trace, origin, ent->r.absmin, ent->r.absmax,  ent->r.currentOrigin, ENTITYNUM_NONE, MASK_SOLID);
+			trap_Trace (&trace, origin, NULL, NULL,  ent->r.currentOrigin, ent->s.number, MASK_SOLID);
+		
+			// Also don't let them get away to easily so check slightly above the origin, and see if it reaches) It may have to be a big hill.
+			VectorCopy(origin, temp);
+			temp[2] += radius / 2;
+			trap_Trace (&trace2, temp, NULL, NULL, ent->r.currentOrigin, ent->s.number, MASK_SOLID);
+		}
+		else
+		{
+			trace.fraction = trace2.fraction = 1.0;
+		}
+		
+		// If it didn't hit anything, do damage, cause nothings in the way, but only players get off so easily >:D
+		if(trace.fraction == 1.0 || trace2.fraction == 1.0)
+		{
 			VectorSubtract (ent->r.currentOrigin, origin, dir);
 			// push the center of mass higher than the origin so players
 			// get knocked into the air more
 			dir[2] += 24;
 			//G_Damage( ent, NULL, attacker, dir, origin, damage, DAMAGE_RADIUS|DAMAGE_NO_TEAM_PROTECTION, MOD_NUKE, CAT_ANY );
+			
 			G_Damage( ent, NULL, attacker, dir, origin, damage, DAMAGE_RADIUS, MOD_NUKE, CAT_ANY );
 			ent->nukeTime = level.time + 3000;
-//		}
+		}
 	}
 }
 
@@ -272,7 +292,6 @@ static void NukeShockWave( vec3_t origin, gentity_t *attacker, float damage, flo
 /*
 ===============
 NukeDamage
-by minkis
 ===============
 */
 static void NukeDamage( gentity_t *self ) {
@@ -286,7 +305,7 @@ static void NukeDamage( gentity_t *self ) {
 	if (self->count >= NUKE_SHOCKWAVE_STARTTIME) {
 		// shockwave push back
 		t = self->count - NUKE_SHOCKWAVE_STARTTIME;
-		NukeShockWave(self->s.pos.trBase, self->activator, 25, 700,	(int) (float) t * self->splashRadius / (NUKE_SHOCKWAVE_ENDTIME - NUKE_SHOCKWAVE_STARTTIME) );
+		NukeShockWave(self->s.pos.trBase, self->activator, 25, 50,	(int) (float) t * self->splashRadius / (NUKE_SHOCKWAVE_ENDTIME - NUKE_SHOCKWAVE_STARTTIME) );
 	}
 	//
 	if (self->count >= NUKE_EXPLODE_STARTTIME) {
@@ -330,15 +349,63 @@ static void NukeDamage( gentity_t *self ) {
 
 /*
 ================
+G_burningManExplode
+================
+*/
+void G_burningManExplode( gentity_t *ent ) {
+	vec3_t		start, dir;
+	int i;
+	gentity_t	*bolt;
+	static int	seed = 0x92;
+
+
+	VectorCopy(ent->r.currentOrigin, start);
+	// we don't have a valid direction, so just point straight up
+	dir[0] = dir[1] = 0;
+	dir[2] = 1;
+
+
+	for(i = 0; i < 75; i++)
+	{
+		VectorSet(dir, (30 - (-30) + 1) * Q_random(&seed) + -30,	(30 - (-30) + 1) * Q_random(&seed) + -30,		40 * Q_random(&seed));
+	
+		bolt = G_Spawn();
+		bolt->classname = "burningman";
+		bolt->nextthink = level.time + 10000 + 4000 * Q_random(&seed);
+		bolt->think = G_ExplodeMissile;
+		bolt->s.eType = ET_MISSILE;
+		bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
+		bolt->s.weaponIndex = WI_BURNINGMAN;
+		
+		// bolt->parent = self;	// No parent
+	//	bolt->r.ownerNum = self->s.number;
+
+		bolt->damage = bolt->splashDamage = 0;
+		bolt->splashRadius = 0;
+		bolt->clipmask = MASK_SHOT;
+		bolt->ONOFF = 1;// not used
+
+		bolt->s.pos.trType = TR_GRAVITY_10;
+		bolt->s.pos.trTime = level.time;// - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
+		VectorCopy( start, bolt->s.pos.trBase );
+		VectorScale( dir, 15, bolt->s.pos.trDelta );
+		SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
+		VectorCopy (start, bolt->r.currentOrigin);
+	}
+}
+
+
+/*
+================
 G_ExplodeNuke
-by minkis
-just *guess* what it does
 ================
 */
 void G_ExplodeNuke( gentity_t *ent ) {
 	gentity_t	*explosion;
 	gentity_t	*te;
 	vec3_t		snapped;
+	static int	seed = 0x94;
+	int rndnum;
 
 
 
@@ -371,6 +438,15 @@ void G_ExplodeNuke( gentity_t *ent ) {
 	explosion->activator = ent->parent;		// Activator is the owner of the bomb/missile 
 
 	ent->freeAfterEvent = qtrue;
+	
+
+	// Easter egg
+	rndnum = (35 - (1) + 1) * Q_random(&seed) + 1;
+	if(rndnum == 2)	// Magic number supplied by Cannon ¬_¬
+	{
+		G_burningManExplode(ent);
+	}
+
 
 	// play global sound at all clients
 	te = G_TempEntity(snapped, EV_GLOBAL_TEAM_SOUND );
@@ -378,6 +454,7 @@ void G_ExplodeNuke( gentity_t *ent ) {
 	te->s.eventParm = GTS_NUKE;
 
 }
+
 
 /*
 ================
@@ -427,6 +504,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 	// is it cheaper in bandwidth to just remove this ent and create a new
 	// one, rather than changing the missile into the explosion?
 
+	
 	if ( other->takedamage && other->client ) {
 		G_AddEvent( ent, EV_MISSILE_HIT, DirToByte( trace->plane.normal ), qtrue );
 		ent->s.otherEntityNum = other->s.number;
@@ -436,14 +514,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 		G_AddEvent( ent, EV_MISSILE_MISS, DirToByte( trace->plane.normal ), qtrue );
 	}
 
-	// Nuke specifics to execute its detonation anyways
-	if(availableWeapons[ent->s.weaponIndex].type == WT_NUKEBOMB || availableWeapons[ent->s.weaponIndex].type == WT_NUKEMISSILE)
-	{
-		if (!ent->think)
-			G_Error ( "NULL ent->think");
-		else
-			ent->think (ent);
-	}
+
 
 
 	ent->freeAfterEvent = qtrue;
@@ -455,8 +526,16 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 
 	G_SetOrigin( ent, trace->endpos );
 
+	// Nuke specifics to execute its detonation anyways
+	if(availableWeapons[ent->s.weaponIndex].type == WT_NUKEBOMB || availableWeapons[ent->s.weaponIndex].type == WT_NUKEMISSILE)
+	{
+		if (!ent->think)
+			G_Error ( "NULL ent->think");
+		else
+			ent->think (ent);
+	}
 	// splash damage (doesn't apply to person directly hit)
-	if ( ent->splashDamage ) {
+	else if ( ent->splashDamage ) {
 		if( G_RadiusDamage( trace->endpos, ent->parent, ent->splashDamage, ent->splashRadius, 
 			other, ent->splashMethodOfDeath, ent->targetcat ) ) {
 			if( !hitClient ) {
@@ -1100,7 +1179,6 @@ void fire_maingun( gentity_t *self ) {
 =================
 fire_flare MFQ3
 =================
-changes by minkis
 */
 void fire_flare( gentity_t *self ) {
 	gentity_t	*bolt;
@@ -1147,7 +1225,6 @@ void fire_flare( gentity_t *self ) {
 fire_flare2 MFQ3
 fire flare with direction
 =================
-changes by minkis
 */
 void fire_flare2( gentity_t *self, vec3_t start, vec3_t up, int age ) {
 	gentity_t	*bolt;
@@ -1181,7 +1258,6 @@ void fire_flare2( gentity_t *self, vec3_t start, vec3_t up, int age ) {
 fire_cflare
 fire flare cluster
 =================
-changes by minkis
 */
 void fire_cflare( gentity_t *self) {
 	gentity_t	*bolt;
@@ -1335,7 +1411,6 @@ void LaunchMissile_GI( gentity_t* ent )
 /*
 =================
 fire_nukebomb MFQ3
-by minkis
 =================
 */
 void fire_nukebomb (gentity_t *self) {
@@ -1384,7 +1459,6 @@ void fire_nukebomb (gentity_t *self) {
 /*
 =================
 fire_nukemissile MFQ3
-by minkis
 =================
 */
 void fire_nukemissile (gentity_t *self) {

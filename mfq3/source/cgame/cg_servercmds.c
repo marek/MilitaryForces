@@ -1,5 +1,5 @@
 /*
- * $Id: cg_servercmds.c,v 1.8 2002-06-12 14:35:33 thebjoern Exp $
+ * $Id: cg_servercmds.c,v 1.10 2004-12-16 19:22:15 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -107,6 +107,7 @@ void CG_ParseServerinfo( void ) {
 	char	*mapname;
 	char	gs[32];
 	unsigned int newset = cgs.gameset;
+	int i;
 
 	info = CG_ConfigString( CS_SERVERINFO );
 	cgs.gametype = atoi( Info_ValueForKey( info, "g_gametype" ) );
@@ -130,12 +131,12 @@ void CG_ParseServerinfo( void ) {
 	else if( strcmp( gs, "ww2" ) == 0 ) newset = MF_GAMESET_WW2;
 	else if( strcmp( gs, "ww1" ) == 0 ) newset = MF_GAMESET_WW1;
 	else newset = MF_GAMESET_MODERN;
-//	Com_Printf("The gameset is '%s'\n", gs);
+	Com_Printf("The gameset is '%s'\n", gs);
 
 	// gameset changed>
 	if( cgs.gameset && newset != cgs.gameset )
-	{
-		trap_SendConsoleCommand( "vid_restart\n" );
+	{	
+		trap_SendConsoleCommand(";vid_restart\n" );  // Leading ' ; ' Previous command getting stuck?
 		Com_Printf("The gameset has changed to %s\n", gs );
 	}
 	cgs.gameset = newset;

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_groundvehicle.c,v 1.21 2003-09-05 00:38:18 minkis Exp $
+ * $Id: cg_groundvehicle.c,v 1.26 2005-06-26 05:08:11 minkis Exp $
 */
 
 
@@ -112,6 +112,8 @@ void CG_GroundVehicle( centity_t *cent, clientInfo_t *ci )
 		cent->gearAnim = AngleMod( cent->gearAnim );
 		cent->gearAnimStartTime = cg.time;
 		drawInfo.wheelAngle = (float)cent->gearAnim;
+	
+		drawInfo.wheelDirection = cent->currentState.vehicleAnim;
 	}
 
 	// muzzleflash

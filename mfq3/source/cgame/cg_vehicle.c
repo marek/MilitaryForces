@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicle.c,v 1.24 2002-07-14 17:13:19 thebjoern Exp $
+ * $Id: cg_vehicle.c,v 1.26 2004-12-16 19:22:15 minkis Exp $
 */
 
 #include "cg_local.h"
@@ -36,6 +36,8 @@ static void CG_CachePlane(int index)
 			availableVehicles[index].modelName );
 
 	for( i = 0; i < BP_PLANE_MAX_PARTS; i++ ) {
+		
+
 		switch(i) {
 		case BP_PLANE_BODY:
 			Com_sprintf( name, sizeof(name), "%s.md3", basename );
@@ -68,7 +70,9 @@ static void CG_CachePlane(int index)
 			Com_sprintf( name, sizeof(name), "%s_prop.md3", basename );
 			break;
 		}
+
 		availableVehicles[index].handle[i] = trap_R_RegisterModel( name );
+
 //		if( !availableVehicles[index].handle[i] ) {
 //			CG_Printf( "MFQ3 Warning: Unable to load model '%s'\n", name );
 //		}

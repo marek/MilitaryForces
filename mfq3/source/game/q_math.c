@@ -1,5 +1,5 @@
 /*
- * $Id: q_math.c,v 1.10 2003-03-19 21:28:18 thebjoern Exp $
+ * $Id: q_math.c,v 1.15 2005-06-26 05:08:12 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1253,7 +1253,6 @@ void Vector4Scale( const vec4_t in, vec_t scale, vec4_t out ) {
 	out[2] = in[2]*scale;
 	out[3] = in[3]*scale;
 }
-
 
 int Q_log2( int val ) {
 	int answer;

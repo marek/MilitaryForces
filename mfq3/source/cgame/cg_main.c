@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.46 2003-09-05 00:34:41 minkis Exp $
+ * $Id: cg_main.c,v 1.50 2005-06-24 06:43:06 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -996,6 +996,7 @@ static void CG_RegisterGraphics( void ) {
 	// MFQ3 new HUD
 	cgs.media.HUDheading = trap_R_RegisterShaderNoMip( "newhud/heading_tape.tga" );
 	cgs.media.HUDvaluebox = trap_R_RegisterShaderNoMip( "newhud/valuebox.tga" );
+	cgs.media.HUDvaluebox2 = trap_R_RegisterShaderNoMip( "newhud/valuebox2.tga" );
 	cgs.media.HUDind_h = trap_R_RegisterShaderNoMip( "newhud/ind_h.tga" );
 	cgs.media.HUDind_v = trap_R_RegisterShaderNoMip( "newhud/ind_v.tga" );
 	cgs.media.HUDind_v_r = trap_R_RegisterShaderNoMip( "newhud/ind_v_r.tga" );

@@ -1,5 +1,5 @@
 /*
- * $Id: g_mfq3util.c,v 1.18 2003-08-14 15:45:47 thebjoern Exp $
+ * $Id: g_mfq3util.c,v 1.23 2005-06-26 05:08:12 minkis Exp $
 */
 
 
@@ -173,7 +173,7 @@ void updateTargetTracking( gentity_t *ent )
 			
 		// check LOS
 		VectorMA( ent->r.currentOrigin, dist, diff, endpos );
-		trap_Trace( &tr, ent->r.currentOrigin, 0, 0, endpos, ent->s.number, MASK_ALL );
+		trap_Trace( &tr, ent->r.currentOrigin, 0, 0, endpos, ent->s.number, MASK_PLAYERSOLID  );
 		if( tr.fraction < 1 && tr.entityNum != ent->s.tracktarget ) {
 			untrack(ent);
 			return;

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_weapons.c,v 1.27 2003-09-05 00:33:14 minkis Exp $
+ * $Id: cg_weapons.c,v 1.29 2004-12-16 19:22:15 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -11,7 +11,6 @@
 ==========================
 CG_FFARTrail
 ==========================
-changed by minkis
 */
 static void CG_FFARTrail( centity_t * cent, const weaponInfo_t *wi )
 {
@@ -55,7 +54,6 @@ static void CG_FFARTrail( centity_t * cent, const weaponInfo_t *wi )
 ==========================
 CG_MissileTrail
 ==========================
-changed by minkis
 */
 static void CG_MissileTrail( centity_t * cent, const weaponInfo_t *wi )
 {
@@ -113,7 +111,6 @@ static void CG_MissileTrail( centity_t * cent, const weaponInfo_t *wi )
 ==========================
 CG_FlareTrail
 ==========================
-changed by minkis
 */
 static void CG_FlareTrail( centity_t * cent, const weaponInfo_t *wi )
 {
@@ -153,27 +150,13 @@ static void CG_FlareTrail( centity_t * cent, const weaponInfo_t *wi )
 
 
 static void CG_MissileTrail2( centity_t * cent, const weaponInfo_t *wi ) {
-	vec3_t axis[36], start, end, vec, vec2, nullvec, temp;
-	float  len;
-	int i;
-	long temp_long;
+	vec3_t  start, end;
 	localEntity_t *le;
 	refEntity_t   *re;
-	static localEntity_t * ent_pt;
 
 	VectorCopy(cent->lastDrawnTrailPos, start);
 	VectorCopy(cent->lerpOrigin, end);
-	VectorSubtract(end, start, vec);
-	VectorCopy(vec, vec2);
-	VectorClear(nullvec);
 
-	// Vec 2 will be used as a rounded value
-	for (i = 0 ; i <= 2; i++) {
-		vec2[i] = vec2[i] * 100;
-		temp_long = vec2[i];
-		vec2[i] = temp_long;
-		vec2[i] = vec2[i] / 100;
-	}
 
 	// Only draw every so often dispite how often a trail is said to be updated
 	// Or you may get a SHADER_MAX_VERTEXES error eith RT_RAIL_CORE draw method
@@ -181,76 +164,52 @@ static void CG_MissileTrail2( centity_t * cent, const weaponInfo_t *wi ) {
 	if(cent->TimeSinceLastTrail <= cg.time - 100)
 	{
 
-
-
-		/*
-	
-		Com_Printf("Drawn New Missile Trail Segment at %i\n", cg.time);
-		Com_Printf("Trail Segment start %i, %i, %i", start[0], start[1], start[2]);
-		Com_Printf("Trail Segment end %i, %i, %i", end[0], end[1], end[2]);
-
-  */
-
-		len = VectorNormalize (vec);
-	
-		PerpendicularVector(temp, vec);
-	
-	
-		for (i = 0 ; i < 36; i++) {
-			RotatePointAroundVector(axis[i], vec, temp, i * 10);//banshee 2.4 was 10
+		// If the trail seems a bit to old, give it a starting origin
+		if(cent->TimeSinceLastTrail <= cg.time - 200)
+		{
+			VectorCopy(cent->lerpOrigin, start); 
 		}
- 
+	
 		le = CG_AllocLocalEntity();
-		ent_pt = le;
+		le->leFlags = LEF_PUFF_DONT_SCALE;
 		re = &le->refEntity;
 
-	//	le->leType = LE_FADE_RGB;
-		le->leType = LE_MOVE_SCALE_FADE;
+
+
+		le->leType = LE_FADE_RGB;
 		le->startTime = cg.time;
-		le->fadeInTime = 0;
 		le->endTime = cg.time + 5000;
+		le->fadeInTime = 2000;
 		le->lifeRate = 1.0 / (le->endTime - le->startTime);
  
 		re->shaderTime = cg.time / 1000.0f;
-		re->reType = RT_RAIL_CORE; //RT_BEAM; // RT_RAIL_CORE;
-
-	//	re->customShader = cgs.media.smokePuffShader;
+		re->reType = RT_LIGHTNING; //RT_RAIL_CORE; //RT_BEAM; // RT_RAIL_CORE;
 		re->customShader = cgs.media.railCoreShader;
 	//	re->customShader = cgs.media.missileTrail2Shader;
+
 		VectorCopy(start, re->origin);
 		VectorCopy(start, le->pos.trBase);
-		VectorCopy(end, le->pos.trDelta);
+	//	VectorCopy(end, le->pos.trDelta);
 		VectorCopy(end, re->oldorigin);
+
+		re->shaderRGBA[0] = 0.3f;
+		re->shaderRGBA[1] = 0.3f;
+		re->shaderRGBA[2] = 0.3f;
+		re->shaderRGBA[3] = 0.3f;
 
 		le->color[0] = 1.0f;
 		le->color[1] = 1.0f;
 		le->color[2] = 1.0f;
 		le->color[3] = 1.0f;
-		re->shaderRGBA[0] = le->color[0] * 0xff;
-		re->shaderRGBA[1] = le->color[1] * 0xff;
-		re->shaderRGBA[2] = le->color[2] * 0xff;
 
 		AxisClear( re->axis );
+
 	
-		// Update last time & Pos & Angles
+		// Update last time & Pos
 		cent->TimeSinceLastTrail = cg.time;
 		VectorCopy(cent->lerpOrigin, cent->lastDrawnTrailPos);
-		VectorCopy(vec2, cent->lastDrawnTrailAngles);
-/*
-		Com_Printf("---------------------------------------------------------\n");
-		Com_Printf("Trail Segment end %i, %i, %i\n", end[0], end[1], end[2]);
-		Com_Printf("Trail Segment start2 %i, %i, %i\n", start[0], start[1], start[2]);
-		Com_Printf("Trail Segment end2 %i, %i, %i\n", end[0], end[1], end[2]);
-		Com_Printf("=========================================================\n");
-		*/
 	}
-	/*
-	else
-	{
-		ent_pt->endTime = cg.time + 5000;
-		VectorCopy(end, ent_pt->refEntity.oldorigin);
-	}
-	*/
+
 
 }
 
@@ -260,32 +219,35 @@ static void CG_MissileTrail2( centity_t * cent, const weaponInfo_t *wi ) {
 ==========================
 CG_NukeTrail
 ==========================
-by minkis
 */
 static void CG_NukeTrail( centity_t * cent, const weaponInfo_t *wi )
 {
-	localEntity_t	* smoke;
-	vec3_t			up, pos, velocity;
+	if(cent->TimeSinceLastTrail <= cg.time - 200)
+	{
+		localEntity_t	* smoke;
+		vec3_t			up, pos, velocity;
 	
-	VectorCopy( cent->lerpOrigin, pos );
+		VectorCopy( cent->lerpOrigin, pos );
 	
-	// draw smoke slightly behind the entitiy position (using -velocity of the entity)
-	VectorCopy( cent->currentState.pos.trDelta, velocity );
-	VectorNormalize( velocity );
+		// draw smoke slightly behind the entitiy position (using -velocity of the entity)
+		VectorCopy( cent->currentState.pos.trDelta, velocity );
+		VectorNormalize( velocity );
 
-	// calc adjusted position
-	VectorScale( velocity, -24.0f, velocity );		// -24.0f is just an arbitary distance which works OK with all current rocket models
-	VectorAdd( pos, velocity, pos );
+		// calc adjusted position
+		VectorScale( velocity, -24.0f, velocity );		// -24.0f is just an arbitary distance which works OK with all current rocket models
+		VectorAdd( pos, velocity, pos );
 
-	// draw trail
+		// draw trail
 
-	smoke = CG_SmokePuff( pos, up, 
-						  20, 
-						  0.0f, 0.0f, 0.0f, 0.8f,
-						  8000, 
-						  cg.time, 6000,
-						  LEF_PUFF_DONT_SCALE, 
-						  cgs.media.nukePuffShader );	
+		smoke = CG_SmokePuff( pos, up, 
+							20, 
+							0.0f, 0.0f, 0.0f, 0.8f,
+							8000, 
+							cg.time, 6000,
+							LEF_PUFF_DONT_SCALE, 
+							cgs.media.nukePuffShader );	
+		cent->TimeSinceLastTrail = cg.time;
+	}
 }
 
 
@@ -339,7 +301,7 @@ void CG_RegisterWeapons() {
 
 			// FFAR trail with no dynamic lighting
 			weaponInfo->missileTrailFunc = CG_FFARTrail;
-		//	weaponInfo->missileTrailFunc = CG_MissileTrail2;
+			//weaponInfo->missileTrailFunc = CG_MissileTrail2;
 			weaponInfo->missileDlight = 0;
 			
 			MAKERGB( weaponInfo->missileDlightColor, 1, 0.75f, 0 );
@@ -368,7 +330,7 @@ void CG_RegisterWeapons() {
 			}
 
 			// FFAR trail with no dynamic lighting
-			weaponInfo->missileTrailFunc = CG_MissileTrail;
+			weaponInfo->missileTrailFunc = CG_MissileTrail2;
 			weaponInfo->missileDlight = 0;
 			
 			MAKERGB( weaponInfo->missileDlightColor, 1, 0.75f, 0 );
@@ -452,7 +414,13 @@ void CG_RegisterWeapons() {
 			switch(i){
 				case WI_CFLARE:
 				case WI_FLARE:
+				
 					weaponInfo->missileTrailFunc = CG_FlareTrail;
+					break;
+				case WI_BURNINGMAN:
+					weaponInfo->missileSound = trap_S_RegisterSound( "sound/misc/scream.wav", qfalse );
+					break;
+				default:
 				break;
 			}
 
@@ -473,11 +441,20 @@ void CG_RegisterWeapons() {
 			weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/rocket/rocklf1a.wav", qfalse );
 			break;
 		case WT_NUKEMISSILE:
-			// find out which model to use
-			weaponInfo->missileModel = trap_R_RegisterModel( availableWeapons[i].modelName );
-			weaponInfo->missileSound = trap_S_RegisterSound( "sound/weapons/rocket/rockfly.wav", qfalse );
-			weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/rocket/rocklf1a.wav", qfalse );
-			weaponInfo->missileTrailFunc = CG_NukeTrail;
+			switch(i)
+			{
+				default:
+					{
+
+						// find out which model to use
+						weaponInfo->missileModel = trap_R_RegisterModel( availableWeapons[i].modelName );
+						weaponInfo->missileSound = trap_S_RegisterSound( "sound/weapons/rocket/rockfly.wav", qfalse );
+						weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/rocket/rocklf1a.wav", qfalse );
+						weaponInfo->missileTrailFunc = CG_MissileTrail2;
+					}
+					break;
+			}
+
 			break;
 		default:
 			//MAKERGB( weaponInfo->flashDlightColor, 1, 1, 1 );
@@ -705,6 +682,7 @@ void CG_FireWeapon( centity_t *cent ) {
 		return;	
 	}
 	weap = &cg_weapons[ent->weaponIndex];
+
 
 	// play a sound
 	for ( c = 0 ; c < 4 ; c++ ) {

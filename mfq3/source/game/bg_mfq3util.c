@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.32 2003-08-06 18:10:21 thebjoern Exp $
+ * $Id: bg_mfq3util.c,v 1.34 2004-12-16 19:22:16 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -9,7 +9,9 @@
 extern void	trap_Cvar_Set( const char *var_name, const char *value );
 extern void	trap_Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize );
 
-
+int		trap_FS_FOpenFile( const char *qpath, fileHandle_t *f, fsMode_t mode );
+void	trap_FS_Read( void *buffer, int len, fileHandle_t f );
+void	trap_FS_FCloseFile( fileHandle_t f );
 
 /*
 =================
@@ -67,8 +69,11 @@ int MF_getIndexOfVehicleEx( int start,
 							int gameset,
 							int team,
 							int cat,
-							int cls )
+							int cls,
+						    int vehicleType,
+						    int change_vehicle)
 {
+
 	// NOTE: vehicleClass & vehicleCat are int enum indexed, convert to flag enums
 
 	// CATAGORY
@@ -85,7 +90,7 @@ int MF_getIndexOfVehicleEx( int start,
 		cls = 1 << cls;		// (convert from int enum to flag enum)
 	}
 
-	return MF_getIndexOfVehicle( start, gameset, team, cat, cls );
+	return MF_getIndexOfVehicle( start, gameset, team, cat, cls, vehicleType, change_vehicle );
 }
 
 /*
@@ -97,9 +102,12 @@ int MF_getIndexOfVehicle( int start,			// where to start in list
 						  int gameset,
 						  int team,
 						  int cat,
-						  int cls )
+						  int cls, 
+						  int vehicleType,
+						  int change_vehicle)
 {
     int				i;
+	int				vehicle_pt = -1;
 	qboolean		done = qfalse;
 
 	// null or negative? use ALL values
@@ -132,18 +140,28 @@ int MF_getIndexOfVehicle( int start,			// where to start in list
 
 		if( i == start ) done = qtrue;//return start;	
 
-//		Com_Printf( "Vehicle is %s %x\n", availableVehicles[i].descriptiveName,
-//										  availableVehicles[i].id );
-
-		if( !(availableVehicles[i].gameset & gameset) ) continue;	// wrong set
-		if( !(availableVehicles[i].team & team) ) continue;			// wrong team
-		if( !(availableVehicles[i].cat & cat) ) continue;			// wrong category
-		if( !(availableVehicles[i].cls & cls) ) continue;			// wrong class
-
+		if( !(availableVehicles[i].gameset & gameset) ) continue;			// wrong set
+		if( !(availableVehicles[i].team & team) ) continue;					// wrong team
+		if( !(availableVehicles[i].cat & cat) ) continue;					// wrong category
+		if( !(availableVehicles[i].cls & cls) ) continue;					// wrong class
+		
+		if(vehicleType != -1 && change_vehicle == 1 && strcmp(availableVehicles[i].tinyName, availableVehicles[vehicleType].tinyName) == 0)
+		{
+			//If its good mark known position just in case its the only good one
+			vehicle_pt = i;
+			continue;	// change vehicle
+		}
+		else if(change_vehicle == 2 && vehicleType != -1)
+		{
+			if(strcmp(availableVehicles[i].tinyName, availableVehicles[vehicleType].tinyName) != 0)
+			{
+				continue;						// make sure its the same
+			}
+		}
 		return i;
     }
 
-    return -1;
+    return vehicle_pt;
 }
 
 /*
@@ -293,6 +311,10 @@ void MF_LoadAllVehicleData()
 	int i, j, num;
 	char* modelbasename = 0;
 	char name[128];
+	fileHandle_t	f;
+	md3Tag_t tag;
+	float diff;
+	vec3_t max, min;
 
 	// MFQ3 loadouts
 	MF_calculateAllDefaultLoadouts();
@@ -309,29 +331,67 @@ void MF_LoadAllVehicleData()
 		Com_sprintf( name, sizeof(name), "%s.md3", modelbasename );
 		MF_getDimensions( name, 0, &availableVehicles[i].maxs, &availableVehicles[i].mins );
 		availableVehicles[i].mins[2] += 1;// to look better ?
+
 		// helo/plane specific
 		if( (availableVehicles[i].cat & CAT_PLANE) ||
 			(availableVehicles[i].cat & CAT_HELO) ) {
+
+			// Find gear tag offset from  min
+			MF_findTag(name, "tag_gear", &tag);
+			diff = tag.origin[2] - availableVehicles[i].mins[2];
+			if(diff < 0) diff = 0;
+
+
 			// gear
 			Com_sprintf( name, sizeof(name), "%s_gear.md3", modelbasename );
-			if( MF_getNumberOfFrames( name, &num ) ) {
+
+			trap_FS_FOpenFile(name, &f, FS_READ);
+
+			if(f &&  MF_getNumberOfFrames( name, &num ) ) {
 				vec3_t min1, min2;
+
+				trap_FS_FCloseFile(f);
 				availableVehicles[i].maxGearFrame = num - 1;
+
+				
+				if(!availableVehicles[i].gearheight)
+				{
+
 				if( MF_getDimensions( name, 0, 0, &min1 ) &&
 					MF_getDimensions( name, num-1, 0, &min2 ) ) {
 					availableVehicles[i].gearheight = min1[2] - min2[2] - 1.5;// for coll. detection
 					if( availableVehicles[i].gearheight < 0 ) availableVehicles[i].gearheight = 0;
 				}
+				
+				}
+				/*
+				
+				MF_findTag(name, "tag_gear", &tag);
+				MF_getDimensions(name, num-1, &max,&min);
+				availableVehicles[i].gearheight = (tag.origin[2] - min[2]) - diff;
+				if( availableVehicles[i].gearheight < 0 ) availableVehicles[i].gearheight = 0;
+
+				
+				*/
+
+				// Don't bother setting the gearheight, its too fucken bugged.
+
 			} else {
 				availableVehicles[i].maxGearFrame = GEAR_DOWN_DEFAULT;
 			}
+
 			// bay
 			Com_sprintf( name, sizeof(name), "%s_bay.md3", modelbasename );
-			if( MF_getNumberOfFrames( name, &num ) ) {
+
+			trap_FS_FOpenFile(name, &f, FS_READ);
+
+			if(f && MF_getNumberOfFrames( name, &num ) ) {
+				trap_FS_FCloseFile(f);
 				availableVehicles[i].maxBayFrame = num - 1;
 			} else {
 				availableVehicles[i].maxBayFrame = BAY_DOWN_DEFAULT;
 			}
+
 			// correct actual loadouts
 			for( j = WP_WEAPON1; j < WP_FLARE; ++j ) {
 				if( availableVehicles[i].weapons[j] ) {
@@ -340,14 +400,35 @@ void MF_LoadAllVehicleData()
 				}
 			}
 		} else if( (availableVehicles[i].cat & CAT_GROUND) ) {
-			vec3_t max, min;
-			float diff;
+
 			// increaes bounding box by turret height
 			Com_sprintf( name, sizeof(name), "%s_tur.md3", modelbasename );
 			MF_getDimensions( name, 0, &max, &min );
 			diff = max[2] - min[2];
 			availableVehicles[i].maxs[2] += diff;
-			availableVehicles[i].mins[2] -= 2;
+		//	availableVehicles[i].mins[2] -= 2;	
+
+			// Increase bounding box if it has wheels!
+			// Increase rougly by 1/2 wheel length?
+
+			// Make sure its actualy listed in the vehicle data that it does (Although not needed)
+			// Then chick if file exists.. read value and divide by half.
+			if(availableVehicles[i].wheels)
+			{
+				Com_sprintf( name, sizeof(name), "%s_w1.md3", modelbasename );
+				trap_FS_FOpenFile(name, &f, FS_READ);
+				if(f)
+				{
+					trap_FS_FCloseFile(f);
+		
+					MF_findTag(name, "tag_wheel", &tag);
+					MF_getDimensions( name, 0, &max, &min );
+					diff = max[2] - min[2];
+					availableVehicles[i].mins[2] = tag.origin[2] - (diff / 2);
+				}
+				
+			}
+
 		} else if( (availableVehicles[i].cat & CAT_BOAT) ) {
 			availableVehicles[i].mins[2] -= 2;
 		}

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_localents.c,v 1.5 2003-09-05 00:36:28 minkis Exp $
+ * $Id: cg_localents.c,v 1.10 2005-06-26 05:08:11 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -411,7 +411,6 @@ static void CG_AddSpriteExplosion( localEntity_t *le ) {
 /*
 ====================
 CG_AddNuke
-by minkis
 ====================
 */
 void CG_AddNuke( localEntity_t *le ) {

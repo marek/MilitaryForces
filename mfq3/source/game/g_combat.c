@@ -1,5 +1,5 @@
 /*
- * $Id: g_combat.c,v 1.9 2002-07-15 18:23:07 thebjoern Exp $
+ * $Id: g_combat.c,v 1.14 2005-06-26 05:08:12 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -655,7 +655,7 @@ void Vehicle_Death( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, 
 	self->enemy = attacker;
 
 	self->client->ps.persistant[PERS_KILLED]++;
-
+	
 	if( attacker && attacker->client )
 	{
 		attacker->client->lastkilled_client = self->s.number;
@@ -675,13 +675,14 @@ void Vehicle_Death( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, 
 				if( meansOfDeath != MOD_VEHICLEEXPLOSION && 
 					meansOfDeath != MOD_CRASH )
 				{
-					AddScore( attacker, self->r.currentOrigin, 3 );
+					AddScore( attacker, self->r.currentOrigin, 1 );
 				}
-/*				else
+				// Easy way to prevent enemy from lossing score in collision as well cause he kills "himself"
+				else
 				{
 					AddScore( attacker, self->r.currentOrigin, 1 );
 				}
-*/
+
 			}
 
 			// check for two kills in a short amount of time
