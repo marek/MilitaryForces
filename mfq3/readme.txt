@@ -6,9 +6,34 @@ History:
 ========
 
 
-
-+++v0.70+++ in progress...
++++v0.72+++ in progress...
 -----------
+
++++v0.71+++
+-----------
+- pressing the landing gear button toggles WaypointMode on/off (you need to have
+  one single vehicle for it selected), when in waypoint mode vehicles cannot be 
+  manipulated
+- when in waypoint mode you can spawn new waypoints with the throttle_increase button
+- pressing CTRL and throttle_increase inserts a waypaint after the selected waypoint
+- waypoints can be selected the same way vehicles can
+- waypoints can now be moved the same way vehicles are moved
+- Backspace deletes selected waypoint(s)
+- pressing Backspace while in menus/console no more deletes selection
+- allow spawning boats and groundvehicles in IGME
+- minor cleanup and fixes
+
++++v0.70+++ 
+-----------
+- in order to make IGME better I rewrote it to be client side only
+- in order to allow selection of client side only stuff, I had to provide new 
+  ray interesect function
+- selecting objects is limited to within 2000 units of yourself
+- holding the attack button and moving the mouse drags selected vehicles around
+- holding the CTRL button while dragging moves selection vertically or rotates it
+- hitting Backspace deletes the selection
+- allow selection of multiple vehicles
+- minor changes
 
 +++v0.69+++
 -----------
