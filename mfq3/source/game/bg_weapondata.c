@@ -1,5 +1,5 @@
 /*
- * $Id: bg_weapondata.c,v 1.2 2001-12-22 02:28:44 thebjoern Exp $
+ * $Id: bg_weapondata.c,v 1.3 2001-12-23 02:02:14 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -418,6 +418,28 @@ completeWeaponData_t availableWeapons[] =
 		2500,								// muzzleVelocity
 		7000,								// range
 		8000,								// fuelrange
+		500,								// fire interval
+		100,								// damage
+		50,									// damageRadius
+		1,									// spread
+		2,									// barrels
+		0,									// barrelDistance
+		CH_MISSILEMODE						// crosshair
+	},
+
+	// Hellfire
+	{ 
+		WT_ANTIGROUNDMISSILE,				// type
+		MF_GAMESET_ANY,						// gameset
+		"Hellfire",							// descriptiveName
+		"models/weapons/ffar.md3",			// modelName
+		"hud/iconw_rkt.tga",				// iconName
+		0,									// iconHandle
+		CAT_GROUND,							// cat
+		0.3f,								// non cat mod
+		1000,								// muzzleVelocity
+		3000,								// range
+		5000,								// fuelrange
 		500,								// fire interval
 		100,								// damage
 		50,									// damageRadius

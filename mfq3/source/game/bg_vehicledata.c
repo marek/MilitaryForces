@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.3 2001-12-22 22:16:01 thebjoern Exp $
+ * $Id: bg_vehicledata.c,v 1.4 2001-12-23 02:02:14 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -36,8 +36,8 @@ completeVehicleData_t availableVehicles[] =
 	60,							// max fuel
 	3,							// gearheight
 	0,							// tailangle
-	WI_MG_20MM, WI_FFAR, WI_MK82, WI_SIDEWINDER, WI_AMRAAM, WI_PHOENIX, 0, WI_FLARE,	// weapons
-	450, 24, 8, 4, 4, 4, 0, 30,		// ammo
+	WI_MG_20MM, WI_FFAR, WI_MK82, WI_SIDEWINDER, WI_AMRAAM, WI_PHOENIX, WI_HELLFIRE, WI_FLARE,	// weapons
+	450, 24, 8, 4, 4, 4, 8, 30,		// ammo
 	{19, 0, 5},					// cameraposition for cockpit view
 	AB_BALL,					// effect model
 	8000,						// radar range
