@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.106 2003-02-05 23:43:33 thebjoern Exp $
+ * $Id: bg_public.h,v 1.107 2003-02-06 14:40:11 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.74k"
+#define	GAME_VERSION		"mfq3 v0.74l"
 #define	GAME_IDENTIFIER		"mfq3"			// use to identify mfq3 servers
 
 #define	DEFAULT_GRAVITY		800
@@ -942,8 +942,8 @@ typedef enum
 
 
 // IGME
-#define IGME_MAX_VEHICLES		128
-#define IGME_MAX_WAYPOINTS		64
+#define IGME_MAX_VEHICLES		64
+#define IGME_MAX_WAYPOINTS		32
 
 typedef struct mission_waypoint_s {
 	qboolean		used;
