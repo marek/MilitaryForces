@@ -5,6 +5,59 @@ Military Forces Q3
 History:
 ========
 
++++v0.67+++ in progress...
+-----------
+
++++v0.66+++
+-----------
+- make FFARs work properly with new vwep code and even when there are more than 2 launchers
+- allow draw char function to also draw numbers
+- certain weapons now limited to categories so not every vehicle can carry for 
+  example ironbombs
+- weapon loadout now limited by pylons, ie if there are not enough pylons the
+  loadout specified in the datasheets is adjusted accordingly (ie old vehicles 
+  will be unarmed until fitted with properly named pylon tags)
+- final (hopefully) naming convention for vwep: tag_P#&$$$$@ with
+  # = number in hex of the station (increasing from outside towards the body)
+  & = group of the weapon (for three mount pylons, set to 0 on single pylons)
+  $$$$ = flags of what to carry (see dev forum)
+  @ = L or R for the side it is on
+  Note that # starts with 0 on both wings, so there will be two tag_P0..
+- added small FFAR pod
+- added medium bomb ('Mk83')
+- Mark: event/prediction code updated
+- Mark: minor death code cleanup
+- revised and improved vwep system
+- Mark: more work on shadows
+- Mark: added proper spectator support to scoreboard
+- Mark: added team counts to scoreboard
+- Mark: fix bug with MFD zoom display not working on non 640x480 resolutions
+- Mark: made gameset artwork appear if no map loading screen available
+- more bugfixes
+
++++v0.65+++
+-----------
+- Mark: masked out all but MFQ3 servers in the UI server browser
+- Mark: gameset now also shown in the 'Type' column (MDRN, WW2, WW1)
+- bounding boxes for vehicles are now read out from the md3 file
+- Mark: changed to fixed point zoom on MFD camera (x1...x8)
+- gearheight is read out from md3 file now
+- number of gear and bay frames now read out from md3 files
+- vwep support for F-16
+- Mark bugfix: smoke not stopped from being drawn anymore when client is close
+- Mark bugfix: stopped smoke drawing when client paused
+- Mark: reduced density of smoke
+- made wingtip AAMs not drop before shooting off
+- Mark: some fixes to smoketrails and shadows
+- added heavy bomb ('Mk84'), and reduced light's damage ('Mk82')
+- added Hawkboy's A-10
+- allow proper reloading of vwep (trigger_recharge)
+- no more possible to shoot missiles while landed
+- made missiles drop from the pylon before their rocket motors go off
+- got a better scaled B2 from Schez, with working gear
+- use updated gear model for Spitfire, Mustang, Gripen, F-16, F-5, F-15, F-14, B-2
+- fix some minor vwep problems
+
 +++v0.64+++
 -----------
 - some more work on turret code (for boat turrets)
