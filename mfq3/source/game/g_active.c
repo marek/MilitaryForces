@@ -1,5 +1,5 @@
 /*
- * $Id: g_active.c,v 1.2 2001-12-22 02:28:44 thebjoern Exp $
+ * $Id: g_active.c,v 1.3 2001-12-22 20:56:40 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -630,7 +630,7 @@ void ClientThink_real( gentity_t *ent ) {
 	if ( level.time > client->rewardTime ) {
 		client->ps.eFlags &= ~(EF_AWARD_IMPRESSIVE | EF_AWARD_EXCELLENT | EF_AWARD_ASSIST | EF_AWARD_DEFEND | EF_AWARD_CAP );
 	}
-
+	
 	if ( client->noclip ) {
 		client->ps.pm_type = PM_NOCLIP;
 	} else if ( client->ps.stats[STAT_HEALTH] <= 0 ) {
@@ -647,8 +647,12 @@ void ClientThink_real( gentity_t *ent ) {
 	}
 
 	// first the general functionality, then the cat-specific one
+	if( client->ps.weaponNum != ucmd->weapon ) {
+		unlock(ent);
+	} else {
+		updateTargetTracking(ent);
+	}
 	// category specific actions if any
-	updateTargetTracking(ent);
 	if( (availableVehicles[client->vehicle].id&CAT_ANY) & CAT_PLANE ) {
 		// takeoff/landing
 		checkTakeoffLanding( ent );

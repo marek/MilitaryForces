@@ -7,6 +7,9 @@ History:
 
 +++v0.44+++ in progress...
 -----------
+- unlock targets on weapon change
+- unlock added to controls/setup
+- added cmd "unlock" to break lock on current target
 - minor bugfixes
 
 +++v0.43+++
