@@ -1,5 +1,5 @@
 /*
- * $Id: cg_missioneditor.c,v 1.12 2003-02-02 02:52:02 thebjoern Exp $
+ * $Id: cg_missioneditor.c,v 1.13 2003-02-07 19:17:44 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -962,5 +962,71 @@ void ME_ExportToScript( const char* scriptname )
 //	trap_SendConsoleCommand("ui_save_to_script whatever");
 }
 
+
+
+
+static void ME_SpawnMissionVehicles(mission_vehicle_t* vehs)
+{
+	// now that we have valid vehicle data make them spawn here
+	// use SP_misc_plane etc and set the relevant values to spawn them
+	// rest should work automatically
+}
+
+
+static void ME_LoadOverviewAndEntities( char *filename,
+										mission_overview_t* overview,
+										mission_vehicle_t* vehs, 
+										mission_groundInstallation_t* gis)
+{
+	int					len;
+	fileHandle_t		f;
+	char				inbuffer[MAX_MISSION_TEXT];
+
+	// open the file, fill it into buffer and close it, afterwards parse it
+	len = trap_FS_FOpenFile( filename, &f, FS_READ );
+	if ( !f ) 
+	{
+		Com_Printf( va( S_COLOR_RED "file not found: %s\n", filename ) );
+		return;
+	}
+	if ( len >= MAX_MISSION_TEXT ) 
+	{
+		Com_Printf( va( S_COLOR_RED "file too large: %s is %i, max allowed is %i", filename, len, MAX_MISSION_TEXT ) );
+		trap_FS_FCloseFile( f );
+		return;
+	}
+
+	trap_FS_Read( inbuffer, len, f );
+	inbuffer[len] = 0;
+	trap_FS_FCloseFile( f );
+
+	Com_Printf( va(S_COLOR_GREEN "Successfully opened mission script: %s\n", filename) );
+
+	MF_ParseMissionScripts(inbuffer, overview, vehs, gis);
+}
+
+void ME_ImportScript( const char* scriptname )
+{
+	char				filename[256];
+	mission_overview_t	overview;
+	mission_vehicle_t	vehicles[IGME_MAX_VEHICLES/4];
+	mission_groundInstallation_t installations[IGME_MAX_VEHICLES/4];
+	const char			*info, *mapname;
+
+	memset(&overview, 0, sizeof(overview));
+	memset(&vehicles[0], 0, sizeof(vehicles));
+	memset(&installations[0], 0, sizeof(installations));
+
+	// set up mission filename
+	info = CG_ConfigString( CS_SERVERINFO );
+	mapname = Info_ValueForKey( info, "mapname" );
+	Com_sprintf(filename, 255, "missions/%s/%s.mis", mapname, scriptname);
+
+	ME_LoadOverviewAndEntities(filename, &overview, vehicles, installations);
+
+	ME_SpawnMissionVehicles(vehicles);
+
+//	trap_Printf( va("Loaded: %s\n", inbuffer) );
+}
 
 
