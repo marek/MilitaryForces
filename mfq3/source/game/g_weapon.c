@@ -1,5 +1,5 @@
 /*
- * $Id: g_weapon.c,v 1.7 2003-08-14 15:45:47 thebjoern Exp $
+ * $Id: g_weapon.c,v 1.11 2004-12-16 19:22:17 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -122,6 +122,12 @@ void FireWeapon( gentity_t *ent ) {
 		drop_fueltank( ent );
 		if( availableWeapons[ent->s.weaponIndex].flags & WF_FIRE_IN_PAIRS )
 			drop_fueltank( ent );
+		break;
+	case WT_NUKEBOMB:
+		fire_nukebomb ( ent );
+		break;
+	case WT_NUKEMISSILE:
+		fire_nukemissile ( ent ); 
 		break;
 	default:
 // FIXME		G_Error( "Bad ent->s.weapon" );
