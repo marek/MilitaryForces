@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.122 2003-04-25 00:02:23 thebjoern Exp $
+ * $Id: bg_public.h,v 1.123 2003-08-06 18:10:21 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.76d"
+#define	GAME_VERSION		"mfq3 v0.76f"
 #define	GAME_IDENTIFIER		"mfq3"			// use to identify mfq3 servers
 
 #define	DEFAULT_GRAVITY		800
@@ -722,7 +722,7 @@ enum ShadowOrientationAdjusts {
 #define PF_DONT_DROP		0x4000	// dont drop on launch (wingtip)
 #define PF_HARM				0x8000	// harm
 
-#define PF_DONT_REMOVE		0x3F00
+#define PF_DONT_REMOVE		0x3900
 
 #define MAX_LOADOUTS			50
 #define MAX_MOUNTS_PER_VEHICLE	32
@@ -821,6 +821,7 @@ typedef enum {
 // weaponflags
 #define	WF_NONE						0
 #define WF_HAS_FIRE_FRAME			1		// for missiles
+#define WF_FIRE_IN_PAIRS			2		// for bombs, tanks etc
 
 // list of ground installations
 typedef struct groundInstallationData_s

@@ -1,5 +1,5 @@
 /*
- * $Id: g_scripts.c,v 1.2 2002-02-23 23:07:08 thebjoern Exp $
+ * $Id: g_scripts.c,v 1.3 2003-08-06 18:10:21 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -96,7 +96,7 @@ static int ParseScripts( gentity_t* ent, char *buf ) {
 	int		count;
 	char	key[MAX_TOKEN_CHARS];
 	char	info[MAX_INFO_STRING];
-	qboolean mfq3map = qfalse;
+//	qboolean mfq3map = qfalse;
 	int     openbraces = 0;
 	scripttask_t* currentTask = 0;
 

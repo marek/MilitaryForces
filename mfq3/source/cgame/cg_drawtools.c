@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawtools.c,v 1.20 2003-02-24 01:24:09 thebjoern Exp $
+ * $Id: cg_drawtools.c,v 1.21 2003-08-06 18:10:20 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -867,7 +867,7 @@ static qboolean CG_PolyMeshGeneratedShadow( BasicDrawInfo_t *drawInfo, float *sh
 	float pitchMax = 0, rollMax = 0;
 	float pitchMod = 0, rollMod = 0;
 	float u = 0, v = 0, mod = 0;
-	int midPoint = 3;
+//	int midPoint = 3;
 	int traceMask = 0;
 	polyVert_t verts[5][5];
 	polyVert_t vertBuff[4];

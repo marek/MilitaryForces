@@ -1,5 +1,5 @@
 /*
- * $Id: g_weapon.c,v 1.5 2003-04-25 00:02:24 thebjoern Exp $
+ * $Id: g_weapon.c,v 1.6 2003-08-06 18:10:21 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -119,7 +119,8 @@ void FireWeapon( gentity_t *ent ) {
 		fire_maingun( ent );
 		break;
 	case WT_FUELTANK:
-		drop_fueltank( ent );
+		while( MF_findWeaponsOfType(ent->client->ps.weaponIndex, &ent->loadout) )
+			drop_fueltank( ent );
 		break;
 	default:
 // FIXME		G_Error( "Bad ent->s.weapon" );

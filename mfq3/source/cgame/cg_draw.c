@@ -1,5 +1,5 @@
 /*
- * $Id: cg_draw.c,v 1.32 2002-06-09 20:09:41 thebjoern Exp $
+ * $Id: cg_draw.c,v 1.33 2003-08-06 18:10:20 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -258,7 +258,7 @@ void CG_Text_Paint(float x, float y, float scale, vec4_t color, const char *text
 				// outline?
 				if (style == ITEM_TEXTSTYLE_OUTLINED )
 				{
-					int ofs = style == ITEM_TEXTSTYLE_SHADOWED ? 1 : 2;
+//					int ofs = style == ITEM_TEXTSTYLE_SHADOWED ? 1 : 2;
 					colorBlack[3] = newColor[3];
 					trap_R_SetColor( colorBlack );
 
@@ -2130,9 +2130,9 @@ CG_DrawFollow
 */
 static qboolean CG_DrawFollow( void )
 {
-	float		x = 0;
+//	float		x = 0;
 	vec4_t		*pColor = NULL;
-	vec4_t		color = {0,0,0,0};
+//	vec4_t		color = {0,0,0,0};
 	const char	*name = NULL;
 
 	// are we NOT following?

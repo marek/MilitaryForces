@@ -1,5 +1,5 @@
 /*
- * $Id: cg_marks.c,v 1.4 2002-02-21 16:39:19 sparky909_uk Exp $
+ * $Id: cg_marks.c,v 1.5 2003-08-06 18:10:20 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -138,7 +138,7 @@ void CG_ImpactMarkEx( qhandle_t markShader, const vec3_t origin, const vec3_t di
 	markFragment_t	markFragments[MAX_MARK_FRAGMENTS], *mf;
 	vec3_t			markPoints[MAX_MARK_POINTS];
 	vec3_t			projection;
-	qboolean		flip = qfalse;
+//	qboolean		flip = qfalse;
 
 
 // MFQ3: disable ALL impact marks because currently the essential trap_CM_MarkFragments() call does not

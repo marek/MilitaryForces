@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.31 2003-02-08 15:20:13 thebjoern Exp $
+ * $Id: bg_mfq3util.c,v 1.32 2003-08-06 18:10:21 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -217,7 +217,7 @@ char * MF_CreateGIPathname( int vehicle, char * pFormatString )
 {
 	char * pReturnString = NULL;
 	char catDir[ 32 ];
-	unsigned int cat = 0;
+//	unsigned int cat = 0;
 
 	// find catagory
 	strcpy( catDir, "npc" );

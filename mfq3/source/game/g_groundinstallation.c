@@ -1,5 +1,5 @@
 /*
- * $Id: g_groundinstallation.c,v 1.4 2003-04-02 13:13:14 thebjoern Exp $
+ * $Id: g_groundinstallation.c,v 1.5 2003-08-06 18:10:21 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -28,7 +28,7 @@ static void Update_GI_Targets( gentity_t* ent )
 	float			range = availableGroundInstallations[ent->s.modelindex2].radarRange;
 	int				i, num, touch[MAX_GENTITIES];
 	gentity_t		*hit, *best = 0;
-	float			dist, closest;
+	float			dist, closest = 999999;
 	unsigned long	cat;
 	trace_t			tr;
 

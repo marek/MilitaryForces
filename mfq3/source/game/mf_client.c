@@ -1,5 +1,5 @@
 /*
- * $Id: mf_client.c,v 1.16 2002-07-13 12:04:40 thebjoern Exp $
+ * $Id: mf_client.c,v 1.17 2003-08-06 18:10:21 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -410,7 +410,7 @@ void MF_ClientSpawn(gentity_t *ent) {
 				break;
 			}
 		}
-		if( client->ps.weaponIndex = WI_NONE ) {
+		if( client->ps.weaponIndex == WI_NONE ) {
 			client->ps.weaponIndex = availableVehicles[vehIndex].weapons[0];
 		}
 

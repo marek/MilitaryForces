@@ -1,5 +1,5 @@
 /*
- * $Id: cg_consolecmds.c,v 1.23 2003-02-07 19:17:43 thebjoern Exp $
+ * $Id: cg_consolecmds.c,v 1.24 2003-08-06 18:10:20 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -164,8 +164,6 @@ MFQ3 HUD Color setting
 
 static void CG_Update_HUD_Color_f( void )
 {
-	int val = -1;
-
 	// update 
 	cg.HUDColor = CG_Cvar_Get( "hud_color" );
 }
@@ -198,8 +196,6 @@ MFQ3 MFD color setting
 
 static void CG_Update_MFD_Color_f( void )
 {
-	int val = -1;
-
 	// update 
 	cg.MFDColor = CG_Cvar_Get( "mfd_color" );
 }
