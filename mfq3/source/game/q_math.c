@@ -1,5 +1,5 @@
 /*
- * $Id: q_math.c,v 1.9 2003-02-11 00:25:11 thebjoern Exp $
+ * $Id: q_math.c,v 1.10 2003-03-19 21:28:18 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -483,12 +483,12 @@ float AxisToRoll( const vec3_t forward, const vec3_t right, const vec3_t up)
 int AxisToAngles( const vec3_t forward, const vec3_t right, const vec3_t up, vec3_t angles)
 {
 	int retVal = 0;
-	float r;
+//	float r;
 
 #ifdef HIER_BUB
 	Du dummer Bub!
 #endif
-
+/*
     angles[1] = asin(up[0]);
     if( angles[1] < M_PI/2 )
     {
@@ -524,7 +524,7 @@ int AxisToAngles( const vec3_t forward, const vec3_t right, const vec3_t up, vec
 	while( angles[1] > 360 ) angles[1] -= 360;
 	while( angles[2] < -180 ) angles[2] += 360;
 	while( angles[2] > 180 ) angles[2] -= 360;
-
+*/
 	return retVal;
 }
 
