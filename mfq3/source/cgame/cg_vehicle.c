@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicle.c,v 1.6 2002-02-09 17:07:03 thebjoern Exp $
+ * $Id: cg_vehicle.c,v 1.7 2002-02-14 12:24:28 sparky909_uk Exp $
 */
 
 #include "cg_local.h"
@@ -193,35 +193,50 @@ CG_Vehicle
 */
 void CG_Vehicle( centity_t *cent ) 
 {
-    clientInfo_t	*ci;
-    int		clientNum;
+    clientInfo_t * ci;
+    int	clientNum;
 
     // get client num and info
     clientNum = cent->currentState.clientNum;
-    if ( clientNum < 0 || clientNum >= MAX_CLIENTS ) {
+    if ( clientNum < 0 || clientNum >= MAX_CLIENTS )
+	{
 		trap_Error( "Bad clientNum on player entity");
     }
     ci = &cgs.clientinfo[ clientNum ];
 	//Com_Printf( "Vehicle = %i\n" ,ci->vehicle);    
 
-    if ( !ci->infoValid ) {
+	// don't continue if client info is invalid
+    if ( !ci->infoValid )
+	{
 		return;
     }
-	
 
-	if( (availableVehicles[ci->vehicle].id&CAT_ANY) & CAT_PLANE ) {
-		if( cg.radarTargets < MAX_RADAR_TARGETS && (cg.predictedPlayerEntity.currentState.ONOFF & OO_RADAR_AIR)) {
+	// don't draw ourselves, if we are rendering the MFDs
+	if( cent == &cg.predictedPlayerEntity && cg.drawingMFD )
+	{
+		return;
+	}
+
+	// plane?
+	if( (availableVehicles[ci->vehicle].id&CAT_ANY) & CAT_PLANE )
+	{
+		if( cg.radarTargets < MAX_RADAR_TARGETS && (cg.predictedPlayerEntity.currentState.ONOFF & OO_RADAR_AIR))
+		{
 			cg.radarEnts[cg.radarTargets++] = cent;
 		}
 		CG_Plane( cent, ci );
 	}
-	else if( (availableVehicles[ci->vehicle].id&CAT_ANY) & CAT_GROUND ) {
-		if( cg.radarTargets < MAX_RADAR_TARGETS && (cg.predictedPlayerEntity.currentState.ONOFF & OO_RADAR_GROUND)) {
+	// ground vehicle?
+	else if( (availableVehicles[ci->vehicle].id&CAT_ANY) & CAT_GROUND )
+	{
+		if( cg.radarTargets < MAX_RADAR_TARGETS && (cg.predictedPlayerEntity.currentState.ONOFF & OO_RADAR_GROUND))
+		{
 			cg.radarEnts[cg.radarTargets++] = cent;
 		}
 		CG_GroundVehicle( cent, ci );
 	}
-	else {
+	else
+	{
 		trap_Error( "Error: CG_Vehicle got wrong CAT!\n" );
 	}
 }
