@@ -1,5 +1,5 @@
 /*
- * $Id: g_main.c,v 1.3 2002-02-11 12:22:37 sparky909_uk Exp $
+ * $Id: g_main.c,v 1.4 2002-02-12 12:40:05 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -367,7 +367,12 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 	// set the game version into a server var (that can be viewed as server-info)
 	trap_Cvar_Set( "mf_version", GAME_VERSION );
-	
+
+	// MFQ3: (for now) always set the 'g_synchronousClients' var to 0, as setting to 1
+	// causes glitching/flickering with the models
+#pragma message( "g_synchronousClients is always being set to 0 in G_InitGame()" )
+	trap_Cvar_Set( "g_synchronousClients", "0" );
+
 	level.time = levelTime;
 	level.startTime = levelTime;
 
