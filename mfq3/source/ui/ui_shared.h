@@ -1,5 +1,5 @@
 /*
- * $Id: ui_shared.h,v 1.8 2002-02-18 16:25:48 sparky909_uk Exp $
+ * $Id: ui_shared.h,v 1.9 2002-02-19 13:57:58 sparky909_uk Exp $
 */
 #ifndef __UI_SHARED_H
 #define __UI_SHARED_H
@@ -539,5 +539,6 @@ unsigned char * CreateColourChar( unsigned char r, unsigned char g, unsigned cha
 void DrawStringNew( int x, int y, float scale, vec4_t colour, const char * pText, int unknown, int hSpacing, int style, textJustify_t formatting );
 void DrawStringNewAlpha( int x, int y, const char * pText, float alpha, textJustify_t formatting );
 void DrawStringNewColour( int x, int y, const char * pText, vec4_t colour, textJustify_t formatting );
+void DrawStringNewBasic( int x, int y, float scale, const char * pText );
 
 #endif
