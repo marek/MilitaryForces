@@ -5,8 +5,18 @@ Military Forces Q3
 History:
 ========
 
-+++v0.72+++ in progress...
+
++++v0.73+++ in progress...
 -----------
+
++++v0.72+++
+-----------
+- added support for copy/paste using CTRL+C/V, in waypoint mode this copies the whole
+  route (so that you can give it to another vehicle as well), in vehicle mode this copies
+  the vehicle and pastes it to your new position
+- fixed bug that caused game to block when spawning a vehicle while another vehicle
+  was selected
+- selection groups now rotate around their geometrical center
 - pressing throttle_decrease toggles waypoint display between "show all waypoints" and
   "show waypoints of selected vehicle"
 - when in waypoint mode only the waypoints of the currently selected vehicle are shown
