@@ -5,9 +5,22 @@ Military Forces Q3
 History:
 ========
 
-+++v0.51+++ in progress...
++++v0.52+++ in progress...
 -----------
 
+
++++v0.51+++
+-----------
+- added cmds "mfd1_mode" and "mfd2_mode" to cycle through MFD modes
+- new HUD: added MFD2 and cvar hud_mfd to turn it on/off
+- new HUD: added MFD and cvar hud_mfd to turn it on/off
+- new HUD: implemented speed tape and cvar hud_speed to turn it on/off
+  NOTE: red caret indicates stall speed, green caret indicates gearspeed
+- new HUD: implemented heading tape and cvar hud_heading to turn it on/off
+  NOTE: caret indicates heading towards waypoint (only pointing north atm though)
+- fixed guided weapons bug allowing to lock with MG after spawning
+- fixed F-14 swingwing bug
+- minor fixes
 
 +++v0.50+++
 -----------
@@ -26,7 +39,9 @@ History:
   NOTE: The test commands are used for example like this: "\testPlaneCmd cockpit"
 - added cmd "testGV" to add a new test model for a ground vehicle
 - added cmd "testPlane" to add a new test model for a plane
-  NOTE: If you want to add a GV or Plane
+  NOTE: If you want to add a GV or Plane you just have to specify the modelname
+  without the extension and without the directory, for example: "\testPlane f-22"
+  This looks for a plane in models/vehicles/planes/f-22/f-22.md3 
 - fix smoke bug
 - minor changes
 
