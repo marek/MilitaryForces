@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.20 2002-02-04 09:38:06 thebjoern Exp $
+ * $Id: cg_main.c,v 1.21 2002-02-04 16:35:14 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1881,7 +1881,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	}
 
 	// MFQ3: MFD color
-	cg.MFDColor = hud_color.integer;
+	cg.MFDColor = mfd_color.integer;
 	if( cg.MFDColor >= HUD_MAX || cg.MFDColor < 0 ) {
 		cg.MFDColor = 0;
 		trap_Cvar_Set( "mfd_color", va("%d", cg.MFDColor) );
