@@ -1,5 +1,5 @@
 /*
- * $Id: mf_client.c,v 1.8 2002-02-19 13:28:54 thebjoern Exp $
+ * $Id: mf_client.c,v 1.9 2002-02-20 12:05:29 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -222,7 +222,8 @@ void MF_ClientSpawn(gentity_t *ent) {
 				// don't spawn near existing origin if possible
 				spawnPoint = SelectSpawnPoint ( 
 					client->ps.origin, 
-					spawn_origin, spawn_angles);
+					spawn_origin, spawn_angles,
+					availableVehicles[vehIndex].cat);
 			}
 
 			// Tim needs to prevent bots from spawning at the initial point
