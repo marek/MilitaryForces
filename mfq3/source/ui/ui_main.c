@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.16 2002-02-20 19:59:03 sparky909_uk Exp $
+ * $Id: ui_main.c,v 1.17 2002-02-21 16:11:05 sparky909_uk Exp $
 */
 /*
 =======================================================================
@@ -5878,8 +5878,13 @@ void Text_PaintCenter(float x, float y, float scale, vec4_t color, const char *t
 	Text_Paint(x - len / 2, y, scale, color, text, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE);
 }
 
-
-static void UI_DisplayDownloadInfo( const char *downloadName, float centerPoint, float yStart, float scale ) {
+/*
+=================
+UI_DisplayDownloadInfo
+=================
+*/
+static void UI_DisplayDownloadInfo( const char *downloadName, float centerPoint, float yStart, float scale )
+{
 	static char dlText[]	= "Downloading:";
 	static char etaText[]	= "Estimated time left:";
 	static char xferText[]	= "Transfer rate:";
@@ -5890,6 +5895,9 @@ static void UI_DisplayDownloadInfo( const char *downloadName, float centerPoint,
 	int leftWidth;
 	const char *s;
 
+	scale = 0.30f;
+	yStart += 48.0f;
+
 	downloadSize = trap_Cvar_VariableValue( "cl_downloadSize" );
 	downloadCount = trap_Cvar_VariableValue( "cl_downloadCount" );
 	downloadTime = trap_Cvar_VariableValue( "cl_downloadTime" );
@@ -5898,8 +5906,8 @@ static void UI_DisplayDownloadInfo( const char *downloadName, float centerPoint,
 
 	UI_SetColor(colorWhite);
 	Text_PaintCenter(centerPoint, yStart + 112, scale, colorWhite, dlText, 0);
-	Text_PaintCenter(centerPoint, yStart + 192, scale, colorWhite, etaText, 0);
-	Text_PaintCenter(centerPoint, yStart + 248, scale, colorWhite, xferText, 0);
+	Text_PaintCenter(centerPoint, yStart + 164, scale, colorWhite, etaText, 0);
+	Text_PaintCenter(centerPoint, yStart + 196, scale, colorWhite, xferText, 0);
 
 	if (downloadSize > 0) {
 		s = va( "%s (%d%%)", downloadName, downloadCount * 100 / downloadSize );
@@ -5907,43 +5915,54 @@ static void UI_DisplayDownloadInfo( const char *downloadName, float centerPoint,
 		s = downloadName;
 	}
 
-	Text_PaintCenter(centerPoint, yStart+136, scale, colorWhite, s, 0);
+	Text_PaintCenter(centerPoint, yStart+132, scale, colorWhite, s, 0);
 
 	UI_ReadableSize( dlSizeBuf,		sizeof dlSizeBuf,		downloadCount );
 	UI_ReadableSize( totalSizeBuf,	sizeof totalSizeBuf,	downloadSize );
 
-	if (downloadCount < 4096 || !downloadTime) {
-		Text_PaintCenter(leftWidth, yStart+216, scale, colorWhite, "estimating", 0);
-		Text_PaintCenter(leftWidth, yStart+160, scale, colorWhite, va("(%s of %s copied)", dlSizeBuf, totalSizeBuf), 0);
-	} else {
-		if ((uiInfo.uiDC.realTime - downloadTime) / 1000) {
+	if( downloadCount < 4096 || !downloadTime )
+	{
+		Text_PaintCenter(leftWidth, yStart+180, scale, colorWhite, "estimating", 0);
+		Text_PaintCenter(leftWidth, yStart+148, scale, colorWhite, va("(%s of %s copied)", dlSizeBuf, totalSizeBuf), 0);
+	}
+	else
+	{
+		if ((uiInfo.uiDC.realTime - downloadTime) / 1000)
+		{
 			xferRate = downloadCount / ((uiInfo.uiDC.realTime - downloadTime) / 1000);
-		} else {
+		}
+		else
+		{
 			xferRate = 0;
 		}
 		UI_ReadableSize( xferRateBuf, sizeof xferRateBuf, xferRate );
 
 		// Extrapolate estimated completion time
-		if (downloadSize && xferRate) {
+		if( downloadSize && xferRate )
+		{
 			int n = downloadSize / xferRate; // estimated time for entire d/l in secs
 
 			// We do it in K (/1024) because we'd overflow around 4MB
-			UI_PrintTime ( dlTimeBuf, sizeof dlTimeBuf, 
-				(n - (((downloadCount/1024) * n) / (downloadSize/1024))) * 1000);
+			UI_PrintTime ( dlTimeBuf, sizeof dlTimeBuf, (n - (((downloadCount/1024) * n) / (downloadSize/1024))) * 1000);
 
-			Text_PaintCenter(leftWidth, yStart+216, scale, colorWhite, dlTimeBuf, 0);
-			Text_PaintCenter(leftWidth, yStart+160, scale, colorWhite, va("(%s of %s copied)", dlSizeBuf, totalSizeBuf), 0);
-		} else {
-			Text_PaintCenter(leftWidth, yStart+216, scale, colorWhite, "estimating", 0);
-			if (downloadSize) {
-				Text_PaintCenter(leftWidth, yStart+160, scale, colorWhite, va("(%s of %s copied)", dlSizeBuf, totalSizeBuf), 0);
+			Text_PaintCenter(leftWidth, yStart+180, scale, colorWhite, dlTimeBuf, 0);
+			Text_PaintCenter(leftWidth, yStart+148, scale, colorWhite, va("(%s of %s copied)", dlSizeBuf, totalSizeBuf), 0);
+		}
+		else
+		{
+			Text_PaintCenter(leftWidth, yStart+180, scale, colorWhite, "estimating", 0);
+			
+			if (downloadSize)
+			{
+				Text_PaintCenter(leftWidth, yStart+148, scale, colorWhite, va("(%s of %s copied)", dlSizeBuf, totalSizeBuf), 0);
 			} else {
-				Text_PaintCenter(leftWidth, yStart+160, scale, colorWhite, va("(%s copied)", dlSizeBuf), 0);
+				Text_PaintCenter(leftWidth, yStart+148, scale, colorWhite, va("(%s copied)", dlSizeBuf), 0);
 			}
 		}
 
-		if (xferRate) {
-			Text_PaintCenter(leftWidth, yStart+272, scale, colorWhite, va("%s/Sec", xferRateBuf), 0);
+		if( xferRate )
+		{
+			Text_PaintCenter(leftWidth, yStart+212, scale, colorWhite, va("%s/Sec", xferRateBuf), 0);
 		}
 	}
 }
@@ -5956,28 +5975,36 @@ This will also be overlaid on the cgame info screen during loading
 to prevent it from blinking away too rapidly on local or lan games.
 ========================
 */
-void UI_DrawConnectScreen( qboolean overlay ) {
-	char			*s;
+void UI_DrawConnectScreen( qboolean overlay )
+{
 	uiClientState_t	cstate;
-	char			info[MAX_INFO_VALUE];
+	char * s = NULL;
+	char info[MAX_INFO_VALUE];
 	char text[256];
 	float centerPoint, yStart, scale;
 	
+	// find the menu
 	menuDef_t *menu = Menus_FindByName("Connect");
 
-
-	if ( !overlay && menu ) {
+	// paint connect menu?
+	if( !overlay && menu )
+	{
 		Menu_Paint(menu, qtrue);
 	}
 
-	if (!overlay) {
+	// adjust coords for overlay mode
+	if( !overlay )
+	{
 		centerPoint = 320;
-		yStart = 130;
+		yStart = 200;
 		scale = 0.5f;
-	} else {
+	}
+	else
+	{
 		centerPoint = 320;
 		yStart = 32;
 		scale = 0.6f;
+		
 		return;
 	}
 
@@ -5985,63 +6012,80 @@ void UI_DrawConnectScreen( qboolean overlay ) {
 	trap_GetClientState( &cstate );
 
 	info[0] = '\0';
-	if( trap_GetConfigString( CS_SERVERINFO, info, sizeof(info) ) ) {
-		Text_PaintCenter(centerPoint, yStart, scale, colorWhite, va( "Loading %s", Info_ValueForKey( info, "mapname" )), 0);
+	if( trap_GetConfigString( CS_SERVERINFO, info, sizeof(info) ) )
+	{
+		Text_PaintCenter( centerPoint, yStart, scale, colorWhite, va( "Loading %s", Info_ValueForKey( info, "mapname" )), 0 );
 	}
 
-	if (!Q_stricmp(cstate.servername,"localhost"))
+	// connect to local server?
+	if( !Q_stricmp( cstate.servername,"localhost" ) )
 	{
-		Text_PaintCenter(centerPoint, yStart + 48 + 64, scale, colorWhite, va("Connecting to localhost"), ITEM_TEXTSTYLE_SHADOWEDMORE);
+		// local server
+		Text_PaintCenter(centerPoint, yStart + 48, scale, colorWhite, va( "Connecting to localhost..." ), ITEM_TEXTSTYLE_SHADOWEDMORE);
 	}
 	else
 	{
-		strcpy(text, va("Connecting to %s", cstate.servername));
-		Text_PaintCenter(centerPoint, yStart + 48 + 64, scale, colorWhite,text , ITEM_TEXTSTYLE_SHADOWEDMORE);
+		// remote server
+		strcpy( text, va( "Connecting to %s...", cstate.servername ) );
+		Text_PaintCenter( centerPoint, yStart + 48, scale, colorWhite,text , ITEM_TEXTSTYLE_SHADOWEDMORE );
 	}
-
-	//UI_DrawProportionalString( 320, 96, "Press Esc to abort", UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, menu_text_color );
+/*
+	UI_DrawProportionalString( 320, 96, "Press Esc to abort", UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, menu_text_color );
 
 	// display global MOTD at bottom
-	Text_PaintCenter(centerPoint, 600, scale, colorWhite, Info_ValueForKey( cstate.updateInfoString, "motd" ), 0);
+	Text_PaintCenter( centerPoint, 600, scale, colorWhite, Info_ValueForKey( cstate.updateInfoString, "motd" ), 0 );
+*/	
 	// print any server info (server full, bad version, etc)
-	if ( cstate.connState < CA_CONNECTED ) {
-		Text_PaintCenter(centerPoint, yStart + 176, scale, colorWhite, cstate.messageString, 0);
+	if( cstate.connState < CA_CONNECTED )
+	{
+		Text_PaintCenter(centerPoint, yStart + 96, scale, colorWhite, cstate.messageString, 0);
 	}
 
-	if ( lastConnState > cstate.connState ) {
+	if( lastConnState > cstate.connState )
+	{
 		lastLoadingText[0] = '\0';
 	}
+	
 	lastConnState = cstate.connState;
 
-	switch ( cstate.connState ) {
+	switch( cstate.connState )
+	{
 	case CA_CONNECTING:
 		s = va("Awaiting connection...%i", cstate.connectPacketCount);
 		break;
+
 	case CA_CHALLENGING:
 		s = va("Awaiting challenge...%i", cstate.connectPacketCount);
 		break;
-	case CA_CONNECTED: {
+
+	case CA_CONNECTED:
+		{
 		char downloadName[MAX_INFO_VALUE];
 
 			trap_Cvar_VariableStringBuffer( "cl_downloadName", downloadName, sizeof(downloadName) );
-			if (*downloadName) {
+			if( *downloadName )
+			{
 				UI_DisplayDownloadInfo( downloadName, centerPoint, yStart, scale );
 				return;
 			}
 		}
 		s = "Awaiting gamestate...";
 		break;
+
 	case CA_LOADING:
 		return;
+
 	case CA_PRIMED:
 		return;
+
 	default:
 		return;
 	}
 
-
-	if (Q_stricmp(cstate.servername,"localhost")) {
-		Text_PaintCenter(centerPoint, yStart + 80, scale, colorWhite, s, 0);
+	// connecting to remove server?
+	if( Q_stricmp( cstate.servername,"localhost" ) )
+	{
+		Text_PaintCenter( centerPoint, yStart + 96, scale, colorWhite, s, 0 );
 	}
 
 	// password required / connection rejected information goes here
