@@ -1,5 +1,5 @@
 /*
- * $Id: q_shared.h,v 1.7 2002-02-20 16:58:08 sparky909_uk Exp $
+ * $Id: q_shared.h,v 1.8 2002-02-25 12:11:06 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -669,8 +669,6 @@ float	LittleFloat (float l);
 void	Swap_Init (void);
 char	* QDECL va(char *format, ...);
 
-//=============================================
-
 //
 // key / value info strings
 //
@@ -1181,6 +1179,12 @@ typedef enum _flag_status {
 
 #define CDKEY_LEN 16
 #define CDCHKSUM_LEN 2
+
+//=============================================
+
+// generic random number functions (based upon calling Rand())
+int RandomInt( int min, int max );
+float RandomFloat( float min, float max );
 
 
 #endif	// __Q_SHARED_H
