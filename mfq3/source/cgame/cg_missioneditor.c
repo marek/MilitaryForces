@@ -1,5 +1,5 @@
 /*
- * $Id: cg_missioneditor.c,v 1.5 2002-06-15 18:37:13 thebjoern Exp $
+ * $Id: cg_missioneditor.c,v 1.6 2002-06-16 21:36:28 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -11,8 +11,8 @@
 extern char *plane_tags[BP_PLANE_MAX_PARTS];
 extern char *gv_tags[BP_GV_MAX_PARTS];
 extern char *boat_tags[BP_BOAT_MAX_PARTS];
+extern char *gi_tags[BP_GI_MAX_PARTS];
 extern char *engine_tags[3];
-
 
 void ME_DrawVehicle( IGME_vehicle_t* veh );
 void ME_CheckForSelection();
@@ -700,7 +700,46 @@ void ME_DrawVehicle( IGME_vehicle_t* veh )
 	if( !veh ) return;
 
 	if( veh->groundInstallation ) {
-
+		refEntity_t part[BP_GI_MAX_PARTS];
+		int i;
+		for( i = 0; i < BP_GI_MAX_PARTS; i++ ) {
+			memset( &part[i], 0, sizeof(part[0]) );	
+		}	
+		// body
+		AnglesToAxis( veh->angles, part[BP_GI_BODY].axis );
+		part[BP_GI_BODY].hModel = availableGroundInstallations[veh->vehidx].handle[BP_GI_BODY];		
+		VectorCopy( veh->origin, part[BP_GI_BODY].origin );	
+		VectorCopy( veh->origin, part[BP_GI_BODY].oldorigin);
+		trap_R_AddRefEntityToScene( &part[BP_GI_BODY] );
+		// other parts
+		for( i = 1; i < BP_GI_MAX_PARTS; i++ ) {
+			if( (i == BP_GI_UPGRADE && !availableGroundInstallations[veh->vehidx].upgrades) ||
+				(i == BP_GI_UPGRADE2 && availableGroundInstallations[veh->vehidx].upgrades < 2 ) ||
+				(i == BP_GI_UPGRADE3 && availableGroundInstallations[veh->vehidx].upgrades < 3 ) ) {
+				break;;
+			}
+			part[i].hModel = availableGroundInstallations[veh->vehidx].handle[i];
+			if( !part[i].hModel ) continue;
+			VectorCopy( veh->origin, part[i].lightingOrigin );
+			AxisCopy( axisDefault, part[i].axis );
+			if( i == BP_GI_GUNBARREL ) {
+				CG_PositionRotatedEntityOnTag( &part[i], &part[BP_GI_TURRET], 
+					availableGroundInstallations[veh->vehidx].handle[BP_GI_TURRET], gi_tags[i] );
+			} else if( i == BP_GI_UPGRADE ) {
+				CG_PositionRotatedEntityOnTag( &part[i], &part[BP_GI_GUNBARREL], 
+					availableGroundInstallations[veh->vehidx].handle[BP_GI_GUNBARREL], gi_tags[i] );
+			} else if( i == BP_GI_UPGRADE2 ) {
+				CG_PositionRotatedEntityOnTag( &part[i], &part[BP_GI_UPGRADE], 
+					availableGroundInstallations[veh->vehidx].handle[BP_GI_UPGRADE], gi_tags[i] );
+			} else if( i == BP_GI_UPGRADE3 ) {
+				CG_PositionRotatedEntityOnTag( &part[i], &part[BP_GI_UPGRADE2], 
+					availableGroundInstallations[veh->vehidx].handle[BP_GI_UPGRADE2], gi_tags[i] );
+			} else {
+				CG_PositionRotatedEntityOnTag( &part[i], &part[BP_GI_BODY], 
+					availableGroundInstallations[veh->vehidx].handle[BP_GI_BODY], gi_tags[i] );
+			}
+			trap_R_AddRefEntityToScene( &part[i] );
+		}
 	} else {
 		switch( availableVehicles[veh->vehidx].cat ) {
 		case CAT_PLANE:
@@ -761,7 +800,7 @@ void ME_DrawVehicle( IGME_vehicle_t* veh )
 						CG_PositionRotatedEntityOnTag( &part[i], &part[BP_GV_TURRET], 
 							availableVehicles[veh->vehidx].handle[BP_GV_TURRET], gv_tags[i] );
 					} else {
-						CG_PositionRotatedEntityOnTag( &part[i], &part[BP_PLANE_BODY], 
+						CG_PositionRotatedEntityOnTag( &part[i], &part[BP_GV_BODY], 
 							availableVehicles[veh->vehidx].handle[BP_GV_BODY], gv_tags[i] );
 					}
 					trap_R_AddRefEntityToScene( &part[i] );
@@ -787,12 +826,12 @@ void ME_DrawVehicle( IGME_vehicle_t* veh )
 					if( !part[i].hModel ) continue;
 					VectorCopy( veh->origin, part[i].lightingOrigin );
 					AxisCopy( axisDefault, part[i].axis );
-					if( i == BP_GV_GUNBARREL ) {
-						CG_PositionRotatedEntityOnTag( &part[i], &part[BP_GV_TURRET], 
-							availableVehicles[veh->vehidx].handle[BP_GV_TURRET], boat_tags[i] );
+					if( i == BP_BOAT_GUNBARREL ) {
+						CG_PositionRotatedEntityOnTag( &part[i], &part[BP_BOAT_TURRET], 
+							availableVehicles[veh->vehidx].handle[BP_BOAT_TURRET], boat_tags[i] );
 					} else {
-						CG_PositionRotatedEntityOnTag( &part[i], &part[BP_PLANE_BODY], 
-							availableVehicles[veh->vehidx].handle[BP_GV_BODY], boat_tags[i] );
+						CG_PositionRotatedEntityOnTag( &part[i], &part[BP_BOAT_BODY], 
+							availableVehicles[veh->vehidx].handle[BP_BOAT_BODY], boat_tags[i] );
 					}
 					trap_R_AddRefEntityToScene( &part[i] );
 				}

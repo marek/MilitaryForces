@@ -1,5 +1,5 @@
 /*
- * $Id: cg_consolecmds.c,v 1.20 2002-06-15 18:37:12 thebjoern Exp $
+ * $Id: cg_consolecmds.c,v 1.21 2002-06-16 21:36:28 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -503,7 +503,10 @@ static void CG_Spawn_GI_f( void ) {
 
 	idx = atoi( CG_Argv(1) );
 
-	if( idx < 0 || idx >= bg_numberOfGroundInstallations ) return;
+	if( idx < 0 || idx >= bg_numberOfGroundInstallations ) {
+		CG_Printf("GroundInstallation number out of range (0-%d)\n", bg_numberOfGroundInstallations-1 );
+		return;
+	}
 
 	ME_SpawnGroundInstallation(idx);
 

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_groundvehicle.c,v 1.16 2002-02-25 12:13:36 sparky909_uk Exp $
+ * $Id: cg_groundvehicle.c,v 1.17 2002-06-16 21:36:28 thebjoern Exp $
 */
 
 
@@ -18,6 +18,17 @@ char *gv_tags[BP_GV_MAX_PARTS] =
 	"tag_wheel5",	// wheel
 	"tag_wheel6"	// wheel
 };
+
+char *gi_tags[BP_GI_MAX_PARTS] =
+{
+	"<no tag>",		// vehicle body
+	"tag_turret",	// turret
+	"tag_weap",		// gun
+	"tag_upgrade",	
+	"tag_upgrade",	
+	"tag_upgrade"	
+};
+
 
 /*
 ==========================

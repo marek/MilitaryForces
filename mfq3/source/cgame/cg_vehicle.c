@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicle.c,v 1.22 2002-02-26 16:38:09 sparky909_uk Exp $
+ * $Id: cg_vehicle.c,v 1.23 2002-06-16 21:36:28 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -330,6 +330,52 @@ static void CG_CacheBoat(int index)
 	}
 }
 
+/*
+===============
+CG_CacheGroundInstallation
+
+On startup cache it
+===============
+*/
+
+static void CG_CacheGroundInstallation(int index)
+{
+	char name[128];
+	char basename[128];
+	int i;
+
+	Com_sprintf( basename, sizeof(basename), "models/vehicles/npc/%s/%s", 
+				 availableGroundInstallations[index].modelName,
+				 availableGroundInstallations[index].modelName );
+// changed mg
+	for( i = 0; i < BP_GI_MAX_PARTS; i++ ) {
+		switch(i) {
+		case BP_GI_BODY:
+			Com_sprintf( name, sizeof(name), "%s.md3", basename );
+			break;
+		case BP_GI_TURRET:
+			Com_sprintf( name, sizeof(name), "%s_tur.md3", basename );
+			break;
+		case BP_GI_GUNBARREL:
+			Com_sprintf( name, sizeof(name), "%s_gun.md3", basename );
+			break;
+		case BP_GI_UPGRADE:
+		case BP_GI_UPGRADE2:
+		case BP_GI_UPGRADE3:
+			Com_sprintf( name, sizeof(name), "%s_upg.md3", basename );
+			break;
+		}
+		availableGroundInstallations[index].handle[i] = trap_R_RegisterModel( name );
+//		if( !availableVehicles[index].handle[i] ) {
+//			CG_Printf( "MFQ3 Warning: Unable to load model '%s'\n", name );
+//		}
+	}
+
+	// only thing that always has to be there is body
+	if( !availableGroundInstallations[index].handle[BP_GV_BODY] ) {
+		trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
+	}
+}
 
 /*
 ===============
@@ -403,7 +449,6 @@ void CG_CacheVehicles()
 {
 	int i;
 
-	// later there could also be a check to only cache the current gameset
 	for( i = 0; i < bg_numberOfVehicles; i++ )
 	{
 		if( availableVehicles[i].gameset & cgs.gameset ) {
@@ -429,6 +474,13 @@ void CG_CacheVehicles()
 			}
 		}
 	}
+	for( i = 0; i < bg_numberOfGroundInstallations; i++ ) {
+		if( availableGroundInstallations[i].gameset & cgs.gameset ) {
+			CG_LoadingString(availableGroundInstallations[i].descriptiveName);
+			CG_CacheGroundInstallation(i);
+		}
+	}
+
 }
 
 /*

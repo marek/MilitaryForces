@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.25 2002-02-28 17:26:06 thebjoern Exp $
+ * $Id: bg_mfq3util.c,v 1.26 2002-06-16 21:36:29 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -164,6 +164,23 @@ char * MF_CreateModelPathname( int vehicle, char * pFormatString )
 	return pReturnString;
 }
 
+// same for groundinstallations
+char * MF_CreateGIPathname( int vehicle, char * pFormatString )
+{
+	char * pReturnString = NULL;
+	char catDir[ 32 ];
+	unsigned int cat = 0;
+
+	// find catagory
+	strcpy( catDir, "npc" );
+
+	// create filename string
+	pReturnString = va( pFormatString, catDir, availableGroundInstallations[ vehicle ].modelName, 
+		availableGroundInstallations[ vehicle ].modelName );
+
+	return pReturnString;
+}
+
 /*
 =================
 MF_LimitFloat
@@ -286,6 +303,14 @@ void MF_LoadAllVehicleData()
 		} else if( (availableVehicles[i].cat & CAT_BOAT) ) {
 			availableVehicles[i].mins[2] -= 2;
 		}
+	}
+	for( i = 0; i < bg_numberOfGroundInstallations; ++i ) {
+		modelbasename = MF_CreateGIPathname( i, "models/vehicles/%s/%s/%s" );	
+		// boundingbox
+		Com_sprintf( name, sizeof(name), "%s.md3", modelbasename );
+		MF_getDimensions( name, 0, &availableGroundInstallations[i].maxs, 
+				&availableGroundInstallations[i].mins );
+		availableGroundInstallations[i].maxs[2] += (15 + 7 * availableGroundInstallations[i].upgrades);
 	}
 }
 
