@@ -1,5 +1,5 @@
 /*
- * $Id: bg_weapondata.c,v 1.27 2003-08-14 15:45:47 thebjoern Exp $
+ * $Id: bg_weapondata.c,v 1.28 2003-09-05 00:56:53 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -1496,7 +1496,7 @@ completeWeaponData_t availableWeapons[] =
 		0,									// turret
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
-		200,								// number per package
+		20,								// number per package
 		CAT_PLANE,							// fits on category
 		PF_JAMMER,							// fits on pylon
 		0,									// basicECMVulnerability
@@ -1537,7 +1537,7 @@ completeWeaponData_t availableWeapons[] =
 		0,									// turret
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
-		200,								// number per package
+		20,								// number per package
 		CAT_PLANE,							// fits on category
 		PF_JAMMER,							// fits on pylon
 		0,									// basicECMVulnerability
@@ -1552,9 +1552,9 @@ completeWeaponData_t availableWeapons[] =
 		"COUNTERMEASURE POD",				// descriptiveName
 		"CM POD",							// shortName
 		"BAD SHIT",							// shortName2 (GVs)
-		"models/weapons/vwep_flarechaff.md3",	// modelName
+		"models/weapons/vwep_flarechaff.md3",			// modelName
 		0,									// handle
-		"models/weapons/vwep_flarechaff.md3",	// vwepName
+		"models/weapons/vwep_flarechaff.md3",			// vwepName
 		0,									// vwephandle
 		"hud/iconw_bmb.tga",				// iconName
 		0,									// iconHandle
@@ -1578,9 +1578,9 @@ completeWeaponData_t availableWeapons[] =
 		0,									// turret
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
-		200,								// number per package
+		20,								// number per package
 		CAT_PLANE,							// fits on category
-		PF_JAMMER,							// fits on pylon
+		PF_FLAREPOD,							// fits on pylon
 		0,									// basicECMVulnerability
 		0,									// flags
 	},
@@ -1753,7 +1753,7 @@ completeWeaponData_t availableWeapons[] =
 		"Flares",							// descriptiveName
 		"Flares",							// shortName
 		"Flares",							// shortName2 (GVs)
-		"models/weapons/vwep_flarechaff.md3",// modelName
+		"models/effects/flare.md3",			// modelName
 		0,									// handle
 		"",									// vwepName
 		0,									// vwephandle
@@ -1784,9 +1784,327 @@ completeWeaponData_t availableWeapons[] =
 		PF_FLAREPOD,						// fits on pylon
 		0,									// basicECMVulnerability
 		0,									// flags
+	},
+
+	// Cflares
+	{ 
+		WT_FLARE,							// type
+		MF_GAMESET_ANY,						// gameset
+		"CFlares",							// descriptiveName
+		"CFlares",							// shortName
+		"CFlares",							// shortName2 (GVs)
+		"models/weapons/vwep_flarechaff.md3",			// modelName
+		0,									// handle
+		"",									// vwepName
+		0,									// vwephandle
+		"",									// iconName
+		0,									// iconHandle
+		0,									// cat
+		0,									// non cat mod
+		0,									// muzzleVelocity
+		0,									// range
+		2000,								// fuelrange
+		200,								// fire interval
+		0,									// damage
+		0,									// damageRadius
+		1,									// spread
+		0,									// barrels
+		0,									// barrelDistance
+		0,									// lockcone (dot)
+		0,									// followcone (dot)
+		0,									// locktime
+		0,									// crosshair
+		0,									// crosshair track
+		0,									// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
+		1,									// number per package
+		CAT_ANY,							// fits on category
+		PF_FLAREPOD,						// fits on pylon
+		0,									// basicECMVulnerability
+		0,									// flags
+	},
+	
+	// Nuke
+	{ 
+		WT_NUKEBOMB,						// type
+		MF_GAMESET_ANY,						// gameset
+		"WW2 relic pos bomb that shouldn't even work anymore",								// descriptiveName
+		"NB10MT",							// shortName
+		"NB10MT",							// shortName2 (GVs)
+		"models/weapons/vwep_nuke.md3",		// modelName
+		0,									// handle
+		"models/weapons/vwep_nuke.md3",		// vwepName
+		0,									// vwephandle
+		"hud/iconw_bmb.tga",				// iconName
+		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
+		0,									// muzzleVelocity
+		0,									// range
+		0,									// fuelrange
+		5000,								// fire interval
+		0,									// damage
+		2000,								// damageRadius
+		1,									// spread
+		2,									// barrels
+		0,									// barrelDistance
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_BOMBMODE,						// crosshair
+		CH_BOMBMODE,						// crosshair track
+		CH_BOMBMODE,						// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
+		1,									// number per package
+		CAT_PLANE,							// fits on category
+		PF_AG_LT,							// fits on pylon
+		0,									// basicECMVulnerability
+		0,									// flags
+	},
+
+	// Nuke
+	{ 
+		WT_NUKEBOMB,						// type
+		MF_GAMESET_ANY,						// gameset
+		"WW2 relic pos bomb that shouldn't even work anymore",								// descriptiveName
+		"NB5MT",							// shortName
+		"NB5MT",							// shortName2 (GVs)
+		"models/weapons/vwep_nuke.md3",		// modelName
+		0,									// handle
+		"models/weapons/vwep_nuke.md3",		// vwepName
+		0,									// vwephandle
+		"hud/iconw_bmb.tga",				// iconName
+		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
+		0,									// muzzleVelocity
+		0,									// range
+		0,									// fuelrange
+		5000,								// fire interval
+		0,									// damage
+		800,								// damageRadius
+		1,									// spread
+		2,									// barrels
+		0,									// barrelDistance
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_BOMBMODE,						// crosshair
+		CH_BOMBMODE,						// crosshair track
+		CH_BOMBMODE,						// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
+		1,									// number per package
+		CAT_PLANE,							// fits on category
+		PF_AG_LT,							// fits on pylon
+		0,									// basicECMVulnerability
+		0,									// flags
+	},
+
+	// Nuke
+	{ 
+		WT_NUKEBOMB,						// type
+		MF_GAMESET_ANY,						// gameset
+		"WW2 relic pos bomb that shouldn't even work anymore",								// descriptiveName
+		"NB1MT",							// shortName
+		"NB1MT",							// shortName2 (GVs)
+		"models/weapons/vwep_nuke.md3",		// modelName
+		0,									// handle
+		"models/weapons/vwep_nuke.md3",		// vwepName
+		0,									// vwephandle
+		"hud/iconw_bmb.tga",				// iconName
+		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
+		0,									// muzzleVelocity
+		0,									// range
+		0,									// fuelrange
+		5000,								// fire interval
+		0,									// damage
+		300,								// damageRadius
+		1,									// spread
+		2,									// barrels
+		0,									// barrelDistance
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_BOMBMODE,						// crosshair
+		CH_BOMBMODE,						// crosshair track
+		CH_BOMBMODE,						// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
+		1,									// number per package
+		CAT_PLANE,							// fits on category
+		PF_AG_LT,							// fits on pylon
+		0,									// basicECMVulnerability
+		0,									// flags
+	},
+
+	// Nuke
+	{ 
+		WT_NUKEMISSILE,						// type
+		MF_GAMESET_ANY,						// gameset
+		"MinkiCorp brand Nuclear device",								// descriptiveName
+		"NM10MT",							// shortName
+		"NM10MT",							// shortName2 (GVs)
+		"models/weapons/vwep_nuke.md3",		// modelName
+		0,									// handle
+		"models/weapons/vwep_nuke.md3",		// vwepName
+		0,									// vwephandle
+		"hud/iconw_bmb.tga",				// iconName
+		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
+		800,								// muzzleVelocity
+		75000,								// range
+		75000,								// fuelrange
+		5000,								// fire interval
+		0,									// damage
+		2000,								// damageRadius
+		1,									// spread
+		2,									// barrels
+		0,									// barrelDistance
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_BOMBMODE,						// crosshair
+		CH_BOMBMODE,						// crosshair track
+		CH_BOMBMODE,						// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
+		1,									// number per package
+		CAT_PLANE,							// fits on category
+		PF_AG_LT,							// fits on pylon
+		0,									// basicECMVulnerability
+		0,									// flags
+	},
+
+	// Nuke
+	{ 
+		WT_NUKEMISSILE,						// type
+		MF_GAMESET_ANY,						// gameset
+		"MinkiCorp brand Nuclear device",								// descriptiveName
+		"NM5MT",							// shortName
+		"NM5MT",							// shortName2 (GVs)
+		"models/weapons/vwep_nuke.md3",		// modelName
+		0,									// handle
+		"models/weapons/vwep_nuke.md3",		// vwepName
+		0,									// vwephandle
+		"hud/iconw_bmb.tga",				// iconName
+		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
+		800,									// muzzleVelocity
+		75000,								// range
+		75000,								// fuelrange
+		5000,								// fire interval
+		0,									// damage
+		800,								// damageRadius
+		1,									// spread
+		2,									// barrels
+		0,									// barrelDistance
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_BOMBMODE,						// crosshair
+		CH_BOMBMODE,						// crosshair track
+		CH_BOMBMODE,						// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
+		1,									// number per package
+		CAT_PLANE,							// fits on category
+		PF_AG_LT,							// fits on pylon
+		0,									// basicECMVulnerability
+		0,									// flags
+	},
+
+	// Nuke
+	{ 
+		WT_NUKEMISSILE,						// type
+		MF_GAMESET_ANY,						// gameset
+		"MinkiCorp brand Nuclear device",								// descriptiveName
+		"NM1MT",							// shortName
+		"NM1MT",							// shortName2 (GVs)
+		"models/weapons/vwep_nuke.md3",		// modelName
+		0,									// handle
+		"models/weapons/vwep_nuke.md3",		// vwepName
+		0,									// vwephandle
+		"hud/iconw_bmb.tga",				// iconName
+		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
+		800,									// muzzleVelocity
+		75000,								// range
+		75000,								// fuelrange
+		5000,								// fire interval
+		0,									// damage
+		300,								// damageRadius
+		1,									// spread
+		2,									// barrels
+		0,									// barrelDistance
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_BOMBMODE,						// crosshair
+		CH_BOMBMODE,						// crosshair track
+		CH_BOMBMODE,						// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
+		1,									// number per package
+		CAT_PLANE,							// fits on category
+		PF_AG_LT,							// fits on pylon
+		0,									// basicECMVulnerability
+		0,									// flags
+	},
+
+	// Nuke
+	{ 
+		WT_NUKEMISSILE,						// type
+		MF_GAMESET_ANY,						// gameset
+		"MinkiCorp brand Nuclear device",								// descriptiveName
+		"NM100MT",							// shortName
+		"NM100MT",							// shortName2 (GVs)
+		"models/weapons/vwep_nuke.md3",		// modelName
+		0,									// handle
+		"models/weapons/vwep_nuke.md3",		// vwepName
+		0,									// vwephandle
+		"hud/iconw_bmb.tga",				// iconName
+		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
+		800,									// muzzleVelocity
+		75000,								// range
+		75000,								// fuelrange
+		5000,								// fire interval
+		0,									// damage
+		100000,								// damageRadius
+		1,									// spread
+		2,									// barrels
+		0,									// barrelDistance
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_BOMBMODE,						// crosshair
+		CH_BOMBMODE,						// crosshair track
+		CH_BOMBMODE,						// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
+		1,									// number per package
+		CAT_PLANE,							// fits on category
+		PF_AG_LT,							// fits on pylon
+		0,									// basicECMVulnerability
+		0,									// flags
 	}
-
-
 };
 
 int bg_numberOfWeapons = sizeof(availableWeapons) / sizeof(availableWeapons[0]);
