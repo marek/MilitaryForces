@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.22 2002-02-06 13:07:40 sparky909_uk Exp $
+ * $Id: cg_main.c,v 1.23 2002-02-07 09:55:27 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -749,23 +749,72 @@ static void CG_RegisterGraphics( void ) {
 		"newhud/hlth/9",
 		"newhud/hlth/10"
 	};
-	static char		*mfq3_throttle[15] = {
-		"newhud/thr/1",
-		"newhud/thr/2",
-		"newhud/thr/3",
-		"newhud/thr/4",
-		"newhud/thr/5",
-		"newhud/thr/6",
-		"newhud/thr/7",
-		"newhud/thr/8",
-		"newhud/thr/9",
-		"newhud/thr/10",
-		"newhud/thr/11",
-		"newhud/thr/12",
-		"newhud/thr/13",
-		"newhud/thr/14",
-		"newhud/thr/15"
+	static char		*mfq3_throttle_1[10] = {
+		"newhud/thr/1_1",
+		"newhud/thr/1_2",
+		"newhud/thr/1_3",
+		"newhud/thr/1_4",
+		"newhud/thr/1_5",
+		"newhud/thr/1_6",
+		"newhud/thr/1_7",
+		"newhud/thr/1_8",
+		"newhud/thr/1_9",
+		"newhud/thr/1_10",
 	};
+	static char		*mfq3_throttle_2[10] = {
+		"newhud/thr/2_1",
+		"newhud/thr/2_2",
+		"newhud/thr/2_3",
+		"newhud/thr/2_4",
+		"newhud/thr/2_5",
+		"newhud/thr/2_6",
+		"newhud/thr/2_7",
+		"newhud/thr/2_8",
+		"newhud/thr/2_9",
+		"newhud/thr/2_10",
+	};
+	static char		*mfq3_throttle_1_ab[15] = {
+		"newhud/thr/ab1_1",
+		"newhud/thr/ab1_2",
+		"newhud/thr/ab1_3",
+		"newhud/thr/ab1_4",
+		"newhud/thr/ab1_5",
+		"newhud/thr/ab1_6",
+		"newhud/thr/ab1_7",
+		"newhud/thr/ab1_8",
+		"newhud/thr/ab1_9",
+		"newhud/thr/ab1_10",
+		"newhud/thr/ab1_11",
+		"newhud/thr/ab1_12",
+		"newhud/thr/ab1_13",
+		"newhud/thr/ab1_14",
+		"newhud/thr/ab1_15"
+	};
+	static char		*mfq3_throttle_2_ab[15] = {
+		"newhud/thr/ab2_1",
+		"newhud/thr/ab2_2",
+		"newhud/thr/ab2_3",
+		"newhud/thr/ab2_4",
+		"newhud/thr/ab2_5",
+		"newhud/thr/ab2_6",
+		"newhud/thr/ab2_7",
+		"newhud/thr/ab2_8",
+		"newhud/thr/ab2_9",
+		"newhud/thr/ab2_10",
+		"newhud/thr/ab2_11",
+		"newhud/thr/ab2_12",
+		"newhud/thr/ab2_13",
+		"newhud/thr/ab2_14",
+		"newhud/thr/ab2_15"
+	};
+	static char		*mfq3_throttle_rev[5] = {
+		"newhud/thr/rev_1",
+		"newhud/thr/rev_2",
+		"newhud/thr/rev_3",
+		"newhud/thr/rev_4",
+		"newhud/thr/rev_5",
+	};
+
 	static char		*mfq3_hudrets[HR_MAX] = {
 		"newhud/reticle/reticle1.tga",
 		"newhud/reticle/reticle2.tga",
@@ -853,7 +902,7 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.HUDradar = trap_R_RegisterShaderNoMip( "hud/radar.tga" );
 	cgs.media.HUDgps = trap_R_RegisterShaderNoMip( "hud/gps.tga" );
 	cgs.media.HUDext = trap_R_RegisterShaderNoMip( "hud/side.tga" );
-	for( i = 0; i <= MF_THROTTLE_MAX; i++ ) {
+	for( i = 0; i <= MF_THROTTLE_AFTERBURNER; i++ ) {
 		cgs.media.throttle[i] = trap_R_RegisterShaderNoMip(va("hud/%i.tga",i));
 	}
 	for( i = 1; i < bg_numberOfWeapons; i++ ) {
@@ -885,7 +934,15 @@ static void CG_RegisterGraphics( void ) {
 		cgs.media.HUDhealth[i] = trap_R_RegisterShader( mfq3_health[i] );
 	}
 	for ( i=0 ; i<15 ; i++) {
-		cgs.media.HUDthrottle[i] = trap_R_RegisterShader( mfq3_throttle[i] );
+		cgs.media.HUDthrottle_1_ab[i] = trap_R_RegisterShader( mfq3_throttle_1_ab[i] );
+		cgs.media.HUDthrottle_2_ab[i] = trap_R_RegisterShader( mfq3_throttle_2_ab[i] );
+	}
+	for ( i=0 ; i<10 ; i++) {
+		cgs.media.HUDthrottle_1[i] = trap_R_RegisterShader( mfq3_throttle_1[i] );
+		cgs.media.HUDthrottle_2[i] = trap_R_RegisterShader( mfq3_throttle_2[i] );
+	}
+	for ( i=0 ; i<5 ; i++) {
+		cgs.media.HUDthrottle_rev[i] = trap_R_RegisterShader( mfq3_throttle_rev[i] );
 	}
 	cgs.media.HUDhealthtext = trap_R_RegisterShaderNoMip( "newhud/text/hlth.tga" );
 	cgs.media.HUDthrottletext = trap_R_RegisterShaderNoMip( "newhud/text/thr.tga" );

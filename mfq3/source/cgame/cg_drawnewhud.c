@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.11 2002-02-06 11:29:21 thebjoern Exp $
+ * $Id: cg_drawnewhud.c,v 1.12 2002-02-07 09:55:27 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -716,7 +716,7 @@ CG_Draw_Center
 
 ================
 */
-static void CG_Draw_Center(int health, int throttle) {
+static void CG_Draw_Center(int vehicle, int health, int throttle) {
 	float		x, y, width, height;
 	int			healthpic = (health/10)-1;
 	int			throttlepic = throttle - 1;
@@ -744,7 +744,24 @@ static void CG_Draw_Center(int health, int throttle) {
 		y = 448;
 		width = 128;
 		height = 32;
-		CG_DrawPic( x, y, width, height, cgs.media.HUDthrottle[throttlepic] ); 
+		if( availableVehicles[vehicle].caps & HC_DUALENGINE ) {
+			if( availableVehicles[vehicle].maxthrottle > MF_THROTTLE_MILITARY ) {
+				CG_DrawPic( x, y, width, height, cgs.media.HUDthrottle_2_ab[throttlepic] ); 
+			} else {
+				CG_DrawPic( x, y, width, height, cgs.media.HUDthrottle_2[throttlepic] ); 
+			}
+		} else {
+			if( availableVehicles[vehicle].maxthrottle > MF_THROTTLE_MILITARY ) {
+				CG_DrawPic( x, y, width, height, cgs.media.HUDthrottle_1_ab[throttlepic] ); 
+			} else {
+				if( (availableVehicles[vehicle].id&CAT_ANY & CAT_GROUND) &&
+					throttlepic >= MF_THROTTLE_MILITARY ) {
+					CG_DrawPic( x, y, width, height, cgs.media.HUDthrottle_rev[throttlepic-10] ); 
+				} else {
+					CG_DrawPic( x, y, width, height, cgs.media.HUDthrottle_1[throttlepic] ); 
+				}
+			}
+		}
 	}
 }
 
@@ -853,7 +870,7 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 		VectorAdd( cent->lerpOrigin, v, cg.HUDCamera.vieworg );
 	} else if( cammode == CAMERA_BOMB ) {
 		int speed = ps->speed/10;
-		vec3_t down, horz, vert, tempH, tempV, end;
+		vec3_t horz, vert, tempH, tempV, end;
 		float hD, vD, alpha;
 		int t;
 		trace_t tr;
@@ -875,10 +892,8 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 			CG_Trace( &tr, cent->currentState.pos.trBase, 0, 0, end, cent->currentState.number, MASK_ALL );
 			if( tr.fraction < 1 ) break;
 		}
-		vectoangles( v, down );
-//		CG_Printf("angle: %.1f %.1f %.1f\n", down[0], down[1], down[2] );
-		CG_Printf("time: %d\n", t );
-		AnglesToAxis( down, cg.HUDCamera.viewaxis );
+		vectoangles( v, end );
+		AnglesToAxis( end, cg.HUDCamera.viewaxis );
 			// position
 		VectorScale( v, -availableVehicles[vehicle].mins[0], v );
 		VectorAdd( cent->lerpOrigin, v, cg.HUDCamera.vieworg );
@@ -1447,7 +1462,7 @@ void CG_DrawStatusBar_MFQ3_new( void ) {
 	value = (100*ps->stats[STAT_HEALTH]/ps->stats[STAT_MAX_HEALTH]);
 	if( value > 100 ) value = 100;
 	if( hud_center.integer ) {
-		CG_Draw_Center(value, ps->throttle);
+		CG_Draw_Center(vehicle, value, ps->throttle);
 	}
 
 	// additional HUD info: health and throttle (redundant)

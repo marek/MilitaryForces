@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.25 2002-02-06 13:07:40 sparky909_uk Exp $
+ * $Id: cg_local.h,v 1.26 2002-02-07 09:55:27 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -666,7 +666,7 @@ typedef struct {
 	qhandle_t	HUDradar;
 	qhandle_t	HUDgps;
 	qhandle_t	HUDext;
-	qhandle_t	throttle[MF_THROTTLE_MAX+1];
+	qhandle_t	throttle[MF_THROTTLE_AFTERBURNER+1];
 	qhandle_t	radarIcons[RD_MAX_ICONS];
 
 	// MFQ3 NEW HUD
@@ -685,7 +685,11 @@ typedef struct {
 	qhandle_t	HUDalt;
 	qhandle_t	HUDsolid;
 	qhandle_t	HUDhealth[10];
-	qhandle_t	HUDthrottle[15];
+	qhandle_t	HUDthrottle_1[10];
+	qhandle_t	HUDthrottle_2[10];
+	qhandle_t	HUDthrottle_1_ab[15];
+	qhandle_t	HUDthrottle_2_ab[15];
+	qhandle_t	HUDthrottle_rev[5];
 	qhandle_t	HUDhealthtext;
 	qhandle_t	HUDthrottletext;
 	qhandle_t	HUDalphabet;

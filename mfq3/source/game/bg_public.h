@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.44 2002-02-06 15:44:59 sparky909_uk Exp $
+ * $Id: bg_public.h,v 1.45 2002-02-07 09:55:27 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.58"
+#define	GAME_VERSION		"mfq3 v0.58b"
 
 #define	DEFAULT_GRAVITY		800
 
@@ -738,9 +738,10 @@ void MF_LimitFloat( float * value, float min, float max );
 void MF_LimitInt( int * value, int min, int max );
 int MF_ExtractEnumFromId( int vehicle, unsigned int op );
 
+#define MF_THROTTLE_REVERSE		-5
 #define MF_THROTTLE_IDLE		0
 #define MF_THROTTLE_MILITARY	10
-#define MF_THROTTLE_MAX		    15
+#define MF_THROTTLE_AFTERBURNER 15
 
 // this is for the PW_HASCAN_FLAGS
 #define HC_NOTHING				0
