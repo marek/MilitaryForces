@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.7 2002-01-31 10:12:05 sparky909_uk Exp $
+ * $Id: bg_mfq3util.c,v 1.8 2002-01-31 12:01:41 thebjoern Exp $
 */
 
 #include "q_shared.h"
