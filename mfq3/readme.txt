@@ -5,9 +5,14 @@ Military Forces Q3
 History:
 ========
 
-
 +++v0.72+++ in progress...
 -----------
+- pressing throttle_decrease toggles waypoint display between "show all waypoints" and
+  "show waypoints of selected vehicle"
+- when in waypoint mode only the waypoints of the currently selected vehicle are shown
+- make controls better: LEFT mouse button now drags, MIDDLE one (or SPACE) selects, SHIFT    while dragging rotates, CTRL while dragging lifts
+- further increase of selection distance in IGME to 3000
+- bugfixes
 
 +++v0.71+++
 -----------
