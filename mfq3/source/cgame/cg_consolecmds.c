@@ -1,5 +1,5 @@
 /*
- * $Id: cg_consolecmds.c,v 1.12 2002-02-04 09:38:06 thebjoern Exp $
+ * $Id: cg_consolecmds.c,v 1.13 2002-02-04 16:34:40 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -158,6 +158,20 @@ static void CG_Set_MFD2_Page_f( void ) {
 
 /*
 ==================
+MFQ3 HUD Color setting
+==================
+*/
+
+static void CG_Update_HUD_Color_f( void )
+{
+	int val = -1;
+
+	// update 
+	cg.HUDColor = CG_Cvar_Get( "hud_color" );
+}
+
+/*
+==================
 MFQ3 HUD Color cycling
 ==================
 */
@@ -174,6 +188,20 @@ static void CG_Cycle_HUD_Color_f( void ) {
 	trap_Cvar_Set( "hud_color", va("%d", cg.HUDColor) );
 
 	cg.HUDColorTime = cg.time + 100;
+}
+
+/*
+==================
+MFQ3 MFD color setting
+==================
+*/
+
+static void CG_Update_MFD_Color_f( void )
+{
+	int val = -1;
+
+	// update 
+	cg.MFDColor = CG_Cvar_Get( "mfd_color" );
 }
 
 /*
@@ -502,7 +530,8 @@ static consoleCommand_t	commands[] = {
 	{ "-downcam", CG_CamOld_f },
 	{ "+bombcam", CG_CamBomb_f },
 	{ "-bombcam", CG_CamOld_f },
-
+	{ "update_hud_color", CG_Update_HUD_Color_f },
+	{ "update_mfd_color", CG_Update_MFD_Color_f }
 };
 
 
