@@ -1,5 +1,5 @@
 /*
- * $Id: cg_missioneditor.c,v 1.8 2002-07-15 18:23:07 thebjoern Exp $
+ * $Id: cg_missioneditor.c,v 1.9 2003-01-14 00:24:10 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -826,6 +826,110 @@ void ME_DrawVehicle( IGME_vehicle_t* veh )
 	}
 }
 
+void ME_ExportToScript( const char* scriptname )
+{
+	char			scriptfile[256];
+	char			outstring[1024];
+	const char		*info, *mapname;
+	fileHandle_t	f;
+	static char		buf[MAX_MENUDEFFILE];
+	int				i;
+	IGME_vehicle_t* veh;
+
+	if( !scriptname )
+	{
+		CG_Printf("Invalid scriptname!\n");
+		return;
+	}
+
+	// set up mission filename
+	info = CG_ConfigString( CS_SERVERINFO );
+	mapname = Info_ValueForKey( info, "mapname" );
+	Com_sprintf(scriptfile, 255, "missions/%s/%s.mis", mapname, scriptname);
+
+	if( trap_FS_FOpenFile(scriptfile, &f, FS_WRITE) < 0 ) {
+		CG_Printf("Unable to write to file %s. Exporting to script cancelled.", scriptfile);
+		return;
+	}
+	
+	CG_Printf("Saving to script: %s\n", scriptfile);
+
+	// first line comment
+	Com_sprintf( outstring, sizeof(outstring), ";Missionscript for map %s\n\n",mapname );
+	trap_FS_Write( outstring, strlen(outstring), f );
+
+	// header
+	Com_sprintf( outstring, sizeof(outstring), "Overview\n{\n\tmap\t%s\n", mapname );
+	trap_FS_Write( outstring, strlen(outstring), f );
+
+	Com_sprintf( outstring, sizeof(outstring), "\tmission\t%s\n", scriptname );
+	trap_FS_Write( outstring, strlen(outstring), f );
+
+	Com_sprintf( outstring, sizeof(outstring), "\ttitle\t%s\n", scriptname );
+	trap_FS_Write( outstring, strlen(outstring), f );
+
+	Com_sprintf( outstring, sizeof(outstring), "\tgoal\tSearch & Destroy\n}\n\n" );
+	trap_FS_Write( outstring, strlen(outstring), f );
+
+	// entities and groundinstallations
+	Com_sprintf( outstring, sizeof(outstring), "Entities\n{\n", mapname );
+	trap_FS_Write( outstring, strlen(outstring), f );
+	for( i = 0; i < IGME_MAX_VEHICLES; ++i ) {
+		veh = &cgs.IGME.vehicles[i]; 
+		if( !veh->active ) continue;
+		if( veh->groundInstallation	)
+		{
+			Com_sprintf( outstring, sizeof(outstring), "\tGroundInstallation\n\t{\n", mapname );
+			trap_FS_Write( outstring, strlen(outstring), f );
+
+			Com_sprintf( outstring, sizeof(outstring), "\t\tIndex\t%d\n", veh->vehidx );
+			trap_FS_Write( outstring, strlen(outstring), f );
+
+			Com_sprintf( outstring, sizeof(outstring), "\t\tName\tSAM Turret\n" );
+			trap_FS_Write( outstring, strlen(outstring), f );
+
+
+
+
+			Com_sprintf( outstring, sizeof(outstring), "\t}\n\n", mapname );
+			trap_FS_Write( outstring, strlen(outstring), f );
+		}
+		else
+		{
+			Com_sprintf( outstring, sizeof(outstring), "\tVehicle\n\t{\n", mapname );
+			trap_FS_Write( outstring, strlen(outstring), f );
+
+			Com_sprintf( outstring, sizeof(outstring), "\t\tIndex\t%d\n", veh->vehidx );
+			trap_FS_Write( outstring, strlen(outstring), f );
+
+			Com_sprintf( outstring, sizeof(outstring), "\t\tName\t%s\n", availableVehicles[veh->vehidx].descriptiveName );
+			trap_FS_Write( outstring, strlen(outstring), f );
+
+
+
+
+			Com_sprintf( outstring, sizeof(outstring), "\t}\n\n", mapname );
+			trap_FS_Write( outstring, strlen(outstring), f );
+		}
+	}
+	Com_sprintf( outstring, sizeof(outstring), "}\n", mapname );
+	trap_FS_Write( outstring, strlen(outstring), f );
+
+
+
+	CG_Printf("Successfully saved to script\n");
+
+	trap_FS_FCloseFile(f);
+
+
+
+
+
+
+
+	// also possible to send it to ui like this:
+//	trap_SendConsoleCommand("ui_save_to_script whatever");
+}
 
 
 

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_consolecmds.c,v 1.21 2002-06-16 21:36:28 thebjoern Exp $
+ * $Id: cg_consolecmds.c,v 1.22 2003-01-14 00:24:09 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -512,6 +512,17 @@ static void CG_Spawn_GI_f( void ) {
 
 }
 
+static void CG_ExportToScript_f( void ) {
+	if( trap_Argc() < 2 ) 
+	{
+		CG_Printf("Scriptname not specified!");
+		return;
+	}
+
+	ME_ExportToScript( CG_Argv(1) );
+
+}
+
 /*
 =================
 CG_ExtractDeveloper
@@ -646,6 +657,7 @@ static consoleCommand_t	commands[] = {
 	{ "update_hud_color", CG_Update_HUD_Color_f },
 	{ "update_mfd_color", CG_Update_MFD_Color_f },
 	{ "me_spawn_gi", CG_Spawn_GI_f },
+	{ "me_export_to_script", CG_ExportToScript_f },
 };
 
 /*
