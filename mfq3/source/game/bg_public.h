@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.124 2003-08-14 15:45:47 thebjoern Exp $
+ * $Id: bg_public.h,v 1.126 2003-10-07 23:15:57 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.76i"
+#define	GAME_VERSION		"mfq3 v0.77d"
 #define	GAME_IDENTIFIER		"mfq3"			// use to identify mfq3 servers
 
 #define	DEFAULT_GRAVITY		800
@@ -338,6 +338,8 @@ typedef enum {
 	EV_GET_DEFAULT_LOADOUT,	// weapon loadout
 	EV_ADD_WEAPON_TO_LOADOUT,// weapon loadout
 
+	EV_NUKE,
+
 	EV_DEBUG_LINE
 
 } entity_event_t;
@@ -354,7 +356,8 @@ typedef enum {
 	GTS_BLUETEAM_SCORED,
 	GTS_REDTEAM_TOOK_LEAD,
 	GTS_BLUETEAM_TOOK_LEAD,
-	GTS_TEAMS_ARE_TIED
+	GTS_TEAMS_ARE_TIED,
+	GTS_NUKE				// come on a nuke just has to be a global sound
 } global_team_sound_t;
 
 
@@ -403,7 +406,8 @@ typedef enum {
 	MOD_AUTOCANNON,
 	MOD_MAINGUN,
 	MOD_VEHICLEEXPLOSION,
-	MOD_CRASH
+	MOD_CRASH,
+	MOD_NUKE
 } meansOfDeath_t;
 
 
@@ -616,7 +620,6 @@ typedef struct md3Tag_s {
 #define	CLASS_BOAT_TRANSPORT		  0x0002 
 #define	CLASS_BOAT_MAX				  0x0002
 
-
 // strings for categories and classes etc..
 extern const char *gameset_items[MF_MAX_GAMESETS+1];
 extern const char *gameset_codes[MF_MAX_GAMESETS+1];
@@ -815,13 +818,16 @@ typedef enum {
 	WT_ANTIGROUNDMISSILE,
 	WT_ANTIRADARMISSILE,
 	WT_FUELTANK,
-	WT_FLARE
+	WT_FLARE,
+	WT_NUKEBOMB,
+	WT_NUKEMISSILE
 }weaponType_t;
 
 // weaponflags
 #define	WF_NONE						0
 #define WF_HAS_FIRE_FRAME			1		// for missiles
 #define WF_FIRE_IN_PAIRS			2		// for bombs, tanks etc
+
 
 // list of ground installations
 typedef struct groundInstallationData_s
@@ -948,6 +954,14 @@ typedef enum
 	WI_DROPTANK_SMALL,	
 	WI_DROPTANK_SMALL_PAIR,
 	WI_FLARE,	
+	WI_CFLARE,
+	WI_NB10MT,
+	WI_NB5MT,
+	WI_NB1MT,
+	WI_NM10MT,
+	WI_NM5MT,
+	WI_NM1MT,
+	WI_NM100MT,
 	WI_MAX
 }weaponIndex_t;
 
@@ -1006,8 +1020,8 @@ void MF_ParseMissionScripts( char *buf, mission_overview_t* overview,
 		mission_vehicle_t* vehs, mission_groundInstallation_t* gis);
 void MF_CheckMissionScriptOverviewValid( mission_overview_t* overview, qboolean updateFormat );
 void MF_SetMissionScriptOverviewDefaults( mission_overview_t* overview );
-int MF_getIndexOfVehicle( int start, int gameset, int team, int cat, int cls );
-int MF_getIndexOfVehicleEx( int start, int gameset, int team, int cat, int cls );
+int MF_getIndexOfVehicle( int start, int gameset, int team, int cat, int cls, int vehicleType, int change_vehicle );
+int MF_getIndexOfVehicleEx( int start, int gameset, int team, int cat, int cls, int vehicleType, int change_vehicle );
 int MF_getItemIndexFromHex(int hexValue);
 int MF_getNumberOfItems(const char **itemlist);
 char * MF_CreateModelPathname( int vehicle, char * pFormatString );
@@ -1112,4 +1126,25 @@ typedef enum {
 #define BAY_ANIM_UP				1
 #define BAY_ANIM_DOWN			2
 
+
+// Nuke
+
+// 1st shockwave times
+#define NUKE_SHOCKWAVE_STARTTIME		0
+#define NUKE_SHOCKWAVEFADE_STARTTIME	1500
+#define NUKE_SHOCKWAVE_ENDTIME			2000
+// explosion/implosion times
+#define NUKE_EXPLODE_STARTTIME			250
+#define NUKE_IMPLODE_STARTTIME			2000
+#define NUKE_IMPLODE_ENDTIME			2250
+// 2nd shockwave times
+#define NUKE_SHOCKWAVE2_STARTTIME		2000
+#define NUKE_SHOCKWAVE2FADE_STARTTIME	2500
+#define NUKE_SHOCKWAVE2_ENDTIME			3000
+// radius of the models without scaling
+#define NUKE_SHOCKWAVEMODEL_RADIUS		88
+#define NUKE_BOOMSPHEREMODEL_RADIUS		72
+// maximum radius of the models during the effect
+#define NUKE_SHOCKWAVE_MAXRADIUS		1000
+#define NUKE_SHOCKWAVE2_MAXRADIUS		1000
 
