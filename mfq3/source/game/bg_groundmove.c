@@ -1,5 +1,5 @@
 /*
- * $Id: bg_groundmove.c,v 1.6 2002-02-28 17:26:06 thebjoern Exp $
+ * $Id: bg_groundmove.c,v 1.8 2003-10-07 23:15:57 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -74,7 +74,7 @@ static void PM_GroundVehicle_FuelFlow( int throttle )
 /*
 ===================
 PM_GroundVehicleAccelerate
-
+GV speed modified by minkis slightly
 ===================
 */
 static void PM_GroundVehicleAccelerate()
@@ -92,8 +92,10 @@ static void PM_GroundVehicleAccelerate()
 	topspeed /= (pm->waterlevel+1);
 
 	if( pm->ps->ONOFF & OO_LANDED ) {
-
+		
+		
 		// terrain angle for additional acceleration
+		// Original
 		if( angle > 180 ) angle -= 360;
 		else if( angle < -180 ) angle += 360;
 		if( Q_fabs(angle) < 36 ) angle /= 36;
@@ -120,10 +122,10 @@ static void PM_GroundVehicleAccelerate()
 		// what is the speed to accelerate towards (consider handbrake)
 		if( (pm->ps->ONOFF & OO_SPEEDBRAKE) ) {
 			targetspeed = 0;
-			if( angle < -1 ) targetspeed += topspeed*angle;
+			if( angle < -1 ) targetspeed += topspeed  *(angle / 5);
 		} else {
 			targetspeed = topspeed*throttle/maxthrottle;
-			targetspeed += topspeed*angle;
+			targetspeed += topspeed * (angle / 5);
 		}
 
 		if( currspeed < targetspeed - accel ) currspeed += accel;
@@ -415,6 +417,17 @@ void PM_GroundVehicleMove( void )
 
 	// turn the hull
 	if( pm->ps->ONOFF & OO_LANDED ) {
+		// *******************
+		// Changes By: Minkis
+		// *******************
+		// Adjusted turning
+		// *******************
+		if(pm->ps->ONOFF & OO_STALLED)
+		{
+			turnModifier *= -1;
+		}
+		// *******************
+
 		if( smove > 0 ) {
 			vehdir[YAW] -= turnspeed[HULL_YAW] * turnModifier;
 		} else if( smove < 0 ) {
