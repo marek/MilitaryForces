@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.43 2002-02-06 10:02:11 thebjoern Exp $
+ * $Id: bg_public.h,v 1.44 2002-02-06 15:44:59 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -753,6 +753,7 @@ int MF_ExtractEnumFromId( int vehicle, unsigned int op );
 #define HC_DUALENGINE			64
 #define HC_SWINGWING			128
 #define HC_AMPHIBIOUS			256
+#define	HC_WHEELS				512	// vehicle has wheels (rather than tracks)
 
 // this is for the PW_ONOFF_FLAGS
 #define OO_NOTHING_ON			0

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_groundmove.c,v 1.3 2002-01-19 02:24:02 thebjoern Exp $
+ * $Id: bg_groundmove.c,v 1.4 2002-02-06 15:44:59 sparky909_uk Exp $
 */
 
 #include "q_shared.h"
@@ -141,10 +141,15 @@ static void PM_GroundVehicleAccelerate()
 		currspeed += (50 * pml.frametime);
 	}
 
+	// apply speed modifier
     pm->ps->speed = currspeed*10;
 
 	// calculate fuel flow (for fuel flow we need abs value)
-	if( throttle < 0 ) throttle *= -1;
+	if( throttle < 0 )
+	{
+		throttle *= -1;
+	}
+
 	PM_GroundVehicle_FuelFlow( throttle );
 }
 
@@ -328,6 +333,7 @@ void PM_GroundVehicleMove( void )
 	float		turret_yaw = ((float)pm->ps->turretAngle)/10;
 	float		gun_pitch = ((float)pm->ps->gunAngle)/10;
 	float		speed;
+    float		topSpeed, currSpeed, turnModifier;
 
 	// brake
 	if( pm->cmd.buttons & BUTTON_BRAKE ) {
@@ -390,12 +396,29 @@ void PM_GroundVehicleMove( void )
 	    turnspeed[i] = availableVehicles[pm->vehicle].turnspeed[i] * pml.frametime;
 	}
 	
+	// non-track ground-vehicle?
+	if( availableVehicles[pm->vehicle].caps & HC_WHEELS )
+	{
+		// create a turning modifier for normal wheeled vehicles
+		topSpeed = availableVehicles[pm->vehicle].maxspeed;
+		currSpeed = (float)pm->ps->speed/10;
+
+		// maxium turn is allowed at a percentage of the top speed (0.5f behind 50% of top speed)
+		turnModifier = currSpeed/(topSpeed * 0.2f);
+		MF_LimitFloat( &turnModifier, 0.0f, 1.0f );
+	}
+	else
+	{
+		// n/a
+		turnModifier = 1.0f;
+	}
+
 	// turn the hull
 	if( pm->ps->ONOFF & OO_LANDED ) {
 		if( smove > 0 ) {
-			vehdir[YAW] -= turnspeed[HULL_YAW];
+			vehdir[YAW] -= turnspeed[HULL_YAW] * turnModifier;
 		} else if( smove < 0 ) {
-			vehdir[YAW] += turnspeed[HULL_YAW];
+			vehdir[YAW] += turnspeed[HULL_YAW] * turnModifier;
 		}
 	}
 
