@@ -1,5 +1,5 @@
 /*
- * $Id: g_client.c,v 1.3 2002-02-20 12:05:29 thebjoern Exp $
+ * $Id: g_client.c,v 1.4 2002-02-21 11:20:06 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -564,17 +564,36 @@ void ClientUserinfoChanged( int clientNum ) {
 	}
 
 	// mfq3 - vehicle
-	if( !(ent->r.svFlags & SVF_BOT) ) {
-		vehicle = atoi( Info_ValueForKey( userinfo, "cg_vehicle" ) );
-		client->vehicle = vehicle;
+	if( !(ent->r.svFlags & SVF_BOT) )
+	{
+		// get the next-vehicle value
 		nextVehicle = atoi( Info_ValueForKey( userinfo, "cg_nextVehicle" ) );	
 		client->nextVehicle = nextVehicle;
-
-		if( nextVehicle >= 0 && (client->ps.pm_flags & PMF_VEHICLESELECT) ) {
+		
+		// if next-vehicle is invalid, set the current vehicle to invalid also
+		if( nextVehicle == -1 )
+		{
+			// current vehicle no longer valid
+			vehicle = -1;
+			client->vehicle = vehicle;
+		}
+		else
+		{
+			// get current vehicle value
+			vehicle = atoi( Info_ValueForKey( userinfo, "cg_vehicle" ) );
+			client->vehicle = vehicle;
+		}
+		
+		// valid next-vehicle, so spawn?
+		if( nextVehicle >= 0 && (client->ps.pm_flags & PMF_VEHICLESELECT) )
+		{
 			client->ps.pm_flags &= ~PMF_VEHICLESELECT;
 			client->ps.pm_flags |= PMF_VEHICLESPAWN;
 		}
-	} else {
+	}
+	else
+	{
+		// no vehicle info is valid
 		client->vehicle = client->nextVehicle = vehicle = nextVehicle = -1;
 	}
 
