@@ -1,5 +1,5 @@
 /*
- * $Id: g_main.c,v 1.2 2002-01-29 12:10:54 sparky909_uk Exp $
+ * $Id: g_main.c,v 1.3 2002-02-11 12:22:37 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1233,7 +1233,7 @@ void CheckExitRules( void ) {
 
 	if ( g_timelimit.integer && !level.warmupTime ) {
 		if ( level.time - level.startTime >= g_timelimit.integer*60000 ) {
-			trap_SendServerCommand( -1, "print \"Timelimit hit.\n\"");
+			trap_SendServerCommand( -1, "print \"Timelimit hit.\n\" \"<scoreboard>\"");
 			LogExit( "Timelimit hit." );
 			return;
 		}
@@ -1245,13 +1245,13 @@ void CheckExitRules( void ) {
 
 	if ( g_gametype.integer < GT_CTF && g_fraglimit.integer ) {
 		if ( level.teamScores[TEAM_RED] >= g_fraglimit.integer ) {
-			trap_SendServerCommand( -1, "print \"Red hit the fraglimit.\n\"" );
+			trap_SendServerCommand( -1, "print \"Red hit the fraglimit.\n\" \"<scoreboard>\"" );
 			LogExit( "Fraglimit hit." );
 			return;
 		}
 
 		if ( level.teamScores[TEAM_BLUE] >= g_fraglimit.integer ) {
-			trap_SendServerCommand( -1, "print \"Blue hit the fraglimit.\n\"" );
+			trap_SendServerCommand( -1, "print \"Blue hit the fraglimit.\n\" \"<scoreboard>\"" );
 			LogExit( "Fraglimit hit." );
 			return;
 		}
@@ -1267,7 +1267,7 @@ void CheckExitRules( void ) {
 
 			if ( cl->ps.persistant[PERS_SCORE] >= g_fraglimit.integer ) {
 				LogExit( "Fraglimit hit." );
-				trap_SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " hit the fraglimit.\n\"",
+				trap_SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " hit the fraglimit.\n\" \"<scoreboard>\"",
 					cl->pers.netname ) );
 				return;
 			}
@@ -1277,13 +1277,13 @@ void CheckExitRules( void ) {
 	if ( g_gametype.integer >= GT_CTF && g_capturelimit.integer ) {
 
 		if ( level.teamScores[TEAM_RED] >= g_capturelimit.integer ) {
-			trap_SendServerCommand( -1, "print \"Red hit the capturelimit.\n\"" );
+			trap_SendServerCommand( -1, "print \"Red hit the capturelimit.\n\" \"<scoreboard>\"" );
 			LogExit( "Capturelimit hit." );
 			return;
 		}
 
 		if ( level.teamScores[TEAM_BLUE] >= g_capturelimit.integer ) {
-			trap_SendServerCommand( -1, "print \"Blue hit the capturelimit.\n\"" );
+			trap_SendServerCommand( -1, "print \"Blue hit the capturelimit.\n\" \"<scoreboard>\"" );
 			LogExit( "Capturelimit hit." );
 			return;
 		}
