@@ -1,5 +1,5 @@
 /*
- * $Id: g_mfq3ents.c,v 1.6 2002-02-15 09:58:31 thebjoern Exp $
+ * $Id: g_mfq3ents.c,v 1.7 2002-02-16 10:16:32 thebjoern Exp $
 */
 
 
@@ -211,7 +211,7 @@ Will reload, repair and refuel vehicles
 void SP_trigger_recharge( gentity_t *self ) {
 
 	if( !self->ent_category ) self->ent_category = CAT_ANY;
-	else self->ent_category <<= 8;
+//	else self->ent_category <<= 8;
 
 	trap_SetBrushModel( self, self->model );
 	self->clipmask = self->r.contents = CONTENTS_TRIGGER;

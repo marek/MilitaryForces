@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.11 2002-02-15 17:43:57 sparky909_uk Exp $
+ * $Id: ui_main.c,v 1.12 2002-02-16 10:16:32 thebjoern Exp $
 */
 /*
 =======================================================================
@@ -6312,8 +6312,8 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_gameset, "ui_gameset", "modern", CVAR_ARCHIVE | CVAR_ROM },
 
 	// (vehicle select dialog)
-	{ &ui_vehicleCat, "ui_vehicleCat", "0", CVAR_ARCHIVE | CVAR_ROM },
-	{ &ui_vehicleClass, "ui_vehicleClass", "0", CVAR_ARCHIVE | CVAR_ROM },
+	{ &ui_vehicleCat, "ui_vehicleCat", "1", CVAR_ARCHIVE | CVAR_ROM },
+	{ &ui_vehicleClass, "ui_vehicleClass", "1", CVAR_ARCHIVE | CVAR_ROM },
 	{ &ui_vehicle, "ui_vehicle", "0", CVAR_ARCHIVE | CVAR_ROM },
 
 	{ &ui_vehicleCat, "ui_vehicleCatTxt", "<Catagory>", CVAR_ROM },
