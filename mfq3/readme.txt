@@ -7,18 +7,17 @@ History:
 
 
 
-
-
-
 +++v0.75+++ in progress...
 -----------
-+ add team info to groundinstallation (not necessary for vehicle?)
 + fix ground installation bounding boxes
 + add script importing
 + spawn groundinstallations from scripts
 + add basic groundinstallation ai to fire missiles at planes
 + then finish flares
 
+- added command "me_import_script" to import a script into IGME, also specify
+  a filename to load (just simply the name, no path or extension)
+- removed misc_waypoints as they are not needed anymore
 - added command "me_export_to_script" to save out the current IGME mission to a script.
   Also specify the filename for this script, otherwise it wont save it  
   NOTE: This is only the first cut of the file format, so dont expect it to stay like this
