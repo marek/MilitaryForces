@@ -1,5 +1,5 @@
 /*
- * $Id: mf_client.c,v 1.22 2004-12-17 00:29:41 minkis Exp $
+ * $Id: mf_client.c,v 1.26 2005-06-26 05:08:12 minkis Exp $
 */
 
 #include "g_local.h"
@@ -193,6 +193,7 @@ void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 	char	userinfo[MAX_INFO_STRING];
 	int		vehIndex;
 	int		savedNext;
+	int		vehCurrent;
 	int		handicap;
 	int		hasNuke = 0;
 	int		newLoadoutForced = 0;
@@ -205,43 +206,6 @@ void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 	trap_GetUserinfo( index, userinfo, sizeof(userinfo) );
 	// vehicle index for next spawning
 	vehIndex = atoi( Info_ValueForKey( userinfo, "cg_nextVehicle" ) );
-
-
-		// If nukes are banned, disallow loadouts with any nukebombs or nukemissiles
-	
-		if(mf_allowNukes.integer == 0 && vehIndex >= 0)
-		{
-			
-			for(cc = 0; cc < MAX_WEAPONS_PER_VEHICLE; cc++)
-			{
-				if( availableWeapons[availableVehicles[vehIndex].weapons[cc]].type == WT_NUKEBOMB || 
-					availableWeapons[availableVehicles[vehIndex].weapons[cc]].type == WT_NUKEMISSILE )
-				{
-					hasNuke = 1;
-					break;
-				}
-			}
-		} 
-		// Now find another appropriate vehicle instead
-		if(hasNuke)
-		{
-			for(cc = 0; cc < bg_numberOfVehicles; ++cc)
-			{
-				for(dd = 0; dd < MAX_WEAPONS_PER_VEHICLE; dd++)
-				{
-					if( availableWeapons[availableVehicles[cc].weapons[dd]].type != WT_NUKEBOMB && 
-						availableWeapons[availableVehicles[cc].weapons[dd]].type != WT_NUKEMISSILE && 
-						availableVehicles[cc].gameset == availableVehicles[vehIndex].gameset) {
-						newLoadoutForced = 1;
-						client->nextVehicle = vehIndex = cc;
-						break;
-					}
-							
-				}
-				if(newLoadoutForced)
-					break;
-			}
-		}
 
 	// find a spawn point
 	// do it before setting health back up, so farthest
@@ -296,6 +260,53 @@ void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 		}
 	}
 
+	// Do initial vehicle checks
+	// if respawning in current spot, and want to be a boat, check for water!
+	if(cs_flags & CS_LASTPOS && availableVehicles[vehIndex].cat & CAT_BOAT ) {
+		trace_t	trace;
+		vec3_t	endpos;
+		VectorCopy( spawn_origin, endpos );
+		endpos[2] -= 512;
+		trap_Trace (&trace, spawn_origin, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_WATER );
+		if((cs_flags & CS_LASTPOS) && trace.entityNum != ENTITYNUM_NONE ) { // Check for water if respawning in current location
+			return;							// Fuck that! dont do shit ;p
+		}
+	}
+
+	// If nukes are banned, disallow loadouts with any nukebombs or nukemissiles
+	if(mf_allowNukes.integer == 0 && vehIndex >= 0)
+	{
+		for(cc = 0; cc < MAX_WEAPONS_PER_VEHICLE; cc++)
+		{
+			if( availableWeapons[availableVehicles[vehIndex].weapons[cc]].type == WT_NUKEBOMB || 
+				availableWeapons[availableVehicles[vehIndex].weapons[cc]].type == WT_NUKEMISSILE ) {
+				hasNuke = 1;
+				break;
+			}
+		}
+	} 
+	// Now find another appropriate vehicle instead
+	if(hasNuke)
+	{
+		for(cc = 0; cc < bg_numberOfVehicles; ++cc)
+		{
+			for(dd = 0; dd < MAX_WEAPONS_PER_VEHICLE; dd++)
+			{
+				if( availableWeapons[availableVehicles[cc].weapons[dd]].type != WT_NUKEBOMB && 
+					availableWeapons[availableVehicles[cc].weapons[dd]].type != WT_NUKEMISSILE && 
+					availableVehicles[cc].gameset == availableVehicles[vehIndex].gameset) {
+					newLoadoutForced = 1;
+					client->nextVehicle = vehIndex = cc;
+					break;
+				}
+						
+			}
+			if(newLoadoutForced)
+				break;
+		}
+	}
+
+
 	client->pers.teamState.state = TEAM_ACTIVE;
 
 	// toggle the teleport bit so the client knows to not lerp
@@ -305,6 +316,7 @@ void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 
 	// save veh
 	savedNext = client->nextVehicle;
+	vehCurrent = client->vehicle;
 
 	// clear everything but the persistant data
 	saved = client->pers;
@@ -360,70 +372,68 @@ void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 	ent->left = qfalse; //first projectile starts right
 	ent->bulletpos = 0;
 
-	client->vehicle = client->nextVehicle = savedNext;
+	// distribute the weapons
+	MF_getDefaultLoadoutForVehicle( vehIndex, &ent->loadout );
+	//	G_AddEvent( ent, EV_GET_DEFAULT_LOADOUT, 0 );
+	ent->loadoutUpdated = qfalse;
+
+	Info_SetValueForKey( userinfo, "cg_vehicle", va( "%d", vehIndex ) );
+	trap_SetUserinfo( index, userinfo );
+	ClientUserinfoChanged( index );
+
+	// cat specific stuff
+	if( availableVehicles[vehIndex].cat & CAT_PLANE ) {
+		// check for landed spawnpoint
+		qboolean landed = qfalse;
+		trace_t	trace;
+		vec3_t	endpos;
+		gentity_t *test;
+		VectorCopy( spawn_origin, endpos );
+		endpos[2] -= 128;
+		trap_Trace (&trace, spawn_origin, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_ALL );
+		if( trace.entityNum != ENTITYNUM_NONE ) {
+			test = &g_entities[trace.entityNum];
+			if( canLandOnIt(test) ) {
+				landed = qtrue;
+				spawn_origin[2] = test->r.maxs[2] - availableVehicles[vehIndex].mins[2] + 
+					availableVehicles[vehIndex].gearheight;
+			}			
+		}
+		MF_Spawn_Plane( ent, vehIndex, landed );
+	} else if( availableVehicles[vehIndex].cat & CAT_GROUND ) {
+		trace_t	trace;
+		vec3_t	endpos;
+		gentity_t *test;
+		VectorCopy( spawn_origin, endpos );
+		endpos[2] -= 512;
+
+		trap_Trace (&trace, spawn_origin, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_ALL );
+		if( trace.entityNum != ENTITYNUM_NONE ) {
+			test = &g_entities[trace.entityNum];
+				spawn_origin[2] = trace.endpos[2] - availableVehicles[vehIndex].mins[2] + 1;
+		}
+		MF_Spawn_GroundVehicle( ent, vehIndex );
+	} else if( availableVehicles[vehIndex].cat & CAT_HELO ) {
+		MF_Spawn_Helo( ent, vehIndex, qfalse );
+	} else if( availableVehicles[vehIndex].cat & CAT_LQM ) {
+		MF_Spawn_LQM( ent, vehIndex );
+	} else if( availableVehicles[vehIndex].cat & CAT_BOAT ) {
+		trace_t	trace;
+		vec3_t	endpos;
+		gentity_t *test;
+		VectorCopy( spawn_origin, endpos );
+		endpos[2] -= 512;
+		trap_Trace (&trace, spawn_origin, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_ALL );
+		if( trace.entityNum != ENTITYNUM_NONE ) {
+			test = &g_entities[trace.entityNum];
+				spawn_origin[2] = trace.endpos[2];
+		}
+		MF_Spawn_Boat( ent, vehIndex );
+	}
 
 	// vehicles only stuff
 	if( vehIndex >= 0 && vehIndex < bg_numberOfVehicles ) {
-		// distribute the weapons
-		MF_getDefaultLoadoutForVehicle( vehIndex, &ent->loadout );
-//		G_AddEvent( ent, EV_GET_DEFAULT_LOADOUT, 0 );
-		ent->loadoutUpdated = qfalse;
-
-		Info_SetValueForKey( userinfo, "cg_vehicle", va( "%d", vehIndex ) );
-		trap_SetUserinfo( index, userinfo );
-		ClientUserinfoChanged( index );
-
-		// cat specific stuff
-		if( availableVehicles[vehIndex].cat & CAT_PLANE ) {
-			// check for landed spawnpoint
-			qboolean landed = qfalse;
-			trace_t	trace;
-			vec3_t	endpos;
-			gentity_t *test;
-			VectorCopy( spawn_origin, endpos );
-			endpos[2] -= 128;
-			trap_Trace (&trace, spawn_origin, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_ALL );
-			if( trace.entityNum != ENTITYNUM_NONE ) {
-				test = &g_entities[trace.entityNum];
-				if( canLandOnIt(test) ) {
-					landed = qtrue;
-					spawn_origin[2] = test->r.maxs[2] - availableVehicles[vehIndex].mins[2] + 
-						availableVehicles[vehIndex].gearheight;
-				}			
-			}
-			MF_Spawn_Plane( ent, vehIndex, landed );
-		} else if( availableVehicles[vehIndex].cat & CAT_GROUND ) {
-			
-			trace_t	trace;
-			vec3_t	endpos;
-			gentity_t *test;
-			VectorCopy( spawn_origin, endpos );
-			endpos[2] -= 512;
-
-			trap_Trace (&trace, spawn_origin, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_ALL );
-			if( trace.entityNum != ENTITYNUM_NONE ) {
-				test = &g_entities[trace.entityNum];
-					spawn_origin[2] = trace.endpos[2] - availableVehicles[vehIndex].mins[2] + 1;
-			}
-			MF_Spawn_GroundVehicle( ent, vehIndex );
-		} else if( availableVehicles[vehIndex].cat & CAT_HELO ) {
-			MF_Spawn_Helo( ent, vehIndex, qfalse );
-		} else if( availableVehicles[vehIndex].cat & CAT_LQM ) {
-			MF_Spawn_LQM( ent, vehIndex );
-		} else if( availableVehicles[vehIndex].cat & CAT_BOAT ) {
-			trace_t	trace;
-			vec3_t	endpos;
-			gentity_t *test;
-			VectorCopy( spawn_origin, endpos );
-			endpos[2] -= 512;
-
-			trap_Trace (&trace, spawn_origin, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_ALL );
-			if( trace.entityNum != ENTITYNUM_NONE ) {
-				test = &g_entities[trace.entityNum];
-					spawn_origin[2] = trace.endpos[2];
-			}
-			MF_Spawn_Boat( ent, vehIndex );
-		}
+		client->vehicle = client->nextVehicle = savedNext;
 
 		VectorCopy (availableVehicles[vehIndex].mins, ent->r.mins);
 		VectorCopy (availableVehicles[vehIndex].maxs, ent->r.maxs);
