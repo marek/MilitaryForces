@@ -1,5 +1,5 @@
 /*
- * $Id: cg_servercmds.c,v 1.4 2002-02-11 12:20:42 sparky909_uk Exp $
+ * $Id: cg_servercmds.c,v 1.5 2002-02-14 14:47:13 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -120,16 +120,20 @@ void CG_ParseServerinfo( void ) {
 	trap_Cvar_Set("g_redTeam", cgs.redTeam);
 	Q_strncpyz( cgs.blueTeam, Info_ValueForKey( info, "g_blueTeam" ), sizeof(cgs.blueTeam) );
 	trap_Cvar_Set("g_blueTeam", cgs.blueTeam);
+	
 	// mfq3
 	Q_strncpyz( gs, Info_ValueForKey( info, "mf_gameset" ), sizeof(gs) );
 	if( strcmp( gs, "modern" ) == 0 ) newset = MF_GAMESET_MODERN;
 	else if( strcmp( gs, "ww2" ) == 0 ) newset = MF_GAMESET_WW2;
 	else if( strcmp( gs, "ww1" ) == 0 ) newset = MF_GAMESET_WW1;
 	else newset = MF_GAMESET_MODERN;
-	Com_Printf("The gameset is '%s'\n", gs);
-	if( cgs.gameset && newset != cgs.gameset ) {
+//	Com_Printf("The gameset is '%s'\n", gs);
+
+	// gameset changed>
+	if( cgs.gameset && newset != cgs.gameset )
+	{
 		trap_SendConsoleCommand( "vid_restart\n" );
-		Com_Printf("The gameset has changed!\n" );
+		Com_Printf("The gameset has changed to %s\n", gs );
 	}
 	cgs.gameset = newset;
 }
