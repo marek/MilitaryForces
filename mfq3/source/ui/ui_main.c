@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.9 2002-02-14 11:48:40 sparky909_uk Exp $
+ * $Id: ui_main.c,v 1.10 2002-02-15 09:58:31 thebjoern Exp $
 */
 /*
 =======================================================================
@@ -3279,7 +3279,8 @@ tryCatAgain:
 	// is this catagory valid for the current gameset+team+catagory?
 
 	// check
-	vehicle = MF_getIndexOfVehicleEx( (vehicle-1), vehicleCat, -1, team, gameset );
+//	vehicle = MF_getIndexOfVehicleEx( (vehicle-1), vehicleCat, -1, team, gameset );
+	vehicle = MF_getIndexOfVehicle( (vehicle-1), gameset, team, vehicleCat, -1 );
 	
 	if( pCat && vehicle >= 0 )
 	{
@@ -3310,7 +3311,8 @@ tryClassAgain:
 	pClass = class_items[ vehicleCat ][ vehicleClass ];
 
 	// check
-	vehicle = MF_getIndexOfVehicleEx( (vehicle-1), vehicleCat, vehicleClass, team, gameset );
+//	vehicle = MF_getIndexOfVehicleEx( (vehicle-1), vehicleCat, vehicleClass, team, gameset );
+	vehicle = MF_getIndexOfVehicle( (vehicle-1), gameset, team, vehicleCat, vehicleClass );
 	
 	if( pClass && vehicle >= 0 )
 	{
@@ -3335,7 +3337,8 @@ tryClassAgain:
 	// is the vehicle valid for the current gameset+team+catagory+class?
 
 	// check
-	vehicle = MF_getIndexOfVehicleEx( (vehicle-1), vehicleCat, vehicleClass, team, gameset );
+//	vehicle = MF_getIndexOfVehicleEx( (vehicle-1), vehicleCat, vehicleClass, team, gameset );
+	vehicle = MF_getIndexOfVehicle( (vehicle-1), gameset, team, vehicleCat, vehicleClass );
 	
 	// -1 means this is not a suitable combination
 	if( vehicle == -1 )

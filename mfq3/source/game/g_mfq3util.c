@@ -1,5 +1,5 @@
 /*
- * $Id: g_mfq3util.c,v 1.13 2002-02-04 09:38:06 thebjoern Exp $
+ * $Id: g_mfq3util.c,v 1.14 2002-02-15 09:58:31 thebjoern Exp $
 */
 
 
@@ -82,7 +82,7 @@ void updateTargetTracking( gentity_t *ent )
 	}
 
 	// weapon range and vehicle direction
-	if( availableVehicles[ent->client->vehicle].id&CAT_ANY & CAT_GROUND ) {
+	if( availableVehicles[ent->client->vehicle].cat & CAT_GROUND ) {
 		vec3_t	right, up, temp;
 		AngleVectors( ent->client->ps.vehicleAngles, forward, right, up );
 		RotatePointAroundVector( temp, up, forward, ((float)ent->client->ps.turretAngle)/10 );
@@ -106,10 +106,10 @@ void updateTargetTracking( gentity_t *ent )
 		// found something
 		test = &g_entities[tr.entityNum];
 		if( test->s.eType == ET_VEHICLE && test->client && 
-			(availableVehicles[test->client->vehicle].id&CAT_ANY & targetcat) ) {
+			(availableVehicles[test->client->vehicle].cat & targetcat) ) {
 			track(ent, test);
 		} else if( test->s.eType == ET_MISC_VEHICLE &&
-			(availableVehicles[test->s.modelindex].id&CAT_ANY & targetcat) ) {
+			(availableVehicles[test->s.modelindex].cat & targetcat) ) {
 			track(ent, test);
 		} else {
 			if( buildings ) {
@@ -133,9 +133,9 @@ void updateTargetTracking( gentity_t *ent )
 			VectorSubtract( mid, ent->r.currentOrigin, diff );
 		} else {
 			if( ent->tracktarget->s.eType == ET_MISC_VEHICLE ) {
-				actualcat = availableVehicles[ent->tracktarget->s.modelindex].id&CAT_ANY;
+				actualcat = availableVehicles[ent->tracktarget->s.modelindex].cat;
 			} else if( ent->tracktarget->s.eType == ET_VEHICLE && ent->tracktarget->client ) {
-				actualcat =	availableVehicles[ent->tracktarget->client->vehicle].id&CAT_ANY;
+				actualcat =	availableVehicles[ent->tracktarget->client->vehicle].cat;
 			}
 			VectorSubtract( ent->tracktarget->r.currentOrigin, ent->r.currentOrigin, diff );
 		}

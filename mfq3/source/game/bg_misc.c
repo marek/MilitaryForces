@@ -1,5 +1,5 @@
 /*
- * $Id: bg_misc.c,v 1.4 2002-02-05 16:09:31 sparky909_uk Exp $
+ * $Id: bg_misc.c,v 1.5 2002-02-15 09:58:31 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -332,7 +332,7 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 			// ent->modelindex2 is non-zero on items if they are dropped
 			// we need to know this because we can pick up our dropped flag (and return it)
 			// but we can't pick up our flag at base
-			if( (availableVehicles[idx].id&CAT_ANY) & CAT_GROUND ) {
+			if( availableVehicles[idx].cat & CAT_GROUND ) {
 				if (ps->persistant[PERS_TEAM] == TEAM_RED) {
 					if (item->giTag == OB_BLUEFLAG ||
 						(item->giTag == OB_REDFLAG && ent->modelindex2) ||

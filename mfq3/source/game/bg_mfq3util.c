@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.10 2002-02-12 12:27:04 sparky909_uk Exp $
+ * $Id: bg_mfq3util.c,v 1.11 2002-02-15 09:58:31 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -88,7 +88,7 @@ unsigned long MF_GetGameset( qboolean asEnum )
 MF_getIndexOfVehicleEx
 =================
 */
-
+/*
 int MF_getIndexOfVehicleEx( int start, int vehicleCat, int vehicleClass, unsigned long team, unsigned long gameset )
 {
 	// NOTE: vehicleClass & vehicleCat are enum indexed
@@ -127,13 +127,48 @@ int MF_getIndexOfVehicleEx( int start, int vehicleCat, int vehicleClass, unsigne
 
 	return MF_getIndexOfVehicle( start, what );
 }
-
+*/
 /*
 =================
 MF_getIndexOfVehicle
 =================
 */
+int MF_getIndexOfVehicle( int start,			// where to start in list
+						  unsigned int gameset,
+						  unsigned int team,
+						  unsigned int cat,
+						  unsigned int cls )
+{
+    int				i;
+	qboolean		done = qfalse;
 
+	if( !gameset ) gameset = MF_GAMESET_ANY;
+	if( !team ) team = MF_TEAM_ANY;
+	if( !cat ) cat = CAT_ANY;
+	if( !cls ) cls = CLASS_ANY;
+
+	if( start >= bg_numberOfVehicles ) start = 0;
+	else if( start < 0 ) start = bg_numberOfVehicles;
+
+    for( i = start+1; done != qtrue; i++ )
+    {
+		if( i >= bg_numberOfVehicles ) {
+			if( start == bg_numberOfVehicles && i == start ) return -1;
+			i = 0;					
+		}
+		if( i == start ) done = qtrue;//return start;	
+//		Com_Printf( "Vehicle is %s %x\n", availableVehicles[i].descriptiveName,
+//										  availableVehicles[i].id );
+		if( !(availableVehicles[i].gameset & gameset) ) continue;		// wrong set
+		if( !(availableVehicles[i].team & team) ) continue;		// wrong team
+		if( !(availableVehicles[i].cat & cat) ) continue;		// wrong category
+		if( !(availableVehicles[i].cls & cls) ) continue;		// wrong category
+		return i;
+    }
+    return -1;
+}
+
+/*
 int MF_getIndexOfVehicle( int start,			// where to start in list
 						  unsigned long what)	// what (team|cat|cls)
 {
@@ -170,7 +205,7 @@ int MF_getIndexOfVehicle( int start,			// where to start in list
     return -1;
 
 }
-
+*/
 /*
 =================
 MF_getNumberOfItems
@@ -214,7 +249,7 @@ char * MF_CreateModelPathname( int vehicle, char * pFormatString )
 	unsigned long cat = 0;
 
 	// find catagory
-	cat = availableVehicles[ vehicle ].id & CAT_ANY;
+	cat = availableVehicles[ vehicle ].cat;
 	if( cat & CAT_PLANE ) {
 		strcpy( catDir, "planes" );
 	}
@@ -269,13 +304,13 @@ int MF_ExtractEnumFromId( int vehicle, unsigned int op )
 	if( op & CAT_ANY )
 	{
 		// catagory
-		daEnum = availableVehicles[ vehicle ].id & CAT_ANY;
+		daEnum = availableVehicles[ vehicle ].cat;
 		daEnum >>= 8;
 	}
 	else if( op & CLASS_ANY )
 	{
 		// class
-		daEnum = availableVehicles[ vehicle ].id & CLASS_ANY;
+		daEnum = availableVehicles[ vehicle ].cls;
 	}
 
 	return daEnum;

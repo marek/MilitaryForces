@@ -1,5 +1,5 @@
 /*
- * $Id: g_miscvehicle.c,v 1.4 2002-02-10 19:18:19 thebjoern Exp $
+ * $Id: g_miscvehicle.c,v 1.5 2002-02-15 09:58:31 thebjoern Exp $
 */
 
 
@@ -186,7 +186,7 @@ void DroneInit()
 	// finish drone init
 	for( i = 0; i < MAX_GENTITIES; ++i ) {
 		if( Q_stricmp( (&g_entities[i])->classname, "misc_vehicle" ) == 0 ) {
-			cat = availableVehicles[(&g_entities[i])->s.modelindex].id & CAT_ANY;
+			cat = availableVehicles[(&g_entities[i])->s.modelindex].cat;
 			if( cat & CAT_PLANE ) {
 				SP_misc_plane( &g_entities[i] );
 			} else {
@@ -221,14 +221,14 @@ void SP_misc_vehicle( gentity_t *sp_ent )
 		else /*if( strcmp( ent->model, "randomground" ) == 0 )*/ cat = CAT_GROUND;
 		j = 0;
 		for( i = 0; i < bg_numberOfVehicles; ++i ) {
-			if( (availableVehicles[i].id&CAT_ANY & cat) &&
-				(availableVehicles[i].id&MF_GAMESET_ANY & gameset ) ) ++j;
+			if( (availableVehicles[i].cat & cat) &&
+				(availableVehicles[i].gameset & gameset ) ) ++j;
 		}
 		k = rand()%j+1;
 		j = 0;
 		for( i = 0; i < bg_numberOfVehicles; ++i ) {
-			if( (availableVehicles[i].id&CAT_ANY & cat) &&
-				(availableVehicles[i].id&MF_GAMESET_ANY & gameset ) ) {
+			if( (availableVehicles[i].cat & cat) &&
+				(availableVehicles[i].gameset & gameset ) ) {
 				++j;
 				// found it
 				if( j == k ) {
@@ -243,7 +243,7 @@ void SP_misc_vehicle( gentity_t *sp_ent )
 		for( i = 0; i < bg_numberOfVehicles; ++i ) {
 			// vehicle is in list
 			if( strcmp( availableVehicles[i].modelName, ent->model ) == 0 ) {
-				if( gameset & (availableVehicles[i].id&MF_GAMESET_ANY) ) {
+				if( gameset & (availableVehicles[i].gameset) ) {
 					found = qtrue;
 				}
 				break;
@@ -255,7 +255,7 @@ void SP_misc_vehicle( gentity_t *sp_ent )
 		G_FreeEntity(ent);
 		return;
 	}
-	cat = (availableVehicles[i].id&CAT_ANY);
+	cat = (availableVehicles[i].cat);
 	if( cat & CAT_PLANE ) {
 		Com_sprintf(modelname, 127, "models/vehicles/planes/%s/%s.md3", availableVehicles[i].modelName,
 			availableVehicles[i].modelName );

@@ -1,5 +1,5 @@
 /*
- * $Id: mf_client.c,v 1.5 2002-01-31 23:47:24 thebjoern Exp $
+ * $Id: mf_client.c,v 1.6 2002-02-15 09:58:31 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -236,7 +236,7 @@ void MF_ClientSpawn(gentity_t *ent) {
 			}
 
 			// check for category on this spawn point
-			if( !(spawnPoint->ent_category & (availableVehicles[vehIndex].id&CAT_ANY)) ) {
+			if( !(spawnPoint->ent_category & availableVehicles[vehIndex].cat) ) {
 				continue;
 			}
 				
@@ -318,7 +318,7 @@ void MF_ClientSpawn(gentity_t *ent) {
 		ClientUserinfoChanged( index );
 
 		// cat specific stuff
-		if( (availableVehicles[vehIndex].id&CAT_ANY) & CAT_PLANE ) {
+		if( availableVehicles[vehIndex].cat & CAT_PLANE ) {
 			// check for landed spawnpoint
 			qboolean landed = qfalse;
 			trace_t	trace;
@@ -336,7 +336,7 @@ void MF_ClientSpawn(gentity_t *ent) {
 				}			
 			}
 			MF_Spawn_Plane( ent, vehIndex, landed );
-		} else if( (availableVehicles[vehIndex].id&CAT_ANY) & CAT_GROUND ) {
+		} else if( availableVehicles[vehIndex].cat & CAT_GROUND ) {
 			
 			qboolean landed = qfalse;
 			trace_t	trace;

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.19 2002-02-12 11:06:27 sparky909_uk Exp $
+ * $Id: bg_vehicledata.c,v 1.20 2002-02-15 09:58:31 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -15,9 +15,9 @@ completeVehicleData_t availableVehicles[] =
 	"F-16",						// tinyName
 	"f-16",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
-	MF_GAMESET_MODERN|			// id
-	MF_TEAM_2|
-	CAT_PLANE|
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_2,
+	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
@@ -59,9 +59,9 @@ completeVehicleData_t availableVehicles[] =
 	"Jas-39",					// tinyName
 	"jas-39",					// modelName
 	SHADOW_DEFAULT,				// alpha shadow
-	MF_GAMESET_MODERN|			// id
-	MF_TEAM_1|
-	CAT_PLANE|
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_1,
+	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
@@ -103,9 +103,9 @@ completeVehicleData_t availableVehicles[] =
 	"F-5",						// tinyName
 	"f-5",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
-	MF_GAMESET_MODERN|			// id
-	MF_TEAM_2|
-	CAT_PLANE|
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_2,
+	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
@@ -147,9 +147,9 @@ completeVehicleData_t availableVehicles[] =
 	"F-15",						// tinyName
 	"f-15",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
-	MF_GAMESET_MODERN|			// id
-	MF_TEAM_1|
-	CAT_PLANE|
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_1,
+	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
@@ -191,9 +191,9 @@ completeVehicleData_t availableVehicles[] =
 	"F-14",						// tinyName
 	"f-14",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
-	MF_GAMESET_MODERN|			// id
-	MF_TEAM_2|
-	CAT_PLANE|
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_2,
+	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
@@ -235,9 +235,9 @@ completeVehicleData_t availableVehicles[] =
 	"F-18",						// tinyName
 	"f-18",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
-	MF_GAMESET_MODERN|			// id
-	MF_TEAM_1|
-	CAT_PLANE|
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_1,
+	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
@@ -279,9 +279,9 @@ completeVehicleData_t availableVehicles[] =
 	"F-22",						// tinyName
 	"f-22",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
-	MF_GAMESET_MODERN|			// id
-	MF_TEAM_1|
-	CAT_PLANE|
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_1,
+	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
@@ -323,9 +323,9 @@ completeVehicleData_t availableVehicles[] =
 	"B-2",						// tinyName
 	"b-2",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
-	MF_GAMESET_MODERN|			// id
-	MF_TEAM_1|
-	CAT_PLANE|
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_1,
+	CAT_PLANE,
 	CLASS_PLANE_BOMBER,
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
@@ -367,9 +367,9 @@ completeVehicleData_t availableVehicles[] =
 	"P-51d",					// tinyName
 	"p-51d",					// modelName
 	SHADOW_DEFAULT,				// alpha shadow
-	MF_GAMESET_WW2|				// id
-	MF_TEAM_1|
-	CAT_PLANE|
+	MF_GAMESET_WW2,				// id
+	MF_TEAM_1,
+	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
 	HC_GEAR|HC_PROP|
@@ -412,9 +412,9 @@ completeVehicleData_t availableVehicles[] =
 	"Spitfire",					// tinyName
 	"spitfire_mk5b",			// modelName
 	SHADOW_DEFAULT,				// alpha shadow
-	MF_GAMESET_WW2|				// id
-	MF_TEAM_1|
-	CAT_PLANE|
+	MF_GAMESET_WW2,				// id
+	MF_TEAM_1,
+	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
 	HC_GEAR|HC_PROP|
@@ -457,9 +457,9 @@ completeVehicleData_t availableVehicles[] =
 	"Bf-109",					// tinyName
 	"bf-109g",					// modelName
 	SHADOW_DEFAULT,				// alpha shadow
-	MF_GAMESET_WW2|				// id
-	MF_TEAM_2|
-	CAT_PLANE|
+	MF_GAMESET_WW2,				// id
+	MF_TEAM_2,
+	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
 	HC_GEAR|HC_PROP|
@@ -502,9 +502,9 @@ completeVehicleData_t availableVehicles[] =
 	"Fw-190",					// tinyName
 	"fw190a8",					// modelName
 	SHADOW_DEFAULT,				// alpha shadow
-	MF_GAMESET_WW2|				// id
-	MF_TEAM_2|
-	CAT_PLANE|
+	MF_GAMESET_WW2,				// id
+	MF_TEAM_2,
+	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
 	HC_GEAR|HC_PROP|
@@ -548,9 +548,9 @@ completeVehicleData_t availableVehicles[] =
 	"B-17",						// tinyName
 	"b17g",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
-	MF_GAMESET_WW2|				// id
-	MF_TEAM_1|
-	CAT_PLANE|
+	MF_GAMESET_WW2,				// id
+	MF_TEAM_1,
+	CAT_PLANE,
 	CLASS_PLANE_BOMBER,
 	0,							// flags
 	HC_GEAR|HC_PROP|
@@ -593,9 +593,9 @@ completeVehicleData_t availableVehicles[] =
 	"Fokker",					// tinyName
 	"dr1",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
-	MF_GAMESET_WW1|				// id
-	MF_TEAM_1|
-	CAT_PLANE|
+	MF_GAMESET_WW1,				// id
+	MF_TEAM_1,
+	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
 	HC_PROP|
@@ -638,9 +638,9 @@ completeVehicleData_t availableVehicles[] =
 	"Camel",					// tinyName
 	"camel",					// modelName
 	SHADOW_DEFAULT,				// alpha shadow
-	MF_GAMESET_WW1|				// id
-	MF_TEAM_2|
-	CAT_PLANE|
+	MF_GAMESET_WW1,				// id
+	MF_TEAM_2,
+	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
 	HC_PROP|
@@ -687,9 +687,9 @@ completeVehicleData_t availableVehicles[] =
 	"M1",						// tinyName
 	"m1",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
-	MF_GAMESET_MODERN|			// id
-	MF_TEAM_1|
-	CAT_GROUND|
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_1,
+	CAT_GROUND,
 	CLASS_GROUND_MBT,
 	0,							// flags
 	0,							// capabilities
@@ -730,9 +730,9 @@ completeVehicleData_t availableVehicles[] =
 	"T-90",						// tinyName
 	"t-90",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
-	MF_GAMESET_MODERN|			// id
-	MF_TEAM_2|
-	CAT_GROUND|
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_2,
+	CAT_GROUND,
 	CLASS_GROUND_MBT,
 	0,							// flags
 	0,							// capabilities
@@ -773,9 +773,9 @@ completeVehicleData_t availableVehicles[] =
 	"BMP-3",					// tinyName
 	"bmp-3",					// modelName
 	SHADOW_DEFAULT,				// alpha shadow
-	MF_GAMESET_MODERN|			// id
-	MF_TEAM_1|
-	CAT_GROUND|
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_1,
+	CAT_GROUND,
 	CLASS_GROUND_RECON,
 	0,							// flags
 	HC_DUALGUNS,				// capabilities
@@ -816,9 +816,9 @@ completeVehicleData_t availableVehicles[] =
 	"HMV",						// tinyName
 	"humvee_50cal",				// modelName
 	SHADOW_DEFAULT,				// alpha shadow
-	MF_GAMESET_MODERN|			// id
-	MF_TEAM_1|
-	CAT_GROUND|
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_1,
+	CAT_GROUND,
 	CLASS_GROUND_RECON,
 	0,							// flags
 	HC_WHEELS,					// capabilities
@@ -859,9 +859,9 @@ completeVehicleData_t availableVehicles[] =
 	"BRDM2",					// tinyName
 	"brdm2",					// modelName
 	SHADOW_DEFAULT,				// alpha shadow
-	MF_GAMESET_MODERN|			// id
-	MF_TEAM_2|
-	CAT_GROUND|
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_2,
+	CAT_GROUND,
 	CLASS_GROUND_RECON,
 	0,							// flags
 	HC_DUALGUNS|HC_AMPHIBIOUS|HC_WHEELS,	// capabilities
@@ -902,9 +902,9 @@ completeVehicleData_t availableVehicles[] =
 	"Pz 3",						// tinyName
 	"panzeriii",				// modelName
 	SHADOW_DEFAULT,				// alpha shadow
-	MF_GAMESET_WW2|				// id
-	MF_TEAM_1|
-	CAT_GROUND|
+	MF_GAMESET_WW2,				// id
+	MF_TEAM_1,
+	CAT_GROUND,
 	CLASS_GROUND_MBT,
 	0,							// flags
 	0,							// capabilities
