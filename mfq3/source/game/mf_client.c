@@ -1,5 +1,5 @@
 /*
- * $Id: mf_client.c,v 1.4 2002-01-31 02:34:33 thebjoern Exp $
+ * $Id: mf_client.c,v 1.5 2002-01-31 23:47:24 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -439,6 +439,9 @@ void MF_ClientSpawn(gentity_t *ent) {
 		// fire the targets of the spawn point
 		G_UseTargets( spawnPoint, ent );
 	}
+
+	// reset lockinfo
+	unlock( ent );
 
 	// run a client frame to drop exactly to the floor,
 	// initialize animations and other things

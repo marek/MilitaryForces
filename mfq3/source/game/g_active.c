@@ -1,5 +1,5 @@
 /*
- * $Id: g_active.c,v 1.6 2002-01-30 19:26:02 thebjoern Exp $
+ * $Id: g_active.c,v 1.7 2002-01-31 23:47:24 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -786,6 +786,9 @@ void ClientThink_real( gentity_t *ent ) {
 		}
 		return;
 	}
+
+	// update lockinfo
+//	client->ps.stats[STAT_LOCKINFO] &= ~(LI_BEING_LOCKED|LI_BEING_LAUNCHED);
 
 	// perform once-a-second actions
 	ClientTimerActions( ent, msec );

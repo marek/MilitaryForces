@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.18 2002-01-31 10:09:40 sparky909_uk Exp $
+ * $Id: cg_main.c,v 1.19 2002-01-31 23:47:24 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -167,6 +167,19 @@ vmCvar_t	mfd_color;
 vmCvar_t	mfd1_defaultpage;
 vmCvar_t	mfd2_defaultpage;
 
+vmCvar_t	m1cp_page0;
+vmCvar_t	m1cp_page1;
+vmCvar_t	m1cp_page2;
+vmCvar_t	m1cp_page3;
+vmCvar_t	m1cp_page4;
+vmCvar_t	m1cp_page5;
+
+vmCvar_t	m2cp_page0;
+vmCvar_t	m2cp_page1;
+vmCvar_t	m2cp_page2;
+vmCvar_t	m2cp_page3;
+vmCvar_t	m2cp_page4;
+vmCvar_t	m2cp_page5;
 
 typedef struct {
 	vmCvar_t	*vmCvar;
@@ -267,6 +280,20 @@ cvarTable_t		cvarTable[] = {
 
 	{ &mfd1_defaultpage, "mfd1_defaultpage", "1", CVAR_ARCHIVE },
 	{ &mfd2_defaultpage, "mfd2_defaultpage", "2", CVAR_ARCHIVE },
+
+	{ &m1cp_page0, "m1cp_page0", "1", CVAR_ARCHIVE },
+	{ &m1cp_page1, "m1cp_page1", "1", CVAR_ARCHIVE },
+	{ &m1cp_page2, "m1cp_page2", "1", CVAR_ARCHIVE },
+	{ &m1cp_page3, "m1cp_page3", "1", CVAR_ARCHIVE },
+	{ &m1cp_page4, "m1cp_page4", "1", CVAR_ARCHIVE },
+	{ &m1cp_page5, "m1cp_page5", "1", CVAR_ARCHIVE },
+
+	{ &m2cp_page0, "m2cp_page0", "1", CVAR_ARCHIVE },
+	{ &m2cp_page1, "m2cp_page1", "1", CVAR_ARCHIVE },
+	{ &m2cp_page2, "m2cp_page2", "1", CVAR_ARCHIVE },
+	{ &m2cp_page3, "m2cp_page3", "1", CVAR_ARCHIVE },
+	{ &m2cp_page4, "m2cp_page4", "1", CVAR_ARCHIVE },
+	{ &m2cp_page5, "m2cp_page5", "1", CVAR_ARCHIVE },
 
 	{ &pmove_fixed, "pmove_fixed", "1", CVAR_ROM},
 	{ &pmove_msec, "pmove_msec", "8", 0},

@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.9 2002-01-31 02:34:33 thebjoern Exp $
+ * $Id: g_local.h,v 1.10 2002-01-31 23:47:24 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -828,6 +828,7 @@ extern	vmCvar_t	g_singlePlayer;
 // MFQ3
 extern  vmCvar_t	mf_gameset;
 extern  vmCvar_t	mf_lvcat;
+
 
 void	trap_Printf( const char *fmt );
 void	trap_Error( const char *fmt );

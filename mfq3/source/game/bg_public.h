@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.37 2002-01-31 12:01:57 thebjoern Exp $
+ * $Id: bg_public.h,v 1.38 2002-01-31 23:47:24 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.56a"
+#define	GAME_VERSION		"mfq3 v0.56g"
 
 #define	DEFAULT_GRAVITY		800
 #define	GIB_HEALTH			-50
@@ -799,6 +799,4 @@ int MF_ExtractEnumFromId( int vehicle, unsigned int op );
 #define GEAR_ANIM_STOP			0
 #define GEAR_ANIM_UP			1
 #define GEAR_ANIM_DOWN			2
-
-
 

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_consolecmds.c,v 1.10 2002-01-31 02:34:33 thebjoern Exp $
+ * $Id: cg_consolecmds.c,v 1.11 2002-01-31 23:47:24 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -8,6 +8,22 @@
 // executed by a key binding
 
 #include "cg_local.h"
+
+static char* cycleCvars[] =
+{
+	"m1cp_page0",
+	"m1cp_page1",
+	"m1cp_page2",
+	"m1cp_page3",
+	"m1cp_page4",
+	"m1cp_page5",
+	"m2cp_page0",
+	"m2cp_page1",
+	"m2cp_page2",
+	"m2cp_page3",
+	"m2cp_page4",
+	"m2cp_page5",
+};
 
 
 void CG_TargetCommand_f( void ) {
@@ -51,13 +67,24 @@ static void CG_ToggleRadarRange_f( void ) {
 
 /*
 ==================
-MFQ3 MFD 
-umm ugly :-)
+MFQ3 MFD Mode cycling
 ==================
 */
 static void CG_Set_MFD_Mode( int num ) {
-	cg.Mode_MFD[num]++;
-	if( cg.Mode_MFD[num] >= MFD_MAX ) cg.Mode_MFD[num] = MFD_OFF;
+	qboolean found = qfalse;
+	char buffer[33], value;
+	int start = cg.Mode_MFD[num] - 1;
+	if( start < 0 ) start = MFD_MAX-1;
+	
+	while( !found && cg.Mode_MFD[num] != start ) {
+		cg.Mode_MFD[num]++;
+		if( cg.Mode_MFD[num] >= MFD_MAX ) cg.Mode_MFD[num] = MFD_OFF;
+		value = cg.Mode_MFD[num];
+		if( num ) value += MFD_MAX;
+		trap_Cvar_VariableStringBuffer( cycleCvars[value], buffer, 32 );
+		value = atoi(buffer);
+		if( value ) found = qtrue;
+	}
 
 	if( num == MFD_1 )
 		trap_Cvar_Set( "mfd1_defaultpage", va("%d", cg.Mode_MFD[num]) );
@@ -66,7 +93,6 @@ static void CG_Set_MFD_Mode( int num ) {
 }
 
 static void CG_Set_MFD1_Mode_f( void ) {
-
 	if( cg.time < cg.MFDTime ) {
 		return;
 	}
@@ -83,6 +109,13 @@ static void CG_Set_MFD2_Mode_f( void ) {
 
 	cg.MFDTime = cg.time + 100;
 }
+
+
+/*
+==================
+MFQ3 MFD Mode setting
+==================
+*/
 
 static void CG_Set_MFD_Page( int num ) {
 	int page;
@@ -123,6 +156,11 @@ static void CG_Set_MFD2_Page_f( void ) {
 	cg.MFDTime = cg.time + 100;
 }
 
+/*
+==================
+MFQ3 HUD Color cycling
+==================
+*/
 
 static void CG_Cycle_HUD_Color_f( void ) {
 	if( cg.time < cg.HUDColorTime ) {
@@ -138,6 +176,12 @@ static void CG_Cycle_HUD_Color_f( void ) {
 	cg.HUDColorTime = cg.time + 100;
 }
 
+/*
+==================
+MFQ3 MFD color cycling
+==================
+*/
+
 static void CG_Cycle_MFD_Color_f( void ) {
 	if( cg.time < cg.MFDColorTime ) {
 		return;
@@ -151,6 +195,70 @@ static void CG_Cycle_MFD_Color_f( void ) {
 
 	cg.MFDColorTime = cg.time + 100;
 }
+
+/*
+==================
+MFQ3 MFD Camera mode cycling
+==================
+*/
+
+static void CG_Cycle_Camera_Mode_f( void ) {
+	if( cg.time < cg.CameraModeTime ) {
+		return;
+	}
+	cg.CameraMode++;
+	if( cg.CameraMode >= CAMERA_MAX || cg.CameraMode < 0 ) {
+		cg.CameraMode = 0;
+	}
+
+	cg.CameraModeTime = cg.time + 100;
+}
+
+/*
+==================
+MFQ3 MFD Camera Mode setting
+==================
+*/
+
+static void CG_Set_Camera_Mode_f( void ) {
+
+	if( cg.time < cg.CameraModeTime ) {
+		return;
+	}
+
+	if( trap_Argc() < 2 ) {
+		return;
+	}
+
+	cg.CameraMode = atoi( CG_Argv(1) );
+	if( cg.CameraMode >= CAMERA_MAX || cg.CameraMode < 0 ) {
+		cg.CameraMode = 0;
+	}
+
+	cg.CameraModeTime = cg.time + 100;
+}
+
+/*
+==================
+MFQ3 MFD camera mode quick action keys
+==================
+*/
+
+static void CG_CamBack_f( void )
+{
+	cg.CameraMode = CAMERA_BACK;
+}
+
+static void CG_CamDown_f( void )
+{
+	cg.CameraMode = CAMERA_DOWN;
+}
+
+static void CG_CamOld_f( void )
+{
+	cg.CameraMode = CAMERA_TARGET;
+}
+
 
 /*
 ==================
@@ -381,6 +489,13 @@ static consoleCommand_t	commands[] = {
 	{ "mfd2_page", CG_Set_MFD2_Page_f },
 	{ "cycle_hud_color", CG_Cycle_HUD_Color_f },
 	{ "cycle_mfd_color", CG_Cycle_MFD_Color_f },
+	{ "cycle_camera_mode", CG_Cycle_Camera_Mode_f },
+	{ "set_camera_mode", CG_Set_Camera_Mode_f },
+	{ "+backcam", CG_CamBack_f },
+	{ "-backcam", CG_CamOld_f },
+	{ "+downcam", CG_CamDown_f },
+	{ "-downcam", CG_CamOld_f },
+
 };
 
 
