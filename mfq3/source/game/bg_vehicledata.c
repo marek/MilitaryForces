@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.14 2002-02-04 09:38:06 thebjoern Exp $
+ * $Id: bg_vehicledata.c,v 1.15 2002-02-06 15:44:59 sparky909_uk Exp $
 */
 
 #include "q_shared.h"
@@ -667,7 +667,7 @@ completeVehicleData_t availableVehicles[] =
 	CAT_GROUND|
 	CLASS_GROUND_RECON,
 	0,							// flags
-	HC_DUALGUNS|HC_AMPHIBIOUS,	// capabilities
+	HC_DUALGUNS|HC_AMPHIBIOUS|HC_WHEELS,	// capabilities
 	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
 	{-10, -5, -2},				// mins (bounding box)
 	{10, 5, 7},					// max (bounding box)
