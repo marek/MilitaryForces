@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.32 2002-06-09 20:09:41 thebjoern Exp $
+ * $Id: cg_drawnewhud.c,v 1.33 2002-07-15 18:23:07 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -1053,12 +1053,12 @@ static void CG_Draw_MFD(int mfdnum, int vehicle, centity_t * cent, int targetran
 		trap_R_SetColor( NULL );
 		// draw contents
 		if( radarmode & OO_RADAR_AIR ) {
-			CG_DrawRadarSymbols_AIR_new(vehicle, range, x+64, y+64);
+			CG_DrawRadarSymbols_AIR_new(vehicle, range, x+60, y+60);
 			Com_sprintf(buffer, 15, "%d", range);
 			CG_DrawString_MFQ3_R( x+122, y+14, buffer, HUDColors[cg.MFDColor], 0);
 			strcpy( mode, "AIR" );
 		} else if( radarmode & OO_RADAR_GROUND ) {
-			CG_DrawRadarSymbols_GROUND_new(vehicle, range, x+64, y+64);
+			CG_DrawRadarSymbols_GROUND_new(vehicle, range, x+60, y+60);
 			Com_sprintf(buffer, 15, "%d", range);
 			CG_DrawString_MFQ3_R( x+122, y+14, buffer, HUDColors[cg.MFDColor], 0);
 			strcpy( mode, "GND" );
@@ -1107,10 +1107,11 @@ static void CG_Draw_MFD(int mfdnum, int vehicle, centity_t * cent, int targetran
 			if( ps->ammo[i+8] ) {
 				char* actualstring;
 				if( (availableVehicles[vehicle].cat & CAT_GROUND) ||
-					(availableVehicles[vehicle].cat & CAT_BOAT) ) 
+					(availableVehicles[vehicle].cat & CAT_BOAT) ) {
 					actualstring = availableWeapons[availableVehicles[vehicle].weapons[i]].shortName2;
-				else
+				} else {
 					actualstring = availableWeapons[availableVehicles[vehicle].weapons[i]].shortName;
+				}
 				Com_sprintf( buffer, 5, "%d", ps->ammo[i] );
 				CG_DrawString_MFQ3_R( x+36, y, buffer, HUDColors[cg.MFDColor], 0);
 				Com_sprintf( invline, 32, "%c    %s", (i == selweap ? '*' : ' '), actualstring );

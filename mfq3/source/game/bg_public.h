@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.97 2002-07-13 12:04:40 thebjoern Exp $
+ * $Id: bg_public.h,v 1.98 2002-07-15 18:23:07 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.73b"
+#define	GAME_VERSION		"mfq3 v0.74"
 #define	GAME_IDENTIFIER		"mfq3"			// use to identify mfq3 servers
 
 #define	DEFAULT_GRAVITY		800
@@ -894,7 +894,7 @@ extern int bg_numberOfWeapons;
 // ...and their index (make sure in symc with availableWeapons[] !!
 typedef enum
 {
-	WI_NONE,
+	WI_NONE,			// 0
 	WI_MG_2XCAL303,
 	WI_MG_2XCAL312,
 	WI_MG_8XCAL50,
@@ -904,7 +904,7 @@ typedef enum
 	WI_MG_20MM,
 	WI_MG_30MM,
 	WI_MG_2X20MM,
-	WI_MGT_2X30MM,
+	WI_MGT_2X30MM,		// 10
 	WI_MGT_12_7MM,
 	WI_FFAR,
 	WI_FFAR_SMALL,
@@ -914,23 +914,22 @@ typedef enum
 	WI_MK83,
 	WI_MK84,
 	WI_GBU15,
-	WI_DURANDAL,
+	WI_DURANDAL,		// 20
 	WI_SIDEWINDER,
 	WI_AMRAAM,
 	WI_SPARROW,
 	WI_PHOENIX,
-	WI_AVENGER,
 	WI_STINGER,
 	WI_ATOLL,
 	WI_ARCHER,
 	WI_ALAMO,
-	WI_HELLFIRE,
+	WI_HELLFIRE,		// 30
 	WI_MAVERICK,
 	WI_HARM,
 	WI_ECM,
 	WI_DROPTANK,
 	WI_DROPTANK_SMALL,
-	WI_FLARE,
+	WI_FLARE,			// 36
 	WI_MAX
 }weaponIndex_t;
 

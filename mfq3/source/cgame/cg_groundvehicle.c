@@ -1,33 +1,10 @@
 /*
- * $Id: cg_groundvehicle.c,v 1.18 2002-07-14 17:13:19 thebjoern Exp $
+ * $Id: cg_groundvehicle.c,v 1.19 2002-07-15 18:23:07 thebjoern Exp $
 */
 
 
 #include "cg_local.h"
 
-// make sure the tags are named properly!
-char *gv_tags[BP_GV_MAX_PARTS] =
-{
-	"<no tag>",		// vehicle body
-	"tag_turret",	// turret
-	"tag_weap",		// gun
-	"tag_wheel",	// wheel
-	"tag_wheel2",	// wheel
-	"tag_wheel3",	// wheel
-	"tag_wheel4",	// wheel
-	"tag_wheel5",	// wheel
-	"tag_wheel6"	// wheel
-};
-
-char *gi_tags[BP_GI_MAX_PARTS] =
-{
-	"<no tag>",		// vehicle body
-	"tag_turret",	// turret
-	"tag_weap",		// gun
-	"tag_upgrade",	
-	"tag_upgrade",	
-	"tag_upgrade"	
-};
 
 
 /*
@@ -88,90 +65,42 @@ CG_GroundVehicle
 */
 void CG_GroundVehicle( centity_t *cent, clientInfo_t *ci ) 
 {
-	refEntity_t	    part[BP_GV_MAX_PARTS];
-	refEntity_t		reticle;
-	float			shadowPlane = 0;
-	int				renderfx = 0;
-	int				i, tanksound;
-	float			speed;
 	vec3_t			velocity;
+	DrawInfo_GV_t	drawInfo;
+
+	memset( &drawInfo, 0, sizeof(drawInfo) );
+	drawInfo.basicInfo.vehicleIndex = ci->vehicle;
+	drawInfo.basicInfo.ONOFF = cent->currentState.ONOFF;
 
 	// get velocity
 	VectorCopy( cent->currentState.pos.trDelta, velocity );
-	speed = VectorLength( velocity );
+	drawInfo.basicInfo.speed = VectorLength( velocity );
 
-	for( i = 0; i < BP_GV_MAX_PARTS; i++ ) {
-	    memset( &part[i], 0, sizeof(part[0]) );	
-	}
-	memset( &reticle, 0, sizeof(reticle) );
+	// entitynum
+	drawInfo.basicInfo.entityNum = cent->currentState.number;
 
     // get the rotation information
     VectorCopy( cent->currentState.angles, cent->lerpAngles );
-    AnglesToAxis( cent->lerpAngles, part[BP_GV_BODY].axis );
+    AnglesToAxis( cent->lerpAngles, drawInfo.basicInfo.axis );
+
+	// position and orientation
+	VectorCopy( cent->lerpOrigin, drawInfo.basicInfo.origin );
+	VectorCopy( cent->lerpAngles, drawInfo.basicInfo.angles );
 
     // add the talk baloon or disconnect icon
-    CG_PlayerSprites( cent );
+//    CG_PlayerSprites( cent );
     
-    // add the shadow
-	switch( cg_shadows.integer )
-	{
-	case 1:
-		CG_GenericShadow( cent, &shadowPlane );
-		break;
-	case 3:
-		renderfx |= RF_SHADOW_PLANE;
-		break;
-	}
+	// loadout
+	drawInfo.basicInfo.loadout = &cg_loadouts[cent->currentState.number];
 
-	// use the same origin for all
-    renderfx |= RF_LIGHTING_ORIGIN;
+	// turret/gun angle
+	drawInfo.gunAngle = cent->currentState.angles2[PITCH];
+	drawInfo.turretAngle = cent->currentState.angles2[ROLL];
 
-    //
-    // add the hull
-    //
-    part[BP_GV_BODY].hModel = ci->parts[BP_GV_BODY];
-    VectorCopy( cent->lerpOrigin, part[BP_GV_BODY].origin );
-    VectorCopy( cent->lerpOrigin, part[BP_GV_BODY].lightingOrigin );
-    part[BP_GV_BODY].shadowPlane = shadowPlane;
-    part[BP_GV_BODY].renderfx = renderfx;
-    VectorCopy (part[BP_GV_BODY].origin, part[BP_GV_BODY].oldorigin);
-    trap_R_AddRefEntityToScene( &part[BP_GV_BODY] );
-
-    //
-    // turret
-    //
-    part[BP_GV_TURRET].hModel = ci->parts[BP_GV_TURRET];
-    VectorCopy( cent->lerpOrigin, part[BP_GV_TURRET].lightingOrigin );
-	AxisCopy( axisDefault, part[BP_GV_TURRET].axis );
-	RotateAroundYaw( part[BP_GV_TURRET].axis, cent->currentState.angles2[ROLL] );
-	CG_PositionRotatedEntityOnTag( &part[BP_GV_TURRET], &part[BP_GV_BODY], ci->parts[BP_GV_BODY], gv_tags[BP_GV_TURRET] );
-	part[BP_GV_TURRET].shadowPlane = shadowPlane;
-    part[BP_GV_TURRET].renderfx = renderfx;
-    VectorCopy (part[BP_GV_TURRET].origin, part[BP_GV_TURRET].oldorigin);
-    trap_R_AddRefEntityToScene( &part[BP_GV_TURRET] );
-
-    //
-    // gun
-    //
-    part[BP_GV_GUNBARREL].hModel = ci->parts[BP_GV_GUNBARREL];
-    VectorCopy( cent->lerpOrigin, part[BP_GV_GUNBARREL].lightingOrigin );
-	AxisCopy( axisDefault, part[BP_GV_GUNBARREL].axis );
-	RotateAroundPitch( part[BP_GV_GUNBARREL].axis, cent->currentState.angles2[PITCH] );
-	CG_PositionRotatedEntityOnTag( &part[BP_GV_GUNBARREL], &part[BP_GV_TURRET], ci->parts[BP_GV_TURRET], gv_tags[BP_GV_GUNBARREL] );
-	part[BP_GV_GUNBARREL].shadowPlane = shadowPlane;
-    part[BP_GV_GUNBARREL].renderfx = renderfx;
-    VectorCopy (part[BP_GV_GUNBARREL].origin, part[BP_GV_GUNBARREL].oldorigin);
-    trap_R_AddRefEntityToScene( &part[BP_GV_GUNBARREL] );
-
-	//
 	// wheels
-	//
-	// gearAnimStartTime is for timediff
-	// gearAnim is for angles
 	if( (availableVehicles[ci->vehicle].caps & HC_WHEELS) ) {
-		int ii;
 		int timediff = cg.time - cent->gearAnimStartTime;
-		float dist = speed * timediff / 1000;
+		float dist = drawInfo.basicInfo.speed * timediff / 1000;
 		vec3_t v1, v2;
 		float dot;
 		AngleVectors( cent->currentState.angles, v1, 0, 0 );
@@ -181,19 +110,24 @@ void CG_GroundVehicle( centity_t *cent, clientInfo_t *ci )
 		dist = ( (dist / availableVehicles[ci->vehicle].wheelCF)*360);
 		cent->gearAnim += (dot > 0 ? dist : -dist);
 		cent->gearAnim = AngleMod( cent->gearAnim );
-		for( ii = 0; ii < availableVehicles[ci->vehicle].wheels; ++ii ) {
-			part[BP_GV_WHEEL+ii].hModel = ci->parts[BP_GV_WHEEL+ii];
-			VectorCopy( cent->lerpOrigin, part[BP_GV_WHEEL+ii].lightingOrigin );
-			AxisCopy( axisDefault, part[BP_GV_WHEEL+ii].axis );
-			part[BP_GV_WHEEL+ii].shadowPlane = shadowPlane;
-			part[BP_GV_WHEEL+ii].renderfx = renderfx;
-			VectorCopy (part[BP_GV_WHEEL+ii].origin, part[BP_GV_WHEEL+ii].oldorigin);
-			RotateAroundPitch( part[BP_GV_WHEEL+ii].axis, cent->gearAnim );
-			CG_PositionRotatedEntityOnTag( &part[BP_GV_WHEEL+ii], &part[BP_GV_BODY], ci->parts[BP_GV_BODY], gv_tags[BP_GV_WHEEL+ii] );
-			trap_R_AddRefEntityToScene( &part[BP_GV_WHEEL+ii] );
-		}
 		cent->gearAnimStartTime = cg.time;
+		drawInfo.wheelAngle = (float)cent->gearAnim;
 	}
+
+	// muzzleflash
+	if( cg.time - cent->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {
+		drawInfo.basicInfo.drawMuzzleFlash = qtrue;
+		drawInfo.basicInfo.flashWeaponIndex = cent->muzzleFlashWeapon;
+	}
+
+
+	// smoke
+	if( cent->currentState.generic1 ) {
+		CG_Generic_Smoke( cent, cent->lerpOrigin, 100 );
+	}
+	
+	// draw plane
+	CG_DrawGV(&drawInfo);
 
 /*
 		AngleVectors( self->client->ps.vehicleAngles, forward, right, up );
@@ -202,14 +136,20 @@ void CG_GroundVehicle( centity_t *cent, clientInfo_t *ci )
 		RotatePointAroundVector( dir, right, temp, ((float)self->client->ps.gunAngle)/10 );
 */
 
+	// CTF
+	CG_GroundVehicleFlags( cent );
+
 	// reticles
 	if( cent == &cg.predictedPlayerEntity )
 	{
+		refEntity_t		reticle;
 		vec3_t	forward, right, up, ang, start, end, temp;
 		trace_t	tr;
 		float len;
 		playerState_t* ps = &cg.snap->ps;
 		float mindist = cg_thirdPersonRange.integer + availableVehicles[ci->vehicle].cam_dist[ CAMERA_V_DEFAULT ] + availableVehicles[ci->vehicle].maxs[0] + 20;
+
+		memset( &reticle, 0, sizeof(reticle) );
 
 		CG_ResetReticles();
 
@@ -264,8 +204,7 @@ void CG_GroundVehicle( centity_t *cent, clientInfo_t *ci )
 			}
 
 			VectorCopy( reticle.origin, reticle.lightingOrigin );
-			reticle.shadowPlane = shadowPlane;
-			reticle.renderfx = renderfx;
+			reticle.renderfx = RF_LIGHTING_ORIGIN|RF_SHADOW_PLANE;
 
 			CG_AddReticleEntityToScene( &reticle, target );
 
@@ -317,8 +256,7 @@ void CG_GroundVehicle( centity_t *cent, clientInfo_t *ci )
 				}
 
 				VectorCopy( reticlelock.origin, reticlelock.lightingOrigin );
-				reticlelock.shadowPlane = shadowPlane;
-				reticlelock.renderfx = renderfx;
+				reticlelock.renderfx = RF_LIGHTING_ORIGIN|RF_SHADOW_PLANE;
 			}
 
 			CG_AddReticleEntityToScene( &reticlelock, NULL );
@@ -362,34 +300,11 @@ void CG_GroundVehicle( centity_t *cent, clientInfo_t *ci )
 			}
 
 			VectorCopy( reticle.origin, reticle.lightingOrigin );
-			reticle.shadowPlane = shadowPlane;
-			reticle.renderfx = renderfx;
+			reticle.renderfx = RF_LIGHTING_ORIGIN|RF_SHADOW_PLANE;
 			
 			CG_AddReticleEntityToScene( &reticle, NULL );
 		}
 	}
-
-	// sound
-	BG_EvaluateTrajectoryDelta( &cent->currentState.pos, cg.time, velocity );
-	tanksound = speed * NUM_TANKSOUNDS / availableVehicles[ci->vehicle].maxspeed;
-	if( tanksound >= NUM_TANKSOUNDS ) tanksound = NUM_TANKSOUNDS - 1;
-	trap_S_AddLoopingSound( cent->currentState.number, 
-							cent->lerpOrigin, 
-							velocity, 
-							cgs.media.engineTank[tanksound] );
-
-	// smoke
-	if( cent->currentState.generic1 ) {
-		CG_Generic_Smoke( cent, cent->lerpOrigin, 100 );
-	}
-	
-	// muzzleflash
-	if ( cg.time - cent->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {
-		CG_VehicleMuzzleFlash( cent->muzzleFlashWeapon, &part[BP_GV_GUNBARREL], ci->parts[BP_GV_GUNBARREL], ci->vehicle );
-	}
-
-	// CTF
-	CG_GroundVehicleFlags( cent );
 }
 
 /*

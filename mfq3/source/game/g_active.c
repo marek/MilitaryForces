@@ -1,5 +1,5 @@
 /*
- * $Id: g_active.c,v 1.18 2002-06-12 14:35:33 thebjoern Exp $
+ * $Id: g_active.c,v 1.19 2002-07-15 18:23:07 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -616,6 +616,10 @@ void ClientThink_real( gentity_t *ent ) {
 
 	client = ent->client;
 
+	// event queue
+	ent->eventSent = qfalse;
+	G_SendEventFromQueue( ent );
+
 	// don't think if the client is not yet connected (and thus not yet spawned in)
 	if (client->pers.connected != CON_CONNECTED) {
 		return;
@@ -718,7 +722,7 @@ void ClientThink_real( gentity_t *ent ) {
 	}
 
 	if( !ent->loadoutUpdated ) {
-		G_AddEvent( ent, EV_GET_DEFAULT_LOADOUT, 0 );
+		G_AddEvent( ent, EV_GET_DEFAULT_LOADOUT, 0, qtrue );
 		ent->loadoutUpdated = qtrue;
 	}
 

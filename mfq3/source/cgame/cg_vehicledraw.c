@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicledraw.c,v 1.2 2002-07-14 17:13:19 thebjoern Exp $
+ * $Id: cg_vehicledraw.c,v 1.3 2002-07-15 18:23:07 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -27,6 +27,43 @@ char *engine_tags[3] =
 	"tag_prop3",
 	"tag_prop4"
 };
+
+char *gv_tags[BP_GV_MAX_PARTS] =
+{
+	"<no tag>",		// vehicle body
+	"tag_turret",	// turret
+	"tag_weap",		// gun
+	"tag_wheel",	// wheel
+	"tag_wheel2",	// wheel
+	"tag_wheel3",	// wheel
+	"tag_wheel4",	// wheel
+	"tag_wheel5",	// wheel
+	"tag_wheel6"	// wheel
+};
+
+char *gi_tags[BP_GI_MAX_PARTS] =
+{
+	"<no tag>",		// vehicle body
+	"tag_turret",	// turret
+	"tag_weap",		// gun
+	"tag_upgrade",	
+	"tag_upgrade",	
+	"tag_upgrade"	
+};
+
+char *boat_tags[BP_BOAT_MAX_PARTS] =
+{
+	"<no tag>",		// vehicle body
+	"tag_turret",	// turret
+	"tag_weap",		// gun
+	"tag_turret2",	// turret
+	"tag_weap2",		// gun
+	"tag_turret3",	// turret
+	"tag_weap",		// gun
+	"tag_turret4",	// turret
+	"tag_weap"		// gun
+};
+
 
 /*
 =============
@@ -241,12 +278,189 @@ void CG_DrawPlane(DrawInfo_Plane_t* drawInfo)
 
 void CG_DrawGV(DrawInfo_GV_t* drawInfo)
 {
+	refEntity_t	    part[BP_GV_MAX_PARTS];
+	float			shadowPlane = 0;
+	int				renderfx = 0;
+	int				i, tanksound;
 
+	completeVehicleData_t* veh = &availableVehicles[drawInfo->basicInfo.vehicleIndex];
+
+	for( i = 0; i < BP_GV_MAX_PARTS; i++ ) {
+	    memset( &part[i], 0, sizeof(part[0]) );	
+	}
+
+    // add the shadow
+	switch( cg_shadows.integer )
+	{
+	case 1:
+		CG_GenericShadow( &drawInfo->basicInfo, &shadowPlane );
+		break;
+	case 3:
+		renderfx |= RF_SHADOW_PLANE;
+		break;
+	}
+
+	// use the same origin for all
+    renderfx |= RF_LIGHTING_ORIGIN;
+
+    //
+    // add the hull
+    //
+    part[BP_GV_BODY].hModel = veh->handle[BP_GV_BODY];
+    VectorCopy( drawInfo->basicInfo.origin, part[BP_GV_BODY].origin );
+    VectorCopy( drawInfo->basicInfo.origin, part[BP_GV_BODY].lightingOrigin );
+	AxisCopy( drawInfo->basicInfo.axis, part[BP_GV_BODY].axis );
+    part[BP_GV_BODY].shadowPlane = shadowPlane;
+    part[BP_GV_BODY].renderfx = renderfx;
+    VectorCopy (part[BP_GV_BODY].origin, part[BP_GV_BODY].oldorigin);
+    trap_R_AddRefEntityToScene( &part[BP_GV_BODY] );
+
+    //
+    // turret
+    //
+    part[BP_GV_TURRET].hModel = veh->handle[BP_GV_TURRET];
+    VectorCopy( drawInfo->basicInfo.origin, part[BP_GV_TURRET].lightingOrigin );
+	AxisCopy( axisDefault, part[BP_GV_TURRET].axis );
+	RotateAroundYaw( part[BP_GV_TURRET].axis, drawInfo->turretAngle );
+	CG_PositionRotatedEntityOnTag( &part[BP_GV_TURRET], &part[BP_GV_BODY], veh->handle[BP_GV_BODY], gv_tags[BP_GV_TURRET] );
+	part[BP_GV_TURRET].shadowPlane = shadowPlane;
+    part[BP_GV_TURRET].renderfx = renderfx;
+    VectorCopy (part[BP_GV_TURRET].origin, part[BP_GV_TURRET].oldorigin);
+    trap_R_AddRefEntityToScene( &part[BP_GV_TURRET] );
+
+    //
+    // gun
+    //
+    part[BP_GV_GUNBARREL].hModel = veh->handle[BP_GV_GUNBARREL];
+    VectorCopy( drawInfo->basicInfo.origin, part[BP_GV_GUNBARREL].lightingOrigin );
+	AxisCopy( axisDefault, part[BP_GV_GUNBARREL].axis );
+	RotateAroundPitch( part[BP_GV_GUNBARREL].axis, drawInfo->gunAngle );
+	CG_PositionRotatedEntityOnTag( &part[BP_GV_GUNBARREL], &part[BP_GV_TURRET], veh->handle[BP_GV_TURRET], gv_tags[BP_GV_GUNBARREL] );
+	part[BP_GV_GUNBARREL].shadowPlane = shadowPlane;
+    part[BP_GV_GUNBARREL].renderfx = renderfx;
+    VectorCopy (part[BP_GV_GUNBARREL].origin, part[BP_GV_GUNBARREL].oldorigin);
+    trap_R_AddRefEntityToScene( &part[BP_GV_GUNBARREL] );
+
+	//
+	// wheels
+	//
+	// gearAnimStartTime is for timediff
+	// gearAnim is for angles
+	if( (veh->caps & HC_WHEELS) ) {
+		int ii;
+		for( ii = 0; ii < availableVehicles[drawInfo->basicInfo.vehicleIndex].wheels; ++ii ) {
+			part[BP_GV_WHEEL+ii].hModel = veh->handle[BP_GV_WHEEL+ii];
+			VectorCopy( drawInfo->basicInfo.origin, part[BP_GV_WHEEL+ii].lightingOrigin );
+			AxisCopy( axisDefault, part[BP_GV_WHEEL+ii].axis );
+			part[BP_GV_WHEEL+ii].shadowPlane = shadowPlane;
+			part[BP_GV_WHEEL+ii].renderfx = renderfx;
+			VectorCopy (part[BP_GV_WHEEL+ii].origin, part[BP_GV_WHEEL+ii].oldorigin);
+			RotateAroundPitch( part[BP_GV_WHEEL+ii].axis, drawInfo->wheelAngle );
+			CG_PositionRotatedEntityOnTag( &part[BP_GV_WHEEL+ii], &part[BP_GV_BODY], veh->handle[BP_GV_BODY], gv_tags[BP_GV_WHEEL+ii] );
+			trap_R_AddRefEntityToScene( &part[BP_GV_WHEEL+ii] );
+		}
+	}
+
+	// sound
+	if( drawInfo->basicInfo.entityNum >= 0 ) {
+		tanksound = drawInfo->basicInfo.speed * NUM_TANKSOUNDS / veh->maxspeed;
+		if( tanksound >= NUM_TANKSOUNDS ) tanksound = NUM_TANKSOUNDS - 1;
+		trap_S_AddLoopingSound( drawInfo->basicInfo.entityNum, 
+								drawInfo->basicInfo.origin, 
+								vec3_origin, 
+								cgs.media.engineTank[tanksound] );
+	}
+
+	// muzzleflash
+	if( drawInfo->basicInfo.drawMuzzleFlash ) {
+		CG_VehicleMuzzleFlash( drawInfo->basicInfo.flashWeaponIndex, &part[BP_GV_GUNBARREL], 
+							   veh->handle[BP_GV_GUNBARREL], drawInfo->basicInfo.vehicleIndex );
+	}
 }
 
 void CG_DrawBoat(DrawInfo_Boat_t* drawInfo)
 {
+	refEntity_t	    part[BP_BOAT_MAX_PARTS];
+	float			shadowPlane = 0;
+	int				renderfx = 0;
+	int				i, tanksound;
 
+	completeVehicleData_t* veh = &availableVehicles[drawInfo->basicInfo.vehicleIndex];
+
+	for( i = 0; i < BP_GV_MAX_PARTS; i++ ) {
+	    memset( &part[i], 0, sizeof(part[0]) );	
+	}
+
+    // add the shadow
+	switch( cg_shadows.integer )
+	{
+	case 1:
+		CG_GenericShadow( &drawInfo->basicInfo, &shadowPlane );
+		break;
+	case 3:
+		renderfx |= RF_SHADOW_PLANE;
+		break;
+	}
+
+	// use the same origin for all
+    renderfx |= RF_LIGHTING_ORIGIN;
+
+    //
+    // add the hull
+    //
+    part[BP_BOAT_BODY].hModel = veh->handle[BP_BOAT_BODY];
+    VectorCopy( drawInfo->basicInfo.origin, part[BP_BOAT_BODY].origin );
+    VectorCopy( drawInfo->basicInfo.origin, part[BP_BOAT_BODY].lightingOrigin );
+	AxisCopy( drawInfo->basicInfo.axis, part[BP_GV_BODY].axis );
+    part[BP_BOAT_BODY].shadowPlane = shadowPlane;
+    part[BP_BOAT_BODY].renderfx = renderfx;
+    VectorCopy (part[BP_BOAT_BODY].origin, part[BP_BOAT_BODY].oldorigin);
+    trap_R_AddRefEntityToScene( &part[BP_BOAT_BODY] );
+
+    //
+    // turrets
+    //
+	for( i = 0; i < 4; ++i ) {
+		int j = 2*i;
+		// turret
+		part[BP_BOAT_TURRET+j].hModel = veh->handle[BP_BOAT_TURRET+j];
+		if( !part[BP_BOAT_TURRET+j].hModel ) break;
+		VectorCopy( drawInfo->basicInfo.origin, part[BP_BOAT_TURRET+j].lightingOrigin );
+		AxisCopy( axisDefault, part[BP_BOAT_TURRET+j].axis );
+		RotateAroundYaw( part[BP_BOAT_TURRET+j].axis, drawInfo->turretAngle[i] );
+		CG_PositionRotatedEntityOnTag( &part[BP_BOAT_TURRET+j], &part[BP_BOAT_BODY], veh->handle[BP_BOAT_BODY], boat_tags[BP_BOAT_TURRET+j] );
+		part[BP_BOAT_TURRET+j].shadowPlane = shadowPlane;
+		part[BP_BOAT_TURRET+j].renderfx = renderfx;
+		VectorCopy (part[BP_BOAT_TURRET+j].origin, part[BP_BOAT_TURRET+j].oldorigin);
+		trap_R_AddRefEntityToScene( &part[BP_BOAT_TURRET+j] );
+		// gun
+		part[BP_BOAT_GUNBARREL+j].hModel = veh->handle[BP_BOAT_GUNBARREL+j];
+		VectorCopy( drawInfo->basicInfo.origin, part[BP_BOAT_GUNBARREL+j].lightingOrigin );
+		AxisCopy( axisDefault, part[BP_BOAT_GUNBARREL+j].axis );
+		RotateAroundPitch( part[BP_BOAT_GUNBARREL+j].axis, drawInfo->gunAngle[i] );
+		CG_PositionRotatedEntityOnTag( &part[BP_BOAT_GUNBARREL+j], &part[BP_BOAT_TURRET+j], veh->handle[BP_BOAT_TURRET+j], boat_tags[BP_BOAT_GUNBARREL+j] );
+		part[BP_BOAT_GUNBARREL+j].shadowPlane = shadowPlane;
+		part[BP_BOAT_GUNBARREL+j].renderfx = renderfx;
+		VectorCopy (part[BP_BOAT_GUNBARREL+j].origin, part[BP_BOAT_GUNBARREL+j].oldorigin);
+		trap_R_AddRefEntityToScene( &part[BP_BOAT_GUNBARREL+j] );
+
+	}
+
+	// sound
+	if( drawInfo->basicInfo.entityNum >= 0 ) {
+		tanksound = drawInfo->basicInfo.speed * NUM_TANKSOUNDS / veh->maxspeed;
+		if( tanksound >= NUM_TANKSOUNDS ) tanksound = NUM_TANKSOUNDS - 1;
+		trap_S_AddLoopingSound( drawInfo->basicInfo.entityNum, 
+								drawInfo->basicInfo.origin, 
+								vec3_origin, 
+								cgs.media.engineTank[tanksound] );
+	}
+
+	// muzzleflash
+	if( drawInfo->basicInfo.drawMuzzleFlash ) {
+		CG_VehicleMuzzleFlash( drawInfo->basicInfo.flashWeaponIndex, &part[BP_BOAT_GUNBARREL], 
+							   veh->handle[BP_BOAT_GUNBARREL], drawInfo->basicInfo.vehicleIndex );
+	}
 }
 
 void CG_DrawHelo(DrawInfo_Helo_t* drawInfo)
@@ -257,4 +471,51 @@ void CG_DrawHelo(DrawInfo_Helo_t* drawInfo)
 void CG_DrawLQM(DrawInfo_LQM_t* drawInfo)
 {
 
+}
+
+void CG_DrawGI(DrawInfo_GI_t* drawInfo)
+{
+	groundInstallationData_t* veh = &availableGroundInstallations[drawInfo->basicInfo.vehicleIndex];
+	refEntity_t part[BP_GI_MAX_PARTS];
+	int i;
+	for( i = 0; i < BP_GI_MAX_PARTS; i++ ) {
+		memset( &part[i], 0, sizeof(part[0]) );	
+	}	
+	// body
+	part[BP_GI_BODY].hModel = veh->handle[BP_GI_BODY];		
+	VectorCopy( drawInfo->basicInfo.origin, part[BP_GI_BODY].origin );	
+	VectorCopy( drawInfo->basicInfo.origin, part[BP_GI_BODY].oldorigin);
+	AxisCopy( drawInfo->basicInfo.axis, part[BP_GI_BODY].axis );
+	trap_R_AddRefEntityToScene( &part[BP_GI_BODY] );
+	// other parts
+	for( i = 1; i < BP_GI_MAX_PARTS; i++ ) {
+		if( (i == BP_GI_UPGRADE && !veh->upgrades) ||
+			(i == BP_GI_UPGRADE2 && veh->upgrades < 2 ) ||
+			(i == BP_GI_UPGRADE3 && veh->upgrades < 3 ) ) {
+			break;;
+		}
+		part[i].hModel = veh->handle[i];
+		if( !part[i].hModel ) continue;
+		VectorCopy( drawInfo->basicInfo.origin, part[i].lightingOrigin );
+		AxisCopy( axisDefault, part[i].axis );
+		if( i == BP_GI_GUNBARREL ) {
+			RotateAroundPitch( part[i].axis, drawInfo->gunAngle );
+			CG_PositionRotatedEntityOnTag( &part[i], &part[BP_GI_TURRET], 
+				veh->handle[BP_GI_TURRET], gi_tags[i] );
+		} else if( i == BP_GI_UPGRADE ) {
+			CG_PositionRotatedEntityOnTag( &part[i], &part[BP_GI_GUNBARREL], 
+				veh->handle[BP_GI_GUNBARREL], gi_tags[i] );
+		} else if( i == BP_GI_UPGRADE2 ) {
+			CG_PositionRotatedEntityOnTag( &part[i], &part[BP_GI_UPGRADE], 
+				veh->handle[BP_GI_UPGRADE], gi_tags[i] );
+		} else if( i == BP_GI_UPGRADE3 ) {
+			CG_PositionRotatedEntityOnTag( &part[i], &part[BP_GI_UPGRADE2], 
+				veh->handle[BP_GI_UPGRADE2], gi_tags[i] );
+		} else {
+			RotateAroundYaw( part[i].axis, drawInfo->turretAngle );
+			CG_PositionRotatedEntityOnTag( &part[i], &part[BP_GI_BODY], 
+				veh->handle[BP_GI_BODY], gi_tags[i] );
+		}
+		trap_R_AddRefEntityToScene( &part[i] );
+	}
 }

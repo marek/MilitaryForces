@@ -1,5 +1,5 @@
 /*
- * $Id: g_items.c,v 1.3 2002-06-12 14:35:33 thebjoern Exp $
+ * $Id: g_items.c,v 1.4 2002-07-15 18:23:07 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -118,7 +118,7 @@ void RespawnItem( gentity_t *ent ) {
 	trap_LinkEntity (ent);
 
 	// play the normal respawn sound only to nearby clients
-	G_AddEvent( ent, EV_ITEM_RESPAWN, 0 );
+	G_AddEvent( ent, EV_ITEM_RESPAWN, 0, qtrue );
 
 	ent->nextthink = 0;
 }
@@ -172,7 +172,7 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 	if (predict) {
 		G_AddPredictableEvent( other, EV_ITEM_PICKUP, ent->s.modelindex );
 	} else {
-		G_AddEvent( other, EV_ITEM_PICKUP, ent->s.modelindex );
+		G_AddEvent( other, EV_ITEM_PICKUP, ent->s.modelindex, qtrue );
 	}
 
 	// powerup pickups are global broadcasts

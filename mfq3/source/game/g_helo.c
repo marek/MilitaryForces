@@ -1,5 +1,5 @@
 /*
- * $Id: g_helo.c,v 1.1 2002-02-18 11:06:31 thebjoern Exp $
+ * $Id: g_helo.c,v 1.2 2002-07-15 18:23:07 thebjoern Exp $
 */
 
 
@@ -26,6 +26,6 @@ void Helo_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 	if( damage < 5 ) return;
 	if( damage > 50 ) damage = 50;
 
-	G_AddEvent(self, EV_VEHICLE_HIT, damage);
+	G_AddEvent(self, EV_VEHICLE_HIT, damage, qtrue);
 
 }

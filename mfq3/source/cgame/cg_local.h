@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.54 2002-07-14 17:13:19 thebjoern Exp $
+ * $Id: cg_local.h,v 1.55 2002-07-15 18:23:07 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -915,10 +915,15 @@ typedef struct {
 
 typedef struct {
     BasicDrawInfo_t		basicInfo;
+	float				turretAngle;
+	float				gunAngle;
+	float				wheelAngle;
 } DrawInfo_GV_t;
 
 typedef struct {
     BasicDrawInfo_t		basicInfo;
+	float				turretAngle[4];
+	float				gunAngle[4];
 } DrawInfo_Boat_t;
 
 typedef struct {
@@ -929,6 +934,12 @@ typedef struct {
     BasicDrawInfo_t		basicInfo;
 } DrawInfo_LQM_t;
 
+typedef struct {
+	BasicDrawInfo_t		basicInfo;
+	int					upgrades;
+	float				turretAngle;
+	float				gunAngle;
+} DrawInfo_GI_t;
 
 // end MFQ3 vehicle drawing
 
@@ -1321,6 +1332,7 @@ void CG_DrawGV(DrawInfo_GV_t* drawInfo);
 void CG_DrawBoat(DrawInfo_Boat_t* drawInfo);
 void CG_DrawHelo(DrawInfo_Helo_t* drawInfo);
 void CG_DrawLQM(DrawInfo_LQM_t* drawInfo);
+void CG_DrawGI(DrawInfo_GI_t* drawInfo);
 
 //
 // cg_plane.c

@@ -1,5 +1,5 @@
 /*
- * $Id: g_utils.c,v 1.4 2002-02-27 16:07:29 sparky909_uk Exp $
+ * $Id: g_utils.c,v 1.5 2002-07-15 18:23:07 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -547,6 +547,41 @@ void G_AddPredictableEvent( gentity_t *ent, int event, int eventParm ) {
 	BG_AddPredictableEventToPlayerstate( event, eventParm, &ent->client->ps );
 }
 
+/*
+===============
+Event queue
+===============
+*/
+
+void G_SendEventFromQueue( gentity_t* ent ) {
+	int i = ent->currentEventToSend;
+
+	// nothing to be done
+	if( !ent->eventQueue[i].used ) return;
+
+	G_AddEvent( ent, ent->eventQueue[i].event, ent->eventQueue[i].eventParm, qfalse );
+	ent->eventQueue[i].used = qfalse;
+
+	i++;
+	if( i >= MAX_EVENT_QUEUE_SIZE ) i = 0;
+	ent->currentEventToSend = i;
+}
+
+void G_AddEventToQueue( gentity_t* ent, int event, int eventParm ) {
+	int i = ent->currentEventToAdd;
+
+	if( ent->eventQueue[i].used ) {
+		G_Printf( "Event queue full! Event lost!\n" );
+		return;
+	}
+	ent->eventQueue[i].event = event;
+	ent->eventQueue[i].eventParm = eventParm;
+	ent->eventQueue[i].used = qtrue;
+
+	i++;
+	if( i >= MAX_EVENT_QUEUE_SIZE ) i = 0;
+	ent->currentEventToAdd = i;
+}
 
 /*
 ===============
@@ -555,12 +590,19 @@ G_AddEvent
 Adds an event+parm and twiddles the event counter
 ===============
 */
-void G_AddEvent( gentity_t *ent, int event, int eventParm )
+void G_AddEvent( gentity_t *ent, int event, int eventParm, qboolean addToQueue )
 {
 	int bits = 0;
 
 	if ( !event ) {
 		G_Printf( "G_AddEvent: zero event added for entity %i\n", ent->s.number );
+		return;
+	}
+
+	if( ent->eventSent ) {
+		if( addToQueue ) {
+			G_AddEventToQueue(ent, event, eventParm);
+		}
 		return;
 	}
 
@@ -581,6 +623,7 @@ void G_AddEvent( gentity_t *ent, int event, int eventParm )
 		ent->s.eventParm = eventParm;
 	}
 	ent->eventTime = level.time;
+	ent->eventSent = qtrue;
 }
 
 

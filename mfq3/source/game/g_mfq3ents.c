@@ -1,5 +1,5 @@
 /*
- * $Id: g_mfq3ents.c,v 1.10 2002-04-16 11:28:18 thebjoern Exp $
+ * $Id: g_mfq3ents.c,v 1.11 2002-07-15 18:23:07 thebjoern Exp $
 */
 
 
@@ -201,7 +201,7 @@ void recharge_touch( gentity_t *self, gentity_t *other, trace_t *trace ) {
 			int diff = other->client->ps.ammo[i+8] - other->client->ps.ammo[i];
 			other->client->ps.ammo[i] = other->client->ps.ammo[i+8];
 			if( MF_addWeaponToLoadout( availableVehicles[other->client->vehicle].weapons[i], &other->loadout ) ) {
-				G_AddEvent( other, EV_ADD_WEAPON_TO_LOADOUT, availableVehicles[other->client->vehicle].weapons[i] );
+				G_AddEvent( other, EV_ADD_WEAPON_TO_LOADOUT, availableVehicles[other->client->vehicle].weapons[i], qtrue );
 			}
 			break;
 		}

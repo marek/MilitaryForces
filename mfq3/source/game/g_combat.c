@@ -1,5 +1,5 @@
 /*
- * $Id: g_combat.c,v 1.8 2002-02-27 16:07:29 sparky909_uk Exp $
+ * $Id: g_combat.c,v 1.9 2002-07-15 18:23:07 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -52,7 +52,7 @@ Explode our vehicle
 void ExplodeVehicle( gentity_t *self )
 {
 	// create the client vehicle explosion event
-	G_AddEvent( self, EV_VEHICLE_GIB, 0 );
+	G_AddEvent( self, EV_VEHICLE_GIB, 0, qtrue );
 
 	self->takedamage = qfalse;
 	self->s.eType = ET_INVISIBLE;
@@ -790,7 +790,7 @@ void Vehicle_Death( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, 
 	else
 	{
 		// create a smaller vehicle explosion
-		G_AddEvent( self, EV_VEHICLE_DIE, 0 );
+		G_AddEvent( self, EV_VEHICLE_DIE, 0, qtrue );
 
 		// wreck can be blown up (i.e on crash into ground)
 		self->die = Vehicle_Die;

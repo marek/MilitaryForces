@@ -1,5 +1,5 @@
 /*
- * $Id: g_missile.c,v 1.18 2002-04-16 11:28:18 thebjoern Exp $
+ * $Id: g_missile.c,v 1.19 2002-07-15 18:23:07 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -65,7 +65,7 @@ void G_ExplodeMissile( gentity_t *ent ) {
 	dir[2] = 1;
 
 	ent->s.eType = ET_GENERAL;
-	G_AddEvent( ent, EV_MISSILE_MISS, DirToByte( dir ) );
+	G_AddEvent( ent, EV_MISSILE_MISS, DirToByte( dir ), qtrue );
 
 	ent->freeAfterEvent = qtrue;
 
@@ -131,12 +131,12 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 	// one, rather than changing the missile into the explosion?
 
 	if ( other->takedamage && other->client ) {
-		G_AddEvent( ent, EV_MISSILE_HIT, DirToByte( trace->plane.normal ) );
+		G_AddEvent( ent, EV_MISSILE_HIT, DirToByte( trace->plane.normal ), qtrue );
 		ent->s.otherEntityNum = other->s.number;
 	} else if( trace->surfaceFlags & SURF_METALSTEPS ) {
-		G_AddEvent( ent, EV_MISSILE_MISS_METAL, DirToByte( trace->plane.normal ) );
+		G_AddEvent( ent, EV_MISSILE_MISS_METAL, DirToByte( trace->plane.normal ), qtrue );
 	} else {
-		G_AddEvent( ent, EV_MISSILE_MISS, DirToByte( trace->plane.normal ) );
+		G_AddEvent( ent, EV_MISSILE_MISS, DirToByte( trace->plane.normal ), qtrue );
 	}
 
 	ent->freeAfterEvent = qtrue;

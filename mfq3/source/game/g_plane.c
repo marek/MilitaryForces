@@ -1,5 +1,5 @@
 /*
- * $Id: g_plane.c,v 1.2 2001-12-22 02:28:44 thebjoern Exp $
+ * $Id: g_plane.c,v 1.3 2002-07-15 18:23:07 thebjoern Exp $
 */
 
 
@@ -110,7 +110,7 @@ void Plane_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 	if( damage < 5 ) return;
 	if( damage > 50 ) damage = 50;
 
-	G_AddEvent(self, EV_VEHICLE_HIT, damage);
+	G_AddEvent(self, EV_VEHICLE_HIT, damage, qtrue);
 
 }
 

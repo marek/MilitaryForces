@@ -1,23 +1,10 @@
 /*
- * $Id: cg_boat.c,v 1.8 2002-07-14 17:13:19 thebjoern Exp $
+ * $Id: cg_boat.c,v 1.9 2002-07-15 18:23:06 thebjoern Exp $
 */
 
 
 #include "cg_local.h"
 
-// make sure the tags are named properly!
-char *boat_tags[BP_BOAT_MAX_PARTS] =
-{
-	"<no tag>",		// vehicle body
-	"tag_turret",	// turret
-	"tag_weap",		// gun
-	"tag_turret2",	// turret
-	"tag_weap2",		// gun
-	"tag_turret3",	// turret
-	"tag_weap",		// gun
-	"tag_turret4",	// turret
-	"tag_weap"		// gun
-};
 
 /*
 ==========================
@@ -42,60 +29,39 @@ CG_Boat
 */
 void CG_Boat( centity_t *cent, clientInfo_t *ci ) 
 {
-	refEntity_t	    part[BP_BOAT_MAX_PARTS];
-	refEntity_t		reticle;
-	float			shadowPlane = 0;
-	int				renderfx = 0;
-	int				i, tanksound;
 	vec3_t			velocity;
-	float			speed;
+	DrawInfo_Boat_t	drawInfo;
+	int				i;
+
+	memset( &drawInfo, 0, sizeof(drawInfo) );
+	drawInfo.basicInfo.vehicleIndex = ci->vehicle;
+	drawInfo.basicInfo.ONOFF = cent->currentState.ONOFF;
 
 	// get velocity
 	VectorCopy( cent->currentState.pos.trDelta, velocity );
-	speed = VectorLength( velocity );
+	drawInfo.basicInfo.speed = VectorLength( velocity );
 
-	for( i = 0; i < BP_BOAT_MAX_PARTS; i++ ) {
-	    memset( &part[i], 0, sizeof(part[0]) );	
-	}
-	memset( &reticle, 0, sizeof(reticle) );
+	// entitynum
+	drawInfo.basicInfo.entityNum = cent->currentState.number;
 
     // get the rotation information
     VectorCopy( cent->currentState.angles, cent->lerpAngles );
-    AnglesToAxis( cent->lerpAngles, part[BP_BOAT_BODY].axis );
+    AnglesToAxis( cent->lerpAngles, drawInfo.basicInfo.axis );
+
+	// position and orientation
+	VectorCopy( cent->lerpOrigin, drawInfo.basicInfo.origin );
+	VectorCopy( cent->lerpAngles, drawInfo.basicInfo.angles );
 
     // add the talk baloon or disconnect icon
-    CG_PlayerSprites( cent );
+//    CG_PlayerSprites( cent );
     
-    // add the shadow
-	switch( cg_shadows.integer )
-	{
-	case 1:
-		CG_GenericShadow( cent, &shadowPlane );
-		break;
-	case 3:
-		renderfx |= RF_SHADOW_PLANE;
-		break;
-	}
-
-	// use the same origin for all
-    renderfx |= RF_LIGHTING_ORIGIN;
-
-    //
-    // add the hull
-    //
-    part[BP_BOAT_BODY].hModel = ci->parts[BP_BOAT_BODY];
-    VectorCopy( cent->lerpOrigin, part[BP_BOAT_BODY].origin );
-    VectorCopy( cent->lerpOrigin, part[BP_BOAT_BODY].lightingOrigin );
-    part[BP_BOAT_BODY].shadowPlane = shadowPlane;
-    part[BP_BOAT_BODY].renderfx = renderfx;
-    VectorCopy (part[BP_BOAT_BODY].origin, part[BP_BOAT_BODY].oldorigin);
-    trap_R_AddRefEntityToScene( &part[BP_BOAT_BODY] );
+	// loadout
+	drawInfo.basicInfo.loadout = &cg_loadouts[cent->currentState.number];
 
     //
     // turrets
     //
 	for( i = 0; i < 4; ++i ) {
-		int j = 2*i;
 		float yaw = cent->currentState.angles2[ROLL];
 		float pitch = cent->currentState.angles2[PITCH];
 		float max, min;
@@ -114,38 +80,34 @@ void CG_Boat( centity_t *cent, clientInfo_t *ci )
 		min = availableWeapons[availableVehicles[ci->vehicle].weapons[i+1]].minturns[0];
 		if( pitch > max ) pitch = max;
 		else if( pitch < min ) pitch = min;
-		// turret
-		part[BP_BOAT_TURRET+j].hModel = ci->parts[BP_BOAT_TURRET+j];
-		if( !part[BP_BOAT_TURRET+j].hModel ) break;
-		VectorCopy( cent->lerpOrigin, part[BP_BOAT_TURRET+j].lightingOrigin );
-		AxisCopy( axisDefault, part[BP_BOAT_TURRET+j].axis );
-		RotateAroundYaw( part[BP_BOAT_TURRET+j].axis, yaw );
-		CG_PositionRotatedEntityOnTag( &part[BP_BOAT_TURRET+j], &part[BP_BOAT_BODY], ci->parts[BP_BOAT_BODY], boat_tags[BP_BOAT_TURRET+j] );
-		part[BP_BOAT_TURRET+j].shadowPlane = shadowPlane;
-		part[BP_BOAT_TURRET+j].renderfx = renderfx;
-		VectorCopy (part[BP_BOAT_TURRET+j].origin, part[BP_BOAT_TURRET+j].oldorigin);
-		trap_R_AddRefEntityToScene( &part[BP_BOAT_TURRET+j] );
-		// gun
-		part[BP_BOAT_GUNBARREL+j].hModel = ci->parts[BP_BOAT_GUNBARREL+j];
-		VectorCopy( cent->lerpOrigin, part[BP_BOAT_GUNBARREL+j].lightingOrigin );
-		AxisCopy( axisDefault, part[BP_BOAT_GUNBARREL+j].axis );
-		RotateAroundPitch( part[BP_BOAT_GUNBARREL+j].axis, pitch );
-		CG_PositionRotatedEntityOnTag( &part[BP_BOAT_GUNBARREL+j], &part[BP_BOAT_TURRET+j], ci->parts[BP_BOAT_TURRET+j], boat_tags[BP_BOAT_GUNBARREL+j] );
-		part[BP_BOAT_GUNBARREL+j].shadowPlane = shadowPlane;
-		part[BP_BOAT_GUNBARREL+j].renderfx = renderfx;
-		VectorCopy (part[BP_BOAT_GUNBARREL+j].origin, part[BP_BOAT_GUNBARREL+j].oldorigin);
-		trap_R_AddRefEntityToScene( &part[BP_BOAT_GUNBARREL+j] );
-
+		drawInfo.turretAngle[i] = yaw;
+		drawInfo.gunAngle[i] = pitch;
 	}
+
+	// smoke 
+	if( cent->currentState.generic1 ) {
+		CG_Generic_Smoke( cent, cent->lerpOrigin, 100 );
+	}
+
+	// muzzleflash
+	if( cg.time - cent->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {
+		drawInfo.basicInfo.drawMuzzleFlash = qtrue;
+		drawInfo.basicInfo.flashWeaponIndex = cent->muzzleFlashWeapon;
+	}
+
+	CG_DrawBoat(&drawInfo);
 
 	// reticles
 	if( cent == &cg.predictedPlayerEntity )
 	{
+		refEntity_t	reticle;
 		vec3_t	forward, right, up, ang, start, end, temp;
 		trace_t	tr;
 		float len;
 		playerState_t* ps = &cg.snap->ps;
 		float mindist = cg_thirdPersonRange.integer + availableVehicles[ci->vehicle].cam_dist[ CAMERA_V_DEFAULT ] + availableVehicles[ci->vehicle].maxs[0] + 20;
+
+		memset( &reticle, 0, sizeof(reticle) );
 
 		CG_ResetReticles();
 
@@ -200,8 +162,7 @@ void CG_Boat( centity_t *cent, clientInfo_t *ci )
 			}
 
 			VectorCopy( reticle.origin, reticle.lightingOrigin );
-			reticle.shadowPlane = shadowPlane;
-			reticle.renderfx = renderfx;
+			reticle.renderfx = RF_LIGHTING_ORIGIN|RF_SHADOW_PLANE;
 
 			CG_AddReticleEntityToScene( &reticle, target );
 
@@ -253,8 +214,7 @@ void CG_Boat( centity_t *cent, clientInfo_t *ci )
 				}
 
 				VectorCopy( reticlelock.origin, reticlelock.lightingOrigin );
-				reticlelock.shadowPlane = shadowPlane;
-				reticlelock.renderfx = renderfx;
+				reticlelock.renderfx = RF_LIGHTING_ORIGIN|RF_SHADOW_PLANE;
 			}
 
 			CG_AddReticleEntityToScene( &reticlelock, NULL );
@@ -298,30 +258,10 @@ void CG_Boat( centity_t *cent, clientInfo_t *ci )
 			}
 
 			VectorCopy( reticle.origin, reticle.lightingOrigin );
-			reticle.shadowPlane = shadowPlane;
-			reticle.renderfx = renderfx;
+			reticle.renderfx = RF_LIGHTING_ORIGIN|RF_SHADOW_PLANE;
 			
 			CG_AddReticleEntityToScene( &reticle, NULL );
 		}
-	}
-
-	// sound
-	BG_EvaluateTrajectoryDelta( &cent->currentState.pos, cg.time, velocity );
-	tanksound = speed * NUM_TANKSOUNDS / availableVehicles[ci->vehicle].maxspeed;
-	if( tanksound >= NUM_TANKSOUNDS ) tanksound = NUM_TANKSOUNDS - 1;
-	trap_S_AddLoopingSound( cent->currentState.number, 
-							cent->lerpOrigin, 
-							velocity, 
-							cgs.media.engineTank[tanksound] );
-
-	// smoke 
-	if( cent->currentState.generic1 ) {
-		CG_Generic_Smoke( cent, cent->lerpOrigin, 100 );
-	}
-
-	// muzzleflash
-	if( cg.time - cent->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {
-		CG_VehicleMuzzleFlash( cent->muzzleFlashWeapon, &part[BP_BOAT_GUNBARREL], ci->parts[BP_BOAT_GUNBARREL], ci->vehicle );
 	}
 }
 

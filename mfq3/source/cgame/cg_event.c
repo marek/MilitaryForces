@@ -1,5 +1,5 @@
 /*
- * $Id: cg_event.c,v 1.13 2002-04-16 11:28:17 thebjoern Exp $
+ * $Id: cg_event.c,v 1.14 2002-07-15 18:23:07 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -327,6 +327,8 @@ void CG_EntityEvent( centity_t *cent, vec3_t position )
 		cent->gearAnimStartTime = 0;
 		cent->gearAnim = GEAR_ANIM_STOP;
 		{
+			// old version
+			/*
 			if( cent->currentState.eType == ET_VEHICLE ) {
 			    clientInfo_t	*ci;
 				int				clientNum;
@@ -338,6 +340,17 @@ void CG_EntityEvent( centity_t *cent, vec3_t position )
 				cent->gearAnimFrame = availableVehicles[ci->vehicle].maxGearFrame;
 			} else if( cent->currentState.eType == ET_MISC_VEHICLE ) {
 				cent->gearAnimFrame = availableVehicles[cent->currentState.modelindex].maxGearFrame;
+			}
+			*/
+			// new version
+			clientInfo_t	*ci;
+			int				clientNum;
+			clientNum = cent->currentState.clientNum;
+			if( clientNum < 0 || clientNum >= MAX_CLIENTS ) {
+				cent->gearAnimFrame = availableVehicles[cent->currentState.modelindex].maxGearFrame;
+			} else {
+				ci = &cgs.clientinfo[ clientNum ];
+				cent->gearAnimFrame = availableVehicles[ci->vehicle].maxGearFrame;
 			}
 		}
 		break;

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_weapons.c,v 1.21 2002-06-16 21:36:28 thebjoern Exp $
+ * $Id: cg_weapons.c,v 1.22 2002-07-15 18:23:07 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -455,7 +455,6 @@ void CG_MissileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_t di
 	case WI_SPARROW:
 	case WI_AMRAAM:
 	case WI_PHOENIX:
-	case WI_AVENGER:
 	case WI_STINGER:
 	case WI_ATOLL:
 	case WI_ARCHER:

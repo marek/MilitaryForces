@@ -1,5 +1,5 @@
 /*
- * $Id: g_target.c,v 1.2 2001-12-22 02:28:44 thebjoern Exp $
+ * $Id: g_target.c,v 1.3 2002-07-15 18:23:07 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -107,11 +107,11 @@ void Use_Target_Speaker (gentity_t *ent, gentity_t *other, gentity_t *activator)
 			ent->s.loopSound = ent->noise_index;	// start it
 	}else {	// normal sound
 		if ( ent->spawnflags & 8 ) {
-			G_AddEvent( activator, EV_GENERAL_SOUND, ent->noise_index );
+			G_AddEvent( activator, EV_GENERAL_SOUND, ent->noise_index, qtrue );
 		} else if (ent->spawnflags & 4) {
-			G_AddEvent( ent, EV_GLOBAL_SOUND, ent->noise_index );
+			G_AddEvent( ent, EV_GLOBAL_SOUND, ent->noise_index, qtrue );
 		} else {
-			G_AddEvent( ent, EV_GENERAL_SOUND, ent->noise_index );
+			G_AddEvent( ent, EV_GENERAL_SOUND, ent->noise_index, qtrue );
 		}
 	}
 }
