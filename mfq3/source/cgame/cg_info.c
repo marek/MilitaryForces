@@ -1,5 +1,5 @@
 /*
- * $Id: cg_info.c,v 1.2 2001-12-19 19:33:00 sparky909_uk Exp $
+ * $Id: cg_info.c,v 1.3 2002-01-16 19:29:36 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -88,7 +88,12 @@ void CG_DrawInformation( void ) {
 
 	// try to load the loading shot for this map
 	// NOTE: changed from 'levelshots', because only use now use the levelshots for small map previews (MM)
-	loadingshot = trap_R_RegisterShaderNoMip( va( "loadingshots/%s.tga", s ) );	
+	loadingshot = trap_R_RegisterShaderNoMip( va( "loadingshots/%s.jpg", s ) );	
+	if( !loadingshot )
+	{
+		// use default
+		loadingshot = trap_R_RegisterShaderNoMip( "ui/assets/noLoadingPicture.jpg" );
+	}
 
 	// load background
 	background = trap_R_RegisterShaderNoMip( "ui/assets/backscreen.jpg" );	
@@ -102,17 +107,17 @@ void CG_DrawInformation( void ) {
 	trap_R_SetColor( NULL );
 	CG_DrawPic( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, background );
 
-	// alpha blend the 320x240 loading shot over the picture frame (bottom right corner)
+	// alpha blend the 1024x256 loading shot over the picture frame
 	if( loadingshot )
 	{
-		CG_DrawPic( SCREEN_WIDTH - 320, SCREEN_HEIGHT - 240, 320, 240, loadingshot );
+		CG_DrawPic( 0, 160, 640, 160, loadingshot );
 	}
 /*
 	// draw the icons of things as they are loaded
 	CG_DrawLoadingIcons();
 */
 	// draw info string information
-	y = 150;
+	y = 320 + 16;
 	x = 32;
 
 	// the first 150 rows are reserved for the client connection

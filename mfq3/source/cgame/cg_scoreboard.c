@@ -1,5 +1,5 @@
 /*
- * $Id: cg_scoreboard.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: cg_scoreboard.c,v 1.2 2002-01-16 19:29:36 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -218,12 +218,14 @@ qboolean CG_DrawOldScoreboard( void ) {
 	int lineHeight;
 	int topBorderSize, bottomBorderSize;
 
-	// don't draw amuthing if the menu or console is up
+	// don't draw anything if the menu or console is up
 	if ( cg_paused.integer ) {
+		cg.deferredPlayerLoading = 0;
 		return qfalse;
 	}
 
 	if ( cgs.gametype == GT_SINGLE_PLAYER && cg.predictedPlayerState.pm_type == PM_INTERMISSION ) {
+		cg.deferredPlayerLoading = 0;
 		return qfalse;
 	}
 
@@ -241,6 +243,7 @@ qboolean CG_DrawOldScoreboard( void ) {
 		
 		if ( !fadeColor ) {
 			// next time scoreboard comes up, don't print killer
+			cg.deferredPlayerLoading = 0;
 			cg.killerName[0] = 0;
 			return qfalse;
 		}
@@ -354,6 +357,11 @@ qboolean CG_DrawOldScoreboard( void ) {
 				break;
 			}
 		}
+	}
+
+	// load any models that have been deferred
+	if ( ++cg.deferredPlayerLoading > 10 ) {
+//		CG_LoadDeferredPlayers();	// CG_LoadDeferredPlayers - not yet implemented - MM
 	}
 
 	return qtrue;

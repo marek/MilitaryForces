@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.2 2001-11-19 17:02:20 thebjoern Exp $
+ * $Id: cg_local.h,v 1.3 2002-01-16 19:29:36 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,6 +9,14 @@
 #include "../game/bg_public.h"
 #include "cg_public.h"
 
+// MFQ3: Uncomment the following line to compile in the new script driven gfx/text/scoreboard/etc..
+#define _MENU_SCOREBOARD
+
+typedef enum {
+	LEFT_JUSTIFY,
+	CENTRE_JUSTIFY,
+	RIGHT_JUSTIFY
+} textJustify_t;
 
 // The entire cgame module is unloaded and reloaded on each level change,
 // so there is NO persistant data between levels on the client side.
@@ -281,6 +289,7 @@ typedef struct {
 
 	// mfq3
 	int				vehicle;
+	int				deaths;
 	qhandle_t		parts[BP_MAX_PARTS];
 } clientInfo_t;
 
@@ -342,6 +351,7 @@ typedef struct {
 	
 	qboolean	demoPlayback;
 	qboolean	levelShot;			// taking a level menu screenshot
+	int			deferredPlayerLoading;
 	qboolean	intermissionStarted;	// don't play voice rewards, because game will end shortly
 
 	// there are only one or two snapshot_t that are relevent at a time
@@ -853,6 +863,7 @@ void CG_KeyEvent(int key, qboolean down);
 void CG_MouseEvent(int x, int y);
 void CG_EventHandling(int type);
 void CG_RankRunFrame( void );
+void CG_SetScoreSelection(void *menu);
 score_t *CG_GetSelectedScore();
 void CG_BuildSpectatorString();
 
@@ -940,8 +951,10 @@ const char *CG_GameTypeString();
 qboolean CG_YourTeamHasFlag();
 qboolean CG_OtherTeamHasFlag();
 qhandle_t CG_StatusHandle(int task);
-
-
+void CG_DrawStringNew( int x, int y, float scale, vec4_t colour, const char * pText, int unknown, int hSpacing, int style, textJustify_t formatting );
+void CG_DrawStringNewAlpha( int x, int y, const char * pText, float alpha, textJustify_t formatting );
+void CG_DrawStringNewColour( int x, int y, const char * pText, vec4_t colour, textJustify_t formatting );
+vec4_t * CG_CreateColour( float r, float g, float b, float a );
 
 //
 // cg_player.c
