@@ -5,8 +5,40 @@ Military Forces Q3
 History:
 ========
 
-+++v0.67+++ in progress...
+
++++v0.69+++ in progress...
 -----------
+- improve the code that displays numbers on the HUD
+- make use of Abbo's "numberline" for displaying numbers
+- update a couple of pk3s with newer artwork/models/etc
+- Mark: add credits page
+- minor fixes
+
++++v0.68+++
+-----------
+- added first cut of flares
+- added first cut of missile-distraction code (flares), needs testing
+- prevent camping on recharge spots by disabling shooting while on them (please test
+  this on networks!)
+- new ww2 loading pic from Abbo
+- got updated F-15 for vwep compliance
+- got updated F-18 for vwep compliance
+- got updated F-5 for vwep compliance
+- fixed throttle blurriness
+- more minor changes
+
++++v0.67+++
+-----------
+- test: F-16 with various loadouts
+- F-14, F-16 and Jas39 updated for vwep
+- Mark: added gameset voting
+- added vwep for ECM and droptanks
+- added new weapons (no special code yet though): HARM, GBU-15, Durandal
+- got new vwep models from Schez
+- added a 30mm gun for use on the A-10
+- make GVs survive longer underwater
+- fix some amphib and boat bugs
+- and other minor fixes
 
 +++v0.66+++
 -----------
