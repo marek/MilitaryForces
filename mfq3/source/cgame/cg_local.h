@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.40 2002-02-23 19:31:55 thebjoern Exp $
+ * $Id: cg_local.h,v 1.41 2002-02-24 19:39:50 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1207,6 +1207,7 @@ void CG_VehicleObituary( entityState_t *ent );
 void CG_VehicleMuzzleFlash( centity_t *cent, const refEntity_t *parent, qhandle_t parentModel, int idx );
 void CG_Misc_Vehicle( centity_t *cent );
 void CG_VehicleLoadout( centity_t* cent );
+void CG_AddToVehicleLoadout( centity_t* cent, int weaponIndex );
 
 //
 // cg_plane.c

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicle.c,v 1.16 2002-02-24 16:52:12 thebjoern Exp $
+ * $Id: cg_vehicle.c,v 1.17 2002-02-24 19:39:50 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -651,5 +651,33 @@ void CG_VehicleLoadout( centity_t* cent ) {
 
 	MF_getDefaultLoadoutForVehicle( idx, &cg_loadouts[cent->currentState.number] );
 }
+
+
+
+/*
+=============
+CG_AddToVehicleLoadout
+
+=============
+*/
+void CG_AddToVehicleLoadout( centity_t* cent, int weaponIndex ) {
+	int idx = -1;
+
+	if( cent->currentState.eType == ET_VEHICLE ) {
+	    clientInfo_t	*ci;
+		int				clientNum;
+	    clientNum = cent->currentState.clientNum;
+		if ( clientNum < 0 || clientNum >= MAX_CLIENTS ) {
+			trap_Error( "Bad clientNum on player entity (CG_VehicleLoadout)");
+		}
+		ci = &cgs.clientinfo[ clientNum ];
+		idx = ci->vehicle;
+	} else if( cent->currentState.eType == ET_MISC_VEHICLE ) {
+		idx = cent->currentState.modelindex;
+	} else return;
+
+	MF_addWeaponToLoadout( weaponIndex, &cg_loadouts[cent->currentState.number] );
+}
+
 
 

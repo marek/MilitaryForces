@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.74 2002-02-24 16:52:12 thebjoern Exp $
+ * $Id: bg_public.h,v 1.75 2002-02-24 19:39:51 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.64a"
+#define	GAME_VERSION		"mfq3 v0.64b"
 
 #define	DEFAULT_GRAVITY		800
 
@@ -327,6 +327,7 @@ typedef enum {
 	EV_BAY_STOP,			// stop bay anim as it is
 
 	EV_GET_DEFAULT_LOADOUT,	// weapon loadout
+	EV_ADD_WEAPON_TO_LOADOUT,// weapon loadout
 
 	EV_DEBUG_LINE
 
@@ -716,6 +717,7 @@ typedef struct completeLoadout_s
 	unsigned int		type[MAX_WEAPONS_PER_VEHICLE];			// type of mount
 	unsigned int		weaponType[MAX_WEAPONS_PER_VEHICLE];	// which weapontype is on it
 	unsigned int		mountedWeapons[MAX_WEAPONS_PER_VEHICLE];// how many actually on
+	unsigned int		maxWeapons[MAX_WEAPONS_PER_VEHICLE];// how many max on it
 	pylonTags_t			tags[MAX_WEAPONS_PER_VEHICLE];
 } completeLoadout_t;
 
@@ -861,6 +863,7 @@ typedef enum
 	WI_100MM_GUN,
 	WI_125MM_GUN,
 	WI_MK82,
+	WI_MK84,
 	WI_SIDEWINDER,
 	WI_AMRAAM,
 	WI_SPARROW,
@@ -889,7 +892,7 @@ void MF_calculateAllDefaultLoadouts();
 void MF_getDefaultLoadoutForVehicle( int idx, completeLoadout_t* loadout );
 void MF_getLoadoutFromAmmo( int idx, completeLoadout_t* loadout, unsigned int ammo[8] );
 qboolean MF_removeWeaponFromLoadout( int weaponIndex, completeLoadout_t* loadout, char* usedTag, vec3_t pos, qboolean nextMount );
-qboolean MF_addWeaponToLoadout( int weaponIndex, completeLoadout_t* loadout );
+int MF_addWeaponToLoadout( int weaponIndex, completeLoadout_t* loadout );
 
 #define MF_THROTTLE_REVERSE		-5
 #define MF_THROTTLE_IDLE		0

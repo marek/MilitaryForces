@@ -1,5 +1,5 @@
 /*
- * $Id: cg_weapons.c,v 1.15 2002-02-23 23:07:07 thebjoern Exp $
+ * $Id: cg_weapons.c,v 1.16 2002-02-24 19:39:51 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -472,6 +472,7 @@ void CG_MissileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_t di
 		break;
 
 	case WI_MK82:
+	case WI_MK84:
 		mod = cgs.media.dishFlashModel;
 		shader = cgs.media.rocketExplosionShader[1];
 		sfx = cgs.media.sfx_rockexp;

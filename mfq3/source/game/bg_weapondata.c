@@ -1,5 +1,5 @@
 /*
- * $Id: bg_weapondata.c,v 1.13 2002-02-24 16:52:12 thebjoern Exp $
+ * $Id: bg_weapondata.c,v 1.14 2002-02-24 19:39:51 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -548,6 +548,45 @@ completeWeaponData_t availableWeapons[] =
 		"Mk82",								// descriptiveName
 		"IRON BOMBS",						// shortName
 		"BAD SHIT",							// shortName2 (GVs)
+		"models/weapons/ag_250_d.md3",		// modelName
+		0,									// handle
+		"models/weapons/vwep_ag_250_d.md3",	// vwepName
+		0,									// handle
+		"hud/iconw_bmb.tga",				// iconName
+		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
+		0,									// muzzleVelocity
+		0,									// range
+		0,									// fuelrange
+		200,								// fire interval
+		100,								// damage
+		100,								// damageRadius
+		1,									// spread
+		2,									// barrels
+		0,									// barrelDistance
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_BOMBMODE,						// crosshair
+		CH_BOMBMODE,						// crosshair track
+		CH_BOMBMODE,						// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
+		1,									// number per package
+		PT_H|PT_M,							// fits on pylon
+		0,									// flags
+	},
+
+
+	// iron bombs
+	{ 
+		WT_IRONBOMB,						// type
+		MF_GAMESET_ANY,						// gameset
+		"Mk84",								// descriptiveName
+		"IRON BOMBS",						// shortName
+		"BAD SHIT",							// shortName2 (GVs)
 		"models/weapons/ag_800_d.md3",		// modelName
 		0,									// handle
 		"models/weapons/vwep_ag_800_d.md3",	// vwepName
@@ -560,8 +599,8 @@ completeWeaponData_t availableWeapons[] =
 		0,									// range
 		0,									// fuelrange
 		200,								// fire interval
-		200,								// damage
-		120,								// damageRadius
+		250,								// damage
+		150,								// damageRadius
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.32 2002-02-24 16:52:12 thebjoern Exp $
+ * $Id: bg_vehicledata.c,v 1.33 2002-02-24 19:39:51 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -8,6 +8,7 @@
 // eek!
 completeLoadout_t defaultLoadout =
 {
+	{0,0,0,0,0,0,0,0},
 	{0,0,0,0,0,0,0,0},
 	{0,0,0,0,0,0,0,0},
 	{0,0,0,0,0,0,0,0},
@@ -161,7 +162,7 @@ completeVehicleData_t availableVehicles[] =
 	3,							// gearheight
 	0,							// tailangle
 	WI_MG_20MM, WI_SIDEWINDER, WI_AMRAAM, WI_FFAR, WI_MK82, 0, 0, WI_FLARE,		// weapons
-	450, 2, 2, 38, 2, 0, 0, 28,	// ammo
+	450, 2, 2, 38, 6, 0, 0, 28,	// ammo
 	0,0,0,0,0,0,0,0,			// turret
 	PT_WING_L,PT_WING_L,PT_WING_H,PT_WING_H,0,0,0,0,// pylons
 	{19, 0, 5},					// cameraposition for cockpit view
@@ -177,6 +178,56 @@ completeVehicleData_t availableVehicles[] =
 	47,							// max bay frame
 	0,							// renderflags
 	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
+    },
+
+    {	"A-10 Thunderbolt II",  // descriptiveName
+	"A-10",						// tinyName
+	"a10",						// modelName
+	SHADOW_DEFAULT,				// alpha shadow
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_2,
+	CAT_PLANE,
+	CLASS_PLANE_BOMBER,
+	0,							// flags
+	HC_GEAR|HC_SPEEDBRAKE|
+	HC_VAPOR|HC_DUALGUNS,		// capabilities
+	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
+	{-24, -16, -1.5},			// mins (bounding box)
+	{36, 16, 11},				// max (bounding box)
+	{70, 80, 300},				// turnspeed around the three axis
+	{0, 100, 70},				// camera distance {min,max,default}
+	{0, 100, 20},				// camera height {min,max,default}
+	170,						// stallspeed
+	620,						// maxspeed
+	0,							// min throttle
+	10,							// max throttle
+	2,							// engines
+	0,							// wheels
+	0,							// wheel circumference
+	270,						// acceleration
+	100,						// health
+	{26.25f, -0.94f, 1.811f},	// gun tag
+	80,							// max fuel
+	3,							// gearheight
+	0,							// tailangle
+	WI_MG_2X20MM, WI_AMRAAM, WI_SIDEWINDER, WI_FFAR, 0, 0, 0, WI_FLARE,	// weapons
+	500, 2, 2, 38, 0, 0, 0, 32,		// ammo
+	0,0,0,0,0,0,0,0,			// turret
+	0,0,0,0,0,0,0,0,			// pylons
+	{11, 0, 5},					// cameraposition for cockpit view
+	0,							// effect model
+	6000,						// radar range
+	2000,						// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
+	0,							// swingangle
+	1400,						// geartime
+	47,							// max gear frame
+	1000,						// baytime
+	47,							// max bay frame
+	0,							// renderflags
+	{5,0,34,26},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
     },
 
@@ -474,7 +525,7 @@ completeVehicleData_t availableVehicles[] =
 	1400,						// geartime
 	47,							// max gear frame
 	100,						// baytime
-	4,							// max bay frame
+	47,							// max bay frame
 	0,							// renderflags
 	{3,0,76,76},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
