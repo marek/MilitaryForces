@@ -36,3 +36,4 @@ call ..\compile ../../game/bg_loadouts.c
 q3asm -f ../ui
 :quit
 cd ..
+x
