@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.27 2002-05-15 10:12:25 sparky909_uk Exp $
+ * $Id: ui_main.c,v 1.28 2002-05-29 12:46:11 sparky909_uk Exp $
 */
 /*
 =======================================================================
@@ -3434,7 +3434,7 @@ static void UI_InitialiseUI( void )
 		char * pLineEnd = NULL;
 
 		// read in the entire credits file
-		uiInfo.pCreditsData = malloc( fileSize );
+		uiInfo.pCreditsData = UI_Alloc( fileSize );
 		pCredits = (char *)uiInfo.pCreditsData;
 		trap_FS_Read( pCredits, fileSize, creditsFile );
 	
