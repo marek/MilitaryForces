@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.28 2002-02-11 12:20:42 sparky909_uk Exp $
+ * $Id: cg_local.h,v 1.29 2002-02-14 12:02:19 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -34,6 +34,8 @@ typedef enum {
 // so there is NO persistant data between levels on the client side.
 // If you absolutely need something stored, it can either be kept
 // by the server in the server stored userinfos, or stashed in a cvar.
+
+#define	MAX_RETICLES		2
 
 #define	POWERUP_BLINKS		5
 
@@ -389,6 +391,14 @@ typedef struct {
 	int				itemNum;
 } powerupInfo_t;
 
+// reticle structure passed to the HUD code for rendering
+typedef struct {
+	int x;
+	int y;
+	int w;
+	int h;
+	qhandle_t shader;
+} reticle_t;
 
 #define MAX_REWARDSTACK		10
 #define MAX_SOUNDBUFFER		20
@@ -577,6 +587,9 @@ typedef struct {
 	refdef_t		HUDCamera;
 	int				CameraMode;
 	int				CameraModeTime;
+	qboolean		drawingMFD;
+	reticle_t		HUDReticle[ MAX_RETICLES ];
+	int				reticleIdx;
 } cg_t;
 
 
@@ -597,8 +610,16 @@ typedef enum {
 } HUDColors_t;
 
 typedef enum {
-	HR_GUIDED_ENEMY,
-	HR_GUIDED_FRIEND,
+	HR_GUIDED_WHITE,
+	HR_TRACKING_FRIEND,
+	HR_TRACKING_ENEMY,
+	HR_LOCKED_FRIEND,
+	HR_LOCKED_ENEMY,
+	HR_GUIDED,
+	HR_UNGUIDED_AND_GUN,
+	HR_BOMB,
+	HR_TARGET_FRIEND,
+	HR_TARGET_ENEMY,
 	HR_MAX
 } HUDReticles_t;
 
@@ -1065,9 +1086,8 @@ void CG_TestModelPrevSkin_f (void);
 void CG_ZoomDown_f( void );
 void CG_ZoomUp_f( void );
 void CG_AddBufferedSound( sfxHandle_t sfx);
-
 void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demoPlayback );
-
+qboolean CG_WorldToScreenCoords( vec3_t worldPoint, int * pX, int * pY );
 
 //
 // cg_drawtools.c
@@ -1098,6 +1118,12 @@ void CG_DrawSides(float x, float y, float w, float h, float size);
 void CG_DrawTopBottom(float x, float y, float w, float h, float size);
 
 qboolean CG_GenericShadow( centity_t *cent, float *shadowPlane );
+
+vec4_t * CG_CreateColourVector( float r, float g, float b, float a, vec4_t * pVector );
+unsigned char * CG_CreateColourChar( unsigned char r, unsigned char g, unsigned char b, unsigned char a, unsigned char * pArray );
+
+void CG_ResetReticles( void );
+void CG_AddReticleEntityToScene( refEntity_t * pReticle, qboolean targetRecticle );
 
 //
 // cg_draw.c, cg_newDraw.c
@@ -1140,7 +1166,6 @@ qhandle_t CG_StatusHandle(int task);
 void CG_DrawStringNew( int x, int y, float scale, vec4_t colour, const char * pText, int unknown, int hSpacing, int style, textJustify_t formatting );
 void CG_DrawStringNewAlpha( int x, int y, const char * pText, float alpha, textJustify_t formatting );
 void CG_DrawStringNewColour( int x, int y, const char * pText, vec4_t colour, textJustify_t formatting );
-vec4_t * CG_CreateColour( float r, float g, float b, float a );
 
 void CG_DrawStatusBar_MFQ3();
 void CG_DrawStatusBar_MFQ3_new();

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.28 2002-02-12 11:30:21 sparky909_uk Exp $
+ * $Id: cg_main.c,v 1.29 2002-02-14 12:02:19 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -208,7 +208,7 @@ cvarTable_t		cvarTable[] = {
 //	{ &cg_drawCrosshair, "cg_drawCrosshair", "4", CVAR_ARCHIVE },
 	{ &cg_drawCrosshairNames, "cg_drawCrosshairNames", "1", CVAR_ARCHIVE },
 	{ &cg_drawRewards, "cg_drawRewards", "1", CVAR_ARCHIVE },
-	{ &cg_crosshairSize, "cg_crosshairSize", "24", CVAR_ARCHIVE },
+	{ &cg_crosshairSize, "cg_crosshairSize", "1", CVAR_ARCHIVE },	// default: small
 	{ &cg_crosshairX, "cg_crosshairX", "0", CVAR_ARCHIVE },
 	{ &cg_crosshairY, "cg_crosshairY", "0", CVAR_ARCHIVE },
 	{ &cg_simpleItems, "cg_simpleItems", "0", CVAR_ARCHIVE },
@@ -873,6 +873,14 @@ static void CG_RegisterGraphics( void ) {
 	static char		*mfq3_hudrets[HR_MAX] = {
 		"newhud/reticle/reticle1.tga",
 		"newhud/reticle/reticle2.tga",
+		"newhud/reticle/reticle3.tga",
+		"newhud/reticle/reticle4.tga",
+		"newhud/reticle/reticle5.tga",
+		"newhud/reticle/reticle6.tga",
+		"newhud/reticle/reticle7.tga",
+		"newhud/reticle/reticle8.tga",
+		"newhud/reticle/reticle9.tga",
+		"newhud/reticle/reticle10.tga"
 	};
 
 	// clear any references to old media
@@ -1438,8 +1446,7 @@ void CG_LoadMenus(const char *menuFile) {
 		}
 	}
 
-	Com_Printf("UI menu load time = %d milli seconds\n", trap_Milliseconds() - start);
-
+//	Com_Printf("UI menu load time = %d milli seconds\n", trap_Milliseconds() - start);
 }
 
 /*

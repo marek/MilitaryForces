@@ -1,5 +1,5 @@
 /*
- * $Id: cg_view.c,v 1.7 2002-02-12 11:08:10 sparky909_uk Exp $
+ * $Id: cg_view.c,v 1.8 2002-02-14 12:02:19 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -606,3 +606,69 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	}
 }
 
+#define DTOR 0.01745329252
+
+/*
+=================
+CG_WorldToScreenCoords
+
+Converts a world vector point into screen coords
+=================
+*/
+qboolean CG_WorldToScreenCoords( vec3_t worldPoint, int * pX, int * pY )
+{
+	vec3_t v, dp, n, p;
+	float tanthetah, tanthetav;
+	float d, cv, ch, w, h;
+	float zoom = 1.0f;
+
+	// move to local coords
+	v[0] = worldPoint[0] - cg.refdef.vieworg[0];
+	v[1] = worldPoint[1] - cg.refdef.vieworg[1];
+	v[2] = worldPoint[2] - cg.refdef.vieworg[2];
+
+	// apply current view axis
+	dp[0] = DotProduct( v, cg.refdef.viewaxis[1] );
+	dp[1] = DotProduct( v, cg.refdef.viewaxis[0] );
+	dp[2] = DotProduct( v, cg.refdef.viewaxis[2] );
+
+	// don't continue if point is behind out view plane
+	if( dp[1] < 0 )
+	{
+		return qfalse;
+	}
+
+	// calc FOV adjustments
+	tanthetah = tan( cg.refdef.fov_x * DTOR / 2);
+	tanthetav = tan( cg.refdef.fov_y * DTOR / 2);
+
+	// create the normalised vector
+	d = zoom / dp[1];
+	n[0] = d * dp[0] / tanthetah;
+	n[1] = dp[1];
+	n[2] = d * dp[2] / tanthetav;
+
+	// work out viewport
+	w = cg.refdef.width;
+	h = cg.refdef.height;
+	cv = h * 0.5f;
+	ch = w * 0.5f;
+		
+	// valid?
+	if( n[0] >= -1 && n[0] <= +1 && n[2] >= -1 && n[2] <= +1 )
+	{
+	   p[0] = ch - w * n[0] / 2;
+	   p[1] = cv - h * n[2] / 2;
+	   p[2] = 0;
+
+	   // convert 
+	   *pX = (int)p[0];
+	   *pY = (int)p[1];
+
+	   // on-screen
+	   return qtrue;
+	}
+
+	// off-screen
+	return qfalse;
+}
