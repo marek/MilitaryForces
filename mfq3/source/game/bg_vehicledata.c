@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.47 2003-02-24 01:24:09 thebjoern Exp $
+ * $Id: bg_vehicledata.c,v 1.48 2003-03-18 22:06:02 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -2170,7 +2170,7 @@ groundInstallationData_t availableGroundInstallations[] =
 	{0,0,0,0,0,0,0,0,0,0},		// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box)
 	{0, 0, 0},					// max (bounding box)
-	{80, 80, 260},				// turnspeed around the three axis
+	{180, 180, 0},				// turnspeed around the three axis
 	290,						// maxgunpitch
 	10,							// mingunpitch
 	120,						// health
@@ -2180,7 +2180,8 @@ groundInstallationData_t availableGroundInstallations[] =
 	0,							// radar range ground
 	0,							// trackcone
 	1,							// trackcone ground
-	0							// upgrades
+	0,							// upgrades
+	6000						// reloadtime
     },
 
     {	"SAM Mk2",					// descriptiveName
@@ -2190,7 +2191,7 @@ groundInstallationData_t availableGroundInstallations[] =
 	{0,0,0,0,0,0,0,0,0,0},		// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box)
 	{0, 0, 0},					// max (bounding box)
-	{80, 80, 260},				// turnspeed around the three axis
+	{180, 180, 0},				// turnspeed around the three axis
 	290,						// maxgunpitch
 	10,							// mingunpitch
 	120,						// health
@@ -2200,7 +2201,8 @@ groundInstallationData_t availableGroundInstallations[] =
 	0,							// radar range ground
 	0,							// trackcone
 	1,							// trackcone ground
-	1							// upgrades
+	1,							// upgrades
+	6000						// reloadtime
     },
 
     {	"SAM Mk3",					// descriptiveName
@@ -2210,7 +2212,7 @@ groundInstallationData_t availableGroundInstallations[] =
 	{0,0,0,0,0,0,0,0,0,0},		// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box)
 	{0, 0, 0},					// max (bounding box)
-	{80, 80, 260},				// turnspeed around the three axis
+	{180, 180, 0},				// turnspeed around the three axis
 	290,						// maxgunpitch
 	10,							// mingunpitch
 	120,						// health
@@ -2220,7 +2222,8 @@ groundInstallationData_t availableGroundInstallations[] =
 	0,							// radar range ground
 	0,							// trackcone
 	1,							// trackcone ground
-	2							// upgrades
+	2,							// upgrades
+	6000						// reloadtime
     },
 
     {	"SAM Mk4",					// descriptiveName
@@ -2230,7 +2233,7 @@ groundInstallationData_t availableGroundInstallations[] =
 	{0,0,0,0,0,0,0,0,0,0},		// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box)
 	{0, 0, 0},					// max (bounding box)
-	{80, 80, 260},				// turnspeed around the three axis
+	{180, 180, 0},				// turnspeed around the three axis
 	290,						// maxgunpitch
 	10,							// mingunpitch
 	120,						// health
@@ -2240,7 +2243,8 @@ groundInstallationData_t availableGroundInstallations[] =
 	0,							// radar range ground
 	0,							// trackcone
 	1,							// trackcone ground
-	3							// upgrades
+	3,							// upgrades
+	6000						// reloadtime
     },
 };
 

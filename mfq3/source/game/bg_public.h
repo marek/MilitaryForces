@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.115 2003-02-24 01:24:09 thebjoern Exp $
+ * $Id: bg_public.h,v 1.116 2003-03-18 22:06:00 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -842,6 +842,7 @@ typedef struct groundInstallationData_s
 	float			trackCone;		// how can radar track it
 	float			trackCone2;		// how can ground radar track it
 	unsigned int	upgrades;		// for larger models (for double, triple etc load);
+	int				reloadTime;		// how long after last firing it takes to reload a weapon
 } groundInstallationData_t;
 
 extern groundInstallationData_t availableGroundInstallations[];

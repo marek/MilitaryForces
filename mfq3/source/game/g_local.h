@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.32 2003-02-24 01:24:10 thebjoern Exp $
+ * $Id: g_local.h,v 1.33 2003-03-18 22:06:05 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -188,9 +188,9 @@ struct gentity_s {
 	int			 currentEventToSend;
 	int			 currentEventToAdd;
 	event_t		 eventQueue[MAX_EVENT_QUEUE_SIZE];
-	vec3_t		 gi_targetHeading;// for ground installations
 	int			 gi_nextScanTime;
-
+	float		 gi_lockangle;
+	int			 gi_reloadTime;
 };
 
 
@@ -645,7 +645,7 @@ void fire_ironbomb (gentity_t *self);
 void fire_autocannon (gentity_t *self, qboolean main);
 void fire_maingun (gentity_t *self);
 void fire_flare (gentity_t *self);
-
+void LaunchMissile_GI( gentity_t* ent );
 
 //
 // g_mover.c

@@ -1,13 +1,31 @@
 /*
- * $Id: g_groundinstallation.c,v 1.2 2003-02-24 01:24:10 thebjoern Exp $
+ * $Id: g_groundinstallation.c,v 1.3 2003-03-18 22:06:05 thebjoern Exp $
 */
 
 #include "g_local.h"
 
-static void Find_GI_Targets( gentity_t* ent )
+
+
+
+
+
+static void loselock( gentity_t* ent )
 {
-	vec3_t			mins, maxs, rangevec, dir, bestdir;
-	float			range = availableGroundInstallations[ent->s.modelindex].radarRange;
+	// update target
+	if( ent->tracktarget && ent->tracktarget->client ) {
+		ent->tracktarget->client->ps.stats[STAT_LOCKINFO] &= ~LI_BEING_LOCKED;
+	}
+	ent->locktime = 0;
+	ent->tracktarget = 0;
+	ent->s.tracktarget = ENTITYNUM_NONE;
+	ent->gi_nextScanTime = level.time + 1500;
+	ent->gi_reloadTime = level.time + availableGroundInstallations[ent->s.modelindex2].reloadTime;
+}
+
+static void Update_GI_Targets( gentity_t* ent )
+{
+	vec3_t			mins, maxs, rangevec, dir;
+	float			range = availableGroundInstallations[ent->s.modelindex2].radarRange;
 	int				i, num, touch[MAX_GENTITIES];
 	gentity_t		*hit, *best = 0;
 	float			dist, closest;
@@ -15,7 +33,9 @@ static void Find_GI_Targets( gentity_t* ent )
 	trace_t			tr;
 
 	// anti air missiles
-	if( availableWeapons[ent->s.weaponIndex].type & WT_ANTIAIRMISSILE )
+	if( ent->count > 0 && 
+		ent->s.weaponIndex > -1 &&
+		(availableWeapons[ent->s.weaponIndex].type & WT_ANTIAIRMISSILE) )
 	{
 		// no target yet
 		if( !ent->tracktarget )
@@ -28,20 +48,20 @@ static void Find_GI_Targets( gentity_t* ent )
 				VectorAdd( ent->r.currentOrigin, rangevec, maxs );
 				num = trap_EntitiesInBox( mins, maxs, touch, MAX_GENTITIES );
 
+				//Com_Printf("GI scanning...%d\n", num);
 				for ( i=0 ; i<num ; i++ ) 
 				{
 					hit = &g_entities[touch[i]];
+					// alive ?
+					if( !hit->inuse || hit->health <= 0 ) continue;
 					// determine category
 					if( hit->s.eType == ET_VEHICLE && hit->client )
-					{
 						cat = availableVehicles[hit->client->vehicle].cat;
-					}
 					else if( hit->s.eType == ET_MISC_VEHICLE &&
 							 hit->s.modelindex < 255 )	// not other sams
-					{
 						cat = availableVehicles[hit->s.modelindex].cat;
-					}
 					else continue;
+					//Com_Printf("%d: %s %d", i, hit->classname, cat );
 					// wrong category
 					if( !(cat & CAT_PLANE) && !(cat & CAT_HELO) ) continue;
 					// check LOS
@@ -55,13 +75,16 @@ static void Find_GI_Targets( gentity_t* ent )
 					{
 						best = hit;
 						closest = dist;
-						VectorCopy( dir, bestdir );
 					}
 				}
 				if( best )
 				{
+					ent->gi_lockangle = acos(availableWeapons[ent->s.weaponIndex].lockcone);
 					ent->tracktarget = best;
-					vectoangles(bestdir, ent->gi_targetHeading);
+					ent->locktime = level.time;
+					ent->s.tracktarget = best->s.number;
+					if( ent->tracktarget->client ) 
+						ent->tracktarget->client->ps.stats[STAT_LOCKINFO] |= LI_BEING_LOCKED;
 				}
 				else
 					ent->tracktarget = 0;
@@ -70,8 +93,38 @@ static void Find_GI_Targets( gentity_t* ent )
 		// fight current target
 		else
 		{
-
+			// check still exists
+			if( !ent->tracktarget->inuse ||
+				ent->tracktarget->health <= 0 )
+			{
+				loselock(ent);
+				return;
+			}
+			// armed ?
+			if( ent->count <= 0 )
+			{
+				loselock(ent);
+				return;
+			}
+			// check distance
+			VectorSubtract(ent->tracktarget->r.currentOrigin, ent->r.currentOrigin, dir);
+			if( VectorLength(dir) > range )
+			{
+				loselock(ent);
+				return;
+			}
+			// check LOS
+			trap_Trace( &tr, ent->r.currentOrigin, 0, 0, ent->tracktarget->r.currentOrigin, ent->s.number, MASK_ALL );
+			if( tr.fraction < 1 && tr.entityNum != ent->tracktarget->s.number ) 
+			{
+				loselock(ent);
+				return;
+			}
 		}
+	}
+	else if( ent->tracktarget )
+	{
+		loselock(ent);
 	}
 }
 
@@ -79,41 +132,82 @@ void GroundInstallation_Think( gentity_t* ent )
 {
 	float	diff, turnspeed;
 	float	timediff = level.time - ent->s.pos.trTime;
+	vec3_t	targdir, targangles;
+	int		locktime;
 
 //	Com_Printf("Ground installation think..\n");
 
-	if( ent->count > 0 && ent->s.weaponIndex > -1 ) // if it has weapons
-		Find_GI_Targets(ent);
+	Update_GI_Targets(ent);
 
 //	ent->s.angles2[ROLL] += 10;
 //	if( ent->s.angles2[ROLL] >= 360 )
 //		ent->s.angles2[ROLL] -= 360;
 
-	// clamp target
-	if( ent->gi_targetHeading[1] >= 360 ) ent->gi_targetHeading[1] -= 360;
-	else if( ent->gi_targetHeading[1] < 0 ) ent->gi_targetHeading[1] += 360;
-	if( ent->gi_targetHeading[0] < 90 && 
-		ent->gi_targetHeading[0] > availableGroundInstallations[ent->s.modelindex2].minpitch ) 
-		ent->gi_targetHeading[0] = availableGroundInstallations[ent->s.modelindex2].minpitch;
-	else if( ent->gi_targetHeading[0] > 270 &&
-		ent->gi_targetHeading[0] < availableGroundInstallations[ent->s.modelindex2].maxpitch )
-		ent->gi_targetHeading[0] = availableGroundInstallations[ent->s.modelindex2].maxpitch;
-	
-	// turn
-	diff = ent->gi_targetHeading[1] - ent->s.angles2[ROLL];
-	if( diff > 180 ) diff -= 360;
-	else if( diff < -180 ) diff += 360;
-	turnspeed = availableGroundInstallations[ent->s.modelindex2].turnspeed[1] * timediff / 1000;
-	if( turnspeed < abs(diff) )
+	if( ent->tracktarget )
 	{
-		if( diff > 0 )
-			ent->s.angles2[ROLL] += turnspeed;
+		//Com_Printf("Ground installation tracking...%s\n", ent->tracktarget->classname);
+
+		VectorSubtract(ent->tracktarget->r.currentOrigin, ent->r.currentOrigin, targdir);
+		vectoangles(targdir, targangles);
+		targangles[1] -= 90;
+
+		// clamp target
+		if( targangles[1] >= 360 ) targangles[1] -= 360;
+		else if( targangles[1] < 0 ) targangles[1] += 360;
+		if( targangles[0] < 90 && 
+			targangles[0] > availableGroundInstallations[ent->s.modelindex2].minpitch ) 
+			targangles[0] = availableGroundInstallations[ent->s.modelindex2].minpitch;
+		else if( targangles[0] > 270 &&
+			targangles[0] < availableGroundInstallations[ent->s.modelindex2].maxpitch )
+			targangles[0] = availableGroundInstallations[ent->s.modelindex2].maxpitch;
+		
+		// turn
+		diff = targangles[1] - ent->s.angles2[ROLL];
+		if( diff > 180 ) diff -= 360;
+		else if( diff < -180 ) diff += 360;
+		turnspeed = availableGroundInstallations[ent->s.modelindex2].turnspeed[1] * timediff / 1000;
+		if( turnspeed < abs(diff) )
+		{
+			if( diff > 0 )
+				ent->s.angles2[ROLL] += turnspeed;
+			else
+				ent->s.angles2[ROLL] -= turnspeed;
+		}
 		else
-			ent->s.angles2[ROLL] -= turnspeed;
+		{
+			ent->s.angles2[ROLL] = targangles[1];
+		}
+		if( diff <= ent->gi_lockangle )
+		{
+			if( ent->tracktarget->client )
+			{
+				if( ent->tracktarget->client->ps.ONOFF & OO_RADAR )
+					locktime = availableWeapons[ent->s.weaponIndex].lockdelay/2;
+				else
+					locktime = availableWeapons[ent->s.weaponIndex].lockdelay;
+			}
+			else
+			{
+				if( ent->s.ONOFF & OO_RADAR )
+					locktime = availableWeapons[ent->s.weaponIndex].lockdelay/2;
+				else
+					locktime = availableWeapons[ent->s.weaponIndex].lockdelay;
+			}
+			if( level.time > ent->locktime + locktime )
+			{
+				LaunchMissile_GI(ent);
+				ent->locktime = level.time;	// so it doesnt launch all of them instantly
+			}
+		}
+		else
+			ent->locktime = level.time;
 	}
-	else
+	else if( level.time > ent->gi_reloadTime && 
+			 ent->count < availableGroundInstallations[ent->s.modelindex2].ammo ) 
 	{
-		ent->s.angles2[ROLL] = ent->gi_targetHeading[1];
+		ent->count++;
+//		G_Printf("Reloading: %d\n", ent->count);
+		ent->gi_reloadTime = level.time + availableGroundInstallations[ent->s.modelindex2].reloadTime;
 	}
 
 	ent->nextthink = level.time + 50;
@@ -121,168 +215,3 @@ void GroundInstallation_Think( gentity_t* ent )
 	trap_LinkEntity (ent);
 }
 
-
-/*
-void Drone_Plane_Think( gentity_t* ent ) {
-
-	vec3_t		origin, angles, forward;
-	trace_t		tr;
-	vec3_t		bearing;
-	float		diff, turnspeed;
-	float		targroll;
-
-	// get current position
-	BG_EvaluateTrajectory( &ent->s.pos, level.time, origin );
-	BG_EvaluateTrajectory( &ent->s.apos, level.time, angles );
-
-	// trace a line from the previous position to the current position
-	trap_Trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, origin, ent->s.number, ent->clipmask );
-	VectorCopy( tr.endpos, ent->r.currentOrigin );
-	VectorCopy( angles, ent->r.currentAngles );
-
-	// check position relative to target
-	getTargetDirAndDist(ent);
-
-	if( ent->physicsBounce < 50 ) {
-		onWaypointEvent( ent );		
-		getTargetDirAndDist( ent );		
-	}
-
-	// check whether to change course (yaw/roll)
-	vectoangles( ent->pos1, bearing );
-	diff = bearing[1] - angles[1];
-	diff = AngleMod(diff);
-	if( diff ) {
-		// calc change
-		turnspeed = availableVehicles[ent->s.modelindex].turnspeed[1];
-		if( diff < -turnspeed ) ent->s.apos.trDelta[1] = -turnspeed;
-		else if( diff > turnspeed ) ent->s.apos.trDelta[1] = turnspeed;
-		else {
-			ent->s.apos.trBase[1] = bearing[1];
-			ent->s.apos.trDelta[1] = 0;
-			ent->s.apos.trTime = level.time;
-		}
-	}
-
-	// roll
-	turnspeed = availableVehicles[ent->s.modelindex].turnspeed[2];
-	if( diff > 1 ) targroll = -90;
-	else if( diff < -1 ) targroll = 90;
-	else targroll = 0;
-
-	diff = targroll - angles[2];
-
-	if( diff < -turnspeed ) ent->s.apos.trDelta[2] = -turnspeed;
-	else if( diff > turnspeed ) ent->s.apos.trDelta[2] = turnspeed;
-	else {
-		ent->s.apos.trBase[2] = targroll;
-		ent->s.apos.trDelta[2] = 0;	
-		ent->s.apos.trTime = level.time;
-	}
-
-
-	// check whether to change course (pitch)
-	diff = bearing[0] - angles[0];
-	diff = AngleMod(diff);
-	if( diff ) {
-		// calc change
-		turnspeed = availableVehicles[ent->s.modelindex].turnspeed[0];
-		if( diff > 270 && diff < 360 - turnspeed ) ent->s.apos.trDelta[0] = turnspeed;
-		else if( diff < 90 && diff > turnspeed ) ent->s.apos.trDelta[0] = turnspeed;
-		else {
-			ent->s.apos.trBase[0] = bearing[0];
-			ent->s.apos.trDelta[0] = 0;
-			ent->s.apos.trTime = level.time;
-		}
-	}
-
-	ent->nextthink = level.time + 100;
-	trap_LinkEntity (ent);
-
-	AngleVectors( angles, forward, 0, 0 );
-	VectorScale( forward, ent->speed, ent->s.pos.trDelta );
-	VectorCopy( tr.endpos, ent->s.pos.trBase );
-	ent->s.pos.trTime = level.time;
-}
-
-
-*/
-/*
-	if( ent->s.ONOFF & OO_LANDED ) {
-
-	} else {
-		vec3_t		origin, angles, forward;
-		trace_t		tr;
-		vec3_t		bearing;
-		float		diff, turnspeed;
-		float		targroll;
-		float		timediff = level.time - ent->s.pos.trTime;
-
-		// get current position
-		BG_EvaluateTrajectory( &ent->s.pos, level.time, origin );
-		BG_EvaluateTrajectory( &ent->s.apos, level.time, angles );
-
-		// trace a line from the previous position to the current position
-		trap_Trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, origin, ent->s.number, ent->clipmask );
-		VectorCopy( tr.endpos, ent->r.currentOrigin );
-
-		// check position relative to target
-		getTargetDirAndDist(ent);
-
-		if( ent->physicsBounce < 50 ) {
-			onWaypointEvent( ent );		
-			getTargetDirAndDist( ent );		
-		}
-
-		// check whether to change course (yaw/roll)
-		vectoangles( ent->pos1, bearing );
-		diff = bearing[1] - angles[1];
-		diff = AngleMod(diff);
-		if( diff ) {
-			// calc change
-			turnspeed = availableVehicles[ent->s.modelindex].turnspeed[1] * timediff / 1000;
-			if( diff < -turnspeed ) angles[1] -= turnspeed;
-			else if( diff > turnspeed ) angles[1] += turnspeed;
-			else angles[1] = bearing[1];
-		}
-
-		// roll
-		turnspeed = availableVehicles[ent->s.modelindex].turnspeed[2] * timediff / 1000;
-		if( diff > 1 ) targroll = -90;
-		else if( diff < -1 ) targroll = 90;
-		else targroll = 0;
-
-		diff = targroll - angles[2];
-
-		if( diff < -turnspeed ) angles[2] -= turnspeed;
-		else if( diff > turnspeed ) angles[2] += turnspeed;
-		else angles[2] = targroll;	
-
-
-		// check whether to change course (pitch)
-		diff = bearing[0] - angles[0];
-		diff = AngleMod(diff);
-		if( diff ) {
-			// calc change
-			turnspeed = availableVehicles[ent->s.modelindex].turnspeed[0] * timediff / 1000;
-			if( diff > 270 && diff < 360 - turnspeed ) angles[0] -= turnspeed;
-			else if( diff < 90 && diff > turnspeed ) angles[0] += turnspeed;
-			else angles[0] = bearing[0];
-		}
-
-		ent->nextthink = level.time + 50;
-		trap_LinkEntity (ent);
-
-		VectorCopy( angles, ent->s.angles );
-		VectorCopy( ent->s.angles, ent->s.apos.trBase );
-		VectorCopy( ent->s.angles, ent->r.currentAngles );
-		ent->s.apos.trTime = level.time;
-
-		AngleVectors( angles, forward, 0, 0 );
-		VectorScale( forward, ent->speed, ent->s.pos.trDelta );
-		VectorCopy( tr.endpos, ent->s.pos.trBase );
-		ent->s.pos.trTime = level.time;
-
-	}
-
-	*/

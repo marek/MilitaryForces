@@ -1,5 +1,5 @@
 /*
- * $Id: g_missile.c,v 1.19 2002-07-15 18:23:07 thebjoern Exp $
+ * $Id: g_missile.c,v 1.20 2003-03-18 22:06:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -816,4 +816,65 @@ void fire_flare( gentity_t *self ) {
 	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
 	VectorCopy (start, bolt->r.currentOrigin);
 }
+
+
+
+
+
+
+
+/*
+=================
+LaunchMissile_GI MFQ3
+=================
+*/
+void LaunchMissile_GI( gentity_t* ent )
+{
+	gentity_t	*bolt;
+	vec3_t		dir, start;
+
+	ent->count--;
+//	G_Printf("Launching GI missile....%d left\n", ent->count);
+
+	VectorCopy( ent->s.pos.trBase, start );
+	start[2] += 10;
+	VectorSubtract( ent->tracktarget->r.currentOrigin, ent->r.currentOrigin, dir );
+	VectorNormalize(dir);
+	SnapVector( start );
+
+	bolt = G_Spawn();
+	bolt->classname = "aam";
+	bolt->tracktarget = ent->tracktarget;
+	// update target
+	if( ent->tracktarget->client ) {
+		ent->tracktarget->client->ps.stats[STAT_LOCKINFO] |= LI_BEING_LAUNCHED;
+	}
+	bolt->followcone = availableWeapons[ent->s.weaponIndex].followcone;
+	bolt->speed = availableWeapons[ent->s.weaponIndex].muzzleVelocity;
+	bolt->wait = level.time + availableWeapons[ent->s.weaponIndex].fuelrange;
+	bolt->think = follow_target;
+	bolt->nextthink = level.time + 50;
+	bolt->s.pos.trType = TR_LINEAR;
+	VectorScale( dir, bolt->speed, bolt->s.pos.trDelta );
+	bolt->s.eType = ET_MISSILE;
+	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
+	bolt->s.weaponIndex = ent->s.weaponIndex;
+	bolt->r.ownerNum = ent->s.number;
+	bolt->parent = ent;
+	bolt->damage = bolt->splashDamage = availableWeapons[ent->s.weaponIndex].damage;
+	bolt->splashRadius = availableWeapons[ent->s.weaponIndex].damageRadius;
+	bolt->targetcat = availableWeapons[ent->s.weaponIndex].category;
+	bolt->catmodifier = availableWeapons[ent->s.weaponIndex].noncatmod;
+	bolt->range = availableWeapons[ent->s.weaponIndex].range;
+	bolt->methodOfDeath = MOD_FFAR;
+	bolt->splashMethodOfDeath = MOD_FFAR_SPLASH;
+	bolt->clipmask = MASK_SHOT|MASK_WATER;
+	bolt->target_ent = NULL;
+
+	bolt->s.pos.trTime = level.time;// - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
+	VectorCopy( start, bolt->s.pos.trBase );
+	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
+	VectorCopy (start, bolt->r.currentOrigin);
+}
+
 
