@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicle.c,v 1.10 2002-02-18 17:31:28 sparky909_uk Exp $
+ * $Id: cg_vehicle.c,v 1.11 2002-02-19 13:28:53 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -139,7 +139,7 @@ static void CG_CacheGroundVehicle(int index)
 	}
 
 	// only thing that always has to be there is body
-	if( !availableVehicles[index].handle[BP_PLANE_BODY] ) {
+	if( !availableVehicles[index].handle[BP_GV_BODY] ) {
 		trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
 	}
 }
@@ -274,42 +274,24 @@ On startup cache it
 */
 
 static void CG_CacheBoat(int index)
-{/*
+{
 	char name[128];
 	char basename[128];
 	int i;
 
-	Com_sprintf( basename, sizeof(basename), "models/vehicles/ground/%s/%s", availableVehicles[index].modelName,
+	Com_sprintf( basename, sizeof(basename), "models/vehicles/sea/%s/%s", availableVehicles[index].modelName,
 			availableVehicles[index].modelName );
 // changed mg
-	for( i = 0; i < BP_GV_MAX_PARTS; i++ ) {
+	for( i = 0; i < BP_BOAT_MAX_PARTS; i++ ) {
 		switch(i) {
-		case BP_GV_BODY:
+		case BP_BOAT_BODY:
 			Com_sprintf( name, sizeof(name), "%s.md3", basename );
 			break;
-		case BP_GV_TURRET:
+		case BP_BOAT_TURRET:
 			Com_sprintf( name, sizeof(name), "%s_tur.md3", basename );
 			break;
-		case BP_GV_GUNBARREL:
+		case BP_BOAT_GUNBARREL:
 			Com_sprintf( name, sizeof(name), "%s_gun.md3", basename );
-			break;
-		case BP_GV_WHEEL:
-			Com_sprintf( name, sizeof(name), "%s_w1.md3", basename );
-			break;
-		case BP_GV_WHEEL2:
-			Com_sprintf( name, sizeof(name), "%s_w2.md3", basename );
-			break;
-		case BP_GV_WHEEL3:
-			Com_sprintf( name, sizeof(name), "%s_w3.md3", basename );
-			break;
-		case BP_GV_WHEEL4:
-			Com_sprintf( name, sizeof(name), "%s_w4.md3", basename );
-			break;
-		case BP_GV_WHEEL5:
-			Com_sprintf( name, sizeof(name), "%s_w5.md3", basename );
-			break;
-		case BP_GV_WHEEL6:
-			Com_sprintf( name, sizeof(name), "%s_w6.md3", basename );
 			break;
 		}
 		availableVehicles[index].handle[i] = trap_R_RegisterModel( name );
@@ -319,9 +301,9 @@ static void CG_CacheBoat(int index)
 	}
 
 	// only thing that always has to be there is body
-	if( !availableVehicles[index].handle[BP_PLANE_BODY] ) {
+	if( !availableVehicles[index].handle[BP_BOAT_BODY] ) {
 		trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
-	}*/
+	}
 }
 
 

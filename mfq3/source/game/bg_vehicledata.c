@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.22 2002-02-17 18:10:54 thebjoern Exp $
+ * $Id: bg_vehicledata.c,v 1.23 2002-02-19 13:28:54 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -1027,6 +1027,55 @@ completeVehicleData_t availableVehicles[] =
 	1000,						// baytime
 	47,							// max bay frame
 	0							// renderflags
+    },
+
+	// ---------------------------------------------
+	// Boats
+	// ---------------------------------------------
+
+    {	"Patrolboat",			// descriptiveName
+	"PBR31",						// tinyName
+	"pbr31mk2",					// modelName
+	SHADOW_DEFAULT,				// alpha shadow
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_1,
+	CAT_BOAT,
+	CLASS_BOAT_PATROL,
+	0,							// flags
+	HC_DUALGUNS,					// capabilities
+	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
+	{-16, -7, -3},				// mins (bounding box)
+	{16, 7, 6},					// max (bounding box)
+	{50, 100, 100},				// turnspeed around the three axis
+	{0, 100, 30},				// camera distance {min,max,default}
+	{0, 100, 10},				// camera height {min,max,default}
+	0,							// stallspeed
+	40,						    // maxspeed
+	-5,							// min throttle
+	10,						    // max throttle
+	1,							// engines
+	0,							// wheels
+	0,							// wheel circumference
+	15,							// acceleration
+	400,						// health
+	{5, 0, 8},					// gun tag
+	150,						// max fuel
+	335,						// max gun pitch (upwards = negative) <- gearheight
+	3,							// min gun pitch (downwards = positive) <- tailangle
+	WI_MG_12_7MM, WI_125MM_GUN, 0, 0, 0, 0, 0, WI_FLARE,// weapons
+	500, 40, 0, 0, 0, 0, 0, 20,	// ammo
+	{0, 0, 14},					// cameraposition for cockpit view
+	0,							// effect model
+	8000,						// radar range
+	4000,						// radar range ground
+	-1,							// trackcone
+	0,							// trackcone ground
+	0,							// swingangle
+	1400,						// geartime
+	47,							// max gear frame
+	1000,						// baytime
+	47,							// max bay frame
+	0							// renderflags
     }
 };
 
@@ -1157,9 +1206,9 @@ const char *cat_fileRef[MF_MAX_CATEGORIES+1] =
 	// categories
 	"Plane",
 	"GroundVehicle",
-	0,
-	0,
-	0,
+	"Helicopter",	// ok that way, Mark ?
+	"Infantry",
+	"Boat",
 	0,
 	0,
 	0,
@@ -1171,9 +1220,9 @@ const char *cat_items[MF_MAX_CATEGORIES+1] =
 	// categories
 	"Planes",
 	"Ground Vehicles",
-	0,
-	0,
-	0,
+	"Helicopters",
+	"Infantry",
+	"Boats",
 	0,
 	0,
 	0,
@@ -1234,10 +1283,10 @@ const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1] =
 		0
 	},
 
-	// free
+	// boats
 	{
-		0,
-		0,
+		"Patrol Boat",
+		"Transport Boat",
 		0,
 		0,
 		0,

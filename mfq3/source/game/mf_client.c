@@ -1,5 +1,5 @@
 /*
- * $Id: mf_client.c,v 1.7 2002-02-18 09:51:28 thebjoern Exp $
+ * $Id: mf_client.c,v 1.8 2002-02-19 13:28:54 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -338,7 +338,6 @@ void MF_ClientSpawn(gentity_t *ent) {
 			MF_Spawn_Plane( ent, vehIndex, landed );
 		} else if( availableVehicles[vehIndex].cat & CAT_GROUND ) {
 			
-			qboolean landed = qfalse;
 			trace_t	trace;
 			vec3_t	endpos;
 			gentity_t *test;
@@ -348,7 +347,6 @@ void MF_ClientSpawn(gentity_t *ent) {
 			trap_Trace (&trace, spawn_origin, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_ALL );
 			if( trace.entityNum != ENTITYNUM_NONE ) {
 				test = &g_entities[trace.entityNum];
-					landed = qtrue;
 					spawn_origin[2] = trace.endpos[2] - availableVehicles[vehIndex].mins[2] + 1;
 			}
 			MF_Spawn_GroundVehicle( ent, vehIndex );
@@ -357,6 +355,17 @@ void MF_ClientSpawn(gentity_t *ent) {
 		} else if( availableVehicles[vehIndex].cat & CAT_LQM ) {
 			MF_Spawn_LQM( ent, vehIndex );
 		} else if( availableVehicles[vehIndex].cat & CAT_BOAT ) {
+			trace_t	trace;
+			vec3_t	endpos;
+			gentity_t *test;
+			VectorCopy( spawn_origin, endpos );
+			endpos[2] -= 512;
+
+			trap_Trace (&trace, spawn_origin, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_ALL );
+			if( trace.entityNum != ENTITYNUM_NONE ) {
+				test = &g_entities[trace.entityNum];
+					spawn_origin[2] = trace.endpos[2];
+			}
 			MF_Spawn_Boat( ent, vehIndex );
 		}
 
@@ -456,7 +465,7 @@ void MF_ClientSpawn(gentity_t *ent) {
 	ClientThink( ent-g_entities );
 
 	// positively link the client, even if the command times are weird
-	if ( ent->client->sess.sessionTeam != TEAM_SPECTATOR ) {
+	if( ent->client->sess.sessionTeam != TEAM_SPECTATOR ) {
 		BG_PlayerStateToEntityState( &client->ps, &ent->s, qtrue );
 		VectorCopy( ent->client->ps.origin, ent->r.currentOrigin );
 		trap_LinkEntity( ent );
