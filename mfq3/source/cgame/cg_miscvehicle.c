@@ -1,5 +1,5 @@
 /*
- * $Id: cg_miscvehicle.c,v 1.12 2003-02-22 17:58:56 thebjoern Exp $
+ * $Id: cg_miscvehicle.c,v 1.13 2003-02-22 18:35:23 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -361,6 +361,9 @@ void CG_Misc_Vehicle( centity_t *cent )
 		cent->currentState.modelindex2 >= 0 &&
 		cent->currentState.modelindex2 < bg_numberOfGroundInstallations )
 	{
+		if( cg.radarTargets < MAX_RADAR_TARGETS && (cg.predictedPlayerEntity.currentState.ONOFF & OO_RADAR_GROUND)) {
+			cg.radarEnts[cg.radarTargets++] = cent;
+		}
 		CG_Misc_GI( cent );
 	}
 	// otherwise normal vehicle

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.33 2002-07-15 18:23:07 thebjoern Exp $
+ * $Id: cg_drawnewhud.c,v 1.34 2003-02-22 18:35:23 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -544,6 +544,7 @@ static void CG_DrawRadarSymbols_GROUND_new( int vehicle, float range, int x, int
 	int			icon;
 	int			drawnTargets = 0;
 	trace_t		res;
+	qboolean	groundinstallation = 0;
 
 	if( cg.RADARRangeSetting ) {
 		range /= (2 * cg.RADARRangeSetting);
@@ -572,10 +573,17 @@ static void CG_DrawRadarSymbols_GROUND_new( int vehicle, float range, int x, int
 		if( cg.radarEnts[i]->currentState.eFlags & EF_DEAD ) continue;
 
 		// vehicles
+		groundinstallation = 0;
 		if( !cg.radarEnts[i]->destroyableStructure ) {
 			// get other vehicle
 			if( cg.radarEnts[i]->currentState.eType == ET_MISC_VEHICLE ) {
-				otherveh = cg.radarEnts[i]->currentState.modelindex;
+				if( cg.radarEnts[i]->currentState.modelindex == 255 )	// ground installation
+				{
+					otherveh = cg.radarEnts[i]->currentState.modelindex2;	
+					groundinstallation = 1;
+				}
+				else													// other misc veh
+					otherveh = cg.radarEnts[i]->currentState.modelindex;
 			} else {
 				otherveh = cgs.clientinfo[cg.radarEnts[i]->currentState.clientNum].vehicle;
 			}
@@ -596,7 +604,8 @@ static void CG_DrawRadarSymbols_GROUND_new( int vehicle, float range, int x, int
 			angle = angles[1]-hdg;
 			if( angle > 360 ) angle -= 360;
 			else if( angle < 0 ) angle += 360;
-			if( angle >= 45 && angle <= 315 ) {
+			if( angle >= 45 && angle <= 315 ) 
+			{
 				if( !(cg.radarEnts[i]->currentState.ONOFF & OO_RADAR) ||	// radar off
 					( cg.radarEnts[i]->destroyableStructure &&	// or radar on and destroyable building
 					(cg.radarEnts[i]->currentState.ONOFF & OO_RADAR) ) ) continue;
@@ -609,26 +618,36 @@ static void CG_DrawRadarSymbols_GROUND_new( int vehicle, float range, int x, int
 			VectorScale( dir, dist, dir );
 
 			// check LOS and/or RADAR on
-			if( !(cg.radarEnts[i]->currentState.ONOFF & OO_RADAR) ) {
-
+			if( !(cg.radarEnts[i]->currentState.ONOFF & OO_RADAR) ) 
+			{
 				CG_Trace( &res, pos, NULL, NULL, otherpos, cg.snap->ps.clientNum, MASK_SOLID );
 				if( res.fraction < 1.0f ) continue;
 			}
 			// which icon (if at all, dont show lqms)
-			if( (availableVehicles[otherveh].cat & CAT_GROUND) ||
-				(availableVehicles[otherveh].cat & CAT_BOAT) ) {
+			if( groundinstallation )
+			{
 				icon = RD_GROUND_ENEMY;
-			} else {
+			}
+			else if( (availableVehicles[otherveh].cat & CAT_GROUND) ||
+					 (availableVehicles[otherveh].cat & CAT_BOAT) ) 
+			{
+				icon = RD_GROUND_ENEMY;
+			} 
+			else 
+			{
 				continue;
 			}
 			// friend or foe
-			if( cgs.gametype >= GT_TEAM ) {
+			if( cgs.gametype >= GT_TEAM ) 
+			{
 				if( cgs.clientinfo[cg.radarEnts[i]->currentState.clientNum].team ==
 					cgs.clientinfo[self->currentState.clientNum].team ) 
 					icon++;
 			}
 		// buildings
-		} else {
+		} 
+		else 
+		{
 			VectorCopy( cgs.inlineModelMidpoints[cg.radarEnts[i]->currentState.modelindex], otherpos );
 			// get dir and dist
 			VectorSet( pos1, otherpos[0], otherpos[1], 0 );

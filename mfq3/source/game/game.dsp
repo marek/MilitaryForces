@@ -187,6 +187,10 @@ SOURCE=.\g_droneutil.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\g_groundinstallation.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\g_groundvehicle.c
 # End Source File
 # Begin Source File

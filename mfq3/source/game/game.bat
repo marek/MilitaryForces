@@ -63,6 +63,8 @@ call ..\compile  ../g_droneground.c
 @if errorlevel 1 goto quit
 call ..\compile  ../g_droneplane.c
 @if errorlevel 1 goto quit
+call ..\compile  ../g_groundinstallation.c
+@if errorlevel 1 goto quit
 call ..\compile  ../g_waypoint.c
 @if errorlevel 1 goto quit
 call ..\compile  ../g_mfq3ents.c
