@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.28 2003-02-05 23:42:05 thebjoern Exp $
+ * $Id: bg_mfq3util.c,v 1.29 2003-02-06 11:59:00 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -779,7 +779,6 @@ void MF_ParseMissionScripts( char *buf,
 		}
 		else
 		{
-			continue;
 			Com_Printf(va(S_COLOR_RED "Invalid Token - parsing cancelled", token));
 			break;
 		}
