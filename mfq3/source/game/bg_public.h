@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.64 2002-02-19 13:28:54 thebjoern Exp $
+ * $Id: bg_public.h,v 1.65 2002-02-19 13:54:02 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -695,6 +695,20 @@ extern const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1];
 #define	SHADOW_DEFAULT	-1
 #define	SHADOW_NONE		-2
 
+enum ShadowCoords {
+	SHC_XOFFSET,
+	SHC_YOFFSET,
+	SHC_XADJUST,
+	SHC_YADJUST
+};
+
+enum ShadowOrientationAdjusts {
+	SHO_PITCHMAX,
+	SHO_ROLLMAX,
+	SHO_PITCHMOD,
+	SHO_ROLLMOD
+};
+
 // list of vehicles (data)
 typedef struct completeVehicleData_s
 {
@@ -742,6 +756,8 @@ typedef struct completeVehicleData_s
 	unsigned int	bayTime;		// time it takes bay to operate
 	unsigned int	maxBayFrame;	// number of bay animation frames
 	unsigned int	renderFlags;	// special stuff for rendering only
+	vec4_t			shadowCoords;	// shadow apply coords { offsetX, offsetY, xAdjust, yAdjust }
+	vec4_t			shadowAdjusts;	// shadow apply adjustments { pitchMax, rollMax, pitchMod, rollMod }
 }completeVehicleData_t;
 
 extern completeVehicleData_t availableVehicles[];

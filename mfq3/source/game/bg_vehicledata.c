@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.23 2002-02-19 13:28:54 thebjoern Exp $
+ * $Id: bg_vehicledata.c,v 1.24 2002-02-19 13:54:02 sparky909_uk Exp $
 */
 
 #include "q_shared.h"
@@ -54,7 +54,9 @@ completeVehicleData_t availableVehicles[] =
 	47,							// max gear frame
 	1000,						// baytime
 	47,							// max bay frame
-	0							// renderflags
+	0,							// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
     },
 
     {	"Saab JAS 39 Gripen",    // descriptiveName
@@ -100,7 +102,9 @@ completeVehicleData_t availableVehicles[] =
 	47,							// max gear frame
 	1000,						// baytime
 	47,							// max bay frame
-	0							// renderflags
+	0,							// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
     },
 
     {	"Harrier GR-7",		    // descriptiveName
@@ -146,7 +150,9 @@ completeVehicleData_t availableVehicles[] =
 	69,							// max gear frame
 	1000,						// baytime
 	47,							// max bay frame
-	0							// renderflags
+	0,							// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
     },
 
     {	"F-5 Tiger",		    // descriptiveName
@@ -192,7 +198,9 @@ completeVehicleData_t availableVehicles[] =
 	47,							// max gear frame
 	1000,						// baytime
 	47,							// max bay frame
-	0							// renderflags
+	0,							// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
     },
 
     {	"F-15 Eagle",		    // descriptiveName
@@ -238,7 +246,9 @@ completeVehicleData_t availableVehicles[] =
 	47,							// max gear frame
 	1000,						// baytime
 	47,							// max bay frame
-	MFR_DUALPILOT|MFR_BIGVAPOR	// renderflags
+	MFR_DUALPILOT|MFR_BIGVAPOR,	// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
     },
 
     {	"F-14 Tomcat",		    // descriptiveName
@@ -284,7 +294,9 @@ completeVehicleData_t availableVehicles[] =
 	47,							// max gear frame
 	1000,						// baytime
 	47,							// max bay frame
-	MFR_DUALPILOT|MFR_BIGVAPOR	// renderflags
+	MFR_DUALPILOT|MFR_BIGVAPOR,	// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
     },
 
     {	"F-18 Hornet",		    // descriptiveName
@@ -330,7 +342,9 @@ completeVehicleData_t availableVehicles[] =
 	47,							// max gear frame
 	1000,						// baytime
 	47,							// max bay frame
-	0							// renderflags
+	0,							// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
     },
 
     {	"F-22 Raptor",		    // descriptiveName
@@ -376,7 +390,9 @@ completeVehicleData_t availableVehicles[] =
 	47,							// max gear frame
 	1000,						// baytime
 	47,							// max bay frame
-	0							// renderflags
+	0,							// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
     },
 
     {	"B-2 Spirit",		    // descriptiveName
@@ -422,7 +438,9 @@ completeVehicleData_t availableVehicles[] =
 	47,							// max gear frame
 	1000,						// baytime
 	47,							// max bay frame
-	0							// renderflags
+	0,							// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
     },
 
     {	"P-51d Mustang",		// descriptiveName
@@ -469,7 +487,9 @@ completeVehicleData_t availableVehicles[] =
 	47,							// max gear frame
 	1000,						// baytime
 	47,							// max bay frame
-	0							// renderflags
+	0,							// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
     },
 
     {	"Spitfire Mk 5b",		// descriptiveName
@@ -516,7 +536,9 @@ completeVehicleData_t availableVehicles[] =
 	47,							// max gear frame
 	1000,						// baytime
 	47,							// max bay frame
-	0							// renderflags
+	0,							// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
     },
 
     {	"Messerschmitt Bf-109g",// descriptiveName
@@ -563,7 +585,9 @@ completeVehicleData_t availableVehicles[] =
 	47,							// max gear frame
 	1000,						// baytime
 	47,							// max bay frame
-	0							// renderflags
+	0,							// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
     },
 
     {	"Focke-Wulf Fw190 A8",// descriptiveName
@@ -610,7 +634,9 @@ completeVehicleData_t availableVehicles[] =
 	47,							// max gear frame
 	1000,						// baytime
 	47,							// max bay frame
-	0							// renderflags
+	0,							// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
     },
 
 
@@ -658,8 +684,10 @@ completeVehicleData_t availableVehicles[] =
 	47,							// max gear frame
 	500,						// baytime
 	19,							// max bay frame
-	0							// renderflags
-    },
+	0,							// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
+	},
 
     {	"Fokker Dr.1",			// descriptiveName
 	"Fokker",					// tinyName
@@ -705,7 +733,9 @@ completeVehicleData_t availableVehicles[] =
 	47,							// max gear frame
 	1000,						// baytime
 	47,							// max bay frame
-	0							// renderflags
+	0,							// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
     },
 
     {	"Sopwith camel",		// descriptiveName
@@ -752,7 +782,9 @@ completeVehicleData_t availableVehicles[] =
 	47,							// max gear frame
 	1000,						// baytime
 	47,							// max bay frame
-	0							// renderflags
+	0,							// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
     },
 
 	// ---------------------------------------------
@@ -801,7 +833,9 @@ completeVehicleData_t availableVehicles[] =
 	47,							// max gear frame
 	1000,						// baytime
 	47,							// max bay frame
-	0							// renderflags
+	0,							// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
     },
 
     {	"T-90",					// descriptiveName
@@ -846,7 +880,9 @@ completeVehicleData_t availableVehicles[] =
 	47,							// max gear frame
 	1000,						// baytime
 	47,							// max bay frame
-	0							// renderflags
+	0,							// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
     },
 
     {	"BMP 3",				// descriptiveName
@@ -891,7 +927,9 @@ completeVehicleData_t availableVehicles[] =
 	47,							// max gear frame
 	1000,						// baytime
 	47,							// max bay frame
-	0							// renderflags
+	0,							// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
     },
 
     {	"Hummer",				// descriptiveName
@@ -936,7 +974,9 @@ completeVehicleData_t availableVehicles[] =
 	47,							// max gear frame
 	1000,						// baytime
 	47,							// max bay frame
-	0							// renderflags
+	0,							// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
     },
 
     {	"BRDM 2",				// descriptiveName
@@ -981,7 +1021,9 @@ completeVehicleData_t availableVehicles[] =
 	47,							// max gear frame
 	1000,						// baytime
 	47,							// max bay frame
-	0							// renderflags
+	0,							// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
     },
 
     {	"Panzer III",			// descriptiveName
@@ -1026,7 +1068,9 @@ completeVehicleData_t availableVehicles[] =
 	47,							// max gear frame
 	1000,						// baytime
 	47,							// max bay frame
-	0							// renderflags
+	0,							// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
     },
 
 	// ---------------------------------------------
@@ -1034,7 +1078,7 @@ completeVehicleData_t availableVehicles[] =
 	// ---------------------------------------------
 
     {	"Patrolboat",			// descriptiveName
-	"PBR31",						// tinyName
+	"PBR31",					// tinyName
 	"pbr31mk2",					// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
@@ -1042,7 +1086,7 @@ completeVehicleData_t availableVehicles[] =
 	CAT_BOAT,
 	CLASS_BOAT_PATROL,
 	0,							// flags
-	HC_DUALGUNS,					// capabilities
+	HC_DUALGUNS,				// capabilities
 	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
 	{-16, -7, -3},				// mins (bounding box)
 	{16, 7, 6},					// max (bounding box)
@@ -1075,7 +1119,9 @@ completeVehicleData_t availableVehicles[] =
 	47,							// max gear frame
 	1000,						// baytime
 	47,							// max bay frame
-	0							// renderflags
+	0,							// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
     }
 };
 
