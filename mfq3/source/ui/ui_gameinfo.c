@@ -1,5 +1,5 @@
 /*
- * $Id: ui_gameinfo.c,v 1.3 2002-01-19 02:24:03 thebjoern Exp $
+ * $Id: ui_gameinfo.c,v 1.4 2002-02-22 18:05:22 sparky909_uk Exp $
 */
 //
 // gameinfo.c
@@ -110,6 +110,19 @@ static void UI_LoadArenasFromFile( char *filename ) {
 
 /*
 ===============
+UI_AlphabeticMapNameQsortCompare
+
+Used to sort the maps into alphabetic order
+===============
+*/
+int UI_AlphabeticMapNameQsortCompare( const void * arg1, const void * arg2 )
+{
+   /* Compare all of both strings: */
+   return _stricmp( ((mapInfo *) arg1)->mapName, ((mapInfo *) arg2)->mapName );
+}
+
+/*
+===============
 UI_LoadArenas
 ===============
 */
@@ -212,6 +225,9 @@ void UI_LoadArenas( void ) {
 			break;
 		}
 	}
+
+	// perform an alphabetic sort on the map names
+	qsort( &uiInfo.mapList[0], uiInfo.mapCount, sizeof( mapInfo ), UI_AlphabeticMapNameQsortCompare );
 }
 
 
