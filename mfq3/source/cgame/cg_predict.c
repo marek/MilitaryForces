@@ -1,5 +1,5 @@
 /*
- * $Id: cg_predict.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: cg_predict.c,v 1.2 2003-02-11 00:25:09 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -547,6 +547,7 @@ void CG_PredictPlayerState( void ) {
 
 		// MFQ3 vehicle
 		cg_pmove.vehicle = cg_vehicle.integer;
+		cg_pmove.advancedControls = cg_advanced.integer;
 
 		Pmove (&cg_pmove);
 

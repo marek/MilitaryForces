@@ -1,5 +1,5 @@
 /*
- * $Id: q_shared.h,v 1.11 2002-06-13 20:08:13 thebjoern Exp $
+ * $Id: q_shared.h,v 1.12 2003-02-11 00:25:11 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -514,6 +514,9 @@ float	Q_crandom( int *seed );
 
 void vectoangles( const vec3_t value1, vec3_t angles);
 void AnglesToAxis( const vec3_t angles, vec3_t axis[3] );
+
+int AxisToAngles( const vec3_t forward, const vec3_t right, const vec3_t up, vec3_t angles);
+float AxisToRoll( const vec3_t forward, const vec3_t right, const vec3_t up);
 
 void AxisClear( vec3_t axis[3] );
 void AxisCopy( vec3_t in[3], vec3_t out[3] );

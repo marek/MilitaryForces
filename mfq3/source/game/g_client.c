@@ -1,5 +1,5 @@
 /*
- * $Id: g_client.c,v 1.7 2002-09-27 14:37:52 scheherazade Exp $
+ * $Id: g_client.c,v 1.8 2003-02-11 00:25:11 thebjoern Exp $
 */
 
 //null cvs upload test, comment placed for a difference.
@@ -628,6 +628,8 @@ void ClientUserinfoChanged( int clientNum ) {
 		client->vehicle = client->nextVehicle = vehicle = nextVehicle = -1;
 	}
 
+	client->advancedControls = atoi( Info_ValueForKey( userinfo, "cg_advanced" ) );
+
 	// set max health
 	health = atoi( Info_ValueForKey( userinfo, "handicap" ) );
 	if( (ent->r.svFlags & SVF_BOT) || vehicle < 0 ) {
@@ -681,16 +683,16 @@ void ClientUserinfoChanged( int clientNum ) {
 	// send over a subset of the userinfo keys so other clients can
 	// print scoreboards, display models, and play custom sounds
 	if ( ent->r.svFlags & SVF_BOT ) {
-		s = va("n\\%s\\t\\%i\\c1\\%s\\hc\\%i\\w\\%i\\l\\%i\\skill\\%s\\tt\\%d\\tl\\%d\\v\\%d\\x\\%d",
+		s = va("n\\%s\\t\\%i\\c1\\%s\\hc\\%i\\w\\%i\\l\\%i\\skill\\%s\\tt\\%d\\tl\\%d\\v\\%d\\x\\%d\\ac\\%d",
 			client->pers.netname, client->sess.sessionTeam, c1,
 			client->pers.maxHealth, client->sess.wins, client->sess.losses,
 			Info_ValueForKey( userinfo, "skill" ), teamTask, teamLeader,
-			-1, -1 );	// MFQ3: for now no vehicle
+			-1, -1, 0 );	// MFQ3: for now no vehicle and simple controls
 	} else {
-		s = va("n\\%s\\t\\%i\\g_redteam\\%s\\g_blueteam\\%s\\c1\\%s\\hc\\%i\\w\\%i\\l\\%i\\tt\\%d\\tl\\%d\\v\\%d\\x\\%d",
+		s = va("n\\%s\\t\\%i\\g_redteam\\%s\\g_blueteam\\%s\\c1\\%s\\hc\\%i\\w\\%i\\l\\%i\\tt\\%d\\tl\\%d\\v\\%d\\x\\%d\\ac\\%d",
 			client->pers.netname, client->sess.sessionTeam, redTeam, blueTeam, c1,
 			client->pers.maxHealth, client->sess.wins, client->sess.losses, teamTask, teamLeader,
-			vehicle, nextVehicle ); // MFQ3: send current/next vehicle indexes
+			vehicle, nextVehicle, client->advancedControls ); // MFQ3: send current/next vehicle indexes
 	}
 
 	trap_SetConfigstring( CS_PLAYERS+clientNum, s );

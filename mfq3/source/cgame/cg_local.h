@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.59 2003-02-07 20:12:16 thebjoern Exp $
+ * $Id: cg_local.h,v 1.60 2003-02-11 00:25:09 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -353,6 +353,7 @@ typedef struct {
 	int				vehicle;
 	int				deaths;
 	qhandle_t		parts[BP_MAX_PARTS];
+	int				advancedControls;
 } clientInfo_t;
 
 // each WP_* weapon enum has an associated weaponInfo_t

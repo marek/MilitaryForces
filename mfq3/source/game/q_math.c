@@ -1,5 +1,5 @@
 /*
- * $Id: q_math.c,v 1.8 2002-06-13 20:08:13 thebjoern Exp $
+ * $Id: q_math.c,v 1.9 2003-02-11 00:25:11 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -460,6 +460,72 @@ void AxisCopy( vec3_t in[3], vec3_t out[3] ) {
 	VectorCopy( in[0], out[0] );
 	VectorCopy( in[1], out[1] );
 	VectorCopy( in[2], out[2] );
+}
+
+float AxisToRoll( const vec3_t forward, const vec3_t right, const vec3_t up)
+{
+	float roll;
+
+#ifdef HIER_BUB
+	Du dummer Bub!
+#endif
+
+
+	roll = atan2(-right[0], forward[0]) + M_PI/2;
+	roll = RAD2DEG(roll);
+
+	while( roll < -180 ) roll += 360;
+	while( roll > 180 ) roll -= 360;
+
+	return roll;
+}
+
+int AxisToAngles( const vec3_t forward, const vec3_t right, const vec3_t up, vec3_t angles)
+{
+	int retVal = 0;
+	float r;
+
+#ifdef HIER_BUB
+	Du dummer Bub!
+#endif
+
+    angles[1] = asin(up[0]);
+    if( angles[1] < M_PI/2 )
+    {
+        if( angles[1] > -M_PI/2 )
+        {
+            angles[0] = atan2(-up[1], up[2]);
+            angles[2] = atan2(-right[0], forward[0]);
+            retVal = 1;
+        }
+        else
+        {
+		// n	ot a unique solution.
+			r = atan2(forward[1], right[1]);
+            angles[2] = 0.0;  // any angle works
+            angles[0] = angles[2] - r;
+        }
+    }
+    else
+    {
+        // not a unique solution.
+        r = atan2(forward[1], right[1]);
+        angles[2] = 0.0;  // any angle works
+        angles[0] = r - angles[2];
+    }
+
+	angles[0] = RAD2DEG(angles[0]);
+	angles[1] = RAD2DEG(angles[1]);
+	angles[2] = RAD2DEG(angles[2]);
+
+	while( angles[0] < -180 ) angles[0] += 360;
+	while( angles[0] > 180 ) angles[0] -= 360;
+	while( angles[1] < 0 ) angles[1] += 360;
+	while( angles[1] > 360 ) angles[1] -= 360;
+	while( angles[2] < -180 ) angles[2] += 360;
+	while( angles[2] > 180 ) angles[2] -= 360;
+
+	return retVal;
 }
 
 void ProjectPointOnPlane( vec3_t dst, const vec3_t p, const vec3_t normal )

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_players.c,v 1.4 2002-02-24 16:52:12 thebjoern Exp $
+ * $Id: cg_players.c,v 1.5 2003-02-11 00:25:09 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -152,6 +152,16 @@ void CG_NewClientInfo( int clientNum ) {
 
 	v = Info_ValueForKey( configstring, "g_blueteam" );
 	Q_strncpyz(newInfo.blueTeam, v, MAX_TEAMNAME);
+
+	// MFQ3: controls
+	v = Info_ValueForKey( configstring, "ac" );
+	newInfo.advancedControls = atoi(v);
+	if( newInfo.advancedControls )
+		trap_SendConsoleCommand( "+strafe" );
+//		trap_Cvar_Set( "cl_freelook", "0" );
+	else
+		trap_SendConsoleCommand( "-strafe" );
+//		trap_Cvar_Set( "cl_freelook", "1" );
 
 	// MFQ3: vehicle
 	v = Info_ValueForKey( configstring, "v" );

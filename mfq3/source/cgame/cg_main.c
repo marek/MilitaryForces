@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.43 2002-06-12 21:12:46 thebjoern Exp $
+ * $Id: cg_main.c,v 1.44 2003-02-11 00:25:09 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -257,7 +257,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_buildScript, "com_buildScript", "0", 0 },	// force loading of all possible data amd error on failures
 	{ &cg_paused, "cl_paused", "0", CVAR_ROM },
 	{ &cg_freelook, "cl_freelook", "1", CVAR_ROM },
-	{ &cg_advanced, "cg_advanced", "0", CVAR_ARCHIVE },
+	{ &cg_advanced, "cg_advanced", "0", CVAR_ARCHIVE | CVAR_USERINFO },
 	{ &cg_synchronousClients, "g_synchronousClients", "0", 0 },	// communicated by systeminfo
 
 	{ &cg_timescaleFadeEnd, "cg_timescaleFadeEnd", "1", 0},

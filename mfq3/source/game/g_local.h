@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.28 2003-02-08 15:20:17 thebjoern Exp $
+ * $Id: g_local.h,v 1.29 2003-02-11 00:25:11 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -333,6 +333,7 @@ struct gclient_s {
 	// MFQ3
 	int			vehicle;			// index of selected vehicle
 	int			nextVehicle;	
+	int			advancedControls;
 };
 
 
