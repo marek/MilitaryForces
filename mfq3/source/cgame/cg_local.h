@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.14 2002-01-26 03:02:38 thebjoern Exp $
+ * $Id: cg_local.h,v 1.15 2002-01-26 19:27:30 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -108,7 +108,8 @@ typedef enum {
 #define MFD_RWR					1
 #define MFD_STATUS				2
 #define MFD_INVENTORY			3
-#define MFD_MAX					4
+#define MFD_CAMERA				4
+#define MFD_MAX					5
 
 #define MFD_1					0
 #define MFD_2					1
@@ -532,6 +533,7 @@ typedef struct {
 	int				tracernum;
 	int				HUDColor;
 	int				HUDColorTime;
+	refdef_t		HUDCamera;
 } cg_t;
 
 

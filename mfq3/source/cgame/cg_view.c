@@ -1,5 +1,5 @@
 /*
- * $Id: cg_view.c,v 1.3 2002-01-25 14:25:12 sparky909_uk Exp $
+ * $Id: cg_view.c,v 1.4 2002-01-26 19:27:30 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -256,8 +256,8 @@ static int CG_CalcFov( void ) {
 	float	v;
 	int		contents;
 	float	fov_x, fov_y;
-	float	zoomFov;
-	float	f;
+//	float	zoomFov;
+//	float	f;
 	int		inwater;
 
 	if ( cg.predictedPlayerState.pm_type == PM_INTERMISSION ) {
@@ -278,7 +278,7 @@ static int CG_CalcFov( void ) {
 		}
 
 		// account for zooms
-		zoomFov = cg_zoomFov.value;
+/*		zoomFov = cg_zoomFov.value;
 		if ( zoomFov < 1 ) {
 			zoomFov = 1;
 		} else if ( zoomFov > 160 ) {
@@ -299,7 +299,7 @@ static int CG_CalcFov( void ) {
 			} else {
 				fov_x = zoomFov + f * ( fov_x - zoomFov );
 			}
-		}
+		}*/
 	}
 
 	x = cg.refdef.width / tan( fov_x / 360 * M_PI );
