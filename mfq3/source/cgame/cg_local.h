@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.41 2002-02-24 19:39:50 thebjoern Exp $
+ * $Id: cg_local.h,v 1.42 2002-02-25 12:13:36 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -243,6 +243,7 @@ typedef enum {
 typedef enum {
 	LEF_PUFF_DONT_SCALE  = 0x0001,			// do not scale size over time
 	LEF_TUMBLE			 = 0x0002,			// tumble over time, used for ejecting shells
+	LEF_NO_RADIUS_KILL	 = 0x0004,			// don't CG_FreeLocalEntity() just because the camera is 'inside' the radius of a sprite (e.g. smoke puffs)
 } leFlag_t;
 
 typedef enum {
@@ -1143,6 +1144,7 @@ void CG_ResetReticles( void );
 void CG_AddReticleEntityToScene( refEntity_t * pReticle, centity_t * pTarget );
 void CG_Draw_Reticles();
 void CG_Draw_HUD_Label( int x, int y, char * pText, float alpha );
+localEntity_t * CG_Generic_Smoke( centity_t * cent, vec3_t smokePosition, int density );
 
 //
 // cg_draw.c, cg_newDraw.c

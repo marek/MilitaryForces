@@ -1,5 +1,5 @@
 /*
- * $Id: cg_localents.c,v 1.3 2002-02-05 16:09:01 sparky909_uk Exp $
+ * $Id: cg_localents.c,v 1.4 2002-02-25 12:13:36 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -280,7 +280,8 @@ static void CG_AddMoveScaleFade( localEntity_t *le ) {
 	// so it doesn't add too much overdraw
 	VectorSubtract( re->origin, cg.refdef.vieworg, delta );
 	len = VectorLength( delta );
-	if ( len < le->radius ) {
+	if( len < le->radius && !(le->leFlags & LEF_NO_RADIUS_KILL) )
+	{
 		CG_FreeLocalEntity( le );
 		return;
 	}
@@ -316,7 +317,8 @@ static void CG_AddScaleFade( localEntity_t *le ) {
 	// so it doesn't add too much overdraw
 	VectorSubtract( re->origin, cg.refdef.vieworg, delta );
 	len = VectorLength( delta );
-	if ( len < le->radius ) {
+	if( len < le->radius && !(le->leFlags & LEF_NO_RADIUS_KILL) )
+	{
 		CG_FreeLocalEntity( le );
 		return;
 	}
@@ -427,7 +429,9 @@ void CG_AddLocalEntities( void ) {
 		// still have it
 		next = le->prev;
 
-		if ( cg.time >= le->endTime ) {
+		// kill entity because life is up?
+		if ( cg.time >= le->endTime )
+		{
 			CG_FreeLocalEntity( le );
 			continue;
 		}

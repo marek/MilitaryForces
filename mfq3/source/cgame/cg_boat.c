@@ -1,5 +1,5 @@
 /*
- * $Id: cg_boat.c,v 1.6 2002-02-22 11:39:40 thebjoern Exp $
+ * $Id: cg_boat.c,v 1.7 2002-02-25 12:13:36 sparky909_uk Exp $
 */
 
 
@@ -315,24 +315,8 @@ void CG_Boat( centity_t *cent, clientInfo_t *ci )
 							cgs.media.engineTank[tanksound] );
 
 	// smoke 
-	if( cent->currentState.generic1 && cg_smoke.integer ) {
-		localEntity_t	*smoke;
-		vec3_t			up = {0, 0, 20};
-		vec3_t			pos;
-		vec3_t			forward;
+	CG_Generic_Smoke( cent, cent->lerpOrigin, 100 );
 
-		AngleVectors( cent->lerpAngles, forward, NULL, NULL );
-		VectorCopy( cent->lerpOrigin, pos );
-		pos[2] += 12;
-
-		smoke = CG_SmokePuff( pos, up, 
-					  cent->currentState.generic1, 
-					  0.5, 0.5, 0.5, 0.66f,
-					  200*cent->currentState.generic1, 
-					  cg.time, 0,
-					  LEF_PUFF_DONT_SCALE, 
-					  cgs.media.smokePuffShader );	
-	}
 	// muzzleflash
 	CG_VehicleMuzzleFlash( cent, &part[BP_BOAT_GUNBARREL], ci->parts[BP_BOAT_GUNBARREL], ci->vehicle );
 
