@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.23 2002-02-07 09:55:27 thebjoern Exp $
+ * $Id: cg_main.c,v 1.24 2002-02-08 21:43:56 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -761,17 +761,29 @@ static void CG_RegisterGraphics( void ) {
 		"newhud/thr/1_9",
 		"newhud/thr/1_10",
 	};
-	static char		*mfq3_throttle_2[10] = {
-		"newhud/thr/2_1",
-		"newhud/thr/2_2",
-		"newhud/thr/2_3",
-		"newhud/thr/2_4",
-		"newhud/thr/2_5",
-		"newhud/thr/2_6",
-		"newhud/thr/2_7",
-		"newhud/thr/2_8",
-		"newhud/thr/2_9",
-		"newhud/thr/2_10",
+	static char		*mfq3_throttle_2_1[10] = {
+		"newhud/thr/2_1_1",
+		"newhud/thr/2_1_2",
+		"newhud/thr/2_1_3",
+		"newhud/thr/2_1_4",
+		"newhud/thr/2_1_5",
+		"newhud/thr/2_1_6",
+		"newhud/thr/2_1_7",
+		"newhud/thr/2_1_8",
+		"newhud/thr/2_1_9",
+		"newhud/thr/2_1_10",
+	};
+	static char		*mfq3_throttle_2_2[10] = {
+		"newhud/thr/2_2_1",
+		"newhud/thr/2_2_2",
+		"newhud/thr/2_2_3",
+		"newhud/thr/2_2_4",
+		"newhud/thr/2_2_5",
+		"newhud/thr/2_2_6",
+		"newhud/thr/2_2_7",
+		"newhud/thr/2_2_8",
+		"newhud/thr/2_2_9",
+		"newhud/thr/2_2_10",
 	};
 	static char		*mfq3_throttle_1_ab[15] = {
 		"newhud/thr/ab1_1",
@@ -790,22 +802,39 @@ static void CG_RegisterGraphics( void ) {
 		"newhud/thr/ab1_14",
 		"newhud/thr/ab1_15"
 	};
-	static char		*mfq3_throttle_2_ab[15] = {
-		"newhud/thr/ab2_1",
-		"newhud/thr/ab2_2",
-		"newhud/thr/ab2_3",
-		"newhud/thr/ab2_4",
-		"newhud/thr/ab2_5",
-		"newhud/thr/ab2_6",
-		"newhud/thr/ab2_7",
-		"newhud/thr/ab2_8",
-		"newhud/thr/ab2_9",
-		"newhud/thr/ab2_10",
-		"newhud/thr/ab2_11",
-		"newhud/thr/ab2_12",
-		"newhud/thr/ab2_13",
-		"newhud/thr/ab2_14",
-		"newhud/thr/ab2_15"
+	static char		*mfq3_throttle_2_1_ab[15] = {
+		"newhud/thr/ab2_1_1",
+		"newhud/thr/ab2_1_2",
+		"newhud/thr/ab2_1_3",
+		"newhud/thr/ab2_1_4",
+		"newhud/thr/ab2_1_5",
+		"newhud/thr/ab2_1_6",
+		"newhud/thr/ab2_1_7",
+		"newhud/thr/ab2_1_8",
+		"newhud/thr/ab2_1_9",
+		"newhud/thr/ab2_1_10",
+		"newhud/thr/ab2_1_11",
+		"newhud/thr/ab2_1_12",
+		"newhud/thr/ab2_1_13",
+		"newhud/thr/ab2_1_14",
+		"newhud/thr/ab2_1_15"
+	};
+	static char		*mfq3_throttle_2_2_ab[15] = {
+		"newhud/thr/ab2_2_1",
+		"newhud/thr/ab2_2_2",
+		"newhud/thr/ab2_2_3",
+		"newhud/thr/ab2_2_4",
+		"newhud/thr/ab2_2_5",
+		"newhud/thr/ab2_2_6",
+		"newhud/thr/ab2_2_7",
+		"newhud/thr/ab2_2_8",
+		"newhud/thr/ab2_2_9",
+		"newhud/thr/ab2_2_10",
+		"newhud/thr/ab2_2_11",
+		"newhud/thr/ab2_2_12",
+		"newhud/thr/ab2_2_13",
+		"newhud/thr/ab2_2_14",
+		"newhud/thr/ab2_2_15"
 	};
 	static char		*mfq3_throttle_rev[5] = {
 		"newhud/thr/rev_1",
@@ -935,11 +964,13 @@ static void CG_RegisterGraphics( void ) {
 	}
 	for ( i=0 ; i<15 ; i++) {
 		cgs.media.HUDthrottle_1_ab[i] = trap_R_RegisterShader( mfq3_throttle_1_ab[i] );
-		cgs.media.HUDthrottle_2_ab[i] = trap_R_RegisterShader( mfq3_throttle_2_ab[i] );
+		cgs.media.HUDthrottle_2_1_ab[i] = trap_R_RegisterShader( mfq3_throttle_2_1_ab[i] );
+		cgs.media.HUDthrottle_2_2_ab[i] = trap_R_RegisterShader( mfq3_throttle_2_2_ab[i] );
 	}
 	for ( i=0 ; i<10 ; i++) {
 		cgs.media.HUDthrottle_1[i] = trap_R_RegisterShader( mfq3_throttle_1[i] );
-		cgs.media.HUDthrottle_2[i] = trap_R_RegisterShader( mfq3_throttle_2[i] );
+		cgs.media.HUDthrottle_2_1[i] = trap_R_RegisterShader( mfq3_throttle_2_1[i] );
+		cgs.media.HUDthrottle_2_2[i] = trap_R_RegisterShader( mfq3_throttle_2_2[i] );
 	}
 	for ( i=0 ; i<5 ; i++) {
 		cgs.media.HUDthrottle_rev[i] = trap_R_RegisterShader( mfq3_throttle_rev[i] );

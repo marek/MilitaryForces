@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.26 2002-02-07 09:55:27 thebjoern Exp $
+ * $Id: cg_local.h,v 1.27 2002-02-08 21:43:56 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -686,9 +686,11 @@ typedef struct {
 	qhandle_t	HUDsolid;
 	qhandle_t	HUDhealth[10];
 	qhandle_t	HUDthrottle_1[10];
-	qhandle_t	HUDthrottle_2[10];
+	qhandle_t	HUDthrottle_2_1[10];
+	qhandle_t	HUDthrottle_2_2[10];
 	qhandle_t	HUDthrottle_1_ab[15];
-	qhandle_t	HUDthrottle_2_ab[15];
+	qhandle_t	HUDthrottle_2_1_ab[15];
+	qhandle_t	HUDthrottle_2_2_ab[15];
 	qhandle_t	HUDthrottle_rev[5];
 	qhandle_t	HUDhealthtext;
 	qhandle_t	HUDthrottletext;

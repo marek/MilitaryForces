@@ -1,5 +1,5 @@
 /*
- * $Id: cg_testmodel.c,v 1.2 2002-01-28 22:34:30 thebjoern Exp $
+ * $Id: cg_testmodel.c,v 1.3 2002-02-08 21:43:57 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -194,9 +194,6 @@ static void registerTestVehicle()
 					Com_sprintf( name, sizeof(name), "%s_special.md3", basename );
 					break;
 				case BP_PLANE_PROP:
-					Com_sprintf( name, sizeof(name), "%s_prop.md3", basename );
-					break;
-				case BP_PLANE_PROP2:
 					Com_sprintf( name, sizeof(name), "%s_prop.md3", basename );
 					break;
 				}

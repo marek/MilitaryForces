@@ -1,5 +1,5 @@
 /*
- * $Id: cg_plane.c,v 1.16 2002-02-04 12:59:14 sparky909_uk Exp $
+ * $Id: cg_plane.c,v 1.17 2002-02-08 21:43:57 thebjoern Exp $
 */
 
 
@@ -17,8 +17,14 @@ char *plane_tags[BP_PLANE_MAX_PARTS] =
 	"tag_wingL",	// wing left
 	"tag_wingR",	// wing right
 	"tag_special",	// special
-	"tag_prop1",	// prop
-	"tag_prop2"		// prop
+	"tag_prop1"	// prop
+};
+
+char *engine_tags[3] =
+{
+	"tag_prop2",
+	"tag_prop3",
+	"tag_prop4"
 };
 
 /*
@@ -285,11 +291,16 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 		VectorCopy( cent->lerpOrigin, part[i].lightingOrigin );
 		AxisCopy( axisDefault, part[i].axis );
 		if( i == BP_PLANE_PROP && (availableVehicles[ci->vehicle].caps & HC_PROP) ) {
+			int ii;
 			RotateAroundDirection( part[i].axis, cg.time );
-		} else if( i == BP_PLANE_PROP2 && (availableVehicles[ci->vehicle].caps & HC_PROP) ) {
-			if( availableVehicles[cent->currentState.modelindex].caps & HC_DUALENGINE ) {
-				RotateAroundDirection( part[i].axis, cg.time );
-			} else continue;
+			for( ii = 1; ii < availableVehicles[ci->vehicle].engines; ++ii ) {
+				refEntity_t engine;
+				memcpy( &engine, &part[i], sizeof(engine) );
+				CG_PositionRotatedEntityOnTag( &engine, &part[BP_PLANE_BODY], ci->parts[BP_PLANE_BODY], engine_tags[ii-1] );
+				engine.shadowPlane = shadowPlane;
+				engine.renderfx = renderfx;
+				trap_R_AddRefEntityToScene( &engine );
+			}
 		}
 		if( (i == BP_PLANE_WINGLEFT || i == BP_PLANE_WINGRIGHT) &&
 			(availableVehicles[ci->vehicle].caps & HC_SWINGWING) ) {
@@ -329,7 +340,7 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 		burner.renderfx = renderfx;
 		burner.frame = ( cent->currentState.frame > 12 ? 0 : 1 );
 		trap_R_AddRefEntityToScene( &burner );
-		if( availableVehicles[ci->vehicle].caps & HC_DUALENGINE ) {
+		if( availableVehicles[ci->vehicle].engines > 1 ) {
 			burner2.hModel = cgs.media.afterburner[availableVehicles[ci->vehicle].effectModel];
 			VectorCopy( cent->lerpOrigin, burner2.lightingOrigin );
 			AxisCopy( axisDefault, burner2.axis );
