@@ -1,5 +1,5 @@
 /*
- * $Id: g_miscvehicle.c,v 1.13 2003-08-06 18:10:21 thebjoern Exp $
+ * $Id: g_miscvehicle.c,v 1.14 2003-08-06 19:05:59 thebjoern Exp $
 */
 
 
@@ -11,6 +11,7 @@
 // MISC_VEHICLE
 //
 //------------------------------------------------------------------
+void groundinstallation_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int meansOfDeath );
 
 void misc_vehicle_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int meansOfDeath )
 {
@@ -490,10 +491,10 @@ void SP_misc_groundinstallation( gentity_t *sp_ent )
 	ent->r.svFlags = SVF_USE_CURRENT_ORIGIN;
 	ent->s.pos.trType = TR_STATIONARY;
 	ent->s.apos.trType = TR_STATIONARY;
-	if( ent->health <= 0 ) ent->health = availableVehicles[i].maxhealth;
+	if( ent->health <= 0 ) ent->health = 1;//availableVehicles[i].maxhealth;
 	ent->takedamage = qtrue;
 	ent->inuse = qtrue;
-	ent->die = misc_vehicle_die;
+	ent->die = groundinstallation_die;
 	if( !ent->score ) ent->score = 1;
 	ent->classname = "misc_vehicle";
 	ent->r.contents = CONTENTS_SOLID;//CONTENTS_BODY;
