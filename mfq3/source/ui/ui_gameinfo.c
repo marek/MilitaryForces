@@ -1,5 +1,6 @@
-// Copyright (C) 1999-2000 Id Software, Inc.
-//
+/*
+ * $Id: ui_gameinfo.c,v 1.3 2002-01-19 02:24:03 thebjoern Exp $
+*/
 //
 // gameinfo.c
 //

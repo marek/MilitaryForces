@@ -1,5 +1,5 @@
 /*
- * $Id: cg_draw.c,v 1.2 2002-01-16 19:29:36 sparky909_uk Exp $
+ * $Id: cg_draw.c,v 1.3 2002-01-19 02:24:02 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -929,7 +929,7 @@ CG_CreateColour
 
 static vec4_t colourVector = {1,1,1,1};	// common return ptr
 
-static vec4_t * CG_CreateColour( float r, float g, float b, float a )
+vec4_t * CG_CreateColour( float r, float g, float b, float a )
 {
 	// assign
 	colourVector[0] = r;
@@ -2248,7 +2248,7 @@ CG_DrawStringNewAlpha
 =================
 */
 
-static void CG_DrawStringNewAlpha( int x, int y, const char * pText, float alpha, textJustify_t formatting )
+void CG_DrawStringNewAlpha( int x, int y, const char * pText, float alpha, textJustify_t formatting )
 {
 	// just use default extra parameters
 	CG_DrawStringNew( x, y, 0.5f, *CG_CreateColour(1,1,1,alpha), pText, 0, 0, 3, formatting );
@@ -2260,7 +2260,7 @@ CG_DrawStringNewColour
 =================
 */
 
-static void CG_DrawStringNewColour( int x, int y, const char * pText, vec4_t colour, textJustify_t formatting )
+void CG_DrawStringNewColour( int x, int y, const char * pText, vec4_t colour, textJustify_t formatting )
 {
 	// just use default extra parameters
 	CG_DrawStringNew( x, y, 0.5f, colour, pText, 0, 0, 3, formatting );
@@ -2272,7 +2272,7 @@ CG_DrawStringNew
 =================
 */
 
-static void CG_DrawStringNew( int x, int y, float scale, vec4_t colour, const char * pText, int hSpacing, int numChars, int style, textJustify_t formatting )
+void CG_DrawStringNew( int x, int y, float scale, vec4_t colour, const char * pText, int hSpacing, int numChars, int style, textJustify_t formatting )
 {
 	int xPos = x;
 	int yPos = y;

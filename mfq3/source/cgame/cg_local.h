@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.3 2002-01-16 19:29:36 sparky909_uk Exp $
+ * $Id: cg_local.h,v 1.4 2002-01-19 02:24:02 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -8,9 +8,6 @@
 #include "tr_types.h"
 #include "../game/bg_public.h"
 #include "cg_public.h"
-
-// MFQ3: Uncomment the following line to compile in the new script driven gfx/text/scoreboard/etc..
-#define _MENU_SCOREBOARD
 
 typedef enum {
 	LEFT_JUSTIFY,
@@ -485,6 +482,16 @@ typedef struct {
 	refEntity_t		testModelEntity;
 	char			testModelName[MAX_QPATH];
 	qboolean		testGun;
+	refEntity_t		testVehicleParts[BP_MAX_PARTS];
+	char			testVehicleName[MAX_QPATH];
+	long			testVehicleCat;
+	refEntity_t		testBurner;
+	refEntity_t		testBurner2;
+	int				testBurnerNum;
+	int				testNumBurners;
+	refEntity_t		testVapor;
+	int				testVaporNum;
+	int				testVaporFrame;
 
 	// MFQ3
 	int			INFO;
@@ -869,14 +876,25 @@ void CG_BuildSpectatorString();
 
 
 //
-// cg_view.c
+// cg_testmodel.c
 //
+void CG_TestPlaneCmd_f(void);
+void CG_TestGVCmd_f(void);
+void CG_TestVehicle(long cat);
+void CG_AddTestVehicle (void);
+void CG_AddTestModel (void);
 void CG_TestModel_f (void);
 void CG_TestGun_f (void);
 void CG_TestModelNextFrame_f (void);
 void CG_TestModelPrevFrame_f (void);
 void CG_TestModelNextSkin_f (void);
 void CG_TestModelPrevSkin_f (void);
+
+
+//
+// cg_view.c
+//
+
 void CG_ZoomDown_f( void );
 void CG_ZoomUp_f( void );
 void CG_AddBufferedSound( sfxHandle_t sfx);

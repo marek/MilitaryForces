@@ -18,6 +18,7 @@ cg_servercmds
 cg_snapshot
 cg_view
 cg_weapons
+cg_testmodel
 cg_vehicle
 cg_miscvehicle
 cg_plane
@@ -33,3 +34,4 @@ bg_groundmove
 bg_mfq3util
 q_math
 q_shared
+ui_shared

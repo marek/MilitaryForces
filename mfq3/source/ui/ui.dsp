@@ -1,5 +1,5 @@
 # Microsoft Developer Studio Project File - Name="ui" - Package Owner=<4>
-# Microsoft Developer Studio Generated Build File, Format Version 60000
+# Microsoft Developer Studio Generated Build File, Format Version 6.00
 # ** DO NOT EDIT **
 
 # TARGTYPE "Win32 (x86) Dynamic-Link Library" 0x0102
@@ -44,7 +44,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /G5 /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "UI_EXPORTS" /D "MISSIONPACK" /FR /YX /FD /GZ /c
-# ADD CPP /nologo /G5 /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "UI_EXPORTS" /D "MISSIONPACK" /FR /YX /FD /GZ /c
+# ADD CPP /nologo /G5 /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "UI_EXPORTS" /FR /YX /FD /GZ /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
@@ -96,7 +96,7 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
-SOURCE=.\game_129h\bg_lib.c
+SOURCE=..\game\bg_lib.c
 # End Source File
 # Begin Source File
 
@@ -104,7 +104,7 @@ SOURCE=..\game\bg_mfq3util.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\game_129h\bg_misc.c
+SOURCE=..\game\bg_misc.c
 # End Source File
 # Begin Source File
 
@@ -112,11 +112,15 @@ SOURCE=..\game\bg_vehicledata.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\game_129h\q_math.c
+SOURCE=..\game\bg_weapondata.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\game_129h\q_shared.c
+SOURCE=..\game\q_math.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\game\q_shared.c
 # End Source File
 # Begin Source File
 
@@ -145,10 +149,6 @@ SOURCE=.\ui_main.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\ui_players.c
-# End Source File
-# Begin Source File
-
 SOURCE=.\ui_shared.c
 # End Source File
 # Begin Source File
@@ -165,6 +165,10 @@ SOURCE=.\ui_util.c
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
+SOURCE=..\game\bg_lib.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\game\bg_public.h
 # End Source File
 # Begin Source File
@@ -173,7 +177,7 @@ SOURCE=.\keycodes.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\ui\menudef.h
+SOURCE=.\menudef.h
 # End Source File
 # Begin Source File
 

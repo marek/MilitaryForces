@@ -1,5 +1,5 @@
 /*
- * $Id: q_shared.h,v 1.3 2001-12-27 19:14:46 thebjoern Exp $
+ * $Id: q_shared.h,v 1.4 2002-01-19 02:24:02 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -10,7 +10,7 @@
 // q_shared.h -- included first by ALL program modules.
 // A user mod should never modify this file
 
-#define	Q3_VERSION		"Q3 1.30"
+#define	Q3_VERSION		"Q3 1.31"
 
 
 #define MAX_TEAMNAME 32

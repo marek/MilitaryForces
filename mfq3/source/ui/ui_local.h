@@ -1,14 +1,17 @@
-// Copyright (C) 1999-2000 Id Software, Inc.
+/*
+ * $Id: ui_local.h,v 1.2 2002-01-19 02:24:03 thebjoern Exp $
+*/
 //
 #ifndef __UI_LOCAL_H__
 #define __UI_LOCAL_H__
 
-#include "game_129h/q_shared.h"
-#include "cgame_129h/tr_types.h"
+#include "../game/q_shared.h"
+#include "../cgame/tr_types.h"
 #include "ui_public.h"
 #include "keycodes.h"
-#include "game_129h/bg_public.h"
+#include "../game/bg_public.h"
 #include "ui_shared.h"
+
 
 // global display context
 
@@ -495,7 +498,6 @@ typedef struct {
 	qboolean	pitching;
 
 	int			animationNumber;	// may include ANIM_TOGGLEBIT
-	animation_t	*animation;
 	int			animationTime;		// time when the first frame of the animation will be exact
 } lerpFrame_t;
 
@@ -511,8 +513,6 @@ typedef struct {
 
 	qhandle_t		headModel;
 	qhandle_t		headSkin;
-
-	animation_t		animations[MAX_TOTALANIMATIONS];
 
 	qhandle_t		weaponModel;
 	qhandle_t		barrelModel;
@@ -592,7 +592,6 @@ typedef struct {
 #define MAX_MAPS 128
 #define MAX_SPMAPS 16
 #define PLAYERS_PER_TEAM 5
-#define MAX_PINGREQUESTS		32
 #define MAX_ADDRESSLENGTH		64
 #define MAX_HOSTNAMELENGTH		22
 #define MAX_MAPNAMELENGTH		16

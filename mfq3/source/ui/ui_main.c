@@ -1,5 +1,6 @@
-// Copyright (C) 1999-2000 Id Software, Inc.
-//
+/*
+ * $Id: ui_main.c,v 1.3 2002-01-19 02:24:03 thebjoern Exp $
+*/
 /*
 =======================================================================
 
@@ -12,77 +13,6 @@ USER INTERFACE MAIN
 //#define PRE_RELEASE_TADEMO
 
 #include "ui_local.h"
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-// 129HACK+ Copied from bg_public.h until we have combined the remaining v1.29h files in the current source
-
-#define MF_MAX_GAMESETS			8
-#define MF_MAX_TEAMS			8
-#define MF_MAX_CATEGORIES		8
-#define MF_MAX_CLASSES			8
-
-#define	CAT_PLANE					  0x00000100 
-#define	CAT_GROUND					  0x00000200 
-#define	CAT_ANY						  0x0000FF00
-
-#define MAX_WEAPONS_PER_VEHICLE	8
-
-#define	MF_TEAM_ANY					  0x00FF0000
-
-// total max parts (not cat may exceed this!)
-#define BP_MAX_PARTS			10
-
-// list of vehicles (data)
-typedef struct completeVehicleData_s
-{
-    char		    *descriptiveName;
-    char		    *modelName;		// just the directory of the model
-    unsigned long   id;				// gameset, team, cat and class
-	unsigned int	flags;			// special flags
-	unsigned int	caps;			// capabilities
-    qhandle_t	    handle[BP_MAX_PARTS];// ditto
-    vec3_t		    mins;
-    vec3_t		    maxs;
-    vec3_t		    turnspeed;	    // how fast can it turn around the three axis
-	int				cam_dist;		// how far away is the camera
-	int				cam_height;		// how high is the camera
-    unsigned int    stallspeed;	
-    unsigned int    maxspeed;	    // max speed at military thrust
-    int			    minthrottle;    // can be less than 0 for ground vehicles
-    int			    maxthrottle;    // if > 10 means afterburner
-    unsigned int    accel;			// vehicle dependent acceleration
-    unsigned int    maxhealth;	    // health
-	vec3_t			gunoffset;		// guntag
-	unsigned int	maxfuel;		// maximum fuel
-	int				gearheight;		// height of gear
-	int				tailangle;		// for taildraggers on ground
-	unsigned int	weapons[MAX_WEAPONS_PER_VEHICLE];// use index from available Weapons
-	unsigned int	ammo[MAX_WEAPONS_PER_VEHICLE];// how much of them (is also max_ammo)
-	vec3_t			cockpitview;	// to place the camera
-	unsigned int	effectModel;	// num of afterburner model (for planes)
-	unsigned int	radarRange;		// how far goes the radar AIR
-	unsigned int	radarRange2;	// how far goes the radar GV
-	float			swingangle;		// for swing wings
-	unsigned int	renderFlags;	// special stuff for rendering only
-}completeVehicleData_t;	
-
-extern completeVehicleData_t availableVehicles[];
-
-// number of available vehicles
-extern int bg_numberOfVehicles;
-
-extern void MF_SetGameset(unsigned long gs);
-extern unsigned long MF_GetGameset(void);
-extern int MF_getIndexOfVehicle( int start, unsigned long what);
-
-// strings for categories and classes
-extern const char *gameset_items[MF_MAX_GAMESETS+1];
-extern const char *team_items[MF_MAX_GAMESETS][MF_MAX_TEAMS+1];
-extern const char *cat_items[MF_MAX_CATEGORIES+1];
-extern const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1];
-
-// 129HACK-
-////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 uiInfo_t uiInfo;
 
@@ -216,6 +146,7 @@ void _UI_KeyEvent( int key, qboolean down );
 void _UI_MouseEvent( int dx, int dy );
 void _UI_Refresh( int realtime );
 qboolean _UI_IsFullscreen( void );
+
 int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11  ) {
   switch ( command ) {
 	  case UI_GETAPIVERSION:
@@ -1112,11 +1043,7 @@ static void UI_DrawClanName(rectDef_t *rect, float scale, vec4_t color, int text
 static void UI_SetCapFragLimits(qboolean uiVars) {
 	int cap = 5;
 	int frag = 10;
-	if (uiInfo.gameTypes[ui_gameType.integer].gtEnum == GT_OBELISK) {
-		cap = 4;
-	} else if (uiInfo.gameTypes[ui_gameType.integer].gtEnum == GT_HARVESTER) {
-		cap = 15;
-	}
+
 	if (uiVars) {
 		trap_Cvar_Set("ui_captureLimit", va("%d", cap));
 		trap_Cvar_Set("ui_fragLimit", va("%d", frag));
@@ -1351,48 +1278,6 @@ static void UI_DrawMapCinematic(rectDef_t *rect, float scale, vec4_t color, qboo
 static qboolean updateModel = qtrue;
 static qboolean q3Model = qfalse;
 
-static void UI_DrawPlayerModel(rectDef_t *rect) {
-  static playerInfo_t info;
-  char model[MAX_QPATH];
-  char team[256];
-	char head[256];
-	vec3_t	viewangles;
-	vec3_t	moveangles;
-
-	  if (trap_Cvar_VariableValue("ui_Q3Model")) {
-	  strcpy(model, UI_Cvar_VariableString("model"));
-		strcpy(head, UI_Cvar_VariableString("headmodel"));
-		if (!q3Model) {
-			q3Model = qtrue;
-			updateModel = qtrue;
-		}
-		team[0] = '\0';
-	} else {
-
-		strcpy(team, UI_Cvar_VariableString("ui_teamName"));
-		strcpy(model, UI_Cvar_VariableString("team_model"));
-		strcpy(head, UI_Cvar_VariableString("team_headmodel"));
-		if (q3Model) {
-			q3Model = qfalse;
-			updateModel = qtrue;
-		}
-	}
-  if (updateModel) {
-  	memset( &info, 0, sizeof(playerInfo_t) );
-  	viewangles[YAW]   = 180 - 10;
-  	viewangles[PITCH] = 0;
-  	viewangles[ROLL]  = 0;
-  	VectorClear( moveangles );
-    UI_PlayerInfo_SetModel( &info, model, head, team);
-    UI_PlayerInfo_SetInfo( &info, LEGS_IDLE, TORSO_STAND, viewangles, vec3_origin, WP_MACHINEGUN, qfalse );
-//		UI_RegisterClientModelname( &info, model, head, team);
-    updateModel = qfalse;
-  }
-
-  UI_DrawPlayer( rect->x, rect->y, rect->w, rect->h, &info, uiInfo.uiDC.realTime / 2);
-
-}
-
 static void UI_DrawNetSource(rectDef_t *rect, float scale, vec4_t color, int textStyle) {
 	if (ui_netSource.integer < 0 || ui_netSource.integer > uiInfo.numGameTypes) {
 		ui_netSource.integer = 0;
@@ -1560,34 +1445,6 @@ static const char *UI_OpponentLeaderModel() {
 
 
 static qboolean updateOpponentModel = qtrue;
-static void UI_DrawOpponent(rectDef_t *rect) {
-  static playerInfo_t info2;
-  char model[MAX_QPATH];
-  char headmodel[MAX_QPATH];
-  char team[256];
-	vec3_t	viewangles;
-	vec3_t	moveangles;
-  
-	if (updateOpponentModel) {
-		
-		strcpy(model, UI_Cvar_VariableString("ui_opponentModel"));
-	  strcpy(headmodel, UI_Cvar_VariableString("ui_opponentModel"));
-		team[0] = '\0';
-
-  	memset( &info2, 0, sizeof(playerInfo_t) );
-  	viewangles[YAW]   = 180 - 10;
-  	viewangles[PITCH] = 0;
-  	viewangles[ROLL]  = 0;
-  	VectorClear( moveangles );
-    UI_PlayerInfo_SetModel( &info2, model, headmodel, "");
-    UI_PlayerInfo_SetInfo( &info2, LEGS_IDLE, TORSO_STAND, viewangles, vec3_origin, WP_MACHINEGUN, qfalse );
-		UI_RegisterClientModelname( &info2, model, headmodel, team);
-    updateOpponentModel = qfalse;
-  }
-
-  UI_DrawPlayer( rect->x, rect->y, rect->w, rect->h, &info2, uiInfo.uiDC.realTime / 2);
-
-}
 
 static void UI_NextOpponent() {
   int i = UI_TeamIndexFromName(UI_Cvar_VariableString("ui_opponentName"));
@@ -2190,9 +2047,6 @@ static void UI_OwnerDraw(float x, float y, float w, float h, float text_x, float
     case UI_EFFECTS:
       UI_DrawEffects(&rect, scale, color);
       break;
-    case UI_PLAYERMODEL:
-      UI_DrawPlayerModel(&rect);
-      break;
     case UI_CLANNAME:
       UI_DrawClanName(&rect, scale, color, textStyle);
       break;
@@ -2263,9 +2117,6 @@ static void UI_OwnerDraw(float x, float y, float w, float h, float text_x, float
 			break;
 		case UI_TIER:
 			UI_DrawTier(&rect, scale, color, textStyle);
-			break;
-		case UI_OPPONENTMODEL:
-			UI_DrawOpponent(&rect);
 			break;
 		case UI_TIERMAP1:
 			UI_DrawTierMap(&rect, 0);

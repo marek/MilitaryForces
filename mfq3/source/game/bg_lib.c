@@ -1,5 +1,5 @@
 /*
- * $Id: bg_lib.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: bg_lib.c,v 1.2 2002-01-19 02:24:02 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -49,10 +49,12 @@
 static char sccsid[] = "@(#)qsort.c	8.1 (Berkeley) 6/4/93";
 #endif
 static const char rcsid[] =
-	"$Id: bg_lib.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $";
+	"$Id: bg_lib.c,v 1.2 2002-01-19 02:24:02 thebjoern Exp $";
 #endif /* LIBC_SCCS and not lint */
 
-//typedef int		 cmp_t(const void *, const void *);
+#if !defined( Q3_VM )
+typedef int		 cmp_t(const void *, const void *);
+#endif
 static char* med3(char *, char *, char *, cmp_t *);
 static void	 swapfunc(char *, char *, int, int);
 
