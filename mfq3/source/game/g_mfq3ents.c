@@ -1,5 +1,5 @@
 /*
- * $Id: g_mfq3ents.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: g_mfq3ents.c,v 1.2 2001-11-16 12:01:39 thebjoern Exp $
 */
 
 
@@ -278,3 +278,39 @@ void SP_trigger_radio( gentity_t *self ) {
 }
 
 
+
+
+
+
+
+/*
+===============================================================================
+
+  AI CONTROLLED STUFF
+
+===============================================================================
+*/
+
+
+
+
+/*QUAKED ai_Radar (.5 .5 .5) ?
+*/
+void SP_ai_radar( gentity_t *ent ) {
+
+	G_FreeEntity(ent);
+}
+
+/*QUAKED ai_SAM (.5 .5 .5) ?
+*/
+void SP_ai_sam( gentity_t *ent ) {
+
+	G_FreeEntity(ent);
+}
+
+/*QUAKED ai_Flak (.5 .5 .5) ?
+*/
+void SP_ai_flak( gentity_t *ent ) {
+
+	G_FreeEntity(ent);
+}

@@ -1,5 +1,5 @@
 /*
- * $Id: g_spawn.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: g_spawn.c,v 1.2 2001-11-16 12:01:39 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -134,6 +134,10 @@ void SP_func_explosive (gentity_t *ent);
 void SP_trigger_recharge (gentity_t *ent);
 void SP_trigger_radio (gentity_t *ent);
 
+void SP_ai_radar (gentity_t* ent);
+void SP_ai_sam (gentity_t* ent);
+void SP_ai_flak (gentity_t* ent);
+
 void SP_trigger_always (gentity_t *ent);
 void SP_trigger_multiple (gentity_t *ent);
 
@@ -194,6 +198,10 @@ spawn_t	spawns[] = {
 	{"trigger_recharge", SP_trigger_recharge},
 	{"trigger_radio", SP_trigger_radio},
 
+	{"ai_radar", SP_ai_radar},
+	{"ai_sam", SP_ai_sam},
+	{"ai_flak", SP_ai_flak},
+	
 	// Triggers are brush objects that cause an effect when contacted
 	// by a living player, usually involving firing targets.
 	// While almost everything could be done with
