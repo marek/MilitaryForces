@@ -1,5 +1,5 @@
 /*
- * $Id: cg_draw.c,v 1.4 2002-01-20 20:28:44 thebjoern Exp $
+ * $Id: cg_draw.c,v 1.5 2002-01-22 11:19:55 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -754,11 +754,22 @@ static void CG_DrawRadarSymbols_GROUND( int vehicle ) {
 
 /*
 ================
-CG_DrawStatusBar_MFQ3
+CG_Draw_SpeedTape
 
 ================
 */
-static void CG_Draw_HeadingTape( int value ) {
+static void CG_Draw_SpeedTape( int speed, int stallspeed, int gearspeed ) {
+
+}
+
+
+/*
+================
+CG_Draw_HeadingTape
+
+================
+*/
+static void CG_Draw_HeadingTape( int value, int targetheading ) {
 
 	float		x, y, width, height;
 	float		offset;
@@ -772,7 +783,7 @@ static void CG_Draw_HeadingTape( int value ) {
 	offset = 0.125f - 0.0125f*value2;
 		// draw heading tape
 	x = 96;
-	y = 12;
+	y = 10;
 	width = 448;
 	height = 16;
 	CG_AdjustFrom640( &x, &y, &width, &height );
@@ -795,11 +806,13 @@ static void CG_Draw_HeadingTape( int value ) {
 		}
 	}
 	visible2 *= 10;
+	if( visible2 <= 0 ) visible2 += 360;
 	visible1 = visible2 - 30;
 	if( visible1 <= 0 ) visible1 += 360;
 	visible3 = visible2 + 30;
 	if( visible3 > 360 ) visible3 -= 360;
 	value2 = value - visible2;
+	if( value2 < -180 ) value2 += 360;
 	if( value2 < -5 ) {
 		left = qtrue;
 		right = qfalse;
@@ -813,12 +826,33 @@ static void CG_Draw_HeadingTape( int value ) {
 	CG_MFQ3HUD_Numbers( 306-(value2*64/10), 6, 3, visible2 );
 	if( left ) {
 		value2 = value - visible1;
+		if( value2 < 0 ) value2 += 360;
 		CG_MFQ3HUD_Numbers( 306-(value2*64/10), 6, 3, visible1 );
 	}
 	if( right ) {
 		value2 = value - visible3;
+		if( value2 > 0 ) value2 -= 360;
 		CG_MFQ3HUD_Numbers( 306-(value2*64/10), 6, 3, visible3 );
 	}
+
+		// heading indicater
+	x = 316;
+	y = 24;
+	width = height = 8;
+	CG_AdjustFrom640( &x, &y, &width, &height );
+	trap_R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, cgs.media.HUDind_h );
+
+		// heading caret
+	value2 = value - targetheading;
+	if( value2 < -180 ) value2 += 360;
+	else if( value2 > 180 ) value2 -= 360;
+	if( value2 < -35 ) value2 = -35;
+	if( value2 > 35 ) value2 = 35;
+	x = 316-(value2*64/10);
+	y = 24;
+	width = height = 8;
+	CG_AdjustFrom640( &x, &y, &width, &height );
+	trap_R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, cgs.media.HUDcaret_h );
 
 }
 
@@ -851,9 +885,18 @@ static void CG_DrawStatusBar_MFQ3_new( void ) {
 	ps = &cg.snap->ps;
 
 	// heading
-	value = 360 - (int)ps->vehicleAngles[1];
-	if( value <= 0 ) value += 360;
-	CG_Draw_HeadingTape( value );
+	if( hud_heading.integer ) {
+		value = 360 - (int)ps->vehicleAngles[1];
+		if( value <= 0 ) value += 360;
+		CG_Draw_HeadingTape( value, 360 );
+	}
+
+	// speed
+	if( hud_speed.integer ) {
+		value = ps->speed/10;
+		CG_Draw_SpeedTape( ps->speed/10, availableVehicles[vehicle].stallspeed,
+				availableVehicles[vehicle].stallspeed * SPEED_GREEN_ARC );
+	}
 }
 
 /*

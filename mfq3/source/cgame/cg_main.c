@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.5 2002-01-20 20:28:44 thebjoern Exp $
+ * $Id: cg_main.c,v 1.6 2002-01-22 11:19:55 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -150,6 +150,10 @@ vmCvar_t	cg_radarTargets;
 vmCvar_t	cg_tracer;
 vmCvar_t	cg_smoke;
 
+vmCvar_t	hud_heading;
+vmCvar_t	hud_speed;
+
+
 typedef struct {
 	vmCvar_t	*vmCvar;
 	char		*cvarName;
@@ -231,6 +235,9 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_radarTargets, "cg_radarTargets", "20", CVAR_ARCHIVE },
 	{ &cg_tracer, "cg_tracer", "3", CVAR_ARCHIVE },
 	{ &cg_smoke, "cg_smoke", "1", CVAR_ARCHIVE },
+
+	{ &hud_heading, "hud_heading", "1", CVAR_ARCHIVE },
+	{ &hud_speed, "hud_speed", "1", CVAR_ARCHIVE },
 
 	{ &pmove_fixed, "pmove_fixed", "1", CVAR_ROM},
 	{ &pmove_msec, "pmove_msec", "8", 0},
@@ -734,7 +741,10 @@ static void CG_RegisterGraphics( void ) {
 		cgs.media.HUDnumbers[i] = trap_R_RegisterShader( mfq3_nums[i] );
 	}
 	cgs.media.HUDvaluebox = trap_R_RegisterShaderNoMip( "newhud/valuebox.tga" );
+	cgs.media.HUDind_h = trap_R_RegisterShaderNoMip( "newhud/ind_h.tga" );
+	cgs.media.HUDcaret_h = trap_R_RegisterShaderNoMip( "newhud/caret_g_h.tga" );
 	// end MFQ£ new HUD
+
 
 	cgs.media.bulletFlashModel = trap_R_RegisterModel("models/weaphits/bullet.md3");
 	cgs.media.dishFlashModel = trap_R_RegisterModel("models/weaphits/boom01.md3");
