@@ -1,5 +1,5 @@
 /*
- * $Id: cg_draw.c,v 1.27 2002-02-21 16:41:25 sparky909_uk Exp $
+ * $Id: cg_draw.c,v 1.28 2002-02-22 10:40:57 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -2740,6 +2740,8 @@ CG_DrawTeamScore
 */
 static void CG_DrawTeamScore( itemDef_t * item, int team )
 {
+	// NOTE: the score strings are  copied to these statics because just using the pointer returned 
+	// by va() appears to cause memory problems
 	static char redScore[32] = { 0 };
 	static char blueScore[32] = { 0 };
 
@@ -2747,12 +2749,12 @@ static void CG_DrawTeamScore( itemDef_t * item, int team )
 	switch( team )
 	{
 	case CG_GAME_REDSCORE:
-		sprintf( redScore, "%d", cg.teamScores[0] );
+		strcpy( redScore, va( "%d", cg.teamScores[0] ) );
 		item->text = redScore; 
 		break;
 
 	case CG_GAME_BLUESCORE:
-		sprintf( blueScore, "%d", cg.teamScores[1] );
+		strcpy( blueScore, va( "%d", cg.teamScores[1] ) );
 		item->text = blueScore; 
 		break;
 
