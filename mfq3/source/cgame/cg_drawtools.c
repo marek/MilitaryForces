@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawtools.c,v 1.9 2002-02-18 16:30:45 sparky909_uk Exp $
+ * $Id: cg_drawtools.c,v 1.10 2002-02-19 13:55:58 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -860,10 +860,13 @@ Uses a X/Y axis of a polygon-mesh to draw shadows
 
 qboolean CG_PolyMeshGeneratedShadow( centity_t *cent, clientInfo_t * ci, float *shadowPlane )
 {
-	int x, y, iMod;
-	float xRad, yRad;
-	float xAlter, yAlter;
-	float u, v, mod;
+	int x = 0, y = 0, iMod = 0;
+	float xRad = 0, yRad = 0;
+	float xOffset = 0, yOffset = 0;
+	float xAlter = 0, yAlter = 0;
+	float pitchMax = 0, rollMax = 0;
+	float pitchMod = 0, rollMod = 0;
+	float u = 0, v = 0, mod = 0;
 	int midPoint = 3;
 	polyVert_t verts[5][5];
 	polyVert_t vertBuff[4];
@@ -875,32 +878,45 @@ qboolean CG_PolyMeshGeneratedShadow( centity_t *cent, clientInfo_t * ci, float *
 #pragma message ("CG_PolyMeshGeneratedShadow() - fix problem when projecting over water")
 #pragma message ("CG_PolyMeshGeneratedShadow() - fix problem with bounding box (use custom coords)")
 
-	// assign the x/y radius values based on the vehicle bounding box
-	// NOTE: we might need to setup dedicated values in availableVehicles[] for this later.  also if min/max
-	// boxes are quite different then we may need to allow for the offset nature of the vehicle's origin
-	xRad = availableVehicles[ ci->vehicle ].maxs[ 0 ];
-	yRad = availableVehicles[ ci->vehicle ].maxs[ 1 ];
-	xRad -= availableVehicles[ ci->vehicle ].mins[ 0 ];
-	yRad -= availableVehicles[ ci->vehicle ].mins[ 1 ];
-	xRad *= 0.5f;
-	yRad *= 0.5f;
+	// apply vehicle shadow size/offset adjusters
+	xRad = availableVehicles[ ci->vehicle ].shadowCoords[ SHC_XADJUST ];
+	yRad = availableVehicles[ ci->vehicle ].shadowCoords[ SHC_YADJUST ];
+	xOffset = availableVehicles[ ci->vehicle ].shadowCoords[ SHC_XOFFSET ];
+	yOffset = availableVehicles[ ci->vehicle ].shadowCoords[ SHC_YOFFSET ];
 
-	// PLANES ONLY: alter the radius values based upon the vehicles pitch & roll
+	// PLANES+HELICOPTERS ONLY: alter the radius values based upon the vehicles pitch & roll
 	if( (availableVehicles[ ci->vehicle ].cat & CAT_PLANE) || 
-		(availableVehicles[ ci->vehicle ].cat & CAT_HELO) ) {
-		xAlter = fabs( cent->lerpAngles[PITCH] / 30.0f );
-		yAlter = fabs( cent->lerpAngles[ROLL] / 90.0f );
+		(availableVehicles[ ci->vehicle ].cat & CAT_HELO) )
+	{
+		// get pitch/roll adjusters
+		pitchMax = availableVehicles[ ci->vehicle ].shadowAdjusts[ SHO_PITCHMAX ];
+		rollMax = availableVehicles[ ci->vehicle ].shadowAdjusts[ SHO_ROLLMAX ];
+		pitchMod = availableVehicles[ ci->vehicle ].shadowAdjusts[ SHO_PITCHMOD ];
+		rollMod = availableVehicles[ ci->vehicle ].shadowAdjusts[ SHO_ROLLMOD ];
+
+		// adjust
+		xAlter = fabs( cent->lerpAngles[PITCH] / pitchMax );
+		yAlter = fabs( cent->lerpAngles[ROLL] / rollMax );
 		MF_LimitFloat( &xAlter, 0.0f, 1.0f );
 		MF_LimitFloat( &yAlter, 0.0f, 1.0f );
-		xRad *= 1.0f - ( 0.8f * xAlter );
-		yRad *= 1.0f - ( 0.8f * yAlter );
+		xRad *= 1.0f - ( pitchMod * xAlter );
+		yRad *= 1.0f - ( rollMod * yAlter );
 	}
 
-	// get the shader handle
-	shaderHandle = CG_GetVehicleShadowShader( ci->vehicle );
-	if( !shaderHandle )
+	// shadow testing active?
+	if( cg_shadowDebug.value )
 	{
-		return qtrue;
+		// use a square outline texture (targetting reticle)
+		shaderHandle = cgs.media.HUDreticles[ HR_TARGET_FRIEND ];
+	}
+	else
+	{
+		// get the shader handle
+		shaderHandle = CG_GetVehicleShadowShader( ci->vehicle );
+		if( !shaderHandle )
+		{
+			return qtrue;
+		}
 	}
 
 	// create the mesh
@@ -917,8 +933,8 @@ qboolean CG_PolyMeshGeneratedShadow( centity_t *cent, clientInfo_t * ci, float *
 			// coords
 
 			// calc the x/y first
-			verts[y][x].xyz[ 0 ] = ((xRad * 2.0f * u) - xRad);
-			verts[y][x].xyz[ 1 ] = ((yRad * 2.0f * v) - yRad);
+			verts[y][x].xyz[ 0 ] = ((xRad * 2.0f * u) - xRad) - xOffset;
+			verts[y][x].xyz[ 1 ] = ((yRad * 2.0f * v) - yRad) - yOffset;
 			verts[y][x].xyz[ 2 ] = 0;
 
 			// rotate the grid around the required yaw (local origin)
@@ -926,8 +942,8 @@ qboolean CG_PolyMeshGeneratedShadow( centity_t *cent, clientInfo_t * ci, float *
 			VectorCopy( tmpVec, verts[y][x].xyz );
 
 			// convert to global origin
-			verts[y][x].xyz[ 0 ] += cent->lerpOrigin[ 0 ];
-			verts[y][x].xyz[ 1 ] += cent->lerpOrigin[ 1 ];
+			verts[y][x].xyz[ 0 ] += (cent->lerpOrigin[ 0 ]);
+			verts[y][x].xyz[ 1 ] += (cent->lerpOrigin[ 1 ]);
 
 			// trace a ray down from the x/y to get the z
 			VectorCopy( verts[y][x].xyz, start );

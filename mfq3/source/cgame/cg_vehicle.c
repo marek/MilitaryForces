@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicle.c,v 1.11 2002-02-19 13:28:53 thebjoern Exp $
+ * $Id: cg_vehicle.c,v 1.12 2002-02-19 13:55:58 sparky909_uk Exp $
 */
 
 #include "cg_local.h"
@@ -309,6 +309,63 @@ static void CG_CacheBoat(int index)
 
 /*
 ===============
+CG_InitShadow
+===============
+*/
+
+void CG_InitShadow( int vehicle )
+{
+	qhandle_t customShadowShader = -1;
+	float xRad = 0, yRad = 0;
+
+	// cache the vehicle's custom shadow shader (if we can find one - format is <modelName>Shadow, "like f-16Shadow")
+
+	// try to load custom shader
+	customShadowShader = trap_R_RegisterShader( va( "%sShadow", availableVehicles[ vehicle ].modelName ) );
+	
+	// replace SHADOW_x fallback op. with the custom shader handle?
+	if( customShadowShader )
+	{
+		availableVehicles[ vehicle ].shadowShader = customShadowShader;
+	}
+
+	// setup default shadow size adjusters if none set
+	if( availableVehicles[ vehicle ].shadowCoords[ SHC_XADJUST ] == 0 &&
+		availableVehicles[ vehicle ].shadowCoords[ SHC_YADJUST ] == 0 )
+	{
+		// create x & y adjusters from the vehicle's bound box
+		xRad = availableVehicles[ vehicle ].maxs[ 0 ];
+		yRad = availableVehicles[ vehicle ].maxs[ 1 ];
+		xRad -= availableVehicles[ vehicle ].mins[ 0 ];
+		yRad -= availableVehicles[ vehicle ].mins[ 1 ];
+		xRad *= 0.5f;
+		yRad *= 0.5f;
+		availableVehicles[ vehicle ].shadowCoords[ SHC_XADJUST ] = xRad;
+		availableVehicles[ vehicle ].shadowCoords[ SHC_YADJUST ] = yRad;
+	}
+
+	// setup default shadow orientation modifiers/adjusters if none set
+	// NOTE: will be set for all vehicles, but currently only used on flying ones
+	
+	// maximums
+	if( availableVehicles[ vehicle ].shadowAdjusts[ SHO_PITCHMAX ] == 0 &&
+		availableVehicles[ vehicle ].shadowAdjusts[ SHO_ROLLMAX ] == 0 )
+	{
+		availableVehicles[ vehicle ].shadowAdjusts[ SHO_PITCHMAX ] = 30.0f;
+		availableVehicles[ vehicle ].shadowAdjusts[ SHO_ROLLMAX ] = 90.0f;
+	}
+
+	// modifiers
+	if( availableVehicles[ vehicle ].shadowAdjusts[ SHO_PITCHMOD ] == 0 &&
+		availableVehicles[ vehicle ].shadowAdjusts[ SHO_ROLLMOD ] == 0 )
+	{
+		availableVehicles[ vehicle ].shadowAdjusts[ SHO_PITCHMOD ] = 0.8f;
+		availableVehicles[ vehicle ].shadowAdjusts[ SHO_ROLLMOD ] = 0.8f;
+	}
+}
+
+/*
+===============
 CG_CacheVehicles
 ===============
 */
@@ -316,7 +373,6 @@ CG_CacheVehicles
 void CG_CacheVehicles()
 {
 	int i;
-	qhandle_t customShadowShader = -1;
 
 	// later there could also be a check to only cache the current gameset
 	for( i = 0; i < bg_numberOfVehicles; i++ )
@@ -342,17 +398,9 @@ void CG_CacheVehicles()
 				trap_Error( va("Invalid Vehicle type in CG_CacheVehicles (%d,%d)", 
 					i, availableVehicles[i].cat));
 			}
-		}
 
-		// cache the vehicle's custom shadow shader (if we can find one - format is <modelName>Shadow, "like f-16Shadow")
-
-		// try to load custom shader
-		customShadowShader = trap_R_RegisterShader( va( "%sShadow", availableVehicles[i].modelName ) );
-		
-		// replace SHADOW_x fallback op. with the custom shader handle?
-		if( customShadowShader )
-		{
-			availableVehicles[i].shadowShader = customShadowShader;
+			// init the vehicle's shadow system
+			CG_InitShadow( i );
 		}
 	}
 }

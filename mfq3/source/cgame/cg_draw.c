@@ -1,5 +1,5 @@
 /*
- * $Id: cg_draw.c,v 1.20 2002-02-18 16:30:45 sparky909_uk Exp $
+ * $Id: cg_draw.c,v 1.21 2002-02-19 13:55:58 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -2297,10 +2297,11 @@ Draw the custom chat console (if active)
 =====================
 */
 
-#define	CHAT_X			128+4
-#define	CHAT_Y			(480-CHAT_HEIGHT-4-32)
-#define CHAT_WIDTH		320+64-4-4
-#define CHAT_HEIGHT		16
+#define	CHAT_X				(128+4)
+#define	CHAT_Y				4
+#define	CHAT_Y_IN_NEWHUD	(480-CHAT_HEIGHT-4-32)
+#define CHAT_WIDTH			(320+64-4-4)
+#define CHAT_HEIGHT			16
 
 #define	CHAT_OX			4
 #define	CHAT_OY			4
@@ -2324,6 +2325,12 @@ void CG_CustomChatDraw( void )
 	if( cg.pCustomChat == NULL )
 	{
 		return;
+	}
+
+	// reposition around HUD?
+	if( CG_NewHUDActive() )
+	{
+		y = CHAT_Y_IN_NEWHUD;
 	}
 
 	// fading out?
@@ -2484,7 +2491,51 @@ static void CG_Draw2D_MFQ3( void ) {
 	CG_DrawCenterString();
 }
 
-static int (QDECL *syscall)( int arg, ... ) = (int (QDECL *)( int, ...))-1;
+/*
+=====================
+CG_DrawDevelop
+
+Draw debugging (ONLY) text
+=====================
+*/
+void CG_DrawDevelop( void )
+{
+	clientInfo_t * ci = NULL;
+	int y = 96;
+
+	// get client information
+	ci = &cgs.clientinfo[ cg.snap->ps.clientNum ];
+
+	// shadow testing on?
+	if( cg_shadowDebug.value )
+	{
+		DC->fillRect( 64-4, y-4, 128+32, 128, *CreateColourVector(0,0,0,0.4f,NULL) );
+		DC->fillRect( 64-4, y-4, 128+32, 16, *CreateColourVector(0,0,0,0.4f,NULL) );
+		DrawStringNewBasic( 64, y, 0.25f, "Shadow Debug" );
+		y+=16;
+		DrawStringNewBasic( 64, y, 0.25f, va( "X=%1.f Y=%1.f Z=%1.f", cg.snap->ps.origin[0], cg.snap->ps.origin[1], cg.snap->ps.origin[2] ) );
+		
+		if( cg.snap->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR )
+		{
+			y+=12;
+			DrawStringNewBasic( 64, y, 0.25f, va( "X Offset=%1.f", availableVehicles[ ci->vehicle ].shadowCoords[ SHC_XOFFSET ] ) );
+			y+=12;
+			DrawStringNewBasic( 64, y, 0.25f, va( "Y Offset=%1.f", availableVehicles[ ci->vehicle ].shadowCoords[ SHC_YOFFSET ] ) );
+			y+=12;
+			DrawStringNewBasic( 64, y, 0.25f, va( "X Adjuster=%1.f", availableVehicles[ ci->vehicle ].shadowCoords[ SHC_XADJUST ] ) );
+			y+=12;
+			DrawStringNewBasic( 64, y, 0.25f, va( "Y Adjuster=%1.f", availableVehicles[ ci->vehicle ].shadowCoords[ SHC_YOFFSET ] ) );
+			y+=12;
+			DrawStringNewBasic( 64, y, 0.25f, va( "Pitch Max=%1.f", availableVehicles[ ci->vehicle ].shadowAdjusts[ SHO_PITCHMAX ] ) );
+			y+=12;
+			DrawStringNewBasic( 64, y, 0.25f, va( "Roll Max=%1.f", availableVehicles[ ci->vehicle ].shadowAdjusts[ SHO_ROLLMAX ] ) );
+			y+=12;
+			DrawStringNewBasic( 64, y, 0.25f, va( "Pitch Modifier=%1.2f", availableVehicles[ ci->vehicle ].shadowAdjusts[ SHO_PITCHMOD ] ) );
+			y+=12;
+			DrawStringNewBasic( 64, y, 0.25f, va( "Roll Modifier=%1.2f", availableVehicles[ ci->vehicle ].shadowAdjusts[ SHO_ROLLMOD ] ) );
+		}
+	}
+}
 
 /*
 =====================
@@ -2544,9 +2595,10 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 	}
 
 	// draw status bar and other floating elements
-// 	CG_Draw2D();	
+// 	CG_Draw2D();
 	CG_Draw2D_MFQ3();
-	CG_CustomChatDraw();
+	CG_CustomChatDraw();	// draw custom chat console
+	CG_DrawDevelop();		// draw debugging (ONLY) text
 }
 
 #ifdef _MENU_SCOREBOARD	// NOTE: functions copied from v1.29h code to enable new scoreboard method

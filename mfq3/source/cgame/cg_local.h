@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.34 2002-02-18 16:30:45 sparky909_uk Exp $
+ * $Id: cg_local.h,v 1.35 2002-02-19 13:55:58 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -920,6 +920,9 @@ typedef struct {
 
 //==============================================================================
 
+//extern	vmCvar_t		cg_pmove_fixed;
+//extern	vmCvar_t		cg_drawCrosshair;
+
 extern	cgs_t			cgs;
 extern	cg_t			cg;
 extern	centity_t		cg_entities[MAX_GENTITIES];
@@ -940,7 +943,6 @@ extern	vmCvar_t		cg_drawFPS;
 extern	vmCvar_t		cg_drawSnapshot;
 extern	vmCvar_t		cg_draw3dIcons;
 extern	vmCvar_t		cg_drawIcons;
-//extern	vmCvar_t		cg_drawCrosshair;
 extern	vmCvar_t		cg_drawCrosshairNames;
 extern	vmCvar_t		cg_drawRewards;
 extern	vmCvar_t		cg_drawTeamOverlay;
@@ -987,7 +989,6 @@ extern	vmCvar_t		cg_teamChatsOnly;
 extern	vmCvar_t		cg_smoothClients;
 extern	vmCvar_t		pmove_fixed;
 extern	vmCvar_t		pmove_msec;
-//extern	vmCvar_t		cg_pmove_fixed;
 extern	vmCvar_t		cg_timescaleFadeEnd;
 extern	vmCvar_t		cg_timescaleFadeSpeed;
 extern	vmCvar_t		cg_timescale;
@@ -996,7 +997,7 @@ extern  vmCvar_t		cg_smallFont;
 extern  vmCvar_t		cg_bigFont;
 extern	vmCvar_t		cg_noTaunt;
 
-// MFQ3
+// MFQ3+
 extern	vmCvar_t		cg_vehicle;
 extern	vmCvar_t		cg_nextVehicle;
 extern	vmCvar_t		cg_thirdPersonHeight;
@@ -1036,6 +1037,10 @@ extern	vmCvar_t		m2cp_page5;
 
 extern	vmCvar_t		cg_fxQuality;
 extern	vmCvar_t		cg_consoleTextStyle;
+
+extern	vmCvar_t		cg_shadowDebug;
+
+// MFQ3-
 
 //
 // cg_main.c
