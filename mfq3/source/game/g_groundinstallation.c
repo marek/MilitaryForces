@@ -1,12 +1,8 @@
 /*
- * $Id: g_groundinstallation.c,v 1.5 2003-08-06 18:10:21 thebjoern Exp $
+ * $Id: g_groundinstallation.c,v 1.6 2003-08-06 19:05:59 thebjoern Exp $
 */
 
 #include "g_local.h"
-
-
-
-
 
 
 static void loselock( gentity_t* ent )
@@ -20,6 +16,35 @@ static void loselock( gentity_t* ent )
 	ent->s.tracktarget = ENTITYNUM_NONE;
 	ent->gi_nextScanTime = level.time + 1500;
 	ent->gi_reloadTime = level.time + availableGroundInstallations[ent->s.modelindex2].reloadTime;
+}
+
+
+void groundinstallation_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int meansOfDeath )
+{
+	loselock(self);
+
+	if( self->score && attacker && attacker->client ) {
+		vec3_t	pos;
+		int score;
+		VectorAdd( self->r.absmin, self->r.absmax, pos );
+		VectorScale( pos, 0.5f, pos );
+		if( g_gametype.integer >= GT_TEAM ) {
+			if( self->s.generic1 == attacker->client->ps.persistant[PERS_TEAM] ) score = -self->score;
+			else if( self->s.generic1 != attacker->client->ps.persistant[PERS_TEAM] ) score = self->score;
+		} else {
+			score = self->score;
+		}
+
+		AddScore( attacker, pos, score );
+	}
+
+	ExplodeVehicle(self);
+	self->freeAfterEvent = qtrue;
+
+	G_RadiusDamage( self->r.currentOrigin, self, 150, 150, self, MOD_VEHICLEEXPLOSION, CAT_ANY );
+
+	trap_LinkEntity( self );
+	
 }
 
 static void Update_GI_Targets( gentity_t* ent )
