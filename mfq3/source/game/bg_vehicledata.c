@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.20 2002-02-15 09:58:31 thebjoern Exp $
+ * $Id: bg_vehicledata.c,v 1.21 2002-02-17 13:26:45 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -96,6 +96,50 @@ completeVehicleData_t availableVehicles[] =
 	0,							// swingangle
 	1400,						// geartime
 	47,							// max gear frame
+	0							// renderflags
+    },
+
+    {	"Harrier GR-7",		    // descriptiveName
+	"GR-7",						// tinyName
+	"gr7",						// modelName
+	SHADOW_DEFAULT,				// alpha shadow
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_1,
+	CAT_PLANE,
+	CLASS_PLANE_FIGHTER,
+	0,							// flags
+	HC_GEAR|HC_SPEEDBRAKE|
+	HC_VAPOR,					// capabilities
+	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
+	{-26, -19, -4},				// mins (bounding box)
+	{38, 19, 12},				// max (bounding box)
+	{70, 80, 340},				// turnspeed around the three axis
+	{0, 100, 70},				// camera distance {min,max,default}
+	{0, 100, 20},				// camera height {min,max,default}
+	200,						// stallspeed
+	720,						// maxspeed
+	0,							// min throttle
+	15,							// max throttle
+	1,							// engines
+	0,							// wheels
+	0,							// wheel circumference
+	250,						// acceleration
+	130,						// health
+	{19.698f, -1.328f, -3.016f},// gun tag
+	60,							// max fuel
+	3,							// gearheight
+	0,							// tailangle
+	WI_MG_20MM, WI_AMRAAM, WI_SIDEWINDER, 0, 0, 0, 0, WI_FLARE,		// weapons
+	450, 5, 4, 0, 0, 0, 0, 28,	// ammo
+	{19, 0, 5},					// cameraposition for cockpit view
+	AB_BALL,					// effect model
+	10000,						// radar range
+	3000,						// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
+	0,							// swingangle
+	1400,						// geartime
+	69,							// max gear frame
 	0							// renderflags
     },
 

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.12 2002-02-15 16:03:19 thebjoern Exp $
+ * $Id: bg_mfq3util.c,v 1.13 2002-02-17 13:26:45 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -49,15 +49,15 @@ unsigned long MF_GetGameset( qboolean asEnum )
 	trap_Cvar_VariableStringBuffer( "mf_gameset", tmpGamesetStr, sizeof(tmpGamesetStr) );
 
 	// compare
-	if( stricmp( tmpGamesetStr, "ww1" ) == 0 )
+	if( Q_stricmp( tmpGamesetStr, "ww1" ) == 0 )
 	{
 		returnValue = MF_GAMESET_WW1;
 	}
-	else if( stricmp( tmpGamesetStr, "ww2" ) == 0 )
+	else if( Q_stricmp( tmpGamesetStr, "ww2" ) == 0 )
 	{
 		returnValue = MF_GAMESET_WW2;
 	}
-	else if( stricmp( tmpGamesetStr, "modern" ) == 0 )
+	else if( Q_stricmp( tmpGamesetStr, "modern" ) == 0 )
 	{
 		returnValue = MF_GAMESET_MODERN;
 	}
