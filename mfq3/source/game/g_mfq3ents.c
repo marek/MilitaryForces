@@ -1,5 +1,5 @@
 /*
- * $Id: g_mfq3ents.c,v 1.2 2001-11-16 12:01:39 thebjoern Exp $
+ * $Id: g_mfq3ents.c,v 1.3 2001-11-19 17:47:07 thebjoern Exp $
 */
 
 
@@ -37,6 +37,23 @@ void explosive_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, 
 	ent = G_TempEntity( pos, EV_VEHICLE_GIB );
 	ent->r.svFlags = SVF_BROADCAST;	// send to everyone
 	ent->s.eventParm = 1;
+
+	if( ent->target ) {
+		gentity_t* t = NULL;
+		while ( (t = G_Find (t, FOFS(targetname), ent->target)) != NULL ) {
+			if ( t == ent ) {
+				G_Printf ("WARNING: Entity used itself.\n");
+			} else {
+				if ( t->die ) {
+					t->die(t, inflictor, attacker, damage, meansOfDeath);
+				}
+			}
+			if ( !ent->inuse ) {
+				G_Printf("entity was removed while using targets\n");
+				break;
+			}
+		}
+	}
 
 	trap_UnlinkEntity( self );
 	

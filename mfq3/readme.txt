@@ -5,8 +5,13 @@ Military Forces Q3
 History:
 ========
 
-+++v0.42+++ in progress...
++++v0.43+++ in progress...
 -----------
+
++++v0.42+++
+-----------
+- func_explosives have target and targetname, to allow chain reactions
+  of explosions
 - added a cvar cg_smoke to allow turning on(1) or off(0) the smoke on
   damaged vehicles
 - planes can land on func_plat now
@@ -28,7 +33,7 @@ History:
 - misc_vehicle can also spawn random vehicles when 'model' key is set to
   'randomplane' or 'randomground' 
 - added an explosion to func_explosive on death
-- made radar work with misc_vehicles
+- made radar work with mi`sc_vehicles
 - added misc_vehicle entity
 - added misc_waypoint
 - minor fixes
