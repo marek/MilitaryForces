@@ -1,5 +1,5 @@
 /*
- * $Id: ui_atoms.c,v 1.3 2002-01-23 18:47:22 sparky909_uk Exp $
+ * $Id: ui_atoms.c,v 1.4 2002-02-15 17:43:57 sparky909_uk Exp $
 */
 
 /**********************************************************************
@@ -297,7 +297,22 @@ static void UI_CalcPostGameStats() {
 
 }
 
+/*
+==================
+MFQ3 Custom Chat
+==================
+*/
 
+static void UI_Chat( int mode )
+{
+	// reset & begin
+	trap_Key_SetCatcher( KEYCATCH_UI );
+	uiInfo.customChat.active = qtrue;
+	uiInfo.customChat.lifeAlpha = 1.0f;
+	uiInfo.customChat.text[0] = 0;
+	uiInfo.customChat.cindex = 0;
+	uiInfo.customChat.mode = mode;
+}
 /*
 =================
 UI_ConsoleCommand
@@ -383,6 +398,7 @@ qboolean UI_ConsoleCommand( int realTime ) {
 
 		return qtrue;
 	}
+
 /* MFQ3: TODO - MM
 
 	// MFQ3: bring up the 'vehicle encyclopedia' dialog (i.e. bind command to key)
@@ -392,6 +408,27 @@ qboolean UI_ConsoleCommand( int realTime ) {
 		return qtrue;
 	}
 */
+	// MFQ3: bring up the custom chat console
+	if( Q_stricmp( cmd, "cmessagemode") == 0 )
+	{
+		UI_Chat( CCHAT_ALL );
+		return qtrue;
+	}
+	else if( Q_stricmp( cmd, "cmessagemode2") == 0 )
+	{
+		UI_Chat( CCHAT_TEAM );
+		return qtrue;
+	}
+	else if( Q_stricmp( cmd, "cmessagemode3") == 0 )
+	{
+		UI_Chat( CCHAT_TARGET );
+		return qtrue;
+	}
+	else if( Q_stricmp( cmd, "cmessagemode4") == 0 )
+	{
+		UI_Chat( CCHAT_ATTACK );
+		return qtrue;
+	}
 
 	return qfalse;
 }

@@ -1,7 +1,8 @@
 /*
- * $Id: ui_syscalls.c,v 1.2 2002-01-19 02:24:03 thebjoern Exp $
+ * $Id: ui_syscalls.c,v 1.3 2002-02-15 17:43:57 sparky909_uk Exp $
 */
 #include "ui_local.h"
+#include "..\cgame\cg_public.h"
 
 // this file is only included when building a dll
 // syscalls.asm is included instead when building a qvm
@@ -362,12 +363,10 @@ void trap_CIN_SetExtents (int handle, int x, int y, int w, int h) {
 }
 
 
-void	trap_R_RemapShader( const char *oldShader, const char *newShader, const char *timeOffset ) {
+void trap_R_RemapShader( const char *oldShader, const char *newShader, const char *timeOffset ) {
 	syscall( UI_R_REMAP_SHADER, oldShader, newShader, timeOffset );
 }
 
 qboolean trap_VerifyCDKey( const char *key, const char *chksum) {
 	return syscall( UI_VERIFY_CDKEY, key, chksum);
 }
-
- 

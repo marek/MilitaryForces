@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.10 2002-02-15 09:58:31 thebjoern Exp $
+ * $Id: ui_main.c,v 1.11 2002-02-15 17:43:57 sparky909_uk Exp $
 */
 /*
 =======================================================================
@@ -241,6 +241,113 @@ void _UI_DrawTopBottom(float x, float y, float w, float h, float size) {
 	trap_R_DrawStretchPic( x, y, w, size, 0, 0, 0, 0, uiInfo.uiDC.whiteShader );
 	trap_R_DrawStretchPic( x, y + h - size, w, size, 0, 0, 0, 0, uiInfo.uiDC.whiteShader );
 }
+
+/*
+=====================
+UI_CustomChatDraw
+
+Draw the custom chat console (if active)
+=====================
+*/
+
+#define	CHAT_X			4
+#define	CHAT_Y			(480-CHAT_HEIGHT-4)
+#define CHAT_WIDTH		(640-8)
+#define CHAT_HEIGHT		16
+
+#define	CHAT_OX			4
+#define	CHAT_OY			4
+#define CHAT_TEXT_SCALE	0.25f
+
+#define	CURSOR_OX		2
+#define	CURSOR_OY		2
+#define	CURSOR_W		8
+#define	CURSOR_H		12
+
+#pragma message ("UI_CustomChatDraw() try to force the UI to draw even when it's not 'active' (so we can fade out)")
+
+void UI_CustomChatDraw( void )
+{
+	int spacer1 = 0, spacer2 = 0;
+	char * pMode = NULL;
+	int x = CHAT_X, y = CHAT_Y;
+	float alpha = 1.0f; 
+
+	// fading out?
+	if( !uiInfo.customChat.active )
+	{
+/*
+		// reduce life based upon time
+ 		uiInfo.customChat.lifeAlpha -= (1.0f * FRAME_SECOND_FRACTION );
+		MF_LimitFloat( &uiInfo.customChat.lifeAlpha, 0.0f, 1.0f );
+
+		// out of life
+		if( uiInfo.customChat.lifeAlpha <= 0.1f )
+		{
+*/
+			// zap to 0
+			uiInfo.customChat.lifeAlpha = 0.0f;
+			return;
+//		}
+	}
+
+	// choose prefix
+	switch( uiInfo.customChat.mode )
+	{
+	case CCHAT_ALL:
+		pMode = "Chat: ";
+		break;
+	case CCHAT_TEAM:
+		pMode = "Team Chat: ";
+		break;
+	case CCHAT_TARGET:
+		pMode = "Target Chat: ";
+		break;
+	case CCHAT_ATTACK:
+		pMode = "Attacker Chat: ";
+		break;
+	}
+
+	alpha = uiInfo.customChat.lifeAlpha;
+
+	// draw the chat background
+	DC->fillRect( x, y, CHAT_WIDTH, CHAT_HEIGHT, *CreateColourVector( 0,0.4f,0,0.75f * alpha,NULL ) );
+	DC->drawRect( x, y, CHAT_WIDTH, CHAT_HEIGHT, 1, *CreateColourVector( 0,0,0,0.75f * alpha,NULL ) );
+
+	spacer1 = DC->textWidth( pMode, CHAT_TEXT_SCALE, 0 );
+
+	// draw the current text line
+	DrawStringNew( x+CHAT_OX, y+CHAT_OY, CHAT_TEXT_SCALE, *CreateColourVector(1,1,0,1 * alpha,NULL), pMode, 0, 0, ITEM_TEXTSTYLE_SHADOWED, LEFT_JUSTIFY );
+	DrawStringNew( x+CHAT_OX+spacer1, y+CHAT_OY, CHAT_TEXT_SCALE, *CreateColourVector(1,1,1,1 * alpha,NULL), uiInfo.customChat.text, 0, 0, ITEM_TEXTSTYLE_SHADOWED, LEFT_JUSTIFY );
+
+	spacer2 = DC->textWidth( uiInfo.customChat.text, CHAT_TEXT_SCALE, 0 );
+
+	// fade the cursor
+	if( uiInfo.customChat.cursorDir )
+	{
+		// down
+		uiInfo.customChat.cursorAlpha -= (2.0f * FRAME_SECOND_FRACTION );
+		if( uiInfo.customChat.cursorAlpha <= 0.0f )
+		{
+			uiInfo.customChat.cursorAlpha = 0.0f;
+			uiInfo.customChat.cursorDir = qfalse;
+		}
+	}
+	else
+	{
+		// down
+		uiInfo.customChat.cursorAlpha += (2.0f * FRAME_SECOND_FRACTION );
+		if( uiInfo.customChat.cursorAlpha >= 1.0f )
+		{
+			uiInfo.customChat.cursorAlpha = 1.0f;
+			uiInfo.customChat.cursorDir = qtrue;
+		}
+	}
+
+	// draw the cursor
+	DC->fillRect( x+spacer1+spacer2+CURSOR_OX+4, y+CURSOR_OY, CURSOR_W, CURSOR_H, *CreateColourVector( 1,1,1,uiInfo.customChat.cursorAlpha * alpha,NULL ) );
+}
+
 /*
 ================
 UI_DrawRect
@@ -632,8 +739,8 @@ void UI_DrawMouse( void )
 		break;
 	}
 
-	// draw cursor (not during loading)
-	if( Menu_Count() > 0 && cstate.connState != CA_LOADING )
+	// draw cursor (not during loading/chat)
+	if( Menu_Count() > 0 && cstate.connState != CA_LOADING && !uiInfo.customChat.active )
 	{
 		UI_DrawHandlePic( uiInfo.uiDC.cursorx + offsetX, uiInfo.uiDC.cursory + offsetY, 32, 32, cursorHandle );
 	}
@@ -701,6 +808,9 @@ void _UI_Refresh( int realtime )
 
 	// render the mouse cursor
 	UI_DrawMouse();
+
+	// render the chat console
+	UI_CustomChatDraw();
 }
 
 /*
@@ -5390,7 +5500,113 @@ static void UI_BuildQ3Model_List( void )
 
 }
 
+/*
+=================
+MFQ3 CUSTOM CONSOLE
+=================
+*/
 
+/*
+=================
+UI_CustomChatEnd
+=================
+*/
+
+void UI_CustomChatEnd( qboolean sendText )
+{
+	// send the text?
+	if( sendText )
+	{
+		trap_Cmd_ExecuteText( EXEC_NOW, va( "say %s", uiInfo.customChat.text ) );
+	}
+
+	// disable chat
+	uiInfo.customChat.active = qfalse;
+
+	// re-enable normal keyboard operation
+	trap_Key_SetCatcher( trap_Key_GetCatcher() & ~KEYCATCH_UI );
+	trap_Key_ClearStates();
+}
+
+/*
+=================
+UI_CustomChatUpdate
+=================
+*/
+
+qboolean UI_CustomChatUpdate( int key, qboolean keyDown )
+{
+	int i = uiInfo.customChat.cindex;
+	qboolean store = qfalse;
+
+	// not active?
+	if( !uiInfo.customChat.active )
+	{
+		return qfalse;
+	}
+
+	// maxed out?
+	if( uiInfo.customChat.cindex >= MAX_CHAT_LEN )
+	{
+		return qtrue;
+	}
+
+	// extended?
+	if( key & K_CHAR_FLAG )
+	{
+		// convert
+		key &= ~K_CHAR_FLAG;
+
+		store = qtrue;
+	}
+
+	// intercept characters
+	switch( key )
+	{
+	// ESCAPE
+	case K_ESCAPE:
+		// abort
+		UI_CustomChatEnd( qfalse );
+		break;
+
+	// Return
+	case 13:
+	// Enter
+	case 169:
+		// say the current text
+		UI_CustomChatEnd( qtrue );
+		return qtrue;
+
+	// Backspace
+	case 127:
+	// Del
+	case 140:
+		// at least one char?
+		if( i > 0 && keyDown )
+		{
+			// remove the last char
+			uiInfo.customChat.text[ i-1 ] = 0;
+			uiInfo.customChat.cindex--;
+		}
+		return qtrue;
+	}
+
+	// valid normal range?
+	if( key < 0x20 || key >= 0x7F )
+	{
+		store = qfalse;
+	}
+
+	// store the character?
+	if( store )
+	{
+		uiInfo.customChat.text[ i ] = key;
+		uiInfo.customChat.text[ i+1 ] = 0;
+		uiInfo.customChat.cindex++;
+	}
+
+	return qtrue;
+}
 
 /*
 =================
@@ -5547,26 +5763,41 @@ void _UI_Init( qboolean inGameLoad ) {
 UI_KeyEvent
 =================
 */
-void _UI_KeyEvent( int key, qboolean down ) {
+void _UI_KeyEvent( int key, qboolean down )
+{
+	// if custom console is up, forward down key presses to the handler
+	if( UI_CustomChatUpdate( key, down ) )
+	{
+		return;
+	}
 
-  if (Menu_Count() > 0) {
-    menuDef_t *menu = Menu_GetFocused();
-		if (menu) {
-			if (key == K_ESCAPE && down && !Menus_AnyFullScreenVisible()) {
+	if (Menu_Count() > 0)
+	{
+		menuDef_t *menu = Menu_GetFocused();
+		if (menu)
+		{
+			if (key == K_ESCAPE && down && !Menus_AnyFullScreenVisible())
+			{
 				Menus_CloseAll();
-			} else {
+			}
+			else
+			{
 				Menu_HandleKey(menu, key, down );
 			}
-		} else {
+		}
+		else
+		{
 			trap_Key_SetCatcher( trap_Key_GetCatcher() & ~KEYCATCH_UI );
 			trap_Key_ClearStates();
 			trap_Cvar_Set( "cl_paused", "0" );
 		}
-  }
-
-  //if ((s > 0) && (s != menu_null_sound)) {
-	//  trap_S_StartLocalSound( s, CHAN_LOCAL_SOUND );
-  //}
+	}
+/*
+	if ((s > 0) && (s != menu_null_sound))
+	{
+		trap_S_StartLocalSound( s, CHAN_LOCAL_SOUND );
+	}
+*/
 }
 
 /*
@@ -6347,4 +6578,3 @@ static void UI_StartServerRefresh(qboolean full)
 		}
 	}
 }
-

@@ -1,5 +1,5 @@
 /*
- * $Id: ui_shared.c,v 1.7 2002-02-12 15:16:42 sparky909_uk Exp $
+ * $Id: ui_shared.c,v 1.8 2002-02-15 17:43:57 sparky909_uk Exp $
 */
 // 
 // string allocation/managment
@@ -5834,3 +5834,129 @@ static qboolean Menu_OverActiveItem(menuDef_t *menu, float x, float y) {
 	return qfalse;
 }
 
+/*
+==================
+CreateColourVector
+
+Create a vector colour definition
+==================
+*/
+
+static vec4_t colourVector = {1,1,1,1};	// common return ptr
+
+vec4_t * CreateColourVector( float r, float g, float b, float a, vec4_t * pVector )
+{
+	// assign
+	colourVector[0] = r;
+	colourVector[1] = g;
+	colourVector[2] = b;
+	colourVector[3] = a;
+
+	// also copy into provided char array pointer?
+	if( pVector )
+	{
+		// duplicate
+		memcpy( pVector, colourVector, sizeof( colourVector ) );
+	}
+
+	// return common ptr
+	return &colourVector;
+}
+
+/*
+==================
+CreateColourChar
+
+Create a unsigned char array of colour definition
+==================
+*/
+
+static unsigned char colourCharArray[4] = {255,255,255,255};	// common return ptr
+
+unsigned char * CreateColourChar( unsigned char r, unsigned char g, unsigned char b, unsigned char a, unsigned char * pArray )
+{
+	// assign
+	colourCharArray[0] = r;
+	colourCharArray[1] = g;
+	colourCharArray[2] = b;
+	colourCharArray[3] = a;
+
+	// also copy into provided char array pointer?
+	if( pArray )
+	{
+		// duplicate
+		memcpy( pArray, colourCharArray, sizeof( colourCharArray ) );
+	}
+
+	// return common ptr
+	return &colourCharArray[0];
+}
+
+/*
+=================
+DrawStringNewAlpha
+=================
+*/
+
+void DrawStringNewAlpha( int x, int y, const char * pText, float alpha, textJustify_t formatting )
+{
+	// just use default extra parameters
+	DrawStringNew( x, y, 0.5f, *CreateColourVector(1,1,1,alpha,NULL), pText, 0, 0, 3, formatting );
+}
+
+/*
+=================
+DrawStringNewColour
+=================
+*/
+
+void DrawStringNewColour( int x, int y, const char * pText, vec4_t colour, textJustify_t formatting )
+{
+	// just use default extra parameters
+	DrawStringNew( x, y, 0.5f, colour, pText, 0, 0, 3, formatting );
+}
+
+/*
+=================
+DrawStringNew
+=================
+*/
+
+void DrawStringNew( int x, int y, float scale, vec4_t colour, const char * pText, int hSpacing, int numChars, int style, textJustify_t formatting )
+{
+	int xPos = x;
+	int yPos = y;
+	int textWidth = 0;
+	int textHeight = 0;
+
+	// can't do anything without a device
+	if( !DC )
+	{
+		return;
+	}
+
+	// get the width and height of this text
+	textWidth = DC->textWidth( pText, scale, 0 );
+	textHeight = DC->textHeight( pText, scale, 0 );
+
+	// ->drawText() is draw from the "bottom up"
+	yPos += textHeight;
+
+	// reformat?
+	switch( formatting )
+	{
+	case LEFT_JUSTIFY:
+		break;
+
+	case CENTRE_JUSTIFY:
+		xPos -= (textWidth/2);
+		break;
+
+	case RIGHT_JUSTIFY:
+		xPos -= textWidth;
+		break;
+	}
+
+	// draw
+	DC->drawText( xPos, yPos, scale, colour, pText, hSpacing, numChars, style );
+}
