@@ -1,5 +1,5 @@
 /*
- * $Id: cg_draw.c,v 1.15 2002-02-11 16:29:42 sparky909_uk Exp $
+ * $Id: cg_draw.c,v 1.16 2002-02-12 12:33:14 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -2608,13 +2608,18 @@ const char *CG_GameMiscString() {
 CG_GameTypeString
 =====================
 */
-const char *CG_GameTypeString() {
+const char *CG_GameTypeString()
+{
+	const char * pGameType = NULL;
+	const char * pGameSet = NULL;
+
+	// get game type
 	if ( cgs.gametype == GT_FFA ) {
-		return "Deathmatch";
+		pGameType = "Deathmatch";
 	} else if ( cgs.gametype == GT_TEAM ) {
-		return "Team Deathmatch";
+		pGameType = "Team Deathmatch";
 	} else if ( cgs.gametype == GT_CTF ) {
-		return "Capture the Flag";
+		pGameType = "Capture the Flag";
 	} /* else if ( cgs.gametype == GT_1FCTF ) {
 		return "One Flag CTF";
 	} else if ( cgs.gametype == GT_OBELISK ) {
@@ -2622,7 +2627,12 @@ const char *CG_GameTypeString() {
 	} else if ( cgs.gametype == GT_HARVESTER ) {
 		return "Harvester";
 	} */
-	return "";
+
+	// get game set
+	pGameSet = gameset_items[ MF_GetGameset( qtrue ) ];
+
+	// return the string as "<gametype> (<gameset>)"
+	return va( "%s - %s", pGameType, pGameSet );
 }
 
 /*
