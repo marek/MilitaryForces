@@ -1,5 +1,5 @@
 /*
- * $Id: g_cmds.c,v 1.15 2002-06-12 14:35:33 thebjoern Exp $
+ * $Id: g_cmds.c,v 1.18 2004-12-14 16:25:10 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -601,6 +601,12 @@ void SetTeam( gentity_t *ent, char *s ) {
 		return; // ignore the request
 	}
 
+
+	// 
+	if(team == TEAM_SPECTATOR)
+	{
+		team = TEAM_FREE;
+	}
 	//
 	// execute the team change
 	//
@@ -695,10 +701,19 @@ void Cmd_Team_f( gentity_t *ent ) {
 		case TEAM_FREE:
 			trap_SendServerCommand( ent-g_entities, "print \"Free team\n\"" );
 			break;
+		// *******************
+		// Changes By: Minkis
+		// *******************
+		// Disable spectate
+		// *******************
+		/*
 		case TEAM_SPECTATOR:
 			trap_SendServerCommand( ent-g_entities, "print \"Spectator team\n\"" );
 			break;
-		}
+		*/
+		// *******************
+		}		
+		
 		return;
 	}
 
