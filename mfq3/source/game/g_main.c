@@ -1,5 +1,5 @@
 /*
- * $Id: g_main.c,v 1.16 2003-02-08 15:20:17 thebjoern Exp $
+ * $Id: g_main.c,v 1.17 2003-02-15 13:04:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -465,11 +465,14 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 	G_RemapTeamShaders();
 
-	// MFQ3 mission scripts
-	G_LoadMissionScripts();
+	if( g_gametype.integer != GT_MISSION_EDITOR )
+	{
+		// MFQ3 mission scripts
+		G_LoadMissionScripts();
 
-	// init some MFQ3 stuff
-	DroneInit();
+		// init some MFQ3 stuff
+		DroneInit();
+	}
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.44 2003-02-11 00:25:09 thebjoern Exp $
+ * $Id: cg_main.c,v 1.45 2003-02-15 13:04:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -2122,6 +2122,9 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	// init all the vehicle's shadow system
 	CG_InitShadows();
 
+	// mission editor
+	if( cgs.gametype == GT_MISSION_EDITOR )
+		ME_Init_MissionEditor();
 }
 
 /*
