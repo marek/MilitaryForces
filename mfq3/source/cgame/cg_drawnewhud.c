@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.16 2002-02-10 19:18:19 thebjoern Exp $
+ * $Id: cg_drawnewhud.c,v 1.17 2002-02-11 12:20:42 sparky909_uk Exp $
 */
 
 #include "cg_local.h"
@@ -1442,8 +1442,10 @@ void CG_DrawStatusBar_MFQ3_new( void ) {
 				availableVehicles[vehicle].stallspeed * SPEED_GREEN_ARC, value );
 	}
 
-	// altitude
-	if( hud_altitude.integer || cg.Mode_MFD[MFD_1] == MFD_INFO || cg.Mode_MFD[MFD_2] == MFD_INFO ) {
+	// altitude (not for ground-vehicles)
+	if( (hud_altitude.integer || cg.Mode_MFD[MFD_1] == MFD_INFO || cg.Mode_MFD[MFD_2] == MFD_INFO) &&
+		!(availableVehicles[vehicle].id & CAT_GROUND) )
+	{
 		trace_t	tr;
 		vec3_t	start, end;
 		VectorCopy( ps->origin, start );

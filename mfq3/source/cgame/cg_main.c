@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.24 2002-02-08 21:43:56 thebjoern Exp $
+ * $Id: cg_main.c,v 1.25 2002-02-11 12:20:42 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -201,7 +201,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_shadows, "cg_shadows", "1", CVAR_ARCHIVE  },
 	{ &cg_draw2D, "cg_draw2D", "1", CVAR_ARCHIVE  },
 	{ &cg_drawStatus, "cg_drawStatus", "1", CVAR_ARCHIVE  },
-	{ &cg_drawTimer, "cg_drawTimer", "0", CVAR_ARCHIVE  },
+	{ &cg_drawTimer, "cg_drawTimer", "1", CVAR_ARCHIVE  },
 	{ &cg_drawFPS, "cg_drawFPS", "0", CVAR_ARCHIVE  },
 	{ &cg_drawSnapshot, "cg_drawSnapshot", "0", CVAR_ARCHIVE  },
 	{ &cg_draw3dIcons, "cg_draw3dIcons", "1", CVAR_ARCHIVE  },
@@ -214,7 +214,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_crosshairY, "cg_crosshairY", "0", CVAR_ARCHIVE },
 	{ &cg_simpleItems, "cg_simpleItems", "0", CVAR_ARCHIVE },
 	{ &cg_addMarks, "cg_marks", "1", CVAR_ARCHIVE },
-	{ &cg_lagometer, "cg_lagometer", "1", CVAR_ARCHIVE },
+	{ &cg_lagometer, "cg_lagometer", "0", CVAR_ARCHIVE },
 	{ &cg_railTrailTime, "cg_railTrailTime", "400", CVAR_ARCHIVE  },
 	{ &cg_gun_x, "cg_gunX", "0", CVAR_CHEAT },
 	{ &cg_gun_y, "cg_gunY", "0", CVAR_CHEAT },
@@ -429,11 +429,11 @@ void QDECL CG_Printf( const char *msg, ... ) {
 	vsprintf (text, msg, argptr);
 	va_end (argptr);
 
-#ifdef _MENU_SCOREBOARD
-	CG_Add_Console_Line( text );
-#else
+//#ifdef _MENU_SCOREBOARD
+//	CG_Add_Console_Line( text );
+//#else
 	trap_Print( text );
-#endif
+//#endif
 }
 
 void QDECL CG_Error( const char *msg, ... ) {
@@ -945,7 +945,7 @@ static void CG_RegisterGraphics( void ) {
 	// MFQ3 new HUD
 	cgs.media.HUDheading = trap_R_RegisterShaderNoMip( "newhud/heading_tape.tga" );
 	for ( i=0 ; i<14 ; i++) {
-		cgs.media.HUDnumbers[i] = trap_R_RegisterShader( mfq3_nums[i] );
+		cgs.media.HUDnumbers[i] = trap_R_RegisterShaderNoMip( mfq3_nums[i] );
 	}
 	cgs.media.HUDvaluebox = trap_R_RegisterShaderNoMip( "newhud/valuebox.tga" );
 	cgs.media.HUDind_h = trap_R_RegisterShaderNoMip( "newhud/ind_h.tga" );
@@ -960,7 +960,7 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.HUDalt = trap_R_RegisterShaderNoMip( "newhud/alt_tape.tga" );
 	cgs.media.HUDsolid = trap_R_RegisterShaderNoMip( "newhud/solid.tga" );
 	for ( i=0 ; i<10 ; i++) {
-		cgs.media.HUDhealth[i] = trap_R_RegisterShader( mfq3_health[i] );
+		cgs.media.HUDhealth[i] = trap_R_RegisterShaderNoMip( mfq3_health[i] );
 	}
 	for ( i=0 ; i<15 ; i++) {
 		cgs.media.HUDthrottle_1_ab[i] = trap_R_RegisterShader( mfq3_throttle_1_ab[i] );
