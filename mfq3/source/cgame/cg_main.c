@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.4 2002-01-16 19:29:36 sparky909_uk Exp $
+ * $Id: cg_main.c,v 1.5 2002-01-20 20:28:44 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -618,6 +618,22 @@ static void CG_RegisterGraphics( void ) {
 		"hud/air_low_friend.tga",
 		"hud/air_low_unknown.tga"
 	};
+	static char		*mfq3_nums[14] = {
+		"newhud/numbers/zero",
+		"newhud/numbers/one",
+		"newhud/numbers/two",
+		"newhud/numbers/three",
+		"newhud/numbers/four",
+		"newhud/numbers/five",
+		"newhud/numbers/six",
+		"newhud/numbers/seven",
+		"newhud/numbers/eight",
+		"newhud/numbers/nine",
+		"newhud/numbers/minus",
+		"newhud/numbers/colon",
+		"newhud/numbers/percent",
+		"newhud/numbers/point"
+	};
 
 	// clear any references to old media
 	memset( &cg.refdef, 0, sizeof( cg.refdef ) );
@@ -710,9 +726,15 @@ static void CG_RegisterGraphics( void ) {
 	for ( i=0 ; i< RD_MAX_ICONS ; i++) {
 		cgs.media.radarIcons[i] = trap_R_RegisterShaderNoMip( rd_icons[i] );
 	}
-		
-
 	// end MFQ3 HUD
+
+	// MFQ3 new HUD
+	cgs.media.HUDheading = trap_R_RegisterShaderNoMip( "newhud/heading_tape.tga" );
+	for ( i=0 ; i<14 ; i++) {
+		cgs.media.HUDnumbers[i] = trap_R_RegisterShader( mfq3_nums[i] );
+	}
+	cgs.media.HUDvaluebox = trap_R_RegisterShaderNoMip( "newhud/valuebox.tga" );
+	// end MFQ£ new HUD
 
 	cgs.media.bulletFlashModel = trap_R_RegisterModel("models/weaphits/bullet.md3");
 	cgs.media.dishFlashModel = trap_R_RegisterModel("models/weaphits/boom01.md3");

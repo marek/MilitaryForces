@@ -1,5 +1,5 @@
 /*
- * $Id: cg_draw.c,v 1.3 2002-01-19 02:24:02 thebjoern Exp $
+ * $Id: cg_draw.c,v 1.4 2002-01-20 20:28:44 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -268,6 +268,67 @@ static void CG_DrawField (int x, int y, int width, int value) {
 		l--;
 	}
 }
+
+
+/*
+==============
+CG_MFQ3HUD_Numbers
+==============
+*/
+static void CG_MFQ3HUD_Numbers (int x, int y, int width, int value) {
+	char	num[16], *ptr;
+	int		l;
+	int		frame;
+
+	if ( width < 1 ) {
+		return;
+	}
+
+	// draw number string
+	if ( width > 5 ) {
+		width = 5;
+	}
+
+	switch ( width ) {
+	case 1:
+		value = value > 9 ? 9 : value;
+		value = value < 0 ? 0 : value;
+		break;
+	case 2:
+		value = value > 99 ? 99 : value;
+		value = value < -9 ? -9 : value;
+		break;
+	case 3:
+		value = value > 999 ? 999 : value;
+		value = value < -99 ? -99 : value;
+		break;
+	case 4:
+		value = value > 9999 ? 9999 : value;
+		value = value < -999 ? -999 : value;
+		break;
+	}
+
+	Com_sprintf (num, sizeof(num), "%i", value);
+	l = strlen(num);
+	if (l > width)
+		l = width;
+	x += 2 + HUDNUM_WIDTH*(width - l);
+
+	ptr = num;
+	while (*ptr && l)
+	{
+		if (*ptr == '-')
+			frame = STAT_MINUS;
+		else
+			frame = *ptr -'0';
+
+		CG_DrawPic( x,y, HUDNUM_WIDTH, HUDNUM_HEIGHT, cgs.media.HUDnumbers[frame] );
+		x += HUDNUM_WIDTH;
+		ptr++;
+		l--;
+	}
+}
+
 
 /*
 ================
@@ -690,6 +751,110 @@ static void CG_DrawRadarSymbols_GROUND( int vehicle ) {
 	cg.radarTargets = 0;
 }
 
+
+/*
+================
+CG_DrawStatusBar_MFQ3
+
+================
+*/
+static void CG_Draw_HeadingTape( int value ) {
+
+	float		x, y, width, height;
+	float		offset;
+	int			value2, visible1, visible2, visible3;
+	qboolean	left, right;
+
+		// find offset on heading tape
+	value2 = value - 35;
+	value2 = value2%10;
+	if( value2 < 0 ) value2 += 10;
+	offset = 0.125f - 0.0125f*value2;
+		// draw heading tape
+	x = 96;
+	y = 12;
+	width = 448;
+	height = 16;
+	CG_AdjustFrom640( &x, &y, &width, &height );
+	trap_R_DrawStretchPic( x, y, width, height, 0.125f-offset, 0, 1-offset, 1, cgs.media.HUDheading );
+		// draw heading value box
+	x = 304;
+	y = 28;
+	width = 32;
+	height = 16;
+	CG_AdjustFrom640( &x, &y, &width, &height );
+	trap_R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, cgs.media.HUDvaluebox );
+		// draw heading
+	CG_MFQ3HUD_Numbers( 306, 32, 3, value );
+		// find visible heading numbers
+	visible2 = ((int)((value+15)/10));
+	if( (visible2%3) ) {
+		visible2--;
+		if( (visible2%3) ) {
+			visible2--;
+		}
+	}
+	visible2 *= 10;
+	visible1 = visible2 - 30;
+	if( visible1 <= 0 ) visible1 += 360;
+	visible3 = visible2 + 30;
+	if( visible3 > 360 ) visible3 -= 360;
+	value2 = value - visible2;
+	if( value2 < -5 ) {
+		left = qtrue;
+		right = qfalse;
+	} else if( value2 > 5 ) {
+		left = qfalse;
+		right = qtrue;
+	} else {
+		right = left = qtrue;
+	}
+		// draw visible heading numbers
+	CG_MFQ3HUD_Numbers( 306-(value2*64/10), 6, 3, visible2 );
+	if( left ) {
+		value2 = value - visible1;
+		CG_MFQ3HUD_Numbers( 306-(value2*64/10), 6, 3, visible1 );
+	}
+	if( right ) {
+		value2 = value - visible3;
+		CG_MFQ3HUD_Numbers( 306-(value2*64/10), 6, 3, visible3 );
+	}
+
+}
+
+/*
+================
+CG_DrawStatusBar_MFQ3
+
+================
+*/
+static void CG_DrawStatusBar_MFQ3_new( void ) {
+	centity_t	*cent;
+	playerState_t	*ps;
+	int			value;
+	int			vehicle = cgs.clientinfo[cg.predictedPlayerState.clientNum].vehicle;
+	
+	static vec4_t colors[] = { 
+//		{ 0.2, 1.0, 0.2, 1.0 } , { 1.0, 0.2, 0.2, 1.0 }, {0.5, 0.5, 0.5, 1} };
+		{ 1.0f, 0.89f, 0.0f, 1.0f } ,		// normal, yellow
+		{ 1.0f, 0.0f, 0.0f, 1.0f },		// low health, red
+		{0.5f, 0.5f, 0.5f, 1.0f},			// weapon firing, grey
+		{ 1.0f, 1.0f, 1.0f, 1.0f },		// health > 100, white
+		{ 0.3f, 1.0f, 0.3f, 1.0f }		// green
+	};
+
+	if ( cg_drawStatus.integer == 0 ) {
+		return;
+	}
+
+	cent = &cg_entities[cg.snap->ps.clientNum];
+	ps = &cg.snap->ps;
+
+	// heading
+	value = 360 - (int)ps->vehicleAngles[1];
+	if( value <= 0 ) value += 360;
+	CG_Draw_HeadingTape( value );
+}
 
 /*
 ================
@@ -2473,8 +2638,10 @@ static void CG_Draw2D_MFQ3( void ) {
 		if ( !cg.showScores && cg.snap->ps.stats[STAT_HEALTH] > 0 &&
 			 !(cg.snap->ps.pm_flags & PMF_VEHICLESELECT) ) {
 
-			CG_DrawStatusBar_MFQ3();
+//			CG_DrawStatusBar_MFQ3();
       
+			CG_DrawStatusBar_MFQ3_new();
+
 //			CG_DrawCrosshair();
 			CG_DrawCrosshairNames();
 
