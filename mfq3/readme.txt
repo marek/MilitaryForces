@@ -7,14 +7,12 @@ History:
 
 
 
-+++v0.75+++ in progress...
++++v0.75+++ 
 -----------
-+ fix ground installation bounding boxes
-+ add script importing
-+ spawn groundinstallations from scripts
-+ add basic groundinstallation ai to fire missiles at planes
-+ then finish flares
-
+- vehicles from mission scripts spawned ingame, but not yet checking for gameset or
+  gametype, and not yet making drones fly around
+- mission scripts in game specified by new cvar mf_mission
+  NOTE: Defaults to "default" and wont load a mission if this is empty or "none"
 - added command "me_import_script" to import a script into IGME, also specify
   a filename to load (just simply the name, no path or extension)
 - removed misc_waypoints as they are not needed anymore
