@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawtools.c,v 1.17 2002-02-25 12:13:36 sparky909_uk Exp $
+ * $Id: cg_drawtools.c,v 1.18 2002-02-25 15:30:19 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1408,3 +1408,4 @@ localEntity_t * CG_Generic_Smoke( centity_t * cent, vec3_t smokePosition, int de
 
 	return smoke;
 }
+
