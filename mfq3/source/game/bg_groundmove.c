@@ -1,5 +1,5 @@
 /*
- * $Id: bg_groundmove.c,v 1.5 2002-02-21 13:14:20 thebjoern Exp $
+ * $Id: bg_groundmove.c,v 1.6 2002-02-28 17:26:06 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -89,7 +89,7 @@ static void PM_GroundVehicleAccelerate()
 	float	angle = pm->ps->vehicleAngles[0];
 		
 	// account for water
-	topspeed /= (pm->waterlevel+2);
+	topspeed /= (pm->waterlevel+1);
 
 	if( pm->ps->ONOFF & OO_LANDED ) {
 

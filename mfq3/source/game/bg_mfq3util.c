@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.24 2002-02-27 23:11:18 thebjoern Exp $
+ * $Id: bg_mfq3util.c,v 1.25 2002-02-28 17:26:06 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -282,6 +282,9 @@ void MF_LoadAllVehicleData()
 			MF_getDimensions( name, 0, &max, &min );
 			diff = max[2] - min[2];
 			availableVehicles[i].maxs[2] += diff;
+			availableVehicles[i].mins[2] -= 2;
+		} else if( (availableVehicles[i].cat & CAT_BOAT) ) {
+			availableVehicles[i].mins[2] -= 2;
 		}
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.38 2002-02-28 10:24:27 sparky909_uk Exp $
+ * $Id: bg_vehicledata.c,v 1.39 2002-02-28 17:26:06 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -63,7 +63,7 @@ completeVehicleData_t availableVehicles[] =
 	0,							// gearheight - SET AUTOMATICALLY
 	0,							// tailangle
 	WI_MG_20MM, WI_SIDEWINDER, WI_AMRAAM, WI_MK84, WI_FFAR, 0, 0, WI_FLARE,	// weapons  WI_MG_20MM
-	450, 2, 2, 2, 4, 0, 0, 30,		// ammo
+	450, 2, 2, 2, 2, 0, 0, 30,		// ammo
 	0,0,0,0,0,0,0,0,			// turret - useful ??
 	{19, 0, 5},					// cameraposition for cockpit view
 	AB_BALL,					// effect model
