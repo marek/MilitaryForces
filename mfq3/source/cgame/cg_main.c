@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.35 2002-02-25 14:19:19 sparky909_uk Exp $
+ * $Id: cg_main.c,v 1.36 2002-02-25 15:20:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -2089,7 +2089,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	trap_S_ClearLoopingSounds( qtrue );
 
 	// MFQ3 vehicles
-	MF_calculateAllDefaultLoadouts();
+	MF_LoadAllVehicleData();
 }
 
 /*
