@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.21 2002-02-22 18:05:22 sparky909_uk Exp $
+ * $Id: ui_main.c,v 1.22 2002-02-25 15:22:58 sparky909_uk Exp $
 */
 /*
 =======================================================================
@@ -54,10 +54,10 @@ static const serverFilter_t serverFilters[] = {
 };
 
 static const char *teamArenaGameTypes[] = {
-	"FFA",
+	"DM",
 	"TOURNAMENT",
 	"SP",
-	"TEAM DM",
+	"TDM",
 	"CTF",
 	"1FCTF",
 	"OVERLOAD",
@@ -67,6 +67,13 @@ static const char *teamArenaGameTypes[] = {
 
 static int const numTeamArenaGameTypes = sizeof(teamArenaGameTypes) / sizeof(const char*);
 
+static const char *mfqGamesets[] = {	// make sure this matches exactly with gameset_items[] of bg_vehicledata.c
+	"MDRN",
+	"WW2",
+	"WW1"
+};
+
+static int const numGamesets = sizeof(mfqGamesets) / sizeof(const char*);
 
 static const char *teamArenaGameNames[] = {
 	"Deathmatch",
@@ -4149,6 +4156,12 @@ static void UI_BuildServerDisplayList(qboolean force) {
 
 			trap_LAN_GetServerInfo(ui_netSource.integer, i, info, MAX_STRING_CHARS);
 
+			// mask out all but "Military Forces" servers
+			if( Q_stricmp( Info_ValueForKey( info, "game" ), GAME_IDENTIFIER ) != 0 )
+			{
+				continue;
+			}
+
 			clients = atoi(Info_ValueForKey(info, "clients"));
 			uiInfo.serverStatus.numPlayersOnServers += clients;
 
@@ -4701,7 +4714,38 @@ static void UI_UpdatePendingPings() {
 
 }
 
-static const char *UI_FeederItemText(float feederID, int index, int column, qhandle_t *handle) {
+/*
+==================
+UI_CreateGameCodes
+==================
+*/
+static char * UI_CreateGameCodes( char * pInfo )
+{
+	int gameType, gameset;
+
+	// get enums
+	gameType = atoi( Info_ValueForKey( pInfo, "gametype") );
+	gameset = MF_UI_Gameset_StringToValue( Info_ValueForKey( pInfo, "mf_gameset"), qtrue );
+
+	// valid?
+	if( gameType >= 0 && gameType < numTeamArenaGameTypes && gameset < numGamesets )
+	{
+		return va( "%s/%s", mfqGamesets[gameset],teamArenaGameTypes[gameType] );
+	}
+	else
+	{
+		return "(Unknown)";
+	}
+}
+
+/*
+==================
+UI_FeederItemText
+==================
+*/
+
+static const char *UI_FeederItemText(float feederID, int index, int column, qhandle_t *handle)
+{
 	static char info[MAX_STRING_CHARS];
 	static char hostname[1024];
 	static char clientBuff[32];
@@ -4720,7 +4764,7 @@ static const char *UI_FeederItemText(float feederID, int index, int column, qhan
 		return UI_SelectedMap(index, &actual);
 	} else if (feederID == FEEDER_SERVERS) {
 		if (index >= 0 && index < uiInfo.serverStatus.numDisplayServers) {
-			int ping, game;
+			int ping;
 			if (lastColumn != column || lastTime > uiInfo.uiDC.realTime + 5000) {
 				trap_LAN_GetServerInfo(ui_netSource.integer, uiInfo.serverStatus.displayServers[index], info, MAX_STRING_CHARS);
 				lastColumn = column;
@@ -4731,11 +4775,15 @@ static const char *UI_FeederItemText(float feederID, int index, int column, qhan
 				// if we ever see a ping that is out of date, do a server refresh
 				// UI_UpdatePendingPings();
 			}
-			switch (column) {
+			switch (column)
+			{
 				case SORT_HOST : 
-					if (ping <= 0) {
+					if (ping <= 0)
+					{
 						return Info_ValueForKey(info, "addr");
-					} else {
+					}
+					else
+					{
 						if ( ui_netSource.integer == AS_LOCAL ) {
 							Com_sprintf( hostname, sizeof(hostname), "%s [%s]",
 											Info_ValueForKey(info, "hostname"),
@@ -4753,17 +4801,17 @@ static const char *UI_FeederItemText(float feederID, int index, int column, qhan
 							return hostname;
 						}
 					}
-				case SORT_MAP : return Info_ValueForKey(info, "mapname");
+
+				case SORT_MAP :
+					return Info_ValueForKey(info, "mapname");
+
 				case SORT_CLIENTS : 
 					Com_sprintf( clientBuff, sizeof(clientBuff), "%s (%s)", Info_ValueForKey(info, "clients"), Info_ValueForKey(info, "sv_maxclients"));
 					return clientBuff;
-				case SORT_GAME : 
-					game = atoi(Info_ValueForKey(info, "gametype"));
-					if (game >= 0 && game < numTeamArenaGameTypes) {
-						return teamArenaGameTypes[game];
-					} else {
-						return "Unknown";
-					}
+
+				case SORT_GAME :
+					return UI_CreateGameCodes( info );
+
 				case SORT_PING : 
 					if (ping <= 0) {
 						return "...";
@@ -5985,7 +6033,7 @@ static void UI_DisplayDownloadInfo( const char *downloadName, float centerPoint,
 	leftWidth = 320;
 
 	UI_SetColor(colorWhite);
-	Text_PaintCenter(centerPoint, yStart + 112, scale, colorWhite, dlText, 0);
+	Text_PaintCenter(centerPoint, yStart + 112, scale + 0.2f, colorWhite, dlText, 0);
 	Text_PaintCenter(centerPoint, yStart + 164, scale, colorWhite, etaText, 0);
 	Text_PaintCenter(centerPoint, yStart + 196, scale, colorWhite, xferText, 0);
 

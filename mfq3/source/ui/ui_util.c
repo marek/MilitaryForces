@@ -1,5 +1,5 @@
 /*
- * $Id: ui_util.c,v 1.5 2002-02-21 09:46:37 sparky909_uk Exp $
+ * $Id: ui_util.c,v 1.6 2002-02-25 15:22:58 sparky909_uk Exp $
 */
 //
 // origin: rad
@@ -62,16 +62,30 @@ unsigned long MF_UI_GetGameset( qboolean asEnum )
 	trap_GetConfigString( CS_SERVERINFO, info, sizeof(info) );
 	pGameSet = Info_ValueForKey( info, "mf_gameset" );
 
+	// compare & return result
+	return MF_UI_Gameset_StringToValue( pGameSet, asEnum );
+}
+
+/*
+=================
+MF_UI_Gameset_StringToEnum
+=================
+*/
+
+unsigned long MF_UI_Gameset_StringToValue( char * pString, qboolean asEnum )
+{
+	int returnValue = MF_GAMESET_MODERN;
+
 	// compare
-	if( Q_stricmp( pGameSet, "ww1" ) == 0 )
+	if( Q_stricmp( pString, "ww1" ) == 0 )
 	{
 		returnValue = MF_GAMESET_WW1;
 	}
-	else if( Q_stricmp( pGameSet, "ww2" ) == 0 )
+	else if( Q_stricmp( pString, "ww2" ) == 0 )
 	{
 		returnValue = MF_GAMESET_WW2;
 	}
-	else if( Q_stricmp( pGameSet, "modern" ) == 0 )
+	else if( Q_stricmp( pString, "modern" ) == 0 )
 	{
 		returnValue = MF_GAMESET_MODERN;
 	}
@@ -92,8 +106,6 @@ unsigned long MF_UI_GetGameset( qboolean asEnum )
 			break;
 		}
 	}
-
-	// return the result (as either flag mask or enum)
+	
 	return returnValue;
 }
-
