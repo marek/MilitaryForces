@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.53 2002-02-12 12:27:04 sparky909_uk Exp $
+ * $Id: bg_public.h,v 1.54 2002-02-13 10:37:39 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.60"
+#define	GAME_VERSION		"mfq3 v0.60a"
 
 #define	DEFAULT_GRAVITY		800
 
@@ -533,8 +533,9 @@ qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTim
 #define CAT_MIN						  0x00000100
 #define	CAT_PLANE					  0x00000100 
 #define	CAT_GROUND					  0x00000200 
-#define	CAT_HELO					  0x00000400 
-#define	CAT_LQM						  0x00000800
+#define	CAT_BOAT					  0x00000400 
+#define	CAT_HELO					  0x00000800 
+#define	CAT_LQM						  0x00001000
 #define CAT_MAX						  0x00000200 
 #define	CAT_ANY						  0x0000FF00
 
