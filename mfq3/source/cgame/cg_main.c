@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.6 2002-01-22 11:19:55 thebjoern Exp $
+ * $Id: cg_main.c,v 1.7 2002-01-22 13:58:18 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -152,7 +152,7 @@ vmCvar_t	cg_smoke;
 
 vmCvar_t	hud_heading;
 vmCvar_t	hud_speed;
-
+vmCvar_t	hud_mfd;
 
 typedef struct {
 	vmCvar_t	*vmCvar;
@@ -238,6 +238,7 @@ cvarTable_t		cvarTable[] = {
 
 	{ &hud_heading, "hud_heading", "1", CVAR_ARCHIVE },
 	{ &hud_speed, "hud_speed", "1", CVAR_ARCHIVE },
+	{ &hud_mfd, "hud_mfd", "1", CVAR_ARCHIVE },
 
 	{ &pmove_fixed, "pmove_fixed", "1", CVAR_ROM},
 	{ &pmove_msec, "pmove_msec", "8", 0},
@@ -742,7 +743,12 @@ static void CG_RegisterGraphics( void ) {
 	}
 	cgs.media.HUDvaluebox = trap_R_RegisterShaderNoMip( "newhud/valuebox.tga" );
 	cgs.media.HUDind_h = trap_R_RegisterShaderNoMip( "newhud/ind_h.tga" );
+	cgs.media.HUDind_v = trap_R_RegisterShaderNoMip( "newhud/ind_v.tga" );
 	cgs.media.HUDcaret_h = trap_R_RegisterShaderNoMip( "newhud/caret_g_h.tga" );
+	cgs.media.HUDcaret_v_g_l = trap_R_RegisterShaderNoMip( "newhud/caret_g_v.tga" );
+	cgs.media.HUDcaret_v_r_l = trap_R_RegisterShaderNoMip( "newhud/caret_r_v.tga" );
+	cgs.media.HUDmfd = trap_R_RegisterShaderNoMip( "newhud/mfd.tga" );
+	cgs.media.HUDspeed = trap_R_RegisterShaderNoMip( "newhud/speed_tape.tga" );
 	// end MFQ£ new HUD
 
 
