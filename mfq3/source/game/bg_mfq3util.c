@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.4 2002-01-23 18:49:20 sparky909_uk Exp $
+ * $Id: bg_mfq3util.c,v 1.5 2002-01-25 13:26:52 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -167,3 +167,5 @@ char * MF_CreateModelPathname( int vehicle, char * pFormatString )
 
 	return pReturnString;
 }
+
+

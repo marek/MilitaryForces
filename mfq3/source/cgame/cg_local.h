@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.11 2002-01-23 22:28:13 thebjoern Exp $
+ * $Id: cg_local.h,v 1.12 2002-01-25 13:26:52 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -106,7 +106,8 @@ typedef enum {
 // MFD
 #define MFD_OFF					0
 #define MFD_RWR					1
-#define MFD_MAX					2
+#define MFD_STATUS				2
+#define MFD_MAX					3
 
 #define MFD_1					0
 #define MFD_2					1
@@ -615,7 +616,8 @@ typedef struct {
 	qhandle_t	HUDthrottle[15];
 	qhandle_t	HUDhealthtext;
 	qhandle_t	HUDthrottletext;
-	
+	qhandle_t	HUDalphabet;
+
 	// weapon effect models
 	qhandle_t	bulletFlashModel;
 	qhandle_t	dishFlashModel;
@@ -893,6 +895,8 @@ extern	vmCvar_t		cg_radarTargets;
 extern  vmCvar_t		cg_tracer;
 extern  vmCvar_t		cg_smoke;
 
+extern	vmCvar_t		cg_oldHUD;
+
 extern	vmCvar_t		hud_heading;
 extern	vmCvar_t		hud_speed;
 extern	vmCvar_t		hud_altitude;
@@ -1025,6 +1029,9 @@ void CG_DrawStringNew( int x, int y, float scale, vec4_t colour, const char * pT
 void CG_DrawStringNewAlpha( int x, int y, const char * pText, float alpha, textJustify_t formatting );
 void CG_DrawStringNewColour( int x, int y, const char * pText, vec4_t colour, textJustify_t formatting );
 vec4_t * CG_CreateColour( float r, float g, float b, float a );
+
+void CG_DrawStatusBar_MFQ3();
+void CG_DrawStatusBar_MFQ3_new();
 
 //
 // cg_player.c

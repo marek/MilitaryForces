@@ -1,5 +1,5 @@
 /*
- * $Id: cg_plane.c,v 1.9 2002-01-20 20:28:44 thebjoern Exp $
+ * $Id: cg_plane.c,v 1.10 2002-01-25 13:26:52 thebjoern Exp $
 */
 
 
@@ -33,7 +33,9 @@ static qboolean CG_PlaneShadow( centity_t *cent, float *shadowPlane ) {
 	vec3_t		end, mins = {-15, -15, 0}, maxs = {15, 15, 2};
 	trace_t		trace;
 	float		alpha;
+
 return qfalse;
+
 	*shadowPlane = 0;
 
 	if ( cg_shadows.integer == 0 ) {

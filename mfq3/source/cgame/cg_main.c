@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.11 2002-01-23 22:28:13 thebjoern Exp $
+ * $Id: cg_main.c,v 1.12 2002-01-25 13:26:52 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -150,6 +150,8 @@ vmCvar_t	cg_radarTargets;
 vmCvar_t	cg_tracer;
 vmCvar_t	cg_smoke;
 
+vmCvar_t	cg_oldHUD;
+
 vmCvar_t	hud_heading;
 vmCvar_t	hud_speed;
 vmCvar_t	hud_altitude;
@@ -241,6 +243,8 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_radarTargets, "cg_radarTargets", "20", CVAR_ARCHIVE },
 	{ &cg_tracer, "cg_tracer", "3", CVAR_ARCHIVE },
 	{ &cg_smoke, "cg_smoke", "1", CVAR_ARCHIVE },
+
+	{ &cg_oldHUD, "cg_oldHUD", "0", CVAR_ARCHIVE },
 
 	{ &hud_heading, "hud_heading", "1", CVAR_ARCHIVE },
 	{ &hud_speed, "hud_speed", "1", CVAR_ARCHIVE },
@@ -816,6 +820,7 @@ static void CG_RegisterGraphics( void ) {
 	}
 	cgs.media.HUDhealthtext = trap_R_RegisterShaderNoMip( "newhud/text/hlth.tga" );
 	cgs.media.HUDthrottletext = trap_R_RegisterShaderNoMip( "newhud/text/thr.tga" );
+	cgs.media.HUDalphabet = trap_R_RegisterShaderNoMip( "newhud/alphabet.tga" );
 	// end MFQ3 new HUD
 
 
