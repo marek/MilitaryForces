@@ -7,6 +7,18 @@ History:
 
 
 
++++v0.77+++ in progress...
+-----------
+- fixed a bug where when locking a target, then losing the lock and trying
+  to lock again allowed to lock too quickly
+- fix SAM bug where they didnt unlock when they died
+- made fueltanks work, use it like any other weapon, ie select it and press
+  fire to pump fuel from the tank to the plane, it automatically drops 
+  when it is empty
+- weaponbays now autoclose a bit later
+- gameplay tweaks (loadouts, weapons) from Schez
+- minor fixes
+
 +++v0.76+++
 -----------
 - make flares work, they now drop from planes and are launched up from GVs
