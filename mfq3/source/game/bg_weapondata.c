@@ -1,5 +1,5 @@
 /*
- * $Id: bg_weapondata.c,v 1.15 2002-02-27 09:42:10 thebjoern Exp $
+ * $Id: bg_weapondata.c,v 1.16 2002-02-27 09:51:12 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -627,7 +627,7 @@ completeWeaponData_t availableWeapons[] =
 		"SR-SAM",							// shortName2 (GVs)
 		"models/weapons/missile_sr.md3",	// modelName
 		0,									// handle
-		"models/weapons/vwep_missile_SR.md3",// vwepName
+		"models/weapons/vwep_sidewinder.md3",// vwepName
 		0,									// handle
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
@@ -665,7 +665,7 @@ completeWeaponData_t availableWeapons[] =
 		"MR-SAM",							// shortName2 (GVs)
 		"models/weapons/missile_mr.md3",	// modelName
 		0,									// handle
-		"models/weapons/vwep_missile_MR.md3",// vwepName
+		"models/weapons/vwep_amraam.md3",// vwepName
 		0,									// handle
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
@@ -703,7 +703,7 @@ completeWeaponData_t availableWeapons[] =
 		"MR_SAM",							// shortName2 (GVs)
 		"models/weapons/missile_mr.md3",	// modelName
 		0,									// handle
-		"models/weapons/vwep_missile_SR.md3",// vwepName
+		"models/weapons/vwep_sparrow.md3",// vwepName
 		0,									// handle
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
@@ -741,7 +741,7 @@ completeWeaponData_t availableWeapons[] =
 		"LR_SAM",							// shortName2 (GVs)
 		"models/weapons/missile_mr.md3",	// modelName
 		0,									// handle
-		"models/weapons/vwep_missile_MR.md3",// vwepName
+		"models/weapons/vwep_phoenix.md3",// vwepName
 		0,									// handle
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
