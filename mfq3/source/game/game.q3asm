@@ -34,6 +34,7 @@ g_scripts
 g_groundvehicle
 g_droneutil
 g_droneplane
+g_groundinstallation
 g_droneground
 mf_client
 mf_vehiclespawn

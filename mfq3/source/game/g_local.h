@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.30 2003-02-22 17:58:57 thebjoern Exp $
+ * $Id: g_local.h,v 1.31 2003-02-22 18:35:24 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -730,6 +730,7 @@ int LoadVehicleScripts( gentity_t* ent, char *filename );
 //
 void Drone_Ground_Think( gentity_t* ent );
 void Drone_Plane_Think( gentity_t* ent );
+void GroundInstallation_Think( gentity_t *ent );
 
 //
 // g_svcmds.c

@@ -1,5 +1,5 @@
 /*
- * $Id: g_miscvehicle.c,v 1.10 2003-02-22 17:58:57 thebjoern Exp $
+ * $Id: g_miscvehicle.c,v 1.11 2003-02-22 18:35:24 thebjoern Exp $
 */
 
 
@@ -296,6 +296,7 @@ void DroneInit()
 	// finish drone init
 	for( i = 0; i < MAX_GENTITIES; ++i ) {
 		if( Q_stricmp( (&g_entities[i])->classname, "misc_vehicle" ) == 0 ) {
+			if( (&g_entities[i])->s.modelindex == 255 ) continue; // ground installation
 			cat = availableVehicles[(&g_entities[i])->s.modelindex].cat;
 			if( cat & CAT_PLANE ) {
 				SP_misc_plane( &g_entities[i] );
@@ -499,6 +500,10 @@ void SP_misc_groundinstallation( gentity_t *sp_ent )
 	ent->clipmask = MASK_PLAYERSOLID;
 
 	ent->idxScriptBegin = ent->idxScriptEnd = -1;
+
+	ent->s.eFlags |= EF_PILOT_ONBOARD;
+	ent->think = GroundInstallation_Think;
+	ent->nextthink = level.time + 1000;
 
 	trap_LinkEntity (ent);
 
