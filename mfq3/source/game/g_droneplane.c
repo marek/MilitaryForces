@@ -1,5 +1,5 @@
 /*
- * $Id: g_droneplane.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: g_droneplane.c,v 1.2 2001-12-03 14:06:38 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -68,7 +68,8 @@ void Drone_Plane_Think( gentity_t* ent ) {
 		// check whether to change course (yaw/roll)
 		vectoangles( ent->pos1, bearing );
 		diff = bearing[1] - angles[1];
-		diff = AngleMod(diff);
+		if( diff > 180 ) diff -= 360;
+		else if( diff < -180 ) diff += 360;
 		if( diff ) {
 			// calc change
 			turnspeed = availableVehicles[ent->s.modelindex].turnspeed[1] * timediff / 1000;
