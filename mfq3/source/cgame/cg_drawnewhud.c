@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.9 2002-02-04 09:38:06 thebjoern Exp $
+ * $Id: cg_drawnewhud.c,v 1.10 2002-02-05 12:41:46 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -766,6 +766,7 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 	float	f;		
 	float	fov_x;
 	playerState_t *ps = &cg.predictedPlayerState;
+	int		cammode;
 
 		// prepare refdef
 	memcpy( &cg.HUDCamera, &cg.refdef, sizeof( cg.HUDCamera) );
@@ -812,8 +813,13 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 	}
 	cg.HUDCamera.fov_x = fov_x;
 	cg.HUDCamera.fov_y = fov_x;
+	cammode = cg.CameraMode;
 
-	if( cg.CameraMode == CAMERA_DOWN ) {
+//cammode = CAMERA_BOMB;// test
+
+	if( availableVehicles[vehicle].id&CAT_ANY & CAT_GROUND ) cammode = CAMERA_TARGET;
+
+	if( cammode == CAMERA_DOWN ) {
 		if( availableVehicles[vehicle].id&CAT_ANY & CAT_GROUND ) {
 			// nothing to be done here...
 		} else {
@@ -825,7 +831,7 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 			// position
 		VectorScale( v, availableVehicles[vehicle].mins[2], v );
 		VectorAdd( cent->lerpOrigin, v, cg.HUDCamera.vieworg );
-	} else if( cg.CameraMode == CAMERA_BACK ) {
+	} else if( cammode == CAMERA_BACK ) {
 		if( availableVehicles[vehicle].id&CAT_ANY & CAT_GROUND ) {
 			vec3_t right, up, temp;
 			AngleVectors( cent->currentState.angles, v, right, up );
@@ -847,33 +853,40 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 			// position
 		VectorScale( v, availableVehicles[vehicle].mins[0], v );
 		VectorAdd( cent->lerpOrigin, v, cg.HUDCamera.vieworg );
-	} else if( cg.CameraMode == CAMERA_BOMB ) {
-		int speed = ps->speed/10;
-		vec3_t down, horz, vert;
-		if( availableVehicles[vehicle].id&CAT_ANY & CAT_GROUND ) {
-			vec3_t right, up, temp;
-			AngleVectors( cent->currentState.angles, v, right, up );
-			RotatePointAroundVector( temp, up, v, cent->currentState.angles2[ROLL] );
-			CrossProduct( up, temp, right );
-			RotatePointAroundVector( v, right, temp, cent->currentState.angles2[PITCH] );
-		} else {
-			AngleVectors( cent->currentState.angles, v, 0, 0 );
-		}
+	} else if( cammode == CAMERA_BOMB ) {
+/*		int speed = ps->speed/10;
+		vec3_t down, horz, vert, tempH, tempV, end;
+		float hD, vD, alpha;
+		int t;
+		trace_t tr;
+		AngleVectors( cent->currentState.angles, v, 0, 0 );
+		VectorScale( v, speed, v );
 		VectorSet( horz, v[0], v[1], 0 );
-		VectorSet( vert, 0, 0, v[2] );
-#pragma message("finish this!")
-/*
-use 500 foot rays, should be precise enough
-x(t) = v*t*cos(alpha)     
-y(t)=  v*t*sin(alpha)-g*t*t/2
-*/
+		VectorSet( vert, 0, 0, (v[2] < 0 ? -v[2] : v[2]) );
+		hD = VectorNormalize( horz );
+		vD = VectorNormalize( vert );
+		// bombs never travel longer than 10 seconds (they autoexplode after that time)
+		// so we can use that for our calculations
+		alpha = DEG2RAD(cent->currentState.angles[0]);
+		for( t = 1; t <= 10; ++t ) {
+			hD = hD*t*cos(alpha);
+			vD = vD*t*sin(alpha) - DEFAULT_GRAVITY*t*t/2;
+			VectorScale( horz, hD, tempH );
+			VectorScale( vert, vD, tempV);
+			VectorAdd( tempH, tempV, v );
+			VectorAdd( cent->currentState.pos.trBase, v, end );
+			VectorNormalize( v );
+			CG_Trace( &tr, cent->currentState.pos.trBase, 0, 0, end, cent->currentState.number, MASK_ALL );
+			if( tr.fraction < 1 ) break;
+		}
 		vectoangles( v, down );
 //		CG_Printf("angle: %.1f %.1f %.1f\n", down[0], down[1], down[2] );
+		CG_Printf("time: %d\n", t );
 		AnglesToAxis( down, cg.HUDCamera.viewaxis );
 			// position
 		VectorScale( v, -availableVehicles[vehicle].mins[0], v );
-		VectorAdd( cent->lerpOrigin, v, cg.HUDCamera.vieworg );
-	} else if( cg.CameraMode == CAMERA_TARGET ) {
+		VectorAdd( cent->lerpOrigin, v, cg.HUDCamera.vieworg );*/
+	} else if( cammode == CAMERA_TARGET ) {
 		// angles
 		if( ps->stats[STAT_LOCKINFO] & LI_TRACKING ) {
 			vec3_t a;
