@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.8 2002-01-31 23:47:24 thebjoern Exp $
+ * $Id: cg_drawnewhud.c,v 1.9 2002-02-04 09:38:06 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -847,6 +847,32 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 			// position
 		VectorScale( v, availableVehicles[vehicle].mins[0], v );
 		VectorAdd( cent->lerpOrigin, v, cg.HUDCamera.vieworg );
+	} else if( cg.CameraMode == CAMERA_BOMB ) {
+		int speed = ps->speed/10;
+		vec3_t down, horz, vert;
+		if( availableVehicles[vehicle].id&CAT_ANY & CAT_GROUND ) {
+			vec3_t right, up, temp;
+			AngleVectors( cent->currentState.angles, v, right, up );
+			RotatePointAroundVector( temp, up, v, cent->currentState.angles2[ROLL] );
+			CrossProduct( up, temp, right );
+			RotatePointAroundVector( v, right, temp, cent->currentState.angles2[PITCH] );
+		} else {
+			AngleVectors( cent->currentState.angles, v, 0, 0 );
+		}
+		VectorSet( horz, v[0], v[1], 0 );
+		VectorSet( vert, 0, 0, v[2] );
+#pragma message("finish this!")
+/*
+use 500 foot rays, should be precise enough
+x(t) = v*t*cos(alpha)     
+y(t)=  v*t*sin(alpha)-g*t*t/2
+*/
+		vectoangles( v, down );
+//		CG_Printf("angle: %.1f %.1f %.1f\n", down[0], down[1], down[2] );
+		AnglesToAxis( down, cg.HUDCamera.viewaxis );
+			// position
+		VectorScale( v, -availableVehicles[vehicle].mins[0], v );
+		VectorAdd( cent->lerpOrigin, v, cg.HUDCamera.vieworg );
 	} else if( cg.CameraMode == CAMERA_TARGET ) {
 		// angles
 		if( ps->stats[STAT_LOCKINFO] & LI_TRACKING ) {
@@ -1426,7 +1452,8 @@ void CG_DrawStatusBar_MFQ3_new( void ) {
 	}
 	
 	// stallwarning
-	if( ps->speed/10 <= availableVehicles[vehicle].stallspeed*1.5 || (cent->currentState.ONOFF & OO_STALLED) ) {
+	if( (ps->speed/10 <= availableVehicles[vehicle].stallspeed*1.5 || (cent->currentState.ONOFF & OO_STALLED)) &&
+		!(cent->currentState.ONOFF & OO_LANDED) ) {
 		float stallscale = 1.0f;
 		if( speed >= stallspeed && !(cent->currentState.ONOFF & OO_STALLED) ) stallscale = 2.0f - ((float)speed/(float)stallspeed);
 		CG_DrawStringNew( 320, 360, stallscale, HUDColors[stallcolor], "STALL!", 0, 0, 3, CENTRE_JUSTIFY );

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.38 2002-01-31 23:47:24 thebjoern Exp $
+ * $Id: bg_public.h,v 1.39 2002-02-04 09:38:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.56g"
+#define	GAME_VERSION		"mfq3 v0.57d"
 
 #define	DEFAULT_GRAVITY		800
 #define	GIB_HEALTH			-50
@@ -633,6 +633,8 @@ typedef struct completeVehicleData_s
 	float			trackCone;		// how can radar track it
 	float			trackCone2;		// how can ground radar track it
 	float			swingangle;		// for swing wings
+	unsigned int	gearTime;		// time it takes gear to operate
+	unsigned int	maxGearFrame;	// number of gear animation frames
 	unsigned int	renderFlags;	// special stuff for rendering only
 }completeVehicleData_t;
 
@@ -794,7 +796,8 @@ int MF_ExtractEnumFromId( int vehicle, unsigned int op );
 
 // gear anim frames
 #define GEAR_UP					0
-#define GEAR_DOWN				47
+#define GEAR_DOWN_DEFAULT		47
+#define GEAR_DOWN_MAX			200
 
 #define GEAR_ANIM_STOP			0
 #define GEAR_ANIM_UP			1

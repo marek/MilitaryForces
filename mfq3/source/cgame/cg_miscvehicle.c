@@ -1,5 +1,5 @@
 /*
- * $Id: cg_miscvehicle.c,v 1.3 2002-01-31 02:34:33 thebjoern Exp $
+ * $Id: cg_miscvehicle.c,v 1.4 2002-02-04 09:38:06 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -72,19 +72,20 @@ static void CG_Misc_Plane( centity_t *cent )
 		// gear
 	if( availableVehicles[cent->currentState.modelindex].caps & HC_GEAR ) {
 		int timediff = cg.time - cent->gearAnimStartTime;
+		int geardown = availableVehicles[cent->currentState.modelindex].maxGearFrame;
 		if( ONOFF & OO_GEAR ) {
 			part[BP_PLANE_CONTROLS].frame += 9;
 		}
 		if( cent->gearAnim == GEAR_ANIM_UP ) {
-			cent->gearAnimFrame = GEAR_DOWN - timediff/25;
+			cent->gearAnimFrame = geardown - timediff/25;
 			if( cent->gearAnimFrame < GEAR_UP ) {
 				cent->gearAnimFrame = GEAR_UP;
 				cent->gearAnim = GEAR_ANIM_STOP;
 			}
 		} else if( cent->gearAnim == GEAR_ANIM_DOWN ) {
 			cent->gearAnimFrame = GEAR_UP + timediff/25;
-			if( cent->gearAnimFrame > GEAR_DOWN ) {
-				cent->gearAnimFrame = GEAR_DOWN;
+			if( cent->gearAnimFrame > geardown ) {
+				cent->gearAnimFrame = geardown;
 				cent->gearAnim = GEAR_ANIM_STOP;
 			}
 		}

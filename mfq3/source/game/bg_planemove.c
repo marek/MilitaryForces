@@ -1,5 +1,5 @@
 /*
- * $Id: bg_planemove.c,v 1.4 2002-01-30 19:26:02 thebjoern Exp $
+ * $Id: bg_planemove.c,v 1.5 2002-02-04 09:38:06 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -58,21 +58,21 @@ void PM_Toggle_Gear()
 	}
 
 	if( pm->ps->speed > availableVehicles[pm->vehicle].stallspeed * 10 * SPEED_GREEN_ARC ) {
-		pm->ps->timers[TIMER_GEAR] = pm->cmd.serverTime + 1500;
+		pm->ps->timers[TIMER_GEAR] = pm->cmd.serverTime + availableVehicles[pm->vehicle].gearTime + 100;
 		return;
 	}
 
 	if( pm->ps->ONOFF & OO_GEAR ) {
 		PM_AddEvent( EV_GEAR_UP );
-		pm->ps->timers[TIMER_GEARANIM] = pm->cmd.serverTime + 1400;
+		pm->ps->timers[TIMER_GEARANIM] = pm->cmd.serverTime + availableVehicles[pm->vehicle].gearTime;
 //		pm->ps->ONOFF &= ~OO_GEAR;
 	}
 	else {
 		PM_AddEvent( EV_GEAR_DOWN );
-		pm->ps->timers[TIMER_GEARANIM] = pm->cmd.serverTime + 1400;
+		pm->ps->timers[TIMER_GEARANIM] = pm->cmd.serverTime + availableVehicles[pm->vehicle].gearTime;
 //		pm->ps->ONOFF |= OO_GEAR;
 	}
-	pm->ps->timers[TIMER_GEAR] = pm->cmd.serverTime + 1500;
+	pm->ps->timers[TIMER_GEAR] = pm->cmd.serverTime + availableVehicles[pm->vehicle].gearTime + 100;
 }
 
 /*
@@ -248,6 +248,22 @@ void PM_PlaneMove( void )
 
 	PM_PlaneAccelerate();
 
+	// swing wings
+	if( availableVehicles[pm->vehicle].caps & HC_SWINGWING && !dead ) {
+		float speed = pm->ps->speed/10;
+		float min = availableVehicles[pm->vehicle].stallspeed * 1.5f;
+		float max = availableVehicles[pm->vehicle].maxspeed * 0.8f;
+		float diff = max - min;
+		float maxangle = availableVehicles[pm->vehicle].swingangle;
+		if( speed >= min ) {
+			if( speed < max ) {
+				pm->ps->gunAngle = ((speed - min) * (maxangle / diff))*10;
+			} else {
+				pm->ps->gunAngle = maxangle*10;
+			}
+		}
+	}
+
     if( dead ) {
 		if( pm->ps->vehicleAngles[PITCH] < 70 ) {
 			pm->ps->vehicleAngles[PITCH] += 40 * pml.frametime; // nose drops at 60 deg/sec
@@ -395,8 +411,8 @@ void PM_PlaneMove( void )
 			!pm->ps->timers[TIMER_GEARANIM] ) {
 			PM_AddEvent( EV_GEAR_UP );
 //			pm->ps->ONOFF &= ~OO_GEAR;
-			pm->ps->timers[TIMER_GEAR] = pm->cmd.serverTime + 1500;
-			pm->ps->timers[TIMER_GEARANIM] = pm->cmd.serverTime + 1400;
+			pm->ps->timers[TIMER_GEAR] = pm->cmd.serverTime + availableVehicles[pm->vehicle].gearTime + 100;
+			pm->ps->timers[TIMER_GEARANIM] = pm->cmd.serverTime + availableVehicles[pm->vehicle].gearTime;
 		}
 		// wheel brakes off when airborne
 		if( !(availableVehicles[pm->vehicle].caps & HC_SPEEDBRAKE) &&

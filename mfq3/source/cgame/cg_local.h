@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.22 2002-01-31 23:47:24 thebjoern Exp $
+ * $Id: cg_local.h,v 1.23 2002-02-04 09:38:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -123,6 +123,7 @@ typedef enum {
 	CAMERA_TARGET,
 	CAMERA_BACK,
 	CAMERA_DOWN,
+	CAMERA_BOMB,
 	CAMERA_MAX		
 } Camera_Modes;
 
@@ -180,7 +181,6 @@ typedef struct centity_s {
 
 	qboolean		destroyableStructure;
 
-	int				lastSwingAngle;
 	int				gearAnim;
 	int				gearAnimFrame;
 	int				gearAnimStartTime;
@@ -565,7 +565,6 @@ typedef enum {
 	HUD_DARK_RED,
 	HUD_BLUE,
 	HUD_DARK_BLUE,
-	HUD_BLACK,
 	HUD_YELLOW,
 	HUD_MAGENTA,
 	HUD_CYAN,

@@ -1,5 +1,5 @@
 /*
- * $Id: g_mfq3util.c,v 1.12 2002-01-31 23:47:24 thebjoern Exp $
+ * $Id: g_mfq3util.c,v 1.13 2002-02-04 09:38:06 thebjoern Exp $
 */
 
 
@@ -62,6 +62,8 @@ void updateTargetTracking( gentity_t *ent )
 	gentity_t		*test;
 	float			cone;
 
+//	G_Printf( "updateTargetTracking for %s\n", ent->client->pers.netname );
+
 	// what can we lock on ?
 	if(	ent->client->ps.ONOFF & OO_RADAR_AIR ) {
 		targetcat = CAT_PLANE|CAT_HELO;
@@ -105,11 +107,9 @@ void updateTargetTracking( gentity_t *ent )
 		test = &g_entities[tr.entityNum];
 		if( test->s.eType == ET_VEHICLE && test->client && 
 			(availableVehicles[test->client->vehicle].id&CAT_ANY & targetcat) ) {
-	//		G_Printf("found target: player %s\n", test->client->pers.netname );
 			track(ent, test);
 		} else if( test->s.eType == ET_MISC_VEHICLE &&
 			(availableVehicles[test->s.modelindex].id&CAT_ANY & targetcat) ) {
-	//		G_Printf("found target: drone %s\n", test->targetname );
 			track(ent, test);
 		} else {
 			if( buildings ) {
@@ -155,8 +155,8 @@ void updateTargetTracking( gentity_t *ent )
 		if( dot < cone ) {
 			untrack(ent);
 			return;
-		} else if( dot < availableWeapons[ent->s.weaponIndex].lockcone ) { // roughly 10 degrees
-			unlock(ent);
+		} else if( dot < availableWeapons[ent->s.weaponIndex].lockcone ) {
+			if( ent->client->ps.stats[STAT_LOCKINFO] & LI_LOCKING )	unlock(ent);
 			return;
 		}
 			
@@ -174,7 +174,7 @@ void updateTargetTracking( gentity_t *ent )
 			availableWeapons[ent->s.weaponIndex].type != WT_ANTIGROUNDMISSILE &&
 			availableWeapons[ent->s.weaponIndex].type != WT_ANTIRADARMISSILE ) {
 			//untrack(ent);
-			unlock(ent);
+			if( ent->client->ps.stats[STAT_LOCKINFO] & LI_LOCKING ) unlock(ent);
 			return;
 		}
 

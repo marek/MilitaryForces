@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.13 2002-01-31 11:10:46 thebjoern Exp $
+ * $Id: bg_vehicledata.c,v 1.14 2002-02-04 09:38:06 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -46,6 +46,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// trackcone
 	-1,							// trackcone ground
 	0,							// swingangle
+	1400,						// geartime
+	47,							// max gear frame
 	0							// renderflags
     },
 
@@ -84,6 +86,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// trackcone
 	-1,							// trackcone ground
 	0,							// swingangle
+	1400,						// geartime
+	47,							// max gear frame
 	0							// renderflags
     },
 
@@ -122,6 +126,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// trackcone
 	-1,							// trackcone ground
 	0,							// swingangle
+	1400,						// geartime
+	47,							// max gear frame
 	0							// renderflags
     },
 
@@ -160,6 +166,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// trackcone
 	-1,							// trackcone ground
 	0,							// swingangle
+	1400,						// geartime
+	47,							// max gear frame
 	MFR_DUALPILOT|MFR_BIGVAPOR	// renderflags
     },
 
@@ -198,6 +206,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// trackcone
 	-1,							// trackcone ground
 	50,							// swingangle
+	1400,						// geartime
+	47,							// max gear frame
 	MFR_DUALPILOT|MFR_BIGVAPOR	// renderflags
     },
 
@@ -236,6 +246,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// trackcone
 	-1,							// trackcone ground
 	0,							// swingangle
+	1400,						// geartime
+	47,							// max gear frame
 	0							// renderflags
     },
 
@@ -274,6 +286,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// trackcone
 	-1,							// trackcone ground
 	0,							// swingangle
+	1400,						// geartime
+	47,							// max gear frame
 	0							// renderflags
     },
 
@@ -313,6 +327,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// trackcone
 	-1,							// trackcone ground
 	0,							// swingangle
+	1400,						// geartime
+	47,							// max gear frame
 	0							// renderflags
     },
 
@@ -352,6 +368,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// trackcone
 	-1,							// trackcone ground
 	0,							// swingangle
+	1400,						// geartime
+	47,							// max gear frame
 	0							// renderflags
     },
 
@@ -391,6 +409,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// trackcone
 	-1,							// trackcone ground
 	0,							// swingangle
+	1400,						// geartime
+	47,							// max gear frame
 	0							// renderflags
     },
 
@@ -430,6 +450,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// trackcone
 	-1,							// trackcone ground
 	0,							// swingangle
+	1400,						// geartime
+	47,							// max gear frame
 	0							// renderflags
     },
 
@@ -469,6 +491,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// trackcone
 	-1,							// trackcone ground
 	0,							// swingangle
+	1400,						// geartime
+	47,							// max gear frame
 	0							// renderflags
     },
 
@@ -508,6 +532,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// trackcone
 	-1,							// trackcone ground
 	0,							// swingangle
+	1400,						// geartime
+	47,							// max gear frame
 	0							// renderflags
     },
 
@@ -549,6 +575,8 @@ completeVehicleData_t availableVehicles[] =
 	-1,							// trackcone
 	0,							// trackcone ground
 	0,							// swingangle
+	1400,						// geartime
+	47,							// max gear frame
 	0							// renderflags
     },
 
@@ -586,6 +614,8 @@ completeVehicleData_t availableVehicles[] =
 	-1,							// trackcone
 	0,							// trackcone ground
 	0,							// swingangle
+	1400,						// geartime
+	47,							// max gear frame
 	0							// renderflags
     },
 
@@ -623,6 +653,8 @@ completeVehicleData_t availableVehicles[] =
 	-1,							// trackcone
 	0,							// trackcone ground
 	0,							// swingangle
+	1400,						// geartime
+	47,							// max gear frame
 	0							// renderflags
     },
 
@@ -660,6 +692,8 @@ completeVehicleData_t availableVehicles[] =
 	-1,							// trackcone
 	0,							// trackcone ground
 	0,							// swingangle
+	1400,						// geartime
+	47,							// max gear frame
 	0							// renderflags
     }
 };
