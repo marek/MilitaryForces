@@ -8,10 +8,12 @@ History:
 
 
 
+
+
 +++v0.75+++ in progress...
 -----------
++ add team info to groundinstallation (not necessary for vehicle?)
 + fix ground installation bounding boxes
-+ finish script exporting
 + add script importing
 + spawn groundinstallations from scripts
 + add basic groundinstallation ai to fire missiles at planes
@@ -20,6 +22,7 @@ History:
 - added command "me_export_to_script" to save out the current IGME mission to a script.
   Also specify the filename for this script, otherwise it wont save it  
   NOTE: This is only the first cut of the file format, so dont expect it to stay like this
+  NOTE2: Mission scripts go into missions\<mapname>\<missionname>.mis
 - fix crosshair-in-fog bug (#664632)
 - minor fixes
 
