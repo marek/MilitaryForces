@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawtools.c,v 1.10 2002-02-19 13:55:58 sparky909_uk Exp $
+ * $Id: cg_drawtools.c,v 1.11 2002-02-20 16:59:36 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -871,12 +871,13 @@ qboolean CG_PolyMeshGeneratedShadow( centity_t *cent, clientInfo_t * ci, float *
 	polyVert_t verts[5][5];
 	polyVert_t vertBuff[4];
 	qhandle_t shaderHandle = -1;
-	vec3_t start, end, mins = {-1, -1, 0}, maxs = {1, 1, 0}, up = {0,0,1}, tmpVec;
+	vec3_t start, end, mins = {-1, -1, 0}, maxs = {1, 1, 0};
 	trace_t	trace;
+	qboolean drawMesh = qfalse;
+	qboolean vertInWater = qfalse;
+	int traceMask = 0;
 
 #pragma message ("CG_PolyMeshGeneratedShadow() - fix problem when projecting over high buildings")
-#pragma message ("CG_PolyMeshGeneratedShadow() - fix problem when projecting over water")
-#pragma message ("CG_PolyMeshGeneratedShadow() - fix problem with bounding box (use custom coords)")
 
 	// apply vehicle shadow size/offset adjusters
 	xRad = availableVehicles[ ci->vehicle ].shadowCoords[ SHC_XADJUST ];
@@ -884,10 +885,12 @@ qboolean CG_PolyMeshGeneratedShadow( centity_t *cent, clientInfo_t * ci, float *
 	xOffset = availableVehicles[ ci->vehicle ].shadowCoords[ SHC_XOFFSET ];
 	yOffset = availableVehicles[ ci->vehicle ].shadowCoords[ SHC_YOFFSET ];
 
-	// PLANES+HELICOPTERS ONLY: alter the radius values based upon the vehicles pitch & roll
+	// PLANES+HELICOPTERS?
 	if( (availableVehicles[ ci->vehicle ].cat & CAT_PLANE) || 
 		(availableVehicles[ ci->vehicle ].cat & CAT_HELO) )
 	{
+		// (alter the radius values based upon the vehicles pitch & roll)
+
 		// get pitch/roll adjusters
 		pitchMax = availableVehicles[ ci->vehicle ].shadowAdjusts[ SHO_PITCHMAX ];
 		rollMax = availableVehicles[ ci->vehicle ].shadowAdjusts[ SHO_ROLLMAX ];
@@ -901,6 +904,10 @@ qboolean CG_PolyMeshGeneratedShadow( centity_t *cent, clientInfo_t * ci, float *
 		MF_LimitFloat( &yAlter, 0.0f, 1.0f );
 		xRad *= 1.0f - ( pitchMod * xAlter );
 		yRad *= 1.0f - ( rollMod * yAlter );
+	}
+	else
+	{
+		// GROUND-VEHICLES+BOATS
 	}
 
 	// shadow testing active?
@@ -922,6 +929,9 @@ qboolean CG_PolyMeshGeneratedShadow( centity_t *cent, clientInfo_t * ci, float *
 	// create the mesh
 	memset( verts, 0, sizeof( verts ) );
 
+	// setup the default trace mask
+	traceMask = (MASK_WATER | MASK_SOLID);
+
 	// create the verts
 	for( y = 0; y<5; y++ )
 	{
@@ -937,31 +947,63 @@ qboolean CG_PolyMeshGeneratedShadow( centity_t *cent, clientInfo_t * ci, float *
 			verts[y][x].xyz[ 1 ] = ((yRad * 2.0f * v) - yRad) - yOffset;
 			verts[y][x].xyz[ 2 ] = 0;
 
-			// rotate the grid around the required yaw (local origin)
-			RotatePointAroundVector( tmpVec, up, verts[y][x].xyz, (cent->lerpAngles[YAW]-180) );
-			VectorCopy( tmpVec, verts[y][x].xyz );
+			// rotate point using entity angles
+			RotatePointAroundAngles( verts[y][x].xyz, verts[y][x].xyz,
+										cent->lerpAngles[YAW]-180,
+										cent->lerpAngles[PITCH],
+										cent->lerpAngles[ROLL] );
 
 			// convert to global origin
 			verts[y][x].xyz[ 0 ] += (cent->lerpOrigin[ 0 ]);
 			verts[y][x].xyz[ 1 ] += (cent->lerpOrigin[ 1 ]);
-
-			// trace a ray down from the x/y to get the z
-			VectorCopy( verts[y][x].xyz, start );
-			VectorCopy( verts[y][x].xyz, end );
-			start[2] = cent->lerpOrigin[2] + 64;
-			end[2] = cent->lerpOrigin[2] - 256;
-			CG_Trace( &trace, start, mins, maxs, end, 0, MASK_PLAYERSOLID );
-
-			// do z
-			verts[y][x].xyz[ 2 ] = trace.endpos[ 2 ];
+			verts[y][x].xyz[ 2 ] += (cent->lerpOrigin[ 2 ]);
 
 			// texture (NOTE: u & v flipped, because that's how it works fine with)
 			verts[y][x].st[ 0 ] = v;
 			verts[y][x].st[ 1 ] = u;
 
+			// is the start point in the water?
+			if( CG_PointContents( verts[y][x].xyz, -1 ) & CONTENTS_WATER )
+			{ 
+				// don't collide rays with water (cause we have at least one vert already in the water)
+				traceMask = MASK_SOLID;
+			}
+		}
+	}
+
+	// fit each verts onto the landscape
+	for( y = 0; y<5; y++ )
+	{
+		for( x = 0; x<5; x++ )
+		{
+			// trace a ray down from the x/y to get the z
+			VectorCopy( verts[y][x].xyz, start );
+			VectorCopy( verts[y][x].xyz, end );
+			end[2] -= 1024;
+			CG_Trace( &trace, start, mins, maxs, end, 0, traceMask );
+			
+			// do z
+			verts[y][x].xyz[ 2 ] = trace.endpos[ 2 ];
+
+			// in the water?
+			vertInWater = qfalse;
+			if( CG_PointContents( verts[y][x].xyz, -1 ) & CONTENTS_WATER )
+			{
+				vertInWater = qtrue;
+			}
+
 			// calc mod
 			mod = 1.0f - trace.fraction;
 			MF_LimitFloat( &mod, 0.0f, 1.0f );
+
+			// apply surface modifiers
+			if( /*!(trace.contents & CONTENTS_SOLID) || */vertInWater )
+			{
+				// lighten shadow when on projected onto or through non-solids by 50% (e.g. water)
+				mod *= 0.5f;
+			}
+
+			// convert mod to char
 			iMod = mod * 255;
 
 			// modulate (black <-> white)
@@ -969,7 +1011,19 @@ qboolean CG_PolyMeshGeneratedShadow( centity_t *cent, clientInfo_t * ci, float *
 			verts[y][x].modulate[1] = iMod;
 			verts[y][x].modulate[2] = iMod;
 			verts[y][x].modulate[3] = iMod;
+
+			// draw mesh? (if at least one vertex alpha was >0)
+			if( iMod )
+			{
+				drawMesh = qtrue;
+			}
 		}
+	}
+
+	// don't bother to continue?
+	if( !drawMesh )
+	{
+		return qfalse;
 	}
 
 	// adjust the verts X/Y position here
