@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.21 2002-02-04 16:35:14 sparky909_uk Exp $
+ * $Id: cg_main.c,v 1.22 2002-02-06 13:07:40 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -181,6 +181,9 @@ vmCvar_t	m2cp_page3;
 vmCvar_t	m2cp_page4;
 vmCvar_t	m2cp_page5;
 
+vmCvar_t	cg_fxQuality;
+vmCvar_t	cg_consoleTextStyle;
+
 typedef struct {
 	vmCvar_t	*vmCvar;
 	char		*cvarName;
@@ -294,6 +297,9 @@ cvarTable_t		cvarTable[] = {
 	{ &m2cp_page3, "m2cp_page3", "1", CVAR_ARCHIVE },
 	{ &m2cp_page4, "m2cp_page4", "1", CVAR_ARCHIVE },
 	{ &m2cp_page5, "m2cp_page5", "1", CVAR_ARCHIVE },
+
+	{ &cg_fxQuality, "cg_fxQuality", "2", CVAR_ARCHIVE },	// enum: quality_t in cg_local.h
+	{ &cg_consoleTextStyle, "cg_consoleTextStyle", "3", CVAR_ARCHIVE },
 
 	{ &pmove_fixed, "pmove_fixed", "1", CVAR_ROM},
 	{ &pmove_msec, "pmove_msec", "8", 0},
@@ -423,7 +429,11 @@ void QDECL CG_Printf( const char *msg, ... ) {
 	vsprintf (text, msg, argptr);
 	va_end (argptr);
 
+#ifdef _MENU_SCOREBOARD
+	CG_Add_Console_Line( text );
+#else
 	trap_Print( text );
+#endif
 }
 
 void QDECL CG_Error( const char *msg, ... ) {
