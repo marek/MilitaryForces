@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.18 2002-02-22 15:26:37 sparky909_uk Exp $
+ * $Id: ui_main.c,v 1.19 2002-02-22 16:13:12 sparky909_uk Exp $
 */
 /*
 =======================================================================
@@ -704,6 +704,9 @@ void _UI_Refresh( int realtime )
 
 	// render the mouse cursor
 	UI_DrawMouse();
+
+	// draw the custom chat
+	UI_CustomChatDraw();
 }
 
 /*
@@ -5423,9 +5426,6 @@ void UI_CustomChatInit( void )
 {
 	// clear memory
 	memset( &uiInfo.customChat, 0, sizeof( chat_t ) );
-
-	// send the address of the custom chat data block to the Client
-	trap_Cmd_ExecuteText( EXEC_APPEND, va( "custom_chat_ptr %d", &uiInfo.customChat ) );
 }
 
 /*
@@ -6575,3 +6575,136 @@ static void UI_StartServerRefresh(qboolean full)
 		}
 	}
 }
+
+/*
+=====================
+UI_CustomChatDraw
+
+Draw the custom chat console (if active)
+=====================
+*/
+
+#define	CHAT_X				(128+4)
+#define	CHAT_Y				4
+#define	CHAT_Y_IN_NEWHUD	(480-CHAT_HEIGHT-4-32)
+#define CHAT_WIDTH			(320+64-4-4)
+#define CHAT_HEIGHT			16
+
+#define	CHAT_OX			4
+#define	CHAT_OY			4
+#define	CHAT_AY			9
+
+#define	CURSOR_OX		2
+#define	CURSOR_OY		2
+#define	CURSOR_W		8
+#define	CURSOR_H		12
+
+void UI_CustomChatDraw( void )
+{
+	int spacer1 = 0, spacer2 = 0;
+	char * pMode = NULL;
+	int x = CHAT_X, y = CHAT_Y;
+	float alpha = 1.0f; 
+	float fx = 1.0f;
+	float textYAdjust = 0;
+
+// we can't do this any more because we've had to make the draw part of the UI	
+/*
+	// reposition around HUD?
+	if( CG_NewHUDActive() )
+	{
+		y = CHAT_Y_IN_NEWHUD;
+	}
+
+	// fading out?
+	if( !uiInfo.customChat.active )
+	{
+		// reduce life based upon time
+ 		uiInfo.customChat.lifeAlpha -= (8.0f * CG_FRAME_SECOND_FRACTION );
+		MF_LimitFloat( &uiInfo.customChat.lifeAlpha, 0.0f, 1.0f );
+
+		// out of life
+		if( uiInfo.customChat.lifeAlpha <= 0.1f )
+		{
+			// zap to 0
+			uiInfo.customChat.lifeAlpha = 0.0f;
+			return;
+		}
+	}
+
+	alpha = uiInfo.customChat.lifeAlpha;
+*/
+	// lock out when not active
+	if( !uiInfo.customChat.active )
+	{
+		return;
+	}
+
+	// choose prefix
+	switch( uiInfo.customChat.mode )
+	{
+	case CCHAT_ALL:
+		pMode = "Chat: ";
+		break;
+	case CCHAT_TEAM:
+		pMode = "Team Chat: ";
+		break;
+	case CCHAT_TARGET:
+		pMode = "Target Chat: ";
+		break;
+	case CCHAT_ATTACK:
+		pMode = "Attacker Chat: ";
+		break;
+	}
+
+	// draw the chat background
+	DC->fillRect( x, y, CHAT_WIDTH, CHAT_HEIGHT, *CreateColourVector( 0,0.4f,0,0.75f * alpha,NULL ) );
+	DC->drawRect( x, y, CHAT_WIDTH, CHAT_HEIGHT, 1, *CreateColourVector( 0,0,0,0.75f * alpha,NULL ) );
+
+	spacer1 = DC->textWidth( pMode, CHAT_TEXT_SCALE, 0 );
+
+	// apply height adjuster (to keep the text base constant)
+	if( uiInfo.customChat.text[0] )
+	{
+		textYAdjust = DC->textHeight( uiInfo.customChat.text, CHAT_TEXT_SCALE, 0 );
+	}
+
+	// draw the current text line
+	DrawStringNew( x+CHAT_OX, y+CHAT_OY, CHAT_TEXT_SCALE, *CreateColourVector(1,1,0,1 * alpha,NULL), pMode, 0, 0, ITEM_TEXTSTYLE_SHADOWED, LEFT_JUSTIFY );
+	DrawStringNew( x+CHAT_OX+spacer1, y+CHAT_OY+CHAT_AY-textYAdjust, CHAT_TEXT_SCALE, *CreateColourVector(1,1,1,1 * alpha,NULL), uiInfo.customChat.text, 0, 0, ITEM_TEXTSTYLE_SHADOWED, LEFT_JUSTIFY );
+
+	spacer2 = DC->textWidth( uiInfo.customChat.text, CHAT_TEXT_SCALE, 0 );
+
+	// fade the cursor
+	if( uiInfo.customChat.cursorDir )
+	{
+		// down
+		uiInfo.customChat.cursorAlpha -= (4.0f * UI_FRAME_SECOND_FRACTION );
+		if( uiInfo.customChat.cursorAlpha <= 0.0f )
+		{
+			uiInfo.customChat.cursorAlpha = 0.0f;
+			uiInfo.customChat.cursorDir = qfalse;
+		}
+	}
+	else
+	{
+		// down
+		uiInfo.customChat.cursorAlpha += (4.0f * UI_FRAME_SECOND_FRACTION );
+		if( uiInfo.customChat.cursorAlpha >= 1.0f )
+		{
+			uiInfo.customChat.cursorAlpha = 1.0f;
+			uiInfo.customChat.cursorDir = qtrue;
+		}
+	}
+
+	// work out cursor attributes
+	fx = 1.0f;
+	if( uiInfo.customChat.lockEntry )
+	{
+		fx = 0.0f;
+	}
+
+	// draw the cursor
+	DC->fillRect( x+spacer1+spacer2+CURSOR_OX+4, y+CURSOR_OY, CURSOR_W, CURSOR_H, *CreateColourVector( 1,fx,fx,uiInfo.customChat.cursorAlpha * alpha,NULL ) );
+}
+

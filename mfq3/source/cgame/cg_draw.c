@@ -1,5 +1,5 @@
 /*
- * $Id: cg_draw.c,v 1.29 2002-02-22 15:25:40 sparky909_uk Exp $
+ * $Id: cg_draw.c,v 1.30 2002-02-22 16:14:07 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -2289,139 +2289,6 @@ static void CG_DrawTourneyScoreboard() {
 	CG_DrawOldTourneyScoreboard();
 }
 
-
-/*
-=====================
-CG_CustomChatDraw
-
-Draw the custom chat console (if active)
-=====================
-*/
-
-#define	CHAT_X				(128+4)
-#define	CHAT_Y				4
-#define	CHAT_Y_IN_NEWHUD	(480-CHAT_HEIGHT-4-32)
-#define CHAT_WIDTH			(320+64-4-4)
-#define CHAT_HEIGHT			16
-
-#define	CHAT_OX			4
-#define	CHAT_OY			4
-#define	CHAT_AY			9
-
-#define	CURSOR_OX		2
-#define	CURSOR_OY		2
-#define	CURSOR_W		8
-#define	CURSOR_H		12
-
-#pragma message ("CG_CustomChatDraw() check that we don't get problems access the 'shared' data block in the UI (code not testing in VMs)")
-
-void CG_CustomChatDraw( void )
-{
-	int spacer1 = 0, spacer2 = 0;
-	char * pMode = NULL;
-	int x = CHAT_X, y = CHAT_Y;
-	float alpha = 1.0f; 
-	float fx = 1.0f;
-	float textYAdjust = 0;
-
-	// can't do anything without a valid pointer from the UI
-	if( cg.pCustomChat == NULL )
-	{
-		return;
-	}
-
-	// reposition around HUD?
-	if( CG_NewHUDActive() )
-	{
-		y = CHAT_Y_IN_NEWHUD;
-	}
-
-	// fading out?
-	if( !cg.pCustomChat->active )
-	{
-		// reduce life based upon time
- 		cg.pCustomChat->lifeAlpha -= (8.0f * CG_FRAME_SECOND_FRACTION );
-		MF_LimitFloat( &cg.pCustomChat->lifeAlpha, 0.0f, 1.0f );
-
-		// out of life
-		if( cg.pCustomChat->lifeAlpha <= 0.1f )
-		{
-			// zap to 0
-			cg.pCustomChat->lifeAlpha = 0.0f;
-			return;
-		}
-	}
-
-	// choose prefix
-	switch( cg.pCustomChat->mode )
-	{
-	case CCHAT_ALL:
-		pMode = "Chat: ";
-		break;
-	case CCHAT_TEAM:
-		pMode = "Team Chat: ";
-		break;
-	case CCHAT_TARGET:
-		pMode = "Target Chat: ";
-		break;
-	case CCHAT_ATTACK:
-		pMode = "Attacker Chat: ";
-		break;
-	}
-
-	alpha = cg.pCustomChat->lifeAlpha;
-
-	// draw the chat background
-	DC->fillRect( x, y, CHAT_WIDTH, CHAT_HEIGHT, *CreateColourVector( 0,0.4f,0,0.75f * alpha,NULL ) );
-	DC->drawRect( x, y, CHAT_WIDTH, CHAT_HEIGHT, 1, *CreateColourVector( 0,0,0,0.75f * alpha,NULL ) );
-
-	spacer1 = DC->textWidth( pMode, CHAT_TEXT_SCALE, 0 );
-
-	// apply height adjuster (to keep the text base constant)
-	if( cg.pCustomChat->text[0] )
-	{
-		textYAdjust = DC->textHeight( cg.pCustomChat->text, CHAT_TEXT_SCALE, 0 );
-	}
-
-	// draw the current text line
-	DrawStringNew( x+CHAT_OX, y+CHAT_OY, CHAT_TEXT_SCALE, *CreateColourVector(1,1,0,1 * alpha,NULL), pMode, 0, 0, ITEM_TEXTSTYLE_SHADOWED, LEFT_JUSTIFY );
-	DrawStringNew( x+CHAT_OX+spacer1, y+CHAT_OY+CHAT_AY-textYAdjust, CHAT_TEXT_SCALE, *CreateColourVector(1,1,1,1 * alpha,NULL), cg.pCustomChat->text, 0, 0, ITEM_TEXTSTYLE_SHADOWED, LEFT_JUSTIFY );
-
-	spacer2 = DC->textWidth( cg.pCustomChat->text, CHAT_TEXT_SCALE, 0 );
-
-	// fade the cursor
-	if( cg.pCustomChat->cursorDir )
-	{
-		// down
-		cg.pCustomChat->cursorAlpha -= (4.0f * CG_FRAME_SECOND_FRACTION );
-		if( cg.pCustomChat->cursorAlpha <= 0.0f )
-		{
-			cg.pCustomChat->cursorAlpha = 0.0f;
-			cg.pCustomChat->cursorDir = qfalse;
-		}
-	}
-	else
-	{
-		// down
-		cg.pCustomChat->cursorAlpha += (4.0f * CG_FRAME_SECOND_FRACTION );
-		if( cg.pCustomChat->cursorAlpha >= 1.0f )
-		{
-			cg.pCustomChat->cursorAlpha = 1.0f;
-			cg.pCustomChat->cursorDir = qtrue;
-		}
-	}
-
-	// work out cursor attributes
-	fx = 1.0f;
-	if( cg.pCustomChat->lockEntry )
-	{
-		fx = 0.0f;
-	}
-
-	// draw the cursor
-	DC->fillRect( x+spacer1+spacer2+CURSOR_OX+4, y+CURSOR_OY, CURSOR_W, CURSOR_H, *CreateColourVector( 1,fx,fx,cg.pCustomChat->cursorAlpha * alpha,NULL ) );
-}
-
 /*
 =================
 CG_Draw2D_MFQ3
@@ -2613,7 +2480,6 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 	// draw status bar and other floating elements
 // 	CG_Draw2D();
 	CG_Draw2D_MFQ3();
-	CG_CustomChatDraw();	// draw custom chat console
 	CG_DrawDevelop();		// draw debugging (ONLY) text
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_consolecmds.c,v 1.18 2002-02-20 11:12:58 sparky909_uk Exp $
+ * $Id: cg_consolecmds.c,v 1.19 2002-02-22 16:14:07 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -498,20 +498,6 @@ static void CG_TestGV_f( void ) {
 
 /*
 =================
-CG_Assign_Custom_Chat_Ptr_f
-
-Accept the address of the custom chat data block from the UI  
-=================
-*/
-
-void CG_Assign_Custom_Chat_Ptr_f( void )
-{
-	// 2nd parameter is the physical address for the pointer (i.e. <ptrname> <address>)
-	cg.pCustomChat = (chat_t *) atoi( CG_Argv(1) );
-}
-
-/*
-=================
 CG_ExtractDeveloper
 
 Intercepts 'say <var> <values>' commands for development purposes
@@ -642,8 +628,7 @@ static consoleCommand_t	commands[] = {
 	{ "toggle_mfd1", CG_Toggle_MFD1_f },
 	{ "toggle_mfd2", CG_Toggle_MFD2_f },
 	{ "update_hud_color", CG_Update_HUD_Color_f },
-	{ "update_mfd_color", CG_Update_MFD_Color_f },
-	{ "custom_chat_ptr", CG_Assign_Custom_Chat_Ptr_f }
+	{ "update_mfd_color", CG_Update_MFD_Color_f }
 };
 
 /*

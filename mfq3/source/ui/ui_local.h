@@ -1,5 +1,5 @@
 /*
- * $Id: ui_local.h,v 1.6 2002-02-20 19:59:03 sparky909_uk Exp $
+ * $Id: ui_local.h,v 1.7 2002-02-22 16:13:12 sparky909_uk Exp $
 */
 //
 #ifndef __UI_LOCAL_H__
@@ -343,6 +343,7 @@ int UI_AdjustTimeByGame(int time);
 void UI_ShowPostGame(qboolean newHigh);
 void UI_ClearScores();
 void UI_LoadArenas(void);
+void UI_CustomChatDraw( void );
 
 //
 // ui_menu.c
