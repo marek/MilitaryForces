@@ -4,21 +4,20 @@ Overview
 {
 	map	mfq31
 	gameset	1
+	gametype	3
 	mission	bjoern1
-	title	bjoern1
-	goal	Search & Destroy
+	goal	SearchAndDestroy
 }
 
 Entities
 {
 	GroundInstallation
 	{
-		Index	0
+		Index	1
 		Name	SAM Turret
 		Team	?
-		Games	?
-		Origin	3616.680176;-2434.657227;576.125000
-		Angles	0.000000;72.630615;0.000000
+		Origin	4185.341309;-3160.657227;576.125000
+		Angles	0.000000;135.204346;0.000000
 	}
 
 	GroundInstallation
@@ -26,19 +25,17 @@ Entities
 		Index	2
 		Name	SAM Turret
 		Team	?
-		Games	?
-		Origin	4945.177734;-2090.240234;576.125000
-		Angles	0.000000;223.179932;0.000000
+		Origin	4740.765625;-2593.259033;576.125000
+		Angles	0.000000;157.140747;0.000000
 	}
 
 	Vehicle
 	{
-		Index	9
-		Name	A-10 Thunderbolt II
-		Team	2
-		Games	?
-		Origin	4676.060059;-2385.761719;588.125000
-		Angles	0.000000;180.039185;0.000000
+		Index	35
+		Name	M1A1i Abrams
+		Team	1
+		Origin	4235.996094;-2400.016113;579.125000
+		Angles	0.000000;161.328735;0.000000
 		Waypoints
 		{
 		}
@@ -49,15 +46,18 @@ Entities
 		Index	0
 		Name	F-16 Falcon (AA)
 		Team	2
-		Games	?
-		Origin	5029.101074;-3337.086914;930.858521
-		Angles	0.000000;71.995972;0.000000
+		Origin	4317.040527;-3898.153809;1082.989746
+		Angles	0.000000;131.281494;0.000000
 		Waypoints
 		{
-			Origin	5046.481445;-2954.619141;926.567871
-			Origin	4750.820313;-2524.981689;924.768433
-			Origin	3669.519531;-2874.265137;843.794739
-			Origin	4636.135254;-4064.966064;793.386902
+			Origin	3714.189697;-3105.854248;1169.641479
+			Origin	3757.775391;-1838.057007;1159.983276
+			Origin	5303.661133;-1700.625122;1214.747070
+			Origin	5429.161621;-3143.176758;1307.953979
+			Origin	4831.812988;-5285.768066;855.245544
+			Origin	3902.677490;-6058.329102;767.883484
+			Origin	3234.083008;-4603.404785;969.130920
+			Origin	4136.594238;-4006.820801;1124.042114
 		}
 	}
 
