@@ -1,5 +1,5 @@
 /*
- * $Id: cg_miscvehicle.c,v 1.6 2002-02-10 19:18:19 thebjoern Exp $
+ * $Id: cg_miscvehicle.c,v 1.7 2002-02-15 09:58:31 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -362,13 +362,13 @@ static void CG_Misc_GV( centity_t *cent )
 
 void CG_Misc_Vehicle( centity_t *cent ) 
 {
-	if( (availableVehicles[cent->currentState.modelindex].id&CAT_ANY) & CAT_PLANE ) {
+	if( availableVehicles[cent->currentState.modelindex].cat & CAT_PLANE ) {
 		if( cg.radarTargets < MAX_RADAR_TARGETS && (cg.predictedPlayerEntity.currentState.ONOFF & OO_RADAR_AIR)) {
 			cg.radarEnts[cg.radarTargets++] = cent;
 		}
 		CG_Misc_Plane( cent );
 	}
-	else if( (availableVehicles[cent->currentState.modelindex].id&CAT_ANY) & CAT_GROUND ) {
+	else if( availableVehicles[cent->currentState.modelindex].cat & CAT_GROUND ) {
 		if( cg.radarTargets < MAX_RADAR_TARGETS && (cg.predictedPlayerEntity.currentState.ONOFF & OO_RADAR_GROUND)) {
 			cg.radarEnts[cg.radarTargets++] = cent;
 		}

@@ -1,5 +1,5 @@
 /*
- * $Id: g_team.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: g_team.c,v 1.2 2002-02-15 09:58:31 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -813,7 +813,7 @@ gentity_t *SelectRandomTeamSpawnPoint( int teamstate, team_t team, int idx ) {
 			continue;
 		}
 		// check for category on this spawn point
-		if( !(spot->ent_category & (availableVehicles[idx].id&CAT_ANY)) ) {
+		if( !(spot->ent_category & availableVehicles[idx].cat) ) {
 			continue;
 		}
 		spots[ count ] = spot;

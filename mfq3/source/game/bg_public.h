@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.56 2002-02-14 11:51:40 sparky909_uk Exp $
+ * $Id: bg_public.h,v 1.57 2002-02-15 09:58:31 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.60a"
+#define	GAME_VERSION		"mfq3 v0.60d"
 
 #define	DEFAULT_GRAVITY		800
 
@@ -506,7 +506,8 @@ qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTim
 //			8 bit 0x0000ff00 are the team (8 possibilities, may be in more than one team)
 //			8 bit 0xffff0000 are the gameset (8 possibilities, may be in more than one gameset)
 
-// gamesets							//  xx------
+// gamesets	
+/*						//  xx------
 #define	MF_GAMESET_MIN				  0x01000000 
 #define	MF_GAMESET_MODERN			  0x01000000 
 #define	MF_GAMESET_WW2				  0x02000000 
@@ -515,8 +516,19 @@ qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTim
 #define	MF_GAMESET_VIETNAM			  0x08000000 
 #define	MF_GAMESET_FUTURE			  0x10000000 
 #define	MF_GAMESET_ANY				  0xFF000000
+*/
+// can now be any number of gamesets (full 8 byte)
+// just expand list as needed and make sure ANY is set properly
+#define	MF_GAMESET_MIN				  0x0001
+#define	MF_GAMESET_MODERN			  0x0001 
+#define	MF_GAMESET_WW2				  0x0002 
+#define	MF_GAMESET_WW1				  0x0004 
+#define	MF_GAMESET_MAX				  0x0004 
+#define	MF_GAMESET_ANY				  0xFFFF
+
 
 // teams							//  --xx----
+/*
 #define	MF_TEAM_MIN					  0x00010000 
 #define	MF_TEAM_1					  0x00010000 
 #define	MF_TEAM_2					  0x00020000 
@@ -528,8 +540,16 @@ qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTim
 #define	MF_TEAM_8					  0x00800000 
 #define	MF_TEAM_MAX					  0x00020000 
 #define	MF_TEAM_ANY					  0x00FF0000
+*/
+#define	MF_TEAM_MIN					  0x0001
+#define	MF_TEAM_1					  0x0001 
+#define	MF_TEAM_2					  0x0002 
+#define	MF_TEAM_MAX					  0x0002 
+#define	MF_TEAM_ANY					  0xFFFF
+
 
 // vehicle categories				//  ----xx--
+/*
 #define CAT_MIN						  0x00000100
 #define	CAT_PLANE					  0x00000100 
 #define	CAT_GROUND					  0x00000200 
@@ -538,7 +558,17 @@ qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTim
 #define	CAT_BOAT					  0x00001000 
 #define CAT_MAX						  0x00000200 
 #define	CAT_ANY						  0x0000FF00
+*/
+#define CAT_MIN						  0x0001
+#define	CAT_PLANE					  0x0001 
+#define	CAT_GROUND					  0x0002 
+#define	CAT_HELO					  0x0004 
+#define	CAT_LQM						  0x0008
+#define	CAT_BOAT					  0x0010 
+#define CAT_MAX						  0x0002 
+#define	CAT_ANY						  0xFFFF
 
+/*
 #define CLASS_MIN					  0x00000001
 #define CLASS_MAX					  0x00000002
 #define CLASS_ANY					  0x000000FF
@@ -565,6 +595,41 @@ qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTim
 // LQM classes						//  ------xx
 #define CLASS_LQM_SPECIAL			  0x00000001 
 #define CLASS_LQM_MAX				  0x00000001 
+
+*/
+
+#define CLASS_MIN					  0x0001
+#define CLASS_MAX					  0x0002
+#define CLASS_ANY					  0xFFFF
+
+// plane classes				
+#define	CLASS_PLANE_FIGHTER			  0x0001 
+#define	CLASS_PLANE_BOMBER			  0x0002 
+#define	CLASS_PLANE_TRANSPORT		  0x0004 
+#define	CLASS_PLANE_MAX				  0x0004
+
+// helo classes					
+#define	CLASS_HELO_ATTACK			  0x0001 
+#define	CLASS_HELO_RECON			  0x0002 
+#define	CLASS_HELO_TRANSPORT		  0x0004 
+#define	CLASS_HELO_MAX				  0x0004
+
+// ground vehicle classes		
+#define CLASS_GROUND_MBT			  0x0001 
+#define	CLASS_GROUND_RECON			  0x0002 
+#define	CLASS_GROUND_APC			  0x0004 
+#define	CLASS_GROUND_SAM			  0x0008 
+#define	CLASS_GROUND_MAX			  0x0008
+
+// LQM classes					
+#define CLASS_LQM_SPECIAL			  0x0001 
+#define CLASS_LQM_MAX				  0x0001 
+
+// boat classes					
+#define	CLASS_BOAT_PATROL			  0x0001 
+#define	CLASS_BOAT_TRANSPORT		  0x0002 
+#define	CLASS_BOAT_MAX				  0x0002
+
 
 // strings for categories and classes
 extern const char *gameset_items[MF_MAX_GAMESETS+1];
@@ -622,7 +687,11 @@ typedef struct completeVehicleData_s
 	char			*tinyName;			// small ident name
     char		    *modelName;			// just the directory of the model
 	qhandle_t		shadowShader;	// the shadow shader (use SHADOW_DEFAULT to use the default shader or SHADOW_NONE for no shadow)
-    unsigned long   id;				// gameset, team, cat and class
+//    unsigned long   id;				// gameset, team, cat and class
+	unsigned int	gameset;		// gameset 
+	unsigned int	team;			// team 
+	unsigned int	cat;			// category bits
+	unsigned int	cls;			// class bits
 	unsigned int	flags;			// special flags
 	unsigned int	caps;			// capabilities
     qhandle_t	    handle[BP_MAX_PARTS];// ditto
@@ -744,8 +813,8 @@ typedef enum
 
 void MF_SetGameset(unsigned long gs);
 unsigned long MF_GetGameset(qboolean asEnum);
-int MF_getIndexOfVehicle( int start, unsigned long what );
-int MF_getIndexOfVehicleEx( int start, int vehicleCat, int vehicleClass, unsigned long team, unsigned long gameset );
+int MF_getIndexOfVehicle( int start, unsigned int gameset, unsigned int team, unsigned int cat, unsigned int cls );
+//int MF_getIndexOfVehicleEx( int start, int vehicleCat, int vehicleClass, unsigned long team, unsigned long gameset );
 int MF_getItemIndexFromHex(int hexValue);
 int MF_getNumberOfItems(const char **itemlist);
 char * MF_CreateModelPathname( int vehicle, char * pFormatString );

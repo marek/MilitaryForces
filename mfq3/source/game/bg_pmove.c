@@ -1,5 +1,5 @@
 /*
- * $Id: bg_pmove.c,v 1.4 2002-01-20 20:28:44 thebjoern Exp $
+ * $Id: bg_pmove.c,v 1.5 2002-02-15 09:58:31 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -798,11 +798,11 @@ PM_VehicleMove
 static void PM_VehicleMove( void ) 
 {
 	pm->ps->pm_type = pm->ps->pm_type;
-	if( (availableVehicles[pm->vehicle].id&CAT_ANY) & CAT_PLANE ) {
+	if( availableVehicles[pm->vehicle].cat & CAT_PLANE ) {
 		PM_PlaneMove();
 	}
 //	else if( availableVehicles[pm->vehicle].id & CAT_HELO )
-	else if( (availableVehicles[pm->vehicle].id&CAT_ANY) & CAT_GROUND ) {
+	else if( availableVehicles[pm->vehicle].cat & CAT_GROUND ) {
 		PM_GroundVehicleMove();
 	}
 //	else if( availableVehicles[pm->vehicle].id & CAT_LQM )

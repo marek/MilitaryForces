@@ -1,5 +1,5 @@
 /*
- * $Id: g_combat.c,v 1.4 2002-02-10 19:18:19 thebjoern Exp $
+ * $Id: g_combat.c,v 1.5 2002-02-15 09:58:31 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -244,12 +244,12 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 	// wrong cat ?
 	if( cat && cat != CAT_ANY ) {
 		if( targ->client ) {
-			if( !(availableVehicles[targ->client->vehicle].id & CAT_ANY & cat) ) {
+			if( !(availableVehicles[targ->client->vehicle].cat & cat) ) {
 				damage *= inflictor->catmodifier;
 			}
 		} else {
 			if( targ->s.eType == ET_MISC_VEHICLE ) {
-				if( !(availableVehicles[targ->s.modelindex].id & CAT_ANY & cat) ) {
+				if( !(availableVehicles[targ->s.modelindex].cat & cat) ) {
 					damage *= inflictor->catmodifier;
 				}
 			}
@@ -731,7 +731,7 @@ void vehicle_death( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, 
 		self->health = GIB_HEALTH - 1;
 	}
 
-	if( (availableVehicles[self->client->vehicle].id&CAT_ANY) & CAT_GROUND ) {
+	if( availableVehicles[self->client->vehicle].cat & CAT_GROUND ) {
 		self->health = GIB_HEALTH - 1;
 	}
 

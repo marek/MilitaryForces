@@ -1,5 +1,5 @@
 /*
- * $Id: g_mfq3ents.c,v 1.5 2002-02-05 16:09:32 sparky909_uk Exp $
+ * $Id: g_mfq3ents.c,v 1.6 2002-02-15 09:58:31 thebjoern Exp $
 */
 
 
@@ -161,7 +161,7 @@ void recharge_touch( gentity_t *self, gentity_t *other, trace_t *trace ) {
 	}
 	
 	// are we the proper category ?
-	if( !((availableVehicles[other->client->vehicle].id&CAT_ANY)&self->ent_category) ) {
+	if( !(availableVehicles[other->client->vehicle].cat&self->ent_category) ) {
 		return;
 	}
 

@@ -1,5 +1,5 @@
 /*
- * $Id: g_active.c,v 1.7 2002-01-31 23:47:24 thebjoern Exp $
+ * $Id: g_active.c,v 1.8 2002-02-15 09:58:31 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -654,7 +654,7 @@ void ClientThink_real( gentity_t *ent ) {
 		updateTargetTracking(ent);
 	}
 	// category specific actions if any
-	if( (availableVehicles[client->vehicle].id&CAT_ANY) & CAT_PLANE ) {
+	if( availableVehicles[client->vehicle].cat & CAT_PLANE ) {
 		// takeoff/landing
 		checkTakeoffLanding( ent );
 	}
@@ -711,7 +711,7 @@ void ClientThink_real( gentity_t *ent ) {
 	ent->updateGear = pm.updateGear;
 
 	// for GV's check for crashland
-	if( (availableVehicles[client->vehicle].id&CAT_ANY) & CAT_GROUND ) {
+	if( availableVehicles[client->vehicle].cat & CAT_GROUND ) {
 		if( client->ps.ONOFF & OO_VAPOR ) {
 			client->ps.ONOFF &= ~OO_VAPOR;
 			G_Damage( ent, 0, ent, 0, 0, client->ps.speed/5, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
@@ -739,7 +739,7 @@ void ClientThink_real( gentity_t *ent ) {
 	ent->watertype = pm.watertype;
 
 	if( client->vehicle >= 0 && ent->waterlevel && 
-		!(availableVehicles[client->vehicle].id&CAT_ANY & CAT_GROUND) ) {
+		!(availableVehicles[client->vehicle].cat & CAT_GROUND) ) {
 	    G_Damage( ent, NULL, ent, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 	}
 

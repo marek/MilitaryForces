@@ -1,5 +1,5 @@
 /*
- * $Id: g_cmds.c,v 1.6 2002-02-05 14:36:32 sparky909_uk Exp $
+ * $Id: g_cmds.c,v 1.7 2002-02-15 09:58:31 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -301,7 +301,7 @@ void Cmd_Kill_f( gentity_t *ent ) {
 		return;
 	}
 	ent->flags &= ~FL_GODMODE;
-	if( (availableVehicles[ent->client->vehicle].id&CAT_ANY) & CAT_PLANE ) {
+	if( availableVehicles[ent->client->vehicle].cat & CAT_PLANE ) {
 		ent->client->ps.stats[STAT_HEALTH] = ent->health = -20;
 	} else {
 		ent->client->ps.stats[STAT_HEALTH] = ent->health = -999;

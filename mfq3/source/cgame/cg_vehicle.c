@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicle.c,v 1.7 2002-02-14 12:24:28 sparky909_uk Exp $
+ * $Id: cg_vehicle.c,v 1.8 2002-02-15 09:58:31 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -139,17 +139,17 @@ void CG_CacheVehicles()
 	// later there could also be a check to only cache the current gameset
 	for( i = 0; i < bg_numberOfVehicles; i++ )
 	{
-		if( (availableVehicles[i].id&MF_GAMESET_ANY) & cgs.gameset ) {
+		if( availableVehicles[i].gameset & cgs.gameset ) {
 			CG_LoadingString(availableVehicles[i].descriptiveName);
-			if( (availableVehicles[i].id&CAT_ANY) & CAT_PLANE ) {
+			if( availableVehicles[i].cat & CAT_PLANE ) {
 					CG_CachePlane(i);
 			}
-			else if( (availableVehicles[i].id&CAT_ANY) & CAT_GROUND ) {
+			else if( availableVehicles[i].cat & CAT_GROUND ) {
 					CG_CacheGroundVehicle(i);
 			}
 			else {
 				trap_Error( va("Invalid Vehicle type in CG_CacheVehicles (%d,%d)", 
-					i, availableVehicles[i].id));
+					i, availableVehicles[i].cat));
 			}
 		}
 
@@ -176,10 +176,10 @@ load the vehicle
 void CG_RegisterVehicle( clientInfo_t *ci )
 {
 //	Com_Printf( "RegVehicle = %i\n" ,ci->vehicle);    
-	if( (availableVehicles[ci->vehicle].id&CAT_ANY) & CAT_PLANE ) {
+	if( availableVehicles[ci->vehicle].cat & CAT_PLANE ) {
 		CG_RegisterPlane(ci);
 	}
-	else if( (availableVehicles[ci->vehicle].id&CAT_ANY) & CAT_GROUND ) {
+	else if( availableVehicles[ci->vehicle].cat & CAT_GROUND ) {
 		CG_RegisterGroundVehicle(ci);
 	}
 	else
@@ -218,7 +218,7 @@ void CG_Vehicle( centity_t *cent )
 	}
 
 	// plane?
-	if( (availableVehicles[ci->vehicle].id&CAT_ANY) & CAT_PLANE )
+	if( availableVehicles[ci->vehicle].cat & CAT_PLANE )
 	{
 		if( cg.radarTargets < MAX_RADAR_TARGETS && (cg.predictedPlayerEntity.currentState.ONOFF & OO_RADAR_AIR))
 		{
@@ -227,7 +227,7 @@ void CG_Vehicle( centity_t *cent )
 		CG_Plane( cent, ci );
 	}
 	// ground vehicle?
-	else if( (availableVehicles[ci->vehicle].id&CAT_ANY) & CAT_GROUND )
+	else if( availableVehicles[ci->vehicle].cat & CAT_GROUND )
 	{
 		if( cg.radarTargets < MAX_RADAR_TARGETS && (cg.predictedPlayerEntity.currentState.ONOFF & OO_RADAR_GROUND))
 		{
@@ -262,10 +262,10 @@ void CG_VehicleObituary( entityState_t *ent )
 		return;
     }
 
-	if( (availableVehicles[ci->vehicle].id&CAT_ANY) & CAT_PLANE ) {
+	if( availableVehicles[ci->vehicle].cat & CAT_PLANE ) {
 		CG_PlaneObituary( ent, ci );
 	}
-	else if( (availableVehicles[ci->vehicle].id&CAT_ANY) & CAT_GROUND ) {
+	else if( availableVehicles[ci->vehicle].cat & CAT_GROUND ) {
 		CG_GroundVehicleObituary( ent, ci );
 	}
 	else {

@@ -1,5 +1,5 @@
 /*
- * $Id: g_missile.c,v 1.7 2002-01-31 23:47:24 thebjoern Exp $
+ * $Id: g_missile.c,v 1.8 2002-02-15 09:58:31 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -347,7 +347,7 @@ void fire_antiair (gentity_t *self) {
 	VectorCopy( availableVehicles[self->client->vehicle].gunoffset, offset );
 	VectorCopy( self->s.pos.trBase, start );
 
-	if( (availableVehicles[self->client->vehicle].id&CAT_ANY) & CAT_GROUND ) {
+	if( availableVehicles[self->client->vehicle].cat & CAT_GROUND ) {
 		// use this to make it shoot where the player looks
 //		AngleVectors( self->client->ps.viewangles, dir, 0, 0 );
 //		VectorCopy( self->s.pos.trBase, start );
@@ -421,7 +421,7 @@ void fire_antiground (gentity_t *self) {
 	VectorCopy( availableVehicles[self->client->vehicle].gunoffset, offset );
 	VectorCopy( self->s.pos.trBase, start );
 
-	if( (availableVehicles[self->client->vehicle].id&CAT_ANY) & CAT_GROUND ) {
+	if( availableVehicles[self->client->vehicle].cat & CAT_GROUND ) {
 		// use this to make it shoot where the player looks
 //		AngleVectors( self->client->ps.viewangles, dir, 0, 0 );
 //		VectorCopy( self->s.pos.trBase, start );
@@ -495,7 +495,7 @@ void fire_ffar (gentity_t *self) {
 	VectorCopy( availableVehicles[self->client->vehicle].gunoffset, offset );
 	VectorCopy( self->s.pos.trBase, start );
 
-	if( (availableVehicles[self->client->vehicle].id&CAT_ANY) & CAT_GROUND ) {
+	if( availableVehicles[self->client->vehicle].cat & CAT_GROUND ) {
 		// use this to make it shoot where the player looks
 //		AngleVectors( self->client->ps.viewangles, dir, 0, 0 );
 //		VectorCopy( self->s.pos.trBase, start );
@@ -558,7 +558,7 @@ void fire_ironbomb (gentity_t *self) {
 
 	AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
 	VectorCopy( self->s.pos.trBase, start );
-	if( (availableVehicles[self->client->vehicle].id&CAT_ANY) & CAT_PLANE ) {
+	if( availableVehicles[self->client->vehicle].cat & CAT_PLANE ) {
 		self->left = (self->left ? qfalse : qtrue);
 		mult = (self->left ? 1 : -1);
 		VectorMA( start, availableVehicles[self->client->vehicle].mins[2], up, start );
@@ -617,7 +617,7 @@ void fire_autocannon (gentity_t *self) {
 	VectorCopy( availableVehicles[self->client->vehicle].gunoffset, offset );
 	VectorCopy( self->s.pos.trBase, start );
 
-	if( (availableVehicles[self->client->vehicle].id&CAT_ANY) & CAT_GROUND ) {
+	if( availableVehicles[self->client->vehicle].cat & CAT_GROUND ) {
 		// use this to make it shoot where the player looks
 //		AngleVectors( self->client->ps.viewangles, dir, 0, 0 );
 //		VectorCopy( self->s.pos.trBase, start );
