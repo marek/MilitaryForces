@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawtools.c,v 1.15 2002-02-23 23:07:06 thebjoern Exp $
+ * $Id: cg_drawtools.c,v 1.16 2002-02-25 09:56:57 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1002,8 +1002,12 @@ qboolean CG_PolyMeshGeneratedShadow( centity_t *cent, clientInfo_t * ci, float *
 			end[2] -= 1024;
 			CG_Trace( &trace, start, mins, maxs, end, 0, traceMask );
 			
-			// do z
-			verts[y][x].xyz[ 2 ] = trace.endpos[ 2 ];
+			// if we didn't starting our trace in the ground, set z
+			if( !trace.startsolid )
+			{
+				// fix z to trace end-point
+				verts[y][x].xyz[ 2 ] = trace.endpos[ 2 ];
+			}
 
 			// in the water?
 			vertInWater = qfalse;
@@ -1017,7 +1021,7 @@ qboolean CG_PolyMeshGeneratedShadow( centity_t *cent, clientInfo_t * ci, float *
 			MF_LimitFloat( &mod, 0.0f, 1.0f );
 
 			// apply surface modifiers
-			if( /*!(trace.contents & CONTENTS_SOLID) || */vertInWater )
+			if( vertInWater )
 			{
 				// lighten shadow when on projected onto or through non-solids by 50% (e.g. water)
 				mod *= 0.5f;
