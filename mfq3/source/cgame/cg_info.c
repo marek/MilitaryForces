@@ -1,5 +1,5 @@
 /*
- * $Id: cg_info.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: cg_info.c,v 1.2 2001-12-19 19:33:00 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -75,44 +75,56 @@ void CG_DrawInformation( void ) {
 	const char	*s;
 	const char	*info;
 	const char	*sysInfo;
-	int			y;
+	int			x, y;
 	int			value;
-	qhandle_t	levelshot;
-	qhandle_t	detail;
+	qhandle_t	background, loadingshot;
 	char		buf[1024];
 
 	info = CG_ConfigString( CS_SERVERINFO );
 	sysInfo = CG_ConfigString( CS_SYSTEMINFO );
 
+	// get the map name
 	s = Info_ValueForKey( info, "mapname" );
-	levelshot = trap_R_RegisterShaderNoMip( va( "levelshots/%s.tga", s ) );
-	if ( !levelshot ) {
-//		levelshot = trap_R_RegisterShaderNoMip( "menu/art/unknownmap" );
-		levelshot = trap_R_RegisterShaderNoMip( "textures/sfx/logo512" );
+
+	// try to load the loading shot for this map
+	// NOTE: changed from 'levelshots', because only use now use the levelshots for small map previews (MM)
+	loadingshot = trap_R_RegisterShaderNoMip( va( "loadingshots/%s.tga", s ) );	
+
+	// load background
+	background = trap_R_RegisterShaderNoMip( "ui/assets/backscreen.jpg" );	
+	if( !background )
+	{
+		// use default
+		background = trap_R_RegisterShaderNoMip( "textures/sfx/logo512" );
 	}
+
+	// full screen render
 	trap_R_SetColor( NULL );
-	CG_DrawPic( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, levelshot );
+	CG_DrawPic( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, background );
 
-	// blend a detail texture over it
-	detail = trap_R_RegisterShader( "levelShotDetail" );
-	trap_R_DrawStretchPic( 0, 0, cgs.glconfig.vidWidth, cgs.glconfig.vidHeight, 0, 0, 2.5, 2, detail );
-
+	// alpha blend the 320x240 loading shot over the picture frame (bottom right corner)
+	if( loadingshot )
+	{
+		CG_DrawPic( SCREEN_WIDTH - 320, SCREEN_HEIGHT - 240, 320, 240, loadingshot );
+	}
+/*
 	// draw the icons of things as they are loaded
-//	CG_DrawLoadingIcons();
+	CG_DrawLoadingIcons();
+*/
+	// draw info string information
+	y = 150;
+	x = 32;
 
 	// the first 150 rows are reserved for the client connection
 	// screen to write into
 	if ( cg.infoScreenText[0] ) {
-		UI_DrawProportionalString( 320, 128-32, va("Loading... %s", cg.infoScreenText),
-			UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
+		UI_DrawProportionalString( x, y, va("Loading... %s", cg.infoScreenText),
+			UI_LEFT|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 	} else {
-		UI_DrawProportionalString( 320, 128-32, "Awaiting snapshot...",
-			UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
+		UI_DrawProportionalString( x, y, "Awaiting snapshot...",
+			UI_LEFT|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 	}
-
-	// draw info string information
-
-	y = 180-32;
+	y += (PROP_HEIGHT * 1.5);
 
 	// don't print server lines if playing a local game
 	trap_Cvar_VariableStringBuffer( "sv_running", buf, sizeof( buf ) );
@@ -120,23 +132,23 @@ void CG_DrawInformation( void ) {
 		// server hostname
 		Q_strncpyz(buf, Info_ValueForKey( info, "sv_hostname" ), 1024);
 		Q_CleanStr(buf);
-		UI_DrawProportionalString( 320, y, buf,
-			UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
+		UI_DrawProportionalString( x, y, buf,
+			UI_LEFT|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 		y += PROP_HEIGHT;
 
 		// pure server
 		s = Info_ValueForKey( sysInfo, "sv_pure" );
 		if ( s[0] == '1' ) {
-			UI_DrawProportionalString( 320, y, "Pure Server",
-				UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
+			UI_DrawProportionalString( x, y, "Pure Server",
+				UI_LEFT|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 			y += PROP_HEIGHT;
 		}
 
 		// server-specific message of the day
 		s = CG_ConfigString( CS_MOTD );
 		if ( s[0] ) {
-			UI_DrawProportionalString( 320, y, s,
-				UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
+			UI_DrawProportionalString( x, y, s,
+				UI_LEFT|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 			y += PROP_HEIGHT;
 		}
 
@@ -147,16 +159,16 @@ void CG_DrawInformation( void ) {
 	// map-specific message (long map name)
 	s = CG_ConfigString( CS_MESSAGE );
 	if ( s[0] ) {
-		UI_DrawProportionalString( 320, y, s,
-			UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
+		UI_DrawProportionalString( x, y, s,
+			UI_LEFT|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 		y += PROP_HEIGHT;
 	}
 
 	// cheats warning
 	s = Info_ValueForKey( sysInfo, "sv_cheats" );
 	if ( s[0] == '1' ) {
-		UI_DrawProportionalString( 320, y, "CHEATS ARE ENABLED",
-			UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
+		UI_DrawProportionalString( x, y, "CHEATS ARE ENABLED",
+			UI_LEFT|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 		y += PROP_HEIGHT;
 	}
 
@@ -181,22 +193,22 @@ void CG_DrawInformation( void ) {
 		s = "Unknown Gametype";
 		break;
 	}
-	UI_DrawProportionalString( 320, y, s,
-		UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
+	UI_DrawProportionalString( x, y, s,
+		UI_LEFT|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 	y += PROP_HEIGHT;
 		
 	value = atoi( Info_ValueForKey( info, "timelimit" ) );
 	if ( value ) {
-		UI_DrawProportionalString( 320, y, va( "timelimit %i", value ),
-			UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
+		UI_DrawProportionalString( x, y, va( "timelimit %i", value ),
+			UI_LEFT|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 		y += PROP_HEIGHT;
 	}
 
 	if (cgs.gametype < GT_CTF ) {
 		value = atoi( Info_ValueForKey( info, "fraglimit" ) );
 		if ( value ) {
-			UI_DrawProportionalString( 320, y, va( "fraglimit %i", value ),
-				UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
+			UI_DrawProportionalString( x, y, va( "fraglimit %i", value ),
+				UI_LEFT|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 			y += PROP_HEIGHT;
 		}
 	}
@@ -204,8 +216,8 @@ void CG_DrawInformation( void ) {
 	if (cgs.gametype >= GT_CTF) {
 		value = atoi( Info_ValueForKey( info, "capturelimit" ) );
 		if ( value ) {
-			UI_DrawProportionalString( 320, y, va( "capturelimit %i", value ),
-				UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
+			UI_DrawProportionalString( x, y, va( "capturelimit %i", value ),
+				UI_LEFT|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 			y += PROP_HEIGHT;
 		}
 	}
