@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.27 2002-02-12 11:08:11 sparky909_uk Exp $
+ * $Id: cg_main.c,v 1.28 2002-02-12 11:30:21 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -683,6 +683,32 @@ static void CG_RegisterSounds( void ) {
 
 /*
 =================
+CG_PrecacheVehiclePreview
+
+Simply does a trap_R_RegisterShaderNoMip() for all our icons
+=================
+*/
+static void CG_PrecacheVehiclePreview( void )
+{
+	char * pIconString = NULL;
+	int i = 0;
+
+	// update loading display
+	CG_LoadingString( "precache icons" );
+
+	// for all icons
+	for( i = 0; i < bg_numberOfVehicles; i++ )
+	{
+		// create filename string
+		pIconString = MF_CreateModelPathname( i, "models/vehicles/%s/%s/%s_icon" );
+
+		// precache
+		trap_R_RegisterShaderNoMip( pIconString );
+	}
+}
+
+/*
+=================
 CG_RegisterGraphics
 
 This function may execute for a couple of minutes with a slow disk.
@@ -983,6 +1009,9 @@ static void CG_RegisterGraphics( void ) {
 	}
 	// end MFQ3 new HUD
 
+	// MFQ3: precache the vehicle icons here (they are used by the UI, but registered models
+	// are engine-global)
+	CG_PrecacheVehiclePreview();
 
 	cgs.media.bulletFlashModel = trap_R_RegisterModel("models/weaphits/bullet.md3");
 	cgs.media.dishFlashModel = trap_R_RegisterModel("models/weaphits/boom01.md3");
@@ -992,7 +1021,6 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.medalDefend = trap_R_RegisterShaderNoMip( "medal_defend" );
 	cgs.media.medalAssist = trap_R_RegisterShaderNoMip( "medal_assist" );
 	cgs.media.medalCapture = trap_R_RegisterShaderNoMip( "medal_capture" );
-
 
 	memset( cg_items, 0, sizeof( cg_items ) );
 	memset( cg_weapons, 0, sizeof( cg_weapons ) );
