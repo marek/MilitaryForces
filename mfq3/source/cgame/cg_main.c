@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: cg_main.c,v 1.2 2001-11-19 17:02:20 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -141,6 +141,7 @@ vmCvar_t	cg_nextVehicle;
 vmCvar_t	cg_vehicle;
 vmCvar_t	cg_radarTargets;
 vmCvar_t	cg_tracer;
+vmCvar_t	cg_smoke;
 
 typedef struct {
 	vmCvar_t	*vmCvar;
@@ -222,6 +223,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_nextVehicle, "cg_nextVehicle", "-1", CVAR_ROM | CVAR_USERINFO },
 	{ &cg_radarTargets, "cg_radarTargets", "20", CVAR_ARCHIVE },
 	{ &cg_tracer, "cg_tracer", "3", CVAR_ARCHIVE },
+	{ &cg_smoke, "cg_smoke", "1", CVAR_ARCHIVE },
 
 	{ &pmove_fixed, "pmove_fixed", "1", CVAR_ROM},
 	{ &pmove_msec, "pmove_msec", "8", 0},

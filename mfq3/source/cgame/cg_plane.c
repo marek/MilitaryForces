@@ -1,5 +1,5 @@
 /*
- * $Id: cg_plane.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: cg_plane.c,v 1.2 2001-11-19 17:02:20 thebjoern Exp $
 */
 
 
@@ -395,7 +395,7 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 		}
 	}
 	// smoke
-	if( cent->currentState.generic1 ) {
+	if( cent->currentState.generic1 && cg_smoke.integer ) {
 		localEntity_t	*smoke;
 		vec3_t			up = {0, 0, 1};
 		vec3_t			pos;

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: cg_local.h,v 1.2 2001-11-19 17:02:20 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -831,6 +831,8 @@ extern	vmCvar_t		cg_nextVehicle;
 extern	vmCvar_t		cg_thirdPersonHeight;
 extern	vmCvar_t		cg_radarTargets;
 extern  vmCvar_t		cg_tracer;
+extern  vmCvar_t		cg_smoke;
+
 //
 // cg_main.c
 //
