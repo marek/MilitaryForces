@@ -1,5 +1,5 @@
 /*
- * $Id: q_shared.h,v 1.12 2003-02-11 00:25:11 thebjoern Exp $
+ * $Id: q_shared.h,v 1.13 2003-03-19 11:37:31 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1056,7 +1056,8 @@ typedef enum {
 	TR_LINEAR,
 	TR_LINEAR_STOP,
 	TR_SINE,					// value = base + sin( time / duration ) * delta
-	TR_GRAVITY
+	TR_GRAVITY,
+	TR_GRAVITY_10
 } trType_t;
 
 typedef struct {
