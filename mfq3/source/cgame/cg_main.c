@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.45 2003-02-15 13:04:54 thebjoern Exp $
+ * $Id: cg_main.c,v 1.46 2003-09-05 00:34:41 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -661,6 +661,13 @@ static void CG_RegisterSounds( void ) {
 	cgs.media.engineProp = trap_S_RegisterSound("sound/engines/prop.wav", qfalse );
 	cgs.media.engineJetAB = trap_S_RegisterSound( "sound/engines/afterburner.wav", qfalse );
 
+	// Nuclear Bomb
+	cgs.media.nukeExplodeSound = trap_S_RegisterSound( "sound/items/kam_explode.wav", qfalse );
+	cgs.media.nukeImplodeSound = trap_S_RegisterSound( "sound/items/kam_implode.wav", qfalse );
+	cgs.media.nukeFarSound = trap_S_RegisterSound( "sound/items/nuke_far.wav", qfalse );
+	cgs.media.nukeEffectModel = trap_R_RegisterModel( "models/weaphits/nukeblast.md3" );
+	cgs.media.nukeShockWave = trap_R_RegisterModel( "models/weaphits/nukeshockwave.md3" );
+
 	// MFQ3: new sounds
 	cgs.media.planeDeath[0] = trap_S_RegisterSound( "sound/explosions/explode1.wav", qfalse );	
 	cgs.media.planeDeath[1] = trap_S_RegisterSound( "sound/explosions/explode2.wav", qfalse );	
@@ -903,6 +910,14 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.smokePuffRageProShader = trap_R_RegisterShader( "smokePuffRagePro" );
 	cgs.media.lagometerShader = trap_R_RegisterShader("lagometer" );
 	cgs.media.connectionShader = trap_R_RegisterShader( "disconnected" );
+
+
+	// MFQ3
+	cgs.media.missilePuffShader = trap_R_RegisterShader( "missilePuff" );
+	cgs.media.flarePuffShader = trap_R_RegisterShader( "flarePuff" );
+	cgs.media.railCoreShader = trap_R_RegisterShader( "railCore" );
+	cgs.media.missileTrail2Shader = trap_R_RegisterShader( "missileTrail2" );
+	cgs.media.nukePuffShader = trap_R_RegisterShader( "nukePuff" );
 
 	cgs.media.selectShader = trap_R_RegisterShader( "gfx/2d/select" );
 
