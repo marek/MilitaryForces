@@ -1,5 +1,5 @@
 /*
- * $Id: ui_local.h,v 1.7 2002-02-22 16:13:12 sparky909_uk Exp $
+ * $Id: ui_local.h,v 1.8 2002-02-25 15:22:58 sparky909_uk Exp $
 */
 //
 #ifndef __UI_LOCAL_H__
@@ -1112,5 +1112,6 @@ typedef struct postGameInfo_s {
 
 unsigned int MF_UI_GetTeam( void );
 unsigned long MF_UI_GetGameset( qboolean asEnum );
+unsigned long MF_UI_Gameset_StringToValue( char * pString, qboolean asEnum );
 
 #endif
