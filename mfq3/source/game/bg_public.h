@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.27 2002-01-26 19:27:30 thebjoern Exp $
+ * $Id: bg_public.h,v 1.28 2002-01-26 23:48:32 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.53d"
+#define	GAME_VERSION		"mfq3 v0.53f"
 
 #define	DEFAULT_GRAVITY		800
 #define	GIB_HEALTH			-50
@@ -615,6 +615,8 @@ typedef struct completeVehicleData_s
 	unsigned int	effectModel;	// num of afterburner model (for planes)
 	unsigned int	radarRange;		// how far goes the radar AIR
 	unsigned int	radarRange2;	// how far goes the radar GV
+	float			trackCone;		// how can radar track it
+	float			trackCone2;		// how can ground radar track it
 	float			swingangle;		// for swing wings
 	unsigned int	renderFlags;	// special stuff for rendering only
 }completeVehicleData_t;
@@ -659,7 +661,6 @@ typedef struct completeWeaponData_s
 	unsigned int	spread;				// how far off the target direction
 	unsigned int	barrels;			// mainly for guns
 	float			barrelDistance;		// how far off the center
-	float			trackcone;			// degrees of half cone to track
 	float			lockcone;			// degrees of half cone to lock
 	float			followcone;			// degrees of half cone to follow
 	int				lockdelay;			// how long does it take to lock on

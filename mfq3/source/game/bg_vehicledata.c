@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.8 2002-01-23 22:28:13 thebjoern Exp $
+ * $Id: bg_vehicledata.c,v 1.9 2002-01-26 23:48:32 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -43,6 +43,8 @@ completeVehicleData_t availableVehicles[] =
 	AB_BALL,					// effect model
 	8000,						// radar range
 	4000,						// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
 	0,							// swingangle
 	0							// renderflags
     },
@@ -78,6 +80,8 @@ completeVehicleData_t availableVehicles[] =
 	AB_BALL,					// effect model
 	10000,						// radar range
 	3000,						// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
 	0,							// swingangle
 	0							// renderflags
     },
@@ -113,6 +117,8 @@ completeVehicleData_t availableVehicles[] =
 	AB_RED_SMALL,				// effect model
 	6000,						// radar range
 	2000,						// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
 	0,							// swingangle
 	0							// renderflags
     },
@@ -148,6 +154,8 @@ completeVehicleData_t availableVehicles[] =
 	AB_RED,						// effect model
 	12000,						// radar range
 	6000,						// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
 	0,							// swingangle
 	MFR_DUALPILOT|MFR_BIGVAPOR	// renderflags
     },
@@ -183,6 +191,8 @@ completeVehicleData_t availableVehicles[] =
 	AB_RED,						// effect model
 	16000,						// radar range
 	1500,						// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
 	50,							// swingangle
 	MFR_DUALPILOT|MFR_BIGVAPOR	// renderflags
     },
@@ -218,6 +228,8 @@ completeVehicleData_t availableVehicles[] =
 	AB_BALL,					// effect model
 	7500,						// radar range
 	6500,						// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
 	0,							// swingangle
 	0							// renderflags
     },
@@ -253,6 +265,8 @@ completeVehicleData_t availableVehicles[] =
 	AB_BALL,					// effect model
 	8000,						// radar range
 	4000,						// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
 	0,							// swingangle
 	0							// renderflags
     },
@@ -289,6 +303,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// effect model
 	0,							// radar range
 	0,							// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
 	0,							// swingangle
 	0							// renderflags
     },
@@ -325,6 +341,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// effect model
 	0,							// radar range
 	0,							// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
 	0,							// swingangle
 	0							// renderflags
     },
@@ -362,6 +380,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// effect model
 	0,							// radar range
 	0,							// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
 	0,							// swingangle
 	0							// renderflags
     },
@@ -398,6 +418,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// effect model
 	0,							// radar range
 	0,							// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
 	0,							// swingangle
 	0							// renderflags
     },
@@ -436,6 +458,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// effect model
 	8000,						// radar range
 	4000,						// radar range ground
+	-1,							// trackcone
+	0,							// trackcone ground
 	0,							// swingangle
 	0							// renderflags
     },
@@ -470,6 +494,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// effect model
 	8000,						// radar range
 	4000,						// radar range ground
+	-1,							// trackcone
+	0,							// trackcone ground
 	0,							// swingangle
 	0							// renderflags
     },
@@ -504,6 +530,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// effect model
 	8000,						// radar range
 	4000,						// radar range ground
+	-1,							// trackcone
+	0,							// trackcone ground
 	0,							// swingangle
 	0							// renderflags
     },
@@ -538,6 +566,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// effect model
 	8000,						// radar range
 	4000,						// radar range ground
+	-1,							// trackcone
+	0,							// trackcone ground
 	0,							// swingangle
 	0							// renderflags
     }
