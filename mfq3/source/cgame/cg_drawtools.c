@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawtools.c,v 1.13 2002-02-21 16:41:25 sparky909_uk Exp $
+ * $Id: cg_drawtools.c,v 1.14 2002-02-22 11:43:26 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1367,3 +1367,4 @@ void CG_Draw_HUD_Label( int x, int y, char * pText, float alpha )
 	// draw timer string
 	DrawStringNew( x, (y+1), HUD_LABEL_SCALE, *CreateColourVector( 0,0,0,(1.0f * alpha),NULL ), pText, 0, 0, ITEM_TEXTSTYLE_NORMAL, CENTRE_JUSTIFY );
 }
+
