@@ -1,5 +1,5 @@
 /*
- * $Id: g_cmds.c,v 1.12 2002-02-22 11:03:13 sparky909_uk Exp $
+ * $Id: g_cmds.c,v 1.13 2002-02-27 11:24:09 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -313,7 +313,7 @@ void Cmd_Kill_f( gentity_t *ent ) {
 	} else {
 		ent->client->ps.stats[STAT_HEALTH] = ent->health = -999;
 	}
-	vehicle_death( ent, ent, ent, 100000, MOD_SUICIDE );
+	Vehicle_Death( ent, ent, ent, 100000, MOD_SUICIDE );
 }
 
 
@@ -608,7 +608,7 @@ void SetTeam( gentity_t *ent, char *s ) {
 		// Kill him (makes sure he loses flags, etc)
 		ent->flags &= ~FL_GODMODE;
 		ent->client->ps.stats[STAT_HEALTH] = ent->health = 0;
-		vehicle_death( ent, ent, ent, 100000, MOD_SUICIDE );
+		Vehicle_Death( ent, ent, ent, 100000, MOD_SUICIDE );
 
 	}
 	// they go to the end of the line for tournements

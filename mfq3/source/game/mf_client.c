@@ -1,5 +1,5 @@
 /*
- * $Id: mf_client.c,v 1.12 2002-02-24 16:52:12 thebjoern Exp $
+ * $Id: mf_client.c,v 1.13 2002-02-27 11:24:09 sparky909_uk Exp $
 */
 
 #include "g_local.h"
@@ -303,7 +303,7 @@ void MF_ClientSpawn(gentity_t *ent) {
 	ent->classname = "player";
 	ent->r.contents = CONTENTS_BODY;
 	ent->clipmask = MASK_PLAYERSOLID;
-	ent->die = vehicle_death;
+	ent->die = Vehicle_Death;
 	ent->waterlevel = 0;
 	ent->watertype = 0;
 	ent->flags = 0;

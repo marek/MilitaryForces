@@ -1,5 +1,5 @@
 /*
- * $Id: g_combat.c,v 1.6 2002-02-18 09:51:28 thebjoern Exp $
+ * $Id: g_combat.c,v 1.7 2002-02-27 11:24:09 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -13,61 +13,86 @@
 ============
 AddScore
 
-Adds score to both the client and his team
+Adds score to both the client (and his team)
 ============
 */
-void AddScore( gentity_t *ent, vec3_t origin, int score ) {
-	if ( !ent->client ) {
+void AddScore( gentity_t *ent, vec3_t origin, int score )
+{
+	if( !ent->client )
+	{
 		return;
 	}
+
 	// no scoring during pre-match warmup
-	if ( level.warmupTime ) {
+	if( level.warmupTime )
+	{
 		return;
 	}
+
+	// add to player's personal score
 	ent->client->ps.persistant[PERS_SCORE] += score;
-	if ( g_gametype.integer == GT_TEAM )
+	
+	// if team-deathmatch, add player's scoring onto team score
+	if( g_gametype.integer == GT_TEAM )
+	{
 		level.teamScores[ ent->client->ps.persistant[PERS_TEAM] ] += score;
+	}
+
+	// calculate rankings
 	CalculateRanks();
 }
 
 /*
 ==================
 ExplodeVehicle
+
+Explode our vehicle
 ==================
 */
-void ExplodeVehicle( gentity_t *self ) {
-
+void ExplodeVehicle( gentity_t *self )
+{
+	// create the client vehicle explosion event
 	G_AddEvent( self, EV_VEHICLE_GIB, 0 );
+
 	self->takedamage = qfalse;
 	self->s.eType = ET_INVISIBLE;
 	self->r.contents = 0;
-	if( self->client ) {
-		self->client->ps.persistant[PERS_DEATHS]++;
+
+	if( self->client )
+	{
+		// no death counting during warmup
+		if( !level.warmupTime )
+		{
+			self->client->ps.persistant[PERS_DEATHS]++;
+		}
+		self->r.contents = CONTENTS_CORPSE;
+
+		// enable vehicle selection
+		self->client->ps.pm_flags |= PMF_VEHICLESELECT;
+		self->client->ps.pm_type = PM_DEAD;
+
+		// prevent early respawn (1.5 seconds lock-out)
+		self->client->respawnTime = level.time + 1500;
 	}
 }
 
 /*
 ==================
-vehicle_die
+Vehicle_Die
 ==================
 */
-void vehicle_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int meansOfDeath ) {
-	if ( self->health > GIB_HEALTH ) {
+void Vehicle_Die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int meansOfDeath )
+{
+	if( self->health > GIB_HEALTH )
+	{
 		return;
-	}
-
-	if( self->client ) {
-		// enable vehicle selection
-		self->client->ps.pm_flags |= PMF_VEHICLESELECT;
-		self->client->ps.pm_type = PM_DEAD;
-		self->client->respawnTime = level.time + 1000;
 	}
 
 	ExplodeVehicle( self );
 }
 
 // these are just for logging, the client prints its own messages
-char	*modNames[] = {
+char * modNames[] = {
 	"MOD_UNKNOWN",
 	"MOD_WATER",
 	"MOD_SLIME",
@@ -544,6 +569,11 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 	return hitClient;
 }
 
+/*
+================== 
+TossVehicleFlags (MFQ3)
+==================
+*/
 
 void TossVehicleFlags( gentity_t *self ) {
 	gitem_t		*item;
@@ -567,14 +597,13 @@ void TossVehicleFlags( gentity_t *self ) {
 	}
 }
 	
-
 /*
-// MFQ3
-==================
-vehicle_death
+================== 
+Vehicle_Death (MFQ3)
 ==================
 */
-void vehicle_death( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int meansOfDeath ) {
+void Vehicle_Death( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int meansOfDeath )
+{
 	gentity_t	*ent;
 	int			contents;
 	int			killer;
@@ -614,9 +643,8 @@ void vehicle_death( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, 
 		obit = modNames[ meansOfDeath ];
 	}
 
-	G_LogPrintf("Kill: %i %i %i: %s killed %s by %s\n", 
-		killer, self->s.number, meansOfDeath, killerName, 
-		self->client->pers.netname, obit );
+	G_LogPrintf( "Kill: %i %i %i: %s killed %s by %s\n", killer, self->s.number, meansOfDeath, killerName, 
+				 self->client->pers.netname, obit );
 
 	// broadcast the death event to everyone
 	ent = G_TempEntity( self->r.currentOrigin, EV_OBITUARY );
@@ -629,28 +657,38 @@ void vehicle_death( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, 
 
 	self->client->ps.persistant[PERS_KILLED]++;
 
-	if (attacker && attacker->client) {
+	if( attacker && attacker->client )
+	{
 		attacker->client->lastkilled_client = self->s.number;
 
-		if ( attacker == self || OnSameTeam (self, attacker ) ) {
+		if ( attacker == self || OnSameTeam (self, attacker ) )
+		{
 			AddScore( attacker, self->r.currentOrigin, -1 );
-		} else {
-			if( attacker->r.svFlags & SVF_BOT ) {
+		}
+		else
+		{
+			if( attacker->r.svFlags & SVF_BOT )
+			{
 				AddScore( attacker, self->r.currentOrigin, 1 );
 			}
-			else {
+			else
+			{
 				if( meansOfDeath != MOD_VEHICLEEXPLOSION && 
-					meansOfDeath != MOD_CRASH ) {
+					meansOfDeath != MOD_CRASH )
+				{
 					AddScore( attacker, self->r.currentOrigin, 3 );
 				}
-//				else {
-//					AddScore( attacker, self->r.currentOrigin, 1 );
-//				}
+/*				else
+				{
+					AddScore( attacker, self->r.currentOrigin, 1 );
+				}
+*/
 			}
 
 			// check for two kills in a short amount of time
 			// if this is close enough to the last kill, give a reward sound
-			if ( level.time - attacker->client->lastKillTime < CARNAGE_REWARD_TIME ) {
+			if ( level.time - attacker->client->lastKillTime < CARNAGE_REWARD_TIME )
+			{
 				// play excellent on player
 				attacker->client->ps.persistant[PERS_EXCELLENT_COUNT]++;
 
@@ -660,13 +698,14 @@ void vehicle_death( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, 
 				attacker->client->rewardTime = level.time + REWARD_SPRITE_TIME;
 			}
 			attacker->client->lastKillTime = level.time;
-
 		}
-	} else {
+	}
+	else
+	{
 		AddScore( self, self->r.currentOrigin, -1 );
 	}
 
-	// Add team bonuses
+	// add team bonuses
 	Team_FragBonuses(self, inflictor, attacker);
 
 	// if I committed suicide, the flag does not fall, it returns.
@@ -698,10 +737,13 @@ void vehicle_death( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, 
 		}
 	}
 
-	Cmd_Score_f( self );		// show scores
+	// update scores
+	Cmd_Score_f( self );
+	
 	// send updated scores to any clients that are following this one,
 	// or they would get stale scoreboards
-	for ( i = 0 ; i < level.maxclients ; i++ ) {
+	for ( i = 0 ; i < level.maxclients ; i++ )
+	{
 		gclient_t	*client;
 
 		client = &level.clients[i];
@@ -717,55 +759,45 @@ void vehicle_death( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, 
 	}
 
 	self->takedamage = qtrue;	// can still be gibbed
-
 	self->s.objectives = 0;
-
 	self->s.loopSound = 0;
-
 	self->r.maxs[2] = -8;
 
 	// remove powerups
-//	memset( self->client->ps.powerups, 0, sizeof(self->client->ps.powerups) );
+/*
+	memset( self->client->ps.powerups, 0, sizeof(self->client->ps.powerups) );
+*/
 
 	if( (self->ONOFF & OO_LANDED) && self->health > GIB_HEALTH ) {
 		self->health = GIB_HEALTH - 1;
 	}
 
+	// always gib ground vehicles
 	if( (availableVehicles[self->client->vehicle].cat & CAT_GROUND) ) {
 		self->health = GIB_HEALTH - 1;
 	}
 
-	// never gib in a nodrop
-	if ( self->health <= GIB_HEALTH ) {
-//		&& !(contents & CONTENTS_NODROP) ) ) {
+	// to gib or not to gib? 
+	if ( self->health <= GIB_HEALTH ) /* && !(contents & CONTENTS_NODROP) ) // never gib in a nodrop */
+	{
+		// create vehicle explosion
 		ExplodeVehicle( self );
 
-		// enable vehicle selection
-		self->client->ps.pm_flags |= PMF_VEHICLESELECT;
-		self->client->ps.pm_type = PM_DEAD;
-		self->r.contents = CONTENTS_CORPSE;
-
-		// don't allow respawn until the death anim is done
-		// g_forcerespawn may force spawning at some later time
-		self->client->respawnTime = level.time + 1000;
-
-		// add radius explosion
+		// create radius explosion damage
 		G_RadiusDamage( self->r.currentOrigin, self, 150, 150, self, MOD_VEHICLEEXPLOSION, CAT_ANY );
 
-	} else {
+	}
+	else
+	{
+		// create a smaller vehicle explosion
 		G_AddEvent( self, EV_VEHICLE_DIE, 0 );
 
-		// wreck can be blown up
-		self->die = vehicle_die;
+		// wreck can be blown up (i.e on crash into ground)
+		self->die = Vehicle_Die;
 
-		// globally cycle through the different death animations
-		i = ( i + 1 ) % 3;
-
-		// prevent early respawning
+		// prevent early respawning during death anim (allows 30 seconds)
 		self->client->respawnTime = level.time + 30000;
-
 	}
 
-	trap_LinkEntity (self);
-
+	trap_LinkEntity( self );
 }
