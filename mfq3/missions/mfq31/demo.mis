@@ -1,4 +1,4 @@
-;Missionscript for map mfq31
+//Missionscript for map mfq31
 
 Overview
 {
@@ -16,20 +16,19 @@ Entities
 		Index	0
 		Name	SAM Turret
 		Team	?
-		Origin	3632.587891;-2678.888428;576.125000
-		Angles	0.000000;104.512939;0.000000
+		Games	?
+		Origin	3616.680176;-2434.657227;576.125000
+		Angles	0.000000;72.630615;0.000000
 	}
 
-	Vehicle
+	GroundInstallation
 	{
-		Index	27
-		Name	B-2 Spirit
-		Team	1
-		Origin	3836.508301;-2766.873047;588.125000
-		Angles	0.000000;88.576538;0.000000
-		Waypoints
-		{
-		}
+		Index	2
+		Name	SAM Turret
+		Team	?
+		Games	?
+		Origin	4945.177734;-2090.240234;576.125000
+		Angles	0.000000;223.179932;0.000000
 	}
 
 	Vehicle
@@ -37,25 +36,29 @@ Entities
 		Index	9
 		Name	A-10 Thunderbolt II
 		Team	2
-		Origin	4203.492676;-3193.136230;850.546326
-		Angles	0.000000;146.725342;0.000000
+		Games	?
+		Origin	4676.060059;-2385.761719;588.125000
+		Angles	0.000000;180.039185;0.000000
 		Waypoints
 		{
-			Origin	3550.122559;-2620.685791;947.101868
-			Origin	4073.248779;-1809.050415;896.003845
-			Origin	5190.809082;-2350.827393;793.593201
-			Origin	5689.400391;-5262.272461;563.900513
-			Origin	4038.424316;-4345.525879;627.374573
 		}
 	}
 
-	GroundInstallation
+	Vehicle
 	{
-		Index	3
-		Name	SAM Turret
-		Team	?
-		Origin	4788.937988;-1727.427734;576.125000
-		Angles	0.000000;-113.939209;0.000000
+		Index	0
+		Name	F-16 Falcon (AA)
+		Team	2
+		Games	?
+		Origin	5029.101074;-3337.086914;930.858521
+		Angles	0.000000;71.995972;0.000000
+		Waypoints
+		{
+			Origin	5046.481445;-2954.619141;926.567871
+			Origin	4750.820313;-2524.981689;924.768433
+			Origin	3669.519531;-2874.265137;843.794739
+			Origin	4636.135254;-4064.966064;793.386902
+		}
 	}
 
 }
