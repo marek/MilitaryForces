@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.26 2002-02-28 10:23:32 sparky909_uk Exp $
+ * $Id: ui_main.c,v 1.27 2002-05-15 10:12:25 sparky909_uk Exp $
 */
 /*
 =======================================================================
@@ -2091,8 +2091,108 @@ static void UI_DrawVehiclePreview( rectDef_t *rect, float scale, vec4_t color, i
 #endif
 }
 
-// FIXME: table drive
-//
+/*
+=================
+UI_DrawCredits
+=================
+*/
+
+#define	HOFFSET			4
+#define	VOFFSET			4
+#define SVSPACER		12
+#define BVSPACER		18
+#define	SPEED_DIVIDER	40
+
+static void UI_DrawCredits( rectDef_t *rect, float scale, vec4_t color, int textStyle )
+{
+	// statics
+	static float z = 0;
+	static qboolean initialised = qfalse;
+
+	// dynamic locals
+	int bx = rect->x + HOFFSET, by = rect->y + VOFFSET;
+	int centreY = rect->y + (rect->h * 0.5f);
+	int i, y = 0;
+
+	// initialise?
+	if( initialised == qfalse )
+	{
+		z = rect->h - BVSPACER;
+
+		// never again
+		initialised = qtrue;
+	}
+
+	// for all credit lines
+	for( i=0; i<uiInfo.creditLines; i++ )
+	{
+		// default size is 'small'
+		int spacer = SVSPACER;
+		float tScale = 0.0f;
+		qboolean draw = qfalse;
+		int drawY = 0;
+		char firstChar = 0;
+
+		// get line
+		char * pLine = uiInfo.pCredits[ i ];
+
+		// move to base of text
+		y += spacer;
+		drawY = by + y + z;
+
+		// which text size?
+		firstChar = *pLine++;
+		if( firstChar == 'B' )
+		{
+			// 'big'
+			tScale = 0.35f;
+			spacer = BVSPACER;
+			draw = qtrue;
+			color[2] = 0.5f;
+		}
+		else if( firstChar == 'S' )
+		{
+			// 'small'
+			tScale = 0.25f;
+			spacer = SVSPACER; 
+			draw = qtrue;
+			color[2] = 1.0f;
+		}
+		else if( firstChar == 'R' && (drawY < by) )
+		{
+			// reset
+			initialised = qfalse;
+		}
+
+		// draw line
+		if( draw )
+		{
+			float alpha = 0.0f;
+
+			// outside draw zone? (approximations on bounding box - this is just to reduce draws)
+			if( drawY < rect->y || drawY > (rect->y+rect->h) )
+			{
+				continue;
+			}
+
+			// alter alpha based upon distance from centre vertical
+			alpha = 1.0f - ((float)abs( centreY - drawY )/90) + 0.40f;
+			MF_LimitFloat( &alpha, 0.0f, 1.0f );
+			color[3] = alpha;
+
+			Text_Paint( bx, drawY, tScale, color, pLine, 0, 0, textStyle );
+		}
+	}
+	
+	// scroll
+	z -= (float)uiInfo.uiDC.frameTime/SPEED_DIVIDER;
+}
+
+/*
+=================
+UI_OwnerDraw
+=================
+*/
 static void UI_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, int ownerDrawFlags, int align, float special, float scale, vec4_t color, qhandle_t shader, int textStyle, itemDef_t * item) {
 	rectDef_t rect;
 
@@ -2254,6 +2354,10 @@ static void UI_OwnerDraw(float x, float y, float w, float h, float text_x, float
 		// MFQ3: drawing a preview vehicle model
 		case UI_PREVIEW_VEHICLE:
 			UI_DrawVehiclePreview(&rect,scale, color, textStyle);
+			break;
+		// MFQ3: drawing the credits
+		case UI_CREDITS:
+			UI_DrawCredits(&rect,scale, color, textStyle);
 			break;
 
     default:
@@ -3310,8 +3414,55 @@ static void UI_Update(const char *name) {
 UI_InitialiseUI
 ===============
 */
+
 static void UI_InitialiseUI( void )
 {
+	fileHandle_t creditsFile;
+	int fileSize = 0;
+
+	// parse our credits text file on main menu run
+	memset( uiInfo.pCredits, 0, sizeof( uiInfo.pCredits ) );
+	uiInfo.creditLines = 0;
+	uiInfo.pCreditsData = NULL;
+
+	// open file
+	fileSize = trap_FS_FOpenFile( "ui\\credits.txt", &creditsFile, FS_READ );	
+	if( fileSize )
+	{
+		int index = 0;
+		char * pCredits = NULL;
+		char * pLineEnd = NULL;
+
+		// read in the entire credits file
+		uiInfo.pCreditsData = malloc( fileSize );
+		pCredits = (char *)uiInfo.pCreditsData;
+		trap_FS_Read( pCredits, fileSize, creditsFile );
+	
+		// assign line pointers
+		do
+		{	
+			// assign
+			uiInfo.pCredits[ uiInfo.creditLines++ ] = pCredits;
+
+			// find next line end
+			pLineEnd = strstr( pCredits, "\n" );
+			if( pLineEnd )
+			{
+				// convert to null terminator
+				*pLineEnd++ = 0;
+	
+				// move work pointer
+				pCredits = pLineEnd;
+			}
+		}
+		while( pLineEnd && pCredits < ((char *)uiInfo.pCreditsData+fileSize) );
+
+		// close file
+		trap_FS_FCloseFile( creditsFile );
+	}
+
+
+	// TODO: free uitInfo.pCreditsData
 }
 
 /*
