@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.12 2002-01-31 10:12:05 sparky909_uk Exp $
+ * $Id: bg_vehicledata.c,v 1.13 2002-01-31 11:10:46 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -358,6 +358,7 @@ completeVehicleData_t availableVehicles[] =
     {	"Messerschmitt Bf-109g",// descriptiveName
 	"Bf-109",					// tinyName
 	"bf-109g",					// modelName
+	SHADOW_NONE,				// alpha shadow
 	MF_GAMESET_WW2|				// id
 	MF_TEAM_2|
 	CAT_PLANE|
@@ -396,6 +397,7 @@ completeVehicleData_t availableVehicles[] =
     {	"Focke-Wulf Fw190 A8",// descriptiveName
 	"Fw-190",					// tinyName
 	"fw190a8",					// modelName
+	SHADOW_NONE,				// alpha shadow
 	MF_GAMESET_WW2|				// id
 	MF_TEAM_2|
 	CAT_PLANE|
