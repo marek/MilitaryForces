@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.66 2002-02-20 12:05:29 thebjoern Exp $
+ * $Id: bg_public.h,v 1.67 2002-02-20 20:03:01 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -844,8 +844,6 @@ typedef enum
 	WI_MAX
 }weaponIndex_t;
 
-void MF_SetGameset(unsigned long gs);
-unsigned long MF_GetGameset(qboolean asEnum);
 int MF_getIndexOfVehicle( int start, int gameset, int team, int cat, int cls );
 int MF_getIndexOfVehicleEx( int start, int gameset, int team, int cat, int cls );
 int MF_getItemIndexFromHex(int hexValue);

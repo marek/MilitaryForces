@@ -1,5 +1,5 @@
 /*
- * $Id: ui_util.c,v 1.3 2002-01-23 18:47:22 sparky909_uk Exp $
+ * $Id: ui_util.c,v 1.4 2002-02-20 19:59:03 sparky909_uk Exp $
 */
 //
 // origin: rad
@@ -43,3 +43,57 @@ unsigned int MF_UI_GetTeam( void )
 	// Spectator/Any
 	return MF_TEAM_ANY;
 }
+
+/*
+=================
+MF_UI_GetGameset
+=================
+*/
+
+// gets the mf_gameset variable into the correct a MF_GAMESET_x return
+unsigned long MF_UI_GetGameset( qboolean asEnum )
+{
+	char * pGameSet = NULL;
+	char info[MAX_INFO_STRING];
+	char * pInfo = NULL;
+	unsigned long returnValue = MF_GAMESET_MODERN;
+
+	// get info
+	trap_GetConfigString( CS_SERVERINFO, info, sizeof(info) );
+	pGameSet = Info_ValueForKey( info, "g_gametype" );
+
+	// compare
+	if( Q_stricmp( pGameSet, "ww1" ) == 0 )
+	{
+		returnValue = MF_GAMESET_WW1;
+	}
+	else if( Q_stricmp( pGameSet, "ww2" ) == 0 )
+	{
+		returnValue = MF_GAMESET_WW2;
+	}
+	else if( Q_stricmp( pGameSet, "modern" ) == 0 )
+	{
+		returnValue = MF_GAMESET_MODERN;
+	}
+
+	// convert to enum?
+	if( asEnum )
+	{
+		switch( returnValue )
+		{
+		case MF_GAMESET_WW1:
+			returnValue = 2;
+			break;
+		case MF_GAMESET_WW2:
+			returnValue = 1;
+			break;
+		case MF_GAMESET_MODERN:
+			returnValue = 0;
+			break;
+		}
+	}
+
+	// return the result (as either flag mask or enum)
+	return returnValue;
+}
+

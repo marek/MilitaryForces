@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.15 2002-02-20 09:44:43 sparky909_uk Exp $
+ * $Id: ui_main.c,v 1.16 2002-02-20 19:59:03 sparky909_uk Exp $
 */
 /*
 =======================================================================
@@ -3265,11 +3265,12 @@ static void UI_RefreshVehicleSelect( void )
 	qboolean currentVehicleValid = qtrue;
 	unsigned long what = 0x00000000;
 	int levelCats = 0;
+	char info[MAX_INFO_STRING];
 
 	// ----------> GAMESET & TEAM <-----------
 
 	// get gameset & team (as MF_GAMESET_x and MF_TEAM_x)
-	gameset = MF_GetGameset( qfalse );
+	gameset = MF_UI_GetGameset( qfalse );
 	team = MF_UI_GetTeam();
 	
 	// ----------> CATAGORY <-----------
@@ -3293,8 +3294,9 @@ tryCatAgain:
 	// ----------> LEVEL SPAWNS <-----------
 
 	// level check (don't allow selection of vehicles that can't spawn on the current level)
-	levelCats = trap_Cvar_VariableValue( "mf_lvcat" );
-	
+	trap_GetConfigString( CS_SERVERINFO, info, sizeof(info) );
+	levelCats = atoi( Info_ValueForKey( info, "mf_lvcat" ) );
+
 	if( pCat && vehicle >= 0 && (levelCats & (1 << vehicleCat)) )
 	{
 		// update the text in the dialog for the UI catagory
