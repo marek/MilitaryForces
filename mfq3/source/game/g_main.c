@@ -1,5 +1,5 @@
 /*
- * $Id: g_main.c,v 1.19 2003-10-07 23:15:57 minkis Exp $
+ * $Id: g_main.c,v 1.24 2005-06-26 05:08:12 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -69,6 +69,7 @@ vmCvar_t	mf_gameset;
 vmCvar_t	mf_lvcat;
 vmCvar_t	mf_version;
 vmCvar_t	mf_mission;
+vmCvar_t	mf_allowNukes;
 
 cvarTable_t		gameCvarTable[] = {
 	// don't override the cheat state set by the system
@@ -91,6 +92,7 @@ cvarTable_t		gameCvarTable[] = {
 	{ &mf_version, "mf_version", "unknown", CVAR_SERVERINFO | CVAR_ROM, 0, qfalse  },
 	{ &mf_lvcat, "mf_lvcat", "0", CVAR_SERVERINFO | CVAR_ROM, 0, qfalse },
 	{ &mf_mission, "mf_mission", "default", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_LATCH, 0, qfalse  },
+	{ &mf_allowNukes, "mf_allowNukes", "1", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_LATCH, 0, qfalse  },
 
 	// change anytime vars
 	{ &g_dmflags, "dmflags", "0", CVAR_SERVERINFO | CVAR_ARCHIVE, 0, qtrue  },
@@ -320,11 +322,11 @@ void G_RegisterCvars( void ) {
 	Team games lag and have a nasty spawn bug
 	*/
 	// *******************
-
+	/*
 	if(g_gametype.integer != GT_MISSION_EDITOR && g_gametype.integer != GT_FFA)
 	{
 		trap_Cvar_Set( "g_gametype", "0" );
-	}
+	}*/
 	
 	level.warmupModificationCount = g_warmup.modificationCount;
 	
@@ -1451,6 +1453,8 @@ void CheckTournament( void ) {
 		}
 	}
 }
+
+
 
 
 /*

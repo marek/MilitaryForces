@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.34 2003-02-22 18:35:23 thebjoern Exp $
+ * $Id: cg_drawnewhud.c,v 1.35 2004-12-14 16:25:09 minkis Exp $
 */
 
 #include "cg_local.h"
@@ -1233,14 +1233,15 @@ static void CG_Draw_AltTape( int value ) {
 	width = height = 8;
 	CG_DrawHUDPic( x, y, width, height, cgs.media.HUDind_v_r, HUDColors[cg.HUDColor] );
 		// draw alt value box
-	x = 586;
+	x = 585;
 	y = 28;
-	width = 32;
+	width = 52;
 	height = 16;
-	CG_DrawHUDPic( x, y, width, height, cgs.media.HUDvaluebox, HUDColors[cg.HUDColor] );
+	CG_DrawHUDPic( x, y, width, height, cgs.media.HUDvaluebox2, HUDColors[cg.HUDColor] );
 		// draw alt
 	Com_sprintf(buffer, 7, "%d", value);
-	CG_DrawString_MFQ3_R( 616, 32, buffer, HUDColors[cg.HUDColor], 0);
+	CG_DrawString_MFQ3_R( 626, 32, buffer, HUDColors[cg.HUDColor], 0);
+	
 		// find visible alt numbers
 	visible3 = (int)((value+(scale/2))/scale);
 	visible3 *= scale;
@@ -1315,14 +1316,14 @@ static void CG_Draw_SpeedTape( int value, int stallspeed, int gearspeed, int sca
 	width = height = 8;
 	CG_DrawHUDPic( x, y, width, height, cgs.media.HUDind_v, HUDColors[cg.HUDColor] );
 		// draw speed value box
-	x = 24;
+	x = 3;
 	y = 28;
-	width = 32;
+	width = 52;
 	height = 16;
-	CG_DrawHUDPic( x, y, width, height, cgs.media.HUDvaluebox, HUDColors[cg.HUDColor] );
+	CG_DrawHUDPic( x, y, width, height, cgs.media.HUDvaluebox2, HUDColors[cg.HUDColor] );
 		// draw speed
 	Com_sprintf(buffer, 7, "%d", value);
-	CG_DrawString_MFQ3_R( 54, 32, buffer, HUDColors[cg.HUDColor], 0);
+	CG_DrawString_MFQ3_R( 45, 32, buffer, HUDColors[cg.HUDColor], 0);
 		// find visible speed numbers
 	visible3 = (int)((value+(scale/2))/scale);
 	visible3 *= scale;

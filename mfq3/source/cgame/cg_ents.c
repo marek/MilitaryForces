@@ -1,5 +1,5 @@
 /*
- * $Id: cg_ents.c,v 1.5 2002-06-12 14:35:33 thebjoern Exp $
+ * $Id: cg_ents.c,v 1.10 2005-06-26 05:08:11 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -377,13 +377,16 @@ static void CG_Missile( centity_t *cent ) {
 	// spin as it moves
 	if ( s1->pos.trType != TR_STATIONARY && 
 		availableWeapons[cent->currentState.weaponIndex].type != WT_IRONBOMB &&
-		availableWeapons[cent->currentState.weaponIndex].type != WT_GUIDEDBOMB ) {	
+		availableWeapons[cent->currentState.weaponIndex].type != WT_GUIDEDBOMB &&
+		availableWeapons[cent->currentState.weaponIndex].type != WT_NUKEBOMB && 
+		availableWeapons[cent->currentState.weaponIndex].type != WT_NUKEMISSILE) {	
 		RotateAroundDirection( ent.axis, cg.time / 4 );
 	} else {
 		{
 			RotateAroundDirection( ent.axis, s1->time );
 		}
 	}
+	
 
 	// add to refresh list
 	trap_R_AddRefEntityToScene( &ent );

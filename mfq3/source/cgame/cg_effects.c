@@ -1,5 +1,5 @@
 /*
- * $Id: cg_effects.c,v 1.4 2003-09-05 00:41:06 minkis Exp $
+ * $Id: cg_effects.c,v 1.6 2004-12-16 19:22:15 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -87,7 +87,6 @@ localEntity_t *CG_SmokePuff( const vec3_t p, const vec3_t vel,
 ==========================
 CG_NukeCloud
 ==========================
-by minkis
 */
 static void CG_NukeCloud( centity_t * cent, entityState_t * es )
 {
@@ -171,6 +170,7 @@ static void CG_NukeCloud( centity_t * cent, entityState_t * es )
 	}
 
 }
+
 
 /*
 ==================

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicledraw.c,v 1.5 2003-08-14 15:45:47 thebjoern Exp $
+ * $Id: cg_vehicledraw.c,v 1.7 2004-12-16 19:22:15 minkis Exp $
 */
 
 #include "cg_local.h"
@@ -363,15 +363,39 @@ void CG_DrawGV(DrawInfo_GV_t* drawInfo)
 	// gearAnim is for angles
 	if( (veh->caps & HC_WHEELS) ) {
 		int ii;
+		float turnModifier;
+
+		turnModifier = (drawInfo->basicInfo.speed / 10) / (availableVehicles[drawInfo->basicInfo.vehicleIndex].maxspeed * 0.2f);
 		for( ii = 0; ii < availableVehicles[drawInfo->basicInfo.vehicleIndex].wheels; ++ii ) {
+
+
 			part[BP_GV_WHEEL+ii].hModel = veh->handle[BP_GV_WHEEL+ii];
 			VectorCopy( drawInfo->basicInfo.origin, part[BP_GV_WHEEL+ii].lightingOrigin );
 			AxisCopy( axisDefault, part[BP_GV_WHEEL+ii].axis );
 			part[BP_GV_WHEEL+ii].shadowPlane = shadowPlane;
 			part[BP_GV_WHEEL+ii].renderfx = renderfx;
 			VectorCopy (part[BP_GV_WHEEL+ii].origin, part[BP_GV_WHEEL+ii].oldorigin);
+			//RotateAroundPitch( part[BP_GV_WHEEL+ii].axis, drawInfo->wheelAngle );
+
+
+			if(availableVehicles[drawInfo->basicInfo.vehicleIndex].wheels > 2 && ii < 2)
+			{
+
+				if(drawInfo->wheelDirection == 1)
+				{
+					RotateAroundYaw(part[BP_GV_WHEEL+ii].axis, 325 + 20 * turnModifier);
+				}
+				else if(drawInfo->wheelDirection == 2)
+				{
+					RotateAroundYaw(part[BP_GV_WHEEL+ii].axis, 35 - 20 * turnModifier);
+				}
+			}
+
 			RotateAroundPitch( part[BP_GV_WHEEL+ii].axis, drawInfo->wheelAngle );
+
+			
 			CG_PositionRotatedEntityOnTag( &part[BP_GV_WHEEL+ii], &part[BP_GV_BODY], veh->handle[BP_GV_BODY], gv_tags[BP_GV_WHEEL+ii] );
+			
 			trap_R_AddRefEntityToScene( &part[BP_GV_WHEEL+ii] );
 		}
 	}

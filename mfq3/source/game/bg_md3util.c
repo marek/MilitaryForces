@@ -1,5 +1,5 @@
 /*
- * $Id: bg_md3util.c,v 1.3 2002-02-27 09:42:10 thebjoern Exp $
+ * $Id: bg_md3util.c,v 1.8 2005-06-26 05:08:12 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -171,6 +171,7 @@ qboolean MF_getDimensions(const char* fileName, int frame, vec3_t* maxs, vec3_t*
 	if( trap_FS_FOpenFile(fileName, &f, FS_READ) >= 0 ) {
 		md3Header_t head;
 		md3Frame_t frames;
+		
 		trap_FS_Read(&head, sizeof(head), f);
 		number = head.numFrames;
 		if( frame >= 0 && frame < number ) {

@@ -1,5 +1,5 @@
 /*
- * $Id: g_client.c,v 1.9 2003-10-07 23:15:57 minkis Exp $
+ * $Id: g_client.c,v 1.11 2004-12-16 19:22:17 minkis Exp $
 */
 
 //null cvs upload test, comment placed for a difference.
@@ -614,20 +614,6 @@ void ClientUserinfoChanged( int clientNum ) {
 			vehicle = atoi( Info_ValueForKey( userinfo, "cg_vehicle" ) );
 			client->vehicle = vehicle;
 		}
-		
-		Com_Printf("New vehicle successfully selected\n");
-		// valid next-vehicle, so spawn?
-
-			if( client->ps.pm_flags & (PMF_RESPAWNED|PMF_RECHARGING) ) 
-			{
-				Com_Printf("Selector::client is recharging\n");
-				// Make sure all vitals/ammo are full first
-				// changes by minkis
-				//if(other->health < other->client->pers.maxHealth
-			//	pm->ps->
-			//	client->ps.pm_flags &= ~PMF_VEHICLESELECT;
-		//		client->ps.pm_flags |= PMF_VEHICLESPAWN;
-			}
 
 		if( nextVehicle >= 0 && (client->ps.pm_flags & PMF_VEHICLESELECT) )
 		{

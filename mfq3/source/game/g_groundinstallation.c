@@ -1,5 +1,5 @@
 /*
- * $Id: g_groundinstallation.c,v 1.6 2003-08-06 19:05:59 thebjoern Exp $
+ * $Id: g_groundinstallation.c,v 1.8 2004-12-16 19:22:17 minkis Exp $
 */
 
 #include "g_local.h"
@@ -90,7 +90,7 @@ static void Update_GI_Targets( gentity_t* ent )
 					// wrong category
 					if( !(cat & CAT_PLANE) && !(cat & CAT_HELO) ) continue;
 					// check LOS
-					trap_Trace( &tr, ent->r.currentOrigin, 0, 0, hit->r.currentOrigin, ent->s.number, MASK_ALL );
+					trap_Trace( &tr, ent->r.currentOrigin, 0, 0, hit->r.currentOrigin, ent->s.number, MASK_PLAYERSOLID );
 					if( tr.fraction < 1 && tr.entityNum != hit->s.number ) continue;
 					// check dist
 					VectorSubtract(hit->r.currentOrigin, ent->r.currentOrigin, dir);
@@ -140,7 +140,7 @@ static void Update_GI_Targets( gentity_t* ent )
 				return;
 			}
 			// check LOS
-			trap_Trace( &tr, ent->r.currentOrigin, 0, 0, ent->tracktarget->r.currentOrigin, ent->s.number, MASK_ALL );
+			trap_Trace( &tr, ent->r.currentOrigin, 0, 0, ent->tracktarget->r.currentOrigin, ent->s.number, MASK_PLAYERSOLID );
 			if( tr.fraction < 1 && tr.entityNum != ent->tracktarget->s.number ) 
 			{
 				loselock(ent);

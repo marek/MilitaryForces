@@ -1,5 +1,5 @@
 /*
- * $Id: bg_weapondata.c,v 1.29 2003-10-07 23:15:57 minkis Exp $
+ * $Id: bg_weapondata.c,v 1.31 2004-12-16 19:22:17 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -1825,6 +1825,46 @@ completeWeaponData_t availableWeapons[] =
 		0,									// basicECMVulnerability
 		0,									// flags
 	},
+
+	// Burning people, can be used as flares
+	{ 
+		WT_FLARE,							// type
+		MF_GAMESET_ANY,						// gameset
+		"BurningMan",						// descriptiveName
+		"BurningMan",						// shortName
+		"BurningMan",						// shortName2 (GVs)
+		"models/effects/burningman.md3",	// modelName
+		0,									// handle
+		"",									// vwepName
+		0,									// vwephandle
+		"",									// iconName
+		0,									// iconHandle
+		0,									// cat
+		0,									// non cat mod
+		0,									// muzzleVelocity
+		0,									// range
+		2000,								// fuelrange
+		200,								// fire interval
+		0,									// damage
+		0,									// damageRadius
+		1,									// spread
+		0,									// barrels
+		0,									// barrelDistance
+		0,									// lockcone (dot)
+		0,									// followcone (dot)
+		0,									// locktime
+		0,									// crosshair
+		0,									// crosshair track
+		0,									// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
+		1,									// number per package
+		CAT_ANY,							// fits on category
+		PF_FLAREPOD,						// fits on pylon
+		0,									// basicECMVulnerability
+		0,									// flags
+	},
 	
 	// Nuke
 	{ 
@@ -1993,9 +2033,9 @@ completeWeaponData_t availableWeapons[] =
 		"MinkiCorp brand Nuclear device",								// descriptiveName
 		"NM5MT",							// shortName
 		"NM5MT",							// shortName2 (GVs)
-		"models/weapons/vwep_nuke.md3",		// modelName
+		"models/weapons/vwep_nukemissile.md3",		// modelName
 		0,									// handle
-		"models/weapons/vwep_nuke.md3",		// vwepName
+		"models/weapons/vwep_nukemissile.md3",		// vwepName
 		0,									// vwephandle
 		"hud/iconw_bmb.tga",				// iconName
 		0,									// iconHandle
@@ -2033,9 +2073,9 @@ completeWeaponData_t availableWeapons[] =
 		"MinkiCorp brand Nuclear device",								// descriptiveName
 		"NM1MT",							// shortName
 		"NM1MT",							// shortName2 (GVs)
-		"models/weapons/vwep_nuke.md3",		// modelName
+		"models/weapons/vwep_nukemissile.md3",		// modelName
 		0,									// handle
-		"models/weapons/vwep_nuke.md3",		// vwepName
+		"models/weapons/vwep_nukemissile.md3",		// vwepName
 		0,									// vwephandle
 		"hud/iconw_bmb.tga",				// iconName
 		0,									// iconHandle
@@ -2064,47 +2104,9 @@ completeWeaponData_t availableWeapons[] =
 		PF_AG_LT,							// fits on pylon
 		0,									// basicECMVulnerability
 		0,									// flags
-	},
-
-	// Nuke
-	{ 
-		WT_NUKEMISSILE,						// type
-		MF_GAMESET_ANY,						// gameset
-		"MinkiCorp brand Nuclear device",								// descriptiveName
-		"NM100MT",							// shortName
-		"NM100MT",							// shortName2 (GVs)
-		"models/weapons/vwep_nuke.md3",		// modelName
-		0,									// handle
-		"models/weapons/vwep_nuke.md3",		// vwepName
-		0,									// vwephandle
-		"hud/iconw_bmb.tga",				// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		800,								// muzzleVelocity
-		75000,								// range
-		75000,								// fuelrange
-		5000,								// fire interval
-		1000,								// damage
-		100000,								// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_BOMBMODE,						// crosshair
-		CH_BOMBMODE,						// crosshair track
-		CH_BOMBMODE,						// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_PLANE,							// fits on category
-		PF_AG_LT,							// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
 	}
+
+
 };
 
 int bg_numberOfWeapons = sizeof(availableWeapons) / sizeof(availableWeapons[0]);

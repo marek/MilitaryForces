@@ -1,5 +1,5 @@
 /*
- * $Id: cg_snapshot.c,v 1.2 2002-02-27 14:20:38 sparky909_uk Exp $
+ * $Id: cg_snapshot.c,v 1.7 2005-06-26 05:08:11 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -32,7 +32,7 @@ static void CG_ResetEntity( centity_t *cent )
 
 	if ( cent->currentState.eType == ET_PLAYER )
 	{
-		//CG_ResetPlayerEntity( cent );
+		// 	CG_ResetPlayerEntity( cent );
 	}
 }
 

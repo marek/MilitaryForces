@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.62 2003-09-05 00:37:49 minkis Exp $
+ * $Id: cg_local.h,v 1.64 2004-12-16 19:22:15 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -200,7 +200,6 @@ typedef struct centity_s {
 
 	vec3_t			beamEnd;
 	vec3_t			lastDrawnTrailPos;		// Position of last drawn trail
-	vec3_t			lastDrawnTrailAngles;	// Angles of last drawn trail (helps reduce a few stuff)
 	// exact interpolated position of entity on this frame
 	vec3_t			lerpOrigin;
 	vec3_t			lerpAngles;
@@ -718,6 +717,7 @@ typedef struct {
 	// MFQ3 NEW HUD
 	qhandle_t	HUDheading;
 	qhandle_t	HUDvaluebox;
+	qhandle_t	HUDvaluebox2;
 	qhandle_t	HUDind_h;
 	qhandle_t	HUDind_v;
 	qhandle_t	HUDind_v_r;
@@ -935,6 +935,7 @@ typedef struct {
 	float				turretAngle;
 	float				gunAngle;
 	float				wheelAngle;
+	float				wheelDirection;
 } DrawInfo_GV_t;
 
 typedef struct {
@@ -1093,6 +1094,7 @@ extern	vmCvar_t		cg_drawStatus;
 extern	vmCvar_t		cg_draw2D;
 extern	vmCvar_t		cg_debugPosition;
 extern	vmCvar_t		cg_debugEvents;
+extern	vmCvar_t		cg_missileEffect;	// 0 Default, 1 White puffs, 2 "Rail trail"
 extern	vmCvar_t		cg_railTrailTime;
 extern	vmCvar_t		cg_errorDecay;
 extern	vmCvar_t		cg_nopredict;

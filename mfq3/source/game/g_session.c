@@ -1,5 +1,5 @@
 /*
- * $Id: g_session.c,v 1.2 2002-06-09 20:09:41 thebjoern Exp $
+ * $Id: g_session.c,v 1.7 2005-06-26 05:08:12 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -136,7 +136,7 @@ G_InitWorldSession
 
 ==================
 */
-void G_InitWorldSession( void ) {
+void G_InitWorldSession(void) {
 	char	s[MAX_STRING_CHARS];
 	int			gt;
 
@@ -145,10 +145,11 @@ void G_InitWorldSession( void ) {
 	
 	// if the gametype changed since the last session, don't use any
 	// client sessions
-	if ( g_gametype.integer != gt ) {
+	if ( g_gametype.integer != gt) 
+	{
 		level.newSession = qtrue;
 		G_Printf( "Gametype changed, clearing session data.\n" );
-	}
+	} 
 }
 
 /*

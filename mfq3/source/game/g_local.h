@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.37 2003-10-07 23:15:57 minkis Exp $
+ * $Id: g_local.h,v 1.39 2004-12-16 19:22:17 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -721,7 +721,6 @@ qboolean SpotWouldTelefrag( gentity_t *spot );
 char *MF_ClientConnect( int clientNum, qboolean firstTime, qboolean isBot );
 void MF_ClientBegin( int clientNum );
 void MF_ClientSpawn( gentity_t *ent );
-void MF_ClientSpawnAtPos(gentity_t *ent, vec3_t	spawn_origin, vec3_t spawn_angles);
 
 // mfq3
 // mf_vehiclespawn.c
@@ -885,6 +884,7 @@ extern	vmCvar_t	g_spectSpeed;
 extern  vmCvar_t	mf_gameset;
 extern  vmCvar_t	mf_lvcat;
 extern  vmCvar_t	mf_mission;
+extern	vmCvar_t	mf_allowNukes;
 
 
 void	trap_Printf( const char *fmt );
