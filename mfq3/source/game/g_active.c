@@ -1,5 +1,5 @@
 /*
- * $Id: g_active.c,v 1.12 2002-02-24 16:52:12 thebjoern Exp $
+ * $Id: g_active.c,v 1.13 2002-02-27 14:21:59 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -470,7 +470,8 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 ==============
 StuckInOtherClient
 ==============
-*//*
+*/
+/*
 static int StuckInOtherClient(gentity_t *ent) {
 	int i;
 	gentity_t	*ent2;
@@ -507,7 +508,47 @@ static int StuckInOtherClient(gentity_t *ent) {
 	return qfalse;
 }
 */
-void BotTestSolid(vec3_t origin);
+
+/*
+==============
+SendPendingPredictableEvents
+==============
+*/
+void SendPendingPredictableEvents( playerState_t *ps )
+{
+	gentity_t *t;
+	int event, seq;
+	int extEvent, number;
+
+	// if there are still events pending
+	if ( ps->entityEventSequence < ps->eventSequence )
+	{
+		// create a temporary entity for this event which is sent to everyone
+		// except the client who generated the event
+		seq = ps->entityEventSequence & (MAX_PS_EVENTS-1);
+		event = ps->events[ seq ] | ( ( ps->entityEventSequence & 3 ) << 8 );
+
+		// set external event to zero before calling BG_PlayerStateToEntityState
+		extEvent = ps->externalEvent;
+		ps->externalEvent = 0;
+
+		// create temporary entity for event
+		t = G_TempEntity( ps->origin, event );
+		number = t->s.number;
+		BG_PlayerStateToEntityState( ps, &t->s, qtrue );
+		t->s.number = number;
+		t->s.eType = ET_EVENTS + event;
+		t->s.eFlags |= EF_PLAYER_EVENT;
+		t->s.otherEntityNum = ps->clientNum;
+
+		// send to everyone except the client who generated the event
+		t->r.svFlags |= SVF_NOTSINGLECLIENT;
+		t->r.singleClient = ps->clientNum;
+
+		// set back external event
+		ps->externalEvent = extEvent;
+	}
+}
 
 /*
 ==============
@@ -736,6 +777,7 @@ void ClientThink_real( gentity_t *ent ) {
 	else {
 		BG_PlayerStateToEntityState( &ent->client->ps, &ent->s, qtrue );
 	}
+	SendPendingPredictableEvents( &ent->client->ps );
 
 	// use the snapped origin for linking so it matches client predicted versions
 	VectorCopy( ent->s.pos.trBase, ent->r.currentOrigin );
@@ -796,9 +838,6 @@ void ClientThink_real( gentity_t *ent ) {
 		return;
 	}
 
-	// update lockinfo
-//	client->ps.stats[STAT_LOCKINFO] &= ~(LI_BEING_LOCKED|LI_BEING_LAUNCHED);
-
 	// perform once-a-second actions
 	ClientTimerActions( ent, msec );
 
@@ -826,7 +865,11 @@ void ClientThink( int clientNum ) {
 	}
 }
 
-
+/*
+==================
+G_RunClient
+==================
+*/
 void G_RunClient( gentity_t *ent ) {
 	if ( !(ent->r.svFlags & SVF_BOT) && !g_synchronousClients.integer ) {
 		return;
@@ -941,6 +984,7 @@ void ClientEndFrame( gentity_t *ent ) {
 	else {
 		BG_PlayerStateToEntityState( &ent->client->ps, &ent->s, qtrue );
 	}
+	SendPendingPredictableEvents( &ent->client->ps );
 
 	// set the bit for the reachability area the client is currently in
 //	i = trap_AAS_PointReachabilityAreaIndex( ent->client->ps.origin );

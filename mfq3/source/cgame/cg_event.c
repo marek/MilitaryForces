@@ -1,5 +1,5 @@
 /*
- * $Id: cg_event.c,v 1.11 2002-02-24 19:39:47 thebjoern Exp $
+ * $Id: cg_event.c,v 1.12 2002-02-27 14:20:38 sparky909_uk Exp $
 */
 
 #include "cg_local.h"
@@ -108,8 +108,11 @@ An entity has an event value
 also called by CG_CheckPlayerstateEvents
 ==============
 */
+
 #define	DEBUGNAME(x) if(cg_debugEvents.integer){CG_Printf(x"\n");}
-void CG_EntityEvent( centity_t *cent, vec3_t position ) {
+
+void CG_EntityEvent( centity_t *cent, vec3_t position )
+{
 	entityState_t	*es;
 	int				event;
 	vec3_t			dir;
@@ -510,22 +513,35 @@ CG_CheckEvents
 
 ==============
 */
-void CG_CheckEvents( centity_t *cent ) {
+void CG_CheckEvents( centity_t *cent )
+{
 	// check for event-only entities
-	if ( cent->currentState.eType > ET_EVENTS ) {
-		if ( cent->previousEvent ) {
+	if ( cent->currentState.eType > ET_EVENTS )
+	{
+		if ( cent->previousEvent )
+		{
 			return;	// already fired
 		}
 		cent->previousEvent = 1;
 
+		// if this is a player event set the entity number of the client entity number
+		if ( cent->currentState.eFlags & EF_PLAYER_EVENT )
+		{
+			cent->currentState.number = cent->currentState.otherEntityNum;
+		}
+
 		cent->currentState.event = cent->currentState.eType - ET_EVENTS;
-	} else {
+	} 
+	else 
+	{
 		// check for events riding with another entity
-		if ( cent->currentState.event == cent->previousEvent ) {
+		if ( cent->currentState.event == cent->previousEvent )
+		{
 			return;
 		}
 		cent->previousEvent = cent->currentState.event;
-		if ( ( cent->currentState.event & ~EV_EVENT_BITS ) == 0 ) {
+		if ( ( cent->currentState.event & ~EV_EVENT_BITS ) == 0 )
+		{
 			return;
 		}
 	}

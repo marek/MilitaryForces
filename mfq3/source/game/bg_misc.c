@@ -1,5 +1,5 @@
 /*
- * $Id: bg_misc.c,v 1.8 2002-02-24 19:39:51 thebjoern Exp $
+ * $Id: bg_misc.c,v 1.9 2002-02-27 14:21:59 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -553,7 +553,8 @@ void BG_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, qboolean 
 		s->eType = ET_INVISIBLE;
 	}
 
-	if( ps->pm_type == PM_VEHICLE ) {
+	if( ps->pm_type == PM_VEHICLE )
+	{
 		s->ONOFF = ps->ONOFF;
 		s->frame = ps->throttle;
 		s->angles2[PITCH] = ((float)ps->gunAngle)/10;
@@ -587,29 +588,29 @@ void BG_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, qboolean 
 		s->eFlags &= ~EF_DEAD;
 	}
 
-	if ( ps->externalEvent ) {
+	if ( ps->externalEvent )
+	{
 		s->event = ps->externalEvent;
 		s->eventParm = ps->externalEventParm;
-	} else {
-		int		seq;
+	}
+	else if ( ps->entityEventSequence < ps->eventSequence )
+	{
+		int seq = 0;
 
-		if ( ps->entityEventSequence < ps->eventSequence - MAX_PS_EVENTS) {
+		if ( ps->entityEventSequence < ps->eventSequence - MAX_PS_EVENTS )
+		{
 			ps->entityEventSequence = ps->eventSequence - MAX_PS_EVENTS;
 		}
-		seq = (ps->entityEventSequence-1) & (MAX_PS_EVENTS-1);
+		seq = ps->entityEventSequence & (MAX_PS_EVENTS-1);
 		s->event = ps->events[ seq ] | ( ( ps->entityEventSequence & 3 ) << 8 );
 		s->eventParm = ps->eventParms[ seq ];
-		if ( ps->entityEventSequence < ps->eventSequence ) {
-			ps->entityEventSequence++;
-		}
+		ps->entityEventSequence++;
 	}
 
 	s->weaponIndex = ps->weaponIndex;
 	s->weaponNum = ps->weaponNum;
 	s->groundEntityNum = ps->groundEntityNum;
-
 	s->objectives = ps->objectives;
-
 	s->loopSound = ps->loopSound;
 	s->generic1 = ps->generic1;
 }
@@ -634,7 +635,8 @@ void BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s
 		s->eType = ET_INVISIBLE;
 	}
 
-	if( ps->pm_type == PM_VEHICLE ) {
+	if( ps->pm_type == PM_VEHICLE )
+	{
 		s->ONOFF = ps->ONOFF;
 		s->frame = ps->throttle;
 		s->angles2[PITCH] = ((float)ps->gunAngle)/10;
@@ -672,29 +674,29 @@ void BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s
 		s->eFlags &= ~EF_DEAD;
 	}
 
-	if ( ps->externalEvent ) {
+	if ( ps->externalEvent )
+	{
 		s->event = ps->externalEvent;
 		s->eventParm = ps->externalEventParm;
-	} else {
-		int		seq;
+	}
+	else if ( ps->entityEventSequence < ps->eventSequence )
+	{
+		int seq = 0;
 
-		if ( ps->entityEventSequence < ps->eventSequence - MAX_PS_EVENTS) {
+		if ( ps->entityEventSequence < ps->eventSequence - MAX_PS_EVENTS )
+		{
 			ps->entityEventSequence = ps->eventSequence - MAX_PS_EVENTS;
 		}
-		seq = (ps->entityEventSequence-1) & (MAX_PS_EVENTS-1);
+		seq = ps->entityEventSequence & (MAX_PS_EVENTS-1);
 		s->event = ps->events[ seq ] | ( ( ps->entityEventSequence & 3 ) << 8 );
 		s->eventParm = ps->eventParms[ seq ];
-		if ( ps->entityEventSequence < ps->eventSequence ) {
-			ps->entityEventSequence++;
-		}
+		ps->entityEventSequence++;
 	}
 
 	s->weaponIndex = ps->weaponIndex;
 	s->weaponNum = ps->weaponNum;
 	s->groundEntityNum = ps->groundEntityNum;
-
 	s->objectives = ps->objectives;
-
 	s->loopSound = ps->loopSound;
 	s->generic1 = ps->generic1;
 }
