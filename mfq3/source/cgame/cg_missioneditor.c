@@ -1,11 +1,11 @@
 /*
- * $Id: cg_missioneditor.c,v 1.2 2002-06-12 21:12:46 thebjoern Exp $
+ * $Id: cg_missioneditor.c,v 1.3 2002-06-13 14:46:34 thebjoern Exp $
 */
 
 #include "cg_local.h"
 
 
-#define MAX_SELECTION_DISTANCE			2000.0f
+#define MAX_SELECTION_DISTANCE			3000.0f
 
 
 extern char *plane_tags[BP_PLANE_MAX_PARTS];
@@ -53,6 +53,14 @@ void ME_ToggleWaypointMode()
 	else CG_Printf( "Waypoint mode is OFF\n" );
 }
 
+void ME_ToggleWaypointDisplay()
+{
+	cgs.IGME.showAllWaypoints = cgs.IGME.showAllWaypoints ? qfalse : qtrue;
+
+	if( cgs.IGME.waypointmode ) CG_Printf( "ALL Waypoints are displayed\n" );
+	else CG_Printf( "Only Waypoints of SELECTED vehicle are displayed\n" );
+}
+
 void CG_Draw_IGME()
 {
 	int				i;
@@ -63,13 +71,14 @@ void CG_Draw_IGME()
 	// check for selections
 	cmdNum = trap_GetCurrentCmdNumber();
 	trap_GetUserCmd( cmdNum, &cmd );
-	if( (cmd.buttons & BUTTON_ATTACK) ) {
+	if( trap_Key_IsDown(K_MOUSE1) ) {
 		if( (cgs.IGME.waypointmode && cgs.IGME.numWptSelections) ||
 			(!cgs.IGME.waypointmode && cgs.IGME.numSelections) ) {
 			trap_Key_SetCatcher( KEYCATCH_CGAME );
 			cgs.IGME.dragmode = qtrue;
 		}
-	} else if( (cmd.buttons & BUTTON_ATTACK_MAIN) && cg.time >= cgs.IGME.selectionTime ) {
+	} else if( (trap_Key_IsDown(K_MOUSE3) || trap_Key_IsDown(K_SPACE)) &&
+				cg.time >= cgs.IGME.selectionTime ) {
 		ME_CheckForSelection();
 		cgs.IGME.selectionTime = cg.time + 250;
 	} else if( trap_Key_IsDown(K_BACKSPACE) && !trap_Key_GetCatcher() && cg.time >= cgs.IGME.selectionTime ) {
@@ -81,6 +90,10 @@ void CG_Draw_IGME()
 	} else if( (cmd.buttons & BUTTON_INCREASE) && cgs.IGME.waypointmode && 
 				cg.time >= cgs.IGME.selectionTime ) {
 		ME_SpawnWaypoint();
+		cgs.IGME.selectionTime = cg.time + 250;
+	} else if( (cmd.buttons & BUTTON_DECREASE) && cgs.IGME.waypointmode && 
+				cg.time >= cgs.IGME.selectionTime ) {
+		ME_ToggleWaypointDisplay();
 		cgs.IGME.selectionTime = cg.time + 250;
 	}	
 	
@@ -359,14 +372,14 @@ void ME_DragSelection( int x, int y )
 	vec3_t			angles, forward, right;
 	int				i;
 	qboolean		vertical = trap_Key_IsDown(K_CTRL);
-	qboolean		rotate = qfalse;
+	qboolean		rotate = trap_Key_IsDown(K_SHIFT);
 
 	if( vertical ) {
 		// move vertically
 		VectorSet( forward, 0, 0, 1 );
 		VectorScale( forward, -y, forward );
-		// rotate
-		if( x ) rotate = qtrue;
+	} else if( rotate ) {
+		VectorClear( forward );
 	} else {
 		// move horizontally
 		VectorSet( angles, 0, cg.predictedPlayerState.viewangles[1], 0 );
@@ -619,7 +632,7 @@ void ME_DrawVehicle( IGME_vehicle_t* veh )
 		trap_R_AddRefEntityToScene( &sel );
 	}
 	// draw waypoints
-	if( cgs.IGME.waypointmode ) {
+	if( cgs.IGME.waypointmode && (veh->selected || cgs.IGME.showAllWaypoints) ) {
 		int k;
 		vec3_t lastpos, dir, ang;
 		VectorCopy( veh->origin, lastpos );
@@ -665,3 +678,7 @@ void ME_DrawVehicle( IGME_vehicle_t* veh )
 		}
 	}
 }
+
+
+
+
