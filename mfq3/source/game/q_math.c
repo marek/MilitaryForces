@@ -1,5 +1,5 @@
 /*
- * $Id: q_math.c,v 1.5 2002-02-25 09:18:30 sparky909_uk Exp $
+ * $Id: q_math.c,v 1.6 2002-02-25 12:11:06 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1363,3 +1363,43 @@ void RotatePointAroundAngles( vec3_t dst, vec3_t src, float yaw, float pitch, fl
 	VectorCopy( tmpVec, dst );
 }
 
+/*
+===============
+RandomInt
+
+Create a random integer
+===============
+*/
+
+int RandomInt( int min, int max )
+{
+	// create a fp modifier
+	float modifier = (float)rand()/(RAND_MAX+1);
+	
+	// spread the modifier over the integer range
+	int range = (max - min) + 1;
+	int result = min + (int)(range * modifier);
+
+	return result;
+}
+
+
+/*
+===============
+RandomFloat
+
+Create a random float
+===============
+*/
+
+float RandomFloat( float min, float max )
+{
+	// create a fp modifier
+	float modifier = (float)rand()/RAND_MAX;
+
+	// spread the modifier over the integer range
+	float range = (max - min);
+	float result = min + (float)(range * modifier);
+
+	return result;
+}
