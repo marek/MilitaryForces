@@ -1,5 +1,5 @@
 /*
- * $Id: cg_missioneditor.c,v 1.11 2003-01-27 00:49:41 thebjoern Exp $
+ * $Id: cg_missioneditor.c,v 1.12 2003-02-02 02:52:02 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -865,13 +865,13 @@ void ME_ExportToScript( const char* scriptname )
 	Com_sprintf( outstring, sizeof(outstring), "\tgameset\t%d\n", cgs.gameset );
 	trap_FS_Write( outstring, strlen(outstring), f );
 
+	Com_sprintf( outstring, sizeof(outstring), "\tgametype\t%d\n", cgs.gametype );
+	trap_FS_Write( outstring, strlen(outstring), f );
+
 	Com_sprintf( outstring, sizeof(outstring), "\tmission\t%s\n", scriptname );
 	trap_FS_Write( outstring, strlen(outstring), f );
 
-	Com_sprintf( outstring, sizeof(outstring), "\ttitle\t%s\n", scriptname );
-	trap_FS_Write( outstring, strlen(outstring), f );
-
-	Com_sprintf( outstring, sizeof(outstring), "\tgoal\tSearch & Destroy\n}\n\n" );
+	Com_sprintf( outstring, sizeof(outstring), "\tgoal\tSearchAndDestroy\n}\n\n" );
 	trap_FS_Write( outstring, strlen(outstring), f );
 
 	// entities and groundinstallations
@@ -892,9 +892,6 @@ void ME_ExportToScript( const char* scriptname )
 			trap_FS_Write( outstring, strlen(outstring), f );
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\tTeam\t?\n" ); // ADD TEAM HERE!
-			trap_FS_Write( outstring, strlen(outstring), f );
-
-			Com_sprintf( outstring, sizeof(outstring), "\t\tGames\t?\n" ); // ADD GAME HERE!
 			trap_FS_Write( outstring, strlen(outstring), f );
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\tOrigin\t%f;%f;%f\n", veh->origin[0],
@@ -920,9 +917,6 @@ void ME_ExportToScript( const char* scriptname )
 			trap_FS_Write( outstring, strlen(outstring), f );
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\tTeam\t%d\n", availableVehicles[veh->vehidx].team ); 
-			trap_FS_Write( outstring, strlen(outstring), f );
-
-			Com_sprintf( outstring, sizeof(outstring), "\t\tGames\t?\n" ); // ADD GAME HERE!
 			trap_FS_Write( outstring, strlen(outstring), f );
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\tOrigin\t%f;%f;%f\n", veh->origin[0],
