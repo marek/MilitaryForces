@@ -1,5 +1,5 @@
 /*
- * $Id: cg_draw.c,v 1.22 2002-02-19 17:50:46 sparky909_uk Exp $
+ * $Id: cg_draw.c,v 1.23 2002-02-20 17:49:32 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -2526,7 +2526,7 @@ void CG_DrawDevelop( void )
 			y+=12;
 			DrawStringNewBasic( 64, y, 0.25f, va( "X Adjuster=%1.f", availableVehicles[ ci->vehicle ].shadowCoords[ SHC_XADJUST ] ) );
 			y+=12;
-			DrawStringNewBasic( 64, y, 0.25f, va( "Y Adjuster=%1.f", availableVehicles[ ci->vehicle ].shadowCoords[ SHC_YOFFSET ] ) );
+			DrawStringNewBasic( 64, y, 0.25f, va( "Y Adjuster=%1.f", availableVehicles[ ci->vehicle ].shadowCoords[ SHC_YADJUST ] ) );
 			y+=12;
 			DrawStringNewBasic( 64, y, 0.25f, va( "Pitch Max=%1.f", availableVehicles[ ci->vehicle ].shadowAdjusts[ SHO_PITCHMAX ] ) );
 			y+=12;
