@@ -1,5 +1,5 @@
 /*
- * $Id: ui_util.c,v 1.4 2002-02-20 19:59:03 sparky909_uk Exp $
+ * $Id: ui_util.c,v 1.5 2002-02-21 09:46:37 sparky909_uk Exp $
 */
 //
 // origin: rad
@@ -60,7 +60,7 @@ unsigned long MF_UI_GetGameset( qboolean asEnum )
 
 	// get info
 	trap_GetConfigString( CS_SERVERINFO, info, sizeof(info) );
-	pGameSet = Info_ValueForKey( info, "g_gametype" );
+	pGameSet = Info_ValueForKey( info, "mf_gameset" );
 
 	// compare
 	if( Q_stricmp( pGameSet, "ww1" ) == 0 )
