@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawtools.c,v 1.11 2002-02-20 16:59:36 sparky909_uk Exp $
+ * $Id: cg_drawtools.c,v 1.12 2002-02-20 18:08:09 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -868,6 +868,7 @@ qboolean CG_PolyMeshGeneratedShadow( centity_t *cent, clientInfo_t * ci, float *
 	float pitchMod = 0, rollMod = 0;
 	float u = 0, v = 0, mod = 0;
 	int midPoint = 3;
+	int traceMask = 0;
 	polyVert_t verts[5][5];
 	polyVert_t vertBuff[4];
 	qhandle_t shaderHandle = -1;
@@ -875,7 +876,7 @@ qboolean CG_PolyMeshGeneratedShadow( centity_t *cent, clientInfo_t * ci, float *
 	trace_t	trace;
 	qboolean drawMesh = qfalse;
 	qboolean vertInWater = qfalse;
-	int traceMask = 0;
+	qboolean dontRotatePR = qfalse;
 
 #pragma message ("CG_PolyMeshGeneratedShadow() - fix problem when projecting over high buildings")
 
@@ -902,8 +903,17 @@ qboolean CG_PolyMeshGeneratedShadow( centity_t *cent, clientInfo_t * ci, float *
 		yAlter = fabs( cent->lerpAngles[ROLL] / rollMax );
 		MF_LimitFloat( &xAlter, 0.0f, 1.0f );
 		MF_LimitFloat( &yAlter, 0.0f, 1.0f );
-		xRad *= 1.0f - ( pitchMod * xAlter );
-		yRad *= 1.0f - ( rollMod * yAlter );
+
+		// only apply any adjustment when airborne
+		if( !(cent->currentState.ONOFF & OO_LANDED) )
+		{
+			xRad *= 1.0f - ( pitchMod * xAlter );
+			yRad *= 1.0f - ( rollMod * yAlter );
+		}
+
+		// don't allow the shadow plane to be rotated in pitch & roll, the 'alter' fudges worked out
+		// above will do the same (but with more control)
+		dontRotatePR = qtrue;
 	}
 	else
 	{
@@ -948,10 +958,20 @@ qboolean CG_PolyMeshGeneratedShadow( centity_t *cent, clientInfo_t * ci, float *
 			verts[y][x].xyz[ 2 ] = 0;
 
 			// rotate point using entity angles
-			RotatePointAroundAngles( verts[y][x].xyz, verts[y][x].xyz,
-										cent->lerpAngles[YAW]-180,
-										cent->lerpAngles[PITCH],
-										cent->lerpAngles[ROLL] );
+			if( dontRotatePR )
+			{
+				// only rotate in yaw (for planes, helicopters, ...)
+				RotatePointAroundAngles( verts[y][x].xyz, verts[y][x].xyz,
+											cent->lerpAngles[YAW]-180, 0, 0 );
+			}
+			else
+			{
+				// rotate in all
+				RotatePointAroundAngles( verts[y][x].xyz, verts[y][x].xyz,
+											cent->lerpAngles[YAW]-180,
+											cent->lerpAngles[PITCH],
+											cent->lerpAngles[ROLL] );
+			}
 
 			// convert to global origin
 			verts[y][x].xyz[ 0 ] += (cent->lerpOrigin[ 0 ]);
