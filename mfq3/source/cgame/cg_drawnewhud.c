@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.28 2002-02-26 13:29:28 sparky909_uk Exp $
+ * $Id: cg_drawnewhud.c,v 1.29 2002-02-27 23:11:18 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -80,6 +80,7 @@ static int CG_DrawChar_MFQ3( int x, int y, int ch, qboolean right ) {
 	float	fcol;
 	float	size;
 	float	ax, ay, aw, ah;
+	qboolean num = qfalse;
 
 	if( ch == '?' ) {
 		col = 26;
@@ -99,6 +100,8 @@ static int CG_DrawChar_MFQ3( int x, int y, int ch, qboolean right ) {
 		col = 33;
 	} else if( Q_isalpha(ch) ) { 
 		col = ch-65;
+	} else if( ch >= '0' && ch <= '9' ) {
+		num = qtrue;
 	} else return HUDNUM_WIDTH;
 
 	ch &= 255;
@@ -107,27 +110,38 @@ static int CG_DrawChar_MFQ3( int x, int y, int ch, qboolean right ) {
 		return HUDNUM_WIDTH;
 	}
 
-	aw = alphabet_spaces[col];//width;
-	ah = 8;//height;
-	ax = x;
-	ay = y;
+	if( num ) {
+		aw = HUDNUM_WIDTH-1;
+		ah = HUDNUM_HEIGHT;
+		ax = x;
+		ay = y;
+	} else {
+		aw = alphabet_spaces[col];//width;
+		ah = 8;//height;
+		ax = x;
+		ay = y;
+	}
 	if( right ) {
 		ax -= aw;
 	}
-	CG_AdjustFrom640( &ax, &ay, &aw, &ah );
 
-//	size = 0.03125;
-//	fcol = col*size;
+	if( num ) {
+		CG_DrawPic( ax,ay, aw, ah, cgs.media.HUDnumbers[ch-'0'] );			
+		return HUDNUM_WIDTH-1;
+	} else {
+		CG_AdjustFrom640( &ax, &ay, &aw, &ah );
 
-	size = 0.00390625f;// size of one pixel on a 256 width bitmap
-	fcol = getStartPos(col)*size;
+		size = 0.00390625f;// size of one pixel on a 256 width bitmap
 
-	trap_R_DrawStretchPic( ax, ay, aw, ah,
-					   fcol, 0, 
-					   fcol + size * alphabet_spaces[col], 1, 
-					   cgs.media.HUDalphabet );
+		fcol = getStartPos(col)*size;
 
-	return alphabet_spaces[col];
+		trap_R_DrawStretchPic( ax, ay, aw, ah,
+							   fcol, 0, 
+							   fcol + size * alphabet_spaces[col], 1, 
+							   cgs.media.HUDalphabet );
+
+		return alphabet_spaces[col];
+	}
 }
 
 /*

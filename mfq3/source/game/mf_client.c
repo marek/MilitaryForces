@@ -1,5 +1,5 @@
 /*
- * $Id: mf_client.c,v 1.13 2002-02-27 11:24:09 sparky909_uk Exp $
+ * $Id: mf_client.c,v 1.14 2002-02-27 23:11:18 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -314,6 +314,11 @@ void MF_ClientSpawn(gentity_t *ent) {
 
 	// vehicles only stuff
 	if( vehIndex >= 0 && vehIndex < bg_numberOfVehicles ) {
+		// distribute the weapons
+		MF_getDefaultLoadoutForVehicle( vehIndex, &ent->loadout );
+//		G_AddEvent( ent, EV_GET_DEFAULT_LOADOUT, 0 );
+		ent->loadoutUpdated = qfalse;
+
 		Info_SetValueForKey( userinfo, "cg_vehicle", va( "%d", vehIndex ) );
 		trap_SetUserinfo( index, userinfo );
 		ClientUserinfoChanged( index );
@@ -389,7 +394,8 @@ void MF_ClientSpawn(gentity_t *ent) {
 		// which weapons do we have
 		for( i = WP_MACHINEGUN; i <= WP_FLARE; i++ ) {
 			if( availableVehicles[vehIndex].weapons[i] != WI_NONE ) {
-				client->ps.ammo[i] = client->ps.ammo[i+8] = availableVehicles[vehIndex].ammo[i];
+				client->ps.ammo[i] = client->ps.ammo[i+8] = availableVehicles[vehIndex].ammo[i] *
+					availableWeapons[availableVehicles[vehIndex].weapons[i]].numberPerPackage;
 			}
 		}
 
@@ -475,21 +481,6 @@ void MF_ClientSpawn(gentity_t *ent) {
 	// run the presend to set anything else
 	ClientEndFrame( ent );
 
-	// temp
-//	{
-//		md3Tag_t tag;
-//		if( MF_findTag("models/vehicles/sea/pbr31mk2/pbr31mk2.md3", "tag_turret", &tag) ) {
-//			G_Printf( "server found tag_turret in boat: %.1f %.1f %.1f\n", 
-//				tag.origin[0], tag.origin[1], tag.origin[2] );
-//		}
-//	}
-	// end temp
-
 	// clear entity state values
 	BG_PlayerStateToEntityState( &client->ps, &ent->s, qtrue );
-
-	// distribute the weapons
-	MF_getDefaultLoadoutForVehicle( vehIndex, &ent->loadout );
-//	G_AddEvent( ent, EV_GET_DEFAULT_LOADOUT, 0 );
-	ent->loadoutUpdated = qfalse;
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.24 2002-02-26 10:48:35 sparky909_uk Exp $
+ * $Id: ui_main.c,v 1.25 2002-02-27 23:11:18 thebjoern Exp $
 */
 /*
 =======================================================================
@@ -5829,6 +5829,9 @@ void _UI_Init( qboolean inGameLoad ) {
 
 	// set the MFQ3 version string
 	trap_Cvar_Set( "ui_mfq3Version", GAME_VERSION );
+
+	// MFQ3 data
+	MF_LoadAllVehicleData();
 
 	// setup the custom chat interface
 	UI_CustomChatInit();

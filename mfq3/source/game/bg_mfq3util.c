@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.23 2002-02-25 15:20:54 thebjoern Exp $
+ * $Id: bg_mfq3util.c,v 1.24 2002-02-27 23:11:18 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -98,44 +98,6 @@ int MF_getIndexOfVehicle( int start,			// where to start in list
     return -1;
 }
 
-/*
-int MF_getIndexOfVehicle( int start,			// where to start in list
-						  unsigned long what)	// what (team|cat|cls)
-{
-    int				i;
-	qboolean		done = qfalse;
-	unsigned long	set  = (what & 0xFF000000),
-					team = (what & 0x00FF0000),
-					cat  = (what & 0x0000FF00),
-					cls  = (what & 0x000000FF);
-
-	if( !set ) set = MF_GAMESET_ANY;
-	if( !team ) team = MF_TEAM_ANY;
-	if( !cat ) cat = CAT_ANY;
-	if( !cls ) cls = CLASS_ANY;
-
-	if( start >= bg_numberOfVehicles ) start = 0;
-	else if( start < 0 ) start = bg_numberOfVehicles;
-
-    for( i = start+1; done != qtrue; i++ )
-    {
-		if( i >= bg_numberOfVehicles ) {
-			if( start == bg_numberOfVehicles && i == start ) return -1;
-			i = 0;					
-		}
-		if( i == start ) done = qtrue;//return start;	
-//		Com_Printf( "Vehicle is %s %x\n", availableVehicles[i].descriptiveName,
-//										  availableVehicles[i].id );
-		if( !(availableVehicles[i].id & set) ) continue;		// wrong set
-		if( !(availableVehicles[i].id & team) ) continue;		// wrong team
-		if( !(availableVehicles[i].id & cat) ) continue;		// wrong category
-		if( !(availableVehicles[i].id & cls) ) continue;		// wrong category
-		return i;
-    }
-    return -1;
-
-}
-*/
 /*
 =================
 MF_getNumberOfItems
@@ -263,7 +225,7 @@ Get the catagory/class enum from the vehicle index (use CAT_ANY & CLASS_ANY to d
 
 void MF_LoadAllVehicleData()
 {
-	int i, num;
+	int i, j, num;
 	char* modelbasename = 0;
 	char name[128];
 
@@ -271,6 +233,12 @@ void MF_LoadAllVehicleData()
 	MF_calculateAllDefaultLoadouts();
 
 	for( i = 0; i < bg_numberOfVehicles; ++i ) {
+		// remove weapons not fitting
+		for( j = WP_WEAPON1; j < WP_FLARE; ++j ) {
+			if( !(availableVehicles[i].cat & availableWeapons[availableVehicles[i].weapons[j]].fitsCategory) ) {
+				availableVehicles[i].ammo[j] = 0;
+			}
+		}
 		modelbasename = MF_CreateModelPathname( i, "models/vehicles/%s/%s/%s" );	
 		// boundingbox
 		Com_sprintf( name, sizeof(name), "%s.md3", modelbasename );
@@ -298,6 +266,13 @@ void MF_LoadAllVehicleData()
 				availableVehicles[i].maxBayFrame = num - 1;
 			} else {
 				availableVehicles[i].maxBayFrame = BAY_DOWN_DEFAULT;
+			}
+			// correct actual loadouts
+			for( j = WP_WEAPON1; j < WP_FLARE; ++j ) {
+				if( availableVehicles[i].weapons[j] ) {
+					availableVehicles[i].ammo[j] = 
+						MF_findWeaponsOfType( availableVehicles[i].weapons[j], &availableLoadouts[i] );
+				}
 			}
 		} else if( (availableVehicles[i].cat & CAT_GROUND) ) {
 			vec3_t max, min;

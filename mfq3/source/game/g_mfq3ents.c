@@ -1,5 +1,5 @@
 /*
- * $Id: g_mfq3ents.c,v 1.8 2002-02-24 19:39:51 thebjoern Exp $
+ * $Id: g_mfq3ents.c,v 1.9 2002-02-27 23:11:18 thebjoern Exp $
 */
 
 
@@ -197,18 +197,11 @@ void recharge_touch( gentity_t *self, gentity_t *other, trace_t *trace ) {
 		if( other->client->ps.ammo[i] < other->client->ps.ammo[i+8] ) {
 			int diff = other->client->ps.ammo[i+8] - other->client->ps.ammo[i];
 			other->client->ps.ammo[i] = other->client->ps.ammo[i+8];
-			if( !(availableWeapons[availableVehicles[other->client->vehicle].weapons[i]].flags & WF_NON_REMOVABLE_VWEP) ) {
-				if( MF_addWeaponToLoadout( availableVehicles[other->client->vehicle].weapons[i], &other->loadout ) ) {
-					G_AddEvent( other, EV_ADD_WEAPON_TO_LOADOUT, availableVehicles[other->client->vehicle].weapons[i] );
-				}
+			if( MF_addWeaponToLoadout( availableVehicles[other->client->vehicle].weapons[i], &other->loadout ) ) {
+				G_AddEvent( other, EV_ADD_WEAPON_TO_LOADOUT, availableVehicles[other->client->vehicle].weapons[i] );
 			}
 			break;
 		}
-//		if( other->client->ps.ammo[i] < other->client->ps.ammo[i+8] ) {
-//			other->client->ps.ammo[i] += (other->client->ps.ammo[i+8]<=10 ? 1 : other->client->ps.ammo[i+8]/10);
-//			if( other->client->ps.ammo[i] > other->client->ps.ammo[i+8] ) 
-//				other->client->ps.ammo[i] = other->client->ps.ammo[i+8];
-//		}
 	}
 
 	other->rechargetime = level.time + ( g_gametype.integer >= GT_TEAM ? 1500 : 1000);

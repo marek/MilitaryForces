@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.19 2002-02-27 11:24:09 sparky909_uk Exp $
+ * $Id: g_local.h,v 1.20 2002-02-27 23:11:18 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -154,7 +154,7 @@ struct gentity_s {
 
 	// MFQ3
 	unsigned int ONOFF;			// to remember status after leaving vehicle
-	qboolean	 left;			// for projectiles
+	int			 left;			// for projectiles
 	int			 bulletpos;		// for dual guns (or more)
 	float		 gearheight;	
 	int			 rechargetime;	// when to recharge next
