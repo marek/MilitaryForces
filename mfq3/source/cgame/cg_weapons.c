@@ -1,5 +1,5 @@
 /*
- * $Id: cg_weapons.c,v 1.16 2002-02-24 19:39:51 thebjoern Exp $
+ * $Id: cg_weapons.c,v 1.17 2002-02-25 10:06:35 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -31,7 +31,7 @@ static void CG_FFARTrail( centity_t * cent, const weaponInfo_t *wi )
 	// draw trail
 	smoke = CG_SmokePuff( pos, up, 
 						  4, 
-						  0.5, 0.5, 0.5, 0.66f,
+						  0.8f, 0.8f, 0.8f, 0.33f,
 						  400, 
 						  cg.time, 0,
 						  LEF_PUFF_DONT_SCALE, 
