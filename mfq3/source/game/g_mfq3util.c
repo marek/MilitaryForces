@@ -1,5 +1,5 @@
 /*
- * $Id: g_mfq3util.c,v 1.5 2001-12-22 17:54:13 thebjoern Exp $
+ * $Id: g_mfq3util.c,v 1.6 2001-12-22 22:16:01 thebjoern Exp $
 */
 
 
@@ -76,10 +76,11 @@ void updateTargetTracking( gentity_t *ent )
 		RotatePointAroundVector( temp, up, forward, ((float)ent->client->ps.turretAngle)/10 );
 		CrossProduct( up, temp, right );
 		RotatePointAroundVector( dir, right, temp, ((float)ent->client->ps.gunAngle)/10 );
+		VectorCopy( dir, forward );
 	} else {
 		VectorCopy( ent->s.angles, dir );
+		AngleVectors( dir, forward, 0, 0 );
 	}
-	AngleVectors( dir, forward, 0, 0 );
 
 
 	// no target yet
