@@ -1,5 +1,5 @@
 /*
- * $Id: ui_shared.c,v 1.5 2002-02-06 17:55:38 sparky909_uk Exp $
+ * $Id: ui_shared.c,v 1.6 2002-02-11 12:23:55 sparky909_uk Exp $
 */
 // 
 // string allocation/managment
@@ -3887,16 +3887,22 @@ void Item_OwnerDraw_Paint(itemDef_t *item) {
 		  memcpy(color, parent->disableColor, sizeof(vec4_t)); // bk001207 - FIXME: Com_Memcpy
 		}
 	
-		if (item->text) {
+		if (item->text)
+		{
 			Item_Text_Paint(item);
-				if (item->text[0]) {
-					// +8 is an offset kludge to properly align owner draw items that have text combined with them
-					DC->ownerDrawItem(item->textRect.x + item->textRect.w + 8, item->window.rect.y, item->window.rect.w, item->window.rect.h, 0, item->textaligny, item->window.ownerDraw, item->window.ownerDrawFlags, item->alignment, item->special, item->textscale, color, item->window.background, item->textStyle );
-				} else {
-					DC->ownerDrawItem(item->textRect.x + item->textRect.w, item->window.rect.y, item->window.rect.w, item->window.rect.h, 0, item->textaligny, item->window.ownerDraw, item->window.ownerDrawFlags, item->alignment, item->special, item->textscale, color, item->window.background, item->textStyle );
-				}
-			} else {
-			DC->ownerDrawItem(item->window.rect.x, item->window.rect.y, item->window.rect.w, item->window.rect.h, item->textalignx, item->textaligny, item->window.ownerDraw, item->window.ownerDrawFlags, item->alignment, item->special, item->textscale, color, item->window.background, item->textStyle );
+			if( item->text[0] )
+			{
+				// +8 is an offset kludge to properly align owner draw items that have text combined with them
+				DC->ownerDrawItem(item->textRect.x + item->textRect.w + 8, item->window.rect.y, item->window.rect.w, item->window.rect.h, 0, item->textaligny, item->window.ownerDraw, item->window.ownerDrawFlags, item->alignment, item->special, item->textscale, color, item->window.background, item->textStyle, item );
+			}
+			else
+			{
+				DC->ownerDrawItem(item->textRect.x + item->textRect.w, item->window.rect.y, item->window.rect.w, item->window.rect.h, 0, item->textaligny, item->window.ownerDraw, item->window.ownerDrawFlags, item->alignment, item->special, item->textscale, color, item->window.background, item->textStyle, item );
+			}
+		}
+		else
+		{
+			DC->ownerDrawItem(item->window.rect.x, item->window.rect.y, item->window.rect.w, item->window.rect.h, item->textalignx, item->textaligny, item->window.ownerDraw, item->window.ownerDrawFlags, item->alignment, item->special, item->textscale, color, item->window.background, item->textStyle, item );
 		}
 	}
 }
@@ -4308,7 +4314,8 @@ void Menu_Paint(menuDef_t *menu, qboolean forcePaint) {
 	// paint the background and or border
 	Window_Paint(&menu->window, menu->fadeAmount, menu->fadeClamp, menu->fadeCycle );
 
-	for (i = 0; i < menu->itemCount; i++) {
+	for( i = 0; i < menu->itemCount; i++ )
+	{
 		Item_Paint(menu->items[i]);
 	}
 

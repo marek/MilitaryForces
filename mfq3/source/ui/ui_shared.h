@@ -1,5 +1,5 @@
 /*
- * $Id: ui_shared.h,v 1.4 2002-02-06 17:55:38 sparky909_uk Exp $
+ * $Id: ui_shared.h,v 1.5 2002-02-11 12:23:55 sparky909_uk Exp $
 */
 #ifndef __UI_SHARED_H
 #define __UI_SHARED_H
@@ -380,7 +380,7 @@ typedef struct {
   void (*addRefEntityToScene) (const refEntity_t *re );
   void (*renderScene) ( const refdef_t *fd );
   void (*registerFont) (const char *pFontname, int pointSize, fontInfo_t *font);
-  void (*ownerDrawItem) (float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, int ownerDrawFlags, int align, float special, float scale, vec4_t color, qhandle_t shader, int textStyle);
+  void (*ownerDrawItem) (float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, int ownerDrawFlags, int align, float special, float scale, vec4_t color, qhandle_t shader, int textStyle, itemDef_t *item);
 	float (*getValue) (int ownerDraw);
 	qboolean (*ownerDrawVisible) (int flags);
   void (*runScript)(char **p);
@@ -497,5 +497,7 @@ int			trap_PC_SourceFileAndLine( int handle, char *filename, int *line );
 
 void GradientBar_Paint(rectDef_t *rect, vec4_t color);
 void VerticalGradient_Paint(rectDef_t *rect, vec4_t color);
+
+void Item_Text_AutoWrapped_Paint(itemDef_t *item);
 
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.5 2002-01-29 12:11:29 sparky909_uk Exp $
+ * $Id: ui_main.c,v 1.6 2002-02-11 12:23:55 sparky909_uk Exp $
 */
 /*
 =======================================================================
@@ -2057,7 +2057,7 @@ static void UI_DrawVehiclePreview( rectDef_t *rect, float scale, vec4_t color, i
 
 // FIXME: table drive
 //
-static void UI_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, int ownerDrawFlags, int align, float special, float scale, vec4_t color, qhandle_t shader, int textStyle) {
+static void UI_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, int ownerDrawFlags, int align, float special, float scale, vec4_t color, qhandle_t shader, int textStyle, itemDef_t * item) {
 	rectDef_t rect;
 
   rect.x = x + text_x;
