@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.7 2002-01-22 13:58:18 thebjoern Exp $
+ * $Id: cg_local.h,v 1.8 2002-01-22 16:15:58 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -102,6 +102,15 @@ typedef enum {
 #define RD_MAX_ICONS			15
 
 #define MAX_RADAR_TARGETS		32
+
+// MFD
+#define MFD_OFF					0
+#define MFD_RWR					1
+#define MFD_MAX					2
+
+#define MFD_1					0
+#define MFD_2					1
+#define NUM_MFDS_IN_COCKPIT		2
 
 //=================================================
 
@@ -502,16 +511,18 @@ typedef struct {
 	int				testVaporFrame;
 
 	// MFQ3
-	int			INFO;
-	int			INFOTime;
-	int			RADARTime;
-	int			RADARRangeSetting;
-	int			GPS;
-	int			GPSTime;
-	int			toggleViewTime;
-	centity_t	*radarEnts[MAX_RADAR_TARGETS];
-	unsigned int radarTargets;
-	int			tracernum;
+	int				INFO;
+	int				INFOTime;
+	int				RADARTime;
+	int				RADARRangeSetting;
+	int				GPS;
+	int				GPSTime;
+	int				MFDTime;
+	int				Mode_MFD[NUM_MFDS_IN_COCKPIT];
+	int				toggleViewTime;
+	centity_t		*radarEnts[MAX_RADAR_TARGETS];
+	unsigned int	radarTargets;
+	int				tracernum;
 } cg_t;
 
 
@@ -592,6 +603,7 @@ typedef struct {
 	qhandle_t	HUDcaret_v_r_l;
 	qhandle_t	HUDmfd;
 	qhandle_t	HUDspeed;
+	qhandle_t	HUDrwr;
 	
 	// weapon effect models
 	qhandle_t	bulletFlashModel;
@@ -873,6 +885,7 @@ extern  vmCvar_t		cg_smoke;
 extern	vmCvar_t		hud_heading;
 extern	vmCvar_t		hud_speed;
 extern	vmCvar_t		hud_mfd;
+extern	vmCvar_t		hud_mfd2;
 
 //
 // cg_main.c

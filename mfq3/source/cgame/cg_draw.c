@@ -1,5 +1,5 @@
 /*
- * $Id: cg_draw.c,v 1.6 2002-01-22 13:58:18 thebjoern Exp $
+ * $Id: cg_draw.c,v 1.7 2002-01-22 16:15:58 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -758,8 +758,28 @@ CG_Draw_MFD
 
 ================
 */
-static void CG_Draw_MFD() {
-	CG_DrawPic( 1, 351, 128, 128, cgs.media.HUDmfd );
+static void CG_Draw_MFD(int mfdnum) {
+	float		x, y, width, height;
+	int			mode = cg.Mode_MFD[mfdnum];
+
+		// draw mfd screen
+	if( mfdnum == MFD_1 ) {
+		x = 1;
+	} else {
+		x = 511;		
+	}
+	y = 351;
+	width = height = 128;
+	CG_AdjustFrom640( &x, &y, &width, &height );
+	trap_R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, cgs.media.HUDmfd );
+
+		// draw contents of mfd only if it is not off
+	if( !mode ) return;
+
+		// RWR mode
+	if( mode == MFD_RWR ) {
+		trap_R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, cgs.media.HUDrwr );
+	} 
 }
 
 
@@ -997,9 +1017,14 @@ static void CG_DrawStatusBar_MFQ3_new( void ) {
 				availableVehicles[vehicle].stallspeed * SPEED_GREEN_ARC, value );
 	}
 
-	// mfd
+	// mfd 1
 	if( hud_mfd.integer ) {
-		CG_Draw_MFD();
+		CG_Draw_MFD(MFD_1);
+	}
+
+	// mfd 2
+	if( hud_mfd2.integer ) {
+		CG_Draw_MFD(MFD_2);
 	}
 }
 
