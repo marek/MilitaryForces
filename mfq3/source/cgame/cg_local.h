@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.47 2002-06-08 17:05:08 thebjoern Exp $
+ * $Id: cg_local.h,v 1.48 2002-06-12 14:35:33 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -731,6 +731,9 @@ typedef struct {
 	qhandle_t	HUDnumberline;
 	qhandle_t	HUDreticles[HR_MAX];
 	
+	// IGME
+	qhandle_t	IGME_selector;
+
 	// weapon effect models
 	qhandle_t	bulletFlashModel;
 	qhandle_t	dishFlashModel;
@@ -840,6 +843,25 @@ enum CameraAdjust {
 	MAX_CAMERA_ADJUSTS
 };
 
+// IGME
+#define IGME_MAX_VEHICLES		128
+
+typedef struct {
+	qboolean		active;
+	qboolean		selected;
+	int				vehidx;
+	vec3_t			angles;
+	vec3_t			origin;
+	vec3_t			selectorScale;
+} IGME_vehicle_t;
+
+typedef struct {
+	IGME_vehicle_t	vehicles[IGME_MAX_VEHICLES];
+	int				selectionTime;
+} IGME_data_t;
+
+// end IGME
+
 // The client game static (cgs) structure hold everything
 // loaded or calculated from the gamestate.  It will NOT
 // be cleared when a tournement restart is done, allowing
@@ -927,6 +949,9 @@ typedef struct {
 
 	// media
 	cgMedia_t		media;
+
+	// IGME
+	IGME_data_t		IGME;
 
 } cgs_t;
 
@@ -1388,6 +1413,11 @@ void CG_Respawn( void );
 void CG_TransitionPlayerState( playerState_t *ps, playerState_t *ops );
 void CG_CheckChangedPredictableEvents( playerState_t *ps );
 
+//
+// cg_missioneditor.c
+//
+void ME_SpawnVehicle( int idx );
+void CG_Draw_IGME();
 
 //===============================================
 

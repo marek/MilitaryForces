@@ -1,5 +1,5 @@
 /*
- * $Id: cg_servercmds.c,v 1.7 2002-06-09 20:09:41 thebjoern Exp $
+ * $Id: cg_servercmds.c,v 1.8 2002-06-12 14:35:33 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -554,6 +554,14 @@ static void CG_ServerCommand( void ) {
 	// the menu system during development
 	if ( !strcmp( cmd, "clientLevelShot" ) ) {
 		cg.levelShot = qtrue;
+		return;
+	}
+
+	if( !strcmp( cmd, "me_spawnvehicle" ) ) {
+		if( trap_Argc() == 2 ) {
+			int idx = atoi(CG_Argv(1));
+			ME_SpawnVehicle(idx);
+		}
 		return;
 	}
 

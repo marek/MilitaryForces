@@ -1,5 +1,5 @@
 /*
- * $Id: cg_testmodel.c,v 1.4 2002-02-09 17:07:03 thebjoern Exp $
+ * $Id: cg_testmodel.c,v 1.5 2002-06-12 14:35:33 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -255,22 +255,6 @@ void CG_AddTestVehicle (void) {
 		CG_Printf ("Can't register model\n");
 		return;
 	}
-
-	// if testing a gun, set the origin reletive to the view origin
-/*	if ( cg.testGun ) {
-		VectorCopy( cg.refdef.vieworg, cg.testModelEntity.origin );
-		VectorCopy( cg.refdef.viewaxis[0], cg.testModelEntity.axis[0] );
-		VectorCopy( cg.refdef.viewaxis[1], cg.testModelEntity.axis[1] );
-		VectorCopy( cg.refdef.viewaxis[2], cg.testModelEntity.axis[2] );
-
-		// allow the position to be adjusted
-		for (i=0 ; i<3 ; i++) {
-			cg.testModelEntity.origin[i] += cg.refdef.viewaxis[0][i] * cg_gun_x.value;
-			cg.testModelEntity.origin[i] += cg.refdef.viewaxis[1][i] * cg_gun_y.value;
-			cg.testModelEntity.origin[i] += cg.refdef.viewaxis[2][i] * cg_gun_z.value;
-		}
-	}*/
-
 
 	trap_R_AddRefEntityToScene( &cg.testVehicleParts[0] );
 

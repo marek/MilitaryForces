@@ -95,6 +95,8 @@ call ..\compile ../cg_lqm.c
 @if errorlevel 1 goto quit
 call ..\compile ../cg_groundvehicle.c
 @if errorlevel 1 goto quit
+call ..\compile ../cg_missioneditor.c
+@if errorlevel 1 goto quit
 
 q3asm -f ../cgame
 :quit

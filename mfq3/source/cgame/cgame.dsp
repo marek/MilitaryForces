@@ -219,6 +219,10 @@ SOURCE=.\cg_miscvehicle.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\cg_missioneditor.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\cg_plane.c
 # End Source File
 # Begin Source File

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_view.c,v 1.10 2002-02-25 14:19:19 sparky909_uk Exp $
+ * $Id: cg_view.c,v 1.11 2002-06-12 14:35:33 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -580,6 +580,9 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	}
 	if( cg.testVehicleParts[0].hModel ) {
 		CG_AddTestVehicle();
+	}
+	if( cgs.gametype == GT_MISSION_EDITOR ) {
+		CG_Draw_IGME();
 	}
 
 	cg.refdef.time = cg.time;

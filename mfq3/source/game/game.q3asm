@@ -35,7 +35,6 @@ g_groundvehicle
 g_droneutil
 g_droneplane
 g_droneground
-g_missioneditor
 mf_client
 mf_vehiclespawn
 g_mfq3ents
