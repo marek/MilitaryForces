@@ -1,5 +1,5 @@
 /*
- * $Id: cg_plane.c,v 1.12 2002-01-28 22:34:30 thebjoern Exp $
+ * $Id: cg_plane.c,v 1.13 2002-01-30 19:26:02 thebjoern Exp $
 */
 
 
@@ -258,13 +258,27 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 	part[BP_PLANE_CONTROLS].frame = cent->currentState.vehicleAnim;
 		// gear
 	if( availableVehicles[ci->vehicle].caps & HC_GEAR ) {
+		int timediff = cg.time - cent->gearAnimStartTime;
 		if( ONOFF & OO_GEAR ) {
-			part[BP_PLANE_GEAR].frame = 0;
 			part[BP_PLANE_CONTROLS].frame += 9;
 		}
-		else {
-			part[BP_PLANE_GEAR].frame = 2;
+//		else {
+//			part[BP_PLANE_GEAR].frame = 2;
+//		}
+		if( cent->gearAnim == GEAR_ANIM_UP ) {
+			cent->gearAnimFrame = GEAR_DOWN - timediff/25;
+			if( cent->gearAnimFrame < GEAR_UP ) {
+				cent->gearAnimFrame = GEAR_UP;
+				cent->gearAnim = GEAR_ANIM_STOP;
+			}
+		} else if( cent->gearAnim == GEAR_ANIM_DOWN ) {
+			cent->gearAnimFrame = GEAR_UP + timediff/25;
+			if( cent->gearAnimFrame > GEAR_DOWN ) {
+				cent->gearAnimFrame = GEAR_DOWN;
+				cent->gearAnim = GEAR_ANIM_STOP;
+			}
 		}
+		part[BP_PLANE_GEAR].frame = cent->gearAnimFrame;
 	}
 		// speedbrakes
 	if( availableVehicles[ci->vehicle].caps & HC_SPEEDBRAKE ) {

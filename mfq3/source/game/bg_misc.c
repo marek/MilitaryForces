@@ -1,5 +1,5 @@
 /*
- * $Id: bg_misc.c,v 1.2 2001-12-22 02:28:43 thebjoern Exp $
+ * $Id: bg_misc.c,v 1.3 2002-01-30 19:26:02 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -481,6 +481,12 @@ char *eventnames[] = {
 	"EV_VEHICLE_HIT",			// smoke puff when hit
 	"EV_VEHICLE_DIE",			// explosion when dying
 	"EV_VEHICLE_GIB",			// even bigger explosion when gibbed
+
+	"EV_GEAR_UP",
+	"EV_GEAR_DOWN",
+	"EV_GEAR_UP_FULL",
+	"EV_GEAR_DOWN_FULL",
+	"EV_GEAR_STOP",
 
 	"EV_DEBUG_LINE"
 

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.9 2002-01-26 23:48:32 thebjoern Exp $
+ * $Id: bg_vehicledata.c,v 1.10 2002-01-30 19:26:02 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -347,6 +347,43 @@ completeVehicleData_t availableVehicles[] =
 	0							// renderflags
     },
 
+    {	"Messerschmitt Bf-109g",// descriptiveName
+	"Bf-109g",					// tinyName
+	"bf-109g",					// modelName
+	MF_GAMESET_WW2|				// id
+	MF_TEAM_2|
+	CAT_PLANE|
+	CLASS_PLANE_FIGHTER,
+	0,							// flags
+	HC_GEAR|HC_PROP|
+	HC_TAILDRAGGER|
+	HC_DUALGUNS,				// capabilities
+	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
+	{-21, -20, -1},				// mins (bounding box)
+	{10, 20, 6},				// max (bounding box)
+	{70, 80, 300},				// turnspeed around the three axis
+	60, 16,						// camera distance and height
+	120,					    // stallspeed
+	500,					    // maxspeed
+	0,							// min throttle
+	10,						    // max throttle
+	220,						// acceleration
+	100,						// health
+	{2.518f, -7.371f, -0.155f},	// gun tag
+	60,							// max fuel
+	3,							// gearheight
+	-14,							// tailangle
+	WI_MG_8XCAL50, 0, 0, 0, 0, 0, 0, 0,		// weapons
+	450, 0, 0, 0, 0, 0, 0, 0,	// ammo
+	{-4, 0, 6},					// cameraposition for cockpit view
+	0,							// effect model
+	0,							// radar range
+	0,							// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
+	0,							// swingangle
+	0							// renderflags
+    },
 
     {	"Fokker Dr.1",			// descriptiveName
 	"Fokker",					// tinyName
