@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.26 2002-02-20 18:43:44 sparky909_uk Exp $
+ * $Id: bg_vehicledata.c,v 1.27 2002-02-20 18:48:18 sparky909_uk Exp $
 */
 
 #include "q_shared.h"
@@ -55,7 +55,7 @@ completeVehicleData_t availableVehicles[] =
 	1000,						// baytime
 	47,							// max bay frame
 	0,							// renderflags
-	{2,0,34,24},				// shadow coordinates
+	{4,0,34,24},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
     },
 
@@ -103,7 +103,7 @@ completeVehicleData_t availableVehicles[] =
 	1000,						// baytime
 	47,							// max bay frame
 	0,							// renderflags
-	{2,0,36,20},				// shadow coordinates
+	{6,0,36,20},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
     },
 
@@ -247,7 +247,7 @@ completeVehicleData_t availableVehicles[] =
 	1000,						// baytime
 	47,							// max bay frame
 	MFR_DUALPILOT|MFR_BIGVAPOR,	// renderflags
-	{4,0,48,34},					// shadow coordinates
+	{6,0,48,34},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
     },
 
@@ -439,7 +439,7 @@ completeVehicleData_t availableVehicles[] =
 	1000,						// baytime
 	47,							// max bay frame
 	0,							// renderflags
-	{0,0,76,42},				// shadow coordinates
+	{3,0,76,76},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
     },
 
@@ -734,7 +734,7 @@ completeVehicleData_t availableVehicles[] =
 	1000,						// baytime
 	47,							// max bay frame
 	0,							// renderflags
-	{-3,0,15,12},				// shadow coordinates
+	{-3,0,13,12},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
     },
 
