@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.18 2002-02-10 19:18:19 thebjoern Exp $
+ * $Id: bg_vehicledata.c,v 1.19 2002-02-12 11:06:27 sparky909_uk Exp $
 */
 
 #include "q_shared.h"
@@ -26,7 +26,8 @@ completeVehicleData_t availableVehicles[] =
 	{-26, -21, -4},				// mins (bounding box)
 	{36, 21, 15},				// max (bounding box)
 	{80, 80, 260},				// turnspeed around the three axis
-	80, 20,						// camera distance and height
+	{0, 100, 70},				// camera distance {min,max,default}
+	{0, 100, 20},				// camera height {min,max,default}
 	200,						// stallspeed
 	700,						// maxspeed
 	0,							// min throttle
@@ -69,7 +70,8 @@ completeVehicleData_t availableVehicles[] =
 	{-26, -19, -4},				// mins (bounding box)
 	{38, 19, 12},				// max (bounding box)
 	{70, 80, 340},				// turnspeed around the three axis
-	80, 20,						// camera distance and height
+	{0, 100, 70},				// camera distance {min,max,default}
+	{0, 100, 20},				// camera height {min,max,default}
 	200,						// stallspeed
 	720,						// maxspeed
 	0,							// min throttle
@@ -112,7 +114,8 @@ completeVehicleData_t availableVehicles[] =
 	{-24, -16, -1.5},				// mins (bounding box)
 	{36, 16, 11},				// max (bounding box)
 	{70, 80, 380},				// turnspeed around the three axis
-	76, 18,						// camera distance and height
+	{0, 100, 70},				// camera distance {min,max,default}
+	{0, 100, 20},				// camera height {min,max,default}
 	170,						// stallspeed
 	620,						// maxspeed
 	0,							// min throttle
@@ -155,7 +158,8 @@ completeVehicleData_t availableVehicles[] =
 	{-31, -28, -5},				// mins (bounding box)
 	{54, 28, 14},				// max (bounding box)
 	{60, 80, 200},				// turnspeed around the three axis
-	90, 18,						// camera distance and height
+	{0, 100, 70},				// camera distance {min,max,default}
+	{0, 100, 20},				// camera height {min,max,default}
 	220,						// stallspeed
 	880,						// maxspeed
 	0,							// min throttle
@@ -198,7 +202,8 @@ completeVehicleData_t availableVehicles[] =
 	{-29, -28, -3},				// mins (bounding box)
 	{46, 28, 14},				// max (bounding box)
 	{60, 80, 200},				// turnspeed around the three axis
-	80, 18,						// camera distance and height
+	{0, 100, 70},				// camera distance {min,max,default}
+	{0, 100, 20},				// camera height {min,max,default}
 	220,						// stallspeed
 	840,						// maxspeed
 	0,							// min throttle
@@ -241,7 +246,8 @@ completeVehicleData_t availableVehicles[] =
 	{-26, -25, -5},				// mins (bounding box)
 	{44, 25, 10},				// max (bounding box)
 	{80, 80, 260},				// turnspeed around the three axis
-	70, 18,						// camera distance and height
+	{0, 100, 70},				// camera distance {min,max,default}
+	{0, 100, 20},				// camera height {min,max,default}
 	200,						// stallspeed
 	720,						// maxspeed
 	0,							// min throttle
@@ -284,7 +290,8 @@ completeVehicleData_t availableVehicles[] =
 	{-26, -25, -5},				// mins (bounding box)
 	{44, 25, 10},				// max (bounding box)
 	{80, 80, 260},				// turnspeed around the three axis
-	70, 18,						// camera distance and height
+	{0, 100, 70},				// camera distance {min,max,default}
+	{0, 100, 20},				// camera height {min,max,default}
 	200,						// stallspeed
 	720,						// maxspeed
 	0,							// min throttle
@@ -327,7 +334,8 @@ completeVehicleData_t availableVehicles[] =
 	{-26, -21, -4},				// mins (bounding box)
 	{36, 21, 15},				// max (bounding box)
 	{80, 80, 260},				// turnspeed around the three axis
-	70, 18,						// camera distance and height
+	{0, 120, 100},				// camera distance {min,max,default}
+	{0, 100, 35},				// camera height {min,max,default}
 	200,						// stallspeed
 	700,						// maxspeed
 	0,							// min throttle
@@ -371,7 +379,8 @@ completeVehicleData_t availableVehicles[] =
 	{-28, -26, -3},				// mins (bounding box)
 	{16, 26, 10},				// max (bounding box)
 	{60, 80, 240},				// turnspeed around the three axis
-	60, 16,						// camera distance and height
+	{0, 100, 50},				// camera distance {min,max,default}
+	{0, 100, 10},				// camera height {min,max,default}
 	130,					    // stallspeed
 	600,					    // maxspeed
 	0,							// min throttle
@@ -415,7 +424,8 @@ completeVehicleData_t availableVehicles[] =
 	{-21, -20, -1},				// mins (bounding box)
 	{10, 20, 6},				// max (bounding box)
 	{70, 80, 300},				// turnspeed around the three axis
-	60, 16,						// camera distance and height
+	{0, 100, 50},				// camera distance {min,max,default}
+	{0, 100, 10},				// camera height {min,max,default}
 	120,					    // stallspeed
 	500,					    // maxspeed
 	0,							// min throttle
@@ -459,7 +469,8 @@ completeVehicleData_t availableVehicles[] =
 	{-21, -20, -1},				// mins (bounding box)
 	{10, 20, 6},				// max (bounding box)
 	{70, 80, 300},				// turnspeed around the three axis
-	60, 16,						// camera distance and height
+	{0, 100, 50},				// camera distance {min,max,default}
+	{0, 100, 10},				// camera height {min,max,default}
 	120,					    // stallspeed
 	500,					    // maxspeed
 	0,							// min throttle
@@ -503,7 +514,8 @@ completeVehicleData_t availableVehicles[] =
 	{-21, -20, -1},				// mins (bounding box)
 	{10, 20, 6},				// max (bounding box)
 	{70, 80, 300},				// turnspeed around the three axis
-	60, 16,						// camera distance and height
+	{0, 100, 50},				// camera distance {min,max,default}
+	{0, 100, 10},				// camera height {min,max,default}
 	120,					    // stallspeed
 	500,					    // maxspeed
 	0,							// min throttle
@@ -548,7 +560,8 @@ completeVehicleData_t availableVehicles[] =
 	{-31, -30, -1},				// mins (bounding box)
 	{20, 30, 6},				// max (bounding box)
 	{40, 50, 120},				// turnspeed around the three axis
-	90, 20,						// camera distance and height
+	{0, 100, 80},				// camera distance {min,max,default}
+	{0, 100, 10},				// camera height {min,max,default}
 	120,					    // stallspeed
 	500,					    // maxspeed
 	0,							// min throttle
@@ -592,7 +605,8 @@ completeVehicleData_t availableVehicles[] =
 	{-21, -20, -1},				// mins (bounding box)
 	{10, 20, 6},				// max (bounding box)
 	{70, 80, 300},				// turnspeed around the three axis
-	50, 14,						// camera distance and height
+	{0, 100, 30},				// camera distance {min,max,default}
+	{0, 100, 10},				// camera height {min,max,default}
 	50,						    // stallspeed
 	150,					    // maxspeed
 	0,							// min throttle
@@ -636,7 +650,8 @@ completeVehicleData_t availableVehicles[] =
 	{-21, -14, -1},				// mins (bounding box)
 	{10, 14, 6},				// max (bounding box)
 	{70, 80, 300},				// turnspeed around the three axis
-	50, 14,						// camera distance and height
+	{0, 100, 30},				// camera distance {min,max,default}
+	{0, 100, 10},				// camera height {min,max,default}
 	50,						    // stallspeed
 	150,					    // maxspeed
 	0,							// min throttle
@@ -682,7 +697,8 @@ completeVehicleData_t availableVehicles[] =
 	{-18, -9, -1},				// mins (bounding box)
 	{18, 9, 9},					// max (bounding box)
 	{50, 100, 100},				// turnspeed around the three axis
-	44, 14,						// camera distance and height
+	{0, 100, 40},				// camera distance {min,max,default}
+	{0, 100, 20},				// camera height {min,max,default}
 	0,							// stallspeed
 	60,						    // maxspeed
 	-5,							// min throttle
@@ -724,7 +740,8 @@ completeVehicleData_t availableVehicles[] =
 	{-17, -9, -1},				// mins (bounding box)
 	{17, 9, 7},					// max (bounding box)
 	{50, 100, 100},				// turnspeed around the three axis
-	44, 14,						// camera distance and height
+	{0, 100, 40},				// camera distance {min,max,default}
+	{0, 100, 20},				// camera height {min,max,default}
 	0,							// stallspeed
 	65,						    // maxspeed
 	-5,							// min throttle
@@ -766,7 +783,8 @@ completeVehicleData_t availableVehicles[] =
 	{-10, -5, -1},				// mins (bounding box)
 	{11, 5, 4.5},				// max (bounding box)
 	{50, 100, 100},				// turnspeed around the three axis
-	38, 14,						// camera distance and height
+	{0, 100, 30},				// camera distance {min,max,default}
+	{0, 100, 10},				// camera height {min,max,default}
 	0,							// stallspeed
 	75,						    // maxspeed
 	-5,							// min throttle
@@ -808,7 +826,8 @@ completeVehicleData_t availableVehicles[] =
 	{-10, -5, -2},				// mins (bounding box)
 	{11, 5, 4.5},				// max (bounding box)
 	{50, 100, 100},				// turnspeed around the three axis
-	38, 14,						// camera distance and height
+	{0, 100, 30},				// camera distance {min,max,default}
+	{0, 100, 10},				// camera height {min,max,default}
 	0,							// stallspeed
 	85,						    // maxspeed
 	-5,							// min throttle
@@ -850,7 +869,8 @@ completeVehicleData_t availableVehicles[] =
 	{-10, -5, -2},				// mins (bounding box)
 	{10, 5, 7},					// max (bounding box)
 	{50, 100, 100},				// turnspeed around the three axis
-	38, 14,						// camera distance and height
+	{0, 100, 30},				// camera distance {min,max,default}
+	{0, 100, 10},				// camera height {min,max,default}
 	0,							// stallspeed
 	90,						    // maxspeed
 	-5,							// min throttle
@@ -892,7 +912,8 @@ completeVehicleData_t availableVehicles[] =
 	{-12, -6, -2},				// mins (bounding box)
 	{12, 6, 9},					// max (bounding box)
 	{50, 100, 100},				// turnspeed around the three axis
-	44, 14,						// camera distance and height
+	{0, 100, 30},				// camera distance {min,max,default}
+	{0, 100, 10},				// camera height {min,max,default}
 	0,							// stallspeed
 	60,						    // maxspeed
 	-5,							// min throttle

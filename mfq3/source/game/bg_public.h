@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.51 2002-02-12 09:22:02 thebjoern Exp $
+ * $Id: bg_public.h,v 1.52 2002-02-12 11:06:27 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -161,6 +161,13 @@ void Pmove (pmove_t *pmove);
 
 //===================================================================================
 
+// 3rd person camera vector interpretations
+
+typedef enum {
+	CAMERA_V_MIN,
+	CAMERA_V_MAX,
+	CAMERA_V_DEFAULT
+};
 
 // player_state->stats[] indexes
 // NOTE: may not have more than 16
@@ -621,8 +628,8 @@ typedef struct completeVehicleData_s
     vec3_t		    mins;
     vec3_t		    maxs;
     vec3_t		    turnspeed;	    // how fast can it turn around the three axis
-	int				cam_dist;		// how far away is the camera
-	int				cam_height;		// how high is the camera
+	vec3_t			cam_dist;		// how far away is the camera {min, max, defualt}
+	vec3_t			cam_height;		// how high is the default {min, max, default}
     unsigned int    stallspeed;	
     unsigned int    maxspeed;	    // max speed at military thrust
     int			    minthrottle;    // can be less than 0 for ground vehicles
