@@ -1,13 +1,15 @@
 /*
- * $Id: bg_mfq3util.c,v 1.2 2002-01-07 00:06:02 thebjoern Exp $
+ * $Id: bg_mfq3util.c,v 1.3 2002-01-18 16:48:26 sparky909_uk Exp $
 */
 
 #include "q_shared.h"
 #include "bg_public.h"
 
-
+// externals
 extern void	trap_Cvar_Set( const char *var_name, const char *value );
+extern void	trap_Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize );
 
+// sets the mf_gameset variable based on the given MF_GAMESET_x parameter
 void MF_SetGameset(unsigned long gs)
 {
 	switch( gs )
@@ -23,6 +25,32 @@ void MF_SetGameset(unsigned long gs)
 		trap_Cvar_Set("mf_gameset", "modern");
 		break;
 	}
+}
+
+// gets the mf_gameset variable into the correct a MF_GAMESET_x return
+unsigned long MF_GetGameset( void )
+{
+	char tmpGamesetStr[ 32 ];
+
+	// get the gameset text
+	trap_Cvar_VariableStringBuffer( "mf_gameset", tmpGamesetStr, sizeof(tmpGamesetStr) );
+
+	// compare and return
+	if( strcmp( tmpGamesetStr, "ww1" ) == 0 )
+	{
+		return MF_GAMESET_WW1;
+	}
+	else if( strcmp( tmpGamesetStr, "ww2" ) == 0 )
+	{
+		return MF_GAMESET_WW2;
+	}
+	else if( strcmp( tmpGamesetStr, "modern" ) == 0 )
+	{
+		return MF_GAMESET_MODERN;
+	}
+
+	// wasn't found, but to be safe
+	return MF_GAMESET_MODERN;
 }
 
 int MF_getIndexOfVehicle( int start,			// where to start in list
