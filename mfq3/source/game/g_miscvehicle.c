@@ -1,5 +1,5 @@
 /*
- * $Id: g_miscvehicle.c,v 1.2 2001-12-22 02:28:44 thebjoern Exp $
+ * $Id: g_miscvehicle.c,v 1.3 2002-01-31 02:34:33 thebjoern Exp $
 */
 
 
@@ -118,6 +118,8 @@ static void SP_misc_plane( gentity_t *ent )
 		AngleVectors( ent->s.angles, forward, 0, 0 );
 		VectorScale( forward, ent->speed, ent->s.pos.trDelta );
 	}
+	// update gear anim
+	ent->updateGear = qtrue;
 
 	ent->s.pos.trTime = level.time;
 	trap_LinkEntity (ent);

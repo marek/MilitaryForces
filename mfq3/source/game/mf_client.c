@@ -1,5 +1,5 @@
 /*
- * $Id: mf_client.c,v 1.3 2002-01-20 20:28:44 thebjoern Exp $
+ * $Id: mf_client.c,v 1.4 2002-01-31 02:34:33 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -416,6 +416,9 @@ void MF_ClientSpawn(gentity_t *ent) {
 		G_KillBox( ent );
 		trap_LinkEntity (ent);
 	}
+
+	// reset radar
+	ent->client->ps.ONOFF |= ent->client->pers.lastRadar;
 
 	// don't allow full run speed for a bit
 	client->ps.pm_flags |= PMF_TIME_KNOCKBACK;

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_miscvehicle.c,v 1.2 2002-01-28 22:34:30 thebjoern Exp $
+ * $Id: cg_miscvehicle.c,v 1.3 2002-01-31 02:34:33 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -60,15 +60,37 @@ static void CG_Misc_Plane( centity_t *cent )
 		// control surfaces
 	part[BP_PLANE_CONTROLS].frame = cent->currentState.vehicleAnim;
 		// gear
+//	if( availableVehicles[cent->currentState.modelindex].caps & HC_GEAR ) {
+//		if( ONOFF & OO_GEAR ) {
+//			part[BP_PLANE_GEAR].frame = 0;
+//			part[BP_PLANE_CONTROLS].frame += 9;
+//		}
+//		else {
+//			part[BP_PLANE_GEAR].frame = 2;
+//		}
+//	}
+		// gear
 	if( availableVehicles[cent->currentState.modelindex].caps & HC_GEAR ) {
+		int timediff = cg.time - cent->gearAnimStartTime;
 		if( ONOFF & OO_GEAR ) {
-			part[BP_PLANE_GEAR].frame = 0;
 			part[BP_PLANE_CONTROLS].frame += 9;
 		}
-		else {
-			part[BP_PLANE_GEAR].frame = 2;
+		if( cent->gearAnim == GEAR_ANIM_UP ) {
+			cent->gearAnimFrame = GEAR_DOWN - timediff/25;
+			if( cent->gearAnimFrame < GEAR_UP ) {
+				cent->gearAnimFrame = GEAR_UP;
+				cent->gearAnim = GEAR_ANIM_STOP;
+			}
+		} else if( cent->gearAnim == GEAR_ANIM_DOWN ) {
+			cent->gearAnimFrame = GEAR_UP + timediff/25;
+			if( cent->gearAnimFrame > GEAR_DOWN ) {
+				cent->gearAnimFrame = GEAR_DOWN;
+				cent->gearAnim = GEAR_ANIM_STOP;
+			}
 		}
+		part[BP_PLANE_GEAR].frame = cent->gearAnimFrame;
 	}
+
 		// speedbrakes
 	if( availableVehicles[cent->currentState.modelindex].caps & HC_SPEEDBRAKE ) {
 		if( ONOFF & OO_SPEEDBRAKE ) {

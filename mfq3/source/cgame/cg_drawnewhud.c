@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.6 2002-01-29 13:03:36 thebjoern Exp $
+ * $Id: cg_drawnewhud.c,v 1.7 2002-01-31 02:34:33 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -7,6 +7,43 @@
 
 // there are a couple of duplicate functions here
 // this should be cleaned up and factorized when there is some time left..
+
+static int alphabet_spaces[34] =
+{
+	8,	// A=8
+	7,	// B=7
+	8,	// C=8
+	8,	// D=8
+	6,	// E=6
+	7,	// F=7
+	8,	// G=8
+	8,	// H=8
+	5,	// I=5
+	6,	// J=6
+	8,	// K=8
+	7,	// L=7
+	8,	// M=8
+	8,	// N=8
+	9,	// O=9
+	7,	// P=7
+	9,	// Q=9
+	6,	// R=6
+	7,	// S=7
+	7,	// T=7
+	8,	// U=8
+	8,	// V=8
+	9,	// W=9
+	7,	// X=7
+	7,	// Y=7
+	7,	// Z=7
+	8,	// ?=8
+	8,	// !=8
+	8,	// *=8
+	8,	// :=8
+	8,	// /=8
+	8,	// \=8
+	7	// ==7	
+};
 
 /*
 ================
@@ -29,7 +66,16 @@ CG_DrawChar
 Coordinates and size in 640*480 virtual screen size
 ===============
 */
-static void CG_DrawChar_MFQ3( int x, int y, int width, int height, int ch ) {
+static int getStartPos( int col ) {
+	int i, ret = 0;
+
+	for( i = 0; i < col; ++i ) {
+		ret += alphabet_spaces[i];
+	}
+	return ret;
+}
+
+static int CG_DrawChar_MFQ3( int x, int y, int ch, qboolean right ) {
 	int		col;
 	float	fcol;
 	float	size;
@@ -47,34 +93,46 @@ static void CG_DrawChar_MFQ3( int x, int y, int width, int height, int ch ) {
 		col = 30;
 	} else if( ch == '/' ) {
 		col = 31;
+	} else if( ch == '\\' ) {
+		col = 32;
+	} else if( ch == '=' ) {
+		col = 33;
 	} else if( Q_isalpha(ch) ) { 
 		col = ch-65;
-	} else return;
+	} else return HUDNUM_WIDTH;
 
 	ch &= 255;
 
 	if ( ch == ' ' ) {
-		return;
+		return HUDNUM_WIDTH;
 	}
 
+	aw = alphabet_spaces[col];//width;
+	ah = 8;//height;
 	ax = x;
 	ay = y;
-	aw = width;
-	ah = height;
+	if( right ) {
+		ax -= aw;
+	}
 	CG_AdjustFrom640( &ax, &ay, &aw, &ah );
 
-	size = 0.03125;
-	fcol = col*size;
+//	size = 0.03125;
+//	fcol = col*size;
+
+	size = 0.00390625f;// size of one pixel on a 256 width bitmap
+	fcol = getStartPos(col)*size;
 
 	trap_R_DrawStretchPic( ax, ay, aw, ah,
 					   fcol, 0, 
-					   fcol + size, 1, 
+					   fcol + size * alphabet_spaces[col], 1, 
 					   cgs.media.HUDalphabet );
+
+	return alphabet_spaces[col];
 }
 
 /*
 ==================
-CG_DrawStringExt
+CG_DrawString_MFQ3
 
 Draws a multi-colored string with a drop shadow, optionally forcing
 to a fixed color.
@@ -82,7 +140,7 @@ to a fixed color.
 Coordinates are at 640 by 480 virtual resolution
 ==================
 */
-static void CG_DrawString_MFQ3( int x, int y, const char *string, const float *setColor, int maxChars ) {
+static int CG_DrawString_MFQ3( int x, int y, const char *string, const float *setColor, int maxChars ) {
 //	vec4_t		color;
 	const char	*s;
 	int			xx;
@@ -112,20 +170,85 @@ static void CG_DrawString_MFQ3( int x, int y, const char *string, const float *s
 //			s += 2;
 //			continue;
 //		}
-		CG_DrawChar_MFQ3( xx, y, charWidth, charHeight, *s );
+		charWidth = CG_DrawChar_MFQ3( xx, y, *s, qfalse );
 		xx += charWidth;
 		cnt++;
 		s++;
 	}
 	trap_R_SetColor( NULL );
+	return (xx-x);
 }
+
+
+/*
+==================
+CG_DrawString_MFQ3 - right aligned (ie x = right end of string)
+
+Draws a multi-colored string with a drop shadow, optionally forcing
+to a fixed color.
+
+Coordinates are at 640 by 480 virtual resolution
+==================
+*/
+static int CG_DrawString_MFQ3_R( int x, int y, const char *string, const float *setColor, int maxChars ) {
+//	vec4_t		color;
+	const char	*s;
+	int			xx;
+	int			cnt;
+	int			charWidth, charHeight;
+	char		invstring[128];
+	int			len = strlen(string)-1, i = 0;
+
+	if( len >= 127 ) {
+		CG_Printf( "String too long! Not printed!" );
+		return 0;
+	}
+	while( len >= 0 ) {
+		invstring[i] = string[len];
+		len--;
+		i++;
+	}
+	invstring[i] = 0;
+
+	charWidth = HUDNUM_WIDTH;
+	charHeight = HUDNUM_HEIGHT;
+
+	Q_strupr( (char*)invstring );
+
+	if (maxChars <= 0)
+		maxChars = 32767; // do them all!
+
+	// draw the colored text
+	s = invstring;
+	xx = x;
+	cnt = 0;
+	trap_R_SetColor( setColor );
+	while ( *s && cnt < maxChars) {
+//		if ( Q_IsColorString( s ) ) {
+//			if ( !forceColor ) {
+//				memcpy( color, g_color_table[ColorIndex(*(s+1))], sizeof( color ) );
+//				color[3] = setColor[3];
+//				trap_R_SetColor( color );
+//			}
+//			s += 2;
+//			continue;
+//		}
+		charWidth = CG_DrawChar_MFQ3( xx, y, *s, qtrue );
+		xx -= charWidth;
+		cnt++;
+		s++;
+	}
+	trap_R_SetColor( NULL );
+	return (xx-x);
+}
+
 
 /*
 ==============
 CG_MFQ3HUD_Numbers
 ==============
 */
-static void CG_MFQ3HUD_Numbers (int x, int y, int width, int value, qboolean percent, vec4_t color) {
+static void CG_MFQ3HUD_Numbers (int x, int y, int width, int value, qboolean percent, vec4_t color, qboolean right ) {
 	char	num[16], *ptr;
 	int		l;
 	int		frame;
@@ -172,7 +295,19 @@ static void CG_MFQ3HUD_Numbers (int x, int y, int width, int value, qboolean per
 	l = strlen(num);
 	if (l > width)
 		l = width;
-	x += 2 + (HUDNUM_WIDTH-1)*(width - l);
+//	x += 2 + (HUDNUM_WIDTH-1)*(width - l);
+	if( right ) {
+		char num2[16];
+		int	 l2 = l-1, i = 0;
+		while( l2 >= 0 ) {
+			num2[i] = num[l2];
+			l2--;
+			i++;
+		}
+		num2[i] = 0;
+		Com_sprintf( num, sizeof(num), "%s", num2 );
+		x -= (HUDNUM_WIDTH-1);
+	}
 
 	ptr = num;
 	while (*ptr && l)
@@ -183,7 +318,8 @@ static void CG_MFQ3HUD_Numbers (int x, int y, int width, int value, qboolean per
 			frame = *ptr -'0';
 
 		CG_DrawPic( x,y, HUDNUM_WIDTH, HUDNUM_HEIGHT, cgs.media.HUDnumbers[frame] );
-		x += HUDNUM_WIDTH-1;
+		if( right ) x -= HUDNUM_WIDTH-1;
+		else x += HUDNUM_WIDTH-1;
 		ptr++;
 		l--;
 	}
@@ -205,7 +341,7 @@ prints a number with a '.' in it; ie divides this number by 10^decimals
 width = total width
 ==============
 */
-static void CG_MFQ3HUD_DecNumbers (int x, int y, int width, int decimals, int invalue, vec4_t color) {
+static void CG_MFQ3HUD_DecNumbers (int x, int y, int width, int decimals, int invalue, vec4_t color ) {
 	int		div = 10;
 	int		pre, post;
 	int		prewid, 
@@ -218,13 +354,13 @@ static void CG_MFQ3HUD_DecNumbers (int x, int y, int width, int decimals, int in
 
 	prewid = width-decimals-1;
 
-	CG_MFQ3HUD_Numbers( x, y, prewid, pre, qfalse, HUDColors[cg.HUDColor] );
-	x += (HUDNUM_WIDTH-1)*prewid;
+	CG_MFQ3HUD_Numbers( x, y, prewid, pre, qfalse, HUDColors[cg.HUDColor], qtrue );
+//	x += (HUDNUM_WIDTH-1)*prewid;
 
-	CG_DrawHUDPic( x+2,y+2, HUDNUM_WIDTH, HUDNUM_HEIGHT, cgs.media.HUDnumbers[STAT_POINT], HUDColors[cg.HUDColor] );
-	x += HUDNUM_WIDTH-1;
+	CG_DrawHUDPic( x-1,y+2, HUDNUM_WIDTH, HUDNUM_HEIGHT, cgs.media.HUDnumbers[STAT_POINT], HUDColors[cg.HUDColor] );
+//	x += HUDNUM_WIDTH-1;
 
-	CG_MFQ3HUD_Numbers( x, y, postwid, post, qfalse, HUDColors[cg.HUDColor] );
+	CG_MFQ3HUD_Numbers( x+4, y, postwid, post, qfalse, HUDColors[cg.HUDColor], qfalse );
 }
 
 
@@ -504,13 +640,13 @@ static void CG_Draw_Coords(int xcoord, int ycoord) {
 	float		x, y, width, height;
 
 		// draw coords
-	x = 240;
+	x = 290;
 	y = 32;
 	width = 32;
 	height = 8;
-	CG_MFQ3HUD_Numbers( x, y, 7, xcoord, qfalse, HUDColors[cg.HUDColor] );
-	x = 330;
-	CG_MFQ3HUD_Numbers( x, y, 7, ycoord, qfalse, HUDColors[cg.HUDColor] );
+	CG_MFQ3HUD_Numbers( x, y, 7, xcoord, qfalse, HUDColors[cg.HUDColor], qtrue );
+	x = 350;
+	CG_MFQ3HUD_Numbers( x, y, 7, ycoord, qfalse, HUDColors[cg.HUDColor], qfalse );
 
 }
 
@@ -530,7 +666,7 @@ static void CG_Draw_Redundant(int vehicle, int health, int throttle, int ammo[16
 		width = 32;
 		height = 8;
 		CG_DrawHUDPic( x, y, width, height, cgs.media.HUDhealthtext, HUDColors[cg.HUDColor] ); 
-		CG_MFQ3HUD_Numbers( 584, 318, 4, health, qtrue, HUDColors[cg.HUDColor] );
+		CG_MFQ3HUD_Numbers( 594, 318, 4, health, qtrue, HUDColors[cg.HUDColor], qfalse );
 	}
 
 		// draw throttle
@@ -540,7 +676,7 @@ static void CG_Draw_Redundant(int vehicle, int health, int throttle, int ammo[16
 		width = 32;
 		height = 8;
 		CG_DrawHUDPic( x, y, width, height, cgs.media.HUDthrottletext, HUDColors[cg.HUDColor] ); 
-		CG_MFQ3HUD_Numbers( 584, 330, 4, throttle*10, qtrue, HUDColors[cg.HUDColor] );
+		CG_MFQ3HUD_Numbers( 594, 330, 4, throttle*10, qtrue, HUDColors[cg.HUDColor], qfalse );
 	}
 
 		// draw ammo
@@ -555,9 +691,8 @@ static void CG_Draw_Redundant(int vehicle, int health, int throttle, int ammo[16
 			else
 				actualstring = availableWeapons[availableVehicles[vehicle].weapons[0]].shortName;
 			Com_sprintf( ammostring, 32, "%s:", actualstring );
-			len = strlen(ammostring);
-			CG_DrawString_MFQ3( 4, 318, ammostring, HUDColors[cg.HUDColor], 0);
-			CG_MFQ3HUD_Numbers( 4 + len * 8, 318, 3, ammo[0], qfalse, HUDColors[cg.HUDColor] );
+			len = CG_DrawString_MFQ3( 4, 318, ammostring, HUDColors[cg.HUDColor], 0);
+			CG_MFQ3HUD_Numbers( 4 + len, 318, 3, ammo[0], qfalse, HUDColors[cg.HUDColor], qfalse );
 		}
 
 			// selected weapon
@@ -567,9 +702,8 @@ static void CG_Draw_Redundant(int vehicle, int health, int throttle, int ammo[16
 			else
 				actualstring = availableWeapons[availableVehicles[vehicle].weapons[selweap]].shortName;
 			Com_sprintf( ammostring, 32, "%s:", actualstring );
-			len = strlen(ammostring);
-			CG_DrawString_MFQ3( 4, 330, ammostring, HUDColors[cg.HUDColor], 0);
-			CG_MFQ3HUD_Numbers( 4 + len * 8, 330, 3, ammo[selweap], qfalse, HUDColors[cg.HUDColor] );
+			len = CG_DrawString_MFQ3( 4, 330, ammostring, HUDColors[cg.HUDColor], 0);
+			CG_MFQ3HUD_Numbers( 4 + len, 330, 3, ammo[selweap], qfalse, HUDColors[cg.HUDColor], qfalse );
 		}
 	}
 
@@ -777,11 +911,11 @@ static void CG_Draw_MFD(int mfdnum, int vehicle, centity_t * cent,
 		// draw contents
 		if( radarmode & OO_RADAR_AIR ) {
 			CG_DrawRadarSymbols_AIR_new(vehicle, range, x+64, y+64);
-			CG_MFQ3HUD_Numbers( x+86, y+14, 5, range, qfalse, HUDColors[cg.MFDColor] );
+			CG_MFQ3HUD_Numbers( x+122, y+14, 5, range, qfalse, HUDColors[cg.MFDColor], qtrue );
 			strcpy( mode, "AIR" );
 		} else if( radarmode & OO_RADAR_GROUND ) {
 			CG_DrawRadarSymbols_GROUND_new(vehicle, range, x+64, y+64);
-			CG_MFQ3HUD_Numbers( x+86, y+14, 5, range, qfalse, HUDColors[cg.MFDColor] );
+			CG_MFQ3HUD_Numbers( x+122, y+14, 5, range, qfalse, HUDColors[cg.MFDColor], qtrue );
 			strcpy( mode, "GND" );
 		} else if( availableVehicles[vehicle].radarRange || 
 				   availableVehicles[vehicle].radarRange2 ) {
@@ -790,10 +924,9 @@ static void CG_Draw_MFD(int mfdnum, int vehicle, centity_t * cent,
 		CG_DrawString_MFQ3( x+4, y+14, mode, HUDColors[cg.MFDColor], 0);
 		// draw flares
 		if( flares >= 0 ) {
-			CG_MFQ3HUD_Numbers( x+86, y+114, 5, flares, qfalse, HUDColors[cg.MFDColor] );
+			CG_MFQ3HUD_Numbers( x+122, y+114, 5, flares, qfalse, HUDColors[cg.MFDColor], qtrue );
 		}
 	} else if( mode == MFD_STATUS ) {
-		char	statusline[33];
 		int		fuel;
 		// fuel (for MFD)
 		fuel = ps->stats[STAT_FUEL];
@@ -801,23 +934,22 @@ static void CG_Draw_MFD(int mfdnum, int vehicle, centity_t * cent,
 			fuel *= 100;
 		}
 		CG_DrawString_MFQ3( x+4, y+14, "STATUS:", HUDColors[cg.MFDColor], 0);
-		CG_DrawString_MFQ3( x+4, y+20, "-------", HUDColors[cg.MFDColor], 0);
-		Com_sprintf( statusline, 32, "GEAR:      %s", (onoff & OO_GEAR ? "DOWN" : "UP") );
-		CG_DrawString_MFQ3( x+4, y+30, statusline, HUDColors[cg.MFDColor], 0);
-		Com_sprintf( statusline, 32, "BRAKES:    %s", (onoff & OO_SPEEDBRAKE ? "ON" : "OFF") );
-		CG_DrawString_MFQ3( x+4, y+40, statusline, HUDColors[cg.MFDColor], 0);
-		Com_sprintf( statusline, 32, "WPNBAYS:   O/S" );
-		CG_DrawString_MFQ3( x+4, y+50, statusline, HUDColors[cg.MFDColor], 0);
-		Com_sprintf( statusline, 32, "AUTOPILOT: O/S" );
-		CG_DrawString_MFQ3( x+4, y+60, statusline, HUDColors[cg.MFDColor], 0);
-		Com_sprintf( statusline, 32, "FUEL:" );
-		CG_DrawString_MFQ3( x+4, y+80, statusline, HUDColors[cg.MFDColor], 0);
-		CG_MFQ3HUD_Numbers( x+86, y+80, 5, fuel, qfalse, HUDColors[cg.MFDColor] );
+		CG_DrawString_MFQ3( x+4, y+20, "------", HUDColors[cg.MFDColor], 0);
+		CG_DrawString_MFQ3( x+4, y+30, "GEAR:", HUDColors[cg.MFDColor], 0);
+		CG_DrawString_MFQ3_R( x+122, y+30, (onoff & OO_GEAR ? "DOWN" : "UP"), HUDColors[cg.MFDColor], 0);
+		CG_DrawString_MFQ3( x+4, y+40, "BRAKES:", HUDColors[cg.MFDColor], 0);
+		CG_DrawString_MFQ3_R( x+122, y+40, (onoff & OO_SPEEDBRAKE ? "ON" : "OFF"), HUDColors[cg.MFDColor], 0);
+		CG_DrawString_MFQ3( x+4, y+50, "WPNBAYS:", HUDColors[cg.MFDColor], 0);
+		CG_DrawString_MFQ3_R( x+122, y+50, "O/S", HUDColors[cg.MFDColor], 0);
+		CG_DrawString_MFQ3( x+4, y+60, "AUTOPILOT:", HUDColors[cg.MFDColor], 0);
+		CG_DrawString_MFQ3_R( x+122, y+60, "O/S", HUDColors[cg.MFDColor], 0);
+		CG_DrawString_MFQ3( x+4, y+80, "FUEL:", HUDColors[cg.MFDColor], 0);
+		CG_MFQ3HUD_Numbers( x+122, y+80, 5, fuel, qfalse, HUDColors[cg.MFDColor], qtrue );
 	} else if( mode == MFD_INVENTORY ) {
 		char	invline[33];
 		int		i;
 		CG_DrawString_MFQ3( x+4, y+14, "INVENTORY:", HUDColors[cg.MFDColor], 0);
-		CG_DrawString_MFQ3( x+4, y+20, "----------", HUDColors[cg.MFDColor], 0);
+		CG_DrawString_MFQ3( x+4, y+20, "---------", HUDColors[cg.MFDColor], 0);
 
 		y = 382;
 
@@ -829,7 +961,7 @@ static void CG_Draw_MFD(int mfdnum, int vehicle, centity_t * cent,
 					actualstring = availableWeapons[availableVehicles[vehicle].weapons[i]].shortName2;
 				else
 					actualstring = availableWeapons[availableVehicles[vehicle].weapons[i]].shortName;
-				CG_MFQ3HUD_Numbers( x+12, y, 3, ps->ammo[i], qfalse, HUDColors[cg.MFDColor] );
+				CG_MFQ3HUD_Numbers( x+34, y, 3, ps->ammo[i], qfalse, HUDColors[cg.MFDColor], qtrue );
 				Com_sprintf( invline, 32, "%c    %s", (i == selweap ? '*' : ' '), actualstring );
 				CG_DrawString_MFQ3( x+4, y, invline, HUDColors[cg.MFDColor], 0);
 				y += 10;
@@ -840,7 +972,7 @@ static void CG_Draw_MFD(int mfdnum, int vehicle, centity_t * cent,
 		CG_HUD_Camera(mfdnum, vehicle);
 		if( targetrange >= 0 ) {
 			CG_DrawString_MFQ3( x+6, y+16, "RANGE:", HUDColors[cg.MFDColor], 0);
-			CG_MFQ3HUD_Numbers( x+48, y+16, 6, targetrange, qfalse, HUDColors[cg.MFDColor] );
+			CG_MFQ3HUD_Numbers( x+54, y+16, 6, targetrange, qfalse, HUDColors[cg.MFDColor], qfalse );
 			CG_DrawHUDPic( x+48, y+48, 32, 32, cgs.media.HUDreticles[HR_GUIDED_ENEMY], HUDColors[HUD_RED] );
 		} else {
 			CG_DrawHUDPic( x+48, y+48, 32, 32, cgs.media.HUDreticles[HR_GUIDED_ENEMY], HUDColors[HUD_GREEN] );
@@ -848,7 +980,7 @@ static void CG_Draw_MFD(int mfdnum, int vehicle, centity_t * cent,
 	} else if( mode == MFD_INFO ) {
 		int			value;
 		CG_DrawString_MFQ3( x+4, y+14, "FLIGHTDATA:", HUDColors[cg.MFDColor], 0);
-		CG_DrawString_MFQ3( x+4, y+20, "-----------", HUDColors[cg.MFDColor], 0);
+		CG_DrawString_MFQ3( x+4, y+20, "----------", HUDColors[cg.MFDColor], 0);
 		CG_DrawString_MFQ3( x+4, y+30, "HEADING:", HUDColors[cg.MFDColor], 0);
 		CG_DrawString_MFQ3( x+4, y+40, "TGT HDG:", HUDColors[cg.MFDColor], 0);
 		CG_DrawString_MFQ3( x+4, y+54, "SPEED:", HUDColors[cg.MFDColor], 0);
@@ -859,21 +991,21 @@ static void CG_Draw_MFD(int mfdnum, int vehicle, centity_t * cent,
 		CG_DrawString_MFQ3( x+4, y+112, "HEALTH:", HUDColors[cg.MFDColor], 0);
 		value = 360 - (int)ps->vehicleAngles[1];
 		if( value <= 0 ) value += 360;
-		CG_MFQ3HUD_Numbers( x+98, y+30, 3, value, qfalse, HUDColors[cg.MFDColor] );
+		CG_MFQ3HUD_Numbers( x+122, y+30, 3, value, qfalse, HUDColors[cg.MFDColor], qtrue );
 		if( targetheading >= 0 ) {
-			CG_MFQ3HUD_Numbers( x+98, y+40, 3, targetheading, qfalse, HUDColors[cg.MFDColor] );
+			CG_MFQ3HUD_Numbers( x+122, y+40, 3, targetheading, qfalse, HUDColors[cg.MFDColor], qtrue );
 		} else {
-			CG_DrawString_MFQ3( x+98, y+40, "---", HUDColors[cg.MFDColor], 0);
+			CG_DrawString_MFQ3_R( x+122, y+40, "---", HUDColors[cg.MFDColor], 0);
 		}
 		value = ps->speed/10;
-		CG_MFQ3HUD_Numbers( x+90, y+54, 4, value, qfalse, HUDColors[cg.MFDColor] );
-		CG_MFQ3HUD_Numbers( x+82, y+64, 5, altitude, qfalse, HUDColors[cg.MFDColor] );
-		CG_MFQ3HUD_Numbers( x+74, y+78, 6, (int)ps->origin[0], qfalse, HUDColors[cg.MFDColor] );
-		CG_MFQ3HUD_Numbers( x+74, y+88, 6, (int)ps->origin[1], qfalse, HUDColors[cg.MFDColor] );
+		CG_MFQ3HUD_Numbers( x+122, y+54, 4, value, qfalse, HUDColors[cg.MFDColor], qtrue );
+		CG_MFQ3HUD_Numbers( x+122, y+64, 5, altitude, qfalse, HUDColors[cg.MFDColor], qtrue );
+		CG_MFQ3HUD_Numbers( x+122, y+78, 6, (int)ps->origin[0], qfalse, HUDColors[cg.MFDColor], qtrue );
+		CG_MFQ3HUD_Numbers( x+122, y+88, 6, (int)ps->origin[1], qfalse, HUDColors[cg.MFDColor], qtrue );
 		value = (100*ps->stats[STAT_HEALTH]/ps->stats[STAT_MAX_HEALTH]);
 		if( value > 100 ) value = 100;	
-		CG_MFQ3HUD_Numbers( x+98, y+102, 3, value, qfalse, HUDColors[cg.MFDColor] );
-		CG_MFQ3HUD_Numbers( x+98, y+112, 3, ps->throttle*10, qfalse, HUDColors[cg.MFDColor] );
+		CG_MFQ3HUD_Numbers( x+122, y+102, 3, ps->throttle*10, qfalse, HUDColors[cg.MFDColor], qtrue );
+		CG_MFQ3HUD_Numbers( x+122, y+112, 3, value, qfalse, HUDColors[cg.MFDColor], qtrue );
 	}
 }
 
@@ -908,7 +1040,7 @@ static void CG_Draw_AltTape( int value ) {
 	CG_AdjustFrom640( &x, &y, &width, &height );
 	trap_R_DrawStretchPic( x, y, width, height, 0, 0.125f+offset, 1, 0.625f+offset, cgs.media.HUDalt );
 	trap_R_SetColor( NULL );
-		// speed indicater
+		// alt indicater
 	x = 578;
 	y = 171;
 	width = height = 8;
@@ -920,7 +1052,7 @@ static void CG_Draw_AltTape( int value ) {
 	height = 16;
 	CG_DrawHUDPic( x, y, width, height, cgs.media.HUDvaluebox, HUDColors[cg.HUDColor] );
 		// draw alt
-	CG_MFQ3HUD_Numbers( 586, 32, 4, value, qfalse, HUDColors[cg.HUDColor] );
+	CG_MFQ3HUD_Numbers( 616, 32, 4, value, qfalse, HUDColors[cg.HUDColor], qtrue );
 		// find visible alt numbers
 	visible3 = (int)((value+(scale/2))/scale);
 	visible3 *= scale;
@@ -939,20 +1071,20 @@ static void CG_Draw_AltTape( int value ) {
 		top = bottom = qfalse;
 	}
 		// draw visible alt numbers
-	CG_MFQ3HUD_DecNumbers( 588, 171+(value2*64/scale), 4, 1, visible3/100, HUDColors[cg.HUDColor] );
+	CG_MFQ3HUD_DecNumbers( 610, 171+(value2*64/scale), 4, 1, visible3/100, HUDColors[cg.HUDColor] );
 	if( visible2 >= 0 ) {
 		value2 = value - visible2;
-		CG_MFQ3HUD_DecNumbers( 588, 171+(value2*64/scale), 4, 1, visible2/100, HUDColors[cg.HUDColor] );
+		CG_MFQ3HUD_DecNumbers( 610, 171+(value2*64/scale), 4, 1, visible2/100, HUDColors[cg.HUDColor] );
 		if( bottom && visible1 >= 0 ) {
 			value2 = value - visible1;
-			CG_MFQ3HUD_DecNumbers( 588, 171+(value2*64/scale), 4, 1, visible1/100, HUDColors[cg.HUDColor] );
+			CG_MFQ3HUD_DecNumbers( 610, 171+(value2*64/scale), 4, 1, visible1/100, HUDColors[cg.HUDColor] );
 		}
 	}
 	value2 = value - visible4;
-	CG_MFQ3HUD_DecNumbers( 588, 171+(value2*64/scale), 4, 1, visible4/100, HUDColors[cg.HUDColor] );
+	CG_MFQ3HUD_DecNumbers( 610, 171+(value2*64/scale), 4, 1, visible4/100, HUDColors[cg.HUDColor] );
 	if( top ) {
 		value2 = value - visible5;
-		CG_MFQ3HUD_DecNumbers( 588, 171+(value2*64/scale), 4, 1, visible5/100, HUDColors[cg.HUDColor] );
+		CG_MFQ3HUD_DecNumbers( 610, 171+(value2*64/scale), 4, 1, visible5/100, HUDColors[cg.HUDColor] );
 	}
 }
 
@@ -995,7 +1127,7 @@ static void CG_Draw_SpeedTape( int value, int stallspeed, int gearspeed, int sca
 	height = 16;
 	CG_DrawHUDPic( x, y, width, height, cgs.media.HUDvaluebox, HUDColors[cg.HUDColor] );
 		// draw speed
-	CG_MFQ3HUD_Numbers( 24, 32, 4, value, qfalse, HUDColors[cg.HUDColor] );
+	CG_MFQ3HUD_Numbers( 54, 32, 4, value, qfalse, HUDColors[cg.HUDColor], qtrue );
 		// find visible speed numbers
 	visible3 = (int)((value+(scale/2))/scale);
 	visible3 *= scale;
@@ -1014,20 +1146,20 @@ static void CG_Draw_SpeedTape( int value, int stallspeed, int gearspeed, int sca
 		top = bottom = qfalse;
 	}
 		// draw visible speed numbers
-	CG_MFQ3HUD_Numbers( 12, 171+(value2*64/scale), 4, visible3, qfalse, HUDColors[cg.HUDColor] );
+	CG_MFQ3HUD_Numbers( 42, 171+(value2*64/scale), 4, visible3, qfalse, HUDColors[cg.HUDColor], qtrue );
 	if( visible2 >= 0 ) {
 		value2 = value - visible2;
-		CG_MFQ3HUD_Numbers( 12, 171+(value2*64/scale), 4, visible2, qfalse, HUDColors[cg.HUDColor] );
+		CG_MFQ3HUD_Numbers( 42, 171+(value2*64/scale), 4, visible2, qfalse, HUDColors[cg.HUDColor], qtrue );
 		if( bottom && visible1 >= 0 ) {
 			value2 = value - visible1;
-			CG_MFQ3HUD_Numbers( 12, 171+(value2*64/scale), 4, visible1, qfalse, HUDColors[cg.HUDColor] );
+			CG_MFQ3HUD_Numbers( 42, 171+(value2*64/scale), 4, visible1, qfalse, HUDColors[cg.HUDColor], qtrue );
 		}
 	}
 	value2 = value - visible4;
-	CG_MFQ3HUD_Numbers( 12, 171+(value2*64/scale), 4, visible4, qfalse, HUDColors[cg.HUDColor] );
+	CG_MFQ3HUD_Numbers( 42, 171+(value2*64/scale), 4, visible4, qfalse, HUDColors[cg.HUDColor], qtrue );
 	if( top ) {
 		value2 = value - visible5;
-		CG_MFQ3HUD_Numbers( 12, 171+(value2*64/scale), 4, visible5, qfalse, HUDColors[cg.HUDColor] );
+		CG_MFQ3HUD_Numbers( 42, 171+(value2*64/scale), 4, visible5, qfalse, HUDColors[cg.HUDColor], qtrue );
 	}
 		// gearspeed
 	if( gearspeed > 0 ) {
@@ -1087,7 +1219,7 @@ static void CG_Draw_HeadingTape( int value, int targetheading ) {
 	height = 16;
 	CG_DrawHUDPic( x, y, width, height, cgs.media.HUDvaluebox, HUDColors[cg.HUDColor] );
 		// draw heading
-	CG_MFQ3HUD_Numbers( 307, 32, 3, value, qfalse, HUDColors[cg.HUDColor] );
+	CG_MFQ3HUD_Numbers( 330, 32, 3, value, qfalse, HUDColors[cg.HUDColor], qtrue );
 		// find visible heading numbers
 	visible2 = ((int)((value+15)/10));
 	if( (visible2%3) ) {
@@ -1114,16 +1246,16 @@ static void CG_Draw_HeadingTape( int value, int targetheading ) {
 		right = left = qtrue;
 	}
 		// draw visible heading numbers
-	CG_MFQ3HUD_Numbers( 307-(value2*64/10), 6, 3, visible2, qfalse, HUDColors[cg.HUDColor] );
+	CG_MFQ3HUD_Numbers( 330-(value2*64/10), 6, 3, visible2, qfalse, HUDColors[cg.HUDColor], qtrue );
 	if( left ) {
 		value2 = value - visible1;
 		if( value2 < 0 ) value2 += 360;
-		CG_MFQ3HUD_Numbers( 307-(value2*64/10), 6, 3, visible1, qfalse, HUDColors[cg.HUDColor] );
+		CG_MFQ3HUD_Numbers( 330-(value2*64/10), 6, 3, visible1, qfalse, HUDColors[cg.HUDColor], qtrue );
 	}
 	if( right ) {
 		value2 = value - visible3;
 		if( value2 > 0 ) value2 -= 360;
-		CG_MFQ3HUD_Numbers( 307-(value2*64/10), 6, 3, visible3, qfalse, HUDColors[cg.HUDColor] );
+		CG_MFQ3HUD_Numbers( 330-(value2*64/10), 6, 3, visible3, qfalse, HUDColors[cg.HUDColor], qtrue );
 	}
 
 		// heading indicater

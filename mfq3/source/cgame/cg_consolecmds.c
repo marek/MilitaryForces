@@ -1,5 +1,5 @@
 /*
- * $Id: cg_consolecmds.c,v 1.9 2002-01-29 13:03:36 thebjoern Exp $
+ * $Id: cg_consolecmds.c,v 1.10 2002-01-31 02:34:33 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -58,6 +58,11 @@ umm ugly :-)
 static void CG_Set_MFD_Mode( int num ) {
 	cg.Mode_MFD[num]++;
 	if( cg.Mode_MFD[num] >= MFD_MAX ) cg.Mode_MFD[num] = MFD_OFF;
+
+	if( num == MFD_1 )
+		trap_Cvar_Set( "mfd1_defaultpage", va("%d", cg.Mode_MFD[num]) );
+	else if( num == MFD_2 )
+		trap_Cvar_Set( "mfd2_defaultpage", va("%d", cg.Mode_MFD[num]) );
 }
 
 static void CG_Set_MFD1_Mode_f( void ) {
@@ -92,6 +97,12 @@ static void CG_Set_MFD_Page( int num ) {
 	else if( page >= MFD_MAX ) page = MFD_MAX - 1;
 
 	cg.Mode_MFD[num] = page;
+
+	if( num == MFD_1 )
+		trap_Cvar_Set( "mfd1_defaultpage", va("%d", page) );
+	else if( num == MFD_2 )
+		trap_Cvar_Set( "mfd2_defaultpage", va("%d", page) );
+
 }
 
 static void CG_Set_MFD1_Page_f( void ) {
