@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.25 2002-01-25 13:26:52 thebjoern Exp $
+ * $Id: bg_public.h,v 1.26 2002-01-26 03:02:38 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.52b"
+#define	GAME_VERSION		"mfq3 v0.53a"
 
 #define	DEFAULT_GRAVITY		800
 #define	GIB_HEALTH			-50
@@ -643,6 +643,7 @@ typedef struct completeWeaponData_s
 	weaponType_t	type;				// behaviour
 	unsigned int	gameset;			// in which epoche can it appear
 	char			*descriptiveName;	// displayed in-game
+	char			*shortName;			// displayed in-game, short form
 	char			*modelName;			// model
 	char			*iconName;			// icon for HUD
 	qhandle_t		iconHandle;			// handle for icon

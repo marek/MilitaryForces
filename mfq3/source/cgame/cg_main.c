@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.13 2002-01-25 14:25:12 sparky909_uk Exp $
+ * $Id: cg_main.c,v 1.14 2002-01-26 03:02:38 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -160,6 +160,9 @@ vmCvar_t	hud_mfd2;
 vmCvar_t	hud_center;
 vmCvar_t	hud_health;
 vmCvar_t	hud_throttle;
+vmCvar_t	hud_weapons;
+
+vmCvar_t	hud_color;
 
 
 typedef struct {
@@ -254,6 +257,9 @@ cvarTable_t		cvarTable[] = {
 	{ &hud_center, "hud_center", "1", CVAR_ARCHIVE },
 	{ &hud_health, "hud_health", "1", CVAR_ARCHIVE },
 	{ &hud_throttle, "hud_throttle", "1", CVAR_ARCHIVE },
+	{ &hud_weapons, "hud_weapons", "1", CVAR_ARCHIVE },
+
+	{ &hud_color, "hud_color", "0", CVAR_ARCHIVE },
 
 	{ &pmove_fixed, "pmove_fixed", "1", CVAR_ROM},
 	{ &pmove_msec, "pmove_msec", "8", 0},
@@ -265,6 +271,23 @@ cvarTable_t		cvarTable[] = {
 };
 
 int		cvarTableSize = sizeof( cvarTable ) / sizeof( cvarTable[0] );
+
+vec4_t HUDColors[HUD_MAX] = {
+							{0.00f, 1.00f, 0.00f, 1.00f},	// HUD_GREEN
+							{0.00f, 0.80f, 0.00f, 1.00f},	// HUD_DARK_GREEN
+							{1.00f, 1.00f, 1.00f, 1.00f},	// HUD_WHITE
+							{0.70f, 0.70f, 0.70f, 1.00f},	// HUD_GREY
+							{1.00f, 0.00f, 0.00f, 1.00f},	// HUD_RED
+							{0.80f, 0.00f, 0.00f, 1.00f},	// HUD_DARK_RED
+							{0.00f, 0.00f, 1.00f, 1.00f},	// HUD_BLUE
+							{0.00f, 0.00f, 0.80f, 1.00f},	// HUD_DARK_BLUE
+							{0.00f, 0.00f, 0.00f, 1.00f},	// HUD_BLACK
+							{1.00f, 1.00f, 0.00f, 1.00f},	// HUD_YELLOW
+							{1.00f, 0.00f, 1.00f, 1.00f},	// HUD_MAGENTA
+							{0.00f, 1.00f, 1.00f, 1.00f},	// HUD_CYAN
+							{1.00f, 0.70f, 0.00f, 1.00f},	// HUD_ORANGE
+							};
+
 
 /*
 =================
@@ -1804,6 +1827,13 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	}
 	if( cg_nextVehicle.integer != -1 ) {
 		trap_Cvar_Set( "cg_nextVehicle", "-1" );
+	}
+
+	// MFQ3: HUD color
+	cg.HUDColor = hud_color.integer;
+	if( cg.HUDColor >= HUD_MAX || cg.HUDColor < 0 ) {
+		cg.HUDColor = 0;
+		trap_Cvar_Set( "hud_color", va("%d", cg.HUDColor) );
 	}
 
 	CG_ParseServerinfo();

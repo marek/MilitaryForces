@@ -1,5 +1,5 @@
 /*
- * $Id: cg_consolecmds.c,v 1.6 2002-01-25 14:25:12 sparky909_uk Exp $
+ * $Id: cg_consolecmds.c,v 1.7 2002-01-26 03:02:38 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -78,6 +78,20 @@ static void CG_Set_MFD2_Mode_f( void ) {
 	cg.MFDTime = cg.time + 100;
 }
 
+
+static void CG_Cycle_HUD_Color_f( void ) {
+	if( cg.time < cg.HUDColorTime ) {
+		return;
+	}
+	cg.HUDColor = hud_color.integer;
+	cg.HUDColor++;
+	if( cg.HUDColor >= HUD_MAX || cg.HUDColor < 0 ) {
+		cg.HUDColor = 0;
+	}
+	trap_Cvar_Set( "hud_color", va("%d", cg.HUDColor) );
+
+	cg.HUDColorTime = cg.time + 100;
+}
 /*
 ==================
 MFQ3 INFO
@@ -302,7 +316,8 @@ static consoleCommand_t	commands[] = {
 	{ "-cameradown", CG_AdjustReset_f },
 	{ "radarrange", CG_ToggleRadarRange_f },
 	{ "mfd1_mode", CG_Set_MFD1_Mode_f },
-	{ "mfd2_mode", CG_Set_MFD2_Mode_f }
+	{ "mfd2_mode", CG_Set_MFD2_Mode_f },
+	{ "cycle_hud_color", CG_Cycle_HUD_Color_f },
 };
 
 
