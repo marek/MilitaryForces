@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.55 2002-02-13 10:58:38 thebjoern Exp $
+ * $Id: bg_public.h,v 1.56 2002-02-14 11:51:40 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -704,7 +704,6 @@ typedef struct completeWeaponData_s
 	unsigned int	crosshair;			// which crosshair to use when this weapon is selected
 	unsigned int	crosshairtrack;		// which crosshair to use when this weapon is tracking
 	unsigned int	crosshairlock;		// which crosshair to use when this weapon is locked
-	unsigned int	crosshairlockfriend;// which crosshair to use when this weapon is locked on friend
 }completeWeaponData_t;
 
 // list of weapons...
@@ -799,13 +798,16 @@ int MF_ExtractEnumFromId( int vehicle, unsigned int op );
 #define MAX_PILOTS				2
 
 // crosshairs
-#define CH_GUNMODE				0
-#define CH_BOMBMODE				1
-#define CH_ROCKETMODE			2
-#define CH_MISSILEMODE			3
-#define CH_MISSILEMODELOCK		4
-#define CH_DEFAULT				5
-#define CH_NUMCROSSHAIRS		6
+typedef enum {
+	CH_DEFAULT,
+	CH_GUNMODE,
+	CH_BOMBMODE,
+	CH_ROCKETMODE,
+	CH_MISSILEMODE,
+	CH_MISSILEMODETRACK,
+	CH_MISSILEMODELOCK,
+	CH_NUMCROSSHAIRS
+} CrossHairs_t;
 
 // lock flags
 #define LI_NOLOCK				0
