@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.12 2002-02-16 10:16:32 thebjoern Exp $
+ * $Id: ui_main.c,v 1.13 2002-02-18 16:25:48 sparky909_uk Exp $
 */
 /*
 =======================================================================
@@ -127,6 +127,8 @@ static int UI_GetIndexFromSelection(int actual);
 
 int ProcessNewUI( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6 );
 
+void UI_CustomChatInit( void );
+
 /*
 ================
 vmMain
@@ -240,112 +242,6 @@ void _UI_DrawTopBottom(float x, float y, float w, float h, float size) {
 	size *= uiInfo.uiDC.yscale;
 	trap_R_DrawStretchPic( x, y, w, size, 0, 0, 0, 0, uiInfo.uiDC.whiteShader );
 	trap_R_DrawStretchPic( x, y + h - size, w, size, 0, 0, 0, 0, uiInfo.uiDC.whiteShader );
-}
-
-/*
-=====================
-UI_CustomChatDraw
-
-Draw the custom chat console (if active)
-=====================
-*/
-
-#define	CHAT_X			4
-#define	CHAT_Y			(480-CHAT_HEIGHT-4)
-#define CHAT_WIDTH		(640-8)
-#define CHAT_HEIGHT		16
-
-#define	CHAT_OX			4
-#define	CHAT_OY			4
-#define CHAT_TEXT_SCALE	0.25f
-
-#define	CURSOR_OX		2
-#define	CURSOR_OY		2
-#define	CURSOR_W		8
-#define	CURSOR_H		12
-
-#pragma message ("UI_CustomChatDraw() try to force the UI to draw even when it's not 'active' (so we can fade out)")
-
-void UI_CustomChatDraw( void )
-{
-	int spacer1 = 0, spacer2 = 0;
-	char * pMode = NULL;
-	int x = CHAT_X, y = CHAT_Y;
-	float alpha = 1.0f; 
-
-	// fading out?
-	if( !uiInfo.customChat.active )
-	{
-/*
-		// reduce life based upon time
- 		uiInfo.customChat.lifeAlpha -= (1.0f * FRAME_SECOND_FRACTION );
-		MF_LimitFloat( &uiInfo.customChat.lifeAlpha, 0.0f, 1.0f );
-
-		// out of life
-		if( uiInfo.customChat.lifeAlpha <= 0.1f )
-		{
-*/
-			// zap to 0
-			uiInfo.customChat.lifeAlpha = 0.0f;
-			return;
-//		}
-	}
-
-	// choose prefix
-	switch( uiInfo.customChat.mode )
-	{
-	case CCHAT_ALL:
-		pMode = "Chat: ";
-		break;
-	case CCHAT_TEAM:
-		pMode = "Team Chat: ";
-		break;
-	case CCHAT_TARGET:
-		pMode = "Target Chat: ";
-		break;
-	case CCHAT_ATTACK:
-		pMode = "Attacker Chat: ";
-		break;
-	}
-
-	alpha = uiInfo.customChat.lifeAlpha;
-
-	// draw the chat background
-	DC->fillRect( x, y, CHAT_WIDTH, CHAT_HEIGHT, *CreateColourVector( 0,0.4f,0,0.75f * alpha,NULL ) );
-	DC->drawRect( x, y, CHAT_WIDTH, CHAT_HEIGHT, 1, *CreateColourVector( 0,0,0,0.75f * alpha,NULL ) );
-
-	spacer1 = DC->textWidth( pMode, CHAT_TEXT_SCALE, 0 );
-
-	// draw the current text line
-	DrawStringNew( x+CHAT_OX, y+CHAT_OY, CHAT_TEXT_SCALE, *CreateColourVector(1,1,0,1 * alpha,NULL), pMode, 0, 0, ITEM_TEXTSTYLE_SHADOWED, LEFT_JUSTIFY );
-	DrawStringNew( x+CHAT_OX+spacer1, y+CHAT_OY, CHAT_TEXT_SCALE, *CreateColourVector(1,1,1,1 * alpha,NULL), uiInfo.customChat.text, 0, 0, ITEM_TEXTSTYLE_SHADOWED, LEFT_JUSTIFY );
-
-	spacer2 = DC->textWidth( uiInfo.customChat.text, CHAT_TEXT_SCALE, 0 );
-
-	// fade the cursor
-	if( uiInfo.customChat.cursorDir )
-	{
-		// down
-		uiInfo.customChat.cursorAlpha -= (2.0f * FRAME_SECOND_FRACTION );
-		if( uiInfo.customChat.cursorAlpha <= 0.0f )
-		{
-			uiInfo.customChat.cursorAlpha = 0.0f;
-			uiInfo.customChat.cursorDir = qfalse;
-		}
-	}
-	else
-	{
-		// down
-		uiInfo.customChat.cursorAlpha += (2.0f * FRAME_SECOND_FRACTION );
-		if( uiInfo.customChat.cursorAlpha >= 1.0f )
-		{
-			uiInfo.customChat.cursorAlpha = 1.0f;
-			uiInfo.customChat.cursorDir = qtrue;
-		}
-	}
-
-	// draw the cursor
-	DC->fillRect( x+spacer1+spacer2+CURSOR_OX+4, y+CURSOR_OY, CURSOR_W, CURSOR_H, *CreateColourVector( 1,1,1,uiInfo.customChat.cursorAlpha * alpha,NULL ) );
 }
 
 /*
@@ -808,9 +704,6 @@ void _UI_Refresh( int realtime )
 
 	// render the mouse cursor
 	UI_DrawMouse();
-
-	// render the chat console
-	UI_CustomChatDraw();
 }
 
 /*
@@ -3349,8 +3242,6 @@ UI_InitialiseUI
 */
 static void UI_InitialiseUI( void )
 {
-	// set the MFQ3 version string
-	trap_Cvar_Set( "ui_mfq3Version", GAME_VERSION );
 }
 
 /*
@@ -3358,6 +3249,9 @@ static void UI_InitialiseUI( void )
 UI_RefreshVehicleSelect
 ===============
 */
+
+#pragma message( "UI_RefreshVehicleSelect() should possibly not be setting values directly using trap_x everytime" )
+
 static void UI_RefreshVehicleSelect( void )
 {
 	int vehicleCat = -1;
@@ -3389,8 +3283,7 @@ tryCatAgain:
 	// is this catagory valid for the current gameset+team+catagory?
 
 	// check
-//	vehicle = MF_getIndexOfVehicleEx( (vehicle-1), vehicleCat, -1, team, gameset );
-	vehicle = MF_getIndexOfVehicle( (vehicle-1), gameset, team, vehicleCat, -1 );
+	vehicle = MF_getIndexOfVehicleEx( (vehicle-1), team, gameset, vehicleCat, -1 );
 	
 	if( pCat && vehicle >= 0 )
 	{
@@ -3421,8 +3314,7 @@ tryClassAgain:
 	pClass = class_items[ vehicleCat ][ vehicleClass ];
 
 	// check
-//	vehicle = MF_getIndexOfVehicleEx( (vehicle-1), vehicleCat, vehicleClass, team, gameset );
-	vehicle = MF_getIndexOfVehicle( (vehicle-1), gameset, team, vehicleCat, vehicleClass );
+	vehicle = MF_getIndexOfVehicleEx( (vehicle-1), gameset, team, vehicleCat, vehicleClass );
 	
 	if( pClass && vehicle >= 0 )
 	{
@@ -3447,8 +3339,7 @@ tryClassAgain:
 	// is the vehicle valid for the current gameset+team+catagory+class?
 
 	// check
-//	vehicle = MF_getIndexOfVehicleEx( (vehicle-1), vehicleCat, vehicleClass, team, gameset );
-	vehicle = MF_getIndexOfVehicle( (vehicle-1), gameset, team, vehicleCat, vehicleClass );
+	vehicle = MF_getIndexOfVehicleEx( (vehicle-1), gameset, team, vehicleCat, vehicleClass );
 	
 	// -1 means this is not a suitable combination
 	if( vehicle == -1 )
@@ -5508,6 +5399,18 @@ MFQ3 CUSTOM CONSOLE
 
 /*
 =================
+UI_CustomChatInit
+=================
+*/
+
+void UI_CustomChatInit( void )
+{
+	// send the address of the custom chat data block to the Client
+	trap_Cmd_ExecuteText( EXEC_APPEND, va( "custom_chat_ptr %d", &uiInfo.customChat ) );
+}
+
+/*
+=================
 UI_CustomChatEnd
 =================
 */
@@ -5517,7 +5420,7 @@ void UI_CustomChatEnd( qboolean sendText )
 	// send the text?
 	if( sendText )
 	{
-		trap_Cmd_ExecuteText( EXEC_NOW, va( "say %s", uiInfo.customChat.text ) );
+		trap_Cmd_ExecuteText( EXEC_APPEND, va( "say %s", uiInfo.customChat.text ) );
 	}
 
 	// disable chat
@@ -5755,6 +5658,12 @@ void _UI_Init( qboolean inGameLoad ) {
 	trap_Cvar_Register(NULL, "debug_protocol", "", 0 );
 
 	trap_Cvar_Set("ui_actualNetGameType", va("%d", ui_netGameType.integer));
+
+	// set the MFQ3 version string
+	trap_Cvar_Set( "ui_mfq3Version", GAME_VERSION );
+
+	// setup the custom chat interface
+	UI_CustomChatInit();
 }
 
 

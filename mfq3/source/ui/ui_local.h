@@ -1,5 +1,5 @@
 /*
- * $Id: ui_local.h,v 1.4 2002-02-15 17:43:57 sparky909_uk Exp $
+ * $Id: ui_local.h,v 1.5 2002-02-18 16:25:48 sparky909_uk Exp $
 */
 //
 #ifndef __UI_LOCAL_H__
@@ -732,28 +732,6 @@ typedef struct {
 	const char *modName;
 	const char *modDescr;
 } modInfo_t;
-
-
-// custom chat system
-typedef enum {
-	CCHAT_ALL,
-	CCHAT_TEAM,
-	CCHAT_TARGET,
-	CCHAT_ATTACK,
-	MAX_CCHAT
-} CustomChatMode;
-
-#define	MAX_CHAT_LEN 1024
-
-typedef struct {
-	qboolean active;			// active?
-	CustomChatMode mode;		// e.g. global chat, team chat, ...
-	char text[ MAX_CHAT_LEN ];	// TODO: possibly make this dynamic to save memory
-	int cindex;					// character index we are currently on
-	float lifeAlpha;			// gfx
-	float cursorAlpha;			// gfx
-	qboolean cursorDir;			// gfx
-} chat_t;
 
 typedef struct {
 	displayContextDef_t uiDC;

@@ -1,5 +1,5 @@
 /*
- * $Id: ui_shared.h,v 1.7 2002-02-15 17:43:57 sparky909_uk Exp $
+ * $Id: ui_shared.h,v 1.8 2002-02-18 16:25:48 sparky909_uk Exp $
 */
 #ifndef __UI_SHARED_H
 #define __UI_SHARED_H
@@ -10,6 +10,27 @@
 #include "keycodes.h"
 
 #include "menudef.h"
+
+// custom chat system
+typedef enum {
+	CCHAT_ALL,
+	CCHAT_TEAM,
+	CCHAT_TARGET,
+	CCHAT_ATTACK,
+	MAX_CCHAT
+} CustomChatMode;
+
+#define	MAX_CHAT_LEN 1024
+
+typedef struct {
+	qboolean active;			// active?
+	CustomChatMode mode;		// e.g. global chat, team chat, ...
+	char text[ MAX_CHAT_LEN ];	// TODO: possibly make this dynamic to save memory
+	int cindex;					// character index we are currently on
+	float lifeAlpha;			// gfx
+	float cursorAlpha;			// gfx
+	qboolean cursorDir;			// gfx
+} chat_t;
 
 // cursor gfx
 enum CursorEnum 
@@ -25,8 +46,9 @@ typedef enum {
 	RIGHT_JUSTIFY
 } textJustify_t;
 
-// simple timing macro
-#define FRAME_SECOND_FRACTION (uiInfo.uiDC.frameTime/1000.0f)
+// simple timing macros
+#define CG_FRAME_SECOND_FRACTION (cg.frametime/1000.0f)
+#define UI_FRAME_SECOND_FRACTION (uiInfo.uiDC.frameTime/1000.0f)
 
 // bindable actions
 #define ID_SHOWSCORES	0
