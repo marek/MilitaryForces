@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.98 2002-07-15 18:23:07 thebjoern Exp $
+ * $Id: bg_public.h,v 1.99 2003-01-11 13:08:50 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.74"
+#define	GAME_VERSION		"mfq3 v0.74a"
 #define	GAME_IDENTIFIER		"mfq3"			// use to identify mfq3 servers
 
 #define	DEFAULT_GRAVITY		800
@@ -717,6 +717,7 @@ enum ShadowOrientationAdjusts {
 #define PF_GUNPOD			0x1000	// gunpod
 #define PF_FLAREPOD			0x2000	// extra flares
 #define PF_DONT_DROP		0x4000	// dont drop on launch (wingtip)
+#define PF_HARM				0x8000	// harm
 
 #define PF_DONT_REMOVE		0x3F00
 
@@ -908,28 +909,33 @@ typedef enum
 	WI_MGT_12_7MM,
 	WI_FFAR,
 	WI_FFAR_SMALL,
+	WI_FFAR_LARGE,
 	WI_100MM_GUN,
 	WI_125MM_GUN,
 	WI_MK82,
+	WI_MK82R,
 	WI_MK83,
+	WI_MK83R,			// 20
 	WI_MK84,
-	WI_GBU15,
-	WI_DURANDAL,		// 20
+	WI_GBU15,			
+	WI_DURANDAL,		
 	WI_SIDEWINDER,
 	WI_AMRAAM,
 	WI_SPARROW,
 	WI_PHOENIX,
 	WI_STINGER,
-	WI_ATOLL,
-	WI_ARCHER,
+	WI_ATOLL,			
+	WI_ARCHER,			// 30
 	WI_ALAMO,
-	WI_HELLFIRE,		// 30
+	WI_HELLFIRE,	
 	WI_MAVERICK,
 	WI_HARM,
 	WI_ECM,
+	WI_LASE,
+	WI_CM,				//This is like WI_FLARE, but will show up on a pylon instead of just being a value concerning the internal flare count
 	WI_DROPTANK,
 	WI_DROPTANK_SMALL,
-	WI_FLARE,			// 36
+	WI_FLARE,			// 40
 	WI_MAX
 }weaponIndex_t;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_plane.c,v 1.31 2002-07-14 17:13:19 thebjoern Exp $
+ * $Id: cg_plane.c,v 1.32 2003-01-11 13:08:50 thebjoern Exp $
 */
 
 
@@ -233,7 +233,7 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 			vectoangles( forward, ang );
 			AnglesToAxis( ang, reticle.axis );
 			VectorMA( cent->lerpOrigin, 2000, forward, end );
-			CG_Trace( &tr, cent->lerpOrigin, 0, 0, end, cg.snap->ps.clientNum, MASK_ALL ); 
+			CG_Trace( &tr, cent->lerpOrigin, 0, 0, end, cg.snap->ps.clientNum, MASK_SOLID ); 
 			if ( tr.entityNum < MAX_CLIENTS )
 			{
 				cg.crosshairClientNum = tr.entityNum;
@@ -280,7 +280,7 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 				reticlelock.nonNormalizedAxes = qtrue;
 				AngleVectors(cent->currentState.angles, forward, 0, 0);
 				VectorMA( cent->lerpOrigin, 2000, forward, end );
-				CG_Trace( &tr, cent->lerpOrigin, 0, 0, end, cg.snap->ps.clientNum, MASK_ALL ); 
+				CG_Trace( &tr, cent->lerpOrigin, 0, 0, end, cg.snap->ps.clientNum, MASK_SOLID ); 
 				VectorCopy( tr.endpos, end );
 				CG_Trace( &tr, cg.refdef.vieworg, 0, 0, end, cg.snap->ps.clientNum, MASK_SOLID ); 
 				VectorSubtract( tr.endpos, cg.refdef.vieworg, forward );
@@ -309,7 +309,7 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 			reticle.nonNormalizedAxes = qtrue;
 			AngleVectors(cent->currentState.angles, forward, 0, 0);
 			VectorMA( cent->lerpOrigin, 2000, forward, end );
-			CG_Trace( &tr, cent->lerpOrigin, 0, 0, end, cg.snap->ps.clientNum, MASK_ALL ); 
+			CG_Trace( &tr, cent->lerpOrigin, 0, 0, end, cg.snap->ps.clientNum, MASK_SOLID ); 
 			if ( tr.entityNum < MAX_CLIENTS ) {
 				cg.crosshairClientNum = tr.entityNum;
 				cg.crosshairClientTime = cg.time;
