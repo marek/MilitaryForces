@@ -1,5 +1,5 @@
 /*
- * $Id: bg_weapondata.c,v 1.9 2002-01-26 23:48:32 thebjoern Exp $
+ * $Id: bg_weapondata.c,v 1.10 2002-02-14 11:51:40 sparky909_uk Exp $
 */
 
 #include "q_shared.h"
@@ -36,7 +36,6 @@ completeWeaponData_t availableWeapons[] =
 		0,									// crosshair
 		0,									// crosshair track
 		0,									// crosshair lock
-		0									// crosshair lock friend
 	},
 
 	// machinegun: WW1, cal .303, 2 barrels
@@ -66,7 +65,6 @@ completeWeaponData_t availableWeapons[] =
 		CH_GUNMODE,							// crosshair
 		CH_GUNMODE,							// crosshair track
 		CH_GUNMODE,							// crosshair lock
-		CH_GUNMODE							// crosshair lock friend
 	},
 
 	// machinegun: WW1, cal .312, 2 barrels
@@ -96,7 +94,6 @@ completeWeaponData_t availableWeapons[] =
 		CH_GUNMODE,							// crosshair
 		CH_GUNMODE,							// crosshair track
 		CH_GUNMODE,							// crosshair lock
-		CH_GUNMODE							// crosshair lock friend
 	},
 
 	// machinegun: WW2, cal 50, 8 barrels
@@ -126,7 +123,6 @@ completeWeaponData_t availableWeapons[] =
 		CH_GUNMODE,							// crosshair
 		CH_GUNMODE,							// crosshair track
 		CH_GUNMODE,							// crosshair lock
-		CH_GUNMODE							// crosshair lock friend
 	},
 
 	// machinegun: WW2, cal 50, 6 barrels
@@ -156,7 +152,6 @@ completeWeaponData_t availableWeapons[] =
 		CH_GUNMODE,							// crosshair
 		CH_GUNMODE,							// crosshair track
 		CH_GUNMODE,							// crosshair lock
-		CH_GUNMODE							// crosshair lock friend
 	},
 
 	// machinegun: any set, 12.7mm, 1 barrel
@@ -186,7 +181,6 @@ completeWeaponData_t availableWeapons[] =
 		CH_GUNMODE,							// crosshair
 		CH_GUNMODE,							// crosshair track
 		CH_GUNMODE,							// crosshair lock
-		CH_GUNMODE							// crosshair lock friend
 	},
 
 	// machinegun: any set, 14.5mm, 1 barrel
@@ -216,7 +210,6 @@ completeWeaponData_t availableWeapons[] =
 		CH_GUNMODE,							// crosshair
 		CH_GUNMODE,							// crosshair track
 		CH_GUNMODE,							// crosshair lock
-		CH_GUNMODE							// crosshair lock friend
 	},
 
 	// machinegun: modern, 20mm, 1 barrel
@@ -246,7 +239,6 @@ completeWeaponData_t availableWeapons[] =
 		CH_GUNMODE,							// crosshair
 		CH_GUNMODE,							// crosshair track
 		CH_GUNMODE,							// crosshair lock
-		CH_GUNMODE							// crosshair lock friend
 	},
 
 	// machinegun: modern, 20mm, 2 barrel
@@ -276,7 +268,6 @@ completeWeaponData_t availableWeapons[] =
 		CH_GUNMODE,							// crosshair
 		CH_GUNMODE,							// crosshair track
 		CH_GUNMODE,							// crosshair lock
-		CH_GUNMODE							// crosshair lock friend
 	},
 
 	// FFAR
@@ -306,7 +297,6 @@ completeWeaponData_t availableWeapons[] =
 		CH_ROCKETMODE,						// crosshair
 		CH_ROCKETMODE,						// crosshair track
 		CH_ROCKETMODE,						// crosshair lock
-		CH_ROCKETMODE						// crosshair lock friend
 	},
 
 	// tank gun
@@ -336,7 +326,6 @@ completeWeaponData_t availableWeapons[] =
 		CH_ROCKETMODE,						// crosshair
 		CH_ROCKETMODE,						// crosshair track
 		CH_ROCKETMODE,						// crosshair lock
-		CH_ROCKETMODE						// crosshair lock friend	
 	},
 
 	// tank gun
@@ -366,7 +355,6 @@ completeWeaponData_t availableWeapons[] =
 		CH_ROCKETMODE,						// crosshair
 		CH_ROCKETMODE,						// crosshair track
 		CH_ROCKETMODE,						// crosshair lock
-		CH_ROCKETMODE						// crosshair lock friend	
 	},
 
 	// iron bombs
@@ -396,7 +384,6 @@ completeWeaponData_t availableWeapons[] =
 		CH_BOMBMODE,						// crosshair
 		CH_BOMBMODE,						// crosshair track
 		CH_BOMBMODE,						// crosshair lock
-		CH_BOMBMODE							// crosshair lock friend
 	},
 
 	// Sidewinder
@@ -424,9 +411,8 @@ completeWeaponData_t availableWeapons[] =
 		0.985f,								// followcone (dot) (0.996)
 		1500,								// locktime
 		CH_MISSILEMODE,						// crosshair
-		CH_MISSILEMODE,						// crosshair track
+		CH_MISSILEMODETRACK,				// crosshair track
 		CH_MISSILEMODELOCK,					// crosshair lock
-		CH_MISSILEMODE						// crosshair lock friend
 	},
 
 	// AMRAAM
@@ -454,9 +440,8 @@ completeWeaponData_t availableWeapons[] =
 		0.996f,								// followcone (dot)
 		1500,								// locktime
 		CH_MISSILEMODE,						// crosshair
-		CH_MISSILEMODE,						// crosshair track
+		CH_MISSILEMODETRACK,				// crosshair track
 		CH_MISSILEMODELOCK,					// crosshair lock
-		CH_MISSILEMODE						// crosshair lock friend
 	},
 
 	// Sparrow
@@ -484,9 +469,8 @@ completeWeaponData_t availableWeapons[] =
 		0.996f,								// followcone (dot)
 		1500,								// locktime
 		CH_MISSILEMODE,						// crosshair
-		CH_MISSILEMODE,						// crosshair track
+		CH_MISSILEMODETRACK,				// crosshair track
 		CH_MISSILEMODELOCK,					// crosshair lock
-		CH_MISSILEMODE						// crosshair lock friend
 	},
 
 	// Phoenix
@@ -514,9 +498,8 @@ completeWeaponData_t availableWeapons[] =
 		0.996f,								// followcone (dot)
 		1500,								// locktime
 		CH_MISSILEMODE,						// crosshair
-		CH_MISSILEMODE,						// crosshair track
+		CH_MISSILEMODETRACK,				// crosshair track
 		CH_MISSILEMODELOCK,					// crosshair lock
-		CH_MISSILEMODE						// crosshair lock friend
 	},
 
 	// Stinger
@@ -544,9 +527,8 @@ completeWeaponData_t availableWeapons[] =
 		0.996f,								// followcone (dot)
 		1500,								// locktime
 		CH_MISSILEMODE,						// crosshair
-		CH_MISSILEMODE,						// crosshair track
+		CH_MISSILEMODETRACK,				// crosshair track
 		CH_MISSILEMODELOCK,					// crosshair lock
-		CH_MISSILEMODE						// crosshair lock friend
 	},
 
 	// Atoll
@@ -574,9 +556,8 @@ completeWeaponData_t availableWeapons[] =
 		0.985f,								// followcone (dot)
 		1500,								// locktime
 		CH_MISSILEMODE,						// crosshair
-		CH_MISSILEMODE,						// crosshair track
+		CH_MISSILEMODETRACK,				// crosshair track
 		CH_MISSILEMODELOCK,					// crosshair lock
-		CH_MISSILEMODE						// crosshair lock friend
 	},
 
 	// Archer
@@ -604,9 +585,8 @@ completeWeaponData_t availableWeapons[] =
 		0.996f,								// followcone (dot)
 		1500,								// locktime
 		CH_MISSILEMODE,						// crosshair
-		CH_MISSILEMODE,						// crosshair track
+		CH_MISSILEMODETRACK,				// crosshair track
 		CH_MISSILEMODELOCK,					// crosshair lock
-		CH_MISSILEMODE						// crosshair lock friend
 	},
 
 	// Alamo
@@ -634,9 +614,8 @@ completeWeaponData_t availableWeapons[] =
 		0.996f,								// followcone (dot)
 		1500,								// locktime
 		CH_MISSILEMODE,						// crosshair
-		CH_MISSILEMODE,						// crosshair track
+		CH_MISSILEMODETRACK,				// crosshair track
 		CH_MISSILEMODELOCK,					// crosshair lock
-		CH_MISSILEMODE						// crosshair lock friend
 	},
 
 	// Hellfire
@@ -664,9 +643,8 @@ completeWeaponData_t availableWeapons[] =
 		0.996f,								// followcone (dot)
 		1500,								// locktime
 		CH_MISSILEMODE,						// crosshair
-		CH_MISSILEMODE,						// crosshair track
+		CH_MISSILEMODETRACK,				// crosshair track
 		CH_MISSILEMODELOCK,					// crosshair lock
-		CH_MISSILEMODE						// crosshair lock friend
 	},
 
 	// Maverick
@@ -694,9 +672,8 @@ completeWeaponData_t availableWeapons[] =
 		0.996f,								// followcone (dot)
 		1500,								// locktime
 		CH_MISSILEMODE,						// crosshair
-		CH_MISSILEMODE,						// crosshair track
+		CH_MISSILEMODETRACK,				// crosshair track
 		CH_MISSILEMODELOCK,					// crosshair lock
-		CH_MISSILEMODE						// crosshair lock friend
 	},
 
 	// flares
@@ -726,7 +703,6 @@ completeWeaponData_t availableWeapons[] =
 		0,									// crosshair
 		0,									// crosshair track
 		0,									// crosshair lock
-		0									// crosshair lock friend
 	}
 };
 
