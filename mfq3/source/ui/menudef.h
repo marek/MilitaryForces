@@ -1,5 +1,5 @@
 /*
- * $Id: menudef.h,v 1.5 2002-02-26 13:31:40 sparky909_uk Exp $
+ * $Id: menudef.h,v 1.6 2002-02-28 10:23:32 sparky909_uk Exp $
 */
 
 #define ITEM_TYPE_TEXT 0                  // simple text
@@ -259,6 +259,7 @@
 #define UI_STARTMAPCINEMATIC 255
 #define UI_MAPS_SELECTION 256
 #define	UI_PREVIEW_VEHICLE 257
+#define UI_NETGAMESET 258
 
 #define VOICECHAT_GETFLAG			"getflag"				// command someone to get the flag
 #define VOICECHAT_OFFENSE			"offense"				// command someone to go on offense

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.37 2002-02-27 23:11:18 thebjoern Exp $
+ * $Id: bg_vehicledata.c,v 1.38 2002-02-28 10:24:27 sparky909_uk Exp $
 */
 
 #include "q_shared.h"
@@ -1225,6 +1225,19 @@ const char *gameset_items[MF_MAX_GAMESETS+1] =
 	"Modern",
 	"World War II",
 	"World War I",
+	0,
+	0,
+	0,
+	0,
+	0,
+	0
+};
+
+const char *gameset_codes[MF_MAX_GAMESETS+1] =
+{
+	"modern",
+	"ww2",
+	"ww1",
 	0,
 	0,
 	0,
