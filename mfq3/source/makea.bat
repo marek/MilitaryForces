@@ -1,3 +1,5 @@
+set LIBRARY= 
+set INCLUDE=
 rem cd q3_ui
 rem call q3_ui
 cd ui

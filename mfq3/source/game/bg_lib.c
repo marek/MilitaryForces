@@ -1,5 +1,5 @@
 /*
- * $Id: bg_lib.c,v 1.2 2002-01-19 02:24:02 thebjoern Exp $
+ * $Id: bg_lib.c,v 1.3 2003-04-02 13:13:14 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -49,7 +49,7 @@
 static char sccsid[] = "@(#)qsort.c	8.1 (Berkeley) 6/4/93";
 #endif
 static const char rcsid[] =
-	"$Id: bg_lib.c,v 1.2 2002-01-19 02:24:02 thebjoern Exp $";
+	"$Id: bg_lib.c,v 1.3 2003-04-02 13:13:14 thebjoern Exp $";
 #endif /* LIBC_SCCS and not lint */
 
 #if !defined( Q3_VM )
@@ -555,7 +555,10 @@ void create_acostable( void ) {
 	fclose(fp);
 }
 */
-
+#endif
+// bjoern hacks to make acos work ???
+#ifdef Q3_VM
+#ifndef CGAME
 float acostable[] = {
 3.14159265,3.07908248,3.05317551,3.03328655,3.01651113,3.00172442,2.98834964,2.97604422,
 2.96458497,2.95381690,2.94362719,2.93393068,2.92466119,2.91576615,2.90720289,2.89893629,
@@ -685,7 +688,7 @@ float acostable[] = {
 0.30739505,0.30087304,0.29421096,0.28739907,0.28042645,0.27328078,0.26594810,0.25841250,
 0.25065566,0.24265636,0.23438976,0.22582651,0.21693146,0.20766198,0.19796546,0.18777575,
 0.17700769,0.16554844,0.15324301,0.13986823,0.12508152,0.10830610,0.08841715,0.06251018,
-}
+};
 
 double acos( double x ) {
 	int index;
@@ -697,7 +700,9 @@ double acos( double x ) {
 	index = (float) (1.0 + x) * 511.9;
 	return acostable[index];
 }
-
+#endif
+#endif
+#if 0
 double atan2( double y, double x ) {
 	float	base;
 	float	temp;

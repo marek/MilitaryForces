@@ -1,5 +1,5 @@
 /*
- * $Id: cg_view.c,v 1.12 2003-02-11 00:25:09 thebjoern Exp $
+ * $Id: cg_view.c,v 1.13 2003-04-02 13:13:14 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -541,9 +541,13 @@ static int CG_CalcViewValues( void ) {
 
 	VectorCopy( ps->origin, cg.refdef.vieworg );
 	if( cg_advanced.integer )
+	{
 		VectorCopy( cg.predictedPlayerEntity.currentState.angles, cg.refdefViewAngles );
+	}
 	else
+	{
 		VectorCopy( ps->viewangles, cg.refdefViewAngles );
+	}
 
 	// add error decay
 	if ( cg_errorDecay.value > 0 ) {

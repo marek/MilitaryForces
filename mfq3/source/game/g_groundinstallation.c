@@ -1,5 +1,5 @@
 /*
- * $Id: g_groundinstallation.c,v 1.3 2003-03-18 22:06:05 thebjoern Exp $
+ * $Id: g_groundinstallation.c,v 1.4 2003-04-02 13:13:14 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -79,7 +79,8 @@ static void Update_GI_Targets( gentity_t* ent )
 				}
 				if( best )
 				{
-					ent->gi_lockangle = acos(availableWeapons[ent->s.weaponIndex].lockcone);
+					ent->gi_lockangle = acos((double)availableWeapons[ent->s.weaponIndex].lockcone);
+					ent->gi_lockangle = RAD2DEG(ent->gi_lockangle);
 					ent->tracktarget = best;
 					ent->locktime = level.time;
 					ent->s.tracktarget = best->s.number;

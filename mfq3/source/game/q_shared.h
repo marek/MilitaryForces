@@ -1,5 +1,5 @@
 /*
- * $Id: q_shared.h,v 1.13 2003-03-19 11:37:31 thebjoern Exp $
+ * $Id: q_shared.h,v 1.14 2003-04-02 13:13:14 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -10,7 +10,7 @@
 // q_shared.h -- included first by ALL program modules.
 // A user mod should never modify this file
 
-#define	Q3_VERSION		"Q3 1.31"
+#define	Q3_VERSION		"Q3 1.32b"
 
 
 #define MAX_TEAMNAME 32
@@ -503,7 +503,7 @@ void Vector4Scale( const vec4_t in, vec_t scale, vec4_t out );
 void VectorRotate( vec3_t in, vec3_t matrix[3], vec3_t out );
 int Q_log2(int val);
 
-float Q_acos(float c);
+//float Q_acos(float c);
 
 int		Q_rand( int *seed );
 float	Q_random( int *seed );
