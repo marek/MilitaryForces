@@ -1,5 +1,5 @@
 /*
- * $Id: g_main.c,v 1.10 2002-02-25 15:25:56 sparky909_uk Exp $
+ * $Id: g_main.c,v 1.11 2002-02-27 14:42:25 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -367,7 +367,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 	G_InitMemory();
 
-	// set the game version into a server var (that can be viewed as server-info)
+	// MFQ3: set the game version into a server var (that can be viewed as server-info)
 	trap_Cvar_Set( "mf_version", GAME_VERSION );
 
 	// MFQ3: (for now) always set the 'g_synchronousClients' var to 0, as setting to 1
@@ -375,6 +375,8 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 #pragma message( "g_synchronousClients is always being set to 0 in G_InitGame()" )
 	trap_Cvar_Set( "g_synchronousClients", "0" );
 
+	// set some level globals
+	memset( &level, 0, sizeof( level ) );
 	level.time = levelTime;
 	level.startTime = levelTime;
 
@@ -856,12 +858,12 @@ When the intermission starts, this will be called for all players.
 If a new client connects, this will be called after the spawn function.
 ========================
 */
-void MoveClientToIntermission( gentity_t *ent ) {
+void MoveClientToIntermission( gentity_t *ent )
+{
 	// take out of follow mode if needed
 	if ( ent->client->sess.spectatorState == SPECTATOR_FOLLOW ) {
 		StopFollowing( ent );
 	}
-
 
 	// move to the spot
 	VectorCopy( level.intermission_origin, ent->s.origin );
