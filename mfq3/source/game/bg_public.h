@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.128 2004-12-16 19:22:16 minkis Exp $
+ * $Id: bg_public.h,v 1.129 2004-12-23 11:29:21 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -727,7 +727,7 @@ enum ShadowOrientationAdjusts {
 
 #define PF_DONT_REMOVE		0x3900
 
-#define MAX_LOADOUTS			50
+#define MAX_LOADOUTS			100
 #define MAX_MOUNTS_PER_VEHICLE	32
 
 typedef struct mountInfo_s

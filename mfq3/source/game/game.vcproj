@@ -22,7 +22,8 @@
 				Optimization="0"
 				OptimizeForProcessor="1"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;BUILDING_REF_GL;DEBUG;GLOBALRANK;QAGAME"
-				RuntimeLibrary="1"
+				ExceptionHandling="FALSE"
+				RuntimeLibrary="3"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderFile=".\Debug/game.pch"
 				AssemblerListingLocation=".\Debug/"
@@ -31,7 +32,8 @@
 				BrowseInformation="1"
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
-				DebugInformationFormat="4"/>
+				DebugInformationFormat="4"
+				CompileAs="1"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
