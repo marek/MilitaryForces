@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.79 2002-02-25 15:30:19 thebjoern Exp $
+ * $Id: bg_public.h,v 1.80 2002-02-27 09:42:10 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.65"
+#define	GAME_VERSION		"mfq3 v0.65a"
 #define	GAME_IDENTIFIER		"mfq3"			// use to identify mfq3 servers
 
 #define	DEFAULT_GRAVITY		800
@@ -683,44 +683,45 @@ enum ShadowOrientationAdjusts {
 };
 
 
-// all the pylons come in pairs
-#define PT_NA				0x0000
-#define	PT_WINGTIP			0x0001			// wingtip, paired, one AAM
-#define	PT_WING_L			0x0002			// outer wing, paired, one AAM, or AGM, FFAR
-#define	PT_BODY_L			0x0004			// body, paired, single
-#define	PT_BODY_CENTER_L	0x0008			// body center, single
-#define	PT_WING_M			0x0010			// outer wing, paired, one AAM, or AGM, FFAR
-#define	PT_BODY_M			0x0020			// body, paired, single
-#define	PT_BODY_CENTER_M	0x0040			// body center, single
-#define	PT_WING_H			0x0080			// innter wing, paired, several AAM/AGM/BOMBS/etc
-#define	PT_BODY_H			0x0100			// body, paired, several
-#define	PT_BODY_CENTER_H	0x0200			// body center, several
-#define	PT_BAY				0x0400			// bay, paired
-#define	PT_BAY_CENTER		0x0800			// bay center, single
-#define PT_H				0x0380
-#define PT_L				0x000E
-#define PT_M				0x0070
-#define PT_WING				0x0092
-#define	PT_ALL				0xFFFF
+// pylon flags
+#define PF_NA				0x0000	// nothing
+#define PF_AA_LT			0x0001	// sidewinder, stinger
+#define PF_AA_MED			0x0002	// amraam
+#define PF_AA_HVY			0x0004	// sparrow
+#define PF_AA_PHX			0x0008	// phoenix
+#define PF_AG_LT			0x0010	// light bombs 500lb, stinger
+#define PF_AG_MED			0x0020	// 800 lb
+#define PF_AG_HVY			0x0040	// 1000lb, 2000lb
+#define PF_AG_GDA			0x0080	// can carry guided bombs
+#define PF_FFAR				0x0100	// FFAR
+#define PF_TANK_LT			0x0200	// droptank
+#define PF_TANK_HVY			0x0400	// droptank big
+#define PF_JAMMER			0x0800	// jammer
+#define PF_GUNPOD			0x1000	// gunpod
+#define PF_FLAREPOD			0x2000	// extra flares
+#define PF_DONT_DROP		0x4000	// dont drop on launch (wingtip)
+
+#define PF_DONT_REMOVE		0x3F00
 
 #define MAX_LOADOUTS			50
-#define MAX_TAG_LENGTH			16
-#define MAX_MOUNTS_PER_PYLON	3
+#define MAX_MOUNTS_PER_VEHICLE	32
 
-typedef struct pylonTags_s 
+typedef struct mountInfo_s
 {
-	char				tagname[MAX_MOUNTS_PER_PYLON*2][MAX_TAG_LENGTH];
-	vec3_t				pos[MAX_MOUNTS_PER_PYLON*2];
-} pylonTags_t;
+	int			pos;
+	int			left;
+	int			flags;
+	md3Tag_t	tag;
+	int			weapon;	// what is actually on
+	int			num;	// how many
+} mountInfo_t;
 
 typedef struct completeLoadout_s
 {
-	unsigned int		type[MAX_WEAPONS_PER_VEHICLE];			// type of mount
-	unsigned int		weaponType[MAX_WEAPONS_PER_VEHICLE];	// which weapontype is on it
-	unsigned int		mountedWeapons[MAX_WEAPONS_PER_VEHICLE];// how many actually on
-	unsigned int		maxWeapons[MAX_WEAPONS_PER_VEHICLE];// how many max on it
-	pylonTags_t			tags[MAX_WEAPONS_PER_VEHICLE];
+	mountInfo_t	mounts[MAX_MOUNTS_PER_VEHICLE];
+	int			usedMounts;
 } completeLoadout_t;
+
 
 // list of vehicles (data)
 typedef struct completeVehicleData_s
@@ -758,7 +759,6 @@ typedef struct completeVehicleData_s
 	unsigned int	weapons[MAX_WEAPONS_PER_VEHICLE];// use index from available Weapons
 	unsigned int	ammo[MAX_WEAPONS_PER_VEHICLE];// how much of them (is also max_ammo)
 	unsigned int	turret[MAX_WEAPONS_PER_VEHICLE];// on which turret is this weapon
-	unsigned int	pylons[MAX_WEAPONS_PER_VEHICLE];// which pylons do we have
 	vec3_t			cockpitview;	// to place the camera
 	unsigned int	effectModel;	// num of afterburner model (for planes)
 	unsigned int	radarRange;		// how far goes the radar AIR
@@ -780,7 +780,6 @@ extern completeVehicleData_t availableVehicles[];
 // number of available vehicles
 extern int bg_numberOfVehicles;
 
-extern completeLoadout_t defaultLoadout;
 extern completeLoadout_t availableLoadouts[MAX_LOADOUTS];
 
 // types of weapons
@@ -895,6 +894,8 @@ void MF_getLoadoutFromAmmo( int idx, completeLoadout_t* loadout, unsigned int am
 qboolean MF_removeWeaponFromLoadout( int weaponIndex, completeLoadout_t* loadout, char* usedTag, vec3_t pos, qboolean nextMount );
 int MF_addWeaponToLoadout( int weaponIndex, completeLoadout_t* loadout );
 qboolean MF_getNumberOfFrames(const char* fileName, int* number);
+qboolean MF_getNumberOfTags(const char* fileName, int* number);
+int MF_getTagsContaining(const char* fileName, const char* str, md3Tag_t* tags, int num);
 qboolean MF_getDimensions(const char* fileName, int frame, vec3_t* maxs, vec3_t* mins);
 void MF_LoadAllVehicleData();
 

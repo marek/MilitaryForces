@@ -1,5 +1,5 @@
 /*
- * $Id: q_shared.h,v 1.8 2002-02-25 12:11:06 sparky909_uk Exp $
+ * $Id: q_shared.h,v 1.9 2002-02-27 09:42:10 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1185,6 +1185,6 @@ typedef enum _flag_status {
 // generic random number functions (based upon calling Rand())
 int RandomInt( int min, int max );
 float RandomFloat( float min, float max );
-
+int ahextoi( const char* string );
 
 #endif	// __Q_SHARED_H

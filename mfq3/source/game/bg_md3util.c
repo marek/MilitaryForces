@@ -1,5 +1,5 @@
 /*
- * $Id: bg_md3util.c,v 1.2 2002-02-25 15:20:54 thebjoern Exp $
+ * $Id: bg_md3util.c,v 1.3 2002-02-27 09:42:10 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -51,6 +51,78 @@ qboolean MF_findTag(const char* fileName, const char* tagname, md3Tag_t* tag)
 		Com_Printf( "Unable to read tag from %s\n", fileName );
 	}
 	return found;
+}
+
+/*
+=================
+MF_getNumberOfTags
+
+providing the file this functions returns the number of tags
+=================
+*/
+
+qboolean MF_getNumberOfTags(const char* fileName, int* number)
+{
+	fileHandle_t	f;
+	qboolean		found = qfalse;
+
+	if( !number ) return found;
+
+	if( trap_FS_FOpenFile(fileName, &f, FS_READ) >= 0 ) {
+		md3Header_t head;
+		trap_FS_Read(&head, sizeof(head), f);
+		*number = head.numTags;
+		found = qtrue;
+		trap_FS_FCloseFile(f);
+	} else {
+		Com_Printf( "Unable to open file %s\n", fileName );
+	}
+	return found;
+
+}
+
+/*
+=================
+MF_getTagsContaining
+
+providing the file this functions returns the tags containing str in their name
+num is the number of tags provided in tags
+=================
+*/
+
+int MF_getTagsContaining(const char* fileName, const char* str, md3Tag_t* tags, int num)
+{
+	fileHandle_t	f;
+	int				i, number = 0, total, len;
+
+	if( !num || !tags ) return 0;
+	if( !str) return 0;
+	len = strlen(str);
+	if( !len ) return 0;
+
+	if( trap_FS_FOpenFile(fileName, &f, FS_READ) >= 0 ) {
+		md3Header_t head;
+		md3Frame_t	frame;
+		md3Tag_t	tag;
+		trap_FS_Read(&head, sizeof(head), f);
+		for( i = 0; i < head.numFrames; ++i ) {
+			trap_FS_Read(&frame, sizeof(frame), f);
+		}
+		total = head.numTags;
+		if( total > num ) total = num;
+		for( i = 0; i < total; ++ i ) {
+			trap_FS_Read(&tag, sizeof(tag), f);
+			if( Q_strncmp( tag.name, str, len ) == 0 ) {
+				memcpy( &tags[number], &tag, sizeof(tag) );
+				number++;
+			}
+		}
+		trap_FS_FCloseFile(f);
+	} else {
+		Com_Printf( "Unable to open file %s\n", fileName );
+	}
+	return number;
+
 }
 
 
