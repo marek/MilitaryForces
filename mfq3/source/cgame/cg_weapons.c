@@ -1,5 +1,5 @@
 /*
- * $Id: cg_weapons.c,v 1.9 2002-02-05 16:09:01 sparky909_uk Exp $
+ * $Id: cg_weapons.c,v 1.10 2002-02-05 16:18:53 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -570,7 +570,7 @@ void CG_VehicleExplosion( vec3_t origin, int type )
 		maxAdjust *= 2;
 	}
 
-	// explosion effect for both types
+	// explosion effect for all types
 	for( i = 0; i<density; i++ )
 	{
 		// adjust origin
@@ -625,6 +625,25 @@ void CG_VehicleExplosion( vec3_t origin, int type )
 	// play 1 of the x explosion sounds
 	soundIdx = rand() % NUM_EXPLOSION_SOUNDS;
 	trap_S_StartSound( origin, ENTITYNUM_WORLD, CHAN_AUTO, cgs.media.planeDeath[ soundIdx ] );
+
+	// if building, play more sound
+	if( type == 2 )
+	{
+		// create point adjusted from building origin
+		adjust[0] = origin[0] + (random()*maxAdjust)-(maxAdjust/2);
+		adjust[1] = origin[1] + (random()*maxAdjust)-(maxAdjust/2);
+
+		// choose a different sound
+		soundIdx++;
+		if( soundIdx >= NUM_EXPLOSION_SOUNDS )
+		{
+			soundIdx = 0;
+		}
+
+		// play additional sound
+		trap_S_StartSound( adjust, ENTITYNUM_WORLD, CHAN_AUTO, cgs.media.planeDeath[ soundIdx ] );
+	}
+
 }
 
 /*
