@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.9 2002-02-12 12:13:43 sparky909_uk Exp $
+ * $Id: bg_mfq3util.c,v 1.10 2002-02-12 12:27:04 sparky909_uk Exp $
 */
 
 #include "q_shared.h"
@@ -40,29 +40,47 @@ MF_GetGameset
 */
 
 // gets the mf_gameset variable into the correct a MF_GAMESET_x return
-unsigned long MF_GetGameset( void )
+unsigned long MF_GetGameset( qboolean asEnum )
 {
 	char tmpGamesetStr[ 32 ];
+	unsigned long returnValue = MF_GAMESET_MODERN;
 
 	// get the gameset text
 	trap_Cvar_VariableStringBuffer( "mf_gameset", tmpGamesetStr, sizeof(tmpGamesetStr) );
 
-	// compare and return
+	// compare
 	if( stricmp( tmpGamesetStr, "ww1" ) == 0 )
 	{
-		return MF_GAMESET_WW1;
+		returnValue = MF_GAMESET_WW1;
 	}
 	else if( stricmp( tmpGamesetStr, "ww2" ) == 0 )
 	{
-		return MF_GAMESET_WW2;
+		returnValue = MF_GAMESET_WW2;
 	}
 	else if( stricmp( tmpGamesetStr, "modern" ) == 0 )
 	{
-		return MF_GAMESET_MODERN;
+		returnValue = MF_GAMESET_MODERN;
 	}
 
-	// wasn't found, but to be safe
-	return MF_GAMESET_MODERN;
+	// convert to enum?
+	if( asEnum )
+	{
+		switch( returnValue )
+		{
+		case MF_GAMESET_WW1:
+			returnValue = 2;
+			break;
+		case MF_GAMESET_WW2:
+			returnValue = 1;
+			break;
+		case MF_GAMESET_MODERN:
+			returnValue = 0;
+			break;
+		}
+	}
+
+	// return the result (as either flag mask or enum)
+	return returnValue;
 }
 
 /*
