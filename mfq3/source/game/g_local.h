@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: g_local.h,v 1.2 2001-12-03 21:33:46 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -613,6 +613,12 @@ void trigger_teleporter_touch (gentity_t *self, gentity_t *other, trace_t *trace
 // g_mfq3util.c
 //
 int canLandOnIt( gentity_t *ent );
+
+//
+// g_droneutil.c
+//
+void onWaypointEvent( gentity_t* ent );
+void getTargetDirAndDist( gentity_t* ent );
 
 //
 // g_mfq3ents.c

@@ -29,6 +29,7 @@ g_waypoint
 g_plane
 g_scripts
 g_groundvehicle
+g_droneutil
 g_droneplane
 g_droneground
 mf_client

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_plane.c,v 1.2 2001-11-19 17:02:20 thebjoern Exp $
+ * $Id: cg_plane.c,v 1.3 2001-12-03 21:33:46 thebjoern Exp $
 */
 
 
@@ -591,7 +591,7 @@ void CG_PlaneObituary( entityState_t *ent, clientInfo_t *ci )
 		message2 = "'s iron bombs";
 		break;
 	case MOD_AUTOCANNON:
-		message = "was blown out of the sky";
+		message = "was blown out of the sky by";
 		message2 = "'s bullets";
 		break;
 	case MOD_MAINGUN:
