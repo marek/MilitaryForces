@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.27 2003-02-05 23:42:07 thebjoern Exp $
+ * $Id: g_local.h,v 1.28 2003-02-08 15:20:17 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -618,6 +618,7 @@ void Boat_Pain( gentity_t *self, gentity_t *attacker, int damage );
 //
 void DroneInit();
 void G_LoadMissionScripts();
+void SP_misc_vehicle (gentity_t *ent);
 
 
 // damage flags
@@ -868,6 +869,7 @@ extern	vmCvar_t	g_spectSpeed;
 // MFQ3
 extern  vmCvar_t	mf_gameset;
 extern  vmCvar_t	mf_lvcat;
+extern  vmCvar_t	mf_mission;
 
 
 void	trap_Printf( const char *fmt );

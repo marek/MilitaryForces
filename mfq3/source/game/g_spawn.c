@@ -1,5 +1,5 @@
 /*
- * $Id: g_spawn.c,v 1.5 2003-01-27 00:49:42 thebjoern Exp $
+ * $Id: g_spawn.c,v 1.6 2003-02-08 15:20:18 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -128,7 +128,6 @@ void SP_func_timer (gentity_t *self);
 
 // MFQ3
 //void SP_misc_waypoint (gentity_t *ent);
-void SP_misc_vehicle (gentity_t *ent);
 void SP_func_runway (gentity_t *ent);
 void SP_func_explosive (gentity_t *ent);
 void SP_trigger_recharge (gentity_t *ent);

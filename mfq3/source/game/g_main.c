@@ -1,5 +1,5 @@
 /*
- * $Id: g_main.c,v 1.15 2003-02-05 23:42:08 thebjoern Exp $
+ * $Id: g_main.c,v 1.16 2003-02-08 15:20:17 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -68,6 +68,7 @@ vmCvar_t	g_spectSpeed;
 vmCvar_t	mf_gameset;
 vmCvar_t	mf_lvcat;
 vmCvar_t	mf_version;
+vmCvar_t	mf_mission;
 
 cvarTable_t		gameCvarTable[] = {
 	// don't override the cheat state set by the system
@@ -89,6 +90,7 @@ cvarTable_t		gameCvarTable[] = {
 	{ &mf_gameset, "mf_gameset", "modern", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_LATCH, 0, qfalse  },
 	{ &mf_version, "mf_version", "unknown", CVAR_SERVERINFO | CVAR_ROM, 0, qfalse  },
 	{ &mf_lvcat, "mf_lvcat", "0", CVAR_SERVERINFO | CVAR_ROM, 0, qfalse },
+	{ &mf_mission, "mf_mission", "default", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_LATCH, 0, qfalse  },
 
 	// change anytime vars
 	{ &g_dmflags, "dmflags", "0", CVAR_SERVERINFO | CVAR_ARCHIVE, 0, qtrue  },
