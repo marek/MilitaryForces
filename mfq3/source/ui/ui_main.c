@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.17 2002-02-21 16:11:05 sparky909_uk Exp $
+ * $Id: ui_main.c,v 1.18 2002-02-22 15:26:37 sparky909_uk Exp $
 */
 /*
 =======================================================================
@@ -5421,6 +5421,9 @@ UI_CustomChatInit
 
 void UI_CustomChatInit( void )
 {
+	// clear memory
+	memset( &uiInfo.customChat, 0, sizeof( chat_t ) );
+
 	// send the address of the custom chat data block to the Client
 	trap_Cmd_ExecuteText( EXEC_APPEND, va( "custom_chat_ptr %d", &uiInfo.customChat ) );
 }
@@ -5456,6 +5459,8 @@ UI_CustomChatUpdate
 qboolean UI_CustomChatUpdate( int key, qboolean keyDown )
 {
 	int i = uiInfo.customChat.cindex;
+	int maxTextWidth = 0;
+
 	qboolean store = qfalse;
 
 	// not active?
@@ -5464,11 +5469,8 @@ qboolean UI_CustomChatUpdate( int key, qboolean keyDown )
 		return qfalse;
 	}
 
-	// maxed out?
-	if( uiInfo.customChat.cindex >= MAX_CHAT_LEN )
-	{
-		return qtrue;
-	}
+	// no-lock
+	uiInfo.customChat.lockEntry = qfalse;
 
 	// extended?
 	if( key & K_CHAR_FLAG )
@@ -5494,7 +5496,7 @@ qboolean UI_CustomChatUpdate( int key, qboolean keyDown )
 	case 169:
 		// say the current text
 		UI_CustomChatEnd( qtrue );
-		return qtrue;
+		break;
 
 	// Backspace
 	case 127:
@@ -5507,13 +5509,39 @@ qboolean UI_CustomChatUpdate( int key, qboolean keyDown )
 			uiInfo.customChat.text[ i-1 ] = 0;
 			uiInfo.customChat.cindex--;
 		}
-		return qtrue;
+		break;
 	}
 
 	// valid normal range?
 	if( key < 0x20 || key >= 0x7F )
 	{
 		store = qfalse;
+	}
+
+	// work out text limit
+	switch( uiInfo.customChat.mode )
+	{
+	case CCHAT_ALL:
+		maxTextWidth = 320;
+		break;
+	case CCHAT_TEAM:
+		maxTextWidth = 286;
+		break;
+	case CCHAT_TARGET:
+		maxTextWidth = 280;
+		break;
+	case CCHAT_ATTACK:
+		maxTextWidth = 268;
+		break;
+	}
+
+	// hit the text limit?
+	if( DC->textWidth( uiInfo.customChat.text, CHAT_TEXT_SCALE, 0 ) > maxTextWidth )
+	{
+		store = qfalse;
+
+		// lock
+		uiInfo.customChat.lockEntry = qtrue;
 	}
 
 	// store the character?

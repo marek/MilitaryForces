@@ -1,5 +1,5 @@
 /*
- * $Id: ui_shared.h,v 1.9 2002-02-19 13:57:58 sparky909_uk Exp $
+ * $Id: ui_shared.h,v 1.10 2002-02-22 15:26:37 sparky909_uk Exp $
 */
 #ifndef __UI_SHARED_H
 #define __UI_SHARED_H
@@ -20,7 +20,9 @@ typedef enum {
 	MAX_CCHAT
 } CustomChatMode;
 
-#define	MAX_CHAT_LEN 1024
+#define	MAX_CHAT_LEN		256
+
+#define CHAT_TEXT_SCALE	0.25f
 
 typedef struct {
 	qboolean active;			// active?
@@ -30,6 +32,7 @@ typedef struct {
 	float lifeAlpha;			// gfx
 	float cursorAlpha;			// gfx
 	qboolean cursorDir;			// gfx
+	qboolean lockEntry;			// set to true to prevent more characters being typed
 } chat_t;
 
 // cursor gfx
