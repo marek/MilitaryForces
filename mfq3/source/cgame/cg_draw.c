@@ -1,5 +1,5 @@
 /*
- * $Id: cg_draw.c,v 1.21 2002-02-19 13:55:58 sparky909_uk Exp $
+ * $Id: cg_draw.c,v 1.22 2002-02-19 17:50:46 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1843,16 +1843,18 @@ static void CG_DrawCrosshairNames( void ) {
 */
 	// draw the name of the player being looked at
 	color = CG_FadeColor( cg.crosshairClientTime, 1000 );
-	if ( !color ) {
+	if ( !color )
+	{
 		trap_R_SetColor( NULL );
 		return;
 	}
 
+	// if we get here then we have a name to draw
 	name = cgs.clientinfo[ cg.crosshairClientNum ].name;
 	w = CG_DrawStrlen( name ) * BIGCHAR_WIDTH;
 
 #ifdef _MENU_SCOREBOARD
-	DrawStringNewAlpha( 320, 170, name, color[3] * 0.5f, CENTRE_JUSTIFY );
+	DrawStringNew( 320, 170, 0.5f, color, name, 0, 0, ITEM_TEXTSTYLE_OUTLINED, CENTRE_JUSTIFY );
 #else
 	CG_DrawBigString( 320 - w / 2, 170, name, color[3] * 0.5f );
 #endif
