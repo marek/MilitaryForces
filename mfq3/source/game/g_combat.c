@@ -1,5 +1,5 @@
 /*
- * $Id: g_combat.c,v 1.2 2001-12-22 02:28:44 thebjoern Exp $
+ * $Id: g_combat.c,v 1.3 2002-02-05 14:36:32 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -41,6 +41,7 @@ void ExplodeVehicle( gentity_t *self ) {
 	self->takedamage = qfalse;
 	self->s.eType = ET_INVISIBLE;
 	self->r.contents = 0;
+	self->client->ps.persistant[PERS_DEATHS]++;
 }
 
 /*
@@ -736,13 +737,16 @@ void vehicle_death( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, 
 	if ( self->health <= GIB_HEALTH ) {
 //		&& !(contents & CONTENTS_NODROP) ) ) {
 		ExplodeVehicle( self );
+
 		// enable vehicle selection
 		self->client->ps.pm_flags |= PMF_VEHICLESELECT;
 		self->client->ps.pm_type = PM_DEAD;
 		self->r.contents = CONTENTS_CORPSE;
+
 		// don't allow respawn until the death anim is done
 		// g_forcerespawn may force spawning at some later time
 		self->client->respawnTime = level.time + 1000;
+
 		// add radius explosion
 		G_RadiusDamage( self->r.currentOrigin, self, 150, 150, self, MOD_VEHICLEEXPLOSION, CAT_ANY );
 

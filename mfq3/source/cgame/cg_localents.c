@@ -1,5 +1,5 @@
 /*
- * $Id: cg_localents.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: cg_localents.c,v 1.2 2002-02-05 14:37:53 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -362,6 +362,13 @@ static void CG_AddSpriteExplosion( localEntity_t *le ) {
 	float c;
 
 	re = le->refEntity;
+
+	// MFQ3: don't add explosion sprites to the scene until their time
+	// has come
+	if( le->startTime > cg.time && le->leType == LE_SPRITE_EXPLOSION )
+	{
+		return;
+	}
 
 	c = ( le->endTime - cg.time ) / ( float ) ( le->endTime - le->startTime );
 	if ( c > 1 ) {

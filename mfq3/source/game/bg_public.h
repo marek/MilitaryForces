@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.40 2002-02-05 12:41:46 thebjoern Exp $
+ * $Id: bg_public.h,v 1.41 2002-02-05 14:36:32 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -201,7 +201,8 @@ typedef enum {
 	PERS_EXCELLENT_COUNT,			// two successive kills in a short amount of time
 	PERS_DEFEND_COUNT,				// defend awards
 	PERS_ASSIST_COUNT,				// assist awards
-	PERS_CAPTURES					// captures
+	PERS_CAPTURES,					// captures
+	PERS_DEATHS						// deaths
 } persEnum_t;
 
 
