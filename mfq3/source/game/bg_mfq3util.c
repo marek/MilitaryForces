@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.8 2002-01-31 12:01:41 thebjoern Exp $
+ * $Id: bg_mfq3util.c,v 1.9 2002-02-12 12:13:43 sparky909_uk Exp $
 */
 
 #include "q_shared.h"
@@ -48,15 +48,15 @@ unsigned long MF_GetGameset( void )
 	trap_Cvar_VariableStringBuffer( "mf_gameset", tmpGamesetStr, sizeof(tmpGamesetStr) );
 
 	// compare and return
-	if( strcmp( tmpGamesetStr, "ww1" ) == 0 )
+	if( stricmp( tmpGamesetStr, "ww1" ) == 0 )
 	{
 		return MF_GAMESET_WW1;
 	}
-	else if( strcmp( tmpGamesetStr, "ww2" ) == 0 )
+	else if( stricmp( tmpGamesetStr, "ww2" ) == 0 )
 	{
 		return MF_GAMESET_WW2;
 	}
-	else if( strcmp( tmpGamesetStr, "modern" ) == 0 )
+	else if( stricmp( tmpGamesetStr, "modern" ) == 0 )
 	{
 		return MF_GAMESET_MODERN;
 	}
