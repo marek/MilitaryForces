@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.10 2002-02-05 12:41:46 thebjoern Exp $
+ * $Id: cg_drawnewhud.c,v 1.11 2002-02-06 11:29:21 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -815,8 +815,6 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 	cg.HUDCamera.fov_y = fov_x;
 	cammode = cg.CameraMode;
 
-//cammode = CAMERA_BOMB;// test
-
 	if( availableVehicles[vehicle].id&CAT_ANY & CAT_GROUND ) cammode = CAMERA_TARGET;
 
 	if( cammode == CAMERA_DOWN ) {
@@ -854,23 +852,21 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 		VectorScale( v, availableVehicles[vehicle].mins[0], v );
 		VectorAdd( cent->lerpOrigin, v, cg.HUDCamera.vieworg );
 	} else if( cammode == CAMERA_BOMB ) {
-/*		int speed = ps->speed/10;
+		int speed = ps->speed/10;
 		vec3_t down, horz, vert, tempH, tempV, end;
 		float hD, vD, alpha;
 		int t;
 		trace_t tr;
 		AngleVectors( cent->currentState.angles, v, 0, 0 );
-		VectorScale( v, speed, v );
 		VectorSet( horz, v[0], v[1], 0 );
-		VectorSet( vert, 0, 0, (v[2] < 0 ? -v[2] : v[2]) );
-		hD = VectorNormalize( horz );
-		vD = VectorNormalize( vert );
+		VectorNormalize( horz );
+		VectorSet( vert, 0, 0, 1 );
+		alpha = DEG2RAD(cent->currentState.angles[0]);
 		// bombs never travel longer than 10 seconds (they autoexplode after that time)
 		// so we can use that for our calculations
-		alpha = DEG2RAD(cent->currentState.angles[0]);
 		for( t = 1; t <= 10; ++t ) {
-			hD = hD*t*cos(alpha);
-			vD = vD*t*sin(alpha) - DEFAULT_GRAVITY*t*t/2;
+			hD = speed*t*cos(alpha);
+			vD = speed*t*sin(alpha) - DEFAULT_GRAVITY*t*t/2;
 			VectorScale( horz, hD, tempH );
 			VectorScale( vert, vD, tempV);
 			VectorAdd( tempH, tempV, v );
@@ -885,7 +881,7 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 		AnglesToAxis( down, cg.HUDCamera.viewaxis );
 			// position
 		VectorScale( v, -availableVehicles[vehicle].mins[0], v );
-		VectorAdd( cent->lerpOrigin, v, cg.HUDCamera.vieworg );*/
+		VectorAdd( cent->lerpOrigin, v, cg.HUDCamera.vieworg );
 	} else if( cammode == CAMERA_TARGET ) {
 		// angles
 		if( ps->stats[STAT_LOCKINFO] & LI_TRACKING ) {
