@@ -6,8 +6,69 @@ History:
 ========
 
 
-+++v0.58+++ in progress...
+
+
++++v0.62+++ in progress...
 -----------
+- stage 1 code preparation for helos, lqms and boats
+- added weaponbay code, they autoclose after the primary weapon hasn't been used
+  for 5 seconds
+- added weaponbay button: +button3
+- minor changes
+
++++v0.61+++
+-----------
+- added first-cut Harrier model from Matt (no VTOL support yet!)
+- got updated B17g from Matt
+- internal cleanup (related to id/cat/class etc)
+- Mark: experimental custom chat console - use cmessagemode/2/3/4 (bind a key to use)
+- Mark: stopped drawing parts of the player's vehicle when rendering the MFD worlds
+- Mark: added the new 2D crosshair system
+- Mark: gameset in action is now shown on the scoreboard
+- Mark: moved pre-cache of vehicle icons into the loading process to prevent 
+  glitching in-game
+- Mark: set example default 3rd person cameras for each vehicle
+  (should have fixed the camera range/height bug)
+- Mark: added min/max for both cam_dist and cam_height (per vehicle)
+- minor fixes
+
++++v0.60+++
+-----------
+- Mark: fixes to allow right_justified owner drawn text (from UI scripts)
+- Mark: added custom console printing (for chat text and game messages)
+- Mark: new scoreboard message support (e.g. timelimit hit)
+- Mark: hud/scoreboard bug fixes
+- fixed a cockpit bug
+- added cmds "toggle_mfd1" and "toggle_mfd2" to allow easily toggling the 
+  MFDs on/off
+- updated BRDM2 (for turning wheels)
+- added new vehicle: Panzer III
+- added a first cut of turning wheels
+- make use of Abbo's new shadows
+- added new vehicle: Humvee with 50 cal MG
+- minor changes
+
++++v0.59+++ 
+-----------
+- fixed a crash bug that appeared when restarting the map
+- added proper multi-engine support
+- added a new plane: the B-17g
+- added a new plane: the F-22
+- HUD now shows different throttle pics for vehicles with reverse and afterburner
+  and if they have more than one engine
+- Mark: make turning more realistic for wheeled vehicles (e.g. BRDM2)
+- Mark: improved explosions (wider smoke on buildings explosions)
+- Mark: added fx quality selector - cg_fxQuality
+- Mark: added new custom console text drawing
+- Mark: added custom console text drawing style selector - cg_consoleTextStyle
+- minor fixes
+
++++v0.58+++
+-----------
+- Mark: add more sfx for building explosions
+- Mark: fixed "deaths" on the scoreboard
+- Mark: added different size explosions and BIG explosions for buildings
+- Mark: more work on shadow code
 - added new command "+bombcam" to be able to see the spot where an iron-bomb
   dropped right now would approximately land, this is also a new mode in the
   list of cuyclable cameramodes, works up to a height of 20000 units
