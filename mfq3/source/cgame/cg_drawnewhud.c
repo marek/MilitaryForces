@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.27 2002-02-25 14:19:19 sparky909_uk Exp $
+ * $Id: cg_drawnewhud.c,v 1.28 2002-02-26 13:29:28 sparky909_uk Exp $
 */
 
 #include "cg_local.h"
@@ -802,7 +802,7 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 	centity_t *cent = &cg.predictedPlayerEntity;
 	playerState_t *ps = &cg.predictedPlayerState;
 	vec3_t	v;
-	float	x, y, w, h;
+	float	x, y, w, h, vx, vy, vh;
 	float	fov;
 	int		cammode;
 
@@ -823,6 +823,9 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 	y = 366;
 	w = 118;
 	h = 108;
+	vx = x;
+	vy = y;
+	vh = h;
 	CG_AdjustFrom640( &x, &y, &w, &h );
 	cg.HUDCamera.x = x;
 	cg.HUDCamera.y = y;
@@ -953,8 +956,8 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 	trap_R_RenderScene( &cg.HUDCamera );
 
 	// draw zoom amount
-	CG_DrawString_MFQ3( x+2, y+h-12, "ZOOM: X", HUDColors[cg.MFDColor], 0);
-	CG_MFQ3HUD_Numbers( x+60, y+h-12, 3, cg.zoomAmount, qfalse, HUDColors[cg.MFDColor], qfalse );
+	CG_DrawString_MFQ3( vx+2, vy+vh-12, "ZOOM: X", HUDColors[cg.MFDColor], 0);
+	CG_MFQ3HUD_Numbers( vx+60, vy+vh-12, 3, cg.zoomAmount, qfalse, HUDColors[cg.MFDColor], qfalse );
 
 	// reset to normal rendering
 	cg.drawingMFD = qfalse;

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.37 2002-02-25 18:08:25 sparky909_uk Exp $
+ * $Id: cg_main.c,v 1.38 2002-02-26 13:29:28 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1472,24 +1472,59 @@ void CG_LoadMenus(const char *menuFile) {
 CG_FeederCount
 =================
 */
-static int CG_FeederCount(float feederID) {
+int CG_FeederCount(float feederID) {
 	int i, count;
 	count = 0;
-	if (feederID == FEEDER_REDTEAM_LIST) {
-		for (i = 0; i < cg.numScores; i++) {
-			if (cg.scores[i].team == TEAM_RED) {
+
+	// red team list?
+	if (feederID == FEEDER_REDTEAM_LIST)
+	{
+		for (i = 0; i < cg.numScores; i++)
+		{
+			// only count red
+			if (cg.scores[i].team == TEAM_RED)
+			{
 				count++;
 			}
 		}
-	} else if (feederID == FEEDER_BLUETEAM_LIST) {
-		for (i = 0; i < cg.numScores; i++) {
-			if (cg.scores[i].team == TEAM_BLUE) {
-				count++;
-			}
-		}
-	} else if (feederID == FEEDER_SCOREBOARD) {
-		return cg.numScores;
 	}
+	// blue team list?
+	else if (feederID == FEEDER_BLUETEAM_LIST)
+	{
+		for (i = 0; i < cg.numScores; i++)
+		{
+			// only count blue
+			if (cg.scores[i].team == TEAM_BLUE)
+			{
+				count++;
+			}
+		}
+	}
+	// free-for-all list?
+	else if (feederID == FEEDER_SCOREBOARD)
+	{
+		for (i = 0; i < cg.numScores; i++)
+		{
+			// DONT count spectators
+			if (cg.scores[i].team != TEAM_SPECTATOR)
+			{
+				count++;
+			}
+		}
+	}
+	// spectator list?
+	else if (feederID == FEEDER_SPECTATOR_LIST)
+	{
+		for (i = 0; i < cg.numScores; i++)
+		{
+			// only count spectators
+			if (cg.scores[i].team == TEAM_SPECTATOR)
+			{
+				count++;
+			}
+		}
+	}
+
 	return count;
 }
 
@@ -1578,6 +1613,8 @@ static const char *CG_FeederItemText(float feederID, int index, int column, qhan
 		team = TEAM_RED;
 	} else if (feederID == FEEDER_BLUETEAM_LIST) {
 		team = TEAM_BLUE;
+	} else if (feederID == FEEDER_SPECTATOR_LIST) {
+		team = TEAM_SPECTATOR;
 	}
 
 	info = CG_InfoFromScoreIndex(index, team, &scoreIndex);
@@ -1639,10 +1676,6 @@ static const char *CG_FeederItemText(float feederID, int index, int column, qhan
 					{
 						return va("%i/%i", info->wins, info->losses);
 					}
-					else if (info->infoValid && info->team == TEAM_SPECTATOR )
-					{
-						return "Spectator";
-					} 
 					else
 					{
 						return "";
@@ -1665,6 +1698,11 @@ static const char *CG_FeederItemText(float feederID, int index, int column, qhan
 
 			// Vehicle
 			case 4:
+
+				if( spectator )
+				{
+					return "";
+				}
 
 				// team game being played?
 				if( cgs.gametype >= GT_TEAM )
@@ -1705,7 +1743,7 @@ static const char *CG_FeederItemText(float feederID, int index, int column, qhan
 			case 5:
 				if( spectator )
 				{
-					return "-";
+					return "";
 				}
 				else
 					return va("%i", info->score);
@@ -1715,7 +1753,7 @@ static const char *CG_FeederItemText(float feederID, int index, int column, qhan
 			case 6:
 				if( spectator )
 				{
-					return "-";
+					return "";
 				}
 				return va("%i", info->deaths);
 			break;
