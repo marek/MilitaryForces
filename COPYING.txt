@@ -1,0 +1,14 @@
+Military Forces - Licensing Notice
+==================================
+
+SOURCE CODE
+Military Forces is a modification of id Software's Quake III Arena game
+source. The id Software game source is used under id Software's Limited Use
+Software License Agreement (see "QIIIA Game Source License.doc").
+
+GAME ASSETS
+The Military Forces game assets (models, textures, maps, sounds, music,
+artwork and all other media, including the contents of any .pk3 archives)
+are not open source. They are part of Military Forces only and may not be
+used, copied, modified, redistributed or used to create derivative works
+outside of the Military Forces project.
