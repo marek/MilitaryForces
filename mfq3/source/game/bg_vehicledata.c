@@ -1,28 +1,10 @@
 /*
- * $Id: bg_vehicledata.c,v 1.40 2002-03-03 15:23:06 thebjoern Exp $
+ * $Id: bg_vehicledata.c,v 1.41 2002-03-05 12:51:06 thebjoern Exp $
 */
 
 #include "q_shared.h"
 #include "bg_public.h"
 
-// eek!
-/*completeLoadout_t defaultLoadout =
-{
-	{0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0},
-	{	{"","","","","","",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-		{"","","","","","",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-		{"","","","","","",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-		{"","","","","","",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-		{"","","","","","",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-		{"","","","","","",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-		{"","","","","","",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-		{"","","","","","",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
-	}
-};
-*/
 
 completeLoadout_t availableLoadouts[MAX_LOADOUTS];
 
@@ -160,8 +142,8 @@ completeVehicleData_t availableVehicles[] =
 	60,							// max fuel
 	0,							// gearheight - SET AUTOMATICALLY
 	0,							// tailangle
-	WI_MG_20MM, WI_SIDEWINDER, WI_MK82, WI_FFAR_SMALL, 0, 0, 0, WI_FLARE,	// weapons  WI_MG_20MM
-	450, 4, 8, 4, 0, 0, 0, 30,		// ammo
+	WI_MG_20MM, WI_SIDEWINDER, WI_FFAR, WI_MK82, 0, 0, 0, WI_FLARE,	// weapons  WI_MG_20MM
+	450, 4, 2, 10, 0, 0, 0, 30,		// ammo
 	0,0,0,0,0,0,0,0,			// turret - useful ??
 	{19, 0, 5},					// cameraposition for cockpit view
 	AB_BALL,					// effect model
@@ -1178,7 +1160,7 @@ completeVehicleData_t availableVehicles[] =
 	CAT_GROUND,
 	CLASS_GROUND_RECON,
 	0,							// flags
-	HC_DUALGUNS,				// capabilities
+	HC_DUALGUNS|HC_AMPHIBIOUS,				// capabilities
 	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
