@@ -1,5 +1,5 @@
 /*
- * $Id: g_team.c,v 1.3 2002-02-16 10:16:32 thebjoern Exp $
+ * $Id: g_team.c,v 1.4 2002-02-20 12:05:29 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -842,7 +842,7 @@ gentity_t *SelectCTFSpawnPoint ( team_t team, int teamstate, vec3_t origin, vec3
 	spot = SelectRandomTeamSpawnPoint ( teamstate, team, idx );
 
 	if (!spot) {
-		return SelectSpawnPoint( vec3_origin, origin, angles );
+		return SelectSpawnPoint( vec3_origin, origin, angles, -1 );
 	}
 
 	VectorCopy (spot->s.origin, origin);

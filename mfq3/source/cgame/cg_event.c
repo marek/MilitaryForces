@@ -1,10 +1,6 @@
 /*
- * $Id: cg_event.c,v 1.7 2002-02-17 18:10:54 thebjoern Exp $
+ * $Id: cg_event.c,v 1.8 2002-02-20 12:05:29 thebjoern Exp $
 */
-
-// Copyright (C) 1999-2000 Id Software, Inc.
-//
-// cg_event.c -- handle entity events at snapshot or playerstate transitions
 
 #include "cg_local.h"
 

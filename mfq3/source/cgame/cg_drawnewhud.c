@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.23 2002-02-18 09:51:27 thebjoern Exp $
+ * $Id: cg_drawnewhud.c,v 1.24 2002-02-20 12:05:29 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -859,15 +859,10 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 		(availableVehicles[vehicle].cat & CAT_BOAT) ) cammode = CAMERA_TARGET;
 
 	if( cammode == CAMERA_DOWN ) {
-		if( (availableVehicles[vehicle].cat & CAT_GROUND) ||
-			(availableVehicles[vehicle].cat & CAT_BOAT) ) {
-			// nothing to be done here...
-		} else {
-			vec3_t a;
-			AngleVectors( cent->currentState.angles, 0, 0, v );
-			VectorSet( a, 90, cent->currentState.angles[1], 0 );
-			AnglesToAxis( a, cg.HUDCamera.viewaxis );
-		}
+		vec3_t a;
+		AngleVectors( cent->currentState.angles, 0, 0, v );
+		VectorSet( a, 90, cent->currentState.angles[1], 0 );
+		AnglesToAxis( a, cg.HUDCamera.viewaxis );
 			// position
 		VectorScale( v, availableVehicles[vehicle].mins[2], v );
 		VectorAdd( cent->lerpOrigin, v, cg.HUDCamera.vieworg );
@@ -957,6 +952,7 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 			// position
 		VectorScale( v, availableVehicles[vehicle].maxs[0], v );
 		VectorAdd( cent->lerpOrigin, v, cg.HUDCamera.vieworg );
+		cg.HUDCamera.vieworg[2] += 4;
 	} 
 
 	// set a client global so that other code can render differently for this mini-render

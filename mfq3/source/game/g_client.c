@@ -1,5 +1,5 @@
 /*
- * $Id: g_client.c,v 1.2 2002-02-16 10:16:32 thebjoern Exp $
+ * $Id: g_client.c,v 1.3 2002-02-20 12:05:29 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -164,7 +164,7 @@ SelectRandomFurthestSpawnPoint
 Chooses a player start, deathmatch start, etc
 ============
 */
-gentity_t *SelectRandomFurthestSpawnPoint ( vec3_t avoidPoint, vec3_t origin, vec3_t angles ) {
+gentity_t *SelectRandomFurthestSpawnPoint ( vec3_t avoidPoint, vec3_t origin, vec3_t angles, int category ) {
 	gentity_t	*spot;
 	vec3_t		delta;
 	float		dist;
@@ -179,6 +179,7 @@ gentity_t *SelectRandomFurthestSpawnPoint ( vec3_t avoidPoint, vec3_t origin, ve
 		if ( SpotWouldTelefrag( spot ) ) {
 			continue;
 		}
+		if( category < 0 || !(spot->ent_category & category) ) continue;
 		VectorSubtract( spot->s.origin, avoidPoint, delta );
 		dist = VectorLength( delta );
 		for (i = 0; i < numSpots; i++) {
@@ -230,8 +231,8 @@ SelectSpawnPoint
 Chooses a player start, deathmatch start, etc
 ============
 */
-gentity_t *SelectSpawnPoint ( vec3_t avoidPoint, vec3_t origin, vec3_t angles ) {
-	return SelectRandomFurthestSpawnPoint( avoidPoint, origin, angles );
+gentity_t *SelectSpawnPoint ( vec3_t avoidPoint, vec3_t origin, vec3_t angles, int category ) {
+	return SelectRandomFurthestSpawnPoint( avoidPoint, origin, angles, category );
 
 	/*
 	gentity_t	*spot;
@@ -281,7 +282,7 @@ gentity_t *SelectInitialSpawnPoint( vec3_t origin, vec3_t angles ) {
 	}
 
 	if ( !spot || SpotWouldTelefrag( spot ) ) {
-		return SelectSpawnPoint( vec3_origin, origin, angles );
+		return SelectSpawnPoint( vec3_origin, origin, angles, -1 );
 	}
 
 	VectorCopy (spot->s.origin, origin);
