@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicle.c,v 1.23 2002-06-16 21:36:28 thebjoern Exp $
+ * $Id: cg_vehicle.c,v 1.24 2002-07-14 17:13:19 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -639,7 +639,7 @@ CG_VehicleMuzzleFlash
 
 =============
 */
-void CG_VehicleMuzzleFlash( centity_t *cent, const refEntity_t *parent, qhandle_t parentModel, int idx ) {
+void CG_VehicleMuzzleFlash( int weaponIdx, const refEntity_t *parent, qhandle_t parentModel, int idx ) {
 
 	refEntity_t		flash[MAX_MUZZLEFLASHES];
 	vec3_t			angles;
@@ -647,13 +647,8 @@ void CG_VehicleMuzzleFlash( centity_t *cent, const refEntity_t *parent, qhandle_
 	unsigned int	flashes;
 	char			tag[10];
 
-	// impulse flash
-	if ( cg.time - cent->muzzleFlashTime > MUZZLE_FLASH_TIME ) {
-		return;
-	}
-
 //	flashes = availableWeapons[availableVehicles[idx].weapons[0]].barrels;
-	flashes = availableWeapons[cent->muzzleFlashWeapon].barrels;
+	flashes = availableWeapons[weaponIdx].barrels;
 
 	if( flashes > MAX_MUZZLEFLASHES ) flashes = MAX_MUZZLEFLASHES;
 

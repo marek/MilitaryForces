@@ -1,5 +1,5 @@
 /*
- * $Id: cg_testmodel.c,v 1.5 2002-06-12 14:35:33 thebjoern Exp $
+ * $Id: cg_testmodel.c,v 1.6 2002-07-14 17:13:19 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -261,6 +261,7 @@ void CG_AddTestVehicle (void) {
 	switch( cg.testVehicleCat ) {
 		case CAT_PLANE:
 			{
+
 				for( i = 1; i < BP_PLANE_MAX_PARTS; ++i ) {
 					if( ! cg.testVehicleParts[i].hModel ) continue;
 					CG_PositionEntityOnTag( &cg.testVehicleParts[i], &cg.testVehicleParts[0], 

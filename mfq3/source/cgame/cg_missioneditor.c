@@ -1,5 +1,5 @@
 /*
- * $Id: cg_missioneditor.c,v 1.6 2002-06-16 21:36:28 thebjoern Exp $
+ * $Id: cg_missioneditor.c,v 1.7 2002-07-14 17:13:19 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -744,37 +744,15 @@ void ME_DrawVehicle( IGME_vehicle_t* veh )
 		switch( availableVehicles[veh->vehidx].cat ) {
 		case CAT_PLANE:
 			{
-				refEntity_t part[BP_PLANE_MAX_PARTS];
-				int i;
-				for( i = 0; i < BP_PLANE_MAX_PARTS; i++ ) {
-					memset( &part[i], 0, sizeof(part[0]) );	
-				}	
-				// body
-				AnglesToAxis( veh->angles, part[BP_PLANE_BODY].axis );
-				part[BP_PLANE_BODY].hModel = availableVehicles[veh->vehidx].handle[BP_PLANE_BODY];		
-				VectorCopy( veh->origin, part[BP_PLANE_BODY].origin );	
-				VectorCopy( veh->origin, part[BP_PLANE_BODY].oldorigin);
-				trap_R_AddRefEntityToScene( &part[BP_PLANE_BODY] );
-				// other parts
-				for( i = 1; i < BP_PLANE_MAX_PARTS; i++ ) {
-					part[i].hModel = availableVehicles[veh->vehidx].handle[i];
-					if( !part[i].hModel ) continue;
-					VectorCopy( veh->origin, part[i].lightingOrigin );
-					AxisCopy( axisDefault, part[i].axis );
-					if( i == BP_PLANE_PROP && (availableVehicles[veh->vehidx].caps & HC_PROP) ) {
-						int ii;
-						for( ii = 1; ii < availableVehicles[veh->vehidx].engines; ++ii ) {
-							refEntity_t engine;
-							memcpy( &engine, &part[i], sizeof(engine) );
-							CG_PositionRotatedEntityOnTag( &engine, &part[BP_PLANE_BODY], 
-								availableVehicles[veh->vehidx].handle[BP_PLANE_BODY], engine_tags[ii-1] );
-							trap_R_AddRefEntityToScene( &engine );
-						}
-					}
-					CG_PositionRotatedEntityOnTag( &part[i], &part[BP_PLANE_BODY], 
-							availableVehicles[veh->vehidx].handle[BP_PLANE_BODY], plane_tags[i] );
-					trap_R_AddRefEntityToScene( &part[i] );
-				}
+				DrawInfo_Plane_t drawInfo;
+				memset( &drawInfo, 0, sizeof(drawInfo) );
+				VectorCopy( veh->angles, drawInfo.basicInfo.angles );
+				VectorCopy( veh->origin, drawInfo.basicInfo.origin );
+				AnglesToAxis( veh->angles, drawInfo.basicInfo.axis );
+				drawInfo.basicInfo.vehicleIndex = veh->vehidx;
+				drawInfo.basicInfo.entityNum = -1;
+				drawInfo.basicInfo.loadout = &availableLoadouts[veh->vehidx];
+				CG_DrawPlane(&drawInfo);	
 			}
 			break;
 		case CAT_GROUND:

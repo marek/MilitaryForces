@@ -1,5 +1,5 @@
 /*
- * $Id: cg_helo.c,v 1.2 2002-02-19 16:32:47 sparky909_uk Exp $
+ * $Id: cg_helo.c,v 1.3 2002-07-14 17:13:19 thebjoern Exp $
 */
 
 
@@ -281,7 +281,7 @@ void CG_Helo( centity_t *cent, clientInfo_t *ci )
 		part[i].renderfx = renderfx;
 		trap_R_AddRefEntityToScene( &part[i] );
 	}
-	CG_PlanePilot( cent, &part[BP_PLANE_BODY], ci->parts[BP_PLANE_BODY], ci->vehicle );
+	CG_PlanePilot( &part[BP_PLANE_BODY], ci->parts[BP_PLANE_BODY], ci->vehicle );
 	
 	// vapor
 	if( ONOFF & OO_VAPOR ) {
@@ -494,7 +494,9 @@ void CG_Helo( centity_t *cent, clientInfo_t *ci )
 					  cgs.media.smokePuffShader );	
 	}
 
-	CG_VehicleMuzzleFlash( cent, &part[BP_PLANE_BODY], ci->parts[BP_PLANE_BODY], ci->vehicle );
+	if ( cg.time - cent->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {
+		CG_VehicleMuzzleFlash( cent->muzzleFlashWeapon, &part[BP_PLANE_BODY], ci->parts[BP_PLANE_BODY], ci->vehicle );
+	}
 
 	CG_PlaneFlags( cent );
 

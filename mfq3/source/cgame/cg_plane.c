@@ -1,33 +1,11 @@
 /*
- * $Id: cg_plane.c,v 1.30 2002-02-27 23:11:18 thebjoern Exp $
+ * $Id: cg_plane.c,v 1.31 2002-07-14 17:13:19 thebjoern Exp $
 */
 
 
 #include "cg_local.h"
 
-#define VAPORSPEED	(SPEED_GREEN_ARC - (SPEED_GREEN_ARC - SPEED_YELLOW_ARC)/2)
 
-// make sure the tags are named properly!
-char *plane_tags[BP_PLANE_MAX_PARTS] =
-{
-	"<no tag>",		// plane body
-	"tag_controls",	// controls
-	"tag_cockpit",	// cockpit
-	"tag_gear",		// gear
-	"tag_breaks",	// brakes
-	"tag_bay",		// bay
-	"tag_wingL",	// wing left
-	"tag_wingR",	// wing right
-	"tag_special",	// special
-	"tag_prop1"	// prop
-};
-
-char *engine_tags[3] =
-{
-	"tag_prop2",
-	"tag_prop3",
-	"tag_prop4"
-};
 
 /*
 ==========================
@@ -50,84 +28,6 @@ void CG_RegisterPlane( clientInfo_t *ci )
 */
 	}
 }
-
-/*
-=============
-CG_PlanePilot
-=============
-*/
-void CG_PlanePilot( centity_t *cent, const refEntity_t *parent, qhandle_t parentModel, int idx ) {
-
-	refEntity_t		pilot[MAX_PILOTS*3];	// three parts per pilot
-	unsigned int	i,j,k;
-	unsigned int	pilots = ((availableVehicles[idx].renderFlags & MFR_DUALPILOT) ? 2 : 1);
-	char			tag[12];
-
-	// pilot
-	for( i = 0; i < pilots; i++ ) {
-		for( j = 0; j < 3; j++ ) {
-			k = 3*i+j;
-			memset( &pilot[k], 0, sizeof( pilot[k] ) );
-			VectorCopy( parent->lightingOrigin, pilot[k].lightingOrigin );
-			pilot[k].shadowPlane = parent->shadowPlane;
-			pilot[k].renderfx = parent->renderfx;
-			if( j == 0 ) pilot[k].hModel = (cgs.gameset != MF_GAMESET_MODERN ? cgs.media.pilotWW2 : cgs.media.pilot);
-			else if( j == 1 ) pilot[k].hModel = (cgs.gameset != MF_GAMESET_MODERN ? cgs.media.pilotHeadWW2 : cgs.media.pilotHead);
-			else pilot[k].hModel = (cgs.gameset != MF_GAMESET_MODERN ? cgs.media.pilotSeatWW2 : cgs.media.pilotSeat);
-			AxisCopy( axisDefault, pilot[k].axis );
-			Com_sprintf( tag, 12, "tag_pilot%d", i+1 );
-			CG_PositionRotatedEntityOnTag( &pilot[k], parent, parentModel, tag);
-			trap_R_AddRefEntityToScene( &pilot[k] );
-		}
-	}
-}
-
-/*
-=============
-CG_PlaneMuzzleFlash
-
-=============
-*/
-/*
-static void CG_PlaneMuzzleFlash( centity_t *cent, const refEntity_t *parent, qhandle_t parentModel, int idx ) {
-
-	refEntity_t		flash[MAX_MUZZLEFLASHES];
-	vec3_t			angles;
-	unsigned int	i;
-	unsigned int	flashes;
-	char			tag[10];
-
-	// impulse flash
-	if ( cg.time - cent->muzzleFlashTime > MUZZLE_FLASH_TIME ) {
-		return;
-	}
-
-	flashes = availableWeapons[availableVehicles[idx].weapons[0]].barrels;
-
-	if( flashes > MAX_MUZZLEFLASHES ) flashes = MAX_MUZZLEFLASHES;
-
-	for( i = 0; i < flashes; i++ ) {
-		memset( &flash[i], 0, sizeof( flash[i] ) );
-		VectorCopy( parent->lightingOrigin, flash[i].lightingOrigin );
-		flash[i].shadowPlane = parent->shadowPlane;
-		flash[i].renderfx = parent->renderfx;
-		flash[i].hModel = cgs.media.vehicleMuzzleFlashModel;
-
-		angles[YAW] = 0;
-		angles[PITCH] = 0;
-		angles[ROLL] = crandom() * 10;
-		AnglesToAxis( angles, flash[i].axis );
-
-		if( i > 0 ) {
-			Com_sprintf( tag, 10, "tag_gun%d", i+1 );
-		} else {
-			strcpy( tag, "tag_gun" );
-		}
-		CG_PositionRotatedEntityOnTag( &flash[i], parent, parentModel, tag);
-		trap_R_AddRefEntityToScene( &flash[i] );
-	}
-}
-*/
 
 /*
 ===============
@@ -166,79 +66,46 @@ CG_Plane
 */
 void CG_Plane( centity_t *cent, clientInfo_t *ci ) 
 {
-	refEntity_t	    part[BP_PLANE_MAX_PARTS];
-	refEntity_t		vapor;
-	refEntity_t		burner;
-	refEntity_t		burner2;
-	refEntity_t		reticle;
-	float			shadowPlane = 0;
-	int				renderfx = 0;
-	int				i;
-	int				ONOFF = cent->currentState.ONOFF;
 	vec3_t			velocity;	
-	float			speed;
 	vec3_t			smokePosition, forward;
+	DrawInfo_Plane_t drawInfo;
+	int				ONOFF = cent->currentState.ONOFF;
 
+	memset( &drawInfo, 0, sizeof(drawInfo) );
+	drawInfo.basicInfo.vehicleIndex = ci->vehicle;
+	drawInfo.basicInfo.ONOFF = ONOFF;
+		
 	// get speed
 	VectorCopy( cent->currentState.pos.trDelta, velocity );
-	speed = VectorLength( velocity );
+	drawInfo.basicInfo.speed = VectorLength( velocity );
+	
+	// entitynum
+	drawInfo.basicInfo.entityNum = cent->currentState.number;
 
-	// get velocity
-//	BG_EvaluateTrajectoryDelta( &cent->currentState.pos, cg.time, velocity );
-
-	for( i = 0; i < BP_PLANE_MAX_PARTS; i++ ) {
-	    memset( &part[i], 0, sizeof(part[0]) );	
-	}
-    memset( &vapor, 0, sizeof(vapor) );	
-    memset( &burner, 0, sizeof(burner) );	
-    memset( &burner2, 0, sizeof(burner2) );	
-	memset( &reticle, 0, sizeof(reticle) );	
-
-    // make sure cockpit view wont show vehicle
-/*
-    if( cent == &cg.predictedPlayerEntity && !cg.renderingThirdPerson )
-	{
-		renderfx |= RF_THIRD_PERSON;
-	}
-*/
     // get the rotation information
     VectorCopy( cent->currentState.angles, cent->lerpAngles );
-    AnglesToAxis( cent->lerpAngles, part[BP_PLANE_BODY].axis );
+    AnglesToAxis( cent->lerpAngles, drawInfo.basicInfo.axis );
+
+	// position and orientation
+	VectorCopy( cent->lerpOrigin, drawInfo.basicInfo.origin );
+	VectorCopy( cent->lerpAngles, drawInfo.basicInfo.angles );
+
+	// throttle
+	drawInfo.basicInfo.throttle = cent->currentState.frame;
 
     // add the talk baloon or disconnect icon
-    CG_PlayerSprites( cent );
+//    CG_PlayerSprites( cent );
     
-   // add the shadow
-	switch( cg_shadows.integer )
-	{
-	case 1:
-		CG_GenericShadow( cent, &shadowPlane );
-		break;
-	case 3:
-		renderfx |= RF_SHADOW_PLANE;
-		break;
-	}
-	
-	// use the same origin for all
-    renderfx |= RF_LIGHTING_ORIGIN;
-
-	//
-	// animations
-	//
-	
 	// control surfaces
-	part[BP_PLANE_CONTROLS].frame = cent->currentState.vehicleAnim;
+	drawInfo.controlFrame = cent->currentState.vehicleAnim;
 	
 	// gear
 	if( availableVehicles[ci->vehicle].caps & HC_GEAR ) {
 		int timediff = cg.time - cent->gearAnimStartTime;
 		int geardown = availableVehicles[ci->vehicle].maxGearFrame;
 		if( ONOFF & OO_GEAR ) {
-			part[BP_PLANE_CONTROLS].frame += 9;
+			drawInfo.controlFrame += 9;
 		}
-//		else {
-//			part[BP_PLANE_GEAR].frame = 2;
-//		}
 		if( cent->gearAnim == GEAR_ANIM_UP ) {
 			cent->gearAnimFrame = geardown - timediff/25;
 			if( cent->gearAnimFrame < GEAR_UP ) {
@@ -252,7 +119,7 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 				cent->gearAnim = GEAR_ANIM_STOP;
 			}
 		}
-		part[BP_PLANE_GEAR].frame = cent->gearAnimFrame;
+		drawInfo.gearFrame = cent->gearAnimFrame;
 	}
 	
 	// bay
@@ -272,146 +139,69 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 				cent->bayAnim = BAY_ANIM_STOP;
 			}
 		}
-		part[BP_PLANE_BAY].frame = cent->bayAnimFrame;
+		drawInfo.bayFrame = cent->bayAnimFrame;
 	}
 
 	// speedbrakes
 	if( availableVehicles[ci->vehicle].caps & HC_SPEEDBRAKE ) {
 		if( ONOFF & OO_SPEEDBRAKE ) {
-			part[BP_PLANE_BRAKES].frame = 1;
+			drawInfo.brakeFrame = 1;
 		}
 		else {
-			part[BP_PLANE_BRAKES].frame = 0;
+			drawInfo.brakeFrame = 0;
 		}
 	}
-	
-	if( speed < 1 ) {
-		part[BP_PLANE_COCKPIT].frame = 1;
+
+	// cockpit
+	if( drawInfo.basicInfo.speed < 1 ) {
+		drawInfo.cockpitFrame = 1;
 	} 
-//	CG_Printf( "CG Anim is %d\n", part[BP_PLANE_CONTROLS].frame );
 
-    //
-    // add the plane body
-    //
-    part[BP_PLANE_BODY].hModel = ci->parts[BP_PLANE_BODY];
-    VectorCopy( cent->lerpOrigin, part[BP_PLANE_BODY].origin );
-
-    VectorCopy( cent->lerpOrigin, part[BP_PLANE_BODY].lightingOrigin );
-    part[BP_PLANE_BODY].shadowPlane = shadowPlane;
-    part[BP_PLANE_BODY].renderfx = renderfx;
-    VectorCopy (part[BP_PLANE_BODY].origin, part[BP_PLANE_BODY].oldorigin);
+	// body
 	if( cent->currentState.frame <= 10 ) {
-		part[BP_PLANE_BODY].frame = 0;
+		drawInfo.bodyFrame = 0;
 	} else {
-		part[BP_PLANE_BODY].frame = ( cent->currentState.frame > 12 ? 2 : 1 );
-	}
-	trap_R_AddRefEntityToScene( &part[BP_PLANE_BODY] );
-	
-	// if the model failed, allow the default nullmodel to be displayed
-	if (!part[BP_PLANE_BODY].hModel) {
-		return;
+		drawInfo.bodyFrame = ( cent->currentState.frame > 12 ? 2 : 1 );
 	}
 
-	for( i = 1; i < BP_PLANE_MAX_PARTS; i++ ) {
-		part[i].hModel = ci->parts[i];
-		if( !part[i].hModel ) {
-			continue;
-		}
-		VectorCopy( cent->lerpOrigin, part[i].lightingOrigin );
-		AxisCopy( axisDefault, part[i].axis );
-		if( i == BP_PLANE_PROP && (availableVehicles[ci->vehicle].caps & HC_PROP) ) {
-			int ii;
-			RotateAroundDirection( part[i].axis, cg.time );
-			for( ii = 1; ii < availableVehicles[ci->vehicle].engines; ++ii ) {
-				refEntity_t engine;
-				memcpy( &engine, &part[i], sizeof(engine) );
-				CG_PositionRotatedEntityOnTag( &engine, &part[BP_PLANE_BODY], ci->parts[BP_PLANE_BODY], engine_tags[ii-1] );
-				engine.shadowPlane = shadowPlane;
-				engine.renderfx = renderfx;
-				trap_R_AddRefEntityToScene( &engine );
-			}
-		}
-		if( (i == BP_PLANE_WINGLEFT || i == BP_PLANE_WINGRIGHT) &&
-			(availableVehicles[ci->vehicle].caps & HC_SWINGWING) ) {
-			RotateAroundYaw( part[BP_PLANE_WINGLEFT].axis, cent->currentState.angles2[PITCH] );
-			RotateAroundYaw( part[BP_PLANE_WINGRIGHT].axis, -cent->currentState.angles2[PITCH] );
-		}
-
-		CG_PositionRotatedEntityOnTag( &part[i], &part[BP_PLANE_BODY], ci->parts[BP_PLANE_BODY], plane_tags[i] );
-		part[i].shadowPlane = shadowPlane;
-		part[i].renderfx = renderfx;
-		trap_R_AddRefEntityToScene( &part[i] );
-	}
-	CG_PlanePilot( cent, &part[BP_PLANE_BODY], ci->parts[BP_PLANE_BODY], ci->vehicle );
-	
-	// vwep
-	if( availableVehicles[ci->vehicle].renderFlags & MFR_VWEP ) {
-		refEntity_t			vwep;
-		completeLoadout_t*	loadout = &cg_loadouts[cent->currentState.number];
-
-		for( i = 0; i < loadout->usedMounts; ++i ) {
-			if( loadout->mounts[i].weapon && loadout->mounts[i].num ) {
-				memset( &vwep, 0, sizeof(vwep) );		
-				vwep.hModel = availableWeapons[loadout->mounts[i].weapon].vwepHandle;
-				VectorCopy( cent->lerpOrigin, vwep.lightingOrigin );
-				AxisCopy( axisDefault, vwep.axis );
-				CG_PositionEntityOnTag( &vwep, &part[BP_PLANE_BODY], ci->parts[BP_PLANE_BODY], 
-						loadout->mounts[i].tag.name );
-				vwep.shadowPlane = shadowPlane;
-				vwep.renderfx = renderfx;
-				trap_R_AddRefEntityToScene( &vwep );
-			}
-		}
+	// swingwings
+	if( availableVehicles[ci->vehicle].caps & HC_SWINGWING ) {
+		drawInfo.swingAngle = cent->currentState.angles2[PITCH];
 	}
 
-	// vapor
-	if( ONOFF & OO_VAPOR ) {
-		vapor.hModel = (availableVehicles[ci->vehicle].renderFlags & MFR_BIGVAPOR) ?
-			cgs.media.vaporBig : cgs.media.vapor;
-		vapor.customShader = cgs.media.vaporShader;
-		if( speed < availableVehicles[ci->vehicle].stallspeed * SPEED_GREEN_ARC &&
-			speed > availableVehicles[ci->vehicle].stallspeed * VAPORSPEED ) {
-			vapor.frame = 1;
-		}
-		VectorCopy( cent->lerpOrigin, vapor.lightingOrigin );
-		AxisCopy( axisDefault, vapor.axis );
-		CG_PositionEntityOnTag( &vapor, &part[BP_PLANE_BODY], ci->parts[BP_PLANE_BODY], "tag_vapor1" );
-		vapor.shadowPlane = shadowPlane;
-		vapor.renderfx = renderfx;
-		trap_R_AddRefEntityToScene( &vapor );
-//		CG_Printf( "Vapor frame %d\n", vapor.frame );
+	// loadout
+	drawInfo.basicInfo.loadout = &cg_loadouts[cent->currentState.number];
+
+	// smoke
+	if( cent->currentState.generic1 ) {
+		AngleVectors( cent->lerpAngles, forward, NULL, NULL );
+		VectorMA( cent->lerpOrigin, availableVehicles[ci->vehicle].mins[0], forward, smokePosition );
+		CG_Generic_Smoke( cent, smokePosition, 10 );
+	}
+
+	// muzzleflash
+	if( cg.time - cent->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {
+		drawInfo.basicInfo.drawMuzzleFlash = qtrue;
+		drawInfo.basicInfo.flashWeaponIndex = cent->muzzleFlashWeapon;
 	}
 	
-	// throttle/afterburner
-	if( cent->currentState.frame > 10 ) {
-		burner.hModel = cgs.media.afterburner[availableVehicles[ci->vehicle].effectModel];
-		VectorCopy( cent->lerpOrigin, burner.lightingOrigin );
-		AxisCopy( axisDefault, burner.axis );
-		CG_PositionEntityOnTag( &burner, &part[BP_PLANE_BODY], ci->parts[BP_PLANE_BODY], "tag_ab1" );
-		burner.shadowPlane = shadowPlane;
-		burner.renderfx = renderfx;
-		burner.frame = ( cent->currentState.frame > 12 ? 0 : 1 );
-		trap_R_AddRefEntityToScene( &burner );
-		if( availableVehicles[ci->vehicle].engines > 1 ) {
-			burner2.hModel = cgs.media.afterburner[availableVehicles[ci->vehicle].effectModel];
-			VectorCopy( cent->lerpOrigin, burner2.lightingOrigin );
-			AxisCopy( axisDefault, burner2.axis );
-			CG_PositionRotatedEntityOnTag( &burner2, &part[BP_PLANE_BODY], ci->parts[BP_PLANE_BODY], "tag_ab2" );
-			burner2.shadowPlane = shadowPlane;
-			burner2.renderfx = renderfx;
-			burner2.frame = ( cent->currentState.frame > 12 ? 0 : 1 );
-			trap_R_AddRefEntityToScene( &burner2 );
-		}
-	}
+	// draw plane
+	CG_DrawPlane(&drawInfo);
+
+	// flags
+	CG_PlaneFlags( cent );
 
 	// reticles
 	if( cent == &cg.predictedPlayerEntity )
 	{
+		refEntity_t		reticle;
 		vec3_t	forward, ang, end;
 		trace_t	tr;
 		playerState_t * ps = &cg.snap->ps;
 		float len;
 		float mindist = cg_thirdPersonRange.integer + availableVehicles[ci->vehicle].cam_dist[ CAMERA_V_DEFAULT ] + availableVehicles[ci->vehicle].maxs[0] + 20;
+
+		memset( &reticle, 0, sizeof(reticle) );	
 
 		CG_ResetReticles();
 
@@ -465,8 +255,7 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 			}
 			
 			VectorCopy( reticle.origin, reticle.lightingOrigin );
-			reticle.shadowPlane = shadowPlane;
-			reticle.renderfx = renderfx;
+			reticle.renderfx = RF_LIGHTING_ORIGIN|RF_SHADOW_PLANE;
 			CG_AddReticleEntityToScene( &reticle, target );
 
 			// are we locked onto this target?
@@ -502,8 +291,7 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 					VectorMA( cg.refdef.vieworg, len - 5, forward, reticlelock.origin );
 				}
 				VectorCopy( reticlelock.origin, reticlelock.lightingOrigin );
-				reticlelock.shadowPlane = shadowPlane;
-				reticlelock.renderfx = renderfx;
+				reticlelock.renderfx = RF_LIGHTING_ORIGIN|RF_SHADOW_PLANE;
 				reticlelock.frame = 1;
 			}
 			
@@ -536,60 +324,11 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 				VectorMA( cg.refdef.vieworg, len - 5, forward, reticle.origin );
 			}
 			VectorCopy( reticle.origin, reticle.lightingOrigin );
-			reticle.shadowPlane = shadowPlane;
-			reticle.renderfx = renderfx;
+			reticle.renderfx = RF_LIGHTING_ORIGIN|RF_SHADOW_PLANE;
 
 			CG_AddReticleEntityToScene( &reticle, NULL );
 		}
 	}
-
-	// sound
-	if ( availableVehicles[ci->vehicle].caps & HC_PROP ) {
-		trap_S_AddLoopingSound( cent->currentState.number, cent->lerpOrigin, vec3_origin, cgs.media.engineProp );
-	}
-	else {
-		if( cent->currentState.frame > 10 ) {
-			trap_S_AddLoopingSound( cent->currentState.number, cent->lerpOrigin, vec3_origin, cgs.media.engineJetAB );
-		}
-		else {
-			trap_S_AddLoopingSound( cent->currentState.number, cent->lerpOrigin, vec3_origin, cgs.media.engineJet );
-		}
-	}
-	
-	// smoke
-	AngleVectors( cent->lerpAngles, forward, NULL, NULL );
-	VectorMA( cent->lerpOrigin, availableVehicles[ci->vehicle].mins[0], forward, smokePosition );
-	CG_Generic_Smoke( cent, smokePosition, 10 );
-
-	CG_VehicleMuzzleFlash( cent, &part[BP_PLANE_BODY], ci->parts[BP_PLANE_BODY], ci->vehicle );
-
-	CG_PlaneFlags( cent );
-/*
-	{
-		localEntity_t	*smoke, *smoke2;
-		vec3_t			up = {0, 0, 1};
-		vec3_t			pos, pos2, right;
-
-		AngleVectors( cent->lerpAngles, NULL, right, NULL );
-		VectorMA( cent->lerpOrigin, availableVehicles[ci->vehicle].maxs[1], right, pos );
-		VectorMA( cent->lerpOrigin, availableVehicles[ci->vehicle].mins[1], right, pos2 );
-
-		smoke = CG_SmokePuff( pos, up, 
-					  4, 
-					  1.0, 1.0, 1.0, 1.0,
-					  10000, 
-					  cg.time, 0,
-					  LEF_PUFF_DONT_SCALE, 
-					  cgs.media.smokePuffShader );	
-		smoke2 = CG_SmokePuff( pos2, up, 
-					  4, 
-					  1.0, 1.0, 1.0, 1.0,
-					  10000, 
-					  cg.time, 0,
-					  LEF_PUFF_DONT_SCALE, 
-					  cgs.media.smokePuffShader );	
-	}
-*/
 }
 
 

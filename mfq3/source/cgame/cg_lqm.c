@@ -1,5 +1,5 @@
 /*
- * $Id: cg_lqm.c,v 1.1 2002-02-18 11:06:31 thebjoern Exp $
+ * $Id: cg_lqm.c,v 1.2 2002-07-14 17:13:19 thebjoern Exp $
 */
 
 
@@ -374,7 +374,9 @@ void CG_LQM( centity_t *cent, clientInfo_t *ci )
 	}
 #pragma message("maybe use the hastePuffShader for a dust trail when tanks drive ?")
 	// muzzleflash
-	CG_VehicleMuzzleFlash( cent, &part[BP_GV_GUNBARREL], ci->parts[BP_GV_GUNBARREL], ci->vehicle );
+	if ( cg.time - cent->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {
+		CG_VehicleMuzzleFlash( cent->muzzleFlashWeapon, &part[BP_GV_GUNBARREL], ci->parts[BP_GV_GUNBARREL], ci->vehicle );
+	}
 
 	// CTF
 	CG_GroundVehicleFlags( cent );*/

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawtools.c,v 1.18 2002-02-25 15:30:19 thebjoern Exp $
+ * $Id: cg_drawtools.c,v 1.19 2002-07-14 17:13:19 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -788,7 +788,7 @@ CG_MarkGeneratedShadow
 Uses the wall-marks system of Q3 to draw shadows
 ===============
 */
-qboolean CG_MarkGeneratedShadow( centity_t *cent, clientInfo_t * ci, float *shadowPlane )
+static qboolean CG_MarkGeneratedShadow( BasicDrawInfo_t *drawInfo, float *shadowPlane )
 {
 	vec3_t		start, end, mins = {-15, -15, 0}, maxs = {15, 15, 2};
 	trace_t		trace;
@@ -800,8 +800,8 @@ qboolean CG_MarkGeneratedShadow( centity_t *cent, clientInfo_t * ci, float *shad
 	*shadowPlane = 0;
 
 	// send a trace down from the player to the ground
-	VectorCopy( cent->lerpOrigin, start );
-	VectorCopy( cent->lerpOrigin, end );
+	VectorCopy( drawInfo->origin, start );
+	VectorCopy( drawInfo->origin, end );
 	start[2] += 64;	// move start-point's Z upwards a little
 	end[2] -= 256;	// move end-point's Z downwards somewhat
 	trap_CM_BoxTrace( &trace, start, end, mins, maxs, 0, MASK_PLAYERSOLID );
@@ -820,7 +820,7 @@ qboolean CG_MarkGeneratedShadow( centity_t *cent, clientInfo_t * ci, float *shad
 	MF_LimitFloat( &alpha, 0.0f, 1.0f );
 
 	// get the shader handle
-	shaderHandle = CG_GetVehicleShadowShader( ci->vehicle );
+	shaderHandle = CG_GetVehicleShadowShader( drawInfo->vehicleIndex );
 	if( !shaderHandle )
 	{
 		return qtrue;
@@ -828,14 +828,14 @@ qboolean CG_MarkGeneratedShadow( centity_t *cent, clientInfo_t * ci, float *shad
 
 	// assign the x/y radius values based on the vehicle bounding box
 	// NOTE: we might need to setup dedicated values in availableVehicles[] for this later
-	xRad = availableVehicles[ ci->vehicle ].maxs[ 0 ];
-	yRad = availableVehicles[ ci->vehicle ].maxs[ 1 ];
+	xRad = availableVehicles[ drawInfo->vehicleIndex ].maxs[ 0 ];
+	yRad = availableVehicles[ drawInfo->vehicleIndex ].maxs[ 1 ];
 
 	// PLANES ONLY: alter the radius values based upon the vehicles pitch & roll
-	if( (availableVehicles[ ci->vehicle ].cat & CAT_PLANE) || 
-		(availableVehicles[ ci->vehicle ].cat & CAT_HELO) ) {
-		xAlter = fabs( cent->lerpAngles[0] / 30.0f );
-		yAlter = fabs( cent->lerpAngles[2] / 90.0f );
+	if( (availableVehicles[ drawInfo->vehicleIndex ].cat & CAT_PLANE) || 
+		(availableVehicles[ drawInfo->vehicleIndex ].cat & CAT_HELO) ) {
+		xAlter = fabs( drawInfo->angles[0] / 30.0f );
+		yAlter = fabs( drawInfo->angles[2] / 90.0f );
 		MF_LimitFloat( &xAlter, 0.0f, 1.0f );
 		MF_LimitFloat( &yAlter, 0.0f, 1.0f );
 		xRad *= 1.0f - ( 0.9f * xAlter );
@@ -845,7 +845,7 @@ qboolean CG_MarkGeneratedShadow( centity_t *cent, clientInfo_t * ci, float *shad
 	// add the mark as a temporary, so it goes directly to the renderer
 	// without taking a spot in the cg_marks array
 	CG_ImpactMarkEx( shaderHandle, trace.endpos, trace.plane.normal, 
-					 (cent->currentState.angles[1]-180), alpha, alpha, alpha, 1, qfalse, xRad, yRad, qtrue );
+					 (drawInfo->angles[1]-180), alpha, alpha, alpha, 1, qfalse, xRad, yRad, qtrue );
 
 	return qtrue;
 }
@@ -858,7 +858,7 @@ Uses a X/Y axis of a polygon-mesh to draw shadows
 ===============
 */
 
-qboolean CG_PolyMeshGeneratedShadow( centity_t *cent, clientInfo_t * ci, float *shadowPlane )
+static qboolean CG_PolyMeshGeneratedShadow( BasicDrawInfo_t *drawInfo, float *shadowPlane )
 {
 	int x = 0, y = 0, iMod = 0;
 	float xRad = 0, yRad = 0;
@@ -881,31 +881,31 @@ qboolean CG_PolyMeshGeneratedShadow( centity_t *cent, clientInfo_t * ci, float *
 #pragma message ("CG_PolyMeshGeneratedShadow() - fix problem when projecting over high buildings")
 
 	// apply vehicle shadow size/offset adjusters
-	xRad = availableVehicles[ ci->vehicle ].shadowCoords[ SHC_XADJUST ];
-	yRad = availableVehicles[ ci->vehicle ].shadowCoords[ SHC_YADJUST ];
-	xOffset = availableVehicles[ ci->vehicle ].shadowCoords[ SHC_XOFFSET ];
-	yOffset = availableVehicles[ ci->vehicle ].shadowCoords[ SHC_YOFFSET ];
+	xRad = availableVehicles[ drawInfo->vehicleIndex ].shadowCoords[ SHC_XADJUST ];
+	yRad = availableVehicles[ drawInfo->vehicleIndex ].shadowCoords[ SHC_YADJUST ];
+	xOffset = availableVehicles[ drawInfo->vehicleIndex ].shadowCoords[ SHC_XOFFSET ];
+	yOffset = availableVehicles[ drawInfo->vehicleIndex ].shadowCoords[ SHC_YOFFSET ];
 
 	// PLANES+HELICOPTERS?
-	if( (availableVehicles[ ci->vehicle ].cat & CAT_PLANE) || 
-		(availableVehicles[ ci->vehicle ].cat & CAT_HELO) )
+	if( (availableVehicles[ drawInfo->vehicleIndex ].cat & CAT_PLANE) || 
+		(availableVehicles[ drawInfo->vehicleIndex ].cat & CAT_HELO) )
 	{
 		// (alter the radius values based upon the vehicles pitch & roll)
 
 		// get pitch/roll adjusters
-		pitchMax = availableVehicles[ ci->vehicle ].shadowAdjusts[ SHO_PITCHMAX ];
-		rollMax = availableVehicles[ ci->vehicle ].shadowAdjusts[ SHO_ROLLMAX ];
-		pitchMod = availableVehicles[ ci->vehicle ].shadowAdjusts[ SHO_PITCHMOD ];
-		rollMod = availableVehicles[ ci->vehicle ].shadowAdjusts[ SHO_ROLLMOD ];
+		pitchMax = availableVehicles[ drawInfo->vehicleIndex ].shadowAdjusts[ SHO_PITCHMAX ];
+		rollMax = availableVehicles[ drawInfo->vehicleIndex ].shadowAdjusts[ SHO_ROLLMAX ];
+		pitchMod = availableVehicles[ drawInfo->vehicleIndex ].shadowAdjusts[ SHO_PITCHMOD ];
+		rollMod = availableVehicles[ drawInfo->vehicleIndex ].shadowAdjusts[ SHO_ROLLMOD ];
 
 		// adjust
-		xAlter = fabs( cent->lerpAngles[PITCH] / pitchMax );
-		yAlter = fabs( cent->lerpAngles[ROLL] / rollMax );
+		xAlter = fabs( drawInfo->angles[PITCH] / pitchMax );
+		yAlter = fabs( drawInfo->angles[ROLL] / rollMax );
 		MF_LimitFloat( &xAlter, 0.0f, 1.0f );
 		MF_LimitFloat( &yAlter, 0.0f, 1.0f );
 
 		// only apply any adjustment when airborne
-		if( !(cent->currentState.ONOFF & OO_LANDED) )
+		if( !(drawInfo->ONOFF & OO_LANDED) )
 		{
 			xRad *= 1.0f - ( pitchMod * xAlter );
 			yRad *= 1.0f - ( rollMod * yAlter );
@@ -929,7 +929,7 @@ qboolean CG_PolyMeshGeneratedShadow( centity_t *cent, clientInfo_t * ci, float *
 	else
 	{
 		// get the shader handle
-		shaderHandle = CG_GetVehicleShadowShader( ci->vehicle );
+		shaderHandle = CG_GetVehicleShadowShader( drawInfo->vehicleIndex );
 		if( !shaderHandle )
 		{
 			return qtrue;
@@ -962,21 +962,21 @@ qboolean CG_PolyMeshGeneratedShadow( centity_t *cent, clientInfo_t * ci, float *
 			{
 				// only rotate in yaw (for planes, helicopters, ...)
 				RotatePointAroundAngles( verts[y][x].xyz, verts[y][x].xyz,
-											cent->lerpAngles[YAW]-180, 0, 0 );
+											drawInfo->angles[YAW]-180, 0, 0 );
 			}
 			else
 			{
 				// rotate in all
 				RotatePointAroundAngles( verts[y][x].xyz, verts[y][x].xyz,
-											cent->lerpAngles[YAW]-180,
-											cent->lerpAngles[PITCH],
-											cent->lerpAngles[ROLL] );
+											drawInfo->angles[YAW]-180,
+											drawInfo->angles[PITCH],
+											drawInfo->angles[ROLL] );
 			}
 
 			// convert to global origin
-			verts[y][x].xyz[ 0 ] += (cent->lerpOrigin[ 0 ]);
-			verts[y][x].xyz[ 1 ] += (cent->lerpOrigin[ 1 ]);
-			verts[y][x].xyz[ 2 ] += (cent->lerpOrigin[ 2 ]);
+			verts[y][x].xyz[ 0 ] += (drawInfo->origin[ 0 ]);
+			verts[y][x].xyz[ 1 ] += (drawInfo->origin[ 1 ]);
+			verts[y][x].xyz[ 2 ] += (drawInfo->origin[ 2 ]);
 
 			// texture (NOTE: u & v flipped, because that's how it works fine with)
 			verts[y][x].st[ 0 ] = v;
@@ -1083,17 +1083,12 @@ Uses polygons to alpha blend a shadow texture onto the terrain
 
 #define _POLYMESH_SHADOW
 
-qboolean CG_GenericShadow( centity_t *cent, float *shadowPlane )
+qboolean CG_GenericShadow( BasicDrawInfo_t *drawInfo, float *shadowPlane )
 {
-	clientInfo_t * ci = NULL;
-
-	// get client information
-	ci = &cgs.clientinfo[ cent->currentState.clientNum ];
-
 #ifndef _POLYMESH_SHADOW
-	return CG_MarkGeneratedShadow( cent, ci, shadowPlane );
+	return CG_MarkGeneratedShadow( drawInfo, shadowPlane );
 #else
-	return CG_PolyMeshGeneratedShadow( cent, ci, shadowPlane );
+	return CG_PolyMeshGeneratedShadow( drawInfo, shadowPlane );
 #endif
 }
 
@@ -1380,7 +1375,7 @@ void CG_Draw_HUD_Label( int x, int y, char * pText, float alpha )
 ================
 CG_Generic_Smoke
 
-Draws generic smoke puffs (e.g. or vehicles on fire)
+Draws generic smoke puffs (vehicles on fire)
 ================
 */
 localEntity_t * CG_Generic_Smoke( centity_t * cent, vec3_t smokePosition, int density )
@@ -1388,7 +1383,7 @@ localEntity_t * CG_Generic_Smoke( centity_t * cent, vec3_t smokePosition, int de
 	localEntity_t * smoke = NULL;
 
 	// valid state to add a smoke puff local entity?
-	if( cent->currentState.generic1 && cg_smoke.integer && cent->miscTime < cg.time )
+	if( cg_smoke.integer && cent->miscTime < cg.time )
 	{
 		vec3_t			up = {0, 0, 20};					// direction of smoke
 		float			lifeTime = RandomInt( 50, 150 );	// general life-frames of smoke
