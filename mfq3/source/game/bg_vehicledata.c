@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.25 2002-02-20 18:38:21 sparky909_uk Exp $
+ * $Id: bg_vehicledata.c,v 1.26 2002-02-20 18:43:44 sparky909_uk Exp $
 */
 
 #include "q_shared.h"
@@ -343,7 +343,7 @@ completeVehicleData_t availableVehicles[] =
 	1000,						// baytime
 	47,							// max bay frame
 	0,							// renderflags
-	{2,0,38,42},				// shadow coordinates
+	{8,0,42,42},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
     },
 
