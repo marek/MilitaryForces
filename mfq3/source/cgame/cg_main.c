@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.30 2002-02-15 18:10:47 sparky909_uk Exp $
+ * $Id: cg_main.c,v 1.31 2002-02-19 13:55:58 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -69,6 +69,10 @@ centity_t			cg_entities[MAX_GENTITIES];
 weaponInfo_t		cg_weapons[WI_MAX];
 itemInfo_t			cg_items[MAX_ITEMS];
 
+// (unused cVars)
+//vmCvar_t	cg_drawCrosshair;
+//vmCvar_t	cg_pmove_fixed;
+//vmCvar_t	cg_thirdPersonAngle;
 
 vmCvar_t	cg_railTrailTime;
 vmCvar_t	cg_centertime;
@@ -84,7 +88,6 @@ vmCvar_t	cg_drawFPS;
 vmCvar_t	cg_drawSnapshot;
 vmCvar_t	cg_draw3dIcons;
 vmCvar_t	cg_drawIcons;
-//vmCvar_t	cg_drawCrosshair;
 vmCvar_t	cg_drawCrosshairNames;
 vmCvar_t	cg_drawRewards;
 vmCvar_t	cg_crosshairSize;
@@ -129,7 +132,6 @@ vmCvar_t	cg_teamChatsOnly;
 vmCvar_t	cg_hudFiles;
 vmCvar_t 	cg_smoothClients;
 vmCvar_t	pmove_fixed;
-//vmCvar_t	cg_pmove_fixed;
 vmCvar_t	pmove_msec;
 vmCvar_t	cg_pmove_msec;
 vmCvar_t	cg_cameraMode;
@@ -139,10 +141,9 @@ vmCvar_t	cg_timescale;
 vmCvar_t	cg_smallFont;
 vmCvar_t	cg_bigFont;
 vmCvar_t	cg_noTaunt;
-// MFQ3
-vmCvar_t	cg_thirdPersonHeight;
 
 // MFQ3
+vmCvar_t	cg_thirdPersonHeight;
 vmCvar_t	cg_nextVehicle;
 vmCvar_t	cg_vehicle;
 vmCvar_t	cg_radarTargets;
@@ -183,6 +184,9 @@ vmCvar_t	m2cp_page5;
 vmCvar_t	cg_fxQuality;
 vmCvar_t	cg_consoleTextStyle;
 
+// MFQ3: development cVars
+vmCvar_t	cg_shadowDebug;
+
 typedef struct {
 	vmCvar_t	*vmCvar;
 	char		*cvarName;
@@ -191,6 +195,10 @@ typedef struct {
 } cvarTable_t;
 
 cvarTable_t		cvarTable[] = {
+//	{ &cg_pmove_fixed, "cg_pmove_fixed", "1", CVAR_USERINFO | CVAR_ARCHIVE },
+//	{ &cg_thirdPersonAngle, "cg_thirdPersonAngle", "0", 0 },
+//	{ &cg_drawCrosshair, "cg_drawCrosshair", "4", CVAR_ARCHIVE },
+
 	{ &cg_ignore, "cg_ignore", "0", 0 },	// used for debugging
 	{ &cg_drawGun, "cg_drawGun", "1", CVAR_ARCHIVE },
 	{ &cg_zoomFov, "cg_zoomfov", "22.5", CVAR_ARCHIVE },
@@ -205,7 +213,6 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_drawSnapshot, "cg_drawSnapshot", "0", CVAR_ARCHIVE  },
 	{ &cg_draw3dIcons, "cg_draw3dIcons", "1", CVAR_ARCHIVE  },
 	{ &cg_drawIcons, "cg_drawIcons", "1", CVAR_ARCHIVE  },
-//	{ &cg_drawCrosshair, "cg_drawCrosshair", "4", CVAR_ARCHIVE },
 	{ &cg_drawCrosshairNames, "cg_drawCrosshairNames", "1", CVAR_ARCHIVE },
 	{ &cg_drawRewards, "cg_drawRewards", "1", CVAR_ARCHIVE },
 	{ &cg_crosshairSize, "cg_crosshairSize", "1", CVAR_ARCHIVE },	// default: small
@@ -243,6 +250,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_stats, "cg_stats", "0", 0 },
 	{ &cg_drawFriend, "cg_drawFriend", "1", CVAR_ARCHIVE },
 	{ &cg_teamChatsOnly, "cg_teamChatsOnly", "0", CVAR_ARCHIVE },
+
 	// the following variables are created in other parts of the system,
 	// but we also reference them here
 	{ &cg_buildScript, "com_buildScript", "0", 0 },	// force loading of all possible data amd error on failures
@@ -257,7 +265,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_smoothClients, "cg_smoothClients", "0", CVAR_USERINFO | CVAR_ARCHIVE},
 	{ &cg_cameraMode, "com_cameraMode", "0", CVAR_CHEAT},
 
-	// MFQ3
+	// MFQ3+
 	{ &cg_vehicle, "cg_vehicle", "-1", CVAR_ROM | CVAR_USERINFO },
 	{ &cg_nextVehicle, "cg_nextVehicle", "-1", CVAR_ROM | CVAR_USERINFO },
 	{ &cg_radarTargets, "cg_radarTargets", "20", CVAR_ARCHIVE },
@@ -299,13 +307,16 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_fxQuality, "cg_fxQuality", "2", CVAR_ARCHIVE },	// enum: quality_t in cg_local.h
 	{ &cg_consoleTextStyle, "cg_consoleTextStyle", "3", CVAR_ARCHIVE },
 
-	{ &pmove_fixed, "pmove_fixed", "1", CVAR_ROM},
-	{ &pmove_msec, "pmove_msec", "8", 0},
-	{ &cg_noTaunt, "cg_noTaunt", "0", CVAR_ARCHIVE},
-	{ &cg_smallFont, "ui_smallFont", "0.25", CVAR_ARCHIVE},
-	{ &cg_bigFont, "ui_bigFont", "0.4", CVAR_ARCHIVE},
+	{ &pmove_fixed, "pmove_fixed", "1", CVAR_ROM },
+	{ &pmove_msec, "pmove_msec", "8", 0 },
+	{ &cg_noTaunt, "cg_noTaunt", "0", CVAR_ARCHIVE },
+	{ &cg_smallFont, "ui_smallFont", "0.25", CVAR_ARCHIVE },
+	{ &cg_bigFont, "ui_bigFont", "0.4", CVAR_ARCHIVE },
 
-//	{ &cg_pmove_fixed, "cg_pmove_fixed", "1", CVAR_USERINFO | CVAR_ARCHIVE }
+// MFQ3: development cVars
+	{ &cg_shadowDebug, "cg_shadowDebug", "0", CVAR_ARCHIVE},	// set this to 1 to enable the shadow development code
+
+	// MFQ3-
 };
 
 int		cvarTableSize = sizeof( cvarTable ) / sizeof( cvarTable[0] );

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_consolecmds.c,v 1.16 2002-02-18 16:30:45 sparky909_uk Exp $
+ * $Id: cg_consolecmds.c,v 1.17 2002-02-19 13:55:58 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -510,6 +510,80 @@ void CG_Assign_Custom_Chat_Ptr_f( void )
 	cg.pCustomChat = (chat_t *) atoi( CG_Argv(1) );
 }
 
+/*
+=================
+CG_ExtractDeveloper
+
+Intercepts 'say <var> <values>' commands for development purposes
+=================
+*/
+
+qboolean CG_ExtractDeveloper( void )
+{
+	clientInfo_t * ci = NULL;
+
+	float value = 0;
+
+	// get client information if we can
+	if( cg.snap )
+	{
+		ci = &cgs.clientinfo[ cg.snap->ps.clientNum ];
+	}
+	else
+	{
+		// no information, nothing possible
+		return qfalse;
+	}
+
+	// convert 2nd param into a value
+	value = atof( CG_Argv(1) );
+
+	// check 2nd param against known variables
+
+	if( !Q_stricmp( CG_Argv(0), "ox" ) )
+	{
+		availableVehicles[ ci->vehicle ].shadowCoords[ SHC_XOFFSET ] = value;
+		return qtrue;
+	}
+	else if( !Q_stricmp( CG_Argv(0), "oy" ) )
+	{
+		availableVehicles[ ci->vehicle ].shadowCoords[ SHC_YOFFSET ] = value;
+		return qtrue;
+	}
+	else if( !Q_stricmp( CG_Argv(0), "ax" ) )
+	{
+		availableVehicles[ ci->vehicle ].shadowCoords[ SHC_XADJUST ] = value;
+		return qtrue;
+	}
+	else if( !Q_stricmp( CG_Argv(0), "ay" ) )
+	{
+		availableVehicles[ ci->vehicle ].shadowCoords[ SHC_YADJUST ] = value;
+		return qtrue;
+	}
+	else if( !Q_stricmp( CG_Argv(0), "pmax" ) )
+	{
+		availableVehicles[ ci->vehicle ].shadowAdjusts[ SHO_PITCHMAX ] = value;
+		return qtrue;
+	}
+	else if( !Q_stricmp( CG_Argv(0), "rmax" ) )
+	{
+		availableVehicles[ ci->vehicle ].shadowAdjusts[ SHO_ROLLMAX ] = value;
+		return qtrue;
+	}
+	else if( !Q_stricmp( CG_Argv(0), "pmod" ) )
+	{
+		availableVehicles[ ci->vehicle ].shadowAdjusts[ SHO_PITCHMAX ] = value;
+		return qtrue;
+	}
+	else if( !Q_stricmp( CG_Argv(0), "rmod" ) )
+	{
+		availableVehicles[ ci->vehicle ].shadowAdjusts[ SHO_ROLLMOD ] = value;
+		return qtrue;
+	}
+
+	return qfalse;
+}
+
 typedef struct {
 	char	*cmd;
 	void	(*function)(void);
@@ -586,9 +660,21 @@ qboolean CG_ConsoleCommand( void ) {
 
 	cmd = CG_Argv(0);
 
-	for ( i = 0 ; i < sizeof( commands ) / sizeof( commands[0] ) ; i++ ) {
-		if ( !Q_stricmp( cmd, commands[i].cmd ) ) {
+	// developer variable modification
+	if( CG_ExtractDeveloper() )
+	{
+		return qtrue;
+	}
+
+	// scan though all known client commands
+	for ( i = 0 ; i < sizeof( commands ) / sizeof( commands[0] ) ; i++ ) 
+	{
+		// match?
+		if ( !Q_stricmp( cmd, commands[i].cmd ) )
+		{
+			// execute associated fn()
 			commands[i].function();
+
 			return qtrue;
 		}
 	}
