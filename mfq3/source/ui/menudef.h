@@ -1,5 +1,5 @@
 /*
- * $Id: menudef.h,v 1.4 2002-02-11 12:23:55 sparky909_uk Exp $
+ * $Id: menudef.h,v 1.5 2002-02-26 13:31:40 sparky909_uk Exp $
 */
 
 #define ITEM_TYPE_TEXT 0                  // simple text
@@ -69,6 +69,7 @@
 #define FEEDER_SERVERSTATUS					0x0d			// server status
 #define FEEDER_FINDPLAYER					0x0e			// find player
 #define FEEDER_CINEMATICS					0x0f			// cinematics
+#define FEEDER_SPECTATOR_LIST				0x10			// spectators
 
 // display flags
 #define CG_SHOW_BLUE_TEAM_HAS_REDFLAG     0x00000001
@@ -194,6 +195,10 @@
 #define CG_GAME_MISC 70
 #define CG_GAME_REDSCORE 71
 #define CG_GAME_BLUESCORE 72
+#define CG_GAME_REDCOUNT 73
+#define CG_GAME_BLUECOUNT 74
+#define CG_GAME_SPECTATORCOUNT 75
+#define	CG_GAME_PLAYERSCOUNT 76
 
 #define UI_OWNERDRAW_BASE 200
 #define UI_HANDICAP 200
