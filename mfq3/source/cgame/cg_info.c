@@ -1,5 +1,5 @@
 /*
- * $Id: cg_info.c,v 1.4 2002-01-29 12:09:01 sparky909_uk Exp $
+ * $Id: cg_info.c,v 1.5 2002-02-12 11:30:22 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -124,8 +124,7 @@ void CG_DrawInformation( void ) {
 		UI_DrawProportionalString( 632, 300, s, UI_RIGHT|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 	}
 
-	// the first 150 rows are reserved for the client connection
-	// screen to write into
+	// draw loading progress text
 	if ( cg.infoScreenText[0] )
 	{
 		UI_DrawProportionalString( 320, 170, va("Loading... %s", cg.infoScreenText), UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
