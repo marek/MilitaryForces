@@ -1,5 +1,5 @@
 /*
- * $Id: cg_plane.c,v 1.11 2002-01-26 19:27:30 thebjoern Exp $
+ * $Id: cg_plane.c,v 1.12 2002-01-28 22:34:30 thebjoern Exp $
 */
 
 
@@ -16,7 +16,8 @@ char *plane_tags[BP_PLANE_MAX_PARTS] =
 	"tag_wingL",	// wing left
 	"tag_wingR",	// wing right
 	"tag_special",	// special
-	"tag_prop1"		// prop
+	"tag_prop1",	// prop
+	"tag_prop2"		// prop
 };
 
 
@@ -315,7 +316,7 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 	} else {
 		part[BP_PLANE_BODY].frame = ( cent->currentState.frame > 12 ? 2 : 1 );
 	}
-    trap_R_AddRefEntityToScene( &part[BP_PLANE_BODY] );
+	trap_R_AddRefEntityToScene( &part[BP_PLANE_BODY] );
 	
 	// if the model failed, allow the default nullmodel to be displayed
 	if (!part[BP_PLANE_BODY].hModel) {
@@ -330,7 +331,11 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 		VectorCopy( cent->lerpOrigin, part[i].lightingOrigin );
 		AxisCopy( axisDefault, part[i].axis );
 		if( i == BP_PLANE_PROP && (availableVehicles[ci->vehicle].caps & HC_PROP) ) {
-			RotateAroundDirection( part[BP_PLANE_PROP].axis, cg.time );
+			RotateAroundDirection( part[i].axis, cg.time );
+		} else if( i == BP_PLANE_PROP2 && (availableVehicles[ci->vehicle].caps & HC_PROP) ) {
+			if( availableVehicles[cent->currentState.modelindex].caps & HC_DUALENGINE ) {
+				RotateAroundDirection( part[i].axis, cg.time );
+			} else continue;
 		}
 		if( (i == BP_PLANE_WINGLEFT || i == BP_PLANE_WINGRIGHT) &&
 			(availableVehicles[ci->vehicle].caps & HC_SWINGWING) ) {

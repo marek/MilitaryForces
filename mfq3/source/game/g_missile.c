@@ -1,5 +1,5 @@
 /*
- * $Id: g_missile.c,v 1.5 2001-12-24 02:17:35 thebjoern Exp $
+ * $Id: g_missile.c,v 1.6 2002-01-28 22:34:30 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -256,6 +256,13 @@ static void follow_target( gentity_t *missile ) {
 		return;
 	}
 
+	// close miss
+	if( missile->lastDist && dist > missile->lastDist && dist < missile->splashRadius ) {
+		missile->nextthink = level.time + 10;
+		missile->think = G_ExplodeMissile;
+		return;
+	}
+
 	// out of seeker cone
 	VectorCopy( missile->s.pos.trDelta, dir );
 	VectorNormalize( dir );
@@ -288,6 +295,7 @@ static void follow_target( gentity_t *missile ) {
 	missile->s.pos.trTime = level.time;
 
 	missile->nextthink = level.time + 100;
+	missile->lastDist = dist;
 
 	trap_LinkEntity( missile );
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_miscvehicle.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: cg_miscvehicle.c,v 1.2 2002-01-28 22:34:30 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -113,7 +113,11 @@ static void CG_Misc_Plane( centity_t *cent )
 		VectorCopy( cent->lerpOrigin, part[i].lightingOrigin );
 		AxisCopy( axisDefault, part[i].axis );
 		if( i == BP_PLANE_PROP && (availableVehicles[cent->currentState.modelindex].caps & HC_PROP) ) {
-			RotateAroundDirection( part[BP_PLANE_PROP].axis, cg.time );
+			RotateAroundDirection( part[i].axis, cg.time );
+		} else if( i == BP_PLANE_PROP2 && (availableVehicles[cent->currentState.modelindex].caps & HC_PROP) ) {
+			if( availableVehicles[cent->currentState.modelindex].caps & HC_DUALENGINE ) {
+				RotateAroundDirection( part[i].axis, cg.time );
+			} else continue;
 		}
 		CG_PositionRotatedEntityOnTag( &part[i], &part[BP_PLANE_BODY], 
 				availableVehicles[cent->currentState.modelindex].handle[BP_PLANE_BODY], plane_tags[i] );

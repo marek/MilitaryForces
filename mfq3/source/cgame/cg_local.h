@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.16 2002-01-27 15:41:28 thebjoern Exp $
+ * $Id: cg_local.h,v 1.17 2002-01-28 22:34:30 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -650,7 +650,7 @@ typedef struct {
 	qhandle_t	HUDthrottletext;
 	qhandle_t	HUDalphabet;
 	qhandle_t	HUDreticles[HR_MAX];
-
+	
 	// weapon effect models
 	qhandle_t	bulletFlashModel;
 	qhandle_t	dishFlashModel;
