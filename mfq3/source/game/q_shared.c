@@ -1,5 +1,5 @@
 /*
- * $Id: q_shared.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: q_shared.c,v 1.2 2002-01-25 13:26:52 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -755,7 +755,9 @@ char *Q_strupr( char *s1 ) {
 
     s = s1;
 	while ( *s ) {
-		*s = toupper(*s);
+		if ( *s >= 'a' && *s <= 'z' ) {
+			*s += 'A' - 'a';
+		}
 		s++;
 	}
     return s1;

@@ -65,6 +65,10 @@ call ..\compile ../cg_weapons.c
 call ..\compile ../cg_testmodel.c
 @if errorlevel 1 goto quit
 
+call ..\compile ../cg_drawnewhud.c
+@if errorlevel 1 goto quit
+call ..\compile ../cg_drawoldhud.c
+@if errorlevel 1 goto quit
 call ..\compile ../cg_vehicle.c
 @if errorlevel 1 goto quit
 call ..\compile ../cg_miscvehicle.c

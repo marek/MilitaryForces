@@ -18,6 +18,8 @@ cg_servercmds
 cg_snapshot
 cg_view
 cg_weapons
+cg_drawnewhud
+cg_drawoldhud
 cg_testmodel
 cg_vehicle
 cg_miscvehicle

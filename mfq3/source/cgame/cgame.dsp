@@ -139,6 +139,14 @@ SOURCE=.\cg_draw.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\cg_drawnewhud.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\cg_drawoldhud.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\cg_drawtools.c
 # End Source File
 # Begin Source File
