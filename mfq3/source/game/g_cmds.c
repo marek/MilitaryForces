@@ -1,5 +1,5 @@
 /*
- * $Id: g_cmds.c,v 1.2 2001-12-22 17:54:13 thebjoern Exp $
+ * $Id: g_cmds.c,v 1.3 2002-01-07 00:06:02 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -992,7 +992,8 @@ void Cmd_CallVote_f( gentity_t *ent ) {
 		Com_sprintf( level.voteString, sizeof( level.voteString ), "%s %d", arg1, i );
 		Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s %s", arg1, gameNames[i] );
 	} else if( !(Q_stricmp( arg1, "mf_gameset") ) ) {
-		if( Q_stricmp( arg2, "modern" ) != 0 && Q_stricmp( arg2, "ww2" ) != 0 ) {
+		if( Q_stricmp( arg2, "modern" ) != 0 && Q_stricmp( arg2, "ww2" ) != 0 &&
+			Q_stricmp( arg2, "ww1" ) != 0 ) {
 			return;
 		}
 		Com_sprintf( level.voteString, sizeof( level.voteString ), "%s \"%s\"", arg1, arg2 );

@@ -1,5 +1,5 @@
 /*
- * $Id: ui_credits.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: ui_credits.c,v 1.2 2002-01-07 00:06:02 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -168,7 +168,7 @@ static void Credits_DrawPlane( void ) {
 	}
 
 	// prop
-	if( availableVehicles[vehnum].id&MF_GAMESET_ANY&MF_GAMESET_WW2 ) {
+	if( availableVehicles[vehnum].caps & HC_PROP ) {
 		memset( &prop, 0, sizeof(prop) );
 		prop.hModel = s_credits.prop;
 		AxisCopy( axisDefault, prop.axis );
@@ -323,7 +323,7 @@ static void Credits_Reg_Plane( void ) {
 		s_credits.brakes = trap_R_RegisterModel( va("models/vehicles/planes/%s/%s_breaks.md3", 
 			availableVehicles[vehnum].modelName, availableVehicles[vehnum].modelName) );
 	}
-	if( availableVehicles[vehnum].id&MF_GAMESET_ANY&MF_GAMESET_WW2 ) {
+	if( availableVehicles[vehnum].caps & HC_PROP ) {
 		s_credits.prop = trap_R_RegisterModel( va("models/vehicles/planes/%s/%s_prop.md3", 
 			availableVehicles[vehnum].modelName, availableVehicles[vehnum].modelName) );
 	}

@@ -1,5 +1,5 @@
 /*
- * $Id: ui_vehicledraw.c,v 1.3 2001-12-22 02:01:55 thebjoern Exp $
+ * $Id: ui_vehicledraw.c,v 1.4 2002-01-07 00:06:02 thebjoern Exp $
 */
 
 /*
@@ -299,7 +299,7 @@ static void VehShow_DrawPlane( void ) {
 	}
 
 	// prop
-	if( availableVehicles[show_vehicle].id&MF_GAMESET_ANY&MF_GAMESET_WW2 ) {
+	if( availableVehicles[show_vehicle].caps & HC_PROP ) {
 		memset( &prop, 0, sizeof(prop) );
 		prop.hModel = s_vehshow.prop;
 		AxisCopy( axisDefault, prop.axis );
@@ -693,7 +693,7 @@ static void VehShow_Reg_Plane( void ) {
 		s_vehshow.brakes = trap_R_RegisterModel( va("models/vehicles/planes/%s/%s_breaks.md3", 
 			availableVehicles[show_vehicle].modelName, availableVehicles[show_vehicle].modelName) );
 	}
-	if( availableVehicles[show_vehicle].id&MF_GAMESET_ANY&MF_GAMESET_WW2 ) {
+	if( availableVehicles[show_vehicle].caps & HC_PROP ) {
 		s_vehshow.prop = trap_R_RegisterModel( va("models/vehicles/planes/%s/%s_prop.md3", 
 			availableVehicles[show_vehicle].modelName, availableVehicles[show_vehicle].modelName) );
 	}

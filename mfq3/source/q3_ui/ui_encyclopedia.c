@@ -1,5 +1,5 @@
 /*
- * $Id: ui_encyclopedia.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: ui_encyclopedia.c,v 1.2 2002-01-07 00:06:02 thebjoern Exp $
 */
 
 /*
@@ -87,7 +87,7 @@ static void setItemInformation(int byWhat)
 		{
 			unsigned long what = ((0x01<<(s_encyclopedia.vgameset.curvalue))<<24);
 			while( !done ) {
-				if( what > MF_GAMESET_WW2 ) what = MF_GAMESET_MODERN;
+				if( what > MF_GAMESET_WW1 ) what = MF_GAMESET_MODERN;
 				if( what == s_encyclopedia.gameset ) done = qtrue;
 				s_encyclopedia.vindex = MF_getIndexOfVehicle( -1, 
 														      what );

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_weapondata.c,v 1.4 2001-12-24 02:17:35 thebjoern Exp $
+ * $Id: bg_weapondata.c,v 1.5 2002-01-07 00:06:02 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -36,6 +36,64 @@ completeWeaponData_t availableWeapons[] =
 		0,									// crosshair track
 		0,									// crosshair lock
 		0									// crosshair lock friend
+	},
+
+	// machinegun: WW1, cal .303, 2 barrels
+	{ 
+		WT_MACHINEGUN,						// type
+		MF_GAMESET_WW1,						// gameset
+		"2x cal.303 MG",					// descriptiveName
+		"",									// modelName
+		"hud/iconw_mg.tga",					// iconName
+		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
+		2000,								// muzzleVelocity
+		0,									// range
+		0,									// fuelrange
+		150,								// fire interval
+		10,									// damage
+		0,									// damageRadius
+		8,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
+		8,									// barrels
+		0,									// barrelDistance
+		0,									// trackcone
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_GUNMODE,							// crosshair
+		CH_GUNMODE,							// crosshair track
+		CH_GUNMODE,							// crosshair lock
+		CH_GUNMODE							// crosshair lock friend
+	},
+
+	// machinegun: WW1, cal .312, 2 barrels
+	{ 
+		WT_MACHINEGUN,						// type
+		MF_GAMESET_WW1,						// gameset
+		"2x cal.312 MG",					// descriptiveName
+		"",									// modelName
+		"hud/iconw_mg.tga",					// iconName
+		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
+		2000,								// muzzleVelocity
+		0,									// range
+		0,									// fuelrange
+		150,								// fire interval
+		10,									// damage
+		0,									// damageRadius
+		8,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
+		8,									// barrels
+		0,									// barrelDistance
+		0,									// trackcone
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_GUNMODE,							// crosshair
+		CH_GUNMODE,							// crosshair track
+		CH_GUNMODE,							// crosshair lock
+		CH_GUNMODE							// crosshair lock friend
 	},
 
 	// machinegun: WW2, cal 50, 8 barrels
@@ -338,8 +396,8 @@ completeWeaponData_t availableWeapons[] =
 		0,									// iconHandle
 		CAT_PLANE|CAT_HELO,					// cat
 		0.3f,								// non cat mod
-		1500,								// muzzleVelocity
-		3000,								// range
+		1000,								// muzzleVelocity
+		5000,								// range
 		8000,								// fuelrange
 		500,								// fire interval
 		100,								// damage
@@ -347,9 +405,9 @@ completeWeaponData_t availableWeapons[] =
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
-		0.7f,								// trackcone (dot)
+		0.35f,								// trackcone (dot) (0.7)
 		0.985f,								// lockcone (dot)
-		0.996f,								// followcone (dot)
+		0.985f,								// followcone (dot) (0.996)
 		1500,								// locktime
 		CH_MISSILEMODE,						// crosshair
 		CH_MISSILEMODE,						// crosshair track
@@ -367,8 +425,8 @@ completeWeaponData_t availableWeapons[] =
 		0,									// iconHandle
 		CAT_PLANE|CAT_HELO,					// cat
 		0.3f,								// non cat mod
-		1800,								// muzzleVelocity
-		6000,								// range
+		1600,								// muzzleVelocity
+		10000,								// range
 		8000,								// fuelrange
 		500,								// fire interval
 		100,								// damage
@@ -396,8 +454,8 @@ completeWeaponData_t availableWeapons[] =
 		0,									// iconHandle
 		CAT_PLANE|CAT_HELO,					// cat
 		0.3f,								// non cat mod
-		1800,								// muzzleVelocity
-		5000,								// range
+		1600,								// muzzleVelocity
+		8000,								// range
 		8000,								// fuelrange
 		500,								// fire interval
 		100,								// damage
@@ -426,7 +484,7 @@ completeWeaponData_t availableWeapons[] =
 		CAT_PLANE|CAT_HELO,					// cat
 		0.3f,								// non cat mod
 		2500,								// muzzleVelocity
-		9000,								// range
+		14000,								// range
 		8000,								// fuelrange
 		500,								// fire interval
 		120,								// damage
@@ -455,7 +513,7 @@ completeWeaponData_t availableWeapons[] =
 		CAT_PLANE|CAT_HELO,					// cat
 		0.3f,								// non cat mod
 		1500,								// muzzleVelocity
-		2500,								// range
+		4000,								// range
 		8000,								// fuelrange
 		1000,								// fire interval
 		80,									// damage
@@ -483,8 +541,8 @@ completeWeaponData_t availableWeapons[] =
 		0,									// iconHandle
 		CAT_PLANE|CAT_HELO,					// cat
 		0.3f,								// non cat mod
-		1500,								// muzzleVelocity
-		2500,								// range
+		1000,								// muzzleVelocity
+		5000,								// range
 		8000,								// fuelrange
 		500,								// fire interval
 		100,								// damage
@@ -492,9 +550,9 @@ completeWeaponData_t availableWeapons[] =
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
-		0.7f,								// trackcone (dot)
+		0.35f,								// trackcone (dot)
 		0.985f,								// lockcone (dot)
-		0.996f,								// followcone (dot)
+		0.985f,								// followcone (dot)
 		1500,								// locktime
 		CH_MISSILEMODE,						// crosshair
 		CH_MISSILEMODE,						// crosshair track
@@ -513,7 +571,7 @@ completeWeaponData_t availableWeapons[] =
 		CAT_PLANE|CAT_HELO,					// cat
 		0.3f,								// non cat mod
 		1800,								// muzzleVelocity
-		5000,								// range
+		8000,								// range
 		8000,								// fuelrange
 		500,								// fire interval
 		100,								// damage
@@ -542,7 +600,7 @@ completeWeaponData_t availableWeapons[] =
 		CAT_PLANE|CAT_HELO,					// cat
 		0.3f,								// non cat mod
 		2500,								// muzzleVelocity
-		7000,								// range
+		10000,								// range
 		8000,								// fuelrange
 		500,								// fire interval
 		100,								// damage
@@ -571,10 +629,39 @@ completeWeaponData_t availableWeapons[] =
 		CAT_GROUND,							// cat
 		0.3f,								// non cat mod
 		1000,								// muzzleVelocity
-		3000,								// range
+		6000,								// range
 		5000,								// fuelrange
 		500,								// fire interval
-		100,								// damage
+		300,								// damage
+		50,									// damageRadius
+		1,									// spread
+		2,									// barrels
+		0,									// barrelDistance
+		0.7f,								// trackcone (dot)
+		0.985f,								// lockcone (dot)
+		0.996f,								// followcone (dot)
+		1500,								// locktime
+		CH_MISSILEMODE,						// crosshair
+		CH_MISSILEMODE,						// crosshair track
+		CH_MISSILEMODELOCK,					// crosshair lock
+		CH_MISSILEMODE						// crosshair lock friend
+	},
+
+	// Maverick
+	{ 
+		WT_ANTIGROUNDMISSILE,				// type
+		MF_GAMESET_ANY,						// gameset
+		"Maverick",							// descriptiveName
+		"models/weapons/ffar.md3",			// modelName
+		"hud/iconw_rkt.tga",				// iconName
+		0,									// iconHandle
+		CAT_GROUND,							// cat
+		0.3f,								// non cat mod
+		1000,								// muzzleVelocity
+		8000,								// range
+		5000,								// fuelrange
+		500,								// fire interval
+		400,								// damage
 		50,									// damageRadius
 		1,									// spread
 		2,									// barrels

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: bg_mfq3util.c,v 1.2 2002-01-07 00:06:02 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -12,6 +12,9 @@ void MF_SetGameset(unsigned long gs)
 {
 	switch( gs )
 	{
+	case MF_GAMESET_WW1:
+		trap_Cvar_Set("mf_gameset", "ww1");
+		break;
 	case MF_GAMESET_WW2:
 		trap_Cvar_Set("mf_gameset", "ww2");
 		break;

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_groundmove.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: bg_groundmove.c,v 1.2 2002-01-07 00:06:02 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -87,6 +87,9 @@ static void PM_GroundVehicleAccelerate()
     float	accel = availableVehicles[pm->vehicle].accel * pml.frametime;
 	float	targetspeed;
 	float	angle = pm->ps->vehicleAngles[0];
+		
+	// account for water
+	topspeed /= (pm->waterlevel+1);
 
 	if( pm->ps->ONOFF & OO_LANDED ) {
 
@@ -162,6 +165,10 @@ static void PM_AdjustToTerrain( void )
 	float		heightX, heightY, heightXC, heightYC;
 	qboolean	fall = qfalse;	
 	float		height;
+
+	if( pm->waterlevel && availableVehicles[pm->vehicle].caps & HC_AMPHIBIOUS ) {
+		return;
+	}
 
 	// set the height
 	VectorSet( start[0], pm->ps->origin[0], pm->ps->origin[1], pm->ps->origin[2] + 30 );
