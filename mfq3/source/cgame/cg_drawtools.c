@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawtools.c,v 1.3 2002-02-04 12:59:14 sparky909_uk Exp $
+ * $Id: cg_drawtools.c,v 1.4 2002-02-14 12:02:19 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -871,7 +871,9 @@ qboolean CG_PolyMeshGeneratedShadow( centity_t *cent, clientInfo_t * ci, float *
 	vec3_t start, end, mins = {-1, -1, 0}, maxs = {1, 1, 0}, up = {0,0,1}, tmpVec;
 	trace_t	trace;
 
-#pragma message ("CG_PolyMeshGeneratedShadow() - fix problem when projecting over high buildings etc..")
+#pragma message ("CG_PolyMeshGeneratedShadow() - fix problem when projecting over high buildings")
+#pragma message ("CG_PolyMeshGeneratedShadow() - fix problem when projecting over water")
+#pragma message ("CG_PolyMeshGeneratedShadow() - fix problem with bounding box (use custom coords)")
 
 	// assign the x/y radius values based on the vehicle bounding box
 	// NOTE: we might need to setup dedicated values in availableVehicles[] for this later.  also if min/max
@@ -984,6 +986,9 @@ CG_GenericShadow
 Uses polygons to alpha blend a shadow texture onto the terrain
 ===============
 */
+
+#define _POLYMESH_SHADOW
+
 qboolean CG_GenericShadow( centity_t *cent, float *shadowPlane )
 {
 	clientInfo_t * ci = NULL;
@@ -991,7 +996,225 @@ qboolean CG_GenericShadow( centity_t *cent, float *shadowPlane )
 	// get client information
 	ci = &cgs.clientinfo[ cent->currentState.clientNum ];
 
-	// NOTE: uncomment which ever system you want to run
-//	return CG_MarkGeneratedShadow( cent, ci, shadowPlane );
+#ifndef _POLYMESH_SHADOW
+	return CG_MarkGeneratedShadow( cent, ci, shadowPlane );
+#else
 	return CG_PolyMeshGeneratedShadow( cent, ci, shadowPlane );
+#endif
+}
+
+/*
+==================
+CG_CreateColourVector
+
+Create a vector colour definition
+==================
+*/
+
+static vec4_t colourVector = {1,1,1,1};	// common return ptr
+
+vec4_t * CG_CreateColourVector( float r, float g, float b, float a, vec4_t * pVector )
+{
+	// assign
+	colourVector[0] = r;
+	colourVector[1] = g;
+	colourVector[2] = b;
+	colourVector[3] = a;
+
+	// also copy into provided char array pointer?
+	if( pVector )
+	{
+		// duplicate
+		memcpy( pVector, colourVector, sizeof( colourVector ) );
+	}
+
+	// return common ptr
+	return &colourVector;
+}
+
+/*
+==================
+CG_CreateColourChar
+
+Create a unsigned char array of colour definition
+==================
+*/
+
+static unsigned char colourCharArray[4] = {255,255,255,255};	// common return ptr
+
+unsigned char * CG_CreateColourChar( unsigned char r, unsigned char g, unsigned char b, unsigned char a, unsigned char * pArray )
+{
+	// assign
+	colourCharArray[0] = r;
+	colourCharArray[1] = g;
+	colourCharArray[2] = b;
+	colourCharArray[3] = a;
+
+	// also copy into provided char array pointer?
+	if( pArray )
+	{
+		// duplicate
+		memcpy( pArray, colourCharArray, sizeof( colourCharArray ) );
+	}
+
+	// return common ptr
+	return &colourCharArray[0];
+}
+
+/*
+===============
+CG_ResetReticles
+
+Calls to reset reticle handling
+===============
+*/
+
+void CG_ResetReticles( void )
+{
+	// reset when starting main scene
+	if( !cg.drawingMFD )
+	{
+		cg.reticleIdx = 0;
+	}
+}
+
+/*
+===============
+CG_AddReticleEntityToScene
+
+Adds a reticle, either as a 2D sprite or as pending HUD gfx
+===============
+*/
+
+#define _DRAW_AS_HUD
+
+#pragma message ("CG_AddReticleEntityToScene() FRIEND tracking/lock NOT implemented")
+
+void CG_AddReticleEntityToScene( refEntity_t * pReticle, qboolean targetRecticle )
+{
+	float offsetx, offsety, scaling = 1.0f;
+
+	// don't draw if at max already
+	if( cg.reticleIdx >= MAX_RETICLES )
+	{
+		return;
+	}
+
+	// setup the reticle so it gets displayed as a sprite
+
+	// most reticles are 32x32
+	cg.HUDReticle[cg.reticleIdx].w = 32;
+	cg.HUDReticle[cg.reticleIdx].h = 32;
+	offsetx = 16;
+	offsety = 16;
+
+	// convert the CH_x define in rectile.customShader into the required shader
+	switch( pReticle->customShader )
+	{
+	case CH_GUNMODE:
+	case CH_ROCKETMODE:
+			pReticle->customShader = cgs.media.HUDreticles[ HR_UNGUIDED_AND_GUN ];
+			break;
+	case CH_BOMBMODE:
+			pReticle->customShader = cgs.media.HUDreticles[ HR_BOMB ];
+			
+			// bomb mode is 32x128
+			cg.HUDReticle[cg.reticleIdx].h = 128;
+			break;
+	case CH_MISSILEMODE:
+			pReticle->customShader = cgs.media.HUDreticles[ HR_GUIDED ];
+			break;
+	case CH_MISSILEMODETRACK:
+			pReticle->customShader = cgs.media.HUDreticles[ HR_TRACKING_ENEMY ];
+			break;
+	case CH_MISSILEMODELOCK:
+			pReticle->customShader = cgs.media.HUDreticles[ HR_LOCKED_ENEMY ];
+			break;
+	}
+
+	// override if target reticle
+	if( targetRecticle )
+	{
+		pReticle->customShader = cgs.media.HUDreticles[ HR_TARGET_ENEMY ];
+		
+		// force size
+		cg.HUDReticle[cg.reticleIdx].w = 32;
+		cg.HUDReticle[cg.reticleIdx].h = 32;
+	}
+
+	// scale is based on cg_crosshairSize
+	switch( cg_crosshairSize.integer )
+	{
+	// tiny
+	case 0:
+		// half normal size
+		scaling = 0.5f;
+		break;
+
+	// small
+	default:
+	case 1:
+		// 0.75x normal size
+		scaling = 0.75f;
+		break;
+
+	// medium
+	case 2:
+		// 1:1 normal size
+		break;
+
+	// large
+	case 3:
+		// 1.5x normal size
+		scaling = 1.5f;
+		break;
+
+	// huge
+	case 4:
+		// twice normal size
+		scaling = 2.0f;
+		break;
+	}
+
+	// apply scaling
+	cg.HUDReticle[cg.reticleIdx].w *= scaling;
+	cg.HUDReticle[cg.reticleIdx].h *= scaling;
+	offsetx *= scaling;
+	offsety *= scaling;
+
+	// scene object attributes
+	pReticle->reType = RT_SPRITE;
+	pReticle->radius = 6;
+	pReticle->renderfx |= RF_FIRST_PERSON;
+
+	// colour as TGA specified
+	CG_CreateColourChar( 255, 255, 255, 255, &pReticle->shaderRGBA[0] );
+
+	// don't add reticles when not drawing main view
+	if( !cg.drawingMFD )
+	{
+		// if added to the scene and drawn as a RT_SPRITE
+#ifndef _DRAW_AS_HUD
+		trap_R_AddRefEntityToScene( pRecticle );
+#else
+		// if HUD image
+		if( CG_WorldToScreenCoords( pReticle->origin, &cg.HUDReticle[cg.reticleIdx].x, &cg.HUDReticle[cg.reticleIdx].y ) )
+		{
+			// apply centering offset
+			cg.HUDReticle[cg.reticleIdx].x -= offsetx;
+			cg.HUDReticle[cg.reticleIdx].y -= offsety;
+
+			// draw
+			cg.HUDReticle[cg.reticleIdx].shader = pReticle->customShader;
+			
+			// this was valid, move to next
+			cg.reticleIdx++;
+		}
+		else
+		{
+			// no draw
+			memset( &cg.HUDReticle[cg.reticleIdx], 0, sizeof( reticle_t ) );
+		}
+#endif
+	}
 }

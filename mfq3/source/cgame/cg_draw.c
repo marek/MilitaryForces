@@ -1,5 +1,5 @@
 /*
- * $Id: cg_draw.c,v 1.16 2002-02-12 12:33:14 sparky909_uk Exp $
+ * $Id: cg_draw.c,v 1.17 2002-02-14 12:02:19 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -539,26 +539,6 @@ static float CG_DrawSnapshot( float y ) {
 
 /*
 ==================
-CG_CreateColour
-==================
-*/
-
-static vec4_t colourVector = {1,1,1,1};	// common return ptr
-
-vec4_t * CG_CreateColour( float r, float g, float b, float a )
-{
-	// assign
-	colourVector[0] = r;
-	colourVector[1] = g;
-	colourVector[2] = b;
-	colourVector[3] = a;
-
-	// return common ptr
-	return &colourVector;
-}
-
-/*
-==================
 CG_DrawFPS
 ==================
 */
@@ -613,7 +593,7 @@ static float CG_DrawFPS( float y ) {
 		w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 
 #ifdef _MENU_SCOREBOARD
-		CG_DrawStringNew( 635, y + 2, 0.5f, *CG_CreateColour(1,1,1,1), s, 0, 0, 3, RIGHT_JUSTIFY );
+		CG_DrawStringNew( 635, y + 2, 0.5f, *CG_CreateColourVector(1,1,1,1,NULL), s, 0, 0, 3, RIGHT_JUSTIFY );
 #else
 		CG_DrawBigString( 635 - w, y + 2, s, 1.0f );
 #endif
@@ -666,8 +646,8 @@ static float CG_DrawTimer( float y ) {
 	}
 
 	// draw the timer background (TODO: possibly replace this with HUD when near/in the HUD)
-	DC->fillRect( dx-(TIMER_WIDTH/2), dy-4, TIMER_WIDTH, TIMER_HEIGHT, *CG_CreateColour( 0,0.5f,0,0.75f) );
-	DC->drawRect( dx-(TIMER_WIDTH/2), dy-4, TIMER_WIDTH, TIMER_HEIGHT, 1, *CG_CreateColour( 0,0,0,1.0f ) );
+	DC->fillRect( dx-(TIMER_WIDTH/2), dy-4, TIMER_WIDTH, TIMER_HEIGHT, *CG_CreateColourVector( 0,0.5f,0,0.75f,NULL ) );
+	DC->drawRect( dx-(TIMER_WIDTH/2), dy-4, TIMER_WIDTH, TIMER_HEIGHT, 1, *CG_CreateColourVector( 0,0,0,1.0f,NULL ) );
 
 	// draw timer string
 	CG_DrawStringNew( dx, dy, 0.35f, colorWhite, s, 0, 0, ITEM_TEXTSTYLE_SHADOWED, CENTRE_JUSTIFY );
@@ -740,8 +720,8 @@ static float CG_DrawCountdownTimer( float y ) {
 	}
 
 	// draw the timer background (TODO: possibly replace this with HUD when near/in the HUD)
-	DC->fillRect( dx-(TIMER_WIDTH/2), dy-4, TIMER_WIDTH, TIMER_HEIGHT, *CG_CreateColour( 0.7f,0,0,0.75f) );
-	DC->drawRect( dx-(TIMER_WIDTH/2), dy-4, TIMER_WIDTH, TIMER_HEIGHT, 1, *CG_CreateColour( 0,0,0,1.0f ) );
+	DC->fillRect( dx-(TIMER_WIDTH/2), dy-4, TIMER_WIDTH, TIMER_HEIGHT, *CG_CreateColourVector( 0.7f,0,0,0.75f,NULL ) );
+	DC->drawRect( dx-(TIMER_WIDTH/2), dy-4, TIMER_WIDTH, TIMER_HEIGHT, 1, *CG_CreateColourVector( 0,0,0,1.0f,NULL ) );
 
 	// draw timer string
 	if( !flash )
@@ -1154,7 +1134,7 @@ static void CG_DrawCustomConsole( void )
 
 			// draw line
 			// NOTE: use *CG_CreateColour(1,1,1,alpha) to fade out whilst scrolling up
-			CG_DrawStringNew( cox, coy, 0.25f, *CG_CreateColour(1,1,1,alpha), consoleLine[drawIdx].text, 0, 0, cg_consoleTextStyle.integer, LEFT_JUSTIFY );
+			CG_DrawStringNew( cox, coy, 0.25f, *CG_CreateColourVector(1,1,1,alpha,NULL), consoleLine[drawIdx].text, 0, 0, cg_consoleTextStyle.integer, LEFT_JUSTIFY );
 
 			// reduce life based upon time
 			consoleLine[drawIdx].life -= (0.1f * cg.frameInterpolation );
@@ -2141,16 +2121,16 @@ static qboolean CG_DrawFollow( void )
 	CG_DrawStringNewAlpha( 320, 48, "following ", 1.0f, RIGHT_JUSTIFY );
 
 	// default colour
-	pColor = CG_CreateColour( 0.0f, 0.75f, 0.0f, 1.0f );	// default: green
+	pColor = CG_CreateColourVector( 0.0f, 0.75f, 0.0f, 1.0f, NULL );	// default: green
 
 	// team colour?
 	if( cgs.clientinfo[ cg.snap->ps.clientNum ].team == 1 )
 	{
-		pColor = CG_CreateColour( 0.75f, 0.0f, 0.0f, 1.0f );	// team: red
+		pColor = CG_CreateColourVector( 0.75f, 0.0f, 0.0f, 1.0f, NULL );	// team: red
 	}
 	else if( cgs.clientinfo[ cg.snap->ps.clientNum ].team == 2 )
 	{
-		pColor = CG_CreateColour( 0.0f, 0.0f, 0.75f, 1.0f );	// team: blue
+		pColor = CG_CreateColourVector( 0.0f, 0.0f, 0.75f, 1.0f, NULL );	// team: blue
 	}
 
 	// get name of player being followed
@@ -2186,7 +2166,7 @@ CG_DrawStringNewAlpha
 void CG_DrawStringNewAlpha( int x, int y, const char * pText, float alpha, textJustify_t formatting )
 {
 	// just use default extra parameters
-	CG_DrawStringNew( x, y, 0.5f, *CG_CreateColour(1,1,1,alpha), pText, 0, 0, 3, formatting );
+	CG_DrawStringNew( x, y, 0.5f, *CG_CreateColourVector(1,1,1,alpha,NULL), pText, 0, 0, 3, formatting );
 }
 
 /*
@@ -2273,7 +2253,7 @@ static void CG_DrawWarmup( void ) {
 		cg.warmupCount = 0;
 
 #ifdef _MENU_SCOREBOARD
-		CG_DrawStringNew( 320, 64, 0.5f, *CG_CreateColour(1,1,1,1), s, 0, 0, 3, CENTRE_JUSTIFY );
+		CG_DrawStringNew( 320, 64, 0.5f, *CG_CreateColourVector(1,1,1,1,NULL), s, 0, 0, 3, CENTRE_JUSTIFY );
 #else
 		CG_DrawBigString( 320 - w / 2, 24, s, 1.0F );
 #endif

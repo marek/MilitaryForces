@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.17 2002-02-11 12:20:42 sparky909_uk Exp $
+ * $Id: cg_drawnewhud.c,v 1.18 2002-02-14 12:02:19 sparky909_uk Exp $
 */
 
 #include "cg_local.h"
@@ -812,6 +812,7 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 	cg.HUDCamera.y = y;
 	cg.HUDCamera.width = w;
 	cg.HUDCamera.height = h;
+
 		// zoomed ?
 	fov_x = cg_fov.value/4;
 	if ( fov_x < 1 ) {
@@ -944,13 +945,19 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 		VectorAdd( cent->lerpOrigin, v, cg.HUDCamera.vieworg );
 	} 
 
-		// ummm shall I really do this ???
+	// set a client global so that other code can render differently for this mini-render
+	cg.drawingMFD = qtrue;
+
+	// ummm shall I really do this ???
 	CG_AddPacketEntities();
 	CG_AddMarks();
 	CG_AddLocalEntities();
 
-		// render
+	// render
 	trap_R_RenderScene( &cg.HUDCamera );
+
+	// reset to normal rendering
+	cg.drawingMFD = qfalse;
 }
 
 /*
@@ -1066,17 +1073,24 @@ static void CG_Draw_MFD(int mfdnum, int vehicle, centity_t * cent, int targetran
 			}
 			if( i == 0 || i == 6 ) y+=4; 
 		}
-	} else if( mode == MFD_CAMERA ) {
+	}
+	else if( mode == MFD_CAMERA )
+	{
 		CG_HUD_Camera(mfdnum, vehicle);
-		if( targetrange >= 0 ) {
+		if( targetrange >= 0 )
+		{
 			CG_DrawString_MFQ3( x+6, y+16, "RANGE:", HUDColors[cg.MFDColor], 0);
 			CG_MFQ3HUD_Numbers( x+54, y+16, 6, targetrange, qfalse, HUDColors[cg.MFDColor], qfalse );
-			CG_DrawHUDPic( x+48, y+48, 32, 32, cgs.media.HUDreticles[HR_GUIDED_ENEMY], HUDColors[HUD_RED] );
-		} else {
-			CG_DrawHUDPic( x+48, y+48, 32, 32, cgs.media.HUDreticles[HR_GUIDED_ENEMY], HUDColors[HUD_GREEN] );
+			CG_DrawHUDPic( x+48, y+48, 32, 32, cgs.media.HUDreticles[HR_TARGET_ENEMY], HUDColors[HUD_GREEN] );
 		}
-	} else if( mode == MFD_INFO ) {
-		int			value;
+		else
+		{
+			CG_DrawHUDPic( x+48, y+48, 32, 32, cgs.media.HUDreticles[HR_GUIDED_WHITE], HUDColors[HUD_WHITE] );
+		}
+	}
+	else if( mode == MFD_INFO )
+	{
+		int	value;
 		CG_DrawString_MFQ3( x+4, y+14, "FLIGHTDATA:", HUDColors[cg.MFDColor], 0);
 		CG_DrawString_MFQ3( x+4, y+20, "----------", HUDColors[cg.MFDColor], 0);
 		CG_DrawString_MFQ3( x+4, y+30, "HEADING:", HUDColors[cg.MFDColor], 0);
@@ -1376,7 +1390,29 @@ static void CG_Draw_HeadingTape( int value, int targetheading ) {
 	}
 }
 
+/*
+================
+CG_Draw_Reticles
 
+================
+*/
+void CG_Draw_Reticles( void )
+{
+	int i = 0;
+
+	// get pointer to the reticles
+	reticle_t * pR = &cg.HUDReticle[0];
+
+	// for all valid
+	for( i = 0; i< cg.reticleIdx; i++ )
+	{
+		// draw?
+		if( pR[i].shader )
+		{
+			CG_DrawPic( pR[i].x, pR[i].y, pR[i].w, pR[i].h, pR[i].shader );
+		}
+	}
+}
 
 /*
 ================
@@ -1508,5 +1544,8 @@ void CG_DrawStatusBar_MFQ3_new( void ) {
 
 	// cleanup
 	cg.radarTargets = 0;
+
+	// aiming/targetting reticles
+	CG_Draw_Reticles();
 }
 

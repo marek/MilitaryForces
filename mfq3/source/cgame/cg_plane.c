@@ -1,5 +1,5 @@
 /*
- * $Id: cg_plane.c,v 1.20 2002-02-12 11:08:11 sparky909_uk Exp $
+ * $Id: cg_plane.c,v 1.21 2002-02-14 12:02:19 sparky909_uk Exp $
 */
 
 
@@ -155,6 +155,7 @@ static void CG_PlaneFlags( centity_t *cent ) {
 //		trap_R_AddLightToScene( cent->lerpOrigin, 200 + (rand()&31), 0.2f, 0.2f, 1.0 );
 	}
 }
+
 
 /*
 ===============
@@ -357,55 +358,85 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 		}
 	}
 
-	// reticle
-	if( cent == &cg.predictedPlayerEntity ) {
+	CG_ResetReticles();
+
+	// reticles
+	if( cent == &cg.predictedPlayerEntity )
+	{
 		vec3_t	forward, ang, end;
 		trace_t	tr;
+		playerState_t * ps = &cg.snap->ps;
 		float len;
-		playerState_t*	ps = &cg.snap->ps;
-		float mindist = cg_thirdPersonRange.integer + availableVehicles[ci->vehicle].cam_dist[ CAMERA_V_DEFAULT ] + 
-			availableVehicles[ci->vehicle].maxs[0] + 20;
+		float mindist = cg_thirdPersonRange.integer + availableVehicles[ci->vehicle].cam_dist[ CAMERA_V_DEFAULT ] + availableVehicles[ci->vehicle].maxs[0] + 20;
 
-		if( ps->stats[STAT_LOCKINFO] & LI_TRACKING ) {
-			refEntity_t		reticlelock;
-			qboolean		building = qfalse;
+		// are we tracking a target?
+		if( ps->stats[STAT_LOCKINFO] & LI_TRACKING )
+		{
+			refEntity_t reticlelock;
+			qboolean building = qfalse;
 			centity_t* target = &cg_entities[cent->currentState.tracktarget];
-			if( target->currentState.eType == ET_EXPLOSIVE ) building = qtrue;
-			reticle.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshairtrack];
-			if( building ) {
+
+			if( target->currentState.eType == ET_EXPLOSIVE )
+			{
+				building = qtrue;
+			}
+
+			reticle.customShader = availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshairtrack;
+			reticle.hModel = cgs.media.reticle[ availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshairtrack ];
+			
+			if( building )
+			{
 				VectorSubtract( cgs.inlineModelMidpoints[target->currentState.modelindex], cent->lerpOrigin, forward );
-			} else {
+			}
+			else
+			{
 				VectorSubtract( target->lerpOrigin, cent->lerpOrigin, forward );
 			}
+
 			len = VectorNormalize( forward );
 			vectoangles( forward, ang );
 			AnglesToAxis( ang, reticle.axis );
 			VectorMA( cent->lerpOrigin, 2000, forward, end );
 			CG_Trace( &tr, cent->lerpOrigin, 0, 0, end, cg.snap->ps.clientNum, MASK_ALL ); 
-			if ( tr.entityNum < MAX_CLIENTS ) {
+			if ( tr.entityNum < MAX_CLIENTS )
+			{
 				cg.crosshairClientNum = tr.entityNum;
 				cg.crosshairClientTime = cg.time;
 			}
+
 			VectorCopy( tr.endpos, end );
 			CG_Trace( &tr, cg.refdef.vieworg, 0, 0, end, cg.snap->ps.clientNum, MASK_SOLID ); 
 			VectorSubtract( tr.endpos, cg.refdef.vieworg, forward );
 			len = VectorNormalize(forward);
-			if( len > mindist ) {
+
+			if( len > mindist )
+			{
 				VectorMA( cg.refdef.vieworg, mindist, forward, reticle.origin );
-			} else {
+			}
+			else
+			{
 				VectorMA( cg.refdef.vieworg, len - 5, forward, reticle.origin );
 			}
+			
 			VectorCopy( reticle.origin, reticle.lightingOrigin );
 			reticle.shadowPlane = shadowPlane;
 			reticle.renderfx = renderfx;
-			trap_R_AddRefEntityToScene( &reticle );
-			if( ps->stats[STAT_LOCKINFO] & LI_LOCKING ) {
+			CG_AddReticleEntityToScene( &reticle, qtrue );
+
+			// are we locked onto this target?
+			if( ps->stats[STAT_LOCKINFO] & LI_LOCKING )
+			{
+				// copy the reticle entity as our reticle-lock entity
 				memcpy( &reticlelock, &reticle, sizeof(reticle) );
-				reticlelock.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshairlock];
+				reticlelock.customShader = availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshairlock;
+				reticlelock.hModel = cgs.media.reticle[ availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshairlock ];
 				reticlelock.frame = 1;
-			} else {
+			}
+			else
+			{
 				memset( &reticlelock, 0, sizeof(reticlelock) );	
-				reticlelock.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshairlock];
+				reticlelock.customShader = availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshairtrack;
+				reticlelock.hModel = cgs.media.reticle[ availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshairtrack ];
 				VectorSet( ang, cent->currentState.angles[0], cent->currentState.angles[1], 0 );
 				AnglesToAxis( ang, reticlelock.axis );
 				VectorScale( reticlelock.axis[0], 0.5f, reticlelock.axis[0] );
@@ -425,13 +456,17 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 					VectorMA( cg.refdef.vieworg, len - 5, forward, reticlelock.origin );
 				}
 				VectorCopy( reticlelock.origin, reticlelock.lightingOrigin );
-				reticle.shadowPlane = shadowPlane;
-				reticle.renderfx = renderfx;
+				reticlelock.shadowPlane = shadowPlane;
+				reticlelock.renderfx = renderfx;
 				reticlelock.frame = 1;
 			}
-			trap_R_AddRefEntityToScene( &reticlelock );
-		} else {
-			reticle.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshair];
+			
+			CG_AddReticleEntityToScene( &reticlelock, qfalse );
+		}
+		else
+		{
+			reticle.customShader = availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshair;
+			reticle.hModel = cgs.media.reticle[ availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshair ];
 			VectorSet( ang, cent->currentState.angles[0], cent->currentState.angles[1], 0 );
 			AnglesToAxis( ang, reticle.axis );
 			VectorScale( reticle.axis[0], 2.0f, reticle.axis[0] );
@@ -457,7 +492,8 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 			VectorCopy( reticle.origin, reticle.lightingOrigin );
 			reticle.shadowPlane = shadowPlane;
 			reticle.renderfx = renderfx;
-			trap_R_AddRefEntityToScene( &reticle );
+
+			CG_AddReticleEntityToScene( &reticle, qfalse );
 		}
 	}
 
