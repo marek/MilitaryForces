@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.27 2003-02-02 02:52:03 thebjoern Exp $
+ * $Id: bg_mfq3util.c,v 1.28 2003-02-05 23:42:05 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -363,3 +363,425 @@ void MF_LoadAllVehicleData()
 }
 
 
+
+
+
+
+
+
+/*
+=================
+
+Mission script parsing
+
+=================
+*/
+
+
+static void MF_ParseOverview( char **buf, mission_overview_t* overview ) 
+{
+	char	*token;
+	char	info[MAX_INFO_STRING];
+
+	token = COM_Parse( buf );
+	if( !token[0] ) 
+	{
+		//trap_Printf(va("Token: '%s' - END\n", token));
+		return;
+	}
+	Com_Printf(va("O-Token: '%s' - VALID\n", token));
+
+	if( strcmp( token, "{" ) ) 
+	{
+		Com_Printf( "Missing { in overview\n" );
+		return;
+	} 
+
+	info[0] = '\0';
+	while( 1 ) 
+	{
+		token = COM_ParseExt( buf, qtrue );
+		if( !token[0] ) 
+		{
+//				Com_Printf( "Unexpected end of info file\n" );
+			break;
+		}
+		if( !strcmp( token, "{" ) ) 
+		{
+//				Com_Printf( "Unexpected { found\n" );
+			break;
+		}
+		if( !strcmp( token, "}" ) ) 
+		{
+			break;
+		}
+		if( !strcmp( token, "map" ) )
+		{
+			token = COM_ParseExt( buf, qfalse );
+			if( token[0] )
+			{
+				Q_strncpyz(overview->mapname, token, MAX_NAME_LENGTH );
+				continue;
+			}
+		}
+		else if( !strcmp( token, "gameset" ) )
+		{
+			token = COM_ParseExt( buf, qfalse );
+			if( token[0] )
+			{
+				overview->gameset = atoi(token);
+				continue;
+			}
+		}
+		else if( !strcmp( token, "gametype" ) )
+		{
+			token = COM_ParseExt( buf, qfalse );
+			if( token[0] )
+			{
+				overview->gametype = atoi(token);
+				continue;
+			}
+		}
+		else if( !strcmp( token, "mission" ) )
+		{
+			token = COM_ParseExt( buf, qfalse );
+			if( token[0] )
+			{
+				Q_strncpyz(overview->missionname, token, MAX_NAME_LENGTH );
+				continue;
+			}
+		}
+		else if( !strcmp( token, "goal" ) )
+		{
+			token = COM_ParseExt( buf, qfalse );
+			if( token[0] )
+			{
+				Q_strncpyz(overview->objective, token, MAX_NAME_LENGTH );
+				continue;
+			}
+		}
+	}
+	MF_CheckMissionScriptOverviewValid(overview, qfalse);// set to true after format change
+}
+
+
+static void MF_ParseWaypoints( char **buf, mission_vehicle_t* veh ) 
+{
+	char	*token;
+	int		num = 0;
+
+	token = COM_Parse( buf );
+	if( !token[0] ) 
+	{
+		//trap_Printf(va("Token: '%s' - END\n", token));
+		return;
+	}
+	Com_Printf(va("W-Token: '%s' - VALID\n", token));
+
+	if( strcmp( token, "{" ) ) 
+	{
+		Com_Printf( "Missing { in vehicle\n" );
+		return;
+	} 
+
+	while( 1 ) 
+	{
+		token = COM_ParseExt( buf, qtrue );
+		if( !token[0] ) 
+		{
+//				Com_Printf( "Unexpected end of info file\n" );
+			break;
+		}
+		if( !strcmp( token, "{" ) ) 
+		{
+//				Com_Printf( "Unexpected { found\n" );
+			break;
+		}
+		if( !strcmp( token, "}" ) ) 
+		{
+			break;
+		}
+		if( !strcmp( token, "Origin" ) )
+		{
+			token = COM_ParseExt( buf, qfalse );
+			if( token[0] )
+			{
+				sscanf(token, "%f;%f;%f", &veh->waypoints[num].origin[0],
+					&veh->waypoints[num].origin[1], &veh->waypoints[num].origin[2]);
+				veh->waypoints[num].used = qtrue;
+				++num;
+				continue;
+			}
+		}
+	}
+}
+
+static void MF_ParseVehicle( char **buf, mission_vehicle_t* veh ) 
+{
+	char	*token;
+
+	token = COM_Parse( buf );
+	if( !token[0] ) 
+	{
+		//trap_Printf(va("Token: '%s' - END\n", token));
+		return;
+	}
+	Com_Printf(va("V-Token: '%s' - VALID\n", token));
+
+	if( strcmp( token, "{" ) ) 
+	{
+		Com_Printf( "Missing { in vehicle\n" );
+		return;
+	} 
+
+	while( 1 ) 
+	{
+		token = COM_ParseExt( buf, qtrue );
+		if( !token[0] ) 
+		{
+//				Com_Printf( "Unexpected end of info file\n" );
+			break;
+		}
+		if( !strcmp( token, "{" ) ) 
+		{
+//				Com_Printf( "Unexpected { found\n" );
+			break;
+		}
+		if( !strcmp( token, "}" ) ) 
+		{
+			break;
+		}
+
+		if( !strcmp( token, "Index" ) )
+		{
+			token = COM_ParseExt( buf, qfalse );
+			if( token[0] )
+			{
+				veh->index = atoi(token);
+				continue;
+			}
+		}
+		else if( !strcmp( token, "Name" ) )
+		{
+			token = COM_ParseExt( buf, qfalse );
+			if( token[0] )
+			{
+				Q_strncpyz(veh->objectname, token, MAX_NAME_LENGTH );
+				continue;
+			}
+		}
+		else if( !strcmp( token, "Team" ) )
+		{
+			token = COM_ParseExt( buf, qfalse );
+			if( token[0] )
+			{
+				veh->team = atoi(token);
+				continue;
+			}
+		}
+		else if( !strcmp( token, "Origin" ) )
+		{
+			token = COM_ParseExt( buf, qfalse );
+			if( token[0] )
+			{
+				sscanf(token, "%f;%f;%f", &veh->origin[0],
+					&veh->origin[1], &veh->origin[2]);
+				continue;
+			}
+		}
+		else if( !strcmp( token, "Angles" ) )
+		{
+			token = COM_ParseExt( buf, qfalse );
+			if( token[0] )
+			{
+				sscanf(token, "%f;%f;%f", &veh->angles[0],
+					&veh->angles[1], &veh->angles[2]);
+				continue;
+			}
+		}
+		else if( !strcmp( token, "Waypoints" ) )
+		{
+			MF_ParseWaypoints(buf, veh);
+		}
+	}
+	veh->used = qtrue;
+}
+
+static void MF_ParseGroundInstallation( char **buf, mission_groundInstallation_t* gi ) 
+{
+	char	*token;
+
+	token = COM_Parse( buf );
+	if( !token[0] ) 
+	{
+		//trap_Printf(va("Token: '%s' - END\n", token));
+		return;
+	}
+	Com_Printf(va("GV-Token: '%s' - VALID\n", token));
+
+	if( strcmp( token, "{" ) ) 
+	{
+		Com_Printf( "Missing { in groundinstallation\n" );
+		return;
+	} 
+
+	while( 1 ) 
+	{
+		token = COM_ParseExt( buf, qtrue );
+		if( !token[0] ) 
+		{
+//				Com_Printf( "Unexpected end of info file\n" );
+			break;
+		}
+		if( !strcmp( token, "{" ) ) 
+		{
+//				Com_Printf( "Unexpected { found\n" );
+			break;
+		}
+		if( !strcmp( token, "}" ) ) 
+		{
+			break;
+		}
+
+		if( !strcmp( token, "Index" ) )
+		{
+			token = COM_ParseExt( buf, qfalse );
+			if( token[0] )
+			{
+				gi->index = atoi(token);
+				continue;
+			}
+		}
+		else if( !strcmp( token, "Name" ) )
+		{
+			token = COM_ParseExt( buf, qfalse );
+			if( token[0] )
+			{
+				Q_strncpyz(gi->objectname, token, MAX_NAME_LENGTH );
+				continue;
+			}
+		}
+		else if( !strcmp( token, "Team" ) )
+		{
+			token = COM_ParseExt( buf, qfalse );
+			if( token[0] )
+			{
+				Q_strncpyz(gi->teamname, token, MAX_NAME_LENGTH );
+				continue;
+			}
+		}
+		else if( !strcmp( token, "Origin" ) )
+		{
+			token = COM_ParseExt( buf, qfalse );
+			if( token[0] )
+			{
+				sscanf(token, "%f;%f;%f", &gi->origin[0],
+					&gi->origin[1], &gi->origin[2]);
+				continue;
+			}
+		}
+		else if( !strcmp( token, "Angles" ) )
+		{
+			token = COM_ParseExt( buf, qfalse );
+			if( token[0] )
+			{
+				sscanf(token, "%f;%f;%f", &gi->angles[0],
+					&gi->angles[1], &gi->angles[2]);
+				continue;
+			}
+		}
+	}
+	gi->used = qtrue;
+}
+
+static void MF_ParseEntities( char **buf, 
+						  mission_vehicle_t* vehs, 
+						  mission_groundInstallation_t* gis ) 
+{
+	char	*token;
+	int		numVeh = 0,
+			numGI = 0;
+
+	token = COM_Parse( buf );
+	if( !token[0] ) 
+	{
+		//trap_Printf(va("Token: '%s' - END\n", token));
+		return;
+	};
+	Com_Printf(va("E-Token: '%s' - VALID\n", token));
+
+	if( strcmp( token, "{" ) ) 
+	{
+		Com_Printf( "Missing { in entities\n" );
+		return;
+	} 
+
+	while( 1 )
+	{
+		token = COM_Parse( buf );
+		if( !token[0] ) 
+		{
+			Com_Printf(va("Token: '%s' - END\n", token));
+			break;
+		}
+		else if( !strcmp(token, "Vehicle" ) )
+		{
+			MF_ParseVehicle(buf, &vehs[numVeh]);
+			++numVeh;
+			continue;
+		}
+		else if( !strcmp(token, "GroundInstallation" ) )
+		{
+			MF_ParseGroundInstallation(buf, &gis[numGI]);
+			++numGI;
+			continue;
+		}
+		else if( !strcmp( token, "}" ) ) 
+		{
+			Com_Printf(va("End of Entities\n"));
+			break;
+		}
+		else
+		{
+			Com_Printf(va(S_COLOR_RED "Invalid Token - parsing cancelled", token));
+			break;
+		}
+	}
+
+}
+
+void MF_ParseMissionScripts( char *buf,
+									mission_overview_t* overview,
+									mission_vehicle_t* vehs, 
+									mission_groundInstallation_t* gis) 
+{
+	char				*token;
+
+	MF_SetMissionScriptOverviewDefaults(overview);
+
+	while( 1 )
+	{
+		token = COM_Parse( &buf );
+		if( !token[0] ) 
+		{
+			Com_Printf(va("Token: '%s' - END\n", token));
+			break;
+		}
+		else if( !strcmp(token, "Overview" ) )
+		{
+			MF_ParseOverview(&buf, overview);
+			continue;
+		}
+		else if( !strcmp(token, "Entities" ) )
+		{
+			MF_ParseEntities(&buf, vehs, gis);
+			continue;
+		}
+		else
+		{
+			continue;
+			Com_Printf(va(S_COLOR_RED "Invalid Token - parsing cancelled", token));
+			break;
+		}
+	}
+}

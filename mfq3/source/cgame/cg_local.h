@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.56 2003-01-14 00:24:09 thebjoern Exp $
+ * $Id: cg_local.h,v 1.57 2003-02-05 23:42:04 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -846,8 +846,6 @@ enum CameraAdjust {
 };
 
 // IGME
-#define IGME_MAX_VEHICLES		128
-#define IGME_MAX_WAYPOINTS		64
 
 enum IGME_OBJECT_TYPES {
 	IGMEO_VEHICLE,
