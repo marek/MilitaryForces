@@ -1,5 +1,5 @@
 /*
- * $Id: cg_draw.c,v 1.9 2002-01-23 18:46:15 sparky909_uk Exp $
+ * $Id: cg_draw.c,v 1.10 2002-01-23 22:28:13 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -275,7 +275,7 @@ static void CG_DrawField (int x, int y, int width, int value) {
 CG_MFQ3HUD_Numbers
 ==============
 */
-static void CG_MFQ3HUD_Numbers (int x, int y, int width, int value) {
+static void CG_MFQ3HUD_Numbers (int x, int y, int width, int value, qboolean percent) {
 	char	num[16], *ptr;
 	int		l;
 	int		frame;
@@ -327,6 +327,9 @@ static void CG_MFQ3HUD_Numbers (int x, int y, int width, int value) {
 		ptr++;
 		l--;
 	}
+	if( percent ) {
+		CG_DrawPic( x,y, HUDNUM_WIDTH, HUDNUM_HEIGHT, cgs.media.HUDnumbers[STAT_PERCENT] );
+	}
 }
 
 
@@ -352,13 +355,13 @@ static void CG_MFQ3HUD_DecNumbers (int x, int y, int width, int decimals, int in
 
 	prewid = width-decimals-1;
 
-	CG_MFQ3HUD_Numbers( x, y, prewid, pre );
+	CG_MFQ3HUD_Numbers( x, y, prewid, pre, qfalse );
 	x += (HUDNUM_WIDTH-1)*prewid;
 
 	CG_DrawPic( x+2,y+2, HUDNUM_WIDTH, HUDNUM_HEIGHT, cgs.media.HUDnumbers[STAT_POINT] );
 	x += HUDNUM_WIDTH-1;
 
-	CG_MFQ3HUD_Numbers( x, y, postwid, post );
+	CG_MFQ3HUD_Numbers( x, y, postwid, post, qfalse );
 }
 
 
@@ -788,6 +791,82 @@ static void CG_DrawRadarSymbols_GROUND( int vehicle ) {
 
 /*
 ================
+CG_Draw_Redundant
+
+================
+*/
+static void CG_Draw_Redundant(int health, int throttle) {
+	float		x, y, width, height;
+
+		// draw health
+	if( hud_health.integer ) {
+		x = 556;
+		y = 318;
+		width = 32;
+		height = 8;
+		CG_AdjustFrom640( &x, &y, &width, &height );
+		trap_R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, cgs.media.HUDhealthtext );
+		CG_MFQ3HUD_Numbers( 584, 318, 4, health, qtrue );
+	}
+
+		// draw throttle
+	if( hud_throttle.integer ) {
+		x = 556;
+		y = 330;
+		width = 32;
+		height = 8;
+		CG_AdjustFrom640( &x, &y, &width, &height );
+		trap_R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, cgs.media.HUDthrottletext );
+		CG_MFQ3HUD_Numbers( 584, 330, 4, throttle*10, qtrue );
+	}
+
+}
+
+
+/*
+================
+CG_Draw_Center
+
+================
+*/
+static void CG_Draw_Center(int health, int throttle) {
+	float		x, y, width, height;
+	int			healthpic = (health/10)-1;
+	int			throttlepic = throttle - 1;
+	
+	x = 192;		
+	y = 448;
+	width = 256;
+	height = 32;
+
+		// background
+	CG_AdjustFrom640( &x, &y, &width, &height );
+	trap_R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, cgs.media.HUDsolid );
+
+		// health
+	if( healthpic >= 0 ) {
+		x = 192;
+		y = 448;
+		width = 128;
+		height = 32;
+		CG_AdjustFrom640( &x, &y, &width, &height );
+		trap_R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, cgs.media.HUDhealth[healthpic] );
+	}
+
+		// throttle
+	if( throttlepic >= 0 ) {
+		x = 320;
+		y = 448;
+		width = 128;
+		height = 32;
+		CG_AdjustFrom640( &x, &y, &width, &height );
+		trap_R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, cgs.media.HUDthrottle[throttlepic] );
+	}
+}
+
+
+/*
+================
 CG_Draw_MFD
 
 ================
@@ -857,7 +936,7 @@ static void CG_Draw_AltTape( int value ) {
 	CG_AdjustFrom640( &x, &y, &width, &height );
 	trap_R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, cgs.media.HUDvaluebox );
 		// draw alt
-	CG_MFQ3HUD_Numbers( 586, 32, 4, value );
+	CG_MFQ3HUD_Numbers( 586, 32, 4, value, qfalse );
 		// find visible alt numbers
 	visible3 = (int)((value+(scale/2))/scale);
 	visible3 *= scale;
@@ -932,7 +1011,7 @@ static void CG_Draw_SpeedTape( int value, int stallspeed, int gearspeed, int sca
 	CG_AdjustFrom640( &x, &y, &width, &height );
 	trap_R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, cgs.media.HUDvaluebox );
 		// draw speed
-	CG_MFQ3HUD_Numbers( 24, 32, 4, value );
+	CG_MFQ3HUD_Numbers( 24, 32, 4, value, qfalse );
 		// find visible speed numbers
 	visible3 = (int)((value+(scale/2))/scale);
 	visible3 *= scale;
@@ -951,20 +1030,20 @@ static void CG_Draw_SpeedTape( int value, int stallspeed, int gearspeed, int sca
 		top = bottom = qfalse;
 	}
 		// draw visible speed numbers
-	CG_MFQ3HUD_Numbers( 12, 171+(value2*64/scale), 4, visible3 );
+	CG_MFQ3HUD_Numbers( 12, 171+(value2*64/scale), 4, visible3, qfalse );
 	if( visible2 >= 0 ) {
 		value2 = value - visible2;
-		CG_MFQ3HUD_Numbers( 12, 171+(value2*64/scale), 4, visible2 );
+		CG_MFQ3HUD_Numbers( 12, 171+(value2*64/scale), 4, visible2, qfalse );
 		if( bottom && visible1 >= 0 ) {
 			value2 = value - visible1;
-			CG_MFQ3HUD_Numbers( 12, 171+(value2*64/scale), 4, visible1 );
+			CG_MFQ3HUD_Numbers( 12, 171+(value2*64/scale), 4, visible1, qfalse );
 		}
 	}
 	value2 = value - visible4;
-	CG_MFQ3HUD_Numbers( 12, 171+(value2*64/scale), 4, visible4 );
+	CG_MFQ3HUD_Numbers( 12, 171+(value2*64/scale), 4, visible4, qfalse );
 	if( top ) {
 		value2 = value - visible5;
-		CG_MFQ3HUD_Numbers( 12, 171+(value2*64/scale), 4, visible5 );
+		CG_MFQ3HUD_Numbers( 12, 171+(value2*64/scale), 4, visible5, qfalse );
 	}
 		// gearspeed
 	if( gearspeed > 0 ) {
@@ -1024,7 +1103,7 @@ static void CG_Draw_HeadingTape( int value, int targetheading ) {
 	CG_AdjustFrom640( &x, &y, &width, &height );
 	trap_R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, cgs.media.HUDvaluebox );
 		// draw heading
-	CG_MFQ3HUD_Numbers( 307, 32, 3, value );
+	CG_MFQ3HUD_Numbers( 307, 32, 3, value, qfalse );
 		// find visible heading numbers
 	visible2 = ((int)((value+15)/10));
 	if( (visible2%3) ) {
@@ -1051,16 +1130,16 @@ static void CG_Draw_HeadingTape( int value, int targetheading ) {
 		right = left = qtrue;
 	}
 		// draw visible heading numbers
-	CG_MFQ3HUD_Numbers( 307-(value2*64/10), 6, 3, visible2 );
+	CG_MFQ3HUD_Numbers( 307-(value2*64/10), 6, 3, visible2, qfalse );
 	if( left ) {
 		value2 = value - visible1;
 		if( value2 < 0 ) value2 += 360;
-		CG_MFQ3HUD_Numbers( 307-(value2*64/10), 6, 3, visible1 );
+		CG_MFQ3HUD_Numbers( 307-(value2*64/10), 6, 3, visible1, qfalse );
 	}
 	if( right ) {
 		value2 = value - visible3;
 		if( value2 > 0 ) value2 -= 360;
-		CG_MFQ3HUD_Numbers( 307-(value2*64/10), 6, 3, visible3 );
+		CG_MFQ3HUD_Numbers( 307-(value2*64/10), 6, 3, visible3, qfalse );
 	}
 
 		// heading indicater
@@ -1149,6 +1228,16 @@ static void CG_DrawStatusBar_MFQ3_new( void ) {
 	if( hud_mfd2.integer ) {
 		CG_Draw_MFD(MFD_2);
 	}
+
+	// solid middle section
+	value = (100*ps->stats[STAT_HEALTH]/ps->stats[STAT_MAX_HEALTH]);
+	if( value > 100 ) value = 100;
+	if( hud_center.integer ) {
+		CG_Draw_Center(value, ps->throttle);
+	}
+
+	// additional HUD info: health and throttle (redundant)
+	CG_Draw_Redundant(value, ps->throttle);
 }
 
 /*

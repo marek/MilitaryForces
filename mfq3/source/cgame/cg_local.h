@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.10 2002-01-23 18:46:15 sparky909_uk Exp $
+ * $Id: cg_local.h,v 1.11 2002-01-23 22:28:13 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -610,6 +610,11 @@ typedef struct {
 	qhandle_t	HUDspeed;
 	qhandle_t	HUDrwr;
 	qhandle_t	HUDalt;
+	qhandle_t	HUDsolid;
+	qhandle_t	HUDhealth[10];
+	qhandle_t	HUDthrottle[15];
+	qhandle_t	HUDhealthtext;
+	qhandle_t	HUDthrottletext;
 	
 	// weapon effect models
 	qhandle_t	bulletFlashModel;
@@ -893,6 +898,9 @@ extern	vmCvar_t		hud_speed;
 extern	vmCvar_t		hud_altitude;
 extern	vmCvar_t		hud_mfd;
 extern	vmCvar_t		hud_mfd2;
+extern	vmCvar_t		hud_center;
+extern  vmCvar_t		hud_health;
+extern	vmCvar_t		hud_throttle;
 
 //
 // cg_main.c
