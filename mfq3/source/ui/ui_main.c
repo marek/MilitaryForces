@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.20 2002-02-22 17:03:06 sparky909_uk Exp $
+ * $Id: ui_main.c,v 1.21 2002-02-22 18:05:22 sparky909_uk Exp $
 */
 /*
 =======================================================================
@@ -1287,37 +1287,54 @@ static void UI_DrawMapTimeToBeat(rectDef_t *rect, float scale, vec4_t color, int
 
 
 
-static void UI_DrawMapCinematic(rectDef_t *rect, float scale, vec4_t color, qboolean net) {
-
+static void UI_DrawMapCinematic(rectDef_t *rect, float scale, vec4_t color, qboolean net)
+{
 	int map = (net) ? ui_currentNetMap.integer : ui_currentMap.integer; 
-	if (map < 0 || map > uiInfo.mapCount) {
-		if (net) {
+	if( map < 0 || map > uiInfo.mapCount )
+	{
+		if (net)
+		{
 			ui_currentNetMap.integer = 0;
 			trap_Cvar_Set("ui_currentNetMap", "0");
-		} else {
+		}
+		else
+		{
 			ui_currentMap.integer = 0;
 			trap_Cvar_Set("ui_currentMap", "0");
 		}
 		map = 0;
 	}
 
-	if (uiInfo.mapList[map].cinematic >= -1) {
-		if (uiInfo.mapList[map].cinematic == -1) {
-			uiInfo.mapList[map].cinematic = trap_CIN_PlayCinematic(va("%s.roq", uiInfo.mapList[map].mapLoadName), 0, 0, 0, 0, (CIN_loop | CIN_silent) );
+	// uninitialised or setup?
+	if( uiInfo.mapList[map].cinematic >= -1 )
+	{
+		// try to load ROQ?
+		if( uiInfo.mapList[map].cinematic == -1 )
+		{
+			uiInfo.mapList[map].cinematic = trap_CIN_PlayCinematic( va("%s.roq", uiInfo.mapList[map].mapLoadName), 0, 0, 0, 0, (CIN_loop | CIN_silent) );
 		}
-		if (uiInfo.mapList[map].cinematic >= 0) {
-		  trap_CIN_RunCinematic(uiInfo.mapList[map].cinematic);
-		  trap_CIN_SetExtents(uiInfo.mapList[map].cinematic, rect->x, rect->y, rect->w, rect->h);
+
+		// ROQ available and loaded OK?
+		if( uiInfo.mapList[map].cinematic >= 0 )
+		{
+			// play ROQ
+			trap_CIN_RunCinematic(uiInfo.mapList[map].cinematic);
+			trap_CIN_SetExtents(uiInfo.mapList[map].cinematic, rect->x, rect->y, rect->w, rect->h);
  			trap_CIN_DrawCinematic(uiInfo.mapList[map].cinematic);
-		} else {
+		}
+		else
+		{
+			// default to map preview
 			uiInfo.mapList[map].cinematic = -2;
 		}
-	} else {
+	}
+	
+	// just draw map preview?
+	if( uiInfo.mapList[map].cinematic == -2 )
+	{
 		UI_DrawMapPreview(rect, scale, color, net);
 	}
 }
-
-
 
 static qboolean updateModel = qtrue;
 static qboolean q3Model = qfalse;
