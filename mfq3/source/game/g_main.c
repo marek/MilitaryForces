@@ -1,5 +1,5 @@
 /*
- * $Id: g_main.c,v 1.6 2002-02-21 12:25:44 sparky909_uk Exp $
+ * $Id: g_main.c,v 1.7 2002-02-22 10:57:17 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -86,7 +86,7 @@ cvarTable_t		gameCvarTable[] = {
 
 	// MFQ3 vars
 	{ &mf_gameset, "mf_gameset", "modern", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_LATCH, 0, qfalse  },
-	{ &mf_version, "mf_version", "unknown", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_LATCH, 0, qfalse  },
+	{ &mf_version, "mf_version", "unknown", CVAR_SERVERINFO | CVAR_ROM, 0, qfalse  },
 	{ &mf_lvcat, "mf_lvcat", "0", CVAR_SERVERINFO | CVAR_ROM, 0, qfalse },
 
 	// change anytime vars
