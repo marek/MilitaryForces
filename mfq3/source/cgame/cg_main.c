@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.19 2002-01-31 23:47:24 thebjoern Exp $
+ * $Id: cg_main.c,v 1.20 2002-02-04 09:38:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -315,7 +315,6 @@ vec4_t HUDColors[HUD_MAX] = {
 							{0.80f, 0.00f, 0.00f, 1.00f},	// HUD_DARK_RED
 							{0.00f, 0.00f, 1.00f, 1.00f},	// HUD_BLUE
 							{0.00f, 0.00f, 0.80f, 1.00f},	// HUD_DARK_BLUE
-							{0.00f, 0.00f, 0.00f, 1.00f},	// HUD_BLACK
 							{1.00f, 1.00f, 0.00f, 1.00f},	// HUD_YELLOW
 							{1.00f, 0.00f, 1.00f, 1.00f},	// HUD_MAGENTA
 							{0.00f, 1.00f, 1.00f, 1.00f},	// HUD_CYAN

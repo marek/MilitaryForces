@@ -1,5 +1,5 @@
 /*
- * $Id: cg_consolecmds.c,v 1.11 2002-01-31 23:47:24 thebjoern Exp $
+ * $Id: cg_consolecmds.c,v 1.12 2002-02-04 09:38:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -254,6 +254,11 @@ static void CG_CamDown_f( void )
 	cg.CameraMode = CAMERA_DOWN;
 }
 
+static void CG_CamBomb_f( void )
+{
+	cg.CameraMode = CAMERA_BOMB;
+}
+
 static void CG_CamOld_f( void )
 {
 	cg.CameraMode = CAMERA_TARGET;
@@ -495,6 +500,8 @@ static consoleCommand_t	commands[] = {
 	{ "-backcam", CG_CamOld_f },
 	{ "+downcam", CG_CamDown_f },
 	{ "-downcam", CG_CamOld_f },
+	{ "+bombcam", CG_CamBomb_f },
+	{ "-bombcam", CG_CamOld_f },
 
 };
 

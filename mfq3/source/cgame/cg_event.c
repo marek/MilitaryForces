@@ -1,5 +1,5 @@
 /*
- * $Id: cg_event.c,v 1.3 2002-01-30 19:26:02 thebjoern Exp $
+ * $Id: cg_event.c,v 1.4 2002-02-04 09:38:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -308,7 +308,20 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		DEBUGNAME("EV_GEAR_DOWN_FULL");
 		cent->gearAnimStartTime = 0;
 		cent->gearAnim = GEAR_ANIM_STOP;
-		cent->gearAnimFrame = GEAR_DOWN;
+		{
+			if( cent->currentState.eType == ET_VEHICLE ) {
+			    clientInfo_t	*ci;
+				int				clientNum;
+			    clientNum = cent->currentState.clientNum;
+				if ( clientNum < 0 || clientNum >= MAX_CLIENTS ) {
+					trap_Error( "Bad clientNum on player entity (EV_GEAR_DOWN_FULL)");
+				}
+				ci = &cgs.clientinfo[ clientNum ];
+				cent->gearAnimFrame = availableVehicles[ci->vehicle].maxGearFrame;
+			} else if( cent->currentState.eType == ET_MISC_VEHICLE ) {
+				cent->gearAnimFrame = availableVehicles[cent->currentState.modelindex].maxGearFrame;
+			}
+		}
 		break;
 	
 

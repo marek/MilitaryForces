@@ -5,10 +5,90 @@ Military Forces Q3
 History:
 ========
 
-+++v0.54+++ in progress...
+
++++v0.58+++ in progress...
 -----------
+- added new command "+bombcam" to be able to see the spot where an iron-bomb
+  dropped right now would approximately land, this is also a new mode in the
+  list of cuyclable cameramodes, works up to a height of 20000 units
+- removed the black color option from the HUD/MFD color palette
+- it is now possible to individually set up the number of gear frames and 
+  the time it takes to operate the gear
+- more fixes on lock/launch code to make it work over the net
+- stallwarning no more displayed when on ground
+- made swingwings work properly over the net as well
+- minor fixes
+
++++v0.57+++
+-----------
+- added lock and launch indicator to HUD
+- added a random factor to the delivered damage of a weapon to reflect hits that
+  might not be perfect, or on spots that are better protected
+- added stallwarning to the HUD
+- speed now colored on MFD page "flightdata", relativ to stallspeed
+- got updated Fw190 model from Matt
+- added new cvars to allow configuring the MFD cycles, ie you can say the left MFD
+  only cycles through these pages and the right one through those. The cvars are
+  starting with m1cp_page# and m2cp_page# and the min number is 0 and the max number
+  is 5 (so for example to enable page 3 you type "m1cp_page3 1" or to disable page 4
+  on MFD2 you type "m2cp_page4 0") - this will later be configurable via the 
+  options menu as well
+- added new cmds "+backcam" and "+downcam" to be able to bind keys so that you
+  look back/down while holding down that key
+- added two new cmds "cycle_camera_mode" (goes through all available camera modes) and 
+  "set_camera_mode" (allows you to explicitely set a camera mode, 0 = targetcam (default),
+  1 = backwards cam, 2 = downwards cam)
+- added two new camera modes: 'back' (looking at your 6 o'clock position) and
+  'down' (looking straight down, might be helpful on bombing)
+- first cut shadow support from Mark 
+- minor fixes
 
 
++++v0.56+++
+-----------
+- now remembering RADAR settings between deaths
+- MFD modes are now saved between games
+- added Matt's Fw190a8 (not yet set it's data properly though)
+- allow properly right and left aligned numbers
+- allow right aligned strings as well
+- use new non-monospaced alphabet from Abbo
+- implemented animations for landing gears
+- got some new gear models for existing planes (which can use the new gear animation 
+  code)
+- got Matt's Bf109g (not yet set it's data properly though)
+- minor changes
+
++++v0.55+++
+-----------
+- more UI fixes from Mark
+- new HUD: added flightinfo page to MFDs, to have redundant info (in case HUD is 
+  damaged)
+- new HUD: for completeness' sake I added a cmd "cycle_mfd_color", to set the color of
+  the MFDs as well
+- new HUD: added cmds to explicitely switch to a certain MFD page, cmds are "mfd1_page"
+  and "mfd2_page" and modenumbers start at 0 (example: "mfd1_page 4" switches
+  to the camera page)
+- added support for dual-prop planes (quick solution, will need proper
+  implementation later)
+- guided missiles now also explode in proximity when it is unlikely that 
+  they can hit
+- minor fixes
+
++++v0.54+++
+-----------
+- new HUD: tracking camera now shows reticle and range
+- switching weapons now only breaks lock, but keeps tracking the target,
+  whereas changing radarmode stops tracking as well
+- new HUD: heading caret now shows direction to targets that are tracked
+- tracking vehicles with radar no more depends on active weapon but only 
+  on vehicle radar system
+- vehicles (not all, only those for which it is set) can now also track targets
+  behind them
+- added a camera page to the MFDs (hopefully not too screwy) - shows view from the
+  plane, when it is locked it shows the target
+- cg_fov and cg_zoomfov now work for the MFD camera screen only
+- disabled setting of fov and zoom fov for the main view
+- minor fixes
 
 +++v0.53+++
 -----------

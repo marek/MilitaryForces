@@ -1,5 +1,5 @@
 /*
- * $Id: cg_plane.c,v 1.14 2002-01-31 10:09:40 sparky909_uk Exp $
+ * $Id: cg_plane.c,v 1.15 2002-02-04 09:38:06 thebjoern Exp $
 */
 
 
@@ -168,8 +168,6 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 	int				i;
 	int				ONOFF = cent->currentState.ONOFF;
 	vec3_t			velocity;	
-	playerState_t*	ps = &cg.snap->ps;
-	float			swingangle = 0;
 
 	// get velocity
 	BG_EvaluateTrajectoryDelta( &cent->currentState.pos, cg.time, velocity );
@@ -214,6 +212,7 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 	// gear
 	if( availableVehicles[ci->vehicle].caps & HC_GEAR ) {
 		int timediff = cg.time - cent->gearAnimStartTime;
+		int geardown = availableVehicles[ci->vehicle].maxGearFrame;
 		if( ONOFF & OO_GEAR ) {
 			part[BP_PLANE_CONTROLS].frame += 9;
 		}
@@ -221,15 +220,15 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 //			part[BP_PLANE_GEAR].frame = 2;
 //		}
 		if( cent->gearAnim == GEAR_ANIM_UP ) {
-			cent->gearAnimFrame = GEAR_DOWN - timediff/25;
+			cent->gearAnimFrame = geardown - timediff/25;
 			if( cent->gearAnimFrame < GEAR_UP ) {
 				cent->gearAnimFrame = GEAR_UP;
 				cent->gearAnim = GEAR_ANIM_STOP;
 			}
 		} else if( cent->gearAnim == GEAR_ANIM_DOWN ) {
 			cent->gearAnimFrame = GEAR_UP + timediff/25;
-			if( cent->gearAnimFrame > GEAR_DOWN ) {
-				cent->gearAnimFrame = GEAR_DOWN;
+			if( cent->gearAnimFrame > geardown ) {
+				cent->gearAnimFrame = geardown;
 				cent->gearAnim = GEAR_ANIM_STOP;
 			}
 		}
@@ -246,27 +245,6 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 		}
 	}
 	
-	// swing wings
-	if( availableVehicles[ci->vehicle].caps & HC_SWINGWING ) {
-		if( ps->stats[STAT_HEALTH] > 0 ) {
-			float speed = ps->speed/10;
-			float min = availableVehicles[ci->vehicle].stallspeed * 1.5f;
-			float max = availableVehicles[ci->vehicle].maxspeed * 0.8f;
-			float diff = max - min;
-			float maxangle = availableVehicles[ci->vehicle].swingangle;
-			if( speed >= min ) {
-				if( speed < max ) {
-					swingangle = (speed - min) * (maxangle / diff);
-				} else {
-					swingangle = maxangle;
-				}
-			}
-			cent->lastSwingAngle = swingangle;
-		} else {
-			swingangle = cent->lastSwingAngle;
-		}
-	}
-		// cockpit
 	if( ONOFF & OO_COCKPIT ) {
 		part[BP_PLANE_COCKPIT].frame = 1;
 	} 
@@ -310,8 +288,8 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 		}
 		if( (i == BP_PLANE_WINGLEFT || i == BP_PLANE_WINGRIGHT) &&
 			(availableVehicles[ci->vehicle].caps & HC_SWINGWING) ) {
-			RotateAroundYaw( part[BP_PLANE_WINGLEFT].axis, swingangle );
-			RotateAroundYaw( part[BP_PLANE_WINGRIGHT].axis, -swingangle );
+			RotateAroundYaw( part[BP_PLANE_WINGLEFT].axis, cent->currentState.angles2[PITCH] );
+			RotateAroundYaw( part[BP_PLANE_WINGRIGHT].axis, -cent->currentState.angles2[PITCH] );
 		}
 
 		CG_PositionRotatedEntityOnTag( &part[i], &part[BP_PLANE_BODY], ci->parts[BP_PLANE_BODY], plane_tags[i] );
@@ -363,6 +341,7 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 		vec3_t	forward, ang, end;
 		trace_t	tr;
 		float len;
+		playerState_t*	ps = &cg.snap->ps;
 		float mindist = cg_thirdPersonRange.integer + availableVehicles[ci->vehicle].cam_dist + 
 			availableVehicles[ci->vehicle].maxs[0] + 20;
 
@@ -524,6 +503,7 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 	}
 */
 }
+
 
 /*
 =============
