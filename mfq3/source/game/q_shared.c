@@ -1,5 +1,5 @@
 /*
- * $Id: q_shared.c,v 1.3 2002-02-27 09:42:10 thebjoern Exp $
+ * $Id: q_shared.c,v 1.4 2002-02-27 23:11:18 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1233,3 +1233,4 @@ int ahextoi( const char* string ) {
 
 	return value;
 }
+

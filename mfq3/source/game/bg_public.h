@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.81 2002-02-27 14:21:59 sparky909_uk Exp $
+ * $Id: bg_public.h,v 1.82 2002-02-27 23:11:18 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.65a"
+#define	GAME_VERSION		"mfq3 v0.66"
 #define	GAME_IDENTIFIER		"mfq3"			// use to identify mfq3 servers
 
 #define	DEFAULT_GRAVITY		800
@@ -711,12 +711,13 @@ enum ShadowOrientationAdjusts {
 
 typedef struct mountInfo_s
 {
-	int			pos;
-	int			left;
-	int			flags;
-	md3Tag_t	tag;
+	int			pos;	// pos on the wing
+	int			group;	// group if any
+	int			left;	// left or right side
+	int			flags;	// what can it carry
+	md3Tag_t	tag;	// tag
 	int			weapon;	// what is actually on
-	int			num;	// how many
+	int			num;	// how many are actually on
 } mountInfo_t;
 
 typedef struct completeLoadout_s
@@ -800,7 +801,7 @@ typedef enum {
 
 // weaponflags
 #define	WF_NONE						0
-#define WF_NON_REMOVABLE_VWEP		1
+#define WF_HAS_FIRE_FRAME			1		// for missiles
 
 // list of weapons
 typedef struct completeWeaponData_s
@@ -812,8 +813,8 @@ typedef struct completeWeaponData_s
 	char			*shortName2;		// displayed in-game, short form, but for GVs
 	char			*modelName;			// model
 	qhandle_t		modelHandle;		// handle
-	char			*vwepName;			// model
-	qhandle_t		vwepHandle;			// handle
+	char			*vwepName;			// vwep model
+	qhandle_t		vwepHandle;			// vwep handle
 	char			*iconName;			// icon for HUD
 	qhandle_t		iconHandle;			// handle for icon
 	unsigned int	category;			// which category can it damage
@@ -837,6 +838,7 @@ typedef struct completeWeaponData_s
 	vec3_t			maxturns;			// max turn angles if turret
 	vec3_t			minturns;			// min turn angles if turret
 	unsigned int	numberPerPackage;	// for example how many rockets in FFAR etc (per mount)
+	unsigned int	fitsCategory;		// which vehicle can carry this weapon
 	unsigned int	fitsPylon;			// on which type of pylon does this go 
 	unsigned int	flags;
 }completeWeaponData_t;
@@ -863,9 +865,11 @@ typedef enum
 	WI_MGT_2X30MM,
 	WI_MGT_12_7MM,
 	WI_FFAR,
+	WI_FFAR_SMALL,
 	WI_100MM_GUN,
 	WI_125MM_GUN,
 	WI_MK82,
+	WI_MK83,
 	WI_MK84,
 	WI_SIDEWINDER,
 	WI_AMRAAM,
@@ -893,14 +897,15 @@ qboolean MF_findTag(const char* fileName, const char* tagname, md3Tag_t* tag);
 qboolean MF_distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout );
 void MF_calculateAllDefaultLoadouts();
 void MF_getDefaultLoadoutForVehicle( int idx, completeLoadout_t* loadout );
-void MF_getLoadoutFromAmmo( int idx, completeLoadout_t* loadout, unsigned int ammo[8] );
-qboolean MF_removeWeaponFromLoadout( int weaponIndex, completeLoadout_t* loadout, char* usedTag, vec3_t pos, qboolean nextMount );
+qboolean MF_removeWeaponFromLoadout( int weaponIndex, completeLoadout_t* loadout, qboolean* wingtip, 
+									vec3_t pos, int launchPos );
 int MF_addWeaponToLoadout( int weaponIndex, completeLoadout_t* loadout );
 qboolean MF_getNumberOfFrames(const char* fileName, int* number);
 qboolean MF_getNumberOfTags(const char* fileName, int* number);
 int MF_getTagsContaining(const char* fileName, const char* str, md3Tag_t* tags, int num);
 qboolean MF_getDimensions(const char* fileName, int frame, vec3_t* maxs, vec3_t* mins);
 void MF_LoadAllVehicleData();
+int MF_findWeaponsOfType( int weaponIndex, completeLoadout_t* loadout );
 
 #define MF_THROTTLE_REVERSE		-5
 #define MF_THROTTLE_IDLE		0

@@ -1,5 +1,5 @@
 /*
- * $Id: g_missile.c,v 1.15 2002-02-25 12:48:26 thebjoern Exp $
+ * $Id: g_missile.c,v 1.16 2002-02-27 23:11:18 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -356,7 +356,6 @@ void fire_antiair (gentity_t *self) {
 	gentity_t	*bolt;
 	vec3_t		dir, right, up, temp, forward;
 	vec3_t		start, offset;
-	char		tagname[16];
 	qboolean	active = ( self->client->ps.stats[STAT_LOCKINFO] & LI_LOCKING );
 	qboolean	wingtip = qfalse;
 
@@ -372,8 +371,7 @@ void fire_antiair (gentity_t *self) {
 
 	} else {
 		self->left = (self->left ? qfalse : qtrue);
-		MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, tagname, offset, self->left );
-		if( strcmp( tagname, "tag_tip_l" ) == 0 || strcmp( tagname, "tag_tip_r" ) == 0 ) wingtip = qtrue;
+		MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, &wingtip, offset, 0 );
 		AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
 		VectorInverse( right );
 	}
@@ -455,7 +453,7 @@ void fire_antiground (gentity_t *self) {
 
 	} else {
 		self->left = (self->left ? qfalse : qtrue);
-		MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, 0, offset, self->left );
+		MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, 0, offset, 0 );
 		AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
 		VectorInverse( right );
 	}
@@ -521,7 +519,10 @@ void fire_ffar (gentity_t *self) {
 
 	VectorCopy( self->s.pos.trBase, start );
 
-	self->left = (self->left ? qfalse : qtrue);
+	self->left++;
+	if( self->left >= availableVehicles[self->client->vehicle].ammo[self->client->ps.weaponNum] ) {
+		self->left = 0;
+	}
 	MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, 0, offset, self->left );
 	AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
 	VectorInverse( right );

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_plane.c,v 1.29 2002-02-27 09:42:09 thebjoern Exp $
+ * $Id: cg_plane.c,v 1.30 2002-02-27 23:11:18 thebjoern Exp $
 */
 
 
@@ -362,24 +362,6 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 				trap_R_AddRefEntityToScene( &vwep );
 			}
 		}
-/*
-		for( i = 0; i < MAX_WEAPONS_PER_VEHICLE; ++i ) {
-			num = loadout->mountedWeapons[i];
-			if( loadout->type[i] && num ) {
-				for( ii = num - 1; ii >= 0; --ii ) {
-					memset( &vwep, 0, sizeof(vwep) );		
-					vwep.hModel = availableWeapons[loadout->weaponType[i]].vwepHandle;
-					VectorCopy( cent->lerpOrigin, vwep.lightingOrigin );
-					AxisCopy( axisDefault, vwep.axis );
-					CG_PositionEntityOnTag( &vwep, &part[BP_PLANE_BODY], ci->parts[BP_PLANE_BODY], 
-							loadout->tags[i].tagname[ii] );
-					vwep.shadowPlane = shadowPlane;
-					vwep.renderfx = renderfx;
-					trap_R_AddRefEntityToScene( &vwep );
-				}
-			}
-		}
-		*/
 	}
 
 	// vapor

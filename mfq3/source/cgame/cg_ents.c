@@ -1,5 +1,5 @@
 /*
- * $Id: cg_ents.c,v 1.2 2002-02-25 12:13:36 sparky909_uk Exp $
+ * $Id: cg_ents.c,v 1.3 2002-02-27 23:11:18 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -367,6 +367,11 @@ static void CG_Missile( centity_t *cent ) {
 	// convert direction of travel into axis
 	if ( VectorNormalize2( s1->pos.trDelta, ent.axis[0] ) == 0 ) {
 		ent.axis[0][2] = 1;
+	}
+
+	// flame frame
+	if( availableWeapons[cent->currentState.weaponIndex].flags & WF_HAS_FIRE_FRAME ) {
+		ent.frame = 1;
 	}
 
 	// spin as it moves
