@@ -1,5 +1,5 @@
 /*
- * $Id: q_shared.h,v 1.2 2001-12-22 02:28:44 thebjoern Exp $
+ * $Id: q_shared.h,v 1.3 2001-12-27 19:14:46 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -924,11 +924,11 @@ typedef struct playerState_s {
 
 	int			groundEntityNum;// ENTITYNUM_NONE = in air
 
-	int			ONOFF;			// ON/OFF flags
+	int			objectives;		// MFQ3 for game objectives like CTF flags
 	int			vehicleAnim;	// set vehicle specific animations
 
 	int			turretAngle;	// MFQ3 used for turret
-	int			objectives;		// MFQ3 for game objectives like CTF flags
+	int			ONOFF;			// ON/OFF flags
 
 	int			fixed_throttle;	// MFQ3 for throttle settings by increase/decrease
 

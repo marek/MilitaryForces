@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.13 2001-12-24 02:17:35 thebjoern Exp $
+ * $Id: bg_public.h,v 1.14 2001-12-27 19:14:46 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.45"
+#define	GAME_VERSION		"mfq3 v0.46"
 
 #define	DEFAULT_GRAVITY		800
 #define	GIB_HEALTH			-50
@@ -568,10 +568,11 @@ extern const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1];
 #define BP_PLANE_GEAR			3
 #define BP_PLANE_BRAKES			4
 #define BP_PLANE_BAY			5
-#define BP_PLANE_SWING			6
-#define BP_PLANE_SPECIAL		7
-#define BP_PLANE_PROP			8
-#define BP_PLANE_MAX_PARTS		9
+#define BP_PLANE_WINGLEFT		6
+#define BP_PLANE_WINGRIGHT		7
+#define BP_PLANE_SPECIAL		8
+#define BP_PLANE_PROP			9
+#define BP_PLANE_MAX_PARTS		10
 
 // 2.helos
 
@@ -582,7 +583,7 @@ extern const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1];
 #define BP_GV_MAX_PARTS			3
 
 // total max parts (not cat may exceed this!)
-#define BP_MAX_PARTS			9
+#define BP_MAX_PARTS			10
 
 // list of vehicles (data)
 typedef struct completeVehicleData_s
@@ -614,6 +615,7 @@ typedef struct completeVehicleData_s
 	unsigned int	effectModel;	// num of afterburner model (for planes)
 	unsigned int	radarRange;		// how far goes the radar AIR
 	unsigned int	radarRange2;	// how far goes the radar GV
+	float			swingangle;		// for swing wings
 	unsigned int	renderFlags;	// special stuff for rendering only
 }completeVehicleData_t;	
 
@@ -715,6 +717,7 @@ int MF_getNumberOfItems(const char **itemlist);
 #define HC_TAILDRAGGER			16
 #define HC_DUALGUNS				32	// will be removed 
 #define HC_DUALENGINE			64
+#define HC_SWINGWING			128
 
 // this is for the PW_ONOFF_FLAGS
 #define OO_NOTHING_ON			0
