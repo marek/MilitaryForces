@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.39 2004-12-16 19:22:17 minkis Exp $
+ * $Id: g_local.h,v 1.40 2004-12-17 00:29:41 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -31,6 +31,8 @@
 #define FL_NO_BOTS				0x00002000	// spawn point not for bot use
 #define FL_NO_HUMANS			0x00004000	// spawn point just for bots
 
+#define CS_NOKILL				0x00000001
+#define CS_LASTPOS				0x00000002
 
 // movers are things like doors, plats, buttons, etc
 typedef enum {
@@ -707,6 +709,7 @@ team_t PickTeam( int ignoreClientNum );
 void SetClientViewAngle( gentity_t *ent, vec3_t angle );
 gentity_t *SelectSpawnPoint ( vec3_t avoidPoint, vec3_t origin, vec3_t angles, int category );
 void respawn (gentity_t *ent);
+void switch_vehicle (gentity_t *ent);
 void BeginIntermission (void);
 void InitClientPersistant (gclient_t *client);
 void InitClientResp (gclient_t *client);
@@ -720,7 +723,7 @@ qboolean SpotWouldTelefrag( gentity_t *spot );
 //
 char *MF_ClientConnect( int clientNum, qboolean firstTime, qboolean isBot );
 void MF_ClientBegin( int clientNum );
-void MF_ClientSpawn( gentity_t *ent );
+void MF_ClientSpawn( gentity_t *ent, long cs_flags);
 
 // mfq3
 // mf_vehiclespawn.c

@@ -1,5 +1,5 @@
 /*
- * $Id: mf_client.c,v 1.21 2004-12-16 19:22:17 minkis Exp $
+ * $Id: mf_client.c,v 1.22 2004-12-17 00:29:41 minkis Exp $
 */
 
 #include "g_local.h"
@@ -148,7 +148,7 @@ void MF_ClientBegin( int clientNum ) {
 	client->vehicle = client->nextVehicle = -1;
 
 	// locate ent at a spawn point
-	MF_ClientSpawn( ent );
+	MF_ClientSpawn( ent, 0 );
 
 	if ( client->sess.sessionTeam != TEAM_SPECTATOR ) {
 		if ( g_gametype.integer != GT_TOURNAMENT  ) {
@@ -175,7 +175,7 @@ gentity_t *SelectSpectatorSpawnPoint( vec3_t origin, vec3_t angles );
 gentity_t *SelectInitialSpawnPoint( vec3_t origin, vec3_t angles );
 
 
-void MF_ClientSpawn(gentity_t *ent) {
+void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 	int		index;
 	vec3_t	spawn_origin, spawn_angles;
 	gclient_t	*client;
@@ -246,48 +246,54 @@ void MF_ClientSpawn(gentity_t *ent) {
 	// find a spawn point
 	// do it before setting health back up, so farthest
 	// ranging doesn't count this client
-	if ( client->sess.sessionTeam == TEAM_SPECTATOR || (client->sess.sessionTeam != TEAM_SPECTATOR &&
-		(vehIndex < 0 || vehIndex >= bg_numberOfVehicles)) ) {
-		spawnPoint = SelectSpectatorSpawnPoint ( 
-						spawn_origin, spawn_angles);
-	} else if (g_gametype.integer >= GT_TEAM ) {
-		// all base oriented team games use the CTF spawn points
-		spawnPoint = SelectCTFSpawnPoint ( 
-						client->sess.sessionTeam, 
-						client->pers.teamState.state, 
-						spawn_origin, spawn_angles, vehIndex);
+	if(cs_flags & CS_LASTPOS) {
+		// use current position as spawn point
+		VectorCopy(client->ps.origin, spawn_origin);
+		VectorCopy(client->ps.vehicleAngles, spawn_angles);
 	} else {
-		do {
-			// the first spawn should be at a good looking spot
-			if ( !client->pers.initialSpawn && client->pers.localClient ) {
-				client->pers.initialSpawn = qtrue;
-				spawnPoint = SelectInitialSpawnPoint( spawn_origin, spawn_angles );
-			} else {
-				// don't spawn near existing origin if possible
-				spawnPoint = SelectSpawnPoint ( 
-					client->ps.origin, 
-					spawn_origin, spawn_angles,
-					availableVehicles[vehIndex].cat);
-			}
+		if ( client->sess.sessionTeam == TEAM_SPECTATOR || (client->sess.sessionTeam != TEAM_SPECTATOR &&
+			(vehIndex < 0 || vehIndex >= bg_numberOfVehicles)) ) {
+			spawnPoint = SelectSpectatorSpawnPoint ( 
+							spawn_origin, spawn_angles);
+		} else if (g_gametype.integer >= GT_TEAM ) {
+			// all base oriented team games use the CTF spawn points
+			spawnPoint = SelectCTFSpawnPoint ( 
+							client->sess.sessionTeam, 
+							client->pers.teamState.state, 
+							spawn_origin, spawn_angles, vehIndex);
+		} else {
+			do {
+				// the first spawn should be at a good looking spot
+				if ( !client->pers.initialSpawn && client->pers.localClient ) {
+					client->pers.initialSpawn = qtrue;
+					spawnPoint = SelectInitialSpawnPoint( spawn_origin, spawn_angles );
+				} else {
+					// don't spawn near existing origin if possible
+					spawnPoint = SelectSpawnPoint ( 
+						client->ps.origin, 
+						spawn_origin, spawn_angles,
+						availableVehicles[vehIndex].cat);
+				}
+	
+				// Tim needs to prevent bots from spawning at the initial point
+				// on q3dm0...
+				if ( ( spawnPoint->flags & FL_NO_BOTS ) && ( ent->r.svFlags & SVF_BOT ) ) {
+					continue;	// try again
+				}
+				// just to be symetric, we have a nohumans option...
+				if ( ( spawnPoint->flags & FL_NO_HUMANS ) && !( ent->r.svFlags & SVF_BOT ) ) {
+					continue;	// try again
+				}
 
-			// Tim needs to prevent bots from spawning at the initial point
-			// on q3dm0...
-			if ( ( spawnPoint->flags & FL_NO_BOTS ) && ( ent->r.svFlags & SVF_BOT ) ) {
-				continue;	// try again
-			}
-			// just to be symetric, we have a nohumans option...
-			if ( ( spawnPoint->flags & FL_NO_HUMANS ) && !( ent->r.svFlags & SVF_BOT ) ) {
-				continue;	// try again
-			}
-
-			// check for category on this spawn point
-			if( !(spawnPoint->ent_category & availableVehicles[vehIndex].cat) ) {
-				continue;
-			}
+				// check for category on this spawn point
+				if( !(spawnPoint->ent_category & availableVehicles[vehIndex].cat) ) {
+					continue;
+				}
 				
-			break;
+				break;
 
-		} while ( 1 );
+			} while ( 1 );
+		}
 	}
 
 	client->pers.teamState.state = TEAM_ACTIVE;
@@ -479,7 +485,8 @@ void MF_ClientSpawn(gentity_t *ent) {
 	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
 
 	} else {
-		G_KillBox( ent );
+		if(!(cs_flags & CS_NOKILL))
+			G_KillBox( ent );
 		trap_LinkEntity (ent);
 	}
 
@@ -528,4 +535,3 @@ void MF_ClientSpawn(gentity_t *ent) {
 	// clear entity state values
 	BG_PlayerStateToEntityState( &client->ps, &ent->s, qtrue );
 }
-
