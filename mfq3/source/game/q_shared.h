@@ -1,5 +1,5 @@
 /*
- * $Id: q_shared.h,v 1.5 2002-01-29 12:10:54 sparky909_uk Exp $
+ * $Id: q_shared.h,v 1.6 2002-02-17 18:10:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -984,7 +984,7 @@ typedef struct playerState_s {
 #define	BUTTON_ATTACK		1
 #define	BUTTON_TALK			2			// displays talk balloon and disables actions
 #define	BUTTON_ATTACK_MAIN	4			// MFQ3 secondary fire "+button2"
-#define BUTTON_XXX1			8
+#define BUTTON_WEAPONBAY	8			// MFQ3 weaponbay "+button3"
 #define BUTTON_XXX2			16
 #define BUTTON_INCREASE		32			// MFQ3	throttle "+button5"
 #define BUTTON_DECREASE		64			// MFQ3 throttle "+button6"

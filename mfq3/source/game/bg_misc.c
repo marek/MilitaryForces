@@ -1,5 +1,5 @@
 /*
- * $Id: bg_misc.c,v 1.5 2002-02-15 09:58:31 thebjoern Exp $
+ * $Id: bg_misc.c,v 1.6 2002-02-17 18:10:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -489,6 +489,12 @@ char *eventnames[] = {
 	"EV_GEAR_UP_FULL",
 	"EV_GEAR_DOWN_FULL",
 	"EV_GEAR_STOP",
+
+	"EV_BAY_UP",
+	"EV_BAY_DOWN",
+	"EV_BAY_UP_FULL",
+	"EV_BAY_DOWN_FULL",
+	"EV_BAY_STOP",
 
 	"EV_DEBUG_LINE"
 

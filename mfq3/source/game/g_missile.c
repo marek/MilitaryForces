@@ -1,5 +1,5 @@
 /*
- * $Id: g_missile.c,v 1.8 2002-02-15 09:58:31 thebjoern Exp $
+ * $Id: g_missile.c,v 1.9 2002-02-17 18:10:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -360,11 +360,13 @@ void fire_antiair (gentity_t *self) {
 
 	} else {
 		// planes and helos for now just shoot along their direction of flight
-		AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
-		self->left = (self->left ? qfalse : qtrue);
-		mult = (self->left ? 1 : -1);
-		VectorMA( start, availableVehicles[self->client->vehicle].mins[2], up, start );
-		VectorMA( start, availableVehicles[self->client->vehicle].maxs[1]*mult/2, right, start );
+		if( !(availableVehicles[self->client->vehicle].caps & HC_WEAPONBAY) ) {
+			AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
+			self->left = (self->left ? qfalse : qtrue);
+			mult = (self->left ? 1 : -1);
+			VectorMA( start, availableVehicles[self->client->vehicle].mins[2], up, start );
+			VectorMA( start, availableVehicles[self->client->vehicle].maxs[1]*mult/2, right, start );
+		}
 	}
 	VectorMA( start, offset[0], dir, start );
 	VectorMA( start, offset[1], right, start );
@@ -434,11 +436,13 @@ void fire_antiground (gentity_t *self) {
 
 	} else {
 		// planes and helos for now just shoot along their direction of flight
-		AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
-		self->left = (self->left ? qfalse : qtrue);
-		mult = (self->left ? 1 : -1);
-		VectorMA( start, availableVehicles[self->client->vehicle].mins[2], up, start );
-		VectorMA( start, availableVehicles[self->client->vehicle].maxs[1]*mult/2, right, start );
+		if(	!(availableVehicles[self->client->vehicle].caps & HC_WEAPONBAY) ) {
+			AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
+			self->left = (self->left ? qfalse : qtrue);
+			mult = (self->left ? 1 : -1);
+			VectorMA( start, availableVehicles[self->client->vehicle].mins[2], up, start );
+			VectorMA( start, availableVehicles[self->client->vehicle].maxs[1]*mult/2, right, start );
+		}
 	}
 	VectorMA( start, offset[0], dir, start );
 	VectorMA( start, offset[1], right, start );
@@ -558,7 +562,8 @@ void fire_ironbomb (gentity_t *self) {
 
 	AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
 	VectorCopy( self->s.pos.trBase, start );
-	if( availableVehicles[self->client->vehicle].cat & CAT_PLANE ) {
+	if( (availableVehicles[self->client->vehicle].cat & CAT_PLANE) &&
+		!(availableVehicles[self->client->vehicle].caps & HC_WEAPONBAY) ) {
 		self->left = (self->left ? qfalse : qtrue);
 		mult = (self->left ? 1 : -1);
 		VectorMA( start, availableVehicles[self->client->vehicle].mins[2], up, start );

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.21 2002-02-17 13:26:45 thebjoern Exp $
+ * $Id: bg_vehicledata.c,v 1.22 2002-02-17 18:10:54 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -52,6 +52,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// swingangle
 	1400,						// geartime
 	47,							// max gear frame
+	1000,						// baytime
+	47,							// max bay frame
 	0							// renderflags
     },
 
@@ -96,6 +98,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// swingangle
 	1400,						// geartime
 	47,							// max gear frame
+	1000,						// baytime
+	47,							// max bay frame
 	0							// renderflags
     },
 
@@ -140,6 +144,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// swingangle
 	1400,						// geartime
 	69,							// max gear frame
+	1000,						// baytime
+	47,							// max bay frame
 	0							// renderflags
     },
 
@@ -184,6 +190,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// swingangle
 	1400,						// geartime
 	47,							// max gear frame
+	1000,						// baytime
+	47,							// max bay frame
 	0							// renderflags
     },
 
@@ -228,6 +236,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// swingangle
 	1400,						// geartime
 	47,							// max gear frame
+	1000,						// baytime
+	47,							// max bay frame
 	MFR_DUALPILOT|MFR_BIGVAPOR	// renderflags
     },
 
@@ -272,6 +282,8 @@ completeVehicleData_t availableVehicles[] =
 	50,							// swingangle
 	1400,						// geartime
 	47,							// max gear frame
+	1000,						// baytime
+	47,							// max bay frame
 	MFR_DUALPILOT|MFR_BIGVAPOR	// renderflags
     },
 
@@ -316,6 +328,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// swingangle
 	1400,						// geartime
 	47,							// max gear frame
+	1000,						// baytime
+	47,							// max bay frame
 	0							// renderflags
     },
 
@@ -329,7 +343,7 @@ completeVehicleData_t availableVehicles[] =
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
-	HC_VAPOR,					// capabilities
+	HC_VAPOR|HC_WEAPONBAY,		// capabilities
 	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
 	{-26, -25, -5},				// mins (bounding box)
 	{44, 25, 10},				// max (bounding box)
@@ -360,6 +374,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// swingangle
 	1400,						// geartime
 	47,							// max gear frame
+	1000,						// baytime
+	47,							// max bay frame
 	0							// renderflags
     },
 
@@ -373,7 +389,7 @@ completeVehicleData_t availableVehicles[] =
 	CLASS_PLANE_BOMBER,
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
-	HC_VAPOR,					// capabilities
+	HC_VAPOR|HC_WEAPONBAY,		// capabilities
 	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
 	{-26, -21, -4},				// mins (bounding box)
 	{36, 21, 15},				// max (bounding box)
@@ -404,6 +420,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// swingangle
 	1400,						// geartime
 	47,							// max gear frame
+	1000,						// baytime
+	47,							// max bay frame
 	0							// renderflags
     },
 
@@ -449,6 +467,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// swingangle
 	1400,						// geartime
 	47,							// max gear frame
+	1000,						// baytime
+	47,							// max bay frame
 	0							// renderflags
     },
 
@@ -494,6 +514,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// swingangle
 	1400,						// geartime
 	47,							// max gear frame
+	1000,						// baytime
+	47,							// max bay frame
 	0							// renderflags
     },
 
@@ -539,6 +561,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// swingangle
 	1400,						// geartime
 	47,							// max gear frame
+	1000,						// baytime
+	47,							// max bay frame
 	0							// renderflags
     },
 
@@ -584,6 +608,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// swingangle
 	1400,						// geartime
 	47,							// max gear frame
+	1000,						// baytime
+	47,							// max bay frame
 	0							// renderflags
     },
 
@@ -599,10 +625,10 @@ completeVehicleData_t availableVehicles[] =
 	0,							// flags
 	HC_GEAR|HC_PROP|
 	HC_TAILDRAGGER|
-	HC_DUALGUNS,				// capabilities
+	HC_WEAPONBAY,				// capabilities
 	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
-	{-31, -30, -1},				// mins (bounding box)
-	{20, 30, 6},				// max (bounding box)
+	{-36, -40, -3},				// mins (bounding box)
+	{30, 40, 9},				// max (bounding box)
 	{40, 50, 120},				// turnspeed around the three axis
 	{0, 100, 80},				// camera distance {min,max,default}
 	{0, 100, 10},				// camera height {min,max,default}
@@ -618,7 +644,7 @@ completeVehicleData_t availableVehicles[] =
 	{2.518f, -7.371f, -0.155f},	// gun tag
 	60,							// max fuel
 	3,							// gearheight
-	-14,							// tailangle
+	-8,							// tailangle
 	WI_MG_8XCAL50, WI_MK82, 0, 0, 0, 0, 0, 0,		// weapons
 	450, 10, 0, 0, 0, 0, 0, 0,	// ammo
 	{-4, 0, 6},					// cameraposition for cockpit view
@@ -630,6 +656,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// swingangle
 	1400,						// geartime
 	47,							// max gear frame
+	500,						// baytime
+	19,							// max bay frame
 	0							// renderflags
     },
 
@@ -675,6 +703,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// swingangle
 	1400,						// geartime
 	47,							// max gear frame
+	1000,						// baytime
+	47,							// max bay frame
 	0							// renderflags
     },
 
@@ -720,6 +750,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// swingangle
 	1400,						// geartime
 	47,							// max gear frame
+	1000,						// baytime
+	47,							// max bay frame
 	0							// renderflags
     },
 
@@ -767,6 +799,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// swingangle
 	1400,						// geartime
 	47,							// max gear frame
+	1000,						// baytime
+	47,							// max bay frame
 	0							// renderflags
     },
 
@@ -810,6 +844,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// swingangle
 	1400,						// geartime
 	47,							// max gear frame
+	1000,						// baytime
+	47,							// max bay frame
 	0							// renderflags
     },
 
@@ -853,6 +889,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// swingangle
 	1400,						// geartime
 	47,							// max gear frame
+	1000,						// baytime
+	47,							// max bay frame
 	0							// renderflags
     },
 
@@ -896,6 +934,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// swingangle
 	1400,						// geartime
 	47,							// max gear frame
+	1000,						// baytime
+	47,							// max bay frame
 	0							// renderflags
     },
 
@@ -939,6 +979,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// swingangle
 	1400,						// geartime
 	47,							// max gear frame
+	1000,						// baytime
+	47,							// max bay frame
 	0							// renderflags
     },
 
@@ -982,6 +1024,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// swingangle
 	1400,						// geartime
 	47,							// max gear frame
+	1000,						// baytime
+	47,							// max bay frame
 	0							// renderflags
     }
 };

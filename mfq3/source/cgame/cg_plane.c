@@ -1,9 +1,11 @@
 /*
- * $Id: cg_plane.c,v 1.21 2002-02-14 12:02:19 sparky909_uk Exp $
+ * $Id: cg_plane.c,v 1.22 2002-02-17 18:10:54 thebjoern Exp $
 */
 
 
 #include "cg_local.h"
+
+#define VAPORSPEED	(SPEED_GREEN_ARC - (SPEED_GREEN_ARC - SPEED_YELLOW_ARC)/2)
 
 // make sure the tags are named properly!
 char *plane_tags[BP_PLANE_MAX_PARTS] =
@@ -252,6 +254,26 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 		part[BP_PLANE_GEAR].frame = cent->gearAnimFrame;
 	}
 	
+	// bay
+	if( availableVehicles[ci->vehicle].caps & HC_WEAPONBAY ) {
+		int timediff = cg.time - cent->bayAnimStartTime;
+		int baydown = availableVehicles[ci->vehicle].maxBayFrame;
+		if( cent->bayAnim == BAY_ANIM_UP ) {
+			cent->bayAnimFrame = baydown - timediff/25;
+			if( cent->bayAnimFrame < BAY_UP ) {
+				cent->bayAnimFrame = BAY_UP;
+				cent->bayAnim = BAY_ANIM_STOP;
+			}
+		} else if( cent->bayAnim == BAY_ANIM_DOWN ) {
+			cent->bayAnimFrame = BAY_UP + timediff/25;
+			if( cent->bayAnimFrame > baydown ) {
+				cent->bayAnimFrame = baydown;
+				cent->bayAnim = BAY_ANIM_STOP;
+			}
+		}
+		part[BP_PLANE_BAY].frame = cent->bayAnimFrame;
+	}
+
 	// speedbrakes
 	if( availableVehicles[ci->vehicle].caps & HC_SPEEDBRAKE ) {
 		if( ONOFF & OO_SPEEDBRAKE ) {
@@ -322,11 +344,14 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 	CG_PlanePilot( cent, &part[BP_PLANE_BODY], ci->parts[BP_PLANE_BODY], ci->vehicle );
 	
 	// vapor
-	if( ONOFF & (OO_VAPOR|OO_VAPOR_BIG) ) {
+	if( ONOFF & OO_VAPOR ) {
 		vapor.hModel = (availableVehicles[ci->vehicle].renderFlags & MFR_BIGVAPOR) ?
 			cgs.media.vaporBig : cgs.media.vapor;
 		vapor.customShader = cgs.media.vaporShader;
-		if( ONOFF & OO_VAPOR ) vapor.frame = 1;
+		if( speed < availableVehicles[ci->vehicle].stallspeed * SPEED_GREEN_ARC &&
+			speed > availableVehicles[ci->vehicle].stallspeed * VAPORSPEED ) {
+			vapor.frame = 1;
+		}
 		VectorCopy( cent->lerpOrigin, vapor.lightingOrigin );
 		AxisCopy( axisDefault, vapor.axis );
 		CG_PositionRotatedEntityOnTag( &vapor, &part[BP_PLANE_BODY], ci->parts[BP_PLANE_BODY], "tag_vapor1" );

@@ -1,5 +1,5 @@
 /*
- * $Id: mf_vehiclespawn.c,v 1.2 2002-01-30 19:26:02 thebjoern Exp $
+ * $Id: mf_vehiclespawn.c,v 1.3 2002-02-17 18:10:54 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -37,6 +37,9 @@ void MF_Spawn_Plane(gentity_t *ent, int idx, qboolean landed) {
 
 	// update gear anim
 	ent->updateGear = qtrue;
+
+	// update bay anim
+	ent->updateBay = qtrue;
 }
 
 // ground vehicles

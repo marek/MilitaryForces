@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.10 2002-01-31 23:47:24 thebjoern Exp $
+ * $Id: g_local.h,v 1.11 2002-02-17 18:10:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -177,6 +177,7 @@ struct gentity_s {
 	float		 followcone;	// for weapons mfq3
 	int			 lastDist;
 	qboolean	 updateGear;
+	qboolean	 updateBay;
 };
 
 
