@@ -1,5 +1,5 @@
 /*
- * $Id: cg_event.c,v 1.14 2002-07-15 18:23:07 thebjoern Exp $
+ * $Id: cg_event.c,v 1.15 2003-09-05 00:39:02 minkis Exp $
 */
 
 #include "cg_local.h"
@@ -228,6 +228,11 @@ void CG_EntityEvent( centity_t *cent, vec3_t position )
 
 	case EV_FIRE_FLARE:
 		DEBUGNAME("EV_FIRE_FLARE");
+		break;
+	
+	case EV_NUKE:
+		DEBUGNAME("EV_NUKE");
+		CG_NukeEffect( cent, es );
 		break;
 
 	//=================================================================
@@ -480,6 +485,11 @@ void CG_EntityEvent( centity_t *cent, vec3_t position )
 					break;
 				case GTS_TEAMS_ARE_TIED:
 					CG_AddBufferedSound( cgs.media.teamsTiedSound );
+					break;
+
+				// MFQ3
+				case GTS_NUKE:
+					trap_S_StartLocalSound(cgs.media.nukeFarSound, CHAN_ANNOUNCER);
 					break;
 				default:
 					break;
