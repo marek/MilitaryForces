@@ -1,5 +1,5 @@
 /*
- * $Id: ui_shared.c,v 1.10 2002-02-22 17:03:06 sparky909_uk Exp $
+ * $Id: ui_shared.c,v 1.11 2002-02-22 17:15:29 sparky909_uk Exp $
 */
 // 
 // string allocation/managment
@@ -3162,7 +3162,6 @@ static bind_t g_bindings[] =
 	{"+cameradown",		"Camera Down",		ID_CAMERADOWN,	-1,				-1,		-1, -1},
 	{"+zoomin",			"Zoom In",			ID_ZOOMIN,		-1,				-1,		-1, -1},
 	{"+zoomout",		"Zoom Out",			ID_ZOOMOUT,		-1,				-1,		-1, -1},
-	{"+speedup",		"Zoom/Move Speed-Up", ID_SPEEDUP,	K_SHIFT,		-1,		-1, -1},
 	{"contact_tower",	"Contact Tower",	ID_CONTACTTOWER,-1,				-1,		-1, -1},
 	{"radar",			"RADAR on/off",		ID_RADAR,		-1,				-1,		-1, -1},
 	{"extinfo",			"Ext.Info on/off",	ID_EXTINFO,		-1,				-1,		-1, -1},
