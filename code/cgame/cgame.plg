@@ -1,0 +1,1429 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: cgame - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "d:\temp\RSP215.tmp" with contents
+[
+/nologo /G6 /ML /W4 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /Fp"Release/cgame.pch" /YX /Fo"Release/" /Fd"Release/" /FD /c 
+"E:\work\1.27g\code\game\bg_misc.c"
+"E:\work\1.27g\code\game\bg_pmove.c"
+"E:\work\1.27g\code\game\bg_slidemove.c"
+"E:\work\1.27g\code\cgame\cg_consolecmds.c"
+"E:\work\1.27g\code\cgame\cg_draw.c"
+"E:\work\1.27g\code\cgame\cg_drawtools.c"
+"E:\work\1.27g\code\cgame\cg_effects.c"
+"E:\work\1.27g\code\cgame\cg_ents.c"
+"E:\work\1.27g\code\cgame\cg_event.c"
+"E:\work\1.27g\code\cgame\cg_info.c"
+"E:\work\1.27g\code\cgame\cg_localents.c"
+"E:\work\1.27g\code\cgame\cg_main.c"
+"E:\work\1.27g\code\cgame\cg_marks.c"
+"E:\work\1.27g\code\cgame\cg_players.c"
+"E:\work\1.27g\code\cgame\cg_playerstate.c"
+"E:\work\1.27g\code\cgame\cg_predict.c"
+"E:\work\1.27g\code\cgame\cg_scoreboard.c"
+"E:\work\1.27g\code\cgame\cg_servercmds.c"
+"E:\work\1.27g\code\cgame\cg_snapshot.c"
+"E:\work\1.27g\code\cgame\cg_syscalls.c"
+"E:\work\1.27g\code\cgame\cg_view.c"
+"E:\work\1.27g\code\cgame\cg_weapons.c"
+"E:\work\1.27g\code\game\q_math.c"
+"E:\work\1.27g\code\game\q_shared.c"
+"E:\work\1.27g\code\ui\ui_shared.c"
+]
+Creating command line "cl.exe @d:\temp\RSP215.tmp" 
+Creating temporary file "d:\temp\RSP216.tmp" with contents
+[
+/nologo /base:"0x30000000" /subsystem:windows /dll /incremental:no /pdb:"Release/cgamex86.pdb" /map:"Release/cgamex86.map" /machine:I386 /def:".\cgame.def" /out:"../Release/cgamex86.dll" /implib:"Release/cgamex86.lib" 
+.\Release\bg_misc.obj
+.\Release\bg_pmove.obj
+.\Release\bg_slidemove.obj
+.\Release\cg_consolecmds.obj
+.\Release\cg_draw.obj
+.\Release\cg_drawtools.obj
+.\Release\cg_effects.obj
+.\Release\cg_ents.obj
+.\Release\cg_event.obj
+.\Release\cg_info.obj
+.\Release\cg_localents.obj
+.\Release\cg_main.obj
+.\Release\cg_marks.obj
+.\Release\cg_players.obj
+.\Release\cg_playerstate.obj
+.\Release\cg_predict.obj
+.\Release\cg_scoreboard.obj
+.\Release\cg_servercmds.obj
+.\Release\cg_snapshot.obj
+.\Release\cg_syscalls.obj
+.\Release\cg_view.obj
+.\Release\cg_weapons.obj
+.\Release\q_math.obj
+.\Release\q_shared.obj
+.\Release\ui_shared.obj
+]
+Creating command line "link.exe @d:\temp\RSP216.tmp"
+<h3>Output Window</h3>
+Compiling...
+bg_misc.c
+bg_pmove.c
+bg_slidemove.c
+cg_consolecmds.c
+cg_draw.c
+E:\work\1.27g\code\cgame\cg_draw.c(1815) : warning C4101: 'h' : unreferenced local variable
+cg_drawtools.c
+cg_effects.c
+cg_ents.c
+cg_event.c
+cg_info.c
+cg_localents.c
+cg_main.c
+E:\work\1.27g\code\cgame\cg_main.c(1915) : warning C4505: 'CG_Cvar_Get' : unreferenced local function has been removed
+        E:\work\1.27g\code\cgame\cg_main.c(1619) : see declaration of 'CG_Cvar_Get'
+cg_marks.c
+cg_players.c
+E:\work\1.27g\code\cgame\cg_players.c(2381) : warning C4505: 'CG_PlayerTokens' : unreferenced local function has been removed
+        E:\work\1.27g\code\cgame\cg_players.c(1516) : see declaration of 'CG_PlayerTokens'
+cg_playerstate.c
+cg_predict.c
+cg_scoreboard.c
+cg_servercmds.c
+E:\work\1.27g\code\cgame\cg_servercmds.c(1055) : warning C4505: 'CG_ValidOrder' : unreferenced local function has been removed
+        E:\work\1.27g\code\cgame\cg_servercmds.c(30) : see declaration of 'CG_ValidOrder'
+cg_snapshot.c
+cg_syscalls.c
+cg_view.c
+cg_weapons.c
+q_math.c
+q_shared.c
+ui_shared.c
+Linking...
+   Creating library Release/cgamex86.lib and object Release/cgamex86.exp
+
+
+
+<h3>Results</h3>
+cgamex86.dll - 0 error(s), 4 warning(s)
+<h3>
+--------------------Configuration: cgame - Win32 Debug--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "d:\temp\RSP21B.tmp" with contents
+[
+/nologo /G5 /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /FR"Debug/" /Fp"Debug/cgame.pch" /YX /Fo"Debug/" /Fd"Debug/" /FD /c 
+"E:\work\1.27g\code\game\bg_misc.c"
+"E:\work\1.27g\code\game\bg_pmove.c"
+"E:\work\1.27g\code\game\bg_slidemove.c"
+"E:\work\1.27g\code\cgame\cg_consolecmds.c"
+"E:\work\1.27g\code\cgame\cg_draw.c"
+"E:\work\1.27g\code\cgame\cg_drawtools.c"
+"E:\work\1.27g\code\cgame\cg_effects.c"
+"E:\work\1.27g\code\cgame\cg_ents.c"
+"E:\work\1.27g\code\cgame\cg_event.c"
+"E:\work\1.27g\code\cgame\cg_info.c"
+"E:\work\1.27g\code\cgame\cg_localents.c"
+"E:\work\1.27g\code\cgame\cg_main.c"
+"E:\work\1.27g\code\cgame\cg_marks.c"
+"E:\work\1.27g\code\cgame\cg_players.c"
+"E:\work\1.27g\code\cgame\cg_playerstate.c"
+"E:\work\1.27g\code\cgame\cg_predict.c"
+"E:\work\1.27g\code\cgame\cg_scoreboard.c"
+"E:\work\1.27g\code\cgame\cg_servercmds.c"
+"E:\work\1.27g\code\cgame\cg_snapshot.c"
+"E:\work\1.27g\code\cgame\cg_syscalls.c"
+"E:\work\1.27g\code\cgame\cg_view.c"
+"E:\work\1.27g\code\cgame\cg_weapons.c"
+"E:\work\1.27g\code\game\q_math.c"
+"E:\work\1.27g\code\game\q_shared.c"
+"E:\work\1.27g\code\ui\ui_shared.c"
+]
+Creating command line "cl.exe @d:\temp\RSP21B.tmp" 
+Creating temporary file "d:\temp\RSP21C.tmp" with contents
+[
+/nologo /base:"0x30000000" /subsystem:windows /dll /incremental:yes /pdb:"Debug/cgamex86.pdb" /map:"Debug/cgamex86.map" /debug /machine:I386 /def:".\cgame.def" /out:"../Debug/cgamex86.dll" /implib:"Debug/cgamex86.lib" 
+.\Debug\bg_misc.obj
+.\Debug\bg_pmove.obj
+.\Debug\bg_slidemove.obj
+.\Debug\cg_consolecmds.obj
+.\Debug\cg_draw.obj
+.\Debug\cg_drawtools.obj
+.\Debug\cg_effects.obj
+.\Debug\cg_ents.obj
+.\Debug\cg_event.obj
+.\Debug\cg_info.obj
+.\Debug\cg_localents.obj
+.\Debug\cg_main.obj
+.\Debug\cg_marks.obj
+.\Debug\cg_players.obj
+.\Debug\cg_playerstate.obj
+.\Debug\cg_predict.obj
+.\Debug\cg_scoreboard.obj
+.\Debug\cg_servercmds.obj
+.\Debug\cg_snapshot.obj
+.\Debug\cg_syscalls.obj
+.\Debug\cg_view.obj
+.\Debug\cg_weapons.obj
+.\Debug\q_math.obj
+.\Debug\q_shared.obj
+.\Debug\ui_shared.obj
+]
+Creating command line "link.exe @d:\temp\RSP21C.tmp"
+<h3>Output Window</h3>
+Compiling...
+bg_misc.c
+bg_pmove.c
+bg_slidemove.c
+cg_consolecmds.c
+cg_draw.c
+e:\work\1.27g\code\cgame\cg_draw.c(1815) : warning C4101: 'h' : unreferenced local variable
+cg_drawtools.c
+cg_effects.c
+cg_ents.c
+cg_event.c
+cg_info.c
+cg_localents.c
+cg_main.c
+cg_marks.c
+cg_players.c
+cg_playerstate.c
+cg_predict.c
+cg_scoreboard.c
+cg_servercmds.c
+cg_snapshot.c
+cg_syscalls.c
+cg_view.c
+cg_weapons.c
+q_math.c
+q_shared.c
+ui_shared.c
+Linking...
+   Creating library Debug/cgamex86.lib and object Debug/cgamex86.exp
+
+
+
+<h3>Results</h3>
+cgamex86.dll - 0 error(s), 1 warning(s)
+<h3>
+--------------------Configuration: cgame - Win32 Release TA--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "d:\temp\RSP221.tmp" with contents
+[
+/nologo /G6 /ML /W4 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "MISSIONPACK" /Fp"Release_TA/cgame.pch" /YX /Fo"Release_TA/" /Fd"Release_TA/" /FD /c 
+"E:\work\1.27g\code\game\bg_misc.c"
+"E:\work\1.27g\code\game\bg_pmove.c"
+"E:\work\1.27g\code\game\bg_slidemove.c"
+"E:\work\1.27g\code\cgame\cg_consolecmds.c"
+"E:\work\1.27g\code\cgame\cg_draw.c"
+"E:\work\1.27g\code\cgame\cg_drawtools.c"
+"E:\work\1.27g\code\cgame\cg_effects.c"
+"E:\work\1.27g\code\cgame\cg_ents.c"
+"E:\work\1.27g\code\cgame\cg_event.c"
+"E:\work\1.27g\code\cgame\cg_info.c"
+"E:\work\1.27g\code\cgame\cg_localents.c"
+"E:\work\1.27g\code\cgame\cg_main.c"
+"E:\work\1.27g\code\cgame\cg_marks.c"
+"E:\work\1.27g\code\cgame\cg_newDraw.c"
+"E:\work\1.27g\code\cgame\cg_players.c"
+"E:\work\1.27g\code\cgame\cg_playerstate.c"
+"E:\work\1.27g\code\cgame\cg_predict.c"
+"E:\work\1.27g\code\cgame\cg_scoreboard.c"
+"E:\work\1.27g\code\cgame\cg_servercmds.c"
+"E:\work\1.27g\code\cgame\cg_snapshot.c"
+"E:\work\1.27g\code\cgame\cg_syscalls.c"
+"E:\work\1.27g\code\cgame\cg_view.c"
+"E:\work\1.27g\code\cgame\cg_weapons.c"
+"E:\work\1.27g\code\game\q_math.c"
+"E:\work\1.27g\code\game\q_shared.c"
+"E:\work\1.27g\code\ui\ui_shared.c"
+]
+Creating command line "cl.exe @d:\temp\RSP221.tmp" 
+Creating temporary file "d:\temp\RSP222.tmp" with contents
+[
+/nologo /base:"0x30000000" /subsystem:windows /dll /incremental:no /pdb:"Release_TA/cgamex86.pdb" /map:"Release_TA/cgamex86.map" /machine:I386 /def:".\cgame.def" /out:"../Release_TA/cgamex86.dll" /implib:"Release_TA/cgamex86.lib" 
+.\Release_TA\bg_misc.obj
+.\Release_TA\bg_pmove.obj
+.\Release_TA\bg_slidemove.obj
+.\Release_TA\cg_consolecmds.obj
+.\Release_TA\cg_draw.obj
+.\Release_TA\cg_drawtools.obj
+.\Release_TA\cg_effects.obj
+.\Release_TA\cg_ents.obj
+.\Release_TA\cg_event.obj
+.\Release_TA\cg_info.obj
+.\Release_TA\cg_localents.obj
+.\Release_TA\cg_main.obj
+.\Release_TA\cg_marks.obj
+.\Release_TA\cg_newDraw.obj
+.\Release_TA\cg_players.obj
+.\Release_TA\cg_playerstate.obj
+.\Release_TA\cg_predict.obj
+.\Release_TA\cg_scoreboard.obj
+.\Release_TA\cg_servercmds.obj
+.\Release_TA\cg_snapshot.obj
+.\Release_TA\cg_syscalls.obj
+.\Release_TA\cg_view.obj
+.\Release_TA\cg_weapons.obj
+.\Release_TA\q_math.obj
+.\Release_TA\q_shared.obj
+.\Release_TA\ui_shared.obj
+]
+Creating command line "link.exe @d:\temp\RSP222.tmp"
+<h3>Output Window</h3>
+Compiling...
+bg_misc.c
+bg_pmove.c
+bg_slidemove.c
+cg_consolecmds.c
+cg_draw.c
+cg_drawtools.c
+cg_effects.c
+cg_ents.c
+cg_event.c
+cg_info.c
+cg_localents.c
+cg_main.c
+cg_marks.c
+cg_newDraw.c
+cg_players.c
+cg_playerstate.c
+cg_predict.c
+cg_scoreboard.c
+cg_servercmds.c
+cg_snapshot.c
+cg_syscalls.c
+cg_view.c
+cg_weapons.c
+q_math.c
+q_shared.c
+ui_shared.c
+Linking...
+   Creating library Release_TA/cgamex86.lib and object Release_TA/cgamex86.exp
+
+
+
+<h3>Results</h3>
+cgamex86.dll - 0 error(s), 0 warning(s)
+<h3>
+--------------------Configuration: cgame - Win32 Debug TA--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "d:\temp\RSP227.tmp" with contents
+[
+/nologo /G5 /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "MISSIONPACK" /FR"Debug_TA/" /Fp"Debug_TA/cgame.pch" /YX /Fo"Debug_TA/" /Fd"Debug_TA/" /FD /c 
+"E:\work\1.27g\code\game\bg_misc.c"
+"E:\work\1.27g\code\game\bg_pmove.c"
+"E:\work\1.27g\code\game\bg_slidemove.c"
+"E:\work\1.27g\code\cgame\cg_consolecmds.c"
+"E:\work\1.27g\code\cgame\cg_draw.c"
+"E:\work\1.27g\code\cgame\cg_drawtools.c"
+"E:\work\1.27g\code\cgame\cg_effects.c"
+"E:\work\1.27g\code\cgame\cg_ents.c"
+"E:\work\1.27g\code\cgame\cg_event.c"
+"E:\work\1.27g\code\cgame\cg_info.c"
+"E:\work\1.27g\code\cgame\cg_localents.c"
+"E:\work\1.27g\code\cgame\cg_main.c"
+"E:\work\1.27g\code\cgame\cg_marks.c"
+"E:\work\1.27g\code\cgame\cg_newDraw.c"
+"E:\work\1.27g\code\cgame\cg_players.c"
+"E:\work\1.27g\code\cgame\cg_playerstate.c"
+"E:\work\1.27g\code\cgame\cg_predict.c"
+"E:\work\1.27g\code\cgame\cg_scoreboard.c"
+"E:\work\1.27g\code\cgame\cg_servercmds.c"
+"E:\work\1.27g\code\cgame\cg_snapshot.c"
+"E:\work\1.27g\code\cgame\cg_syscalls.c"
+"E:\work\1.27g\code\cgame\cg_view.c"
+"E:\work\1.27g\code\cgame\cg_weapons.c"
+"E:\work\1.27g\code\game\q_math.c"
+"E:\work\1.27g\code\game\q_shared.c"
+"E:\work\1.27g\code\ui\ui_shared.c"
+]
+Creating command line "cl.exe @d:\temp\RSP227.tmp" 
+Creating temporary file "d:\temp\RSP228.tmp" with contents
+[
+/nologo /base:"0x30000000" /subsystem:windows /dll /incremental:yes /pdb:"Debug_TA/cgamex86.pdb" /map:"Debug_TA/cgamex86.map" /debug /machine:I386 /def:".\cgame.def" /out:"..\Debug_TA\cgamex86.dll" /implib:"Debug_TA/cgamex86.lib" 
+.\Debug_TA\bg_misc.obj
+.\Debug_TA\bg_pmove.obj
+.\Debug_TA\bg_slidemove.obj
+.\Debug_TA\cg_consolecmds.obj
+.\Debug_TA\cg_draw.obj
+.\Debug_TA\cg_drawtools.obj
+.\Debug_TA\cg_effects.obj
+.\Debug_TA\cg_ents.obj
+.\Debug_TA\cg_event.obj
+.\Debug_TA\cg_info.obj
+.\Debug_TA\cg_localents.obj
+.\Debug_TA\cg_main.obj
+.\Debug_TA\cg_marks.obj
+.\Debug_TA\cg_newDraw.obj
+.\Debug_TA\cg_players.obj
+.\Debug_TA\cg_playerstate.obj
+.\Debug_TA\cg_predict.obj
+.\Debug_TA\cg_scoreboard.obj
+.\Debug_TA\cg_servercmds.obj
+.\Debug_TA\cg_snapshot.obj
+.\Debug_TA\cg_syscalls.obj
+.\Debug_TA\cg_view.obj
+.\Debug_TA\cg_weapons.obj
+.\Debug_TA\q_math.obj
+.\Debug_TA\q_shared.obj
+.\Debug_TA\ui_shared.obj
+]
+Creating command line "link.exe @d:\temp\RSP228.tmp"
+<h3>Output Window</h3>
+Compiling...
+bg_misc.c
+bg_pmove.c
+bg_slidemove.c
+cg_consolecmds.c
+cg_draw.c
+cg_drawtools.c
+cg_effects.c
+cg_ents.c
+cg_event.c
+cg_info.c
+cg_localents.c
+cg_main.c
+cg_marks.c
+cg_newDraw.c
+cg_players.c
+cg_playerstate.c
+cg_predict.c
+cg_scoreboard.c
+cg_servercmds.c
+cg_snapshot.c
+cg_syscalls.c
+cg_view.c
+cg_weapons.c
+q_math.c
+q_shared.c
+ui_shared.c
+Linking...
+   Creating library Debug_TA/cgamex86.lib and object Debug_TA/cgamex86.exp
+
+
+
+<h3>Results</h3>
+cgamex86.dll - 0 error(s), 0 warning(s)
+<h3>
+--------------------Configuration: game - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "d:\temp\RSP22D.tmp" with contents
+[
+/nologo /G6 /ML /W4 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "GLOBALRANK" /Fp".\Release/game.pch" /YX /Fo".\Release/" /Fd".\Release/" /FD /c 
+"E:\work\1.27g\code\game\ai_chat.c"
+"E:\work\1.27g\code\game\ai_cmd.c"
+"E:\work\1.27g\code\game\ai_dmnet.c"
+"E:\work\1.27g\code\game\ai_dmq3.c"
+"E:\work\1.27g\code\game\ai_main.c"
+"E:\work\1.27g\code\game\ai_team.c"
+"E:\work\1.27g\code\game\ai_vcmd.c"
+"E:\work\1.27g\code\game\bg_misc.c"
+"E:\work\1.27g\code\game\bg_pmove.c"
+"E:\work\1.27g\code\game\bg_slidemove.c"
+"E:\work\1.27g\code\game\g_active.c"
+"E:\work\1.27g\code\game\g_arenas.c"
+"E:\work\1.27g\code\game\g_bot.c"
+"E:\work\1.27g\code\game\g_client.c"
+"E:\work\1.27g\code\game\g_cmds.c"
+"E:\work\1.27g\code\game\g_combat.c"
+"E:\work\1.27g\code\game\g_items.c"
+"E:\work\1.27g\code\game\g_main.c"
+"E:\work\1.27g\code\game\g_mem.c"
+"E:\work\1.27g\code\game\g_misc.c"
+"E:\work\1.27g\code\game\g_missile.c"
+"E:\work\1.27g\code\game\g_mover.c"
+"E:\work\1.27g\code\game\g_session.c"
+"E:\work\1.27g\code\game\g_spawn.c"
+"E:\work\1.27g\code\game\g_svcmds.c"
+"E:\work\1.27g\code\game\g_syscalls.c"
+"E:\work\1.27g\code\game\g_target.c"
+"E:\work\1.27g\code\game\g_team.c"
+"E:\work\1.27g\code\game\g_trigger.c"
+"E:\work\1.27g\code\game\g_utils.c"
+"E:\work\1.27g\code\game\g_weapon.c"
+"E:\work\1.27g\code\game\q_math.c"
+"E:\work\1.27g\code\game\q_shared.c"
+]
+Creating command line "cl.exe @d:\temp\RSP22D.tmp" 
+Creating temporary file "d:\temp\RSP22E.tmp" with contents
+[
+kernel32.lib user32.lib winmm.lib /nologo /base:"0x20000000" /subsystem:windows /dll /incremental:no /pdb:".\Release/qagamex86.pdb" /map:".\Release/qagamex86.map" /machine:I386 /def:".\game.def" /out:"../Release/qagamex86.dll" /implib:".\Release/qagamex86.lib" 
+.\Release\ai_chat.obj
+.\Release\ai_cmd.obj
+.\Release\ai_dmnet.obj
+.\Release\ai_dmq3.obj
+.\Release\ai_main.obj
+.\Release\ai_team.obj
+.\Release\ai_vcmd.obj
+.\Release\bg_misc.obj
+.\Release\bg_pmove.obj
+.\Release\bg_slidemove.obj
+.\Release\g_active.obj
+.\Release\g_arenas.obj
+.\Release\g_bot.obj
+.\Release\g_client.obj
+.\Release\g_cmds.obj
+.\Release\g_combat.obj
+.\Release\g_items.obj
+.\Release\g_main.obj
+.\Release\g_mem.obj
+.\Release\g_misc.obj
+.\Release\g_missile.obj
+.\Release\g_mover.obj
+.\Release\g_session.obj
+.\Release\g_spawn.obj
+.\Release\g_svcmds.obj
+.\Release\g_syscalls.obj
+.\Release\g_target.obj
+.\Release\g_team.obj
+.\Release\g_trigger.obj
+.\Release\g_utils.obj
+.\Release\g_weapon.obj
+.\Release\q_math.obj
+.\Release\q_shared.obj
+]
+Creating command line "link.exe @d:\temp\RSP22E.tmp"
+<h3>Output Window</h3>
+Compiling...
+ai_chat.c
+ai_cmd.c
+ai_dmnet.c
+ai_dmq3.c
+ai_main.c
+ai_team.c
+ai_vcmd.c
+E:\work\1.27g\code\game\ai_team.c(145) : warning C4701: local variable 'goal' may be used without having been initialized
+bg_misc.c
+bg_pmove.c
+bg_slidemove.c
+g_active.c
+E:\work\1.27g\code\game\g_active.c(1132) : warning C4505: 'StuckInOtherClient' : unreferenced local function has been removed
+        E:\work\1.27g\code\game\g_active.c(650) : see declaration of 'StuckInOtherClient'
+g_arenas.c
+E:\work\1.27g\code\game\g_arenas.c(25) : warning C4101: 'score1' : unreferenced local variable
+E:\work\1.27g\code\game\g_arenas.c(25) : warning C4101: 'score2' : unreferenced local variable
+E:\work\1.27g\code\game\g_arenas.c(26) : warning C4101: 'won' : unreferenced local variable
+g_bot.c
+g_client.c
+g_cmds.c
+g_combat.c
+g_items.c
+g_main.c
+E:\work\1.27g\code\game\g_main.c(1094) : warning C4189: 'won' : local variable is initialized but not referenced
+g_mem.c
+g_misc.c
+g_missile.c
+g_mover.c
+g_session.c
+g_spawn.c
+g_svcmds.c
+g_syscalls.c
+g_target.c
+g_team.c
+g_trigger.c
+g_utils.c
+g_weapon.c
+q_math.c
+q_shared.c
+Linking...
+   Creating library .\Release/qagamex86.lib and object .\Release/qagamex86.exp
+
+
+
+<h3>Results</h3>
+qagamex86.dll - 0 error(s), 6 warning(s)
+<h3>
+--------------------Configuration: game - Win32 Debug--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "d:\temp\RSP233.tmp" with contents
+[
+/nologo /G5 /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "BUILDING_REF_GL" /D "DEBUG" /D "GLOBALRANK" /FR".\Debug/" /Fp".\Debug/game.pch" /YX /Fo".\Debug/" /Fd".\Debug/" /FD /c 
+"E:\work\1.27g\code\game\ai_chat.c"
+"E:\work\1.27g\code\game\ai_cmd.c"
+"E:\work\1.27g\code\game\ai_dmnet.c"
+"E:\work\1.27g\code\game\ai_dmq3.c"
+"E:\work\1.27g\code\game\ai_main.c"
+"E:\work\1.27g\code\game\ai_team.c"
+"E:\work\1.27g\code\game\ai_vcmd.c"
+"E:\work\1.27g\code\game\bg_misc.c"
+"E:\work\1.27g\code\game\bg_pmove.c"
+"E:\work\1.27g\code\game\bg_slidemove.c"
+"E:\work\1.27g\code\game\g_active.c"
+"E:\work\1.27g\code\game\g_arenas.c"
+"E:\work\1.27g\code\game\g_bot.c"
+"E:\work\1.27g\code\game\g_client.c"
+"E:\work\1.27g\code\game\g_cmds.c"
+"E:\work\1.27g\code\game\g_combat.c"
+"E:\work\1.27g\code\game\g_items.c"
+"E:\work\1.27g\code\game\g_main.c"
+"E:\work\1.27g\code\game\g_mem.c"
+"E:\work\1.27g\code\game\g_misc.c"
+"E:\work\1.27g\code\game\g_missile.c"
+"E:\work\1.27g\code\game\g_mover.c"
+"E:\work\1.27g\code\game\g_session.c"
+"E:\work\1.27g\code\game\g_spawn.c"
+"E:\work\1.27g\code\game\g_svcmds.c"
+"E:\work\1.27g\code\game\g_syscalls.c"
+"E:\work\1.27g\code\game\g_target.c"
+"E:\work\1.27g\code\game\g_team.c"
+"E:\work\1.27g\code\game\g_trigger.c"
+"E:\work\1.27g\code\game\g_utils.c"
+"E:\work\1.27g\code\game\g_weapon.c"
+"E:\work\1.27g\code\game\q_math.c"
+"E:\work\1.27g\code\game\q_shared.c"
+]
+Creating command line "cl.exe @d:\temp\RSP233.tmp" 
+Creating temporary file "d:\temp\RSP234.tmp" with contents
+[
+kernel32.lib user32.lib winmm.lib /nologo /base:"0x20000000" /subsystem:windows /dll /incremental:yes /pdb:".\Debug/qagamex86.pdb" /map:".\Debug/qagamex86.map" /debug /machine:I386 /def:".\game.def" /out:"../Debug/qagamex86.dll" /implib:".\Debug/qagamex86.lib" 
+.\Debug\ai_chat.obj
+.\Debug\ai_cmd.obj
+.\Debug\ai_dmnet.obj
+.\Debug\ai_dmq3.obj
+.\Debug\ai_main.obj
+.\Debug\ai_team.obj
+.\Debug\ai_vcmd.obj
+.\Debug\bg_misc.obj
+.\Debug\bg_pmove.obj
+.\Debug\bg_slidemove.obj
+.\Debug\g_active.obj
+.\Debug\g_arenas.obj
+.\Debug\g_bot.obj
+.\Debug\g_client.obj
+.\Debug\g_cmds.obj
+.\Debug\g_combat.obj
+.\Debug\g_items.obj
+.\Debug\g_main.obj
+.\Debug\g_mem.obj
+.\Debug\g_misc.obj
+.\Debug\g_missile.obj
+.\Debug\g_mover.obj
+.\Debug\g_session.obj
+.\Debug\g_spawn.obj
+.\Debug\g_svcmds.obj
+.\Debug\g_syscalls.obj
+.\Debug\g_target.obj
+.\Debug\g_team.obj
+.\Debug\g_trigger.obj
+.\Debug\g_utils.obj
+.\Debug\g_weapon.obj
+.\Debug\q_math.obj
+.\Debug\q_shared.obj
+]
+Creating command line "link.exe @d:\temp\RSP234.tmp"
+<h3>Output Window</h3>
+Compiling...
+ai_chat.c
+ai_cmd.c
+ai_dmnet.c
+ai_dmq3.c
+ai_main.c
+ai_team.c
+ai_vcmd.c
+bg_misc.c
+bg_pmove.c
+bg_slidemove.c
+g_active.c
+g_arenas.c
+E:\work\1.27g\code\game\g_arenas.c(25) : warning C4101: 'score1' : unreferenced local variable
+E:\work\1.27g\code\game\g_arenas.c(25) : warning C4101: 'score2' : unreferenced local variable
+E:\work\1.27g\code\game\g_arenas.c(26) : warning C4101: 'won' : unreferenced local variable
+g_bot.c
+g_client.c
+g_cmds.c
+g_combat.c
+g_items.c
+g_main.c
+g_mem.c
+g_misc.c
+g_missile.c
+g_mover.c
+g_session.c
+g_spawn.c
+g_svcmds.c
+g_syscalls.c
+g_target.c
+g_team.c
+g_trigger.c
+g_utils.c
+g_weapon.c
+q_math.c
+q_shared.c
+Linking...
+   Creating library .\Debug/qagamex86.lib and object .\Debug/qagamex86.exp
+
+
+
+<h3>Results</h3>
+qagamex86.dll - 0 error(s), 3 warning(s)
+<h3>
+--------------------Configuration: game - Win32 Release TA--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "d:\temp\RSP239.tmp" with contents
+[
+/nologo /G6 /ML /W4 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "MISSIONPACK" /Fp"Release_TA/game.pch" /YX /Fo"Release_TA/" /Fd"Release_TA/" /FD /c 
+"E:\work\1.27g\code\game\ai_chat.c"
+"E:\work\1.27g\code\game\ai_cmd.c"
+"E:\work\1.27g\code\game\ai_dmnet.c"
+"E:\work\1.27g\code\game\ai_dmq3.c"
+"E:\work\1.27g\code\game\ai_main.c"
+"E:\work\1.27g\code\game\ai_team.c"
+"E:\work\1.27g\code\game\ai_vcmd.c"
+"E:\work\1.27g\code\game\bg_misc.c"
+"E:\work\1.27g\code\game\bg_pmove.c"
+"E:\work\1.27g\code\game\bg_slidemove.c"
+"E:\work\1.27g\code\game\g_active.c"
+"E:\work\1.27g\code\game\g_arenas.c"
+"E:\work\1.27g\code\game\g_bot.c"
+"E:\work\1.27g\code\game\g_client.c"
+"E:\work\1.27g\code\game\g_cmds.c"
+"E:\work\1.27g\code\game\g_combat.c"
+"E:\work\1.27g\code\game\g_items.c"
+"E:\work\1.27g\code\game\g_main.c"
+"E:\work\1.27g\code\game\g_mem.c"
+"E:\work\1.27g\code\game\g_misc.c"
+"E:\work\1.27g\code\game\g_missile.c"
+"E:\work\1.27g\code\game\g_mover.c"
+"E:\work\1.27g\code\game\g_session.c"
+"E:\work\1.27g\code\game\g_spawn.c"
+"E:\work\1.27g\code\game\g_svcmds.c"
+"E:\work\1.27g\code\game\g_syscalls.c"
+"E:\work\1.27g\code\game\g_target.c"
+"E:\work\1.27g\code\game\g_team.c"
+"E:\work\1.27g\code\game\g_trigger.c"
+"E:\work\1.27g\code\game\g_utils.c"
+"E:\work\1.27g\code\game\g_weapon.c"
+"E:\work\1.27g\code\game\q_math.c"
+"E:\work\1.27g\code\game\q_shared.c"
+]
+Creating command line "cl.exe @d:\temp\RSP239.tmp" 
+Creating temporary file "d:\temp\RSP23A.tmp" with contents
+[
+kernel32.lib user32.lib winmm.lib /nologo /base:"0x20000000" /subsystem:windows /dll /incremental:no /pdb:"Release_TA/qagamex86.pdb" /map:"Release_TA/qagamex86.map" /machine:I386 /def:".\game.def" /out:"../Release_TA/qagamex86.dll" /implib:"Release_TA/qagamex86.lib" 
+.\Release_TA\ai_chat.obj
+.\Release_TA\ai_cmd.obj
+.\Release_TA\ai_dmnet.obj
+.\Release_TA\ai_dmq3.obj
+.\Release_TA\ai_main.obj
+.\Release_TA\ai_team.obj
+.\Release_TA\ai_vcmd.obj
+.\Release_TA\bg_misc.obj
+.\Release_TA\bg_pmove.obj
+.\Release_TA\bg_slidemove.obj
+.\Release_TA\g_active.obj
+.\Release_TA\g_arenas.obj
+.\Release_TA\g_bot.obj
+.\Release_TA\g_client.obj
+.\Release_TA\g_cmds.obj
+.\Release_TA\g_combat.obj
+.\Release_TA\g_items.obj
+.\Release_TA\g_main.obj
+.\Release_TA\g_mem.obj
+.\Release_TA\g_misc.obj
+.\Release_TA\g_missile.obj
+.\Release_TA\g_mover.obj
+.\Release_TA\g_session.obj
+.\Release_TA\g_spawn.obj
+.\Release_TA\g_svcmds.obj
+.\Release_TA\g_syscalls.obj
+.\Release_TA\g_target.obj
+.\Release_TA\g_team.obj
+.\Release_TA\g_trigger.obj
+.\Release_TA\g_utils.obj
+.\Release_TA\g_weapon.obj
+.\Release_TA\q_math.obj
+.\Release_TA\q_shared.obj
+]
+Creating command line "link.exe @d:\temp\RSP23A.tmp"
+<h3>Output Window</h3>
+Compiling...
+ai_chat.c
+ai_cmd.c
+ai_dmnet.c
+ai_dmq3.c
+ai_main.c
+ai_team.c
+ai_vcmd.c
+bg_misc.c
+bg_pmove.c
+bg_slidemove.c
+g_active.c
+g_arenas.c
+g_bot.c
+g_client.c
+g_cmds.c
+g_combat.c
+g_items.c
+g_main.c
+g_mem.c
+g_misc.c
+g_missile.c
+g_mover.c
+g_session.c
+g_spawn.c
+g_svcmds.c
+g_syscalls.c
+g_target.c
+g_team.c
+g_trigger.c
+g_utils.c
+g_weapon.c
+q_math.c
+q_shared.c
+Linking...
+   Creating library Release_TA/qagamex86.lib and object Release_TA/qagamex86.exp
+
+
+
+<h3>Results</h3>
+qagamex86.dll - 0 error(s), 0 warning(s)
+<h3>
+--------------------Configuration: game - Win32 Debug TA--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "d:\temp\RSP23F.tmp" with contents
+[
+/nologo /G5 /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "BUILDING_REF_GL" /D "DEBUG" /D "MISSIONPACK" /D "QAGAME" /FR"Debug_TA/" /Fp"Debug_TA/game.pch" /YX /Fo"Debug_TA/" /Fd"Debug_TA/" /FD /c 
+"E:\work\1.27g\code\game\ai_chat.c"
+"E:\work\1.27g\code\game\ai_cmd.c"
+"E:\work\1.27g\code\game\ai_dmnet.c"
+"E:\work\1.27g\code\game\ai_dmq3.c"
+"E:\work\1.27g\code\game\ai_main.c"
+"E:\work\1.27g\code\game\ai_team.c"
+"E:\work\1.27g\code\game\ai_vcmd.c"
+"E:\work\1.27g\code\game\bg_misc.c"
+"E:\work\1.27g\code\game\bg_pmove.c"
+"E:\work\1.27g\code\game\bg_slidemove.c"
+"E:\work\1.27g\code\game\g_active.c"
+"E:\work\1.27g\code\game\g_arenas.c"
+"E:\work\1.27g\code\game\g_bot.c"
+"E:\work\1.27g\code\game\g_client.c"
+"E:\work\1.27g\code\game\g_cmds.c"
+"E:\work\1.27g\code\game\g_combat.c"
+"E:\work\1.27g\code\game\g_items.c"
+"E:\work\1.27g\code\game\g_main.c"
+"E:\work\1.27g\code\game\g_mem.c"
+"E:\work\1.27g\code\game\g_misc.c"
+"E:\work\1.27g\code\game\g_missile.c"
+"E:\work\1.27g\code\game\g_mover.c"
+"E:\work\1.27g\code\game\g_session.c"
+"E:\work\1.27g\code\game\g_spawn.c"
+"E:\work\1.27g\code\game\g_svcmds.c"
+"E:\work\1.27g\code\game\g_syscalls.c"
+"E:\work\1.27g\code\game\g_target.c"
+"E:\work\1.27g\code\game\g_team.c"
+"E:\work\1.27g\code\game\g_trigger.c"
+"E:\work\1.27g\code\game\g_utils.c"
+"E:\work\1.27g\code\game\g_weapon.c"
+"E:\work\1.27g\code\game\q_math.c"
+"E:\work\1.27g\code\game\q_shared.c"
+]
+Creating command line "cl.exe @d:\temp\RSP23F.tmp" 
+Creating temporary file "d:\temp\RSP240.tmp" with contents
+[
+kernel32.lib user32.lib winmm.lib /nologo /base:"0x20000000" /subsystem:windows /dll /incremental:yes /pdb:"Debug_TA/qagamex86.pdb" /map:"Debug_TA/qagamex86.map" /debug /machine:I386 /def:".\game.def" /out:"..\Debug_TA\qagamex86.dll" /implib:"Debug_TA/qagamex86.lib" 
+.\Debug_TA\ai_chat.obj
+.\Debug_TA\ai_cmd.obj
+.\Debug_TA\ai_dmnet.obj
+.\Debug_TA\ai_dmq3.obj
+.\Debug_TA\ai_main.obj
+.\Debug_TA\ai_team.obj
+.\Debug_TA\ai_vcmd.obj
+.\Debug_TA\bg_misc.obj
+.\Debug_TA\bg_pmove.obj
+.\Debug_TA\bg_slidemove.obj
+.\Debug_TA\g_active.obj
+.\Debug_TA\g_arenas.obj
+.\Debug_TA\g_bot.obj
+.\Debug_TA\g_client.obj
+.\Debug_TA\g_cmds.obj
+.\Debug_TA\g_combat.obj
+.\Debug_TA\g_items.obj
+.\Debug_TA\g_main.obj
+.\Debug_TA\g_mem.obj
+.\Debug_TA\g_misc.obj
+.\Debug_TA\g_missile.obj
+.\Debug_TA\g_mover.obj
+.\Debug_TA\g_session.obj
+.\Debug_TA\g_spawn.obj
+.\Debug_TA\g_svcmds.obj
+.\Debug_TA\g_syscalls.obj
+.\Debug_TA\g_target.obj
+.\Debug_TA\g_team.obj
+.\Debug_TA\g_trigger.obj
+.\Debug_TA\g_utils.obj
+.\Debug_TA\g_weapon.obj
+.\Debug_TA\q_math.obj
+.\Debug_TA\q_shared.obj
+]
+Creating command line "link.exe @d:\temp\RSP240.tmp"
+<h3>Output Window</h3>
+Compiling...
+ai_chat.c
+ai_cmd.c
+ai_dmnet.c
+ai_dmq3.c
+ai_main.c
+ai_team.c
+ai_vcmd.c
+bg_misc.c
+bg_pmove.c
+bg_slidemove.c
+g_active.c
+g_arenas.c
+g_bot.c
+g_client.c
+g_cmds.c
+g_combat.c
+g_items.c
+g_main.c
+g_mem.c
+g_misc.c
+g_missile.c
+g_mover.c
+g_session.c
+g_spawn.c
+g_svcmds.c
+g_syscalls.c
+g_target.c
+g_team.c
+g_trigger.c
+g_utils.c
+g_weapon.c
+q_math.c
+q_shared.c
+Linking...
+   Creating library Debug_TA/qagamex86.lib and object Debug_TA/qagamex86.exp
+
+
+
+<h3>Results</h3>
+qagamex86.dll - 0 error(s), 0 warning(s)
+<h3>
+--------------------Configuration: q3_ui - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "d:\temp\RSP245.tmp" with contents
+[
+/nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "Q3_UI_EXPORTS" /Fp"Release/q3_ui.pch" /YX /Fo"Release/" /Fd"Release/" /FD /c 
+"E:\work\1.27g\code\game\bg_misc.c"
+"E:\work\1.27g\code\game\q_math.c"
+"E:\work\1.27g\code\game\q_shared.c"
+"E:\work\1.27g\code\q3_ui\ui_addbots.c"
+"E:\work\1.27g\code\q3_ui\ui_atoms.c"
+"E:\work\1.27g\code\q3_ui\ui_cdkey.c"
+"E:\work\1.27g\code\q3_ui\ui_cinematics.c"
+"E:\work\1.27g\code\q3_ui\ui_confirm.c"
+"E:\work\1.27g\code\q3_ui\ui_connect.c"
+"E:\work\1.27g\code\q3_ui\ui_controls2.c"
+"E:\work\1.27g\code\q3_ui\ui_credits.c"
+"E:\work\1.27g\code\q3_ui\ui_demo2.c"
+"E:\work\1.27g\code\q3_ui\ui_display.c"
+"E:\work\1.27g\code\q3_ui\ui_gameinfo.c"
+"E:\work\1.27g\code\q3_ui\ui_ingame.c"
+"E:\work\1.27g\code\q3_ui\ui_main.c"
+"E:\work\1.27g\code\q3_ui\ui_menu.c"
+"E:\work\1.27g\code\q3_ui\ui_mfield.c"
+"E:\work\1.27g\code\q3_ui\ui_mods.c"
+"E:\work\1.27g\code\q3_ui\ui_network.c"
+"E:\work\1.27g\code\q3_ui\ui_options.c"
+"E:\work\1.27g\code\q3_ui\ui_playermodel.c"
+"E:\work\1.27g\code\q3_ui\ui_players.c"
+"E:\work\1.27g\code\q3_ui\ui_playersettings.c"
+"E:\work\1.27g\code\q3_ui\ui_preferences.c"
+"E:\work\1.27g\code\q3_ui\ui_qmenu.c"
+"E:\work\1.27g\code\q3_ui\ui_removebots.c"
+"E:\work\1.27g\code\q3_ui\ui_serverinfo.c"
+"E:\work\1.27g\code\q3_ui\ui_servers2.c"
+"E:\work\1.27g\code\q3_ui\ui_setup.c"
+"E:\work\1.27g\code\q3_ui\ui_sound.c"
+"E:\work\1.27g\code\q3_ui\ui_sparena.c"
+"E:\work\1.27g\code\q3_ui\ui_specifyserver.c"
+"E:\work\1.27g\code\q3_ui\ui_splevel.c"
+"E:\work\1.27g\code\q3_ui\ui_sppostgame.c"
+"E:\work\1.27g\code\q3_ui\ui_spreset.c"
+"E:\work\1.27g\code\q3_ui\ui_spskill.c"
+"E:\work\1.27g\code\q3_ui\ui_startserver.c"
+"E:\work\1.27g\code\q3_ui\ui_syscalls.c"
+"E:\work\1.27g\code\q3_ui\ui_team.c"
+"E:\work\1.27g\code\q3_ui\ui_teamorders.c"
+"E:\work\1.27g\code\q3_ui\ui_video.c"
+]
+Creating command line "cl.exe @d:\temp\RSP245.tmp" 
+Creating temporary file "d:\temp\RSP246.tmp" with contents
+[
+kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /incremental:no /pdb:"Release/uix86.pdb" /machine:I386 /def:".\ui.def" /out:"../Release/uix86.dll" /implib:"Release/uix86.lib" 
+.\Release\bg_misc.obj
+.\Release\q_math.obj
+.\Release\q_shared.obj
+.\Release\ui_addbots.obj
+.\Release\ui_atoms.obj
+.\Release\ui_cdkey.obj
+.\Release\ui_cinematics.obj
+.\Release\ui_confirm.obj
+.\Release\ui_connect.obj
+.\Release\ui_controls2.obj
+.\Release\ui_credits.obj
+.\Release\ui_demo2.obj
+.\Release\ui_display.obj
+.\Release\ui_gameinfo.obj
+.\Release\ui_ingame.obj
+.\Release\ui_main.obj
+.\Release\ui_menu.obj
+.\Release\ui_mfield.obj
+.\Release\ui_mods.obj
+.\Release\ui_network.obj
+.\Release\ui_options.obj
+.\Release\ui_playermodel.obj
+.\Release\ui_players.obj
+.\Release\ui_playersettings.obj
+.\Release\ui_preferences.obj
+.\Release\ui_qmenu.obj
+.\Release\ui_removebots.obj
+.\Release\ui_serverinfo.obj
+.\Release\ui_servers2.obj
+.\Release\ui_setup.obj
+.\Release\ui_sound.obj
+.\Release\ui_sparena.obj
+.\Release\ui_specifyserver.obj
+.\Release\ui_splevel.obj
+.\Release\ui_sppostgame.obj
+.\Release\ui_spreset.obj
+.\Release\ui_spskill.obj
+.\Release\ui_startserver.obj
+.\Release\ui_syscalls.obj
+.\Release\ui_team.obj
+.\Release\ui_teamorders.obj
+.\Release\ui_video.obj
+]
+Creating command line "link.exe @d:\temp\RSP246.tmp"
+<h3>Output Window</h3>
+Compiling...
+bg_misc.c
+q_math.c
+q_shared.c
+ui_addbots.c
+ui_atoms.c
+ui_cdkey.c
+E:\work\1.27g\code\q3_ui\ui_cdkey.c(233) : warning C4013: 'trap_VerifyCDKey' undefined; assuming extern returning int
+ui_cinematics.c
+ui_confirm.c
+ui_connect.c
+ui_controls2.c
+E:\work\1.27g\code\q3_ui\ui_controls2.c(206) : warning C4305: 'initializing' : truncation from 'const double ' to 'float '
+E:\work\1.27g\code\q3_ui\ui_controls2.c(792) : warning C4305: 'function' : truncation from 'const double ' to 'float '
+E:\work\1.27g\code\q3_ui\ui_controls2.c(1529) : warning C4305: '=' : truncation from 'const double ' to 'float '
+ui_credits.c
+ui_demo2.c
+ui_display.c
+ui_gameinfo.c
+ui_ingame.c
+ui_main.c
+ui_menu.c
+E:\work\1.27g\code\q3_ui\ui_menu.c(240) : warning C4013: 'trap_VerifyCDKey' undefined; assuming extern returning int
+ui_mfield.c
+ui_mods.c
+ui_network.c
+ui_options.c
+ui_playermodel.c
+ui_players.c
+E:\work\1.27g\code\q3_ui\ui_players.c(84) : warning C4305: '=' : truncation from 'const double ' to 'float '
+E:\work\1.27g\code\q3_ui\ui_players.c(84) : warning C4305: '=' : truncation from 'const double ' to 'float '
+E:\work\1.27g\code\q3_ui\ui_players.c(96) : warning C4305: '=' : truncation from 'const double ' to 'float '
+E:\work\1.27g\code\q3_ui\ui_players.c(104) : warning C4305: '=' : truncation from 'const double ' to 'float '
+E:\work\1.27g\code\q3_ui\ui_players.c(104) : warning C4305: '=' : truncation from 'const double ' to 'float '
+E:\work\1.27g\code\q3_ui\ui_players.c(112) : warning C4305: '=' : truncation from 'const double ' to 'float '
+E:\work\1.27g\code\q3_ui\ui_players.c(112) : warning C4305: '=' : truncation from 'const double ' to 'float '
+E:\work\1.27g\code\q3_ui\ui_players.c(116) : warning C4305: '=' : truncation from 'const double ' to 'float '
+E:\work\1.27g\code\q3_ui\ui_players.c(120) : warning C4305: '=' : truncation from 'const double ' to 'float '
+E:\work\1.27g\code\q3_ui\ui_players.c(120) : warning C4305: '=' : truncation from 'const double ' to 'float '
+E:\work\1.27g\code\q3_ui\ui_players.c(583) : warning C4305: 'function' : truncation from 'const double ' to 'float '
+E:\work\1.27g\code\q3_ui\ui_players.c(584) : warning C4305: 'function' : truncation from 'const double ' to 'float '
+E:\work\1.27g\code\q3_ui\ui_players.c(597) : warning C4305: 'function' : truncation from 'const double ' to 'float '
+ui_playersettings.c
+ui_preferences.c
+ui_qmenu.c
+E:\work\1.27g\code\q3_ui\ui_qmenu.c(27) : warning C4305: 'initializing' : truncation from 'const double ' to 'float '
+E:\work\1.27g\code\q3_ui\ui_qmenu.c(28) : warning C4305: 'initializing' : truncation from 'const double ' to 'float '
+E:\work\1.27g\code\q3_ui\ui_qmenu.c(35) : warning C4305: 'initializing' : truncation from 'const double ' to 'float '
+E:\work\1.27g\code\q3_ui\ui_qmenu.c(37) : warning C4305: 'initializing' : truncation from 'const double ' to 'float '
+E:\work\1.27g\code\q3_ui\ui_qmenu.c(37) : warning C4305: 'initializing' : truncation from 'const double ' to 'float '
+ui_removebots.c
+ui_serverinfo.c
+ui_servers2.c
+ui_setup.c
+ui_sound.c
+ui_sparena.c
+ui_specifyserver.c
+ui_splevel.c
+ui_sppostgame.c
+ui_spreset.c
+ui_spskill.c
+ui_startserver.c
+ui_syscalls.c
+ui_team.c
+ui_teamorders.c
+ui_video.c
+Linking...
+   Creating library Release/uix86.lib and object Release/uix86.exp
+
+
+
+<h3>Results</h3>
+uix86.dll - 0 error(s), 23 warning(s)
+<h3>
+--------------------Configuration: q3_ui - Win32 Debug--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "d:\temp\RSP24B.tmp" with contents
+[
+/nologo /G5 /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "UI_EXPORTS" /FR"Debug/" /Fp"Debug/q3_ui.pch" /YX /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
+"E:\work\1.27g\code\game\bg_misc.c"
+"E:\work\1.27g\code\game\q_math.c"
+"E:\work\1.27g\code\game\q_shared.c"
+"E:\work\1.27g\code\q3_ui\ui_addbots.c"
+"E:\work\1.27g\code\q3_ui\ui_atoms.c"
+"E:\work\1.27g\code\q3_ui\ui_cdkey.c"
+"E:\work\1.27g\code\q3_ui\ui_cinematics.c"
+"E:\work\1.27g\code\q3_ui\ui_confirm.c"
+"E:\work\1.27g\code\q3_ui\ui_connect.c"
+"E:\work\1.27g\code\q3_ui\ui_controls2.c"
+"E:\work\1.27g\code\q3_ui\ui_credits.c"
+"E:\work\1.27g\code\q3_ui\ui_demo2.c"
+"E:\work\1.27g\code\q3_ui\ui_display.c"
+"E:\work\1.27g\code\q3_ui\ui_gameinfo.c"
+"E:\work\1.27g\code\q3_ui\ui_ingame.c"
+"E:\work\1.27g\code\q3_ui\ui_main.c"
+"E:\work\1.27g\code\q3_ui\ui_menu.c"
+"E:\work\1.27g\code\q3_ui\ui_mfield.c"
+"E:\work\1.27g\code\q3_ui\ui_mods.c"
+"E:\work\1.27g\code\q3_ui\ui_network.c"
+"E:\work\1.27g\code\q3_ui\ui_options.c"
+"E:\work\1.27g\code\q3_ui\ui_playermodel.c"
+"E:\work\1.27g\code\q3_ui\ui_players.c"
+"E:\work\1.27g\code\q3_ui\ui_playersettings.c"
+"E:\work\1.27g\code\q3_ui\ui_preferences.c"
+"E:\work\1.27g\code\q3_ui\ui_qmenu.c"
+"E:\work\1.27g\code\q3_ui\ui_removebots.c"
+"E:\work\1.27g\code\q3_ui\ui_serverinfo.c"
+"E:\work\1.27g\code\q3_ui\ui_servers2.c"
+"E:\work\1.27g\code\q3_ui\ui_setup.c"
+"E:\work\1.27g\code\q3_ui\ui_sound.c"
+"E:\work\1.27g\code\q3_ui\ui_sparena.c"
+"E:\work\1.27g\code\q3_ui\ui_specifyserver.c"
+"E:\work\1.27g\code\q3_ui\ui_splevel.c"
+"E:\work\1.27g\code\q3_ui\ui_sppostgame.c"
+"E:\work\1.27g\code\q3_ui\ui_spreset.c"
+"E:\work\1.27g\code\q3_ui\ui_spskill.c"
+"E:\work\1.27g\code\q3_ui\ui_startserver.c"
+"E:\work\1.27g\code\q3_ui\ui_syscalls.c"
+"E:\work\1.27g\code\q3_ui\ui_team.c"
+"E:\work\1.27g\code\q3_ui\ui_teamorders.c"
+"E:\work\1.27g\code\q3_ui\ui_video.c"
+]
+Creating command line "cl.exe @d:\temp\RSP24B.tmp" 
+Creating temporary file "d:\temp\RSP24C.tmp" with contents
+[
+/nologo /base:"0x40000000" /dll /incremental:yes /pdb:"../Debug/ui.pdb" /map:"Debug/uix86.map" /debug /machine:I386 /def:".\ui.def" /out:"../Debug/uix86.dll" /implib:"Debug/uix86.lib" /pdbtype:sept 
+.\Debug\bg_misc.obj
+.\Debug\q_math.obj
+.\Debug\q_shared.obj
+.\Debug\ui_addbots.obj
+.\Debug\ui_atoms.obj
+.\Debug\ui_cdkey.obj
+.\Debug\ui_cinematics.obj
+.\Debug\ui_confirm.obj
+.\Debug\ui_connect.obj
+.\Debug\ui_controls2.obj
+.\Debug\ui_credits.obj
+.\Debug\ui_demo2.obj
+.\Debug\ui_display.obj
+.\Debug\ui_gameinfo.obj
+.\Debug\ui_ingame.obj
+.\Debug\ui_main.obj
+.\Debug\ui_menu.obj
+.\Debug\ui_mfield.obj
+.\Debug\ui_mods.obj
+.\Debug\ui_network.obj
+.\Debug\ui_options.obj
+.\Debug\ui_playermodel.obj
+.\Debug\ui_players.obj
+.\Debug\ui_playersettings.obj
+.\Debug\ui_preferences.obj
+.\Debug\ui_qmenu.obj
+.\Debug\ui_removebots.obj
+.\Debug\ui_serverinfo.obj
+.\Debug\ui_servers2.obj
+.\Debug\ui_setup.obj
+.\Debug\ui_sound.obj
+.\Debug\ui_sparena.obj
+.\Debug\ui_specifyserver.obj
+.\Debug\ui_splevel.obj
+.\Debug\ui_sppostgame.obj
+.\Debug\ui_spreset.obj
+.\Debug\ui_spskill.obj
+.\Debug\ui_startserver.obj
+.\Debug\ui_syscalls.obj
+.\Debug\ui_team.obj
+.\Debug\ui_teamorders.obj
+.\Debug\ui_video.obj
+]
+Creating command line "link.exe @d:\temp\RSP24C.tmp"
+<h3>Output Window</h3>
+Compiling...
+bg_misc.c
+q_math.c
+q_shared.c
+ui_addbots.c
+ui_atoms.c
+ui_cdkey.c
+E:\work\1.27g\code\q3_ui\ui_cdkey.c(233) : warning C4013: 'trap_VerifyCDKey' undefined; assuming extern returning int
+ui_cinematics.c
+ui_confirm.c
+ui_connect.c
+ui_controls2.c
+E:\work\1.27g\code\q3_ui\ui_controls2.c(206) : warning C4305: 'initializing' : truncation from 'const double ' to 'float '
+E:\work\1.27g\code\q3_ui\ui_controls2.c(792) : warning C4305: 'function' : truncation from 'const double ' to 'float '
+E:\work\1.27g\code\q3_ui\ui_controls2.c(1529) : warning C4305: '=' : truncation from 'const double ' to 'float '
+ui_credits.c
+ui_demo2.c
+ui_display.c
+ui_gameinfo.c
+ui_ingame.c
+ui_main.c
+ui_menu.c
+E:\work\1.27g\code\q3_ui\ui_menu.c(240) : warning C4013: 'trap_VerifyCDKey' undefined; assuming extern returning int
+ui_mfield.c
+ui_mods.c
+ui_network.c
+ui_options.c
+ui_playermodel.c
+ui_players.c
+E:\work\1.27g\code\q3_ui\ui_players.c(84) : warning C4305: '=' : truncation from 'const double ' to 'float '
+E:\work\1.27g\code\q3_ui\ui_players.c(84) : warning C4305: '=' : truncation from 'const double ' to 'float '
+E:\work\1.27g\code\q3_ui\ui_players.c(96) : warning C4305: '=' : truncation from 'const double ' to 'float '
+E:\work\1.27g\code\q3_ui\ui_players.c(104) : warning C4305: '=' : truncation from 'const double ' to 'float '
+E:\work\1.27g\code\q3_ui\ui_players.c(104) : warning C4305: '=' : truncation from 'const double ' to 'float '
+E:\work\1.27g\code\q3_ui\ui_players.c(112) : warning C4305: '=' : truncation from 'const double ' to 'float '
+E:\work\1.27g\code\q3_ui\ui_players.c(112) : warning C4305: '=' : truncation from 'const double ' to 'float '
+E:\work\1.27g\code\q3_ui\ui_players.c(116) : warning C4305: '=' : truncation from 'const double ' to 'float '
+E:\work\1.27g\code\q3_ui\ui_players.c(120) : warning C4305: '=' : truncation from 'const double ' to 'float '
+E:\work\1.27g\code\q3_ui\ui_players.c(120) : warning C4305: '=' : truncation from 'const double ' to 'float '
+E:\work\1.27g\code\q3_ui\ui_players.c(583) : warning C4305: 'function' : truncation from 'const double ' to 'float '
+E:\work\1.27g\code\q3_ui\ui_players.c(584) : warning C4305: 'function' : truncation from 'const double ' to 'float '
+E:\work\1.27g\code\q3_ui\ui_players.c(597) : warning C4305: 'function' : truncation from 'const double ' to 'float '
+ui_playersettings.c
+ui_preferences.c
+ui_qmenu.c
+E:\work\1.27g\code\q3_ui\ui_qmenu.c(27) : warning C4305: 'initializing' : truncation from 'const double ' to 'float '
+E:\work\1.27g\code\q3_ui\ui_qmenu.c(28) : warning C4305: 'initializing' : truncation from 'const double ' to 'float '
+E:\work\1.27g\code\q3_ui\ui_qmenu.c(35) : warning C4305: 'initializing' : truncation from 'const double ' to 'float '
+E:\work\1.27g\code\q3_ui\ui_qmenu.c(37) : warning C4305: 'initializing' : truncation from 'const double ' to 'float '
+E:\work\1.27g\code\q3_ui\ui_qmenu.c(37) : warning C4305: 'initializing' : truncation from 'const double ' to 'float '
+ui_removebots.c
+ui_serverinfo.c
+ui_servers2.c
+ui_setup.c
+ui_sound.c
+ui_sparena.c
+ui_specifyserver.c
+ui_splevel.c
+ui_sppostgame.c
+ui_spreset.c
+ui_spskill.c
+ui_startserver.c
+ui_syscalls.c
+ui_team.c
+ui_teamorders.c
+ui_video.c
+Linking...
+   Creating library Debug/uix86.lib and object Debug/uix86.exp
+
+
+
+<h3>Results</h3>
+uix86.dll - 0 error(s), 23 warning(s)
+<h3>
+--------------------Configuration: q3_ui - Win32 Release TA--------------------
+</h3>
+<h3>Command Lines</h3>
+
+
+
+<h3>Results</h3>
+uix86_old.dll - 0 error(s), 0 warning(s)
+<h3>
+--------------------Configuration: q3_ui - Win32 Debug TA--------------------
+</h3>
+<h3>Command Lines</h3>
+
+
+
+<h3>Results</h3>
+uix86_old.dll - 0 error(s), 0 warning(s)
+<h3>
+--------------------Configuration: ui - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "d:\temp\RSP251.tmp" with contents
+[
+/nologo /G6 /ML /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "UI_EXPORTS" /Fp"Release/ui.pch" /YX /Fo"Release/" /Fd"Release/" /FD /c 
+"E:\work\1.27g\code\ui\ui_gameinfo.c"
+]
+Creating command line "cl.exe @d:\temp\RSP251.tmp" 
+Creating command line "link.exe /nologo /base:"0x40000000" /dll /incremental:no /pdb:"Release/uix86_new.pdb" /map:"Release/uix86_new.map" /machine:I386 /out:"../Release/uix86_new.dll" /implib:"Release/uix86_new.lib"  .\Release\ui_gameinfo.obj "
+<h3>Output Window</h3>
+Compiling...
+ui_gameinfo.c
+Linking...
+ui_gameinfo.obj : error LNK2001: unresolved external symbol _UI_Alloc
+ui_gameinfo.obj : error LNK2001: unresolved external symbol _va
+ui_gameinfo.obj : error LNK2001: unresolved external symbol _Com_Printf
+ui_gameinfo.obj : error LNK2001: unresolved external symbol _Info_SetValueForKey
+ui_gameinfo.obj : error LNK2001: unresolved external symbol _Q_strncpyz
+ui_gameinfo.obj : error LNK2001: unresolved external symbol _COM_ParseExt
+ui_gameinfo.obj : error LNK2001: unresolved external symbol _COM_Parse
+ui_gameinfo.obj : error LNK2001: unresolved external symbol _String_Alloc
+ui_gameinfo.obj : error LNK2001: unresolved external symbol _Info_ValueForKey
+ui_gameinfo.obj : error LNK2001: unresolved external symbol _UI_OutOfMemory
+ui_gameinfo.obj : error LNK2001: unresolved external symbol _trap_Print
+ui_gameinfo.obj : error LNK2001: unresolved external symbol _trap_FS_GetFileList
+ui_gameinfo.obj : error LNK2001: unresolved external symbol _trap_Cvar_Register
+ui_gameinfo.obj : error LNK2001: unresolved external symbol _uiInfo
+ui_gameinfo.obj : error LNK2001: unresolved external symbol _trap_FS_Read
+ui_gameinfo.obj : error LNK2001: unresolved external symbol _trap_FS_FCloseFile
+ui_gameinfo.obj : error LNK2001: unresolved external symbol _trap_FS_FOpenFile
+ui_gameinfo.obj : error LNK2001: unresolved external symbol _COM_Compress
+ui_gameinfo.obj : error LNK2001: unresolved external symbol _Q_stricmp
+../Release/uix86_new.dll : fatal error LNK1120: 19 unresolved externals
+Error executing link.exe.
+
+
+
+<h3>Results</h3>
+uix86_new.dll - 20 error(s), 0 warning(s)
+<h3>
+--------------------Configuration: ui - Win32 Debug--------------------
+</h3>
+<h3>Command Lines</h3>
+
+
+
+<h3>Results</h3>
+uix86_new.dll - 0 error(s), 0 warning(s)
+<h3>
+--------------------Configuration: ui - Win32 Release TA--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "d:\temp\RSP254.tmp" with contents
+[
+/nologo /G6 /ML /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "UI_EXPORTS" /Fp"Release_TA/ui.pch" /YX /Fo"Release_TA/" /Fd"Release_TA/" /FD /c 
+"E:\work\1.27g\code\game\bg_misc.c"
+"E:\work\1.27g\code\game\q_math.c"
+"E:\work\1.27g\code\game\q_shared.c"
+"E:\work\1.27g\code\ui\ui_atoms.c"
+"E:\work\1.27g\code\ui\ui_gameinfo.c"
+"E:\work\1.27g\code\ui\ui_main.c"
+"E:\work\1.27g\code\ui\ui_players.c"
+"E:\work\1.27g\code\ui\ui_shared.c"
+"E:\work\1.27g\code\ui\ui_syscalls.c"
+"E:\work\1.27g\code\ui\ui_util.c"
+]
+Creating command line "cl.exe @d:\temp\RSP254.tmp" 
+Creating temporary file "d:\temp\RSP255.tmp" with contents
+[
+/nologo /base:"0x40000000" /dll /incremental:no /pdb:"Release_TA/uix86.pdb" /map:"Release_TA/uix86.map" /machine:I386 /def:".\ui.def" /out:"../Release_TA/uix86.dll" /implib:"Release_TA/uix86.lib" 
+.\Release_TA\bg_misc.obj
+.\Release_TA\q_math.obj
+.\Release_TA\q_shared.obj
+.\Release_TA\ui_atoms.obj
+.\Release_TA\ui_gameinfo.obj
+.\Release_TA\ui_main.obj
+.\Release_TA\ui_players.obj
+.\Release_TA\ui_shared.obj
+.\Release_TA\ui_syscalls.obj
+.\Release_TA\ui_util.obj
+]
+Creating command line "link.exe @d:\temp\RSP255.tmp"
+<h3>Output Window</h3>
+Compiling...
+bg_misc.c
+q_math.c
+q_shared.c
+ui_atoms.c
+ui_gameinfo.c
+ui_main.c
+ui_players.c
+ui_shared.c
+ui_syscalls.c
+ui_util.c
+Linking...
+   Creating library Release_TA/uix86.lib and object Release_TA/uix86.exp
+
+
+
+<h3>Results</h3>
+uix86.dll - 0 error(s), 0 warning(s)
+<h3>
+--------------------Configuration: ui - Win32 Debug TA--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "d:\temp\RSP25A.tmp" with contents
+[
+/nologo /G5 /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "UI_EXPORTS" /D "MISSIONPACK" /FR"Debug_TA/" /Fp"Debug_TA/ui.pch" /YX /Fo"Debug_TA/" /Fd"Debug_TA/" /FD /GZ /c 
+"E:\work\1.27g\code\game\bg_misc.c"
+"E:\work\1.27g\code\game\q_math.c"
+"E:\work\1.27g\code\game\q_shared.c"
+"E:\work\1.27g\code\ui\ui_atoms.c"
+"E:\work\1.27g\code\ui\ui_gameinfo.c"
+"E:\work\1.27g\code\ui\ui_main.c"
+"E:\work\1.27g\code\ui\ui_players.c"
+"E:\work\1.27g\code\ui\ui_shared.c"
+"E:\work\1.27g\code\ui\ui_syscalls.c"
+"E:\work\1.27g\code\ui\ui_util.c"
+]
+Creating command line "cl.exe @d:\temp\RSP25A.tmp" 
+Creating temporary file "d:\temp\RSP25B.tmp" with contents
+[
+/nologo /base:"0x40000000" /dll /incremental:yes /pdb:"../Debug/ui.pdb" /map:"Debug_TA/uix86.map" /debug /machine:I386 /def:".\ui.def" /out:"../Debug_TA/uix86.dll" /implib:"Debug_TA/uix86.lib" /pdbtype:sept 
+.\Debug_TA\bg_misc.obj
+.\Debug_TA\q_math.obj
+.\Debug_TA\q_shared.obj
+.\Debug_TA\ui_atoms.obj
+.\Debug_TA\ui_gameinfo.obj
+.\Debug_TA\ui_main.obj
+.\Debug_TA\ui_players.obj
+.\Debug_TA\ui_shared.obj
+.\Debug_TA\ui_syscalls.obj
+.\Debug_TA\ui_util.obj
+]
+Creating command line "link.exe @d:\temp\RSP25B.tmp"
+<h3>Output Window</h3>
+Compiling...
+bg_misc.c
+q_math.c
+q_shared.c
+ui_atoms.c
+ui_gameinfo.c
+ui_main.c
+ui_players.c
+ui_shared.c
+ui_syscalls.c
+ui_util.c
+Linking...
+   Creating library Debug_TA/uix86.lib and object Debug_TA/uix86.exp
+
+
+
+<h3>Results</h3>
+uix86.dll - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>

@@ -1,0 +1,129 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: game - Win32 Debug TA--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "D:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP244.tmp" with contents
+[
+/nologo /G5 /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "BUILDING_REF_GL" /D "DEBUG" /D "MISSIONPACK" /FR"Debug_TA/" /Fp"Debug_TA/game.pch" /YX /Fo"Debug_TA/" /Fd"Debug_TA/" /FD /c 
+"D:\Quake3\MissionPack\code\game\ai_chat.c"
+"D:\Quake3\MissionPack\code\game\ai_cmd.c"
+"D:\Quake3\MissionPack\code\game\ai_dmnet.c"
+"D:\Quake3\MissionPack\code\game\ai_dmq3.c"
+"D:\Quake3\MissionPack\code\game\ai_main.c"
+"D:\Quake3\MissionPack\code\game\ai_team.c"
+"D:\Quake3\MissionPack\code\game\bg_misc.c"
+"D:\Quake3\MissionPack\code\game\bg_pmove.c"
+"D:\Quake3\MissionPack\code\game\bg_slidemove.c"
+"D:\Quake3\MissionPack\code\game\g_active.c"
+"D:\Quake3\MissionPack\code\game\g_arenas.c"
+"D:\Quake3\MissionPack\code\game\g_bot.c"
+"D:\Quake3\MissionPack\code\game\g_client.c"
+"D:\Quake3\MissionPack\code\game\g_cmds.c"
+"D:\Quake3\MissionPack\code\game\g_combat.c"
+"D:\Quake3\MissionPack\code\game\g_items.c"
+"D:\Quake3\MissionPack\code\game\g_main.c"
+"D:\Quake3\MissionPack\code\game\g_mem.c"
+"D:\Quake3\MissionPack\code\game\g_misc.c"
+"D:\Quake3\MissionPack\code\game\g_missile.c"
+"D:\Quake3\MissionPack\code\game\g_mover.c"
+"D:\Quake3\MissionPack\code\game\g_rankings.c"
+"D:\Quake3\MissionPack\code\game\g_session.c"
+"D:\Quake3\MissionPack\code\game\g_spawn.c"
+"D:\Quake3\MissionPack\code\game\g_svcmds.c"
+"D:\Quake3\MissionPack\code\game\g_syscalls.c"
+"D:\Quake3\MissionPack\code\game\g_target.c"
+"D:\Quake3\MissionPack\code\game\g_team.c"
+"D:\Quake3\MissionPack\code\game\g_trigger.c"
+"D:\Quake3\MissionPack\code\game\g_utils.c"
+"D:\Quake3\MissionPack\code\game\g_weapon.c"
+"D:\Quake3\MissionPack\code\game\q_math.c"
+"D:\Quake3\MissionPack\code\game\q_shared.c"
+]
+Creating command line "cl.exe @D:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP244.tmp" 
+Creating temporary file "D:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP245.tmp" with contents
+[
+kernel32.lib user32.lib winmm.lib /nologo /base:"0x20000000" /subsystem:windows /dll /incremental:yes /pdb:"Debug_TA/qagamex86.pdb" /map:"Debug_TA/qagamex86.map" /debug /machine:I386 /def:".\game.def" /out:"..\Debug_TA\qagamex86.dll" /implib:"Debug_TA/qagamex86.lib" 
+.\Debug_TA\ai_chat.obj
+.\Debug_TA\ai_cmd.obj
+.\Debug_TA\ai_dmnet.obj
+.\Debug_TA\ai_dmq3.obj
+.\Debug_TA\ai_main.obj
+.\Debug_TA\ai_team.obj
+.\Debug_TA\bg_misc.obj
+.\Debug_TA\bg_pmove.obj
+.\Debug_TA\bg_slidemove.obj
+.\Debug_TA\g_active.obj
+.\Debug_TA\g_arenas.obj
+.\Debug_TA\g_bot.obj
+.\Debug_TA\g_client.obj
+.\Debug_TA\g_cmds.obj
+.\Debug_TA\g_combat.obj
+.\Debug_TA\g_items.obj
+.\Debug_TA\g_main.obj
+.\Debug_TA\g_mem.obj
+.\Debug_TA\g_misc.obj
+.\Debug_TA\g_missile.obj
+.\Debug_TA\g_mover.obj
+.\Debug_TA\g_rankings.obj
+.\Debug_TA\g_session.obj
+.\Debug_TA\g_spawn.obj
+.\Debug_TA\g_svcmds.obj
+.\Debug_TA\g_syscalls.obj
+.\Debug_TA\g_target.obj
+.\Debug_TA\g_team.obj
+.\Debug_TA\g_trigger.obj
+.\Debug_TA\g_utils.obj
+.\Debug_TA\g_weapon.obj
+.\Debug_TA\q_math.obj
+.\Debug_TA\q_shared.obj
+]
+Creating command line "link.exe @D:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP245.tmp"
+<h3>Output Window</h3>
+Compiling...
+ai_chat.c
+ai_cmd.c
+ai_dmnet.c
+ai_dmq3.c
+ai_main.c
+ai_team.c
+bg_misc.c
+bg_pmove.c
+bg_slidemove.c
+g_active.c
+g_arenas.c
+g_bot.c
+g_client.c
+g_cmds.c
+g_combat.c
+g_items.c
+g_main.c
+g_mem.c
+g_misc.c
+g_missile.c
+g_mover.c
+g_rankings.c
+g_session.c
+g_spawn.c
+g_svcmds.c
+g_syscalls.c
+g_target.c
+g_team.c
+g_trigger.c
+g_utils.c
+g_weapon.c
+q_math.c
+q_shared.c
+Linking...
+   Creating library Debug_TA/qagamex86.lib and object Debug_TA/qagamex86.exp
+
+
+
+<h3>Results</h3>
+qagamex86.dll - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>
