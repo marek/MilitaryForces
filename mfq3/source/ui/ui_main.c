@@ -13,6 +13,77 @@ USER INTERFACE MAIN
 
 #include "ui_local.h"
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 129HACK+ Copied from bg_public.h until we have combined the remaining v1.29h files in the current source
+
+#define MF_MAX_GAMESETS			8
+#define MF_MAX_TEAMS			8
+#define MF_MAX_CATEGORIES		8
+#define MF_MAX_CLASSES			8
+
+#define	CAT_PLANE					  0x00000100 
+#define	CAT_GROUND					  0x00000200 
+#define	CAT_ANY						  0x0000FF00
+
+#define MAX_WEAPONS_PER_VEHICLE	8
+
+#define	MF_TEAM_ANY					  0x00FF0000
+
+// total max parts (not cat may exceed this!)
+#define BP_MAX_PARTS			10
+
+// list of vehicles (data)
+typedef struct completeVehicleData_s
+{
+    char		    *descriptiveName;
+    char		    *modelName;		// just the directory of the model
+    unsigned long   id;				// gameset, team, cat and class
+	unsigned int	flags;			// special flags
+	unsigned int	caps;			// capabilities
+    qhandle_t	    handle[BP_MAX_PARTS];// ditto
+    vec3_t		    mins;
+    vec3_t		    maxs;
+    vec3_t		    turnspeed;	    // how fast can it turn around the three axis
+	int				cam_dist;		// how far away is the camera
+	int				cam_height;		// how high is the camera
+    unsigned int    stallspeed;	
+    unsigned int    maxspeed;	    // max speed at military thrust
+    int			    minthrottle;    // can be less than 0 for ground vehicles
+    int			    maxthrottle;    // if > 10 means afterburner
+    unsigned int    accel;			// vehicle dependent acceleration
+    unsigned int    maxhealth;	    // health
+	vec3_t			gunoffset;		// guntag
+	unsigned int	maxfuel;		// maximum fuel
+	int				gearheight;		// height of gear
+	int				tailangle;		// for taildraggers on ground
+	unsigned int	weapons[MAX_WEAPONS_PER_VEHICLE];// use index from available Weapons
+	unsigned int	ammo[MAX_WEAPONS_PER_VEHICLE];// how much of them (is also max_ammo)
+	vec3_t			cockpitview;	// to place the camera
+	unsigned int	effectModel;	// num of afterburner model (for planes)
+	unsigned int	radarRange;		// how far goes the radar AIR
+	unsigned int	radarRange2;	// how far goes the radar GV
+	float			swingangle;		// for swing wings
+	unsigned int	renderFlags;	// special stuff for rendering only
+}completeVehicleData_t;	
+
+extern completeVehicleData_t availableVehicles[];
+
+// number of available vehicles
+extern int bg_numberOfVehicles;
+
+extern void MF_SetGameset(unsigned long gs);
+extern unsigned long MF_GetGameset(void);
+extern int MF_getIndexOfVehicle( int start, unsigned long what);
+
+// strings for categories and classes
+extern const char *gameset_items[MF_MAX_GAMESETS+1];
+extern const char *team_items[MF_MAX_GAMESETS][MF_MAX_TEAMS+1];
+extern const char *cat_items[MF_MAX_CATEGORIES+1];
+extern const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1];
+
+// 129HACK-
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 uiInfo_t uiInfo;
 
 static const char *MonthAbbrev[] = {
@@ -1980,8 +2051,126 @@ static void UI_DrawGLInfo(rectDef_t *rect, float scale, vec4_t color, int textSt
 			break;
 		}
 	}
+}
 
+/*
+=================
+UI_DrawVehiclePreview
+=================
+*/
+static void UI_DrawVehiclePreview( rectDef_t *rect, float scale, vec4_t color, int textStyle )
+{
+#if 0
+	refdef_t		refdef;
+	refEntity_t		plane;
+	vec3_t			origin;
+	vec3_t			angles;
+	float			x, y, w, h;
+	
+	static int		old = 0;
+	static float	angle = 180;
+	static qhandle_t hModel = 0;
+	
+	if( !hModel ) 
+		hModel = trap_R_RegisterModel("models/mapobjects/f-14/f-14.md3");
 
+	// setup the refdef
+	memset( &refdef, 0, sizeof( refdef ) );
+	refdef.rdflags = RDF_NOWORLDMODEL;
+	AxisClear( refdef.viewaxis );
+
+	x = rect->x;
+	y = rect->y;
+	w = rect->w;
+	h = rect->h;
+	UI_AdjustFrom640( &x, &y, &w, &h );
+	refdef.x = x;
+	refdef.y = y;
+	refdef.width = w;
+	refdef.height = h;
+
+	refdef.fov_x = 58;
+	refdef.fov_y = 8;
+	refdef.time = uiInfo.uiDC.realTime;
+
+	trap_R_ClearScene();
+
+	// add the model
+	origin[0] = 520;
+	origin[1] = -50;
+	origin[2] = -20;
+	memset( &plane, 0, sizeof(plane) );
+	VectorSet( angles, 10, angle, 0 );
+	AnglesToAxis( angles, plane.axis );
+	plane.hModel = hModel;
+	VectorCopy( origin, plane.origin );
+	VectorCopy( origin, plane.lightingOrigin );
+	plane.renderfx = RF_LIGHTING_ORIGIN | RF_NOSHADOW;
+	VectorCopy( plane.origin, plane.oldorigin );
+
+	trap_R_AddRefEntityToScene( &plane );
+
+	trap_R_RenderScene( &refdef );
+
+	// spin
+	if( uiInfo.uiDC.realTime > old + 20 ) { 
+		angle++;
+		old =  uiInfo.uiDC.realTime;
+	}
+	if( angle >= 360 ) angle -= 360;
+	//	UI_FillRect(rect->x, rect->y, rect->w, rect->h, color );
+/*
+	Text_Paint(rect->x, rect->y, scale, color, "Waiting for new key... Press ESCAPE to cancel", 0, 0, textStyle);
+*/
+#else
+	int vehicle = -1;
+	char * dir = NULL;
+	char * pIconString = NULL;
+	unsigned long cat = 0;
+	char catDir[32];
+	static qhandle_t pictureHandle = -1;
+	static int lastVehicle = -1;
+
+	// find out the current UI vehicle index
+	vehicle = trap_Cvar_VariableValue("ui_vehicle");
+
+	// valid?
+	if( vehicle >= 0 && vehicle < bg_numberOfVehicles )
+	{
+		cat = availableVehicles[ vehicle ].id & CAT_ANY;
+		if( cat & CAT_PLANE ) {
+			strcpy( catDir, "planes" );
+		}
+		else if( cat & CAT_GROUND ) {
+			strcpy( catDir, "ground" );
+		}
+/*
+		trap_R_RegisterShaderNoMip( va("models/vehicles/%s/%s/%s_icon", dir, availableVehicles[i].modelName,
+		availableVehicles[i].modelName ) );
+*/
+		// create filename string
+		pIconString = va( "models/vehicles/%s/%s/%s_icon", catDir,
+						   availableVehicles[ vehicle ].modelName, availableVehicles[ vehicle ].modelName );
+
+		// register shader?
+		if( pictureHandle == -1 || (lastVehicle != vehicle) )
+		{
+			pictureHandle = trap_R_RegisterShaderNoMip( pIconString );
+		}
+
+		// draw
+		UI_DrawHandlePic( rect->x, rect->y, rect->w, rect->h, pictureHandle );
+
+		// save last done
+		lastVehicle = vehicle;
+	}
+	else
+	{
+		// invalid vehicle
+
+	}
+
+#endif
 }
 
 // FIXME: table drive
@@ -2147,6 +2336,11 @@ static void UI_OwnerDraw(float x, float y, float w, float h, float text_x, float
 		case UI_KEYBINDSTATUS:
 			UI_DrawKeyBindStatus(&rect,scale, color, textStyle);
 			break;
+		// MFQ3: drawing a preview vehicle model
+		case UI_PREVIEW_VEHICLE:
+			UI_DrawVehiclePreview(&rect,scale, color, textStyle);
+			break;
+
     default:
       break;
   }
@@ -3159,6 +3353,178 @@ static void UI_Update(const char *name) {
 	}
 }
 
+/*
+===============
+UI_RefreshVehicleSelect
+===============
+*/
+static void UI_RefreshVehicleSelect( void )
+{
+	int vehicleCat = -1;
+	int vehicleClass = -1;
+	int vehicle = -1;
+	unsigned long gameset = -1;
+	const char * pCat = NULL;
+	const char * pClass = NULL;
+	const char * pVehicle = NULL;
+	qboolean currentVehicleValid = qtrue;
+	unsigned long what = 0x00000000;
+
+	// find out the current UI catagory
+	vehicleCat = trap_Cvar_VariableValue("ui_vehicleCat");
+
+tryCatAgain:
+
+	// get the text
+	pCat = cat_items[ vehicleCat ];
+	if( pCat )
+	{
+		// update the text in the dialog for the UI catagory
+		trap_Cvar_Set( "ui_vehicleCatTxt", pCat );
+	}
+	else
+	{
+		// the 'ui_vehicleCat' must be invalid, reset
+		trap_Cvar_Set( "ui_vehicleCat", "0" );
+		vehicleCat = 0;
+
+		goto tryCatAgain;
+	}
+
+	// find out the current UI class (based upon the known catagory)
+	vehicleClass = trap_Cvar_VariableValue("ui_vehicleClass");
+
+tryClassAgain:
+
+	// get the text
+	pClass = class_items[ vehicleCat ][ vehicleClass ];
+	if( pClass )
+	{
+		// update the text in the dialog for the UI class
+		trap_Cvar_Set( "ui_vehicleClassTxt", pClass );
+	}
+	else
+	{
+		// the 'ui_vehicleClass' must be invalid, reset
+		trap_Cvar_Set( "ui_vehicleClass", "0" );
+		vehicleClass = 0;
+
+		goto tryClassAgain;
+	}
+
+	// find out the current UI vehicle (based upon the known catagory+class)
+	vehicle = trap_Cvar_VariableValue("ui_vehicle");
+
+	// is this vehicle valid for the current gameset+team+catagory+class?
+	
+	// get gameset (as MF_GAMESET_x)
+	gameset = MF_GetGameset();
+	
+	// create the mask DWORD
+
+	// add components (in LB -> HB order in DWORD)
+	what |= (1 << vehicleClass);		// (convert from enum)
+	what |= (1 << vehicleCat) << 8;		// (convert from enum)
+	what |= MF_TEAM_ANY;
+	what |= gameset;
+
+	// check
+	vehicle = MF_getIndexOfVehicle( (vehicle-1), what );
+	
+	// -1 means this is not a suitable combination
+	if( vehicle == -1 )
+	{
+		// prevent change & say so
+		trap_Cvar_Set( "ui_vehicle", va( "%d", -1 ));
+		trap_Cvar_Set( "ui_vehicleTxt", "<Nothing Available>" );
+
+		return;
+	}
+
+	// get the text
+	pVehicle = availableVehicles[ vehicle ].descriptiveName;
+	if( pVehicle )
+	{
+		// update the text in the dialog for the UI vehicle
+		trap_Cvar_Set( "ui_vehicleTxt", pVehicle );
+	}
+	else
+	{
+		// the 'ui_vehicle' must be invalid, reset
+		trap_Cvar_Set( "ui_vehicle", "0" );
+		vehicle = 0;
+	}
+
+	// always set back the vehicle index
+	trap_Cvar_Set( "ui_vehicle", va( "%d", vehicle ));
+}
+
+/*
+===============
+UI_CycleVehicleSelect
+===============
+*/
+static void UI_CycleVehicleSelect( int cycleIdx )
+{
+	int idx = -1;
+	const char * pVar = NULL;
+
+	// switch on what was asked to cycle
+	switch( cycleIdx )
+	{
+	// Catagory
+	case 0:
+		pVar = "ui_vehicleCat";
+
+		// reset dependent
+		trap_Cvar_Set( "ui_vehicleClass", "0" );
+
+		break;
+
+	// Class
+	case 1:
+		pVar = "ui_vehicleClass";
+		break;
+
+	// Vehicle
+	case 2:
+		pVar = "ui_vehicle";
+		break;
+
+	default:
+		return;
+	}
+
+	// cycle numeric var
+	idx = trap_Cvar_VariableValue( pVar );
+	idx++;
+	trap_Cvar_Set( pVar, va( "%d", idx ));
+
+	// update the dialog
+	UI_RefreshVehicleSelect();
+}
+
+/*
+===============
+UI_SelectVehicle
+===============
+*/
+static void UI_SelectVehicle( void )
+{
+	int idx = -1;
+
+	// get the UI vehicle index
+	idx = trap_Cvar_VariableValue( "ui_vehicle" );
+
+	// set into the trigger index
+	trap_Cvar_Set( "cg_nextVehicle", va( "%d", idx ));	
+}
+
+/*
+===============
+UI_RunMenuScript
+===============
+*/
 static void UI_RunMenuScript(char **args) {
 	const char *name, *name2;
 	char buff[1024];
@@ -3535,9 +3901,23 @@ static void UI_RunMenuScript(char **args) {
 		}
 		else if( Q_stricmp(name, "selectVehicle") == 0 )
 		{
-			// MFQ3: testing code
-			int idx = trap_Cvar_VariableValue("cg_vehicle");
-			trap_Cvar_Set( "cg_nextVehicle", va( "%d", idx ));	
+			// MFQ3: select a vehicle
+			UI_SelectVehicle();
+		}
+		else if( Q_stricmp(name, "refreshVehicleSelect") == 0 )
+		{
+			// MFQ3: refresh the vehicle select dialog
+			UI_RefreshVehicleSelect();
+		}
+		else if( Q_stricmp(name, "cycleVehicleSelect") == 0 )
+		{
+			int cycleIdx = -1;
+
+			// MFQ3: cycle through catagory/class/vehicle
+			if( Int_Parse(args, &cycleIdx) )
+			{
+				UI_CycleVehicleSelect( cycleIdx );
+			}
 		}
 		else
 		{
@@ -5621,9 +6001,6 @@ vmCvar_t	ui_server16;
 
 vmCvar_t	ui_cdkeychecked;
 
-// MFQ3
-vmCvar_t	ui_gameset;
-
 vmCvar_t	ui_redteam;
 vmCvar_t	ui_redteam1;
 vmCvar_t	ui_redteam2;
@@ -5685,6 +6062,17 @@ vmCvar_t	ui_realCaptureLimit;
 vmCvar_t	ui_realWarmUp;
 vmCvar_t	ui_serverStatusTimeOut;
 
+// MFQ3
+vmCvar_t	ui_gameset;			// UI copy of the gameset var (not sure were going to need this - MM)
+
+// (vehicle select dialog)
+vmCvar_t	ui_vehicleCat;		// vehicle catagory value
+vmCvar_t	ui_vehicleClass;	// vehicle class value
+vmCvar_t	ui_vehicle;			// vehicle value
+
+vmCvar_t	ui_vehicleCatTxt;	// vehicle catagory text
+vmCvar_t	ui_vehicleClassTxt;	// vehicle class text
+vmCvar_t	ui_vehicleTxt;		// vehicle text
 
 // bk001129 - made static to avoid aliasing
 static cvarTable_t		cvarTable[] = {
@@ -5728,6 +6116,15 @@ static cvarTable_t		cvarTable[] = {
 
 	// MFQ3
 	{ &ui_gameset, "ui_gameset", "modern", CVAR_ARCHIVE | CVAR_ROM },
+
+	// (vehicle select dialog)
+	{ &ui_vehicleCat, "ui_vehicleCat", "0", CVAR_ARCHIVE | CVAR_ROM },
+	{ &ui_vehicleClass, "ui_vehicleClass", "0", CVAR_ARCHIVE | CVAR_ROM },
+	{ &ui_vehicle, "ui_vehicle", "0", CVAR_ARCHIVE | CVAR_ROM },
+
+	{ &ui_vehicleCat, "ui_vehicleCatTxt", "<Catagory>", CVAR_ARCHIVE | CVAR_ROM },
+	{ &ui_vehicleClass, "ui_vehicleClassTxt", "<Class>", CVAR_ARCHIVE | CVAR_ROM },
+	{ &ui_vehicle, "ui_vehicleTxt", "<Vehicle>", CVAR_ARCHIVE | CVAR_ROM },
 
 	{ &ui_server1, "server1", "", CVAR_ARCHIVE },
 	{ &ui_server2, "server2", "", CVAR_ARCHIVE },

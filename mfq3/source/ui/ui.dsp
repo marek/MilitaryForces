@@ -100,7 +100,15 @@ SOURCE=.\game_129h\bg_lib.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\game\bg_mfq3util.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\game_129h\bg_misc.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\game\bg_vehicledata.c
 # End Source File
 # Begin Source File
 
