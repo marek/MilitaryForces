@@ -1,5 +1,5 @@
 /*
- * $Id: mf_client.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: mf_client.c,v 1.2 2001-12-22 02:28:44 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -367,6 +367,7 @@ void MF_ClientSpawn(gentity_t *ent) {
 
 		// fuel
 		client->ps.stats[STAT_FUEL] = client->ps.stats[STAT_MAX_FUEL] = availableVehicles[vehIndex].maxfuel;
+		client->ps.stats[STAT_LOCKINFO] = 0;
 		client->ps.timers[TIMER_FUEL] = level.time;
 
 		// which weapons do we have

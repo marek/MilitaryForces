@@ -1,5 +1,5 @@
 /*
- * $Id: bg_misc.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: bg_misc.c,v 1.2 2001-12-22 02:28:43 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -542,6 +542,7 @@ void BG_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, qboolean 
 		s->angles2[PITCH] = ((float)ps->gunAngle)/10;
 		s->angles2[ROLL] = ((float)ps->turretAngle)/10;
 		s->vehicleAnim = ps->vehicleAnim;
+		s->tracktarget = ps->tracktarget;
 	} 
 
 	s->number = ps->clientNum;
@@ -622,6 +623,7 @@ void BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s
 		s->angles2[PITCH] = ((float)ps->gunAngle)/10;
 		s->angles2[ROLL] = ((float)ps->turretAngle)/10;
 		s->vehicleAnim = ps->vehicleAnim;
+		s->tracktarget = ps->tracktarget;
 	} 
 
 	s->number = ps->clientNum;

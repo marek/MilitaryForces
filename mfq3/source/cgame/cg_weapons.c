@@ -1,5 +1,5 @@
 /*
- * $Id: cg_weapons.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: cg_weapons.c,v 1.2 2001-12-22 02:28:43 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -62,6 +62,9 @@ void CG_RegisterWeapons() {
 		switch( availableWeapons[i].type ) {
 
 		case WT_ROCKET:
+		case WT_ANTIAIRMISSILE:
+		case WT_ANTIGROUNDMISSILE:
+		case WT_ANTIRADARMISSILE:
 			weaponInfo->missileModel = trap_R_RegisterModel( availableWeapons[i].modelName );
 			weaponInfo->missileSound = trap_S_RegisterSound( "sound/weapons/rocket/rockfly.wav", qfalse );
 			weaponInfo->missileTrailFunc = CG_FFARTrail;
@@ -75,6 +78,7 @@ void CG_RegisterWeapons() {
 			break;
 
 		case WT_IRONBOMB:
+		case WT_GUIDEDBOMB:
 			weaponInfo->missileModel = trap_R_RegisterModel( availableWeapons[i].modelName );
 			weaponInfo->missileSound = trap_S_RegisterSound( "sound/weapons/rocket/rockfly.wav", qfalse );
 
@@ -347,6 +351,14 @@ void CG_MissileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_t di
 	switch ( weaponIndex ) {
 	default:
 	case WI_FFAR:
+	case WI_SIDEWINDER:
+	case WI_SPARROW:
+	case WI_AMRAAM:
+	case WI_PHOENIX:
+	case WI_STINGER:
+	case WI_ATOLL:
+	case WI_ARCHER:
+	case WI_ALAMO:
 		mod = cgs.media.dishFlashModel;
 		shader = cgs.media.rocketExplosionShader;
 		sfx = cgs.media.sfx_rockexp;

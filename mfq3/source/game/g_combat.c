@@ -1,5 +1,5 @@
 /*
- * $Id: g_combat.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: g_combat.c,v 1.2 2001-12-22 02:28:44 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -193,7 +193,7 @@ dflags		these flags are used to control how T_Damage works
 */
 
 void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
-			   vec3_t dir, vec3_t point, int damage, int dflags, int mod ) {
+			   vec3_t dir, vec3_t point, int damage, int dflags, int mod, long cat ) {
 	gclient_t	*client;
 	int			take;
 	int			save;
@@ -236,6 +236,21 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 			}
 		}
 		return;
+	}
+
+	// wrong cat ?
+	if( cat && cat != CAT_ANY ) {
+		if( targ->client ) {
+			if( !(availableVehicles[targ->client->vehicle].id & CAT_ANY & cat) ) {
+				damage *= inflictor->catmodifier;
+			}
+		} else {
+			if( targ->s.eType == ET_MISC_VEHICLE ) {
+				if( !(availableVehicles[targ->s.modelindex].id & CAT_ANY & cat) ) {
+					damage *= inflictor->catmodifier;
+				}
+			}
+		}
 	}
 
 	// reduce damage by the attacker's handicap value
@@ -463,7 +478,7 @@ G_RadiusDamage
 ============
 */
 qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, float radius,
-					 gentity_t *ignore, int mod) {
+					 gentity_t *ignore, int mod, long cat) {
 	float		points, dist;
 	gentity_t	*ent;
 	int			entityList[MAX_GENTITIES];
@@ -519,7 +534,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 			// push the center of mass higher than the origin so players
 			// get knocked into the air more
 			dir[2] += 24;
-			G_Damage (ent, NULL, attacker, dir, origin, (int)points, DAMAGE_RADIUS, mod);
+			G_Damage (ent, NULL, attacker, dir, origin, (int)points, DAMAGE_RADIUS, mod, cat);
 		}
 	}
 
@@ -729,7 +744,7 @@ void vehicle_death( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, 
 		// g_forcerespawn may force spawning at some later time
 		self->client->respawnTime = level.time + 1000;
 		// add radius explosion
-		G_RadiusDamage( self->r.currentOrigin, self, 150, 150, self, MOD_VEHICLEEXPLOSION );
+		G_RadiusDamage( self->r.currentOrigin, self, 150, 150, self, MOD_VEHICLEEXPLOSION, CAT_ANY );
 
 	} else {
 		G_AddEvent( self, EV_VEHICLE_DIE, 0 );

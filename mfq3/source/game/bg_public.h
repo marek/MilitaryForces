@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.6 2001-12-03 21:33:46 thebjoern Exp $
+ * $Id: bg_public.h,v 1.7 2001-12-22 02:28:43 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.42c"
+#define	GAME_VERSION		"mfq3 v0.43a"
 
 #define	DEFAULT_GRAVITY		800
 #define	GIB_HEALTH			-50
@@ -167,7 +167,8 @@ typedef enum {
 	STAT_CLIENTS_READY,				// bit mask of clients wishing to exit the intermission (FIXME: configstring?)
 	STAT_MAX_HEALTH,				// health limit, changable by handicap
 	STAT_FUEL,
-	STAT_MAX_FUEL
+	STAT_MAX_FUEL,
+	STAT_LOCKINFO
 } statIndex_t;
 
 typedef enum {
@@ -630,6 +631,7 @@ typedef enum {
 	WT_GUIDEDBOMB,
 	WT_ANTIAIRMISSILE,
 	WT_ANTIGROUNDMISSILE,
+	WT_ANTIRADARMISSILE,
 	WT_FLARE
 }weaponType_t;
 
@@ -642,7 +644,11 @@ typedef struct completeWeaponData_s
 	char			*modelName;			// model
 	char			*iconName;			// icon for HUD
 	qhandle_t		iconHandle;			// handle for icon
+	unsigned int	category;			// which category can it damage
+	float			noncatmod;			// modifier for hitting wrong category
 	unsigned int	muzzleVelocity;		// speed at which it starts
+	float			range;				// target acquiring range
+	unsigned int	fuelrange;			// for how long lasts its fuel
 	unsigned int	fireInterval;		// time between two shots
 	unsigned int	damage;				// damage done to target
 	unsigned int	damageRadius;		// radius that damage is applied to
@@ -672,6 +678,14 @@ typedef enum
 	WI_100MM_GUN,
 	WI_125MM_GUN,
 	WI_MK82,
+	WI_SIDEWINDER,
+	WI_AMRAAM,
+	WI_SPARROW,
+	WI_PHOENIX,
+	WI_STINGER,
+	WI_ATOLL,
+	WI_ARCHER,
+	WI_ALAMO,
 	WI_FLARE,
 	WI_MAX
 }weaponIndex_t;
@@ -727,7 +741,15 @@ int MF_getNumberOfItems(const char **itemlist);
 #define CH_BOMBMODE				1
 #define CH_ROCKETMODE			2
 #define CH_MISSILEMODE			3
-#define CH_DEFAULT				4
-#define CH_NUMCROSSHAIRS		5
+#define CH_MISSILEMODELOCK		4
+#define CH_DEFAULT				5
+#define CH_NUMCROSSHAIRS		6
+
+// lock flags
+#define LI_NOLOCK				0
+#define LI_TRACKING				1
+#define LI_LOCKING				2
+#define LI_BEING_LOCKED			4
+#define LI_BEING_LAUNCHED		8
 
 

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.2 2001-11-19 17:02:20 thebjoern Exp $
+ * $Id: cg_main.c,v 1.3 2001-12-22 02:28:43 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -685,6 +685,7 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.reticle[CH_BOMBMODE] = trap_R_RegisterModel( "models/effects/ch_agmode.md3" );
 	cgs.media.reticle[CH_ROCKETMODE] = trap_R_RegisterModel( "models/effects/ch_rocketmode.md3" );
 	cgs.media.reticle[CH_MISSILEMODE] = trap_R_RegisterModel( "models/effects/ch_missilemode.md3" );
+	cgs.media.reticle[CH_MISSILEMODELOCK] = trap_R_RegisterModel( "models/effects/ch_missilemodelock.md3" );
 	cgs.media.reticle[CH_DEFAULT] = trap_R_RegisterModel( "models/effects/ch_default.md3" );
 	// end MFQ3
 

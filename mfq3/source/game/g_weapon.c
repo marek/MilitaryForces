@@ -1,5 +1,5 @@
 /*
- * $Id: g_weapon.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: g_weapon.c,v 1.2 2001-12-22 02:28:44 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -47,6 +47,38 @@ void SnapVectorTowards( vec3_t v, vec3_t to ) {
 		} else {
 			v[i] = (int)v[i] + 1;
 		}
+	}
+}
+
+/*
+======================================================================
+
+Anti air guided
+
+======================================================================
+*/
+
+void Weapon_AntiAir_Fire (gentity_t *ent) {
+	if( ent->client->ps.stats[STAT_LOCKINFO] & LI_LOCKING ) {
+		fire_antiair(ent);
+	} else {
+		fire_ffar(ent);
+	}
+}
+
+/*
+======================================================================
+
+Anti ground guided
+
+======================================================================
+*/
+
+void Weapon_AntiGround_Fire (gentity_t *ent) {
+	if( ent->client->ps.stats[STAT_LOCKINFO] & LI_LOCKING ) {
+		fire_antiground(ent);
+	} else {
+		fire_ffar(ent);
 	}
 }
 
@@ -158,10 +190,18 @@ void FireWeapon( gentity_t *ent ) {
 
 	// fire the specific weapon
 	switch( availableWeapons[ent->s.weaponIndex].type ) {
+	case WT_ANTIAIRMISSILE:
+		Weapon_AntiAir_Fire( ent );
+		break;
+	case WT_ANTIGROUNDMISSILE:
+	case WT_ANTIRADARMISSILE:
+		Weapon_AntiGround_Fire( ent );
+		break;
 	case WT_ROCKET:
 		Weapon_FFAR_Fire( ent );
 		break;
 	case WT_IRONBOMB:
+	case WT_GUIDEDBOMB:
 		Weapon_IronBomb_Fire( ent );
 		break;
 	case WT_MACHINEGUN:

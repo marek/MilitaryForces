@@ -1,5 +1,5 @@
 /*
- * $Id: bg_weapondata.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: bg_weapondata.c,v 1.2 2001-12-22 02:28:44 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -17,7 +17,11 @@ completeWeaponData_t availableWeapons[] =
 		"",									// modelName
 		"",									// iconName
 		0,									// iconHandle
+		0,									// cat
+		0,									// non cat mod
 		0,									// muzzleVelocity
+		0,									// range
+		0,									// fuelrange
 		0,									// fire interval
 		0,									// damage
 		0,									// damageRadius
@@ -35,7 +39,11 @@ completeWeaponData_t availableWeapons[] =
 		"",									// modelName
 		"hud/iconw_mg.tga",					// iconName
 		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
 		3000,								// muzzleVelocity
+		0,									// range
+		0,									// fuelrange
 		150,								// fire interval
 		18,									// damage
 		0,									// damageRadius
@@ -53,7 +61,11 @@ completeWeaponData_t availableWeapons[] =
 		"",									// modelName
 		"hud/iconw_mg.tga",					// iconName
 		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
 		3000,								// muzzleVelocity
+		0,									// range
+		0,									// fuelrange
 		150,								// fire interval
 		18,									// damage
 		0,									// damageRadius
@@ -71,7 +83,11 @@ completeWeaponData_t availableWeapons[] =
 		"",									// modelName
 		"hud/iconw_mg.tga",					// iconName
 		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
 		3000,								// muzzleVelocity
+		0,									// range
+		0,									// fuelrange
 		100,								// fire interval
 		12,									// damage
 		0,									// damageRadius
@@ -89,7 +105,11 @@ completeWeaponData_t availableWeapons[] =
 		"",									// modelName
 		"hud/iconw_mg.tga",					// iconName
 		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
 		3000,								// muzzleVelocity
+		0,									// range
+		0,									// fuelrange
 		120,								// fire interval
 		14,									// damage
 		0,									// damageRadius
@@ -107,7 +127,11 @@ completeWeaponData_t availableWeapons[] =
 		"",									// modelName
 		"hud/iconw_mg.tga",					// iconName
 		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
 		3000,								// muzzleVelocity
+		0,									// range
+		0,									// fuelrange
 		100,								// fire interval
 		20,									// damage
 		0,									// damageRadius
@@ -125,7 +149,11 @@ completeWeaponData_t availableWeapons[] =
 		"",									// modelName
 		"hud/iconw_mg.tga",					// iconName
 		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
 		3000,								// muzzleVelocity
+		0,									// range
+		0,									// fuelrange
 		100,								// fire interval
 		20,									// damage
 		0,									// damageRadius
@@ -143,7 +171,11 @@ completeWeaponData_t availableWeapons[] =
 		"models/weapons/ffar.md3",			// modelName
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
 		1500,								// muzzleVelocity
+		0,									// range
+		8000,								// fuelrange
 		160,								// fire interval
 		40,									// damage
 		50,									// damageRadius
@@ -161,7 +193,11 @@ completeWeaponData_t availableWeapons[] =
 		"models/weapons/ffar.md3",			// modelName
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
 		2000,								// muzzleVelocity
+		0,									// range
+		0,									// fuelrange
 		1500,								// fire interval
 		140,								// damage
 		80,									// damageRadius
@@ -179,7 +215,11 @@ completeWeaponData_t availableWeapons[] =
 		"models/weapons/ffar.md3",			// modelName
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
 		2500,								// muzzleVelocity
+		0,									// range
+		0,									// fuelrange
 		1500,								// fire interval
 		200,								// damage
 		100,								// damageRadius
@@ -197,7 +237,11 @@ completeWeaponData_t availableWeapons[] =
 		"models/weapons/ag_800_d.md3",		// modelName
 		"hud/iconw_bmb.tga",				// iconName
 		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
 		0,									// muzzleVelocity
+		0,									// range
+		0,									// fuelrange
 		150,								// fire interval
 		200,								// damage
 		120,								// damageRadius
@@ -205,6 +249,182 @@ completeWeaponData_t availableWeapons[] =
 		2,									// barrels
 		0,									// barrelDistance
 		CH_BOMBMODE							// crosshair
+	},
+
+	// Sidewinder
+	{ 
+		WT_ANTIAIRMISSILE,					// type
+		MF_GAMESET_ANY,						// gameset
+		"AIM-9 Sidewinder",					// descriptiveName
+		"models/weapons/ffar.md3",			// modelName
+		"hud/iconw_rkt.tga",				// iconName
+		0,									// iconHandle
+		CAT_PLANE|CAT_HELO,					// cat
+		0.3f,								// non cat mod
+		1500,								// muzzleVelocity
+		3000,								// range
+		8000,								// fuelrange
+		500,								// fire interval
+		100,								// damage
+		50,									// damageRadius
+		1,									// spread
+		2,									// barrels
+		0,									// barrelDistance
+		CH_MISSILEMODE						// crosshair
+	},
+
+	// AMRAAM
+	{ 
+		WT_ANTIAIRMISSILE,					// type
+		MF_GAMESET_ANY,						// gameset
+		"AIM-120 AMRAMM",							// descriptiveName
+		"models/weapons/ffar.md3",			// modelName
+		"hud/iconw_rkt.tga",				// iconName
+		0,									// iconHandle
+		CAT_PLANE|CAT_HELO,					// cat
+		0.3f,								// non cat mod
+		1800,								// muzzleVelocity
+		6000,								// range
+		8000,								// fuelrange
+		500,								// fire interval
+		100,								// damage
+		50,									// damageRadius
+		1,									// spread
+		2,									// barrels
+		0,									// barrelDistance
+		CH_MISSILEMODE						// crosshair
+	},
+
+	// Sparrow
+	{ 
+		WT_ANTIAIRMISSILE,					// type
+		MF_GAMESET_ANY,						// gameset
+		"AIM-7 Sparrow",					// descriptiveName
+		"models/weapons/ffar.md3",			// modelName
+		"hud/iconw_rkt.tga",				// iconName
+		0,									// iconHandle
+		CAT_PLANE|CAT_HELO,					// cat
+		0.3f,								// non cat mod
+		1800,								// muzzleVelocity
+		5000,								// range
+		8000,								// fuelrange
+		500,								// fire interval
+		100,								// damage
+		50,									// damageRadius
+		1,									// spread
+		2,									// barrels
+		0,									// barrelDistance
+		CH_MISSILEMODE						// crosshair
+	},
+
+	// Phoenix
+	{ 
+		WT_ANTIAIRMISSILE,					// type
+		MF_GAMESET_ANY,						// gameset
+		"AIM-54 Phoenix",					// descriptiveName
+		"models/weapons/ffar.md3",			// modelName
+		"hud/iconw_rkt.tga",				// iconName
+		0,									// iconHandle
+		CAT_PLANE|CAT_HELO,					// cat
+		0.3f,								// non cat mod
+		2500,								// muzzleVelocity
+		9000,								// range
+		8000,								// fuelrange
+		500,								// fire interval
+		120,								// damage
+		50,									// damageRadius
+		1,									// spread
+		2,									// barrels
+		0,									// barrelDistance
+		CH_MISSILEMODE						// crosshair
+	},
+
+	// Stinger
+	{ 
+		WT_ANTIAIRMISSILE,					// type
+		MF_GAMESET_ANY,						// gameset
+		"Stinger",							// descriptiveName
+		"models/weapons/ffar.md3",			// modelName
+		"hud/iconw_rkt.tga",				// iconName
+		0,									// iconHandle
+		CAT_PLANE|CAT_HELO,					// cat
+		0.3f,								// non cat mod
+		1500,								// muzzleVelocity
+		2500,								// range
+		8000,								// fuelrange
+		1000,								// fire interval
+		80,									// damage
+		50,									// damageRadius
+		1,									// spread
+		2,									// barrels
+		0,									// barrelDistance
+		CH_MISSILEMODE						// crosshair
+	},
+
+	// Atoll
+	{ 
+		WT_ANTIAIRMISSILE,					// type
+		MF_GAMESET_ANY,						// gameset
+		"AA-2 Atoll",						// descriptiveName
+		"models/weapons/ffar.md3",			// modelName
+		"hud/iconw_rkt.tga",				// iconName
+		0,									// iconHandle
+		CAT_PLANE|CAT_HELO,					// cat
+		0.3f,								// non cat mod
+		1500,								// muzzleVelocity
+		2500,								// range
+		8000,								// fuelrange
+		500,								// fire interval
+		100,								// damage
+		50,									// damageRadius
+		1,									// spread
+		2,									// barrels
+		0,									// barrelDistance
+		CH_MISSILEMODE						// crosshair
+	},
+
+	// Archer
+	{ 
+		WT_ANTIAIRMISSILE,					// type
+		MF_GAMESET_ANY,						// gameset
+		"AA-11 Archer",						// descriptiveName
+		"models/weapons/ffar.md3",			// modelName
+		"hud/iconw_rkt.tga",				// iconName
+		0,									// iconHandle
+		CAT_PLANE|CAT_HELO,					// cat
+		0.3f,								// non cat mod
+		1800,								// muzzleVelocity
+		5000,								// range
+		8000,								// fuelrange
+		500,								// fire interval
+		100,								// damage
+		50,									// damageRadius
+		1,									// spread
+		2,									// barrels
+		0,									// barrelDistance
+		CH_MISSILEMODE						// crosshair
+	},
+
+	// Alamo
+	{ 
+		WT_ANTIAIRMISSILE,					// type
+		MF_GAMESET_ANY,						// gameset
+		"AA-10 Alamo",						// descriptiveName
+		"models/weapons/ffar.md3",			// modelName
+		"hud/iconw_rkt.tga",				// iconName
+		0,									// iconHandle
+		CAT_PLANE|CAT_HELO,					// cat
+		0.3f,								// non cat mod
+		2500,								// muzzleVelocity
+		7000,								// range
+		8000,								// fuelrange
+		500,								// fire interval
+		100,								// damage
+		50,									// damageRadius
+		1,									// spread
+		2,									// barrels
+		0,									// barrelDistance
+		CH_MISSILEMODE						// crosshair
 	},
 
 	// flares
@@ -215,7 +435,11 @@ completeWeaponData_t availableWeapons[] =
 		"models/weapons/ffar.md3",			// modelName
 		"",									// iconName
 		0,									// iconHandle
+		0,									// cat
+		0,									// non cat mod
 		0,									// muzzleVelocity
+		0,									// range
+		2000,								// fuelrange
 		100,								// fire interval
 		0,									// damage
 		0,									// damageRadius

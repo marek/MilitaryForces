@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.2 2001-12-03 21:33:46 thebjoern Exp $
+ * $Id: g_local.h,v 1.3 2001-12-22 02:28:44 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -169,6 +169,11 @@ struct gentity_s {
 	int			 idxScriptBegin;// first script for this ent
 	int			 idxScriptEnd;	// last script for this ent
 	waypoint_t*	 nextWaypoint;
+	gentity_t*	 tracktarget;
+	int			 locktime;
+	float		 targetcat;		// for weapons mfq3
+	float		 catmodifier;	// for weapons mfq3
+	float		 range;			// for weapons mfq3
 };
 
 
@@ -550,8 +555,8 @@ extern unsigned long	G_GetGameset();
 // g_combat.c
 //
 qboolean CanDamage (gentity_t *targ, vec3_t origin);
-void G_Damage (gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_t dir, vec3_t point, int damage, int dflags, int mod);
-qboolean G_RadiusDamage (vec3_t origin, gentity_t *attacker, float damage, float radius, gentity_t *ignore, int mod);
+void G_Damage (gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_t dir, vec3_t point, int damage, int dflags, int mod, long cat);
+qboolean G_RadiusDamage (vec3_t origin, gentity_t *attacker, float damage, float radius, gentity_t *ignore, int mod, long cat);
 int G_InvulnerabilityEffect( gentity_t *targ, vec3_t dir, vec3_t point, vec3_t impactpoint, vec3_t bouncedir );
 void vehicle_death( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int meansOfDeath );
 void TossVehicleFlags( gentity_t *self );
@@ -560,7 +565,7 @@ void ExplodeVehicle( gentity_t *self );
 // MFQ3
 // g_plane.c
 //
-void Check_Takeoff_Landing( gentity_t *self );
+void checkTakeoffLanding( gentity_t *self );
 void Touch_Plane( gentity_t *ent, gentity_t *other, trace_t *trace );
 void Plane_Pain( gentity_t *self, gentity_t *attacker, int damage );
 
@@ -588,6 +593,8 @@ void DroneInit();
 //
 void G_RunMissile( gentity_t *ent );
 
+void fire_antiair (gentity_t *self);
+void fire_antiground (gentity_t *self);
 void fire_ffar (gentity_t *self);
 void fire_ironbomb (gentity_t *self);
 void fire_autocannon (gentity_t *self);
@@ -613,6 +620,7 @@ void trigger_teleporter_touch (gentity_t *self, gentity_t *other, trace_t *trace
 // g_mfq3util.c
 //
 int canLandOnIt( gentity_t *ent );
+void updateTargetTracking( gentity_t *ent );
 
 //
 // g_droneutil.c

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_plane.c,v 1.3 2001-12-03 21:33:46 thebjoern Exp $
+ * $Id: cg_plane.c,v 1.4 2001-12-22 02:28:43 thebjoern Exp $
 */
 
 
@@ -352,34 +352,97 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 		vec3_t	forward, ang, end;
 		trace_t	tr;
 		float len;
+		playerState_t* ps = &cg.snap->ps;
 		float mindist = cg_thirdPersonRange.integer + availableVehicles[ci->vehicle].cam_dist + 
 			availableVehicles[ci->vehicle].maxs[0] + 20;
-		reticle.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshair];
-		VectorSet( ang, cent->currentState.angles[0], cent->currentState.angles[1], 0 );
-		AnglesToAxis( ang, reticle.axis );
-		VectorScale( reticle.axis[0], 2.0f, reticle.axis[0] );
-		VectorScale( reticle.axis[1], 2.0f, reticle.axis[1] );
-		VectorScale( reticle.axis[2], 2.0f, reticle.axis[2] );
-		AngleVectors(cent->currentState.angles, forward, 0, 0);
-		VectorMA( cent->lerpOrigin, 2000, forward, end );
-		CG_Trace( &tr, cent->lerpOrigin, 0, 0, end, cg.snap->ps.clientNum, MASK_ALL ); 
-		if ( tr.entityNum < MAX_CLIENTS ) {
-			cg.crosshairClientNum = tr.entityNum;
-			cg.crosshairClientTime = cg.time;
-		}
-		VectorCopy( tr.endpos, end );
-		CG_Trace( &tr, cg.refdef.vieworg, 0, 0, end, cg.snap->ps.clientNum, MASK_SOLID ); 
-		VectorSubtract( tr.endpos, cg.refdef.vieworg, forward );
-		len = VectorNormalize(forward);
-		if( len > mindist ) {
-			VectorMA( cg.refdef.vieworg, mindist, forward, reticle.origin );
+
+		if( ps->stats[STAT_LOCKINFO] & LI_TRACKING ) {
+			refEntity_t		reticlelock;
+			centity_t* target = &cg_entities[cent->currentState.tracktarget];
+			reticle.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshair];
+			VectorSubtract( target->lerpOrigin, cent->lerpOrigin, forward );
+			len = VectorNormalize( forward );
+			vectoangles( forward, ang );
+			AnglesToAxis( ang, reticle.axis );
+			VectorMA( cent->lerpOrigin, 2000, forward, end );
+			CG_Trace( &tr, cent->lerpOrigin, 0, 0, end, cg.snap->ps.clientNum, MASK_ALL ); 
+			if ( tr.entityNum < MAX_CLIENTS ) {
+				cg.crosshairClientNum = tr.entityNum;
+				cg.crosshairClientTime = cg.time;
+			}
+			VectorCopy( tr.endpos, end );
+			CG_Trace( &tr, cg.refdef.vieworg, 0, 0, end, cg.snap->ps.clientNum, MASK_SOLID ); 
+			VectorSubtract( tr.endpos, cg.refdef.vieworg, forward );
+			len = VectorNormalize(forward);
+			if( len > mindist ) {
+				VectorMA( cg.refdef.vieworg, mindist, forward, reticle.origin );
+			} else {
+				VectorMA( cg.refdef.vieworg, len - 5, forward, reticle.origin );
+			}
+			VectorCopy( reticle.origin, reticle.lightingOrigin );
+			reticle.shadowPlane = shadowPlane;
+			reticle.renderfx = renderfx;
+			trap_R_AddRefEntityToScene( &reticle );
+			if( ps->stats[STAT_LOCKINFO] & LI_LOCKING ) {
+				memcpy( &reticlelock, &reticle, sizeof(reticle) );
+				reticlelock.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshair+1];
+				reticlelock.frame = 1;
+			} else {
+				memset( &reticlelock, 0, sizeof(reticlelock) );	
+				reticlelock.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshair+1];
+				VectorSet( ang, cent->currentState.angles[0], cent->currentState.angles[1], 0 );
+				AnglesToAxis( ang, reticlelock.axis );
+				VectorScale( reticlelock.axis[0], 0.5f, reticlelock.axis[0] );
+				VectorScale( reticlelock.axis[1], 0.5f, reticlelock.axis[1] );
+				VectorScale( reticlelock.axis[2], 0.5f, reticlelock.axis[2] );
+				reticlelock.nonNormalizedAxes = qtrue;
+				AngleVectors(cent->currentState.angles, forward, 0, 0);
+				VectorMA( cent->lerpOrigin, 2000, forward, end );
+				CG_Trace( &tr, cent->lerpOrigin, 0, 0, end, cg.snap->ps.clientNum, MASK_ALL ); 
+				VectorCopy( tr.endpos, end );
+				CG_Trace( &tr, cg.refdef.vieworg, 0, 0, end, cg.snap->ps.clientNum, MASK_SOLID ); 
+				VectorSubtract( tr.endpos, cg.refdef.vieworg, forward );
+				len = VectorNormalize(forward);
+				if( len > mindist ) {
+					VectorMA( cg.refdef.vieworg, mindist, forward, reticlelock.origin );
+				} else {
+					VectorMA( cg.refdef.vieworg, len - 5, forward, reticlelock.origin );
+				}
+				VectorCopy( reticlelock.origin, reticlelock.lightingOrigin );
+				reticle.shadowPlane = shadowPlane;
+				reticle.renderfx = renderfx;
+				reticlelock.frame = 1;
+			}
+			trap_R_AddRefEntityToScene( &reticlelock );
 		} else {
-			VectorMA( cg.refdef.vieworg, len - 5, forward, reticle.origin );
+			reticle.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshair];
+			VectorSet( ang, cent->currentState.angles[0], cent->currentState.angles[1], 0 );
+			AnglesToAxis( ang, reticle.axis );
+			VectorScale( reticle.axis[0], 2.0f, reticle.axis[0] );
+			VectorScale( reticle.axis[1], 2.0f, reticle.axis[1] );
+			VectorScale( reticle.axis[2], 2.0f, reticle.axis[2] );
+			reticle.nonNormalizedAxes = qtrue;
+			AngleVectors(cent->currentState.angles, forward, 0, 0);
+			VectorMA( cent->lerpOrigin, 2000, forward, end );
+			CG_Trace( &tr, cent->lerpOrigin, 0, 0, end, cg.snap->ps.clientNum, MASK_ALL ); 
+			if ( tr.entityNum < MAX_CLIENTS ) {
+				cg.crosshairClientNum = tr.entityNum;
+				cg.crosshairClientTime = cg.time;
+			}
+			VectorCopy( tr.endpos, end );
+			CG_Trace( &tr, cg.refdef.vieworg, 0, 0, end, cg.snap->ps.clientNum, MASK_SOLID ); 
+			VectorSubtract( tr.endpos, cg.refdef.vieworg, forward );
+			len = VectorNormalize(forward);
+			if( len > mindist ) {
+				VectorMA( cg.refdef.vieworg, mindist, forward, reticle.origin );
+			} else {
+				VectorMA( cg.refdef.vieworg, len - 5, forward, reticle.origin );
+			}
+			VectorCopy( reticle.origin, reticle.lightingOrigin );
+			reticle.shadowPlane = shadowPlane;
+			reticle.renderfx = renderfx;
+			trap_R_AddRefEntityToScene( &reticle );
 		}
-		VectorCopy( reticle.origin, reticle.lightingOrigin );
-		reticle.shadowPlane = shadowPlane;
-		reticle.renderfx = renderfx;
-		trap_R_AddRefEntityToScene( &reticle );
 	}
 
 	// sound
