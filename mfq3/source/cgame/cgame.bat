@@ -29,6 +29,10 @@ call ..\compile ../../game/bg_boatmove.c
 @if errorlevel 1 goto quit
 call ..\compile ../../game/bg_mfq3util.c
 @if errorlevel 1 goto quit
+call ..\compile ../../game/bg_md3util.c
+@if errorlevel 1 goto quit
+call ..\compile ../../game/bg_loadouts.c
+@if errorlevel 1 goto quit
 call ..\compile ../../ui/ui_shared.c
 @if errorlevel 1 goto quit
 

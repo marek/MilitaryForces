@@ -111,7 +111,15 @@ SOURCE=.\bg_lib.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\bg_loadouts.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\bg_lqmmove.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\bg_md3util.c
 # End Source File
 # Begin Source File
 

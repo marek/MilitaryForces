@@ -10,5 +10,7 @@ bg_lib
 bg_weapondata
 bg_vehicledata
 bg_mfq3util
+bg_md3util
+bg_loadouts
 q_math
 q_shared

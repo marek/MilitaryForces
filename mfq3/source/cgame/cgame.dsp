@@ -1,5 +1,5 @@
 # Microsoft Developer Studio Project File - Name="cgame" - Package Owner=<4>
-# Microsoft Developer Studio Generated Build File, Format Version 60000
+# Microsoft Developer Studio Generated Build File, Format Version 6.00
 # ** DO NOT EDIT **
 
 # TARGTYPE "Win32 (x86) Dynamic-Link Library" 0x0102
@@ -111,7 +111,15 @@ SOURCE=..\game\bg_lib.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\game\bg_loadouts.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\game\bg_lqmmove.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\game\bg_md3util.c
 # End Source File
 # Begin Source File
 
