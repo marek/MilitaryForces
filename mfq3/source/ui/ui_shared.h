@@ -1,5 +1,5 @@
 /*
- * $Id: ui_shared.h,v 1.5 2002-02-11 12:23:55 sparky909_uk Exp $
+ * $Id: ui_shared.h,v 1.6 2002-02-12 15:16:42 sparky909_uk Exp $
 */
 #ifndef __UI_SHARED_H
 #define __UI_SHARED_H
@@ -71,6 +71,8 @@ enum CursorEnum
 #define ID_TEAMSEL		46
 #define	ID_SPEEDUP		47
 #define	ID_BOMBCAMERA	48
+#define	ID_CYCLEMFD1	49
+#define	ID_CYCLEMFD2	50
 
 #define MAX_MENUNAME 32
 #define MAX_ITEMTEXT 64
