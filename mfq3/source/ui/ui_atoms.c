@@ -1,5 +1,5 @@
 /*
- * $Id: ui_atoms.c,v 1.4 2002-02-15 17:43:57 sparky909_uk Exp $
+ * $Id: ui_atoms.c,v 1.5 2002-02-22 16:13:12 sparky909_uk Exp $
 */
 
 /**********************************************************************
@@ -308,7 +308,6 @@ static void UI_Chat( int mode )
 	// reset & begin
 	trap_Key_SetCatcher( KEYCATCH_UI );
 	uiInfo.customChat.active = qtrue;
-	uiInfo.customChat.lifeAlpha = 1.0f;
 	uiInfo.customChat.text[0] = 0;
 	uiInfo.customChat.cindex = 0;
 	uiInfo.customChat.mode = mode;
