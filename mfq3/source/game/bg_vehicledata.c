@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.42 2002-04-16 11:28:18 thebjoern Exp $
+ * $Id: bg_vehicledata.c,v 1.43 2002-06-15 18:37:13 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -25,7 +25,7 @@ completeVehicleData_t availableVehicles[] =
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
 	HC_VAPOR,					// capabilities
-	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0,0,0,0,0,0,0,0,0,0},		// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{80, 80, 260},				// turnspeed around the three axis
@@ -74,7 +74,7 @@ completeVehicleData_t availableVehicles[] =
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
 	HC_VAPOR,					// capabilities
-	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{80, 80, 260},				// turnspeed around the three axis
@@ -123,7 +123,7 @@ completeVehicleData_t availableVehicles[] =
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
 	HC_VAPOR,					// capabilities
-	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{80, 80, 260},				// turnspeed around the three axis
@@ -172,7 +172,7 @@ completeVehicleData_t availableVehicles[] =
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
 	HC_VAPOR,					// capabilities
-	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{80, 80, 260},				// turnspeed around the three axis
@@ -221,7 +221,7 @@ completeVehicleData_t availableVehicles[] =
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
 	HC_VAPOR,					// capabilities
-	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{80, 80, 260},				// turnspeed around the three axis
@@ -270,7 +270,7 @@ completeVehicleData_t availableVehicles[] =
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
 	HC_VAPOR,					// capabilities
-	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{70, 80, 340},				// turnspeed around the three axis
@@ -319,7 +319,7 @@ completeVehicleData_t availableVehicles[] =
 	0,							// flags
 	HC_GEAR|
 	HC_VAPOR,					// capabilities
-	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{70, 80, 340},				// turnspeed around the three axis
@@ -368,7 +368,7 @@ completeVehicleData_t availableVehicles[] =
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
 	HC_VAPOR|HC_DUALGUNS,		// capabilities
-	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{70, 80, 300},				// turnspeed around the three axis
@@ -417,7 +417,7 @@ completeVehicleData_t availableVehicles[] =
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
 	HC_VAPOR|HC_DUALGUNS,		// capabilities
-	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{70, 80, 380},				// turnspeed around the three axis
@@ -466,7 +466,7 @@ completeVehicleData_t availableVehicles[] =
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
 	HC_VAPOR,					// capabilities
-	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{60, 80, 200},				// turnspeed around the three axis
@@ -515,7 +515,7 @@ completeVehicleData_t availableVehicles[] =
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
 	HC_VAPOR|HC_SWINGWING,		// capabilities
-	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{60, 80, 200},				// turnspeed around the three axis
@@ -564,7 +564,7 @@ completeVehicleData_t availableVehicles[] =
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
 	HC_VAPOR,					// capabilities
-	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{80, 80, 260},				// turnspeed around the three axis
@@ -613,7 +613,7 @@ completeVehicleData_t availableVehicles[] =
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
 	HC_VAPOR|HC_WEAPONBAY,		// capabilities
-	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{80, 80, 260},				// turnspeed around the three axis
@@ -662,7 +662,7 @@ completeVehicleData_t availableVehicles[] =
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
 	HC_VAPOR|HC_WEAPONBAY,		// capabilities
-	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{80, 80, 260},				// turnspeed around the three axis
@@ -712,7 +712,7 @@ completeVehicleData_t availableVehicles[] =
 	HC_GEAR|HC_PROP|
 	HC_TAILDRAGGER|
 	HC_DUALGUNS,				// capabilities
-	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{60, 80, 240},				// turnspeed around the three axis
@@ -762,7 +762,7 @@ completeVehicleData_t availableVehicles[] =
 	HC_GEAR|HC_PROP|
 	HC_TAILDRAGGER|
 	HC_DUALGUNS,				// capabilities
-	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{70, 80, 300},				// turnspeed around the three axis
@@ -812,7 +812,7 @@ completeVehicleData_t availableVehicles[] =
 	HC_GEAR|HC_PROP|
 	HC_TAILDRAGGER|
 	HC_DUALGUNS,				// capabilities
-	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{70, 80, 300},				// turnspeed around the three axis
@@ -862,7 +862,7 @@ completeVehicleData_t availableVehicles[] =
 	HC_GEAR|HC_PROP|
 	HC_TAILDRAGGER|
 	HC_DUALGUNS,				// capabilities
-	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{70, 80, 300},				// turnspeed around the three axis
@@ -913,7 +913,7 @@ completeVehicleData_t availableVehicles[] =
 	HC_GEAR|HC_PROP|
 	HC_TAILDRAGGER|
 	HC_WEAPONBAY,				// capabilities
-	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{40, 50, 120},				// turnspeed around the three axis
@@ -963,7 +963,7 @@ completeVehicleData_t availableVehicles[] =
 	HC_PROP|
 	HC_TAILDRAGGER|
 	HC_DUALGUNS,				// capabilities
-	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{70, 80, 320},				// turnspeed around the three axis
@@ -1013,7 +1013,7 @@ completeVehicleData_t availableVehicles[] =
 	HC_PROP|
 	HC_TAILDRAGGER|
 	HC_DUALGUNS,				// capabilities
-	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{60, 70, 260},				// turnspeed around the three axis
@@ -1065,7 +1065,7 @@ completeVehicleData_t availableVehicles[] =
 	CLASS_GROUND_MBT,
 	0,							// flags
 	0,							// capabilities
-	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{50, 100, 100},				// turnspeed around the three axis
@@ -1113,7 +1113,7 @@ completeVehicleData_t availableVehicles[] =
 	CLASS_GROUND_MBT,
 	0,							// flags
 	0,							// capabilities
-	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{50, 100, 100},				// turnspeed around the three axis
@@ -1161,7 +1161,7 @@ completeVehicleData_t availableVehicles[] =
 	CLASS_GROUND_RECON,
 	0,							// flags
 	HC_DUALGUNS|HC_AMPHIBIOUS,				// capabilities
-	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{50, 100, 100},				// turnspeed around the three axis
@@ -1209,7 +1209,7 @@ completeVehicleData_t availableVehicles[] =
 	CLASS_GROUND_RECON,
 	0,							// flags
 	HC_WHEELS,					// capabilities
-	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{50, 100, 100},				// turnspeed around the three axis
@@ -1257,7 +1257,7 @@ completeVehicleData_t availableVehicles[] =
 	CLASS_GROUND_RECON,
 	0,							// flags
 	HC_DUALGUNS|HC_AMPHIBIOUS|HC_WHEELS,	// capabilities
-	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{50, 100, 100},				// turnspeed around the three axis
@@ -1305,7 +1305,7 @@ completeVehicleData_t availableVehicles[] =
 	CLASS_GROUND_MBT,
 	0,							// flags
 	0,							// capabilities
-	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{50, 100, 100},				// turnspeed around the three axis
@@ -1357,7 +1357,7 @@ completeVehicleData_t availableVehicles[] =
 	CLASS_BOAT_PATROL,
 	0,							// flags
 	HC_DUALGUNS,				// capabilities
-	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{50, 100, 20},				// turnspeed around the three axis
@@ -1397,6 +1397,32 @@ completeVehicleData_t availableVehicles[] =
 };
 
 int bg_numberOfVehicles = sizeof(availableVehicles) / sizeof(availableVehicles[0]);
+
+// just contains data of all the available vehicles
+groundInstallationData_t availableGroundInstallations[] = 
+{
+    {	"SAM",					// descriptiveName
+	"SAM",						// tinyName
+	"f-16",						// modelName
+	MF_GAMESET_MODERN,			// gameset
+	{0,0,0,0,0,0,0,0,0,0},		// handles - SET AUTOMATICALLY
+	{-10, -10, -10},					// mins (bounding box)
+	{10, 10, 10},					// max (bounding box)
+	{80, 80, 260},				// turnspeed around the three axis
+	120,						// health
+	WI_MG_20MM,					// weapon
+	450,						// ammo
+	12000,						// radar range
+	9000,						// radar range ground
+	0,							// trackcone
+	-1							// trackcone ground
+    },
+
+};
+
+int bg_numberOfGroundInstallations = sizeof(availableGroundInstallations) / 
+								sizeof(availableGroundInstallations[0]);
+
 
 const char *gameset_items[MF_MAX_GAMESETS+1] =
 {

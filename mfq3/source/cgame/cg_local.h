@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.51 2002-06-13 20:08:13 thebjoern Exp $
+ * $Id: cg_local.h,v 1.52 2002-06-15 18:37:13 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -863,6 +863,7 @@ typedef struct {
 typedef struct {
 	qboolean		active;
 	qboolean		selected;
+	qboolean		groundInstallation;
 	int				vehidx;
 	vec3_t			angles;
 	vec3_t			origin;
@@ -1441,6 +1442,7 @@ void CG_CheckChangedPredictableEvents( playerState_t *ps );
 // cg_missioneditor.c
 //
 void ME_SpawnVehicle( int idx );
+void ME_SpawnGroundInstallation( int idx );
 void CG_Draw_IGME();
 void ME_KeyEvent(int key, qboolean down);
 void ME_MouseEvent(int x, int y);

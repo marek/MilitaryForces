@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.94 2002-06-13 20:08:13 thebjoern Exp $
+ * $Id: bg_public.h,v 1.95 2002-06-15 18:37:13 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.72"
+#define	GAME_VERSION		"mfq3 v0.72b"
 #define	GAME_IDENTIFIER		"mfq3"			// use to identify mfq3 servers
 
 #define	DEFAULT_GRAVITY		800
@@ -668,6 +668,13 @@ extern const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1];
 #define BP_BOAT_GUNBARREL4		8
 #define BP_BOAT_MAX_PARTS		9
 
+// ground installations
+#define BP_GI_BODY				0
+#define BP_GI_TURRET			1
+#define BP_GI_GUNBARREL			2
+#define BP_GI_MAX_PARTS			3
+
+
 // total max parts (no cat may exceed this!)
 #define BP_MAX_PARTS			10
 
@@ -806,6 +813,32 @@ typedef enum {
 // weaponflags
 #define	WF_NONE						0
 #define WF_HAS_FIRE_FRAME			1		// for missiles
+
+// list of ground installations
+typedef struct groundInstallationData_s
+{
+    char		    *descriptiveName;	// long descriptive name
+	char			*tinyName;			// small ident name
+    char		    *modelName;			// just the directory of the model
+	unsigned int	gameset;		// gameset 
+    qhandle_t	    handle[BP_MAX_PARTS];// ditto
+    vec3_t		    mins;
+    vec3_t		    maxs;
+    vec3_t		    turnspeed;	    // how fast can it turn around the three axis
+    unsigned int    maxhealth;	    // health
+	unsigned int	weapon;
+	unsigned int	ammo;
+	unsigned int	radarRange;		// how far goes the radar AIR
+	unsigned int	radarRange2;	// how far goes the radar GV
+	float			trackCone;		// how can radar track it
+	float			trackCone2;		// how can ground radar track it
+} groundInstallationData_t;
+
+extern groundInstallationData_t availableGroundInstallations[];
+
+// number of available vehicles
+extern int bg_numberOfGroundInstallations;
+
 
 // list of weapons
 typedef struct completeWeaponData_s
