@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.33 2002-02-18 09:51:27 thebjoern Exp $
+ * $Id: cg_local.h,v 1.34 2002-02-18 16:30:45 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -588,6 +588,7 @@ typedef struct {
 	qboolean		drawingMFD;
 	reticle_t		HUDReticle[ MAX_RETICLES ];
 	int				reticleIdx;
+	chat_t			*pCustomChat;	// custom chat data block
 } cg_t;
 
 
@@ -1085,7 +1086,7 @@ void CG_ZoomDown_f( void );
 void CG_ZoomUp_f( void );
 void CG_AddBufferedSound( sfxHandle_t sfx);
 void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demoPlayback );
-qboolean CG_WorldToScreenCoords( vec3_t worldPoint, int * pX, int * pY );
+qboolean CG_WorldToScreenCoords( vec3_t worldPoint, int * pX, int * pY, qboolean virtualXY );
 
 //
 // cg_drawtools.c

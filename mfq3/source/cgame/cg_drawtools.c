@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawtools.c,v 1.8 2002-02-18 09:51:27 thebjoern Exp $
+ * $Id: cg_drawtools.c,v 1.9 2002-02-18 16:30:45 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -754,7 +754,7 @@ Uses polygons to alpha blend a shadow texture onto the terrain
 int CG_GetVehicleShadowShader( int vehicle )
 {
 	int			shaderIndex = -1;
-	qhandle_t	shaderHandle = -1;
+	qhandle_t	shaderHandle = 0;
 
 	// no shadow shader specfied?
 	if( availableVehicles[ vehicle ].shadowShader == SHADOW_NONE )
@@ -1140,7 +1140,7 @@ void CG_AddReticleEntityToScene( refEntity_t * pReticle, qboolean targetRecticle
 		trap_R_AddRefEntityToScene( pRecticle );
 #else
 		// if HUD image
-		if( CG_WorldToScreenCoords( pReticle->origin, &cg.HUDReticle[cg.reticleIdx].x, &cg.HUDReticle[cg.reticleIdx].y ) )
+		if( CG_WorldToScreenCoords( pReticle->origin, &cg.HUDReticle[cg.reticleIdx].x, &cg.HUDReticle[cg.reticleIdx].y, qtrue ) )
 		{
 			// apply centering offset
 			cg.HUDReticle[cg.reticleIdx].x -= offsetx;

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_consolecmds.c,v 1.15 2002-02-15 18:10:33 sparky909_uk Exp $
+ * $Id: cg_consolecmds.c,v 1.16 2002-02-18 16:30:45 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -496,6 +496,19 @@ static void CG_TestGV_f( void ) {
 	CG_TestVehicle(CAT_GROUND);
 }
 
+/*
+=================
+CG_Assign_Custom_Chat_Ptr_f
+
+Accept the address of the custom chat data block from the UI  
+=================
+*/
+
+void CG_Assign_Custom_Chat_Ptr_f( void )
+{
+	// 2nd parameter is the physical address for the pointer (i.e. <ptrname> <address>)
+	cg.pCustomChat = (chat_t *) atoi( CG_Argv(1) );
+}
 
 typedef struct {
 	char	*cmd;
@@ -555,9 +568,9 @@ static consoleCommand_t	commands[] = {
 	{ "toggle_mfd1", CG_Toggle_MFD1_f },
 	{ "toggle_mfd2", CG_Toggle_MFD2_f },
 	{ "update_hud_color", CG_Update_HUD_Color_f },
-	{ "update_mfd_color", CG_Update_MFD_Color_f }
+	{ "update_mfd_color", CG_Update_MFD_Color_f },
+	{ "custom_chat_ptr", CG_Assign_Custom_Chat_Ptr_f }
 };
-
 
 /*
 =================
