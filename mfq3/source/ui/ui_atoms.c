@@ -1,5 +1,5 @@
 /*
- * $Id: ui_atoms.c,v 1.2 2002-01-19 02:24:03 thebjoern Exp $
+ * $Id: ui_atoms.c,v 1.3 2002-01-23 18:47:22 sparky909_uk Exp $
 */
 
 /**********************************************************************
@@ -359,6 +359,39 @@ qboolean UI_ConsoleCommand( int realTime ) {
 		//UI_CDKeyMenu_f();
 		return qtrue;
 	}
+
+	// MFQ3: bring up the 'team selection' dialog (i.e. bind command to key)
+	if( Q_stricmp (cmd, "teamselect") == 0 ) 
+	{
+		trap_Cvar_Set( "cl_paused", "1" );
+		trap_Key_SetCatcher( KEYCATCH_UI );
+		Menus_CloseAll();
+
+		Menus_ActivateByName( "ingame_select_team" );
+
+		return qtrue;
+	}
+
+	// MFQ3: bring up the 'vehicle selection' dialog (i.e. bind command to key)
+	if( Q_stricmp (cmd, "vehicleselect") == 0 ) 
+	{
+		trap_Cvar_Set( "cl_paused", "1" );
+		trap_Key_SetCatcher( KEYCATCH_UI );
+		Menus_CloseAll();
+
+		Menus_ActivateByName( "ingame_select_vehicle" );
+
+		return qtrue;
+	}
+/* MFQ3: TODO - MM
+
+	// MFQ3: bring up the 'vehicle encyclopedia' dialog (i.e. bind command to key)
+	if( Q_stricmp (cmd, "encyclopedia") == 0 )
+	{
+		UI_EncyclopediaMenu();
+		return qtrue;
+	}
+*/
 
 	return qfalse;
 }

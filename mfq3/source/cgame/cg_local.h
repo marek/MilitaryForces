@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.9 2002-01-22 22:29:30 thebjoern Exp $
+ * $Id: cg_local.h,v 1.10 2002-01-23 18:46:15 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -425,6 +425,10 @@ typedef struct {
 	int			zoomTime;
 	float		zoomSensitivity;
 
+	// speed up key
+	qboolean	speedup;
+	float		speedupamount;
+
 	// information screen text during loading
 	char		infoScreenText[MAX_STRING_CHARS];
 
@@ -702,7 +706,7 @@ typedef struct {
 	sfxHandle_t engineJet;
 	sfxHandle_t	engineJetAB;
 	sfxHandle_t engineProp;
-	sfxHandle_t planeDeath;
+	sfxHandle_t planeDeath[NUM_EXPLOSION_SOUNDS];
 	sfxHandle_t engineTank[NUM_TANKSOUNDS];
 	
 } cgMedia_t;
@@ -913,7 +917,7 @@ void CG_RankRunFrame( void );
 void CG_SetScoreSelection(void *menu);
 score_t *CG_GetSelectedScore();
 void CG_BuildSpectatorString();
-
+float CG_Cvar_Get( const char * cvar );
 
 //
 // cg_testmodel.c

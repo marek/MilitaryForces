@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.22 2002-01-22 22:29:30 thebjoern Exp $
+ * $Id: bg_public.h,v 1.23 2002-01-23 18:49:20 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -469,8 +469,9 @@ qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTim
 // MFQ3 globals
 // (everything below)
 
-// number of sounds for tanks
+// number of sounds for things
 #define NUM_TANKSOUNDS			9
+#define NUM_EXPLOSION_SOUNDS	4
 
 // modelname strings
 #define MF_MAX_MODELNAME		128
@@ -479,9 +480,6 @@ qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTim
 #define MF_MAX_TEAMS			8
 #define MF_MAX_CATEGORIES		8
 #define MF_MAX_CLASSES			8
-
-void MF_SetGameset(unsigned long gs);
-unsigned long MF_GetGameset(void);
 
 // NOTE:	The id of a vehice is made of 32 bit:
 //			8 bit 0x0000000f are the class  (8 possibilities)
@@ -589,7 +587,8 @@ extern const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1];
 // list of vehicles (data)
 typedef struct completeVehicleData_s
 {
-    char		    *descriptiveName;
+    char		    *descriptiveName;	// long descriptive name
+	char			*tinyName;			// small ident name
     char		    *modelName;		// just the directory of the model
     unsigned long   id;				// gameset, team, cat and class
 	unsigned int	flags;			// special flags
@@ -618,8 +617,7 @@ typedef struct completeVehicleData_s
 	unsigned int	radarRange2;	// how far goes the radar GV
 	float			swingangle;		// for swing wings
 	unsigned int	renderFlags;	// special stuff for rendering only
-}completeVehicleData_t;	
-
+}completeVehicleData_t;
 
 extern completeVehicleData_t availableVehicles[];
 
@@ -705,9 +703,12 @@ typedef enum
 	WI_MAX
 }weaponIndex_t;
 
+void MF_SetGameset(unsigned long gs);
+unsigned long MF_GetGameset(void);
 extern int MF_getIndexOfVehicle( int start, unsigned long what);
 int MF_getItemIndexFromHex(int hexValue);
 int MF_getNumberOfItems(const char **itemlist);
+char * MF_CreateModelPathname( int vehicle, char * pFormatString );
 
 #define MF_THROTTLE_IDLE		0
 #define MF_THROTTLE_MILITARY	10

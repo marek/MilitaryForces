@@ -1,5 +1,5 @@
 /*
- * $Id: cg_weapons.c,v 1.4 2002-01-07 00:06:02 thebjoern Exp $
+ * $Id: cg_weapons.c,v 1.5 2002-01-23 18:46:15 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -45,7 +45,9 @@ void CG_RegisterWeapons() {
 	gitem_t			*ammo;
 	int				i;
 
-	for( i = 0; i < WI_MAX; i++ ) {
+	// for all weapon indexes in cg_weapons[]
+	for( i = 0; i < WI_MAX; i++ )
+	{
 		weaponInfo = &cg_weapons[i];
 		memset( weaponInfo, 0, sizeof( *weaponInfo ) );
 		weaponInfo->registered = qtrue;
@@ -66,14 +68,28 @@ void CG_RegisterWeapons() {
 		case WT_ANTIGROUNDMISSILE:
 		case WT_ANTIRADARMISSILE:
 			weaponInfo->missileModel = trap_R_RegisterModel( availableWeapons[i].modelName );
-			weaponInfo->missileSound = trap_S_RegisterSound( "sound/weapons/rocket/rockfly.wav", qfalse );
+			
+			// MFQ3: new sound
+			weaponInfo->missileSound = trap_S_RegisterSound( "sound/weapons/rocket/rocketFly1.wav", qfalse );
+			if( !weaponInfo->missileSound )
+			{
+				// MFQ3: old quake3 sound (backup)
+				weaponInfo->missileSound = trap_S_RegisterSound( "sound/weapons/rocket/rockfly.wav", qfalse );
+			}
+
 			weaponInfo->missileTrailFunc = CG_FFARTrail;
 			weaponInfo->missileDlight = 200;
 			
 			MAKERGB( weaponInfo->missileDlightColor, 1, 0.75f, 0 );
 			MAKERGB( weaponInfo->flashDlightColor, 1, 0.75f, 0 );
 
-			weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/rocket/rocklf1a.wav", qfalse );
+			// MFQ3: new sound
+			weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/rocket/rocketFire1.wav", qfalse );
+			if( !weaponInfo->flashSound[0] )
+			{
+				// MFQ3: old quake3 sound (backup)
+				weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/rocket/rocklf1a.wav", qfalse );
+			}
 			cgs.media.rocketExplosionShader = trap_R_RegisterShader( "rocketExplosion" );
 			break;
 
@@ -88,10 +104,45 @@ void CG_RegisterWeapons() {
 
 		case WT_MACHINEGUN:
 	//		MAKERGB( weaponInfo->flashDlightColor, 1, 1, 0 );
-			weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/machinegun/machgf1b.wav", qfalse );
-			weaponInfo->flashSound[1] = trap_S_RegisterSound( "sound/weapons/machinegun/machgf2b.wav", qfalse );
-			weaponInfo->flashSound[2] = trap_S_RegisterSound( "sound/weapons/machinegun/machgf3b.wav", qfalse );
-			weaponInfo->flashSound[3] = trap_S_RegisterSound( "sound/weapons/machinegun/machgf4b.wav", qfalse );
+
+			// MFQ3: new sounds
+			switch( i )
+			{
+			case WI_MG_2XCAL303:
+			case WI_MG_2XCAL312:
+			case WI_MG_8XCAL50:
+			case WI_MG_6XCAL50:
+				// olden sound
+				weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/machinegun/machineGun2.wav", qfalse );
+				break;
+
+			case WI_MG_12_7MM:
+			case WI_MG_14_5MM:
+				// modern sound (noisey)
+				weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/machinegun/machineGun3.wav", qfalse );
+				break;
+
+			case WI_MG_20MM:
+			default:
+				// modern sound (silenced)
+				weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/machinegun/machineGun1.wav", qfalse );
+				break;
+			}
+
+			// don't bother with multiple bullet noises for now
+			weaponInfo->flashSound[1] = weaponInfo->flashSound[0];
+			weaponInfo->flashSound[2] = weaponInfo->flashSound[0];
+			weaponInfo->flashSound[3] = weaponInfo->flashSound[0];
+
+			// MFQ3: old quake3 sounds (backup)
+			if( !weaponInfo->flashSound[0] )
+			{
+				weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/machinegun/machgf1b.wav", qfalse );
+				weaponInfo->flashSound[1] = trap_S_RegisterSound( "sound/weapons/machinegun/machgf2b.wav", qfalse );
+				weaponInfo->flashSound[2] = trap_S_RegisterSound( "sound/weapons/machinegun/machgf3b.wav", qfalse );
+				weaponInfo->flashSound[3] = trap_S_RegisterSound( "sound/weapons/machinegun/machgf4b.wav", qfalse );
+			}
+
 			cgs.media.bulletExplosionShader = trap_R_RegisterShader( "bulletExplosion" );
 			break;
 
@@ -253,28 +304,46 @@ CG_FireWeapon
 Caused by an EV_FIRE_MG event
 ================
 */
-void CG_FireMachinegun( centity_t *cent ) {
-	entityState_t *ent;
-	int				c;
-	weaponInfo_t	*weap;
+void CG_FireMachinegun( centity_t *cent )
+{
+	entityState_t * ent;
+	weaponInfo_t * weap;
+	int c = -1;
 
+	// get the current entity state and weapon info
 	ent = &cent->currentState;
-	weap = &cg_weapons[WI_MG_20MM];
+
+/* awaiting fixes to the way the machine gun is hacked in
+	weap = &cg_weapons[ ent->weaponIndex ];
+*/
+	weap = &cg_weapons[ WI_MG_20MM ];
 
 	// mark the entity as muzzle flashing, so when it is added it will
 	// append the flash to the weapon model
 	cent->muzzleFlashTime = cg.time;
 
 	// play a sound
-	for ( c = 0 ; c < 4 ; c++ ) {
-		if ( !weap->flashSound[c] ) {
+
+	// find out how many sounds are available
+	for ( c = 0 ; c < 4 ; c++ )
+	{
+		// NOT available?
+		if ( !weap->flashSound[c] )
+		{
 			break;
 		}
 	}
-	if ( c > 0 ) {
+
+	// got something to play?
+	if ( c > 0 )
+	{
+		// random index of count
 		c = rand() % c;
+
+		// final check
 		if ( weap->flashSound[c] )
 		{
+			// play
 			trap_S_StartSound( NULL, ent->number, CHAN_WEAPON, weap->flashSound[c] );
 		}
 	}
@@ -453,6 +522,7 @@ CG_VehicleExplosion
 void CG_VehicleExplosion( vec3_t origin, int type ) {
 	localEntity_t	*le;
 	vec3_t			up = {0, 0, 1};
+	int soundIdx = -1;
 
 	// explosion effect for both
 	le = CG_MakeExplosion( origin, 
@@ -477,7 +547,10 @@ void CG_VehicleExplosion( vec3_t origin, int type ) {
 					  cgs.media.smokePuffShader );
 		smoke->leType = LE_MOVE_SCALE_FADE;
 	}
-	trap_S_StartSound( origin, ENTITYNUM_WORLD, CHAN_AUTO, cgs.media.planeDeath );
+
+	// play 1 of x explosion sounds
+	soundIdx = rand() % NUM_EXPLOSION_SOUNDS;
+	trap_S_StartSound( origin, ENTITYNUM_WORLD, CHAN_AUTO, cgs.media.planeDeath[ soundIdx ] );
 }
 
 /*

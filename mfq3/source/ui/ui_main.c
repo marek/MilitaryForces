@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.3 2002-01-19 02:24:03 thebjoern Exp $
+ * $Id: ui_main.c,v 1.4 2002-01-23 18:47:22 sparky909_uk Exp $
 */
 /*
 =======================================================================
@@ -596,6 +596,59 @@ void UI_DrawCenteredPic(qhandle_t image, int w, int h) {
   UI_DrawHandlePic(x, y, w, h, image);
 }
 
+/*
+=================
+UI_DrawMouse
+=================
+*/
+void UI_DrawMouse( void )
+{
+	// server info structure
+	uiClientState_t	cstate;
+
+	qhandle_t cursorHandle = -1;
+	int offsetX = 0;
+	int offsetY = 0;
+
+	// get client information
+	trap_GetClientState( &cstate );
+
+	UI_SetColor( NULL );
+
+	// select cursor to draw
+	switch( uiInfo.uiDC.cursorEnum )
+	{
+	default:
+	case CURSOR_NORMAL:
+		cursorHandle = uiInfo.uiDC.Assets.cursor;
+		offsetX = 0;
+		offsetY = 0;
+		break;
+
+	case CURSOR_WAIT:
+		cursorHandle = uiInfo.uiDC.Assets.cursorWait;
+		offsetX = -7;
+		offsetY = -12;
+		break;
+	}
+
+	// draw cursor (not during loading)
+	if( Menu_Count() > 0 && cstate.connState != CA_LOADING )
+	{
+		UI_DrawHandlePic( uiInfo.uiDC.cursorx + offsetX, uiInfo.uiDC.cursory + offsetY, 32, 32, cursorHandle );
+	}
+
+#ifndef NDEBUG
+/*
+	if (uiInfo.uiDC.debug)
+	{
+		// cursor coordinates
+		UI_DrawString( 0, 0, va("(%d,%d)",uis.cursorx,uis.cursory), UI_LEFT|UI_SMALLFONT, colorRed );
+	}
+*/
+#endif
+}
+
 int frameCount = 0;
 int startTime;
 
@@ -609,16 +662,12 @@ _UI_Refresh
 void _UI_Refresh( int realtime )
 {
 	static int index;
-	static int	previousTimes[UI_FPS_FRAMES];
-
-	// server info structure
-	uiClientState_t	cstate;
+	static int previousTimes[UI_FPS_FRAMES];
 /*
 	if ( !( trap_Key_GetCatcher() & KEYCATCH_UI ) ) {
 		return;
 	}
 */
-
 	uiInfo.uiDC.frameTime = realtime - uiInfo.uiDC.realTime;
 	uiInfo.uiDC.realTime = realtime;
 
@@ -649,28 +698,9 @@ void _UI_Refresh( int realtime )
 		// refresh find player list
 		UI_BuildFindPlayerList(qfalse);
 	} 
-	
-	// get client information
-	trap_GetClientState( &cstate );
 
-	UI_SetColor( NULL );
-
-	// draw cursor (not during loading)
-	if( Menu_Count() > 0 && cstate.connState != CA_LOADING )
-	{
-		UI_DrawHandlePic( uiInfo.uiDC.cursorx, uiInfo.uiDC.cursory, 32, 32, uiInfo.uiDC.Assets.cursor);
-	}
-
-#ifndef NDEBUG
-/*
-	if (uiInfo.uiDC.debug)
-	{
-		// cursor coordinates
-		UI_DrawString( 0, 0, va("(%d,%d)",uis.cursorx,uis.cursory), UI_LEFT|UI_SMALLFONT, colorRed );
-	}
-*/
-#endif
-
+	// render the mouse cursor
+	UI_DrawMouse();
 }
 
 /*
@@ -805,10 +835,18 @@ qboolean Asset_Parse(int handle) {
 		}
 
 		if (Q_stricmp(token.string, "cursor") == 0) {
-			if (!PC_String_Parse(handle, &uiInfo.uiDC.Assets.cursorStr)) {
+			if (!PC_String_Parse(handle, &uiInfo.uiDC.Assets.cursorStr )) {
 				return qfalse;
 			}
-			uiInfo.uiDC.Assets.cursor = trap_R_RegisterShaderNoMip( uiInfo.uiDC.Assets.cursorStr);
+			uiInfo.uiDC.Assets.cursor = trap_R_RegisterShaderNoMip( uiInfo.uiDC.Assets.cursorStr );
+			continue;
+		}
+
+		if (Q_stricmp(token.string, "cursorWait") == 0) {
+			if (!PC_String_Parse(handle, &uiInfo.uiDC.Assets.cursorStrWait )) {
+				return qfalse;
+			}
+			uiInfo.uiDC.Assets.cursorWait = trap_R_RegisterShaderNoMip( uiInfo.uiDC.Assets.cursorStrWait );
 			continue;
 		}
 
@@ -1918,6 +1956,7 @@ UI_DrawVehiclePreview
 static void UI_DrawVehiclePreview( rectDef_t *rect, float scale, vec4_t color, int textStyle )
 {
 #if 0
+	// * EXPERIMENTAL MODEL RATHER THAN PICTURE CODE *
 	refdef_t		refdef;
 	refEntity_t		plane;
 	vec3_t			origin;
@@ -1980,11 +2019,10 @@ static void UI_DrawVehiclePreview( rectDef_t *rect, float scale, vec4_t color, i
 	Text_Paint(rect->x, rect->y, scale, color, "Waiting for new key... Press ESCAPE to cancel", 0, 0, textStyle);
 */
 #else
+	// DRAW VEHICLE ICON CODE
 	int vehicle = -1;
 	char * dir = NULL;
 	char * pIconString = NULL;
-	unsigned long cat = 0;
-	char catDir[32];
 	static qhandle_t pictureHandle = -1;
 	static int lastVehicle = -1;
 
@@ -1994,24 +2032,12 @@ static void UI_DrawVehiclePreview( rectDef_t *rect, float scale, vec4_t color, i
 	// valid?
 	if( vehicle >= 0 && vehicle < bg_numberOfVehicles )
 	{
-		cat = availableVehicles[ vehicle ].id & CAT_ANY;
-		if( cat & CAT_PLANE ) {
-			strcpy( catDir, "planes" );
-		}
-		else if( cat & CAT_GROUND ) {
-			strcpy( catDir, "ground" );
-		}
-/*
-		trap_R_RegisterShaderNoMip( va("models/vehicles/%s/%s/%s_icon", dir, availableVehicles[i].modelName,
-		availableVehicles[i].modelName ) );
-*/
-		// create filename string
-		pIconString = va( "models/vehicles/%s/%s/%s_icon", catDir,
-						   availableVehicles[ vehicle ].modelName, availableVehicles[ vehicle ].modelName );
-
-		// register shader?
+		// register different shader? (only do this on change)
 		if( pictureHandle == -1 || (lastVehicle != vehicle) )
 		{
+			// create filename string
+			pIconString = MF_CreateModelPathname( vehicle, "models/vehicles/%s/%s/%s_icon" );
+
 			pictureHandle = trap_R_RegisterShaderNoMip( pIconString );
 		}
 
@@ -2023,8 +2049,7 @@ static void UI_DrawVehiclePreview( rectDef_t *rect, float scale, vec4_t color, i
 	}
 	else
 	{
-		// invalid vehicle
-
+		// invalid vehicle draw nothing
 	}
 
 #endif
@@ -3276,7 +3301,7 @@ tryClassAgain:
 	// add components (in LB -> HB order in DWORD)
 	what |= (1 << vehicleClass);		// (convert from enum)
 	what |= (1 << vehicleCat) << 8;		// (convert from enum)
-	what |= MF_TEAM_ANY;
+	what |= MF_UI_GetTeam();
 	what |= gameset;
 
 	// check
@@ -3369,6 +3394,29 @@ static void UI_SelectVehicle( void )
 
 	// set into the trigger index
 	trap_Cvar_Set( "cg_nextVehicle", va( "%d", idx ));	
+}
+
+/*
+=================
+UI_PrecacheVehiclePreview
+=================
+*/
+
+// simply does a trap_R_RegisterShaderNoMip() for all our icons
+static void UI_PrecacheVehiclePreview( void )
+{
+	char * pIconString = NULL;
+	int i = 0;
+
+	// for all icons
+	for( i = 0; i < bg_numberOfVehicles; i++ )
+	{
+		// create filename string
+		pIconString = MF_CreateModelPathname( i, "models/vehicles/%s/%s/%s_icon" );
+
+		// precache
+		trap_R_RegisterShaderNoMip( pIconString );
+	}
 }
 
 /*
@@ -3769,6 +3817,16 @@ static void UI_RunMenuScript(char **args) {
 			{
 				UI_CycleVehicleSelect( cycleIdx );
 			}
+		}
+		else if( Q_stricmp(name, "precacheVehicleIcons") == 0 )
+		{
+			// MFQ3: precache vehicle icons
+			UI_PrecacheVehiclePreview();
+		}
+		else if( Q_stricmp(name, "normalCursor") == 0 )
+		{
+			// reset cursor
+			uiInfo.uiDC.cursorEnum = CURSOR_NORMAL;
 		}
 		else
 		{
@@ -4394,56 +4452,93 @@ static void UI_BuildFindPlayerList(qboolean force) {
 UI_BuildServerStatus
 ==================
 */
-static void UI_BuildServerStatus(qboolean force) {
-	
-	
+static void UI_BuildServerStatus(qboolean force)
+{
 	uiClientState_t	cstate;	// server info structure
-	char * pAddressName = NULL;
 
-	if (uiInfo.nextFindPlayerRefresh) {
+	static char * pAddressName = NULL;	// server address
+	static qboolean pending = qfalse;	// pending flag
+
+	if( uiInfo.nextFindPlayerRefresh )
+	{
 		return;
 	}
-	if (!force) {
-		if (!uiInfo.nextServerStatusRefresh || uiInfo.nextServerStatusRefresh > uiInfo.uiDC.realTime) {
+	
+	// not forced?
+	if( !force ) 
+	{
+		// still waiting?
+		if( !uiInfo.nextServerStatusRefresh || uiInfo.nextServerStatusRefresh > uiInfo.uiDC.realTime )
+		{
 			return;
 		}
 	}
-	else {
+	else
+	{
+		// set feeder
 		Menu_SetFeederSelection(NULL, FEEDER_SERVERSTATUS, 0, NULL);
 		uiInfo.serverStatusInfo.numLines = 0;
+		
 		// reset all server status requests
 		trap_LAN_ServerStatus( NULL, NULL, 0);
 	}
 
 	// normal case
-	pAddressName = uiInfo.serverStatusAddress;
-
-	// if the variable cl_paused == 1, then we assume that the feeder is for the
-	// current server (that the client is connected to) and the request is of in-game origin
-	if( trap_Cvar_VariableValue( "cl_paused" ) == 1 )
+	if( !pending )
 	{
-		// special case: in game popup
-
-		// get client information
-		trap_GetClientState( &cstate );
-
-		// use the known server address
-		pAddressName = cstate.servername;
+		pAddressName = uiInfo.serverStatusAddress;
 	}
-	else
+
+	// NOT already a request pended?
+	if( !pending )
 	{
-		// normal case: front end UI
-		if (uiInfo.serverStatus.currentServer < 0 || uiInfo.serverStatus.currentServer > uiInfo.serverStatus.numDisplayServers || uiInfo.serverStatus.numDisplayServers == 0) {
+		// if the variable cl_paused == 1, then we assume that the feeder is for the
+		// current server (that the client is connected to) and the request is of in-game origin
+		if( trap_Cvar_VariableValue( "cl_paused" ) == 1 )
+		{
+			// special case: in game popup
+
+			// change to the wait cursor
+			uiInfo.uiDC.cursorEnum = CURSOR_WAIT;
+			UI_DrawMouse();
+
+			// get client information
+			trap_GetClientState( &cstate );
+
+			// use the known server address
+			pAddressName = cstate.servername;
+
+			// do refresh in 50ms
+			uiInfo.nextServerStatusRefresh = uiInfo.uiDC.realTime + 50;
+
+			// pend it (don't do it immediatley)
+			pending = qtrue;
+
 			return;
+		}
+		else
+		{
+			// normal case: front end UI
+			if (uiInfo.serverStatus.currentServer < 0 || uiInfo.serverStatus.currentServer > uiInfo.serverStatus.numDisplayServers || uiInfo.serverStatus.numDisplayServers == 0)
+			{
+				return;
+			}
 		}
 	}
 
 	// get information
-	if (UI_GetServerStatusInfo( pAddressName, &uiInfo.serverStatusInfo ) ) {
+	if( UI_GetServerStatusInfo( pAddressName, &uiInfo.serverStatusInfo ) )
+	{
+		// reset pend
+		pending = qfalse;
+
+		// ready so do
 		uiInfo.nextServerStatusRefresh = 0;
 		UI_GetServerStatusInfo( uiInfo.serverStatusAddress, NULL );
 	}
-	else {
+	else
+	{
+		// try again in 500ms
 		uiInfo.nextServerStatusRefresh = uiInfo.uiDC.realTime + 500;
 	}
 }
@@ -4617,6 +4712,10 @@ static const char *UI_FeederItemText(float feederID, int index, int column, qhan
 	} else if (feederID == FEEDER_SERVERSTATUS) {
 		if ( index >= 0 && index < uiInfo.serverStatusInfo.numLines ) {
 			if ( column >= 0 && column < 4 ) {
+
+				// make sure cursor is reset when we have finished
+				uiInfo.uiDC.cursorEnum = CURSOR_NORMAL;
+
 				return uiInfo.serverStatusInfo.lines[index][column];
 			}
 		}
@@ -5369,8 +5468,9 @@ void _UI_Init( qboolean inGameLoad ) {
 
 	String_Init();
   
-	uiInfo.uiDC.cursor	= trap_R_RegisterShaderNoMip( "menu/art/3_cursor2" );
 	uiInfo.uiDC.whiteShader = trap_R_RegisterShaderNoMip( "white" );
+	uiInfo.uiDC.cursor	= trap_R_RegisterShaderNoMip( "menu/art/cursor" );
+	uiInfo.uiDC.cursorEnum = CURSOR_NORMAL;
 
 	AssetCache();
 

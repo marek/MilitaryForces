@@ -1,5 +1,5 @@
 /*
- * $Id: cg_draw.c,v 1.8 2002-01-22 22:29:30 thebjoern Exp $
+ * $Id: cg_draw.c,v 1.9 2002-01-23 18:46:15 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1654,7 +1654,11 @@ static void CG_DrawUpperLeft( void )
 	fillRect.y = 0;
 	fillRect.w = 640;
 	fillRect.h = 48;
+
+/*
+	// NOTE: make this activatable by a cg_x variable - MM
 	VerticalGradient_Paint( &fillRect, *CG_CreateColour( 0, 0, 1, 0.50f ) );
+*/
 }
 
 #endif
@@ -2493,7 +2497,7 @@ CG_DrawSpectator
 static void CG_DrawSpectator(void) {
 
 #ifdef _MENU_SCOREBOARD
-	// this is where we load the script
+	// this is where we load the spectator menu script
 	if( menuSpectator == NULL)
 	{
 		menuSpectator = Menus_FindByName("spectator_menu");
@@ -2502,6 +2506,28 @@ static void CG_DrawSpectator(void) {
 	// spectator menu loaded?
 	if( menuSpectator )
 	{
+		// decide what to place into the three textual placeholders in the spectator menu
+		
+		// still a spectator?
+		if( cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR )
+		{
+			trap_Cvar_Set( "ui_spectatorTitleTxt", "Spectator" );
+			trap_Cvar_Set( "ui_spectatorLine1Txt", "Press FIRE to switch view." );
+			
+			// team game?
+			if ( cgs.gametype >= GT_TEAM )
+				trap_Cvar_Set( "ui_spectatorLine2Txt", "Choose a team from the 'Team' dialog to play." );
+			else
+				trap_Cvar_Set( "ui_spectatorLine2Txt", "Select 'Join' from the 'Team' dialog to play." );
+		}
+		else
+		{
+			// we have a team (or don't need one) but no vehicle
+			trap_Cvar_Set( "ui_spectatorTitleTxt", "Limbo" );
+			trap_Cvar_Set( "ui_spectatorLine1Txt", "Choose a vehicle to join in the game or" );
+			trap_Cvar_Set( "ui_spectatorLine2Txt", "select 'Specator' from the 'Team' dialog." );
+		}
+
 		// draw
 		Menu_Paint( menuSpectator, qtrue );
 	}
@@ -2675,28 +2701,57 @@ static void CG_DrawIntermission( void ) {
 CG_DrawFollow
 =================
 */
-static qboolean CG_DrawFollow( void ) {
-	float		x;
-	vec4_t		color;
-	const char	*name;
+static qboolean CG_DrawFollow( void )
+{
+	float		x = 0;
+	vec4_t		*pColor = NULL;
+	vec4_t		color = {0,0,0,0};
+	const char	*name = NULL;
 
-	if ( !(cg.snap->ps.pm_flags & PMF_FOLLOW) ) {
+	// are we NOT following?
+	if( !(cg.snap->ps.pm_flags & PMF_FOLLOW) )
+	{
 		return qfalse;
 	}
-	color[0] = 1;
-	color[1] = 1;
-	color[2] = 1;
-	color[3] = 1;
 
+#ifdef _MENU_SCOREBOARD
+	// new style
 
+	// draw label
+	CG_DrawStringNewAlpha( 320, 48, "following ", 1.0f, RIGHT_JUSTIFY );
+
+	// default colour
+	pColor = CG_CreateColour( 0.0f, 0.75f, 0.0f, 1.0f );	// default: green
+
+	// team colour?
+	if( cgs.clientinfo[ cg.snap->ps.clientNum ].team == 1 )
+	{
+		pColor = CG_CreateColour( 0.75f, 0.0f, 0.0f, 1.0f );	// team: red
+	}
+	else if( cgs.clientinfo[ cg.snap->ps.clientNum ].team == 2 )
+	{
+		pColor = CG_CreateColour( 0.0f, 0.0f, 0.75f, 1.0f );	// team: blue
+	}
+
+	// get name of player being followed
+	name = cgs.clientinfo[ cg.snap->ps.clientNum ].name;
+
+	// draw name
+	CG_DrawStringNewColour( 320, 48, name, pColor[0], LEFT_JUSTIFY );
+#else
+	// old style
 	CG_DrawBigString( 320 - 9 * 8, 24, "following", 1.0F );
 
 	name = cgs.clientinfo[ cg.snap->ps.clientNum ].name;
 
 	x = 0.5 * ( 640 - GIANT_WIDTH * CG_DrawStrlen( name ) );
 
+	color[0] = 1;
+	color[1] = 1;
+	color[2] = 1;
+	color[3] = 1;
 	CG_DrawStringExt( x, 40, name, color, qtrue, qtrue, GIANT_WIDTH, GIANT_HEIGHT, 0 );
-
+#endif
 	return qtrue;
 }
 
@@ -2924,23 +2979,25 @@ static void CG_Draw2D_MFQ3( void ) {
 		return;
 	}
 
-	if ( cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR ) {
+	// are we in spectator mode, or awaiting vehicle selection?
+	if( cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR ||
+		CG_Cvar_Get( "cg_nextVehicle" ) == -1 )
+	{
 		CG_DrawSpectator();
 //		CG_DrawCrosshair();
 //		CG_DrawCrosshairNames();
-	} else {
+	}
+	else
+	{
 		// don't draw any status if dead or the scoreboard is being explicitly shown
 		if ( !cg.showScores && cg.snap->ps.stats[STAT_HEALTH] > 0 &&
 			 !(cg.snap->ps.pm_flags & PMF_VEHICLESELECT) ) {
 
 //			CG_DrawStatusBar_MFQ3();
-      
-			CG_DrawStatusBar_MFQ3_new();
-
+      		CG_DrawStatusBar_MFQ3_new();
 //			CG_DrawCrosshair();
 			CG_DrawCrosshairNames();
-
-			CG_DrawReward();
+//			CG_DrawReward();
 		}
     
 	}
@@ -2955,7 +3012,8 @@ static void CG_Draw2D_MFQ3( void ) {
 #endif
 	CG_DrawUpperRight();
 
-	if ( !CG_DrawFollow() ) {
+	if( !CG_DrawFollow() )
+	{
 		CG_DrawWarmup();
 	}
 
