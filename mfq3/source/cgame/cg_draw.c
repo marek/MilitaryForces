@@ -1,5 +1,5 @@
 /*
- * $Id: cg_draw.c,v 1.30 2002-02-22 16:14:07 sparky909_uk Exp $
+ * $Id: cg_draw.c,v 1.31 2002-02-26 13:29:28 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -2650,6 +2650,70 @@ static void CG_DrawTeamScore( itemDef_t * item, int team )
 
 /*
 =====================
+CG_DrawTeamCount
+=====================
+*/
+static void CG_DrawTeamCount( itemDef_t * item, int team )
+{
+	// NOTE: the count strings are  copied to these statics because just using the pointer returned 
+	// by va() appears to cause memory problems
+	static char redCount[32] = { 0 };
+	static char blueCount[32] = { 0 };
+	static char spectatorCount[32] = { 0 };
+	static char playerCount[32] = { 0 };
+	int count = 0;
+
+	// setup text
+	switch( team )
+	{
+	case CG_GAME_REDCOUNT:
+		count = CG_FeederCount( FEEDER_REDTEAM_LIST );
+		if( count == 1 )
+			strcpy( redCount, va( "Red (%d player)", count ));
+		else
+			strcpy( redCount, va( "Red (%d players)", count ));
+		item->text = redCount; 
+		
+		break;
+
+	case CG_GAME_BLUECOUNT:
+		count = CG_FeederCount( FEEDER_BLUETEAM_LIST );
+		if( count == 1 )
+			strcpy( blueCount, va( "Blue (%d player)", count ));
+		else
+			strcpy( blueCount, va( "Blue (%d players)", count ));
+		item->text = blueCount; 
+		break;
+
+	case CG_GAME_SPECTATORCOUNT:
+		count = CG_FeederCount( FEEDER_SPECTATOR_LIST );
+		if( count == 1 )
+			strcpy( spectatorCount, va( "Spectator (%d client)", count ));
+		else
+			strcpy( spectatorCount, va( "Spectators (%d clients)", count ));
+		item->text = spectatorCount; 
+		break;
+
+	case CG_GAME_PLAYERSCOUNT:
+		count = CG_FeederCount( FEEDER_SCOREBOARD );
+		if( count == 1 )
+			strcpy( playerCount, va( "Players (%d player)", count ));
+		else
+			strcpy( playerCount, va( "Players (%d players)", count ));
+		item->text = playerCount; 
+		break;
+
+	default:
+		item->text = "";
+		break;
+	}
+
+	// draw
+	Item_Text_AutoWrapped_Paint( item );
+}
+
+/*
+=====================
 CG_DrawGameStatus
 =====================
 */
@@ -2819,6 +2883,22 @@ void CG_OwnerDraw( float x, float y, float w, float h, float text_x, float text_
   case CG_GAME_MISC:
     CG_DrawGameMisc( item );
 	break;
+
+  case CG_GAME_REDCOUNT:
+    CG_DrawTeamCount( item, CG_GAME_REDCOUNT );
+	break;
+
+  case CG_GAME_BLUECOUNT:
+    CG_DrawTeamCount( item, CG_GAME_BLUECOUNT );
+    break;
+
+  case CG_GAME_SPECTATORCOUNT:
+    CG_DrawTeamCount( item, CG_GAME_SPECTATORCOUNT );
+    break;
+
+  case CG_GAME_PLAYERSCOUNT:
+    CG_DrawTeamCount( item, CG_GAME_PLAYERSCOUNT );
+    break;
 
   case CG_GAME_REDSCORE:
     CG_DrawTeamScore( item, CG_GAME_REDSCORE );

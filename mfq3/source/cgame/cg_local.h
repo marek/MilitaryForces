@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.44 2002-02-25 18:08:25 sparky909_uk Exp $
+ * $Id: cg_local.h,v 1.45 2002-02-26 13:29:28 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1079,6 +1079,7 @@ void CG_RankRunFrame( void );
 void CG_SetScoreSelection(void *menu);
 score_t *CG_GetSelectedScore();
 void CG_BuildSpectatorString();
+int CG_FeederCount(float feederID);
 
 //
 // cg_util.c
