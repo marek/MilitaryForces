@@ -1,5 +1,5 @@
 /*
- * $Id: cg_missioneditor.c,v 1.13 2003-02-07 19:17:44 thebjoern Exp $
+ * $Id: cg_missioneditor.c,v 1.14 2003-02-07 20:12:17 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -626,14 +626,14 @@ void ME_SpawnWaypoint()
 	}
 }
 
-void ME_SpawnVehicle( int vehidx ) 
+static IGME_vehicle_t* ME_SpawnVehicleAt( int vehidx, vec3_t pos, vec3_t angles ) 
 {
 	IGME_vehicle_t*	 veh = 0;
 	int i;
 
 	if( cgs.IGME.waypointmode ) {
 		CG_Printf( "You are in waypoint mode, spawning vehicles not allowed now!\n" );
-		return;
+		return 0;
 	}
 
 	for( i = 0; i < IGME_MAX_VEHICLES; ++i ) {
@@ -644,11 +644,11 @@ void ME_SpawnVehicle( int vehidx )
 	}
 	if( !veh ) {
 		CG_Printf( "Too many vehicles spawned! Please delete one first!\n" );
-		return;
+		return 0;
 	}
 
-	VectorCopy( cg.predictedPlayerState.origin, veh->origin );
-	VectorCopy( cg.predictedPlayerState.viewangles, veh->angles );
+	VectorCopy( pos, veh->origin );
+	VectorCopy( angles, veh->angles );
 	veh->angles[0] = veh->angles[2] = 0;
 	veh->vehidx = vehidx;
 	veh->active = qtrue;
@@ -660,9 +660,18 @@ void ME_SpawnVehicle( int vehidx )
 					availableVehicles[veh->vehidx].mins[i];
 		veh->selectorScale[i] = wid/200.0f;
 	}
+	return veh;
 }
 
-void ME_SpawnGroundInstallation( int idx )
+IGME_vehicle_t* ME_SpawnVehicle( int vehidx ) 
+{
+	// spawns at current player location
+	return ME_SpawnVehicleAt( vehidx, 
+							  cg.predictedPlayerState.origin,
+							  cg.predictedPlayerState.viewangles );
+}
+
+static void ME_SpawnGroundInstallationAt( int idx, vec3_t pos, vec3_t angles )
 {
 	IGME_vehicle_t*	 veh = 0;
 	int i;
@@ -683,8 +692,8 @@ void ME_SpawnGroundInstallation( int idx )
 		return;
 	}
 
-	VectorCopy( cg.predictedPlayerState.origin, veh->origin );
-	VectorCopy( cg.predictedPlayerState.viewangles, veh->angles );
+	VectorCopy( pos, veh->origin );
+	VectorCopy( angles, veh->angles );
 	veh->angles[0] = veh->angles[2] = 0;
 	veh->vehidx = idx;
 	veh->active = qtrue;
@@ -696,6 +705,14 @@ void ME_SpawnGroundInstallation( int idx )
 					availableGroundInstallations[veh->vehidx].mins[i];
 		veh->selectorScale[i] = wid/200.0f;
 	}
+}
+
+void ME_SpawnGroundInstallation( int idx )
+{
+	// spawn at player loc
+	ME_SpawnGroundInstallationAt( idx, 
+								  cg.predictedPlayerState.origin, 
+								  cg.predictedPlayerState.viewangles );
 }
 
 void ME_DrawVehicle( IGME_vehicle_t* veh ) 
@@ -963,17 +980,48 @@ void ME_ExportToScript( const char* scriptname )
 }
 
 
+static void ME_SpawnMissionGroundInstallations(mission_groundInstallation_t* gis)
+{
+	int	i;
+
+	for( i = 0; i < IGME_MAX_VEHICLES/4; ++i )
+	{
+		if( !gis[i].used ) break;
+		ME_SpawnGroundInstallationAt(gis[i].index,
+									 gis[i].origin,
+									 gis[i].angles);
+	}
+}
 
 
 static void ME_SpawnMissionVehicles(mission_vehicle_t* vehs)
 {
-	// now that we have valid vehicle data make them spawn here
-	// use SP_misc_plane etc and set the relevant values to spawn them
-	// rest should work automatically
+	int	i, j, k = 0;
+	IGME_vehicle_t* veh;
+
+	for( i = 0; i < IGME_MAX_VEHICLES/4; ++i )
+	{
+		if( !vehs[i].used ) break;
+		veh = ME_SpawnVehicleAt(vehs[i].index,
+					 		    vehs[i].origin,
+								vehs[i].angles);
+		if( !veh ) continue;
+		for( j = 0; j < IGME_MAX_WAYPOINTS; ++j )
+		{
+			if( vehs[i].waypoints[j].used )
+			{
+				veh->waypoints[k].active = qtrue;
+				veh->waypoints[k].selected = qfalse;
+				VectorCopy( vehs[i].waypoints[j].origin, veh->waypoints[k].origin );
+				k++;
+			}
+		}
+	}
+
 }
 
 
-static void ME_LoadOverviewAndEntities( char *filename,
+static qboolean ME_LoadOverviewAndEntities( char *filename,
 										mission_overview_t* overview,
 										mission_vehicle_t* vehs, 
 										mission_groundInstallation_t* gis)
@@ -987,13 +1035,13 @@ static void ME_LoadOverviewAndEntities( char *filename,
 	if ( !f ) 
 	{
 		Com_Printf( va( S_COLOR_RED "file not found: %s\n", filename ) );
-		return;
+		return qfalse;
 	}
 	if ( len >= MAX_MISSION_TEXT ) 
 	{
 		Com_Printf( va( S_COLOR_RED "file too large: %s is %i, max allowed is %i", filename, len, MAX_MISSION_TEXT ) );
 		trap_FS_FCloseFile( f );
-		return;
+		return qfalse;
 	}
 
 	trap_FS_Read( inbuffer, len, f );
@@ -1003,6 +1051,8 @@ static void ME_LoadOverviewAndEntities( char *filename,
 	Com_Printf( va(S_COLOR_GREEN "Successfully opened mission script: %s\n", filename) );
 
 	MF_ParseMissionScripts(inbuffer, overview, vehs, gis);
+
+	return qtrue;
 }
 
 void ME_ImportScript( const char* scriptname )
@@ -1022,9 +1072,18 @@ void ME_ImportScript( const char* scriptname )
 	mapname = Info_ValueForKey( info, "mapname" );
 	Com_sprintf(filename, 255, "missions/%s/%s.mis", mapname, scriptname);
 
-	ME_LoadOverviewAndEntities(filename, &overview, vehicles, installations);
+	if( !ME_LoadOverviewAndEntities(filename, &overview, vehicles, installations) )
+	{
+		Com_Printf( "Unable to load script\n" );
+		return;
+	}
 
+	// clean out old stuff
+	memset( &cgs.IGME, 0, sizeof(cgs.IGME) );
+
+	// spawn new stuff
 	ME_SpawnMissionVehicles(vehicles);
+	ME_SpawnMissionGroundInstallations(installations);
 
 //	trap_Printf( va("Loaded: %s\n", inbuffer) );
 }
