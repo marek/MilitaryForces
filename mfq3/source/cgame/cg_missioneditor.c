@@ -1,5 +1,5 @@
 /*
- * $Id: cg_missioneditor.c,v 1.3 2002-06-13 14:46:34 thebjoern Exp $
+ * $Id: cg_missioneditor.c,v 1.4 2002-06-13 20:08:13 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -40,6 +40,99 @@ void ME_MouseEvent(int x, int y)
 	}
 }
 
+void ME_CopySelection()
+{
+	IGME_vehicle_t* veh = 0;
+	int				i;
+
+	if( cgs.IGME.numSelections > 1 ) {
+		CG_Printf( "Can only copy a SINGLE vehicle!\n" );
+		return;
+	} else if( cgs.IGME.numSelections < 1 ) {
+		CG_Printf( "Select object to copy!\n" );
+		return;
+	}
+
+	for( i = 0; i < IGME_MAX_VEHICLES; ++i ) {
+		if( cgs.IGME.vehicles[i].selected ) {
+			veh = &cgs.IGME.vehicles[i];
+			break;
+		}
+	}
+
+	if( !veh ) return;
+
+	if( cgs.IGME.waypointmode ) {
+		for( i = 0; i < IGME_MAX_WAYPOINTS; ++i ) {
+			cgs.IGME.copyBufferRoute[i].active = veh->waypoints[i].active;
+			cgs.IGME.copyBufferRoute[i].selected = veh->waypoints[i].selected;
+			VectorCopy( veh->waypoints[i].origin, cgs.IGME.copyBufferRoute[i].origin );
+		}	
+		cgs.IGME.copyBufferRouteUsed = qtrue;
+	} else {
+		cgs.IGME.copyBufferVehicle.active = veh->active;
+		VectorCopy( veh->angles, cgs.IGME.copyBufferVehicle.angles );
+		VectorClear( cgs.IGME.copyBufferVehicle.origin );
+		cgs.IGME.copyBufferVehicle.selected = veh->selected;
+		VectorCopy( veh->selectorScale, cgs.IGME.copyBufferVehicle.selectorScale );
+		cgs.IGME.copyBufferVehicle.vehidx = veh->vehidx;
+		for( i = 0; i < IGME_MAX_WAYPOINTS; ++i ) {
+			cgs.IGME.copyBufferVehicle.waypoints[i].active = veh->waypoints[i].active;
+			cgs.IGME.copyBufferVehicle.waypoints[i].selected = veh->waypoints[i].selected;
+			VectorCopy( veh->waypoints[i].origin, cgs.IGME.copyBufferVehicle.waypoints[i].origin );
+		}
+		cgs.IGME.copyBufferVehicleUsed = qtrue;
+	}
+	CG_Printf( "Copied to clipboard\n" );
+}
+
+void ME_PasteSelection()
+{
+	IGME_vehicle_t* veh = 0;
+	int				i;
+
+	if( cgs.IGME.waypointmode ) {
+		if( !cgs.IGME.copyBufferRouteUsed ) {
+			CG_Printf( "Clipboard empty, copy something first!" );
+			return;
+		}
+		veh = ME_GetSelectedVehicle();
+		if( !veh ) return;
+		for( i = 0; i < IGME_MAX_WAYPOINTS; ++i ) {
+			veh->waypoints[i].active = cgs.IGME.copyBufferRoute[i].active;
+			veh->waypoints[i].selected = qfalse;
+			VectorCopy( cgs.IGME.copyBufferRoute[i].origin, veh->waypoints[i].origin );
+		}	
+	} else {
+		if( !cgs.IGME.copyBufferVehicleUsed ) {
+			CG_Printf( "Clipboard empty, copy something first!" );
+			return;
+		}
+		for( i = 0; i < IGME_MAX_VEHICLES; ++i ) {
+			if( !cgs.IGME.vehicles[i].active ) {
+				veh = &cgs.IGME.vehicles[i];
+				break;
+			}
+		}
+		if( !veh ) {
+			CG_Printf( "No more space for vehicles left! Delete some first!\n" );
+			return;
+		}
+		veh->active = cgs.IGME.copyBufferVehicle.active;
+		VectorCopy( cgs.IGME.copyBufferVehicle.angles, veh->angles );
+		VectorCopy( cg.predictedPlayerState.origin, veh->origin );
+		veh->selected = qfalse;
+		VectorCopy( cgs.IGME.copyBufferVehicle.selectorScale, veh->selectorScale );
+		veh->vehidx = cgs.IGME.copyBufferVehicle.vehidx;
+		for( i = 0; i < IGME_MAX_WAYPOINTS; ++i ) {
+			veh->waypoints[i].active = cgs.IGME.copyBufferVehicle.waypoints[i].active;
+			veh->waypoints[i].selected = cgs.IGME.copyBufferVehicle.waypoints[i].selected;
+			VectorCopy( cgs.IGME.copyBufferVehicle.waypoints[i].origin, veh->waypoints[i].origin );
+		}
+	}
+	CG_Printf( "Pasted\n" );
+}
+
 void ME_ToggleWaypointMode()
 {
 	if( cgs.IGME.numSelections != 1 ) {
@@ -57,7 +150,7 @@ void ME_ToggleWaypointDisplay()
 {
 	cgs.IGME.showAllWaypoints = cgs.IGME.showAllWaypoints ? qfalse : qtrue;
 
-	if( cgs.IGME.waypointmode ) CG_Printf( "ALL Waypoints are displayed\n" );
+	if( cgs.IGME.showAllWaypoints ) CG_Printf( "ALL Waypoints are displayed\n" );
 	else CG_Printf( "Only Waypoints of SELECTED vehicle are displayed\n" );
 }
 
@@ -71,7 +164,7 @@ void CG_Draw_IGME()
 	// check for selections
 	cmdNum = trap_GetCurrentCmdNumber();
 	trap_GetUserCmd( cmdNum, &cmd );
-	if( trap_Key_IsDown(K_MOUSE1) ) {
+	if( trap_Key_IsDown(K_MOUSE1) && !trap_Key_GetCatcher() ) {
 		if( (cgs.IGME.waypointmode && cgs.IGME.numWptSelections) ||
 			(!cgs.IGME.waypointmode && cgs.IGME.numSelections) ) {
 			trap_Key_SetCatcher( KEYCATCH_CGAME );
@@ -95,8 +188,16 @@ void CG_Draw_IGME()
 				cg.time >= cgs.IGME.selectionTime ) {
 		ME_ToggleWaypointDisplay();
 		cgs.IGME.selectionTime = cg.time + 250;
-	}	
-	
+	} else if( !cgs.IGME.dragmode && trap_Key_IsDown(K_CTRL) && trap_Key_IsDown('c') && 
+				cg.time >= cgs.IGME.selectionTime ) {
+		ME_CopySelection();
+		cgs.IGME.selectionTime = cg.time + 500;
+	} else if( !cgs.IGME.dragmode && trap_Key_IsDown(K_CTRL) && trap_Key_IsDown('v') &&
+				cg.time >= cgs.IGME.selectionTime ) {
+		ME_PasteSelection();
+		cgs.IGME.selectionTime = cg.time + 500;
+	}
+
 	// draw vehicles
 	for( i = 0; i < IGME_MAX_VEHICLES; ++i ) {
 		veh = &cgs.IGME.vehicles[i]; 
@@ -367,6 +468,56 @@ int ME_GetSelectedWaypointNumber()
 	return -1;
 }
 
+void ME_RotateSelection( int delta )
+{
+	IGME_vehicle_t* veh;
+	sbox3_t			box;
+	qboolean		boxinit = qfalse;
+	vec3_t			mins = { -1, -1, -1 },
+					maxs = { 1, 1, 1 };
+	vec3_t			center;
+	vec3_t			dir, angles;
+	int				i;
+	float			dist;
+
+	for( i = 0; i < IGME_MAX_VEHICLES; ++i ) {
+		veh = &cgs.IGME.vehicles[i];
+		if( !veh->selected ) continue;
+		if( !boxinit ) {
+			VectorAdd( veh->origin, mins, box.mins );
+			VectorAdd( veh->origin, maxs, box.maxs );
+			boxinit = qtrue;
+		} else {
+			AddToBox( &box, veh->origin );		
+		}
+	}	
+	BoxCenter( &box, &center );	
+
+	for( i = 0; i < IGME_MAX_VEHICLES; ++i ) {
+		veh = &cgs.IGME.vehicles[i];
+		if( !veh->selected ) continue;
+		// get direction vector and dist
+		VectorSubtract( veh->origin, center, dir );
+		dist = VectorNormalize(dir);
+		vectoangles( dir, angles );
+		// rotate
+		veh->angles[1] += delta;
+		AngleMod( veh->angles[1] );
+		angles[1] += delta;
+		AngleMod( angles[1] );
+		// move object
+		AngleVectors(angles, dir, 0, 0);
+		VectorScale(dir, dist, dir);
+		VectorAdd(center, dir, veh->origin);
+	}
+
+//			if( rotate ) {
+//				veh->angles[1] -= x;
+//				AngleMod( veh->angles[1] );
+//			}
+
+}
+
 void ME_DragSelection( int x, int y )
 {
 	vec3_t			angles, forward, right;
@@ -379,7 +530,8 @@ void ME_DragSelection( int x, int y )
 		VectorSet( forward, 0, 0, 1 );
 		VectorScale( forward, -y, forward );
 	} else if( rotate ) {
-		VectorClear( forward );
+		ME_RotateSelection( -x );
+		return;
 	} else {
 		// move horizontally
 		VectorSet( angles, 0, cg.predictedPlayerState.viewangles[1], 0 );
@@ -404,10 +556,6 @@ void ME_DragSelection( int x, int y )
 			veh = &cgs.IGME.vehicles[i];
 			if( !veh->selected ) continue;
 			VectorAdd( veh->origin, forward, veh->origin );
-			if( rotate ) {
-				veh->angles[1] -= x;
-				AngleMod( veh->angles[1] );
-			}
 		}
 	}
 }
@@ -458,7 +606,7 @@ void ME_SpawnVehicle( int vehidx )
 	int i;
 
 	if( cgs.IGME.waypointmode ) {
-		CG_Printf( "You are in waypoint, spawning vehicles not allowed now!\n" );
+		CG_Printf( "You are in waypoint mode, spawning vehicles not allowed now!\n" );
 		return;
 	}
 

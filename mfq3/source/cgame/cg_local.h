@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.50 2002-06-13 14:46:34 thebjoern Exp $
+ * $Id: cg_local.h,v 1.51 2002-06-13 20:08:13 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -878,6 +878,10 @@ typedef struct {
 	qboolean		dragmode;
 	qboolean		waypointmode;
 	qboolean		showAllWaypoints;
+	IGME_vehicle_t	copyBufferVehicle;
+	qboolean		copyBufferVehicleUsed;
+	IGME_waypoint_t	copyBufferRoute[IGME_MAX_WAYPOINTS];
+	qboolean		copyBufferRouteUsed;
 } IGME_data_t;
 
 // end IGME

@@ -1,5 +1,5 @@
 /*
- * $Id: q_math.c,v 1.7 2002-06-12 14:35:33 thebjoern Exp $
+ * $Id: q_math.c,v 1.8 2002-06-13 20:08:13 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1438,6 +1438,27 @@ void MakeBoxFromExtents( box3_t* box, const vec3_t mins, const vec3_t maxs, cons
 	VectorSet( box->edgePoints[6], box->edgePoints[BOX3_MIN][0], box->edgePoints[BOX3_MAX][1], box->edgePoints[BOX3_MAX][2]);
 	VectorSet( box->edgePoints[7], box->edgePoints[BOX3_MIN][0], box->edgePoints[BOX3_MIN][1], box->edgePoints[BOX3_MAX][2]);
 
+}
+
+// expand box to contain this point
+void AddToBox( sbox3_t* box, const vec3_t p )
+{
+    if( p[0] > box->maxs[0] ) box->maxs[0] = p[0];
+    if( p[0] < box->mins[0] ) box->mins[0] = p[0];
+    if( p[1] > box->maxs[1] ) box->maxs[1] = p[1];
+    if( p[1] < box->mins[1] ) box->mins[1] = p[1];
+    if( p[2] > box->maxs[2] ) box->maxs[2] = p[2];
+    if( p[2] < box->mins[2] ) box->mins[2] = p[2];    
+}
+
+void BoxCenter( sbox3_t* box, vec3_t* center )
+{
+	float dia;
+
+	VectorSubtract( box->maxs, box->mins, *center );
+	dia = VectorNormalize( *center );
+	VectorScale( *center, dia/2.0f, *center );
+	VectorAdd( box->mins, *center, *center );
 }
 
 void MakeRay( ray3_t* ray, const vec3_t start, const vec3_t dir )

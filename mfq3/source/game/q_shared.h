@@ -1,5 +1,5 @@
 /*
- * $Id: q_shared.h,v 1.10 2002-06-12 14:35:33 thebjoern Exp $
+ * $Id: q_shared.h,v 1.11 2002-06-13 20:08:13 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -553,6 +553,7 @@ void PerpendicularVector( vec3_t dst, const vec3_t src );
 #define BOX3_MAX	2
 #define BOX3_MIN	4
 
+// complex box for intersection method
 typedef struct {
 	vec3_t		edgePoints[8];	// 8 edge-points
 	
@@ -561,7 +562,18 @@ typedef struct {
 	vec3_t		extents;		// extents along axis	
 } box3_t;
 
+
 void MakeBoxFromExtents( box3_t* box, const vec3_t mins, const vec3_t maxs, const vec3_t angles );
+
+// simple box
+typedef struct {
+    vec3_t		mins;
+	vec3_t		maxs;
+} sbox3_t;
+
+// expand box to contain this point
+void AddToBox( sbox3_t* box, const vec3_t point );
+void BoxCenter( sbox3_t* box, vec3_t* center );
 
 typedef struct {
 	vec3_t		start;
