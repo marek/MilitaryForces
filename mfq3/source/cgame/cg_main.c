@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.36 2002-02-25 15:20:54 thebjoern Exp $
+ * $Id: cg_main.c,v 1.37 2002-02-25 18:08:25 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -2090,6 +2090,9 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 
 	// MFQ3 vehicles
 	MF_LoadAllVehicleData();
+
+	// init all the vehicle's shadow system
+	CG_InitShadows();
 }
 
 /*

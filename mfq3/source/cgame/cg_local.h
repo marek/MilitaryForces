@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.43 2002-02-25 14:19:19 sparky909_uk Exp $
+ * $Id: cg_local.h,v 1.44 2002-02-25 18:08:25 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1212,6 +1212,7 @@ void CG_VehicleMuzzleFlash( centity_t *cent, const refEntity_t *parent, qhandle_
 void CG_Misc_Vehicle( centity_t *cent );
 void CG_VehicleLoadout( centity_t* cent );
 void CG_AddToVehicleLoadout( centity_t* cent, int weaponIndex );
+void CG_InitShadows( void );
 
 //
 // cg_plane.c
