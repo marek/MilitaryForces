@@ -1,5 +1,5 @@
 /*
- * $Id: cg_localents.c,v 1.4 2002-02-25 12:13:36 sparky909_uk Exp $
+ * $Id: cg_localents.c,v 1.5 2003-09-05 00:36:28 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -408,7 +408,144 @@ static void CG_AddSpriteExplosion( localEntity_t *le ) {
 	}
 }
 
+/*
+====================
+CG_AddNuke
+by minkis
+====================
+*/
+void CG_AddNuke( localEntity_t *le ) {
+	refEntity_t	*re;
+	refEntity_t shockwave;
+	float		c;
+	vec3_t		test, axis[3];
+	int			t;
+	int			rad;
 
+
+
+	re = &le->refEntity;
+
+	rad = re->radius;
+	// Set limits
+	if(rad < NUKE_BOOMSPHEREMODEL_RADIUS)
+	{
+		rad = NUKE_BOOMSPHEREMODEL_RADIUS;
+	}
+
+	t = cg.time - le->startTime;
+	VectorClear( test );
+	AnglesToAxis( test, axis );
+
+	if (t > NUKE_SHOCKWAVE_STARTTIME && t < NUKE_SHOCKWAVE_ENDTIME) {
+
+		if (!(le->leFlags & LEF_SOUND1)) {
+//			trap_S_StartSound (re->origin, ENTITYNUM_WORLD, CHAN_AUTO, cgs.media.nukeExplodeSound );
+			trap_S_StartLocalSound(cgs.media.nukeExplodeSound, CHAN_AUTO);
+			le->leFlags |= LEF_SOUND1;
+		}
+		// 1st nuke shockwave
+		memset(&shockwave, 0, sizeof(shockwave));
+		shockwave.hModel = cgs.media.nukeShockWave;
+		shockwave.reType = RT_MODEL;
+		shockwave.shaderTime = re->shaderTime;
+		VectorCopy(re->origin, shockwave.origin);
+
+		c = (float)(t - NUKE_SHOCKWAVE_STARTTIME) / (float)(NUKE_SHOCKWAVE_ENDTIME - NUKE_SHOCKWAVE_STARTTIME);
+		VectorScale( axis[0], c * rad + 100 / NUKE_SHOCKWAVEMODEL_RADIUS, shockwave.axis[0] );
+		VectorScale( axis[1], c * rad + 100 / NUKE_SHOCKWAVEMODEL_RADIUS, shockwave.axis[1] );
+		VectorScale( axis[2], c * rad + 100 / NUKE_SHOCKWAVEMODEL_RADIUS, shockwave.axis[2] );
+		shockwave.nonNormalizedAxes = qtrue;
+
+		if (t > NUKE_SHOCKWAVEFADE_STARTTIME) {
+			c = (float)(t - NUKE_SHOCKWAVEFADE_STARTTIME) / (float)(NUKE_SHOCKWAVE_ENDTIME - NUKE_SHOCKWAVEFADE_STARTTIME);
+		}
+		else {
+			c = 0;
+		}
+		c *= 0xff;
+		shockwave.shaderRGBA[0] = 0xff - c;
+		shockwave.shaderRGBA[1] = 0xff - c;
+		shockwave.shaderRGBA[2] = 0xff - c;
+		shockwave.shaderRGBA[3] = 0xff - c;
+
+		trap_R_AddRefEntityToScene( &shockwave );
+	}
+
+	if (t > NUKE_EXPLODE_STARTTIME && t < NUKE_IMPLODE_ENDTIME) {
+		// explosion and implosion
+		c = ( le->endTime - cg.time ) * le->lifeRate;
+		c *= 0xff;
+		re->shaderRGBA[0] = le->color[0] * c;
+		re->shaderRGBA[1] = le->color[1] * c;
+		re->shaderRGBA[2] = le->color[2] * c;
+		re->shaderRGBA[3] = le->color[3] * c;
+
+		if( t < NUKE_IMPLODE_STARTTIME ) {
+			c = (float)(t - NUKE_EXPLODE_STARTTIME) / (float)(NUKE_IMPLODE_STARTTIME - NUKE_EXPLODE_STARTTIME);
+		}
+		else {
+			if (!(le->leFlags & LEF_SOUND2)) {
+//				trap_S_StartSound (re->origin, ENTITYNUM_WORLD, CHAN_AUTO, cgs.media.nukeImplodeSound );
+				trap_S_StartLocalSound(cgs.media.nukeImplodeSound, CHAN_AUTO);
+				le->leFlags |= LEF_SOUND2;
+			}
+			c = (float)(NUKE_IMPLODE_ENDTIME - t) / (float) (NUKE_IMPLODE_ENDTIME - NUKE_IMPLODE_STARTTIME);
+		}
+		VectorScale( axis[0], c * rad / NUKE_BOOMSPHEREMODEL_RADIUS, re->axis[0] );
+		VectorScale( axis[1], c * rad / NUKE_BOOMSPHEREMODEL_RADIUS, re->axis[1] );
+		VectorScale( axis[2], c * rad / NUKE_BOOMSPHEREMODEL_RADIUS, re->axis[2] );
+		re->nonNormalizedAxes = qtrue;
+
+		trap_R_AddRefEntityToScene( re );
+		// add the dlight
+		trap_R_AddLightToScene( re->origin, c * 1000.0, 1.0, 1.0, c );
+	}
+
+	if (t > NUKE_SHOCKWAVE2_STARTTIME && t < NUKE_SHOCKWAVE2_ENDTIME) {
+		// 2nd nuke shockwave
+		if (le->angles.trBase[0] == 0 &&
+			le->angles.trBase[1] == 0 &&
+			le->angles.trBase[2] == 0) {
+			le->angles.trBase[0] = random() * 360;
+			le->angles.trBase[1] = random() * 360;
+			le->angles.trBase[2] = random() * 360;
+		}
+		else {
+			c = 0;
+		}
+		memset(&shockwave, 0, sizeof(shockwave));
+		shockwave.hModel = cgs.media.nukeShockWave;
+		shockwave.reType = RT_MODEL;
+		shockwave.shaderTime = re->shaderTime;
+		VectorCopy(re->origin, shockwave.origin);
+
+		test[0] = le->angles.trBase[0];
+		test[1] = le->angles.trBase[1];
+		test[2] = le->angles.trBase[2];
+		AnglesToAxis( test, axis );
+
+		c = (float)(t - NUKE_SHOCKWAVE2_STARTTIME) / (float)(NUKE_SHOCKWAVE2_ENDTIME - NUKE_SHOCKWAVE2_STARTTIME);
+		VectorScale( axis[0], c * rad + 100 / NUKE_SHOCKWAVEMODEL_RADIUS, shockwave.axis[0] );
+		VectorScale( axis[1], c * rad + 100 / NUKE_SHOCKWAVEMODEL_RADIUS, shockwave.axis[1] );
+		VectorScale( axis[2], c * rad + 100 / NUKE_SHOCKWAVEMODEL_RADIUS, shockwave.axis[2] );
+		shockwave.nonNormalizedAxes = qtrue;
+
+		if (t > NUKE_SHOCKWAVE2FADE_STARTTIME) {
+			c = (float)(t - NUKE_SHOCKWAVE2FADE_STARTTIME) / (float)(NUKE_SHOCKWAVE2_ENDTIME - NUKE_SHOCKWAVE2FADE_STARTTIME);
+		}
+		else {
+			c = 0;
+		}
+		c *= 0xff;
+		shockwave.shaderRGBA[0] = 0xff - c;
+		shockwave.shaderRGBA[1] = 0xff - c;
+		shockwave.shaderRGBA[2] = 0xff - c;
+		shockwave.shaderRGBA[3] = 0xff - c;
+
+		trap_R_AddRefEntityToScene( &shockwave );
+	}
+}
 
 //==============================================================================
 
@@ -466,10 +603,15 @@ void CG_AddLocalEntities( void ) {
 		case LE_SCALE_FADE:		// rocket trails
 			CG_AddScaleFade( le );
 			break;
+		case LE_NUKE:
+			CG_AddNuke( le );
+			break;
 
 		}
 	}
 }
+
+
 
 
 
