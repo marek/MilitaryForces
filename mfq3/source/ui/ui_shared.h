@@ -1,5 +1,5 @@
 /*
- * $Id: ui_shared.h,v 1.11 2002-02-22 16:13:12 sparky909_uk Exp $
+ * $Id: ui_shared.h,v 1.12 2002-02-25 17:33:48 sparky909_uk Exp $
 */
 #ifndef __UI_SHARED_H
 #define __UI_SHARED_H
@@ -353,9 +353,12 @@ typedef struct {
   const char *cursorStr;
   const char *cursorStrWait;
   const char *gradientStr;
+
   fontInfo_t textFont;
   fontInfo_t smallFont;
   fontInfo_t bigFont;
+
+  qhandle_t midPanelGfx;
   qhandle_t cursor;
   qhandle_t cursorWait;
   qhandle_t gradientBar;
@@ -385,9 +388,9 @@ typedef struct {
   qboolean fontRegistered;
 
   // player settings
-	qhandle_t fxBasePic;
+  qhandle_t fxBasePic;
   qhandle_t fxPic[7];
-	qhandle_t	crosshairShader[NUM_CROSSHAIRS];
+  qhandle_t	crosshairShader[NUM_CROSSHAIRS];
 
 } cachedAssets_t;
 

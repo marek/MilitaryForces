@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.22 2002-02-25 15:22:58 sparky909_uk Exp $
+ * $Id: ui_main.c,v 1.23 2002-02-25 17:33:47 sparky909_uk Exp $
 */
 /*
 =======================================================================
@@ -207,10 +207,6 @@ int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int a
 
 void AssetCache() {
 	int n;
-	//if (Assets.textFont == NULL) {
-	//}
-	//Assets.background = trap_R_RegisterShaderNoMip( ASSET_BACKGROUND );
-	//Com_Printf("Menu Size: %i bytes\n", sizeof(Menus));
 	uiInfo.uiDC.Assets.gradientBar = trap_R_RegisterShaderNoMip( ASSET_GRADIENTBAR );
 	uiInfo.uiDC.Assets.verticalGradient = trap_R_RegisterShaderNoMip( ASSET_VERTICALGRADIENT );
 	uiInfo.uiDC.Assets.fxBasePic = trap_R_RegisterShaderNoMip( ART_FX_BASE );
@@ -4225,13 +4221,16 @@ typedef struct
 serverStatusCvar_t serverStatusCvars[] = {
 	{"sv_hostname", "Name"},
 	{"Address", ""},
-	{"gamename", "Game name"},
-	{"g_gametype", "Game type"},
+	{"gamename", "Game Name"},
+	{"g_gametype", "Game Type"},
+	{"mf_gameset", "MFQ3 Game Set"},
+	{"mf_version", "MFQ3 Version"},
 	{"mapname", "Map"},
-	{"version", ""},
-	{"protocol", ""},
-	{"timelimit", ""},
-	{"fraglimit", ""},
+	{"version", "Version"},
+	{"protocol", "Protocol"},
+	{"timelimit", "Time Limit"},
+	{"fraglimit", "Frag Limit"},
+	{"capturelimit", "Capture Limit"},
 	{NULL, NULL}
 };
 
@@ -4721,21 +4720,46 @@ UI_CreateGameCodes
 */
 static char * UI_CreateGameCodes( char * pInfo )
 {
+	char exInfo[ 1024 ];
+	char * pGameset = NULL, * pAddress = NULL;
 	int gameType, gameset;
 
 	// get enums
 	gameType = atoi( Info_ValueForKey( pInfo, "gametype") );
-	gameset = MF_UI_Gameset_StringToValue( Info_ValueForKey( pInfo, "mf_gameset"), qtrue );
 
 	// valid?
-	if( gameType >= 0 && gameType < numTeamArenaGameTypes && gameset < numGamesets )
+	if( gameType >= 0 && gameType < numTeamArenaGameTypes )
 	{
-		return va( "%s/%s", mfqGamesets[gameset],teamArenaGameTypes[gameType] );
+		// get server address
+		pAddress = Info_ValueForKey( pInfo, "addr");
+		if( !pAddress )
+		{
+			return "(Error)";
+		}
+
+		// get complete info text
+		if( trap_LAN_ServerStatus( pAddress, exInfo, 1024 ) )
+		{
+			pGameset = Info_ValueForKey( exInfo, "mf_gameset");
+
+			// convert gameset string to enum
+			gameset = MF_UI_Gameset_StringToValue( pGameset, qtrue );
+			if( gameset < numGamesets )
+			{
+				return va( "%s/%s", mfqGamesets[gameset],teamArenaGameTypes[gameType] );
+			}
+		}
+		else
+		{
+			// reset info requests
+			trap_LAN_ServerStatus( pAddress, NULL, 0 );
+	
+			// pending...
+			return "...";
+		}
 	}
-	else
-	{
-		return "(Unknown)";
-	}
+
+	return "(Unknown)";
 }
 
 /*
@@ -6109,15 +6133,23 @@ void UI_DrawConnectScreen( qboolean overlay )
 	char * s = NULL;
 	char info[MAX_INFO_VALUE];
 	char text[256];
+	char exInfo[1024];
+	char * pGameset = NULL;
 	float centerPoint, yStart, scale;
+	int gameset = 0;
+	menuDef_t * menu = NULL;
+
+	static qboolean resetRequest = qfalse;
+	static qboolean giveUpLoadingGfx = qfalse;
+	static float w = 0.0f;
 	
 	// find the menu
-	menuDef_t *menu = Menus_FindByName("Connect");
+	menu = Menus_FindByName( "Connect" );
 
 	// paint connect menu?
 	if( !overlay && menu )
 	{
-		Menu_Paint(menu, qtrue);
+		Menu_Paint( menu, qtrue );
 	}
 
 	// adjust coords for overlay mode
@@ -6129,17 +6161,59 @@ void UI_DrawConnectScreen( qboolean overlay )
 	}
 	else
 	{
-		centerPoint = 320;
-		yStart = 32;
-		scale = 0.6f;
-		
 		return;
 	}
 
-	// see what information we should display
+	// get server information
 	trap_GetClientState( &cstate );
 
-	info[0] = '\0';
+	// got the mid-panel shader? (gameset artwork)
+	if( uiInfo.uiDC.Assets.midPanelGfx )
+	{
+		// draw gfx
+		UI_DrawHandlePic( 0, 160, 640, 160, uiInfo.uiDC.Assets.midPanelGfx );
+	}
+	else
+	{
+		// not loaded the gfx yet
+
+		// try?
+		if( !giveUpLoadingGfx )
+		{
+			// get complete info text
+			if( trap_LAN_ServerStatus( cstate.servername, exInfo, 1024 ) )
+			{
+				pGameset = Info_ValueForKey( exInfo, "mf_gameset");
+
+				// convert gameset string to enum
+				gameset = MF_UI_Gameset_StringToValue( pGameset, qtrue );
+				if( gameset < numGamesets )
+				{
+					// attempt load - once only!
+					uiInfo.uiDC.Assets.midPanelGfx = trap_R_RegisterShaderNoMip( va( "ui\\assets\\mid-%s", pGameset ) );
+
+					// didn't work?
+					if( !uiInfo.uiDC.Assets.midPanelGfx )
+					{
+						// don't try again
+						giveUpLoadingGfx = qtrue;
+					}
+				}
+			}
+			else
+			{
+				// reset info requests
+				if( !resetRequest )
+				{
+					trap_LAN_ServerStatus( cstate.servername, NULL, 0 );
+					resetRequest = qtrue;
+				}
+			}
+		}
+	}
+
+	// get info string
+	info[0] = 0;
 	if( trap_GetConfigString( CS_SERVERINFO, info, sizeof(info) ) )
 	{
 		Text_PaintCenter( centerPoint, yStart, scale, colorWhite, va( "Loading %s", Info_ValueForKey( info, "mapname" )), 0 );
