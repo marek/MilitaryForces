@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.42 2002-06-12 14:35:33 thebjoern Exp $
+ * $Id: cg_main.c,v 1.43 2002-06-12 21:12:46 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1020,6 +1020,8 @@ static void CG_RegisterGraphics( void ) {
 	// MFQ3 IGME
 	if( cgs.gametype == GT_MISSION_EDITOR ) {
 		cgs.media.IGME_selector = trap_R_RegisterModel("models/effects/selector.md3");
+		cgs.media.IGME_waypoint = trap_R_RegisterShaderNoMip("models/tex_shared/powerup_green");
+		cgs.media.IGME_waypoint2 = trap_R_RegisterShaderNoMip("models/tex_shared/powerup_gray");
 	}
 	// end MFQ3 IGME
 
@@ -2157,6 +2159,9 @@ CG_KeyEvent
 */
 void CG_KeyEvent(int key, qboolean down)
 {
+	if( cgs.gametype == GT_MISSION_EDITOR ) {
+		ME_KeyEvent(key, down);
+	}
 }
 
 /*
@@ -2166,4 +2171,7 @@ CG_MouseEvent
 */
 void CG_MouseEvent(int x, int y)
 {
+	if( cgs.gametype == GT_MISSION_EDITOR ) {
+		ME_MouseEvent(x, y);
+	}
 }

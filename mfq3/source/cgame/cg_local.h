@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.48 2002-06-12 14:35:33 thebjoern Exp $
+ * $Id: cg_local.h,v 1.49 2002-06-12 21:12:46 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -733,6 +733,8 @@ typedef struct {
 	
 	// IGME
 	qhandle_t	IGME_selector;
+	qhandle_t	IGME_waypoint;
+	qhandle_t	IGME_waypoint2;
 
 	// weapon effect models
 	qhandle_t	bulletFlashModel;
@@ -845,6 +847,18 @@ enum CameraAdjust {
 
 // IGME
 #define IGME_MAX_VEHICLES		128
+#define IGME_MAX_WAYPOINTS		64
+
+enum IGME_OBJECT_TYPES {
+	IGMEO_VEHICLE,
+	IGMEO_WAYPOINT
+};
+
+typedef struct {
+	qboolean		active;
+	qboolean		selected;
+	vec3_t			origin;
+} IGME_waypoint_t;
 
 typedef struct {
 	qboolean		active;
@@ -853,11 +867,16 @@ typedef struct {
 	vec3_t			angles;
 	vec3_t			origin;
 	vec3_t			selectorScale;
+	IGME_waypoint_t waypoints[IGME_MAX_WAYPOINTS];
 } IGME_vehicle_t;
 
 typedef struct {
 	IGME_vehicle_t	vehicles[IGME_MAX_VEHICLES];
 	int				selectionTime;
+	int				numSelections;
+	int				numWptSelections;
+	qboolean		dragmode;
+	qboolean		waypointmode;
 } IGME_data_t;
 
 // end IGME
@@ -1418,6 +1437,8 @@ void CG_CheckChangedPredictableEvents( playerState_t *ps );
 //
 void ME_SpawnVehicle( int idx );
 void CG_Draw_IGME();
+void ME_KeyEvent(int key, qboolean down);
+void ME_MouseEvent(int x, int y);
 
 //===============================================
 
