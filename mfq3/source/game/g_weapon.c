@@ -1,5 +1,5 @@
 /*
- * $Id: g_weapon.c,v 1.6 2003-08-06 18:10:21 thebjoern Exp $
+ * $Id: g_weapon.c,v 1.7 2003-08-14 15:45:47 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -119,7 +119,8 @@ void FireWeapon( gentity_t *ent ) {
 		fire_maingun( ent );
 		break;
 	case WT_FUELTANK:
-		while( MF_findWeaponsOfType(ent->client->ps.weaponIndex, &ent->loadout) )
+		drop_fueltank( ent );
+		if( availableWeapons[ent->s.weaponIndex].flags & WF_FIRE_IN_PAIRS )
 			drop_fueltank( ent );
 		break;
 	default:

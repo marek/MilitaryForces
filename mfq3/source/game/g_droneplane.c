@@ -1,5 +1,5 @@
 /*
- * $Id: g_droneplane.c,v 1.7 2003-02-22 18:35:24 thebjoern Exp $
+ * $Id: g_droneplane.c,v 1.8 2003-08-14 15:45:47 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -87,7 +87,7 @@ void Drone_Plane_Think( gentity_t* ent ) {
 			else angles[0] = bearing[0];
 		}
 
-		ent->nextthink = level.time + 50;
+		ent->nextthink = level.time + 100;
 		trap_LinkEntity (ent);
 
 		VectorCopy( angles, ent->s.angles );

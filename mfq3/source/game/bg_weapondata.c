@@ -1,5 +1,5 @@
 /*
- * $Id: bg_weapondata.c,v 1.26 2003-04-25 00:02:23 thebjoern Exp $
+ * $Id: bg_weapondata.c,v 1.27 2003-08-14 15:45:47 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -1323,7 +1323,7 @@ completeWeaponData_t availableWeapons[] =
 		0,									// barrelDistance
 		0.985f,								// lockcone (dot)
 		0.996f,								// followcone (dot)
-		1500,								// locktime
+		2000,								// locktime
 		CH_MISSILEMODE,						// crosshair
 		CH_MISSILEMODETRACK,				// crosshair track
 		CH_MISSILEMODELOCK,					// crosshair lock
@@ -1365,7 +1365,7 @@ completeWeaponData_t availableWeapons[] =
 		0,									// barrelDistance
 		0.5f,								// lockcone (dot)
 		0.5f,								// followcone (dot)
-		1500,								// locktime
+		2500,								// locktime
 		CH_MISSILEMODE,						// crosshair
 		CH_MISSILEMODETRACK,				// crosshair track
 		CH_MISSILEMODELOCK,					// crosshair lock
@@ -1405,7 +1405,7 @@ completeWeaponData_t availableWeapons[] =
 		0,									// barrelDistance
 		0.985f,								// lockcone (dot)
 		0.996f,								// followcone (dot)
-		700,								// locktime
+		1700,								// locktime
 		CH_MISSILEMODE,						// crosshair
 		CH_MISSILEMODETRACK,				// crosshair track
 		CH_MISSILEMODELOCK,					// crosshair lock
@@ -1613,9 +1613,9 @@ completeWeaponData_t availableWeapons[] =
 		0,									// lockcone
 		0,									// followcone
 		0,									// locktime
-		CH_BOMBMODE,						// crosshair
-		CH_BOMBMODE,						// crosshair track
-		CH_BOMBMODE,						// crosshair lock
+		CH_GUNMODE,							// crosshair
+		CH_GUNMODE,							// crosshair track
+		CH_GUNMODE,							// crosshair lock
 		0,									// turret
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
@@ -1624,6 +1624,46 @@ completeWeaponData_t availableWeapons[] =
 		PF_TANK_HVY,						// fits on pylon
 		0,									// basicECMVulnerability
 		0,									// flags
+	},
+
+	// droptank pair
+	{ 
+		WT_FUELTANK,						// type
+		MF_GAMESET_ANY,						// gameset
+		"Droptank",							// descriptiveName
+		"Droptank",							// shortName
+		"BAD SHIT",							// shortName2 (GVs)
+		"models/weapons/vwep_droptank.md3",	// modelName
+		0,									// handle
+		"models/weapons/vwep_droptank.md3",// vwepName
+		0,									// vwephandle
+		"hud/iconw_bmb.tga",				// iconName
+		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
+		0,									// muzzleVelocity
+		0,									// range
+		0,									// fuelrange
+		200,								// fire interval
+		30,									// damage
+		15,									// damageRadius
+		1,									// spread
+		2,									// barrels
+		0,									// barrelDistance
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_GUNMODE,							// crosshair
+		CH_GUNMODE,							// crosshair track
+		CH_GUNMODE,							// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
+		30,									// number per package
+		CAT_PLANE,							// fits on category
+		PF_TANK_HVY,						// fits on pylon
+		0,									// basicECMVulnerability
+		WF_FIRE_IN_PAIRS,					// flags
 	},
 
 	// droptank lt
@@ -1653,9 +1693,9 @@ completeWeaponData_t availableWeapons[] =
 		0,									// lockcone
 		0,									// followcone
 		0,									// locktime
-		CH_BOMBMODE,						// crosshair
-		CH_BOMBMODE,						// crosshair track
-		CH_BOMBMODE,						// crosshair lock
+		CH_GUNMODE,							// crosshair
+		CH_GUNMODE,							// crosshair track
+		CH_GUNMODE,							// crosshair lock
 		0,									// turret
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
@@ -1664,6 +1704,46 @@ completeWeaponData_t availableWeapons[] =
 		PF_TANK_LT,							// fits on pylon
 		0,									// basicECMVulnerability
 		0,									// flags
+	},
+
+	// droptank lt pair
+	{ 
+		WT_FUELTANK,						// type
+		MF_GAMESET_ANY,						// gameset
+		"Droptank small",					// descriptiveName
+		"Droptank",							// shortName
+		"BAD SHIT",							// shortName2 (GVs)
+		"models/weapons/vwep_droptank_lt.md3",// modelName
+		0,									// handle
+		"models/weapons/vwep_droptank_lt.md3",// vwepName
+		0,									// vwephandle
+		"hud/iconw_bmb.tga",				// iconName
+		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
+		0,									// muzzleVelocity
+		0,									// range
+		0,									// fuelrange
+		200,								// fire interval
+		20,									// damage
+		10,									// damageRadius
+		1,									// spread
+		2,									// barrels
+		0,									// barrelDistance
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_GUNMODE,							// crosshair
+		CH_GUNMODE,							// crosshair track
+		CH_GUNMODE,							// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
+		20,									// number per package
+		CAT_PLANE,							// fits on category
+		PF_TANK_LT,							// fits on pylon
+		0,									// basicECMVulnerability
+		WF_FIRE_IN_PAIRS,					// flags
 	},
 
 	// flares
