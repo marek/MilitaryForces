@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.11 2002-02-15 09:58:31 thebjoern Exp $
+ * $Id: bg_mfq3util.c,v 1.12 2002-02-15 16:03:19 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -134,18 +134,18 @@ MF_getIndexOfVehicle
 =================
 */
 int MF_getIndexOfVehicle( int start,			// where to start in list
-						  unsigned int gameset,
-						  unsigned int team,
-						  unsigned int cat,
-						  unsigned int cls )
+						  int gameset,
+						  int team,
+						  int cat,
+						  int cls )
 {
     int				i;
 	qboolean		done = qfalse;
 
-	if( !gameset ) gameset = MF_GAMESET_ANY;
-	if( !team ) team = MF_TEAM_ANY;
-	if( !cat ) cat = CAT_ANY;
-	if( !cls ) cls = CLASS_ANY;
+	if( gameset <= 0 ) gameset = MF_GAMESET_ANY;
+	if( team <= 0 ) team = MF_TEAM_ANY;
+	if( cat <= 0 ) cat = CAT_ANY;
+	if( cls <= 0 ) cls = CLASS_ANY;
 
 	if( start >= bg_numberOfVehicles ) start = 0;
 	else if( start < 0 ) start = bg_numberOfVehicles;
@@ -246,7 +246,7 @@ char * MF_CreateModelPathname( int vehicle, char * pFormatString )
 {
 	char * pReturnString = NULL;
 	char catDir[ 32 ];
-	unsigned long cat = 0;
+	unsigned int cat = 0;
 
 	// find catagory
 	cat = availableVehicles[ vehicle ].cat;
