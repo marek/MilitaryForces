@@ -1,5 +1,5 @@
 /*
- * $Id: cg_consolecmds.c,v 1.14 2002-02-09 18:23:15 thebjoern Exp $
+ * $Id: cg_consolecmds.c,v 1.15 2002-02-15 18:10:33 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -314,7 +314,6 @@ static void CG_CamOld_f( void )
 {
 	cg.CameraMode = CAMERA_TARGET;
 }
-
 
 /*
 ==================

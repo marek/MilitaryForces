@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.29 2002-02-14 12:02:19 sparky909_uk Exp $
+ * $Id: cg_main.c,v 1.30 2002-02-15 18:10:47 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1808,12 +1808,13 @@ CG_OwnerDrawWidth();
 =================
 */
 static int CG_OwnerDrawWidth(int ownerDraw, float scale) {
-	switch (ownerDraw) {
+	switch (ownerDraw)
+	{
 	  case CG_GAME_TYPE:
 			return CG_Text_Width(CG_GameTypeString(), scale, 0);
+
 	  case CG_GAME_STATUS:
 			return CG_Text_Width(CG_GetGameStatusText(), scale, 0);
-			break;
 /*
 	  case CG_KILLER:
 			return CG_Text_Width(CG_GetKillerText(), scale, 0);
@@ -2101,7 +2102,6 @@ void CG_Shutdown( void ) {
 	// like closing files or archiving session data
 }
 
-
 /*
 ==================
 CG_EventHandling
@@ -2111,14 +2111,25 @@ CG_EventHandling
       2 - hud editor
 
 */
-void CG_EventHandling(int type) {
+void CG_EventHandling(int type)
+{
 }
 
-
-
-void CG_KeyEvent(int key, qboolean down) {
+/*
+=================
+CG_KeyEvent
+=================
+*/
+void CG_KeyEvent(int key, qboolean down)
+{
 }
 
-void CG_MouseEvent(int x, int y) {
+/*
+=================
+CG_MouseEvent
+=================
+*/
+void CG_MouseEvent(int x, int y)
+{
 }
 
