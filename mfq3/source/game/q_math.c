@@ -1,5 +1,5 @@
 /*
- * $Id: q_math.c,v 1.4 2002-02-22 11:43:26 thebjoern Exp $
+ * $Id: q_math.c,v 1.5 2002-02-25 09:18:30 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1340,7 +1340,9 @@ Rotates a point around a local axis of y/p/r
 
 void RotatePointAroundAngles( vec3_t dst, vec3_t src, float yaw, float pitch, float roll )
 {
-	vec3_t up = {0,0,1}, forwards = {1,0,0}, left = {0,1,0}, tmpVec;
+	// NOTE: not sure whether we are using the correct axis here, it may be an inverse or something.
+	// The function works fine for shadows, but check results if you use it for other purposes.
+	vec3_t up = {0,0,1}, forwards = {-1,0,0}, left = {0,-1,0}, tmpVec;
 
 	// rotate point (+ left vector & forwards vector) around yaw
 	RotatePointAroundVector( tmpVec, up, src, yaw );
