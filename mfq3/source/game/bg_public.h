@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.33 2002-01-29 13:04:11 thebjoern Exp $
+ * $Id: bg_public.h,v 1.34 2002-01-30 19:26:02 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.55"
+#define	GAME_VERSION		"mfq3 v0.55d"
 
 #define	DEFAULT_GRAVITY		800
 #define	GIB_HEALTH			-50
@@ -146,6 +146,7 @@ typedef struct {
 	int			pmove_msec;
 
 	int			vehicle;		// MFQ3
+	qboolean	updateGear;
 
 	// callbacks to test the world
 	// these will be different functions during game and cgame
@@ -168,13 +169,14 @@ typedef enum {
 	STAT_MAX_HEALTH,				// health limit, changable by handicap
 	STAT_FUEL,
 	STAT_MAX_FUEL,
-	STAT_LOCKINFO
+	STAT_LOCKINFO,
 } statIndex_t;
 
 typedef enum {
 	TIMER_FUEL,
 	TIMER_THROTTLE,
 	TIMER_GEAR,
+	TIMER_GEARANIM,
 	TIMER_BRAKE,
 	TIMER_MACHINEGUN,
 	TIMER_WEAPON
@@ -296,6 +298,12 @@ typedef enum {
 	EV_VEHICLE_HIT,			// smoke puff when hit
 	EV_VEHICLE_DIE,			// explosion when dying
 	EV_VEHICLE_GIB,			// even bigger explosion when gibbed
+
+	EV_GEAR_UP,				// start gear up anim
+	EV_GEAR_DOWN,			// start gear down anim
+	EV_GEAR_UP_FULL,		// bring gear up fully
+	EV_GEAR_DOWN_FULL,		// bring gear down fully
+	EV_GEAR_STOP,			// stop gear anim as it is
 
 	EV_DEBUG_LINE
 
@@ -774,5 +782,14 @@ char * MF_CreateModelPathname( int vehicle, char * pFormatString );
 #define LI_LOCKING				2
 #define LI_BEING_LOCKED			4
 #define LI_BEING_LAUNCHED		8
+
+// gear anim frames
+#define GEAR_UP					0
+#define GEAR_DOWN				47
+
+#define GEAR_ANIM_STOP			0
+#define GEAR_ANIM_UP			1
+#define GEAR_ANIM_DOWN			2
+
 
 

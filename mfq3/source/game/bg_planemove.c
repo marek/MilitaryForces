@@ -1,5 +1,5 @@
 /*
- * $Id: bg_planemove.c,v 1.3 2002-01-19 02:24:02 thebjoern Exp $
+ * $Id: bg_planemove.c,v 1.4 2002-01-30 19:26:02 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -53,22 +53,26 @@ void PM_Toggle_Gear()
 		return;
 	}
 
-	if( pm->cmd.serverTime < pm->ps->timers[TIMER_GEAR] ) {
+	if( pm->cmd.serverTime < pm->ps->timers[TIMER_GEAR] && pm->ps->timers[TIMER_GEARANIM] ) {
 		return;
 	}
 
 	if( pm->ps->speed > availableVehicles[pm->vehicle].stallspeed * 10 * SPEED_GREEN_ARC ) {
-		pm->ps->timers[TIMER_GEAR] = pm->cmd.serverTime + 500;
+		pm->ps->timers[TIMER_GEAR] = pm->cmd.serverTime + 1500;
 		return;
 	}
 
 	if( pm->ps->ONOFF & OO_GEAR ) {
-		pm->ps->ONOFF &= ~OO_GEAR;
+		PM_AddEvent( EV_GEAR_UP );
+		pm->ps->timers[TIMER_GEARANIM] = pm->cmd.serverTime + 1400;
+//		pm->ps->ONOFF &= ~OO_GEAR;
 	}
 	else {
-		pm->ps->ONOFF |= OO_GEAR;
+		PM_AddEvent( EV_GEAR_DOWN );
+		pm->ps->timers[TIMER_GEARANIM] = pm->cmd.serverTime + 1400;
+//		pm->ps->ONOFF |= OO_GEAR;
 	}
-	pm->ps->timers[TIMER_GEAR] = pm->cmd.serverTime + 2000;
+	pm->ps->timers[TIMER_GEAR] = pm->cmd.serverTime + 1500;
 }
 
 /*
@@ -201,6 +205,26 @@ void PM_PlaneMove( void )
 	// gear
 	if( !dead && (pm->cmd.buttons & BUTTON_GEAR) ) {
 		PM_Toggle_Gear();
+	}
+	// gearanim
+	if( !dead && pm->ps->timers[TIMER_GEARANIM] &&
+		pm->cmd.serverTime >= pm->ps->timers[TIMER_GEARANIM] ) {
+		pm->ps->timers[TIMER_GEARANIM] = 0;
+		if( pm->ps->ONOFF & OO_GEAR ) {
+			pm->ps->ONOFF &= ~OO_GEAR;
+		} else {
+			pm->ps->ONOFF |= OO_GEAR;
+		}
+	}
+	// update gear
+	if( pm->updateGear ) {
+		// sync anim
+		if( pm->ps->ONOFF & OO_GEAR ) {
+			PM_AddEvent( EV_GEAR_DOWN_FULL );
+		} else {
+			PM_AddEvent( EV_GEAR_UP_FULL );
+		}
+		pm->updateGear = qfalse;
 	}
 	// brake
 	if( !dead && (pm->cmd.buttons & BUTTON_BRAKE) ) {
@@ -367,9 +391,12 @@ void PM_PlaneMove( void )
 			//}
 		}
 		if( (availableVehicles[pm->vehicle].caps & HC_GEAR) && (pm->ps->ONOFF & OO_GEAR) &&
-			(pm->ps->speed > availableVehicles[pm->vehicle].stallspeed * 10 * SPEED_GREEN_ARC) ) {
-			pm->ps->ONOFF &= ~OO_GEAR;
-			pm->ps->timers[TIMER_GEAR] = pm->cmd.serverTime + 2000;
+			(pm->ps->speed > availableVehicles[pm->vehicle].stallspeed * 10 * SPEED_GREEN_ARC) &&
+			!pm->ps->timers[TIMER_GEARANIM] ) {
+			PM_AddEvent( EV_GEAR_UP );
+//			pm->ps->ONOFF &= ~OO_GEAR;
+			pm->ps->timers[TIMER_GEAR] = pm->cmd.serverTime + 1500;
+			pm->ps->timers[TIMER_GEARANIM] = pm->cmd.serverTime + 1400;
 		}
 		// wheel brakes off when airborne
 		if( !(availableVehicles[pm->vehicle].caps & HC_SPEEDBRAKE) &&

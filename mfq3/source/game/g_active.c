@@ -1,5 +1,5 @@
 /*
- * $Id: g_active.c,v 1.5 2002-01-27 15:41:28 thebjoern Exp $
+ * $Id: g_active.c,v 1.6 2002-01-30 19:26:02 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -688,6 +688,7 @@ void ClientThink_real( gentity_t *ent ) {
 
 	// setup vehicle for pmove
 	pm.vehicle = client->vehicle;
+	pm.updateGear = ent->updateGear;
 	VectorCopy( ent->s.angles, pm.ps->vehicleAngles );
 	pm.ps->speed = client->ps.speed;
 	pm.ps->gunAngle = client->ps.gunAngle;
@@ -707,6 +708,7 @@ void ClientThink_real( gentity_t *ent ) {
 	client->ps.speed = pm.ps->speed;
 	client->ps.gunAngle = pm.ps->gunAngle;
 	client->ps.turretAngle = pm.ps->turretAngle;
+	ent->updateGear = pm.updateGear;
 
 	// for GV's check for crashland
 	if( (availableVehicles[client->vehicle].id&CAT_ANY) & CAT_GROUND ) {

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.18 2002-01-29 13:03:36 thebjoern Exp $
+ * $Id: cg_local.h,v 1.19 2002-01-30 19:26:02 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -170,6 +170,9 @@ typedef struct centity_s {
 	qboolean		destroyableStructure;
 
 	int				lastSwingAngle;
+	int				gearAnim;
+	int				gearAnimFrame;
+	int				gearAnimStartTime;
 
 } centity_t;
 
@@ -1097,7 +1100,6 @@ void CG_RegisterVehicle( clientInfo_t *ci );
 void CG_VehicleObituary( entityState_t *ent );
 void CG_VehicleMuzzleFlash( centity_t *cent, const refEntity_t *parent, qhandle_t parentModel, int idx );
 void CG_Misc_Vehicle( centity_t *cent );
-
 //
 // cg_plane.c
 //

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_event.c,v 1.2 2002-01-16 19:29:36 sparky909_uk Exp $
+ * $Id: cg_event.c,v 1.3 2002-01-30 19:26:02 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -278,6 +278,39 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		DEBUGNAME("EV_VEHICLE_GIB");
 		CG_VehicleExplosion( position, 1 );
 		break;
+
+	case EV_GEAR_UP_FULL:
+		DEBUGNAME("EV_GEAR_UP_FULL");
+		cent->gearAnimStartTime = 0;
+		cent->gearAnim = GEAR_ANIM_STOP;
+		cent->gearAnimFrame = GEAR_UP;
+		break;
+
+	case EV_GEAR_UP:
+		DEBUGNAME("EV_GEAR_UP");
+		cent->gearAnimStartTime = cg.time;
+		cent->gearAnim = GEAR_ANIM_UP;
+		break;
+
+	case EV_GEAR_STOP:
+		DEBUGNAME("EV_GEAR_STOP");
+		cent->gearAnimStartTime = 0;
+		cent->gearAnim = GEAR_ANIM_STOP;
+		break;
+
+	case EV_GEAR_DOWN:
+		DEBUGNAME("EV_GEAR_DOWN");
+		cent->gearAnimStartTime = cg.time;
+		cent->gearAnim = GEAR_ANIM_DOWN;
+		break;
+
+	case EV_GEAR_DOWN_FULL:
+		DEBUGNAME("EV_GEAR_DOWN_FULL");
+		cent->gearAnimStartTime = 0;
+		cent->gearAnim = GEAR_ANIM_STOP;
+		cent->gearAnimFrame = GEAR_DOWN;
+		break;
+	
 
 	case EV_GENERAL_SOUND:
 		DEBUGNAME("EV_GENERAL_SOUND");
