@@ -5,8 +5,17 @@ Military Forces Q3
 History:
 ========
 
-+++v0.44+++ in progress...
+
++++v0.45+++ in progress...
 -----------
+
++++v0.44+++
+-----------
+- equipped F16 with Hellfires as a test (will be removed soon)
+- equipped M1 with Stingers as a test (will be removed soon)
+- added Hellfire as first test-anti-ground missile
+- made missiles work with ground vehicles
+- make tracking reticles work with ground vehicles 
 - unlock targets on weapon change
 - unlock added to controls/setup
 - added cmd "unlock" to break lock on current target
