@@ -5,19 +5,32 @@ Military Forces Q3
 History:
 ========
 
-
-
-+++v0.77+++ in progress...
++++v0.78+++ in progress...
 -----------
-- fixed a bug where when locking a target, then losing the lock and trying
-  to lock again allowed to lock too quickly
-- fix SAM bug where they didnt unlock when they died
-- made fueltanks work, use it like any other weapon, ie select it and press
-  fire to pump fuel from the tank to the plane, it automatically drops 
-  when it is empty
-- weaponbays now autoclose a bit later
-- gameplay tweaks (loadouts, weapons) from Schez
-- minor fixes
+- fixed for media reload
+- fixed lock-on fog bug
+
++++v0.77+++
+-----------
+- Disabled CTF/TDM due to lag and mass bugs
+- Disabled Spectator (causes crashing sometimes)
+- Nuclear Weapons Bomb and Cruise missile flavours, NukeBomb Model by Schez, Nuke Missile Model By Minkis
+- new cvar "mf_allowNukes"  1 = Allow[default]  0 = disallow
+- New "RailTrail" style Missile trails
+- New Flare Model, thanks schez
+- Cluster Flare added, spans for regular flares after a delay
+- Vehicle wheels now turn left and right
+- Adjusted vehicle turning
+- Added vehicle loadout selector to UI
+- Vehicle Speed less affected on slopes
+- Modified B17g to support bombs, thanks Minkis
+- New HUD, thanks OQ
+- Maps now include mfq3_subpen, and mfq3_field, mfq3_orientation, mfq3_canyon,
+  mfq3_groundwar, mfq3_atoll, mfq3_groundwar, thanks cannon & Angel
+- Drop tanks now are fully functional
+- Various mission scripts thanks cannon and edwin
+- Various media fixes (Thanks whole team)
+- lots of fixes
 
 +++v0.76+++
 -----------
