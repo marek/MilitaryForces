@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.31 2002-06-08 18:56:07 thebjoern Exp $
+ * $Id: cg_drawnewhud.c,v 1.32 2002-06-09 20:09:41 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -253,7 +253,8 @@ static int CG_DrawString_MFQ3_R( int x, int y, const char *string, const float *
 	int			cnt;
 	int			charWidth, charHeight;
 	char		invstring[128];
-	int			len = strlen(string)-1, i = 0;
+	int			len = strlen(string)-1;
+	int			i = 0;
 
 	if( len >= 127 ) {
 		CG_Printf( "String too long! Not printed!" );
@@ -1161,9 +1162,9 @@ static void CG_Draw_MFD(int mfdnum, int vehicle, centity_t * cent, int targetran
 		CG_DrawString_MFQ3_R( x+122, y+54, buffer, HUDColors[stallcolor], 0);
 		Com_sprintf(buffer, 7, "%d", altitude);
 		CG_DrawString_MFQ3_R( x+122, y+64, buffer, HUDColors[cg.MFDColor], 0);
-		Com_sprintf(buffer, 7, "%d", ps->origin[0]);
+		Com_sprintf(buffer, 7, "%d", (int)ps->origin[0]);
 		CG_DrawString_MFQ3_R( x+122, y+78, buffer, HUDColors[cg.MFDColor], 0);
-		Com_sprintf(buffer, 7, "%d", ps->origin[1]);
+		Com_sprintf(buffer, 7, "%d", (int)ps->origin[1]);
 		CG_DrawString_MFQ3_R( x+122, y+88, buffer, HUDColors[cg.MFDColor], 0);
 		value = (100*ps->stats[STAT_HEALTH]/ps->stats[STAT_MAX_HEALTH]);
 		if( value > 100 ) value = 100;	

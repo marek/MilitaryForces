@@ -1,5 +1,5 @@
 /*
- * $Id: cg_draw.c,v 1.31 2002-02-26 13:29:28 sparky909_uk Exp $
+ * $Id: cg_draw.c,v 1.32 2002-06-09 20:09:41 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1886,14 +1886,21 @@ static void CG_DrawSpectator(void) {
 		// still a spectator?
 		if( cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR )
 		{
-			trap_Cvar_Set( "ui_spectatorTitleTxt", "Spectator" );
-			trap_Cvar_Set( "ui_spectatorLine1Txt", "Press FIRE to switch view." );
-			
-			// team game?
-			if ( cgs.gametype >= GT_TEAM )
-				trap_Cvar_Set( "ui_spectatorLine2Txt", "Choose a team from the 'Team' dialog to play." );
-			else
-				trap_Cvar_Set( "ui_spectatorLine2Txt", "Select 'Join' from the 'Team' dialog to play." );
+			if( cgs.gametype != GT_MISSION_EDITOR ) {
+				trap_Cvar_Set( "ui_spectatorTitleTxt", "Spectator" );
+				trap_Cvar_Set( "ui_spectatorLine1Txt", "Press FIRE to switch view." );
+				
+				// team game?
+				if ( cgs.gametype >= GT_TEAM )
+					trap_Cvar_Set( "ui_spectatorLine2Txt", "Choose a team from the 'Team' dialog to play." );
+				else
+					trap_Cvar_Set( "ui_spectatorLine2Txt", "Select 'Join' from the 'Team' dialog to play." );
+			} else {
+				trap_Cvar_Set( "ui_spectatorTitleTxt", "Mission Editor" );
+				trap_Cvar_Set( "ui_spectatorLine1Txt", "Use Vehicle Selection to spawn a vehicle" );
+				trap_Cvar_Set( "ui_spectatorLine2Txt", "Press FIRE2 to select what you are looking at" );
+
+			}
 		}
 		else
 		{
@@ -1905,6 +1912,24 @@ static void CG_DrawSpectator(void) {
 
 		// draw
 		Menu_Paint( menuSpectator, qtrue );
+	}
+
+	if( cgs.gametype == GT_MISSION_EDITOR ) {
+		float		w, h;
+		qhandle_t	hShader;
+		float		x, y;
+
+		w = h = cg_crosshairSize.value;
+		x = cg_crosshairX.integer;
+		y = cg_crosshairY.integer;
+
+		CG_AdjustFrom640( &x, &y, &w, &h );
+
+		hShader = cgs.media.crosshairShader[8];
+
+		trap_R_DrawStretchPic( x + cg.refdef.x + 0.5 * (cg.refdef.width - w), 
+			y + cg.refdef.y + 0.5 * (cg.refdef.height - h), 
+		w, h, 0, 0, 1, 1, hShader );
 	}
 #else
 	// old style
@@ -2222,6 +2247,8 @@ static void CG_DrawWarmup( void ) {
 			s = "Team Deathmatch";
 		} else if ( cgs.gametype == GT_CTF ) {
 			s = "Capture the Flag";
+		} else if ( cgs.gametype == GT_MISSION_EDITOR ) {
+			s = "MFQ3 Mission Editor";
 		} else {
 			s = "";
 		}
@@ -2244,18 +2271,20 @@ static void CG_DrawWarmup( void ) {
 	s = va( "Starts in: %i", sec + 1 );
 	if ( sec != cg.warmupCount ) {
 		cg.warmupCount = sec;
-		switch ( sec ) {
-		case 0:
-			trap_S_StartLocalSound( cgs.media.count1Sound, CHAN_ANNOUNCER );
-			break;
-		case 1:
-			trap_S_StartLocalSound( cgs.media.count2Sound, CHAN_ANNOUNCER );
-			break;
-		case 2:
-			trap_S_StartLocalSound( cgs.media.count3Sound, CHAN_ANNOUNCER );
-			break;
-		default:
-			break;
+		if( cgs.gametype != GT_MISSION_EDITOR ) {
+			switch ( sec ) {
+			case 0:
+				trap_S_StartLocalSound( cgs.media.count1Sound, CHAN_ANNOUNCER );
+				break;
+			case 1:
+				trap_S_StartLocalSound( cgs.media.count2Sound, CHAN_ANNOUNCER );
+				break;
+			case 2:
+				trap_S_StartLocalSound( cgs.media.count3Sound, CHAN_ANNOUNCER );
+				break;
+			default:
+				break;
+			}
 		}
 	}
 	scale = 0.45f;

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.89 2002-06-08 18:56:07 thebjoern Exp $
+ * $Id: bg_public.h,v 1.90 2002-06-09 20:09:41 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.68b"
+#define	GAME_VERSION		"mfq3 v0.69"
 #define	GAME_IDENTIFIER		"mfq3"			// use to identify mfq3 servers
 
 #define	DEFAULT_GRAVITY		800
@@ -72,6 +72,7 @@ typedef enum {
 	GT_FFA,				// free for all
 	GT_TOURNAMENT,		// one on one tournament
 	GT_SINGLE_PLAYER,	// single player ffa
+	GT_MISSION_EDITOR,	// editing MFQ3 missions
 
 	//-- team games go after this --
 
@@ -107,7 +108,7 @@ typedef enum {
 #define	PMF_DUCKED			1
 #define	PMF_RECHARGING		2		// set when recharging
 #define PMF_VEHICLESPAWN	4		// spawning vehicle
-#define	PMF_MFQ3_FREE2		8		// --- unused ---
+#define	PMF_ME_FREEZE		8		// mission editor freeze (when manipulating objects)
 #define	PMF_MFQ3_FREE3		16		// --- unused ---
 #define	PMF_MFQ3_FREE5		32		// --- unused ---
 #define	PMF_TIME_KNOCKBACK	64		// pm_time is an air-accelerate only time

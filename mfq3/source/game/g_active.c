@@ -1,5 +1,5 @@
 /*
- * $Id: g_active.c,v 1.16 2002-04-16 11:28:18 thebjoern Exp $
+ * $Id: g_active.c,v 1.17 2002-06-09 20:09:41 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -330,7 +330,7 @@ void SpectatorThink( gentity_t *ent, usercmd_t *ucmd ) {
 
 	if ( client->sess.spectatorState != SPECTATOR_FOLLOW ) {
 		client->ps.pm_type = PM_SPECTATOR;
-		client->ps.speed = 400;	// faster than normal
+		client->ps.speed = g_spectSpeed.integer;	// faster than normal
 
 		// set up for pmove
 		memset (&pm, 0, sizeof(pm));
@@ -360,6 +360,56 @@ void SpectatorThink( gentity_t *ent, usercmd_t *ucmd ) {
 }
 
 
+/*
+=================
+MissionEditorThink
+=================
+*/
+void MissionEditorThink( gentity_t *ent, usercmd_t *ucmd ) {
+	pmove_t	pm;
+	gclient_t	*client;
+
+	client = ent->client;
+
+	if ( client->sess.spectatorState != SPECTATOR_FOLLOW ) {
+		client->ps.pm_type = PM_SPECTATOR;
+		client->ps.speed = g_spectSpeed.integer;	// faster than normal
+		if( ucmd->forwardmove ) {
+			ucmd->forwardmove = ucmd->forwardmove;
+		}
+		// set up for pmove
+		memset (&pm, 0, sizeof(pm));
+		pm.ps = &client->ps;
+		pm.cmd = *ucmd;
+		pm.tracemask = MASK_PLAYERSOLID & ~CONTENTS_BODY;	// spectators can fly through bodies
+		pm.trace = trap_Trace;
+		pm.pointcontents = trap_PointContents;
+
+		// perform a pmove
+		pm.vehicle = -1;
+		Pmove (&pm);
+		// save results of pmove
+		VectorCopy( client->ps.origin, ent->s.origin );
+
+		G_TouchTriggers( ent );
+		trap_UnlinkEntity( ent );
+	}
+
+	client->oldbuttons = client->buttons;
+	client->buttons = ucmd->buttons;
+
+	// attack button cycles through spectators
+	if ( ( client->buttons & BUTTON_ATTACK_MAIN ) && ! ( client->oldbuttons & BUTTON_ATTACK_MAIN ) &&
+		level.time >= client->ps.timers[TIMER_WEAPON] ) {
+		ME_Find(ent);
+	} 
+	if( client->buttons & BUTTON_ATTACK ) {
+//		ME_MoveObject( ent, ucmd );
+	} else {
+		client->ps.pm_flags &= ~PMF_ME_FREEZE;
+		if( ent->selector ) ent->selector->last_move_time = 0;
+	}
+}
 
 /*
 =================
@@ -634,7 +684,11 @@ void ClientThink_real( gentity_t *ent ) {
 		if ( client->sess.spectatorState == SPECTATOR_SCOREBOARD ) {
 			return;
 		}
-		SpectatorThink( ent, ucmd );
+		if( g_gametype.integer == GT_MISSION_EDITOR ) {
+			MissionEditorThink( ent, ucmd );
+		} else {
+			SpectatorThink( ent, ucmd );
+		}
 		return;
 	}
 

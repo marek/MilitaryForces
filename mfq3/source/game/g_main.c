@@ -1,5 +1,5 @@
 /*
- * $Id: g_main.c,v 1.11 2002-02-27 14:42:25 sparky909_uk Exp $
+ * $Id: g_main.c,v 1.12 2002-06-09 20:09:41 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -62,6 +62,7 @@ vmCvar_t	pmove_fixed;
 vmCvar_t	pmove_msec;
 vmCvar_t	g_rankings;
 vmCvar_t	g_listEntity;
+vmCvar_t	g_spectSpeed;
 
 // MFQ3
 vmCvar_t	mf_gameset;
@@ -136,7 +137,8 @@ cvarTable_t		gameCvarTable[] = {
 	{ &pmove_fixed, "pmove_fixed", "1", CVAR_SYSTEMINFO|CVAR_ROM, 0, qfalse},
 	{ &pmove_msec, "pmove_msec", "8", CVAR_SYSTEMINFO, 0, qfalse},
 
-	{ &g_rankings, "g_rankings", "0", 0, 0, qfalse}
+	{ &g_rankings, "g_rankings", "0", 0, 0, qfalse},
+	{ &g_spectSpeed, "g_spectSpeed", "400", CVAR_ARCHIVE, 0, qfalse}
 
 };
 
@@ -382,7 +384,8 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 	level.snd_fry = G_SoundIndex("sound/player/fry.wav");	// FIXME standing in lava / slime
 
-	if ( g_gametype.integer != GT_SINGLE_PLAYER && g_log.string[0] ) {
+	if ( g_gametype.integer != GT_SINGLE_PLAYER && g_gametype.integer != GT_MISSION_EDITOR &&
+			g_log.string[0] ) {
 		if ( g_logSync.integer ) {
 			trap_FS_FOpenFile( g_log.string, &level.logFile, FS_APPEND_SYNC );
 		} else {
@@ -1119,7 +1122,7 @@ void CheckIntermissionExit( void ) {
 	gclient_t	*cl;
 	int			readyMask;
 
-	if ( g_gametype.integer == GT_SINGLE_PLAYER ) {
+	if ( g_gametype.integer == GT_SINGLE_PLAYER || g_gametype.integer == GT_MISSION_EDITOR ) {
 		return;
 	}
 
@@ -1372,7 +1375,8 @@ void CheckTournament( void ) {
 			level.restarted = qtrue;
 			return;
 		}
-	} else if ( g_gametype.integer != GT_SINGLE_PLAYER && level.warmupTime != 0 ) {
+	} else if ( g_gametype.integer != GT_SINGLE_PLAYER && g_gametype.integer != GT_MISSION_EDITOR &&
+					level.warmupTime != 0 ) {
 		int		counts[TEAM_NUM_TEAMS];
 		qboolean	notEnough = qfalse;
 

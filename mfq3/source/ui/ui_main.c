@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.28 2002-05-29 12:46:11 sparky909_uk Exp $
+ * $Id: ui_main.c,v 1.29 2002-06-09 20:09:41 thebjoern Exp $
 */
 /*
 =======================================================================
@@ -57,6 +57,7 @@ static const char *teamArenaGameTypes[] = {
 	"DM",
 	"TOURNAMENT",
 	"SP",
+	"MISSIONEDITOR",
 	"TDM",
 	"CTF",
 	"1FCTF",
@@ -79,6 +80,7 @@ static const char *teamArenaGameNames[] = {
 	"Deathmatch",
 	"Tournament",
 	"Single Player",
+	"MFQ3 Mission Editor",
 	"Team Deathmatch",
 	"Capture the Flag",
 	"One Flag CTF",
@@ -3679,8 +3681,12 @@ static void UI_SelectVehicle( void )
 	// get the UI vehicle index
 	idx = trap_Cvar_VariableValue( "ui_vehicle" );
 
-	// set into the trigger index
-	trap_Cvar_Set( "cg_nextVehicle", va( "%d", idx ));	
+	if( trap_Cvar_VariableValue("g_gametype") == GT_MISSION_EDITOR ) {
+		trap_Cmd_ExecuteText( EXEC_APPEND, va( "me_spawn %d\n", idx ) );
+	} else {
+		// set into the trigger index
+		trap_Cvar_Set( "cg_nextVehicle", va( "%d", idx ));	
+	}
 }
 
 /*

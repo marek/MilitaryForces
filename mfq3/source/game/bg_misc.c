@@ -1,5 +1,5 @@
 /*
- * $Id: bg_misc.c,v 1.10 2002-04-16 11:28:17 thebjoern Exp $
+ * $Id: bg_misc.c,v 1.11 2002-06-09 20:09:41 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -212,6 +212,23 @@ Only in CTF games
 		0,
 		IT_TEAM,
 		OB_BLUEFLAG,
+/* precache */ "",
+/* sounds */ ""
+	},
+
+/*QUAKED ME_selector (0 0 1) (-16 -16 -16) (16 16 16)
+Mission Editor selector
+*/
+	{
+		"ME_Selector",
+		NULL,
+        { "models/effects/selector.md3",
+		0, 0, 0 },
+/* icon */		"icons/iconf_blu1",
+/* pickup */	"ME Selector",
+		0,
+		IT_TEAM,
+		0,
 /* precache */ "",
 /* sounds */ ""
 	},

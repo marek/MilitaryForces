@@ -83,6 +83,8 @@ call ..\compile  ../g_scripts.c
 @if errorlevel 1 goto quit
 call ..\compile  ../g_groundvehicle.c
 @if errorlevel 1 goto quit
+call ..\compile  ../g_missioneditor.c
+@if errorlevel 1 goto quit
 call ..\compile  ../mf_client.c
 @if errorlevel 1 goto quit
 call ..\compile  ../mf_vehiclespawn.c

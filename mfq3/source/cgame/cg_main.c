@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.40 2002-06-08 17:05:08 thebjoern Exp $
+ * $Id: cg_main.c,v 1.41 2002-06-09 20:09:41 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -2113,6 +2113,17 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 
 	// init all the vehicle's shadow system
 	CG_InitShadows();
+
+	// in missioneditor load selector box
+	if( cgs.gametype == GT_MISSION_EDITOR ) {
+		gitem_t* item;
+		int i = 1;
+		for ( item=bg_itemlist+1 ; item->classname ; item++, i++ ) {
+			if ( !strcmp(item->classname, "ME_Selector") ) {
+				CG_RegisterItemVisuals(i);
+			}
+		}
+	}
 }
 
 /*
