@@ -5,9 +5,19 @@ Military Forces Q3
 History:
 ========
 
-
-+++v0.45+++ in progress...
++++v0.46+++ in progress...
 -----------
+
++++v0.45+++
+-----------
+- each weapon now has its own time that it needs to lock on
+- each weapon can have its own individual tracking, locking and 
+  follow cones
+- each weapon can now have individual crosshairs for no-lock, tracking,
+  locking, locking on friendly
+- made guided missiles work with func_explosives
+- made missile reticles work with func_explosives
+- minor fixes
 
 +++v0.44+++
 -----------
