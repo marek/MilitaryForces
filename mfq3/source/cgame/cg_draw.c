@@ -1,5 +1,5 @@
 /*
- * $Id: cg_draw.c,v 1.28 2002-02-22 10:40:57 sparky909_uk Exp $
+ * $Id: cg_draw.c,v 1.29 2002-02-22 15:25:40 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -2306,7 +2306,7 @@ Draw the custom chat console (if active)
 
 #define	CHAT_OX			4
 #define	CHAT_OY			4
-#define CHAT_TEXT_SCALE	0.25f
+#define	CHAT_AY			9
 
 #define	CURSOR_OX		2
 #define	CURSOR_OY		2
@@ -2321,6 +2321,8 @@ void CG_CustomChatDraw( void )
 	char * pMode = NULL;
 	int x = CHAT_X, y = CHAT_Y;
 	float alpha = 1.0f; 
+	float fx = 1.0f;
+	float textYAdjust = 0;
 
 	// can't do anything without a valid pointer from the UI
 	if( cg.pCustomChat == NULL )
@@ -2375,9 +2377,15 @@ void CG_CustomChatDraw( void )
 
 	spacer1 = DC->textWidth( pMode, CHAT_TEXT_SCALE, 0 );
 
+	// apply height adjuster (to keep the text base constant)
+	if( cg.pCustomChat->text[0] )
+	{
+		textYAdjust = DC->textHeight( cg.pCustomChat->text, CHAT_TEXT_SCALE, 0 );
+	}
+
 	// draw the current text line
 	DrawStringNew( x+CHAT_OX, y+CHAT_OY, CHAT_TEXT_SCALE, *CreateColourVector(1,1,0,1 * alpha,NULL), pMode, 0, 0, ITEM_TEXTSTYLE_SHADOWED, LEFT_JUSTIFY );
-	DrawStringNew( x+CHAT_OX+spacer1, y+CHAT_OY, CHAT_TEXT_SCALE, *CreateColourVector(1,1,1,1 * alpha,NULL), cg.pCustomChat->text, 0, 0, ITEM_TEXTSTYLE_SHADOWED, LEFT_JUSTIFY );
+	DrawStringNew( x+CHAT_OX+spacer1, y+CHAT_OY+CHAT_AY-textYAdjust, CHAT_TEXT_SCALE, *CreateColourVector(1,1,1,1 * alpha,NULL), cg.pCustomChat->text, 0, 0, ITEM_TEXTSTYLE_SHADOWED, LEFT_JUSTIFY );
 
 	spacer2 = DC->textWidth( cg.pCustomChat->text, CHAT_TEXT_SCALE, 0 );
 
@@ -2403,8 +2411,15 @@ void CG_CustomChatDraw( void )
 		}
 	}
 
+	// work out cursor attributes
+	fx = 1.0f;
+	if( cg.pCustomChat->lockEntry )
+	{
+		fx = 0.0f;
+	}
+
 	// draw the cursor
-	DC->fillRect( x+spacer1+spacer2+CURSOR_OX+4, y+CURSOR_OY, CURSOR_W, CURSOR_H, *CreateColourVector( 1,1,1,cg.pCustomChat->cursorAlpha * alpha,NULL ) );
+	DC->fillRect( x+spacer1+spacer2+CURSOR_OX+4, y+CURSOR_OY, CURSOR_W, CURSOR_H, *CreateColourVector( 1,fx,fx,cg.pCustomChat->cursorAlpha * alpha,NULL ) );
 }
 
 /*
