@@ -1,5 +1,5 @@
 /*
- * $Id: ui_local.h,v 1.9 2002-02-28 10:23:32 sparky909_uk Exp $
+ * $Id: ui_local.h,v 1.10 2002-05-15 10:12:25 sparky909_uk Exp $
 */
 //
 #ifndef __UI_LOCAL_H__
@@ -735,6 +735,8 @@ typedef struct {
 	const char *modDescr;
 } modInfo_t;
 
+#define MAX_CREDITS_LINES 128	// max character pointers to allocate
+
 typedef struct {
 	displayContextDef_t uiDC;
 	int newHighScoreTime;
@@ -823,6 +825,10 @@ typedef struct {
 	qboolean inGameLoad;
 
 	chat_t customChat;	// custom MFQ3 chat console
+
+	void * pCreditsData;					// credits data block
+	char * pCredits[ MAX_CREDITS_LINES ];	// credits line list
+	int creditLines;						// active lines in the list
 
 }	uiInfo_t;
 
