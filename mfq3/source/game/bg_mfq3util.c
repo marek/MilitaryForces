@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.14 2002-02-18 09:51:27 thebjoern Exp $
+ * $Id: bg_mfq3util.c,v 1.15 2002-02-18 16:23:25 sparky909_uk Exp $
 */
 
 #include "q_shared.h"
@@ -88,46 +88,32 @@ unsigned long MF_GetGameset( qboolean asEnum )
 MF_getIndexOfVehicleEx
 =================
 */
-/*
-int MF_getIndexOfVehicleEx( int start, int vehicleCat, int vehicleClass, unsigned long team, unsigned long gameset )
+
+int MF_getIndexOfVehicleEx( int start,
+							int gameset,
+							int team,
+							int cat,
+							int cls )
 {
-	// NOTE: vehicleClass & vehicleCat are enum indexed
-	// team & gameset are bitmapped MFQ3
+	// NOTE: vehicleClass & vehicleCat are int enum indexed, convert to flag enums
 
-	unsigned long what = 0x00000000;
-
-	// add components (in LB -> HB order in DWORD)
-	
 	// CATAGORY
-	if( vehicleCat < 0 )
-	{
-		// any catagory
-		what |= CAT_ANY;
-	}
-	else
+	if( cat >= 0 )
 	{
 		// specific catagory
-		what |= (1 << vehicleCat) << 8;		// (convert from enum)
+		cat = 1 << cat;		// (convert from int enum to flag enum)
 	}
 
 	// CLASS
-	if( vehicleClass < 0 )
-	{
-		// any class
-		what |= CLASS_ANY;
-	}
-	else
+	if( cls >= 0 )
 	{
 		// specific class
-		what |= (1 << vehicleClass);		// (convert from enum)
+		cls = 1 << cls;		// (convert from int enum to flag enum)
 	}
 
-	what |= team;		// as bitmapped
-	what |= gameset;	// as bitmapped
-
-	return MF_getIndexOfVehicle( start, what );
+	return MF_getIndexOfVehicle( start, gameset, team, cat, cls );
 }
-*/
+
 /*
 =================
 MF_getIndexOfVehicle
@@ -142,29 +128,47 @@ int MF_getIndexOfVehicle( int start,			// where to start in list
     int				i;
 	qboolean		done = qfalse;
 
+	// null or negative? use ALL values
 	if( gameset <= 0 ) gameset = MF_GAMESET_ANY;
 	if( team <= 0 ) team = MF_TEAM_ANY;
 	if( cat <= 0 ) cat = CAT_ANY;
 	if( cls <= 0 ) cls = CLASS_ANY;
 
-	if( start >= bg_numberOfVehicles ) start = 0;
-	else if( start < 0 ) start = bg_numberOfVehicles;
+	if( start >= bg_numberOfVehicles )
+	{
+		start = 0;
+	}
+	else if( start < 0 )
+	{
+		start = bg_numberOfVehicles;
+	}
 
+	// scan loop
     for( i = start+1; done != qtrue; i++ )
     {
-		if( i >= bg_numberOfVehicles ) {
-			if( start == bg_numberOfVehicles && i == start ) return -1;
+		if( i >= bg_numberOfVehicles )
+		{
+			if( start == bg_numberOfVehicles && i == start )
+			{
+				return -1;
+			}
+			
 			i = 0;					
 		}
+
 		if( i == start ) done = qtrue;//return start;	
+
 //		Com_Printf( "Vehicle is %s %x\n", availableVehicles[i].descriptiveName,
 //										  availableVehicles[i].id );
-		if( !(availableVehicles[i].gameset & gameset) ) continue;		// wrong set
-		if( !(availableVehicles[i].team & team) ) continue;		// wrong team
-		if( !(availableVehicles[i].cat & cat) ) continue;		// wrong category
-		if( !(availableVehicles[i].cls & cls) ) continue;		// wrong category
+
+		if( !(availableVehicles[i].gameset & gameset) ) continue;	// wrong set
+		if( !(availableVehicles[i].team & team) ) continue;			// wrong team
+		if( !(availableVehicles[i].cat & cat) ) continue;			// wrong category
+		if( !(availableVehicles[i].cls & cls) ) continue;			// wrong class
+
 		return i;
     }
+
     return -1;
 }
 
@@ -311,7 +315,6 @@ int MF_ExtractEnumFromId( int vehicle, unsigned int op )
 	{
 		// catagory
 		daEnum = availableVehicles[ vehicle ].cat;
-		daEnum >>= 8;
 	}
 	else if( op & CLASS_ANY )
 	{
