@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.58 2003-02-07 19:17:43 thebjoern Exp $
+ * $Id: cg_local.h,v 1.59 2003-02-07 20:12:16 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1505,7 +1505,7 @@ void CG_CheckChangedPredictableEvents( playerState_t *ps );
 //
 // cg_missioneditor.c
 //
-void ME_SpawnVehicle( int idx );
+IGME_vehicle_t* ME_SpawnVehicle( int idx );
 void ME_SpawnGroundInstallation( int idx );
 void ME_ExportToScript( const char* scriptname );
 void ME_ImportScript( const char* scriptname );
