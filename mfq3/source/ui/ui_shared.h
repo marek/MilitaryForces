@@ -1,5 +1,5 @@
 /*
- * $Id: ui_shared.h,v 1.6 2002-02-12 15:16:42 sparky909_uk Exp $
+ * $Id: ui_shared.h,v 1.7 2002-02-15 17:43:57 sparky909_uk Exp $
 */
 #ifndef __UI_SHARED_H
 #define __UI_SHARED_H
@@ -11,6 +11,7 @@
 
 #include "menudef.h"
 
+// cursor gfx
 enum CursorEnum 
 {
 	CURSOR_NORMAL,
@@ -18,6 +19,14 @@ enum CursorEnum
 	MAX_CURSORS
 };
 
+typedef enum {
+	LEFT_JUSTIFY,
+	CENTRE_JUSTIFY,
+	RIGHT_JUSTIFY
+} textJustify_t;
+
+// simple timing macro
+#define FRAME_SECOND_FRACTION (uiInfo.uiDC.frameTime/1000.0f)
 
 // bindable actions
 #define ID_SHOWSCORES	0
@@ -501,5 +510,12 @@ void GradientBar_Paint(rectDef_t *rect, vec4_t color);
 void VerticalGradient_Paint(rectDef_t *rect, vec4_t color);
 
 void Item_Text_AutoWrapped_Paint(itemDef_t *item);
+
+vec4_t * CreateColourVector( float r, float g, float b, float a, vec4_t * pVector );
+unsigned char * CreateColourChar( unsigned char r, unsigned char g, unsigned char b, unsigned char a, unsigned char * pArray );
+
+void DrawStringNew( int x, int y, float scale, vec4_t colour, const char * pText, int unknown, int hSpacing, int style, textJustify_t formatting );
+void DrawStringNewAlpha( int x, int y, const char * pText, float alpha, textJustify_t formatting );
+void DrawStringNewColour( int x, int y, const char * pText, vec4_t colour, textJustify_t formatting );
 
 #endif

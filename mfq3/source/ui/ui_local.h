@@ -1,5 +1,5 @@
 /*
- * $Id: ui_local.h,v 1.3 2002-01-23 18:47:22 sparky909_uk Exp $
+ * $Id: ui_local.h,v 1.4 2002-02-15 17:43:57 sparky909_uk Exp $
 */
 //
 #ifndef __UI_LOCAL_H__
@@ -14,6 +14,8 @@
 
 
 // global display context
+
+extern displayContextDef_t * DC;
 
 extern vmCvar_t	ui_ffa_fraglimit;
 extern vmCvar_t	ui_ffa_timelimit;
@@ -113,8 +115,6 @@ extern vmCvar_t	ui_scoreTime;
 extern vmCvar_t	ui_smallFont;
 extern vmCvar_t	ui_bigFont;
 extern vmCvar_t ui_serverStatusTimeOut;
-
-
 
 //
 // ui_qmenu.c
@@ -734,6 +734,27 @@ typedef struct {
 } modInfo_t;
 
 
+// custom chat system
+typedef enum {
+	CCHAT_ALL,
+	CCHAT_TEAM,
+	CCHAT_TARGET,
+	CCHAT_ATTACK,
+	MAX_CCHAT
+} CustomChatMode;
+
+#define	MAX_CHAT_LEN 1024
+
+typedef struct {
+	qboolean active;			// active?
+	CustomChatMode mode;		// e.g. global chat, team chat, ...
+	char text[ MAX_CHAT_LEN ];	// TODO: possibly make this dynamic to save memory
+	int cindex;					// character index we are currently on
+	float lifeAlpha;			// gfx
+	float cursorAlpha;			// gfx
+	qboolean cursorDir;			// gfx
+} chat_t;
+
 typedef struct {
 	displayContextDef_t uiDC;
 	int newHighScoreTime;
@@ -774,7 +795,6 @@ typedef struct {
 	int mapCount;
 	mapInfo mapList[MAX_MAPS];
 
-
 	int tierCount;
 	tierInfo tierList[MAX_TIERS];
 
@@ -813,14 +833,16 @@ typedef struct {
 	int startPostGameTime;
 	sfxHandle_t newHighScoreSound;
 
-	int				q3HeadCount;
-	char			q3HeadNames[MAX_PLAYERMODELS][64];
-	qhandle_t	q3HeadIcons[MAX_PLAYERMODELS];
-	int				q3SelectedHead;
+	int q3HeadCount;
+	char q3HeadNames[MAX_PLAYERMODELS][64];
+	qhandle_t q3HeadIcons[MAX_PLAYERMODELS];
+	int q3SelectedHead;
 
 	int effectsColor;
 
 	qboolean inGameLoad;
+
+	chat_t customChat;	// custom MFQ3 chat console
 
 }	uiInfo_t;
 
