@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.95 2002-06-15 18:37:13 thebjoern Exp $
+ * $Id: bg_public.h,v 1.96 2002-06-16 21:36:29 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.72b"
+#define	GAME_VERSION		"mfq3 v0.72c"
 #define	GAME_IDENTIFIER		"mfq3"			// use to identify mfq3 servers
 
 #define	DEFAULT_GRAVITY		800
@@ -672,7 +672,10 @@ extern const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1];
 #define BP_GI_BODY				0
 #define BP_GI_TURRET			1
 #define BP_GI_GUNBARREL			2
-#define BP_GI_MAX_PARTS			3
+#define BP_GI_UPGRADE			3
+#define BP_GI_UPGRADE2			4
+#define BP_GI_UPGRADE3			5
+#define BP_GI_MAX_PARTS			6
 
 
 // total max parts (no cat may exceed this!)
@@ -832,6 +835,7 @@ typedef struct groundInstallationData_s
 	unsigned int	radarRange2;	// how far goes the radar GV
 	float			trackCone;		// how can radar track it
 	float			trackCone2;		// how can ground radar track it
+	unsigned int	upgrades;		// for larger models (for double, triple etc load);
 } groundInstallationData_t;
 
 extern groundInstallationData_t availableGroundInstallations[];
@@ -915,6 +919,7 @@ typedef enum
 	WI_AMRAAM,
 	WI_SPARROW,
 	WI_PHOENIX,
+	WI_AVENGER,
 	WI_STINGER,
 	WI_ATOLL,
 	WI_ARCHER,
@@ -934,6 +939,7 @@ int MF_getIndexOfVehicleEx( int start, int gameset, int team, int cat, int cls )
 int MF_getItemIndexFromHex(int hexValue);
 int MF_getNumberOfItems(const char **itemlist);
 char * MF_CreateModelPathname( int vehicle, char * pFormatString );
+char * MF_CreateGIPathname( int vehicle, char * pFormatString );
 void MF_LimitFloat( float * value, float min, float max );
 void MF_LimitInt( int * value, int min, int max );
 int MF_ExtractEnumFromId( int vehicle, unsigned int op );

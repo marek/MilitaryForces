@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.43 2002-06-15 18:37:13 thebjoern Exp $
+ * $Id: bg_vehicledata.c,v 1.44 2002-06-16 21:36:29 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -1247,6 +1247,55 @@ completeVehicleData_t availableVehicles[] =
 	{0,0,0,0}					// shadow orientation adjusters
     },
 
+
+    {	"Hummer (AA)",			// descriptiveName
+	"HMVAA",						// tinyName
+	"humvee_avng",				// modelName
+	SHADOW_DEFAULT,				// alpha shadow
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_1,
+	CAT_GROUND,
+	CLASS_GROUND_SAM,
+	0,							// flags
+	HC_WHEELS,					// capabilities
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
+	{50, 100, 100},				// turnspeed around the three axis
+	{0, 100, 30},				// camera distance {min,max,default}
+	{0, 100, 10},				// camera height {min,max,default}
+	0,							// stallspeed
+	85,						    // maxspeed
+	-5,							// min throttle
+	10,						    // max throttle
+	1,							// engines
+	4,							// wheels
+	8,							// wheel circumference
+	18,							// acceleration
+	140,						// health
+	{8, 0, 2},					// gun tag
+	160,						// max fuel
+	300,						// max gun pitch (upwards = negative) <- gearheight
+	6,							// min gun pitch (downwards = positive) <- tailangle
+	WI_MG_12_7MM, WI_PHOENIX, 0, 0, 0, 0, 0, WI_FLARE,// weapons
+	300, 4, 0, 0, 0, 0, 0, 20,	// ammo
+	0,0,0,0,0,0,0,0,			// turret
+	{0, 0, 10},					// cameraposition for cockpit view
+	0,							// effect model
+	8000,						// radar range
+	4000,						// radar range ground
+	-1,							// trackcone
+	0,							// trackcone ground
+	0,							// swingangle
+	1400,						// geartime
+	0,							// max gear frame
+	1000,						// baytime
+	0,							// max bay frame
+	0,							// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
+    },
+
     {	"BRDM 2",				// descriptiveName
 	"BRDM2",					// tinyName
 	"brdm2",					// modelName
@@ -1401,13 +1450,13 @@ int bg_numberOfVehicles = sizeof(availableVehicles) / sizeof(availableVehicles[0
 // just contains data of all the available vehicles
 groundInstallationData_t availableGroundInstallations[] = 
 {
-    {	"SAM",					// descriptiveName
-	"SAM",						// tinyName
-	"f-16",						// modelName
+    {	"SAM Mk1",					// descriptiveName
+	"SAM1",						// tinyName
+	"turret_samup",						// modelName
 	MF_GAMESET_MODERN,			// gameset
 	{0,0,0,0,0,0,0,0,0,0},		// handles - SET AUTOMATICALLY
-	{-10, -10, -10},					// mins (bounding box)
-	{10, 10, 10},					// max (bounding box)
+	{0, 0, 0},					// mins (bounding box)
+	{0, 0, 0},					// max (bounding box)
 	{80, 80, 260},				// turnspeed around the three axis
 	120,						// health
 	WI_MG_20MM,					// weapon
@@ -1415,9 +1464,63 @@ groundInstallationData_t availableGroundInstallations[] =
 	12000,						// radar range
 	9000,						// radar range ground
 	0,							// trackcone
-	-1							// trackcone ground
+	-1,							// trackcone ground
+	0							// upgrades
     },
 
+    {	"SAM Mk2",					// descriptiveName
+	"SAM2",						// tinyName
+	"turret_samup",						// modelName
+	MF_GAMESET_MODERN,			// gameset
+	{0,0,0,0,0,0,0,0,0,0},		// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box)
+	{0, 0, 0},					// max (bounding box)
+	{80, 80, 260},				// turnspeed around the three axis
+	120,						// health
+	WI_MG_20MM,					// weapon
+	450,						// ammo
+	12000,						// radar range
+	9000,						// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
+	1							// upgrades
+    },
+
+    {	"SAM Mk3",					// descriptiveName
+	"SAM3",						// tinyName
+	"turret_samup",						// modelName
+	MF_GAMESET_MODERN,			// gameset
+	{0,0,0,0,0,0,0,0,0,0},		// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box)
+	{0, 0, 0},					// max (bounding box)
+	{80, 80, 260},				// turnspeed around the three axis
+	120,						// health
+	WI_MG_20MM,					// weapon
+	450,						// ammo
+	12000,						// radar range
+	9000,						// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
+	2							// upgrades
+    },
+
+    {	"SAM Mk4",					// descriptiveName
+	"SAM4",						// tinyName
+	"turret_samup",				// modelName
+	MF_GAMESET_MODERN,			// gameset
+	{0,0,0,0,0,0,0,0,0,0},		// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box)
+	{0, 0, 0},					// max (bounding box)
+	{80, 80, 260},				// turnspeed around the three axis
+	120,						// health
+	WI_MG_20MM,					// weapon
+	450,						// ammo
+	12000,						// radar range
+	9000,						// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
+	3							// upgrades
+    },
 };
 
 int bg_numberOfGroundInstallations = sizeof(availableGroundInstallations) / 
