@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.23 2002-02-25 17:33:47 sparky909_uk Exp $
+ * $Id: ui_main.c,v 1.24 2002-02-26 10:48:35 sparky909_uk Exp $
 */
 /*
 =======================================================================
@@ -6161,16 +6161,18 @@ void UI_DrawConnectScreen( qboolean overlay )
 	}
 	else
 	{
+		// DRAW NOTHING MORE IF IN 'OVERLAY MODE'
 		return;
 	}
 
 	// get server information
 	trap_GetClientState( &cstate );
 
-	// got the mid-panel shader? (gameset artwork)
+	// got the mid-panel shader?
 	if( uiInfo.uiDC.Assets.midPanelGfx )
 	{
 		// draw gfx
+		// NOTE: this only gets drawn until CGame takes over the drawing of this
 		UI_DrawHandlePic( 0, 160, 640, 160, uiInfo.uiDC.Assets.midPanelGfx );
 	}
 	else
@@ -6216,7 +6218,7 @@ void UI_DrawConnectScreen( qboolean overlay )
 	info[0] = 0;
 	if( trap_GetConfigString( CS_SERVERINFO, info, sizeof(info) ) )
 	{
-		Text_PaintCenter( centerPoint, yStart, scale, colorWhite, va( "Loading %s", Info_ValueForKey( info, "mapname" )), 0 );
+		Text_PaintCenter( centerPoint, yStart, scale, colorWhite, va( "Loading map - %s", Info_ValueForKey( info, "mapname" )), 0 );
 	}
 
 	// connect to local server?
@@ -6228,7 +6230,7 @@ void UI_DrawConnectScreen( qboolean overlay )
 	else
 	{
 		// remote server
-		strcpy( text, va( "Connecting to %s...", cstate.servername ) );
+		strcpy( text, va( "Connecting to server %s...", cstate.servername ) );
 		Text_PaintCenter( centerPoint, yStart + 48, scale, colorWhite,text , ITEM_TEXTSTYLE_SHADOWEDMORE );
 	}
 /*
