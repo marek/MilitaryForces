@@ -1,5 +1,5 @@
 /*
- * $Id: mf_client.c,v 1.14 2002-02-27 23:11:18 thebjoern Exp $
+ * $Id: mf_client.c,v 1.15 2002-03-03 15:23:06 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -292,7 +292,7 @@ void MF_ClientSpawn(gentity_t *ent) {
 	client->ps.persistant[PERS_TEAM] = client->sess.sessionTeam;
 	client->ps.clientNum = index;
 
-	client->airOutTime = level.time + 12000;
+	client->airOutTime = level.time + 25000;
 
 	client->ps.eFlags = flags;
 

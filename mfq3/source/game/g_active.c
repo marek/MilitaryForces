@@ -1,5 +1,5 @@
 /*
- * $Id: g_active.c,v 1.14 2002-02-27 16:07:29 sparky909_uk Exp $
+ * $Id: g_active.c,v 1.15 2002-03-03 15:23:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -90,7 +90,7 @@ void P_WorldEffects( gentity_t *ent ) {
 	int			waterlevel;
 
 	if ( ent->client->noclip ) {
-		ent->client->airOutTime = level.time + 12000;	// don't need air
+		ent->client->airOutTime = level.time + 20000;	// don't need air
 		return;
 	}
 
@@ -104,12 +104,12 @@ void P_WorldEffects( gentity_t *ent ) {
 		// if out of air, start drowning
 		if ( ent->client->airOutTime < level.time) {
 			// drown!
-			ent->client->airOutTime += 1000;
+			ent->client->airOutTime += 3000;
 			if ( ent->health > 0 ) {
 				// take more damage the longer underwater
 				ent->damage += 5;
-				if (ent->damage > 15)
-					ent->damage = 15;
+				if (ent->damage > 8)
+					ent->damage = 8;
 
 				// play a gurp sound instead of a normal pain sound
 /*				if (ent->health <= ent->damage) {
@@ -128,7 +128,7 @@ void P_WorldEffects( gentity_t *ent ) {
 			}
 		}
 	} else {
-		ent->client->airOutTime = level.time + 2000;
+		ent->client->airOutTime = level.time + 3000;
 		ent->damage = 5;
 	}
 

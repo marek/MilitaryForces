@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.39 2002-02-28 17:26:06 thebjoern Exp $
+ * $Id: bg_vehicledata.c,v 1.40 2002-03-03 15:23:06 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -32,7 +32,7 @@ completeVehicleData_t availableVehicles[] =
 	// ---------------------------------------------
 	// Planes
 	// ---------------------------------------------
-    {	"F-16 Falcon",		    // descriptiveName
+    {	"F-16 Falcon (AA)",		// descriptiveName
 	"F-16",						// tinyName
 	"f-16",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
@@ -57,18 +57,214 @@ completeVehicleData_t availableVehicles[] =
 	0,							// wheels
 	0,							// wheel circumference
 	260,						// acceleration
-	130,						// health
+	120,						// health
 	{16.65f, -3.391f, 0.378f},	// gun tag
 	60,							// max fuel
 	0,							// gearheight - SET AUTOMATICALLY
 	0,							// tailangle
-	WI_MG_20MM, WI_SIDEWINDER, WI_AMRAAM, WI_MK84, WI_FFAR, 0, 0, WI_FLARE,	// weapons  WI_MG_20MM
+	WI_MG_20MM, WI_SIDEWINDER, WI_AMRAAM, WI_SPARROW, 0, 0, 0, WI_FLARE,	// weapons  WI_MG_20MM
+	450, 4, 2, 2, 0, 0, 0, 30,		// ammo
+	0,0,0,0,0,0,0,0,			// turret - useful ??
+	{19, 0, 5},					// cameraposition for cockpit view
+	AB_BALL,					// effect model
+	12000,						// radar range
+	9000,						// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
+	0,							// swingangle
+	1400,						// geartime
+	0,							// max gear frame
+	1000,						// baytime
+	0,							// max bay frame
+	0,							// renderflags
+	{4,0,34,24},				// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
+    },
+
+    {	"F-16 Falcon (AG - Ironbomb)",	    // descriptiveName
+	"F-16",						// tinyName
+	"f-16",						// modelName
+	SHADOW_DEFAULT,				// alpha shadow
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_2,
+	CAT_PLANE,
+	CLASS_PLANE_FIGHTER,
+	0,							// flags
+	HC_GEAR|HC_SPEEDBRAKE|
+	HC_VAPOR,					// capabilities
+	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
+	{80, 80, 260},				// turnspeed around the three axis
+	{0, 100, 70},				// camera distance {min,max,default}
+	{0, 100, 20},				// camera height {min,max,default}
+	200,						// stallspeed
+	700,						// maxspeed
+	0,							// min throttle
+	15,							// max throttle
+	1,							// engines
+	0,							// wheels
+	0,							// wheel circumference
+	260,						// acceleration
+	120,						// health
+	{16.65f, -3.391f, 0.378f},	// gun tag
+	60,							// max fuel
+	0,							// gearheight - SET AUTOMATICALLY
+	0,							// tailangle
+	WI_MG_20MM, WI_SIDEWINDER, WI_AMRAAM, WI_MK84, 0, 0, 0, WI_FLARE,	// weapons  WI_MG_20MM
+	450, 2, 2, 4, 0, 0, 0, 30,		// ammo
+	0,0,0,0,0,0,0,0,			// turret - useful ??
+	{19, 0, 5},					// cameraposition for cockpit view
+	AB_BALL,					// effect model
+	12000,						// radar range
+	9000,						// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
+	0,							// swingangle
+	1400,						// geartime
+	0,							// max gear frame
+	1000,						// baytime
+	0,							// max bay frame
+	0,							// renderflags
+	{4,0,34,24},				// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
+    },
+
+    {	"F-16 Falcon (AG - Light)",    // descriptiveName
+	"F-16",						// tinyName
+	"f-16",						// modelName
+	SHADOW_DEFAULT,				// alpha shadow
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_2,
+	CAT_PLANE,
+	CLASS_PLANE_FIGHTER,
+	0,							// flags
+	HC_GEAR|HC_SPEEDBRAKE|
+	HC_VAPOR,					// capabilities
+	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
+	{80, 80, 260},				// turnspeed around the three axis
+	{0, 100, 70},				// camera distance {min,max,default}
+	{0, 100, 20},				// camera height {min,max,default}
+	200,						// stallspeed
+	700,						// maxspeed
+	0,							// min throttle
+	15,							// max throttle
+	1,							// engines
+	0,							// wheels
+	0,							// wheel circumference
+	260,						// acceleration
+	120,						// health
+	{16.65f, -3.391f, 0.378f},	// gun tag
+	60,							// max fuel
+	0,							// gearheight - SET AUTOMATICALLY
+	0,							// tailangle
+	WI_MG_20MM, WI_SIDEWINDER, WI_MK82, WI_FFAR_SMALL, 0, 0, 0, WI_FLARE,	// weapons  WI_MG_20MM
+	450, 4, 8, 4, 0, 0, 0, 30,		// ammo
+	0,0,0,0,0,0,0,0,			// turret - useful ??
+	{19, 0, 5},					// cameraposition for cockpit view
+	AB_BALL,					// effect model
+	12000,						// radar range
+	9000,						// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
+	0,							// swingangle
+	1400,						// geartime
+	0,							// max gear frame
+	1000,						// baytime
+	0,							// max bay frame
+	0,							// renderflags
+	{4,0,34,24},				// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
+    },
+
+    {	"F-16 Falcon (AG - Guided)",    // descriptiveName
+	"F-16",						// tinyName
+	"f-16",						// modelName
+	SHADOW_DEFAULT,				// alpha shadow
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_2,
+	CAT_PLANE,
+	CLASS_PLANE_FIGHTER,
+	0,							// flags
+	HC_GEAR|HC_SPEEDBRAKE|
+	HC_VAPOR,					// capabilities
+	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
+	{80, 80, 260},				// turnspeed around the three axis
+	{0, 100, 70},				// camera distance {min,max,default}
+	{0, 100, 20},				// camera height {min,max,default}
+	200,						// stallspeed
+	700,						// maxspeed
+	0,							// min throttle
+	15,							// max throttle
+	1,							// engines
+	0,							// wheels
+	0,							// wheel circumference
+	260,						// acceleration
+	120,						// health
+	{16.65f, -3.391f, 0.378f},	// gun tag
+	60,							// max fuel
+	0,							// gearheight - SET AUTOMATICALLY
+	0,							// tailangle
+	WI_MG_20MM, WI_SIDEWINDER, WI_AMRAAM, WI_MAVERICK, 0, 0, 0, WI_FLARE,	// weapons  WI_MG_20MM
+	450, 2, 2, 12, 0, 0, 0, 30,		// ammo
+	0,0,0,0,0,0,0,0,			// turret - useful ??
+	{19, 0, 5},					// cameraposition for cockpit view
+	AB_BALL,					// effect model
+	12000,						// radar range
+	9000,						// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
+	0,							// swingangle
+	1400,						// geartime
+	0,							// max gear frame
+	1000,						// baytime
+	0,							// max bay frame
+	0,							// renderflags
+	{4,0,34,24},				// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
+    },
+
+    {	"F-16 Falcon (AA FFAR)",    // descriptiveName
+	"F-16",						// tinyName
+	"f-16",						// modelName
+	SHADOW_DEFAULT,				// alpha shadow
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_2,
+	CAT_PLANE,
+	CLASS_PLANE_FIGHTER,
+	0,							// flags
+	HC_GEAR|HC_SPEEDBRAKE|
+	HC_VAPOR,					// capabilities
+	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
+	{80, 80, 260},				// turnspeed around the three axis
+	{0, 100, 70},				// camera distance {min,max,default}
+	{0, 100, 20},				// camera height {min,max,default}
+	200,						// stallspeed
+	700,						// maxspeed
+	0,							// min throttle
+	15,							// max throttle
+	1,							// engines
+	0,							// wheels
+	0,							// wheel circumference
+	260,						// acceleration
+	120,						// health
+	{16.65f, -3.391f, 0.378f},	// gun tag
+	60,							// max fuel
+	0,							// gearheight - SET AUTOMATICALLY
+	0,							// tailangle
+	WI_MG_20MM, WI_SIDEWINDER, WI_AMRAAM, WI_FFAR, WI_SPARROW, 0, 0, WI_FLARE,	// weapons  WI_MG_20MM
 	450, 2, 2, 2, 2, 0, 0, 30,		// ammo
 	0,0,0,0,0,0,0,0,			// turret - useful ??
 	{19, 0, 5},					// cameraposition for cockpit view
 	AB_BALL,					// effect model
-	8000,						// radar range
-	4000,						// radar range ground
+	12000,						// radar range
+	9000,						// radar range ground
 	0,							// trackcone
 	-1,							// trackcone ground
 	0,							// swingangle
@@ -106,7 +302,7 @@ completeVehicleData_t availableVehicles[] =
 	0,							// wheels
 	0,							// wheel circumference
 	250,						// acceleration
-	130,						// health
+	110,						// health
 	{19.698f, -1.328f, -3.016f},// gun tag
 	60,							// max fuel
 	0,							// gearheight - SET AUTOMATICALLY
@@ -117,7 +313,7 @@ completeVehicleData_t availableVehicles[] =
 	{19, 0, 5},					// cameraposition for cockpit view
 	AB_BALL,					// effect model
 	10000,						// radar range
-	3000,						// radar range ground
+	8000,						// radar range ground
 	0,							// trackcone
 	-1,							// trackcone ground
 	0,							// swingangle
@@ -155,7 +351,7 @@ completeVehicleData_t availableVehicles[] =
 	0,							// wheels
 	0,							// wheel circumference
 	250,						// acceleration
-	130,						// health
+	110,						// health
 	{19.698f, -1.328f, -3.016f},// gun tag
 	60,							// max fuel
 	0,							// gearheight - SET AUTOMATICALLY
@@ -166,7 +362,7 @@ completeVehicleData_t availableVehicles[] =
 	{19, 0, 5},					// cameraposition for cockpit view
 	AB_BALL,					// effect model
 	10000,						// radar range
-	3000,						// radar range ground
+	8000,						// radar range ground
 	0,							// trackcone
 	-1,							// trackcone ground
 	0,							// swingangle
@@ -204,18 +400,18 @@ completeVehicleData_t availableVehicles[] =
 	0,							// wheels
 	0,							// wheel circumference
 	270,						// acceleration
-	100,						// health
+	200,						// health
 	{26.25f, -0.94f, 1.811f},	// gun tag
 	80,							// max fuel
 	0,							// gearheight - SET AUTOMATICALLY
 	0,							// tailangle
-	WI_MG_2X20MM, WI_AMRAAM, WI_SIDEWINDER, WI_FFAR, 0, 0, 0, WI_FLARE,	// weapons
+	WI_MG_30MM, WI_AMRAAM, WI_SIDEWINDER, WI_FFAR, 0, 0, 0, WI_FLARE,	// weapons
 	500, 2, 2, 38, 0, 0, 0, 32,		// ammo
 	0,0,0,0,0,0,0,0,			// turret
 	{11, 0, 5},					// cameraposition for cockpit view
 	0,							// effect model
-	6000,						// radar range
-	2000,						// radar range ground
+	8000,						// radar range
+	10000,						// radar range ground
 	0,							// trackcone
 	-1,							// trackcone ground
 	0,							// swingangle
@@ -264,7 +460,7 @@ completeVehicleData_t availableVehicles[] =
 	{11, 0, 5},					// cameraposition for cockpit view
 	AB_RED_SMALL,				// effect model
 	6000,						// radar range
-	2000,						// radar range ground
+	4000,						// radar range ground
 	0,							// trackcone
 	-1,							// trackcone ground
 	0,							// swingangle
@@ -312,8 +508,8 @@ completeVehicleData_t availableVehicles[] =
 	0,0,0,0,0,0,0,0,			// turret
 	{28, 0, 6},					// cameraposition for cockpit view
 	AB_RED,						// effect model
-	12000,						// radar range
-	6000,						// radar range ground
+	14000,						// radar range
+	7000,						// radar range ground
 	0,							// trackcone
 	-1,							// trackcone ground
 	0,							// swingangle
@@ -362,7 +558,7 @@ completeVehicleData_t availableVehicles[] =
 	{28, 0, 6},					// cameraposition for cockpit view
 	AB_RED,						// effect model
 	16000,						// radar range
-	1500,						// radar range ground
+	5500,						// radar range ground
 	0,							// trackcone
 	-1,							// trackcone ground
 	50,							// swingangle
@@ -410,8 +606,8 @@ completeVehicleData_t availableVehicles[] =
 	0,0,0,0,0,0,0,0,			// turret
 	{19, 0, 5},					// cameraposition for cockpit view
 	AB_BALL,					// effect model
-	7500,						// radar range
-	6500,						// radar range ground
+	11000,						// radar range
+	8500,						// radar range ground
 	0,							// trackcone
 	-1,							// trackcone ground
 	0,							// swingangle
@@ -498,7 +694,7 @@ completeVehicleData_t availableVehicles[] =
 	0,							// wheels
 	0,							// wheel circumference
 	260,						// acceleration
-	130,						// health
+	150,						// health
 	{16.65f, -3.391f, 0.378f},	// gun tag
 	60,							// max fuel
 	0,							// gearheight - SET AUTOMATICALLY
@@ -508,8 +704,8 @@ completeVehicleData_t availableVehicles[] =
 	0,0,0,0,0,0,0,0,			// turret
 	{19, 0, 5},					// cameraposition for cockpit view
 	AB_BALL,					// effect model
-	8000,						// radar range
-	4000,						// radar range ground
+	5000,						// radar range
+	9000,						// radar range ground
 	0,							// trackcone
 	-1,							// trackcone ground
 	0,							// swingangle
@@ -540,8 +736,8 @@ completeVehicleData_t availableVehicles[] =
 	{60, 80, 240},				// turnspeed around the three axis
 	{0, 100, 50},				// camera distance {min,max,default}
 	{0, 100, 10},				// camera height {min,max,default}
-	130,					    // stallspeed
-	600,					    // maxspeed
+	90,						    // stallspeed
+	420,					    // maxspeed
 	0,							// min throttle
 	10,						    // max throttle
 	1,							// engines
@@ -590,8 +786,8 @@ completeVehicleData_t availableVehicles[] =
 	{70, 80, 300},				// turnspeed around the three axis
 	{0, 100, 50},				// camera distance {min,max,default}
 	{0, 100, 10},				// camera height {min,max,default}
-	120,					    // stallspeed
-	500,					    // maxspeed
+	85,						    // stallspeed
+	400,					    // maxspeed
 	0,							// min throttle
 	10,						    // max throttle
 	1,							// engines
@@ -640,8 +836,8 @@ completeVehicleData_t availableVehicles[] =
 	{70, 80, 300},				// turnspeed around the three axis
 	{0, 100, 50},				// camera distance {min,max,default}
 	{0, 100, 10},				// camera height {min,max,default}
-	120,					    // stallspeed
-	500,					    // maxspeed
+	90,						    // stallspeed
+	410,					    // maxspeed
 	0,							// min throttle
 	10,						    // max throttle
 	1,							// engines
@@ -690,8 +886,8 @@ completeVehicleData_t availableVehicles[] =
 	{70, 80, 300},				// turnspeed around the three axis
 	{0, 100, 50},				// camera distance {min,max,default}
 	{0, 100, 10},				// camera height {min,max,default}
-	120,					    // stallspeed
-	500,					    // maxspeed
+	90,						    // stallspeed
+	420,					    // maxspeed
 	0,							// min throttle
 	10,						    // max throttle
 	1,							// engines
@@ -741,15 +937,15 @@ completeVehicleData_t availableVehicles[] =
 	{40, 50, 120},				// turnspeed around the three axis
 	{0, 100, 80},				// camera distance {min,max,default}
 	{0, 100, 10},				// camera height {min,max,default}
-	120,					    // stallspeed
-	500,					    // maxspeed
+	100,					    // stallspeed
+	320,					    // maxspeed
 	0,							// min throttle
 	10,						    // max throttle
 	4,							// engines
 	0,							// wheels
 	0,							// wheel circumference
 	220,						// acceleration
-	100,						// health
+	250,						// health
 	{2.518f, -7.371f, -0.155f},	// gun tag
 	60,							// max fuel
 	0,							// gearheight - SET AUTOMATICALLY
@@ -788,7 +984,7 @@ completeVehicleData_t availableVehicles[] =
 	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
-	{70, 80, 300},				// turnspeed around the three axis
+	{70, 80, 320},				// turnspeed around the three axis
 	{0, 100, 30},				// camera distance {min,max,default}
 	{0, 100, 10},				// camera height {min,max,default}
 	50,						    // stallspeed
@@ -838,11 +1034,11 @@ completeVehicleData_t availableVehicles[] =
 	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
-	{70, 80, 300},				// turnspeed around the three axis
+	{60, 70, 260},				// turnspeed around the three axis
 	{0, 100, 30},				// camera distance {min,max,default}
 	{0, 100, 10},				// camera height {min,max,default}
-	50,						    // stallspeed
-	150,					    // maxspeed
+	55,						    // stallspeed
+	170,					    // maxspeed
 	0,							// min throttle
 	10,						    // max throttle
 	1,							// engines
@@ -901,7 +1097,7 @@ completeVehicleData_t availableVehicles[] =
 	0,							// wheels
 	0,							// wheel circumference
 	15,							// acceleration
-	400,						// health
+	380,						// health
 	{5, 0, 8},					// gun tag
 	150,						// max fuel
 	310,						// max gun pitch (upwards = negative) <- gearheight
@@ -911,8 +1107,8 @@ completeVehicleData_t availableVehicles[] =
 	0,0,0,0,0,0,0,0,			// turret
 	{0, 0, 14},					// cameraposition for cockpit view
 	0,							// effect model
-	8000,						// radar range
-	4000,						// radar range ground
+	9000,						// radar range
+	6000,						// radar range ground
 	-1,							// trackcone
 	0,							// trackcone ground
 	0,							// swingangle
@@ -949,7 +1145,7 @@ completeVehicleData_t availableVehicles[] =
 	0,							// wheels
 	0,							// wheel circumference
 	15,							// acceleration
-	450,						// health
+	400,						// health
 	{25, 0, 2},					// gun tag
 	150,						// max fuel
 	310,						// max gun pitch (upwards = negative) <- gearheight
@@ -959,8 +1155,8 @@ completeVehicleData_t availableVehicles[] =
 	0,0,0,0,0,0,0,0,			// turret
 	{0, 0, 14},					// cameraposition for cockpit view
 	0,							// effect model
-	8000,						// radar range
-	4000,						// radar range ground
+	9000,						// radar range
+	6000,						// radar range ground
 	-1,							// trackcone
 	0,							// trackcone ground
 	0,							// swingangle
@@ -997,7 +1193,7 @@ completeVehicleData_t availableVehicles[] =
 	0,							// wheels
 	0,							// wheel circumference
 	18,							// acceleration
-	240,						// health
+	210,						// health
 	{8, 1, 2},					// gun tag
 	160,						// max fuel
 	300,						// max gun pitch (upwards = negative) <- gearheight
@@ -1008,7 +1204,7 @@ completeVehicleData_t availableVehicles[] =
 	{0, 0, 10},					// cameraposition for cockpit view
 	0,							// effect model
 	8000,						// radar range
-	4000,						// radar range ground
+	5000,						// radar range ground
 	-1,							// trackcone
 	0,							// trackcone ground
 	0,							// swingangle
@@ -1045,13 +1241,13 @@ completeVehicleData_t availableVehicles[] =
 	4,							// wheels
 	8,							// wheel circumference
 	18,							// acceleration
-	240,						// health
+	140,						// health
 	{8, 0, 2},					// gun tag
 	160,						// max fuel
 	300,						// max gun pitch (upwards = negative) <- gearheight
 	6,							// min gun pitch (downwards = positive) <- tailangle
-	WI_MG_12_7MM, 0, 0, 0, 0, 0, 0, WI_FLARE,// weapons
-	500, 0, 0, 0, 0, 0, 0, 20,	// ammo
+	WI_MG_12_7MM, WI_STINGER, 0, 0, 0, 0, 0, WI_FLARE,// weapons
+	500, 4, 0, 0, 0, 0, 0, 20,	// ammo
 	0,0,0,0,0,0,0,0,			// turret
 	{0, 0, 10},					// cameraposition for cockpit view
 	0,							// effect model
@@ -1093,7 +1289,7 @@ completeVehicleData_t availableVehicles[] =
 	4,							// wheels
 	9,							// wheel circumference
 	18,							// acceleration
-	180,						// health
+	160,						// health
 	{3, 1, 6},					// gun tag
 	160,						// max fuel
 	285,						// max gun pitch (upwards = negative) <- gearheight
@@ -1104,7 +1300,7 @@ completeVehicleData_t availableVehicles[] =
 	{0, 0, 10},					// cameraposition for cockpit view
 	0,							// effect model
 	8000,						// radar range
-	4000,						// radar range ground
+	5000,						// radar range ground
 	-1,							// trackcone
 	0,							// trackcone ground
 	0,							// swingangle
@@ -1193,18 +1389,18 @@ completeVehicleData_t availableVehicles[] =
 	0,							// wheels
 	0,							// wheel circumference
 	15,							// acceleration
-	400,						// health
+	350,						// health
 	{5, 0, 8},					// gun tag
 	150,						// max fuel
 	8,							// max angle to lean when turning <- gearheight
 	-5,							// bowangle (depends on speeed) <-tailangle 
-	0, WI_MGT_2X30MM, WI_MGT_12_7MM, 0, 0, 0, 0, WI_FLARE,// weapons
-	0, 500, 300, 0, 0, 0, 0, 20,	// ammo
+	0, WI_MGT_2X30MM, WI_MGT_12_7MM, WI_HELLFIRE, WI_STINGER, 0, 0, WI_FLARE,// weapons
+	0, 500, 300, 2, 2, 0, 0, 20,	// ammo
 	1,2,0,0,0,0,0,0,			// turret
 	{0, 0, 6},					// cameraposition for cockpit view
 	0,							// effect model
 	8000,						// radar range
-	4000,						// radar range ground
+	7000,						// radar range ground
 	-1,							// trackcone
 	0,							// trackcone ground
 	0,							// swingangle

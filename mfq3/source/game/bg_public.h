@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.84 2002-02-28 17:26:06 thebjoern Exp $
+ * $Id: bg_public.h,v 1.85 2002-03-03 15:23:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.66b"
+#define	GAME_VERSION		"mfq3 v0.66e"
 #define	GAME_IDENTIFIER		"mfq3"			// use to identify mfq3 servers
 
 #define	DEFAULT_GRAVITY		800
@@ -862,6 +862,7 @@ typedef enum
 	WI_MG_12_7MM,
 	WI_MG_14_5MM,
 	WI_MG_20MM,
+	WI_MG_30MM,
 	WI_MG_2X20MM,
 	WI_MGT_2X30MM,
 	WI_MGT_12_7MM,
@@ -872,6 +873,8 @@ typedef enum
 	WI_MK82,
 	WI_MK83,
 	WI_MK84,
+	WI_GBU15,
+	WI_DURANDAL,
 	WI_SIDEWINDER,
 	WI_AMRAAM,
 	WI_SPARROW,
@@ -882,6 +885,10 @@ typedef enum
 	WI_ALAMO,
 	WI_HELLFIRE,
 	WI_MAVERICK,
+	WI_HARM,
+	WI_ECM,
+	WI_DROPTANK,
+	WI_DROPTANK_SMALL,
 	WI_FLARE,
 	WI_MAX
 }weaponIndex_t;

@@ -1,5 +1,5 @@
 /*
- * $Id: g_missile.c,v 1.16 2002-02-27 23:11:18 thebjoern Exp $
+ * $Id: g_missile.c,v 1.17 2002-03-03 15:23:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -368,7 +368,7 @@ void fire_antiair (gentity_t *self) {
 		RotatePointAroundVector( temp, up, forward, ((float)self->client->ps.turretAngle)/10 );
 		CrossProduct( up, temp, right );
 		RotatePointAroundVector( dir, right, temp, ((float)self->client->ps.gunAngle)/10 );
-
+		wingtip = qtrue; // dont drop
 	} else {
 		self->left = (self->left ? qfalse : qtrue);
 		MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, &wingtip, offset, 0 );
@@ -440,6 +440,7 @@ void fire_antiground (gentity_t *self) {
 	vec3_t		dir, right, up;
 	vec3_t		start, offset, forward, temp;
 	qboolean	active = ( self->client->ps.stats[STAT_LOCKINFO] & LI_LOCKING );
+	qboolean	wingtip = qfalse;
 
 	VectorCopy( self->s.pos.trBase, start );
 
@@ -450,7 +451,7 @@ void fire_antiground (gentity_t *self) {
 		RotatePointAroundVector( temp, up, forward, ((float)self->client->ps.turretAngle)/10 );
 		CrossProduct( up, temp, right );
 		RotatePointAroundVector( dir, right, temp, ((float)self->client->ps.gunAngle)/10 );
-
+		wingtip = qtrue; // dont drop
 	} else {
 		self->left = (self->left ? qfalse : qtrue);
 		MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, 0, offset, 0 );
@@ -479,8 +480,27 @@ void fire_antiground (gentity_t *self) {
 //		bolt->think = G_ExplodeMissile;
 //		bolt->nextthink = level.time + availableWeapons[self->client->ps.weaponIndex].fuelrange;
 	}
-	bolt->think = drop_to_normal_transition;
-	bolt->nextthink = level.time + 400;
+
+	bolt->speed = availableWeapons[self->client->ps.weaponIndex].muzzleVelocity;
+	if( wingtip ) {
+		if( active ) {
+			bolt->wait = level.time + availableWeapons[self->client->ps.weaponIndex].fuelrange;
+			bolt->think = follow_target;
+			bolt->nextthink = level.time + 50;
+		} else {
+			bolt->think = G_ExplodeMissile;
+			bolt->nextthink = level.time + availableWeapons[self->client->ps.weaponIndex].fuelrange;
+		}
+		bolt->s.pos.trType = TR_LINEAR;
+		VectorScale( dir, bolt->speed, bolt->s.pos.trDelta );
+	} else {
+		bolt->think = drop_to_normal_transition;
+		bolt->nextthink = level.time + 400;
+		bolt->s.pos.trType = TR_GRAVITY;
+		VectorScale( dir, self->client->ps.speed/10, bolt->s.pos.trDelta );
+	}
+
+
 	bolt->s.eType = ET_MISSILE;
 	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
 	bolt->s.weaponIndex = self->client->ps.weaponIndex;
@@ -493,15 +513,11 @@ void fire_antiground (gentity_t *self) {
 	bolt->range = availableWeapons[self->client->ps.weaponIndex].range;
 	bolt->methodOfDeath = MOD_FFAR;
 	bolt->splashMethodOfDeath = MOD_FFAR_SPLASH;
-	bolt->clipmask = MASK_SHOT;
+	bolt->clipmask = MASK_SHOT|MASK_WATER;
 	bolt->target_ent = NULL;
-	bolt->speed = availableWeapons[self->client->ps.weaponIndex].muzzleVelocity;
 
-	bolt->s.pos.trType = TR_GRAVITY;// TR_LINEAR;
 	bolt->s.pos.trTime = level.time;// - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
 	VectorCopy( start, bolt->s.pos.trBase );
-//	VectorScale( dir, bolt->speed, bolt->s.pos.trDelta );
-	VectorScale( dir, self->client->ps.speed/10, bolt->s.pos.trDelta );
 	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
 	VectorCopy (start, bolt->r.currentOrigin);
 }
@@ -546,7 +562,7 @@ void fire_ffar (gentity_t *self) {
 	bolt->catmodifier = availableWeapons[self->client->ps.weaponIndex].noncatmod;
 	bolt->methodOfDeath = MOD_FFAR;
 	bolt->splashMethodOfDeath = MOD_FFAR_SPLASH;
-	bolt->clipmask = MASK_SHOT;
+	bolt->clipmask = MASK_SHOT|MASK_WATER;
 	bolt->target_ent = NULL;
 
 	bolt->s.pos.trType = TR_LINEAR;
@@ -592,7 +608,7 @@ void fire_ironbomb (gentity_t *self) {
 	bolt->catmodifier = availableWeapons[self->client->ps.weaponIndex].noncatmod;
 	bolt->methodOfDeath = MOD_IRONBOMB;
 	bolt->splashMethodOfDeath = MOD_IRONBOMB_SPLASH;
-	bolt->clipmask = MASK_SHOT;
+	bolt->clipmask = MASK_SHOT|MASK_WATER;
 	bolt->target_ent = NULL;
 
 	bolt->s.pos.trType = TR_GRAVITY;
