@@ -1,5 +1,5 @@
 /*
- * $Id: cg_draw.c,v 1.5 2002-01-22 11:19:55 thebjoern Exp $
+ * $Id: cg_draw.c,v 1.6 2002-01-22 13:58:18 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -312,7 +312,7 @@ static void CG_MFQ3HUD_Numbers (int x, int y, int width, int value) {
 	l = strlen(num);
 	if (l > width)
 		l = width;
-	x += 2 + HUDNUM_WIDTH*(width - l);
+	x += 2 + (HUDNUM_WIDTH-1)*(width - l);
 
 	ptr = num;
 	while (*ptr && l)
@@ -323,7 +323,7 @@ static void CG_MFQ3HUD_Numbers (int x, int y, int width, int value) {
 			frame = *ptr -'0';
 
 		CG_DrawPic( x,y, HUDNUM_WIDTH, HUDNUM_HEIGHT, cgs.media.HUDnumbers[frame] );
-		x += HUDNUM_WIDTH;
+		x += HUDNUM_WIDTH-1;
 		ptr++;
 		l--;
 	}
@@ -754,12 +754,110 @@ static void CG_DrawRadarSymbols_GROUND( int vehicle ) {
 
 /*
 ================
+CG_Draw_MFD
+
+================
+*/
+static void CG_Draw_MFD() {
+	CG_DrawPic( 1, 351, 128, 128, cgs.media.HUDmfd );
+}
+
+
+/*
+================
 CG_Draw_SpeedTape
 
 ================
 */
-static void CG_Draw_SpeedTape( int speed, int stallspeed, int gearspeed ) {
+static void CG_Draw_SpeedTape( int value, int stallspeed, int gearspeed, int scale ) {
+	int			value2, visible1, visible2, visible3, visible4, visible5;
+	float		offset;
+	float		x, y, width, height;
+	float		scaledmaxoff = 0.125f/scale;
+	qboolean	top, bottom;
 
+		// find offset on speed tape
+	value2 = value - scale * 2;
+	value2 = value2%scale;
+	if( value2 < 0 ) value2 += scale;
+	offset = 0.125f - scaledmaxoff*value2;
+		// draw speed tape
+	x = 40;
+	y = 46;
+	width = 16;
+	height = 256;
+	CG_AdjustFrom640( &x, &y, &width, &height );
+	trap_R_DrawStretchPic( x, y, width, height, 0, 0.125f+offset, 1, 0.625f+offset, cgs.media.HUDspeed );
+		// speed indicater
+	x = 55;
+	y = 171;
+	width = height = 8;
+	CG_AdjustFrom640( &x, &y, &width, &height );
+	trap_R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, cgs.media.HUDind_v );
+		// draw speed value box
+	x = 24;
+	y = 28;
+	width = 32;
+	height = 16;
+	CG_AdjustFrom640( &x, &y, &width, &height );
+	trap_R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, cgs.media.HUDvaluebox );
+		// draw speed
+	CG_MFQ3HUD_Numbers( 24, 32, 4, value );
+		// find visible speed numbers
+	visible3 = (int)((value+(scale/2))/scale);
+	visible3 *= scale;
+	visible2 = visible3 - scale;
+	visible1 = visible2 - scale;
+	visible4 = visible3 + scale;
+	visible5 = visible4 + scale;
+	value2 = value - visible3;
+	if( value2 < 0 && value2 >= -scale/2 ) {
+		top = qfalse;
+		bottom = qtrue;
+	} else if( value2 > 0 && value2 <= scale/2 ) {
+		top = qtrue;
+		bottom = qfalse;
+	} else {
+		top = bottom = qfalse;
+	}
+		// draw visible speed numbers
+	CG_MFQ3HUD_Numbers( 12, 171+(value2*64/scale), 4, visible3 );
+	if( visible2 >= 0 ) {
+		value2 = value - visible2;
+		CG_MFQ3HUD_Numbers( 12, 171+(value2*64/scale), 4, visible2 );
+		if( bottom && visible1 >= 0 ) {
+			value2 = value - visible1;
+			CG_MFQ3HUD_Numbers( 12, 171+(value2*64/scale), 4, visible1 );
+		}
+	}
+	value2 = value - visible4;
+	CG_MFQ3HUD_Numbers( 12, 171+(value2*64/scale), 4, visible4 );
+	if( top ) {
+		value2 = value - visible5;
+		CG_MFQ3HUD_Numbers( 12, 171+(value2*64/scale), 4, visible5 );
+	}
+		// gearspeed
+	if( gearspeed > 0 ) {
+		value2 = value - gearspeed;
+		if( value2 > -(scale*2) && value2 < (scale*2) ) {
+			x = 55;
+			y = 171+(value2*64/scale);
+			width = height = 8;
+			CG_AdjustFrom640( &x, &y, &width, &height );
+			trap_R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, cgs.media.HUDcaret_v_g_l );
+		}
+	}
+		// stallspeed
+	if( stallspeed > 0 ) {
+		value2 = value - stallspeed;
+		if( value2 > -(scale*2) && value2 < (scale*2) ) {
+			x = 55;
+			y = 171+(value2*64/scale);
+			width = height = 8;
+			CG_AdjustFrom640( &x, &y, &width, &height );
+			trap_R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, cgs.media.HUDcaret_v_r_l );
+		}
+	}
 }
 
 
@@ -796,7 +894,7 @@ static void CG_Draw_HeadingTape( int value, int targetheading ) {
 	CG_AdjustFrom640( &x, &y, &width, &height );
 	trap_R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, cgs.media.HUDvaluebox );
 		// draw heading
-	CG_MFQ3HUD_Numbers( 306, 32, 3, value );
+	CG_MFQ3HUD_Numbers( 307, 32, 3, value );
 		// find visible heading numbers
 	visible2 = ((int)((value+15)/10));
 	if( (visible2%3) ) {
@@ -823,16 +921,16 @@ static void CG_Draw_HeadingTape( int value, int targetheading ) {
 		right = left = qtrue;
 	}
 		// draw visible heading numbers
-	CG_MFQ3HUD_Numbers( 306-(value2*64/10), 6, 3, visible2 );
+	CG_MFQ3HUD_Numbers( 307-(value2*64/10), 6, 3, visible2 );
 	if( left ) {
 		value2 = value - visible1;
 		if( value2 < 0 ) value2 += 360;
-		CG_MFQ3HUD_Numbers( 306-(value2*64/10), 6, 3, visible1 );
+		CG_MFQ3HUD_Numbers( 307-(value2*64/10), 6, 3, visible1 );
 	}
 	if( right ) {
 		value2 = value - visible3;
 		if( value2 > 0 ) value2 -= 360;
-		CG_MFQ3HUD_Numbers( 306-(value2*64/10), 6, 3, visible3 );
+		CG_MFQ3HUD_Numbers( 307-(value2*64/10), 6, 3, visible3 );
 	}
 
 		// heading indicater
@@ -893,9 +991,15 @@ static void CG_DrawStatusBar_MFQ3_new( void ) {
 
 	// speed
 	if( hud_speed.integer ) {
-		value = ps->speed/10;
+		if( availableVehicles[vehicle].id&CAT_ANY & CAT_GROUND ) value = 10;
+		else value = 50;
 		CG_Draw_SpeedTape( ps->speed/10, availableVehicles[vehicle].stallspeed,
-				availableVehicles[vehicle].stallspeed * SPEED_GREEN_ARC );
+				availableVehicles[vehicle].stallspeed * SPEED_GREEN_ARC, value );
+	}
+
+	// mfd
+	if( hud_mfd.integer ) {
+		CG_Draw_MFD();
 	}
 }
 
