@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.67 2002-02-20 20:03:01 sparky909_uk Exp $
+ * $Id: bg_public.h,v 1.68 2002-02-21 13:14:20 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.62a"
+#define	GAME_VERSION		"mfq3 v0.62d"
 
 #define	DEFAULT_GRAVITY		800
 
@@ -686,7 +686,13 @@ extern const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1];
 #define BP_BOAT_BODY			0
 #define BP_BOAT_TURRET			1
 #define BP_BOAT_GUNBARREL		2
-#define BP_BOAT_MAX_PARTS		3
+#define BP_BOAT_TURRET2			3
+#define BP_BOAT_GUNBARREL2		4
+#define BP_BOAT_TURRET3			5
+#define BP_BOAT_GUNBARREL3		6
+#define BP_BOAT_TURRET4			7
+#define BP_BOAT_GUNBARREL4		8
+#define BP_BOAT_MAX_PARTS		9
 
 // total max parts (no cat may exceed this!)
 #define BP_MAX_PARTS			10
@@ -744,6 +750,7 @@ typedef struct completeVehicleData_s
 	int				tailangle;		// for taildraggers on ground
 	unsigned int	weapons[MAX_WEAPONS_PER_VEHICLE];// use index from available Weapons
 	unsigned int	ammo[MAX_WEAPONS_PER_VEHICLE];// how much of them (is also max_ammo)
+	unsigned int	turret[MAX_WEAPONS_PER_VEHICLE];// on which turret is this weapon
 	vec3_t			cockpitview;	// to place the camera
 	unsigned int	effectModel;	// num of afterburner model (for planes)
 	unsigned int	radarRange;		// how far goes the radar AIR
@@ -806,6 +813,9 @@ typedef struct completeWeaponData_s
 	unsigned int	crosshair;			// which crosshair to use when this weapon is selected
 	unsigned int	crosshairtrack;		// which crosshair to use when this weapon is tracking
 	unsigned int	crosshairlock;		// which crosshair to use when this weapon is locked
+	unsigned int	turret;				// is it a turret
+	vec3_t			maxturns;			// max turn angles if turret
+	vec3_t			minturns;			// min turn angles if turret
 }completeWeaponData_t;
 
 // list of weapons...
@@ -826,6 +836,8 @@ typedef enum
 	WI_MG_14_5MM,
 	WI_MG_20MM,
 	WI_MG_2X20MM,
+	WI_MGT_2X30MM,
+	WI_MGT_12_7MM,
 	WI_FFAR,
 	WI_100MM_GUN,
 	WI_125MM_GUN,

@@ -70,6 +70,8 @@ call ..\compile ../cg_weapons.c
 @if errorlevel 1 goto quit
 call ..\compile ../cg_testmodel.c
 @if errorlevel 1 goto quit
+call ..\compile ../cg_util.c
+@if errorlevel 1 goto quit
 
 call ..\compile ../cg_drawnewhud.c
 @if errorlevel 1 goto quit

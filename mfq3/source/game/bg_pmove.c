@@ -1,5 +1,5 @@
 /*
- * $Id: bg_pmove.c,v 1.7 2002-02-18 09:51:28 thebjoern Exp $
+ * $Id: bg_pmove.c,v 1.8 2002-02-21 13:14:20 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -399,9 +399,15 @@ static void PM_SetWaterLevel( void ) {
 	pm->waterlevel = 0;
 	pm->watertype = 0;
 
-	point[0] = pm->ps->origin[0];
-	point[1] = pm->ps->origin[1];
-	point[2] = pm->ps->origin[2] + mins_z + 1;	
+	if( availableVehicles[pm->vehicle].cat & CAT_BOAT ) {
+		point[0] = pm->ps->origin[0];
+		point[1] = pm->ps->origin[1];
+		point[2] = pm->ps->origin[2] + mins_z;	
+	} else {
+		point[0] = pm->ps->origin[0];
+		point[1] = pm->ps->origin[1];
+		point[2] = pm->ps->origin[2] + mins_z + 1;	
+	}
 	cont = pm->pointcontents( point, pm->ps->clientNum );
 
 	// new version

@@ -97,6 +97,15 @@ LINK32=link.exe
 # Begin Source File
 
 SOURCE=..\game\bg_lib.c
+
+!IF  "$(CFG)" == "ui - Win32 Debug"
+
+!ELSEIF  "$(CFG)" == "ui - Win32 Release"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 

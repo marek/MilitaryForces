@@ -1,5 +1,5 @@
 /*
- * $Id: bg_boatmove.c,v 1.2 2002-02-19 13:28:53 thebjoern Exp $
+ * $Id: bg_boatmove.c,v 1.3 2002-02-21 13:14:20 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -125,24 +125,57 @@ void PM_BoatMove( void )
 	float		turret_yaw = ((float)pm->ps->turretAngle)/10;
 	float		gun_pitch = ((float)pm->ps->gunAngle)/10;
 	float		speed;
+	qboolean	reverse = qfalse;
+	float		lean = 0;
 
 	// set speed
 	PM_BoatAccelerate();
 
 	// speed
 	speed = (float)pm->ps->speed/10;
+	VectorCopy( pm->ps->vehicleAngles, vehdir );
+	vehdir[0] = 0;
 	if( pm->ps->ONOFF & OO_STALLED ) {
-//		speed *= -1;
-		AngleVectors( pm->ps->vehicleAngles, forward, NULL, NULL );
+		AngleVectors( vehdir, forward, NULL, NULL );
 		VectorNegate( forward, forward );
+		reverse = qtrue;
 	} else {
-		AngleVectors( pm->ps->vehicleAngles, forward, NULL, NULL );
+		AngleVectors( vehdir, forward, NULL, NULL );
 	}
 	VectorNormalize( pm->ps->velocity );
 	VectorAdd( forward, pm->ps->velocity, forward );
 	VectorScale( forward, speed, pm->ps->velocity );
 
 	PM_SlideMove_Boat();
+
+	// get the turnspeeds
+	for( i = HULL_YAW; i <= GUN_PITCH; i++ ) {
+	    turnspeed[i] = availableVehicles[pm->vehicle].turnspeed[i] * pml.frametime;
+	}
+
+	// set the hull angle dependent on speed
+	if( !reverse ) {
+		pm->ps->vehicleAngles[0] = (speed/(float)availableVehicles[pm->vehicle].maxspeed) *
+				availableVehicles[pm->vehicle].tailangle;
+		if( smove > 0 ) {
+			lean = (speed/(float)availableVehicles[pm->vehicle].maxspeed) *
+				availableVehicles[pm->vehicle].gearheight;
+		} else if( smove < 0 ) {
+			lean = -(speed/(float)availableVehicles[pm->vehicle].maxspeed) *
+				availableVehicles[pm->vehicle].gearheight;
+		}
+
+	}
+	if( pm->ps->vehicleAngles[2] != lean ) {
+		diff[2] = lean - pm->ps->vehicleAngles[2];
+		if( diff[2] < -turnspeed[2] ) {
+			pm->ps->vehicleAngles[2] -= turnspeed[2];
+		} else if( diff[2] > turnspeed[2] ) {
+			pm->ps->vehicleAngles[2] += turnspeed[2];
+		} else {
+			pm->ps->vehicleAngles[2] += diff[2];
+		}			
+	}
 
 	// get the actual turret angles
 	AngleVectors( pm->ps->vehicleAngles, forward, 0, up );
@@ -173,18 +206,19 @@ void PM_BoatMove( void )
 	vehdir[PITCH] = AngleMod( vehdir[PITCH] );
 	turretdir[PITCH] = AngleMod( turretdir[PITCH] );
 
-
-	// get the turnspeeds
-	for( i = HULL_YAW; i <= GUN_PITCH; i++ ) {
-	    turnspeed[i] = availableVehicles[pm->vehicle].turnspeed[i] * pml.frametime;
-	}
-	
 	// turn the hull
 	if( pm->ps->ONOFF & OO_LANDED ) {
+		// create a turning modifier for normal wheeled vehicles
+		float topSpeed = availableVehicles[pm->vehicle].maxspeed;
+
+		// maxium turn is allowed at a percentage of the top speed (0.5f behind 50% of top speed)
+		float turnModifier = speed/(topSpeed * 0.2f);
+		MF_LimitFloat( &turnModifier, 0.0f, 1.0f );
+
 		if( smove > 0 ) {
-			vehdir[YAW] -= turnspeed[HULL_YAW];
+			vehdir[YAW] -= (turnspeed[HULL_YAW] * turnModifier);
 		} else if( smove < 0 ) {
-			vehdir[YAW] += turnspeed[HULL_YAW];
+			vehdir[YAW] += (turnspeed[HULL_YAW] * turnModifier);
 		}
 	}
 
@@ -208,11 +242,11 @@ void PM_BoatMove( void )
 		else gun_pitch += diff[PITCH];
 		if( gun_pitch < 0 ) gun_pitch += 360;
 		else if( gun_pitch > 360 ) gun_pitch -= 360;
-		if( gun_pitch < 90 && gun_pitch > availableVehicles[pm->vehicle].tailangle ) {
-			gun_pitch = availableVehicles[pm->vehicle].tailangle;
-		} else if ( gun_pitch > 90 && gun_pitch < availableVehicles[pm->vehicle].gearheight ) {
-			gun_pitch = availableVehicles[pm->vehicle].gearheight;
-		}
+//		if( gun_pitch < 90 && gun_pitch > availableVehicles[pm->vehicle].tailangle ) {
+//			gun_pitch = availableVehicles[pm->vehicle].tailangle;
+//		} else if ( gun_pitch > 90 && gun_pitch < availableVehicles[pm->vehicle].gearheight ) {
+//			gun_pitch = availableVehicles[pm->vehicle].gearheight;
+//		}
 //		Com_Printf( "gun %.1f (d %.1f)\n", gun_pitch, diff[PITCH] );
 	}
 
@@ -260,6 +294,89 @@ PM_SlideMove_Boat
 Returns qtrue if the velocity was clipped in some way
 ==================
 */
+
+qboolean PM_SlideMove_Boat() {
+	float		time_left;
+	vec3_t		end;
+	vec3_t		up, down;
+	trace_t		trace;
+	float		angle;
+	float		base;
+
+	time_left = pml.frametime;
+
+	// put on water, dependent on speed
+	VectorCopy( pm->ps->origin, up );
+	VectorCopy( up, down );
+	up[2] += 10;
+	down[2] -= 10;
+	pm->trace( &trace,
+			   up,
+			   0,
+			   0,
+			   down,
+			   pm->ps->clientNum,
+			   MASK_ALL );
+	pm->ps->origin[2] = trace.endpos[2];
+
+	// calculate position we are trying to move to
+	VectorMA( pm->ps->origin, time_left, pm->ps->velocity, end );
+
+	// see if we can make it there
+	pm->trace ( &trace, 
+				pm->ps->origin, 
+				pm->mins, 
+				pm->maxs, 
+				end, 
+				pm->ps->clientNum, 
+				pm->tracemask);
+
+	if( trace.allsolid ) {
+
+		pm->trace ( &trace, 
+					pm->ps->origin, 
+					0, 
+					0, 
+					end, 
+					pm->ps->clientNum, 
+					pm->tracemask);
+
+		if( trace.allsolid ) {
+			// entity is completely trapped in another solid
+			pm->ps->velocity[2] = 0;	// don't build up falling damage, but allow sideways acceleration
+			return qtrue;
+		}
+	}
+
+	if( pm->waterlevel && trace.fraction > 0 ) {
+		// actually covered some distance
+		VectorCopy (trace.endpos, pm->ps->origin);
+	} else {
+		VectorClear(pm->ps->velocity);
+		pm->ps->speed = 0;
+	}
+
+//	if( trace.fraction == 1 ) {
+//	}
+
+	// save entity for contact
+	if(	trace.entityNum != ENTITYNUM_WORLD ||
+		pm->ps->stats[STAT_HEALTH] <= 0 ||
+		(trace.entityNum == ENTITYNUM_WORLD &&
+//				!(trace.surfaceFlags & SURF_NOIMPACT) &&
+		!(trace.surfaceFlags & SURF_SKY)) ) {
+		PM_AddTouchEnt_Boat( trace.entityNum );
+	}
+
+	// angle
+	angle = -DEG2RAD( pm->ps->vehicleAngles[0] );
+	base = sin(angle) * -pm->mins[0];
+	pm->ps->origin[2] += base;
+
+	return qtrue;
+}
+
+/*
 #define	MAX_CLIP_PLANES	5
 qboolean	PM_SlideMove_Boat() {
 	int			bumpcount, numbumps;
@@ -454,4 +571,4 @@ qboolean	PM_SlideMove_Boat() {
 	return ( bumpcount != 0 );
 }
 
-
+*/
