@@ -1,5 +1,5 @@
 /*
- * $Id: cg_boat.c,v 1.7 2002-02-25 12:13:36 sparky909_uk Exp $
+ * $Id: cg_boat.c,v 1.8 2002-07-14 17:13:19 thebjoern Exp $
 */
 
 
@@ -315,11 +315,14 @@ void CG_Boat( centity_t *cent, clientInfo_t *ci )
 							cgs.media.engineTank[tanksound] );
 
 	// smoke 
-	CG_Generic_Smoke( cent, cent->lerpOrigin, 100 );
+	if( cent->currentState.generic1 ) {
+		CG_Generic_Smoke( cent, cent->lerpOrigin, 100 );
+	}
 
 	// muzzleflash
-	CG_VehicleMuzzleFlash( cent, &part[BP_BOAT_GUNBARREL], ci->parts[BP_BOAT_GUNBARREL], ci->vehicle );
-
+	if( cg.time - cent->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {
+		CG_VehicleMuzzleFlash( cent->muzzleFlashWeapon, &part[BP_BOAT_GUNBARREL], ci->parts[BP_BOAT_GUNBARREL], ci->vehicle );
+	}
 }
 
 /*

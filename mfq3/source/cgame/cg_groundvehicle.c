@@ -1,5 +1,5 @@
 /*
- * $Id: cg_groundvehicle.c,v 1.17 2002-06-16 21:36:28 thebjoern Exp $
+ * $Id: cg_groundvehicle.c,v 1.18 2002-07-14 17:13:19 thebjoern Exp $
 */
 
 
@@ -379,11 +379,14 @@ void CG_GroundVehicle( centity_t *cent, clientInfo_t *ci )
 							cgs.media.engineTank[tanksound] );
 
 	// smoke
-	CG_Generic_Smoke( cent, cent->lerpOrigin, 100 );
+	if( cent->currentState.generic1 ) {
+		CG_Generic_Smoke( cent, cent->lerpOrigin, 100 );
+	}
 	
-#pragma message("maybe use the hastePuffShader for a dust trail when tanks drive ?")
 	// muzzleflash
-	CG_VehicleMuzzleFlash( cent, &part[BP_GV_GUNBARREL], ci->parts[BP_GV_GUNBARREL], ci->vehicle );
+	if ( cg.time - cent->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {
+		CG_VehicleMuzzleFlash( cent->muzzleFlashWeapon, &part[BP_GV_GUNBARREL], ci->parts[BP_GV_GUNBARREL], ci->vehicle );
+	}
 
 	// CTF
 	CG_GroundVehicleFlags( cent );

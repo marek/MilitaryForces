@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.53 2002-07-13 12:04:40 thebjoern Exp $
+ * $Id: cg_local.h,v 1.54 2002-07-14 17:13:19 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -890,10 +890,27 @@ typedef struct {
 // MFQ3 vehicle drawing
 typedef struct {
     int					vehicleIndex;
+	float				speed;
+	vec3_t				axis[3];
+	vec3_t				origin;
+	vec3_t				angles;
+	int					ONOFF;
+	completeLoadout_t*	loadout;
+	int					throttle;
+	int					entityNum;
+	int					flashWeaponIndex;
+	qboolean			drawMuzzleFlash;
 } BasicDrawInfo_t;
 
 typedef struct {
     BasicDrawInfo_t		basicInfo;
+	int					controlFrame;
+	int					gearFrame;
+	int					bayFrame;
+	int					brakeFrame;
+	int					cockpitFrame;
+	int					bodyFrame;
+	float				swingAngle;
 } DrawInfo_Plane_t;
 
 typedef struct {
@@ -1221,7 +1238,7 @@ void CG_DrawRect( float x, float y, float width, float height, float size, const
 void CG_DrawSides(float x, float y, float w, float h, float size);
 void CG_DrawTopBottom(float x, float y, float w, float h, float size);
 
-qboolean CG_GenericShadow( centity_t *cent, float *shadowPlane );
+qboolean CG_GenericShadow( BasicDrawInfo_t *drawInfo, float *shadowPlane );
 
 void CG_ResetReticles( void );
 void CG_AddReticleEntityToScene( refEntity_t * pReticle, centity_t * pTarget );
@@ -1289,7 +1306,7 @@ void CG_CacheVehicles();
 void CG_Vehicle( centity_t *cent );
 void CG_RegisterVehicle( clientInfo_t *ci );
 void CG_VehicleObituary( entityState_t *ent );
-void CG_VehicleMuzzleFlash( centity_t *cent, const refEntity_t *parent, qhandle_t parentModel, int idx );
+void CG_VehicleMuzzleFlash( int weaponIdx, const refEntity_t *parent, qhandle_t parentModel, int idx );
 void CG_Misc_Vehicle( centity_t *cent );
 void CG_VehicleLoadout( centity_t* cent );
 void CG_AddToVehicleLoadout( centity_t* cent, int weaponIndex );
@@ -1311,7 +1328,6 @@ void CG_DrawLQM(DrawInfo_LQM_t* drawInfo);
 void CG_Plane( centity_t *cent, clientInfo_t *ci );
 void CG_RegisterPlane( clientInfo_t *ci );
 void CG_PlaneObituary( entityState_t *ent, clientInfo_t *ci );
-void CG_PlanePilot( centity_t *cent, const refEntity_t *parent, qhandle_t parentModel, int idx );
 
 //
 // cg_groundvehicle.c
