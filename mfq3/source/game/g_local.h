@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.17 2002-02-24 16:52:12 thebjoern Exp $
+ * $Id: g_local.h,v 1.18 2002-02-25 15:25:56 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -11,9 +11,6 @@
 #include "g_public.h"
 
 //==================================================================
-
-// the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"mfq3"
 
 #define INFINITE			1000000
 
