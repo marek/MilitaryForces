@@ -1,5 +1,5 @@
 /*
- * $Id: g_mfq3util.c,v 1.10 2002-01-26 23:48:32 thebjoern Exp $
+ * $Id: g_mfq3util.c,v 1.11 2002-01-27 15:41:28 thebjoern Exp $
 */
 
 
@@ -20,8 +20,13 @@ int canLandOnIt( gentity_t *ent )
 	return 0;
 }
 
-
 void unlock( gentity_t* ent )
+{
+	ent->locktime = level.time;
+	ent->client->ps.stats[STAT_LOCKINFO] &= ~LI_LOCKING;
+}
+
+void untrack( gentity_t* ent )
 {
 	ent->locktime = 0;
 	ent->tracktarget = 0;
@@ -62,7 +67,7 @@ void updateTargetTracking( gentity_t *ent )
 	}
 	
 	if( !targetcat ) {
-		if( ent->client->ps.stats[STAT_LOCKINFO] ) unlock(ent);
+		if( ent->client->ps.stats[STAT_LOCKINFO] ) untrack(ent);
 		return;
 	}
 
@@ -110,35 +115,48 @@ void updateTargetTracking( gentity_t *ent )
 	} else { // update existing target
 		vec3_t diff;
 		float dot, dist;
+		int actualcat = 0;
+
 		if( ent->tracktarget->s.eType == ET_EXPLOSIVE ) {
 			vec3_t	mid;
+			actualcat = CAT_GROUND;
 			VectorAdd( ent->tracktarget->r.absmax, ent->tracktarget->r.absmin, mid );
 			VectorScale( mid, 0.5f, mid );
 			VectorSubtract( mid, ent->r.currentOrigin, diff );
 		} else {
+			if( ent->tracktarget->s.eType == ET_MISC_VEHICLE ) {
+				actualcat = availableVehicles[ent->tracktarget->s.modelindex].id&CAT_ANY;
+			} else if( ent->tracktarget->s.eType == ET_VEHICLE && ent->tracktarget->client ) {
+				actualcat =	availableVehicles[ent->tracktarget->client->vehicle].id&CAT_ANY;
+			}
 			VectorSubtract( ent->tracktarget->r.currentOrigin, ent->r.currentOrigin, diff );
 		}
+		if( !actualcat ) {
+			untrack(ent);
+			return;
+		}
+			
 		// check within range
 		dist = VectorNormalize( diff );
 		if( dist > radarrange ) {
-			unlock(ent);
+			untrack(ent);
 			return;
 		}
 		// check within cone
 		dot = DotProduct( forward, diff );
 		if( dot < cone ) {
-			unlock(ent);
+			untrack(ent);
 			return;
 		} else if( dot < availableWeapons[ent->s.weaponIndex].lockcone ) { // roughly 10 degrees
-			ent->locktime = level.time;
-			ent->client->ps.stats[STAT_LOCKINFO] &= ~LI_LOCKING;
+			unlock(ent);
+			return;
 		}
 			
 		// check LOS
 		VectorMA( ent->r.currentOrigin, dist, diff, endpos );
 		trap_Trace( &tr, ent->r.currentOrigin, 0, 0, endpos, ent->s.number, MASK_ALL );
 		if( tr.fraction < 1 && tr.entityNum != ent->s.tracktarget ) {
-			unlock(ent);
+			untrack(ent);
 			return;
 		}
 
@@ -147,11 +165,9 @@ void updateTargetTracking( gentity_t *ent )
 			availableWeapons[ent->s.weaponIndex].type != WT_ANTIAIRMISSILE &&
 			availableWeapons[ent->s.weaponIndex].type != WT_ANTIGROUNDMISSILE &&
 			availableWeapons[ent->s.weaponIndex].type != WT_ANTIRADARMISSILE ) {
-			if( ent->client->ps.stats[STAT_LOCKINFO] & LI_LOCKING ) {
-				//unlock(ent);
-				ent->client->ps.stats[STAT_LOCKINFO] &= ~LI_LOCKING;
-				return;
-			}
+			//untrack(ent);
+			unlock(ent);
+			return;
 		}
 
 		// what can we lock on ?
@@ -165,11 +181,12 @@ void updateTargetTracking( gentity_t *ent )
 			buildings = qtrue;
 		}
 		if( !targetcat ) {
-			if( ent->client->ps.stats[STAT_LOCKINFO] & LI_LOCKING ) {
-				ent->client->ps.stats[STAT_LOCKINFO] &= ~LI_LOCKING;
-				//unlock(ent);
-				return;
-			}
+			unlock(ent);
+			//untrack(ent);
+			return;
+		} else if( !(targetcat & actualcat) ) {
+			unlock(ent);
+			return;			
 		}
 		// check time
 		if( level.time > ent->locktime + availableWeapons[ent->s.weaponIndex].lockdelay ) {
@@ -195,7 +212,7 @@ void updateTargetTracking( gentity_t *ent )
 		availableWeapons[ent->s.weaponIndex].type != WT_ANTIAIRMISSILE &&
 		availableWeapons[ent->s.weaponIndex].type != WT_ANTIGROUNDMISSILE &&
 		availableWeapons[ent->s.weaponIndex].type != WT_ANTIRADARMISSILE ) {
-		if( ent->client->ps.stats[STAT_LOCKINFO] ) unlock(ent);
+		if( ent->client->ps.stats[STAT_LOCKINFO] ) untrack(ent);
 		return;
 	}
 
@@ -210,7 +227,7 @@ void updateTargetTracking( gentity_t *ent )
 	}
 	
 	if( !targetcat ) {
-		if( ent->client->ps.stats[STAT_LOCKINFO] ) unlock(ent);
+		if( ent->client->ps.stats[STAT_LOCKINFO] ) untrack(ent);
 		return;
 	}
 
@@ -270,13 +287,13 @@ void updateTargetTracking( gentity_t *ent )
 		// check within range
 		dist = VectorNormalize( diff );
 		if( dist > range ) {
-			unlock(ent);
+			untrack(ent);
 			return;
 		}
 		// check within cone
 		dot = DotProduct( forward, diff );
 		if( dot < availableWeapons[ent->s.weaponIndex].trackcone ) {// roughly 45 degrees 
-			unlock(ent);
+			untrack(ent);
 			return;
 		} else if( dot < availableWeapons[ent->s.weaponIndex].lockcone ) { // roughly 10 degrees
 			ent->locktime = level.time;
@@ -287,8 +304,7 @@ void updateTargetTracking( gentity_t *ent )
 		VectorMA( ent->r.currentOrigin, dist, diff, endpos );
 		trap_Trace( &tr, ent->r.currentOrigin, 0, 0, endpos, ent->s.number, MASK_ALL );
 		if( tr.fraction < 1 && tr.entityNum != ent->s.tracktarget ) {
-			unlock(ent);
-			return;
+			untrack(ent);
 		}
 
 		// check time

@@ -1,5 +1,5 @@
 /*
- * $Id: g_cmds.c,v 1.3 2002-01-07 00:06:02 thebjoern Exp $
+ * $Id: g_cmds.c,v 1.4 2002-01-27 15:41:28 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -368,6 +368,7 @@ void Cmd_Radar_f( gentity_t *ent ) {
 	} else if( ent->client->ps.ONOFF & OO_RADAR_GROUND ) {
 		ent->client->ps.ONOFF &= ~OO_RADAR;
 	}
+	untrack(ent);
 	ent->radartime = level.time + 200;
 }
 
@@ -380,7 +381,7 @@ void Cmd_Unlock_f( gentity_t *ent ) {
 	if( ent->health <= 0 ) {
 		return;
 	}
-	unlock(ent);
+	untrack(ent);
 }
 
 /*
