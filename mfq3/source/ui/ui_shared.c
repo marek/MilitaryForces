@@ -1,5 +1,5 @@
 /*
- * $Id: ui_shared.c,v 1.6 2002-02-11 12:23:55 sparky909_uk Exp $
+ * $Id: ui_shared.c,v 1.7 2002-02-12 15:16:42 sparky909_uk Exp $
 */
 // 
 // string allocation/managment
@@ -3165,6 +3165,8 @@ static bind_t g_bindings[] =
 	{"radarrange",		"Toggle RADAR Range",ID_RADARRANGE,	-1,				-1,		-1, -1},
 	{"unlock",			"Unlock Target",	ID_UNLOCK,		-1,				-1,		-1, -1},
 	{"+bombcam",		"Bomb Camera",		ID_BOMBCAMERA,	-1,				-1,		-1, -1},
+	{"mfd1_mode",		"Cycle MFD1 Mode",	ID_CYCLEMFD1,	-1,				-1,		-1, -1},
+	{"mfd2_mode",		"Cycle MFD2 Mode",	ID_CYCLEMFD2,	-1,				-1,		-1, -1},
 	
 	{(char*)NULL,		(char*)NULL,		0,				-1,				-1,		-1,	-1},
 };
