@@ -1,5 +1,5 @@
 /*
- * $Id: cg_view.c,v 1.2 2002-01-19 02:24:02 thebjoern Exp $
+ * $Id: cg_view.c,v 1.3 2002-01-25 14:25:12 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -71,20 +71,31 @@ static void CG_OffsetVehicleView( qboolean spectator )
 	float		height = cg_thirdPersonHeight.value;
 
 	// this might be expensive ? trap_Cvar_Set ? dont do it, you dumb user! 
-	if( dist < -availableVehicles[cg_vehicle.integer].cam_dist ) {
+	if( dist < -availableVehicles[cg_vehicle.integer].cam_dist )
+	{
 		dist = -availableVehicles[cg_vehicle.integer].cam_dist;
 		trap_Cvar_Set("cg_thirdPersonRange", va("%i",-availableVehicles[cg_vehicle.integer].cam_dist));
-	} else if( dist > 50 ) {
+	}
+	else if( dist > 50 )
+	{
 		dist = 50;
 		trap_Cvar_Set("cg_thirdPersonRange", va("%i",50));
 	}
-	if( height < -2*availableVehicles[cg_vehicle.integer].cam_height ) {
+
+	if( height < -2*availableVehicles[cg_vehicle.integer].cam_height )
+	{
 		height = -2*availableVehicles[cg_vehicle.integer].cam_height;
 		trap_Cvar_Set("cg_thirdPersonHeight", va("%i",-2*availableVehicles[cg_vehicle.integer].cam_height));
-	} else if( height > 50 ) {
+	}
+	else if( height > 50 )
+	{
 		height = 50;
 		trap_Cvar_Set("cg_thirdPersonHeight", va("%i",50));
 	}
+
+	// update vars
+	cg_thirdPersonRange.value = dist;
+	cg_thirdPersonHeight.value = height;
 
 	if( spectator ) {
 		VectorSet( mins, -8, -8, -8 );
@@ -325,6 +336,56 @@ static int CG_CalcFov( void ) {
 /*
 ===============
 CG_CalcViewValues
+===============
+*/
+
+static void CG_CalcMiscViewValues( void )
+{
+	qboolean noAdjust = qfalse;
+
+	float mult = 0.0f;
+	
+	// faster?
+	if( cg.cameraAdjustCount < 50 )
+	{
+		mult = 1.0f;
+	}
+	else
+	{
+		mult = 2.0f;
+	}
+
+	// adjustment active?
+	switch( cg.cameraAdjustEnum )
+	{
+	case CAMADJ_INOUT:
+		cg_thirdPersonRange.value += cg.cameraAdjustAmount * mult;
+		break;
+
+	case CAMADJ_UPDOWN:
+		cg_thirdPersonHeight.value += cg.cameraAdjustAmount * mult;
+		break;
+
+	default:
+		noAdjust = qtrue;
+		break;
+	}
+
+	// count up?
+	if( !noAdjust )
+	{
+		cg.cameraAdjustCount++;
+	}
+	else
+	{
+		// reset
+		cg.cameraAdjustCount = 0;
+	}
+}
+
+/*
+===============
+CG_CalcViewValues
 
 Sets cg.refdef view values
 ===============
@@ -333,6 +394,8 @@ static int CG_CalcViewValues( void ) {
 	playerState_t	*ps;
 
 	memset( &cg.refdef, 0, sizeof( cg.refdef ) );
+
+	CG_CalcMiscViewValues();
 
 	// strings for in game rendering
 	// Q_strncpyz( cg.refdef.text[0], "Park Ranger", sizeof(cg.refdef.text[0]) );

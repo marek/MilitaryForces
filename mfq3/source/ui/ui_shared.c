@@ -1,5 +1,5 @@
 /*
- * $Id: ui_shared.c,v 1.3 2002-01-23 18:47:22 sparky909_uk Exp $
+ * $Id: ui_shared.c,v 1.4 2002-01-25 14:27:11 sparky909_uk Exp $
 */
 // 
 // string allocation/managment
@@ -3154,10 +3154,10 @@ static bind_t g_bindings[] =
 	{"vehicleselect",	"Vehicle Selection",ID_VEHSEL,		-1,				-1,		-1, -1},
 	{"gps",				"GPS on/off",		ID_GPS,			-1,				-1,		-1, -1},
 	{"toggleview",		"Toggle Camera",	ID_TOGGLEVIEW,	-1,				-1,		-1, -1},
-	{"cameraup",		"Camera Up",		ID_CAMERAUP,	-1,				-1,		-1, -1},
-	{"cameradown",		"Camera Down",		ID_CAMERADOWN,	-1,				-1,		-1, -1},
-	{"zoomin",			"Zoom In",			ID_ZOOMIN,		-1,				-1,		-1, -1},
-	{"zoomout",			"Zoom Out",			ID_ZOOMOUT,		-1,				-1,		-1, -1},
+	{"+cameraup",		"Camera Up",		ID_CAMERAUP,	-1,				-1,		-1, -1},
+	{"+cameradown",		"Camera Down",		ID_CAMERADOWN,	-1,				-1,		-1, -1},
+	{"+zoomin",			"Zoom In",			ID_ZOOMIN,		-1,				-1,		-1, -1},
+	{"+zoomout",		"Zoom Out",			ID_ZOOMOUT,		-1,				-1,		-1, -1},
 	{"+speedup",		"Zoom/Move Speed-Up", ID_SPEEDUP,	K_SHIFT,		-1,		-1, -1},
 	{"contact_tower",	"Contact Tower",	ID_CONTACTTOWER,-1,				-1,		-1, -1},
 	{"radar",			"RADAR on/off",		ID_RADAR,		-1,				-1,		-1, -1},

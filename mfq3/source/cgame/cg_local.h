@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.12 2002-01-25 13:26:52 thebjoern Exp $
+ * $Id: cg_local.h,v 1.13 2002-01-25 14:25:12 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -302,7 +302,7 @@ typedef struct {
 
 	sfxHandle_t		sounds[MAX_CUSTOM_SOUNDS];
 
-	// mfq3
+	// mfq3 specific
 	int				vehicle;
 	int				deaths;
 	qhandle_t		parts[BP_MAX_PARTS];
@@ -426,9 +426,10 @@ typedef struct {
 	int			zoomTime;
 	float		zoomSensitivity;
 
-	// speed up key
-	qboolean	speedup;
-	float		speedupamount;
+	// camera adjusting
+	int			cameraAdjustEnum;		// camera adjustment identifier enum
+	float		cameraAdjustAmount;		// camera adjustment amount
+	int			cameraAdjustCount;
 
 	// information screen text during loading
 	char		infoScreenText[MAX_STRING_CHARS];
@@ -718,6 +719,12 @@ typedef struct {
 	
 } cgMedia_t;
 
+enum CameraAdjust {
+	CAMADJ_NONE,
+	CAMADJ_INOUT,
+	CAMADJ_UPDOWN,
+	MAX_CAMERA_ADJUSTS
+};
 
 // The client game static (cgs) structure hold everything
 // loaded or calculated from the gamestate.  It will NOT
