@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.18 2002-02-25 15:25:56 sparky909_uk Exp $
+ * $Id: g_local.h,v 1.19 2002-02-27 11:24:09 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -552,8 +552,8 @@ void G_SetOrigin( gentity_t *ent, vec3_t origin );
 void AddRemap(const char *oldShader, const char *newShader, float timeOffset);
 const char *BuildShaderStateConfig();
 
-// mfq3
-extern unsigned long	G_GetGameset();
+// MFQ3
+extern unsigned long G_GetGameset();
 
 //
 // g_combat.c
@@ -562,7 +562,8 @@ qboolean CanDamage (gentity_t *targ, vec3_t origin);
 void G_Damage (gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_t dir, vec3_t point, int damage, int dflags, int mod, long cat);
 qboolean G_RadiusDamage (vec3_t origin, gentity_t *attacker, float damage, float radius, gentity_t *ignore, int mod, long cat);
 int G_InvulnerabilityEffect( gentity_t *targ, vec3_t dir, vec3_t point, vec3_t impactpoint, vec3_t bouncedir );
-void vehicle_death( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int meansOfDeath );
+
+void Vehicle_Death( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int meansOfDeath );
 void TossVehicleFlags( gentity_t *self );
 void ExplodeVehicle( gentity_t *self );
 
