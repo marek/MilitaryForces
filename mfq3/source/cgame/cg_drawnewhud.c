@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.35 2004-12-14 16:25:09 minkis Exp $
+ * $Id: cg_drawnewhud.c,v 1.36 2004-12-16 19:22:15 minkis Exp $
 */
 
 #include "cg_local.h"
@@ -727,6 +727,10 @@ CG_Draw_Redundant
 */
 static void CG_Draw_Redundant(int vehicle, int health, int throttle, int ammo[16], int selweap) {
 	char		buffer[12];
+		
+	// if vehicle is invalid break
+	if( vehicle < 0 )
+		return;
 
 		// draw health
 	if( hud_health.integer ) {
