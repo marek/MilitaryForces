@@ -1,5 +1,5 @@
 /*
- * $Id: cg_marks.c,v 1.3 2002-02-04 12:59:14 sparky909_uk Exp $
+ * $Id: cg_marks.c,v 1.4 2002-02-21 16:39:19 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -140,22 +140,23 @@ void CG_ImpactMarkEx( qhandle_t markShader, const vec3_t origin, const vec3_t di
 	vec3_t			projection;
 	qboolean		flip = qfalse;
 
+
+// MFQ3: disable ALL impact marks because currently the essential trap_CM_MarkFragments() call does not
+// work with most of our MFQ3 specific entities
+return;
+
 	// client marks disabled?
 	if( !cg_addMarks.integer )
 	{
 		return;
 	}
 
+	// rubbish radius?
 	if ( xRadius <= 0 || yRadius <= 0 )
 	{
 		CG_Error( "CG_ImpactMarkEx called with xradius AND/OR yradius <= 0" );
 	}
-/*
-	if ( markTotal >= MAX_MARK_POLYS )
-	{
-		return;
-	}
-*/
+
 	// create the texture axis
 	VectorNormalize2( dir, axis[0] );
 
@@ -230,7 +231,7 @@ void CG_ImpactMarkEx( qhandle_t markShader, const vec3_t origin, const vec3_t di
 		mark = CG_AllocMark();
 		mark->time = cg.time;
 		mark->alphaFade = alphaFade;
-		mark->markShader = markShader;
+		mark->markShader = 440;
 		mark->poly.numVerts = mf->numPoints;
 		mark->color[0] = red;
 		mark->color[1] = green;
