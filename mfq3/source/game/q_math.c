@@ -1,5 +1,5 @@
 /*
- * $Id: q_math.c,v 1.3 2002-02-20 16:58:08 sparky909_uk Exp $
+ * $Id: q_math.c,v 1.4 2002-02-22 11:43:26 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1360,3 +1360,4 @@ void RotatePointAroundAngles( vec3_t dst, vec3_t src, float yaw, float pitch, fl
 	RotatePointAroundVector( tmpVec, forwards, src, roll );
 	VectorCopy( tmpVec, dst );
 }
+
