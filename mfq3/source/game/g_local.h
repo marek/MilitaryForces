@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.31 2003-02-22 18:35:24 thebjoern Exp $
+ * $Id: g_local.h,v 1.32 2003-02-24 01:24:10 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -188,6 +188,9 @@ struct gentity_s {
 	int			 currentEventToSend;
 	int			 currentEventToAdd;
 	event_t		 eventQueue[MAX_EVENT_QUEUE_SIZE];
+	vec3_t		 gi_targetHeading;// for ground installations
+	int			 gi_nextScanTime;
+
 };
 
 
@@ -664,6 +667,7 @@ void trigger_teleporter_touch (gentity_t *self, gentity_t *other, trace_t *trace
 //
 int canLandOnIt( gentity_t *ent );
 void untrack( gentity_t *ent );
+void track( gentity_t* ent, gentity_t* target );
 void unlock( gentity_t *ent );
 void updateTargetTracking( gentity_t *ent );
 

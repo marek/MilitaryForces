@@ -1,5 +1,5 @@
 /*
- * $Id: g_miscvehicle.c,v 1.11 2003-02-22 18:35:24 thebjoern Exp $
+ * $Id: g_miscvehicle.c,v 1.12 2003-02-24 01:24:10 thebjoern Exp $
 */
 
 
@@ -501,9 +501,14 @@ void SP_misc_groundinstallation( gentity_t *sp_ent )
 
 	ent->idxScriptBegin = ent->idxScriptEnd = -1;
 
+	ent->s.weaponIndex = availableGroundInstallations[i].weapon;
+	ent->count = availableGroundInstallations[i].ammo;
+
 	ent->s.eFlags |= EF_PILOT_ONBOARD;
 	ent->think = GroundInstallation_Think;
 	ent->nextthink = level.time + 1000;
+
+	ent->s.ONOFF = OO_RADAR;
 
 	trap_LinkEntity (ent);
 

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.46 2003-01-11 13:08:50 thebjoern Exp $
+ * $Id: bg_vehicledata.c,v 1.47 2003-02-24 01:24:09 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -2171,13 +2171,15 @@ groundInstallationData_t availableGroundInstallations[] =
 	{0, 0, 0},					// mins (bounding box)
 	{0, 0, 0},					// max (bounding box)
 	{80, 80, 260},				// turnspeed around the three axis
+	290,						// maxgunpitch
+	10,							// mingunpitch
 	120,						// health
-	WI_MG_20MM,					// weapon
-	450,						// ammo
-	12000,						// radar range
-	9000,						// radar range ground
+	WI_AMRAAM,					// weapon
+	4,							// ammo
+	8000,						// radar range
+	0,							// radar range ground
 	0,							// trackcone
-	-1,							// trackcone ground
+	1,							// trackcone ground
 	0							// upgrades
     },
 
@@ -2189,13 +2191,15 @@ groundInstallationData_t availableGroundInstallations[] =
 	{0, 0, 0},					// mins (bounding box)
 	{0, 0, 0},					// max (bounding box)
 	{80, 80, 260},				// turnspeed around the three axis
+	290,						// maxgunpitch
+	10,							// mingunpitch
 	120,						// health
-	WI_MG_20MM,					// weapon
-	450,						// ammo
-	12000,						// radar range
-	9000,						// radar range ground
+	WI_AMRAAM,					// weapon
+	8,							// ammo
+	8000,						// radar range
+	0,							// radar range ground
 	0,							// trackcone
-	-1,							// trackcone ground
+	1,							// trackcone ground
 	1							// upgrades
     },
 
@@ -2207,13 +2211,15 @@ groundInstallationData_t availableGroundInstallations[] =
 	{0, 0, 0},					// mins (bounding box)
 	{0, 0, 0},					// max (bounding box)
 	{80, 80, 260},				// turnspeed around the three axis
+	290,						// maxgunpitch
+	10,							// mingunpitch
 	120,						// health
-	WI_MG_20MM,					// weapon
-	450,						// ammo
-	12000,						// radar range
-	9000,						// radar range ground
+	WI_AMRAAM,					// weapon
+	12,							// ammo
+	8000,						// radar range
+	0,							// radar range ground
 	0,							// trackcone
-	-1,							// trackcone ground
+	1,							// trackcone ground
 	2							// upgrades
     },
 
@@ -2225,13 +2231,15 @@ groundInstallationData_t availableGroundInstallations[] =
 	{0, 0, 0},					// mins (bounding box)
 	{0, 0, 0},					// max (bounding box)
 	{80, 80, 260},				// turnspeed around the three axis
+	290,						// maxgunpitch
+	10,							// mingunpitch
 	120,						// health
-	WI_MG_20MM,					// weapon
-	450,						// ammo
-	12000,						// radar range
-	9000,						// radar range ground
+	WI_AMRAAM,					// weapon
+	16,							// ammo
+	8000,						// radar range
+	0,							// radar range ground
 	0,							// trackcone
-	-1,							// trackcone ground
+	1,							// trackcone ground
 	3							// upgrades
     },
 };
