@@ -1,5 +1,5 @@
 /*
- * $Id: ui_shared.c,v 1.4 2002-01-25 14:27:11 sparky909_uk Exp $
+ * $Id: ui_shared.c,v 1.5 2002-02-06 17:55:38 sparky909_uk Exp $
 */
 // 
 // string allocation/managment
@@ -3164,6 +3164,7 @@ static bind_t g_bindings[] =
 	{"extinfo",			"Ext.Info on/off",	ID_EXTINFO,		-1,				-1,		-1, -1},
 	{"radarrange",		"Toggle RADAR Range",ID_RADARRANGE,	-1,				-1,		-1, -1},
 	{"unlock",			"Unlock Target",	ID_UNLOCK,		-1,				-1,		-1, -1},
+	{"+bombcam",		"Bomb Camera",		ID_BOMBCAMERA,	-1,				-1,		-1, -1},
 	
 	{(char*)NULL,		(char*)NULL,		0,				-1,				-1,		-1,	-1},
 };
