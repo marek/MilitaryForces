@@ -5,8 +5,23 @@ Military Forces Q3
 History:
 ========
 
-+++v0.43+++ in progress...
++++v0.44+++ in progress...
 -----------
+- minor bugfixes
+
++++v0.43+++
+-----------
+- first cut of missile target tracking code
+- weapons can now be set to work against certain categories only and have 
+  limited effect on others
+- added a first set of anti air missiles: Sidewinder, Stinger, Sparrow,
+  AMRAAM, Phoenix, Archer, Atoll, Alamo
+- added new weapon types: anti aircraft missile, anti ground missile, anti
+  radar missile and guided bombs
+- added tracking and locking mechanism for use with guided weapons, in order
+  to make it not too easy weapon platform has to use radar 
+- Mark: changed loading screen
+- Mark: enhanced encyclopedia/vehicle information
 - fix a drone bug where it always turned left instead of the shortest distance
 - planes can now land on other platform-like entities as well (func_train and
   func_door)
