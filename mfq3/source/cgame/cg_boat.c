@@ -1,5 +1,5 @@
 /*
- * $Id: cg_boat.c,v 1.10 2003-01-11 13:08:49 thebjoern Exp $
+ * $Id: cg_boat.c,v 1.11 2003-09-05 00:42:31 minkis Exp $
 */
 
 
@@ -432,6 +432,8 @@ void CG_BoatObituary( entityState_t *ent, clientInfo_t *ci )
 			message = "tried to invade";
 			message2 = "'s personal space";
 			break;
+		case MOD_NUKE:
+			message = "got owned with a MinkiCorp(r) brand Nuclear Weapon by";
 		default:
 			message = "was killed by";
 			break;
