@@ -1,5 +1,5 @@
 /*
- * $Id: cg_consolecmds.c,v 1.13 2002-02-04 16:34:40 sparky909_uk Exp $
+ * $Id: cg_consolecmds.c,v 1.14 2002-02-09 18:23:15 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -203,6 +203,29 @@ static void CG_Update_MFD_Color_f( void )
 	// update 
 	cg.MFDColor = CG_Cvar_Get( "mfd_color" );
 }
+
+/*
+==================
+MFQ3 MFD toggling
+==================
+*/
+
+static void CG_Toggle_MFD1_f( void ) {
+	int mfd1 = hud_mfd.integer;
+
+	mfd1 = mfd1 ? 0 : 1;
+	trap_Cvar_Set( "hud_mfd", va("%d", mfd1) );
+	
+}
+
+static void CG_Toggle_MFD2_f( void ) {
+	int mfd2 = hud_mfd2.integer;
+
+	mfd2 = mfd2 ? 0 : 1;
+	trap_Cvar_Set( "hud_mfd2", va("%d", mfd2) );
+
+}
+
 
 /*
 ==================
@@ -530,6 +553,8 @@ static consoleCommand_t	commands[] = {
 	{ "-downcam", CG_CamOld_f },
 	{ "+bombcam", CG_CamBomb_f },
 	{ "-bombcam", CG_CamOld_f },
+	{ "toggle_mfd1", CG_Toggle_MFD1_f },
+	{ "toggle_mfd2", CG_Toggle_MFD2_f },
 	{ "update_hud_color", CG_Update_HUD_Color_f },
 	{ "update_mfd_color", CG_Update_MFD_Color_f }
 };
