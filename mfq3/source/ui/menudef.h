@@ -1,3 +1,6 @@
+/*
+ * $Id: menudef.h,v 1.3 2002-01-19 02:24:03 thebjoern Exp $
+*/
 
 #define ITEM_TYPE_TEXT 0                  // simple text
 #define ITEM_TYPE_BUTTON 1                // button, basically text with a border 

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_planemove.c,v 1.2 2002-01-07 00:06:02 thebjoern Exp $
+ * $Id: bg_planemove.c,v 1.3 2002-01-19 02:24:02 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -425,7 +425,7 @@ Returns qtrue if the velocity was clipped in some way
 ==================
 */
 #define	MAX_CLIP_PLANES	5
-static qboolean	PM_SlideMove_Plane() {
+qboolean	PM_SlideMove_Plane() {
 	int			bumpcount, numbumps;
 	vec3_t		dir;
 	float		d;

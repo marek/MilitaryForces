@@ -1,3 +1,6 @@
+/*
+ * $Id: ui_shared.h,v 1.2 2002-01-19 02:24:03 thebjoern Exp $
+*/
 #ifndef __UI_SHARED_H
 #define __UI_SHARED_H
 

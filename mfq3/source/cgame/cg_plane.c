@@ -1,5 +1,5 @@
 /*
- * $Id: cg_plane.c,v 1.7 2001-12-27 19:14:46 thebjoern Exp $
+ * $Id: cg_plane.c,v 1.8 2002-01-19 02:24:02 thebjoern Exp $
 */
 
 
@@ -491,7 +491,7 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 	// smoke
 	if( cent->currentState.generic1 && cg_smoke.integer ) {
 		localEntity_t	*smoke;
-		vec3_t			up = {0, 0, 1};
+		vec3_t			up = {0, 0, 20};
 		vec3_t			pos;
 		vec3_t			forward;
 
@@ -501,11 +501,12 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 		smoke = CG_SmokePuff( pos, up, 
 					  cent->currentState.generic1, 
 					  0.5, 0.5, 0.5, 0.66f,
-					  100*cent->currentState.generic1, 
+					  150*cent->currentState.generic1, 
 					  cg.time, 0,
 					  LEF_PUFF_DONT_SCALE, 
 					  cgs.media.smokePuffShader );	
 	}
+
 	CG_VehicleMuzzleFlash( cent, &part[BP_PLANE_BODY], ci->parts[BP_PLANE_BODY], ci->vehicle );
 
 	CG_PlaneFlags( cent );

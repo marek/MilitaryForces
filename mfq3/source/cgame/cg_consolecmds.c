@@ -1,5 +1,5 @@
 /*
- * $Id: cg_consolecmds.c,v 1.2 2001-12-22 17:54:13 thebjoern Exp $
+ * $Id: cg_consolecmds.c,v 1.3 2002-01-19 02:24:02 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -206,8 +206,13 @@ static void CG_TellAttacker_f( void ) {
 	trap_SendClientCommand( command );
 }
 
+static void CG_TestPlane_f( void ) {
+	CG_TestVehicle(CAT_PLANE);
+}
 
-
+static void CG_TestGV_f( void ) {
+	CG_TestVehicle(CAT_GROUND);
+}
 
 
 typedef struct {
@@ -222,6 +227,10 @@ static consoleCommand_t	commands[] = {
 	{ "prevframe", CG_TestModelPrevFrame_f },
 	{ "nextskin", CG_TestModelNextSkin_f },
 	{ "prevskin", CG_TestModelPrevSkin_f },
+	{ "testPlane", CG_TestPlane_f },
+	{ "testGV", CG_TestGV_f },
+	{ "testPlaneCmd", CG_TestPlaneCmd_f },
+	{ "testGVCmd", CG_TestGVCmd_f },
 	{ "viewpos", CG_Viewpos_f },
 	{ "+scores", CG_ScoresDown_f },
 	{ "-scores", CG_ScoresUp_f },

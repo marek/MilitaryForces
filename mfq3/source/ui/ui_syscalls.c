@@ -1,5 +1,6 @@
-// Copyright (C) 1999-2000 Id Software, Inc.
-//
+/*
+ * $Id: ui_syscalls.c,v 1.2 2002-01-19 02:24:03 thebjoern Exp $
+*/
 #include "ui_local.h"
 
 // this file is only included when building a dll

@@ -23,6 +23,8 @@ call ..\compile ../../game/bg_groundmove.c
 @if errorlevel 1 goto quit
 call ..\compile ../../game/bg_mfq3util.c
 @if errorlevel 1 goto quit
+call ..\compile ../../ui/ui_shared.c
+@if errorlevel 1 goto quit
 
 call ..\compile ../cg_consolecmds.c
 @if errorlevel 1 goto quit
@@ -59,6 +61,8 @@ call ..\compile ../cg_snapshot.c
 call ..\compile ../cg_view.c
 @if errorlevel 1 goto quit
 call ..\compile ../cg_weapons.c
+@if errorlevel 1 goto quit
+call ..\compile ../cg_testmodel.c
 @if errorlevel 1 goto quit
 
 call ..\compile ../cg_vehicle.c
