@@ -1,5 +1,5 @@
 /*
- * $Id: g_svcmds.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: g_svcmds.c,v 1.2 2002-02-14 15:07:54 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -427,17 +427,17 @@ qboolean	ConsoleCommand( void ) {
 		Svcmd_GameMem_f();
 		return qtrue;
 	}
+/*
+	if (Q_stricmp (cmd, "addbot") == 0) {
+		Svcmd_AddBot_f();
+		return qtrue;
+	}
 
-//	if (Q_stricmp (cmd, "addbot") == 0) {
-//		Svcmd_AddBot_f();
-//		return qtrue;
-//	}
-
-//	if (Q_stricmp (cmd, "botlist") == 0) {
-//		Svcmd_BotList_f();
-//		return qtrue;
-//	}
-
+	if (Q_stricmp (cmd, "botlist") == 0) {
+		Svcmd_BotList_f();
+		return qtrue;
+	}
+*/
 	if (Q_stricmp (cmd, "addip") == 0) {
 		Svcmd_AddIP_f();
 		return qtrue;
@@ -455,11 +455,11 @@ qboolean	ConsoleCommand( void ) {
 
 	if (g_dedicated.integer) {
 		if (Q_stricmp (cmd, "say") == 0) {
-			trap_SendServerCommand( -1, va("print \"server: %s\"", ConcatArgs(1) ) );
+			trap_SendServerCommand( -1, va("print \"^3Server:^7 %s\"", ConcatArgs(1) ) );
 			return qtrue;
 		}
 		// everything else will also be printed as a say command
-		trap_SendServerCommand( -1, va("print \"server: %s\"", ConcatArgs(0) ) );
+		trap_SendServerCommand( -1, va("print \"^3Server:^7 %s\"", ConcatArgs(0) ) );
 		return qtrue;
 	}
 
