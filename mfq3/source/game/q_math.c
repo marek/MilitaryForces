@@ -1,5 +1,5 @@
 /*
- * $Id: q_math.c,v 1.2 2002-02-09 17:07:04 thebjoern Exp $
+ * $Id: q_math.c,v 1.3 2002-02-20 16:58:08 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1317,4 +1317,46 @@ void PerpendicularVector( vec3_t dst, const vec3_t src )
 	VectorNormalize( dst );
 }
 
+/*
+===============
+RotatePointAroundAngleVector
 
+Rotates a point around a local axis of y/p/r
+===============
+*/
+
+void RotatePointAroundAngleVector( vec3_t dst, vec3_t src, vec3_t angles )
+{
+	RotatePointAroundAngles( dst, src, angles[YAW], angles[PITCH], angles[ROLL] );
+}
+
+/*
+===============
+RotatePointAroundAngles
+
+Rotates a point around a local axis of y/p/r
+===============
+*/
+
+void RotatePointAroundAngles( vec3_t dst, vec3_t src, float yaw, float pitch, float roll )
+{
+	vec3_t up = {0,0,1}, forwards = {1,0,0}, left = {0,1,0}, tmpVec;
+
+	// rotate point (+ left vector & forwards vector) around yaw
+	RotatePointAroundVector( tmpVec, up, src, yaw );
+	VectorCopy( tmpVec, src );
+	RotatePointAroundVector( tmpVec, up, left, yaw );
+	VectorCopy( tmpVec, left );
+	RotatePointAroundVector( tmpVec, up, forwards, yaw );
+	VectorCopy( tmpVec, forwards );
+
+	// rotate point (+ left vector vector) around pitch
+	RotatePointAroundVector( tmpVec, left, src, pitch );
+	VectorCopy( tmpVec, src );
+	RotatePointAroundVector( tmpVec, left, forwards, pitch );
+	VectorCopy( tmpVec, forwards );
+	
+	// rotate point around roll
+	RotatePointAroundVector( tmpVec, forwards, src, roll );
+	VectorCopy( tmpVec, dst );
+}

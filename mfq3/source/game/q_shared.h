@@ -1,5 +1,5 @@
 /*
- * $Id: q_shared.h,v 1.6 2002-02-17 18:10:54 thebjoern Exp $
+ * $Id: q_shared.h,v 1.7 2002-02-20 16:58:08 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -538,6 +538,10 @@ void RotateAroundYaw( vec3_t axis[3], float angle );//MFQ3
 void RotateAroundPitch( vec3_t axis[3], float angle );// MFQ3
 void MakeNormalVectors( const vec3_t forward, vec3_t right, vec3_t up );
 // perpendicular vector could be replaced by this
+
+void RotatePointAroundAngleVector( vec3_t dst, vec3_t src, vec3_t angles );
+void RotatePointAroundAngles( vec3_t dst, vec3_t src, float yaw, float pitch, float roll );
+
 
 //int	PlaneTypeForNormal (vec3_t normal);
 
