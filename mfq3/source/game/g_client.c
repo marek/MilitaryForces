@@ -1,6 +1,8 @@
 /*
- * $Id: g_client.c,v 1.6 2002-02-21 12:25:44 sparky909_uk Exp $
+ * $Id: g_client.c,v 1.7 2002-09-27 14:37:52 scheherazade Exp $
 */
+
+//null cvs upload test, comment placed for a difference.
 
 // Copyright (C) 1999-2000 Id Software, Inc.
 //
