@@ -22,6 +22,7 @@ cg_drawnewhud
 cg_drawoldhud
 cg_testmodel
 cg_vehicle
+cg_vehicledraw
 cg_miscvehicle
 cg_plane
 cg_helo

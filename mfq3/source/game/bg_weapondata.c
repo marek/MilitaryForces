@@ -1,5 +1,5 @@
 /*
- * $Id: bg_weapondata.c,v 1.20 2002-06-16 21:36:29 thebjoern Exp $
+ * $Id: bg_weapondata.c,v 1.21 2002-07-13 12:04:40 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -985,45 +985,6 @@ completeWeaponData_t availableWeapons[] =
 		WF_HAS_FIRE_FRAME,					// flags
 	},
 
-	// Avenger
-	{ 
-		WT_ANTIAIRMISSILE,					// type
-		MF_GAMESET_ANY,						// gameset
-		"Avenger",							// descriptiveName
-		"MR-AAM",							// shortName
-		"MR-SAM",							// shortName2 (GVs)
-		"models/weapons/vwep_sidewinder.md3",// modelName
-		0,									// handle
-		"models/weapons/vwep_sidewinder.md3",// vwepName
-		0,									// vwephandle
-		"hud/iconw_rkt.tga",				// iconName
-		0,									// iconHandle
-		CAT_GROUND,							// cat
-		0.3f,								// non cat mod
-		1500,								// muzzleVelocity
-		12000,								// range
-		8000,								// fuelrange
-		1000,								// fire interval
-		100,								// damage
-		50,									// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0.985f,								// lockcone (dot)
-		0.996f,								// followcone (dot)
-		1500,								// locktime
-		CH_MISSILEMODE,						// crosshair
-		CH_MISSILEMODETRACK,				// crosshair track
-		CH_MISSILEMODELOCK,					// crosshair lock
-		0,									// turret
-		{5,180,0},							// max turret angles
-		{-85,-180,0},						// min turret angles
-		1,									// number per package
-		CAT_ANY,							// fits on category
-		PF_AA_LT,							// fits on pylon
-		WF_HAS_FIRE_FRAME,					// flags
-	},
-
 	// Stinger
 	{ 
 		WT_ANTIAIRMISSILE,					// type
@@ -1040,9 +1001,9 @@ completeWeaponData_t availableWeapons[] =
 		CAT_ANY,							// cat
 		0.3f,								// non cat mod
 		1500,								// muzzleVelocity
-		4000,								// range
+		8000,								// range
 		8000,								// fuelrange
-		1000,								// fire interval
+		1500,								// fire interval
 		80,									// damage
 		50,									// damageRadius
 		1,									// spread

@@ -1,5 +1,5 @@
 /*
- * $Id: mf_client.c,v 1.15 2002-03-03 15:23:06 thebjoern Exp $
+ * $Id: mf_client.c,v 1.16 2002-07-13 12:04:40 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -33,6 +33,10 @@ char *MF_ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 
 	if( isBot ) {
 		return "MFQ3 doesn't have bots yet";
+	}
+
+	if( g_gametype.integer == GT_MISSION_EDITOR && level.numConnectedClients >= 1 ) {
+		return "MFQ3 IGME in use. Connecting not allowed.";
 	}
 
 	ent = &g_entities[ clientNum ];

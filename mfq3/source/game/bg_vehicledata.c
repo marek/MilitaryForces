@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.44 2002-06-16 21:36:29 thebjoern Exp $
+ * $Id: bg_vehicledata.c,v 1.45 2002-07-13 12:04:40 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -651,6 +651,56 @@ completeVehicleData_t availableVehicles[] =
 	{0,0,0,0}					// shadow orientation adjusters
     },
 
+
+    {	"YF-23",			    // descriptiveName
+	"YF-23",					// tinyName
+	"yf-23",					// modelName
+	SHADOW_DEFAULT,				// alpha shadow
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_1,
+	CAT_PLANE,
+	CLASS_PLANE_FIGHTER,
+	0,							// flags
+	HC_GEAR|HC_SPEEDBRAKE|
+	HC_VAPOR,					// capabilities
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
+	{60, 80, 200},				// turnspeed around the three axis
+	{0, 100, 70},				// camera distance {min,max,default}
+	{0, 100, 20},				// camera height {min,max,default}
+	220,						// stallspeed
+	880,						// maxspeed
+	0,							// min throttle
+	15,							// max throttle
+	2,							// engines
+	0,							// wheels
+	0,							// wheel circumference
+	260,						// acceleration
+	150,						// health
+	{19.1f,7.87f,-0.112f},		// gun tag
+	80,							// max fuel
+	0,							// gearheight - SET AUTOMATICALLY
+	0,							// tailangle
+	WI_MG_20MM, WI_AMRAAM, WI_SIDEWINDER, 0, 0, 0, 0, WI_FLARE,	// weapons
+	450, 4, 4, 0, 0, 0, 0, 35,		// ammo
+	0,0,0,0,0,0,0,0,			// turret
+	{28, 0, 6},					// cameraposition for cockpit view
+	AB_RED,						// effect model
+	14000,						// radar range
+	7000,						// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
+	0,							// swingangle
+	1400,						// geartime
+	0,							// max gear frame
+	1000,						// baytime
+	0,							// max bay frame
+	0,							// renderflags
+	{6,0,48,34},				// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
+    },
+
     {	"B-2 Spirit",		    // descriptiveName
 	"B-2",						// tinyName
 	"b-2",						// modelName
@@ -1277,7 +1327,7 @@ completeVehicleData_t availableVehicles[] =
 	160,						// max fuel
 	300,						// max gun pitch (upwards = negative) <- gearheight
 	6,							// min gun pitch (downwards = positive) <- tailangle
-	WI_MG_12_7MM, WI_PHOENIX, 0, 0, 0, 0, 0, WI_FLARE,// weapons
+	WI_MG_12_7MM, WI_STINGER, 0, 0, 0, 0, 0, WI_FLARE,// weapons
 	300, 4, 0, 0, 0, 0, 0, 20,	// ammo
 	0,0,0,0,0,0,0,0,			// turret
 	{0, 0, 10},					// cameraposition for cockpit view
