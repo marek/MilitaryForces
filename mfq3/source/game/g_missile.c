@@ -1,5 +1,5 @@
 /*
- * $Id: g_missile.c,v 1.21 2003-03-19 11:37:31 thebjoern Exp $
+ * $Id: g_missile.c,v 1.22 2003-03-19 12:53:13 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -245,8 +245,8 @@ static void follow_target( gentity_t *missile ) {
 	vec3_t	dir, targdir, mid, mins, maxs;
 	float	dist, dot;
 	trace_t	tr;
-	int		i, prob, num, touch[MAX_GENTITIES];
-	static vec3_t range = { 300, 300, 300 };
+	int		i, prob, num, touch[MAX_GENTITIES], vulner;
+	static vec3_t range = { 500, 500, 500 };
 	gentity_t* hit;
 
 	// target invalid
@@ -287,13 +287,18 @@ static void follow_target( gentity_t *missile ) {
 
 	for ( i=0 ; i<num ; i++ ) {
 		hit = &g_entities[touch[i]];
+		if( !hit->inuse ) continue;
 		if( hit->s.eType != ET_MISSILE ) continue;
 		if( strcmp( hit->classname, "flare" ) != 0 ) continue;
 		if( !hit->ONOFF ) continue;
 		if( hit->r.ownerNum == missile->r.ownerNum ) continue; 
 		hit->ONOFF = 0; // disable the flare
 		prob = rand() % 100;
-		if( prob < 5 ) {
+		vulner = missile->basicECMVulnerability - missile->tracktarget->s.frame;
+		//G_Printf("TT: %d, vulner: %d, prob: %d\n", missile->tracktarget->s.frame, vulner, prob);
+		if( prob < vulner ) {
+			if( missile->tracktarget->client )
+				missile->tracktarget->client->ps.stats[STAT_LOCKINFO] &= ~LI_BEING_LAUNCHED;
 			missile->tracktarget = hit;
 			missile->lastDist = 0;
 			missile->nextthink = level.time + 10;
@@ -446,6 +451,7 @@ void fire_antiair (gentity_t *self) {
 	bolt->splashMethodOfDeath = MOD_FFAR_SPLASH;
 	bolt->clipmask = MASK_SHOT|MASK_WATER;
 	bolt->target_ent = NULL;
+	bolt->basicECMVulnerability = availableWeapons[self->client->ps.weaponIndex].basicECMVulnerability;
 
 	bolt->s.pos.trTime = level.time;// - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
 	VectorCopy( start, bolt->s.pos.trBase );
@@ -539,6 +545,7 @@ void fire_antiground (gentity_t *self) {
 	bolt->splashMethodOfDeath = MOD_FFAR_SPLASH;
 	bolt->clipmask = MASK_SHOT|MASK_WATER;
 	bolt->target_ent = NULL;
+	bolt->basicECMVulnerability = availableWeapons[self->client->ps.weaponIndex].basicECMVulnerability;
 
 	bolt->s.pos.trTime = level.time;// - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
 	VectorCopy( start, bolt->s.pos.trBase );
@@ -876,6 +883,7 @@ void LaunchMissile_GI( gentity_t* ent )
 	bolt->splashMethodOfDeath = MOD_FFAR_SPLASH;
 	bolt->clipmask = MASK_SHOT|MASK_WATER;
 	bolt->target_ent = NULL;
+	bolt->basicECMVulnerability = availableWeapons[ent->s.weaponIndex].basicECMVulnerability;
 
 	bolt->s.pos.trTime = level.time;// - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
 	VectorCopy( start, bolt->s.pos.trBase );
