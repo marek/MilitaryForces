@@ -1,5 +1,5 @@
 /*
- * $Id: cg_groundvehicle.c,v 1.5 2001-12-23 02:02:14 thebjoern Exp $
+ * $Id: cg_groundvehicle.c,v 1.6 2001-12-24 02:17:35 thebjoern Exp $
 */
 
 
@@ -254,7 +254,7 @@ void CG_GroundVehicle( centity_t *cent, clientInfo_t *ci )
 		if( ps->stats[STAT_LOCKINFO] & LI_TRACKING ) {
 			refEntity_t		reticlelock;
 			centity_t* target = &cg_entities[cent->currentState.tracktarget];
-			reticle.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshair];
+			reticle.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshairtrack];
 			VectorSubtract( target->lerpOrigin, cent->lerpOrigin, forward );
 			len = VectorNormalize( forward );
 			vectoangles( forward, ang );
@@ -280,11 +280,11 @@ void CG_GroundVehicle( centity_t *cent, clientInfo_t *ci )
 			trap_R_AddRefEntityToScene( &reticle );
 			if( ps->stats[STAT_LOCKINFO] & LI_LOCKING ) {
 				memcpy( &reticlelock, &reticle, sizeof(reticle) );
-				reticlelock.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshair+1];
+				reticlelock.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshairlock];
 				reticlelock.frame = 1;
 			} else {
 				memset( &reticlelock, 0, sizeof(reticlelock) );	
-				reticlelock.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshair+1];
+				reticlelock.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshairlock];
 				AngleVectors( cent->currentState.angles, forward, right, up );
 				RotatePointAroundVector( temp, up, forward, cent->currentState.angles2[ROLL] );
 				CrossProduct( up, temp, right );

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.12 2001-12-23 22:46:37 thebjoern Exp $
+ * $Id: bg_public.h,v 1.13 2001-12-24 02:17:35 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.44a"
+#define	GAME_VERSION		"mfq3 v0.45"
 
 #define	DEFAULT_GRAVITY		800
 #define	GIB_HEALTH			-50
@@ -655,7 +655,14 @@ typedef struct completeWeaponData_s
 	unsigned int	spread;				// how far off the target direction
 	unsigned int	barrels;			// mainly for guns
 	float			barrelDistance;		// how far off the center
+	float			trackcone;			// degrees of half cone to track
+	float			lockcone;			// degrees of half cone to lock
+	float			followcone;			// degrees of half cone to follow
+	int				lockdelay;			// how long does it take to lock on
 	unsigned int	crosshair;			// which crosshair to use when this weapon is selected
+	unsigned int	crosshairtrack;		// which crosshair to use when this weapon is tracking
+	unsigned int	crosshairlock;		// which crosshair to use when this weapon is locked
+	unsigned int	crosshairlockfriend;// which crosshair to use when this weapon is locked on friend
 }completeWeaponData_t;
 
 // list of weapons...

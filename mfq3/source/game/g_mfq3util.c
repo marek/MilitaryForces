@@ -1,5 +1,5 @@
 /*
- * $Id: g_mfq3util.c,v 1.7 2001-12-23 22:46:37 thebjoern Exp $
+ * $Id: g_mfq3util.c,v 1.8 2001-12-24 02:17:35 thebjoern Exp $
 */
 
 
@@ -131,10 +131,10 @@ void updateTargetTracking( gentity_t *ent )
 		}
 		// check within cone
 		dot = DotProduct( forward, diff );
-		if( dot < 0.7f ) {// roughly 45 degrees 
+		if( dot < availableWeapons[ent->s.weaponIndex].trackcone ) {// roughly 45 degrees 
 			unlock(ent);
 			return;
-		} else if( dot < 0.985f ) { // roughly 10 degrees
+		} else if( dot < availableWeapons[ent->s.weaponIndex].lockcone ) { // roughly 10 degrees
 			ent->locktime = level.time;
 			ent->client->ps.stats[STAT_LOCKINFO] &= ~LI_LOCKING;
 		}
@@ -148,7 +148,7 @@ void updateTargetTracking( gentity_t *ent )
 		}
 
 		// check time
-		if( level.time > ent->locktime + 1500 ) {
+		if( level.time > ent->locktime + availableWeapons[ent->s.weaponIndex].lockdelay ) {
 			ent->client->ps.stats[STAT_LOCKINFO] |= LI_LOCKING;
 		}
 	}

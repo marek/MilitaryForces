@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.4 2001-12-22 17:54:13 thebjoern Exp $
+ * $Id: g_local.h,v 1.5 2001-12-24 02:17:35 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -174,6 +174,7 @@ struct gentity_s {
 	float		 targetcat;		// for weapons mfq3
 	float		 catmodifier;	// for weapons mfq3
 	float		 range;			// for weapons mfq3
+	float		 followcone;	// for weapons mfq3
 };
 
 

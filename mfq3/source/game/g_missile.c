@@ -1,5 +1,5 @@
 /*
- * $Id: g_missile.c,v 1.4 2001-12-23 22:46:37 thebjoern Exp $
+ * $Id: g_missile.c,v 1.5 2001-12-24 02:17:35 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -260,7 +260,7 @@ static void follow_target( gentity_t *missile ) {
 	VectorCopy( missile->s.pos.trDelta, dir );
 	VectorNormalize( dir );
 	dot = DotProduct( dir, targdir );
-	if( dot < 0.996f ) { // roughly 5 degrees
+	if( dot < missile->followcone ) { // roughly 5 degrees
 		on_target_lost(missile);
 		return;
 	}
@@ -343,6 +343,7 @@ void fire_antiair (gentity_t *self) {
 	bolt->wait = level.time + availableWeapons[self->client->ps.weaponIndex].fuelrange;
 	bolt->think = follow_target;
 	bolt->tracktarget = self->tracktarget;
+	bolt->followcone = availableWeapons[self->client->ps.weaponIndex].followcone;
 	bolt->s.eType = ET_MISSILE;
 	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
 	bolt->s.weaponIndex = self->client->ps.weaponIndex;
@@ -412,6 +413,7 @@ void fire_antiground (gentity_t *self) {
 	bolt->wait = level.time + availableWeapons[self->client->ps.weaponIndex].fuelrange;
 	bolt->think = follow_target;
 	bolt->tracktarget = self->tracktarget;
+	bolt->followcone = availableWeapons[self->client->ps.weaponIndex].followcone;
 	bolt->s.eType = ET_MISSILE;
 	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
 	bolt->s.weaponIndex = self->client->ps.weaponIndex;
