@@ -1,5 +1,5 @@
 /*
- * $Id: g_missile.c,v 1.6 2002-01-28 22:34:30 thebjoern Exp $
+ * $Id: g_missile.c,v 1.7 2002-01-31 23:47:24 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -51,6 +51,11 @@ void G_ExplodeMissile( gentity_t *ent ) {
 	vec3_t		dir;
 	vec3_t		origin;
 
+	// update target
+	if( ent->tracktarget && ent->tracktarget->client ) {
+		ent->tracktarget->client->ps.stats[STAT_LOCKINFO] &= ~LI_BEING_LAUNCHED;
+	}
+
 	BG_EvaluateTrajectory( &ent->s.pos, level.time, origin );
 	SnapVector( origin );
 	G_SetOrigin( ent, origin );
@@ -94,11 +99,18 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 //		return;
 //	}
 
+	// update target
+	if( ent->tracktarget && ent->tracktarget->client ) {
+		ent->tracktarget->client->ps.stats[STAT_LOCKINFO] &= ~LI_BEING_LAUNCHED;
+	}
+
+
 	// impact damage
 	if (other->takedamage) {
 		// FIXME: wrong damage direction?
 		if ( ent->damage ) {
 			vec3_t	velocity;
+			int		actualdamage;
 
 			if( LogAccuracyHit( other, &g_entities[ent->r.ownerNum] ) ) {
 				g_entities[ent->r.ownerNum].client->accuracy_hits++;
@@ -108,8 +120,9 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 			if ( VectorLength( velocity ) == 0 ) {
 				velocity[2] = 1;
 			}
+			actualdamage = ent->damage + ((rand() % (ent->damage/2)) - (ent->damage/4));
 			G_Damage (other, ent, &g_entities[ent->r.ownerNum], velocity,
-				ent->s.origin, ent->damage, 
+				ent->s.origin, actualdamage, 
 				0, ent->methodOfDeath, ent->targetcat);
 		}
 	}
@@ -204,12 +217,20 @@ void G_RunMissile( gentity_t *ent ) {
 //=============================================================================
 
 static void no_fuel_flight( gentity_t *missile ) {
+	// update target
+	if( missile->tracktarget && missile->tracktarget->client ) {
+		missile->tracktarget->client->ps.stats[STAT_LOCKINFO] &= ~LI_BEING_LAUNCHED;
+	}
 	missile->s.pos.trType = TR_GRAVITY;
 	missile->think = G_ExplodeMissile;
 	missile->nextthink = level.time + 5000;
 }
 
 static void on_target_lost( gentity_t *missile ) {
+	// update target
+	if( missile->tracktarget && missile->tracktarget->client ) {
+		missile->tracktarget->client->ps.stats[STAT_LOCKINFO] &= ~LI_BEING_LAUNCHED;
+	}
 	missile->tracktarget = 0;
 	missile->think = no_fuel_flight;
 	missile->nextthink = missile->wait + 50;
@@ -260,7 +281,6 @@ static void follow_target( gentity_t *missile ) {
 	if( missile->lastDist && dist > missile->lastDist && dist < missile->splashRadius ) {
 		missile->nextthink = level.time + 10;
 		missile->think = G_ExplodeMissile;
-		return;
 	}
 
 	// out of seeker cone
@@ -296,6 +316,12 @@ static void follow_target( gentity_t *missile ) {
 
 	missile->nextthink = level.time + 100;
 	missile->lastDist = dist;
+
+	// update target
+	if( missile->tracktarget->client ) {
+		missile->tracktarget->client->ps.stats[STAT_LOCKINFO] |= LI_BEING_LAUNCHED;
+	}
+
 
 	trap_LinkEntity( missile );
 }
@@ -351,6 +377,10 @@ void fire_antiair (gentity_t *self) {
 	bolt->wait = level.time + availableWeapons[self->client->ps.weaponIndex].fuelrange;
 	bolt->think = follow_target;
 	bolt->tracktarget = self->tracktarget;
+	// update target
+	if( self->tracktarget->client ) {
+		self->tracktarget->client->ps.stats[STAT_LOCKINFO] |= LI_BEING_LAUNCHED;
+	}
 	bolt->followcone = availableWeapons[self->client->ps.weaponIndex].followcone;
 	bolt->s.eType = ET_MISSILE;
 	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
@@ -421,6 +451,10 @@ void fire_antiground (gentity_t *self) {
 	bolt->wait = level.time + availableWeapons[self->client->ps.weaponIndex].fuelrange;
 	bolt->think = follow_target;
 	bolt->tracktarget = self->tracktarget;
+	// update target
+	if( self->tracktarget->client ) {
+		self->tracktarget->client->ps.stats[STAT_LOCKINFO] |= LI_BEING_LAUNCHED;
+	}
 	bolt->followcone = availableWeapons[self->client->ps.weaponIndex].followcone;
 	bolt->s.eType = ET_MISSILE;
 	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
@@ -625,12 +659,12 @@ void fire_autocannon (gentity_t *self) {
 	bolt->methodOfDeath = MOD_AUTOCANNON;
 	bolt->clipmask = MASK_SHOT;
 	bolt->target_ent = NULL;
-	bolt->s.eType = ET_BULLET;
 	bolt->s.pos.trType = TR_LINEAR;
 	bolt->s.pos.trTime = level.time - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
 	//tracer
 	self->tracerindex --;
 	if( self->tracerindex < 0 ) self->tracerindex = 255;
+	bolt->s.eType = ET_BULLET;
 	bolt->s.generic1 = self->tracerindex;
 	VectorCopy( start, bolt->s.pos.trBase );
 	VectorScale( dir, availableWeapons[availableVehicles[self->client->vehicle].weapons[WP_MACHINEGUN]].muzzleVelocity, bolt->s.pos.trDelta );

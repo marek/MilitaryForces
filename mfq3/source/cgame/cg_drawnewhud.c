@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.7 2002-01-31 02:34:33 thebjoern Exp $
+ * $Id: cg_drawnewhud.c,v 1.8 2002-01-31 23:47:24 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -813,38 +813,74 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 	cg.HUDCamera.fov_x = fov_x;
 	cg.HUDCamera.fov_y = fov_x;
 
-		// angles
-	if( ps->stats[STAT_LOCKINFO] & LI_TRACKING ) {
-		vec3_t a;
-		centity_t* target = &cg_entities[cent->currentState.tracktarget];
-		qboolean building = qfalse;
-
-		if( target->currentState.eType == ET_EXPLOSIVE ) building = qtrue;
-		if( building ) {
-			VectorSubtract( cgs.inlineModelMidpoints[target->currentState.modelindex], cent->lerpOrigin, v );
+	if( cg.CameraMode == CAMERA_DOWN ) {
+		if( availableVehicles[vehicle].id&CAT_ANY & CAT_GROUND ) {
+			// nothing to be done here...
 		} else {
-			VectorSubtract( target->lerpOrigin, cent->lerpOrigin, v );
+			vec3_t a;
+			AngleVectors( cent->currentState.angles, 0, 0, v );
+			VectorSet( a, 90, cent->currentState.angles[1], 0 );
+			AnglesToAxis( a, cg.HUDCamera.viewaxis );
 		}
-		VectorNormalize( v );
-		vectoangles( v, a );
-		AnglesToAxis( a, cg.HUDCamera.viewaxis );
-	} else {
+			// position
+		VectorScale( v, availableVehicles[vehicle].mins[2], v );
+		VectorAdd( cent->lerpOrigin, v, cg.HUDCamera.vieworg );
+	} else if( cg.CameraMode == CAMERA_BACK ) {
 		if( availableVehicles[vehicle].id&CAT_ANY & CAT_GROUND ) {
 			vec3_t right, up, temp;
 			AngleVectors( cent->currentState.angles, v, right, up );
 			RotatePointAroundVector( temp, up, v, cent->currentState.angles2[ROLL] );
 			CrossProduct( up, temp, right );
 			RotatePointAroundVector( v, right, temp, cent->currentState.angles2[PITCH] );
+			VectorInverse( v );
 			vectoangles( v, temp );
 			AnglesToAxis( temp, cg.HUDCamera.viewaxis );
 		} else {
-			AnglesToAxis( cent->currentState.angles, cg.HUDCamera.viewaxis );
+			vec3_t a, b;
 			AngleVectors( cent->currentState.angles, v, 0, 0 );
+			VectorCopy( v, b );
+			VectorInverse( b );
+			vectoangles( b, a );
+			a[2] = -cent->currentState.angles[2];
+			AnglesToAxis( a, cg.HUDCamera.viewaxis );
 		}
-	}
-		// position
-	VectorScale( v, availableVehicles[vehicle].maxs[0], v );
-	VectorAdd( cent->lerpOrigin, v, cg.HUDCamera.vieworg );
+			// position
+		VectorScale( v, availableVehicles[vehicle].mins[0], v );
+		VectorAdd( cent->lerpOrigin, v, cg.HUDCamera.vieworg );
+	} else if( cg.CameraMode == CAMERA_TARGET ) {
+		// angles
+		if( ps->stats[STAT_LOCKINFO] & LI_TRACKING ) {
+			vec3_t a;
+			centity_t* target = &cg_entities[cent->currentState.tracktarget];
+			qboolean building = qfalse;
+
+			if( target->currentState.eType == ET_EXPLOSIVE ) building = qtrue;
+			if( building ) {
+				VectorSubtract( cgs.inlineModelMidpoints[target->currentState.modelindex], cent->lerpOrigin, v );
+			} else {
+				VectorSubtract( target->lerpOrigin, cent->lerpOrigin, v );
+			}
+			VectorNormalize( v );
+			vectoangles( v, a );
+			AnglesToAxis( a, cg.HUDCamera.viewaxis );
+		} else {
+			if( availableVehicles[vehicle].id&CAT_ANY & CAT_GROUND ) {
+				vec3_t right, up, temp;
+				AngleVectors( cent->currentState.angles, v, right, up );
+				RotatePointAroundVector( temp, up, v, cent->currentState.angles2[ROLL] );
+				CrossProduct( up, temp, right );
+				RotatePointAroundVector( v, right, temp, cent->currentState.angles2[PITCH] );
+				vectoangles( v, temp );
+				AnglesToAxis( temp, cg.HUDCamera.viewaxis );
+			} else {
+				AnglesToAxis( cent->currentState.angles, cg.HUDCamera.viewaxis );
+				AngleVectors( cent->currentState.angles, v, 0, 0 );
+			}
+		}
+			// position
+		VectorScale( v, availableVehicles[vehicle].maxs[0], v );
+		VectorAdd( cent->lerpOrigin, v, cg.HUDCamera.vieworg );
+	} 
 
 		// ummm shall I really do this ???
 	CG_AddPacketEntities();
@@ -861,8 +897,8 @@ CG_Draw_MFD
 
 ================
 */
-static void CG_Draw_MFD(int mfdnum, int vehicle, centity_t * cent, 
-						int targetrange, int targetheading, int altitude, playerState_t *ps) {
+static void CG_Draw_MFD(int mfdnum, int vehicle, centity_t * cent, int targetrange, 
+						int targetheading, int altitude, playerState_t *ps, int stallcolor) {
 	float		x, y, width, height;
 	int			mode = cg.Mode_MFD[mfdnum];
 	int			onoff = cent->currentState.ONOFF;
@@ -998,7 +1034,7 @@ static void CG_Draw_MFD(int mfdnum, int vehicle, centity_t * cent,
 			CG_DrawString_MFQ3_R( x+122, y+40, "---", HUDColors[cg.MFDColor], 0);
 		}
 		value = ps->speed/10;
-		CG_MFQ3HUD_Numbers( x+122, y+54, 4, value, qfalse, HUDColors[cg.MFDColor], qtrue );
+		CG_MFQ3HUD_Numbers( x+122, y+54, 4, value, qfalse, HUDColors[stallcolor], qtrue );
 		CG_MFQ3HUD_Numbers( x+122, y+64, 5, altitude, qfalse, HUDColors[cg.MFDColor], qtrue );
 		CG_MFQ3HUD_Numbers( x+122, y+78, 6, (int)ps->origin[0], qfalse, HUDColors[cg.MFDColor], qtrue );
 		CG_MFQ3HUD_Numbers( x+122, y+88, 6, (int)ps->origin[1], qfalse, HUDColors[cg.MFDColor], qtrue );
@@ -1291,7 +1327,8 @@ void CG_DrawStatusBar_MFQ3_new( void ) {
 	playerState_t	*ps;
 	int			value, value2;
 	int			vehicle = cgs.clientinfo[cg.predictedPlayerState.clientNum].vehicle;
-	int			targetheading, targetrange, altitude;
+	int			targetheading, targetrange, altitude, stallcolor;
+	int			speed, stallspeed = availableVehicles[vehicle].stallspeed;
 
 	static vec4_t colors[] = { 
 //		{ 0.2, 1.0, 0.2, 1.0 } , { 1.0, 0.2, 0.2, 1.0 }, {0.5, 0.5, 0.5, 1} };
@@ -1308,6 +1345,7 @@ void CG_DrawStatusBar_MFQ3_new( void ) {
 
 	cent = &cg_entities[cg.snap->ps.clientNum];
 	ps = &cg.snap->ps;
+	speed = ps->speed/10;
 
 	// calc target range and heading
 	if( ps->stats[STAT_LOCKINFO] & LI_TRACKING ) {
@@ -1355,14 +1393,19 @@ void CG_DrawStatusBar_MFQ3_new( void ) {
 		CG_Draw_AltTape(altitude);
 	}
 
+	// stall related
+	if( speed <= stallspeed || (cent->currentState.ONOFF & OO_STALLED) ) stallcolor = HUD_RED;
+	else if( speed <= stallspeed * 1.25 ) stallcolor = HUD_YELLOW;
+	else stallcolor = HUD_GREEN;
+
 	// mfd 1
 	if( hud_mfd.integer ) {
-		CG_Draw_MFD(MFD_1, vehicle, cent, targetrange, targetheading, altitude, ps);
+		CG_Draw_MFD(MFD_1, vehicle, cent, targetrange, targetheading, altitude, ps, stallcolor);
 	}
 
 	// mfd 2
 	if( hud_mfd2.integer ) {
-		CG_Draw_MFD(MFD_2, vehicle, cent, targetrange, targetheading, altitude, ps);
+		CG_Draw_MFD(MFD_2, vehicle, cent, targetrange, targetheading, altitude, ps, stallcolor);
 	}
 
 	// solid middle section
@@ -1380,6 +1423,20 @@ void CG_DrawStatusBar_MFQ3_new( void ) {
 		value = (int)ps->origin[0];
 		value2 = (int)ps->origin[1];
 		CG_Draw_Coords( value, value2 );
+	}
+	
+	// stallwarning
+	if( ps->speed/10 <= availableVehicles[vehicle].stallspeed*1.5 || (cent->currentState.ONOFF & OO_STALLED) ) {
+		float stallscale = 1.0f;
+		if( speed >= stallspeed && !(cent->currentState.ONOFF & OO_STALLED) ) stallscale = 2.0f - ((float)speed/(float)stallspeed);
+		CG_DrawStringNew( 320, 360, stallscale, HUDColors[stallcolor], "STALL!", 0, 0, 3, CENTRE_JUSTIFY );
+	}
+
+	// lock warning
+	if( ps->stats[STAT_LOCKINFO] & LI_BEING_LAUNCHED ) {
+		CG_DrawStringNew( 320, 60, 0.8f, HUDColors[HUD_RED], "LAUNCH!", 0, 0, 3, CENTRE_JUSTIFY );
+	} else if( ps->stats[STAT_LOCKINFO] & LI_BEING_LOCKED ) {
+		CG_DrawStringNew( 320, 60, 1.0f, HUDColors[HUD_YELLOW], "LOCK!", 0, 0, 3, CENTRE_JUSTIFY );
 	}
 
 	// cleanup

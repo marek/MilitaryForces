@@ -1,5 +1,5 @@
 /*
- * $Id: g_mfq3util.c,v 1.11 2002-01-27 15:41:28 thebjoern Exp $
+ * $Id: g_mfq3util.c,v 1.12 2002-01-31 23:47:24 thebjoern Exp $
 */
 
 
@@ -22,12 +22,20 @@ int canLandOnIt( gentity_t *ent )
 
 void unlock( gentity_t* ent )
 {
+	// update target
+	if( ent->tracktarget && ent->tracktarget->client ) {
+		ent->tracktarget->client->ps.stats[STAT_LOCKINFO] &= ~LI_BEING_LOCKED;
+	}
 	ent->locktime = level.time;
 	ent->client->ps.stats[STAT_LOCKINFO] &= ~LI_LOCKING;
 }
 
 void untrack( gentity_t* ent )
 {
+	// update target
+	if( ent->tracktarget && ent->tracktarget->client ) {
+		ent->tracktarget->client->ps.stats[STAT_LOCKINFO] &= ~LI_BEING_LOCKED;
+	}
 	ent->locktime = 0;
 	ent->tracktarget = 0;
 	ent->s.tracktarget = ENTITYNUM_NONE;
@@ -191,6 +199,10 @@ void updateTargetTracking( gentity_t *ent )
 		// check time
 		if( level.time > ent->locktime + availableWeapons[ent->s.weaponIndex].lockdelay ) {
 			ent->client->ps.stats[STAT_LOCKINFO] |= LI_LOCKING;
+		}
+		// update target
+		if( ent->tracktarget->client && (ent->client->ps.stats[STAT_LOCKINFO] & LI_LOCKING) ) {
+			ent->tracktarget->client->ps.stats[STAT_LOCKINFO] |= LI_BEING_LOCKED;
 		}
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.21 2002-01-31 10:09:40 sparky909_uk Exp $
+ * $Id: cg_local.h,v 1.22 2002-01-31 23:47:24 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -104,17 +104,28 @@ typedef enum {
 #define MAX_RADAR_TARGETS		32
 
 // MFD
-#define MFD_OFF					0
-#define MFD_RWR					1
-#define MFD_STATUS				2
-#define MFD_INVENTORY			3
-#define MFD_CAMERA				4
-#define MFD_INFO				5
-#define MFD_MAX					6
+typedef enum {
+	MFD_OFF,
+	MFD_RWR,
+	MFD_STATUS,
+	MFD_INVENTORY,
+	MFD_CAMERA,
+	MFD_INFO,
+	MFD_MAX					
+} MFD_Modes;
 
 #define MFD_1					0
 #define MFD_2					1
 #define NUM_MFDS_IN_COCKPIT		2
+
+// cameramode
+typedef enum {
+	CAMERA_TARGET,
+	CAMERA_BACK,
+	CAMERA_DOWN,
+	CAMERA_MAX		
+} Camera_Modes;
+
 
 //=================================================
 
@@ -540,6 +551,8 @@ typedef struct {
 	int				MFDColor;
 	int				MFDColorTime;
 	refdef_t		HUDCamera;
+	int				CameraMode;
+	int				CameraModeTime;
 } cg_t;
 
 
@@ -957,6 +970,20 @@ extern	vmCvar_t		hud_color;
 extern	vmCvar_t		mfd_color;
 extern	vmCvar_t		mfd1_defaultpage;
 extern	vmCvar_t		mfd2_defaultpage;
+
+extern	vmCvar_t		m1cp_page0;
+extern	vmCvar_t		m1cp_page1;
+extern	vmCvar_t		m1cp_page2;
+extern	vmCvar_t		m1cp_page3;
+extern	vmCvar_t		m1cp_page4;
+extern	vmCvar_t		m1cp_page5;
+extern	vmCvar_t		m2cp_page0;
+extern	vmCvar_t		m2cp_page1;
+extern	vmCvar_t		m2cp_page2;
+extern	vmCvar_t		m2cp_page3;
+extern	vmCvar_t		m2cp_page4;
+extern	vmCvar_t		m2cp_page5;
+
 
 //
 // cg_main.c
