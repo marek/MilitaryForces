@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.15 2002-01-07 00:06:02 thebjoern Exp $
+ * $Id: bg_public.h,v 1.16 2002-01-18 16:48:26 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -481,6 +481,7 @@ qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTim
 #define MF_MAX_CLASSES			8
 
 void MF_SetGameset(unsigned long gs);
+unsigned long MF_GetGameset(void);
 
 // NOTE:	The id of a vehice is made of 32 bit:
 //			8 bit 0x0000000f are the class  (8 possibilities)
