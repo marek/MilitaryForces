@@ -1,5 +1,5 @@
 /*
- * $Id: g_missile.c,v 1.20 2003-03-18 22:06:06 thebjoern Exp $
+ * $Id: g_missile.c,v 1.21 2003-03-19 11:37:31 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -792,7 +792,11 @@ void fire_flare( gentity_t *self ) {
 
 	VectorSet( up, 0, 0, 1 );
 	VectorCopy( self->s.pos.trBase, start );
-	VectorMA( start, self->r.maxs[2]+3, up, start );
+	if( (availableVehicles[self->client->vehicle].cat & CAT_GROUND) ||
+		(availableVehicles[self->client->vehicle].cat & CAT_BOAT) ) 
+		VectorMA( start, self->r.maxs[2]+3, up, start );
+	else
+		VectorMA( start, self->r.mins[2]-3, up, start );
 	SnapVector( start );
 
 	bolt = G_Spawn();
@@ -809,10 +813,12 @@ void fire_flare( gentity_t *self ) {
 	bolt->clipmask = MASK_SHOT;
 	bolt->ONOFF = 1;// not used
 
-	bolt->s.pos.trType = TR_GRAVITY;
+	bolt->s.pos.trType = TR_GRAVITY_10;
 	bolt->s.pos.trTime = level.time;// - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
 	VectorCopy( start, bolt->s.pos.trBase );
-	VectorScale( up, 700, bolt->s.pos.trDelta );
+	if( (availableVehicles[self->client->vehicle].cat & CAT_GROUND) ||
+		(availableVehicles[self->client->vehicle].cat & CAT_BOAT) ) 
+		VectorScale( up, 300, bolt->s.pos.trDelta );
 	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
 	VectorCopy (start, bolt->r.currentOrigin);
 }
