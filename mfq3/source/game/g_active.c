@@ -1,5 +1,5 @@
 /*
- * $Id: g_active.c,v 1.25 2004-12-17 00:29:40 minkis Exp $
+ * $Id: g_active.c,v 1.29 2005-06-26 05:08:12 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -616,7 +616,7 @@ void ClientThink_real( gentity_t *ent ) {
 	int			oldEventSequence;
 	int			msec;
 	usercmd_t	*ucmd;
-int on_recharge = 0;
+
 	client = ent->client;
 
 	// event queue
