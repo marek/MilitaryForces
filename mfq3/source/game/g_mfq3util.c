@@ -1,5 +1,5 @@
 /*
- * $Id: g_mfq3util.c,v 1.15 2002-02-18 09:51:28 thebjoern Exp $
+ * $Id: g_mfq3util.c,v 1.16 2003-02-22 19:18:00 thebjoern Exp $
 */
 
 
@@ -58,10 +58,10 @@ void updateTargetTracking( gentity_t *ent )
 	trace_t			tr;
 	vec3_t			forward, endpos, dir;
 	float			radarrange;
-	qboolean		buildings = qfalse;
+	qboolean		buildings = qfalse, groundinstallations = qfalse;
 	gentity_t		*test;
 	float			cone;
-
+	
 //	G_Printf( "updateTargetTracking for %s\n", ent->client->pers.netname );
 
 	// what can we lock on ?
@@ -72,6 +72,7 @@ void updateTargetTracking( gentity_t *ent )
 	} else if( ent->client->ps.ONOFF & OO_RADAR_GROUND ) {
 		targetcat = CAT_GROUND|CAT_BOAT;
 		buildings = qtrue;
+		groundinstallations = qtrue;
 		radarrange = availableVehicles[ent->client->vehicle].radarRange2;
 		cone = availableVehicles[ent->client->vehicle].trackCone2;
 	}
@@ -109,9 +110,10 @@ void updateTargetTracking( gentity_t *ent )
 		if( test->s.eType == ET_VEHICLE && test->client && 
 			(availableVehicles[test->client->vehicle].cat & targetcat) ) {
 			track(ent, test);
-		} else if( test->s.eType == ET_MISC_VEHICLE &&
-			(availableVehicles[test->s.modelindex].cat & targetcat) ) {
-			track(ent, test);
+		} else if( test->s.eType == ET_MISC_VEHICLE ) {
+			if( (test->s.modelindex == 255 && groundinstallations) || // ground installations
+			    (availableVehicles[test->s.modelindex].cat & targetcat) ) 
+				track(ent, test);
 		} else {
 			if( buildings ) {
 				if( test->s.eType == ET_EXPLOSIVE && test->takedamage ) {
@@ -134,7 +136,13 @@ void updateTargetTracking( gentity_t *ent )
 			VectorSubtract( mid, ent->r.currentOrigin, diff );
 		} else {
 			if( ent->tracktarget->s.eType == ET_MISC_VEHICLE ) {
-				actualcat = availableVehicles[ent->tracktarget->s.modelindex].cat;
+				if( ent->tracktarget->s.modelindex == 255 )// groundinstallation
+				{
+					actualcat = CAT_GROUND;
+					groundinstallations = qtrue;
+				}
+				else
+					actualcat = availableVehicles[ent->tracktarget->s.modelindex].cat;
 			} else if( ent->tracktarget->s.eType == ET_VEHICLE && ent->tracktarget->client ) {
 				actualcat =	availableVehicles[ent->tracktarget->client->vehicle].cat;
 			}
