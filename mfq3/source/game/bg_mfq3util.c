@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.20 2002-02-24 16:52:12 thebjoern Exp $
+ * $Id: bg_mfq3util.c,v 1.21 2002-02-24 19:39:51 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -418,7 +418,7 @@ qboolean MF_distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout )
 				}
 				ammos[j] -= num;
 				loadout->weaponType[i] = weaps[j];
-				loadout->mountedWeapons[i] = num / availableWeapons[weaps[j]].numberPerPackage;
+				loadout->mountedWeapons[i] = loadout->maxWeapons[i] = num / availableWeapons[weaps[j]].numberPerPackage;
 				done = qtrue;
 			}
 			if( done ) break;
@@ -560,10 +560,20 @@ reloading
 =================
 */
 
-qboolean MF_addWeaponToLoadout( int weaponIndex, completeLoadout_t* loadout )
+int MF_addWeaponToLoadout( int weaponIndex, completeLoadout_t* loadout )
 {
-	return qfalse;
+	int i, diff, added = 0;
+
+	for( i = 0; i < MAX_WEAPONS_PER_VEHICLE; ++i ) {
+		diff = loadout->maxWeapons[i] - loadout->mountedWeapons[i];
+		if( loadout->weaponType[i] == weaponIndex && diff ) {
+			loadout->mountedWeapons[i] = loadout->maxWeapons[i];
+			added += diff;
+		}
+	}
+	return added;
 }
+
 
 
 
