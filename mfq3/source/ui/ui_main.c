@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.6 2002-02-11 12:23:55 sparky909_uk Exp $
+ * $Id: ui_main.c,v 1.7 2002-02-12 11:40:47 sparky909_uk Exp $
 */
 /*
 =======================================================================
@@ -2041,8 +2041,11 @@ static void UI_DrawVehiclePreview( rectDef_t *rect, float scale, vec4_t color, i
 			pictureHandle = trap_R_RegisterShaderNoMip( pIconString );
 		}
 
-		// draw
-		UI_DrawHandlePic( rect->x, rect->y, rect->w, rect->h, pictureHandle );
+		// draw (if valid picture handle)
+		if( pictureHandle )
+		{
+			UI_DrawHandlePic( rect->x, rect->y, rect->w, rect->h, pictureHandle );
+		}
 
 		// save last done
 		lastVehicle = vehicle;
@@ -3424,29 +3427,6 @@ static void UI_SelectVehicle( void )
 }
 
 /*
-=================
-UI_PrecacheVehiclePreview
-=================
-*/
-
-// simply does a trap_R_RegisterShaderNoMip() for all our icons
-static void UI_PrecacheVehiclePreview( void )
-{
-	char * pIconString = NULL;
-	int i = 0;
-
-	// for all icons
-	for( i = 0; i < bg_numberOfVehicles; i++ )
-	{
-		// create filename string
-		pIconString = MF_CreateModelPathname( i, "models/vehicles/%s/%s/%s_icon" );
-
-		// precache
-		trap_R_RegisterShaderNoMip( pIconString );
-	}
-}
-
-/*
 ===============
 UI_RunMenuScript
 ===============
@@ -3844,11 +3824,6 @@ static void UI_RunMenuScript(char **args) {
 			{
 				UI_CycleVehicleSelect( cycleIdx );
 			}
-		}
-		else if( Q_stricmp(name, "precacheVehicleIcons") == 0 )
-		{
-			// MFQ3: precache vehicle icons
-			UI_PrecacheVehiclePreview();
 		}
 		else if( Q_stricmp(name, "normalCursor") == 0 )
 		{
