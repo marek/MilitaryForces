@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.60 2003-02-11 00:25:09 thebjoern Exp $
+ * $Id: cg_local.h,v 1.61 2003-02-15 13:04:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1513,6 +1513,7 @@ void ME_ImportScript( const char* scriptname );
 void CG_Draw_IGME();
 void ME_KeyEvent(int key, qboolean down);
 void ME_MouseEvent(int x, int y);
+void ME_Init_MissionEditor();
 
 //===============================================
 

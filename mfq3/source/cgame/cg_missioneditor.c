@@ -1,5 +1,5 @@
 /*
- * $Id: cg_missioneditor.c,v 1.15 2003-02-08 15:20:11 thebjoern Exp $
+ * $Id: cg_missioneditor.c,v 1.16 2003-02-15 13:04:54 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -1086,6 +1086,18 @@ void ME_ImportScript( const char* scriptname )
 	ME_SpawnMissionGroundInstallations(installations);
 
 //	trap_Printf( va("Loaded: %s\n", inbuffer) );
+}
+
+// loads up initial mission (specified in mf_mission)
+void ME_Init_MissionEditor()
+{
+	const char	*info;
+	const char	*scriptname;
+
+	info = CG_ConfigString( CS_SERVERINFO );
+	scriptname = Info_ValueForKey( info, "mf_mission" );
+
+	ME_ImportScript(scriptname);
 }
 
 
