@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.5 2001-12-27 19:14:46 thebjoern Exp $
+ * $Id: bg_vehicledata.c,v 1.6 2002-01-07 00:06:02 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -36,8 +36,8 @@ completeVehicleData_t availableVehicles[] =
 	60,							// max fuel
 	3,							// gearheight
 	0,							// tailangle
-	WI_MG_20MM, WI_FFAR, WI_MK82, WI_SIDEWINDER, WI_AMRAAM, WI_PHOENIX, WI_HELLFIRE, WI_FLARE,	// weapons
-	450, 24, 8, 4, 4, 4, 8, 30,		// ammo
+	WI_MG_20MM, WI_AMRAAM, WI_SIDEWINDER, WI_MAVERICK, WI_FFAR, 0, 0, WI_FLARE,	// weapons
+	450, 4, 2, 2, 38, 0, 0, 30,		// ammo
 	{19, 0, 5},					// cameraposition for cockpit view
 	AB_BALL,					// effect model
 	8000,						// radar range
@@ -70,8 +70,8 @@ completeVehicleData_t availableVehicles[] =
 	60,							// max fuel
 	3,							// gearheight
 	0,							// tailangle
-	WI_MG_20MM, WI_FFAR, WI_MK82, 0, 0, 0, 0, WI_FLARE,		// weapons
-	450, 24, 8, 0, 0, 0, 0, 28,	// ammo
+	WI_MG_20MM, WI_AMRAAM, WI_SIDEWINDER, 0, 0, 0, 0, WI_FLARE,		// weapons
+	450, 5, 4, 0, 0, 0, 0, 28,	// ammo
 	{19, 0, 5},					// cameraposition for cockpit view
 	AB_BALL,					// effect model
 	10000,						// radar range
@@ -104,8 +104,8 @@ completeVehicleData_t availableVehicles[] =
 	80,							// max fuel
 	3,							// gearheight
 	0,							// tailangle
-	WI_MG_2X20MM, WI_FFAR, WI_MK82, 0, 0, 0, 0, WI_FLARE,	// weapons
-	500, 12, 4, 0, 0, 0, 0, 32,		// ammo
+	WI_MG_2X20MM, WI_AMRAAM, WI_SIDEWINDER, WI_FFAR, 0, 0, 0, WI_FLARE,	// weapons
+	500, 2, 2, 38, 0, 0, 0, 32,		// ammo
 	{11, 0, 5},					// cameraposition for cockpit view
 	AB_RED_SMALL,				// effect model
 	6000,						// radar range
@@ -138,8 +138,8 @@ completeVehicleData_t availableVehicles[] =
 	80,							// max fuel
 	3,							// gearheight
 	0,							// tailangle
-	WI_MG_20MM, WI_FFAR, WI_MK82, 0, 0, 0, 0, WI_FLARE,	// weapons
-	450, 12, 12, 0, 0, 0, 0, 35,		// ammo
+	WI_MG_20MM, WI_AMRAAM, WI_SIDEWINDER, WI_MK82, 0, 0, 0, WI_FLARE,	// weapons
+	450, 2, 4, 16, 0, 0, 0, 35,		// ammo
 	{28, 0, 6},					// cameraposition for cockpit view
 	AB_RED,						// effect model
 	12000,						// radar range
@@ -158,26 +158,26 @@ completeVehicleData_t availableVehicles[] =
 	HC_GEAR|HC_SPEEDBRAKE|
 	HC_VAPOR|HC_DUALENGINE|HC_SWINGWING,		// capabilities
 	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
-	{-31, -28, -5},				// mins (bounding box)
-	{54, 28, 14},				// max (bounding box)
+	{-29, -28, -3},				// mins (bounding box)
+	{46, 28, 14},				// max (bounding box)
 	{60, 80, 200},				// turnspeed around the three axis
 	80, 18,						// camera distance and height
 	220,						// stallspeed
-	880,						// maxspeed
+	840,						// maxspeed
 	0,							// min throttle
 	15,							// max throttle
 	260,						// acceleration
 	150,						// health
-	{19.1f,7.87f,-0.112f},		// gun tag
-	80,							// max fuel
-	3,							// gearheight
+	{37.8f,2.4f,-1.3f},			// gun tag
+	70,							// max fuel
+	2,							// gearheight
 	0,							// tailangle
-	WI_MG_20MM, WI_FFAR, WI_MK82, 0, 0, 0, 0, WI_FLARE,	// weapons
-	450, 12, 12, 0, 0, 0, 0, 35,		// ammo
+	WI_MG_20MM, WI_PHOENIX, WI_SIDEWINDER, 0, 0, 0, 0, WI_FLARE,	// weapons
+	450, 6, 2, 0, 0, 0, 0, 35,		// ammo
 	{28, 0, 6},					// cameraposition for cockpit view
 	AB_RED,						// effect model
-	12000,						// radar range
-	6000,						// radar range ground
+	16000,						// radar range
+	1500,						// radar range ground
 	50,							// swingangle
 	MFR_DUALPILOT|MFR_BIGVAPOR	// renderflags
     },
@@ -192,17 +192,17 @@ completeVehicleData_t availableVehicles[] =
 	HC_GEAR|HC_SPEEDBRAKE|
 	HC_VAPOR,					// capabilities
 	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
-	{-26, -21, -4},				// mins (bounding box)
-	{36, 21, 15},				// max (bounding box)
+	{-26, -25, -5},				// mins (bounding box)
+	{44, 25, 10},				// max (bounding box)
 	{80, 80, 260},				// turnspeed around the three axis
 	70, 18,						// camera distance and height
 	200,						// stallspeed
-	700,						// maxspeed
+	720,						// maxspeed
 	0,							// min throttle
 	15,							// max throttle
 	260,						// acceleration
 	130,						// health
-	{16.65f, -3.391f, 0.378f},	// gun tag
+	{40.3f, 0, 0.478f},			// gun tag
 	60,							// max fuel
 	3,							// gearheight
 	0,							// tailangle
@@ -210,18 +210,18 @@ completeVehicleData_t availableVehicles[] =
 	450, 24, 8, 4, 4, 4, 8, 30,		// ammo
 	{19, 0, 5},					// cameraposition for cockpit view
 	AB_BALL,					// effect model
-	8000,						// radar range
-	4000,						// radar range ground
+	7500,						// radar range
+	6500,						// radar range ground
 	0,							// swingangle
 	0							// renderflags
     },
 
-    {	"B-2 Shadow",		    // descriptiveName
+    {	"B-2 Spirit",		    // descriptiveName
 	"b-2",						// modelName
 	MF_GAMESET_MODERN|			// id
 	MF_TEAM_1|
 	CAT_PLANE|
-	CLASS_PLANE_FIGHTER,
+	CLASS_PLANE_BOMBER,
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
 	HC_VAPOR,					// capabilities
@@ -240,8 +240,8 @@ completeVehicleData_t availableVehicles[] =
 	60,							// max fuel
 	3,							// gearheight
 	0,							// tailangle
-	WI_MG_20MM, WI_FFAR, WI_MK82, WI_SIDEWINDER, WI_AMRAAM, WI_PHOENIX, WI_HELLFIRE, WI_FLARE,	// weapons
-	450, 24, 8, 4, 4, 4, 8, 30,		// ammo
+	WI_MG_20MM, WI_MK82, WI_MAVERICK, 0, 0, 0, 0, WI_FLARE,	// weapons
+	450, 16, 4, 0, 0, 0, 0, 30,		// ammo
 	{19, 0, 5},					// cameraposition for cockpit view
 	AB_BALL,					// effect model
 	8000,						// radar range
@@ -320,6 +320,77 @@ completeVehicleData_t availableVehicles[] =
 	0							// renderflags
     },
 
+
+    {	"Fokker Dr.1",			// descriptiveName
+	"dr1",						// modelName
+	MF_GAMESET_WW1|				// id
+	MF_TEAM_1|
+	CAT_PLANE|
+	CLASS_PLANE_FIGHTER,
+	0,							// flags
+	HC_PROP|
+	HC_TAILDRAGGER|
+	HC_DUALGUNS,				// capabilities
+	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
+	{-21, -20, -1},				// mins (bounding box)
+	{10, 20, 6},				// max (bounding box)
+	{70, 80, 300},				// turnspeed around the three axis
+	50, 14,						// camera distance and height
+	50,						    // stallspeed
+	150,					    // maxspeed
+	0,							// min throttle
+	10,						    // max throttle
+	220,						// acceleration
+	100,						// health
+	{2.518f, -1.371f, -0.155f},	// gun tag
+	60,							// max fuel
+	3,							// gearheight
+	-14,							// tailangle
+	WI_MG_2XCAL312, 0, 0, 0, 0, 0, 0, 0,		// weapons
+	450, 0, 0, 0, 0, 0, 0, 0,	// ammo
+	{-4, 0, 6},					// cameraposition for cockpit view
+	0,							// effect model
+	0,							// radar range
+	0,							// radar range ground
+	0,							// swingangle
+	0							// renderflags
+    },
+
+    {	"Sopwith camel",		// descriptiveName
+	"camel",					// modelName
+	MF_GAMESET_WW1|				// id
+	MF_TEAM_2|
+	CAT_PLANE|
+	CLASS_PLANE_FIGHTER,
+	0,							// flags
+	HC_PROP|
+	HC_TAILDRAGGER|
+	HC_DUALGUNS,				// capabilities
+	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
+	{-21, -14, -1},				// mins (bounding box)
+	{10, 14, 6},				// max (bounding box)
+	{70, 80, 300},				// turnspeed around the three axis
+	50, 14,						// camera distance and height
+	50,						    // stallspeed
+	150,					    // maxspeed
+	0,							// min throttle
+	10,						    // max throttle
+	220,						// acceleration
+	100,						// health
+	{2.518f, -1.371f, -0.155f},	// gun tag
+	60,							// max fuel
+	3,							// gearheight
+	-14,							// tailangle
+	WI_MG_2XCAL303, 0, 0, 0, 0, 0, 0, 0,		// weapons
+	450, 0, 0, 0, 0, 0, 0, 0,	// ammo
+	{-4, 0, 6},					// cameraposition for cockpit view
+	0,							// effect model
+	0,							// radar range
+	0,							// radar range ground
+	0,							// swingangle
+	0							// renderflags
+    },
+
 	// ---------------------------------------------
 	// Ground Vehicles
 	// ---------------------------------------------
@@ -347,8 +418,8 @@ completeVehicleData_t availableVehicles[] =
 	150,						// max fuel
 	310,						// max gun pitch (upwards = negative) <- gearheight
 	3,							// min gun pitch (downwards = positive) <- tailangle
-	WI_MG_12_7MM, WI_125MM_GUN, WI_STINGER, 0, 0, 0, 0, WI_FLARE,// weapons
-	500, 40, 10, 0, 0, 0, 0, 20,	// ammo
+	WI_MG_12_7MM, WI_125MM_GUN, WI_STINGER, WI_HELLFIRE, 0, 0, 0, WI_FLARE,// weapons
+	500, 40, 4, 2, 0, 0, 0, 20,	// ammo
 	{0, 0, 14},					// cameraposition for cockpit view
 	0,							// effect model
 	8000,						// radar range
@@ -380,8 +451,8 @@ completeVehicleData_t availableVehicles[] =
 	150,						// max fuel
 	310,						// max gun pitch (upwards = negative) <- gearheight
 	3,							// min gun pitch (downwards = positive) <- tailangle
-	WI_MG_12_7MM, WI_125MM_GUN, 0, 0, 0, 0, 0, WI_FLARE,// weapons
-	500, 40, 0, 0, 0, 0, 0, 20,	// ammo
+	WI_MG_12_7MM, WI_125MM_GUN, WI_STINGER, WI_HELLFIRE, 0, 0, 0, WI_FLARE,// weapons
+	500, 40, 4, 2, 0, 0, 0, 20,	// ammo
 	{0, 0, 14},					// cameraposition for cockpit view
 	0,							// effect model
 	8000,						// radar range
@@ -413,8 +484,8 @@ completeVehicleData_t availableVehicles[] =
 	160,						// max fuel
 	300,						// max gun pitch (upwards = negative) <- gearheight
 	6,							// min gun pitch (downwards = positive) <- tailangle
-	WI_MG_14_5MM, WI_100MM_GUN, 0, 0, 0, 0, 0, WI_FLARE,// weapons
-	500, 35, 0, 0, 0, 0, 0, 20,	// ammo
+	WI_MG_14_5MM, WI_100MM_GUN, WI_STINGER, WI_HELLFIRE, 0, 0, 0, WI_FLARE,// weapons
+	500, 35, 2, 2, 0, 0, 0, 20,	// ammo
 	{0, 0, 10},					// cameraposition for cockpit view
 	0,							// effect model
 	8000,						// radar range
@@ -430,7 +501,7 @@ completeVehicleData_t availableVehicles[] =
 	CAT_GROUND|
 	CLASS_GROUND_RECON,
 	0,							// flags
-	HC_DUALGUNS,				// capabilities
+	HC_DUALGUNS|HC_AMPHIBIOUS,	// capabilities
 	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
 	{-10, -5, -2},				// mins (bounding box)
 	{10, 5, 7},					// max (bounding box)
@@ -446,8 +517,8 @@ completeVehicleData_t availableVehicles[] =
 	160,						// max fuel
 	285,						// max gun pitch (upwards = negative) <- gearheight
 	5,							// min gun pitch (downwards = positive) <- tailangle
-	WI_MG_14_5MM, 0, 0, 0, 0, 0, 0, WI_FLARE,// weapons
-	600, 0, 0, 0, 0, 0, 0, 20,	// ammo
+	WI_MG_14_5MM, WI_STINGER, WI_HELLFIRE, 0, 0, 0, 0, WI_FLARE,// weapons
+	600, 2, 4, 0, 0, 0, 0, 20,	// ammo
 	{0, 0, 10},					// cameraposition for cockpit view
 	0,							// effect model
 	8000,						// radar range
@@ -463,7 +534,7 @@ const char *gameset_items[MF_MAX_GAMESETS+1] =
 {
 	"Modern",
 	"World War II",
-	0,
+	"World War I",
 	0,
 	0,
 	0,
@@ -500,10 +571,10 @@ const char *team_items[MF_MAX_GAMESETS][MF_MAX_TEAMS+1] =
 		0
 	},
 
-	// free
+	// world war 1
 	{
-		0,
-		0,
+		"Germany",
+		"England",
 		0,
 		0,
 		0,

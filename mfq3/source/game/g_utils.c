@@ -1,5 +1,5 @@
 /*
- * $Id: g_utils.c,v 1.2 2001-12-22 02:28:44 thebjoern Exp $
+ * $Id: g_utils.c,v 1.3 2002-01-07 00:06:02 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -666,6 +666,9 @@ unsigned long G_GetGameset()
 	}
 	else if( strcmp( buffer, "ww2" ) == 0 ) {
 		return MF_GAMESET_WW2;
+	}
+	else if( strcmp( buffer, "ww1" ) == 0 ) {
+		return MF_GAMESET_WW1;
 	}
 	else {	// default gameset
 		Com_Printf( "mf_gameset is not valid, defaulting 'modern'\n" );

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.14 2001-12-27 19:14:46 thebjoern Exp $
+ * $Id: bg_public.h,v 1.15 2002-01-07 00:06:02 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.46"
+#define	GAME_VERSION		"mfq3 v0.48b"
 
 #define	DEFAULT_GRAVITY		800
 #define	GIB_HEALTH			-50
@@ -492,8 +492,8 @@ void MF_SetGameset(unsigned long gs);
 #define	MF_GAMESET_MIN				  0x01000000 
 #define	MF_GAMESET_MODERN			  0x01000000 
 #define	MF_GAMESET_WW2				  0x02000000 
-#define	MF_GAMESET_MAX				  0x02000000 
 #define	MF_GAMESET_WW1				  0x04000000 
+#define	MF_GAMESET_MAX				  0x04000000 
 #define	MF_GAMESET_VIETNAM			  0x08000000 
 #define	MF_GAMESET_FUTURE			  0x10000000 
 #define	MF_GAMESET_ANY				  0xFF000000
@@ -619,6 +619,7 @@ typedef struct completeVehicleData_s
 	unsigned int	renderFlags;	// special stuff for rendering only
 }completeVehicleData_t;	
 
+
 extern completeVehicleData_t availableVehicles[];
 
 // number of available vehicles
@@ -677,6 +678,8 @@ extern int bg_numberOfWeapons;
 typedef enum
 {
 	WI_NONE,
+	WI_MG_2XCAL303,
+	WI_MG_2XCAL312,
 	WI_MG_8XCAL50,
 	WI_MG_6XCAL50,
 	WI_MG_12_7MM,
@@ -696,6 +699,7 @@ typedef enum
 	WI_ARCHER,
 	WI_ALAMO,
 	WI_HELLFIRE,
+	WI_MAVERICK,
 	WI_FLARE,
 	WI_MAX
 }weaponIndex_t;
@@ -718,6 +722,7 @@ int MF_getNumberOfItems(const char **itemlist);
 #define HC_DUALGUNS				32	// will be removed 
 #define HC_DUALENGINE			64
 #define HC_SWINGWING			128
+#define HC_AMPHIBIOUS			256
 
 // this is for the PW_ONOFF_FLAGS
 #define OO_NOTHING_ON			0

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_servercmds.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: cg_servercmds.c,v 1.2 2002-01-07 00:06:02 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -119,6 +119,7 @@ void CG_ParseServerinfo( void ) {
 	Q_strncpyz( gs, Info_ValueForKey( info, "mf_gameset" ), sizeof(gs) );
 	if( strcmp( gs, "modern" ) == 0 ) newset = MF_GAMESET_MODERN;
 	else if( strcmp( gs, "ww2" ) == 0 ) newset = MF_GAMESET_WW2;
+	else if( strcmp( gs, "ww1" ) == 0 ) newset = MF_GAMESET_WW1;
 	else newset = MF_GAMESET_MODERN;
 	Com_Printf("The gameset is '%s'\n", gs);
 	if( cgs.gameset && newset != cgs.gameset ) {

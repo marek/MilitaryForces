@@ -1,5 +1,5 @@
 /*
- * $Id: ui_singlemulti.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: ui_singlemulti.c,v 1.2 2002-01-07 00:06:02 thebjoern Exp $
 */
 
 /*
@@ -23,6 +23,7 @@ SINGLE/MULTIPLAYER MENU
 #define ART_BANNER					"menu/art/startgame"
 #define ART_LOGO					"menu/art/background_fade"
 #define ART_GAMESET_WW2				"menu/art/wwii/logo"
+#define ART_GAMESET_WW1				"menu/art/wwi/logo"
 #define ART_GAMESET_MODERN			"menu/art/modern/logo"
 	
 #define ID_BACK				10
@@ -68,6 +69,9 @@ static void UI_Set_Gameset()
 	{
 	case MF_GAMESET_WW2:
 		trap_Cvar_Set("ui_gameset", "ww2");
+		break;
+	case MF_GAMESET_WW1:
+		trap_Cvar_Set("ui_gameset", "ww1");
 		break;
 	case MF_GAMESET_MODERN:
 	default:
@@ -159,6 +163,9 @@ static void SingleMultiMenu_Draw( void ) {
 		break;
 	case MF_GAMESET_WW2:
 		UI_DrawNamedPic( 221, 136, 360, 280, ART_GAMESET_WW2 );
+		break;
+	case MF_GAMESET_WW1:
+		UI_DrawNamedPic( 221, 136, 360, 280, ART_GAMESET_WW1 );
 		break;
 	default:
 		break;
@@ -293,6 +300,7 @@ void SingleMulti_Cache( void ) {
 	trap_R_RegisterShaderNoMip( ART_DOWN );
 	trap_R_RegisterShaderNoMip( ART_DOWN_A );
 	trap_R_RegisterShaderNoMip( ART_GAMESET_WW2 );
+	trap_R_RegisterShaderNoMip( ART_GAMESET_WW1 );
 	trap_R_RegisterShaderNoMip( ART_GAMESET_MODERN );
 }
 

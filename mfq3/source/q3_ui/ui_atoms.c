@@ -1,5 +1,5 @@
 /*
- * $Id: ui_atoms.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: ui_atoms.c,v 1.2 2002-01-07 00:06:02 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1211,17 +1211,22 @@ unsigned long UI_GetGameset()
 	Q_strncpyz( buffer, Info_ValueForKey( info, "mf_gameset" ), sizeof(buffer) );
 
 	// in game
-	if( strcmp( buffer, "ww2" ) == 0 ) 
+	if( strcmp( buffer, "ww2" ) == 0 )  {
 		return MF_GAMESET_WW2;
-	else if( strcmp( buffer, "modern" ) == 0 )
+	} else if( strcmp( buffer, "ww1" ) == 0 ) {
+		return MF_GAMESET_WW1;
+	} else if( strcmp( buffer, "modern" ) == 0 ) {
 		return MF_GAMESET_MODERN;
 	// not in game
-	else {
+	} else {
 		trap_Cvar_VariableStringBuffer( "ui_gameset", buffer, sizeof(buffer) );
-		if( strcmp( buffer, "ww2" ) == 0 ) 
+		if( strcmp( buffer, "ww2" ) == 0 ) {
 			return MF_GAMESET_WW2;
-		else
+		} else if( strcmp( buffer, "ww1" ) == 0 ) {
+			return MF_GAMESET_WW1;
+		} else {
 			return MF_GAMESET_MODERN;
+		}
 	}
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_pmove.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: bg_pmove.c,v 1.2 2002-01-07 00:06:02 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -350,12 +350,15 @@ PM_SetWaterLevel	FIXME: avoid this twice?  certainly if not moving
 =============
 */
 static void PM_SetWaterLevel( void ) {
-	vec3_t		point;
+	vec3_t		point, start, end;
 	int			cont;
-	int			sample1;
-	int			sample2;
+//	int			sample1;
+//	int			sample2;
 	float		mins_z = availableVehicles[pm->vehicle].mins[2];
+	float		maxs_z = availableVehicles[pm->vehicle].maxs[2];
+	trace_t		tr;
 
+/* old version
 	//
 	// get waterlevel, accounting for ducking
 	//
@@ -381,6 +384,48 @@ static void PM_SetWaterLevel( void ) {
 			cont = pm->pointcontents (point, pm->ps->clientNum );
 			if ( cont & MASK_WATER ){
 				pm->waterlevel = 3;
+			}
+		}
+	}
+*/
+	pm->waterlevel = 0;
+	pm->watertype = 0;
+
+	point[0] = pm->ps->origin[0];
+	point[1] = pm->ps->origin[1];
+	point[2] = pm->ps->origin[2] + mins_z + 1;	
+	cont = pm->pointcontents( point, pm->ps->clientNum );
+
+	// new version
+	if ( cont & MASK_WATER ) {
+		pm->watertype = cont;
+		pm->waterlevel = 1;
+		point[2] = pm->ps->origin[2];
+		cont = pm->pointcontents (point, pm->ps->clientNum );
+		if ( cont & MASK_WATER ) {
+			pm->waterlevel = 2;
+			point[2] = pm->ps->origin[2] + maxs_z;
+			cont = pm->pointcontents (point, pm->ps->clientNum );
+			if ( cont & MASK_WATER ){
+				pm->waterlevel = 3;
+			} else {
+				if( availableVehicles[pm->vehicle].caps & HC_AMPHIBIOUS ) {
+					pm->ps->vehicleAngles[0] = pm->ps->vehicleAngles[2] = 0;
+					VectorCopy( pm->ps->origin, start );
+					start[2] += 10;
+					VectorCopy( pm->ps->origin, end );
+					end[2] -= 10;
+					pm->trace ( &tr, 
+								start, 
+								0, 
+								0, 
+								end, 
+								pm->ps->clientNum, 
+								MASK_WATER );
+					if( tr.fraction < 1.0f && pm->ps->origin[2] < tr.endpos[2] ) {
+						pm->ps->origin[2] = tr.endpos[2];
+					}
+				}
 			}
 		}
 	}

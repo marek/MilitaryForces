@@ -1,5 +1,5 @@
 /*
- * $Id: g_active.c,v 1.3 2001-12-22 20:56:40 thebjoern Exp $
+ * $Id: g_active.c,v 1.4 2002-01-07 00:06:02 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -100,29 +100,29 @@ void P_WorldEffects( gentity_t *ent ) {
 			ent->client->airOutTime += 1000;
 			if ( ent->health > 0 ) {
 				// take more damage the longer underwater
-				ent->damage += 2;
+				ent->damage += 5;
 				if (ent->damage > 15)
 					ent->damage = 15;
 
 				// play a gurp sound instead of a normal pain sound
-				if (ent->health <= ent->damage) {
+/*				if (ent->health <= ent->damage) {
 					G_Sound(ent, CHAN_VOICE, G_SoundIndex("*drown.wav"));
 				} else if (rand()&1) {
 					G_Sound(ent, CHAN_VOICE, G_SoundIndex("sound/player/gurp1.wav"));
 				} else {
 					G_Sound(ent, CHAN_VOICE, G_SoundIndex("sound/player/gurp2.wav"));
 				}
-
+*/
 				// don't play a normal pain sound
-				ent->pain_debounce_time = level.time + 200;
+//				ent->pain_debounce_time = level.time + 200;
 
 				G_Damage (ent, NULL, NULL, NULL, NULL, 
 					ent->damage, DAMAGE_NO_PROTECTION, MOD_WATER, CAT_ANY);
 			}
 		}
 	} else {
-		ent->client->airOutTime = level.time + 12000;
-		ent->damage = 2;
+		ent->client->airOutTime = level.time + 2000;
+		ent->damage = 5;
 	}
 
 	//
@@ -735,7 +735,8 @@ void ClientThink_real( gentity_t *ent ) {
 	ent->waterlevel = pm.waterlevel;
 	ent->watertype = pm.watertype;
 
-	if( client->vehicle >= 0 && ent->waterlevel ) {
+	if( client->vehicle >= 0 && ent->waterlevel && 
+		!(availableVehicles[client->vehicle].id&CAT_ANY & CAT_GROUND) ) {
 	    G_Damage( ent, NULL, ent, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 	}
 

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_planemove.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: bg_planemove.c,v 1.2 2002-01-07 00:06:02 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -366,7 +366,7 @@ void PM_PlaneMove( void )
 	        //Com_Printf( va("move: %.1f %.1f %.1f\n", vehdir[PITCH], vehdir[YAW], vehdir[ROLL]) );
 			//}
 		}
-		if( (pm->ps->ONOFF & OO_GEAR) &&
+		if( (availableVehicles[pm->vehicle].caps & HC_GEAR) && (pm->ps->ONOFF & OO_GEAR) &&
 			(pm->ps->speed > availableVehicles[pm->vehicle].stallspeed * 10 * SPEED_GREEN_ARC) ) {
 			pm->ps->ONOFF &= ~OO_GEAR;
 			pm->ps->timers[TIMER_GEAR] = pm->cmd.serverTime + 2000;
