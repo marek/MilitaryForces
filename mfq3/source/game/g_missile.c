@@ -1,5 +1,5 @@
 /*
- * $Id: g_missile.c,v 1.24 2003-09-05 00:45:24 minkis Exp $
+ * $Id: g_missile.c,v 1.25 2003-10-07 23:15:57 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1362,9 +1362,9 @@ void fire_nukebomb (gentity_t *self) {
 	bolt->s.weaponIndex = self->client->ps.weaponIndex;
 	bolt->r.ownerNum = self->s.number;
 	bolt->parent = self;
-	bolt->damage = 1;
-	bolt->splashDamage = 1;
-//	bolt->damage = bolt->splashDamage = availableWeapons[self->client->ps.weaponIndex].damage;
+	bolt->damage = 1000;
+	bolt->splashDamage = 0;
+	bolt->damage = availableWeapons[self->client->ps.weaponIndex].damage;
 	bolt->splashRadius = availableWeapons[self->client->ps.weaponIndex].damageRadius;
 	bolt->targetcat = availableWeapons[self->client->ps.weaponIndex].category;
 	bolt->catmodifier = availableWeapons[self->client->ps.weaponIndex].noncatmod;
@@ -1432,7 +1432,7 @@ void fire_nukemissile (gentity_t *self) {
 	bolt->r.ownerNum = self->s.number;
 	bolt->parent = self;
 
-	bolt->damage = 0;
+	bolt->damage = availableWeapons[self->client->ps.weaponIndex].damage;
 	bolt->splashDamage = 0;
 	bolt->splashRadius = availableWeapons[self->client->ps.weaponIndex].damageRadius;
 
