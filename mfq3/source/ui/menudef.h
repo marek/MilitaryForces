@@ -250,6 +250,7 @@
 #define UI_PREVIEWCINEMATIC 254
 #define UI_STARTMAPCINEMATIC 255
 #define UI_MAPS_SELECTION 256
+#define	UI_PREVIEW_VEHICLE 257
 
 #define VOICECHAT_GETFLAG			"getflag"				// command someone to get the flag
 #define VOICECHAT_OFFENSE			"offense"				// command someone to go on offense

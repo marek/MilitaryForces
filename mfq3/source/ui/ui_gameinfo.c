@@ -120,7 +120,7 @@ void UI_LoadArenas( void ) {
 	char*		dirptr;
 	int			i, n;
 	int			dirlen;
-	char		*type;
+	char		*type, *game;
 
 	ui_numArenas = 0;
 	uiInfo.mapCount = 0;
@@ -134,7 +134,7 @@ void UI_LoadArenas( void ) {
 	}
 
 	// get all arenas from .arena files
-	numdirs = trap_FS_GetFileList("scripts", ".mfq3_arena", dirlist, 1024 );
+	numdirs = trap_FS_GetFileList("scripts", ".arena", dirlist, 1024 );
 	dirptr  = dirlist;
 	for (i = 0; i < numdirs; i++, dirptr += dirlen+1) {
 		dirlen = strlen(dirptr);
@@ -147,7 +147,16 @@ void UI_LoadArenas( void ) {
 		trap_Print(S_COLOR_YELLOW"WARNING: not anough memory in pool to load all arenas\n");
 	}
 
-	for( n = 0; n < ui_numArenas; n++ ) {
+	for( n = 0; n < ui_numArenas; n++ )
+	{
+		// only allow mfq3 maps
+		game = Info_ValueForKey( ui_arenaInfos[n], "game" );
+		if( strcmp( game, "mfq3" ) != 0 )
+		{
+			// not a mfq3 map
+			continue;
+		}
+
 		// determine type
 
 		uiInfo.mapList[uiInfo.mapCount].cinematic = -1;
@@ -162,12 +171,12 @@ void UI_LoadArenas( void ) {
 		// if no type specified, it will be treated as "dm"
 		if( *type )
 		{
-			// deathmatch (Free For All)
-			if( strstr( type, "dm" ) ) {
+			// deathmatch (Free For All) ('ffa' supported for backwards compatibility)
+			if( strstr( type, "dm" ) || strstr( type, "ffa" ) ) {
 				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_FFA);
 			}
-			// team deathmatch
-			if( strstr( type, "tdm" ) ) {
+			// team deathmatch ('team' supported for backwards compatibility)
+			if( strstr( type, "tdm" ) || strstr( type, "team" ) ) {
 				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_TEAM);
 			}
 			// capture the flag
