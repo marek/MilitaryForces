@@ -1,5 +1,5 @@
 /*
- * $Id: g_client.c,v 1.8 2003-02-11 00:25:11 thebjoern Exp $
+ * $Id: g_client.c,v 1.9 2003-10-07 23:15:57 minkis Exp $
 */
 
 //null cvs upload test, comment placed for a difference.
@@ -615,7 +615,20 @@ void ClientUserinfoChanged( int clientNum ) {
 			client->vehicle = vehicle;
 		}
 		
+		Com_Printf("New vehicle successfully selected\n");
 		// valid next-vehicle, so spawn?
+
+			if( client->ps.pm_flags & (PMF_RESPAWNED|PMF_RECHARGING) ) 
+			{
+				Com_Printf("Selector::client is recharging\n");
+				// Make sure all vitals/ammo are full first
+				// changes by minkis
+				//if(other->health < other->client->pers.maxHealth
+			//	pm->ps->
+			//	client->ps.pm_flags &= ~PMF_VEHICLESELECT;
+		//		client->ps.pm_flags |= PMF_VEHICLESPAWN;
+			}
+
 		if( nextVehicle >= 0 && (client->ps.pm_flags & PMF_VEHICLESELECT) )
 		{
 			client->ps.pm_flags &= ~PMF_VEHICLESELECT;

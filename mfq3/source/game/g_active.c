@@ -1,5 +1,5 @@
 /*
- * $Id: g_active.c,v 1.21 2003-09-05 00:55:46 minkis Exp $
+ * $Id: g_active.c,v 1.22 2003-10-07 23:15:57 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -710,6 +710,42 @@ void ClientThink_real( gentity_t *ent ) {
 	if( (client->ps.pm_flags & PMF_VEHICLESPAWN) ) {
 		client->ps.pm_flags &= ~PMF_VEHICLESPAWN;
 		respawn( ent );
+		/*
+		vec3_t old_vehicleAngles, old_origin, old_viewangles;
+		float old_turretAngle, old_gunAngle;
+		int on_recharge = 0;
+		if(client->ps.pm_flags & PMF_RECHARGING)
+		{
+			on_recharge = 1;
+			client->ps.pm_flags &= ~PMF_VEHICLESPAWN;
+			VectorCopy( client->ps.origin, old_origin);
+			VectorCopy( client->ps.viewangles, old_viewangles); 
+		}
+		
+		
+		if(on_recharge == 1)
+		{
+			
+			VectorCopy( old_vehicleAngles, client->ps.vehicleAngles );
+			VectorCopy( old_origin, ent->r.currentOrigin );
+			VectorCopy( old_origin, client->ps.origin);
+
+			// set flags
+			client->ps.ONOFF = OO_NOTHING_ON;
+			// speed, throttle depend on landed/airborne 
+
+			client->ps.speed = 0;
+			client->ps.fixed_throttle = 0;
+			client->ps.ONOFF |= OO_LANDED|OO_STALLED|OO_GEAR;
+ 
+			MF_ClientSpawnAtPos(ent , old_origin, old_viewangles);
+
+		}
+		else
+		{
+			respawn( ent );
+		}
+		*/
 		return;
 	}
 

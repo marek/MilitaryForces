@@ -1,5 +1,5 @@
 /*
- * $Id: bg_weapondata.c,v 1.28 2003-09-05 00:56:53 minkis Exp $
+ * $Id: bg_weapondata.c,v 1.29 2003-10-07 23:15:57 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -1845,7 +1845,7 @@ completeWeaponData_t availableWeapons[] =
 		0,									// range
 		0,									// fuelrange
 		5000,								// fire interval
-		0,									// damage
+		1000,								// damage
 		2000,								// damageRadius
 		1,									// spread
 		2,									// barrels
@@ -1885,7 +1885,7 @@ completeWeaponData_t availableWeapons[] =
 		0,									// range
 		0,									// fuelrange
 		5000,								// fire interval
-		0,									// damage
+		1000,								// damage
 		800,								// damageRadius
 		1,									// spread
 		2,									// barrels
@@ -1925,7 +1925,7 @@ completeWeaponData_t availableWeapons[] =
 		0,									// range
 		0,									// fuelrange
 		5000,								// fire interval
-		0,									// damage
+		1000,								// damage
 		300,								// damageRadius
 		1,									// spread
 		2,									// barrels
@@ -1965,7 +1965,7 @@ completeWeaponData_t availableWeapons[] =
 		75000,								// range
 		75000,								// fuelrange
 		5000,								// fire interval
-		0,									// damage
+		1000,								// damage
 		2000,								// damageRadius
 		1,									// spread
 		2,									// barrels
@@ -2005,7 +2005,7 @@ completeWeaponData_t availableWeapons[] =
 		75000,								// range
 		75000,								// fuelrange
 		5000,								// fire interval
-		0,									// damage
+		1000,								// damage
 		800,								// damageRadius
 		1,									// spread
 		2,									// barrels
@@ -2045,7 +2045,7 @@ completeWeaponData_t availableWeapons[] =
 		75000,								// range
 		75000,								// fuelrange
 		5000,								// fire interval
-		0,									// damage
+		1000,								// damage
 		300,								// damageRadius
 		1,									// spread
 		2,									// barrels
@@ -2081,11 +2081,11 @@ completeWeaponData_t availableWeapons[] =
 		0,									// iconHandle
 		CAT_ANY,							// cat
 		0,									// non cat mod
-		800,									// muzzleVelocity
+		800,								// muzzleVelocity
 		75000,								// range
 		75000,								// fuelrange
 		5000,								// fire interval
-		0,									// damage
+		1000,								// damage
 		100000,								// damageRadius
 		1,									// spread
 		2,									// barrels
