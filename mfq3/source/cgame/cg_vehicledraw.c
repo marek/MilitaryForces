@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicledraw.c,v 1.4 2003-01-11 13:08:50 thebjoern Exp $
+ * $Id: cg_vehicledraw.c,v 1.5 2003-08-14 15:45:47 thebjoern Exp $
 */
 
 #include "cg_local.h"

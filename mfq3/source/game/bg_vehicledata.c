@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.50 2003-04-25 00:02:23 thebjoern Exp $
+ * $Id: bg_vehicledata.c,v 1.51 2003-08-14 15:45:47 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -245,7 +245,7 @@ completeVehicleData_t availableVehicles[] =
 	60,							// max fuel
 	0,							// gearheight - SET AUTOMATICALLY
 	0,							// tailangle
-	WI_MG_20MM, WI_AMRAAM, WI_DROPTANK, WI_DROPTANK_SMALL, 0, 0, 0, WI_FLARE,	// weapons  WI_MG_20MM
+	WI_MG_20MM, WI_AMRAAM, WI_DROPTANK_PAIR, WI_DROPTANK_SMALL, 0, 0, 0, WI_FLARE,	// weapons  WI_MG_20MM
 	450, 6, 2, 1, 0, 0, 0, 30,		// ammo
 	0,0,0,0,0,0,0,0,			// turret - useful ??
 	{19, 0, 5},					// cameraposition for cockpit view
@@ -750,7 +750,7 @@ completeVehicleData_t availableVehicles[] =
 	70,							// max fuel
 	0,							// gearheight - SET AUTOMATICALLY
 	0,							// tailangle
-	WI_MG_20MM, WI_PHOENIX, WI_SIDEWINDER, WI_DROPTANK_SMALL, 0, 0, 0, WI_FLARE,	// weapons
+	WI_MG_20MM, WI_PHOENIX, WI_SIDEWINDER, WI_DROPTANK_SMALL_PAIR, 0, 0, 0, WI_FLARE,	// weapons
 	450, 6, 2, 2, 0, 0, 0, 35,		// ammo
 	0,0,0,0,0,0,0,0,			// turret
 	{28, 0, 6},					// cameraposition for cockpit view
@@ -903,7 +903,7 @@ completeVehicleData_t availableVehicles[] =
 	60,							// max fuel
 	0,							// gearheight - SET AUTOMATICALLY
 	0,							// tailangle
-	WI_MG_20MM, WI_SIDEWINDER, WI_AMRAAM, WI_DROPTANK, WI_SPARROW, 0, 0, WI_FLARE,	// weapons
+	WI_MG_20MM, WI_SIDEWINDER, WI_AMRAAM, WI_DROPTANK_PAIR, WI_SPARROW, 0, 0, WI_FLARE,	// weapons
 	450, 2, 6, 2, 2, 0, 0, 30,		// ammo
 	0,0,0,0,0,0,0,0,			// turret
 	{19, 0, 5},					// cameraposition for cockpit view

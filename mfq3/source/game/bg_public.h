@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.123 2003-08-06 18:10:21 thebjoern Exp $
+ * $Id: bg_public.h,v 1.124 2003-08-14 15:45:47 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.76f"
+#define	GAME_VERSION		"mfq3 v0.76i"
 #define	GAME_IDENTIFIER		"mfq3"			// use to identify mfq3 servers
 
 #define	DEFAULT_GRAVITY		800
@@ -944,7 +944,9 @@ typedef enum
 	WI_LASE,
 	WI_CM,				//This is like WI_FLARE, but will show up on a pylon instead of just being a value concerning the internal flare count
 	WI_DROPTANK,
-	WI_DROPTANK_SMALL,	// 40
+	WI_DROPTANK_PAIR,	// 40
+	WI_DROPTANK_SMALL,	
+	WI_DROPTANK_SMALL_PAIR,
 	WI_FLARE,	
 	WI_MAX
 }weaponIndex_t;

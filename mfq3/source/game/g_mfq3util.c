@@ -1,5 +1,5 @@
 /*
- * $Id: g_mfq3util.c,v 1.17 2003-02-24 01:24:10 thebjoern Exp $
+ * $Id: g_mfq3util.c,v 1.18 2003-08-14 15:45:47 thebjoern Exp $
 */
 
 
@@ -36,7 +36,7 @@ void untrack( gentity_t* ent )
 	if( ent->tracktarget && ent->tracktarget->client ) {
 		ent->tracktarget->client->ps.stats[STAT_LOCKINFO] &= ~LI_BEING_LOCKED;
 	}
-	ent->locktime = 0;
+	ent->locktime = level.time;
 	ent->tracktarget = 0;
 	ent->s.tracktarget = ENTITYNUM_NONE;
 	ent->client->ps.stats[STAT_LOCKINFO] &= ~(LI_TRACKING|LI_LOCKING);
@@ -165,7 +165,9 @@ void updateTargetTracking( gentity_t *ent )
 			untrack(ent);
 			return;
 		} else if( dot < availableWeapons[ent->s.weaponIndex].lockcone ) {
-			if( ent->client->ps.stats[STAT_LOCKINFO] & LI_LOCKING )	unlock(ent);
+			if( ent->client->ps.stats[STAT_LOCKINFO] & LI_LOCKING )	
+				unlock(ent);
+			ent->locktime = level.time;
 			return;
 		}
 			
