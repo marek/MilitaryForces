@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.16 2002-02-23 19:31:55 thebjoern Exp $
+ * $Id: g_local.h,v 1.17 2002-02-24 16:52:12 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -179,6 +179,7 @@ struct gentity_s {
 	qboolean	 updateGear;
 	qboolean	 updateBay;
 	completeLoadout_t loadout;
+	qboolean	 loadoutUpdated;
 };
 
 
@@ -668,7 +669,6 @@ void radio_comply( gentity_t *ent );
 qboolean LogAccuracyHit( gentity_t *target, gentity_t *attacker );
 void CalcMuzzlePoint ( gentity_t *ent, vec3_t forward, vec3_t right, vec3_t up, vec3_t muzzlePoint );
 void SnapVectorTowards( vec3_t v, vec3_t to );
-void Weapon_Autocannon_Fire (gentity_t *ent, qboolean main);
 
 //
 // g_client.c

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_plane.c,v 1.26 2002-02-23 23:07:07 thebjoern Exp $
+ * $Id: cg_plane.c,v 1.27 2002-02-24 16:52:12 thebjoern Exp $
 */
 
 
@@ -361,19 +361,7 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 					vwep.shadowPlane = shadowPlane;
 					vwep.renderfx = renderfx;
 					trap_R_AddRefEntityToScene( &vwep );
-
 				}
-//				for( ii = 0; ii < MAX_MOUNTS_PER_PYLON*2, num; ++ii, --num ) {
-//					memset( &vwep, 0, sizeof(vwep) );		
-//					vwep.hModel = availableWeapons[loadout->weaponType[i]].vwepHandle;
-//					VectorCopy( cent->lerpOrigin, vwep.lightingOrigin );
-//					AxisCopy( axisDefault, vwep.axis );
-//					CG_PositionEntityOnTag( &vwep, &part[BP_PLANE_BODY], ci->parts[BP_PLANE_BODY], 
-//							loadout->tags[i].tagname[ii] );
-//					vwep.shadowPlane = shadowPlane;
-//					vwep.renderfx = renderfx;
-//					trap_R_AddRefEntityToScene( &vwep );
-//				}
 			}
 		}
 	}

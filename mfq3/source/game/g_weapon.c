@@ -1,5 +1,5 @@
 /*
- * $Id: g_weapon.c,v 1.3 2002-02-22 11:39:40 thebjoern Exp $
+ * $Id: g_weapon.c,v 1.4 2002-02-24 16:52:12 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -51,101 +51,6 @@ void SnapVectorTowards( vec3_t v, vec3_t to ) {
 }
 
 /*
-======================================================================
-
-Anti air guided
-
-======================================================================
-*/
-
-void Weapon_AntiAir_Fire (gentity_t *ent) {
-	if( ent->client->ps.stats[STAT_LOCKINFO] & LI_LOCKING ) {
-		fire_antiair(ent);
-	} else {
-		fire_ffar(ent);
-	}
-}
-
-/*
-======================================================================
-
-Anti ground guided
-
-======================================================================
-*/
-
-void Weapon_AntiGround_Fire (gentity_t *ent) {
-	if( ent->client->ps.stats[STAT_LOCKINFO] & LI_LOCKING ) {
-		fire_antiground(ent);
-	} else {
-		fire_ffar(ent);
-	}
-}
-
-/*
-======================================================================
-
-FFAR
-
-======================================================================
-*/
-
-void Weapon_FFAR_Fire (gentity_t *ent) {
-	fire_ffar(ent);
-}
-
-
-/*
-======================================================================
-
-IronBomb
-
-======================================================================
-*/
-
-void Weapon_IronBomb_Fire (gentity_t *ent) {
-	fire_ironbomb(ent);
-}
-
-
-/*
-======================================================================
-
-Autocannon
-
-======================================================================
-*/
-
-void Weapon_Autocannon_Fire (gentity_t *ent, qboolean main) {
-	fire_autocannon(ent, main);
-
-#pragma message("later add proper code for #barrels (also for other weapons (for ripples))")
-	if( availableVehicles[ent->client->vehicle].caps & HC_DUALGUNS ) {
-		fire_autocannon(ent, main);
-	}
-}
-
-
-
-/*
-======================================================================
-
-Maingun
-
-======================================================================
-*/
-
-void Weapon_Maingun_Fire (gentity_t *ent) {
-	fire_maingun(ent);
-}
-
-
-
-
-//======================================================================
-
-
-/*
 ===============
 LogAccuracyHit
 ===============
@@ -191,24 +96,27 @@ void FireWeapon( gentity_t *ent ) {
 	// fire the specific weapon
 	switch( availableWeapons[ent->s.weaponIndex].type ) {
 	case WT_ANTIAIRMISSILE:
-		Weapon_AntiAir_Fire( ent );
+		fire_antiair( ent );
 		break;
 	case WT_ANTIGROUNDMISSILE:
 	case WT_ANTIRADARMISSILE:
-		Weapon_AntiGround_Fire( ent );
+		fire_antiground( ent );
 		break;
 	case WT_ROCKET:
-		Weapon_FFAR_Fire( ent );
+		fire_ffar( ent );
 		break;
 	case WT_IRONBOMB:
 	case WT_GUIDEDBOMB:
-		Weapon_IronBomb_Fire( ent );
+		fire_ironbomb( ent );
 		break;
 	case WT_MACHINEGUN:
-		Weapon_Autocannon_Fire( ent, qtrue );
+		fire_autocannon(ent, qtrue);
+		if( availableVehicles[ent->client->vehicle].caps & HC_DUALGUNS ) {
+			fire_autocannon(ent, qtrue);
+		}
 		break;
 	case WT_BALLISTICGUN:
-		Weapon_Maingun_Fire( ent );
+		fire_maingun( ent );
 		break;
 	default:
 // FIXME		G_Error( "Bad ent->s.weapon" );

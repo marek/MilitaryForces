@@ -1,5 +1,5 @@
 /*
- * $Id: g_active.c,v 1.11 2002-02-22 11:39:40 thebjoern Exp $
+ * $Id: g_active.c,v 1.12 2002-02-24 16:52:12 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -452,7 +452,7 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 
 		switch ( event ) {
 		case EV_FIRE_MG:
-			Weapon_Autocannon_Fire( ent, qfalse );
+			fire_autocannon( ent, qfalse );
 			break;
 
 		case EV_FIRE_WEAPON:
@@ -624,6 +624,11 @@ void ClientThink_real( gentity_t *ent ) {
 	// check for inactivity timer, but never drop the local client of a non-dedicated server
 	if ( !ClientInactivityTimer( client ) ) {
 		return;
+	}
+
+	if( !ent->loadoutUpdated ) {
+		G_AddEvent( ent, EV_GET_DEFAULT_LOADOUT, 0 );
+		ent->loadoutUpdated = qtrue;
 	}
 
 	// clear the rewards if time

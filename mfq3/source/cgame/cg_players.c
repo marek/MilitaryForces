@@ -1,5 +1,5 @@
 /*
- * $Id: cg_players.c,v 1.3 2002-02-12 11:08:11 sparky909_uk Exp $
+ * $Id: cg_players.c,v 1.4 2002-02-24 16:52:12 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -159,7 +159,6 @@ void CG_NewClientInfo( int clientNum ) {
 	if( newInfo.vehicle >= 0 && clientNum == cg.predictedPlayerEntity.currentState.clientNum )
 	{
 		trap_Cvar_Set( "cg_vehicle", va( "%d", newInfo.vehicle ) );
-
 		// only set "cg_nextvehicle" to the same as "cg_vehicle" when we currently don't have
 		// a vehicle index in it.
 		if( CG_Cvar_Get( "cg_nextVehicle" ) == -1 )

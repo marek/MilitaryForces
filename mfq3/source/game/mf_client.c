@@ -1,5 +1,5 @@
 /*
- * $Id: mf_client.c,v 1.11 2002-02-23 19:31:55 thebjoern Exp $
+ * $Id: mf_client.c,v 1.12 2002-02-24 16:52:12 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -490,5 +490,6 @@ void MF_ClientSpawn(gentity_t *ent) {
 
 	// distribute the weapons
 	MF_getDefaultLoadoutForVehicle( vehIndex, &ent->loadout );
-	G_AddEvent( ent, EV_GET_DEFAULT_LOADOUT, 0 );
+//	G_AddEvent( ent, EV_GET_DEFAULT_LOADOUT, 0 );
+	ent->loadoutUpdated = qfalse;
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_pmove.c,v 1.9 2002-02-22 11:39:40 thebjoern Exp $
+ * $Id: bg_pmove.c,v 1.10 2002-02-24 16:52:12 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -558,6 +558,17 @@ static void PM_Weapon( void ) {
 		}
 	}
 
+	// landed
+	if( (availableVehicles[pm->vehicle].cat & CAT_PLANE) ||
+		(availableVehicles[pm->vehicle].cat & CAT_HELO) ) {
+		if((pm->ps->ONOFF & OO_LANDED) ||
+		   ((availableWeapons[pm->ps->weaponIndex].type == WT_IRONBOMB ||
+			 availableWeapons[pm->ps->weaponIndex].type == WT_GUIDEDBOMB) &&
+			Q_fabs(pm->ps->vehicleAngles[2]) > 60 ) ) {
+			canShoot = qfalse;
+		} 
+	}
+
 	// check for MG primary fire
 	if( (pm->cmd.buttons & BUTTON_ATTACK_MAIN) && pm->ps->weaponNum == WP_MACHINEGUN ) {
 		pm->cmd.buttons |= BUTTON_ATTACK;
@@ -580,15 +591,6 @@ static void PM_Weapon( void ) {
 			return;
 		}
 		if( pm->ps->weaponNum == WP_MACHINEGUN ) return;
-
-		// check for bank angle with bombs, and if it is landed
-		if ( availableWeapons[pm->ps->weaponIndex].type == WT_IRONBOMB ||
-			 availableWeapons[pm->ps->weaponIndex].type == WT_GUIDEDBOMB ) {
-			if( Q_fabs(pm->ps->vehicleAngles[2]) > 60 ||
-				(pm->ps->ONOFF & OO_LANDED) ) {
-				return;
-			}
-		}
 
 		pm->ps->ammo[pm->ps->weaponNum]--;
 		PM_AddEvent( EV_FIRE_WEAPON );
