@@ -1,5 +1,5 @@
 /*
- * $Id: ui_vehicledraw.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: ui_vehicledraw.c,v 1.2 2001-12-04 13:36:47 sparky909_uk Exp $
 */
 
 /*
@@ -18,8 +18,16 @@ VEHICLE MENU
 #define ART_BACK0_A					"menu/art/back_a"
 #define ART_LOGO					"menu/art/background_sub"
 	
-#define ID_BACK				10
+/*
+=======================================================================
+DEFINES
+=======================================================================
 
+*/
+
+#define ID_BACK		10
+#define	VIDI_TOP	120
+#define	VIDI_ADJUST	4
 
 typedef struct {
 	menuframework_s	menu;
@@ -115,6 +123,78 @@ void UI_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *pare
 	MatrixMultiply( lerped.axis, tempAxis, entity->axis );
 }
 
+/*
+======================
+VehShow_AddLighting
+======================
+*/
+void VehShow_AddLighting( vec3_t origin )
+{
+	vec3_t light_source;
+
+	// add lighting
+	VectorCopy( origin, light_source );
+	light_source[ 1 ] += 200.0f;
+	trap_R_AddLightToScene( light_source, 500, 1.0f, 1.0f, 1.0f );
+}
+
+
+/*
+======================
+VehShow_DrawBackground
+======================
+*/
+void VehShow_DrawBackground( void )
+{
+	vec4_t tcolor;
+	int y = 0, ty = VIDI_TOP-12;
+
+	// for what vehicle type?
+	if( availableVehicles[show_vehicle].id&CAT_ANY & CAT_PLANE )
+	{
+		VectorSet( tcolor, 0.0f, 0.3f, 0.7f );
+	}
+	else if( availableVehicles[show_vehicle].id&CAT_ANY & CAT_GROUND )
+	{
+		VectorSet( tcolor, 0.7f, 0.0f, 0.0f );
+	}
+
+	// fade in
+	for( y = 0; y<12; y++ )
+	{
+		// set alpha
+		tcolor[3] = y / 20.0f;
+
+		// draw line
+		UI_FillRect( 0, ty, 640, 1, tcolor );
+		ty++;
+	}
+
+	// set alpha
+	tcolor[3] = 0.6f;
+
+	// draw console back
+	UI_FillRect( 0, ty, 640, (4 * 13), tcolor );
+	ty += (4 * 13);
+
+	// set alpha
+	tcolor[3] = 0.4f;
+
+	// draw model back
+	UI_FillRect( 0, ty, 640, 160, tcolor );
+	ty += 160;
+
+	// fade out
+	for( y = 8; y>0; y-- )
+	{
+		// set alpha
+		tcolor[3] = y / 20.0f;
+
+		// draw line
+		UI_FillRect( 0, ty, 640, 1, tcolor );
+		ty++;
+	}
+}
 
 /*
 ===============
@@ -135,7 +215,7 @@ static void VehShow_DrawPlane( void ) {
 	float			x, y, w, h;
 	vec4_t			color = {0.5, 0, 0, 1};
 	static float	angle = 0;
-
+	
 	// setup the refdef
 	memset( &refdef, 0, sizeof( refdef ) );
 	refdef.rdflags = RDF_NOWORLDMODEL;
@@ -162,8 +242,11 @@ static void VehShow_DrawPlane( void ) {
 
 	trap_R_ClearScene();
 
+	VehShow_DrawBackground();
+
 	// add the models
-	angle = 180.0 * sin( (float)uis.realtime / 5000 );
+//	angle = 180.0 * ( (float)uis.realtime / 5000 );
+	angle += 0.4f;
 	memset( &body, 0, sizeof(body) );
 	VectorSet( angles, 0, 180 + angle, 0 );
 	AnglesToAxis( angles, body.axis );
@@ -227,6 +310,7 @@ static void VehShow_DrawPlane( void ) {
 		trap_R_AddRefEntityToScene( &prop );
 	}
 
+	VehShow_AddLighting( body.origin );
 	trap_R_RenderScene( &refdef );
 }
 
@@ -269,12 +353,15 @@ static void VehShow_DrawGV( void ) {
 
 	origin[0] = 70;
 	origin[1] = 0;
-	origin[2] = -10;
+	origin[2] = -5;
 
 	trap_R_ClearScene();
 
+	VehShow_DrawBackground();
+
 	// add the models
-	angle = 180.0 * sin( (float)uis.realtime / 5000 );
+//	angle = 180.0 * sin( (float)uis.realtime / 5000 );
+	angle += 0.4f;
 	memset( &body, 0, sizeof(body) );
 	VectorSet( angles, 0, 180 + angle, 0 );
 	AnglesToAxis( angles, body.axis );
@@ -303,7 +390,227 @@ static void VehShow_DrawGV( void ) {
 	UI_PositionRotatedEntityOnTag( &gun, &turret, s_vehshow.turret, "tag_weap");
 	trap_R_AddRefEntityToScene( &gun );
 
+	VehShow_AddLighting( body.origin );
 	trap_R_RenderScene( &refdef );
+}
+
+/*
+===============
+Vidiprinter Variables
+===============
+*/
+
+char vidiWorkingText[ 256 ];	// line buffer
+char vidiTextBuffer[ 1024 ];	// complete text buffer (from file)
+
+int delay = 0;				// pre-delay
+qboolean bChewRow =	qfalse;	// move up a row
+char * pPosition = NULL;	// current character position
+char * pStart = NULL;		// starting position
+
+/*
+===============
+VehShow_RemoveVidiCharacter
+===============
+*/
+static void VehShow_RemoveVidiCharacter( void ) {
+	int moveAmount = 1024 - (pPosition - vidiTextBuffer);
+	memcpy( pPosition, pPosition+1, moveAmount );
+}
+
+/*
+===============
+VehShowMenu_VidiPrinter
+===============
+*/
+
+static void VehShowMenu_VidiPrinter( void ) {
+	
+	vec4_t vidiColor = {0.8f, 0.8f, 0.0f, 0.75f};	// text+cursor colour
+	
+	static int timer = 0;
+	static char cTerminator = { 0x0D };	// line terminator (1st character of 2)
+	
+	int tx = 0, ty = VIDI_TOP - VIDI_ADJUST;
+	int cx = 0, cy = 0;
+	char * sPos = NULL;
+	char * pScan = NULL;
+	int length = 0;
+	int rowCount = 0;
+	qboolean completeLoop = qfalse;
+
+	// reset?
+	if( pPosition == NULL )
+	{
+		// assign text
+		pPosition = vidiTextBuffer;
+		pStart = vidiTextBuffer;
+	}
+
+	// move to start
+	pScan = pStart;
+
+	// chew a row?
+	if( bChewRow )
+	{
+		// chew
+		pStart = strstr( pScan, &cTerminator );
+		pStart += 2;
+		pScan = pStart;
+
+		// reset
+		bChewRow = qfalse;
+	}
+
+	// do the 'whole' rows first
+	completeLoop = qtrue;
+	do
+	{
+		// find any terminator
+		sPos = strstr( pScan, &cTerminator );
+		
+		// render a complete line?
+		if( sPos && sPos < pPosition )
+		{
+			length = (sPos - pScan);
+
+			// copy text from current position up to the terminator
+			strncpy( vidiWorkingText, pScan, length );
+			vidiWorkingText[ length ] = 0;
+
+			// gfx it
+			UI_DrawString( tx, ty, vidiWorkingText, UI_SMALLFONT|UI_LEFT, vidiColor );
+			
+			// move gfx ptr down a line
+			ty += 13;
+
+			// move along two characters (as terminator sequence is 0x0D, 0x0A)
+			pScan = sPos;
+			pScan += 2;
+
+			// one more row
+			rowCount++;
+			if( rowCount >= 4 )
+			{
+				// move line up
+				bChewRow = qtrue;
+			}
+		}
+		else
+		{
+			// break
+			completeLoop = qfalse;
+		}
+
+	} while( completeLoop );
+
+	// fix char pointers
+	if( pScan > pPosition )
+	{
+		// don't let pPosition get behind
+		pPosition = pScan;
+	}
+
+	// do the remaining row
+	length = (pPosition - pScan);
+	strncpy( vidiWorkingText, pScan, length );
+	vidiWorkingText[ length ] = 0;
+	UI_DrawString( tx, ty, vidiWorkingText, UI_SMALLFONT|UI_LEFT, vidiColor );
+	
+	// do the cursor
+	cx = strlen( vidiWorkingText ) * 8;
+	UI_DrawChar( tx+cx, ty+cy, 11, UI_BLINK|UI_SMALLFONT, vidiColor);
+
+	// delay startup
+	if( delay )
+	{
+		delay--;
+		return;
+	}
+
+	// cursor handler
+	timer++;
+	if( timer > 2 )
+	{
+		// depends on character
+		switch( *pPosition )
+		{
+			// finished?
+			case '*':
+				// pause at end
+				break;
+
+			// paragraph pause?
+			case '#':
+				// breather...
+				delay = 150;
+
+				// remove this character
+				VehShow_RemoveVidiCharacter();
+				break;
+
+			// normal printable character
+			default:
+			{
+				// do next character
+				pPosition++;
+
+				// vidiprinter sound
+				//trap_S_StartLocalSound( menu_buzz_sound, CHAN_LOCAL_SOUND );
+			} 
+		}
+
+		// reset character timer
+		timer = 0;
+	}
+}
+
+/*
+===============
+VehShow_ResetVidiPrint
+===============
+*/
+static void VehShow_ResetVidiPrint( void ) {
+	fileHandle_t fileHandle;
+	int fileLength;
+	char filename[ 64 ];
+
+	// clear the working scratch buffer
+	memset( &vidiWorkingText, 0, sizeof( vidiWorkingText ) );
+	pPosition = NULL;
+	
+	// setup the pre-vidiprinting delay
+	delay = 25;
+
+	// make filename
+	if( availableVehicles[show_vehicle].id&CAT_ANY & CAT_PLANE ) {
+		strcpy( filename, "models/vehicles/planes" );
+	} else if( availableVehicles[show_vehicle].id&CAT_ANY & CAT_GROUND ) {
+		strcpy( filename, "models/vehicles/ground" );
+	}
+	sprintf( filename, "%s/%s/%s.info", filename, availableVehicles[show_vehicle].modelName, availableVehicles[show_vehicle].modelName );
+
+	// open vidi description file
+	fileLength = trap_FS_FOpenFile( filename, &fileHandle, FS_READ );
+	if( fileHandle )
+	{
+		// prevent overrun
+		if( fileLength > 1024 )
+		{
+			fileLength = 1024;
+		}
+
+		// if open, read into buffer
+		trap_FS_Read( vidiTextBuffer, fileLength, fileHandle );
+
+		// close file, we don't need it again
+		trap_FS_FCloseFile( fileHandle );
+	}
+	else
+	{
+		// no description file available
+		strcpy( vidiTextBuffer, "No further information available*" );
+	}
 }
 
 /*
@@ -317,11 +624,15 @@ static void VehShowMenu_Draw( void ) {
 	// standard menu drawing
 	Menu_Draw( &s_vehshow.menu );
 
+	// draw plane/ground vehicle
 	if( availableVehicles[show_vehicle].id&CAT_ANY & CAT_PLANE ) {
 		VehShow_DrawPlane();
 	} else if( availableVehicles[show_vehicle].id&CAT_ANY & CAT_GROUND ) {
 		VehShow_DrawGV();
 	}
+
+	// the vidi-printer
+	VehShowMenu_VidiPrinter();
 }
 
 /*
@@ -333,6 +644,7 @@ static void VehShow_MenuInit( void ) {
 
 	memset( &s_vehshow, 0 ,sizeof(vehshow_t) );
 
+	VehShow_ResetVidiPrint();
 	VehShow_Cache();
 
 	s_vehshow.menu.wrapAround = qtrue;
