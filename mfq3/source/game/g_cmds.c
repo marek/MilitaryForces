@@ -1,5 +1,5 @@
 /*
- * $Id: g_cmds.c,v 1.11 2002-02-21 12:25:44 sparky909_uk Exp $
+ * $Id: g_cmds.c,v 1.12 2002-02-22 11:03:13 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -576,6 +576,9 @@ void SetTeam( gentity_t *ent, char *s ) {
 		// decided what to say
 		switch( team )
 		{
+		case TEAM_FREE:
+			pTeam = " in the game.";
+			break;
 		case TEAM_SPECTATOR:
 			pTeam = " a spectator.";
 			break;
