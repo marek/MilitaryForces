@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.26 2002-06-16 21:36:29 thebjoern Exp $
+ * $Id: bg_mfq3util.c,v 1.27 2003-02-02 02:52:03 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -8,6 +8,54 @@
 // externals
 extern void	trap_Cvar_Set( const char *var_name, const char *value );
 extern void	trap_Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize );
+
+
+
+/*
+=================
+MF_getIndexOfVehicleEx
+=================
+*/
+
+void MF_SetMissionScriptOverviewDefaults( mission_overview_t* overview )
+{
+	overview->gameset = -1;
+	overview->gametype = -1;
+	overview->mapname[0] = 0;
+	overview->missionname[0] = 0;
+	overview->objective[0] = 0;
+	overview->valid = qfalse;
+}
+
+// updateFormat should only be set to true to be backwards compatible after a format change
+// so that incomplete values can be filled in
+void MF_CheckMissionScriptOverviewValid( mission_overview_t* overview, qboolean updateFormat )
+{
+	if( overview->gameset >= 0 &&
+		overview->gametype >= 0 &&
+		overview->mapname[0] > 0 &&	// very simple check
+		overview->missionname[0] > 0 &&
+		overview->objective[0] > 0 )
+		overview->valid = qtrue;
+
+	if( updateFormat )
+	{
+		overview->valid = qtrue;
+		if( overview->gameset < 0 )
+			overview->gameset = 0;
+		if( overview->gametype < 0 )
+			overview->gametype = 0;
+		if( overview->mapname[0] == 0 )
+			strcpy(overview->mapname, "mfq31");
+		if( overview->mapname[0] == 0 )
+			strcpy(overview->missionname, "bjoern1");
+		if( overview->mapname[0] == 0 )
+			strcpy(overview->objective, "SearchAndDestroy");
+
+
+	}
+}
+
 
 /*
 =================

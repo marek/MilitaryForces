@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.103 2003-01-29 10:38:19 thebjoern Exp $
+ * $Id: bg_public.h,v 1.104 2003-02-02 02:52:03 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.74g"
+#define	GAME_VERSION		"mfq3 v0.74h"
 #define	GAME_IDENTIFIER		"mfq3"			// use to identify mfq3 servers
 
 #define	DEFAULT_GRAVITY		800
@@ -940,6 +940,29 @@ typedef enum
 	WI_MAX
 }weaponIndex_t;
 
+
+
+
+
+// mission scripts
+typedef struct mission_overview_s {
+	char			mapname[MAX_NAME_LENGTH];
+	int				gameset;
+	int				gametype;			
+	char			missionname[MAX_NAME_LENGTH];
+	char			objective[MAX_NAME_LENGTH];
+	qboolean		valid;
+}mission_overview_t;
+
+
+
+
+
+
+
+
+void MF_CheckMissionScriptOverviewValid( mission_overview_t* overview, qboolean updateFormat );
+void MF_SetMissionScriptOverviewDefaults( mission_overview_t* overview );
 int MF_getIndexOfVehicle( int start, int gameset, int team, int cat, int cls );
 int MF_getIndexOfVehicleEx( int start, int gameset, int team, int cat, int cls );
 int MF_getItemIndexFromHex(int hexValue);

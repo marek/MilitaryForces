@@ -1,27 +1,99 @@
 /*
- * $Id: g_missions.c,v 1.1 2003-01-28 20:44:47 thebjoern Exp $
+ * $Id: g_missions.c,v 1.2 2003-02-02 02:52:03 thebjoern Exp $
  */
 
  
 #include "g_local.h"
 
-static void ParseOverview( char *buf ) 
+static void ParseOverview( char *buf, mission_overview_t* overview ) 
 {
 	char	*token;
+//	char	key[MAX_TOKEN_CHARS];
+	char	info[MAX_INFO_STRING];
+	int     openbraces = 0;
 
 	// TODO: count number of { and } and if < 0 (ie more closed than opened
 	// then we know overview is finished and return
 
-	while( 1 )
+	token = COM_Parse( &buf );
+	if( !token[0] ) 
 	{
-		token = COM_Parse( &buf );
+		//trap_Printf(va("Token: '%s' - END\n", token));
+		return;
+	}
+	trap_Printf(va("O-Token: '%s' - VALID\n", token));
+
+	if( strcmp( token, "{" ) ) 
+	{
+		Com_Printf( "Missing { in overview\n" );
+		return;
+	} 
+
+	info[0] = '\0';
+	while( 1 ) 
+	{
+		token = COM_ParseExt( &buf, qtrue );
 		if( !token[0] ) 
 		{
-			trap_Printf(va("Token: '%s' - END\n", token));
+//				Com_Printf( "Unexpected end of info file\n" );
 			break;
 		}
-		trap_Printf(va("O-Token: '%s' - VALID\n", token));
+		if( !strcmp( token, "{" ) ) 
+		{
+//				Com_Printf( "Unexpected { found\n" );
+			break;
+		}
+		if( !strcmp( token, "}" ) ) 
+		{
+			break;
+		}
+		if( !strcmp( token, "map" ) )
+		{
+			token = COM_ParseExt( &buf, qfalse );
+			if( token[0] )
+			{
+				Q_strncpyz(overview->mapname, token, MAX_NAME_LENGTH );
+				continue;
+			}
+		}
+		else if( !strcmp( token, "gameset" ) )
+		{
+			token = COM_ParseExt( &buf, qfalse );
+			if( token[0] )
+			{
+				overview->gameset = atoi(token);
+				continue;
+			}
+		}
+		else if( !strcmp( token, "gametype" ) )
+		{
+			token = COM_ParseExt( &buf, qfalse );
+			if( token[0] )
+			{
+				overview->gametype = atoi(token);
+				continue;
+			}
+		}
+		else if( !strcmp( token, "mission" ) )
+		{
+			token = COM_ParseExt( &buf, qfalse );
+			if( token[0] )
+			{
+				Q_strncpyz(overview->missionname, token, MAX_NAME_LENGTH );
+				continue;
+			}
+		}
+		else if( !strcmp( token, "goal" ) )
+		{
+			token = COM_ParseExt( &buf, qfalse );
+			if( token[0] )
+			{
+				Q_strncpyz(overview->objective, token, MAX_NAME_LENGTH );
+				continue;
+			}
+		}
 	}
+	MF_CheckMissionScriptOverviewValid(overview, qfalse);// set to true after format change
 }
 
 static void ParseEntities( char *buf ) 
@@ -43,7 +115,10 @@ static void ParseEntities( char *buf )
 
 static void ParseMissionScripts( char *buf ) 
 {
-	char	*token;
+	char				*token;
+	mission_overview_t	overview;
+
+	MF_SetMissionScriptOverviewDefaults(&overview);
 
 	while( 1 )
 	{
@@ -55,7 +130,7 @@ static void ParseMissionScripts( char *buf )
 		}
 		else if( !strcmp(token, "Overview" ) )
 		{
-			ParseOverview(buf);
+			ParseOverview(buf, &overview);
 			continue;
 		}
 		else if( !strcmp(token, "Entities" ) )

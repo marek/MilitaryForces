@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.25 2003-01-27 00:49:42 thebjoern Exp $
+ * $Id: g_local.h,v 1.26 2003-02-02 02:52:03 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -341,6 +341,8 @@ struct gclient_s {
 // MFQ3
 //
 //
+
+
 
 // task types
 typedef enum {
