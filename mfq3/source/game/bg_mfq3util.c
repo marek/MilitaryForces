@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.19 2002-02-23 23:07:07 thebjoern Exp $
+ * $Id: bg_mfq3util.c,v 1.20 2002-02-24 16:52:12 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -334,6 +334,7 @@ qboolean MF_distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout )
 	int pyls[MAX_WEAPONS_PER_VEHICLE];
 	qboolean done;
 	char* modelname = MF_CreateModelPathname( idx, "models/vehicles/%s/%s/%s.md3" );
+//	char where[10];
 
 	if( idx < 0 ) return qfalse;
 
@@ -356,8 +357,6 @@ qboolean MF_distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout )
 		ammos[i-1] = availableVehicles[idx].ammo[i];
 		if( availableVehicles[idx].weapons[i] ) numWeaps++;
 	}
-
-
 
 	for( i = 0; i < numPylons; ++i ) {
 		int mounts = 0;
@@ -427,16 +426,21 @@ qboolean MF_distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout )
 	}
 
 	// print out
-	Com_Printf( "Loadout is:\n" );
-	for( i = 0; i < numPylons; ++i ) {
-		Com_Printf( "Pylon %d (type: %d): %d * %s\n", i, loadout->type[i],
-				loadout->mountedWeapons[i], availableWeapons[loadout->weaponType[i]].descriptiveName );
-		Com_Printf( "Tags are:\n" );
-		for( j = 0; j < MAX_MOUNTS_PER_PYLON*2; ++j ) {
-			Com_Printf( "%s (%.2f %.2f %.2f)\n", loadout->tags[i].tagname[j], loadout->tags[i].pos[j][0],
-				loadout->tags[i].pos[j][1], loadout->tags[i].pos[j][2] );
-		}
-	}
+#ifdef QAGAME
+//	strcpy( where, "server" );
+#else
+//	strcpy( where, "client" );
+#endif
+//	Com_Printf( "Loadout is (%s):\n", where );
+//	for( i = 0; i < numPylons; ++i ) {
+//		Com_Printf( "Pylon %d (type: %d): %d * %s\n", i, loadout->type[i],
+//				loadout->mountedWeapons[i], availableWeapons[loadout->weaponType[i]].descriptiveName );
+//		Com_Printf( "Tags are:\n" );
+//		for( j = 0; j < MAX_MOUNTS_PER_PYLON*2; ++j ) {
+//			Com_Printf( "%s (%.2f %.2f %.2f)\n", loadout->tags[i].tagname[j], loadout->tags[i].pos[j][0],
+//				loadout->tags[i].pos[j][1], loadout->tags[i].pos[j][2] );
+//		}
+//	}
 
 	return qtrue;
 }
@@ -474,10 +478,49 @@ weapon mount info
 
 void MF_getDefaultLoadoutForVehicle( int idx, completeLoadout_t* loadout )
 {
+//	char where[10];
 	if( idx < 0 ) return;
+#ifdef QAGAME
+//	strcpy( where, "server" );
+#else
+//	strcpy( where, "client" );
+#endif
+//	Com_Printf("Getting default loadout for %s (%s)\n", availableVehicles[idx].descriptiveName, where );
 	memcpy( loadout, &availableLoadouts[idx], sizeof(completeLoadout_t) );
 }
 
+
+/*
+=================
+MF_getLoadoutFromAmmo
+
+weapon mount info
+=================
+*/
+
+void MF_getLoadoutFromAmmo( int idx, completeLoadout_t* loadout, unsigned int ammo[8] )
+{
+	int i, j, diff;
+//	char where[10];
+
+	if( idx < 0 ) return;
+#ifdef QAGAME
+//	strcpy( where, "server" );
+#else
+//	strcpy( where, "client" );
+#endif
+//	Com_Printf("Getting loadout from ammo for %s (%s)\n", availableVehicles[idx].descriptiveName, where );
+	memcpy( loadout, &availableLoadouts[idx], sizeof(completeLoadout_t) );
+
+	for( i = WP_WEAPON1; i < WP_FLARE; ++i ) {
+		diff = availableVehicles[idx].ammo[i] - ammo[i];
+		if( diff ) { // less than full loadout
+			for( j = 0; j < diff; ++j ) {
+				MF_removeWeaponFromLoadout( availableVehicles[idx].weapons[i], loadout, 0, 0, 0 );
+			}
+		}
+	}
+}
 
 /*
 =================
@@ -517,61 +560,10 @@ reloading
 =================
 */
 
-void MF_addWeaponToLoadout( int weaponIndex, completeLoadout_t* loadout )
+qboolean MF_addWeaponToLoadout( int weaponIndex, completeLoadout_t* loadout )
 {
+	return qfalse;
 }
 
 
-
-
-/*
-
-  		int mounts = 0;
-		char temp[16];
-		switch( pyls[i] ) {
-		case PT_WINGTIP:
-			strcpy( loadout->tags[i].tagname[0], "tag_tip_l" );
-			MF_setPylonTag(modelname, "tag_turret", &loadout->tags[i], 0);
-			strcpy( loadout->tags[i].tagname[1], "tag_tip_r" );
-			mounts = 2;
-			break;
-		case PT_WING_L:
-		case PT_BODY_L:
-		case PT_WING_M:
-		case PT_BODY_M:
-			Com_sprintf(temp, 15, "tag_mt%d_l", i+1 );
-			strcpy( loadout->tags[i].tagname[0], temp );
-			Com_sprintf(temp, 15, "tag_mt%d_r", i+1 );
-			strcpy( loadout->tags[i].tagname[1], temp );
-			mounts = 2;
-			break;
-		case PT_WING_H:
-		case PT_BODY_H:
-		case PT_BODY_CENTER_H:
-			Com_sprintf(temp, 15, "tag_mt%d_1_l", i+1 );
-			strcpy( loadout->tags[i].tagname[0], temp );
-			Com_sprintf(temp, 15, "tag_mt%d_1_r", i+1 );
-			strcpy( loadout->tags[i].tagname[1], temp );
-			Com_sprintf(temp, 15, "tag_mt%d_2_r", i+1 );
-			strcpy( loadout->tags[i].tagname[2], temp );
-			Com_sprintf(temp, 15, "tag_mt%d_2_l", i+1 );
-			strcpy( loadout->tags[i].tagname[3], temp );
-			Com_sprintf(temp, 15, "tag_mt%d_3_l", i+1 );
-			strcpy( loadout->tags[i].tagname[4], temp );
-			Com_sprintf(temp, 15, "tag_mt%d_3_r", i+1 );
-			strcpy( loadout->tags[i].tagname[5], temp );
-			mounts = 6;
-			break;
-		case PT_BODY_CENTER_L:
-		case PT_BODY_CENTER_M:
-		case PT_BAY:
-		case PT_BAY_CENTER:
-			Com_sprintf(temp, 15, "tag_mt%d_l", i+1 );
-			strcpy( loadout->tags[i].tagname[0], temp );
-			Com_sprintf(temp, 15, "tag_mt%d_r", i+1 );
-			strcpy( loadout->tags[i].tagname[1], temp );
-			mounts = 1;
-			break;
-
-  */
 

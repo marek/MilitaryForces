@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.31 2002-02-23 23:07:08 thebjoern Exp $
+ * $Id: bg_vehicledata.c,v 1.32 2002-02-24 16:52:12 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -139,10 +139,10 @@ completeVehicleData_t availableVehicles[] =
 	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
-	HC_GEAR|HC_SPEEDBRAKE|
+	HC_GEAR|
 	HC_VAPOR,					// capabilities
 	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
-	{-26, -19, -4},				// mins (bounding box)
+	{-26, -19, -1},				// mins (bounding box)
 	{38, 19, 12},				// max (bounding box)
 	{70, 80, 340},				// turnspeed around the three axis
 	{0, 100, 70},				// camera distance {min,max,default}
@@ -160,8 +160,8 @@ completeVehicleData_t availableVehicles[] =
 	60,							// max fuel
 	3,							// gearheight
 	0,							// tailangle
-	WI_MG_20MM, WI_SIDEWINDER, WI_AMRAAM, WI_FFAR, 0, 0, 0, WI_FLARE,		// weapons
-	450, 4, 2, 38, 0, 0, 0, 28,	// ammo
+	WI_MG_20MM, WI_SIDEWINDER, WI_AMRAAM, WI_FFAR, WI_MK82, 0, 0, WI_FLARE,		// weapons
+	450, 2, 2, 38, 2, 0, 0, 28,	// ammo
 	0,0,0,0,0,0,0,0,			// turret
 	PT_WING_L,PT_WING_L,PT_WING_H,PT_WING_H,0,0,0,0,// pylons
 	{19, 0, 5},					// cameraposition for cockpit view
@@ -473,8 +473,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// swingangle
 	1400,						// geartime
 	47,							// max gear frame
-	1000,						// baytime
-	47,							// max bay frame
+	100,						// baytime
+	4,							// max bay frame
 	0,							// renderflags
 	{3,0,76,76},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters

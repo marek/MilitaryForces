@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicle.c,v 1.15 2002-02-23 19:31:55 thebjoern Exp $
+ * $Id: cg_vehicle.c,v 1.16 2002-02-24 16:52:12 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -647,7 +647,7 @@ void CG_VehicleLoadout( centity_t* cent ) {
 		idx = ci->vehicle;
 	} else if( cent->currentState.eType == ET_MISC_VEHICLE ) {
 		idx = cent->currentState.modelindex;
-	}
+	} else return;
 
 	MF_getDefaultLoadoutForVehicle( idx, &cg_loadouts[cent->currentState.number] );
 }

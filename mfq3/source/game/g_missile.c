@@ -1,5 +1,5 @@
 /*
- * $Id: g_missile.c,v 1.13 2002-02-23 23:07:08 thebjoern Exp $
+ * $Id: g_missile.c,v 1.14 2002-02-24 16:52:12 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -328,7 +328,21 @@ static void follow_target( gentity_t *missile ) {
 
 
 
-
+static void drop_to_normal_transition( gentity_t* missile ) {
+	missile->s.pos.trType = TR_LINEAR;
+	missile->s.pos.trTime = level.time;
+	VectorCopy( missile->r.currentOrigin, missile->s.pos.trBase );
+	VectorNormalize( missile->s.pos.trDelta );
+	VectorScale( missile->s.pos.trDelta, missile->speed, missile->s.pos.trDelta );
+	if( missile->tracktarget ) {
+		missile->wait = level.time + availableWeapons[missile->s.weaponIndex].fuelrange;
+		missile->think = follow_target;
+		missile->nextthink = level.time + 50;
+	} else {
+		missile->think = G_ExplodeMissile;
+		missile->nextthink = level.time + availableWeapons[missile->s.weaponIndex].fuelrange;
+	}
+}
 
 
 //=============================================================================
@@ -342,35 +356,24 @@ void fire_antiair (gentity_t *self) {
 	gentity_t	*bolt;
 	vec3_t		dir, right, up, temp, forward;
 	vec3_t		start, offset;
-	int			mult;
 	char		tagname[16];
+	qboolean	active = ( self->client->ps.stats[STAT_LOCKINFO] & LI_LOCKING );
 
-	MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, tagname,0,0 );
-
-	VectorCopy( availableVehicles[self->client->vehicle].gunoffset, offset );
 	VectorCopy( self->s.pos.trBase, start );
 
 	if( (availableVehicles[self->client->vehicle].cat & CAT_GROUND) ||
 		(availableVehicles[self->client->vehicle].cat & CAT_BOAT) ) {
-		// use this to make it shoot where the player looks
-//		AngleVectors( self->client->ps.viewangles, dir, 0, 0 );
-//		VectorCopy( self->s.pos.trBase, start );
-//		start[2] += availableVehicles[self->client->vehicle].maxs[2];
-		// otherwise use this
+		VectorCopy( availableVehicles[self->client->vehicle].gunoffset, offset );
 		AngleVectors( self->client->ps.vehicleAngles, forward, right, up );
 		RotatePointAroundVector( temp, up, forward, ((float)self->client->ps.turretAngle)/10 );
 		CrossProduct( up, temp, right );
 		RotatePointAroundVector( dir, right, temp, ((float)self->client->ps.gunAngle)/10 );
 
 	} else {
-		// planes and helos for now just shoot along their direction of flight
-		if( !(availableVehicles[self->client->vehicle].caps & HC_WEAPONBAY) ) {
-			AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
-			self->left = (self->left ? qfalse : qtrue);
-			mult = (self->left ? 1 : -1);
-			VectorMA( start, availableVehicles[self->client->vehicle].mins[2], up, start );
-			VectorMA( start, availableVehicles[self->client->vehicle].maxs[1]*mult/2, right, start );
-		}
+		self->left = (self->left ? qfalse : qtrue);
+		MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, tagname, offset, self->left );
+		AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
+		VectorInverse( right );
 	}
 	VectorMA( start, offset[0], dir, start );
 	VectorMA( start, offset[1], right, start );
@@ -379,15 +382,22 @@ void fire_antiair (gentity_t *self) {
 
 	bolt = G_Spawn();
 	bolt->classname = "aam";
-	bolt->nextthink = level.time + 50;
-	bolt->wait = level.time + availableWeapons[self->client->ps.weaponIndex].fuelrange;
-	bolt->think = follow_target;
-	bolt->tracktarget = self->tracktarget;
-	// update target
-	if( self->tracktarget->client ) {
-		self->tracktarget->client->ps.stats[STAT_LOCKINFO] |= LI_BEING_LAUNCHED;
+	if( active ) {
+//		bolt->wait = level.time + availableWeapons[self->client->ps.weaponIndex].fuelrange;
+//		bolt->think = follow_target;
+//		bolt->nextthink = level.time + 50;
+		bolt->tracktarget = self->tracktarget;
+		// update target
+		if( self->tracktarget->client ) {
+			self->tracktarget->client->ps.stats[STAT_LOCKINFO] |= LI_BEING_LAUNCHED;
+		}
+		bolt->followcone = availableWeapons[self->client->ps.weaponIndex].followcone;
+//	} else {
+//		bolt->think = G_ExplodeMissile;
+//		bolt->nextthink = level.time + availableWeapons[self->client->ps.weaponIndex].fuelrange;
 	}
-	bolt->followcone = availableWeapons[self->client->ps.weaponIndex].followcone;
+	bolt->think = drop_to_normal_transition;
+	bolt->nextthink = level.time + 400;
 	bolt->s.eType = ET_MISSILE;
 	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
 	bolt->s.weaponIndex = self->client->ps.weaponIndex;
@@ -400,14 +410,15 @@ void fire_antiair (gentity_t *self) {
 	bolt->range = availableWeapons[self->client->ps.weaponIndex].range;
 	bolt->methodOfDeath = MOD_FFAR;
 	bolt->splashMethodOfDeath = MOD_FFAR_SPLASH;
-	bolt->clipmask = MASK_SHOT;
+	bolt->clipmask = MASK_SHOT|MASK_WATER;
 	bolt->target_ent = NULL;
 	bolt->speed = availableWeapons[self->client->ps.weaponIndex].muzzleVelocity;
 
-	bolt->s.pos.trType = TR_LINEAR;
+	bolt->s.pos.trType = TR_GRAVITY;
 	bolt->s.pos.trTime = level.time;// - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
 	VectorCopy( start, bolt->s.pos.trBase );
-	VectorScale( dir, bolt->speed, bolt->s.pos.trDelta );
+//	VectorScale( dir, bolt->speed, bolt->s.pos.trDelta );
+	VectorScale( dir, self->client->ps.speed/10, bolt->s.pos.trDelta );
 	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
 	VectorCopy (start, bolt->r.currentOrigin);
 }
@@ -422,35 +433,24 @@ void fire_antiground (gentity_t *self) {
 	gentity_t	*bolt;
 	vec3_t		dir, right, up;
 	vec3_t		start, offset, forward, temp;
-	int			mult;
 	char		tagname[16];
+	qboolean	active = ( self->client->ps.stats[STAT_LOCKINFO] & LI_LOCKING );
 
-	MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, tagname,0,0 );
-
-	VectorCopy( availableVehicles[self->client->vehicle].gunoffset, offset );
 	VectorCopy( self->s.pos.trBase, start );
 
 	if( (availableVehicles[self->client->vehicle].cat & CAT_GROUND) ||
 		(availableVehicles[self->client->vehicle].cat & CAT_BOAT) ) {
-		// use this to make it shoot where the player looks
-//		AngleVectors( self->client->ps.viewangles, dir, 0, 0 );
-//		VectorCopy( self->s.pos.trBase, start );
-//		start[2] += availableVehicles[self->client->vehicle].maxs[2];
-		// otherwise use this
+		VectorCopy( availableVehicles[self->client->vehicle].gunoffset, offset );
 		AngleVectors( self->client->ps.vehicleAngles, forward, right, up );
 		RotatePointAroundVector( temp, up, forward, ((float)self->client->ps.turretAngle)/10 );
 		CrossProduct( up, temp, right );
 		RotatePointAroundVector( dir, right, temp, ((float)self->client->ps.gunAngle)/10 );
 
 	} else {
-		// planes and helos for now just shoot along their direction of flight
-		if(	!(availableVehicles[self->client->vehicle].caps & HC_WEAPONBAY) ) {
-			AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
-			self->left = (self->left ? qfalse : qtrue);
-			mult = (self->left ? 1 : -1);
-			VectorMA( start, availableVehicles[self->client->vehicle].mins[2], up, start );
-			VectorMA( start, availableVehicles[self->client->vehicle].maxs[1]*mult/2, right, start );
-		}
+		self->left = (self->left ? qfalse : qtrue);
+		MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, tagname, offset, self->left );
+		AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
+		VectorInverse( right );
 	}
 	VectorMA( start, offset[0], dir, start );
 	VectorMA( start, offset[1], right, start );
@@ -459,15 +459,23 @@ void fire_antiground (gentity_t *self) {
 
 	bolt = G_Spawn();
 	bolt->classname = "agm";
-	bolt->nextthink = level.time + 50;
-	bolt->wait = level.time + availableWeapons[self->client->ps.weaponIndex].fuelrange;
-	bolt->think = follow_target;
-	bolt->tracktarget = self->tracktarget;
-	// update target
-	if( self->tracktarget->client ) {
-		self->tracktarget->client->ps.stats[STAT_LOCKINFO] |= LI_BEING_LAUNCHED;
+
+	if( active ) {
+//		bolt->wait = level.time + availableWeapons[self->client->ps.weaponIndex].fuelrange;
+//		bolt->think = follow_target;
+//		bolt->nextthink = level.time + 50;
+		bolt->tracktarget = self->tracktarget;
+		// update target
+		if( self->tracktarget->client ) {
+			self->tracktarget->client->ps.stats[STAT_LOCKINFO] |= LI_BEING_LAUNCHED;
+		}
+		bolt->followcone = availableWeapons[self->client->ps.weaponIndex].followcone;
+//	} else {
+//		bolt->think = G_ExplodeMissile;
+//		bolt->nextthink = level.time + availableWeapons[self->client->ps.weaponIndex].fuelrange;
 	}
-	bolt->followcone = availableWeapons[self->client->ps.weaponIndex].followcone;
+	bolt->think = drop_to_normal_transition;
+	bolt->nextthink = level.time + 400;
 	bolt->s.eType = ET_MISSILE;
 	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
 	bolt->s.weaponIndex = self->client->ps.weaponIndex;
@@ -484,10 +492,11 @@ void fire_antiground (gentity_t *self) {
 	bolt->target_ent = NULL;
 	bolt->speed = availableWeapons[self->client->ps.weaponIndex].muzzleVelocity;
 
-	bolt->s.pos.trType = TR_LINEAR;
+	bolt->s.pos.trType = TR_GRAVITY;// TR_LINEAR;
 	bolt->s.pos.trTime = level.time;// - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
 	VectorCopy( start, bolt->s.pos.trBase );
-	VectorScale( dir, bolt->speed, bolt->s.pos.trDelta );
+//	VectorScale( dir, bolt->speed, bolt->s.pos.trDelta );
+	VectorScale( dir, self->client->ps.speed/10, bolt->s.pos.trDelta );
 	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
 	VectorCopy (start, bolt->r.currentOrigin);
 }
@@ -501,42 +510,24 @@ fire_ffar MFQ3
 void fire_ffar (gentity_t *self) {
 	gentity_t	*bolt;
 	vec3_t		dir, right, up;
-	vec3_t		start, offset, forward, temp;
-//	int			mult;
+	vec3_t		start, offset;
 	char		tagname[16];
 
 	VectorCopy( self->s.pos.trBase, start );
 
-	if( (availableVehicles[self->client->vehicle].cat & CAT_GROUND) ||
-		(availableVehicles[self->client->vehicle].cat & CAT_BOAT) ) {
-		VectorCopy( availableVehicles[self->client->vehicle].gunoffset, offset );
-		// use this to make it shoot where the player looks
-//		AngleVectors( self->client->ps.viewangles, dir, 0, 0 );
-//		VectorCopy( self->s.pos.trBase, start );
-//		start[2] += availableVehicles[self->client->vehicle].maxs[2];
-		// otherwise use this
-		AngleVectors( self->client->ps.vehicleAngles, forward, right, up );
-		RotatePointAroundVector( temp, up, forward, ((float)self->client->ps.turretAngle)/10 );
-		CrossProduct( up, temp, right );
-		RotatePointAroundVector( dir, right, temp, ((float)self->client->ps.gunAngle)/10 );
-
-	} else {
-		self->left = (self->left ? qfalse : qtrue);
-		MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, tagname, offset, self->left );
-		AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
-//		mult = (self->left ? 1 : -1);
-//		VectorMA( start, availableVehicles[self->client->vehicle].mins[2], up, start );
-//		VectorMA( start, availableVehicles[self->client->vehicle].maxs[1]*mult/2, right, start );
-	}
+	self->left = (self->left ? qfalse : qtrue);
+	MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, tagname, offset, self->left );
+	AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
+	VectorInverse( right );
 	VectorMA( start, offset[0], dir, start );
-	VectorMA( start, -offset[1], right, start );
+	VectorMA( start, offset[1], right, start );
 	VectorMA( start, offset[2], up, start );
 	SnapVector( start );
 
 	bolt = G_Spawn();
 	bolt->classname = "ffar";
 	bolt->nextthink = level.time + availableWeapons[self->client->ps.weaponIndex].fuelrange;
-	bolt->think = no_fuel_flight;
+	bolt->think = G_ExplodeMissile;
 	bolt->s.eType = ET_MISSILE;
 	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
 	bolt->s.weaponIndex = self->client->ps.weaponIndex;
@@ -566,22 +557,18 @@ fire_ironbomb MFQ3
 */
 void fire_ironbomb (gentity_t *self) {
 	gentity_t	*bolt;
-	vec3_t		dir, right, up;
+	vec3_t		dir, right, up, offset;
 	vec3_t		start;
-	int			mult;
 	char		tagname[16];
 
-	MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, tagname,0,0 );
-
+//	self->left = (self->left ? qfalse : qtrue);
+	MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, tagname, offset, 0 );
 	AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
+	VectorInverse( right );
 	VectorCopy( self->s.pos.trBase, start );
-	if( (availableVehicles[self->client->vehicle].cat & CAT_PLANE) &&
-		!(availableVehicles[self->client->vehicle].caps & HC_WEAPONBAY) ) {
-		self->left = (self->left ? qfalse : qtrue);
-		mult = (self->left ? 1 : -1);
-		VectorMA( start, availableVehicles[self->client->vehicle].mins[2], up, start );
-		VectorMA( start, availableVehicles[self->client->vehicle].maxs[1]*mult/2, right, start );
-	}
+	VectorMA( start, offset[0], dir, start );
+	VectorMA( start, offset[1], right, start );
+	VectorMA( start, offset[2], up, start );
 	SnapVector( start );
 
 	bolt = G_Spawn();

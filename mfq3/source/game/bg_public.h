@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.73 2002-02-23 23:07:08 thebjoern Exp $
+ * $Id: bg_public.h,v 1.74 2002-02-24 16:52:12 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.64"
+#define	GAME_VERSION		"mfq3 v0.64a"
 
 #define	DEFAULT_GRAVITY		800
 
@@ -887,8 +887,9 @@ qboolean MF_findTag(const char* fileName, const char* tagname, md3Tag_t* tag);
 qboolean MF_distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout );
 void MF_calculateAllDefaultLoadouts();
 void MF_getDefaultLoadoutForVehicle( int idx, completeLoadout_t* loadout );
+void MF_getLoadoutFromAmmo( int idx, completeLoadout_t* loadout, unsigned int ammo[8] );
 qboolean MF_removeWeaponFromLoadout( int weaponIndex, completeLoadout_t* loadout, char* usedTag, vec3_t pos, qboolean nextMount );
-void MF_addWeaponToLoadout( int weaponIndex, completeLoadout_t* loadout );
+qboolean MF_addWeaponToLoadout( int weaponIndex, completeLoadout_t* loadout );
 
 #define MF_THROTTLE_REVERSE		-5
 #define MF_THROTTLE_IDLE		0
