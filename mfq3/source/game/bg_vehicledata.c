@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.45 2002-07-13 12:04:40 thebjoern Exp $
+ * $Id: bg_vehicledata.c,v 1.46 2003-01-11 13:08:50 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -93,8 +93,8 @@ completeVehicleData_t availableVehicles[] =
 	60,							// max fuel
 	0,							// gearheight - SET AUTOMATICALLY
 	0,							// tailangle
-	WI_MG_20MM, WI_SIDEWINDER, WI_AMRAAM, WI_MK84, 0, 0, 0, WI_FLARE,	// weapons  WI_MG_20MM
-	450, 2, 2, 4, 0, 0, 0, 30,		// ammo
+	WI_MG_20MM, WI_SIDEWINDER, WI_AMRAAM, WI_MK84, WI_CM, 0, 0, WI_FLARE,	// weapons  WI_MG_20MM
+	450, 2, 2, 4, 1, 0, 0, 30,		// ammo
 	0,0,0,0,0,0,0,0,			// turret - useful ??
 	{19, 0, 5},					// cameraposition for cockpit view
 	AB_BALL,					// effect model
@@ -142,8 +142,8 @@ completeVehicleData_t availableVehicles[] =
 	60,							// max fuel
 	0,							// gearheight - SET AUTOMATICALLY
 	0,							// tailangle
-	WI_MG_20MM, WI_SIDEWINDER, WI_FFAR, WI_MK82, 0, 0, 0, WI_FLARE,	// weapons  WI_MG_20MM
-	450, 4, 2, 10, 0, 0, 0, 30,		// ammo
+	WI_MG_20MM, WI_SIDEWINDER, WI_FFAR, WI_MK82, WI_ECM, WI_CM, 0, WI_FLARE,	// weapons  WI_MG_20MM
+	450, 4, 2, 10, 1, 1, 0, 30,		// ammo
 	0,0,0,0,0,0,0,0,			// turret - useful ??
 	{19, 0, 5},					// cameraposition for cockpit view
 	AB_BALL,					// effect model
@@ -191,8 +191,8 @@ completeVehicleData_t availableVehicles[] =
 	60,							// max fuel
 	0,							// gearheight - SET AUTOMATICALLY
 	0,							// tailangle
-	WI_MG_20MM, WI_SIDEWINDER, WI_AMRAAM, WI_MAVERICK, 0, 0, 0, WI_FLARE,	// weapons  WI_MG_20MM
-	450, 2, 2, 12, 0, 0, 0, 30,		// ammo
+	WI_MG_20MM, WI_SIDEWINDER, WI_AMRAAM, WI_MAVERICK, WI_DROPTANK_SMALL, 0, 0, WI_FLARE,	// weapons  WI_MG_20MM
+	450, 2, 2, 12, 1, 0, 0, 30,		// ammo
 	0,0,0,0,0,0,0,0,			// turret - useful ??
 	{19, 0, 5},					// cameraposition for cockpit view
 	AB_BALL,					// effect model
@@ -210,7 +210,8 @@ completeVehicleData_t availableVehicles[] =
 	{0,0,0,0}					// shadow orientation adjusters
     },
 
-    {	"F-16 Falcon (AA FFAR)",    // descriptiveName
+
+    {	"F-16 Falcon (AG FFAR)",    // descriptiveName
 	"F-16",						// tinyName
 	"f-16",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
@@ -240,8 +241,8 @@ completeVehicleData_t availableVehicles[] =
 	60,							// max fuel
 	0,							// gearheight - SET AUTOMATICALLY
 	0,							// tailangle
-	WI_MG_20MM, WI_SIDEWINDER, WI_AMRAAM, WI_FFAR, WI_SPARROW, 0, 0, WI_FLARE,	// weapons  WI_MG_20MM
-	450, 2, 2, 2, 2, 0, 0, 30,		// ammo
+	WI_MG_20MM, WI_SIDEWINDER, WI_AMRAAM, WI_FFAR, WI_CM, 0, 0, WI_FLARE,	// weapons  WI_MG_20MM
+	450, 2, 2, 8, 2, 0, 0, 30,		// ammo
 	0,0,0,0,0,0,0,0,			// turret - useful ??
 	{19, 0, 5},					// cameraposition for cockpit view
 	AB_BALL,					// effect model
@@ -258,6 +259,59 @@ completeVehicleData_t availableVehicles[] =
 	{4,0,34,24},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
     },
+
+
+
+    {	"F-16 Falcon (ER)",    // descriptiveName
+	"F-16",						// tinyName
+	"f-16",						// modelName
+	SHADOW_DEFAULT,				// alpha shadow
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_2,
+	CAT_PLANE,
+	CLASS_PLANE_FIGHTER,
+	0,							// flags
+	HC_GEAR|HC_SPEEDBRAKE|
+	HC_VAPOR,					// capabilities
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
+	{80, 80, 260},				// turnspeed around the three axis
+	{0, 100, 70},				// camera distance {min,max,default}
+	{0, 100, 20},				// camera height {min,max,default}
+	200,						// stallspeed
+	700,						// maxspeed
+	0,							// min throttle
+	15,							// max throttle
+	1,							// engines
+	0,							// wheels
+	0,							// wheel circumference
+	260,						// acceleration
+	120,						// health
+	{16.65f, -3.391f, 0.378f},	// gun tag
+	60,							// max fuel
+	0,							// gearheight - SET AUTOMATICALLY
+	0,							// tailangle
+	WI_MG_20MM, WI_AMRAAM, WI_DROPTANK, WI_DROPTANK_SMALL, WI_CM, 0, 0, WI_FLARE,	// weapons  WI_MG_20MM
+	450, 6, 2, 1, 1, 0, 0, 30,		// ammo
+	0,0,0,0,0,0,0,0,			// turret - useful ??
+	{19, 0, 5},					// cameraposition for cockpit view
+	AB_BALL,					// effect model
+	12000,						// radar range
+	9000,						// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
+	0,							// swingangle
+	1400,						// geartime
+	0,							// max gear frame
+	1000,						// baytime
+	0,							// max bay frame
+	0,							// renderflags
+	{4,0,34,24},				// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
+    },
+
+
 
     {	"Saab JAS 39 Gripen",    // descriptiveName
 	"Jas-39",					// tinyName
@@ -289,8 +343,57 @@ completeVehicleData_t availableVehicles[] =
 	60,							// max fuel
 	0,							// gearheight - SET AUTOMATICALLY
 	0,							// tailangle
-	WI_MG_20MM, WI_AMRAAM, WI_SIDEWINDER, 0, 0, 0, 0, WI_FLARE,		// weapons
-	450, 5, 4, 0, 0, 0, 0, 28,	// ammo
+	WI_MG_20MM, WI_AMRAAM, WI_SIDEWINDER, WI_DROPTANK_SMALL, WI_CM, 0, 0, WI_FLARE,		// weapons
+	450, 4, 2, 1, 1, 0, 0, 28,	// ammo
+	0,0,0,0,0,0,0,0,			// turret
+	{19, 0, 5},					// cameraposition for cockpit view
+	AB_BALL,					// effect model
+	10000,						// radar range
+	8000,						// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
+	0,							// swingangle
+	1400,						// geartime
+	0,							// max gear frame
+	1000,						// baytime
+	0,							// max bay frame
+	0,							// renderflags
+	{6,0,36,20},				// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
+    },
+
+    {	"Saab JAS 39 Gripen (FFAR+)",    // descriptiveName
+	"Jas-39",					// tinyName
+	"jas-39",					// modelName
+	SHADOW_DEFAULT,				// alpha shadow
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_1,
+	CAT_PLANE,
+	CLASS_PLANE_FIGHTER,
+	0,							// flags
+	HC_GEAR|HC_SPEEDBRAKE|
+	HC_VAPOR,					// capabilities
+	{0,0,0,0,0,0,0,0,0,0},		// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
+	{70, 80, 340},				// turnspeed around the three axis
+	{0, 100, 70},				// camera distance {min,max,default}
+	{0, 100, 20},				// camera height {min,max,default}
+	200,						// stallspeed
+	720,						// maxspeed
+	0,							// min throttle
+	15,							// max throttle
+	1,							// engines
+	0,							// wheels
+	0,							// wheel circumference
+	250,						// acceleration
+	110,						// health
+	{19.698f, -1.328f, -3.016f},// gun tag
+	60,							// max fuel
+	0,							// gearheight - SET AUTOMATICALLY
+	0,							// tailangle
+	WI_MG_20MM, WI_FFAR_LARGE, WI_SIDEWINDER, WI_DROPTANK_SMALL, WI_ECM, 0, 0, WI_FLARE,		// weapons
+	450, 4, 2, 1, 1, 0, 0, 28,	// ammo
 	0,0,0,0,0,0,0,0,			// turret
 	{19, 0, 5},					// cameraposition for cockpit view
 	AB_BALL,					// effect model
@@ -387,8 +490,8 @@ completeVehicleData_t availableVehicles[] =
 	80,							// max fuel
 	0,							// gearheight - SET AUTOMATICALLY
 	0,							// tailangle
-	WI_MG_30MM, WI_AMRAAM, WI_SIDEWINDER, WI_FFAR, 0, 0, 0, WI_FLARE,	// weapons
-	500, 2, 2, 38, 0, 0, 0, 32,		// ammo
+	WI_MG_30MM, WI_SIDEWINDER, WI_FFAR, WI_MAVERICK, 0, 0, 0, WI_FLARE,	// weapons
+	500, 3, 38, 6, 0, 0, 0, 32,		// ammo
 	0,0,0,0,0,0,0,0,			// turret
 	{11, 0, 5},					// cameraposition for cockpit view
 	0,							// effect model
@@ -405,6 +508,209 @@ completeVehicleData_t availableVehicles[] =
 	{5,0,34,26},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
     },
+
+
+    {	"A-10 Thunderbolt II (Runway Killer)",  // descriptiveName
+	"A-10",						// tinyName
+	"a10",						// modelName
+	SHADOW_DEFAULT,				// alpha shadow
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_2,
+	CAT_PLANE,
+	CLASS_PLANE_BOMBER,
+	0,							// flags
+	HC_GEAR|HC_SPEEDBRAKE|
+	HC_VAPOR|HC_DUALGUNS,		// capabilities
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
+	{70, 80, 300},				// turnspeed around the three axis
+	{0, 100, 70},				// camera distance {min,max,default}
+	{0, 100, 20},				// camera height {min,max,default}
+	170,						// stallspeed
+	620,						// maxspeed
+	0,							// min throttle
+	10,							// max throttle
+	2,							// engines
+	0,							// wheels
+	0,							// wheel circumference
+	270,						// acceleration
+	200,						// health
+	{26.25f, -0.94f, 1.811f},	// gun tag
+	80,							// max fuel
+	0,							// gearheight - SET AUTOMATICALLY
+	0,							// tailangle
+	WI_MG_30MM, WI_SIDEWINDER, WI_DURANDAL, WI_MAVERICK, 0, 0, 0, WI_FLARE,	// weapons
+	500, 3, 6, 6, 0, 0, 0, 32,		// ammo
+	0,0,0,0,0,0,0,0,			// turret
+	{11, 0, 5},					// cameraposition for cockpit view
+	0,							// effect model
+	8000,						// radar range
+	10000,						// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
+	0,							// swingangle
+	1400,						// geartime
+	0,							// max gear frame
+	1000,						// baytime
+	0,							// max bay frame
+	0,							// renderflags
+	{5,0,34,26},				// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
+    },
+
+
+
+   {	"A-10 Thunderbolt II (SMART)",  // descriptiveName
+	"A-10",						// tinyName
+	"a10",						// modelName
+	SHADOW_DEFAULT,				// alpha shadow
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_2,
+	CAT_PLANE,
+	CLASS_PLANE_BOMBER,
+	0,							// flags
+	HC_GEAR|HC_SPEEDBRAKE|
+	HC_VAPOR|HC_DUALGUNS,		// capabilities
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
+	{70, 80, 300},				// turnspeed around the three axis
+	{0, 100, 70},				// camera distance {min,max,default}
+	{0, 100, 20},				// camera height {min,max,default}
+	170,						// stallspeed
+	620,						// maxspeed
+	0,							// min throttle
+	10,							// max throttle
+	2,							// engines
+	0,							// wheels
+	0,							// wheel circumference
+	270,						// acceleration
+	200,						// health
+	{26.25f, -0.94f, 1.811f},	// gun tag
+	80,							// max fuel
+	0,							// gearheight - SET AUTOMATICALLY
+	0,							// tailangle
+	WI_MG_30MM, WI_LASE, WI_CM, WI_SIDEWINDER, WI_MAVERICK, WI_GBU15, 0, WI_FLARE,	// weapons
+	500, 1, 1, 2, 4, 2, 0, 32,		// ammo
+	0,0,0,0,0,0,0,0,			// turret
+	{11, 0, 5},					// cameraposition for cockpit view
+	0,							// effect model
+	8000,						// radar range
+	10000,						// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
+	0,							// swingangle
+	1400,						// geartime
+	0,							// max gear frame
+	1000,						// baytime
+	0,							// max bay frame
+	0,							// renderflags
+	{5,0,34,26},				// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
+    },
+
+
+   {	"A-10 Thunderbolt II (ER)",  // descriptiveName
+	"A-10",						// tinyName
+	"a10",						// modelName
+	SHADOW_DEFAULT,				// alpha shadow
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_2,
+	CAT_PLANE,
+	CLASS_PLANE_BOMBER,
+	0,							// flags
+	HC_GEAR|HC_SPEEDBRAKE|
+	HC_VAPOR|HC_DUALGUNS,		// capabilities
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
+	{70, 80, 300},				// turnspeed around the three axis
+	{0, 100, 70},				// camera distance {min,max,default}
+	{0, 100, 20},				// camera height {min,max,default}
+	170,						// stallspeed
+	620,						// maxspeed
+	0,							// min throttle
+	10,							// max throttle
+	2,							// engines
+	0,							// wheels
+	0,							// wheel circumference
+	270,						// acceleration
+	200,						// health
+	{26.25f, -0.94f, 1.811f},	// gun tag
+	80,							// max fuel
+	0,							// gearheight - SET AUTOMATICALLY
+	0,							// tailangle
+	WI_MG_30MM, WI_CM, WI_SIDEWINDER, WI_MK84, WI_DROPTANK, WI_MAVERICK, WI_MK82, WI_FLARE,	// weapons
+	500, 1, 2, 2, 2, 3, 6, 32,		// ammo
+	0,0,0,0,0,0,0,0,			// turret
+	{11, 0, 5},					// cameraposition for cockpit view
+	0,							// effect model
+	8000,						// radar range
+	10000,						// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
+	0,							// swingangle
+	1400,						// geartime
+	0,							// max gear frame
+	1000,						// baytime
+	0,							// max bay frame
+	0,							// renderflags
+	{5,0,34,26},				// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
+    },
+
+
+    {	"F-105 TEST",			    // descriptiveName
+	"F-105",					// tinyName
+	"f-105",					// modelName
+	SHADOW_DEFAULT,				// alpha shadow
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_2,
+	CAT_PLANE,
+	CLASS_PLANE_FIGHTER,
+	0,							// flags
+	HC_GEAR|HC_SPEEDBRAKE|
+	HC_VAPOR,			// capabilities
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
+	{60, 80, 200},				// turnspeed around the three axis
+	{0, 100, 70},				// camera distance {min,max,default}
+	{0, 100, 20},				// camera height {min,max,default}
+	220,						// stallspeed
+	800,						// maxspeed
+	0,							// min throttle
+	15,							// max throttle
+	2,							// engines
+	0,							// wheels
+	0,							// wheel circumference
+	260,						// acceleration
+	150,						// health
+	{19.1f,7.87f,-0.112f},		// gun tag
+	80,							// max fuel
+	0,							// gearheight - SET AUTOMATICALLY
+	0,							// tailangle
+	WI_MG_20MM, WI_SIDEWINDER, WI_MK83R, 0, 0, 0, 0, WI_FLARE,	// weapons
+	450, 2, 11, 0, 0, 0, 0, 35,		// ammo
+	0,0,0,0,0,0,0,0,			// turret
+	{28, 0, 6},					// cameraposition for cockpit view
+	AB_RED,						// effect model
+	11000,						// radar range
+	6000,						// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
+	0,							// swingangle
+	1400,						// geartime
+	0,							// max gear frame
+	1000,						// baytime
+	0,							// max bay frame
+	0,							// renderflags
+	{6,0,48,34},				// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
+    },
+
+
 
     {	"F-5 Tiger",		    // descriptiveName
 	"F-5",						// tinyName
@@ -485,8 +791,8 @@ completeVehicleData_t availableVehicles[] =
 	80,							// max fuel
 	0,							// gearheight - SET AUTOMATICALLY
 	0,							// tailangle
-	WI_MG_20MM, WI_AMRAAM, WI_SIDEWINDER, WI_MK82, 0, 0, 0, WI_FLARE,	// weapons
-	450, 2, 4, 16, 0, 0, 0, 35,		// ammo
+	WI_MG_20MM, WI_SIDEWINDER, WI_AMRAAM, WI_MK82, 0, 0, 0, WI_FLARE,	// weapons
+	450, 4, 2, 16, 0, 0, 0, 35,		// ammo
 	0,0,0,0,0,0,0,0,			// turret
 	{28, 0, 6},					// cameraposition for cockpit view
 	AB_RED,						// effect model
@@ -504,7 +810,108 @@ completeVehicleData_t availableVehicles[] =
 	{0,0,0,0}					// shadow orientation adjusters
     },
 
+
+    {	"F-15 Eagle (AA)",		    // descriptiveName
+	"F-15",						// tinyName
+	"f-15",						// modelName
+	SHADOW_DEFAULT,				// alpha shadow
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_1,
+	CAT_PLANE,
+	CLASS_PLANE_FIGHTER,
+	0,							// flags
+	HC_GEAR|HC_SPEEDBRAKE|
+	HC_VAPOR,					// capabilities
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
+	{60, 80, 200},				// turnspeed around the three axis
+	{0, 100, 70},				// camera distance {min,max,default}
+	{0, 100, 20},				// camera height {min,max,default}
+	220,						// stallspeed
+	880,						// maxspeed
+	0,							// min throttle
+	15,							// max throttle
+	2,							// engines
+	0,							// wheels
+	0,							// wheel circumference
+	260,						// acceleration
+	150,						// health
+	{19.1f,7.87f,-0.112f},		// gun tag
+	80,							// max fuel
+	0,							// gearheight - SET AUTOMATICALLY
+	0,							// tailangle
+	WI_MG_20MM, WI_AMRAAM, WI_SIDEWINDER, WI_CM, 0, 0, 0, WI_FLARE,	// weapons
+	450, 8, 2, 1, 0, 0, 0, 35,		// ammo
+	0,0,0,0,0,0,0,0,			// turret
+	{28, 0, 6},					// cameraposition for cockpit view
+	AB_RED,						// effect model
+	14000,						// radar range
+	7000,						// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
+	0,							// swingangle
+	1400,						// geartime
+	0,							// max gear frame
+	1000,						// baytime
+	0,							// max bay frame
+	MFR_DUALPILOT|MFR_BIGVAPOR,	// renderflags
+	{6,0,48,34},				// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
+    },
+
+
     {	"F-14 Tomcat",		    // descriptiveName
+	"F-14",						// tinyName
+	"f-14",						// modelName
+	SHADOW_DEFAULT,				// alpha shadow
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_2,
+	CAT_PLANE,
+	CLASS_PLANE_FIGHTER,
+	0,							// flags
+	HC_GEAR|HC_SPEEDBRAKE|
+	HC_VAPOR|HC_SWINGWING,		// capabilities
+	{0,0,0,0,0,0,0,0,0,0},		// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
+	{60, 80, 200},				// turnspeed around the three axis
+	{0, 100, 70},				// camera distance {min,max,default}
+	{0, 100, 20},				// camera height {min,max,default}
+	220,						// stallspeed
+	840,						// maxspeed
+	0,							// min throttle
+	15,							// max throttle
+	2,							// engines
+	0,							// wheels
+	0,							// wheel circumference
+	260,						// acceleration
+	150,						// health
+	{37.8f,2.4f,-1.3f},			// gun tag
+	70,							// max fuel
+	0,							// gearheight - SET AUTOMATICALLY
+	0,							// tailangle
+	WI_MG_20MM, WI_SIDEWINDER, WI_SPARROW, WI_PHOENIX, WI_CM, 0, 0, WI_FLARE,	// weapons
+	450, 2, 2, 4, 1, 0, 0, 35,		// ammo
+	0,0,0,0,0,0,0,0,			// turret
+	{28, 0, 6},					// cameraposition for cockpit view
+	AB_RED,						// effect model
+	20000,						// radar range
+	5500,						// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
+	50,							// swingangle
+	1400,						// geartime
+	0,							// max gear frame
+	1000,						// baytime
+	0,							// max bay frame
+	MFR_DUALPILOT|MFR_BIGVAPOR,	// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
+    },
+
+
+    {	"F-14 Tomcat (ER)",		    // descriptiveName
 	"F-14",						// tinyName
 	"f-14",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
@@ -534,12 +941,12 @@ completeVehicleData_t availableVehicles[] =
 	70,							// max fuel
 	0,							// gearheight - SET AUTOMATICALLY
 	0,							// tailangle
-	WI_MG_20MM, WI_PHOENIX, WI_SIDEWINDER, 0, 0, 0, 0, WI_FLARE,	// weapons
-	450, 6, 2, 0, 0, 0, 0, 35,		// ammo
+	WI_MG_20MM, WI_PHOENIX, WI_SIDEWINDER, WI_DROPTANK_SMALL, 0, 0, 0, WI_FLARE,	// weapons
+	450, 6, 2, 2, 0, 0, 0, 35,		// ammo
 	0,0,0,0,0,0,0,0,			// turret
 	{28, 0, 6},					// cameraposition for cockpit view
 	AB_RED,						// effect model
-	16000,						// radar range
+	20000,						// radar range
 	5500,						// radar range ground
 	0,							// trackcone
 	-1,							// trackcone ground
@@ -552,6 +959,57 @@ completeVehicleData_t availableVehicles[] =
 	{0,0,0,0},					// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
     },
+
+
+    {	"F-14 Tomcat (AG)",		    // descriptiveName
+	"F-14",						// tinyName
+	"f-14",						// modelName
+	SHADOW_DEFAULT,				// alpha shadow
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_2,
+	CAT_PLANE,
+	CLASS_PLANE_FIGHTER,
+	0,							// flags
+	HC_GEAR|HC_SPEEDBRAKE|
+	HC_VAPOR|HC_SWINGWING,		// capabilities
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
+	{60, 80, 200},				// turnspeed around the three axis
+	{0, 100, 70},				// camera distance {min,max,default}
+	{0, 100, 20},				// camera height {min,max,default}
+	220,						// stallspeed
+	840,						// maxspeed
+	0,							// min throttle
+	15,							// max throttle
+	2,							// engines
+	0,							// wheels
+	0,							// wheel circumference
+	260,						// acceleration
+	150,						// health
+	{37.8f,2.4f,-1.3f},			// gun tag
+	70,							// max fuel
+	0,							// gearheight - SET AUTOMATICALLY
+	0,							// tailangle
+	WI_MG_20MM, WI_SIDEWINDER, WI_SPARROW, WI_MAVERICK, WI_MK83R, WI_ECM, 0, WI_FLARE,	// weapons
+	450, 2, 1, 1, 4, 1, 0, 35,		// ammo
+	0,0,0,0,0,0,0,0,			// turret
+	{28, 0, 6},					// cameraposition for cockpit view
+	AB_RED,						// effect model
+	20000,						// radar range
+	5500,						// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
+	50,							// swingangle
+	1400,						// geartime
+	0,							// max gear frame
+	1000,						// baytime
+	0,							// max bay frame
+	MFR_DUALPILOT|MFR_BIGVAPOR,	// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
+    },
+
 
     {	"F-18 Hornet",		    // descriptiveName
 	"F-18",						// tinyName
@@ -583,8 +1041,8 @@ completeVehicleData_t availableVehicles[] =
 	60,							// max fuel
 	0,							// gearheight - SET AUTOMATICALLY
 	0,							// tailangle
-	WI_MG_20MM, WI_FFAR, WI_MK82, WI_SIDEWINDER, WI_AMRAAM, WI_PHOENIX, WI_HELLFIRE, WI_FLARE,	// weapons
-	450, 24, 8, 4, 4, 4, 8, 30,		// ammo
+	WI_MG_20MM, WI_FFAR_SMALL, WI_MK82R, WI_SIDEWINDER, WI_AMRAAM, WI_MAVERICK, 0, WI_FLARE,	// weapons
+	450, 8, 4, 2, 2, 5, 0, 30,		// ammo
 	0,0,0,0,0,0,0,0,			// turret
 	{19, 0, 5},					// cameraposition for cockpit view
 	AB_BALL,					// effect model
@@ -601,6 +1059,160 @@ completeVehicleData_t availableVehicles[] =
 	{8,0,42,42},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
     },
+
+
+
+    {	"F-18 Hornet (AA MAX)",		    // descriptiveName
+	"F-18",						// tinyName
+	"f-18",						// modelName
+	SHADOW_DEFAULT,				// alpha shadow
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_1,
+	CAT_PLANE,
+	CLASS_PLANE_FIGHTER,
+	0,							// flags
+	HC_GEAR|HC_SPEEDBRAKE|
+	HC_VAPOR,					// capabilities
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
+	{80, 80, 260},				// turnspeed around the three axis
+	{0, 100, 70},				// camera distance {min,max,default}
+	{0, 100, 20},				// camera height {min,max,default}
+	200,						// stallspeed
+	720,						// maxspeed
+	0,							// min throttle
+	15,							// max throttle
+	2,							// engines
+	0,							// wheels
+	0,							// wheel circumference
+	260,						// acceleration
+	130,						// health
+	{40.3f, 0, 0.478f},			// gun tag
+	60,							// max fuel
+	0,							// gearheight - SET AUTOMATICALLY
+	0,							// tailangle
+	WI_MG_20MM, WI_SIDEWINDER, WI_AMRAAM, 0, 0, 0, 0, WI_FLARE,	// weapons
+	450, 2, 14, 0, 0, 0, 0, 30,		// ammo
+	0,0,0,0,0,0,0,0,			// turret
+	{19, 0, 5},					// cameraposition for cockpit view
+	AB_BALL,					// effect model
+	11000,						// radar range
+	8500,						// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
+	0,							// swingangle
+	1400,						// geartime
+	0,							// max gear frame
+	1000,						// baytime
+	0,							// max bay frame
+	0,							// renderflags
+	{8,0,42,42},				// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
+    },
+
+
+
+
+    {	"F-18 Hornet (Weasel)",		    // descriptiveName
+	"F-18",						// tinyName
+	"f-18",						// modelName
+	SHADOW_DEFAULT,				// alpha shadow
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_1,
+	CAT_PLANE,
+	CLASS_PLANE_FIGHTER,
+	0,							// flags
+	HC_GEAR|HC_SPEEDBRAKE|
+	HC_VAPOR,					// capabilities
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
+	{80, 80, 260},				// turnspeed around the three axis
+	{0, 100, 70},				// camera distance {min,max,default}
+	{0, 100, 20},				// camera height {min,max,default}
+	200,						// stallspeed
+	720,						// maxspeed
+	0,							// min throttle
+	15,							// max throttle
+	2,							// engines
+	0,							// wheels
+	0,							// wheel circumference
+	260,						// acceleration
+	130,						// health
+	{40.3f, 0, 0.478f},			// gun tag
+	60,							// max fuel
+	0,							// gearheight - SET AUTOMATICALLY
+	0,							// tailangle
+	WI_MG_20MM, WI_SIDEWINDER, WI_AMRAAM, WI_HARM, WI_ECM, 0, 0, WI_FLARE,	// weapons
+	450, 2, 4, 4, 1, 0, 0, 30,		// ammo
+	0,0,0,0,0,0,0,0,			// turret
+	{19, 0, 5},					// cameraposition for cockpit view
+	AB_BALL,					// effect model
+	11000,						// radar range
+	8500,						// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
+	0,							// swingangle
+	1400,						// geartime
+	0,							// max gear frame
+	1000,						// baytime
+	0,							// max bay frame
+	0,							// renderflags
+	{8,0,42,42},				// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
+    },
+
+
+    {	"F-18 Hornet (ER)",		    // descriptiveName
+	"F-18",						// tinyName
+	"f-18",						// modelName
+	SHADOW_DEFAULT,				// alpha shadow
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_1,
+	CAT_PLANE,
+	CLASS_PLANE_FIGHTER,
+	0,							// flags
+	HC_GEAR|HC_SPEEDBRAKE|
+	HC_VAPOR,					// capabilities
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
+	{80, 80, 260},				// turnspeed around the three axis
+	{0, 100, 70},				// camera distance {min,max,default}
+	{0, 100, 20},				// camera height {min,max,default}
+	200,						// stallspeed
+	720,						// maxspeed
+	0,							// min throttle
+	15,							// max throttle
+	2,							// engines
+	0,							// wheels
+	0,							// wheel circumference
+	260,						// acceleration
+	130,						// health
+	{40.3f, 0, 0.478f},			// gun tag
+	60,							// max fuel
+	0,							// gearheight - SET AUTOMATICALLY
+	0,							// tailangle
+	WI_MG_20MM, WI_SIDEWINDER, WI_AMRAAM, WI_DROPTANK, WI_SPARROW, WI_CM, 0, WI_FLARE,	// weapons
+	450, 2, 6, 2, 2, 1, 0, 30,		// ammo
+	0,0,0,0,0,0,0,0,			// turret
+	{19, 0, 5},					// cameraposition for cockpit view
+	AB_BALL,					// effect model
+	11000,						// radar range
+	8500,						// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
+	0,							// swingangle
+	1400,						// geartime
+	0,							// max gear frame
+	1000,						// baytime
+	0,							// max bay frame
+	0,							// renderflags
+	{8,0,42,42},				// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
+    },
+
 
     {	"F-22 Raptor",		    // descriptiveName
 	"F-22",						// tinyName
@@ -632,8 +1244,8 @@ completeVehicleData_t availableVehicles[] =
 	60,							// max fuel
 	0,							// gearheight - SET AUTOMATICALLY
 	0,							// tailangle
-	WI_MG_20MM, WI_FFAR, WI_MK82, WI_SIDEWINDER, WI_AMRAAM, WI_PHOENIX, WI_HELLFIRE, WI_FLARE,	// weapons
-	450, 24, 8, 4, 4, 4, 8, 30,		// ammo
+	WI_MG_20MM, WI_SIDEWINDER, WI_AMRAAM, WI_MAVERICK, 0, 0, 0, WI_FLARE,	// weapons
+	450, 2, 4, 2, 0, 0, 0, 30,		// ammo
 	0,0,0,0,0,0,0,0,			// turret
 	{19, 0, 5},					// cameraposition for cockpit view
 	AB_BALL,					// effect model
@@ -657,12 +1269,12 @@ completeVehicleData_t availableVehicles[] =
 	"yf-23",					// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_1,
+	MF_TEAM_2,
 	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
-	HC_VAPOR,					// capabilities
+	HC_VAPOR|HC_WEAPONBAY,			// capabilities
 	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
@@ -701,6 +1313,57 @@ completeVehicleData_t availableVehicles[] =
 	{0,0,0,0}					// shadow orientation adjusters
     },
 
+
+    {	"SU-27 TEST",			    // descriptiveName
+	"SU-27",					// tinyName
+	"su-27",					// modelName
+	SHADOW_DEFAULT,				// alpha shadow
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_2,
+	CAT_PLANE,
+	CLASS_PLANE_FIGHTER,
+	0,							// flags
+	HC_GEAR|HC_SPEEDBRAKE|
+	HC_VAPOR,			// capabilities
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
+	{60, 80, 200},				// turnspeed around the three axis
+	{0, 100, 70},				// camera distance {min,max,default}
+	{0, 100, 20},				// camera height {min,max,default}
+	220,						// stallspeed
+	880,						// maxspeed
+	0,							// min throttle
+	15,							// max throttle
+	2,							// engines
+	0,							// wheels
+	0,							// wheel circumference
+	260,						// acceleration
+	150,						// health
+	{19.1f,7.87f,-0.112f},		// gun tag
+	80,							// max fuel
+	0,							// gearheight - SET AUTOMATICALLY
+	0,							// tailangle
+	WI_MG_20MM, WI_AMRAAM, WI_SIDEWINDER, 0, 0, 0, 0, WI_FLARE,	// weapons
+	450, 4, 4, 0, 0, 0, 0, 35,		// ammo
+	0,0,0,0,0,0,0,0,			// turret
+	{28, 0, 6},					// cameraposition for cockpit view
+	AB_RED,						// effect model
+	11000,						// radar range
+	6000,						// radar range ground
+	0,							// trackcone
+	-1,							// trackcone ground
+	0,							// swingangle
+	1400,						// geartime
+	0,							// max gear frame
+	1000,						// baytime
+	0,							// max bay frame
+	0,							// renderflags
+	{6,0,48,34},				// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
+    },
+
+
     {	"B-2 Spirit",		    // descriptiveName
 	"B-2",						// tinyName
 	"b-2",						// modelName
@@ -731,8 +1394,8 @@ completeVehicleData_t availableVehicles[] =
 	60,							// max fuel
 	0,							// gearheight - SET AUTOMATICALLY
 	0,							// tailangle
-	WI_MG_20MM, WI_MK82, WI_MAVERICK, 0, 0, 0, 0, WI_FLARE,	// weapons
-	450, 16, 4, 0, 0, 0, 0, 30,		// ammo
+	WI_MG_20MM, WI_MK83, 0, 0, 0, 0, 0, WI_FLARE,	// weapons
+	450, 32, 0, 0, 0, 0, 0, 30,		// ammo
 	0,0,0,0,0,0,0,0,			// turret
 	{19, 0, 5},					// cameraposition for cockpit view
 	AB_BALL,					// effect model

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_weapondata.c,v 1.22 2002-07-15 18:23:07 thebjoern Exp $
+ * $Id: bg_weapondata.c,v 1.23 2003-01-11 13:08:51 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -514,7 +514,7 @@ completeWeaponData_t availableWeapons[] =
 		19,									// number per package
 		CAT_PLANE|CAT_HELO,					// fits on category
 		PF_FFAR,							// fits on pylon
-		0,									// flags
+		WF_HAS_FIRE_FRAME,					// flags
 	},
 
 	// FFAR
@@ -553,8 +553,49 @@ completeWeaponData_t availableWeapons[] =
 		7,									// number per package
 		CAT_PLANE|CAT_HELO,					// fits on category
 		PF_FFAR,							// fits on pylon
-		0,									// flags
+		WF_HAS_FIRE_FRAME,					// flags
 	},
+
+
+	// FFAR
+	{ 
+		WT_ROCKET,							// type
+		MF_GAMESET_ANY,						// gameset
+		"FFAR+ (6)",						// descriptiveName
+		"FFAR+",							// shortName
+		"FFAR+",							// shortName2 (GVs)
+		"models/weapons/vwep_rocket_hv.md3",// modelName
+		0,									// handle
+		"models/weapons/vwep_ffar_hv.md3",	// vwepName
+		0,									// vwephandle
+		"hud/iconw_rkt.tga",				// iconName
+		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
+		1500,								// muzzleVelocity
+		0,									// range
+		8000,								// fuelrange
+		200,								// fire interval
+		80, 								// damage
+		80,									// damageRadius
+		1,									// spread
+		2,									// barrels
+		0,									// barrelDistance
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_ROCKETMODE,						// crosshair
+		CH_ROCKETMODE,						// crosshair track
+		CH_ROCKETMODE,						// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
+		6,									// number per package
+		CAT_PLANE|CAT_HELO,					// fits on category
+		PF_FFAR,							// fits on pylon  !! PF_FFAR&PF_AG_HVY !!
+		WF_HAS_FIRE_FRAME,					// flags
+	},
+
 
 	// tank gun
 	{ 
@@ -654,7 +695,7 @@ completeWeaponData_t availableWeapons[] =
 		0,									// fuelrange
 		200,								// fire interval
 		100,								// damage
-		100,								// damageRadius
+		150,								// damageRadius
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
@@ -672,6 +713,47 @@ completeWeaponData_t availableWeapons[] =
 		PF_AG_LT,							// fits on pylon
 		0,									// flags
 	},
+
+
+	// iron bombs
+	{ 
+		WT_IRONBOMB,						// type
+		MF_GAMESET_ANY,						// gameset
+		"Mk82 R",							// descriptiveName
+		"MK-82 R",							// shortName
+		"BAD SHIT R",						// shortName2 (GVs)
+		"models/weapons/vwep_500.md3",		// modelName
+		0,									// handle
+		"models/weapons/vwep_500.md3",		// vwepName
+		0,									// vwephandle
+		"hud/iconw_bmb.tga",				// iconName
+		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
+		0,									// muzzleVelocity
+		0,									// range
+		0,									// fuelrange
+		200,								// fire interval
+		100,								// damage
+		150,								// damageRadius
+		1,									// spread
+		2,									// barrels
+		0,									// barrelDistance
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_BOMBMODE,						// crosshair
+		CH_BOMBMODE,						// crosshair track
+		CH_BOMBMODE,						// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
+		1,									// number per package
+		CAT_PLANE,							// fits on category
+		PF_AG_LT,							// fits on pylon
+		WF_HAS_FIRE_FRAME,					// flags
+	},
+
 
 	// iron bombs
 	{ 
@@ -692,8 +774,8 @@ completeWeaponData_t availableWeapons[] =
 		0,									// range
 		0,									// fuelrange
 		200,								// fire interval
-		170,								// damage
-		100,								// damageRadius
+		150,								// damage
+		200,								// damageRadius
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
@@ -708,9 +790,51 @@ completeWeaponData_t availableWeapons[] =
 		{0,0,0},							// min turret angles
 		1,									// number per package
 		CAT_PLANE,							// fits on category
-		PF_AG_LT,							// fits on pylon
+		PF_AG_MED,							// fits on pylon
 		0,									// flags
 	},
+
+
+	// iron bombs
+	{ 
+		WT_IRONBOMB,						// type
+		MF_GAMESET_ANY,						// gameset
+		"Mk83 R",								// descriptiveName
+		"MK-83 R",							// shortName
+		"BAD SHIT",							// shortName2 (GVs)
+		"models/weapons/vwep_1000.md3",		// modelName
+		0,									// handle
+		"models/weapons/vwep_1000.md3",		// vwepName
+		0,									// vwephandle
+		"hud/iconw_bmb.tga",				// iconName
+		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
+		0,									// muzzleVelocity
+		0,									// range
+		0,									// fuelrange
+		200,								// fire interval
+		150,								// damage
+		200,								// damageRadius
+		1,									// spread
+		2,									// barrels
+		0,									// barrelDistance
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_BOMBMODE,						// crosshair
+		CH_BOMBMODE,						// crosshair track
+		CH_BOMBMODE,						// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
+		1,									// number per package
+		CAT_PLANE,							// fits on category
+		PF_AG_MED,							// fits on pylon
+		WF_HAS_FIRE_FRAME,					// flags
+	},
+
+
 
 	// iron bombs
 	{ 
@@ -732,7 +856,7 @@ completeWeaponData_t availableWeapons[] =
 		0,									// fuelrange
 		200,								// fire interval
 		250,								// damage
-		150,								// damageRadius
+		250,								// damageRadius
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
@@ -753,7 +877,7 @@ completeWeaponData_t availableWeapons[] =
 
 	// gbu15
 	{ 
-		WT_IRONBOMB,						// type
+		WT_ANTIGROUNDMISSILE,						// type
 		MF_GAMESET_ANY,						// gameset
 		"GBU-15",							// descriptiveName
 		"GBU-15",							// shortName
@@ -786,7 +910,7 @@ completeWeaponData_t availableWeapons[] =
 		{0,0,0},							// min turret angles
 		1,									// number per package
 		CAT_PLANE,							// fits on category
-		PF_AG_MED,							// fits on pylon
+		PF_AG_HVY,							// fits on pylon  !! PF_AG_HVY&PF_AG_GDA !!
 		WF_HAS_FIRE_FRAME,					// flags
 	},
 
@@ -808,9 +932,9 @@ completeWeaponData_t availableWeapons[] =
 		1000,								// muzzleVelocity
 		8000,								// range
 		5000,								// fuelrange
-		500,								// fire interval
-		400,								// damage
-		50,									// damageRadius
+		300,								// fire interval
+		600,								// damage
+		30,									// damageRadius
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
@@ -844,12 +968,12 @@ completeWeaponData_t availableWeapons[] =
 		0,									// iconHandle
 		CAT_PLANE|CAT_HELO,					// cat
 		0.3f,								// non cat mod
-		1400,								// muzzleVelocity
-		5000,								// range
+		1000,								// muzzleVelocity
+		2500,								// range
 		8000,								// fuelrange
-		500,								// fire interval
-		100,								// damage
-		50,									// damageRadius
+		400,								// fire interval
+		80,									// damage
+		40,									// damageRadius
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
@@ -883,12 +1007,12 @@ completeWeaponData_t availableWeapons[] =
 		0,									// iconHandle
 		CAT_PLANE|CAT_HELO,					// cat
 		0.3f,								// non cat mod
-		1800,								// muzzleVelocity
-		10000,								// range
+		1500,								// muzzleVelocity
+		5000,								// range
 		8000,								// fuelrange
-		500,								// fire interval
+		600,								// fire interval
 		100,								// damage
-		50,									// damageRadius
+		60,									// damageRadius
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
@@ -922,12 +1046,12 @@ completeWeaponData_t availableWeapons[] =
 		0,									// iconHandle
 		CAT_PLANE|CAT_HELO,					// cat
 		0.3f,								// non cat mod
-		1600,								// muzzleVelocity
-		8000,								// range
+		2200,								// muzzleVelocity
+		10000,								// range
 		8000,								// fuelrange
-		500,								// fire interval
-		100,								// damage
-		50,									// damageRadius
+		900,								// fire interval
+		120,								// damage
+		90,									// damageRadius
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
@@ -961,18 +1085,18 @@ completeWeaponData_t availableWeapons[] =
 		0,									// iconHandle
 		CAT_PLANE|CAT_HELO,					// cat
 		0.3f,								// non cat mod
-		2500,								// muzzleVelocity
-		14000,								// range
+		3300,								// muzzleVelocity
+		20000,								// range
 		8000,								// fuelrange
-		500,								// fire interval
-		120,								// damage
-		50,									// damageRadius
+		1200,								// fire interval
+		150,								// damage
+		120,								// damageRadius
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
 		0.985f,								// lockcone (dot)
 		0.996f,								// followcone (dot)
-		1500,								// locktime
+		3000,								// locktime
 		CH_MISSILEMODE,						// crosshair
 		CH_MISSILEMODETRACK,				// crosshair track
 		CH_MISSILEMODELOCK,					// crosshair lock
@@ -992,15 +1116,15 @@ completeWeaponData_t availableWeapons[] =
 		"Stinger",							// descriptiveName
 		"SR-AAM",							// shortName
 		"SR-SAM",							// shortName2 (GVs)
-		"models/weapons/vwep_sidewinder.md3",// modelName
+		"models/weapons/vwep_stinger.md3",// modelName
 		0,									// handle
-		"models/weapons/vwep_sidewinder.md3",// vwepName
+		"models/weapons/vwep_stinger.md3",// vwepName
 		0,									// vwephandle
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
 		CAT_ANY,							// cat
 		0.3f,								// non cat mod
-		1300,								// muzzleVelocity
+		1500,								// muzzleVelocity
 		8000,								// range
 		8000,								// fuelrange
 		1500,								// fire interval
@@ -1148,9 +1272,9 @@ completeWeaponData_t availableWeapons[] =
 		"Hellfire",							// descriptiveName
 		"AGM",								// shortName
 		"SSM",								// shortName2 (GVs)
-		"models/weapons/vwep_sidewinder.md3",// modelName
+		"models/weapons/vwep_hellfire.md3",// modelName
 		0,									// handle
-		"models/weapons/vwep_sidewinder.md3",// vwepName
+		"models/weapons/vwep_hellfire.md3",// vwepName
 		0,									// vwephandle
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
@@ -1172,8 +1296,10 @@ completeWeaponData_t availableWeapons[] =
 		CH_MISSILEMODETRACK,				// crosshair track
 		CH_MISSILEMODELOCK,					// crosshair lock
 		0,									// turret
-		{5,180,0},							// max turret angles
-		{-40,-180,0},							// min turret angles
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
+//		{5,180,0},							// max turret angles
+//		{-40,-180,0},						// min turret angles
 		1,									// number per package
 		CAT_HELO|CAT_GROUND|CAT_BOAT,		// fits on category
 		PF_AG_MED,							// fits on pylon
@@ -1215,7 +1341,7 @@ completeWeaponData_t availableWeapons[] =
 		{0,0,0},							// min turret angles
 		1,									// number per package
 		CAT_PLANE,							// fits on category
-		PF_AG_MED,							// fits on pylon
+		PF_AG_MED,							// fits on pylon  !! PF_AG_MED&PF_AG_GDA !!
 		WF_HAS_FIRE_FRAME,					// flags
 	},
 
@@ -1254,7 +1380,7 @@ completeWeaponData_t availableWeapons[] =
 		{0,0,0},							// min turret angles
 		1,									// number per package
 		CAT_PLANE,							// fits on category
-		PF_AG_MED,							// fits on pylon
+		PF_HARM,							// fits on pylon
 		WF_HAS_FIRE_FRAME,					// flags
 	},
 
@@ -1277,8 +1403,8 @@ completeWeaponData_t availableWeapons[] =
 		0,									// range
 		0,									// fuelrange
 		200,								// fire interval
-		100,								// damage
-		100,								// damageRadius
+		10,									// damage
+		10,									// damageRadius
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
@@ -1293,9 +1419,90 @@ completeWeaponData_t availableWeapons[] =
 		{0,0,0},							// min turret angles
 		200,								// number per package
 		CAT_PLANE,							// fits on category
-		PF_AG_LT,							// fits on pylon
+		PF_JAMMER,							// fits on pylon
 		0,									// flags
 	},
+
+
+	// LASE
+	{ 
+		WT_IRONBOMB,						// type
+		MF_GAMESET_ANY,						// gameset
+		"LASER DESIGNATOR",								// descriptiveName
+		"LASE",								// shortName
+		"BAD SHIT",							// shortName2 (GVs)
+		"models/weapons/vwep_ir.md3",		// modelName
+		0,									// handle
+		"models/weapons/vwep_ir.md3",		// vwepName
+		0,									// vwephandle
+		"hud/iconw_bmb.tga",				// iconName
+		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
+		0,									// muzzleVelocity
+		0,									// range
+		0,									// fuelrange
+		200,								// fire interval
+		10,									// damage
+		10,									// damageRadius
+		1,									// spread
+		2,									// barrels
+		0,									// barrelDistance
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_BOMBMODE,						// crosshair
+		CH_BOMBMODE,						// crosshair track
+		CH_BOMBMODE,						// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
+		200,								// number per package
+		CAT_PLANE,							// fits on category
+		PF_JAMMER,							// fits on pylon
+		0,									// flags
+	},
+
+
+	// FLARECHAFF
+	{ 
+		WT_IRONBOMB,						// type
+		MF_GAMESET_ANY,						// gameset
+		"COUNTERMEASURE POD",				// descriptiveName
+		"CM POD",							// shortName
+		"BAD SHIT",							// shortName2 (GVs)
+		"models/weapons/vwep_flarechaff.md3",	// modelName
+		0,									// handle
+		"models/weapons/vwep_flarechaff.md3",	// vwepName
+		0,									// vwephandle
+		"hud/iconw_bmb.tga",				// iconName
+		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
+		0,									// muzzleVelocity
+		0,									// range
+		0,									// fuelrange
+		200,								// fire interval
+		10,									// damage
+		10,									// damageRadius
+		1,									// spread
+		2,									// barrels
+		0,									// barrelDistance
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_BOMBMODE,						// crosshair
+		CH_BOMBMODE,						// crosshair track
+		CH_BOMBMODE,						// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
+		200,								// number per package
+		CAT_PLANE,							// fits on category
+		PF_JAMMER,							// fits on pylon
+		0,									// flags
+	},
+
 
 	// droptank
 	{ 
@@ -1316,8 +1523,8 @@ completeWeaponData_t availableWeapons[] =
 		0,									// range
 		0,									// fuelrange
 		200,								// fire interval
-		100,								// damage
-		100,								// damageRadius
+		50,								// damage
+		150,								// damageRadius
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
@@ -1330,9 +1537,9 @@ completeWeaponData_t availableWeapons[] =
 		0,									// turret
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
-		300,								// number per package
+		200,								// number per package
 		CAT_PLANE,							// fits on category
-		PF_AG_LT,							// fits on pylon
+		PF_TANK_HVY,						// fits on pylon
 		0,									// flags
 	},
 
@@ -1355,7 +1562,7 @@ completeWeaponData_t availableWeapons[] =
 		0,									// range
 		0,									// fuelrange
 		200,								// fire interval
-		100,								// damage
+		25,								// damage
 		100,								// damageRadius
 		1,									// spread
 		2,									// barrels
@@ -1369,9 +1576,9 @@ completeWeaponData_t availableWeapons[] =
 		0,									// turret
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
-		150,								// number per package
+		100,								// number per package
 		CAT_PLANE,							// fits on category
-		PF_AG_LT,							// fits on pylon
+		PF_TANK_LT,							// fits on pylon
 		0,									// flags
 	},
 

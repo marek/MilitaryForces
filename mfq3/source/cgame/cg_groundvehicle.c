@@ -1,5 +1,5 @@
 /*
- * $Id: cg_groundvehicle.c,v 1.19 2002-07-15 18:23:07 thebjoern Exp $
+ * $Id: cg_groundvehicle.c,v 1.20 2003-01-11 13:08:50 thebjoern Exp $
 */
 
 
@@ -181,7 +181,7 @@ void CG_GroundVehicle( centity_t *cent, clientInfo_t *ci )
 			vectoangles( forward, ang );
 			AnglesToAxis( ang, reticle.axis );
 			VectorMA( cent->lerpOrigin, 2000, forward, end );
-			CG_Trace( &tr, cent->lerpOrigin, 0, 0, end, cg.snap->ps.clientNum, MASK_ALL ); 
+			CG_Trace( &tr, cent->lerpOrigin, 0, 0, end, cg.snap->ps.clientNum, MASK_SOLID ); 
 			
 			if( tr.entityNum < MAX_CLIENTS )
 			{
@@ -240,7 +240,7 @@ void CG_GroundVehicle( centity_t *cent, clientInfo_t *ci )
 				VectorScale( reticlelock.axis[1], 10.0f, reticlelock.axis[1] );
 				VectorScale( reticlelock.axis[2], 10.0f, reticlelock.axis[2] );
 				reticlelock.nonNormalizedAxes = qtrue;
-				CG_Trace( &tr, start, 0, 0, end, cg.snap->ps.clientNum, MASK_ALL ); 
+				CG_Trace( &tr, start, 0, 0, end, cg.snap->ps.clientNum, MASK_SOLID ); 
 				VectorCopy( tr.endpos, end );
 				CG_Trace( &tr, cg.refdef.vieworg, 0, 0, end, cg.snap->ps.clientNum, MASK_SOLID ); 
 				VectorSubtract( tr.endpos, cg.refdef.vieworg, forward );
@@ -277,7 +277,7 @@ void CG_GroundVehicle( centity_t *cent, clientInfo_t *ci )
 			vectoangles( forward, ang );
 			ang[2] = 0;
 			AnglesToAxis( ang, reticle.axis );
-			CG_Trace( &tr, start, 0, 0, end, cg.snap->ps.clientNum, MASK_ALL ); 
+			CG_Trace( &tr, start, 0, 0, end, cg.snap->ps.clientNum, MASK_SOLID ); 
 
 			if( tr.entityNum < MAX_CLIENTS )
 			{

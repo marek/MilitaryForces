@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicledraw.c,v 1.3 2002-07-15 18:23:07 thebjoern Exp $
+ * $Id: cg_vehicledraw.c,v 1.4 2003-01-11 13:08:50 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -201,6 +201,21 @@ void CG_DrawPlane(DrawInfo_Plane_t* drawInfo)
 				drawInfo->basicInfo.loadout->mounts[i].num ) {
 				memset( &vwep, 0, sizeof(vwep) );		
 				vwep.hModel = availableWeapons[drawInfo->basicInfo.loadout->mounts[i].weapon].vwepHandle;
+
+			//	scheherazade +
+			//	This was an experiment wiht frames. i didnt complete it because i'd either
+			//	have to add info into the draw info, or add parameters to pull in the ammo data,
+			//	which i dont want to do because i dont know if you have a way you'd go about it that you like more, etc.
+			//	if ( availableWeapons[drawInfo->basicInfo.loadout->mounts[i].weapon].type == WT_ROCKET )
+			//	{
+			//		if(drawInfo->basicInfo.loadout->mounts[i].num <= availableWeapons[drawInfo->basicInfo.loadout->mounts[i].weapon].numberPerPackage)
+			//		vwep.frame = ( availableWeapons[drawInfo->basicInfo.loadout->mounts[i].weapon].numberPerPackage - drawInfo->basicInfo.loadout->mounts[i].num );
+			//		Mental Note, num does not contain the remailing Number-In-Package, maybe it should so as to make this change easier.
+			//		vwep.frame = ( availableWeapons[drawInfo->basicInfo.loadout->mounts[i].weapon].numberPerPackage - ammo[(drawInfo->basicInfo.loadout->mounts[i].weapon)] );
+			//		vwep.frame = max_Ammo_per_ffar_pack - Ammo_left_in_ffar_pack
+			//	}
+			//	scheherazade -
+
 				VectorCopy( drawInfo->basicInfo.origin, vwep.lightingOrigin );
 				AxisCopy( axisDefault, vwep.axis );
 				CG_PositionEntityOnTag( &vwep, &part[BP_PLANE_BODY], veh->handle[BP_PLANE_BODY], 

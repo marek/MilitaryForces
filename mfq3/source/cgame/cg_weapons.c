@@ -1,5 +1,5 @@
 /*
- * $Id: cg_weapons.c,v 1.22 2002-07-15 18:23:07 thebjoern Exp $
+ * $Id: cg_weapons.c,v 1.23 2003-01-11 13:08:50 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -451,6 +451,7 @@ void CG_MissileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_t di
 	default:
 	case WI_FFAR:
 	case WI_FFAR_SMALL:
+	case WI_FFAR_LARGE:
 	case WI_SIDEWINDER:
 	case WI_SPARROW:
 	case WI_AMRAAM:
@@ -476,11 +477,15 @@ void CG_MissileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_t di
 		break;
 
 	case WI_MK82:
+	case WI_MK82R:
 	case WI_MK83:
+	case WI_MK83R:
 	case WI_MK84:
 	case WI_GBU15:
 	case WI_DURANDAL:
 	case WI_ECM:
+	case WI_LASE:
+	case WI_CM:
 	case WI_DROPTANK:
 	case WI_DROPTANK_SMALL:
 		mod = cgs.media.dishFlashModel;
