@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.82 2002-02-27 23:11:18 thebjoern Exp $
+ * $Id: bg_public.h,v 1.83 2002-02-28 10:24:27 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -611,8 +611,9 @@ typedef struct md3Tag_s {
 #define	CLASS_BOAT_MAX				  0x0002
 
 
-// strings for categories and classes
+// strings for categories and classes etc..
 extern const char *gameset_items[MF_MAX_GAMESETS+1];
+extern const char *gameset_codes[MF_MAX_GAMESETS+1];
 extern const char *team_items[MF_MAX_GAMESETS][MF_MAX_TEAMS+1];
 extern const char *cat_fileRef[MF_MAX_CATEGORIES+1];
 extern const char *cat_items[MF_MAX_CATEGORIES+1];

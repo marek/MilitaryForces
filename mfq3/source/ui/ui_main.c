@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.25 2002-02-27 23:11:18 thebjoern Exp $
+ * $Id: ui_main.c,v 1.26 2002-02-28 10:23:32 sparky909_uk Exp $
 */
 /*
 =======================================================================
@@ -1112,6 +1112,13 @@ static void UI_DrawNetGameType(rectDef_t *rect, float scale, vec4_t color, int t
   Text_Paint(rect->x, rect->y, scale, color, uiInfo.gameTypes[ui_netGameType.integer].gameType , 0, 0, textStyle);
 }
 
+static void UI_DrawNetGameset(rectDef_t *rect, float scale, vec4_t color, int textStyle) {
+	if (ui_netGameset.integer < 0 || ui_netGameset.integer > numGamesets) {
+		trap_Cvar_Set("ui_netGameset", "0");
+	}
+  Text_Paint(rect->x, rect->y, scale, color, gameset_items[ui_netGameset.integer] , 0, 0, textStyle);
+}
+
 static void UI_DrawJoinGameType(rectDef_t *rect, float scale, vec4_t color, int textStyle) {
 	if (ui_joinGameType.integer < 0 || ui_joinGameType.integer > uiInfo.numJoinGameTypes) {
 		trap_Cvar_Set("ui_joinGameType", "0");
@@ -2119,6 +2126,9 @@ static void UI_OwnerDraw(float x, float y, float w, float h, float text_x, float
     case UI_NETGAMETYPE:
       UI_DrawNetGameType(&rect, scale, color, textStyle);
       break;
+    case UI_NETGAMESET:
+      UI_DrawNetGameset(&rect, scale, color, textStyle);
+      break;
     case UI_JOINGAMETYPE:
 	  UI_DrawJoinGameType(&rect, scale, color, textStyle);
 	  break;
@@ -2496,6 +2506,40 @@ static qboolean UI_NetGameType_HandleKey(int flags, float *special, int key) {
   return qfalse;
 }
 
+static qboolean UI_NetGameset_HandleKey(int flags, float *special, int key)
+{
+	// valid action?
+	if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_ENTER || key == K_KP_ENTER)
+	{
+		// cycle up/down through values
+		if (key == K_MOUSE2)
+		{
+			ui_netGameset.integer--;
+		}
+		else
+		{
+			ui_netGameset.integer++;
+		}
+
+		// wrap (both ends)
+		if( ui_netGameset.integer < 0 )
+		{
+			ui_netGameset.integer = numGamesets - 1;
+		}
+		else if (ui_netGameset.integer >= numGamesets )
+		{
+			ui_netGameset.integer = 0;
+		} 
+
+		// re-set the value into cvar
+		trap_Cvar_Set( "ui_netGameset", va("%d", ui_netGameset.integer));
+
+		return qtrue;
+	}
+
+	return qfalse;
+}
+
 static qboolean UI_JoinGameType_HandleKey(int flags, float *special, int key) {
 	if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_ENTER || key == K_KP_ENTER) {
 
@@ -2782,6 +2826,9 @@ static qboolean UI_OwnerDrawHandleKey(int ownerDraw, int flags, float *special, 
       break;
     case UI_NETGAMETYPE:
       return UI_NetGameType_HandleKey(flags, special, key);
+      break;
+    case UI_NETGAMESET:
+      return UI_NetGameset_HandleKey(flags, special, key);
       break;
     case UI_JOINGAMETYPE:
       return UI_JoinGameType_HandleKey(flags, special, key);
@@ -3733,6 +3780,10 @@ static void UI_RunMenuScript(char **args) {
 		} else if (Q_stricmp(name, "voteGame") == 0) {
 			if (ui_netGameType.integer >= 0 && ui_netGameType.integer < uiInfo.numGameTypes) {
 				trap_Cmd_ExecuteText( EXEC_APPEND, va("callvote g_gametype %i\n",uiInfo.gameTypes[ui_netGameType.integer].gtEnum) );
+			}
+		} else if (Q_stricmp(name, "voteSet") == 0) {
+			if (ui_netGameset.integer >= 0 && ui_netGameset.integer < numGamesets) {
+				trap_Cmd_ExecuteText( EXEC_APPEND, va("callvote mf_gameset %s\n",gameset_codes[ui_netGameset.integer]) );
 			}
 		} else if (Q_stricmp(name, "voteLeader") == 0) {
 			if (uiInfo.teamIndex >= 0 && uiInfo.teamIndex < uiInfo.myTeamCount) {
@@ -6385,6 +6436,7 @@ vmCvar_t	ui_teamName;
 vmCvar_t	ui_dedicated;
 vmCvar_t	ui_gameType;
 vmCvar_t	ui_netGameType;
+vmCvar_t	ui_netGameset;
 vmCvar_t	ui_actualNetGameType;
 vmCvar_t	ui_joinGameType;
 vmCvar_t	ui_netSource;
@@ -6531,6 +6583,7 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_gameType, "ui_gametype", "3", CVAR_ARCHIVE },
 	{ &ui_joinGameType, "ui_joinGametype", "0", CVAR_ARCHIVE },
 	{ &ui_netGameType, "ui_netGametype", "3", CVAR_ARCHIVE },
+	{ &ui_netGameset, "ui_netGameset", "0", CVAR_ARCHIVE },
 	{ &ui_actualNetGameType, "ui_actualNetGametype", "3", CVAR_ARCHIVE },
 	{ &ui_redteam1, "ui_redteam1", "0", CVAR_ARCHIVE },
 	{ &ui_redteam2, "ui_redteam2", "0", CVAR_ARCHIVE },
