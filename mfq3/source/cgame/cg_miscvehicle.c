@@ -1,5 +1,5 @@
 /*
- * $Id: cg_miscvehicle.c,v 1.7 2002-02-15 09:58:31 thebjoern Exp $
+ * $Id: cg_miscvehicle.c,v 1.8 2002-02-17 18:10:54 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -158,20 +158,6 @@ static void CG_Misc_Plane( centity_t *cent )
 					availableVehicles[cent->currentState.modelindex].handle[BP_PLANE_BODY], 
 					cent->currentState.modelindex );
 	}
-	// vapor
-/*	if( ONOFF & (OO_VAPOR|OO_VAPOR_BIG) ) {
-		vapor.hModel = (availableVehicles[cent->currentState.modelindex].renderFlags & MFR_BIGVAPOR) ?
-			cgs.media.vaporBig : cgs.media.vapor;
-		vapor.customShader = cgs.media.vaporShader;
-		if( ONOFF & OO_VAPOR ) vapor.frame = 1;
-		VectorCopy( cent->lerpOrigin, vapor.lightingOrigin );
-		AxisCopy( axisDefault, vapor.axis );
-		CG_PositionRotatedEntityOnTag( &vapor, &part[BP_PLANE_BODY], ci->parts[BP_PLANE_BODY], "tag_vapor1" );
-		vapor.shadowPlane = shadowPlane;
-		vapor.renderfx = renderfx;
-		trap_R_AddRefEntityToScene( &vapor );
-//		CG_Printf( "Vapor frame %d\n", vapor.frame );
-	}*/
 	// throttle/afterburner
 	if( cent->currentState.frame > 10 ) {
 		burner.hModel = cgs.media.afterburner[availableVehicles[cent->currentState.modelindex].effectModel];

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.31 2002-02-15 18:10:46 sparky909_uk Exp $
+ * $Id: cg_local.h,v 1.32 2002-02-17 18:10:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -202,6 +202,10 @@ typedef struct centity_s {
 	int				gearAnim;
 	int				gearAnimFrame;
 	int				gearAnimStartTime;
+
+	int				bayAnim;
+	int				bayAnimFrame;
+	int				bayAnimStartTime;
 
 } centity_t;
 

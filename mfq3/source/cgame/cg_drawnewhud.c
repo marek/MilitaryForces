@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.21 2002-02-15 18:10:45 sparky909_uk Exp $
+ * $Id: cg_drawnewhud.c,v 1.22 2002-02-17 18:10:54 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -1045,7 +1045,7 @@ static void CG_Draw_MFD(int mfdnum, int vehicle, centity_t * cent, int targetran
 		CG_DrawString_MFQ3( x+4, y+40, "BRAKES:", HUDColors[cg.MFDColor], 0);
 		CG_DrawString_MFQ3_R( x+122, y+40, (onoff & OO_SPEEDBRAKE ? "ON" : "OFF"), HUDColors[cg.MFDColor], 0);
 		CG_DrawString_MFQ3( x+4, y+50, "WPNBAYS:", HUDColors[cg.MFDColor], 0);
-		CG_DrawString_MFQ3_R( x+122, y+50, "O/S", HUDColors[cg.MFDColor], 0);
+		CG_DrawString_MFQ3_R( x+122, y+50, (onoff & OO_WEAPONBAY ? "OPEN" : "CLSD"), HUDColors[cg.MFDColor], 0);
 		CG_DrawString_MFQ3( x+4, y+60, "AUTOPILOT:", HUDColors[cg.MFDColor], 0);
 		CG_DrawString_MFQ3_R( x+122, y+60, "O/S", HUDColors[cg.MFDColor], 0);
 		CG_DrawString_MFQ3( x+4, y+80, "FUEL:", HUDColors[cg.MFDColor], 0);

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_planemove.c,v 1.6 2002-02-10 19:18:19 thebjoern Exp $
+ * $Id: bg_planemove.c,v 1.7 2002-02-17 18:10:54 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -74,6 +74,39 @@ void PM_Toggle_Gear()
 	}
 	pm->ps->timers[TIMER_GEAR] = pm->cmd.serverTime + availableVehicles[pm->vehicle].gearTime + 100;
 }
+
+
+
+/*
+===================
+PM_Toggle_Bay
+
+===================
+*/
+void PM_Toggle_Bay()
+{
+	if( !(availableVehicles[pm->vehicle].caps & HC_WEAPONBAY) ) {
+		return;
+	}
+
+	if( pm->cmd.serverTime < pm->ps->timers[TIMER_BAY] && pm->ps->timers[TIMER_BAYANIM] ) {
+		return;
+	}
+
+	if( pm->ps->ONOFF & OO_WEAPONBAY ) {
+		PM_AddEvent( EV_BAY_UP );
+		pm->ps->timers[TIMER_BAYANIM] = pm->cmd.serverTime + availableVehicles[pm->vehicle].bayTime;
+//		pm->ps->ONOFF &= ~OO_GEAR;
+	}
+	else {
+		PM_AddEvent( EV_BAY_DOWN );
+		pm->ps->timers[TIMER_BAYANIM] = pm->cmd.serverTime + availableVehicles[pm->vehicle].bayTime;
+//		pm->ps->ONOFF |= OO_GEAR;
+	}
+	pm->ps->timers[TIMER_BAY] = pm->cmd.serverTime + availableVehicles[pm->vehicle].bayTime + 100;
+	pm->ps->timers[TIMER_BAYCLOSE] = 0;
+}
+
 
 /*
 ===================
@@ -200,12 +233,13 @@ void PM_PlaneMove( void )
 	if( verydead ) return;
 
 	// clear FX
-	pm->ps->ONOFF &= ~(OO_VAPOR|OO_VAPOR_BIG);
+	pm->ps->ONOFF &= ~OO_VAPOR;
 
 	// gear
 	if( !dead && (pm->cmd.buttons & BUTTON_GEAR) ) {
 		PM_Toggle_Gear();
 	}
+
 	// gearanim
 	if( !dead && pm->ps->timers[TIMER_GEARANIM] &&
 		pm->cmd.serverTime >= pm->ps->timers[TIMER_GEARANIM] ) {
@@ -226,6 +260,43 @@ void PM_PlaneMove( void )
 		}
 		pm->updateGear = qfalse;
 	}
+
+	// bay
+	if( !dead && (pm->cmd.buttons & BUTTON_WEAPONBAY) ) {
+		PM_Toggle_Bay();
+	}
+
+	// bayanim
+	if( !dead ) {
+		if( pm->ps->timers[TIMER_BAYANIM] ) {
+			if( pm->cmd.serverTime >= pm->ps->timers[TIMER_BAYANIM] ) {
+				pm->ps->timers[TIMER_BAYANIM] = 0;
+				if( pm->ps->ONOFF & OO_WEAPONBAY ) {
+					pm->ps->ONOFF &= ~OO_WEAPONBAY;
+				} else {
+					pm->ps->ONOFF |= OO_WEAPONBAY;
+					pm->ps->timers[TIMER_BAYCLOSE] = pm->cmd.serverTime + 5000;
+				}
+			}
+		} else {
+			if( pm->ps->timers[TIMER_BAYCLOSE] && 
+				pm->cmd.serverTime >= pm->ps->timers[TIMER_BAYCLOSE] ) {
+				PM_Toggle_Bay();
+			}
+		}
+	}
+
+	// update bay
+	if( pm->updateBay ) {
+		// sync anim
+		if( pm->ps->ONOFF & OO_WEAPONBAY ) {
+			PM_AddEvent( EV_BAY_DOWN_FULL );
+		} else {
+			PM_AddEvent( EV_BAY_UP_FULL );
+		}
+		pm->updateBay = qfalse;
+	}
+
 	// brake
 	if( !dead && (pm->cmd.buttons & BUTTON_BRAKE) ) {
 		PM_Plane_Brakes();
@@ -370,17 +441,17 @@ void PM_PlaneMove( void )
 					if( diff[PITCH] < -70 || diff[YAW] > 70 || diff[YAW] < -70 ) {
 						if( speed < availableVehicles[pm->vehicle].stallspeed * SPEED_GREEN_ARC &&
 							speed > availableVehicles[pm->vehicle].stallspeed * SPEED_YELLOW_ARC ) {
-							pm->ps->ONOFF |= OO_VAPOR_BIG;
-							pm->ps->ONOFF &= ~OO_VAPOR;
-						}
-					}
-					else if( diff[PITCH] < -50 || diff[YAW] > 50 || diff[YAW] < -50 ) {
-						if( speed < availableVehicles[pm->vehicle].stallspeed * SPEED_GREEN_ARC &&
-							speed > availableVehicles[pm->vehicle].stallspeed * SPEED_YELLOW_ARC ) {
 							pm->ps->ONOFF |= OO_VAPOR;
-							pm->ps->ONOFF &= ~OO_VAPOR_BIG;
+//							pm->ps->ONOFF &= ~OO_VAPOR;
 						}
 					}
+//					else if( diff[PITCH] < -50 || diff[YAW] > 50 || diff[YAW] < -50 ) {
+//						if( speed < availableVehicles[pm->vehicle].stallspeed * SPEED_GREEN_ARC &&
+//							speed > availableVehicles[pm->vehicle].stallspeed * SPEED_YELLOW_ARC ) {
+//							pm->ps->ONOFF |= OO_VAPOR;
+//							pm->ps->ONOFF &= ~OO_VAPOR_BIG;
+//						}
+//					}
 				}
 			}
 			else if( diff[PITCH] > 8 ) { // down

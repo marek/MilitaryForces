@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.60 2002-02-17 13:26:45 thebjoern Exp $
+ * $Id: bg_public.h,v 1.61 2002-02-17 18:10:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.61"
+#define	GAME_VERSION		"mfq3 v0.61b"
 
 #define	DEFAULT_GRAVITY		800
 
@@ -148,6 +148,7 @@ typedef struct {
 
 	int			vehicle;		// MFQ3
 	qboolean	updateGear;
+	qboolean	updateBay;
 
 	// callbacks to test the world
 	// these will be different functions during game and cgame
@@ -187,7 +188,10 @@ typedef enum {
 	TIMER_GEARANIM,
 	TIMER_BRAKE,
 	TIMER_MACHINEGUN,
-	TIMER_WEAPON
+	TIMER_WEAPON,
+	TIMER_BAY,
+	TIMER_BAYANIM,
+	TIMER_BAYCLOSE
 } timerIndex_t;
 
 // player_state->persistant[] indexes
@@ -315,6 +319,12 @@ typedef enum {
 	EV_GEAR_UP_FULL,		// bring gear up fully
 	EV_GEAR_DOWN_FULL,		// bring gear down fully
 	EV_GEAR_STOP,			// stop gear anim as it is
+
+	EV_BAY_UP,				// start open anim
+	EV_BAY_DOWN,			// start close anim
+	EV_BAY_UP_FULL,			// close fully
+	EV_BAY_DOWN_FULL,		// open fully
+	EV_BAY_STOP,			// stop bay anim as it is
 
 	EV_DEBUG_LINE
 
@@ -724,6 +734,8 @@ typedef struct completeVehicleData_s
 	float			swingangle;		// for swing wings
 	unsigned int	gearTime;		// time it takes gear to operate
 	unsigned int	maxGearFrame;	// number of gear animation frames
+	unsigned int	bayTime;		// time it takes bay to operate
+	unsigned int	maxBayFrame;	// number of bay animation frames
 	unsigned int	renderFlags;	// special stuff for rendering only
 }completeVehicleData_t;
 
@@ -838,6 +850,7 @@ int MF_ExtractEnumFromId( int vehicle, unsigned int op );
 #define HC_SWINGWING			64
 #define HC_AMPHIBIOUS			128
 #define	HC_WHEELS				256	// vehicle has wheels (rather than tracks)
+#define	HC_WEAPONBAY			512
 
 // this is for the PW_ONOFF_FLAGS
 #define OO_NOTHING_ON			0
@@ -846,7 +859,7 @@ int MF_ExtractEnumFromId( int vehicle, unsigned int op );
 #define OO_SPEEDBRAKE			4
 #define OO_GEAR					8
 #define OO_VAPOR				16
-#define OO_VAPOR_BIG			32
+#define OO_WEAPONBAY			32
 #define OO_RADAR_AIR			64
 #define OO_RADAR_GROUND			128
 #define OO_RADAR				192	// OO_RADAR_GROUND|OO_RADAR_AIR
@@ -893,4 +906,13 @@ typedef enum {
 #define GEAR_ANIM_STOP			0
 #define GEAR_ANIM_UP			1
 #define GEAR_ANIM_DOWN			2
+
+// bay anim frames
+#define BAY_UP					0
+#define BAY_DOWN_DEFAULT		47
+#define BAY_DOWN_MAX			200
+
+#define BAY_ANIM_STOP			0
+#define BAY_ANIM_UP				1
+#define BAY_ANIM_DOWN			2
 

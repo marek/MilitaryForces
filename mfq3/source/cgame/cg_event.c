@@ -1,5 +1,5 @@
 /*
- * $Id: cg_event.c,v 1.6 2002-02-06 13:07:40 sparky909_uk Exp $
+ * $Id: cg_event.c,v 1.7 2002-02-17 18:10:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -329,6 +329,36 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		}
 		break;
 	
+	case EV_BAY_UP_FULL:
+		DEBUGNAME("EV_BAY_UP_FULL");
+		cent->bayAnimStartTime = 0;
+		cent->bayAnim = BAY_ANIM_STOP;
+		cent->bayAnimFrame = BAY_UP;
+		break;
+
+	case EV_BAY_UP:
+		DEBUGNAME("EV_BAY_UP");
+		cent->bayAnimStartTime = cg.time;
+		cent->bayAnim = BAY_ANIM_UP;
+		break;
+
+	case EV_BAY_STOP:
+		DEBUGNAME("EV_BAY_STOP");
+		cent->bayAnimStartTime = 0;
+		cent->bayAnim = BAY_ANIM_STOP;
+		break;
+
+	case EV_BAY_DOWN:
+		DEBUGNAME("EV_BAY_DOWN");
+		cent->bayAnimStartTime = cg.time;
+		cent->bayAnim = BAY_ANIM_DOWN;
+		break;
+
+	case EV_BAY_DOWN_FULL:
+		DEBUGNAME("EV_BAY_DOWN_FULL");
+		cent->bayAnimStartTime = 0;
+		cent->bayAnim = BAY_ANIM_STOP;
+		break;
 
 	case EV_GENERAL_SOUND:
 		DEBUGNAME("EV_GENERAL_SOUND");

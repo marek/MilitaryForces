@@ -1,5 +1,5 @@
 /*
- * $Id: bg_pmove.c,v 1.5 2002-02-15 09:58:31 thebjoern Exp $
+ * $Id: bg_pmove.c,v 1.6 2002-02-17 18:10:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -539,6 +539,14 @@ static void PM_Weapon( void ) {
 		}
 	}
 
+	// weaponbays
+	if( availableVehicles[pm->vehicle].caps & HC_WEAPONBAY ) {
+		if( !(pm->ps->ONOFF & OO_WEAPONBAY) ) {
+			if( pm->cmd.buttons & BUTTON_ATTACK_MAIN ) PM_Toggle_Bay();
+			canShoot = qfalse;
+		}
+	}
+
 	// check for MG primary fire
 	if( (pm->cmd.buttons & BUTTON_ATTACK_MAIN) && pm->ps->weaponNum == WP_MACHINEGUN ) {
 		pm->cmd.buttons |= BUTTON_ATTACK;
@@ -574,6 +582,7 @@ static void PM_Weapon( void ) {
 		pm->ps->ammo[pm->ps->weaponNum]--;
 		PM_AddEvent( EV_FIRE_WEAPON );
 		pm->ps->timers[TIMER_WEAPON] += availableWeapons[pm->ps->weaponIndex].fireInterval;
+		pm->ps->timers[TIMER_BAYCLOSE] = pm->cmd.serverTime + 5000;
 	}
 }
 
