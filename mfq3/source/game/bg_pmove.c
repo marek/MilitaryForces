@@ -1,5 +1,5 @@
 /*
- * $Id: bg_pmove.c,v 1.2 2002-01-07 00:06:02 thebjoern Exp $
+ * $Id: bg_pmove.c,v 1.3 2002-01-09 14:25:15 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -259,6 +259,14 @@ static void PM_FlyMove( void ) {
 	PM_Friction ();
 
 	scale = PM_CmdScale( &pm->cmd );
+
+	// MFQ3: maps are much bigger and open than normal (e.g. Q3) maps, so increase the speed that
+	// the spectator camera can travel at
+	if ( pm->ps->pm_type == PM_SPECTATOR )
+	{
+		scale *= 4.0f;
+	}
+
 	//
 	// user intentions
 	//
