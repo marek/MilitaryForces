@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.4 2002-01-19 02:24:02 thebjoern Exp $
+ * $Id: cg_local.h,v 1.5 2002-01-20 20:28:44 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -50,6 +50,12 @@ typedef enum {
 #define	MAX_MARK_POLYS		256
 
 #define STAT_MINUS			10	// num frame for '-' stats digit
+#define STAT_COLON			11	// num frame for ':' stats digit
+#define STAT_PERCENT		12	// num frame for '%' stats digit
+#define STAT_POINT			13	// num frame for '.' stats digit
+
+#define HUDNUM_WIDTH		8
+#define HUDNUM_HEIGHT		8
 
 #define	ICON_SIZE			48
 #define	CHAR_WIDTH			32
@@ -149,6 +155,8 @@ typedef struct centity_s {
 	vec3_t			lerpAngles;
 
 	qboolean		destroyableStructure;
+
+	int				lastSwingAngle;
 
 } centity_t;
 
@@ -572,6 +580,11 @@ typedef struct {
 	qhandle_t	HUDext;
 	qhandle_t	throttle[MF_THROTTLE_MAX+1];
 	qhandle_t	radarIcons[RD_MAX_ICONS];
+
+	// MFQ3 NEW HUD
+	qhandle_t	HUDheading;
+	qhandle_t	HUDnumbers[14];
+	qhandle_t	HUDvaluebox;
 
 	// weapon effect models
 	qhandle_t	bulletFlashModel;

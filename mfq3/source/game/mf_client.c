@@ -1,5 +1,5 @@
 /*
- * $Id: mf_client.c,v 1.2 2001-12-22 02:28:44 thebjoern Exp $
+ * $Id: mf_client.c,v 1.3 2002-01-20 20:28:44 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -377,13 +377,16 @@ void MF_ClientSpawn(gentity_t *ent) {
 			}
 		}
 
+			// old
 		// select the first weapon
-		for( i = WP_WEAPON1; i <= WP_WEAPON6; i++ ) {
-			if( availableVehicles[vehIndex].weapons[i] != WI_NONE ) {
-				client->ps.weaponIndex = availableVehicles[vehIndex].weapons[i];
-				break;
-			}
-		}
+//		for( i = WP_WEAPON1; i <= WP_WEAPON6; i++ ) {
+//			if( availableVehicles[vehIndex].weapons[i] != WI_NONE ) {
+//				client->ps.weaponIndex = availableVehicles[vehIndex].weapons[i];
+//				break;
+//			}
+//		}
+			// new
+		client->ps.weaponIndex = availableVehicles[vehIndex].weapons[0];
 
 	} else { // spectator only stuff
 		VectorSet( ent->r.mins, -8, -8, -8 );

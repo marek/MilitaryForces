@@ -1,5 +1,5 @@
 /*
- * $Id: bg_pmove.c,v 1.3 2002-01-09 14:25:15 sparky909_uk Exp $
+ * $Id: bg_pmove.c,v 1.4 2002-01-20 20:28:44 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -430,7 +430,7 @@ static void PM_SetWaterLevel( void ) {
 								end, 
 								pm->ps->clientNum, 
 								MASK_WATER );
-					if( tr.fraction < 1.0f && pm->ps->origin[2] < tr.endpos[2] ) {
+					if( tr.fraction < 1.0f && pm->ps->origin[2] < tr.endpos[2]) {
 						pm->ps->origin[2] = tr.endpos[2];
 					}
 				}

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_plane.c,v 1.8 2002-01-19 02:24:02 thebjoern Exp $
+ * $Id: cg_plane.c,v 1.9 2002-01-20 20:28:44 thebjoern Exp $
 */
 
 
@@ -274,17 +274,22 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 	}
 		// swing wings
 	if( availableVehicles[ci->vehicle].caps & HC_SWINGWING ) {
-		float speed = ps->speed/10;
-		float min = availableVehicles[ci->vehicle].stallspeed * 1.5f;
-		float max = availableVehicles[ci->vehicle].maxspeed * 0.8f;
-		float diff = max - min;
-		float maxangle = availableVehicles[ci->vehicle].swingangle;
-		if( speed >= min ) {
-			if( speed < max ) {
-				swingangle = (speed - min) * (maxangle / diff);
-			} else {
-				swingangle = maxangle;
+		if( ps->stats[STAT_HEALTH] > 0 ) {
+			float speed = ps->speed/10;
+			float min = availableVehicles[ci->vehicle].stallspeed * 1.5f;
+			float max = availableVehicles[ci->vehicle].maxspeed * 0.8f;
+			float diff = max - min;
+			float maxangle = availableVehicles[ci->vehicle].swingangle;
+			if( speed >= min ) {
+				if( speed < max ) {
+					swingangle = (speed - min) * (maxangle / diff);
+				} else {
+					swingangle = maxangle;
+				}
 			}
+			cent->lastSwingAngle = swingangle;
+		} else {
+			swingangle = cent->lastSwingAngle;
 		}
 	}
 		// cockpit
