@@ -1,14 +1,14 @@
 /*
- * $Id: cg_vehicle.c,v 1.3 2002-01-28 22:34:30 thebjoern Exp $
+ * $Id: cg_vehicle.c,v 1.4 2002-01-31 10:09:40 sparky909_uk Exp $
 */
 
 #include "cg_local.h"
 
 /*
 ===============
-CG_CacheVehicles
+CG_CachePlane
 
-on startup cache it
+On startup cache it
 ===============
 */
 
@@ -69,6 +69,14 @@ static void CG_CachePlane(int index)
 	}
 }
 
+/*
+===============
+CG_CacheGroundVehicle
+
+On startup cache it
+===============
+*/
+
 static void CG_CacheGroundVehicle(int index)
 {
 	char name[128];
@@ -102,12 +110,20 @@ static void CG_CacheGroundVehicle(int index)
 	}
 }
 
+/*
+===============
+CG_CacheVehicles
+===============
+*/
+
 void CG_CacheVehicles()
 {
 	int i;
+	qhandle_t customShadowShader = -1;
 
 	// later there could also be a check to only cache the current gameset
-	for( i = 0; i < bg_numberOfVehicles; i++ ) {
+	for( i = 0; i < bg_numberOfVehicles; i++ )
+	{
 		if( (availableVehicles[i].id&MF_GAMESET_ANY) & cgs.gameset ) {
 			CG_LoadingString(availableVehicles[i].descriptiveName);
 			if( (availableVehicles[i].id&CAT_ANY) & CAT_PLANE ) {
@@ -120,6 +136,17 @@ void CG_CacheVehicles()
 				trap_Error( va("Invalid Vehicle type in CG_CacheVehicles (%d,%d)", 
 					i, availableVehicles[i].id));
 			}
+		}
+
+		// cache the vehicle's custom shadow shader (if we can find one - format is <modelName>Shadow, "like f-16Shadow")
+
+		// try to load custom shader
+		customShadowShader = trap_R_RegisterShader( va( "%sShadow", availableVehicles[i].modelName ) );
+		
+		// replace SHADOW_x fallback op. with the custom shader handle?
+		if( customShadowShader )
+		{
+			availableVehicles[i].shadowShader = customShadowShader;
 		}
 	}
 }

@@ -1,10 +1,9 @@
 /*
- * $Id: bg_vehicledata.c,v 1.11 2002-01-31 02:34:33 thebjoern Exp $
+ * $Id: bg_vehicledata.c,v 1.12 2002-01-31 10:12:05 sparky909_uk Exp $
 */
 
 #include "q_shared.h"
 #include "bg_public.h"
-
 
 // just contains data of all the available vehicles
 completeVehicleData_t availableVehicles[] = 
@@ -15,6 +14,7 @@ completeVehicleData_t availableVehicles[] =
     {	"F-16 Falcon",		    // descriptiveName
 	"F-16",						// tinyName
 	"f-16",						// modelName
+	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN|			// id
 	MF_TEAM_2|
 	CAT_PLANE|
@@ -52,6 +52,7 @@ completeVehicleData_t availableVehicles[] =
     {	"Saab JAS 39 Gripen",    // descriptiveName
 	"Jas-39",					// tinyName
 	"jas-39",					// modelName
+	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN|			// id
 	MF_TEAM_1|
 	CAT_PLANE|
@@ -89,6 +90,7 @@ completeVehicleData_t availableVehicles[] =
     {	"F-5 Tiger",		    // descriptiveName
 	"F-5",						// tinyName
 	"f-5",						// modelName
+	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN|			// id
 	MF_TEAM_2|
 	CAT_PLANE|
@@ -126,6 +128,7 @@ completeVehicleData_t availableVehicles[] =
     {	"F-15 Eagle",		    // descriptiveName
 	"F-15",						// tinyName
 	"f-15",						// modelName
+	SHADOW_NONE,				// alpha shadow
 	MF_GAMESET_MODERN|			// id
 	MF_TEAM_1|
 	CAT_PLANE|
@@ -163,6 +166,7 @@ completeVehicleData_t availableVehicles[] =
     {	"F-14 Tomcat",		    // descriptiveName
 	"F-14",						// tinyName
 	"f-14",						// modelName
+	SHADOW_NONE,				// alpha shadow
 	MF_GAMESET_MODERN|			// id
 	MF_TEAM_2|
 	CAT_PLANE|
@@ -200,6 +204,7 @@ completeVehicleData_t availableVehicles[] =
     {	"F-18 Hornet",		    // descriptiveName
 	"F-18",						// tinyName
 	"f-18",						// modelName
+	SHADOW_NONE,				// alpha shadow
 	MF_GAMESET_MODERN|			// id
 	MF_TEAM_1|
 	CAT_PLANE|
@@ -237,6 +242,7 @@ completeVehicleData_t availableVehicles[] =
     {	"B-2 Spirit",		    // descriptiveName
 	"B-2",						// tinyName
 	"b-2",						// modelName
+	SHADOW_NONE,				// alpha shadow
 	MF_GAMESET_MODERN|			// id
 	MF_TEAM_1|
 	CAT_PLANE|
@@ -274,6 +280,7 @@ completeVehicleData_t availableVehicles[] =
     {	"P-51d Mustang",		// descriptiveName
 	"P-51d",					// tinyName
 	"p-51d",					// modelName
+	SHADOW_NONE,				// alpha shadow
 	MF_GAMESET_WW2|				// id
 	MF_TEAM_1|
 	CAT_PLANE|
@@ -312,6 +319,7 @@ completeVehicleData_t availableVehicles[] =
     {	"Spitfire Mk 5b",		// descriptiveName
 	"Spitfire",					// tinyName
 	"spitfire_mk5b",			// modelName
+	SHADOW_NONE,				// alpha shadow
 	MF_GAMESET_WW2|				// id
 	MF_TEAM_1|
 	CAT_PLANE|
@@ -426,6 +434,7 @@ completeVehicleData_t availableVehicles[] =
     {	"Fokker Dr.1",			// descriptiveName
 	"Fokker",					// tinyName
 	"dr1",						// modelName
+	SHADOW_NONE,				// alpha shadow
 	MF_GAMESET_WW1|				// id
 	MF_TEAM_1|
 	CAT_PLANE|
@@ -464,6 +473,7 @@ completeVehicleData_t availableVehicles[] =
     {	"Sopwith camel",		// descriptiveName
 	"Camel",					// tinyName
 	"camel",					// modelName
+	SHADOW_NONE,				// alpha shadow
 	MF_GAMESET_WW1|				// id
 	MF_TEAM_2|
 	CAT_PLANE|
@@ -506,6 +516,7 @@ completeVehicleData_t availableVehicles[] =
     {	"M1A1i Abrams",			// descriptiveName
 	"M1",						// tinyName
 	"m1",						// modelName
+	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN|			// id
 	MF_TEAM_1|
 	CAT_GROUND|
@@ -542,6 +553,7 @@ completeVehicleData_t availableVehicles[] =
     {	"T-90",					// descriptiveName
 	"T-90",						// tinyName
 	"t-90",						// modelName
+	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN|			// id
 	MF_TEAM_2|
 	CAT_GROUND|
@@ -578,6 +590,7 @@ completeVehicleData_t availableVehicles[] =
     {	"BMP 3",				// descriptiveName
 	"BMP-3",					// tinyName
 	"bmp-3",					// modelName
+	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN|			// id
 	MF_TEAM_1|
 	CAT_GROUND|
@@ -586,7 +599,7 @@ completeVehicleData_t availableVehicles[] =
 	HC_DUALGUNS,				// capabilities
 	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
 	{-10, -5, -1},				// mins (bounding box)
-	{11, 5, 4.5},					// max (bounding box)
+	{11, 5, 4.5},				// max (bounding box)
 	{50, 100, 100},				// turnspeed around the three axis
 	38, 14,						// camera distance and height
 	0,							// stallspeed
@@ -614,6 +627,7 @@ completeVehicleData_t availableVehicles[] =
     {	"BRDM 2",				// descriptiveName
 	"BRDM2",					// tinyName
 	"brdm2",					// modelName
+	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN|			// id
 	MF_TEAM_2|
 	CAT_GROUND|
@@ -768,6 +782,20 @@ const char *team_items[MF_MAX_GAMESETS][MF_MAX_TEAMS+1] =
 		0,
 		0
 	}
+};
+
+const char *cat_fileRef[MF_MAX_CATEGORIES+1] =
+{
+	// categories
+	"Plane",
+	"GroundVehicle",
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0
 };
 
 const char *cat_items[MF_MAX_CATEGORIES+1] =

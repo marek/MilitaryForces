@@ -1,5 +1,5 @@
 /*
- * $Id: cg_marks.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: cg_marks.c,v 1.2 2002-01-31 10:09:40 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -96,10 +96,24 @@ markPoly_t	*CG_AllocMark( void ) {
 }
 
 
-
 /*
 =================
 CG_ImpactMark
+=================
+*/
+
+void CG_ImpactMark( qhandle_t markShader, const vec3_t origin, const vec3_t dir, 
+					  float orientation, float red, float green, float blue, float alpha,
+					  qboolean alphaFade, float radius, qboolean temporary )
+{
+	// link to extended version
+	CG_ImpactMarkEx( markShader, origin, dir, orientation, red, green, blue, alpha,
+					 alphaFade, radius, radius, temporary );
+}
+
+/*
+=================
+CG_ImpactMarkEx
 
 origin should be a point within a unit of the plane
 dir should be the plane normal
@@ -111,11 +125,12 @@ passed to the renderer.
 #define	MAX_MARK_FRAGMENTS	128
 #define	MAX_MARK_POINTS		384
 
-void CG_ImpactMark( qhandle_t markShader, const vec3_t origin, const vec3_t dir, 
-				   float orientation, float red, float green, float blue, float alpha,
-				   qboolean alphaFade, float radius, qboolean temporary ) {
+void CG_ImpactMarkEx( qhandle_t markShader, const vec3_t origin, const vec3_t dir, 
+					  float orientation, float red, float green, float blue, float alpha,
+					  qboolean alphaFade, float xRadius, float yRadius, qboolean temporary )
+{
 	vec3_t			axis[3];
-	float			texCoordScale;
+	float			xTexCoordScale, yTexCoordScale;
 	vec3_t			originalPoints[4];
 	byte			colors[4];
 	int				i, j;
@@ -124,46 +139,63 @@ void CG_ImpactMark( qhandle_t markShader, const vec3_t origin, const vec3_t dir,
 	vec3_t			markPoints[MAX_MARK_POINTS];
 	vec3_t			projection;
 
-	if ( !cg_addMarks.integer ) {
+	// client marks disabled?
+	if( !cg_addMarks.integer )
+	{
 		return;
 	}
 
-	if ( radius <= 0 ) {
-		CG_Error( "CG_ImpactMark called with <= 0 radius" );
+	if ( xRadius <= 0 || yRadius <= 0 )
+	{
+		CG_Error( "CG_ImpactMarkEx called with xradius AND/OR yradius <= 0" );
 	}
-
-	//if ( markTotal >= MAX_MARK_POLYS ) {
-	//	return;
-	//}
-
+/*
+	if ( markTotal >= MAX_MARK_POLYS )
+	{
+		return;
+	}
+*/
 	// create the texture axis
 	VectorNormalize2( dir, axis[0] );
+
+	// HACK: to prevent axis flipping and incorrect orientation rotations just fudge the
+	// axis[0] vector for now
+#pragma message ("CG_ImpactMarkEx() - 'straight up' axis hack in (for shadows - may impact other marks)")
+	axis[0][0]=0;
+	axis[0][1]=0;
+	axis[0][2]=1;
+	
 	PerpendicularVector( axis[1], axis[0] );
 	RotatePointAroundVector( axis[2], axis[0], axis[1], orientation );
 	CrossProduct( axis[0], axis[2], axis[1] );
 
-	texCoordScale = 0.5 * 1.0 / radius;
+	xTexCoordScale = 0.5 * 1.0 / xRadius;
+	yTexCoordScale = 0.5 * 1.0 / yRadius;
 
 	// create the full polygon
-	for ( i = 0 ; i < 3 ; i++ ) {
-		originalPoints[0][i] = origin[i] - radius * axis[1][i] - radius * axis[2][i];
-		originalPoints[1][i] = origin[i] + radius * axis[1][i] - radius * axis[2][i];
-		originalPoints[2][i] = origin[i] + radius * axis[1][i] + radius * axis[2][i];
-		originalPoints[3][i] = origin[i] - radius * axis[1][i] + radius * axis[2][i];
+	for ( i = 0 ; i < 3 ; i++ )
+	{
+		originalPoints[0][i] = origin[i] - yRadius * axis[1][i] - xRadius * axis[2][i];
+		originalPoints[1][i] = origin[i] + yRadius * axis[1][i] - xRadius * axis[2][i];
+		originalPoints[2][i] = origin[i] + yRadius * axis[1][i] + xRadius * axis[2][i];
+		originalPoints[3][i] = origin[i] - yRadius * axis[1][i] + xRadius * axis[2][i];
 	}
 
 	// get the fragments
 	VectorScale( dir, -20, projection );
 	numFragments = trap_CM_MarkFragments( 4, (void *)originalPoints,
-					projection, MAX_MARK_POINTS, markPoints[0],
-					MAX_MARK_FRAGMENTS, markFragments );
+										  projection, MAX_MARK_POINTS, markPoints[0],
+										  MAX_MARK_FRAGMENTS, markFragments );
 
+	// create the colour
 	colors[0] = red * 255;
 	colors[1] = green * 255;
 	colors[2] = blue * 255;
 	colors[3] = alpha * 255;
 
-	for ( i = 0, mf = markFragments ; i < numFragments ; i++, mf++ ) {
+	// process the fragments
+	for ( i = 0, mf = markFragments ; i < numFragments ; i++, mf++ )
+	{
 		polyVert_t	*v;
 		polyVert_t	verts[MAX_VERTS_ON_POLY];
 		markPoly_t	*mark;
@@ -171,21 +203,28 @@ void CG_ImpactMark( qhandle_t markShader, const vec3_t origin, const vec3_t dir,
 		// we have an upper limit on the complexity of polygons
 		// that we store persistantly
 		if ( mf->numPoints > MAX_VERTS_ON_POLY ) {
-			mf->numPoints = MAX_VERTS_ON_POLY;
+			 mf->numPoints = MAX_VERTS_ON_POLY;
 		}
-		for ( j = 0, v = verts ; j < mf->numPoints ; j++, v++ ) {
-			vec3_t		delta;
+
+		// for each vert on the poly
+		for( j = 0, v = verts ; j < mf->numPoints ; j++, v++ )
+		{
+			vec3_t delta;
 
 			VectorCopy( markPoints[mf->firstPoint + j], v->xyz );
-
 			VectorSubtract( v->xyz, origin, delta );
-			v->st[0] = 0.5 + DotProduct( delta, axis[1] ) * texCoordScale;
-			v->st[1] = 0.5 + DotProduct( delta, axis[2] ) * texCoordScale;
+
+			// texture coords
+			v->st[0] = 0.5 + DotProduct( delta, axis[1] ) * yTexCoordScale;
+			v->st[1] = 0.5 + DotProduct( delta, axis[2] ) * xTexCoordScale;
+
+			// colour
 			*(int *)v->modulate = *(int *)colors;
 		}
 
 		// if it is a temporary (shadow) mark, add it immediately and forget about it
-		if ( temporary ) {
+		if ( temporary )
+		{
 			trap_R_AddPolyToScene( markShader, mf->numPoints, verts );
 			continue;
 		}
