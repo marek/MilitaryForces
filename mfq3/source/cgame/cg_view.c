@@ -1,5 +1,5 @@
 /*
- * $Id: cg_view.c,v 1.9 2002-02-18 16:30:45 sparky909_uk Exp $
+ * $Id: cg_view.c,v 1.10 2002-02-25 14:19:19 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -228,26 +228,41 @@ static void CG_OffsetCockpitView( void ) {
 }
 */
 
-
-
 //======================================================================
 
-void CG_ZoomDown_f( void ) { 
-	if ( cg.zoomed ) {
+void CG_ZoomDown_f( void )
+{ 
+	// locked-out?
+	if( cg.zoomLockOut )
+	{
 		return;
 	}
-	cg.zoomed = qtrue;
-	cg.zoomTime = cg.time;
-}
+	
+	// alter the zoom amount
+	cg.zoomAmount *= 2;
 
-void CG_ZoomUp_f( void ) { 
-	if ( !cg.zoomed ) {
-		return;
+	// reset?
+	if( cg.zoomAmount > 8 )	// x8 is max zoom
+	{
+		// off
+		cg.zoomed = qfalse;
+		cg.zoomAmount = 1;
 	}
-	cg.zoomed = qfalse;
-	cg.zoomTime = cg.time;
+	else
+	{
+		// on
+		cg.zoomed = qtrue;
+	}
+
+	// lock-out
+	cg.zoomLockOut = qfalse;
 }
 
+void CG_ZoomUp_f( void )
+{ 
+	// reset lock-out
+	cg.zoomLockOut = qfalse;
+}
 
 /*
 ====================

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.26 2002-02-22 11:39:40 thebjoern Exp $
+ * $Id: cg_drawnewhud.c,v 1.27 2002-02-25 14:19:19 sparky909_uk Exp $
 */
 
 #include "cg_local.h"
@@ -190,7 +190,8 @@ to a fixed color.
 Coordinates are at 640 by 480 virtual resolution
 ==================
 */
-static int CG_DrawString_MFQ3_R( int x, int y, const char *string, const float *setColor, int maxChars ) {
+static int CG_DrawString_MFQ3_R( int x, int y, const char *string, const float *setColor, int maxChars )
+{
 //	vec4_t		color;
 	const char	*s;
 	int			xx;
@@ -789,7 +790,7 @@ static void CG_Draw_Center(int vehicle, int health, int throttle) {
 
 /*
 ================
-CG_Draw_MFD
+CG_HUD_Camera
 
 ================
 */
@@ -797,23 +798,28 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 
 	// this is probably very dirty and ugly
 	// but so far I haven't found another way to do it...
-	// any ideas anyone ?n		
+	// any ideas anyone?
 	centity_t *cent = &cg.predictedPlayerEntity;
-	float x, y, w, h;
-	vec3_t v;
-	float	zoomFov;
-	float	f;		
-	float	fov_x;
 	playerState_t *ps = &cg.predictedPlayerState;
+	vec3_t	v;
+	float	x, y, w, h;
+	float	fov;
 	int		cammode;
 
-		// prepare refdef
+	// prepare refdef
 	memcpy( &cg.HUDCamera, &cg.refdef, sizeof( cg.HUDCamera) );
-	if( mfdnum == MFD_1 ) {
+	
+	// set left draw position
+	if( mfdnum == MFD_1 )
+	{
 		x = 5;
-	} else {
+	}
+	else
+	{
 		x = 517;
 	}
+
+	// general
 	y = 366;
 	w = 118;
 	h = 108;
@@ -822,37 +828,17 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 	cg.HUDCamera.y = y;
 	cg.HUDCamera.width = w;
 	cg.HUDCamera.height = h;
+	fov = 90/4;	// fov = 22.5
 
-		// zoomed ?
-	fov_x = cg_fov.value/4;
-	if ( fov_x < 1 ) {
-		fov_x = 1;
-	} else if ( fov_x > 160 ) {
-		fov_x = 160;
+	// apply any zoom
+	if( cg.zoomed )
+	{
+		fov /= (float)cg.zoomAmount;
 	}
-	zoomFov = cg_zoomFov.value/4;
-	if ( zoomFov < 1 ) {
-		zoomFov = 1;
-	} else if ( zoomFov > 160 ) {
-		zoomFov = 160;
-	}
-	if ( cg.zoomed ) {
-		f = ( cg.time - cg.zoomTime ) / (float)ZOOM_TIME;
-		if ( f > 1.0 ) {
-			fov_x = zoomFov;
-		} else {
-			fov_x = fov_x + f * ( zoomFov - fov_x );
-		}
-	} else {
-		f = ( cg.time - cg.zoomTime ) / (float)ZOOM_TIME;
-		if ( f > 1.0 ) {
-			fov_x = fov_x;
-		} else {
-			fov_x = zoomFov + f * ( fov_x - zoomFov );
-		}
-	}
-	cg.HUDCamera.fov_x = fov_x;
-	cg.HUDCamera.fov_y = fov_x;
+
+	// set final FOV
+	cg.HUDCamera.fov_x = fov;
+	cg.HUDCamera.fov_y = fov;
 	cammode = cg.CameraMode;
 
 	if( (availableVehicles[vehicle].cat & CAT_GROUND) ||
@@ -965,6 +951,10 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 
 	// render
 	trap_R_RenderScene( &cg.HUDCamera );
+
+	// draw zoom amount
+	CG_DrawString_MFQ3( x+2, y+h-12, "ZOOM: X", HUDColors[cg.MFDColor], 0);
+	CG_MFQ3HUD_Numbers( x+60, y+h-12, 3, cg.zoomAmount, qfalse, HUDColors[cg.MFDColor], qfalse );
 
 	// reset to normal rendering
 	cg.drawingMFD = qfalse;
@@ -1414,7 +1404,7 @@ void CG_DrawStatusBar_MFQ3_new( void ) {
 	playerState_t	*ps;
 	int			value, value2;
 	int			vehicle = cgs.clientinfo[cg.predictedPlayerState.clientNum].vehicle;
-	int			targetheading, targetrange, altitude, stallcolor;
+	int			targetheading, targetrange, altitude = 0, stallcolor;
 	int			speed, stallspeed = availableVehicles[vehicle].stallspeed;
 
 	static vec4_t colors[] = { 

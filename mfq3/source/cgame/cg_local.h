@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.42 2002-02-25 12:13:36 sparky909_uk Exp $
+ * $Id: cg_local.h,v 1.43 2002-02-25 14:19:19 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -478,9 +478,11 @@ typedef struct {
 	vec3_t		refdefViewAngles;		// will be converted to refdef.viewaxis
 
 	// zoom key
-	qboolean	zoomed;
-	int			zoomTime;
-	float		zoomSensitivity;
+	qboolean	zoomed;					// are we applying any zoom?
+	qboolean	zoomLockOut;			// lock zoom until zoom button releases
+	int			zoomAmount;				// x2, x4, x8 ...
+	int			zoomTime;				// (unused)
+	float		zoomSensitivity;		// (unused)
 
 	// camera adjusting
 	int			cameraAdjustEnum;		// camera adjustment identifier enum
