@@ -1,5 +1,5 @@
 /*
- * $Id: bg_boatmove.c,v 1.1 2002-02-18 11:06:31 thebjoern Exp $
+ * $Id: bg_boatmove.c,v 1.2 2002-02-19 13:28:53 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -13,7 +13,7 @@ extern pml_t		pml;
 
 /*
 ===================
-PM_Plane_FuelFlow
+PM_Boat_FuelFlow
 
 ===================
 */
@@ -22,17 +22,14 @@ static void PM_Boat_FuelFlow( int throttle )
 {
 	int fuelflow = (20 - throttle) * 1000;
 
-	// afterburner takes additional fuel
-	if( throttle > 10 ) fuelflow -= 4000;
-
 	if( pm->cmd.serverTime < pm->ps->timers[TIMER_FUEL] + fuelflow ) {
 		return;
 	}	
 
 	pm->ps->stats[STAT_FUEL]--;
 	if( pm->ps->stats[STAT_FUEL] <= 0 ) {
-		pm->ps->stats[STAT_FUEL] = 0;
-		pm->ps->throttle = pm->ps->fixed_throttle = 0;
+		pm->ps->throttle = 0;
+		return;
 	}
 
 	pm->ps->timers[TIMER_FUEL] = pm->cmd.serverTime;
@@ -45,77 +42,69 @@ PM_BoatAccelerate
 ===================
 */
 static void PM_BoatAccelerate()
-{/*
-    float	throttle = pm->ps->fixed_throttle;
+{
     float	topspeed = availableVehicles[pm->vehicle].maxspeed;
-    int		maxthrottle = availableVehicles[pm->vehicle].maxthrottle;
-	int		minthrottle = availableVehicles[pm->vehicle].minthrottle;
     float	currspeed = (float)pm->ps->speed/10;
-    float	stallspeed = (float)availableVehicles[pm->vehicle].stallspeed;
-    float	accel = availableVehicles[pm->vehicle].accel * pml.frametime/3;
-    float	decel = accel;
-
-    float	acceleration;
-
-	// check for overriding throttle
-	if( pm->ps->stats[STAT_HEALTH] > 0 ) {
-		if( pm->cmd.forwardmove > 0 ) throttle = maxthrottle;
-		else if( pm->cmd.forwardmove < 0 ) throttle = minthrottle;
-	}
-
-	// check for fuel
-	if( pm->ps->stats[STAT_FUEL] <= 0 ) throttle = 0;
-
-	// set it back
-	pm->ps->throttle = throttle;
-
-    // accel depends on thrust
-    accel *= ( 1 + ( throttle - maxthrottle ) / maxthrottle );
-	if( throttle > 10 ) accel *= (throttle/10);
-
-    // decel depends on speed
-    decel *= ( 1 + ( currspeed - topspeed ) / topspeed);
-	if( currspeed > topspeed ) decel *= (currspeed/topspeed);
-	// decel depends on gear/brakes
-	if( pm->ps->ONOFF & OO_SPEEDBRAKE ) {
-		decel *= 1.7f;
-	}
-	if( pm->ps->ONOFF & OO_GEAR ) {
-		decel *= 1.1f;
-	}
+	float	maxthrottle = availableVehicles[pm->vehicle].maxthrottle;
+	float	minthrottle = availableVehicles[pm->vehicle].minthrottle;
+    float	throttle = pm->ps->fixed_throttle;
+    float	accel = availableVehicles[pm->vehicle].accel * pml.frametime;
+	float	targetspeed;
+		
 	if( pm->ps->ONOFF & OO_LANDED ) {
-		float factor = (stallspeed - currspeed) / stallspeed;
-		if( factor > 0 ) {
-			decel *= factor+1;
+
+		// check for overriding throttle
+		if( pm->cmd.forwardmove > 0 ) throttle = maxthrottle;
+		else if( pm->cmd.forwardmove < 0 ) throttle = maxthrottle - minthrottle;
+
+		// set it back
+		pm->ps->throttle = throttle;
+
+		// check for reverse
+		if( throttle > maxthrottle ) {
+			throttle = -(throttle - maxthrottle);
 		}
-		accel *= 0.8f;
+		if( pm->ps->ONOFF & OO_STALLED ) {
+			currspeed *= -1;
+		}
+
+		// check for fuel
+		if( pm->ps->stats[STAT_FUEL] <= 0 ) throttle = 0;
+
+		// what is the speed to accelerate towards (consider handbrake)
+		targetspeed = topspeed*throttle/maxthrottle;
+
+		if( currspeed < targetspeed - accel ) currspeed += accel;
+		else if( currspeed > targetspeed + accel ) currspeed -= accel;
+		else currspeed = targetspeed;
+
+		// for negative speeds we set the flag OO_STALLED as speed is an unsigned int
+		if( currspeed < 0 ) {
+			currspeed *= -1;
+			pm->ps->ONOFF |= OO_STALLED;
+		} else {
+			pm->ps->ONOFF &= ~OO_STALLED;
+		}
+	} else { // falling
+		currspeed += (50 * pml.frametime);
 	}
-    acceleration = accel - decel;
 
-    // accel depens on angle
-    acceleration += pm->ps->vehicleAngles[0]/90;
-
-    currspeed += acceleration;
-    if( currspeed < 0 )
-		currspeed = 0;
-
-	if( (pm->ps->ONOFF & OO_LANDED) && currspeed > stallspeed * 1.5f ) 
-		currspeed = stallspeed *1.5f;
-
-    if( currspeed <= stallspeed ) {
-		pm->ps->ONOFF |= OO_STALLED;
-    }
-
+	// apply speed modifier
     pm->ps->speed = currspeed*10;
 
-	// fuel flow
-	PM_Plane_FuelFlow( throttle );*/
+	// calculate fuel flow (for fuel flow we need abs value)
+	if( throttle < 0 )
+	{
+		throttle *= -1;
+	}
 
+	PM_Boat_FuelFlow( throttle );
 }
+
 
 /*
 ===================
-PM_PlaneMove
+PM_BoatMove
 
 ===================
 */
@@ -123,290 +112,125 @@ qboolean	PM_SlideMove_Boat();
 
 void PM_BoatMove( void ) 
 {
-  /*  vec3_t	viewdir;
-    vec3_t	vehdir;
-    vec3_t	diff;
-    vec3_t	turnspeed;
-    float	targroll;
+    vec3_t		viewdir;
+    vec3_t		vehdir;
+	vec3_t		turretdir;
+    vec3_t		diff;
+    vec3_t		turnspeed;
+	vec3_t		forward, up;
+	vec3_t		temp;
     qboolean	dead = (pm->ps->stats[STAT_HEALTH] <= 0);
-	qboolean	verydead = (pm->ps->stats[STAT_HEALTH] <= GIB_HEALTH);
-    int		i;
-	int		anim = 0;
+	int			i;
+	float		smove = pm->cmd.rightmove;
+	float		turret_yaw = ((float)pm->ps->turretAngle)/10;
+	float		gun_pitch = ((float)pm->ps->gunAngle)/10;
+	float		speed;
 
-	if( verydead ) return;
+	// set speed
+	PM_BoatAccelerate();
 
-	// clear FX
-	pm->ps->ONOFF &= ~OO_VAPOR;
-
-	// gear
-	if( !dead && (pm->cmd.buttons & BUTTON_GEAR) ) {
-		PM_Toggle_Gear();
+	// speed
+	speed = (float)pm->ps->speed/10;
+	if( pm->ps->ONOFF & OO_STALLED ) {
+//		speed *= -1;
+		AngleVectors( pm->ps->vehicleAngles, forward, NULL, NULL );
+		VectorNegate( forward, forward );
+	} else {
+		AngleVectors( pm->ps->vehicleAngles, forward, NULL, NULL );
 	}
+	VectorNormalize( pm->ps->velocity );
+	VectorAdd( forward, pm->ps->velocity, forward );
+	VectorScale( forward, speed, pm->ps->velocity );
 
-	// gearanim
-	if( !dead && pm->ps->timers[TIMER_GEARANIM] &&
-		pm->cmd.serverTime >= pm->ps->timers[TIMER_GEARANIM] ) {
-		pm->ps->timers[TIMER_GEARANIM] = 0;
-		if( pm->ps->ONOFF & OO_GEAR ) {
-			pm->ps->ONOFF &= ~OO_GEAR;
-		} else {
-			pm->ps->ONOFF |= OO_GEAR;
-		}
-	}
-	// update gear
-	if( pm->updateGear ) {
-		// sync anim
-		if( pm->ps->ONOFF & OO_GEAR ) {
-			PM_AddEvent( EV_GEAR_DOWN_FULL );
-		} else {
-			PM_AddEvent( EV_GEAR_UP_FULL );
-		}
-		pm->updateGear = qfalse;
-	}
+	PM_SlideMove_Boat();
 
-	// bay
-	if( !dead && (pm->cmd.buttons & BUTTON_WEAPONBAY) ) {
-		PM_Toggle_Bay();
-	}
+	// get the actual turret angles
+	AngleVectors( pm->ps->vehicleAngles, forward, 0, up );
+	RotatePointAroundVector( temp, up, forward, turret_yaw );
+	vectoangles( temp, turretdir );
+	turretdir[PITCH] += gun_pitch;
 
-	// bayanim
-	if( !dead ) {
-		if( pm->ps->timers[TIMER_BAYANIM] ) {
-			if( pm->cmd.serverTime >= pm->ps->timers[TIMER_BAYANIM] ) {
-				pm->ps->timers[TIMER_BAYANIM] = 0;
-				if( pm->ps->ONOFF & OO_WEAPONBAY ) {
-					pm->ps->ONOFF &= ~OO_WEAPONBAY;
-				} else {
-					pm->ps->ONOFF |= OO_WEAPONBAY;
-					pm->ps->timers[TIMER_BAYCLOSE] = pm->cmd.serverTime + 5000;
-				}
-			}
-		} else {
-			if( pm->ps->timers[TIMER_BAYCLOSE] && 
-				pm->cmd.serverTime >= pm->ps->timers[TIMER_BAYCLOSE] ) {
-				PM_Toggle_Bay();
-			}
-		}
-	}
+//	Com_Printf( "vehd = %.1f %.1f %.1f (%.1f %.1f)\n", pm->ps->vehicleAngles[0], pm->ps->vehicleAngles[1],
+//			pm->ps->vehicleAngles[2], turret_yaw, gun_pitch );
+//	Com_Printf( "view = %.1f %.1f %.1f\n", pm->ps->viewangles[0], pm->ps->viewangles[1],
+//			pm->ps->viewangles[2] );
+//	Com_Printf( "turr = %.1f %.1f %.1f\n", turretdir[0], turretdir[1], turretdir[2] );
 
-	// update bay
-	if( pm->updateBay ) {
-		// sync anim
-		if( pm->ps->ONOFF & OO_WEAPONBAY ) {
-			PM_AddEvent( EV_BAY_DOWN_FULL );
-		} else {
-			PM_AddEvent( EV_BAY_UP_FULL );
-		}
-		pm->updateBay = qfalse;
-	}
-
-	// brake
-	if( !dead && (pm->cmd.buttons & BUTTON_BRAKE) ) {
-		PM_Plane_Brakes();
-	}
-
-    // local vectors
+	// local vectors
     VectorCopy( pm->ps->vehicleAngles, vehdir );
-	if( pm->ps->ONOFF & OO_LANDED ) vehdir[0] = 0;
-	// freelook - plane keeps current heading
-	if( (pm->cmd.buttons & BUTTON_FREELOOK) && !dead ) {
-		VectorCopy( vehdir, viewdir );
+	if( (pm->cmd.buttons & BUTTON_FREELOOK) && !dead ) { // freelook
+		VectorCopy( turretdir, viewdir );
 	}
-	else { // normal - plane follows camera
+	else { // normal - turret follows camera
 		VectorCopy( pm->ps->viewangles, viewdir );
 	}
 
-	// set yaw to 0 <= x <= 360
+	// set to 0<=x<=360
 	viewdir[YAW] = AngleMod( viewdir[YAW] );
 	vehdir[YAW] = AngleMod( vehdir[YAW] );
+	turretdir[YAW] = AngleMod( turretdir[YAW] );
+	viewdir[PITCH] = AngleMod( viewdir[PITCH] );
+	vehdir[PITCH] = AngleMod( vehdir[PITCH] );
+	turretdir[PITCH] = AngleMod( turretdir[PITCH] );
 
-	PM_PlaneAccelerate();
 
-	// swing wings
-	if( availableVehicles[pm->vehicle].caps & HC_SWINGWING && !dead ) {
-		float speed = pm->ps->speed/10;
-		float min = availableVehicles[pm->vehicle].stallspeed * 1.5f;
-		float max = availableVehicles[pm->vehicle].maxspeed * 0.8f;
-		float diff = max - min;
-		float maxangle = availableVehicles[pm->vehicle].swingangle;
-		if( speed >= min ) {
-			if( speed < max ) {
-				pm->ps->gunAngle = ((speed - min) * (maxangle / diff))*10;
-			} else {
-				pm->ps->gunAngle = maxangle*10;
-			}
-		}
-	}
-
-    if( dead ) {
-		if( pm->ps->vehicleAngles[PITCH] < 70 ) {
-			pm->ps->vehicleAngles[PITCH] += 40 * pml.frametime; // nose drops at 60 deg/sec
-		}
-		AngleVectors( pm->ps->vehicleAngles, pm->ps->velocity, NULL, NULL );
-		VectorScale( pm->ps->velocity, (float)pm->ps->speed/10, pm->ps->velocity );
-		// dirty trick to remember bankangle
-		if( pm->ps->vehicleAngles[2] <= 0 ) {
-			pm->ps->vehicleAngles[2] -= availableVehicles[pm->vehicle].turnspeed[2]/2 * pml.frametime;
-			if( pm->ps->vehicleAngles[2] < -360 ) pm->ps->vehicleAngles[2] += 360;
-		}
-		else {
-			pm->ps->vehicleAngles[2] += availableVehicles[pm->vehicle].turnspeed[2]/2 * pml.frametime;
-			if( pm->ps->vehicleAngles[2] > 360 ) pm->ps->vehicleAngles[2] -= 360;
-		}
-		PM_SlideMove_Plane();
-		return;
-    }
-
-	for( i = PITCH; i <= ROLL; i++ ) {
+	// get the turnspeeds
+	for( i = HULL_YAW; i <= GUN_PITCH; i++ ) {
 	    turnspeed[i] = availableVehicles[pm->vehicle].turnspeed[i] * pml.frametime;
 	}
-
-	// ground movement
+	
+	// turn the hull
 	if( pm->ps->ONOFF & OO_LANDED ) {
-		float speed = (float)pm->ps->speed/10;
-		if( (availableVehicles[pm->vehicle].caps & HC_TAILDRAGGER) ) {
-			if( speed > availableVehicles[pm->vehicle].stallspeed/2 ) {
-				vehdir[0] = 0;
-			} else if( speed > ((float)availableVehicles[pm->vehicle].stallspeed/2 + 
-							(float)availableVehicles[pm->vehicle].tailangle) ) {
-				vehdir[0] = -((float)availableVehicles[pm->vehicle].stallspeed/2 - speed);
-			} else {
-				vehdir[0] = (float)availableVehicles[pm->vehicle].tailangle;
-			}
-		} else {
-			vehdir[0] = 0;
-		}
-		vehdir[2] = 0;
-		for( i = PITCH; i <= YAW; i++ ) {
-			diff[i] = viewdir[i] - vehdir[i];
-			if( diff[i] > 180 ) diff[i] -= 360;
-			else if( diff[i] < -180 ) diff[i] += 360;
-		}
-		if( speed > 0 ) {
-			if( diff[YAW] < -turnspeed[YAW] ) vehdir[YAW] -= turnspeed[YAW];
-			else if( diff[YAW] > turnspeed[YAW] ) vehdir[YAW] += turnspeed[YAW];
-			else vehdir[YAW] = viewdir[YAW];
-			if( speed > availableVehicles[pm->vehicle].stallspeed &&
-				diff[PITCH] < 0 ) {
-				if( diff[PITCH] < -turnspeed[PITCH] ) vehdir[PITCH] -= turnspeed[PITCH];
-				else vehdir[PITCH] = viewdir[PITCH];
-				pm->ps->ONOFF &= ~(OO_LANDED|OO_STALLED);
-			}	
+		if( smove > 0 ) {
+			vehdir[YAW] -= turnspeed[HULL_YAW];
+		} else if( smove < 0 ) {
+			vehdir[YAW] += turnspeed[HULL_YAW];
 		}
 	}
-	// air movement
-	else {
-	    // stalled
-	    if( pm->ps->ONOFF & OO_STALLED ) {
-			if( vehdir[PITCH] < 50 ) vehdir[PITCH] += turnspeed[PITCH];
-			if( vehdir[ROLL] < -5 ) vehdir[YAW] += turnspeed[YAW];
-			else if( vehdir[ROLL] > 5 ) vehdir[YAW] -= turnspeed[YAW];
 
-			if( viewdir[PITCH] >= vehdir[PITCH]  ) {//&&
-				//viewdir[YAW] < vehdir[YAW] + 10 &&		// disable because it was too difficult
-				//viewdir[YAW] > vehdir[YAW] - 10 ) {
-				pm->ps->ONOFF &= ~OO_STALLED;
-			}
-//			Com_Printf( "Stalled\n" );    
-	    }
-	    // normal flight
-	    else {
-//			Com_Printf( "Normal\n" );
-			// yaw/pitch
-			for( i = PITCH; i <= YAW; i++ ) {
-				diff[i] = viewdir[i] - vehdir[i];
-    
-				if( diff[i] > 180 ) diff[i] -= 360;
-				else if( diff[i] < -180 ) diff[i] += 360;
+	if( !(pm->cmd.buttons & BUTTON_FREELOOK) ) {
+		// get the angle difference
+		for( i = PITCH; i <= YAW; i++ ) {
+			diff[i] = viewdir[i] - turretdir[i];
+			if( diff[i] > 180 ) diff[i] -= 360;
+			else if( diff[i] < -180 ) diff[i] += 360;
+		}	
+		// turn the turret
+		if( diff[YAW] < -turnspeed[TURRET_YAW] ) turret_yaw -= turnspeed[TURRET_YAW];
+		else if( diff[YAW] > turnspeed[TURRET_YAW] ) turret_yaw += turnspeed[TURRET_YAW];
+		else turret_yaw += diff[YAW];
+		if( turret_yaw < 0 ) turret_yaw += 360;
+		else if( turret_yaw > 360 ) turret_yaw -= 360;
 
-				if( diff[i] < -turnspeed[i] ) vehdir[i] -= turnspeed[i];
-				else if( diff[i] > turnspeed[i] ) vehdir[i] += turnspeed[i];
-				else vehdir[i] = viewdir[i];
-			}
-
-			// roll
-			if( diff[YAW] > 1 ) targroll = -90;
-			else if( diff[YAW] < -1 ) targroll = 90;
-			else targroll = 0;
-
-			diff[ROLL] = targroll - vehdir[ROLL];
-
-			if( diff[ROLL] < -turnspeed[ROLL] ) vehdir[ROLL] -= turnspeed[ROLL];
-			else if( diff[ROLL] > turnspeed[ROLL] ) vehdir[ROLL] += turnspeed[ROLL];
-			else vehdir[ROLL] = targroll;
-
-			// animations dependent on movement
-			if( diff[PITCH] < -8 || diff[YAW] > 8 || diff[YAW] < -8 ) {	// up
-				anim = 3;
-				// vapor effect on positive Gs
-				if( availableVehicles[pm->vehicle].caps & HC_VAPOR ) {
-					int speed = pm->ps->speed/10;
-					if( diff[PITCH] < -70 || diff[YAW] > 70 || diff[YAW] < -70 ) {
-						if( speed < availableVehicles[pm->vehicle].stallspeed * SPEED_GREEN_ARC &&
-							speed > availableVehicles[pm->vehicle].stallspeed * SPEED_YELLOW_ARC ) {
-							pm->ps->ONOFF |= OO_VAPOR;
-//							pm->ps->ONOFF &= ~OO_VAPOR;
-						}
-					}
-//					else if( diff[PITCH] < -50 || diff[YAW] > 50 || diff[YAW] < -50 ) {
-//						if( speed < availableVehicles[pm->vehicle].stallspeed * SPEED_GREEN_ARC &&
-//							speed > availableVehicles[pm->vehicle].stallspeed * SPEED_YELLOW_ARC ) {
-//							pm->ps->ONOFF |= OO_VAPOR;
-//							pm->ps->ONOFF &= ~OO_VAPOR_BIG;
-//						}
-//					}
-				}
-			}
-			else if( diff[PITCH] > 8 ) { // down
-				anim = 6;
-			}
-			if( diff[ROLL] < -8 ) {
-				anim++;
-			}
-			else if( diff[ROLL] > 8 ) {
-				anim += 2;
-			}
-			pm->ps->vehicleAnim = anim;
-
-		//	Com_Printf( va("anim is %d\n", anim) );
-		//	Com_Printf( va( "diff %.1f %.1f %.1f\n", diff[0], diff[1], diff[2] ) ); 
-	      //  Com_Printf( va("hdg: %.1f diff: %.1f\n", viewdir[YAW], diff[YAW]) );
-	    //   Com_Printf( va("view: %.1f %.1f %.1f\n", viewdir[PITCH], viewdir[YAW], viewdir[ROLL]) );
-	        //Com_Printf( va("move: %.1f %.1f %.1f\n", vehdir[PITCH], vehdir[YAW], vehdir[ROLL]) );
-			//}
+		// turn the gun
+		if( diff[PITCH] < -turnspeed[GUN_PITCH] ) gun_pitch -= turnspeed[GUN_PITCH];
+		else if( diff[PITCH] > turnspeed[GUN_PITCH] ) gun_pitch += turnspeed[GUN_PITCH];
+		else gun_pitch += diff[PITCH];
+		if( gun_pitch < 0 ) gun_pitch += 360;
+		else if( gun_pitch > 360 ) gun_pitch -= 360;
+		if( gun_pitch < 90 && gun_pitch > availableVehicles[pm->vehicle].tailangle ) {
+			gun_pitch = availableVehicles[pm->vehicle].tailangle;
+		} else if ( gun_pitch > 90 && gun_pitch < availableVehicles[pm->vehicle].gearheight ) {
+			gun_pitch = availableVehicles[pm->vehicle].gearheight;
 		}
-		if( (availableVehicles[pm->vehicle].caps & HC_GEAR) && (pm->ps->ONOFF & OO_GEAR) &&
-			(pm->ps->speed > availableVehicles[pm->vehicle].stallspeed * 10 * SPEED_GREEN_ARC) &&
-			!pm->ps->timers[TIMER_GEARANIM] ) {
-			PM_AddEvent( EV_GEAR_UP );
-//			pm->ps->ONOFF &= ~OO_GEAR;
-			pm->ps->timers[TIMER_GEAR] = pm->cmd.serverTime + availableVehicles[pm->vehicle].gearTime + 100;
-			pm->ps->timers[TIMER_GEARANIM] = pm->cmd.serverTime + availableVehicles[pm->vehicle].gearTime;
-		}
-		// wheel brakes off when airborne
-		if( !(availableVehicles[pm->vehicle].caps & HC_SPEEDBRAKE) &&
-			(pm->ps->ONOFF & OO_SPEEDBRAKE) ) {
-			pm->ps->ONOFF &= ~ OO_SPEEDBRAKE;
-		}
-    }
+//		Com_Printf( "gun %.1f (d %.1f)\n", gun_pitch, diff[PITCH] );
+	}
+
 	// return angles
 	VectorCopy( vehdir, pm->ps->vehicleAngles );
+	pm->ps->turretAngle = (int)(turret_yaw*10);
+	pm->ps->gunAngle = (int)(gun_pitch*10);
 
-	// speed
-	if( pm->ps->ONOFF & OO_LANDED ) vehdir[0] = 0;
-	AngleVectors( vehdir, pm->ps->velocity, NULL, NULL );
-	VectorScale( pm->ps->velocity, (float)pm->ps->speed/10, pm->ps->velocity );
-
-	PM_SlideMove_Plane();*/
 }
+
 
 /*
 ===============
-PM_AddTouchEnt_Plane
+PM_AddTouchEnt_Boat
 ===============
 */
 static void PM_AddTouchEnt_Boat( int entityNum ) {
-/*	int		i;
+	int		i;
 
 	if ( entityNum == ENTITYNUM_WORLD ) {
 		if( pm->ps->pm_type != PM_VEHICLE )
@@ -425,20 +249,20 @@ static void PM_AddTouchEnt_Boat( int entityNum ) {
 
 	// add it
 	pm->touchents[pm->numtouch] = entityNum;
-	pm->numtouch++;*/
+	pm->numtouch++;
 }
 
 
 /*
 ==================
-PM_SlideMove_Plane
+PM_SlideMove_Boat
 
 Returns qtrue if the velocity was clipped in some way
 ==================
 */
 #define	MAX_CLIP_PLANES	5
 qboolean	PM_SlideMove_Boat() {
-/*	int			bumpcount, numbumps;
+	int			bumpcount, numbumps;
 	vec3_t		dir;
 	float		d;
 	int			numplanes;
@@ -452,6 +276,10 @@ qboolean	PM_SlideMove_Boat() {
 	float		into;
 	vec3_t		endVelocity;
 	vec3_t		endClipVelocity;
+	vec3_t		mins;
+	
+	VectorCopy( availableVehicles[pm->vehicle].mins, mins );
+	mins[2] += 4;
 	
 	numbumps = 4;
 
@@ -479,7 +307,7 @@ qboolean	PM_SlideMove_Boat() {
 		// see if we can make it there
 		pm->trace ( &trace, 
 					pm->ps->origin, 
-					pm->mins, 
+					mins, 
 					pm->maxs, 
 					end, 
 					pm->ps->clientNum, 
@@ -517,7 +345,7 @@ qboolean	PM_SlideMove_Boat() {
 			(trace.entityNum == ENTITYNUM_WORLD &&
 //				!(trace.surfaceFlags & SURF_NOIMPACT) &&
 			!(trace.surfaceFlags & SURF_SKY)) ) {
-			PM_AddTouchEnt_Plane( trace.entityNum );
+			PM_AddTouchEnt_Boat( trace.entityNum );
 		}
 
 		time_left -= time_left * trace.fraction;
@@ -623,8 +451,7 @@ qboolean	PM_SlideMove_Boat() {
 		VectorCopy( primal_velocity, pm->ps->velocity );
 	}
 
-	return ( bumpcount != 0 );*/
-	return 0;
+	return ( bumpcount != 0 );
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.63 2002-02-18 16:23:25 sparky909_uk Exp $
+ * $Id: bg_public.h,v 1.64 2002-02-19 13:28:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.61f"
+#define	GAME_VERSION		"mfq3 v0.62"
 
 #define	DEFAULT_GRAVITY		800
 
@@ -575,7 +575,7 @@ qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTim
 #define	CAT_HELO					  0x0004 
 #define	CAT_LQM						  0x0008
 #define	CAT_BOAT					  0x0010 
-#define CAT_MAX						  0x0002 
+#define CAT_MAX						  0x0010 
 #define	CAT_ANY						  0xFFFF
 
 /*
@@ -656,7 +656,7 @@ extern const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1];
 #define SPEED_GREEN_ARC				2.0f
 
 // body part defines
-// 1.planes
+// planes
 #define BP_PLANE_BODY			0
 #define BP_PLANE_CONTROLS		1
 #define BP_PLANE_COCKPIT		2
@@ -669,9 +669,8 @@ extern const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1];
 #define BP_PLANE_PROP			9
 #define BP_PLANE_MAX_PARTS		10
 
-// 2.helos
 
-// 3.ground vehicles
+// ground vehicles
 #define BP_GV_BODY				0
 #define BP_GV_TURRET			1
 #define BP_GV_GUNBARREL			2
@@ -682,6 +681,12 @@ extern const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1];
 #define BP_GV_WHEEL5			7
 #define BP_GV_WHEEL6			8
 #define BP_GV_MAX_PARTS			9
+
+// boats
+#define BP_BOAT_BODY			0
+#define BP_BOAT_TURRET			1
+#define BP_BOAT_GUNBARREL		2
+#define BP_BOAT_MAX_PARTS		3
 
 // total max parts (no cat may exceed this!)
 #define BP_MAX_PARTS			10

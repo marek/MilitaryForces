@@ -1,5 +1,5 @@
 /*
- * $Id: mf_vehiclespawn.c,v 1.4 2002-02-18 09:51:28 thebjoern Exp $
+ * $Id: mf_vehiclespawn.c,v 1.5 2002-02-19 13:28:54 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -77,6 +77,13 @@ void MF_Spawn_LQM(gentity_t *ent, int idx) {
 
 // Boat
 void MF_Spawn_Boat(gentity_t *ent, int idx) {
+
+	// set flags
+	ent->client->ps.ONOFF = OO_LANDED;	// only "aerial" when falling
+
+	// speed, throttle
+	ent->client->ps.speed = 0;
+	ent->client->ps.fixed_throttle = 0;
 
 	// set functions
 	ent->touch = Touch_Boat;

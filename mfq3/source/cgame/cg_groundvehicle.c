@@ -1,5 +1,5 @@
 /*
- * $Id: cg_groundvehicle.c,v 1.12 2002-02-14 12:02:19 sparky909_uk Exp $
+ * $Id: cg_groundvehicle.c,v 1.13 2002-02-19 13:28:53 thebjoern Exp $
 */
 
 
@@ -77,7 +77,7 @@ CG_GroundVehicle
 */
 void CG_GroundVehicle( centity_t *cent, clientInfo_t *ci ) 
 {
-	refEntity_t	    part[BP_PLANE_MAX_PARTS];
+	refEntity_t	    part[BP_GV_MAX_PARTS];
 	refEntity_t		reticle;
 	float			shadowPlane = 0;
 	int				renderfx = 0;
@@ -94,13 +94,6 @@ void CG_GroundVehicle( centity_t *cent, clientInfo_t *ci )
 	}
 	memset( &reticle, 0, sizeof(reticle) );
 
-    // make sure cockpit view wont show vehicle
-/*
-    if( cent == &cg.predictedPlayerEntity && !cg.renderingThirdPerson )
-	{
-		renderfx |= RF_THIRD_PERSON;
-	}
-*/
     // get the rotation information
     VectorCopy( cent->currentState.angles, cent->lerpAngles );
     AnglesToAxis( cent->lerpAngles, part[BP_GV_BODY].axis );

@@ -1,76 +1,42 @@
 /*
- * $Id: cg_boat.c,v 1.1 2002-02-18 11:06:31 thebjoern Exp $
+ * $Id: cg_boat.c,v 1.2 2002-02-19 13:28:53 thebjoern Exp $
 */
 
 
 #include "cg_local.h"
-/*
+
 // make sure the tags are named properly!
-char *gv_tags[BP_GV_MAX_PARTS] =
+char *boat_tags[BP_BOAT_MAX_PARTS] =
 {
 	"<no tag>",		// vehicle body
 	"tag_turret",	// turret
-	"tag_weap",		// gun
-	"tag_wheel",	// wheel
-	"tag_wheel2",	// wheel
-	"tag_wheel3",	// wheel
-	"tag_wheel4",	// wheel
-	"tag_wheel5",	// wheel
-	"tag_wheel6"	// wheel
+	"tag_weap"		// gun
 };
-*/
+
 /*
 ==========================
 CG_RegisterBoat
 ==========================
 */
 void CG_RegisterBoat( clientInfo_t *ci ) 
-{/*
+{
 	int i;
 
-	for( i = 0; i < BP_GV_MAX_PARTS; i++ ) {
+	for( i = 0; i < BP_BOAT_MAX_PARTS; i++ ) {
 		ci->parts[i] = availableVehicles[ci->vehicle].handle[i];
-	}*/
+	}
 }
+
 
 
 /*
 ===============
-CG_GroundVehicleFlags
-===============
-*/
-static void CG_BoatFlags( centity_t *cent ) {
-/*	int		powerups;
-	clientInfo_t	*ci;
-
-	powerups = cent->currentState.objectives;
-	if ( !powerups ) {
-		return;
-	}
-
-	ci = &cgs.clientinfo[ cent->currentState.clientNum ];
-
-	// redflag
-	if ( powerups & OB_REDFLAG ) {
-		CG_TrailItem( cent, cgs.media.redFlagModel );
-//		trap_R_AddLightToScene( cent->lerpOrigin, 200 + (rand()&31), 1.0, 0.2f, 0.2f );
-	}
-
-	// blueflag
-	if ( powerups & OB_BLUEFLAG ) {
-		CG_TrailItem( cent, cgs.media.blueFlagModel );
-//		trap_R_AddLightToScene( cent->lerpOrigin, 200 + (rand()&31), 0.2f, 0.2f, 1.0 );
-	}*/
-}
-
-/*
-===============
-CG_GroundVehicle
+CG_Boat
 ===============
 */
 void CG_Boat( centity_t *cent, clientInfo_t *ci ) 
-{/*
-	refEntity_t	    part[BP_PLANE_MAX_PARTS];
+{
+	refEntity_t	    part[BP_BOAT_MAX_PARTS];
 	refEntity_t		reticle;
 	float			shadowPlane = 0;
 	int				renderfx = 0;
@@ -82,14 +48,14 @@ void CG_Boat( centity_t *cent, clientInfo_t *ci )
 	VectorCopy( cent->currentState.pos.trDelta, velocity );
 	speed = VectorLength( velocity );
 
-	for( i = 0; i < BP_GV_MAX_PARTS; i++ ) {
+	for( i = 0; i < BP_BOAT_MAX_PARTS; i++ ) {
 	    memset( &part[i], 0, sizeof(part[0]) );	
 	}
 	memset( &reticle, 0, sizeof(reticle) );
 
     // get the rotation information
     VectorCopy( cent->currentState.angles, cent->lerpAngles );
-    AnglesToAxis( cent->lerpAngles, part[BP_GV_BODY].axis );
+    AnglesToAxis( cent->lerpAngles, part[BP_BOAT_BODY].axis );
 
     // add the talk baloon or disconnect icon
     CG_PlayerSprites( cent );
@@ -111,71 +77,39 @@ void CG_Boat( centity_t *cent, clientInfo_t *ci )
     //
     // add the hull
     //
-    part[BP_GV_BODY].hModel = ci->parts[BP_GV_BODY];
-    VectorCopy( cent->lerpOrigin, part[BP_GV_BODY].origin );
-    VectorCopy( cent->lerpOrigin, part[BP_GV_BODY].lightingOrigin );
-    part[BP_GV_BODY].shadowPlane = shadowPlane;
-    part[BP_GV_BODY].renderfx = renderfx;
-    VectorCopy (part[BP_GV_BODY].origin, part[BP_GV_BODY].oldorigin);
-    trap_R_AddRefEntityToScene( &part[BP_GV_BODY] );
+    part[BP_BOAT_BODY].hModel = ci->parts[BP_BOAT_BODY];
+    VectorCopy( cent->lerpOrigin, part[BP_BOAT_BODY].origin );
+    VectorCopy( cent->lerpOrigin, part[BP_BOAT_BODY].lightingOrigin );
+    part[BP_BOAT_BODY].shadowPlane = shadowPlane;
+    part[BP_BOAT_BODY].renderfx = renderfx;
+    VectorCopy (part[BP_BOAT_BODY].origin, part[BP_BOAT_BODY].oldorigin);
+    trap_R_AddRefEntityToScene( &part[BP_BOAT_BODY] );
 
     //
     // turret
     //
-    part[BP_GV_TURRET].hModel = ci->parts[BP_GV_TURRET];
-    VectorCopy( cent->lerpOrigin, part[BP_GV_TURRET].lightingOrigin );
-	AxisCopy( axisDefault, part[BP_GV_TURRET].axis );
-	RotateAroundYaw( part[BP_GV_TURRET].axis, cent->currentState.angles2[ROLL] );
-	CG_PositionRotatedEntityOnTag( &part[BP_GV_TURRET], &part[BP_GV_BODY], ci->parts[BP_GV_BODY], gv_tags[BP_GV_TURRET] );
-	part[BP_GV_TURRET].shadowPlane = shadowPlane;
-    part[BP_GV_TURRET].renderfx = renderfx;
-    VectorCopy (part[BP_GV_TURRET].origin, part[BP_GV_TURRET].oldorigin);
-    trap_R_AddRefEntityToScene( &part[BP_GV_TURRET] );
+    part[BP_BOAT_TURRET].hModel = ci->parts[BP_BOAT_TURRET];
+    VectorCopy( cent->lerpOrigin, part[BP_BOAT_TURRET].lightingOrigin );
+	AxisCopy( axisDefault, part[BP_BOAT_TURRET].axis );
+	RotateAroundYaw( part[BP_BOAT_TURRET].axis, cent->currentState.angles2[ROLL] );
+	CG_PositionRotatedEntityOnTag( &part[BP_BOAT_TURRET], &part[BP_BOAT_BODY], ci->parts[BP_BOAT_BODY], boat_tags[BP_BOAT_TURRET] );
+	part[BP_BOAT_TURRET].shadowPlane = shadowPlane;
+    part[BP_BOAT_TURRET].renderfx = renderfx;
+    VectorCopy (part[BP_BOAT_TURRET].origin, part[BP_BOAT_TURRET].oldorigin);
+    trap_R_AddRefEntityToScene( &part[BP_BOAT_TURRET] );
 
     //
     // gun
     //
-    part[BP_GV_GUNBARREL].hModel = ci->parts[BP_GV_GUNBARREL];
-    VectorCopy( cent->lerpOrigin, part[BP_GV_GUNBARREL].lightingOrigin );
-	AxisCopy( axisDefault, part[BP_GV_GUNBARREL].axis );
-	RotateAroundPitch( part[BP_GV_GUNBARREL].axis, cent->currentState.angles2[PITCH] );
-	CG_PositionRotatedEntityOnTag( &part[BP_GV_GUNBARREL], &part[BP_GV_TURRET], ci->parts[BP_GV_TURRET], gv_tags[BP_GV_GUNBARREL] );
-	part[BP_GV_GUNBARREL].shadowPlane = shadowPlane;
-    part[BP_GV_GUNBARREL].renderfx = renderfx;
-    VectorCopy (part[BP_GV_GUNBARREL].origin, part[BP_GV_GUNBARREL].oldorigin);
-    trap_R_AddRefEntityToScene( &part[BP_GV_GUNBARREL] );
-
-	//
-	// wheels
-	//
-	// gearAnimStartTime is for timediff
-	// gearAnim is for angles
-	if( (availableVehicles[ci->vehicle].caps & HC_WHEELS) ) {
-		int ii;
-		int timediff = cg.time - cent->gearAnimStartTime;
-		float dist = speed * timediff / 1000;
-		vec3_t v1, v2;
-		float dot;
-		AngleVectors( cent->currentState.angles, v1, 0, 0 );
-		VectorCopy( cent->currentState.pos.trDelta, v2 );
-		VectorNormalize( v2 );
-		dot = DotProduct( v1, v2 );
-		dist = ( (dist / availableVehicles[ci->vehicle].wheelCF)*360);
-		cent->gearAnim += (dot > 0 ? dist : -dist);
-		cent->gearAnim = AngleMod( cent->gearAnim );
-		for( ii = 0; ii < availableVehicles[ci->vehicle].wheels; ++ii ) {
-			part[BP_GV_WHEEL+ii].hModel = ci->parts[BP_GV_WHEEL+ii];
-			VectorCopy( cent->lerpOrigin, part[BP_GV_WHEEL+ii].lightingOrigin );
-			AxisCopy( axisDefault, part[BP_GV_WHEEL+ii].axis );
-			part[BP_GV_WHEEL+ii].shadowPlane = shadowPlane;
-			part[BP_GV_WHEEL+ii].renderfx = renderfx;
-			VectorCopy (part[BP_GV_WHEEL+ii].origin, part[BP_GV_WHEEL+ii].oldorigin);
-			RotateAroundPitch( part[BP_GV_WHEEL+ii].axis, cent->gearAnim );
-			CG_PositionRotatedEntityOnTag( &part[BP_GV_WHEEL+ii], &part[BP_GV_BODY], ci->parts[BP_GV_BODY], gv_tags[BP_GV_WHEEL+ii] );
-			trap_R_AddRefEntityToScene( &part[BP_GV_WHEEL+ii] );
-		}
-		cent->gearAnimStartTime = cg.time;
-	}
+    part[BP_BOAT_GUNBARREL].hModel = ci->parts[BP_BOAT_GUNBARREL];
+    VectorCopy( cent->lerpOrigin, part[BP_BOAT_GUNBARREL].lightingOrigin );
+	AxisCopy( axisDefault, part[BP_BOAT_GUNBARREL].axis );
+	RotateAroundPitch( part[BP_BOAT_GUNBARREL].axis, cent->currentState.angles2[PITCH] );
+	CG_PositionRotatedEntityOnTag( &part[BP_BOAT_GUNBARREL], &part[BP_BOAT_TURRET], ci->parts[BP_BOAT_TURRET], boat_tags[BP_BOAT_GUNBARREL] );
+	part[BP_BOAT_GUNBARREL].shadowPlane = shadowPlane;
+    part[BP_BOAT_GUNBARREL].renderfx = renderfx;
+    VectorCopy (part[BP_BOAT_GUNBARREL].origin, part[BP_BOAT_GUNBARREL].oldorigin);
+    trap_R_AddRefEntityToScene( &part[BP_BOAT_GUNBARREL] );
 
 	CG_ResetReticles();
 
@@ -374,10 +308,8 @@ void CG_Boat( centity_t *cent, clientInfo_t *ci )
 	}
 #pragma message("maybe use the hastePuffShader for a dust trail when tanks drive ?")
 	// muzzleflash
-	CG_VehicleMuzzleFlash( cent, &part[BP_GV_GUNBARREL], ci->parts[BP_GV_GUNBARREL], ci->vehicle );
+	CG_VehicleMuzzleFlash( cent, &part[BP_BOAT_GUNBARREL], ci->parts[BP_BOAT_GUNBARREL], ci->vehicle );
 
-	// CTF
-	CG_GroundVehicleFlags( cent );*/
 }
 
 /*
@@ -388,7 +320,7 @@ General ugly function, needs to be made prettier some day...
 =============
 */
 void CG_BoatObituary( entityState_t *ent, clientInfo_t *ci ) 
-{/*
+{
 	// add some cool stuff here :-)
 
     int			mod;
@@ -560,6 +492,6 @@ void CG_BoatObituary( entityState_t *ent, clientInfo_t *ci )
     }
 
     // we don't know what it was
-    CG_Printf( "%s died.\n", targetName );*/
+    CG_Printf( "%s died.\n", targetName );
 }
 
