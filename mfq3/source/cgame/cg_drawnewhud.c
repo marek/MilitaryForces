@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.3 2002-01-26 19:27:30 thebjoern Exp $
+ * $Id: cg_drawnewhud.c,v 1.4 2002-01-26 23:48:31 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -727,7 +727,8 @@ CG_Draw_MFD
 
 ================
 */
-static void CG_Draw_MFD(int mfdnum, int vehicle, int onoff, int fuel, int flares, int ammo[16], int selweap) {
+static void CG_Draw_MFD(int mfdnum, int vehicle, int onoff, int fuel, int flares, 
+						int ammo[16], int selweap, int targetrange) {
 	float		x, y, width, height;
 	int			mode = cg.Mode_MFD[mfdnum];
 
@@ -763,14 +764,14 @@ static void CG_Draw_MFD(int mfdnum, int vehicle, int onoff, int fuel, int flares
 		trap_R_SetColor( HUDColors[HUD_GREEN] );
 		CG_DrawPic( x, y, width, height, cgs.media.HUDrwr );
 		trap_R_SetColor( NULL );
-		
+/*		
 		if( mfdnum == MFD_1 ) {
 			x = 0;
 		} else {
 			x = 512;
 		}
 		y = 352;
-
+*/
 		// draw contents
 		if( radarmode & OO_RADAR_AIR ) {
 			CG_DrawRadarSymbols_AIR_new(vehicle, range, x+64, y+64);
@@ -789,14 +790,14 @@ static void CG_Draw_MFD(int mfdnum, int vehicle, int onoff, int fuel, int flares
 		CG_MFQ3HUD_Numbers( x+86, y+114, 5, flares, qfalse, HUDColors[HUD_GREEN] );
 	} else if( mode == MFD_STATUS ) {
 		char	statusline[33];
-
+/*
 		if( mfdnum == MFD_1 ) {
 			x = 0;
 		} else {
 			x = 512;
 		}
 		y = 352;
-
+*/
 		CG_DrawString_MFQ3( x+4, y+14, "STATUS:", HUDColors[HUD_GREEN], 0);
 		CG_DrawString_MFQ3( x+4, y+20, "-------", HUDColors[HUD_GREEN], 0);
 		Com_sprintf( statusline, 32, "GEAR:      %s", (onoff & OO_GEAR ? "DOWN" : "UP") );
@@ -813,14 +814,14 @@ static void CG_Draw_MFD(int mfdnum, int vehicle, int onoff, int fuel, int flares
 	} else if( mode == MFD_INVENTORY ) {
 		char	invline[33];
 		int		i;
-	
+/*	
 		if( mfdnum == MFD_1 ) {
 			x = 0;
 		} else {
 			x = 512;
 		}
 		y = 352;
-
+*/
 		CG_DrawString_MFQ3( x+4, y+14, "INVENTORY:", HUDColors[HUD_GREEN], 0);
 		CG_DrawString_MFQ3( x+4, y+20, "----------", HUDColors[HUD_GREEN], 0);
 
@@ -843,6 +844,10 @@ static void CG_Draw_MFD(int mfdnum, int vehicle, int onoff, int fuel, int flares
 		}
 	} else if( mode == MFD_CAMERA ) {
 		CG_HUD_Camera(mfdnum, vehicle);
+		if( targetrange >= 0 ) {
+			CG_DrawString_MFQ3( x+6, y+16, "RANGE:", HUDColors[HUD_GREEN], 0);
+			CG_MFQ3HUD_Numbers( x+48, y+16, 6, targetrange, qfalse, HUDColors[HUD_GREEN] );
+		}
 	}
 }
 
@@ -1102,16 +1107,17 @@ static void CG_Draw_HeadingTape( int value, int targetheading ) {
 	CG_DrawHUDPic( x, y, width, height, cgs.media.HUDind_h );
 
 		// heading caret
-	value2 = value - targetheading;
-	if( value2 < -180 ) value2 += 360;
-	else if( value2 > 180 ) value2 -= 360;
-	if( value2 < -35 ) value2 = -35;
-	if( value2 > 35 ) value2 = 35;
-	x = 316-(value2*64/10);
-	y = 24;
-	width = height = 8;
-	CG_DrawHUDPic( x, y, width, height, cgs.media.HUDcaret_h );
-
+	if( targetheading > 0 && targetheading <= 360 ) {
+		value2 = value - targetheading;
+		if( value2 < -180 ) value2 += 360;
+		else if( value2 > 180 ) value2 -= 360;
+		if( value2 < -35 ) value2 = -35;
+		if( value2 > 35 ) value2 = 35;
+		x = 316-(value2*64/10);
+		y = 24;
+		width = height = 8;
+		CG_DrawHUDPic( x, y, width, height, cgs.media.HUDcaret_h );
+	}
 }
 
 
@@ -1127,7 +1133,8 @@ void CG_DrawStatusBar_MFQ3_new( void ) {
 	playerState_t	*ps;
 	int			value, value2;
 	int			vehicle = cgs.clientinfo[cg.predictedPlayerState.clientNum].vehicle;
-	
+	int			targetheading, targetrange;
+
 	static vec4_t colors[] = { 
 //		{ 0.2, 1.0, 0.2, 1.0 } , { 1.0, 0.2, 0.2, 1.0 }, {0.5, 0.5, 0.5, 1} };
 		{ 1.0f, 0.89f, 0.0f, 1.0f } ,		// normal, yellow
@@ -1144,11 +1151,29 @@ void CG_DrawStatusBar_MFQ3_new( void ) {
 	cent = &cg_entities[cg.snap->ps.clientNum];
 	ps = &cg.snap->ps;
 
+	// calc target range and heading
+	if( ps->stats[STAT_LOCKINFO] & LI_TRACKING ) {
+		centity_t* target = &cg_entities[cent->currentState.tracktarget];
+		vec3_t dir, angles;
+		if( target->currentState.eType == ET_EXPLOSIVE ) {
+			VectorSubtract( cgs.inlineModelMidpoints[target->currentState.modelindex], cent->lerpOrigin, dir );
+		} else {
+			VectorSubtract( target->lerpOrigin, cent->lerpOrigin, dir );
+		}
+		targetrange = VectorNormalize( dir );
+		vectoangles( dir, angles );
+		targetheading = 360 - angles[1];
+		if( targetheading <= 0 ) targetheading += 360;
+	} else {
+		targetheading = -1;
+		targetrange = -1;
+	}
+
 	// heading
 	if( hud_heading.integer ) {
 		value = 360 - (int)ps->vehicleAngles[1];
 		if( value <= 0 ) value += 360;
-		CG_Draw_HeadingTape( value, 360 );
+		CG_Draw_HeadingTape( value, targetheading );
 	}
 
 	// speed
@@ -1187,12 +1212,12 @@ void CG_DrawStatusBar_MFQ3_new( void ) {
 
 	// mfd 1
 	if( hud_mfd.integer ) {
-		CG_Draw_MFD(MFD_1, vehicle, cent->currentState.ONOFF, value2, value, ps->ammo, cent->currentState.weaponNum);
+		CG_Draw_MFD(MFD_1, vehicle, cent->currentState.ONOFF, value2, value, ps->ammo, cent->currentState.weaponNum, targetrange);
 	}
 
 	// mfd 2
 	if( hud_mfd2.integer ) {
-		CG_Draw_MFD(MFD_2, vehicle, cent->currentState.ONOFF, value2, value, ps->ammo, cent->currentState.weaponNum);
+		CG_Draw_MFD(MFD_2, vehicle, cent->currentState.ONOFF, value2, value, ps->ammo, cent->currentState.weaponNum, targetrange);
 	}
 
 	// solid middle section

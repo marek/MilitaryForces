@@ -1,5 +1,5 @@
 /*
- * $Id: bg_weapondata.c,v 1.8 2002-01-26 19:27:30 thebjoern Exp $
+ * $Id: bg_weapondata.c,v 1.9 2002-01-26 23:48:32 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -30,7 +30,6 @@ completeWeaponData_t availableWeapons[] =
 		0,									// spread
 		0,									// barrels
 		0,									// barrelDistance
-		0,									// trackcone
 		0,									// lockcone
 		0,									// followcone
 		0,									// locktime
@@ -61,7 +60,6 @@ completeWeaponData_t availableWeapons[] =
 		8,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
 		8,									// barrels
 		0,									// barrelDistance
-		0,									// trackcone
 		0,									// lockcone
 		0,									// followcone
 		0,									// locktime
@@ -92,7 +90,6 @@ completeWeaponData_t availableWeapons[] =
 		8,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
 		8,									// barrels
 		0,									// barrelDistance
-		0,									// trackcone
 		0,									// lockcone
 		0,									// followcone
 		0,									// locktime
@@ -123,7 +120,6 @@ completeWeaponData_t availableWeapons[] =
 		8,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
 		8,									// barrels
 		0,									// barrelDistance
-		0,									// trackcone
 		0,									// lockcone
 		0,									// followcone
 		0,									// locktime
@@ -154,7 +150,6 @@ completeWeaponData_t availableWeapons[] =
 		8,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
 		6,									// barrels
 		0,									// barrelDistance
-		0,									// trackcone
 		0,									// lockcone
 		0,									// followcone
 		0,									// locktime
@@ -185,7 +180,6 @@ completeWeaponData_t availableWeapons[] =
 		14,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
 		1,									// barrels
 		0,									// barrelDistance
-		0,									// trackcone
 		0,									// lockcone
 		0,									// followcone
 		0,									// locktime
@@ -216,7 +210,6 @@ completeWeaponData_t availableWeapons[] =
 		14,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
 		2,									// barrels
 		0,									// barrelDistance
-		0,									// trackcone
 		0,									// lockcone
 		0,									// followcone
 		0,									// locktime
@@ -247,7 +240,6 @@ completeWeaponData_t availableWeapons[] =
 		14,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
 		1,									// barrels
 		0,									// barrelDistance
-		0,									// trackcone
 		0,									// lockcone
 		0,									// followcone
 		0,									// locktime
@@ -278,7 +270,6 @@ completeWeaponData_t availableWeapons[] =
 		10,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
 		2,									// barrels
 		0,									// barrelDistance
-		0,									// trackcone
 		0,									// lockcone
 		0,									// followcone
 		0,									// locktime
@@ -309,7 +300,6 @@ completeWeaponData_t availableWeapons[] =
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
-		0,									// trackcone
 		0,									// lockcone
 		0,									// followcone
 		0,									// locktime
@@ -340,7 +330,6 @@ completeWeaponData_t availableWeapons[] =
 		1,									// spread
 		1,									// barrels
 		0,									// barrelDistance
-		0,									// trackcone
 		0,									// lockcone
 		0,									// followcone
 		0,									// locktime
@@ -371,7 +360,6 @@ completeWeaponData_t availableWeapons[] =
 		1,									// spread
 		1,									// barrels
 		0,									// barrelDistance
-		0,									// trackcone
 		0,									// lockcone
 		0,									// followcone
 		0,									// locktime
@@ -402,7 +390,6 @@ completeWeaponData_t availableWeapons[] =
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
-		0,									// trackcone
 		0,									// lockcone
 		0,									// followcone
 		0,									// locktime
@@ -433,7 +420,6 @@ completeWeaponData_t availableWeapons[] =
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
-		0.35f,								// trackcone (dot) (0.7)
 		0.985f,								// lockcone (dot)
 		0.985f,								// followcone (dot) (0.996)
 		1500,								// locktime
@@ -464,7 +450,6 @@ completeWeaponData_t availableWeapons[] =
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
-		0.7f,								// trackcone (dot)
 		0.985f,								// lockcone (dot)
 		0.996f,								// followcone (dot)
 		1500,								// locktime
@@ -495,7 +480,6 @@ completeWeaponData_t availableWeapons[] =
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
-		0.7f,								// trackcone (dot)
 		0.985f,								// lockcone (dot)
 		0.996f,								// followcone (dot)
 		1500,								// locktime
@@ -526,7 +510,6 @@ completeWeaponData_t availableWeapons[] =
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
-		0.7f,								// trackcone (dot)
 		0.985f,								// lockcone (dot)
 		0.996f,								// followcone (dot)
 		1500,								// locktime
@@ -557,7 +540,6 @@ completeWeaponData_t availableWeapons[] =
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
-		0.7f,								// trackcone (dot)
 		0.985f,								// lockcone (dot)
 		0.996f,								// followcone (dot)
 		1500,								// locktime
@@ -588,7 +570,6 @@ completeWeaponData_t availableWeapons[] =
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
-		0.35f,								// trackcone (dot)
 		0.985f,								// lockcone (dot)
 		0.985f,								// followcone (dot)
 		1500,								// locktime
@@ -619,7 +600,6 @@ completeWeaponData_t availableWeapons[] =
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
-		0.7f,								// trackcone (dot)
 		0.985f,								// lockcone (dot)
 		0.996f,								// followcone (dot)
 		1500,								// locktime
@@ -650,7 +630,6 @@ completeWeaponData_t availableWeapons[] =
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
-		0.7f,								// trackcone (dot)
 		0.985f,								// lockcone (dot)
 		0.996f,								// followcone (dot)
 		1500,								// locktime
@@ -681,7 +660,6 @@ completeWeaponData_t availableWeapons[] =
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
-		0.7f,								// trackcone (dot)
 		0.985f,								// lockcone (dot)
 		0.996f,								// followcone (dot)
 		1500,								// locktime
@@ -712,7 +690,6 @@ completeWeaponData_t availableWeapons[] =
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
-		0.7f,								// trackcone (dot)
 		0.985f,								// lockcone (dot)
 		0.996f,								// followcone (dot)
 		1500,								// locktime
@@ -743,7 +720,6 @@ completeWeaponData_t availableWeapons[] =
 		1,									// spread
 		0,									// barrels
 		0,									// barrelDistance
-		0,									// trackcone (dot)
 		0,									// lockcone (dot)
 		0,									// followcone (dot)
 		0,									// locktime
