@@ -1,5 +1,5 @@
 /*
- * $Id: g_main.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: g_main.c,v 1.2 2002-01-29 12:10:54 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -65,6 +65,7 @@ vmCvar_t	g_listEntity;
 // MFQ3
 vmCvar_t	mf_gameset;
 vmCvar_t	mf_lvcat;
+vmCvar_t	mf_version;
 
 cvarTable_t		gameCvarTable[] = {
 	// don't override the cheat state set by the system
@@ -84,6 +85,7 @@ cvarTable_t		gameCvarTable[] = {
 
 	// MFQ3 vars
 	{ &mf_gameset, "mf_gameset", "modern", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_LATCH, 0, qfalse  },
+	{ &mf_version, "mf_version", "unknown", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_LATCH, 0, qfalse  },
 	{ &mf_lvcat, "mf_lvcat", "0", CVAR_SERVERINFO | CVAR_ROM, 0, qfalse },
 
 	// change anytime vars
@@ -352,7 +354,8 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 	G_Printf ("------- Game Initialization -------\n");
 	G_Printf ("gamename: %s\n", GAMEVERSION);
-	G_Printf ("gamedate: %s\n", __DATE__);
+	G_Printf ("gamedate: %s\n",  __DATE__ );
+	G_Printf ("mfq3 version: %s\n", GAME_VERSION );
 
 	srand( randomSeed );
 
@@ -362,8 +365,9 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 	G_InitMemory();
 
-	// set some level globals
-	memset( &level, 0, sizeof( level ) );
+	// set the game version into a server var (that can be viewed as server-info)
+	trap_Cvar_Set( "mf_version", GAME_VERSION );
+	
 	level.time = levelTime;
 	level.startTime = levelTime;
 

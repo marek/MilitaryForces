@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.4 2002-01-23 18:47:22 sparky909_uk Exp $
+ * $Id: ui_main.c,v 1.5 2002-01-29 12:11:29 sparky909_uk Exp $
 */
 /*
 =======================================================================
@@ -3231,6 +3231,17 @@ static void UI_Update(const char *name) {
 
 /*
 ===============
+UI_InitialiseUI
+===============
+*/
+static void UI_InitialiseUI( void )
+{
+	// set the MFQ3 version string
+	trap_Cvar_Set( "ui_mfq3Version", GAME_VERSION );
+}
+
+/*
+===============
 UI_RefreshVehicleSelect
 ===============
 */
@@ -3240,11 +3251,19 @@ static void UI_RefreshVehicleSelect( void )
 	int vehicleClass = -1;
 	int vehicle = -1;
 	unsigned long gameset = -1;
+	unsigned long team = -1;
 	const char * pCat = NULL;
 	const char * pClass = NULL;
 	const char * pVehicle = NULL;
 	qboolean currentVehicleValid = qtrue;
 	unsigned long what = 0x00000000;
+
+	// get gameset & team (as MF_GAMESET_x and MF_TEAM_x)
+	gameset = MF_GetGameset();
+	team = MF_UI_GetTeam();
+	
+	// find out the current UI vehicle (based upon the known catagory+class)
+	vehicle = trap_Cvar_VariableValue("ui_vehicle");
 
 	// find out the current UI catagory
 	vehicleCat = trap_Cvar_VariableValue("ui_vehicleCat");
@@ -3253,16 +3272,28 @@ tryCatAgain:
 
 	// get the text
 	pCat = cat_items[ vehicleCat ];
-	if( pCat )
+
+	// is this catagory valid for the current gameset+team+catagory?
+
+	// check
+	vehicle = MF_getIndexOfVehicleEx( (vehicle-1), vehicleCat, -1, team, gameset );
+	
+	if( pCat && vehicle >= 0 )
 	{
 		// update the text in the dialog for the UI catagory
 		trap_Cvar_Set( "ui_vehicleCatTxt", pCat );
 	}
 	else
 	{
-		// the 'ui_vehicleCat' must be invalid, reset
-		trap_Cvar_Set( "ui_vehicleCat", "0" );
-		vehicleCat = 0;
+		// the 'ui_vehicleCat' must be invalid try the next one
+		vehicleCat++;
+		
+		// wrap?
+		if( vehicleCat >= MF_MAX_CATEGORIES )
+		{
+			trap_Cvar_Set( "ui_vehicleCat", "0" );
+			vehicleCat = 0;
+		}
 
 		goto tryCatAgain;
 	}
@@ -3274,38 +3305,34 @@ tryClassAgain:
 
 	// get the text
 	pClass = class_items[ vehicleCat ][ vehicleClass ];
-	if( pClass )
+
+	// check
+	vehicle = MF_getIndexOfVehicleEx( (vehicle-1), vehicleCat, vehicleClass, team, gameset );
+	
+	if( pClass && vehicle >= 0 )
 	{
 		// update the text in the dialog for the UI class
 		trap_Cvar_Set( "ui_vehicleClassTxt", pClass );
 	}
 	else
 	{
-		// the 'ui_vehicleClass' must be invalid, reset
-		trap_Cvar_Set( "ui_vehicleClass", "0" );
-		vehicleClass = 0;
+		// the 'ui_vehicleCat' must be invalid try the next one
+		vehicleClass++;
+
+		// wrap?
+		if( vehicleClass >= MF_MAX_CLASSES )
+		{
+			trap_Cvar_Set( "ui_vehicleClass", "0" );
+			vehicleClass = 0;
+		}
 
 		goto tryClassAgain;
 	}
 
-	// find out the current UI vehicle (based upon the known catagory+class)
-	vehicle = trap_Cvar_VariableValue("ui_vehicle");
-
-	// is this vehicle valid for the current gameset+team+catagory+class?
-	
-	// get gameset (as MF_GAMESET_x)
-	gameset = MF_GetGameset();
-	
-	// create the mask DWORD
-
-	// add components (in LB -> HB order in DWORD)
-	what |= (1 << vehicleClass);		// (convert from enum)
-	what |= (1 << vehicleCat) << 8;		// (convert from enum)
-	what |= MF_UI_GetTeam();
-	what |= gameset;
+	// is the vehicle valid for the current gameset+team+catagory+class?
 
 	// check
-	vehicle = MF_getIndexOfVehicle( (vehicle-1), what );
+	vehicle = MF_getIndexOfVehicleEx( (vehicle-1), vehicleCat, vehicleClass, team, gameset );
 	
 	// -1 means this is not a suitable combination
 	if( vehicle == -1 )
@@ -3827,6 +3854,11 @@ static void UI_RunMenuScript(char **args) {
 		{
 			// reset cursor
 			uiInfo.uiDC.cursorEnum = CURSOR_NORMAL;
+		}
+		else if( Q_stricmp(name, "uiInitialise") == 0 )
+		{
+			// UI: initialise anything on main menu open
+			UI_InitialiseUI();
 		}
 		else
 		{
@@ -6025,6 +6057,8 @@ vmCvar_t	ui_vehicleCatTxt;	// vehicle catagory text
 vmCvar_t	ui_vehicleClassTxt;	// vehicle class text
 vmCvar_t	ui_vehicleTxt;		// vehicle text
 
+vmCvar_t	ui_mfq3Version;		// version text
+
 // bk001129 - made static to avoid aliasing
 static cvarTable_t		cvarTable[] = {
 	{ &ui_ffa_fraglimit, "ui_ffa_fraglimit", "20", CVAR_ARCHIVE },
@@ -6073,9 +6107,12 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_vehicleClass, "ui_vehicleClass", "0", CVAR_ARCHIVE | CVAR_ROM },
 	{ &ui_vehicle, "ui_vehicle", "0", CVAR_ARCHIVE | CVAR_ROM },
 
-	{ &ui_vehicleCat, "ui_vehicleCatTxt", "<Catagory>", CVAR_ARCHIVE | CVAR_ROM },
-	{ &ui_vehicleClass, "ui_vehicleClassTxt", "<Class>", CVAR_ARCHIVE | CVAR_ROM },
-	{ &ui_vehicle, "ui_vehicleTxt", "<Vehicle>", CVAR_ARCHIVE | CVAR_ROM },
+	{ &ui_vehicleCat, "ui_vehicleCatTxt", "<Catagory>", CVAR_ROM },
+	{ &ui_vehicleClass, "ui_vehicleClassTxt", "<Class>", CVAR_ROM },
+	{ &ui_vehicle, "ui_vehicleTxt", "<Vehicle>", CVAR_ROM },
+
+	// (misc)
+	{ &ui_mfq3Version, "ui_mfq3Version", "<MFQ3 Version>", CVAR_ROM },
 
 	{ &ui_server1, "server1", "", CVAR_ARCHIVE },
 	{ &ui_server2, "server2", "", CVAR_ARCHIVE },
