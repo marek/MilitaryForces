@@ -1,5 +1,5 @@
 /*
- * $Id: g_client.c,v 1.4 2002-02-21 11:20:06 sparky909_uk Exp $
+ * $Id: g_client.c,v 1.5 2002-02-21 11:25:13 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -653,12 +653,13 @@ void ClientUserinfoChanged( int clientNum ) {
 		s = va("n\\%s\\t\\%i\\c1\\%s\\hc\\%i\\w\\%i\\l\\%i\\skill\\%s\\tt\\%d\\tl\\%d\\v\\%d\\x\\%d",
 			client->pers.netname, client->sess.sessionTeam, c1,
 			client->pers.maxHealth, client->sess.wins, client->sess.losses,
-			Info_ValueForKey( userinfo, "skill" ), teamTask, teamLeader, -1, -1 );// mfq3 for now no vehicle
+			Info_ValueForKey( userinfo, "skill" ), teamTask, teamLeader,
+			-1, -1 );	// MFQ3: for now no vehicle
 	} else {
 		s = va("n\\%s\\t\\%i\\g_redteam\\%s\\g_blueteam\\%s\\c1\\%s\\hc\\%i\\w\\%i\\l\\%i\\tt\\%d\\tl\\%d\\v\\%d\\x\\%d",
 			client->pers.netname, client->sess.sessionTeam, redTeam, blueTeam, c1,
 			client->pers.maxHealth, client->sess.wins, client->sess.losses, teamTask, teamLeader,
-			vehicle, nextVehicle ); // mfq3
+			vehicle, nextVehicle ); // MFQ3: send current/next vehicle indexes
 	}
 
 	trap_SetConfigstring( CS_PLAYERS+clientNum, s );
