@@ -1,5 +1,5 @@
 /*
- * $Id: cg_draw.c,v 1.24 2002-02-20 19:58:08 sparky909_uk Exp $
+ * $Id: cg_draw.c,v 1.25 2002-02-21 11:17:15 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1079,13 +1079,15 @@ Is the new HUD actually being draw?
 qboolean CG_NewHUDActive( void )
 {
 	// definatley not active?
-	if ( cg.snap->ps.pm_type == PM_DEAD || cg.snap->ps.pm_type == PM_SPECTATOR || 
+	if ( cg.snap->ps.pm_type == PM_DEAD ||
+		 cg.snap->ps.pm_type == PM_SPECTATOR || 
+		 cg.snap->ps.pm_type == PM_FREEZE ||
 		 cg.snap->ps.stats[STAT_HEALTH] <= 0 || cg.scoreBoardShowing )
 	{
 		return qfalse;
 	}
 
-	// new HUD active?
+	// do we have a valid current vehicle index and the 'Retro' HUD is not being used?
 	return( cg_vehicle.integer != -1 && !cg_oldHUD.integer );
 }
 
