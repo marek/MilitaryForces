@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawtools.c,v 1.4 2002-02-14 12:02:19 sparky909_uk Exp $
+ * $Id: cg_drawtools.c,v 1.5 2002-02-14 12:41:48 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1218,3 +1218,28 @@ void CG_AddReticleEntityToScene( refEntity_t * pReticle, qboolean targetRecticle
 #endif
 	}
 }
+
+/*
+================
+CG_Draw_Reticles
+
+================
+*/
+void CG_Draw_Reticles( void )
+{
+	int i = 0;
+
+	// get pointer to the reticles
+	reticle_t * pR = &cg.HUDReticle[0];
+
+	// for all valid
+	for( i = 0; i< cg.reticleIdx; i++ )
+	{
+		// draw?
+		if( pR[i].shader )
+		{
+			CG_DrawPic( pR[i].x, pR[i].y, pR[i].w, pR[i].h, pR[i].shader );
+		}
+	}
+}
+

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawoldhud.c,v 1.1 2002-01-25 13:26:52 thebjoern Exp $
+ * $Id: cg_drawoldhud.c,v 1.2 2002-02-14 12:41:48 sparky909_uk Exp $
 */
 
 #include "cg_local.h"
@@ -506,4 +506,7 @@ void CG_DrawStatusBar_MFQ3( void ) {
 			CG_DrawPic( 200, 440, 24, 45, availableWeapons[availableVehicles[vehicle].weapons[0]].iconHandle );
 		}
 	}
+
+	// aiming/targetting reticles
+	CG_Draw_Reticles();
 }
