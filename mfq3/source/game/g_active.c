@@ -1,5 +1,5 @@
 /*
- * $Id: g_active.c,v 1.19 2002-07-15 18:23:07 thebjoern Exp $
+ * $Id: g_active.c,v 1.20 2003-02-11 00:25:10 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -788,6 +788,7 @@ void ClientThink_real( gentity_t *ent ) {
 	VectorCopy( client->ps.origin, client->oldOrigin );
 
 	// setup vehicle for pmove
+	pm.advancedControls = client->advancedControls;
 	pm.vehicle = client->vehicle;
 	pm.updateGear = ent->updateGear;
 	pm.updateBay = ent->updateBay;

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.109 2003-02-08 15:20:16 thebjoern Exp $
+ * $Id: bg_public.h,v 1.110 2003-02-11 00:25:10 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.75"
+#define	GAME_VERSION		"mfq3 v0.75b"
 #define	GAME_IDENTIFIER		"mfq3"			// use to identify mfq3 servers
 
 #define	DEFAULT_GRAVITY		800
@@ -151,6 +151,8 @@ typedef struct {
 	int			vehicle;		// MFQ3
 	qboolean	updateGear;
 	qboolean	updateBay;
+
+	int			advancedControls;	// MFQ3
 
 	// callbacks to test the world
 	// these will be different functions during game and cgame

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_view.c,v 1.11 2002-06-12 14:35:33 thebjoern Exp $
+ * $Id: cg_view.c,v 1.12 2003-02-11 00:25:09 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -151,6 +151,106 @@ static void CG_OffsetVehicleView( qboolean spectator )
 }
 
 
+
+// MFQ3
+static void CG_OffsetVehicleViewCFV( qboolean spectator ) 
+{
+    vec3_t	    forward, right, up;
+    vec3_t	    focusAngles;
+    vec3_t	    view;
+    trace_t	    trace;
+    vec3_t		mins, maxs, start; 
+	float		dist, height;
+	static int	lastVehicle = -1;
+
+#ifdef _VIEW_SETTING_DISPLAY
+	char test[ 64 ];
+#endif
+	// reset 3rd person camera distance and height to vehicle default (only when valid)
+	if( cg_vehicle.integer != lastVehicle )
+	{
+		// reset
+		cg_thirdPersonRange.value = availableVehicles[ cg_vehicle.integer ].cam_dist[ CAMERA_V_DEFAULT ];
+		cg_thirdPersonHeight.value = availableVehicles[ cg_vehicle.integer ].cam_height[ CAMERA_V_DEFAULT ];
+
+		// save vehicle we reset for
+		lastVehicle = cg_vehicle.integer;
+	}
+
+	// get vars
+	dist = cg_thirdPersonRange.value;
+	height = cg_thirdPersonHeight.value;
+
+	// clamp distance
+	MF_LimitFloat( &dist,
+					availableVehicles[cg_vehicle.integer].cam_dist[ CAMERA_V_MIN ],
+					availableVehicles[cg_vehicle.integer].cam_dist[ CAMERA_V_MAX ] );
+
+	// clamp height
+	MF_LimitFloat( &height,
+					availableVehicles[cg_vehicle.integer].cam_height[ CAMERA_V_MIN ],
+					availableVehicles[cg_vehicle.integer].cam_height[ CAMERA_V_MAX ] );
+
+#ifdef _VIEW_SETTING_DISPLAY
+	sprintf( test,"d=%f h=%f", dist, height );
+	CG_CenterPrint( test, 100, 10 );
+#endif
+
+	// update vars
+	cg_thirdPersonRange.value = dist;
+	cg_thirdPersonHeight.value = height;
+
+	if( spectator ) {
+		VectorSet( mins, -8, -8, -8 );
+		VectorSet( maxs, 8, 8, 8 );
+	} else {
+		VectorSet( mins, -2, -2, -2 );
+		VectorSet( maxs, 2, 2, 2 );
+	}
+
+//    VectorCopy( cg.refdefViewAngles, focusAngles );
+	VectorCopy( cg.predictedPlayerEntity.currentState.angles, focusAngles );
+
+//    if ( cg.predictedPlayerState.stats[STAT_HEALTH] <= GIB_HEALTH ) 
+//    {
+//	}
+
+    AngleVectors( focusAngles, forward, right, up);
+
+    VectorCopy( cg.refdef.vieworg, start );
+	if( !spectator ) {
+		if( cg_advanced.integer )
+			VectorMA(start, availableVehicles[cg_vehicle.integer].maxs[2], up, start);
+		else
+			start[2] += availableVehicles[cg_vehicle.integer].maxs[2];
+	}
+    VectorCopy( cg.refdef.vieworg, view );
+
+	if( !spectator ) {
+		VectorMA( view, /*-(availableVehicles[cg_vehicle.integer].cam_dist[ CAMERA_V_DEFAULT ]*/ - dist/*)*/, forward, view );
+		if( cg_advanced.integer )
+			VectorMA(view, availableVehicles[cg_vehicle.integer].maxs[2], up, view);
+		else
+			view[2] += /*(availableVehicles[cg_vehicle.integer].cam_height[ CAMERA_V_DEFAULT ]*/ + height /*)*/;
+	}
+
+    CG_Trace( &trace, start, mins, maxs, view, cg.predictedPlayerState.clientNum, MASK_SOLID );
+
+    if ( trace.fraction < 1.0 ) 
+    {
+		VectorCopy( trace.endpos, view );
+		view[2] += (1.0 - trace.fraction) * 32;
+		// try another trace to this position, because a tunnel may have the ceiling
+		// close enogh that this is poking out
+
+		CG_Trace( &trace, start, mins, maxs, view, cg.predictedPlayerState.clientNum, MASK_SOLID );
+		VectorCopy( trace.endpos, view );
+    }
+
+    VectorCopy( view, cg.refdef.vieworg );
+}
+
+
 /*
 ===============
 CG_OffsetCockpitView
@@ -172,6 +272,7 @@ static void CG_OffsetCockpitView( void )
 
     VectorCopy( view, cg.refdef.vieworg );
 }
+
 
 
 /*
@@ -439,7 +540,10 @@ static int CG_CalcViewValues( void ) {
 	}
 
 	VectorCopy( ps->origin, cg.refdef.vieworg );
-	VectorCopy( ps->viewangles, cg.refdefViewAngles );
+	if( cg_advanced.integer )
+		VectorCopy( cg.predictedPlayerEntity.currentState.angles, cg.refdefViewAngles );
+	else
+		VectorCopy( ps->viewangles, cg.refdefViewAngles );
 
 	// add error decay
 	if ( cg_errorDecay.value > 0 ) {
@@ -458,9 +562,12 @@ static int CG_CalcViewValues( void ) {
 	if( ps->pm_type == PM_SPECTATOR ) {
 	    CG_OffsetVehicleView(qtrue);
 	} else if ( cg.renderingThirdPerson ) {
-	    CG_OffsetVehicleView(qfalse);
+		if( cg_advanced.integer )
+			CG_OffsetVehicleViewCFV(qfalse);
+		else
+			CG_OffsetVehicleView(qfalse);
 	} else {
-	    CG_OffsetCockpitView();
+		CG_OffsetCockpitView();
 	}
 
 	// position eye reletive to origin
