@@ -1,5 +1,5 @@
 /*
- * $Id: cg_info.c,v 1.7 2002-02-26 10:47:30 sparky909_uk Exp $
+ * $Id: cg_info.c,v 1.8 2002-06-09 20:09:41 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -187,6 +187,9 @@ void CG_DrawInformation( void ) {
 		break;
 	case GT_SINGLE_PLAYER:
 		s = "Single Player";
+		break;
+	case GT_MISSION_EDITOR:
+		s = "MFQ3 Mission Editor";
 		break;
 	case GT_TOURNAMENT:
 		s = "Tournament";

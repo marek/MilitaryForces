@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.21 2002-04-16 11:28:18 thebjoern Exp $
+ * $Id: g_local.h,v 1.22 2002-06-09 20:09:41 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -177,6 +177,9 @@ struct gentity_s {
 	qboolean	 updateBay;
 	completeLoadout_t loadout;
 	qboolean	 loadoutUpdated;
+	gentity_t*	 selector;			// mission editor
+	int			 meangles[3];		// mission editor
+
 };
 
 
@@ -782,6 +785,13 @@ void G_InitMemory( void );
 void Svcmd_GameMem_f( void );
 
 //
+// g_missioneditor.c
+//
+void Cmd_ME_Spawn_f( gentity_t* editor );
+void ME_Find( gentity_t* ent );
+void ME_MoveObject(gentity_t* editor, usercmd_t *ucmd );
+
+//
 // g_session.c
 //
 void G_ReadSessionData( gclient_t *client );
@@ -848,6 +858,7 @@ extern	vmCvar_t	g_rankings;
 extern	vmCvar_t	g_enableDust;
 extern	vmCvar_t	g_enableBreath;
 extern	vmCvar_t	g_singlePlayer;
+extern	vmCvar_t	g_spectSpeed;
 
 // MFQ3
 extern  vmCvar_t	mf_gameset;

@@ -1,5 +1,5 @@
 /*
- * $Id: g_cmds.c,v 1.13 2002-02-27 11:24:09 sparky909_uk Exp $
+ * $Id: g_cmds.c,v 1.14 2002-06-09 20:09:41 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -453,6 +453,9 @@ void SetTeam( gentity_t *ent, char *s ) {
 	qboolean			dontBalance = qfalse;
 	int					balanceNum = 0;
 	const char *		pTeam = NULL;
+
+	// only spect int mission editor
+	if( g_gametype.integer == GT_MISSION_EDITOR ) return;
 
 	//
 	// see what change is requested
@@ -1022,6 +1025,7 @@ static const char *gameNames[] = {
 	"Free For All",
 	"Tournament",
 	"Single Player",
+	"MFQ3 Mission Editor",
 	"Team Deathmatch",
 	"Capture the Flag",
 	"One Flag CTF",
@@ -1091,7 +1095,7 @@ void Cmd_CallVote_f( gentity_t *ent ) {
 	// special case for g_gametype, check for bad values
 	if ( !Q_stricmp( arg1, "g_gametype" ) ) {
 		i = atoi( arg2 );
-		if( i == GT_SINGLE_PLAYER || i < GT_FFA || i >= GT_MAX_GAME_TYPE) {
+		if( i == GT_SINGLE_PLAYER || i == GT_MISSION_EDITOR || i < GT_FFA || i >= GT_MAX_GAME_TYPE) {
 			trap_SendServerCommand( ent-g_entities, "print \"Invalid gametype.\n\"" );
 			return;
 		}
@@ -1464,6 +1468,8 @@ void ClientCommand( int clientNum ) {
 		Cmd_GameCommand_f( ent );
 	else if (Q_stricmp (cmd, "stats") == 0)
 		Cmd_Stats_f( ent );
+	else if (Q_stricmp (cmd, "me_spawn") == 0)
+		Cmd_ME_Spawn_f( ent );
 	else
 		trap_SendServerCommand( clientNum, va("print \"unknown cmd %s\n\"", cmd ) );
 }

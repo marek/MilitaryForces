@@ -1,5 +1,5 @@
 /*
- * $Id: cg_servercmds.c,v 1.6 2002-02-19 17:53:04 sparky909_uk Exp $
+ * $Id: cg_servercmds.c,v 1.7 2002-06-09 20:09:41 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -157,7 +157,7 @@ static void CG_ParseWarmup( void ) {
 
 	if ( warmup == 0 && cg.warmup ) {
 
-	} else if ( warmup > 0 && cg.warmup <= 0 ) {
+	} else if ( warmup > 0 && cg.warmup <= 0 && cgs.gametype != GT_MISSION_EDITOR ) {
 		{
 			trap_S_StartLocalSound( cgs.media.countPrepareSound, CHAN_ANNOUNCER );
 		}
@@ -427,9 +427,11 @@ static void CG_MapRestart( void ) {
 	// we really should clear more parts of cg here and stop sounds
 
 	// play the "fight" sound if this is a restart without warmup
-	if ( cg.warmup == 0 /* && cgs.gametype == GT_TOURNAMENT */) {
+	if ( cg.warmup == 0 && cgs.gametype != GT_MISSION_EDITOR /* && cgs.gametype == GT_TOURNAMENT */) {
 		trap_S_StartLocalSound( cgs.media.countFightSound, CHAN_ANNOUNCER );
 		CG_CenterPrint( "FIGHT!", 120, GIANTCHAR_WIDTH*2 );
+	} else if ( cgs.gametype == GT_MISSION_EDITOR ) {
+		CG_CenterPrint( "EDIT!", 120, GIANTCHAR_WIDTH*2 );
 	}
 }
 

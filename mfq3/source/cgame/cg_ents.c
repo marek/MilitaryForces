@@ -1,5 +1,5 @@
 /*
- * $Id: cg_ents.c,v 1.3 2002-02-27 23:11:18 thebjoern Exp $
+ * $Id: cg_ents.c,v 1.4 2002-06-09 20:09:41 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -240,65 +240,91 @@ static void CG_Item( centity_t *cent ) {
 		return;
 	}
 
-	// items bob up and down continuously
-	scale = 0.005 + cent->currentState.number * 0.00001;
-	cent->lerpOrigin[2] += 4 + cos( ( cg.time + 1000 ) *  scale ) * 4;
+	if( strcmp(item->classname, "ME_Selector") ) {
+		// items bob up and down continuously
+		scale = 0.005 + cent->currentState.number * 0.00001;
+		cent->lerpOrigin[2] += 4 + cos( ( cg.time + 1000 ) *  scale ) * 4;
 
-	memset (&ent, 0, sizeof(ent));
+		memset (&ent, 0, sizeof(ent));
 
-	// autorotate at one of two speeds
-	if ( item->giType == IT_HEALTH ) {
-		VectorCopy( cg.autoAnglesFast, cent->lerpAngles );
-		AxisCopy( cg.autoAxisFast, ent.axis );
-	} else {
-		VectorCopy( cg.autoAngles, cent->lerpAngles );
-		AxisCopy( cg.autoAxis, ent.axis );
-	}
+		// autorotate at one of two speeds
+		if ( item->giType == IT_HEALTH ) {
+			VectorCopy( cg.autoAnglesFast, cent->lerpAngles );
+			AxisCopy( cg.autoAxisFast, ent.axis );
+		} else {
+			VectorCopy( cg.autoAngles, cent->lerpAngles );
+			AxisCopy( cg.autoAxis, ent.axis );
+		}
 
-	ent.hModel = cg_items[es->modelindex].models[0];
+		ent.hModel = cg_items[es->modelindex].models[0];
 
-	VectorCopy( cent->lerpOrigin, ent.origin);
-	VectorCopy( cent->lerpOrigin, ent.oldorigin);
+		VectorCopy( cent->lerpOrigin, ent.origin);
+		VectorCopy( cent->lerpOrigin, ent.oldorigin);
 
-	ent.nonNormalizedAxes = qfalse;
+		ent.nonNormalizedAxes = qfalse;
 
-	// if just respawned, slowly scale up
-	msec = cg.time - cent->miscTime;
-	if ( msec >= 0 && msec < ITEM_SCALEUP_TIME ) {
-		frac = (float)msec / ITEM_SCALEUP_TIME;
-		VectorScale( ent.axis[0], frac, ent.axis[0] );
-		VectorScale( ent.axis[1], frac, ent.axis[1] );
-		VectorScale( ent.axis[2], frac, ent.axis[2] );
-		ent.nonNormalizedAxes = qtrue;
-	} else {
-		frac = 1.0;
-	}
+		// if just respawned, slowly scale up
+		msec = cg.time - cent->miscTime;
+		if ( msec >= 0 && msec < ITEM_SCALEUP_TIME ) {
+			frac = (float)msec / ITEM_SCALEUP_TIME;
+			VectorScale( ent.axis[0], frac, ent.axis[0] );
+			VectorScale( ent.axis[1], frac, ent.axis[1] );
+			VectorScale( ent.axis[2], frac, ent.axis[2] );
+			ent.nonNormalizedAxes = qtrue;
+		} else {
+			frac = 1.0;
+		}
 
-	// add to refresh list
-	trap_R_AddRefEntityToScene(&ent);
+		// add to refresh list
+		trap_R_AddRefEntityToScene(&ent);
 
-	// accompanying rings / spheres for powerups
-	if ( !cg_simpleItems.integer ) 
-	{
-		vec3_t spinAngles;
-
-		VectorClear( spinAngles );
-
-		if ( item->giType == IT_HEALTH )
+		// accompanying rings / spheres for powerups
+		if ( !cg_simpleItems.integer ) 
 		{
-			if ( ( ent.hModel = cg_items[es->modelindex].models[1] ) != 0 )
+			vec3_t spinAngles;
+
+			VectorClear( spinAngles );
+
+			if ( item->giType == IT_HEALTH )
 			{
-				AnglesToAxis( spinAngles, ent.axis );
-				
-				// scale up if respawning
-				if ( frac != 1.0 ) {
-					VectorScale( ent.axis[0], frac, ent.axis[0] );
-					VectorScale( ent.axis[1], frac, ent.axis[1] );
-					VectorScale( ent.axis[2], frac, ent.axis[2] );
-					ent.nonNormalizedAxes = qtrue;
+				if ( ( ent.hModel = cg_items[es->modelindex].models[1] ) != 0 )
+				{
+					AnglesToAxis( spinAngles, ent.axis );
+					
+					// scale up if respawning
+					if ( frac != 1.0 ) {
+						VectorScale( ent.axis[0], frac, ent.axis[0] );
+						VectorScale( ent.axis[1], frac, ent.axis[1] );
+						VectorScale( ent.axis[2], frac, ent.axis[2] );
+						ent.nonNormalizedAxes = qtrue;
+					}
+					trap_R_AddRefEntityToScene( &ent );
 				}
-				trap_R_AddRefEntityToScene( &ent );
 			}
+		}
+	// this is special code for selector items (mission editor)
+	} else {
+		if( es->modelindex2 >= 0 && es->modelindex2 < bg_numberOfVehicles ) {
+			float scale, wid;
+			int i;
+			memset (&ent, 0, sizeof(ent));
+			ent.hModel = cg_items[es->modelindex].models[0];
+
+			VectorCopy( cent->lerpOrigin, ent.origin);
+			VectorCopy( cent->lerpOrigin, ent.oldorigin);
+
+			AxisClear( ent.axis );
+//			CG_Printf( "Our selected object is %d (%s)\n", es->modelindex2, availableVehicles[es->modelindex2].tinyName );
+
+			for( i = 0; i < 3; ++i ) {
+				wid = availableVehicles[es->modelindex2].maxs[i] - availableVehicles[es->modelindex2].mins[i];
+				scale = wid/200.0f;
+				VectorScale( ent.axis[i], scale, ent.axis[i] );
+			}
+			ent.nonNormalizedAxes = qtrue;
+
+			// add to refresh list
+			trap_R_AddRefEntityToScene(&ent);
 		}
 	}
 }

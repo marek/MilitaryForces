@@ -1,5 +1,5 @@
 /*
- * $Id: g_items.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: g_items.c,v 1.2 2002-06-09 20:09:41 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -354,7 +354,9 @@ void FinishSpawningItem( gentity_t *ent ) {
 	ent->r.contents = CONTENTS_TRIGGER;
 	ent->touch = Touch_Item;
 	// useing an item causes it to respawn
-	ent->use = Use_Item;
+	if( strcmp( ent->classname, "Selector" ) ) {
+		ent->use = Use_Item;
+	}
 
 	if ( ent->spawnflags & 1 ) {
 		// suspended
@@ -539,6 +541,9 @@ void G_RunItem( gentity_t *ent ) {
 	trace_t		tr;
 	int			contents;
 	int			mask;
+
+	// selector is not an item as such and therefore doesnt need this
+	if( !strcmp( ent->classname, "Selector" ) ) return;
 
 	// if groundentity has been set to -1, it may have been pushed off an edge
 	if ( ent->s.groundEntityNum == -1 ) {

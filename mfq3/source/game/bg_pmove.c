@@ -1,5 +1,5 @@
 /*
- * $Id: bg_pmove.c,v 1.11 2002-04-16 11:28:17 thebjoern Exp $
+ * $Id: bg_pmove.c,v 1.12 2002-06-09 20:09:41 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -682,6 +682,10 @@ void PM_UpdateViewAngles( playerState_t *ps, const usercmd_t *cmd ) {
 	}
 
 	if( (ps->pm_flags & PMF_VEHICLESELECT) && (ps->pm_type != PM_SPECTATOR) ) {
+		return;
+	}
+
+	if( (ps->pm_flags & PMF_ME_FREEZE) ) {
 		return;
 	}
 

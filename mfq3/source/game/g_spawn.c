@@ -1,5 +1,5 @@
 /*
- * $Id: g_spawn.c,v 1.3 2001-12-03 21:33:46 thebjoern Exp $
+ * $Id: g_spawn.c,v 1.4 2002-06-09 20:09:41 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -401,7 +401,7 @@ void G_SpawnGEntityFromSpawnVars( void ) {
 	int			i;
 	gentity_t	*ent;
 	char		*s, *value, *gametypeName;
-	static char *gametypeNames[] = {"ffa", "tournament", "single", "team", "ctf", "oneflag", "obelisk", "harvester", "teamtournament"};
+	static char *gametypeNames[] = {"ffa", "tournament", "single", "missioneditor", "team", "ctf", "oneflag", "obelisk", "harvester", "teamtournament"};
 
 	// get the next free entity
 	ent = G_Spawn();
