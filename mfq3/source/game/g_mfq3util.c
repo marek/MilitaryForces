@@ -1,5 +1,5 @@
 /*
- * $Id: g_mfq3util.c,v 1.16 2003-02-22 19:18:00 thebjoern Exp $
+ * $Id: g_mfq3util.c,v 1.17 2003-02-24 01:24:10 thebjoern Exp $
 */
 
 
@@ -43,7 +43,7 @@ void untrack( gentity_t* ent )
 	ent->client->ps.tracktarget = ENTITYNUM_NONE;
 }
 
-static void track( gentity_t* ent, gentity_t* target )
+void track( gentity_t* ent, gentity_t* target )
 {
 	ent->tracktarget = target;
 	ent->locktime = level.time;

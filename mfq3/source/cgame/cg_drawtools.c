@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawtools.c,v 1.19 2002-07-14 17:13:19 thebjoern Exp $
+ * $Id: cg_drawtools.c,v 1.20 2003-02-24 01:24:09 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1287,7 +1287,10 @@ void CG_Parse_Reticle_Target( reticle_t * pR )
 	} 
 	else if( pR->pTarget->currentState.eType == ET_MISC_VEHICLE )
 	{
-		pText = "^7Drone";
+		if( pR->pTarget->currentState.modelindex == 255 )
+			pText = va( "^7%s", availableGroundInstallations[pR->pTarget->currentState.modelindex2].tinyName );
+		else
+			pText = va( "^2Drone ^3%s", availableVehicles[pR->pTarget->currentState.modelindex].tinyName );//"^7Drone";
 	}
 	else
 	{
@@ -1298,7 +1301,7 @@ void CG_Parse_Reticle_Target( reticle_t * pR )
 
 		// create the text
 		pText = va( "^2%s ^3%s", cgs.clientinfo[ client ].name, 
-					availableVehicles[ client ].tinyName );
+					availableVehicles[cgs.clientinfo[client].vehicle].tinyName );
 	}
 
 	// draw label?
