@@ -1,5 +1,5 @@
 /*
- * $Id: cg_event.c,v 1.5 2002-02-05 16:09:01 sparky909_uk Exp $
+ * $Id: cg_event.c,v 1.6 2002-02-06 13:07:40 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -263,7 +263,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		CG_MissileHitWall( es->weaponIndex, 0, position, dir, IMPACTSOUND_METAL );
 		break;
 
-	// MFQ3 vehicle events
+	// MFQ3 events
 	case EV_VEHICLE_HIT:
 		DEBUGNAME("EV_VEHICLE_HIT");
 		CG_VehicleHit( position, es->eventParm );
@@ -271,17 +271,17 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 	case EV_VEHICLE_DIE:
 		DEBUGNAME("EV_VEHICLE_DIE");
-		CG_VehicleExplosion( position, 0 );
+		CG_GenericExplosion( position, EXPLODE_VEHICLE_DIE );
 		break;
 
 	case EV_VEHICLE_GIB:
 		DEBUGNAME("EV_VEHICLE_GIB");
-		CG_VehicleExplosion( position, 1 );
+		CG_GenericExplosion( position, EXPLODE_VEHICLE_GIB );
 		break;
 
 	case EV_BUILDING_EXPLODE:
 		DEBUGNAME("EV_BUILDING_EXPLODE");
-		CG_VehicleExplosion( position, 2 );
+		CG_GenericExplosion( position, EXPLODE_BUILDING );
 		break;
 
 	case EV_GEAR_UP_FULL:

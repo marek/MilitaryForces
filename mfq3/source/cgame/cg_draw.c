@@ -1,5 +1,5 @@
 /*
- * $Id: cg_draw.c,v 1.12 2002-01-25 14:25:12 sparky909_uk Exp $
+ * $Id: cg_draw.c,v 1.13 2002-02-06 13:07:40 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -30,7 +30,34 @@ char systemChat[256];
 char teamChat1[256];
 char teamChat2[256];
 
+// console
+struct strConsoleLine consoleLine[ MAX_CONSOLE_LINES ];	// our custom console buffer
+int consoleIdx = 0;
+
 #ifdef _MENU_SCOREBOARD
+
+/*
+==============
+CG_Add_Console_Line
+==============
+*/
+
+void CG_Add_Console_Line( char * pText )
+{
+	// copy the text in
+	strcpy( consoleLine[ consoleIdx ].text, pText );
+
+	// set the life up
+	consoleLine[ consoleIdx ].life = 10.0f;
+
+	// next
+	consoleIdx++;
+	if( consoleIdx >= MAX_CONSOLE_LINES )
+	{
+		// wrap around
+		consoleIdx = 0;
+	}
+}
 
 /*
 ==============
@@ -136,19 +163,24 @@ void CG_Text_PaintChar(float x, float y, float width, float height, float scale,
 CG_Text_Paint
 ==============
 */
-void CG_Text_Paint(float x, float y, float scale, vec4_t color, const char *text, float adjust, int limit, int style) {
-  int len, count;
+void CG_Text_Paint(float x, float y, float scale, vec4_t color, const char *text, float adjust, int limit, int style)
+{
+	int ix = 0, iy = 0;
+	int len, count;
 	vec4_t newColor;
 	glyphInfo_t *glyph;
 	float useScale;
 	fontInfo_t *font = &cgDC.Assets.textFont;
+
 	if (scale <= cg_smallFont.value) {
 		font = &cgDC.Assets.smallFont;
 	} else if (scale > cg_bigFont.value) {
 		font = &cgDC.Assets.bigFont;
 	}
 	useScale = scale * font->glyphScale;
-  if (text) {
+
+	if (text)
+	{
 // TTimo: FIXME
 //		const unsigned char *s = text;
 		const char *s = text;
@@ -160,50 +192,95 @@ void CG_Text_Paint(float x, float y, float scale, vec4_t color, const char *text
 		}
 		count = 0;
 		while (s && *s && count < len) {
-			glyph = &font->glyphs[(int)*s]; // TTimo: FIXME: getting nasty warnings without the cast, hopefully this doesn't break the VM build
-      //int yadj = Assets.textFont.glyphs[text[i]].bottom + Assets.textFont.glyphs[text[i]].top;
-      //float yadj = scale * (Assets.textFont.glyphs[text[i]].imageHeight - Assets.textFont.glyphs[text[i]].height);
-			if ( Q_IsColorString( s ) ) {
+			glyph = &font->glyphs[(int)*s];
+			
+			// TTimo: FIXME: getting nasty warnings without the cast, hopefully this doesn't break the VM build
+			//int yadj = Assets.textFont.glyphs[text[i]].bottom + Assets.textFont.glyphs[text[i]].top;
+			//float yadj = scale * (Assets.textFont.glyphs[text[i]].imageHeight - Assets.textFont.glyphs[text[i]].height);
+
+			if ( Q_IsColorString( s ) )
+			{
 				memcpy( newColor, g_color_table[ColorIndex(*(s+1))], sizeof( newColor ) );
 				newColor[3] = color[3];
 				trap_R_SetColor( newColor );
 				s += 2;
 				continue;
-			} else {
+			}
+			else
+			{
 				float yadj = useScale * glyph->top;
+
+				// shadow?
 				if (style == ITEM_TEXTSTYLE_SHADOWED || style == ITEM_TEXTSTYLE_SHADOWEDMORE) {
 					int ofs = style == ITEM_TEXTSTYLE_SHADOWED ? 1 : 2;
 					colorBlack[3] = newColor[3];
 					trap_R_SetColor( colorBlack );
 					CG_Text_PaintChar(x + ofs, y - yadj + ofs, 
-														glyph->imageWidth,
-														glyph->imageHeight,
-														useScale, 
-														glyph->s,
-														glyph->t,
-														glyph->s2,
-														glyph->t2,
-														glyph->glyph);
+									glyph->imageWidth,
+									glyph->imageHeight,
+									useScale, 
+									glyph->s,
+									glyph->t,
+									glyph->s2,
+									glyph->t2,
+									glyph->glyph);
+
 					colorBlack[3] = 1.0;
 					trap_R_SetColor( newColor );
 				}
+
+				// outline?
+				if (style == ITEM_TEXTSTYLE_OUTLINED )
+				{
+					int ofs = style == ITEM_TEXTSTYLE_SHADOWED ? 1 : 2;
+					colorBlack[3] = newColor[3];
+					trap_R_SetColor( colorBlack );
+
+					// create the outline
+					for( iy = -1; iy<2; iy++ )
+					{
+						for( ix = -1; ix<2; ix++ )
+						{
+							// don't bother for the middle, we'll do that later
+							if( ix && iy )
+							{
+								CG_Text_PaintChar(x - ix, y - yadj - iy, 
+												glyph->imageWidth,
+												glyph->imageHeight,
+												useScale, 
+												glyph->s,
+												glyph->t,
+												glyph->s2,
+												glyph->t2,
+												glyph->glyph);
+							}
+						}	// ix
+					}	// iy
+
+					colorBlack[3] = 1.0;
+					trap_R_SetColor( newColor );
+				}
+
+				// print the actual text
 				CG_Text_PaintChar(x, y - yadj, 
-													glyph->imageWidth,
-													glyph->imageHeight,
-													useScale, 
-													glyph->s,
-													glyph->t,
-													glyph->s2,
-													glyph->t2,
-													glyph->glyph);
+								glyph->imageWidth,
+								glyph->imageHeight,
+								useScale, 
+								glyph->s,
+								glyph->t,
+								glyph->s2,
+								glyph->t2,
+								glyph->glyph);
+
 				// CG_DrawPic(x, y - yadj, scale * cgDC.Assets.textFont.glyphs[text[i]].imageWidth, scale * cgDC.Assets.textFont.glyphs[text[i]].imageHeight, cgDC.Assets.textFont.glyphs[text[i]].glyph);
 				x += (glyph->xSkip * useScale) + adjust;
 				s++;
 				count++;
 			}
     }
-	  trap_R_SetColor( NULL );
-  }
+	 
+	trap_R_SetColor( NULL );
+	}
 }
 
 #endif
@@ -516,7 +593,21 @@ static float CG_DrawTimer( float y ) {
 	s = va( "%i:%i%i", mins, tens, seconds );
 	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 
+#ifdef _MENU_SCOREBOARD
+	// alter the draw position?
+	if( CG_NewHUDActive() )
+	{
+		// fit around the new HUD (draw bottom middle-right)
+		CG_DrawStringNewAlpha( 524, 32, s, 1.0f, LEFT_JUSTIFY );
+	}
+	else
+	{
+		// draw top right
+		CG_DrawStringNewAlpha( 574, 32, s, 1.0f, LEFT_JUSTIFY );
+	}
+#else
 	CG_DrawBigString( 635 - w, y + 2, s, 1.0F);
+#endif
 
 	return y + BIGCHAR_HEIGHT + 4;
 }
@@ -686,24 +777,130 @@ static float CG_DrawTeamOverlay( float y, qboolean right, qboolean upper ) {
 
 /*
 =====================
+CG_NewHUDActive
+
+Is the new HUD actually being draw?
+=====================
+*/
+
+static qboolean CG_NewHUDActive( void )
+{
+	// definatley not active?
+	if ( cg.snap->ps.pm_type == PM_DEAD || cg.snap->ps.pm_type == PM_SPECTATOR || 
+		 cg.snap->ps.stats[STAT_HEALTH] <= 0 )
+	{
+		return qfalse;
+	}
+
+	// new HUD active?
+	return( cg_vehicle.integer != -1 && !cg_oldHUD.integer );
+}
+
+/*
+=====================
+CG_DrawCustomConsole
+
+=====================
+*/
+
+#define LINE_HEIGHT	14
+
+static void CG_DrawCustomConsole( void )
+{
+	float alpha = 0.0f;
+	int drawIdx = 0;
+	int i = 0;
+	int line = 0;
+	int cox = 4;	// console default position (screen TL)
+	int coy = 4;
+	
+	// alter draw TL position?
+	if( CG_NewHUDActive() )
+	{
+		cox = 64;
+		coy = 32;
+	}
+
+	// sort out the draw index
+	drawIdx = consoleIdx;
+
+	// draw our custom console text
+	for( i=0; i<MAX_CONSOLE_LINES; i++ )
+	{
+		// line active?
+		if( consoleLine[drawIdx].life && *consoleLine[drawIdx].text )
+		{
+			// sort out alpha
+			alpha = consoleLine[drawIdx].life;
+			MF_LimitFloat( &alpha, 0.0f, 1.0f );
+
+			// use the top line's life as the negative offset
+			if( line == 0 )
+			{
+				coy -= LINE_HEIGHT * (1.0f - alpha);
+			}
+
+			// draw line
+			// NOTE: use *CG_CreateColour(1,1,1,alpha) to fade out whilst scrolling up
+			CG_DrawStringNew( cox, coy, 0.25f, *CG_CreateColour(1,1,1,alpha), consoleLine[drawIdx].text, 0, 0, cg_consoleTextStyle.integer, LEFT_JUSTIFY );
+
+			// reduce life based upon time
+			consoleLine[drawIdx].life -= (0.1f * cg.frameInterpolation );
+
+			// non-top lines can't go below 1.0f
+			if( line > 0 && consoleLine[drawIdx].life < 1.0f )
+			{
+				// hold line
+				consoleLine[drawIdx].life = 1.0f;
+			}
+
+			// top line eventually gets removed
+			if( consoleLine[drawIdx].life <= 0.0f )
+			{
+				// reset line
+				consoleLine[drawIdx].life = 0.0f;
+				*consoleLine[drawIdx].text = 0;
+			}
+
+			// inc. line
+			coy += LINE_HEIGHT;
+			line++;
+		}
+
+		// next line
+		drawIdx++;
+		if( drawIdx >= MAX_CONSOLE_LINES )
+		{
+			// wrap
+			drawIdx = 0;
+		}
+	}
+}
+
+/*
+=====================
 CG_DrawUpperLeft
 
 =====================
 */
+
 static void CG_DrawUpperLeft( void )
 {
 	rectDef_t fillRect;
-
-	// draw the faded vertical gradient
+	
+	// faded vertical gradient
 	fillRect.x = 0;
 	fillRect.y = 0;
 	fillRect.w = 640;
 	fillRect.h = 48;
 
 /*
-	// NOTE: make this activatable by a cg_x variable - MM
+	// TEST: heading gradient band
 	VerticalGradient_Paint( &fillRect, *CG_CreateColour( 0, 0, 1, 0.50f ) );
 */
+
+	// draw our custom console
+	CG_DrawCustomConsole();
 }
 
 #endif
@@ -1839,6 +2036,12 @@ void CG_DrawStringNew( int x, int y, float scale, vec4_t colour, const char * pT
 	int textWidth = 0;
 	int textHeight = 0;
 
+	// can't do anything without a device
+	if( !DC )
+	{
+		return;
+	}
+
 	// get the width and height of this text
 	textWidth = DC->textWidth( pText, scale, 0 );
 	textHeight = DC->textHeight( pText, scale, 0 );
@@ -2011,22 +2214,24 @@ to keep it in case we have to look something up later
 static void CG_Draw2D_MFQ3( void ) {
 
 	// if we are taking a levelshot for the menu, don't draw anything
-	if ( cg.levelShot ) {
+	if ( cg.levelShot )
+	{
 		return;
 	}
 
-	if ( cg_draw2D.integer == 0 ) {
+	if ( cg_draw2D.integer == 0 )
+	{
 		return;
 	}
 
-	if ( cg.snap->ps.pm_type == PM_INTERMISSION ) {
+	if ( cg.snap->ps.pm_type == PM_INTERMISSION )
+	{
 		CG_DrawIntermission();
 		return;
 	}
 
 	// are we in spectator mode, or awaiting vehicle selection?
-	if( cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR ||
-		CG_Cvar_Get( "cg_Vehicle" ) == -1 )
+	if( cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR || cg_vehicle.integer == -1 )
 	{
 		CG_DrawSpectator();
 //		CG_DrawCrosshair();
@@ -2034,13 +2239,18 @@ static void CG_Draw2D_MFQ3( void ) {
 	}
 	else
 	{
-		// don't draw any status if dead or the scoreboard is being explicitly shown
-		if ( !cg.showScores && cg.snap->ps.stats[STAT_HEALTH] > 0 &&
-			 !(cg.snap->ps.pm_flags & PMF_VEHICLESELECT) ) {
-
-			if( cg_oldHUD.integer ) {
+		// don't draw any status if dead
+		if ( cg.snap->ps.pm_type != PM_DEAD &&
+			 cg.snap->ps.stats[STAT_HEALTH] > 0 )
+//			 !(cg.snap->ps.pm_flags & PMF_VEHICLESELECT) )
+		{
+			// old or new HUD?
+			if( cg_oldHUD.integer )
+			{
 				CG_DrawStatusBar_MFQ3();
-			} else {
+			}
+			else
+			{
       			CG_DrawStatusBar_MFQ3_new();
 			}
 

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.24 2002-02-05 14:37:53 sparky909_uk Exp $
+ * $Id: cg_local.h,v 1.25 2002-02-06 13:07:40 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -8,6 +8,20 @@
 #include "tr_types.h"
 #include "../game/bg_public.h"
 #include "cg_public.h"
+
+// global client enumerations
+
+typedef enum {
+	EXPLODE_VEHICLE_DIE,
+	EXPLODE_VEHICLE_GIB,
+	EXPLODE_BUILDING
+} explosion_t;
+
+typedef enum {
+	LOW_QUALITY,
+	MEDIUM_QUALITY,
+	HIGH_QUALITY
+} quality_t;
 
 typedef enum {
 	LEFT_JUSTIFY,
@@ -127,6 +141,13 @@ typedef enum {
 	CAMERA_MAX		
 } Camera_Modes;
 
+#define MAX_CONSOLE_LINES	8
+
+// console
+struct strConsoleLine {
+	char text[ 1024 ];	// TODO: possibly make this dynamic to save memory
+	float life;
+};
 
 //=================================================
 
@@ -985,6 +1006,8 @@ extern	vmCvar_t		m2cp_page3;
 extern	vmCvar_t		m2cp_page4;
 extern	vmCvar_t		m2cp_page5;
 
+extern	vmCvar_t		cg_fxQuality;
+extern	vmCvar_t		cg_consoleTextStyle;
 
 //
 // cg_main.c
@@ -1114,6 +1137,9 @@ vec4_t * CG_CreateColour( float r, float g, float b, float a );
 void CG_DrawStatusBar_MFQ3();
 void CG_DrawStatusBar_MFQ3_new();
 
+void CG_Add_Console_Line( char * pText );
+qboolean CG_NewHUDActive( void );
+
 //
 // cg_player.c
 //
@@ -1194,7 +1220,7 @@ void CG_RegisterItemVisuals( int itemNum );
 void CG_FireWeapon( centity_t *cent );
 void CG_FireMachinegun( centity_t *cent );
 void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType );
-void CG_VehicleExplosion( vec3_t origin, int type );
+void CG_GenericExplosion( vec3_t origin, int type );
 void CG_VehicleHit( vec3_t origin, int damage );
 void CG_Bullet( vec3_t origin, int sourceEntityNum, vec3_t normal, int fleshEntityNum );
 

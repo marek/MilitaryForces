@@ -1,5 +1,5 @@
 /*
- * $Id: cg_weapons.c,v 1.10 2002-02-05 16:18:53 sparky909_uk Exp $
+ * $Id: cg_weapons.c,v 1.11 2002-02-06 13:09:27 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -545,22 +545,41 @@ void CG_MissileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_t di
 
 /*
 =================
-CG_VehicleExplosion
+CG_GenericExplosion
 =================
 */
-void CG_VehicleExplosion( vec3_t origin, int type )
+void CG_GenericExplosion( vec3_t origin, int type )
 {
 	localEntity_t	* le = NULL;
 	vec3_t			up = {0, 0, 1};
 	vec3_t			adjust = {0, 0, 0};
 	int				soundIdx = -1;
-	int				i, offset = 0;
-	int				density = 3;	// TODO: maybe control this with a cg_x cVar
+	int				i, m, offset = 0;
+	int				density = 0;
 	float			radiusModifier = 1.0f;
 	float			maxAdjust = 16;
 	
+	// * DENSITY *
+
+	// adjust density based on cg_fxQuality setting
+	switch( cg_fxQuality.integer )
+	{
+		case LOW_QUALITY:
+			// reduced fx density
+			density = 1;
+			break;
+
+		default:
+		case MEDIUM_QUALITY:
+		case HIGH_QUALITY:
+
+			// normal fx density
+			density = 3;
+			break;
+	}
+
 	// building explosion?
-	if( type == 2 )
+	if( type == 2 && density > 1 )
 	{
 		// x5 size explosions for buildings
 		radiusModifier = 5.0f;
@@ -570,13 +589,16 @@ void CG_VehicleExplosion( vec3_t origin, int type )
 		maxAdjust *= 2;
 	}
 
+	// * EXPLOSION SPRITE *
+
 	// explosion effect for all types
 	for( i = 0; i<density; i++ )
 	{
+		VectorCopy( origin, adjust );
+
 		// adjust origin
 		if( density > 1 )
 		{
-			VectorCopy( origin, adjust );
 			adjust[0] = origin[0] + (random()*maxAdjust)-(maxAdjust/2);
 			adjust[1] = origin[1] + (random()*maxAdjust)-(maxAdjust/2);
 		}
@@ -598,6 +620,8 @@ void CG_VehicleExplosion( vec3_t origin, int type )
 //	le->light = 300;
 	}
 
+	// * SMOKE SPRITE *
+
 	VectorSet( le->lightColor, 1, 0.75, 0 );
 
 	// and also smoke for gib/building explosion
@@ -607,20 +631,35 @@ void CG_VehicleExplosion( vec3_t origin, int type )
 
 		for( i = 1; i<=density; i++ )
 		{
+			VectorCopy( origin, adjust );
+
 			// adjust origin
 			if( density > 1 )
 			{
-				VectorCopy( origin, adjust );
 				adjust[0] = origin[0] + (random()*maxAdjust)-(maxAdjust/2);
 				adjust[1] = origin[1] + (random()*maxAdjust)-(maxAdjust/2);
 			}
 
+			// if building, bigger smoke clouds
+			if( type == 2 )
+			{
+				// bigger clouds
+				m = i;
+			}
+			else
+			{
+				// all smoke is the same scale
+				m = 1;
+			}
+
 			// make smoke
-			smoke = CG_SmokePuff( adjust, up, 75, 0.8f, 0.8f, 0.8f, 1.00f, (i * 2000), cg.time,
+			smoke = CG_SmokePuff( adjust, up, 75 * m, 0.8f, 0.8f, 0.8f, 1.00f, (i * 2000), cg.time,
 								  0, 0, 
 								  cgs.media.smokePuffShader );
 		}
 	}
+
+	// * SOUND FX *
 
 	// play 1 of the x explosion sounds
 	soundIdx = rand() % NUM_EXPLOSION_SOUNDS;
