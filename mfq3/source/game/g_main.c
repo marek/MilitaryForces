@@ -1,5 +1,5 @@
 /*
- * $Id: g_main.c,v 1.8 2002-02-23 19:31:55 thebjoern Exp $
+ * $Id: g_main.c,v 1.9 2002-02-25 15:20:55 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -455,8 +455,8 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 	G_RemapTeamShaders();
 
-	// MFQ3 loadouts
-	MF_calculateAllDefaultLoadouts();
+	// MFQ3 data
+	MF_LoadAllVehicleData();
 
 	// init some MFQ3 stuff
 	DroneInit();

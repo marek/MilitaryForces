@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicle.c,v 1.17 2002-02-24 19:39:50 thebjoern Exp $
+ * $Id: cg_vehicle.c,v 1.18 2002-02-25 15:20:54 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -30,7 +30,7 @@ static void CG_CachePlane(int index)
 {
 	char name[128];
 	char basename[128];
-	int i;
+	int i, num;
 
 	Com_sprintf( basename, sizeof(basename), "models/vehicles/planes/%s/%s", availableVehicles[index].modelName,
 			availableVehicles[index].modelName );

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.76 2002-02-25 12:48:26 thebjoern Exp $
+ * $Id: bg_public.h,v 1.77 2002-02-25 15:20:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.64d"
+#define	GAME_VERSION		"mfq3 v0.64e"
 
 #define	DEFAULT_GRAVITY		800
 
@@ -752,8 +752,8 @@ typedef struct completeVehicleData_s
     unsigned int    maxhealth;	    // health
 	vec3_t			gunoffset;		// guntag
 	unsigned int	maxfuel;		// maximum fuel
-	int				gearheight;		// height of gear
-	int				tailangle;		// for taildraggers on ground
+	float			gearheight;		// height of gear
+	float				tailangle;		// for taildraggers on ground
 	unsigned int	weapons[MAX_WEAPONS_PER_VEHICLE];// use index from available Weapons
 	unsigned int	ammo[MAX_WEAPONS_PER_VEHICLE];// how much of them (is also max_ammo)
 	unsigned int	turret[MAX_WEAPONS_PER_VEHICLE];// on which turret is this weapon
@@ -766,9 +766,9 @@ typedef struct completeVehicleData_s
 	float			trackCone2;		// how can ground radar track it
 	float			swingangle;		// for swing wings
 	unsigned int	gearTime;		// time it takes gear to operate
-	unsigned int	maxGearFrame;	// number of gear animation frames
+	unsigned int	maxGearFrame;	// number of gear animation frames - SET AUTOMATICALLY!
 	unsigned int	bayTime;		// time it takes bay to operate
-	unsigned int	maxBayFrame;	// number of bay animation frames
+	unsigned int	maxBayFrame;	// number of bay animation frames - SET AUTOMATICALLY!
 	unsigned int	renderFlags;	// special stuff for rendering only
 	vec4_t			shadowCoords;	// shadow apply coords { offsetX, offsetY, xAdjust, yAdjust }
 	vec4_t			shadowAdjusts;	// shadow apply adjustments { pitchMax, rollMax, pitchMod, rollMod }
@@ -893,6 +893,9 @@ void MF_getDefaultLoadoutForVehicle( int idx, completeLoadout_t* loadout );
 void MF_getLoadoutFromAmmo( int idx, completeLoadout_t* loadout, unsigned int ammo[8] );
 qboolean MF_removeWeaponFromLoadout( int weaponIndex, completeLoadout_t* loadout, char* usedTag, vec3_t pos, qboolean nextMount );
 int MF_addWeaponToLoadout( int weaponIndex, completeLoadout_t* loadout );
+qboolean MF_getNumberOfFrames(const char* fileName, int* number);
+qboolean MF_getDimensions(const char* fileName, int frame, vec3_t* maxs, vec3_t* mins);
+void MF_LoadAllVehicleData();
 
 #define MF_THROTTLE_REVERSE		-5
 #define MF_THROTTLE_IDLE		0

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.34 2002-02-25 12:48:26 thebjoern Exp $
+ * $Id: bg_vehicledata.c,v 1.35 2002-02-25 15:20:55 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -42,9 +42,9 @@ completeVehicleData_t availableVehicles[] =
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
 	HC_VAPOR,					// capabilities
-	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
-	{-26, -21, -4},				// mins (bounding box)
-	{36, 21, 15},				// max (bounding box)
+	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{80, 80, 260},				// turnspeed around the three axis
 	{0, 100, 70},				// camera distance {min,max,default}
 	{0, 100, 20},				// camera height {min,max,default}
@@ -59,7 +59,7 @@ completeVehicleData_t availableVehicles[] =
 	130,						// health
 	{16.65f, -3.391f, 0.378f},	// gun tag
 	60,							// max fuel
-	3,							// gearheight
+	0,							// gearheight - SET AUTOMATICALLY
 	0,							// tailangle
 	WI_MG_20MM, WI_SIDEWINDER, WI_AMRAAM, WI_MK82, 0, 0, 0, WI_FLARE,	// weapons  WI_MG_20MM
 	450, 2, 2, 12, 0, 0, 0, 30,		// ammo
@@ -73,9 +73,9 @@ completeVehicleData_t availableVehicles[] =
 	-1,							// trackcone ground
 	0,							// swingangle
 	1400,						// geartime
-	47,							// max gear frame
+	0,							// max gear frame
 	1000,						// baytime
-	47,							// max bay frame
+	0,							// max bay frame
 	0,							// renderflags
 	{4,0,34,24},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
@@ -92,9 +92,9 @@ completeVehicleData_t availableVehicles[] =
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
 	HC_VAPOR,					// capabilities
-	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
-	{-26, -19, -4},				// mins (bounding box)
-	{38, 19, 12},				// max (bounding box)
+	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{70, 80, 340},				// turnspeed around the three axis
 	{0, 100, 70},				// camera distance {min,max,default}
 	{0, 100, 20},				// camera height {min,max,default}
@@ -109,7 +109,7 @@ completeVehicleData_t availableVehicles[] =
 	130,						// health
 	{19.698f, -1.328f, -3.016f},// gun tag
 	60,							// max fuel
-	3,							// gearheight
+	0,							// gearheight - SET AUTOMATICALLY
 	0,							// tailangle
 	WI_MG_20MM, WI_AMRAAM, WI_SIDEWINDER, 0, 0, 0, 0, WI_FLARE,		// weapons
 	450, 5, 4, 0, 0, 0, 0, 28,	// ammo
@@ -123,9 +123,9 @@ completeVehicleData_t availableVehicles[] =
 	-1,							// trackcone ground
 	0,							// swingangle
 	1400,						// geartime
-	47,							// max gear frame
+	0,							// max gear frame
 	1000,						// baytime
-	47,							// max bay frame
+	0,							// max bay frame
 	0,							// renderflags
 	{6,0,36,20},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
@@ -142,9 +142,9 @@ completeVehicleData_t availableVehicles[] =
 	0,							// flags
 	HC_GEAR|
 	HC_VAPOR,					// capabilities
-	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
-	{-26, -19, -1},				// mins (bounding box)
-	{38, 19, 12},				// max (bounding box)
+	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{70, 80, 340},				// turnspeed around the three axis
 	{0, 100, 70},				// camera distance {min,max,default}
 	{0, 100, 20},				// camera height {min,max,default}
@@ -159,7 +159,7 @@ completeVehicleData_t availableVehicles[] =
 	130,						// health
 	{19.698f, -1.328f, -3.016f},// gun tag
 	60,							// max fuel
-	3,							// gearheight
+	0,							// gearheight - SET AUTOMATICALLY
 	0,							// tailangle
 	WI_MG_20MM, WI_SIDEWINDER, WI_AMRAAM, WI_FFAR, WI_MK82, 0, 0, WI_FLARE,		// weapons
 	450, 2, 2, 38, 6, 0, 0, 28,	// ammo
@@ -173,9 +173,9 @@ completeVehicleData_t availableVehicles[] =
 	-1,							// trackcone ground
 	0,							// swingangle
 	1400,						// geartime
-	69,							// max gear frame
+	0,							// max gear frame
 	1000,						// baytime
-	47,							// max bay frame
+	0,							// max bay frame
 	0,							// renderflags
 	{0,0,0,0},					// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
@@ -192,9 +192,9 @@ completeVehicleData_t availableVehicles[] =
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
 	HC_VAPOR|HC_DUALGUNS,		// capabilities
-	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
-	{-24, -16, -1.5},			// mins (bounding box)
-	{36, 16, 11},				// max (bounding box)
+	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{70, 80, 300},				// turnspeed around the three axis
 	{0, 100, 70},				// camera distance {min,max,default}
 	{0, 100, 20},				// camera height {min,max,default}
@@ -209,7 +209,7 @@ completeVehicleData_t availableVehicles[] =
 	100,						// health
 	{26.25f, -0.94f, 1.811f},	// gun tag
 	80,							// max fuel
-	3,							// gearheight
+	0,							// gearheight - SET AUTOMATICALLY
 	0,							// tailangle
 	WI_MG_2X20MM, WI_AMRAAM, WI_SIDEWINDER, WI_FFAR, 0, 0, 0, WI_FLARE,	// weapons
 	500, 2, 2, 38, 0, 0, 0, 32,		// ammo
@@ -223,9 +223,9 @@ completeVehicleData_t availableVehicles[] =
 	-1,							// trackcone ground
 	0,							// swingangle
 	1400,						// geartime
-	47,							// max gear frame
+	0,							// max gear frame
 	1000,						// baytime
-	47,							// max bay frame
+	0,							// max bay frame
 	0,							// renderflags
 	{5,0,34,26},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
@@ -242,9 +242,9 @@ completeVehicleData_t availableVehicles[] =
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
 	HC_VAPOR|HC_DUALGUNS,		// capabilities
-	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
-	{-24, -16, -1.5},				// mins (bounding box)
-	{36, 16, 11},				// max (bounding box)
+	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{70, 80, 380},				// turnspeed around the three axis
 	{0, 100, 70},				// camera distance {min,max,default}
 	{0, 100, 20},				// camera height {min,max,default}
@@ -259,7 +259,7 @@ completeVehicleData_t availableVehicles[] =
 	100,						// health
 	{26.25f, -0.94f, 1.811f},	// gun tag
 	80,							// max fuel
-	3,							// gearheight
+	0,							// gearheight - SET AUTOMATICALLY
 	0,							// tailangle
 	WI_MG_2X20MM, WI_AMRAAM, WI_SIDEWINDER, WI_FFAR, 0, 0, 0, WI_FLARE,	// weapons
 	500, 2, 2, 38, 0, 0, 0, 32,		// ammo
@@ -273,9 +273,9 @@ completeVehicleData_t availableVehicles[] =
 	-1,							// trackcone ground
 	0,							// swingangle
 	1400,						// geartime
-	47,							// max gear frame
+	0,							// max gear frame
 	1000,						// baytime
-	47,							// max bay frame
+	0,							// max bay frame
 	0,							// renderflags
 	{5,0,34,26},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
@@ -292,9 +292,9 @@ completeVehicleData_t availableVehicles[] =
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
 	HC_VAPOR,					// capabilities
-	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
-	{-31, -28, -5},				// mins (bounding box)
-	{54, 28, 14},				// max (bounding box)
+	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{60, 80, 200},				// turnspeed around the three axis
 	{0, 100, 70},				// camera distance {min,max,default}
 	{0, 100, 20},				// camera height {min,max,default}
@@ -309,7 +309,7 @@ completeVehicleData_t availableVehicles[] =
 	150,						// health
 	{19.1f,7.87f,-0.112f},		// gun tag
 	80,							// max fuel
-	3,							// gearheight
+	0,							// gearheight - SET AUTOMATICALLY
 	0,							// tailangle
 	WI_MG_20MM, WI_AMRAAM, WI_SIDEWINDER, WI_MK82, 0, 0, 0, WI_FLARE,	// weapons
 	450, 2, 4, 16, 0, 0, 0, 35,		// ammo
@@ -323,9 +323,9 @@ completeVehicleData_t availableVehicles[] =
 	-1,							// trackcone ground
 	0,							// swingangle
 	1400,						// geartime
-	47,							// max gear frame
+	0,							// max gear frame
 	1000,						// baytime
-	47,							// max bay frame
+	0,							// max bay frame
 	MFR_DUALPILOT|MFR_BIGVAPOR,	// renderflags
 	{6,0,48,34},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
@@ -342,9 +342,9 @@ completeVehicleData_t availableVehicles[] =
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
 	HC_VAPOR|HC_SWINGWING,		// capabilities
-	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
-	{-29, -28, -3},				// mins (bounding box)
-	{46, 28, 14},				// max (bounding box)
+	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{60, 80, 200},				// turnspeed around the three axis
 	{0, 100, 70},				// camera distance {min,max,default}
 	{0, 100, 20},				// camera height {min,max,default}
@@ -359,7 +359,7 @@ completeVehicleData_t availableVehicles[] =
 	150,						// health
 	{37.8f,2.4f,-1.3f},			// gun tag
 	70,							// max fuel
-	2,							// gearheight
+	0,							// gearheight - SET AUTOMATICALLY
 	0,							// tailangle
 	WI_MG_20MM, WI_PHOENIX, WI_SIDEWINDER, 0, 0, 0, 0, WI_FLARE,	// weapons
 	450, 6, 2, 0, 0, 0, 0, 35,		// ammo
@@ -373,9 +373,9 @@ completeVehicleData_t availableVehicles[] =
 	-1,							// trackcone ground
 	50,							// swingangle
 	1400,						// geartime
-	47,							// max gear frame
+	0,							// max gear frame
 	1000,						// baytime
-	47,							// max bay frame
+	0,							// max bay frame
 	MFR_DUALPILOT|MFR_BIGVAPOR,	// renderflags
 	{0,0,0,0},					// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
@@ -392,9 +392,9 @@ completeVehicleData_t availableVehicles[] =
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
 	HC_VAPOR,					// capabilities
-	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
-	{-26, -25, -5},				// mins (bounding box)
-	{44, 25, 10},				// max (bounding box)
+	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{80, 80, 260},				// turnspeed around the three axis
 	{0, 100, 70},				// camera distance {min,max,default}
 	{0, 100, 20},				// camera height {min,max,default}
@@ -409,7 +409,7 @@ completeVehicleData_t availableVehicles[] =
 	130,						// health
 	{40.3f, 0, 0.478f},			// gun tag
 	60,							// max fuel
-	3,							// gearheight
+	0,							// gearheight - SET AUTOMATICALLY
 	0,							// tailangle
 	WI_MG_20MM, WI_FFAR, WI_MK82, WI_SIDEWINDER, WI_AMRAAM, WI_PHOENIX, WI_HELLFIRE, WI_FLARE,	// weapons
 	450, 24, 8, 4, 4, 4, 8, 30,		// ammo
@@ -423,9 +423,9 @@ completeVehicleData_t availableVehicles[] =
 	-1,							// trackcone ground
 	0,							// swingangle
 	1400,						// geartime
-	47,							// max gear frame
+	0,							// max gear frame
 	1000,						// baytime
-	47,							// max bay frame
+	0,							// max bay frame
 	0,							// renderflags
 	{8,0,42,42},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
@@ -442,9 +442,9 @@ completeVehicleData_t availableVehicles[] =
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
 	HC_VAPOR|HC_WEAPONBAY,		// capabilities
-	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
-	{-26, -25, -5},				// mins (bounding box)
-	{44, 25, 10},				// max (bounding box)
+	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{80, 80, 260},				// turnspeed around the three axis
 	{0, 100, 70},				// camera distance {min,max,default}
 	{0, 100, 20},				// camera height {min,max,default}
@@ -459,7 +459,7 @@ completeVehicleData_t availableVehicles[] =
 	130,						// health
 	{40.3f, 0, 0.478f},			// gun tag
 	60,							// max fuel
-	3,							// gearheight
+	0,							// gearheight - SET AUTOMATICALLY
 	0,							// tailangle
 	WI_MG_20MM, WI_FFAR, WI_MK82, WI_SIDEWINDER, WI_AMRAAM, WI_PHOENIX, WI_HELLFIRE, WI_FLARE,	// weapons
 	450, 24, 8, 4, 4, 4, 8, 30,		// ammo
@@ -473,9 +473,9 @@ completeVehicleData_t availableVehicles[] =
 	-1,							// trackcone ground
 	0,							// swingangle
 	1400,						// geartime
-	47,							// max gear frame
+	0,							// max gear frame
 	1000,						// baytime
-	47,							// max bay frame
+	0,							// max bay frame
 	0,							// renderflags
 	{0,0,0,0},					// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
@@ -492,9 +492,9 @@ completeVehicleData_t availableVehicles[] =
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
 	HC_VAPOR|HC_WEAPONBAY,		// capabilities
-	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
-	{-26, -21, -4},				// mins (bounding box)
-	{36, 21, 15},				// max (bounding box)
+	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{80, 80, 260},				// turnspeed around the three axis
 	{0, 120, 100},				// camera distance {min,max,default}
 	{0, 100, 35},				// camera height {min,max,default}
@@ -509,7 +509,7 @@ completeVehicleData_t availableVehicles[] =
 	130,						// health
 	{16.65f, -3.391f, 0.378f},	// gun tag
 	60,							// max fuel
-	3,							// gearheight
+	0,							// gearheight - SET AUTOMATICALLY
 	0,							// tailangle
 	WI_MG_20MM, WI_MK82, WI_MAVERICK, 0, 0, 0, 0, WI_FLARE,	// weapons
 	450, 16, 4, 0, 0, 0, 0, 30,		// ammo
@@ -523,9 +523,9 @@ completeVehicleData_t availableVehicles[] =
 	-1,							// trackcone ground
 	0,							// swingangle
 	1400,						// geartime
-	47,							// max gear frame
+	0,							// max gear frame
 	100,						// baytime
-	47,							// max bay frame
+	0,							// max bay frame
 	0,							// renderflags
 	{3,0,76,76},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
@@ -543,9 +543,9 @@ completeVehicleData_t availableVehicles[] =
 	HC_GEAR|HC_PROP|
 	HC_TAILDRAGGER|
 	HC_DUALGUNS,				// capabilities
-	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
-	{-28, -26, -3},				// mins (bounding box)
-	{16, 26, 10},				// max (bounding box)
+	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{60, 80, 240},				// turnspeed around the three axis
 	{0, 100, 50},				// camera distance {min,max,default}
 	{0, 100, 10},				// camera height {min,max,default}
@@ -560,7 +560,7 @@ completeVehicleData_t availableVehicles[] =
 	100,						// health
 	{3.5f, -9.2f, 0.136f},		// gun tag
 	60,							// max fuel
-	3,							// gearheight
+	0,							// gearheight - SET AUTOMATICALLY
 	-14,						// tailangle
 	WI_MG_6XCAL50, 0, 0, 0, 0, 0, 0, 0,		// weapons
 	450, 0, 0, 0, 0, 0, 0, 0,	// ammo
@@ -574,9 +574,9 @@ completeVehicleData_t availableVehicles[] =
 	-1,							// trackcone ground
 	0,							// swingangle
 	1400,						// geartime
-	47,							// max gear frame
+	0,							// max gear frame
 	1000,						// baytime
-	47,							// max bay frame
+	0,							// max bay frame
 	0,							// renderflags
 	{2,0,30,26},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
@@ -594,9 +594,9 @@ completeVehicleData_t availableVehicles[] =
 	HC_GEAR|HC_PROP|
 	HC_TAILDRAGGER|
 	HC_DUALGUNS,				// capabilities
-	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
-	{-21, -20, -1},				// mins (bounding box)
-	{10, 20, 6},				// max (bounding box)
+	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{70, 80, 300},				// turnspeed around the three axis
 	{0, 100, 50},				// camera distance {min,max,default}
 	{0, 100, 10},				// camera height {min,max,default}
@@ -611,7 +611,7 @@ completeVehicleData_t availableVehicles[] =
 	100,						// health
 	{2.518f, -7.371f, -0.155f},	// gun tag
 	60,							// max fuel
-	3,							// gearheight
+	0,							// gearheight - SET AUTOMATICALLY
 	-14,							// tailangle
 	WI_MG_8XCAL50, 0, 0, 0, 0, 0, 0, 0,		// weapons
 	450, 0, 0, 0, 0, 0, 0, 0,	// ammo
@@ -625,9 +625,9 @@ completeVehicleData_t availableVehicles[] =
 	-1,							// trackcone ground
 	0,							// swingangle
 	1400,						// geartime
-	47,							// max gear frame
+	0,							// max gear frame
 	1000,						// baytime
-	47,							// max bay frame
+	0,							// max bay frame
 	0,							// renderflags
 	{-4,0,22,20},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
@@ -645,9 +645,9 @@ completeVehicleData_t availableVehicles[] =
 	HC_GEAR|HC_PROP|
 	HC_TAILDRAGGER|
 	HC_DUALGUNS,				// capabilities
-	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
-	{-21, -20, -1},				// mins (bounding box)
-	{10, 20, 6},				// max (bounding box)
+	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{70, 80, 300},				// turnspeed around the three axis
 	{0, 100, 50},				// camera distance {min,max,default}
 	{0, 100, 10},				// camera height {min,max,default}
@@ -662,7 +662,7 @@ completeVehicleData_t availableVehicles[] =
 	100,						// health
 	{2.518f, -7.371f, -0.155f},	// gun tag
 	60,							// max fuel
-	3,							// gearheight
+	0,							// gearheight - SET AUTOMATICALLY
 	-14,							// tailangle
 	WI_MG_8XCAL50, 0, 0, 0, 0, 0, 0, 0,		// weapons
 	450, 0, 0, 0, 0, 0, 0, 0,	// ammo
@@ -676,9 +676,9 @@ completeVehicleData_t availableVehicles[] =
 	-1,							// trackcone ground
 	0,							// swingangle
 	1400,						// geartime
-	47,							// max gear frame
+	0,							// max gear frame
 	1000,						// baytime
-	47,							// max bay frame
+	0,							// max bay frame
 	0,							// renderflags
 	{-3,0,18,16},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
@@ -696,9 +696,9 @@ completeVehicleData_t availableVehicles[] =
 	HC_GEAR|HC_PROP|
 	HC_TAILDRAGGER|
 	HC_DUALGUNS,				// capabilities
-	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
-	{-21, -20, -1},				// mins (bounding box)
-	{10, 20, 6},				// max (bounding box)
+	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{70, 80, 300},				// turnspeed around the three axis
 	{0, 100, 50},				// camera distance {min,max,default}
 	{0, 100, 10},				// camera height {min,max,default}
@@ -713,7 +713,7 @@ completeVehicleData_t availableVehicles[] =
 	100,						// health
 	{2.518f, -7.371f, -0.155f},	// gun tag
 	60,							// max fuel
-	3,							// gearheight
+	0,							// gearheight - SET AUTOMATICALLY
 	-14,							// tailangle
 	WI_MG_8XCAL50, 0, 0, 0, 0, 0, 0, 0,		// weapons
 	450, 0, 0, 0, 0, 0, 0, 0,	// ammo
@@ -727,9 +727,9 @@ completeVehicleData_t availableVehicles[] =
 	-1,							// trackcone ground
 	0,							// swingangle
 	1400,						// geartime
-	47,							// max gear frame
+	0,							// max gear frame
 	1000,						// baytime
-	47,							// max bay frame
+	0,							// max bay frame
 	0,							// renderflags
 	{-2,0,18,18},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
@@ -748,9 +748,9 @@ completeVehicleData_t availableVehicles[] =
 	HC_GEAR|HC_PROP|
 	HC_TAILDRAGGER|
 	HC_WEAPONBAY,				// capabilities
-	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
-	{-36, -40, -3},				// mins (bounding box)
-	{30, 40, 9},				// max (bounding box)
+	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{40, 50, 120},				// turnspeed around the three axis
 	{0, 100, 80},				// camera distance {min,max,default}
 	{0, 100, 10},				// camera height {min,max,default}
@@ -765,7 +765,7 @@ completeVehicleData_t availableVehicles[] =
 	100,						// health
 	{2.518f, -7.371f, -0.155f},	// gun tag
 	60,							// max fuel
-	3,							// gearheight
+	0,							// gearheight - SET AUTOMATICALLY
 	-8,							// tailangle
 	WI_MG_8XCAL50, WI_MK82, 0, 0, 0, 0, 0, 0,		// weapons
 	450, 10, 0, 0, 0, 0, 0, 0,	// ammo
@@ -779,9 +779,9 @@ completeVehicleData_t availableVehicles[] =
 	-1,							// trackcone ground
 	0,							// swingangle
 	1400,						// geartime
-	47,							// max gear frame
+	0,							// max gear frame
 	500,						// baytime
-	19,							// max bay frame
+	0,							// max bay frame
 	0,							// renderflags
 	{-12,0,60,60},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
@@ -799,9 +799,9 @@ completeVehicleData_t availableVehicles[] =
 	HC_PROP|
 	HC_TAILDRAGGER|
 	HC_DUALGUNS,				// capabilities
-	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
-	{-21, -20, -1},				// mins (bounding box)
-	{10, 20, 6},				// max (bounding box)
+	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{70, 80, 300},				// turnspeed around the three axis
 	{0, 100, 30},				// camera distance {min,max,default}
 	{0, 100, 10},				// camera height {min,max,default}
@@ -816,7 +816,7 @@ completeVehicleData_t availableVehicles[] =
 	100,						// health
 	{2.518f, -1.371f, -0.155f},	// gun tag
 	60,							// max fuel
-	3,							// gearheight
+	0,							// gearheight - SET AUTOMATICALLY
 	-14,							// tailangle
 	WI_MG_2XCAL312, 0, 0, 0, 0, 0, 0, 0,		// weapons
 	450, 0, 0, 0, 0, 0, 0, 0,	// ammo
@@ -830,9 +830,9 @@ completeVehicleData_t availableVehicles[] =
 	-1,							// trackcone ground
 	0,							// swingangle
 	1400,						// geartime
-	47,							// max gear frame
+	0,							// max gear frame
 	1000,						// baytime
-	47,							// max bay frame
+	0,							// max bay frame
 	0,							// renderflags
 	{-3,0,13,12},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
@@ -850,9 +850,9 @@ completeVehicleData_t availableVehicles[] =
 	HC_PROP|
 	HC_TAILDRAGGER|
 	HC_DUALGUNS,				// capabilities
-	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
-	{-21, -14, -1},				// mins (bounding box)
-	{10, 14, 6},				// max (bounding box)
+	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{70, 80, 300},				// turnspeed around the three axis
 	{0, 100, 30},				// camera distance {min,max,default}
 	{0, 100, 10},				// camera height {min,max,default}
@@ -867,7 +867,7 @@ completeVehicleData_t availableVehicles[] =
 	100,						// health
 	{2.518f, -1.371f, -0.155f},	// gun tag
 	60,							// max fuel
-	3,							// gearheight
+	0,							// gearheight - SET AUTOMATICALLY
 	-14,							// tailangle
 	WI_MG_2XCAL303, 0, 0, 0, 0, 0, 0, 0,		// weapons
 	450, 0, 0, 0, 0, 0, 0, 0,	// ammo
@@ -881,9 +881,9 @@ completeVehicleData_t availableVehicles[] =
 	-1,							// trackcone ground
 	0,							// swingangle
 	1400,						// geartime
-	47,							// max gear frame
+	0,							// max gear frame
 	1000,						// baytime
-	47,							// max bay frame
+	0,							// max bay frame
 	0,							// renderflags
 	{-1,0,15,14},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
@@ -903,9 +903,9 @@ completeVehicleData_t availableVehicles[] =
 	CLASS_GROUND_MBT,
 	0,							// flags
 	0,							// capabilities
-	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
-	{-18, -9, -1},				// mins (bounding box)
-	{18, 9, 9},					// max (bounding box)
+	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{50, 100, 100},				// turnspeed around the three axis
 	{0, 100, 40},				// camera distance {min,max,default}
 	{0, 100, 20},				// camera height {min,max,default}
@@ -934,9 +934,9 @@ completeVehicleData_t availableVehicles[] =
 	0,							// trackcone ground
 	0,							// swingangle
 	1400,						// geartime
-	47,							// max gear frame
+	0,							// max gear frame
 	1000,						// baytime
-	47,							// max bay frame
+	0,							// max bay frame
 	0,							// renderflags
 	{0,0,0,0},					// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
@@ -952,9 +952,9 @@ completeVehicleData_t availableVehicles[] =
 	CLASS_GROUND_MBT,
 	0,							// flags
 	0,							// capabilities
-	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
-	{-17, -9, -1},				// mins (bounding box)
-	{17, 9, 7},					// max (bounding box)
+	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{50, 100, 100},				// turnspeed around the three axis
 	{0, 100, 40},				// camera distance {min,max,default}
 	{0, 100, 20},				// camera height {min,max,default}
@@ -983,9 +983,9 @@ completeVehicleData_t availableVehicles[] =
 	0,							// trackcone ground
 	0,							// swingangle
 	1400,						// geartime
-	47,							// max gear frame
+	0,							// max gear frame
 	1000,						// baytime
-	47,							// max bay frame
+	0,							// max bay frame
 	0,							// renderflags
 	{0,0,0,0},					// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
@@ -1001,9 +1001,9 @@ completeVehicleData_t availableVehicles[] =
 	CLASS_GROUND_RECON,
 	0,							// flags
 	HC_DUALGUNS,				// capabilities
-	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
-	{-10, -5, -1},				// mins (bounding box)
-	{11, 5, 4.5},				// max (bounding box)
+	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{50, 100, 100},				// turnspeed around the three axis
 	{0, 100, 30},				// camera distance {min,max,default}
 	{0, 100, 10},				// camera height {min,max,default}
@@ -1032,9 +1032,9 @@ completeVehicleData_t availableVehicles[] =
 	0,							// trackcone ground
 	0,							// swingangle
 	1400,						// geartime
-	47,							// max gear frame
+	0,							// max gear frame
 	1000,						// baytime
-	47,							// max bay frame
+	0,							// max bay frame
 	0,							// renderflags
 	{0,0,0,0},					// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
@@ -1050,9 +1050,9 @@ completeVehicleData_t availableVehicles[] =
 	CLASS_GROUND_RECON,
 	0,							// flags
 	HC_WHEELS,					// capabilities
-	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
-	{-10, -5, -2},				// mins (bounding box)
-	{11, 5, 4.5},				// max (bounding box)
+	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{50, 100, 100},				// turnspeed around the three axis
 	{0, 100, 30},				// camera distance {min,max,default}
 	{0, 100, 10},				// camera height {min,max,default}
@@ -1081,9 +1081,9 @@ completeVehicleData_t availableVehicles[] =
 	0,							// trackcone ground
 	0,							// swingangle
 	1400,						// geartime
-	47,							// max gear frame
+	0,							// max gear frame
 	1000,						// baytime
-	47,							// max bay frame
+	0,							// max bay frame
 	0,							// renderflags
 	{0,0,0,0},					// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
@@ -1099,9 +1099,9 @@ completeVehicleData_t availableVehicles[] =
 	CLASS_GROUND_RECON,
 	0,							// flags
 	HC_DUALGUNS|HC_AMPHIBIOUS|HC_WHEELS,	// capabilities
-	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
-	{-10, -5, -2},				// mins (bounding box)
-	{10, 5, 7},					// max (bounding box)
+	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{50, 100, 100},				// turnspeed around the three axis
 	{0, 100, 30},				// camera distance {min,max,default}
 	{0, 100, 10},				// camera height {min,max,default}
@@ -1130,9 +1130,9 @@ completeVehicleData_t availableVehicles[] =
 	0,							// trackcone ground
 	0,							// swingangle
 	1400,						// geartime
-	47,							// max gear frame
+	0,							// max gear frame
 	1000,						// baytime
-	47,							// max bay frame
+	0,							// max bay frame
 	0,							// renderflags
 	{0,0,0,0},					// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
@@ -1148,9 +1148,9 @@ completeVehicleData_t availableVehicles[] =
 	CLASS_GROUND_MBT,
 	0,							// flags
 	0,							// capabilities
-	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
-	{-12, -6, -2},				// mins (bounding box)
-	{12, 6, 9},					// max (bounding box)
+	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{50, 100, 100},				// turnspeed around the three axis
 	{0, 100, 30},				// camera distance {min,max,default}
 	{0, 100, 10},				// camera height {min,max,default}
@@ -1179,9 +1179,9 @@ completeVehicleData_t availableVehicles[] =
 	0,							// trackcone ground
 	0,							// swingangle
 	1400,						// geartime
-	47,							// max gear frame
+	0,							// max gear frame
 	1000,						// baytime
-	47,							// max bay frame
+	0,							// max bay frame
 	0,							// renderflags
 	{0,0,0,0},					// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
@@ -1201,9 +1201,9 @@ completeVehicleData_t availableVehicles[] =
 	CLASS_BOAT_PATROL,
 	0,							// flags
 	HC_DUALGUNS,				// capabilities
-	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
-	{-16, -7, -2},				// mins (bounding box)
-	{16, 7, 6},					// max (bounding box)
+	{0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{50, 100, 20},				// turnspeed around the three axis
 	{0, 100, 30},				// camera distance {min,max,default}
 	{0, 100, 10},				// camera height {min,max,default}
@@ -1232,9 +1232,9 @@ completeVehicleData_t availableVehicles[] =
 	0,							// trackcone ground
 	0,							// swingangle
 	1400,						// geartime
-	47,							// max gear frame
+	0,							// max gear frame
 	1000,						// baytime
-	47,							// max bay frame
+	0,							// max bay frame
 	0,							// renderflags
 	{0,0,0,0},					// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters

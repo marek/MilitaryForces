@@ -1,5 +1,5 @@
 /*
- * $Id: bg_md3util.c,v 1.1 2002-02-25 13:16:54 thebjoern Exp $
+ * $Id: bg_md3util.c,v 1.2 2002-02-25 15:20:54 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -48,13 +48,74 @@ qboolean MF_findTag(const char* fileName, const char* tagname, md3Tag_t* tag)
 		}
 		trap_FS_FCloseFile(f);
 	} else {
-		Com_Printf( "Unable to read tag from &s\n", fileName );
+		Com_Printf( "Unable to read tag from %s\n", fileName );
 	}
 	return found;
 }
 
 
+/*
+=================
+MF_getNumberOfFrames
 
+providing the file this functions returns the number of frames
+=================
+*/
+
+qboolean MF_getNumberOfFrames(const char* fileName, int* number)
+{
+	fileHandle_t	f;
+	qboolean		found = qfalse;
+
+	if( !number ) return found;
+
+	if( trap_FS_FOpenFile(fileName, &f, FS_READ) >= 0 ) {
+		md3Header_t head;
+		trap_FS_Read(&head, sizeof(head), f);
+		*number = head.numFrames;
+		found = qtrue;
+		trap_FS_FCloseFile(f);
+	} else {
+		Com_Printf( "Unable to open file %s\n", fileName );
+	}
+	return found;
+
+}
+
+/*
+=================
+MF_getDimensions
+
+providing the file and the framenumber this functions returns the dimensions of the model
+=================
+*/
+
+qboolean MF_getDimensions(const char* fileName, int frame, vec3_t* maxs, vec3_t* mins)
+{
+	fileHandle_t	f;
+	qboolean		found = qfalse;
+	int				i, number;
+
+	if( trap_FS_FOpenFile(fileName, &f, FS_READ) >= 0 ) {
+		md3Header_t head;
+		md3Frame_t frames;
+		trap_FS_Read(&head, sizeof(head), f);
+		number = head.numFrames;
+		if( frame >= 0 && frame < number ) {
+			for( i = 0; i <= frame; ++i ) {
+				trap_FS_Read(&frames, sizeof(frames), f);
+			}
+			if( mins ) VectorCopy( frames.bounds[0], *mins );
+			if( maxs ) VectorCopy( frames.bounds[1], *maxs );
+			found = qtrue;
+		}
+		trap_FS_FCloseFile(f);
+	} else {
+		Com_Printf( "Unable to open file %s\n", fileName );
+	}
+	return found;
+
+}
 
 
 

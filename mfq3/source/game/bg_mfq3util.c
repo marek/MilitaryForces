@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.22 2002-02-25 12:48:26 thebjoern Exp $
+ * $Id: bg_mfq3util.c,v 1.23 2002-02-25 15:20:54 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -253,5 +253,62 @@ int MF_ExtractEnumFromId( int vehicle, unsigned int op )
 
 
 
+/*
+=================
+MF_ExtractEnumFromId
+
+Get the catagory/class enum from the vehicle index (use CAT_ANY & CLASS_ANY to decide operation done)
+=================
+*/
+
+void MF_LoadAllVehicleData()
+{
+	int i, num;
+	char* modelbasename = 0;
+	char name[128];
+
+	// MFQ3 loadouts
+	MF_calculateAllDefaultLoadouts();
+
+	for( i = 0; i < bg_numberOfVehicles; ++i ) {
+		modelbasename = MF_CreateModelPathname( i, "models/vehicles/%s/%s/%s" );	
+		// boundingbox
+		Com_sprintf( name, sizeof(name), "%s.md3", modelbasename );
+		MF_getDimensions( name, 0, &availableVehicles[i].maxs, &availableVehicles[i].mins );
+		availableVehicles[i].mins[2] += 1;// to look better ?
+		// helo/plane specific
+		if( (availableVehicles[i].cat & CAT_PLANE) ||
+			(availableVehicles[i].cat & CAT_HELO) ) {
+			// gear
+			Com_sprintf( name, sizeof(name), "%s_gear.md3", modelbasename );
+			if( MF_getNumberOfFrames( name, &num ) ) {
+				vec3_t min1, min2;
+				availableVehicles[i].maxGearFrame = num - 1;
+				if( MF_getDimensions( name, 0, 0, &min1 ) &&
+					MF_getDimensions( name, num-1, 0, &min2 ) ) {
+					availableVehicles[i].gearheight = min1[2] - min2[2] - 1.5;// for coll. detection
+					if( availableVehicles[i].gearheight < 0 ) availableVehicles[i].gearheight = 0;
+				}
+			} else {
+				availableVehicles[i].maxGearFrame = GEAR_DOWN_DEFAULT;
+			}
+			// bay
+			Com_sprintf( name, sizeof(name), "%s_bay.md3", modelbasename );
+			if( MF_getNumberOfFrames( name, &num ) ) {
+				availableVehicles[i].maxBayFrame = num - 1;
+			} else {
+				availableVehicles[i].maxBayFrame = BAY_DOWN_DEFAULT;
+			}
+		} else if( (availableVehicles[i].cat & CAT_GROUND) ) {
+			vec3_t max, min;
+			float diff;
+			// increaes bounding box by turret height
+			Com_sprintf( name, sizeof(name), "%s_tur.md3", modelbasename );
+			MF_getDimensions( name, 0, &max, &min );
+			diff = max[2] - min[2];
+			availableVehicles[i].maxs[2] += diff;
+		}
+	}
+}
 
 
