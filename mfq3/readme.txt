@@ -5,6 +5,7 @@ Military Forces Q3
 History:
 ========
 
+
 +++v0.78+++ in progress...
 -----------
 - fixed for media reload
