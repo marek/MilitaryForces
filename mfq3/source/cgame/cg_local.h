@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.13 2002-01-25 14:25:12 sparky909_uk Exp $
+ * $Id: cg_local.h,v 1.14 2002-01-26 03:02:38 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -107,7 +107,8 @@ typedef enum {
 #define MFD_OFF					0
 #define MFD_RWR					1
 #define MFD_STATUS				2
-#define MFD_MAX					3
+#define MFD_INVENTORY			3
+#define MFD_MAX					4
 
 #define MFD_1					0
 #define MFD_2					1
@@ -529,8 +530,30 @@ typedef struct {
 	centity_t		*radarEnts[MAX_RADAR_TARGETS];
 	unsigned int	radarTargets;
 	int				tracernum;
+	int				HUDColor;
+	int				HUDColorTime;
 } cg_t;
 
+
+typedef enum {
+	HUD_GREEN,
+	HUD_DARK_GREEN,
+	HUD_WHITE,
+	HUD_GREY,
+	HUD_RED,
+	HUD_DARK_RED,
+	HUD_BLUE,
+	HUD_DARK_BLUE,
+	HUD_BLACK,
+	HUD_YELLOW,
+	HUD_MAGENTA,
+	HUD_CYAN,
+	HUD_ORANGE,
+	HUD_MAX
+} HUDColors_t;
+
+// colors
+extern vec4_t		HUDColors[HUD_MAX];
 
 // all of the model, shader, and sound references that are
 // loaded at gamestate time are stored in cgMedia_t
@@ -716,8 +739,9 @@ typedef struct {
 	sfxHandle_t engineProp;
 	sfxHandle_t planeDeath[NUM_EXPLOSION_SOUNDS];
 	sfxHandle_t engineTank[NUM_TANKSOUNDS];
-	
+
 } cgMedia_t;
+
 
 enum CameraAdjust {
 	CAMADJ_NONE,
@@ -912,6 +936,9 @@ extern	vmCvar_t		hud_mfd2;
 extern	vmCvar_t		hud_center;
 extern  vmCvar_t		hud_health;
 extern	vmCvar_t		hud_throttle;
+extern	vmCvar_t		hud_weapons;
+
+extern	vmCvar_t		hud_color;
 
 //
 // cg_main.c

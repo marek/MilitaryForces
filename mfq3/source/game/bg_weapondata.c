@@ -1,5 +1,5 @@
 /*
- * $Id: bg_weapondata.c,v 1.6 2002-01-25 14:26:12 sparky909_uk Exp $
+ * $Id: bg_weapondata.c,v 1.7 2002-01-26 03:02:38 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -14,6 +14,7 @@ completeWeaponData_t availableWeapons[] =
 		0,									// type
 		0,									// gameset
 		"",									// descriptiveName
+		"",									// shortName
 		"",									// modelName
 		"",									// iconName
 		0,									// iconHandle
@@ -43,6 +44,7 @@ completeWeaponData_t availableWeapons[] =
 		WT_MACHINEGUN,						// type
 		MF_GAMESET_WW1,						// gameset
 		"2x cal.303 MG",					// descriptiveName
+		"MG",								// shortName
 		"",									// modelName
 		"hud/iconw_mg.tga",					// iconName
 		0,									// iconHandle
@@ -72,6 +74,7 @@ completeWeaponData_t availableWeapons[] =
 		WT_MACHINEGUN,						// type
 		MF_GAMESET_WW1,						// gameset
 		"2x cal.312 MG",					// descriptiveName
+		"MG",								// shortName
 		"",									// modelName
 		"hud/iconw_mg.tga",					// iconName
 		0,									// iconHandle
@@ -101,6 +104,7 @@ completeWeaponData_t availableWeapons[] =
 		WT_MACHINEGUN,						// type
 		MF_GAMESET_WW2,						// gameset
 		"8x cal.50 MG",						// descriptiveName
+		"MG",								// shortName
 		"",									// modelName
 		"hud/iconw_mg.tga",					// iconName
 		0,									// iconHandle
@@ -130,6 +134,7 @@ completeWeaponData_t availableWeapons[] =
 		WT_MACHINEGUN,						// type
 		MF_GAMESET_WW2,						// gameset
 		"6x cal.50 MG",						// descriptiveName
+		"MG",								// shortName
 		"",									// modelName
 		"hud/iconw_mg.tga",					// iconName
 		0,									// iconHandle
@@ -159,6 +164,7 @@ completeWeaponData_t availableWeapons[] =
 		WT_MACHINEGUN,						// type
 		MF_GAMESET_ANY,						// gameset
 		"12.7mm MG",						// descriptiveName
+		"MG",								// shortName
 		"",									// modelName
 		"hud/iconw_mg.tga",					// iconName
 		0,									// iconHandle
@@ -188,6 +194,7 @@ completeWeaponData_t availableWeapons[] =
 		WT_MACHINEGUN,						// type
 		MF_GAMESET_ANY,						// gameset
 		"Dual 14.5mm MG",					// descriptiveName
+		"MG",								// shortName
 		"",									// modelName
 		"hud/iconw_mg.tga",					// iconName
 		0,									// iconHandle
@@ -217,6 +224,7 @@ completeWeaponData_t availableWeapons[] =
 		WT_MACHINEGUN,						// type
 		MF_GAMESET_MODERN,					// gameset
 		"20mm MG",							// descriptiveName
+		"MG",								// shortName
 		"",									// modelName
 		"hud/iconw_mg.tga",					// iconName
 		0,									// iconHandle
@@ -246,6 +254,7 @@ completeWeaponData_t availableWeapons[] =
 		WT_MACHINEGUN,						// type
 		MF_GAMESET_MODERN,					// gameset
 		"Dual 20mm MG",						// descriptiveName
+		"MG",								// shortName
 		"",									// modelName
 		"hud/iconw_mg.tga",					// iconName
 		0,									// iconHandle
@@ -275,6 +284,7 @@ completeWeaponData_t availableWeapons[] =
 		WT_ROCKET,							// type
 		MF_GAMESET_ANY,						// gameset
 		"FFAR",								// descriptiveName
+		"FFAR",								// shortName
 		"models/weapons/missile_sr.md3",	// modelName
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
@@ -304,6 +314,7 @@ completeWeaponData_t availableWeapons[] =
 		WT_BALLISTICGUN,					// type
 		MF_GAMESET_ANY,						// gameset
 		"100mm Gun",						// descriptiveName
+		"GUN",								// shortName
 		"models/weapons/ffar.md3",			// modelName
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
@@ -333,6 +344,7 @@ completeWeaponData_t availableWeapons[] =
 		WT_BALLISTICGUN,					// type
 		MF_GAMESET_ANY,						// gameset
 		"125mm Gun",						// descriptiveName
+		"GUN",								// shortName
 		"models/weapons/ffar.md3",			// modelName
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
@@ -362,6 +374,7 @@ completeWeaponData_t availableWeapons[] =
 		WT_IRONBOMB,						// type
 		MF_GAMESET_ANY,						// gameset
 		"Mk82",								// descriptiveName
+		"IRON BOMBS",						// shortName
 		"models/weapons/ag_800_d.md3",		// modelName
 		"hud/iconw_bmb.tga",				// iconName
 		0,									// iconHandle
@@ -391,6 +404,7 @@ completeWeaponData_t availableWeapons[] =
 		WT_ANTIAIRMISSILE,					// type
 		MF_GAMESET_ANY,						// gameset
 		"AIM-9 Sidewinder",					// descriptiveName
+		"SR-AAM",							// shortName
 		"models/weapons/missile_sr.md3",	// modelName
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
@@ -420,6 +434,7 @@ completeWeaponData_t availableWeapons[] =
 		WT_ANTIAIRMISSILE,					// type
 		MF_GAMESET_ANY,						// gameset
 		"AIM-120 AMRAMM",					// descriptiveName
+		"MR-AAM",							// shortName
 		"models/weapons/missile_mr.md3",	// modelName
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
@@ -449,6 +464,7 @@ completeWeaponData_t availableWeapons[] =
 		WT_ANTIAIRMISSILE,					// type
 		MF_GAMESET_ANY,						// gameset
 		"AIM-7 Sparrow",					// descriptiveName
+		"MR-AAM",							// shortName
 		"models/weapons/missile_mr.md3",	// modelName
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
@@ -478,6 +494,7 @@ completeWeaponData_t availableWeapons[] =
 		WT_ANTIAIRMISSILE,					// type
 		MF_GAMESET_ANY,						// gameset
 		"AIM-54 Phoenix",					// descriptiveName
+		"LR-AAM",							// shortName
 		"models/weapons/missile_mr.md3",	// modelName
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
@@ -507,6 +524,7 @@ completeWeaponData_t availableWeapons[] =
 		WT_ANTIAIRMISSILE,					// type
 		MF_GAMESET_ANY,						// gameset
 		"Stinger",							// descriptiveName
+		"SR-AAM",							// shortName
 		"models/weapons/missile_sr.md3",	// modelName
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
@@ -536,6 +554,7 @@ completeWeaponData_t availableWeapons[] =
 		WT_ANTIAIRMISSILE,					// type
 		MF_GAMESET_ANY,						// gameset
 		"AA-2 Atoll",						// descriptiveName
+		"SR-AAM",							// shortName
 		"models/weapons/missile_sr.md3",	// modelName
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
@@ -565,6 +584,7 @@ completeWeaponData_t availableWeapons[] =
 		WT_ANTIAIRMISSILE,					// type
 		MF_GAMESET_ANY,						// gameset
 		"AA-11 Archer",						// descriptiveName
+		"MR-AAM",							// shortName
 		"models/weapons/missile_mr.md3",	// modelName
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
@@ -594,6 +614,7 @@ completeWeaponData_t availableWeapons[] =
 		WT_ANTIAIRMISSILE,					// type
 		MF_GAMESET_ANY,						// gameset
 		"AA-10 Alamo",						// descriptiveName
+		"MR-AAM",							// shortName
 		"models/weapons/missile_mr.md3",	// modelName
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
@@ -623,6 +644,7 @@ completeWeaponData_t availableWeapons[] =
 		WT_ANTIGROUNDMISSILE,				// type
 		MF_GAMESET_ANY,						// gameset
 		"Hellfire",							// descriptiveName
+		"AGM",								// shortName
 		"models/weapons/missile_sr.md3",	// modelName
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
@@ -652,6 +674,7 @@ completeWeaponData_t availableWeapons[] =
 		WT_ANTIGROUNDMISSILE,				// type
 		MF_GAMESET_ANY,						// gameset
 		"Maverick",							// descriptiveName
+		"AGM",								// shortName
 		"models/weapons/missile_sr.md3",	// modelName
 		"hud/iconw_rkt.tga",				// iconName
 		0,									// iconHandle
@@ -680,7 +703,8 @@ completeWeaponData_t availableWeapons[] =
 	{ 
 		WT_FLARE,							// type
 		MF_GAMESET_ANY,						// gameset
-		"Flare",							// descriptiveName
+		"Flares",							// descriptiveName
+		"Flares",							// shortName
 		"models/weapons/ffar.md3",			// modelName
 		"",									// iconName
 		0,									// iconHandle
