@@ -1,5 +1,5 @@
 /*
- * $Id: cg_plane.c,v 1.17 2002-02-08 21:43:57 thebjoern Exp $
+ * $Id: cg_plane.c,v 1.18 2002-02-09 17:07:03 thebjoern Exp $
 */
 
 
@@ -173,9 +173,15 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 	int				i;
 	int				ONOFF = cent->currentState.ONOFF;
 	vec3_t			velocity;	
+//	float			speed;
 
 	// get velocity
 	BG_EvaluateTrajectoryDelta( &cent->currentState.pos, cg.time, velocity );
+
+	// get velocity
+//	VectorCopy( cent->currentState.pos.trDelta, velocity );
+//	speed = VectorLength( velocity );
+
 
 	for( i = 0; i < BP_PLANE_MAX_PARTS; i++ ) {
 	    memset( &part[i], 0, sizeof(part[0]) );	

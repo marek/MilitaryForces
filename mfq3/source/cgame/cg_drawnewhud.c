@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.14 2002-02-08 21:43:56 thebjoern Exp $
+ * $Id: cg_drawnewhud.c,v 1.15 2002-02-09 17:07:03 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -754,27 +754,23 @@ static void CG_Draw_Center(int vehicle, int health, int throttle) {
 
 		// throttle
 	if( throttlepic >= 0 ) {
-		x = 320;
-		y = 448;
-		width = 128;
-		height = 32;
 		if( availableVehicles[vehicle].engines > 1 ) {
 			if( availableVehicles[vehicle].maxthrottle > MF_THROTTLE_MILITARY ) {
-				CG_DrawPic( x, y, width, height, cgs.media.HUDthrottle_2_1_ab[throttlepic] ); 
-				CG_DrawPic( x, y, width, height, cgs.media.HUDthrottle_2_2_ab[throttlepic] ); 
+				CG_DrawPic( 320, 448, 128, 16, cgs.media.HUDthrottle_2_1_ab[throttlepic] ); 
+				CG_DrawPic( 320, 464, 128, 16, cgs.media.HUDthrottle_2_2_ab[throttlepic] ); 
 			} else {
-				CG_DrawPic( x, y, width, height, cgs.media.HUDthrottle_2_1[throttlepic] ); 
-				CG_DrawPic( x, y, width, height, cgs.media.HUDthrottle_2_2[throttlepic] ); 
+				CG_DrawPic( 320, 448, 128, 16, cgs.media.HUDthrottle_2_1[throttlepic] ); 
+				CG_DrawPic( 320, 464, 128, 16, cgs.media.HUDthrottle_2_2[throttlepic] ); 
 			}
 		} else {
 			if( availableVehicles[vehicle].maxthrottle > MF_THROTTLE_MILITARY ) {
-				CG_DrawPic( x, y, width, height, cgs.media.HUDthrottle_1_ab[throttlepic] ); 
+				CG_DrawPic( 320, 448, 128, height, cgs.media.HUDthrottle_1_ab[throttlepic] ); 
 			} else {
 				if( (availableVehicles[vehicle].id&CAT_ANY & CAT_GROUND) &&
 					throttlepic >= MF_THROTTLE_MILITARY ) {
-					CG_DrawPic( x, y, width, height, cgs.media.HUDthrottle_rev[throttlepic-10] ); 
+					CG_DrawPic( 320, 448, 128, 32, cgs.media.HUDthrottle_rev[throttlepic-10] ); 
 				} else {
-					CG_DrawPic( x, y, width, height, cgs.media.HUDthrottle_1[throttlepic] ); 
+					CG_DrawPic( 320, 448, 128, 32, cgs.media.HUDthrottle_1[throttlepic] ); 
 				}
 			}
 		}

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_groundvehicle.c,v 1.9 2002-02-04 12:59:14 sparky909_uk Exp $
+ * $Id: cg_groundvehicle.c,v 1.10 2002-02-09 17:07:03 thebjoern Exp $
 */
 
 
@@ -11,6 +11,12 @@ char *gv_tags[BP_GV_MAX_PARTS] =
 	"<no tag>",		// vehicle body
 	"tag_turret",	// turret
 	"tag_weap",		// gun
+	"tag_wheel",	// wheel
+	"tag_wheel2",	// wheel
+	"tag_wheel3",	// wheel
+	"tag_wheel4",	// wheel
+	"tag_wheel5",	// wheel
+	"tag_wheel6"	// wheel
 };
 
 /*
@@ -34,38 +40,6 @@ void CG_RegisterGroundVehicle( clientInfo_t *ci )
 	}
 }
 
-/*
-==========================
-CG_GroundVehicleMuzzleFlash
-==========================
-*/
-/*
-static void CG_GroundVehicleMuzzleFlash( centity_t *cent, const refEntity_t *parent, qhandle_t parentModel ) {
-	refEntity_t		flash;
-	vec3_t			angles;
-
-	// impulse flash
-	if ( cg.time - cent->muzzleFlashTime > MUZZLE_FLASH_TIME ) {
-		return;
-	}
-
-	// UGLY!
-	memset( &flash, 0, sizeof( flash ) );
-	VectorCopy( parent->lightingOrigin, flash.lightingOrigin );
-	flash.shadowPlane = parent->shadowPlane;
-	flash.renderfx = parent->renderfx;
-	flash.hModel = cgs.media.vehicleMuzzleFlashModel;
-
-	angles[YAW] = 0;
-	angles[PITCH] = 0;
-	angles[ROLL] = crandom() * 10;
-	AnglesToAxis( angles, flash.axis );
-
-	CG_PositionRotatedEntityOnTag( &flash, parent, parentModel, "tag_gun2");
-	trap_R_AddRefEntityToScene( &flash );
-
-}
-*/
 
 /*
 ===============
@@ -184,6 +158,38 @@ void CG_GroundVehicle( centity_t *cent, clientInfo_t *ci )
     part[BP_GV_GUNBARREL].renderfx = renderfx;
     VectorCopy (part[BP_GV_GUNBARREL].origin, part[BP_GV_GUNBARREL].oldorigin);
     trap_R_AddRefEntityToScene( &part[BP_GV_GUNBARREL] );
+
+	//
+	// wheels
+	//
+	// gearAnimStartTime is for timediff
+	// gearAnim is for angles
+	if( (availableVehicles[ci->vehicle].caps & HC_WHEELS) ) {
+		int ii;
+		int timediff = cg.time - cent->gearAnimStartTime;
+		float dist = speed * timediff / 1000;
+		vec3_t v1, v2;
+		float dot;
+		AngleVectors( cent->currentState.angles, v1, 0, 0 );
+		VectorCopy( cent->currentState.pos.trDelta, v2 );
+		VectorNormalize( v2 );
+		dot = DotProduct( v1, v2 );
+		dist = ( (dist / availableVehicles[ci->vehicle].wheelCF)*360);
+		cent->gearAnim += (dot > 0 ? dist : -dist);
+		cent->gearAnim = AngleMod( cent->gearAnim );
+		for( ii = 0; ii < availableVehicles[ci->vehicle].wheels; ++ii ) {
+			part[BP_GV_WHEEL+ii].hModel = ci->parts[BP_GV_WHEEL+ii];
+			VectorCopy( cent->lerpOrigin, part[BP_GV_WHEEL+ii].lightingOrigin );
+			AxisCopy( axisDefault, part[BP_GV_WHEEL+ii].axis );
+			part[BP_GV_WHEEL+ii].shadowPlane = shadowPlane;
+			part[BP_GV_WHEEL+ii].renderfx = renderfx;
+			VectorCopy (part[BP_GV_WHEEL+ii].origin, part[BP_GV_WHEEL+ii].oldorigin);
+			RotateAroundPitch( part[BP_GV_WHEEL+ii].axis, cent->gearAnim );
+			CG_PositionRotatedEntityOnTag( &part[BP_GV_WHEEL+ii], &part[BP_GV_BODY], ci->parts[BP_GV_BODY], gv_tags[BP_GV_WHEEL+ii] );
+			trap_R_AddRefEntityToScene( &part[BP_GV_WHEEL+ii] );
+		}
+		cent->gearAnimStartTime = cg.time;
+	}
 
 /*
 		AngleVectors( self->client->ps.vehicleAngles, forward, right, up );
