@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.35 2003-04-25 00:02:23 thebjoern Exp $
+ * $Id: g_local.h,v 1.37 2003-10-07 23:15:57 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -192,6 +192,8 @@ struct gentity_s {
 	float		 gi_lockangle;
 	int			 gi_reloadTime;
 	int			 basicECMVulnerability;
+	int			 nukeTime;			// For nuke effect/damage
+	int			 nukeShockTime;		// For nuke effect/damage
 };
 
 
@@ -646,9 +648,12 @@ void fire_ironbomb (gentity_t *self);
 void fire_autocannon (gentity_t *self, qboolean main);
 void fire_maingun (gentity_t *self);
 void fire_flare (gentity_t *self);
+void fire_flare2 (gentity_t *self, vec3_t start, vec3_t up, int age);
+void fire_cflare (gentity_t *self);
 void drop_fueltank (gentity_t *self);
 void LaunchMissile_GI( gentity_t* ent );
-
+void fire_nukebomb (gentity_t *self);
+void fire_nukemissile (gentity_t *self);
 //
 // g_mover.c
 //
@@ -716,6 +721,7 @@ qboolean SpotWouldTelefrag( gentity_t *spot );
 char *MF_ClientConnect( int clientNum, qboolean firstTime, qboolean isBot );
 void MF_ClientBegin( int clientNum );
 void MF_ClientSpawn( gentity_t *ent );
+void MF_ClientSpawnAtPos(gentity_t *ent, vec3_t	spawn_origin, vec3_t spawn_angles);
 
 // mfq3
 // mf_vehiclespawn.c
