@@ -1,5 +1,5 @@
 /*
- * $Id: mf_vehiclespawn.c,v 1.3 2002-02-17 18:10:54 thebjoern Exp $
+ * $Id: mf_vehiclespawn.c,v 1.4 2002-02-18 09:51:28 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -56,3 +56,32 @@ void MF_Spawn_GroundVehicle(gentity_t *ent, int idx) {
 	ent->touch = Touch_GroundVehicle;
 	ent->pain = GroundVehicle_Pain;
 }
+
+// ground vehicles
+void MF_Spawn_Helo(gentity_t *ent, int idx, qboolean landed) {
+
+	// set functions
+	ent->touch = Touch_Helo;
+	ent->pain = Helo_Pain;
+
+}
+
+// LQM
+void MF_Spawn_LQM(gentity_t *ent, int idx) {
+
+	// set functions
+	ent->touch = Touch_LQM;
+	ent->pain = LQM_Pain;
+
+}
+
+// Boat
+void MF_Spawn_Boat(gentity_t *ent, int idx) {
+
+	// set functions
+	ent->touch = Touch_Boat;
+	ent->pain = Boat_Pain;
+
+}
+
+

@@ -1,5 +1,5 @@
 /*
- * $Id: g_mfq3util.c,v 1.14 2002-02-15 09:58:31 thebjoern Exp $
+ * $Id: g_mfq3util.c,v 1.15 2002-02-18 09:51:28 thebjoern Exp $
 */
 
 
@@ -70,7 +70,7 @@ void updateTargetTracking( gentity_t *ent )
 		radarrange = availableVehicles[ent->client->vehicle].radarRange;
 		cone = availableVehicles[ent->client->vehicle].trackCone;
 	} else if( ent->client->ps.ONOFF & OO_RADAR_GROUND ) {
-		targetcat = CAT_GROUND;
+		targetcat = CAT_GROUND|CAT_BOAT;
 		buildings = qtrue;
 		radarrange = availableVehicles[ent->client->vehicle].radarRange2;
 		cone = availableVehicles[ent->client->vehicle].trackCone2;
@@ -82,7 +82,8 @@ void updateTargetTracking( gentity_t *ent )
 	}
 
 	// weapon range and vehicle direction
-	if( availableVehicles[ent->client->vehicle].cat & CAT_GROUND ) {
+	if( (availableVehicles[ent->client->vehicle].cat & CAT_GROUND) ||
+		(availableVehicles[ent->client->vehicle].cat & CAT_BOAT)) {
 		vec3_t	right, up, temp;
 		AngleVectors( ent->client->ps.vehicleAngles, forward, right, up );
 		RotatePointAroundVector( temp, up, forward, ((float)ent->client->ps.turretAngle)/10 );
@@ -185,7 +186,7 @@ void updateTargetTracking( gentity_t *ent )
 			targetcat = CAT_PLANE|CAT_HELO;
 		} else if( availableWeapons[ent->s.weaponIndex].type != WT_ANTIAIRMISSILE &&
 			(ent->client->ps.ONOFF & OO_RADAR_GROUND) ) {
-			targetcat = CAT_GROUND;
+			targetcat = CAT_GROUND|CAT_BOAT;
 			buildings = qtrue;
 		}
 		if( !targetcat ) {

@@ -1,5 +1,5 @@
 /*
- * $Id: ui_vehicleselection.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: ui_vehicleselection.c,v 1.2 2002-02-18 09:51:28 thebjoern Exp $
 */
 
 /*
@@ -493,6 +493,15 @@ void VehicleSelection_Cache( void ) {
 		}
 		else if( cat & CAT_GROUND ) {
 			strcpy( dir, "ground" );
+		}
+		else if( cat & CAT_HELO ) {
+			strcpy( dir, "helos" );
+		}
+		else if( cat & CAT_LQM ) {
+			strcpy( dir, "lqms" );
+		}
+		else if( cat & CAT_BOAT ) {
+			strcpy( dir, "sea" );
 		}
 		trap_R_RegisterShaderNoMip( va("models/vehicles/%s/%s/%s_icon", dir, availableVehicles[i].modelName,
 				availableVehicles[i].modelName ) );

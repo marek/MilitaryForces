@@ -73,6 +73,12 @@ call ..\compile  ../g_mfq3util.c
 @if errorlevel 1 goto quit
 call ..\compile  ../g_plane.c
 @if errorlevel 1 goto quit
+call ..\compile  ../g_helo.c
+@if errorlevel 1 goto quit
+call ..\compile  ../g_lqm.c
+@if errorlevel 1 goto quit
+call ..\compile  ../g_boat.c
+@if errorlevel 1 goto quit
 call ..\compile  ../g_scripts.c
 @if errorlevel 1 goto quit
 call ..\compile  ../g_groundvehicle.c
@@ -88,6 +94,12 @@ call ..\compile  ../bg_weapondata.c
 call ..\compile  ../bg_planemove.c
 @if errorlevel 1 goto quit
 call ..\compile  ../bg_groundmove.c
+@if errorlevel 1 goto quit
+call ..\compile  ../bg_helomove.c
+@if errorlevel 1 goto quit
+call ..\compile  ../bg_lqmmove.c
+@if errorlevel 1 goto quit
+call ..\compile  ../bg_boatmove.c
 @if errorlevel 1 goto quit
 call ..\compile  ../bg_mfq3util.c
 @if errorlevel 1 goto quit

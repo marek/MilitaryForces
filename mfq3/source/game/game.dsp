@@ -94,12 +94,24 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;hpj;bat;for;f90"
 # Begin Source File
 
+SOURCE=.\bg_boatmove.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\bg_groundmove.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\bg_helomove.c
 # End Source File
 # Begin Source File
 
 SOURCE=.\bg_lib.c
 # PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=.\bg_lqmmove.c
 # End Source File
 # Begin Source File
 
@@ -139,6 +151,10 @@ SOURCE=.\g_arenas.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\g_boat.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\g_client.c
 # End Source File
 # Begin Source File
@@ -167,7 +183,15 @@ SOURCE=.\g_groundvehicle.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\g_helo.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\g_items.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\g_lqm.c
 # End Source File
 # Begin Source File
 

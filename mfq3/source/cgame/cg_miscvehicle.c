@@ -1,5 +1,5 @@
 /*
- * $Id: cg_miscvehicle.c,v 1.8 2002-02-17 18:10:54 thebjoern Exp $
+ * $Id: cg_miscvehicle.c,v 1.9 2002-02-18 09:51:27 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -345,6 +345,39 @@ static void CG_Misc_GV( centity_t *cent )
 //	CG_GroundVehicleFlags( cent );
 }
 
+/*
+===============
+CG_Misc_Helo
+===============
+*/
+
+static void CG_Misc_Helo( centity_t *cent ) 
+{
+
+}
+
+/*
+===============
+CG_Misc_LQM
+===============
+*/
+
+static void CG_Misc_LQM( centity_t *cent ) 
+{
+
+}
+
+/*
+===============
+CG_Misc_Boat
+===============
+*/
+
+static void CG_Misc_Boat( centity_t *cent ) 
+{
+
+}
+
 
 void CG_Misc_Vehicle( centity_t *cent ) 
 {
@@ -359,6 +392,21 @@ void CG_Misc_Vehicle( centity_t *cent )
 			cg.radarEnts[cg.radarTargets++] = cent;
 		}
 		CG_Misc_GV( cent );
+	}
+	else if( availableVehicles[cent->currentState.modelindex].cat & CAT_HELO ) {
+		if( cg.radarTargets < MAX_RADAR_TARGETS && (cg.predictedPlayerEntity.currentState.ONOFF & OO_RADAR_AIR)) {
+			cg.radarEnts[cg.radarTargets++] = cent;
+		}
+		CG_Misc_Helo( cent );
+	}
+	else if( availableVehicles[cent->currentState.modelindex].cat & CAT_LQM ) {
+		CG_Misc_LQM( cent );
+	}
+	else if( availableVehicles[cent->currentState.modelindex].cat & CAT_BOAT ) {
+		if( cg.radarTargets < MAX_RADAR_TARGETS && (cg.predictedPlayerEntity.currentState.ONOFF & OO_RADAR_GROUND)) {
+			cg.radarEnts[cg.radarTargets++] = cent;
+		}
+		CG_Misc_Boat( cent );
 	}
 	else {
 		trap_Error( "Error: CG_Misc_Vehicle got wrong CAT!\n" );

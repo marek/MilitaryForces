@@ -21,6 +21,12 @@ call ..\compile ../../game/bg_planemove.c
 @if errorlevel 1 goto quit
 call ..\compile ../../game/bg_groundmove.c
 @if errorlevel 1 goto quit
+call ..\compile ../../game/bg_helomove.c
+@if errorlevel 1 goto quit
+call ..\compile ../../game/bg_lqmmove.c
+@if errorlevel 1 goto quit
+call ..\compile ../../game/bg_boatmove.c
+@if errorlevel 1 goto quit
 call ..\compile ../../game/bg_mfq3util.c
 @if errorlevel 1 goto quit
 call ..\compile ../../ui/ui_shared.c
@@ -74,6 +80,12 @@ call ..\compile ../cg_vehicle.c
 call ..\compile ../cg_miscvehicle.c
 @if errorlevel 1 goto quit
 call ..\compile ../cg_plane.c
+@if errorlevel 1 goto quit
+call ..\compile ../cg_helo.c
+@if errorlevel 1 goto quit
+call ..\compile ../cg_boat.c
+@if errorlevel 1 goto quit
+call ..\compile ../cg_lqm.c
 @if errorlevel 1 goto quit
 call ..\compile ../cg_groundvehicle.c
 @if errorlevel 1 goto quit

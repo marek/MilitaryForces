@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.32 2002-02-17 18:10:54 thebjoern Exp $
+ * $Id: cg_local.h,v 1.33 2002-02-18 09:51:27 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1197,6 +1197,30 @@ void CG_PlanePilot( centity_t *cent, const refEntity_t *parent, qhandle_t parent
 void CG_GroundVehicle( centity_t *cent, clientInfo_t *ci );
 void CG_RegisterGroundVehicle( clientInfo_t *ci );
 void CG_GroundVehicleObituary( entityState_t *ent, clientInfo_t *ci );
+
+
+//
+// cg_helo.c
+//
+void CG_Helo( centity_t *cent, clientInfo_t *ci );
+void CG_RegisterHelo( clientInfo_t *ci );
+void CG_HeloObituary( entityState_t *ent, clientInfo_t *ci );
+
+
+//
+// cg_lqm.c
+//
+void CG_LQM( centity_t *cent, clientInfo_t *ci );
+void CG_RegisterLQM( clientInfo_t *ci );
+void CG_LQMObituary( entityState_t *ent, clientInfo_t *ci );
+
+
+//
+// cg_boat.c
+//
+void CG_Boat( centity_t *cent, clientInfo_t *ci );
+void CG_RegisterBoat( clientInfo_t *ci );
+void CG_BoatObituary( entityState_t *ent, clientInfo_t *ci );
 
 
 //

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.13 2002-02-17 13:26:45 thebjoern Exp $
+ * $Id: bg_mfq3util.c,v 1.14 2002-02-18 09:51:27 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -257,7 +257,13 @@ char * MF_CreateModelPathname( int vehicle, char * pFormatString )
 		strcpy( catDir, "ground" );
 	}
 	else if( cat & CAT_HELO ) {
-		strcpy( catDir, "helicopters" );
+		strcpy( catDir, "helos" );
+	}
+	else if( cat & CAT_LQM ) {
+		strcpy( catDir, "lqms" );
+	}
+	else if( cat & CAT_BOAT ) {
+		strcpy( catDir, "sea" );
 	}
 
 	// create filename string

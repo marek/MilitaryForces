@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawtools.c,v 1.7 2002-02-15 18:10:45 sparky909_uk Exp $
+ * $Id: cg_drawtools.c,v 1.8 2002-02-18 09:51:27 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -832,8 +832,8 @@ qboolean CG_MarkGeneratedShadow( centity_t *cent, clientInfo_t * ci, float *shad
 	yRad = availableVehicles[ ci->vehicle ].maxs[ 1 ];
 
 	// PLANES ONLY: alter the radius values based upon the vehicles pitch & roll
-	if( availableVehicles[ ci->vehicle ].cat & CAT_PLANE )
-	{
+	if( (availableVehicles[ ci->vehicle ].cat & CAT_PLANE) || 
+		(availableVehicles[ ci->vehicle ].cat & CAT_HELO) ) {
 		xAlter = fabs( cent->lerpAngles[0] / 30.0f );
 		yAlter = fabs( cent->lerpAngles[2] / 90.0f );
 		MF_LimitFloat( &xAlter, 0.0f, 1.0f );
@@ -886,8 +886,8 @@ qboolean CG_PolyMeshGeneratedShadow( centity_t *cent, clientInfo_t * ci, float *
 	yRad *= 0.5f;
 
 	// PLANES ONLY: alter the radius values based upon the vehicles pitch & roll
-	if( availableVehicles[ ci->vehicle ].cat & CAT_PLANE )
-	{
+	if( (availableVehicles[ ci->vehicle ].cat & CAT_PLANE) || 
+		(availableVehicles[ ci->vehicle ].cat & CAT_HELO) ) {
 		xAlter = fabs( cent->lerpAngles[PITCH] / 30.0f );
 		yAlter = fabs( cent->lerpAngles[ROLL] / 90.0f );
 		MF_LimitFloat( &xAlter, 0.0f, 1.0f );

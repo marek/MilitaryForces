@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawoldhud.c,v 1.3 2002-02-15 09:58:31 thebjoern Exp $
+ * $Id: cg_drawoldhud.c,v 1.4 2002-02-18 09:51:27 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -61,7 +61,8 @@ static void CG_DrawRadarSymbols_AIR( int vehicle ) {
 	CG_DrawSmallString( 595, 320, va("%.0f", range), 1.0f);
 
 	// ground vehicle adjustment for angle
-	if( availableVehicles[vehicle].cat & CAT_GROUND ) {
+	if( (availableVehicles[vehicle].cat & CAT_GROUND) ||
+		(availableVehicles[vehicle].cat & CAT_BOAT) ) {
 		hdg += self->currentState.angles2[ROLL];
 		if( hdg > 360 ) hdg -= 360;
 		else if( hdg < 0 ) hdg += 360;
@@ -176,7 +177,8 @@ static void CG_DrawRadarSymbols_GROUND( int vehicle ) {
 	CG_DrawSmallString( 595, 320, va("%.0f", range), 1.0f);
 
 	// ground vehicle adjustment for angle
-	if( availableVehicles[vehicle].cat & CAT_GROUND ) {
+	if( (availableVehicles[vehicle].cat & CAT_GROUND) ||
+		(availableVehicles[vehicle].cat & CAT_BOAT) ) {
 		hdg += self->currentState.angles2[ROLL];
 		if( hdg > 360 ) hdg -= 360;
 		else if( hdg < 0 ) hdg += 360;
@@ -237,7 +239,8 @@ static void CG_DrawRadarSymbols_GROUND( int vehicle ) {
 				if( res.fraction < 1.0f ) continue;
 			}
 			// which icon (if at all, dont show lqms)
-			if( availableVehicles[otherveh].cat & CAT_GROUND ) {
+			if( (availableVehicles[otherveh].cat & CAT_GROUND) ||
+				(availableVehicles[otherveh].cat & CAT_BOAT) ) {
 				icon = RD_GROUND_ENEMY;
 			} else {
 				continue;
@@ -266,9 +269,11 @@ static void CG_DrawRadarSymbols_GROUND( int vehicle ) {
 			angle = angles[1]-hdg;
 			if( angle > 360 ) angle -= 360;
 			else if( angle < 0 ) angle += 360;
-			if( ( availableVehicles[vehicle].cat & CAT_GROUND ) &&
+			if( ( (availableVehicles[vehicle].cat & CAT_GROUND) ||
+				  (availableVehicles[vehicle].cat & CAT_BOAT) ) &&
 				angle >= 90 && angle <= 270 ) continue;
-			else if( ( availableVehicles[vehicle].cat & CAT_PLANE ) &&
+			else if( ( (availableVehicles[vehicle].cat & CAT_PLANE) ||
+					   (availableVehicles[vehicle].cat & CAT_HELO) ) &&
 				angle >= 45 && angle <= 315 ) continue;
 			angles[1] -= hdg - 90;
 			if( angles[1] > 360 ) angles[1] -= 360;
@@ -431,7 +436,9 @@ void CG_DrawStatusBar_MFQ3( void ) {
 		} else {
 			color = 1;	// red
 		}
-		if( availableVehicles[vehicle].cat & CAT_PLANE ) {
+		if( (availableVehicles[vehicle].cat & CAT_PLANE) ||
+			(availableVehicles[vehicle].cat & CAT_HELO) ||
+			(availableVehicles[vehicle].cat & CAT_BOAT) ) {
 			value *= 100;
 		}
 		CG_DrawSmallStringColor( 2, 430, va("Fuel %i", value), colors[color]);

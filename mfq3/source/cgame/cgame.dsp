@@ -94,12 +94,24 @@ LINK32=link.exe
 # PROP Default_Filter "c"
 # Begin Source File
 
+SOURCE=..\game\bg_boatmove.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\game\bg_groundmove.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\game\bg_helomove.c
 # End Source File
 # Begin Source File
 
 SOURCE=..\game\bg_lib.c
 # PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=..\game\bg_lqmmove.c
 # End Source File
 # Begin Source File
 
@@ -128,6 +140,10 @@ SOURCE=..\game\bg_vehicledata.c
 # Begin Source File
 
 SOURCE=..\game\bg_weapondata.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\cg_boat.c
 # End Source File
 # Begin Source File
 
@@ -167,11 +183,19 @@ SOURCE=.\cg_groundvehicle.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\cg_helo.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\cg_info.c
 # End Source File
 # Begin Source File
 
 SOURCE=.\cg_localents.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\cg_lqm.c
 # End Source File
 # Begin Source File
 

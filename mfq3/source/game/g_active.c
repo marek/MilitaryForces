@@ -1,5 +1,5 @@
 /*
- * $Id: g_active.c,v 1.9 2002-02-17 18:10:54 thebjoern Exp $
+ * $Id: g_active.c,v 1.10 2002-02-18 09:51:28 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -654,7 +654,8 @@ void ClientThink_real( gentity_t *ent ) {
 		updateTargetTracking(ent);
 	}
 	// category specific actions if any
-	if( availableVehicles[client->vehicle].cat & CAT_PLANE ) {
+	if( (availableVehicles[client->vehicle].cat & CAT_PLANE) ||
+		(availableVehicles[client->vehicle].cat & CAT_HELO) ) {
 		// takeoff/landing
 		checkTakeoffLanding( ent );
 	}
@@ -741,7 +742,8 @@ void ClientThink_real( gentity_t *ent ) {
 	ent->watertype = pm.watertype;
 
 	if( client->vehicle >= 0 && ent->waterlevel && 
-		!(availableVehicles[client->vehicle].cat & CAT_GROUND) ) {
+		!(availableVehicles[client->vehicle].cat & CAT_GROUND) &&
+		!(availableVehicles[client->vehicle].cat & CAT_BOAT) ) {
 	    G_Damage( ent, NULL, ent, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 	}
 
