@@ -1,8 +1,8 @@
-//Missionscript for map mfq31
+//Missionscript for map mfq3_desertstorm
 
 Overview
 {
-	map	mfq31
+	map	mfq3_desertstorm
 	gameset	1
 	gametype	3
 	mission	bjoern1
