@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.15 2002-02-09 17:07:03 thebjoern Exp $
+ * $Id: cg_drawnewhud.c,v 1.16 2002-02-10 19:18:19 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -1491,7 +1491,7 @@ void CG_DrawStatusBar_MFQ3_new( void ) {
 	
 	// stallwarning
 	if( (ps->speed/10 <= availableVehicles[vehicle].stallspeed*1.5 || (cent->currentState.ONOFF & OO_STALLED)) &&
-		!(cent->currentState.ONOFF & OO_LANDED) ) {
+		!(cent->currentState.ONOFF & OO_LANDED) && ps->stats[STAT_HEALTH] > 0 ) {
 		float stallscale = 1.0f;
 		if( speed >= stallspeed && !(cent->currentState.ONOFF & OO_STALLED) ) stallscale = 2.0f - ((float)speed/(float)stallspeed);
 		CG_DrawStringNew( 320, 360, stallscale, HUDColors[stallcolor], "STALL!", 0, 0, 3, CENTRE_JUSTIFY );

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_planemove.c,v 1.5 2002-02-04 09:38:06 thebjoern Exp $
+ * $Id: bg_planemove.c,v 1.6 2002-02-10 19:18:19 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -318,11 +318,6 @@ void PM_PlaneMove( void )
 				else vehdir[PITCH] = viewdir[PITCH];
 				pm->ps->ONOFF &= ~(OO_LANDED|OO_STALLED);
 			}	
-		}
-		if( speed < 20 && pm->ps->throttle == 0 ) {
-			pm->ps->ONOFF |= OO_COCKPIT;
-		} else {
-			pm->ps->ONOFF &= ~OO_COCKPIT;
 		}
 	}
 	// air movement

@@ -1,5 +1,5 @@
 /*
- * $Id: g_combat.c,v 1.3 2002-02-05 14:36:32 sparky909_uk Exp $
+ * $Id: g_combat.c,v 1.4 2002-02-10 19:18:19 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -41,7 +41,9 @@ void ExplodeVehicle( gentity_t *self ) {
 	self->takedamage = qfalse;
 	self->s.eType = ET_INVISIBLE;
 	self->r.contents = 0;
-	self->client->ps.persistant[PERS_DEATHS]++;
+	if( self->client ) {
+		self->client->ps.persistant[PERS_DEATHS]++;
+	}
 }
 
 /*
