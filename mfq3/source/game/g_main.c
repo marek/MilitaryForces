@@ -1,5 +1,5 @@
 /*
- * $Id: g_main.c,v 1.17 2003-02-15 13:04:54 thebjoern Exp $
+ * $Id: g_main.c,v 1.19 2003-10-07 23:15:57 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -312,8 +312,23 @@ void G_RegisterCvars( void ) {
 		trap_Cvar_Set( "g_gametype", "0" );
 	}
 
+	// *******************
+	// Changes By: Minkis
+	// *******************
+	/*
+	Temporarly disabley Team based games(anything but DM and ME)
+	Team games lag and have a nasty spawn bug
+	*/
+	// *******************
+
+	if(g_gametype.integer != GT_MISSION_EDITOR && g_gametype.integer != GT_FFA)
+	{
+		trap_Cvar_Set( "g_gametype", "0" );
+	}
+	
 	level.warmupModificationCount = g_warmup.modificationCount;
-}
+	
+  }
 
 /*
 =================
