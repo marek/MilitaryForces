@@ -5,9 +5,33 @@ Military Forces Q3
 History:
 ========
 
-
-+++v0.73+++ in progress...
++++v0.75+++ in progress...
 -----------
+
++++v0.74+++
+-----------
+- added basic terrain-collision detection to IGME
+- gear-up-when-spawning-landed bug should be fixed now
+- added an event queuing system to the server qvm
+- fix a drone bug, that made their bounding boxes of 0 size (and they couldnt be hit therefore)
+- fix a radar bug, objects dead ahead are centered again
+- fix inventory page overflow error (MFD)
+- big code cleanup and factorization of vehicle drawing code
+- minor fixes along the way
+
++++v0.73+++ 
+-----------
+- make use of Abbo's latest shadows
+- dont allow connecting other clients to IGME
+- put in first cut of Schez's YF-23 (needs some fixes and a skin)
+- adder HMMWV Avenger (unskinned, not armed with missiles yet) - thanks Minkis
+- added 4 ground installations, "SAM Mk1", "SAM Mk2", "SAM Mk3" and "SAM Mk4", can be used 
+  in IGME using "me_spawn_gi 0-3" (not finished)
+- temporarily added cmd me_spawn_gi to spawn ground installations, this command has to 
+  provide a number of the installation as well (for example: "me_spawn_gi 2") - this command 
+  will be removed when we have a UI for the IGME
+- fixed a bug in vehicle deletion that caused route to appear in the next spawned vehicle
+- minor fixes
 
 +++v0.72+++
 -----------
