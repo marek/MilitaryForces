@@ -1,5 +1,5 @@
 /*
- * $Id: g_missions.c,v 1.4 2003-02-06 14:40:13 thebjoern Exp $
+ * $Id: g_missions.c,v 1.5 2003-02-08 15:20:18 thebjoern Exp $
  */
 
  
@@ -8,13 +8,38 @@
 
 static void G_SpawnMissionVehicles(mission_vehicle_t* vehs)
 {
-	// now that we have valid vehicle data make them spawn here
-	// use SP_misc_plane etc and set the relevant values to spawn them
-	// rest should work automatically
+	int			i;
+	gentity_t*	ent;
+
+	for( i = 0; i < IGME_MAX_VEHICLES/4; ++i )
+	{
+		if( !vehs[i].used ) break;
+		ent = G_Spawn();
+		ent->classname = "misc_vehicle";
+		VectorCopy(vehs[i].origin, ent->s.origin);
+		VectorCopy(vehs[i].angles, ent->s.angles);
+		ent->model = G_NewString(vehs[i].objectname);
+		ent->s.modelindex = vehs[i].index;
+		SP_misc_vehicle(ent);
+	}
+
+/*
+		for( j = 0; j < IGME_MAX_WAYPOINTS; ++j )
+		{
+			if( vehs[i].waypoints[j].used )
+			{
+				veh->waypoints[k].active = qtrue;
+				veh->waypoints[k].selected = qfalse;
+				VectorCopy( vehs[i].waypoints[j].origin, veh->waypoints[k].origin );
+				k++;
+			}
+		}
+	}
+*/
 }
 
 
-static void G_LoadOverviewAndEntities( char *filename,
+static qboolean G_LoadOverviewAndEntities( char *filename,
 										mission_overview_t* overview,
 										mission_vehicle_t* vehs, 
 										mission_groundInstallation_t* gis)
@@ -28,13 +53,13 @@ static void G_LoadOverviewAndEntities( char *filename,
 	if ( !f ) 
 	{
 		trap_Printf( va( S_COLOR_RED "file not found: %s\n", filename ) );
-		return;
+		return qfalse;
 	}
 	if ( len >= MAX_MISSION_TEXT ) 
 	{
 		trap_Printf( va( S_COLOR_RED "file too large: %s is %i, max allowed is %i", filename, len, MAX_MISSION_TEXT ) );
 		trap_FS_FCloseFile( f );
-		return;
+		return qfalse;
 	}
 
 	trap_FS_Read( inbuffer, len, f );
@@ -44,11 +69,14 @@ static void G_LoadOverviewAndEntities( char *filename,
 	trap_Printf( va(S_COLOR_GREEN "Successfully opened mission script: %s\n", filename) );
 
 	MF_ParseMissionScripts(inbuffer, overview, vehs, gis);
+
+	return qtrue;
 }
 
 void G_LoadMissionScripts()
 {
 	char				filename[MAX_FILEPATH];
+	char				missionname[32];
 	char				buffer[33];
 	mission_overview_t	overview;
 	mission_vehicle_t	vehicles[IGME_MAX_VEHICLES/4];
@@ -58,11 +86,25 @@ void G_LoadMissionScripts()
 	memset(&vehicles[0], 0, sizeof(vehicles));
 	memset(&installations[0], 0, sizeof(installations));
 
+	if( strlen(mf_mission.string) > 31 ) 
+	{
+		Com_Printf(S_COLOR_RED "Missionname in mf_mission too long -> no mission loaded\n");
+		return;
+	}
+	Q_strncpyz(missionname, mf_mission.string, 32);
+	if( !Q_stricmp(missionname, "") ||
+		!Q_stricmp(missionname, "none") )
+	{
+		Com_Printf("Not loading mission, as requested.\n");
+		return;
+	}
+
 	// for now just load the default mission
 	trap_Cvar_VariableStringBuffer("mapname", buffer, 32);
-	Com_sprintf( filename, MAX_FILEPATH, "missions/%s/default.mis", buffer );
+	Com_sprintf( filename, MAX_FILEPATH, "missions/%s/%s.mis", buffer, missionname );
 
-	G_LoadOverviewAndEntities(filename, &overview, vehicles, installations);
+	if( !G_LoadOverviewAndEntities(filename, &overview, vehicles, installations) )
+		return;
 
 	G_SpawnMissionVehicles(vehicles);
 

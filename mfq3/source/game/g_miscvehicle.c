@@ -1,5 +1,5 @@
 /*
- * $Id: g_miscvehicle.c,v 1.8 2002-07-15 18:23:07 thebjoern Exp $
+ * $Id: g_miscvehicle.c,v 1.9 2003-02-08 15:20:18 thebjoern Exp $
 */
 
 
@@ -315,7 +315,7 @@ void DroneInit()
 void SP_misc_vehicle( gentity_t *sp_ent ) 
 {
 	char modelname[128];
-	int i, k;
+	int i;
 	unsigned long gameset = G_GetGameset();
 	qboolean found = qfalse;
 	unsigned long cat;
@@ -326,9 +326,18 @@ void SP_misc_vehicle( gentity_t *sp_ent )
 	VectorCopy( sp_ent->s.origin, ent->s.origin );
 	VectorCopy( sp_ent->s.angles, ent->s.angles );
 	ent->health = sp_ent->health;
+	i = sp_ent->s.modelindex;
+
+	if( i < 0 || i >= bg_numberOfVehicles ) 
+	{
+		G_Printf ("%s (%s) cannot be spawned - index out of range\n", ent->classname, ent->model);
+		G_FreeEntity(ent);
+		G_FreeEntity(sp_ent);
+		return;
+	}
 
 	// is it a random one ?
-	if( strcmp( ent->model, "randomplane" ) == 0 ||
+/*	if( strcmp( ent->model, "randomplane" ) == 0 ||
 		strcmp( ent->model, "randomhelo" ) == 0 ||
 		strcmp( ent->model, "randomboat" ) == 0 ||
 		strcmp( ent->model, "randomground" ) == 0 ) {
@@ -372,7 +381,7 @@ void SP_misc_vehicle( gentity_t *sp_ent )
 		G_Printf ("%s (%s) cannot be spawned\n", ent->classname, ent->model);
 		G_FreeEntity(ent);
 		return;
-	}
+	}*/
 	cat = (availableVehicles[i].cat);
 	if( cat & CAT_PLANE ) {
 		Com_sprintf(modelname, 127, "models/vehicles/planes/%s/%s.md3", availableVehicles[i].modelName,

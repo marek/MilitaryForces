@@ -1,5 +1,5 @@
 /*
- * $Id: cg_missioneditor.c,v 1.14 2003-02-07 20:12:17 thebjoern Exp $
+ * $Id: cg_missioneditor.c,v 1.15 2003-02-08 15:20:11 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -930,7 +930,7 @@ void ME_ExportToScript( const char* scriptname )
 			Com_sprintf( outstring, sizeof(outstring), "\t\tIndex\t%d\n", veh->vehidx );
 			trap_FS_Write( outstring, strlen(outstring), f );
 
-			Com_sprintf( outstring, sizeof(outstring), "\t\tName\t%s\n", availableVehicles[veh->vehidx].descriptiveName );
+			Com_sprintf( outstring, sizeof(outstring), "\t\tName\t%s\n", availableVehicles[veh->vehidx].modelName );
 			trap_FS_Write( outstring, strlen(outstring), f );
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\tTeam\t%d\n", availableVehicles[veh->vehidx].team ); 

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.30 2003-02-06 14:40:10 thebjoern Exp $
+ * $Id: bg_mfq3util.c,v 1.31 2003-02-08 15:20:13 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -389,7 +389,7 @@ static void MF_ParseOverview( char **buf, mission_overview_t* overview )
 		//trap_Printf(va("Token: '%s' - END\n", token));
 		return;
 	}
-	Com_Printf(va("O-Token: '%s' - VALID\n", token));
+//	Com_Printf(va("O-Token: '%s' - VALID\n", token));
 
 	if( strcmp( token, "{" ) ) 
 	{
@@ -476,7 +476,7 @@ static void MF_ParseWaypoints( char **buf, mission_vehicle_t* veh )
 		//trap_Printf(va("Token: '%s' - END\n", token));
 		return;
 	}
-	Com_Printf(va("W-Token: '%s' - VALID\n", token));
+//	Com_Printf(va("W-Token: '%s' - VALID\n", token));
 
 	if( strcmp( token, "{" ) ) 
 	{
@@ -526,7 +526,7 @@ static void MF_ParseVehicle( char **buf, mission_vehicle_t* veh )
 		//trap_Printf(va("Token: '%s' - END\n", token));
 		return;
 	}
-	Com_Printf(va("V-Token: '%s' - VALID\n", token));
+//	Com_Printf(va("V-Token: '%s' - VALID\n", token));
 
 	if( strcmp( token, "{" ) ) 
 	{
@@ -617,7 +617,7 @@ static void MF_ParseGroundInstallation( char **buf, mission_groundInstallation_t
 		//trap_Printf(va("Token: '%s' - END\n", token));
 		return;
 	}
-	Com_Printf(va("GV-Token: '%s' - VALID\n", token));
+//	Com_Printf(va("GV-Token: '%s' - VALID\n", token));
 
 	if( strcmp( token, "{" ) ) 
 	{
@@ -708,7 +708,7 @@ static void MF_ParseEntities( char **buf,
 		//trap_Printf(va("Token: '%s' - END\n", token));
 		return;
 	};
-	Com_Printf(va("E-Token: '%s' - VALID\n", token));
+//	Com_Printf(va("E-Token: '%s' - VALID\n", token));
 
 	if( strcmp( token, "{" ) ) 
 	{
@@ -764,7 +764,7 @@ void MF_ParseMissionScripts( char *buf,
 		token = COM_Parse( &buf );
 		if( !token[0] ) 
 		{
-			Com_Printf(va("Token: '%s' - END\n", token));
+			//Com_Printf(va("Token: '%s' - END\n", token));
 			break;
 		}
 		else if( !strcmp(token, "Overview" ) )
