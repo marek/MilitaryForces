@@ -1,5 +1,5 @@
 /*
- * $Id: g_active.c,v 1.24 2004-12-16 19:22:17 minkis Exp $
+ * $Id: g_active.c,v 1.25 2004-12-17 00:29:40 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -616,7 +616,7 @@ void ClientThink_real( gentity_t *ent ) {
 	int			oldEventSequence;
 	int			msec;
 	usercmd_t	*ucmd;
-
+int on_recharge = 0;
 	client = ent->client;
 
 	// event queue
@@ -686,7 +686,7 @@ void ClientThink_real( gentity_t *ent ) {
 
 	// MFQ3 vehicle not selected
 	if( client->ps.pm_flags & PMF_VEHICLESELECT ) {
-		if ( level.time > client->respawnTime && client->nextVehicle >= 0 ) {
+			if ( level.time > client->respawnTime && client->nextVehicle >= 0 ) {
 
 			// forcerespawn is to prevent users from waiting out powerups
 			if ( g_forcerespawn.integer > 0 && ( level.time - client->respawnTime ) > g_forcerespawn.integer * 1000 ) {
@@ -708,43 +708,14 @@ void ClientThink_real( gentity_t *ent ) {
 
 	// MFQ3 just selected vehicle
 	if( (client->ps.pm_flags & PMF_VEHICLESPAWN)) {
-		
-
 		client->ps.pm_flags &= ~PMF_VEHICLESPAWN;
-		
 
-		respawn( ent );
-
-
-		/*
-		int on_recharge = 0;
-		if(client->ps.pm_flags & PMF_RECHARGING)
-		{
-			on_recharge = 1;
-			client->ps.pm_flags &= ~PMF_VEHICLESPAWN;
-		}
-		
-		
-		if(on_recharge == 1)
-		{
-			
-
-			// set flags
-			client->ps.ONOFF = OO_NOTHING_ON;
-			// speed, throttle depend on landed/airborne 
-
-			client->ps.speed = 0;
-			client->ps.fixed_throttle = 0;
-			client->ps.ONOFF |= OO_LANDED|OO_STALLED|OO_GEAR;
-			ent->model = availableVehicles[client->nextVehicle].mod
-			
-
-		}
+		if (client->ps.pm_flags & PMF_RECHARGING)
+			switch_vehicle( ent );
 		else
-		{
 			respawn( ent );
-		}*/
-		
+
+
 		return;
 	}
 

@@ -1,5 +1,5 @@
 /*
- * $Id: g_client.c,v 1.11 2004-12-16 19:22:17 minkis Exp $
+ * $Id: g_client.c,v 1.12 2004-12-17 00:29:40 minkis Exp $
 */
 
 //null cvs upload test, comment placed for a difference.
@@ -338,7 +338,16 @@ respawn
 ================
 */
 void respawn( gentity_t *ent ) {
-	MF_ClientSpawn(ent);
+	MF_ClientSpawn(ent, 0);
+}
+
+/*
+================
+respawn
+================
+*/
+void switch_vehicle( gentity_t *ent ) {
+	MF_ClientSpawn(ent, CS_NOKILL | CS_LASTPOS );
 }
 
 /*
@@ -591,6 +600,15 @@ void ClientUserinfoChanged( int clientNum ) {
 		if ( strcmp( oldname, client->pers.netname ) ) {
 			trap_SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " renamed to %s\n\"", oldname, 
 				client->pers.netname) );
+		}
+	}
+	
+	// For changing vehicle
+	if(client->ps.pm_flags & PMF_RECHARGING) {
+		nextVehicle = atoi( Info_ValueForKey( userinfo, "cg_nextVehicle" ) );	
+		if(nextVehicle != client->nextVehicle) {
+			client->ps.pm_flags &= ~PMF_VEHICLESELECT;
+			client->ps.pm_flags |= PMF_VEHICLESPAWN;
 		}
 	}
 
