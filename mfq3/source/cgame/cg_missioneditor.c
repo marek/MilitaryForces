@@ -1,5 +1,5 @@
 /*
- * $Id: cg_missioneditor.c,v 1.10 2003-01-16 00:27:43 thebjoern Exp $
+ * $Id: cg_missioneditor.c,v 1.11 2003-01-27 00:49:41 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -855,7 +855,7 @@ void ME_ExportToScript( const char* scriptname )
 	CG_Printf("Saving to script: %s\n", scriptfile);
 
 	// first line comment
-	Com_sprintf( outstring, sizeof(outstring), ";Missionscript for map %s\n\n",mapname );
+	Com_sprintf( outstring, sizeof(outstring), "//Missionscript for map %s\n\n",mapname );
 	trap_FS_Write( outstring, strlen(outstring), f );
 
 	// header
@@ -894,6 +894,9 @@ void ME_ExportToScript( const char* scriptname )
 			Com_sprintf( outstring, sizeof(outstring), "\t\tTeam\t?\n" ); // ADD TEAM HERE!
 			trap_FS_Write( outstring, strlen(outstring), f );
 
+			Com_sprintf( outstring, sizeof(outstring), "\t\tGames\t?\n" ); // ADD GAME HERE!
+			trap_FS_Write( outstring, strlen(outstring), f );
+
 			Com_sprintf( outstring, sizeof(outstring), "\t\tOrigin\t%f;%f;%f\n", veh->origin[0],
 				veh->origin[1], veh->origin[2]);
 			trap_FS_Write( outstring, strlen(outstring), f );
@@ -917,6 +920,9 @@ void ME_ExportToScript( const char* scriptname )
 			trap_FS_Write( outstring, strlen(outstring), f );
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\tTeam\t%d\n", availableVehicles[veh->vehidx].team ); 
+			trap_FS_Write( outstring, strlen(outstring), f );
+
+			Com_sprintf( outstring, sizeof(outstring), "\t\tGames\t?\n" ); // ADD GAME HERE!
 			trap_FS_Write( outstring, strlen(outstring), f );
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\tOrigin\t%f;%f;%f\n", veh->origin[0],

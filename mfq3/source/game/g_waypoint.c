@@ -1,5 +1,5 @@
 /*
- * $Id: g_waypoint.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: g_waypoint.c,v 1.2 2003-01-27 00:49:42 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -31,7 +31,7 @@ void AddToWaypointManager( gentity_t *wp )
 
 /*QUAKED misc_waypoint (0 .5 .8) (-32 -32 0) (32 32 32)
 */
-void SP_misc_waypoint( gentity_t *ent ) 
+/*void SP_misc_waypoint( gentity_t *ent ) 
 {
 	if( ent->targetname ) {
 		AddToWaypointManager(ent);
@@ -39,5 +39,6 @@ void SP_misc_waypoint( gentity_t *ent )
 
 	G_FreeEntity(ent);
 }
+*/
 
 

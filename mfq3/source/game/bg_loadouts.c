@@ -1,5 +1,5 @@
 /*
- * $Id: bg_loadouts.c,v 1.5 2002-04-16 11:28:17 thebjoern Exp $
+ * $Id: bg_loadouts.c,v 1.6 2003-01-27 00:49:42 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -35,9 +35,9 @@ qboolean MF_distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout )
 
 	modelname = MF_CreateModelPathname( idx, "models/vehicles/%s/%s/%s.md3" );
 
-#ifdef _DEBUG
-	Com_Printf( "Calculating weapon stations for %s\n", availableVehicles[idx].tinyName );
-#endif
+//#ifdef _DEBUG
+//	Com_Printf( "Calculating weapon stations for %s\n", availableVehicles[idx].tinyName );
+//#endif
 
 	num = MF_getTagsContaining(modelname, "tag_P", tags, MAX_MOUNTS_PER_VEHICLE );
 	if( !num ) return qfalse;
@@ -46,9 +46,9 @@ qboolean MF_distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout )
 		memcpy( &loadout->mounts[i].tag, &tags[i], sizeof(md3Tag_t) );
 	}
 
-#ifdef _DEBUG
-	Com_Printf( "%s has %d mounts\n", modelname, num );
-#endif
+//#ifdef _DEBUG
+//	Com_Printf( "%s has %d mounts\n", modelname, num );
+//#endif
 
 	loadout->usedMounts = num;
 
@@ -81,13 +81,13 @@ qboolean MF_distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout )
 			}
 		}
 	}
-#ifdef _DEBUG
-	for( i = 0; i < num; ++i ) {
-		Com_Printf( "Mount %d: %d %x %c %d x %s\n", i, loadout->mounts[i].pos, loadout->mounts[i].flags,
-			(loadout->mounts[i].left ? 'L' : 'R'), loadout->mounts[i].num, 
-			availableWeapons[loadout->mounts[i].weapon].descriptiveName );
-	}
-#endif
+//#ifdef _DEBUG
+//	for( i = 0; i < num; ++i ) {
+//		Com_Printf( "Mount %d: %d %x %c %d x %s\n", i, loadout->mounts[i].pos, loadout->mounts[i].flags,
+//			(loadout->mounts[i].left ? 'L' : 'R'), loadout->mounts[i].num, 
+//			availableWeapons[loadout->mounts[i].weapon].descriptiveName );
+//	}
+//#endif
 
 	return qtrue;
 }
