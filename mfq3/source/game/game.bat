@@ -57,6 +57,8 @@ call ..\compile  ../g_utils.c
 call ..\compile  ../g_weapon.c
 @if errorlevel 1 goto quit
 
+call ..\compile  ../g_droneutil.c
+@if errorlevel 1 goto quit
 call ..\compile  ../g_droneground.c
 @if errorlevel 1 goto quit
 call ..\compile  ../g_droneplane.c

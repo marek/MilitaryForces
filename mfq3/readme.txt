@@ -7,6 +7,10 @@ History:
 
 +++v0.43+++ in progress...
 -----------
+- fix a drone bug where it always turned left instead of the shortest distance
+- planes can now land on other platform-like entities as well (func_train and
+  func_door)
+- minor fixes
 
 +++v0.42+++
 -----------

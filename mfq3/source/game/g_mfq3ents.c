@@ -1,5 +1,5 @@
 /*
- * $Id: g_mfq3ents.c,v 1.3 2001-11-19 17:47:07 thebjoern Exp $
+ * $Id: g_mfq3ents.c,v 1.4 2001-12-03 21:33:46 thebjoern Exp $
 */
 
 
@@ -296,7 +296,28 @@ void SP_trigger_radio( gentity_t *self ) {
 
 
 
+/*
+===============================================================================
 
+  CARRIER STUFF
+
+===============================================================================
+*/
+
+
+/*QUAKED func_catapult (.5 .5 .5) ?
+*/
+void SP_func_catapult( gentity_t *ent ) {
+
+	G_FreeEntity(ent);
+}
+
+/*QUAKED func_wires (.5 .5 .5) ?
+*/
+void SP_func_wires( gentity_t *ent ) {
+
+	G_FreeEntity(ent);
+}
 
 
 
