@@ -1,5 +1,5 @@
 /*
- * $Id: cg_syscalls.c,v 1.1 2001-11-15 21:35:14 thebjoern Exp $
+ * $Id: cg_syscalls.c,v 1.2 2002-02-15 18:10:48 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -372,4 +372,3 @@ void trap_CIN_DrawCinematic (int handle) {
 void trap_CIN_SetExtents (int handle, int x, int y, int w, int h) {
   syscall(CG_CIN_SETEXTENTS, handle, x, y, w, h);
 }
-

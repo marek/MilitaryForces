@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.30 2002-02-14 12:41:48 sparky909_uk Exp $
+ * $Id: cg_local.h,v 1.31 2002-02-15 18:10:46 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -23,12 +23,6 @@ typedef enum {
 	MEDIUM_QUALITY,
 	HIGH_QUALITY
 } quality_t;
-
-typedef enum {
-	LEFT_JUSTIFY,
-	CENTRE_JUSTIFY,
-	RIGHT_JUSTIFY
-} textJustify_t;
 
 // The entire cgame module is unloaded and reloaded on each level change,
 // so there is NO persistant data between levels on the client side.
@@ -144,9 +138,9 @@ typedef enum {
 	CAMERA_MAX		
 } Camera_Modes;
 
-#define MAX_CONSOLE_LINES	8
+#define MAX_CONSOLE_LINES 8
 
-// console
+// custom console
 struct strConsoleLine {
 	char text[ 1024 ];	// TODO: possibly make this dynamic to save memory
 	float life;
@@ -1119,9 +1113,6 @@ void CG_DrawTopBottom(float x, float y, float w, float h, float size);
 
 qboolean CG_GenericShadow( centity_t *cent, float *shadowPlane );
 
-vec4_t * CG_CreateColourVector( float r, float g, float b, float a, vec4_t * pVector );
-unsigned char * CG_CreateColourChar( unsigned char r, unsigned char g, unsigned char b, unsigned char a, unsigned char * pArray );
-
 void CG_ResetReticles( void );
 void CG_AddReticleEntityToScene( refEntity_t * pReticle, qboolean targetRecticle );
 void CG_Draw_Reticles();
@@ -1164,9 +1155,6 @@ const char *CG_GameTypeString();
 qboolean CG_YourTeamHasFlag();
 qboolean CG_OtherTeamHasFlag();
 qhandle_t CG_StatusHandle(int task);
-void CG_DrawStringNew( int x, int y, float scale, vec4_t colour, const char * pText, int unknown, int hSpacing, int style, textJustify_t formatting );
-void CG_DrawStringNewAlpha( int x, int y, const char * pText, float alpha, textJustify_t formatting );
-void CG_DrawStringNewColour( int x, int y, const char * pText, vec4_t colour, textJustify_t formatting );
 
 void CG_DrawStatusBar_MFQ3();
 void CG_DrawStatusBar_MFQ3_new();
@@ -1505,13 +1493,11 @@ int			trap_Key_GetCatcher( void );
 void		trap_Key_SetCatcher( int catcher );
 int			trap_Key_GetKey( const char *binding );
 
-
 typedef enum {
   SYSTEM_PRINT,
   CHAT_PRINT,
   TEAMCHAT_PRINT
 };
-
 
 int trap_CIN_PlayCinematic( const char *arg0, int xpos, int ypos, int width, int height, int bits);
 e_status trap_CIN_StopCinematic(int handle);

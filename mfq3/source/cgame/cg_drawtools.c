@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawtools.c,v 1.6 2002-02-15 09:58:31 thebjoern Exp $
+ * $Id: cg_drawtools.c,v 1.7 2002-02-15 18:10:45 sparky909_uk Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1004,64 +1004,6 @@ qboolean CG_GenericShadow( centity_t *cent, float *shadowPlane )
 }
 
 /*
-==================
-CG_CreateColourVector
-
-Create a vector colour definition
-==================
-*/
-
-static vec4_t colourVector = {1,1,1,1};	// common return ptr
-
-vec4_t * CG_CreateColourVector( float r, float g, float b, float a, vec4_t * pVector )
-{
-	// assign
-	colourVector[0] = r;
-	colourVector[1] = g;
-	colourVector[2] = b;
-	colourVector[3] = a;
-
-	// also copy into provided char array pointer?
-	if( pVector )
-	{
-		// duplicate
-		memcpy( pVector, colourVector, sizeof( colourVector ) );
-	}
-
-	// return common ptr
-	return &colourVector;
-}
-
-/*
-==================
-CG_CreateColourChar
-
-Create a unsigned char array of colour definition
-==================
-*/
-
-static unsigned char colourCharArray[4] = {255,255,255,255};	// common return ptr
-
-unsigned char * CG_CreateColourChar( unsigned char r, unsigned char g, unsigned char b, unsigned char a, unsigned char * pArray )
-{
-	// assign
-	colourCharArray[0] = r;
-	colourCharArray[1] = g;
-	colourCharArray[2] = b;
-	colourCharArray[3] = a;
-
-	// also copy into provided char array pointer?
-	if( pArray )
-	{
-		// duplicate
-		memcpy( pArray, colourCharArray, sizeof( colourCharArray ) );
-	}
-
-	// return common ptr
-	return &colourCharArray[0];
-}
-
-/*
 ===============
 CG_ResetReticles
 
@@ -1188,7 +1130,7 @@ void CG_AddReticleEntityToScene( refEntity_t * pReticle, qboolean targetRecticle
 	pReticle->renderfx |= RF_FIRST_PERSON;
 
 	// colour as TGA specified
-	CG_CreateColourChar( 255, 255, 255, 255, &pReticle->shaderRGBA[0] );
+	CreateColourChar( 255, 255, 255, 255, &pReticle->shaderRGBA[0] );
 
 	// don't add reticles when not drawing main view
 	if( !cg.drawingMFD )

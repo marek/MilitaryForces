@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.20 2002-02-15 09:58:31 thebjoern Exp $
+ * $Id: cg_drawnewhud.c,v 1.21 2002-02-15 18:10:45 sparky909_uk Exp $
 */
 
 #include "cg_local.h"
@@ -1508,14 +1508,14 @@ void CG_DrawStatusBar_MFQ3_new( void ) {
 		!(cent->currentState.ONOFF & OO_LANDED) && ps->stats[STAT_HEALTH] > 0 ) {
 		float stallscale = 1.0f;
 		if( speed >= stallspeed && !(cent->currentState.ONOFF & OO_STALLED) ) stallscale = 2.0f - ((float)speed/(float)stallspeed);
-		CG_DrawStringNew( 320, 360, stallscale, HUDColors[stallcolor], "STALL!", 0, 0, 3, CENTRE_JUSTIFY );
+		DrawStringNew( 320, 360, stallscale, HUDColors[stallcolor], "STALL!", 0, 0, 3, CENTRE_JUSTIFY );
 	}
 
 	// lock warning
 	if( ps->stats[STAT_LOCKINFO] & LI_BEING_LAUNCHED ) {
-		CG_DrawStringNew( 320, 60, 0.8f, HUDColors[HUD_RED], "LAUNCH!", 0, 0, 3, CENTRE_JUSTIFY );
+		DrawStringNew( 320, 60, 0.8f, HUDColors[HUD_RED], "LAUNCH!", 0, 0, 3, CENTRE_JUSTIFY );
 	} else if( ps->stats[STAT_LOCKINFO] & LI_BEING_LOCKED ) {
-		CG_DrawStringNew( 320, 60, 1.0f, HUDColors[HUD_YELLOW], "LOCK!", 0, 0, 3, CENTRE_JUSTIFY );
+		DrawStringNew( 320, 60, 1.0f, HUDColors[HUD_YELLOW], "LOCK!", 0, 0, 3, CENTRE_JUSTIFY );
 	}
 
 	// cleanup
