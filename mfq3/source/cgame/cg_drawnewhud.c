@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.4 2002-01-26 23:48:31 thebjoern Exp $
+ * $Id: cg_drawnewhud.c,v 1.5 2002-01-27 15:41:28 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -15,8 +15,8 @@ CG_DrawHUDPic
 Coordinates are 640*480 virtual values
 =================
 */
-static void CG_DrawHUDPic( float x, float y, float width, float height, qhandle_t hShader ) {
-	trap_R_SetColor( HUDColors[cg.HUDColor] );
+static void CG_DrawHUDPic( float x, float y, float width, float height, qhandle_t hShader, vec4_t color ) {
+	trap_R_SetColor( color );
 	CG_AdjustFrom640( &x, &y, &width, &height );
 	trap_R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, hShader );
 	trap_R_SetColor( NULL );
@@ -221,7 +221,7 @@ static void CG_MFQ3HUD_DecNumbers (int x, int y, int width, int decimals, int in
 	CG_MFQ3HUD_Numbers( x, y, prewid, pre, qfalse, HUDColors[cg.HUDColor] );
 	x += (HUDNUM_WIDTH-1)*prewid;
 
-	CG_DrawHUDPic( x+2,y+2, HUDNUM_WIDTH, HUDNUM_HEIGHT, cgs.media.HUDnumbers[STAT_POINT] );
+	CG_DrawHUDPic( x+2,y+2, HUDNUM_WIDTH, HUDNUM_HEIGHT, cgs.media.HUDnumbers[STAT_POINT], HUDColors[cg.HUDColor] );
 	x += HUDNUM_WIDTH-1;
 
 	CG_MFQ3HUD_Numbers( x, y, postwid, post, qfalse, HUDColors[cg.HUDColor] );
@@ -529,7 +529,7 @@ static void CG_Draw_Redundant(int vehicle, int health, int throttle, int ammo[16
 		y = 318;
 		width = 32;
 		height = 8;
-		CG_DrawHUDPic( x, y, width, height, cgs.media.HUDhealthtext ); 
+		CG_DrawHUDPic( x, y, width, height, cgs.media.HUDhealthtext, HUDColors[cg.HUDColor] ); 
 		CG_MFQ3HUD_Numbers( 584, 318, 4, health, qtrue, HUDColors[cg.HUDColor] );
 	}
 
@@ -539,7 +539,7 @@ static void CG_Draw_Redundant(int vehicle, int health, int throttle, int ammo[16
 		y = 330;
 		width = 32;
 		height = 8;
-		CG_DrawHUDPic( x, y, width, height, cgs.media.HUDthrottletext ); 
+		CG_DrawHUDPic( x, y, width, height, cgs.media.HUDthrottletext, HUDColors[cg.HUDColor] ); 
 		CG_MFQ3HUD_Numbers( 584, 330, 4, throttle*10, qtrue, HUDColors[cg.HUDColor] );
 	}
 
@@ -847,6 +847,9 @@ static void CG_Draw_MFD(int mfdnum, int vehicle, int onoff, int fuel, int flares
 		if( targetrange >= 0 ) {
 			CG_DrawString_MFQ3( x+6, y+16, "RANGE:", HUDColors[HUD_GREEN], 0);
 			CG_MFQ3HUD_Numbers( x+48, y+16, 6, targetrange, qfalse, HUDColors[HUD_GREEN] );
+			CG_DrawHUDPic( x+48, y+48, 32, 32, cgs.media.HUDreticles[HR_GUIDED_ENEMY], HUDColors[HUD_RED] );
+		} else {
+			CG_DrawHUDPic( x+48, y+48, 32, 32, cgs.media.HUDreticles[HR_GUIDED_ENEMY], HUDColors[HUD_GREEN] );
 		}
 	}
 }
@@ -886,13 +889,13 @@ static void CG_Draw_AltTape( int value ) {
 	x = 578;
 	y = 171;
 	width = height = 8;
-	CG_DrawHUDPic( x, y, width, height, cgs.media.HUDind_v_r );
+	CG_DrawHUDPic( x, y, width, height, cgs.media.HUDind_v_r, HUDColors[cg.HUDColor] );
 		// draw alt value box
 	x = 586;
 	y = 28;
 	width = 32;
 	height = 16;
-	CG_DrawHUDPic( x, y, width, height, cgs.media.HUDvaluebox );
+	CG_DrawHUDPic( x, y, width, height, cgs.media.HUDvaluebox, HUDColors[cg.HUDColor] );
 		// draw alt
 	CG_MFQ3HUD_Numbers( 586, 32, 4, value, qfalse, HUDColors[cg.HUDColor] );
 		// find visible alt numbers
@@ -961,13 +964,13 @@ static void CG_Draw_SpeedTape( int value, int stallspeed, int gearspeed, int sca
 	x = 55;
 	y = 171;
 	width = height = 8;
-	CG_DrawHUDPic( x, y, width, height, cgs.media.HUDind_v );
+	CG_DrawHUDPic( x, y, width, height, cgs.media.HUDind_v, HUDColors[cg.HUDColor] );
 		// draw speed value box
 	x = 24;
 	y = 28;
 	width = 32;
 	height = 16;
-	CG_DrawHUDPic( x, y, width, height, cgs.media.HUDvaluebox );
+	CG_DrawHUDPic( x, y, width, height, cgs.media.HUDvaluebox, HUDColors[cg.HUDColor] );
 		// draw speed
 	CG_MFQ3HUD_Numbers( 24, 32, 4, value, qfalse, HUDColors[cg.HUDColor] );
 		// find visible speed numbers
@@ -1010,7 +1013,7 @@ static void CG_Draw_SpeedTape( int value, int stallspeed, int gearspeed, int sca
 			x = 55;
 			y = 171+(value2*64/scale);
 			width = height = 8;
-			CG_DrawHUDPic( x, y, width, height, cgs.media.HUDcaret_v_g_l );
+			CG_DrawHUDPic( x, y, width, height, cgs.media.HUDcaret_v_g_l, HUDColors[cg.HUDColor] );
 		}
 	}
 		// stallspeed
@@ -1059,7 +1062,7 @@ static void CG_Draw_HeadingTape( int value, int targetheading ) {
 	y = 28;
 	width = 32;
 	height = 16;
-	CG_DrawHUDPic( x, y, width, height, cgs.media.HUDvaluebox );
+	CG_DrawHUDPic( x, y, width, height, cgs.media.HUDvaluebox, HUDColors[cg.HUDColor] );
 		// draw heading
 	CG_MFQ3HUD_Numbers( 307, 32, 3, value, qfalse, HUDColors[cg.HUDColor] );
 		// find visible heading numbers
@@ -1104,7 +1107,7 @@ static void CG_Draw_HeadingTape( int value, int targetheading ) {
 	x = 316;
 	y = 24;
 	width = height = 8;
-	CG_DrawHUDPic( x, y, width, height, cgs.media.HUDind_h );
+	CG_DrawHUDPic( x, y, width, height, cgs.media.HUDind_h, HUDColors[cg.HUDColor] );
 
 		// heading caret
 	if( targetheading > 0 && targetheading <= 360 ) {
@@ -1116,7 +1119,7 @@ static void CG_Draw_HeadingTape( int value, int targetheading ) {
 		x = 316-(value2*64/10);
 		y = 24;
 		width = height = 8;
-		CG_DrawHUDPic( x, y, width, height, cgs.media.HUDcaret_h );
+		CG_DrawHUDPic( x, y, width, height, cgs.media.HUDcaret_h, HUDColors[cg.HUDColor] );
 	}
 }
 

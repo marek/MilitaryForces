@@ -1,5 +1,5 @@
 /*
- * $Id: g_active.c,v 1.4 2002-01-07 00:06:02 thebjoern Exp $
+ * $Id: g_active.c,v 1.5 2002-01-27 15:41:28 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -649,6 +649,7 @@ void ClientThink_real( gentity_t *ent ) {
 	// first the general functionality, then the cat-specific one
 	if( client->ps.weaponNum != ucmd->weapon ) {
 		unlock(ent);
+//		untrack(ent);
 	} else {
 		updateTargetTracking(ent);
 	}

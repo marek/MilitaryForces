@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.14 2002-01-26 03:02:38 thebjoern Exp $
+ * $Id: cg_main.c,v 1.15 2002-01-27 15:41:28 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -723,7 +723,10 @@ static void CG_RegisterGraphics( void ) {
 		"newhud/thr/14",
 		"newhud/thr/15"
 	};
-
+	static char		*mfq3_hudrets[HR_MAX] = {
+		"newhud/reticle/reticle1.tga",
+		"newhud/reticle/reticle2.tga",
+	};
 
 	// clear any references to old media
 	memset( &cg.refdef, 0, sizeof( cg.refdef ) );
@@ -844,6 +847,9 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.HUDhealthtext = trap_R_RegisterShaderNoMip( "newhud/text/hlth.tga" );
 	cgs.media.HUDthrottletext = trap_R_RegisterShaderNoMip( "newhud/text/thr.tga" );
 	cgs.media.HUDalphabet = trap_R_RegisterShaderNoMip( "newhud/alphabet.tga" );
+	for ( i=0 ; i<HR_MAX ; i++) {
+		cgs.media.HUDreticles[i] = trap_R_RegisterShaderNoMip( mfq3_hudrets[i] );
+	}
 	// end MFQ3 new HUD
 
 

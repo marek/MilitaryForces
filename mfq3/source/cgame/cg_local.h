@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.15 2002-01-26 19:27:30 thebjoern Exp $
+ * $Id: cg_local.h,v 1.16 2002-01-27 15:41:28 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -554,6 +554,12 @@ typedef enum {
 	HUD_MAX
 } HUDColors_t;
 
+typedef enum {
+	HR_GUIDED_ENEMY,
+	HR_GUIDED_FRIEND,
+	HR_MAX
+} HUDReticles_t;
+
 // colors
 extern vec4_t		HUDColors[HUD_MAX];
 
@@ -643,6 +649,7 @@ typedef struct {
 	qhandle_t	HUDhealthtext;
 	qhandle_t	HUDthrottletext;
 	qhandle_t	HUDalphabet;
+	qhandle_t	HUDreticles[HR_MAX];
 
 	// weapon effect models
 	qhandle_t	bulletFlashModel;
