@@ -1,5 +1,5 @@
 /*
- * $Id: bg_planemove.c,v 1.8 2003-02-11 00:25:10 thebjoern Exp $
+ * $Id: bg_planemove.c,v 1.9 2003-04-25 00:02:23 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -275,7 +275,7 @@ void PM_PlaneMove( void )
 					pm->ps->ONOFF &= ~OO_WEAPONBAY;
 				} else {
 					pm->ps->ONOFF |= OO_WEAPONBAY;
-					pm->ps->timers[TIMER_BAYCLOSE] = pm->cmd.serverTime + 5000;
+					pm->ps->timers[TIMER_BAYCLOSE] = pm->cmd.serverTime + 10000;
 				}
 			}
 		} else {
@@ -555,7 +555,7 @@ void PM_PlaneMoveAdvanced( void )
 					pm->ps->ONOFF &= ~OO_WEAPONBAY;
 				} else {
 					pm->ps->ONOFF |= OO_WEAPONBAY;
-					pm->ps->timers[TIMER_BAYCLOSE] = pm->cmd.serverTime + 5000;
+					pm->ps->timers[TIMER_BAYCLOSE] = pm->cmd.serverTime + 10000;
 				}
 			}
 		} else {

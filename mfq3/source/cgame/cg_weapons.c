@@ -1,5 +1,5 @@
 /*
- * $Id: cg_weapons.c,v 1.24 2003-04-24 10:56:49 thebjoern Exp $
+ * $Id: cg_weapons.c,v 1.25 2003-04-25 00:02:23 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -175,6 +175,11 @@ void CG_RegisterWeapons() {
 			weaponInfo->missileDlight = 100;			
 			MAKERGB( weaponInfo->missileDlightColor, 1, 0.75f, 0 );
 			break;
+
+		case WT_FUELTANK:
+			weaponInfo->missileModel = trap_R_RegisterModel( availableWeapons[i].modelName );
+			weaponInfo->missileDlight = 0;
+			break;		
 
 		default:
 			//MAKERGB( weaponInfo->flashDlightColor, 1, 1, 1 );
@@ -390,6 +395,11 @@ void CG_FireWeapon( centity_t *cent ) {
 	if ( ent->weaponIndex == WI_NONE ) {
 		return;
 	}
+
+	if( availableWeapons[ent->weaponIndex].type == WT_FUELTANK ) {
+		return;
+	}
+
 	if( availableWeapons[ent->weaponIndex].type == WT_MACHINEGUN ) {
 		CG_FireMachinegun(cent, qtrue);
 		return;	

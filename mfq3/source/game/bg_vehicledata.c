@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.49 2003-04-24 10:56:50 thebjoern Exp $
+ * $Id: bg_vehicledata.c,v 1.50 2003-04-25 00:02:23 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -496,8 +496,8 @@ completeVehicleData_t availableVehicles[] =
 	80,							// max fuel
 	0,							// gearheight - SET AUTOMATICALLY
 	0,							// tailangle
-	WI_MG_30MM, WI_SIDEWINDER, WI_DURANDAL, WI_MAVERICK, 0, 0, 0, WI_FLARE,	// weapons
-	500, 3, 6, 6, 0, 0, 0, 64,		// ammo
+	WI_MG_30MM, WI_SIDEWINDER, WI_MAVERICK, WI_GBU15, WI_DURANDAL, 0, 0, WI_FLARE,	// weapons
+	500, 3, 2, 2, 8, 0, 0, 64,		// ammo
 	0,0,0,0,0,0,0,0,			// turret
 	{11, 0, 5},					// cameraposition for cockpit view
 	0,							// effect model
@@ -548,7 +548,7 @@ completeVehicleData_t availableVehicles[] =
 	0,							// gearheight - SET AUTOMATICALLY
 	0,							// tailangle
 	WI_MG_20MM, WI_SIDEWINDER, WI_MK83R, 0, 0, 0, 0, WI_FLARE,	// weapons
-	450, 2, 11, 0, 0, 0, 0, 40,		// ammo
+	450, 2, 11, 0, 0, 0, 0, 50,		// ammo
 	0,0,0,0,0,0,0,0,			// turret
 	{28, 0, 6},					// cameraposition for cockpit view
 	AB_RED,						// effect model
@@ -782,7 +782,7 @@ completeVehicleData_t availableVehicles[] =
 	0,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
 	HC_VAPOR,					// capabilities
-	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0,0,0,0,0,0,0,0,0,0},		// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{70, 60, 240},				// turnspeed around the three axis

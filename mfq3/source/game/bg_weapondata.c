@@ -1,5 +1,5 @@
 /*
- * $Id: bg_weapondata.c,v 1.25 2003-04-24 10:56:50 thebjoern Exp $
+ * $Id: bg_weapondata.c,v 1.26 2003-04-25 00:02:23 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -1588,7 +1588,7 @@ completeWeaponData_t availableWeapons[] =
 
 	// droptank
 	{ 
-		WT_IRONBOMB,						// type
+		WT_FUELTANK,						// type
 		MF_GAMESET_ANY,						// gameset
 		"Droptank",							// descriptiveName
 		"Droptank",							// shortName
@@ -1605,8 +1605,8 @@ completeWeaponData_t availableWeapons[] =
 		0,									// range
 		0,									// fuelrange
 		200,								// fire interval
-		50,								// damage
-		150,								// damageRadius
+		30,									// damage
+		15,									// damageRadius
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
@@ -1619,7 +1619,7 @@ completeWeaponData_t availableWeapons[] =
 		0,									// turret
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
-		200,								// number per package
+		30,									// number per package
 		CAT_PLANE,							// fits on category
 		PF_TANK_HVY,						// fits on pylon
 		0,									// basicECMVulnerability
@@ -1628,7 +1628,7 @@ completeWeaponData_t availableWeapons[] =
 
 	// droptank lt
 	{ 
-		WT_IRONBOMB,						// type
+		WT_FUELTANK,						// type
 		MF_GAMESET_ANY,						// gameset
 		"Droptank small",					// descriptiveName
 		"Droptank",							// shortName
@@ -1645,8 +1645,8 @@ completeWeaponData_t availableWeapons[] =
 		0,									// range
 		0,									// fuelrange
 		200,								// fire interval
-		25,								// damage
-		100,								// damageRadius
+		20,									// damage
+		10,									// damageRadius
 		1,									// spread
 		2,									// barrels
 		0,									// barrelDistance
@@ -1659,7 +1659,7 @@ completeWeaponData_t availableWeapons[] =
 		0,									// turret
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
-		100,								// number per package
+		20,									// number per package
 		CAT_PLANE,							// fits on category
 		PF_TANK_LT,							// fits on pylon
 		0,									// basicECMVulnerability

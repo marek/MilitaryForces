@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.121 2003-04-24 10:56:49 thebjoern Exp $
+ * $Id: bg_public.h,v 1.122 2003-04-25 00:02:23 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.76c"
+#define	GAME_VERSION		"mfq3 v0.76d"
 #define	GAME_IDENTIFIER		"mfq3"			// use to identify mfq3 servers
 
 #define	DEFAULT_GRAVITY		800
@@ -814,6 +814,7 @@ typedef enum {
 	WT_ANTIAIRMISSILE,
 	WT_ANTIGROUNDMISSILE,
 	WT_ANTIRADARMISSILE,
+	WT_FUELTANK,
 	WT_FLARE
 }weaponType_t;
 

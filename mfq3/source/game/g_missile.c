@@ -1,5 +1,5 @@
 /*
- * $Id: g_missile.c,v 1.22 2003-03-19 12:53:13 thebjoern Exp $
+ * $Id: g_missile.c,v 1.23 2003-04-25 00:02:23 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -830,6 +830,51 @@ void fire_flare( gentity_t *self ) {
 	VectorCopy (start, bolt->r.currentOrigin);
 }
 
+/*
+=================
+use_fueltank MFQ3
+=================
+*/
+void drop_fueltank (gentity_t *self) {
+	gentity_t	*bolt;
+	vec3_t		dir, right, up, offset;
+	vec3_t		start;
+
+//	self->left = (self->left ? qfalse : qtrue);
+	MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, 0, offset, 0 );
+	AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
+	VectorInverse( right );
+	VectorCopy( self->s.pos.trBase, start );
+	VectorMA( start, offset[0], dir, start );
+	VectorMA( start, offset[1], right, start );
+	VectorMA( start, offset[2], up, start );
+	SnapVector( start );
+
+	bolt = G_Spawn();
+	bolt->classname = "droptank";
+	bolt->nextthink = level.time + 10000;
+	bolt->think = G_ExplodeMissile;
+	bolt->s.eType = ET_MISSILE;
+	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
+	bolt->s.weaponIndex = self->client->ps.weaponIndex;
+	bolt->r.ownerNum = self->s.number;
+	bolt->parent = self;
+	bolt->damage = bolt->splashDamage = availableWeapons[self->client->ps.weaponIndex].damage;
+	bolt->splashRadius = availableWeapons[self->client->ps.weaponIndex].damageRadius;
+	bolt->targetcat = availableWeapons[self->client->ps.weaponIndex].category;
+	bolt->catmodifier = availableWeapons[self->client->ps.weaponIndex].noncatmod;
+	bolt->methodOfDeath = MOD_IRONBOMB;
+	bolt->splashMethodOfDeath = MOD_IRONBOMB_SPLASH;
+	bolt->clipmask = MASK_SHOT|MASK_WATER;
+	bolt->target_ent = NULL;
+
+	bolt->s.pos.trType = TR_GRAVITY;
+	bolt->s.pos.trTime = level.time;// - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
+	VectorCopy( start, bolt->s.pos.trBase );
+	VectorScale( dir, self->client->ps.speed/10, bolt->s.pos.trDelta );
+	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
+	VectorCopy (start, bolt->r.currentOrigin);
+}
 
 
 
