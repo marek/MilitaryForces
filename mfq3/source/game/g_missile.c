@@ -1,5 +1,5 @@
 /*
- * $Id: g_missile.c,v 1.3 2001-12-23 02:02:14 thebjoern Exp $
+ * $Id: g_missile.c,v 1.4 2001-12-23 22:46:37 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -221,7 +221,7 @@ follow your target
 ================
 */
 static void follow_target( gentity_t *missile ) {
-	vec3_t	dir, targdir;
+	vec3_t	dir, targdir, mid;
 	float	dist, dot;
 	trace_t	tr;
 
@@ -241,7 +241,13 @@ static void follow_target( gentity_t *missile ) {
 	}
 
 	// direction vector and range
-	VectorSubtract( missile->tracktarget->r.currentOrigin, missile->r.currentOrigin, targdir );
+	if( missile->tracktarget->s.eType == ET_EXPLOSIVE ) {
+		VectorAdd( missile->tracktarget->r.absmin, missile->tracktarget->r.absmax, mid );
+		VectorScale( mid, 0.5f, mid );
+	} else {
+		VectorCopy( missile->tracktarget->r.currentOrigin, mid );
+	}
+	VectorSubtract( mid, missile->r.currentOrigin, targdir );
 	dist = VectorNormalize(dir);
 
 	// out of range (if ever possible)
@@ -260,7 +266,7 @@ static void follow_target( gentity_t *missile ) {
 	}
 
 	// LOS
-	trap_Trace( &tr, missile->r.currentOrigin, 0, 0, missile->tracktarget->r.currentOrigin, missile->tracktarget->s.number, MASK_SOLID );
+	trap_Trace( &tr, missile->r.currentOrigin, 0, 0, mid, missile->tracktarget->s.number, MASK_SOLID );
 	if( tr.fraction < 1.0f ) {
 		on_target_lost(missile);
 		return;

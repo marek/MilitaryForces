@@ -1,5 +1,5 @@
 /*
- * $Id: cg_plane.c,v 1.4 2001-12-22 02:28:43 thebjoern Exp $
+ * $Id: cg_plane.c,v 1.5 2001-12-23 22:46:37 thebjoern Exp $
 */
 
 
@@ -358,9 +358,15 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 
 		if( ps->stats[STAT_LOCKINFO] & LI_TRACKING ) {
 			refEntity_t		reticlelock;
+			qboolean		building = qfalse;
 			centity_t* target = &cg_entities[cent->currentState.tracktarget];
+			if( target->currentState.eType == ET_EXPLOSIVE ) building = qtrue;
 			reticle.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshair];
-			VectorSubtract( target->lerpOrigin, cent->lerpOrigin, forward );
+			if( building ) {
+				VectorSubtract( cgs.inlineModelMidpoints[target->currentState.modelindex], cent->lerpOrigin, forward );
+			} else {
+				VectorSubtract( target->lerpOrigin, cent->lerpOrigin, forward );
+			}
 			len = VectorNormalize( forward );
 			vectoangles( forward, ang );
 			AnglesToAxis( ang, reticle.axis );

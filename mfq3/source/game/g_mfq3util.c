@@ -1,5 +1,5 @@
 /*
- * $Id: g_mfq3util.c,v 1.6 2001-12-22 22:16:01 thebjoern Exp $
+ * $Id: g_mfq3util.c,v 1.7 2001-12-23 22:46:37 thebjoern Exp $
 */
 
 
@@ -45,6 +45,7 @@ void updateTargetTracking( gentity_t *ent )
 	trace_t			tr;
 	vec3_t			forward, endpos, dir;
 	float			range;
+	qboolean		buildings = qfalse;
 	gentity_t		*test;
 
 	// only weapons that can lock on
@@ -62,6 +63,7 @@ void updateTargetTracking( gentity_t *ent )
 	} else if( availableWeapons[ent->s.weaponIndex].type != WT_ANTIAIRMISSILE &&
 		(ent->client->ps.ONOFF & OO_RADAR_GROUND) ) {
 		targetcat = CAT_GROUND;
+		buildings = qtrue;
 	}
 	if( !targetcat ) {
 		if( ent->client->ps.stats[STAT_LOCKINFO] ) unlock(ent);
@@ -101,11 +103,26 @@ void updateTargetTracking( gentity_t *ent )
 			(availableVehicles[test->s.modelindex].id&CAT_ANY & targetcat) ) {
 	//		G_Printf("found target: drone %s\n", test->targetname );
 			track(ent, test);
+		} else {
+			if( buildings ) {
+				if( test->s.eType == ET_EXPLOSIVE ) {
+					track(ent, test);
+				}
+			} else {
+				return;
+			}
 		}
 	} else { // update existing target
 		vec3_t diff;
 		float dot, dist;
-		VectorSubtract( ent->tracktarget->r.currentOrigin, ent->r.currentOrigin, diff );
+		if( ent->tracktarget->s.eType == ET_EXPLOSIVE ) {
+			vec3_t	mid;
+			VectorAdd( ent->tracktarget->r.absmax, ent->tracktarget->r.absmin, mid );
+			VectorScale( mid, 0.5f, mid );
+			VectorSubtract( mid, ent->r.currentOrigin, diff );
+		} else {
+			VectorSubtract( ent->tracktarget->r.currentOrigin, ent->r.currentOrigin, diff );
+		}
 		// check within range
 		dist = VectorNormalize( diff );
 		if( dist > range ) {
