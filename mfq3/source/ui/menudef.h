@@ -1,5 +1,5 @@
 /*
- * $Id: menudef.h,v 1.3 2002-01-19 02:24:03 thebjoern Exp $
+ * $Id: menudef.h,v 1.4 2002-02-11 12:23:55 sparky909_uk Exp $
 */
 
 #define ITEM_TYPE_TEXT 0                  // simple text
@@ -191,9 +191,9 @@
 #define CG_1STPLACE 67
 #define CG_2NDPLACE 68
 #define CG_CAPTURES 69
-
-
-
+#define CG_GAME_MISC 70
+#define CG_GAME_REDSCORE 71
+#define CG_GAME_BLUESCORE 72
 
 #define UI_OWNERDRAW_BASE 200
 #define UI_HANDICAP 200
