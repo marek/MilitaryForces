@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.49 2002-02-09 18:23:15 thebjoern Exp $
+ * $Id: bg_public.h,v 1.50 2002-02-10 19:18:19 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.59c"
+#define	GAME_VERSION		"mfq3 v0.59e"
 
 #define	DEFAULT_GRAVITY		800
 
@@ -774,7 +774,6 @@ int MF_ExtractEnumFromId( int vehicle, unsigned int op );
 #define OO_RADAR_AIR			64
 #define OO_RADAR_GROUND			128
 #define OO_RADAR				192	// OO_RADAR_GROUND|OO_RADAR_AIR
-#define OO_COCKPIT				256
 
 // afterburners
 #define AB_BALL					0

@@ -1,5 +1,5 @@
 /*
- * $Id: g_miscvehicle.c,v 1.3 2002-01-31 02:34:33 thebjoern Exp $
+ * $Id: g_miscvehicle.c,v 1.4 2002-02-10 19:18:19 thebjoern Exp $
 */
 
 
@@ -108,7 +108,7 @@ static void SP_misc_plane( gentity_t *ent )
 	if( landed ) {
 		ent->speed = 0;
 		ent->s.frame = 0;
-		ent->s.ONOFF |= OO_LANDED|OO_STALLED|OO_GEAR|OO_COCKPIT;
+		ent->s.ONOFF |= OO_LANDED|OO_STALLED|OO_GEAR;
 		ent->s.angles[0] = ent->s.apos.trBase[0] = 0;
 	}
 	else if( ent->s.eFlags & EF_PILOT_ONBOARD ) {			// only drones can fly

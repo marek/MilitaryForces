@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.17 2002-02-09 17:07:04 thebjoern Exp $
+ * $Id: bg_vehicledata.c,v 1.18 2002-02-10 19:18:19 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -803,14 +803,14 @@ completeVehicleData_t availableVehicles[] =
 	CAT_GROUND|
 	CLASS_GROUND_RECON,
 	0,							// flags
-	HC_DUALGUNS|HC_WHEELS,		// capabilities
+	HC_WHEELS,					// capabilities
 	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
 	{-10, -5, -2},				// mins (bounding box)
 	{11, 5, 4.5},				// max (bounding box)
 	{50, 100, 100},				// turnspeed around the three axis
 	38, 14,						// camera distance and height
 	0,							// stallspeed
-	75,						    // maxspeed
+	85,						    // maxspeed
 	-5,							// min throttle
 	10,						    // max throttle
 	1,							// engines
@@ -818,12 +818,12 @@ completeVehicleData_t availableVehicles[] =
 	8,							// wheel circumference
 	18,							// acceleration
 	240,						// health
-	{8, 1, 2},					// gun tag
+	{8, 0, 2},					// gun tag
 	160,						// max fuel
 	300,						// max gun pitch (upwards = negative) <- gearheight
 	6,							// min gun pitch (downwards = positive) <- tailangle
-	WI_MG_14_5MM, WI_100MM_GUN, WI_STINGER, WI_HELLFIRE, 0, 0, 0, WI_FLARE,// weapons
-	500, 35, 2, 2, 0, 0, 0, 20,	// ammo
+	WI_MG_12_7MM, 0, 0, 0, 0, 0, 0, WI_FLARE,// weapons
+	500, 0, 0, 0, 0, 0, 0, 20,	// ammo
 	{0, 0, 10},					// cameraposition for cockpit view
 	0,							// effect model
 	8000,						// radar range
@@ -889,7 +889,7 @@ completeVehicleData_t availableVehicles[] =
 	0,							// flags
 	0,							// capabilities
 	{0,0,0,0,0,0,0,0},			// handles MUST BE NULL!
-	{-12, -6, -1},				// mins (bounding box)
+	{-12, -6, -2},				// mins (bounding box)
 	{12, 6, 9},					// max (bounding box)
 	{50, 100, 100},				// turnspeed around the three axis
 	44, 14,						// camera distance and height
@@ -904,7 +904,7 @@ completeVehicleData_t availableVehicles[] =
 	400,						// health
 	{5, 0, 8},					// gun tag
 	150,						// max fuel
-	310,						// max gun pitch (upwards = negative) <- gearheight
+	335,						// max gun pitch (upwards = negative) <- gearheight
 	3,							// min gun pitch (downwards = positive) <- tailangle
 	WI_MG_12_7MM, WI_125MM_GUN, 0, 0, 0, 0, 0, WI_FLARE,// weapons
 	500, 40, 0, 0, 0, 0, 0, 20,	// ammo

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_miscvehicle.c,v 1.5 2002-02-08 21:43:57 thebjoern Exp $
+ * $Id: cg_miscvehicle.c,v 1.6 2002-02-10 19:18:19 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -27,9 +27,14 @@ static void CG_Misc_Plane( centity_t *cent )
 	int				i;
 	int				ONOFF = cent->currentState.ONOFF;
 	vec3_t			velocity;	
+	float			speed;
+
+	// get speed
+	VectorCopy( cent->currentState.pos.trDelta, velocity );
+	speed = VectorLength( velocity );
 
 	// get velocity
-	BG_EvaluateTrajectoryDelta( &cent->currentState.pos, cg.time, velocity );
+//	BG_EvaluateTrajectoryDelta( &cent->currentState.pos, cg.time, velocity );
 
 	for( i = 0; i < BP_PLANE_MAX_PARTS; i++ ) {
 	    memset( &part[i], 0, sizeof(part[0]) );	
@@ -101,7 +106,7 @@ static void CG_Misc_Plane( centity_t *cent )
 			part[BP_PLANE_BRAKES].frame = 0;
 		}
 	}
-	if( ONOFF & OO_COCKPIT ) {
+	if( speed < 1 ) {
 		part[BP_PLANE_COCKPIT].frame = 1;
 	}
 //	CG_Printf( "CG Anim is %d\n", part[BP_PLANE_CONTROLS].frame );
@@ -194,14 +199,14 @@ static void CG_Misc_Plane( centity_t *cent )
 	// sound
 	if( cent->currentState.eFlags & EF_PILOT_ONBOARD ) {
 		if( availableVehicles[cent->currentState.modelindex].caps & HC_PROP ) {
-			trap_S_AddLoopingSound( cent->currentState.number, cent->lerpOrigin, velocity, cgs.media.engineProp );
+			trap_S_AddLoopingSound( cent->currentState.number, cent->lerpOrigin, vec3_origin, cgs.media.engineProp );
 		}
 		else {
 			if( cent->currentState.frame > 10 ) {
-				trap_S_AddLoopingSound( cent->currentState.number, cent->lerpOrigin, velocity, cgs.media.engineJetAB );
+				trap_S_AddLoopingSound( cent->currentState.number, cent->lerpOrigin, vec3_origin, cgs.media.engineJetAB );
 			}
 			else {
-				trap_S_AddLoopingSound( cent->currentState.number, cent->lerpOrigin, velocity, cgs.media.engineJet );
+				trap_S_AddLoopingSound( cent->currentState.number, cent->lerpOrigin, vec3_origin, cgs.media.engineJet );
 			}
 		}
 	}
