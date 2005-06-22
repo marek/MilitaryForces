@@ -1,5 +1,5 @@
 /*
- * $Id: cg_event.c,v 1.15 2003-09-05 00:39:02 minkis Exp $
+ * $Id: cg_event.c,v 1.18 2005-06-26 05:08:11 minkis Exp $
 */
 
 #include "cg_local.h"
@@ -233,6 +233,11 @@ void CG_EntityEvent( centity_t *cent, vec3_t position )
 	case EV_NUKE:
 		DEBUGNAME("EV_NUKE");
 		CG_NukeEffect( cent, es );
+		break;
+
+	case EV_FLAK:
+		DEBUGNAME("EV_FLAK");
+		CG_FlakEffect( cent, es );
 		break;
 
 	//=================================================================

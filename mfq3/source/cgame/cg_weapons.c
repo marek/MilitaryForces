@@ -1,5 +1,5 @@
 /*
- * $Id: cg_weapons.c,v 1.29 2004-12-16 19:22:15 minkis Exp $
+ * $Id: cg_weapons.c,v 1.31 2005-06-24 06:43:06 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -434,6 +434,12 @@ void CG_RegisterWeapons() {
 			weaponInfo->missileModel = trap_R_RegisterModel( availableWeapons[i].modelName );
 			weaponInfo->missileDlight = 0;
 			break;		
+
+		case WT_FLAK:
+			weaponInfo->missileModel = trap_R_RegisterModel( availableWeapons[i].modelName );
+			weaponInfo->missileDlight = 0;
+			break;
+
 		case WT_NUKEBOMB:
 			// find out which model to use
 			weaponInfo->missileModel = trap_R_RegisterModel( availableWeapons[i].modelName );

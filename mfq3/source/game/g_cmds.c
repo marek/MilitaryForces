@@ -1,5 +1,5 @@
 /*
- * $Id: g_cmds.c,v 1.19 2004-12-16 19:22:17 minkis Exp $
+ * $Id: g_cmds.c,v 1.22 2005-06-26 05:08:12 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1401,7 +1401,7 @@ void Cmd_Stats_f( gentity_t *ent ) {
 
 /*
 =================
-Cmd_Stats_f
+Cmd_ME_Spawn_f
 =================
 */
 void Cmd_ME_Spawn_f( gentity_t *ent ) {
@@ -1416,6 +1416,25 @@ void Cmd_ME_Spawn_f( gentity_t *ent ) {
 
 
 	trap_SendServerCommand( -1, va("me_spawnvehicle %d\n", idx) );
+}
+
+/*
+=================
+Cmd_ME_SpawnGI_f
+=================
+*/
+void Cmd_ME_SpawnGI_f( gentity_t *ent ) {
+
+	int		idx;
+	char	arg1[MAX_STRING_TOKENS];
+
+	trap_Argv( 1, arg1, sizeof( arg1 ) );
+
+	idx = atoi(arg1);
+	if( idx < 0 || idx >= bg_numberOfGroundInstallations ) return;
+
+
+	trap_SendServerCommand( -1, va("me_spawnvehiclegi %d\n", idx) );
 }
 
 /*
@@ -1496,6 +1515,8 @@ void ClientCommand( int clientNum ) {
 		Cmd_Stats_f( ent );
 	else if (Q_stricmp (cmd, "me_spawn") == 0)
 		Cmd_ME_Spawn_f( ent );
+	else if (Q_stricmp (cmd, "me_spawngi") == 0)
+		Cmd_ME_SpawnGI_f( ent );
 	else
 		trap_SendServerCommand( clientNum, va("print \"unknown cmd %s\n\"", cmd ) );
 }

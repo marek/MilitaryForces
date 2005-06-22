@@ -1,5 +1,5 @@
 /*
- * $Id: bg_pmove.c,v 1.15 2003-08-06 18:10:21 thebjoern Exp $
+ * $Id: bg_pmove.c,v 1.18 2005-06-26 05:08:12 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -527,7 +527,7 @@ static void PM_Flare( void ) {
 		}
 	}
 
-	// fire machinegun
+	// fire flare
 	if( pm->cmd.buttons & BUTTON_FLARE ) {
 		// check for out of ammo
 		if ( pm->ps->ammo[WP_FLARE] > 0 ) {

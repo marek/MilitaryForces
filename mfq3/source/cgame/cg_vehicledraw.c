@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicledraw.c,v 1.7 2004-12-16 19:22:15 minkis Exp $
+ * $Id: cg_vehicledraw.c,v 1.8 2005-06-22 06:00:39 minkis Exp $
 */
 
 #include "cg_local.h"
@@ -19,6 +19,13 @@ char *plane_tags[BP_PLANE_MAX_PARTS] =
 	"tag_wingR",	// wing right
 	"tag_special",	// special
 	"tag_prop1"	// prop
+};
+
+char *helo_tags[BP_PLANE_MAX_PARTS] =
+{
+	"<no tag>",		// plane body
+	"tag_mrotor",	// prop
+	"tag_trotor"	// prop
 };
 
 char *engine_tags[3] =
@@ -504,7 +511,52 @@ void CG_DrawBoat(DrawInfo_Boat_t* drawInfo)
 
 void CG_DrawHelo(DrawInfo_Helo_t* drawInfo)
 {
+refEntity_t	    part[BP_HELO_MAX_PARTS];
+	float			shadowPlane = 0;
+	int				renderfx = 0;
+	int				i, tanksound;
 
+	completeVehicleData_t* veh = &availableVehicles[drawInfo->basicInfo.vehicleIndex];
+
+	for( i = 0; i < BP_HELO_MAX_PARTS; i++ ) {
+	    memset( &part[i], 0, sizeof(part[0]) );	
+	}
+
+	// use the same origin for all
+    renderfx |= RF_LIGHTING_ORIGIN;
+
+    //
+    // add the hull
+    //
+    part[BP_HELO_BODY].hModel = veh->handle[BP_HELO_BODY];
+    VectorCopy( drawInfo->basicInfo.origin, part[BP_HELO_BODY].origin );
+    VectorCopy( drawInfo->basicInfo.origin, part[BP_HELO_BODY].lightingOrigin );
+	AxisCopy( drawInfo->basicInfo.axis, part[BP_HELO_BODY].axis );
+    part[BP_HELO_BODY].shadowPlane = shadowPlane;
+    part[BP_HELO_BODY].renderfx = renderfx;
+    VectorCopy (part[BP_HELO_BODY].origin, part[BP_HELO_BODY].oldorigin);
+    trap_R_AddRefEntityToScene( &part[BP_HELO_BODY] );
+
+
+	// other parts
+	for( i = 1; i < BP_HELO_MAX_PARTS; i++ ) {
+		part[i].hModel = veh->handle[i];
+		if( !part[i].hModel ) {
+			continue;
+		}
+		VectorCopy( drawInfo->basicInfo.origin, part[i].lightingOrigin );
+		AxisCopy( axisDefault, part[i].axis );
+		if( i == BP_HELO_MAINROTOR ) {
+			RotateAroundYaw( part[i].axis, cg.time );
+		}
+		if( i == BP_HELO_TAILROTOR ) {
+			RotateAroundPitch( part[i].axis, cg.time );
+		}
+		CG_PositionRotatedEntityOnTag( &part[i], &part[BP_HELO_BODY], veh->handle[BP_HELO_BODY], helo_tags[i] );
+		part[i].shadowPlane = shadowPlane;
+		part[i].renderfx = renderfx;
+		trap_R_AddRefEntityToScene( &part[i] );
+	}
 }
 
 void CG_DrawLQM(DrawInfo_LQM_t* drawInfo)

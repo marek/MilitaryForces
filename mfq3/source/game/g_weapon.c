@@ -1,5 +1,5 @@
 /*
- * $Id: g_weapon.c,v 1.11 2004-12-16 19:22:17 minkis Exp $
+ * $Id: g_weapon.c,v 1.14 2005-06-26 05:08:12 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -90,7 +90,6 @@ FireWeapon
 ===============
 */
 void FireWeapon( gentity_t *ent ) {
-
 	ent->client->accuracy_shots++;
 
 	// fire the specific weapon
@@ -123,11 +122,50 @@ void FireWeapon( gentity_t *ent ) {
 		if( availableWeapons[ent->s.weaponIndex].flags & WF_FIRE_IN_PAIRS )
 			drop_fueltank( ent );
 		break;
+	case WT_FLAK:
+		// No client flak firing yet
+		break;
 	case WT_NUKEBOMB:
 		fire_nukebomb ( ent );
 		break;
 	case WT_NUKEMISSILE:
 		fire_nukemissile ( ent ); 
+		break;
+	default:
+// FIXME		G_Error( "Bad ent->s.weapon" );
+		break;
+	}
+}
+
+/*
+===============
+FireWeapon_GI
+===============
+*/
+void FireWeapon_GI( gentity_t *ent ) {
+	if(ent->s.eType != ET_MISC_VEHICLE)
+		ent->client->accuracy_shots++;
+
+	// fire the specific weapon
+	switch( availableWeapons[ent->s.weaponIndex].type ) {
+	case WT_ANTIAIRMISSILE:
+		LaunchMissile_GI( ent );
+		break;
+	case WT_FLAK:
+		fire_flak_GI ( ent );
+		break;
+	case WT_ANTIGROUNDMISSILE:
+	case WT_ANTIRADARMISSILE:
+	case WT_ROCKET:
+	case WT_IRONBOMB:
+	case WT_GUIDEDBOMB:
+	case WT_BALLISTICGUN:
+	case WT_FUELTANK:
+	case WT_NUKEBOMB:
+	case WT_NUKEMISSILE:
+		break;
+	case WT_MACHINEGUN:
+		fire_autocannon_GI(ent);
 		break;
 	default:
 // FIXME		G_Error( "Bad ent->s.weapon" );

@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.33 2004-12-16 19:22:17 minkis Exp $
+ * $Id: ui_main.c,v 1.36 2005-06-26 05:08:12 minkis Exp $
 */
 /*
 =======================================================================
@@ -1944,7 +1944,7 @@ static void UI_DrawKeyBindStatus(rectDef_t *rect, float scale, vec4_t color, int
 
 static void UI_DrawGLInfo(rectDef_t *rect, float scale, vec4_t color, int textStyle) {
 	char * eptr;
-	char buff[4096];
+	char buff[1024];
 	const char *lines[64];
 	int y, numLines, i;
 
@@ -1953,7 +1953,10 @@ static void UI_DrawGLInfo(rectDef_t *rect, float scale, vec4_t color, int textSt
 	Text_Paint(rect->x + 2, rect->y + 30, scale, color, va ("PIXELFORMAT: color(%d-bits) Z(%d-bits) stencil(%d-bits)", uiInfo.uiDC.glconfig.colorBits, uiInfo.uiDC.glconfig.depthBits, uiInfo.uiDC.glconfig.stencilBits), 0, 30, textStyle);
 
 	// build null terminated extension strings
-	Q_strncpyz(buff, uiInfo.uiDC.glconfig.extensions_string, 4096);
+  // TTimo: https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=399
+  // in TA this was not directly crashing, but displaying a nasty broken shader right in the middle
+  // brought down the string size to 1024, there's not much that can be shown on the screen anyway
+	Q_strncpyz(buff, uiInfo.uiDC.glconfig.extensions_string, 1024);
 	eptr = buff;
 	y = rect->y + 45;
 	numLines = 0;
@@ -1982,6 +1985,8 @@ static void UI_DrawGLInfo(rectDef_t *rect, float scale, vec4_t color, int textSt
 			break;
 		}
 	}
+
+
 }
 
 /*
@@ -2057,6 +2062,7 @@ static void UI_DrawVehiclePreview( rectDef_t *rect, float scale, vec4_t color, i
 #else
 	// DRAW VEHICLE ICON CODE
 	int vehicle = -1;
+	int vehicleCat = -1;
 //	char * dir = NULL;
 	char * pIconString = NULL;
 	static qhandle_t pictureHandle = -1;
@@ -2064,24 +2070,29 @@ static void UI_DrawVehiclePreview( rectDef_t *rect, float scale, vec4_t color, i
 
 	// find out the current UI vehicle index
 	vehicle = trap_Cvar_VariableValue("ui_vehicle");
+	vehicleCat = trap_Cvar_VariableValue("ui_vehicleCat");
 
 	// valid?
-	if( vehicle >= 0 && vehicle < bg_numberOfVehicles )
+	if( vehicle >= 0 )
 	{
-		// register different shader? (only do this on change)
-		if( pictureHandle == -1 || (lastVehicle != vehicle) )
-		{
-			// create filename string
-			pIconString = MF_CreateModelPathname( vehicle, "models/vehicles/%s/%s/%s_icon" );
-
-			pictureHandle = trap_R_RegisterShaderNoMip( pIconString );
+		if(UI_CAT_GI == vehicleCat &&  vehicle < bg_numberOfGroundInstallations) {
+			if( pictureHandle == -1 || lastVehicle != vehicle ) {
+				// create filename string
+				pIconString = va( "models/vehicles/npc/%s/%s_icon", availableGroundInstallations[ vehicle ].modelName, availableGroundInstallations[ vehicle ].modelName );
+				pictureHandle = trap_R_RegisterShaderNoMip( pIconString );
+			}
+		} else if (vehicle < bg_numberOfVehicles) {
+			// register different shader? (only do this on change)
+			if( pictureHandle == -1 || lastVehicle != vehicle) {
+				// create filename string
+				pIconString = MF_CreateModelPathname( vehicle, "models/vehicles/%s/%s/%s_icon" );
+				pictureHandle = trap_R_RegisterShaderNoMip( pIconString );
+			}
 		}
 
 		// draw (if valid picture handle)
 		if( pictureHandle )
-		{
 			UI_DrawHandlePic( rect->x, rect->y, rect->w, rect->h, pictureHandle );
-		}
 
 		// save last done
 		lastVehicle = vehicle;
@@ -3483,12 +3494,12 @@ static void UI_RefreshVehicleSelect( int change_vehicle )
 	static int vehicleType = -1;
 	int vehicle = -1;
 	int gameset = -1;
+	int gametype = -1;
 	int team = -1;
 	const char * pCat = NULL;
 	const char * pClass = NULL;
 	const char * pVehicle = NULL;
-//	qboolean currentVehicleValid = qtrue;
-//	unsigned long what = 0x00000000;
+	qboolean bSelectGI = qfalse; 
 	int levelCats = 0;
 	char info[MAX_INFO_STRING];
 
@@ -3497,7 +3508,7 @@ static void UI_RefreshVehicleSelect( int change_vehicle )
 	// get gameset & team (as MF_GAMESET_x and MF_TEAM_x)
 	gameset = MF_UI_GetGameset( qfalse );
 	team = MF_UI_GetTeam();
-	
+	gametype = trap_Cvar_VariableValue("g_gametype");
 	// ----------> AVAILABLE VEHICLES <-----------
 
 	switch( team )
@@ -3521,16 +3532,24 @@ static void UI_RefreshVehicleSelect( int change_vehicle )
 
 	// find out the current UI catagory
 	vehicleCat = trap_Cvar_VariableValue("ui_vehicleCat");
+	bSelectGI = (UI_CAT_GI == vehicleCat);
+	if(gametype != GT_MISSION_EDITOR)
+		bSelectGI = qfalse;
 
 tryCatAgain:
 
-	// get the text
-	pCat = cat_items[ vehicleCat ];
+	
+	
 
 	// is this catagory valid for the current gameset+team+catagory?
 
-	// check
-	vehicle = MF_getIndexOfVehicleEx( (vehicle-1), gameset, team, vehicleCat, -1, -1, 0);
+	if(bSelectGI) {
+		pCat = "Ground Installations";
+		vehicle = MF_getIndexOfGI( (vehicle-1), gameset, -1, 0);
+	} else {
+		pCat = cat_items[ vehicleCat ];	// get the text
+		vehicle = MF_getIndexOfVehicleEx( (vehicle-1), gameset, team, vehicleCat, -1, -1, 0);
+	}
 
 	// ----------> LEVEL SPAWNS <-----------
 
@@ -3538,20 +3557,21 @@ tryCatAgain:
 	trap_GetConfigString( CS_SERVERINFO, info, sizeof(info) );
 	levelCats = atoi( Info_ValueForKey( info, "mf_lvcat" ) );
 
-	if( pCat && vehicle >= 0 && (levelCats & (1 << vehicleCat)) )
-	{
+	if( pCat && vehicle >= 0 && (levelCats & (1 << vehicleCat)) || bSelectGI) {
 		// update the text in the dialog for the UI catagory
 		trap_Cvar_Set( "ui_vehicleCatTxt", pCat );
-	}
-	else
-	{
+	} else {
 		// the 'ui_vehicleCat' must be invalid try the next one
 		vehicleCat++;
+		bSelectGI = qfalse;
 		
 		// wrap?
-		if( vehicleCat >= MF_MAX_CATEGORIES )
-		{
+		if( vehicleCat >= MF_MAX_CATEGORIES ) {
 			vehicleCat = 0;
+		}
+
+		if(gametype == GT_MISSION_EDITOR && UI_CAT_GI == vehicleCat) {
+			bSelectGI = qtrue;
 		}
 
 		goto tryCatAgain;
@@ -3560,43 +3580,47 @@ tryCatAgain:
 
 	// ----------> CLASS <-----------
 
-	// find out the current UI class (based upon the known catagory)
-	vehicleClass = trap_Cvar_VariableValue("ui_vehicleClass");
+	if(!bSelectGI) {
+		// find out the current UI class (based upon the known catagory)
+		vehicleClass = trap_Cvar_VariableValue("ui_vehicleClass");
 
-tryClassAgain:
+	tryClassAgain:
 
-	// get the text
-	pClass = class_items[ vehicleCat ][ vehicleClass ];
+		// get the text
+		pClass = class_items[ vehicleCat ][ vehicleClass ];
 
-	// check
-	vehicle = MF_getIndexOfVehicleEx( (vehicle-1), gameset, team, vehicleCat, vehicleClass, -1, 0);
-	
-	if( pClass && vehicle >= 0 )
-	{
-		// update the text in the dialog for the UI class
-		trap_Cvar_Set( "ui_vehicleClassTxt", pClass );
-	}
-	else
-	{
-		// the 'ui_vehicleCat' must be invalid try the next one
-		vehicleClass++;
+		// check
+		vehicle = MF_getIndexOfVehicleEx( (vehicle-1), gameset, team, vehicleCat, vehicleClass, -1, 0);
+		
+		if( pClass && vehicle >= 0 ) {
+			// update the text in the dialog for the UI class
+			trap_Cvar_Set( "ui_vehicleClassTxt", pClass );
+		} else {
+			// the 'ui_vehicleCat' must be invalid try the next one
+			vehicleClass++;
 
-		// wrap?
-		if( vehicleClass >= MF_MAX_CLASSES )
-		{
-			vehicleClass = 0;
+			// wrap?
+			if( vehicleClass >= MF_MAX_CLASSES )
+				vehicleClass = 0;
+
+			goto tryClassAgain;
 		}
-
-		goto tryClassAgain;
+		trap_Cvar_Set( "ui_vehicleClass", va( "%d", vehicleClass ) );
+	} else {
+		// Disable Class field when selecting GI's
+		trap_Cvar_Set( "ui_vehicleClass", "-1" );
+		trap_Cvar_Set( "ui_vehicleClassTxt", "<Nothing Available>" );
 	}
-	trap_Cvar_Set( "ui_vehicleClass", va( "%d", vehicleClass ) );
-
 
 	// ----------> VEHICLE <-----------
 		
 	// is the vehicle valid for the current gameset+team+catagory+class?
-	// check
-	vehicle = MF_getIndexOfVehicleEx( (vehicle-1), gameset, team, vehicleCat, vehicleClass, vehicleType, change_vehicle);
+
+	// Use proper selector for vehicle/GI
+	if(bSelectGI)
+		vehicle = MF_getIndexOfGI( (vehicle-1), gameset, vehicleType, change_vehicle);
+	else
+		vehicle = MF_getIndexOfVehicleEx( (vehicle-1), gameset, team, vehicleCat, vehicleClass, vehicleType, change_vehicle);
 
 	// -1 means this is not a suitable combination
 	if( vehicle == -1 )
@@ -3606,23 +3630,21 @@ tryClassAgain:
 		trap_Cvar_Set( "ui_vehicleTxt", "<Nothing Available>" );
 		trap_Cvar_Set( "ui_vehicleLoadout", "-1" );
 		trap_Cvar_Set( "ui_vehicleLoadoutTxt", "<Nothing Available>" );
-
 		return;
 	}
 
 	// get the text
-	pVehicle = availableVehicles[ vehicle ].tinyName;
-	if( pVehicle )
-	{
+	if(bSelectGI)
+		pVehicle = availableGroundInstallations[ vehicle ].tinyName;
+	else
+		pVehicle = availableVehicles[ vehicle ].tinyName;
+	
+	if( pVehicle ) {
 		// update the text in the dialog for the UI vehicle
 		trap_Cvar_Set( "ui_vehicleTxt", pVehicle );
-		
 		// If it wasnt rejected in the first place its safe to update vehicleType
 		vehicleType = vehicle;
-
-	}
-	else
-	{
+	} else {
 		// the 'ui_vehicle' must be invalid, reset
 		trap_Cvar_Set( "ui_vehicle", "0" );
 		vehicle = 0;
@@ -3631,16 +3653,16 @@ tryClassAgain:
 	// always set back the vehicle index
 	trap_Cvar_Set( "ui_vehicle", va( "%d", vehicle ));
 	
-
 	// get the text
-	pVehicle = availableVehicles[ vehicle ].descriptiveName;
-	if( pVehicle )
-	{
+	if(bSelectGI) 
+		pVehicle = availableGroundInstallations[ vehicle ].descriptiveName;
+	else
+		pVehicle = availableVehicles[ vehicle ].descriptiveName;
+
+	if( pVehicle ) {
 		// update the text in the dialog for the UI vehicle
 		trap_Cvar_Set( "ui_vehicleLoadoutTxt", pVehicle );
-	}
-	else
-	{
+	} else {
 		// the 'ui_vehicleLoadout' must be invalid, reset
 		trap_Cvar_Set( "ui_vehicleLoadout", "0" );
 		vehicle = 0;
@@ -3692,8 +3714,7 @@ static void UI_CycleVehicleSelect( int cycleIdx )
 	}
 
 
-	if(cycleIdx != 2)
-	{
+	if(cycleIdx != 2) {
 		// cycle numeric var
 		idx = trap_Cvar_VariableValue( pVar );
 		idx++;
@@ -3711,13 +3732,18 @@ UI_SelectVehicle
 */
 static void UI_SelectVehicle( void )
 {
+	int vehicleCat;
 	int idx = -1;
 
 	// get the UI vehicle index
 	idx = trap_Cvar_VariableValue( "ui_vehicle" );
+	vehicleCat = trap_Cvar_VariableValue("ui_vehicleCat");
 
 	if( trap_Cvar_VariableValue("g_gametype") == GT_MISSION_EDITOR ) {
-		trap_Cmd_ExecuteText( EXEC_APPEND, va( "me_spawn %d\n", idx ) );
+		if(UI_CAT_GI == vehicleCat)
+			trap_Cmd_ExecuteText( EXEC_APPEND, va( "me_spawngi %d\n", idx ) );
+		else
+			trap_Cmd_ExecuteText( EXEC_APPEND, va( "me_spawn %d\n", idx ) );
 	} else {
 		// set into the trigger index
 		trap_Cvar_Set( "cg_nextVehicle", va( "%d", idx ));	

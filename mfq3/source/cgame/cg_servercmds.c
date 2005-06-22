@@ -1,5 +1,5 @@
 /*
- * $Id: cg_servercmds.c,v 1.10 2004-12-16 19:22:15 minkis Exp $
+ * $Id: cg_servercmds.c,v 1.13 2005-06-26 05:08:11 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -562,6 +562,14 @@ static void CG_ServerCommand( void ) {
 		if( trap_Argc() == 2 ) {
 			int idx = atoi(CG_Argv(1));
 			ME_SpawnVehicle(idx);
+		}
+		return;
+	}
+
+	if( !strcmp( cmd, "me_spawnvehiclegi" ) ) {
+		if( trap_Argc() == 2 ) {
+			int idx = atoi(CG_Argv(1));
+			ME_SpawnGroundInstallation(idx);
 		}
 		return;
 	}

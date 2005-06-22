@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.64 2004-12-16 19:22:15 minkis Exp $
+ * $Id: cg_local.h,v 1.65 2005-06-22 06:00:39 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1485,7 +1485,7 @@ localEntity_t *CG_MakeExplosion( vec3_t origin, vec3_t dir,
 								qboolean isSprite );
 
 void CG_NukeEffect(  centity_t * cent, entityState_t * es );
-
+void CG_FlakEffect(  centity_t * cent, entityState_t * es );
 
 //
 // cg_snapshot.c

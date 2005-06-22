@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.129 2004-12-23 11:29:21 thebjoern Exp $
+ * $Id: bg_public.h,v 1.131 2005-06-24 06:43:06 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -340,6 +340,8 @@ typedef enum {
 
 	EV_NUKE,
 
+	EV_FLAK,
+
 	EV_DEBUG_LINE
 
 } entity_event_t;
@@ -564,6 +566,9 @@ typedef struct md3Tag_s {
 #define MF_MAX_CATEGORIES		8
 #define MF_MAX_CLASSES			8
 
+// Which "ui_vehicleCat" are ground installtions
+#define UI_CAT_GI				5
+
 // can now be any number of gamesets (full 8 byte)
 // just expand list as needed and make sure ANY is set properly
 #define	MF_GAMESET_MIN				  0x0001
@@ -584,8 +589,9 @@ typedef struct md3Tag_s {
 #define	CAT_GROUND					  0x0002 
 #define	CAT_HELO					  0x0004 
 #define	CAT_LQM						  0x0008
-#define	CAT_BOAT					  0x0010 
-#define CAT_MAX						  0x0010 
+#define	CAT_BOAT					  0x0010
+#define CAT_NPC						  0x0016
+#define CAT_MAX						  0x0016 
 #define	CAT_ANY						  0xFFFF
 
 #define CLASS_MIN					  0x0001
@@ -673,6 +679,12 @@ extern const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1];
 #define BP_BOAT_TURRET4			7
 #define BP_BOAT_GUNBARREL4		8
 #define BP_BOAT_MAX_PARTS		9
+
+// helos
+#define BP_HELO_BODY			0
+#define BP_HELO_MAINROTOR		1
+#define BP_HELO_TAILROTOR		2
+#define BP_HELO_MAX_PARTS		3
 
 // ground installations
 #define BP_GI_BODY				0
@@ -819,6 +831,7 @@ typedef enum {
 	WT_ANTIRADARMISSILE,
 	WT_FUELTANK,
 	WT_FLARE,
+	WT_FLAK,
 	WT_NUKEBOMB,
 	WT_NUKEMISSILE
 }weaponType_t;
@@ -962,6 +975,7 @@ typedef enum
 	WI_NM10MT,
 	WI_NM5MT,
 	WI_NM1MT,
+	WI_FLAK,
 	WI_MAX
 }weaponIndex_t;
 
@@ -1022,6 +1036,7 @@ void MF_CheckMissionScriptOverviewValid( mission_overview_t* overview, qboolean 
 void MF_SetMissionScriptOverviewDefaults( mission_overview_t* overview );
 int MF_getIndexOfVehicle( int start, int gameset, int team, int cat, int cls, int vehicleType, int change_vehicle );
 int MF_getIndexOfVehicleEx( int start, int gameset, int team, int cat, int cls, int vehicleType, int change_vehicle );
+int MF_getIndexOfGI( int start, int gameset, int GIType, int mode);
 int MF_getItemIndexFromHex(int hexValue);
 int MF_getNumberOfItems(const char **itemlist);
 char * MF_CreateModelPathname( int vehicle, char * pFormatString );
