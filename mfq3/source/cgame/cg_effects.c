@@ -1,5 +1,5 @@
 /*
- * $Id: cg_effects.c,v 1.6 2004-12-16 19:22:15 minkis Exp $
+ * $Id: cg_effects.c,v 1.9 2005-06-26 05:08:11 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -205,6 +205,44 @@ void CG_NukeEffect(  centity_t * cent, entityState_t * es ) {
 	CG_NukeCloud(cent, es);
 
 }
+
+
+/*
+==========================
+CG_FlakEffect
+==========================
+*/
+void CG_FlakEffect( centity_t * cent, entityState_t * es )
+{
+	localEntity_t	* smoke;
+	vec3_t			pos, velocity;
+	int i, temp, puff_size;
+	static int	seed = 0x92;
+	puff_size = availableWeapons[es->weaponIndex].damageRadius / 10;
+
+	VectorCopy( cent->lerpOrigin, pos );
+
+	// draw base
+	temp = availableWeapons[es->weaponIndex].damageRadius * 0.5;
+	for(i = 0; i <= 30; i++)
+	{
+			VectorCopy(cent->lerpOrigin, pos);
+			pos[0] += (temp - (temp * -1) + 1) * Q_random( &seed ) + (temp * -1);
+			pos[1] += (temp - (temp * -1) + 1) * Q_random( &seed ) + (temp * -1);
+			pos[2] += (temp - (temp * -1) + 1) * Q_random( &seed ) + (temp * -1);
+			velocity[0] = (5 - (-5) + 1) * Q_random(&seed) + -5;
+			velocity[1] = (5 - (-5) + 1) * Q_random(&seed) + -5;
+			smoke = CG_SmokePuff( pos, velocity, 
+						  puff_size, 
+						  0.0f, 0.0f, 0.0f, 0.7f,
+						  10000, 
+						  cg.time, 8000,
+						  LEF_PUFF_DONT_SCALE, 
+						  cgs.media.smokePuffShader );	
+	}
+}
+
+
 
 /*
 ====================

@@ -1,5 +1,5 @@
 /*
- * $Id: g_client.c,v 1.12 2004-12-17 00:29:40 minkis Exp $
+ * $Id: g_client.c,v 1.15 2005-06-26 05:08:12 minkis Exp $
 */
 
 //null cvs upload test, comment placed for a difference.
@@ -343,7 +343,7 @@ void respawn( gentity_t *ent ) {
 
 /*
 ================
-respawn
+switch_vehicle
 ================
 */
 void switch_vehicle( gentity_t *ent ) {

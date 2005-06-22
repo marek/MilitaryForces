@@ -1,5 +1,5 @@
 /*
- * $Id: g_missile.c,v 1.27 2004-12-16 19:22:17 minkis Exp $
+ * $Id: g_missile.c,v 1.28 2005-06-22 06:00:41 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -67,6 +67,45 @@ void G_ExplodeMissile( gentity_t *ent ) {
 
 	ent->s.eType = ET_GENERAL;
 	G_AddEvent( ent, EV_MISSILE_MISS, DirToByte( dir ), qtrue );
+
+	ent->freeAfterEvent = qtrue;
+
+	// splash damage
+	if ( ent->splashDamage ) {
+		if( G_RadiusDamage( ent->r.currentOrigin, ent->parent, ent->splashDamage, ent->splashRadius, ent
+			, ent->splashMethodOfDeath, ent->targetcat ) ) {
+			g_entities[ent->r.ownerNum].client->accuracy_hits++;
+		}
+	}
+
+	trap_LinkEntity( ent );
+}
+
+
+
+
+/*
+================
+G_ExplodeFlak
+
+Explode a flak at destination
+================
+*/
+void G_ExplodeFlak( gentity_t *ent ) {
+	vec3_t		dir;
+	vec3_t		origin;
+
+
+	BG_EvaluateTrajectory( &ent->s.pos, level.time, origin );
+	SnapVector( origin );
+	G_SetOrigin( ent, origin );
+
+	// we don't have a valid direction, so just point straight up
+	dir[0] = dir[1] = 0;
+	dir[2] = 1;
+
+	ent->s.eType = ET_GENERAL;
+	G_AddEvent( ent, EV_FLAK, DirToByte( dir ), qtrue );
 
 	ent->freeAfterEvent = qtrue;
 
@@ -1126,6 +1165,73 @@ void fire_autocannon (gentity_t *self, qboolean main) {
 
 /*
 =================
+fire_autocannon_GI MFQ3
+=================
+*/
+void fire_autocannon_GI (gentity_t *self) {
+	gentity_t	*bolt;
+	vec3_t		dir, forward, right, up, temp;
+	vec3_t		start, offset;
+	vec3_t		spreadangle;
+	int			weapIdx = self->s.weaponIndex;
+	float		spreadX = availableWeapons[weapIdx].spread; 
+	float		spreadY = spreadX;
+
+	// used for spread
+	VectorCopy( self->s.angles, spreadangle );
+	spreadX = ((rand() % (unsigned int)spreadX) - spreadX/2)/10;
+	spreadY = ((rand() % (unsigned int)spreadY) - spreadY/2)/10;
+	spreadangle[0] += spreadX;
+	spreadangle[1] += spreadY;
+//	G_Printf( "spread %.1f %.1f\n", spreadX, spreadY );
+
+	VectorCopy( self->s.pos.trBase, start );
+
+		// use this to make it shoot where the player looks
+//		AngleVectors( self->client->ps.viewangles, dir, 0, 0 );
+//		VectorCopy( self->s.pos.trBase, start );
+//		start[2] += availableVehicles[self->client->vehicle].maxs[2];
+		// otherwise use this
+		AngleVectors( spreadangle, forward, right, up );
+		RotatePointAroundVector( temp, up, forward, ((float)self->s.angles[1])/10 );
+		CrossProduct( up, temp, right );
+		RotatePointAroundVector( dir, right, temp, ((float)self->s.angles[1])/10 );
+
+
+	VectorMA( start, offset[0], dir, start );
+	VectorMA( start, offset[1], right, start );
+	VectorMA( start, offset[2], up, start );
+	SnapVector( start );
+
+	bolt = G_Spawn();
+	bolt->classname = "bullet";
+	bolt->nextthink = level.time + 4000;
+	bolt->think = G_FreeEntity;
+	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
+	bolt->s.weaponIndex = weapIdx;
+	bolt->r.ownerNum = self->s.number;
+	bolt->parent = self;
+	bolt->damage = availableWeapons[weapIdx].damage;
+	bolt->targetcat = availableWeapons[weapIdx].category;
+	bolt->catmodifier = availableWeapons[weapIdx].noncatmod;
+	bolt->methodOfDeath = MOD_AUTOCANNON;
+	bolt->clipmask = MASK_SHOT;
+	bolt->target_ent = NULL;
+	bolt->s.pos.trType = TR_LINEAR;
+	bolt->s.pos.trTime = level.time - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
+	//tracer
+	self->tracerindex --;
+	if( self->tracerindex < 0 ) self->tracerindex = 255;
+	bolt->s.eType = ET_BULLET;
+	bolt->s.generic1 = self->tracerindex;
+	VectorCopy( start, bolt->s.pos.trBase );
+	VectorScale( dir, availableWeapons[weapIdx].muzzleVelocity, bolt->s.pos.trDelta );
+	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
+	VectorCopy (start, bolt->r.currentOrigin);
+}
+
+/*
+=================
 fire_maingun MFQ3
 =================
 */
@@ -1349,65 +1455,6 @@ void drop_fueltank (gentity_t *self) {
 }
 
 
-
-
-
-
-/*
-=================
-LaunchMissile_GI MFQ3
-=================
-*/
-void LaunchMissile_GI( gentity_t* ent )
-{
-	gentity_t	*bolt;
-	vec3_t		dir, start;
-
-	ent->count--;
-//	G_Printf("Launching GI missile....%d left\n", ent->count);
-
-	VectorCopy( ent->s.pos.trBase, start );
-	start[2] += 10;
-	VectorSubtract( ent->tracktarget->r.currentOrigin, ent->r.currentOrigin, dir );
-	VectorNormalize(dir);
-	SnapVector( start );
-
-	bolt = G_Spawn();
-	bolt->classname = "aam";
-	bolt->tracktarget = ent->tracktarget;
-	// update target
-	if( ent->tracktarget->client ) {
-		ent->tracktarget->client->ps.stats[STAT_LOCKINFO] |= LI_BEING_LAUNCHED;
-	}
-	bolt->followcone = availableWeapons[ent->s.weaponIndex].followcone;
-	bolt->speed = availableWeapons[ent->s.weaponIndex].muzzleVelocity;
-	bolt->wait = level.time + availableWeapons[ent->s.weaponIndex].fuelrange;
-	bolt->think = follow_target;
-	bolt->nextthink = level.time + 50;
-	bolt->s.pos.trType = TR_LINEAR;
-	VectorScale( dir, bolt->speed, bolt->s.pos.trDelta );
-	bolt->s.eType = ET_MISSILE;
-	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
-	bolt->s.weaponIndex = ent->s.weaponIndex;
-	bolt->r.ownerNum = ent->s.number;
-	bolt->parent = ent;
-	bolt->damage = bolt->splashDamage = availableWeapons[ent->s.weaponIndex].damage;
-	bolt->splashRadius = availableWeapons[ent->s.weaponIndex].damageRadius;
-	bolt->targetcat = availableWeapons[ent->s.weaponIndex].category;
-	bolt->catmodifier = availableWeapons[ent->s.weaponIndex].noncatmod;
-	bolt->range = availableWeapons[ent->s.weaponIndex].range;
-	bolt->methodOfDeath = MOD_FFAR;
-	bolt->splashMethodOfDeath = MOD_FFAR_SPLASH;
-	bolt->clipmask = MASK_SHOT|MASK_WATER;
-	bolt->target_ent = NULL;
-	bolt->basicECMVulnerability = availableWeapons[ent->s.weaponIndex].basicECMVulnerability;
-
-	bolt->s.pos.trTime = level.time;// - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
-	VectorCopy( start, bolt->s.pos.trBase );
-	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
-	VectorCopy (start, bolt->r.currentOrigin);
-}
-
 /*
 =================
 fire_nukebomb MFQ3
@@ -1525,3 +1572,134 @@ void fire_nukemissile (gentity_t *self) {
 	VectorCopy (start, bolt->r.currentOrigin);
 	
 }
+
+
+// =================================================================================================================
+// ================================================== GI MISSILE STUFF =============================================
+// =================================================================================================================
+
+
+
+
+/*
+=================
+LaunchMissile_GI MFQ3
+=================
+*/
+void LaunchMissile_GI( gentity_t* ent )
+{
+	gentity_t	*bolt;
+	vec3_t		dir, start;
+
+	ent->count--;
+//	G_Printf("Launching GI missile....%d left\n", ent->count);
+
+	VectorCopy( ent->s.pos.trBase, start );
+	start[2] += 10;
+	VectorSubtract( ent->tracktarget->r.currentOrigin, ent->r.currentOrigin, dir );
+	VectorNormalize(dir);
+	SnapVector( start );
+
+	bolt = G_Spawn();
+	bolt->classname = "aam";
+	bolt->tracktarget = ent->tracktarget;
+	// update target
+	if( ent->tracktarget->client ) {
+		ent->tracktarget->client->ps.stats[STAT_LOCKINFO] |= LI_BEING_LAUNCHED;
+	}
+	bolt->followcone = availableWeapons[ent->s.weaponIndex].followcone;
+	bolt->speed = availableWeapons[ent->s.weaponIndex].muzzleVelocity;
+	bolt->wait = level.time + availableWeapons[ent->s.weaponIndex].fuelrange;
+	bolt->think = follow_target;
+	bolt->nextthink = level.time + 50;
+	bolt->s.pos.trType = TR_LINEAR;
+	VectorScale( dir, bolt->speed, bolt->s.pos.trDelta );
+	bolt->s.eType = ET_MISSILE;
+	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
+	bolt->s.weaponIndex = ent->s.weaponIndex;
+	bolt->r.ownerNum = ent->s.number;
+	bolt->parent = ent;
+	bolt->damage = bolt->splashDamage = availableWeapons[ent->s.weaponIndex].damage;
+	bolt->splashRadius = availableWeapons[ent->s.weaponIndex].damageRadius;
+	bolt->targetcat = availableWeapons[ent->s.weaponIndex].category;
+	bolt->catmodifier = availableWeapons[ent->s.weaponIndex].noncatmod;
+	bolt->range = availableWeapons[ent->s.weaponIndex].range;
+	bolt->methodOfDeath = MOD_FFAR;
+	bolt->splashMethodOfDeath = MOD_FFAR_SPLASH;
+	bolt->clipmask = MASK_SHOT|MASK_WATER;
+	bolt->target_ent = NULL;
+	bolt->basicECMVulnerability = availableWeapons[ent->s.weaponIndex].basicECMVulnerability;
+
+	bolt->s.pos.trTime = level.time;// - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
+	VectorCopy( start, bolt->s.pos.trBase );
+	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
+	VectorCopy (start, bolt->r.currentOrigin);
+}
+
+
+
+/*
+=================
+fire_flak_GI
+=================
+*/
+#define FLAK_DEVIATION_XY 800
+#define FLAK_DEVIATION_HEIGHT 200
+void fire_flak_GI (gentity_t *self) {
+	gentity_t	*bolt;
+	vec3_t		start, offset;
+	qboolean	wingtip = qfalse;
+	int		fuse;
+	static int	seed = 0x92;
+	int dis;
+
+	// Find fuse time
+	dis = Distance(self->r.currentOrigin,self->tracktarget->r.currentOrigin);
+	if(dis < 1000)
+		return;	// Need to be above reasonably!
+	fuse = (float)dis/availableWeapons[self->s.weaponIndex].muzzleVelocity;
+
+
+	// Cheat using a random detonation position near player
+	start[0] = self->tracktarget->r.currentOrigin[0] + (FLAK_DEVIATION_XY - (FLAK_DEVIATION_XY * -1) + 1) * Q_random( &seed ) + (FLAK_DEVIATION_XY * -1);
+	start[1] = self->tracktarget->r.currentOrigin[1] + (FLAK_DEVIATION_XY - (FLAK_DEVIATION_XY * -1) + 1) * Q_random( &seed ) + (FLAK_DEVIATION_XY * -1);
+	start[2] = self->tracktarget->r.currentOrigin[2] + (FLAK_DEVIATION_HEIGHT - (FLAK_DEVIATION_HEIGHT * -1) + 1) * Q_random( &seed ) + (FLAK_DEVIATION_HEIGHT * -1);
+
+	// Remove one weapon to fire
+	MF_removeWeaponFromLoadout(self->s.weaponIndex, &self->loadout, &wingtip, offset, 0 );
+	
+
+
+	bolt = G_Spawn();
+	bolt->classname = "flak";
+
+	bolt->speed = availableWeapons[self->s.weaponIndex].muzzleVelocity;
+	bolt->think = G_ExplodeFlak;
+	bolt->nextthink = level.time + fuse;
+	bolt->s.pos.trType = TR_LINEAR;
+
+
+	bolt->s.eType = ET_INVISIBLE;
+	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
+	bolt->s.weaponIndex = self->s.weaponIndex;
+	bolt->r.ownerNum = self->s.number;
+	bolt->parent = self;
+	bolt->damage = bolt->splashDamage = availableWeapons[self->s.weaponIndex].damage;
+	bolt->splashRadius = availableWeapons[self->s.weaponIndex].damageRadius;
+	bolt->targetcat = availableWeapons[self->s.weaponIndex].category;
+	bolt->catmodifier = availableWeapons[self->s.weaponIndex].noncatmod;
+	bolt->range = availableWeapons[self->s.weaponIndex].range;
+	bolt->methodOfDeath = MOD_FFAR;
+	bolt->splashMethodOfDeath = MOD_FFAR_SPLASH;
+	bolt->clipmask = MASK_SHOT|MASK_WATER;
+	bolt->target_ent = NULL;
+	bolt->basicECMVulnerability = availableWeapons[self->s.weaponIndex].basicECMVulnerability;
+
+	bolt->s.pos.trTime = level.time;// - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
+	VectorCopy( start, bolt->s.pos.trBase );
+	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
+	VectorCopy (start, bolt->r.currentOrigin);
+	
+}
+
+

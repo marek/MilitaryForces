@@ -1,5 +1,5 @@
 /*
- * $Id: bg_weapondata.c,v 1.31 2004-12-16 19:22:17 minkis Exp $
+ * $Id: bg_weapondata.c,v 1.33 2005-06-24 06:43:06 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -305,7 +305,7 @@ completeWeaponData_t availableWeapons[] =
 		CAT_ANY,							// cat
 		0,									// non cat mod
 		3000,								// muzzleVelocity
-		0,									// range
+		6500,								// range (for AAA-GI guns)
 		0,									// fuelrange
 		100,								// fire interval
 		12,									// damage
@@ -385,7 +385,7 @@ completeWeaponData_t availableWeapons[] =
 		0,									// iconHandle
 		CAT_ANY,							// cat
 		0,									// non cat mod
-		3000,								// muzzleVelocity
+		3000,								// muzzleVelocity 
 		0,									// range
 		0,									// fuelrange
 		100,								// fire interval
@@ -2104,7 +2104,47 @@ completeWeaponData_t availableWeapons[] =
 		PF_AG_LT,							// fits on pylon
 		0,									// basicECMVulnerability
 		0,									// flags
-	}
+	},
+	// Flak
+	{ 
+		WT_FLAK,							// type
+		MF_GAMESET_ANY,						// gameset
+		"Flak",								// descriptiveName
+		"Flak",								// shortName
+		"Flak",								// shortName2 (GVs)
+		"",		// modelName
+		0,									// handle
+		"",		// vwepName
+		0,									// vwephandle
+		"hud/iconw_bmb.tga",				// iconName
+		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
+		3000,								// muzzleVelocity
+		75000,								// range
+		75000,								// fuelrange
+		5000,								// fire interval
+		35,									// damage
+		300,								// damageRadius
+		1,									// spread
+		2,									// barrels
+		0,									// barrelDistance
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_MISSILEMODE,						// crosshair
+		CH_MISSILEMODE,						// crosshair track
+		CH_MISSILEMODE,						// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
+		1,									// number per package
+		CAT_GROUND,							// fits on category
+		PF_NA,								// fits on pylon
+		0,									// basicECMVulnerability
+		0,									// flags
+	},
+	// ****************************************************************************** 
 
 
 };

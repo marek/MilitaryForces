@@ -12,8 +12,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory=".\Debug"
-			IntermediateDirectory=".\Debug"
+			OutputDirectory="D:\Games\Quake III Arena"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="FALSE"
@@ -22,10 +22,9 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				OptimizeForProcessor="1"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;UI_EXPORTS;_USRDLL"
-				ExceptionHandling="FALSE"
-				BasicRuntimeChecks="0"
-				RuntimeLibrary="3"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;UI_EXPORTS"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="1"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderFile=".\Debug/ui.pch"
 				AssemblerListingLocation=".\Debug/"
@@ -34,14 +33,13 @@
 				BrowseInformation="1"
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
-				DebugInformationFormat="4"
-				CompileAs="1"/>
+				DebugInformationFormat="4"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="odbc32.lib odbccp32.lib"
-				OutputFile="..\..\uix86.dll"
+				OutputFile="D:\Games\Quake III Arena\mfq3\uix86.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
 				ModuleDefinitionFile=".\ui.def"
@@ -49,7 +47,10 @@
 				ProgramDatabaseFile=".\Debug/uix86.pdb"
 				GenerateMapFile="TRUE"
 				MapFileName=".\Debug/uix86.map"
-				SubSystem="2"
+				HeapReserveSize="10485760"
+				HeapCommitSize="10485760"
+				StackReserveSize="10485760"
+				StackCommitSize="10485760"
 				BaseAddress="0x40000000"
 				ImportLibrary=".\Debug/uix86.lib"
 				TargetMachine="1"/>
@@ -84,8 +85,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory=".\Release"
-			IntermediateDirectory=".\Release"
+			OutputDirectory="D:\Games\Quake III Arena"
+			IntermediateDirectory="D:\Games\Quake III Arena"
 			ConfigurationType="2"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="FALSE"
@@ -160,8 +161,7 @@
 			<File
 				RelativePath="..\game\bg_lib.c">
 				<FileConfiguration
-					Name="Debug|Win32"
-					ExcludedFromBuild="TRUE">
+					Name="Debug|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="0"

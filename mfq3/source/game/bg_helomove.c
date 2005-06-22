@@ -1,5 +1,5 @@
 /*
- * $Id: bg_helomove.c,v 1.2 2002-07-15 18:23:07 thebjoern Exp $
+ * $Id: bg_helomove.c,v 1.3 2005-06-22 06:00:40 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -20,7 +20,7 @@ PM_Plane_FuelFlow
 */
 
 static void PM_Helo_FuelFlow( int throttle )
-{/*
+{
 	int fuelflow = (20 - throttle) * 1000;
 
 	// afterburner takes additional fuel
@@ -36,7 +36,7 @@ static void PM_Helo_FuelFlow( int throttle )
 		pm->ps->throttle = pm->ps->fixed_throttle = 0;
 	}
 
-	pm->ps->timers[TIMER_FUEL] = pm->cmd.serverTime;*/
+	pm->ps->timers[TIMER_FUEL] = pm->cmd.serverTime;
 }
 
 /*
@@ -46,7 +46,7 @@ PM_HeloAccelerate
 ===================
 */
 static void PM_HeloAccelerate()
-{/*
+{
     float	throttle = pm->ps->fixed_throttle;
     float	topspeed = availableVehicles[pm->vehicle].maxspeed;
     int		maxthrottle = availableVehicles[pm->vehicle].maxthrottle;
@@ -110,7 +110,7 @@ static void PM_HeloAccelerate()
     pm->ps->speed = currspeed*10;
 
 	// fuel flow
-	PM_Plane_FuelFlow( throttle );*/
+	PM_Helo_FuelFlow( throttle );
 
 }
 
@@ -123,7 +123,7 @@ PM_HeloMove
 qboolean	PM_SlideMove_Helo();
 
 void PM_HeloMove( void ) 
-{/*
+{
     vec3_t	viewdir;
     vec3_t	vehdir;
     vec3_t	diff;
@@ -138,73 +138,6 @@ void PM_HeloMove( void )
 
 	// clear FX
 	pm->ps->ONOFF &= ~OO_VAPOR;
-
-	// gear
-	if( !dead && (pm->cmd.buttons & BUTTON_GEAR) ) {
-		PM_Toggle_Gear();
-	}
-
-	// gearanim
-	if( !dead && pm->ps->timers[TIMER_GEARANIM] &&
-		pm->cmd.serverTime >= pm->ps->timers[TIMER_GEARANIM] ) {
-		pm->ps->timers[TIMER_GEARANIM] = 0;
-		if( pm->ps->ONOFF & OO_GEAR ) {
-			pm->ps->ONOFF &= ~OO_GEAR;
-		} else {
-			pm->ps->ONOFF |= OO_GEAR;
-		}
-	}
-	// update gear
-	if( pm->updateGear ) {
-		// sync anim
-		if( pm->ps->ONOFF & OO_GEAR ) {
-			PM_AddEvent( EV_GEAR_DOWN_FULL );
-		} else {
-			PM_AddEvent( EV_GEAR_UP_FULL );
-		}
-		pm->updateGear = qfalse;
-	}
-
-	// bay
-	if( !dead && (pm->cmd.buttons & BUTTON_WEAPONBAY) ) {
-		PM_Toggle_Bay();
-	}
-
-	// bayanim
-	if( !dead ) {
-		if( pm->ps->timers[TIMER_BAYANIM] ) {
-			if( pm->cmd.serverTime >= pm->ps->timers[TIMER_BAYANIM] ) {
-				pm->ps->timers[TIMER_BAYANIM] = 0;
-				if( pm->ps->ONOFF & OO_WEAPONBAY ) {
-					pm->ps->ONOFF &= ~OO_WEAPONBAY;
-				} else {
-					pm->ps->ONOFF |= OO_WEAPONBAY;
-					pm->ps->timers[TIMER_BAYCLOSE] = pm->cmd.serverTime + 5000;
-				}
-			}
-		} else {
-			if( pm->ps->timers[TIMER_BAYCLOSE] && 
-				pm->cmd.serverTime >= pm->ps->timers[TIMER_BAYCLOSE] ) {
-				PM_Toggle_Bay();
-			}
-		}
-	}
-
-	// update bay
-	if( pm->updateBay ) {
-		// sync anim
-		if( pm->ps->ONOFF & OO_WEAPONBAY ) {
-			PM_AddEvent( EV_BAY_DOWN_FULL );
-		} else {
-			PM_AddEvent( EV_BAY_UP_FULL );
-		}
-		pm->updateBay = qfalse;
-	}
-
-	// brake
-	if( !dead && (pm->cmd.buttons & BUTTON_BRAKE) ) {
-		PM_Plane_Brakes();
-	}
 
     // local vectors
     VectorCopy( pm->ps->vehicleAngles, vehdir );
@@ -221,23 +154,7 @@ void PM_HeloMove( void )
 	viewdir[YAW] = AngleMod( viewdir[YAW] );
 	vehdir[YAW] = AngleMod( vehdir[YAW] );
 
-	PM_PlaneAccelerate();
-
-	// swing wings
-	if( availableVehicles[pm->vehicle].caps & HC_SWINGWING && !dead ) {
-		float speed = pm->ps->speed/10;
-		float min = availableVehicles[pm->vehicle].stallspeed * 1.5f;
-		float max = availableVehicles[pm->vehicle].maxspeed * 0.8f;
-		float diff = max - min;
-		float maxangle = availableVehicles[pm->vehicle].swingangle;
-		if( speed >= min ) {
-			if( speed < max ) {
-				pm->ps->gunAngle = ((speed - min) * (maxangle / diff))*10;
-			} else {
-				pm->ps->gunAngle = maxangle*10;
-			}
-		}
-	}
+	PM_HeloAccelerate();
 
     if( dead ) {
 		if( pm->ps->vehicleAngles[PITCH] < 70 ) {
@@ -254,7 +171,7 @@ void PM_HeloMove( void )
 			pm->ps->vehicleAngles[2] += availableVehicles[pm->vehicle].turnspeed[2]/2 * pml.frametime;
 			if( pm->ps->vehicleAngles[2] > 360 ) pm->ps->vehicleAngles[2] -= 360;
 		}
-		PM_SlideMove_Plane();
+		PM_SlideMove_Helo();
 		return;
     }
 
@@ -304,15 +221,11 @@ void PM_HeloMove( void )
 			else if( vehdir[ROLL] > 5 ) vehdir[YAW] -= turnspeed[YAW];
 
 			if( viewdir[PITCH] >= vehdir[PITCH]  ) {//&&
-				//viewdir[YAW] < vehdir[YAW] + 10 &&		// disable because it was too difficult
-				//viewdir[YAW] > vehdir[YAW] - 10 ) {
 				pm->ps->ONOFF &= ~OO_STALLED;
 			}
-//			Com_Printf( "Stalled\n" );    
 	    }
 	    // normal flight
 	    else {
-//			Com_Printf( "Normal\n" );
 			// yaw/pitch
 			for( i = PITCH; i <= YAW; i++ ) {
 				diff[i] = viewdir[i] - vehdir[i];
@@ -346,16 +259,8 @@ void PM_HeloMove( void )
 						if( speed < availableVehicles[pm->vehicle].stallspeed * SPEED_GREEN_ARC &&
 							speed > availableVehicles[pm->vehicle].stallspeed * SPEED_YELLOW_ARC ) {
 							pm->ps->ONOFF |= OO_VAPOR;
-//							pm->ps->ONOFF &= ~OO_VAPOR;
 						}
 					}
-//					else if( diff[PITCH] < -50 || diff[YAW] > 50 || diff[YAW] < -50 ) {
-//						if( speed < availableVehicles[pm->vehicle].stallspeed * SPEED_GREEN_ARC &&
-//							speed > availableVehicles[pm->vehicle].stallspeed * SPEED_YELLOW_ARC ) {
-//							pm->ps->ONOFF |= OO_VAPOR;
-//							pm->ps->ONOFF &= ~OO_VAPOR_BIG;
-//						}
-//					}
 				}
 			}
 			else if( diff[PITCH] > 8 ) { // down
@@ -369,18 +274,11 @@ void PM_HeloMove( void )
 			}
 			pm->ps->vehicleAnim = anim;
 
-		//	Com_Printf( va("anim is %d\n", anim) );
-		//	Com_Printf( va( "diff %.1f %.1f %.1f\n", diff[0], diff[1], diff[2] ) ); 
-	      //  Com_Printf( va("hdg: %.1f diff: %.1f\n", viewdir[YAW], diff[YAW]) );
-	    //   Com_Printf( va("view: %.1f %.1f %.1f\n", viewdir[PITCH], viewdir[YAW], viewdir[ROLL]) );
-	        //Com_Printf( va("move: %.1f %.1f %.1f\n", vehdir[PITCH], vehdir[YAW], vehdir[ROLL]) );
-			//}
 		}
 		if( (availableVehicles[pm->vehicle].caps & HC_GEAR) && (pm->ps->ONOFF & OO_GEAR) &&
 			(pm->ps->speed > availableVehicles[pm->vehicle].stallspeed * 10 * SPEED_GREEN_ARC) &&
 			!pm->ps->timers[TIMER_GEARANIM] ) {
 			PM_AddEvent( EV_GEAR_UP );
-//			pm->ps->ONOFF &= ~OO_GEAR;
 			pm->ps->timers[TIMER_GEAR] = pm->cmd.serverTime + availableVehicles[pm->vehicle].gearTime + 100;
 			pm->ps->timers[TIMER_GEARANIM] = pm->cmd.serverTime + availableVehicles[pm->vehicle].gearTime;
 		}
@@ -398,7 +296,7 @@ void PM_HeloMove( void )
 	AngleVectors( vehdir, pm->ps->velocity, NULL, NULL );
 	VectorScale( pm->ps->velocity, (float)pm->ps->speed/10, pm->ps->velocity );
 
-	PM_SlideMove_Plane();*/
+	PM_SlideMove_Helo();
 }
 
 /*
@@ -407,7 +305,7 @@ PM_AddTouchEnt_Plane
 ===============
 */
 static void PM_AddTouchEnt_Helo( int entityNum ) {
-/*	int		i;
+	int		i;
 
 	if ( entityNum == ENTITYNUM_WORLD ) {
 		if( pm->ps->pm_type != PM_VEHICLE )
@@ -426,7 +324,7 @@ static void PM_AddTouchEnt_Helo( int entityNum ) {
 
 	// add it
 	pm->touchents[pm->numtouch] = entityNum;
-	pm->numtouch++;*/
+	pm->numtouch++;
 }
 
 
@@ -439,7 +337,7 @@ Returns qtrue if the velocity was clipped in some way
 */
 #define	MAX_CLIP_PLANES	5
 qboolean	PM_SlideMove_Helo() {
-/*	int			bumpcount, numbumps;
+	int			bumpcount, numbumps;
 	vec3_t		dir;
 	float		d;
 	int			numplanes;
@@ -518,7 +416,7 @@ qboolean	PM_SlideMove_Helo() {
 			(trace.entityNum == ENTITYNUM_WORLD &&
 //				!(trace.surfaceFlags & SURF_NOIMPACT) &&
 			!(trace.surfaceFlags & SURF_SKY)) ) {
-			PM_AddTouchEnt_Plane( trace.entityNum );
+			PM_AddTouchEnt_Helo( trace.entityNum );
 		}
 
 		time_left -= time_left * trace.fraction;
@@ -624,7 +522,7 @@ qboolean	PM_SlideMove_Helo() {
 		VectorCopy( primal_velocity, pm->ps->velocity );
 	}
 
-	return ( bumpcount != 0 );*/
+	return ( bumpcount != 0 );
 	return 0;
 }
 

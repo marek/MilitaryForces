@@ -1,5 +1,5 @@
 /*
- * $Id: g_groundinstallation.c,v 1.8 2004-12-16 19:22:17 minkis Exp $
+ * $Id: g_groundinstallation.c,v 1.11 2005-06-26 05:08:12 minkis Exp $
 */
 
 #include "g_local.h"
@@ -60,7 +60,11 @@ static void Update_GI_Targets( gentity_t* ent )
 	// anti air missiles
 	if( ent->count > 0 && 
 		ent->s.weaponIndex > -1 &&
-		(availableWeapons[ent->s.weaponIndex].type & WT_ANTIAIRMISSILE) )
+			(	(availableWeapons[ent->s.weaponIndex].type == WT_ANTIAIRMISSILE) 
+				|| (availableWeapons[ent->s.weaponIndex].type == WT_FLAK)
+				|| (availableWeapons[ent->s.weaponIndex].type == WT_MACHINEGUN)
+			) 
+		)
 	{
 		// no target yet
 		if( !ent->tracktarget )
@@ -219,10 +223,11 @@ void GroundInstallation_Think( gentity_t* ent )
 				else
 					locktime = availableWeapons[ent->s.weaponIndex].lockdelay;
 			}
-			if( level.time > ent->locktime + locktime )
+			if( level.time > ent->locktime + locktime && Distance(ent->r.currentOrigin,ent->tracktarget->r.currentOrigin) <= availableWeapons[ent->s.weaponIndex].range)
 			{
-				LaunchMissile_GI(ent);
-				ent->locktime = level.time;	// so it doesnt launch all of them instantly
+				//LaunchMissile_GI(ent);
+				FireWeapon_GI(ent);
+				ent->locktime = level.time + availableWeapons[ent->s.weaponIndex].fireInterval;	// so it doesnt launch all of them instantly
 			}
 		}
 		else

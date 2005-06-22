@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.36 2004-12-16 19:22:15 minkis Exp $
+ * $Id: cg_drawnewhud.c,v 1.37 2005-06-22 06:00:39 minkis Exp $
 */
 
 #include "cg_local.h"
@@ -530,6 +530,180 @@ static void CG_DrawRadarSymbols_AIR_new( int vehicle, float range, int x, int y 
 }
 
 static void CG_DrawRadarSymbols_GROUND_new( int vehicle, float range, int x, int y ) {
+	unsigned int i;
+	centity_t	*self = &cg.predictedPlayerEntity;
+	vec3_t		pos, pos1, pos2;
+	vec3_t		dir;
+	float		dist;
+	float		scale;
+	float		hdg = self->currentState.angles[1];
+	float		angle;
+	vec3_t		angles;
+	int			otherveh;
+	vec3_t		otherpos;
+	int			icon;
+	int			drawnTargets = 0;
+	trace_t		res;
+	qboolean	groundinstallation = 0;
+
+	if( cg.RADARRangeSetting ) {
+		range /= (2 * cg.RADARRangeSetting);
+	}
+
+	// adjust for radar screen size
+	scale = range/54;
+
+	// ground vehicle adjustment for angle
+	if( (availableVehicles[vehicle].cat & CAT_GROUND) ||
+		(availableVehicles[vehicle].cat & CAT_BOAT) ) {
+		hdg += self->currentState.angles2[ROLL];
+		if( hdg > 360 ) hdg -= 360;
+		else if( hdg < 0 ) hdg += 360;
+	}
+
+	// pos
+	VectorCopy( self->currentState.pos.trBase, pos );
+
+	// walk through list of targets
+	for( i = 0; i < cg.radarTargets; i++ ) {
+		// dont show self
+		if( cg.radarEnts[i] == &cg.predictedPlayerEntity ) continue;
+
+		// dont show dead ones
+		if( cg.radarEnts[i]->currentState.eFlags & EF_DEAD ) continue;
+
+		// vehicles
+		groundinstallation = 0;
+		if( !cg.radarEnts[i]->destroyableStructure ) {
+			// get other vehicle
+			if( cg.radarEnts[i]->currentState.eType == ET_MISC_VEHICLE ) {
+				if( cg.radarEnts[i]->currentState.modelindex == 255 )	// ground installation
+				{
+					otherveh = cg.radarEnts[i]->currentState.modelindex2;	
+					groundinstallation = 1;
+				}
+				else													// other misc veh
+					otherveh = cg.radarEnts[i]->currentState.modelindex;
+			} else {
+				otherveh = cgs.clientinfo[cg.radarEnts[i]->currentState.clientNum].vehicle;
+			}
+			VectorCopy( cg.radarEnts[i]->currentState.pos.trBase, otherpos );
+
+			// get dir and dist
+			VectorSet( pos1, otherpos[0], otherpos[1], 0 );
+			VectorSet( pos2, pos[0], pos[1], 0 );
+			VectorSubtract( pos1, pos2, dir );
+			dist = VectorNormalize(dir);
+			// check out of range
+			if( dist > range ) continue;
+			// scale dist to radar screen
+			dist /= scale;
+
+			// get screen dir
+			vectoangles( dir, angles );
+			angle = angles[1]-hdg;
+			if( angle > 360 ) angle -= 360;
+			else if( angle < 0 ) angle += 360;
+			if( angle >= 45 && angle <= 315 ) 
+			{
+				if( !(cg.radarEnts[i]->currentState.ONOFF & OO_RADAR) ||	// radar off
+					( cg.radarEnts[i]->destroyableStructure &&	// or radar on and destroyable building
+					(cg.radarEnts[i]->currentState.ONOFF & OO_RADAR) ) ) continue;
+			}
+			angles[1] -= hdg - 90;
+			if( angles[1] > 360 ) angles[1] -= 360;
+			else if( angles[1] < 0 ) angles[1] += 360;
+			angles[0] = angles[2] = 0;
+			AngleVectors( angles, dir, 0, 0 );
+			VectorScale( dir, dist, dir );
+
+			// check LOS and/or RADAR on
+			if( !(cg.radarEnts[i]->currentState.ONOFF & OO_RADAR) ) 
+			{
+				CG_Trace( &res, pos, NULL, NULL, otherpos, cg.snap->ps.clientNum, MASK_SOLID );
+				if( res.fraction < 1.0f ) continue;
+			}
+			// which icon (if at all, dont show lqms)
+			if( groundinstallation )
+			{
+				icon = RD_GROUND_ENEMY;
+			}
+			else if( (availableVehicles[otherveh].cat & CAT_GROUND) ||
+					 (availableVehicles[otherveh].cat & CAT_BOAT) ) 
+			{
+				icon = RD_GROUND_ENEMY;
+			} 
+			else 
+			{
+				continue;
+			}
+			// friend or foe
+			if( cgs.gametype >= GT_TEAM ) 
+			{
+				if( cgs.clientinfo[cg.radarEnts[i]->currentState.clientNum].team ==
+					cgs.clientinfo[self->currentState.clientNum].team ) 
+					icon++;
+			}
+		// buildings
+		} 
+		else 
+		{
+			VectorCopy( cgs.inlineModelMidpoints[cg.radarEnts[i]->currentState.modelindex], otherpos );
+			// get dir and dist
+			VectorSet( pos1, otherpos[0], otherpos[1], 0 );
+			VectorSet( pos2, pos[0], pos[1], 0 );
+			VectorSubtract( pos1, pos2, dir );
+			dist = VectorNormalize(dir);
+			// check out of range
+			if( dist > range ) continue;
+			// scale dist to radar screen
+			dist /= scale;
+
+			// get screen dir
+			vectoangles( dir, angles );
+			angle = angles[1]-hdg;
+			if( angle > 360 ) angle -= 360;
+			else if( angle < 0 ) angle += 360;
+			if( ( (availableVehicles[vehicle].cat & CAT_GROUND) || 
+				  (availableVehicles[vehicle].cat & CAT_BOAT) ) &&
+				angle >= 90 && angle <= 270 ) continue;
+			else if( ( (availableVehicles[vehicle].cat & CAT_PLANE) ||
+					   (availableVehicles[vehicle].cat & CAT_HELO) ) &&
+				angle >= 45 && angle <= 315 ) continue;
+			angles[1] -= hdg - 90;
+			if( angles[1] > 360 ) angles[1] -= 360;
+			else if( angles[1] < 0 ) angles[1] += 360;
+			angles[0] = angles[2] = 0;
+			AngleVectors( angles, dir, 0, 0 );
+			VectorScale( dir, dist, dir );
+
+			icon = RD_BUILDING_ENEMY;
+			// friend or foe
+			if( cgs.gametype >= GT_TEAM ) {
+				if( !cg.radarEnts[i]->currentState.generic1 ) {
+					icon += 2;
+				}
+				else if( cg.radarEnts[i]->currentState.generic1 ==
+					cgs.clientinfo[self->currentState.clientNum].team ) {
+					icon++;
+				}
+			}
+			// check LOS
+			CG_Trace( &res, pos, NULL, NULL, otherpos, cg.snap->ps.clientNum, MASK_SOLID );
+//			if( res.fraction < 1.0f ) continue;
+			if( res.entityNum != cg.radarEnts[i]->currentState.number ) continue;
+		}
+
+		// draw
+		CG_DrawPic( x + dir[0], y - dir[1], 8, 8, cgs.media.radarIcons[icon] );
+		// check if we should draw any more targets
+		drawnTargets++;
+		if( drawnTargets >= cg_radarTargets.integer ) break;
+	}
+}
+
+
+static void CG_DrawGroundSupportRadar( int vehicle, float range, int x, int y ) {
 	unsigned int i;
 	centity_t	*self = &cg.predictedPlayerEntity;
 	vec3_t		pos, pos1, pos2;

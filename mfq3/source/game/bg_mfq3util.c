@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.34 2004-12-16 19:22:16 minkis Exp $
+ * $Id: bg_mfq3util.c,v 1.36 2005-06-24 06:43:06 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -164,6 +164,49 @@ int MF_getIndexOfVehicle( int start,			// where to start in list
     return vehicle_pt;
 }
 
+
+/*
+=================
+MF_getIndexOfGI
+=================
+*/
+int MF_getIndexOfGI( int start, int gameset, int GIType, int mode)
+{
+    int				i;
+	int				gi_pt = -1;
+	qboolean		done = qfalse;
+
+	if( gameset <= 0 ) gameset = MF_GAMESET_ANY;
+	if( start >= bg_numberOfGroundInstallations )
+		start = 0;
+	else if( start < 0 )
+		start = bg_numberOfGroundInstallations;
+
+	// scan loop
+    for( i = start+1; done != qtrue; i++ )
+    {
+		if(i >= bg_numberOfGroundInstallations)
+			i = 0;					
+
+		if( i == start ) done = qtrue;			//return start;	
+		if( !(availableGroundInstallations[i].gameset & gameset) ) continue;			// wrong set
+		
+		if(GIType != -1) {
+			if(mode == 1 && strcmp(availableGroundInstallations[i].tinyName, availableGroundInstallations[GIType].tinyName) == 0) {
+				//If its good mark known position just in case its the only good one
+				gi_pt = i;
+				continue;	// change vehicle
+			}else if(mode == 2 && strcmp(availableGroundInstallations[i].tinyName, availableGroundInstallations[GIType].tinyName) != 0) {
+				continue;						// make sure its the same
+			}
+		}
+		return i;
+    }
+
+    return gi_pt;
+}
+
+
 /*
 =================
 MF_getNumberOfItems
@@ -208,6 +251,7 @@ char * MF_CreateModelPathname( int vehicle, char * pFormatString )
 
 	// find catagory
 	cat = availableVehicles[ vehicle ].cat;
+
 	if( cat & CAT_PLANE ) {
 		strcpy( catDir, "planes" );
 	}
@@ -216,6 +260,9 @@ char * MF_CreateModelPathname( int vehicle, char * pFormatString )
 	}
 	else if( cat & CAT_HELO ) {
 		strcpy( catDir, "helos" );
+	}
+	else if( cat & CAT_NPC ) {
+		strcpy( catDir, "npc" );
 	}
 	else if( cat & CAT_LQM ) {
 		strcpy( catDir, "lqms" );

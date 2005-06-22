@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.40 2004-12-17 00:29:41 minkis Exp $
+ * $Id: g_local.h,v 1.43 2005-06-26 05:08:12 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -653,9 +653,12 @@ void fire_flare (gentity_t *self);
 void fire_flare2 (gentity_t *self, vec3_t start, vec3_t up, int age);
 void fire_cflare (gentity_t *self);
 void drop_fueltank (gentity_t *self);
-void LaunchMissile_GI( gentity_t* ent );
 void fire_nukebomb (gentity_t *self);
 void fire_nukemissile (gentity_t *self);
+void LaunchMissile_GI( gentity_t* ent );
+void fire_flak_GI (gentity_t *self);
+void fire_autocannon_GI (gentity_t *self);
+
 //
 // g_mover.c
 //
@@ -757,7 +760,7 @@ qboolean G_FilterPacket (char *from);
 // g_weapon.c
 //
 void FireWeapon( gentity_t *ent );
-
+void FireWeapon_GI( gentity_t *ent );
 //
 // p_hud.c
 //

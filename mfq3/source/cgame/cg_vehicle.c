@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicle.c,v 1.26 2004-12-16 19:22:15 minkis Exp $
+ * $Id: cg_vehicle.c,v 1.28 2005-06-24 06:43:06 minkis Exp $
 */
 
 #include "cg_local.h"
@@ -153,54 +153,33 @@ On startup cache it
 */
 
 static void CG_CacheHelo(int index)
-{/*
+{
 	char name[128];
 	char basename[128];
 	int i;
 
-	Com_sprintf( basename, sizeof(basename), "models/vehicles/ground/%s/%s", availableVehicles[index].modelName,
+	Com_sprintf( basename, sizeof(basename), "models/vehicles/helos/%s/%s", availableVehicles[index].modelName,
 			availableVehicles[index].modelName );
-// changed mg
-	for( i = 0; i < BP_GV_MAX_PARTS; i++ ) {
+
+	for( i = 0; i < BP_HELO_MAX_PARTS; i++ ) {
 		switch(i) {
-		case BP_GV_BODY:
+		case BP_HELO_BODY:
 			Com_sprintf( name, sizeof(name), "%s.md3", basename );
 			break;
-		case BP_GV_TURRET:
-			Com_sprintf( name, sizeof(name), "%s_tur.md3", basename );
+		case BP_HELO_MAINROTOR:
+			Com_sprintf( name, sizeof(name), "%s_mrotor.md3", basename );
 			break;
-		case BP_GV_GUNBARREL:
-			Com_sprintf( name, sizeof(name), "%s_gun.md3", basename );
-			break;
-		case BP_GV_WHEEL:
-			Com_sprintf( name, sizeof(name), "%s_w1.md3", basename );
-			break;
-		case BP_GV_WHEEL2:
-			Com_sprintf( name, sizeof(name), "%s_w2.md3", basename );
-			break;
-		case BP_GV_WHEEL3:
-			Com_sprintf( name, sizeof(name), "%s_w3.md3", basename );
-			break;
-		case BP_GV_WHEEL4:
-			Com_sprintf( name, sizeof(name), "%s_w4.md3", basename );
-			break;
-		case BP_GV_WHEEL5:
-			Com_sprintf( name, sizeof(name), "%s_w5.md3", basename );
-			break;
-		case BP_GV_WHEEL6:
-			Com_sprintf( name, sizeof(name), "%s_w6.md3", basename );
+		case BP_HELO_TAILROTOR:
+			Com_sprintf( name, sizeof(name), "%s_trotor.md3", basename );
 			break;
 		}
 		availableVehicles[index].handle[i] = trap_R_RegisterModel( name );
-//		if( !availableVehicles[index].handle[i] ) {
-//			CG_Printf( "MFQ3 Warning: Unable to load model '%s'\n", name );
-//		}
 	}
 
 	// only thing that always has to be there is body
-	if( !availableVehicles[index].handle[BP_PLANE_BODY] ) {
+	if( !availableVehicles[index].handle[BP_HELO_BODY] ) {
 		trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
-	}*/
+	}
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.56 2004-12-23 11:29:21 thebjoern Exp $
+ * $Id: bg_vehicledata.c,v 1.57 2005-06-22 06:00:40 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -14,55 +14,6 @@ completeVehicleData_t availableVehicles[] =
 	// ---------------------------------------------
 	// Planes
 	// ---------------------------------------------
-    {	"F-16 Fuckon",			// descriptiveName
-	"F-16",						// tinyName
-	"f-16",						// modelName
-	SHADOW_DEFAULT,				// alpha shadow
-	MF_GAMESET_MODERN,			// id
-	MF_TEAM_2,
-	CAT_PLANE,
-	CLASS_PLANE_FIGHTER,
-	0,							// flags
-	HC_GEAR|HC_SPEEDBRAKE|
-	HC_VAPOR,					// capabilities
-	{0,0,0,0,0,0,0,0,0,0},		// handles - SET AUTOMATICALLY
-	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
-	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
-	{85, 60, 280},				// turnspeed around the three axis
-	{0, 100, 70},				// camera distance {min,max,default}
-	{0, 100, 20},				// camera height {min,max,default}
-	200,						// stallspeed
-	700,						// maxspeed
-	0,							// min throttle
-	15,							// max throttle
-	1,							// engines
-	0,							// wheels
-	0,							// wheel circumference
-	260,						// acceleration
-	120,						// health
-	{16.65f, -3.391f, 0.378f},	// gun tag
-	60,							// max fuel
-	0,							// gearheight - SET AUTOMATICALLY
-	0,							// tailangle
-	WI_MG_20MM, WI_SIDEWINDER, WI_AMRAAM, 0, 0, 0, 0, WI_FLARE,	// weapons  WI_MG_20MM
-	450, 4, 4, 0, 0, 0, 0, 30,		// ammo
-	0,0,0,0,0,0,0,0,			// turret - useful ??
-	{19, 0, 5},					// cameraposition for cockpit view
-	AB_BALL,					// effect model
-	12000,						// radar range
-	9000,						// radar range ground
-	0,							// trackcone
-	-1,							// trackcone ground
-	0,							// swingangle
-	1400,						// geartime
-	0,							// max gear frame
-	1000,						// baytime
-	0,							// max bay frame
-	0,							// renderflags
-	{4,0,34,24},				// shadow coordinates
-	{0,0,0,0}					// shadow orientation adjusters
-    },
-
     {	"F-16 Falcon",			// descriptiveName
 	"F-16",						// tinyName
 	"f-16",						// modelName
@@ -2561,7 +2512,7 @@ completeVehicleData_t availableVehicles[] =
 	{0,0,0,0},					// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
     },
-
+/*
     {	"BMP 3",				// descriptiveName
 	"BMP-3",					// tinyName
 	"bmp-3",					// modelName
@@ -2608,7 +2559,7 @@ completeVehicleData_t availableVehicles[] =
 	0,							// renderflags
 	{0,0,0,0},					// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
-    },
+    },*/
 
     {	"Hummer",				// descriptiveName
 	"HMV",						// tinyName
@@ -2755,6 +2706,54 @@ completeVehicleData_t availableVehicles[] =
 	{0,0,0,0}					// shadow orientation adjusters
     },
 
+    {	"ZSU-23",				// descriptiveName
+	"zsu23",					// tinyName
+	"ZSU-23",					// modelName
+	SHADOW_DEFAULT,				// alpha shadow
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_2,
+	CAT_GROUND,
+	CLASS_GROUND_SAM,
+	0,							// flags
+	HC_DUALGUNS,	// capabilities
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
+	{50, 100, 100},				// turnspeed around the three axis
+	{0, 100, 30},				// camera distance {min,max,default}
+	{0, 100, 10},				// camera height {min,max,default}
+	0,							// stallspeed
+	90,						    // maxspeed
+	-5,							// min throttle
+	10,						    // max throttle
+	1,							// engines
+	4,							// wheels
+	9,							// wheel circumference
+	33,							// acceleration
+	170,						// health
+	{3, 1, 6},					// gun tag
+	160,						// max fuel
+	285,						// max gun pitch (upwards = negative) <- gearheight
+	5,							// min gun pitch (downwards = positive) <- tailangle
+	WI_MG_14_5MM, WI_STINGER, WI_HELLFIRE, 0, 0, 0, 0, WI_CFLARE,// weapons
+	600, 2, 4, 0, 0, 0, 0, 20,	// ammo
+	0,0,0,0,0,0,0,0,			// turret
+	{0, 0, 10},					// cameraposition for cockpit view
+	0,							// effect model
+	8000,						// radar range
+	5000,						// radar range ground
+	-1,							// trackcone
+	0,							// trackcone ground
+	0,							// swingangle
+	1400,						// geartime
+	0,							// max gear frame
+	1000,						// baytime
+	0,							// max bay frame
+	0,							// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
+    },
+
     {	"Panzer III",			// descriptiveName
 	"Pz 3",						// tinyName
 	"panzeriii",				// modelName
@@ -2802,6 +2801,59 @@ completeVehicleData_t availableVehicles[] =
 	{0,0,0,0},					// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
     },
+
+	// ---------------------------------------------
+	// Helo
+	// ---------------------------------------------
+
+{	"helo",				// descriptiveName
+	"helo",					// tinyName
+	"helo",					// modelName
+	SHADOW_DEFAULT,				// alpha shadow
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_2,
+	CAT_HELO,
+	CLASS_HELO_RECON,
+	0,							// flags
+	0,	// capabilities
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
+	{50, 100, 100},				// turnspeed around the three axis
+	{0, 100, 30},				// camera distance {min,max,default}
+	{0, 100, 10},				// camera height {min,max,default}
+	0,							// stallspeed
+	500,						    // maxspeed
+	-5,							// min throttle
+	10,						    // max throttle
+	1,							// engines
+	4,							// wheels
+	9,							// wheel circumference
+	33,							// acceleration
+	170,						// health
+	{3, 1, 6},					// gun tag
+	160,						// max fuel
+	285,						// max gun pitch (upwards = negative) <- gearheight
+	5,							// min gun pitch (downwards = positive) <- tailangle
+	WI_MG_14_5MM, WI_STINGER, WI_HELLFIRE, 0, 0, 0, 0, WI_CFLARE,// weapons
+	600, 2, 4, 0, 0, 0, 0, 20,	// ammo
+	0,0,0,0,0,0,0,0,			// turret
+	{0, 0, 10},					// cameraposition for cockpit view
+	0,							// effect model
+	8000,						// radar range
+	5000,						// radar range ground
+	-1,							// trackcone
+	0,							// trackcone ground
+	0,							// swingangle
+	1400,						// geartime
+	0,							// max gear frame
+	1000,						// baytime
+	0,							// max bay frame
+	0,							// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
+    },
+
 
 	// ---------------------------------------------
 	// Boats
@@ -2861,9 +2913,9 @@ int bg_numberOfVehicles = sizeof(availableVehicles) / sizeof(availableVehicles[0
 // just contains data of all the available vehicles
 groundInstallationData_t availableGroundInstallations[] = 
 {
-    {	"SAM Mk1",					// descriptiveName
-	"SAM1",						// tinyName
-	"turret_samup",						// modelName
+    {	"SAM Mk1",				// descriptiveName
+	"SAM",						// tinyName
+	"turret_samup",				// modelName
 	MF_GAMESET_MODERN,			// gameset
 	{0,0,0,0,0,0,0,0,0,0},		// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box)
@@ -2882,9 +2934,9 @@ groundInstallationData_t availableGroundInstallations[] =
 	6000						// reloadtime
     },
 
-    {	"SAM Mk2",					// descriptiveName
-	"SAM2",						// tinyName
-	"turret_samup",						// modelName
+    {	"SAM Mk2",				// descriptiveName
+	"SAM",						// tinyName
+	"turret_samup",				// modelName
 	MF_GAMESET_MODERN,			// gameset
 	{0,0,0,0,0,0,0,0,0,0},		// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box)
@@ -2903,9 +2955,9 @@ groundInstallationData_t availableGroundInstallations[] =
 	6000						// reloadtime
     },
 
-    {	"SAM Mk3",					// descriptiveName
-	"SAM3",						// tinyName
-	"turret_samup",						// modelName
+    {	"SAM Mk3",				// descriptiveName
+	"SAM",						// tinyName
+	"turret_samup",				// modelName
 	MF_GAMESET_MODERN,			// gameset
 	{0,0,0,0,0,0,0,0,0,0},		// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box)
@@ -2924,7 +2976,7 @@ groundInstallationData_t availableGroundInstallations[] =
 	6000						// reloadtime
     },
 
-    {	"SAM Mk4",					// descriptiveName
+    {	"SAM Mk4",				// descriptiveName
 	"SAM4",						// tinyName
 	"turret_samup",				// modelName
 	MF_GAMESET_MODERN,			// gameset
@@ -2937,6 +2989,69 @@ groundInstallationData_t availableGroundInstallations[] =
 	130,						// health
 	WI_AASAM,					// weapon
 	16,							// ammo
+	4500,						// radar range
+	0,							// radar range ground
+	0,							// trackcone
+	1,							// trackcone ground
+	3,							// upgrades
+	6000						// reloadtime
+    },  
+
+	{	"Flak (modern)",		// descriptiveName
+	"Flak",						// tinyName
+	"turret_samup",				// modelName
+	MF_GAMESET_MODERN,			// gameset
+	{0,0,0,0,0,0,0,0,0,0},		// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box)
+	{0, 0, 0},					// max (bounding box)
+	{45, 45, 0},				// turnspeed around the three axis
+	290,						// maxgunpitch
+	10,							// mingunpitch
+	130,						// health
+	WI_FLAK,					// weapon
+	16,							// ammo
+	4500,						// radar range
+	0,							// radar range ground
+	0,							// trackcone
+	1,							// trackcone ground
+	3,							// upgrades
+	6000						// reloadtime
+    },	
+
+	{	"Flak (ww2)",			// descriptiveName
+	"Flak",						// tinyName
+	"turret_samup",				// modelName
+	MF_GAMESET_WW2,				// gameset
+	{0,0,0,0,0,0,0,0,0,0},		// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box)
+	{0, 0, 0},					// max (bounding box)
+	{45, 45, 0},				// turnspeed around the three axis
+	290,						// maxgunpitch
+	10,							// mingunpitch
+	130,						// health
+	WI_FLAK,					// weapon
+	16,							// ammo
+	4500,						// radar range
+	0,							// radar range ground
+	0,							// trackcone
+	1,							// trackcone ground
+	3,							// upgrades
+	6000						// reloadtime
+    },
+
+	{	"AAA (modern)",			// descriptiveName
+	"AAA",						// tinyName
+	"turret_samup",				// modelName
+	MF_GAMESET_MODERN,			// gameset
+	{0,0,0,0,0,0,0,0,0,0},		// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box)
+	{0, 0, 0},					// max (bounding box)
+	{45, 45, 0},				// turnspeed around the three axis
+	290,						// maxgunpitch
+	10,							// mingunpitch
+	130,						// health
+	WI_MG_20MM,					// weapon
+	5000,						// ammo
 	4500,						// radar range
 	0,							// radar range ground
 	0,							// trackcone
@@ -3105,7 +3220,7 @@ const char *cat_items[MF_MAX_CATEGORIES+1] =
 	"Helicopters",
 	"Infantry",
 	"Boats",
-	0,
+	"Ground Installations",
 	0,
 	0,
 	0
