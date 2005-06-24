@@ -1,5 +1,5 @@
 /*
- * $Id: g_helo.c,v 1.2 2002-07-15 18:23:07 thebjoern Exp $
+ * $Id: g_helo.c,v 1.4 2005-06-26 05:08:12 minkis Exp $
 */
 
 
@@ -13,7 +13,7 @@ void Touch_Helo( gentity_t *self, gentity_t *other, trace_t *trace )
 	// instead of dying on every collision we take damage depending on the speed
 	// with which we crashed into an obstacle, and this should be rather low...
 
-//  G_Damage( self, NULL, self, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH );
+	   G_Damage( self, NULL, self, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 }
 
 

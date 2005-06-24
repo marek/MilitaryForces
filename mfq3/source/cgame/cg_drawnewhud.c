@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.37 2005-06-22 06:00:39 minkis Exp $
+ * $Id: cg_drawnewhud.c,v 1.39 2005-06-26 05:08:11 minkis Exp $
 */
 
 #include "cg_local.h"
@@ -1007,7 +1007,8 @@ static void CG_Draw_Center(int vehicle, int health, int throttle) {
 				CG_DrawPic( 320, 448, 128, height, cgs.media.HUDthrottle_1_ab[throttlepic] ); 
 			} else {
 				if( ( (availableVehicles[vehicle].cat & CAT_GROUND) ||
-					(availableVehicles[vehicle].cat & CAT_BOAT) ) &&
+					(availableVehicles[vehicle].cat & CAT_BOAT) ||
+					(availableVehicles[vehicle].cat & CAT_HELO) ) &&
 					throttlepic >= MF_THROTTLE_MILITARY ) {
 					CG_DrawPic( 320, 448, 128, 32, cgs.media.HUDthrottle_rev[throttlepic-10] ); 
 				} else {
@@ -1781,7 +1782,8 @@ void CG_DrawStatusBar_MFQ3_new( void ) {
 	
 	// stallwarning
 	if( (ps->speed/10 <= availableVehicles[vehicle].stallspeed*1.5 || (cent->currentState.ONOFF & OO_STALLED)) &&
-		!(cent->currentState.ONOFF & OO_LANDED) && ps->stats[STAT_HEALTH] > 0 ) {
+		!(cent->currentState.ONOFF & OO_LANDED) && ps->stats[STAT_HEALTH] > 0 && 
+		availableVehicles[vehicle].cat != CAT_HELO) {
 		float stallscale = 1.0f;
 		if( speed >= stallspeed && !(cent->currentState.ONOFF & OO_STALLED) ) stallscale = 2.0f - ((float)speed/(float)stallspeed);
 		DrawStringNew( 320, 360, stallscale, HUDColors[stallcolor], "STALL!", 0, 0, 3, CENTRE_JUSTIFY );

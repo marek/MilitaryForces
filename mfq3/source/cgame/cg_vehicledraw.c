@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicledraw.c,v 1.8 2005-06-22 06:00:39 minkis Exp $
+ * $Id: cg_vehicledraw.c,v 1.9 2005-06-24 06:43:06 minkis Exp $
 */
 
 #include "cg_local.h"
@@ -547,10 +547,10 @@ refEntity_t	    part[BP_HELO_MAX_PARTS];
 		VectorCopy( drawInfo->basicInfo.origin, part[i].lightingOrigin );
 		AxisCopy( axisDefault, part[i].axis );
 		if( i == BP_HELO_MAINROTOR ) {
-			RotateAroundYaw( part[i].axis, cg.time );
+			RotateAroundYaw( part[i].axis, cg.time*1.25 );
 		}
 		if( i == BP_HELO_TAILROTOR ) {
-			RotateAroundPitch( part[i].axis, cg.time );
+			RotateAroundPitch( part[i].axis, cg.time*1.25 );
 		}
 		CG_PositionRotatedEntityOnTag( &part[i], &part[BP_HELO_BODY], veh->handle[BP_HELO_BODY], helo_tags[i] );
 		part[i].shadowPlane = shadowPlane;

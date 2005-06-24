@@ -1,5 +1,5 @@
 /*
- * $Id: g_missile.c,v 1.28 2005-06-22 06:00:41 minkis Exp $
+ * $Id: g_missile.c,v 1.29 2005-06-24 06:43:06 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1178,29 +1178,10 @@ void fire_autocannon_GI (gentity_t *self) {
 	float		spreadY = spreadX;
 
 	// used for spread
-	VectorCopy( self->s.angles, spreadangle );
-	spreadX = ((rand() % (unsigned int)spreadX) - spreadX/2)/10;
-	spreadY = ((rand() % (unsigned int)spreadY) - spreadY/2)/10;
-	spreadangle[0] += spreadX;
-	spreadangle[1] += spreadY;
-//	G_Printf( "spread %.1f %.1f\n", spreadX, spreadY );
-
+	VectorSubtract( self->tracktarget->r.currentOrigin, self->r.currentOrigin, dir );
+	VectorNormalize(dir);
 	VectorCopy( self->s.pos.trBase, start );
-
-		// use this to make it shoot where the player looks
-//		AngleVectors( self->client->ps.viewangles, dir, 0, 0 );
-//		VectorCopy( self->s.pos.trBase, start );
-//		start[2] += availableVehicles[self->client->vehicle].maxs[2];
-		// otherwise use this
-		AngleVectors( spreadangle, forward, right, up );
-		RotatePointAroundVector( temp, up, forward, ((float)self->s.angles[1])/10 );
-		CrossProduct( up, temp, right );
-		RotatePointAroundVector( dir, right, temp, ((float)self->s.angles[1])/10 );
-
-
-	VectorMA( start, offset[0], dir, start );
-	VectorMA( start, offset[1], right, start );
-	VectorMA( start, offset[2], up, start );
+	start[2] += 10;
 	SnapVector( start );
 
 	bolt = G_Spawn();

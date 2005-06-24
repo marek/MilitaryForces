@@ -1,5 +1,5 @@
 /*
- * $Id: cg_helo.c,v 1.4 2005-06-22 06:00:39 minkis Exp $
+ * $Id: cg_helo.c,v 1.5 2005-06-24 06:43:06 minkis Exp $
 */
 
 
@@ -114,9 +114,10 @@ CG_Plane
 void CG_Helo( centity_t *cent, clientInfo_t *ci ) 
 {
 	vec3_t			velocity;	
-	vec3_t			smokePosition, forward;
+	vec3_t			smokePosition, forward, right, up, temp, start;
 	DrawInfo_Helo_t drawInfo;
 	int				ONOFF = cent->currentState.ONOFF;
+	int				i;
 
 	memset( &drawInfo, 0, sizeof(drawInfo) );
 	drawInfo.basicInfo.vehicleIndex = ci->vehicle;
@@ -140,13 +141,33 @@ void CG_Helo( centity_t *cent, clientInfo_t *ci )
 	// throttle
 	drawInfo.basicInfo.throttle = cent->currentState.frame;
 
-    // add the talk baloon or disconnect icon
-//    CG_PlayerSprites( cent );
-    
-
-
 	// loadout
 	drawInfo.basicInfo.loadout = &cg_loadouts[cent->currentState.number];
+
+    // turrets
+	for( i = 0; i < 4; ++i ) {
+		float yaw = cent->currentState.angles2[ROLL];
+		float pitch = cent->currentState.angles2[PITCH];
+		float max, min;
+		if( yaw > 180 ) yaw -= 360;
+		max = availableWeapons[availableVehicles[ci->vehicle].weapons[i+1]].maxturns[1];
+		min = availableWeapons[availableVehicles[ci->vehicle].weapons[i+1]].minturns[1];
+		if( max > min ) {
+			if( yaw > max ) yaw = max;
+			else if( yaw < min ) yaw = min;
+		} else {
+			if( yaw > 0 && yaw < min ) yaw = min;
+			else if( yaw < 0 && yaw > max ) yaw = max;
+		}
+		if( pitch > 180 ) pitch -= 360;
+		max = availableWeapons[availableVehicles[ci->vehicle].weapons[i+1]].maxturns[0];
+		min = availableWeapons[availableVehicles[ci->vehicle].weapons[i+1]].minturns[0];
+		if( pitch > max ) pitch = max;
+		else if( pitch < min ) pitch = min;
+		drawInfo.turretAngle[i] = yaw;
+		drawInfo.gunAngle[i] = pitch;
+	}
+
 
 	// smoke
 	if( cent->currentState.generic1 ) {
@@ -156,7 +177,7 @@ void CG_Helo( centity_t *cent, clientInfo_t *ci )
 	}
 
 	
-	// draw plane
+	// draw helo
 	CG_DrawHelo(&drawInfo);
 
 	// flags
@@ -238,67 +259,50 @@ void CG_Helo( centity_t *cent, clientInfo_t *ci )
 				reticlelock.hModel = cgs.media.reticle[ availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshairlock ];
 				reticlelock.frame = 1;
 			}
-			else
-			{
-				memset( &reticlelock, 0, sizeof(reticlelock) );	
-				reticlelock.customShader = availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshairtrack;
-				reticlelock.hModel = cgs.media.reticle[ availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshairtrack ];
-				VectorSet( ang, cent->currentState.angles[0], cent->currentState.angles[1], 0 );
-				AnglesToAxis( ang, reticlelock.axis );
-				VectorScale( reticlelock.axis[0], 0.5f, reticlelock.axis[0] );
-				VectorScale( reticlelock.axis[1], 0.5f, reticlelock.axis[1] );
-				VectorScale( reticlelock.axis[2], 0.5f, reticlelock.axis[2] );
-				reticlelock.nonNormalizedAxes = qtrue;
-				AngleVectors(cent->currentState.angles, forward, 0, 0);
-				VectorMA( cent->lerpOrigin, 2000, forward, end );
-				CG_Trace( &tr, cent->lerpOrigin, 0, 0, end, cg.snap->ps.clientNum, MASK_SOLID ); 
-				VectorCopy( tr.endpos, end );
-				CG_Trace( &tr, cg.refdef.vieworg, 0, 0, end, cg.snap->ps.clientNum, MASK_SOLID ); 
-				VectorSubtract( tr.endpos, cg.refdef.vieworg, forward );
-				len = VectorNormalize(forward);
-				if( len > mindist ) {
-					VectorMA( cg.refdef.vieworg, mindist, forward, reticlelock.origin );
-				} else {
-					VectorMA( cg.refdef.vieworg, len - 5, forward, reticlelock.origin );
-				}
-				VectorCopy( reticlelock.origin, reticlelock.lightingOrigin );
-				reticlelock.renderfx = RF_LIGHTING_ORIGIN|RF_SHADOW_PLANE;
-				reticlelock.frame = 1;
-			}
-			
-			CG_AddReticleEntityToScene( &reticlelock, NULL );
 		}
 		else
 		{
 			reticle.customShader = availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshair;
-			reticle.hModel = cgs.media.reticle[ availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshair ];
-			VectorSet( ang, cent->currentState.angles[0], cent->currentState.angles[1], 0 );
+			reticle.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshair];
+
+			AngleVectors( cent->currentState.angles, forward, right, up );
+			RotatePointAroundVector( temp, up, forward, cent->currentState.angles2[ROLL] );
+			CrossProduct( up, temp, right );
+			RotatePointAroundVector( forward, right, temp, cent->currentState.angles2[PITCH] );
+			VectorMA( cent->lerpOrigin, availableVehicles[ci->vehicle].gunoffset[0], forward, start );
+			VectorMA( start, availableVehicles[ci->vehicle].gunoffset[1], right, start );
+			VectorMA( start, availableVehicles[ci->vehicle].gunoffset[2], up, start );
+			VectorMA( start, 2000, forward, end );
+			vectoangles( forward, ang );
+			ang[2] = 0;
 			AnglesToAxis( ang, reticle.axis );
-			VectorScale( reticle.axis[0], 2.0f, reticle.axis[0] );
-			VectorScale( reticle.axis[1], 2.0f, reticle.axis[1] );
-			VectorScale( reticle.axis[2], 2.0f, reticle.axis[2] );
-			reticle.nonNormalizedAxes = qtrue;
-			AngleVectors(cent->currentState.angles, forward, 0, 0);
-			VectorMA( cent->lerpOrigin, 2000, forward, end );
-			CG_Trace( &tr, cent->lerpOrigin, 0, 0, end, cg.snap->ps.clientNum, MASK_SOLID ); 
-			if ( tr.entityNum < MAX_CLIENTS ) {
+			CG_Trace( &tr, start, 0, 0, end, cg.snap->ps.clientNum, MASK_SOLID ); 
+
+			if( tr.entityNum < MAX_CLIENTS )
+			{
 				cg.crosshairClientNum = tr.entityNum;
 				cg.crosshairClientTime = cg.time;
 			}
+
 			VectorCopy( tr.endpos, end );
 			CG_Trace( &tr, cg.refdef.vieworg, 0, 0, end, cg.snap->ps.clientNum, MASK_SOLID ); 
 			VectorSubtract( tr.endpos, cg.refdef.vieworg, forward );
 			len = VectorNormalize(forward);
-			if( len > mindist ) {
+			
+			if( len > mindist )
+			{
 				VectorMA( cg.refdef.vieworg, mindist, forward, reticle.origin );
-			} else {
+			}
+			else
+			{
 				VectorMA( cg.refdef.vieworg, len - 5, forward, reticle.origin );
 			}
+
 			VectorCopy( reticle.origin, reticle.lightingOrigin );
 			reticle.renderfx = RF_LIGHTING_ORIGIN|RF_SHADOW_PLANE;
-
+			
 			CG_AddReticleEntityToScene( &reticle, NULL );
-		}
+			}
 	}
 }
 

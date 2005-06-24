@@ -1,5 +1,5 @@
 /*
- * $Id: q_shared.h,v 1.14 2003-04-02 13:13:14 thebjoern Exp $
+ * $Id: q_shared.h,v 1.16 2005-06-26 05:08:12 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -338,6 +338,13 @@ MATHLIB
 ==============================================================
 */
 
+#ifndef min
+#define min(a, b)	(a) < (b) ? a : b
+#endif
+
+#ifndef max	
+#define max(a, b)	(a) > (b) ? a : b
+#endif
 
 typedef float vec_t;
 typedef vec_t vec2_t[2];
