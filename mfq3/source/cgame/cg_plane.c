@@ -1,5 +1,5 @@
 /*
- * $Id: cg_plane.c,v 1.33 2003-09-05 00:33:44 minkis Exp $
+ * $Id: cg_plane.c,v 1.35 2005-06-26 05:08:11 minkis Exp $
 */
 
 
@@ -92,9 +92,6 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 
 	// throttle
 	drawInfo.basicInfo.throttle = cent->currentState.frame;
-
-    // add the talk baloon or disconnect icon
-//    CG_PlayerSprites( cent );
     
 	// control surfaces
 	drawInfo.controlFrame = cent->currentState.vehicleAnim;

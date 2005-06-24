@@ -1,5 +1,5 @@
 /*
- * $Id: bg_helomove.c,v 1.3 2005-06-22 06:00:40 minkis Exp $
+ * $Id: bg_helomove.c,v 1.4 2005-06-24 06:43:06 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -14,7 +14,7 @@ extern pml_t		pml;
 
 /*
 ===================
-PM_Plane_FuelFlow
+PM_Helo_FuelFlow
 
 ===================
 */
@@ -22,9 +22,6 @@ PM_Plane_FuelFlow
 static void PM_Helo_FuelFlow( int throttle )
 {
 	int fuelflow = (20 - throttle) * 1000;
-
-	// afterburner takes additional fuel
-	if( throttle > 10 ) fuelflow -= 4000;
 
 	if( pm->cmd.serverTime < pm->ps->timers[TIMER_FUEL] + fuelflow ) {
 		return;
@@ -48,69 +45,45 @@ PM_HeloAccelerate
 static void PM_HeloAccelerate()
 {
     float	throttle = pm->ps->fixed_throttle;
-    float	topspeed = availableVehicles[pm->vehicle].maxspeed;
     int		maxthrottle = availableVehicles[pm->vehicle].maxthrottle;
 	int		minthrottle = availableVehicles[pm->vehicle].minthrottle;
-    float	currspeed = (float)pm->ps->speed/10;
-    float	stallspeed = (float)availableVehicles[pm->vehicle].stallspeed;
-    float	accel = availableVehicles[pm->vehicle].accel * pml.frametime/3;
-    float	decel = accel;
+	int		maxforwardspeed = availableVehicles[pm->vehicle].maxspeed;
+	int		maxrightspeed = availableVehicles[pm->vehicle].turnspeed[YAW];
+	int		maxliftspeed = maxforwardspeed*0.00525;
+	int		maxspeed = sqrt(maxforwardspeed*maxforwardspeed + maxrightspeed*maxrightspeed + maxliftspeed*maxliftspeed);
+	float	stallspeed = (float)availableVehicles[pm->vehicle].stallspeed;
+	float	curforwardspeed;
+	float	curliftspeed;
+	float	curliftspeedadjust;
+	float	currightspeed;
+	float	curspeed;
+	float	curspeedadjust;
+	float	totalthrottle;
+	vec3_t	vehdir;
+	
+	// Copy Vehicle Direction
+	VectorCopy( pm->ps->vehicleAngles, vehdir );
 
-    float	acceleration;
+	curforwardspeed = (vehdir[PITCH]/45)*availableVehicles[pm->vehicle].maxspeed;
+	currightspeed = (vehdir[ROLL]/45)*availableVehicles[pm->vehicle].turnspeed[YAW];
+	curliftspeed = throttle > maxthrottle ? -(throttle-maxthrottle) : throttle * 25;	// real vert speed	
+	curliftspeedadjust = throttle > maxthrottle ? 0 : throttle * 25;					// adjusted vert speed, don't want down movement to effect fuel usage "more"
+	curspeed = sqrt(curforwardspeed*curforwardspeed + currightspeed*currightspeed + curliftspeed*curliftspeed);						// real total speed
+	curspeedadjust = sqrt(curforwardspeed*curforwardspeed + currightspeed*currightspeed + curliftspeedadjust*curliftspeedadjust);	// adjusted total speed, dont want down movement to effect throttle more
+	totalthrottle = (curspeedadjust/maxspeed)*10;
 
-	// check for overriding throttle
-	if( pm->ps->stats[STAT_HEALTH] > 0 ) {
-		if( pm->cmd.forwardmove > 0 ) throttle = maxthrottle;
-		else if( pm->cmd.forwardmove < 0 ) throttle = minthrottle;
+	// check for fuel 
+	if( pm->ps->stats[STAT_FUEL] <= 0 ) { 
+		pm->ps->throttle = 0;
 	}
 
-	// check for fuel
-	if( pm->ps->stats[STAT_FUEL] <= 0 ) throttle = 0;
+	if( (pm->ps->ONOFF & OO_LANDED) && curspeed > stallspeed * 1.5f ) 
+		curspeed = stallspeed *1.5f;
 
-	// set it back
-	pm->ps->throttle = throttle;
-
-    // accel depends on thrust
-    accel *= ( 1 + ( throttle - maxthrottle ) / maxthrottle );
-	if( throttle > 10 ) accel *= (throttle/10);
-
-    // decel depends on speed
-    decel *= ( 1 + ( currspeed - topspeed ) / topspeed);
-	if( currspeed > topspeed ) decel *= (currspeed/topspeed);
-	// decel depends on gear/brakes
-	if( pm->ps->ONOFF & OO_SPEEDBRAKE ) {
-		decel *= 1.7f;
-	}
-	if( pm->ps->ONOFF & OO_GEAR ) {
-		decel *= 1.1f;
-	}
-	if( pm->ps->ONOFF & OO_LANDED ) {
-		float factor = (stallspeed - currspeed) / stallspeed;
-		if( factor > 0 ) {
-			decel *= factor+1;
-		}
-		accel *= 0.8f;
-	}
-    acceleration = accel - decel;
-
-    // accel depens on angle
-    acceleration += pm->ps->vehicleAngles[0]/90;
-
-    currspeed += acceleration;
-    if( currspeed < 0 )
-		currspeed = 0;
-
-	if( (pm->ps->ONOFF & OO_LANDED) && currspeed > stallspeed * 1.5f ) 
-		currspeed = stallspeed *1.5f;
-
-    if( currspeed <= stallspeed ) {
-		pm->ps->ONOFF |= OO_STALLED;
-    }
-
-    pm->ps->speed = currspeed*10;
+    pm->ps->speed = curspeed*10;
 
 	// fuel flow
-	PM_Helo_FuelFlow( throttle );
+	PM_Helo_FuelFlow( totalthrottle );
 
 }
 
@@ -133,6 +106,19 @@ void PM_HeloMove( void )
 	qboolean	verydead = (pm->ps->stats[STAT_HEALTH] <= GIB_HEALTH);
     int		i;
 	int		anim = 0;
+	// Speed related stuff
+    float	throttle = pm->ps->fixed_throttle;
+    int		maxthrottle = availableVehicles[pm->vehicle].maxthrottle;
+	int		maxforwardspeed = availableVehicles[pm->vehicle].maxspeed;
+	int		maxrightspeed = availableVehicles[pm->vehicle].turnspeed[YAW];
+	int		maxliftspeed = maxforwardspeed*0.00525;
+	int		maxspeed = sqrt(maxforwardspeed*maxforwardspeed + maxrightspeed*maxrightspeed + maxliftspeed*maxliftspeed);
+	float	curforwardspeed;
+	float	curliftspeed;
+	float	currightspeed;
+	float	curspeed = pm->ps->speed;
+	vec3_t  forwardvel,rightvel, liftvel, deltavel;
+
 
 	if( verydead ) return;
 
@@ -142,9 +128,16 @@ void PM_HeloMove( void )
     // local vectors
     VectorCopy( pm->ps->vehicleAngles, vehdir );
 	if( pm->ps->ONOFF & OO_LANDED ) vehdir[0] = 0;
+
+	// Set current speeds
+	curforwardspeed = (vehdir[PITCH]/45)*availableVehicles[pm->vehicle].maxspeed;
+	currightspeed = (vehdir[ROLL]/45)*availableVehicles[pm->vehicle].turnspeed[YAW];
+	curliftspeed = throttle > maxthrottle ? -(throttle-maxthrottle)*20 : throttle * 25;	
+	
 	// freelook - plane keeps current heading
 	if( (pm->cmd.buttons & BUTTON_FREELOOK) && !dead ) {
 		VectorCopy( vehdir, viewdir );
+		viewdir[0] = 0;
 	}
 	else { // normal - plane follows camera
 		VectorCopy( pm->ps->viewangles, viewdir );
@@ -160,8 +153,10 @@ void PM_HeloMove( void )
 		if( pm->ps->vehicleAngles[PITCH] < 70 ) {
 			pm->ps->vehicleAngles[PITCH] += 40 * pml.frametime; // nose drops at 60 deg/sec
 		}
+
 		AngleVectors( pm->ps->vehicleAngles, pm->ps->velocity, NULL, NULL );
 		VectorScale( pm->ps->velocity, (float)pm->ps->speed/10, pm->ps->velocity );
+
 		// dirty trick to remember bankangle
 		if( pm->ps->vehicleAngles[2] <= 0 ) {
 			pm->ps->vehicleAngles[2] -= availableVehicles[pm->vehicle].turnspeed[2]/2 * pml.frametime;
@@ -214,67 +209,49 @@ void PM_HeloMove( void )
 	}
 	// air movement
 	else {
-	    // stalled
-	    if( pm->ps->ONOFF & OO_STALLED ) {
-			if( vehdir[PITCH] < 50 ) vehdir[PITCH] += turnspeed[PITCH];
-			if( vehdir[ROLL] < -5 ) vehdir[YAW] += turnspeed[YAW];
-			else if( vehdir[ROLL] > 5 ) vehdir[YAW] -= turnspeed[YAW];
+		// yaw
+		diff[YAW] = viewdir[YAW] - vehdir[YAW];
+		if( diff[YAW] > 180 ) diff[YAW] -= 360;
+		else if( diff[YAW] < -180 ) diff[YAW] += 360;
+		if( diff[YAW] < -turnspeed[YAW] ) vehdir[YAW] -= turnspeed[YAW];
+		else if( diff[YAW] > turnspeed[YAW] ) vehdir[YAW] += turnspeed[YAW];
+		else vehdir[YAW] = viewdir[YAW];
 
-			if( viewdir[PITCH] >= vehdir[PITCH]  ) {//&&
-				pm->ps->ONOFF &= ~OO_STALLED;
-			}
-	    }
-	    // normal flight
-	    else {
-			// yaw/pitch
-			for( i = PITCH; i <= YAW; i++ ) {
-				diff[i] = viewdir[i] - vehdir[i];
-    
-				if( diff[i] > 180 ) diff[i] -= 360;
-				else if( diff[i] < -180 ) diff[i] += 360;
+		if( pm->ps->stats[STAT_HEALTH] > 0 ) {
 
-				if( diff[i] < -turnspeed[i] ) vehdir[i] -= turnspeed[i];
-				else if( diff[i] > turnspeed[i] ) vehdir[i] += turnspeed[i];
-				else vehdir[i] = viewdir[i];
-			}
+		// pitch
 
-			// roll
-			if( diff[YAW] > 1 ) targroll = -90;
-			else if( diff[YAW] < -1 ) targroll = 90;
-			else targroll = 0;
+		if(pm->cmd.forwardmove > 0)
+			vehdir[PITCH] += turnspeed[PITCH]*1.25;
+		else if(pm->cmd.forwardmove < 0)
+			vehdir[PITCH] -= turnspeed[PITCH]*1.25;
+		else if(vehdir[PITCH] > 0)
+			vehdir[PITCH] -= min(vehdir[PITCH], turnspeed[PITCH]*1.05);
+		else if(vehdir[PITCH] < 0)
+			vehdir[PITCH] += max(vehdir[PITCH], turnspeed[PITCH]*1.05);
 
-			diff[ROLL] = targroll - vehdir[ROLL];
-
-			if( diff[ROLL] < -turnspeed[ROLL] ) vehdir[ROLL] -= turnspeed[ROLL];
-			else if( diff[ROLL] > turnspeed[ROLL] ) vehdir[ROLL] += turnspeed[ROLL];
-			else vehdir[ROLL] = targroll;
-
-			// animations dependent on movement
-			if( diff[PITCH] < -8 || diff[YAW] > 8 || diff[YAW] < -8 ) {	// up
-				anim = 3;
-				// vapor effect on positive Gs
-				if( availableVehicles[pm->vehicle].caps & HC_VAPOR ) {
-					int speed = pm->ps->speed/10;
-					if( diff[PITCH] < -70 || diff[YAW] > 70 || diff[YAW] < -70 ) {
-						if( speed < availableVehicles[pm->vehicle].stallspeed * SPEED_GREEN_ARC &&
-							speed > availableVehicles[pm->vehicle].stallspeed * SPEED_YELLOW_ARC ) {
-							pm->ps->ONOFF |= OO_VAPOR;
-						}
-					}
-				}
-			}
-			else if( diff[PITCH] > 8 ) { // down
-				anim = 6;
-			}
-			if( diff[ROLL] < -8 ) {
-				anim++;
-			}
-			else if( diff[ROLL] > 8 ) {
-				anim += 2;
-			}
-			pm->ps->vehicleAnim = anim;
-
+		// roll
+		if(pm->cmd.rightmove > 0)
+			vehdir[ROLL] += turnspeed[ROLL]*2;
+		else if(pm->cmd.rightmove < 0)
+			vehdir[ROLL] -= turnspeed[ROLL]*2;
 		}
+
+		// limit roll and pitch
+		vehdir[PITCH] = vehdir[PITCH] < 0 ? max(-45, vehdir[PITCH]) : min (45, vehdir[PITCH]);
+		vehdir[ROLL] = vehdir[ROLL] < 0 ? max(-45, vehdir[ROLL]) : min (45, vehdir[ROLL]);
+
+		if( diff[YAW] > 1 ) targroll = -90;
+		else if( diff[YAW] < -1 ) targroll = 90;
+		else targroll = 0;
+
+		diff[ROLL] = targroll - vehdir[ROLL];
+
+		if( diff[ROLL] < -turnspeed[ROLL] ) vehdir[ROLL] -= turnspeed[ROLL];
+		else if( diff[ROLL] > turnspeed[ROLL] ) vehdir[ROLL] += turnspeed[ROLL];
+		else vehdir[ROLL] = targroll;
+
+
 		if( (availableVehicles[pm->vehicle].caps & HC_GEAR) && (pm->ps->ONOFF & OO_GEAR) &&
 			(pm->ps->speed > availableVehicles[pm->vehicle].stallspeed * 10 * SPEED_GREEN_ARC) &&
 			!pm->ps->timers[TIMER_GEARANIM] ) {
@@ -291,10 +268,31 @@ void PM_HeloMove( void )
 	// return angles
 	VectorCopy( vehdir, pm->ps->vehicleAngles );
 
+	// Forward speed
+	VectorCopy(vehdir, forwardvel);
+	forwardvel[PITCH] = 0;				// Don't let vehicle angels effect verticle acceleration
+	AngleVectors(forwardvel, forwardvel, NULL, NULL );
+	VectorScale(forwardvel, curforwardspeed, forwardvel);
+
+	// Sideways speed
+	VectorCopy(vehdir,  rightvel);
+	rightvel[PITCH] = rightvel[ROLL] = 0;
+	AngleVectors( rightvel,  NULL, rightvel, NULL );
+	VectorScale( rightvel, currightspeed*2.5, rightvel );
+
+	// Lift Speed
+	VectorCopy(vehdir,  liftvel);
+	liftvel[PITCH] = liftvel[YAW] = 0;
+	AngleVectors( liftvel, NULL , NULL, liftvel );
+	VectorScale( liftvel, curliftspeed, liftvel );
+
 	// speed
 	if( pm->ps->ONOFF & OO_LANDED ) vehdir[0] = 0;
-	AngleVectors( vehdir, pm->ps->velocity, NULL, NULL );
-	VectorScale( pm->ps->velocity, (float)pm->ps->speed/10, pm->ps->velocity );
+	
+	VectorAdd(forwardvel,rightvel,deltavel);
+	VectorAdd(liftvel,deltavel,deltavel);
+
+	VectorCopy(deltavel, pm->ps->velocity);
 
 	PM_SlideMove_Helo();
 }
@@ -350,8 +348,12 @@ qboolean	PM_SlideMove_Helo() {
 	float		time_left;
 	float		into;
 	vec3_t		endVelocity;
+	vec3_t		liftVelocity;
 	vec3_t		endClipVelocity;
-	
+	float		maxthrottle = availableVehicles[pm->vehicle].maxthrottle;
+	float		minthrottle = availableVehicles[pm->vehicle].minthrottle;
+    float		throttle = pm->ps->fixed_throttle;
+
 	numbumps = 4;
 
 	VectorCopy (pm->ps->velocity, primal_velocity);
@@ -371,9 +373,7 @@ qboolean	PM_SlideMove_Helo() {
 	numplanes++;
 
 	for ( bumpcount=0 ; bumpcount < numbumps ; bumpcount++ ) {
-
-		// calculate position we are trying to move to
-		VectorMA( pm->ps->origin, time_left, pm->ps->velocity, end );
+		VectorMA(pm->ps->origin, time_left, pm->ps->velocity, end );			// calculate position we are trying to move to
 
 		// see if we can make it there
 		pm->trace ( &trace, 

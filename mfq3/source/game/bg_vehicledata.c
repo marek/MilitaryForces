@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.57 2005-06-22 06:00:40 minkis Exp $
+ * $Id: bg_vehicledata.c,v 1.58 2005-06-24 06:43:06 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -2823,7 +2823,7 @@ completeVehicleData_t availableVehicles[] =
 	{0, 100, 30},				// camera distance {min,max,default}
 	{0, 100, 10},				// camera height {min,max,default}
 	0,							// stallspeed
-	500,						    // maxspeed
+	300,						// maxspeed
 	-5,							// min throttle
 	10,						    // max throttle
 	1,							// engines
@@ -2835,9 +2835,9 @@ completeVehicleData_t availableVehicles[] =
 	160,						// max fuel
 	285,						// max gun pitch (upwards = negative) <- gearheight
 	5,							// min gun pitch (downwards = positive) <- tailangle
-	WI_MG_14_5MM, WI_STINGER, WI_HELLFIRE, 0, 0, 0, 0, WI_CFLARE,// weapons
-	600, 2, 4, 0, 0, 0, 0, 20,	// ammo
-	0,0,0,0,0,0,0,0,			// turret
+	0, WI_MGT_2X30MM, WI_STINGER, WI_HELLFIRE, 0, 0, 0, WI_CFLARE,// weapons
+	0, 2, 4, 0, 0, 0, 0, 20,	// ammo
+	1,2,0,0,0,0,0,0,			// turret
 	{0, 0, 10},					// cameraposition for cockpit view
 	0,							// effect model
 	8000,						// radar range

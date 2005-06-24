@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.65 2005-06-22 06:00:39 minkis Exp $
+ * $Id: cg_local.h,v 1.66 2005-06-24 06:43:06 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -946,6 +946,8 @@ typedef struct {
 
 typedef struct {
     BasicDrawInfo_t		basicInfo;
+	float				turretAngle[4];
+	float				gunAngle[4];
 } DrawInfo_Helo_t;
 
 typedef struct {
