@@ -1,5 +1,5 @@
 /*
- * $Id: bg_helomove.c,v 1.5 2005-06-26 05:08:12 minkis Exp $
+ * $Id: bg_helomove.c,v 1.6 2005-06-26 23:47:07 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -9,8 +9,9 @@
 extern pmove_t		*pm;
 extern pml_t		pml;
 
-
-
+#define MAX_HELO_PITCH		30
+#define MAX_HELO_ROLL		40
+#define MAX_HELO_TARGROLL	20	
 
 /*
 ===================
@@ -64,8 +65,8 @@ static void PM_HeloAccelerate()
 	// Copy Vehicle Direction
 	VectorCopy( pm->ps->vehicleAngles, vehdir );
 
-	curforwardspeed = (vehdir[PITCH]/45)*availableVehicles[pm->vehicle].maxspeed;
-	currightspeed = (vehdir[ROLL]/45)*availableVehicles[pm->vehicle].turnspeed[YAW];
+	curforwardspeed = (vehdir[PITCH]/MAX_HELO_PITCH)*availableVehicles[pm->vehicle].maxspeed;
+	currightspeed = (vehdir[ROLL]/MAX_HELO_ROLL)*availableVehicles[pm->vehicle].turnspeed[YAW];
 	curliftspeed = throttle > maxthrottle ? -(throttle-maxthrottle) : throttle * 25;	// real vert speed	
 	curliftspeedadjust = throttle > maxthrottle ? 0 : throttle * 25;					// adjusted vert speed, don't want down movement to effect fuel usage "more"
 	curspeed = sqrt(curforwardspeed*curforwardspeed + currightspeed*currightspeed + curliftspeed*curliftspeed);						// real total speed
@@ -142,10 +143,34 @@ void PM_HeloMove( void )
     VectorCopy( pm->ps->vehicleAngles, vehdir );
 	if( pm->ps->ONOFF & OO_LANDED ) vehdir[0] = 0;
 
-	// Set current speeds
-	curforwardspeed = (vehdir[PITCH]/45)*availableVehicles[pm->vehicle].maxspeed;
-	currightspeed = (vehdir[ROLL]/45)*availableVehicles[pm->vehicle].turnspeed[YAW];
+	//
+	// Set current speeds (Do it here to allow more realistic crash)
+	//
+	curforwardspeed = (vehdir[PITCH]/MAX_HELO_PITCH)*availableVehicles[pm->vehicle].maxspeed;
+	currightspeed = (vehdir[ROLL]/MAX_HELO_ROLL)*availableVehicles[pm->vehicle].turnspeed[YAW];
 	curliftspeed = throttle > maxthrottle ? -(throttle-maxthrottle)*20 : throttle * 25;	
+			// Forward speed
+			VectorCopy(vehdir, forwardvel);
+			forwardvel[PITCH] = 0;				// Don't let vehicle angels effect verticle acceleration
+			AngleVectors(forwardvel, forwardvel, NULL, NULL );
+			VectorScale(forwardvel, curforwardspeed, forwardvel);
+
+			// Sideways speed
+			VectorCopy(vehdir,  rightvel);
+			rightvel[PITCH] = rightvel[ROLL] = 0;
+			AngleVectors( rightvel,  NULL, rightvel, NULL );
+			VectorScale( rightvel, currightspeed*2.5, rightvel );
+
+			// Lift Speed
+			VectorCopy(vehdir,  liftvel);
+			liftvel[PITCH] = liftvel[YAW] = 0;
+			AngleVectors( liftvel, NULL , NULL, liftvel );
+			VectorScale( liftvel, curliftspeed, liftvel );
+
+			// speed
+			VectorAdd(forwardvel,rightvel,deltavel);
+			VectorAdd(liftvel,deltavel,deltavel);
+			VectorCopy(deltavel, pm->ps->velocity);
 	
 	// freelook - plane keeps current heading
 	if( (pm->cmd.buttons & BUTTON_FREELOOK) && !dead ) {
@@ -164,21 +189,19 @@ void PM_HeloMove( void )
 	PM_HeloAccelerate();
 
     if( dead ) {
-		if( pm->ps->vehicleAngles[PITCH] < 70 ) {
-			pm->ps->vehicleAngles[PITCH] += 40 * pml.frametime; // nose drops at 60 deg/sec
-		}
+		pm->ps->vehicleAngles[PITCH] = 30*sin(pm->ps->origin[2]/25);
+		pm->ps->vehicleAngles[ROLL] = 20*sin(pm->ps->origin[2]/50);	
 
-		AngleVectors( pm->ps->vehicleAngles, pm->ps->velocity, NULL, NULL );
-		VectorScale( pm->ps->velocity, (float)pm->ps->speed/10, pm->ps->velocity );
+		pm->ps->velocity[ROLL] = -DEFAULT_GRAVITY/10;
 
 		// dirty trick to remember bankangle
-		if( pm->ps->vehicleAngles[2] <= 0 ) {
-			pm->ps->vehicleAngles[2] -= availableVehicles[pm->vehicle].turnspeed[2]/2 * pml.frametime;
-			if( pm->ps->vehicleAngles[2] < -360 ) pm->ps->vehicleAngles[2] += 360;
+		if( pm->ps->vehicleAngles[1] <= 0 ) {
+			pm->ps->vehicleAngles[1] -= availableVehicles[pm->vehicle].turnspeed[1]*1.3 * pml.frametime;
+			if( pm->ps->vehicleAngles[1] < -360 ) pm->ps->vehicleAngles[1] += 360;
 		}
 		else {
-			pm->ps->vehicleAngles[2] += availableVehicles[pm->vehicle].turnspeed[2]/2 * pml.frametime;
-			if( pm->ps->vehicleAngles[2] > 360 ) pm->ps->vehicleAngles[2] -= 360;
+			pm->ps->vehicleAngles[1] += availableVehicles[pm->vehicle].turnspeed[1]*1.3 * pml.frametime;
+			if( pm->ps->vehicleAngles[1] > 360 ) pm->ps->vehicleAngles[1] -= 360;
 		}
 		PM_SlideMove_Helo();
 		return;
@@ -228,7 +251,7 @@ void PM_HeloMove( void )
 		if( diff[YAW] > 180 ) diff[YAW] -= 360;
 		else if( diff[YAW] < -180 ) diff[YAW] += 360;
 		if( diff[YAW] < -turnspeed[YAW] ) vehdir[YAW] -= turnspeed[YAW];
-		else if( diff[YAW] > turnspeed[YAW] ) vehdir[YAW] += turnspeed[YAW];
+		else if( diff[YAW] > turnspeed[YAW]) vehdir[YAW] += turnspeed[YAW];
 		else vehdir[YAW] = viewdir[YAW];
 
 		if( pm->ps->stats[STAT_HEALTH] > 0 ) {
@@ -251,20 +274,20 @@ void PM_HeloMove( void )
 			vehdir[ROLL] -= turnspeed[ROLL]*2;
 		}
 
-		// limit roll and pitch
-		vehdir[PITCH] = vehdir[PITCH] < 0 ? max(-45, vehdir[PITCH]) : min (45, vehdir[PITCH]);
-		vehdir[ROLL] = vehdir[ROLL] < 0 ? max(-45, vehdir[ROLL]) : min (45, vehdir[ROLL]);
-
-		if( diff[YAW] > 1 ) targroll = -90;
-		else if( diff[YAW] < -1 ) targroll = 90;
+		
+		// handle roll dependended on yaw otherwise return the vehicle ROLL to normal
+		if( diff[YAW] > 1 ) targroll = -MAX_HELO_TARGROLL;
+		else if( diff[YAW] < -1 ) targroll = MAX_HELO_TARGROLL;
 		else targroll = 0;
-
 		diff[ROLL] = targroll - vehdir[ROLL];
-
 		if( diff[ROLL] < -turnspeed[ROLL] ) vehdir[ROLL] -= turnspeed[ROLL];
 		else if( diff[ROLL] > turnspeed[ROLL] ) vehdir[ROLL] += turnspeed[ROLL];
-		else vehdir[ROLL] = targroll;
+		else if( vehdir[ROLL] > 0 && vehdir[ROLL] < turnspeed[ROLL]) vehdir[ROLL] = 0;
+		else if( vehdir[ROLL] < 0 && vehdir[ROLL] > -turnspeed[ROLL]) vehdir[ROLL] = 0;
 
+		// limit roll and pitch
+		vehdir[PITCH] = vehdir[PITCH] < 0 ? max(-MAX_HELO_PITCH, vehdir[PITCH]) : min (MAX_HELO_PITCH, vehdir[PITCH]);
+		vehdir[ROLL] = vehdir[ROLL] < 0 ? max(-MAX_HELO_ROLL, vehdir[ROLL]) : min (MAX_HELO_ROLL, vehdir[ROLL]);
 
 		if( (availableVehicles[pm->vehicle].caps & HC_GEAR) && (pm->ps->ONOFF & OO_GEAR) &&
 			(pm->ps->speed > availableVehicles[pm->vehicle].stallspeed * 10 * SPEED_GREEN_ARC) &&
@@ -322,30 +345,9 @@ void PM_HeloMove( void )
 	pm->ps->turretAngle = (int)(turret_yaw*10);
 	pm->ps->gunAngle = (int)(gun_pitch*10);
 
-	// Forward speed
-	VectorCopy(vehdir, forwardvel);
-	forwardvel[PITCH] = 0;				// Don't let vehicle angels effect verticle acceleration
-	AngleVectors(forwardvel, forwardvel, NULL, NULL );
-	VectorScale(forwardvel, curforwardspeed, forwardvel);
-
-	// Sideways speed
-	VectorCopy(vehdir,  rightvel);
-	rightvel[PITCH] = rightvel[ROLL] = 0;
-	AngleVectors( rightvel,  NULL, rightvel, NULL );
-	VectorScale( rightvel, currightspeed*2.5, rightvel );
-
-	// Lift Speed
-	VectorCopy(vehdir,  liftvel);
-	liftvel[PITCH] = liftvel[YAW] = 0;
-	AngleVectors( liftvel, NULL , NULL, liftvel );
-	VectorScale( liftvel, curliftspeed, liftvel );
-
 	// speed
 	if( pm->ps->ONOFF & OO_LANDED ) vehdir[0] = 0;
 	
-	VectorAdd(forwardvel,rightvel,deltavel);
-	VectorAdd(liftvel,deltavel,deltavel);
-	VectorCopy(deltavel, pm->ps->velocity);
 
 	PM_SlideMove_Helo();
 }

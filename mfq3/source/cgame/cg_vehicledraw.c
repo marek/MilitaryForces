@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicledraw.c,v 1.10 2005-06-26 05:08:11 minkis Exp $
+ * $Id: cg_vehicledraw.c,v 1.11 2005-06-26 23:47:07 minkis Exp $
 */
 
 #include "cg_local.h"
@@ -518,7 +518,7 @@ void CG_DrawHelo(DrawInfo_Helo_t* drawInfo)
 refEntity_t	    part[BP_HELO_MAX_PARTS];
 	float			shadowPlane = 0;
 	int				renderfx = 0;
-	int				i, tanksound;
+	int				i;
 
 	completeVehicleData_t* veh = &availableVehicles[drawInfo->basicInfo.vehicleIndex];
 
