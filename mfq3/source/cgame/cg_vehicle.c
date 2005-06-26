@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicle.c,v 1.28 2005-06-24 06:43:06 minkis Exp $
+ * $Id: cg_vehicle.c,v 1.29 2005-06-26 05:08:11 minkis Exp $
 */
 
 #include "cg_local.h"
@@ -171,6 +171,18 @@ static void CG_CacheHelo(int index)
 			break;
 		case BP_HELO_TAILROTOR:
 			Com_sprintf( name, sizeof(name), "%s_trotor.md3", basename );
+			break;
+		case BP_HELO_TURRET:
+			Com_sprintf( name, sizeof(name), "%s_tur.md3", basename );
+			break;
+		case BP_HELO_GUNBARREL:
+			Com_sprintf( name, sizeof(name), "%s_gun.md3", basename );
+			break;
+		case BP_HELO_TURRET2:
+			Com_sprintf( name, sizeof(name), "%s_tur2.md3", basename );
+			break;
+		case BP_HELO_GUNBARREL2:
+			Com_sprintf( name, sizeof(name), "%s_gun2.md3", basename );
 			break;
 		}
 		availableVehicles[index].handle[i] = trap_R_RegisterModel( name );

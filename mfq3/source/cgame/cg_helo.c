@@ -1,5 +1,5 @@
 /*
- * $Id: cg_helo.c,v 1.5 2005-06-24 06:43:06 minkis Exp $
+ * $Id: cg_helo.c,v 1.6 2005-06-26 05:08:11 minkis Exp $
 */
 
 
@@ -31,17 +31,17 @@ char *engine_tags[3] =
 
 /*
 ==========================
-CG_RegisterPlane
+CG_RegisterHelo
 ==========================
 */
 void CG_RegisterHelo( clientInfo_t *ci ) 
-{/*
+{
 	int i;
 
-	for( i = 0; i < BP_PLANE_MAX_PARTS; i++ ) 
+	for( i = 0; i < BP_HELO_MAX_PARTS; i++ ) 
 	{
 		ci->parts[i] = availableVehicles[ci->vehicle].handle[i];
-	}*/
+	}
 }
 
 /*
@@ -174,6 +174,12 @@ void CG_Helo( centity_t *cent, clientInfo_t *ci )
 		AngleVectors( cent->lerpAngles, forward, NULL, NULL );
 		VectorMA( cent->lerpOrigin, availableVehicles[ci->vehicle].mins[0], forward, smokePosition );
 		CG_Generic_Smoke( cent, smokePosition, 10 );
+	}
+
+	// muzzleflash
+	if( cg.time - cent->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {
+		drawInfo.basicInfo.drawMuzzleFlash = qtrue;
+		drawInfo.basicInfo.flashWeaponIndex = cent->muzzleFlashWeapon;
 	}
 
 	

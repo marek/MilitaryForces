@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicledraw.c,v 1.9 2005-06-24 06:43:06 minkis Exp $
+ * $Id: cg_vehicledraw.c,v 1.10 2005-06-26 05:08:11 minkis Exp $
 */
 
 #include "cg_local.h"
@@ -21,11 +21,15 @@ char *plane_tags[BP_PLANE_MAX_PARTS] =
 	"tag_prop1"	// prop
 };
 
-char *helo_tags[BP_PLANE_MAX_PARTS] =
+char *helo_tags[BP_HELO_MAX_PARTS] =
 {
 	"<no tag>",		// plane body
 	"tag_mrotor",	// prop
-	"tag_trotor"	// prop
+	"tag_trotor",	// prop
+	"tag_turret",	// turret
+	"tag_weap",		// gun
+	"tag_turret2",	// turret
+	"tag_weap2",	// gun
 };
 
 char *engine_tags[3] =
@@ -466,7 +470,7 @@ void CG_DrawBoat(DrawInfo_Boat_t* drawInfo)
     //
     // turrets
     //
-	for( i = 0; i < 4; ++i ) {
+	for( i = 0; i < 2; ++i ) {
 		int j = 2*i;
 		// turret
 		part[BP_BOAT_TURRET+j].hModel = veh->handle[BP_BOAT_TURRET+j];
@@ -538,25 +542,68 @@ refEntity_t	    part[BP_HELO_MAX_PARTS];
     trap_R_AddRefEntityToScene( &part[BP_HELO_BODY] );
 
 
-	// other parts
-	for( i = 1; i < BP_HELO_MAX_PARTS; i++ ) {
+
+	// rotors
+	for( i = BP_HELO_MAINROTOR; i <= BP_HELO_TAILROTOR; i++ ) {
 		part[i].hModel = veh->handle[i];
 		if( !part[i].hModel ) {
 			continue;
 		}
 		VectorCopy( drawInfo->basicInfo.origin, part[i].lightingOrigin );
 		AxisCopy( axisDefault, part[i].axis );
-		if( i == BP_HELO_MAINROTOR ) {
+		if( i == BP_HELO_MAINROTOR ) 
 			RotateAroundYaw( part[i].axis, cg.time*1.25 );
-		}
-		if( i == BP_HELO_TAILROTOR ) {
+		if( i == BP_HELO_TAILROTOR )
 			RotateAroundPitch( part[i].axis, cg.time*1.25 );
-		}
+
 		CG_PositionRotatedEntityOnTag( &part[i], &part[BP_HELO_BODY], veh->handle[BP_HELO_BODY], helo_tags[i] );
 		part[i].shadowPlane = shadowPlane;
 		part[i].renderfx = renderfx;
 		trap_R_AddRefEntityToScene( &part[i] );
 	}
+
+
+//
+    // turrets
+    //
+	for( i = 0; i < 2; ++i ) {
+		int j = 2*i;
+		// turret
+		part[BP_HELO_TURRET+j].hModel = veh->handle[BP_HELO_TURRET+j];
+		if( !part[BP_HELO_TURRET+j].hModel ) break;
+		VectorCopy( drawInfo->basicInfo.origin, part[BP_HELO_TURRET+j].lightingOrigin );
+		AxisCopy( axisDefault, part[BP_HELO_TURRET+j].axis );
+		RotateAroundYaw( part[BP_HELO_TURRET+j].axis, drawInfo->turretAngle[i] );
+		CG_PositionRotatedEntityOnTag( &part[BP_HELO_TURRET+j], &part[BP_HELO_BODY], veh->handle[BP_HELO_BODY], helo_tags[BP_HELO_TURRET+j] );
+		part[BP_HELO_TURRET+j].shadowPlane = shadowPlane;
+		part[BP_HELO_TURRET+j].renderfx = renderfx;
+		VectorCopy (part[BP_HELO_TURRET+j].origin, part[BP_HELO_TURRET+j].oldorigin);
+		trap_R_AddRefEntityToScene( &part[BP_HELO_TURRET+j] );
+		// gun
+		part[BP_HELO_GUNBARREL+j].hModel = veh->handle[BP_HELO_GUNBARREL+j];
+		VectorCopy( drawInfo->basicInfo.origin, part[BP_HELO_GUNBARREL+j].lightingOrigin );
+		AxisCopy( axisDefault, part[BP_HELO_GUNBARREL+j].axis );
+		RotateAroundPitch( part[BP_HELO_GUNBARREL+j].axis, drawInfo->gunAngle[i] );
+		CG_PositionRotatedEntityOnTag( &part[BP_HELO_GUNBARREL+j], &part[BP_HELO_TURRET+j], veh->handle[BP_HELO_TURRET+j], helo_tags[BP_HELO_GUNBARREL+j] );
+		part[BP_HELO_GUNBARREL+j].shadowPlane = shadowPlane;
+		part[BP_HELO_GUNBARREL+j].renderfx = renderfx;
+		VectorCopy (part[BP_HELO_GUNBARREL+j].origin, part[BP_HELO_GUNBARREL+j].oldorigin);
+		trap_R_AddRefEntityToScene( &part[BP_HELO_GUNBARREL+j] );
+
+	}
+
+	// sound
+	if( drawInfo->basicInfo.entityNum >= 0 ) {
+			trap_S_AddLoopingSound( drawInfo->basicInfo.entityNum, drawInfo->basicInfo.origin, vec3_origin, 
+									cgs.media.engineHelo );
+	}
+
+	// muzzleflash
+	if( drawInfo->basicInfo.drawMuzzleFlash ) {
+		CG_VehicleMuzzleFlash( drawInfo->basicInfo.flashWeaponIndex, &part[BP_HELO_GUNBARREL], 
+							   veh->handle[BP_HELO_GUNBARREL], drawInfo->basicInfo.vehicleIndex );
+	}
+
 }
 
 void CG_DrawLQM(DrawInfo_LQM_t* drawInfo)

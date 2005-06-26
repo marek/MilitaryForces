@@ -1,5 +1,5 @@
 /*
- * $Id: bg_weapondata.c,v 1.33 2005-06-24 06:43:06 minkis Exp $
+ * $Id: bg_weapondata.c,v 1.34 2005-06-26 05:08:12 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -450,6 +450,46 @@ completeWeaponData_t availableWeapons[] =
 		0,									// flags
 	},
 
+	// machinegun: modern, 7.62mm minigun turret
+	{ 
+		WT_MACHINEGUN,						// type
+		MF_GAMESET_MODERN,					// gameset
+		"7.62mm Minigun",						// descriptiveName
+		"GUN",								// shortName
+		"MG",								// shortName2 (GVs)
+		"",									// modelName
+		0,									// handle
+		"",									// vwepName
+		0,									// vwephandle
+		"hud/iconw_mg.tga",					// iconName
+		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
+		3500,								// muzzleVelocity
+		0,									// range
+		0,									// fuelrange
+		100,									// fire interval
+		6,									// damage
+		0,									// damageRadius
+		5,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
+		1,									// barrels
+		0,									// barrelDistance
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_GUNMODE,							// crosshair
+		CH_GUNMODE,							// crosshair track
+		CH_GUNMODE,							// crosshair lock
+		1,									// turret
+		{45,-2,0},							// max turret angles
+		{-10,-178,0},							// min turret angles
+		1,									// number per package
+		CAT_ANY,							// fits on category
+		PF_NA,								// fits on pylon
+		0,									// basicECMVulnerability
+		0,									// flags
+	},
+
 	// machinegun: modern, 12.7mm turret
 	{ 
 		WT_MACHINEGUN,						// type
@@ -481,8 +521,8 @@ completeWeaponData_t availableWeapons[] =
 		CH_GUNMODE,							// crosshair track
 		CH_GUNMODE,							// crosshair lock
 		1,									// turret
-		{5,-60,0},							// max turret angles
-		{-75,60,0},							// min turret angles
+		{45,45,0},							// max turret angles
+		{-45,135,0},							// min turret angles
 		1,									// number per package
 		CAT_ANY,							// fits on category
 		PF_NA,								// fits on pylon

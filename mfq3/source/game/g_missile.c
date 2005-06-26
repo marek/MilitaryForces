@@ -1,5 +1,5 @@
 /*
- * $Id: g_missile.c,v 1.29 2005-06-24 06:43:06 minkis Exp $
+ * $Id: g_missile.c,v 1.30 2005-06-26 05:08:12 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1104,7 +1104,8 @@ void fire_autocannon (gentity_t *self, qboolean main) {
 	VectorCopy( self->s.pos.trBase, start );
 
 	if( (availableVehicles[self->client->vehicle].cat & CAT_GROUND) ||
-		(availableVehicles[self->client->vehicle].cat & CAT_BOAT) ) {
+		(availableVehicles[self->client->vehicle].cat & CAT_BOAT) ||
+		(availableVehicles[self->client->vehicle].cat & CAT_HELO)) {
 		// use this to make it shoot where the player looks
 //		AngleVectors( self->client->ps.viewangles, dir, 0, 0 );
 //		VectorCopy( self->s.pos.trBase, start );
@@ -1170,9 +1171,8 @@ fire_autocannon_GI MFQ3
 */
 void fire_autocannon_GI (gentity_t *self) {
 	gentity_t	*bolt;
-	vec3_t		dir, forward, right, up, temp;
-	vec3_t		start, offset;
-	vec3_t		spreadangle;
+	vec3_t		dir;
+	vec3_t		start;
 	int			weapIdx = self->s.weaponIndex;
 	float		spreadX = availableWeapons[weapIdx].spread; 
 	float		spreadY = spreadX;

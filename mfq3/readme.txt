@@ -2,14 +2,48 @@ Military Forces Q3
 ==================
 
 
+Install:
+========
+
+unzip everything with the directory tree intact, so that you have a mfq3 subdirectory 
+in your quake3 directory.
+
+Start the game with either the batch files (.bat) contained witin the mfq3 directory or 
+just start the game like this:
+
+quake3.exe +set fs_game mfq3
+
+
+
+
+Thanks:
+========
+A very special thanks goes out to the whole mfq3 team and the contributers that made this 
+release possible. Sorry for this several year delay. :) A full credit list is available in game.
+
+
+
 History:
 ========
 
 
 +++v0.78+++ in progress...
 -----------
-- fixed for media reload
-- fixed lock-on fog bug
+- vehicle select on refuel pad option
+- media reload bug
+- multiplayer browser (see pk3s)
+- fog bug (mfq3_norway)
+   ^ - SAM fog lock bug
+- add mf_allowNukes into GUI server config page
+- add sams into vehicle selector when in mission editor
+- driver info button crashes game
+- team deathmatch / ctf
+   ^ - all player's vehicles resets each new player bug
+- flak
+- basic aaa (dont think it works)
+- added ZSU-23, and new Humvees, thanks Xealot
+- added Mk1 (Only in PK3s so far, need to add with code) ty Edwin
+- added helo test model
 
 +++v0.77+++
 -----------
@@ -1235,49 +1269,3 @@ History:
 ----------------------
 - Start Date: Tuesday Oct. 10th
 - New team built
-
-
-
-
-
-
-
-Testing Notes:
-==============
-Unless otherwise stated test versions that you receive are for your local use
-only and not to be distributed. You can of course play it with your siblings
-and friends to test it, but keep it private, I don't want to get emails from
-people -who are not supposed to have it- saying something like "this doesn't work
-properly" etc.
-The following just states what you have to look at when testing the mod. I want
-to be able to find and eliminate bugs as early as possible to save a lot of time
-later. Therefore you need to make sure you properly test all the new stuff and 
-also do some regression tests, ie see if older features still work. The first 
-thing you should do is read through the history section to find out what was 
-changed lately and read through the to-do section to see known problems and not
-yet implemented features. When you send feedback of your testing don't send an
-email "this or that doesn't work.", but send a report as complete as possible,
-I will probably provide you with a template document to fill out in the process
-of testing, use this form ("testing.txt") to keep my workload, in trying
-to find useful information from the reports, minimal. The following is a rough
-overview of what you should especially take care of when testing:
-
-- if possible do multiplayer testing, make sure all clients run smoothly and the
-  prediction looks ok; jerky or jumpy movement means I might have a problem with
-  the prediction code which needs to be addressed ASAP. Make sure the content is
-  consistent on all machines in the network. I can not overstate the importance
-  of multiplayer testing, it is essential to get support and to keep the community
-  alive and make sure MFQ3 gets plenty of servers on the net for everyone to play.
-- check all the cvars the have been changed or newly implemented or removed by
-  me, make sure they work as expected and dont cause sideeffects on other clients
-- when encountering bugs make sure you can reproduce them and know (and can tell
-  me) how to reproduce them
-- if somehow possible make sure the game works on different operating systems, as
-  I only have access to Win98 and Win2k I cannot test other platforms, if you have
-  the chance please make sure it works properly and as expected on non Win-platforms.
-  The .qvm files are supposed to work equally fine on different platforms.
-- test all new and old features according to the test document which comes with
-  the test versions
-- report results to bjoern.drabeck@planetquake.com 
-
-
