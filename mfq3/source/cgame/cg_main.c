@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.50 2005-06-24 06:43:06 minkis Exp $
+ * $Id: cg_main.c,v 1.51 2005-06-26 05:08:11 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -660,6 +660,7 @@ static void CG_RegisterSounds( void ) {
 	cgs.media.engineJet = trap_S_RegisterSound("sound/engines/jet.wav", qfalse );
 	cgs.media.engineProp = trap_S_RegisterSound("sound/engines/prop.wav", qfalse );
 	cgs.media.engineJetAB = trap_S_RegisterSound( "sound/engines/afterburner.wav", qfalse );
+	cgs.media.engineHelo = trap_S_RegisterSound( "sound/engines/helo.wav", qfalse );
 
 	// Nuclear Bomb
 	cgs.media.nukeExplodeSound = trap_S_RegisterSound( "sound/items/kam_explode.wav", qfalse );

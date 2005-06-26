@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.36 2005-06-24 06:43:06 minkis Exp $
+ * $Id: bg_mfq3util.c,v 1.37 2005-06-26 05:08:12 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -380,8 +380,7 @@ void MF_LoadAllVehicleData()
 		availableVehicles[i].mins[2] += 1;// to look better ?
 
 		// helo/plane specific
-		if( (availableVehicles[i].cat & CAT_PLANE) ||
-			(availableVehicles[i].cat & CAT_HELO) ) {
+		if(availableVehicles[i].cat & CAT_PLANE) {
 
 			// Find gear tag offset from  min
 			MF_findTag(name, "tag_gear", &tag);
@@ -446,6 +445,39 @@ void MF_LoadAllVehicleData()
 						MF_findWeaponsOfType( availableVehicles[i].weapons[j], &availableLoadouts[i] );
 				}
 			}
+		} else if(availableVehicles[i].cat & CAT_HELO) {
+
+			// Find gear tag offset from  min
+			MF_findTag(name, "tag_gear", &tag);
+			diff = tag.origin[2] - availableVehicles[i].mins[2];
+			if(diff < 0) diff = 0;
+
+
+			// gear
+			Com_sprintf( name, sizeof(name), "%s_gear.md3", modelbasename );
+
+			trap_FS_FOpenFile(name, &f, FS_READ);
+
+			if(f &&  MF_getNumberOfFrames( name, &num ) ) {
+				vec3_t min1, min2;
+
+				trap_FS_FCloseFile(f);
+				availableVehicles[i].maxGearFrame = num - 1;
+
+				
+				if(!availableVehicles[i].gearheight){
+
+					if( MF_getDimensions( name, 0, 0, &min1 ) &&
+						MF_getDimensions( name, num-1, 0, &min2 ) ) {
+						availableVehicles[i].gearheight = min1[2] - min2[2] - 1.5;// for coll. detection
+						if( availableVehicles[i].gearheight < 0 ) availableVehicles[i].gearheight = 0;
+					}
+				
+				}
+			} else {
+				availableVehicles[i].maxGearFrame = GEAR_DOWN_DEFAULT;
+			}
+
 		} else if( (availableVehicles[i].cat & CAT_GROUND) ) {
 
 			// increaes bounding box by turret height

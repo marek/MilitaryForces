@@ -1,5 +1,5 @@
 /*
- * $Id: cg_weapons.c,v 1.31 2005-06-24 06:43:06 minkis Exp $
+ * $Id: cg_weapons.c,v 1.32 2005-06-26 05:08:11 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -373,6 +373,10 @@ void CG_RegisterWeapons() {
 				weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/machinegun/machineGun3.wav", qfalse );
 				break;
 
+			case WI_MGT_7_62MM:
+				weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/machinegun/minigun.wav", qfalse );
+				break;
+			
 			case WI_MG_20MM:
 			default:
 				// modern sound (silenced)
@@ -804,6 +808,7 @@ void CG_MissileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_t di
 	case WI_MG_14_5MM:
 	case WI_MG_20MM:
 	case WI_MG_2X20MM:
+	case WI_MGT_7_62MM:
 	case WI_MGT_2X30MM:
 	case WI_MGT_12_7MM:
 		mod = cgs.media.bulletFlashModel;

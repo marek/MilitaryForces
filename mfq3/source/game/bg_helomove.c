@@ -1,5 +1,5 @@
 /*
- * $Id: bg_helomove.c,v 1.4 2005-06-24 06:43:06 minkis Exp $
+ * $Id: bg_helomove.c,v 1.5 2005-06-26 05:08:12 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -81,6 +81,7 @@ static void PM_HeloAccelerate()
 		curspeed = stallspeed *1.5f;
 
     pm->ps->speed = curspeed*10;
+	pm->ps->throttle = throttle;
 
 	// fuel flow
 	PM_Helo_FuelFlow( totalthrottle );
@@ -118,12 +119,24 @@ void PM_HeloMove( void )
 	float	currightspeed;
 	float	curspeed = pm->ps->speed;
 	vec3_t  forwardvel,rightvel, liftvel, deltavel;
-
+	// Turret stuff
+	vec3_t		forward, up;
+	vec3_t		temp;
+	float		turret_yaw = ((float)pm->ps->turretAngle)/10;
+	float		gun_pitch = ((float)pm->ps->gunAngle)/10;
+	vec3_t		turretdir;
+	float		min, max;
 
 	if( verydead ) return;
 
 	// clear FX
 	pm->ps->ONOFF &= ~OO_VAPOR;
+
+	// get the actual turret angles
+	AngleVectors( pm->ps->vehicleAngles, forward, 0, up );
+	RotatePointAroundVector( temp, up, forward, turret_yaw );
+	vectoangles( temp, turretdir );
+	turretdir[PITCH] += gun_pitch;
 
     // local vectors
     VectorCopy( pm->ps->vehicleAngles, vehdir );
@@ -146,7 +159,8 @@ void PM_HeloMove( void )
 	// set yaw to 0 <= x <= 360
 	viewdir[YAW] = AngleMod( viewdir[YAW] );
 	vehdir[YAW] = AngleMod( vehdir[YAW] );
-
+	turretdir[YAW] = AngleMod( turretdir[YAW] );
+	turretdir[PITCH] = AngleMod( turretdir[PITCH] );
 	PM_HeloAccelerate();
 
     if( dead ) {
@@ -265,8 +279,48 @@ void PM_HeloMove( void )
 			pm->ps->ONOFF &= ~ OO_SPEEDBRAKE;
 		}
     }
+
+	// Show turrets
+	// get the angle difference
+	for( i = PITCH; i <= YAW; i++ ) {
+		diff[i] = pm->ps->viewangles[i] - turretdir[i];
+		if( diff[i] > 180 ) diff[i] -= 360;
+		else if( diff[i] < -180 ) diff[i] += 360;
+	}	
+	// turn the turret
+	if( diff[YAW] < -turnspeed[TURRET_YAW] ) turret_yaw -= turnspeed[TURRET_YAW];
+	else if( diff[YAW] > turnspeed[TURRET_YAW] ) turret_yaw += turnspeed[TURRET_YAW];
+	else turret_yaw += diff[YAW];
+	if( turret_yaw > 180 ) turret_yaw -= 360;// limit to +- 180
+	min = availableWeapons[pm->ps->weaponIndex].minturns[1];
+	max = availableWeapons[pm->ps->weaponIndex].maxturns[1];
+	if( max > min ) {
+		if( turret_yaw > max ) turret_yaw = max;
+		else if( turret_yaw < min ) turret_yaw = min;
+	} else {
+		if( turret_yaw > 0 && turret_yaw < min ) turret_yaw = min;
+		else if( turret_yaw < 0 && turret_yaw > max ) turret_yaw = max;
+	}
+	if( turret_yaw < 0 ) turret_yaw += 360;// clamp back to pos
+	else if( turret_yaw > 360 ) turret_yaw -= 360;
+
+	
+	// turn the gun
+	if( diff[PITCH] < -turnspeed[GUN_PITCH] ) gun_pitch -= turnspeed[GUN_PITCH];
+	else if( diff[PITCH] > turnspeed[GUN_PITCH] ) gun_pitch += turnspeed[GUN_PITCH];
+	else gun_pitch += diff[PITCH];
+	min = availableWeapons[pm->ps->weaponIndex].minturns[0];
+	max = availableWeapons[pm->ps->weaponIndex].maxturns[0];
+	if( gun_pitch > 180 ) gun_pitch -= 360;// limit to +-180 to make it easier
+	if( gun_pitch > max ) gun_pitch = max;
+	else if( gun_pitch < min ) gun_pitch = min;
+	if( gun_pitch < 0 ) gun_pitch += 360;// clamp it back to pos
+	else if( gun_pitch > 360 ) gun_pitch -= 360;
+
 	// return angles
 	VectorCopy( vehdir, pm->ps->vehicleAngles );
+	pm->ps->turretAngle = (int)(turret_yaw*10);
+	pm->ps->gunAngle = (int)(gun_pitch*10);
 
 	// Forward speed
 	VectorCopy(vehdir, forwardvel);
@@ -291,7 +345,6 @@ void PM_HeloMove( void )
 	
 	VectorAdd(forwardvel,rightvel,deltavel);
 	VectorAdd(liftvel,deltavel,deltavel);
-
 	VectorCopy(deltavel, pm->ps->velocity);
 
 	PM_SlideMove_Helo();
@@ -348,7 +401,6 @@ qboolean	PM_SlideMove_Helo() {
 	float		time_left;
 	float		into;
 	vec3_t		endVelocity;
-	vec3_t		liftVelocity;
 	vec3_t		endClipVelocity;
 	float		maxthrottle = availableVehicles[pm->vehicle].maxthrottle;
 	float		minthrottle = availableVehicles[pm->vehicle].minthrottle;

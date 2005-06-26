@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.66 2005-06-24 06:43:06 minkis Exp $
+ * $Id: cg_local.h,v 1.67 2005-06-26 05:08:11 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -853,6 +853,7 @@ typedef struct {
 	sfxHandle_t engineProp;
 	sfxHandle_t planeDeath[NUM_EXPLOSION_SOUNDS];
 	sfxHandle_t engineTank[NUM_TANKSOUNDS];
+	sfxHandle_t	engineHelo;
 
 } cgMedia_t;
 

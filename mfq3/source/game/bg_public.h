@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.131 2005-06-24 06:43:06 minkis Exp $
+ * $Id: bg_public.h,v 1.132 2005-06-26 05:08:12 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -556,6 +556,7 @@ typedef struct md3Tag_s {
 
 // number of sounds for things
 #define NUM_TANKSOUNDS			9
+#define NUM_HELOSOUNDS			1
 #define NUM_EXPLOSION_SOUNDS	4
 
 // modelname strings
@@ -684,7 +685,12 @@ extern const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1];
 #define BP_HELO_BODY			0
 #define BP_HELO_MAINROTOR		1
 #define BP_HELO_TAILROTOR		2
-#define BP_HELO_MAX_PARTS		3
+#define BP_HELO_TURRET			3
+#define BP_HELO_GUNBARREL		4
+#define BP_HELO_TURRET2			5
+#define BP_HELO_GUNBARREL2		6
+#define BP_HELO_MAX_PARTS		7
+
 
 // ground installations
 #define BP_GI_BODY				0
@@ -934,6 +940,7 @@ typedef enum
 	WI_MG_30MM,
 	WI_MG_2X20MM,
 	WI_MGT_2X30MM,		// 10
+	WI_MGT_7_62MM,
 	WI_MGT_12_7MM,
 	WI_FFAR,
 	WI_FFAR_SMALL,
