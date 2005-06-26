@@ -1,5 +1,5 @@
 /*
- * $Id: bg_weapondata.c,v 1.34 2005-06-26 05:08:12 minkis Exp $
+ * $Id: bg_weapondata.c,v 1.35 2005-06-26 23:47:07 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -468,8 +468,8 @@ completeWeaponData_t availableWeapons[] =
 		3500,								// muzzleVelocity
 		0,									// range
 		0,									// fuelrange
-		100,									// fire interval
-		6,									// damage
+		100,								// fire interval
+		10,									// damage
 		0,									// damageRadius
 		5,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
 		1,									// barrels

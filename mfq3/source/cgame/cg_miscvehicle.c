@@ -1,5 +1,5 @@
 /*
- * $Id: cg_miscvehicle.c,v 1.13 2003-02-22 18:35:23 thebjoern Exp $
+ * $Id: cg_miscvehicle.c,v 1.14 2005-06-26 23:47:07 minkis Exp $
 */
 
 #include "cg_local.h"
@@ -266,7 +266,68 @@ CG_Misc_Helo
 
 static void CG_Misc_Helo( centity_t *cent ) 
 {
+	vec3_t			velocity;
+	DrawInfo_Helo_t	drawInfo;
+	int i;
 
+	memset( &drawInfo, 0, sizeof(drawInfo) );
+	drawInfo.basicInfo.vehicleIndex = cent->currentState.modelindex;
+	drawInfo.basicInfo.ONOFF = cent->currentState.ONOFF;
+
+	// get velocity
+	VectorCopy( cent->currentState.pos.trDelta, velocity );
+	drawInfo.basicInfo.speed = VectorLength( velocity );
+
+	// entitynum
+	drawInfo.basicInfo.entityNum = cent->currentState.number;
+
+    // get the rotation information
+    VectorCopy( cent->currentState.angles, cent->lerpAngles );
+    AnglesToAxis( cent->lerpAngles, drawInfo.basicInfo.axis );
+
+	// position and orientation
+	VectorCopy( cent->lerpOrigin, drawInfo.basicInfo.origin );
+	VectorCopy( cent->lerpAngles, drawInfo.basicInfo.angles );
+   
+	// loadout
+	drawInfo.basicInfo.loadout = &cg_loadouts[cent->currentState.number];
+
+	// turret/gun angle
+	for(i = 0; i < 4; i++)
+	{
+		drawInfo.gunAngle[i] = cent->currentState.angles2[PITCH];
+		drawInfo.turretAngle[i] = cent->currentState.angles2[ROLL];
+	}
+
+	// muzzleflash
+	if( cg.time - cent->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {
+		drawInfo.basicInfo.drawMuzzleFlash = qtrue;
+		drawInfo.basicInfo.flashWeaponIndex = cent->muzzleFlashWeapon;
+	}
+
+	
+	// draw helo
+	CG_DrawHelo(&drawInfo);
+
+	// smoke 
+	if( cent->currentState.generic1 ) {
+		localEntity_t	*smoke;
+		vec3_t			up = {0, 0, 20};
+		vec3_t			pos;
+		vec3_t			forward;
+
+		AngleVectors( cent->lerpAngles, forward, NULL, NULL );
+		VectorCopy( cent->lerpOrigin, pos );
+		pos[2] += 12;
+
+		smoke = CG_SmokePuff( pos, up, 
+					  cent->currentState.generic1, 
+					  0.5, 0.5, 0.5, 0.66f,
+					  200*cent->currentState.generic1, 
+					  cg.time, 0,
+					  LEF_PUFF_DONT_SCALE, 
+					  cgs.media.smokePuffShader );	
+	}
 }
 
 /*
@@ -288,7 +349,67 @@ CG_Misc_Boat
 
 static void CG_Misc_Boat( centity_t *cent ) 
 {
+	vec3_t			velocity;
+	DrawInfo_Boat_t	drawInfo;
+	int i;
 
+	memset( &drawInfo, 0, sizeof(drawInfo) );
+	drawInfo.basicInfo.vehicleIndex = cent->currentState.modelindex;
+	drawInfo.basicInfo.ONOFF = cent->currentState.ONOFF;
+
+	// get velocity
+	VectorCopy( cent->currentState.pos.trDelta, velocity );
+	drawInfo.basicInfo.speed = VectorLength( velocity );
+
+	// entitynum
+	drawInfo.basicInfo.entityNum = cent->currentState.number;
+
+    // get the rotation information
+    VectorCopy( cent->currentState.angles, cent->lerpAngles );
+    AnglesToAxis( cent->lerpAngles, drawInfo.basicInfo.axis );
+
+	// position and orientation
+	VectorCopy( cent->lerpOrigin, drawInfo.basicInfo.origin );
+	VectorCopy( cent->lerpAngles, drawInfo.basicInfo.angles );
+   
+	// loadout
+	drawInfo.basicInfo.loadout = &cg_loadouts[cent->currentState.number];
+
+	// turret/gun angle
+	for(i = 0; i < 4; i++)
+	{
+		drawInfo.gunAngle[i] = cent->currentState.angles2[PITCH];
+		drawInfo.turretAngle[i] = cent->currentState.angles2[ROLL];
+	}
+
+	// muzzleflash
+	if( cg.time - cent->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {
+		drawInfo.basicInfo.drawMuzzleFlash = qtrue;
+		drawInfo.basicInfo.flashWeaponIndex = cent->muzzleFlashWeapon;
+	}
+
+	// draw boat
+	CG_DrawBoat(&drawInfo);
+
+	// smoke 
+	if( cent->currentState.generic1 ) {
+		localEntity_t	*smoke;
+		vec3_t			up = {0, 0, 20};
+		vec3_t			pos;
+		vec3_t			forward;
+
+		AngleVectors( cent->lerpAngles, forward, NULL, NULL );
+		VectorCopy( cent->lerpOrigin, pos );
+		pos[2] += 12;
+
+		smoke = CG_SmokePuff( pos, up, 
+					  cent->currentState.generic1, 
+					  0.5, 0.5, 0.5, 0.66f,
+					  200*cent->currentState.generic1, 
+					  cg.time, 0,
+					  LEF_PUFF_DONT_SCALE, 
+					  cgs.media.smokePuffShader );	
+	}
 }
 
 

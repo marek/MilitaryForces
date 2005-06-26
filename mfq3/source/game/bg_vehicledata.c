@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.59 2005-06-26 05:08:12 minkis Exp $
+ * $Id: bg_vehicledata.c,v 1.60 2005-06-26 23:47:07 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -2867,9 +2867,9 @@ completeVehicleData_t availableVehicles[] =
 	{0,0,0,0,0,0,0,0,0,0},		// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
-	{50, 100, 100},				// turnspeed around the three axis
-	{0, 100, 30},				// camera distance {min,max,default}
-	{0, 100, 10},				// camera height {min,max,default}
+	{50, 125, 70},				// turnspeed around the three axis
+	{0, 100, 80},				// camera distance {min,max,default}
+	{0, 100, 25},				// camera height {min,max,default}
 	0,							// stallspeed
 	300,						// maxspeed
 	-5,							// min throttle
@@ -2883,7 +2883,7 @@ completeVehicleData_t availableVehicles[] =
 	160,						// max fuel
 	285,						// max gun pitch (upwards = negative) <- gearheight
 	5,							// min gun pitch (downwards = positive) <- tailangle
-	0, WI_MGT_7_62MM, 0, 0, 0, 0, 0, WI_CFLARE,// weapons
+	0, WI_MGT_7_62MM, 0, 0, 0, 0, 0, WI_FLARE,// weapons
 	0, 9000, 0, 0, 0, 0, 0, 20,	// ammo
 	1,0,0,0,0,0,0,0,			// turret
 	{0, 0, 10},					// cameraposition for cockpit view

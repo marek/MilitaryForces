@@ -1,5 +1,5 @@
 /*
- * $Id: g_missile.c,v 1.30 2005-06-26 05:08:12 minkis Exp $
+ * $Id: g_missile.c,v 1.31 2005-06-26 23:47:07 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1274,7 +1274,8 @@ void fire_flare( gentity_t *self ) {
 	VectorSet( up, 0, 0, 1 );
 	VectorCopy( self->s.pos.trBase, start );
 	if( (availableVehicles[self->client->vehicle].cat & CAT_GROUND) ||
-		(availableVehicles[self->client->vehicle].cat & CAT_BOAT) ) 
+		(availableVehicles[self->client->vehicle].cat & CAT_BOAT) ||
+		(availableVehicles[self->client->vehicle].cat & CAT_HELO) ) 
 		VectorMA( start, self->r.maxs[2]+3, up, start );
 	else
 		VectorMA( start, self->r.mins[2]-3, up, start );
@@ -1354,7 +1355,8 @@ void fire_cflare( gentity_t *self) {
 	VectorSet( up, 0, 0, 1 );
 	VectorCopy( self->s.pos.trBase, start );
 	if( (availableVehicles[self->client->vehicle].cat & CAT_GROUND) ||
-		(availableVehicles[self->client->vehicle].cat & CAT_BOAT) )  {
+		(availableVehicles[self->client->vehicle].cat & CAT_BOAT) ||
+		(availableVehicles[self->client->vehicle].cat & CAT_HELO) )  {
 		VectorMA( start, self->r.maxs[2]+3, up, start );
 		age = 1600;
 	}
