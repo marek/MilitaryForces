@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.43 2005-06-26 05:08:12 minkis Exp $
+ * $Id: g_local.h,v 1.44 2005-06-27 05:52:51 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -593,7 +593,7 @@ void ExplodeVehicle( gentity_t *self );
 // MFQ3
 // g_plane.c
 //
-void checkTakeoffLanding( gentity_t *self );
+void checkTakeoffLandingPlane( gentity_t *self );
 void Touch_Plane( gentity_t *ent, gentity_t *other, trace_t *trace );
 void Plane_Pain( gentity_t *self, gentity_t *attacker, int damage );
 
@@ -606,6 +606,7 @@ void GroundVehicle_Pain( gentity_t *self, gentity_t *attacker, int damage );
 // MFQ3
 // g_helo.c
 //
+void checkTakeoffLandingHelo( gentity_t *self );
 void Touch_Helo( gentity_t *ent, gentity_t *other, trace_t *trace );
 void Helo_Pain( gentity_t *self, gentity_t *attacker, int damage );
 

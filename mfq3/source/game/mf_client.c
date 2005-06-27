@@ -1,5 +1,5 @@
 /*
- * $Id: mf_client.c,v 1.26 2005-06-26 05:08:12 minkis Exp $
+ * $Id: mf_client.c,v 1.27 2005-06-27 05:52:51 minkis Exp $
 */
 
 #include "g_local.h"
@@ -210,6 +210,7 @@ void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 	// find a spawn point
 	// do it before setting health back up, so farthest
 	// ranging doesn't count this client
+	i = 0;
 	if(cs_flags & CS_LASTPOS) {
 		// use current position as spawn point
 		VectorCopy(client->ps.origin, spawn_origin);
@@ -227,6 +228,7 @@ void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 							spawn_origin, spawn_angles, vehIndex);
 		} else {
 			do {
+				i++;
 				// the first spawn should be at a good looking spot
 				if ( !client->pers.initialSpawn && client->pers.localClient ) {
 					client->pers.initialSpawn = qtrue;
@@ -239,6 +241,13 @@ void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 						availableVehicles[vehIndex].cat);
 				}
 	
+				if( i > 25) {
+					//G_Error( "Couldn't find a decent spawn point after over 25 tries" );
+					#pragma message("mf_client.c:MF_ClientSpawn(): NEED TO FIX THIS SPAWN SELECT BUG!!")
+					G_Printf(S_COLOR_YELLOW "WARNING: Couldn't find a decent spawn point after over 25 tries\n");
+					break;
+				}
+
 				// Tim needs to prevent bots from spawning at the initial point
 				// on q3dm0...
 				if ( ( spawnPoint->flags & FL_NO_BOTS ) && ( ent->r.svFlags & SVF_BOT ) ) {

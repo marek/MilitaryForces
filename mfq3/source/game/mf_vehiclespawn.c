@@ -1,5 +1,5 @@
 /*
- * $Id: mf_vehiclespawn.c,v 1.5 2002-02-19 13:28:54 thebjoern Exp $
+ * $Id: mf_vehiclespawn.c,v 1.6 2005-06-27 05:52:51 minkis Exp $
 */
 
 #include "g_local.h"
@@ -59,6 +59,26 @@ void MF_Spawn_GroundVehicle(gentity_t *ent, int idx) {
 
 // ground vehicles
 void MF_Spawn_Helo(gentity_t *ent, int idx, qboolean landed) {
+
+	// set flags
+	ent->client->ps.ONOFF = OO_NOTHING_ON;
+
+	// speed, throttle depend on landed/airborne 
+	if( landed ) {
+		ent->client->ps.speed = 0;
+		ent->client->ps.fixed_throttle = 0;
+		ent->client->ps.ONOFF |= OO_LANDED|OO_STALLED|OO_GEAR;
+	}
+
+	// gearheight
+	if( availableVehicles[idx].caps & HC_GEAR ) {
+		ent->gearheight = (float)availableVehicles[idx].gearheight;
+	} else {
+		ent->client->ps.ONOFF |= OO_GEAR;
+	}
+
+	// update gear anim
+	ent->updateGear = qtrue;
 
 	// set functions
 	ent->touch = Touch_Helo;

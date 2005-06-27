@@ -1,5 +1,5 @@
 /*
- * $Id: bg_groundmove.c,v 1.13 2005-06-26 05:08:12 minkis Exp $
+ * $Id: bg_groundmove.c,v 1.14 2005-06-27 05:52:50 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -418,9 +418,7 @@ void PM_GroundVehicleMove( void )
 	// turn the hull
 	if( pm->ps->ONOFF & OO_LANDED ) {
 		if(pm->ps->ONOFF & OO_STALLED)
-		{
 			turnModifier *= -1;
-		}
 
 		if( smove > 0 ) {
 			vehdir[YAW] -= turnspeed[HULL_YAW] * turnModifier;

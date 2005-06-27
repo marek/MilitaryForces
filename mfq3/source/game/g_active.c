@@ -1,5 +1,5 @@
 /*
- * $Id: g_active.c,v 1.29 2005-06-26 05:08:12 minkis Exp $
+ * $Id: g_active.c,v 1.30 2005-06-27 05:52:51 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -763,11 +763,11 @@ void ClientThink_real( gentity_t *ent ) {
 		updateTargetTracking(ent);
 	}
 	// category specific actions if any
-	if( (availableVehicles[client->vehicle].cat & CAT_PLANE) ||
-		(availableVehicles[client->vehicle].cat & CAT_HELO) ) {
-		// takeoff/landing
-		checkTakeoffLanding( ent );
-	}
+	if(availableVehicles[client->vehicle].cat & CAT_PLANE)
+		checkTakeoffLandingPlane( ent );	// takeoff/landing
+	else if (availableVehicles[client->vehicle].cat & CAT_HELO) 
+		checkTakeoffLandingHelo( ent );
+
 	// don't forget to update flags!
 	ent->ONOFF = ent->client->ps.ONOFF;
 
