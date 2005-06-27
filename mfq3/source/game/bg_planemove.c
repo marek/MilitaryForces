@@ -1,5 +1,5 @@
 /*
- * $Id: bg_planemove.c,v 1.10 2003-08-06 18:10:21 thebjoern Exp $
+ * $Id: bg_planemove.c,v 1.11 2005-06-27 05:52:50 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -43,7 +43,7 @@ PM_Toggle_Gear
 
 ===================
 */
-void PM_Toggle_Gear()
+void PM_Toggle_PlaneGear()
 {
 	if( !(availableVehicles[pm->vehicle].caps & HC_GEAR) ) {
 		return;
@@ -237,7 +237,7 @@ void PM_PlaneMove( void )
 
 	// gear
 	if( !dead && (pm->cmd.buttons & BUTTON_GEAR) ) {
-		PM_Toggle_Gear();
+		PM_Toggle_PlaneGear();
 	}
 
 	// gearanim
@@ -517,7 +517,7 @@ void PM_PlaneMoveAdvanced( void )
 
 	// gear
 	if( !dead && (pm->cmd.buttons & BUTTON_GEAR) ) {
-		PM_Toggle_Gear();
+		PM_Toggle_PlaneGear();
 	}
 
 	// gearanim

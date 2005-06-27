@@ -1,5 +1,5 @@
 /*
- * $Id: g_miscvehicle.c,v 1.14 2003-08-06 19:05:59 thebjoern Exp $
+ * $Id: g_miscvehicle.c,v 1.15 2005-06-27 05:52:51 minkis Exp $
 */
 
 
@@ -202,6 +202,13 @@ static void SP_misc_helo( gentity_t *ent )
 
 	// set flags
 	ent->s.ONOFF = OO_LANDED;
+
+	// gearheight
+	if( availableVehicles[vehIndex].caps & HC_GEAR ) {
+		ent->gearheight = (float)availableVehicles[vehIndex].gearheight;
+	} else {
+		ent->s.ONOFF |= OO_GEAR;
+	}
 
 	ent->speed = 0;
 	ent->s.frame = 0;// throttle

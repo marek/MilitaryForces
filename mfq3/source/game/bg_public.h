@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.132 2005-06-26 05:08:12 minkis Exp $
+ * $Id: bg_public.h,v 1.133 2005-06-27 05:52:51 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1094,6 +1094,7 @@ int MF_findWeaponsOfType( int weaponIndex, completeLoadout_t* loadout );
 #define OO_RADAR_AIR			64
 #define OO_RADAR_GROUND			128
 #define OO_RADAR				192	// OO_RADAR_GROUND|OO_RADAR_AIR
+#define OO_LANDEDTERRAIN		256
 
 // afterburners
 #define AB_BALL					0

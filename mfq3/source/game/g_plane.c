@@ -1,12 +1,12 @@
 /*
- * $Id: g_plane.c,v 1.8 2005-06-26 05:08:12 minkis Exp $
+ * $Id: g_plane.c,v 1.9 2005-06-27 05:52:51 minkis Exp $
 */
 
 
 #include "g_local.h"
 
 // ugly first-cut function!
-void checkTakeoffLanding( gentity_t *self )
+void checkTakeoffLandingPlane( gentity_t *self )
 {
 	trace_t	trace;
 	vec3_t	startpos;
