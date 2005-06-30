@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.133 2005-06-27 05:52:51 minkis Exp $
+ * $Id: bg_public.h,v 1.134 2005-06-30 03:54:00 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -420,6 +420,7 @@ typedef enum {
 	IT_BAD,
 	IT_AMMO,				// EFX: rotate
 	IT_HEALTH,				// EFX: static external sphere + rotating internal
+	IT_FUEL,
 	IT_TEAM
 } itemType_t;
 
@@ -839,7 +840,10 @@ typedef enum {
 	WT_FLARE,
 	WT_FLAK,
 	WT_NUKEBOMB,
-	WT_NUKEMISSILE
+	WT_NUKEMISSILE,
+	WT_FUELCRATE,
+	WT_AMMOCRATE,
+	WT_HEALTHCRATE
 }weaponType_t;
 
 // weaponflags
@@ -973,6 +977,9 @@ typedef enum
 	WI_DROPTANK_PAIR,	// 40
 	WI_DROPTANK_SMALL,	
 	WI_DROPTANK_SMALL_PAIR,
+	WI_FUELCRATE,
+	WI_HEALTHCRATE,
+	WI_AMMOCRATE,
 	WI_FLARE,	
 	WI_CFLARE,
 	WI_BURNINGMAN,

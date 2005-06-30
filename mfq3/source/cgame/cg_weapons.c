@@ -1,5 +1,5 @@
 /*
- * $Id: cg_weapons.c,v 1.32 2005-06-26 05:08:11 minkis Exp $
+ * $Id: cg_weapons.c,v 1.33 2005-06-30 03:54:00 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -466,6 +466,15 @@ void CG_RegisterWeapons() {
 			}
 
 			break;
+
+		// Pickup creates
+		case WT_FUELCRATE:
+		case WT_AMMOCRATE:
+		case WT_HEALTHCRATE:
+			weaponInfo->missileModel = trap_R_RegisterModel( availableWeapons[i].modelName );
+			weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/rocket/rocklf1a.wav", qfalse );
+			break;
+
 		default:
 			//MAKERGB( weaponInfo->flashDlightColor, 1, 1, 1 );
 			weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/rocket/rocklf1a.wav", qfalse );

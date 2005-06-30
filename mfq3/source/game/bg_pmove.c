@@ -1,5 +1,5 @@
 /*
- * $Id: bg_pmove.c,v 1.18 2005-06-26 05:08:12 minkis Exp $
+ * $Id: bg_pmove.c,v 1.19 2005-06-30 03:54:00 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -893,7 +893,6 @@ PM_VehicleMove
 */
 static void PM_VehicleMove( void ) 
 {
-	pm->ps->pm_type = pm->ps->pm_type;
 	if( availableVehicles[pm->vehicle].cat & CAT_PLANE ) {
 		if( pm->advancedControls )
 			PM_PlaneMoveAdvanced();

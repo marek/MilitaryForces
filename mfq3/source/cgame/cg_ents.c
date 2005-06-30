@@ -1,5 +1,5 @@
 /*
- * $Id: cg_ents.c,v 1.10 2005-06-26 05:08:11 minkis Exp $
+ * $Id: cg_ents.c,v 1.11 2005-06-30 03:54:00 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -379,12 +379,13 @@ static void CG_Missile( centity_t *cent ) {
 		availableWeapons[cent->currentState.weaponIndex].type != WT_IRONBOMB &&
 		availableWeapons[cent->currentState.weaponIndex].type != WT_GUIDEDBOMB &&
 		availableWeapons[cent->currentState.weaponIndex].type != WT_NUKEBOMB && 
-		availableWeapons[cent->currentState.weaponIndex].type != WT_NUKEMISSILE) {	
+		availableWeapons[cent->currentState.weaponIndex].type != WT_NUKEMISSILE && 
+		availableWeapons[cent->currentState.weaponIndex].type != WT_AMMOCRATE && 
+		availableWeapons[cent->currentState.weaponIndex].type != WT_HEALTHCRATE && 
+		availableWeapons[cent->currentState.weaponIndex].type != WT_FUELCRATE) {	
 		RotateAroundDirection( ent.axis, cg.time / 4 );
 	} else {
-		{
-			RotateAroundDirection( ent.axis, s1->time );
-		}
+		RotateAroundDirection( ent.axis, s1->time );
 	}
 	
 

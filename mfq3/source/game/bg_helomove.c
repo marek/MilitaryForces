@@ -1,5 +1,5 @@
 /*
- * $Id: bg_helomove.c,v 1.7 2005-06-27 05:52:50 minkis Exp $
+ * $Id: bg_helomove.c,v 1.8 2005-06-30 03:54:00 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -570,8 +570,6 @@ void PM_HeloMove( void )
 	
 	// Copy final vel
 	VectorCopy(deltavel, pm->ps->velocity);
-	if(deltavel[2] < 0 && (pm->ps->ONOFF & OO_LANDED))
-		Com_Printf("!=0\n");
 
 	PM_SlideMove_Helo();
 }

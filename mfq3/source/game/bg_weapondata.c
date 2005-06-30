@@ -1,5 +1,5 @@
 /*
- * $Id: bg_weapondata.c,v 1.35 2005-06-26 23:47:07 minkis Exp $
+ * $Id: bg_weapondata.c,v 1.36 2005-06-30 03:54:00 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -1784,6 +1784,126 @@ completeWeaponData_t availableWeapons[] =
 		PF_TANK_LT,							// fits on pylon
 		0,									// basicECMVulnerability
 		WF_FIRE_IN_PAIRS,					// flags
+	},
+
+	// droptank lt pair
+	{ 
+		WT_FUELCRATE,						// type
+		MF_GAMESET_ANY,						// gameset
+		"Fuel Crate",						// descriptiveName
+		"Fuel Crate",							// shortName
+		"Fuel Crate",							// shortName2 (GVs)
+		"models/weapons/crate.md3",// modelName
+		0,									// handle
+		"models/weapons/crate.md3",// vwepName
+		0,									// vwephandle
+		"hud/iconw_bmb.tga",				// iconName
+		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
+		4,									// muzzleVelocity
+		0,									// range
+		0,									// fuelrange
+		200,								// fire interval
+		20,									// damage
+		10,									// damageRadius
+		1,									// spread
+		2,									// barrels
+		0,									// barrelDistance
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_GUNMODE,							// crosshair
+		CH_GUNMODE,							// crosshair track
+		CH_GUNMODE,							// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
+		1,									// number per package
+		CAT_HELO,							// fits on category
+		0,									// fits on pylon
+		0,									// basicECMVulnerability
+		0,									// flags
+	},
+
+	// Health Crate
+	{ 
+		WT_HEALTHCRATE,						// type
+		MF_GAMESET_ANY,						// gameset
+		"Health Crate",						// descriptiveName
+		"Health Crate",							// shortName
+		"Health Crate",							// shortName2 (GVs)
+		"models/weapons/crate.md3",// modelName
+		0,									// handle
+		"models/weapons/crate.md3",// vwepName
+		0,									// vwephandle
+		"hud/iconw_bmb.tga",				// iconName
+		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
+		4,									// muzzleVelocity
+		0,									// range
+		0,									// fuelrange
+		200,								// fire interval
+		15,									// damage
+		10,									// damageRadius
+		1,									// spread
+		2,									// barrels
+		0,									// barrelDistance
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_GUNMODE,							// crosshair
+		CH_GUNMODE,							// crosshair track
+		CH_GUNMODE,							// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
+		1,									// number per package
+		CAT_HELO,							// fits on category
+		0,									// fits on pylon
+		0,									// basicECMVulnerability
+		0,									// flags
+	},
+
+	// Ammo Crate
+	{ 
+		WT_AMMOCRATE,						// type
+		MF_GAMESET_ANY,						// gameset
+		"Ammo Crate",						// descriptiveName
+		"Ammo Crate",							// shortName
+		"Ammo Crate",							// shortName2 (GVs)
+		"models/weapons/crate.md3",// modelName
+		0,									// handle
+		"models/weapons/crate.md3",// vwepName
+		0,									// vwephandle
+		"hud/iconw_bmb.tga",				// iconName
+		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
+		4,									// muzzleVelocity
+		0,									// range
+		0,									// fuelrange
+		200,								// fire interval
+		15,									// damage
+		10,									// damageRadius
+		1,									// spread
+		2,									// barrels
+		0,									// barrelDistance
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_GUNMODE,							// crosshair
+		CH_GUNMODE,							// crosshair track
+		CH_GUNMODE,							// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
+		1,									// number per package
+		CAT_HELO,							// fits on category
+		0,									// fits on pylon
+		0,									// basicECMVulnerability
+		0,									// flags
 	},
 
 	// flares

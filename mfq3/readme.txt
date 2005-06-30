@@ -29,6 +29,7 @@ History:
 
 +++v0.78+++ in progress...
 -----------
+- misc bug fixes
 - vehicle select on refuel pad option
 - media reload bug
 - multiplayer browser (see pk3s)
@@ -44,6 +45,9 @@ History:
 - added ZSU-23, and new Humvees, thanks Xealot
 - added Mk1 (Only in PK3s so far, need to add with code) ty Edwin
 - added helo test model
+- added UH-1 "Huey" by Angel/Nordbo
+- added dropcrate weapons
+- added fuel pickup
 
 +++v0.77+++
 -----------

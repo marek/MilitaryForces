@@ -1,5 +1,5 @@
 /*
- * $Id: g_items.c,v 1.4 2002-07-15 18:23:07 thebjoern Exp $
+ * $Id: g_items.c,v 1.5 2005-06-30 03:54:00 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -24,7 +24,7 @@
 #define	RESPAWN_AMMO		40
 #define	RESPAWN_MEGAHEALTH	35//120
 #define	RESPAWN_POWERUP		120
-
+#define	RESPAWN_FUEL		35
 
 //======================================================================
 
@@ -83,6 +83,26 @@ int Pickup_Health (gentity_t *ent, gentity_t *other) {
 
 	return RESPAWN_HEALTH;
 }
+
+
+//======================================================================
+
+int Pickup_Fuel (gentity_t *ent, gentity_t *other) {
+	int			max;
+	int			quantity;
+
+	max = other->client->ps.stats[STAT_MAX_FUEL] ;
+
+	if ( ent->count )
+		quantity = ent->count;
+	else 
+		quantity = ent->item->quantity;
+
+	other->client->ps.stats[STAT_FUEL] = min(other->client->ps.stats[STAT_FUEL]+quantity,max);
+
+	return RESPAWN_FUEL;
+}
+
 
 //======================================================================
 
@@ -156,6 +176,9 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 		break;
 	case IT_HEALTH:
 		respawn = Pickup_Health(ent, other);
+		break;
+	case IT_FUEL:
+		respawn = Pickup_Fuel(ent, other);
 		break;
 	case IT_TEAM:
 		respawn = Pickup_Team(ent, other);
@@ -421,6 +444,16 @@ ClearRegisteredItems
 */
 void ClearRegisteredItems( void ) {
 	memset( itemRegistered, 0, sizeof( itemRegistered ) );
+	// Always load health/ammo/fuel pickups
+	RegisterItem( BG_FindItem( "5 Health" ) );
+	RegisterItem( BG_FindItem( "25 Health" ) );
+	RegisterItem( BG_FindItem( "50 Health" ) );
+	RegisterItem( BG_FindItem( "Some Fuel" ) );
+	RegisterItem( BG_FindItem( "More Fuel" ) );
+	RegisterItem( BG_FindItem( "Shells" ) );
+	RegisterItem( BG_FindItem( "Bullets" ) );
+	RegisterItem( BG_FindItem( "Slugs" ) );
+	RegisterItem( BG_FindItem( "Rockets" ) );
 }
 
 /*
