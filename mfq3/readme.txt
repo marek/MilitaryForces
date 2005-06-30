@@ -48,6 +48,7 @@ History:
 - added UH-1 "Huey" by Angel/Nordbo
 - added dropcrate weapons
 - added fuel pickup
+- added long over due MLRS, thanks Xealot
 
 +++v0.77+++
 -----------
