@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.61 2005-06-30 03:54:00 minkis Exp $
+ * $Id: bg_vehicledata.c,v 1.62 2005-06-30 06:37:09 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -2796,6 +2796,55 @@ completeVehicleData_t availableVehicles[] =
 	1400,						// geartime
 	0,							// max gear frame
 	1000,						// baytime
+	0,							// max bay frame
+	0,							// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
+    },
+
+
+{	"MLRS",						// descriptiveName
+	"MLRS",						// tinyName
+	"mlrs",						// modelName
+	SHADOW_DEFAULT,				// alpha shadow
+	MF_GAMESET_MODERN,				// id
+	MF_TEAM_1,
+	CAT_GROUND,
+	CLASS_GROUND_SAM,
+	0,							// flags
+	0,							// capabilities
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
+	{50, 100, 100},				// turnspeed around the three axis
+	{0, 100, 30},				// camera distance {min,max,default}
+	{0, 100, 10},				// camera height {min,max,default}
+	0,							// stallspeed
+	60,						    // maxspeed
+	-5,							// min throttle
+	10,						    // max throttle
+	1,							// engines
+	0,							// wheels
+	0,							// wheel circumference
+	20,							// acceleration
+	400,						// health
+	{5, 0, 8},					// gun tag
+	150,						// max fuel
+	335,						// max gun pitch (upwards = negative) <- gearheight
+	3,							// min gun pitch (downwards = positive) <- tailangle
+	0, WI_HELLFIRE, 0, 0, 0, 0, 0, WI_CFLARE,// weapons
+	0, 12, 0, 0, 0, 0, 0, 20,	// ammo
+	0,0,0,0,0,0,0,0,			// turret
+	{0, 0, 14},					// cameraposition for cockpit view
+	0,							// effect model
+	8000,						// radar range
+	4000,						// radar range ground
+	0,							// trackcone
+	0,							// trackcone ground
+	0,							// swingangle
+	0,						// geartime
+	0,							// max gear frame
+	0,						// baytime
 	0,							// max bay frame
 	0,							// renderflags
 	{0,0,0,0},					// shadow coordinates
