@@ -1,5 +1,5 @@
 /*
- * $Id: bg_misc.c,v 1.17 2005-06-26 05:08:12 minkis Exp $
+ * $Id: bg_misc.c,v 1.18 2005-06-30 03:54:00 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -108,6 +108,36 @@ gitem_t	bg_itemlist[] =
 /* pickup */	"Mega Health",
 		100,
 		IT_HEALTH,
+		0,
+/* precache */ "",
+/* sounds */ ""
+	},
+
+	{
+		"item_fuel_some",
+		"sound/items/m_health.wav",
+        { "models/powerups/fuel_canister/fuel_canister.md3", 
+		0, 
+		0, 0 },
+/* icon */		"icons/iconf_some",
+/* pickup */	"Some Fuel",
+		250,
+		IT_FUEL,
+		0,
+/* precache */ "",
+/* sounds */ ""
+	},
+
+	{
+		"item_fuel_more",
+		"sound/items/m_health.wav",
+        { "models/powerups/fuel_refueller/fuel_refueller.md3", 
+		0, 
+		0, 0 },
+/* icon */		"icons/iconf_more",
+/* pickup */	"more Fuel",
+		2000,
+		IT_FUEL,
 		0,
 /* precache */ "",
 /* sounds */ ""
@@ -326,6 +356,14 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 			return qfalse;
 		}
 		return qtrue;
+
+	case IT_FUEL:
+		// small and mega healths will go over the max, otherwise
+		// don't pick up if already at max
+			if ( ps->stats[STAT_FUEL] >= ps->stats[STAT_MAX_FUEL] ) {
+				return qfalse;
+			}
+			return qtrue;
 
 	case IT_TEAM: // team items, such as flags
 		if( gametype == GT_CTF ) {

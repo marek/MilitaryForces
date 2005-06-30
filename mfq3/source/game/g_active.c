@@ -1,5 +1,5 @@
 /*
- * $Id: g_active.c,v 1.30 2005-06-27 05:52:51 minkis Exp $
+ * $Id: g_active.c,v 1.31 2005-06-30 03:54:00 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -805,6 +805,7 @@ void ClientThink_real( gentity_t *ent ) {
 	pm.ps->speed = client->ps.speed;
 	pm.ps->gunAngle = client->ps.gunAngle;
 	pm.ps->turretAngle = client->ps.turretAngle;
+
 	if( ent->health < 0 ) {
 		pm.ps->generic1 = 30;
 	} else if( ent->health >= 0 && ent->health < 30 ) {
@@ -906,7 +907,6 @@ void ClientThink_real( gentity_t *ent ) {
 
 	// perform once-a-second actions
 	ClientTimerActions( ent, msec );
-
 }
 
 /*

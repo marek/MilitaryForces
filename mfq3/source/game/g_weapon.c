@@ -1,5 +1,5 @@
 /*
- * $Id: g_weapon.c,v 1.14 2005-06-26 05:08:12 minkis Exp $
+ * $Id: g_weapon.c,v 1.15 2005-06-30 03:54:00 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -121,6 +121,11 @@ void FireWeapon( gentity_t *ent ) {
 		drop_fueltank( ent );
 		if( availableWeapons[ent->s.weaponIndex].flags & WF_FIRE_IN_PAIRS )
 			drop_fueltank( ent );
+		break;
+	case WT_FUELCRATE:
+	case WT_AMMOCRATE:
+	case WT_HEALTHCRATE:
+		drop_crate( ent );
 		break;
 	case WT_FLAK:
 		// No client flak firing yet

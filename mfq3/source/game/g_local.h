@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.44 2005-06-27 05:52:51 minkis Exp $
+ * $Id: g_local.h,v 1.45 2005-06-30 03:54:00 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -162,7 +162,7 @@ struct gentity_s {
 	gitem_t		*item;			// for bonus items
 
 	// MFQ3
-	unsigned int ONOFF;			// to remember status after leaving vehicle
+ int ONOFF;			// to remember status after leaving vehicle
 	int			 left;			// for projectiles
 	int			 bulletpos;		// for dual guns (or more)
 	float		 gearheight;	
@@ -654,6 +654,7 @@ void fire_flare (gentity_t *self);
 void fire_flare2 (gentity_t *self, vec3_t start, vec3_t up, int age);
 void fire_cflare (gentity_t *self);
 void drop_fueltank (gentity_t *self);
+void drop_crate (gentity_t *self);
 void fire_nukebomb (gentity_t *self);
 void fire_nukemissile (gentity_t *self);
 void LaunchMissile_GI( gentity_t* ent );

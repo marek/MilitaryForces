@@ -1,5 +1,5 @@
 /*
- * $Id: g_missile.c,v 1.31 2005-06-26 23:47:07 minkis Exp $
+ * $Id: g_missile.c,v 1.32 2005-06-30 03:54:00 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -436,6 +436,77 @@ void G_burningManExplode( gentity_t *ent ) {
 
 /*
 ================
+G_CrateDropItems
+================
+*/
+void G_CrateDropItems(gentity_t *ent)
+{
+	gitem_t		*item;
+	qboolean	found = qfalse;
+	char		*classname[5];
+	int			items,i;
+
+	switch(availableWeapons[ent->s.weaponIndex].type)
+	{
+		case WT_FUELCRATE:
+			switch(availableWeapons[ent->s.weaponIndex].damage)
+			{
+				case 1:
+				default:
+					classname[0] = "Some Fuel";
+					break;
+				case 2:
+					classname[0] = "More Fuel";
+					break;
+			}
+			items = 1;
+			break;
+		case WT_AMMOCRATE:
+			classname[0] = "Shells";
+			classname[1] = "Bullets";
+			classname[2] = "Rockets";
+			classname[3] = "Slugs";
+			items = 4;
+			break;
+		case WT_HEALTHCRATE:
+			switch(availableWeapons[ent->s.weaponIndex].damage)
+			{
+				case 5:
+				default:
+					classname[0] = "5 Health";
+					break;
+				case 25:
+					classname[0] = "25 Health";
+					break;
+				case 50:
+					classname[0] = "50 Health";
+					break;
+			}
+			items = 1;
+			break;
+	}
+
+	for(i = 0; i < items; i++)
+	{
+		found = qfalse;
+		// find the item 
+		for ( item = bg_itemlist + 1; item->classname; item++) {
+			if ( strcmp(item->pickup_name,classname[i]) == 0  )  {
+				found = qtrue;
+				break;
+			}
+		}
+		// spawn the item
+		if(found)
+			Drop_Item( ent, item, 0 );
+	}
+
+
+
+}
+
+/*
+================
 G_ExplodeNuke
 ================
 */
@@ -543,18 +614,19 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 	// is it cheaper in bandwidth to just remove this ent and create a new
 	// one, rather than changing the missile into the explosion?
 
-	
-	if ( other->takedamage && other->client ) {
-		G_AddEvent( ent, EV_MISSILE_HIT, DirToByte( trace->plane.normal ), qtrue );
-		ent->s.otherEntityNum = other->s.number;
-	} else if( trace->surfaceFlags & SURF_METALSTEPS ) {
-		G_AddEvent( ent, EV_MISSILE_MISS_METAL, DirToByte( trace->plane.normal ), qtrue );
-	} else {
-		G_AddEvent( ent, EV_MISSILE_MISS, DirToByte( trace->plane.normal ), qtrue );
+	if (availableWeapons[ent->s.weaponIndex].type != WT_FUELCRATE && 
+			availableWeapons[ent->s.weaponIndex].type != WT_AMMOCRATE && 
+			availableWeapons[ent->s.weaponIndex].type != WT_HEALTHCRATE) 
+	{
+		if ( other->takedamage && other->client ) {
+			G_AddEvent( ent, EV_MISSILE_HIT, DirToByte( trace->plane.normal ), qtrue );
+			ent->s.otherEntityNum = other->s.number;
+		} else if( trace->surfaceFlags & SURF_METALSTEPS ) {
+			G_AddEvent( ent, EV_MISSILE_MISS_METAL, DirToByte( trace->plane.normal ), qtrue );
+		} else {
+			G_AddEvent( ent, EV_MISSILE_MISS, DirToByte( trace->plane.normal ), qtrue );
+		}
 	}
-
-
-
 
 	ent->freeAfterEvent = qtrue;
 
@@ -572,6 +644,19 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 			G_Error ( "NULL ent->think");
 		else
 			ent->think (ent);
+	}
+	else if (availableWeapons[ent->s.weaponIndex].type == WT_FUELCRATE || 
+		availableWeapons[ent->s.weaponIndex].type == WT_AMMOCRATE || 
+		availableWeapons[ent->s.weaponIndex].type == WT_HEALTHCRATE)
+	{
+		char * classname = g_entities[trace->entityNum].classname;
+		if( strcmp( classname, "func_runway" ) == 0 ||
+			strcmp( classname, "func_plat" ) == 0 ||
+			strcmp( classname, "func_train" ) == 0 ||
+			strcmp( classname, "func_door" ) == 0 ||
+			strcmp( classname, "worldspawn" ) == 0) {
+			G_CrateDropItems(ent);
+		}
 	}
 	// splash damage (doesn't apply to person directly hit)
 	else if ( ent->splashDamage ) {
@@ -627,6 +712,7 @@ void G_RunMissile( gentity_t *ent ) {
 			G_FreeEntity( ent );
 			return;
 		}
+
 		G_MissileImpact( ent, &tr );
 
 		if ( ent->s.eType != ET_MISSILE &&
@@ -639,6 +725,56 @@ void G_RunMissile( gentity_t *ent ) {
 	G_RunThink( ent );
 }
 
+/*
+================
+G_CrateThink
+================
+*/
+void G_CrateThink( gentity_t *ent ) {
+	vec3_t angles, pos, dir;
+	int i;
+
+	// Get values
+	VectorCopy(ent->r.currentAngles, angles);
+	VectorCopy(ent->r.currentOrigin, pos);
+
+	// set angles to 0 <= x <= 360
+	angles[0] = AngleMod( angles[0] );
+	angles[1] = AngleMod( angles[1] );
+	angles[2] = AngleMod( angles[2] );
+
+	// Set angles
+	for(i = 0; i < 3; i++)
+	{
+		angles[i] = 15*sin((pos[2]/25)+(i*10));
+	}
+	angles[1] = 0;	// some odd bug
+
+	// Create forces based on angles
+	VectorCopy(angles,  dir);
+	AngleVectors( dir, dir, NULL, NULL );
+	VectorScale( dir, (float)ent->speed/5, dir );
+	VectorAdd(dir,pos,pos);
+	pos[2] -= ent->speed;
+	
+	// Save angles
+	VectorCopy( angles, ent->s.angles );
+	VectorCopy( ent->s.angles, ent->s.apos.trBase );
+	VectorCopy( ent->s.angles, ent->r.currentAngles );
+	ent->s.apos.trTime = level.time;
+
+	// Save Origin
+	VectorCopy( pos, ent->r.currentOrigin);
+	VectorCopy( ent->r.currentOrigin, ent->s.pos.trBase );
+	VectorCopy( dir, ent->s.pos.trDelta );
+	ent->s.pos.trTime = level.time;
+
+	// Set next think
+	ent->nextthink = level.time + 5;
+	ent->lastDist = VectorNormalize(dir);
+
+	trap_LinkEntity( ent );
+}
 
 //=============================================================================
 
@@ -1437,6 +1573,70 @@ void drop_fueltank (gentity_t *self) {
 	VectorCopy (start, bolt->r.currentOrigin);
 }
 
+/*
+================
+G_CrateDie
+================
+*/
+void G_CrateDie( gentity_t *self, gentity_t *inflictor,
+        gentity_t *attacker, int damage, int mod ) {
+        if (inflictor == self)
+                return;
+        self->takedamage = qfalse;
+        self->think = G_ExplodeMissile;
+        self->nextthink = level.time + 10;
+}
+
+
+/*
+=================
+drop_crate
+=================
+*/
+void drop_crate (gentity_t *self) {
+	gentity_t	*bolt;
+	vec3_t		start;
+
+	MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, 0, 0, 0 );
+
+	VectorCopy( self->s.pos.trBase, start );
+	//start[2] -= availableVehicles[self->client->vehicle].maxs[2] - availableVehicles[self->client->vehicle].mins[2];
+	SnapVector( start );
+
+	bolt = G_Spawn();
+	bolt->classname = "crate";
+	bolt->nextthink = level.time + 100;
+	//bolt->nextthink = level.time + 10000;
+	bolt->think = G_CrateThink;
+	//bolt->think = G_ExplodeMissile;
+	bolt->s.eType = ET_MISSILE;
+	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
+	bolt->s.weaponIndex = self->client->ps.weaponIndex;
+	bolt->r.ownerNum = self->s.number;
+	bolt->parent = self;
+	bolt->catmodifier = availableWeapons[self->client->ps.weaponIndex].noncatmod;
+	bolt->clipmask = MASK_SHOT|MASK_WATER;
+	bolt->target_ent = NULL;
+	bolt->speed = bolt->speed = availableWeapons[self->client->ps.weaponIndex].muzzleVelocity;
+
+	//bolt->s.pos.trType = TR_LINEAR;
+	bolt->s.pos.trType = TR_GRAVITY;
+	bolt->s.pos.trTime = level.time;
+
+	bolt->health = 5;
+	bolt->takedamage = qtrue;
+	bolt->die = G_CrateDie;
+	bolt->r.contents = CONTENTS_BODY;
+
+	VectorSet(bolt->r.mins, -10, -3, 0);
+	VectorCopy(bolt->r.mins, bolt->r.absmin);
+	VectorSet(bolt->r.maxs, 10, 3, 6);
+	VectorCopy(bolt->r.maxs, bolt->r.absmax);
+
+	VectorCopy( start, bolt->s.pos.trBase );
+	VectorCopy (start, bolt->r.currentOrigin);
+}
+
 
 /*
 =================
@@ -1529,6 +1729,7 @@ void fire_nukemissile (gentity_t *self) {
 	bolt->s.pos.trType = TR_LINEAR;
 	VectorScale( dir, bolt->speed, bolt->s.pos.trDelta );
 
+	// Give health? TODO...
 
 	bolt->s.eType = ET_MISSILE;
 	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
