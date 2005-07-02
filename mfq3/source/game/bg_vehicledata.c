@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.62 2005-06-30 06:37:09 minkis Exp $
+ * $Id: bg_vehicledata.c,v 1.63 2005-07-02 07:45:05 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -2723,20 +2723,20 @@ completeVehicleData_t availableVehicles[] =
 	{0, 100, 30},				// camera distance {min,max,default}
 	{0, 100, 10},				// camera height {min,max,default}
 	0,							// stallspeed
-	90,						    // maxspeed
+	70,						    // maxspeed
 	-5,							// min throttle
 	10,						    // max throttle
 	1,							// engines
-	4,							// wheels
-	9,							// wheel circumference
+	0,							// wheels
+	0,							// wheel circumference
 	33,							// acceleration
-	170,						// health
+	160,						// health
 	{3, 1, 6},					// gun tag
 	160,						// max fuel
 	285,						// max gun pitch (upwards = negative) <- gearheight
 	5,							// min gun pitch (downwards = positive) <- tailangle
-	WI_MG_14_5MM, WI_STINGER, WI_HELLFIRE, 0, 0, 0, 0, WI_CFLARE,// weapons
-	600, 2, 4, 0, 0, 0, 0, 20,	// ammo
+	WI_MG_4X14_5MM, 0, 0, 0, 0, 0, 0, WI_CFLARE,// weapons
+	1200, 0, 0, 0, 0, 0, 0, 20,	// ammo
 	0,0,0,0,0,0,0,0,			// turret
 	{0, 0, 10},					// cameraposition for cockpit view
 	0,							// effect model
@@ -2745,9 +2745,9 @@ completeVehicleData_t availableVehicles[] =
 	-1,							// trackcone
 	0,							// trackcone ground
 	0,							// swingangle
-	1400,						// geartime
+	0,						// geartime
 	0,							// max gear frame
-	1000,						// baytime
+	0,						// baytime
 	0,							// max bay frame
 	0,							// renderflags
 	{0,0,0,0},					// shadow coordinates
@@ -2783,8 +2783,8 @@ completeVehicleData_t availableVehicles[] =
 	150,						// max fuel
 	335,						// max gun pitch (upwards = negative) <- gearheight
 	3,							// min gun pitch (downwards = positive) <- tailangle
-	WI_MG_12_7MM, WI_125MM_GUN, 0, 0, 0, 0, 0, WI_FLARE,// weapons
-	500, 40, 0, 0, 0, 0, 0, 20,	// ammo
+	WI_MG_12_7MM, WI_125MM_GUN, 0, 0, 0, 0, 0, 0,// weapons
+	500, 40, 0, 0, 0, 0, 0, 0,	// ammo
 	0,0,0,0,0,0,0,0,			// turret
 	{0, 0, 14},					// cameraposition for cockpit view
 	0,							// effect model
@@ -2803,7 +2803,55 @@ completeVehicleData_t availableVehicles[] =
     },
 
 
-{	"MLRS",						// descriptiveName
+    {	"M4 Sherman",			// descriptiveName
+	"M4",						// tinyName
+	"m4",				// modelName
+	SHADOW_DEFAULT,				// alpha shadow
+	MF_GAMESET_WW2,				// id
+	MF_TEAM_2,
+	CAT_GROUND,
+	CLASS_GROUND_MBT,
+	0,							// flags
+	0,							// capabilities
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
+	{50, 100, 100},				// turnspeed around the three axis
+	{0, 100, 30},				// camera distance {min,max,default}
+	{0, 100, 10},				// camera height {min,max,default}
+	0,							// stallspeed
+	60,						    // maxspeed
+	-5,							// min throttle
+	10,						    // max throttle
+	1,							// engines
+	0,							// wheels
+	0,							// wheel circumference
+	20,							// acceleration
+	350,						// health
+	{5, 0, 8},					// gun tag
+	150,						// max fuel
+	335,						// max gun pitch (upwards = negative) <- gearheight
+	3,							// min gun pitch (downwards = positive) <- tailangle
+	WI_MG_12_7MM, WI_125MM_GUN, 0, 0, 0, 0, 0, 0,// weapons
+	500, 40, 0, 0, 0, 0, 0, 0,	// ammo
+	0,0,0,0,0,0,0,0,			// turret
+	{0, 0, 14},					// cameraposition for cockpit view
+	0,							// effect model
+	8000,						// radar range
+	4000,						// radar range ground
+	-1,							// trackcone
+	0,							// trackcone ground
+	0,							// swingangle
+	1400,						// geartime
+	0,							// max gear frame
+	1000,						// baytime
+	0,							// max bay frame
+	0,							// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
+    },
+
+	{	"MLRS",						// descriptiveName
 	"MLRS",						// tinyName
 	"mlrs",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
@@ -2939,6 +2987,58 @@ completeVehicleData_t availableVehicles[] =
 	0,							// effect model
 	8000,						// radar range
 	5000,						// radar range ground
+	-1,							// trackcone
+	0,							// trackcone ground
+	0,							// swingangle
+	0,							// geartime
+	0,							// max gear frame
+	0,							// baytime
+	0,							// max bay frame
+	0,							// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
+    },
+
+	// ---------------------------------------------
+	// Infantry
+	// ---------------------------------------------
+
+	{	"Sarge - Generic Fodder",	// descriptiveName
+	"sarge",					// tinyName
+	"sarge",					// modelName
+	SHADOW_DEFAULT,				// alpha shadow
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_2,
+	CAT_LQM,
+	CLASS_LQM_INFANTRY,
+	0,							// flags
+	0,	// capabilities
+	{0,0,0,0,0,0,0,0,0,0},		// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
+	{50, 125, 70},				// turnspeed around the three axis
+	{0, 100, 80},				// camera distance {min,max,default}
+	{0, 100, 25},				// camera height {min,max,default}
+	0,							// stallspeed
+	300,						// maxspeed
+	0,							// min throttle
+	0,						    // max throttle
+	0,							// engines
+	0,							// wheels
+	0,							// wheel circumference
+	0,							// acceleration
+	20,							// health
+	{0, 0, 0},					// gun tag
+	0,							// max fuel
+	0,							// max gun pitch (upwards = negative) <- gearheight
+	0,							// min gun pitch (downwards = positive) <- tailangle
+	0, 0, 0, 0, 0, 0, 0, 0,		// weapons
+	0, 0, 0, 0, 0, 0, 0, 0,		// ammo
+	0,0,0,0,0,0,0,0,			// turret
+	{0, 0, 10},					// cameraposition for cockpit view
+	0,							// effect model
+	0,							// radar range
+	0,							// radar range ground
 	-1,							// trackcone
 	0,							// trackcone ground
 	0,							// swingangle
@@ -3366,7 +3466,7 @@ const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1] =
 	// infantry
 	{
 		"Special Unit",
-		0,
+		"Infantry",
 		0,
 		0,
 		0,

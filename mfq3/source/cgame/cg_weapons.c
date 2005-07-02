@@ -1,5 +1,5 @@
 /*
- * $Id: cg_weapons.c,v 1.33 2005-06-30 03:54:00 minkis Exp $
+ * $Id: cg_weapons.c,v 1.34 2005-07-02 07:45:05 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -815,6 +815,7 @@ void CG_MissileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_t di
 	case WI_MG_6XCAL50:
 	case WI_MG_12_7MM:
 	case WI_MG_14_5MM:
+	case WI_MG_4X14_5MM:
 	case WI_MG_20MM:
 	case WI_MG_2X20MM:
 	case WI_MGT_7_62MM:

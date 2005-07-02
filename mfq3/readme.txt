@@ -49,6 +49,8 @@ History:
 - added dropcrate weapons
 - added fuel pickup
 - added long over due MLRS, thanks Xealot
+- added M4 Sherman, thanks Edwin
+- added mfq3_subpen into default distribution
 
 +++v0.77+++
 -----------

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_weapondata.c,v 1.36 2005-06-30 03:54:00 minkis Exp $
+ * $Id: bg_weapondata.c,v 1.37 2005-07-02 07:45:05 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -272,6 +272,46 @@ completeWeaponData_t availableWeapons[] =
 		0,									// damageRadius
 		14,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
 		2,									// barrels
+		0,									// barrelDistance
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_GUNMODE,							// crosshair
+		CH_GUNMODE,							// crosshair track
+		CH_GUNMODE,							// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
+		1,									// number per package
+		CAT_ANY,							// fits on category
+		PF_NA,								// fits on pylon
+		0,									// basicECMVulnerability
+		0,									// flags
+	},
+
+	// machinegun: any set,  4x14.5mm, 1 barrel
+	{ 
+		WT_MACHINEGUN,						// type
+		MF_GAMESET_ANY,						// gameset
+		"Quad 14.5mm MG",					// descriptiveName
+		"MG",								// shortName
+		"MG",								// shortName2 (GVs)
+		"",									// modelName
+		0,									// handle
+		"",									// vwepName
+		0,									// vwephandle
+		"hud/iconw_mg.tga",					// iconName
+		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
+		3000,								// muzzleVelocity
+		0,									// range
+		0,									// fuelrange
+		100,								// fire interval
+		7,									// damage
+		0,									// damageRadius
+		14,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
+		4,									// barrels
 		0,									// barrelDistance
 		0,									// lockcone
 		0,									// followcone

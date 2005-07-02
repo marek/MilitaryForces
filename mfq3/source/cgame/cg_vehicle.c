@@ -1,11 +1,16 @@
 /*
- * $Id: cg_vehicle.c,v 1.29 2005-06-26 05:08:11 minkis Exp $
+ * $Id: cg_vehicle.c,v 1.30 2005-07-02 07:45:04 minkis Exp $
 */
 
 #include "cg_local.h"
 
-
-
+#define MAX_LQM_MODELS	32
+typedef struct LQMAnimations_s
+{
+	int			numAnimations;
+	animation_t	anim[MAX_LQM_MODELS];
+} LQMAnimations_t;
+LQMAnimations_t availableLQMAnimations;
 
 /*
 ===============
@@ -24,6 +29,155 @@ void trap_Cache_Error( char * pString )
 	// (release builds, VM builds, ...)
 	trap_Error( pString );
 #endif
+}
+
+/*
+======================
+CG_ParseLQMAnimationFile
+
+Read a configuration file containing animation coutns and rates
+models/players/visor/animation.cfg, etc
+======================
+*/
+static animation_t * CG_ParseLQMAnimationFile( const char *filename ) {
+	char		*text_p, *prev;
+	int			len;
+	int			i;
+	char		*token;
+	float		fps;
+	int			skip;
+	char		text[20000];
+	fileHandle_t	f;
+	animation_t *animations;
+
+	animations = &availableLQMAnimations.anim[availableLQMAnimations.numAnimations];
+
+	// load the file
+	len = trap_FS_FOpenFile( filename, &f, FS_READ );
+	if ( len <= 0 ) {
+		return NULL;
+	}
+	if ( len >= sizeof( text ) - 1 ) {
+		CG_Printf( "File %s too long\n", filename );
+		return NULL;
+	}
+	trap_FS_Read( text, len, f );
+	text[len] = 0;
+	trap_FS_FCloseFile( f );
+
+	// parse the text
+	text_p = text;
+	skip = 0;	// quite the compiler warning
+
+	// read optional parameters
+	while ( 1 ) {
+		prev = text_p;	// so we can unget
+		token = COM_Parse( &text_p );
+		if ( !token ) {
+			break;
+		}
+
+		// if it is a number, start parsing animations
+		if ( token[0] >= '0' && token[0] <= '9' ) {
+			text_p = prev;	// unget the token
+			break;
+		}
+		Com_Printf( "unknown token '%s' is %s\n", token, filename );
+	}
+
+	// read information for each frame
+	for ( i = 0 ; i < MAX_ANIMATIONS ; i++ ) {
+
+		token = COM_Parse( &text_p );
+		if ( !*token ) {
+			if( i >= TORSO_GETFLAG && i <= TORSO_NEGATIVE ) {
+				animations[i].firstFrame = animations[TORSO_GESTURE].firstFrame;
+				animations[i].frameLerp = animations[TORSO_GESTURE].frameLerp;
+				animations[i].initialLerp = animations[TORSO_GESTURE].initialLerp;
+				animations[i].loopFrames = animations[TORSO_GESTURE].loopFrames;
+				animations[i].numFrames = animations[TORSO_GESTURE].numFrames;
+				animations[i].reversed = qfalse;
+				animations[i].flipflop = qfalse;
+				continue;
+			}
+			break;
+		}
+		animations[i].firstFrame = atoi( token );
+		// leg only frames are adjusted to not count the upper body only frames
+		if ( i == LEGS_WALKCR ) {
+			skip = animations[LEGS_WALKCR].firstFrame - animations[TORSO_GESTURE].firstFrame;
+		}
+		if ( i >= LEGS_WALKCR && i<TORSO_GETFLAG) {
+			animations[i].firstFrame -= skip;
+		}
+
+		token = COM_Parse( &text_p );
+		if ( !*token ) {
+			break;
+		}
+		animations[i].numFrames = atoi( token );
+
+		animations[i].reversed = qfalse;
+		animations[i].flipflop = qfalse;
+		// if numFrames is negative the animation is reversed
+		if (animations[i].numFrames < 0) {
+			animations[i].numFrames = -animations[i].numFrames;
+			animations[i].reversed = qtrue;
+		}
+
+		token = COM_Parse( &text_p );
+		if ( !*token ) {
+			break;
+		}
+		animations[i].loopFrames = atoi( token );
+
+		token = COM_Parse( &text_p );
+		if ( !*token ) {
+			break;
+		}
+		fps = atof( token );
+		if ( fps == 0 ) {
+			fps = 1;
+		}
+		animations[i].frameLerp = 1000 / fps;
+		animations[i].initialLerp = 1000 / fps;
+	}
+
+	if ( i != MAX_ANIMATIONS ) {
+		CG_Printf( "Error parsing animation file: %s", filename );
+		return NULL;
+	}
+
+	// crouch backward animation
+	memcpy(&animations[LEGS_BACKCR], &animations[LEGS_WALKCR], sizeof(animation_t));
+	animations[LEGS_BACKCR].reversed = qtrue;
+	// walk backward animation
+	memcpy(&animations[LEGS_BACKWALK], &animations[LEGS_WALK], sizeof(animation_t));
+	animations[LEGS_BACKWALK].reversed = qtrue;
+	// flag moving fast
+	animations[FLAG_RUN].firstFrame = 0;
+	animations[FLAG_RUN].numFrames = 16;
+	animations[FLAG_RUN].loopFrames = 16;
+	animations[FLAG_RUN].frameLerp = 1000 / 15;
+	animations[FLAG_RUN].initialLerp = 1000 / 15;
+	animations[FLAG_RUN].reversed = qfalse;
+	// flag not moving or moving slowly
+	animations[FLAG_STAND].firstFrame = 16;
+	animations[FLAG_STAND].numFrames = 5;
+	animations[FLAG_STAND].loopFrames = 0;
+	animations[FLAG_STAND].frameLerp = 1000 / 20;
+	animations[FLAG_STAND].initialLerp = 1000 / 20;
+	animations[FLAG_STAND].reversed = qfalse;
+	// flag speeding up
+	animations[FLAG_STAND2RUN].firstFrame = 16;
+	animations[FLAG_STAND2RUN].numFrames = 5;
+	animations[FLAG_STAND2RUN].loopFrames = 1;
+	animations[FLAG_STAND2RUN].frameLerp = 1000 / 15;
+	animations[FLAG_STAND2RUN].initialLerp = 1000 / 15;
+	animations[FLAG_STAND2RUN].reversed = qtrue;
+
+	availableLQMAnimations.numAnimations++;
+	return animations;
 }
 
 static void CG_CachePlane(int index)
@@ -204,60 +358,44 @@ On startup cache it
 */
 
 static void CG_CacheLQM(int index)
-{/*
+{
 	char name[128];
 	char basename[128];
 	int i;
 
-	Com_sprintf( basename, sizeof(basename), "models/vehicles/ground/%s/%s", availableVehicles[index].modelName,
+	Com_sprintf( basename, sizeof(basename), "models/vehicles/lqms/%s/%s", availableVehicles[index].modelName,
 			availableVehicles[index].modelName );
 // changed mg
-	for( i = 0; i < BP_GV_MAX_PARTS; i++ ) {
+	for( i = 0; i < BP_LQM_MAX_PARTS; i++ ) {
 		switch(i) {
-		case BP_GV_BODY:
+		case BP_LQM_BODY:
 			Com_sprintf( name, sizeof(name), "%s.md3", basename );
 			break;
-		case BP_GV_TURRET:
-			Com_sprintf( name, sizeof(name), "%s_tur.md3", basename );
+		case BP_LQM_LOWER:
+			Com_sprintf( name, sizeof(name), "%s_lower.md3", basename );
 			break;
-		case BP_GV_GUNBARREL:
-			Com_sprintf( name, sizeof(name), "%s_gun.md3", basename );
-			break;
-		case BP_GV_WHEEL:
-			Com_sprintf( name, sizeof(name), "%s_w1.md3", basename );
-			break;
-		case BP_GV_WHEEL2:
-			Com_sprintf( name, sizeof(name), "%s_w2.md3", basename );
-			break;
-		case BP_GV_WHEEL3:
-			Com_sprintf( name, sizeof(name), "%s_w3.md3", basename );
-			break;
-		case BP_GV_WHEEL4:
-			Com_sprintf( name, sizeof(name), "%s_w4.md3", basename );
-			break;
-		case BP_GV_WHEEL5:
-			Com_sprintf( name, sizeof(name), "%s_w5.md3", basename );
-			break;
-		case BP_GV_WHEEL6:
-			Com_sprintf( name, sizeof(name), "%s_w6.md3", basename );
+		case BP_LQM_HEAD:
+			Com_sprintf( name, sizeof(name), "%s_head.md3", basename );
 			break;
 		}
 		availableVehicles[index].handle[i] = trap_R_RegisterModel( name );
-//		if( !availableVehicles[index].handle[i] ) {
-//			CG_Printf( "MFQ3 Warning: Unable to load model '%s'\n", name );
-//		}
 	}
 
 	// only thing that always has to be there is body
-	if( !availableVehicles[index].handle[BP_PLANE_BODY] ) {
+	if( !availableVehicles[index].handle[BP_LQM_BODY] ) {
 		trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
-	}*/
+	}
+
+	// Parse LQM Animations
+	Com_sprintf( name, sizeof(name), "models/vehicles/lqms/%s/animation.cfg",  availableVehicles[index].modelName );
+	if(!(availableVehicles[index].animations = CG_ParseLQMAnimationFile(name))) 
+		trap_Cache_Error( va("MFQ3 Error: Cannot parse %s: animation.cfg\n", basename) );
 }
 
 
 /*
 ===============
-CG_CacheGroundVehicle
+CG_CacheBoat
 
 On startup cache it
 ===============
@@ -566,9 +704,12 @@ void CG_Vehicle( centity_t *cent )
 		CG_Helo( cent, ci );
 	}
 	// lqm?
-	else if( availableVehicles[ci->vehicle].cat & CAT_LQM )
+	else if( availableVehicles[ci->vehicle].cat & CAT_LQM)
 	{
-		CG_LQM( cent, ci );
+		if(cg.clientNum != clientNum)
+			CG_LQM( cent, ci );
+		else
+			CG_LQM( cent, ci );	//CG_LQMFirstPerson(cent, ci);
 	}
 	// boat ?
 	else if( availableVehicles[ci->vehicle].cat & CAT_BOAT )

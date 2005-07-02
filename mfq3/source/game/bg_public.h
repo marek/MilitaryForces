@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.134 2005-06-30 03:54:00 minkis Exp $
+ * $Id: bg_public.h,v 1.135 2005-07-02 07:45:05 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -363,6 +363,72 @@ typedef enum {
 } global_team_sound_t;
 
 
+// animations
+typedef enum {
+	BOTH_DEATH1,
+	BOTH_DEAD1,
+	BOTH_DEATH2,
+	BOTH_DEAD2,
+	BOTH_DEATH3,
+	BOTH_DEAD3,
+
+	TORSO_GESTURE,
+
+	TORSO_ATTACK,
+	TORSO_ATTACK2,
+
+	TORSO_DROP,
+	TORSO_RAISE,
+
+	TORSO_STAND,
+	TORSO_STAND2,
+
+	LEGS_WALKCR,
+	LEGS_WALK,
+	LEGS_RUN,
+	LEGS_BACK,
+	LEGS_SWIM,
+
+	LEGS_JUMP,
+	LEGS_LAND,
+
+	LEGS_JUMPB,
+	LEGS_LANDB,
+
+	LEGS_IDLE,
+	LEGS_IDLECR,
+
+	LEGS_TURN,
+
+	TORSO_GETFLAG,
+	TORSO_GUARDBASE,
+	TORSO_PATROL,
+	TORSO_FOLLOWME,
+	TORSO_AFFIRMATIVE,
+	TORSO_NEGATIVE,
+
+	MAX_ANIMATIONS,
+
+	LEGS_BACKCR,
+	LEGS_BACKWALK,
+	FLAG_RUN,
+	FLAG_STAND,
+	FLAG_STAND2RUN,
+
+	MAX_TOTALANIMATIONS
+} LQManimNumber_t;
+
+
+typedef struct animation_s {
+	int		firstFrame;
+	int		numFrames;
+	int		loopFrames;			// 0 to numFrames
+	int		frameLerp;			// msec between frames
+	int		initialLerp;		// msec to get to first frame
+	int		reversed;			// true if animation is reversed
+	int		flipflop;			// true if animation should flipflop back to base
+} animation_t;
+
 typedef enum {
 	TEAM_FREE,
 	TEAM_RED,
@@ -592,8 +658,8 @@ typedef struct md3Tag_s {
 #define	CAT_HELO					  0x0004 
 #define	CAT_LQM						  0x0008
 #define	CAT_BOAT					  0x0010
-#define CAT_NPC						  0x0016
-#define CAT_MAX						  0x0016 
+#define CAT_NPC						  0x0020
+#define CAT_MAX						  0x0020 
 #define	CAT_ANY						  0xFFFF
 
 #define CLASS_MIN					  0x0001
@@ -621,7 +687,8 @@ typedef struct md3Tag_s {
 
 // LQM classes					
 #define CLASS_LQM_SPECIAL			  0x0001 
-#define CLASS_LQM_MAX				  0x0001 
+#define CLASS_LQM_INFANTRY			  0x0002
+#define CLASS_LQM_MAX				  0x0002 
 
 // boat classes					
 #define	CLASS_BOAT_PATROL			  0x0001 
@@ -669,6 +736,15 @@ extern const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1];
 #define BP_GV_WHEEL5			7
 #define BP_GV_WHEEL6			8
 #define BP_GV_MAX_PARTS			9
+
+// LQM
+#define BP_LQM_BODY				0
+#define BP_LQM_LOWER			1
+#define BP_LQM_HEAD				2
+//#define BP_LQM_WEAP				3
+//#define BP_LQM_GUNBARREL		4
+#define BP_LQM_MAX_PARTS		3
+
 
 // boats
 #define BP_BOAT_BODY			0
@@ -764,6 +840,7 @@ typedef struct completeLoadout_s
 {
 	mountInfo_t	mounts[MAX_MOUNTS_PER_VEHICLE];
 	int			usedMounts;
+	animation_t		animations[MAX_TOTALANIMATIONS];
 } completeLoadout_t;
 
 
@@ -817,6 +894,7 @@ typedef struct completeVehicleData_s
 	unsigned int	renderFlags;	// special stuff for rendering only
 	vec4_t			shadowCoords;	// shadow apply coords { offsetX, offsetY, xAdjust, yAdjust }
 	vec4_t			shadowAdjusts;	// shadow apply adjustments { pitchMax, rollMax, pitchMod, rollMod }
+	animation_t		*animations;	// Animation pointer
 }completeVehicleData_t;
 
 extern completeVehicleData_t availableVehicles[];
@@ -940,6 +1018,7 @@ typedef enum
 	WI_MG_6XCAL50,
 	WI_MG_12_7MM,
 	WI_MG_14_5MM,
+	WI_MG_4X14_5MM,
 	WI_MG_20MM,
 	WI_MG_30MM,
 	WI_MG_2X20MM,
@@ -1089,6 +1168,17 @@ int MF_findWeaponsOfType( int weaponIndex, completeLoadout_t* loadout );
 #define HC_AMPHIBIOUS			128
 #define	HC_WHEELS				256	// vehicle has wheels (rather than tracks)
 #define	HC_WEAPONBAY			512
+
+// LQM Animations (replace instead of using frame index, and let CG read animation.cfg)
+#define A_LQM_STAND				0
+#define A_LQM_RUNNING			1
+#define A_LQM_CROUCH			2
+#define A_LQM_FORWARD			4
+#define A_LQM_LEFT				8
+#define A_LQM_RIGHT				16
+#define A_LQM_EJECT				32
+#define A_LQM_FLY				64
+#define A_LQM_DIE				128
 
 // this is for the PW_ONOFF_FLAGS
 #define OO_NOTHING_ON			0
