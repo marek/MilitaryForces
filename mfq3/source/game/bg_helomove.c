@@ -1,5 +1,5 @@
 /*
- * $Id: bg_helomove.c,v 1.8 2005-06-30 03:54:00 minkis Exp $
+ * $Id: bg_helomove.c,v 1.9 2005-07-02 07:45:05 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -64,10 +64,6 @@ static void PM_AdjustToTerrainHelo( void )
 	float		heightX, heightY, heightXC, heightYC;
 	qboolean	fall = qfalse;	
 	float		height;
-
-	if( pm->waterlevel && availableVehicles[pm->vehicle].caps & HC_AMPHIBIOUS ) {
-		return;
-	}
 
 	// set the height
 	VectorSet( start[0], pm->ps->origin[0], pm->ps->origin[1], pm->ps->origin[2] + 30 );
@@ -226,7 +222,20 @@ void PM_Toggle_HeloGear()
 	pm->ps->timers[TIMER_GEAR] = pm->cmd.serverTime + availableVehicles[pm->vehicle].gearTime + 100;
 }
 
+void PM_Helo_Brakes()
+{
+	if( pm->cmd.serverTime < pm->ps->timers[TIMER_BRAKE] ) return;
 
+	if( pm->ps->ONOFF & OO_SPEEDBRAKE ) {
+		pm->ps->ONOFF &= ~OO_SPEEDBRAKE;
+	}
+	else {
+		pm->ps->ONOFF |= OO_SPEEDBRAKE;
+	}
+
+	pm->ps->timers[TIMER_BRAKE] = pm->cmd.serverTime + 500;
+
+}
 
 /*
 ===================
@@ -394,6 +403,10 @@ void PM_HeloMove( void )
 			VectorAdd(forwardvel,rightvel,deltavel);
 			VectorAdd(liftvel,deltavel,deltavel);
 
+	// brake
+	if( pm->cmd.buttons & BUTTON_BRAKE ) {
+		PM_Helo_Brakes();
+	}
 	
 	// freelook - plane keeps current heading
 	if( (pm->cmd.buttons & BUTTON_FREELOOK) && !dead ) {
@@ -475,35 +488,47 @@ void PM_HeloMove( void )
 		else if( diff[YAW] > turnspeed[YAW]) vehdir[YAW] += turnspeed[YAW];
 		else vehdir[YAW] = viewdir[YAW];
 
-		if( pm->ps->stats[STAT_HEALTH] > 0 ) {
+		if( pm->ps->ONOFF & OO_SPEEDBRAKE ) {
+			// pitch
+			if(pm->cmd.forwardmove > 0)
+				vehdir[PITCH] += turnspeed[PITCH]*1.25;
+			else if(pm->cmd.forwardmove < 0)
+				vehdir[PITCH] -= turnspeed[PITCH]*1.25;
+			if( pm->ps->ONOFF & OO_SPEEDBRAKE && pm->cmd.forwardmove == 0) {
+				if(vehdir[PITCH] > 0)
+					vehdir[PITCH] -= min(vehdir[PITCH], turnspeed[PITCH]*1.05);
+				else if(vehdir[PITCH] < 0)
+					vehdir[PITCH] += max(vehdir[PITCH], turnspeed[PITCH]*1.05);
+			}
 
-		// pitch
+			// roll
+			if(pm->cmd.rightmove > 0)
+				vehdir[ROLL] += turnspeed[ROLL]*2;
+			else if(pm->cmd.rightmove < 0)
+				vehdir[ROLL] -= turnspeed[ROLL]*2;
+			
+			// handle roll dependended on yaw otherwise return the vehicle ROLL to normal
+			if( diff[YAW] > 1 ) targroll = -MAX_HELO_TARGROLL;
+			else if( diff[YAW] < -1 ) targroll = MAX_HELO_TARGROLL;
+			else targroll = 0;
+			diff[ROLL] = targroll - vehdir[ROLL];
+			if( diff[ROLL] < -turnspeed[ROLL] ) vehdir[ROLL] -= turnspeed[ROLL];
+			else if( diff[ROLL] > turnspeed[ROLL] ) vehdir[ROLL] += turnspeed[ROLL];
+			else vehdir[ROLL] = targroll;
+		} else {
+			// pitch
+			if(pm->cmd.forwardmove > 0)
+				vehdir[PITCH] += turnspeed[PITCH];
+			else if(pm->cmd.forwardmove < 0)
+				vehdir[PITCH] -= turnspeed[PITCH];
 
-		if(pm->cmd.forwardmove > 0)
-			vehdir[PITCH] += turnspeed[PITCH]*1.25;
-		else if(pm->cmd.forwardmove < 0)
-			vehdir[PITCH] -= turnspeed[PITCH]*1.25;
-		else if(vehdir[PITCH] > 0)
-			vehdir[PITCH] -= min(vehdir[PITCH], turnspeed[PITCH]*1.05);
-		else if(vehdir[PITCH] < 0)
-			vehdir[PITCH] += max(vehdir[PITCH], turnspeed[PITCH]*1.05);
-
-		// roll
-		if(pm->cmd.rightmove > 0)
-			vehdir[ROLL] += turnspeed[ROLL]*2;
-		else if(pm->cmd.rightmove < 0)
-			vehdir[ROLL] -= turnspeed[ROLL]*2;
+			// roll
+			if(pm->cmd.rightmove > 0)
+				vehdir[ROLL] += turnspeed[ROLL];
+			else if(pm->cmd.rightmove < 0)
+				vehdir[ROLL] -= turnspeed[ROLL];
 		}
 
-		
-		// handle roll dependended on yaw otherwise return the vehicle ROLL to normal
-		if( diff[YAW] > 1 ) targroll = -MAX_HELO_TARGROLL;
-		else if( diff[YAW] < -1 ) targroll = MAX_HELO_TARGROLL;
-		else targroll = 0;
-		diff[ROLL] = targroll - vehdir[ROLL];
-		if( diff[ROLL] < -turnspeed[ROLL] ) vehdir[ROLL] -= turnspeed[ROLL];
-		else if( diff[ROLL] > turnspeed[ROLL] ) vehdir[ROLL] += turnspeed[ROLL];
-		else vehdir[ROLL] = targroll;
 
 		// limit roll and pitch
 		vehdir[PITCH] = vehdir[PITCH] < 0 ? max(-MAX_HELO_PITCH, vehdir[PITCH]) : min (MAX_HELO_PITCH, vehdir[PITCH]);
@@ -515,11 +540,6 @@ void PM_HeloMove( void )
 			PM_AddEvent( EV_GEAR_UP );
 			pm->ps->timers[TIMER_GEAR] = pm->cmd.serverTime + availableVehicles[pm->vehicle].gearTime + 100;
 			pm->ps->timers[TIMER_GEARANIM] = pm->cmd.serverTime + availableVehicles[pm->vehicle].gearTime;
-		}
-		// wheel brakes off when airborne
-		if( !(availableVehicles[pm->vehicle].caps & HC_SPEEDBRAKE) &&
-			(pm->ps->ONOFF & OO_SPEEDBRAKE) ) {
-			pm->ps->ONOFF &= ~ OO_SPEEDBRAKE;
 		}
     }
 

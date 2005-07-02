@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicledraw.c,v 1.11 2005-06-26 23:47:07 minkis Exp $
+ * $Id: cg_vehicledraw.c,v 1.12 2005-07-02 07:45:05 minkis Exp $
 */
 
 #include "cg_local.h"
@@ -73,6 +73,13 @@ char *boat_tags[BP_BOAT_MAX_PARTS] =
 	"tag_weap",		// gun
 	"tag_turret4",	// turret
 	"tag_weap"		// gun
+};
+
+char *lqm_tags[BP_LQM_MAX_PARTS] =
+{
+	"<no tag>",		// vehicle body		
+	"tag_torso",
+	"tag_head"		
 };
 
 
@@ -606,10 +613,77 @@ refEntity_t	    part[BP_HELO_MAX_PARTS];
 
 }
 
+
+
 void CG_DrawLQM(DrawInfo_LQM_t* drawInfo)
 {
+	refEntity_t	    part[BP_LQM_MAX_PARTS];
+	float			shadowPlane = 0;
+	int				renderfx = 0;
+	int				i;
+	int				anim = drawInfo->anim;
+
+	completeVehicleData_t* veh = &availableVehicles[drawInfo->basicInfo.vehicleIndex];
+
+	for( i = 0; i < BP_LQM_MAX_PARTS; i++ ) {
+	    memset( &part[i], 0, sizeof(part[0]) );	
+	}
+
+	// use the same origin for all
+    renderfx |= RF_LIGHTING_ORIGIN;
+
+	// Animations	
+	if(anim & A_LQM_RUNNING) {
+		if(drawInfo->legsTime < cg.time) {
+			drawInfo->legsFrame++;
+			drawInfo->legsTime = cg.time + 30;
+		}
+		if(anim & A_LQM_FORWARD) {
+			part[BP_LQM_LOWER].frame =  veh->animations[LEGS_RUN].firstFrame + drawInfo->legsFrame;
+			if(drawInfo->legsFrame > veh->animations[LEGS_RUN].numFrames-1) drawInfo->legsFrame = 0;
+		} else {
+			part[BP_LQM_LOWER].frame =  veh->animations[LEGS_BACK].firstFrame + drawInfo->legsFrame;
+			if(drawInfo->legsFrame > veh->animations[LEGS_BACK].numFrames-1) drawInfo->legsFrame = 0;
+		}
+	} else
+		part[BP_LQM_LOWER].frame = veh->animations[LEGS_RUN].firstFrame;
+
+
+	// Crouch Movement
+	//if(anim & A_LQM_CROUCH)
+
+
+
+    //
+    // add the torso
+    //
+    part[BP_LQM_BODY].hModel = veh->handle[BP_LQM_BODY];
+    VectorCopy( drawInfo->basicInfo.origin, part[BP_LQM_BODY].origin );
+    VectorCopy( drawInfo->basicInfo.origin, part[BP_LQM_BODY].lightingOrigin );
+	AxisCopy( drawInfo->basicInfo.axis, part[BP_LQM_BODY].axis );
+    part[BP_LQM_BODY].shadowPlane = shadowPlane;
+    part[BP_LQM_BODY].renderfx = renderfx;
+    VectorCopy (part[BP_LQM_BODY].origin, part[BP_LQM_BODY].oldorigin);
+    trap_R_AddRefEntityToScene( &part[BP_LQM_BODY] );
+
+
+	// add the rest
+	for( i = BP_LQM_BODY+1; i <= BP_LQM_MAX_PARTS; i++ ) {
+		part[i].hModel = veh->handle[i];
+		if( !part[i].hModel ) {
+			continue;
+		}
+		VectorCopy( drawInfo->basicInfo.origin, part[i].lightingOrigin );
+		AxisCopy( axisDefault, part[i].axis );
+		CG_PositionRotatedEntityOnTag( &part[i], &part[BP_LQM_BODY], veh->handle[BP_LQM_BODY], lqm_tags[i] );
+		part[i].shadowPlane = shadowPlane;
+		part[i].renderfx = renderfx;
+		trap_R_AddRefEntityToScene( &part[i] );
+	}
 
 }
+
+
 
 void CG_DrawGI(DrawInfo_GI_t* drawInfo)
 {
