@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.68 2005-07-02 07:45:04 minkis Exp $
+ * $Id: cg_local.h,v 1.69 2005-07-03 07:50:20 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -958,6 +958,8 @@ typedef struct {
 	int					legsFrame;
 	int					bodyTime;
 	int					legsTime;
+	int					lastLegsAngle;
+	int					lastTorsoAngle;
 } DrawInfo_LQM_t;
 
 typedef struct {

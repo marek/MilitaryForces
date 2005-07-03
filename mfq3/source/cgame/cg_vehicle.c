@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicle.c,v 1.30 2005-07-02 07:45:04 minkis Exp $
+ * $Id: cg_vehicle.c,v 1.31 2005-07-03 07:50:20 minkis Exp $
 */
 
 #include "cg_local.h"
@@ -368,11 +368,11 @@ static void CG_CacheLQM(int index)
 // changed mg
 	for( i = 0; i < BP_LQM_MAX_PARTS; i++ ) {
 		switch(i) {
-		case BP_LQM_BODY:
-			Com_sprintf( name, sizeof(name), "%s.md3", basename );
+		case BP_LQM_LEGS:
+			Com_sprintf( name, sizeof(name), "%s_legs.md3", basename );
 			break;
-		case BP_LQM_LOWER:
-			Com_sprintf( name, sizeof(name), "%s_lower.md3", basename );
+		case BP_LQM_TORSO:
+			Com_sprintf( name, sizeof(name), "%s_torso.md3", basename );
 			break;
 		case BP_LQM_HEAD:
 			Com_sprintf( name, sizeof(name), "%s_head.md3", basename );
@@ -382,7 +382,7 @@ static void CG_CacheLQM(int index)
 	}
 
 	// only thing that always has to be there is body
-	if( !availableVehicles[index].handle[BP_LQM_BODY] ) {
+	if( !availableVehicles[index].handle[BP_LQM_TORSO] ) {
 		trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
 	}
 

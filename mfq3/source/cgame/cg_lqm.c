@@ -1,5 +1,5 @@
 /*
- * $Id: cg_lqm.c,v 1.3 2005-07-02 07:45:04 minkis Exp $
+ * $Id: cg_lqm.c,v 1.4 2005-07-03 07:50:20 minkis Exp $
 */
 
 
@@ -72,6 +72,8 @@ void CG_LQM( centity_t *cent, clientInfo_t *ci )
 	drawInfo.anim = cent->currentState.vehicleAnim;
 
 	// Copy animation frames
+	drawInfo.lastTorsoAngle = cent->bayAnim;
+	drawInfo.lastLegsAngle = cent->gearAnim;
 	drawInfo.bodyFrame = cent->bayAnimFrame;
 	drawInfo.legsFrame = cent->gearAnimFrame;
 	drawInfo.bodyTime = cent->bayAnimStartTime;
@@ -98,6 +100,7 @@ void CG_LQM( centity_t *cent, clientInfo_t *ci )
 	// loadout
 	drawInfo.basicInfo.loadout = &cg_loadouts[cent->currentState.number];
 
+	/*
 	// smoke 
 	if( cent->currentState.generic1 && cg_smoke.integer ) {
 		localEntity_t	*smoke;
@@ -116,7 +119,7 @@ void CG_LQM( centity_t *cent, clientInfo_t *ci )
 					  cg.time, 0,
 					  LEF_PUFF_DONT_SCALE, 
 					  cgs.media.smokePuffShader );	
-	}
+	}*/
 
 
 	// muzzleflash
@@ -129,6 +132,8 @@ void CG_LQM( centity_t *cent, clientInfo_t *ci )
 	CG_DrawLQM(&drawInfo);
 
 	// return frames
+	cent->bayAnim = drawInfo.lastTorsoAngle;
+	cent->gearAnim = drawInfo.lastLegsAngle;
 	cent->bayAnimFrame = drawInfo.bodyFrame;
 	cent->bayAnimStartTime = drawInfo.bodyTime;
 	cent->gearAnimFrame = drawInfo.legsFrame;

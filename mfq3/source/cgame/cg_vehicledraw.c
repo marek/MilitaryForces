@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicledraw.c,v 1.12 2005-07-02 07:45:05 minkis Exp $
+ * $Id: cg_vehicledraw.c,v 1.13 2005-07-03 07:50:20 minkis Exp $
 */
 
 #include "cg_local.h"
@@ -559,9 +559,9 @@ refEntity_t	    part[BP_HELO_MAX_PARTS];
 		VectorCopy( drawInfo->basicInfo.origin, part[i].lightingOrigin );
 		AxisCopy( axisDefault, part[i].axis );
 		if( i == BP_HELO_MAINROTOR ) 
-			RotateAroundYaw( part[i].axis, cg.time*1.25 );
+			RotateAroundYaw( part[i].axis, cg.time*1.25+drawInfo->basicInfo.entityNum*100 );	// make rotors more random by entitynum so it doesnt look stupid in a screenshot when everyone has the same rotor position
 		if( i == BP_HELO_TAILROTOR )
-			RotateAroundPitch( part[i].axis, cg.time*1.25 );
+			RotateAroundPitch( part[i].axis, cg.time*1.25+drawInfo->basicInfo.entityNum*100);
 
 		CG_PositionRotatedEntityOnTag( &part[i], &part[BP_HELO_BODY], veh->handle[BP_HELO_BODY], helo_tags[i] );
 		part[i].shadowPlane = shadowPlane;
@@ -620,8 +620,15 @@ void CG_DrawLQM(DrawInfo_LQM_t* drawInfo)
 	refEntity_t	    part[BP_LQM_MAX_PARTS];
 	float			shadowPlane = 0;
 	int				renderfx = 0;
-	int				i;
 	int				anim = drawInfo->anim;
+	int				i;
+	vec3_t			angles;
+	vec3_t			axis[3];
+	float			diff = 0;
+	int				*lastTorsoAngle = &drawInfo->lastTorsoAngle;
+	int				*lastLegsAngle = &drawInfo->lastLegsAngle;
+	int				legsTurnAngle = 45;
+	int				torsoTurnAngle = 30;
 
 	completeVehicleData_t* veh = &availableVehicles[drawInfo->basicInfo.vehicleIndex];
 
@@ -632,54 +639,103 @@ void CG_DrawLQM(DrawInfo_LQM_t* drawInfo)
 	// use the same origin for all
     renderfx |= RF_LIGHTING_ORIGIN;
 
-	// Animations	
-	if(anim & A_LQM_RUNNING) {
-		if(drawInfo->legsTime < cg.time) {
-			drawInfo->legsFrame++;
-			drawInfo->legsTime = cg.time + 30;
-		}
-		if(anim & A_LQM_FORWARD) {
-			part[BP_LQM_LOWER].frame =  veh->animations[LEGS_RUN].firstFrame + drawInfo->legsFrame;
-			if(drawInfo->legsFrame > veh->animations[LEGS_RUN].numFrames-1) drawInfo->legsFrame = 0;
-		} else {
-			part[BP_LQM_LOWER].frame =  veh->animations[LEGS_BACK].firstFrame + drawInfo->legsFrame;
-			if(drawInfo->legsFrame > veh->animations[LEGS_BACK].numFrames-1) drawInfo->legsFrame = 0;
-		}
+	if ((anim & A_LQM_FORWARD) || (anim & A_LQM_BACKWARD) || (anim & A_LQM_LEFT) || (anim & A_LQM_RIGHT)) {
+		legsTurnAngle = (float)legsTurnAngle/3;
+		torsoTurnAngle = (float)torsoTurnAngle/3;
+	}
+
+	// Leg Animations	
+	if(drawInfo->legsTime < cg.time) {
+		drawInfo->legsFrame++;
+		drawInfo->legsTime = cg.time + ((float)veh->maxspeed/veh->animations[LEGS_RUN].numFrames);
+	}
+
+	if(anim & A_LQM_BACKWARD){
+		part[BP_LQM_LEGS].frame =  veh->animations[LEGS_BACK].firstFrame + drawInfo->legsFrame;
+		if(drawInfo->legsFrame > veh->animations[LEGS_BACK].numFrames-1) drawInfo->legsFrame = 0;
+	} else if((anim & A_LQM_FORWARD) || (anim & A_LQM_LEFT) || (anim & A_LQM_RIGHT)) {
+		part[BP_LQM_LEGS].frame =  veh->animations[LEGS_RUN].firstFrame + drawInfo->legsFrame;
+		if(drawInfo->legsFrame > veh->animations[LEGS_RUN].numFrames-1) drawInfo->legsFrame = 0;
 	} else
-		part[BP_LQM_LOWER].frame = veh->animations[LEGS_RUN].firstFrame;
+		part[BP_LQM_LEGS].frame = veh->animations[LEGS_IDLE].firstFrame;
+		
+	// Torso Animations
+	part[BP_LQM_TORSO].frame = veh->animations[TORSO_STAND].firstFrame;
 
 
 	// Crouch Movement
 	//if(anim & A_LQM_CROUCH)
 
+	//
+    // Add legs
+	//
+    part[BP_LQM_LEGS].hModel = veh->handle[BP_LQM_LEGS];
+    VectorCopy( drawInfo->basicInfo.origin, part[BP_LQM_LEGS].origin );
+    VectorCopy( drawInfo->basicInfo.origin, part[BP_LQM_LEGS].lightingOrigin );
+	VectorCopy( drawInfo->basicInfo.angles, angles );
+	angles[0] = 0;
 
+	if((anim & A_LQM_FORWARD) && (anim & A_LQM_LEFT)) angles[1] += 45;
+	else if((anim & A_LQM_FORWARD) && (anim & A_LQM_RIGHT)) angles[1] -= 45;
+	else if((anim & A_LQM_BACKWARD) && (anim & A_LQM_LEFT)) angles[1] -= 45;
+	else if((anim & A_LQM_BACKWARD) && (anim & A_LQM_RIGHT)) angles[1] += 45;
+	else if (anim & A_LQM_LEFT) angles[1] += 90;
+	else if (anim & A_LQM_RIGHT) angles[1] -= 90;
+	
+	diff =  drawInfo->basicInfo.angles[1] - angles[1];
+	if(abs(angles[1] - *lastLegsAngle) < legsTurnAngle) {
+		diff += angles[1] - *lastLegsAngle;
+		angles[1] = *lastLegsAngle;
+	} else 
+		*lastLegsAngle = angles[1];
+	
 
-    //
-    // add the torso
-    //
-    part[BP_LQM_BODY].hModel = veh->handle[BP_LQM_BODY];
-    VectorCopy( drawInfo->basicInfo.origin, part[BP_LQM_BODY].origin );
-    VectorCopy( drawInfo->basicInfo.origin, part[BP_LQM_BODY].lightingOrigin );
-	AxisCopy( drawInfo->basicInfo.axis, part[BP_LQM_BODY].axis );
-    part[BP_LQM_BODY].shadowPlane = shadowPlane;
-    part[BP_LQM_BODY].renderfx = renderfx;
-    VectorCopy (part[BP_LQM_BODY].origin, part[BP_LQM_BODY].oldorigin);
-    trap_R_AddRefEntityToScene( &part[BP_LQM_BODY] );
+	AnglesToAxis(angles, axis);
+	AxisCopy(axis, part[BP_LQM_LEGS].axis );
+    part[BP_LQM_LEGS].shadowPlane = shadowPlane;
+    part[BP_LQM_LEGS].renderfx = renderfx;
+    VectorCopy (part[BP_LQM_LEGS].origin, part[BP_LQM_LEGS].oldorigin);
+    trap_R_AddRefEntityToScene( &part[BP_LQM_LEGS] );
 
+	//
+	// Add Torso
+	//
+	part[BP_LQM_TORSO].hModel = veh->handle[BP_LQM_TORSO];
+	VectorCopy( drawInfo->basicInfo.origin, part[BP_LQM_TORSO].lightingOrigin );
+	VectorCopy( drawInfo->basicInfo.angles, angles );
+	angles[2] = 0;
+	angles[1] = diff;
 
-	// add the rest
-	for( i = BP_LQM_BODY+1; i <= BP_LQM_MAX_PARTS; i++ ) {
-		part[i].hModel = veh->handle[i];
-		if( !part[i].hModel ) {
-			continue;
-		}
-		VectorCopy( drawInfo->basicInfo.origin, part[i].lightingOrigin );
-		AxisCopy( axisDefault, part[i].axis );
-		CG_PositionRotatedEntityOnTag( &part[i], &part[BP_LQM_BODY], veh->handle[BP_LQM_BODY], lqm_tags[i] );
-		part[i].shadowPlane = shadowPlane;
-		part[i].renderfx = renderfx;
-		trap_R_AddRefEntityToScene( &part[i] );
+	if(abs(angles[1] - *lastTorsoAngle) < torsoTurnAngle) {
+		diff = angles[1] - *lastTorsoAngle;
+		angles[1] = *lastTorsoAngle;
+	} else { 
+		diff = 0;
+		*lastTorsoAngle = angles[1];
 	}
+
+	// Counter Leg & camera Left/right movement
+	angles[0] = angles[0] < 0 ? max(-25,  angles[0]) :  min(25,  angles[0]);
+	AnglesToAxis(angles, axis);
+	AxisCopy(axis, part[BP_LQM_TORSO].axis );
+	CG_PositionRotatedEntityOnTag( &part[BP_LQM_TORSO], &part[BP_LQM_LEGS], veh->handle[BP_LQM_LEGS], lqm_tags[BP_LQM_TORSO] );
+	part[BP_LQM_TORSO].shadowPlane = shadowPlane;
+	part[BP_LQM_TORSO].renderfx = renderfx;
+	trap_R_AddRefEntityToScene( &part[BP_LQM_TORSO] );
+
+	// Add Head
+	part[BP_LQM_HEAD].hModel = veh->handle[BP_LQM_HEAD];
+	VectorCopy( drawInfo->basicInfo.origin, part[BP_LQM_HEAD].lightingOrigin );
+	VectorCopy( drawInfo->basicInfo.angles, angles );
+	angles[2] = 0;
+	angles[1] = diff;
+	angles[0] = angles[0] < 0 ? max(-25,  angles[0]) : min(25, angles[0]);
+	AnglesToAxis(angles, axis);
+	AxisCopy(axis, part[BP_LQM_HEAD].axis );
+	CG_PositionRotatedEntityOnTag( &part[BP_LQM_HEAD], &part[BP_LQM_TORSO], veh->handle[BP_LQM_TORSO], lqm_tags[BP_LQM_HEAD] );
+	part[BP_LQM_HEAD].shadowPlane = shadowPlane;
+	part[BP_LQM_HEAD].renderfx = renderfx;
+	trap_R_AddRefEntityToScene( &part[BP_LQM_HEAD] );
 
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.37 2005-06-26 05:08:12 minkis Exp $
+ * $Id: bg_mfq3util.c,v 1.38 2005-07-03 07:50:20 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -510,6 +510,10 @@ void MF_LoadAllVehicleData()
 
 		} else if( (availableVehicles[i].cat & CAT_BOAT) ) {
 			availableVehicles[i].mins[2] -= 2;
+		} else if ( availableVehicles[i].cat & CAT_LQM) {
+			// boundingbox
+			Com_sprintf( name, sizeof(name), "%s_legs.md3", modelbasename );
+			MF_getDimensions( name, LEGS_IDLE, &availableVehicles[i].maxs, &availableVehicles[i].mins );
 		}
 	}
 	for( i = 0; i < bg_numberOfGroundInstallations; ++i ) {
