@@ -1,5 +1,5 @@
 /*
- * $Id: bg_lqmmove.c,v 1.3 2005-07-02 07:45:05 minkis Exp $
+ * $Id: bg_lqmmove.c,v 1.4 2005-07-03 07:50:20 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -21,8 +21,30 @@ qboolean	PM_SlideMove_LQM();
 
 void PM_LQMAdjustToTerrain( void )
 {
+	trace_t		tr;
+	vec3_t		start, end;
+	qboolean	fall;
+	float		height;
 
+	// set the height
+	VectorSet( start, pm->ps->origin[0], pm->ps->origin[1], pm->ps->origin[2] );
+	VectorSet( end, pm->ps->origin[0], pm->ps->origin[1], (float)pm->ps->origin[2] + pm->mins[2] - 1);
+	pm->trace ( &tr, 
+				start, 
+				0,//availableVehicles[pm->vehicle].mins, 
+				0,//availableVehicles[pm->vehicle].maxs, 
+				end, 
+				pm->ps->clientNum, 
+				MASK_SOLID );
 
+	if( tr.fraction < 1.0f ) {
+		height = tr.endpos[2] - pm->ps->origin[2] - pm->mins[2];
+		pm->ps->origin[2] += height;
+		if( tr.fraction == 1 ) fall = qtrue;
+	
+	}
+
+		
 }
 
 void PM_LQMMove( void ) 
@@ -32,11 +54,21 @@ void PM_LQMMove( void )
 	qboolean	verydead = (pm->ps->stats[STAT_HEALTH] <= GIB_HEALTH);
     int		i;
 	int		anim = 0;
+	int		maxspeed = availableVehicles[pm->vehicle].maxspeed;
+	int		maxspeed2 = sqrt(((float)maxspeed*maxspeed/2));
+	int		speedtemp;
+	vec3_t	liftvel, forwardvel, rightvel, deltavel;
 
 	if( verydead ) return;
 
 	// clear FX
 	pm->ps->ONOFF &= ~OO_VAPOR;
+
+	// Clear vectors
+	VectorClear(forwardvel);
+	VectorClear(liftvel);
+	VectorClear(rightvel);
+	VectorClear(deltavel);
 
     // local vectors
     VectorCopy( pm->ps->viewangles, viewdir );
@@ -61,29 +93,52 @@ void PM_LQMMove( void )
 	else {
 		// Forward Movement
 		if(pm->cmd.forwardmove != 0) {
-			anim |= A_LQM_RUNNING;
-			if(pm->cmd.forwardmove >= 0)
+			speedtemp = pm->cmd.rightmove != 0 ? maxspeed2 : maxspeed;
+			// Forward speed
+			VectorCopy(viewdir, forwardvel);
+			forwardvel[PITCH] = forwardvel[ROLL] = 0;				// Don't let vehicle angels effect verticle acceleration
+			AngleVectors(forwardvel, forwardvel, NULL, NULL );
+			if(pm->cmd.forwardmove > 0) {
 				anim |= A_LQM_FORWARD;
-			else
+				anim &= ~A_LQM_BACKWARD;
+				VectorScale(forwardvel, speedtemp, forwardvel);
+			} else {
+				anim |= A_LQM_BACKWARD;
 				anim &= ~A_LQM_FORWARD;
+				VectorScale(forwardvel, -speedtemp, forwardvel);
+			}
 		} else
-			anim &= ~A_LQM_RUNNING;
+			anim &= ~(A_LQM_FORWARD|A_LQM_BACKWARD);
 
 		// Left/Right Movement
-		if(pm->cmd.rightmove > 0) {
-			anim |= A_LQM_RIGHT;
-			anim &= ~A_LQM_LEFT;
-		} else if (pm->cmd.rightmove < 0) {
-			anim |= A_LQM_LEFT;
-			anim &= ~A_LQM_RIGHT;
+		if(pm->cmd.rightmove != 0) {
+			speedtemp = pm->cmd.forwardmove != 0 ? maxspeed2 : maxspeed;
+			// Right speed
+			VectorCopy(viewdir,  rightvel);
+			rightvel[PITCH] = rightvel[ROLL] = 0;
+			AngleVectors( rightvel,  NULL, rightvel, NULL );
+			if(pm->cmd.rightmove > 0) {
+				anim |= A_LQM_RIGHT;
+				anim &= ~A_LQM_LEFT;
+				VectorScale( rightvel, speedtemp, rightvel );
+			} else {
+				anim |= A_LQM_LEFT;
+				anim &= ~A_LQM_RIGHT;
+				VectorScale( rightvel, -speedtemp, rightvel );
+			}
 		} else
 			anim &= ~(A_LQM_LEFT|A_LQM_RIGHT);
 
+			
 		// Crouch Movement
 		if(pm->cmd.buttons & BUTTON_BRAKE)
 			anim |= A_LQM_CROUCH;
 		else
 			anim &= ~A_LQM_CROUCH;
+
+		// Gravity
+		VectorAdd(forwardvel, rightvel, deltavel);
+		deltavel[2] = -DEFAULT_GRAVITY;
     }
 	// return angles
 	VectorCopy( viewdir, pm->ps->vehicleAngles );
@@ -91,11 +146,17 @@ void PM_LQMMove( void )
 	// Return anim
 	pm->ps->vehicleAnim = anim;
 
-	// speed
-	AngleVectors( viewdir, pm->ps->velocity, NULL, NULL );
-	VectorScale( pm->ps->velocity, (float)pm->ps->speed/10, pm->ps->velocity );
+	// Set velocity
+	VectorCopy(deltavel, pm->ps->velocity);
 
+	// speed
+	pm->ps->speed = VectorLength(pm->ps->velocity);
+
+	// Move the lqm
 	PM_SlideMove_LQM();
+
+	// Adjust to terrain
+	PM_LQMAdjustToTerrain();
 }
 
 /*

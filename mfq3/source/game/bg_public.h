@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.135 2005-07-02 07:45:05 minkis Exp $
+ * $Id: bg_public.h,v 1.136 2005-07-03 07:50:20 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -738,10 +738,10 @@ extern const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1];
 #define BP_GV_MAX_PARTS			9
 
 // LQM
-#define BP_LQM_BODY				0
-#define BP_LQM_LOWER			1
+#define BP_LQM_LEGS				0
+#define BP_LQM_TORSO			1
 #define BP_LQM_HEAD				2
-//#define BP_LQM_WEAP				3
+//#define BP_LQM_WEAP			3
 //#define BP_LQM_GUNBARREL		4
 #define BP_LQM_MAX_PARTS		3
 
@@ -1171,9 +1171,9 @@ int MF_findWeaponsOfType( int weaponIndex, completeLoadout_t* loadout );
 
 // LQM Animations (replace instead of using frame index, and let CG read animation.cfg)
 #define A_LQM_STAND				0
-#define A_LQM_RUNNING			1
-#define A_LQM_CROUCH			2
-#define A_LQM_FORWARD			4
+#define A_LQM_FORWARD			1
+#define A_LQM_BACKWARD			2
+#define A_LQM_CROUCH			4
 #define A_LQM_LEFT				8
 #define A_LQM_RIGHT				16
 #define A_LQM_EJECT				32

@@ -1,5 +1,5 @@
 /*
- * $Id: mf_client.c,v 1.27 2005-06-27 05:52:51 minkis Exp $
+ * $Id: mf_client.c,v 1.28 2005-07-03 07:50:20 minkis Exp $
 */
 
 #include "g_local.h"
@@ -416,7 +416,7 @@ void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 		VectorCopy( spawn_origin, endpos );
 		endpos[2] -= 512;
 
-		trap_Trace (&trace, spawn_origin, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_ALL );
+		trap_Trace (&trace, spawn_origin, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_SOLID );
 		if( trace.entityNum != ENTITYNUM_NONE ) {
 			test = &g_entities[trace.entityNum];
 				spawn_origin[2] = trace.endpos[2] - availableVehicles[vehIndex].mins[2] + 1;
