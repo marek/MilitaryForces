@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.51 2005-06-26 05:08:11 minkis Exp $
+ * $Id: cg_main.c,v 1.52 2005-07-04 23:46:30 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -912,6 +912,18 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.lagometerShader = trap_R_RegisterShader("lagometer" );
 	cgs.media.connectionShader = trap_R_RegisterShader( "disconnected" );
 
+
+	// LQM gibs
+	cgs.media.gibAbdomen = trap_R_RegisterModel( "models/gibs/abdomen.md3" );
+	cgs.media.gibArm = trap_R_RegisterModel( "models/gibs/arm.md3" );
+	cgs.media.gibChest = trap_R_RegisterModel( "models/gibs/chest.md3" );
+	cgs.media.gibFist = trap_R_RegisterModel( "models/gibs/fist.md3" );
+	cgs.media.gibFoot = trap_R_RegisterModel( "models/gibs/foot.md3" );
+	cgs.media.gibForearm = trap_R_RegisterModel( "models/gibs/forearm.md3" );
+	cgs.media.gibIntestine = trap_R_RegisterModel( "models/gibs/intestine.md3" );
+	cgs.media.gibLeg = trap_R_RegisterModel( "models/gibs/leg.md3" );
+	cgs.media.gibSkull = trap_R_RegisterModel( "models/gibs/skull.md3" );
+	cgs.media.gibBrain = trap_R_RegisterModel( "models/gibs/brain.md3" );
 
 	// MFQ3
 	cgs.media.missilePuffShader = trap_R_RegisterShader( "missilePuff" );

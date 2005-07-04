@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.137 2005-07-04 05:48:04 minkis Exp $
+ * $Id: bg_public.h,v 1.138 2005-07-04 23:46:31 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1181,6 +1181,7 @@ int MF_findWeaponsOfType( int weaponIndex, completeLoadout_t* loadout );
 #define A_LQM_EJECT				32
 #define A_LQM_FLY				64
 #define A_LQM_DIE				128
+#define A_LQM_JUMP				A_LQM_CROUCH|A_LQM_EJECT
 
 // this is for the PW_ONOFF_FLAGS
 #define OO_NOTHING_ON			0

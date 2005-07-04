@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicledraw.c,v 1.14 2005-07-04 05:48:04 minkis Exp $
+ * $Id: cg_vehicledraw.c,v 1.15 2005-07-04 23:46:30 minkis Exp $
 */
 
 #include "cg_local.h"
@@ -638,8 +638,9 @@ void CG_DrawLQM(DrawInfo_LQM_t* drawInfo)
 
 	// use the same origin for all
     renderfx |= RF_LIGHTING_ORIGIN;
+	/*
 	if(drawInfo->basicInfo.entityNum == cg.clientNum)
-		renderfx |= RF_THIRD_PERSON;
+		renderfx |= RF_THIRD_PERSON;*/
 
 	if ((anim & A_LQM_FORWARD) || (anim & A_LQM_BACKWARD) || (anim & A_LQM_LEFT) || (anim & A_LQM_RIGHT) || drawInfo->basicInfo.drawMuzzleFlash) {
 		legsTurnAngle = (float)legsTurnAngle/3;
@@ -649,20 +650,55 @@ void CG_DrawLQM(DrawInfo_LQM_t* drawInfo)
 	// Leg Animations	
 	if(drawInfo->legsTime < cg.time) {
 		drawInfo->legsFrame++;
-		drawInfo->legsTime = cg.time + 35; //(veh->animations[LEGS_RUN].numFrames/(float)veh->maxspeed);
+		if(anim & A_LQM_CROUCH)
+			drawInfo->legsTime = cg.time + veh->animations[LEGS_WALKCR].frameLerp; 
+		else
+			drawInfo->legsTime = cg.time + veh->animations[LEGS_RUN].frameLerp; 
 	}
 
-	if(anim & A_LQM_BACKWARD){
-		part[BP_LQM_LEGS].frame =  veh->animations[LEGS_BACK].firstFrame + drawInfo->legsFrame;
-		if(drawInfo->legsFrame > veh->animations[LEGS_BACK].numFrames-1) drawInfo->legsFrame = 0;
+	if(anim & A_LQM_BACKWARD) {
+		if(anim & A_LQM_CROUCH) {
+			if(drawInfo->legsFrame > veh->animations[LEGS_WALKCR].numFrames-1) drawInfo->legsFrame = 0;
+			part[BP_LQM_LEGS].frame = (veh->animations[LEGS_WALKCR].firstFrame + veh->animations[LEGS_WALKCR].numFrames-1) - drawInfo->legsFrame;
+		} else {
+			if(drawInfo->legsFrame > veh->animations[LEGS_BACK].numFrames-1) drawInfo->legsFrame = 0;
+			part[BP_LQM_LEGS].frame =  veh->animations[LEGS_BACK].firstFrame + drawInfo->legsFrame;
+		}
 	} else if((anim & A_LQM_FORWARD) || (anim & A_LQM_LEFT) || (anim & A_LQM_RIGHT)) {
-		part[BP_LQM_LEGS].frame =  veh->animations[LEGS_RUN].firstFrame + drawInfo->legsFrame;
-		if(drawInfo->legsFrame > veh->animations[LEGS_RUN].numFrames-1) drawInfo->legsFrame = 0;
-	} else
-		part[BP_LQM_LEGS].frame = veh->animations[LEGS_IDLE].firstFrame;
+		if(anim & A_LQM_CROUCH) {
+			if(anim & A_LQM_RIGHT) {	// Play left animation backwards, so legs arent facing backward
+				if(drawInfo->legsFrame > veh->animations[LEGS_WALKCR].numFrames-1) drawInfo->legsFrame = 0;
+				part[BP_LQM_LEGS].frame = (veh->animations[LEGS_WALKCR].firstFrame + veh->animations[LEGS_WALKCR].numFrames-1) - drawInfo->legsFrame;
+			} else {
+				if(drawInfo->legsFrame > veh->animations[LEGS_WALKCR].numFrames-1) drawInfo->legsFrame = 0;
+				part[BP_LQM_LEGS].frame =  veh->animations[LEGS_WALKCR].firstFrame + drawInfo->legsFrame;
+			}
+		} else {
+			if(drawInfo->legsFrame > veh->animations[LEGS_RUN].numFrames-1) drawInfo->legsFrame = 0;
+			part[BP_LQM_LEGS].frame =  veh->animations[LEGS_RUN].firstFrame + drawInfo->legsFrame;
+		}
+	} else {
+		if(anim & A_LQM_CROUCH) 
+			part[BP_LQM_LEGS].frame = veh->animations[LEGS_WALKCR].firstFrame;
+		else
+			part[BP_LQM_LEGS].frame = veh->animations[LEGS_IDLE].firstFrame;
+	}
 		
 	// Torso Animations
-	part[BP_LQM_TORSO].frame = veh->animations[TORSO_STAND].firstFrame;
+	if(drawInfo->basicInfo.drawMuzzleFlash) {
+		drawInfo->torsoFrame = veh->animations[TORSO_ATTACK].firstFrame;
+		drawInfo->torsoTime = cg.time + veh->animations[TORSO_ATTACK].frameLerp;
+	} else {
+		if (drawInfo->torsoFrame >= veh->animations[TORSO_ATTACK].firstFrame && drawInfo->torsoFrame <= veh->animations[TORSO_ATTACK].firstFrame+veh->animations[TORSO_ATTACK].numFrames) {
+			if(drawInfo->torsoTime < cg.time) {
+				drawInfo->torsoFrame++;
+				drawInfo->torsoTime = cg.time + veh->animations[TORSO_ATTACK].frameLerp; 
+			}
+			if(drawInfo->torsoFrame > veh->animations[TORSO_ATTACK].numFrames-1) drawInfo->torsoFrame = 0;
+		} else 
+			drawInfo->torsoFrame = veh->animations[TORSO_STAND].firstFrame;
+	}
+	part[BP_LQM_TORSO].frame = drawInfo->torsoFrame;
 
 
 	// Crouch Movement
@@ -682,6 +718,7 @@ void CG_DrawLQM(DrawInfo_LQM_t* drawInfo)
 	else if((anim & A_LQM_BACKWARD) && (anim & A_LQM_LEFT)) angles[1] -= 45;
 	else if((anim & A_LQM_BACKWARD) && (anim & A_LQM_RIGHT)) angles[1] += 45;
 	else if (anim & A_LQM_LEFT) angles[1] += 90;
+	else if ((anim & A_LQM_RIGHT) && (anim & A_LQM_CROUCH)) angles[1] += 90;
 	else if (anim & A_LQM_RIGHT) angles[1] -= 90;
 	
 	diff =  drawInfo->basicInfo.angles[1] - angles[1];
@@ -755,6 +792,25 @@ void CG_DrawLQM(DrawInfo_LQM_t* drawInfo)
 		CG_VehicleMuzzleFlash( drawInfo->basicInfo.flashWeaponIndex, &part[BP_LQM_MAX_PARTS], 
 							   availableWeapons[drawInfo->weaponIndex].modelHandle, drawInfo->basicInfo.vehicleIndex );
 	}
+
+	{
+		refEntity_t	sel;
+		int j;
+		memset( &sel, 0, sizeof(sel) );
+		cgs.media.IGME_selector = trap_R_RegisterModel("models/effects/selector.md3");
+		sel.hModel = cgs.media.IGME_selector;
+		VectorCopy( drawInfo->basicInfo.origin, sel.origin );
+		VectorCopy( drawInfo->basicInfo.origin, sel.lightingOrigin );
+		VectorCopy( drawInfo->basicInfo.origin, sel.oldorigin );
+		AnglesToAxis( drawInfo->basicInfo.angles, sel.axis );
+		for( j = 0; j < 3; ++j ) {
+			float wid = veh->maxs[j] - veh->mins[j];
+			VectorScale( sel.axis[j], wid/200.0f, sel.axis[j] );
+		}
+		sel.nonNormalizedAxes = qtrue;
+		trap_R_AddRefEntityToScene( &sel );
+	}
+
 }
 
 
