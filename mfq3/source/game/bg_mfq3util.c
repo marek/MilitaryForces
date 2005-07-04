@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.38 2005-07-03 07:50:20 minkis Exp $
+ * $Id: bg_mfq3util.c,v 1.39 2005-07-04 05:48:04 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -514,6 +514,11 @@ void MF_LoadAllVehicleData()
 			// boundingbox
 			Com_sprintf( name, sizeof(name), "%s_legs.md3", modelbasename );
 			MF_getDimensions( name, LEGS_IDLE, &availableVehicles[i].maxs, &availableVehicles[i].mins );
+			// Scale LQMs
+			for(j = 0; j < 3; j++) {
+				availableVehicles[i].maxs[j] *= (float)LQM_SCALE;
+				availableVehicles[i].mins[j] *= (float)LQM_SCALE;
+			}
 		}
 	}
 	for( i = 0; i < bg_numberOfGroundInstallations; ++i ) {

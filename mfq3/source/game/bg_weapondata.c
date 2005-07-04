@@ -1,5 +1,5 @@
 /*
- * $Id: bg_weapondata.c,v 1.37 2005-07-02 07:45:05 minkis Exp $
+ * $Id: bg_weapondata.c,v 1.38 2005-07-04 05:48:04 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -410,6 +410,8 @@ completeWeaponData_t availableWeapons[] =
 		0,									// flags
 	},
 
+
+
 	// machinegun: modern, 20mm, 2 barrel
 	{ 
 		WT_MACHINEGUN,						// type
@@ -433,6 +435,46 @@ completeWeaponData_t availableWeapons[] =
 		0,									// damageRadius
 		10,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
 		2,									// barrels
+		0,									// barrelDistance
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_GUNMODE,							// crosshair
+		CH_GUNMODE,							// crosshair track
+		CH_GUNMODE,							// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
+		1,									// number per package
+		CAT_ANY,							// fits on category
+		PF_NA,								// fits on pylon
+		0,									// basicECMVulnerability
+		0,									// flags
+	},
+
+	// machinegun: M4A1
+	{ 
+		WT_MACHINEGUN,						// type
+		MF_GAMESET_MODERN,					// gameset
+		"M4A1",								// descriptiveName
+		"GUN",								// shortName
+		"MG",								// shortName2 (GVs)
+		"models/weapons/m4a1.md3",			// modelName
+		0,									// handle
+		"models/weapons/m4a1.md3",			// vwepName
+		0,									// vwephandle
+		"hud/iconw_mg.tga",					// iconName
+		0,									// iconHandle
+		CAT_LQM,							// cat
+		0,									// non cat mod
+		2500,								// muzzleVelocity
+		0,									// range
+		0,									// fuelrange
+		300,								// fire interval
+		1,									// damage
+		30,									// damageRadius
+		16,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
+		1,									// barrels
 		0,									// barrelDistance
 		0,									// lockcone
 		0,									// followcone

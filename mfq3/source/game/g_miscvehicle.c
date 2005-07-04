@@ -1,5 +1,5 @@
 /*
- * $Id: g_miscvehicle.c,v 1.15 2005-06-27 05:52:51 minkis Exp $
+ * $Id: g_miscvehicle.c,v 1.16 2005-07-04 05:48:04 minkis Exp $
 */
 
 
@@ -399,7 +399,7 @@ void SP_misc_vehicle( gentity_t *sp_ent )
 		Com_sprintf(modelname, 127, "models/vehicles/helos/%s/%s.md3", availableVehicles[i].modelName,
 			availableVehicles[i].modelName );
 	} else if( cat & CAT_LQM ) {
-		Com_sprintf(modelname, 127, "models/vehicles/lqms/%s/%s.md3", availableVehicles[i].modelName,
+		Com_sprintf(modelname, 127, "models/vehicles/lqms/%s/%s_torso.md3", availableVehicles[i].modelName,
 			availableVehicles[i].modelName );
 	} else if( cat & CAT_BOAT ) {
 		Com_sprintf(modelname, 127, "models/vehicles/boats/%s/%s.md3", availableVehicles[i].modelName,

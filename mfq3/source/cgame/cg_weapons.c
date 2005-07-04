@@ -1,5 +1,5 @@
 /*
- * $Id: cg_weapons.c,v 1.34 2005-07-02 07:45:05 minkis Exp $
+ * $Id: cg_weapons.c,v 1.35 2005-07-04 05:48:04 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -378,6 +378,7 @@ void CG_RegisterWeapons() {
 				break;
 			
 			case WI_MG_20MM:
+			case WI_MG_M4A1:
 			default:
 				// modern sound (silenced)
 				weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/machinegun/machineGun1.wav", qfalse );
@@ -815,6 +816,7 @@ void CG_MissileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_t di
 	case WI_MG_6XCAL50:
 	case WI_MG_12_7MM:
 	case WI_MG_14_5MM:
+	case WI_MG_M4A1:
 	case WI_MG_4X14_5MM:
 	case WI_MG_20MM:
 	case WI_MG_2X20MM:
@@ -834,7 +836,7 @@ void CG_MissileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_t di
 			sfx = cgs.media.sfx_ric3;
 		}
 
-		radius = 8;
+		radius = 0.2f; //radius = 8;
 		break;
 
 	case WI_125MM_GUN:

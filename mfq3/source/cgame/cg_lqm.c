@@ -1,5 +1,5 @@
 /*
- * $Id: cg_lqm.c,v 1.4 2005-07-03 07:50:20 minkis Exp $
+ * $Id: cg_lqm.c,v 1.5 2005-07-04 05:48:04 minkis Exp $
 */
 
 
@@ -68,6 +68,9 @@ void CG_LQM( centity_t *cent, clientInfo_t *ci )
 	drawInfo.basicInfo.vehicleIndex = ci->vehicle;
 	drawInfo.basicInfo.ONOFF = ONOFF;
 
+	// Copy Weapon Index
+	drawInfo.weaponIndex = cent->currentState.weaponIndex;
+
 	// Copy animation state
 	drawInfo.anim = cent->currentState.vehicleAnim;
 
@@ -100,33 +103,11 @@ void CG_LQM( centity_t *cent, clientInfo_t *ci )
 	// loadout
 	drawInfo.basicInfo.loadout = &cg_loadouts[cent->currentState.number];
 
-	/*
-	// smoke 
-	if( cent->currentState.generic1 && cg_smoke.integer ) {
-		localEntity_t	*smoke;
-		vec3_t			up = {0, 0, 20};
-		vec3_t			pos;
-		vec3_t			forward;
-
-		AngleVectors( cent->lerpAngles, forward, NULL, NULL );
-		VectorCopy( cent->lerpOrigin, pos );
-		pos[2] += 12;
-
-		smoke = CG_SmokePuff( pos, up, 
-					  cent->currentState.generic1, 
-					  0.5, 0.5, 0.5, 0.66f,
-					  200*cent->currentState.generic1, 
-					  cg.time, 0,
-					  LEF_PUFF_DONT_SCALE, 
-					  cgs.media.smokePuffShader );	
-	}*/
-
-
 	// muzzleflash
-	/*
-	if ( cg.time - cent->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {
-		CG_VehicleMuzzleFlash( cent->muzzleFlashWeapon, &part[BP_LQM_GUNBARREL], ci->parts[BP_LQM_GUNBARREL], ci->vehicle );
-	}*/
+	if( cg.time - cent->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {
+		drawInfo.basicInfo.drawMuzzleFlash = qtrue;
+		drawInfo.basicInfo.flashWeaponIndex = cent->muzzleFlashWeapon;
+	}
 
 	// draw lqm
 	CG_DrawLQM(&drawInfo);
@@ -144,7 +125,61 @@ void CG_LQM( centity_t *cent, clientInfo_t *ci )
 	CG_LQMFlags( cent );
 
 
-	CG_ResetReticles();
+	// reticles
+	if( cent == &cg.predictedPlayerEntity )
+	{
+		refEntity_t		reticle;
+		vec3_t	forward, ang, end;
+		trace_t	tr;
+		playerState_t * ps = &cg.snap->ps;
+		float len;
+		float mindist = cg_thirdPersonRange.integer + availableVehicles[ci->vehicle].cam_dist[ CAMERA_V_DEFAULT ] + availableVehicles[ci->vehicle].maxs[0] + 20;
+
+		memset( &reticle, 0, sizeof(reticle) );	
+
+		CG_ResetReticles();
+
+		reticle.customShader = availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshair;
+		reticle.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshair];
+
+		AngleVectors( cent->currentState.angles, forward, right, up );
+		RotatePointAroundVector( temp, up, forward, cent->currentState.angles2[ROLL] );
+		CrossProduct( up, temp, right );
+		RotatePointAroundVector( forward, right, temp, cent->currentState.angles2[PITCH] );
+		VectorMA( cent->lerpOrigin, availableVehicles[ci->vehicle].gunoffset[0], forward, start );
+		VectorMA( start, availableVehicles[ci->vehicle].gunoffset[1], right, start );
+		VectorMA( start, availableVehicles[ci->vehicle].gunoffset[2], up, start );
+		VectorMA( start, 2000, forward, end );
+		vectoangles( forward, ang );
+		ang[2] = 0;
+		AnglesToAxis( ang, reticle.axis );
+		CG_Trace( &tr, start, 0, 0, end, cg.snap->ps.clientNum, MASK_SOLID ); 
+
+		if( tr.entityNum < MAX_CLIENTS )
+		{
+			cg.crosshairClientNum = tr.entityNum;
+			cg.crosshairClientTime = cg.time;
+		}
+
+		VectorCopy( tr.endpos, end );
+		CG_Trace( &tr, cg.refdef.vieworg, 0, 0, end, cg.snap->ps.clientNum, MASK_SOLID ); 
+		VectorSubtract( tr.endpos, cg.refdef.vieworg, forward );
+		len = VectorNormalize(forward);
+		
+		if( len > mindist )
+		{
+			VectorMA( cg.refdef.vieworg, mindist, forward, reticle.origin );
+		}
+		else
+		{
+			VectorMA( cg.refdef.vieworg, len - 5, forward, reticle.origin );
+		}
+
+		VectorCopy( reticle.origin, reticle.lightingOrigin );
+		reticle.renderfx = RF_LIGHTING_ORIGIN|RF_SHADOW_PLANE;
+		
+		CG_AddReticleEntityToScene( &reticle, NULL );
+	}
 }
 
 /*

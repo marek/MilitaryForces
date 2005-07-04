@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.39 2005-06-26 05:08:11 minkis Exp $
+ * $Id: cg_drawnewhud.c,v 1.40 2005-07-04 05:48:04 minkis Exp $
 */
 
 #include "cg_local.h"
@@ -1722,78 +1722,82 @@ void CG_DrawStatusBar_MFQ3_new( void ) {
 		CG_Draw_HeadingTape( value, targetheading );
 	}
 
-	// speed
-	if( hud_speed.integer ) {
-		if( (availableVehicles[vehicle].cat & CAT_GROUND) || 
-			(availableVehicles[vehicle].cat & CAT_BOAT) ) value = 10;
-		else value = 50;
-		CG_Draw_SpeedTape( ps->speed/10, availableVehicles[vehicle].stallspeed,
-				availableVehicles[vehicle].stallspeed * SPEED_GREEN_ARC, value );
-	}
-
-	// altitude (not for ground-vehicles)
-	if( (hud_altitude.integer || cg.Mode_MFD[MFD_1] == MFD_INFO || cg.Mode_MFD[MFD_2] == MFD_INFO) &&
-		!(availableVehicles[vehicle].cat & CAT_GROUND) && !(availableVehicles[vehicle].cat & CAT_BOAT) )
+	// Not for LQM's
+	if(!(availableVehicles[vehicle].cat & CAT_LQM))
 	{
-		trace_t	tr;
-		vec3_t	start, end;
-		VectorCopy( ps->origin, start );
-		start[2] += availableVehicles[vehicle].mins[2];
-		VectorCopy( start, end );
-		end[2] -= 20000;
-		CG_Trace( &tr, start, vec3_origin, vec3_origin, end, cg.snap->ps.clientNum, MASK_SOLID|MASK_WATER );
-		altitude = (int)(tr.fraction * 20000);
-		CG_Draw_AltTape(altitude);
-	}
+		// speed
+		if( hud_speed.integer ) {
+			if( (availableVehicles[vehicle].cat & CAT_GROUND) || 
+				(availableVehicles[vehicle].cat & CAT_BOAT) ) value = 10;
+			else value = 50;
+			CG_Draw_SpeedTape( ps->speed/10, availableVehicles[vehicle].stallspeed,
+					availableVehicles[vehicle].stallspeed * SPEED_GREEN_ARC, value );
+		}
 
-	// stall related
-	if( speed <= stallspeed || (cent->currentState.ONOFF & OO_STALLED) ) stallcolor = HUD_RED;
-	else if( speed <= stallspeed * 1.25 ) stallcolor = HUD_YELLOW;
-	else stallcolor = HUD_GREEN;
+		// altitude (not for ground-vehicles)
+		if( (hud_altitude.integer || cg.Mode_MFD[MFD_1] == MFD_INFO || cg.Mode_MFD[MFD_2] == MFD_INFO) &&
+			!(availableVehicles[vehicle].cat & CAT_GROUND) && !(availableVehicles[vehicle].cat & CAT_BOAT) )
+		{
+			trace_t	tr;
+			vec3_t	start, end;
+			VectorCopy( ps->origin, start );
+			start[2] += availableVehicles[vehicle].mins[2];
+			VectorCopy( start, end );
+			end[2] -= 20000;
+			CG_Trace( &tr, start, vec3_origin, vec3_origin, end, cg.snap->ps.clientNum, MASK_SOLID|MASK_WATER );
+			altitude = (int)(tr.fraction * 20000);
+			CG_Draw_AltTape(altitude);
+		}
 
-	// mfd 1
-	if( hud_mfd.integer ) {
-		CG_Draw_MFD(MFD_1, vehicle, cent, targetrange, targetheading, altitude, ps, stallcolor);
-	}
+		// stall related
+		if( speed <= stallspeed || (cent->currentState.ONOFF & OO_STALLED) ) stallcolor = HUD_RED;
+		else if( speed <= stallspeed * 1.25 ) stallcolor = HUD_YELLOW;
+		else stallcolor = HUD_GREEN;
 
-	// mfd 2
-	if( hud_mfd2.integer ) {
-		CG_Draw_MFD(MFD_2, vehicle, cent, targetrange, targetheading, altitude, ps, stallcolor);
-	}
+		// mfd 1
+		if( hud_mfd.integer ) {
+			CG_Draw_MFD(MFD_1, vehicle, cent, targetrange, targetheading, altitude, ps, stallcolor);
+		}
 
-	// solid middle section
-	if( ps->stats[STAT_MAX_HEALTH] ) {
-		value = (100*ps->stats[STAT_HEALTH]/ps->stats[STAT_MAX_HEALTH]);
-	} else value = 0;
-	if( value > 100 ) value = 100;
-	if( hud_center.integer ) {
-		CG_Draw_Center(vehicle, value, ps->throttle);
-	}
+		// mfd 2
+		if( hud_mfd2.integer ) {
+			CG_Draw_MFD(MFD_2, vehicle, cent, targetrange, targetheading, altitude, ps, stallcolor);
+		}
 
-	// additional HUD info: health and throttle (redundant)
-	CG_Draw_Redundant(vehicle, value, ps->throttle, ps->ammo, cent->currentState.weaponNum );
+		// solid middle section
+		if( ps->stats[STAT_MAX_HEALTH] ) {
+			value = (100*ps->stats[STAT_HEALTH]/ps->stats[STAT_MAX_HEALTH]);
+		} else value = 0;
+		if( value > 100 ) value = 100;
+		if( hud_center.integer ) {
+			CG_Draw_Center(vehicle, value, ps->throttle);
+		}
 
-	// GPS
-	if( cg.GPS ) {
-		value = (int)ps->origin[0];
-		value2 = (int)ps->origin[1];
-		CG_Draw_Coords( value, value2 );
-	}
-	
-	// stallwarning
-	if( (ps->speed/10 <= availableVehicles[vehicle].stallspeed*1.5 || (cent->currentState.ONOFF & OO_STALLED)) &&
-		!(cent->currentState.ONOFF & OO_LANDED) && ps->stats[STAT_HEALTH] > 0 && 
-		availableVehicles[vehicle].cat != CAT_HELO) {
-		float stallscale = 1.0f;
-		if( speed >= stallspeed && !(cent->currentState.ONOFF & OO_STALLED) ) stallscale = 2.0f - ((float)speed/(float)stallspeed);
-		DrawStringNew( 320, 360, stallscale, HUDColors[stallcolor], "STALL!", 0, 0, 3, CENTRE_JUSTIFY );
-	}
+		// additional HUD info: health and throttle (redundant)
+		CG_Draw_Redundant(vehicle, value, ps->throttle, ps->ammo, cent->currentState.weaponNum );
 
-	// lock warning
-	if( ps->stats[STAT_LOCKINFO] & LI_BEING_LAUNCHED ) {
-		DrawStringNew( 320, 60, 0.8f, HUDColors[HUD_RED], "LAUNCH!", 0, 0, 3, CENTRE_JUSTIFY );
-	} else if( ps->stats[STAT_LOCKINFO] & LI_BEING_LOCKED ) {
-		DrawStringNew( 320, 60, 1.0f, HUDColors[HUD_YELLOW], "LOCK!", 0, 0, 3, CENTRE_JUSTIFY );
+		// GPS
+		if( cg.GPS ) {
+			value = (int)ps->origin[0];
+			value2 = (int)ps->origin[1];
+			CG_Draw_Coords( value, value2 );
+		}
+		
+		// stallwarning
+		if( (ps->speed/10 <= availableVehicles[vehicle].stallspeed*1.5 || (cent->currentState.ONOFF & OO_STALLED)) &&
+			!(cent->currentState.ONOFF & OO_LANDED) && ps->stats[STAT_HEALTH] > 0 && 
+			availableVehicles[vehicle].cat != CAT_HELO) {
+			float stallscale = 1.0f;
+			if( speed >= stallspeed && !(cent->currentState.ONOFF & OO_STALLED) ) stallscale = 2.0f - ((float)speed/(float)stallspeed);
+			DrawStringNew( 320, 360, stallscale, HUDColors[stallcolor], "STALL!", 0, 0, 3, CENTRE_JUSTIFY );
+		}
+
+		// lock warning
+		if( ps->stats[STAT_LOCKINFO] & LI_BEING_LAUNCHED ) {
+			DrawStringNew( 320, 60, 0.8f, HUDColors[HUD_RED], "LAUNCH!", 0, 0, 3, CENTRE_JUSTIFY );
+		} else if( ps->stats[STAT_LOCKINFO] & LI_BEING_LOCKED ) {
+			DrawStringNew( 320, 60, 1.0f, HUDColors[HUD_YELLOW], "LOCK!", 0, 0, 3, CENTRE_JUSTIFY );
+		}
 	}
 
 	// cleanup

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicledraw.c,v 1.13 2005-07-03 07:50:20 minkis Exp $
+ * $Id: cg_vehicledraw.c,v 1.14 2005-07-04 05:48:04 minkis Exp $
 */
 
 #include "cg_local.h"
@@ -617,7 +617,7 @@ refEntity_t	    part[BP_HELO_MAX_PARTS];
 
 void CG_DrawLQM(DrawInfo_LQM_t* drawInfo)
 {
-	refEntity_t	    part[BP_LQM_MAX_PARTS];
+	refEntity_t	    part[BP_LQM_MAX_PARTS+1];	// +1 for muzzle flash
 	float			shadowPlane = 0;
 	int				renderfx = 0;
 	int				anim = drawInfo->anim;
@@ -632,14 +632,16 @@ void CG_DrawLQM(DrawInfo_LQM_t* drawInfo)
 
 	completeVehicleData_t* veh = &availableVehicles[drawInfo->basicInfo.vehicleIndex];
 
-	for( i = 0; i < BP_LQM_MAX_PARTS; i++ ) {
+	for( i = 0; i < BP_LQM_MAX_PARTS+1; i++ ) {
 	    memset( &part[i], 0, sizeof(part[0]) );	
 	}
 
 	// use the same origin for all
     renderfx |= RF_LIGHTING_ORIGIN;
+	if(drawInfo->basicInfo.entityNum == cg.clientNum)
+		renderfx |= RF_THIRD_PERSON;
 
-	if ((anim & A_LQM_FORWARD) || (anim & A_LQM_BACKWARD) || (anim & A_LQM_LEFT) || (anim & A_LQM_RIGHT)) {
+	if ((anim & A_LQM_FORWARD) || (anim & A_LQM_BACKWARD) || (anim & A_LQM_LEFT) || (anim & A_LQM_RIGHT) || drawInfo->basicInfo.drawMuzzleFlash) {
 		legsTurnAngle = (float)legsTurnAngle/3;
 		torsoTurnAngle = (float)torsoTurnAngle/3;
 	}
@@ -647,7 +649,7 @@ void CG_DrawLQM(DrawInfo_LQM_t* drawInfo)
 	// Leg Animations	
 	if(drawInfo->legsTime < cg.time) {
 		drawInfo->legsFrame++;
-		drawInfo->legsTime = cg.time + ((float)veh->maxspeed/veh->animations[LEGS_RUN].numFrames);
+		drawInfo->legsTime = cg.time + 35; //(veh->animations[LEGS_RUN].numFrames/(float)veh->maxspeed);
 	}
 
 	if(anim & A_LQM_BACKWARD){
@@ -691,6 +693,8 @@ void CG_DrawLQM(DrawInfo_LQM_t* drawInfo)
 	
 
 	AnglesToAxis(angles, axis);
+	for(i = 0; i<3;i++)
+		VectorScale(axis[i],(float)LQM_SCALE,axis[i]);
 	AxisCopy(axis, part[BP_LQM_LEGS].axis );
     part[BP_LQM_LEGS].shadowPlane = shadowPlane;
     part[BP_LQM_LEGS].renderfx = renderfx;
@@ -737,6 +741,20 @@ void CG_DrawLQM(DrawInfo_LQM_t* drawInfo)
 	part[BP_LQM_HEAD].renderfx = renderfx;
 	trap_R_AddRefEntityToScene( &part[BP_LQM_HEAD] );
 
+	// Add Weapon
+	part[BP_LQM_MAX_PARTS].hModel = availableWeapons[drawInfo->weaponIndex].modelHandle;
+	VectorCopy( drawInfo->basicInfo.origin, part[BP_LQM_MAX_PARTS].lightingOrigin );
+	AxisCopy( axisDefault , part[BP_LQM_MAX_PARTS].axis); 
+	CG_PositionRotatedEntityOnTag( &part[BP_LQM_MAX_PARTS], &part[BP_LQM_TORSO], veh->handle[BP_LQM_TORSO], "tag_weap" );
+	part[BP_LQM_MAX_PARTS].shadowPlane = shadowPlane;
+	part[BP_LQM_MAX_PARTS].renderfx = renderfx;
+	trap_R_AddRefEntityToScene( &part[BP_LQM_MAX_PARTS] );
+
+	// muzzleflash
+	if( drawInfo->basicInfo.drawMuzzleFlash ) {
+		CG_VehicleMuzzleFlash( drawInfo->basicInfo.flashWeaponIndex, &part[BP_LQM_MAX_PARTS], 
+							   availableWeapons[drawInfo->weaponIndex].modelHandle, drawInfo->basicInfo.vehicleIndex );
+	}
 }
 
 
