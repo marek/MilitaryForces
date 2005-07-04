@@ -1,5 +1,5 @@
 /*
- * $Id: g_combat.c,v 1.14 2005-06-26 05:08:12 minkis Exp $
+ * $Id: g_combat.c,v 1.15 2005-07-04 23:46:31 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -83,10 +83,7 @@ Vehicle_Die
 void Vehicle_Die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int meansOfDeath )
 {
 	if( self->health > GIB_HEALTH )
-	{
 		return;
-	}
-
 	ExplodeVehicle( self );
 }
 
@@ -773,8 +770,8 @@ void Vehicle_Death( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, 
 		self->health = GIB_HEALTH - 1;
 	}
 
-	// always gib ground vehicles
-	if( (availableVehicles[self->client->vehicle].cat & CAT_GROUND) ) {
+	// always gib ground vehicles and lqms
+	if( (availableVehicles[self->client->vehicle].cat & CAT_GROUND) ||  (availableVehicles[self->client->vehicle].cat & CAT_LQM)) {
 		self->health = GIB_HEALTH - 1;
 	}
 

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_event.c,v 1.18 2005-06-26 05:08:11 minkis Exp $
+ * $Id: cg_event.c,v 1.19 2005-07-04 23:46:30 minkis Exp $
 */
 
 #include "cg_local.h"
@@ -299,7 +299,10 @@ void CG_EntityEvent( centity_t *cent, vec3_t position )
 
 	case EV_VEHICLE_GIB:
 		DEBUGNAME("EV_VEHICLE_GIB");
-		CG_GenericExplosion( position, EXPLODE_VEHICLE_GIB );
+		if(availableVehicles[cgs.clientinfo[ cent->currentState.clientNum ].vehicle].cat & CAT_LQM)
+			CG_GibPlayer(position);
+		else
+			CG_GenericExplosion( position, EXPLODE_VEHICLE_GIB );
 		break;
 
 	case EV_BUILDING_EXPLODE:

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.70 2005-07-04 05:48:04 minkis Exp $
+ * $Id: cg_local.h,v 1.71 2005-07-04 23:46:30 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -255,12 +255,14 @@ typedef enum {
 
 typedef enum {
 	LEMT_NONE,
-	LEMT_BURN
+	LEMT_BURN,
+	LEMT_BLOOD
 } leMarkType_t;			// fragment local entities can leave marks on walls
 
 typedef enum {
 	LEBS_NONE,
-	LEBS_BRASS
+	LEBS_BRASS,
+	LEBS_BLOOD
 } leBounceSoundType_t;	// fragment local entities can make sounds on impacts
 
 typedef struct localEntity_s {
@@ -777,6 +779,19 @@ typedef struct {
 	qhandle_t	medalAssist;
 	qhandle_t	medalCapture;
 
+	// gib explosions
+	sfxHandle_t	gibSound;
+	qhandle_t	gibAbdomen;
+	qhandle_t	gibArm;
+	qhandle_t	gibChest;
+	qhandle_t	gibFist;
+	qhandle_t	gibFoot;
+	qhandle_t	gibForearm;
+	qhandle_t	gibIntestine;
+	qhandle_t	gibLeg;
+	qhandle_t	gibSkull;
+	qhandle_t	gibBrain;
+
 	// sounds
 	sfxHandle_t	sfx_ric1;
 	sfxHandle_t	sfx_ric2;
@@ -954,9 +969,9 @@ typedef struct {
 typedef struct {
     BasicDrawInfo_t		basicInfo;
 	int					anim;
-	int					bodyFrame;
+	int					torsoFrame;
 	int					legsFrame;
-	int					bodyTime;
+	int					torsoTime;
 	int					legsTime;
 	int					lastLegsAngle;
 	int					lastTorsoAngle;
@@ -1497,6 +1512,7 @@ localEntity_t *CG_MakeExplosion( vec3_t origin, vec3_t dir,
 
 void CG_NukeEffect(  centity_t * cent, entityState_t * es );
 void CG_FlakEffect(  centity_t * cent, entityState_t * es );
+void CG_GibPlayer( vec3_t playerOrigin );
 
 //
 // cg_snapshot.c

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicle.c,v 1.32 2005-07-04 05:48:04 minkis Exp $
+ * $Id: cg_vehicle.c,v 1.33 2005-07-04 23:46:30 minkis Exp $
 */
 
 #include "cg_local.h"
@@ -8,7 +8,7 @@
 typedef struct LQMAnimations_s
 {
 	int			numAnimations;
-	animation_t	anim[MAX_LQM_MODELS];
+	animation_t	anim[MAX_LQM_MODELS][MAX_ANIMATIONS];
 } LQMAnimations_t;
 LQMAnimations_t availableLQMAnimations;
 
@@ -798,11 +798,7 @@ void CG_VehicleMuzzleFlash( int weaponIdx, const refEntity_t *parent, qhandle_t 
 		AnglesToAxis( angles, flash[i].axis );
 		if(availableWeapons[weaponIdx].category & CAT_LQM) {
 			for(j = 0; j < 3; j++) 
-			{
-				flash[i].axis[j][0] = flash[i].axis[j][0]/(float)LQM_SCALE;
-				flash[i].axis[j][1] = flash[i].axis[j][1]/(float)LQM_SCALE;
-				flash[i].axis[j][2] = flash[i].axis[j][2]/(float)LQM_SCALE;
-			}
+				VectorScale(flash[i].axis[j], 1/(float)LQM_SCALE, flash[i].axis[j]);
 		}
 
 		if( i > 0 ) {

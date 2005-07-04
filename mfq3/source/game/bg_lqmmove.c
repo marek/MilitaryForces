@@ -1,5 +1,5 @@
 /*
- * $Id: bg_lqmmove.c,v 1.4 2005-07-03 07:50:20 minkis Exp $
+ * $Id: bg_lqmmove.c,v 1.5 2005-07-04 23:46:30 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -28,7 +28,7 @@ void PM_LQMAdjustToTerrain( void )
 
 	// set the height
 	VectorSet( start, pm->ps->origin[0], pm->ps->origin[1], pm->ps->origin[2] );
-	VectorSet( end, pm->ps->origin[0], pm->ps->origin[1], (float)pm->ps->origin[2] + pm->mins[2] - 1);
+	VectorSet( end, pm->ps->origin[0], (float)pm->ps->origin[1], (float)pm->ps->origin[2] + (float)pm->mins[2] - 2);
 	pm->trace ( &tr, 
 				start, 
 				0,//availableVehicles[pm->vehicle].mins, 
@@ -39,7 +39,7 @@ void PM_LQMAdjustToTerrain( void )
 
 	if( tr.fraction < 1.0f ) {
 		height = tr.endpos[2] - pm->ps->origin[2] - pm->mins[2];
-		pm->ps->origin[2] += height;
+		pm->ps->origin[2] += height + 1;
 		if( tr.fraction == 1 ) fall = qtrue;
 	
 	}
@@ -91,6 +91,22 @@ void PM_LQMMove( void )
 	}
 	// air movement
 	else {
+		// Crouch/Jump Movement
+		if( pm->cmd.buttons & BUTTON_INCREASE ) {
+			anim &= ~A_LQM_CROUCH;
+			anim |= A_LQM_JUMP;
+			maxspeed *= (float)0.5;
+			maxspeed2 *= (float)0.5;
+		} else if( pm->cmd.buttons & BUTTON_DECREASE ) {
+			anim &= ~A_LQM_JUMP;
+			anim |= A_LQM_CROUCH;
+			maxspeed *= (float)0.5;
+			maxspeed2 *= (float)0.5;
+		} else {
+			anim &= ~A_LQM_JUMP;
+			anim &= ~A_LQM_CROUCH;
+		}
+
 		// Forward Movement
 		if(pm->cmd.forwardmove != 0) {
 			speedtemp = pm->cmd.rightmove != 0 ? maxspeed2 : maxspeed;
@@ -129,12 +145,12 @@ void PM_LQMMove( void )
 		} else
 			anim &= ~(A_LQM_LEFT|A_LQM_RIGHT);
 
-			
-		// Crouch Movement
+		
+		/*
 		if(pm->cmd.buttons & BUTTON_BRAKE)
 			anim |= A_LQM_CROUCH;
 		else
-			anim &= ~A_LQM_CROUCH;
+			anim &= ~A_LQM_CROUCH;*/
 
 		// Gravity
 		VectorAdd(forwardvel, rightvel, deltavel);

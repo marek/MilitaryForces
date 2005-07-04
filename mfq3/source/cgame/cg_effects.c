@@ -1,5 +1,5 @@
 /*
- * $Id: cg_effects.c,v 1.9 2005-06-26 05:08:11 minkis Exp $
+ * $Id: cg_effects.c,v 1.10 2005-07-04 23:46:30 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -342,3 +342,125 @@ void CG_LaunchExplode( vec3_t origin, vec3_t velocity, qhandle_t hModel ) {
 	le->leMarkType = LEMT_NONE;
 }
 
+
+/*
+==================
+CG_LaunchGib
+==================
+*/
+void CG_LaunchGib( vec3_t origin, vec3_t velocity, qhandle_t hModel ) {
+	localEntity_t	*le;
+	refEntity_t		*re;
+	int				i;
+
+	le = CG_AllocLocalEntity();
+	re = &le->refEntity;
+
+	le->leType = LE_FRAGMENT;
+	le->startTime = cg.time;
+	le->endTime = le->startTime + 5000 + random() * 3000;
+
+	VectorCopy( origin, re->origin );
+	AxisCopy( axisDefault, re->axis );
+	for(i=0;i<3;i++)
+		VectorScale(re->axis[i], LQM_SCALE,re->axis[i]);
+	re->hModel = hModel;
+
+	le->pos.trType = TR_GRAVITY;
+	VectorCopy( origin, le->pos.trBase );
+	VectorCopy( velocity, le->pos.trDelta );
+	le->pos.trTime = cg.time;
+
+	le->bounceFactor = 0.6f;
+
+	le->leBounceSoundType = LEBS_BLOOD;
+	le->leMarkType = LEMT_BLOOD;
+}
+
+/*
+===================
+CG_GibPlayer
+
+Generated a bunch of gibs launching out from the bodies location
+===================
+*/
+#define	GIB_VELOCITY	250*LQM_SCALE
+#define	GIB_JUMP		250
+void CG_GibPlayer( vec3_t playerOrigin ) {
+	vec3_t	origin, velocity;
+
+	/*
+	if ( !cg_blood.integer ) {
+		return;
+	}*/
+
+	VectorCopy( playerOrigin, origin );
+	velocity[0] = crandom()*GIB_VELOCITY;
+	velocity[1] = crandom()*GIB_VELOCITY;
+	velocity[2] = GIB_JUMP + crandom()*GIB_VELOCITY;
+	if ( rand() & 1 ) {
+		CG_LaunchGib( origin, velocity, cgs.media.gibSkull );
+	} else {
+		CG_LaunchGib( origin, velocity, cgs.media.gibBrain );
+	}
+
+	// allow gibs to be turned off for speed
+	/*
+	if ( !cg_gibs.integer ) {
+		return;
+	}*/
+
+	VectorCopy( playerOrigin, origin );
+	velocity[0] = crandom()*GIB_VELOCITY;
+	velocity[1] = crandom()*GIB_VELOCITY;
+	velocity[2] = GIB_JUMP + crandom()*GIB_VELOCITY;
+	CG_LaunchGib( origin, velocity, cgs.media.gibAbdomen );
+
+	VectorCopy( playerOrigin, origin );
+	velocity[0] = crandom()*GIB_VELOCITY;
+	velocity[1] = crandom()*GIB_VELOCITY;
+	velocity[2] = GIB_JUMP + crandom()*GIB_VELOCITY;
+	CG_LaunchGib( origin, velocity, cgs.media.gibArm );
+
+	VectorCopy( playerOrigin, origin );
+	velocity[0] = crandom()*GIB_VELOCITY;
+	velocity[1] = crandom()*GIB_VELOCITY;
+	velocity[2] = GIB_JUMP + crandom()*GIB_VELOCITY;
+	CG_LaunchGib( origin, velocity, cgs.media.gibChest );
+
+	VectorCopy( playerOrigin, origin );
+	velocity[0] = crandom()*GIB_VELOCITY;
+	velocity[1] = crandom()*GIB_VELOCITY;
+	velocity[2] = GIB_JUMP + crandom()*GIB_VELOCITY;
+	CG_LaunchGib( origin, velocity, cgs.media.gibFist );
+
+	VectorCopy( playerOrigin, origin );
+	velocity[0] = crandom()*GIB_VELOCITY;
+	velocity[1] = crandom()*GIB_VELOCITY;
+	velocity[2] = GIB_JUMP + crandom()*GIB_VELOCITY;
+	CG_LaunchGib( origin, velocity, cgs.media.gibFoot );
+
+	VectorCopy( playerOrigin, origin );
+	velocity[0] = crandom()*GIB_VELOCITY;
+	velocity[1] = crandom()*GIB_VELOCITY;
+	velocity[2] = GIB_JUMP + crandom()*GIB_VELOCITY;
+	CG_LaunchGib( origin, velocity, cgs.media.gibForearm );
+
+	VectorCopy( playerOrigin, origin );
+	velocity[0] = crandom()*GIB_VELOCITY;
+	velocity[1] = crandom()*GIB_VELOCITY;
+	velocity[2] = GIB_JUMP + crandom()*GIB_VELOCITY;
+	CG_LaunchGib( origin, velocity, cgs.media.gibIntestine );
+
+	VectorCopy( playerOrigin, origin );
+	velocity[0] = crandom()*GIB_VELOCITY;
+	velocity[1] = crandom()*GIB_VELOCITY;
+	velocity[2] = GIB_JUMP + crandom()*GIB_VELOCITY;
+	CG_LaunchGib( origin, velocity, cgs.media.gibLeg );
+
+	VectorCopy( playerOrigin, origin );
+	velocity[0] = crandom()*GIB_VELOCITY;
+	velocity[1] = crandom()*GIB_VELOCITY;
+	velocity[2] = GIB_JUMP + crandom()*GIB_VELOCITY;
+	CG_LaunchGib( origin, velocity, cgs.media.gibLeg );
+}

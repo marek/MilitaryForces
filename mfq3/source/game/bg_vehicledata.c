@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.64 2005-07-04 05:48:04 minkis Exp $
+ * $Id: bg_vehicledata.c,v 1.65 2005-07-04 23:46:31 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -3017,10 +3017,10 @@ completeVehicleData_t availableVehicles[] =
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{50, 125, 70},				// turnspeed around the three axis
-	{0, 0, 0},					// camera distance {min,max,default}
-	{2.5, 2.5, 2.5},					// camera height {min,max,default}
-	//{0, 10, 0},					// camera distance {min,max,default}
-	//{0, 10, 2.5},					// camera height {min,max,default}
+	//{0, 0, 0},					// camera distance {min,max,default}
+	//{2.5, 2.5, 2.5},					// camera height {min,max,default}
+	{0, 10, 0},					// camera distance {min,max,default}
+	{0, 10, 2.5},					// camera height {min,max,default}
 	0,							// stallspeed
 	80,							// maxspeed
 	0,							// min throttle
@@ -3067,10 +3067,10 @@ completeVehicleData_t availableVehicles[] =
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{50, 125, 70},				// turnspeed around the three axis
-	{0, 0, 0},					// camera distance {min,max,default}
-	{2.5, 2.5, 2.5},					// camera height {min,max,default}
-	//{0, 10, 0},					// camera distance {min,max,default}
-	//{0, 10, 2.5},					// camera height {min,max,default}
+	//{0, 0, 0},					// camera distance {min,max,default}
+	//{2.5, 2.5, 2.5},					// camera height {min,max,default}
+	{0, 10, 0},					// camera distance {min,max,default}
+	{0, 10, 2.5},					// camera height {min,max,default}
 	0,							// stallspeed
 	80,							// maxspeed
 	0,							// min throttle

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_lqm.c,v 1.5 2005-07-04 05:48:04 minkis Exp $
+ * $Id: cg_lqm.c,v 1.6 2005-07-04 23:46:30 minkis Exp $
 */
 
 
@@ -58,7 +58,7 @@ CG_GroundVehicle
 void CG_LQM( centity_t *cent, clientInfo_t *ci ) 
 {
 	vec3_t			velocity;	
-	vec3_t			smokePosition, forward, right, up, temp, start;
+	vec3_t		    forward, right, up, temp, start;
 	DrawInfo_LQM_t drawInfo;
 	int				ONOFF = cent->currentState.ONOFF;
 	int				i;
@@ -77,9 +77,9 @@ void CG_LQM( centity_t *cent, clientInfo_t *ci )
 	// Copy animation frames
 	drawInfo.lastTorsoAngle = cent->bayAnim;
 	drawInfo.lastLegsAngle = cent->gearAnim;
-	drawInfo.bodyFrame = cent->bayAnimFrame;
+	drawInfo.torsoFrame = cent->bayAnimFrame;
 	drawInfo.legsFrame = cent->gearAnimFrame;
-	drawInfo.bodyTime = cent->bayAnimStartTime;
+	drawInfo.torsoTime = cent->bayAnimStartTime;
 	drawInfo.legsTime = cent->gearAnimStartTime;
 
 	// get speed
@@ -115,8 +115,8 @@ void CG_LQM( centity_t *cent, clientInfo_t *ci )
 	// return frames
 	cent->bayAnim = drawInfo.lastTorsoAngle;
 	cent->gearAnim = drawInfo.lastLegsAngle;
-	cent->bayAnimFrame = drawInfo.bodyFrame;
-	cent->bayAnimStartTime = drawInfo.bodyTime;
+	cent->bayAnimFrame = drawInfo.torsoFrame;
+	cent->bayAnimStartTime = drawInfo.torsoTime;
 	cent->gearAnimFrame = drawInfo.legsFrame;
 	cent->gearAnimStartTime = drawInfo.legsTime;
 	
