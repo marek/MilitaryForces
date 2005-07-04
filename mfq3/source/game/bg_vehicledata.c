@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.63 2005-07-02 07:45:05 minkis Exp $
+ * $Id: bg_vehicledata.c,v 1.64 2005-07-04 05:48:04 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -3003,8 +3003,8 @@ completeVehicleData_t availableVehicles[] =
 	// Infantry
 	// ---------------------------------------------
 
-	{	"Sarge - Generic Fodder",	// descriptiveName
-	"sarge",					// tinyName
+	{	"Sarge",	// descriptiveName
+	"Soldier",					// tinyName
 	"sarge",					// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
@@ -3017,10 +3017,12 @@ completeVehicleData_t availableVehicles[] =
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{50, 125, 70},				// turnspeed around the three axis
-	{0, 100, 80},				// camera distance {min,max,default}
-	{0, 100, 25},				// camera height {min,max,default}
+	{0, 0, 0},					// camera distance {min,max,default}
+	{2.5, 2.5, 2.5},					// camera height {min,max,default}
+	//{0, 10, 0},					// camera distance {min,max,default}
+	//{0, 10, 2.5},					// camera height {min,max,default}
 	0,							// stallspeed
-	300,						// maxspeed
+	80,							// maxspeed
 	0,							// min throttle
 	0,						    // max throttle
 	0,							// engines
@@ -3032,8 +3034,8 @@ completeVehicleData_t availableVehicles[] =
 	0,							// max fuel
 	0,							// max gun pitch (upwards = negative) <- gearheight
 	0,							// min gun pitch (downwards = positive) <- tailangle
-	0, 0, 0, 0, 0, 0, 0, 0,		// weapons
-	0, 0, 0, 0, 0, 0, 0, 0,		// ammo
+	WI_MG_M4A1, 0, 0, 0, 0, 0, 0, 0,		// weapons
+	90, 0, 0, 0, 0, 0, 0, 0,		// ammo
 	0,0,0,0,0,0,0,0,			// turret
 	{0, 0, 10},					// cameraposition for cockpit view
 	0,							// effect model
@@ -3050,6 +3052,57 @@ completeVehicleData_t availableVehicles[] =
 	{0,0,0,0},					// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
     },
+
+	{	"Major",				// descriptiveName
+	"Soldier",					// tinyName
+	"major",					// modelName
+	SHADOW_DEFAULT,				// alpha shadow
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_2,
+	CAT_LQM,
+	CLASS_LQM_INFANTRY,
+	0,							// flags
+	0,	// capabilities
+	{0,0,0,0,0,0,0,0,0,0},		// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
+	{50, 125, 70},				// turnspeed around the three axis
+	{0, 0, 0},					// camera distance {min,max,default}
+	{2.5, 2.5, 2.5},					// camera height {min,max,default}
+	//{0, 10, 0},					// camera distance {min,max,default}
+	//{0, 10, 2.5},					// camera height {min,max,default}
+	0,							// stallspeed
+	80,							// maxspeed
+	0,							// min throttle
+	0,						    // max throttle
+	0,							// engines
+	0,							// wheels
+	0,							// wheel circumference
+	0,							// acceleration
+	20,							// health
+	{0, 0, 0},					// gun tag
+	0,							// max fuel
+	0,							// max gun pitch (upwards = negative) <- gearheight
+	0,							// min gun pitch (downwards = positive) <- tailangle
+	WI_MG_M4A1, 0, 0, 0, 0, 0, 0, 0,		// weapons
+	90, 0, 0, 0, 0, 0, 0, 0,		// ammo
+	0,0,0,0,0,0,0,0,			// turret
+	{0, 0, 10},					// cameraposition for cockpit view
+	0,							// effect model
+	0,							// radar range
+	0,							// radar range ground
+	-1,							// trackcone
+	0,							// trackcone ground
+	0,							// swingangle
+	0,							// geartime
+	0,							// max gear frame
+	0,							// baytime
+	0,							// max bay frame
+	0,							// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
+    },
+
 
 	// ---------------------------------------------
 	// Boats

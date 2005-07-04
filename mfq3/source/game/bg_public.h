@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.136 2005-07-03 07:50:20 minkis Exp $
+ * $Id: bg_public.h,v 1.137 2005-07-04 05:48:04 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1022,6 +1022,7 @@ typedef enum
 	WI_MG_20MM,
 	WI_MG_30MM,
 	WI_MG_2X20MM,
+	WI_MG_M4A1,
 	WI_MGT_2X30MM,		// 10
 	WI_MGT_7_62MM,
 	WI_MGT_12_7MM,
@@ -1170,6 +1171,7 @@ int MF_findWeaponsOfType( int weaponIndex, completeLoadout_t* loadout );
 #define	HC_WEAPONBAY			512
 
 // LQM Animations (replace instead of using frame index, and let CG read animation.cfg)
+#define LQM_SCALE				0.1
 #define A_LQM_STAND				0
 #define A_LQM_FORWARD			1
 #define A_LQM_BACKWARD			2

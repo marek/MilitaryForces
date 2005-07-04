@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicle.c,v 1.31 2005-07-03 07:50:20 minkis Exp $
+ * $Id: cg_vehicle.c,v 1.32 2005-07-04 05:48:04 minkis Exp $
 */
 
 #include "cg_local.h"
@@ -383,7 +383,7 @@ static void CG_CacheLQM(int index)
 
 	// only thing that always has to be there is body
 	if( !availableVehicles[index].handle[BP_LQM_TORSO] ) {
-		trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
+		trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s_torso.md3\n", basename) );
 	}
 
 	// Parse LQM Animations
@@ -706,10 +706,7 @@ void CG_Vehicle( centity_t *cent )
 	// lqm?
 	else if( availableVehicles[ci->vehicle].cat & CAT_LQM)
 	{
-		if(cg.clientNum != clientNum)
 			CG_LQM( cent, ci );
-		else
-			CG_LQM( cent, ci );	//CG_LQMFirstPerson(cent, ci);
 	}
 	// boat ?
 	else if( availableVehicles[ci->vehicle].cat & CAT_BOAT )
@@ -779,7 +776,7 @@ void CG_VehicleMuzzleFlash( int weaponIdx, const refEntity_t *parent, qhandle_t 
 
 	refEntity_t		flash[MAX_MUZZLEFLASHES];
 	vec3_t			angles;
-	unsigned int	i;
+	unsigned int	i,j;
 	unsigned int	flashes;
 	char			tag[10];
 
@@ -799,6 +796,14 @@ void CG_VehicleMuzzleFlash( int weaponIdx, const refEntity_t *parent, qhandle_t 
 		angles[PITCH] = 0;
 		angles[ROLL] = crandom() * 10;
 		AnglesToAxis( angles, flash[i].axis );
+		if(availableWeapons[weaponIdx].category & CAT_LQM) {
+			for(j = 0; j < 3; j++) 
+			{
+				flash[i].axis[j][0] = flash[i].axis[j][0]/(float)LQM_SCALE;
+				flash[i].axis[j][1] = flash[i].axis[j][1]/(float)LQM_SCALE;
+				flash[i].axis[j][2] = flash[i].axis[j][2]/(float)LQM_SCALE;
+			}
+		}
 
 		if( i > 0 ) {
 			Com_sprintf( tag, 10, "tag_gun%d", i+1 );
