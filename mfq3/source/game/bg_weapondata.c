@@ -1,5 +1,5 @@
 /*
- * $Id: bg_weapondata.c,v 1.38 2005-07-04 05:48:04 minkis Exp $
+ * $Id: bg_weapondata.c,v 1.39 2005-07-05 03:33:40 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -470,8 +470,8 @@ completeWeaponData_t availableWeapons[] =
 		2500,								// muzzleVelocity
 		0,									// range
 		0,									// fuelrange
-		300,								// fire interval
-		1,									// damage
+		150,								// fire interval
+		2,									// damage
 		30,									// damageRadius
 		16,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
 		1,									// barrels
@@ -485,7 +485,7 @@ completeWeaponData_t availableWeapons[] =
 		0,									// turret
 		{0,0,0},							// max turret angles
 		{0,0,0},							// min turret angles
-		1,									// number per package
+		30,									// number per package
 		CAT_ANY,							// fits on category
 		PF_NA,								// fits on pylon
 		0,									// basicECMVulnerability

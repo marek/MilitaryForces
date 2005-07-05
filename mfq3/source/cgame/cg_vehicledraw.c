@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicledraw.c,v 1.15 2005-07-04 23:46:30 minkis Exp $
+ * $Id: cg_vehicledraw.c,v 1.16 2005-07-05 03:33:40 minkis Exp $
 */
 
 #include "cg_local.h"
@@ -638,6 +638,7 @@ void CG_DrawLQM(DrawInfo_LQM_t* drawInfo)
 
 	// use the same origin for all
     renderfx |= RF_LIGHTING_ORIGIN;
+
 	/*
 	if(drawInfo->basicInfo.entityNum == cg.clientNum)
 		renderfx |= RF_THIRD_PERSON;*/
@@ -677,6 +678,9 @@ void CG_DrawLQM(DrawInfo_LQM_t* drawInfo)
 			if(drawInfo->legsFrame > veh->animations[LEGS_RUN].numFrames-1) drawInfo->legsFrame = 0;
 			part[BP_LQM_LEGS].frame =  veh->animations[LEGS_RUN].firstFrame + drawInfo->legsFrame;
 		}
+	} else if (anim & A_LQM_DIE) {
+		if(drawInfo->legsFrame > veh->animations[BOTH_DEATH1].numFrames-1) drawInfo->legsFrame = veh->animations[BOTH_DEAD1].firstFrame;;
+		part[BP_LQM_LEGS].frame = drawInfo->legsFrame;
 	} else {
 		if(anim & A_LQM_CROUCH) 
 			part[BP_LQM_LEGS].frame = veh->animations[LEGS_WALKCR].firstFrame;
@@ -688,16 +692,21 @@ void CG_DrawLQM(DrawInfo_LQM_t* drawInfo)
 	if(drawInfo->basicInfo.drawMuzzleFlash) {
 		drawInfo->torsoFrame = veh->animations[TORSO_ATTACK].firstFrame;
 		drawInfo->torsoTime = cg.time + veh->animations[TORSO_ATTACK].frameLerp;
-	} else {
-		if (drawInfo->torsoFrame >= veh->animations[TORSO_ATTACK].firstFrame && drawInfo->torsoFrame <= veh->animations[TORSO_ATTACK].firstFrame+veh->animations[TORSO_ATTACK].numFrames) {
-			if(drawInfo->torsoTime < cg.time) {
-				drawInfo->torsoFrame++;
-				drawInfo->torsoTime = cg.time + veh->animations[TORSO_ATTACK].frameLerp; 
-			}
-			if(drawInfo->torsoFrame > veh->animations[TORSO_ATTACK].numFrames-1) drawInfo->torsoFrame = 0;
-		} else 
-			drawInfo->torsoFrame = veh->animations[TORSO_STAND].firstFrame;
-	}
+	} else if (anim & A_LQM_DIE) {
+		if(drawInfo->torsoTime < cg.time) {
+			drawInfo->torsoFrame++;
+			drawInfo->torsoTime = cg.time + veh->animations[BOTH_DEATH1].frameLerp; 
+		}
+		if(drawInfo->torsoFrame > veh->animations[BOTH_DEATH1].numFrames-1) drawInfo->torsoFrame = veh->animations[BOTH_DEAD1].firstFrame;
+		part[BP_LQM_TORSO].frame = drawInfo->torsoFrame;
+	} else if (drawInfo->torsoFrame >= veh->animations[TORSO_ATTACK].firstFrame && drawInfo->torsoFrame <= veh->animations[TORSO_ATTACK].firstFrame+veh->animations[TORSO_ATTACK].numFrames) {
+		if(drawInfo->torsoTime < cg.time) {
+			drawInfo->torsoFrame++;
+			drawInfo->torsoTime = cg.time + veh->animations[TORSO_ATTACK].frameLerp; 
+		}
+		if(drawInfo->torsoFrame > veh->animations[TORSO_ATTACK].numFrames-1) drawInfo->torsoFrame = 0;
+	} else 
+		drawInfo->torsoFrame = veh->animations[TORSO_STAND].firstFrame;
 	part[BP_LQM_TORSO].frame = drawInfo->torsoFrame;
 
 
