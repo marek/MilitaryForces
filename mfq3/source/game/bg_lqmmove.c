@@ -1,5 +1,5 @@
 /*
- * $Id: bg_lqmmove.c,v 1.5 2005-07-04 23:46:30 minkis Exp $
+ * $Id: bg_lqmmove.c,v 1.6 2005-07-05 03:33:40 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -80,7 +80,7 @@ void PM_LQMMove( void )
 	anim = pm->ps->vehicleAnim;
 
     if( dead ) {
-		// ....
+		pm->ps->vehicleAnim = A_LQM_DIE;
 		PM_SlideMove_LQM();
 		return;
     }

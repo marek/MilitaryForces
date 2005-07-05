@@ -1,5 +1,5 @@
 /*
- * $Id: g_lqm.c,v 1.2 2002-07-15 18:23:07 thebjoern Exp $
+ * $Id: g_lqm.c,v 1.3 2005-07-05 03:33:40 minkis Exp $
 */
 
 
@@ -13,7 +13,13 @@ void Touch_LQM( gentity_t *self, gentity_t *other, trace_t *trace )
 	// instead of dying on every collision we take damage depending on the speed
 	// with which we crashed into an obstacle, and this should be rather low...
 
-//  G_Damage( self, NULL, self, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH );
+	// Get Run over
+	if((strcmp(other->classname,"player") == 0) && (availableVehicles[other->client->vehicle].cat != CAT_LQM) &&
+		( (g_gametype.integer >= GT_TEAM && other->team != self->team) ||
+		(g_gametype.integer < GT_MISSION_EDITOR) ) ) 
+	{
+		  G_Damage( self, NULL, other, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
+	}
 }
 
 

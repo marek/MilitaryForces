@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.65 2005-07-04 23:46:31 minkis Exp $
+ * $Id: bg_vehicledata.c,v 1.66 2005-07-05 03:33:40 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -3035,7 +3035,7 @@ completeVehicleData_t availableVehicles[] =
 	0,							// max gun pitch (upwards = negative) <- gearheight
 	0,							// min gun pitch (downwards = positive) <- tailangle
 	WI_MG_M4A1, 0, 0, 0, 0, 0, 0, 0,		// weapons
-	90, 0, 0, 0, 0, 0, 0, 0,		// ammo
+	5, 0, 0, 0, 0, 0, 0, 0,		// ammo
 	0,0,0,0,0,0,0,0,			// turret
 	{0, 0, 10},					// cameraposition for cockpit view
 	0,							// effect model
@@ -3085,7 +3085,7 @@ completeVehicleData_t availableVehicles[] =
 	0,							// max gun pitch (upwards = negative) <- gearheight
 	0,							// min gun pitch (downwards = positive) <- tailangle
 	WI_MG_M4A1, 0, 0, 0, 0, 0, 0, 0,		// weapons
-	90, 0, 0, 0, 0, 0, 0, 0,		// ammo
+	5, 0, 0, 0, 0, 0, 0, 0,		// ammo
 	0,0,0,0,0,0,0,0,			// turret
 	{0, 0, 10},					// cameraposition for cockpit view
 	0,							// effect model

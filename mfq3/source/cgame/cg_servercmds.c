@@ -1,5 +1,5 @@
 /*
- * $Id: cg_servercmds.c,v 1.13 2005-06-26 05:08:11 minkis Exp $
+ * $Id: cg_servercmds.c,v 1.14 2005-07-05 03:33:40 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -107,7 +107,6 @@ void CG_ParseServerinfo( void ) {
 	char	*mapname;
 	char	gs[32];
 	unsigned int newset = cgs.gameset;
-	int i;
 
 	info = CG_ConfigString( CS_SERVERINFO );
 	cgs.gametype = atoi( Info_ValueForKey( info, "g_gametype" ) );
