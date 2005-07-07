@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicle.c,v 1.33 2005-07-04 23:46:30 minkis Exp $
+ * $Id: cg_vehicle.c,v 1.34 2005-07-07 04:02:11 minkis Exp $
 */
 
 #include "cg_local.h"
@@ -50,7 +50,7 @@ static animation_t * CG_ParseLQMAnimationFile( const char *filename ) {
 	fileHandle_t	f;
 	animation_t *animations;
 
-	animations = &availableLQMAnimations.anim[availableLQMAnimations.numAnimations];
+	animations = (animation_t *)&availableLQMAnimations.anim[availableLQMAnimations.numAnimations];
 
 	// load the file
 	len = trap_FS_FOpenFile( filename, &f, FS_READ );

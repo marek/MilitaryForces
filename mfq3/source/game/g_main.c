@@ -1,5 +1,5 @@
 /*
- * $Id: g_main.c,v 1.24 2005-06-26 05:08:12 minkis Exp $
+ * $Id: g_main.c,v 1.25 2005-07-07 04:02:11 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -313,20 +313,6 @@ void G_RegisterCvars( void ) {
 		G_Printf( "g_gametype %i is out of range, defaulting to 0\n", g_gametype.integer );
 		trap_Cvar_Set( "g_gametype", "0" );
 	}
-
-	// *******************
-	// Changes By: Minkis
-	// *******************
-	/*
-	Temporarly disabley Team based games(anything but DM and ME)
-	Team games lag and have a nasty spawn bug
-	*/
-	// *******************
-	/*
-	if(g_gametype.integer != GT_MISSION_EDITOR && g_gametype.integer != GT_FFA)
-	{
-		trap_Cvar_Set( "g_gametype", "0" );
-	}*/
 	
 	level.warmupModificationCount = g_warmup.modificationCount;
 	
