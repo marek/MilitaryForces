@@ -1,5 +1,5 @@
 /*
- * $Id: ui_shared.h,v 1.12 2002-02-25 17:33:48 sparky909_uk Exp $
+ * $Id: ui_shared.h,v 1.13 2005-07-07 22:22:06 minkis Exp $
 */
 #ifndef __UI_SHARED_H
 #define __UI_SHARED_H
@@ -105,6 +105,7 @@ typedef enum {
 #define	ID_BOMBCAMERA	48
 #define	ID_CYCLEMFD1	49
 #define	ID_CYCLEMFD2	50
+#define ID_EJECT		51
 
 #define MAX_MENUNAME 32
 #define MAX_ITEMTEXT 64

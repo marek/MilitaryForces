@@ -1,5 +1,5 @@
 /*
- * $Id: g_missile.c,v 1.32 2005-06-30 03:54:00 minkis Exp $
+ * $Id: g_missile.c,v 1.33 2005-07-07 22:22:06 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -497,8 +497,13 @@ void G_CrateDropItems(gentity_t *ent)
 			}
 		}
 		// spawn the item
-		if(found)
-			Drop_Item( ent, item, 0 );
+		if(found) 
+		{
+			ent->s.pos.trBase[2] += 25;
+			Drop_Item( ent, item, 180*sin(crandom()));
+			ent->s.pos.trBase[2] -= 25;
+
+		}
 	}
 
 
@@ -735,36 +740,28 @@ void G_CrateThink( gentity_t *ent ) {
 	int i;
 
 	// Get values
-	VectorCopy(ent->r.currentAngles, angles);
 	VectorCopy(ent->r.currentOrigin, pos);
-
-	// set angles to 0 <= x <= 360
-	angles[0] = AngleMod( angles[0] );
-	angles[1] = AngleMod( angles[1] );
-	angles[2] = AngleMod( angles[2] );
 
 	// Set angles
 	for(i = 0; i < 3; i++)
 	{
-		angles[i] = 15*sin((pos[2]/25)+(i*10));
+		angles[i] = 45*sin((pos[2]/25)+(i*10));
 	}
-	angles[1] = 0;	// some odd bug
 
 	// Create forces based on angles
 	VectorCopy(angles,  dir);
 	AngleVectors( dir, dir, NULL, NULL );
 	VectorScale( dir, (float)ent->speed/5, dir );
-	VectorAdd(dir,pos,pos);
-	pos[2] -= ent->speed;
-	
+	dir[2] -= ent->speed;
+		
 	// Save angles
+	VectorCopy( ent->r.currentAngles, ent->s.apos.trBase);
 	VectorCopy( angles, ent->s.angles );
-	VectorCopy( ent->s.angles, ent->s.apos.trBase );
+	VectorCopy( ent->s.angles, ent->s.apos.trDelta );
 	VectorCopy( ent->s.angles, ent->r.currentAngles );
 	ent->s.apos.trTime = level.time;
 
 	// Save Origin
-	VectorCopy( pos, ent->r.currentOrigin);
 	VectorCopy( ent->r.currentOrigin, ent->s.pos.trBase );
 	VectorCopy( dir, ent->s.pos.trDelta );
 	ent->s.pos.trTime = level.time;
@@ -1619,8 +1616,8 @@ void drop_crate (gentity_t *self) {
 	bolt->target_ent = NULL;
 	bolt->speed = bolt->speed = availableWeapons[self->client->ps.weaponIndex].muzzleVelocity;
 
-	//bolt->s.pos.trType = TR_LINEAR;
-	bolt->s.pos.trType = TR_GRAVITY;
+	bolt->s.pos.trType = TR_LINEAR;
+	//bolt->s.pos.trType = TR_GRAVITY;
 	bolt->s.pos.trTime = level.time;
 
 	bolt->health = 5;

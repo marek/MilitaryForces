@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicle.c,v 1.34 2005-07-07 04:02:11 minkis Exp $
+ * $Id: cg_vehicle.c,v 1.35 2005-07-07 22:22:05 minkis Exp $
 */
 
 #include "cg_local.h"
@@ -796,7 +796,7 @@ void CG_VehicleMuzzleFlash( int weaponIdx, const refEntity_t *parent, qhandle_t 
 		angles[PITCH] = 0;
 		angles[ROLL] = crandom() * 10;
 		AnglesToAxis( angles, flash[i].axis );
-		if(availableWeapons[weaponIdx].category & CAT_LQM) {
+		if(availableVehicles[idx].cat & CAT_LQM) {
 			for(j = 0; j < 3; j++) 
 				VectorScale(flash[i].axis[j], 1/(float)LQM_SCALE, flash[i].axis[j]);
 		}
