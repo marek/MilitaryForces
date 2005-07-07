@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.138 2005-07-04 23:46:31 minkis Exp $
+ * $Id: bg_public.h,v 1.139 2005-07-07 04:02:11 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -105,7 +105,7 @@ typedef enum {
 } pmtype_t;
 
 // pmove->pm_flags
-#define	PMF_DUCKED			1
+#define	PMF_MFQ3_FREE1		1
 #define	PMF_RECHARGING		2		// set when recharging
 #define PMF_VEHICLESPAWN	4		// spawning vehicle
 #define	PMF_ME_FREEZE		8		// mission editor freeze (when manipulating objects)
@@ -1181,7 +1181,7 @@ int MF_findWeaponsOfType( int weaponIndex, completeLoadout_t* loadout );
 #define A_LQM_EJECT				32
 #define A_LQM_FLY				64
 #define A_LQM_DIE				128
-#define A_LQM_JUMP				A_LQM_CROUCH|A_LQM_EJECT
+#define A_LQM_JUMP				(A_LQM_CROUCH|A_LQM_EJECT)
 
 // this is for the PW_ONOFF_FLAGS
 #define OO_NOTHING_ON			0

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_lqm.c,v 1.6 2005-07-04 23:46:30 minkis Exp $
+ * $Id: cg_lqm.c,v 1.7 2005-07-07 04:02:11 minkis Exp $
 */
 
 
@@ -61,7 +61,6 @@ void CG_LQM( centity_t *cent, clientInfo_t *ci )
 	vec3_t		    forward, right, up, temp, start;
 	DrawInfo_LQM_t drawInfo;
 	int				ONOFF = cent->currentState.ONOFF;
-	int				i;
 
 
 	memset( &drawInfo, 0, sizeof(drawInfo) );

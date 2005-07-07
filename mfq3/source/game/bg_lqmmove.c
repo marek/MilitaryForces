@@ -1,5 +1,5 @@
 /*
- * $Id: bg_lqmmove.c,v 1.6 2005-07-05 03:33:40 minkis Exp $
+ * $Id: bg_lqmmove.c,v 1.7 2005-07-07 04:02:11 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -9,6 +9,11 @@
 extern pmove_t		*pm;
 extern pml_t		pml;
 
+
+#define	MIN_WALK_NORMAL	0.4f
+#define	JUMP_VELOCITY	370;
+#define	STEPSIZE		18*LQM_SCALE
+
 /*
 ===================
 PM_LQMMove
@@ -16,33 +21,56 @@ PM_LQMMove
 ===================
 */
 qboolean	PM_SlideMove_LQM();
+void	PM_StepSlideMove_LQM();
 
 
-
-void PM_LQMAdjustToTerrain( void )
+void PM_LQMGroundTrace( void )
 {
-	trace_t		tr;
-	vec3_t		start, end;
-	qboolean	fall;
-	float		height;
+	trace_t		trace;
+	vec3_t		end;
 
 	// set the height
-	VectorSet( start, pm->ps->origin[0], pm->ps->origin[1], pm->ps->origin[2] );
-	VectorSet( end, pm->ps->origin[0], (float)pm->ps->origin[1], (float)pm->ps->origin[2] + (float)pm->mins[2] - 2);
-	pm->trace ( &tr, 
-				start, 
-				0,//availableVehicles[pm->vehicle].mins, 
-				0,//availableVehicles[pm->vehicle].maxs, 
-				end, 
-				pm->ps->clientNum, 
-				MASK_SOLID );
 
-	if( tr.fraction < 1.0f ) {
-		height = tr.endpos[2] - pm->ps->origin[2] - pm->mins[2];
-		pm->ps->origin[2] += height + 1;
-		if( tr.fraction == 1 ) fall = qtrue;
-	
+	VectorSet( end, pm->ps->origin[0], (float)pm->ps->origin[1], (float)pm->ps->origin[2] + (float)pm->mins[2] + 2);
+
+	pm->trace (&trace, pm->ps->origin, pm->mins, pm->maxs, end, pm->ps->clientNum, MASK_SOLID);
+	pml.groundTrace = trace;
+
+	// if the trace didn't hit anything, we are in free fall
+	if ( trace.fraction == 1.0 ) {
+		// go into jump animation
+		if(pm->ps->velocity[2] <= 0) {
+			pm->ps->vehicleAnim |= A_LQM_JUMP;
+			pm->ps->ONOFF |= OO_STALLED;	// start landing
+		}
+
+		pml.groundPlane = qfalse;
+		pml.walking = qfalse;
+		return;
 	}
+
+	// check if getting thrown off the ground
+	if ( pm->ps->velocity[2] > 0 && DotProduct( pm->ps->velocity, trace.plane.normal ) > 10 ) {
+		
+		// go into jump animation
+		pm->ps->vehicleAnim |= A_LQM_JUMP;
+
+		pm->ps->groundEntityNum = ENTITYNUM_NONE;
+		pml.groundPlane = qfalse;
+		pml.walking = qfalse;
+		return;
+	}
+	
+	// slopes that are too steep will not be considered onground
+	if ( trace.plane.normal[2] < MIN_WALK_NORMAL ) {
+		pm->ps->groundEntityNum = ENTITYNUM_NONE;
+		pml.groundPlane = qtrue;
+		pml.walking = qfalse;
+		return;
+	}
+
+	pml.groundPlane = qtrue;
+	pml.walking = qtrue;
 
 		
 }
@@ -52,7 +80,6 @@ void PM_LQMMove( void )
     vec3_t	viewdir;
     qboolean	dead = (pm->ps->stats[STAT_HEALTH] <= 0);
 	qboolean	verydead = (pm->ps->stats[STAT_HEALTH] <= GIB_HEALTH);
-    int		i;
 	int		anim = 0;
 	int		maxspeed = availableVehicles[pm->vehicle].maxspeed;
 	int		maxspeed2 = sqrt(((float)maxspeed*maxspeed/2));
@@ -81,6 +108,7 @@ void PM_LQMMove( void )
 
     if( dead ) {
 		pm->ps->vehicleAnim = A_LQM_DIE;
+		VectorClear(pm->ps->velocity);
 		PM_SlideMove_LQM();
 		return;
     }
@@ -91,20 +119,24 @@ void PM_LQMMove( void )
 	}
 	// air movement
 	else {
+		liftvel[2] = pm->ps->velocity[2];
+
 		// Crouch/Jump Movement
 		if( pm->cmd.buttons & BUTTON_INCREASE ) {
 			anim &= ~A_LQM_CROUCH;
 			anim |= A_LQM_JUMP;
 			maxspeed *= (float)0.5;
 			maxspeed2 *= (float)0.5;
+			if(liftvel[2] == 0 && !(pm->ps->ONOFF & OO_STALLED))
+				liftvel[2] += JUMP_VELOCITY;
 		} else if( pm->cmd.buttons & BUTTON_DECREASE ) {
 			anim &= ~A_LQM_JUMP;
 			anim |= A_LQM_CROUCH;
 			maxspeed *= (float)0.5;
 			maxspeed2 *= (float)0.5;
 		} else {
-			anim &= ~A_LQM_JUMP;
-			anim &= ~A_LQM_CROUCH;
+			if(!((anim & A_LQM_EJECT) && (anim & A_LQM_CROUCH)))
+				anim &= ~A_LQM_CROUCH;
 		}
 
 		// Forward Movement
@@ -146,15 +178,16 @@ void PM_LQMMove( void )
 			anim &= ~(A_LQM_LEFT|A_LQM_RIGHT);
 
 		
-		/*
+		/* // Parachute?
 		if(pm->cmd.buttons & BUTTON_BRAKE)
 			anim |= A_LQM_CROUCH;
 		else
 			anim &= ~A_LQM_CROUCH;*/
 
-		// Gravity
 		VectorAdd(forwardvel, rightvel, deltavel);
-		deltavel[2] = -DEFAULT_GRAVITY;
+		VectorAdd(liftvel, deltavel, deltavel);
+		// Gravity
+		deltavel[2] = max(deltavel[2]-DEFAULT_GRAVITY*pml.frametime ,-DEFAULT_GRAVITY);
     }
 	// return angles
 	VectorCopy( viewdir, pm->ps->vehicleAngles );
@@ -169,10 +202,14 @@ void PM_LQMMove( void )
 	pm->ps->speed = VectorLength(pm->ps->velocity);
 
 	// Move the lqm
-	PM_SlideMove_LQM();
-
-	// Adjust to terrain
-	PM_LQMAdjustToTerrain();
+	PM_LQMGroundTrace();
+	if(pml.walking) {
+		pm->ps->velocity[2] = 0;
+		pm->ps->ONOFF &= ~OO_STALLED;	// Done landing
+		if((anim & A_LQM_CROUCH) && (anim & A_LQM_EJECT)) 
+			pm->ps->vehicleAnim &= ~A_LQM_JUMP;
+	}
+	PM_StepSlideMove_LQM();
 }
 
 /*
@@ -402,4 +439,52 @@ qboolean	PM_SlideMove_LQM() {
 	return 0;
 }
 
+void PM_StepSlideMove_LQM() {
+	vec3_t		start_o, start_v;
+	vec3_t		down_o, down_v;
+	trace_t		trace;
+	vec3_t		up, down;
+	float		stepSize;
 
+	VectorCopy (pm->ps->origin, start_o);
+	VectorCopy (pm->ps->velocity, start_v);
+
+	if ( PM_SlideMove_LQM() == 0 )
+		return;		// we got exactly where we wanted to go first try	
+
+	VectorCopy(start_o, down);
+	down[2] -= STEPSIZE;
+	pm->trace (&trace, start_o, pm->mins, pm->maxs, down, pm->ps->clientNum, pm->tracemask);
+	VectorSet(up, 0, 0, 1);
+	// never step up when you still have up velocity
+	if ( pm->ps->velocity[2] > 0 && (trace.fraction == 1.0 || DotProduct(trace.plane.normal, up) < 0.7))
+		return;
+
+	VectorCopy (pm->ps->origin, down_o);
+	VectorCopy (pm->ps->velocity, down_v);
+
+	VectorCopy (start_o, up);
+	up[2] += STEPSIZE;
+
+	// test the player position if they were a stepheight higher
+	pm->trace (&trace, start_o, pm->mins, pm->maxs, up, pm->ps->clientNum, pm->tracemask);
+	if ( trace.allsolid )
+		return;		// can't step up
+
+	stepSize = trace.endpos[2] - start_o[2];
+	// try slidemove from this position
+	VectorCopy (trace.endpos, pm->ps->origin);
+	VectorCopy (start_v, pm->ps->velocity);
+
+	PM_SlideMove_LQM();
+
+	// push down the final amount
+	VectorCopy (pm->ps->origin, down);
+	down[2] -= stepSize;
+	pm->trace (&trace, pm->ps->origin, pm->mins, pm->maxs, down, pm->ps->clientNum, pm->tracemask);
+	if ( !trace.allsolid )
+		VectorCopy (trace.endpos, pm->ps->origin);
+	if ( trace.fraction < 1.0 )
+		PM_ClipVelocity( pm->ps->velocity, trace.plane.normal, pm->ps->velocity, OVERCLIP );
+
+}
