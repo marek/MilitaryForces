@@ -1,5 +1,5 @@
 /*
- * $Id: bg_weapondata.c,v 1.39 2005-07-05 03:33:40 minkis Exp $
+ * $Id: bg_weapondata.c,v 1.40 2005-07-07 22:22:05 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -1883,7 +1883,7 @@ completeWeaponData_t availableWeapons[] =
 		0,									// iconHandle
 		CAT_ANY,							// cat
 		0,									// non cat mod
-		4,									// muzzleVelocity
+		45,									// muzzleVelocity
 		0,									// range
 		0,									// fuelrange
 		200,								// fire interval
@@ -1923,7 +1923,7 @@ completeWeaponData_t availableWeapons[] =
 		0,									// iconHandle
 		CAT_ANY,							// cat
 		0,									// non cat mod
-		4,									// muzzleVelocity
+		45,									// muzzleVelocity
 		0,									// range
 		0,									// fuelrange
 		200,								// fire interval
@@ -1963,7 +1963,7 @@ completeWeaponData_t availableWeapons[] =
 		0,									// iconHandle
 		CAT_ANY,							// cat
 		0,									// non cat mod
-		4,									// muzzleVelocity
+		45,									// muzzleVelocity
 		0,									// range
 		0,									// fuelrange
 		200,								// fire interval

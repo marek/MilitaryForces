@@ -1,5 +1,5 @@
 /*
- * $Id: g_cmds.c,v 1.22 2005-06-26 05:08:12 minkis Exp $
+ * $Id: g_cmds.c,v 1.23 2005-07-07 22:22:06 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1401,6 +1401,51 @@ void Cmd_Stats_f( gentity_t *ent ) {
 
 /*
 =================
+Cmd_Eject_f
+=================
+*/
+void Cmd_Eject_f( gentity_t *ent ) 
+{
+	gentity_t	*newent;
+	Com_Printf ("eject!!\n");
+	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
+		return;
+	}
+	if (ent->health <= 0) {
+		return;
+	}
+	ent->flags &= ~FL_GODMODE;
+	if( (availableVehicles[ent->client->vehicle].cat & CAT_PLANE) ||
+		(availableVehicles[ent->client->vehicle].cat & CAT_HELO) ) 
+	{
+		ent->client->ps.fixed_throttle = 0;
+		ent->health = 0;
+		ent->parent = NULL;
+		ent->nextthink = level.time + 0.1;
+		ent->tracktarget = NULL;
+		
+		newent = G_Spawn();
+		G_InitGentity( newent );
+		newent->classname = "abandonedvehicle";
+		newent->nextthink = level.time + 10000;
+		newent->think = ExplodeVehicle;
+		newent->s.eType = ET_MISSILE;
+		newent->r.svFlags = SVF_USE_CURRENT_ORIGIN;
+		newent->s.weaponIndex = WI_CFLARE;
+		newent->r.ownerNum = ent->s.number;
+		newent->parent = ent;
+		newent->damage = 0;
+		newent->splashRadius = 0;
+		newent->clipmask = MASK_SHOT;
+		newent->ONOFF = 1;// not used
+				
+		MF_ClientSpawn(ent, CS_NOKILL | CS_LASTPOS );
+	}
+}
+
+
+/*
+=================
 Cmd_ME_Spawn_f
 =================
 */
@@ -1517,6 +1562,9 @@ void ClientCommand( int clientNum ) {
 		Cmd_ME_Spawn_f( ent );
 	else if (Q_stricmp (cmd, "me_spawngi") == 0)
 		Cmd_ME_SpawnGI_f( ent );
+	else if (Q_stricmp (cmd, "eject") == 0)
+		Cmd_Eject_f( ent );
+
 	else
 		trap_SendServerCommand( clientNum, va("print \"unknown cmd %s\n\"", cmd ) );
 }
