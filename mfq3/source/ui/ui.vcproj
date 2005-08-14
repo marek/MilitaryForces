@@ -12,7 +12,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="D:\Games\Quake III Arena"
+			OutputDirectory="$(SolutionDir).."
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
 			UseOfMFC="0"
@@ -23,6 +23,7 @@
 				Optimization="0"
 				OptimizeForProcessor="1"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;UI_EXPORTS"
+				ExceptionHandling="FALSE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
 				UsePrecompiledHeader="2"
@@ -33,13 +34,13 @@
 				BrowseInformation="1"
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
-				DebugInformationFormat="4"/>
+				DebugInformationFormat="3"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="odbc32.lib odbccp32.lib"
-				OutputFile="D:\Games\Quake III Arena\mfq3\uix86.dll"
+				OutputFile="..\uix86.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
 				ModuleDefinitionFile=".\ui.def"
@@ -98,6 +99,7 @@
 				OptimizeForProcessor="2"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;UI_EXPORTS"
 				StringPooling="TRUE"
+				ExceptionHandling="FALSE"
 				RuntimeLibrary="4"
 				EnableFunctionLevelLinking="TRUE"
 				UsePrecompiledHeader="2"
@@ -112,7 +114,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="odbc32.lib odbccp32.lib"
-				OutputFile="../Release/uix86.dll"
+				OutputFile="..\uix86.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
 				ModuleDefinitionFile=".\ui.def"
