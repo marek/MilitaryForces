@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.139 2005-07-07 04:02:11 minkis Exp $
+ * $Id: bg_public.h,v 1.140 2005-08-14 09:26:30 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1171,7 +1171,7 @@ int MF_findWeaponsOfType( int weaponIndex, completeLoadout_t* loadout );
 #define	HC_WEAPONBAY			512
 
 // LQM Animations (replace instead of using frame index, and let CG read animation.cfg)
-#define LQM_SCALE				0.1
+#define LQM_SCALE				0.1f
 #define A_LQM_STAND				0
 #define A_LQM_FORWARD			1
 #define A_LQM_BACKWARD			2

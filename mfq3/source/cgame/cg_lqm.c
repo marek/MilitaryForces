@@ -1,5 +1,5 @@
 /*
- * $Id: cg_lqm.c,v 1.7 2005-07-07 04:02:11 minkis Exp $
+ * $Id: cg_lqm.c,v 1.8 2005-08-14 09:26:30 thebjoern Exp $
 */
 
 
@@ -58,7 +58,7 @@ CG_GroundVehicle
 void CG_LQM( centity_t *cent, clientInfo_t *ci ) 
 {
 	vec3_t			velocity;	
-	vec3_t		    forward, right, up, temp, start;
+	vec3_t		    right, up, temp, start;
 	DrawInfo_LQM_t drawInfo;
 	int				ONOFF = cent->currentState.ONOFF;
 
