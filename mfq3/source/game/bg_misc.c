@@ -1,5 +1,5 @@
 /*
- * $Id: bg_misc.c,v 1.18 2005-06-30 03:54:00 minkis Exp $
+ * $Id: bg_misc.c,v 1.19 2005-08-19 00:09:36 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -405,6 +405,7 @@ BG_EvaluateTrajectory
 void BG_EvaluateTrajectory( const trajectory_t *tr, int atTime, vec3_t result ) {
 	float		deltaTime;
 	float		phase;
+	vec3_t		dir;
 
 	switch( tr->trType ) {
 	case TR_STATIONARY:
@@ -440,6 +441,17 @@ void BG_EvaluateTrajectory( const trajectory_t *tr, int atTime, vec3_t result ) 
 		VectorMA( tr->trBase, deltaTime, tr->trDelta, result );
 		result[2] -= 0.5 * (DEFAULT_GRAVITY * 0.1) * deltaTime * deltaTime;		// FIXME: local gravity...
 		break;
+	case TR_ACCEL:
+		deltaTime = ( atTime - tr->trTime ) * 0.001;
+		phase = (tr->trDuration/10 / 2) * (deltaTime * deltaTime);
+		if(phase < tr->trDuration) {
+			VectorCopy (tr->trDelta, dir);
+			VectorNormalize (dir);
+			VectorMA (tr->trBase, phase, dir, result);
+			VectorMA (result, deltaTime, tr->trDelta, result);
+		} else
+			VectorMA( tr->trBase, deltaTime, tr->trDelta, result );
+		break;
 	default:
 		Com_Error( ERR_DROP, "BG_EvaluateTrajectory: unknown trType: %i", tr->trTime );
 		break;
@@ -456,6 +468,7 @@ For determining velocity at a given time
 void BG_EvaluateTrajectoryDelta( const trajectory_t *tr, int atTime, vec3_t result ) {
 	float	deltaTime;
 	float	phase;
+	vec3_t		dir;
 
 	switch( tr->trType ) {
 	case TR_STATIONARY:
@@ -488,6 +501,18 @@ void BG_EvaluateTrajectoryDelta( const trajectory_t *tr, int atTime, vec3_t resu
 		VectorCopy( tr->trDelta, result );
 		result[2] -= (DEFAULT_GRAVITY * 0.1) * deltaTime;		// FIXME: local gravity...
 		break;
+	case TR_ACCEL:
+		deltaTime = ( atTime - tr->trTime ) * 0.001;
+		if(VectorLength(tr->trDelta)/deltaTime < tr->trDuration)
+		{
+			VectorCopy(tr->trDelta,dir);
+			VectorNormalize (dir);
+			VectorScale (dir, tr->trDuration/10, dir);
+			VectorMA (tr->trDelta, deltaTime, dir, result);
+		} else
+			VectorCopy( tr->trDelta, result );
+		break;
+
 	default:
 		Com_Error( ERR_DROP, "BG_EvaluateTrajectoryDelta: unknown trType: %i", tr->trTime );
 		break;

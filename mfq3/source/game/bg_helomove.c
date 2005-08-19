@@ -1,5 +1,5 @@
 /*
- * $Id: bg_helomove.c,v 1.9 2005-07-02 07:45:05 minkis Exp $
+ * $Id: bg_helomove.c,v 1.10 2005-08-19 00:09:36 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -461,7 +461,7 @@ void PM_HeloMove( void )
 					VectorScale(forwardvel, availableVehicles[pm->vehicle].turnspeed[PITCH], forwardvel);
 			} else if (pm->cmd.forwardmove < 0) {
 					VectorCopy(vehdir, forwardvel);
-					forwardvel[PITCH] = forwardvel[YAW] = 0;
+					forwardvel[PITCH] = forwardvel[ROLL] = 0;
 					AngleVectors(forwardvel, forwardvel, NULL, NULL );
 					pm->ps->speed = availableVehicles[pm->vehicle].turnspeed[PITCH]*10;
 					VectorScale(forwardvel, -availableVehicles[pm->vehicle].turnspeed[PITCH], forwardvel);

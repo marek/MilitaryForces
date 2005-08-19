@@ -1,5 +1,5 @@
 /*
- * $Id: cg_helo.c,v 1.6 2005-06-26 05:08:11 minkis Exp $
+ * $Id: cg_helo.c,v 1.7 2005-08-19 00:09:36 minkis Exp $
 */
 
 
@@ -192,14 +192,14 @@ void CG_Helo( centity_t *cent, clientInfo_t *ci )
 	// reticles
 	if( cent == &cg.predictedPlayerEntity )
 	{
-		refEntity_t		reticle;
-		vec3_t	forward, ang, end;
+		refEntity_t	reticle;
+		vec3_t	forward, right, up, ang, start, end, temp;
 		trace_t	tr;
-		playerState_t * ps = &cg.snap->ps;
 		float len;
+		playerState_t* ps = &cg.snap->ps;
 		float mindist = cg_thirdPersonRange.integer + availableVehicles[ci->vehicle].cam_dist[ CAMERA_V_DEFAULT ] + availableVehicles[ci->vehicle].maxs[0] + 20;
 
-		memset( &reticle, 0, sizeof(reticle) );	
+		memset( &reticle, 0, sizeof(reticle) );
 
 		CG_ResetReticles();
 
@@ -209,15 +209,15 @@ void CG_Helo( centity_t *cent, clientInfo_t *ci )
 			refEntity_t reticlelock;
 			qboolean building = qfalse;
 			centity_t* target = &cg_entities[cent->currentState.tracktarget];
-
+			
 			if( target->currentState.eType == ET_EXPLOSIVE )
 			{
 				building = qtrue;
 			}
 
 			reticle.customShader = availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshairtrack;
-			reticle.hModel = cgs.media.reticle[ availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshairtrack ];
-			
+			reticle.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshairtrack];
+
 			if( building )
 			{
 				VectorSubtract( cgs.inlineModelMidpoints[target->currentState.modelindex], cent->lerpOrigin, forward );
@@ -232,7 +232,8 @@ void CG_Helo( centity_t *cent, clientInfo_t *ci )
 			AnglesToAxis( ang, reticle.axis );
 			VectorMA( cent->lerpOrigin, 2000, forward, end );
 			CG_Trace( &tr, cent->lerpOrigin, 0, 0, end, cg.snap->ps.clientNum, MASK_SOLID ); 
-			if ( tr.entityNum < MAX_CLIENTS )
+			
+			if( tr.entityNum < MAX_CLIENTS )
 			{
 				cg.crosshairClientNum = tr.entityNum;
 				cg.crosshairClientTime = cg.time;
@@ -242,7 +243,7 @@ void CG_Helo( centity_t *cent, clientInfo_t *ci )
 			CG_Trace( &tr, cg.refdef.vieworg, 0, 0, end, cg.snap->ps.clientNum, MASK_SOLID ); 
 			VectorSubtract( tr.endpos, cg.refdef.vieworg, forward );
 			len = VectorNormalize(forward);
-
+			
 			if( len > mindist )
 			{
 				VectorMA( cg.refdef.vieworg, mindist, forward, reticle.origin );
@@ -251,9 +252,10 @@ void CG_Helo( centity_t *cent, clientInfo_t *ci )
 			{
 				VectorMA( cg.refdef.vieworg, len - 5, forward, reticle.origin );
 			}
-			
+
 			VectorCopy( reticle.origin, reticle.lightingOrigin );
 			reticle.renderfx = RF_LIGHTING_ORIGIN|RF_SHADOW_PLANE;
+
 			CG_AddReticleEntityToScene( &reticle, target );
 
 			// are we locked onto this target?
@@ -261,12 +263,55 @@ void CG_Helo( centity_t *cent, clientInfo_t *ci )
 			{
 				// copy the reticle entity as our reticle-lock entity
 				memcpy( &reticlelock, &reticle, sizeof(reticle) );
+				
 				reticlelock.customShader = availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshairlock;
-				reticlelock.hModel = cgs.media.reticle[ availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshairlock ];
+				reticlelock.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshairlock];
 				reticlelock.frame = 1;
 			}
+			else
+			{
+				memset( &reticlelock, 0, sizeof(reticlelock) );	
+				
+				reticlelock.customShader = availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshairtrack;
+				reticlelock.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshairtrack];
+				
+				AngleVectors( cent->currentState.angles, forward, right, up );
+				RotatePointAroundVector( temp, up, forward, cent->currentState.angles2[ROLL] );
+				CrossProduct( up, temp, right );
+				RotatePointAroundVector( forward, right, temp, cent->currentState.angles2[PITCH] );
+				VectorMA( cent->lerpOrigin, availableVehicles[ci->vehicle].gunoffset[0], forward, start );
+				VectorMA( start, availableVehicles[ci->vehicle].gunoffset[1], right, start );
+				VectorMA( start, availableVehicles[ci->vehicle].gunoffset[2], up, start );
+				VectorMA( start, 2000, forward, end );
+				vectoangles( forward, ang );
+//				ang[2] = 0;
+				AnglesToAxis( ang, reticlelock.axis );
+				VectorScale( reticlelock.axis[0], 10.0f, reticlelock.axis[0] );
+				VectorScale( reticlelock.axis[1], 10.0f, reticlelock.axis[1] );
+				VectorScale( reticlelock.axis[2], 10.0f, reticlelock.axis[2] );
+				reticlelock.nonNormalizedAxes = qtrue;
+				CG_Trace( &tr, start, 0, 0, end, cg.snap->ps.clientNum, MASK_SOLID ); 
+				VectorCopy( tr.endpos, end );
+				CG_Trace( &tr, cg.refdef.vieworg, 0, 0, end, cg.snap->ps.clientNum, MASK_SOLID ); 
+				VectorSubtract( tr.endpos, cg.refdef.vieworg, forward );
+				len = VectorNormalize(forward);
+
+				if( len > mindist )
+				{
+					VectorMA( cg.refdef.vieworg, mindist, forward, reticlelock.origin );
+				}
+				else
+				{
+					VectorMA( cg.refdef.vieworg, len - 5, forward, reticlelock.origin );
+				}
+
+				VectorCopy( reticlelock.origin, reticlelock.lightingOrigin );
+				reticlelock.renderfx = RF_LIGHTING_ORIGIN|RF_SHADOW_PLANE;
+			}
+
+			CG_AddReticleEntityToScene( &reticlelock, NULL );
 		}
-		else
+		else if(!(ps->stats[STAT_LOCKINFO] & LI_TRACKING) || (availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].type == WT_MACHINEGUN))
 		{
 			reticle.customShader = availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshair;
 			reticle.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshair];
@@ -308,7 +353,7 @@ void CG_Helo( centity_t *cent, clientInfo_t *ci )
 			reticle.renderfx = RF_LIGHTING_ORIGIN|RF_SHADOW_PLANE;
 			
 			CG_AddReticleEntityToScene( &reticle, NULL );
-			}
+		}
 	}
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_localents.c,v 1.10 2005-06-26 05:08:11 minkis Exp $
+ * $Id: cg_localents.c,v 1.11 2005-08-19 00:09:36 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -416,6 +416,7 @@ CG_AddNuke
 void CG_AddNuke( localEntity_t *le ) {
 	refEntity_t	*re;
 	refEntity_t shockwave;
+	refEntity_t cloud;
 	float		c;
 	vec3_t		test, axis[3];
 	int			t;
@@ -543,6 +544,37 @@ void CG_AddNuke( localEntity_t *le ) {
 		shockwave.shaderRGBA[3] = 0xff - c;
 
 		trap_R_AddRefEntityToScene( &shockwave );
+	}
+
+	if (t > NUKE_CLOUD_STARTTIME && t < NUKE_CLOUD_ENDTIME) {
+		int i;
+		AxisClear(axis);
+		memset(&cloud, 0, sizeof(cloud));
+		cloud.hModel = cgs.media.nukeCloudModel;
+		cloud.reType = RT_MODEL;
+		cloud.shaderTime = re->shaderTime;
+		VectorCopy(re->origin, cloud.origin);
+		cloud.renderfx = RF_LIGHTING_ORIGIN|RF_SHADOW_PLANE;
+		
+		c = (float)(t - NUKE_CLOUD_STARTTIME) / (float)(NUKE_CLOUD_FADETIME - NUKE_CLOUD_STARTTIME);
+		cloud.customShader = cgs.media.nukeCloud[min((int)(c*100),100)];
+		for(i = 0; i<3;i++)
+			VectorScale(axis[i],(c + 1) * rad * 0.01f,cloud.axis[i]);
+		shockwave.nonNormalizedAxes = qtrue;
+
+		if (t > NUKE_CLOUD_FADETIME) {
+			c = (float)(t - NUKE_CLOUD_FADETIME) / (float)(NUKE_CLOUD_ENDTIME - NUKE_CLOUD_FADETIME);
+		}
+		else {
+			c = 0;
+		}
+		c *= 0xff;
+		cloud.shaderRGBA[0] = 0xff - c;
+		cloud.shaderRGBA[1] = 0xff - c;
+		cloud.shaderRGBA[2] = 0xff - c;
+		cloud.shaderRGBA[3] = 0xff - c;
+
+		trap_R_AddRefEntityToScene( &cloud );
 	}
 }
 

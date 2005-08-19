@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.140 2005-08-14 09:26:30 thebjoern Exp $
+ * $Id: bg_public.h,v 1.141 2005-08-19 00:09:36 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1249,9 +1249,9 @@ typedef enum {
 #define BAY_ANIM_UP				1
 #define BAY_ANIM_DOWN			2
 
-
+/////////////////////
 // Nuke
-
+/////////////////////
 // 1st shockwave times
 #define NUKE_SHOCKWAVE_STARTTIME		0
 #define NUKE_SHOCKWAVEFADE_STARTTIME	1500
@@ -1264,6 +1264,12 @@ typedef enum {
 #define NUKE_SHOCKWAVE2_STARTTIME		2000
 #define NUKE_SHOCKWAVE2FADE_STARTTIME	2500
 #define NUKE_SHOCKWAVE2_ENDTIME			3000
+// nuke cloud times
+#define NUKE_CLOUD_FRAMES				101
+#define NUKE_CLOUD_STARTTIME			2500
+#define NUKE_CLOUD_FADETIME				20000
+#define NUKE_CLOUD_ENDTIME				30000
+
 // radius of the models without scaling
 #define NUKE_SHOCKWAVEMODEL_RADIUS		88
 #define NUKE_BOOMSPHEREMODEL_RADIUS		72

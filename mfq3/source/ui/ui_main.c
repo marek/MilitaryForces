@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.36 2005-06-26 05:08:12 minkis Exp $
+ * $Id: ui_main.c,v 1.37 2005-08-19 00:09:36 minkis Exp $
 */
 /*
 =======================================================================
@@ -6767,7 +6767,7 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_vehicleClass, "ui_vehicleLoadout", "1", CVAR_ARCHIVE | CVAR_ROM },
 	{ &ui_vehicle, "ui_vehicle", "0", CVAR_ARCHIVE | CVAR_ROM },
 
-	{ &ui_vehicleCat, "ui_vehicleCatTxt", "<Catagory>", CVAR_ROM },
+	{ &ui_vehicleCat, "ui_vehicleCatTxt", "<Category>", CVAR_ROM },
 	{ &ui_vehicleClass, "ui_vehicleClassTxt", "<Class>", CVAR_ROM },
 	{ &ui_vehicleClass, "ui_vehicleLoadoutTxt", "<Loadout>", CVAR_ROM },
 	{ &ui_vehicle, "ui_vehicleTxt", "<Vehicle>", CVAR_ROM },

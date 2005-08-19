@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.52 2005-07-04 23:46:30 minkis Exp $
+ * $Id: cg_main.c,v 1.53 2005-08-19 00:09:36 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -668,6 +668,7 @@ static void CG_RegisterSounds( void ) {
 	cgs.media.nukeFarSound = trap_S_RegisterSound( "sound/items/nuke_far.wav", qfalse );
 	cgs.media.nukeEffectModel = trap_R_RegisterModel( "models/weaphits/nukeblast.md3" );
 	cgs.media.nukeShockWave = trap_R_RegisterModel( "models/weaphits/nukeshockwave.md3" );
+	cgs.media.nukeCloudModel = trap_R_RegisterModel( "models/weaphits/nukecloud.md3" );
 
 	// MFQ3: new sounds
 	cgs.media.planeDeath[0] = trap_S_RegisterSound( "sound/explosions/explode1.wav", qfalse );	
@@ -932,6 +933,10 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.missileTrail2Shader = trap_R_RegisterShader( "missileTrail2" );
 	cgs.media.nukePuffShader = trap_R_RegisterShader( "nukePuff" );
 
+	for( i = 0; i < NUKE_CLOUD_FRAMES; i++) {
+		cgs.media.nukeCloud[i] = trap_R_RegisterShader( va("nukecloud%d", i) );
+	}
+	
 	cgs.media.selectShader = trap_R_RegisterShader( "gfx/2d/select" );
 
 	for ( i = 0 ; i < NUM_CROSSHAIRS ; i++ ) {

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_effects.c,v 1.10 2005-07-04 23:46:30 minkis Exp $
+ * $Id: cg_effects.c,v 1.11 2005-08-19 00:09:36 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -185,7 +185,7 @@ void CG_NukeEffect(  centity_t * cent, entityState_t * es ) {
 	le->leFlags = 0;
 	le->leType = LE_NUKE;
 	le->startTime = cg.time;
-	le->endTime = cg.time + 3000;//2250;
+	le->endTime = cg.time + NUKE_CLOUD_ENDTIME;// 3000;//2250;
 	le->lifeRate = 1.0 / ( le->endTime - le->startTime );
 
 	le->color[0] = le->color[1] = le->color[2] = le->color[3] = 1.0;
@@ -202,7 +202,7 @@ void CG_NukeEffect(  centity_t * cent, entityState_t * es ) {
 
 	VectorCopy( cent->lerpOrigin, re->origin );
 
-	CG_NukeCloud(cent, es);
+	//CG_NukeCloud(cent, es);
 
 }
 

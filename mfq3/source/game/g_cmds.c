@@ -1,5 +1,5 @@
 /*
- * $Id: g_cmds.c,v 1.23 2005-07-07 22:22:06 minkis Exp $
+ * $Id: g_cmds.c,v 1.24 2005-08-19 00:09:36 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1406,7 +1406,13 @@ Cmd_Eject_f
 */
 void Cmd_Eject_f( gentity_t *ent ) 
 {
-	gentity_t	*newent;
+	gentity_t	*veh;
+	gclient_t	*client;
+	char	userinfo[MAX_INFO_STRING];
+	int index = ent - g_entities;
+	vec3_t start;
+	int i;
+
 	Com_Printf ("eject!!\n");
 	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
 		return;
@@ -1414,32 +1420,31 @@ void Cmd_Eject_f( gentity_t *ent )
 	if (ent->health <= 0) {
 		return;
 	}
+
+	VectorCopy( ent->s.pos.trBase, start );
+	SnapVector( start );
+
+
 	ent->flags &= ~FL_GODMODE;
 	if( (availableVehicles[ent->client->vehicle].cat & CAT_PLANE) ||
 		(availableVehicles[ent->client->vehicle].cat & CAT_HELO) ) 
 	{
-		ent->client->ps.fixed_throttle = 0;
-		ent->health = 0;
-		ent->parent = NULL;
-		ent->nextthink = level.time + 0.1;
-		ent->tracktarget = NULL;
-		
-		newent = G_Spawn();
-		G_InitGentity( newent );
-		newent->classname = "abandonedvehicle";
-		newent->nextthink = level.time + 10000;
-		newent->think = ExplodeVehicle;
-		newent->s.eType = ET_MISSILE;
-		newent->r.svFlags = SVF_USE_CURRENT_ORIGIN;
-		newent->s.weaponIndex = WI_CFLARE;
-		newent->r.ownerNum = ent->s.number;
-		newent->parent = ent;
-		newent->damage = 0;
-		newent->splashRadius = 0;
-		newent->clipmask = MASK_SHOT;
-		newent->ONOFF = 1;// not used
-				
-		MF_ClientSpawn(ent, CS_NOKILL | CS_LASTPOS );
+		veh = G_Spawn();
+		G_InitGentity( veh );
+		veh->classname = "misc_vehicle";
+		veh->health = 0;
+		veh->client = NULL;
+		veh->think = ExplodeVehicle;
+		veh->nextthink = level.time + 10000;
+		veh->tracktarget = NULL;
+		veh->parent = ent;
+		veh->r.ownerNum = veh->parent->s.number;
+		veh->s.eType = ET_MISC_VEHICLE;
+		veh->r.svFlags = SVF_USE_CURRENT_ORIGIN;
+		veh->s.modelindex2 = 255;
+		veh->s.modelindex = ent->client->vehicle;
+		VectorCopy( start, veh->s.pos.trBase );
+		VectorCopy(start, veh->r.currentOrigin);
 	}
 }
 

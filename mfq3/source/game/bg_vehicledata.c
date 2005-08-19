@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.66 2005-07-05 03:33:40 minkis Exp $
+ * $Id: bg_vehicledata.c,v 1.67 2005-08-19 00:09:36 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -3248,7 +3248,7 @@ groundInstallationData_t availableGroundInstallations[] =
 
 	{	"Flak (modern)",		// descriptiveName
 	"Flak",						// tinyName
-	"turret_samup",				// modelName
+	"turret_aaa",				// modelName
 	MF_GAMESET_MODERN,			// gameset
 	{0,0,0,0,0,0,0,0,0,0},		// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box)
@@ -3269,7 +3269,7 @@ groundInstallationData_t availableGroundInstallations[] =
 
 	{	"Flak (ww2)",			// descriptiveName
 	"Flak",						// tinyName
-	"turret_samup",				// modelName
+	"turret_aaa",				// modelName
 	MF_GAMESET_WW2,				// gameset
 	{0,0,0,0,0,0,0,0,0,0},		// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box)
@@ -3288,9 +3288,9 @@ groundInstallationData_t availableGroundInstallations[] =
 	6000						// reloadtime
     },
 
-	{	"AAA (modern)",			// descriptiveName
-	"AAA",						// tinyName
-	"turret_samup",				// modelName
+	{	"AA",					// descriptiveName
+	"AA",						// tinyName
+	"turret_aa",				// modelName
 	MF_GAMESET_MODERN,			// gameset
 	{0,0,0,0,0,0,0,0,0,0},		// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box)
