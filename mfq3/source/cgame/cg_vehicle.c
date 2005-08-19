@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicle.c,v 1.35 2005-07-07 22:22:05 minkis Exp $
+ * $Id: cg_vehicle.c,v 1.36 2005-08-19 05:34:51 minkis Exp $
 */
 
 #include "cg_local.h"
@@ -225,7 +225,7 @@ static void CG_CachePlane(int index)
 			break;
 		}
 
-		availableVehicles[index].handle[i] = trap_R_RegisterModel( name );
+		CG_RegisterItemModel(&availableVehicles[index].handle[i], name);
 
 //		if( !availableVehicles[index].handle[i] ) {
 //			CG_Printf( "MFQ3 Warning: Unable to load model '%s'\n", name );
@@ -285,7 +285,7 @@ static void CG_CacheGroundVehicle(int index)
 			Com_sprintf( name, sizeof(name), "%s_w6.md3", basename );
 			break;
 		}
-		availableVehicles[index].handle[i] = trap_R_RegisterModel( name );
+		CG_RegisterItemModel(&availableVehicles[index].handle[i], name);
 //		if( !availableVehicles[index].handle[i] ) {
 //			CG_Printf( "MFQ3 Warning: Unable to load model '%s'\n", name );
 //		}
@@ -339,7 +339,7 @@ static void CG_CacheHelo(int index)
 			Com_sprintf( name, sizeof(name), "%s_gun2.md3", basename );
 			break;
 		}
-		availableVehicles[index].handle[i] = trap_R_RegisterModel( name );
+		CG_RegisterItemModel(&availableVehicles[index].handle[i], name);
 	}
 
 	// only thing that always has to be there is body
@@ -378,7 +378,7 @@ static void CG_CacheLQM(int index)
 			Com_sprintf( name, sizeof(name), "%s_head.md3", basename );
 			break;
 		}
-		availableVehicles[index].handle[i] = trap_R_RegisterModel( name );
+		CG_RegisterItemModel(&availableVehicles[index].handle[i], name);
 	}
 
 	// only thing that always has to be there is body
@@ -450,7 +450,7 @@ static void CG_CacheBoat(int index)
 			Com_sprintf( name, sizeof(name), "%s_gun4.md3", basename );
 			break;
 		}
-		availableVehicles[index].handle[i] = trap_R_RegisterModel( name );
+		CG_RegisterItemModel(&availableVehicles[index].handle[i], name);
 
 //		if( !availableVehicles[index].handle[i] ) {
 //			CG_Printf( "MFQ3 Warning: Unable to load model '%s'\n", name );
@@ -498,7 +498,7 @@ static void CG_CacheGroundInstallation(int index)
 			Com_sprintf( name, sizeof(name), "%s_upg.md3", basename );
 			break;
 		}
-		availableGroundInstallations[index].handle[i] = trap_R_RegisterModel( name );
+		CG_RegisterItemModel(&availableGroundInstallations[index].handle[i], name);
 //		if( !availableVehicles[index].handle[i] ) {
 //			CG_Printf( "MFQ3 Warning: Unable to load model '%s'\n", name );
 //		}
@@ -581,10 +581,11 @@ CG_CacheVehicles
 void CG_CacheVehicles()
 {
 	int i;
-
+	
 	for( i = 0; i < bg_numberOfVehicles; i++ )
 	{
 		if( availableVehicles[i].gameset & cgs.gameset ) {
+			CG_AddRegisterMessage(availableVehicles[i].descriptiveName);
 			CG_LoadingString(availableVehicles[i].descriptiveName);
 			if( availableVehicles[i].cat & CAT_PLANE ) {
 					CG_CachePlane(i);
@@ -610,6 +611,7 @@ void CG_CacheVehicles()
 	for( i = 0; i < bg_numberOfGroundInstallations; i++ ) {
 		if( availableGroundInstallations[i].gameset & cgs.gameset ) {
 			CG_LoadingString(availableGroundInstallations[i].descriptiveName);
+			CG_AddRegisterMessage(availableGroundInstallations[i].descriptiveName);
 			CG_CacheGroundInstallation(i);
 		}
 	}
