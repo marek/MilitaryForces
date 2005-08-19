@@ -1,5 +1,5 @@
 /*
- * $Id: g_missile.c,v 1.33 2005-07-07 22:22:06 minkis Exp $
+ * $Id: g_missile.c,v 1.34 2005-08-19 00:09:36 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -917,8 +917,10 @@ static void follow_target( gentity_t *missile ) {
 
 
 static void drop_to_normal_transition( gentity_t* missile ) {
-	missile->s.pos.trType = TR_LINEAR;
+	missile->s.pos.trType = TR_ACCEL;//TR_LINEAR;
 	missile->s.pos.trTime = level.time;
+	missile->s.pos.trDuration = 500;
+
 	VectorCopy( missile->r.currentOrigin, missile->s.pos.trBase );
 	VectorNormalize( missile->s.pos.trDelta );
 	VectorScale( missile->s.pos.trDelta, missile->speed, missile->s.pos.trDelta );
@@ -989,7 +991,12 @@ void fire_antiair (gentity_t *self) {
 			bolt->nextthink = level.time + availableWeapons[self->client->ps.weaponIndex].fuelrange;
 		}
 		bolt->s.pos.trType = TR_LINEAR;
-		VectorScale( dir, bolt->speed, bolt->s.pos.trDelta );
+		VectorScale( dir, availableWeapons[self->client->ps.weaponIndex].muzzleVelocity, bolt->s.pos.trDelta );
+		/*
+		bolt->s.pos.trType = TR_ACCEL;
+		bolt->s.pos.trDuration = availableWeapons[self->client->ps.weaponIndex].muzzleVelocity;
+		VectorScale( dir, max(10,self->client->ps.speed/10), bolt->s.pos.trDelta );
+		*/
 	} else {
 		bolt->think = drop_to_normal_transition;
 		bolt->nextthink = level.time + 400;

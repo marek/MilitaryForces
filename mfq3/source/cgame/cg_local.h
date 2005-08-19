@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.71 2005-07-04 23:46:30 minkis Exp $
+ * $Id: cg_local.h,v 1.72 2005-08-19 00:09:36 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -702,6 +702,7 @@ typedef struct {
 	qhandle_t   railCoreShader;
 	qhandle_t	missileTrail2Shader;
 	qhandle_t	nukePuffShader;
+	qhandle_t	nukeCloud[NUKE_CLOUD_FRAMES];
 
 	qhandle_t	reticle[CH_NUMCROSSHAIRS];
 
@@ -762,6 +763,7 @@ typedef struct {
 	// Nuke
 	qhandle_t	nukeEffectModel;
 	qhandle_t	nukeShockWave;
+	qhandle_t	nukeCloudModel;
 	sfxHandle_t nukeExplodeSound;
 	sfxHandle_t nukeImplodeSound;
 	sfxHandle_t nukeFarSound;

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.40 2005-07-04 05:48:04 minkis Exp $
+ * $Id: cg_drawnewhud.c,v 1.41 2005-08-19 00:09:36 minkis Exp $
 */
 
 #include "cg_local.h"
@@ -1077,7 +1077,8 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 	cammode = cg.CameraMode;
 
 	if( (availableVehicles[vehicle].cat & CAT_GROUND) ||
-		(availableVehicles[vehicle].cat & CAT_BOAT) ) cammode = CAMERA_TARGET;
+		(availableVehicles[vehicle].cat & CAT_BOAT) ||
+		(availableVehicles[vehicle].cat & CAT_HELO)) cammode = CAMERA_TARGET;
 
 	if( cammode == CAMERA_DOWN ) {
 		vec3_t a;
@@ -1089,7 +1090,8 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 		VectorAdd( cent->lerpOrigin, v, cg.HUDCamera.vieworg );
 	} else if( cammode == CAMERA_BACK ) {
 		if( (availableVehicles[vehicle].cat & CAT_GROUND) ||
-			(availableVehicles[vehicle].cat & CAT_BOAT) ) {
+			(availableVehicles[vehicle].cat & CAT_BOAT) ||
+			(availableVehicles[vehicle].cat & CAT_HELO)) {
 			vec3_t right, up, temp;
 			AngleVectors( cent->currentState.angles, v, right, up );
 			RotatePointAroundVector( temp, up, v, cent->currentState.angles2[ROLL] );
@@ -1157,7 +1159,8 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 			AnglesToAxis( a, cg.HUDCamera.viewaxis );
 		} else {
 			if( (availableVehicles[vehicle].cat & CAT_GROUND) ||
-				(availableVehicles[vehicle].cat & CAT_BOAT) ) {
+				(availableVehicles[vehicle].cat & CAT_BOAT) ||
+				(availableVehicles[vehicle].cat & CAT_HELO)) {
 				vec3_t right, up, temp;
 				AngleVectors( cent->currentState.angles, v, right, up );
 				RotatePointAroundVector( temp, up, v, cent->currentState.angles2[ROLL] );
