@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.72 2005-08-19 00:09:36 minkis Exp $
+ * $Id: cg_local.h,v 1.73 2005-08-19 05:34:51 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -501,6 +501,8 @@ typedef struct {
 
 	// information screen text during loading
 	char		infoScreenText[MAX_STRING_CHARS];
+	char		infoCurrentLoadItemText[MAX_STRING_CHARS];
+	float		infoLoadFraction;
 
 	// scoreboard
 	int			scoresRequestTime;
@@ -1236,6 +1238,10 @@ score_t *CG_GetSelectedScore();
 void CG_BuildSpectatorString();
 int CG_FeederCount(float feederID);
 
+void CG_RegisterItemSound(sfxHandle_t * h, const char *sample, qboolean compressed);
+void CG_RegisterItemModel(qhandle_t * h, const char * name);
+void CG_AddRegisterMessage(const char * s);
+
 //
 // cg_util.c
 //
@@ -1271,6 +1277,7 @@ qboolean CG_WorldToScreenCoords( vec3_t worldPoint, int * pX, int * pY, qboolean
 //
 // cg_drawtools.c
 //
+void CG_DrawProgressBar( rectDef_t *rect, vec4_t color, vec4_t textcolor, float scale, int textStyle, float progress );
 void CG_AdjustFrom640( float *x, float *y, float *w, float *h );
 void CG_FillRect( float x, float y, float width, float height, const float *color );
 void CG_DrawPic( float x, float y, float width, float height, qhandle_t hShader );
@@ -1525,7 +1532,8 @@ void CG_ProcessSnapshots( void );
 // cg_info.c
 //
 void CG_LoadingString( const char *s );
-//void CG_LoadingItem( int itemNum );
+void CG_LoadFraction( float f );
+void CG_LoadItemText( const char *s );
 void CG_DrawInformation( void );
 
 //

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_info.c,v 1.8 2002-06-09 20:09:41 thebjoern Exp $
+ * $Id: cg_info.c,v 1.9 2005-08-19 05:34:51 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -48,6 +48,27 @@ void CG_LoadingString( const char *s ) {
 }
 
 /*
+======================
+CG_LoadFraction
+
+======================
+*/
+void CG_LoadFraction( float f ) {
+	cg.infoLoadFraction = f;
+	trap_UpdateScreen();
+}
+/*
+======================
+CG_LoadItemText
+
+======================
+*/
+void CG_LoadItemText( const char *s ) {
+	Q_strncpyz( cg.infoCurrentLoadItemText, s, sizeof( cg.infoCurrentLoadItemText ) );
+	trap_UpdateScreen();
+}
+
+/*
 ===================
 CG_LoadingItem
 ===================
@@ -80,6 +101,7 @@ void CG_DrawInformation( void ) {
 	qhandle_t	background = 0, loadingshot = 0;
 	char		buf[1024] = { 0 } ;
 	char		flagBuf[64] = { 0 };
+	rectDef_t p;
 
 	info = CG_ConfigString( CS_SERVERINFO );
 	sysInfo = CG_ConfigString( CS_SYSTEMINFO );
@@ -139,10 +161,16 @@ void CG_DrawInformation( void ) {
 	{
 		UI_DrawProportionalString( 320, 170, "Awaiting snapshot...", UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 	}
+	CG_DrawStringExt(0, 150, cg.infoCurrentLoadItemText, colorLtGrey, qtrue, qfalse, 6,6, strlen(cg.infoCurrentLoadItemText));
+	p.x = 0;
+	p.y = 323;
+	p.h = 15;
+	p.w = 640;
+	CG_DrawProgressBar(&p, colorDkGrey, colorWhite, 12.0f, UI_SMALLFONT|UI_INVERSE|UI_CENTER, cg.infoLoadFraction);
 
 	// draw info string information
 	x = 32;
-	y = 336;
+	y = 348;
 
 	// server information (OPTIONAL - if not a local game)
 	trap_Cvar_VariableStringBuffer( "sv_running", buf, sizeof( buf ) );

@@ -1,11 +1,46 @@
 /*
- * $Id: cg_drawtools.c,v 1.21 2003-08-06 18:10:20 thebjoern Exp $
+ * $Id: cg_drawtools.c,v 1.22 2005-08-19 05:34:51 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
 //
 // cg_drawtools.c -- helper functions called by cg_draw, cg_scoreboard, cg_info, etc
 #include "cg_local.h"
+
+
+
+void CG_DrawProgressBar( rectDef_t *rect, vec4_t color, vec4_t textcolor, float scale, int textStyle, float progress )
+{
+	float   rimWidth = rect->h / 20.0f;
+	float   doneWidth, leftWidth;
+	float   tx, ty, twa;
+	char    textBuffer[ 8 ];
+
+	if( progress < 0.0f )
+		progress = 0.0f;
+	else if( progress > 1.0f )
+		progress = 1.0f;
+  
+	doneWidth = ( rect->w - 2 * rimWidth ) * progress;
+	leftWidth = ( rect->w - 2 * rimWidth ) - doneWidth;
+  
+	trap_R_SetColor( color );
+	CG_DrawPic( rect->x, rect->y, rimWidth + doneWidth, rect->h, cgs.media.whiteShader );
+	CG_DrawPic( rimWidth + rect->x + doneWidth, rect->y, leftWidth, rimWidth, cgs.media.whiteShader );
+	CG_DrawPic( rimWidth + rect->x + doneWidth, rect->y + rect->h - rimWidth, leftWidth, rimWidth, cgs.media.whiteShader );
+	CG_DrawPic( rect->x + rect->w - rimWidth, rect->y, rimWidth, rect->h, cgs.media.whiteShader );
+	trap_R_SetColor( NULL );
+  
+	//draw text
+	if( scale > 0.0 )
+	{
+		Com_sprintf( textBuffer, sizeof( textBuffer ), "%d%%", (int)( progress * 100 ) );
+		twa = scale * strlen(textBuffer);
+		tx = rect->x + ( rect->w / 2.0f ) - ( twa / 2.0f );
+		ty = rect->y + ( rect->h / 2.0f ) - ( scale / 2.0f );
+		CG_DrawStringExt(tx, ty, textBuffer, textcolor, qtrue, qfalse, scale,scale, strlen(textBuffer));
+	}
+}
 
 /*
 ================

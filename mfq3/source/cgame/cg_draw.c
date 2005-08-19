@@ -1,5 +1,5 @@
 /*
- * $Id: cg_draw.c,v 1.39 2005-06-26 05:08:11 minkis Exp $
+ * $Id: cg_draw.c,v 1.40 2005-08-19 05:34:51 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -61,6 +61,7 @@ typedef struct {
 lagometer_t		lagometer;
 
 #ifdef _MENU_SCOREBOARD
+
 
 /*
 ==============
