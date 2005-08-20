@@ -1,5 +1,5 @@
 /*
- * $Id: bg_lqmmove.c,v 1.7 2005-07-07 04:02:11 minkis Exp $
+ * $Id: bg_lqmmove.c,v 1.8 2005-08-20 07:50:13 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -11,7 +11,7 @@ extern pml_t		pml;
 
 
 #define	MIN_WALK_NORMAL	0.4f
-#define	JUMP_VELOCITY	370;
+#define	JUMP_VELOCITY	370/3;
 #define	STEPSIZE		18*LQM_SCALE
 
 /*

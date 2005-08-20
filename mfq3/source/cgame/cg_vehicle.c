@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicle.c,v 1.36 2005-08-19 05:34:51 minkis Exp $
+ * $Id: cg_vehicle.c,v 1.37 2005-08-20 07:50:13 minkis Exp $
 */
 
 #include "cg_local.h"
@@ -234,7 +234,7 @@ static void CG_CachePlane(int index)
 
 	// only thing that always has to be there is body
 	if( !availableVehicles[index].handle[BP_PLANE_BODY] ) {
-		trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
+		//trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
 	}
 }
 
@@ -293,7 +293,7 @@ static void CG_CacheGroundVehicle(int index)
 
 	// only thing that always has to be there is body
 	if( !availableVehicles[index].handle[BP_GV_BODY] ) {
-		trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
+		//trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
 	}
 }
 
@@ -344,7 +344,7 @@ static void CG_CacheHelo(int index)
 
 	// only thing that always has to be there is body
 	if( !availableVehicles[index].handle[BP_HELO_BODY] ) {
-		trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
+		//trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
 	}
 }
 
@@ -383,7 +383,7 @@ static void CG_CacheLQM(int index)
 
 	// only thing that always has to be there is body
 	if( !availableVehicles[index].handle[BP_LQM_TORSO] ) {
-		trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s_torso.md3\n", basename) );
+		//trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s_torso.md3\n", basename) );
 	}
 
 	// Parse LQM Animations
@@ -459,7 +459,7 @@ static void CG_CacheBoat(int index)
 
 	// only thing that always has to be there is body
 	if( !availableVehicles[index].handle[BP_BOAT_BODY] ) {
-		trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
+		//trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
 	}
 }
 
@@ -506,7 +506,7 @@ static void CG_CacheGroundInstallation(int index)
 
 	// only thing that always has to be there is body
 	if( !availableGroundInstallations[index].handle[BP_GV_BODY] ) {
-		trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
+		//trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
 	}
 }
 
