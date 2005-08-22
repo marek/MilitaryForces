@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.1 2005-08-22 16:02:47 thebjoern Exp $
+ * $Id: cg_main.c,v 1.2 2005-08-22 22:29:54 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -7,12 +7,10 @@
 // cg_main.c -- initialization and primary entry point for cgame
 #include "cg_local.h"
 
-#ifdef _MENU_SCOREBOARD
-	#include "../ui/ui_shared.h"
+#include "../ui/ui_shared.h"
 
-	// display context for new ui stuff
-	displayContextDef_t cgDC;
-#endif
+// display context for new ui stuff
+displayContextDef_t cgDC;
 
 int forceModelModificationCount = -1;
 
@@ -646,10 +644,8 @@ void QDECL CG_Printf( const char *msg, ... ) {
 	vsprintf (text, msg, argptr);
 	va_end (argptr);
 
-#ifdef _MENU_SCOREBOARD
 	// add the text into the custom consol
 	CG_Add_Console_Line( text );
-#endif 
 
 	// write the text into the console (only displayed if the cVar 'con_notifytime' is not -1)
 	trap_Print( text );
@@ -1384,7 +1380,7 @@ static void CG_RegisterClients( void ) {
 	CG_BuildSpectatorString();
 }
 
-#ifdef _MENU_SCOREBOARD	// NOTE: functions copied from v1.29h code to enable new scoreboard method
+	// NOTE: functions copied from v1.29h code to enable new scoreboard method
 
 /*
 =================
@@ -2031,7 +2027,7 @@ static void CG_FeederSelection(float feederID, int index) {
 	}
 }
 
-#endif	// NOTE: functions copied from v1.29h code to enable new scoreboard method
+// NOTE: functions copied from v1.29h code to enable new scoreboard method
 
 //===========================================================================
 
@@ -2067,7 +2063,7 @@ void CG_StartMusic( void ) {
 	trap_S_StartBackgroundTrack( parm1, parm2 );
 }
 
-#ifdef _MENU_SCOREBOARD	// NOTE: functions copied from v1.29h code to enable new scoreboard method
+// NOTE: functions copied from v1.29h code to enable new scoreboard method
 
 /*
 =================
@@ -2202,7 +2198,7 @@ void CG_AssetCache()
 	cgDC.Assets.sliderThumb = trap_R_RegisterShaderNoMip( ASSET_SLIDER_THUMB );
 }
 
-#endif	// NOTE: functions copied from v1.29h code to enable new scoreboard method
+// NOTE: functions copied from v1.29h code to enable new scoreboard method
 
 /*
 =================
@@ -2249,9 +2245,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	// this has the effect of stopping the usual Q3 console text being displayed (because
 	// we want to custom handle this textual display - but still retain the history that
 	// gets written to the "drop-down" console)
-#ifdef _MENU_SCOREBOARD
 	trap_Cvar_Set( "con_notifytime", "-1" );
-#endif
 
 	cg.weaponSelect = WP_WEAPON1;
 
@@ -2317,9 +2311,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 
 	trap_CM_LoadMap( cgs.mapname );
 
-#ifdef _MENU_SCOREBOARD
 	String_Init();
-#endif
 
 	CG_LoadingString( "sounds" );
 	CG_LoadingString( "graphics" );
@@ -2333,10 +2325,8 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 
 	CG_RegisterClients();
 
-#ifdef _MENU_SCOREBOARD
 	CG_AssetCache();       // cache UI gfx
 	CG_LoadHudMenu();      // load new hud stuff
-#endif
 
 	CG_InitLocalEntities();
 

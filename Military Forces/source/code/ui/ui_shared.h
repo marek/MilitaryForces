@@ -1,5 +1,5 @@
 /*
- * $Id: ui_shared.h,v 1.1 2005-08-22 16:16:39 thebjoern Exp $
+ * $Id: ui_shared.h,v 1.2 2005-08-22 22:29:54 minkis Exp $
 */
 #ifndef __UI_SHARED_H
 #define __UI_SHARED_H
@@ -182,7 +182,7 @@ typedef enum {
 #define SLIDER_HEIGHT 16.0
 #define SLIDER_THUMB_WIDTH 12.0
 #define SLIDER_THUMB_HEIGHT 20.0
-#define	NUM_CROSSHAIRS			10
+#define	NUM_CROSSHAIRS			1
 
 typedef struct {
   const char *command;

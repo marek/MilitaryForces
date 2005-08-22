@@ -91,7 +91,7 @@
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				OptimizeForProcessor="3"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;MISSIONPACK;_MENU_SCOREBOARD"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;MISSIONPACK"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="TRUE"

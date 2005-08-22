@@ -1,5 +1,5 @@
 /*
- * $Id: cg_draw.c,v 1.1 2005-08-22 16:01:54 thebjoern Exp $
+ * $Id: cg_draw.c,v 1.2 2005-08-22 22:29:54 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -10,14 +10,12 @@
 #include "cg_local.h"
 #include "..\ui\ui_public.h"
 
-#ifdef _MENU_SCOREBOARD
-	#include "../ui/ui_shared.h"
+#include "../ui/ui_shared.h"
 
-	// used for scoreboard
-	extern displayContextDef_t cgDC;
-	menuDef_t *menuScoreboard = NULL;
-	menuDef_t *menuSpectator = NULL;
-#endif
+// used for scoreboard
+extern displayContextDef_t cgDC;
+menuDef_t *menuScoreboard = NULL;
+menuDef_t *menuSpectator = NULL;
 
 /*
 ===============================================================================
@@ -60,7 +58,6 @@ typedef struct {
 
 lagometer_t		lagometer;
 
-#ifdef _MENU_SCOREBOARD
 
 
 /*
@@ -310,8 +307,6 @@ void CG_Text_Paint(float x, float y, float scale, vec4_t color, const char *text
 	}
 }
 
-#endif
-
 /*
 ==============
 CG_DrawField
@@ -525,15 +520,9 @@ static float CG_DrawSnapshot( float y ) {
 		cg.latestSnapshotNum, cgs.serverCommandSequence );
 	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 
-#ifdef _MENU_SCOREBOARD
 	DrawStringNew( 320, 430, 0.35f, colorWhite, s, 0, 0, ITEM_TEXTSTYLE_SHADOWED, CENTRE_JUSTIFY );
 
 	return y;
-#else
-	CG_DrawBigString( 635 - w, y + 2, s, 1.0F);
-
-	return y + BIGCHAR_HEIGHT + 4;
-#endif
 }
 
 /*
@@ -591,11 +580,9 @@ static float CG_DrawFPS( float y ) {
 		s = va( "%ifps", fps );
 		w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 
-#ifdef _MENU_SCOREBOARD
+
 		DrawStringNew( 635, y + 2, 0.5f, *CreateColourVector(1,1,1,1,NULL), s, 0, 0, 3, RIGHT_JUSTIFY );
-#else
-		CG_DrawBigString( 635 - w, y + 2, s, 1.0f );
-#endif
+
 	}
 
 	return y + BIGCHAR_HEIGHT + 4;
@@ -629,7 +616,6 @@ static float CG_DrawTimer( float y ) {
 	s = va( "%i:%i%i", mins, tens, seconds );
 	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 
-#ifdef _MENU_SCOREBOARD
 	// alter the draw position?
 	if( CG_NewHUDActive() )
 	{
@@ -652,11 +638,6 @@ static float CG_DrawTimer( float y ) {
 	DrawStringNew( dx, dy, 0.35f, colorWhite, s, 0, 0, ITEM_TEXTSTYLE_SHADOWED, CENTRE_JUSTIFY );
 
 	return y + TIMER_HEIGHT + 4;
-#else
-	CG_DrawBigString( 635 - w, y + 2, s, 1.0F);
-
-	return y + BIGCHAR_HEIGHT + 4;
-#endif
 }
 
 /*
@@ -703,7 +684,6 @@ static float CG_DrawCountdownTimer( float y ) {
 	s = va( "%i:%i%i", mins, tens, seconds );
 	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 
-#ifdef _MENU_SCOREBOARD
 	// alter the draw position?
 	if( CG_NewHUDActive() )
 	{
@@ -729,11 +709,6 @@ static float CG_DrawCountdownTimer( float y ) {
 	}
 
 	return y + TIMER_HEIGHT + 4;
-#else
-	CG_DrawBigString( 635 - w, y + 2, s, 1.0F);
-
-	return y + BIGCHAR_HEIGHT + 4;
-#endif
 }
 
 /*
@@ -922,11 +897,7 @@ static void CG_DrawDisconnect( void ) {
 	s = "Connection Interrupted";
 	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 
-#ifdef _MENU_SCOREBOARD
 	DrawStringNewAlpha( 320, 100, s, 1.0f, CENTRE_JUSTIFY );
-#else
-	CG_DrawBigString( 320 - w/2, 100, s, 1.0F);
-#endif
 
 	// blink the icon
 	if ( ( cg.time >> 9 ) & 1 ) {
@@ -1062,7 +1033,7 @@ static void CG_DrawLagometer( float y )
 	CG_DrawDisconnect();
 }
 
-#ifdef _MENU_SCOREBOARD
+
 
 /*
 =====================
@@ -1194,7 +1165,6 @@ static void CG_DrawUpperLeft( void )
 	CG_DrawCustomConsole();
 }
 
-#endif
 
 /*
 =====================
@@ -1700,12 +1670,8 @@ static void CG_DrawCenterString( void ) {
 
 		x = ( SCREEN_WIDTH - w ) / 2;
 
-#ifdef _MENU_SCOREBOARD
 		DrawStringNewColour( 320, y, linebuffer, color, CENTRE_JUSTIFY );
-#else
-		CG_DrawStringExt( x, y, linebuffer, color, qfalse, qtrue,
-			cg.centerPrintCharWidth, (int)(cg.centerPrintCharWidth * 1.5), 0 );
-#endif
+
 		y += cg.centerPrintCharWidth * 1.5;
 
 		while ( *start && ( *start != '\n' ) ) {
@@ -1851,11 +1817,7 @@ static void CG_DrawCrosshairNames( void ) {
 	name = cgs.clientinfo[ cg.crosshairClientNum ].name;
 	w = CG_DrawStrlen( name ) * BIGCHAR_WIDTH;
 
-#ifdef _MENU_SCOREBOARD
 	DrawStringNew( 320, 170, 0.5f, color, name, 0, 0, ITEM_TEXTSTYLE_OUTLINED, CENTRE_JUSTIFY );
-#else
-	CG_DrawBigString( 320 - w / 2, 170, name, color[3] * 0.5f );
-#endif
 
 	trap_R_SetColor( NULL );
 }
@@ -1870,7 +1832,6 @@ CG_DrawSpectator
 */
 static void CG_DrawSpectator(void) {
 
-#ifdef _MENU_SCOREBOARD
 	// this is where we load the spectator menu script
 	if( menuSpectator == NULL)
 	{
@@ -1930,16 +1891,6 @@ static void CG_DrawSpectator(void) {
 			y + cg.refdef.y + 0.5 * (cg.refdef.height - h), 
 		w, h, 0, 0, 1, 1, hShader );
 	}
-#else
-	// old style
-	CG_DrawBigString(320 - 9 * 8, 440, "SPECTATOR", 1.0F);
-	if ( cgs.gametype == GT_TOURNAMENT ) {
-		CG_DrawBigString(320 - 15 * 8, 460, "waiting to play", 1.0F);
-	}
-	else if ( cgs.gametype >= GT_TEAM ) {
-		CG_DrawBigString(320 - 39 * 8, 460, "Use the TEAM SELECT ", 1.0F);
-	}
-#endif
 }
 
 /*
@@ -2011,7 +1962,6 @@ CG_DrawScoreboard
 */
 static qboolean CG_DrawScoreboard()
 {
-#ifdef _MENU_SCOREBOARD
 	static qboolean firstTime = qtrue;
 	float fade, *fadeColor;
 
@@ -2100,9 +2050,6 @@ static qboolean CG_DrawScoreboard()
 	}
 
 	return qtrue;
-#else
-	return CG_DrawOldScoreboard();
-#endif
 }
 
 /*
@@ -2140,7 +2087,6 @@ static qboolean CG_DrawFollow( void )
 		return qfalse;
 	}
 
-#ifdef _MENU_SCOREBOARD
 	// new style
 
 	// draw label
@@ -2164,20 +2110,7 @@ static qboolean CG_DrawFollow( void )
 
 	// draw name
 	DrawStringNewColour( 320, 48, name, pColor[0], LEFT_JUSTIFY );
-#else
-	// old style
-	CG_DrawBigString( 320 - 9 * 8, 24, "following", 1.0F );
 
-	name = cgs.clientinfo[ cg.snap->ps.clientNum ].name;
-
-	x = 0.5 * ( 640 - GIANT_WIDTH * CG_DrawStrlen( name ) );
-
-	color[0] = 1;
-	color[1] = 1;
-	color[2] = 1;
-	color[3] = 1;
-	CG_DrawStringExt( x, 40, name, color, qtrue, qtrue, GIANT_WIDTH, GIANT_HEIGHT, 0 );
-#endif
 	return qtrue;
 }
 
@@ -2205,11 +2138,8 @@ static void CG_DrawWarmup( void ) {
 		w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 		cg.warmupCount = 0;
 
-#ifdef _MENU_SCOREBOARD
 		DrawStringNew( 320, 64, 0.5f, *CreateColourVector(1,1,1,1,NULL), s, 0, 0, 3, CENTRE_JUSTIFY );
-#else
-		CG_DrawBigString( 320 - w / 2, 24, s, 1.0F );
-#endif
+
 		return;
 	}
 
@@ -2390,9 +2320,8 @@ static void CG_Draw2D_MFQ3( void ) {
 	CG_DrawVote();
 	CG_DrawTeamVote();
 
-#ifdef _MENU_SCOREBOARD
 	CG_DrawUpperLeft();
-#endif
+
 	CG_DrawUpperRight( qfalse );
 
 	if( !CG_DrawFollow() )
@@ -2511,7 +2440,6 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 	CG_DrawDevelop();		// draw debugging (ONLY) text
 }
 
-#ifdef _MENU_SCOREBOARD	// NOTE: functions copied from v1.29h code to enable new scoreboard method
 
 /*
 =====================
@@ -2979,5 +2907,4 @@ void CG_OwnerDraw( float x, float y, float w, float h, float text_x, float text_
 */
   }
 }
-
-#endif	// NOTE: functions copied from v1.29h code to enable new scoreboard method
+	// NOTE: functions copied from v1.29h code to enable new scoreboard method

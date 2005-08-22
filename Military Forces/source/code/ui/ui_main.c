@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.1 2005-08-22 16:16:10 thebjoern Exp $
+ * $Id: ui_main.c,v 1.2 2005-08-22 22:29:54 minkis Exp $
 */
 /*
 =======================================================================
@@ -110,10 +110,6 @@ static char* netnames[] = {
 	"IPX",
 	NULL
 };
-
-#ifndef MISSIONPACK // bk001206
-static char quake3worldMessage[] = "Visit www.quake3world.com - News, Community, Events, Files";
-#endif
 
 static int gamecodetoui[] = {4,2,3,0,5,1,6};
 static int uitogamecode[] = {4,6,2,3,1,5,7};
@@ -1072,9 +1068,6 @@ void UI_Load() {
 }
 
 static const char *handicapValues[] = {"None","95","90","85","80","75","70","65","60","55","50","45","40","35","30","25","20","15","10","5",NULL};
-#ifndef MISSIONPACK // bk001206
-static int numHandicaps = sizeof(handicapValues) / sizeof(const char*);
-#endif
 
 static void UI_DrawHandicap(rectDef_t *rect, float scale, vec4_t color, int textStyle) {
   int i, h;
@@ -1455,12 +1448,6 @@ static void UI_DrawTierGameType(rectDef_t *rect, float scale, vec4_t color, int 
 }
 
 
-#ifndef MISSIONPACK // bk001206
-static const char *UI_OpponentLeaderName() {
-  int i = UI_TeamIndexFromName(UI_Cvar_VariableString("ui_opponentName"));
-	return uiInfo.teamList[i].teamMembers[0];
-}
-#endif
 
 static const char *UI_AIFromName(const char *name) {
 	int j;
@@ -1472,50 +1459,6 @@ static const char *UI_AIFromName(const char *name) {
 	return "James";
 }
 
-#ifndef MISSIONPACK // bk001206
-static const int UI_AIIndex(const char *name) {
-	int j;
-	for (j = 0; j < uiInfo.characterCount; j++) {
-		if (Q_stricmp(name, uiInfo.characterList[j].name) == 0) {
-			return j;
-		}
-	}
-	return 0;
-}
-#endif
-
-#ifndef MISSIONPACK // bk001206
-static const int UI_AIIndexFromName(const char *name) {
-	int j;
-	for (j = 0; j < uiInfo.aliasCount; j++) {
-		if (Q_stricmp(uiInfo.aliasList[j].name, name) == 0) {
-			return UI_AIIndex(uiInfo.aliasList[j].ai);
-		}
-	}
-	return 0;
-}
-#endif
-
-
-#ifndef MISSIONPACK // bk001206
-static const char *UI_OpponentLeaderHead() {
-	const char *leader = UI_OpponentLeaderName();
-	return UI_AIFromName(leader);
-}
-#endif
-
-#ifndef MISSIONPACK // bk001206
-static const char *UI_OpponentLeaderModel() {
-	int i;
-	const char *head = UI_OpponentLeaderHead();
-	for (i = 0; i < uiInfo.characterCount; i++) {
-		if (Q_stricmp(head, uiInfo.characterList[i].name) == 0) {
-			return uiInfo.characterList[i].base;
-		}
-	}
-	return "James";
-}
-#endif
 
 
 static qboolean updateOpponentModel = qtrue;
@@ -5666,12 +5609,6 @@ static void UI_Pause(qboolean b) {
 	}
 }
 
-#ifndef MISSIONPACK // bk001206
-static int UI_OwnerDraw_Width(int ownerDraw) {
-  // bk001205 - LCC missing return value
-  return 0;
-}
-#endif
 
 static int UI_PlayCinematic(const char *name, float x, float y, float w, float h) {
   return trap_CIN_PlayCinematic(name, x, y, w, h, (CIN_loop | CIN_silent));
@@ -5713,76 +5650,6 @@ static void UI_RunCinematicFrame(int handle) {
   trap_CIN_RunCinematic(handle);
 }
 
-
-
-/*
-=================
-PlayerModel_BuildList
-=================
-*/
-static void UI_BuildQ3Model_List( void )
-{
-	int		numdirs;
-	int		numfiles;
-	char	dirlist[2048];
-	char	filelist[2048];
-	char	skinname[64];
-	char	scratch[256];
-	char*	dirptr;
-	char*	fileptr;
-	int		i;
-	int		j, k, dirty;
-	int		dirlen;
-	int		filelen;
-
-	uiInfo.q3HeadCount = 0;
-
-	// iterate directory of all player models
-	numdirs = trap_FS_GetFileList("models/players", "/", dirlist, 2048 );
-	dirptr  = dirlist;
-	for (i=0; i<numdirs && uiInfo.q3HeadCount < MAX_PLAYERMODELS; i++,dirptr+=dirlen+1)
-	{
-		dirlen = strlen(dirptr);
-		
-		if (dirlen && dirptr[dirlen-1]=='/') dirptr[dirlen-1]='\0';
-
-		if (!strcmp(dirptr,".") || !strcmp(dirptr,".."))
-			continue;
-			
-		// iterate all skin files in directory
-		numfiles = trap_FS_GetFileList( va("models/players/%s",dirptr), "tga", filelist, 2048 );
-		fileptr  = filelist;
-		for (j=0; j<numfiles && uiInfo.q3HeadCount < MAX_PLAYERMODELS;j++,fileptr+=filelen+1)
-		{
-			filelen = strlen(fileptr);
-
-			COM_StripExtension(fileptr,skinname);
-
-			// look for icon_????
-			if (Q_stricmpn(skinname, "icon_", 5) == 0 && !(Q_stricmp(skinname,"icon_blue") == 0 || Q_stricmp(skinname,"icon_red") == 0))
-			{
-				if (Q_stricmp(skinname, "icon_default") == 0) {
-					Com_sprintf( scratch, sizeof(scratch), dirptr);
-				} else {
-					Com_sprintf( scratch, sizeof(scratch), "%s/%s",dirptr, skinname + 5);
-				}
-				dirty = 0;
-				for(k=0;k<uiInfo.q3HeadCount;k++) {
-					if (!Q_stricmp(scratch, uiInfo.q3HeadNames[uiInfo.q3HeadCount])) {
-						dirty = 1;
-						break;
-					}
-				}
-				if (!dirty) {
-					Com_sprintf( uiInfo.q3HeadNames[uiInfo.q3HeadCount], sizeof(uiInfo.q3HeadNames[uiInfo.q3HeadCount]), scratch);
-					uiInfo.q3HeadIcons[uiInfo.q3HeadCount++] = trap_R_RegisterShaderNoMip(va("models/players/%s/%s",dirptr,skinname));
-				}
-			}
-
-		}
-	}	
-
-}
 
 /*
 =================
@@ -6075,7 +5942,6 @@ void _UI_Init( qboolean inGameLoad ) {
 	trap_LAN_LoadCachedServers();
 	UI_LoadBestScores(uiInfo.mapList[ui_currentMap.integer].mapLoadName, uiInfo.gameTypes[ui_gameType.integer].gtEnum);
 
-	UI_BuildQ3Model_List();
 	UI_LoadBots();
 
 	// sets defaults for ui temp cvars
@@ -6920,22 +6786,6 @@ static void UI_StopServerRefresh( void )
 
 }
 
-/*
-=================
-ArenaServers_MaxPing
-=================
-*/
-#ifndef MISSIONPACK // bk001206
-static int ArenaServers_MaxPing( void ) {
-	int		maxPing;
-
-	maxPing = (int)trap_Cvar_VariableValue( "cl_maxPing" );
-	if( maxPing < 100 ) {
-		maxPing = 100;
-	}
-	return maxPing;
-}
-#endif
 
 /*
 =================
