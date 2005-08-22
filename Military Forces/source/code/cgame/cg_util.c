@@ -2,9 +2,7 @@
 // cg_util.c -- utility functions for use with CGame
 #include "cg_local.h"
 
-#ifdef _MENU_SCOREBOARD
-	#include "../ui/ui_shared.h"
-#endif
+#include "../ui/ui_shared.h"
 
 /*
 =================

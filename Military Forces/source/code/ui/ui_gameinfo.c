@@ -1,5 +1,5 @@
 /*
- * $Id: ui_gameinfo.c,v 1.1 2005-08-22 16:15:33 thebjoern Exp $
+ * $Id: ui_gameinfo.c,v 1.2 2005-08-22 22:29:54 minkis Exp $
 */
 //
 // gameinfo.c
@@ -18,11 +18,6 @@ static char		*ui_botInfos[MAX_BOTS];
 
 static int		ui_numArenas;
 static char		*ui_arenaInfos[MAX_ARENAS];
-
-#ifndef MISSIONPACK // bk001206
-static int		ui_numSinglePlayerArenas;
-static int		ui_numSpecialSinglePlayerArenas;
-#endif
 
 /*
 ===============

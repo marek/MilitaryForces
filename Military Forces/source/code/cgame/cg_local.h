@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.1 2005-08-22 16:02:32 thebjoern Exp $
+ * $Id: cg_local.h,v 1.2 2005-08-22 22:29:54 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -83,8 +83,6 @@ typedef enum {
 // very large characters
 #define	GIANT_WIDTH			32
 #define	GIANT_HEIGHT		48
-
-#define	NUM_CROSSHAIRS		10
 
 #define TEAM_OVERLAY_MAXNAME_WIDTH	12
 #define TEAM_OVERLAY_MAXLOCATION_WIDTH	16
@@ -1540,7 +1538,6 @@ void CG_DrawInformation( void );
 //
 // cg_scoreboard.c
 //
-qboolean CG_DrawOldScoreboard( void );
 void CG_DrawOldTourneyScoreboard( void );
 
 //

@@ -1,5 +1,5 @@
 /*
- * $Id: ui_shared.c,v 1.1 2005-08-22 16:16:36 thebjoern Exp $
+ * $Id: ui_shared.c,v 1.2 2005-08-22 22:29:54 minkis Exp $
 */
 // 
 // string allocation/managment
@@ -3244,21 +3244,6 @@ static bind_t g_bindings[] =
 
 static const int g_bindCount = sizeof(g_bindings) / sizeof(bind_t);
 
-#ifndef MISSIONPACK // bk001206
-static configcvar_t g_configcvars[] =
-{
-	{"cl_run",			0,					0},
-	{"m_pitch",			0,					0},
-	{"cg_autoswitch",	0,					0},
-	{"sensitivity",		0,					0},
-	{"in_joystick",		0,					0},
-	{"joy_threshold",	0,					0},
-	{"m_filter",		0,					0},
-	{"cl_freelook",		0,					0},
-	{NULL,				0,					0}
-};
-#endif
-
 /*
 =================
 Controls_GetKeyAssignment
@@ -5692,11 +5677,6 @@ displayContextDef_t *Display_GetContext() {
 	return DC;
 }
  
-#ifndef MISSIONPACK // bk001206
-static float captureX;
-static float captureY;
-#endif
-
 void *Display_CaptureItem(int x, int y) {
 	int i;
 
