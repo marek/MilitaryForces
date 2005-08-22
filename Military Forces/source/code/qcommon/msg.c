@@ -1111,54 +1111,54 @@ typedef struct playerState_s {
 
 netField_t	playerStateFields[] = 
 {
-{ PSF(commandTime), 32 },	////////////////////			
-{ PSF(origin[0]), 0 },	////////////////////
-{ PSF(origin[1]), 0 },	////////////////////
-{ PSF(throttle), 8 },	////////////////////
-{ PSF(velocity[0]), 0 },	////////////////////
-{ PSF(velocity[1]), 0 },	////////////////////
-{ PSF(viewangles[1]), 0 },	////////////////////
-{ PSF(viewangles[0]), 0 },	////////////////////
-{ PSF(tracktarget), 32 },	////////////////////
-{ PSF(origin[2]), 0 },	////////////////////
-{ PSF(velocity[2]), 0 },	////////////////////
-{ PSF(weaponIndex), 16 },	////////////////////
-{ PSF(pm_time), 32 },	 ////////////////////
-{ PSF(eventSequence), 16 },	////////////////////
-{ PSF(objectives), 8 },	////////////////////
-{ PSF(vehicleAnim), 16 },	////////////////////
-{ PSF(events[0]), 8 },	////////////////////
-{ PSF(turretAngle), 32 },	////////////////////
-{ PSF(events[1]), 8 },	////////////////////
-{ PSF(pm_flags), 16 },	////////////////////
-{ PSF(groundEntityNum), GENTITYNUM_BITS },	////////////////////
-{ PSF(fixed_throttle), 8 },	////////////////////
-{ PSF(eFlags), 16 },	////////////////////
-{ PSF(externalEvent), 10 },	////////////////////
-{ PSF(ONOFF), 32 },		////////////////////
-{ PSF(speed), 16 },		////////////////////
-{ PSF(delta_angles[1]), 16 },	////////////////////
-{ PSF(externalEventParm), 8 },	////////////////////
-{ PSF(viewheight), 8 },	////////////////////
-{ PSF(damageEvent), 8 },	////////////////////
-{ PSF(damageYaw), 8 },	////////////////////
-{ PSF(damagePitch), 8 },	////////////////////
-{ PSF(damageCount), 8 },	////////////////////
-{ PSF(generic1), 8 },	////////////////////
-{ PSF(pm_type), 8 },		////////////////////			
-{ PSF(delta_angles[0]), 16 },	////////////////////
-{ PSF(delta_angles[2]), 16 },	////////////////////
-{ PSF(externalEventTime), 32 },	////////////////////
-{ PSF(eventParms[0]), 8 },	////////////////////
-{ PSF(eventParms[1]), 8 },	////////////////////
-{ PSF(clientNum), 8 },	////////////////////
-{ PSF(viewangles[2]), 0 },	////////////////////
-{ PSF(vehicleAngles[0]), 0 },	////////////////////
-{ PSF(vehicleAngles[1]), 0 },	////////////////////
-{ PSF(vehicleAngles[2]), 0 },	////////////////////
-{ PSF(jumppad_ent), 10 },	////////////////////
-{ PSF(loopSound), 16 },	////////////////////
-{ PSF(weaponNum), 16 }	////////////////////
+{ PSF(commandTime), 32 },			
+{ PSF(origin[0]), 0 },	
+{ PSF(origin[1]), 0 },
+{ PSF(throttle), 8 },	
+{ PSF(velocity[0]), 0 },	
+{ PSF(velocity[1]), 0 },	
+{ PSF(viewangles[1]), 0 },
+{ PSF(viewangles[0]), 0 },
+{ PSF(tracktarget), 32 },	
+{ PSF(origin[2]), 0 },
+{ PSF(velocity[2]), 0 },	
+{ PSF(weaponIndex), 16 },	
+{ PSF(pm_time), 32 },	 
+{ PSF(eventSequence), 16 },	
+{ PSF(objectives), 8 },
+{ PSF(vehicleAnim), 16 },	
+{ PSF(events[0]), 8 },	
+{ PSF(turretAngle), 32 },	
+{ PSF(events[1]), 8 },	
+{ PSF(pm_flags), 32 },	
+{ PSF(groundEntityNum), GENTITYNUM_BITS },	
+{ PSF(fixed_throttle), 8 },
+{ PSF(eFlags), 16 },	
+{ PSF(externalEvent), 10 },	
+{ PSF(ONOFF), 32 },		
+{ PSF(speed), 16 },		
+{ PSF(delta_angles[1]), 16 },	
+{ PSF(externalEventParm), 8 },	
+{ PSF(viewheight), 8 },
+{ PSF(damageEvent), 8 },	
+{ PSF(damageYaw), 8 },	
+{ PSF(damagePitch), 8 },
+{ PSF(damageCount), 8 },	
+{ PSF(generic1), 8 },	
+{ PSF(pm_type), 8 },					
+{ PSF(delta_angles[0]), 16 },	
+{ PSF(delta_angles[2]), 16 },	
+{ PSF(externalEventTime), 32 },	
+{ PSF(eventParms[0]), 8 },	
+{ PSF(eventParms[1]), 8 },	
+{ PSF(clientNum), 8 },	
+{ PSF(viewangles[2]), 0 },	
+{ PSF(vehicleAngles[0]), 0 },	
+{ PSF(vehicleAngles[1]), 0 },	
+{ PSF(vehicleAngles[2]), 0 },	
+{ PSF(jumppad_ent), 10 },	
+{ PSF(loopSound), 16 },
+{ PSF(weaponNum), 16 }	
 };
 
 /*

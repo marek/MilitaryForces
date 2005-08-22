@@ -537,7 +537,7 @@ void * QDECL Sys_LoadDll( const char *name, char *fqpath , int (QDECL **entryPoi
 	char	*fn;
 #ifdef NDEBUG
 	int		timestamp;
-  int   ret;
+//  int   ret;
 #endif
 	char	filename[MAX_QPATH];
 
@@ -551,7 +551,7 @@ void * QDECL Sys_LoadDll( const char *name, char *fqpath , int (QDECL **entryPoi
 		&& !Cvar_VariableIntegerValue( "com_blindlyLoadDLLs" ) ) {
 		if (FS_FileExists(filename)) {
 			lastWarning = timestamp;
-			ret = MessageBoxEx( NULL, "You are about to load a .DLL executable that\n"
+			/*ret = MessageBoxEx( NULL, "You are about to load a .DLL executable that\n"
 				  "has not been verified for use with Quake III Arena.\n"
 				  "This type of file can compromise the security of\n"
 				  "your computer.\n\n"
@@ -560,7 +560,7 @@ void * QDECL Sys_LoadDll( const char *name, char *fqpath , int (QDECL **entryPoi
 				  MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ) );
 			if( ret != IDOK ) {
 				return NULL;
-			}
+			}*/
 		}
 	}
 #endif
