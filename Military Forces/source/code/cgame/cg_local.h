@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.2 2005-08-22 22:29:54 minkis Exp $
+ * $Id: cg_local.h,v 1.3 2005-08-23 02:48:59 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -768,12 +768,6 @@ typedef struct {
 	sfxHandle_t nukeExplodeSound;
 	sfxHandle_t nukeImplodeSound;
 	sfxHandle_t nukeFarSound;
-
-	// scoreboard headers
-	qhandle_t	scoreboardName;
-	qhandle_t	scoreboardPing;
-	qhandle_t	scoreboardScore;
-	qhandle_t	scoreboardTime;
 
 	// medals shown during gameplay
 	qhandle_t	medalImpressive;

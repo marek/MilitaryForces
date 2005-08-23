@@ -30,7 +30,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // A user mod should never modify this file
 
 // incursion of DOOM code into the Q3A codebase
-//#define	Q3_VERSION		"DOOM 0.01"
 
 // alignment macros for SIMD
 #define	ALIGN_ON
