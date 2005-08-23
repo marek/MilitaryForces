@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.3 2005-08-23 02:48:59 minkis Exp $
+ * $Id: cg_main.c,v 1.4 2005-08-23 22:20:21 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -470,16 +470,16 @@ void CG_RegisterItemSound(sfxHandle_t * h, const char *sample, qboolean compress
 	RegisteredItems.Sound[RegisteredItems.numSound].compressed = compressed;
 	RegisteredItems.numSound++;
 }
-void CG_RegisterItemModel(qhandle_t * h, const char * name)
-{
-	if(RegisteredItems.numModel+1 > (sizeof(RegisteredItems.Model)/sizeof(RegisteredItems.Model[0]))) {
-		CG_Error( "Register Item Model Overflow..." );
-		return;
-	}
-	RegisteredItems.Model[RegisteredItems.numModel].h = h;
-	strcpy(RegisteredItems.Model[RegisteredItems.numModel].name, name);
-	RegisteredItems.numModel++;
-}
+//void CG_RegisterItemModel(qhandle_t * h, const char * name)
+//{
+//	if(RegisteredItems.numModel+1 > (sizeof(RegisteredItems.Model)/sizeof(RegisteredItems.Model[0]))) {
+//		CG_Error( "Register Item Model Overflow..." );
+//		return;
+//	}
+//	RegisteredItems.Model[RegisteredItems.numModel].h = h;
+//	strcpy(RegisteredItems.Model[RegisteredItems.numModel].name, name);
+//	RegisteredItems.numModel++;
+//}
 //void CG_RegisterItemShader(qhandle_t * h, const char * name)
 //{
 //	if(RegisteredItems.numShader+1 > (sizeof(RegisteredItems.Shader)/sizeof(RegisteredItems.Shader[0]))) {
@@ -1113,16 +1113,16 @@ static void CG_RegisterGraphics( void ) {
 
 
 	// LQM gibs
-	CG_RegisterItemModel(&cgs.media.gibAbdomen, "models/gibs/abdomen.md3" );
-	CG_RegisterItemModel(&cgs.media.gibArm, "models/gibs/arm.md3" );
-	CG_RegisterItemModel(&cgs.media.gibChest, "models/gibs/chest.md3" );
-	CG_RegisterItemModel(&cgs.media.gibFist, "models/gibs/fist.md3" );
-	CG_RegisterItemModel(&cgs.media.gibFoot, "models/gibs/foot.md3" );
-	CG_RegisterItemModel(&cgs.media.gibForearm, "models/gibs/forearm.md3" );
-	CG_RegisterItemModel(&cgs.media.gibIntestine, "models/gibs/intestine.md3" );
-	CG_RegisterItemModel(&cgs.media.gibLeg, "models/gibs/leg.md3" );
-	CG_RegisterItemModel(&cgs.media.gibSkull, "models/gibs/skull.md3" );
-	CG_RegisterItemModel(&cgs.media.gibBrain, "models/gibs/brain.md3" );
+	cgs.media.gibAbdomen = trap_R_RegisterModel( "models/gibs/abdomen.md3" );
+	cgs.media.gibArm = trap_R_RegisterModel( "models/gibs/arm.md3" );
+	cgs.media.gibChest = trap_R_RegisterModel( "models/gibs/chest.md3" );
+	cgs.media.gibFist = trap_R_RegisterModel( "models/gibs/fist.md3" );
+	cgs.media.gibFoot = trap_R_RegisterModel( "models/gibs/foot.md3" );
+	cgs.media.gibForearm = trap_R_RegisterModel( "models/gibs/forearm.md3" );
+	cgs.media.gibIntestine = trap_R_RegisterModel( "models/gibs/intestine.md3" );
+	cgs.media.gibLeg = trap_R_RegisterModel( "models/gibs/leg.md3" );
+	cgs.media.gibSkull = trap_R_RegisterModel( "models/gibs/skull.md3" );
+	cgs.media.gibBrain = trap_R_RegisterModel( "models/gibs/brain.md3" );
 
 	// MFQ3
 	cgs.media.missilePuffShader = trap_R_RegisterShader( "missilePuff" );
@@ -1146,8 +1146,8 @@ static void CG_RegisterGraphics( void ) {
 
 
 	if ( cgs.gametype == GT_CTF || cg_buildScript.integer ) {
-		CG_RegisterItemModel(&cgs.media.redFlagModel, "models/flags/r_flag.md3" );
-		CG_RegisterItemModel(&cgs.media.blueFlagModel, "models/flags/b_flag.md3" );
+		cgs.media.redFlagModel = trap_R_RegisterModel( "models/flags/r_flag.md3" );
+		cgs.media.blueFlagModel = trap_R_RegisterModel( "models/flags/b_flag.md3" );
 		cgs.media.redFlagShader[0] = trap_R_RegisterShaderNoMip( "icons/iconf_red1" );
 		cgs.media.redFlagShader[1] = trap_R_RegisterShaderNoMip( "icons/iconf_red2" );
 		cgs.media.redFlagShader[2] = trap_R_RegisterShaderNoMip( "icons/iconf_red3" );
@@ -1164,27 +1164,27 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.balloonShader = trap_R_RegisterShader( "sprites/balloon3" );
 
 	// MFQ3 stuff
-	CG_RegisterItemModel(&cgs.media.vapor, "models/effects/vapor.md3" );
-	CG_RegisterItemModel(&cgs.media.vaporBig, "models/effects/vapor_big.md3" );
-	CG_RegisterItemModel(&cgs.media.vaporShader, "models/effects/turbulence" );
-	CG_RegisterItemModel(&cgs.media.afterburner[AB_BALL], "models/effects/burner_ball.md3" );
-	CG_RegisterItemModel(&cgs.media.afterburner[AB_BLUE], "models/effects/burner_blue.md3" );
-	CG_RegisterItemModel(&cgs.media.afterburner[AB_RED], "models/effects/burner_red.md3" );
-	CG_RegisterItemModel(&cgs.media.afterburner[AB_RED_SMALL], "models/effects/burner_red_small.md3" );
-	CG_RegisterItemModel(&cgs.media.vehicleMuzzleFlashModel,"models/effects/muzzleflash_md.md3");
-	CG_RegisterItemModel(&cgs.media.bulletTracer,"models/effects/tracer_yellow.md3");
-	CG_RegisterItemModel(&cgs.media.pilot, "models/effects/pilot_body.md3" );
-	CG_RegisterItemModel(&cgs.media.pilotHead, "models/effects/pilot_head.md3" );
-	CG_RegisterItemModel(&cgs.media.pilotSeat, "models/effects/pilot_seat.md3" );
-	CG_RegisterItemModel(&cgs.media.pilotWW2, "models/effects/pilot_body_ww2.md3" );
-	CG_RegisterItemModel(&cgs.media.pilotHeadWW2, "models/effects/pilot_head_ww2.md3" );
-	CG_RegisterItemModel(&cgs.media.pilotSeatWW2, "models/effects/pilot_seat_ww2.md3" );
-	CG_RegisterItemModel(&cgs.media.reticle[CH_GUNMODE], "models/effects/ch_gunmode.md3" );
-	CG_RegisterItemModel(&cgs.media.reticle[CH_BOMBMODE], "models/effects/ch_agmode.md3" );
-	CG_RegisterItemModel(&cgs.media.reticle[CH_ROCKETMODE], "models/effects/ch_rocketmode.md3" );
-	CG_RegisterItemModel(&cgs.media.reticle[CH_MISSILEMODE], "models/effects/ch_missilemode.md3" );
-	CG_RegisterItemModel(&cgs.media.reticle[CH_MISSILEMODELOCK], "models/effects/ch_missilemodelock.md3" );
-	CG_RegisterItemModel(&cgs.media.reticle[CH_DEFAULT], "models/effects/ch_default.md3" );
+	cgs.media.vapor = trap_R_RegisterModel( "models/effects/vapor.md3" );
+	cgs.media.vaporBig = trap_R_RegisterModel( "models/effects/vapor_big.md3" );
+	cgs.media.vaporShader = trap_R_RegisterModel( "models/effects/turbulence" );
+	cgs.media.afterburner[AB_BALL] = trap_R_RegisterModel( "models/effects/burner_ball.md3" );
+	cgs.media.afterburner[AB_BLUE] = trap_R_RegisterModel( "models/effects/burner_blue.md3" );
+	cgs.media.afterburner[AB_RED] = trap_R_RegisterModel( "models/effects/burner_red.md3" );
+	cgs.media.afterburner[AB_RED_SMALL] = trap_R_RegisterModel( "models/effects/burner_red_small.md3" );
+	cgs.media.vehicleMuzzleFlashModel = trap_R_RegisterModel( "models/effects/muzzleflash_md.md3");
+	cgs.media.bulletTracer = trap_R_RegisterModel("models/effects/tracer_yellow.md3");
+	cgs.media.pilot = trap_R_RegisterModel( "models/effects/pilot_body.md3" );
+	cgs.media.pilotHead = trap_R_RegisterModel( "models/effects/pilot_head.md3" );
+	cgs.media.pilotSeat = trap_R_RegisterModel("models/effects/pilot_seat.md3" );
+	cgs.media.pilotWW2 = trap_R_RegisterModel( "models/effects/pilot_body_ww2.md3" );
+	cgs.media.pilotHeadWW2 = trap_R_RegisterModel( "models/effects/pilot_head_ww2.md3" );
+	cgs.media.pilotSeatWW2 = trap_R_RegisterModel( "models/effects/pilot_seat_ww2.md3" );
+	cgs.media.reticle[CH_GUNMODE] = trap_R_RegisterModel( "models/effects/ch_gunmode.md3" );
+	cgs.media.reticle[CH_BOMBMODE] = trap_R_RegisterModel( "models/effects/ch_agmode.md3" );
+	cgs.media.reticle[CH_ROCKETMODE] = trap_R_RegisterModel( "models/effects/ch_rocketmode.md3" );
+	cgs.media.reticle[CH_MISSILEMODE] = trap_R_RegisterModel( "models/effects/ch_missilemode.md3" );
+	cgs.media.reticle[CH_MISSILEMODELOCK] = trap_R_RegisterModel( "models/effects/ch_missilemodelock.md3" );
+	cgs.media.reticle[CH_DEFAULT] = trap_R_RegisterModel( "models/effects/ch_default.md3" );
 	// end MFQ3
 
 	// MFQ3 HUD
@@ -1198,10 +1198,10 @@ static void CG_RegisterGraphics( void ) {
 	for( i = 1; i < bg_numberOfWeapons; i++ ) {
 		availableWeapons[i].iconHandle = trap_R_RegisterShaderNoMip( availableWeapons[i].iconName );
 		if( availableWeapons[i].modelName && strlen(availableWeapons[i].modelName) ) {
-			CG_RegisterItemModel(&availableWeapons[i].modelHandle, availableWeapons[i].modelName);
+			availableWeapons[i].modelHandle = trap_R_RegisterModel(availableWeapons[i].modelName);
 		}
 		if( availableWeapons[i].vwepName && strlen(availableWeapons[i].vwepName) ) {
-			CG_RegisterItemModel(&availableWeapons[i].vwepHandle, availableWeapons[i].vwepName);
+			availableWeapons[i].vwepHandle = trap_R_RegisterModel( availableWeapons[i].vwepName);
 		}
 	}
 	for ( i=0 ; i< RD_MAX_ICONS ; i++) {
@@ -1251,7 +1251,7 @@ static void CG_RegisterGraphics( void ) {
 
 	// MFQ3 IGME
 	if( cgs.gametype == GT_MISSION_EDITOR ) {
-		CG_RegisterItemModel(&cgs.media.IGME_selector, "models/effects/selector.md3");
+		cgs.media.IGME_selector = trap_R_RegisterModel( "models/effects/selector.md3");
 		cgs.media.IGME_waypoint = trap_R_RegisterShaderNoMip( "models/tex_shared/powerup_green");
 		cgs.media.IGME_waypoint2 = trap_R_RegisterShaderNoMip( "models/tex_shared/powerup_gray");
 	}
@@ -1261,8 +1261,8 @@ static void CG_RegisterGraphics( void ) {
 	// are engine-global)
 	CG_PrecacheVehiclePreview();
 
-	CG_RegisterItemModel(&cgs.media.bulletFlashModel, "models/weaphits/bullet.md3");
-	CG_RegisterItemModel(&cgs.media.dishFlashModel, "models/weaphits/boom01.md3");
+	cgs.media.bulletFlashModel = trap_R_RegisterModel( "models/weaphits/bullet.md3");
+	cgs.media.dishFlashModel = trap_R_RegisterModel( "models/weaphits/boom01.md3");
 
 	cgs.media.medalImpressive = trap_R_RegisterShaderNoMip( "medal_impressive" );
 	cgs.media.medalExcellent = trap_R_RegisterShaderNoMip("medal_excellent" );
@@ -1301,7 +1301,7 @@ static void CG_RegisterGraphics( void ) {
 		int	j;
 
 		Com_sprintf( name, sizeof(name), "*%i", i );
-		CG_RegisterItemModel(&cgs.inlineDrawModel[i], name);
+		cgs.inlineDrawModel[i] = trap_R_RegisterModel( name );
 		trap_R_ModelBounds( cgs.inlineDrawModel[i], mins, maxs );
 		for ( j = 0 ; j < 3 ; j++ ) {
 			cgs.inlineModelMidpoints[i][j] = mins[j] + 0.5 * ( maxs[j] - mins[j] );
@@ -1316,7 +1316,7 @@ static void CG_RegisterGraphics( void ) {
 		if ( !modelName[0] ) {
 			break;
 		}
-		CG_RegisterItemModel(&cgs.gameModels[i], modelName);
+		cgs.gameModels[i] = trap_R_RegisterModel( modelName);
 	}
 
 	// MFQ3 register all the vehicles

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_weapons.c,v 1.1 2005-08-22 16:03:44 thebjoern Exp $
+ * $Id: cg_weapons.c,v 1.2 2005-08-23 22:20:21 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -279,7 +279,7 @@ void CG_RegisterWeapons() {
 			}
 		}
 		if ( ammo->classname && ammo->world_model[0] ) {
-			CG_RegisterItemModel(&weaponInfo->ammoModel, ammo->world_model[0] );
+			weaponInfo->ammoModel = trap_R_RegisterModel( ammo->world_model[0] );
 		}
 
 		// switch on weapon type
@@ -287,7 +287,7 @@ void CG_RegisterWeapons() {
 		{
 		case WT_ROCKET:
 			// find out which model to use
-			CG_RegisterItemModel(&weaponInfo->missileModel , availableWeapons[i].modelName );
+			weaponInfo->missileModel = trap_R_RegisterModel( availableWeapons[i].modelName );
 			
 			// MFQ3: new sound
 			CG_RegisterItemSound(&weaponInfo->missileSound, "sound/weapons/rocket/rocketFly1.wav", qfalse );
@@ -313,7 +313,7 @@ void CG_RegisterWeapons() {
 		case WT_ANTIGROUNDMISSILE:
 		case WT_ANTIRADARMISSILE:
 			// find out which model to use
-			CG_RegisterItemModel(&weaponInfo->missileModel, availableWeapons[i].modelName );
+			weaponInfo->missileModel = trap_R_RegisterModel( availableWeapons[i].modelName );
 			
 			// MFQ3: new sound
 			CG_RegisterItemSound(&weaponInfo->missileSound, "sound/weapons/rocket/rocketFly1.wav", qfalse );
@@ -334,7 +334,7 @@ void CG_RegisterWeapons() {
 		case WT_IRONBOMB:
 		case WT_GUIDEDBOMB:
 			// find out which model to use
-			CG_RegisterItemModel(&weaponInfo->missileModel, availableWeapons[i].modelName );
+			weaponInfo->missileModel = trap_R_RegisterModel( availableWeapons[i].modelName );
 			CG_RegisterItemSound(&weaponInfo->missileSound, "sound/weapons/rocket/rockfly.wav", qfalse );
 			CG_RegisterItemSound(&weaponInfo->flashSound[0], "sound/weapons/rocket/rocklf1a.wav", qfalse );
 			break;
@@ -382,7 +382,7 @@ void CG_RegisterWeapons() {
 			break;
 
 		case WT_BALLISTICGUN:
-			CG_RegisterItemModel(&weaponInfo->missileModel, availableWeapons[i].modelName );
+			weaponInfo->missileModel = trap_R_RegisterModel( availableWeapons[i].modelName );
 			CG_RegisterItemSound(&weaponInfo->missileSound, "sound/weapons/rocket/rockfly.wav", qfalse );
 
 			// no dynamic lighting
@@ -407,25 +407,25 @@ void CG_RegisterWeapons() {
 				break;
 			}
 
-			CG_RegisterItemModel(&weaponInfo->missileModel, availableWeapons[i].modelName );
+			weaponInfo->missileModel = trap_R_RegisterModel( availableWeapons[i].modelName );
 			weaponInfo->missileDlight = 100;
 			MAKERGB( weaponInfo->missileDlightColor, 1, 0.75f, 0 );
 			
 			break;
 
 		case WT_FUELTANK:
-			CG_RegisterItemModel(&weaponInfo->missileModel, availableWeapons[i].modelName );
+			weaponInfo->missileModel = trap_R_RegisterModel( availableWeapons[i].modelName );
 			weaponInfo->missileDlight = 0;
 			break;		
 
 		case WT_FLAK:
-			CG_RegisterItemModel(&weaponInfo->missileModel, availableWeapons[i].modelName );
+			weaponInfo->missileModel = trap_R_RegisterModel( availableWeapons[i].modelName );
 			weaponInfo->missileDlight = 0;
 			break;
 
 		case WT_NUKEBOMB:
 			// find out which model to use
-			CG_RegisterItemModel(&weaponInfo->missileModel, availableWeapons[i].modelName );
+			weaponInfo->missileModel = trap_R_RegisterModel( availableWeapons[i].modelName );
 			CG_RegisterItemSound(&weaponInfo->missileSound, "sound/weapons/rocket/rockfly.wav", qfalse );
 			CG_RegisterItemSound(&weaponInfo->flashSound[0], "sound/weapons/rocket/rocklf1a.wav", qfalse );
 			break;
@@ -436,7 +436,7 @@ void CG_RegisterWeapons() {
 					{
 
 						// find out which model to use
-						CG_RegisterItemModel(&weaponInfo->missileModel, availableWeapons[i].modelName );
+						weaponInfo->missileModel = trap_R_RegisterModel( availableWeapons[i].modelName );
 						CG_RegisterItemSound(&weaponInfo->missileSound, "sound/weapons/rocket/rockfly.wav", qfalse );
 						CG_RegisterItemSound(&weaponInfo->flashSound[0], "sound/weapons/rocket/rocklf1a.wav", qfalse );
 						weaponInfo->missileTrailFunc = CG_MissileTrail;
@@ -450,7 +450,7 @@ void CG_RegisterWeapons() {
 		case WT_FUELCRATE:
 		case WT_AMMOCRATE:
 		case WT_HEALTHCRATE:
-			CG_RegisterItemModel(&weaponInfo->missileModel, availableWeapons[i].modelName );
+			weaponInfo->missileModel = trap_R_RegisterModel( availableWeapons[i].modelName );
 			CG_RegisterItemSound(&weaponInfo->flashSound[0], "sound/weapons/rocket/rocklf1a.wav", qfalse );
 			break;
 
