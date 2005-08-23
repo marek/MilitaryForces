@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.3 2005-08-23 02:48:59 minkis Exp $
+ * $Id: cg_local.h,v 1.4 2005-08-23 22:20:21 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1232,7 +1232,7 @@ void CG_BuildSpectatorString();
 int CG_FeederCount(float feederID);
 
 void CG_RegisterItemSound(sfxHandle_t * h, const char *sample, qboolean compressed);
-void CG_RegisterItemModel(qhandle_t * h, const char * name);
+//void CG_RegisterItemModel(qhandle_t * h, const char * name);
 void CG_AddRegisterMessage(const char * s);
 
 //
