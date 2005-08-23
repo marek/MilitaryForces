@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.1 2005-08-22 16:01:59 thebjoern Exp $
+ * $Id: cg_drawnewhud.c,v 1.2 2005-08-23 19:41:09 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -469,10 +469,12 @@ static void CG_DrawRadarSymbols_AIR_new( int vehicle, float range, int x, int y 
 	// walk through list of targets
 	for( i = 0; i < cg.radarTargets; i++ ) {
 		// dont show self
-		if( cg.radarEnts[i] == &cg.predictedPlayerEntity ) continue;
+		if( cg.radarEnts[i] == &cg.predictedPlayerEntity ) 
+			continue;
 
 		// dont show dead ones
-		if( cg.radarEnts[i]->currentState.eFlags & EF_DEAD ) continue;
+		if( cg.radarEnts[i]->currentState.eFlags & EF_DEAD ) 
+			continue;
 
 		// get other vehicle
 		if( cg.radarEnts[i]->currentState.eType == ET_MISC_VEHICLE ) {
@@ -488,7 +490,8 @@ static void CG_DrawRadarSymbols_AIR_new( int vehicle, float range, int x, int y 
 		VectorSubtract( pos1, pos2, dir );
 		dist = VectorNormalize(dir);
 		// check out of range
-		if( dist > range ) continue;
+		if( dist > range ) 
+			continue;
 		// scale dist to radar screen
 		dist /= scale;
 
@@ -498,7 +501,8 @@ static void CG_DrawRadarSymbols_AIR_new( int vehicle, float range, int x, int y 
 		if( angle > 360 ) angle -= 360;
 		else if( angle < 0 ) angle += 360;
 		if( angle >= 90 && angle <= 270 ) {
-			if( !(cg.radarEnts[i]->currentState.ONOFF & OO_RADAR) ) continue;
+			if( !(cg.radarEnts[i]->currentState.ONOFF & OO_RADAR) ) 
+				continue;
 		}
 		angles[1] -= hdg - 90;
 		if( angles[1] > 360 ) angles[1] -= 360;
@@ -510,15 +514,18 @@ static void CG_DrawRadarSymbols_AIR_new( int vehicle, float range, int x, int y 
 		// check LOS and/or RADAR on
 		if( !(cg.radarEnts[i]->currentState.ONOFF & OO_RADAR) ) {
 			CG_Trace( &res, pos, NULL, NULL, otherpos, cg.snap->ps.clientNum, MASK_SOLID );
-			if( res.fraction < 1.0f ) continue;
+			if( res.fraction < 1.0f ) 
+				continue;
 		}
 		// which icon (if at all, dont show lqms)
 		if( (availableVehicles[otherveh].cat & CAT_PLANE) || 
 			(availableVehicles[otherveh].cat & CAT_HELO) ) {
 			float alt = otherpos[2] - pos[2];
 			icon = RD_AIR_SAME_ENEMY;
-			if( alt > 1000 ) icon += 3;
-			else if( alt < -1000 ) icon += 6;
+			if( alt > 1000 ) 
+				icon += 3;
+			else if( alt < -1000 ) 
+				icon += 6;
 		} else {
 			continue;
 		}
@@ -537,7 +544,8 @@ static void CG_DrawRadarSymbols_AIR_new( int vehicle, float range, int x, int y 
 	}
 }
 
-static void CG_DrawRadarSymbols_GROUND_new( int vehicle, float range, int x, int y ) {
+static void CG_DrawRadarSymbols_GROUND_new( int vehicle, float range, int x, int y ) 
+{
 	unsigned int i;
 	centity_t	*self = &cg.predictedPlayerEntity;
 	vec3_t		pos, pos1, pos2;
@@ -565,8 +573,10 @@ static void CG_DrawRadarSymbols_GROUND_new( int vehicle, float range, int x, int
 	if( (availableVehicles[vehicle].cat & CAT_GROUND) ||
 		(availableVehicles[vehicle].cat & CAT_BOAT) ) {
 		hdg += self->currentState.angles2[ROLL];
-		if( hdg > 360 ) hdg -= 360;
-		else if( hdg < 0 ) hdg += 360;
+		if( hdg > 360 ) 
+			hdg -= 360;
+		else if( hdg < 0 ) 
+			hdg += 360;
 	}
 
 	// pos
@@ -575,10 +585,12 @@ static void CG_DrawRadarSymbols_GROUND_new( int vehicle, float range, int x, int
 	// walk through list of targets
 	for( i = 0; i < cg.radarTargets; i++ ) {
 		// dont show self
-		if( cg.radarEnts[i] == &cg.predictedPlayerEntity ) continue;
+		if( cg.radarEnts[i] == &cg.predictedPlayerEntity ) 
+			continue;
 
 		// dont show dead ones
-		if( cg.radarEnts[i]->currentState.eFlags & EF_DEAD ) continue;
+		if( cg.radarEnts[i]->currentState.eFlags & EF_DEAD ) 
+			continue;
 
 		// vehicles
 		groundinstallation = 0;
@@ -603,24 +615,30 @@ static void CG_DrawRadarSymbols_GROUND_new( int vehicle, float range, int x, int
 			VectorSubtract( pos1, pos2, dir );
 			dist = VectorNormalize(dir);
 			// check out of range
-			if( dist > range ) continue;
+			if( dist > range ) 
+				continue;
 			// scale dist to radar screen
 			dist /= scale;
 
 			// get screen dir
 			vectoangles( dir, angles );
 			angle = angles[1]-hdg;
-			if( angle > 360 ) angle -= 360;
-			else if( angle < 0 ) angle += 360;
+			if( angle > 360 ) 
+				angle -= 360;
+			else if( angle < 0 ) 
+				angle += 360;
 			if( angle >= 45 && angle <= 315 ) 
 			{
 				if( !(cg.radarEnts[i]->currentState.ONOFF & OO_RADAR) ||	// radar off
 					( cg.radarEnts[i]->destroyableStructure &&	// or radar on and destroyable building
-					(cg.radarEnts[i]->currentState.ONOFF & OO_RADAR) ) ) continue;
+					(cg.radarEnts[i]->currentState.ONOFF & OO_RADAR) ) ) 
+					continue;
 			}
 			angles[1] -= hdg - 90;
-			if( angles[1] > 360 ) angles[1] -= 360;
-			else if( angles[1] < 0 ) angles[1] += 360;
+			if( angles[1] > 360 ) 
+				angles[1] -= 360;
+			else if( angles[1] < 0 ) 
+				angles[1] += 360;
 			angles[0] = angles[2] = 0;
 			AngleVectors( angles, dir, 0, 0 );
 			VectorScale( dir, dist, dir );
@@ -629,7 +647,8 @@ static void CG_DrawRadarSymbols_GROUND_new( int vehicle, float range, int x, int
 			if( !(cg.radarEnts[i]->currentState.ONOFF & OO_RADAR) ) 
 			{
 				CG_Trace( &res, pos, NULL, NULL, otherpos, cg.snap->ps.clientNum, MASK_SOLID );
-				if( res.fraction < 1.0f ) continue;
+				if( res.fraction < 1.0f ) 
+					continue;
 			}
 			// which icon (if at all, dont show lqms)
 			if( groundinstallation )
@@ -663,7 +682,8 @@ static void CG_DrawRadarSymbols_GROUND_new( int vehicle, float range, int x, int
 			VectorSubtract( pos1, pos2, dir );
 			dist = VectorNormalize(dir);
 			// check out of range
-			if( dist > range ) continue;
+			if( dist > range ) 
+				continue;
 			// scale dist to radar screen
 			dist /= scale;
 
@@ -674,13 +694,17 @@ static void CG_DrawRadarSymbols_GROUND_new( int vehicle, float range, int x, int
 			else if( angle < 0 ) angle += 360;
 			if( ( (availableVehicles[vehicle].cat & CAT_GROUND) || 
 				  (availableVehicles[vehicle].cat & CAT_BOAT) ) &&
-				angle >= 90 && angle <= 270 ) continue;
+				angle >= 90 && angle <= 270 ) 
+				continue;
 			else if( ( (availableVehicles[vehicle].cat & CAT_PLANE) ||
 					   (availableVehicles[vehicle].cat & CAT_HELO) ) &&
-				angle >= 45 && angle <= 315 ) continue;
+				angle >= 45 && angle <= 315 ) 
+				continue;
 			angles[1] -= hdg - 90;
-			if( angles[1] > 360 ) angles[1] -= 360;
-			else if( angles[1] < 0 ) angles[1] += 360;
+			if( angles[1] > 360 ) 
+				angles[1] -= 360;
+			else if( angles[1] < 0 ) 
+				angles[1] += 360;
 			angles[0] = angles[2] = 0;
 			AngleVectors( angles, dir, 0, 0 );
 			VectorScale( dir, dist, dir );
@@ -699,14 +723,16 @@ static void CG_DrawRadarSymbols_GROUND_new( int vehicle, float range, int x, int
 			// check LOS
 			CG_Trace( &res, pos, NULL, NULL, otherpos, cg.snap->ps.clientNum, MASK_SOLID );
 //			if( res.fraction < 1.0f ) continue;
-			if( res.entityNum != cg.radarEnts[i]->currentState.number ) continue;
+			if( res.entityNum != cg.radarEnts[i]->currentState.number ) 
+				continue;
 		}
 
 		// draw
 		CG_DrawPic( x + dir[0], y - dir[1], 8, 8, cgs.media.radarIcons[icon] );
 		// check if we should draw any more targets
 		drawnTargets++;
-		if( drawnTargets >= cg_radarTargets.integer ) break;
+		if( drawnTargets >= cg_radarTargets.integer ) 
+			break;
 	}
 }
 
