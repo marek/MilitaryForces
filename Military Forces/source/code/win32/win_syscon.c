@@ -129,7 +129,7 @@ static LONG WINAPI ConWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 	case WM_CTLCOLORSTATIC:
 		if ( ( HWND ) lParam == s_wcd.hwndBuffer )
 		{
-			SetBkColor( ( HDC ) wParam, RGB( 0x10, 0x70, 0x10 ) );
+			SetBkColor( ( HDC ) wParam, RGB( 0x0a, 0x43, 0x0a ) );
 			SetTextColor( ( HDC ) wParam, RGB( 0xff, 0xff, 0x00 ) );
 
 #if 0	// this draws a background in the edit box, but there are issues with this
@@ -190,7 +190,7 @@ static LONG WINAPI ConWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 	case WM_CREATE:
 //		s_wcd.hbmLogo = LoadBitmap( g_wv.hInstance, MAKEINTRESOURCE( IDB_BITMAP1 ) );
 //		s_wcd.hbmClearBitmap = LoadBitmap( g_wv.hInstance, MAKEINTRESOURCE( IDB_BITMAP2 ) );
-		s_wcd.hbrEditBackground = CreateSolidBrush( RGB( 0x10, 0x70, 0x10 ) );
+		s_wcd.hbrEditBackground = CreateSolidBrush( RGB( 0x0a, 0x43, 0x0a ) );
 		s_wcd.hbrErrorBackground = CreateSolidBrush( RGB( 0x80, 0x80, 0x80 ) );
 		SetTimer( hWnd, 1, 1000, NULL );
 		break;
@@ -297,7 +297,7 @@ void Sys_CreateConsole( void )
 	HDC hDC;
 	WNDCLASS wc;
 	RECT rect;
-	const char *DEDCLASS = "Q3 WinConsole";
+	const char *DEDCLASS = "MF WinConsole";
 	int nHeight;
 	int swidth, sheight;
 	int DEDSTYLE = WS_POPUPWINDOW | WS_CAPTION | WS_MINIMIZEBOX;

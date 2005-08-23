@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.2 2005-08-22 22:29:54 minkis Exp $
+ * $Id: cg_main.c,v 1.3 2005-08-23 02:48:59 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1105,11 +1105,6 @@ static void CG_RegisterGraphics( void ) {
 	for ( i=0 ; i<11 ; i++) {
 		cgs.media.numberShaders[i] = trap_R_RegisterShader( sb_nums[i] );
 	}
-
-	cgs.media.scoreboardName = trap_R_RegisterShaderNoMip( "menu/tab/name.tga" );
-	cgs.media.scoreboardPing = trap_R_RegisterShaderNoMip( "menu/tab/ping.tga" );
-	cgs.media.scoreboardScore = trap_R_RegisterShaderNoMip( "menu/tab/score.tga" );
-	cgs.media.scoreboardTime = trap_R_RegisterShaderNoMip( "menu/tab/time.tga" );
 
 	cgs.media.smokePuffShader = trap_R_RegisterShader( "smokePuff" );
 	cgs.media.smokePuffRageProShader = trap_R_RegisterShader( "smokePuffRagePro" );
