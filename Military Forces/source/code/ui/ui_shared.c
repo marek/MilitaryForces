@@ -1,5 +1,5 @@
 /*
- * $Id: ui_shared.c,v 1.2 2005-08-22 22:29:54 minkis Exp $
+ * $Id: ui_shared.c,v 1.3 2005-08-23 06:27:20 minkis Exp $
 */
 // 
 // string allocation/managment
@@ -3173,74 +3173,6 @@ static bind_t g_bindings[] =
 	{(char*)NULL,		(char*)NULL,		0,				-1,				-1,		-1,	-1},
 };
 
-/*
-
-// MFQ3: orignal MISSIONPACK bindings
-static bind_t g_bindings[] = 
-{
-	{"+scores",			 K_TAB,				-1,		-1, -1},
-	{"+button2",		 K_ENTER,			-1,		-1, -1},
-	{"+speed", 			 K_SHIFT,			-1,		-1,	-1},
-	{"+forward", 		 K_UPARROW,		-1,		-1, -1},
-	{"+back", 			 K_DOWNARROW,	-1,		-1, -1},
-	{"+moveleft", 	 ',',					-1,		-1, -1},
-	{"+moveright", 	 '.',					-1,		-1, -1},
-	{"+moveup",			 K_SPACE,			-1,		-1, -1},
-	{"+movedown",		 'c',					-1,		-1, -1},
-	{"+left", 			 K_LEFTARROW,	-1,		-1, -1},
-	{"+right", 			 K_RIGHTARROW,	-1,		-1, -1},
-	{"+strafe", 		 K_ALT,				-1,		-1, -1},
-	{"+lookup", 		 K_PGDN,				-1,		-1, -1},
-	{"+lookdown", 	 K_DEL,				-1,		-1, -1},
-	{"+mlook", 			 '/',					-1,		-1, -1},
-	{"centerview", 	 K_END,				-1,		-1, -1},
-	{"+zoom", 			 -1,						-1,		-1, -1},
-	{"weapon 1",		 '1',					-1,		-1, -1},
-	{"weapon 2",		 '2',					-1,		-1, -1},
-	{"weapon 3",		 '3',					-1,		-1, -1},
-	{"weapon 4",		 '4',					-1,		-1, -1},
-	{"weapon 5",		 '5',					-1,		-1, -1},
-	{"weapon 6",		 '6',					-1,		-1, -1},
-	{"weapon 7",		 '7',					-1,		-1, -1},
-	{"weapon 8",		 '8',					-1,		-1, -1},
-	{"weapon 9",		 '9',					-1,		-1, -1},
-	{"weapon 10",		 '0',					-1,		-1, -1},
-	{"weapon 11",		 -1,					-1,		-1, -1},
-	{"weapon 12",		 -1,					-1,		-1, -1},
-	{"weapon 13",		 -1,					-1,		-1, -1},
-	{"+attack", 		 K_CTRL,				-1,		-1, -1},
-	{"weapprev",		 '[',					-1,		-1, -1},
-	{"weapnext", 		 ']',					-1,		-1, -1},
-	{"+button3", 		 K_MOUSE3,			-1,		-1, -1},
-	{"+button4", 		 K_MOUSE4,			-1,		-1, -1},
-	{"prevTeamMember", 'w',					-1,		-1, -1},
-	{"nextTeamMember", 'r',					-1,		-1, -1},
-	{"nextOrder", 't',					-1,		-1, -1},
-	{"confirmOrder", 'y',					-1,		-1, -1},
-	{"denyOrder", 'n',					-1,		-1, -1},
-	{"taskOffense", 'o',					-1,		-1, -1},
-	{"taskDefense", 'd',					-1,		-1, -1},
-	{"taskPatrol", 'p',					-1,		-1, -1},
-	{"taskCamp", 'c',					-1,		-1, -1},
-	{"taskFollow", 'f',					-1,		-1, -1},
-	{"taskRetrieve", 'v',					-1,		-1, -1},
-	{"taskEscort", 'e',					-1,		-1, -1},
-	{"taskOwnFlag", 'i',					-1,		-1, -1},
-	{"taskSuicide", 'k',					-1,		-1, -1},
-	{"tauntKillInsult", K_F1,			-1,		-1, -1},
-	{"tauntPraise", K_F2,			-1,		-1, -1},
-	{"tauntTaunt", K_F3,			-1,		-1, -1},
-	{"tauntDeathInsult", K_F4,			-1,		-1, -1},
-	{"tauntGauntlet", K_F5,			-1,		-1, -1},
-	{"scoresUp", K_KP_PGUP,			-1,		-1, -1},
-	{"scoresDown", K_KP_PGDN,			-1,		-1, -1},
-	// bk001205 - this one below was:  '-1' 
-	{"messagemode",  -1,					-1,		-1, -1},
-	{"messagemode2", -1,						-1,		-1, -1},
-	{"messagemode3", -1,						-1,		-1, -1},
-	{"messagemode4", -1,						-1,		-1, -1}
-};
-*/
 
 static const int g_bindCount = sizeof(g_bindings) / sizeof(bind_t);
 
