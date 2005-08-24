@@ -1,5 +1,5 @@
 /*
- * $Id: mf_client.c,v 1.1 2005-08-22 16:07:32 thebjoern Exp $
+ * $Id: mf_client.c,v 1.2 2005-08-24 04:52:21 minkis Exp $
 */
 
 #include "g_local.h"
@@ -214,6 +214,7 @@ void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 		{
 			if( availableWeapons[availableVehicles[vehIndex].weapons[cc]].type == WT_NUKEBOMB || 
 				availableWeapons[availableVehicles[vehIndex].weapons[cc]].type == WT_NUKEMISSILE ) {
+				client->ps.pm_flags &= ~PMF_VEHICLESPAWN;
 				return;
 			}
 		}
@@ -226,6 +227,7 @@ void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 	if(cs_flags & CS_LASTPOS) {
 		// use current position as spawn point
 		VectorCopy(client->ps.origin, spawn_origin);
+		spawn_origin[2] += 25;
 		VectorCopy(client->ps.vehicleAngles, spawn_angles);
 	} else {
 		if ( client->sess.sessionTeam == TEAM_SPECTATOR || (client->sess.sessionTeam != TEAM_SPECTATOR &&
@@ -417,7 +419,7 @@ void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 			trap_Trace (&trace, spawn_origin, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_SOLID );
 			if( trace.entityNum != ENTITYNUM_NONE ) {
 				test = &g_entities[trace.entityNum];
-					spawn_origin[2] = trace.endpos[2] - availableVehicles[vehIndex].mins[2] + 1;
+					spawn_origin[2] = trace.endpos[2] - availableVehicles[vehIndex].mins[2] + 0.1;
 			}
 			MF_Spawn_LQM( ent, vehIndex );
 		} else if( availableVehicles[vehIndex].cat & CAT_BOAT ) {
