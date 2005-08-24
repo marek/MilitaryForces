@@ -177,7 +177,7 @@
 				ProgramDataBaseFileName="$(IntDir)\"
 				BrowseInformation="1"
 				BrowseInformationFile="$(IntDir)\"
-				WarningLevel="3"
+				WarningLevel="4"
 				SuppressStartupBanner="TRUE"
 				DebugInformationFormat="3"/>
 			<Tool
