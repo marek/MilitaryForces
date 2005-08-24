@@ -425,6 +425,9 @@ RotateAroundYaw - MFQ3
 */
 void RotateAroundYaw( vec3_t axis[3], float angle ) {
 
+	if( Q_fabs(angle) == 0.0f )
+		return;
+		
 	// create an arbitrary axis[1] 
 	PerpendicularVector( axis[0], axis[2] );
 
