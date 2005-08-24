@@ -518,9 +518,9 @@ SV_BotInitBotLib
 void SV_BotInitBotLib(void) {
 	botlib_import_t	botlib_import;
 
-	if ( !Cvar_VariableValue("fs_restrict") && !Sys_CheckCD() ) {
-		Com_Error( ERR_NEED_CD, "Game CD not in drive" );
-	}
+	//if ( !Cvar_VariableValue("fs_restrict") && !Sys_CheckCD() ) {
+	//	Com_Error( ERR_NEED_CD, "Game CD not in drive" );
+	//}
 
 	if (debugpolygons) Z_Free(debugpolygons);
 	bot_maxdebugpolys = Cvar_VariableIntegerValue("bot_maxdebugpolys");
