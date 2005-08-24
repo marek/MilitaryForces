@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.1 2005-08-22 16:05:31 thebjoern Exp $
+ * $Id: bg_public.h,v 1.2 2005-08-24 15:13:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"mfq3 v0.78"
+#define	GAME_VERSION		"mfq3 v0.79"
 #define	GAME_IDENTIFIER		"mfq3"			// use to identify mfq3 servers
 
 #define	DEFAULT_GRAVITY		800

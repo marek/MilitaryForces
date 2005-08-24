@@ -832,7 +832,7 @@ static void follow_target( gentity_t *missile ) {
 		VectorCopy( missile->tracktarget->r.currentOrigin, mid );
 	}
 	VectorSubtract( mid, missile->r.currentOrigin, targdir );
-	dist = VectorNormalize(dir);
+	dist = VectorNormalize(targdir);
 
 	// out of range (if ever possible)
 	if( dist > missile->range ) {
@@ -847,11 +847,16 @@ static void follow_target( gentity_t *missile ) {
 
 	for ( i=0 ; i<num ; i++ ) {
 		hit = &g_entities[touch[i]];
-		if( !hit->inuse ) continue;
-		if( hit->s.eType != ET_MISSILE ) continue;
-		if( strcmp( hit->classname, "flare" ) != 0 ) continue;
-		if( !hit->ONOFF ) continue;
-		if( hit->r.ownerNum == missile->r.ownerNum ) continue; 
+		if( !hit->inuse ) 
+			continue;
+		if( hit->s.eType != ET_MISSILE ) 
+			continue;
+		if( strcmp( hit->classname, "flare" ) != 0 ) 
+			continue;
+		if( !hit->ONOFF ) 
+			continue;
+		if( hit->r.ownerNum == missile->r.ownerNum ) 
+			continue; 
 		hit->ONOFF = 0; // disable the flare
 		prob = rand() % 100;
 		vulner = missile->basicECMVulnerability - missile->tracktarget->s.frame;
@@ -889,7 +894,7 @@ static void follow_target( gentity_t *missile ) {
 	}
 
 	// adjust course/speed
-	VectorMA( dir, 0.05f, targdir, targdir );
+	VectorMA( dir, 0.15f, targdir, targdir );
 	VectorNormalize( targdir );
 	VectorScale( targdir, missile->speed, dir );
 	
@@ -1315,7 +1320,7 @@ void fire_autocannon_GI (gentity_t *self) {
 	vec3_t		dir;
 	vec3_t		start;
 	int			weapIdx = self->s.weaponIndex;
-	float		spreadX = availableWeapons[weapIdx].spread; 
+//	float		spreadX = availableWeapons[weapIdx].spread; 
 //	float		spreadY = spreadX;
 
 	// used for spread
