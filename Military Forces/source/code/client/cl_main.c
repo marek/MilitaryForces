@@ -904,9 +904,9 @@ void CL_RequestAuthorization( void ) {
 		return;
 	}
 
-	if ( Cvar_VariableValue( "fs_restrict" ) ) {
-		Q_strncpyz( nums, "mfdemo", sizeof( nums ) );
-	} else {
+	//if ( Cvar_VariableValue( "fs_restrict" ) ) {
+	//	Q_strncpyz( nums, "mfdemo", sizeof( nums ) );
+	//} else {
 		// only grab the alphanumeric values from the cdkey, to avoid any dashes or spaces
 		j = 0;
 		l = strlen( cl_cdkey );
@@ -923,7 +923,7 @@ void CL_RequestAuthorization( void ) {
 			}
 		}
 		nums[j] = 0;
-	}
+	//}
 
 	fs = Cvar_Get ("cl_anonymous", "0", CVAR_INIT|CVAR_SYSTEMINFO );
 
@@ -2894,9 +2894,9 @@ void CL_GlobalServers_f( void ) {
 		buffptr += sprintf( buffptr, " %s", Cmd_Argv(i) );
 
 	// if we are a demo, automatically add a "demo" keyword
-	if ( Cvar_VariableValue( "fs_restrict" ) ) {
-		buffptr += sprintf( buffptr, " demo" );
-	}
+	//if ( Cvar_VariableValue( "fs_restrict" ) ) {
+	//	buffptr += sprintf( buffptr, " demo" );
+	//}
 
 	NET_OutOfBandPrint( NS_SERVER, to, command );
 }
