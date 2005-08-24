@@ -586,6 +586,25 @@ void * QDECL Sys_LoadDll( const char *name, char *fqpath , int (QDECL **entryPoi
     Com_Printf("LoadLibrary '%s' failed\n", fn);
 #endif
 
+  //libHandle = LoadLibrary( "C:\\Military Forces\\mfdata\\uix86.dll" );
+  //libHandle = LoadLibrary( "C:\\Military Forces\\uix86.dll" );
+  // Temporary message to show dll success
+  {
+		LPVOID lpMsgBuf;
+		FormatMessage( 
+			FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+			FORMAT_MESSAGE_FROM_SYSTEM | 
+			FORMAT_MESSAGE_IGNORE_INSERTS,
+			NULL,
+			GetLastError(),
+			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), 
+			(LPTSTR) &lpMsgBuf,
+			0,
+			NULL );
+		Com_Printf("Sys_LoadDll()->LoadLibrary(): %s\n", (LPCTSTR)lpMsgBuf); 
+		LocalFree( lpMsgBuf ); 
+  }
+
 	if ( !libHandle ) {
 		if( cdpath[0] ) {
 			fn = FS_BuildOSPath( cdpath, gamedir, filename );

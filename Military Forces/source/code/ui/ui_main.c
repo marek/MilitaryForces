@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.2 2005-08-22 22:29:54 minkis Exp $
+ * $Id: ui_main.c,v 1.3 2005-08-24 04:52:22 minkis Exp $
 */
 /*
 =======================================================================
@@ -3498,7 +3498,11 @@ tryCatAgain:
 
 	// level check (don't allow selection of vehicles that can't spawn on the current level)
 	trap_GetConfigString( CS_SERVERINFO, info, sizeof(info) );
-	levelCats = atoi( Info_ValueForKey( info, "mf_lvcat" ) );
+	/*levelCats = Info_ValueForKey( info, "g_cheats" );
+	if(Info_ValueForKey( info, "g_cheats" ))
+		levelCats = CAT_ANY;
+	else*/
+		levelCats = atoi( Info_ValueForKey( info, "mf_lvcat" ) );
 
 	if( pCat && vehicle >= 0 && (levelCats & (1 << vehicleCat)) || bSelectGI) {
 		// update the text in the dialog for the UI catagory
