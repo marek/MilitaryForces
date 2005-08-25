@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicle.c,v 1.2 2005-08-23 22:20:21 thebjoern Exp $
+ * $Id: cg_vehicle.c,v 1.3 2005-08-25 20:29:27 minkis Exp $
 */
 
 #include "cg_local.h"
@@ -234,7 +234,7 @@ static void CG_CachePlane(int index)
 
 	// only thing that always has to be there is body
 	if( !availableVehicles[index].handle[BP_PLANE_BODY] ) {
-		//trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
+		trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
 	}
 }
 
@@ -293,7 +293,7 @@ static void CG_CacheGroundVehicle(int index)
 
 	// only thing that always has to be there is body
 	if( !availableVehicles[index].handle[BP_GV_BODY] ) {
-		//trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
+		trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
 	}
 }
 
@@ -344,7 +344,7 @@ static void CG_CacheHelo(int index)
 
 	// only thing that always has to be there is body
 	if( !availableVehicles[index].handle[BP_HELO_BODY] ) {
-		//trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
+		trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
 	}
 }
 
@@ -383,7 +383,7 @@ static void CG_CacheLQM(int index)
 
 	// only thing that always has to be there is body
 	if( !availableVehicles[index].handle[BP_LQM_TORSO] ) {
-		//trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s_torso.md3\n", basename) );
+		trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s_torso.md3\n", basename) );
 	}
 
 	// Parse LQM Animations
@@ -453,9 +453,9 @@ static void CG_CacheBoat(int index)
 		}
 		availableVehicles[index].handle[i] = trap_R_RegisterModel(name);
 
-//		if( !availableVehicles[index].handle[i] ) {
-//			CG_Printf( "MFQ3 Warning: Unable to load model '%s'\n", name );
-//		}
+		if( !availableVehicles[index].handle[i] ) {
+			CG_Printf( "MFQ3 Warning: Unable to load model '%s'\n", name );
+		}
 	}
 
 	// only thing that always has to be there is body
@@ -586,7 +586,6 @@ void CG_CacheVehicles()
 	for( i = 0; i < bg_numberOfVehicles; i++ )
 	{
 		if( availableVehicles[i].gameset & cgs.gameset ) {
-			CG_AddRegisterMessage(availableVehicles[i].descriptiveName);
 			CG_LoadingString(availableVehicles[i].descriptiveName);
 			if( availableVehicles[i].cat & CAT_PLANE ) {
 					CG_CachePlane(i);
@@ -612,7 +611,6 @@ void CG_CacheVehicles()
 	for( i = 0; i < bg_numberOfGroundInstallations; i++ ) {
 		if( availableGroundInstallations[i].gameset & cgs.gameset ) {
 			CG_LoadingString(availableGroundInstallations[i].descriptiveName);
-			CG_AddRegisterMessage(availableGroundInstallations[i].descriptiveName);
 			CG_CacheGroundInstallation(i);
 		}
 	}
