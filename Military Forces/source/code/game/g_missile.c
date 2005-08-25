@@ -961,9 +961,9 @@ void fire_antiair (gentity_t *self) {
 		(availableVehicles[self->client->vehicle].cat & CAT_BOAT) ) {
 		VectorCopy( availableVehicles[self->client->vehicle].gunoffset, offset );
 		AngleVectors( self->client->ps.vehicleAngles, forward, right, up );
-		RotatePointAroundVector( temp, up, forward, ((float)self->client->ps.turretAngle)/10 );
+		RotatePointAroundVector( temp, up, forward, self->client->ps.turretAngle );
 		CrossProduct( up, temp, right );
-		RotatePointAroundVector( dir, right, temp, ((float)self->client->ps.gunAngle)/10 );
+		RotatePointAroundVector( dir, right, temp, self->client->ps.gunAngle );
 		wingtip = qtrue; // dont drop
 	} else {
 		self->left = (self->left ? qfalse : qtrue);
@@ -1050,9 +1050,9 @@ void fire_antiground (gentity_t *self) {
 		(availableVehicles[self->client->vehicle].cat & CAT_BOAT) ) {
 		VectorCopy( availableVehicles[self->client->vehicle].gunoffset, offset );
 		AngleVectors( self->client->ps.vehicleAngles, forward, right, up );
-		RotatePointAroundVector( temp, up, forward, ((float)self->client->ps.turretAngle)/10 );
+		RotatePointAroundVector( temp, up, forward, self->client->ps.turretAngle );
 		CrossProduct( up, temp, right );
-		RotatePointAroundVector( dir, right, temp, ((float)self->client->ps.gunAngle)/10 );
+		RotatePointAroundVector( dir, right, temp, self->client->ps.gunAngle );
 		wingtip = qtrue; // dont drop
 	} else {
 		self->left = (self->left ? qfalse : qtrue);
@@ -1258,9 +1258,9 @@ void fire_autocannon (gentity_t *self, qboolean main) {
 //		start[2] += availableVehicles[self->client->vehicle].maxs[2];
 		// otherwise use this
 		AngleVectors( spreadangle, forward, right, up );
-		RotatePointAroundVector( temp, up, forward, ((float)self->client->ps.turretAngle)/10 );
+		RotatePointAroundVector( temp, up, forward, self->client->ps.turretAngle );
 		CrossProduct( up, temp, right );
-		RotatePointAroundVector( dir, right, temp, ((float)self->client->ps.gunAngle)/10 );
+		RotatePointAroundVector( dir, right, temp, self->client->ps.gunAngle );
 
 	} else {
 		// planes and helos for now just shoot along their direction of flight
@@ -1368,9 +1368,9 @@ void fire_maingun( gentity_t *self ) {
 	vec3_t		start, offset;
 
 	AngleVectors( self->client->ps.vehicleAngles, forward, right, up );
-	RotatePointAroundVector( temp, up, forward, ((float)self->client->ps.turretAngle)/10 );
+	RotatePointAroundVector( temp, up, forward, self->client->ps.turretAngle );
 	CrossProduct( up, temp, right );
-	RotatePointAroundVector( dir, right, temp, ((float)self->client->ps.gunAngle)/10 );
+	RotatePointAroundVector( dir, right, temp, self->client->ps.gunAngle );
 
 #pragma message("we NEED access to the guntag in order to properly place the gunshell!!!!!!!!!!!!!")
 	VectorCopy( self->s.pos.trBase, start );
@@ -1713,9 +1713,9 @@ void fire_nukemissile (gentity_t *self) {
 		(availableVehicles[self->client->vehicle].cat & CAT_BOAT) ) {
 		VectorCopy( availableVehicles[self->client->vehicle].gunoffset, offset );
 		AngleVectors( self->client->ps.vehicleAngles, forward, right, up );
-		RotatePointAroundVector( temp, up, forward, ((float)self->client->ps.turretAngle)/10 );
+		RotatePointAroundVector( temp, up, forward, self->client->ps.turretAngle );
 		CrossProduct( up, temp, right );
-		RotatePointAroundVector( dir, right, temp, ((float)self->client->ps.gunAngle)/10 );
+		RotatePointAroundVector( dir, right, temp, self->client->ps.gunAngle );
 		wingtip = qtrue; // dont drop
 	} else {
 		self->left = (self->left ? qfalse : qtrue);

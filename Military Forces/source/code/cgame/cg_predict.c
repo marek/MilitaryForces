@@ -1,5 +1,5 @@
 /*
- * $Id: cg_predict.c,v 1.1 2005-08-22 16:03:13 thebjoern Exp $
+ * $Id: cg_predict.c,v 1.2 2005-08-25 19:49:21 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -238,8 +238,8 @@ static void CG_InterpolatePlayerState( qboolean grabAngles ) {
    
 	if( cg.snap->ps.pm_type == PM_VEHICLE ) {
 		VectorCopy( out->vehicleAngles, cg.predictedPlayerEntity.currentState.angles );
-		cg.predictedPlayerEntity.currentState.angles2[PITCH] = ((float)out->gunAngle)/10;
-		cg.predictedPlayerEntity.currentState.angles2[ROLL] = ((float)out->turretAngle)/10;
+		cg.predictedPlayerEntity.currentState.angles2[PITCH] = out->gunAngle;
+		cg.predictedPlayerEntity.currentState.angles2[ROLL] = out->turretAngle;
     }
 
 }

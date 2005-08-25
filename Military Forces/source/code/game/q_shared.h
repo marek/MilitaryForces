@@ -26,8 +26,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // q_shared.h -- included first by ALL program modules.
 // A user mod should never modify this file
 
-#define	Q3_VERSION		"MF 1.01"
-// 1.32 released 7-10-2002
+#define	Q3_VERSION		"MF 1.01d"
 
 #define MAX_TEAMNAME 32
 
@@ -1274,7 +1273,7 @@ typedef struct playerState_s {
 	vec3_t		origin;
 	vec3_t		velocity;
 	int			tracktarget;
-	int			gunAngle;
+	float		gunAngle;
 	int			speed;
 	int			delta_angles[3];	// add to command angles to get view direction
 									// changed by spawns, rotating objects, and teleporters
@@ -1284,7 +1283,7 @@ typedef struct playerState_s {
 	int			objectives;		// MFQ3 for game objectives like CTF flags
 	int			vehicleAnim;	// set vehicle specific animations
 
-	int			turretAngle;	// MFQ3 used for turret
+	float		turretAngle;	// MFQ3 used for turret
 	int			ONOFF;			// ON/OFF flags
 
 	int			fixed_throttle;	// MFQ3 for throttle settings by increase/decrease

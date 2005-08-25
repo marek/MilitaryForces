@@ -1129,6 +1129,7 @@ netField_t	playerStateFields[] =
 { PSF(vehicleAnim), 16 },	
 { PSF(events[0]), 8 },	
 { PSF(turretAngle), 32 },	
+{ PSF(gunAngle), 32 },	
 { PSF(events[1]), 8 },	
 { PSF(pm_flags), 32 },	
 { PSF(groundEntityNum), GENTITYNUM_BITS },	

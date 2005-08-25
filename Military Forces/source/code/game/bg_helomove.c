@@ -1,5 +1,5 @@
 /*
- * $Id: bg_helomove.c,v 1.1 2005-08-22 16:04:58 thebjoern Exp $
+ * $Id: bg_helomove.c,v 1.2 2005-08-25 19:49:21 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -326,8 +326,8 @@ void PM_HeloMove( void )
 	// Turret stuff
 	vec3_t		forward, up;
 	vec3_t		temp;
-	float		turret_yaw = ((float)pm->ps->turretAngle)/10;
-	float		gun_pitch = ((float)pm->ps->gunAngle)/10;
+	float		turret_yaw = pm->ps->turretAngle;
+	float		gun_pitch = pm->ps->gunAngle;
 	vec3_t		turretdir;
 	float		min, max;
 	float		turnModifier = 1.0f;
@@ -583,8 +583,8 @@ void PM_HeloMove( void )
 
 	// return angles
 	VectorCopy( vehdir, pm->ps->vehicleAngles );
-	pm->ps->turretAngle = (int)(turret_yaw*10);
-	pm->ps->gunAngle = (int)(gun_pitch*10);
+	pm->ps->turretAngle = turret_yaw;
+	pm->ps->gunAngle = gun_pitch;
 
 	// speed
 	if( pm->ps->ONOFF & OO_LANDED ) vehdir[0] = 0;
