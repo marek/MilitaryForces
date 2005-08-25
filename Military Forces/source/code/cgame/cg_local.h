@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.5 2005-08-24 15:13:54 thebjoern Exp $
+ * $Id: cg_local.h,v 1.6 2005-08-25 20:29:27 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -500,8 +500,6 @@ typedef struct {
 
 	// information screen text during loading
 	char		infoScreenText[MAX_STRING_CHARS];
-	char		infoCurrentLoadItemText[MAX_STRING_CHARS];
-	float		infoLoadFraction;
 
 	// scoreboard
 	int			scoresRequestTime;
@@ -1523,8 +1521,6 @@ void CG_ProcessSnapshots( void );
 // cg_info.c
 //
 void CG_LoadingString( const char *s );
-void CG_LoadFraction( float f );
-void CG_LoadItemText( const char *s );
 void CG_DrawInformation( void );
 
 //

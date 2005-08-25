@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.5 2005-08-24 15:13:54 thebjoern Exp $
+ * $Id: cg_main.c,v 1.6 2005-08-25 20:29:27 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -334,173 +334,6 @@ vec4_t HUDColors[HUD_MAX] = {
 							{0.00f, 1.00f, 1.00f, 1.00f},	// HUD_CYAN
 							{1.00f, 0.70f, 0.00f, 1.00f},	// HUD_ORANGE
 							};
-
-
-
-typedef enum
-{
-	RI_TYPE_SOUND,
-	RI_TYPE_SHADER,
-	RI_TYPE_SHADERNOMIP,
-	RI_TYPE_MODEL,
-	RI_TYPE_SKIN,
-	RI_TYPE_FONT,
-} RI_TYPE;
-
-typedef struct
-{
-	sfxHandle_t * h;
-	char sample[512];
-	qboolean compressed;
-} RI_ITEM_SOUND_t;
-typedef struct
-{
-	qhandle_t * h;
-	char name[512];
-} RI_ITEM_MODEL_t;
-typedef struct
-{
-	qhandle_t * h;
-	char name[512];
-} RI_ITEM_SHADER_t;
-typedef struct
-{
-	qhandle_t * h;
-	char name[512];
-} RI_ITEM_SHADERNOMIP_t;
-typedef struct
-{
-	qhandle_t * h;
-	char name[512];
-	int pointSize;
-	fontInfo_t *font;
-}  RI_ITEM_FONT_t;
-typedef struct
-{
-	int numSoundPos;
-	int numModelPos;
-	int numShaderPos;
-	int numShaderNoMipPos;
-	int numFontPos;
-	char s[MAX_STRING_CHARS];
-} RI_ITEM_MSG_t;
-typedef struct
-{
-	int numSound;
-	int numSoundLoaded;
-	int numModel;
-	int numModelLoaded;
-	int numShader;
-	int numShaderLoaded;
-	int numShaderNoMip;
-	int numShaderNoMipLoaded;
-	int numFont;
-	int numFontLoaded;
-	int numMsg;
-	RI_ITEM_FONT_t			Font[100];
-	RI_ITEM_SOUND_t			Sound[500];
-	RI_ITEM_MODEL_t			Model[1000];
-	RI_ITEM_SHADER_t		Shader[1000];
-	RI_ITEM_SHADERNOMIP_t	ShaderNoMip[1000];
-	RI_ITEM_MSG_t			Msg[500];
-} RI_RegisteredItems_t;
-
-RI_RegisteredItems_t RegisteredItems;
-void CG_AddRegisterMessage(const char * s)
-{
-	RegisteredItems.Msg[RegisteredItems.numMsg].numModelPos = RegisteredItems.numModel;
-	RegisteredItems.Msg[RegisteredItems.numMsg].numFontPos = RegisteredItems.numFont;
-	RegisteredItems.Msg[RegisteredItems.numMsg].numShaderNoMipPos = RegisteredItems.numShaderNoMip;
-	RegisteredItems.Msg[RegisteredItems.numMsg].numShaderPos = RegisteredItems.numShader;
-	RegisteredItems.Msg[RegisteredItems.numMsg].numSoundPos = RegisteredItems.numSound;
-	Q_strncpyz( RegisteredItems.Msg[RegisteredItems.numMsg].s, s, sizeof( RegisteredItems.Msg[RegisteredItems.numMsg].s ) );
-	RegisteredItems.numMsg++;
-}
-
-void CG_UpdateRegisterMessage(int t)
-{
-	int i;
-	qboolean found = qfalse;
-	for(i = 0; i < (sizeof(RegisteredItems.Msg)/sizeof(RegisteredItems.Msg[0])); i++)
-	{
-		switch(t)
-		{
-			case RI_TYPE_FONT:
-				if(RegisteredItems.numFontLoaded == RegisteredItems.Msg[i].numFontPos)
-					found = qtrue;
-				break;
-			case RI_TYPE_SOUND:
-				if(RegisteredItems.numSoundLoaded == RegisteredItems.Msg[i].numSoundPos)
-					found = qtrue;
-				break;
-			case RI_TYPE_MODEL:
-				if(RegisteredItems.numModelLoaded == RegisteredItems.Msg[i].numModelPos)
-					found = qtrue;
-				break;
-			case RI_TYPE_SHADER:
-				if(RegisteredItems.numShaderLoaded == RegisteredItems.Msg[i].numShaderPos)
-					found = qtrue;
-				break;
-			case RI_TYPE_SHADERNOMIP:
-				if(RegisteredItems.numShaderNoMipLoaded == RegisteredItems.Msg[i].numShaderNoMipPos)
-					found = qtrue;
-				break;
-			case RI_TYPE_SKIN:
-				if(RegisteredItems.numFontLoaded == RegisteredItems.Msg[i].numFontPos)
-					found = qtrue;
-				break;
-		}
-
-		if(found)
-		{
-			CG_LoadingString(RegisteredItems.Msg[i].s);
-			break;
-		}
-	}
-}
-
-void CG_UpdateLoadFraction()
-{
-	int TotalItems = RegisteredItems.numFont + RegisteredItems.numModel + RegisteredItems.numShader + RegisteredItems.numShaderNoMip + RegisteredItems.numSound;
-	int TotalLoaded =  RegisteredItems.numFontLoaded + RegisteredItems.numModelLoaded + RegisteredItems.numShaderLoaded + RegisteredItems.numShaderNoMipLoaded + RegisteredItems.numSoundLoaded;
-	CG_LoadFraction((float)TotalLoaded/TotalItems);
-}
-void CG_LoadRegisteredItems()
-{
-	int i;
-	for(i = 0; i < RegisteredItems.numSound; i++)
-	{
-		*RegisteredItems.Sound[i].h = trap_S_RegisterSound(RegisteredItems.Sound[i].sample, RegisteredItems.Sound[i].compressed);
-		RegisteredItems.numSoundLoaded++;
-		CG_UpdateLoadFraction();
-		CG_LoadItemText(va("Sound: %s", RegisteredItems.Sound[i].sample));
-		CG_UpdateRegisterMessage(RI_TYPE_SOUND);
-	}
-	for(i = 0; i < RegisteredItems.numModel; i++)
-	{
-		*RegisteredItems.Model[i].h = trap_R_RegisterModel(RegisteredItems.Model[i].name);
-		RegisteredItems.numModelLoaded++;
-		CG_UpdateLoadFraction();
-		CG_LoadItemText(va("Model: %s", RegisteredItems.Model[i].name));
-		CG_UpdateRegisterMessage(RI_TYPE_MODEL);
-	}
-	for(i = 0; i < RegisteredItems.numShader; i++)
-	{
-		*RegisteredItems.Shader[i].h = trap_R_RegisterShader(RegisteredItems.Shader[i].name);
-		RegisteredItems.numShaderLoaded++;
-		CG_UpdateLoadFraction();
-		CG_LoadItemText(va("Shader: %s", RegisteredItems.Shader[i].name));
-		CG_UpdateRegisterMessage(RI_TYPE_SHADER);
-	}
-	for(i = 0; i < RegisteredItems.numShaderNoMip; i++)
-	{
-		*RegisteredItems.ShaderNoMip[i].h = trap_R_RegisterShaderNoMip(RegisteredItems.ShaderNoMip[i].name);
-		RegisteredItems.numShaderNoMipLoaded++;
-		CG_UpdateLoadFraction();
-		CG_LoadItemText(va("Shader (no mip): %s", RegisteredItems.ShaderNoMip[i].name));
-		CG_UpdateRegisterMessage(RI_TYPE_SHADERNOMIP);
-	}
-}
 
 /*
 =================
@@ -2172,7 +2005,6 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	memset( cg_loadouts, 0, sizeof(cg_loadouts) );
 	memset( cg_weapons, 0, sizeof(cg_weapons) );
 	memset( cg_items, 0, sizeof(cg_items) );
-	memset( &RegisteredItems, 0, sizeof(RegisteredItems));
 
 	cg.clientNum = clientNum;
 	
@@ -2273,7 +2105,6 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	CG_RegisterSounds();
 	CG_RegisterGraphics();
 	CG_RegisterWeapons();
-	CG_LoadRegisteredItems();
 
 	CG_LoadingString( "clients" );
 
