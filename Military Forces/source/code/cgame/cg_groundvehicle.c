@@ -1,5 +1,5 @@
 /*
- * $Id: cg_groundvehicle.c,v 1.1 2005-08-22 16:02:16 thebjoern Exp $
+ * $Id: cg_groundvehicle.c,v 1.2 2005-08-25 19:49:21 thebjoern Exp $
 */
 
 
@@ -133,9 +133,9 @@ void CG_GroundVehicle( centity_t *cent, clientInfo_t *ci )
 
 /*
 		AngleVectors( self->client->ps.vehicleAngles, forward, right, up );
-		RotatePointAroundVector( temp, up, forward, ((float)self->client->ps.turretAngle)/10 );
+		RotatePointAroundVector( temp, up, forward, self->client->ps.turretAngle );
 		CrossProduct( up, temp, right );
-		RotatePointAroundVector( dir, right, temp, ((float)self->client->ps.gunAngle)/10 );
+		RotatePointAroundVector( dir, right, temp, self->client->ps.gunAngle );
 */
 
 	// CTF

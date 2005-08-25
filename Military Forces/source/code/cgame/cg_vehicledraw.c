@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicledraw.c,v 1.1 2005-08-22 16:03:38 thebjoern Exp $
+ * $Id: cg_vehicledraw.c,v 1.2 2005-08-25 19:49:21 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -197,10 +197,13 @@ void CG_DrawPlane(DrawInfo_Plane_t* drawInfo)
 				trap_R_AddRefEntityToScene( &engine );
 			}
 		}
-		if( (i == BP_PLANE_WINGLEFT || i == BP_PLANE_WINGRIGHT) &&
-			(veh->caps & HC_SWINGWING) ) {
-			RotateAroundYaw( part[BP_PLANE_WINGLEFT].axis, drawInfo->swingAngle );
-			RotateAroundYaw( part[BP_PLANE_WINGRIGHT].axis, -drawInfo->swingAngle );
+		if( (veh->caps & HC_SWINGWING) && 
+			(i == BP_PLANE_WINGLEFT || i == BP_PLANE_WINGRIGHT)  ) {
+			//Com_Printf( "Swingwing: %f\n", drawInfo->swingAngle );
+			if( i == BP_PLANE_WINGLEFT ) 
+				RotateAroundYaw( part[BP_PLANE_WINGLEFT].axis, drawInfo->swingAngle );
+			else if( i == BP_PLANE_WINGRIGHT )
+				RotateAroundYaw( part[BP_PLANE_WINGRIGHT].axis, -drawInfo->swingAngle );
 		}
 		CG_PositionRotatedEntityOnTag( &part[i], &part[BP_PLANE_BODY], veh->handle[BP_PLANE_BODY], plane_tags[i] );
 		part[i].shadowPlane = shadowPlane;

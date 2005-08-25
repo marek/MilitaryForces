@@ -1,5 +1,5 @@
 /*
- * $Id: g_mfq3util.c,v 1.2 2005-08-23 06:27:20 minkis Exp $
+ * $Id: g_mfq3util.c,v 1.3 2005-08-25 19:49:21 thebjoern Exp $
 */
 
 
@@ -87,9 +87,9 @@ void updateTargetTracking( gentity_t *ent )
 		(availableVehicles[ent->client->vehicle].cat & CAT_BOAT)) {
 		vec3_t	right, up, temp;
 		AngleVectors( ent->client->ps.vehicleAngles, forward, right, up );
-		RotatePointAroundVector( temp, up, forward, ((float)ent->client->ps.turretAngle)/10 );
+		RotatePointAroundVector( temp, up, forward, ent->client->ps.turretAngle );
 		CrossProduct( up, temp, right );
-		RotatePointAroundVector( dir, right, temp, ((float)ent->client->ps.gunAngle)/10 );
+		RotatePointAroundVector( dir, right, temp, ent->client->ps.gunAngle );
 		VectorCopy( dir, forward );
 	} else {
 		VectorCopy( ent->s.angles, dir );

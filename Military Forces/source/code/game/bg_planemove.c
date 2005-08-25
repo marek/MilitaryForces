@@ -1,5 +1,5 @@
 /*
- * $Id: bg_planemove.c,v 1.1 2005-08-22 16:05:22 thebjoern Exp $
+ * $Id: bg_planemove.c,v 1.2 2005-08-25 19:49:21 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -329,9 +329,9 @@ void PM_PlaneMove( void )
 		float maxangle = availableVehicles[pm->vehicle].swingangle;
 		if( speed >= min ) {
 			if( speed < max ) {
-				pm->ps->gunAngle = ((speed - min) * (maxangle / diff))*10;
+				pm->ps->gunAngle = (speed - min) * (maxangle / diff);
 			} else {
-				pm->ps->gunAngle = maxangle*10;
+				pm->ps->gunAngle = maxangle;
 			}
 		}
 	}
@@ -609,9 +609,9 @@ void PM_PlaneMoveAdvanced( void )
 		float maxangle = availableVehicles[pm->vehicle].swingangle;
 		if( speed >= min ) {
 			if( speed < max ) {
-				pm->ps->gunAngle = ((speed - min) * (maxangle / diff))*10;
+				pm->ps->gunAngle = (speed - min) * (maxangle / diff);
 			} else {
-				pm->ps->gunAngle = maxangle*10;
+				pm->ps->gunAngle = maxangle;
 			}
 		}
 	}
