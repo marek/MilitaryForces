@@ -1437,9 +1437,9 @@ void MSG_ReadDeltaPlayerstate (msg_t *msg, playerState_t *from, playerState_t *t
 			}
 		}
 
-		// parse powerups
+		// parse timers
 		if ( MSG_ReadBits( msg, 1 ) ) {
-			LOG("PS_POWERUPS");
+			LOG("PS_TIMERS");
 			bits = MSG_ReadShort (msg);
 			for (i=0 ; i<16 ; i++) {
 				if (bits & (1<<i) ) {

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_loadouts.c,v 1.1 2005-08-22 16:05:04 thebjoern Exp $
+ * $Id: bg_loadouts.c,v 1.2 2005-08-26 21:46:35 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -125,12 +125,13 @@ weapon mount info
 void MF_getDefaultLoadoutForVehicle( int idx, completeLoadout_t* loadout )
 {
 //	char where[10];
-	if( idx < 0 ) return;
-#ifdef QAGAME
+	if( idx < 0 ) 
+		return;
+//#ifdef QAGAME
 //	strcpy( where, "server" );
-#else
+//#else
 //	strcpy( where, "client" );
-#endif
+//#endif
 //	Com_Printf("Getting default loadout for %s (%s)\n", availableVehicles[idx].descriptiveName, where );
 	memcpy( loadout, &availableLoadouts[idx], sizeof(completeLoadout_t) );
 }

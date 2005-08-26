@@ -1,5 +1,5 @@
 /*
- * $Id: g_utils.c,v 1.1 2005-08-22 16:07:29 thebjoern Exp $
+ * $Id: g_utils.c,v 1.2 2005-08-26 21:46:35 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -557,13 +557,15 @@ void G_SendEventFromQueue( gentity_t* ent ) {
 	int i = ent->currentEventToSend;
 
 	// nothing to be done
-	if( !ent->eventQueue[i].used ) return;
+	if( !ent->eventQueue[i].used ) 
+		return;
 
 	G_AddEvent( ent, ent->eventQueue[i].event, ent->eventQueue[i].eventParm, qfalse );
 	ent->eventQueue[i].used = qfalse;
 
 	i++;
-	if( i >= MAX_EVENT_QUEUE_SIZE ) i = 0;
+	if( i >= MAX_EVENT_QUEUE_SIZE ) 
+		i = 0;
 	ent->currentEventToSend = i;
 }
 

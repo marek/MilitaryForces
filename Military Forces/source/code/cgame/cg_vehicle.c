@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicle.c,v 1.3 2005-08-25 20:29:27 minkis Exp $
+ * $Id: cg_vehicle.c,v 1.4 2005-08-26 21:46:35 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -823,7 +823,8 @@ CG_VehicleLoadout
 void CG_VehicleLoadout( centity_t* cent ) {
 	int idx = -1;
 
-	if( cent->currentState.eType == ET_VEHICLE ) {
+	if( cent->currentState.eType == ET_VEHICLE ) 
+	{
 	    clientInfo_t	*ci;
 		int				clientNum;
 	    clientNum = cent->currentState.clientNum;
@@ -832,9 +833,12 @@ void CG_VehicleLoadout( centity_t* cent ) {
 		}
 		ci = &cgs.clientinfo[ clientNum ];
 		idx = ci->vehicle;
-	} else if( cent->currentState.eType == ET_MISC_VEHICLE ) {
+	} 
+	else if( cent->currentState.eType == ET_MISC_VEHICLE ) {
 		idx = cent->currentState.modelindex;
-	} else return;
+	} 
+	else 
+		return;
 
 	MF_getDefaultLoadoutForVehicle( idx, &cg_loadouts[cent->currentState.number] );
 }
@@ -855,7 +859,7 @@ void CG_AddToVehicleLoadout( centity_t* cent, int weaponIndex ) {
 		int				clientNum;
 	    clientNum = cent->currentState.clientNum;
 		if ( clientNum < 0 || clientNum >= MAX_CLIENTS ) {
-			trap_Error( "Bad clientNum on player entity (CG_VehicleLoadout)");
+			trap_Error( "Bad clientNum on player entity (CG_AddToVehicleLoadout)");
 		}
 		ci = &cgs.clientinfo[ clientNum ];
 		idx = ci->vehicle;
