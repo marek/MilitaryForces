@@ -390,7 +390,7 @@ void Com_ParseCommandLine( char *commandLine ) {
 Com_SafeMode
 
 Check for "safe" on the command line, which will
-skip loading of q3config.cfg
+skip loading of mfconfig.cfg
 ===================
 */
 qboolean Com_SafeMode( void ) {
@@ -2357,8 +2357,8 @@ void Com_Init( char *commandLine ) {
 		Sys_Error ("Error during initialization");
 	}
 
-  // bk001129 - do this before anything else decides to push events
-  Com_InitPushEvent();
+	// bk001129 - do this before anything else decides to push events
+	Com_InitPushEvent();
 
 	Com_InitSmallZoneMemory();
 	Cvar_Init ();
@@ -2388,9 +2388,9 @@ void Com_Init( char *commandLine ) {
 
 	Cbuf_AddText ("exec default.cfg\n");
 
-	// skip the q3config.cfg if "safe" is on the command line
+	// skip the mfconfig.cfg if "safe" is on the command line
 	if ( !Com_SafeMode() ) {
-		Cbuf_AddText ("exec q3config.cfg\n");
+		Cbuf_AddText ("exec mfconfig.cfg\n");
 	}
 
 	Cbuf_AddText ("exec autoexec.cfg\n");
@@ -2489,8 +2489,8 @@ void Com_Init( char *commandLine ) {
 		}
 	}
 
-	// start in full screen ui mode
-	Cvar_Set("r_uiFullScreen", "1");
+	// start in windowed ui mode
+	Cvar_Set("r_uiFullScreen", "0");
 
 	CL_StartHunkUsers();
 
@@ -2541,7 +2541,7 @@ void Com_WriteConfiguration( void ) {
 	}
 	cvar_modifiedFlags &= ~CVAR_ARCHIVE;
 
-	Com_WriteConfigToFile( "q3config.cfg" );
+	Com_WriteConfigToFile( "mfconfig.cfg" );
 
 	// bk001119 - tentative "not needed for dedicated"
 #ifndef DEDICATED

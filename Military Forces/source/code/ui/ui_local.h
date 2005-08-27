@@ -1,5 +1,5 @@
 /*
- * $Id: ui_local.h,v 1.1 2005-08-22 16:15:38 thebjoern Exp $
+ * $Id: ui_local.h,v 1.2 2005-08-27 16:33:41 thebjoern Exp $
 */
 //
 #ifndef __UI_LOCAL_H__
@@ -80,7 +80,7 @@ extern vmCvar_t	ui_captureLimit;
 extern vmCvar_t	ui_fragLimit;
 extern vmCvar_t	ui_gameType;
 extern vmCvar_t	ui_netGameType;
-extern vmCvar_t	ui_netGameset;
+//extern vmCvar_t	ui_netGameset;
 extern vmCvar_t	ui_actualNetGameType;
 extern vmCvar_t	ui_joinGameType;
 extern vmCvar_t	ui_netSource;
