@@ -1,5 +1,5 @@
 /*
- * $Id: mf_client.c,v 1.3 2005-08-25 20:29:27 minkis Exp $
+ * $Id: mf_client.c,v 1.4 2005-08-27 00:27:51 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -367,9 +367,9 @@ void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 	// vehicles only stuff
 	if( vehIndex >= 0 && vehIndex < bg_numberOfVehicles ) {
 		// distribute the weapons
-		MF_getDefaultLoadoutForVehicle( vehIndex, &ent->loadout );
+		MF_getDefaultLoadoutForVehicle( vehIndex, &ent->loadout, &ent->client->ps );
 		//	G_AddEvent( ent, EV_GET_DEFAULT_LOADOUT, 0 );
-		ent->loadoutUpdated = qfalse;
+		//ent->loadoutUpdated = qfalse;
 
 		Info_SetValueForKey( userinfo, "cg_vehicle", va( "%d", vehIndex ) );
 		trap_SetUserinfo( index, userinfo );

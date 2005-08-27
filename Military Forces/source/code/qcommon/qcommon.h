@@ -219,7 +219,7 @@ PROTOCOL
 ==============================================================
 */
 
-#define	PROTOCOL_VERSION	02
+#define	PROTOCOL_VERSION	03
 // 1.31 - 67
 
 // maintain a list of compatible protocols for demo playing

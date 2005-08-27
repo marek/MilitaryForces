@@ -1,5 +1,5 @@
 /*
- * $Id: cg_lqm.c,v 1.1 2005-08-22 16:02:36 thebjoern Exp $
+ * $Id: cg_lqm.c,v 1.2 2005-08-27 00:27:51 thebjoern Exp $
 */
 
 
@@ -100,7 +100,7 @@ void CG_LQM( centity_t *cent, clientInfo_t *ci )
 	drawInfo.basicInfo.throttle = cent->currentState.frame;
 
 	// loadout
-	drawInfo.basicInfo.loadout = &cg_loadouts[cent->currentState.number];
+	drawInfo.basicInfo.usedLoadout = 0;//&cg_loadouts[cent->currentState.number];
 
 	// muzzleflash
 	if( cg.time - cent->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {

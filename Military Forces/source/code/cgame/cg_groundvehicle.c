@@ -1,5 +1,5 @@
 /*
- * $Id: cg_groundvehicle.c,v 1.2 2005-08-25 19:49:21 thebjoern Exp $
+ * $Id: cg_groundvehicle.c,v 1.3 2005-08-27 00:27:51 thebjoern Exp $
 */
 
 
@@ -91,7 +91,7 @@ void CG_GroundVehicle( centity_t *cent, clientInfo_t *ci )
 //    CG_PlayerSprites( cent );
     
 	// loadout
-	drawInfo.basicInfo.loadout = &cg_loadouts[cent->currentState.number];
+	drawInfo.basicInfo.usedLoadout = 0;//&cg_loadouts[cent->currentState.number];
 
 	// turret/gun angle
 	drawInfo.gunAngle = cent->currentState.angles2[PITCH];

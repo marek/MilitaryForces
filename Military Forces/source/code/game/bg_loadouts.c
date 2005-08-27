@@ -1,5 +1,5 @@
 /*
- * $Id: bg_loadouts.c,v 1.2 2005-08-26 21:46:35 thebjoern Exp $
+ * $Id: bg_loadouts.c,v 1.3 2005-08-27 00:27:51 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -122,9 +122,11 @@ weapon mount info
 =================
 */
 
-void MF_getDefaultLoadoutForVehicle( int idx, completeLoadout_t* loadout )
+void MF_getDefaultLoadoutForVehicle( int idx, completeLoadout_t* loadout, playerState_t* ps )
 {
 //	char where[10];
+	int i;
+
 	if( idx < 0 ) 
 		return;
 //#ifdef QAGAME
@@ -134,6 +136,8 @@ void MF_getDefaultLoadoutForVehicle( int idx, completeLoadout_t* loadout )
 //#endif
 //	Com_Printf("Getting default loadout for %s (%s)\n", availableVehicles[idx].descriptiveName, where );
 	memcpy( loadout, &availableLoadouts[idx], sizeof(completeLoadout_t) );
+	for( i = 0; i < 32; ++i )
+		ps->numWeaponsOnMount[i] = loadout->mounts[i].num;
 }
 
 
@@ -145,26 +149,31 @@ firing
 =================
 */
 
-qboolean MF_removeWeaponFromLoadout( int weaponIndex, completeLoadout_t* loadout, qboolean* wingtip, 
-									vec3_t pos, int launchPos )
+qboolean MF_removeWeaponFromLoadout( int weaponIndex, completeLoadout_t* loadout, playerState_t* ps, 
+									 qboolean* wingtip, vec3_t pos, int launchPos )
 {
 	int i;
 
-	for( i = 0; i < loadout->usedMounts; ++i ) {
+	for( i = 0; i < loadout->usedMounts; ++i ) 
+	{
 		if( loadout->mounts[i].weapon == weaponIndex &&
-			loadout->mounts[i].num ) {
+			loadout->mounts[i].num ) 
+		{
 			if( launchPos ) {
 				launchPos--;
 				continue;
 			}
-			if( !(availableWeapons[loadout->mounts[i].weapon].fitsPylon & PF_DONT_REMOVE) ) {
+			if( !(availableWeapons[loadout->mounts[i].weapon].fitsPylon & PF_DONT_REMOVE) ) 
+			{
 				loadout->mounts[i].num--;
+				ps->numWeaponsOnMount[i]--;// for now keep them both in parallel
 			}
-			if( wingtip ) {
+			if( wingtip ) 
 				*wingtip = (loadout->mounts[i].flags & PF_DONT_DROP);
-			}
-			if( pos ) VectorCopy( loadout->mounts[i].tag.origin, pos );
-			return qtrue;
+			if( pos ) 
+				VectorCopy( loadout->mounts[i].tag.origin, pos );
+			return 
+				qtrue;
 		}
 	}
 
@@ -184,12 +193,15 @@ int MF_addWeaponToLoadout( int weaponIndex, completeLoadout_t* loadout )
 {
 	int i, added = 0;
 
-	if( availableWeapons[weaponIndex].fitsPylon & PF_DONT_REMOVE ) return added;
+	if( availableWeapons[weaponIndex].fitsPylon & PF_DONT_REMOVE ) 
+		return added;
 
-	for( i = 0; i < loadout->usedMounts; ++i ) {
+	for( i = 0; i < loadout->usedMounts; ++i ) 
+	{
 		if( loadout->mounts[i].weapon == weaponIndex &&
 			!loadout->mounts[i].num &&
-			!(availableWeapons[loadout->mounts[i].weapon].fitsPylon & PF_DONT_REMOVE) ) {
+			!(availableWeapons[loadout->mounts[i].weapon].fitsPylon & PF_DONT_REMOVE) ) 
+		{
 			loadout->mounts[i].num++;
 			added++;
 		}

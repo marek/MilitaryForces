@@ -967,7 +967,7 @@ void fire_antiair (gentity_t *self) {
 		wingtip = qtrue; // dont drop
 	} else {
 		self->left = (self->left ? qfalse : qtrue);
-		MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, &wingtip, offset, 0 );
+		MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, &self->client->ps, &wingtip, offset, 0 );
 		AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
 		VectorInverse( right );
 	}
@@ -1056,7 +1056,7 @@ void fire_antiground (gentity_t *self) {
 		wingtip = qtrue; // dont drop
 	} else {
 		self->left = (self->left ? qfalse : qtrue);
-		MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, 0, offset, 0 );
+		MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, &self->client->ps, 0, offset, 0 );
 		AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
 		VectorInverse( right );
 	}
@@ -1142,7 +1142,7 @@ void fire_ffar (gentity_t *self) {
 	if( self->left >= availableVehicles[self->client->vehicle].ammo[self->client->ps.weaponNum] ) {
 		self->left = 0;
 	}
-	MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, 0, offset, self->left );
+	MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, &self->client->ps, 0, offset, self->left );
 	AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
 	VectorInverse( right );
 	VectorMA( start, offset[0], dir, start );
@@ -1187,7 +1187,7 @@ void fire_ironbomb (gentity_t *self) {
 	vec3_t		start;
 
 //	self->left = (self->left ? qfalse : qtrue);
-	MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, 0, offset, 0 );
+	MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, &self->client->ps, 0, offset, 0 );
 	AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
 	VectorInverse( right );
 	VectorCopy( self->s.pos.trBase, start );
@@ -1548,7 +1548,7 @@ void drop_fueltank (gentity_t *self) {
 	vec3_t		start;
 
 //	self->left = (self->left ? qfalse : qtrue);
-	MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, 0, offset, 0 );
+	MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, &self->client->ps, 0, offset, 0 );
 	AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
 	VectorInverse( right );
 	VectorCopy( self->s.pos.trBase, start );
@@ -1607,7 +1607,7 @@ void drop_crate (gentity_t *self) {
 	gentity_t	*bolt;
 	vec3_t		start;
 
-	MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, 0, 0, 0 );
+	MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, &self->client->ps, 0, 0, 0 );
 
 	VectorCopy( self->s.pos.trBase, start );
 	//start[2] -= availableVehicles[self->client->vehicle].maxs[2] - availableVehicles[self->client->vehicle].mins[2];
@@ -1659,7 +1659,7 @@ void fire_nukebomb (gentity_t *self) {
 	vec3_t		start;
 
 //	self->left = (self->left ? qfalse : qtrue);
-	MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, 0, offset, 0 );
+	MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, &self->client->ps, 0, offset, 0 );
 	AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
 	VectorInverse( right );
 	VectorCopy( self->s.pos.trBase, start );
@@ -1719,7 +1719,7 @@ void fire_nukemissile (gentity_t *self) {
 		wingtip = qtrue; // dont drop
 	} else {
 		self->left = (self->left ? qfalse : qtrue);
-		MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, 0, offset, 0 );
+		MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, &self->client->ps, 0, offset, 0 );
 		AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
 		VectorInverse( right );
 	}
@@ -1860,7 +1860,7 @@ void fire_flak_GI (gentity_t *self) {
 	start[2] = self->tracktarget->r.currentOrigin[2] + (FLAK_DEVIATION_HEIGHT - (FLAK_DEVIATION_HEIGHT * -1) + 1) * Q_random( &seed ) + (FLAK_DEVIATION_HEIGHT * -1);
 
 	// Remove one weapon to fire
-	MF_removeWeaponFromLoadout(self->s.weaponIndex, &self->loadout, &wingtip, offset, 0 );
+	MF_removeWeaponFromLoadout(self->s.weaponIndex, &self->loadout, &self->client->ps, &wingtip, offset, 0 );
 	
 
 
