@@ -1,5 +1,5 @@
 /*
- * $Id: cg_plane.c,v 1.1 2005-08-22 16:03:07 thebjoern Exp $
+ * $Id: cg_plane.c,v 1.2 2005-08-27 00:27:51 thebjoern Exp $
 */
 
 
@@ -70,6 +70,7 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 	vec3_t			smokePosition, forward;
 	DrawInfo_Plane_t drawInfo;
 	int				ONOFF = cent->currentState.ONOFF;
+	int				i;
 
 	memset( &drawInfo, 0, sizeof(drawInfo) );
 	drawInfo.basicInfo.vehicleIndex = ci->vehicle;
@@ -155,29 +156,40 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 	} 
 
 	// body
-	if( cent->currentState.frame <= 10 ) {
+	if( cent->currentState.frame <= 10 ) 
+	{
 		drawInfo.bodyFrame = 0;
-	} else {
+	} 
+	else 
+	{
 		drawInfo.bodyFrame = ( cent->currentState.frame > 12 ? 2 : 1 );
 	}
 
 	// swingwings
-	if( availableVehicles[ci->vehicle].caps & HC_SWINGWING ) {
+	if( availableVehicles[ci->vehicle].caps & HC_SWINGWING ) 
+	{
 		drawInfo.swingAngle = cent->currentState.angles2[PITCH];
 	}
 
 	// loadout
-	drawInfo.basicInfo.loadout = &cg_loadouts[cent->currentState.number];
+	drawInfo.basicInfo.usedLoadout = &availableLoadouts[drawInfo.basicInfo.vehicleIndex];
+	for( i = 0; i < drawInfo.basicInfo.usedLoadout->usedMounts; ++i ) 
+	{
+		if( drawInfo.basicInfo.usedLoadout->mounts[i].weapon ) 
+			drawInfo.basicInfo.numWeaponsOnMount[i] = cg.snap->ps.numWeaponsOnMount[i];
+	}
 
 	// smoke
-	if( cent->currentState.generic1 ) {
+	if( cent->currentState.generic1 ) 
+	{
 		AngleVectors( cent->lerpAngles, forward, NULL, NULL );
 		VectorMA( cent->lerpOrigin, availableVehicles[ci->vehicle].mins[0], forward, smokePosition );
 		CG_Generic_Smoke( cent, smokePosition, 10 );
 	}
 
 	// muzzleflash
-	if( cg.time - cent->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {
+	if( cg.time - cent->muzzleFlashTime <= MUZZLE_FLASH_TIME ) 
+	{
 		drawInfo.basicInfo.drawMuzzleFlash = qtrue;
 		drawInfo.basicInfo.flashWeaponIndex = cent->muzzleFlashWeapon;
 	}

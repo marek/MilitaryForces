@@ -26,7 +26,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // q_shared.h -- included first by ALL program modules.
 // A user mod should never modify this file
 
-#define	Q3_VERSION		"MF 1.01e"
+#define	Q3_VERSION		"MF 1.01f"
 
 #define MAX_TEAMNAME 32
 
@@ -1321,6 +1321,11 @@ typedef struct playerState_s {
 	int			generic1;
 	int			loopSound;
 	int			jumppad_ent;	// jumppad entity hit this frame
+
+	// mfq3 weapons/vwep
+	int			numWeaponsOnMount[32];	// number of weapons actually on this mount; note: each of these are just 5 bit numbers (ie 32)
+										// 32 = MAX_MOUNTS_PER_VEHICLE 
+										// shouldnt be hardcoded like this, but want to get new system to work first
 
 	// not communicated over the net at all
 	int			ping;			// server to game info for scoreboard

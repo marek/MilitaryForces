@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.4 2005-08-26 21:46:35 thebjoern Exp $
+ * $Id: bg_public.h,v 1.5 2005-08-27 00:27:51 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"v0.79e"
+#define	GAME_VERSION		"v0.79f"
 #define	GAME_IDENTIFIER		"mfgame"			// use to identify mfq3 servers
 
 #define	DEFAULT_GRAVITY		800
@@ -803,7 +803,7 @@ typedef struct completeLoadout_s
 {
 	mountInfo_t	mounts[MAX_MOUNTS_PER_VEHICLE];
 	int			usedMounts;
-	animation_t		animations[MAX_TOTALANIMATIONS];
+	animation_t	animations[MAX_TOTALANIMATIONS];
 } completeLoadout_t;
 
 
@@ -1104,9 +1104,9 @@ int MF_ExtractEnumFromId( int vehicle, unsigned int op );
 qboolean MF_findTag(const char* fileName, const char* tagname, md3Tag_t* tag);
 qboolean MF_distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout );
 void MF_calculateAllDefaultLoadouts();
-void MF_getDefaultLoadoutForVehicle( int idx, completeLoadout_t* loadout );
-qboolean MF_removeWeaponFromLoadout( int weaponIndex, completeLoadout_t* loadout, qboolean* wingtip, 
-									vec3_t pos, int launchPos );
+void MF_getDefaultLoadoutForVehicle( int idx, completeLoadout_t* loadout, playerState_t* ps );
+qboolean MF_removeWeaponFromLoadout( int weaponIndex, completeLoadout_t* loadout, playerState_t* ps,
+									 qboolean* wingtip, vec3_t pos, int launchPos );
 int MF_addWeaponToLoadout( int weaponIndex, completeLoadout_t* loadout );
 qboolean MF_getNumberOfFrames(const char* fileName, int* number);
 qboolean MF_getNumberOfTags(const char* fileName, int* number);

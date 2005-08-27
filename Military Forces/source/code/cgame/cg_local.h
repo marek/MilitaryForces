@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.6 2005-08-25 20:29:27 minkis Exp $
+ * $Id: cg_local.h,v 1.7 2005-08-27 00:27:51 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -923,7 +923,8 @@ typedef struct {
 	vec3_t				origin;
 	vec3_t				angles;
 	int					ONOFF;
-	completeLoadout_t*	loadout;
+	completeLoadout_t*	usedLoadout;
+	int					numWeaponsOnMount[32];
 	int					throttle;
 	int					entityNum;
 	int					flashWeaponIndex;
@@ -1362,8 +1363,8 @@ void CG_RegisterVehicle( clientInfo_t *ci );
 void CG_VehicleObituary( entityState_t *ent );
 void CG_VehicleMuzzleFlash( int weaponIdx, const refEntity_t *parent, qhandle_t parentModel, int idx );
 void CG_Misc_Vehicle( centity_t *cent );
-void CG_VehicleLoadout( centity_t* cent );
-void CG_AddToVehicleLoadout( centity_t* cent, int weaponIndex );
+//void CG_VehicleLoadout( centity_t* cent );
+//void CG_AddToVehicleLoadout( centity_t* cent, int weaponIndex );
 void CG_InitShadows( void );
 
 

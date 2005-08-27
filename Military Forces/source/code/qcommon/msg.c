@@ -866,8 +866,8 @@ void MSG_WriteDeltaEntity( msg_t *msg, struct entityState_s *from, struct entity
 
 	numFields = sizeof(entityStateFields)/sizeof(entityStateFields[0]);
 
-	// all fields should be 32 bits to avoid any compiler packing issues
-	// the "number" field is not part of the field list
+	// all fields should be 32 bits to avoid any compiler packing issues,
+	// the "number" field is not part of the field list (hence the "+ 1"),
 	// if this assert fails, someone added a field to the entityState_t
 	// struct without updating the message fields
 	assert( numFields + 1 == sizeof( *from )/4 );
@@ -1076,6 +1076,7 @@ void MSG_ReadDeltaEntity( msg_t *msg, entityState_t *from, entityState_t *to,
 		*toF = *fromF;
 	}
 
+	// print ?
 	if ( print ) {
 		if ( msg->bit == 0 ) {
 			endBit = msg->readcount * 8 - GENTITYNUM_BITS;
@@ -1175,6 +1176,7 @@ void MSG_WriteDeltaPlayerstate( msg_t *msg, struct playerState_s *from, struct p
 	int				persistantbits;
 	int				ammobits;
 	int				timerbits;
+	long			vwepBits;
 	int				numFields;
 	int				c;
 	netField_t		*field;
@@ -1266,10 +1268,17 @@ void MSG_WriteDeltaPlayerstate( msg_t *msg, struct playerState_s *from, struct p
 			timerbits |= 1<<i;
 		}
 	}
+	// check vwep changes
+	vwepBits = 0;
+	for (i=0 ; i<32 ; i++) {
+		if (to->numWeaponsOnMount[i] != from->numWeaponsOnMount[i]) {
+			vwepBits |= 1<<i;
+		}
+	}
 
-	if (!statsbits && !persistantbits && !ammobits && !timerbits) {
+	if (!statsbits && !persistantbits && !ammobits && !timerbits && !vwepBits) {
 		MSG_WriteBits( msg, 0, 1 );	// no change
-		oldsize += 4;
+		oldsize += 5;// 4 ?
 		return;
 	}
 	MSG_WriteBits( msg, 1, 1 );	// changed
@@ -1316,6 +1325,17 @@ void MSG_WriteDeltaPlayerstate( msg_t *msg, struct playerState_s *from, struct p
 	} else {
 		MSG_WriteBits( msg, 0, 1 );	// no change
 	}
+
+	// numWeaponsOnMount array
+	if ( vwepBits ) {
+		MSG_WriteBits( msg, 1, 1 );	// changed
+		MSG_WriteLong( msg, vwepBits );
+		for (i=0 ; i<32 ; i++)
+			if (vwepBits & (1<<i) )
+				MSG_WriteBits (msg, to->numWeaponsOnMount[i], 6);
+	} else {
+		MSG_WriteBits( msg, 0, 1 );	// no change
+	}
 }
 
 
@@ -1334,6 +1354,7 @@ void MSG_ReadDeltaPlayerstate (msg_t *msg, playerState_t *from, playerState_t *t
 	int			*fromF, *toF;
 	int			trunc;
 	playerState_t	dummy;
+	long		vwepBits;
 
 	if ( !from ) {
 		from = &dummy;
@@ -1447,6 +1468,18 @@ void MSG_ReadDeltaPlayerstate (msg_t *msg, playerState_t *from, playerState_t *t
 				}
 			}
 		}
+
+		// parse vwep array
+		if ( MSG_ReadBits( msg, 1 ) ) {
+			LOG("PS_VWEP");
+			vwepBits = MSG_ReadLong (msg);
+			for (i=0 ; i<32 ; i++) {
+				if (vwepBits & (1<<i) ) {
+					to->numWeaponsOnMount[i] = MSG_ReadBits(msg, 6);
+				}
+			}
+		}
+
 	}
 
 	if ( print ) {

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_boat.c,v 1.1 2005-08-22 16:01:39 thebjoern Exp $
+ * $Id: cg_boat.c,v 1.2 2005-08-27 00:27:51 thebjoern Exp $
 */
 
 
@@ -56,7 +56,7 @@ void CG_Boat( centity_t *cent, clientInfo_t *ci )
 //    CG_PlayerSprites( cent );
     
 	// loadout
-	drawInfo.basicInfo.loadout = &cg_loadouts[cent->currentState.number];
+	drawInfo.basicInfo.usedLoadout = 0;//&cg_loadouts[cent->currentState.number];
 
     //
     // turrets

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_helo.c,v 1.1 2005-08-22 16:02:25 thebjoern Exp $
+ * $Id: cg_helo.c,v 1.2 2005-08-27 00:27:51 thebjoern Exp $
 */
 
 
@@ -142,7 +142,7 @@ void CG_Helo( centity_t *cent, clientInfo_t *ci )
 	drawInfo.basicInfo.throttle = cent->currentState.frame;
 
 	// loadout
-	drawInfo.basicInfo.loadout = &cg_loadouts[cent->currentState.number];
+	drawInfo.basicInfo.usedLoadout = 0;//&cg_loadouts[cent->currentState.number];
 
     // turrets
 	for( i = 0; i < 4; ++i ) {

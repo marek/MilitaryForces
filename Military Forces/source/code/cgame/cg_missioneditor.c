@@ -1,5 +1,5 @@
 /*
- * $Id: cg_missioneditor.c,v 1.1 2005-08-22 16:03:04 thebjoern Exp $
+ * $Id: cg_missioneditor.c,v 1.2 2005-08-27 00:27:51 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -742,7 +742,7 @@ void ME_DrawVehicle( IGME_vehicle_t* veh )
 				AnglesToAxis( veh->angles, drawInfo.basicInfo.axis );
 				drawInfo.basicInfo.vehicleIndex = veh->vehidx;
 				drawInfo.basicInfo.entityNum = -1;
-				drawInfo.basicInfo.loadout = &availableLoadouts[veh->vehidx];
+				drawInfo.basicInfo.usedLoadout = &availableLoadouts[veh->vehidx];
 				CG_DrawPlane(&drawInfo);	
 			}
 			break;
@@ -755,7 +755,7 @@ void ME_DrawVehicle( IGME_vehicle_t* veh )
 				AnglesToAxis( veh->angles, drawInfo.basicInfo.axis );
 				drawInfo.basicInfo.vehicleIndex = veh->vehidx;
 				drawInfo.basicInfo.entityNum = -1;
-				drawInfo.basicInfo.loadout = &availableLoadouts[veh->vehidx];
+				drawInfo.basicInfo.usedLoadout = &availableLoadouts[veh->vehidx];
 				CG_DrawGV(&drawInfo);	
 			}
 			break;
@@ -768,7 +768,7 @@ void ME_DrawVehicle( IGME_vehicle_t* veh )
 				AnglesToAxis( veh->angles, drawInfo.basicInfo.axis );
 				drawInfo.basicInfo.vehicleIndex = veh->vehidx;
 				drawInfo.basicInfo.entityNum = -1;
-				drawInfo.basicInfo.loadout = &availableLoadouts[veh->vehidx];
+				drawInfo.basicInfo.usedLoadout = &availableLoadouts[veh->vehidx];
 				CG_DrawBoat(&drawInfo);
 			}
 			break;

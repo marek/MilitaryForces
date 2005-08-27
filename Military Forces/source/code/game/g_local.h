@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.1 2005-08-22 16:06:38 thebjoern Exp $
+ * $Id: g_local.h,v 1.2 2005-08-27 00:27:51 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -163,7 +163,7 @@ struct gentity_s {
 	gitem_t		*item;			// for bonus items
 
 	// MFQ3
- int ONOFF;			// to remember status after leaving vehicle
+	int			 ONOFF;			// to remember status after leaving vehicle
 	int			 left;			// for projectiles
 	int			 bulletpos;		// for dual guns (or more)
 	float		 gearheight;	
@@ -186,7 +186,7 @@ struct gentity_s {
 	qboolean	 updateGear;
 	qboolean	 updateBay;
 	completeLoadout_t loadout;
-	qboolean	 loadoutUpdated;
+	//qboolean	 loadoutUpdated;
 	qboolean	 eventSent;
 	int			 currentEventToSend;
 	int			 currentEventToAdd;

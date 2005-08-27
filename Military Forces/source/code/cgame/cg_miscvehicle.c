@@ -1,5 +1,5 @@
 /*
- * $Id: cg_miscvehicle.c,v 1.1 2005-08-22 16:02:50 thebjoern Exp $
+ * $Id: cg_miscvehicle.c,v 1.2 2005-08-27 00:27:51 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -117,7 +117,7 @@ static void CG_Misc_Plane( centity_t *cent )
 	}
 
 	// loadout
-	drawInfo.basicInfo.loadout = &cg_loadouts[cent->currentState.number];
+	drawInfo.basicInfo.usedLoadout = 0;//&cg_loadouts[cent->currentState.number];
 
 	// smoke
 	if( cent->currentState.generic1 ) {
@@ -199,7 +199,7 @@ static void CG_Misc_GV( centity_t *cent )
 //    CG_PlayerSprites( cent );
     
 	// loadout
-	drawInfo.basicInfo.loadout = &cg_loadouts[cent->currentState.number];
+	drawInfo.basicInfo.usedLoadout = 0;//&cg_loadouts[cent->currentState.number];
 
 	// turret/gun angle
 	drawInfo.gunAngle = cent->currentState.angles2[PITCH];
@@ -290,7 +290,7 @@ static void CG_Misc_Helo( centity_t *cent )
 	VectorCopy( cent->lerpAngles, drawInfo.basicInfo.angles );
    
 	// loadout
-	drawInfo.basicInfo.loadout = &cg_loadouts[cent->currentState.number];
+	drawInfo.basicInfo.usedLoadout = 0;//&cg_loadouts[cent->currentState.number];
 
 	// turret/gun angle
 	for(i = 0; i < 4; i++)
@@ -373,7 +373,7 @@ static void CG_Misc_Boat( centity_t *cent )
 	VectorCopy( cent->lerpAngles, drawInfo.basicInfo.angles );
    
 	// loadout
-	drawInfo.basicInfo.loadout = &cg_loadouts[cent->currentState.number];
+	drawInfo.basicInfo.usedLoadout = 0;//&cg_loadouts[cent->currentState.number];
 
 	// turret/gun angle
 	for(i = 0; i < 4; i++)
