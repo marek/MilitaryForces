@@ -1,5 +1,5 @@
 /*
- * $Id: bg_misc.c,v 1.2 2005-08-25 19:49:21 thebjoern Exp $
+ * $Id: bg_misc.c,v 1.3 2005-08-27 09:45:38 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -570,9 +570,6 @@ char *eventnames[] = {
 	"EV_BAY_UP_FULL",
 	"EV_BAY_DOWN_FULL",
 	"EV_BAY_STOP",
-
-	"EV_GET_DEFAULT_LOADOUT",
-	"EV_ADD_WEAPON_TO_LOADOUT",
 
 	"EV_NUKE",
 	"EV_FLAK",

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.1 2005-08-22 16:05:10 thebjoern Exp $
+ * $Id: bg_mfq3util.c,v 1.2 2005-08-27 09:45:38 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -367,12 +367,13 @@ void MF_LoadAllVehicleData()
 	// MFQ3 loadouts
 	MF_calculateAllDefaultLoadouts();
 
-	for( i = 0; i < bg_numberOfVehicles; ++i ) {
+	for( i = 0; i < bg_numberOfVehicles; ++i ) 
+	{
 		// remove weapons not fitting
-		for( j = WP_WEAPON1; j < WP_FLARE; ++j ) {
-			if( !(availableVehicles[i].cat & availableWeapons[availableVehicles[i].weapons[j]].fitsCategory) ) {
+		for( j = WP_WEAPON1; j < WP_FLARE; ++j ) 
+		{
+			if( !(availableVehicles[i].cat & availableWeapons[availableVehicles[i].weapons[j]].fitsCategory) )
 				availableVehicles[i].ammo[j] = 0;
-			}
 		}
 		modelbasename = MF_CreateModelPathname( i, "models/vehicles/%s/%s/%s" );	
 		// boundingbox
@@ -381,20 +382,20 @@ void MF_LoadAllVehicleData()
 		availableVehicles[i].mins[2] += 1;// to look better ?
 
 		// helo/plane specific
-		if(availableVehicles[i].cat & CAT_PLANE) {
-
+		if(availableVehicles[i].cat & CAT_PLANE) 
+		{
 			// Find gear tag offset from  min
 			MF_findTag(name, "tag_gear", &tag);
 			diff = tag.origin[2] - availableVehicles[i].mins[2];
 			if(diff < 0) diff = 0;
-
 
 			// gear
 			Com_sprintf( name, sizeof(name), "%s_gear.md3", modelbasename );
 
 			trap_FS_FOpenFile(name, &f, FS_READ);
 
-			if(f &&  MF_getNumberOfFrames( name, &num ) ) {
+			if(f &&  MF_getNumberOfFrames( name, &num ) ) 
+			{
 				vec3_t min1, min2;
 
 				trap_FS_FCloseFile(f);
@@ -403,41 +404,38 @@ void MF_LoadAllVehicleData()
 				
 				if(!availableVehicles[i].gearheight)
 				{
-
-				if( MF_getDimensions( name, 0, 0, &min1 ) &&
-					MF_getDimensions( name, num-1, 0, &min2 ) ) {
-					availableVehicles[i].gearheight = min1[2] - min2[2] - 1.5;// for coll. detection
-					if( availableVehicles[i].gearheight < 0 ) availableVehicles[i].gearheight = 0;
-				}
-				
+					if( MF_getDimensions( name, 0, 0, &min1 ) &&
+						MF_getDimensions( name, num-1, 0, &min2 ) ) 
+					{
+						availableVehicles[i].gearheight = min1[2] - min2[2] - 1.5;// for coll. detection
+						if( availableVehicles[i].gearheight < 0 ) 
+							availableVehicles[i].gearheight = 0;
+					}
 				}
 				/*
-				
 				MF_findTag(name, "tag_gear", &tag);
 				MF_getDimensions(name, num-1, &max,&min);
 				availableVehicles[i].gearheight = (tag.origin[2] - min[2]) - diff;
 				if( availableVehicles[i].gearheight < 0 ) availableVehicles[i].gearheight = 0;
-
-				
 				*/
 
 				// Don't bother setting the gearheight, its too fucken bugged.
-
-			} else {
+			} 
+			else 
 				availableVehicles[i].maxGearFrame = GEAR_DOWN_DEFAULT;
-			}
 
 			// bay
 			Com_sprintf( name, sizeof(name), "%s_bay.md3", modelbasename );
 
 			trap_FS_FOpenFile(name, &f, FS_READ);
 
-			if(f && MF_getNumberOfFrames( name, &num ) ) {
+			if(f && MF_getNumberOfFrames( name, &num ) ) 
+			{
 				trap_FS_FCloseFile(f);
 				availableVehicles[i].maxBayFrame = num - 1;
-			} else {
-				availableVehicles[i].maxBayFrame = BAY_DOWN_DEFAULT;
 			}
+			else 
+				availableVehicles[i].maxBayFrame = BAY_DOWN_DEFAULT;
 
 			// correct actual loadouts
 			for( j = WP_WEAPON1; j < WP_FLARE; ++j ) {

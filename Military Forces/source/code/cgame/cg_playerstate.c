@@ -1,5 +1,5 @@
 /*
- * $Id: cg_playerstate.c,v 1.1 2005-08-22 16:03:11 thebjoern Exp $
+ * $Id: cg_playerstate.c,v 1.2 2005-08-27 09:45:38 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -124,9 +124,6 @@ void CG_Respawn( void ) {
 
 	// select the weapon the server says we are using
 	cg.weaponSelect = cg.snap->ps.weaponNum;
-
-//	CG_VehicleLoadout(&cg_entities[cg.snap->ps.clientNum]);
-
 }
 
 extern char *eventnames[];

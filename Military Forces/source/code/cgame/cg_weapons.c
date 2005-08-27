@@ -1,5 +1,5 @@
 /*
- * $Id: cg_weapons.c,v 1.4 2005-08-27 00:27:51 thebjoern Exp $
+ * $Id: cg_weapons.c,v 1.5 2005-08-27 09:45:38 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -668,12 +668,6 @@ void CG_FireWeapon( centity_t *cent ) {
 	if ( ent->weaponIndex == WI_NONE ) {
 		return;
 	}
-
-	//if( availableWeapons[ent->weaponIndex].type == WT_FUELTANK ) {
-	//	while( MF_findWeaponsOfType(ent->weaponIndex, &cg_loadouts[ent->number]) )
-	//		MF_removeWeaponFromLoadout(ent->weaponIndex, &cg_loadouts[ent->number], 0, 0, 0 );
-	//	return;
-	//}
 
 	if( availableWeapons[ent->weaponIndex].type == WT_MACHINEGUN ) {
 		CG_FireMachinegun(cent, qtrue);

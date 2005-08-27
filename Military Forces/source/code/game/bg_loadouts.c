@@ -1,5 +1,5 @@
 /*
- * $Id: bg_loadouts.c,v 1.3 2005-08-27 00:27:51 thebjoern Exp $
+ * $Id: bg_loadouts.c,v 1.4 2005-08-27 09:45:38 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -189,7 +189,7 @@ reloading - all of that type
 =================
 */
 
-int MF_addWeaponToLoadout( int weaponIndex, completeLoadout_t* loadout )
+int MF_addWeaponToLoadout( int weaponIndex, completeLoadout_t* loadout, playerState_t* ps )
 {
 	int i, added = 0;
 
@@ -203,6 +203,7 @@ int MF_addWeaponToLoadout( int weaponIndex, completeLoadout_t* loadout )
 			!(availableWeapons[loadout->mounts[i].weapon].fitsPylon & PF_DONT_REMOVE) ) 
 		{
 			loadout->mounts[i].num++;
+			ps->numWeaponsOnMount[i]++;
 			added++;
 		}
 	}
