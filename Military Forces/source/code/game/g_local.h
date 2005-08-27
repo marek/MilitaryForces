@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.2 2005-08-27 00:27:51 thebjoern Exp $
+ * $Id: g_local.h,v 1.3 2005-08-27 09:45:38 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -186,7 +186,6 @@ struct gentity_s {
 	qboolean	 updateGear;
 	qboolean	 updateBay;
 	completeLoadout_t loadout;
-	//qboolean	 loadoutUpdated;
 	qboolean	 eventSent;
 	int			 currentEventToSend;
 	int			 currentEventToAdd;

@@ -1,5 +1,5 @@
 /*
- * $Id: g_active.c,v 1.2 2005-08-27 00:27:51 thebjoern Exp $
+ * $Id: g_active.c,v 1.3 2005-08-27 09:45:38 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -729,11 +729,6 @@ void ClientThink_real( gentity_t *ent ) {
 	if ( !ClientInactivityTimer( client ) ) {
 		return;
 	}
-
-	//if( !ent->loadoutUpdated ) {
-	//	G_AddEvent( ent, EV_GET_DEFAULT_LOADOUT, 0, qtrue );
-	//	ent->loadoutUpdated = qtrue;
-	//}
 
 	// clear the rewards if time
 	if ( level.time > client->rewardTime ) {

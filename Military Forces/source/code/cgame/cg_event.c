@@ -1,5 +1,5 @@
 /*
- * $Id: cg_event.c,v 1.2 2005-08-27 00:27:51 thebjoern Exp $
+ * $Id: cg_event.c,v 1.3 2005-08-27 09:45:38 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -277,15 +277,6 @@ void CG_EntityEvent( centity_t *cent, vec3_t position )
 		break;
 
 	// MFQ3 events
-	case EV_GET_DEFAULT_LOADOUT:
-		//CG_VehicleLoadout( cent );
-		DEBUGNAME("EV_GET_DEFAULT_LOADOUT");
-		break;
-
-	case EV_ADD_WEAPON_TO_LOADOUT:
-		//CG_AddToVehicleLoadout( cent, es->eventParm );
-		DEBUGNAME("EV_ADD_WEAPON_TO_LOADOUT");
-		break;
 
 	case EV_VEHICLE_HIT:
 		DEBUGNAME("EV_VEHICLE_HIT");

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.5 2005-08-27 00:27:51 thebjoern Exp $
+ * $Id: bg_public.h,v 1.6 2005-08-27 09:45:38 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"v0.79f"
+#define	GAME_VERSION		"v0.79g"
 #define	GAME_IDENTIFIER		"mfgame"			// use to identify mfq3 servers
 
 #define	DEFAULT_GRAVITY		800
@@ -334,9 +334,6 @@ typedef enum {
 	EV_BAY_UP_FULL,			// close fully
 	EV_BAY_DOWN_FULL,		// open fully
 	EV_BAY_STOP,			// stop bay anim as it is
-
-	EV_GET_DEFAULT_LOADOUT,	// weapon loadout
-	EV_ADD_WEAPON_TO_LOADOUT,// weapon loadout
 
 	EV_NUKE,
 
@@ -1107,7 +1104,7 @@ void MF_calculateAllDefaultLoadouts();
 void MF_getDefaultLoadoutForVehicle( int idx, completeLoadout_t* loadout, playerState_t* ps );
 qboolean MF_removeWeaponFromLoadout( int weaponIndex, completeLoadout_t* loadout, playerState_t* ps,
 									 qboolean* wingtip, vec3_t pos, int launchPos );
-int MF_addWeaponToLoadout( int weaponIndex, completeLoadout_t* loadout );
+int MF_addWeaponToLoadout( int weaponIndex, completeLoadout_t* loadout, playerState_t* ps );
 qboolean MF_getNumberOfFrames(const char* fileName, int* number);
 qboolean MF_getNumberOfTags(const char* fileName, int* number);
 int MF_getTagsContaining(const char* fileName, const char* str, md3Tag_t* tags, int num);
