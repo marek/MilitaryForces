@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.3 2005-08-24 04:52:22 minkis Exp $
+ * $Id: ui_main.c,v 1.4 2005-08-27 16:33:41 thebjoern Exp $
 */
 /*
 =======================================================================
@@ -1108,12 +1108,12 @@ static void UI_DrawNetGameType(rectDef_t *rect, float scale, vec4_t color, int t
   Text_Paint(rect->x, rect->y, scale, color, uiInfo.gameTypes[ui_netGameType.integer].gameType , 0, 0, textStyle);
 }
 
-static void UI_DrawNetGameset(rectDef_t *rect, float scale, vec4_t color, int textStyle) {
-	if (ui_netGameset.integer < 0 || ui_netGameset.integer > numGamesets) {
-		trap_Cvar_Set("ui_netGameset", "0");
-	}
-  Text_Paint(rect->x, rect->y, scale, color, gameset_items[ui_netGameset.integer] , 0, 0, textStyle);
-}
+//static void UI_DrawNetGameset(rectDef_t *rect, float scale, vec4_t color, int textStyle) {
+//	if (ui_netGameset.integer < 0 || ui_netGameset.integer > numGamesets) {
+//		trap_Cvar_Set("ui_netGameset", "0");
+//	}
+//  Text_Paint(rect->x, rect->y, scale, color, gameset_items[ui_netGameset.integer] , 0, 0, textStyle);
+//}
 
 static void UI_DrawJoinGameType(rectDef_t *rect, float scale, vec4_t color, int textStyle) {
 	if (ui_joinGameType.integer < 0 || ui_joinGameType.integer > uiInfo.numJoinGameTypes) {
@@ -2184,7 +2184,7 @@ static void UI_OwnerDraw(float x, float y, float w, float h, float text_x, float
       UI_DrawNetGameType(&rect, scale, color, textStyle);
       break;
     case UI_NETGAMESET:
-      UI_DrawNetGameset(&rect, scale, color, textStyle);
+      //UI_DrawNetGameset(&rect, scale, color, textStyle);
       break;
     case UI_JOINGAMETYPE:
 	  UI_DrawJoinGameType(&rect, scale, color, textStyle);
@@ -2567,39 +2567,39 @@ static qboolean UI_NetGameType_HandleKey(int flags, float *special, int key) {
   return qfalse;
 }
 
-static qboolean UI_NetGameset_HandleKey(int flags, float *special, int key)
-{
-	// valid action?
-	if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_ENTER || key == K_KP_ENTER)
-	{
-		// cycle up/down through values
-		if (key == K_MOUSE2)
-		{
-			ui_netGameset.integer--;
-		}
-		else
-		{
-			ui_netGameset.integer++;
-		}
-
-		// wrap (both ends)
-		if( ui_netGameset.integer < 0 )
-		{
-			ui_netGameset.integer = numGamesets - 1;
-		}
-		else if (ui_netGameset.integer >= numGamesets )
-		{
-			ui_netGameset.integer = 0;
-		} 
-
-		// re-set the value into cvar
-		trap_Cvar_Set( "ui_netGameset", va("%d", ui_netGameset.integer));
-
-		return qtrue;
-	}
-
-	return qfalse;
-}
+//static qboolean UI_NetGameset_HandleKey(int flags, float *special, int key)
+//{
+//	// valid action?
+//	if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_ENTER || key == K_KP_ENTER)
+//	{
+//		// cycle up/down through values
+//		if (key == K_MOUSE2)
+//		{
+//			ui_netGameset.integer--;
+//		}
+//		else
+//		{
+//			ui_netGameset.integer++;
+//		}
+//
+//		// wrap (both ends)
+//		if( ui_netGameset.integer < 0 )
+//		{
+//			ui_netGameset.integer = numGamesets - 1;
+//		}
+//		else if (ui_netGameset.integer >= numGamesets )
+//		{
+//			ui_netGameset.integer = 0;
+//		} 
+//
+//		// re-set the value into cvar
+//		trap_Cvar_Set( "ui_netGameset", va("%d", ui_netGameset.integer));
+//
+//		return qtrue;
+//	}
+//
+//	return qfalse;
+//}
 
 static qboolean UI_JoinGameType_HandleKey(int flags, float *special, int key) {
 	if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_ENTER || key == K_KP_ENTER) {
@@ -2889,7 +2889,7 @@ static qboolean UI_OwnerDrawHandleKey(int ownerDraw, int flags, float *special, 
       return UI_NetGameType_HandleKey(flags, special, key);
       break;
     case UI_NETGAMESET:
-      return UI_NetGameset_HandleKey(flags, special, key);
+      //return UI_NetGameset_HandleKey(flags, special, key);
       break;
     case UI_JOINGAMETYPE:
       return UI_JoinGameType_HandleKey(flags, special, key);
@@ -3946,10 +3946,9 @@ static void UI_RunMenuScript(char **args) {
 			if (ui_netGameType.integer >= 0 && ui_netGameType.integer < uiInfo.numGameTypes) {
 				trap_Cmd_ExecuteText( EXEC_APPEND, va("callvote g_gametype %i\n",uiInfo.gameTypes[ui_netGameType.integer].gtEnum) );
 			}
-		} else if (Q_stricmp(name, "voteSet") == 0) {
-			if (ui_netGameset.integer >= 0 && ui_netGameset.integer < numGamesets) {
-				trap_Cmd_ExecuteText( EXEC_APPEND, va("callvote mf_gameset %s\n",gameset_codes[ui_netGameset.integer]) );
-			}
+		//} else if (Q_stricmp(name, "voteSet") == 0) {	// TEMP DISABLED FOR NOW
+//			if (ui_netGameset.integer >= 0 && ui_netGameset.integer < numGamesets) 
+				//trap_Cmd_ExecuteText( EXEC_APPEND, va("callvote mf_gameset %s\n",gameset_codes[ui_netGameset.integer]) );
 		} else if (Q_stricmp(name, "voteLeader") == 0) {
 			if (uiInfo.teamIndex >= 0 && uiInfo.teamIndex < uiInfo.myTeamCount) {
 				trap_Cmd_ExecuteText( EXEC_APPEND, va("callteamvote leader %s\n",uiInfo.teamNames[uiInfo.teamIndex]) );
@@ -6524,7 +6523,7 @@ vmCvar_t	ui_teamName;
 vmCvar_t	ui_dedicated;
 vmCvar_t	ui_gameType;
 vmCvar_t	ui_netGameType;
-vmCvar_t	ui_netGameset;
+//vmCvar_t	ui_netGameset;
 vmCvar_t	ui_actualNetGameType;
 vmCvar_t	ui_joinGameType;
 vmCvar_t	ui_netSource;
@@ -6571,7 +6570,7 @@ vmCvar_t	ui_realWarmUp;
 vmCvar_t	ui_serverStatusTimeOut;
 
 // MFQ3
-vmCvar_t	ui_gameset;			// UI copy of the gameset var (not sure were going to need this - MM)
+//vmCvar_t	ui_gameset;			// UI copy of the gameset var (not sure were going to need this - MM)
 
 // (vehicle select dialog)
 vmCvar_t	ui_vehicleCat;			// vehicle catagory value
@@ -6629,7 +6628,7 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_marks, "cg_marks", "1", CVAR_ARCHIVE },
 
 	// MFQ3
-	{ &ui_gameset, "ui_gameset", "modern", CVAR_ARCHIVE | CVAR_ROM },
+//	{ &ui_gameset, "ui_gameset", "modern", CVAR_ARCHIVE | CVAR_ROM },
 
 	// (vehicle select dialog)
 	{ &ui_vehicleCat, "ui_vehicleCat", "1", CVAR_ARCHIVE | CVAR_ROM },
@@ -6672,11 +6671,11 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_redteam, "ui_redteam", "Pagans", CVAR_ARCHIVE },
 	{ &ui_blueteam, "ui_blueteam", "Stroggs", CVAR_ARCHIVE },
 	{ &ui_dedicated, "ui_dedicated", "0", CVAR_ARCHIVE },
-	{ &ui_gameType, "ui_gametype", "3", CVAR_ARCHIVE },
+	{ &ui_gameType, "ui_gametype", "0", CVAR_ARCHIVE },
 	{ &ui_joinGameType, "ui_joinGametype", "0", CVAR_ARCHIVE },
-	{ &ui_netGameType, "ui_netGametype", "3", CVAR_ARCHIVE },
-	{ &ui_netGameset, "ui_netGameset", "0", CVAR_ARCHIVE },
-	{ &ui_actualNetGameType, "ui_actualNetGametype", "3", CVAR_ARCHIVE },
+	{ &ui_netGameType, "ui_netGametype", "0", CVAR_ARCHIVE },
+//	{ &ui_netGameset, "ui_netGameset", "0", CVAR_ARCHIVE },
+	{ &ui_actualNetGameType, "ui_actualNetGametype", "0", CVAR_ARCHIVE },
 	{ &ui_redteam1, "ui_redteam1", "0", CVAR_ARCHIVE },
 	{ &ui_redteam2, "ui_redteam2", "0", CVAR_ARCHIVE },
 	{ &ui_redteam3, "ui_redteam3", "0", CVAR_ARCHIVE },
