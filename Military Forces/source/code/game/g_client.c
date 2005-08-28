@@ -1,5 +1,5 @@
 /*
- * $Id: g_client.c,v 1.1 2005-08-22 16:06:19 thebjoern Exp $
+ * $Id: g_client.c,v 1.2 2005-08-28 04:54:08 minkis Exp $
 */
 
 //null cvs upload test, comment placed for a difference.
@@ -604,7 +604,7 @@ void ClientUserinfoChanged( int clientNum ) {
 	}
 	
 	// For changing vehicle
-	if(client->ps.pm_flags & PMF_RECHARGING) {
+	if((client->ps.pm_flags & PMF_RECHARGING) && (client->ps.objectives != OB_REDFLAG) && (client->ps.objectives != OB_BLUEFLAG)) {
 		nextVehicle = atoi( Info_ValueForKey( userinfo, "cg_nextVehicle" ) );	
 		if(nextVehicle != client->nextVehicle) {
 			client->ps.pm_flags &= ~PMF_VEHICLESELECT;

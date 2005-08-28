@@ -1,5 +1,5 @@
 /*
- * $Id: mf_client.c,v 1.5 2005-08-27 09:45:38 thebjoern Exp $
+ * $Id: mf_client.c,v 1.6 2005-08-28 04:54:08 minkis Exp $
 */
 
 #include "g_local.h"
@@ -194,10 +194,7 @@ void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 	int		vehIndex;
 	int		savedNext;
 	int		handicap;
-//	int		hasNuke = 0;
-//	int		newLoadoutForced = 0;
 	int		cc = 0;
-//	int		dd = 0;
 
 	index = ent - g_entities;
 	client = ent->client;
@@ -292,6 +289,7 @@ void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 		endpos[2] -= 512;
 		trap_Trace (&trace, spawn_origin, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_WATER );
 		if((cs_flags & CS_LASTPOS) && trace.entityNum != ENTITYNUM_NONE ) { // Check for water if respawning in current location
+			client->ps.pm_flags &= ~PMF_VEHICLESPAWN;
 			return;							// Fuck that! dont do shit ;p
 		}
 	}
@@ -382,7 +380,7 @@ void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 			gentity_t *test;
 			VectorCopy( spawn_origin, endpos );
 			endpos[2] -= 128;
-			trap_Trace (&trace, spawn_origin, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_ALL );
+			trap_Trace (&trace, spawn_origin, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_SOLID );
 			if( trace.entityNum != ENTITYNUM_NONE ) {
 				test = &g_entities[trace.entityNum];
 				if( canLandOnIt(test) ) {
