@@ -1,5 +1,5 @@
 /*
- * $Id: cg_weapons.c,v 1.5 2005-08-27 09:45:38 thebjoern Exp $
+ * $Id: cg_weapons.c,v 1.6 2005-08-29 04:16:09 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -164,10 +164,12 @@ static void CG_MissileTrail2( centity_t * cent, const weaponInfo_t *wi ) {
 	if(cent->TimeSinceLastTrail <= cg.time - 100)
 	{
 
-		// If the trail seems a bit to old, give it a starting origin
+		// If the trail seems a bit to old, give it a starting origin, and skip this round
 		if(cent->TimeSinceLastTrail <= cg.time - 200)
 		{
-			VectorCopy(cent->lerpOrigin, start); 
+			cent->TimeSinceLastTrail = cg.time;
+			VectorCopy(cent->lerpOrigin, cent->lastDrawnTrailPos);
+			return;
 		}
 	
 		le = CG_AllocLocalEntity();
@@ -181,13 +183,13 @@ static void CG_MissileTrail2( centity_t * cent, const weaponInfo_t *wi ) {
 		le->lifeRate = 1.0 / (le->endTime - le->startTime);
  
 		re->shaderTime = cg.time / 1000.0f;
-		re->reType = RT_LIGHTNING; //RT_RAIL_CORE; //RT_BEAM; // RT_RAIL_CORE;
+		re->reType = RT_LIGHTNING;
 		re->customShader = cgs.media.railCoreShader;
 	//	re->customShader = cgs.media.missileTrail2Shader;
 
 		VectorCopy(start, re->origin);
 		VectorCopy(start, le->pos.trBase);
-	//	VectorCopy(end, le->pos.trDelta);
+		VectorClear(le->pos.trDelta);
 		VectorCopy(end, re->oldorigin);
 
 		re->shaderRGBA[0] = 0.3f;
@@ -200,9 +202,6 @@ static void CG_MissileTrail2( centity_t * cent, const weaponInfo_t *wi ) {
 		le->color[2] = 1.0f;
 		le->color[3] = 1.0f;
 
-		AxisClear( re->axis );
-
-	
 		// Update last time & Pos
 		cent->TimeSinceLastTrail = cg.time;
 		VectorCopy(cent->lerpOrigin, cent->lastDrawnTrailPos);
@@ -320,7 +319,7 @@ void CG_RegisterWeapons() {
 
 
 			// FFAR trail with no dynamic lighting
-			weaponInfo->missileTrailFunc = CG_MissileTrail;
+			weaponInfo->missileTrailFunc = CG_MissileTrail2;
 			weaponInfo->missileDlight = 0;
 			
 			MAKERGB( weaponInfo->missileDlightColor, 1, 0.75f, 0 );
