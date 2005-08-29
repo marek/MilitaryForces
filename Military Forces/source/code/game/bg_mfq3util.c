@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.2 2005-08-27 09:45:38 thebjoern Exp $
+ * $Id: bg_mfq3util.c,v 1.3 2005-08-29 01:35:45 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -72,7 +72,8 @@ int MF_getIndexOfVehicleEx( int start,
 							int cat,
 							int cls,
 						    int vehicleType,
-						    int change_vehicle)
+						    int change_vehicle,
+							qboolean allowNukes)
 {
 
 	// NOTE: vehicleClass & vehicleCat are int enum indexed, convert to flag enums
@@ -91,7 +92,7 @@ int MF_getIndexOfVehicleEx( int start,
 		cls = 1 << cls;		// (convert from int enum to flag enum)
 	}
 
-	return MF_getIndexOfVehicle( start, gameset, team, cat, cls, vehicleType, change_vehicle );
+	return MF_getIndexOfVehicle( start, gameset, team, cat, cls, vehicleType, change_vehicle, allowNukes );
 }
 
 /*
@@ -105,9 +106,10 @@ int MF_getIndexOfVehicle( int start,			// where to start in list
 						  int cat,
 						  int cls, 
 						  int vehicleType,
-						  int change_vehicle)
+						  int change_vehicle,
+						  qboolean allowNukes)
 {
-    int				i;
+    int				i,j;
 	int				vehicle_pt = -1;
 	qboolean		done = qfalse;
 
@@ -146,19 +148,32 @@ int MF_getIndexOfVehicle( int start,			// where to start in list
 		if( !(availableVehicles[i].cat & cat) ) continue;					// wrong category
 		if( !(availableVehicles[i].cls & cls) ) continue;					// wrong class
 		
+		if(!allowNukes)
+		{
+			qboolean nukes = qfalse;
+			for(j = 0; j < MAX_WEAPONS_PER_VEHICLE; j++)
+			{
+				if( availableWeapons[availableVehicles[i].weapons[j]].type == WT_NUKEBOMB || 
+					availableWeapons[availableVehicles[i].weapons[j]].type == WT_NUKEMISSILE )
+				{
+						vehicle_pt != -1;
+						nukes = qtrue;
+				}
+			}
+			if(nukes) continue;
+		} 
+
 		if(vehicleType != -1 && change_vehicle == 1 && strcmp(availableVehicles[i].tinyName, availableVehicles[vehicleType].tinyName) == 0)
 		{
 			//If its good mark known position just in case its the only good one
 			vehicle_pt = i;
 			continue;	// change vehicle
 		}
-		else if(change_vehicle == 2 && vehicleType != -1)
+		else if(change_vehicle == 2 && vehicleType != -1 && strcmp(availableVehicles[i].tinyName, availableVehicles[vehicleType].tinyName) != 0)
 		{
-			if(strcmp(availableVehicles[i].tinyName, availableVehicles[vehicleType].tinyName) != 0)
-			{
-				continue;						// make sure its the same
-			}
+			continue;						// make sure its the same
 		}
+
 		return i;
     }
 

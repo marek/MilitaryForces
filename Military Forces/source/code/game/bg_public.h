@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.8 2005-08-27 16:33:41 thebjoern Exp $
+ * $Id: bg_public.h,v 1.9 2005-08-29 01:35:45 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1088,8 +1088,8 @@ void MF_ParseMissionScripts( char *buf, mission_overview_t* overview,
 		mission_vehicle_t* vehs, mission_groundInstallation_t* gis);
 void MF_CheckMissionScriptOverviewValid( mission_overview_t* overview, qboolean updateFormat );
 void MF_SetMissionScriptOverviewDefaults( mission_overview_t* overview );
-int MF_getIndexOfVehicle( int start, int gameset, int team, int cat, int cls, int vehicleType, int change_vehicle );
-int MF_getIndexOfVehicleEx( int start, int gameset, int team, int cat, int cls, int vehicleType, int change_vehicle );
+int MF_getIndexOfVehicle( int start, int gameset, int team, int cat, int cls, int vehicleType, int change_vehicle, qboolean allowNukes );
+int MF_getIndexOfVehicleEx( int start, int gameset, int team, int cat, int cls, int vehicleType, int change_vehicle, qboolean allowNukes );
 int MF_getIndexOfGI( int start, int gameset, int GIType, int mode);
 int MF_getItemIndexFromHex(int hexValue);
 int MF_getNumberOfItems(const char **itemlist);

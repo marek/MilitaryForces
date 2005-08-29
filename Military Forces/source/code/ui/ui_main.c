@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.4 2005-08-27 16:33:41 thebjoern Exp $
+ * $Id: ui_main.c,v 1.5 2005-08-29 01:35:45 minkis Exp $
 */
 /*
 =======================================================================
@@ -3445,6 +3445,13 @@ static void UI_RefreshVehicleSelect( int change_vehicle )
 	qboolean bSelectGI = qfalse; 
 	int levelCats = 0;
 	char info[MAX_INFO_STRING];
+	qboolean allowNukes;
+
+	// Get server info
+	trap_GetConfigString( CS_SERVERINFO, info, sizeof(info) );
+
+	// Nukes
+	allowNukes = atoi( Info_ValueForKey( info, "mf_allowNukes" ) );
 
 	// ----------> GAMESET & TEAM <-----------
 
@@ -3491,17 +3498,15 @@ tryCatAgain:
 		vehicle = MF_getIndexOfGI( (vehicle-1), gameset, -1, 0);
 	} else {
 		pCat = cat_items[ vehicleCat ];	// get the text
-		vehicle = MF_getIndexOfVehicleEx( (vehicle-1), gameset, team, vehicleCat, -1, -1, 0);
+		vehicle = MF_getIndexOfVehicleEx( (vehicle-1), gameset, team, vehicleCat, -1, -1, 0, allowNukes);
 	}
 
 	// ----------> LEVEL SPAWNS <-----------
 
 	// level check (don't allow selection of vehicles that can't spawn on the current level)
-	trap_GetConfigString( CS_SERVERINFO, info, sizeof(info) );
-	/*levelCats = Info_ValueForKey( info, "g_cheats" );
-	if(Info_ValueForKey( info, "g_cheats" ))
-		levelCats = CAT_ANY;
-	else*/
+//	if(atoi(Info_ValueForKey( info, "sv_cheats" )) == 1)
+//		levelCats = CAT_ANY;
+	//else
 		levelCats = atoi( Info_ValueForKey( info, "mf_lvcat" ) );
 
 	if( pCat && vehicle >= 0 && (levelCats & (1 << vehicleCat)) || bSelectGI) {
@@ -3537,7 +3542,7 @@ tryCatAgain:
 		pClass = class_items[ vehicleCat ][ vehicleClass ];
 
 		// check
-		vehicle = MF_getIndexOfVehicleEx( (vehicle-1), gameset, team, vehicleCat, vehicleClass, -1, 0);
+		vehicle = MF_getIndexOfVehicleEx( (vehicle-1), gameset, team, vehicleCat, vehicleClass, -1, 0, allowNukes);
 		
 		if( pClass && vehicle >= 0 ) {
 			// update the text in the dialog for the UI class
@@ -3567,7 +3572,7 @@ tryCatAgain:
 	if(bSelectGI)
 		vehicle = MF_getIndexOfGI( (vehicle-1), gameset, vehicleType, change_vehicle);
 	else
-		vehicle = MF_getIndexOfVehicleEx( (vehicle-1), gameset, team, vehicleCat, vehicleClass, vehicleType, change_vehicle);
+		vehicle = MF_getIndexOfVehicleEx( (vehicle-1), gameset, team, vehicleCat, vehicleClass, vehicleType, change_vehicle, allowNukes);
 
 	// -1 means this is not a suitable combination
 	if( vehicle == -1 )
