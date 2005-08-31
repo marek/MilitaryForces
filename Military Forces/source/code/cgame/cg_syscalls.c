@@ -1,5 +1,5 @@
 /*
- * $Id: cg_syscalls.c,v 1.1 2005-08-22 16:03:21 thebjoern Exp $
+ * $Id: cg_syscalls.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -150,7 +150,7 @@ void	trap_S_StartLocalSound( sfxHandle_t sfx, int channelNum ) {
 	syscall( CG_S_STARTLOCALSOUND, sfx, channelNum );
 }
 
-void	trap_S_ClearLoopingSounds( qboolean killall ) {
+void	trap_S_ClearLoopingSounds( bool killall ) {
 	syscall( CG_S_CLEARLOOPINGSOUNDS, killall );
 }
 
@@ -174,7 +174,7 @@ void	trap_S_Respatialize( int entityNum, const vec3_t origin, vec3_t axis[3], in
 	syscall( CG_S_RESPATIALIZE, entityNum, origin, axis, inwater );
 }
 
-sfxHandle_t	trap_S_RegisterSound( const char *sample, qboolean compressed ) {
+sfxHandle_t	trap_S_RegisterSound( const char *sample, bool compressed ) {
 	return syscall( CG_S_REGISTERSOUND, sample, compressed );
 }
 
@@ -264,11 +264,11 @@ void		trap_GetCurrentSnapshotNumber( int *snapshotNumber, int *serverTime ) {
 	syscall( CG_GETCURRENTSNAPSHOTNUMBER, snapshotNumber, serverTime );
 }
 
-qboolean	trap_GetSnapshot( int snapshotNumber, snapshot_t *snapshot ) {
+int			trap_GetSnapshot( int snapshotNumber, snapshot_t *snapshot ) {
 	return syscall( CG_GETSNAPSHOT, snapshotNumber, snapshot );
 }
 
-qboolean	trap_GetServerCommand( int serverCommandNumber ) {
+int			trap_GetServerCommand( int serverCommandNumber ) {
 	return syscall( CG_GETSERVERCOMMAND, serverCommandNumber );
 }
 
@@ -276,7 +276,7 @@ int			trap_GetCurrentCmdNumber( void ) {
 	return syscall( CG_GETCURRENTCMDNUMBER );
 }
 
-qboolean	trap_GetUserCmd( int cmdNumber, usercmd_t *ucmd ) {
+int			trap_GetUserCmd( int cmdNumber, usercmd_t *ucmd ) {
 	return syscall( CG_GETUSERCMD, cmdNumber, ucmd );
 }
 
@@ -296,7 +296,7 @@ int trap_MemoryRemaining( void ) {
 	return syscall( CG_MEMORY_REMAINING );
 }
 
-qboolean trap_Key_IsDown( int keynum ) {
+int trap_Key_IsDown( int keynum ) {
 	return syscall( CG_KEY_ISDOWN, keynum );
 }
 
@@ -344,7 +344,7 @@ void trap_SnapVector( float *v ) {
 	syscall( CG_SNAPVECTOR, v );
 }
 
-// this returns a handle.  arg0 is the name in the format "idlogo.roq", set arg1 to NULL, alteredstates to qfalse (do not alter gamestate)
+// this returns a handle.  arg0 is the name in the format "idlogo.roq", set arg1 to NULL, alteredstates to false (do not alter gamestate)
 int trap_CIN_PlayCinematic( const char *arg0, int xpos, int ypos, int width, int height, int bits) {
   return syscall(CG_CIN_PLAYCINEMATIC, arg0, xpos, ypos, width, height, bits);
 }
@@ -352,13 +352,13 @@ int trap_CIN_PlayCinematic( const char *arg0, int xpos, int ypos, int width, int
 // stops playing the cinematic and ends it.  should always return FMV_EOF
 // cinematics must be stopped in reverse order of when they are started
 e_status trap_CIN_StopCinematic(int handle) {
-  return syscall(CG_CIN_STOPCINEMATIC, handle);
+  return static_cast<e_status>(syscall(CG_CIN_STOPCINEMATIC, handle));
 }
 
 
 // will run a frame of the cinematic but will not draw it.  Will return FMV_EOF if the end of the cinematic has been reached.
 e_status trap_CIN_RunCinematic (int handle) {
-  return syscall(CG_CIN_RUNCINEMATIC, handle);
+  return static_cast<e_status>(syscall(CG_CIN_RUNCINEMATIC, handle));
 }
  
 

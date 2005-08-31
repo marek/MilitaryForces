@@ -1,5 +1,5 @@
 /*
- * $Id: g_team.c,v 1.1 2005-08-22 16:07:24 thebjoern Exp $
+ * $Id: g_team.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -31,7 +31,7 @@ void Team_InitGame( void ) {
 
 	switch( g_gametype.integer ) {
 	case GT_CTF:
-		teamgame.redStatus = teamgame.blueStatus = -1; // Invalid to force update
+		teamgame.redStatus = teamgame.blueStatus = static_cast<flagStatus_t>(-1); // Invalid to force update
 		Team_SetFlagStatus( TEAM_RED, FLAG_ATBASE );
 		Team_SetFlagStatus( TEAM_BLUE, FLAG_ATBASE );
 		break;
@@ -149,20 +149,20 @@ void AddTeamScore(vec3_t origin, int team, int score) {
 OnSameTeam
 ==============
 */
-qboolean OnSameTeam( gentity_t *ent1, gentity_t *ent2 ) {
+bool OnSameTeam( gentity_t *ent1, gentity_t *ent2 ) {
 	if ( !ent1->client || !ent2->client ) {
-		return qfalse;
+		return false;
 	}
 
 	if ( g_gametype.integer < GT_TEAM ) {
-		return qfalse;
+		return false;
 	}
 
 	if ( ent1->client->sess.sessionTeam == ent2->client->sess.sessionTeam ) {
-		return qtrue;
+		return true;
 	}
 
-	return qfalse;
+	return false;
 }
 
 
@@ -170,27 +170,27 @@ static char ctfFlagStatusRemap[] = { '0', '1', '*', '*', '2' };
 static char oneFlagStatusRemap[] = { '0', '1', '2', '3', '4' };
 
 void Team_SetFlagStatus( int team, flagStatus_t status ) {
-	qboolean modified = qfalse;
+	bool modified = false;
 
 	switch( team ) {
 	case TEAM_RED:	// CTF
 		if( teamgame.redStatus != status ) {
 			teamgame.redStatus = status;
-			modified = qtrue;
+			modified = true;
 		}
 		break;
 
 	case TEAM_BLUE:	// CTF
 		if( teamgame.blueStatus != status ) {
 			teamgame.blueStatus = status;
-			modified = qtrue;
+			modified = true;
 		}
 		break;
 
 	case TEAM_FREE:	// One Flag CTF
 		if( teamgame.flagStatus != status ) {
 			teamgame.flagStatus = status;
-			modified = qtrue;
+			modified = true;
 		}
 		break;
 	}
@@ -750,14 +750,14 @@ Team_GetLocation
 Report a location for the player. Uses placed nearby target_location entities
 ============
 */
-qboolean Team_GetLocationMsg(gentity_t *ent, char *loc, int loclen)
+bool Team_GetLocationMsg(gentity_t *ent, char *loc, int loclen)
 {
 	gentity_t *best;
 
 	best = Team_GetLocation( ent );
 	
 	if (!best)
-		return qfalse;
+		return false;
 
 	if (best->count) {
 		if (best->count < 0)
@@ -768,7 +768,7 @@ qboolean Team_GetLocationMsg(gentity_t *ent, char *loc, int loclen)
 	} else
 		Com_sprintf(loc, loclen, "%s", best->message);
 
-	return qtrue;
+	return true;
 }
 
 

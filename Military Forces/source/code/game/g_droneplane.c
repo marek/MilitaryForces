@@ -1,5 +1,5 @@
 /*
- * $Id: g_droneplane.c,v 1.1 2005-08-22 16:06:31 thebjoern Exp $
+ * $Id: g_droneplane.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -8,11 +8,11 @@ void Drone_Plane_Think( gentity_t* ent ) {
 
 	if( ent->updateGear ) {
 		if( ent->s.ONOFF & OO_GEAR ) {
-			G_AddEvent( ent, EV_GEAR_DOWN_FULL, 0, qtrue );
+			G_AddEvent( ent, EV_GEAR_DOWN_FULL, 0, true );
 		} else {
-			G_AddEvent( ent, EV_GEAR_UP_FULL, 0, qtrue );
+			G_AddEvent( ent, EV_GEAR_UP_FULL, 0, true );
 		}
-		ent->updateGear = qfalse;
+		ent->updateGear = false;
 	}
 
 	if( ent->s.ONOFF & OO_LANDED ) {

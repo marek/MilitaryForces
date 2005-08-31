@@ -1,11 +1,12 @@
 /*
- * $Id: bg_lqmmove.c,v 1.1 2005-08-22 16:05:07 thebjoern Exp $
+ * $Id: bg_lqmmove.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 #include "q_shared.h"
 #include "../qcommon/qfiles.h"
 #include "bg_public.h"
 #include "bg_local.h"
+#include <algorithm>
 
 extern pmove_t		*pm;
 extern pml_t		pml;
@@ -21,7 +22,7 @@ PM_LQMMove
 
 ===================
 */
-qboolean	PM_SlideMove_LQM();
+bool	PM_SlideMove_LQM();
 void	PM_StepSlideMove_LQM();
 
 
@@ -45,8 +46,8 @@ void PM_LQMGroundTrace( void )
 			pm->ps->ONOFF |= OO_STALLED;	// start landing
 		}
 
-		pml.groundPlane = qfalse;
-		pml.walking = qfalse;
+		pml.groundPlane = false;
+		pml.walking = false;
 		return;
 	}
 
@@ -57,21 +58,21 @@ void PM_LQMGroundTrace( void )
 		pm->ps->vehicleAnim |= A_LQM_JUMP;
 
 		pm->ps->groundEntityNum = ENTITYNUM_NONE;
-		pml.groundPlane = qfalse;
-		pml.walking = qfalse;
+		pml.groundPlane = false;
+		pml.walking = false;
 		return;
 	}
 	
 	// slopes that are too steep will not be considered onground
 	if ( trace.plane.normal[2] < MIN_WALK_NORMAL ) {
 		pm->ps->groundEntityNum = ENTITYNUM_NONE;
-		pml.groundPlane = qtrue;
-		pml.walking = qfalse;
+		pml.groundPlane = true;
+		pml.walking = false;
 		return;
 	}
 
-	pml.groundPlane = qtrue;
-	pml.walking = qtrue;
+	pml.groundPlane = true;
+	pml.walking = true;
 
 		
 }
@@ -79,8 +80,8 @@ void PM_LQMGroundTrace( void )
 void PM_LQMMove( void ) 
 {
     vec3_t	viewdir;
-    qboolean	dead = (pm->ps->stats[STAT_HEALTH] <= 0);
-	qboolean	verydead = (pm->ps->stats[STAT_HEALTH] <= GIB_HEALTH);
+    bool	dead = (pm->ps->stats[STAT_HEALTH] <= 0);
+	bool	verydead = (pm->ps->stats[STAT_HEALTH] <= GIB_HEALTH);
 	int		anim = 0;
 	int		maxspeed = availableVehicles[pm->vehicle].maxspeed;
 	int		maxspeed2 = sqrt(((float)maxspeed*maxspeed/2));
@@ -188,7 +189,7 @@ void PM_LQMMove( void )
 		VectorAdd(forwardvel, rightvel, deltavel);
 		VectorAdd(liftvel, deltavel, deltavel);
 		// Gravity
-		deltavel[2] = max(deltavel[2]-DEFAULT_GRAVITY*pml.frametime ,-DEFAULT_GRAVITY);
+		deltavel[2] = std::max(deltavel[2]-DEFAULT_GRAVITY*pml.frametime ,-DEFAULT_GRAVITY);
     }
 	// return angles
 	VectorCopy( viewdir, pm->ps->vehicleAngles );
@@ -246,11 +247,11 @@ static void PM_AddTouchEnt_LQM( int entityNum ) {
 ==================
 PM_SlideMove_Plane
 
-Returns qtrue if the velocity was clipped in some way
+Returns true if the velocity was clipped in some way
 ==================
 */
 #define	MAX_CLIP_PLANES	5
-qboolean	PM_SlideMove_LQM() {
+bool	PM_SlideMove_LQM() {
 	int			bumpcount, numbumps;
 	vec3_t		dir;
 	float		d;
@@ -311,7 +312,7 @@ qboolean	PM_SlideMove_LQM() {
 			if( trace.allsolid ) {
 				// entity is completely trapped in another solid
 				pm->ps->velocity[2] = 0;	// don't build up falling damage, but allow sideways acceleration
-				return qtrue;
+				return true;
 			}
 		}
 
@@ -338,7 +339,7 @@ qboolean	PM_SlideMove_LQM() {
 		if (numplanes >= MAX_CLIP_PLANES) {
 			// this shouldn't really happen
 			VectorClear( pm->ps->velocity );
-			return qtrue;
+			return true;
 		}
 
 		//
@@ -420,7 +421,7 @@ qboolean	PM_SlideMove_LQM() {
 
 					// stop dead at a tripple plane interaction
 					VectorClear( pm->ps->velocity );
-					return qtrue;
+					return true;
 				}
 			}
 

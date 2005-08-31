@@ -1,5 +1,5 @@
 /*
- * $Id: bg_weapondata.c,v 1.1 2005-08-22 16:06:08 thebjoern Exp $
+ * $Id: bg_weapondata.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -12,7 +12,7 @@ completeWeaponData_t availableWeapons[] =
 {
 	// empty entry
 	{ 
-		0,									// type
+		static_cast<weaponType_t>(0),		// type
 		0,									// gameset
 		"",									// descriptiveName
 		"",									// shortName

@@ -1,5 +1,5 @@
 /*
- * $Id: mf_client.c,v 1.6 2005-08-28 04:54:08 minkis Exp $
+ * $Id: mf_client.c,v 1.7 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -20,12 +20,12 @@ a string with the reason for denial.
 Otherwise, the client will be sent the current gamestate
 and will eventually get to ClientBegin.
 
-firstTime will be qtrue the very first time a client connects
-to the server machine, but qfalse on map changes and tournement
+firstTime will be true the very first time a client connects
+to the server machine, but false on map changes and tournement
 restarts.
 ============
 */
-char *MF_ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
+char *MF_ClientConnect( int clientNum, int firstTime, int isBot ) {
 	char		*value;
 	gclient_t	*client;
 	char		userinfo[MAX_INFO_STRING];
@@ -73,7 +73,7 @@ char *MF_ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	// for later
 	if( isBot ) {
 		ent->r.svFlags |= SVF_BOT;
-		ent->inuse = qtrue;
+		ent->inuse = true;
 //		if( !G_BotConnect( clientNum, !firstTime ) ) {
 			return "BotConnectfailed";
 //		}
@@ -242,7 +242,7 @@ void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 				i++;
 				// the first spawn should be at a good looking spot
 				if ( !client->pers.initialSpawn && client->pers.localClient ) {
-					client->pers.initialSpawn = qtrue;
+					client->pers.initialSpawn = true;
 					spawnPoint = SelectInitialSpawnPoint( spawn_origin, spawn_angles );
 				} else {
 					// don't spawn near existing origin if possible
@@ -348,8 +348,8 @@ void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 
 	ent->s.groundEntityNum = ENTITYNUM_NONE;
 	ent->client = &level.clients[index];
-	ent->takedamage = qtrue;
-	ent->inuse = qtrue;
+	ent->takedamage = true;
+	ent->inuse = true;
 	ent->classname = "player";
 	ent->r.contents = CONTENTS_BODY;
 	ent->clipmask = MASK_PLAYERSOLID;
@@ -357,7 +357,7 @@ void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 	ent->waterlevel = 0;
 	ent->watertype = 0;
 	ent->flags = 0;
-	ent->left = qfalse; //first projectile starts right
+	ent->left = false; //first projectile starts right
 	ent->bulletpos = 0;
 
 	client->vehicle = client->nextVehicle = savedNext;
@@ -374,7 +374,7 @@ void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 		// cat specific stuff
 		if( availableVehicles[vehIndex].cat & CAT_PLANE ) {
 			// check for landed spawnpoint
-			qboolean landed = qfalse;
+			bool landed = false;
 			trace_t	trace;
 			vec3_t	endpos;
 			gentity_t *test;
@@ -384,7 +384,7 @@ void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 			if( trace.entityNum != ENTITYNUM_NONE ) {
 				test = &g_entities[trace.entityNum];
 				if( canLandOnIt(test) ) {
-					landed = qtrue;
+					landed = true;
 					spawn_origin[2] = test->r.maxs[2] - availableVehicles[vehIndex].mins[2] + 
 						availableVehicles[vehIndex].gearheight;
 				}			
@@ -404,7 +404,7 @@ void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 			}
 			MF_Spawn_GroundVehicle( ent, vehIndex );
 		} else if( availableVehicles[vehIndex].cat & CAT_HELO ) {
-			MF_Spawn_Helo( ent, vehIndex, qfalse );
+			MF_Spawn_Helo( ent, vehIndex, false );
 		} else if( availableVehicles[vehIndex].cat & CAT_LQM ) {
 			trace_t	trace;
 			vec3_t	endpos;
@@ -531,7 +531,7 @@ void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 
 	// positively link the client, even if the command times are weird
 	if( ent->client->sess.sessionTeam != TEAM_SPECTATOR ) {
-		BG_PlayerStateToEntityState( &client->ps, &ent->s, qtrue );
+		BG_PlayerStateToEntityState( &client->ps, &ent->s, true );
 		VectorCopy( ent->client->ps.origin, ent->r.currentOrigin );
 		trap_LinkEntity( ent );
 	}
@@ -540,5 +540,5 @@ void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 	ClientEndFrame( ent );
 
 	// clear entity state values
-	BG_PlayerStateToEntityState( &client->ps, &ent->s, qtrue );
+	BG_PlayerStateToEntityState( &client->ps, &ent->s, true );
 }

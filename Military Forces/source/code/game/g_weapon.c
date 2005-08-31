@@ -1,5 +1,5 @@
 /*
- * $Id: g_weapon.c,v 1.1 2005-08-22 16:07:29 thebjoern Exp $
+ * $Id: g_weapon.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -55,32 +55,32 @@ void SnapVectorTowards( vec3_t v, vec3_t to ) {
 LogAccuracyHit
 ===============
 */
-qboolean LogAccuracyHit( gentity_t *target, gentity_t *attacker ) {
+bool LogAccuracyHit( gentity_t *target, gentity_t *attacker ) {
 	if( !target->takedamage ) {
-		return qfalse;
+		return false;
 	}
 
 	if ( target == attacker ) {
-		return qfalse;
+		return false;
 	}
 
 	if( !target->client ) {
-		return qfalse;
+		return false;
 	}
 
 	if( !attacker->client ) {
-		return qfalse;
+		return false;
 	}
 
 	if( target->client->ps.stats[STAT_HEALTH] <= 0 ) {
-		return qfalse;
+		return false;
 	}
 
 	if ( OnSameTeam( target, attacker ) ) {
-		return qfalse;
+		return false;
 	}
 
-	return qtrue;
+	return true;
 }
 
 
@@ -109,9 +109,9 @@ void FireWeapon( gentity_t *ent ) {
 		fire_ironbomb( ent );
 		break;
 	case WT_MACHINEGUN:
-		fire_autocannon(ent, qtrue);
+		fire_autocannon(ent, true);
 		if( availableVehicles[ent->client->vehicle].caps & HC_DUALGUNS ) {
-			fire_autocannon(ent, qtrue);
+			fire_autocannon(ent, true);
 		}
 		break;
 	case WT_BALLISTICGUN:

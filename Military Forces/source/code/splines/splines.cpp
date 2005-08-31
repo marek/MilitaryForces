@@ -722,13 +722,13 @@ void idCameraDef::parse(const char *(*text)  ) {
 
 }
 
-qboolean idCameraDef::load(const char *filename) {
+bool idCameraDef::load(const char *filename) {
 	char *buf;
 	const char *buf_p;
 	//int length = 
   FS_ReadFile( filename, (void **)&buf );
 	if ( !buf ) {
-		return qfalse;
+		return false;
 	}
 
 	clear();
@@ -738,7 +738,7 @@ qboolean idCameraDef::load(const char *filename) {
 	Com_EndParseSession();
 	FS_FreeFile( buf );
 
-	return qtrue;
+	return true;
 }
 
 void idCameraDef::save(const char *filename) {
@@ -1219,12 +1219,12 @@ void idCameraDef::addTarget(const char *name, idCameraPosition::positionType typ
 idCameraDef camera;
 
 extern "C" {
-qboolean loadCamera(const char *name) {
+bool loadCamera(const char *name) {
   camera.clear();
-  return static_cast<qboolean>(camera.load(name));
+  return static_cast<bool>(camera.load(name));
 }
 
-qboolean getCameraInfo(int time, float *origin, float*angles) {
+bool getCameraInfo(int time, float *origin, float*angles) {
 	idVec3_t dir, org;
 	org[0] = origin[0];
 	org[1] = origin[1];
@@ -1236,9 +1236,9 @@ qboolean getCameraInfo(int time, float *origin, float*angles) {
 		origin[2] = org[2];
 		angles[1] = atan2 (dir[1], dir[0])*180/3.14159;
 		angles[0] = asin (dir[2])*180/3.14159;
-		return qtrue;
+		return true;
 	}
-	return qfalse;
+	return false;
 }
 
 void startCamera(int time) {

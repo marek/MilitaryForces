@@ -1,5 +1,5 @@
 /*
- * $Id: cg_consolecmds.c,v 1.1 2005-08-22 16:01:41 thebjoern Exp $
+ * $Id: cg_consolecmds.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -71,7 +71,7 @@ MFQ3 MFD Mode cycling
 ==================
 */
 static void CG_Set_MFD_Mode( int num ) {
-	qboolean found = qfalse;
+	bool found = false;
 	char buffer[33], value;
 	int start = cg.Mode_MFD[num] - 1;
 	if( start < 0 ) start = MFD_MAX-1;
@@ -83,7 +83,7 @@ static void CG_Set_MFD_Mode( int num ) {
 		if( num ) value += MFD_MAX;
 		trap_Cvar_VariableStringBuffer( cycleCvars[value], buffer, 32 );
 		value = atoi(buffer);
-		if( value ) found = qtrue;
+		if( value ) found = true;
 	}
 
 	if( num == MFD_1 )
@@ -437,19 +437,19 @@ static void CG_ScoresDown_f( void ) {
 		// leave the current scores up if they were already
 		// displayed, but if this is the first hit, clear them out
 		if ( !cg.showScores ) {
-			cg.showScores = qtrue;
+			cg.showScores = true;
 			cg.numScores = 0;
 		}
 	} else {
 		// show the cached contents even if they just pressed if it
 		// is within two seconds
-		cg.showScores = qtrue;
+		cg.showScores = true;
 	}
 }
 
 static void CG_ScoresUp_f( void ) {
 	if ( cg.showScores ) {
-		cg.showScores = qfalse;
+		cg.showScores = false;
 		cg.scoreFadeTime = cg.time;
 	}
 }
@@ -536,7 +536,7 @@ Intercepts 'say <var> <values>' commands for development purposes
 =================
 */
 
-qboolean CG_ExtractDeveloper( void )
+bool CG_ExtractDeveloper( void )
 {
 	clientInfo_t * ci = NULL;
 
@@ -550,7 +550,7 @@ qboolean CG_ExtractDeveloper( void )
 	else
 	{
 		// no information, nothing possible
-		return qfalse;
+		return false;
 	}
 
 	// convert 2nd param into a value
@@ -561,45 +561,45 @@ qboolean CG_ExtractDeveloper( void )
 	if( !Q_stricmp( CG_Argv(0), "ox" ) )
 	{
 		availableVehicles[ ci->vehicle ].shadowCoords[ SHC_XOFFSET ] = value;
-		return qtrue;
+		return true;
 	}
 	else if( !Q_stricmp( CG_Argv(0), "oy" ) )
 	{
 		availableVehicles[ ci->vehicle ].shadowCoords[ SHC_YOFFSET ] = value;
-		return qtrue;
+		return true;
 	}
 	else if( !Q_stricmp( CG_Argv(0), "ax" ) )
 	{
 		availableVehicles[ ci->vehicle ].shadowCoords[ SHC_XADJUST ] = value;
-		return qtrue;
+		return true;
 	}
 	else if( !Q_stricmp( CG_Argv(0), "ay" ) )
 	{
 		availableVehicles[ ci->vehicle ].shadowCoords[ SHC_YADJUST ] = value;
-		return qtrue;
+		return true;
 	}
 	else if( !Q_stricmp( CG_Argv(0), "pmax" ) )
 	{
 		availableVehicles[ ci->vehicle ].shadowAdjusts[ SHO_PITCHMAX ] = value;
-		return qtrue;
+		return true;
 	}
 	else if( !Q_stricmp( CG_Argv(0), "rmax" ) )
 	{
 		availableVehicles[ ci->vehicle ].shadowAdjusts[ SHO_ROLLMAX ] = value;
-		return qtrue;
+		return true;
 	}
 	else if( !Q_stricmp( CG_Argv(0), "pmod" ) )
 	{
 		availableVehicles[ ci->vehicle ].shadowAdjusts[ SHO_PITCHMOD ] = value;
-		return qtrue;
+		return true;
 	}
 	else if( !Q_stricmp( CG_Argv(0), "rmod" ) )
 	{
 		availableVehicles[ ci->vehicle ].shadowAdjusts[ SHO_ROLLMOD ] = value;
-		return qtrue;
+		return true;
 	}
 
-	return qfalse;
+	return false;
 }
 
 typedef struct {
@@ -674,7 +674,7 @@ The string has been tokenized and can be retrieved with
 Cmd_Argc() / Cmd_Argv()
 =================
 */
-qboolean CG_ConsoleCommand( void ) {
+bool CG_ConsoleCommand( void ) {
 	const char	*cmd;
 	int		i;
 
@@ -683,7 +683,7 @@ qboolean CG_ConsoleCommand( void ) {
 	// developer variable modification
 	if( CG_ExtractDeveloper() )
 	{
-		return qtrue;
+		return true;
 	}
 
 	// scan though all known client commands
@@ -695,11 +695,11 @@ qboolean CG_ConsoleCommand( void ) {
 			// execute associated fn()
 			commands[i].function();
 
-			return qtrue;
+			return true;
 		}
 	}
 
-	return qfalse;
+	return false;
 }
 
 

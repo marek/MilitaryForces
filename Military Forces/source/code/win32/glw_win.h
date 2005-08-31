@@ -35,13 +35,13 @@ typedef struct
 
 	HINSTANCE hinstOpenGL;	// HINSTANCE for the OpenGL library
 
-	qboolean allowdisplaydepthchange;
-	qboolean pixelFormatSet;
+	bool allowdisplaydepthchange;
+	bool pixelFormatSet;
 
 	int		 desktopBitsPixel;
 	int		 desktopWidth, desktopHeight;
 
-	qboolean	cdsFullscreen;
+	bool	cdsFullscreen;
 
 	FILE *log_fp;
 } glwstate_t;

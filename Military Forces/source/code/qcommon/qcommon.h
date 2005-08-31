@@ -33,9 +33,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // msg.c
 //
 typedef struct {
-	qboolean	allowoverflow;	// if false, do a Com_Error
-	qboolean	overflowed;		// set to true if the buffer size failed (with allowoverflow set)
-	qboolean	oob;			// set to true if the buffer size failed (with allowoverflow set)
+	bool	allowoverflow;	// if false, do a Com_Error
+	bool	overflowed;		// set to true if the buffer size failed (with allowoverflow set)
+	bool	oob;			// set to true if the buffer size failed (with allowoverflow set)
 	byte	*data;
 	int		maxsize;
 	int		cursize;
@@ -94,7 +94,7 @@ void MSG_WriteDeltaUsercmdKey( msg_t *msg, int key, usercmd_t *from, usercmd_t *
 void MSG_ReadDeltaUsercmdKey( msg_t *msg, int key, usercmd_t *from, usercmd_t *to );
 
 void MSG_WriteDeltaEntity( msg_t *msg, struct entityState_s *from, struct entityState_s *to
-						   , qboolean force );
+						   , bool force );
 void MSG_ReadDeltaEntity( msg_t *msg, entityState_t *from, entityState_t *to, 
 						 int number );
 
@@ -151,18 +151,18 @@ typedef struct {
 void		NET_Init( void );
 void		NET_Shutdown( void );
 void		NET_Restart( void );
-void		NET_Config( qboolean enableNetworking );
+void		NET_Config( bool enableNetworking );
 
 void		NET_SendPacket (netsrc_t sock, int length, const void *data, netadr_t to);
 void		QDECL NET_OutOfBandPrint( netsrc_t net_socket, netadr_t adr, const char *format, ...);
 void		QDECL NET_OutOfBandData( netsrc_t sock, netadr_t adr, byte *format, int len );
 
-qboolean	NET_CompareAdr (netadr_t a, netadr_t b);
-qboolean	NET_CompareBaseAdr (netadr_t a, netadr_t b);
-qboolean	NET_IsLocalAddress (netadr_t adr);
+bool	NET_CompareAdr (netadr_t a, netadr_t b);
+bool	NET_CompareBaseAdr (netadr_t a, netadr_t b);
+bool	NET_IsLocalAddress (netadr_t adr);
 const char	*NET_AdrToString (netadr_t a);
-qboolean	NET_StringToAdr ( const char *s, netadr_t *a);
-qboolean	NET_GetLoopPacket (netsrc_t sock, netadr_t *net_from, msg_t *net_message);
+bool	NET_StringToAdr ( const char *s, netadr_t *a);
+bool	NET_GetLoopPacket (netsrc_t sock, netadr_t *net_from, msg_t *net_message);
 void		NET_Sleep(int msec);
 
 
@@ -196,7 +196,7 @@ typedef struct {
 
 	// outgoing fragment buffer
 	// we need to space out the sending of large fragmented messages
-	qboolean	unsentFragments;
+	bool	unsentFragments;
 	int			unsentFragmentStart;
 	int			unsentLength;
 	byte		unsentBuffer[MAX_MSGLEN];
@@ -208,7 +208,7 @@ void Netchan_Setup( netsrc_t sock, netchan_t *chan, netadr_t adr, int qport );
 void Netchan_Transmit( netchan_t *chan, int length, const byte *data );
 void Netchan_TransmitNextFragment( netchan_t *chan );
 
-qboolean Netchan_Process( netchan_t *chan, msg_t *msg );
+bool Netchan_Process( netchan_t *chan, msg_t *msg );
 
 
 /*
@@ -219,7 +219,7 @@ PROTOCOL
 ==============================================================
 */
 
-#define	PROTOCOL_VERSION	03
+#define	PROTOCOL_VERSION	04
 // 1.31 - 67
 
 // maintain a list of compatible protocols for demo playing
@@ -291,7 +291,7 @@ typedef enum {
 	VMI_COMPILED
 } vmInterpret_t;
 
-typedef enum {
+/*typedef enum {
 	TRAP_MEMSET = 100,
 	TRAP_MEMCPY,
 	TRAP_STRNCPY,
@@ -307,7 +307,7 @@ typedef enum {
 
 	TRAP_TESTPRINTINT,
 	TRAP_TESTPRINTFLOAT
-} sharedTraps_t;
+} sharedTraps_t;*/
 
 void	VM_Init( void );
 vm_t	*VM_Create( const char *module, int (*systemCalls)(int *), 
@@ -467,7 +467,7 @@ void 	Cvar_Reset( const char *var_name );
 void	Cvar_SetCheatState( void );
 // reset all testing vars to a safe value
 
-qboolean Cvar_Command( void );
+bool Cvar_Command( void );
 // called by Cmd_ExecuteString when Cmd_Argv(0) doesn't match a known
 // command.  Returns true if the command was a variable reference that
 // was handled. (print or change)
@@ -516,12 +516,12 @@ issues.
 
 #define BASEGAME "mfdata"
 
-qboolean FS_Initialized();
+bool FS_Initialized();
 
 void	FS_InitFilesystem (void);
-void	FS_Shutdown( qboolean closemfp );
+void	FS_Shutdown( bool closemfp );
 
-qboolean	FS_ConditionalRestart( int checksumFeed );
+bool	FS_ConditionalRestart( int checksumFeed );
 void	FS_Restart( int checksumFeed );
 // shutdown and restart the filesystem so changes to fs_gamedir can take effect
 
@@ -532,7 +532,7 @@ char	**FS_ListFiles( const char *directory, const char *extension, int *numfiles
 
 void	FS_FreeFileList( char **list );
 
-qboolean FS_FileExists( const char *file );
+bool FS_FileExists( const char *file );
 
 int		FS_LoadStack();
 
@@ -546,7 +546,7 @@ int		FS_filelength( fileHandle_t f );
 fileHandle_t FS_SV_FOpenFileWrite( const char *filename );
 int		FS_SV_FOpenFileRead( const char *filename, fileHandle_t *fp );
 void	FS_SV_Rename( const char *from, const char *to );
-int		FS_FOpenFileRead( const char *qpath, fileHandle_t *file, qboolean uniqueFILE );
+int		FS_FOpenFileRead( const char *qpath, fileHandle_t *file, bool uniqueFILE );
 // if uniqueFILE is true, then a new FILE will be fopened even if the file
 // is found in an already open pak file.  If uniqueFILE is false, you must call
 // FS_FCloseFile instead of fclose, otherwise the pak FILE would be improperly closed
@@ -599,7 +599,7 @@ int		FS_FOpenFileByMode( const char *qpath, fileHandle_t *f, fsMode_t mode );
 int		FS_Seek( fileHandle_t f, long offset, int origin );
 // seek on a file (doesn't work for zip files!!!!!!!!)
 
-qboolean FS_FilenameCompare( const char *s1, const char *s2 );
+int FS_FilenameCompare( const char *s1, const char *s2 );
 
 const char *FS_GamePureChecksum( void );
 // Returns the checksum of the pk3 from which the server loaded the qagame.qvm
@@ -627,8 +627,8 @@ void FS_PureServerSetLoadedPaks( const char *pakSums, const char *pakNames );
 // separated checksums will be checked for files, with the
 // sole exception of .cfg files.
 
-qboolean FS_idPak( char *pak, char *base );
-qboolean FS_ComparePaks( char *neededpaks, int len, qboolean dlstring );
+bool FS_idPak( char *pak, char *base );
+bool FS_ComparePaks( char *neededpaks, int len, bool dlstring );
 
 void FS_Rename( const char *from, const char *to );
 
@@ -706,7 +706,7 @@ int			Com_HashKey(char *string, int maxlen);
 int			Com_Filter(char *filter, char *name, int casesensitive);
 int			Com_FilterPath(char *filter, char *name, int casesensitive);
 int			Com_RealTime(qtime_t *qtime);
-qboolean	Com_SafeMode( void );
+bool	Com_SafeMode( void );
 
 void		Com_StartupVariable( const char *match );
 // checks for and removes command line "+set var arg" constructs
@@ -739,7 +739,7 @@ extern	int		time_backend;		// renderer backend time
 extern	int		com_frameTime;
 extern	int		com_frameMsec;
 
-extern	qboolean	com_errorEntered;
+extern	bool	com_errorEntered;
 
 extern	fileHandle_t	com_journalFile;
 extern	fileHandle_t	com_journalDataFile;
@@ -796,7 +796,7 @@ void Z_LogHeap( void );
 void Hunk_Clear( void );
 void Hunk_ClearToMark( void );
 void Hunk_SetMark( void );
-qboolean Hunk_CheckMark( void );
+bool Hunk_CheckMark( void );
 void Hunk_ClearTempMemory( void );
 void *Hunk_AllocateTempMemory( int size );
 void Hunk_FreeTempMemory( void *buf );
@@ -828,11 +828,11 @@ void CL_InitKeyCommands( void );
 // config files, but the rest of client startup will happen later
 
 void CL_Init( void );
-void CL_Disconnect( qboolean showMainMenu );
+void CL_Disconnect( bool showMainMenu );
 void CL_Shutdown( void );
 void CL_Frame( int msec );
-qboolean CL_GameCommand( void );
-void CL_KeyEvent (int key, qboolean down, unsigned time);
+bool CL_GameCommand( void );
+void CL_KeyEvent (int key, int down, unsigned time);
 
 void CL_CharEvent( int key );
 // char events are for field typing, not game control
@@ -884,14 +884,14 @@ void SV_Init( void );
 void SV_Shutdown( char *finalmsg );
 void SV_Frame( int msec );
 void SV_PacketEvent( netadr_t from, msg_t *msg );
-qboolean SV_GameCommand( void );
+bool SV_GameCommand( void );
 
 
 //
 // UI interface
 //
-qboolean UI_GameCommand( void );
-qboolean UI_usesUniqueCDKey();
+bool UI_GameCommand( void );
+bool UI_usesUniqueCDKey();
 
 /*
 ==============================================================
@@ -968,7 +968,7 @@ int		Sys_Milliseconds (void);
 void	Sys_SnapVector( float *v );
 
 // the system console is shown when a dedicated server is running
-void	Sys_DisplaySystemConsole( qboolean show );
+void	Sys_DisplaySystemConsole( bool show );
 
 int		Sys_GetProcessorId( void );
 
@@ -977,18 +977,18 @@ void	Sys_EndStreamedFile( fileHandle_t f );
 int		Sys_StreamedRead( void *buffer, int size, int count, fileHandle_t f );
 void	Sys_StreamSeek( fileHandle_t f, int offset, int origin );
 
-void	Sys_ShowConsole( int level, qboolean quitOnClose );
+void	Sys_ShowConsole( int level, bool quitOnClose );
 void	Sys_SetErrorText( const char *text );
 
 void	Sys_SendPacket( int length, const void *data, netadr_t to );
 
-qboolean	Sys_StringToAdr( const char *s, netadr_t *a );
+bool	Sys_StringToAdr( const char *s, netadr_t *a );
 //Does NOT parse port numbers, only base addresses.
 
-qboolean	Sys_IsLANAddress (netadr_t adr);
+bool	Sys_IsLANAddress (netadr_t adr);
 void		Sys_ShowIP(void);
 
-qboolean	Sys_CheckCD( void );
+bool	Sys_CheckCD( void );
 
 void	Sys_Mkdir( const char *path );
 char	*Sys_Cwd( void );
@@ -999,13 +999,13 @@ char	*Sys_DefaultInstallPath(void);
 void  Sys_SetDefaultHomePath(const char *path);
 char	*Sys_DefaultHomePath(void);
 
-char **Sys_ListFiles( const char *directory, const char *extension, char *filter, int *numfiles, qboolean wantsubs );
+char **Sys_ListFiles( const char *directory, const char *extension, char *filter, int *numfiles, bool wantsubs );
 void	Sys_FreeFileList( char **list );
 
 void	Sys_BeginProfiling( void );
 void	Sys_EndProfiling( void );
 
-qboolean Sys_LowPhysicalMemory();
+bool Sys_LowPhysicalMemory();
 unsigned int Sys_ProcessorCount();
 
 int Sys_MonkeyShouldBeSpanked( void );

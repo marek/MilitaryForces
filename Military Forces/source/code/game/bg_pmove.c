@@ -1,5 +1,5 @@
 /*
- * $Id: bg_pmove.c,v 1.1 2005-08-22 16:05:25 thebjoern Exp $
+ * $Id: bg_pmove.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -231,7 +231,7 @@ static float PM_CmdScale( usercmd_t *cmd ) {
 		return 0;
 	}
 
-	total = sqrt( cmd->forwardmove * cmd->forwardmove
+	total = sqrtf( cmd->forwardmove * cmd->forwardmove
 		+ cmd->rightmove * cmd->rightmove + cmd->upmove * cmd->upmove );
 	scale = (float)pm->ps->speed * max / ( 127.0 * total );
 
@@ -288,7 +288,7 @@ static void PM_FlyMove( void ) {
 
 	PM_Accelerate (wishdir, wishspeed, pm_flyaccelerate);
 
-	PM_SlideMove( qfalse );
+	PM_SlideMove( false );
 }
 
 /*
@@ -547,8 +547,8 @@ Generates weapon events and modifes the weapon counter
 ==============
 */
 static void PM_Weapon( void ) {
-	qboolean	canShoot = qtrue,
-				canShootMG = qtrue;
+	bool	canShoot = true,
+				canShootMG = true;
 
 	// don't allow attack until all buttons are up and dont attack while recharging
 	if( pm->ps->pm_flags & (PMF_RESPAWNED|PMF_RECHARGING) ) {
@@ -578,7 +578,7 @@ static void PM_Weapon( void ) {
 	if( pm->ps->timers[TIMER_MACHINEGUN] > 0 ) {
 		pm->ps->timers[TIMER_MACHINEGUN] -= pml.msec;
 		if( pm->ps->timers[TIMER_MACHINEGUN] > 0 ) {
-			canShootMG = qfalse;
+			canShootMG = false;
 		} else {
 			pm->ps->timers[TIMER_MACHINEGUN] = 0;
 		}
@@ -586,7 +586,7 @@ static void PM_Weapon( void ) {
 	if( pm->ps->timers[TIMER_WEAPON] > 0 ) {
 		pm->ps->timers[TIMER_WEAPON] -= pml.msec;
 		if( pm->ps->timers[TIMER_WEAPON] > 0 ) {
-			canShoot = qfalse;
+			canShoot = false;
 		} else {
 			pm->ps->timers[TIMER_WEAPON] = 0;
 		}
@@ -601,7 +601,7 @@ static void PM_Weapon( void ) {
 	if( availableVehicles[pm->vehicle].caps & HC_WEAPONBAY ) {
 		if( !(pm->ps->ONOFF & OO_WEAPONBAY) ) {
 			if( pm->cmd.buttons & BUTTON_ATTACK_MAIN ) PM_Toggle_Bay();
-			canShoot = qfalse;
+			canShoot = false;
 		}
 	}
 
@@ -612,14 +612,14 @@ static void PM_Weapon( void ) {
 		   ((availableWeapons[pm->ps->weaponIndex].type == WT_IRONBOMB ||
 			 availableWeapons[pm->ps->weaponIndex].type == WT_GUIDEDBOMB) &&
 			Q_fabs(pm->ps->vehicleAngles[2]) > 60 ) ) {
-			canShoot = qfalse;
+			canShoot = false;
 		} 
 	}
 
 	// fueltank override
 	if( availableWeapons[pm->ps->weaponIndex].type == WT_FUELTANK &&
 		pm->ps->timers[TIMER_WEAPON] <= 0 )
-		canShoot = qtrue;
+		canShoot = true;
 
 //#ifndef QAGAME
 //	Com_Printf("Weaponindex: %d\n", pm->ps->weaponIndex);
@@ -1097,6 +1097,7 @@ void Pmove (pmove_t *pmove) {
 				msec = 66;
 			}
 		}
+			
 		pmove->cmd.serverTime = pmove->ps->commandTime + msec;
 		PmoveSingle( pmove );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: g_groundinstallation.c,v 1.1 2005-08-22 16:06:31 thebjoern Exp $
+ * $Id: g_groundinstallation.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -41,7 +41,7 @@ void groundinstallation_die( gentity_t *self, gentity_t *inflictor, gentity_t *a
 	}
 
 	ExplodeVehicle(self);
-	self->freeAfterEvent = qtrue;
+	self->freeAfterEvent = true;
 
 	G_RadiusDamage( self->r.currentOrigin, self, 150, 150, self, MOD_VEHICLEEXPLOSION, CAT_ANY );
 

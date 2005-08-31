@@ -1,10 +1,11 @@
 /*
- * $Id: g_items.c,v 1.1 2005-08-22 16:06:33 thebjoern Exp $
+ * $Id: g_items.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
 //
 #include "g_local.h"
+#include <algorithm>
 
 /*
 
@@ -98,7 +99,7 @@ int Pickup_Fuel (gentity_t *ent, gentity_t *other) {
 	else 
 		quantity = ent->item->quantity;
 
-	other->client->ps.stats[STAT_FUEL] = min(other->client->ps.stats[STAT_FUEL]+quantity,max);
+	other->client->ps.stats[STAT_FUEL] = std::min(other->client->ps.stats[STAT_FUEL]+quantity,max);
 
 	return RESPAWN_FUEL;
 }
@@ -138,7 +139,7 @@ void RespawnItem( gentity_t *ent ) {
 	trap_LinkEntity (ent);
 
 	// play the normal respawn sound only to nearby clients
-	G_AddEvent( ent, EV_ITEM_RESPAWN, 0, qtrue );
+	G_AddEvent( ent, EV_ITEM_RESPAWN, 0, true );
 
 	ent->nextthink = 0;
 }
@@ -151,7 +152,7 @@ Touch_Item
 */
 void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 	int			respawn;
-	qboolean	predict;
+	bool	predict;
 
 	if (!other->client)
 		return;
@@ -195,7 +196,7 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 	if (predict) {
 		G_AddPredictableEvent( other, EV_ITEM_PICKUP, ent->s.modelindex );
 	} else {
-		G_AddEvent( other, EV_ITEM_PICKUP, ent->s.modelindex, qtrue );
+		G_AddEvent( other, EV_ITEM_PICKUP, ent->s.modelindex, true );
 	}
 
 	// powerup pickups are global broadcasts
@@ -226,7 +227,7 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 		ent->r.svFlags |= SVF_NOCLIENT;
 		ent->s.eFlags |= EF_NODRAW;
 		ent->r.contents = 0;
-		ent->unlinkAfterEvent = qtrue;
+		ent->unlinkAfterEvent = true;
 		return;
 	}
 
@@ -245,7 +246,7 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 
 	// dropped items will not respawn
 	if ( ent->flags & FL_DROPPED_ITEM ) {
-		ent->freeAfterEvent = qtrue;
+		ent->freeAfterEvent = true;
 	}
 
 	// picked up items still stay around, they just don't
@@ -410,7 +411,7 @@ void FinishSpawningItem( gentity_t *ent ) {
 }
 
 
-qboolean	itemRegistered[MAX_ITEMS];
+bool	itemRegistered[MAX_ITEMS];
 
 /*
 ==================
@@ -467,7 +468,7 @@ void RegisterItem( gitem_t *item ) {
 	if ( !item ) {
 		G_Error( "RegisterItem: NULL" );
 	}
-	itemRegistered[ item - bg_itemlist ] = qtrue;
+	itemRegistered[ item - bg_itemlist ] = true;
 }
 
 

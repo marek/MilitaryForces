@@ -26,7 +26,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // q_shared.h -- included first by ALL program modules.
 // A user mod should never modify this file
 
-#define	Q3_VERSION		"MF 1.01j"
+#define	Q3_VERSION		"MF 1.02"
 
 #define MAX_TEAMNAME 32
 
@@ -78,11 +78,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #else
 
 #include <assert.h>
-#include <math.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <string.h>
-#include <stdlib.h>
+#include <cmath>
+#include <cstdio>
+#include <cstdarg>
+#include <cstring>
+#include <cstdlib>
 #include <time.h>
 #include <ctype.h>
 #include <limits.h>
@@ -326,8 +326,6 @@ static float LittleFloat (const float *l) { return FloatSwap(l); }
 //=============================================================
 
 typedef unsigned char 		byte;
-
-typedef enum {qfalse, qtrue}	qboolean;
 
 typedef int		qhandle_t;
 typedef int		sfxHandle_t;
@@ -767,7 +765,7 @@ float AngleNormalize360 ( float angle );
 float AngleNormalize180 ( float angle );
 float AngleDelta ( float angle1, float angle2 );
 
-qboolean PlaneFromPoints( vec4_t plane, const vec3_t a, const vec3_t b, const vec3_t c );
+bool PlaneFromPoints( vec4_t plane, const vec3_t a, const vec3_t b, const vec3_t c );
 void ProjectPointOnPlane( vec3_t dst, const vec3_t p, const vec3_t normal );
 void RotatePointAroundVector( vec3_t dst, const vec3_t dir, const vec3_t point, float degrees );
 void RotateAroundDirection( vec3_t axis[3], float yaw );
@@ -818,7 +816,7 @@ typedef struct {
 
 void MakeRay( ray3_t* ray, const vec3_t start, const vec3_t dir );
 
-qboolean RayIntersectBox( const ray3_t* ray, const box3_t* bbox );
+bool RayIntersectBox( const ray3_t* ray, const box3_t* bbox );
 
 // end MFQ3
 
@@ -833,7 +831,7 @@ void	COM_DefaultExtension( char *path, int maxSize, const char *extension );
 void	COM_BeginParseSession( const char *name );
 int		COM_GetCurrentParseLine( void );
 char	*COM_Parse( char **data_p );
-char	*COM_ParseExt( char **data_p, qboolean allowLineBreak );
+char	*COM_ParseExt( char **data_p, bool allowLineBreak );
 int		COM_Compress( char *data_p );
 void	COM_ParseError( char *format, ... );
 void	COM_ParseWarning( char *format, ... );
@@ -952,7 +950,7 @@ void Info_RemoveKey( char *s, const char *key );
 void Info_RemoveKey_big( char *s, const char *key );
 void Info_SetValueForKey( char *s, const char *key, const char *value );
 void Info_SetValueForKey_Big( char *s, const char *key, const char *value );
-qboolean Info_Validate( const char *s );
+bool Info_Validate( const char *s );
 void Info_NextPair( const char **s, char *key, char *value );
 
 // this is only here so the functions in q_shared.c and bg_*.c can link
@@ -997,7 +995,7 @@ typedef struct cvar_s {
 	char		*resetString;		// cvar_restart will reset to this value
 	char		*latchedString;		// for CVAR_LATCH vars
 	int			flags;
-	qboolean	modified;			// set each time the cvar is changed
+	bool	modified;			// set each time the cvar is changed
 	int			modificationCount;	// incremented each time the cvar is changed
 	float		value;				// atof( string )
 	int			integer;			// atoi( string )
@@ -1058,8 +1056,8 @@ typedef struct cplane_s {
 
 // a trace is returned when a box is swept through the world
 typedef struct {
-	qboolean	allsolid;	// if true, plane is not valid
-	qboolean	startsolid;	// if true, the initial point was in a solid area
+	bool	allsolid;	// if true, plane is not valid
+	bool	startsolid;	// if true, the initial point was in a solid area
 	float		fraction;	// time completed, 1.0 = didn't hit anything
 	vec3_t		endpos;		// final position
 	cplane_t	plane;		// surface normal at impact, transformed to world space

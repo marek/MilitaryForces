@@ -1,5 +1,5 @@
 /*
- * $Id: bg_groundmove.c,v 1.2 2005-08-25 19:49:21 thebjoern Exp $
+ * $Id: bg_groundmove.c,v 1.3 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -170,7 +170,7 @@ static void PM_AdjustToTerrain( void )
 	int			i;
 	float		angleX, angleY, angleXC, angleYC;
 	float		heightX, heightY, heightXC, heightYC;
-	qboolean	fall = qfalse;	
+	bool	fall = false;	
 	float		height;
 
 	if( pm->waterlevel && availableVehicles[pm->vehicle].caps & HC_AMPHIBIOUS ) {
@@ -227,7 +227,7 @@ static void PM_AdjustToTerrain( void )
 						pm->ps->clientNum, 
 						MASK_SOLID );
 			VectorCopy( tr.endpos, end[i] ); // new
-			if( tr.fraction == 1 ) fall = qtrue;
+			if( tr.fraction == 1 ) fall = true;
 		}
 		// new way
 		VectorSubtract( end[PFRONT], end[PBACK], forward );
@@ -306,7 +306,7 @@ PM_GroundVehicleMove
 
 ===================
 */
-qboolean	PM_SlideMove_GV();
+bool	PM_SlideMove_GV();
 
 void PM_GroundVehicleMove( void ) 
 {
@@ -329,7 +329,7 @@ void PM_GroundVehicleMove( void )
     vec3_t		turnspeed;
 	vec3_t		forward, up;
 	vec3_t		temp;
-    qboolean	dead = (pm->ps->stats[STAT_HEALTH] <= 0);
+    bool	dead = (pm->ps->stats[STAT_HEALTH] <= 0);
 	int			i;
 	float		smove = pm->cmd.rightmove;
 	float		turret_yaw = pm->ps->turretAngle;
@@ -500,11 +500,11 @@ static void PM_AddTouchEnt_GV( int entityNum ) {
 ==================
 PM_SlideMove_GV
 
-Returns qtrue if the velocity was clipped in some way
+Returns true if the velocity was clipped in some way
 ==================
 */
 #define	MAX_CLIP_PLANES	5
-qboolean	PM_SlideMove_GV() {
+bool	PM_SlideMove_GV() {
 	int			bumpcount, numbumps;
 	vec3_t		dir;
 	float		d;
@@ -569,7 +569,7 @@ qboolean	PM_SlideMove_GV() {
 			if( trace.allsolid ) {
 				// entity is completely trapped in another solid
 				pm->ps->velocity[2] = 0;	// don't build up falling damage, but allow sideways acceleration
-				return qtrue;
+				return true;
 			}
 		}
 
@@ -596,7 +596,7 @@ qboolean	PM_SlideMove_GV() {
 		if (numplanes >= MAX_CLIP_PLANES) {
 			// this shouldn't really happen
 			VectorClear( pm->ps->velocity );
-			return qtrue;
+			return true;
 		}
 
 		//
@@ -678,7 +678,7 @@ qboolean	PM_SlideMove_GV() {
 
 					// stop dead at a tripple plane interaction
 					VectorClear( pm->ps->velocity );
-					return qtrue;
+					return true;
 				}
 			}
 

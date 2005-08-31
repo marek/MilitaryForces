@@ -1,17 +1,18 @@
 /*
- * $Id: bg_helomove.c,v 1.2 2005-08-25 19:49:21 thebjoern Exp $
+ * $Id: bg_helomove.c,v 1.3 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 #include "q_shared.h"
 #include "../qcommon/qfiles.h"
 #include "bg_public.h"
 #include "bg_local.h"
+#include <algorithm>
 
 extern pmove_t		*pm;
 extern pml_t		pml;
 
-#define MAX_HELO_PITCH		30
-#define MAX_HELO_ROLL		40
+#define MAX_HELO_PITCH		30.0f
+#define MAX_HELO_ROLL		40.0f
 #define MAX_HELO_TARGROLL	20	
 #define	PFRONT		0
 #define PBACK		1
@@ -54,136 +55,136 @@ PM_AdjustToTerrain
 
 ===================
 */
-static void PM_AdjustToTerrainHelo( void ) 
-{
-	trace_t		tr;
-	vec3_t		dir, forward, right;
-	vec3_t		start[PMAX], end[PMAX];
-	float		hLength, hWidth, hLengthC, hWidthC;
-	int			i;
-	float		angleX, angleY, angleXC, angleYC;
-	float		heightX, heightY, heightXC, heightYC;
-	qboolean	fall = qfalse;	
-	float		height;
-
-	// set the height
-	VectorSet( start[0], pm->ps->origin[0], pm->ps->origin[1], pm->ps->origin[2] + 30 );
-	VectorSet( end[0], pm->ps->origin[0], pm->ps->origin[1], pm->ps->origin[2] + pm->mins[2] - 2 );
-	pm->trace ( &tr, 
-				start[0], 
-				0,//availableVehicles[pm->vehicle].mins, 
-				0,//availableVehicles[pm->vehicle].maxs, 
-				end[0], 
-				pm->ps->clientNum, 
-				MASK_SOLID );
-	height = tr.endpos[2] - availableVehicles[pm->vehicle].mins[2] + 1;
-
-	if( tr.fraction < 1.0f ) {
-
-		// set up start and endpoints for full and close distance
-		VectorSet( dir, 0, pm->ps->vehicleAngles[1], 0 );
-		AngleVectors( dir, forward, right, 0 );
-		VectorMA( pm->ps->origin, availableVehicles[pm->vehicle].maxs[0], forward, start[PFRONT] );
-		VectorMA( pm->ps->origin, availableVehicles[pm->vehicle].mins[0], forward, start[PBACK] );
-		VectorMA( pm->ps->origin, availableVehicles[pm->vehicle].maxs[1], right, start[PRIGHT] );
-		VectorMA( pm->ps->origin, availableVehicles[pm->vehicle].mins[1], right, start[PLEFT] );
-		VectorMA( pm->ps->origin, 1, forward, start[PFRONTC] );
-		VectorMA( pm->ps->origin, -1, forward, start[PBACKC] );
-		VectorMA( pm->ps->origin, 1, right, start[PRIGHTC] );
-		VectorMA( pm->ps->origin, -1, right, start[PLEFTC] );
-		for( i = 0; i < PMAX; i++ ) {
-			VectorCopy( start[i], end[i] );
-			start[i][2] = pm->ps->origin[2] + 20;
-			end[i][2] = pm->ps->origin[2] - 40;
-		}
-		// get the projected length&width
-		VectorSubtract( start[PFRONT], start[PBACK], forward );
-		hLength = VectorLength( forward );
-		VectorSubtract( start[PRIGHT], start[PLEFT], right );
-		hWidth = VectorLength( right );
-		VectorSubtract( start[PFRONTC], start[PBACKC], forward );
-		hLengthC = VectorLength( forward );
-		VectorSubtract( start[PRIGHTC], start[PLEFTC], right );
-		hWidthC = VectorLength( right );
-
-		// do the ray tracing
-		for( i = 0; i < PMAX; i++ ) {
-			pm->trace ( &tr, 
-						start[i], 
-						vec3_origin, 
-						vec3_origin,
-						end[i], 
-						pm->ps->clientNum, 
-						MASK_SOLID );
-			VectorCopy( tr.endpos, end[i] ); // new
-			if( tr.fraction == 1 ) fall = qtrue;
-		}
-		// new way
-		VectorSubtract( end[PFRONT], end[PBACK], forward );
-		vectoangles( forward, dir );
-		angleX = dir[0];
-		heightX = pm->ps->origin[2] + (end[PFRONT][2] - end[PBACK][2])/2;
-
-		VectorSubtract( end[PRIGHT], end[PLEFT], forward );
-		vectoangles( forward, dir );
-		angleY = dir[0];
-		heightY = pm->ps->origin[2] + (end[PRIGHT][2] - end[PLEFT][2])/2;
-
-		VectorSubtract( end[PFRONTC], end[PBACKC], forward );
-		vectoangles( forward, dir );
-		angleXC = dir[0];
-		heightXC = pm->ps->origin[2] + (end[PFRONTC][2] - end[PBACKC][2])/2;
-
-		VectorSubtract( end[PRIGHTC], end[PLEFTC], forward );
-		vectoangles( forward, dir );
-		angleYC = dir[0];
-		heightYC = pm->ps->origin[2] + (end[PRIGHTC][2] - end[PLEFTC][2])/2;
-
-		// check which one to use
-		if( !fall ) {
-			pm->ps->vehicleAngles[PITCH] = angleX;
-			pm->ps->vehicleAngles[ROLL] = angleY;
-		} else {
-			float diffp, diffr;
-			if( heightXC < heightX ) {
-				diffp = angleX - pm->ps->vehicleAngles[PITCH];
-			} else {
-				diffp = angleXC - pm->ps->vehicleAngles[PITCH];
-			}
-			while( diffp > 180 ) diffp -= 360;
-			while( diffp < -180) diffp += 360;
-			if( diffp > 0 ) {
-				pm->ps->vehicleAngles[0] += availableVehicles[pm->vehicle].turnspeed[0] * pml.frametime;
-			} else if( diffp < 0 ) {
-				pm->ps->vehicleAngles[0] -= availableVehicles[pm->vehicle].turnspeed[0] * pml.frametime;
-			}
-			if( heightYC < heightY ) {
-				diffr = angleY - pm->ps->vehicleAngles[ROLL];
-			} else {
-				diffr = angleYC - pm->ps->vehicleAngles[ROLL];
-			}
-			while( diffr > 180 ) diffr -= 360;
-			while( diffr < -180) diffr += 360;
-			if( diffr > 0 ) {
-				pm->ps->vehicleAngles[2] += availableVehicles[pm->vehicle].turnspeed[0] * pml.frametime;
-			} else if( diffr < 0 ) {
-				pm->ps->vehicleAngles[2] -= availableVehicles[pm->vehicle].turnspeed[0] * pml.frametime;
-			}
-		}
-		// set height
-		pm->ps->origin[2] = height;
-	} else {
-		pm->ps->ONOFF &= ~(OO_LANDED|OO_LANDEDTERRAIN);
-		if( pm->ps->ONOFF & OO_STALLED ) {
-			if( pm->ps->vehicleAngles[0] > 269 || pm->ps->vehicleAngles[0] < 90 ) 
-				pm->ps->vehicleAngles[0] -= availableVehicles[pm->vehicle].turnspeed[0] * pml.frametime;
-		} else {
-			if( pm->ps->vehicleAngles[0] < 89 || pm->ps->vehicleAngles[0] > 270 )
-				pm->ps->vehicleAngles[0] += availableVehicles[pm->vehicle].turnspeed[0] * pml.frametime;
-		}
-//		Com_Printf( "%.1f\n", pm->ps->vehicleAngles[2] );
-	}
-}
+//static void PM_AdjustToTerrainHelo( void ) 
+//{
+//	trace_t		tr;
+//	vec3_t		dir, forward, right;
+//	vec3_t		start[PMAX], end[PMAX];
+//	float		hLength, hWidth, hLengthC, hWidthC;
+//	int			i;
+//	float		angleX, angleY, angleXC, angleYC;
+//	float		heightX, heightY, heightXC, heightYC;
+//	bool	fall = false;	
+//	float		height;
+//
+//	// set the height
+//	VectorSet( start[0], pm->ps->origin[0], pm->ps->origin[1], pm->ps->origin[2] + 30 );
+//	VectorSet( end[0], pm->ps->origin[0], pm->ps->origin[1], pm->ps->origin[2] + pm->mins[2] - 2 );
+//	pm->trace ( &tr, 
+//				start[0], 
+//				0,//availableVehicles[pm->vehicle].mins, 
+//				0,//availableVehicles[pm->vehicle].maxs, 
+//				end[0], 
+//				pm->ps->clientNum, 
+//				MASK_SOLID );
+//	height = tr.endpos[2] - availableVehicles[pm->vehicle].mins[2] + 1;
+//
+//	if( tr.fraction < 1.0f ) {
+//
+//		// set up start and endpoints for full and close distance
+//		VectorSet( dir, 0, pm->ps->vehicleAngles[1], 0 );
+//		AngleVectors( dir, forward, right, 0 );
+//		VectorMA( pm->ps->origin, availableVehicles[pm->vehicle].maxs[0], forward, start[PFRONT] );
+//		VectorMA( pm->ps->origin, availableVehicles[pm->vehicle].mins[0], forward, start[PBACK] );
+//		VectorMA( pm->ps->origin, availableVehicles[pm->vehicle].maxs[1], right, start[PRIGHT] );
+//		VectorMA( pm->ps->origin, availableVehicles[pm->vehicle].mins[1], right, start[PLEFT] );
+//		VectorMA( pm->ps->origin, 1, forward, start[PFRONTC] );
+//		VectorMA( pm->ps->origin, -1, forward, start[PBACKC] );
+//		VectorMA( pm->ps->origin, 1, right, start[PRIGHTC] );
+//		VectorMA( pm->ps->origin, -1, right, start[PLEFTC] );
+//		for( i = 0; i < PMAX; i++ ) {
+//			VectorCopy( start[i], end[i] );
+//			start[i][2] = pm->ps->origin[2] + 20;
+//			end[i][2] = pm->ps->origin[2] - 40;
+//		}
+//		// get the projected length&width
+//		VectorSubtract( start[PFRONT], start[PBACK], forward );
+//		hLength = VectorLength( forward );
+//		VectorSubtract( start[PRIGHT], start[PLEFT], right );
+//		hWidth = VectorLength( right );
+//		VectorSubtract( start[PFRONTC], start[PBACKC], forward );
+//		hLengthC = VectorLength( forward );
+//		VectorSubtract( start[PRIGHTC], start[PLEFTC], right );
+//		hWidthC = VectorLength( right );
+//
+//		// do the ray tracing
+//		for( i = 0; i < PMAX; i++ ) {
+//			pm->trace ( &tr, 
+//						start[i], 
+//						vec3_origin, 
+//						vec3_origin,
+//						end[i], 
+//						pm->ps->clientNum, 
+//						MASK_SOLID );
+//			VectorCopy( tr.endpos, end[i] ); // new
+//			if( tr.fraction == 1 ) fall = true;
+//		}
+//		// new way
+//		VectorSubtract( end[PFRONT], end[PBACK], forward );
+//		vectoangles( forward, dir );
+//		angleX = dir[0];
+//		heightX = pm->ps->origin[2] + (end[PFRONT][2] - end[PBACK][2])/2;
+//
+//		VectorSubtract( end[PRIGHT], end[PLEFT], forward );
+//		vectoangles( forward, dir );
+//		angleY = dir[0];
+//		heightY = pm->ps->origin[2] + (end[PRIGHT][2] - end[PLEFT][2])/2;
+//
+//		VectorSubtract( end[PFRONTC], end[PBACKC], forward );
+//		vectoangles( forward, dir );
+//		angleXC = dir[0];
+//		heightXC = pm->ps->origin[2] + (end[PFRONTC][2] - end[PBACKC][2])/2;
+//
+//		VectorSubtract( end[PRIGHTC], end[PLEFTC], forward );
+//		vectoangles( forward, dir );
+//		angleYC = dir[0];
+//		heightYC = pm->ps->origin[2] + (end[PRIGHTC][2] - end[PLEFTC][2])/2;
+//
+//		// check which one to use
+//		if( !fall ) {
+//			pm->ps->vehicleAngles[PITCH] = angleX;
+//			pm->ps->vehicleAngles[ROLL] = angleY;
+//		} else {
+//			float diffp, diffr;
+//			if( heightXC < heightX ) {
+//				diffp = angleX - pm->ps->vehicleAngles[PITCH];
+//			} else {
+//				diffp = angleXC - pm->ps->vehicleAngles[PITCH];
+//			}
+//			while( diffp > 180 ) diffp -= 360;
+//			while( diffp < -180) diffp += 360;
+//			if( diffp > 0 ) {
+//				pm->ps->vehicleAngles[0] += availableVehicles[pm->vehicle].turnspeed[0] * pml.frametime;
+//			} else if( diffp < 0 ) {
+//				pm->ps->vehicleAngles[0] -= availableVehicles[pm->vehicle].turnspeed[0] * pml.frametime;
+//			}
+//			if( heightYC < heightY ) {
+//				diffr = angleY - pm->ps->vehicleAngles[ROLL];
+//			} else {
+//				diffr = angleYC - pm->ps->vehicleAngles[ROLL];
+//			}
+//			while( diffr > 180 ) diffr -= 360;
+//			while( diffr < -180) diffr += 360;
+//			if( diffr > 0 ) {
+//				pm->ps->vehicleAngles[2] += availableVehicles[pm->vehicle].turnspeed[0] * pml.frametime;
+//			} else if( diffr < 0 ) {
+//				pm->ps->vehicleAngles[2] -= availableVehicles[pm->vehicle].turnspeed[0] * pml.frametime;
+//			}
+//		}
+//		// set height
+//		pm->ps->origin[2] = height;
+//	} else {
+//		pm->ps->ONOFF &= ~(OO_LANDED|OO_LANDEDTERRAIN);
+//		if( pm->ps->ONOFF & OO_STALLED ) {
+//			if( pm->ps->vehicleAngles[0] > 269 || pm->ps->vehicleAngles[0] < 90 ) 
+//				pm->ps->vehicleAngles[0] -= availableVehicles[pm->vehicle].turnspeed[0] * pml.frametime;
+//		} else {
+//			if( pm->ps->vehicleAngles[0] < 89 || pm->ps->vehicleAngles[0] > 270 )
+//				pm->ps->vehicleAngles[0] += availableVehicles[pm->vehicle].turnspeed[0] * pml.frametime;
+//		}
+////		Com_Printf( "%.1f\n", pm->ps->vehicleAngles[2] );
+//	}
+//}
 
 /*
 ===================
@@ -249,11 +250,13 @@ static void PM_HeloAccelerate()
     float	throttle = pm->ps->fixed_throttle;
     int		maxthrottle = availableVehicles[pm->vehicle].maxthrottle;
 //	int		minthrottle = availableVehicles[pm->vehicle].minthrottle;
-	int		maxforwardspeed = availableVehicles[pm->vehicle].maxspeed;
-	int		maxrightspeed = availableVehicles[pm->vehicle].turnspeed[YAW];
-	int		maxliftspeed = maxforwardspeed*0.00525;
-	int		maxspeed = sqrt(maxforwardspeed*maxforwardspeed + maxrightspeed*maxrightspeed + maxliftspeed*maxliftspeed);
-	float	stallspeed = (float)availableVehicles[pm->vehicle].stallspeed;
+	float	maxforwardspeed = availableVehicles[pm->vehicle].maxspeed;
+	float	maxrightspeed = availableVehicles[pm->vehicle].turnspeed[YAW];
+	float	maxliftspeed = maxforwardspeed*0.00525;
+	float	maxspeed = sqrt(maxforwardspeed*maxforwardspeed + 
+							maxrightspeed*maxrightspeed + 
+							maxliftspeed*maxliftspeed);
+	float	stallspeed = static_cast<float>(availableVehicles[pm->vehicle].stallspeed);
 	float	curforwardspeed;
 	float	curliftspeed;
 	float	curliftspeedadjust;
@@ -298,7 +301,7 @@ PM_HeloMove
 
 ===================
 */
-qboolean	PM_SlideMove_Helo();
+bool	PM_SlideMove_Helo();
 
 void PM_HeloMove( void ) 
 {
@@ -307,8 +310,8 @@ void PM_HeloMove( void )
     vec3_t	diff;
     vec3_t	turnspeed;
     float	targroll;
-    qboolean	dead = (pm->ps->stats[STAT_HEALTH] <= 0);
-	qboolean	verydead = (pm->ps->stats[STAT_HEALTH] <= GIB_HEALTH);
+    bool	dead = (pm->ps->stats[STAT_HEALTH] <= 0);
+	bool	verydead = (pm->ps->stats[STAT_HEALTH] <= GIB_HEALTH);
     int		i;
 //	int		anim = 0;
 	// Speed related stuff
@@ -361,7 +364,7 @@ void PM_HeloMove( void )
 		} else {
 			PM_AddEvent( EV_GEAR_UP_FULL );
 		}
-		pm->updateGear = qfalse;
+		pm->updateGear = false;
 	}
 
 	// get the actual turret angles
@@ -497,9 +500,9 @@ void PM_HeloMove( void )
 				vehdir[PITCH] -= turnspeed[PITCH]*1.25;
 			if( pm->ps->ONOFF & OO_SPEEDBRAKE && pm->cmd.forwardmove == 0) {
 				if(vehdir[PITCH] > 0)
-					vehdir[PITCH] -= min(vehdir[PITCH], turnspeed[PITCH]*1.05);
+					vehdir[PITCH] -= std::min(vehdir[PITCH], turnspeed[PITCH]*1.05f);
 				else if(vehdir[PITCH] < 0)
-					vehdir[PITCH] += max(vehdir[PITCH], turnspeed[PITCH]*1.05);
+					vehdir[PITCH] += std::max(vehdir[PITCH], turnspeed[PITCH]*1.05f);
 			}
 
 			// roll
@@ -532,8 +535,8 @@ void PM_HeloMove( void )
 
 
 		// limit roll and pitch
-		vehdir[PITCH] = vehdir[PITCH] < 0 ? max(-MAX_HELO_PITCH, vehdir[PITCH]) : min (MAX_HELO_PITCH, vehdir[PITCH]);
-		vehdir[ROLL] = vehdir[ROLL] < 0 ? max(-MAX_HELO_ROLL, vehdir[ROLL]) : min (MAX_HELO_ROLL, vehdir[ROLL]);
+		vehdir[PITCH] = vehdir[PITCH] < 0 ? std::max(-MAX_HELO_PITCH, vehdir[PITCH]) : std::min (MAX_HELO_PITCH, vehdir[PITCH]);
+		vehdir[ROLL] = vehdir[ROLL] < 0 ? std::max(-MAX_HELO_ROLL, vehdir[ROLL]) : std::min (MAX_HELO_ROLL, vehdir[ROLL]);
 
 		if( (availableVehicles[pm->vehicle].caps & HC_GEAR) && (pm->ps->ONOFF & OO_GEAR) &&
 			(pm->ps->speed > availableVehicles[pm->vehicle].stallspeed * 10 * SPEED_GREEN_ARC) &&
@@ -628,11 +631,11 @@ static void PM_AddTouchEnt_Helo( int entityNum ) {
 ==================
 PM_SlideMove_Plane
 
-Returns qtrue if the velocity was clipped in some way
+Returns true if the velocity was clipped in some way
 ==================
 */
 #define	MAX_CLIP_PLANES	5
-qboolean	PM_SlideMove_Helo() {
+bool	PM_SlideMove_Helo() {
 	int			bumpcount, numbumps;
 	vec3_t		dir;
 	float		d;
@@ -691,7 +694,7 @@ qboolean	PM_SlideMove_Helo() {
 			if( trace.allsolid ) {
 				// entity is completely trapped in another solid
 				pm->ps->velocity[2] = 0;	// don't build up falling damage, but allow sideways acceleration
-				return qtrue;
+				return true;
 			}
 		}
 
@@ -718,7 +721,7 @@ qboolean	PM_SlideMove_Helo() {
 		if (numplanes >= MAX_CLIP_PLANES) {
 			// this shouldn't really happen
 			VectorClear( pm->ps->velocity );
-			return qtrue;
+			return true;
 		}
 
 		//
@@ -800,7 +803,7 @@ qboolean	PM_SlideMove_Helo() {
 
 					// stop dead at a tripple plane interaction
 					VectorClear( pm->ps->velocity );
-					return qtrue;
+					return true;
 				}
 			}
 

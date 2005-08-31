@@ -1,5 +1,5 @@
 /*
- * $Id: g_mfq3util.c,v 1.3 2005-08-25 19:49:21 thebjoern Exp $
+ * $Id: g_mfq3util.c,v 1.4 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 
@@ -58,7 +58,7 @@ void updateTargetTracking( gentity_t *ent )
 	trace_t			tr;
 	vec3_t			forward, endpos, dir;
 	float			radarrange = 0;
-	qboolean		buildings = qfalse, groundinstallations = qfalse;
+	bool		buildings = false, groundinstallations = false;
 	gentity_t		*test;
 	float			cone = 0.0f;
 	
@@ -71,8 +71,8 @@ void updateTargetTracking( gentity_t *ent )
 		cone = availableVehicles[ent->client->vehicle].trackCone;
 	} else if( ent->client->ps.ONOFF & OO_RADAR_GROUND ) {
 		targetcat = CAT_GROUND|CAT_BOAT;
-		buildings = qtrue;
-		groundinstallations = qtrue;
+		buildings = true;
+		groundinstallations = true;
 		radarrange = availableVehicles[ent->client->vehicle].radarRange2;
 		cone = availableVehicles[ent->client->vehicle].trackCone2;
 	}
@@ -139,7 +139,7 @@ void updateTargetTracking( gentity_t *ent )
 				if( ent->tracktarget->s.modelindex == 255 )// groundinstallation
 				{
 					actualcat = CAT_GROUND;
-					groundinstallations = qtrue;
+					groundinstallations = true;
 				}
 				else
 					actualcat = availableVehicles[ent->tracktarget->s.modelindex].cat;
@@ -197,7 +197,7 @@ void updateTargetTracking( gentity_t *ent )
 		} else if( availableWeapons[ent->s.weaponIndex].type != WT_ANTIAIRMISSILE &&
 			(ent->client->ps.ONOFF & OO_RADAR_GROUND) ) {
 			targetcat = CAT_GROUND|CAT_BOAT;
-			buildings = qtrue;
+			buildings = true;
 		}
 		if( !targetcat ) {
 			unlock(ent);

@@ -31,7 +31,7 @@ MF_CG_GetGameset
 */
 
 // gets the mf_gameset variable into the correct a MF_GAMESET_x return
-unsigned long MF_CG_GetGameset( qboolean asEnum )
+unsigned long MF_CG_GetGameset( bool asEnum )
 {
 	char * pGameSet = NULL;
 	const char * pInfo = NULL;

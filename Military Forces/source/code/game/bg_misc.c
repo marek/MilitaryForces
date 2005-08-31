@@ -1,5 +1,5 @@
 /*
- * $Id: bg_misc.c,v 1.3 2005-08-27 09:45:38 thebjoern Exp $
+ * $Id: bg_misc.c,v 1.4 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -37,7 +37,7 @@ gitem_t	bg_itemlist[] =
 /* icon */		NULL,
 /* pickup */	NULL,
 		0,
-		0,
+		static_cast<itemType_t>(0),
 		0,
 /* precache */ "",
 /* sounds */ ""
@@ -297,7 +297,7 @@ Items can be picked up without actually touching their physical bounds to make
 grabbing them easier
 ============
 */
-qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTime ) {
+bool	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTime ) {
 	vec3_t		origin;
 
 	BG_EvaluateTrajectory( &item->pos, atTime, origin );
@@ -309,10 +309,10 @@ qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTim
 		|| ps->origin[1] - origin[1] < -36
 		|| ps->origin[2] - origin[2] > 36
 		|| ps->origin[2] - origin[2] < -36 ) {
-		return qfalse;
+		return false;
 	}
 
-	return qtrue;
+	return true;
 }
 
 
@@ -325,7 +325,7 @@ Returns false if the item should not be picked up.
 This needs to be the same for client side prediction and server use.
 ================
 */
-qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const playerState_t *ps, int idx ) {
+bool BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const playerState_t *ps, int idx ) {
 	gitem_t	*item;
 	int		i;
 
@@ -339,32 +339,32 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 	case IT_AMMO:
 		for( i = WP_MACHINEGUN; i <= WP_FLARE; i++ ) {
 			if( item->giTag == availableWeapons[availableVehicles[idx].weapons[i]].type &&
-				ps->ammo[i] < ps->ammo[i+8] ) return qtrue;
+				ps->ammo[i] < ps->ammo[i+8] ) return true;
 		}
-		return qfalse;
+		return false;
 
 	case IT_HEALTH:
 		// small and mega healths will go over the max, otherwise
 		// don't pick up if already at max
 		if ( item->quantity == 5 || item->quantity == 100 ) {
 			if ( ps->stats[STAT_HEALTH] >= ps->stats[STAT_MAX_HEALTH] * 2 ) {
-				return qfalse;
+				return false;
 			}
-			return qtrue;
+			return true;
 		}
 
 		if ( ps->stats[STAT_HEALTH] >= ps->stats[STAT_MAX_HEALTH] ) {
-			return qfalse;
+			return false;
 		}
-		return qtrue;
+		return true;
 
 	case IT_FUEL:
 		// small and mega healths will go over the max, otherwise
 		// don't pick up if already at max
 			if ( ps->stats[STAT_FUEL] >= ps->stats[STAT_MAX_FUEL] ) {
-				return qfalse;
+				return false;
 			}
-			return qtrue;
+			return true;
 
 	case IT_TEAM: // team items, such as flags
 		if( gametype == GT_CTF ) {
@@ -376,23 +376,23 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 					if (item->giTag == OB_BLUEFLAG ||
 						(item->giTag == OB_REDFLAG && ent->modelindex2) ||
 						(item->giTag == OB_REDFLAG && (ps->objectives&OB_BLUEFLAG)) )
-						return qtrue;
+						return true;
 				} else if (ps->persistant[PERS_TEAM] == TEAM_BLUE) {
 					if (item->giTag == OB_REDFLAG ||
 						(item->giTag == OB_BLUEFLAG && ent->modelindex2) ||
 						(item->giTag == OB_BLUEFLAG && (ps->objectives&OB_REDFLAG)) )
-						return qtrue;
+						return true;
 				}
 			}
 		}
 
-		return qfalse;
+		return false;
 
     case IT_BAD:
             Com_Error( ERR_DROP, "BG_CanItemBeGrabbed: IT_BAD" );
 	}
 
-	return qfalse;
+	return false;
 }
 
 //======================================================================
@@ -616,7 +616,7 @@ This is done after each set of usercmd_t on the server,
 and after local prediction on the client
 ========================
 */
-void BG_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, qboolean snap ) {
+void BG_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, bool snap ) {
 
 	if ( ps->pm_type == PM_INTERMISSION || ps->pm_type == PM_SPECTATOR ) {
 		s->eType = ET_INVISIBLE;
@@ -699,7 +699,7 @@ This is done after each set of usercmd_t on the server,
 and after local prediction on the client
 ========================
 */
-void BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s, int time, qboolean snap ) {
+void BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s, int time, bool snap ) {
 
 	if ( ps->pm_type == PM_INTERMISSION || ps->pm_type == PM_SPECTATOR ) {
 		s->eType = ET_INVISIBLE;

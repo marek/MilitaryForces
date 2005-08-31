@@ -1,5 +1,5 @@
 /*
- * $Id: cg_view.c,v 1.1 2005-08-22 16:03:41 thebjoern Exp $
+ * $Id: cg_view.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -60,7 +60,7 @@ CG_OffsetVehicleView
 //#define	_VIEW_SETTING_DISPLAY
 
 // MFQ3
-static void CG_OffsetVehicleView( qboolean spectator ) 
+static void CG_OffsetVehicleView( bool spectator ) 
 {
     vec3_t	    forward, right, up;
     vec3_t	    focusAngles;
@@ -153,7 +153,7 @@ static void CG_OffsetVehicleView( qboolean spectator )
 
 
 // MFQ3
-static void CG_OffsetVehicleViewCFV( qboolean spectator ) 
+static void CG_OffsetVehicleViewCFV( bool spectator ) 
 {
     vec3_t	    forward, right, up;
     vec3_t	    focusAngles;
@@ -346,23 +346,23 @@ void CG_ZoomDown_f( void )
 	if( cg.zoomAmount > 8 )	// x8 is max zoom
 	{
 		// off
-		cg.zoomed = qfalse;
+		cg.zoomed = false;
 		cg.zoomAmount = 1;
 	}
 	else
 	{
 		// on
-		cg.zoomed = qtrue;
+		cg.zoomed = true;
 	}
 
 	// lock-out
-	cg.zoomLockOut = qfalse;
+	cg.zoomLockOut = false;
 }
 
 void CG_ZoomUp_f( void )
 { 
 	// reset lock-out
-	cg.zoomLockOut = qfalse;
+	cg.zoomLockOut = false;
 }
 
 /*
@@ -438,10 +438,10 @@ static int CG_CalcFov( void ) {
 		v = WAVE_AMPLITUDE * sin( phase );
 		fov_x += v;
 		fov_y -= v;
-		inwater = qtrue;
+		inwater = true;
 	}
 	else {
-		inwater = qfalse;
+		inwater = false;
 	}
 
 
@@ -466,7 +466,7 @@ CG_CalcViewValues
 
 static void CG_CalcMiscViewValues( void )
 {
-	qboolean noAdjust = qfalse;
+	bool noAdjust = false;
 
 	float mult = 0.0f;
 	
@@ -492,7 +492,7 @@ static void CG_CalcMiscViewValues( void )
 		break;
 
 	default:
-		noAdjust = qtrue;
+		noAdjust = true;
 		break;
 	}
 
@@ -564,12 +564,12 @@ static int CG_CalcViewValues( void ) {
 	}
 
 	if( ps->pm_type == PM_SPECTATOR ) {
-	    CG_OffsetVehicleView(qtrue);
+	    CG_OffsetVehicleView(true);
 	} else if ( cg.renderingThirdPerson ) {
 		if( cg_advanced.integer )
-			CG_OffsetVehicleViewCFV(qfalse);
+			CG_OffsetVehicleViewCFV(false);
 		else
-			CG_OffsetVehicleView(qfalse);
+			CG_OffsetVehicleView(false);
 	} else {
 		CG_OffsetCockpitView();
 	}
@@ -626,7 +626,7 @@ CG_DrawActiveFrame
 Generates and draws a game scene and status information at the given time.
 =================
 */
-void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demoPlayback ) {
+void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, int demoPlayback ) {
 	int		inwater;
 
 	cg.time = serverTime;
@@ -645,7 +645,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 
 	// any looped sounds will be respecified as entities
 	// are added to the render list
-	trap_S_ClearLoopingSounds(qfalse);
+	trap_S_ClearLoopingSounds(false);
 
 	// clear all the render lists
 	trap_R_ClearScene();
@@ -744,7 +744,7 @@ CG_WorldToScreenCoords
 Converts a world vector point into screen coords
 =================
 */
-qboolean CG_WorldToScreenCoords( vec3_t worldPoint, int * pX, int * pY, qboolean virtualXY )
+bool CG_WorldToScreenCoords( vec3_t worldPoint, int * pX, int * pY, bool virtualXY )
 {
 	vec3_t v, dp, n, p;
 	float tanthetah, tanthetav;
@@ -764,7 +764,7 @@ qboolean CG_WorldToScreenCoords( vec3_t worldPoint, int * pX, int * pY, qboolean
 	// don't continue if point is behind out view plane
 	if( dp[1] < 0 )
 	{
-		return qfalse;
+		return false;
 	}
 
 	// calc FOV adjustments
@@ -803,9 +803,9 @@ qboolean CG_WorldToScreenCoords( vec3_t worldPoint, int * pX, int * pY, qboolean
 	   *pY = (int)p[1];
 
 	   // on-screen
-	   return qtrue;
+	   return true;
 	}
 
 	// off-screen
-	return qfalse;
+	return false;
 }

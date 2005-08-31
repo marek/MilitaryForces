@@ -1,5 +1,5 @@
 /*
- * $Id: g_active.c,v 1.3 2005-08-27 09:45:38 thebjoern Exp $
+ * $Id: g_active.c,v 1.4 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -46,7 +46,7 @@ void P_DamageFeedback( gentity_t *player ) {
 		client->ps.damagePitch = 255;
 		client->ps.damageYaw = 255;
 
-		client->damage_fromWorld = qfalse;
+		client->damage_fromWorld = false;
 	} else {
 		vectoangles( client->damage_from, angles );
 		client->ps.damagePitch = angles[PITCH]/360.0 * 256;
@@ -400,32 +400,32 @@ void MissionEditorThink( gentity_t *ent, usercmd_t *ucmd ) {
 =================
 ClientInactivityTimer
 
-Returns qfalse if the client is dropped
+Returns false if the client is dropped
 =================
 */
-qboolean ClientInactivityTimer( gclient_t *client ) {
+bool ClientInactivityTimer( gclient_t *client ) {
 	if ( ! g_inactivity.integer ) {
 		// give everyone some time, so if the operator sets g_inactivity during
 		// gameplay, everyone isn't kicked
 		client->inactivityTime = level.time + 60 * 1000;
-		client->inactivityWarning = qfalse;
+		client->inactivityWarning = false;
 	} else if ( client->pers.cmd.forwardmove || 
 		client->pers.cmd.rightmove || 
 		client->pers.cmd.upmove ||
 		(client->pers.cmd.buttons & BUTTON_ATTACK) ) {
 		client->inactivityTime = level.time + g_inactivity.integer * 1000;
-		client->inactivityWarning = qfalse;
+		client->inactivityWarning = false;
 	} else if ( !client->pers.localClient ) {
 		if ( level.time > client->inactivityTime ) {
 			trap_DropClient( client - level.clients, "Dropped due to inactivity" );
-			return qfalse;
+			return false;
 		}
 		if ( level.time > client->inactivityTime - 10000 && !client->inactivityWarning ) {
-			client->inactivityWarning = qtrue;
+			client->inactivityWarning = true;
 			trap_SendServerCommand( client - level.clients, "cp \"Ten seconds until inactivity drop!\n\"" );
 		}
 	}
-	return qtrue;
+	return true;
 }
 
 /*
@@ -494,7 +494,7 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 
 		switch ( event ) {
 		case EV_FIRE_MG:
-			fire_autocannon( ent, qfalse );
+			fire_autocannon( ent, false );
 			break;
 
 		case EV_FIRE_WEAPON:
@@ -552,9 +552,9 @@ static int StuckInOtherClient(gentity_t *ent) {
 			continue;
 		if (ent2->r.absmax[2] < ent->r.absmin[2])
 			continue;
-		return qtrue;
+		return true;
 	}
-	return qfalse;
+	return false;
 }
 */
 
@@ -584,7 +584,7 @@ void SendPendingPredictableEvents( playerState_t *ps )
 		// create temporary entity for event
 		t = G_TempEntity( ps->origin, event );
 		number = t->s.number;
-		BG_PlayerStateToEntityState( ps, &t->s, qtrue );
+		BG_PlayerStateToEntityState( ps, &t->s, true );
 		t->s.number = number;
 		t->s.eType = ET_EVENTS + event;
 		t->s.eFlags |= EF_PLAYER_EVENT;
@@ -620,7 +620,7 @@ void ClientThink_real( gentity_t *ent ) {
 	client = ent->client;
 
 	// event queue
-	ent->eventSent = qfalse;
+	ent->eventSent = false;
 	G_SendEventFromQueue( ent );
 
 	// don't think if the client is not yet connected (and thus not yet spawned in)
@@ -786,7 +786,7 @@ void ClientThink_real( gentity_t *ent ) {
 	pm.pointcontents = trap_PointContents;
 	pm.debugLevel = g_debugMove.integer;
 
-	pm.pmove_fixed = pmove_fixed.integer | client->pers.pmoveFixed;
+	pm.pmove_fixed = (pmove_fixed.integer!=0) | client->pers.pmoveFixed;
 	pm.pmove_msec = pmove_msec.integer;
 
 	VectorCopy( client->ps.origin, client->oldOrigin );
@@ -834,10 +834,10 @@ void ClientThink_real( gentity_t *ent ) {
 		ent->eventTime = level.time;
 	}
 	if (g_smoothClients.integer) {
-		BG_PlayerStateToEntityStateExtraPolate( &ent->client->ps, &ent->s, ent->client->ps.commandTime, qtrue );
+		BG_PlayerStateToEntityStateExtraPolate( &ent->client->ps, &ent->s, ent->client->ps.commandTime, true );
 	}
 	else {
-		BG_PlayerStateToEntityState( &ent->client->ps, &ent->s, qtrue );
+		BG_PlayerStateToEntityState( &ent->client->ps, &ent->s, true );
 	}
 	SendPendingPredictableEvents( &ent->client->ps );
 
@@ -1040,10 +1040,10 @@ void ClientEndFrame( gentity_t *ent ) {
 
 	// set the latest infor
 	if (g_smoothClients.integer) {
-		BG_PlayerStateToEntityStateExtraPolate( &ent->client->ps, &ent->s, ent->client->ps.commandTime, qtrue );
+		BG_PlayerStateToEntityStateExtraPolate( &ent->client->ps, &ent->s, ent->client->ps.commandTime, true );
 	}
 	else {
-		BG_PlayerStateToEntityState( &ent->client->ps, &ent->s, qtrue );
+		BG_PlayerStateToEntityState( &ent->client->ps, &ent->s, true );
 	}
 	SendPendingPredictableEvents( &ent->client->ps );
 

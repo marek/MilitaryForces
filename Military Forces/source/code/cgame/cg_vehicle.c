@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicle.c,v 1.6 2005-08-27 09:45:38 thebjoern Exp $
+ * $Id: cg_vehicle.c,v 1.7 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -96,8 +96,8 @@ static animation_t * CG_ParseLQMAnimationFile( const char *filename ) {
 				animations[i].initialLerp = animations[TORSO_GESTURE].initialLerp;
 				animations[i].loopFrames = animations[TORSO_GESTURE].loopFrames;
 				animations[i].numFrames = animations[TORSO_GESTURE].numFrames;
-				animations[i].reversed = qfalse;
-				animations[i].flipflop = qfalse;
+				animations[i].reversed = false;
+				animations[i].flipflop = false;
 				continue;
 			}
 			break;
@@ -117,12 +117,12 @@ static animation_t * CG_ParseLQMAnimationFile( const char *filename ) {
 		}
 		animations[i].numFrames = atoi( token );
 
-		animations[i].reversed = qfalse;
-		animations[i].flipflop = qfalse;
+		animations[i].reversed = false;
+		animations[i].flipflop = false;
 		// if numFrames is negative the animation is reversed
 		if (animations[i].numFrames < 0) {
 			animations[i].numFrames = -animations[i].numFrames;
-			animations[i].reversed = qtrue;
+			animations[i].reversed = true;
 		}
 
 		token = COM_Parse( &text_p );
@@ -150,31 +150,31 @@ static animation_t * CG_ParseLQMAnimationFile( const char *filename ) {
 
 	// crouch backward animation
 	memcpy(&animations[LEGS_BACKCR], &animations[LEGS_WALKCR], sizeof(animation_t));
-	animations[LEGS_BACKCR].reversed = qtrue;
+	animations[LEGS_BACKCR].reversed = true;
 	// walk backward animation
 	memcpy(&animations[LEGS_BACKWALK], &animations[LEGS_WALK], sizeof(animation_t));
-	animations[LEGS_BACKWALK].reversed = qtrue;
+	animations[LEGS_BACKWALK].reversed = true;
 	// flag moving fast
 	animations[FLAG_RUN].firstFrame = 0;
 	animations[FLAG_RUN].numFrames = 16;
 	animations[FLAG_RUN].loopFrames = 16;
 	animations[FLAG_RUN].frameLerp = 1000 / 15;
 	animations[FLAG_RUN].initialLerp = 1000 / 15;
-	animations[FLAG_RUN].reversed = qfalse;
+	animations[FLAG_RUN].reversed = false;
 	// flag not moving or moving slowly
 	animations[FLAG_STAND].firstFrame = 16;
 	animations[FLAG_STAND].numFrames = 5;
 	animations[FLAG_STAND].loopFrames = 0;
 	animations[FLAG_STAND].frameLerp = 1000 / 20;
 	animations[FLAG_STAND].initialLerp = 1000 / 20;
-	animations[FLAG_STAND].reversed = qfalse;
+	animations[FLAG_STAND].reversed = false;
 	// flag speeding up
 	animations[FLAG_STAND2RUN].firstFrame = 16;
 	animations[FLAG_STAND2RUN].numFrames = 5;
 	animations[FLAG_STAND2RUN].loopFrames = 1;
 	animations[FLAG_STAND2RUN].frameLerp = 1000 / 15;
 	animations[FLAG_STAND2RUN].initialLerp = 1000 / 15;
-	animations[FLAG_STAND2RUN].reversed = qtrue;
+	animations[FLAG_STAND2RUN].reversed = true;
 
 	availableLQMAnimations.numAnimations++;
 	return animations;

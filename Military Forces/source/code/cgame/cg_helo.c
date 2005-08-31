@@ -1,5 +1,5 @@
 /*
- * $Id: cg_helo.c,v 1.2 2005-08-27 00:27:51 thebjoern Exp $
+ * $Id: cg_helo.c,v 1.3 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 
@@ -178,7 +178,7 @@ void CG_Helo( centity_t *cent, clientInfo_t *ci )
 
 	// muzzleflash
 	if( cg.time - cent->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {
-		drawInfo.basicInfo.drawMuzzleFlash = qtrue;
+		drawInfo.basicInfo.drawMuzzleFlash = true;
 		drawInfo.basicInfo.flashWeaponIndex = cent->muzzleFlashWeapon;
 	}
 
@@ -207,12 +207,12 @@ void CG_Helo( centity_t *cent, clientInfo_t *ci )
 		if( ps->stats[STAT_LOCKINFO] & LI_TRACKING )
 		{
 			refEntity_t reticlelock;
-			qboolean building = qfalse;
+			bool building = false;
 			centity_t* target = &cg_entities[cent->currentState.tracktarget];
 			
 			if( target->currentState.eType == ET_EXPLOSIVE )
 			{
-				building = qtrue;
+				building = true;
 			}
 
 			reticle.customShader = availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshairtrack;
@@ -289,7 +289,7 @@ void CG_Helo( centity_t *cent, clientInfo_t *ci )
 				VectorScale( reticlelock.axis[0], 10.0f, reticlelock.axis[0] );
 				VectorScale( reticlelock.axis[1], 10.0f, reticlelock.axis[1] );
 				VectorScale( reticlelock.axis[2], 10.0f, reticlelock.axis[2] );
-				reticlelock.nonNormalizedAxes = qtrue;
+				reticlelock.nonNormalizedAxes = true;
 				CG_Trace( &tr, start, 0, 0, end, cg.snap->ps.clientNum, MASK_SOLID ); 
 				VectorCopy( tr.endpos, end );
 				CG_Trace( &tr, cg.refdef.vieworg, 0, 0, end, cg.snap->ps.clientNum, MASK_SOLID ); 

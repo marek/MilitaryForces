@@ -1,5 +1,5 @@
 /*
- * $Id: cg_testmodel.c,v 1.1 2005-08-22 16:03:23 thebjoern Exp $
+ * $Id: cg_testmodel.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -82,7 +82,7 @@ void CG_TestModel_f (void) {
 	angles[ROLL] = 0;
 
 	AnglesToAxis( angles, cg.testModelEntity.axis );
-	cg.testGun = qfalse;
+	cg.testGun = false;
 }
 
 /*
@@ -94,7 +94,7 @@ Replaces the current view weapon with the given model
 */
 void CG_TestGun_f (void) {
 	CG_TestModel_f();
-	cg.testGun = qtrue;
+	cg.testGun = true;
 	cg.testModelEntity.renderfx = RF_MINLIGHT | RF_DEPTHHACK | RF_FIRST_PERSON;
 }
 
@@ -353,7 +353,7 @@ void CG_TestVehicle (long cat) {
 		AnglesToAxis( angles, cg.testVehicleParts[i].axis );
 	}
 
-//	cg.testGun = qfalse;
+//	cg.testGun = false;
 }
 
 

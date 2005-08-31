@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawoldhud.c,v 1.1 2005-08-22 16:02:03 thebjoern Exp $
+ * $Id: cg_drawoldhud.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -17,7 +17,7 @@ CG_DrawStatusBarFlag
 ================
 */
 static void CG_DrawStatusBarFlag( float x, int team ) {
-	CG_DrawFlagModel( x, 480 - ICON_SIZE, ICON_SIZE, ICON_SIZE, team, qfalse );
+	CG_DrawFlagModel( x, 480 - ICON_SIZE, ICON_SIZE, ICON_SIZE, team, false );
 }
 
 

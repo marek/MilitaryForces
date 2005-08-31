@@ -1,5 +1,5 @@
 /*
- * $Id: ui_gameinfo.c,v 1.2 2005-08-22 22:29:54 minkis Exp $
+ * $Id: ui_gameinfo.c,v 1.3 2005-08-31 19:20:23 thebjoern Exp $
 */
 //
 // gameinfo.c
@@ -24,7 +24,8 @@ static char		*ui_arenaInfos[MAX_ARENAS];
 UI_ParseInfos
 ===============
 */
-int UI_ParseInfos( char *buf, int max, char *infos[] ) {
+int UI_ParseInfos( char *buf, int max, char *infos[] ) 
+{
 	char	*token;
 	int		count;
 	char	key[MAX_TOKEN_CHARS];
@@ -32,42 +33,48 @@ int UI_ParseInfos( char *buf, int max, char *infos[] ) {
 
 	count = 0;
 
-	while ( 1 ) {
+	while ( 1 ) 
+	{
 		token = COM_Parse( &buf );
-		if ( !token[0] ) {
+		if ( !token[0] ) 
 			break;
-		}
-		if ( strcmp( token, "{" ) ) {
+		
+		if ( strcmp( token, "{" ) ) 
+		{
 			Com_Printf( "Missing { in info file\n" );
 			break;
 		}
 
-		if ( count == max ) {
+		if ( count == max ) 
+		{
 			Com_Printf( "Max infos exceeded\n" );
 			break;
 		}
 
 		info[0] = '\0';
-		while ( 1 ) {
-			token = COM_ParseExt( &buf, qtrue );
-			if ( !token[0] ) {
+		while ( 1 ) 
+		{
+			token = COM_ParseExt( &buf, true );
+			if ( !token[0] ) 
+			{
 				Com_Printf( "Unexpected end of info file\n" );
 				break;
 			}
-			if ( !strcmp( token, "}" ) ) {
+			if ( !strcmp( token, "}" ) ) 
 				break;
-			}
+			
 			Q_strncpyz( key, token, sizeof( key ) );
 
-			token = COM_ParseExt( &buf, qfalse );
-			if ( !token[0] ) {
+			token = COM_ParseExt( &buf, false );
+			if ( !token[0] ) 
 				strcpy( token, "<NULL>" );
-			}
+			
 			Info_SetValueForKey( info, key, token );
 		}
 		//NOTE: extra space for arena number
-		infos[count] = UI_Alloc(strlen(info) + strlen("\\num\\") + strlen(va("%d", MAX_ARENAS)) + 1);
-		if (infos[count]) {
+		infos[count] = reinterpret_cast<char*>(UI_Alloc(strlen(info) + strlen("\\num\\") + strlen(va("%d", MAX_ARENAS)) + 1));
+		if (infos[count]) 
+		{
 			strcpy(infos[count], info);
 			count++;
 		}

@@ -1,5 +1,5 @@
 /*
- * $Id: g_miscvehicle.c,v 1.1 2005-08-22 16:06:51 thebjoern Exp $
+ * $Id: g_miscvehicle.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 
@@ -33,7 +33,7 @@ void misc_vehicle_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacke
 	}
 
 	ExplodeVehicle(self);
-	self->freeAfterEvent = qtrue;
+	self->freeAfterEvent = true;
 
 	G_RadiusDamage( self->r.currentOrigin, self, 150, 150, self, MOD_VEHICLEEXPLOSION, CAT_ANY );
 
@@ -56,7 +56,7 @@ static void faceFirstWaypoint( gentity_t* ent ) {
 static void SP_misc_plane( gentity_t *ent )
 {
 	unsigned int vehIndex = ent->s.modelindex;
-	qboolean landed = qfalse;
+	bool landed = false;
 	trace_t	trace;
 	vec3_t	startpos, endpos, startorg, forward;
 	gentity_t *test;
@@ -70,7 +70,7 @@ static void SP_misc_plane( gentity_t *ent )
 	if( trace.entityNum != ENTITYNUM_NONE ) {
 		test = &g_entities[trace.entityNum];
 		if( canLandOnIt(test) ) {
-			landed = qtrue;
+			landed = true;
 			ent->s.origin[2] = test->r.maxs[2] - availableVehicles[vehIndex].mins[2] + 
 				availableVehicles[vehIndex].gearheight;
 		}			
@@ -95,7 +95,7 @@ static void SP_misc_plane( gentity_t *ent )
 		trap_Cvar_VariableStringBuffer("mapname", buffer, 32);
 		Com_sprintf( filename, MAX_FILEPATH, "dronefiles/%s/%s.drone", buffer, ent->targetname );
 		if( LoadVehicleScripts( ent, filename ) ) {
-			if( !(ent->s.ONOFF & OO_LANDED) && landed ) landed = qfalse;
+			if( !(ent->s.ONOFF & OO_LANDED) && landed ) landed = false;
 			faceFirstWaypoint(ent);
 			ent->s.eFlags |= EF_PILOT_ONBOARD;
 			ent->s.pos.trType = TR_LINEAR;//TR_INTERPOLATE;
@@ -122,10 +122,10 @@ static void SP_misc_plane( gentity_t *ent )
 		VectorScale( forward, ent->speed, ent->s.pos.trDelta );
 	}
 	// update gear anim
-	ent->updateGear = qtrue;
+	ent->updateGear = true;
 
 	// update bay anim
-	ent->updateBay = qtrue;
+	ent->updateBay = true;
 
 	ent->s.pos.trTime = level.time;
 	trap_LinkEntity (ent);
@@ -328,7 +328,7 @@ void SP_misc_vehicle( gentity_t *sp_ent )
 	char modelname[128];
 	int i;
 //	unsigned long gameset = G_GetGameset();
-//	qboolean found = qfalse;
+//	bool found = false;
 	unsigned long cat;
 	gentity_t* ent = G_Spawn();
 
@@ -370,7 +370,7 @@ void SP_misc_vehicle( gentity_t *sp_ent )
 				++j;
 				// found it
 				if( j == k ) {
-					found = qtrue;
+					found = true;
 					break;
 				}
 			}
@@ -382,7 +382,7 @@ void SP_misc_vehicle( gentity_t *sp_ent )
 			// vehicle is in list
 			if( strcmp( availableVehicles[i].modelName, ent->model ) == 0 ) {
 				if( gameset & (availableVehicles[i].gameset) ) {
-					found = qtrue;
+					found = true;
 				}
 				break;
 			}
@@ -435,8 +435,8 @@ void SP_misc_vehicle( gentity_t *sp_ent )
 	ent->s.pos.trType = TR_STATIONARY;
 	ent->s.apos.trType = TR_STATIONARY;
 	if( ent->health <= 0 ) ent->health = availableVehicles[i].maxhealth;
-	ent->takedamage = qtrue;
-	ent->inuse = qtrue;
+	ent->takedamage = true;
+	ent->inuse = true;
 	ent->die = misc_vehicle_die;
 	if( !ent->score ) ent->score = 1;
 	ent->classname = "misc_vehicle";
@@ -455,7 +455,7 @@ void SP_misc_groundinstallation( gentity_t *sp_ent )
 	char modelname[128];
 	int i;
 //	unsigned long gameset = G_GetGameset();
-//	qboolean found = qfalse;
+//	bool found = false;
 	gentity_t* ent = G_Spawn();
 
 	ent->model = sp_ent->model;
@@ -501,8 +501,8 @@ void SP_misc_groundinstallation( gentity_t *sp_ent )
 	ent->s.pos.trType = TR_STATIONARY;
 	ent->s.apos.trType = TR_STATIONARY;
 	if( ent->health <= 0 ) ent->health = 1;//availableVehicles[i].maxhealth;
-	ent->takedamage = qtrue;
-	ent->inuse = qtrue;
+	ent->takedamage = true;
+	ent->inuse = true;
 	ent->die = groundinstallation_die;
 	if( !ent->score ) ent->score = 1;
 	ent->classname = "misc_vehicle";

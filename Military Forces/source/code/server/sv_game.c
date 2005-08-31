@@ -135,7 +135,7 @@ void SV_SetBrushModel( sharedEntity_t *ent, const char *name ) {
 	CM_ModelBounds( h, mins, maxs );
 	VectorCopy (mins, ent->r.mins);
 	VectorCopy (maxs, ent->r.maxs);
-	ent->r.bmodel = qtrue;
+	ent->r.bmodel = true;
 
 	ent->r.contents = -1;		// we don't know exactly what is in the brushes
 
@@ -151,7 +151,7 @@ SV_inPVS
 Also checks portalareas so that doors block sight
 =================
 */
-qboolean SV_inPVS (const vec3_t p1, const vec3_t p2)
+bool SV_inPVS (const vec3_t p1, const vec3_t p2)
 {
 	int		leafnum;
 	int		cluster;
@@ -167,10 +167,10 @@ qboolean SV_inPVS (const vec3_t p1, const vec3_t p2)
 	cluster = CM_LeafCluster (leafnum);
 	area2 = CM_LeafArea (leafnum);
 	if ( mask && (!(mask[cluster>>3] & (1<<(cluster&7)) ) ) )
-		return qfalse;
+		return false;
 	if (!CM_AreasConnected (area1, area2))
-		return qfalse;		// a door blocks sight
-	return qtrue;
+		return false;		// a door blocks sight
+	return true;
 }
 
 
@@ -181,7 +181,7 @@ SV_inPVSIgnorePortals
 Does NOT check portalareas
 =================
 */
-qboolean SV_inPVSIgnorePortals( const vec3_t p1, const vec3_t p2)
+bool SV_inPVSIgnorePortals( const vec3_t p1, const vec3_t p2)
 {
 	int		leafnum;
 	int		cluster;
@@ -198,9 +198,9 @@ qboolean SV_inPVSIgnorePortals( const vec3_t p1, const vec3_t p2)
 	area2 = CM_LeafArea (leafnum);
 
 	if ( mask && (!(mask[cluster>>3] & (1<<(cluster&7)) ) ) )
-		return qfalse;
+		return false;
 
-	return qtrue;
+	return true;
 }
 
 
@@ -209,7 +209,7 @@ qboolean SV_inPVSIgnorePortals( const vec3_t p1, const vec3_t p2)
 SV_AdjustAreaPortalState
 ========================
 */
-void SV_AdjustAreaPortalState( sharedEntity_t *ent, qboolean open ) {
+void SV_AdjustAreaPortalState( sharedEntity_t *ent, int open ) {
 	svEntity_t	*svEnt;
 
 	svEnt = SV_SvEntityForGentity( ent );
@@ -225,7 +225,7 @@ void SV_AdjustAreaPortalState( sharedEntity_t *ent, qboolean open ) {
 SV_GameAreaEntities
 ==================
 */
-qboolean	SV_EntityContact( vec3_t mins, vec3_t maxs, const sharedEntity_t *gEnt, int capsule ) {
+bool	SV_EntityContact( vec3_t mins, vec3_t maxs, const sharedEntity_t *gEnt, int capsule ) {
 	const float	*origin, *angles;
 	clipHandle_t	ch;
 	trace_t			trace;
@@ -325,10 +325,13 @@ int SV_GameSystemCalls( int *args ) {
 	case G_MILLISECONDS:
 		return Sys_Milliseconds();
 	case G_CVAR_REGISTER:
-		Cvar_Register( VMA(1), VMA(2), VMA(3), args[4] ); 
+		Cvar_Register( reinterpret_cast<vmCvar_t*>(VMA(1)), 
+					   reinterpret_cast<const char*>(VMA(2)), 
+					   reinterpret_cast<const char*>(VMA(3)), 
+					   args[4] ); 
 		return 0;
 	case G_CVAR_UPDATE:
-		Cvar_Update( VMA(1) );
+		Cvar_Update( reinterpret_cast<vmCvar_t*>(VMA(1)) );
 		return 0;
 	case G_CVAR_SET:
 		Cvar_Set( (const char *)VMA(1), (const char *)VMA(2) );
@@ -336,19 +339,23 @@ int SV_GameSystemCalls( int *args ) {
 	case G_CVAR_VARIABLE_INTEGER_VALUE:
 		return Cvar_VariableIntegerValue( (const char *)VMA(1) );
 	case G_CVAR_VARIABLE_STRING_BUFFER:
-		Cvar_VariableStringBuffer( VMA(1), VMA(2), args[3] );
+		Cvar_VariableStringBuffer( reinterpret_cast<const char*>(VMA(1)), 
+								   reinterpret_cast<char*>(VMA(2)), 
+								   args[3] );
 		return 0;
 	case G_ARGC:
 		return Cmd_Argc();
 	case G_ARGV:
-		Cmd_ArgvBuffer( args[1], VMA(2), args[3] );
+		Cmd_ArgvBuffer( args[1], reinterpret_cast<char*>(VMA(2)), args[3] );
 		return 0;
 	case G_SEND_CONSOLE_COMMAND:
-		Cbuf_ExecuteText( args[1], VMA(2) );
+		Cbuf_ExecuteText( args[1], reinterpret_cast<const char*>(VMA(2)));
 		return 0;
 
 	case G_FS_FOPEN_FILE:
-		return FS_FOpenFileByMode( VMA(1), VMA(2), args[3] );
+		return FS_FOpenFileByMode( reinterpret_cast<const char*>(VMA(1)), 
+								   reinterpret_cast<fileHandle_t*>(VMA(2)), 
+								   static_cast<fsMode_t>(args[3]) );
 	case G_FS_READ:
 		FS_Read2( VMA(1), args[2], args[3] );
 		return 0;
@@ -359,64 +366,97 @@ int SV_GameSystemCalls( int *args ) {
 		FS_FCloseFile( args[1] );
 		return 0;
 	case G_FS_GETFILELIST:
-		return FS_GetFileList( VMA(1), VMA(2), VMA(3), args[4] );
+		return FS_GetFileList( reinterpret_cast<const char*>(VMA(1)), 
+							   reinterpret_cast<const char*>(VMA(2)), 
+							   reinterpret_cast<char*>(VMA(3)), 
+							   args[4] );
 	case G_FS_SEEK:
 		return 0;//FS_Seek( args[1], args[2], args[3] );
 
 	case G_LOCATE_GAME_DATA:
-		SV_LocateGameData( VMA(1), args[2], args[3], VMA(4), args[5] );
+		SV_LocateGameData( reinterpret_cast<sharedEntity_t*>(VMA(1)), 
+						   args[2], 
+						   args[3], 
+						   reinterpret_cast<playerState_t*>(VMA(4)), 
+						   args[5] );
 		return 0;
 	case G_DROP_CLIENT:
-		SV_GameDropClient( args[1], VMA(2) );
+		SV_GameDropClient( args[1], reinterpret_cast<const char*>(VMA(2)) );
 		return 0;
 	case G_SEND_SERVER_COMMAND:
-		SV_GameSendServerCommand( args[1], VMA(2) );
+		SV_GameSendServerCommand( args[1], reinterpret_cast<const char*>(VMA(2)) );
 		return 0;
 	case G_LINKENTITY:
-		SV_LinkEntity( VMA(1) );
+		SV_LinkEntity( reinterpret_cast<sharedEntity_t*>(VMA(1)) );
 		return 0;
 	case G_UNLINKENTITY:
-		SV_UnlinkEntity( VMA(1) );
+		SV_UnlinkEntity( reinterpret_cast<sharedEntity_t*>(VMA(1)) );
 		return 0;
 	case G_ENTITIES_IN_BOX:
-		return SV_AreaEntities( VMA(1), VMA(2), VMA(3), args[4] );
+		return SV_AreaEntities( reinterpret_cast<float*>(VMA(1)), 
+								reinterpret_cast<float*>(VMA(2)), 
+								reinterpret_cast<int*>(VMA(3)), 
+								args[4] );
 	case G_ENTITY_CONTACT:
-		return SV_EntityContact( VMA(1), VMA(2), VMA(3), /*int capsule*/ qfalse );
+		return SV_EntityContact( reinterpret_cast<float*>(VMA(1)), 
+								 reinterpret_cast<float*>(VMA(2)), 
+								 reinterpret_cast<const sharedEntity_t*>(VMA(3)), 
+								 /*int capsule*/ false );
 	case G_ENTITY_CONTACTCAPSULE:
-		return SV_EntityContact( VMA(1), VMA(2), VMA(3), /*int capsule*/ qtrue );
+		return SV_EntityContact( reinterpret_cast<float*>(VMA(1)), 
+								 reinterpret_cast<float*>(VMA(2)), 
+								 reinterpret_cast<const sharedEntity_t*>(VMA(3)), 
+								 /*int capsule*/ true );
 	case G_TRACE:
-		SV_Trace( VMA(1), VMA(2), VMA(3), VMA(4), VMA(5), args[6], args[7], /*int capsule*/ qfalse );
+		SV_Trace( reinterpret_cast<trace_t*>(VMA(1)), 
+				  reinterpret_cast<const float*>(VMA(2)), 
+				  reinterpret_cast<float*>(VMA(3)), 
+				  reinterpret_cast<float*>(VMA(4)), 
+				  reinterpret_cast<const float*>(VMA(5)), 
+				  args[6], 
+				  args[7], 
+				  /*int capsule*/ false );
 		return 0;
 	case G_TRACECAPSULE:
-		SV_Trace( VMA(1), VMA(2), VMA(3), VMA(4), VMA(5), args[6], args[7], /*int capsule*/ qtrue );
+		SV_Trace( reinterpret_cast<trace_t*>(VMA(1)), 
+				  reinterpret_cast<const float*>(VMA(2)), 
+				  reinterpret_cast<float*>(VMA(3)), 
+				  reinterpret_cast<float*>(VMA(4)), 
+				  reinterpret_cast<const float*>(VMA(5)), 
+				  args[6], 
+				  args[7], 
+				  /*int capsule*/ true );
 		return 0;
 	case G_POINT_CONTENTS:
-		return SV_PointContents( VMA(1), args[2] );
+		return SV_PointContents( reinterpret_cast<const float*>(VMA(1)), args[2] );
 	case G_SET_BRUSH_MODEL:
-		SV_SetBrushModel( VMA(1), VMA(2) );
+		SV_SetBrushModel( reinterpret_cast<sharedEntity_t*>(VMA(1)), 
+						  reinterpret_cast<const char*>(VMA(2)) );
 		return 0;
 	case G_IN_PVS:
-		return SV_inPVS( VMA(1), VMA(2) );
+		return SV_inPVS( reinterpret_cast<const float*>(VMA(1)), 
+						 reinterpret_cast<const float*>(VMA(2)) );
 	case G_IN_PVS_IGNORE_PORTALS:
-		return SV_inPVSIgnorePortals( VMA(1), VMA(2) );
+		return SV_inPVSIgnorePortals( reinterpret_cast<const float*>(VMA(1)), 
+									  reinterpret_cast<const float*>(VMA(2)) );
 
 	case G_SET_CONFIGSTRING:
-		SV_SetConfigstring( args[1], VMA(2) );
+		SV_SetConfigstring( args[1], reinterpret_cast<const char*>(VMA(2)) );
 		return 0;
 	case G_GET_CONFIGSTRING:
-		SV_GetConfigstring( args[1], VMA(2), args[3] );
+		SV_GetConfigstring( args[1], reinterpret_cast<char*>(VMA(2)), args[3] );
 		return 0;
 	case G_SET_USERINFO:
-		SV_SetUserinfo( args[1], VMA(2) );
+		SV_SetUserinfo( args[1], reinterpret_cast<const char*>(VMA(2)) );
 		return 0;
 	case G_GET_USERINFO:
-		SV_GetUserinfo( args[1], VMA(2), args[3] );
+		SV_GetUserinfo( args[1], reinterpret_cast<char*>(VMA(2)), args[3] );
 		return 0;
 	case G_GET_SERVERINFO:
-		SV_GetServerinfo( VMA(1), args[2] );
+		SV_GetServerinfo( reinterpret_cast<char*>(VMA(1)), args[2] );
 		return 0;
 	case G_ADJUST_AREA_PORTAL_STATE:
-		SV_AdjustAreaPortalState( VMA(1), args[2] );
+		SV_AdjustAreaPortalState( reinterpret_cast<sharedEntity_t*>(VMA(1)), args[2] );
 		return 0;
 	case G_AREAS_CONNECTED:
 		return CM_AreasConnected( args[1], args[2] );
@@ -428,18 +468,18 @@ int SV_GameSystemCalls( int *args ) {
 	//	return 0;
 
 	case G_GET_USERCMD:
-		SV_GetUsercmd( args[1], VMA(2) );
+		SV_GetUsercmd( args[1], reinterpret_cast<usercmd_t*>(VMA(2)) );
 		return 0;
 	case G_GET_ENTITY_TOKEN:
 		{
 			const char	*s;
 
 			s = COM_Parse( &sv.entityParsePoint );
-			Q_strncpyz( VMA(1), s, args[2] );
+			Q_strncpyz( reinterpret_cast<char*>(VMA(1)), s, args[2] );
 			if ( !sv.entityParsePoint && !s[0] ) {
-				return qfalse;
+				return false;
 			} else {
-				return qtrue;
+				return true;
 			}
 		}
 
@@ -449,9 +489,9 @@ int SV_GameSystemCalls( int *args ) {
 	//	BotImport_DebugPolygonDelete( args[1] );
 	//	return 0;
 	case G_REAL_TIME:
-		return Com_RealTime( VMA(1) );
+		return Com_RealTime( reinterpret_cast<qtime_t*>(VMA(1)) );
 	case G_SNAPVECTOR:
-		Sys_SnapVector( VMA(1) );
+		Sys_SnapVector( reinterpret_cast<float*>(VMA(1)) );
 		return 0;
 
 		//====================================
@@ -819,7 +859,7 @@ int SV_GameSystemCalls( int *args ) {
 	case BOTLIB_AI_GENETIC_PARENTS_AND_CHILD_SELECTION:
 		return botlib_export->ai.GeneticParentsAndChildSelection(args[1], VMA(2), VMA(3), VMA(4), VMA(5));
 */
-	case TRAP_MEMSET:
+/*	case TRAP_MEMSET:
 		Com_Memset( VMA(1), args[2], args[3] );
 		return 0;
 
@@ -828,7 +868,9 @@ int SV_GameSystemCalls( int *args ) {
 		return 0;
 
 	case TRAP_STRNCPY:
-		return (int)strncpy( VMA(1), VMA(2), args[3] );
+		return (int)strncpy( VMA(1), 
+							 VMA(2), 
+							 args[3] );
 
 	case TRAP_SIN:
 		return FloatAsInt( sin( VMF(1) ) );
@@ -843,7 +885,9 @@ int SV_GameSystemCalls( int *args ) {
 		return FloatAsInt( sqrt( VMF(1) ) );
 
 	case TRAP_MATRIXMULTIPLY:
-		MatrixMultiply( VMA(1), VMA(2), VMA(3) );
+		MatrixMultiply( VMA(1), 
+						VMA(2), 
+						VMA(3) );
 		return 0;
 
 	case TRAP_ANGLEVECTORS:
@@ -859,7 +903,7 @@ int SV_GameSystemCalls( int *args ) {
 
 	case TRAP_CEIL:
 		return FloatAsInt( ceil( VMF(1) ) );
-
+*/
 
 	default:
 		Com_Error( ERR_DROP, "Bad game system trap: %i", args[0] );
@@ -878,7 +922,7 @@ void SV_ShutdownGameProgs( void ) {
 	if ( !gvm ) {
 		return;
 	}
-	VM_Call( gvm, GAME_SHUTDOWN, qfalse );
+	VM_Call( gvm, GAME_SHUTDOWN, false );
 	VM_Free( gvm );
 	gvm = NULL;
 }
@@ -890,7 +934,7 @@ SV_InitGameVM
 Called for both a full init and a restart
 ==================
 */
-static void SV_InitGameVM( qboolean restart ) {
+static void SV_InitGameVM( bool restart ) {
 	int		i;
 
 	// start the entity parsing at the beginning
@@ -922,7 +966,7 @@ void SV_RestartGameProgs( void ) {
 	if ( !gvm ) {
 		return;
 	}
-	VM_Call( gvm, GAME_SHUTDOWN, qtrue );
+	VM_Call( gvm, GAME_SHUTDOWN, true );
 
 	// do a restart instead of a free
 	gvm = VM_Restart( gvm );
@@ -930,7 +974,7 @@ void SV_RestartGameProgs( void ) {
 		Com_Error( ERR_FATAL, "VM_Restart on game failed" );
 	}
 
-	SV_InitGameVM( qtrue );
+	SV_InitGameVM( true );
 }
 
 
@@ -955,12 +999,12 @@ void SV_InitGameProgs( void ) {
 	//}
 
 	// load the dll or bytecode
-	gvm = VM_Create( "qagame", SV_GameSystemCalls, Cvar_VariableValue( "vm_game" ) );
+	gvm = VM_Create( "qagame", SV_GameSystemCalls, static_cast<vmInterpret_t>(Cvar_VariableIntegerValue( "vm_game" )) );
 	if ( !gvm ) {
 		Com_Error( ERR_FATAL, "VM_Create on game failed" );
 	}
 
-	SV_InitGameVM( qfalse );
+	SV_InitGameVM( false );
 }
 
 
@@ -971,11 +1015,11 @@ SV_GameCommand
 See if the current console command is claimed by the game
 ====================
 */
-qboolean SV_GameCommand( void ) {
+bool SV_GameCommand( void ) {
 	if ( sv.state != SS_GAME ) {
-		return qfalse;
+		return false;
 	}
 
-	return VM_Call( gvm, GAME_CONSOLE_COMMAND );
+	return (VM_Call( gvm, GAME_CONSOLE_COMMAND )!=0);
 }
 

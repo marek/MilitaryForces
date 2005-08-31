@@ -66,9 +66,9 @@ void G_ExplodeMissile( gentity_t *ent ) {
 	dir[2] = 1;
 
 	ent->s.eType = ET_GENERAL;
-	G_AddEvent( ent, EV_MISSILE_MISS, DirToByte( dir ), qtrue );
+	G_AddEvent( ent, EV_MISSILE_MISS, DirToByte( dir ), true );
 
-	ent->freeAfterEvent = qtrue;
+	ent->freeAfterEvent = true;
 
 	// splash damage
 	if ( ent->splashDamage ) {
@@ -105,9 +105,9 @@ void G_ExplodeFlak( gentity_t *ent ) {
 	dir[2] = 1;
 
 	ent->s.eType = ET_GENERAL;
-	G_AddEvent( ent, EV_FLAK, DirToByte( dir ), qtrue );
+	G_AddEvent( ent, EV_FLAK, DirToByte( dir ), true );
 
-	ent->freeAfterEvent = qtrue;
+	ent->freeAfterEvent = true;
 
 	// splash damage
 	if ( ent->splashDamage ) {
@@ -146,9 +146,9 @@ void G_ExplodeCFlare( gentity_t *ent ) {
 	dir[2] = 1;
 
 	ent->s.eType = ET_GENERAL;
-	G_AddEvent( ent, EV_MISSILE_MISS, DirToByte( dir ), qtrue );
+	G_AddEvent( ent, EV_MISSILE_MISS, DirToByte( dir ), true );
 
-	ent->freeAfterEvent = qtrue;
+	ent->freeAfterEvent = true;
 
 	// splash damage
 	if ( ent->splashDamage ) {
@@ -442,7 +442,7 @@ G_CrateDropItems
 void G_CrateDropItems(gentity_t *ent)
 {
 	gitem_t		*item;
-	qboolean	found = qfalse;
+	bool	found = false;
 	char		*classname[5];
 	int			items = 0;
 	int			i;
@@ -489,11 +489,11 @@ void G_CrateDropItems(gentity_t *ent)
 
 	for(i = 0; i < items; i++)
 	{
-		found = qfalse;
+		found = false;
 		// find the item 
 		for ( item = bg_itemlist + 1; item->classname; item++) {
 			if ( strcmp(item->pickup_name,classname[i]) == 0  )  {
-				found = qtrue;
+				found = true;
 				break;
 			}
 		}
@@ -553,7 +553,7 @@ void G_ExplodeNuke( gentity_t *ent ) {
 
 	explosion->activator = ent->parent;		// Activator is the owner of the bomb/missile 
 
-	ent->freeAfterEvent = qtrue;
+	ent->freeAfterEvent = true;
 	
 
 	// Easter egg
@@ -579,7 +579,7 @@ G_MissileImpact
 */
 void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 	gentity_t		*other;
-	qboolean		hitClient = qfalse;
+	bool		hitClient = false;
 
 	other = &g_entities[trace->entityNum];
 
@@ -604,7 +604,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 
 			if( LogAccuracyHit( other, &g_entities[ent->r.ownerNum] ) ) {
 				g_entities[ent->r.ownerNum].client->accuracy_hits++;
-				hitClient = qtrue;
+				hitClient = true;
 			}
 			BG_EvaluateTrajectoryDelta( &ent->s.pos, level.time, velocity );
 			if ( VectorLength( velocity ) == 0 ) {
@@ -625,16 +625,16 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 			availableWeapons[ent->s.weaponIndex].type != WT_HEALTHCRATE) 
 	{
 		if ( other->takedamage && other->client ) {
-			G_AddEvent( ent, EV_MISSILE_HIT, DirToByte( trace->plane.normal ), qtrue );
+			G_AddEvent( ent, EV_MISSILE_HIT, DirToByte( trace->plane.normal ), true );
 			ent->s.otherEntityNum = other->s.number;
 		} else if( trace->surfaceFlags & SURF_METALSTEPS ) {
-			G_AddEvent( ent, EV_MISSILE_MISS_METAL, DirToByte( trace->plane.normal ), qtrue );
+			G_AddEvent( ent, EV_MISSILE_MISS_METAL, DirToByte( trace->plane.normal ), true );
 		} else {
-			G_AddEvent( ent, EV_MISSILE_MISS, DirToByte( trace->plane.normal ), qtrue );
+			G_AddEvent( ent, EV_MISSILE_MISS, DirToByte( trace->plane.normal ), true );
 		}
 	}
 
-	ent->freeAfterEvent = qtrue;
+	ent->freeAfterEvent = true;
 
 	// change over to a normal entity right at the point of impact
 	ent->s.eType = ET_GENERAL;
@@ -952,8 +952,8 @@ void fire_antiair (gentity_t *self) {
 	gentity_t	*bolt;
 	vec3_t		dir, right, up, temp, forward;
 	vec3_t		start, offset;
-	qboolean	active = ( self->client->ps.stats[STAT_LOCKINFO] & LI_LOCKING );
-	qboolean	wingtip = qfalse;
+	bool	active = ( (self->client->ps.stats[STAT_LOCKINFO] & LI_LOCKING) != 0 );
+	bool	wingtip = false;
 
 	VectorCopy( self->s.pos.trBase, start );
 
@@ -964,9 +964,9 @@ void fire_antiair (gentity_t *self) {
 		RotatePointAroundVector( temp, up, forward, self->client->ps.turretAngle );
 		CrossProduct( up, temp, right );
 		RotatePointAroundVector( dir, right, temp, self->client->ps.gunAngle );
-		wingtip = qtrue; // dont drop
+		wingtip = true; // dont drop
 	} else {
-		self->left = (self->left ? qfalse : qtrue);
+		self->left = (self->left ? false : true);
 		MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, &self->client->ps, &wingtip, offset, 0 );
 		AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
 		VectorInverse( right );
@@ -1041,8 +1041,8 @@ void fire_antiground (gentity_t *self) {
 	gentity_t	*bolt;
 	vec3_t		dir, right, up;
 	vec3_t		start, offset, forward, temp;
-	qboolean	active = ( self->client->ps.stats[STAT_LOCKINFO] & LI_LOCKING );
-	qboolean	wingtip = qfalse;
+	bool	active = ( (self->client->ps.stats[STAT_LOCKINFO] & LI_LOCKING) != 0 );
+	bool	wingtip = false;
 
 	VectorCopy( self->s.pos.trBase, start );
 
@@ -1053,9 +1053,9 @@ void fire_antiground (gentity_t *self) {
 		RotatePointAroundVector( temp, up, forward, self->client->ps.turretAngle );
 		CrossProduct( up, temp, right );
 		RotatePointAroundVector( dir, right, temp, self->client->ps.gunAngle );
-		wingtip = qtrue; // dont drop
+		wingtip = true; // dont drop
 	} else {
-		self->left = (self->left ? qfalse : qtrue);
+		self->left = (self->left ? false : true);
 		MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, &self->client->ps, 0, offset, 0 );
 		AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
 		VectorInverse( right );
@@ -1186,7 +1186,7 @@ void fire_ironbomb (gentity_t *self) {
 	vec3_t		dir, right, up, offset;
 	vec3_t		start;
 
-//	self->left = (self->left ? qfalse : qtrue);
+//	self->left = (self->left ? false : true);
 	MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, &self->client->ps, 0, offset, 0 );
 	AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
 	VectorInverse( right );
@@ -1228,7 +1228,7 @@ void fire_ironbomb (gentity_t *self) {
 fire_autocannon MFQ3
 =================
 */
-void fire_autocannon (gentity_t *self, qboolean main) {
+void fire_autocannon (gentity_t *self, bool main) {
 	gentity_t	*bolt;
 	vec3_t		dir, forward, right, up, temp;
 	vec3_t		start, offset;
@@ -1547,7 +1547,7 @@ void drop_fueltank (gentity_t *self) {
 	vec3_t		dir, right, up, offset;
 	vec3_t		start;
 
-//	self->left = (self->left ? qfalse : qtrue);
+//	self->left = (self->left ? false : true);
 	MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, &self->client->ps, 0, offset, 0 );
 	AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
 	VectorInverse( right );
@@ -1592,7 +1592,7 @@ void G_CrateDie( gentity_t *self, gentity_t *inflictor,
         gentity_t *attacker, int damage, int mod ) {
         if (inflictor == self)
                 return;
-        self->takedamage = qfalse;
+        self->takedamage = false;
         self->think = G_ExplodeMissile;
         self->nextthink = level.time + 10;
 }
@@ -1634,7 +1634,7 @@ void drop_crate (gentity_t *self) {
 	bolt->s.pos.trTime = level.time;
 
 	bolt->health = 5;
-	bolt->takedamage = qtrue;
+	bolt->takedamage = true;
 	bolt->die = G_CrateDie;
 	bolt->r.contents = CONTENTS_BODY;
 
@@ -1658,7 +1658,7 @@ void fire_nukebomb (gentity_t *self) {
 	vec3_t		dir, right, up, offset;
 	vec3_t		start;
 
-//	self->left = (self->left ? qfalse : qtrue);
+//	self->left = (self->left ? false : true);
 	MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, &self->client->ps, 0, offset, 0 );
 	AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
 	VectorInverse( right );
@@ -1705,7 +1705,7 @@ void fire_nukemissile (gentity_t *self) {
 	gentity_t	*bolt;
 	vec3_t		dir, right, up;
 	vec3_t		start, offset, forward, temp;
-	qboolean	wingtip = qfalse;
+	bool	wingtip = false;
 
 	VectorCopy( self->s.pos.trBase, start );
 
@@ -1716,9 +1716,9 @@ void fire_nukemissile (gentity_t *self) {
 		RotatePointAroundVector( temp, up, forward, self->client->ps.turretAngle );
 		CrossProduct( up, temp, right );
 		RotatePointAroundVector( dir, right, temp, self->client->ps.gunAngle );
-		wingtip = qtrue; // dont drop
+		wingtip = true; // dont drop
 	} else {
-		self->left = (self->left ? qfalse : qtrue);
+		self->left = (self->left ? false : true);
 		MF_removeWeaponFromLoadout(self->client->ps.weaponIndex, &self->loadout, &self->client->ps, 0, offset, 0 );
 		AngleVectors( self->client->ps.vehicleAngles, dir, right, up );
 		VectorInverse( right );
@@ -1842,7 +1842,7 @@ fire_flak_GI
 void fire_flak_GI (gentity_t *self) {
 	gentity_t	*bolt;
 	vec3_t		start, offset;
-	qboolean	wingtip = qfalse;
+	bool	wingtip = false;
 	int		fuse;
 	static int	seed = 0x92;
 	int dis;

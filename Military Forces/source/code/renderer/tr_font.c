@@ -101,7 +101,7 @@ void R_GetGlyphInfo(FT_GlyphSlot glyph, int *left, int *right, int *width, int *
   *top    = _CEIL( glyph->metrics.horiBearingY );
   *bottom = _FLOOR( glyph->metrics.horiBearingY - glyph->metrics.height );
   *height = _TRUNC( *top - *bottom );
-  *pitch  = ( qtrue ? (*width+3) & -4 : (*width+7) >> 3 );
+  *pitch  = ( true ? (*width+3) & -4 : (*width+7) >> 3 );
 }
 
 
@@ -176,7 +176,7 @@ void WriteTGA (char *filename, byte *data, int width, int height) {
 	Z_Free (buffer);
 }
 
-static glyphInfo_t *RE_ConstructGlyphInfo(unsigned char *imageOut, int *xOut, int *yOut, int *maxHeight, FT_Face face, const unsigned char c, qboolean calcHeight) {
+static glyphInfo_t *RE_ConstructGlyphInfo(unsigned char *imageOut, int *xOut, int *yOut, int *maxHeight, FT_Face face, const unsigned char c, bool calcHeight) {
   int i;
   static glyphInfo_t glyph;
   unsigned char *src, *dst;
@@ -368,7 +368,7 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
 	if (len == sizeof(fontInfo_t)) {
 		ri.FS_ReadFile(name, &faceData);
 		fdOffset = 0;
-		fdFile = faceData;
+		fdFile = reinterpret_cast<byte*>(faceData);
 		for(i=0; i<GLYPHS_PER_FONT; i++) {
 			font->glyphs[i].height		= readInt();
 			font->glyphs[i].top			= readInt();
@@ -438,7 +438,7 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
   maxHeight = 0;
 
   for (i = GLYPH_START; i < GLYPH_END; i++) {
-    glyph = RE_ConstructGlyphInfo(out, &xOut, &yOut, &maxHeight, face, (unsigned char)i, qtrue);
+    glyph = RE_ConstructGlyphInfo(out, &xOut, &yOut, &maxHeight, face, (unsigned char)i, true);
   }
 
   xOut = 0;
@@ -449,7 +449,7 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
 
   while ( i <= GLYPH_END ) {
 
-    glyph = RE_ConstructGlyphInfo(out, &xOut, &yOut, &maxHeight, face, (unsigned char)i, qfalse);
+    glyph = RE_ConstructGlyphInfo(out, &xOut, &yOut, &maxHeight, face, (unsigned char)i, false);
 
     if (xOut == -1 || yOut == -1 || i == GLYPH_END)  {
       // ran out of room
@@ -486,8 +486,8 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
 			}
 
     	//Com_sprintf (name, sizeof(name), "fonts/fontImage_%i_%i", imageNumber++, pointSize);
-      image = R_CreateImage(name, imageBuff, 256, 256, qfalse, qfalse, GL_CLAMP);
-      h = RE_RegisterShaderFromImage(name, LIGHTMAP_2D, image, qfalse);
+      image = R_CreateImage(name, imageBuff, 256, 256, false, false, GL_CLAMP);
+      h = RE_RegisterShaderFromImage(name, LIGHTMAP_2D, image, false);
       for (j = lastStart; j < i; j++) {
         font->glyphs[j].glyph = h;
 				Q_strncpyz(font->glyphs[j].shaderName, name, sizeof(font->glyphs[j].shaderName));

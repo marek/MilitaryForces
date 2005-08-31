@@ -1,5 +1,5 @@
 /*
- * $Id: g_combat.c,v 1.1 2005-08-22 16:06:28 thebjoern Exp $
+ * $Id: g_combat.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -52,9 +52,9 @@ Explode our vehicle
 void ExplodeVehicle( gentity_t *self )
 {
 	// create the client vehicle explosion event
-	G_AddEvent( self, EV_VEHICLE_GIB, 0, qtrue );
+	G_AddEvent( self, EV_VEHICLE_GIB, 0, true );
 
-	self->takedamage = qfalse;
+	self->takedamage = false;
 	self->s.eType = ET_INVISIBLE;
 	self->r.contents = 0;
 
@@ -395,10 +395,10 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		client->damage_knockback += knockback;
 		if ( dir ) {
 			VectorCopy ( dir, client->damage_from );
-			client->damage_fromWorld = qfalse;
+			client->damage_fromWorld = false;
 		} else {
 			VectorCopy ( targ->r.currentOrigin, client->damage_from );
-			client->damage_fromWorld = qtrue;
+			client->damage_fromWorld = true;
 		}
 	}
 
@@ -442,11 +442,11 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 ============
 CanDamage
 
-Returns qtrue if the inflictor can directly damage the target.  Used for
+Returns true if the inflictor can directly damage the target.  Used for
 explosions and melee attacks.
 ============
 */
-qboolean CanDamage (gentity_t *targ, vec3_t origin) {
+bool CanDamage (gentity_t *targ, vec3_t origin) {
 	vec3_t	dest;
 	trace_t	tr;
 	vec3_t	midpoint;
@@ -459,7 +459,7 @@ qboolean CanDamage (gentity_t *targ, vec3_t origin) {
 	VectorCopy (midpoint, dest);
 	trap_Trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID);
 	if (tr.fraction == 1.0 || tr.entityNum == targ->s.number)
-		return qtrue;
+		return true;
 
 	// this should probably check in the plane of projection, 
 	// rather than in world coordinate, and also include Z
@@ -468,31 +468,31 @@ qboolean CanDamage (gentity_t *targ, vec3_t origin) {
 	dest[1] += 15.0;
 	trap_Trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID);
 	if (tr.fraction == 1.0)
-		return qtrue;
+		return true;
 
 	VectorCopy (midpoint, dest);
 	dest[0] += 15.0;
 	dest[1] -= 15.0;
 	trap_Trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID);
 	if (tr.fraction == 1.0)
-		return qtrue;
+		return true;
 
 	VectorCopy (midpoint, dest);
 	dest[0] -= 15.0;
 	dest[1] += 15.0;
 	trap_Trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID);
 	if (tr.fraction == 1.0)
-		return qtrue;
+		return true;
 
 	VectorCopy (midpoint, dest);
 	dest[0] -= 15.0;
 	dest[1] -= 15.0;
 	trap_Trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID);
 	if (tr.fraction == 1.0)
-		return qtrue;
+		return true;
 
 
-	return qfalse;
+	return false;
 }
 
 
@@ -501,7 +501,7 @@ qboolean CanDamage (gentity_t *targ, vec3_t origin) {
 G_RadiusDamage
 ============
 */
-qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, float radius,
+bool G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, float radius,
 					 gentity_t *ignore, int mod, long cat) {
 	float		points, dist;
 	gentity_t	*ent;
@@ -511,7 +511,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 	vec3_t		v;
 	vec3_t		dir;
 	int			i, e;
-	qboolean	hitClient = qfalse;
+	bool	hitClient = false;
 
 	if ( radius < 1 ) {
 		radius = 1;
@@ -552,7 +552,7 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 
 		if( CanDamage (ent, origin) ) {
 			if( LogAccuracyHit( ent, attacker ) ) {
-				hitClient = qtrue;
+				hitClient = true;
 			}
 			VectorSubtract (ent->r.currentOrigin, origin, dir);
 			// push the center of mass higher than the origin so players
@@ -582,7 +582,7 @@ void TossVehicleFlags( gentity_t *self ) {
 		angle = 45;
 		for ( i = OB_REDFLAG; i <= OB_BLUEFLAG ; i<<=1 ) {
 			if ( self->client->ps.objectives & i ) {
-				item = BG_FindItemForPowerup( i );
+				item = BG_FindItemForPowerup( static_cast<objective_t>(i) );
 				if ( !item ) {
 					continue;
 				}
@@ -755,7 +755,7 @@ void Vehicle_Death( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, 
 		}
 	}
 
-	self->takedamage = qtrue;	// can still be gibbed
+	self->takedamage = true;	// can still be gibbed
 	self->r.contents = CONTENTS_CORPSE;
 	self->s.objectives = 0;
 	self->s.loopSound = 0;
@@ -796,7 +796,7 @@ void Vehicle_Death( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, 
 	else
 	{
 		// create a smaller vehicle explosion
-		G_AddEvent( self, EV_VEHICLE_DIE, 0, qtrue );
+		G_AddEvent( self, EV_VEHICLE_DIE, 0, true );
 
 		// wreck can be blown up (i.e on crash into ground)
 		self->die = Vehicle_Die;

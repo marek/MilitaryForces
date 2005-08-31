@@ -31,9 +31,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 typedef struct {
 	// called before the library is unloaded
-	// if the system is just reconfiguring, pass destroyWindow = qfalse,
+	// if the system is just reconfiguring, pass destroyWindow = false,
 	// which will keep the screen from flashing to the desktop.
-	void	(*Shutdown)( qboolean destroyWindow );
+	void	(*Shutdown)( bool destroyWindow );
 
 	// All data that will be used in a level should be
 	// registered before rendering any frames to prevent disk hits,
@@ -74,8 +74,8 @@ typedef struct {
 		float s1, float t1, float s2, float t2, qhandle_t hShader );	// 0 = white
 
 	// Draw images for cinematic rendering, pass as 32 bit rgba
-	void	(*DrawStretchRaw) (int x, int y, int w, int h, int cols, int rows, const byte *data, int client, qboolean dirty);
-	void	(*UploadCinematic) (int w, int h, int cols, int rows, const byte *data, int client, qboolean dirty);
+	void	(*DrawStretchRaw) (int x, int y, int w, int h, int cols, int rows, const byte *data, int client, bool dirty);
+	void	(*UploadCinematic) (int w, int h, int cols, int rows, const byte *data, int client, bool dirty);
 
 	void	(*BeginFrame)( stereoFrame_t stereoFrame );
 
@@ -95,8 +95,8 @@ typedef struct {
 #endif
 	void	(*RegisterFont)(const char *fontName, int pointSize, fontInfo_t *font);
 	void	(*RemapShader)(const char *oldShader, const char *newShader, const char *offsetTime);
-	qboolean (*GetEntityToken)( char *buffer, int size );
-	qboolean (*inPVS)( const vec3_t p1, const vec3_t p2 );
+	bool (*GetEntityToken)( char *buffer, int size );
+	bool (*inPVS)( const vec3_t p1, const vec3_t p2 );
 } refexport_t;
 
 //
@@ -149,7 +149,7 @@ typedef struct {
 	char **	(*FS_ListFiles)( const char *name, const char *extension, int *numfilesfound );
 	void	(*FS_FreeFileList)( char **filelist );
 	void	(*FS_WriteFile)( const char *qpath, const void *buffer, int size );
-	qboolean (*FS_FileExists)( const char *file );
+	bool (*FS_FileExists)( const char *file );
 
 	// cinematic stuff
 	void	(*CIN_UploadCinematic)(int handle);

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_plane.c,v 1.2 2005-08-27 00:27:51 thebjoern Exp $
+ * $Id: cg_plane.c,v 1.3 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 
@@ -190,7 +190,7 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 	// muzzleflash
 	if( cg.time - cent->muzzleFlashTime <= MUZZLE_FLASH_TIME ) 
 	{
-		drawInfo.basicInfo.drawMuzzleFlash = qtrue;
+		drawInfo.basicInfo.drawMuzzleFlash = true;
 		drawInfo.basicInfo.flashWeaponIndex = cent->muzzleFlashWeapon;
 	}
 	
@@ -218,12 +218,12 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 		if( ps->stats[STAT_LOCKINFO] & LI_TRACKING )
 		{
 			refEntity_t reticlelock;
-			qboolean building = qfalse;
+			bool building = false;
 			centity_t* target = &cg_entities[cent->currentState.tracktarget];
 
 			if( target->currentState.eType == ET_EXPLOSIVE )
 			{
-				building = qtrue;
+				building = true;
 			}
 
 			reticle.customShader = availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshairtrack;
@@ -286,7 +286,7 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 				VectorScale( reticlelock.axis[0], 0.5f, reticlelock.axis[0] );
 				VectorScale( reticlelock.axis[1], 0.5f, reticlelock.axis[1] );
 				VectorScale( reticlelock.axis[2], 0.5f, reticlelock.axis[2] );
-				reticlelock.nonNormalizedAxes = qtrue;
+				reticlelock.nonNormalizedAxes = true;
 				AngleVectors(cent->currentState.angles, forward, 0, 0);
 				VectorMA( cent->lerpOrigin, 2000, forward, end );
 				CG_Trace( &tr, cent->lerpOrigin, 0, 0, end, cg.snap->ps.clientNum, MASK_SOLID ); 
@@ -315,7 +315,7 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 			VectorScale( reticle.axis[0], 2.0f, reticle.axis[0] );
 			VectorScale( reticle.axis[1], 2.0f, reticle.axis[1] );
 			VectorScale( reticle.axis[2], 2.0f, reticle.axis[2] );
-			reticle.nonNormalizedAxes = qtrue;
+			reticle.nonNormalizedAxes = true;
 			AngleVectors(cent->currentState.angles, forward, 0, 0);
 			VectorMA( cent->lerpOrigin, 2000, forward, end );
 			CG_Trace( &tr, cent->lerpOrigin, 0, 0, end, cg.snap->ps.clientNum, MASK_SOLID ); 

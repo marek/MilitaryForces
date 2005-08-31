@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawtools.c,v 1.1 2005-08-22 16:02:06 thebjoern Exp $
+ * $Id: cg_drawtools.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -38,7 +38,7 @@ void CG_DrawProgressBar( rectDef_t *rect, vec4_t color, vec4_t textcolor, float 
 		twa = scale * strlen(textBuffer);
 		tx = rect->x + ( rect->w / 2.0f ) - ( twa / 2.0f );
 		ty = rect->y + ( rect->h / 2.0f ) - ( scale / 2.0f );
-		CG_DrawStringExt(tx, ty, textBuffer, textcolor, qtrue, qfalse, scale,scale, strlen(textBuffer));
+		CG_DrawStringExt(tx, ty, textBuffer, textcolor, true, false, scale,scale, strlen(textBuffer));
 	}
 }
 
@@ -181,7 +181,7 @@ Coordinates are at 640 by 480 virtual resolution
 ==================
 */
 void CG_DrawStringExt( int x, int y, const char *string, const float *setColor, 
-		qboolean forceColor, qboolean shadow, int charWidth, int charHeight, int maxChars ) {
+		bool forceColor, bool shadow, int charWidth, int charHeight, int maxChars ) {
 	vec4_t		color;
 	const char	*s;
 	int			xx;
@@ -238,11 +238,11 @@ void CG_DrawBigString( int x, int y, const char *s, float alpha ) {
 
 	color[0] = color[1] = color[2] = 1.0;
 	color[3] = alpha;
-	CG_DrawStringExt( x, y, s, color, qfalse, qtrue, BIGCHAR_WIDTH, BIGCHAR_HEIGHT, 0 );
+	CG_DrawStringExt( x, y, s, color, false, true, BIGCHAR_WIDTH, BIGCHAR_HEIGHT, 0 );
 }
 
 void CG_DrawBigStringColor( int x, int y, const char *s, vec4_t color ) {
-	CG_DrawStringExt( x, y, s, color, qtrue, qtrue, BIGCHAR_WIDTH, BIGCHAR_HEIGHT, 0 );
+	CG_DrawStringExt( x, y, s, color, true, true, BIGCHAR_WIDTH, BIGCHAR_HEIGHT, 0 );
 }
 
 void CG_DrawSmallString( int x, int y, const char *s, float alpha ) {
@@ -250,11 +250,11 @@ void CG_DrawSmallString( int x, int y, const char *s, float alpha ) {
 
 	color[0] = color[1] = color[2] = 1.0;
 	color[3] = alpha;
-	CG_DrawStringExt( x, y, s, color, qfalse, qfalse, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, 0 );
+	CG_DrawStringExt( x, y, s, color, false, false, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, 0 );
 }
 
 void CG_DrawSmallStringColor( int x, int y, const char *s, vec4_t color ) {
-	CG_DrawStringExt( x, y, s, color, qtrue, qfalse, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, 0 );
+	CG_DrawStringExt( x, y, s, color, true, false, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, 0 );
 }
 
 /*
@@ -770,7 +770,7 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 		drawcolor[0] = color[0];
 		drawcolor[1] = color[1];
 		drawcolor[2] = color[2];
-		drawcolor[3] = 0.5 + 0.5 * sin( cg.time / PULSE_DIVISOR );
+		drawcolor[3] = 0.5f + 0.5f * sinf( cg.time / PULSE_DIVISOR );
 		UI_DrawProportionalString2( x, y, str, drawcolor, sizeScale, cgs.media.charsetPropGlow );
 		return;
 	}
@@ -794,7 +794,7 @@ int CG_GetVehicleShadowShader( int vehicle )
 	// no shadow shader specfied?
 	if( availableVehicles[ vehicle ].shadowShader == SHADOW_NONE )
 	{
-		return qtrue;
+		return true;
 	}
 	
 	// custom shader specfied?
@@ -823,67 +823,67 @@ CG_MarkGeneratedShadow
 Uses the wall-marks system of Q3 to draw shadows
 ===============
 */
-static qboolean CG_MarkGeneratedShadow( BasicDrawInfo_t *drawInfo, float *shadowPlane )
-{
-	vec3_t		start, end, mins = {-15, -15, 0}, maxs = {15, 15, 2};
-	trace_t		trace;
-	float		alpha;
-	float		xRad, yRad;
-	float		xAlter, yAlter;
-	qhandle_t	shaderHandle = -1;
-
-	*shadowPlane = 0;
-
-	// send a trace down from the player to the ground
-	VectorCopy( drawInfo->origin, start );
-	VectorCopy( drawInfo->origin, end );
-	start[2] += 64;	// move start-point's Z upwards a little
-	end[2] -= 256;	// move end-point's Z downwards somewhat
-	trap_CM_BoxTrace( &trace, start, end, mins, maxs, 0, MASK_PLAYERSOLID );
-
-	// no shadow if too high from the ground
-	if( trace.fraction == 1.0 )
-	{
-		return qfalse;
-	}
-
-	// set the shadow plane value
-	*shadowPlane = trace.endpos[2] + 1;
-
-	// fade the shadow out with height
-	alpha = 1.0f - trace.fraction;
-	MF_LimitFloat( &alpha, 0.0f, 1.0f );
-
-	// get the shader handle
-	shaderHandle = CG_GetVehicleShadowShader( drawInfo->vehicleIndex );
-	if( !shaderHandle )
-	{
-		return qtrue;
-	}
-
-	// assign the x/y radius values based on the vehicle bounding box
-	// NOTE: we might need to setup dedicated values in availableVehicles[] for this later
-	xRad = availableVehicles[ drawInfo->vehicleIndex ].maxs[ 0 ];
-	yRad = availableVehicles[ drawInfo->vehicleIndex ].maxs[ 1 ];
-
-	// PLANES ONLY: alter the radius values based upon the vehicles pitch & roll
-	if( (availableVehicles[ drawInfo->vehicleIndex ].cat & CAT_PLANE) || 
-		(availableVehicles[ drawInfo->vehicleIndex ].cat & CAT_HELO) ) {
-		xAlter = fabs( drawInfo->angles[0] / 30.0f );
-		yAlter = fabs( drawInfo->angles[2] / 90.0f );
-		MF_LimitFloat( &xAlter, 0.0f, 1.0f );
-		MF_LimitFloat( &yAlter, 0.0f, 1.0f );
-		xRad *= 1.0f - ( 0.9f * xAlter );
-		yRad *= 1.0f - ( 0.5f * yAlter );
-	}
-
-	// add the mark as a temporary, so it goes directly to the renderer
-	// without taking a spot in the cg_marks array
-	CG_ImpactMarkEx( shaderHandle, trace.endpos, trace.plane.normal, 
-					 (drawInfo->angles[1]-180), alpha, alpha, alpha, 1, qfalse, xRad, yRad, qtrue );
-
-	return qtrue;
-}
+//static bool CG_MarkGeneratedShadow( BasicDrawInfo_t *drawInfo, float *shadowPlane )
+//{
+//	vec3_t		start, end, mins = {-15, -15, 0}, maxs = {15, 15, 2};
+//	trace_t		trace;
+//	float		alpha;
+//	float		xRad, yRad;
+//	float		xAlter, yAlter;
+//	qhandle_t	shaderHandle = -1;
+//
+//	*shadowPlane = 0;
+//
+//	// send a trace down from the player to the ground
+//	VectorCopy( drawInfo->origin, start );
+//	VectorCopy( drawInfo->origin, end );
+//	start[2] += 64;	// move start-point's Z upwards a little
+//	end[2] -= 256;	// move end-point's Z downwards somewhat
+//	trap_CM_BoxTrace( &trace, start, end, mins, maxs, 0, MASK_PLAYERSOLID );
+//
+//	// no shadow if too high from the ground
+//	if( trace.fraction == 1.0 )
+//	{
+//		return false;
+//	}
+//
+//	// set the shadow plane value
+//	*shadowPlane = trace.endpos[2] + 1;
+//
+//	// fade the shadow out with height
+//	alpha = 1.0f - trace.fraction;
+//	MF_LimitFloat( &alpha, 0.0f, 1.0f );
+//
+//	// get the shader handle
+//	shaderHandle = CG_GetVehicleShadowShader( drawInfo->vehicleIndex );
+//	if( !shaderHandle )
+//	{
+//		return true;
+//	}
+//
+//	// assign the x/y radius values based on the vehicle bounding box
+//	// NOTE: we might need to setup dedicated values in availableVehicles[] for this later
+//	xRad = availableVehicles[ drawInfo->vehicleIndex ].maxs[ 0 ];
+//	yRad = availableVehicles[ drawInfo->vehicleIndex ].maxs[ 1 ];
+//
+//	// PLANES ONLY: alter the radius values based upon the vehicles pitch & roll
+//	if( (availableVehicles[ drawInfo->vehicleIndex ].cat & CAT_PLANE) || 
+//		(availableVehicles[ drawInfo->vehicleIndex ].cat & CAT_HELO) ) {
+//		xAlter = fabs( drawInfo->angles[0] / 30.0f );
+//		yAlter = fabs( drawInfo->angles[2] / 90.0f );
+//		MF_LimitFloat( &xAlter, 0.0f, 1.0f );
+//		MF_LimitFloat( &yAlter, 0.0f, 1.0f );
+//		xRad *= 1.0f - ( 0.9f * xAlter );
+//		yRad *= 1.0f - ( 0.5f * yAlter );
+//	}
+//
+//	// add the mark as a temporary, so it goes directly to the renderer
+//	// without taking a spot in the cg_marks array
+//	CG_ImpactMarkEx( shaderHandle, trace.endpos, trace.plane.normal, 
+//					 (drawInfo->angles[1]-180), alpha, alpha, alpha, 1, false, xRad, yRad, true );
+//
+//	return true;
+//}
 	
 /*
 ===============
@@ -893,7 +893,7 @@ Uses a X/Y axis of a polygon-mesh to draw shadows
 ===============
 */
 
-static qboolean CG_PolyMeshGeneratedShadow( BasicDrawInfo_t *drawInfo, float *shadowPlane )
+static bool CG_PolyMeshGeneratedShadow( BasicDrawInfo_t *drawInfo, float *shadowPlane )
 {
 	int x = 0, y = 0, iMod = 0;
 	float xRad = 0, yRad = 0;
@@ -909,9 +909,9 @@ static qboolean CG_PolyMeshGeneratedShadow( BasicDrawInfo_t *drawInfo, float *sh
 	qhandle_t shaderHandle = -1;
 	vec3_t start, end, mins = {-1, -1, 0}, maxs = {1, 1, 0};
 	trace_t	trace;
-	qboolean drawMesh = qfalse;
-	qboolean vertInWater = qfalse;
-	qboolean dontRotatePR = qfalse;
+	bool drawMesh = false;
+	bool vertInWater = false;
+	bool dontRotatePR = false;
 
 #pragma message ("CG_PolyMeshGeneratedShadow() - fix problem when projecting over high buildings")
 
@@ -948,7 +948,7 @@ static qboolean CG_PolyMeshGeneratedShadow( BasicDrawInfo_t *drawInfo, float *sh
 
 		// don't allow the shadow plane to be rotated in pitch & roll, the 'alter' fudges worked out
 		// above will do the same (but with more control)
-		dontRotatePR = qtrue;
+		dontRotatePR = true;
 	}
 	else
 	{
@@ -967,7 +967,7 @@ static qboolean CG_PolyMeshGeneratedShadow( BasicDrawInfo_t *drawInfo, float *sh
 		shaderHandle = CG_GetVehicleShadowShader( drawInfo->vehicleIndex );
 		if( !shaderHandle )
 		{
-			return qtrue;
+			return true;
 		}
 	}
 
@@ -1045,10 +1045,10 @@ static qboolean CG_PolyMeshGeneratedShadow( BasicDrawInfo_t *drawInfo, float *sh
 			}
 
 			// in the water?
-			vertInWater = qfalse;
+			vertInWater = false;
 			if( CG_PointContents( verts[y][x].xyz, -1 ) & CONTENTS_WATER )
 			{
-				vertInWater = qtrue;
+				vertInWater = true;
 			}
 
 			// calc mod
@@ -1074,7 +1074,7 @@ static qboolean CG_PolyMeshGeneratedShadow( BasicDrawInfo_t *drawInfo, float *sh
 			// draw mesh? (if at least one vertex alpha was >0)
 			if( iMod )
 			{
-				drawMesh = qtrue;
+				drawMesh = true;
 			}
 		}
 	}
@@ -1082,7 +1082,7 @@ static qboolean CG_PolyMeshGeneratedShadow( BasicDrawInfo_t *drawInfo, float *sh
 	// don't bother to continue?
 	if( !drawMesh )
 	{
-		return qfalse;
+		return false;
 	}
 
 	// adjust the verts X/Y position here
@@ -1104,7 +1104,7 @@ static qboolean CG_PolyMeshGeneratedShadow( BasicDrawInfo_t *drawInfo, float *sh
 		}
 	}
 
-	return qtrue;
+	return true;
 }
 
 
@@ -1118,13 +1118,13 @@ Uses polygons to alpha blend a shadow texture onto the terrain
 
 #define _POLYMESH_SHADOW
 
-qboolean CG_GenericShadow( BasicDrawInfo_t *drawInfo, float *shadowPlane )
+bool CG_GenericShadow( BasicDrawInfo_t *drawInfo, float *shadowPlane )
 {
-#ifndef _POLYMESH_SHADOW
-	return CG_MarkGeneratedShadow( drawInfo, shadowPlane );
-#else
+//#ifndef _POLYMESH_SHADOW
+//	return CG_MarkGeneratedShadow( drawInfo, shadowPlane );
+//#else
 	return CG_PolyMeshGeneratedShadow( drawInfo, shadowPlane );
-#endif
+//#endif
 }
 
 /*
@@ -1264,7 +1264,7 @@ void CG_AddReticleEntityToScene( refEntity_t * pReticle, centity_t * pTarget )
 		trap_R_AddRefEntityToScene( pRecticle );
 #else
 		// if HUD image
-		if( CG_WorldToScreenCoords( pReticle->origin, &cg.HUDReticle[cg.reticleIdx].x, &cg.HUDReticle[cg.reticleIdx].y, qtrue ) )
+		if( CG_WorldToScreenCoords( pReticle->origin, &cg.HUDReticle[cg.reticleIdx].x, &cg.HUDReticle[cg.reticleIdx].y, true ) )
 		{
 			// set origin
 			cg.HUDReticle[cg.reticleIdx].ox = cg.HUDReticle[cg.reticleIdx].x;

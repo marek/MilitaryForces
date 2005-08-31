@@ -51,7 +51,7 @@ static	int		pc = 0;
 
 static	int		*instructionPointers = NULL;
 
-#define FTOL_PTR
+//#define FTOL_PTR
 
 #ifdef _WIN32
 
@@ -360,19 +360,19 @@ static void EmitMovEAXEDI(vm_t *vm) {
 	EmitString( "8B 07" );		// mov eax, dword ptr [edi]
 }
 
-qboolean EmitMovEBXEDI(vm_t *vm, int andit) {
+bool EmitMovEBXEDI(vm_t *vm, int andit) {
 	if (LastCommand == LAST_COMMAND_MOV_EDI_EAX) 
 	{	// mov [edi], eax
 		compiledOfs -= 2;
 		vm->instructionPointers[ instruction-1 ] = compiledOfs;
 		EmitString( "8B D8");		// mov bx, eax
-		return qfalse;
+		return false;
 	}
 	if (pop1 == OP_DIVI || pop1 == OP_DIVU || pop1 == OP_MULI || pop1 == OP_MULU ||
 		pop1 == OP_STORE4 || pop1 == OP_STORE2 || pop1 == OP_STORE1 ) 
 	{	
 		EmitString( "8B D8");		// mov bx, eax
-		return qfalse;
+		return false;
 	}
 	if (pop1 == OP_CONST && buf[compiledOfs-6] == 0xC7 && buf[compiledOfs-5] == 0x07 ) 
 	{		// mov edi, 0x123456
@@ -384,11 +384,11 @@ qboolean EmitMovEBXEDI(vm_t *vm, int andit) {
 		} else {
 			Emit4( lastConst );
 		}
-		return qtrue;
+		return true;
 	}
 
 	EmitString( "8B 1F" );		// mov ebx, dword ptr [edi]
-	return qfalse;
+	return false;
 }
 
 /*
@@ -401,12 +401,12 @@ void VM_Compile( vm_t *vm, vmHeader_t *header ) {
 	int		maxLength;
 	int		v;
 	int		i;
-	qboolean opt;
+	bool opt;
 
 	// allocate a very large temp buffer, we will shrink it later
 	maxLength = header->codeLength * 8;
-	buf = Z_Malloc( maxLength );
-	jused = Z_Malloc(header->instructionCount + 2 );
+	buf = reinterpret_cast<byte*>(Z_Malloc( maxLength ));
+	jused = reinterpret_cast<byte*>(Z_Malloc(header->instructionCount + 2 ));
 	
 	Com_Memset(jused, 0, header->instructionCount+2);
 
@@ -1054,7 +1054,7 @@ void VM_Compile( vm_t *vm, vmHeader_t *header ) {
 
 	// copy to an exact size buffer on the hunk
 	vm->codeLength = compiledOfs;
-	vm->codeBase = Hunk_Alloc( compiledOfs, h_low );
+	vm->codeBase = reinterpret_cast<byte*>(Hunk_Alloc( compiledOfs, h_low ));
 	Com_Memcpy( vm->codeBase, buf, compiledOfs );
 	Z_Free( buf );
 	Z_Free( jused );
@@ -1108,7 +1108,7 @@ int	VM_CallCompiled( vm_t *vm, int *args ) {
 	instructionPointers = vm->instructionPointers;
 
 	// interpret the code
-	vm->currentlyInterpreting = qtrue;
+	vm->currentlyInterpreting = true;
 
 	callMask = vm->dataMask;
 

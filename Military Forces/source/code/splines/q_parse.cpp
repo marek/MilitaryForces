@@ -41,7 +41,7 @@ static const char *punctuation[] = {
 typedef struct {
 	char	token[MAX_TOKEN_CHARS];
 	int		lines;
-	qboolean	ungetToken;
+	bool	ungetToken;
 	char	parseFile[MAX_QPATH];
 } parseInfo_t;
 
@@ -130,11 +130,11 @@ void Com_UngetToken( void ) {
 	if ( pi->ungetToken ) {
 		Com_ScriptError( "UngetToken called twice" );
 	}
-	pi->ungetToken = qtrue;
+	pi->ungetToken = true;
 }
 
 
-static const char *SkipWhitespace( const char (*data), qboolean *hasNewLines ) {
+static const char *SkipWhitespace( const char (*data), bool *hasNewLines ) {
 	int c;
 
 	while( (c = *data) <= ' ') {
@@ -143,7 +143,7 @@ static const char *SkipWhitespace( const char (*data), qboolean *hasNewLines ) {
 		}
 		if( c == '\n' ) {
 			pi->lines++;
-			*hasNewLines = qtrue;
+			*hasNewLines = true;
 		}
 		data++;
 	}
@@ -159,14 +159,14 @@ Parse a token out of a string
 Will never return NULL, just empty strings.
 An empty string will only be returned at end of file.
 
-If "allowLineBreaks" is qtrue then an empty
+If "allowLineBreaks" is true then an empty
 string will be returned if the next token is
 a newline.
 ==============
 */
-static char *Com_ParseExt( const char *(*data_p), qboolean allowLineBreaks ) {
+static char *Com_ParseExt( const char *(*data_p), bool allowLineBreaks ) {
 	int c = 0, len;
-	qboolean hasNewLines = qfalse;
+	bool hasNewLines = false;
 	const char *data;
 	const char **punc;
 
@@ -361,10 +361,10 @@ Com_Parse
 */
 const char *Com_Parse( const char *(*data_p) ) {
 	if ( pi->ungetToken ) {
-		pi->ungetToken = qfalse;
+		pi->ungetToken = false;
 		return pi->token;
 	}
-	return Com_ParseExt( data_p, qtrue );
+	return Com_ParseExt( data_p, true );
 }
 
 /*
@@ -374,10 +374,10 @@ Com_ParseOnLine
 */
 const char *Com_ParseOnLine( const char *(*data_p) ) {
 	if ( pi->ungetToken ) {
-		pi->ungetToken = qfalse;
+		pi->ungetToken = false;
 		return pi->token;
 	}
-	return Com_ParseExt( data_p, qfalse );
+	return Com_ParseExt( data_p, false );
 }
 
 
@@ -387,7 +387,7 @@ const char *Com_ParseOnLine( const char *(*data_p) ) {
 Com_MatchToken
 ==================
 */
-void Com_MatchToken( const char *(*buf_p), const char *match, qboolean warning ) {
+void Com_MatchToken( const char *(*buf_p), const char *match, bool warning ) {
 	const char	*token;
 
 	token = Com_Parse( buf_p );

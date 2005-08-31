@@ -1,5 +1,5 @@
 /*
- * $Id: cg_public.h,v 1.1 2005-08-22 16:03:13 thebjoern Exp $
+ * $Id: cg_public.h,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -187,14 +187,14 @@ typedef enum {
 	// oportunity to flush and close any open files
 
 	CG_CONSOLE_COMMAND,
-//	qboolean (*CG_ConsoleCommand)( void );
+//	bool (*CG_ConsoleCommand)( void );
 	// a console command has been issued locally that is not recognized by the
 	// main game system.
-	// use Cmd_Argc() / Cmd_Argv() to read the command, return qfalse if the
+	// use Cmd_Argc() / Cmd_Argv() to read the command, return false if the
 	// command is not known to the game
 
 	CG_DRAW_ACTIVE_FRAME,
-//	void (*CG_DrawActiveFrame)( int serverTime, stereoFrame_t stereoView, qboolean demoPlayback );
+//	void (*CG_DrawActiveFrame)( int serverTime, stereoFrame_t stereoView, bool demoPlayback );
 	// Generates and draws a game scene and status information at the given time.
 	// If demoPlayback is set, local movement prediction will not be enabled
 
@@ -205,7 +205,7 @@ typedef enum {
 //	int (*CG_LastAttacker)( void );
 
 	CG_KEY_EVENT, 
-//	void	(*CG_KeyEvent)( int key, qboolean down );
+//	void	(*CG_KeyEvent)( int key, bool down );
 
 	CG_MOUSE_EVENT,
 //	void	(*CG_MouseEvent)( int dx, int dy );

@@ -62,7 +62,7 @@ channel_t   loop_channels[MAX_CHANNELS];
 int			numLoopChannels;
 
 static int	s_soundStarted;
-static		qboolean	s_soundMuted;
+static		bool	s_soundMuted;
 
 dma_t		dma;
 
@@ -138,7 +138,7 @@ S_Init
 */
 void S_Init( void ) {
 	cvar_t	*cv;
-	qboolean	r;
+	bool	r;
 
 	Com_Printf("\n------- sound initialization -------\n");
 
@@ -358,7 +358,7 @@ are no longer valid.
 */
 void S_DisableSounds( void ) {
 	S_StopAllSounds();
-	s_soundMuted = qtrue;
+	s_soundMuted = true;
 }
 
 /*
@@ -368,7 +368,7 @@ S_BeginRegistration
 =====================
 */
 void S_BeginRegistration( void ) {
-	s_soundMuted = qfalse;		// we can play again
+	s_soundMuted = false;		// we can play again
 
 	if (s_numSfx == 0) {
 		SND_setup();
@@ -377,7 +377,7 @@ void S_BeginRegistration( void ) {
 		Com_Memset( s_knownSfx, 0, sizeof( s_knownSfx ) );
 		Com_Memset(sfxHash, 0, sizeof(sfx_t *)*LOOP_HASH);
 
-		S_RegisterSound("sound/feedback/hit.wav", qfalse);		// changed to a sound in mfdata
+		S_RegisterSound("sound/feedback/hit.wav", false);		// changed to a sound in mfdata
 	}
 }
 
@@ -389,10 +389,10 @@ S_RegisterSound
 Creates a default buzz sound if the file can't be loaded
 ==================
 */
-sfxHandle_t	S_RegisterSound( const char *name, qboolean compressed ) {
+sfxHandle_t	S_RegisterSound( const char *name, bool compressed ) {
 	sfx_t	*sfx;
 
-	compressed = qfalse;
+	compressed = false;
 	if (!s_soundStarted) {
 		return 0;
 	}
@@ -411,7 +411,7 @@ sfxHandle_t	S_RegisterSound( const char *name, qboolean compressed ) {
 		return sfx - s_knownSfx;
 	}
 
-	sfx->inMemory = qfalse;
+	sfx->inMemory = false;
 	sfx->soundCompressed = compressed;
 
   S_memoryLoad(sfx);
@@ -428,9 +428,9 @@ void S_memoryLoad(sfx_t	*sfx) {
 	// load the sound file
 	if ( !S_LoadSound ( sfx ) ) {
 //		Com_Printf( S_COLOR_YELLOW "WARNING: couldn't load sound: %s\n", sfx->soundName );
-		sfx->defaultSound = qtrue;
+		sfx->defaultSound = true;
 	}
-	sfx->inMemory = qtrue;
+	sfx->inMemory = true;
 }
 
 //=============================================================================
@@ -530,7 +530,7 @@ void S_StartSound(vec3_t origin, int entityNum, int entchannel, sfxHandle_t sfxH
 
 	sfx = &s_knownSfx[ sfxHandle ];
 
-	if (sfx->inMemory == qfalse) {
+	if (sfx->inMemory == false) {
 		S_memoryLoad(sfx);
 	}
 
@@ -609,9 +609,9 @@ void S_StartSound(vec3_t origin, int entityNum, int entchannel, sfxHandle_t sfxH
 
 	if (origin) {
 		VectorCopy (origin, ch->origin);
-		ch->fixed_origin = qtrue;
+		ch->fixed_origin = true;
 	} else {
-		ch->fixed_origin = qfalse;
+		ch->fixed_origin = false;
 	}
 
 	ch->master_vol = 127;
@@ -621,7 +621,7 @@ void S_StartSound(vec3_t origin, int entityNum, int entchannel, sfxHandle_t sfxH
 	ch->entchannel = entchannel;
 	ch->leftvol = ch->master_vol;		// these will get calced at next spatialize
 	ch->rightvol = ch->master_vol;		// unless the game isn't running
-	ch->doppler = qfalse;
+	ch->doppler = false;
 }
 
 
@@ -707,9 +707,9 @@ continuous looping sounds are added each frame
 */
 
 void S_StopLoopingSound(int entityNum) {
-	loopSounds[entityNum].active = qfalse;
+	loopSounds[entityNum].active = false;
 //	loopSounds[entityNum].sfx = 0;
-	loopSounds[entityNum].kill = qfalse;
+	loopSounds[entityNum].kill = false;
 }
 
 /*
@@ -718,11 +718,11 @@ S_ClearLoopingSounds
 
 ==================
 */
-void S_ClearLoopingSounds( qboolean killall ) {
+void S_ClearLoopingSounds( bool killall ) {
 	int i;
 	for ( i = 0 ; i < MAX_GENTITIES ; i++) {
-		if (killall || loopSounds[i].kill == qtrue || (loopSounds[i].sfx && loopSounds[i].sfx->soundLength == 0)) {
-			loopSounds[i].kill = qfalse;
+		if (killall || loopSounds[i].kill == true || (loopSounds[i].sfx && loopSounds[i].sfx->soundLength == 0)) {
+			loopSounds[i].kill = false;
 			S_StopLoopingSound(i);
 		}
 	}
@@ -751,7 +751,7 @@ void S_AddLoopingSound( int entityNum, const vec3_t origin, const vec3_t velocit
 
 	sfx = &s_knownSfx[ sfxHandle ];
 
-	if (sfx->inMemory == qfalse) {
+	if (sfx->inMemory == false) {
 		S_memoryLoad(sfx);
 	}
 
@@ -761,9 +761,9 @@ void S_AddLoopingSound( int entityNum, const vec3_t origin, const vec3_t velocit
 
 	VectorCopy( origin, loopSounds[entityNum].origin );
 	VectorCopy( velocity, loopSounds[entityNum].velocity );
-	loopSounds[entityNum].active = qtrue;
-	loopSounds[entityNum].kill = qtrue;
-	loopSounds[entityNum].doppler = qfalse;
+	loopSounds[entityNum].active = true;
+	loopSounds[entityNum].kill = true;
+	loopSounds[entityNum].doppler = false;
 	loopSounds[entityNum].oldDopplerScale = 1.0;
 	loopSounds[entityNum].dopplerScale = 1.0;
 	loopSounds[entityNum].sfx = sfx;
@@ -772,7 +772,7 @@ void S_AddLoopingSound( int entityNum, const vec3_t origin, const vec3_t velocit
 		vec3_t	out;
 		float	lena, lenb;
 
-		loopSounds[entityNum].doppler = qtrue;
+		loopSounds[entityNum].doppler = true;
 		lena = DistanceSquared(loopSounds[listener_number].origin, loopSounds[entityNum].origin);
 		VectorAdd(loopSounds[entityNum].origin, loopSounds[entityNum].velocity, out);
 		lenb = DistanceSquared(loopSounds[listener_number].origin, out);
@@ -783,7 +783,7 @@ void S_AddLoopingSound( int entityNum, const vec3_t origin, const vec3_t velocit
 		}
 		loopSounds[entityNum].dopplerScale = lenb/(lena*100);
 		if (loopSounds[entityNum].dopplerScale<=1.0) {
-			loopSounds[entityNum].doppler = qfalse;			// don't bother doing the math
+			loopSounds[entityNum].doppler = false;			// don't bother doing the math
 		}
 	}
 
@@ -812,7 +812,7 @@ void S_AddRealLoopingSound( int entityNum, const vec3_t origin, const vec3_t vel
 
 	sfx = &s_knownSfx[ sfxHandle ];
 
-	if (sfx->inMemory == qfalse) {
+	if (sfx->inMemory == false) {
 		S_memoryLoad(sfx);
 	}
 
@@ -822,9 +822,9 @@ void S_AddRealLoopingSound( int entityNum, const vec3_t origin, const vec3_t vel
 	VectorCopy( origin, loopSounds[entityNum].origin );
 	VectorCopy( velocity, loopSounds[entityNum].velocity );
 	loopSounds[entityNum].sfx = sfx;
-	loopSounds[entityNum].active = qtrue;
-	loopSounds[entityNum].kill = qfalse;
-	loopSounds[entityNum].doppler = qfalse;
+	loopSounds[entityNum].active = true;
+	loopSounds[entityNum].kill = false;
+	loopSounds[entityNum].doppler = false;
 }
 
 
@@ -1113,15 +1113,15 @@ void S_Respatialize( int entityNum, const vec3_t head, vec3_t axis[3], int inwat
 ========================
 S_ScanChannelStarts
 
-Returns qtrue if any new sounds were started since the last mix
+Returns true if any new sounds were started since the last mix
 ========================
 */
-qboolean S_ScanChannelStarts( void ) {
+bool S_ScanChannelStarts( void ) {
 	channel_t		*ch;
 	int				i;
-	qboolean		newSamples;
+	bool		newSamples;
 
-	newSamples = qfalse;
+	newSamples = false;
 	ch = s_channels;
 
 	for (i=0; i<MAX_CHANNELS ; i++, ch++) {
@@ -1133,7 +1133,7 @@ qboolean S_ScanChannelStarts( void ) {
 		// into the very first sample
 		if ( ch->startSample == START_SAMPLE_IMMEDIATE ) {
 			ch->startSample = s_paintedtime;
-			newSamples = qtrue;
+			newSamples = true;
 			continue;
 		}
 
@@ -1311,7 +1311,7 @@ void S_Play_f( void ) {
 		} else {
 			Q_strncpyz( name, Cmd_Argv(i), sizeof(name) );
 		}
-		h = S_RegisterSound( name, qfalse );
+		h = S_RegisterSound( name, false );
 		if( h ) {
 			S_StartLocalSound( h, CHAN_LOCAL_SOUND );
 		}
@@ -1464,7 +1464,7 @@ void S_StartBackgroundTrack( const char *intro, const char *loop ){
 	//
 	// open up a wav file and get all the info
 	//
-	FS_FOpenFileRead( name, &s_backgroundFile, qtrue );
+	FS_FOpenFileRead( name, &s_backgroundFile, true );
 	if ( !s_backgroundFile ) {
 		Com_Printf( S_COLOR_YELLOW "WARNING: couldn't open music file %s\n", name );
 		return;
@@ -1631,6 +1631,6 @@ void S_FreeOldestSound() {
 		SND_free(buffer);
 		buffer = nbuffer;
 	}
-	sfx->inMemory = qfalse;
+	sfx->inMemory = false;
 	sfx->soundData = NULL;
 }

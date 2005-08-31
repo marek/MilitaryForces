@@ -1,5 +1,5 @@
 /*
- * $Id: g_syscalls.c,v 1.1 2005-08-22 16:07:19 thebjoern Exp $
+ * $Id: g_syscalls.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -132,19 +132,19 @@ int trap_PointContents( const vec3_t point, int passEntityNum ) {
 }
 
 
-qboolean trap_InPVS( const vec3_t p1, const vec3_t p2 ) {
+int trap_InPVS( const vec3_t p1, const vec3_t p2 ) {
 	return syscall( G_IN_PVS, p1, p2 );
 }
 
-qboolean trap_InPVSIgnorePortals( const vec3_t p1, const vec3_t p2 ) {
+int trap_InPVSIgnorePortals( const vec3_t p1, const vec3_t p2 ) {
 	return syscall( G_IN_PVS_IGNORE_PORTALS, p1, p2 );
 }
 
-void trap_AdjustAreaPortalState( gentity_t *ent, qboolean open ) {
+void trap_AdjustAreaPortalState( gentity_t *ent, bool open ) {
 	syscall( G_ADJUST_AREA_PORTAL_STATE, ent, open );
 }
 
-qboolean trap_AreasConnected( int area1, int area2 ) {
+int trap_AreasConnected( int area1, int area2 ) {
 	return syscall( G_AREAS_CONNECTED, area1, area2 );
 }
 
@@ -161,7 +161,7 @@ int trap_EntitiesInBox( const vec3_t mins, const vec3_t maxs, int *list, int max
 	return syscall( G_ENTITIES_IN_BOX, mins, maxs, list, maxcount );
 }
 
-qboolean trap_EntityContact( const vec3_t mins, const vec3_t maxs, const gentity_t *ent ) {
+int trap_EntityContact( const vec3_t mins, const vec3_t maxs, const gentity_t *ent ) {
 	return syscall( G_ENTITY_CONTACT, mins, maxs, ent );
 }
 
@@ -177,7 +177,7 @@ void trap_GetUsercmd( int clientNum, usercmd_t *cmd ) {
 	syscall( G_GET_USERCMD, clientNum, cmd );
 }
 
-qboolean trap_GetEntityToken( char *buffer, int bufferSize ) {
+int trap_GetEntityToken( char *buffer, int bufferSize ) {
 	return syscall( G_GET_ENTITY_TOKEN, buffer, bufferSize );
 }
 

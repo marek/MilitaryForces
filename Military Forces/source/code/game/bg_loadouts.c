@@ -1,5 +1,5 @@
 /*
- * $Id: bg_loadouts.c,v 1.4 2005-08-27 09:45:38 thebjoern Exp $
+ * $Id: bg_loadouts.c,v 1.5 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -26,13 +26,13 @@ static int QDECL MF_posCompare( const void* a, const void* b )
 	} else return p1-p2;
 }
 
-qboolean MF_distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout )
+bool MF_distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout )
 {
 	char* modelname;
 	int num = 0, i, j, k;
 	md3Tag_t tags[MAX_MOUNTS_PER_VEHICLE];
 
-	if( idx < 0 ) return qfalse;
+	if( idx < 0 ) return false;
 
 	modelname = MF_CreateModelPathname( idx, "models/vehicles/%s/%s/%s.md3" );
 
@@ -41,7 +41,7 @@ qboolean MF_distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout )
 //#endif
 
 	num = MF_getTagsContaining(modelname, "tag_P", tags, MAX_MOUNTS_PER_VEHICLE );
-	if( !num ) return qfalse;
+	if( !num ) return false;
 
 	for( i = 0; i < num; ++i ) {
 		memcpy( &loadout->mounts[i].tag, &tags[i], sizeof(md3Tag_t) );
@@ -55,12 +55,12 @@ qboolean MF_distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout )
 
 	// set up
 	for( i = 0; i < num; ++i ) {
-		if( strlen( tags[i].name ) < 12 ) return qfalse;
+		if( strlen( tags[i].name ) < 12 ) return false;
 		loadout->mounts[i].pos = ahextoi( va("0x%c", tags[i].name[5]) );
 		loadout->mounts[i].group = ahextoi( va("0x%c", tags[i].name[6]) );
 		loadout->mounts[i].flags = ahextoi( va("0x%c%c%c%c", tags[i].name[7], tags[i].name[8],
 				tags[i].name[9], tags[i].name[10]) );
-		loadout->mounts[i].left = tags[i].name[11] == 'L' ? qtrue : qfalse;
+		loadout->mounts[i].left = tags[i].name[11] == 'L' ? true : false;
 	}
 
 	// sort
@@ -90,7 +90,7 @@ qboolean MF_distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout )
 //	}
 //#endif
 
-	return qtrue;
+	return true;
 }
 
 /*
@@ -149,8 +149,8 @@ firing
 =================
 */
 
-qboolean MF_removeWeaponFromLoadout( int weaponIndex, completeLoadout_t* loadout, playerState_t* ps, 
-									 qboolean* wingtip, vec3_t pos, int launchPos )
+bool MF_removeWeaponFromLoadout( int weaponIndex, completeLoadout_t* loadout, playerState_t* ps, 
+									 bool* wingtip, vec3_t pos, int launchPos )
 {
 	int i;
 
@@ -169,15 +169,15 @@ qboolean MF_removeWeaponFromLoadout( int weaponIndex, completeLoadout_t* loadout
 				ps->numWeaponsOnMount[i]--;// for now keep them both in parallel
 			}
 			if( wingtip ) 
-				*wingtip = (loadout->mounts[i].flags & PF_DONT_DROP);
+				*wingtip = ((loadout->mounts[i].flags & PF_DONT_DROP) != 0);
 			if( pos ) 
 				VectorCopy( loadout->mounts[i].tag.origin, pos );
 			return 
-				qtrue;
+				true;
 		}
 	}
 
-	return qfalse;
+	return false;
 }
 
 

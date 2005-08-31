@@ -161,7 +161,7 @@ int Com_Filter( const char *filter, const char *name, int casesensitive)
 			buf[i] = '\0';
 			if (strlen(buf)) {
 				ptr = Com_StringContains(name, buf, casesensitive);
-				if (!ptr) return qfalse;
+				if (!ptr) return false;
 				name = ptr + strlen(buf);
 			}
 		}
@@ -174,30 +174,30 @@ int Com_Filter( const char *filter, const char *name, int casesensitive)
 		}
 		else if (*filter == '[') {
 			filter++;
-			found = qfalse;
+			found = false;
 			while(*filter && !found) {
 				if (*filter == ']' && *(filter+1) != ']') break;
 				if (*(filter+1) == '-' && *(filter+2) && (*(filter+2) != ']' || *(filter+3) == ']')) {
 					if (casesensitive) {
-						if (*name >= *filter && *name <= *(filter+2)) found = qtrue;
+						if (*name >= *filter && *name <= *(filter+2)) found = true;
 					}
 					else {
 						if (toupper(*name) >= toupper(*filter) &&
-							toupper(*name) <= toupper(*(filter+2))) found = qtrue;
+							toupper(*name) <= toupper(*(filter+2))) found = true;
 					}
 					filter += 3;
 				}
 				else {
 					if (casesensitive) {
-						if (*filter == *name) found = qtrue;
+						if (*filter == *name) found = true;
 					}
 					else {
-						if (toupper(*filter) == toupper(*name)) found = qtrue;
+						if (toupper(*filter) == toupper(*name)) found = true;
 					}
 					filter++;
 				}
 			}
-			if (!found) return qfalse;
+			if (!found) return false;
 			while(*filter) {
 				if (*filter == ']' && *(filter+1) != ']') break;
 				filter++;
@@ -207,16 +207,16 @@ int Com_Filter( const char *filter, const char *name, int casesensitive)
 		}
 		else {
 			if (casesensitive) {
-				if (*filter != *name) return qfalse;
+				if (*filter != *name) return false;
 			}
 			else {
-				if (toupper(*filter) != toupper(*name)) return qfalse;
+				if (toupper(*filter) != toupper(*name)) return false;
 			}
 			filter++;
 			name++;
 		}
 	}
-	return qtrue;
+	return true;
 }
 
 
@@ -887,14 +887,14 @@ Some characters are illegal in info strings because they
 can mess up the server's parsing
 ==================
 */
-qboolean Info_Validate( const char *s ) {
+bool Info_Validate( const char *s ) {
 	if ( strchr( s, '\"' ) ) {
-		return qfalse;
+		return false;
 	}
 	if ( strchr( s, ';' ) ) {
-		return qfalse;
+		return false;
 	}
-	return qtrue;
+	return true;
 }
 
 /*

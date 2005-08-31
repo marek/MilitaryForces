@@ -178,7 +178,7 @@ BotImport_Trace
 void BotImport_Trace(bsp_trace_t *bsptrace, vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, int passent, int contentmask) {
 	trace_t trace;
 
-	SV_Trace(&trace, start, mins, maxs, end, passent, contentmask, qfalse);
+	SV_Trace(&trace, start, mins, maxs, end, passent, contentmask, false);
 	//copy the trace information
 	bsptrace->allsolid = trace.allsolid;
 	bsptrace->startsolid = trace.startsolid;
@@ -203,7 +203,7 @@ BotImport_EntityTrace
 void BotImport_EntityTrace(bsp_trace_t *bsptrace, vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, int entnum, int contentmask) {
 	trace_t trace;
 
-	SV_ClipToEntity(&trace, start, mins, maxs, end, entnum, contentmask, qfalse);
+	SV_ClipToEntity(&trace, start, mins, maxs, end, entnum, contentmask, false);
 	//copy the trace information
 	bsptrace->allsolid = trace.allsolid;
 	bsptrace->startsolid = trace.startsolid;
@@ -328,7 +328,7 @@ int BotImport_DebugPolygonCreate(int color, int numPoints, vec3_t *points) {
 	if (i >= bot_maxdebugpolys)
 		return 0;
 	poly = &debugpolygons[i];
-	poly->inuse = qtrue;
+	poly->inuse = true;
 	poly->color = color;
 	poly->numPoints = numPoints;
 	Com_Memcpy(poly->points, points, numPoints * sizeof(vec3_t));
@@ -346,7 +346,7 @@ void BotImport_DebugPolygonShow(int id, int color, int numPoints, vec3_t *points
 
 	if (!debugpolygons) return;
 	poly = &debugpolygons[id];
-	poly->inuse = qtrue;
+	poly->inuse = true;
 	poly->color = color;
 	poly->numPoints = numPoints;
 	Com_Memcpy(poly->points, points, numPoints * sizeof(vec3_t));
@@ -360,7 +360,7 @@ BotImport_DebugPolygonDelete
 void BotImport_DebugPolygonDelete(int id)
 {
 	if (!debugpolygons) return;
-	debugpolygons[id].inuse = qfalse;
+	debugpolygons[id].inuse = false;
 }
 
 /*
@@ -421,7 +421,7 @@ SV_BotClientCommand
 ==================
 */
 void BotClientCommand( int client, char *command ) {
-	SV_ExecuteClientCommand( &svs.clients[client], command, qtrue );
+	SV_ExecuteClientCommand( &svs.clients[client], command, true );
 }
 
 /*
@@ -524,7 +524,7 @@ void SV_BotInitBotLib(void) {
 
 	if (debugpolygons) Z_Free(debugpolygons);
 	bot_maxdebugpolys = Cvar_VariableIntegerValue("bot_maxdebugpolys");
-	debugpolygons = Z_Malloc(sizeof(bot_debugpoly_t) * bot_maxdebugpolys);
+	debugpolygons = reinterpret_cast<bot_debugpoly_t*>(Z_Malloc(sizeof(bot_debugpoly_t) * bot_maxdebugpolys));
 
 	botlib_import.Print = BotImport_Print;
 	botlib_import.Trace = BotImport_Trace;
@@ -580,18 +580,18 @@ int SV_BotGetConsoleMessage( int client, char *buf, int size )
 	cl->lastPacketTime = svs.time;
 
 	if ( cl->reliableAcknowledge == cl->reliableSequence ) {
-		return qfalse;
+		return false;
 	}
 
 	cl->reliableAcknowledge++;
 	index = cl->reliableAcknowledge & ( MAX_RELIABLE_COMMANDS - 1 );
 
 	if ( !cl->reliableCommands[index][0] ) {
-		return qfalse;
+		return false;
 	}
 
 	Q_strncpyz( buf, cl->reliableCommands[index], size );
-	return qtrue;
+	return true;
 }
 
 #if 0
@@ -609,10 +609,10 @@ int EntityInPVS( int client, int entityNum ) {
 	frame = &cl->frames[cl->netchan.outgoingSequence & PACKET_MASK];
 	for ( i = 0; i < frame->num_entities; i++ )	{
 		if ( svs.snapshotEntities[(frame->first_entity + i) % svs.numSnapshotEntities].number == entityNum ) {
-			return qtrue;
+			return true;
 		}
 	}
-	return qfalse;
+	return false;
 }
 #endif
 

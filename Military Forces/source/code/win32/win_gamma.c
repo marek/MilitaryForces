@@ -39,14 +39,14 @@ void WG_CheckHardwareGamma( void )
 {
 	HDC			hDC;
 
-	glConfig.deviceSupportsGamma = qfalse;
+	glConfig.deviceSupportsGamma = false;
 
 	if ( qwglSetDeviceGammaRamp3DFX )
 	{
-		glConfig.deviceSupportsGamma = qtrue;
+		glConfig.deviceSupportsGamma = true;
 
 		hDC = GetDC( GetDesktopWindow() );
-		glConfig.deviceSupportsGamma = qwglGetDeviceGammaRamp3DFX( hDC, s_oldHardwareGamma );
+		glConfig.deviceSupportsGamma = (qwglGetDeviceGammaRamp3DFX( hDC, s_oldHardwareGamma ) != 0);
 		ReleaseDC( GetDesktopWindow(), hDC );
 
 		return;
@@ -61,7 +61,7 @@ void WG_CheckHardwareGamma( void )
 	if ( !r_ignorehwgamma->integer )
 	{
 		hDC = GetDC( GetDesktopWindow() );
-		glConfig.deviceSupportsGamma = GetDeviceGammaRamp( hDC, s_oldHardwareGamma );
+		glConfig.deviceSupportsGamma = (GetDeviceGammaRamp( hDC, s_oldHardwareGamma ) != 0);
 		ReleaseDC( GetDesktopWindow(), hDC );
 
 		if ( glConfig.deviceSupportsGamma )
@@ -73,7 +73,7 @@ void WG_CheckHardwareGamma( void )
 				 ( HIBYTE( s_oldHardwareGamma[1][255] ) <= HIBYTE( s_oldHardwareGamma[1][0] ) ) ||
 				 ( HIBYTE( s_oldHardwareGamma[2][255] ) <= HIBYTE( s_oldHardwareGamma[2][0] ) ) )
 			{
-				glConfig.deviceSupportsGamma = qfalse;
+				glConfig.deviceSupportsGamma = false;
 				ri.Printf( PRINT_WARNING, "WARNING: device has broken gamma support, generated gamma.dat\n" );
 			}
 

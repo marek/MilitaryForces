@@ -317,18 +317,18 @@ Returns false if the triangle is degenrate.
 The normal will point out of the clock for clockwise ordered points
 =====================
 */
-qboolean PlaneFromPoints( vec4_t plane, const vec3_t a, const vec3_t b, const vec3_t c ) {
+bool PlaneFromPoints( vec4_t plane, const vec3_t a, const vec3_t b, const vec3_t c ) {
 	vec3_t	d1, d2;
 
 	VectorSubtract( b, a, d1 );
 	VectorSubtract( c, a, d2 );
 	CrossProduct( d2, d1, plane );
 	if ( VectorNormalize( plane ) == 0 ) {
-		return qfalse;
+		return false;
 	}
 
 	plane[3] = DotProduct( a, plane );
-	return qtrue;
+	return true;
 }
 
 /*
@@ -1504,7 +1504,7 @@ void MakeRay( ray3_t* ray, const vec3_t start, const vec3_t dir )
 	VectorCopy( dir, ray->dir );
 }
 
-qboolean RayIntersectBox( const ray3_t* ray, const box3_t* bbox )
+bool RayIntersectBox( const ray3_t* ray, const box3_t* bbox )
 {
 	vec3_t dir, midpoint, md, projAxis;
 	float box, seg, dist;
@@ -1519,7 +1519,7 @@ qboolean RayIntersectBox( const ray3_t* ray, const box3_t* bbox )
 	seg = Q_fabs(DotProduct(projAxis, dir));
 	dist = Q_fabs(DotProduct(projAxis, md));
 	if( dist > box + seg ) {
-		return qfalse;
+		return false;
 	}
 
 	// sec. axis
@@ -1528,7 +1528,7 @@ qboolean RayIntersectBox( const ray3_t* ray, const box3_t* bbox )
 	seg = Q_fabs(DotProduct(projAxis, dir));
 	dist = Q_fabs(DotProduct(projAxis, md));
 	if( dist > box + seg ) {
-		return qfalse;
+		return false;
 	}
 
 	// third. axis
@@ -1537,7 +1537,7 @@ qboolean RayIntersectBox( const ray3_t* ray, const box3_t* bbox )
 	seg = Q_fabs(DotProduct(projAxis, dir));
 	dist = Q_fabs(DotProduct(projAxis, md));
 	if( dist > box + seg ) {
-		return qfalse;
+		return false;
 	}
 
 	// first separating axis
@@ -1547,7 +1547,7 @@ qboolean RayIntersectBox( const ray3_t* ray, const box3_t* bbox )
 	box = bbox->extents[1]*Q_fabs(DotProduct(bbox->axis[1], projAxis)) + 
 		  bbox->extents[2]*Q_fabs(DotProduct(bbox->axis[2], projAxis));
 	if( dist > box ) {
-		return qfalse;
+		return false;
 	}
 
 	// second separating axis
@@ -1557,7 +1557,7 @@ qboolean RayIntersectBox( const ray3_t* ray, const box3_t* bbox )
 	box = bbox->extents[0]*Q_fabs(DotProduct(bbox->axis[0], projAxis)) + 
 		  bbox->extents[2]*Q_fabs(DotProduct(bbox->axis[2], projAxis));
 	if( dist > box ) {
-		return qfalse;
+		return false;
 	}
 
 	// third separating axis
@@ -1567,10 +1567,10 @@ qboolean RayIntersectBox( const ray3_t* ray, const box3_t* bbox )
 	box = bbox->extents[0]*Q_fabs(DotProduct(bbox->axis[0], projAxis)) + 
 		  bbox->extents[1]*Q_fabs(DotProduct(bbox->axis[1], projAxis));
 	if( dist > box ) {
-		return qfalse;
+		return false;
 	}
 
-	return qtrue;
+	return true;
 }
 
 

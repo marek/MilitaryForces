@@ -1,5 +1,5 @@
 /*
- * $Id: cg_localents.c,v 1.1 2005-08-22 16:02:35 thebjoern Exp $
+ * $Id: cg_localents.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,6 +9,7 @@
 // processed entities, like smoke puffs, gibs, shells, etc.
 
 #include "cg_local.h"
+#include <algorithm>
 
 #define	MAX_LOCAL_ENTITIES	512
 localEntity_t	cg_localEntities[MAX_LOCAL_ENTITIES];
@@ -106,7 +107,7 @@ void CG_FragmentBounceMark( localEntity_t *le, trace_t *trace ) {
 
 	radius = 8 + (rand()&15);
 	CG_ImpactMark( cgs.media.burnMarkShader, trace->endpos, trace->plane.normal, random()*360,
-			1,1,1,1, qtrue, radius, qfalse );
+			1,1,1,1, true, radius, false );
 
 	// don't allow a fragment to make multiple marks, or they
 	// pile up while settling
@@ -455,7 +456,7 @@ void CG_AddNuke( localEntity_t *le ) {
 		VectorScale( axis[0], c * rad + 100 / NUKE_SHOCKWAVEMODEL_RADIUS, shockwave.axis[0] );
 		VectorScale( axis[1], c * rad + 100 / NUKE_SHOCKWAVEMODEL_RADIUS, shockwave.axis[1] );
 		VectorScale( axis[2], c * rad + 100 / NUKE_SHOCKWAVEMODEL_RADIUS, shockwave.axis[2] );
-		shockwave.nonNormalizedAxes = qtrue;
+		shockwave.nonNormalizedAxes = true;
 
 		if (t > NUKE_SHOCKWAVEFADE_STARTTIME) {
 			c = (float)(t - NUKE_SHOCKWAVEFADE_STARTTIME) / (float)(NUKE_SHOCKWAVE_ENDTIME - NUKE_SHOCKWAVEFADE_STARTTIME);
@@ -495,7 +496,7 @@ void CG_AddNuke( localEntity_t *le ) {
 		VectorScale( axis[0], c * rad / NUKE_BOOMSPHEREMODEL_RADIUS, re->axis[0] );
 		VectorScale( axis[1], c * rad / NUKE_BOOMSPHEREMODEL_RADIUS, re->axis[1] );
 		VectorScale( axis[2], c * rad / NUKE_BOOMSPHEREMODEL_RADIUS, re->axis[2] );
-		re->nonNormalizedAxes = qtrue;
+		re->nonNormalizedAxes = true;
 
 		trap_R_AddRefEntityToScene( re );
 		// add the dlight
@@ -529,7 +530,7 @@ void CG_AddNuke( localEntity_t *le ) {
 		VectorScale( axis[0], c * rad + 100 / NUKE_SHOCKWAVEMODEL_RADIUS, shockwave.axis[0] );
 		VectorScale( axis[1], c * rad + 100 / NUKE_SHOCKWAVEMODEL_RADIUS, shockwave.axis[1] );
 		VectorScale( axis[2], c * rad + 100 / NUKE_SHOCKWAVEMODEL_RADIUS, shockwave.axis[2] );
-		shockwave.nonNormalizedAxes = qtrue;
+		shockwave.nonNormalizedAxes = true;
 
 		if (t > NUKE_SHOCKWAVE2FADE_STARTTIME) {
 			c = (float)(t - NUKE_SHOCKWAVE2FADE_STARTTIME) / (float)(NUKE_SHOCKWAVE2_ENDTIME - NUKE_SHOCKWAVE2FADE_STARTTIME);
@@ -557,10 +558,10 @@ void CG_AddNuke( localEntity_t *le ) {
 		cloud.renderfx = RF_LIGHTING_ORIGIN|RF_SHADOW_PLANE;
 		
 		c = (float)(t - NUKE_CLOUD_STARTTIME) / (float)(NUKE_CLOUD_FADETIME - NUKE_CLOUD_STARTTIME);
-		cloud.customShader = cgs.media.nukeCloud[min((int)(c*100),100)];
+		cloud.customShader = cgs.media.nukeCloud[std::min((int)(c*100),100)];
 		for(i = 0; i<3;i++)
 			VectorScale(axis[i],(c + 1) * rad * 0.01f,cloud.axis[i]);
-		shockwave.nonNormalizedAxes = qtrue;
+		shockwave.nonNormalizedAxes = true;
 
 		if (t > NUKE_CLOUD_FADETIME) {
 			c = (float)(t - NUKE_CLOUD_FADETIME) / (float)(NUKE_CLOUD_ENDTIME - NUKE_CLOUD_FADETIME);

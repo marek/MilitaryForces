@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.9 2005-08-29 01:35:45 minkis Exp $
+ * $Id: bg_public.h,v 1.10 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,10 +9,10 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"v0.79j"
+#define	GAME_VERSION		"v0.8"
 #define	GAME_IDENTIFIER		"mfgame"			// use to identify mfq3 servers
 
-#define	DEFAULT_GRAVITY		800
+#define	DEFAULT_GRAVITY		800.0f
 
 #define	GIB_HEALTH			-50
 
@@ -145,12 +145,12 @@ typedef struct {
 	int			waterlevel;
 
 	// for fixed msec Pmove
-	int			pmove_fixed;
 	int			pmove_msec;
+	int			pmove_fixed;
 
 	int			vehicle;		// MFQ3
-	qboolean	updateGear;
-	qboolean	updateBay;
+	bool	updateGear;
+	bool	updateBay;
 
 	int			advancedControls;	// MFQ3
 
@@ -514,7 +514,7 @@ gitem_t	*BG_FindItem( const char *pickupName );
 gitem_t	*BG_FindItemForPowerup( objective_t pw );
 #define	ITEM_INDEX(x) ((x)-bg_itemlist)
 
-qboolean	BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const playerState_t *ps, int idx );
+bool	BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const playerState_t *ps, int idx );
 
 
 // g_dmflags->integer flags
@@ -563,10 +563,10 @@ void	BG_EvaluateTrajectoryDelta( const trajectory_t *tr, int atTime, vec3_t resu
 
 void	BG_AddPredictableEventToPlayerstate( int newEvent, int eventParm, playerState_t *ps );
 
-void	BG_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, qboolean snap );
-void	BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s, int time, qboolean snap );
+void	BG_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, bool snap );
+void	BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s, int time, bool snap );
 
-qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTime );
+bool	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTime );
 
 
 #define ARENAS_PER_TIER		4
@@ -1039,7 +1039,7 @@ typedef enum
 #define IGME_MAX_WAYPOINTS		32
 
 typedef struct mission_waypoint_s {
-	qboolean		used;
+	bool		used;
 	vec3_t			origin;
 }mission_waypoint_t;
 
@@ -1050,11 +1050,11 @@ typedef struct mission_overview_s {
 	int				gametype;			
 	char			missionname[MAX_NAME_LENGTH];
 	char			objective[MAX_NAME_LENGTH];
-	qboolean		valid;
+	bool		valid;
 }mission_overview_t;
 
 typedef struct mission_groundInstallation_s {
-	qboolean		used;
+	bool		used;
 	int				index;
 	char			objectname[MAX_NAME_LENGTH];
 	char			teamname[MAX_NAME_LENGTH];
@@ -1064,7 +1064,7 @@ typedef struct mission_groundInstallation_s {
 
 
 typedef struct mission_vehicle_s {
-	qboolean		used;
+	bool		used;
 	int				index;
 	char			objectname[MAX_NAME_LENGTH];
 	int				team;
@@ -1086,10 +1086,10 @@ typedef struct mission_vehicle_s {
 
 void MF_ParseMissionScripts( char *buf, mission_overview_t* overview, 
 		mission_vehicle_t* vehs, mission_groundInstallation_t* gis);
-void MF_CheckMissionScriptOverviewValid( mission_overview_t* overview, qboolean updateFormat );
+void MF_CheckMissionScriptOverviewValid( mission_overview_t* overview, bool updateFormat );
 void MF_SetMissionScriptOverviewDefaults( mission_overview_t* overview );
-int MF_getIndexOfVehicle( int start, int gameset, int team, int cat, int cls, int vehicleType, int change_vehicle, qboolean allowNukes );
-int MF_getIndexOfVehicleEx( int start, int gameset, int team, int cat, int cls, int vehicleType, int change_vehicle, qboolean allowNukes );
+int MF_getIndexOfVehicle( int start, int gameset, int team, int cat, int cls, int vehicleType, int change_vehicle, bool allowNukes );
+int MF_getIndexOfVehicleEx( int start, int gameset, int team, int cat, int cls, int vehicleType, int change_vehicle, bool allowNukes );
 int MF_getIndexOfGI( int start, int gameset, int GIType, int mode);
 int MF_getItemIndexFromHex(int hexValue);
 int MF_getNumberOfItems(const char **itemlist);
@@ -1098,17 +1098,17 @@ char * MF_CreateGIPathname( int vehicle, char * pFormatString );
 void MF_LimitFloat( float * value, float min, float max );
 void MF_LimitInt( int * value, int min, int max );
 int MF_ExtractEnumFromId( int vehicle, unsigned int op );
-qboolean MF_findTag(const char* fileName, const char* tagname, md3Tag_t* tag);
-qboolean MF_distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout );
+bool MF_findTag(const char* fileName, const char* tagname, md3Tag_t* tag);
+bool MF_distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout );
 void MF_calculateAllDefaultLoadouts();
 void MF_getDefaultLoadoutForVehicle( int idx, completeLoadout_t* loadout, playerState_t* ps );
-qboolean MF_removeWeaponFromLoadout( int weaponIndex, completeLoadout_t* loadout, playerState_t* ps,
-									 qboolean* wingtip, vec3_t pos, int launchPos );
+bool MF_removeWeaponFromLoadout( int weaponIndex, completeLoadout_t* loadout, playerState_t* ps,
+									 bool* wingtip, vec3_t pos, int launchPos );
 int MF_addWeaponToLoadout( int weaponIndex, completeLoadout_t* loadout, playerState_t* ps );
-qboolean MF_getNumberOfFrames(const char* fileName, int* number);
-qboolean MF_getNumberOfTags(const char* fileName, int* number);
+bool MF_getNumberOfFrames(const char* fileName, int* number);
+bool MF_getNumberOfTags(const char* fileName, int* number);
 int MF_getTagsContaining(const char* fileName, const char* str, md3Tag_t* tags, int num);
-qboolean MF_getDimensions(const char* fileName, int frame, vec3_t* maxs, vec3_t* mins);
+bool MF_getDimensions(const char* fileName, int frame, vec3_t* maxs, vec3_t* mins);
 void MF_LoadAllVehicleData();
 int MF_findWeaponsOfType( int weaponIndex, completeLoadout_t* loadout );
 
