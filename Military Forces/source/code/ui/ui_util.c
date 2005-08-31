@@ -1,5 +1,5 @@
 /*
- * $Id: ui_util.c,v 1.1 2005-08-22 16:16:40 thebjoern Exp $
+ * $Id: ui_util.c,v 1.2 2005-08-31 19:20:23 thebjoern Exp $
 */
 //
 // origin: rad
@@ -51,7 +51,7 @@ MF_UI_GetGameset
 */
 
 // gets the mf_gameset variable into the correct a MF_GAMESET_x return
-unsigned long MF_UI_GetGameset( qboolean asEnum )
+unsigned long MF_UI_GetGameset( bool asEnum )
 {
 	char * pGameSet = NULL;
 	char info[MAX_INFO_STRING];
@@ -72,7 +72,7 @@ MF_UI_Gameset_StringToEnum
 =================
 */
 
-unsigned long MF_UI_Gameset_StringToValue( char * pString, qboolean asEnum )
+unsigned long MF_UI_Gameset_StringToValue( char * pString, bool asEnum )
 {
 	int returnValue = MF_GAMESET_MODERN;
 

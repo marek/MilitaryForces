@@ -1,5 +1,5 @@
 /*
- * $Id: g_cmds.c,v 1.1 2005-08-22 16:06:24 thebjoern Exp $
+ * $Id: g_cmds.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -97,16 +97,16 @@ void Cmd_Score_f( gentity_t *ent ) {
 CheatsOk
 ==================
 */
-qboolean	CheatsOk( gentity_t *ent ) {
+bool	CheatsOk( gentity_t *ent ) {
 	if ( !g_cheats.integer ) {
 		trap_SendServerCommand( ent-g_entities, va("print \"Cheats are not enabled on this server.\n\""));
-		return qfalse;
+		return false;
 	}
 	if ( ent->health <= 0 ) {
 		trap_SendServerCommand( ent-g_entities, va("print \"You must be alive to use this command.\n\""));
-		return qfalse;
+		return false;
 	}
-	return qtrue;
+	return true;
 }
 
 
@@ -450,7 +450,7 @@ void SetTeam( gentity_t *ent, char *s ) {
 	int					specClient;
 	int					teamLeader;
 	char				userinfo[MAX_INFO_STRING];
-	qboolean			dontBalance = qfalse;
+	bool			dontBalance = false;
 	int					balanceNum = 0;
 	const char *		pTeam = NULL;
 
@@ -519,7 +519,7 @@ void SetTeam( gentity_t *ent, char *s ) {
 			team = PickTeam( clientNum );
 
 			// since we asked the server to 'auto-join' us, we should not do a balance check
-			dontBalance = qtrue;
+			dontBalance = true;
 		}
 
 		// force team balance? (stop very uneven teams for being allowed)
@@ -635,11 +635,11 @@ void SetTeam( gentity_t *ent, char *s ) {
 	Info_SetValueForKey( userinfo, "cg_nextVehicle", "-1" );
 	trap_SetUserinfo( clientNum, userinfo );
 
-	client->sess.sessionTeam = team;
+	client->sess.sessionTeam = static_cast<team_t>(team);
 	client->sess.spectatorState = specState;
 	client->sess.spectatorClient = specClient;
 
-	client->sess.teamLeader = qfalse;
+	client->sess.teamLeader = false;
 	if ( team == TEAM_RED || team == TEAM_BLUE ) {
 		teamLeader = TeamLeader( team );
 		// if there is no team leader or the team leader is a bot and this client is not a bot
@@ -932,7 +932,7 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 Cmd_Say_f
 ==================
 */
-static void Cmd_Say_f( gentity_t *ent, int mode, qboolean arg0 ) {
+static void Cmd_Say_f( gentity_t *ent, int mode, bool arg0 ) {
 	char		*p;
 
 	if ( trap_Argc () < 2 && !arg0 ) {
@@ -1505,11 +1505,11 @@ void ClientCommand( int clientNum ) {
 	trap_Argv( 0, cmd, sizeof( cmd ) );
 
 	if (Q_stricmp (cmd, "say") == 0) {
-		Cmd_Say_f (ent, SAY_ALL, qfalse);
+		Cmd_Say_f (ent, SAY_ALL, false);
 		return;
 	}
 	if (Q_stricmp (cmd, "say_team") == 0) {
-		Cmd_Say_f (ent, SAY_TEAM, qfalse);
+		Cmd_Say_f (ent, SAY_TEAM, false);
 		return;
 	}
 	if (Q_stricmp (cmd, "tell") == 0) {
@@ -1523,7 +1523,7 @@ void ClientCommand( int clientNum ) {
 
 	// ignore all other commands when at intermission
 	if (level.intermissiontime) {
-		Cmd_Say_f (ent, qfalse, qtrue);
+		Cmd_Say_f (ent, false, true);
 		return;
 	}
 

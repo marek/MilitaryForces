@@ -119,14 +119,14 @@ static void MakeMeshNormals( int width, int height, drawVert_t ctrl[MAX_GRID_SIZ
 	int		x, y;
 	drawVert_t	*dv;
 	vec3_t		around[8], temp;
-	qboolean	good[8];
-	qboolean	wrapWidth, wrapHeight;
+	bool	good[8];
+	bool	wrapWidth, wrapHeight;
 	float		len;
 static	int	neighbors[8][2] = {
 	{0,1}, {1,1}, {1,0}, {1,-1}, {0,-1}, {-1,-1}, {-1,0}, {-1,1}
 	};
 
-	wrapWidth = qfalse;
+	wrapWidth = false;
 	for ( i = 0 ; i < height ; i++ ) {
 		VectorSubtract( ctrl[i][0].xyz, ctrl[i][width-1].xyz, delta );
 		len = VectorLengthSquared( delta );
@@ -135,10 +135,10 @@ static	int	neighbors[8][2] = {
 		}
 	}
 	if ( i == height ) {
-		wrapWidth = qtrue;
+		wrapWidth = true;
 	}
 
-	wrapHeight = qfalse;
+	wrapHeight = false;
 	for ( i = 0 ; i < width ; i++ ) {
 		VectorSubtract( ctrl[0][i].xyz, ctrl[height-1][i].xyz, delta );
 		len = VectorLengthSquared( delta );
@@ -147,7 +147,7 @@ static	int	neighbors[8][2] = {
 		}
 	}
 	if ( i == width) {
-		wrapHeight = qtrue;
+		wrapHeight = true;
 	}
 
 
@@ -158,7 +158,7 @@ static	int	neighbors[8][2] = {
 			VectorCopy( dv->xyz, base );
 			for ( k = 0 ; k < 8 ; k++ ) {
 				VectorClear( around[k] );
-				good[k] = qfalse;
+				good[k] = false;
 
 				for ( dist = 1 ; dist <= 3 ; dist++ ) {
 					x = i + neighbors[k][0] * dist;
@@ -185,7 +185,7 @@ static	int	neighbors[8][2] = {
 					if ( VectorNormalize2( temp, temp ) == 0 ) {
 						continue;				// degenerate edge, get more dist
 					} else {
-						good[k] = qtrue;
+						good[k] = true;
 						VectorCopy( temp, around[k] );
 						break;					// good edge
 					}
@@ -298,13 +298,13 @@ srfGridMesh_t *R_CreateSurfaceGridMesh(int width, int height,
 	size = (width * height - 1) * sizeof( drawVert_t ) + sizeof( *grid );
 
 #ifdef PATCH_STITCHING
-	grid = /*ri.Hunk_Alloc*/ ri.Malloc( size );
+	grid = /*ri.Hunk_Alloc*/ reinterpret_cast<srfGridMesh_t*>(ri.Malloc( size ));
 	Com_Memset(grid, 0, size);
 
-	grid->widthLodError = /*ri.Hunk_Alloc*/ ri.Malloc( width * 4 );
+	grid->widthLodError = /*ri.Hunk_Alloc*/ reinterpret_cast<float*>(ri.Malloc( width * 4 ));
 	Com_Memcpy( grid->widthLodError, errorTable[0], width * 4 );
 
-	grid->heightLodError = /*ri.Hunk_Alloc*/ ri.Malloc( height * 4 );
+	grid->heightLodError = /*ri.Hunk_Alloc*/ reinterpret_cast<float*>(ri.Malloc( height * 4 ));
 	Com_Memcpy( grid->heightLodError, errorTable[1], height * 4 );
 #else
 	grid = ri.Hunk_Alloc( size );

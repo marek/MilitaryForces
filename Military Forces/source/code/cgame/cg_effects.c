@@ -1,5 +1,5 @@
 /*
- * $Id: cg_effects.c,v 1.1 2005-08-22 16:02:08 thebjoern Exp $
+ * $Id: cg_effects.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -88,88 +88,88 @@ localEntity_t *CG_SmokePuff( const vec3_t p, const vec3_t vel,
 CG_NukeCloud
 ==========================
 */
-static void CG_NukeCloud( centity_t * cent, entityState_t * es )
-{
-	localEntity_t	* smoke;
-	vec3_t			pos, velocity;
-	int i, temp, puff_size;
-	static int	seed = 0x92;
-
-	puff_size = availableWeapons[es->weaponIndex].damageRadius / 10;
-
-	VectorCopy( cent->lerpOrigin, pos );
-	
-	// draw smoke slightly behind the entitiy position (using -velocity of the entity)
-	VectorCopy( cent->currentState.pos.trDelta, velocity );
-	VectorNormalize( velocity );
-
-	// calc adjusted position
-	VectorScale( velocity, -24.0f, velocity );		// -24.0f is just an arbitary distance which works OK with all current rocket models
-	VectorAdd( pos, velocity, pos );
-
-	// draw base
-	temp = availableWeapons[es->weaponIndex].damageRadius / 2.5;
-	for(i = 0; i <= 30; i++)
-	{
-			VectorCopy(cent->lerpOrigin, pos);
-			pos[0] += (temp - (temp * -1) + 1) * Q_random( &seed ) + (temp * -1);
-			pos[1] += (temp - (temp * -1) + 1) * Q_random( &seed ) + (temp * -1);
-			pos[2] += Q_random( &seed ) * 50;
-			velocity[0] = (5 - (-5) + 1) * Q_random(&seed) + -5;
-			velocity[1] = (5 - (-5) + 1) * Q_random(&seed) + -5;
-			smoke = CG_SmokePuff( pos, velocity, 
-						  puff_size, 
-						  0.1f, 0.1f, 0.1f, 0.7f,
-						  10000, 
-						  cg.time, 8000,
-						  LEF_PUFF_DONT_SCALE, 
-						  cgs.media.smokePuffShader );	
-	}
-	// Draw slowly rising funnle
-	// draw base
-	temp = availableWeapons[es->weaponIndex].damageRadius / 10;
-	for(i = 0; i <= 60; i++)
-	{
-			VectorCopy(cent->lerpOrigin, pos);
-			pos[0] += (temp - (temp * -1) + 1) * Q_random( &seed ) + (temp * -1);
-			pos[1] += (temp - (temp * -1) + 1) * Q_random( &seed ) + (temp * -1);
-			pos[2] += Q_random( &seed ) * (temp * 5) ;
-			velocity[0] = (1 - (-1) + 1) * Q_random(&seed) + -1;
-			velocity[1] = (1 - (-1) + 1) * Q_random(&seed) + -1;
-			velocity[2] = ((temp * 10) / 6.5) * Q_random(&seed);
-
-			smoke = CG_SmokePuff( pos, velocity, 
-						  puff_size, 
-						  0.1f, 0.1f, 0.1f, 0.7f,
-						  10000, 
-						  cg.time, 8000,
-						  LEF_PUFF_DONT_SCALE, 
-						  cgs.media.smokePuffShader );	
-	}
-	// Draw mushroom top
-	temp = availableWeapons[es->weaponIndex].damageRadius / 2;
-	for(i = 0; i <= 60; i++)
-	{
-			VectorCopy(cent->lerpOrigin, pos);
-			pos[2] +=  temp;
-
-			pos[0] += (temp - (temp * -1) + 1) * Q_random( &seed ) + (temp * -1);
-			pos[1] += (temp - (temp * -1) + 1) * Q_random( &seed ) + (temp * -1);
-			pos[2] += (temp / 5) * Q_random( &seed ) ;
-			velocity[0] = (3 - (-3) + 1) * Q_random(&seed) + -3;
-			velocity[1] = (3 - (-3) + 1) * Q_random(&seed) + -3;
-			velocity[2] = ((temp * 2) / 6.5) * Q_random(&seed);
-
-			smoke = CG_SmokePuff( pos, velocity, 
-						  puff_size, 
-						  0.1f, 0.1f, 0.1f, 0.7f,
-						  10000, 
-						  cg.time, 8000,
-						  LEF_PUFF_DONT_SCALE, 
-						  cgs.media.smokePuffShader );	
-	}
-
-}
+//static void CG_NukeCloud( centity_t * cent, entityState_t * es )
+//{
+//	localEntity_t	* smoke;
+//	vec3_t			pos, velocity;
+//	int i, temp, puff_size;
+//	static int	seed = 0x92;
+//
+//	puff_size = availableWeapons[es->weaponIndex].damageRadius / 10;
+//
+//	VectorCopy( cent->lerpOrigin, pos );
+//	
+//	// draw smoke slightly behind the entitiy position (using -velocity of the entity)
+//	VectorCopy( cent->currentState.pos.trDelta, velocity );
+//	VectorNormalize( velocity );
+//
+//	// calc adjusted position
+//	VectorScale( velocity, -24.0f, velocity );		// -24.0f is just an arbitary distance which works OK with all current rocket models
+//	VectorAdd( pos, velocity, pos );
+//
+//	// draw base
+//	temp = availableWeapons[es->weaponIndex].damageRadius / 2.5;
+//	for(i = 0; i <= 30; i++)
+//	{
+//			VectorCopy(cent->lerpOrigin, pos);
+//			pos[0] += (temp - (temp * -1) + 1) * Q_random( &seed ) + (temp * -1);
+//			pos[1] += (temp - (temp * -1) + 1) * Q_random( &seed ) + (temp * -1);
+//			pos[2] += Q_random( &seed ) * 50;
+//			velocity[0] = (5 - (-5) + 1) * Q_random(&seed) + -5;
+//			velocity[1] = (5 - (-5) + 1) * Q_random(&seed) + -5;
+//			smoke = CG_SmokePuff( pos, velocity, 
+//						  puff_size, 
+//						  0.1f, 0.1f, 0.1f, 0.7f,
+//						  10000, 
+//						  cg.time, 8000,
+//						  LEF_PUFF_DONT_SCALE, 
+//						  cgs.media.smokePuffShader );	
+//	}
+//	// Draw slowly rising funnle
+//	// draw base
+//	temp = availableWeapons[es->weaponIndex].damageRadius / 10;
+//	for(i = 0; i <= 60; i++)
+//	{
+//			VectorCopy(cent->lerpOrigin, pos);
+//			pos[0] += (temp - (temp * -1) + 1) * Q_random( &seed ) + (temp * -1);
+//			pos[1] += (temp - (temp * -1) + 1) * Q_random( &seed ) + (temp * -1);
+//			pos[2] += Q_random( &seed ) * (temp * 5) ;
+//			velocity[0] = (1 - (-1) + 1) * Q_random(&seed) + -1;
+//			velocity[1] = (1 - (-1) + 1) * Q_random(&seed) + -1;
+//			velocity[2] = ((temp * 10) / 6.5) * Q_random(&seed);
+//
+//			smoke = CG_SmokePuff( pos, velocity, 
+//						  puff_size, 
+//						  0.1f, 0.1f, 0.1f, 0.7f,
+//						  10000, 
+//						  cg.time, 8000,
+//						  LEF_PUFF_DONT_SCALE, 
+//						  cgs.media.smokePuffShader );	
+//	}
+//	// Draw mushroom top
+//	temp = availableWeapons[es->weaponIndex].damageRadius / 2;
+//	for(i = 0; i <= 60; i++)
+//	{
+//			VectorCopy(cent->lerpOrigin, pos);
+//			pos[2] +=  temp;
+//
+//			pos[0] += (temp - (temp * -1) + 1) * Q_random( &seed ) + (temp * -1);
+//			pos[1] += (temp - (temp * -1) + 1) * Q_random( &seed ) + (temp * -1);
+//			pos[2] += (temp / 5) * Q_random( &seed ) ;
+//			velocity[0] = (3 - (-3) + 1) * Q_random(&seed) + -3;
+//			velocity[1] = (3 - (-3) + 1) * Q_random(&seed) + -3;
+//			velocity[2] = ((temp * 2) / 6.5) * Q_random(&seed);
+//
+//			smoke = CG_SmokePuff( pos, velocity, 
+//						  puff_size, 
+//						  0.1f, 0.1f, 0.1f, 0.7f,
+//						  10000, 
+//						  cg.time, 8000,
+//						  LEF_PUFF_DONT_SCALE, 
+//						  cgs.media.smokePuffShader );	
+//	}
+//
+//}
 
 
 /*
@@ -251,7 +251,7 @@ CG_MakeExplosion
 */
 localEntity_t *CG_MakeExplosion( vec3_t origin, vec3_t dir, 
 								 qhandle_t hModel, qhandle_t shader,
-								 int offset, int duration, qboolean isSprite )
+								 int offset, int duration, bool isSprite )
 {
 	float			ang;
 	localEntity_t	*ex;

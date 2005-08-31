@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.3 2005-08-29 01:35:45 minkis Exp $
+ * $Id: bg_mfq3util.c,v 1.4 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -27,23 +27,23 @@ void MF_SetMissionScriptOverviewDefaults( mission_overview_t* overview )
 	overview->mapname[0] = 0;
 	overview->missionname[0] = 0;
 	overview->objective[0] = 0;
-	overview->valid = qfalse;
+	overview->valid = false;
 }
 
 // updateFormat should only be set to true to be backwards compatible after a format change
 // so that incomplete values can be filled in
-void MF_CheckMissionScriptOverviewValid( mission_overview_t* overview, qboolean updateFormat )
+void MF_CheckMissionScriptOverviewValid( mission_overview_t* overview, bool updateFormat )
 {
 	if( overview->gameset >= 0 &&
 		overview->gametype >= 0 &&
 		overview->mapname[0] > 0 &&	// very simple check
 		overview->missionname[0] > 0 &&
 		overview->objective[0] > 0 )
-		overview->valid = qtrue;
+		overview->valid = true;
 
 	if( updateFormat )
 	{
-		overview->valid = qtrue;
+		overview->valid = true;
 		if( overview->gameset < 0 )
 			overview->gameset = 0;
 		if( overview->gametype < 0 )
@@ -73,7 +73,7 @@ int MF_getIndexOfVehicleEx( int start,
 							int cls,
 						    int vehicleType,
 						    int change_vehicle,
-							qboolean allowNukes)
+							bool allowNukes)
 {
 
 	// NOTE: vehicleClass & vehicleCat are int enum indexed, convert to flag enums
@@ -107,11 +107,11 @@ int MF_getIndexOfVehicle( int start,			// where to start in list
 						  int cls, 
 						  int vehicleType,
 						  int change_vehicle,
-						  qboolean allowNukes)
+						  bool allowNukes)
 {
     int				i,j;
 	int				vehicle_pt = -1;
-	qboolean		done = qfalse;
+	bool		done = false;
 
 	// null or negative? use ALL values
 	if( gameset <= 0 ) gameset = MF_GAMESET_ANY;
@@ -129,7 +129,7 @@ int MF_getIndexOfVehicle( int start,			// where to start in list
 	}
 
 	// scan loop
-    for( i = start+1; done != qtrue; i++ )
+    for( i = start+1; done != true; i++ )
     {
 		if( i >= bg_numberOfVehicles )
 		{
@@ -141,7 +141,7 @@ int MF_getIndexOfVehicle( int start,			// where to start in list
 			i = 0;					
 		}
 
-		if( i == start ) done = qtrue;//return start;	
+		if( i == start ) done = true;//return start;	
 
 		if( !(availableVehicles[i].gameset & gameset) ) continue;			// wrong set
 		if( !(availableVehicles[i].team & team) ) continue;					// wrong team
@@ -150,17 +150,18 @@ int MF_getIndexOfVehicle( int start,			// where to start in list
 		
 		if(!allowNukes)
 		{
-			qboolean nukes = qfalse;
+			bool nukes = false;
 			for(j = 0; j < MAX_WEAPONS_PER_VEHICLE; j++)
 			{
 				if( availableWeapons[availableVehicles[i].weapons[j]].type == WT_NUKEBOMB || 
 					availableWeapons[availableVehicles[i].weapons[j]].type == WT_NUKEMISSILE )
 				{
-						vehicle_pt != -1;
-						nukes = qtrue;
+						vehicle_pt = -1;
+						nukes = true;
 				}
 			}
-			if(nukes) continue;
+			if(nukes) 
+				continue;
 		} 
 
 		if(vehicleType != -1 && change_vehicle == 1 && strcmp(availableVehicles[i].tinyName, availableVehicles[vehicleType].tinyName) == 0)
@@ -190,7 +191,7 @@ int MF_getIndexOfGI( int start, int gameset, int GIType, int mode)
 {
     int				i;
 	int				gi_pt = -1;
-	qboolean		done = qfalse;
+	bool		done = false;
 
 	if( gameset <= 0 ) gameset = MF_GAMESET_ANY;
 	if( start >= bg_numberOfGroundInstallations )
@@ -199,12 +200,12 @@ int MF_getIndexOfGI( int start, int gameset, int GIType, int mode)
 		start = bg_numberOfGroundInstallations;
 
 	// scan loop
-    for( i = start+1; done != qtrue; i++ )
+    for( i = start+1; done != true; i++ )
     {
 		if(i >= bg_numberOfGroundInstallations)
 			i = 0;					
 
-		if( i == start ) done = qtrue;			//return start;	
+		if( i == start ) done = true;			//return start;	
 		if( !(availableGroundInstallations[i].gameset & gameset) ) continue;			// wrong set
 		
 		if(GIType != -1) {
@@ -589,7 +590,7 @@ static void MF_ParseOverview( char **buf, mission_overview_t* overview )
 	info[0] = '\0';
 	while( 1 ) 
 	{
-		token = COM_ParseExt( buf, qtrue );
+		token = COM_ParseExt( buf, true );
 		if( !token[0] ) 
 		{
 //				Com_Printf( "Unexpected end of info file\n" );
@@ -606,7 +607,7 @@ static void MF_ParseOverview( char **buf, mission_overview_t* overview )
 		}
 		if( !strcmp( token, "map" ) )
 		{
-			token = COM_ParseExt( buf, qfalse );
+			token = COM_ParseExt( buf, false );
 			if( token[0] )
 			{
 				Q_strncpyz(overview->mapname, token, MAX_NAME_LENGTH );
@@ -615,7 +616,7 @@ static void MF_ParseOverview( char **buf, mission_overview_t* overview )
 		}
 		else if( !strcmp( token, "gameset" ) )
 		{
-			token = COM_ParseExt( buf, qfalse );
+			token = COM_ParseExt( buf, false );
 			if( token[0] )
 			{
 				overview->gameset = atoi(token);
@@ -624,7 +625,7 @@ static void MF_ParseOverview( char **buf, mission_overview_t* overview )
 		}
 		else if( !strcmp( token, "gametype" ) )
 		{
-			token = COM_ParseExt( buf, qfalse );
+			token = COM_ParseExt( buf, false );
 			if( token[0] )
 			{
 				overview->gametype = atoi(token);
@@ -633,7 +634,7 @@ static void MF_ParseOverview( char **buf, mission_overview_t* overview )
 		}
 		else if( !strcmp( token, "mission" ) )
 		{
-			token = COM_ParseExt( buf, qfalse );
+			token = COM_ParseExt( buf, false );
 			if( token[0] )
 			{
 				Q_strncpyz(overview->missionname, token, MAX_NAME_LENGTH );
@@ -642,7 +643,7 @@ static void MF_ParseOverview( char **buf, mission_overview_t* overview )
 		}
 		else if( !strcmp( token, "goal" ) )
 		{
-			token = COM_ParseExt( buf, qfalse );
+			token = COM_ParseExt( buf, false );
 			if( token[0] )
 			{
 				Q_strncpyz(overview->objective, token, MAX_NAME_LENGTH );
@@ -650,7 +651,7 @@ static void MF_ParseOverview( char **buf, mission_overview_t* overview )
 			}
 		}
 	}
-	MF_CheckMissionScriptOverviewValid(overview, qfalse);// set to true after format change
+	MF_CheckMissionScriptOverviewValid(overview, false);// set to true after format change
 }
 
 
@@ -675,7 +676,7 @@ static void MF_ParseWaypoints( char **buf, mission_vehicle_t* veh )
 
 	while( 1 ) 
 	{
-		token = COM_ParseExt( buf, qtrue );
+		token = COM_ParseExt( buf, true );
 		if( !token[0] ) 
 		{
 //				Com_Printf( "Unexpected end of info file\n" );
@@ -692,12 +693,12 @@ static void MF_ParseWaypoints( char **buf, mission_vehicle_t* veh )
 		}
 		if( !strcmp( token, "Origin" ) )
 		{
-			token = COM_ParseExt( buf, qfalse );
+			token = COM_ParseExt( buf, false );
 			if( token[0] )
 			{
 				sscanf(token, "%f;%f;%f", &veh->waypoints[num].origin[0],
 					&veh->waypoints[num].origin[1], &veh->waypoints[num].origin[2]);
-				veh->waypoints[num].used = qtrue;
+				veh->waypoints[num].used = true;
 				++num;
 				continue;
 			}
@@ -725,7 +726,7 @@ static void MF_ParseVehicle( char **buf, mission_vehicle_t* veh )
 
 	while( 1 ) 
 	{
-		token = COM_ParseExt( buf, qtrue );
+		token = COM_ParseExt( buf, true );
 		if( !token[0] ) 
 		{
 //				Com_Printf( "Unexpected end of info file\n" );
@@ -743,7 +744,7 @@ static void MF_ParseVehicle( char **buf, mission_vehicle_t* veh )
 
 		if( !strcmp( token, "Index" ) )
 		{
-			token = COM_ParseExt( buf, qfalse );
+			token = COM_ParseExt( buf, false );
 			if( token[0] )
 			{
 				veh->index = atoi(token);
@@ -752,7 +753,7 @@ static void MF_ParseVehicle( char **buf, mission_vehicle_t* veh )
 		}
 		else if( !strcmp( token, "Name" ) )
 		{
-			token = COM_ParseExt( buf, qfalse );
+			token = COM_ParseExt( buf, false );
 			if( token[0] )
 			{
 				Q_strncpyz(veh->objectname, token, MAX_NAME_LENGTH );
@@ -761,7 +762,7 @@ static void MF_ParseVehicle( char **buf, mission_vehicle_t* veh )
 		}
 		else if( !strcmp( token, "Team" ) )
 		{
-			token = COM_ParseExt( buf, qfalse );
+			token = COM_ParseExt( buf, false );
 			if( token[0] )
 			{
 				veh->team = atoi(token);
@@ -770,7 +771,7 @@ static void MF_ParseVehicle( char **buf, mission_vehicle_t* veh )
 		}
 		else if( !strcmp( token, "Origin" ) )
 		{
-			token = COM_ParseExt( buf, qfalse );
+			token = COM_ParseExt( buf, false );
 			if( token[0] )
 			{
 				sscanf(token, "%f;%f;%f", &veh->origin[0],
@@ -780,7 +781,7 @@ static void MF_ParseVehicle( char **buf, mission_vehicle_t* veh )
 		}
 		else if( !strcmp( token, "Angles" ) )
 		{
-			token = COM_ParseExt( buf, qfalse );
+			token = COM_ParseExt( buf, false );
 			if( token[0] )
 			{
 				sscanf(token, "%f;%f;%f", &veh->angles[0],
@@ -793,7 +794,7 @@ static void MF_ParseVehicle( char **buf, mission_vehicle_t* veh )
 			MF_ParseWaypoints(buf, veh);
 		}
 	}
-	veh->used = qtrue;
+	veh->used = true;
 }
 
 static void MF_ParseGroundInstallation( char **buf, mission_groundInstallation_t* gi ) 
@@ -816,7 +817,7 @@ static void MF_ParseGroundInstallation( char **buf, mission_groundInstallation_t
 
 	while( 1 ) 
 	{
-		token = COM_ParseExt( buf, qtrue );
+		token = COM_ParseExt( buf, true );
 		if( !token[0] ) 
 		{
 //				Com_Printf( "Unexpected end of info file\n" );
@@ -834,7 +835,7 @@ static void MF_ParseGroundInstallation( char **buf, mission_groundInstallation_t
 
 		if( !strcmp( token, "Index" ) )
 		{
-			token = COM_ParseExt( buf, qfalse );
+			token = COM_ParseExt( buf, false );
 			if( token[0] )
 			{
 				gi->index = atoi(token);
@@ -843,7 +844,7 @@ static void MF_ParseGroundInstallation( char **buf, mission_groundInstallation_t
 		}
 		else if( !strcmp( token, "Name" ) )
 		{
-			token = COM_ParseExt( buf, qfalse );
+			token = COM_ParseExt( buf, false );
 			if( token[0] )
 			{
 				Q_strncpyz(gi->objectname, token, MAX_NAME_LENGTH );
@@ -852,7 +853,7 @@ static void MF_ParseGroundInstallation( char **buf, mission_groundInstallation_t
 		}
 		else if( !strcmp( token, "Team" ) )
 		{
-			token = COM_ParseExt( buf, qfalse );
+			token = COM_ParseExt( buf, false );
 			if( token[0] )
 			{
 				Q_strncpyz(gi->teamname, token, MAX_NAME_LENGTH );
@@ -861,7 +862,7 @@ static void MF_ParseGroundInstallation( char **buf, mission_groundInstallation_t
 		}
 		else if( !strcmp( token, "Origin" ) )
 		{
-			token = COM_ParseExt( buf, qfalse );
+			token = COM_ParseExt( buf, false );
 			if( token[0] )
 			{
 				sscanf(token, "%f;%f;%f", &gi->origin[0],
@@ -871,7 +872,7 @@ static void MF_ParseGroundInstallation( char **buf, mission_groundInstallation_t
 		}
 		else if( !strcmp( token, "Angles" ) )
 		{
-			token = COM_ParseExt( buf, qfalse );
+			token = COM_ParseExt( buf, false );
 			if( token[0] )
 			{
 				sscanf(token, "%f;%f;%f", &gi->angles[0],
@@ -880,7 +881,7 @@ static void MF_ParseGroundInstallation( char **buf, mission_groundInstallation_t
 			}
 		}
 	}
-	gi->used = qtrue;
+	gi->used = true;
 }
 
 static void MF_ParseEntities( char **buf, 

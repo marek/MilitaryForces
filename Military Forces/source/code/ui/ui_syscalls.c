@@ -1,5 +1,5 @@
 /*
- * $Id: ui_syscalls.c,v 1.1 2005-08-22 16:16:40 thebjoern Exp $
+ * $Id: ui_syscalls.c,v 1.2 2005-08-31 19:20:23 thebjoern Exp $
 */
 #include "ui_local.h"
 #include "..\cgame\cg_public.h"
@@ -161,7 +161,7 @@ void trap_S_StartLocalSound( sfxHandle_t sfx, int channelNum ) {
 	syscall( UI_S_STARTLOCALSOUND, sfx, channelNum );
 }
 
-sfxHandle_t	trap_S_RegisterSound( const char *sample, qboolean compressed ) {
+sfxHandle_t	trap_S_RegisterSound( const char *sample, bool compressed ) {
 	return syscall( UI_S_REGISTERSOUND, sample, compressed );
 }
 
@@ -177,15 +177,15 @@ void trap_Key_SetBinding( int keynum, const char *binding ) {
 	syscall( UI_KEY_SETBINDING, keynum, binding );
 }
 
-qboolean trap_Key_IsDown( int keynum ) {
+int trap_Key_IsDown( int keynum ) {
 	return syscall( UI_KEY_ISDOWN, keynum );
 }
 
-qboolean trap_Key_GetOverstrikeMode( void ) {
+int trap_Key_GetOverstrikeMode( void ) {
 	return syscall( UI_KEY_GETOVERSTRIKEMODE );
 }
 
-void trap_Key_SetOverstrikeMode( qboolean state ) {
+void trap_Key_SetOverstrikeMode( bool state ) {
 	syscall( UI_KEY_SETOVERSTRIKEMODE, state );
 }
 
@@ -265,7 +265,7 @@ void trap_LAN_GetPingInfo( int n, char *buf, int buflen ) {
 	syscall( UI_LAN_GETPINGINFO, n, buf, buflen );
 }
 
-void trap_LAN_MarkServerVisible( int source, int n, qboolean visible ) {
+void trap_LAN_MarkServerVisible( int source, int n, bool visible ) {
 	syscall( UI_LAN_MARKSERVERVISIBLE, source, n, visible );
 }
 
@@ -273,7 +273,7 @@ int trap_LAN_ServerIsVisible( int source, int n) {
 	return syscall( UI_LAN_SERVERISVISIBLE, source, n );
 }
 
-qboolean trap_LAN_UpdateVisiblePings( int source ) {
+int trap_LAN_UpdateVisiblePings( int source ) {
 	return syscall( UI_LAN_UPDATEVISIBLEPINGS, source );
 }
 
@@ -333,21 +333,23 @@ int trap_RealTime(qtime_t *qtime) {
 	return syscall( UI_REAL_TIME, qtime );
 }
 
-// this returns a handle.  arg0 is the name in the format "idlogo.roq", set arg1 to NULL, alteredstates to qfalse (do not alter gamestate)
+// this returns a handle.  arg0 is the name in the format "idlogo.roq", set arg1 to NULL, alteredstates to false (do not alter gamestate)
 int trap_CIN_PlayCinematic( const char *arg0, int xpos, int ypos, int width, int height, int bits) {
   return syscall(UI_CIN_PLAYCINEMATIC, arg0, xpos, ypos, width, height, bits);
 }
  
 // stops playing the cinematic and ends it.  should always return FMV_EOF
 // cinematics must be stopped in reverse order of when they are started
-e_status trap_CIN_StopCinematic(int handle) {
-  return syscall(UI_CIN_STOPCINEMATIC, handle);
+e_status trap_CIN_StopCinematic(int handle) 
+{
+	return static_cast<e_status>(syscall(UI_CIN_STOPCINEMATIC, handle));
 }
 
 
 // will run a frame of the cinematic but will not draw it.  Will return FMV_EOF if the end of the cinematic has been reached.
-e_status trap_CIN_RunCinematic (int handle) {
-  return syscall(UI_CIN_RUNCINEMATIC, handle);
+e_status trap_CIN_RunCinematic (int handle) 
+{
+	return static_cast<e_status>(syscall(UI_CIN_RUNCINEMATIC, handle));
 }
  
 
@@ -367,6 +369,6 @@ void trap_R_RemapShader( const char *oldShader, const char *newShader, const cha
 	syscall( UI_R_REMAP_SHADER, oldShader, newShader, timeOffset );
 }
 
-qboolean trap_VerifyCDKey( const char *key, const char *chksum) {
+int trap_VerifyCDKey( const char *key, const char *chksum) {
 	return syscall( UI_VERIFY_CDKEY, key, chksum);
 }

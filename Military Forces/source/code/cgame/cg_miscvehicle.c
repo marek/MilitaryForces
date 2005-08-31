@@ -1,5 +1,5 @@
 /*
- * $Id: cg_miscvehicle.c,v 1.2 2005-08-27 00:27:51 thebjoern Exp $
+ * $Id: cg_miscvehicle.c,v 1.3 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -128,12 +128,12 @@ static void CG_Misc_Plane( centity_t *cent )
 
 	// muzzleflash
 	if( cg.time - cent->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {
-		drawInfo.basicInfo.drawMuzzleFlash = qtrue;
+		drawInfo.basicInfo.drawMuzzleFlash = true;
 		drawInfo.basicInfo.flashWeaponIndex = cent->muzzleFlashWeapon;
 	}
 	// muzzleflash
 	if( cg.time - cent->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {
-		drawInfo.basicInfo.drawMuzzleFlash = qtrue;
+		drawInfo.basicInfo.drawMuzzleFlash = true;
 		drawInfo.basicInfo.flashWeaponIndex = cent->muzzleFlashWeapon;
 	}
 
@@ -224,7 +224,7 @@ static void CG_Misc_GV( centity_t *cent )
 
 	// muzzleflash
 	if( cg.time - cent->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {
-		drawInfo.basicInfo.drawMuzzleFlash = qtrue;
+		drawInfo.basicInfo.drawMuzzleFlash = true;
 		drawInfo.basicInfo.flashWeaponIndex = cent->muzzleFlashWeapon;
 	}
 
@@ -301,7 +301,7 @@ static void CG_Misc_Helo( centity_t *cent )
 
 	// muzzleflash
 	if( cg.time - cent->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {
-		drawInfo.basicInfo.drawMuzzleFlash = qtrue;
+		drawInfo.basicInfo.drawMuzzleFlash = true;
 		drawInfo.basicInfo.flashWeaponIndex = cent->muzzleFlashWeapon;
 	}
 
@@ -384,7 +384,7 @@ static void CG_Misc_Boat( centity_t *cent )
 
 	// muzzleflash
 	if( cg.time - cent->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {
-		drawInfo.basicInfo.drawMuzzleFlash = qtrue;
+		drawInfo.basicInfo.drawMuzzleFlash = true;
 		drawInfo.basicInfo.flashWeaponIndex = cent->muzzleFlashWeapon;
 	}
 

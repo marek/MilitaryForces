@@ -1048,4 +1048,6 @@ struct jpeg_color_quantizer { long dummy; };
 #include "../jpeg-6/jerror.h"		/* fetch error codes too */
 #endif
 
+#include "../renderer/tr_local.h"
+
 #endif /* JPEGLIB_H */

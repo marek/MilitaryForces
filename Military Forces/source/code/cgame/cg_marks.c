@@ -1,5 +1,5 @@
 /*
- * $Id: cg_marks.c,v 1.1 2005-08-22 16:02:48 thebjoern Exp $
+ * $Id: cg_marks.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -104,7 +104,7 @@ CG_ImpactMark
 
 void CG_ImpactMark( qhandle_t markShader, const vec3_t origin, const vec3_t dir, 
 					  float orientation, float red, float green, float blue, float alpha,
-					  qboolean alphaFade, float radius, qboolean temporary )
+					  bool alphaFade, float radius, bool temporary )
 {
 	// link to extended version
 	CG_ImpactMarkEx( markShader, origin, dir, orientation, red, green, blue, alpha,
@@ -127,7 +127,7 @@ passed to the renderer.
 
 void CG_ImpactMarkEx( qhandle_t markShader, const vec3_t origin, const vec3_t dir, 
 					  float orientation, float red, float green, float blue, float alpha,
-					  qboolean alphaFade, float xRadius, float yRadius, qboolean temporary )
+					  bool alphaFade, float xRadius, float yRadius, bool temporary )
 {
 	vec3_t			axis[3];
 	float			xTexCoordScale, yTexCoordScale;
@@ -138,7 +138,7 @@ void CG_ImpactMarkEx( qhandle_t markShader, const vec3_t origin, const vec3_t di
 	markFragment_t	markFragments[MAX_MARK_FRAGMENTS], *mf;
 	vec3_t			markPoints[MAX_MARK_POINTS];
 	vec3_t			projection;
-//	qboolean		flip = qfalse;
+//	bool		flip = false;
 
 
 // MFQ3: disable ALL impact marks because currently the essential trap_CM_MarkFragments() call does not
@@ -181,9 +181,13 @@ return;
 
 	// get the fragments
 	VectorScale( dir, -20, projection );
-	numFragments = trap_CM_MarkFragments( 4, (void *)originalPoints,
-										  projection, MAX_MARK_POINTS, markPoints[0],
-										  MAX_MARK_FRAGMENTS, markFragments );
+	numFragments = trap_CM_MarkFragments( 4, 
+										  originalPoints,
+										  projection, 
+										  MAX_MARK_POINTS, 
+										  markPoints[0],
+										  MAX_MARK_FRAGMENTS, 
+										  markFragments );
 
 	// create the colour
 	colors[0] = red * 255;

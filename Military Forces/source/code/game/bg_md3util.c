@@ -1,5 +1,5 @@
 /*
- * $Id: bg_md3util.c,v 1.1 2005-08-22 16:05:07 thebjoern Exp $
+ * $Id: bg_md3util.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -24,10 +24,10 @@ void	trap_FS_Read( void *buffer, int len, fileHandle_t f );
 void	trap_FS_FCloseFile( fileHandle_t f );
 
 
-qboolean MF_findTag(const char* fileName, const char* tagname, md3Tag_t* tag)
+bool MF_findTag(const char* fileName, const char* tagname, md3Tag_t* tag)
 {
 	fileHandle_t	f;
-	qboolean		found = qfalse;
+	bool		found = false;
 
 	if( trap_FS_FOpenFile(fileName, &f, FS_READ) >= 0 ) {
 		md3Header_t head;
@@ -41,7 +41,7 @@ qboolean MF_findTag(const char* fileName, const char* tagname, md3Tag_t* tag)
 		for( i = 0; i < head.numTags; ++i ) {
 			trap_FS_Read(tag, sizeof(md3Tag_t), f);
 			if( strcmp( tag->name, tagname ) == 0 ) {
-				found = qtrue;
+				found = true;
 				break;
 			}
 //			CG_Printf("tag %i: %s\n", i, tag.name );
@@ -62,10 +62,10 @@ providing the file this functions returns the number of tags
 =================
 */
 
-qboolean MF_getNumberOfTags(const char* fileName, int* number)
+bool MF_getNumberOfTags(const char* fileName, int* number)
 {
 	fileHandle_t	f;
-	qboolean		found = qfalse;
+	bool		found = false;
 
 	if( !number ) return found;
 
@@ -73,7 +73,7 @@ qboolean MF_getNumberOfTags(const char* fileName, int* number)
 		md3Header_t head;
 		trap_FS_Read(&head, sizeof(head), f);
 		*number = head.numTags;
-		found = qtrue;
+		found = true;
 		trap_FS_FCloseFile(f);
 	} else {
 		Com_Printf( "Unable to open file %s\n", fileName );
@@ -135,10 +135,10 @@ providing the file this functions returns the number of frames
 =================
 */
 
-qboolean MF_getNumberOfFrames(const char* fileName, int* number)
+bool MF_getNumberOfFrames(const char* fileName, int* number)
 {
 	fileHandle_t	f;
-	qboolean		found = qfalse;
+	bool		found = false;
 
 	if( !number ) return found;
 
@@ -146,7 +146,7 @@ qboolean MF_getNumberOfFrames(const char* fileName, int* number)
 		md3Header_t head;
 		trap_FS_Read(&head, sizeof(head), f);
 		*number = head.numFrames;
-		found = qtrue;
+		found = true;
 		trap_FS_FCloseFile(f);
 	} else {
 		Com_Printf( "Unable to open file %s\n", fileName );
@@ -163,10 +163,10 @@ providing the file and the framenumber this functions returns the dimensions of 
 =================
 */
 
-qboolean MF_getDimensions(const char* fileName, int frame, vec3_t* maxs, vec3_t* mins)
+bool MF_getDimensions(const char* fileName, int frame, vec3_t* maxs, vec3_t* mins)
 {
 	fileHandle_t	f;
-	qboolean		found = qfalse;
+	bool		found = false;
 	int				i, number;
 
 	if( trap_FS_FOpenFile(fileName, &f, FS_READ) >= 0 ) {
@@ -183,7 +183,7 @@ qboolean MF_getDimensions(const char* fileName, int frame, vec3_t* maxs, vec3_t*
 				VectorCopy( frames.bounds[0], *mins );
 			if( maxs ) 
 				VectorCopy( frames.bounds[1], *maxs );
-			found = qtrue;
+			found = true;
 		}
 		trap_FS_FCloseFile(f);
 	} else {

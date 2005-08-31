@@ -1,5 +1,5 @@
 /*
- * $Id: cg_info.c,v 1.2 2005-08-25 20:29:27 minkis Exp $
+ * $Id: cg_info.c,v 1.3 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -140,7 +140,7 @@ void CG_DrawInformation( void ) {
 	{
 		UI_DrawProportionalString( 320, 170, "Awaiting snapshot...", UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 	}
-	//CG_DrawStringExt(0, 150, cg.infoCurrentLoadItemText, colorLtGrey, qtrue, qfalse, 6,6, strlen(cg.infoCurrentLoadItemText));
+	//CG_DrawStringExt(0, 150, cg.infoCurrentLoadItemText, colorLtGrey, true, false, 6,6, strlen(cg.infoCurrentLoadItemText));
 	//p.x = 0;
 	//p.y = 323;
 	//p.h = 15;

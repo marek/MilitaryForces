@@ -1,5 +1,5 @@
 /*
- * $Id: g_target.c,v 1.1 2005-08-22 16:07:21 thebjoern Exp $
+ * $Id: g_target.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -107,11 +107,11 @@ void Use_Target_Speaker (gentity_t *ent, gentity_t *other, gentity_t *activator)
 			ent->s.loopSound = ent->noise_index;	// start it
 	}else {	// normal sound
 		if ( ent->spawnflags & 8 ) {
-			G_AddEvent( activator, EV_GENERAL_SOUND, ent->noise_index, qtrue );
+			G_AddEvent( activator, EV_GENERAL_SOUND, ent->noise_index, true );
 		} else if (ent->spawnflags & 4) {
-			G_AddEvent( ent, EV_GLOBAL_SOUND, ent->noise_index, qtrue );
+			G_AddEvent( ent, EV_GLOBAL_SOUND, ent->noise_index, true );
 		} else {
-			G_AddEvent( ent, EV_GENERAL_SOUND, ent->noise_index, qtrue );
+			G_AddEvent( ent, EV_GENERAL_SOUND, ent->noise_index, true );
 		}
 	}
 }
@@ -228,7 +228,7 @@ static void target_location_linkup(gentity_t *ent)
 	if (level.locationLinked) 
 		return;
 
-	level.locationLinked = qtrue;
+	level.locationLinked = true;
 
 	level.locationHead = NULL;
 

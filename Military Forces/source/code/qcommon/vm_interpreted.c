@@ -159,7 +159,7 @@ void VM_PrepareInterpreter( vm_t *vm, vmHeader_t *header ) {
 	int		instruction;
 	int		*codeBase;
 
-	vm->codeBase = Hunk_Alloc( vm->codeLength*4, h_high );			// we're now int aligned
+	vm->codeBase = reinterpret_cast<byte*>(Hunk_Alloc( vm->codeLength*4, h_high ));			// we're now int aligned
 //	memcpy( vm->codeBase, (byte *)header + header->codeOffset, vm->codeLength );
 
 	// we don't need to translate the instructions, but we still need
@@ -325,7 +325,7 @@ int	VM_CallInterpreted( vm_t *vm, int *args ) {
 #endif
 
 	// interpret the code
-	vm->currentlyInterpreting = qtrue;
+	vm->currentlyInterpreting = true;
 
 	// we might be called recursively, so this might not be the very top
 	programStack = stackOnEntry = vm->programStack;
@@ -876,7 +876,7 @@ nextInstruction2:
 	}
 
 done:
-	vm->currentlyInterpreting = qfalse;
+	vm->currentlyInterpreting = false;
 
 	if ( opStack != &stack[1] ) {
 		Com_Error( ERR_DROP, "Interpreter error: opStack = %i", opStack - stack );

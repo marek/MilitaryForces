@@ -293,7 +293,7 @@ Scale up the pixel values in a texture to increase the
 lighting range
 ================
 */
-void R_LightScaleTexture (unsigned *in, int inwidth, int inheight, qboolean only_gamma )
+void R_LightScaleTexture (unsigned *in, int inwidth, int inheight, bool only_gamma )
 {
 	if ( only_gamma )
 	{
@@ -362,7 +362,7 @@ static void R_MipMap2( unsigned *in, int inWidth, int inHeight ) {
 
 	outWidth = inWidth >> 1;
 	outHeight = inHeight >> 1;
-	temp = ri.Hunk_AllocateTempMemory( outWidth * outHeight * 4 );
+	temp = reinterpret_cast<unsigned int*>(ri.Hunk_AllocateTempMemory( outWidth * outHeight * 4 ));
 
 	inWidthMask = inWidth - 1;
 	inHeightMask = inHeight - 1;
@@ -498,12 +498,12 @@ Upload32
 
 ===============
 */
-extern qboolean charSet;
+extern bool charSet;
 static void Upload32( unsigned *data, 
 						  int width, int height, 
-						  qboolean mipmap, 
-						  qboolean picmip, 
-							qboolean lightMap,
+						  bool mipmap, 
+						  bool picmip, 
+							bool lightMap,
 						  int *format, 
 						  int *pUploadWidth, int *pUploadHeight )
 {
@@ -529,7 +529,7 @@ static void Upload32( unsigned *data,
 		scaled_height >>= 1;
 
 	if ( scaled_width != width || scaled_height != height ) {
-		resampledBuffer = ri.Hunk_AllocateTempMemory( scaled_width * scaled_height * 4 );
+		resampledBuffer = reinterpret_cast<unsigned int*>(ri.Hunk_AllocateTempMemory( scaled_width * scaled_height * 4 ));
 		ResampleTexture (data, width, height, resampledBuffer, scaled_width, scaled_height);
 		data = resampledBuffer;
 		width = scaled_width;
@@ -565,7 +565,7 @@ static void Upload32( unsigned *data,
 		scaled_height >>= 1;
 	}
 
-	scaledBuffer = ri.Hunk_AllocateTempMemory( sizeof( unsigned ) * scaled_width * scaled_height );
+	scaledBuffer = reinterpret_cast<unsigned int*>(ri.Hunk_AllocateTempMemory( sizeof( unsigned ) * scaled_width * scaled_height ));
 
 	//
 	// scan the texture for each channel's max values
@@ -725,23 +725,23 @@ This is the only way any image_t are created
 ================
 */
 image_t *R_CreateImage( const char *name, const byte *pic, int width, int height, 
-					   qboolean mipmap, qboolean allowPicmip, int glWrapClampMode ) {
+					   bool mipmap, bool allowPicmip, int glWrapClampMode ) {
 	image_t		*image;
-	qboolean	isLightmap = qfalse;
+	bool	isLightmap = false;
 	long		hash;
 
 	if (strlen(name) >= MAX_QPATH ) {
 		ri.Error (ERR_DROP, "R_CreateImage: \"%s\" is too long\n", name);
 	}
 	if ( !strncmp( name, "*lightmap", 9 ) ) {
-		isLightmap = qtrue;
+		isLightmap = true;
 	}
 
 	if ( tr.numImages == MAX_DRAWIMAGES ) {
 		ri.Error( ERR_DROP, "R_CreateImage: MAX_DRAWIMAGES hit\n");
 	}
 
-	image = tr.images[tr.numImages] = ri.Hunk_Alloc( sizeof( image_t ), h_low );
+	image = tr.images[tr.numImages] = reinterpret_cast<image_t*>(ri.Hunk_Alloc( sizeof( image_t ), h_low ));
 	image->texnum = 1024 + tr.numImages;
 	tr.numImages++;
 
@@ -906,7 +906,7 @@ static void LoadBMP( const char *name, byte **pic, int *width, int *height )
 	if ( height )
 		*height = rows;
 
-	bmpRGBA = ri.Malloc( numPixels * 4 );
+	bmpRGBA = reinterpret_cast<byte*>(ri.Malloc( numPixels * 4 ));
 	*pic = bmpRGBA;
 
 
@@ -1024,7 +1024,7 @@ static void LoadPCX ( const char *filename, byte **pic, byte **palette, int *wid
 		return;
 	}
 
-	out = ri.Malloc ( (ymax+1) * (xmax+1) );
+	out = reinterpret_cast<byte*>(ri.Malloc ( (ymax+1) * (xmax+1) ));
 
 	*pic = out;
 
@@ -1032,7 +1032,7 @@ static void LoadPCX ( const char *filename, byte **pic, byte **palette, int *wid
 
 	if (palette)
 	{
-		*palette = ri.Malloc(768);
+		*palette = reinterpret_cast<byte*>(ri.Malloc(768));
 		Com_Memcpy (*palette, (byte *)pcx + len - 768, 768);
 	}
 
@@ -1091,7 +1091,7 @@ static void LoadPCX32 ( const char *filename, byte **pic, int *width, int *heigh
 	}
 
 	c = (*width) * (*height);
-	pic32 = *pic = ri.Malloc(4 * c );
+	pic32 = *pic = reinterpret_cast<byte*>(ri.Malloc(4 * c ));
 	for (i = 0 ; i < c ; i++) {
 		p = pic8[i];
 		pic32[0] = palette[p*3];
@@ -1186,7 +1186,7 @@ static void LoadTGA ( const char *name, byte **pic, int *width, int *height)
 	if (height)
 		*height = rows;
 
-	targa_rgba = ri.Malloc (numPixels*4);
+	targa_rgba = reinterpret_cast<byte*>(ri.Malloc (numPixels*4));
 	*pic = targa_rgba;
 
 	if (targa_header.id_length != 0)
@@ -1440,7 +1440,7 @@ static void LoadJPG( const char *filename, unsigned char **pic, int *width, int 
   /* JSAMPLEs per row in output buffer */
   row_stride = cinfo.output_width * cinfo.output_components;
 
-  out = ri.Malloc(cinfo.output_width*cinfo.output_height*cinfo.output_components);
+  out = reinterpret_cast<unsigned char*>(ri.Malloc(cinfo.output_width*cinfo.output_height*cinfo.output_components));
 
   *pic = out;
   *width = cinfo.output_width;
@@ -1738,7 +1738,7 @@ void SaveJPG(char * filename, int quality, int image_width, int image_height, un
    * VERY IMPORTANT: use "b" option to fopen() if you are on a machine that
    * requires it in order to write binary files.
    */
-  out = ri.Hunk_AllocateTempMemory(image_width*image_height*4);
+  out = reinterpret_cast<unsigned char*>(ri.Hunk_AllocateTempMemory(image_width*image_height*4));
   jpegDest(&cinfo, out, image_width*image_height*4);
 
   /* Step 3: set parameters for compression */
@@ -1853,7 +1853,7 @@ Finds or loads the given image.
 Returns NULL if it fails, not a default image.
 ==============
 */
-image_t	*R_FindImageFile( const char *name, qboolean mipmap, qboolean allowPicmip, int glWrapClampMode ) {
+image_t	*R_FindImageFile( const char *name, bool mipmap, bool allowPicmip, int glWrapClampMode ) {
 	image_t	*image;
 	int		width, height;
 	byte	*pic;
@@ -1941,7 +1941,7 @@ static void R_CreateDlightImage( void ) {
 			data[y][x][3] = 255;			
 		}
 	}
-	tr.dlightImage = R_CreateImage("*dlight", (byte *)data, DLIGHT_SIZE, DLIGHT_SIZE, qfalse, qfalse, GL_CLAMP );
+	tr.dlightImage = R_CreateImage("*dlight", (byte *)data, DLIGHT_SIZE, DLIGHT_SIZE, false, false, GL_CLAMP );
 }
 
 
@@ -2013,7 +2013,7 @@ static void R_CreateFogImage( void ) {
 	float	d;
 	float	borderColor[4];
 
-	data = ri.Hunk_AllocateTempMemory( FOG_S * FOG_T * 4 );
+	data = reinterpret_cast<byte*>(ri.Hunk_AllocateTempMemory( FOG_S * FOG_T * 4 ));
 
 	g = 2.0;
 
@@ -2031,7 +2031,7 @@ static void R_CreateFogImage( void ) {
 	// standard openGL clamping doesn't really do what we want -- it includes
 	// the border color at the edges.  OpenGL 1.2 has clamp-to-edge, which does
 	// what we want.
-	tr.fogImage = R_CreateImage("*fog", (byte *)data, FOG_S, FOG_T, qfalse, qfalse, GL_CLAMP );
+	tr.fogImage = R_CreateImage("*fog", (byte *)data, FOG_S, FOG_T, false, false, GL_CLAMP );
 	ri.Hunk_FreeTempMemory( data );
 
 	borderColor[0] = 1.0;
@@ -2075,7 +2075,7 @@ static void R_CreateDefaultImage( void ) {
 		data[x][DEFAULT_SIZE-1][2] =
 		data[x][DEFAULT_SIZE-1][3] = 255;
 	}
-	tr.defaultImage = R_CreateImage("*default", (byte *)data, DEFAULT_SIZE, DEFAULT_SIZE, qtrue, qfalse, GL_REPEAT );
+	tr.defaultImage = R_CreateImage("*default", (byte *)data, DEFAULT_SIZE, DEFAULT_SIZE, true, false, GL_REPEAT );
 }
 
 /*
@@ -2091,7 +2091,7 @@ void R_CreateBuiltinImages( void ) {
 
 	// we use a solid white image instead of disabling texturing
 	Com_Memset( data, 255, sizeof( data ) );
-	tr.whiteImage = R_CreateImage("*white", (byte *)data, 8, 8, qfalse, qfalse, GL_REPEAT );
+	tr.whiteImage = R_CreateImage("*white", (byte *)data, 8, 8, false, false, GL_REPEAT );
 
 	// with overbright bits active, we need an image which is some fraction of full color,
 	// for default lightmaps, etc
@@ -2104,12 +2104,12 @@ void R_CreateBuiltinImages( void ) {
 		}
 	}
 
-	tr.identityLightImage = R_CreateImage("*identityLight", (byte *)data, 8, 8, qfalse, qfalse, GL_REPEAT );
+	tr.identityLightImage = R_CreateImage("*identityLight", (byte *)data, 8, 8, false, false, GL_REPEAT );
 
 
 	for(x=0;x<32;x++) {
 		// scratchimage is usually used for cinematic drawing
-		tr.scratchImage[x] = R_CreateImage("*scratch", (byte *)data, DEFAULT_SIZE, DEFAULT_SIZE, qfalse, qtrue, GL_CLAMP );
+		tr.scratchImage[x] = R_CreateImage("*scratch", (byte *)data, DEFAULT_SIZE, DEFAULT_SIZE, false, true, GL_CLAMP );
 	}
 
 	R_CreateDlightImage();
@@ -2402,7 +2402,7 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 		return 0;
 	}
 	tr.numSkins++;
-	skin = ri.Hunk_Alloc( sizeof( skin_t ), h_low );
+	skin = reinterpret_cast<skin_t*>(ri.Hunk_Alloc( sizeof( skin_t ), h_low ));
 	tr.skins[hSkin] = skin;
 	Q_strncpyz( skin->name, name, sizeof( skin->name ) );
 	skin->numSurfaces = 0;
@@ -2413,8 +2413,8 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 	// If not a .skin file, load as a single shader
 	if ( strcmp( name + strlen( name ) - 5, ".skin" ) ) {
 		skin->numSurfaces = 1;
-		skin->surfaces[0] = ri.Hunk_Alloc( sizeof(skin->surfaces[0]), h_low );
-		skin->surfaces[0]->shader = R_FindShader( name, LIGHTMAP_NONE, qtrue );
+		skin->surfaces[0] = reinterpret_cast<skinSurface_t*>(ri.Hunk_Alloc( sizeof(skin->surfaces[0]), h_low ));
+		skin->surfaces[0]->shader = R_FindShader( name, LIGHTMAP_NONE, true );
 		return hSkin;
 	}
 
@@ -2447,9 +2447,9 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 		// parse the shader name
 		token = CommaParse( &text_p );
 
-		surf = skin->surfaces[ skin->numSurfaces ] = ri.Hunk_Alloc( sizeof( *skin->surfaces[0] ), h_low );
+		surf = skin->surfaces[ skin->numSurfaces ] = reinterpret_cast<skinSurface_t*>(ri.Hunk_Alloc( sizeof( *skin->surfaces[0] ), h_low ));
 		Q_strncpyz( surf->name, surfName, sizeof( surf->name ) );
-		surf->shader = R_FindShader( token, LIGHTMAP_NONE, qtrue );
+		surf->shader = R_FindShader( token, LIGHTMAP_NONE, true );
 		skin->numSurfaces++;
 	}
 
@@ -2476,10 +2476,10 @@ void	R_InitSkins( void ) {
 	tr.numSkins = 1;
 
 	// make the default skin have all default shaders
-	skin = tr.skins[0] = ri.Hunk_Alloc( sizeof( skin_t ), h_low );
+	skin = tr.skins[0] = reinterpret_cast<skin_t*>(ri.Hunk_Alloc( sizeof( skin_t ), h_low ));
 	Q_strncpyz( skin->name, "<default skin>", sizeof( skin->name )  );
 	skin->numSurfaces = 1;
-	skin->surfaces[0] = ri.Hunk_Alloc( sizeof( *skin->surfaces ), h_low );
+	skin->surfaces[0] = reinterpret_cast<skinSurface_t*>(ri.Hunk_Alloc( sizeof( *skin->surfaces ), h_low ));
 	skin->surfaces[0]->shader = tr.defaultShader;
 }
 

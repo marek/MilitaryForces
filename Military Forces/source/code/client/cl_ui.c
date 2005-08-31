@@ -165,7 +165,7 @@ static int LAN_AddServer(int source, const char *name, const char *address) {
 		if (i >= *count) {
 			servers[*count].adr = adr;
 			Q_strncpyz(servers[*count].hostName, name, sizeof(servers[*count].hostName));
-			servers[*count].visible = qtrue;
+			servers[*count].visible = true;
 			(*count)++;
 			return 1;
 		}
@@ -506,7 +506,7 @@ static void LAN_GetPingInfo( int n, char *buf, int buflen ) {
 LAN_MarkServerVisible
 ====================
 */
-static void LAN_MarkServerVisible(int source, int n, qboolean visible ) {
+static void LAN_MarkServerVisible(int source, int n, bool visible ) {
 	if (n == -1) {
 		int count = MAX_OTHER_SERVERS;
 		serverInfo_t *server = NULL;
@@ -586,7 +586,7 @@ static int LAN_ServerIsVisible(int source, int n ) {
 			}
 			break;
 	}
-	return qfalse;
+	return false;
 }
 
 /*
@@ -594,7 +594,7 @@ static int LAN_ServerIsVisible(int source, int n ) {
 LAN_UpdateVisiblePings
 =======================
 */
-qboolean LAN_UpdateVisiblePings(int source ) {
+bool LAN_UpdateVisiblePings(int source ) {
 	return CL_UpdateVisiblePings_f(source);
 }
 
@@ -729,19 +729,19 @@ static int GetConfigString(int index, char *buf, int size)
 	int		offset;
 
 	if (index < 0 || index >= MAX_CONFIGSTRINGS)
-		return qfalse;
+		return false;
 
 	offset = cl.gameState.stringOffsets[index];
 	if (!offset) {
 		if( size ) {
 			buf[0] = 0;
 		}
-		return qfalse;
+		return false;
 	}
 
 	Q_strncpyz( buf, cl.gameState.stringData+offset, size);
  
-	return qtrue;
+	return true;
 }
 
 /*
@@ -782,53 +782,64 @@ int CL_UISystemCalls( int *args ) {
 		return Sys_Milliseconds();
 
 	case UI_CVAR_REGISTER:
-		Cvar_Register( VMA(1), VMA(2), VMA(3), args[4] ); 
+		Cvar_Register( reinterpret_cast<vmCvar_t*>(VMA(1)), 
+					   reinterpret_cast<const char*>(VMA(2)), 
+					   reinterpret_cast<const char*>(VMA(3)), 
+					   args[4] ); 
 		return 0;
 
 	case UI_CVAR_UPDATE:
-		Cvar_Update( VMA(1) );
+		Cvar_Update( reinterpret_cast<vmCvar_t*>(VMA(1)) );
 		return 0;
 
 	case UI_CVAR_SET:
-		Cvar_Set( VMA(1), VMA(2) );
+		Cvar_Set( reinterpret_cast<const char*>(VMA(1)), 
+				  reinterpret_cast<const char*>(VMA(2)) );
 		return 0;
 
 	case UI_CVAR_VARIABLEVALUE:
-		return FloatAsInt( Cvar_VariableValue( VMA(1) ) );
+		return FloatAsInt( Cvar_VariableValue( reinterpret_cast<const char*>(VMA(1)) ) );
 
 	case UI_CVAR_VARIABLESTRINGBUFFER:
-		Cvar_VariableStringBuffer( VMA(1), VMA(2), args[3] );
+		Cvar_VariableStringBuffer( reinterpret_cast<const char*>(VMA(1)), 
+								   reinterpret_cast<char*>(VMA(2)), 
+								   args[3] );
 		return 0;
 
 	case UI_CVAR_SETVALUE:
-		Cvar_SetValue( VMA(1), VMF(2) );
+		Cvar_SetValue( reinterpret_cast<const char*>(VMA(1)), 
+					   VMF(2) );
 		return 0;
 
 	case UI_CVAR_RESET:
-		Cvar_Reset( VMA(1) );
+		Cvar_Reset( reinterpret_cast<const char*>(VMA(1)) );
 		return 0;
 
 	case UI_CVAR_CREATE:
-		Cvar_Get( VMA(1), VMA(2), args[3] );
+		Cvar_Get( reinterpret_cast<const char*>(VMA(1)), 
+				  reinterpret_cast<const char*>(VMA(2)), 
+				  args[3] );
 		return 0;
 
 	case UI_CVAR_INFOSTRINGBUFFER:
-		Cvar_InfoStringBuffer( args[1], VMA(2), args[3] );
+		Cvar_InfoStringBuffer( args[1], reinterpret_cast<char*>(VMA(2)), args[3] );
 		return 0;
 
 	case UI_ARGC:
 		return Cmd_Argc();
 
 	case UI_ARGV:
-		Cmd_ArgvBuffer( args[1], VMA(2), args[3] );
+		Cmd_ArgvBuffer( args[1], reinterpret_cast<char*>(VMA(2)), args[3] );
 		return 0;
 
 	case UI_CMD_EXECUTETEXT:
-		Cbuf_ExecuteText( args[1], VMA(2) );
+		Cbuf_ExecuteText( args[1], reinterpret_cast<const char*>(VMA(2)) );
 		return 0;
 
 	case UI_FS_FOPENFILE:
-		return FS_FOpenFileByMode( VMA(1), VMA(2), args[3] );
+		return FS_FOpenFileByMode( reinterpret_cast<const char*>(VMA(1)), 
+								   reinterpret_cast<fileHandle_t*>(VMA(2)), 
+								   static_cast<fsMode_t>(args[3]) );
 
 	case UI_FS_READ:
 		FS_Read2( VMA(1), args[2], args[3] );
@@ -843,42 +854,49 @@ int CL_UISystemCalls( int *args ) {
 		return 0;
 
 	case UI_FS_GETFILELIST:
-		return FS_GetFileList( VMA(1), VMA(2), VMA(3), args[4] );
+		return FS_GetFileList( reinterpret_cast<const char*>(VMA(1)), 
+							   reinterpret_cast<const char*>(VMA(2)), 
+							   reinterpret_cast<char*>(VMA(3)), 
+							   args[4] );
 
 	case UI_FS_SEEK:
 		return 0;//FS_Seek( args[1], args[2], args[3] );
 	
 	case UI_R_REGISTERMODEL:
-		return re.RegisterModel( VMA(1) );
+		return re.RegisterModel( reinterpret_cast<const char*>(VMA(1)) );
 
 	case UI_R_REGISTERSKIN:
-		return re.RegisterSkin( VMA(1) );
+		return re.RegisterSkin( reinterpret_cast<const char*>(VMA(1)) );
 
 	case UI_R_REGISTERSHADERNOMIP:
-		return re.RegisterShaderNoMip( VMA(1) );
+		return re.RegisterShaderNoMip( reinterpret_cast<const char*>(VMA(1)) );
 
 	case UI_R_CLEARSCENE:
 		re.ClearScene();
 		return 0;
 
 	case UI_R_ADDREFENTITYTOSCENE:
-		re.AddRefEntityToScene( VMA(1) );
+		re.AddRefEntityToScene( reinterpret_cast<refEntity_t*>(VMA(1)) );
 		return 0;
 
 	case UI_R_ADDPOLYTOSCENE:
-		re.AddPolyToScene( args[1], args[2], VMA(3), 1 );
+		re.AddPolyToScene( args[1], args[2], reinterpret_cast<const polyVert_t*>(VMA(3)), 1 );
 		return 0;
 
 	case UI_R_ADDLIGHTTOSCENE:
-		re.AddLightToScene( VMA(1), VMF(2), VMF(3), VMF(4), VMF(5) );
+		re.AddLightToScene( reinterpret_cast<float*>(VMA(1)), 
+							VMF(2), 
+							VMF(3), 
+							VMF(4), 
+							VMF(5) );
 		return 0;
 
 	case UI_R_RENDERSCENE:
-		re.RenderScene( VMA(1) );
+		re.RenderScene( reinterpret_cast<refdef_t*>(VMA(1)) );
 		return 0;
 
 	case UI_R_SETCOLOR:
-		re.SetColor( VMA(1) );
+		re.SetColor( reinterpret_cast<float*>(VMA(1)) );
 		return 0;
 
 	case UI_R_DRAWSTRETCHPIC:
@@ -886,7 +904,9 @@ int CL_UISystemCalls( int *args ) {
 		return 0;
 
   case UI_R_MODELBOUNDS:
-		re.ModelBounds( args[1], VMA(2), VMA(3) );
+		re.ModelBounds( static_cast<qhandle_t>(args[1]), 
+						reinterpret_cast<float*>(VMA(2)), 
+						reinterpret_cast<float*>(VMA(3)) );
 		return 0;
 
 	case UI_UPDATESCREEN:
@@ -894,26 +914,31 @@ int CL_UISystemCalls( int *args ) {
 		return 0;
 
 	case UI_CM_LERPTAG:
-		re.LerpTag( VMA(1), args[2], args[3], args[4], VMF(5), VMA(6) );
+		re.LerpTag( reinterpret_cast<orientation_t*>(VMA(1)), 
+					args[2], 
+					args[3],
+					args[4], 
+					VMF(5), 
+					reinterpret_cast<const char*>(VMA(6)) );
 		return 0;
 
 	case UI_S_REGISTERSOUND:
-		return S_RegisterSound( VMA(1), args[2] );
+		return S_RegisterSound( reinterpret_cast<const char*>(VMA(1)), (args[2]!=0) );
 
 	case UI_S_STARTLOCALSOUND:
 		S_StartLocalSound( args[1], args[2] );
 		return 0;
 
 	case UI_KEY_KEYNUMTOSTRINGBUF:
-		Key_KeynumToStringBuf( args[1], VMA(2), args[3] );
+		Key_KeynumToStringBuf( args[1], reinterpret_cast<char*>(VMA(2)), args[3] );
 		return 0;
 
 	case UI_KEY_GETBINDINGBUF:
-		Key_GetBindingBuf( args[1], VMA(2), args[3] );
+		Key_GetBindingBuf( args[1], reinterpret_cast<char*>(VMA(2)), args[3] );
 		return 0;
 
 	case UI_KEY_SETBINDING:
-		Key_SetBinding( args[1], VMA(2) );
+		Key_SetBinding( args[1], reinterpret_cast<const char*>(VMA(2)) );
 		return 0;
 
 	case UI_KEY_ISDOWN:
@@ -923,7 +948,7 @@ int CL_UISystemCalls( int *args ) {
 		return Key_GetOverstrikeMode();
 
 	case UI_KEY_SETOVERSTRIKEMODE:
-		Key_SetOverstrikeMode( args[1] );
+		Key_SetOverstrikeMode( args[1]!=0 );
 		return 0;
 
 	case UI_KEY_CLEARSTATES:
@@ -938,19 +963,19 @@ int CL_UISystemCalls( int *args ) {
 		return 0;
 
 	case UI_GETCLIPBOARDDATA:
-		GetClipboardData( VMA(1), args[2] );
+		GetClipboardData( reinterpret_cast<char*>(VMA(1)), args[2] );
 		return 0;
 
 	case UI_GETCLIENTSTATE:
-		GetClientState( VMA(1) );
+		GetClientState( reinterpret_cast<uiClientState_t*>(VMA(1)) );
 		return 0;		
 
 	case UI_GETGLCONFIG:
-		CL_GetGlconfig( VMA(1) );
+		CL_GetGlconfig( reinterpret_cast<glconfig_t*>(VMA(1)) );
 		return 0;
 
 	case UI_GETCONFIGSTRING:
-		return GetConfigString( args[1], VMA(2), args[3] );
+		return GetConfigString( args[1], reinterpret_cast<char*>(VMA(2)), args[3] );
 
 	case UI_LAN_LOADCACHEDSERVERS:
 		LAN_LoadCachedServers();
@@ -961,10 +986,10 @@ int CL_UISystemCalls( int *args ) {
 		return 0;
 
 	case UI_LAN_ADDSERVER:
-		return LAN_AddServer(args[1], VMA(2), VMA(3));
+		return LAN_AddServer(args[1], reinterpret_cast<const char*>(VMA(2)), reinterpret_cast<const char*>(VMA(3)));
 
 	case UI_LAN_REMOVESERVER:
-		LAN_RemoveServer(args[1], VMA(2));
+		LAN_RemoveServer(args[1], reinterpret_cast<const char*>(VMA(2)));
 		return 0;
 
 	case UI_LAN_GETPINGQUEUECOUNT:
@@ -975,29 +1000,29 @@ int CL_UISystemCalls( int *args ) {
 		return 0;
 
 	case UI_LAN_GETPING:
-		LAN_GetPing( args[1], VMA(2), args[3], VMA(4) );
+		LAN_GetPing( args[1], reinterpret_cast<char*>(VMA(2)), args[3], reinterpret_cast<int*>(VMA(4)) );
 		return 0;
 
 	case UI_LAN_GETPINGINFO:
-		LAN_GetPingInfo( args[1], VMA(2), args[3] );
+		LAN_GetPingInfo( args[1], reinterpret_cast<char*>(VMA(2)), args[3] );
 		return 0;
 
 	case UI_LAN_GETSERVERCOUNT:
 		return LAN_GetServerCount(args[1]);
 
 	case UI_LAN_GETSERVERADDRESSSTRING:
-		LAN_GetServerAddressString( args[1], args[2], VMA(3), args[4] );
+		LAN_GetServerAddressString( args[1], args[2], reinterpret_cast<char*>(VMA(3)), args[4] );
 		return 0;
 
 	case UI_LAN_GETSERVERINFO:
-		LAN_GetServerInfo( args[1], args[2], VMA(3), args[4] );
+		LAN_GetServerInfo( args[1], args[2], reinterpret_cast<char*>(VMA(3)), args[4] );
 		return 0;
 
 	case UI_LAN_GETSERVERPING:
 		return LAN_GetServerPing( args[1], args[2] );
 
 	case UI_LAN_MARKSERVERVISIBLE:
-		LAN_MarkServerVisible( args[1], args[2], args[3] );
+		LAN_MarkServerVisible( args[1], args[2], (args[3]!=0) );
 		return 0;
 
 	case UI_LAN_SERVERISVISIBLE:
@@ -1011,7 +1036,7 @@ int CL_UISystemCalls( int *args ) {
 		return 0;
 
 	case UI_LAN_SERVERSTATUS:
-		return LAN_GetServerStatus( VMA(1), VMA(2), args[3] );
+		return LAN_GetServerStatus( reinterpret_cast<char*>(VMA(1)), reinterpret_cast<char*>(VMA(2)), args[3] );
 
 	case UI_LAN_COMPARESERVERS:
 		return LAN_CompareServers( args[1], args[2], args[3], args[4], args[5] );
@@ -1020,18 +1045,18 @@ int CL_UISystemCalls( int *args ) {
 		return Hunk_MemoryRemaining();
 
 	case UI_GET_CDKEY:
-		CLUI_GetCDKey( VMA(1), args[2] );
+		CLUI_GetCDKey( reinterpret_cast<char*>(VMA(1)), args[2] );
 		return 0;
 
 	case UI_SET_CDKEY:
-		CLUI_SetCDKey( VMA(1) );
+		CLUI_SetCDKey( reinterpret_cast<char*>(VMA(1)) );
 		return 0;
 	
 	case UI_SET_PBCLSTATUS:
 		return 0;	
 
 	case UI_R_REGISTERFONT:
-		re.RegisterFont( VMA(1), args[2], VMA(3));
+		re.RegisterFont( reinterpret_cast<const char*>(VMA(1)), args[2], reinterpret_cast<fontInfo_t*>(VMA(3)));
 		return 0;
 
 	case UI_MEMSET:
@@ -1043,7 +1068,7 @@ int CL_UISystemCalls( int *args ) {
 		return 0;
 
 	case UI_STRNCPY:
-		return (int)strncpy( VMA(1), VMA(2), args[3] );
+		return (int)strncpy( reinterpret_cast<char*>(VMA(1)), reinterpret_cast<const char*>(VMA(2)), args[3] );
 
 	case UI_SIN:
 		return FloatAsInt( sin( VMF(1) ) );
@@ -1064,29 +1089,31 @@ int CL_UISystemCalls( int *args ) {
 		return FloatAsInt( ceil( VMF(1) ) );
 
 	case UI_PC_ADD_GLOBAL_DEFINE:
-		return botlib_export->PC_AddGlobalDefine( VMA(1) );
+		return botlib_export->PC_AddGlobalDefine( reinterpret_cast<char*>(VMA(1)) );
 	case UI_PC_LOAD_SOURCE:
-		return botlib_export->PC_LoadSourceHandle( VMA(1) );
+		return botlib_export->PC_LoadSourceHandle( reinterpret_cast<const char*>(VMA(1)) );
 	case UI_PC_FREE_SOURCE:
 		return botlib_export->PC_FreeSourceHandle( args[1] );
 	case UI_PC_READ_TOKEN:
-		return botlib_export->PC_ReadTokenHandle( args[1], VMA(2) );
+		return botlib_export->PC_ReadTokenHandle( static_cast<int>(args[1]), reinterpret_cast<pc_token_t*>(VMA(2)) );
 	case UI_PC_SOURCE_FILE_AND_LINE:
-		return botlib_export->PC_SourceFileAndLine( args[1], VMA(2), VMA(3) );
+		return botlib_export->PC_SourceFileAndLine( args[1], 
+													reinterpret_cast<char*>(VMA(2)), 
+													reinterpret_cast<int*>(VMA(3)) );
 
 	case UI_S_STOPBACKGROUNDTRACK:
 		S_StopBackgroundTrack();
 		return 0;
 	case UI_S_STARTBACKGROUNDTRACK:
-		S_StartBackgroundTrack( VMA(1), VMA(2));
+		S_StartBackgroundTrack( reinterpret_cast<const char*>(VMA(1)), reinterpret_cast<const char*>(VMA(2)));
 		return 0;
 
 	case UI_REAL_TIME:
-		return Com_RealTime( VMA(1) );
+		return Com_RealTime( reinterpret_cast<qtime_t*>(VMA(1)) );
 
 	case UI_CIN_PLAYCINEMATIC:
 	  Com_DPrintf("UI_CIN_PlayCinematic\n");
-	  return CIN_PlayCinematic(VMA(1), args[2], args[3], args[4], args[5], args[6]);
+	  return CIN_PlayCinematic(reinterpret_cast<const char*>(VMA(1)), args[2], args[3], args[4], args[5], args[6]);
 
 	case UI_CIN_STOPCINEMATIC:
 	  return CIN_StopCinematic(args[1]);
@@ -1103,11 +1130,14 @@ int CL_UISystemCalls( int *args ) {
 	  return 0;
 
 	case UI_R_REMAP_SHADER:
-		re.RemapShader( VMA(1), VMA(2), VMA(3) );
+		re.RemapShader( reinterpret_cast<const char*>(VMA(1)), 
+						reinterpret_cast<const char*>(VMA(2)), 
+						reinterpret_cast<const char*>(VMA(3)) );
 		return 0;
 
 	case UI_VERIFY_CDKEY:
-		return CL_CDKeyValidate(VMA(1), VMA(2));
+		return CL_CDKeyValidate(reinterpret_cast<const char*>(VMA(1)),
+								reinterpret_cast<const char*>(VMA(2)));
 
 
 		
@@ -1126,7 +1156,7 @@ CL_ShutdownUI
 */
 void CL_ShutdownUI( void ) {
 	cls.keyCatchers &= ~KEYCATCH_UI;
-	cls.uiStarted = qfalse;
+	cls.uiStarted = false;
 	if ( !uivm ) {
 		return;
 	}
@@ -1154,7 +1184,7 @@ void CL_InitUI( void )
 		interpret = VMI_COMPILED;
 	}
 	else 
-		interpret = Cvar_VariableValue( "vm_ui" );
+		interpret = static_cast<vmInterpret_t>(Cvar_VariableIntegerValue( "vm_ui" ));
 	
 	uivm = VM_Create( "ui", CL_UISystemCalls, interpret );
 	if ( !uivm ) 
@@ -1171,7 +1201,7 @@ void CL_InitUI( void )
 	else if (v != UI_API_VERSION) 
 	{
 		Com_Error( ERR_DROP, "User Interface is version %d, expected %d", v, UI_API_VERSION );
-		cls.uiStarted = qfalse;
+		cls.uiStarted = false;
 	}
 	else 
 	{
@@ -1180,12 +1210,12 @@ void CL_InitUI( void )
 	}
 }
 
-qboolean UI_usesUniqueCDKey() 
+bool UI_usesUniqueCDKey() 
 {
 	if (uivm) 
-		return (VM_Call( uivm, UI_HASUNIQUECDKEY) == qtrue);
+		return (VM_Call( uivm, UI_HASUNIQUECDKEY) != 0);
 	else 
-		return qfalse;
+		return false;
 }
 
 /*
@@ -1195,10 +1225,10 @@ UI_GameCommand
 See if the current console command is claimed by the ui
 ====================
 */
-qboolean UI_GameCommand( void ) {
+bool UI_GameCommand( void ) {
 	if ( !uivm ) {
-		return qfalse;
+		return false;
 	}
 
-	return VM_Call( uivm, UI_CONSOLE_COMMAND, cls.realtime );
+	return (VM_Call( uivm, UI_CONSOLE_COMMAND, cls.realtime )!=0);
 }

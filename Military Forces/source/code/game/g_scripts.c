@@ -1,11 +1,11 @@
 /*
- * $Id: g_scripts.c,v 1.1 2005-08-22 16:07:10 thebjoern Exp $
+ * $Id: g_scripts.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 #include "g_local.h"
 
 
-static int setState( gentity_t* ent, const char* token, qboolean taskaction ) {
+static int setState( gentity_t* ent, const char* token, bool taskaction ) {
 
 	if( taskaction ) {
 
@@ -37,7 +37,7 @@ static int addToGeneralBehaviour( gentity_t* ent, actionTypes_t at, const char* 
 		}
 		break;
 	case AT_SET_STATE:
-		if( setState( ent, token, qfalse ) ) return 1;
+		if( setState( ent, token, false ) ) return 1;
 		break;
 	}
 
@@ -59,7 +59,7 @@ static int addToTask( scripttask_t* st, actionTypes_t at, const char* token ) {
 		}
 		break;
 	case AT_SET_STATE:
-		if( setState( st->owner, token, qtrue ) ) return 1;
+		if( setState( st->owner, token, true ) ) return 1;
 		return 1;
 		break;
 	}
@@ -96,7 +96,7 @@ static int ParseScripts( gentity_t* ent, char *buf ) {
 	int		count;
 	char	key[MAX_TOKEN_CHARS];
 	char	info[MAX_INFO_STRING];
-//	qboolean mfq3map = qfalse;
+//	bool mfq3map = false;
 	int     openbraces = 0;
 	scripttask_t* currentTask = 0;
 
@@ -118,7 +118,7 @@ static int ParseScripts( gentity_t* ent, char *buf ) {
 
 		info[0] = '\0';
 		while( 1 ) {
-			token = COM_ParseExt( &buf, qtrue );
+			token = COM_ParseExt( &buf, true );
 			if( !token[0] ) {
 //				Com_Printf( "Unexpected end of info file\n" );
 				break;
@@ -139,7 +139,7 @@ static int ParseScripts( gentity_t* ent, char *buf ) {
 			}
 			Q_strncpyz( key, token, sizeof( key ) );
 
-			token = COM_ParseExt( &buf, qfalse );
+			token = COM_ParseExt( &buf, false );
 			if( !token[0] ) {
 				strcpy( token, "<NULL>" );
 			}

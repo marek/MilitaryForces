@@ -1,5 +1,5 @@
 /*
- * $Id: bg_lib.c,v 1.1 2005-08-22 16:05:04 thebjoern Exp $
+ * $Id: bg_lib.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -49,7 +49,7 @@
 static char sccsid[] = "@(#)qsort.c	8.1 (Berkeley) 6/4/93";
 #endif
 static const char rcsid[] =
-	"$Id: bg_lib.c,v 1.1 2005-08-22 16:05:04 thebjoern Exp $";
+	"$Id: bg_lib.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $";
 #endif /* LIBC_SCCS and not lint */
 
 #if !defined( Q3_VM )
@@ -1197,7 +1197,7 @@ int vsprintf( char *buffer, const char *fmt, va_list argptr ) {
 	buf_p = buffer;
 	arg = (int *)argptr;
 
-	while( qtrue ) {
+	while( true ) {
 		// run through the format string until we hit a '%' or '\0'
 		for ( ch = *fmt; (ch = *fmt) != '\0' && ch != '%'; fmt++ ) {
 			*buf_p++ = ch;

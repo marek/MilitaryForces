@@ -1,5 +1,5 @@
 /*
- * $Id: g_spawn.c,v 1.1 2005-08-22 16:07:13 thebjoern Exp $
+ * $Id: g_spawn.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -7,7 +7,7 @@
 
 #include "g_local.h"
 
-qboolean	G_SpawnString( const char *key, const char *defaultString, char **out ) {
+bool	G_SpawnString( const char *key, const char *defaultString, char **out ) {
 	int		i;
 
 	if ( !level.spawning ) {
@@ -18,35 +18,35 @@ qboolean	G_SpawnString( const char *key, const char *defaultString, char **out )
 	for ( i = 0 ; i < level.numSpawnVars ; i++ ) {
 		if ( !Q_stricmp( key, level.spawnVars[i][0] ) ) {
 			*out = level.spawnVars[i][1];
-			return qtrue;
+			return true;
 		}
 	}
 
 	*out = (char *)defaultString;
-	return qfalse;
+	return false;
 }
 
-qboolean	G_SpawnFloat( const char *key, const char *defaultString, float *out ) {
+bool	G_SpawnFloat( const char *key, const char *defaultString, float *out ) {
 	char		*s;
-	qboolean	present;
+	bool	present;
 
 	present = G_SpawnString( key, defaultString, &s );
 	*out = atof( s );
 	return present;
 }
 
-qboolean	G_SpawnInt( const char *key, const char *defaultString, int *out ) {
+bool	G_SpawnInt( const char *key, const char *defaultString, int *out ) {
 	char		*s;
-	qboolean	present;
+	bool	present;
 
 	present = G_SpawnString( key, defaultString, &s );
 	*out = atoi( s );
 	return present;
 }
 
-qboolean	G_SpawnVector( const char *key, const char *defaultString, float *out ) {
+bool	G_SpawnVector( const char *key, const char *defaultString, float *out ) {
 	char		*s;
-	qboolean	present;
+	bool	present;
 
 	present = G_SpawnString( key, defaultString, &s );
 	sscanf( s, "%f %f %f", &out[0], &out[1], &out[2] );
@@ -263,25 +263,25 @@ int G_ItemDisabled( gitem_t *item ) {
 G_CallSpawn
 
 Finds the spawn function for the entity and calls it,
-returning qfalse if not found
+returning false if not found
 ===============
 */
-qboolean G_CallSpawn( gentity_t *ent ) {
+bool G_CallSpawn( gentity_t *ent ) {
 	spawn_t	*s;
 	gitem_t	*item;
 
 	if ( !ent->classname ) {
 		G_Printf ("G_CallSpawn: NULL classname\n");
-		return qfalse;
+		return false;
 	}
 
 	// check item spawn functions
 	for ( item=bg_itemlist+1 ; item->classname ; item++ ) {
 		if ( !strcmp(item->classname, ent->classname) ) {
 			if ( G_ItemDisabled(item) )	// MFQ3
-				return qfalse;			// MFQ3
+				return false;			// MFQ3
 			G_SpawnItem( ent, item );
-				return qtrue;
+				return true;
 		}
 	}
 
@@ -290,11 +290,11 @@ qboolean G_CallSpawn( gentity_t *ent ) {
 		if ( !strcmp(s->name, ent->classname) ) {
 			// found it
 			s->spawn(ent);
-			return qtrue;
+			return true;
 		}
 	}
 	G_Printf ("%s doesn't have a spawn function\n", ent->classname);
-	return qfalse;
+	return false;
 }
 
 /*
@@ -311,7 +311,7 @@ char *G_NewString( const char *string ) {
 	
 	l = strlen(string) + 1;
 
-	newb = G_Alloc( l );
+	newb = reinterpret_cast<char*>(G_Alloc( l ));
 
 	new_p = newb;
 
@@ -495,7 +495,7 @@ level's entity strings into level.spawnVars[]
 This does not actually spawn an entity.
 ====================
 */
-qboolean G_ParseSpawnVars( void ) {
+bool G_ParseSpawnVars( void ) {
 	char		keyname[MAX_TOKEN_CHARS];
 	char		com_token[MAX_TOKEN_CHARS];
 
@@ -505,7 +505,7 @@ qboolean G_ParseSpawnVars( void ) {
 	// parse the opening brace
 	if ( !trap_GetEntityToken( com_token, sizeof( com_token ) ) ) {
 		// end of spawn string
-		return qfalse;
+		return false;
 	}
 	if ( com_token[0] != '{' ) {
 		G_Error( "G_ParseSpawnVars: found %s when expecting {",com_token );
@@ -538,7 +538,7 @@ qboolean G_ParseSpawnVars( void ) {
 		level.numSpawnVars++;
 	}
 
-	return qtrue;
+	return true;
 }
 
 
@@ -606,7 +606,7 @@ Parses textual entity definitions out of an entstring and spawns gentities.
 */
 void G_SpawnEntitiesFromString( void ) {
 	// allow calls to G_Spawn*()
-	level.spawning = qtrue;
+	level.spawning = true;
 	level.numSpawnVars = 0;
 
 	// the worldspawn is not an actual entity, but it still
@@ -622,6 +622,6 @@ void G_SpawnEntitiesFromString( void ) {
 		G_SpawnGEntityFromSpawnVars();
 	}	
 
-	level.spawning = qfalse;			// any future calls to G_Spawn*() will be errors
+	level.spawning = false;			// any future calls to G_Spawn*() will be errors
 }
 

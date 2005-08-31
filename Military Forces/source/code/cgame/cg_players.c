@@ -1,5 +1,5 @@
 /*
- * $Id: cg_players.c,v 1.1 2005-08-22 16:03:08 thebjoern Exp $
+ * $Id: cg_players.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -35,7 +35,7 @@ sfxHandle_t	CG_CustomSound( int clientNum, const char *soundName ) {
 	int			i;
 
 	if ( soundName[0] != '*' ) {
-		return trap_S_RegisterSound( soundName, qfalse );
+		return trap_S_RegisterSound( soundName, false );
 	}
 
 	if ( clientNum < 0 || clientNum >= MAX_CLIENTS ) {
@@ -132,7 +132,7 @@ void CG_NewClientInfo( int clientNum ) {
 
 	// team
 	v = Info_ValueForKey( configstring, "t" );
-	newInfo.team = atoi( v );
+	newInfo.team = static_cast<team_t>(atoi( v ));
 	if(cg.clientNum == clientNum && ci->team != newInfo.team ) // use cg.predictedPlayerEntity.currentState.clientNum instead?
 	{
 		// MFQ3: team changed so reset the vehicle trigger
@@ -184,7 +184,7 @@ void CG_NewClientInfo( int clientNum ) {
 	if( newInfo.vehicle >= 0 )
 	{
 	    CG_RegisterVehicle(&newInfo);
-	    newInfo.infoValid = qtrue;
+	    newInfo.infoValid = true;
 	    *ci = newInfo;
 
 //		Com_Printf( "New info received, it is a vehicle (%s)\n", newInfo.name );
@@ -192,7 +192,7 @@ void CG_NewClientInfo( int clientNum ) {
 	}
 
 	// replace whatever was there with the new one
-	newInfo.infoValid = qtrue;
+	newInfo.infoValid = true;
 	*ci = newInfo;
 }
 
@@ -354,7 +354,7 @@ int CG_LightVerts( vec3_t normal, int numVerts, polyVert_t *verts )
 
 		verts[i].modulate[3] = 255;
 	}
-	return qtrue;
+	return true;
 }
 
 

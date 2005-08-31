@@ -25,8 +25,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define	LL(x) x=LittleLong(x)
 
-static qboolean R_LoadMD3 (model_t *mod, int lod, void *buffer, const char *name );
-static qboolean R_LoadMD4 (model_t *mod, void *buffer, const char *name );
+static bool R_LoadMD3 (model_t *mod, int lod, void *buffer, const char *name );
+static bool R_LoadMD4 (model_t *mod, void *buffer, const char *name );
 
 model_t	*loadmodel;
 
@@ -58,7 +58,7 @@ model_t *R_AllocModel( void ) {
 		return NULL;
 	}
 
-	mod = ri.Hunk_Alloc( sizeof( *tr.models[tr.numModels] ), h_low );
+	mod = reinterpret_cast<model_t*>(ri.Hunk_Alloc( sizeof( *tr.models[tr.numModels] ), h_low ));
 	mod->index = tr.numModels;
 	tr.models[tr.numModels] = mod;
 	tr.numModels++;
@@ -83,7 +83,7 @@ qhandle_t RE_RegisterModel( const char *name ) {
 	unsigned	*buf;
 	int			lod;
 	int			ident;
-	qboolean	loaded;
+	bool	loaded;
 	qhandle_t	hModel;
 	int			numLoaded;
 
@@ -214,7 +214,7 @@ fail:
 R_LoadMD3
 =================
 */
-static qboolean R_LoadMD3 (model_t *mod, int lod, void *buffer, const char *mod_name ) {
+static bool R_LoadMD3 (model_t *mod, int lod, void *buffer, const char *mod_name ) {
 	int					i, j;
 	md3Header_t			*pinmodel;
     md3Frame_t			*frame;
@@ -233,13 +233,13 @@ static qboolean R_LoadMD3 (model_t *mod, int lod, void *buffer, const char *mod_
 	if (version != MD3_VERSION) {
 		ri.Printf( PRINT_WARNING, "R_LoadMD3: %s has wrong version (%i should be %i)\n",
 				 mod_name, version, MD3_VERSION);
-		return qfalse;
+		return false;
 	}
 
 	mod->type = MOD_MESH;
 	size = LittleLong(pinmodel->ofsEnd);
 	mod->dataSize += size;
-	mod->md3[lod] = ri.Hunk_Alloc( size, h_low );
+	mod->md3[lod] = reinterpret_cast<md3Header_t*>(ri.Hunk_Alloc( size, h_low ));
 
 	Com_Memcpy (mod->md3[lod], buffer, LittleLong(pinmodel->ofsEnd) );
 
@@ -255,7 +255,7 @@ static qboolean R_LoadMD3 (model_t *mod, int lod, void *buffer, const char *mod_
 
 	if ( mod->md3[lod]->numFrames < 1 ) {
 		ri.Printf( PRINT_WARNING, "R_LoadMD3: %s has no frames\n", mod_name );
-		return qfalse;
+		return false;
 	}
     
 	// swap all the frames
@@ -323,7 +323,7 @@ static qboolean R_LoadMD3 (model_t *mod, int lod, void *buffer, const char *mod_
         for ( j = 0 ; j < surf->numShaders ; j++, shader++ ) {
             shader_t	*sh;
 
-            sh = R_FindShader( shader->name, LIGHTMAP_NONE, qtrue );
+            sh = R_FindShader( shader->name, LIGHTMAP_NONE, true );
 			if ( sh->defaultShader ) {
 				shader->shaderIndex = 0;
 			} else {
@@ -362,7 +362,7 @@ static qboolean R_LoadMD3 (model_t *mod, int lod, void *buffer, const char *mod_
 		surf = (md3Surface_t *)( (byte *)surf + surf->ofsEnd );
 	}
     
-	return qtrue;
+	return true;
 }
 
 
@@ -372,7 +372,7 @@ static qboolean R_LoadMD3 (model_t *mod, int lod, void *buffer, const char *mod_
 R_LoadMD4
 =================
 */
-static qboolean R_LoadMD4( model_t *mod, void *buffer, const char *mod_name ) {
+static bool R_LoadMD4( model_t *mod, void *buffer, const char *mod_name ) {
 	int					i, j, k, lodindex;
 	md4Header_t			*pinmodel, *md4;
     md4Frame_t			*frame;
@@ -391,13 +391,13 @@ static qboolean R_LoadMD4( model_t *mod, void *buffer, const char *mod_name ) {
 	if (version != MD4_VERSION) {
 		ri.Printf( PRINT_WARNING, "R_LoadMD4: %s has wrong version (%i should be %i)\n",
 				 mod_name, version, MD4_VERSION);
-		return qfalse;
+		return false;
 	}
 
 	mod->type = MOD_MD4;
 	size = LittleLong(pinmodel->ofsEnd);
 	mod->dataSize += size;
-	md4 = mod->md4 = ri.Hunk_Alloc( size, h_low );
+	md4 = mod->md4 = reinterpret_cast<md4Header_t*>(ri.Hunk_Alloc( size, h_low ));
 
 	Com_Memcpy( md4, buffer, LittleLong(pinmodel->ofsEnd) );
 
@@ -412,7 +412,7 @@ static qboolean R_LoadMD4( model_t *mod, void *buffer, const char *mod_name ) {
 
 	if ( md4->numFrames < 1 ) {
 		ri.Printf( PRINT_WARNING, "R_LoadMD4: %s has no frames\n", mod_name );
-		return qfalse;
+		return false;
 	}
 
     // we don't need to swap tags in the renderer, they aren't used
@@ -462,7 +462,7 @@ static qboolean R_LoadMD4( model_t *mod, void *buffer, const char *mod_name ) {
 			Q_strlwr( surf->name );
 		
 			// register the shaders
-			sh = R_FindShader( surf->shader, LIGHTMAP_NONE, qtrue );
+			sh = R_FindShader( surf->shader, LIGHTMAP_NONE, true );
 			if ( sh->defaultShader ) {
 				surf->shaderIndex = 0;
 			} else {
@@ -515,7 +515,7 @@ static qboolean R_LoadMD4( model_t *mod, void *buffer, const char *mod_name ) {
 		lod = (md4LOD_t *)( (byte *)lod + lod->ofsEnd );
 	}
 
-	return qtrue;
+	return true;
 }
 
 
@@ -538,7 +538,7 @@ void RE_BeginRegistration( glconfig_t *glconfigOut ) {
 	R_ClearFlares();
 	RE_ClearScene();
 
-	tr.registered = qtrue;
+	tr.registered = true;
 
 	// NOTE: this sucks, for some reason the first stretch pic is never drawn
 	// without this we'd see a white flash on a level load because the very
@@ -640,7 +640,7 @@ int R_LerpTag( orientation_t *tag, qhandle_t handle, int startFrame, int endFram
 	if ( !model->md3[0] ) {
 		AxisClear( tag->axis );
 		VectorClear( tag->origin );
-		return qfalse;
+		return false;
 	}
 
 	start = R_GetTag( model->md3[0], startFrame, tagName );
@@ -648,7 +648,7 @@ int R_LerpTag( orientation_t *tag, qhandle_t handle, int startFrame, int endFram
 	if ( !start || !end ) {
 		AxisClear( tag->axis );
 		VectorClear( tag->origin );
-		return qfalse;
+		return false;
 	}
 
 	frontLerp = frac;
@@ -663,7 +663,7 @@ int R_LerpTag( orientation_t *tag, qhandle_t handle, int startFrame, int endFram
 	VectorNormalize( tag->axis[0] );
 	VectorNormalize( tag->axis[1] );
 	VectorNormalize( tag->axis[2] );
-	return qtrue;
+	return true;
 }
 
 

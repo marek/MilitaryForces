@@ -1,5 +1,5 @@
 /*
- * $Id: ui_atoms.c,v 1.2 2005-08-22 22:29:54 minkis Exp $
+ * $Id: ui_atoms.c,v 1.3 2005-08-31 19:20:23 thebjoern Exp $
 */
 
 /**********************************************************************
@@ -9,7 +9,7 @@
 **********************************************************************/
 #include "ui_local.h"
 
-qboolean		m_entersound;		// after a frame, so caching won't disrupt the sound
+bool		m_entersound;		// after a frame, so caching won't disrupt the sound
 
 // these are here so the functions in q_shared.c can link
 #ifndef UI_HARD_LINKED
@@ -38,7 +38,7 @@ void QDECL Com_Printf( const char *msg, ... ) {
 
 #endif
 
-qboolean newUI = qfalse;
+bool newUI = false;
 
 
 /*
@@ -81,7 +81,7 @@ char *UI_Cvar_VariableString( const char *var_name ) {
 
 
 
-void UI_SetBestScores(postGameInfo_t *newInfo, qboolean postGame) {
+void UI_SetBestScores(postGameInfo_t *newInfo, bool postGame) {
 	trap_Cvar_Set("ui_scoreAccuracy",     va("%i%%", newInfo->accuracy));
 	trap_Cvar_Set("ui_scoreImpressives",	va("%i", newInfo->impressives));
 	trap_Cvar_Set("ui_scoreExcellents", 	va("%i", newInfo->excellents));
@@ -130,12 +130,12 @@ void UI_LoadBestScores(const char *map, int game) {
 		}
 		trap_FS_FCloseFile(f);
 	}
-	UI_SetBestScores(&newInfo, qfalse);
+	UI_SetBestScores(&newInfo, false);
 
 	Com_sprintf(fileName, MAX_QPATH, "demos/%s_%d.dm_%d", map, game, (int)trap_Cvar_VariableValue("protocol"));
-	uiInfo.demoAvailable = qfalse;
+	uiInfo.demoAvailable = false;
 	if (trap_FS_FOpenFile(fileName, &f, FS_READ) >= 0) {
-		uiInfo.demoAvailable = qtrue;
+		uiInfo.demoAvailable = true;
 		trap_FS_FCloseFile(f);
 	} 
 }
@@ -170,7 +170,7 @@ void UI_ClearScores() {
 		}
 	}
 	
-	UI_SetBestScores(&newInfo, qfalse);
+	UI_SetBestScores(&newInfo, false);
 
 }
 
@@ -193,7 +193,7 @@ static void UI_CalcPostGameStats() {
 	int size, game, time, adjustedTime;
 	postGameInfo_t oldInfo;
 	postGameInfo_t newInfo;
-	qboolean newHigh = qfalse;
+	bool newHigh = false;
 
 	trap_GetConfigString( CS_SERVERINFO, info, sizeof(info) );
 	Q_strncpyz( map, Info_ValueForKey( info, "mapname" ), sizeof(map) );
@@ -274,7 +274,7 @@ static void UI_CalcPostGameStats() {
 	trap_Cvar_Set("sv_pure", UI_Cvar_VariableString("ui_pure"));
 	trap_Cvar_Set("g_friendlyFire", UI_Cvar_VariableString("ui_friendlyFire"));
 
-	UI_SetBestScores(&newInfo, qtrue);
+	UI_SetBestScores(&newInfo, true);
 	UI_ShowPostGame(newHigh);
 
 
@@ -290,17 +290,17 @@ static void UI_Chat( int mode )
 {
 	// reset & begin
 	trap_Key_SetCatcher( KEYCATCH_UI );
-	uiInfo.customChat.active = qtrue;
+	uiInfo.customChat.active = true;
 	uiInfo.customChat.text[0] = 0;
 	uiInfo.customChat.cindex = 0;
-	uiInfo.customChat.mode = mode;
+	uiInfo.customChat.mode = static_cast<CustomChatMode>(mode);
 }
 /*
 =================
 UI_ConsoleCommand
 =================
 */
-qboolean UI_ConsoleCommand( int realTime ) {
+bool UI_ConsoleCommand( int realTime ) {
 	char	*cmd;
 
 	uiInfo.uiDC.frameTime = realTime - uiInfo.uiDC.realTime;
@@ -312,17 +312,17 @@ qboolean UI_ConsoleCommand( int realTime ) {
 	//Menu_Cache();
 
 	if ( Q_stricmp (cmd, "ui_test") == 0 ) {
-		UI_ShowPostGame(qtrue);
+		UI_ShowPostGame(true);
 	}
 
 	if ( Q_stricmp (cmd, "ui_report") == 0 ) {
 		UI_Report();
-		return qtrue;
+		return true;
 	}
 	
 	if ( Q_stricmp (cmd, "ui_load") == 0 ) {
 		UI_Load();
-		return qtrue;
+		return true;
 	}
 
 	if ( Q_stricmp (cmd, "remapShader") == 0 ) {
@@ -332,29 +332,29 @@ qboolean UI_ConsoleCommand( int realTime ) {
 			Q_strncpyz(shader1, UI_Argv(1), sizeof(shader1));
 			Q_strncpyz(shader2, UI_Argv(2), sizeof(shader2));
 			trap_R_RemapShader(shader1, shader2, UI_Argv(3));
-			return qtrue;
+			return true;
 		}
 	}
 
 	if ( Q_stricmp (cmd, "postgame") == 0 ) {
 		UI_CalcPostGameStats();
-		return qtrue;
+		return true;
 	}
 
 	if ( Q_stricmp (cmd, "ui_cache") == 0 ) {
 		UI_Cache_f();
-		return qtrue;
+		return true;
 	}
 
 	if ( Q_stricmp (cmd, "ui_teamOrders") == 0 ) {
 		//UI_TeamOrdersMenu_f();
-		return qtrue;
+		return true;
 	}
 
 
 	if ( Q_stricmp (cmd, "ui_cdkey") == 0 ) {
 		//UI_CDKeyMenu_f();
-		return qtrue;
+		return true;
 	}
 
 	// MFQ3: bring up the 'team selection' dialog (i.e. bind command to key)
@@ -366,7 +366,7 @@ qboolean UI_ConsoleCommand( int realTime ) {
 
 		Menus_ActivateByName( "ingame_select_team" );
 
-		return qtrue;
+		return true;
 	}
 
 	// MFQ3: bring up the 'vehicle selection' dialog (i.e. bind command to key)
@@ -378,7 +378,7 @@ qboolean UI_ConsoleCommand( int realTime ) {
 
 		Menus_ActivateByName( "ingame_select_vehicle" );
 
-		return qtrue;
+		return true;
 	}
 
 /* MFQ3: TODO - MM
@@ -387,32 +387,32 @@ qboolean UI_ConsoleCommand( int realTime ) {
 	if( Q_stricmp (cmd, "encyclopedia") == 0 )
 	{
 		UI_EncyclopediaMenu();
-		return qtrue;
+		return true;
 	}
 */
 	// MFQ3: bring up the custom chat console
 	if( Q_stricmp( cmd, "cmessagemode") == 0 )
 	{
 		UI_Chat( CCHAT_ALL );
-		return qtrue;
+		return true;
 	}
 	else if( Q_stricmp( cmd, "cmessagemode2") == 0 )
 	{
 		UI_Chat( CCHAT_TEAM );
-		return qtrue;
+		return true;
 	}
 	else if( Q_stricmp( cmd, "cmessagemode3") == 0 )
 	{
 		UI_Chat( CCHAT_TARGET );
-		return qtrue;
+		return true;
 	}
 	else if( Q_stricmp( cmd, "cmessagemode4") == 0 )
 	{
 		UI_Chat( CCHAT_ATTACK );
-		return qtrue;
+		return true;
 	}
 
-	return qfalse;
+	return false;
 }
 
 /*
@@ -542,13 +542,13 @@ void UI_DrawTextBox (int x, int y, int width, int lines)
 	UI_DrawRect( x + BIGCHAR_WIDTH/2, y + BIGCHAR_HEIGHT/2, ( width + 1 ) * BIGCHAR_WIDTH, ( lines + 1 ) * BIGCHAR_HEIGHT, colorWhite );
 }
 
-qboolean UI_CursorInRect (int x, int y, int width, int height)
+bool UI_CursorInRect (int x, int y, int width, int height)
 {
 	if (uiInfo.uiDC.cursorx < x ||
 		uiInfo.uiDC.cursory < y ||
 		uiInfo.uiDC.cursorx > x+width ||
 		uiInfo.uiDC.cursory > y+height)
-		return qfalse;
+		return false;
 
-	return qtrue;
+	return true;
 }

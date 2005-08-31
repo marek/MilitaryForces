@@ -1,5 +1,5 @@
 /*
- * $Id: g_mfq3ents.c,v 1.2 2005-08-27 09:45:38 thebjoern Exp $
+ * $Id: g_mfq3ents.c,v 1.3 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 
@@ -74,7 +74,7 @@ void SP_func_runway( gentity_t *ent ) {
 	VectorCopy( ent->s.origin, ent->s.pos.trBase );
 	VectorCopy( ent->s.origin, ent->r.currentOrigin );
 	if (ent->health > 0) {
-		ent->takedamage = qtrue;
+		ent->takedamage = true;
 		ent->die = explosive_die;
 //		ent->s.ONOFF = OO_RADAR_GROUND;
 	}
@@ -117,7 +117,7 @@ void SP_func_explosive( gentity_t *ent ) {
 	VectorCopy( ent->s.origin, ent->s.pos.trBase );
 	VectorCopy( ent->s.origin, ent->r.currentOrigin );
 	ent->die = explosive_die;
-	ent->takedamage = qtrue;
+	ent->takedamage = true;
 	ent->s.ONOFF = OO_RADAR_GROUND;
 	if( ent->health <= 0 ) {
 		ent->health = 200;

@@ -24,7 +24,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				OptimizeForProcessor="2"
+				OptimizeForProcessor="1"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -37,14 +37,15 @@
 				BrowseInformationFile="$(IntDir)\"
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
-				DebugInformationFormat="3"/>
+				DebugInformationFormat="3"
+				CompileAs="2"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib wsock32.lib"
+				AdditionalDependencies="winmm.lib wsock32.lib dxguid.lib dsound.lib dinput8.lib"
 				OutputFile="$(SolutionDir)..\..\MilitaryForces.exe"
-				LinkIncremental="2"
+				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(IntDir)\MilitaryForces.pdb"
@@ -107,12 +108,13 @@
 				ObjectFile="$(IntDir)\"
 				ProgramDataBaseFileName="$(IntDir)\"
 				WarningLevel="3"
-				SuppressStartupBanner="TRUE"/>
+				SuppressStartupBanner="TRUE"
+				CompileAs="2"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib wsock32.lib"
+				AdditionalDependencies="winmm.lib wsock32.lib dxguid.lib dsound.lib dinput8.lib"
 				OutputFile="$(SolutionDir)..\..\MilitaryForces.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
@@ -179,12 +181,13 @@
 				BrowseInformationFile="$(IntDir)\"
 				WarningLevel="4"
 				SuppressStartupBanner="TRUE"
-				DebugInformationFormat="3"/>
+				DebugInformationFormat="3"
+				CompileAs="2"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib wsock32.lib"
+				AdditionalDependencies="winmm.lib wsock32.lib dxguid.lib dsound.lib dinput8.lib"
 				OutputFile="$(SolutionDir)..\..\MilitaryForces.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
@@ -431,6 +434,7 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="0"
+						OptimizeForProcessor="2"
 						PreprocessorDefinitions=""
 						BrowseInformation="1"/>
 				</FileConfiguration>

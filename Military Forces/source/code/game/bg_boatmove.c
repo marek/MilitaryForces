@@ -1,5 +1,5 @@
 /*
- * $Id: bg_boatmove.c,v 1.2 2005-08-25 19:49:21 thebjoern Exp $
+ * $Id: bg_boatmove.c,v 1.3 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -109,7 +109,7 @@ PM_BoatMove
 
 ===================
 */
-qboolean	PM_SlideMove_Boat();
+bool	PM_SlideMove_Boat();
 
 void PM_BoatMove( void ) 
 {
@@ -120,13 +120,13 @@ void PM_BoatMove( void )
     vec3_t		turnspeed;
 	vec3_t		forward, up;
 	vec3_t		temp;
-    qboolean	dead = (pm->ps->stats[STAT_HEALTH] <= 0);
+    bool	dead = (pm->ps->stats[STAT_HEALTH] <= 0);
 	int			i;
 	float		smove = pm->cmd.rightmove;
 	float		turret_yaw = pm->ps->turretAngle;
 	float		gun_pitch = pm->ps->gunAngle;
 	float		speed;
-	qboolean	reverse = qfalse;
+	bool	reverse = false;
 	float		lean = 0;
 
 	// set speed
@@ -139,7 +139,7 @@ void PM_BoatMove( void )
 	if( pm->ps->ONOFF & OO_STALLED ) {
 		AngleVectors( vehdir, forward, NULL, NULL );
 		VectorNegate( forward, forward );
-		reverse = qtrue;
+		reverse = true;
 	} else {
 		AngleVectors( vehdir, forward, NULL, NULL );
 	}
@@ -305,11 +305,11 @@ static void PM_AddTouchEnt_Boat( int entityNum ) {
 ==================
 PM_SlideMove_Boat
 
-Returns qtrue if the velocity was clipped in some way
+Returns true if the velocity was clipped in some way
 ==================
 */
 
-qboolean PM_SlideMove_Boat() {
+bool PM_SlideMove_Boat() {
 	float		time_left;
 	vec3_t		end;
 	vec3_t		up, down;
@@ -358,7 +358,7 @@ qboolean PM_SlideMove_Boat() {
 		if( trace.allsolid ) {
 			// entity is completely trapped in another solid
 			pm->ps->velocity[2] = 0;	// don't build up falling damage, but allow sideways acceleration
-			return qtrue;
+			return true;
 		}
 	}
 
@@ -387,12 +387,12 @@ qboolean PM_SlideMove_Boat() {
 	base = sin(angle) * -pm->mins[0];
 	pm->ps->origin[2] += base;
 
-	return qtrue;
+	return true;
 }
 
 /*
 #define	MAX_CLIP_PLANES	5
-qboolean	PM_SlideMove_Boat() {
+bool	PM_SlideMove_Boat() {
 	int			bumpcount, numbumps;
 	vec3_t		dir;
 	float		d;
@@ -457,7 +457,7 @@ qboolean	PM_SlideMove_Boat() {
 			if( trace.allsolid ) {
 				// entity is completely trapped in another solid
 				pm->ps->velocity[2] = 0;	// don't build up falling damage, but allow sideways acceleration
-				return qtrue;
+				return true;
 			}
 		}
 
@@ -484,7 +484,7 @@ qboolean	PM_SlideMove_Boat() {
 		if (numplanes >= MAX_CLIP_PLANES) {
 			// this shouldn't really happen
 			VectorClear( pm->ps->velocity );
-			return qtrue;
+			return true;
 		}
 
 		//
@@ -566,7 +566,7 @@ qboolean	PM_SlideMove_Boat() {
 
 					// stop dead at a tripple plane interaction
 					VectorClear( pm->ps->velocity );
-					return qtrue;
+					return true;
 				}
 			}
 

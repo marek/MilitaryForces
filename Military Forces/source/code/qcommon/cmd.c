@@ -562,7 +562,7 @@ void	Cmd_AddCommand( const char *cmd_name, xcommand_t function ) {
 	}
 
 	// use a small malloc to avoid zone fragmentation
-	cmd = S_Malloc (sizeof(cmd_function_t));
+	cmd = reinterpret_cast<cmd_function_t*>(S_Malloc (sizeof(cmd_function_t)));
 	cmd->name = CopyString( cmd_name );
 	cmd->function = function;
 	cmd->next = cmd_functions;
@@ -692,7 +692,7 @@ void Cmd_List_f (void)
 
 	i = 0;
 	for (cmd=cmd_functions ; cmd ; cmd=cmd->next) {
-		if (match && !Com_Filter(match, cmd->name, qfalse)) continue;
+		if (match && !Com_Filter(match, cmd->name, false)) continue;
 
 		Com_Printf ("%s\n", cmd->name);
 		i++;

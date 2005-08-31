@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.2 2005-08-23 19:41:09 thebjoern Exp $
+ * $Id: cg_drawnewhud.c,v 1.3 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -105,12 +105,12 @@ static int getStartPosNum( int col ) {
 }
 
 
-static int CG_DrawChar_MFQ3( int x, int y, int ch, qboolean right ) {
+static int CG_DrawChar_MFQ3( int x, int y, int ch, bool right ) {
 	int		col;
 	float	fcol;
 	float	size;
 	float	ax, ay, aw, ah;
-	qboolean num = qfalse;
+	bool num = false;
 
 	if( ch == '?' ) {
 		col = 26;
@@ -132,25 +132,25 @@ static int CG_DrawChar_MFQ3( int x, int y, int ch, qboolean right ) {
 		col = ch-65;
 	} else if( (ch >= '0' && ch <= '9') ) {
 		col = ch-'0';
-		num = qtrue;
+		num = true;
 	} else if( ch == '<' ) {
 		col = 10;
-		num = qtrue;
+		num = true;
 	} else if( ch == '>' ) {
 		col = 11;	
-		num = qtrue;
+		num = true;
 	} else if( ch == ',' ) {
 		col = 12;
-		num = qtrue;
+		num = true;
 	} else if( ch == '.' ) {
 		col = 13;
-		num = qtrue;
+		num = true;
 	} else if( ch == '%' ) {
 		col = 14;
-		num = qtrue;
+		num = true;
 	} else if( ch == '-' ) {
 		col = 15;
-		num = qtrue;
+		num = true;
 	} else return HUDNUM_WIDTH;
 
 	ch &= 255;
@@ -216,7 +216,7 @@ static int CG_DrawString_MFQ3( int x, int y, const char *string, const float *se
 	if( !string )
 		return 0;
 	
-	lowerstring = malloc(strlen(string)+1);
+	lowerstring = reinterpret_cast<char*>(malloc(strlen(string)+1));
 	strcpy(lowerstring, string);
 
 	charWidth = HUDNUM_WIDTH;
@@ -232,7 +232,7 @@ static int CG_DrawString_MFQ3( int x, int y, const char *string, const float *se
 	cnt = 0;
 	trap_R_SetColor( setColor );
 	while ( *s && cnt < maxChars) {
-		charWidth = CG_DrawChar_MFQ3( xx, y, *s, qfalse );
+		charWidth = CG_DrawChar_MFQ3( xx, y, *s, false );
 		xx += charWidth;
 		cnt++;
 		s++;
@@ -289,7 +289,7 @@ static int CG_DrawString_MFQ3_R( int x, int y, const char *string, const float *
 	cnt = 0;
 	trap_R_SetColor( setColor );
 	while ( *s && cnt < maxChars) {
-		charWidth = CG_DrawChar_MFQ3( xx, y, *s, qtrue );
+		charWidth = CG_DrawChar_MFQ3( xx, y, *s, true );
 		xx -= charWidth;
 		cnt++;
 		s++;
@@ -305,7 +305,7 @@ CG_MFQ3HUD_Numbers
 ==============
 */
 /*
-static void CG_MFQ3HUD_Numbers (int x, int y, int width, int value, qboolean percent, vec4_t color, qboolean right ) {
+static void CG_MFQ3HUD_Numbers (int x, int y, int width, int value, bool percent, vec4_t color, bool right ) {
 	char	num[16], *ptr;
 	int		l;
 	int		frame;
@@ -412,13 +412,13 @@ static void CG_MFQ3HUD_DecNumbers (int x, int y, int width, int decimals, int in
 
 	prewid = width-decimals-1;
 
-	CG_MFQ3HUD_Numbers( x, y, prewid, pre, qfalse, HUDColors[cg.HUDColor], qtrue );
+	CG_MFQ3HUD_Numbers( x, y, prewid, pre, false, HUDColors[cg.HUDColor], true );
 //	x += (HUDNUM_WIDTH-1)*prewid;
 
 	CG_DrawHUDPic( x-1,y+2, HUDNUM_WIDTH, HUDNUM_HEIGHT, cgs.media.HUDnumbers[STAT_POINT], HUDColors[cg.HUDColor] );
 //	x += HUDNUM_WIDTH-1;
 
-	CG_MFQ3HUD_Numbers( x+4, y, postwid, post, qfalse, HUDColors[cg.HUDColor], qfalse );
+	CG_MFQ3HUD_Numbers( x+4, y, postwid, post, false, HUDColors[cg.HUDColor], false );
 }
 
 */
@@ -560,7 +560,7 @@ static void CG_DrawRadarSymbols_GROUND_new( int vehicle, float range, int x, int
 	int			icon;
 	int			drawnTargets = 0;
 	trace_t		res;
-	qboolean	groundinstallation = 0;
+	bool	groundinstallation = 0;
 
 	if( cg.RADARRangeSetting ) {
 		range /= (2 * cg.RADARRangeSetting);
@@ -737,179 +737,179 @@ static void CG_DrawRadarSymbols_GROUND_new( int vehicle, float range, int x, int
 }
 
 
-static void CG_DrawGroundSupportRadar( int vehicle, float range, int x, int y ) {
-	unsigned int i;
-	centity_t	*self = &cg.predictedPlayerEntity;
-	vec3_t		pos, pos1, pos2;
-	vec3_t		dir;
-	float		dist;
-	float		scale;
-	float		hdg = self->currentState.angles[1];
-	float		angle;
-	vec3_t		angles;
-	int			otherveh;
-	vec3_t		otherpos;
-	int			icon;
-	int			drawnTargets = 0;
-	trace_t		res;
-	qboolean	groundinstallation = 0;
-
-	if( cg.RADARRangeSetting ) {
-		range /= (2 * cg.RADARRangeSetting);
-	}
-
-	// adjust for radar screen size
-	scale = range/54;
-
-	// ground vehicle adjustment for angle
-	if( (availableVehicles[vehicle].cat & CAT_GROUND) ||
-		(availableVehicles[vehicle].cat & CAT_BOAT) ) {
-		hdg += self->currentState.angles2[ROLL];
-		if( hdg > 360 ) hdg -= 360;
-		else if( hdg < 0 ) hdg += 360;
-	}
-
-	// pos
-	VectorCopy( self->currentState.pos.trBase, pos );
-
-	// walk through list of targets
-	for( i = 0; i < cg.radarTargets; i++ ) {
-		// dont show self
-		if( cg.radarEnts[i] == &cg.predictedPlayerEntity ) continue;
-
-		// dont show dead ones
-		if( cg.radarEnts[i]->currentState.eFlags & EF_DEAD ) continue;
-
-		// vehicles
-		groundinstallation = 0;
-		if( !cg.radarEnts[i]->destroyableStructure ) {
-			// get other vehicle
-			if( cg.radarEnts[i]->currentState.eType == ET_MISC_VEHICLE ) {
-				if( cg.radarEnts[i]->currentState.modelindex == 255 )	// ground installation
-				{
-					otherveh = cg.radarEnts[i]->currentState.modelindex2;	
-					groundinstallation = 1;
-				}
-				else													// other misc veh
-					otherveh = cg.radarEnts[i]->currentState.modelindex;
-			} else {
-				otherveh = cgs.clientinfo[cg.radarEnts[i]->currentState.clientNum].vehicle;
-			}
-			VectorCopy( cg.radarEnts[i]->currentState.pos.trBase, otherpos );
-
-			// get dir and dist
-			VectorSet( pos1, otherpos[0], otherpos[1], 0 );
-			VectorSet( pos2, pos[0], pos[1], 0 );
-			VectorSubtract( pos1, pos2, dir );
-			dist = VectorNormalize(dir);
-			// check out of range
-			if( dist > range ) continue;
-			// scale dist to radar screen
-			dist /= scale;
-
-			// get screen dir
-			vectoangles( dir, angles );
-			angle = angles[1]-hdg;
-			if( angle > 360 ) angle -= 360;
-			else if( angle < 0 ) angle += 360;
-			if( angle >= 45 && angle <= 315 ) 
-			{
-				if( !(cg.radarEnts[i]->currentState.ONOFF & OO_RADAR) ||	// radar off
-					( cg.radarEnts[i]->destroyableStructure &&	// or radar on and destroyable building
-					(cg.radarEnts[i]->currentState.ONOFF & OO_RADAR) ) ) continue;
-			}
-			angles[1] -= hdg - 90;
-			if( angles[1] > 360 ) angles[1] -= 360;
-			else if( angles[1] < 0 ) angles[1] += 360;
-			angles[0] = angles[2] = 0;
-			AngleVectors( angles, dir, 0, 0 );
-			VectorScale( dir, dist, dir );
-
-			// check LOS and/or RADAR on
-			if( !(cg.radarEnts[i]->currentState.ONOFF & OO_RADAR) ) 
-			{
-				CG_Trace( &res, pos, NULL, NULL, otherpos, cg.snap->ps.clientNum, MASK_SOLID );
-				if( res.fraction < 1.0f ) continue;
-			}
-			// which icon (if at all, dont show lqms)
-			if( groundinstallation )
-			{
-				icon = RD_GROUND_ENEMY;
-			}
-			else if( (availableVehicles[otherveh].cat & CAT_GROUND) ||
-					 (availableVehicles[otherveh].cat & CAT_BOAT) ) 
-			{
-				icon = RD_GROUND_ENEMY;
-			} 
-			else 
-			{
-				continue;
-			}
-			// friend or foe
-			if( cgs.gametype >= GT_TEAM ) 
-			{
-				if( cgs.clientinfo[cg.radarEnts[i]->currentState.clientNum].team ==
-					cgs.clientinfo[self->currentState.clientNum].team ) 
-					icon++;
-			}
-		// buildings
-		} 
-		else 
-		{
-			VectorCopy( cgs.inlineModelMidpoints[cg.radarEnts[i]->currentState.modelindex], otherpos );
-			// get dir and dist
-			VectorSet( pos1, otherpos[0], otherpos[1], 0 );
-			VectorSet( pos2, pos[0], pos[1], 0 );
-			VectorSubtract( pos1, pos2, dir );
-			dist = VectorNormalize(dir);
-			// check out of range
-			if( dist > range ) continue;
-			// scale dist to radar screen
-			dist /= scale;
-
-			// get screen dir
-			vectoangles( dir, angles );
-			angle = angles[1]-hdg;
-			if( angle > 360 ) angle -= 360;
-			else if( angle < 0 ) angle += 360;
-			if( ( (availableVehicles[vehicle].cat & CAT_GROUND) || 
-				  (availableVehicles[vehicle].cat & CAT_BOAT) ) &&
-				angle >= 90 && angle <= 270 ) continue;
-			else if( ( (availableVehicles[vehicle].cat & CAT_PLANE) ||
-					   (availableVehicles[vehicle].cat & CAT_HELO) ) &&
-				angle >= 45 && angle <= 315 ) continue;
-			angles[1] -= hdg - 90;
-			if( angles[1] > 360 ) angles[1] -= 360;
-			else if( angles[1] < 0 ) angles[1] += 360;
-			angles[0] = angles[2] = 0;
-			AngleVectors( angles, dir, 0, 0 );
-			VectorScale( dir, dist, dir );
-
-			icon = RD_BUILDING_ENEMY;
-			// friend or foe
-			if( cgs.gametype >= GT_TEAM ) {
-				if( !cg.radarEnts[i]->currentState.generic1 ) {
-					icon += 2;
-				}
-				else if( cg.radarEnts[i]->currentState.generic1 ==
-					cgs.clientinfo[self->currentState.clientNum].team ) {
-					icon++;
-				}
-			}
-			// check LOS
-			CG_Trace( &res, pos, NULL, NULL, otherpos, cg.snap->ps.clientNum, MASK_SOLID );
-//			if( res.fraction < 1.0f ) continue;
-			if( res.entityNum != cg.radarEnts[i]->currentState.number ) continue;
-		}
-
-		// draw
-		CG_DrawPic( x + dir[0], y - dir[1], 8, 8, cgs.media.radarIcons[icon] );
-		// check if we should draw any more targets
-		drawnTargets++;
-		if( drawnTargets >= cg_radarTargets.integer ) break;
-	}
-}
-
+//static void CG_DrawGroundSupportRadar( int vehicle, float range, int x, int y ) {
+//	unsigned int i;
+//	centity_t	*self = &cg.predictedPlayerEntity;
+//	vec3_t		pos, pos1, pos2;
+//	vec3_t		dir;
+//	float		dist;
+//	float		scale;
+//	float		hdg = self->currentState.angles[1];
+//	float		angle;
+//	vec3_t		angles;
+//	int			otherveh;
+//	vec3_t		otherpos;
+//	int			icon;
+//	int			drawnTargets = 0;
+//	trace_t		res;
+//	bool	groundinstallation = 0;
+//
+//	if( cg.RADARRangeSetting ) {
+//		range /= (2 * cg.RADARRangeSetting);
+//	}
+//
+//	// adjust for radar screen size
+//	scale = range/54;
+//
+//	// ground vehicle adjustment for angle
+//	if( (availableVehicles[vehicle].cat & CAT_GROUND) ||
+//		(availableVehicles[vehicle].cat & CAT_BOAT) ) {
+//		hdg += self->currentState.angles2[ROLL];
+//		if( hdg > 360 ) hdg -= 360;
+//		else if( hdg < 0 ) hdg += 360;
+//	}
+//
+//	// pos
+//	VectorCopy( self->currentState.pos.trBase, pos );
+//
+//	// walk through list of targets
+//	for( i = 0; i < cg.radarTargets; i++ ) {
+//		// dont show self
+//		if( cg.radarEnts[i] == &cg.predictedPlayerEntity ) continue;
+//
+//		// dont show dead ones
+//		if( cg.radarEnts[i]->currentState.eFlags & EF_DEAD ) continue;
+//
+//		// vehicles
+//		groundinstallation = 0;
+//		if( !cg.radarEnts[i]->destroyableStructure ) {
+//			// get other vehicle
+//			if( cg.radarEnts[i]->currentState.eType == ET_MISC_VEHICLE ) {
+//				if( cg.radarEnts[i]->currentState.modelindex == 255 )	// ground installation
+//				{
+//					otherveh = cg.radarEnts[i]->currentState.modelindex2;	
+//					groundinstallation = 1;
+//				}
+//				else													// other misc veh
+//					otherveh = cg.radarEnts[i]->currentState.modelindex;
+//			} else {
+//				otherveh = cgs.clientinfo[cg.radarEnts[i]->currentState.clientNum].vehicle;
+//			}
+//			VectorCopy( cg.radarEnts[i]->currentState.pos.trBase, otherpos );
+//
+//			// get dir and dist
+//			VectorSet( pos1, otherpos[0], otherpos[1], 0 );
+//			VectorSet( pos2, pos[0], pos[1], 0 );
+//			VectorSubtract( pos1, pos2, dir );
+//			dist = VectorNormalize(dir);
+//			// check out of range
+//			if( dist > range ) continue;
+//			// scale dist to radar screen
+//			dist /= scale;
+//
+//			// get screen dir
+//			vectoangles( dir, angles );
+//			angle = angles[1]-hdg;
+//			if( angle > 360 ) angle -= 360;
+//			else if( angle < 0 ) angle += 360;
+//			if( angle >= 45 && angle <= 315 ) 
+//			{
+//				if( !(cg.radarEnts[i]->currentState.ONOFF & OO_RADAR) ||	// radar off
+//					( cg.radarEnts[i]->destroyableStructure &&	// or radar on and destroyable building
+//					(cg.radarEnts[i]->currentState.ONOFF & OO_RADAR) ) ) continue;
+//			}
+//			angles[1] -= hdg - 90;
+//			if( angles[1] > 360 ) angles[1] -= 360;
+//			else if( angles[1] < 0 ) angles[1] += 360;
+//			angles[0] = angles[2] = 0;
+//			AngleVectors( angles, dir, 0, 0 );
+//			VectorScale( dir, dist, dir );
+//
+//			// check LOS and/or RADAR on
+//			if( !(cg.radarEnts[i]->currentState.ONOFF & OO_RADAR) ) 
+//			{
+//				CG_Trace( &res, pos, NULL, NULL, otherpos, cg.snap->ps.clientNum, MASK_SOLID );
+//				if( res.fraction < 1.0f ) continue;
+//			}
+//			// which icon (if at all, dont show lqms)
+//			if( groundinstallation )
+//			{
+//				icon = RD_GROUND_ENEMY;
+//			}
+//			else if( (availableVehicles[otherveh].cat & CAT_GROUND) ||
+//					 (availableVehicles[otherveh].cat & CAT_BOAT) ) 
+//			{
+//				icon = RD_GROUND_ENEMY;
+//			} 
+//			else 
+//			{
+//				continue;
+//			}
+//			// friend or foe
+//			if( cgs.gametype >= GT_TEAM ) 
+//			{
+//				if( cgs.clientinfo[cg.radarEnts[i]->currentState.clientNum].team ==
+//					cgs.clientinfo[self->currentState.clientNum].team ) 
+//					icon++;
+//			}
+//		// buildings
+//		} 
+//		else 
+//		{
+//			VectorCopy( cgs.inlineModelMidpoints[cg.radarEnts[i]->currentState.modelindex], otherpos );
+//			// get dir and dist
+//			VectorSet( pos1, otherpos[0], otherpos[1], 0 );
+//			VectorSet( pos2, pos[0], pos[1], 0 );
+//			VectorSubtract( pos1, pos2, dir );
+//			dist = VectorNormalize(dir);
+//			// check out of range
+//			if( dist > range ) continue;
+//			// scale dist to radar screen
+//			dist /= scale;
+//
+//			// get screen dir
+//			vectoangles( dir, angles );
+//			angle = angles[1]-hdg;
+//			if( angle > 360 ) angle -= 360;
+//			else if( angle < 0 ) angle += 360;
+//			if( ( (availableVehicles[vehicle].cat & CAT_GROUND) || 
+//				  (availableVehicles[vehicle].cat & CAT_BOAT) ) &&
+//				angle >= 90 && angle <= 270 ) continue;
+//			else if( ( (availableVehicles[vehicle].cat & CAT_PLANE) ||
+//					   (availableVehicles[vehicle].cat & CAT_HELO) ) &&
+//				angle >= 45 && angle <= 315 ) continue;
+//			angles[1] -= hdg - 90;
+//			if( angles[1] > 360 ) angles[1] -= 360;
+//			else if( angles[1] < 0 ) angles[1] += 360;
+//			angles[0] = angles[2] = 0;
+//			AngleVectors( angles, dir, 0, 0 );
+//			VectorScale( dir, dist, dir );
+//
+//			icon = RD_BUILDING_ENEMY;
+//			// friend or foe
+//			if( cgs.gametype >= GT_TEAM ) {
+//				if( !cg.radarEnts[i]->currentState.generic1 ) {
+//					icon += 2;
+//				}
+//				else if( cg.radarEnts[i]->currentState.generic1 ==
+//					cgs.clientinfo[self->currentState.clientNum].team ) {
+//					icon++;
+//				}
+//			}
+//			// check LOS
+//			CG_Trace( &res, pos, NULL, NULL, otherpos, cg.snap->ps.clientNum, MASK_SOLID );
+////			if( res.fraction < 1.0f ) continue;
+//			if( res.entityNum != cg.radarEnts[i]->currentState.number ) continue;
+//		}
+//
+//		// draw
+//		CG_DrawPic( x + dir[0], y - dir[1], 8, 8, cgs.media.radarIcons[icon] );
+//		// check if we should draw any more targets
+//		drawnTargets++;
+//		if( drawnTargets >= cg_radarTargets.integer ) break;
+//	}
+//}
+//
 
 
 /*
@@ -1180,9 +1180,9 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 		if( ps->stats[STAT_LOCKINFO] & LI_TRACKING ) {
 			vec3_t a;
 			centity_t* target = &cg_entities[cent->currentState.tracktarget];
-			qboolean building = qfalse;
+			bool building = false;
 
-			if( target->currentState.eType == ET_EXPLOSIVE ) building = qtrue;
+			if( target->currentState.eType == ET_EXPLOSIVE ) building = true;
 			if( building ) {
 				VectorSubtract( cgs.inlineModelMidpoints[target->currentState.modelindex], cent->lerpOrigin, v );
 			} else {
@@ -1214,7 +1214,7 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 	} 
 
 	// set a client global so that other code can render differently for this mini-render
-	cg.drawingMFD = qtrue;
+	cg.drawingMFD = true;
 
 	// ummm shall I really do this ???
 	CG_AddPacketEntities();
@@ -1229,7 +1229,7 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 	CG_DrawString_MFQ3( vx+2, vy+vh-12, buffer, HUDColors[cg.MFDColor], 0);
 
 	// reset to normal rendering
-	cg.drawingMFD = qfalse;
+	cg.drawingMFD = false;
 }
 
 /*
@@ -1426,7 +1426,7 @@ static void CG_Draw_AltTape( int value ) {
 	float		offset;
 	float		x, y, width, height;
 	float		scaledmaxoff = 0.125f/scale;
-	qboolean	top, bottom;
+	bool	top, bottom;
 	char		buffer[12];
 
 		// find offset on alt tape
@@ -1467,13 +1467,13 @@ static void CG_Draw_AltTape( int value ) {
 	visible5 = visible4 + scale;
 	value2 = value - visible3;
 	if( value2 < 0 && value2 >= -scale/2 ) {
-		top = qfalse;
-		bottom = qtrue;
+		top = false;
+		bottom = true;
 	} else if( value2 > 0 && value2 <= scale/2 ) {
-		top = qtrue;
-		bottom = qfalse;
+		top = true;
+		bottom = false;
 	} else {
-		top = bottom = qfalse;
+		top = bottom = false;
 	}
 		// draw visible alt numbers
 	Com_sprintf(buffer, 11, "%.1f", (float)visible3/100 );
@@ -1509,7 +1509,7 @@ static void CG_Draw_SpeedTape( int value, int stallspeed, int gearspeed, int sca
 	float		offset;
 	float		x, y, width, height;
 	float		scaledmaxoff = 0.125f/scale;
-	qboolean	top, bottom;
+	bool	top, bottom;
 	char		buffer[12];
 
 		// find offset on speed tape
@@ -1549,13 +1549,13 @@ static void CG_Draw_SpeedTape( int value, int stallspeed, int gearspeed, int sca
 	visible5 = visible4 + scale;
 	value2 = value - visible3;
 	if( value2 < 0 && value2 >= -scale/2 ) {
-		top = qfalse;
-		bottom = qtrue;
+		top = false;
+		bottom = true;
 	} else if( value2 > 0 && value2 <= scale/2 ) {
-		top = qtrue;
-		bottom = qfalse;
+		top = true;
+		bottom = false;
 	} else {
-		top = bottom = qfalse;
+		top = bottom = false;
 	}
 		// draw visible speed numbers
 	Com_sprintf(buffer, 7, "%d", visible3);
@@ -1613,7 +1613,7 @@ static void CG_Draw_HeadingTape( int value, int targetheading ) {
 	float		x, y, width, height;
 	float		offset;
 	int			value2, visible1, visible2, visible3;
-	qboolean	left, right;
+	bool	left, right;
 	char		buffer[8];
 
 		// find offset on heading tape
@@ -1656,13 +1656,13 @@ static void CG_Draw_HeadingTape( int value, int targetheading ) {
 	value2 = value - visible2;
 	if( value2 < -180 ) value2 += 360;
 	if( value2 < -5 ) {
-		left = qtrue;
-		right = qfalse;
+		left = true;
+		right = false;
 	} else if( value2 > 5 ) {
-		left = qfalse;
-		right = qtrue;
+		left = false;
+		right = true;
 	} else {
-		right = left = qtrue;
+		right = left = true;
 	}
 		// draw visible heading numbers
 	Com_sprintf(buffer, 7, "%d", visible2);

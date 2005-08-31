@@ -1,5 +1,5 @@
 /*
- * $Id: g_client.c,v 1.2 2005-08-28 04:54:08 minkis Exp $
+ * $Id: g_client.c,v 1.3 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 //null cvs upload test, comment placed for a difference.
@@ -72,7 +72,7 @@ SpotWouldTelefrag
 
 ================
 */
-qboolean SpotWouldTelefrag( gentity_t *spot ) {
+bool SpotWouldTelefrag( gentity_t *spot ) {
 	int			i, num;
 	int			touch[MAX_GENTITIES];
 	gentity_t	*hit;
@@ -86,12 +86,12 @@ qboolean SpotWouldTelefrag( gentity_t *spot ) {
 		hit = &g_entities[touch[i]];
 		//if ( hit->client && hit->client->ps.stats[STAT_HEALTH] > 0 ) {
 		if ( hit->client) {
-			return qtrue;
+			return true;
 		}
 
 	}
 
-	return qfalse;
+	return false;
 }
 
 /*
@@ -373,7 +373,7 @@ team_t TeamCount( int ignoreClientNum, int team ) {
 		}
 	}
 
-	return count;
+	return static_cast<team_t>(count);
 }
 
 /*
@@ -574,15 +574,15 @@ void ClientUserinfoChanged( int clientNum ) {
 	// check for local client
 	s = Info_ValueForKey( userinfo, "ip" );
 	if ( !strcmp( s, "localhost" ) ) {
-		client->pers.localClient = qtrue;
+		client->pers.localClient = true;
 	}
 
 	// check the item prediction
 	s = Info_ValueForKey( userinfo, "cg_predictItems" );
 	if ( !atoi( s ) ) {
-		client->pers.predictItemPickup = qfalse;
+		client->pers.predictItemPickup = false;
 	} else {
-		client->pers.predictItemPickup = qtrue;
+		client->pers.predictItemPickup = true;
 	}
 
 	// set name
@@ -682,9 +682,9 @@ void ClientUserinfoChanged( int clientNum ) {
 	// teamInfo
 	s = Info_ValueForKey( userinfo, "teamoverlay" );
 	if ( ! *s || atoi( s ) != 0 ) {
-		client->pers.teamInfo = qtrue;
+		client->pers.teamInfo = true;
 	} else {
-		client->pers.teamInfo = qfalse;
+		client->pers.teamInfo = false;
 	}
 
 	// team task (0 = none, 1 = offence, 2 = defence)
@@ -768,7 +768,7 @@ void ClientDisconnect( int clientNum ) {
 
 	trap_UnlinkEntity (ent);
 	ent->s.modelindex = 0;
-	ent->inuse = qfalse;
+	ent->inuse = false;
 	ent->classname = "disconnected";
 	ent->client->pers.connected = CON_DISCONNECTED;
 	ent->client->ps.persistant[PERS_TEAM] = TEAM_FREE;

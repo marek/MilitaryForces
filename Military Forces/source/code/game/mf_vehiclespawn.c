@@ -1,5 +1,5 @@
 /*
- * $Id: mf_vehiclespawn.c,v 1.1 2005-08-22 16:07:32 thebjoern Exp $
+ * $Id: mf_vehiclespawn.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -8,7 +8,7 @@
 // spawning functions for vehicles, that just set certain values, functions etc.
 
 // planes
-void MF_Spawn_Plane(gentity_t *ent, int idx, qboolean landed) {
+void MF_Spawn_Plane(gentity_t *ent, int idx, bool landed) {
 
 	// set flags
 	ent->client->ps.ONOFF = OO_NOTHING_ON;
@@ -36,10 +36,10 @@ void MF_Spawn_Plane(gentity_t *ent, int idx, qboolean landed) {
 	ent->pain = Plane_Pain;
 
 	// update gear anim
-	ent->updateGear = qtrue;
+	ent->updateGear = true;
 
 	// update bay anim
-	ent->updateBay = qtrue;
+	ent->updateBay = true;
 }
 
 // ground vehicles
@@ -58,7 +58,7 @@ void MF_Spawn_GroundVehicle(gentity_t *ent, int idx) {
 }
 
 // ground vehicles
-void MF_Spawn_Helo(gentity_t *ent, int idx, qboolean landed) {
+void MF_Spawn_Helo(gentity_t *ent, int idx, bool landed) {
 
 	// set flags
 	ent->client->ps.ONOFF = OO_NOTHING_ON;
@@ -78,7 +78,7 @@ void MF_Spawn_Helo(gentity_t *ent, int idx, qboolean landed) {
 	}
 
 	// update gear anim
-	ent->updateGear = qtrue;
+	ent->updateGear = true;
 
 	// set functions
 	ent->touch = Touch_Helo;

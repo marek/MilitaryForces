@@ -1,5 +1,5 @@
 /*
- * $Id: g_arenas.c,v 1.1 2005-08-22 16:06:15 thebjoern Exp $
+ * $Id: g_arenas.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -22,7 +22,7 @@ void UpdateTournamentInfo( void ) {
 	int			playerClientNum;
 	int			n, accuracy, perfect,	msglen;
 	int			buflen;//, score1, score2;
-//	qboolean won;
+//	bool won;
 	char		buf[32];
 	char		msg[MAX_STRING_CHARS];
 

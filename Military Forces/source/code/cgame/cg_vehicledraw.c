@@ -1,8 +1,9 @@
 /*
- * $Id: cg_vehicledraw.c,v 1.3 2005-08-27 00:27:51 thebjoern Exp $
+ * $Id: cg_vehicledraw.c,v 1.4 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 #include "cg_local.h"
+#include <algorithm>
 
 #define VAPORSPEED	(SPEED_GREEN_ARC - (SPEED_GREEN_ARC - SPEED_YELLOW_ARC)/2)
 
@@ -812,7 +813,7 @@ void CG_DrawLQM(DrawInfo_LQM_t* drawInfo)
 	}
 
 	// Counter Leg & camera Left/right movement
-	angles[0] = angles[0] < 0 ? max(-25,  angles[0]) :  min(25,  angles[0]);
+	angles[0] = angles[0] < 0 ? std::max(-25.0f,  angles[0]) :  std::min(25.0f,  angles[0]);
 	AnglesToAxis(angles, axis);
 	AxisCopy(axis, part[BP_LQM_TORSO].axis );
 	CG_PositionRotatedEntityOnTag( &part[BP_LQM_TORSO], &part[BP_LQM_LEGS], veh->handle[BP_LQM_LEGS], lqm_tags[BP_LQM_TORSO] );
@@ -826,7 +827,7 @@ void CG_DrawLQM(DrawInfo_LQM_t* drawInfo)
 	VectorCopy( drawInfo->basicInfo.angles, angles );
 	angles[2] = 0;
 	angles[1] = diff;
-	angles[0] = angles[0] < 0 ? max(-25,  angles[0]) : min(25, angles[0]);
+	angles[0] = angles[0] < 0 ? std::max(-25.0f,  angles[0]) : std::min(25.0f, angles[0]);
 	AnglesToAxis(angles, axis);
 	AxisCopy(axis, part[BP_LQM_HEAD].axis );
 	CG_PositionRotatedEntityOnTag( &part[BP_LQM_HEAD], &part[BP_LQM_TORSO], veh->handle[BP_LQM_TORSO], lqm_tags[BP_LQM_HEAD] );

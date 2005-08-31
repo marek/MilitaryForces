@@ -863,7 +863,7 @@ public:
 	}
 
 	void parse(const char *(*text));
-	qboolean load(const char *filename);
+	bool load(const char *filename);
 	void save(const char *filename);
 
 	void buildCamera();

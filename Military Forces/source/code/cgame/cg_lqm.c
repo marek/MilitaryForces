@@ -1,5 +1,5 @@
 /*
- * $Id: cg_lqm.c,v 1.2 2005-08-27 00:27:51 thebjoern Exp $
+ * $Id: cg_lqm.c,v 1.3 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 
@@ -104,7 +104,7 @@ void CG_LQM( centity_t *cent, clientInfo_t *ci )
 
 	// muzzleflash
 	if( cg.time - cent->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {
-		drawInfo.basicInfo.drawMuzzleFlash = qtrue;
+		drawInfo.basicInfo.drawMuzzleFlash = true;
 		drawInfo.basicInfo.flashWeaponIndex = cent->muzzleFlashWeapon;
 	}
 

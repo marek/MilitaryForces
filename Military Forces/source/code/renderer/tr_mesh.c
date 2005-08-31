@@ -273,7 +273,7 @@ void R_AddMD3Surfaces( trRefEntity_t *ent ) {
 	int				cull;
 	int				lod;
 	int				fogNum;
-	qboolean		personalModel;
+	bool		personalModel;
 
 	// don't add third_person objects if not in a portal
 	personalModel = (ent->e.renderfx & RF_THIRD_PERSON) && !tr.viewParms.isPortal;
@@ -374,7 +374,7 @@ void R_AddMD3Surfaces( trRefEntity_t *ent ) {
 			&& fogNum == 0
 			&& !(ent->e.renderfx & ( RF_NOSHADOW | RF_DEPTHHACK ) ) 
 			&& shader->sort == SS_OPAQUE ) {
-			R_AddDrawSurf( (void *)surface, tr.shadowShader, 0, qfalse );
+			R_AddDrawSurf( reinterpret_cast<surfaceType_t*>(surface), tr.shadowShader, 0, false );
 		}
 
 		// projection shadows work fine with personal models
@@ -382,12 +382,12 @@ void R_AddMD3Surfaces( trRefEntity_t *ent ) {
 			&& fogNum == 0
 			&& (ent->e.renderfx & RF_SHADOW_PLANE )
 			&& shader->sort == SS_OPAQUE ) {
-			R_AddDrawSurf( (void *)surface, tr.projectionShadowShader, 0, qfalse );
+			R_AddDrawSurf( reinterpret_cast<surfaceType_t*>(surface), tr.projectionShadowShader, 0, false );
 		}
 
 		// don't add third_person objects if not viewing through a portal
 		if ( !personalModel ) {
-			R_AddDrawSurf( (void *)surface, shader, fogNum, qfalse );
+			R_AddDrawSurf( reinterpret_cast<surfaceType_t*>(surface), shader, fogNum, false );
 		}
 
 		surface = (md3Surface_t *)( (byte *)surface + surface->ofsEnd );

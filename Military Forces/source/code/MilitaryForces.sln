@@ -2,8 +2,6 @@ Microsoft Visual Studio Solution File, Format Version 8.00
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Splines", "splines\Splines.vcproj", "{DBAF2C53-3858-455D-A1AE-3FC093515314}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cgame", "cgame\cgame.vcproj", "{C878E295-CB82-4B40-8ECF-5CE5525466FA}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -15,6 +13,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "game", "game\game.vcproj", 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "renderer", "renderer\renderer.vcproj", "{AB424155-FBED-4D8D-B007-5B6CF93EA395}"
 	ProjectSection(ProjectDependencies) = postProject
+		{0E65018D-61C6-44DF-BB76-941DD61679CE} = {0E65018D-61C6-44DF-BB76-941DD61679CE}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ui", "ui\ui.vcproj", "{A8EAC38E-C7DA-42F8-811D-77FD092B9D19}"
@@ -29,6 +28,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MilitaryForces", "MilitaryF
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "botlib", "botlib\botlib.vcproj", "{B549420F-50C8-4959-AA30-DA8E7E515091}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "jpeg-6", "jpeg-6\jpeg-6.vcproj", "{0E65018D-61C6-44DF-BB76-941DD61679CE}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -81,6 +84,12 @@ Global
 		{B549420F-50C8-4959-AA30-DA8E7E515091}.Release.Build.0 = Release|Win32
 		{B549420F-50C8-4959-AA30-DA8E7E515091}.ReleaseWithDebugInfo.ActiveCfg = ReleaseWithDebugInfo|Win32
 		{B549420F-50C8-4959-AA30-DA8E7E515091}.ReleaseWithDebugInfo.Build.0 = ReleaseWithDebugInfo|Win32
+		{0E65018D-61C6-44DF-BB76-941DD61679CE}.Debug.ActiveCfg = Debug|Win32
+		{0E65018D-61C6-44DF-BB76-941DD61679CE}.Debug.Build.0 = Debug|Win32
+		{0E65018D-61C6-44DF-BB76-941DD61679CE}.Release.ActiveCfg = Release|Win32
+		{0E65018D-61C6-44DF-BB76-941DD61679CE}.Release.Build.0 = Release|Win32
+		{0E65018D-61C6-44DF-BB76-941DD61679CE}.ReleaseWithDebugInfo.ActiveCfg = ReleaseWithDebugInfo|Win32
+		{0E65018D-61C6-44DF-BB76-941DD61679CE}.ReleaseWithDebugInfo.Build.0 = ReleaseWithDebugInfo|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

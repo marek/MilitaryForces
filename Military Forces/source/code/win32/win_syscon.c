@@ -68,7 +68,7 @@ typedef struct
 
 	char		consoleText[512], returnedText[512];
 	int			visLevel;
-	qboolean	quitOnClose;
+	bool	quitOnClose;
 	int			windowWidth, windowHeight;
 	
 	WNDPROC		SysInputLineWndProc;
@@ -80,7 +80,7 @@ static WinConData s_wcd;
 static LONG WINAPI ConWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	char *cmdString;
-	static qboolean s_timePolarity;
+	static bool s_timePolarity;
 
 	switch (uMsg)
 	{
@@ -122,7 +122,7 @@ static LONG WINAPI ConWndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 		}
 		else
 		{
-			Sys_ShowConsole( 0, qfalse );
+			Sys_ShowConsole( 0, false );
 			Cvar_Set( "viewlog", "0" );
 		}
 		return 0;
@@ -311,7 +311,7 @@ void Sys_CreateConsole( void )
 	wc.hInstance     = g_wv.hInstance;
 	wc.hIcon         = LoadIcon( g_wv.hInstance, MAKEINTRESOURCE(IDI_ICON1));
 	wc.hCursor       = LoadCursor (NULL,IDC_ARROW);
-	wc.hbrBackground = (void *)COLOR_WINDOW;
+	wc.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_WINDOW);
 	wc.lpszMenuName  = 0;
 	wc.lpszClassName = DEDCLASS;
 
@@ -442,7 +442,7 @@ void Sys_DestroyConsole( void ) {
 /*
 ** Sys_ShowConsole
 */
-void Sys_ShowConsole( int visLevel, qboolean quitOnClose )
+void Sys_ShowConsole( int visLevel, bool quitOnClose )
 {
 	s_wcd.quitOnClose = quitOnClose;
 

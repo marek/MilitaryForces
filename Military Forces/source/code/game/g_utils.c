@@ -1,5 +1,5 @@
 /*
- * $Id: g_utils.c,v 1.2 2005-08-26 21:46:35 thebjoern Exp $
+ * $Id: g_utils.c,v 1.3 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -65,7 +65,7 @@ G_FindConfigstringIndex
 
 ================
 */
-int G_FindConfigstringIndex( char *name, int start, int max, qboolean create ) {
+int G_FindConfigstringIndex( char *name, int start, int max, bool create ) {
 	int		i;
 	char	s[MAX_STRING_CHARS];
 
@@ -98,11 +98,11 @@ int G_FindConfigstringIndex( char *name, int start, int max, qboolean create ) {
 
 
 int G_ModelIndex( char *name ) {
-	return G_FindConfigstringIndex (name, CS_MODELS, MAX_MODELS, qtrue);
+	return G_FindConfigstringIndex (name, CS_MODELS, MAX_MODELS, true);
 }
 
 int G_SoundIndex( char *name ) {
-	return G_FindConfigstringIndex (name, CS_SOUNDS, MAX_SOUNDS, qtrue);
+	return G_FindConfigstringIndex (name, CS_SOUNDS, MAX_SOUNDS, true);
 }
 
 //=====================================================================
@@ -349,7 +349,7 @@ float vectoyaw( const vec3_t vec ) {
 
 
 void G_InitGentity( gentity_t *e ) {
-	e->inuse = qtrue;
+	e->inuse = true;
 	e->classname = "noclass";
 	e->s.number = e - g_entities;
 	e->r.ownerNum = ENTITYNUM_NONE;
@@ -422,7 +422,7 @@ gentity_t *G_Spawn( void ) {
 G_EntitiesFree
 =================
 */
-qboolean G_EntitiesFree( void ) {
+bool G_EntitiesFree( void ) {
 	int			i;
 	gentity_t	*e;
 
@@ -432,9 +432,9 @@ qboolean G_EntitiesFree( void ) {
 			continue;
 		}
 		// slot available
-		return qtrue;
+		return true;
 	}
-	return qfalse;
+	return false;
 }
 
 
@@ -455,7 +455,7 @@ void G_FreeEntity( gentity_t *ed ) {
 	memset (ed, 0, sizeof(*ed));
 	ed->classname = "freed";
 	ed->freetime = level.time;
-	ed->inuse = qfalse;
+	ed->inuse = false;
 }
 
 /*
@@ -476,7 +476,7 @@ gentity_t *G_TempEntity( vec3_t origin, int event ) {
 
 	e->classname = "tempEntity";
 	e->eventTime = level.time;
-	e->freeAfterEvent = qtrue;
+	e->freeAfterEvent = true;
 
 	VectorCopy( origin, snapped );
 	SnapVector( snapped );		// save network bandwidth
@@ -560,8 +560,8 @@ void G_SendEventFromQueue( gentity_t* ent ) {
 	if( !ent->eventQueue[i].used ) 
 		return;
 
-	G_AddEvent( ent, ent->eventQueue[i].event, ent->eventQueue[i].eventParm, qfalse );
-	ent->eventQueue[i].used = qfalse;
+	G_AddEvent( ent, ent->eventQueue[i].event, ent->eventQueue[i].eventParm, false );
+	ent->eventQueue[i].used = false;
 
 	i++;
 	if( i >= MAX_EVENT_QUEUE_SIZE ) 
@@ -578,7 +578,7 @@ void G_AddEventToQueue( gentity_t* ent, int event, int eventParm ) {
 	}
 	ent->eventQueue[i].event = event;
 	ent->eventQueue[i].eventParm = eventParm;
-	ent->eventQueue[i].used = qtrue;
+	ent->eventQueue[i].used = true;
 
 	i++;
 	if( i >= MAX_EVENT_QUEUE_SIZE ) i = 0;
@@ -592,7 +592,7 @@ G_AddEvent
 Adds an event+parm and twiddles the event counter
 ===============
 */
-void G_AddEvent( gentity_t *ent, int event, int eventParm, qboolean addToQueue )
+void G_AddEvent( gentity_t *ent, int event, int eventParm, bool addToQueue )
 {
 	int bits = 0;
 
@@ -625,7 +625,7 @@ void G_AddEvent( gentity_t *ent, int event, int eventParm, qboolean addToQueue )
 		ent->s.eventParm = eventParm;
 	}
 	ent->eventTime = level.time;
-	ent->eventSent = qtrue;
+	ent->eventSent = true;
 }
 
 

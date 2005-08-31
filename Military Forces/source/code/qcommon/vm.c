@@ -266,7 +266,7 @@ void VM_LoadSymbols( vm_t *vm ) {
 			break;
 		}
 		chars = strlen( token );
-		sym = Hunk_Alloc( sizeof( *sym ) + chars, h_high );
+		sym = reinterpret_cast<vmSymbol_t*>(Hunk_Alloc( sizeof( *sym ) + chars, h_high ));
 		*prev = sym;
 		prev = &sym->next;
 		sym->next = NULL;
@@ -524,7 +524,7 @@ vm_t *VM_Create( const char *module, int (*systemCalls)(int *),
 	dataLength = 1 << i;
 
 	// allocate zero filled space for initialized and uninitialized data
-	vm->dataBase = Hunk_Alloc( dataLength, h_high );
+	vm->dataBase = reinterpret_cast<byte*>(Hunk_Alloc( dataLength, h_high ));
 	vm->dataMask = dataLength - 1;
 
 	// copy the intialized data
@@ -537,16 +537,16 @@ vm_t *VM_Create( const char *module, int (*systemCalls)(int *),
 
 	// allocate space for the jump targets, which will be filled in by the compile/prep functions
 	vm->instructionPointersLength = header->instructionCount * 4;
-	vm->instructionPointers = Hunk_Alloc( vm->instructionPointersLength, h_high );
+	vm->instructionPointers = reinterpret_cast<int*>(Hunk_Alloc( vm->instructionPointersLength, h_high ));
 
 	// copy or compile the instructions
 	vm->codeLength = header->codeLength;
 
 	if ( interpret >= VMI_COMPILED ) {
-		vm->compiled = qtrue;
+		vm->compiled = true;
 		VM_Compile( vm, header );
 	} else {
-		vm->compiled = qfalse;
+		vm->compiled = false;
 		VM_PrepareInterpreter( vm, header );
 	}
 
@@ -749,7 +749,7 @@ void VM_VmProfile_f( void ) {
 		return;
 	}
 
-	sorted = Z_Malloc( vm->numSymbols * sizeof( *sorted ) );
+	sorted = reinterpret_cast<vmSymbol_t**>(Z_Malloc( vm->numSymbols * sizeof( *sorted ) ));
 	sorted[0] = vm->symbols;
 	total = sorted[0]->profileCount;
 	for ( i = 1 ; i < vm->numSymbols ; i++ ) {

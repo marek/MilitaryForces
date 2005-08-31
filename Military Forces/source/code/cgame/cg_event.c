@@ -1,5 +1,5 @@
 /*
- * $Id: cg_event.c,v 1.3 2005-08-27 09:45:38 thebjoern Exp $
+ * $Id: cg_event.c,v 1.4 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -178,7 +178,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position )
 			if ( item->giType == IT_TEAM) {
 				trap_S_StartSound (NULL, es->number, CHAN_AUTO,	cgs.media.n_healthSound );
 			} else {
-				trap_S_StartSound (NULL, es->number, CHAN_AUTO,	trap_S_RegisterSound( item->pickup_sound, qfalse ) );
+				trap_S_StartSound (NULL, es->number, CHAN_AUTO,	trap_S_RegisterSound( item->pickup_sound, false ) );
 			}
 
 			// show icon and name on status bar
@@ -202,7 +202,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position )
 			item = &bg_itemlist[ index ];
 			// powerup pickups are global
 			if( item->pickup_sound ) {
-				trap_S_StartSound (NULL, cg.snap->ps.clientNum, CHAN_AUTO, trap_S_RegisterSound( item->pickup_sound, qfalse ) );
+				trap_S_StartSound (NULL, cg.snap->ps.clientNum, CHAN_AUTO, trap_S_RegisterSound( item->pickup_sound, false ) );
 			}
 
 			// show icon and name on status bar
@@ -218,7 +218,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position )
 
 	case EV_FIRE_MG:
 		DEBUGNAME("EV_FIRE_WEAPON");
-		CG_FireMachinegun( cent, qfalse );
+		CG_FireMachinegun( cent, false );
 		break;
 
 	case EV_FIRE_WEAPON:

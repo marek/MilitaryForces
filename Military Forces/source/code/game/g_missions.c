@@ -1,5 +1,5 @@
 /*
- * $Id: g_missions.c,v 1.1 2005-08-22 16:07:00 thebjoern Exp $
+ * $Id: g_missions.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
  */
 
  
@@ -28,8 +28,8 @@ static void G_SpawnMissionVehicles(mission_vehicle_t* vehs)
 		{
 			if( vehs[i].waypoints[j].used )
 			{
-				veh->waypoints[k].active = qtrue;
-				veh->waypoints[k].selected = qfalse;
+				veh->waypoints[k].active = true;
+				veh->waypoints[k].selected = false;
 				VectorCopy( vehs[i].waypoints[j].origin, veh->waypoints[k].origin );
 				k++;
 			}
@@ -58,7 +58,7 @@ static void G_SpawnMissionGroundInstallations(mission_groundInstallation_t* gis)
 }
 
 
-static qboolean G_LoadOverviewAndEntities( char *filename,
+static bool G_LoadOverviewAndEntities( char *filename,
 										mission_overview_t* overview,
 										mission_vehicle_t* vehs, 
 										mission_groundInstallation_t* gis)
@@ -72,13 +72,13 @@ static qboolean G_LoadOverviewAndEntities( char *filename,
 	if ( !f ) 
 	{
 		trap_Printf( va( S_COLOR_RED "file not found: %s\n", filename ) );
-		return qfalse;
+		return false;
 	}
 	if ( len >= MAX_MISSION_TEXT ) 
 	{
 		trap_Printf( va( S_COLOR_RED "file too large: %s is %i, max allowed is %i", filename, len, MAX_MISSION_TEXT ) );
 		trap_FS_FCloseFile( f );
-		return qfalse;
+		return false;
 	}
 
 	trap_FS_Read( inbuffer, len, f );
@@ -89,7 +89,7 @@ static qboolean G_LoadOverviewAndEntities( char *filename,
 
 	MF_ParseMissionScripts(inbuffer, overview, vehs, gis);
 
-	return qtrue;
+	return true;
 }
 
 void G_LoadMissionScripts()

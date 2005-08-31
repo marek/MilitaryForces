@@ -1,5 +1,5 @@
 /*
- * $Id: bg_local.h,v 1.1 2005-08-22 16:05:05 thebjoern Exp $
+ * $Id: bg_local.h,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -17,8 +17,8 @@ typedef struct {
 
 	int			msec;
 
-	qboolean	walking;
-	qboolean	groundPlane;
+	bool	walking;
+	bool	groundPlane;
 	trace_t		groundTrace;
 
 	float		impactSpeed;
@@ -58,7 +58,7 @@ void PM_HeloMove( void );
 void PM_LQMMove( void );
 void PM_BoatMove( void );
 
-qboolean	PM_SlideMove( qboolean gravity );
-void		PM_StepSlideMove( qboolean gravity );
+bool	PM_SlideMove( bool gravity );
+void		PM_StepSlideMove( bool gravity );
 
 

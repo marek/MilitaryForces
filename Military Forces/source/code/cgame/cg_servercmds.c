@@ -1,5 +1,5 @@
 /*
- * $Id: cg_servercmds.c,v 1.1 2005-08-22 16:03:18 thebjoern Exp $
+ * $Id: cg_servercmds.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -109,7 +109,7 @@ void CG_ParseServerinfo( void ) {
 	unsigned int newset = cgs.gameset;
 
 	info = CG_ConfigString( CS_SERVERINFO );
-	cgs.gametype = atoi( Info_ValueForKey( info, "g_gametype" ) );
+	cgs.gametype = static_cast<gametype_t>(atoi( Info_ValueForKey( info, "g_gametype" ) ));
 	trap_Cvar_Set("g_gametype", va("%i", cgs.gametype));
 	cgs.dmflags = atoi( Info_ValueForKey( info, "dmflags" ) );
 	cgs.teamflags = atoi( Info_ValueForKey( info, "teamflags" ) );
@@ -261,24 +261,24 @@ static void CG_ConfigStringModified( void ) {
 		cgs.levelStartTime = atoi( str );
 	} else if ( num == CS_VOTE_TIME ) {
 		cgs.voteTime = atoi( str );
-		cgs.voteModified = qtrue;
+		cgs.voteModified = true;
 	} else if ( num == CS_VOTE_YES ) {
 		cgs.voteYes = atoi( str );
-		cgs.voteModified = qtrue;
+		cgs.voteModified = true;
 	} else if ( num == CS_VOTE_NO ) {
 		cgs.voteNo = atoi( str );
-		cgs.voteModified = qtrue;
+		cgs.voteModified = true;
 	} else if ( num == CS_VOTE_STRING ) {
 		Q_strncpyz( cgs.voteString, str, sizeof( cgs.voteString ) );
 	} else if ( num >= CS_TEAMVOTE_TIME && num <= CS_TEAMVOTE_TIME + 1) {
 		cgs.teamVoteTime[num-CS_TEAMVOTE_TIME] = atoi( str );
-		cgs.teamVoteModified[num-CS_TEAMVOTE_TIME] = qtrue;
+		cgs.teamVoteModified[num-CS_TEAMVOTE_TIME] = true;
 	} else if ( num >= CS_TEAMVOTE_YES && num <= CS_TEAMVOTE_YES + 1) {
 		cgs.teamVoteYes[num-CS_TEAMVOTE_YES] = atoi( str );
-		cgs.teamVoteModified[num-CS_TEAMVOTE_YES] = qtrue;
+		cgs.teamVoteModified[num-CS_TEAMVOTE_YES] = true;
 	} else if ( num >= CS_TEAMVOTE_NO && num <= CS_TEAMVOTE_NO + 1) {
 		cgs.teamVoteNo[num-CS_TEAMVOTE_NO] = atoi( str );
-		cgs.teamVoteModified[num-CS_TEAMVOTE_NO] = qtrue;
+		cgs.teamVoteModified[num-CS_TEAMVOTE_NO] = true;
 	} else if ( num >= CS_TEAMVOTE_STRING && num <= CS_TEAMVOTE_STRING + 1) {
 		Q_strncpyz( cgs.teamVoteString[num-CS_TEAMVOTE_STRING], str, sizeof( cgs.teamVoteString ) );
 	} else if ( num == CS_INTERMISSION ) {
@@ -287,7 +287,7 @@ static void CG_ConfigStringModified( void ) {
 		cgs.gameModels[ num-CS_MODELS ] = trap_R_RegisterModel( str );
 	} else if ( num >= CS_SOUNDS && num < CS_SOUNDS+MAX_MODELS ) {
 		if ( str[0] != '*' ) {	// player specific sounds don't register here
-			cgs.gameSounds[ num-CS_SOUNDS] = trap_S_RegisterSound( str, qfalse );
+			cgs.gameSounds[ num-CS_SOUNDS] = trap_S_RegisterSound( str, false );
 		}
 	} else if ( num >= CS_PLAYERS && num < CS_PLAYERS+MAX_CLIENTS ) {
 		CG_NewClientInfo( num - CS_PLAYERS );
@@ -406,15 +406,15 @@ static void CG_MapRestart( void ) {
 
 	cg.timelimitWarnings = 0;
 
-	cg.intermissionStarted = qfalse;
+	cg.intermissionStarted = false;
 
 	cgs.voteTime = 0;
 
-	cg.mapRestart = qtrue;
+	cg.mapRestart = true;
 
 	CG_StartMusic();
 
-	trap_S_ClearLoopingSounds(qtrue);
+	trap_S_ClearLoopingSounds(true);
 
 	// MFQ3 vehicle needs to be reset
 	if( cg_vehicle.integer != -1 ) {
@@ -553,7 +553,7 @@ static void CG_ServerCommand( void ) {
 	// clientLevelShot is sent before taking a special screenshot for
 	// the menu system during development
 	if ( !strcmp( cmd, "clientLevelShot" ) ) {
-		cg.levelShot = qtrue;
+		cg.levelShot = true;
 		return;
 	}
 

@@ -51,9 +51,9 @@ typedef	struct sndBuffer_s {
 
 typedef struct sfx_s {
 	sndBuffer		*soundData;
-	qboolean		defaultSound;			// couldn't be loaded, so use buzz
-	qboolean		inMemory;				// not in Memory
-	qboolean		soundCompressed;		// not in Memory
+	bool		defaultSound;			// couldn't be loaded, so use buzz
+	bool		inMemory;				// not in Memory
+	bool		soundCompressed;		// not in Memory
 	int				soundCompressionMethod;	
 	int 			soundLength;
 	char 			soundName[MAX_QPATH];
@@ -77,9 +77,9 @@ typedef struct loopSound_s {
 	vec3_t		velocity;
 	sfx_t		*sfx;
 	int			mergeFrame;
-	qboolean	active;
-	qboolean	kill;
-	qboolean	doppler;
+	bool	active;
+	bool	kill;
+	bool	doppler;
 	float		dopplerScale;
 	float		oldDopplerScale;
 	int			framenum;
@@ -97,9 +97,9 @@ typedef struct
 	float		dopplerScale;
 	float		oldDopplerScale;
 	vec3_t		origin;			// only use if fixed_origin is set
-	qboolean	fixed_origin;	// use origin instead of fetching entnum's origin
+	bool	fixed_origin;	// use origin instead of fetching entnum's origin
 	sfx_t		*thesfx;		// sfx structure
-	qboolean	doppler;
+	bool	doppler;
 } channel_t;
 
 
@@ -125,7 +125,7 @@ typedef struct {
 */
 
 // initializes cycling through a DMA buffer and returns information on it
-qboolean SNDDMA_Init(void);
+bool SNDDMA_Init(void);
 
 // gets the current DMA position
 int		SNDDMA_GetDMAPos(void);
@@ -164,7 +164,7 @@ extern cvar_t	*s_mixahead;
 extern cvar_t	*s_testsound;
 extern cvar_t	*s_separation;
 
-qboolean S_LoadSound( sfx_t *sfx );
+bool S_LoadSound( sfx_t *sfx );
 
 void		SND_free(sndBuffer *v);
 sndBuffer*	SND_malloc();

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_ents.c,v 1.1 2005-08-22 16:02:12 thebjoern Exp $
+ * $Id: cg_ents.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -260,7 +260,7 @@ static void CG_Item( centity_t *cent ) {
 	VectorCopy( cent->lerpOrigin, ent.origin);
 	VectorCopy( cent->lerpOrigin, ent.oldorigin);
 
-	ent.nonNormalizedAxes = qfalse;
+	ent.nonNormalizedAxes = false;
 
 	// if just respawned, slowly scale up
 	msec = cg.time - cent->miscTime;
@@ -269,7 +269,7 @@ static void CG_Item( centity_t *cent ) {
 		VectorScale( ent.axis[0], frac, ent.axis[0] );
 		VectorScale( ent.axis[1], frac, ent.axis[1] );
 		VectorScale( ent.axis[2], frac, ent.axis[2] );
-		ent.nonNormalizedAxes = qtrue;
+		ent.nonNormalizedAxes = true;
 	} else {
 		frac = 1.0;
 	}
@@ -295,7 +295,7 @@ static void CG_Item( centity_t *cent ) {
 					VectorScale( ent.axis[0], frac, ent.axis[0] );
 					VectorScale( ent.axis[1], frac, ent.axis[1] );
 					VectorScale( ent.axis[2], frac, ent.axis[2] );
-					ent.nonNormalizedAxes = qtrue;
+					ent.nonNormalizedAxes = true;
 				}
 				trap_R_AddRefEntityToScene( &ent );
 			}
@@ -488,7 +488,7 @@ static void CG_Explosive( centity_t *cent ) {
 	// radar
 	if( cg.radarTargets < MAX_RADAR_TARGETS && (cg.predictedPlayerEntity.currentState.ONOFF & OO_RADAR_GROUND) 
 		&& (cent->currentState.ONOFF & OO_RADAR) ) {
-		cent->destroyableStructure = qtrue;
+		cent->destroyableStructure = true;
 		cg.radarEnts[cg.radarTargets++] = cent;
 	}
 
@@ -794,7 +794,7 @@ void CG_AddPacketEntities( void ) {
 
 	// generate and add the entity from the playerstate
 	ps = &cg.predictedPlayerState;
-	BG_PlayerStateToEntityState( ps, &cg.predictedPlayerEntity.currentState, qfalse );
+	BG_PlayerStateToEntityState( ps, &cg.predictedPlayerEntity.currentState, false );
 	if( !(cg.predictedPlayerState.pm_flags & PMF_VEHICLESELECT) ) {
 		CG_AddCEntity( &cg.predictedPlayerEntity );
 	}

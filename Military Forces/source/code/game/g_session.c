@@ -1,5 +1,5 @@
 /*
- * $Id: g_session.c,v 1.1 2005-08-22 16:07:10 thebjoern Exp $
+ * $Id: g_session.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -147,7 +147,7 @@ void G_InitWorldSession(void) {
 	// client sessions
 	if ( g_gametype.integer != gt) 
 	{
-		level.newSession = qtrue;
+		level.newSession = true;
 		G_Printf( "Gametype changed, clearing session data.\n" );
 	} 
 }

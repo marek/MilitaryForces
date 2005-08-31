@@ -31,15 +31,15 @@ Returns true if the grid is completely culled away.
 Also sets the clipped hint bit in tess
 =================
 */
-static qboolean	R_CullTriSurf( srfTriangles_t *cv ) {
+static bool	R_CullTriSurf( srfTriangles_t *cv ) {
 	int 	boxCull;
 
 	boxCull = R_CullLocalBox( cv->bounds );
 
 	if ( boxCull == CULL_OUT ) {
-		return qtrue;
+		return true;
 	}
-	return qfalse;
+	return false;
 }
 
 /*
@@ -50,12 +50,12 @@ Returns true if the grid is completely culled away.
 Also sets the clipped hint bit in tess
 =================
 */
-static qboolean	R_CullGrid( srfGridMesh_t *cv ) {
+static bool	R_CullGrid( srfGridMesh_t *cv ) {
 	int 	boxCull;
 	int 	sphereCull;
 
 	if ( r_nocurves->integer ) {
-		return qtrue;
+		return true;
 	}
 
 	if ( tr.currentEntityNum != ENTITYNUM_WORLD ) {
@@ -69,7 +69,7 @@ static qboolean	R_CullGrid( srfGridMesh_t *cv ) {
 	if ( sphereCull == CULL_OUT )
 	{
 		tr.pc.c_sphere_cull_patch_out++;
-		return qtrue;
+		return true;
 	}
 	// check bounding box if necessary
 	else if ( sphereCull == CULL_CLIP )
@@ -81,7 +81,7 @@ static qboolean	R_CullGrid( srfGridMesh_t *cv ) {
 		if ( boxCull == CULL_OUT ) 
 		{
 			tr.pc.c_box_cull_patch_out++;
-			return qtrue;
+			return true;
 		}
 		else if ( boxCull == CULL_IN )
 		{
@@ -97,7 +97,7 @@ static qboolean	R_CullGrid( srfGridMesh_t *cv ) {
 		tr.pc.c_sphere_cull_patch_in++;
 	}
 
-	return qfalse;
+	return false;
 }
 
 
@@ -111,12 +111,12 @@ added to the sorting list.
 This will also allow mirrors on both sides of a model without recursion.
 ================
 */
-static qboolean	R_CullSurface( surfaceType_t *surface, shader_t *shader ) {
+static bool	R_CullSurface( surfaceType_t *surface, shader_t *shader ) {
 	srfSurfaceFace_t *sface;
 	float			d;
 
 	if ( r_nocull->integer ) {
-		return qfalse;
+		return false;
 	}
 
 	if ( *surface == SF_GRID ) {
@@ -128,16 +128,16 @@ static qboolean	R_CullSurface( surfaceType_t *surface, shader_t *shader ) {
 	}
 
 	if ( *surface != SF_FACE ) {
-		return qfalse;
+		return false;
 	}
 
 	if ( shader->cullType == CT_TWO_SIDED ) {
-		return qfalse;
+		return false;
 	}
 
 	// face culling
 	if ( !r_facePlaneCull->integer ) {
-		return qfalse;
+		return false;
 	}
 
 	sface = ( srfSurfaceFace_t * ) surface;
@@ -148,15 +148,15 @@ static qboolean	R_CullSurface( surfaceType_t *surface, shader_t *shader ) {
 	// epsilon isn't allowed here 
 	if ( shader->cullType == CT_FRONT_SIDED ) {
 		if ( d < sface->plane.dist - 8 ) {
-			return qtrue;
+			return true;
 		}
 	} else {
 		if ( d > sface->plane.dist + 8 ) {
-			return qtrue;
+			return true;
 		}
 	}
 
-	return qfalse;
+	return false;
 }
 
 
@@ -542,7 +542,7 @@ static const byte *R_ClusterPVS (int cluster) {
 R_inPVS
 =================
 */
-qboolean R_inPVS( const vec3_t p1, const vec3_t p2 ) {
+bool R_inPVS( const vec3_t p1, const vec3_t p2 ) {
 	mnode_t *leaf;
 	byte	*vis;
 
@@ -551,9 +551,9 @@ qboolean R_inPVS( const vec3_t p1, const vec3_t p2 ) {
 	leaf = R_PointInLeaf( p2 );
 
 	if ( !(vis[leaf->cluster>>3] & (1<<(leaf->cluster&7))) ) {
-		return qfalse;
+		return false;
 	}
-	return qtrue;
+	return true;
 }
 
 /*
@@ -590,7 +590,7 @@ static void R_MarkLeaves (void) {
 	}
 
 	if ( r_showcluster->modified || r_showcluster->integer ) {
-		r_showcluster->modified = qfalse;
+		r_showcluster->modified = false;
 		if ( r_showcluster->integer ) {
 			ri.Printf( PRINT_ALL, "cluster:%i  area:%i\n", cluster, leaf->area );
 		}
