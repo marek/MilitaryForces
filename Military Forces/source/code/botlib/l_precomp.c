@@ -177,7 +177,7 @@ void PC_PushIndent(source_t *source, int type, int skip)
 {
 	indent_t *indent;
 
-	indent = (indent_t *) GetMemory(sizeof(indent_t));
+	indent = reinterpret_cast<indent_t *>(GetMemory(sizeof(indent_t)));
 	indent->type = type;
 	indent->script = source->scriptstack;
 	indent->skip = (skip != 0);
@@ -264,7 +264,7 @@ token_t *PC_CopyToken(token_t *token)
 	token_t *t;
 
 //	t = (token_t *) malloc(sizeof(token_t));
-	t = (token_t *) GetMemory(sizeof(token_t));
+	t = reinterpret_cast<token_t *>(GetMemory(sizeof(token_t)));
 //	t = freetokens;
 	if (!t)
 	{
@@ -682,7 +682,7 @@ void PC_AddBuiltinDefines(source_t *source)
 
 	for( i = 0; builtin[i].string; i++ )
 	{
-		define = (define_t *) GetMemory(sizeof(define_t) + strlen(builtin[i].string) + 1);
+		define = reinterpret_cast<define_t *>(GetMemory(sizeof(define_t) + strlen(builtin[i].string) + 1));
 		Com_Memset(define, 0, sizeof(define_t));
 		define->name = (char *) define + sizeof(define_t);
 		strcpy(define->name, builtin[i].string);
@@ -1217,7 +1217,7 @@ int PC_Directive_define(source_t *source)
 #endif //DEFINEHASHING
 	} //end if
 	//allocate define
-	define = (define_t *) GetMemory(sizeof(define_t) + strlen(token.string) + 1);
+	define = reinterpret_cast<define_t *>(GetMemory(sizeof(define_t) + strlen(token.string) + 1));
 	Com_Memset(define, 0, sizeof(define_t));
 	define->name = (char *) define + sizeof(define_t);
 	strcpy(define->name, token.string);
@@ -1333,7 +1333,7 @@ define_t *PC_DefineFromString(char *string)
 	strncpy(src.filename, "*extern", MAX_PATH);
 	src.scriptstack = script;
 #if DEFINEHASHING
-	src.definehash = reinterpret_cast<define_t**>(GetClearedMemory(DEFINEHASHSIZE * sizeof(define_t *)));
+	src.definehash = reinterpret_cast<define_t**>(GetClearedMemory((DEFINEHASHSIZE * sizeof(define_t *))));
 #endif //DEFINEHASHING
 	//create a define from the source
 	res = PC_Directive_define(&src);
@@ -1453,7 +1453,7 @@ define_t *PC_CopyDefine(source_t *source, define_t *define)
 	define_t *newdefine;
 	token_t *token, *newtoken, *lasttoken;
 
-	newdefine = (define_t *) GetMemory(sizeof(define_t) + strlen(define->name) + 1);
+	newdefine = reinterpret_cast<define_t *>(GetMemory(sizeof(define_t) + strlen(define->name) + 1));
 	//copy the define name
 	newdefine->name = (char *) newdefine + sizeof(define_t);
 	strcpy(newdefine->name, define->name);
@@ -3012,7 +3012,7 @@ source_t *LoadSourceFile(const char *filename)
 
 	script->next = NULL;
 
-	source = (source_t *) GetMemory(sizeof(source_t));
+	source = reinterpret_cast<source_t *>(GetMemory(sizeof(source_t)));
 	Com_Memset(source, 0, sizeof(source_t));
 
 	strncpy(source->filename, filename, MAX_PATH);
@@ -3045,7 +3045,7 @@ source_t *LoadSourceMemory(char *ptr, int length, char *name)
 	if (!script) return NULL;
 	script->next = NULL;
 
-	source = (source_t *) GetMemory(sizeof(source_t));
+	source = reinterpret_cast<source_t *>(GetMemory(sizeof(source_t)));
 	Com_Memset(source, 0, sizeof(source_t));
 
 	strncpy(source->filename, name, MAX_PATH);

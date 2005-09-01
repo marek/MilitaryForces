@@ -76,7 +76,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				OptimizeForProcessor="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;BOTLIB;DEBUG"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;BOTLIB;DEBUG;MEMDEBUG;MEMORYMANAGER"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="2"
