@@ -1,5 +1,5 @@
 /*
- * $Id: bg_weapondata.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: bg_weapondata.c,v 1.3 2005-09-01 07:54:46 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -1105,7 +1105,7 @@ completeWeaponData_t availableWeapons[] =
 		WT_ANTIAIRMISSILE,					// type
 		MF_GAMESET_ANY,						// gameset
 		"AIM-9 Sidewinder",					// descriptiveName
-		"9AIM-9P",							// shortName
+		"AIM-9",							// shortName
 		"SR-SAM",							// shortName2 (GVs)
 		"models/weapons/vwep_sidewinder.md3",// modelName
 		0,									// handle
