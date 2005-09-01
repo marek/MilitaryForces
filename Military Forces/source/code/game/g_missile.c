@@ -894,7 +894,7 @@ static void follow_target( gentity_t *missile ) {
 	}
 
 	// adjust course/speed
-	VectorMA( dir, 0.35f, targdir, targdir );
+	VectorMA( dir, 1.85f, targdir, targdir );
 	VectorNormalize( targdir );
 	VectorScale( targdir, missile->speed, dir );
 	

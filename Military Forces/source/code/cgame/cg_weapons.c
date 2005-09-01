@@ -1,5 +1,5 @@
 /*
- * $Id: cg_weapons.c,v 1.7 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: cg_weapons.c,v 1.8 2005-09-01 07:54:45 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -807,6 +807,7 @@ void CG_MissileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_t di
 		}
 
 		radius = 0.2f; //radius = 8;
+		duration = 300;
 		break;
 
 	case WI_125MM_GUN:
