@@ -773,10 +773,10 @@ typedef struct {
 
 // you don't need to init the growlist if you don't mind it growing and moving
 // the list as it expands
-void		Com_InitGrowList( growList_t *list, int maxElements );
-int			Com_AddToGrowList( growList_t *list, void *data );
-void		*Com_GrowListElement( const growList_t *list, int index );
-int			Com_IndexForGrowListElement( const growList_t *list, const void *element );
+//void		Com_InitGrowList( growList_t *list, int maxElements );
+//int			Com_AddToGrowList( growList_t *list, void *data );
+//void		*Com_GrowListElement( const growList_t *list, int index );
+//int			Com_IndexForGrowListElement( const growList_t *list, const void *element );
 
 
 //
