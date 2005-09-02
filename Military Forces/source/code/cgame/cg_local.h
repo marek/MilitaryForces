@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.9 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: cg_local.h,v 1.10 2005-09-02 06:27:57 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1739,4 +1739,112 @@ void trap_CIN_DrawCinematic (int handle);
 void trap_CIN_SetExtents (int handle, int x, int y, int w, int h);
 
 void trap_SnapVector( float *v );
+
+
+// cg_particles.c
+
+#define MAX_WORLD_PARTICLES 		20000
+#define	MAX_WORLD_EMITTERS			2500
+#define MAX_WORLD_SYSTEMS			500
+#define MAX_PARTICLE_SHADERS		100
+
+
+
+
+// Particle systems are nothing more than a collection of emitters
+typedef struct particleSystem_s
+{
+	int			parentWorld;
+	centity_t	* cent;
+
+	vec3_t		pos;		// position of system  if cent != null
+	// age properties
+	bool		dead;
+	long		birthtime;
+	long		lifetime;
+	long		lastthink;
+
+} particleSystem_t;
+
+
+typedef struct particle_s
+{
+	int	parentEmitter;
+	
+	// age properties
+	bool		dead;
+	long		birthtime;
+	long		lifetime;
+	long		lastthink;
+	
+	// size
+	float	radius;				// radius of particle
+	long	growstart;			// when to start growing
+	long 	growend;			// when to end growing
+	float	growrate;			// how fast to grow
+	
+	// phsyics
+	vec3_t		trDelta;
+	vec3_t		trBase;
+	float		maxspeed;
+	float		accel;				// acceleration rate
+	float		acceltime;			// how long to accelerate for
+	float		rotation;			// current rotation
+	float  		rotationvel;		// rotation velocity
+	float		attractionSystem;	// attraction to particles of the same system in a world
+	float 		attractionEmitter;	// attraction to particles of the same emitter in a world
+	float		attractionWorld;	// attraction to all particles in the same world 
+	float		attractionEntity;	// Attraction to entities;
+	float		bounce;				// Bounce  1.0 = perfect bounce
+	int			pm_type;			//
+	bool		dieOnCollision;		//
+	float		gravity;			// gravity value;
+		
+	// visual properties
+	bool				reallight;		// whether or not to be affected by world lights
+	qhandle_t			shaders[100];	// visual shader to use
+	unsigned int 		shaderFPS;		// shader animation time; 0 = by age, > 0 by fps
+	unsigned int		numShaders;		// number of shaders
+	float				alpha;			// alpha transparacy of particle
+	long 				alphaDecayStartTime;
+	long				alphaDecayEndTime;
+	float				alphaDecayStartValue;
+	float				alphaDecayEndValue;
+} particle_t;
+
+// Particle emitters spawn new particles in a certain way
+typedef struct particleEmitter_s
+{
+	bool					dead;
+
+	long					birthtime;
+	long					lifetime;
+	long					lastthink;
+
+	int						parentSytem;
+	int						inheritVelocity;   // -1 = eject with opposite velocity, 0 = stationary, 1 = eject with same velocity
+
+	particle_t				particleTemplate;
+	
+	vec3_t					ejectVelocity;
+
+	float					accelVariance;
+	float					rotationVariance;
+	float					velVariance;
+	float					maxspeedVariance;
+	float					gravityVariance;
+	float					bounceVariance;
+	float					radiusVariance;
+	float					lifetimeVariance;
+} particleEmitter_t;
+
+
+// Particle worlds are nothing more than a collection of systems
+typedef struct particleWorld_s					// Usualy only one world;
+{
+	particle_t			particles[MAX_WORLD_PARTICLES];
+	particleSystem_t	systems[MAX_WORLD_SYSTEMS];
+	particleEmitter_t	emitters[MAX_WORLD_EMITTERS];
+} particleWorld_t;
+
 
