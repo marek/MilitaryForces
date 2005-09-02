@@ -1,5 +1,5 @@
 /*
- * $Id: g_team.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: g_team.c,v 1.3 2005-09-02 08:45:17 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -8,7 +8,7 @@
 #include "g_local.h"
 
 
-typedef struct teamgame_s {
+struct teamgame_t {
 	float			last_flag_capture;
 	int				last_capture_team;
 	flagStatus_t	redStatus;	// CTF
@@ -18,7 +18,7 @@ typedef struct teamgame_s {
 	int				blueTakenTime;
 	int				redObeliskAttackedTime;
 	int				blueObeliskAttackedTime;
-} teamgame_t;
+};
 
 teamgame_t teamgame;
 
@@ -239,7 +239,6 @@ void Team_FragBonuses(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker
 	int tokens;
 	gentity_t *flag, *carrier = NULL;
 	char *c;
-	vec3_t v1, v2;
 	int team;
 
 	// no bonus for fragging yourself or team mates
@@ -279,26 +278,6 @@ void Team_FragBonuses(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker
 		return;
 	}
 
-	if (targ->client->pers.teamState.lasthurtcarrier &&
-		level.time - targ->client->pers.teamState.lasthurtcarrier < CTF_CARRIER_DANGER_PROTECT_TIMEOUT &&
-		!(attacker->client->ps.objectives & flag_pw)) {
-		// attacker is on the same team as the flag carrier and
-		// fragged a guy who hurt our flag carrier
-		AddScore(attacker, targ->r.currentOrigin, CTF_CARRIER_DANGER_PROTECT_BONUS);
-
-		attacker->client->pers.teamState.carrierdefense++;
-		targ->client->pers.teamState.lasthurtcarrier = 0;
-
-		attacker->client->ps.persistant[PERS_DEFEND_COUNT]++;
-		team = attacker->client->sess.sessionTeam;
-		// add the sprite over the player's head
-		attacker->client->ps.eFlags &= ~(EF_AWARD_IMPRESSIVE | EF_AWARD_EXCELLENT | EF_AWARD_ASSIST | EF_AWARD_DEFEND | EF_AWARD_CAP );
-		attacker->client->ps.eFlags |= EF_AWARD_DEFEND;
-		attacker->client->rewardTime = level.time + REWARD_SPRITE_TIME;
-
-		return;
-	}
-
 	// flag and flag carrier area defense bonuses
 
 	// we have to find the flag and carrier entities
@@ -327,83 +306,7 @@ void Team_FragBonuses(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker
 			break;
 	}
 
-	if (!flag)
-		return; // can't find attacker's flag
-
-	// ok we have the attackers flag and a pointer to the carrier
-
-	// check to see if we are defending the base's flag
-	VectorSubtract(targ->r.currentOrigin, flag->r.currentOrigin, v1);
-	VectorSubtract(attacker->r.currentOrigin, flag->r.currentOrigin, v2);
-
-	if ( ( ( VectorLength(v1) < CTF_TARGET_PROTECT_RADIUS &&
-		trap_InPVS(flag->r.currentOrigin, targ->r.currentOrigin ) ) ||
-		( VectorLength(v2) < CTF_TARGET_PROTECT_RADIUS &&
-		trap_InPVS(flag->r.currentOrigin, attacker->r.currentOrigin ) ) ) &&
-		attacker->client->sess.sessionTeam != targ->client->sess.sessionTeam) {
-
-		// we defended the base flag
-		AddScore(attacker, targ->r.currentOrigin, CTF_FLAG_DEFENSE_BONUS);
-		attacker->client->pers.teamState.basedefense++;
-
-		attacker->client->ps.persistant[PERS_DEFEND_COUNT]++;
-		// add the sprite over the player's head
-		attacker->client->ps.eFlags &= ~(EF_AWARD_IMPRESSIVE | EF_AWARD_EXCELLENT | EF_AWARD_ASSIST | EF_AWARD_DEFEND | EF_AWARD_CAP );
-		attacker->client->ps.eFlags |= EF_AWARD_DEFEND;
-		attacker->client->rewardTime = level.time + REWARD_SPRITE_TIME;
-
-		return;
-	}
-
-	if (carrier && carrier != attacker) {
-		VectorSubtract(targ->r.currentOrigin, carrier->r.currentOrigin, v1);
-		VectorSubtract(attacker->r.currentOrigin, carrier->r.currentOrigin, v1);
-
-		if ( ( ( VectorLength(v1) < CTF_ATTACKER_PROTECT_RADIUS &&
-			trap_InPVS(carrier->r.currentOrigin, targ->r.currentOrigin ) ) ||
-			( VectorLength(v2) < CTF_ATTACKER_PROTECT_RADIUS &&
-				trap_InPVS(carrier->r.currentOrigin, attacker->r.currentOrigin ) ) ) &&
-			attacker->client->sess.sessionTeam != targ->client->sess.sessionTeam) {
-			AddScore(attacker, targ->r.currentOrigin, CTF_CARRIER_PROTECT_BONUS);
-			attacker->client->pers.teamState.carrierdefense++;
-
-			attacker->client->ps.persistant[PERS_DEFEND_COUNT]++;
-			// add the sprite over the player's head
-			attacker->client->ps.eFlags &= ~(EF_AWARD_IMPRESSIVE | EF_AWARD_EXCELLENT | EF_AWARD_ASSIST | EF_AWARD_DEFEND | EF_AWARD_CAP );
-			attacker->client->ps.eFlags |= EF_AWARD_DEFEND;
-			attacker->client->rewardTime = level.time + REWARD_SPRITE_TIME;
-
-			return;
-		}
-	}
 }
-
-/*
-================
-Team_CheckHurtCarrier
-
-Check to see if attacker hurt the flag carrier.  Needed when handing out bonuses for assistance to flag
-carrier defense.
-================
-*/
-void Team_CheckHurtCarrier(gentity_t *targ, gentity_t *attacker)
-{
-	int flag_pw;
-
-	if(!targ->client || !attacker->client)
-		return;
-
-	if(targ->client->sess.sessionTeam == TEAM_RED)
-		flag_pw = OB_BLUEFLAG;
-	else
-		flag_pw = OB_REDFLAG;
-
-	// flags
-	if( (targ->client->ps.objectives & flag_pw) &&
-		targ->client->sess.sessionTeam != attacker->client->sess.sessionTeam)
-		attacker->client->pers.teamState.lasthurtcarrier = level.time;
-}
-
 
 gentity_t *Team_ResetFlag( int team ) {
 	char *c;
@@ -568,8 +471,6 @@ Team_DroppedFlagThink
 ==============
 */
 int Team_TouchOurFlag( gentity_t *ent, gentity_t *other, int team ) {
-	int			i;
-	gentity_t	*player;
 	gclient_t	*cl = other->client;
 	int			enemy_flag;
 
@@ -607,9 +508,6 @@ int Team_TouchOurFlag( gentity_t *ent, gentity_t *other, int team ) {
 
 	other->client->pers.teamState.captures++;
 	// add the sprite over the player's head
-	other->client->ps.eFlags &= ~(EF_AWARD_IMPRESSIVE | EF_AWARD_EXCELLENT | EF_AWARD_ASSIST | EF_AWARD_DEFEND | EF_AWARD_CAP );
-	other->client->ps.eFlags |= EF_AWARD_CAP;
-	other->client->rewardTime = level.time + REWARD_SPRITE_TIME;
 	other->client->ps.persistant[PERS_CAPTURES]++;
 
 	// other gets another 10 frag bonus
@@ -617,44 +515,6 @@ int Team_TouchOurFlag( gentity_t *ent, gentity_t *other, int team ) {
 
 	Team_CaptureFlagSound( ent, team );
 
-	// Ok, let's do the player loop, hand out the bonuses
-	for (i = 0; i < g_maxclients.integer; i++) {
-		player = &g_entities[i];
-		if (!player->inuse)
-			continue;
-
-		if (player->client->sess.sessionTeam !=
-			cl->sess.sessionTeam) {
-			player->client->pers.teamState.lasthurtcarrier = -5;
-		} else if (player->client->sess.sessionTeam ==
-			cl->sess.sessionTeam) {
-			if (player != other)
-				AddScore(player, ent->r.currentOrigin, CTF_TEAM_BONUS);
-			// award extra points for capture assists
-			if (player->client->pers.teamState.lastreturnedflag + 
-				CTF_RETURN_FLAG_ASSIST_TIMEOUT > level.time) {
-				AddScore (player, ent->r.currentOrigin, CTF_RETURN_FLAG_ASSIST_BONUS);
-				other->client->pers.teamState.assists++;
-
-				player->client->ps.persistant[PERS_ASSIST_COUNT]++;
-				// add the sprite over the player's head
-				player->client->ps.eFlags &= ~(EF_AWARD_IMPRESSIVE | EF_AWARD_EXCELLENT | EF_AWARD_ASSIST | EF_AWARD_DEFEND | EF_AWARD_CAP );
-				player->client->ps.eFlags |= EF_AWARD_ASSIST;
-				player->client->rewardTime = level.time + REWARD_SPRITE_TIME;
-
-			}
-			if (player->client->pers.teamState.lastfraggedcarrier + 
-				CTF_FRAG_CARRIER_ASSIST_TIMEOUT > level.time) {
-				AddScore(player, ent->r.currentOrigin, CTF_FRAG_CARRIER_ASSIST_BONUS);
-				other->client->pers.teamState.assists++;
-				player->client->ps.persistant[PERS_ASSIST_COUNT]++;
-				// add the sprite over the player's head
-				player->client->ps.eFlags &= ~(EF_AWARD_IMPRESSIVE | EF_AWARD_EXCELLENT | EF_AWARD_ASSIST | EF_AWARD_DEFEND | EF_AWARD_CAP );
-				player->client->ps.eFlags |= EF_AWARD_ASSIST;
-				player->client->rewardTime = level.time + REWARD_SPRITE_TIME;
-			}
-		}
-	}
 	Team_ResetFlags();
 
 	CalculateRanks();

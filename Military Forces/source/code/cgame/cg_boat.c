@@ -1,5 +1,5 @@
 /*
- * $Id: cg_boat.c,v 1.3 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: cg_boat.c,v 1.4 2005-09-02 08:45:17 thebjoern Exp $
 */
 
 
@@ -52,9 +52,6 @@ void CG_Boat( centity_t *cent, clientInfo_t *ci )
 	VectorCopy( cent->lerpOrigin, drawInfo.basicInfo.origin );
 	VectorCopy( cent->lerpAngles, drawInfo.basicInfo.angles );
 
-    // add the talk baloon or disconnect icon
-//    CG_PlayerSprites( cent );
-    
 	// loadout
 	drawInfo.basicInfo.usedLoadout = 0;//&cg_loadouts[cent->currentState.number];
 

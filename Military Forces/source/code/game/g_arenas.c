@@ -1,5 +1,5 @@
 /*
- * $Id: g_arenas.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: g_arenas.c,v 1.3 2005-09-02 08:45:17 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -57,7 +57,7 @@ void UpdateTournamentInfo( void ) {
 		}
 		perfect = ( level.clients[playerClientNum].ps.persistant[PERS_RANK] == 0 && player->client->ps.persistant[PERS_KILLED] == 0 ) ? 1 : 0;
 		Com_sprintf( msg, sizeof(msg), "postgame %i %i %i %i %i %i %i", level.numNonSpectatorClients, playerClientNum, accuracy,
-			player->client->ps.persistant[PERS_IMPRESSIVE_COUNT], player->client->ps.persistant[PERS_EXCELLENT_COUNT],
+			0, 0,
 			player->client->ps.persistant[PERS_SCORE], perfect );
 	}
 

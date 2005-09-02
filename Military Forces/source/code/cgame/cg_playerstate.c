@@ -1,5 +1,5 @@
 /*
- * $Id: cg_playerstate.c,v 1.3 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: cg_playerstate.c,v 1.4 2005-09-02 08:45:17 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -202,19 +202,6 @@ void CG_CheckChangedPredictableEvents( playerState_t *ps ) {
 	}
 }
 
-/*
-==================
-pushReward
-==================
-*/
-static void pushReward(sfxHandle_t sfx, qhandle_t shader, int rewardCount) {
-	if (cg.rewardStack < (MAX_REWARDSTACK-1)) {
-		cg.rewardStack++;
-		cg.rewardSound[cg.rewardStack] = sfx;
-		cg.rewardShader[cg.rewardStack] = shader;
-		cg.rewardCount[cg.rewardStack] = rewardCount;
-	}
-}
 
 /*
 ==================
@@ -222,8 +209,7 @@ CG_CheckLocalSounds
 ==================
 */
 void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
-	int			highScore, reward;
-	sfxHandle_t sfx;
+	int			highScore;
 
 	// don't play the sounds if the player just changed teams
 	if ( ps->persistant[PERS_TEAM] != ops->persistant[PERS_TEAM] ) {
@@ -250,47 +236,6 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 		return;
 	}
 
-	// reward sounds
-	reward = false;
-	if (ps->persistant[PERS_CAPTURES] != ops->persistant[PERS_CAPTURES]) {
-		pushReward(cgs.media.captureAwardSound, cgs.media.medalCapture, ps->persistant[PERS_CAPTURES]);
-		reward = true;
-		//Com_Printf("capture\n");
-	}
-	if (ps->persistant[PERS_IMPRESSIVE_COUNT] != ops->persistant[PERS_IMPRESSIVE_COUNT]) {
-		sfx = cgs.media.impressiveSound;
-		pushReward(sfx, cgs.media.medalImpressive, ps->persistant[PERS_IMPRESSIVE_COUNT]);
-		reward = true;
-		//Com_Printf("impressive\n");
-	}
-	if (ps->persistant[PERS_EXCELLENT_COUNT] != ops->persistant[PERS_EXCELLENT_COUNT]) {
-		sfx = cgs.media.excellentSound;
-		pushReward(sfx, cgs.media.medalExcellent, ps->persistant[PERS_EXCELLENT_COUNT]);
-		reward = true;
-		//Com_Printf("excellent\n");
-	}
-	if (ps->persistant[PERS_DEFEND_COUNT] != ops->persistant[PERS_DEFEND_COUNT]) {
-		pushReward(cgs.media.defendSound, cgs.media.medalDefend, ps->persistant[PERS_DEFEND_COUNT]);
-		reward = true;
-		//Com_Printf("defend\n");
-	}
-	if (ps->persistant[PERS_ASSIST_COUNT] != ops->persistant[PERS_ASSIST_COUNT]) {
-		pushReward(cgs.media.assistSound, cgs.media.medalAssist, ps->persistant[PERS_ASSIST_COUNT]);
-		reward = true;
-		//Com_Printf("assist\n");
-	}
-	// if any of the player event bits changed
-	if (ps->persistant[PERS_PLAYEREVENTS] != ops->persistant[PERS_PLAYEREVENTS]) {
-		if ((ps->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_DENIEDREWARD) !=
-				(ops->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_DENIEDREWARD)) {
-			trap_S_StartLocalSound( cgs.media.deniedSound, CHAN_ANNOUNCER );
-		}
-		else if ((ps->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_HOLYSHIT) !=
-				(ops->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_HOLYSHIT)) {
-			trap_S_StartLocalSound( cgs.media.holyShitSound, CHAN_ANNOUNCER );
-		}
-		reward = true;
-	}
 
 	// check for flag pickup
 	if ( cgs.gametype >= GT_TEAM ) {
@@ -302,19 +247,16 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 	}
 
 	// lead changes
-	if (!reward) {
-		//
-		if ( !cg.warmup ) {
-			// never play lead changes during warmup
-			if ( ps->persistant[PERS_RANK] != ops->persistant[PERS_RANK] ) {
-				if ( cgs.gametype < GT_TEAM) {
-					if (  ps->persistant[PERS_RANK] == 0 ) {
-						CG_AddBufferedSound(cgs.media.takenLeadSound);
-					} else if ( ps->persistant[PERS_RANK] == RANK_TIED_FLAG ) {
-						CG_AddBufferedSound(cgs.media.tiedLeadSound);
-					} else if ( ( ops->persistant[PERS_RANK] & ~RANK_TIED_FLAG ) == 0 ) {
-						CG_AddBufferedSound(cgs.media.lostLeadSound);
-					}
+	if ( !cg.warmup ) {
+		// never play lead changes during warmup
+		if ( ps->persistant[PERS_RANK] != ops->persistant[PERS_RANK] ) {
+			if ( cgs.gametype < GT_TEAM) {
+				if (  ps->persistant[PERS_RANK] == 0 ) {
+					CG_AddBufferedSound(cgs.media.takenLeadSound);
+				} else if ( ps->persistant[PERS_RANK] == RANK_TIED_FLAG ) {
+					CG_AddBufferedSound(cgs.media.tiedLeadSound);
+				} else if ( ( ops->persistant[PERS_RANK] & ~RANK_TIED_FLAG ) == 0 ) {
+					CG_AddBufferedSound(cgs.media.lostLeadSound);
 				}
 			}
 		}

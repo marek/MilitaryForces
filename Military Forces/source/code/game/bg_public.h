@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.12 2005-09-02 08:00:21 thebjoern Exp $
+ * $Id: bg_public.h,v 1.13 2005-09-02 08:45:17 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -215,11 +215,6 @@ typedef enum {
 	PERS_PLAYEREVENTS,				// 16 bits that can be flipped for events
 	PERS_ATTACKER,					// clientnum of last damage inflicter
 	PERS_KILLED,					// count of the number of times you died
-	// player awards tracking
-	PERS_IMPRESSIVE_COUNT,			// two railgun hits in a row
-	PERS_EXCELLENT_COUNT,			// two successive kills in a short amount of time
-	PERS_DEFEND_COUNT,				// defend awards
-	PERS_ASSIST_COUNT,				// assist awards
 	PERS_CAPTURES,					// captures
 	PERS_DEATHS						// deaths
 } persEnum_t;
@@ -228,7 +223,6 @@ typedef enum {
 // entityState_t->eFlags
 #define	EF_DEAD				0x00000001		// don't draw a foe marker over players with EF_DEAD
 #define	EF_TELEPORT_BIT		0x00000004		// toggled every time the origin abruptly changes
-#define	EF_AWARD_EXCELLENT	0x00000008		// draw an excellent sprite
 #define EF_PLAYER_EVENT		0x00000010
 #define	EF_BOUNCE			0x00000010		// for missiles
 #define	EF_BOUNCE_HALF		0x00000020		// for missiles
@@ -237,14 +231,8 @@ typedef enum {
 #define	EF_MFQ3_FREE2		0x00000100		// --- not used ---
 #define	EF_MFQ3_FREE3		0x00000200		// --- not used ---
 #define	EF_MOVER_STOP		0x00000400		// will push otherwise
-#define EF_AWARD_CAP		0x00000800		// draw the capture sprite
-#define	EF_TALK				0x00001000		// draw a talk balloon
 #define	EF_CONNECTION		0x00002000		// draw a connection trouble sprite
 #define	EF_VOTED			0x00004000		// already cast a vote
-#define	EF_AWARD_IMPRESSIVE	0x00008000		// draw an impressive sprite
-#define	EF_AWARD_DEFEND		0x00010000		// draw a defend sprite
-#define	EF_AWARD_ASSIST		0x00020000		// draw a assist sprite
-#define EF_AWARD_DENIED		0x00040000		// denied
 #define EF_TEAMVOTED		0x00080000		// already cast a team vote
 
 // NOTE: may not have more than 16
@@ -265,11 +253,6 @@ typedef enum {
 	WP_WEAPON6,
 	WP_FLARE
 } weapon_t;
-
-
-// reward sounds (stored in ps->persistant[PERS_PLAYEREVENTS])
-#define	PLAYEREVENT_DENIEDREWARD		0x0001
-#define PLAYEREVENT_HOLYSHIT			0x0004
 
 // entityState_t->event values
 // entity events are for effects that take place reletive

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_players.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: cg_players.c,v 1.3 2005-09-02 08:45:17 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -221,94 +221,9 @@ void CG_TrailItem( centity_t *cent, qhandle_t hModel ) {
 	trap_R_AddRefEntityToScene( &ent );
 }
 
-/*
-===============
-CG_PlayerFloatSprite
-
-Float a sprite over the player's head
-===============
-*/
-static void CG_PlayerFloatSprite( centity_t *cent, qhandle_t shader ) {
-	int				rf;
-	refEntity_t		ent;
-
-	if ( cent->currentState.number == cg.snap->ps.clientNum && !cg.renderingThirdPerson ) {
-		rf = RF_THIRD_PERSON;		// only show in mirrors
-	} else {
-		rf = 0;
-	}
-
-	memset( &ent, 0, sizeof( ent ) );
-	VectorCopy( cent->lerpOrigin, ent.origin );
-	ent.origin[2] += 48;
-	ent.reType = RT_SPRITE;
-	ent.customShader = shader;
-	ent.radius = 10;
-	ent.renderfx = rf;
-	ent.shaderRGBA[0] = 255;
-	ent.shaderRGBA[1] = 255;
-	ent.shaderRGBA[2] = 255;
-	ent.shaderRGBA[3] = 255;
-	trap_R_AddRefEntityToScene( &ent );
-}
 
 
 
-/*
-===============
-CG_PlayerSprites
-
-Float sprites over the player's head
-===============
-*/
-void CG_PlayerSprites( centity_t *cent ) {
-//	int		team;
-
-	if ( cent->currentState.eFlags & EF_CONNECTION ) {
-		CG_PlayerFloatSprite( cent, cgs.media.connectionShader );
-		return;
-	}
-
-	if ( cent->currentState.eFlags & EF_TALK ) {
-		CG_PlayerFloatSprite( cent, cgs.media.balloonShader );
-		return;
-	}
-
-	if ( cent->currentState.eFlags & EF_AWARD_IMPRESSIVE ) {
-		CG_PlayerFloatSprite( cent, cgs.media.medalImpressive );
-		return;
-	}
-
-	if ( cent->currentState.eFlags & EF_AWARD_EXCELLENT ) {
-		CG_PlayerFloatSprite( cent, cgs.media.medalExcellent );
-		return;
-	}
-
-	if ( cent->currentState.eFlags & EF_AWARD_DEFEND ) {
-		CG_PlayerFloatSprite( cent, cgs.media.medalDefend );
-		return;
-	}
-
-	if ( cent->currentState.eFlags & EF_AWARD_ASSIST ) {
-		CG_PlayerFloatSprite( cent, cgs.media.medalAssist );
-		return;
-	}
-
-	if ( cent->currentState.eFlags & EF_AWARD_CAP ) {
-		CG_PlayerFloatSprite( cent, cgs.media.medalCapture );
-		return;
-	}
-
-/*	team = cgs.clientinfo[ cent->currentState.clientNum ].team;
-	if ( !(cent->currentState.eFlags & EF_DEAD) && 
-		cg.snap->ps.persistant[PERS_TEAM] == team &&
-		cgs.gametype >= GT_TEAM) {
-		if (cg_drawFriend.integer) {
-			CG_PlayerFloatSprite( cent, cgs.media.friendShader );
-		}
-		return;
-	}*/
-}
 
 /*
 =================
