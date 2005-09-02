@@ -1,5 +1,5 @@
 /*
- * $Id: bg_pmove.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: bg_pmove.c,v 1.3 2005-09-02 08:45:17 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -943,13 +943,6 @@ void PmoveSingle (pmove_t *pmove) {
 
 	if( pm->vehicle >= 0 && pm->ps->stats[STAT_HEALTH] <= GIB_HEALTH ) {
 		pm->tracemask &= ~CONTENTS_BODY;	// corpses can fly through bodies
-	}
-
-	// set the talk balloon flag
-	if ( pm->cmd.buttons & BUTTON_TALK ) {
-		pm->ps->eFlags |= EF_TALK;
-	} else {
-		pm->ps->eFlags &= ~EF_TALK;
 	}
 
 	// clear the respawned flag if attack and use are cleared

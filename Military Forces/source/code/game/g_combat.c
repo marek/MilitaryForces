@@ -1,5 +1,5 @@
 /*
- * $Id: g_combat.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: g_combat.c,v 1.3 2005-09-02 08:45:17 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -108,53 +108,6 @@ char * modNames[] = {
 	"MOD_CRASH"
 };
 
-/*
-==================
-CheckAlmostCapture
-==================
-*/
-void CheckAlmostCapture( gentity_t *self, gentity_t *attacker ) {
-	gentity_t	*ent;
-	vec3_t		dir;
-	char		*classname;
-
-	// if this player was carrying a flag
-	if ( self->client->ps.objectives ) {
-		// get the goal flag this player should have been going for
-		if ( g_gametype.integer == GT_CTF ) {
-			if ( self->client->sess.sessionTeam == TEAM_BLUE ) {
-				classname = "team_CTF_blueflag";
-			}
-			else {
-				classname = "team_CTF_redflag";
-			}
-		}
-		else {
-			if ( self->client->sess.sessionTeam == TEAM_BLUE ) {
-				classname = "team_CTF_redflag";
-			}
-			else {
-				classname = "team_CTF_blueflag";
-			}
-		}
-		ent = NULL;
-		do
-		{
-			ent = G_Find(ent, FOFS(classname), classname);
-		} while (ent && (ent->flags & FL_DROPPED_ITEM));
-		// if we found the destination flag and it's not picked up
-		if (ent && !(ent->r.svFlags & SVF_NOCLIENT) ) {
-			// if the player was *very* close
-			VectorSubtract( self->client->ps.origin, ent->s.origin, dir );
-			if ( VectorLength(dir) < 200 ) {
-				self->client->ps.persistant[PERS_PLAYEREVENTS] ^= PLAYEREVENT_HOLYSHIT;
-				if ( attacker->client ) {
-					attacker->client->ps.persistant[PERS_PLAYEREVENTS] ^= PLAYEREVENT_HOLYSHIT;
-				}
-			}
-		}
-	}
-}
 
 /*
 ================
@@ -402,11 +355,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		}
 	}
 
-	// See if it's the player hurting the emeny flag carrier
-	if( g_gametype.integer == GT_CTF) {
-		Team_CheckHurtCarrier(targ, attacker);
-	}
-
 	if (targ->client) {
 		// set the last client who damaged the target
 		targ->client->lasthurt_client = attacker->s.number;
@@ -614,8 +562,6 @@ void Vehicle_Death( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, 
 		return;
 	}
 
-	CheckAlmostCapture( self, attacker );
-
 	if ( attacker ) {
 		killer = attacker->s.number;
 		if ( attacker->client ) {
@@ -682,18 +628,6 @@ void Vehicle_Death( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, 
 
 			}
 
-			// check for two kills in a short amount of time
-			// if this is close enough to the last kill, give a reward sound
-			if ( level.time - attacker->client->lastKillTime < CARNAGE_REWARD_TIME )
-			{
-				// play excellent on player
-				attacker->client->ps.persistant[PERS_EXCELLENT_COUNT]++;
-
-				// add the sprite over the player's head
-				attacker->client->ps.eFlags &= ~(EF_AWARD_IMPRESSIVE | EF_AWARD_EXCELLENT | EF_AWARD_ASSIST | EF_AWARD_DEFEND | EF_AWARD_CAP );
-				attacker->client->ps.eFlags |= EF_AWARD_EXCELLENT;
-				attacker->client->rewardTime = level.time + REWARD_SPRITE_TIME;
-			}
 			attacker->client->lastKillTime = level.time;
 		}
 	}

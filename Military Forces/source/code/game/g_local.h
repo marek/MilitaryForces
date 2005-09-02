@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.5 2005-09-02 08:00:21 thebjoern Exp $
+ * $Id: g_local.h,v 1.6 2005-09-02 08:45:17 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -21,8 +21,6 @@
 
 #define	FRAMETIME			100					// msec
 #define	EVENT_VALID_MSEC	300
-#define	CARNAGE_REWARD_TIME	3000
-#define REWARD_SPRITE_TIME	2000
 
 #define	INTERMISSION_DELAY_TIME	1000
 #define	SP_INTERMISSION_DELAY_TIME	5000
@@ -324,8 +322,7 @@ struct gclient_s {
 	// timers
 	int			respawnTime;		// can respawn when time > this, force after g_forcerespwan
 	int			inactivityTime;		// kick players when time > this
-	bool	inactivityWarning;	// true if the five seoond warning has been given
-	int			rewardTime;			// clear the EF_AWARD_IMPRESSIVE, etc when time > this
+	bool		inactivityWarning;	// true if the five seoond warning has been given
 
 	int			airOutTime;
 

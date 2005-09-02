@@ -1,5 +1,5 @@
 /*
- * $Id: g_active.c,v 1.4 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: g_active.c,v 1.5 2005-09-02 08:45:17 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -288,8 +288,6 @@ void NotSelectedThink( gentity_t *ent, usercmd_t *ucmd ) {
 	
 	client = ent->client;
 
-	client->ps.eFlags &= ~EF_TALK;
-
 	client->ps.pm_type = PM_FREEZE;
 	client->ps.speed = 0;
 	
@@ -457,7 +455,6 @@ ClientIntermissionThink
 ====================
 */
 void ClientIntermissionThink( gclient_t *client ) {
-	client->ps.eFlags &= ~EF_TALK;
 
 	// the level will exit when everyone wants to or after timeouts
 
@@ -730,11 +727,6 @@ void ClientThink_real( gentity_t *ent ) {
 		return;
 	}
 
-	// clear the rewards if time
-	if ( level.time > client->rewardTime ) {
-		client->ps.eFlags &= ~(EF_AWARD_IMPRESSIVE | EF_AWARD_EXCELLENT | EF_AWARD_ASSIST | EF_AWARD_DEFEND | EF_AWARD_CAP );
-	}
-	
 	if ( client->noclip ) {
 		client->ps.pm_type = PM_NOCLIP;
 	} else if ( client->ps.stats[STAT_HEALTH] <= 0 ) {

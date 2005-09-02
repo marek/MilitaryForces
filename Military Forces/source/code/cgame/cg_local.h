@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.11 2005-09-02 08:00:21 thebjoern Exp $
+ * $Id: cg_local.h,v 1.12 2005-09-02 08:45:17 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1354,7 +1354,6 @@ bool CG_NewHUDActive( void );
 //
 void CG_NewClientInfo( int clientNum );
 sfxHandle_t	CG_CustomSound( int clientNum, const char *soundName );
-void CG_PlayerSprites( centity_t *cent );   // MFQ3 needed it non-static
 void CG_TrailItem( centity_t *cent, qhandle_t hModel );	// ditto
 
 //

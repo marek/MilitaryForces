@@ -1,5 +1,5 @@
 /*
- * $Id: g_cmds.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: g_cmds.c,v 1.3 2005-09-02 08:45:17 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -57,11 +57,11 @@ void DeathmatchScoreboardMessage( gentity_t *ent ) {
 			scoreFlags,
 			g_entities[level.sortedClients[i]].s.objectives,
 			accuracy, 
-			cl->ps.persistant[PERS_IMPRESSIVE_COUNT],
-			cl->ps.persistant[PERS_EXCELLENT_COUNT],
 			0,
-			cl->ps.persistant[PERS_DEFEND_COUNT], 
-			cl->ps.persistant[PERS_ASSIST_COUNT], 
+			0,
+			0,
+			0, 
+			0, 
 			perfect,
 			cl->ps.persistant[PERS_CAPTURES],
 			cl->ps.persistant[PERS_DEATHS] );
