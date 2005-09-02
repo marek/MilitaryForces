@@ -29,6 +29,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *****************************************************************************/
 
+#ifndef __L_LOG_H__
+#define __L_LOG_H__
+
 //open a log file
 void Log_Open(char *filename);
 //close the current log file
@@ -44,3 +47,5 @@ FILE *Log_FilePointer(void);
 //flush log file
 void Log_Flush(void);
 
+
+#endif // __L_LOG_H__

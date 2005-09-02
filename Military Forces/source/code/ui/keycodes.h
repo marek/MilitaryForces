@@ -1,5 +1,5 @@
 /*
- * $Id: keycodes.h,v 1.1 2005-08-22 16:15:27 thebjoern Exp $
+ * $Id: keycodes.h,v 1.2 2005-09-02 08:00:21 thebjoern Exp $
 */
 #ifndef __KEYCODES_H__
 #define __KEYCODES_H__
@@ -141,4 +141,4 @@ typedef enum {
 // distinguished by or'ing in K_CHAR_FLAG (ugly)
 #define	K_CHAR_FLAG		1024
 
-#endif
+#endif	// __KEYCODES_H__

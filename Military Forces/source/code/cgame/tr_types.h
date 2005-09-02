@@ -1,11 +1,11 @@
 /*
- * $Id: tr_types.h,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: tr_types.h,v 1.3 2005-09-02 08:00:21 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
 //
-#ifndef __TR_TYPES_H
-#define __TR_TYPES_H
+#ifndef __TR_TYPES_H__
+#define __TR_TYPES_H__
 
 
 #define	MAX_DLIGHTS		32			// can't be increased, because bit flags are used on surfaces
@@ -200,4 +200,4 @@ typedef struct {
 #endif	// !defined _WIN32
 
 
-#endif	// __TR_TYPES_H
+#endif	// __TR_TYPES_H__

@@ -1,10 +1,13 @@
 /*
- * $Id: bg_local.h,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: bg_local.h,v 1.3 2005-09-02 08:00:21 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
 //
 // bg_local.h -- local definitions for the bg (both games) files
+
+#ifndef __BG_LOCAL_H__
+#define __BG_LOCAL_H__
 
 #define	OVERCLIP		1.001f
 
@@ -62,3 +65,4 @@ bool	PM_SlideMove( bool gravity );
 void		PM_StepSlideMove( bool gravity );
 
 
+#endif // __BG_LOCAL_H__

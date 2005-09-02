@@ -1,9 +1,12 @@
 /*
- * $Id: cg_local.h,v 1.10 2005-09-02 06:27:57 minkis Exp $
+ * $Id: cg_local.h,v 1.11 2005-09-02 08:00:21 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
 //
+#ifndef __CG_LOCAL_H__
+#define __CG_LOCAL_H__
+
 #include "../game/q_shared.h"
 #include "../qcommon/qfiles.h"
 #include "tr_types.h"
@@ -1848,3 +1851,4 @@ typedef struct particleWorld_s					// Usualy only one world;
 } particleWorld_t;
 
 
+#endif // __CG_LOCAL_H__

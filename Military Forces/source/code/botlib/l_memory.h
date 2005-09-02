@@ -29,6 +29,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *****************************************************************************/
 
+#ifndef __L_MEMORY_H__
+#define __L_MEMORY_H__
+
 //#define MEMDEBUG
 
 #ifdef MEMDEBUG
@@ -74,3 +77,5 @@ void PrintMemoryLabels(void);
 int MemoryByteSize(void *ptr);
 //free all allocated memory
 void DumpMemory(void);
+
+#endif // __L_MEMORY_H__

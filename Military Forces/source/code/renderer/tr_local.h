@@ -21,8 +21,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 
-#ifndef TR_LOCAL_H
-#define TR_LOCAL_H
+#ifndef __TR_LOCAL_H__
+#define __TR_LOCAL_H__
 
 #include "../game/q_shared.h"
 #include "../qcommon/qfiles.h"
@@ -1606,4 +1606,4 @@ void R_DoneFreeType();
 void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font);
 
 
-#endif //TR_LOCAL_H
+#endif //__TR_LOCAL_H__

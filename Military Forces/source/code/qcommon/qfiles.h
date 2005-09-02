@@ -485,4 +485,5 @@ typedef struct {
 } dsurface_t;
 
 
-#endif
+#endif // __QFILES_H__
+

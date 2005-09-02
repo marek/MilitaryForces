@@ -1,8 +1,8 @@
 /*
- * $Id: ui_shared.h,v 1.3 2005-08-31 19:20:23 thebjoern Exp $
+ * $Id: ui_shared.h,v 1.4 2005-09-02 08:00:21 thebjoern Exp $
 */
-#ifndef __UI_SHARED_H
-#define __UI_SHARED_H
+#ifndef __UI_SHARED_H__
+#define __UI_SHARED_H__
 
 
 #include "../game/q_shared.h"
@@ -546,4 +546,4 @@ void DrawStringNewAlpha( int x, int y, const char * pText, float alpha, textJust
 void DrawStringNewColour( int x, int y, const char * pText, vec4_t colour, textJustify_t formatting );
 void DrawStringNewBasic( int x, int y, float scale, const char * pText );
 
-#endif
+#endif	// __UI_SHARED_H__

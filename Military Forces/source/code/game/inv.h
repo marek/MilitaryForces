@@ -1,6 +1,9 @@
 /*
- * $Id: inv.h,v 1.1 2005-08-22 16:07:29 thebjoern Exp $
+ * $Id: inv.h,v 1.2 2005-09-02 08:00:21 thebjoern Exp $
 */
+
+#ifdef __INV_H__
+#define __INV_H__
 
 #define INVENTORY_NONE				0
 //ammo
@@ -46,3 +49,6 @@
 #define WEAPONINDEX_IRONBOMB			2
 #define WEAPONINDEX_AUTOCANNON			3
 #define WEAPONINDEX_MAINGUN				4
+
+
+#endif // __INV_H__

@@ -47,5 +47,6 @@ typedef struct
 } glwstate_t;
 
 extern glwstate_t glw_state;
+	
+#endif	// __GLW_WIN_H__
 
-#endif

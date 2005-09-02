@@ -1,5 +1,5 @@
 /*
- * $Id: surfaceflags.h,v 1.1 2005-08-22 16:07:48 thebjoern Exp $
+ * $Id: surfaceflags.h,v 1.2 2005-09-02 08:00:21 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -10,6 +10,9 @@
 // a given brush can contribute multiple content bits
 
 // these definitions also need to be in q_shared.h!
+
+#ifndef __SURFACEFLAGS_H__
+#define __SURFACEFLAGS_H__
 
 #define	CONTENTS_SOLID			1		// an eye is never valid in a solid
 #define	CONTENTS_LAVA			8
@@ -58,3 +61,7 @@
 #define	SURF_ALPHASHADOW		0x10000	// do per-pixel light shadow casting in q3map
 #define	SURF_NODLIGHT			0x20000	// don't dlight even if solid (solid lava, skies)
 #define SURF_DUST				0x40000 // leave a dust trail when walking on this surface
+
+
+#endif // __SURFACEFLAGS_H__
+

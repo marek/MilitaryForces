@@ -1,14 +1,18 @@
 /*
- * $Id: g_local.h,v 1.4 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: g_local.h,v 1.5 2005-09-02 08:00:21 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
 //
 // g_local.h -- local definitions for game module
 
+#ifndef __G_LOCAL_H__
+#define __G_LOCAL_H__
+
 #include "q_shared.h"
 #include "../qcommon/qfiles.h"
 #include "bg_public.h"
+#include "bg_vehicle.h"
 #include "g_public.h"
 
 //==================================================================
@@ -1098,3 +1102,7 @@ int		trap_GeneticParentsAndChildSelection(int numranks, float *ranks, int *paren
 
 void	trap_SnapVector( float *v );
 
+
+
+
+#endif //__G_LOCAL_H__

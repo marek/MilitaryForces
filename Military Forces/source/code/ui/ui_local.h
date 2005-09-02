@@ -1,5 +1,5 @@
 /*
- * $Id: ui_local.h,v 1.3 2005-08-31 19:20:23 thebjoern Exp $
+ * $Id: ui_local.h,v 1.4 2005-09-02 08:00:21 thebjoern Exp $
 */
 //
 #ifndef __UI_LOCAL_H__
@@ -1122,4 +1122,5 @@ unsigned int MF_UI_GetTeam( void );
 unsigned long MF_UI_GetGameset( bool asEnum );
 unsigned long MF_UI_Gameset_StringToValue( char * pString, bool asEnum );
 
-#endif
+#endif	// __UI_LOCAL_H__
+

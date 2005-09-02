@@ -1,5 +1,5 @@
 /*
- * $Id: ui_public.h,v 1.2 2005-08-31 19:20:23 thebjoern Exp $
+ * $Id: ui_public.h,v 1.3 2005-09-02 08:00:21 thebjoern Exp $
 */
 #ifndef __UI_PUBLIC_H__
 #define __UI_PUBLIC_H__
@@ -168,4 +168,4 @@ typedef enum {
 // a GetClientState syscall will be made to get the current strings
 } uiExport_t;
 
-#endif
+#endif	// __UI_PUBLIC_H__

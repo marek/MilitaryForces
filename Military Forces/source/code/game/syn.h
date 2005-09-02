@@ -1,5 +1,5 @@
 /*
- * $Id: syn.h,v 1.1 2005-08-22 16:07:48 thebjoern Exp $
+ * $Id: syn.h,v 1.2 2005-09-02 08:00:21 thebjoern Exp $
 */
 
 //===========================================================================
@@ -11,6 +11,9 @@
 // Tab Size:		4 (real tabs)
 // Notes:			-
 //===========================================================================
+
+#ifndef __SYN_H__
+#define __SYN_H__
 
 #define CONTEXT_ALL						0xFFFFFFFF
 #define CONTEXT_NORMAL					1
@@ -24,3 +27,5 @@
 #define CONTEXT_HARVESTERBLUETEAM		256
 
 #define CONTEXT_NAMES 1024
+
+#endif // __SYN_H__

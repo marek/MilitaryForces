@@ -29,6 +29,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *****************************************************************************/
 
+#ifndef __BE_INTERFACE_H__
+#define __BE_INTERFACE_H__
+
 //#define DEBUG			//debug code
 #define RANDOMIZE		//randomize bot behaviour
 
@@ -55,3 +58,5 @@ extern int bot_developer;					//true if developer is on
 //
 int Sys_MilliSeconds(void);
 
+
+#endif // __BE_INTERFACE_H__
