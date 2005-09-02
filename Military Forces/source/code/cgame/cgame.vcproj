@@ -343,6 +343,9 @@
 				RelativePath=".\cg_missioneditor.c">
 			</File>
 			<File
+				RelativePath=".\cg_particles.c">
+			</File>
+			<File
 				RelativePath=".\cg_plane.c">
 			</File>
 			<File
