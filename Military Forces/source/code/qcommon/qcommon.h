@@ -20,8 +20,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 // qcommon.h -- definitions common between client and server, but not game.or ref modules
-#ifndef _QCOMMON_H_
-#define _QCOMMON_H_
+#ifndef __QCOMMON_H__
+#define __QCOMMON_H__
 
 #include "../qcommon/cm_public.h"
 
@@ -1064,4 +1064,4 @@ extern huffman_t clientHuffTables;
 #define	CL_ENCODE_START		12
 #define CL_DECODE_START		4
 
-#endif // _QCOMMON_H_
+#endif // __QCOMMON_H__

@@ -29,6 +29,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *****************************************************************************/
 
+#ifndef __L_STRUCT_H__
+#define __L_STRUCT_H__
 
 #define MAX_STRINGFIELD				80
 //field types
@@ -73,3 +75,4 @@ int WriteIndent(FILE *fp, int indent);
 int WriteFloat(FILE *fp, float value);
 
 
+#endif // __L_STRUCT_H__

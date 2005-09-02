@@ -1,3 +1,6 @@
+#ifndef __RESOURCE_H__
+#define __RESOURCE_H__
+
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
 // Used by winquake.rc
@@ -20,5 +23,8 @@
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         1005
 #define _APS_NEXT_SYMED_VALUE           101
-#endif
-#endif
+#endif	// APSTUDIO_READONLY_SYMBOLS
+#endif	// APSTUDIO_INVOKED
+
+
+#endif //__RESOURCE_H__

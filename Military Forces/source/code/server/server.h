@@ -21,6 +21,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // server.h
 
+#ifndef __SERVER_H__
+#define __SERVER_H__
+
 #include "../game/q_shared.h"
 #include "../qcommon/qcommon.h"
 #include "../game/g_public.h"
@@ -403,3 +406,4 @@ void SV_Netchan_Transmit( client_t *client, msg_t *msg);
 void SV_Netchan_TransmitNextFragment( client_t *client );
 bool SV_Netchan_Process( client_t *client, msg_t *msg );
 
+#endif // __SERVER_H__

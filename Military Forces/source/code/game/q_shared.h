@@ -20,13 +20,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 //
-#ifndef __Q_SHARED_H
-#define __Q_SHARED_H
+#ifndef __Q_SHARED_H__
+#define __Q_SHARED_H__
 
 // q_shared.h -- included first by ALL program modules.
 // A user mod should never modify this file
 
-#define	Q3_VERSION		"MF 1.02b"
+#define	Q3_VERSION		"MF 1.02c"
 
 #define MAX_TEAMNAME 32
 
@@ -1618,4 +1618,4 @@ int ahextoi( const char* string );
 
 
 
-#endif	// __Q_SHARED_H
+#endif	// __Q_SHARED_H__

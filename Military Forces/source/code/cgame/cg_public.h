@@ -1,9 +1,12 @@
 /*
- * $Id: cg_public.h,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: cg_public.h,v 1.3 2005-09-02 08:00:21 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
 //
+
+#ifndef __CG_PUBLIC_H__
+#define __CG_PUBLIC_H__
 
 
 #define	CMD_BACKUP			64	
@@ -214,3 +217,5 @@ typedef enum {
 } cgameExport_t;
 
 // ----------------------------------------------
+
+#endif // __CG_PUBLIC_H__

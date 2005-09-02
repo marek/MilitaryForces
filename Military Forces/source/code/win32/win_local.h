@@ -21,6 +21,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // win_local.h: Win32-specific Quake3 header file
 
+#ifndef __WIN_LOCAL_H__
+#define __WIN_LOCAL_H__
+
 #if defined (_MSC_VER) && (_MSC_VER >= 1200)
 #pragma warning(disable : 4201)
 #pragma warning( push )
@@ -93,3 +96,6 @@ typedef struct
 } WinVars_t;
 
 extern WinVars_t	g_wv;
+
+
+#endif // __WIN_LOCAL_H__

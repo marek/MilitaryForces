@@ -29,6 +29,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *****************************************************************************/
 
+#ifndef __BOTLIB_H__
+#define __BOTLIB_H__
+
 #define	BOTLIB_API_VERSION		2
 
 struct aas_clientmove_s;
@@ -514,3 +517,4 @@ name:						default:			module(s):			description:
 
 */
 
+#endif // __BOTLIB_H__

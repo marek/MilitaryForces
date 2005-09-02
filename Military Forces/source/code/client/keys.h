@@ -19,6 +19,9 @@ along with Foobar; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
+#ifndef __KEYS_H__
+#define __KEYS_H__
+
 #include "../ui/keycodes.h"
 
 #define	MAX_KEYS		256
@@ -55,3 +58,6 @@ bool Key_GetOverstrikeMode( void );
 void Key_SetOverstrikeMode( bool state );
 void Key_ClearStates( void );
 int Key_GetKey(const char *binding);
+
+
+#endif // __KEYS_H__

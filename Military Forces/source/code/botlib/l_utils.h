@@ -28,8 +28,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  * $Archive: /source/code/botlib/l_util.h $
  *
  *****************************************************************************/
+#ifndef __L_UTIL_H__
+#define __L_UTIL_H__
 
 #define Vector2Angles(v,a)		vectoangles(v,a)
 #define MAX_PATH				MAX_QPATH
 #define Maximum(x,y)			(x > y ? x : y)
 #define Minimum(x,y)			(x < y ? x : y)
+
+#endif __L_UTIL_H__

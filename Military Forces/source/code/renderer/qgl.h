@@ -569,4 +569,4 @@ extern void (*qglXSwapBuffers)( Display *dpy, GLXDrawable drawable );
 
 #endif	// _WIN32 && __linux__
 
-#endif
+#endif	// __QGL_H__

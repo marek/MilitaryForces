@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.11 2005-09-01 12:36:45 thebjoern Exp $
+ * $Id: bg_public.h,v 1.12 2005-09-02 08:00:21 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,10 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#define	GAME_VERSION		"v0.8b"
+#ifndef __BG_PUBLIC_H__
+#define __BG_PUBLIC_H__
+
+#define	GAME_VERSION		"v0.8c"
 #define	GAME_IDENTIFIER		"mfgame"			// use to identify mfq3 servers
 
 #define	DEFAULT_GRAVITY		800.0f
@@ -785,7 +788,7 @@ enum ShadowOrientationAdjusts {
 #define MAX_LOADOUTS			100
 #define MAX_MOUNTS_PER_VEHICLE	32
 
-typedef struct mountInfo_s
+struct mountInfo_t
 {
 	int			pos;	// pos on the wing
 	int			group;	// group if any
@@ -794,18 +797,18 @@ typedef struct mountInfo_s
 	md3Tag_t	tag;	// tag
 	int			weapon;	// what is actually on
 	int			num;	// how many are actually on
-} mountInfo_t;
+};
 
-typedef struct completeLoadout_s
+struct completeLoadout_t
 {
 	mountInfo_t	mounts[MAX_MOUNTS_PER_VEHICLE];
 	int			usedMounts;
 	animation_t	animations[MAX_TOTALANIMATIONS];
-} completeLoadout_t;
+};
 
 
 // list of vehicles (data)
-typedef struct completeVehicleData_s
+struct completeVehicleData_t
 {
     char		    *descriptiveName;	// long descriptive name
 	char			*tinyName;			// small ident name
@@ -855,7 +858,7 @@ typedef struct completeVehicleData_s
 	vec4_t			shadowCoords;	// shadow apply coords { offsetX, offsetY, xAdjust, yAdjust }
 	vec4_t			shadowAdjusts;	// shadow apply adjustments { pitchMax, rollMax, pitchMod, rollMod }
 	animation_t		*animations;	// Animation pointer
-}completeVehicleData_t;
+};
 
 extern completeVehicleData_t availableVehicles[];
 
@@ -865,7 +868,7 @@ extern int bg_numberOfVehicles;
 extern completeLoadout_t availableLoadouts[MAX_LOADOUTS];
 
 // types of weapons
-typedef enum {
+enum weaponType_t {
 	WT_MACHINEGUN,
 	WT_BALLISTICGUN,
 	WT_ROCKET,
@@ -882,7 +885,7 @@ typedef enum {
 	WT_FUELCRATE,
 	WT_AMMOCRATE,
 	WT_HEALTHCRATE
-}weaponType_t;
+};
 
 // weaponflags
 #define	WF_NONE						0
@@ -891,7 +894,7 @@ typedef enum {
 
 
 // list of ground installations
-typedef struct groundInstallationData_s
+struct groundInstallationData_t
 {
     char		    *descriptiveName;	// long descriptive name
 	char			*tinyName;			// small ident name
@@ -912,7 +915,7 @@ typedef struct groundInstallationData_s
 	float			trackCone2;		// how can ground radar track it
 	unsigned int	upgrades;		// for larger models (for double, triple etc load);
 	int				reloadTime;		// how long after last firing it takes to reload a weapon
-} groundInstallationData_t;
+};
 
 extern groundInstallationData_t availableGroundInstallations[];
 
@@ -921,7 +924,7 @@ extern int bg_numberOfGroundInstallations;
 
 
 // list of weapons
-typedef struct completeWeaponData_s
+struct completeWeaponData_t
 {
 	weaponType_t	type;				// behaviour
 	unsigned int	gameset;			// in which epoche can it appear
@@ -959,7 +962,7 @@ typedef struct completeWeaponData_s
 	unsigned int	fitsPylon;			// on which type of pylon does this go 
 	unsigned int	basicECMVulnerability;// how likely in percent to be distracted
 	unsigned int	flags;
-}completeWeaponData_t;
+};
 
 
 // list of weapons...
@@ -969,7 +972,7 @@ extern completeWeaponData_t	availableWeapons[];
 extern int bg_numberOfWeapons;
 
 // ...and their index (make sure in symc with availableWeapons[] !!
-typedef enum
+enum weaponIndex_t
 {
 	WI_NONE,			// 0
 	WI_MG_2XCAL303,
@@ -1031,39 +1034,39 @@ typedef enum
 	WI_NM1MT,
 	WI_FLAK,
 	WI_MAX
-}weaponIndex_t;
+};
 
 
 // IGME
 #define IGME_MAX_VEHICLES		64
 #define IGME_MAX_WAYPOINTS		32
 
-typedef struct mission_waypoint_s {
+struct mission_waypoint_t {
 	bool		used;
 	vec3_t			origin;
-}mission_waypoint_t;
+};
 
 // mission scripts
-typedef struct mission_overview_s {
+struct mission_overview_t {
 	char			mapname[MAX_NAME_LENGTH];
 	int				gameset;
 	int				gametype;			
 	char			missionname[MAX_NAME_LENGTH];
 	char			objective[MAX_NAME_LENGTH];
 	bool		valid;
-}mission_overview_t;
+};
 
-typedef struct mission_groundInstallation_s {
+struct mission_groundInstallation_t {
 	bool		used;
 	int				index;
 	char			objectname[MAX_NAME_LENGTH];
 	char			teamname[MAX_NAME_LENGTH];
 	vec3_t			origin;
 	vec3_t			angles;
-}mission_groundInstallation_t;
+};
 
 
-typedef struct mission_vehicle_s {
+struct mission_vehicle_t {
 	bool		used;
 	int				index;
 	char			objectname[MAX_NAME_LENGTH];
@@ -1071,7 +1074,7 @@ typedef struct mission_vehicle_s {
 	vec3_t			origin;
 	vec3_t			angles;
 	mission_waypoint_t waypoints[IGME_MAX_WAYPOINTS];
-}mission_vehicle_t;
+};
 
 
 
@@ -1237,3 +1240,6 @@ typedef enum {
 #define NUKE_SHOCKWAVE_MAXRADIUS		1000
 #define NUKE_SHOCKWAVE2_MAXRADIUS		1000
 
+
+
+#endif // __BG_PUBLIC_H__

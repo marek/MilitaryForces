@@ -28,6 +28,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  * $Archive: /source/code/botlib/l_precomp.h $
  *
  *****************************************************************************/
+#ifndef __L_PRECOMP_H__
+#define __L_PRECOMP_H__
 
 #ifndef MAX_PATH
 	#define MAX_PATH			MAX_QPATH
@@ -178,3 +180,5 @@ int PC_FreeSourceHandle(int handle);
 int PC_ReadTokenHandle(int handle, pc_token_t *pc_token);
 int PC_SourceFileAndLine(int handle, char *filename, int *line);
 void PC_CheckOpenSourceHandles(void);
+
+#endif // __L_PRECOMP_H__

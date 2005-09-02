@@ -19,6 +19,10 @@ along with Foobar; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
+
+#ifndef __VM_LOCAL_H__
+#define __VM_LOCAL_H__
+
 #include "../game/q_shared.h"
 #include "qcommon.h"
 
@@ -178,3 +182,5 @@ int VM_SymbolToValue( vm_t *vm, const char *symbol );
 const char *VM_ValueToSymbol( vm_t *vm, int value );
 void VM_LogSyscalls( int *args );
 
+
+#endif // __VM_LOCAL_H__

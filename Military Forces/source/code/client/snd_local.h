@@ -21,6 +21,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // snd_local.h -- private sound definations
 
+#ifndef __SND_LOCAL_H__
+#define __SND_LOCAL_H__
 
 #include "../game/q_shared.h"
 #include "../qcommon/qcommon.h"
@@ -202,3 +204,5 @@ extern short *sfxScratchBuffer;
 extern sfx_t *sfxScratchPointer;
 extern int	   sfxScratchIndex;
 
+
+#endif // __SND_LOCAL_H__

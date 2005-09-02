@@ -1,9 +1,12 @@
 /*
- * $Id: g_team.h,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: g_team.h,v 1.3 2005-09-02 08:00:21 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
 //
+
+#ifndef __G_TEAM_H__
+#define __G_TEAM_H__
 
 #define CTF_CAPTURE_BONUS		5		// what you get for capture
 #define CTF_TEAM_BONUS			0		// what your team gets for capture
@@ -51,3 +54,6 @@ void TeamplayInfoMessage( gentity_t *ent );
 void CheckTeamStatus(void);
 
 int Pickup_Team( gentity_t *ent, gentity_t *other );
+
+
+#endif // __G_TEAM_H__

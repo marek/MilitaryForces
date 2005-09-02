@@ -1,11 +1,14 @@
 /*
- * $Id: g_public.h,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: g_public.h,v 1.3 2005-09-02 08:00:21 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
 //
 
 // g_public.h -- game module information visible to server
+
+#ifndef __G_PUBLIC_H__
+#define __G_PUBLIC_H__
 
 #define	GAME_API_VERSION	8
 
@@ -406,3 +409,4 @@ typedef enum {
 	BOTAI_START_FRAME				// ( int time );
 } gameExport_t;
 
+#endif // __G_PUBLIC_H__

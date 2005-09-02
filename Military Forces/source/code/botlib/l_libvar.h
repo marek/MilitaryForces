@@ -29,6 +29,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *****************************************************************************/
 
+#ifndef __L_LIBVAR_H__
+#define __L_LIBVAR_H__
+
 //library variable
 typedef struct libvar_s
 {
@@ -61,3 +64,4 @@ bool LibVarChanged(char *var_name);
 //sets the library variable to unmodified
 void LibVarSetNotModified(char *var_name);
 
+#endif // __L_LIBVAR_H__

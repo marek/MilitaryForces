@@ -1,6 +1,9 @@
 /*
- * $Id: menudef.h,v 1.1 2005-08-22 16:15:27 thebjoern Exp $
+ * $Id: menudef.h,v 1.2 2005-09-02 08:00:21 thebjoern Exp $
 */
+
+#ifndef __MENUDEF_H__
+#define __MENUDEF_H__
 
 #define ITEM_TYPE_TEXT 0                  // simple text
 #define ITEM_TYPE_BUTTON 1                // button, basically text with a border 
@@ -296,3 +299,6 @@
 #define VOICECHAT_DEATHINSULT		"death_insult"			// you just killed me
 #define VOICECHAT_KILLGAUNTLET		"kill_gauntlet"			// I just killed you with the gauntlet
 #define VOICECHAT_PRAISE			"praise"				// you did something good
+
+
+#endif // __MENUDEF_H__

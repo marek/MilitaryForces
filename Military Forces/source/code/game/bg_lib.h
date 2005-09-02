@@ -3,6 +3,9 @@
 
 // This file is NOT included on native builds
 
+#ifndef __BG_LIB_H__
+#define __BG_LIB_H__
+
 typedef int size_t;
 
 typedef char *  va_list;
@@ -72,3 +75,4 @@ double acos( double x );
 
 
 
+#endif // __BG_LIB_H__

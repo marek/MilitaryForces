@@ -19,8 +19,8 @@ along with Foobar; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
-#ifndef __SPLINES_H
-#define __SPLINES_H
+#ifndef __SPLINES_H__
+#define __SPLINES_H__
 
 extern "C" {
 #ifdef Q3RADIANT
@@ -1072,4 +1072,4 @@ extern bool g_splineMode;
 extern idCameraDef *g_splineList;
 
 
-#endif
+#endif	// __SPLINES_H__

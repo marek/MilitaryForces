@@ -419,6 +419,9 @@
 				RelativePath=".\bg_public.h">
 			</File>
 			<File
+				RelativePath=".\bg_vehicle.h">
+			</File>
+			<File
 				RelativePath=".\g_local.h">
 			</File>
 			<File
