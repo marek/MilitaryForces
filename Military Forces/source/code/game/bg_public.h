@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.13 2005-09-02 08:45:17 thebjoern Exp $
+ * $Id: bg_public.h,v 1.14 2005-09-05 11:30:08 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -629,7 +629,8 @@ bool	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTime );
 #define	CLASS_GROUND_RECON			  0x0002 
 #define	CLASS_GROUND_APC			  0x0004 
 #define	CLASS_GROUND_SAM			  0x0008 
-#define	CLASS_GROUND_MAX			  0x0008
+#define	CLASS_GROUND_ARTY			  0x0016 
+#define	CLASS_GROUND_MAX			  0x0016
 
 // LQM classes					
 #define CLASS_LQM_SPECIAL			  0x0001 
@@ -852,6 +853,7 @@ extern completeLoadout_t availableLoadouts[MAX_LOADOUTS];
 
 // types of weapons
 enum weaponType_t {
+	WT_NONE = -1,
 	WT_MACHINEGUN,
 	WT_BALLISTICGUN,
 	WT_ROCKET,

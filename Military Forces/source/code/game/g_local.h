@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.6 2005-09-02 08:45:17 thebjoern Exp $
+ * $Id: g_local.h,v 1.7 2005-09-05 11:30:08 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -12,7 +12,7 @@
 #include "q_shared.h"
 #include "../qcommon/qfiles.h"
 #include "bg_public.h"
-#include "bg_vehicle.h"
+//#include "bg_vehicleinfo.h"
 #include "g_public.h"
 
 //==================================================================

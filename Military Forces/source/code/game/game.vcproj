@@ -405,6 +405,49 @@
 			<File
 				RelativePath=".\q_shared.c">
 			</File>
+			<Filter
+				Name="DataManagment"
+				Filter="">
+				<File
+					RelativePath=".\bg_datamanager.cpp">
+				</File>
+				<File
+					RelativePath=".\bg_vehicleextra.cpp">
+				</File>
+				<File
+					RelativePath=".\bg_vehicleinfo.cpp">
+				</File>
+				<File
+					RelativePath=".\bg_vehicleinfo_boats.cpp">
+				</File>
+				<File
+					RelativePath=".\bg_vehicleinfo_ground.cpp">
+				</File>
+				<File
+					RelativePath=".\bg_vehicleinfo_helos.cpp">
+				</File>
+				<File
+					RelativePath=".\bg_vehicleinfo_infantry.cpp">
+				</File>
+				<File
+					RelativePath=".\bg_vehicleinfo_planes.cpp">
+				</File>
+				<File
+					RelativePath=".\bg_weaponinfo.cpp">
+				</File>
+				<File
+					RelativePath=".\bg_weaponinfo_bombs.cpp">
+				</File>
+				<File
+					RelativePath=".\bg_weaponinfo_guns.cpp">
+				</File>
+				<File
+					RelativePath=".\bg_weaponinfo_missiles.cpp">
+				</File>
+				<File
+					RelativePath=".\bg_weaponinfo_other.cpp">
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -417,9 +460,6 @@
 			</File>
 			<File
 				RelativePath=".\bg_public.h">
-			</File>
-			<File
-				RelativePath=".\bg_vehicle.h">
 			</File>
 			<File
 				RelativePath=".\g_local.h">
@@ -442,6 +482,22 @@
 			<File
 				RelativePath=".\syn.h">
 			</File>
+			<Filter
+				Name="DataManagment"
+				Filter="">
+				<File
+					RelativePath=".\bg_datamanager.h">
+				</File>
+				<File
+					RelativePath=".\bg_vehicleextra.h">
+				</File>
+				<File
+					RelativePath=".\bg_vehicleinfo.h">
+				</File>
+				<File
+					RelativePath=".\bg_weaponinfo.h">
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Resource Files"
