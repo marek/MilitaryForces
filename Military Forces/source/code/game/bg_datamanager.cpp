@@ -98,6 +98,7 @@ DataManager::addWeaponToLoadout( Loadout& loadout,
 								 std::string const& lookupName,
 								 std::string const& displayName,
 								 int maxAmmo,
+								 unsigned int selectionType,
 								 int turret,
 								 bool limitedAngles,
 								 vec3_t minAngles,
@@ -113,6 +114,7 @@ DataManager::addWeaponToLoadout( Loadout& loadout,
 	arm.displayName_ = displayName;
 	arm.maxAmmo_ = maxAmmo;
 	arm.weaponIndex_ = idx;
+	arm.selectionType_ = selectionType;
 	arm.limitedAngles_ = limitedAngles;
 	VectorCopy( minAngles, arm.minAngles_ );
 	VectorCopy( maxAngles, arm.maxAngles_ );

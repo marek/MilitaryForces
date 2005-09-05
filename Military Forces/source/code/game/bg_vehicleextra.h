@@ -50,9 +50,17 @@ struct Armament
 					Armament();
 					~Armament();
 
+	enum
+	{
+		ST_NOT_SELECTABLE,		// non selectable weapons (who have special buttons, like flares)
+		ST_PRIMARY_WEAPON,		// ie first fire button
+		ST_SECONDARY_WEAPON,	// ie second fire button
+	};
+
 	std::string		displayName_;	// what it is displayed as
 	int				weaponIndex_;	// what weapon is it
 	int				maxAmmo_;		// how much ammo
+	unsigned int	selectionType_;	// primary/secondary/non-selectable
 	int				turret_;		// what turret this is on
 	bool			limitedAngles_;	// if angles somehow limited
 	vec3_t			minAngles_;		// min angles on this turret (if applicable on these axis)

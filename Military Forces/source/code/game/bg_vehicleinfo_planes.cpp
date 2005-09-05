@@ -55,17 +55,17 @@ DataManager::createAllPlanes()
 	allVehicles_.push_back(veh);
 	loadout.clear();
 	allLoadouts.clear();
-	addWeaponToLoadout(loadout, "20mm MG", "MG", 450);
-	addWeaponToLoadout(loadout, "AIM-9 Sidewinder", "AIM-9", 4);
-	addWeaponToLoadout(loadout, "AIM-120 AMRAAM", "AIM-120", 4);
-	addWeaponToLoadout(loadout, "Flares", "Flares", 30);
+	addWeaponToLoadout(loadout, "20mm MG", "MG", 450, Armament::ST_PRIMARY_WEAPON );
+	addWeaponToLoadout(loadout, "AIM-9 Sidewinder", "AIM-9", 4, Armament::ST_SECONDARY_WEAPON );
+	addWeaponToLoadout(loadout, "AIM-120 AMRAAM", "AIM-120", 4, Armament::ST_SECONDARY_WEAPON );
+	addWeaponToLoadout(loadout, "Flares", "Flares", 30, Armament::ST_NOT_SELECTABLE );
 	allLoadouts.push_back(loadout);
 	loadout.clear();
-	addWeaponToLoadout(loadout, "20mm MG", "MG", 450);
-	addWeaponToLoadout(loadout, "AIM-9 Sidewinder", "AIM-9", 2);
-	addWeaponToLoadout(loadout, "AIM-120 AMRAAM", "AIM-120", 2);
-	addWeaponToLoadout(loadout, "Mk-83", "Mk-83", 4);
-	addWeaponToLoadout(loadout, "Flares", "Flares", 30);
+	addWeaponToLoadout(loadout, "20mm MG", "MG", 450, Armament::ST_PRIMARY_WEAPON );
+	addWeaponToLoadout(loadout, "AIM-9 Sidewinder", "AIM-9", 2, Armament::ST_SECONDARY_WEAPON );
+	addWeaponToLoadout(loadout, "AIM-120 AMRAAM", "AIM-120", 2, Armament::ST_SECONDARY_WEAPON );
+	addWeaponToLoadout(loadout, "Mk-83", "Mk-83", 4, Armament::ST_SECONDARY_WEAPON );
+	addWeaponToLoadout(loadout, "Flares", "Flares", 30, Armament::ST_NOT_SELECTABLE );
 	allLoadouts.push_back(loadout);
 
 	// JAS-39

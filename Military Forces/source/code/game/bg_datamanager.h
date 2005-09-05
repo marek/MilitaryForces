@@ -45,6 +45,7 @@ protected:
 												 	std::string const& lookupName,
 													std::string const& displayName,
 													int maxAmmo,
+													unsigned int selectionType,
 													int turret = -1,
 													bool limitedAngles = false,
 													vec3_t minAngles = 0,

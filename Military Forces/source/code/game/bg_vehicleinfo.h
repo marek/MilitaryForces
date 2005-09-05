@@ -11,7 +11,10 @@ struct VehicleInfo
 							VehicleInfo();
 							~VehicleInfo();
 
+	// go through loadouts to make sure they are ok
 	void					verifyLoadouts();
+	std::string				getModelPath( bool extension );
+
 
 	// all vehicles
 	std::string				descriptiveName_;		// long descriptive name
@@ -78,6 +81,9 @@ private:
     // disable
 							VehicleInfo(VehicleInfo const&);
 	VehicleInfo&			operator=(VehicleInfo const&);
+
+	// base path
+	static const std::string baseModelPath;
 };
 
 
