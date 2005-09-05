@@ -9,7 +9,7 @@
 
 
 WeaponInfo::WeaponInfo() :
-	type_(WT_NONE),					
+	type_(WT_NONE),	
 	gameSet_(0),				
 	descriptiveName_(""),
 	modelName_(""),	
