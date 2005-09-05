@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.4 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: bg_mfq3util.c,v 1.5 2005-09-05 11:30:08 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -416,7 +416,6 @@ void MF_LoadAllVehicleData()
 
 				trap_FS_FCloseFile(f);
 				availableVehicles[i].maxGearFrame = num - 1;
-
 				
 				if(!availableVehicles[i].gearheight)
 				{
