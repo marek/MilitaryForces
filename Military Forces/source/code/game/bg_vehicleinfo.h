@@ -48,7 +48,7 @@ struct VehicleInfo
 	unsigned int			acceleration_;	
 	unsigned int			maxFuel_;
 	TurretList				turrets_;
-	MountList				mounts_;				// all mounts it has
+	MountList				mounts_;				// all mounts it has (unloaded)
 
 	// wheeled vehicles
 	int						wheels_;				// how many wheels does it have 
@@ -77,7 +77,7 @@ struct VehicleInfo
 
 protected:
 	// make sure all the weapons actually fit on the mounts
-	void					distributeWeaponsOnMounts(Loadout& loadout);
+	void					createWeaponMounts();
 
 	// get the path of this model
 	std::string				getModelPath( bool extension );
