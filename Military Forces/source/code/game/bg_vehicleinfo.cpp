@@ -4,6 +4,12 @@
 #include "bg_public.h"
 #include "bg_vehicleinfo.h"
 
+// decls
+int		trap_FS_FOpenFile( const char *qpath, fileHandle_t *f, fsMode_t mode );
+void	trap_FS_Read( void *buffer, int len, fileHandle_t f );
+void	trap_FS_FCloseFile( fileHandle_t f );
+
+
 
 const std::string VehicleInfo::baseModelPath = "models/vehicles/";
 
@@ -74,44 +80,44 @@ VehicleInfo::verifyLoadouts()
 void
 VehicleInfo::distributeWeaponsOnMounts(Loadout& loadout)
 {
-//	std::string modelname;
-//	int num = 0, i, j, k;
-//	md3Tag_t tags[MAX_MOUNTS_PER_VEHICLE];
-
-//	if( idx < 0 ) 
-//		return false;
-
 	std::string modelname = getModelPath( true );
 
+	std::vector<md3Tag_t> tagList;
+	if( !getTagsContaining(modelname, "tag_P", tagList) )
+		return;
+
+	for( size_t i = 0; i < tagList.size(); ++i )
+	{
+		VehicleMountInfo newMount(tagList[i]);
+		mounts_.push_back(newMount);
+	}
+
 //#ifdef _DEBUG
-//	Com_Printf( "Calculating weapon stations for %s\n", availableVehicles[idx].tinyName );
+//	Com_Printf( "%s has %d mounts\n", descriptiveName_.c_str(), mounts_.size() );
 //#endif
 
-	//num = MF_getTagsContaining(modelname, "tag_P", tags, MAX_MOUNTS_PER_VEHICLE );
-	//if( !num ) return false;
+	// set up
+	for( size_t i = 0; i < mounts_.size(); ++i )
+	{
+		if( strlen( mounts_[i].tag_.name ) < 12 )
+			return;
+		mounts_[i].position_ = ahextoi( va("0x%c", mounts_[i].tag_.name[5]) );
+		mounts_[i].group_ = ahextoi( va("0x%c", mounts_[i].tag_.name[6]) );
+		mounts_[i].flags_ = ahextoi( va("0x%c%c%c%c", mounts_[i].tag_.name[7], mounts_[i].tag_.name[8],
+														mounts_[i].tag_.name[9], mounts_[i].tag_.name[10]) );
+		mounts_[i].left_ = (mounts_[i].tag_.name[11] == 'L') ? true : false;
+	}
 
-	//for( i = 0; i < num; ++i ) {
-	//	memcpy( &loadout->mounts[i].tag, &tags[i], sizeof(md3Tag_t) );
-	//}
+	// sort - this could really be improved 
+	VehicleMountInfo* sortMounts = new VehicleMountInfo[mounts_.size()];
+	for( size_t i = 0; i < mounts_.size(); ++i )
+		sortMounts[i] = mounts_[i];
+	qsort(&sortMounts[0], mounts_.size(), sizeof(VehicleMountInfo), VehicleMountInfo::mountCompare);
+	mounts_.clear();
+	for( size_t i = 0; i < mounts_.size(); ++i )
+		mounts_.push_back(sortMounts[i]);
+	delete [] sortMounts;
 
-//#ifdef _DEBUG
-//	Com_Printf( "%s has %d mounts\n", modelname, num );
-//#endif
-
-	//loadout->usedMounts = num;
-
-	//// set up
-	//for( i = 0; i < num; ++i ) {
-	//	if( strlen( tags[i].name ) < 12 ) return false;
-	//	loadout->mounts[i].pos = ahextoi( va("0x%c", tags[i].name[5]) );
-	//	loadout->mounts[i].group = ahextoi( va("0x%c", tags[i].name[6]) );
-	//	loadout->mounts[i].flags = ahextoi( va("0x%c%c%c%c", tags[i].name[7], tags[i].name[8],
-	//			tags[i].name[9], tags[i].name[10]) );
-	//	loadout->mounts[i].left = tags[i].name[11] == 'L' ? true : false;
-	//}
-
-	//// sort
-	//qsort(&loadout->mounts[0], num, sizeof(loadout->mounts[0]), MF_posCompare );
 
 	//// fill
 	//for( i = WP_WEAPON1; i < WP_FLARE; ++i ) {
@@ -172,6 +178,41 @@ VehicleInfo::getModelPath( bool extension )
 		returnString += ".md3";
 
 	return returnString;
+}
+
+int
+VehicleInfo::getTagsContaining( std::string const& filename, 
+								std::string const& str,
+								std::vector<md3Tag_t>& tagList )
+{
+	if( str.empty() || str == "" ) 
+		return 0;
+
+	fileHandle_t	f;
+	if( trap_FS_FOpenFile(filename.c_str(), &f, FS_READ) >= 0 ) 
+	{
+		md3Header_t head;
+		md3Frame_t	frame;
+		md3Tag_t	tag;
+		trap_FS_Read(&head, sizeof(head), f);
+		for( int i = 0; i < head.numFrames; ++i ) 
+			trap_FS_Read(&frame, sizeof(frame), f);
+		int total = head.numTags;
+		for( int i = 0; i < total; ++ i ) 
+		{
+			trap_FS_Read(&tag, sizeof(tag), f);
+			std::string tagName(tag.name);
+			// if it contains the string at the first position, then add it
+			if( tagName.find_first_of(str) == 0 )
+				tagList.push_back(tag);
+		}
+		trap_FS_FCloseFile(f);
+	} 
+	else 
+	{
+		Com_Printf( "Unable to open file %s\n", filename.c_str() );
+	}
+	return tagList.size();
 }
 
 

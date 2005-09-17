@@ -125,18 +125,20 @@ typedef struct _TargaHeader {
 // vertex scales
 #define	MD3_XYZ_SCALE		(1.0/64)
 
-typedef struct md3Frame_s {
+struct md3Frame_t 
+{
 	vec3_t		bounds[2];
 	vec3_t		localOrigin;
 	float		radius;
 	char		name[16];
-} md3Frame_t;
+};
 
-typedef struct md3Tag_s {
+struct md3Tag_t 
+{
 	char		name[MAX_QPATH];	// tag name
 	vec3_t		origin;
 	vec3_t		axis[3];
-} md3Tag_t;
+};
 
 /*
 ** md3Surface_t
@@ -148,7 +150,8 @@ typedef struct md3Tag_s {
 ** st				sizeof( md3St_t ) * numVerts
 ** XyzNormals		sizeof( md3XyzNormal_t ) * numVerts * numFrames
 */
-typedef struct {
+struct md3Surface_t
+{
 	int		ident;				// 
 
 	char	name[MAX_QPATH];	// polyset name
@@ -167,27 +170,32 @@ typedef struct {
 	int		ofsXyzNormals;		// numVerts * numFrames
 
 	int		ofsEnd;				// next surface follows
-} md3Surface_t;
+} ;
 
-typedef struct {
+struct md3Shader_t
+{
 	char			name[MAX_QPATH];
 	int				shaderIndex;	// for in-game use
-} md3Shader_t;
+};
 
-typedef struct {
+struct md3Triangle_t
+{
 	int			indexes[3];
-} md3Triangle_t;
+};
 
-typedef struct {
+struct md3St_t
+{
 	float		st[2];
-} md3St_t;
+};
 
-typedef struct {
+struct md3XyzNormal_t
+{
 	short		xyz[3];
 	short		normal;
-} md3XyzNormal_t;
+};
 
-typedef struct {
+struct md3Header_t
+{
 	int			ident;
 	int			version;
 
@@ -206,7 +214,7 @@ typedef struct {
 	int			ofsSurfaces;		// first surface, others follow
 
 	int			ofsEnd;				// end of file
-} md3Header_t;
+};
 
 /*
 ==============================================================================

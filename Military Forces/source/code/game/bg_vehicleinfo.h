@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 
+struct md3Tag_t;
+
 struct VehicleInfo
 {
 							VehicleInfo();
@@ -13,8 +15,6 @@ struct VehicleInfo
 
 	// go through loadouts to make sure they are ok
 	void					verifyLoadouts();
-	std::string				getModelPath( bool extension );
-
 
 	// all vehicles
 	std::string				descriptiveName_;		// long descriptive name
@@ -48,6 +48,7 @@ struct VehicleInfo
 	unsigned int			acceleration_;	
 	unsigned int			maxFuel_;
 	TurretList				turrets_;
+	MountList				mounts_;				// all mounts it has
 
 	// wheeled vehicles
 	int						wheels_;				// how many wheels does it have 
@@ -75,7 +76,16 @@ struct VehicleInfo
 	AnimationInfo*			animations_;			// Animation pointer
 
 protected:
+	// make sure all the weapons actually fit on the mounts
 	void					distributeWeaponsOnMounts(Loadout& loadout);
+
+	// get the path of this model
+	std::string				getModelPath( bool extension );
+
+	// find all tags containing string str
+	int						getTagsContaining( std::string const& filename, 
+											   std::string const& str,
+											   std::vector<md3Tag_t>& tagList );
 
 private:
     // disable
