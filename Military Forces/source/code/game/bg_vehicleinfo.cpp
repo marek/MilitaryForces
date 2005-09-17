@@ -73,12 +73,15 @@ VehicleInfo::~VehicleInfo()
 void
 VehicleInfo::verifyLoadouts()
 {
-	for( size_t i = 0; i < defaultLoadouts_.size(); ++i )
-		distributeWeaponsOnMounts(defaultLoadouts_[i]);
+	createWeaponMounts();
+
+	//for( size_t i = 0; i < defaultLoadouts_.size(); ++i )
+	//	distributeWeaponsOnMounts(defaultLoadouts_[i]);
 }
 
+// creates the mounts (without actually putting weapons on, thats done somewhere else)
 void
-VehicleInfo::distributeWeaponsOnMounts(Loadout& loadout)
+VehicleInfo::createWeaponMounts()
 {
 	std::string modelname = getModelPath( true );
 
