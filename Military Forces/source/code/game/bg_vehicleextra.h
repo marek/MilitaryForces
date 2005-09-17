@@ -2,16 +2,19 @@
 #define __BG_VEHICLEEXTRA_H__
 
 #include "q_shared.h"
+#include "../qcommon/qfiles.h"
 #include <string>
 #include <vector>
 
 struct Armament;
 struct TurretInfo;
+struct VehicleMountInfo;
 
-typedef std::vector<Armament>		Loadout;
-typedef std::vector<Loadout>		LoadoutList;
-typedef std::vector<qhandle_t>		HandleList;
-typedef std::vector<TurretInfo>		TurretList;
+typedef std::vector<Armament>			Loadout;
+typedef std::vector<Loadout>			LoadoutList;
+typedef std::vector<qhandle_t>			HandleList;
+typedef std::vector<TurretInfo>			TurretList;
+typedef std::vector<VehicleMountInfo>	MountList;
 
 
 struct VehiclePartAnimInfo
@@ -43,6 +46,23 @@ struct TurretInfo
 	vec3_t			minAngles_;		// min angles of this turret (if applicable on these axis)
 	vec3_t			maxAngles_;		// max angles of this turret (if applicable on these axis)
 	vec3_t			turnSpeed_;		// how fast it can turn
+};
+
+struct VehicleMountInfo
+{
+					VehicleMountInfo() {}
+					VehicleMountInfo(md3Tag_t const& tag);
+
+	md3Tag_t		tag_;					// tag information
+	int				position_;				// pos on the wing
+	int				group_;					// group
+	int				flags_;					// flags
+	bool			left_;					// left side or right
+
+	//int			weapon;	// what is actually on
+	//int			num;	// how many are actually on
+
+	static int		mountCompare( const void* a, const void* b );
 };
 
 struct Armament
