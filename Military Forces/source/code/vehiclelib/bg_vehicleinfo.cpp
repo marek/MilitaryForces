@@ -1,7 +1,7 @@
 
-#include "q_shared.h"
+#include "../game/q_shared.h"
 #include "../qcommon/qfiles.h"
-#include "bg_public.h"
+#include "../game/bg_public.h"
 #include "bg_vehicleinfo.h"
 
 // decls
@@ -73,10 +73,15 @@ VehicleInfo::~VehicleInfo()
 void
 VehicleInfo::verifyLoadouts()
 {
+	// always add an empty loadout for customization
+	defaultLoadouts_.insert(std::make_pair("Custom", Loadout()));
+
+	// create the weapon mounts (empty)
 	createWeaponMounts();
 
-	//for( size_t i = 0; i < defaultLoadouts_.size(); ++i )
-	//	distributeWeaponsOnMounts(defaultLoadouts_[i]);
+	// go through all reported loadouts and verify that they actually fit on the vehicle
+	for( LoadoutMapIter it = defaultLoadouts_.begin(); it != defaultLoadouts_.end(); ++it )
+		correctArmament((*it).second);
 }
 
 // creates the mounts (without actually putting weapons on, thats done somewhere else)
@@ -89,39 +94,46 @@ VehicleInfo::createWeaponMounts()
 	if( !getTagsContaining(modelname, "tag_P", tagList) )
 		return;
 
+	VehicleMountInfo* sortMounts = new VehicleMountInfo[tagList.size()];
+
 	for( size_t i = 0; i < tagList.size(); ++i )
-	{
-		VehicleMountInfo newMount(tagList[i]);
-		mounts_.push_back(newMount);
-	}
+		sortMounts[i].tag_ = tagList[i];
 
 //#ifdef _DEBUG
-//	Com_Printf( "%s has %d mounts\n", descriptiveName_.c_str(), mounts_.size() );
+//	Com_Printf( "%s has %d mounts\n", descriptiveName_.c_str(), tagList.size() );
 //#endif
 
 	// set up
-	for( size_t i = 0; i < mounts_.size(); ++i )
+	for( size_t i = 0; i < tagList.size(); ++i )
 	{
-		if( strlen( mounts_[i].tag_.name ) < 12 )
+		// check if format is ok
+		if( strlen( tagList[i].name ) < 12 )
+		{
+			delete [] sortMounts;
 			return;
-		mounts_[i].position_ = ahextoi( va("0x%c", mounts_[i].tag_.name[5]) );
-		mounts_[i].group_ = ahextoi( va("0x%c", mounts_[i].tag_.name[6]) );
-		mounts_[i].flags_ = ahextoi( va("0x%c%c%c%c", mounts_[i].tag_.name[7], mounts_[i].tag_.name[8],
-														mounts_[i].tag_.name[9], mounts_[i].tag_.name[10]) );
-		mounts_[i].left_ = (mounts_[i].tag_.name[11] == 'L') ? true : false;
+		}
+		sortMounts[i].position_ = ahextoi( va("0x%c", tagList[i].name[5]) );
+		sortMounts[i].group_ = ahextoi( va("0x%c", tagList[i].name[6]) );
+		sortMounts[i].flags_ = ahextoi( va("0x%c%c%c%c", tagList[i].name[7], tagList[i].name[8],
+														tagList[i].name[9], tagList[i].name[10]) );
+		sortMounts[i].left_ = (tagList[i].name[11] == 'L') ? true : false;
 	}
 
-	// sort - this could really be improved 
-	VehicleMountInfo* sortMounts = new VehicleMountInfo[mounts_.size()];
-	for( size_t i = 0; i < mounts_.size(); ++i )
-		sortMounts[i] = mounts_[i];
+	// sort  
+	//for( size_t i = 0; i < mounts_.size(); ++i )
+	//	sortMounts[i] = mounts_[i];
 	qsort(&sortMounts[0], mounts_.size(), sizeof(VehicleMountInfo), VehicleMountInfo::mountCompare);
-	mounts_.clear();
-	for( size_t i = 0; i < mounts_.size(); ++i )
+	//mounts_.clear();
+
+	// move the mounts into the list
+	for( size_t i = 0; i < tagList.size(); ++i )
 		mounts_.push_back(sortMounts[i]);
 	delete [] sortMounts;
+}
 
-
+void
+VehicleInfo::correctArmament(Loadout& loadout)
+{
 	//// fill
 	//for( i = WP_WEAPON1; i < WP_FLARE; ++i ) {
 	//	if( availableVehicles[idx].weapons[i] &&
@@ -146,7 +158,7 @@ VehicleInfo::createWeaponMounts()
 //	}
 //#endif
 
-	//return true;
+	//return true;	
 }
 
 std::string

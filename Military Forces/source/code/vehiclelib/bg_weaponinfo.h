@@ -1,7 +1,7 @@
 #ifndef __BG_WEAPONINFO_H__
 #define __BG_WEAPONINFO_H__
 
-#include "q_shared.h"
+#include "../game/q_shared.h"
 #include <string>
 
 

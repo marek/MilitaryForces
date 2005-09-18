@@ -1,17 +1,19 @@
 #ifndef __BG_VEHICLEEXTRA_H__
 #define __BG_VEHICLEEXTRA_H__
 
-#include "q_shared.h"
+#include "../game/q_shared.h"
 #include "../qcommon/qfiles.h"
 #include <string>
 #include <vector>
+#include <map>
 
 struct Armament;
 struct TurretInfo;
 struct VehicleMountInfo;
 
 typedef std::vector<Armament>			Loadout;
-typedef std::vector<Loadout>			LoadoutList;
+typedef std::map<std::string, Loadout>	LoadoutMap;
+typedef LoadoutMap::iterator			LoadoutMapIter;
 typedef std::vector<qhandle_t>			HandleList;
 typedef std::vector<TurretInfo>			TurretList;
 typedef std::vector<VehicleMountInfo>	MountList;
@@ -50,8 +52,7 @@ struct TurretInfo
 
 struct VehicleMountInfo
 {
-					VehicleMountInfo() {}
-					VehicleMountInfo(md3Tag_t const& tag);
+					VehicleMountInfo();
 
 	md3Tag_t		tag_;					// tag information
 	int				position_;				// pos on the wing

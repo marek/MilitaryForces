@@ -34,7 +34,7 @@ struct VehicleInfo
 	qhandle_t				shadowShader_;			// the shadow shader (use SHADOW_DEFAULT to use the default shader or SHADOW_NONE for no shadow)
 	vec4_t					shadowCoords_;			// shadow apply coords { offsetX, offsetY, xAdjust, yAdjust }
 	vec4_t					shadowAdjusts_;			// shadow apply adjustments { pitchMax, rollMax, pitchMod, rollMod }
-	LoadoutList				defaultLoadouts_;		// what weapons this vehicle carries		
+	LoadoutMap				defaultLoadouts_;		// what weapons this vehicle can carry
     vec3_t					mins_;
     vec3_t					maxs_;
 
@@ -77,7 +77,8 @@ struct VehicleInfo
 
 protected:
 	// make sure all the weapons actually fit on the mounts
-	void					createWeaponMounts();
+	void					createWeaponMounts();	// create the empty mounts
+	void					correctArmament(Loadout& loadout);
 
 	// get the path of this model
 	std::string				getModelPath( bool extension );

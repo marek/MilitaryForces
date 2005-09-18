@@ -1,6 +1,6 @@
-#include "q_shared.h"
+#include "../game/q_shared.h"
 #include "../qcommon/qfiles.h"
-#include "bg_public.h"
+#include "../game/bg_public.h"
 #include "bg_vehicleextra.h"
 
 
@@ -23,13 +23,13 @@ Armament::~Armament()
 {
 }
 
-VehicleMountInfo::VehicleMountInfo(md3Tag_t const& tag) :
-	tag_(tag),
+VehicleMountInfo::VehicleMountInfo() :
 	position_(-1),
 	group_(-1),
 	flags_(-1),
 	left_(false)
 {
+	tag_.name[0] = 0;
 }
 
 int VehicleMountInfo::mountCompare( const void* a, const void* b )

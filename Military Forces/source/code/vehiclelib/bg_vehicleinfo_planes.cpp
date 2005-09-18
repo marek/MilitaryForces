@@ -1,15 +1,14 @@
 #include "bg_datamanager.h"
 #include "bg_vehicleinfo.h"
-#include "q_shared.h"
+#include "../game/q_shared.h"
 #include "../qcommon/qfiles.h"
-#include "bg_public.h"
+#include "../game/bg_public.h"
 
 void
 DataManager::createAllPlanes()
 {
 	VehicleInfo* veh = 0;
 	Loadout loadout;
-	LoadoutList allLoadouts;
 
 	// --- MODERN ---
 
@@ -52,21 +51,20 @@ DataManager::createAllPlanes()
 	veh->sonarInfo_ = 0; 		
     veh->maxSpeed_ = 700;		
 	veh->animations_ = 0;	
-	allVehicles_.push_back(veh);
 	loadout.clear();
-	allLoadouts.clear();
 	addWeaponToLoadout(loadout, "20mm MG", "MG", 450, Armament::ST_PRIMARY_WEAPON );
 	addWeaponToLoadout(loadout, "AIM-9 Sidewinder", "AIM-9", 4, Armament::ST_SECONDARY_WEAPON );
 	addWeaponToLoadout(loadout, "AIM-120 AMRAAM", "AIM-120", 4, Armament::ST_SECONDARY_WEAPON );
 	addWeaponToLoadout(loadout, "Flares", "Flares", 30, Armament::ST_NOT_SELECTABLE );
-	allLoadouts.push_back(loadout);
+	veh->defaultLoadouts_.insert(std::make_pair("Anti Aircraft", loadout));
 	loadout.clear();
 	addWeaponToLoadout(loadout, "20mm MG", "MG", 450, Armament::ST_PRIMARY_WEAPON );
 	addWeaponToLoadout(loadout, "AIM-9 Sidewinder", "AIM-9", 2, Armament::ST_SECONDARY_WEAPON );
 	addWeaponToLoadout(loadout, "AIM-120 AMRAAM", "AIM-120", 2, Armament::ST_SECONDARY_WEAPON );
 	addWeaponToLoadout(loadout, "Mk-83", "Mk-83", 4, Armament::ST_SECONDARY_WEAPON );
 	addWeaponToLoadout(loadout, "Flares", "Flares", 30, Armament::ST_NOT_SELECTABLE );
-	allLoadouts.push_back(loadout);
+	veh->defaultLoadouts_.insert(std::make_pair("Iron Bombs", loadout));
+	allVehicles_.push_back(veh);
 
 	// JAS-39
 	veh = createVehicle();
