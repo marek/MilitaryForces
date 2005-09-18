@@ -80,6 +80,9 @@ VehicleInfo::verifyLoadouts()
 	if( !createWeaponMounts() )
 		return;
 
+	// we got mounts, that means we can show the vwep
+	renderFlags_ |= MFR_VWEP;
+
 	// always add an empty loadout for customization
 	defaultLoadouts_.insert(std::make_pair("Custom", Loadout()));
 
@@ -145,10 +148,21 @@ VehicleInfo::correctArmament(Loadout& loadout, std::string const& loadoutName)
 	// the weapon list
 	WeaponList const& allWeapons = DataManager::getInstance().getAllWeapons();
 
+	// create a work copy of the loadout
+	Loadout workCopy;
+	for( size_t i = 0; i < loadout.size(); ++i  )
+	{
+		// dont add weapons not fitting this category of vehicle
+		if( category_ & allWeapons[loadout[i].weaponIndex_]->fitsCategory_ )
+			workCopy.push_back(loadout[i]);
+	}
+	loadout.clear();
+
+	// create a copy of the mount list, with evaluation class
 	std::vector<VehicleMountInfoEvaluator> mountList;
 	for( size_t i = 0; i < mounts_.size(); ++i )
 		mountList.push_back(mounts_[i]);
-	Loadout workCopy(loadout);
+	// go through all weapons and fit them on mounts
 	for( size_t i = 0; i < workCopy.size(); ++i )
 	{
 		// weapons which cant be fitted on mounts arent evaluated
@@ -169,6 +183,10 @@ VehicleInfo::correctArmament(Loadout& loadout, std::string const& loadoutName)
 				break;
 		}
 	}
+	// put loadout back together from workCopy
+	for( size_t i = 0; i < workCopy.size(); ++i )
+		loadout.push_back(workCopy[i]);
+
 	// remove extraneous weapons from default loadout
 	int numProblems = 0;
 	for( size_t i = 0; i < workCopy.size(); ++i )
