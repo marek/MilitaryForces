@@ -46,6 +46,7 @@ DataManager::createVehicle()
 	if( !newVehicle )
 		Com_Error(ERR_FATAL, "Unable to allocate memory for VehicleInfo!");
 		return 0;
+
 	return newVehicle;
 }
 
@@ -118,6 +119,8 @@ DataManager::addWeaponToLoadout( Loadout& loadout,
 	arm.limitedAngles_ = limitedAngles;
 	VectorCopy( minAngles, arm.minAngles_ );
 	VectorCopy( maxAngles, arm.maxAngles_ );
+
+	loadout.push_back(arm);
 
 	return true;
 }

@@ -4,7 +4,7 @@
 
 #include <string>
 #include <vector>
-#include "q_shared.h"
+#include "../game/q_shared.h"
 #include "bg_vehicleextra.h"
 
 struct VehicleInfo;

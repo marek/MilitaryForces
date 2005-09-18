@@ -1,6 +1,6 @@
-#include "q_shared.h"
+#include "../game/q_shared.h"
 #include "../qcommon/qfiles.h"
-#include "bg_public.h"
+#include "../game/bg_public.h"
 #include "bg_datamanager.h"
 #include "bg_weaponinfo.h"
 
