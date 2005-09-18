@@ -136,6 +136,38 @@ DataManager::createAllOther()
 	wep->crosshairLock_ = 0;			
 	wep->numberPerPackage_ = 1;		
 	wep->fitsCategory_ = CAT_ANY;			
+	wep->fitsPylon_ = PF_NA;				
+	wep->basicECMVulnerability_ = 0;	
+	wep->flags_ = 0;
+	allWeapons_.push_back(wep);
+
+	// flarepod
+	wep = createWeapon();
+	wep->type_ = WT_FLARE;					
+	wep->gameSet_ = MF_GAMESET_ANY;				
+	wep->descriptiveName_ = "Flarepod";		
+	wep->modelName_ = "models/effects/flare.md3";				
+	wep->vwepName_ = "";				
+	wep->iconName_ = "";				
+	wep->targetCategory_ = 0;				
+	wep->nonCatMod_ = 0.0f;				
+	wep->muzzleVelocity_ = 0;		
+	wep->range_ = 0.0f;					
+	wep->fuelRange_ = 2000;				
+	wep->fireInterval_ = 200;			
+	wep->damage_ = 0;				
+	wep->damageRadius_ = 0;			
+	wep->spread_ = 0;				
+	wep->barrels_ = 0;				
+	wep->barrelDistance_ = 0;		
+	wep->lockCone_ = 0;				
+	wep->followCone_ = 0;			
+	wep->lockDelay_ = 0;				
+	wep->crosshair_ = 0;				
+	wep->crosshairTrack_ = 0;		
+	wep->crosshairLock_ = 0;			
+	wep->numberPerPackage_ = 1;		
+	wep->fitsCategory_ = CAT_ANY;			
 	wep->fitsPylon_ = PF_FLAREPOD;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;

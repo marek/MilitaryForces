@@ -1,6 +1,6 @@
-#include "q_shared.h"
+#include "../game/q_shared.h"
 #include "../qcommon/qfiles.h"
-#include "bg_public.h"
+#include "../game/bg_public.h"
 #include "bg_datamanager.h"
 #include "bg_vehicleinfo.h"
 #include "bg_weaponinfo.h"
@@ -44,9 +44,10 @@ DataManager::createVehicle()
 	VehicleInfo* newVehicle = new VehicleInfo();
 
 	if( !newVehicle )
+	{
 		Com_Error(ERR_FATAL, "Unable to allocate memory for VehicleInfo!");
 		return 0;
-
+	}
 	return newVehicle;
 }
 
@@ -68,8 +69,10 @@ DataManager::createWeapon()
 	WeaponInfo* newWeapon = new WeaponInfo();
 
 	if( !newWeapon )
+	{
 		Com_Error(ERR_FATAL, "Unable to allocate memory for WeaponInfo!");
 		return 0;
+	}
 	return newWeapon;
 }
 
@@ -116,10 +119,12 @@ DataManager::addWeaponToLoadout( Loadout& loadout,
 	arm.maxAmmo_ = maxAmmo;
 	arm.weaponIndex_ = idx;
 	arm.selectionType_ = selectionType;
-	arm.limitedAngles_ = limitedAngles;
-	VectorCopy( minAngles, arm.minAngles_ );
-	VectorCopy( maxAngles, arm.maxAngles_ );
-
+	if( limitedAngles && minAngles && maxAngles )
+	{
+		arm.limitedAngles_ = limitedAngles;
+		VectorCopy( minAngles, arm.minAngles_ );
+		VectorCopy( maxAngles, arm.maxAngles_ );
+	}
 	loadout.push_back(arm);
 
 	return true;
@@ -138,4 +143,17 @@ DataManager::createAllData()
 	createAllWeapons();
 	createAllVehicles();
 }
+
+WeaponList const&
+DataManager::getAllWeapons() const
+{
+	return allWeapons_;
+}
+
+VehicleList const&
+DataManager::getAllVehicles() const
+{
+	return allVehicles_;
+}
+
 

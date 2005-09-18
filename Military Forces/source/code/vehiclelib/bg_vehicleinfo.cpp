@@ -3,6 +3,8 @@
 #include "../qcommon/qfiles.h"
 #include "../game/bg_public.h"
 #include "bg_vehicleinfo.h"
+#include "bg_weaponinfo.h"
+#include "bg_datamanager.h"
 
 // decls
 int		trap_FS_FOpenFile( const char *qpath, fileHandle_t *f, fsMode_t mode );
@@ -73,26 +75,28 @@ VehicleInfo::~VehicleInfo()
 void
 VehicleInfo::verifyLoadouts()
 {
+	// create the weapon mounts (empty)
+	// if none are there this isnt a vehicle with mounts, so nothing further to check
+	if( !createWeaponMounts() )
+		return;
+
 	// always add an empty loadout for customization
 	defaultLoadouts_.insert(std::make_pair("Custom", Loadout()));
 
-	// create the weapon mounts (empty)
-	createWeaponMounts();
-
 	// go through all reported loadouts and verify that they actually fit on the vehicle
 	for( LoadoutMapIter it = defaultLoadouts_.begin(); it != defaultLoadouts_.end(); ++it )
-		correctArmament((*it).second);
+		correctArmament((*it).second, (*it).first);
 }
 
 // creates the mounts (without actually putting weapons on, thats done somewhere else)
-void
+bool
 VehicleInfo::createWeaponMounts()
 {
 	std::string modelname = getModelPath( true );
 
 	std::vector<md3Tag_t> tagList;
 	if( !getTagsContaining(modelname, "tag_P", tagList) )
-		return;
+		return false;
 
 	VehicleMountInfo* sortMounts = new VehicleMountInfo[tagList.size()];
 
@@ -110,7 +114,7 @@ VehicleInfo::createWeaponMounts()
 		if( strlen( tagList[i].name ) < 12 )
 		{
 			delete [] sortMounts;
-			return;
+			return false;
 		}
 		sortMounts[i].position_ = ahextoi( va("0x%c", tagList[i].name[5]) );
 		sortMounts[i].group_ = ahextoi( va("0x%c", tagList[i].name[6]) );
@@ -120,45 +124,69 @@ VehicleInfo::createWeaponMounts()
 	}
 
 	// sort  
-	//for( size_t i = 0; i < mounts_.size(); ++i )
-	//	sortMounts[i] = mounts_[i];
 	qsort(&sortMounts[0], mounts_.size(), sizeof(VehicleMountInfo), VehicleMountInfo::mountCompare);
-	//mounts_.clear();
 
 	// move the mounts into the list
+	mounts_.clear();
 	for( size_t i = 0; i < tagList.size(); ++i )
 		mounts_.push_back(sortMounts[i]);
 	delete [] sortMounts;
+
+	return true;
 }
 
 void
-VehicleInfo::correctArmament(Loadout& loadout)
+VehicleInfo::correctArmament(Loadout& loadout, std::string const& loadoutName)
 {
-	//// fill
-	//for( i = WP_WEAPON1; i < WP_FLARE; ++i ) {
-	//	if( availableVehicles[idx].weapons[i] &&
-	//		availableWeapons[availableVehicles[idx].weapons[i]].type != WT_MACHINEGUN ) {
-	//		j = availableVehicles[idx].ammo[i];
-	//		for( k = 0; k < num; ++k ) {
-	//			if( !loadout->mounts[k].weapon &&
-	//				(loadout->mounts[k].flags & availableWeapons[availableVehicles[idx].weapons[i]].fitsPylon) ) {
-	//				loadout->mounts[k].weapon = availableVehicles[idx].weapons[i];
-	//				loadout->mounts[k].num = 1;
-	//				j--;
-	//			}
-	//			if( !j ) break;
-	//		}
-	//	}
-	//}
-//#ifdef _DEBUG
-//	for( i = 0; i < num; ++i ) {
-//		Com_Printf( "Mount %d: %d %x %c %d x %s\n", i, loadout->mounts[i].pos, loadout->mounts[i].flags,
-//			(loadout->mounts[i].left ? 'L' : 'R'), loadout->mounts[i].num, 
-//			availableWeapons[loadout->mounts[i].weapon].descriptiveName );
-//	}
-//#endif
+	// fallback check
+	if( !mounts_.size() )
+		return;
 
-	//return true;	
+	// the weapon list
+	WeaponList const& allWeapons = DataManager::getInstance().getAllWeapons();
+
+	std::vector<VehicleMountInfoEvaluator> mountList;
+	for( size_t i = 0; i < mounts_.size(); ++i )
+		mountList.push_back(mounts_[i]);
+	Loadout workCopy(loadout);
+	for( size_t i = 0; i < workCopy.size(); ++i )
+	{
+		// weapons which cant be fitted on mounts arent evaluated
+		if( allWeapons[workCopy[i].weaponIndex_]->fitsPylon_ == PF_NA )
+			continue;
+		// go through all mounts
+		for( size_t j = 0; j < mountList.size(); ++j )
+		{
+			// if mount is emtpy and weapon fits, then "put it on"
+			if( mountList[j].weaponIndex_ < 0 &&
+				(mountList[j].flags_ & allWeapons[workCopy[i].weaponIndex_]->fitsPylon_) )
+			{
+				mountList[j].weaponIndex_ = workCopy[i].weaponIndex_;
+				mountList[j].num_ = 1;
+				workCopy[i].maxAmmo_--;
+			}
+			if( !workCopy[i].maxAmmo_ )
+				break;
+		}
+	}
+	// remove extraneous weapons from default loadout
+	int numProblems = 0;
+	for( size_t i = 0; i < workCopy.size(); ++i )
+	{
+		// weapons which cant be fitted on mounts arent evaluated
+		if( allWeapons[workCopy[i].weaponIndex_]->fitsPylon_ == PF_NA )
+			continue;
+		if( workCopy[i].maxAmmo_ > 0 )
+		{
+			Com_Printf("WARNING: %s loadout '%s' can't fit all the weapons, loadout modified: %d %ss removed\n",
+				descriptiveName_.c_str(), loadoutName.c_str(), workCopy[i].maxAmmo_, 
+				allWeapons[workCopy[i].weaponIndex_]->descriptiveName_.c_str() );
+			loadout[i].maxAmmo_ -= workCopy[i].maxAmmo_;
+			numProblems++;
+		}
+	}
+	if( !numProblems )
+		Com_Printf("INFO: %s loadout '%s' verified OK.\n", descriptiveName_.c_str(), loadoutName.c_str() );
 }
 
 std::string
@@ -218,7 +246,7 @@ VehicleInfo::getTagsContaining( std::string const& filename,
 			trap_FS_Read(&tag, sizeof(tag), f);
 			std::string tagName(tag.name);
 			// if it contains the string at the first position, then add it
-			if( tagName.find_first_of(str) == 0 )
+			if( tagName.find(str) == 0 )
 				tagList.push_back(tag);
 		}
 		trap_FS_FCloseFile(f);
