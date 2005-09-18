@@ -32,6 +32,21 @@ VehicleMountInfo::VehicleMountInfo() :
 	tag_.name[0] = 0;
 }
 
+VehicleMountInfoEvaluator::VehicleMountInfoEvaluator() :
+	VehicleMountInfo(),
+	weaponIndex_(-1),
+	num_(-1)
+{
+}
+
+VehicleMountInfoEvaluator::VehicleMountInfoEvaluator(VehicleMountInfo const& vmi) :
+	VehicleMountInfo(vmi),
+	weaponIndex_(-1),
+	num_(-1)
+{
+
+}
+
 int VehicleMountInfo::mountCompare( const void* a, const void* b )
 {
 	int p1 = (reinterpret_cast<const VehicleMountInfo*>(a))->position_;

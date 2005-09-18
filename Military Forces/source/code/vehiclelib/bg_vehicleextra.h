@@ -60,10 +60,16 @@ struct VehicleMountInfo
 	int				flags_;					// flags
 	bool			left_;					// left side or right
 
-	//int			weapon;	// what is actually on
-	//int			num;	// how many are actually on
-
 	static int		mountCompare( const void* a, const void* b );
+};
+
+struct VehicleMountInfoEvaluator : public VehicleMountInfo
+{
+					VehicleMountInfoEvaluator();
+					VehicleMountInfoEvaluator(VehicleMountInfo const&);
+
+	int				weaponIndex_;			// what is actually on
+	int				num_;					// how many are actually on
 };
 
 struct Armament

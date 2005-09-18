@@ -77,8 +77,8 @@ struct VehicleInfo
 
 protected:
 	// make sure all the weapons actually fit on the mounts
-	void					createWeaponMounts();	// create the empty mounts
-	void					correctArmament(Loadout& loadout);
+	bool					createWeaponMounts();	// create the empty mounts
+	void					correctArmament(Loadout& loadout, std::string const& loadoutName);
 
 	// get the path of this model
 	std::string				getModelPath( bool extension );

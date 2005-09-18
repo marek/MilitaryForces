@@ -20,6 +20,9 @@ struct DataManager
 
 	void						createAllData();
 
+	WeaponList const&			getAllWeapons() const;
+	VehicleList const&			getAllVehicles() const;
+
 protected:
 	// vehicles/weapon creation util functions
 	void						createAllVehicles();
