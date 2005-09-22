@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.12 2005-09-02 08:45:17 thebjoern Exp $
+ * $Id: cg_local.h,v 1.13 2005-09-22 23:31:17 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -668,6 +668,9 @@ typedef struct {
 	qhandle_t	friendShader;
 
 	qhandle_t	balloonShader;
+
+	qhandle_t	particleShader;
+
 	qhandle_t	connectionShader;
 
 	qhandle_t	selectShader;
@@ -1105,6 +1108,7 @@ extern	vmCvar_t		cg_swingSpeed;
 extern	vmCvar_t		cg_shadows;
 extern	vmCvar_t		cg_drawTimer;
 extern	vmCvar_t		cg_drawFPS;
+extern	vmCvar_t		cg_drawParticleStats;
 extern	vmCvar_t		cg_drawSnapshot;
 extern	vmCvar_t		cg_draw3dIcons;
 extern	vmCvar_t		cg_drawIcons;
@@ -1745,9 +1749,11 @@ void trap_SnapVector( float *v );
 
 // cg_particles.c
 
-#define MAX_WORLD_PARTICLES 		20000
-#define	MAX_WORLD_EMITTERS			2500
-#define MAX_WORLD_SYSTEMS			500
+
+
+#define MAX_WORLD_PARTICLES 		4096
+#define	MAX_WORLD_EMITTERS			500
+#define MAX_WORLD_SYSTEMS			200
 #define MAX_PARTICLE_SHADERS		100
 
 
@@ -1756,7 +1762,6 @@ void trap_SnapVector( float *v );
 // Particle systems are nothing more than a collection of emitters
 typedef struct particleSystem_s
 {
-	int			parentWorld;
 	centity_t	* cent;
 
 	vec3_t		pos;		// position of system  if cent != null
@@ -1778,6 +1783,7 @@ typedef struct particle_s
 	long		birthtime;
 	long		lifetime;
 	long		lastthink;
+	long		lastAttractionThink;
 	
 	// size
 	float	radius;				// radius of particle
@@ -1788,6 +1794,7 @@ typedef struct particle_s
 	// phsyics
 	vec3_t		trDelta;
 	vec3_t		trBase;
+	vec3_t		trAttraction;
 	float		maxspeed;
 	float		accel;				// acceleration rate
 	float		acceltime;			// how long to accelerate for
@@ -1830,7 +1837,8 @@ typedef struct particleEmitter_s
 	
 	vec3_t					ejectVelocity;
 
-	float					accelVariance;
+	vec3_t					accelVarianceMax;
+	vec3_t					accelVarianceMin;
 	float					rotationVariance;
 	float					velVariance;
 	float					maxspeedVariance;
@@ -1838,6 +1846,10 @@ typedef struct particleEmitter_s
 	float					bounceVariance;
 	float					radiusVariance;
 	float					lifetimeVariance;
+
+	long					numEjectPerInterval;
+	long					ejectInterval;
+	long					lastEjectTime;
 } particleEmitter_t;
 
 
@@ -1847,7 +1859,16 @@ typedef struct particleWorld_s					// Usualy only one world;
 	particle_t			particles[MAX_WORLD_PARTICLES];
 	particleSystem_t	systems[MAX_WORLD_SYSTEMS];
 	particleEmitter_t	emitters[MAX_WORLD_EMITTERS];
+	int					numParticles;
 } particleWorld_t;
+
+void CG_ParticleWorldRender(particleWorld_t * w);
+void CG_ParticleWorldThink(particleWorld_t * w);
+int CG_AddParticleEmitter(particleWorld_t * w, particleEmitter_t * e);
+int CG_AddParticleSystem(particleWorld_t * w, particleSystem_t * s);
+void CG_ParticleWorldInit(particleWorld_t * w);
+void CG_ParticleThink(particleWorld_t * w, particle_t * p);
+extern particleWorld_t pw;
 
 
 #endif // __CG_LOCAL_H__

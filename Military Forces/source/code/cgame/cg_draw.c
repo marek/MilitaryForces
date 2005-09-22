@@ -1,5 +1,5 @@
 /*
- * $Id: cg_draw.c,v 1.3 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: cg_draw.c,v 1.4 2005-09-22 23:31:16 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -585,6 +585,18 @@ static float CG_DrawFPS( float y ) {
 
 	}
 
+	return y + BIGCHAR_HEIGHT + 4;
+}
+
+static float CG_DrawParticleStats( float y ) {
+	char		*s;
+	int			w;
+	
+	s = va( "# Particles: %i", pw.numParticles );
+	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
+
+	DrawStringNew( 635, y + 2, 0.5f, *CreateColourVector(1,1,1,1,NULL), s, 0, 0, 3, RIGHT_JUSTIFY );
+	
 	return y + BIGCHAR_HEIGHT + 4;
 }
 
@@ -1192,6 +1204,11 @@ static void CG_DrawUpperRight( bool scoreboard )
 		// framerate
 		if ( cg_drawFPS.integer ) {
 			y = CG_DrawFPS( y );
+		}
+
+		// Particle stats
+		if ( cg_drawParticleStats.integer ) {
+			y = CG_DrawParticleStats( y );
 		}
 	}
 
