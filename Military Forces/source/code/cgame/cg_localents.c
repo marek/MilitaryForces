@@ -1,5 +1,5 @@
 /*
- * $Id: cg_localents.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: cg_localents.c,v 1.3 2005-09-22 23:31:17 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -53,6 +53,9 @@ void CG_FreeLocalEntity( localEntity_t *le ) {
 	// the free list is only singly linked
 	le->next = cg_freeLocalEntities;
 	cg_freeLocalEntities = le;
+
+	// remove any particle systems/emitters attached to this system
+
 }
 
 /*
@@ -81,6 +84,7 @@ localEntity_t	*CG_AllocLocalEntity( void ) {
 	le->prev = &cg_activeLocalEntities;
 	cg_activeLocalEntities.next->prev = le;
 	cg_activeLocalEntities.next = le;
+
 	return le;
 }
 

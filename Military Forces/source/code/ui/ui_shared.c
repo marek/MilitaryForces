@@ -1,5 +1,5 @@
 /*
- * $Id: ui_shared.c,v 1.4 2005-08-31 19:20:23 thebjoern Exp $
+ * $Id: ui_shared.c,v 1.5 2005-09-22 23:31:17 minkis Exp $
 */
 // 
 // string allocation/managment
@@ -3192,62 +3192,105 @@ typedef struct
 
 static bind_t g_bindings[] = 
 {
-	{"+scores",			"Show Scoreboard",	ID_SHOWSCORES,	K_TAB,			-1,		-1, -1},
-	{"+forward", 		"Forward (Max)",	ID_FORWARD,		'w',		-1,		-1, -1},
-	{"+back", 			"Back/Stop (Min)",	ID_BACKPEDAL,	's',	-1,		-1, -1},
-	{"+moveleft", 		"Turn left (tank)",	ID_MOVELEFT,	'a',			-1,		-1, -1},
-	{"+moveright", 		"Turn right (tank)",ID_MOVERIGHT,	'd',			-1,		-1, -1},
-	{"+moveup",			"up / jump",		ID_MOVEUP,		-1,		-1,		-1, -1},
-	{"+movedown",		"down / crouch",	ID_MOVEDOWN,	-1,			-1,		-1, -1},
-	{"+left", 			"Left (view)",		ID_LEFT,		K_LEFTARROW,	-1,		-1, -1},
-	{"+right", 			"Right (view)", 	ID_RIGHT,		K_RIGHTARROW,	-1,		-1, -1},
-	{"+lookup", 		"Up (view)",		ID_LOOKUP,		K_PGUP,			-1,		-1, -1},
-	{"+lookdown", 		"Down (view)",		ID_LOOKDOWN,	K_PGDN,			-1,		-1, -1},
-	{"+zoom", 			"Zoom View",		ID_ZOOMVIEW,	K_SHIFT,				-1,		-1, -1},
-	{"+attack", 		"Fire MG",			ID_ATTACK,		K_CTRL,			-1,		-1, -1},
-	{"+button2", 		"Fire Main Weapon",	ID_ATTACK2,		K_ENTER, K_MOUSE4,		-1, -1},
-	{"weapprev",		"Previous Weapon",	ID_WEAPPREV,	'[',			-1,		-1, -1},
-	{"weapnext", 		"Next Weapon",		ID_WEAPNEXT,	']',			-1,		-1, -1},
-	{"messagemode", 	"Chat",				ID_CHAT,		't',				-1,		-1, -1},
-	{"messagemode2", 	"Chat - Team",		ID_CHAT2,		'y',				-1,		-1, -1},
-	{"messagemode3", 	"Chat - Target",	ID_CHAT3,		'u',				-1,		-1, -1},
-	{"messagemode4", 	"Chat - Attacker",	ID_CHAT4,		'i',				-1,		-1, -1},
-	{"cmessagemode", 	"MFQ3 Chat",			ID_CHAT,	't',			-1,		-1, -1},
-	{"cmessagemode2", 	"MFQ3 Chat - Team",		ID_CHAT2,	-1,				-1,		-1, -1},
-	{"cmessagemode3", 	"MFQ3 Chat - Target",	ID_CHAT3,	-1,				-1,		-1, -1},
-	{"cmessagemode4", 	"MFQ3 Chat - Attacker",	ID_CHAT4,	-1,				-1,		-1, -1},
-	{"+button7",		"Landing Gear",		ID_GEAR,		'g',				-1,		-1, -1},
-	{"+button8",	 	"(Speed)Brakes",	ID_BRAKE,		K_ALT,				-1,		-1, -1},
-	{"+button9",	 	"Freelook Camera",	ID_FREECAM,		-1,				-1,		-1, -1},
-	{"+button5", 		"Throttle Up",		ID_INCREASE,	'q',				-1,		-1, -1},
-	{"+button6", 		"Throttle Down",	ID_DECREASE,	'e',				-1,		-1, -1},
-	{"weapon 0",		"Select MG",		ID_WEAPON_MG,	'0',			-1,		-1, -1},
-	{"weapon 1",		"Select Weapon 1",	ID_WEAPON_1,	'1',			-1,		-1, -1},
-	{"weapon 2",		"Select Weapon 2",	ID_WEAPON_2,	'2',			-1,		-1, -1},
-	{"weapon 3",		"Select Weapon 3",	ID_WEAPON_3,	'3',			-1,		-1, -1},
-	{"weapon 4",		"Select Weapon 4",	ID_WEAPON_4,	'4',			-1,		-1, -1},
-	{"weapon 5",		"Select Weapon 5",	ID_WEAPON_5,	'5',			-1,		-1, -1},
-	{"weapon 6",		"Select Weapon 6",	ID_WEAPON_6,	'6',			-1,		-1, -1},
-	{"+button10",		"Fire Flare",		ID_WEAPON_FLARE,K_SPACE,			-1,		-1, -1},
-	{"encyclopedia",	"Encyclopedia",		ID_ENCYC,		-1,				-1,		-1, -1},
-	{"teamselect",		"Team Selection",	ID_TEAMSEL,		-1,				-1,		-1, -1},
-	{"vehicleselect",	"Vehicle Selection",ID_VEHSEL,		'\\',				-1,		-1, -1},
-	{"gps",				"GPS on/off",		ID_GPS,			'f',				-1,		-1, -1},
-	{"toggleview",		"Toggle Camera",	ID_TOGGLEVIEW,	-1,				-1,		-1, -1},
-	{"+cameraup",		"Camera Up",		ID_CAMERAUP,	-1,				-1,		-1, -1},
-	{"+cameradown",		"Camera Down",		ID_CAMERADOWN,	-1,				-1,		-1, -1},
-	{"+zoomin",			"Zoom In",			ID_ZOOMIN,		-1,				-1,		-1, -1},
-	{"+zoomout",		"Zoom Out",			ID_ZOOMOUT,		-1,				-1,		-1, -1},
-	{"contact_tower",	"Contact Tower",	ID_CONTACTTOWER, K_BACKSPACE,				-1,		-1, -1},
-	{"radar",			"RADAR on/off",		ID_RADAR,		'r',				-1,		-1, -1},
-	{"extinfo",			"Ext.Info on/off",	ID_EXTINFO,		'-',				-1,		-1, -1},
-	{"radarrange",		"Toggle RADAR Range",ID_RADARRANGE,	'=',				-1,		-1, -1},
-	{"unlock",			"Unlock Target",	ID_UNLOCK,		K_CTRL,				-1,		-1, -1},
-	{"+bombcam",		"Bomb Camera",		ID_BOMBCAMERA,	-1,				-1,		-1, -1},
-	{"mfd1_mode",		"Cycle MFD1 Mode",	ID_CYCLEMFD1,	-1,				-1,		-1, -1},
-	{"mfd2_mode",		"Cycle MFD2 Mode",	ID_CYCLEMFD2,	-1,				-1,		-1, -1},
-	{"eject",			"Eject",	ID_EJECT,	-1,				'o',		-1, -1},
+	{"+scores",			"Show Scoreboard",				ID_SHOWSCORES,		K_TAB,			-1,			-1, -1},
+	{"weapprev",		"Previous Weapon",				ID_WEAPPREV,		'[',			-1,			-1, -1},
+	{"weapnext", 		"Next Weapon",					ID_WEAPNEXT,		']',			-1,			-1, -1},
+	{"messagemode", 	"Chat",							ID_CHAT,			't',			-1,			-1, -1},
+	{"messagemode2", 	"Chat - Team",					ID_CHAT2,			'y',			-1,			-1, -1},
+	{"messagemode3", 	"Chat - Target",				ID_CHAT3,			'u',			-1,			-1, -1},
+	{"messagemode4", 	"Chat - Attacker",				ID_CHAT4,			'i',			-1,			-1, -1},
+	{"cmessagemode", 	"MFQ3 Chat",					ID_CHAT,			't',			-1,			-1, -1},
+	{"cmessagemode2", 	"MFQ3 Chat - Team",				ID_CHAT2,			-1,				-1,			-1, -1},
+	{"cmessagemode3", 	"MFQ3 Chat - Target",			ID_CHAT3,			-1,				-1,			-1, -1},
+	{"cmessagemode4", 	"MFQ3 Chat - Attacker",			ID_CHAT4,			-1,				-1,			-1, -1},
+	{"weapon 0",		"Select MG",					ID_WEAPON_MG,		'0',			-1,			-1, -1},
+	{"weapon 1",		"Select Weapon 1",				ID_WEAPON_1,		'1',			-1,			-1, -1},
+	{"weapon 2",		"Select Weapon 2",				ID_WEAPON_2,		'2',			-1,			-1, -1},
+	{"weapon 3",		"Select Weapon 3",				ID_WEAPON_3,		'3',			-1,			-1, -1},
+	{"weapon 4",		"Select Weapon 4",				ID_WEAPON_4,		'4',			-1,			-1, -1},
+	{"weapon 5",		"Select Weapon 5",				ID_WEAPON_5,		'5',			-1,			-1, -1},
+	{"weapon 6",		"Select Weapon 6",				ID_WEAPON_6,		'6',			-1,			-1, -1},
+	{"+button10",		"Fire Flare",					ID_WEAPON_FLARE,	K_SPACE,		-1,			-1, -1},
+	{"encyclopedia",	"Encyclopedia",					ID_ENCYC,			-1,				-1,			-1, -1},
+	{"teamselect",		"Team Selection",				ID_TEAMSEL,			-1,				-1,			-1, -1},
+	{"vehicleselect",	"Vehicle Selection",			ID_VEHSEL,			'\\',			-1,			-1, -1},
+	{"gps",				"GPS on/off",					ID_GPS,				'f',			-1,			-1, -1},
+	{"toggleview",		"Toggle Camera",				ID_TOGGLEVIEW,		-1,				-1,			-1, -1},
+	{"+cameraup",		"Camera Up",					ID_CAMERAUP,		-1,				-1,			-1, -1},
+	{"+cameradown",		"Camera Down",					ID_CAMERADOWN,		-1,				-1,			-1, -1},
+	{"+zoomin",			"Zoom In",						ID_ZOOMIN,			-1,				-1,			-1, -1},
+	{"+zoomout",		"Zoom Out",						ID_ZOOMOUT,			-1,				-1,			-1, -1},
+	{"contact_tower",	"Contact Tower",				ID_CONTACTTOWER,	K_BACKSPACE,	-1,			-1, -1},
+	{"radar",			"RADAR on/off",					ID_RADAR,			'r',			-1,			-1, -1},
+	{"extinfo",			"Ext.Info on/off",				ID_EXTINFO,			'-',			-1,			-1, -1},
+	{"radarrange",		"Toggle RADAR Range",			ID_RADARRANGE,		'=',			-1,			-1, -1},
+	{"mfd1_mode",		"Cycle MFD1 Mode",				ID_CYCLEMFD1,		-1,				-1,			-1, -1},
+	{"mfd2_mode",		"Cycle MFD2 Mode",				ID_CYCLEMFD2,		-1,				-1,			-1, -1},
+	{"eject",			"Eject",						ID_EJECT,			-1,				'o',		-1,	-1},
 	
+
+	{"+AP_forward", 		"Forward (Max)",			ID_FORWARD,			'w',			-1,			-1, -1},
+	{"+AP_back", 			"Back/Stop (Min)",			ID_BACKPEDAL,		's',			-1,			-1, -1},
+	{"+AP_moveleft", 		"Turn left (tank)",			ID_MOVELEFT,		'a',			-1,			-1, -1},
+	{"+AP_moveright", 		"Turn right (tank)",		ID_MOVERIGHT,		'd',			-1,			-1, -1},
+	{"+AP_moveup",			"up / jump",				ID_MOVEUP,			-1,				-1,			-1, -1},
+	{"+AP_movedown",		"down / crouch",			ID_MOVEDOWN,		-1,				-1,			-1, -1},
+	{"+AP_left", 			"Left (view)",				ID_LEFT,			K_LEFTARROW,	-1,			-1, -1},
+	{"+AP_right", 			"Right (view)", 			ID_RIGHT,			K_RIGHTARROW,	-1,			-1, -1},
+	{"+AP_lookup", 			"Up (view)",				ID_LOOKUP,			K_PGUP,			-1,			-1, -1},
+	{"+AP_lookdown", 		"Down (view)",				ID_LOOKDOWN,		K_PGDN,			-1,			-1, -1},
+	{"+AP_zoom", 			"Zoom View",				ID_ZOOMVIEW,		K_SHIFT,		-1,			-1, -1},
+	{"+AP_attack", 			"Fire MG",					ID_ATTACK,			K_CTRL,			-1,			-1, -1},
+	{"+AP_button2", 		"Fire Main Weapon",			ID_ATTACK2,			K_ENTER,		K_MOUSE4,	-1, -1},
+	{"+AP_button7",			"Landing Gear",				ID_GEAR,			'g',			-1,			-1, -1},
+	{"+AP_button8",	 		"(Speed)Brakes",			ID_BRAKE,			K_ALT,			-1,			-1, -1},
+	{"+AP_button9",			"Freelook Camera",			ID_FREECAM,			-1,				-1,			-1, -1},
+	{"+AP_button5", 		"Throttle Up",				ID_INCREASE,		'q',			-1,			-1, -1},
+	{"+AP_button6", 		"Throttle Down",			ID_DECREASE,		'e',			-1,			-1, -1},
+	{"AP_unlock",			"Unlock Target",			ID_UNLOCK,			K_CTRL,			-1,			-1, -1},
+	{"+AP_bombcam",			"Bomb Camera",				ID_BOMBCAMERA,		-1,				-1,			-1, -1},
+	
+	{"+Heli_forward", 		"Forward (Max)",			ID_FORWARD,			'w',			-1,			-1, -1},
+	{"+Heli_back", 			"Back/Stop (Min)",			ID_BACKPEDAL,		's',			-1,			-1, -1},
+	{"+Heli_moveleft", 		"Turn left (tank)",			ID_MOVELEFT,		'a',			-1,			-1, -1},
+	{"+Heli_moveright", 	"Turn right (tank)",		ID_MOVERIGHT,		'd',			-1,			-1, -1},
+	{"+Heli_moveup",		"up / jump",				ID_MOVEUP,			-1,				-1,			-1, -1},
+	{"+Heli_movedown",		"down / crouch",			ID_MOVEDOWN,		-1,				-1,			-1, -1},
+	{"+Heli_left", 			"Left (view)",				ID_LEFT,			K_LEFTARROW,	-1,			-1, -1},
+	{"+Heli_right", 		"Right (view)", 			ID_RIGHT,			K_RIGHTARROW,	-1,			-1, -1},
+	{"+Heli_lookup", 		"Up (view)",				ID_LOOKUP,			K_PGUP,			-1,			-1, -1},
+	{"+Heli_lookdown", 		"Down (view)",				ID_LOOKDOWN,		K_PGDN,			-1,			-1, -1},
+	{"+Heli_zoom", 			"Zoom View",				ID_ZOOMVIEW,		K_SHIFT,		-1,			-1, -1},
+	{"+Heli_attack", 		"Fire MG",					ID_ATTACK,			K_CTRL,			-1,			-1, -1},
+	{"+Heli_button2", 		"Fire Main Weapon",			ID_ATTACK2,			K_ENTER,		K_MOUSE4,	-1, -1},
+	{"+Heli_button7",		"Landing Gear",				ID_GEAR,			'g',			-1,			-1, -1},
+	{"+Heli_button8",	 	"(Speed)Brakes",			ID_BRAKE,			K_ALT,			-1,			-1, -1},
+	{"+Heli_button9",	 	"Freelook Camera",			ID_FREECAM,			-1,				-1,			-1, -1},
+	{"+Heli_button5", 		"Throttle Up",				ID_INCREASE,		'q',			-1,			-1, -1},
+	{"+Heli_button6", 		"Throttle Down",			ID_DECREASE,		'e',			-1,			-1, -1},
+	{"Heli_unlock",			"Unlock Target",			ID_UNLOCK,			K_CTRL,			-1,			-1, -1},
+
+
+	{"+GV_forward", 		"Forward (Max)",			ID_FORWARD,			'w',			-1,			-1, -1},
+	{"+GV_back", 			"Back/Stop (Min)",			ID_BACKPEDAL,		's',			-1,			-1, -1},
+	{"+GV_moveleft", 		"Turn left",				ID_MOVELEFT,		'a',			-1,			-1, -1},
+	{"+GV_moveright", 		"Turn right",				ID_MOVERIGHT,		'd',			-1,			-1, -1},
+	{"+GV_moveup",			"up",						ID_MOVEUP,			-1,				-1,			-1, -1},
+	{"+GV_movedown",		"down / crouch",			ID_MOVEDOWN,		-1,				-1,			-1, -1},
+	{"+GV_left", 			"Left (view)",				ID_LEFT,			K_LEFTARROW,	-1,			-1, -1},
+	{"+GV_right", 			"Right (view)", 			ID_RIGHT,			K_RIGHTARROW,	-1,			-1, -1},
+	{"+GV_lookup", 			"Up (view)",				ID_LOOKUP,			K_PGUP,			-1,			-1, -1},
+	{"+GV_lookdown", 		"Down (view)",				ID_LOOKDOWN,		K_PGDN,			-1,			-1, -1},
+	{"+GV_zoom", 			"Zoom View",				ID_ZOOMVIEW,		K_SHIFT,		-1,			-1, -1},
+	{"+GV_attack", 			"Fire MG",					ID_ATTACK,			K_CTRL,			-1,			-1, -1},
+	{"+GV_button2", 		"Fire Main Weapon",			ID_ATTACK2,			K_ENTER,		K_MOUSE4,	-1, -1},
+	{"+GV_button8",	 		"Brakes",					ID_BRAKE,			K_ALT,			-1,			-1, -1},
+	{"+GV_button9",	 		"Freelook Camera",			ID_FREECAM,			-1,				-1,			-1, -1},
+	{"+GV_button5", 		"Throttle Up",				ID_INCREASE,		'q',			-1,			-1, -1},
+	{"+GV_button6", 		"Throttle Down",			ID_DECREASE,		'e',			-1,			-1, -1},
+	{"GV_unlock",			"Unlock Target",			ID_UNLOCK,			K_CTRL,			-1,			-1, -1},
+
+
 	{(char*)NULL,		(char*)NULL,		0,				-1,				-1,		-1,	-1},
 };
 
@@ -3297,21 +3340,11 @@ void Controls_GetConfig( void )
 	// iterate each command, get its numeric binding
 	for (i=0; i < g_bindCount; i++)
 	{
-
 		Controls_GetKeyAssignment(g_bindings[i].command, twokeys);
 
 		g_bindings[i].bind1 = twokeys[0];
 		g_bindings[i].bind2 = twokeys[1];
 	}
-
-	//s_controls.invertmouse.curvalue  = DC->getCVarValue( "m_pitch" ) < 0;
-	//s_controls.smoothmouse.curvalue  = UI_ClampCvar( 0, 1, Controls_GetCvarValue( "m_filter" ) );
-	//s_controls.alwaysrun.curvalue    = UI_ClampCvar( 0, 1, Controls_GetCvarValue( "cl_run" ) );
-	//s_controls.autoswitch.curvalue   = UI_ClampCvar( 0, 1, Controls_GetCvarValue( "cg_autoswitch" ) );
-	//s_controls.sensitivity.curvalue  = UI_ClampCvar( 2, 30, Controls_GetCvarValue( "sensitivity" ) );
-	//s_controls.joyenable.curvalue    = UI_ClampCvar( 0, 1, Controls_GetCvarValue( "in_joystick" ) );
-	//s_controls.joythreshold.curvalue = UI_ClampCvar( 0.05, 0.75, Controls_GetCvarValue( "joy_threshold" ) );
-	//s_controls.freelook.curvalue     = UI_ClampCvar( 0, 1, Controls_GetCvarValue( "cl_freelook" ) );
 }
 
 /*
@@ -3336,20 +3369,7 @@ void Controls_SetConfig(bool restart)
 		}
 	}
 
-	//if ( s_controls.invertmouse.curvalue )
-	//	DC->setCVar("m_pitch", va("%f),-fabs( DC->getCVarValue( "m_pitch" ) ) );
-	//else
-	//	trap_Cvar_SetValue( "m_pitch", fabs( trap_Cvar_VariableValue( "m_pitch" ) ) );
-
-	//trap_Cvar_SetValue( "m_filter", s_controls.smoothmouse.curvalue );
-	//trap_Cvar_SetValue( "cl_run", s_controls.alwaysrun.curvalue );
-	//trap_Cvar_SetValue( "cg_autoswitch", s_controls.autoswitch.curvalue );
-	//trap_Cvar_SetValue( "sensitivity", s_controls.sensitivity.curvalue );
-	//trap_Cvar_SetValue( "in_joystick", s_controls.joyenable.curvalue );
-	//trap_Cvar_SetValue( "joy_threshold", s_controls.joythreshold.curvalue );
-	//trap_Cvar_SetValue( "cl_freelook", s_controls.freelook.curvalue );
 	DC->executeText(EXEC_APPEND, "in_restart\n");
-	//trap_Cmd_ExecuteText( EXEC_APPEND, "in_restart\n" );
 }
 
 /*
@@ -3367,15 +3387,6 @@ void Controls_SetDefaults( void )
 		g_bindings[i].bind1 = g_bindings[i].defaultbind1;
 		g_bindings[i].bind2 = g_bindings[i].defaultbind2;
 	}
-
-	//s_controls.invertmouse.curvalue  = Controls_GetCvarDefault( "m_pitch" ) < 0;
-	//s_controls.smoothmouse.curvalue  = Controls_GetCvarDefault( "m_filter" );
-	//s_controls.alwaysrun.curvalue    = Controls_GetCvarDefault( "cl_run" );
-	//s_controls.autoswitch.curvalue   = Controls_GetCvarDefault( "cg_autoswitch" );
-	//s_controls.sensitivity.curvalue  = Controls_GetCvarDefault( "sensitivity" );
-	//s_controls.joyenable.curvalue    = Controls_GetCvarDefault( "in_joystick" );
-	//s_controls.joythreshold.curvalue = Controls_GetCvarDefault( "joy_threshold" );
-	//s_controls.freelook.curvalue     = Controls_GetCvarDefault( "cl_freelook" );
 }
 
 int BindingIDFromName(const char *name) {

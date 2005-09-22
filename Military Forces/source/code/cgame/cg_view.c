@@ -1,5 +1,5 @@
 /*
- * $Id: cg_view.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: cg_view.c,v 1.3 2005-09-22 23:31:17 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -680,6 +680,14 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, int demoPlayb
 		CG_AddPacketEntities();			// adter calcViewValues, so predicted player state is correct
 		CG_AddMarks();
 		CG_AddLocalEntities();
+
+
+		pw.systems[0].pos[0] = sin((float)cg.time/100)*10;
+		pw.systems[0].pos[1] = cos((float)cg.time/100)*10;
+
+		// Add Particles
+		CG_ParticleWorldThink(&pw);
+		CG_ParticleWorldRender(&pw);
 	}
 
 	// add buffered sounds

@@ -209,7 +209,7 @@ void RE_AddRefEntityToScene( const refEntity_t *ent ) {
 		return;
 	}
   // https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=402
-	if ( r_numentities >= ENTITYNUM_WORLD ) {
+	if ( r_numentities >= MAX_RENTITIES) { //ENTITYNUM_WORLD ) {
 		return;
 	}
 	if ( ent->reType < 0 || ent->reType >= RT_MAX_REF_ENTITY_TYPE ) {

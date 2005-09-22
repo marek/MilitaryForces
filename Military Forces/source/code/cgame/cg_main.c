@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.7 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: cg_main.c,v 1.8 2005-09-22 23:31:17 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -67,6 +67,7 @@ centity_t			cg_entities[MAX_GENTITIES];
 completeLoadout_t	cg_loadouts[MAX_GENTITIES];
 weaponInfo_t		cg_weapons[WI_MAX];
 itemInfo_t			cg_items[MAX_ITEMS];
+particleWorld_t		pw;
 
 // (unused cVars)
 //vmCvar_t	cg_drawCrosshair;
@@ -84,6 +85,7 @@ vmCvar_t	cg_swingSpeed;
 vmCvar_t	cg_shadows;
 vmCvar_t	cg_drawTimer;
 vmCvar_t	cg_drawFPS;
+vmCvar_t	cg_drawParticleStats;
 vmCvar_t	cg_drawSnapshot;
 vmCvar_t	cg_draw3dIcons;
 vmCvar_t	cg_drawIcons;
@@ -209,6 +211,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_drawStatus, "cg_drawStatus", "1", CVAR_ARCHIVE  },
 	{ &cg_drawTimer, "cg_drawTimer", "1", CVAR_ARCHIVE  },
 	{ &cg_drawFPS, "cg_drawFPS", "0", CVAR_ARCHIVE  },
+	{ &cg_drawParticleStats, "cg_drawParticleStats", "0", CVAR_ARCHIVE  },
 	{ &cg_drawSnapshot, "cg_drawSnapshot", "0", CVAR_ARCHIVE  },
 	{ &cg_draw3dIcons, "cg_draw3dIcons", "1", CVAR_ARCHIVE  },
 	{ &cg_drawIcons, "cg_drawIcons", "1", CVAR_ARCHIVE  },
@@ -954,6 +957,7 @@ static void CG_RegisterGraphics( void ) {
 	}
 
 	cgs.media.balloonShader = trap_R_RegisterShader( "sprites/balloon3" );
+	cgs.media.particleShader = trap_R_RegisterShader( "gfx/misc/particle.tga" );
 
 	// MFQ3 stuff
 	cgs.media.vapor = trap_R_RegisterModel( "models/effects/vapor.md3" );
@@ -2141,6 +2145,61 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	// mission editor
 	if( cgs.gametype == GT_MISSION_EDITOR )
 		ME_Init_MissionEditor();
+
+
+	// Add a particle system origin
+	{
+		particleSystem_t	ps;
+		particleEmitter_t	pe;
+		particle_t			p;
+		int					i;
+
+		memset(&pw, 0, sizeof(pw));
+		memset(&ps, 0, sizeof(ps));
+		memset(&pe, 0, sizeof(pe));
+		memset(&p, 0, sizeof(p));
+		
+		CG_ParticleWorldInit(&pw);
+
+		ps.cent = NULL;
+		ps.dead = false;
+		ps.lifetime = 0;
+		VectorSet(ps.pos, 0, 0, 3000);
+		i = CG_AddParticleSystem(&pw, &ps);
+		if(i >= 0)
+		{
+			p.lifetime = 20000;
+			p.gravity = 1600;
+			p.radius = 10;
+			p.alphaDecayStartValue = 1.0f;
+			p.alphaDecayEndValue = 1.0f;
+			//p.alphaDecayStartTime = 1000;
+			//p.alphaDecayEndTime = 10000;
+			p.bounce = 1.0f;
+			p.numShaders = 1;
+			p.dieOnCollision = false;
+			p.shaders[0] = cgs.media.particleShader;
+			p.rotationvel = 1.0f;
+			p.growstart = 0;
+			p.growend = 20000;
+			p.growrate = 5.0f;
+		//	p.attractionEmitter = -500.0f;
+		//	p.attractionEntity = 500.0f;
+
+			pe.ejectInterval = 10;
+			VectorSet(pe.ejectVelocity,0.0f,0.0f,500.0f);
+			VectorSet(pe.accelVarianceMax,100.0f,100.0f,0.0f);
+			VectorSet(pe.accelVarianceMin,-100.0f,-100.0f,0.0f);
+			//VectorClear(pe.ejectVelocity);
+			pe.lifetime = 0;
+			pe.parentSytem = i;
+			pe.numEjectPerInterval = 5;
+			pe.particleTemplate = p;
+			i = CG_AddParticleEmitter(&pw, &pe);
+			pw.emitters[i].particleTemplate.parentEmitter = i;
+		}
+	}
+
 }
 
 /*
