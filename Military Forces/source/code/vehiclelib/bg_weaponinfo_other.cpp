@@ -39,7 +39,7 @@ DataManager::createAllOther()
 	wep->crosshairLock_ = CH_ROCKETMODE;			
 	wep->numberPerPackage_ = 19;		
 	wep->fitsCategory_ = CAT_PLANE|CAT_HELO;			
-	wep->fitsPylon_ = PF_FFAR;				
+	wep->fitsPylon_ = WeaponInfo::PF_OTW_FH;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = WF_HAS_FIRE_FRAME;
 	allWeapons_.push_back(wep);
@@ -71,43 +71,10 @@ DataManager::createAllOther()
 	wep->crosshairLock_ = CH_ROCKETMODE;			
 	wep->numberPerPackage_ = 7;		
 	wep->fitsCategory_ = CAT_PLANE|CAT_HELO;			
-	wep->fitsPylon_ = PF_FFAR;				
+	wep->fitsPylon_ = WeaponInfo::PF_OTW_FL;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = WF_HAS_FIRE_FRAME;
 	allWeapons_.push_back(wep);
-
-	// FFAR+ (6)
-	wep = createWeapon();
-	wep->type_ = WT_ROCKET;					
-	wep->gameSet_ = MF_GAMESET_ANY;				
-	wep->descriptiveName_ = "FFAR+ (6)";		
-	wep->modelName_ = "models/weapons/vwep_rocket_hv.md3";				
-	wep->vwepName_ = "models/weapons/vwep_ffar_hv.md3";				
-	wep->iconName_ = "hud/iconw_rkt.tga";				
-	wep->targetCategory_ = CAT_ANY;				
-	wep->nonCatMod_ = 0.0f;				
-	wep->muzzleVelocity_ = 1500;		
-	wep->range_ = 0.0f;					
-	wep->fuelRange_ = 5000;				
-	wep->fireInterval_ = 200;			
-	wep->damage_ = 80;				
-	wep->damageRadius_ = 80;			
-	wep->spread_ = 2;				
-	wep->barrels_ = 2;				
-	wep->barrelDistance_ = 0;		
-	wep->lockCone_ = 0;				
-	wep->followCone_ = 0;			
-	wep->lockDelay_ = 0;				
-	wep->crosshair_ = CH_ROCKETMODE;				
-	wep->crosshairTrack_ = CH_ROCKETMODE;		
-	wep->crosshairLock_ = CH_ROCKETMODE;			
-	wep->numberPerPackage_ = 6;		
-	wep->fitsCategory_ = CAT_PLANE|CAT_HELO;			
-	wep->fitsPylon_ = PF_FFAR;				
-	wep->basicECMVulnerability_ = 0;	
-	wep->flags_ = WF_HAS_FIRE_FRAME;
-	allWeapons_.push_back(wep);
-
 
 	// flares
 	wep = createWeapon();
@@ -136,7 +103,7 @@ DataManager::createAllOther()
 	wep->crosshairLock_ = 0;			
 	wep->numberPerPackage_ = 1;		
 	wep->fitsCategory_ = CAT_ANY;			
-	wep->fitsPylon_ = PF_NA;				
+	wep->fitsPylon_ = WeaponInfo::PF_NOT_AP;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
 	allWeapons_.push_back(wep);
@@ -168,7 +135,7 @@ DataManager::createAllOther()
 	wep->crosshairLock_ = 0;			
 	wep->numberPerPackage_ = 1;		
 	wep->fitsCategory_ = CAT_ANY;			
-	wep->fitsPylon_ = PF_FLAREPOD;				
+	wep->fitsPylon_ = WeaponInfo::PF_MSC_FL;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
 	allWeapons_.push_back(wep);

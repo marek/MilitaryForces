@@ -47,19 +47,17 @@ VehicleMountInfoEvaluator::VehicleMountInfoEvaluator(VehicleMountInfo const& vmi
 
 }
 
-int VehicleMountInfo::mountCompare( const void* a, const void* b )
+bool
+VehicleMountInfo::mountCompare( VehicleMountInfo const& a, VehicleMountInfo const& b )
 {
-	int p1 = (reinterpret_cast<const VehicleMountInfo*>(a))->position_;
-	int p2 = (reinterpret_cast<const VehicleMountInfo*>(b))->position_;
-	if( p1 == p2 ) 
+	if( a.position_ == b.position_ )
 	{
-		if( (reinterpret_cast<const VehicleMountInfo*>(a))->left_ ) 
-			return -1;
-		return 1;
-	} 
-	else 
-		return p1-p2;
+		if( a.left_ )
+			return true;
+		return false;
+	}
+	else
+		return ((b.position_ - a.position_) >= 0);
 }
-
 
 
