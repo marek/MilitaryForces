@@ -115,13 +115,13 @@ VehicleInfo::createWeaponMounts()
 	for( size_t i = 0; i < tagList.size(); ++i )
 	{
 		// check if format is ok
-		if( strlen( tagList[i].name ) < 12 )
+		if( strlen( tagList[i].name ) < 10 )
 			return false;
-		mounts_[i].position_ = ahextoi( va("0x%c", tagList[i].name[5]) );
-		mounts_[i].group_ = ahextoi( va("0x%c", tagList[i].name[6]) );
-		mounts_[i].flags_ = ahextoi( va("0x%c%c%c%c%c%c", tagList[i].name[7], tagList[i].name[8],
-														 tagList[i].name[9], tagList[i].name[10],
-														 tagList[i].name[11], tagList[i].name[12]) );
+		mounts_[i].position_ = ahextoi( va("0x%c", tagList[i].name[2]) );
+		mounts_[i].group_ = ahextoi( va("0x%c", tagList[i].name[3]) );
+		mounts_[i].flags_ = ahextoi( va("0x%c%c%c%c%c%c", tagList[i].name[4], tagList[i].name[5],
+														 tagList[i].name[6], tagList[i].name[7],
+														 tagList[i].name[8], tagList[i].name[9]) );
 		mounts_[i].left_ = (tagList[i].name[13] == 'L') ? true : false;
 	}
 
@@ -242,6 +242,7 @@ VehicleInfo::getTagsContaining( std::string const& filename,
 	if( str.empty() || str == "" ) 
 		return 0;
 
+	tagList.clear();
 	fileHandle_t	f;
 	if( trap_FS_FOpenFile(filename.c_str(), &f, FS_READ) >= 0 ) 
 	{
