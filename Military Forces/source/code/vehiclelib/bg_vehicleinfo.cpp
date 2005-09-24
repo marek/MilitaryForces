@@ -6,6 +6,8 @@
 #include "bg_weaponinfo.h"
 #include "bg_datamanager.h"
 
+#include <algorithm>
+
 // decls
 int		trap_FS_FOpenFile( const char *qpath, fileHandle_t *f, fsMode_t mode );
 void	trap_FS_Read( void *buffer, int len, fileHandle_t f );
@@ -98,13 +100,12 @@ VehicleInfo::createWeaponMounts()
 	std::string modelname = getModelPath( true );
 
 	std::vector<md3Tag_t> tagList;
-	if( !getTagsContaining(modelname, "tag_P", tagList) )
+	if( !getTagsContaining(modelname, "PY", tagList) )
 		return false;
 
-	VehicleMountInfo* sortMounts = new VehicleMountInfo[tagList.size()];
-
+	mounts_.resize(tagList.size());
 	for( size_t i = 0; i < tagList.size(); ++i )
-		sortMounts[i].tag_ = tagList[i];
+		mounts_[i].tag_ = tagList[i];
 
 //#ifdef _DEBUG
 //	Com_Printf( "%s has %d mounts\n", descriptiveName_.c_str(), tagList.size() );
@@ -115,25 +116,17 @@ VehicleInfo::createWeaponMounts()
 	{
 		// check if format is ok
 		if( strlen( tagList[i].name ) < 12 )
-		{
-			delete [] sortMounts;
 			return false;
-		}
-		sortMounts[i].position_ = ahextoi( va("0x%c", tagList[i].name[5]) );
-		sortMounts[i].group_ = ahextoi( va("0x%c", tagList[i].name[6]) );
-		sortMounts[i].flags_ = ahextoi( va("0x%c%c%c%c", tagList[i].name[7], tagList[i].name[8],
-														tagList[i].name[9], tagList[i].name[10]) );
-		sortMounts[i].left_ = (tagList[i].name[11] == 'L') ? true : false;
+		mounts_[i].position_ = ahextoi( va("0x%c", tagList[i].name[5]) );
+		mounts_[i].group_ = ahextoi( va("0x%c", tagList[i].name[6]) );
+		mounts_[i].flags_ = ahextoi( va("0x%c%c%c%c%c%c", tagList[i].name[7], tagList[i].name[8],
+														 tagList[i].name[9], tagList[i].name[10],
+														 tagList[i].name[11], tagList[i].name[12]) );
+		mounts_[i].left_ = (tagList[i].name[13] == 'L') ? true : false;
 	}
 
-	// sort  
-	qsort(&sortMounts[0], mounts_.size(), sizeof(VehicleMountInfo), VehicleMountInfo::mountCompare);
-
-	// move the mounts into the list
-	mounts_.clear();
-	for( size_t i = 0; i < tagList.size(); ++i )
-		mounts_.push_back(sortMounts[i]);
-	delete [] sortMounts;
+	// sort them
+	std::sort( mounts_.begin(), mounts_.end(), VehicleMountInfo::mountCompare );
 
 	return true;
 }
@@ -166,7 +159,7 @@ VehicleInfo::correctArmament(Loadout& loadout, std::string const& loadoutName)
 	for( size_t i = 0; i < workCopy.size(); ++i )
 	{
 		// weapons which cant be fitted on mounts arent evaluated
-		if( allWeapons[workCopy[i].weaponIndex_]->fitsPylon_ == PF_NA )
+		if( allWeapons[workCopy[i].weaponIndex_]->fitsPylon_ == WeaponInfo::PF_NOT_AP )
 			continue;
 		// go through all mounts
 		for( size_t j = 0; j < mountList.size(); ++j )
@@ -192,7 +185,7 @@ VehicleInfo::correctArmament(Loadout& loadout, std::string const& loadoutName)
 	for( size_t i = 0; i < workCopy.size(); ++i )
 	{
 		// weapons which cant be fitted on mounts arent evaluated
-		if( allWeapons[workCopy[i].weaponIndex_]->fitsPylon_ == PF_NA )
+		if( allWeapons[workCopy[i].weaponIndex_]->fitsPylon_ == WeaponInfo::PF_NOT_AP )
 			continue;
 		if( workCopy[i].maxAmmo_ > 0 )
 		{

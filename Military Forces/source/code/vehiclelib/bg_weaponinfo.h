@@ -9,6 +9,50 @@
 // list of weapons
 struct WeaponInfo
 {	
+	// pylon info
+	enum
+	{
+		PF_NOT_AP		= 0x000000,		// not applicable
+
+		// anti aircraft missiles
+		PF_AAM_ST		= 0x000001,		// Stinger	(very small AA)
+		PF_AAM_SW		= 0x000002,		// Sidewinder (small AA)
+		PF_AAM_AM		= 0x000004,		// AMRAAM (medium AA)
+		PF_AAM_PH		= 0x000008,		// Phoenix (heavy AA)
+
+		// bombs (dumb and guided)
+		PF_BMB_82		= 0x000010,		// bomb Mk82 (light)
+		PF_BMB_83		= 0x000020,		// bomb Mk83 (medium)
+		PF_BMB_84		= 0x000040,		// bomb Mk84 (heavy)
+		PF_BMB_GD		= 0x000080,		// guided bomb (as extra flag to bomb flags)
+
+		// anti ground missiles
+		PF_AGM_HF		= 0x000100,		// Hellfire (light AGM)
+		PF_AGM_MV		= 0x000200,		// Maverick (heavy AGM)
+		PF_AGM_HM		= 0x000400,		// HARM (anti radar)
+		PF_AGM_DU		= 0x000800,		// Durandal (anti runway)
+
+		// other weapons
+		PF_OTW_FL		= 0x001000,		// FFAR light = dont remove
+		PF_OTW_FH		= 0x002000,		// FFAR heavy = dont remove
+		PF_OTW_NL		= 0x004000,		// nuke light
+		PF_OTW_NH		= 0x008000,		// nuke heavy
+
+		// misc stuff
+		PF_MSC_FL		= 0x010000,		// flare pod = dont remove
+		PF_MSC_EC		= 0x020000,		// ECM pod = dont remove
+		PF_MSC_TL		= 0x040000,		// drop tank light
+		PF_MSC_TH		= 0x080000,		// drop tank heavy
+
+		// flags
+		PF_FLG_DD		= 0x100000,		// dont drop on launch (for example wingtip)
+		// free flags: 0x200000 - 0x800000
+
+		// helper flags
+		PF_FLH_DR		= 0x033000,		// these weapons arent removed on launch                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
+		
+	};
+
 					WeaponInfo();
 					~WeaponInfo();
 

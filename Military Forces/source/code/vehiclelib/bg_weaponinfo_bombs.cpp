@@ -29,7 +29,7 @@ DataManager::createAllBombs()
 	wep->damage_ = 50;				
 	wep->damageRadius_ = 150;			
 	wep->spread_ = 0;				
-	wep->barrels_ = 2;				
+	wep->barrels_ = 0;				
 	wep->barrelDistance_ = 0;		
 	wep->lockCone_ = 0;				
 	wep->followCone_ = 0;			
@@ -39,7 +39,7 @@ DataManager::createAllBombs()
 	wep->crosshairLock_ = CH_BOMBMODE;			
 	wep->numberPerPackage_ = 1;		
 	wep->fitsCategory_ = CAT_PLANE;			
-	wep->fitsPylon_ = PF_AG_LT;				
+	wep->fitsPylon_ = WeaponInfo::PF_BMB_82;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
 	allWeapons_.push_back(wep);
@@ -61,7 +61,7 @@ DataManager::createAllBombs()
 	wep->damage_ = 50;				
 	wep->damageRadius_ = 150;			
 	wep->spread_ = 0;				
-	wep->barrels_ = 2;				
+	wep->barrels_ = 0;				
 	wep->barrelDistance_ = 0;		
 	wep->lockCone_ = 0;				
 	wep->followCone_ = 0;			
@@ -71,9 +71,41 @@ DataManager::createAllBombs()
 	wep->crosshairLock_ = CH_BOMBMODE;			
 	wep->numberPerPackage_ = 1;		
 	wep->fitsCategory_ = CAT_PLANE;			
-	wep->fitsPylon_ = PF_AG_LT;				
+	wep->fitsPylon_ = WeaponInfo::PF_BMB_82;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = WF_HAS_FIRE_FRAME;
+	allWeapons_.push_back(wep);
+
+	// GBU12
+	wep = createWeapon();
+	wep->type_ = WT_IRONBOMB;					
+	wep->gameSet_ = MF_GAMESET_ANY;				
+	wep->descriptiveName_ = "GBU-12";		
+	wep->modelName_ = "models/weapons/vwep_500.md3";				
+	wep->vwepName_ = "models/weapons/vwep_500.md3";				
+	wep->iconName_ = "hud/iconw_rkt.tga";				
+	wep->targetCategory_ = CAT_ANY;				
+	wep->nonCatMod_ = 0.0f;				
+	wep->muzzleVelocity_ = 0;		
+	wep->range_ = 0.0f;					
+	wep->fuelRange_ = 0;				
+	wep->fireInterval_ = 100;			
+	wep->damage_ = 50;				
+	wep->damageRadius_ = 150;			
+	wep->spread_ = 0;				
+	wep->barrels_ = 2;				
+	wep->barrelDistance_ = 0;		
+	wep->lockCone_ = 0.985f;				
+	wep->followCone_ = 0.996f;			
+	wep->lockDelay_ = 1500;				
+	wep->crosshair_ = CH_MISSILEMODE;				
+	wep->crosshairTrack_ = CH_MISSILEMODETRACK;		
+	wep->crosshairLock_ = CH_MISSILEMODELOCK;			
+	wep->numberPerPackage_ = 1;		
+	wep->fitsCategory_ = CAT_PLANE;			
+	wep->fitsPylon_ = WeaponInfo::PF_BMB_82|WeaponInfo::PF_BMB_GD;				
+	wep->basicECMVulnerability_ = 0;	
+	wep->flags_ = 0;
 	allWeapons_.push_back(wep);
 
 	// Mk83
@@ -93,7 +125,7 @@ DataManager::createAllBombs()
 	wep->damage_ = 120;				
 	wep->damageRadius_ = 230;			
 	wep->spread_ = 0;				
-	wep->barrels_ = 2;				
+	wep->barrels_ = 0;				
 	wep->barrelDistance_ = 0;		
 	wep->lockCone_ = 0;				
 	wep->followCone_ = 0;			
@@ -103,12 +135,12 @@ DataManager::createAllBombs()
 	wep->crosshairLock_ = CH_BOMBMODE;			
 	wep->numberPerPackage_ = 1;		
 	wep->fitsCategory_ = CAT_PLANE;			
-	wep->fitsPylon_ = PF_AG_MED;				
+	wep->fitsPylon_ = WeaponInfo::PF_BMB_83;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
 	allWeapons_.push_back(wep);
 
-	// Mk83
+	// Mk83R
 	wep = createWeapon();
 	wep->type_ = WT_IRONBOMB;					
 	wep->gameSet_ = MF_GAMESET_ANY;				
@@ -125,7 +157,7 @@ DataManager::createAllBombs()
 	wep->damage_ = 120;				
 	wep->damageRadius_ = 230;			
 	wep->spread_ = 0;				
-	wep->barrels_ = 2;				
+	wep->barrels_ = 0;				
 	wep->barrelDistance_ = 0;		
 	wep->lockCone_ = 0;				
 	wep->followCone_ = 0;			
@@ -135,9 +167,41 @@ DataManager::createAllBombs()
 	wep->crosshairLock_ = CH_BOMBMODE;			
 	wep->numberPerPackage_ = 1;		
 	wep->fitsCategory_ = CAT_PLANE;			
-	wep->fitsPylon_ = PF_AG_MED;				
+	wep->fitsPylon_ = WeaponInfo::PF_BMB_83;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = WF_HAS_FIRE_FRAME;
+	allWeapons_.push_back(wep);
+
+	// GBU16
+	wep = createWeapon();
+	wep->type_ = WT_IRONBOMB;					
+	wep->gameSet_ = MF_GAMESET_ANY;				
+	wep->descriptiveName_ = "GBU-16";		
+	wep->modelName_ = "models/weapons/vwep_1000.md3";				
+	wep->vwepName_ = "models/weapons/vwep_1000.md3";				
+	wep->iconName_ = "hud/iconw_rkt.tga";				
+	wep->targetCategory_ = CAT_ANY;				
+	wep->nonCatMod_ = 0.0f;				
+	wep->muzzleVelocity_ = 0;		
+	wep->range_ = 0.0f;					
+	wep->fuelRange_ = 0;				
+	wep->fireInterval_ = 200;			
+	wep->damage_ = 120;				
+	wep->damageRadius_ = 230;			
+	wep->spread_ = 0;				
+	wep->barrels_ = 0;				
+	wep->barrelDistance_ = 0;		
+	wep->lockCone_ = 0.985f;				
+	wep->followCone_ = 0.996f;			
+	wep->lockDelay_ = 1500;				
+	wep->crosshair_ = CH_MISSILEMODE;				
+	wep->crosshairTrack_ = CH_MISSILEMODETRACK;		
+	wep->crosshairLock_ = CH_MISSILEMODELOCK;			
+	wep->numberPerPackage_ = 1;		
+	wep->fitsCategory_ = CAT_PLANE;			
+	wep->fitsPylon_ = WeaponInfo::PF_BMB_83|WeaponInfo::PF_BMB_GD;				
+	wep->basicECMVulnerability_ = 0;	
+	wep->flags_ = 0;
 	allWeapons_.push_back(wep);
 
 	// Mk84
@@ -157,7 +221,7 @@ DataManager::createAllBombs()
 	wep->damage_ = 260;				
 	wep->damageRadius_ = 330;			
 	wep->spread_ = 0;				
-	wep->barrels_ = 2;				
+	wep->barrels_ = 0;				
 	wep->barrelDistance_ = 0;		
 	wep->lockCone_ = 0;				
 	wep->followCone_ = 0;			
@@ -167,16 +231,16 @@ DataManager::createAllBombs()
 	wep->crosshairLock_ = CH_BOMBMODE;			
 	wep->numberPerPackage_ = 1;		
 	wep->fitsCategory_ = CAT_PLANE;			
-	wep->fitsPylon_ = PF_AG_HVY;				
+	wep->fitsPylon_ = WeaponInfo::PF_BMB_84;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
 	allWeapons_.push_back(wep);
 
-	// gbu15
+	// gbu10
 	wep = createWeapon();
 	wep->type_ = WT_GUIDEDBOMB;					
 	wep->gameSet_ = MF_GAMESET_MODERN;				
-	wep->descriptiveName_ = "GBU-15";		
+	wep->descriptiveName_ = "GBU-10";		
 	wep->modelName_ = "models/weapons/vwep_2000.md3";				
 	wep->vwepName_ = "models/weapons/vwep_2000.md3";				
 	wep->iconName_ = "hud/iconw_rkt.tga";				
@@ -189,7 +253,7 @@ DataManager::createAllBombs()
 	wep->damage_ = 300;				
 	wep->damageRadius_ = 300;			
 	wep->spread_ = 0;				
-	wep->barrels_ = 2;				
+	wep->barrels_ = 0;				
 	wep->barrelDistance_ = 0;		
 	wep->lockCone_ = 0.985f;				
 	wep->followCone_ = 0.996f;			
@@ -199,7 +263,7 @@ DataManager::createAllBombs()
 	wep->crosshairLock_ = CH_MISSILEMODELOCK;			
 	wep->numberPerPackage_ = 1;		
 	wep->fitsCategory_ = CAT_PLANE;			
-	wep->fitsPylon_ = PF_AG_HVY;				
+	wep->fitsPylon_ = WeaponInfo::PF_BMB_84|WeaponInfo::PF_BMB_GD;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
 	allWeapons_.push_back(wep);
@@ -231,7 +295,7 @@ DataManager::createAllBombs()
 	wep->crosshairLock_ = CH_BOMBMODE;			
 	wep->numberPerPackage_ = 1;		
 	wep->fitsCategory_ = CAT_PLANE;			
-	wep->fitsPylon_ = PF_AG_MED;				
+	wep->fitsPylon_ = WeaponInfo::PF_AGM_DU;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = WF_HAS_FIRE_FRAME;
 	allWeapons_.push_back(wep);

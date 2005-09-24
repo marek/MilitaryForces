@@ -61,7 +61,7 @@ DataManager::createAllPlanes()
 	addWeaponToLoadout(loadout, "20mm MG", "MG", 450, Armament::ST_PRIMARY_WEAPON );
 	addWeaponToLoadout(loadout, "AIM-9 Sidewinder", "AIM-9", 2, Armament::ST_SECONDARY_WEAPON );
 	addWeaponToLoadout(loadout, "AIM-120 AMRAAM", "AIM-120", 2, Armament::ST_SECONDARY_WEAPON );
-	addWeaponToLoadout(loadout, "Mk-83", "Mk-83", 4, Armament::ST_SECONDARY_WEAPON );
+	addWeaponToLoadout(loadout, "Mk-82", "Mk-82", 12, Armament::ST_SECONDARY_WEAPON );
 	addWeaponToLoadout(loadout, "Flares", "Flares", 30, Armament::ST_NOT_SELECTABLE );
 	veh->defaultLoadouts_.insert(std::make_pair("Iron Bombs", loadout));
 	allVehicles_.push_back(veh);

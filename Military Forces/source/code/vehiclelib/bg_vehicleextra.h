@@ -60,7 +60,7 @@ struct VehicleMountInfo
 	int				flags_;					// flags
 	bool			left_;					// left side or right
 
-	static int		mountCompare( const void* a, const void* b );
+	static bool		mountCompare( VehicleMountInfo const& a, VehicleMountInfo const& b );
 };
 
 struct VehicleMountInfoEvaluator : public VehicleMountInfo

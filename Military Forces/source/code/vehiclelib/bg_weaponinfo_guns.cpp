@@ -39,7 +39,7 @@ DataManager::createAllGuns()
 	wep->crosshairLock_ = CH_GUNMODE;			
 	wep->numberPerPackage_ = 1;		
 	wep->fitsCategory_ = CAT_ANY;			
-	wep->fitsPylon_ = PF_NA;				
+	wep->fitsPylon_ = WeaponInfo::PF_NOT_AP;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;	
 	allWeapons_.push_back(wep);
@@ -71,7 +71,7 @@ DataManager::createAllGuns()
 	wep->crosshairLock_ = CH_GUNMODE;			
 	wep->numberPerPackage_ = 1;		
 	wep->fitsCategory_ = CAT_ANY;			
-	wep->fitsPylon_ = PF_NA;				
+	wep->fitsPylon_ = WeaponInfo::PF_NOT_AP;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
 	allWeapons_.push_back(wep);
@@ -103,7 +103,7 @@ DataManager::createAllGuns()
 	wep->crosshairLock_ = CH_GUNMODE;			
 	wep->numberPerPackage_ = 1;		
 	wep->fitsCategory_ = CAT_ANY;			
-	wep->fitsPylon_ = PF_NA;				
+	wep->fitsPylon_ = WeaponInfo::PF_NOT_AP;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
 	allWeapons_.push_back(wep);
@@ -135,7 +135,7 @@ DataManager::createAllGuns()
 	wep->crosshairLock_ = CH_GUNMODE;			
 	wep->numberPerPackage_ = 1;		
 	wep->fitsCategory_ = CAT_ANY;			
-	wep->fitsPylon_ = PF_NA;				
+	wep->fitsPylon_ = WeaponInfo::PF_NOT_AP;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
 	allWeapons_.push_back(wep);
@@ -167,7 +167,7 @@ DataManager::createAllGuns()
 	wep->crosshairLock_ = CH_GUNMODE;			
 	wep->numberPerPackage_ = 1;		
 	wep->fitsCategory_ = CAT_ANY;			
-	wep->fitsPylon_ = PF_NA;				
+	wep->fitsPylon_ = WeaponInfo::PF_NOT_AP;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
 	allWeapons_.push_back(wep);
@@ -199,7 +199,7 @@ DataManager::createAllGuns()
 	wep->crosshairLock_ = CH_GUNMODE;			
 	wep->numberPerPackage_ = 1;		
 	wep->fitsCategory_ = CAT_ANY;			
-	wep->fitsPylon_ = PF_NA;				
+	wep->fitsPylon_ = WeaponInfo::PF_NOT_AP;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
 	allWeapons_.push_back(wep);
@@ -231,7 +231,7 @@ DataManager::createAllGuns()
 	wep->crosshairLock_ = CH_GUNMODE;			
 	wep->numberPerPackage_ = 1;		
 	wep->fitsCategory_ = CAT_ANY;			
-	wep->fitsPylon_ = PF_NA;				
+	wep->fitsPylon_ = WeaponInfo::PF_NOT_AP;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
 	allWeapons_.push_back(wep);
@@ -263,7 +263,7 @@ DataManager::createAllGuns()
 	wep->crosshairLock_ = CH_GUNMODE;			
 	wep->numberPerPackage_ = 1;		
 	wep->fitsCategory_ = CAT_ANY;			
-	wep->fitsPylon_ = PF_NA;				
+	wep->fitsPylon_ = WeaponInfo::PF_NOT_AP;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
 	allWeapons_.push_back(wep);
@@ -295,7 +295,7 @@ DataManager::createAllGuns()
 	wep->crosshairLock_ = CH_GUNMODE;			
 	wep->numberPerPackage_ = 1;		
 	wep->fitsCategory_ = CAT_ANY;			
-	wep->fitsPylon_ = PF_NA;				
+	wep->fitsPylon_ = WeaponInfo::PF_NOT_AP;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
 	allWeapons_.push_back(wep);
@@ -327,7 +327,7 @@ DataManager::createAllGuns()
 	wep->crosshairLock_ = CH_GUNMODE;			
 	wep->numberPerPackage_ = 1;		
 	wep->fitsCategory_ = CAT_ANY;			
-	wep->fitsPylon_ = PF_NA;				
+	wep->fitsPylon_ = WeaponInfo::PF_NOT_AP;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
 	allWeapons_.push_back(wep);
@@ -359,7 +359,7 @@ DataManager::createAllGuns()
 	wep->crosshairLock_ = CH_GUNMODE;			
 	wep->numberPerPackage_ = 1;		
 	wep->fitsCategory_ = CAT_ANY;			
-	wep->fitsPylon_ = PF_NA;				
+	wep->fitsPylon_ = WeaponInfo::PF_NOT_AP;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
 	allWeapons_.push_back(wep);
@@ -391,7 +391,7 @@ DataManager::createAllGuns()
 	wep->crosshairLock_ = CH_GUNMODE;			
 	wep->numberPerPackage_ = 1;		
 	wep->fitsCategory_ = CAT_ANY;			
-	wep->fitsPylon_ = PF_NA;				
+	wep->fitsPylon_ = WeaponInfo::PF_NOT_AP;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
 	allWeapons_.push_back(wep);
@@ -423,7 +423,7 @@ DataManager::createAllGuns()
 	wep->crosshairLock_ = CH_GUNMODE;			
 	wep->numberPerPackage_ = 1;		
 	wep->fitsCategory_ = CAT_ANY;			
-	wep->fitsPylon_ = PF_NA;				
+	wep->fitsPylon_ = WeaponInfo::PF_NOT_AP;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
 	allWeapons_.push_back(wep);
@@ -455,7 +455,7 @@ DataManager::createAllGuns()
 	wep->crosshairLock_ = CH_GUNMODE;			
 	wep->numberPerPackage_ = 1;		
 	wep->fitsCategory_ = CAT_ANY;			
-	wep->fitsPylon_ = PF_NA;				
+	wep->fitsPylon_ = WeaponInfo::PF_NOT_AP;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
 	allWeapons_.push_back(wep);
@@ -487,7 +487,7 @@ DataManager::createAllGuns()
 	wep->crosshairLock_ = CH_ROCKETMODE;			
 	wep->numberPerPackage_ = 1;		
 	wep->fitsCategory_ = CAT_GROUND;			
-	wep->fitsPylon_ = PF_NA;				
+	wep->fitsPylon_ = WeaponInfo::PF_NOT_AP;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
 	allWeapons_.push_back(wep);
@@ -519,7 +519,7 @@ DataManager::createAllGuns()
 	wep->crosshairLock_ = CH_ROCKETMODE;			
 	wep->numberPerPackage_ = 1;		
 	wep->fitsCategory_ = CAT_GROUND;			
-	wep->fitsPylon_ = PF_NA;				
+	wep->fitsPylon_ = WeaponInfo::PF_NOT_AP;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
 	allWeapons_.push_back(wep);
