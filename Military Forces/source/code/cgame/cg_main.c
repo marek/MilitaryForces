@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.8 2005-09-22 23:31:17 minkis Exp $
+ * $Id: cg_main.c,v 1.9 2005-10-15 14:05:23 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -2148,7 +2148,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 
 
 	// Add a particle system origin
-	{
+	/*{
 		particleSystem_t	ps;
 		particleEmitter_t	pe;
 		particle_t			p;
@@ -2158,6 +2158,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 		memset(&ps, 0, sizeof(ps));
 		memset(&pe, 0, sizeof(pe));
 		memset(&p, 0, sizeof(p));
+		
 		
 		CG_ParticleWorldInit(&pw);
 
@@ -2198,7 +2199,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 			i = CG_AddParticleEmitter(&pw, &pe);
 			pw.emitters[i].particleTemplate.parentEmitter = i;
 		}
-	}
+	}*/
 
 }
 

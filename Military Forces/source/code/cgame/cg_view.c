@@ -1,5 +1,5 @@
 /*
- * $Id: cg_view.c,v 1.3 2005-09-22 23:31:17 minkis Exp $
+ * $Id: cg_view.c,v 1.4 2005-10-15 14:05:23 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -686,8 +686,10 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, int demoPlayb
 		pw.systems[0].pos[1] = cos((float)cg.time/100)*10;
 
 		// Add Particles
+		/*
 		CG_ParticleWorldThink(&pw);
 		CG_ParticleWorldRender(&pw);
+		*/
 	}
 
 	// add buffered sounds
