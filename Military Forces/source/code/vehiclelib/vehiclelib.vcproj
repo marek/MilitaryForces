@@ -23,6 +23,7 @@
 				MinimalRebuild="FALSE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
+				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderFile="$(IntDir)\vehiclelib.pch"
 				AssemblerListingLocation="$(IntDir)\"
@@ -70,6 +71,7 @@
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="TRUE"
+				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderFile="$(IntDir)\vehiclelib.pch"
 				AssemblerListingLocation="$(IntDir)\"
@@ -115,6 +117,7 @@
 				MinimalRebuild="FALSE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
+				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderFile="$(IntDir)\vehiclelib.pch"
 				AssemblerListingLocation="$(IntDir)\"
@@ -180,6 +183,9 @@
 			</File>
 			<File
 				RelativePath=".\bg_vehicleinfo_planes.cpp">
+			</File>
+			<File
+				RelativePath=".\bg_vehicleinfo_vehicle.cpp">
 			</File>
 			<File
 				RelativePath=".\bg_weaponinfo.cpp">

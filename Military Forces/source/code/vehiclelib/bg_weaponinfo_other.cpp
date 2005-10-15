@@ -8,12 +8,12 @@
 
 
 void						
-DataManager::createAllOther()
+WeaponInfo::createAllOther(WeaponList& weapons)
 {
 	WeaponInfo* wep = 0;
 
 	// FFAR (19)
-	wep = createWeapon();
+	wep = WeaponInfo::createWeapon();
 	wep->type_ = WT_ROCKET;					
 	wep->gameSet_ = MF_GAMESET_ANY;				
 	wep->descriptiveName_ = "FFAR (19)";		
@@ -42,7 +42,7 @@ DataManager::createAllOther()
 	wep->fitsPylon_ = WeaponInfo::PF_OTW_FH;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = WF_HAS_FIRE_FRAME;
-	allWeapons_.push_back(wep);
+	weapons.push_back(wep);
 
 	// FFAR (7)
 	wep = createWeapon();
@@ -74,7 +74,7 @@ DataManager::createAllOther()
 	wep->fitsPylon_ = WeaponInfo::PF_OTW_FL;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = WF_HAS_FIRE_FRAME;
-	allWeapons_.push_back(wep);
+	weapons.push_back(wep);
 
 	// flares
 	wep = createWeapon();
@@ -106,7 +106,7 @@ DataManager::createAllOther()
 	wep->fitsPylon_ = WeaponInfo::PF_NOT_AP;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
-	allWeapons_.push_back(wep);
+	weapons.push_back(wep);
 
 	// flarepod
 	wep = createWeapon();
@@ -138,7 +138,7 @@ DataManager::createAllOther()
 	wep->fitsPylon_ = WeaponInfo::PF_MSC_FL;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
-	allWeapons_.push_back(wep);
+	weapons.push_back(wep);
 }
 
 	

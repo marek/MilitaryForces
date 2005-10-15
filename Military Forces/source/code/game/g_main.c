@@ -1,5 +1,5 @@
 /*
- * $Id: g_main.c,v 1.4 2005-09-24 15:05:50 thebjoern Exp $
+ * $Id: g_main.c,v 1.5 2005-10-15 11:49:39 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -440,7 +440,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 	// MFQ3 data
 	MF_LoadAllVehicleData();
-	DataManager::getInstance().createAllData();
+	//DataManager::getInstance().createAllData();
 
 	// parse the key/value pairs and spawn gentities
 	G_SpawnEntitiesFromString();

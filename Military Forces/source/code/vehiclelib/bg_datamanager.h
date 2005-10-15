@@ -7,11 +7,11 @@
 #include "../game/q_shared.h"
 #include "bg_vehicleextra.h"
 
-struct VehicleInfo;
+struct GameObjectInfo;
 struct WeaponInfo;
 
-typedef std::vector<VehicleInfo*>	VehicleList;
-typedef std::vector<WeaponInfo*>	WeaponList;
+typedef std::vector<GameObjectInfo*>	GameObjectList;
+typedef std::vector<WeaponInfo*>		WeaponList;
 
 
 struct DataManager
@@ -21,46 +21,25 @@ struct DataManager
 	void						createAllData();
 
 	WeaponList const&			getAllWeapons() const;
-	VehicleList const&			getAllVehicles() const;
+	GameObjectList const&		getAllGameObjects() const;
+
+	// loadout helpers
+	int							findWeaponByName( std::string const& lookupName );
 
 protected:
 	// vehicles/weapon creation util functions
 	void						createAllVehicles();
-	VehicleInfo*				createVehicle();
-
-	void						createAllPlanes();
-	void						createAllHelos();
-	void						createAllGroundVehicles();
-	void						createAllBoats();
-	void						createAllInfantry();
 
 	void						createAllWeapons();
-	WeaponInfo*					createWeapon();
 
-	void						createAllGuns();
-	void						createAllMissiles();
-	void						createAllBombs();
-	void						createAllOther();
-
-	// loadout helpers
-	int							findWeaponByName( std::string const& lookupName );
-	bool						addWeaponToLoadout( Loadout& loadout, 
-												 	std::string const& lookupName,
-													std::string const& displayName,
-													int maxAmmo,
-													unsigned int selectionType,
-													int turret = -1,
-													bool limitedAngles = false,
-													vec3_t minAngles = 0,
-													vec3_t maxAngles = 0 );
-	void						verifyAllLoadouts();
+	void						setupAllVehicles();
 
 private:
 								DataManager();
 								~DataManager();
 
 	// the actual list
-	VehicleList					allVehicles_;
+	GameObjectList				allGameObjects_;
 	WeaponList					allWeapons_;
 };
 

@@ -47,3 +47,16 @@ WeaponInfo::~WeaponInfo()
 {
 }
 
+WeaponInfo*
+WeaponInfo::createWeapon()
+{
+	WeaponInfo* newWeapon = new WeaponInfo();
+
+	if( !newWeapon )
+	{
+		Com_Error(ERR_FATAL, "Unable to allocate memory for WeaponInfo!");
+		return 0;
+	}
+	return newWeapon;
+}
+

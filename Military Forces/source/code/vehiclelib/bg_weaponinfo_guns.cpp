@@ -8,7 +8,7 @@
 
 
 void						
-DataManager::createAllGuns()
+WeaponInfo::createAllGuns(WeaponList& weapons)
 {
 	WeaponInfo* wep = 0;
 
@@ -42,7 +42,7 @@ DataManager::createAllGuns()
 	wep->fitsPylon_ = WeaponInfo::PF_NOT_AP;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;	
-	allWeapons_.push_back(wep);
+	weapons.push_back(wep);
 
 	// machinegun: WW1, cal .312, 2 barrels
 	wep = createWeapon();
@@ -74,7 +74,7 @@ DataManager::createAllGuns()
 	wep->fitsPylon_ = WeaponInfo::PF_NOT_AP;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
-	allWeapons_.push_back(wep);
+	weapons.push_back(wep);
 
 	// machinegun: WW2, cal 50, 8 barrels
 	wep = createWeapon();
@@ -106,7 +106,7 @@ DataManager::createAllGuns()
 	wep->fitsPylon_ = WeaponInfo::PF_NOT_AP;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
-	allWeapons_.push_back(wep);
+	weapons.push_back(wep);
 
 	// machinegun: WW2, cal 50, 6 barrels
 	wep = createWeapon();
@@ -138,7 +138,7 @@ DataManager::createAllGuns()
 	wep->fitsPylon_ = WeaponInfo::PF_NOT_AP;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
-	allWeapons_.push_back(wep);
+	weapons.push_back(wep);
 
 	// machinegun: any set, 12.7mm, 1 barrel
 	wep = createWeapon();
@@ -170,7 +170,7 @@ DataManager::createAllGuns()
 	wep->fitsPylon_ = WeaponInfo::PF_NOT_AP;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
-	allWeapons_.push_back(wep);
+	weapons.push_back(wep);
 
 	// machinegun: any set, 14.5mm, 2 barrels
 	wep = createWeapon();
@@ -202,7 +202,7 @@ DataManager::createAllGuns()
 	wep->fitsPylon_ = WeaponInfo::PF_NOT_AP;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
-	allWeapons_.push_back(wep);
+	weapons.push_back(wep);
 
 	// machinegun: any set,  4x14.5mm, 4 barrel
 	wep = createWeapon();
@@ -234,7 +234,7 @@ DataManager::createAllGuns()
 	wep->fitsPylon_ = WeaponInfo::PF_NOT_AP;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
-	allWeapons_.push_back(wep);
+	weapons.push_back(wep);
 
 	// machinegun: modern, 20mm, 1 barrel
 	wep = createWeapon();
@@ -266,7 +266,7 @@ DataManager::createAllGuns()
 	wep->fitsPylon_ = WeaponInfo::PF_NOT_AP;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
-	allWeapons_.push_back(wep);
+	weapons.push_back(wep);
 
 	// machinegun: modern, 30mm, 1 barrel
 	wep = createWeapon();
@@ -298,7 +298,7 @@ DataManager::createAllGuns()
 	wep->fitsPylon_ = WeaponInfo::PF_NOT_AP;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
-	allWeapons_.push_back(wep);
+	weapons.push_back(wep);
 
 	// machinegun: modern, 20mm, 2 barrel
 	wep = createWeapon();
@@ -330,7 +330,7 @@ DataManager::createAllGuns()
 	wep->fitsPylon_ = WeaponInfo::PF_NOT_AP;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
-	allWeapons_.push_back(wep);
+	weapons.push_back(wep);
 
 	// machinegun: M4A1
 	wep = createWeapon();
@@ -362,7 +362,7 @@ DataManager::createAllGuns()
 	wep->fitsPylon_ = WeaponInfo::PF_NOT_AP;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
-	allWeapons_.push_back(wep);
+	weapons.push_back(wep);
 
 	// machinegun: modern, 30mm, 2 barrel
 	wep = createWeapon();
@@ -394,7 +394,7 @@ DataManager::createAllGuns()
 	wep->fitsPylon_ = WeaponInfo::PF_NOT_AP;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
-	allWeapons_.push_back(wep);
+	weapons.push_back(wep);
 
 	// machinegun: modern, 7.62mm minigun turret
 	wep = createWeapon();
@@ -426,7 +426,7 @@ DataManager::createAllGuns()
 	wep->fitsPylon_ = WeaponInfo::PF_NOT_AP;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
-	allWeapons_.push_back(wep);
+	weapons.push_back(wep);
 
 	// machinegun: modern, 12.7mm turret
 	wep = createWeapon();
@@ -458,7 +458,7 @@ DataManager::createAllGuns()
 	wep->fitsPylon_ = WeaponInfo::PF_NOT_AP;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
-	allWeapons_.push_back(wep);
+	weapons.push_back(wep);
 
 	// 100mm Gun
 	wep = createWeapon();
@@ -490,7 +490,7 @@ DataManager::createAllGuns()
 	wep->fitsPylon_ = WeaponInfo::PF_NOT_AP;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
-	allWeapons_.push_back(wep);
+	weapons.push_back(wep);
 
 	// 125mm Gun
 	wep = createWeapon();
@@ -522,7 +522,7 @@ DataManager::createAllGuns()
 	wep->fitsPylon_ = WeaponInfo::PF_NOT_AP;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
-	allWeapons_.push_back(wep);
+	weapons.push_back(wep);
 
 
 }

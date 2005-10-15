@@ -8,7 +8,7 @@
 
 
 void						
-DataManager::createAllMissiles()
+WeaponInfo::createAllMissiles(WeaponList& weapons)
 {
 	WeaponInfo* wep = 0;
 
@@ -42,7 +42,7 @@ DataManager::createAllMissiles()
 	wep->fitsPylon_ = WeaponInfo::PF_AAM_SW;				
 	wep->basicECMVulnerability_ = 30;	
 	wep->flags_ = WF_HAS_FIRE_FRAME;
-	allWeapons_.push_back(wep);
+	weapons.push_back(wep);
 
 	// AMRAAM
 	wep = createWeapon();
@@ -74,7 +74,7 @@ DataManager::createAllMissiles()
 	wep->fitsPylon_ = WeaponInfo::PF_AAM_AM;				
 	wep->basicECMVulnerability_ = 25;	
 	wep->flags_ = WF_HAS_FIRE_FRAME;
-	allWeapons_.push_back(wep);
+	weapons.push_back(wep);
 
 	// Phoenix
 	wep = createWeapon();
@@ -106,7 +106,7 @@ DataManager::createAllMissiles()
 	wep->fitsPylon_ = WeaponInfo::PF_AAM_PH;				
 	wep->basicECMVulnerability_ = 15;	
 	wep->flags_ = WF_HAS_FIRE_FRAME;
-	allWeapons_.push_back(wep);
+	weapons.push_back(wep);
 
 	// Stinger
 	wep = createWeapon();
@@ -138,7 +138,7 @@ DataManager::createAllMissiles()
 	wep->fitsPylon_ = WeaponInfo::PF_AAM_ST;				
 	wep->basicECMVulnerability_ = 25;	
 	wep->flags_ = WF_HAS_FIRE_FRAME;
-	allWeapons_.push_back(wep);
+	weapons.push_back(wep);
 
 	// Hellfire
 	wep = createWeapon();
@@ -170,7 +170,7 @@ DataManager::createAllMissiles()
 	wep->fitsPylon_ = WeaponInfo::PF_AGM_HF;				
 	wep->basicECMVulnerability_ = 25;	
 	wep->flags_ = WF_HAS_FIRE_FRAME;
-	allWeapons_.push_back(wep);
+	weapons.push_back(wep);
 
 	// HARM
 	wep = createWeapon();
@@ -202,7 +202,7 @@ DataManager::createAllMissiles()
 	wep->fitsPylon_ = WeaponInfo::PF_AGM_HM;				
 	wep->basicECMVulnerability_ = 25;	
 	wep->flags_ = WF_HAS_FIRE_FRAME;
-	allWeapons_.push_back(wep);
+	weapons.push_back(wep);
 
 	// Maverick
 	wep = createWeapon();
@@ -234,7 +234,7 @@ DataManager::createAllMissiles()
 	wep->fitsPylon_ = WeaponInfo::PF_AGM_MV;				
 	wep->basicECMVulnerability_ = 25;	
 	wep->flags_ = WF_HAS_FIRE_FRAME;
-	allWeapons_.push_back(wep);
+	weapons.push_back(wep);
 }
 
 

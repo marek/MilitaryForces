@@ -4,18 +4,33 @@
 #include "../qcommon/qfiles.h"
 #include "../game/bg_public.h"
 
-void
-DataManager::createAllHelos()
+
+
+GameObjectInfo_Helicopter::GameObjectInfo_Helicopter()
 {
-	VehicleInfo* veh = 0;
+
+}
+
+GameObjectInfo_Helicopter::~GameObjectInfo_Helicopter()
+{
+
+}
+
+
+
+
+void
+GameObjectInfo_Helicopter::createAllHelicopters( GameObjectList& gameObjects )
+{
+	GameObjectInfo_Helicopter* veh = 0;
 
 	// UH-1
-	veh = createVehicle();
+	veh = dynamic_cast<GameObjectInfo_Helicopter*>(createVehicle(GameObjectInfo::GO_CAT_HELO));
 	veh->descriptiveName_ =	"UH-1 \"Huey\"";
 	veh->tinyName_ = "UH-1";
 	veh->modelName_ = "UH-1";
 	veh->gameSet_ = MF_GAMESET_MODERN;
-	veh->category_ = CAT_HELO;
+	veh->category_ = GameObjectInfo::GO_CAT_HELO;
 	veh->class_ = CLASS_HELO_RECON;
 	veh->flags_ = 0;
 	veh->caps_ = 0;
@@ -35,19 +50,13 @@ DataManager::createAllHelos()
 	veh->maxThrottle_ = 10;
 	veh->acceleration_ = 100;
 	veh->maxFuel_ = 160;
-	veh->wheels_ = 0;		
-	veh->wheelCF_ = 0.0f;		
 	veh->engines_ = 1;		
 	veh->bayAnim_ = 0;		
 	veh->gearAnim_ = 0;		
 	veh->tailAngle_ = 0;		
 	veh->abEffectModel_ = 0;	
-    veh->stallSpeed_ = 0;	
-	veh->swingAngle_ = 0;	
-	veh->sonarInfo_ = 0; 		
     veh->maxSpeed_ = 250;		
-	veh->animations_ = 0;	
-	allVehicles_.push_back(veh);
+	gameObjects.push_back(veh);
 	//285,						// max gun pitch (upwards = negative) <- gearheight
 	//5,							// min gun pitch (downwards = positive) <- tailangle
 
