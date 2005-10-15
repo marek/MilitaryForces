@@ -4,18 +4,57 @@
 #include "../qcommon/qfiles.h"
 #include "../game/bg_public.h"
 
-void
-DataManager::createAllInfantry()
+GameObjectInfo_Infantry::GameObjectInfo_Infantry() :
+	animations_(0)
 {
-	VehicleInfo* veh = 0;
+}
+
+GameObjectInfo_Infantry::~GameObjectInfo_Infantry()
+{
+	delete animations_;
+	animations_ = 0;
+}
+
+bool
+GameObjectInfo_Infantry::setupGameObject()
+{
+	return GameObjectInfo::setupGameObject();
+}
+
+bool
+GameObjectInfo_Infantry::setupBoundingBox()
+{
+/*
+	// boundingbox
+	Com_sprintf( name, sizeof(name), "%s_legs.md3", modelbasename );
+	MF_getDimensions( name, LEGS_IDLE, &availableVehicles[i].maxs, &availableVehicles[i].mins );
+	Com_sprintf( name, sizeof(name), "%s_torso.md3", modelbasename );
+	MF_getDimensions( name, LEGS_IDLE, &max, &min );
+	availableVehicles[i].maxs[2] += max[2] - min[2];
+	Com_sprintf( name, sizeof(name), "%s_head.md3", modelbasename );
+	MF_getDimensions( name, LEGS_IDLE, &max, &min );
+	availableVehicles[i].maxs[2] += max[2] - min[2];
+	// Scale LQMs
+	for(j = 0; j < 3; j++) {
+		availableVehicles[i].maxs[j] *= (float)LQM_SCALE;
+		availableVehicles[i].mins[j] *= (float)LQM_SCALE;
+	}
+	*/
+	return false;
+}
+
+void
+GameObjectInfo_Infantry::createAllInfantry( GameObjectList& gameObjects )
+{
+	GameObjectInfo_Infantry* veh = 0;
 
 	// Male
-	veh = createVehicle();
+	veh = dynamic_cast<GameObjectInfo_Infantry*>(createVehicle(GameObjectInfo::GO_CAT_INF));
 	veh->descriptiveName_ =	"Sarge";
 	veh->tinyName_ = "Soldier";
 	veh->modelName_ = "sarge";
 	veh->gameSet_ = MF_GAMESET_MODERN;
-	veh->category_ = CAT_LQM;
+	veh->category_ = GameObjectInfo::GO_CAT_INF;
 	veh->class_ = CLASS_LQM_INFANTRY;
 	veh->flags_ = 0;
 	veh->caps_ = 0;
@@ -27,35 +66,17 @@ DataManager::createAllInfantry()
 	veh->shadowShader_ = SHADOW_DEFAULT;	
 	Vector4Set( veh->shadowCoords_, 4, 0, 34, 24 );	
 	Vector4Set( veh->shadowAdjusts_, 0, 0, 0, 0 );	
-	VectorSet( veh->gunoffset_, 16.65f, -3.391f, 0.378f );		
-	VectorSet( veh->cockpitview_, 19, 0, 5 );	
-	veh->airRadar_ = 0;		
-	veh->groundRadar_ = 0;			
-	veh->minThrottle_ = 0;
-	veh->maxThrottle_ = 0;
-	veh->acceleration_ = 0;
-	veh->maxFuel_ = 0;
-	veh->wheels_ = 0;		
-	veh->wheelCF_ = 0.0f;		
-	veh->engines_ = 0;		
-	veh->bayAnim_ = 0;		
-	veh->gearAnim_ = 0;		
-	veh->tailAngle_ = 0;		
-	veh->abEffectModel_ = 0;	
-    veh->stallSpeed_ = 0;	
-	veh->swingAngle_ = 0;	
-	veh->sonarInfo_ = 0; 		
     veh->maxSpeed_ = 50;		
 	veh->animations_ = 0;	
-	allVehicles_.push_back(veh);
+	gameObjects.push_back(veh);
 
 	// Female
-	veh = createVehicle();
+	veh = dynamic_cast<GameObjectInfo_Infantry*>(createVehicle(GameObjectInfo::GO_CAT_INF));
 	veh->descriptiveName_ =	"Major";
 	veh->tinyName_ = "Soldier";
 	veh->modelName_ = "Major";
 	veh->gameSet_ = MF_GAMESET_MODERN;
-	veh->category_ = CAT_LQM;
+	veh->category_ = GameObjectInfo::GO_CAT_INF;
 	veh->class_ = CLASS_LQM_INFANTRY;
 	veh->flags_ = 0;
 	veh->caps_ = 0;
@@ -67,27 +88,9 @@ DataManager::createAllInfantry()
 	veh->shadowShader_ = SHADOW_DEFAULT;	
 	Vector4Set( veh->shadowCoords_, 4, 0, 34, 24 );	
 	Vector4Set( veh->shadowAdjusts_, 0, 0, 0, 0 );	
-	VectorSet( veh->gunoffset_, 16.65f, -3.391f, 0.378f );		
-	VectorSet( veh->cockpitview_, 19, 0, 5 );	
-	veh->airRadar_ = 0;		
-	veh->groundRadar_ = 0;			
-	veh->minThrottle_ = 0;
-	veh->maxThrottle_ = 0;
-	veh->acceleration_ = 0;
-	veh->maxFuel_ = 0;
-	veh->wheels_ = 0;		
-	veh->wheelCF_ = 0.0f;		
-	veh->engines_ = 0;		
-	veh->bayAnim_ = 0;		
-	veh->gearAnim_ = 0;		
-	veh->tailAngle_ = 0;		
-	veh->abEffectModel_ = 0;	
-    veh->stallSpeed_ = 0;	
-	veh->swingAngle_ = 0;	
-	veh->sonarInfo_ = 0; 		
     veh->maxSpeed_ = 50;		
 	veh->animations_ = 0;	
-	allVehicles_.push_back(veh);
+	gameObjects.push_back(veh);
 }
 
 

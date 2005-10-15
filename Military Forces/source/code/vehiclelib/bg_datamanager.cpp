@@ -21,12 +21,12 @@ DataManager::DataManager()
 DataManager::~DataManager()
 {
 	// empty the vehicle list, dont forget to delete the vehicles
-	for( size_t i = 0; i < allVehicles_.size(); ++i )
+	for( size_t i = 0; i < allGameObjects_.size(); ++i )
 	{
-		delete allVehicles_[i];
-		allVehicles_[i] = 0;
+		delete allGameObjects_[i];
+		allGameObjects_[i] = 0;
 	}
-	allVehicles_.clear();
+	allGameObjects_.clear();
 
 	// empty the weapon list, dont forget to delete the weapon
 	for( size_t i = 0; i < allWeapons_.size(); ++i )
@@ -38,52 +38,25 @@ DataManager::~DataManager()
 
 }
 
-VehicleInfo*
-DataManager::createVehicle()
-{
-	VehicleInfo* newVehicle = new VehicleInfo();
-
-	if( !newVehicle )
-	{
-		Com_Error(ERR_FATAL, "Unable to allocate memory for VehicleInfo!");
-		return 0;
-	}
-	return newVehicle;
-}
-
 void
 DataManager::createAllVehicles()
 {
-	createAllPlanes();
-	createAllHelos();
-	createAllGroundVehicles();
-	createAllBoats();
-	createAllInfantry();
+	GameObjectInfo_Plane::createAllPlanes(allGameObjects_);
+	GameObjectInfo_Helicopter::createAllHelicopters(allGameObjects_);
+	GameObjectInfo_GroundVehicle::createAllGroundVehicles(allGameObjects_);
+	GameObjectInfo_Boat::createAllBoats(allGameObjects_);
+	GameObjectInfo_Infantry::createAllInfantry(allGameObjects_);
 
-	verifyAllLoadouts();
+	setupAllVehicles();
 }
-
-WeaponInfo*
-DataManager::createWeapon()
-{
-	WeaponInfo* newWeapon = new WeaponInfo();
-
-	if( !newWeapon )
-	{
-		Com_Error(ERR_FATAL, "Unable to allocate memory for WeaponInfo!");
-		return 0;
-	}
-	return newWeapon;
-}
-
 
 void
 DataManager::createAllWeapons()
 {
-	createAllGuns();
-	createAllMissiles();
-	createAllBombs();
-	createAllOther();
+	WeaponInfo::createAllGuns(allWeapons_);
+	WeaponInfo::createAllMissiles(allWeapons_);
+	WeaponInfo::createAllBombs(allWeapons_);
+	WeaponInfo::createAllOther(allWeapons_);
 }
 
 int
@@ -97,44 +70,11 @@ DataManager::findWeaponByName( std::string const& lookupName )
 	return -1;
 }
 
-bool
-DataManager::addWeaponToLoadout( Loadout& loadout, 
-								 std::string const& lookupName,
-								 std::string const& displayName,
-								 int maxAmmo,
-								 unsigned int selectionType,
-								 int turret,
-								 bool limitedAngles,
-								 vec3_t minAngles,
-								 vec3_t maxAngles )
-{
-	int idx = findWeaponByName(lookupName);
-	if( idx < 0 )
-	{
-		Com_Printf("Unable to add weapon with name '%s' to loadout, didnt find it.", lookupName.c_str());
-		return false;
-	}
-	Armament arm;
-	arm.displayName_ = displayName;
-	arm.maxAmmo_ = maxAmmo;
-	arm.weaponIndex_ = idx;
-	arm.selectionType_ = selectionType;
-	if( limitedAngles && minAngles && maxAngles )
-	{
-		arm.limitedAngles_ = limitedAngles;
-		VectorCopy( minAngles, arm.minAngles_ );
-		VectorCopy( maxAngles, arm.maxAngles_ );
-	}
-	loadout.push_back(arm);
-
-	return true;
-}
-
 void
-DataManager::verifyAllLoadouts()
+DataManager::setupAllVehicles()
 {
-	for( size_t i = 0; i < allVehicles_.size(); ++i )
-		allVehicles_[i]->verifyLoadouts();
+	for( size_t i = 0; i < allGameObjects_.size(); ++i )
+		allGameObjects_[i]->setupGameObject();
 }
 
 void
@@ -150,10 +90,10 @@ DataManager::getAllWeapons() const
 	return allWeapons_;
 }
 
-VehicleList const&
-DataManager::getAllVehicles() const
+GameObjectList const&
+DataManager::getAllGameObjects() const
 {
-	return allVehicles_;
+	return allGameObjects_;
 }
 
 

@@ -6,7 +6,6 @@
 #include "bg_weaponinfo.h"
 #include "bg_datamanager.h"
 
-#include <algorithm>
 
 // decls
 int		trap_FS_FOpenFile( const char *qpath, fileHandle_t *f, fsMode_t mode );
@@ -15,12 +14,14 @@ void	trap_FS_FCloseFile( fileHandle_t f );
 
 
 
-const std::string VehicleInfo::baseModelPath = "models/vehicles/";
 
-VehicleInfo::VehicleInfo() :
+const std::string GameObjectInfo::baseModelPath = "models/vehicles/";
+
+GameObjectInfo::GameObjectInfo() :
 	descriptiveName_(""),
 	tinyName_(""),
 	modelName_(""),
+	modelPath_(""),
 	gameSet_(0),
 	category_(0),
 	class_(0),
@@ -29,25 +30,7 @@ VehicleInfo::VehicleInfo() :
 	renderFlags_(0),
 	maxHealth_(0),
 	shadowShader_(SHADOW_NONE),
-	airRadar_(0),
-	groundRadar_(0),
-	minThrottle_(0),
-	maxThrottle_(0),
-	acceleration_(0),
-	maxFuel_(0),
-	wheels_(0),
-	wheelCF_(0.0f),
-	engines_(0),
-	bayAnim_(0),
-	gearAnim_(0),
-	tailAngle_(0.0f),
-	gearHeight_(0),
-	abEffectModel_(0),
-	stallSpeed_(0),
-	swingAngle_(0.0f),
-	sonarInfo_(0),
-	maxSpeed_(0),
-	animations_(0)
+	maxSpeed_(0)
 {
 	VectorSet( turnSpeed_, 0, 0, 0 );
 	VectorSet( camDist_, 0, 0, 0 );
@@ -56,186 +39,106 @@ VehicleInfo::VehicleInfo() :
 	Vector4Set( shadowAdjusts_, 0, 0, 0, 0 );
 	VectorSet( mins_, 0, 0, 0 );
 	VectorSet( maxs_, 0, 0, 0 );
-	VectorSet( gunoffset_, 0, 0, 0 );
-	VectorSet( cockpitview_, 0, 0, 0 );
 }
 
-VehicleInfo::~VehicleInfo()
+GameObjectInfo::~GameObjectInfo()
 {
-	delete airRadar_;
-	airRadar_ = 0;
-	delete groundRadar_;
-	groundRadar_ = 0;
-	delete sonarInfo_;
-	sonarInfo_ = 0;
-	delete bayAnim_;
-	bayAnim_ = 0;
-	delete gearAnim_;
-	gearAnim_ = 0;
 }
 
-void
-VehicleInfo::verifyLoadouts()
+GameObjectInfo*
+GameObjectInfo::createVehicle(unsigned int category)
 {
-	// create the weapon mounts (empty)
-	// if none are there this isnt a vehicle with mounts, so nothing further to check
-	if( !createWeaponMounts() )
-		return;
+	GameObjectInfo* newVehicle = 0;
 
-	// we got mounts, that means we can show the vwep
-	renderFlags_ |= MFR_VWEP;
+	switch( category )
+	{
+	case GameObjectInfo::GO_CAT_PLANE:
+		newVehicle = new GameObjectInfo_Plane();	
+		break;
+	case GameObjectInfo::GO_CAT_HELO:
+		newVehicle = new GameObjectInfo_Helicopter();
+		break;
+	case GameObjectInfo::GO_CAT_GROUND:
+		newVehicle = new GameObjectInfo_GroundVehicle();
+		break;
+	case GameObjectInfo::GO_CAT_BOAT:
+		newVehicle = new GameObjectInfo_Boat();
+		break;
+	case GameObjectInfo::GO_CAT_INF:
+		newVehicle = new GameObjectInfo_Infantry();
+		break;
+	default:
+		Com_Error(ERR_FATAL, "Invalid vehicle class in createVehicle!");
+		return 0;
+	}
 
+	if( !newVehicle )
+	{
+		Com_Error(ERR_FATAL, "Unable to allocate memory for GameObjectInfo!");
+		return 0;
+	}
+	return newVehicle;
+}
+
+bool
+GameObjectInfo::setupGameObject()
+{
 	// always add an empty loadout for customization
 	defaultLoadouts_.insert(std::make_pair("Custom", Loadout()));
 
-	// go through all reported loadouts and verify that they actually fit on the vehicle
-	for( LoadoutMapIter it = defaultLoadouts_.begin(); it != defaultLoadouts_.end(); ++it )
-		correctArmament((*it).second, (*it).first);
-}
-
-// creates the mounts (without actually putting weapons on, thats done somewhere else)
-bool
-VehicleInfo::createWeaponMounts()
-{
-	std::string modelname = getModelPath( true );
-
-	std::vector<md3Tag_t> tagList;
-	if( !getTagsContaining(modelname, "PY", tagList) )
+	if( !createModelPath() )
 		return false;
 
-	mounts_.resize(tagList.size());
-	for( size_t i = 0; i < tagList.size(); ++i )
-		mounts_[i].tag_ = tagList[i];
-
-//#ifdef _DEBUG
-//	Com_Printf( "%s has %d mounts\n", descriptiveName_.c_str(), tagList.size() );
-//#endif
-
-	// set up
-	for( size_t i = 0; i < tagList.size(); ++i )
-	{
-		// check if format is ok
-		if( strlen( tagList[i].name ) < 10 )
-			return false;
-		mounts_[i].position_ = ahextoi( va("0x%c", tagList[i].name[2]) );
-		mounts_[i].group_ = ahextoi( va("0x%c", tagList[i].name[3]) );
-		mounts_[i].flags_ = ahextoi( va("0x%c%c%c%c%c%c", tagList[i].name[4], tagList[i].name[5],
-														 tagList[i].name[6], tagList[i].name[7],
-														 tagList[i].name[8], tagList[i].name[9]) );
-		mounts_[i].left_ = (tagList[i].name[13] == 'L') ? true : false;
-	}
-
-	// sort them
-	std::sort( mounts_.begin(), mounts_.end(), VehicleMountInfo::mountCompare );
+	if( !setupBoundingBox() )
+		return false;
 
 	return true;
 }
 
-void
-VehicleInfo::correctArmament(Loadout& loadout, std::string const& loadoutName)
+bool
+GameObjectInfo::createModelPath()
 {
-	// fallback check
-	if( !mounts_.size() )
-		return;
-
-	// the weapon list
-	WeaponList const& allWeapons = DataManager::getInstance().getAllWeapons();
-
-	// create a work copy of the loadout
-	Loadout workCopy;
-	for( size_t i = 0; i < loadout.size(); ++i  )
-	{
-		// dont add weapons not fitting this category of vehicle
-		if( category_ & allWeapons[loadout[i].weaponIndex_]->fitsCategory_ )
-			workCopy.push_back(loadout[i]);
-	}
-	loadout.clear();
-
-	// create a copy of the mount list, with evaluation class
-	std::vector<VehicleMountInfoEvaluator> mountList;
-	for( size_t i = 0; i < mounts_.size(); ++i )
-		mountList.push_back(mounts_[i]);
-	// go through all weapons and fit them on mounts
-	for( size_t i = 0; i < workCopy.size(); ++i )
-	{
-		// weapons which cant be fitted on mounts arent evaluated
-		if( allWeapons[workCopy[i].weaponIndex_]->fitsPylon_ == WeaponInfo::PF_NOT_AP )
-			continue;
-		// go through all mounts
-		for( size_t j = 0; j < mountList.size(); ++j )
-		{
-			// if mount is emtpy and weapon fits, then "put it on"
-			if( mountList[j].weaponIndex_ < 0 &&
-				(mountList[j].flags_ & allWeapons[workCopy[i].weaponIndex_]->fitsPylon_) )
-			{
-				mountList[j].weaponIndex_ = workCopy[i].weaponIndex_;
-				mountList[j].num_ = 1;
-				workCopy[i].maxAmmo_--;
-			}
-			if( !workCopy[i].maxAmmo_ )
-				break;
-		}
-	}
-	// put loadout back together from workCopy
-	for( size_t i = 0; i < workCopy.size(); ++i )
-		loadout.push_back(workCopy[i]);
-
-	// remove extraneous weapons from default loadout
-	int numProblems = 0;
-	for( size_t i = 0; i < workCopy.size(); ++i )
-	{
-		// weapons which cant be fitted on mounts arent evaluated
-		if( allWeapons[workCopy[i].weaponIndex_]->fitsPylon_ == WeaponInfo::PF_NOT_AP )
-			continue;
-		if( workCopy[i].maxAmmo_ > 0 )
-		{
-			Com_Printf("WARNING: %s loadout '%s' can't fit all the weapons, loadout modified: %d %ss removed\n",
-				descriptiveName_.c_str(), loadoutName.c_str(), workCopy[i].maxAmmo_, 
-				allWeapons[workCopy[i].weaponIndex_]->descriptiveName_.c_str() );
-			loadout[i].maxAmmo_ -= workCopy[i].maxAmmo_;
-			numProblems++;
-		}
-	}
-	if( !numProblems )
-		Com_Printf("INFO: %s loadout '%s' verified OK.\n", descriptiveName_.c_str(), loadoutName.c_str() );
-}
-
-std::string
-VehicleInfo::getModelPath( bool extension )
-{
-	std::string returnString = baseModelPath;
+	modelPath_ = baseModelPath;
 
 	switch( category_ )
 	{
-	case CAT_PLANE:
-		returnString += "planes/";
+	case GO_CAT_PLANE:
+		modelPath_ += "planes/";
 		break;
-	case CAT_HELO:
-		returnString += "helos/";
+	case GO_CAT_HELO:
+		modelPath_ += "helos/";
 		break;
-	case CAT_GROUND:
-		returnString += "ground/";
+	case GO_CAT_GROUND:
+		modelPath_ += "ground/";
 		break;
-	case CAT_BOAT:
-		returnString += "sea/";
+	case GO_CAT_BOAT:
+		modelPath_ += "sea/";
 		break;
-	case CAT_LQM:
-		returnString += "lqms/";
+	case GO_CAT_INF:
+		modelPath_ += "lqms/";
 		break;
 	default:
 		Com_Error(ERR_FATAL, "Wrong category in vehicle in 'getModelPath'");
-		return "";
+		return false;
 	}
-	returnString += modelName_ + "/" + modelName_;
-	
-	if( extension )
-		returnString += ".md3";
+	modelPath_ += modelName_ + "/" + modelName_;
+	return true;
+}
 
-	return returnString;
+std::string
+GameObjectInfo::getModelPath( bool extension )
+{
+	if( !modelPath_.length() || modelPath_ == "" )
+		createModelPath();
+
+	if( extension )
+		return (modelPath_ + ".md3");
+
+	return modelPath_;
 }
 
 int
-VehicleInfo::getTagsContaining( std::string const& filename, 
+GameObjectInfo::getTagsContaining( std::string const& filename, 
 								std::string const& str,
 								std::vector<md3Tag_t>& tagList )
 {
@@ -270,5 +173,37 @@ VehicleInfo::getTagsContaining( std::string const& filename,
 	return tagList.size();
 }
 
+bool
+GameObjectInfo::addWeaponToLoadout( Loadout& loadout, 
+									std::string const& lookupName,
+									std::string const& displayName,
+									int maxAmmo,
+									unsigned int selectionType,
+									int turret,
+									bool limitedAngles,
+									vec3_t minAngles,
+									vec3_t maxAngles )
+{
+	int idx = DataManager::getInstance().findWeaponByName(lookupName);
+	if( idx < 0 )
+	{
+		Com_Printf("Unable to add weapon with name '%s' to loadout, didnt find it.", lookupName.c_str());
+		return false;
+	}
+	Armament arm;
+	arm.displayName_ = displayName;
+	arm.maxAmmo_ = maxAmmo;
+	arm.weaponIndex_ = idx;
+	arm.selectionType_ = selectionType;
+	if( limitedAngles && minAngles && maxAngles )
+	{
+		arm.limitedAngles_ = limitedAngles;
+		VectorCopy( minAngles, arm.minAngles_ );
+		VectorCopy( maxAngles, arm.maxAngles_ );
+	}
+	loadout.push_back(arm);
+
+	return true;
+}
 
 					

@@ -8,7 +8,7 @@
 
 
 void						
-DataManager::createAllBombs()
+WeaponInfo::createAllBombs(WeaponList& weapons)
 {
 	WeaponInfo* wep = 0;
 
@@ -42,7 +42,7 @@ DataManager::createAllBombs()
 	wep->fitsPylon_ = WeaponInfo::PF_BMB_82;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
-	allWeapons_.push_back(wep);
+	weapons.push_back(wep);
 
 	// Mk82 R
 	wep = createWeapon();
@@ -74,7 +74,7 @@ DataManager::createAllBombs()
 	wep->fitsPylon_ = WeaponInfo::PF_BMB_82;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = WF_HAS_FIRE_FRAME;
-	allWeapons_.push_back(wep);
+	weapons.push_back(wep);
 
 	// GBU12
 	wep = createWeapon();
@@ -106,7 +106,7 @@ DataManager::createAllBombs()
 	wep->fitsPylon_ = WeaponInfo::PF_BMB_82|WeaponInfo::PF_BMB_GD;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
-	allWeapons_.push_back(wep);
+	weapons.push_back(wep);
 
 	// Mk83
 	wep = createWeapon();
@@ -138,7 +138,7 @@ DataManager::createAllBombs()
 	wep->fitsPylon_ = WeaponInfo::PF_BMB_83;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
-	allWeapons_.push_back(wep);
+	weapons.push_back(wep);
 
 	// Mk83R
 	wep = createWeapon();
@@ -170,7 +170,7 @@ DataManager::createAllBombs()
 	wep->fitsPylon_ = WeaponInfo::PF_BMB_83;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = WF_HAS_FIRE_FRAME;
-	allWeapons_.push_back(wep);
+	weapons.push_back(wep);
 
 	// GBU16
 	wep = createWeapon();
@@ -202,7 +202,7 @@ DataManager::createAllBombs()
 	wep->fitsPylon_ = WeaponInfo::PF_BMB_83|WeaponInfo::PF_BMB_GD;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
-	allWeapons_.push_back(wep);
+	weapons.push_back(wep);
 
 	// Mk84
 	wep = createWeapon();
@@ -234,7 +234,7 @@ DataManager::createAllBombs()
 	wep->fitsPylon_ = WeaponInfo::PF_BMB_84;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
-	allWeapons_.push_back(wep);
+	weapons.push_back(wep);
 
 	// gbu10
 	wep = createWeapon();
@@ -266,7 +266,7 @@ DataManager::createAllBombs()
 	wep->fitsPylon_ = WeaponInfo::PF_BMB_84|WeaponInfo::PF_BMB_GD;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = 0;
-	allWeapons_.push_back(wep);
+	weapons.push_back(wep);
 
 	// durandal
 	wep = createWeapon();
@@ -298,6 +298,6 @@ DataManager::createAllBombs()
 	wep->fitsPylon_ = WeaponInfo::PF_AGM_DU;				
 	wep->basicECMVulnerability_ = 0;	
 	wep->flags_ = WF_HAS_FIRE_FRAME;
-	allWeapons_.push_back(wep);
+	weapons.push_back(wep);
 }
 

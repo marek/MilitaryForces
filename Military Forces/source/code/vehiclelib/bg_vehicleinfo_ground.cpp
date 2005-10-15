@@ -4,21 +4,35 @@
 #include "../qcommon/qfiles.h"
 #include "../game/bg_public.h"
 
-void
-DataManager::createAllGroundVehicles()
+
+GameObjectInfo_GroundVehicle::GameObjectInfo_GroundVehicle() :
+	wheels_(0),
+	wheelCF_(0.0f)
 {
-	VehicleInfo* veh = 0;
+}
+
+GameObjectInfo_GroundVehicle::~GameObjectInfo_GroundVehicle()
+{
+}
+
+
+
+
+void
+GameObjectInfo_GroundVehicle::createAllGroundVehicles( GameObjectList& gameObjects )
+{
+	GameObjectInfo_GroundVehicle* veh = 0;
 
 
 	// --- MODERN --- 
 
 	// M-1
-	veh = createVehicle();
+	veh = dynamic_cast<GameObjectInfo_GroundVehicle*>(createVehicle(GameObjectInfo::GO_CAT_GROUND));
 	veh->descriptiveName_ =	"M1A1i Abrams";
 	veh->tinyName_ = "M1";
 	veh->modelName_ = "m1";
 	veh->gameSet_ = MF_GAMESET_MODERN;
-	veh->category_ = CAT_GROUND;
+	veh->category_ = GameObjectInfo::GO_CAT_GROUND;
 	veh->class_ = CLASS_GROUND_MBT;
 	veh->flags_ = 0;
 	veh->caps_ = 0;
@@ -40,27 +54,18 @@ DataManager::createAllGroundVehicles()
 	veh->maxFuel_ = 150;
 	veh->wheels_ = 0;		
 	veh->wheelCF_ = 0.0f;		
-	veh->engines_ = 1;		
-	veh->bayAnim_ = 0;		
-	veh->gearAnim_ = 0;		
-	veh->tailAngle_ = 0;		
-	veh->abEffectModel_ = 0;	
-    veh->stallSpeed_ = 0;	
-	veh->swingAngle_ = 0;	
-	veh->sonarInfo_ = 0; 		
     veh->maxSpeed_ = 60;		
-	veh->animations_ = 0;	
-	allVehicles_.push_back(veh);
+	gameObjects.push_back(veh);
 	//310,						// max gun pitch (upwards = negative) <- gearheight
 	//3,							// min gun pitch (downwards = positive) <- tailangle
 
 	// T-90
-	veh = createVehicle();
+	veh = dynamic_cast<GameObjectInfo_GroundVehicle*>(createVehicle(GameObjectInfo::GO_CAT_GROUND));
 	veh->descriptiveName_ =	"T-90";
 	veh->tinyName_ = "T-90";
 	veh->modelName_ = "t-90";
 	veh->gameSet_ = MF_GAMESET_MODERN;
-	veh->category_ = CAT_GROUND;
+	veh->category_ = GameObjectInfo::GO_CAT_GROUND;
 	veh->class_ = CLASS_GROUND_MBT;
 	veh->flags_ = 0;
 	veh->caps_ = 0;
@@ -82,27 +87,18 @@ DataManager::createAllGroundVehicles()
 	veh->maxFuel_ = 150;
 	veh->wheels_ = 0;		
 	veh->wheelCF_ = 0.0f;		
-	veh->engines_ = 1;		
-	veh->bayAnim_ = 0;		
-	veh->gearAnim_ = 0;		
-	veh->tailAngle_ = 0;		
-	veh->abEffectModel_ = 0;	
-    veh->stallSpeed_ = 0;	
-	veh->swingAngle_ = 0;	
-	veh->sonarInfo_ = 0; 		
     veh->maxSpeed_ = 65;		
-	veh->animations_ = 0;	
-	allVehicles_.push_back(veh);
+	gameObjects.push_back(veh);
 	//310,						// max gun pitch (upwards = negative) <- gearheight
 	//3,							// min gun pitch (downwards = positive) <- tailangle
 
 	// Hummer 50cal
-	veh = createVehicle();
+	veh = dynamic_cast<GameObjectInfo_GroundVehicle*>(createVehicle(GameObjectInfo::GO_CAT_GROUND));
 	veh->descriptiveName_ =	"Hummer";
 	veh->tinyName_ = "HMV";
 	veh->modelName_ = "humvee_50cal";
 	veh->gameSet_ = MF_GAMESET_MODERN;
-	veh->category_ = CAT_GROUND;
+	veh->category_ = GameObjectInfo::GO_CAT_GROUND;
 	veh->class_ = CLASS_GROUND_RECON;
 	veh->flags_ = 0;
 	veh->caps_ = HC_WHEELS;
@@ -124,27 +120,18 @@ DataManager::createAllGroundVehicles()
 	veh->maxFuel_ = 160;
 	veh->wheels_ = 4;		
 	veh->wheelCF_ = 8.0f;		
-	veh->engines_ = 1;		
-	veh->bayAnim_ = 0;		
-	veh->gearAnim_ = 0;		
-	veh->tailAngle_ = 0;		
-	veh->abEffectModel_ = 0;	
-    veh->stallSpeed_ = 0;	
-	veh->swingAngle_ = 0;	
-	veh->sonarInfo_ = 0; 		
     veh->maxSpeed_ = 85;		
-	veh->animations_ = 0;	
-	allVehicles_.push_back(veh);
+	gameObjects.push_back(veh);
 	//300,						// max gun pitch (upwards = negative) <- gearheight
 	//6,							// min gun pitch (downwards = positive) <- tailangle
 
 	// Hummer Avenger
-	veh = createVehicle();
+	veh = dynamic_cast<GameObjectInfo_GroundVehicle*>(createVehicle(GameObjectInfo::GO_CAT_GROUND));
 	veh->descriptiveName_ =	"Hummer Avenger";
 	veh->tinyName_ = "HMVAA";
 	veh->modelName_ = "humvee_avng";
 	veh->gameSet_ = MF_GAMESET_MODERN;
-	veh->category_ = CAT_GROUND;
+	veh->category_ = GameObjectInfo::GO_CAT_GROUND;
 	veh->class_ = CLASS_GROUND_SAM;
 	veh->flags_ = 0;
 	veh->caps_ = HC_WHEELS;
@@ -166,27 +153,18 @@ DataManager::createAllGroundVehicles()
 	veh->maxFuel_ = 160;
 	veh->wheels_ = 4;		
 	veh->wheelCF_ = 8.0f;		
-	veh->engines_ = 1;		
-	veh->bayAnim_ = 0;		
-	veh->gearAnim_ = 0;		
-	veh->tailAngle_ = 0;		
-	veh->abEffectModel_ = 0;	
-    veh->stallSpeed_ = 0;	
-	veh->swingAngle_ = 0;	
-	veh->sonarInfo_ = 0; 		
     veh->maxSpeed_ = 85;		
-	veh->animations_ = 0;	
-	allVehicles_.push_back(veh);
+	gameObjects.push_back(veh);
 	//300,						// max gun pitch (upwards = negative) <- gearheight
 	//6,							// min gun pitch (downwards = positive) <- tailangle
 
 	// BRDM2
-	veh = createVehicle();
+	veh = dynamic_cast<GameObjectInfo_GroundVehicle*>(createVehicle(GameObjectInfo::GO_CAT_GROUND));
 	veh->descriptiveName_ =	"BRDM 2";
 	veh->tinyName_ = "BRDM2";
 	veh->modelName_ = "brdm2";
 	veh->gameSet_ = MF_GAMESET_MODERN;
-	veh->category_ = CAT_GROUND;
+	veh->category_ = GameObjectInfo::GO_CAT_GROUND;
 	veh->class_ = CLASS_GROUND_RECON;
 	veh->flags_ = 0;
 	veh->caps_ = HC_DUALGUNS|HC_AMPHIBIOUS|HC_WHEELS;
@@ -208,27 +186,18 @@ DataManager::createAllGroundVehicles()
 	veh->maxFuel_ = 160;
 	veh->wheels_ = 4;		
 	veh->wheelCF_ = 9.0f;		
-	veh->engines_ = 1;		
-	veh->bayAnim_ = 0;		
-	veh->gearAnim_ = 0;		
-	veh->tailAngle_ = 0;		
-	veh->abEffectModel_ = 0;	
-    veh->stallSpeed_ = 0;	
-	veh->swingAngle_ = 0;	
-	veh->sonarInfo_ = 0; 		
     veh->maxSpeed_ = 90;		
-	veh->animations_ = 0;	
-	allVehicles_.push_back(veh);
+	gameObjects.push_back(veh);
 	//285,						// max gun pitch (upwards = negative) <- gearheight
 	//5,							// min gun pitch (downwards = positive) <- tailangle
 
 	// ZSU-23
-	veh = createVehicle();
+	veh = dynamic_cast<GameObjectInfo_GroundVehicle*>(createVehicle(GameObjectInfo::GO_CAT_GROUND));
 	veh->descriptiveName_ =	"ZSU-23";
 	veh->tinyName_ = "zsu23";
 	veh->modelName_ = "ZSU-23";
 	veh->gameSet_ = MF_GAMESET_MODERN;
-	veh->category_ = CAT_GROUND;
+	veh->category_ = GameObjectInfo::GO_CAT_GROUND;
 	veh->class_ = CLASS_GROUND_SAM;
 	veh->flags_ = 0;
 	veh->caps_ = HC_DUALGUNS;
@@ -250,28 +219,19 @@ DataManager::createAllGroundVehicles()
 	veh->maxFuel_ = 160;
 	veh->wheels_ = 0;		
 	veh->wheelCF_ = 0;		
-	veh->engines_ = 1;		
-	veh->bayAnim_ = 0;		
-	veh->gearAnim_ = 0;		
-	veh->tailAngle_ = 0;		
-	veh->abEffectModel_ = 0;	
-    veh->stallSpeed_ = 0;	
-	veh->swingAngle_ = 0;	
-	veh->sonarInfo_ = 0; 		
     veh->maxSpeed_ = 70;		
-	veh->animations_ = 0;	
-	allVehicles_.push_back(veh);
+	gameObjects.push_back(veh);
 	//285,						// max gun pitch (upwards = negative) <- gearheight
 	//5,							// min gun pitch (downwards = positive) <- tailangle
 
 
 	// MLRS
-	veh = createVehicle();
+	veh = dynamic_cast<GameObjectInfo_GroundVehicle*>(createVehicle(GameObjectInfo::GO_CAT_GROUND));
 	veh->descriptiveName_ =	"MLRS";
 	veh->tinyName_ = "MLRS";
 	veh->modelName_ = "mlrs";
 	veh->gameSet_ = MF_GAMESET_MODERN;
-	veh->category_ = CAT_GROUND;
+	veh->category_ = GameObjectInfo::GO_CAT_GROUND;
 	veh->class_ = CLASS_GROUND_SAM;
 	veh->flags_ = 0;
 	veh->caps_ = HC_DUALGUNS;
@@ -293,17 +253,8 @@ DataManager::createAllGroundVehicles()
 	veh->maxFuel_ = 160;
 	veh->wheels_ = 0;		
 	veh->wheelCF_ = 0;		
-	veh->engines_ = 1;		
-	veh->bayAnim_ = 0;		
-	veh->gearAnim_ = 0;		
-	veh->tailAngle_ = 0;		
-	veh->abEffectModel_ = 0;	
-    veh->stallSpeed_ = 0;	
-	veh->swingAngle_ = 0;	
-	veh->sonarInfo_ = 0; 		
     veh->maxSpeed_ = 60;		
-	veh->animations_ = 0;	
-	allVehicles_.push_back(veh);
+	gameObjects.push_back(veh);
 	//335,						// max gun pitch (upwards = negative) <- gearheight
 	//3,							// min gun pitch (downwards = positive) <- tailangle
 
@@ -316,12 +267,12 @@ DataManager::createAllGroundVehicles()
 
 
 	// Panzer III
-	veh = createVehicle();
+	veh = dynamic_cast<GameObjectInfo_GroundVehicle*>(createVehicle(GameObjectInfo::GO_CAT_GROUND));
 	veh->descriptiveName_ =	"Panzer III";
 	veh->tinyName_ = "Pz 3";
 	veh->modelName_ = "panzeriii";
 	veh->gameSet_ = MF_GAMESET_WW2;
-	veh->category_ = CAT_GROUND;
+	veh->category_ = GameObjectInfo::GO_CAT_GROUND;
 	veh->class_ = CLASS_GROUND_MBT;
 	veh->flags_ = 0;
 	veh->caps_ = 0;
@@ -343,27 +294,18 @@ DataManager::createAllGroundVehicles()
 	veh->maxFuel_ = 150;
 	veh->wheels_ = 0;		
 	veh->wheelCF_ = 0;		
-	veh->engines_ = 1;		
-	veh->bayAnim_ = 0;		
-	veh->gearAnim_ = 0;		
-	veh->tailAngle_ = 0;		
-	veh->abEffectModel_ = 0;	
-    veh->stallSpeed_ = 0;	
-	veh->swingAngle_ = 0;	
-	veh->sonarInfo_ = 0; 		
     veh->maxSpeed_ = 60;		
-	veh->animations_ = 0;	
-	allVehicles_.push_back(veh);
+	gameObjects.push_back(veh);
 	//335,						// max gun pitch (upwards = negative) <- gearheight
 	//3,							// min gun pitch (downwards = positive) <- tailangle
 
 	// M4
-	veh = createVehicle();
+	veh = dynamic_cast<GameObjectInfo_GroundVehicle*>(createVehicle(GameObjectInfo::GO_CAT_GROUND));
 	veh->descriptiveName_ =	"M4 Sherman";
 	veh->tinyName_ = "M4";
 	veh->modelName_ = "m4";
 	veh->gameSet_ = MF_GAMESET_WW2;
-	veh->category_ = CAT_GROUND;
+	veh->category_ = GameObjectInfo::GO_CAT_GROUND;
 	veh->class_ = CLASS_GROUND_MBT;
 	veh->flags_ = 0;
 	veh->caps_ = 0;
@@ -385,27 +327,18 @@ DataManager::createAllGroundVehicles()
 	veh->maxFuel_ = 150;
 	veh->wheels_ = 0;		
 	veh->wheelCF_ = 0;		
-	veh->engines_ = 1;		
-	veh->bayAnim_ = 0;		
-	veh->gearAnim_ = 0;		
-	veh->tailAngle_ = 0;		
-	veh->abEffectModel_ = 0;	
-    veh->stallSpeed_ = 0;	
-	veh->swingAngle_ = 0;	
-	veh->sonarInfo_ = 0; 		
     veh->maxSpeed_ = 60;		
-	veh->animations_ = 0;	
-	allVehicles_.push_back(veh);
+	gameObjects.push_back(veh);
 	//335,						// max gun pitch (upwards = negative) <- gearheight
 	//3,							// min gun pitch (downwards = positive) <- tailangle
 
 	// static SAM turret
-	veh = createVehicle();
+	veh = dynamic_cast<GameObjectInfo_GroundVehicle*>(createVehicle(GameObjectInfo::GO_CAT_GROUND));
 	veh->descriptiveName_ =	"SAM Mk1";
 	veh->tinyName_ = "SAM";
 	veh->modelName_ = "turret_samup";
 	veh->gameSet_ = MF_GAMESET_MODERN;
-	veh->category_ = CAT_GROUND;
+	veh->category_ = GameObjectInfo::GO_CAT_GROUND;
 	veh->class_ = CLASS_GROUND_SAM;
 	veh->flags_ = 0;
 	veh->caps_ = 0;
@@ -427,26 +360,17 @@ DataManager::createAllGroundVehicles()
 	veh->maxFuel_ = 0;
 	veh->wheels_ = 0;		
 	veh->wheelCF_ = 0;		
-	veh->engines_ = 0;		
-	veh->bayAnim_ = 0;		
-	veh->gearAnim_ = 0;		
-	veh->tailAngle_ = 0;		
-	veh->abEffectModel_ = 0;	
-    veh->stallSpeed_ = 0;	
-	veh->swingAngle_ = 0;	
-	veh->sonarInfo_ = 0; 		
     veh->maxSpeed_ = 0;		
-	veh->animations_ = 0;	
-	allVehicles_.push_back(veh);
+	gameObjects.push_back(veh);
 
 
 	// static AAA turret
-	veh = createVehicle();
+	veh = dynamic_cast<GameObjectInfo_GroundVehicle*>(createVehicle(GameObjectInfo::GO_CAT_GROUND));
 	veh->descriptiveName_ =	"AAA Mk1";
 	veh->tinyName_ = "AAA";
 	veh->modelName_ = "turret_aaa";
 	veh->gameSet_ = MF_GAMESET_MODERN;
-	veh->category_ = CAT_GROUND;
+	veh->category_ = GameObjectInfo::GO_CAT_GROUND;
 	veh->class_ = CLASS_GROUND_SAM;
 	veh->flags_ = 0;
 	veh->caps_ = 0;
@@ -468,17 +392,8 @@ DataManager::createAllGroundVehicles()
 	veh->maxFuel_ = 0;
 	veh->wheels_ = 0;		
 	veh->wheelCF_ = 0;		
-	veh->engines_ = 0;		
-	veh->bayAnim_ = 0;		
-	veh->gearAnim_ = 0;		
-	veh->tailAngle_ = 0;		
-	veh->abEffectModel_ = 0;	
-    veh->stallSpeed_ = 0;	
-	veh->swingAngle_ = 0;	
-	veh->sonarInfo_ = 0; 		
     veh->maxSpeed_ = 0;		
-	veh->animations_ = 0;	
-	allVehicles_.push_back(veh);
+	gameObjects.push_back(veh);
 }
 
 

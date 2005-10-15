@@ -4,22 +4,61 @@
 #include "../qcommon/qfiles.h"
 #include "../game/bg_public.h"
 
-void
-DataManager::createAllPlanes()
+GameObjectInfo_Aircraft::GameObjectInfo_Aircraft() :
+	engines_(0),
+	bayAnim_(0),
+	gearAnim_(0),
+	tailAngle_(0.0f),
+	gearHeight_(0),
+	abEffectModel_(0)
 {
-	VehicleInfo* veh = 0;
+
+}
+
+GameObjectInfo_Aircraft::~GameObjectInfo_Aircraft()
+{
+	delete bayAnim_;
+	bayAnim_ = 0;
+	delete gearAnim_;
+	gearAnim_ = 0;
+}
+
+
+
+
+GameObjectInfo_Plane::GameObjectInfo_Plane() :
+	stallSpeed_(0),
+	swingAngle_(0.0f)
+{
+}
+
+GameObjectInfo_Plane::~GameObjectInfo_Plane()
+{
+}
+
+
+
+
+
+
+
+
+void
+GameObjectInfo_Plane::createAllPlanes( GameObjectList& gameObjects )
+{
+	GameObjectInfo_Plane* veh = 0;
 	Loadout loadout;
 
 	// --- MODERN ---
 
 
 	// F-16
-	veh = createVehicle();
+	veh = dynamic_cast<GameObjectInfo_Plane*>(createVehicle(GameObjectInfo::GO_CAT_PLANE));
 	veh->descriptiveName_ =	"F-16C Falcon";
 	veh->tinyName_ = "F-16C";
 	veh->modelName_ = "f-16";
 	veh->gameSet_ = MF_GAMESET_MODERN;
-	veh->category_ = CAT_PLANE;
+	veh->category_ = GameObjectInfo::GO_CAT_PLANE;
 	veh->class_ = CLASS_PLANE_FIGHTER;
 	veh->flags_ = 0;
 	veh->caps_ = HC_GEAR|HC_SPEEDBRAKE|HC_VAPOR;
@@ -39,8 +78,6 @@ DataManager::createAllPlanes()
 	veh->maxThrottle_ = 15;
 	veh->acceleration_ = 260;
 	veh->maxFuel_ = 60;
-	veh->wheels_ = 0;		
-	veh->wheelCF_ = 0.0f;		
 	veh->engines_ = 1;		
 	veh->bayAnim_ = 0;		
 	veh->gearAnim_ = new VehiclePartAnimInfo(1400);		
@@ -48,9 +85,7 @@ DataManager::createAllPlanes()
 	veh->abEffectModel_ = AB_BALL;	
     veh->stallSpeed_ = 200;	
 	veh->swingAngle_ = 0;	
-	veh->sonarInfo_ = 0; 		
     veh->maxSpeed_ = 700;		
-	veh->animations_ = 0;	
 	loadout.clear();
 	addWeaponToLoadout(loadout, "20mm MG", "MG", 450, Armament::ST_PRIMARY_WEAPON );
 	addWeaponToLoadout(loadout, "AIM-9 Sidewinder", "AIM-9", 4, Armament::ST_SECONDARY_WEAPON );
@@ -64,15 +99,15 @@ DataManager::createAllPlanes()
 	addWeaponToLoadout(loadout, "Mk-82", "Mk-82", 12, Armament::ST_SECONDARY_WEAPON );
 	addWeaponToLoadout(loadout, "Flares", "Flares", 30, Armament::ST_NOT_SELECTABLE );
 	veh->defaultLoadouts_.insert(std::make_pair("Iron Bombs", loadout));
-	allVehicles_.push_back(veh);
+	gameObjects.push_back(veh);
 
 	// JAS-39
-	veh = createVehicle();
+	veh = dynamic_cast<GameObjectInfo_Plane*>(createVehicle(GameObjectInfo::GO_CAT_PLANE));
 	veh->descriptiveName_ =	"Saab JAS 39 Gripen";
 	veh->tinyName_ = "Jas-39";
 	veh->modelName_ = "jas-39";
 	veh->gameSet_ = MF_GAMESET_MODERN;
-	veh->category_ = CAT_PLANE;
+	veh->category_ = GameObjectInfo::GO_CAT_PLANE;
 	veh->class_ = CLASS_PLANE_FIGHTER;
 	veh->flags_ = 0;
 	veh->caps_ = HC_GEAR|HC_SPEEDBRAKE|HC_VAPOR;
@@ -92,8 +127,6 @@ DataManager::createAllPlanes()
 	veh->maxThrottle_ = 15;
 	veh->acceleration_ = 250;
 	veh->maxFuel_ = 60;
-	veh->wheels_ = 0;		
-	veh->wheelCF_ = 0.0f;		
 	veh->engines_ = 1;		
 	veh->bayAnim_ = 0;		
 	veh->gearAnim_ = new VehiclePartAnimInfo(1400);		
@@ -101,18 +134,16 @@ DataManager::createAllPlanes()
 	veh->abEffectModel_ = AB_BALL;	
     veh->stallSpeed_ = 200;	
 	veh->swingAngle_ = 0;	
-	veh->sonarInfo_ = 0; 		
     veh->maxSpeed_ = 720;		
-	veh->animations_ = 0;	
-	allVehicles_.push_back(veh);
+	gameObjects.push_back(veh);
 
 	// A-10
-	veh = createVehicle();
+	veh = dynamic_cast<GameObjectInfo_Plane*>(createVehicle(GameObjectInfo::GO_CAT_PLANE));
 	veh->descriptiveName_ =	"A-10 Thunderbolt II";
 	veh->tinyName_ = "A-10";
 	veh->modelName_ = "a10";
 	veh->gameSet_ = MF_GAMESET_MODERN;
-	veh->category_ = CAT_PLANE;
+	veh->category_ = GameObjectInfo::GO_CAT_PLANE;
 	veh->class_ = CLASS_PLANE_BOMBER;
 	veh->flags_ = 0;
 	veh->caps_ = HC_GEAR|HC_SPEEDBRAKE|HC_VAPOR;
@@ -132,8 +163,6 @@ DataManager::createAllPlanes()
 	veh->maxThrottle_ = 10;
 	veh->acceleration_ = 270;
 	veh->maxFuel_ = 80;
-	veh->wheels_ = 0;		
-	veh->wheelCF_ = 0.0f;		
 	veh->engines_ = 2;		
 	veh->bayAnim_ = 0;		
 	veh->gearAnim_ = new VehiclePartAnimInfo(1400);		
@@ -141,18 +170,16 @@ DataManager::createAllPlanes()
 	veh->abEffectModel_ = AB_BALL;	
     veh->stallSpeed_ = 170;	
 	veh->swingAngle_ = 0;	
-	veh->sonarInfo_ = 0; 		
     veh->maxSpeed_ = 620;		
-	veh->animations_ = 0;	
-	allVehicles_.push_back(veh);
+	gameObjects.push_back(veh);
 
 	// F-5
-	veh = createVehicle();
+	veh = dynamic_cast<GameObjectInfo_Plane*>(createVehicle(GameObjectInfo::GO_CAT_PLANE));
 	veh->descriptiveName_ =	"F-5 Tiger";
 	veh->tinyName_ = "F-5";
 	veh->modelName_ = "f-5";
 	veh->gameSet_ = MF_GAMESET_MODERN;
-	veh->category_ = CAT_PLANE;
+	veh->category_ = GameObjectInfo::GO_CAT_PLANE;
 	veh->class_ = CLASS_PLANE_FIGHTER;
 	veh->flags_ = 0;
 	veh->caps_ = HC_GEAR|HC_SPEEDBRAKE|HC_VAPOR|HC_DUALGUNS;
@@ -172,8 +199,6 @@ DataManager::createAllPlanes()
 	veh->maxThrottle_ = 15;
 	veh->acceleration_ = 270;
 	veh->maxFuel_ = 80;
-	veh->wheels_ = 0;		
-	veh->wheelCF_ = 0.0f;		
 	veh->engines_ = 2;		
 	veh->bayAnim_ = 0;		
 	veh->gearAnim_ = new VehiclePartAnimInfo(1400);		
@@ -181,18 +206,16 @@ DataManager::createAllPlanes()
 	veh->abEffectModel_ = AB_RED_SMALL;	
     veh->stallSpeed_ = 170;	
 	veh->swingAngle_ = 0;	
-	veh->sonarInfo_ = 0; 		
     veh->maxSpeed_ = 620;		
-	veh->animations_ = 0;	
-	allVehicles_.push_back(veh);
+	gameObjects.push_back(veh);
 
 	// F-15
-	veh = createVehicle();
+	veh = dynamic_cast<GameObjectInfo_Plane*>(createVehicle(GameObjectInfo::GO_CAT_PLANE));
 	veh->descriptiveName_ =	"F-15E Eagle";
 	veh->tinyName_ = "F-15";
 	veh->modelName_ = "f-15";
 	veh->gameSet_ = MF_GAMESET_MODERN;
-	veh->category_ = CAT_PLANE;
+	veh->category_ = GameObjectInfo::GO_CAT_PLANE;
 	veh->class_ = CLASS_PLANE_BOMBER;
 	veh->flags_ = 0;
 	veh->caps_ = HC_GEAR|HC_SPEEDBRAKE|HC_VAPOR;
@@ -212,8 +235,6 @@ DataManager::createAllPlanes()
 	veh->maxThrottle_ = 15;
 	veh->acceleration_ = 260;
 	veh->maxFuel_ = 80;
-	veh->wheels_ = 0;		
-	veh->wheelCF_ = 0.0f;		
 	veh->engines_ = 2;		
 	veh->bayAnim_ = 0;		
 	veh->gearAnim_ = new VehiclePartAnimInfo(1400);		
@@ -221,18 +242,16 @@ DataManager::createAllPlanes()
 	veh->abEffectModel_ = AB_RED;	
     veh->stallSpeed_ = 220;	
 	veh->swingAngle_ = 0;	
-	veh->sonarInfo_ = 0; 		
     veh->maxSpeed_ = 880;		
-	veh->animations_ = 0;	
-	allVehicles_.push_back(veh);
+	gameObjects.push_back(veh);
 
 	// F-14
-	veh = createVehicle();
+	veh = dynamic_cast<GameObjectInfo_Plane*>(createVehicle(GameObjectInfo::GO_CAT_PLANE));
 	veh->descriptiveName_ =	"F-14 Tomcat";
 	veh->tinyName_ = "F-14";
 	veh->modelName_ = "f-14";
 	veh->gameSet_ = MF_GAMESET_MODERN;
-	veh->category_ = CAT_PLANE;
+	veh->category_ = GameObjectInfo::GO_CAT_PLANE;
 	veh->class_ = CLASS_PLANE_FIGHTER;
 	veh->flags_ = 0;
 	veh->caps_ = HC_GEAR|HC_SPEEDBRAKE|HC_VAPOR|HC_SWINGWING;
@@ -252,8 +271,6 @@ DataManager::createAllPlanes()
 	veh->maxThrottle_ = 15;
 	veh->acceleration_ = 260;
 	veh->maxFuel_ = 70;
-	veh->wheels_ = 0;		
-	veh->wheelCF_ = 0.0f;		
 	veh->engines_ = 2;		
 	veh->bayAnim_ = 0;		
 	veh->gearAnim_ = new VehiclePartAnimInfo(1400);		
@@ -261,18 +278,16 @@ DataManager::createAllPlanes()
 	veh->abEffectModel_ = AB_RED;	
     veh->stallSpeed_ = 220;	
 	veh->swingAngle_ = 50;	
-	veh->sonarInfo_ = 0; 		
     veh->maxSpeed_ = 840;		
-	veh->animations_ = 0;	
-	allVehicles_.push_back(veh);
+	gameObjects.push_back(veh);
 
 	// F-18
-	veh = createVehicle();
+	veh = dynamic_cast<GameObjectInfo_Plane*>(createVehicle(GameObjectInfo::GO_CAT_PLANE));
 	veh->descriptiveName_ =	"F-18 Hornet";
 	veh->tinyName_ = "F-18";
 	veh->modelName_ = "f-18";
 	veh->gameSet_ = MF_GAMESET_MODERN;
-	veh->category_ = CAT_PLANE;
+	veh->category_ = GameObjectInfo::GO_CAT_PLANE;
 	veh->class_ = CLASS_PLANE_FIGHTER;
 	veh->flags_ = 0;
 	veh->caps_ = HC_GEAR|HC_SPEEDBRAKE|HC_VAPOR;
@@ -292,8 +307,6 @@ DataManager::createAllPlanes()
 	veh->maxThrottle_ = 15;
 	veh->acceleration_ = 260;
 	veh->maxFuel_ = 60;
-	veh->wheels_ = 0;		
-	veh->wheelCF_ = 0.0f;		
 	veh->engines_ = 2;		
 	veh->bayAnim_ = 0;		
 	veh->gearAnim_ = new VehiclePartAnimInfo(1400);		
@@ -301,18 +314,16 @@ DataManager::createAllPlanes()
 	veh->abEffectModel_ = AB_BALL;	
     veh->stallSpeed_ = 200;	
 	veh->swingAngle_ = 0;	
-	veh->sonarInfo_ = 0; 		
     veh->maxSpeed_ = 720;		
-	veh->animations_ = 0;	
-	allVehicles_.push_back(veh);
+	gameObjects.push_back(veh);
 
 	// B-2
-	veh = createVehicle();
+	veh = dynamic_cast<GameObjectInfo_Plane*>(createVehicle(GameObjectInfo::GO_CAT_PLANE));
 	veh->descriptiveName_ =	"B-2 Spirit";
 	veh->tinyName_ = "B-2";
 	veh->modelName_ = "b-2";
 	veh->gameSet_ = MF_GAMESET_MODERN;
-	veh->category_ = CAT_PLANE;
+	veh->category_ = GameObjectInfo::GO_CAT_PLANE;
 	veh->class_ = CLASS_PLANE_BOMBER;
 	veh->flags_ = 0;
 	veh->caps_ = HC_GEAR|HC_SPEEDBRAKE|HC_VAPOR|HC_WEAPONBAY;
@@ -332,8 +343,6 @@ DataManager::createAllPlanes()
 	veh->maxThrottle_ = 10;
 	veh->acceleration_ = 260;
 	veh->maxFuel_ = 60;
-	veh->wheels_ = 0;		
-	veh->wheelCF_ = 0.0f;		
 	veh->engines_ = 2;		
 	veh->bayAnim_ = new VehiclePartAnimInfo(200);		
 	veh->gearAnim_ = new VehiclePartAnimInfo(1400);		
@@ -341,10 +350,8 @@ DataManager::createAllPlanes()
 	veh->abEffectModel_ = AB_BALL;	
     veh->stallSpeed_ = 200;	
 	veh->swingAngle_ = 0;	
-	veh->sonarInfo_ = 0; 		
     veh->maxSpeed_ = 700;		
-	veh->animations_ = 0;	
-	allVehicles_.push_back(veh);
+	gameObjects.push_back(veh);
 
 
 
@@ -353,12 +360,12 @@ DataManager::createAllPlanes()
 
 
 	// P-51
-	veh = createVehicle();
+	veh = dynamic_cast<GameObjectInfo_Plane*>(createVehicle(GameObjectInfo::GO_CAT_PLANE));
 	veh->descriptiveName_ =	"P-51d Mustang";
 	veh->tinyName_ = "P-51d";
 	veh->modelName_ = "p-51d";
 	veh->gameSet_ = MF_GAMESET_WW2;
-	veh->category_ = CAT_PLANE;
+	veh->category_ = GameObjectInfo::GO_CAT_PLANE;
 	veh->class_ = CLASS_PLANE_FIGHTER;
 	veh->flags_ = 0;
 	veh->caps_ = HC_GEAR|HC_PROP|HC_TAILDRAGGER|HC_DUALGUNS;
@@ -378,8 +385,6 @@ DataManager::createAllPlanes()
 	veh->maxThrottle_ = 10;
 	veh->acceleration_ = 220;
 	veh->maxFuel_ = 60;
-	veh->wheels_ = 0;		
-	veh->wheelCF_ = 0.0f;		
 	veh->engines_ = 1;		
 	veh->bayAnim_ = 0;		
 	veh->gearAnim_ = new VehiclePartAnimInfo(1400);		
@@ -387,18 +392,16 @@ DataManager::createAllPlanes()
 	veh->abEffectModel_ = 0;	
     veh->stallSpeed_ = 90;	
 	veh->swingAngle_ = 0;	
-	veh->sonarInfo_ = 0; 		
     veh->maxSpeed_ = 420;		
-	veh->animations_ = 0;	
-	allVehicles_.push_back(veh);
+	gameObjects.push_back(veh);
 
 	// Spitfire
-	veh = createVehicle();
+	veh = dynamic_cast<GameObjectInfo_Plane*>(createVehicle(GameObjectInfo::GO_CAT_PLANE));
 	veh->descriptiveName_ =	"Spitfire Mk 5b";
 	veh->tinyName_ = "Spitfire";
 	veh->modelName_ = "spitfire_mk5b";
 	veh->gameSet_ = MF_GAMESET_WW2;
-	veh->category_ = CAT_PLANE;
+	veh->category_ = GameObjectInfo::GO_CAT_PLANE;
 	veh->class_ = CLASS_PLANE_FIGHTER;
 	veh->flags_ = 0;
 	veh->caps_ = HC_GEAR|HC_PROP|HC_TAILDRAGGER|HC_DUALGUNS;
@@ -418,8 +421,6 @@ DataManager::createAllPlanes()
 	veh->maxThrottle_ = 10;
 	veh->acceleration_ = 220;
 	veh->maxFuel_ = 60;
-	veh->wheels_ = 0;		
-	veh->wheelCF_ = 0.0f;		
 	veh->engines_ = 1;		
 	veh->bayAnim_ = 0;		
 	veh->gearAnim_ = new VehiclePartAnimInfo(1400);		
@@ -427,18 +428,16 @@ DataManager::createAllPlanes()
 	veh->abEffectModel_ = 0;	
     veh->stallSpeed_ = 85;	
 	veh->swingAngle_ = 0;	
-	veh->sonarInfo_ = 0; 		
     veh->maxSpeed_ = 400;		
-	veh->animations_ = 0;	
-	allVehicles_.push_back(veh);
+	gameObjects.push_back(veh);
 
 	// Bf109
-	veh = createVehicle();
+	veh = dynamic_cast<GameObjectInfo_Plane*>(createVehicle(GameObjectInfo::GO_CAT_PLANE));
 	veh->descriptiveName_ =	"Messerschmitt Bf-109g";
 	veh->tinyName_ = "Bf-109";
 	veh->modelName_ = "bf-109g";
 	veh->gameSet_ = MF_GAMESET_WW2;
-	veh->category_ = CAT_PLANE;
+	veh->category_ = GameObjectInfo::GO_CAT_PLANE;
 	veh->class_ = CLASS_PLANE_FIGHTER;
 	veh->flags_ = 0;
 	veh->caps_ = HC_GEAR|HC_PROP|HC_TAILDRAGGER|HC_DUALGUNS;
@@ -458,8 +457,6 @@ DataManager::createAllPlanes()
 	veh->maxThrottle_ = 10;
 	veh->acceleration_ = 220;
 	veh->maxFuel_ = 60;
-	veh->wheels_ = 0;		
-	veh->wheelCF_ = 0.0f;		
 	veh->engines_ = 1;		
 	veh->bayAnim_ = 0;		
 	veh->gearAnim_ = new VehiclePartAnimInfo(1400);		
@@ -467,18 +464,16 @@ DataManager::createAllPlanes()
 	veh->abEffectModel_ = 0;	
     veh->stallSpeed_ = 90;	
 	veh->swingAngle_ = 0;	
-	veh->sonarInfo_ = 0; 		
     veh->maxSpeed_ = 410;		
-	veh->animations_ = 0;	
-	allVehicles_.push_back(veh);
+	gameObjects.push_back(veh);
 
 	// Fw190
-	veh = createVehicle();
+	veh = dynamic_cast<GameObjectInfo_Plane*>(createVehicle(GameObjectInfo::GO_CAT_PLANE));
 	veh->descriptiveName_ =	"Focke-Wulf Fw190 A8";
 	veh->tinyName_ = "Fw-190";
 	veh->modelName_ = "fw190a8";
 	veh->gameSet_ = MF_GAMESET_WW2;
-	veh->category_ = CAT_PLANE;
+	veh->category_ = GameObjectInfo::GO_CAT_PLANE;
 	veh->class_ = CLASS_PLANE_FIGHTER;
 	veh->flags_ = 0;
 	veh->caps_ = HC_GEAR|HC_PROP|HC_TAILDRAGGER|HC_DUALGUNS;
@@ -498,8 +493,6 @@ DataManager::createAllPlanes()
 	veh->maxThrottle_ = 10;
 	veh->acceleration_ = 220;
 	veh->maxFuel_ = 60;
-	veh->wheels_ = 0;		
-	veh->wheelCF_ = 0.0f;		
 	veh->engines_ = 1;		
 	veh->bayAnim_ = 0;		
 	veh->gearAnim_ = new VehiclePartAnimInfo(1400);		
@@ -507,18 +500,16 @@ DataManager::createAllPlanes()
 	veh->abEffectModel_ = 0;	
     veh->stallSpeed_ = 90;	
 	veh->swingAngle_ = 0;	
-	veh->sonarInfo_ = 0; 		
     veh->maxSpeed_ = 420;		
-	veh->animations_ = 0;	
-	allVehicles_.push_back(veh);
+	gameObjects.push_back(veh);
 
 	// B-17
-	veh = createVehicle();
+	veh = dynamic_cast<GameObjectInfo_Plane*>(createVehicle(GameObjectInfo::GO_CAT_PLANE));
 	veh->descriptiveName_ =	"B-17g";
 	veh->tinyName_ = "B-17";
 	veh->modelName_ = "b17g";
 	veh->gameSet_ = MF_GAMESET_WW2;
-	veh->category_ = CAT_PLANE;
+	veh->category_ = GameObjectInfo::GO_CAT_PLANE;
 	veh->class_ = CLASS_PLANE_BOMBER;
 	veh->flags_ = 0;
 	veh->caps_ = HC_GEAR|HC_PROP|HC_TAILDRAGGER|HC_WEAPONBAY;
@@ -538,8 +529,6 @@ DataManager::createAllPlanes()
 	veh->maxThrottle_ = 10;
 	veh->acceleration_ = 220;
 	veh->maxFuel_ = 60;
-	veh->wheels_ = 0;		
-	veh->wheelCF_ = 0.0f;		
 	veh->engines_ = 4;		
 	veh->bayAnim_ = new VehiclePartAnimInfo(500);		
 	veh->gearAnim_ = new VehiclePartAnimInfo(1400);		
@@ -547,10 +536,8 @@ DataManager::createAllPlanes()
 	veh->abEffectModel_ = 0;	
     veh->stallSpeed_ = 100;	
 	veh->swingAngle_ = 0;	
-	veh->sonarInfo_ = 0; 		
     veh->maxSpeed_ = 320;		
-	veh->animations_ = 0;	
-	allVehicles_.push_back(veh);
+	gameObjects.push_back(veh);
 
 
 
@@ -559,12 +546,12 @@ DataManager::createAllPlanes()
 
 
 	// Dr.1
-	veh = createVehicle();
+	veh = dynamic_cast<GameObjectInfo_Plane*>(createVehicle(GameObjectInfo::GO_CAT_PLANE));
 	veh->descriptiveName_ =	"Fokker Dr.1";
 	veh->tinyName_ = "Dr.1";
 	veh->modelName_ = "dr1";
 	veh->gameSet_ = MF_GAMESET_WW1;
-	veh->category_ = CAT_PLANE;
+	veh->category_ = GameObjectInfo::GO_CAT_PLANE;
 	veh->class_ = CLASS_PLANE_FIGHTER;
 	veh->flags_ = 0;
 	veh->caps_ = HC_PROP|HC_TAILDRAGGER|HC_DUALGUNS;
@@ -584,8 +571,6 @@ DataManager::createAllPlanes()
 	veh->maxThrottle_ = 10;
 	veh->acceleration_ = 200;
 	veh->maxFuel_ = 60;
-	veh->wheels_ = 0;		
-	veh->wheelCF_ = 0.0f;		
 	veh->engines_ = 1;		
 	veh->bayAnim_ = 0;		
 	veh->gearAnim_ = 0;		
@@ -593,18 +578,16 @@ DataManager::createAllPlanes()
 	veh->abEffectModel_ = 0;	
     veh->stallSpeed_ = 50;	
 	veh->swingAngle_ = 0;	
-	veh->sonarInfo_ = 0; 		
     veh->maxSpeed_ = 150;		
-	veh->animations_ = 0;	
-	allVehicles_.push_back(veh);
+	gameObjects.push_back(veh);
 
 	// Camel
-	veh = createVehicle();
+	veh = dynamic_cast<GameObjectInfo_Plane*>(createVehicle(GameObjectInfo::GO_CAT_PLANE));
 	veh->descriptiveName_ =	"Sopwith camel";
 	veh->tinyName_ = "Camel";
 	veh->modelName_ = "camel";
 	veh->gameSet_ = MF_GAMESET_WW1;
-	veh->category_ = CAT_PLANE;
+	veh->category_ = GameObjectInfo::GO_CAT_PLANE;
 	veh->class_ = CLASS_PLANE_FIGHTER;
 	veh->flags_ = 0;
 	veh->caps_ = HC_PROP|HC_TAILDRAGGER|HC_DUALGUNS;
@@ -624,8 +607,6 @@ DataManager::createAllPlanes()
 	veh->maxThrottle_ = 10;
 	veh->acceleration_ = 200;
 	veh->maxFuel_ = 60;
-	veh->wheels_ = 0;		
-	veh->wheelCF_ = 0.0f;		
 	veh->engines_ = 1;		
 	veh->bayAnim_ = 0;		
 	veh->gearAnim_ = 0;		
@@ -633,10 +614,8 @@ DataManager::createAllPlanes()
 	veh->abEffectModel_ = 0;	
     veh->stallSpeed_ = 55;	
 	veh->swingAngle_ = 0;	
-	veh->sonarInfo_ = 0; 		
     veh->maxSpeed_ = 170;		
-	veh->animations_ = 0;	
-	allVehicles_.push_back(veh);
+	gameObjects.push_back(veh);
 }
 
 
