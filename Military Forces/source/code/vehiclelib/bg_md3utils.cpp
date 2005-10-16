@@ -43,7 +43,7 @@ Md3Utils::getModelDimensions( fileHandle_t const& file,
 	}
 
 	// put it back to beginning of file (just in case)
-	if( trap_FS_Seek( file, FS_SEEK_SET, 0 ) != 0 )
+	if( trap_FS_Seek( file, 0, FS_SEEK_SET ) != 0 )
 	{
 		Com_Error(ERR_FATAL, "Unable to set file pointer in file!\n" );
 		return false;
@@ -142,7 +142,7 @@ Md3Utils::getTagsContaining( fileHandle_t const& file,
 	}
 
 	// put it back to beginning of file (just in case)
-	if( trap_FS_Seek( file, FS_SEEK_SET, 0 ) != 0 )
+	if( trap_FS_Seek( file, 0, FS_SEEK_SET ) != 0 )
 	{
 		Com_Error(ERR_FATAL, "Unable to set file pointer in file!\n" );
 		return false;
@@ -201,7 +201,7 @@ Md3Utils::getTagInfo( fileHandle_t const& file,
 	}
 
 	// put it back to beginning of file (just in case)
-	if( trap_FS_Seek( file, FS_SEEK_SET, 0 ) != 0 )
+	if( trap_FS_Seek( file, 0, FS_SEEK_SET ) != 0 )
 	{
 		Com_Error(ERR_FATAL, "Unable to set file pointer in file!\n" );
 		return false;
@@ -256,7 +256,7 @@ Md3Utils::getNumberOfFrames( fileHandle_t const& file )
 	}
 
 	// put it back to beginning of file (just in case)
-	if( trap_FS_Seek( file, FS_SEEK_SET, 0 ) != 0 )
+	if( trap_FS_Seek( file, 0, FS_SEEK_SET ) != 0 )
 	{
 		Com_Error(ERR_FATAL, "Unable to set file pointer in file!\n" );
 		return false;
