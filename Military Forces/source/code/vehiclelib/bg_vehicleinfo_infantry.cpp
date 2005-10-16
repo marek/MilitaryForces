@@ -1,5 +1,6 @@
 #include "bg_datamanager.h"
 #include "bg_vehicleinfo.h"
+#include "bg_md3utils.h"
 #include "../game/q_shared.h"
 #include "../qcommon/qfiles.h"
 #include "../game/bg_public.h"
@@ -24,23 +25,33 @@ GameObjectInfo_Infantry::setupGameObject()
 bool
 GameObjectInfo_Infantry::setupBoundingBox()
 {
-/*
+	char const* modelBaseName = getModelPath(false).c_str();
+	size_t len = strlen( modelBaseName );
+	char* name = new char[len+16];
+
 	// boundingbox
-	Com_sprintf( name, sizeof(name), "%s_legs.md3", modelbasename );
-	MF_getDimensions( name, LEGS_IDLE, &availableVehicles[i].maxs, &availableVehicles[i].mins );
-	Com_sprintf( name, sizeof(name), "%s_torso.md3", modelbasename );
-	MF_getDimensions( name, LEGS_IDLE, &max, &min );
-	availableVehicles[i].maxs[2] += max[2] - min[2];
-	Com_sprintf( name, sizeof(name), "%s_head.md3", modelbasename );
-	MF_getDimensions( name, LEGS_IDLE, &max, &min );
-	availableVehicles[i].maxs[2] += max[2] - min[2];
+	Com_sprintf( name, sizeof(name), "%s_legs.md3", modelBaseName );
+	Md3Utils::getModelDimensions( name, mins_, maxs_, LEGS_IDLE );
+	
+	Com_sprintf( name, sizeof(name), "%s_torso.md3", modelBaseName );
+	vec3_t maxs, mins;
+	Md3Utils::getModelDimensions( name, mins, maxs, LEGS_IDLE );
+	maxs_[2] += maxs[2] - mins[2];
+
+	Com_sprintf( name, sizeof(name), "%s_head.md3", modelBaseName );
+	Md3Utils::getModelDimensions( name, mins, maxs, LEGS_IDLE );
+	maxs_[2] += maxs[2] - mins[2];
+
 	// Scale LQMs
-	for(j = 0; j < 3; j++) {
-		availableVehicles[i].maxs[j] *= (float)LQM_SCALE;
-		availableVehicles[i].mins[j] *= (float)LQM_SCALE;
+	for( int j = 0; j < 3; ++j ) 
+	{
+		maxs_[j] *= LQM_SCALE;
+		mins_[j] *= LQM_SCALE;
 	}
-	*/
-	return false;
+	
+	delete [] modelBaseName;
+
+	return true;
 }
 
 void

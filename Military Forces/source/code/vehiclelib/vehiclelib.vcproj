@@ -164,6 +164,9 @@
 				RelativePath=".\bg_datamanager.cpp">
 			</File>
 			<File
+				RelativePath=".\bg_md3utils.cpp">
+			</File>
+			<File
 				RelativePath=".\bg_vehicleextra.cpp">
 			</File>
 			<File
@@ -209,6 +212,9 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
 				RelativePath=".\bg_datamanager.h">
+			</File>
+			<File
+				RelativePath=".\bg_md3utils.h">
 			</File>
 			<File
 				RelativePath=".\bg_vehicleextra.h">

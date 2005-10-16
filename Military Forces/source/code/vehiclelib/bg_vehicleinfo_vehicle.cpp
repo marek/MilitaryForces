@@ -5,6 +5,7 @@
 #include "bg_vehicleinfo.h"
 #include "bg_weaponinfo.h"
 #include "bg_datamanager.h"
+#include "bg_md3utils.h"
 
 #include <algorithm>
 
@@ -88,7 +89,6 @@ GameObjectInfo_Vehicle::setupBoundingBox()
 					maxs_[1] = currentFrame.bounds[1][1];
 				if( currentFrame.bounds[1][2] > maxs_[2] )
 					maxs_[2] = currentFrame.bounds[1][2];
-
 			}
 		}
 		trap_FS_FCloseFile(file);
@@ -126,7 +126,7 @@ GameObjectInfo_Vehicle::createWeaponMounts()
 	std::string modelname = getModelPath( true );
 
 	std::vector<md3Tag_t> tagList;
-	if( !getTagsContaining(modelname, "PY", tagList) )
+	if( !Md3Utils::getTagsContaining(modelname, "PY", tagList) )
 		return false;
 
 	mounts_.resize(tagList.size());

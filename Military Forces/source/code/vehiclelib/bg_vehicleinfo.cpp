@@ -7,10 +7,6 @@
 #include "bg_datamanager.h"
 
 
-// decls
-int		trap_FS_FOpenFile( const char *qpath, fileHandle_t *f, fsMode_t mode );
-void	trap_FS_Read( void *buffer, int len, fileHandle_t f );
-void	trap_FS_FCloseFile( fileHandle_t f );
 
 
 
@@ -137,42 +133,6 @@ GameObjectInfo::getModelPath( bool extension )
 	return modelPath_;
 }
 
-int
-GameObjectInfo::getTagsContaining( std::string const& filename, 
-								std::string const& str,
-								std::vector<md3Tag_t>& tagList )
-{
-	if( str.empty() || str == "" ) 
-		return 0;
-
-	tagList.clear();
-	fileHandle_t	f;
-	if( trap_FS_FOpenFile(filename.c_str(), &f, FS_READ) >= 0 ) 
-	{
-		md3Header_t head;
-		md3Frame_t	frame;
-		md3Tag_t	tag;
-		trap_FS_Read(&head, sizeof(head), f);
-		for( int i = 0; i < head.numFrames; ++i ) 
-			trap_FS_Read(&frame, sizeof(frame), f);
-		int total = head.numTags;
-		for( int i = 0; i < total; ++ i ) 
-		{
-			trap_FS_Read(&tag, sizeof(tag), f);
-			std::string tagName(tag.name);
-			// if it contains the string at the first position, then add it
-			if( tagName.find(str) == 0 )
-				tagList.push_back(tag);
-		}
-		trap_FS_FCloseFile(f);
-	} 
-	else 
-	{
-		Com_Printf( "Unable to open file %s\n", filename.c_str() );
-	}
-	return tagList.size();
-}
-
 bool
 GameObjectInfo::addWeaponToLoadout( Loadout& loadout, 
 									std::string const& lookupName,
@@ -206,4 +166,3 @@ GameObjectInfo::addWeaponToLoadout( Loadout& loadout,
 	return true;
 }
 
-					
