@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicledraw.c,v 1.4 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: cg_vehicledraw.c,v 1.5 2005-10-16 15:12:33 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -636,7 +636,8 @@ void CG_DrawLQM(DrawInfo_LQM_t* drawInfo)
 
 	completeVehicleData_t* veh = &availableVehicles[drawInfo->basicInfo.vehicleIndex];
 
-	for( i = 0; i < BP_LQM_MAX_PARTS+1; i++ ) {
+	for( i = 0; i < BP_LQM_MAX_PARTS+1; i++ ) 
+	{
 	    memset( &part[i], 0, sizeof(part[0]) );	
 	}
 
@@ -647,117 +648,205 @@ void CG_DrawLQM(DrawInfo_LQM_t* drawInfo)
 	if(drawInfo->basicInfo.entityNum == cg.clientNum)
 		renderfx |= RF_THIRD_PERSON;*/
 
-	if ((anim & A_LQM_FORWARD) || (anim & A_LQM_BACKWARD) || (anim & A_LQM_LEFT) || (anim & A_LQM_RIGHT) || drawInfo->basicInfo.drawMuzzleFlash) {
+	if( (anim & A_LQM_FORWARD) || 
+		(anim & A_LQM_BACKWARD) || 
+		(anim & A_LQM_LEFT) || 
+		(anim & A_LQM_RIGHT) || 
+		drawInfo->basicInfo.drawMuzzleFlash ) 
+	{
 		legsTurnAngle = 0;
 		torsoTurnAngle = 0;
 	}
 
 	// Time Next Animations	
 	lastLegsFrame = drawInfo->legsFrame;
-	if(drawInfo->legsTime < cg.time) {
+	if(drawInfo->legsTime < cg.time) 
+	{
 		drawInfo->legsFrame++;
-		if(inframerange(drawInfo->legsFrame, LEGS_WALKCR)) drawInfo->legsTime = cg.time + veh->animations[LEGS_WALKCR].frameLerp; 
-		else if(inframerange(drawInfo->legsFrame, LEGS_JUMP)) drawInfo->legsTime = cg.time + veh->animations[LEGS_JUMP].frameLerp; 
-		else if(inframerange(drawInfo->legsFrame, LEGS_JUMPB)) drawInfo->legsTime = cg.time + veh->animations[LEGS_JUMPB].frameLerp; 
-		else if(inframerange(drawInfo->legsFrame, LEGS_RUN)) drawInfo->legsTime = cg.time + veh->animations[LEGS_RUN].frameLerp; 
-		else if(inframerange(drawInfo->legsFrame, LEGS_BACK)) drawInfo->legsTime = cg.time + veh->animations[LEGS_BACK].frameLerp; 
-		else if(inframerange(drawInfo->legsFrame, BOTH_DEATH1)) drawInfo->legsTime = cg.time + veh->animations[BOTH_DEATH1].frameLerp; 
-		else if(inframerange(drawInfo->legsFrame, LEGS_IDLE)) drawInfo->legsTime = cg.time + veh->animations[LEGS_IDLE].frameLerp; 
-		else if(inframerange(drawInfo->legsFrame, LEGS_IDLECR)) drawInfo->legsTime = cg.time + veh->animations[LEGS_IDLECR].frameLerp; 
-		else if(inframerange(drawInfo->legsFrame, LEGS_LAND)) drawInfo->legsTime = cg.time + veh->animations[LEGS_LAND].frameLerp; 
-		else if(inframerange(drawInfo->legsFrame, LEGS_LANDB)) drawInfo->legsTime = cg.time + veh->animations[LEGS_LANDB].frameLerp; 
-		else drawInfo->legsTime = cg.time + veh->animations[LEGS_RUN].frameLerp; 
+		if( inframerange(drawInfo->legsFrame, LEGS_WALKCR) ) 
+			drawInfo->legsTime = cg.time + veh->animations[LEGS_WALKCR].frameLerp; 
+		else if(inframerange(drawInfo->legsFrame, LEGS_JUMP)) 
+			drawInfo->legsTime = cg.time + veh->animations[LEGS_JUMP].frameLerp; 
+		else if(inframerange(drawInfo->legsFrame, LEGS_JUMPB)) 
+			drawInfo->legsTime = cg.time + veh->animations[LEGS_JUMPB].frameLerp; 
+		else if(inframerange(drawInfo->legsFrame, LEGS_RUN)) 
+			drawInfo->legsTime = cg.time + veh->animations[LEGS_RUN].frameLerp; 
+		else if(inframerange(drawInfo->legsFrame, LEGS_BACK)) 
+			drawInfo->legsTime = cg.time + veh->animations[LEGS_BACK].frameLerp; 
+		else if(inframerange(drawInfo->legsFrame, BOTH_DEATH1)) 
+			drawInfo->legsTime = cg.time + veh->animations[BOTH_DEATH1].frameLerp; 
+		else if(inframerange(drawInfo->legsFrame, LEGS_IDLE)) 
+			drawInfo->legsTime = cg.time + veh->animations[LEGS_IDLE].frameLerp; 
+		else if(inframerange(drawInfo->legsFrame, LEGS_IDLECR)) 
+			drawInfo->legsTime = cg.time + veh->animations[LEGS_IDLECR].frameLerp; 
+		else if(inframerange(drawInfo->legsFrame, LEGS_LAND)) 
+			drawInfo->legsTime = cg.time + veh->animations[LEGS_LAND].frameLerp; 
+		else if(inframerange(drawInfo->legsFrame, LEGS_LANDB)) 
+			drawInfo->legsTime = cg.time + veh->animations[LEGS_LANDB].frameLerp; 
+		else 
+			drawInfo->legsTime = cg.time + veh->animations[LEGS_RUN].frameLerp; 
 	}
 
 	// I droped the idea of using offsets for "legsFrame/torsoFrame", 
 	// less variables to keep track, slightly more calculation, but just as doable
-	if(drawInfo->basicInfo.ONOFF & OO_STALLED) {
+	if(drawInfo->basicInfo.ONOFF & OO_STALLED) 
+	{
 		if(inframerange(lastLegsFrame, LEGS_JUMP))
 			drawInfo->legsFrame = veh->animations[LEGS_LAND].firstFrame;
 		if(inframerange(lastLegsFrame, LEGS_JUMPB))
 			drawInfo->legsFrame = veh->animations[LEGS_LANDB].firstFrame;
 
-		if(inframerange(drawInfo->legsFrame, LEGS_LANDB)) {
-			if(drawInfo->legsFrame > veh->animations[LEGS_LANDB].firstFrame+veh->animations[LEGS_LANDB].numFrames-1) drawInfo->legsFrame = veh->animations[LEGS_LANDB].firstFrame + veh->animations[LEGS_LANDB].numFrames-1;
+		if(inframerange(drawInfo->legsFrame, LEGS_LANDB)) 
+		{
+			if(drawInfo->legsFrame > veh->animations[LEGS_LANDB].firstFrame+veh->animations[LEGS_LANDB].numFrames-1) 
+				drawInfo->legsFrame = veh->animations[LEGS_LANDB].firstFrame + veh->animations[LEGS_LANDB].numFrames-1;
 			part[BP_LQM_LEGS].frame = drawInfo->legsFrame;	
-		} else {
-			if(drawInfo->legsFrame > veh->animations[LEGS_LAND].firstFrame+veh->animations[LEGS_LAND].numFrames-1) drawInfo->legsFrame = veh->animations[LEGS_LAND].firstFrame + veh->animations[LEGS_LAND].numFrames-1;
+		} 
+		else 
+		{
+			if(drawInfo->legsFrame > veh->animations[LEGS_LAND].firstFrame+veh->animations[LEGS_LAND].numFrames-1) 
+				drawInfo->legsFrame = veh->animations[LEGS_LAND].firstFrame + veh->animations[LEGS_LAND].numFrames-1;
 			part[BP_LQM_LEGS].frame = drawInfo->legsFrame;	
 		}
-	} else if(anim & A_LQM_BACKWARD) {
-		if((anim & A_LQM_CROUCH) && (anim & A_LQM_EJECT)) {	// jump
-			if(drawInfo->legsFrame < veh->animations[LEGS_JUMPB].firstFrame) drawInfo->legsFrame = veh->animations[LEGS_JUMPB].firstFrame;
-			else if(lastLegsFrame > veh->animations[LEGS_JUMPB].firstFrame+veh->animations[LEGS_JUMPB].numFrames-1) drawInfo->legsFrame = veh->animations[LEGS_JUMPB].firstFrame;	// Make sure to start from begining
-			else if(drawInfo->legsFrame > veh->animations[LEGS_JUMPB].firstFrame+veh->animations[LEGS_JUMPB].numFrames-1) drawInfo->legsFrame = veh->animations[LEGS_JUMPB].firstFrame + veh->animations[LEGS_JUMPB].numFrames-1;
+	} 
+	else if(anim & A_LQM_BACKWARD) 
+	{
+		if((anim & A_LQM_CROUCH) && (anim & A_LQM_EJECT)) 
+		{	// jump
+			if(drawInfo->legsFrame < veh->animations[LEGS_JUMPB].firstFrame) 
+				drawInfo->legsFrame = veh->animations[LEGS_JUMPB].firstFrame;
+			else if(lastLegsFrame > veh->animations[LEGS_JUMPB].firstFrame+veh->animations[LEGS_JUMPB].numFrames-1) 
+				drawInfo->legsFrame = veh->animations[LEGS_JUMPB].firstFrame;	// Make sure to start from begining
+			else if(drawInfo->legsFrame > veh->animations[LEGS_JUMPB].firstFrame+veh->animations[LEGS_JUMPB].numFrames-1) 
+				drawInfo->legsFrame = veh->animations[LEGS_JUMPB].firstFrame + veh->animations[LEGS_JUMPB].numFrames-1;
 			part[BP_LQM_LEGS].frame = drawInfo->legsFrame;			
-		} else if(anim & A_LQM_CROUCH) {
-			if(drawInfo->legsFrame < veh->animations[LEGS_WALKCR].firstFrame) drawInfo->legsFrame = veh->animations[LEGS_WALKCR].firstFrame;
-			else if(drawInfo->legsFrame > veh->animations[LEGS_WALKCR].firstFrame+veh->animations[LEGS_WALKCR].numFrames-1) drawInfo->legsFrame = veh->animations[LEGS_WALKCR].firstFrame;
-			part[BP_LQM_LEGS].frame = (veh->animations[LEGS_WALKCR].firstFrame+veh->animations[LEGS_WALKCR].numFrames-1)-(drawInfo->legsFrame-veh->animations[LEGS_WALKCR].firstFrame);
-		} else {
-			if(drawInfo->legsFrame < veh->animations[LEGS_BACK].firstFrame) drawInfo->legsFrame = veh->animations[LEGS_BACK].firstFrame;
-			else if(drawInfo->legsFrame > veh->animations[LEGS_BACK].firstFrame+veh->animations[LEGS_BACK].numFrames-1) drawInfo->legsFrame = veh->animations[LEGS_BACK].firstFrame;
+		} 
+		else if(anim & A_LQM_CROUCH) 
+		{
+			if(drawInfo->legsFrame < veh->animations[LEGS_WALKCR].firstFrame) 
+				drawInfo->legsFrame = veh->animations[LEGS_WALKCR].firstFrame;
+			else if(drawInfo->legsFrame > veh->animations[LEGS_WALKCR].firstFrame+veh->animations[LEGS_WALKCR].numFrames-1) 
+				drawInfo->legsFrame = veh->animations[LEGS_WALKCR].firstFrame;
+			part[BP_LQM_LEGS].frame = ( veh->animations[LEGS_WALKCR].firstFrame + 
+				veh->animations[LEGS_WALKCR].numFrames-1 ) - 
+				( drawInfo->legsFrame-veh->animations[LEGS_WALKCR].firstFrame );
+		} 
+		else 
+		{
+			if(drawInfo->legsFrame < veh->animations[LEGS_BACK].firstFrame) 
+				drawInfo->legsFrame = veh->animations[LEGS_BACK].firstFrame;
+			else if(drawInfo->legsFrame > veh->animations[LEGS_BACK].firstFrame+veh->animations[LEGS_BACK].numFrames-1) 
+				drawInfo->legsFrame = veh->animations[LEGS_BACK].firstFrame;
 			part[BP_LQM_LEGS].frame =  drawInfo->legsFrame;
 		}
-	} else if((anim & A_LQM_FORWARD) || (anim & A_LQM_LEFT) || (anim & A_LQM_RIGHT)) {
-		if((anim & A_LQM_CROUCH) && (anim & A_LQM_EJECT)) {// jump
-			if(drawInfo->legsFrame < veh->animations[LEGS_JUMP].firstFrame) drawInfo->legsFrame = veh->animations[LEGS_JUMP].firstFrame;
-			else if(lastLegsFrame > veh->animations[LEGS_JUMP].firstFrame+veh->animations[LEGS_JUMP].numFrames-1) drawInfo->legsFrame = veh->animations[LEGS_JUMP].firstFrame;	// Make sure to start from begining
-			else if(drawInfo->legsFrame > veh->animations[LEGS_JUMP].firstFrame+veh->animations[LEGS_JUMP].numFrames-1) drawInfo->legsFrame = veh->animations[LEGS_JUMP].firstFrame + veh->animations[LEGS_JUMP].numFrames-1;
+	} 
+	else if((anim & A_LQM_FORWARD) || (anim & A_LQM_LEFT) || (anim & A_LQM_RIGHT)) 
+	{
+		if((anim & A_LQM_CROUCH) && (anim & A_LQM_EJECT)) // jump
+		{
+			if(drawInfo->legsFrame < veh->animations[LEGS_JUMP].firstFrame) 
+				drawInfo->legsFrame = veh->animations[LEGS_JUMP].firstFrame;
+			else if(lastLegsFrame > veh->animations[LEGS_JUMP].firstFrame+veh->animations[LEGS_JUMP].numFrames-1) 
+				drawInfo->legsFrame = veh->animations[LEGS_JUMP].firstFrame;	// Make sure to start from begining
+			else if(drawInfo->legsFrame > veh->animations[LEGS_JUMP].firstFrame+veh->animations[LEGS_JUMP].numFrames-1) 
+				drawInfo->legsFrame = veh->animations[LEGS_JUMP].firstFrame + veh->animations[LEGS_JUMP].numFrames-1;
 			part[BP_LQM_LEGS].frame = drawInfo->legsFrame;	
-		} else if(anim & A_LQM_CROUCH) {
-			if(anim & A_LQM_RIGHT) {	// Play left animation backwards, so legs arent facing backward
-				if(drawInfo->legsFrame < veh->animations[LEGS_WALKCR].firstFrame) drawInfo->legsFrame = veh->animations[LEGS_WALKCR].firstFrame;
-				else if(drawInfo->legsFrame > veh->animations[LEGS_WALKCR].firstFrame+veh->animations[LEGS_WALKCR].numFrames-1) drawInfo->legsFrame = veh->animations[LEGS_WALKCR].firstFrame;
-				part[BP_LQM_LEGS].frame = (veh->animations[LEGS_WALKCR].firstFrame+veh->animations[LEGS_WALKCR].numFrames-1)-(drawInfo->legsFrame-veh->animations[LEGS_WALKCR].firstFrame);
-			} else {
-				if(drawInfo->legsFrame < veh->animations[LEGS_WALKCR].firstFrame) drawInfo->legsFrame = veh->animations[LEGS_WALKCR].firstFrame;
-				else if(drawInfo->legsFrame > veh->animations[LEGS_WALKCR].firstFrame+veh->animations[LEGS_WALKCR].numFrames-1) drawInfo->legsFrame = veh->animations[LEGS_WALKCR].firstFrame;
+		} 
+		else if(anim & A_LQM_CROUCH) 
+		{
+			if(anim & A_LQM_RIGHT) 
+			{	// Play left animation backwards, so legs arent facing backward
+				if(drawInfo->legsFrame < veh->animations[LEGS_WALKCR].firstFrame) 
+					drawInfo->legsFrame = veh->animations[LEGS_WALKCR].firstFrame;
+				else if(drawInfo->legsFrame > veh->animations[LEGS_WALKCR].firstFrame+veh->animations[LEGS_WALKCR].numFrames-1) 
+					drawInfo->legsFrame = veh->animations[LEGS_WALKCR].firstFrame;
+				part[BP_LQM_LEGS].frame = ( veh->animations[LEGS_WALKCR].firstFrame +
+					veh->animations[LEGS_WALKCR].numFrames-1 ) - 
+					(drawInfo->legsFrame-veh->animations[LEGS_WALKCR].firstFrame);
+			} 
+			else 
+			{
+				if(drawInfo->legsFrame < veh->animations[LEGS_WALKCR].firstFrame) 
+					drawInfo->legsFrame = veh->animations[LEGS_WALKCR].firstFrame;
+				else if(drawInfo->legsFrame > veh->animations[LEGS_WALKCR].firstFrame+veh->animations[LEGS_WALKCR].numFrames-1) 
+					drawInfo->legsFrame = veh->animations[LEGS_WALKCR].firstFrame;
 				part[BP_LQM_LEGS].frame = drawInfo->legsFrame;
 			}
-		} else {
-			if(drawInfo->legsFrame < veh->animations[LEGS_RUN].firstFrame) drawInfo->legsFrame = veh->animations[LEGS_RUN].firstFrame;
-			else if(drawInfo->legsFrame > veh->animations[LEGS_RUN].firstFrame+veh->animations[LEGS_RUN].numFrames-1) drawInfo->legsFrame = veh->animations[LEGS_RUN].firstFrame;
+		} 
+		else 
+		{
+			if(drawInfo->legsFrame < veh->animations[LEGS_RUN].firstFrame) 
+				drawInfo->legsFrame = veh->animations[LEGS_RUN].firstFrame;
+			else if(drawInfo->legsFrame > veh->animations[LEGS_RUN].firstFrame+veh->animations[LEGS_RUN].numFrames-1) 
+				drawInfo->legsFrame = veh->animations[LEGS_RUN].firstFrame;
 			part[BP_LQM_LEGS].frame = drawInfo->legsFrame;
 		}
-	} else if (anim & A_LQM_DIE) {
-		if(drawInfo->legsFrame < veh->animations[BOTH_DEATH1].firstFrame) drawInfo->legsFrame = veh->animations[BOTH_DEATH1].firstFrame;
-		else if(drawInfo->legsFrame > veh->animations[BOTH_DEATH1].firstFrame+veh->animations[BOTH_DEATH1].numFrames-1) drawInfo->legsFrame = veh->animations[BOTH_DEAD1].firstFrame;
+	} 
+	else if (anim & A_LQM_DIE) 
+	{
+		if(drawInfo->legsFrame < veh->animations[BOTH_DEATH1].firstFrame) 
+			drawInfo->legsFrame = veh->animations[BOTH_DEATH1].firstFrame;
+		else if(drawInfo->legsFrame > veh->animations[BOTH_DEATH1].firstFrame+veh->animations[BOTH_DEATH1].numFrames-1) 
+			drawInfo->legsFrame = veh->animations[BOTH_DEAD1].firstFrame;
 		part[BP_LQM_LEGS].frame = drawInfo->legsFrame;
-	} else {
-		if((anim & A_LQM_CROUCH) && (anim & A_LQM_EJECT)) {// jump
-			if(drawInfo->legsFrame < veh->animations[LEGS_JUMP].firstFrame) drawInfo->legsFrame = veh->animations[LEGS_JUMP].firstFrame;
-			else if(lastLegsFrame > veh->animations[LEGS_JUMP].firstFrame+veh->animations[LEGS_JUMP].numFrames-1) drawInfo->legsFrame = veh->animations[LEGS_JUMP].firstFrame;	// Make sure to start from begining
-			else if(drawInfo->legsFrame > veh->animations[LEGS_JUMP].firstFrame+veh->animations[LEGS_JUMP].numFrames-1) drawInfo->legsFrame = veh->animations[LEGS_JUMP].firstFrame + veh->animations[LEGS_JUMP].numFrames-1;
+	} 
+	else 
+	{
+		if((anim & A_LQM_CROUCH) && (anim & A_LQM_EJECT)) // jump
+		{
+			if(drawInfo->legsFrame < veh->animations[LEGS_JUMP].firstFrame) 
+				drawInfo->legsFrame = veh->animations[LEGS_JUMP].firstFrame;
+			else if(lastLegsFrame > veh->animations[LEGS_JUMP].firstFrame+veh->animations[LEGS_JUMP].numFrames-1) 
+				drawInfo->legsFrame = veh->animations[LEGS_JUMP].firstFrame;	// Make sure to start from begining
+			else if(drawInfo->legsFrame > veh->animations[LEGS_JUMP].firstFrame+veh->animations[LEGS_JUMP].numFrames-1)
+				drawInfo->legsFrame = veh->animations[LEGS_JUMP].firstFrame + veh->animations[LEGS_JUMP].numFrames-1;
 			part[BP_LQM_LEGS].frame = drawInfo->legsFrame;	
-		} else if(anim & A_LQM_CROUCH) {
-			if(drawInfo->legsFrame < veh->animations[LEGS_IDLECR].firstFrame) drawInfo->legsFrame = veh->animations[LEGS_IDLECR].firstFrame;
-			else if(drawInfo->legsFrame > veh->animations[LEGS_IDLECR].firstFrame+veh->animations[LEGS_IDLECR].numFrames-1) drawInfo->legsFrame = veh->animations[LEGS_IDLECR].firstFrame;
+		} 
+		else if(anim & A_LQM_CROUCH) 
+		{
+			if(drawInfo->legsFrame < veh->animations[LEGS_IDLECR].firstFrame) 
+				drawInfo->legsFrame = veh->animations[LEGS_IDLECR].firstFrame;
+			else if(drawInfo->legsFrame > veh->animations[LEGS_IDLECR].firstFrame+veh->animations[LEGS_IDLECR].numFrames-1) 
+				drawInfo->legsFrame = veh->animations[LEGS_IDLECR].firstFrame;
 			part[BP_LQM_LEGS].frame = drawInfo->legsFrame;
-		} else {
-			if(drawInfo->legsFrame < veh->animations[LEGS_IDLE].firstFrame) drawInfo->legsFrame = veh->animations[LEGS_IDLE].firstFrame;
-			else if(drawInfo->legsFrame > veh->animations[LEGS_IDLE].firstFrame+veh->animations[LEGS_IDLECR].numFrames-1) drawInfo->legsFrame = veh->animations[LEGS_IDLE].firstFrame;
+		} 
+		else 
+		{
+			if(drawInfo->legsFrame < veh->animations[LEGS_IDLE].firstFrame) 
+				drawInfo->legsFrame = veh->animations[LEGS_IDLE].firstFrame;
+			else if(drawInfo->legsFrame > veh->animations[LEGS_IDLE].firstFrame+veh->animations[LEGS_IDLECR].numFrames-1) 
+				drawInfo->legsFrame = veh->animations[LEGS_IDLE].firstFrame;
 			part[BP_LQM_LEGS].frame = drawInfo->legsFrame;
 		}
 	}
 		
 	// Torso Animations
-	if(drawInfo->basicInfo.drawMuzzleFlash) {
+	if(drawInfo->basicInfo.drawMuzzleFlash) 
+	{
 		drawInfo->torsoFrame = veh->animations[TORSO_ATTACK].firstFrame;
 		drawInfo->torsoTime = cg.time + veh->animations[TORSO_ATTACK].frameLerp;
-	} else if (anim & A_LQM_DIE) {
-		if(drawInfo->torsoTime < cg.time) {
+	} 
+	else if (anim & A_LQM_DIE) 
+	{
+		if(drawInfo->torsoTime < cg.time) 
+		{
 			drawInfo->torsoFrame++;
 			drawInfo->torsoTime = cg.time + veh->animations[BOTH_DEATH1].frameLerp; 
 		}
-		if(drawInfo->torsoFrame > veh->animations[BOTH_DEATH1].numFrames-1) drawInfo->torsoFrame = veh->animations[BOTH_DEAD1].firstFrame;
+		if(drawInfo->torsoFrame > veh->animations[BOTH_DEATH1].numFrames-1) 
+			drawInfo->torsoFrame = veh->animations[BOTH_DEAD1].firstFrame;
 		part[BP_LQM_TORSO].frame = drawInfo->torsoFrame;
-	} else if (drawInfo->torsoFrame >= veh->animations[TORSO_ATTACK].firstFrame && drawInfo->torsoFrame < veh->animations[TORSO_ATTACK].firstFrame+veh->animations[TORSO_ATTACK].numFrames-1) {
-		if(drawInfo->torsoTime < cg.time) {
+	} 
+	else if (drawInfo->torsoFrame >= veh->animations[TORSO_ATTACK].firstFrame && 
+		drawInfo->torsoFrame < veh->animations[TORSO_ATTACK].firstFrame+veh->animations[TORSO_ATTACK].numFrames-1) 
+	{
+		if(drawInfo->torsoTime < cg.time) 
+		{
 			drawInfo->torsoFrame++;
 			drawInfo->torsoTime = cg.time + veh->animations[TORSO_ATTACK].frameLerp; 
 		}
-	} else 
+	} 
+	else 
 		drawInfo->torsoFrame = veh->animations[TORSO_STAND].firstFrame;
 	part[BP_LQM_TORSO].frame = drawInfo->torsoFrame;
 
@@ -770,19 +859,28 @@ void CG_DrawLQM(DrawInfo_LQM_t* drawInfo)
 	VectorCopy( drawInfo->basicInfo.angles, angles );
 	angles[0] = 0;
 
-	if((anim & A_LQM_FORWARD) && (anim & A_LQM_LEFT)) angles[1] += 45;
-	else if((anim & A_LQM_FORWARD) && (anim & A_LQM_RIGHT)) angles[1] -= 45;
-	else if((anim & A_LQM_BACKWARD) && (anim & A_LQM_LEFT)) angles[1] -= 45;
-	else if((anim & A_LQM_BACKWARD) && (anim & A_LQM_RIGHT)) angles[1] += 45;
-	else if (anim & A_LQM_LEFT) angles[1] += 90;
-	else if ((anim & A_LQM_RIGHT) && (anim & A_LQM_CROUCH)) angles[1] += 90;
-	else if (anim & A_LQM_RIGHT) angles[1] -= 90;
+	if((anim & A_LQM_FORWARD) && (anim & A_LQM_LEFT)) 
+		angles[1] += 45;
+	else if((anim & A_LQM_FORWARD) && (anim & A_LQM_RIGHT)) 
+		angles[1] -= 45;
+	else if((anim & A_LQM_BACKWARD) && (anim & A_LQM_LEFT)) 
+		angles[1] -= 45;
+	else if((anim & A_LQM_BACKWARD) && (anim & A_LQM_RIGHT)) 
+		angles[1] += 45;
+	else if (anim & A_LQM_LEFT) 
+		angles[1] += 90;
+	else if ((anim & A_LQM_RIGHT) && (anim & A_LQM_CROUCH)) 
+		angles[1] += 90;
+	else if (anim & A_LQM_RIGHT) 
+		angles[1] -= 90;
 	
 	diff =  drawInfo->basicInfo.angles[1] - angles[1];
-	if(abs(angles[1] - *lastLegsAngle) < legsTurnAngle) {
+	if(abs(angles[1] - *lastLegsAngle) < legsTurnAngle) 
+	{
 		diff += angles[1] - *lastLegsAngle;
 		angles[1] = *lastLegsAngle;
-	} else 
+	} 
+	else 
 		*lastLegsAngle = angles[1];
 	
 
@@ -804,10 +902,13 @@ void CG_DrawLQM(DrawInfo_LQM_t* drawInfo)
 	angles[2] = 0;
 	angles[1] = diff;
 
-	if(abs(angles[1] - *lastTorsoAngle) < torsoTurnAngle) {
+	if(abs(angles[1] - *lastTorsoAngle) < torsoTurnAngle) 
+	{
 		diff = angles[1] - *lastTorsoAngle;
 		angles[1] = *lastTorsoAngle;
-	} else { 
+	} 
+	else 
+	{ 
 		diff = 0;
 		*lastTorsoAngle = angles[1];
 	}
@@ -859,7 +960,8 @@ void CG_DrawGI(DrawInfo_GI_t* drawInfo)
 	groundInstallationData_t* veh = &availableGroundInstallations[drawInfo->basicInfo.vehicleIndex];
 	refEntity_t part[BP_GI_MAX_PARTS];
 	int i;
-	for( i = 0; i < BP_GI_MAX_PARTS; i++ ) {
+	for( i = 0; i < BP_GI_MAX_PARTS; i++ ) 
+	{
 		memset( &part[i], 0, sizeof(part[0]) );	
 	}	
 	// body
@@ -868,31 +970,43 @@ void CG_DrawGI(DrawInfo_GI_t* drawInfo)
 	VectorCopy( drawInfo->basicInfo.origin, part[BP_GI_BODY].oldorigin);
 	AxisCopy( drawInfo->basicInfo.axis, part[BP_GI_BODY].axis );
 	trap_R_AddRefEntityToScene( &part[BP_GI_BODY] );
+
 	// other parts
-	for( i = 1; i < BP_GI_MAX_PARTS; i++ ) {
+	for( i = 1; i < BP_GI_MAX_PARTS; i++ ) 
+	{
 		if( (i == BP_GI_UPGRADE && !veh->upgrades) ||
 			(i == BP_GI_UPGRADE2 && veh->upgrades < 2 ) ||
-			(i == BP_GI_UPGRADE3 && veh->upgrades < 3 ) ) {
+			(i == BP_GI_UPGRADE3 && veh->upgrades < 3 ) ) 
+		{
 			break;;
 		}
 		part[i].hModel = veh->handle[i];
 		if( !part[i].hModel ) continue;
 		VectorCopy( drawInfo->basicInfo.origin, part[i].lightingOrigin );
 		AxisCopy( axisDefault, part[i].axis );
-		if( i == BP_GI_GUNBARREL ) {
+		if( i == BP_GI_GUNBARREL ) 
+		{
 			RotateAroundPitch( part[i].axis, drawInfo->gunAngle );
 			CG_PositionRotatedEntityOnTag( &part[i], &part[BP_GI_TURRET], 
 				veh->handle[BP_GI_TURRET], gi_tags[i] );
-		} else if( i == BP_GI_UPGRADE ) {
+		} 
+		else if( i == BP_GI_UPGRADE ) 
+		{
 			CG_PositionRotatedEntityOnTag( &part[i], &part[BP_GI_GUNBARREL], 
 				veh->handle[BP_GI_GUNBARREL], gi_tags[i] );
-		} else if( i == BP_GI_UPGRADE2 ) {
+		} 
+		else if( i == BP_GI_UPGRADE2 ) 
+		{
 			CG_PositionRotatedEntityOnTag( &part[i], &part[BP_GI_UPGRADE], 
 				veh->handle[BP_GI_UPGRADE], gi_tags[i] );
-		} else if( i == BP_GI_UPGRADE3 ) {
+		} 
+		else if( i == BP_GI_UPGRADE3 ) 
+		{
 			CG_PositionRotatedEntityOnTag( &part[i], &part[BP_GI_UPGRADE2], 
 				veh->handle[BP_GI_UPGRADE2], gi_tags[i] );
-		} else {
+		} 
+		else 
+		{
 			RotateAroundYaw( part[i].axis, drawInfo->turretAngle );
 			CG_PositionRotatedEntityOnTag( &part[i], &part[BP_GI_BODY], 
 				veh->handle[BP_GI_BODY], gi_tags[i] );

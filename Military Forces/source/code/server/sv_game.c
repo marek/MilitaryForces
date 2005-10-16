@@ -371,7 +371,7 @@ int SV_GameSystemCalls( int *args ) {
 							   reinterpret_cast<char*>(VMA(3)), 
 							   args[4] );
 	case G_FS_SEEK:
-		return 0;//FS_Seek( args[1], args[2], args[3] );
+		FS_Seek( args[1], args[2], args[3] );
 
 	case G_LOCATE_GAME_DATA:
 		SV_LocateGameData( reinterpret_cast<sharedEntity_t*>(VMA(1)), 

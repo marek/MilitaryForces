@@ -1,5 +1,5 @@
 /*
- * $Id: ui_syscalls.c,v 1.2 2005-08-31 19:20:23 thebjoern Exp $
+ * $Id: ui_syscalls.c,v 1.3 2005-10-16 15:12:33 thebjoern Exp $
 */
 #include "ui_local.h"
 #include "..\cgame\cg_public.h"
@@ -99,6 +99,10 @@ void trap_FS_FCloseFile( fileHandle_t f ) {
 
 int trap_FS_GetFileList(  const char *path, const char *extension, char *listbuf, int bufsize ) {
 	return syscall( UI_FS_GETFILELIST, path, extension, listbuf, bufsize );
+}
+
+int trap_FS_Seek( fileHandle_t f, long offset, int origin ) {
+	return syscall( UI_FS_SEEK, f, offset, origin );
 }
 
 qhandle_t trap_R_RegisterModel( const char *name ) {

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.13 2005-09-22 23:31:17 minkis Exp $
+ * $Id: cg_local.h,v 1.14 2005-10-16 15:12:33 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1600,6 +1600,7 @@ int			trap_FS_FOpenFile( const char *qpath, fileHandle_t *f, fsMode_t mode );
 void		trap_FS_Read( void *buffer, int len, fileHandle_t f );
 void		trap_FS_Write( const void *buffer, int len, fileHandle_t f );
 void		trap_FS_FCloseFile( fileHandle_t f );
+int			trap_FS_Seek( fileHandle_t f, long offset, int origin ); // fsOrigin_t
 
 // add commands to the local console as if they were typed in
 // for map changing, etc.  The command is not executed immediately,

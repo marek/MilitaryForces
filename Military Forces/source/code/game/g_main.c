@@ -1,10 +1,3 @@
-/*
- * $Id: g_main.c,v 1.6 2005-10-16 09:43:37 thebjoern Exp $
-*/
-
-// Copyright (C) 1999-2000 Id Software, Inc.
-//
-
 #include "g_local.h"
 #include "..\vehiclelib\bg_datamanager.h"
 
@@ -440,7 +433,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 	// MFQ3 data
 	MF_LoadAllVehicleData();
-	DataManager::getInstance().createAllData();
+	//DataManager::getInstance().createAllData();
 
 	// parse the key/value pairs and spawn gentities
 	G_SpawnEntitiesFromString();

@@ -1,8 +1,14 @@
 #include "bg_datamanager.h"
 #include "bg_vehicleinfo.h"
+#include "bg_md3utils.h"
 #include "../game/q_shared.h"
 #include "../qcommon/qfiles.h"
 #include "../game/bg_public.h"
+
+
+// decls
+int		trap_FS_FOpenFile( const char *qpath, fileHandle_t *f, fsMode_t mode );
+void	trap_FS_FCloseFile( fileHandle_t f );
 
 
 GameObjectInfo_GroundVehicle::GameObjectInfo_GroundVehicle() :
@@ -15,7 +21,34 @@ GameObjectInfo_GroundVehicle::~GameObjectInfo_GroundVehicle()
 {
 }
 
+bool
+GameObjectInfo_GroundVehicle::setupBoundingBox()
+{
+	if( !GameObjectInfo_Vehicle::setupBoundingBox() )
+		return false;
 
+	std::string const& modelBaseName = getModelPath(false);
+
+	// increaes bounding box by turret height
+	vec3_t mins, maxs;
+	if( !Md3Utils::getModelDimensions( modelBaseName + "_tur.md3", mins, maxs ) )
+		return false;
+	float diff = maxs[2] - mins[2];
+	maxs_[2] += diff;
+
+	// Increase bounding box if it has wheels!
+	if( wheels_ )
+	{
+		if( !Md3Utils::getModelDimensions( modelBaseName + "_w1.md3", mins, maxs ) )
+			return false;
+		diff = maxs[2] - mins[2];
+		md3Tag_t tag;
+		if( !Md3Utils::getTagInfo( modelBaseName + ".md3", "tag_wheel", tag ) )
+			return false;
+		mins_[2] = tag.origin[2] - (diff / 2);
+	}
+	return true;
+}
 
 
 void
@@ -361,6 +394,7 @@ GameObjectInfo_GroundVehicle::createAllGroundVehicles( GameObjectList& gameObjec
 	veh->wheels_ = 0;		
 	veh->wheelCF_ = 0;		
     veh->maxSpeed_ = 0;		
+	veh->playerSelectable_ = false;
 	gameObjects.push_back(veh);
 
 
@@ -393,6 +427,7 @@ GameObjectInfo_GroundVehicle::createAllGroundVehicles( GameObjectList& gameObjec
 	veh->wheels_ = 0;		
 	veh->wheelCF_ = 0;		
     veh->maxSpeed_ = 0;		
+	veh->playerSelectable_ = false;
 	gameObjects.push_back(veh);
 }
 

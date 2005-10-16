@@ -1,5 +1,5 @@
 /*
- * $Id: cg_syscalls.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: cg_syscalls.c,v 1.3 2005-10-16 15:12:33 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -76,6 +76,10 @@ void	trap_FS_Write( const void *buffer, int len, fileHandle_t f ) {
 
 void	trap_FS_FCloseFile( fileHandle_t f ) {
 	syscall( CG_FS_FCLOSEFILE, f );
+}
+
+int		trap_FS_Seek( fileHandle_t f, long offset, int origin ) {
+	return syscall( CG_FS_SEEK, f, offset, origin );
 }
 
 void	trap_SendConsoleCommand( const char *text ) {

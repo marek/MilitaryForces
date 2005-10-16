@@ -464,7 +464,7 @@ int CL_CgameSystemCalls( int *args ) {
 		FS_FCloseFile( args[1] );
 		return 0;
 	case CG_FS_SEEK:
-		return 0;//FS_Seek( args[1], args[2], args[3] );
+		return FS_Seek( args[1], args[2], args[3] );
 	case CG_SENDCONSOLECOMMAND:
 		Cbuf_AddText( reinterpret_cast<const char*>(VMA(1)) );
 		return 0;
