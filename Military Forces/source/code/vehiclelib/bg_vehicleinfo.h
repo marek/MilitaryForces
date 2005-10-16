@@ -7,8 +7,6 @@
 #include <string>
 #include <vector>
 
-struct md3Tag_t;
-
 struct GameObjectInfo
 {
 	enum
@@ -63,11 +61,6 @@ protected:
 
 	// bounding box
 	virtual bool			setupBoundingBox() = 0;
-
-	// find all tags containing string str
-	static int				getTagsContaining( std::string const& filename, 
-											   std::string const& str,
-											   std::vector<md3Tag_t>& tagList );
 
 	// add a weapon to the specified loadout
 	static bool				addWeaponToLoadout( Loadout& loadout, 
