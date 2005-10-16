@@ -26,7 +26,8 @@ GameObjectInfo::GameObjectInfo() :
 	renderFlags_(0),
 	maxHealth_(0),
 	shadowShader_(SHADOW_NONE),
-	maxSpeed_(0)
+	maxSpeed_(0),
+	playerSelectable_(true)
 {
 	VectorSet( turnSpeed_, 0, 0, 0 );
 	VectorSet( camDist_, 0, 0, 0 );

@@ -860,7 +860,7 @@ int CL_UISystemCalls( int *args ) {
 							   args[4] );
 
 	case UI_FS_SEEK:
-		return 0;//FS_Seek( args[1], args[2], args[3] );
+		return FS_Seek( args[1], args[2], args[3] );
 	
 	case UI_R_REGISTERMODEL:
 		return re.RegisterModel( reinterpret_cast<const char*>(VMA(1)) );

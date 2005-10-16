@@ -44,9 +44,10 @@ struct GameObjectInfo
 	vec4_t					shadowCoords_;			// shadow apply coords { offsetX, offsetY, xAdjust, yAdjust }
 	vec4_t					shadowAdjusts_;			// shadow apply adjustments { pitchMax, rollMax, pitchMod, rollMod }
 	LoadoutMap				defaultLoadouts_;		// what weapons this object can carry
-    vec3_t					mins_;
-    vec3_t					maxs_;
+    vec3_t					mins_;					// bbox
+    vec3_t					maxs_;					// bbox
     unsigned int			maxSpeed_;				// max speed at military thrust
+	bool					playerSelectable_;		// can this be selected from vehicle selection menu ?
 
 protected:
 	// dont allow construction of this
@@ -122,15 +123,19 @@ private:
 
 struct GameObjectInfo_GroundVehicle : public GameObjectInfo_Vehicle
 {
-							GameObjectInfo_GroundVehicle();
-	virtual					~GameObjectInfo_GroundVehicle();
+									GameObjectInfo_GroundVehicle();
+	virtual							~GameObjectInfo_GroundVehicle();
 
 	// helper to create all of this type
-	static void				createAllGroundVehicles( GameObjectList& gameObjects );
+	static void						createAllGroundVehicles( GameObjectList& gameObjects );
 
 	// wheeled vehicles
-	int						wheels_;				// how many wheels does it have 
-	float					wheelCF_;				// circumference
+	int								wheels_;				// how many wheels does it have 
+	float							wheelCF_;				// circumference
+
+protected:
+	// bounding box
+	virtual bool					setupBoundingBox();
 
 private:
     // disable
@@ -174,6 +179,10 @@ struct GameObjectInfo_Plane : public GameObjectInfo_Aircraft
 	// swing wing planes
 	float					swingAngle_;				// for swing wings
 
+protected:
+	// bounding box
+	virtual bool			setupBoundingBox();
+
 private:
     // disable
 							GameObjectInfo_Plane(GameObjectInfo_Plane const&);
@@ -188,6 +197,10 @@ struct GameObjectInfo_Helicopter : public GameObjectInfo_Aircraft
 
 	// helper to create all of this type
 	static void				createAllHelicopters( GameObjectList& gameObjects );
+
+protected:
+	// bounding box
+	virtual bool			setupBoundingBox();
 
 private:
     // disable

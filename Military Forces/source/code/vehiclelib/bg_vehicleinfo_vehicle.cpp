@@ -53,52 +53,7 @@ GameObjectInfo_Vehicle::setupGameObject()
 bool
 GameObjectInfo_Vehicle::setupBoundingBox()
 {
-	fileHandle_t		file;
-	std::string const&	fileName = getModelPath(true);
-	bool				found = false;
-
-	// get body bounding boxes
-	if( trap_FS_FOpenFile(fileName.c_str(), &file, FS_READ) >= 0 ) 
-	{
-		found = true;
-		md3Header_t header;
-		md3Frame_t currentFrame;
-
-		trap_FS_Read(&header, sizeof(header), file);
-		int number = header.numFrames;
-		for( int i = 0; i < number; ++i ) 
-		{
-			trap_FS_Read(&currentFrame, sizeof(currentFrame), file);
-			if( i == 0 )
-			{
-				VectorCopy( currentFrame.bounds[0], mins_ );
-				VectorCopy( currentFrame.bounds[1], maxs_ );
-			}
-			else
-			{
-				if( currentFrame.bounds[0][0] < mins_[0] )
-					mins_[0] = currentFrame.bounds[0][0];
-				if( currentFrame.bounds[0][1] < mins_[1] )
-					mins_[1] = currentFrame.bounds[0][1];
-				if( currentFrame.bounds[0][2] < mins_[2] )
-					mins_[2] = currentFrame.bounds[0][2];
-
-				if( currentFrame.bounds[1][0] > maxs_[0] )
-					maxs_[0] = currentFrame.bounds[1][0];
-				if( currentFrame.bounds[1][1] > maxs_[1] )
-					maxs_[1] = currentFrame.bounds[1][1];
-				if( currentFrame.bounds[1][2] > maxs_[2] )
-					maxs_[2] = currentFrame.bounds[1][2];
-			}
-		}
-		trap_FS_FCloseFile(file);
-	} 
-	else 
-	{
-		Com_Error(ERR_FATAL, "Unable to open file %s\n", fileName.c_str() );
-	}
-	return found;
-
+	return Md3Utils::getModelDimensions( getModelPath(true), mins_, maxs_ );
 }
 
 bool

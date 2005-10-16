@@ -8,45 +8,8 @@
 int		trap_FS_FOpenFile( const char *qpath, fileHandle_t *f, fsMode_t mode );
 void	trap_FS_Read( void *buffer, int len, fileHandle_t f );
 void	trap_FS_FCloseFile( fileHandle_t f );
+int		trap_FS_Seek( fileHandle_t f, long offset, int origin );
 
-
-
-
-int
-Md3Utils::getTagsContaining( std::string const& filename, 
-							 std::string const& str,
-							 std::vector<md3Tag_t>& tagList )
-{
-	if( str.empty() || str == "" ) 
-		return 0;
-
-	tagList.clear();
-	fileHandle_t	f;
-	if( trap_FS_FOpenFile(filename.c_str(), &f, FS_READ) >= 0 ) 
-	{
-		md3Header_t head;
-		md3Frame_t	frame;
-		md3Tag_t	tag;
-		trap_FS_Read(&head, sizeof(head), f);
-		for( int i = 0; i < head.numFrames; ++i ) 
-			trap_FS_Read(&frame, sizeof(frame), f);
-		int total = head.numTags;
-		for( int i = 0; i < total; ++ i ) 
-		{
-			trap_FS_Read(&tag, sizeof(tag), f);
-			std::string tagName(tag.name);
-			// if it contains the string at the first position, then add it
-			if( tagName.find(str) == 0 )
-				tagList.push_back(tag);
-		}
-		trap_FS_FCloseFile(f);
-	} 
-	else 
-	{
-		Com_Printf( "Unable to open file %s\n", filename.c_str() );
-	}
-	return tagList.size();
-}
 
 bool
 Md3Utils::getModelDimensions( std::string const& filename,
@@ -54,74 +17,255 @@ Md3Utils::getModelDimensions( std::string const& filename,
 							  vec3_t& maxs,
 							  int checkFrame )
 {
-	fileHandle_t		file;
-	bool				found = false;
+	bool success = false;
+	fileHandle_t file;
+
+	if( trap_FS_FOpenFile(filename.c_str(), &file, FS_READ) >= 0 ) 
+		 success = getModelDimensions( file, mins, maxs, checkFrame );
+	else
+		Com_Error(ERR_FATAL, "Unable to open file %s\n", filename.c_str() );
+
+	trap_FS_FCloseFile(file);
+
+	return success;
+}
+
+bool
+Md3Utils::getModelDimensions( fileHandle_t const& file,
+							  vec3_t& mins,
+							  vec3_t& maxs,
+							  int checkFrame )
+{
+	if( !file )
+	{
+		Com_Error(ERR_FATAL, "Invalid filehandle passed to Md3Utils::getModelDimensions\n" );
+		return false;
+	}
+
+	// put it back to beginning of file (just in case)
+	if( trap_FS_Seek( file, FS_SEEK_SET, 0 ) != 0 )
+	{
+		Com_Error(ERR_FATAL, "Unable to set file pointer in file!\n" );
+		return false;
+	}
+
+	bool found = false;
 
 	// get body bounding boxes
-	if( trap_FS_FOpenFile(filename.c_str(), &file, FS_READ) >= 0 ) 
+	md3Header_t header;
+	md3Frame_t currentFrame;
+
+	trap_FS_Read(&header, sizeof(header), file);
+	int number = header.numFrames;
+
+	if( checkFrame >= number )
 	{
-		md3Header_t header;
-		md3Frame_t currentFrame;
+		Com_Error(ERR_FATAL, "File only has %d frames, therefore unable to check frame %d\n", 
+					number, checkFrame );
+		return false;
+	}
+	else if( checkFrame == FRAMESIZE_FIRST )
+		checkFrame = 0;
+	else if( checkFrame == FRAMESIZE_LAST )
+		checkFrame = number - 1;
 
-		trap_FS_Read(&header, sizeof(header), file);
-		int number = header.numFrames;
+	found = true;
 
-		if( checkFrame >= number )
+	for( int i = 0; i < number; ++i ) 
+	{
+		trap_FS_Read(&currentFrame, sizeof(currentFrame), file);
+
+		if( checkFrame >= 0 && i == checkFrame )
 		{
-			Com_Error(ERR_FATAL, "File %s only has %d frames, therefore unable to check frame %d\n", 
-						filename.c_str(), number, checkFrame );
-			trap_FS_FCloseFile(file);
-			return false;
+			VectorCopy( currentFrame.bounds[0], mins );
+			VectorCopy( currentFrame.bounds[1], maxs );
+			break;
 		}
-		else if( checkFrame == FRAMESIZE_FIRST )
-			checkFrame = 0;
-		else if( checkFrame == FRAMESIZE_LAST )
-			checkFrame = number - 1;
-
-		found = true;
-
-		for( int i = 0; i < number; ++i ) 
+		else	// check for all
 		{
-			trap_FS_Read(&currentFrame, sizeof(currentFrame), file);
-
-			if( checkFrame >= 0 && i == checkFrame )
+			if( i == 0 )
 			{
 				VectorCopy( currentFrame.bounds[0], mins );
 				VectorCopy( currentFrame.bounds[1], maxs );
-				break;
 			}
-			else	// check for all
+			else
 			{
-				if( i == 0 )
-				{
-					VectorCopy( currentFrame.bounds[0], mins );
-					VectorCopy( currentFrame.bounds[1], maxs );
-				}
-				else
-				{
-					if( currentFrame.bounds[0][0] < mins[0] )
-						mins[0] = currentFrame.bounds[0][0];
-					if( currentFrame.bounds[0][1] < mins[1] )
-						mins[1] = currentFrame.bounds[0][1];
-					if( currentFrame.bounds[0][2] < mins[2] )
-						mins[2] = currentFrame.bounds[0][2];
+				if( currentFrame.bounds[0][0] < mins[0] )
+					mins[0] = currentFrame.bounds[0][0];
+				if( currentFrame.bounds[0][1] < mins[1] )
+					mins[1] = currentFrame.bounds[0][1];
+				if( currentFrame.bounds[0][2] < mins[2] )
+					mins[2] = currentFrame.bounds[0][2];
 
-					if( currentFrame.bounds[1][0] > maxs[0] )
-						maxs[0] = currentFrame.bounds[1][0];
-					if( currentFrame.bounds[1][1] > maxs[1] )
-						maxs[1] = currentFrame.bounds[1][1];
-					if( currentFrame.bounds[1][2] > maxs[2] )
-						maxs[2] = currentFrame.bounds[1][2];
-				}
+				if( currentFrame.bounds[1][0] > maxs[0] )
+					maxs[0] = currentFrame.bounds[1][0];
+				if( currentFrame.bounds[1][1] > maxs[1] )
+					maxs[1] = currentFrame.bounds[1][1];
+				if( currentFrame.bounds[1][2] > maxs[2] )
+					maxs[2] = currentFrame.bounds[1][2];
 			}
 		}
-		trap_FS_FCloseFile(file);
-	} 
-	else 
-	{
-		Com_Error(ERR_FATAL, "Unable to open file %s\n", filename.c_str() );
 	}
 	return found;
-	
 }
+
+int
+Md3Utils::getTagsContaining( std::string const& filename, 
+							 std::string const& str,
+							 std::vector<md3Tag_t>& tagList )
+{
+	int found = 0;
+	fileHandle_t file;
+
+	if( trap_FS_FOpenFile(filename.c_str(), &file, FS_READ) >= 0 ) 
+		 found = getTagsContaining( file, str, tagList );
+	else
+		Com_Error(ERR_FATAL, "Unable to open file %s\n", filename.c_str() );
+
+	trap_FS_FCloseFile(file);
+
+	return found;
+}
+
+int
+Md3Utils::getTagsContaining( fileHandle_t const& file, 
+							 std::string const& str,
+							 std::vector<md3Tag_t>& tagList )
+{
+	if( str.empty() || str == "" ) 
+		return 0;
+
+	if( !file )
+	{
+		Com_Error(ERR_FATAL, "Invalid filehandle passed to Md3Utils::getTagsContaining\n" );
+		return 0;
+	}
+
+	// put it back to beginning of file (just in case)
+	if( trap_FS_Seek( file, FS_SEEK_SET, 0 ) != 0 )
+	{
+		Com_Error(ERR_FATAL, "Unable to set file pointer in file!\n" );
+		return false;
+	}
+
+	tagList.clear();
+
+	md3Header_t head;
+	trap_FS_Read(&head, sizeof(head), file);
+
+	md3Frame_t	frame;
+	for( int i = 0; i < head.numFrames; ++i ) 
+		trap_FS_Read(&frame, sizeof(frame), file);
+
+	int total = head.numTags;
+	md3Tag_t	tag;
+	for( int i = 0; i < total; ++ i ) 
+	{
+		trap_FS_Read(&tag, sizeof(tag), file);
+		std::string tagName(tag.name);
+		// if it contains the string at the first position, then add it
+		if( tagName.find(str) == 0 )
+			tagList.push_back(tag);
+	}
+
+	return tagList.size();
+}
+
+bool
+Md3Utils::getTagInfo( std::string const& filename,
+					  std::string const& tagname,
+					  md3Tag_t& tag )
+{
+	bool success = false;
+	fileHandle_t file;
+
+	if( trap_FS_FOpenFile(filename.c_str(), &file, FS_READ) >= 0 ) 
+		 success = getTagInfo( file, tagname, tag );
+	else
+		Com_Error(ERR_FATAL, "Unable to open file %s\n", filename.c_str() );
+
+	trap_FS_FCloseFile(file);
+
+	return success;
+}
+
+bool
+Md3Utils::getTagInfo( fileHandle_t const& file,
+					  std::string const& tagname,
+					  md3Tag_t& tag )
+{
+	if( !file )
+	{
+		Com_Error(ERR_FATAL, "Invalid filehandle passed to Md3Utils::getTagInfo\n" );
+		return false;
+	}
+
+	// put it back to beginning of file (just in case)
+	if( trap_FS_Seek( file, FS_SEEK_SET, 0 ) != 0 )
+	{
+		Com_Error(ERR_FATAL, "Unable to set file pointer in file!\n" );
+		return false;
+	}
+
+	bool found = false;
+
+	md3Header_t head;
+	md3Frame_t	frame;
+
+	trap_FS_Read(&head, sizeof(head), file);
+	for( int i = 0; i < head.numFrames; ++i ) 
+		trap_FS_Read(&frame, sizeof(frame), file);
+
+	for( int i = 0; i < head.numTags; ++i ) 
+	{
+		trap_FS_Read(&tag, sizeof(md3Tag_t), file);
+		if( strcmp( tag.name, tagname.c_str() ) == 0 ) 
+		{
+			found = true;
+			break;
+		}
+	}
+
+	return found;
+}
+
+int
+Md3Utils::getNumberOfFrames( std::string const& fileName )
+{
+	fileHandle_t file;
+	
+	if( trap_FS_FOpenFile( fileName.c_str(), &file, FS_READ ) >= 0 ) 
+	{
+		int frames = getNumberOfFrames( file );
+		trap_FS_FCloseFile( file );
+		return frames;
+	}
+
+	Com_Printf( "Unable to open file %s\n", fileName.c_str() );
+
+	return 0;
+}
+
+int
+Md3Utils::getNumberOfFrames( fileHandle_t const& file )
+{
+	if( !file )
+	{
+		Com_Error(ERR_FATAL, "Invalid filehandle passed to Md3Utils::getNumberOfFrames\n" );
+		return false;
+	}
+
+	// put it back to beginning of file (just in case)
+	if( trap_FS_Seek( file, FS_SEEK_SET, 0 ) != 0 )
+	{
+		Com_Error(ERR_FATAL, "Unable to set file pointer in file!\n" );
+		return false;
+	}
+
+	md3Header_t head;
+	trap_FS_Read( &head, sizeof(head), file );
+	return head.numFrames;
+}
+
+
 

@@ -1,5 +1,6 @@
 #include "bg_datamanager.h"
 #include "bg_vehicleinfo.h"
+#include "bg_md3utils.h"
 #include "../game/q_shared.h"
 #include "../qcommon/qfiles.h"
 #include "../game/bg_public.h"
@@ -35,6 +36,84 @@ GameObjectInfo_Plane::GameObjectInfo_Plane() :
 GameObjectInfo_Plane::~GameObjectInfo_Plane()
 {
 }
+
+bool
+GameObjectInfo_Plane::setupBoundingBox()
+{
+	if( !GameObjectInfo_Vehicle::setupBoundingBox() )
+		return false;
+
+	std::string const& modelBaseName = getModelPath(false);
+
+	if( caps_ & HC_GEAR )
+	{
+		// gear tag
+		md3Tag_t tag;
+		if( !Md3Utils::getTagInfo( modelBaseName + ".md3", "tag_gear", tag ) )
+			return false;
+		float diff = tag.origin[2] - mins_[2];
+		//if(diff < 0) diff = 0;
+
+		// gear
+		int frames = Md3Utils::getNumberOfFrames( modelBaseName + "_gear.md3" );
+		if( !frames )
+			return false;
+
+	}
+/*
+			if(f &&  MF_getNumberOfFrames( name, &num ) ) 
+			{
+				vec3_t min1, min2;
+
+				trap_FS_FCloseFile(f);
+				availableVehicles[i].maxGearFrame = num - 1;
+				
+				if(!availableVehicles[i].gearheight)
+				{
+					if( MF_getDimensions( name, 0, 0, &min1 ) &&
+						MF_getDimensions( name, num-1, 0, &min2 ) ) 
+					{
+						availableVehicles[i].gearheight = min1[2] - min2[2] - 1.5;// for coll. detection
+						if( availableVehicles[i].gearheight < 0 ) 
+							availableVehicles[i].gearheight = 0;
+					}
+				}
+				
+				//MF_findTag(name, "tag_gear", &tag);
+				//MF_getDimensions(name, num-1, &max,&min);
+				//availableVehicles[i].gearheight = (tag.origin[2] - min[2]) - diff;
+				//if( availableVehicles[i].gearheight < 0 ) availableVehicles[i].gearheight = 0;
+				
+
+				// Don't bother setting the gearheight, its too fucken bugged.
+			} 
+			else 
+				availableVehicles[i].maxGearFrame = GEAR_DOWN_DEFAULT;
+
+			// bay
+			Com_sprintf( name, sizeof(name), "%s_bay.md3", modelbasename );
+
+			trap_FS_FOpenFile(name, &f, FS_READ);
+
+			if(f && MF_getNumberOfFrames( name, &num ) ) 
+			{
+				trap_FS_FCloseFile(f);
+				availableVehicles[i].maxBayFrame = num - 1;
+			}
+			else 
+				availableVehicles[i].maxBayFrame = BAY_DOWN_DEFAULT;
+
+			// correct actual loadouts
+			for( j = WP_WEAPON1; j < WP_FLARE; ++j ) {
+				if( availableVehicles[i].weapons[j] ) {
+					availableVehicles[i].ammo[j] = 
+						MF_findWeaponsOfType( availableVehicles[i].weapons[j], &availableLoadouts[i] );
+				}
+			}
+*/
+	return true;
+}
+
 
 
 

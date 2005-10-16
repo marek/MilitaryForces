@@ -25,21 +25,19 @@ GameObjectInfo_Infantry::setupGameObject()
 bool
 GameObjectInfo_Infantry::setupBoundingBox()
 {
-	char const* modelBaseName = getModelPath(false).c_str();
-	size_t len = strlen( modelBaseName );
-	char* name = new char[len+16];
+	std::string const modelBaseName = getModelPath(false);
 
 	// boundingbox
-	Com_sprintf( name, sizeof(name), "%s_legs.md3", modelBaseName );
-	Md3Utils::getModelDimensions( name, mins_, maxs_, LEGS_IDLE );
-	
-	Com_sprintf( name, sizeof(name), "%s_torso.md3", modelBaseName );
+	if( !Md3Utils::getModelDimensions( modelBaseName + "_legs.md3", mins_, maxs_, LEGS_IDLE ) )
+		return false;
+
 	vec3_t maxs, mins;
-	Md3Utils::getModelDimensions( name, mins, maxs, LEGS_IDLE );
+	if( !Md3Utils::getModelDimensions( modelBaseName + "_torso.md3", mins, maxs, LEGS_IDLE ) )
+		return false;
 	maxs_[2] += maxs[2] - mins[2];
 
-	Com_sprintf( name, sizeof(name), "%s_head.md3", modelBaseName );
-	Md3Utils::getModelDimensions( name, mins, maxs, LEGS_IDLE );
+	if( !Md3Utils::getModelDimensions( modelBaseName + "_head.md3", mins, maxs ) )
+		return false;
 	maxs_[2] += maxs[2] - mins[2];
 
 	// Scale LQMs
@@ -48,8 +46,6 @@ GameObjectInfo_Infantry::setupBoundingBox()
 		maxs_[j] *= LQM_SCALE;
 		mins_[j] *= LQM_SCALE;
 	}
-	
-	delete [] modelBaseName;
 
 	return true;
 }
