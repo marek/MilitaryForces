@@ -433,7 +433,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 	// MFQ3 data
 	MF_LoadAllVehicleData();
-	//DataManager::getInstance().createAllData();
+	DataManager::getInstance().createAllData();
 
 	// parse the key/value pairs and spawn gentities
 	G_SpawnEntitiesFromString();
