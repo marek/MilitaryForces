@@ -154,6 +154,9 @@ struct GameObjectInfo_Aircraft : public GameObjectInfo_Vehicle
 	unsigned int			abEffectModel_;			// num of afterburner model (for planes)
 
 protected:
+	// bounding box
+	virtual bool			setupBoundingBox();
+
 	// dont allow construction of this
 							GameObjectInfo_Aircraft();
 	virtual					~GameObjectInfo_Aircraft();
