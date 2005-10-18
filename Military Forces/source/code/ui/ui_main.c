@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.6 2005-08-31 19:20:23 thebjoern Exp $
+ * $Id: ui_main.c,v 1.7 2005-10-18 19:31:50 thebjoern Exp $
 */
 /*
 =======================================================================
@@ -3457,7 +3457,6 @@ static void UI_RefreshVehicleSelect( int change_vehicle )
 	const char * pCat = NULL;
 	const char * pClass = NULL;
 	const char * pVehicle = NULL;
-	bool bSelectGI = false; 
 	int levelCats = 0;
 	char info[MAX_INFO_STRING];
 	bool allowNukes;
@@ -3497,24 +3496,13 @@ static void UI_RefreshVehicleSelect( int change_vehicle )
 
 	// find out the current UI catagory
 	vehicleCat = trap_Cvar_VariableValue("ui_vehicleCat");
-	bSelectGI = (UI_CAT_GI == vehicleCat);
-	if(gametype != GT_MISSION_EDITOR)
-		bSelectGI = false;
 
 tryCatAgain:
 
-	
-	
-
 	// is this catagory valid for the current gameset+team+catagory?
 
-	if(bSelectGI) {
-		pCat = "Ground Installations";
-		vehicle = MF_getIndexOfGI( (vehicle-1), gameset, -1, 0);
-	} else {
-		pCat = cat_items[ vehicleCat ];	// get the text
-		vehicle = MF_getIndexOfVehicleEx( (vehicle-1), gameset, team, vehicleCat, -1, -1, 0, allowNukes);
-	}
+	pCat = cat_items[ vehicleCat ];	// get the text
+	vehicle = MF_getIndexOfVehicleEx( (vehicle-1), gameset, team, vehicleCat, -1, -1, 0, allowNukes);
 
 	// ----------> LEVEL SPAWNS <-----------
 
@@ -3524,22 +3512,19 @@ tryCatAgain:
 	//else
 		levelCats = atoi( Info_ValueForKey( info, "mf_lvcat" ) );
 
-	if( pCat && vehicle >= 0 && (levelCats & (1 << vehicleCat)) || bSelectGI) {
+	if( pCat && vehicle >= 0 && (levelCats & (1 << vehicleCat)) ) 
+	{
 		// update the text in the dialog for the UI catagory
 		trap_Cvar_Set( "ui_vehicleCatTxt", pCat );
-	} else {
+	} 
+	else 
+	{
 		// the 'ui_vehicleCat' must be invalid try the next one
 		vehicleCat++;
-		bSelectGI = false;
 		
 		// wrap?
-		if( vehicleCat >= MF_MAX_CATEGORIES ) {
+		if( vehicleCat >= MF_MAX_CATEGORIES ) 
 			vehicleCat = 0;
-		}
-
-		if(gametype == GT_MISSION_EDITOR && UI_CAT_GI == vehicleCat) {
-			bSelectGI = true;
-		}
 
 		goto tryCatAgain;
 	}
@@ -3547,47 +3532,41 @@ tryCatAgain:
 
 	// ----------> CLASS <-----------
 
-	if(!bSelectGI) {
-		// find out the current UI class (based upon the known catagory)
-		vehicleClass = trap_Cvar_VariableValue("ui_vehicleClass");
+	// find out the current UI class (based upon the known catagory)
+	vehicleClass = trap_Cvar_VariableValue("ui_vehicleClass");
 
-	tryClassAgain:
+tryClassAgain:
 
-		// get the text
-		pClass = class_items[ vehicleCat ][ vehicleClass ];
+	// get the text
+	pClass = class_items[ vehicleCat ][ vehicleClass ];
 
-		// check
-		vehicle = MF_getIndexOfVehicleEx( (vehicle-1), gameset, team, vehicleCat, vehicleClass, -1, 0, allowNukes);
+	// check
+	vehicle = MF_getIndexOfVehicleEx( (vehicle-1), gameset, team, vehicleCat, vehicleClass, -1, 0, allowNukes);
 		
-		if( pClass && vehicle >= 0 ) {
-			// update the text in the dialog for the UI class
-			trap_Cvar_Set( "ui_vehicleClassTxt", pClass );
-		} else {
-			// the 'ui_vehicleCat' must be invalid try the next one
-			vehicleClass++;
+	if( pClass && vehicle >= 0 ) 
+	{
+		// update the text in the dialog for the UI class
+		trap_Cvar_Set( "ui_vehicleClassTxt", pClass );
+	} 
+	else
+	{
+		// the 'ui_vehicleCat' must be invalid try the next one
+		vehicleClass++;
 
-			// wrap?
-			if( vehicleClass >= MF_MAX_CLASSES )
-				vehicleClass = 0;
+		// wrap?
+		if( vehicleClass >= MF_MAX_CLASSES )
+			vehicleClass = 0;
 
-			goto tryClassAgain;
-		}
-		trap_Cvar_Set( "ui_vehicleClass", va( "%d", vehicleClass ) );
-	} else {
-		// Disable Class field when selecting GI's
-		trap_Cvar_Set( "ui_vehicleClass", "-1" );
-		trap_Cvar_Set( "ui_vehicleClassTxt", "<Nothing Available>" );
+		goto tryClassAgain;
 	}
+	trap_Cvar_Set( "ui_vehicleClass", va( "%d", vehicleClass ) );
 
 	// ----------> VEHICLE <-----------
 		
 	// is the vehicle valid for the current gameset+team+catagory+class?
 
 	// Use proper selector for vehicle/GI
-	if(bSelectGI)
-		vehicle = MF_getIndexOfGI( (vehicle-1), gameset, vehicleType, change_vehicle);
-	else
-		vehicle = MF_getIndexOfVehicleEx( (vehicle-1), gameset, team, vehicleCat, vehicleClass, vehicleType, change_vehicle, allowNukes);
+	vehicle = MF_getIndexOfVehicleEx( (vehicle-1), gameset, team, vehicleCat, vehicleClass, vehicleType, change_vehicle, allowNukes);
 
 	// -1 means this is not a suitable combination
 	if( vehicle == -1 )
@@ -3601,17 +3580,17 @@ tryCatAgain:
 	}
 
 	// get the text
-	if(bSelectGI)
-		pVehicle = availableGroundInstallations[ vehicle ].tinyName;
-	else
-		pVehicle = availableVehicles[ vehicle ].tinyName;
+	pVehicle = availableVehicles[ vehicle ].tinyName;
 	
-	if( pVehicle ) {
+	if( pVehicle ) 
+	{
 		// update the text in the dialog for the UI vehicle
 		trap_Cvar_Set( "ui_vehicleTxt", pVehicle );
 		// If it wasnt rejected in the first place its safe to update vehicleType
 		vehicleType = vehicle;
-	} else {
+	} 
+	else 
+	{
 		// the 'ui_vehicle' must be invalid, reset
 		trap_Cvar_Set( "ui_vehicle", "0" );
 		vehicle = 0;
@@ -3621,15 +3600,15 @@ tryCatAgain:
 	trap_Cvar_Set( "ui_vehicle", va( "%d", vehicle ));
 	
 	// get the text
-	if(bSelectGI) 
-		pVehicle = availableGroundInstallations[ vehicle ].descriptiveName;
-	else
-		pVehicle = availableVehicles[ vehicle ].descriptiveName;
+	pVehicle = availableVehicles[ vehicle ].descriptiveName;
 
-	if( pVehicle ) {
+	if( pVehicle ) 
+	{
 		// update the text in the dialog for the UI vehicle
 		trap_Cvar_Set( "ui_vehicleLoadoutTxt", pVehicle );
-	} else {
+	} 
+	else 
+	{
 		// the 'ui_vehicleLoadout' must be invalid, reset
 		trap_Cvar_Set( "ui_vehicleLoadout", "0" );
 		vehicle = 0;
