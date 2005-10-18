@@ -19,7 +19,7 @@ GameObjectInfo_Helicopter::~GameObjectInfo_Helicopter()
 bool
 GameObjectInfo_Helicopter::setupBoundingBox()
 {
-	return false;
+	return GameObjectInfo_Aircraft::setupBoundingBox();
 }
 
 

@@ -5,6 +5,13 @@
 #include "../qcommon/qfiles.h"
 #include "../game/bg_public.h"
 
+// decls
+int		trap_FS_FOpenFile( const char *qpath, fileHandle_t *f, fsMode_t mode );
+void	trap_FS_Read( void *buffer, int len, fileHandle_t f );
+void	trap_FS_FCloseFile( fileHandle_t f );
+
+
+
 GameObjectInfo_Aircraft::GameObjectInfo_Aircraft() :
 	engines_(0),
 	bayAnim_(0),
@@ -24,6 +31,95 @@ GameObjectInfo_Aircraft::~GameObjectInfo_Aircraft()
 	gearAnim_ = 0;
 }
 
+bool
+GameObjectInfo_Aircraft::setupBoundingBox()
+{
+	std::string const& modelBaseName = getModelPath(false);
+
+	fileHandle_t fileVehicle;
+
+	if( trap_FS_FOpenFile((modelBaseName + ".md3").c_str(), &fileVehicle, FS_READ) < 0 ) 
+	{
+		Com_Error(ERR_FATAL, "Unable to open model file %s\n", modelBaseName.c_str() );
+		return false;
+	}
+
+	bool success = Md3Utils::getModelDimensions( fileVehicle, mins_, maxs_ );
+
+	// gear
+	if( success && gearAnim_ )
+	{
+		// gear tag
+		md3Tag_t tagVehicle;
+		if( Md3Utils::getTagInfo( fileVehicle, "tag_gear", tagVehicle ) )
+		{
+			// gear
+			fileHandle_t fileGear;
+			if( trap_FS_FOpenFile((modelBaseName + "_gear.md3").c_str(), &fileGear, FS_READ) >= 0 ) 
+			{
+				// gear animations
+				int frames = Md3Utils::getNumberOfFrames( fileGear );
+				if( !frames )
+					success = false;
+				else
+					gearAnim_->maxFrame_ = frames - 1;
+
+				// gear bbox
+				if( success )
+				{
+					md3Tag_t tagGear;
+					if( Md3Utils::getTagInfo( fileGear, "tag_gear", tagGear ) )
+					{
+						vec3_t mins, maxs;
+						if( Md3Utils::getModelDimensions( fileGear, mins, maxs ) )
+						{
+							float diffGear = tagGear.origin[2] - mins[2];
+							mins_[2] = tagVehicle.origin[2] - diffGear;
+						}
+						else
+							success = false;
+					}
+					else
+						success = false;
+				}
+
+				trap_FS_FCloseFile(fileGear);
+			}
+			else
+			{
+				success = false;
+			}
+
+		}
+		else
+			success = false;
+	}
+	trap_FS_FCloseFile(fileVehicle);
+
+	if( success && bayAnim_ )
+	{
+		// gear
+		fileHandle_t fileBay;
+		if( trap_FS_FOpenFile((modelBaseName + "_bay.md3").c_str(), &fileBay, FS_READ) >= 0 ) 
+		{
+			// gear animations
+			int frames = Md3Utils::getNumberOfFrames( fileBay );
+			if( !frames )
+				success = false;
+			else
+				bayAnim_->maxFrame_ = frames - 1;
+
+			trap_FS_FCloseFile(fileBay);
+		}
+		else
+			success = false;
+	}
+
+	return success;
+}
+
+
+
 
 
 
@@ -40,87 +136,8 @@ GameObjectInfo_Plane::~GameObjectInfo_Plane()
 bool
 GameObjectInfo_Plane::setupBoundingBox()
 {
-	if( !GameObjectInfo_Vehicle::setupBoundingBox() )
-		return false;
-
-	std::string const& modelBaseName = getModelPath(false);
-
-	if( caps_ & HC_GEAR )
-	{
-		// gear tag
-		md3Tag_t tag;
-		if( !Md3Utils::getTagInfo( modelBaseName + ".md3", "tag_gear", tag ) )
-			return false;
-		float diff = tag.origin[2] - mins_[2];
-		//if(diff < 0) diff = 0;
-
-		// gear
-		int frames = Md3Utils::getNumberOfFrames( modelBaseName + "_gear.md3" );
-		if( !frames )
-			return false;
-
-	}
-/*
-			if(f &&  MF_getNumberOfFrames( name, &num ) ) 
-			{
-				vec3_t min1, min2;
-
-				trap_FS_FCloseFile(f);
-				availableVehicles[i].maxGearFrame = num - 1;
-				
-				if(!availableVehicles[i].gearheight)
-				{
-					if( MF_getDimensions( name, 0, 0, &min1 ) &&
-						MF_getDimensions( name, num-1, 0, &min2 ) ) 
-					{
-						availableVehicles[i].gearheight = min1[2] - min2[2] - 1.5;// for coll. detection
-						if( availableVehicles[i].gearheight < 0 ) 
-							availableVehicles[i].gearheight = 0;
-					}
-				}
-				
-				//MF_findTag(name, "tag_gear", &tag);
-				//MF_getDimensions(name, num-1, &max,&min);
-				//availableVehicles[i].gearheight = (tag.origin[2] - min[2]) - diff;
-				//if( availableVehicles[i].gearheight < 0 ) availableVehicles[i].gearheight = 0;
-				
-
-				// Don't bother setting the gearheight, its too fucken bugged.
-			} 
-			else 
-				availableVehicles[i].maxGearFrame = GEAR_DOWN_DEFAULT;
-
-			// bay
-			Com_sprintf( name, sizeof(name), "%s_bay.md3", modelbasename );
-
-			trap_FS_FOpenFile(name, &f, FS_READ);
-
-			if(f && MF_getNumberOfFrames( name, &num ) ) 
-			{
-				trap_FS_FCloseFile(f);
-				availableVehicles[i].maxBayFrame = num - 1;
-			}
-			else 
-				availableVehicles[i].maxBayFrame = BAY_DOWN_DEFAULT;
-
-			// correct actual loadouts
-			for( j = WP_WEAPON1; j < WP_FLARE; ++j ) {
-				if( availableVehicles[i].weapons[j] ) {
-					availableVehicles[i].ammo[j] = 
-						MF_findWeaponsOfType( availableVehicles[i].weapons[j], &availableLoadouts[i] );
-				}
-			}
-*/
-	return true;
+	return GameObjectInfo_Aircraft::setupBoundingBox();
 }
-
-
-
-
-
-
-
-
 
 void
 GameObjectInfo_Plane::createAllPlanes( GameObjectList& gameObjects )
