@@ -415,7 +415,7 @@ void IN_DIMouse( int *mx, int *my ) {
 		return;
 	}
 
-	// fetch new events
+	// fetch New events
 	for (;;)
 	{
 		dwElements = 1;

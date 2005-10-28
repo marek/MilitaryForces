@@ -184,7 +184,7 @@ void S_AdpcmEncode( short indata[], char outdata[], int len, struct adpcm_state 
 		}
 		bufferstep = !bufferstep;
 
-		/* Step 2 - Find new index value (for later) */
+		/* Step 2 - Find New index value (for later) */
 		index += indexTable[delta];
 		if ( index < 0 ) index = 0;
 		if ( index > 88 ) index = 88;
@@ -193,7 +193,7 @@ void S_AdpcmEncode( short indata[], char outdata[], int len, struct adpcm_state 
 		sign = delta & 8;
 		delta = delta & 7;
 
-		/* Step 4 - Compute difference and new predicted value */
+		/* Step 4 - Compute difference and New predicted value */
 		/*
 		** Computes 'vpdiff = (delta+0.5)*step/4', but see comment
 		** in adpcm_coder.

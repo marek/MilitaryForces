@@ -78,7 +78,7 @@ void G_ExplodeMissile( gentity_t *ent ) {
 		}
 	}
 
-	trap_LinkEntity( ent );
+	trap_LinkEntity( &ent->s, &ent->r );
 }
 
 
@@ -117,7 +117,7 @@ void G_ExplodeFlak( gentity_t *ent ) {
 		}
 	}
 
-	trap_LinkEntity( ent );
+	trap_LinkEntity( &ent->s, &ent->r );
 }
 
 
@@ -170,7 +170,7 @@ void G_ExplodeCFlare( gentity_t *ent ) {
 	VectorSet(dir, 0 + 5 * Q_random(&seed),	0 + 5 * Q_random(&seed),	120 * Q_random(&seed));
 	fire_flare2(ent->parent, ent->r.currentOrigin, dir, 2000 + 1000 * Q_random(&seed) );
 
-	trap_LinkEntity( ent );
+	trap_LinkEntity( &ent->s, &ent->r );
 }
 
 /*
@@ -549,7 +549,7 @@ void G_ExplodeNuke( gentity_t *ent ) {
 
 	VectorClear(explosion->movedir);
 
-	trap_LinkEntity( explosion );
+	trap_LinkEntity( &explosion->s, &explosion->r );
 
 	explosion->activator = ent->parent;		// Activator is the owner of the bomb/missile 
 
@@ -617,7 +617,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 		}
 	}
 
-	// is it cheaper in bandwidth to just remove this ent and create a new
+	// is it cheaper in bandwidth to just remove this ent and create a New
 	// one, rather than changing the missile into the explosion?
 
 	if (availableWeapons[ent->s.weaponIndex].type != WT_FUELCRATE && 
@@ -674,7 +674,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 		}
 	}
 
-	trap_LinkEntity( ent );
+	trap_LinkEntity( &ent->s, &ent->r );
 }
 
 /*
@@ -710,7 +710,7 @@ void G_RunMissile( gentity_t *ent ) {
 		VectorCopy( tr.endpos, ent->r.currentOrigin );
 	}
 
-	trap_LinkEntity( ent );
+	trap_LinkEntity( &ent->s, &ent->r );
 
 	if ( tr.fraction != 1) {
 		// never explode or bounce on sky
@@ -771,7 +771,7 @@ void G_CrateThink( gentity_t *ent ) {
 	ent->nextthink = level.time + 5;
 	ent->lastDist = VectorNormalize(dir);
 
-	trap_LinkEntity( ent );
+	trap_LinkEntity( &ent->s, &ent->r );
 }
 
 //=============================================================================
@@ -917,7 +917,7 @@ static void follow_target( gentity_t *missile ) {
 	}
 
 
-	trap_LinkEntity( missile );
+	trap_LinkEntity( &missile->s, &missile->r );
 }
 
 

@@ -50,7 +50,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // use three or four scales, most of them exactly equaling the specific rendered size. We 
 // rendered three sizes in Team Arena, 12, 16, and 20. 
 //
-// To generate new font data you need to go through the following steps.
+// To generate New font data you need to go through the following steps.
 // 1. delete the fontImage_x_xx.tga files and fontImage_xx.dat files from the fonts path.
 // 2. in a ui script, specificy a font, smallFont, and bigFont keyword with font name and 
 //    point size. the original TrueType fonts must exist in fonts at this point.
@@ -66,7 +66,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //    touch the font bitmaps.
 // 
 // Currently a define in the project turns on or off the FreeType code which is currently 
-// defined out. To pre-render new fonts you need enable the define ( BUILD_FREETYPE ) and 
+// defined out. To pre-render New fonts you need enable the define ( BUILD_FREETYPE ) and 
 // uncheck the exclude from build check box in the FreeType2 area of the Renderer project. 
 
 
@@ -413,7 +413,7 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
 
   // allocate on the stack first in case we fail
   if (FT_New_Memory_Face( ftLibrary, faceData, len, 0, &face )) {
-    ri.Printf(PRINT_ALL, "RE_RegisterFont: FreeType2, unable to allocate new face.\n");
+    ri.Printf(PRINT_ALL, "RE_RegisterFont: FreeType2, unable to allocate New face.\n");
     return;
   }
 

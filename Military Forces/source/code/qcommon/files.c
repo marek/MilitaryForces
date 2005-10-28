@@ -198,7 +198,7 @@ or configs will never get loaded from disk!
 
 #define	DEMOGAME			"mfdemo"
 
-// every time a new demo pk3 file is built, this checksum must be updated.
+// every time a New demo pk3 file is built, this checksum must be updated.
 // the easiest way to get it is to just run the game and see what it spits out
 #define	DEMO_PAK_CHECKSUM	437558517u
 
@@ -207,8 +207,6 @@ or configs will never get loaded from disk!
 // last demo release to prevent the mac and linux users from using the demo
 // executable with the production windows pak before the mac/linux products
 // hit the shelves a little later
-// NOW defined in build files
-//#define PRE_RELEASE_TADEMO
 
 #define MAX_ZPATH			256
 #define	MAX_SEARCH_PATHS	4096
@@ -518,45 +516,51 @@ FS_CopyFile
 Copy a fully specified file from one place to another
 =================
 */
-static void FS_CopyFile( char *fromOSPath, char *toOSPath ) {
+static void FS_CopyFile( char *fromOSPath, char *toOSPath ) 
+{
 	FILE	*f;
 	int		len;
 	byte	*buf;
 
 	Com_Printf( "copy %s to %s\n", fromOSPath, toOSPath );
 
-	if (strstr(fromOSPath, "journal.dat") || strstr(fromOSPath, "journaldata.dat")) {
+	if (strstr(fromOSPath, "journal.dat") || strstr(fromOSPath, "journaldata.dat")) 
+	{
 		Com_Printf( "Ignoring journal files\n");
 		return;
 	}
 
 	f = fopen( fromOSPath, "rb" );
-	if ( !f ) {
+	if ( !f ) 
 		return;
-	}
+
 	fseek (f, 0, SEEK_END);
 	len = ftell (f);
 	fseek (f, 0, SEEK_SET);
 
 	// we are using direct malloc instead of Z_Malloc here, so it
 	// probably won't work on a mac... Its only for developers anyway...
-	buf = reinterpret_cast<byte*>(malloc( len ));
+	buf = new byte[len];
 	if (fread( buf, 1, len, f ) != len)
 		Com_Error( ERR_FATAL, "Short read in FS_Copyfiles()\n" );
 	fclose( f );
 
-	if( FS_CreatePath( toOSPath ) ) {
+	if( FS_CreatePath( toOSPath ) ) 
+	{
+		delete [] buf;
 		return;
 	}
 
 	f = fopen( toOSPath, "wb" );
-	if ( !f ) {
+	if ( !f ) 
+	{
+		delete [] buf;
 		return;
 	}
 	if (fwrite( buf, 1, len, f ) != len)
 		Com_Error( ERR_FATAL, "Short write in FS_Copyfiles()\n" );
 	fclose( f );
-	free( buf );
+	delete [] buf;
 }
 
 /*
@@ -1125,7 +1129,7 @@ int FS_FOpenFileRead( const char *filename, fileHandle_t *file, bool uniqueFILE 
 					}
 
 					if ( uniqueFILE ) {
-						// open a new file on the pakfile
+						// open a New file on the pakfile
 						fsh[*file].handleFiles.file.z = unzReOpen (pak->pakFilename, pak->handle);
 						if (fsh[*file].handleFiles.file.z == NULL) {
 							Com_Error (ERR_FATAL, "Couldn't reopen %s", pak->pakFilename);
@@ -1136,7 +1140,7 @@ int FS_FOpenFileRead( const char *filename, fileHandle_t *file, bool uniqueFILE 
 					Q_strncpyz( fsh[*file].name, filename, sizeof( fsh[*file].name ) );
 					fsh[*file].zipFile = true;
 					zfi = (unz_s *)fsh[*file].handleFiles.file.z;
-					// in case the file was new
+					// in case the file was New
 					temp = zfi->file;
 					// set the file position in the zip file (also sets the current file info)
 					unzSetCurrentFileInfoPosition(pak->handle, pakFile->pos);
@@ -1670,7 +1674,7 @@ ZIP FILE LOADING
 =================
 FS_LoadZipFile
 
-Creates a new pak_t in the search chain for the contents
+Creates a New pak_t in the search chain for the contents
 of a zip file.
 =================
 */
@@ -2040,7 +2044,7 @@ int	FS_GetFileList(  const char *path, const char *extension, char *listbuf, int
 Sys_ConcatenateFileLists
 
 mkv: Naive implementation. Concatenates three lists into a
-     new list, and frees the old lists from the heap.
+     New list, and frees the old lists from the heap.
 bk001129 - from cvs1.17 (mkv)
 
 FIXME TTimo those two should move to common.c next to Sys_ListFiles
@@ -2070,7 +2074,7 @@ static char** Sys_ConcatenateFileLists( char **list0, char **list1, char **list2
   totalLength += Sys_CountFileList(list1);
   totalLength += Sys_CountFileList(list2);
 
-  /* Create new list. */
+  /* Create New list. */
   dst = cat = reinterpret_cast<char**>(Z_Malloc( ( totalLength + 1 ) * sizeof( char* ) ));
 
   /* Copy over lists. */
@@ -3314,7 +3318,7 @@ void FS_Restart( int checksumFeed ) {
 		Com_Error( ERR_FATAL, "Couldn't load default.cfg" );
 	}
 
-	// bk010116 - new check before safeMode
+	// bk010116 - New check before safeMode
 	if ( Q_stricmp(fs_gamedirvar->string, lastValidGame) ) {
 		// skip the mfconfig.cfg if "safe" is on the command line
 		if ( !Com_SafeMode() ) {

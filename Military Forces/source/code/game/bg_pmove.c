@@ -1,5 +1,5 @@
 /*
- * $Id: bg_pmove.c,v 1.3 2005-09-02 08:45:17 thebjoern Exp $
+ * $Id: bg_pmove.c,v 1.4 2005-10-28 13:06:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -411,7 +411,7 @@ static void PM_SetWaterLevel( void ) {
 	}
 	cont = pm->pointcontents( point, pm->ps->clientNum );
 
-	// new version
+	// New version
 	if ( cont & MASK_WATER ) {
 		pm->watertype = cont;
 		pm->waterlevel = 1;
@@ -620,11 +620,6 @@ static void PM_Weapon( void ) {
 	if( availableWeapons[pm->ps->weaponIndex].type == WT_FUELTANK &&
 		pm->ps->timers[TIMER_WEAPON] <= 0 )
 		canShoot = true;
-
-//#ifndef QAGAME
-//	Com_Printf("Weaponindex: %d\n", pm->ps->weaponIndex);
-//#endif
-
 
 	// check for MG primary fire
 	if( (pm->cmd.buttons & BUTTON_ATTACK_MAIN) && pm->ps->weaponNum == WP_MACHINEGUN ) {
@@ -894,30 +889,32 @@ PM_VehicleMove
 */
 static void PM_VehicleMove( void ) 
 {
-	if( availableVehicles[pm->vehicle].cat & CAT_PLANE ) {
+	if( availableVehicles[pm->vehicle].cat & CAT_PLANE ) 
+	{
 		if( pm->advancedControls )
 			PM_PlaneMoveAdvanced();
 		else
 			PM_PlaneMove();
 	}
-	else if( availableVehicles[pm->vehicle].cat & CAT_HELO ) {
+	else if( availableVehicles[pm->vehicle].cat & CAT_HELO ) 
+	{
 		PM_HeloMove();
 	}
-	else if( availableVehicles[pm->vehicle].cat & CAT_LQM ) {
+	else if( availableVehicles[pm->vehicle].cat & CAT_LQM ) 
+	{
 		PM_LQMMove();
 	}
-	else if( availableVehicles[pm->vehicle].cat & CAT_BOAT ) {
+	else if( availableVehicles[pm->vehicle].cat & CAT_BOAT ) 
+	{
 		PM_BoatMove();
 	}
-	else if( availableVehicles[pm->vehicle].cat & CAT_GROUND ) {
+	else if( availableVehicles[pm->vehicle].cat & CAT_GROUND ) 
+	{
 		PM_GroundVehicleMove();
 	}
-	else {
-#ifdef QAGAME
-		Com_Error( ERR_DROP, "Server: Invalid vehicle type in PM_VehicleMove" );
-#else
-		Com_Error( ERR_DROP, "Client: Invalid vehicle type in PM_VehicleMove" );
-#endif
+	else 
+	{
+		Com_Error( ERR_DROP, "ERROR: Invalid vehicle type in PM_VehicleMove" );
 	}
 }
 

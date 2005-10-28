@@ -208,7 +208,7 @@ typedef my_coef_controller * my_coef_ptr;
 
 LOCAL void
 start_iMCU_row (j_compress_ptr cinfo)
-/* Reset within-iMCU-row counters for a new row */
+/* Reset within-iMCU-row counters for a New row */
 {
   my_coef_ptr coef = (my_coef_ptr) cinfo->coef;
 

@@ -276,7 +276,7 @@ finish_input_pass (j_decompress_ptr cinfo)
 
 /*
  * Read JPEG markers before, between, or after compressed-data scans.
- * Change state as necessary when a new scan is reached.
+ * Change state as necessary when a New scan is reached.
  * Return value is JPEG_SUSPENDED, JPEG_REACHED_SOS, or JPEG_REACHED_EOI.
  *
  * The consume_input method pointer points either here or to the

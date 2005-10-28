@@ -209,11 +209,11 @@ void CL_ParseSnapshot( msg_t *msg ) {
 	// NOTE: now sent with all server to client messages
 	//clc.reliableAcknowledge = MSG_ReadLong( msg );
 
-	// read in the new snapshot to a temporary buffer
+	// read in the New snapshot to a temporary buffer
 	// we will only copy to cl.snap if it is valid
 	Com_Memset (&newSnap, 0, sizeof(newSnap));
 
-	// we will have read any new server commands in this
+	// we will have read any New server commands in this
 	// message before we got to svc_snapshot
 	newSnap.serverCommandNum = clc.serverCommandSequence;
 
@@ -320,7 +320,7 @@ int cl_connectedToPureServer;
 CL_SystemInfoChanged
 
 The systeminfo configstring has been changed, so parse
-new information out of it.  This will happen at every
+New information out of it.  This will happen at every
 gamestate, and possibly during gameplay.
 ==================
 */
@@ -333,7 +333,7 @@ void CL_SystemInfoChanged( void ) {
 
 	systemInfo = cl.gameState.stringData + cl.gameState.stringOffsets[ CS_SYSTEMINFO ];
 	// NOTE TTimo:
-	// when the serverId changes, any further messages we send to the server will use this new serverId
+	// when the serverId changes, any further messages we send to the server will use this New serverId
 	// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=475
 	// in some cases, outdated cp commands might get sent with this news serverId
 	cl.serverId = atoi( Info_ValueForKey( systemInfo, "sv_serverid" ) );

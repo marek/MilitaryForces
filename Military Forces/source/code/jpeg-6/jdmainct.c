@@ -442,7 +442,7 @@ process_data_context_main (j_decompress_ptr cinfo,
     /* After the first iMCU, change wraparound pointers to normal state */
     if (jmain->iMCU_row_ctr == 1)
       set_wraparound_pointers(cinfo);
-    /* Prepare to load new iMCU row using other xbuffer list */
+    /* Prepare to load New iMCU row using other xbuffer list */
     jmain->whichptr ^= 1;	/* 0=>1 or 1=>0 */
     jmain->buffer_full = FALSE;
     /* Still need to process last row group of this iMCU row, */

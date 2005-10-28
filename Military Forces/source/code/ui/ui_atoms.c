@@ -1,5 +1,5 @@
 /*
- * $Id: ui_atoms.c,v 1.3 2005-08-31 19:20:23 thebjoern Exp $
+ * $Id: ui_atoms.c,v 1.4 2005-10-28 13:07:04 thebjoern Exp $
 */
 
 /**********************************************************************
@@ -12,31 +12,31 @@
 bool		m_entersound;		// after a frame, so caching won't disrupt the sound
 
 // these are here so the functions in q_shared.c can link
-#ifndef UI_HARD_LINKED
-
-void QDECL Com_Error( int level, const char *error, ... ) {
-	va_list		argptr;
-	char		text[1024];
-
-	va_start (argptr, error);
-	vsprintf (text, error, argptr);
-	va_end (argptr);
-
-	trap_Error( va("%s", text) );
-}
-
-void QDECL Com_Printf( const char *msg, ... ) {
-	va_list		argptr;
-	char		text[1024];
-
-	va_start (argptr, msg);
-	vsprintf (text, msg, argptr);
-	va_end (argptr);
-
-	trap_Print( va("%s", text) );
-}
-
-#endif
+//#ifndef UI_HARD_LINKED
+//
+//void QDECL Com_Error( int level, const char *error, ... ) {
+//	va_list		argptr;
+//	char		text[1024];
+//
+//	va_start (argptr, error);
+//	vsprintf (text, error, argptr);
+//	va_end (argptr);
+//
+//	trap_Error( va("%s", text) );
+//}
+//
+//void QDECL Com_Printf( const char *msg, ... ) {
+//	va_list		argptr;
+//	char		text[1024];
+//
+//	va_start (argptr, msg);
+//	vsprintf (text, msg, argptr);
+//	va_end (argptr);
+//
+//	trap_Print( va("%s", text) );
+//}
+//
+//#endif
 
 bool newUI = false;
 
@@ -132,7 +132,7 @@ void UI_LoadBestScores(const char *map, int game) {
 	}
 	UI_SetBestScores(&newInfo, false);
 
-	Com_sprintf(fileName, MAX_QPATH, "demos/%s_%d.dm_%d", map, game, (int)trap_Cvar_VariableValue("protocol"));
+	Com_sprintf(fileName, MAX_QPATH, "demos/%s_%d.dm_%d", map, game, trap_Cvar_VariableValue("protocol"));
 	uiInfo.demoAvailable = false;
 	if (trap_FS_FOpenFile(fileName, &f, FS_READ) >= 0) {
 		uiInfo.demoAvailable = true;
@@ -251,7 +251,7 @@ static void UI_CalcPostGameStats() {
 	newHigh = (newInfo.redScore > newInfo.blueScore && newInfo.score > oldInfo.score);
 
 	if  (newHigh) {
-		// if so write out the new one
+		// if so write out the New one
 		uiInfo.newHighScoreTime = uiInfo.uiDC.realTime + 20000;
 		if (trap_FS_FOpenFile(fileName, &f, FS_WRITE) >= 0) {
 			size = sizeof(postGameInfo_t);

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_weapons.c,v 1.8 2005-09-01 07:54:45 minkis Exp $
+ * $Id: cg_weapons.c,v 1.9 2005-10-28 13:06:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -287,7 +287,7 @@ void CG_RegisterWeapons() {
 			// find out which model to use
 			weaponInfo->missileModel = trap_R_RegisterModel( availableWeapons[i].modelName );
 			
-			// MFQ3: new sound
+			// MFQ3: New sound
 			weaponInfo->missileSound = trap_S_RegisterSound( "sound/weapons/rocket/rocketFly1.wav", false );
 			if( !weaponInfo->missileSound )
 			{
@@ -303,7 +303,7 @@ void CG_RegisterWeapons() {
 			MAKERGB( weaponInfo->missileDlightColor, 1, 0.75f, 0 );
 			//MAKERGB( weaponInfo->flashDlightColor, 1, 0.75f, 0 );
 
-			// MFQ3: new sound
+			// MFQ3: New sound
 			weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/rocket/rocketFire1.wav", false );
 
 			break;
@@ -313,7 +313,7 @@ void CG_RegisterWeapons() {
 			// find out which model to use
 			weaponInfo->missileModel = trap_R_RegisterModel( availableWeapons[i].modelName );
 			
-			// MFQ3: new sound
+			// MFQ3: New sound
 			weaponInfo->missileSound = trap_S_RegisterSound( "sound/weapons/rocket/rocketFly1.wav", false );
 
 
@@ -324,7 +324,7 @@ void CG_RegisterWeapons() {
 			MAKERGB( weaponInfo->missileDlightColor, 1, 0.75f, 0 );
 			//MAKERGB( weaponInfo->flashDlightColor, 1, 0.75f, 0 );
 
-			// MFQ3: new sound
+			// MFQ3: New sound
 			weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/rocket/rocketFire1.wav", false );
 
 			break;
@@ -340,7 +340,7 @@ void CG_RegisterWeapons() {
 		case WT_MACHINEGUN:
 			// MAKERGB( weaponInfo->flashDlightColor, 1, 1, 0 );
 
-			// MFQ3: new sounds
+			// MFQ3: New sounds
 			switch( i )
 			{
 			case WI_MG_2XCAL303:

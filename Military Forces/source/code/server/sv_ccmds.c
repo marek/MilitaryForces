@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #include "server.h"
+#include "../game/game.h"
 
 /*
 ===============================================================================
@@ -203,7 +204,7 @@ static void SV_Map_f( void ) {
 ================
 SV_MapRestart_f
 
-Completely restarts a level, but doesn't send a new gamestate to the clients.
+Completely restarts a level, but doesn't send a New gamestate to the clients.
 This allows fair starts with variable load times.
 ================
 */
@@ -258,7 +259,7 @@ static void SV_MapRestart_f( void ) {
 	// map_restart has happened
 	svs.snapFlagServerBit ^= SNAPFLAG_SERVERCOUNT;
 
-	// generate a new serverid	
+	// generate a New serverid	
 	// TTimo - don't update restartedserverId there, otherwise we won't deal correctly with multiple map_restart
 	sv.serverId = com_frameTime;
 	Cvar_Set( "sv_serverid", va("%i", sv.serverId ) );
@@ -273,7 +274,8 @@ static void SV_MapRestart_f( void ) {
 
 	// run a few frames to allow everything to settle
 	for ( i = 0 ;i < 3 ; i++ ) {
-		VM_Call( gvm, GAME_RUN_FRAME, svs.time );
+		//VM_Call( gvm, GAME_RUN_FRAME, svs.time );
+		theSG.gameRunFrame( svs.time );
 		svs.time += 100;
 	}
 
@@ -284,7 +286,7 @@ static void SV_MapRestart_f( void ) {
 	for (i=0 ; i<sv_maxclients->integer ; i++) {
 		client = &svs.clients[i];
 
-		// send the new gamestate to all connected clients
+		// send the New gamestate to all connected clients
 		if ( client->state < CS_CONNECTED) {
 			continue;
 		}
@@ -299,7 +301,8 @@ static void SV_MapRestart_f( void ) {
 		SV_AddServerCommand( client, "map_restart\n" );
 
 		// connect the client again, without the firstTime flag
-		denied = reinterpret_cast<char*>(VM_ExplicitArgPtr( gvm, VM_Call( gvm, GAME_CLIENT_CONNECT, i, false, isBot ) ));
+		//denied = reinterpret_cast<char*>(VM_ExplicitArgPtr( gvm, VM_Call( gvm, GAME_CLIENT_CONNECT, i, false, isBot ) ));
+		denied = theSG.clientConnect( i, false, isBot );
 		if ( denied ) {
 			// this generally shouldn't happen, because the client
 			// was connected before the level change
@@ -314,7 +317,8 @@ static void SV_MapRestart_f( void ) {
 	}	
 
 	// run another frame to allow things to look at all the players
-	VM_Call( gvm, GAME_RUN_FRAME, svs.time );
+	//VM_Call( gvm, GAME_RUN_FRAME, svs.time );
+	theSG.gameRunFrame( svs.time );
 	svs.time += 100;
 }
 

@@ -191,7 +191,7 @@ libvar_t *LibVar(char *var_name, char *value)
 	libvar_t *v;
 	v = LibVarGet(var_name);
 	if (v) return v;
-	//create new variable
+	//create New variable
 	v = LibVarAlloc(var_name);
 	//variable string
 	v->string = reinterpret_cast<char *>(GetMemory(strlen(value) + 1));

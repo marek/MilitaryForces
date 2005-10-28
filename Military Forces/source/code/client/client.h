@@ -64,7 +64,7 @@ typedef struct {
 =============================================================================
 
 the clientActive_t structure is wiped completely at every
-new gamestate_t, potentially several times during an established connection
+New gamestate_t, potentially several times during an established connection
 
 =============================================================================
 */
@@ -307,10 +307,15 @@ extern	clientStatic_t		cls;
 
 //=============================================================================
 
-extern	vm_t			*cgvm;	// interface to cgame dll or vm
-extern	vm_t			*uivm;	// interface to ui dll or vm
+//extern	vm_t			*cgvm;	// interface to cgame dll or vm
+//extern	vm_t			*uivm;	// interface to ui dll or vm
 extern	refexport_t		re;		// interface to refresh .dll
 
+struct UserInterface;
+extern UserInterface& theUI;
+
+struct ClientGame;
+extern ClientGame& theCG;
 
 //
 // cvars
@@ -384,7 +389,7 @@ int CL_GetPingQueueCount( void );
 void CL_ShutdownRef( void );
 void CL_InitRef( void );
 bool CL_CDKeyValidate( const char *key, const char *checksum );
-int CL_ServerStatus( char *serverAddress, char *serverStatusString, int maxLen );
+int CL_ServerStatus( const char *serverAddress, char *serverStatusString, int maxLen );
 
 
 //

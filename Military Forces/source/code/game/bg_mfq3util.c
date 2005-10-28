@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.5 2005-09-05 11:30:08 thebjoern Exp $
+ * $Id: bg_mfq3util.c,v 1.6 2005-10-28 13:06:54 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -7,8 +7,8 @@
 #include "bg_public.h"
 
 // externals
-extern void	trap_Cvar_Set( const char *var_name, const char *value );
-extern void	trap_Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize );
+//extern void	trap_Cvar_Set( const char *var_name, const char *value );
+//extern void	trap_Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize );
 
 int		trap_FS_FOpenFile( const char *qpath, fileHandle_t *f, fsMode_t mode );
 void	trap_FS_Read( void *buffer, int len, fileHandle_t f );
@@ -575,7 +575,7 @@ static void MF_ParseOverview( char **buf, mission_overview_t* overview )
 	token = COM_Parse( buf );
 	if( !token[0] ) 
 	{
-		//trap_Printf(va("Token: '%s' - END\n", token));
+		//trap_Print(va("Token: '%s' - END\n", token));
 		return;
 	}
 //	Com_Printf(va("O-Token: '%s' - VALID\n", token));
@@ -662,7 +662,7 @@ static void MF_ParseWaypoints( char **buf, mission_vehicle_t* veh )
 	token = COM_Parse( buf );
 	if( !token[0] ) 
 	{
-		//trap_Printf(va("Token: '%s' - END\n", token));
+		//trap_Print(va("Token: '%s' - END\n", token));
 		return;
 	}
 //	Com_Printf(va("W-Token: '%s' - VALID\n", token));
@@ -712,7 +712,7 @@ static void MF_ParseVehicle( char **buf, mission_vehicle_t* veh )
 	token = COM_Parse( buf );
 	if( !token[0] ) 
 	{
-		//trap_Printf(va("Token: '%s' - END\n", token));
+		//trap_Print(va("Token: '%s' - END\n", token));
 		return;
 	}
 //	Com_Printf(va("V-Token: '%s' - VALID\n", token));
@@ -803,7 +803,7 @@ static void MF_ParseGroundInstallation( char **buf, mission_groundInstallation_t
 	token = COM_Parse( buf );
 	if( !token[0] ) 
 	{
-		//trap_Printf(va("Token: '%s' - END\n", token));
+		//trap_Print(va("Token: '%s' - END\n", token));
 		return;
 	}
 //	Com_Printf(va("GV-Token: '%s' - VALID\n", token));
@@ -894,7 +894,7 @@ static void MF_ParseEntities( char **buf,
 	token = COM_Parse( buf );
 	if( !token[0] ) 
 	{
-		//trap_Printf(va("Token: '%s' - END\n", token));
+		//trap_Print(va("Token: '%s' - END\n", token));
 		return;
 	};
 //	Com_Printf(va("E-Token: '%s' - VALID\n", token));

@@ -14,14 +14,14 @@
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)..\compiler_output\Debug\game"
 			IntermediateDirectory="$(SolutionDir)..\compiler_output\Debug\game"
-			ConfigurationType="2"
+			ConfigurationType="4"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="FALSE">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				OptimizeForProcessor="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;BUILDING_REF_GL;DEBUG;MISSIONPACK;QAGAME"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_WINDOWS"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				RuntimeTypeInfo="TRUE"
@@ -38,20 +38,8 @@
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib"
-				OutputFile="$(SolutionDir)..\..\mfdata\qagamex86.dll"
-				LinkIncremental="1"
-				SuppressStartupBanner="TRUE"
-				ModuleDefinitionFile=".\game.def"
-				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(IntDir)\qagamex86.pdb"
-				GenerateMapFile="TRUE"
-				MapFileName="$(IntDir)\qagamex86.map"
-				SubSystem="2"
-				BaseAddress="0x20000000"
-				ImportLibrary="$(IntDir)\qagamex86.lib"
-				TargetMachine="1"/>
+				Name="VCLibrarianTool"
+				OutputFile="$(IntDir)\game.lib"/>
 			<Tool
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="_DEBUG"
@@ -75,8 +63,6 @@
 			<Tool
 				Name="VCXMLDataGeneratorTool"/>
 			<Tool
-				Name="VCWebDeploymentTool"/>
-			<Tool
 				Name="VCManagedWrapperGeneratorTool"/>
 			<Tool
 				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
@@ -85,7 +71,7 @@
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)..\compiler_output\Release\game"
 			IntermediateDirectory="$(SolutionDir)..\compiler_output\Release\game"
-			ConfigurationType="2"
+			ConfigurationType="4"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="FALSE">
 			<Tool
@@ -93,7 +79,7 @@
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				OptimizeForProcessor="2"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;MISSIONPACK;QAGAME;BUILDING_REF_GL"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_WINDOWS"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="TRUE"
@@ -109,19 +95,8 @@
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib"
-				OutputFile="$(SolutionDir)..\..\mfdata\qagamex86.dll"
-				LinkIncremental="1"
-				SuppressStartupBanner="TRUE"
-				ModuleDefinitionFile=".\game.def"
-				ProgramDatabaseFile="$(IntDir)\qagamex86.pdb"
-				GenerateMapFile="TRUE"
-				MapFileName="$(IntDir)\qagamex86.map"
-				SubSystem="2"
-				BaseAddress="0x20000000"
-				ImportLibrary="$(IntDir)\qagamex86.lib"
-				TargetMachine="1"/>
+				Name="VCLibrarianTool"
+				OutputFile="$(IntDir)\game.lib"/>
 			<Tool
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="NDEBUG"
@@ -145,8 +120,6 @@
 			<Tool
 				Name="VCXMLDataGeneratorTool"/>
 			<Tool
-				Name="VCWebDeploymentTool"/>
-			<Tool
 				Name="VCManagedWrapperGeneratorTool"/>
 			<Tool
 				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
@@ -155,14 +128,14 @@
 			Name="ReleaseWithDebugInfo|Win32"
 			OutputDirectory="$(SolutionDir)..\compiler_output\ReleaseWithDebugInfo\game"
 			IntermediateDirectory="$(SolutionDir)..\compiler_output\ReleaseWithDebugInfo\game"
-			ConfigurationType="2"
+			ConfigurationType="4"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="FALSE">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				OptimizeForProcessor="3"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;MISSIONPACK;QAGAME;BUILDING_REF_GL"
+				OptimizeForProcessor="0"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_WINDOWS"
 				StringPooling="FALSE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -181,20 +154,8 @@
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="winmm.lib"
-				OutputFile="$(SolutionDir)..\..\mfdata\qagamex86.dll"
-				LinkIncremental="1"
-				SuppressStartupBanner="TRUE"
-				ModuleDefinitionFile=".\game.def"
-				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(IntDir)\qagamex86.pdb"
-				GenerateMapFile="TRUE"
-				MapFileName="$(IntDir)\qagamex86.map"
-				SubSystem="2"
-				BaseAddress="0x20000000"
-				ImportLibrary="$(IntDir)\qagamex86.lib"
-				TargetMachine="1"/>
+				Name="VCLibrarianTool"
+				OutputFile="$(IntDir)\game.lib"/>
 			<Tool
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="_DEBUG"
@@ -217,8 +178,6 @@
 				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"/>
-			<Tool
-				Name="VCWebDeploymentTool"/>
 			<Tool
 				Name="VCManagedWrapperGeneratorTool"/>
 			<Tool
@@ -397,6 +356,9 @@
 				RelativePath=".\g_weapon.c">
 			</File>
 			<File
+				RelativePath=".\game.cpp">
+			</File>
+			<File
 				RelativePath=".\mf_client.c">
 			</File>
 			<File
@@ -429,6 +391,9 @@
 			</File>
 			<File
 				RelativePath=".\g_team.h">
+			</File>
+			<File
+				RelativePath=".\game.h">
 			</File>
 			<File
 				RelativePath=".\inv.h">

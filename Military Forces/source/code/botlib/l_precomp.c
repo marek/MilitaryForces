@@ -1328,7 +1328,7 @@ define_t *PC_DefineFromString(char *string)
 	PC_InitTokenHeap();
 
 	script = LoadScriptMemory(string, strlen(string), "*extern");
-	//create a new source
+	//create a New source
 	Com_Memset(&src, 0, sizeof(source_t));
 	strncpy(src.filename, "*extern", MAX_PATH);
 	src.scriptstack = script;

@@ -123,7 +123,7 @@ void Cbuf_InsertText( const char *text ) {
 		cmd_text.data[ i + len ] = cmd_text.data[ i ];
 	}
 
-	// copy the new text in
+	// copy the New text in
 	Com_Memcpy( cmd_text.data, text, len - 1 );
 
 	// add a \n

@@ -283,13 +283,13 @@ VIRTUAL MACHINE
 ==============================================================
 */
 
-typedef struct vm_s vm_t;
-
-typedef enum {
-	VMI_NATIVE,
-	VMI_BYTECODE,
-	VMI_COMPILED
-} vmInterpret_t;
+//typedef struct vm_s vm_t;
+//
+//typedef enum {
+//	VMI_NATIVE,
+//	VMI_BYTECODE,
+//	VMI_COMPILED
+//} vmInterpret_t;
 
 /*typedef enum {
 	TRAP_MEMSET = 100,
@@ -309,21 +309,21 @@ typedef enum {
 	TRAP_TESTPRINTFLOAT
 } sharedTraps_t;*/
 
-void	VM_Init( void );
-vm_t	*VM_Create( const char *module, int (*systemCalls)(int *), 
-				   vmInterpret_t interpret );
+//void	VM_Init( void );
+//vm_t	*VM_Create( const char *module, int (*systemCalls)(int *), 
+//				   vmInterpret_t interpret );
 // module should be bare: "cgame", not "cgame.dll" or "vm/cgame.qvm"
 
-void	VM_Free( vm_t *vm );
-void	VM_Clear(void);
-vm_t	*VM_Restart( vm_t *vm );
+//void	VM_Free( vm_t *vm );
+//void	VM_Clear(void);
+//vm_t	*VM_Restart( vm_t *vm );
 
-int		QDECL VM_Call( vm_t *vm, int callNum, ... );
+//int		QDECL VM_Call( vm_t *vm, int callNum, ... );
 
-void	VM_Debug( int level );
+//void	VM_Debug( int level );
 
-void	*VM_ArgPtr( int intValue );
-void	*VM_ExplicitArgPtr( vm_t *vm, int intValue );
+//void	*VM_ArgPtr( int intValue );
+//void	*VM_ExplicitArgPtr( vm_t *vm, int intValue );
 
 /*
 ==============================================================
@@ -547,7 +547,7 @@ fileHandle_t FS_SV_FOpenFileWrite( const char *filename );
 int		FS_SV_FOpenFileRead( const char *filename, fileHandle_t *fp );
 void	FS_SV_Rename( const char *from, const char *to );
 int		FS_FOpenFileRead( const char *qpath, fileHandle_t *file, bool uniqueFILE );
-// if uniqueFILE is true, then a new FILE will be fopened even if the file
+// if uniqueFILE is true, then a New FILE will be fopened even if the file
 // is found in an already open pak file.  If uniqueFILE is false, you must call
 // FS_FCloseFile instead of fclose, otherwise the pak FILE would be improperly closed
 // It is generally safe to always set uniqueFILE to true, because the majority of
@@ -832,12 +832,12 @@ void CL_Disconnect( bool showMainMenu );
 void CL_Shutdown( void );
 void CL_Frame( int msec );
 bool CL_GameCommand( void );
-void CL_KeyEvent (int key, int down, unsigned time);
+void CL_KeyEvent (int key, bool down, unsigned time);
 
 void CL_CharEvent( int key );
 // char events are for field typing, not game control
 
-void CL_MouseEvent( int dx, int dy, int time );
+void CL_MouseEvent( int dx, int dy );//, int time );
 
 void CL_JoystickEvent( int axis, int value, int time );
 
@@ -847,7 +847,7 @@ void CL_ConsolePrint( char *text );
 
 void CL_MapLoading( void );
 // do a screen update before starting to load a map
-// when the server is going to load a new map, the entire hunk
+// when the server is going to load a New map, the entire hunk
 // will be cleared, so the client must shutdown cgame, ui, and
 // the renderer
 
@@ -884,7 +884,7 @@ void SV_Init( void );
 void SV_Shutdown( char *finalmsg );
 void SV_Frame( int msec );
 void SV_PacketEvent( netadr_t from, msg_t *msg );
-bool SV_GameCommand( void );
+bool SV_GameCommand();
 
 
 //
@@ -935,10 +935,9 @@ sysEvent_t	Sys_GetEvent( void );
 void	Sys_Init (void);
 
 // general development dll loading for virtual machine testing
-// fqpath param added 7/20/02 by T.Ray - Sys_LoadDll is only called in vm.c at this time
-void	* QDECL Sys_LoadDll( const char *name, char *fqpath , int (QDECL **entryPoint)(int, ...),
-				  int (QDECL *systemcalls)(int, ...) );
-void	Sys_UnloadDll( void *dllHandle );
+//void	* QDECL Sys_LoadDll( const char *name, char *fqpath , int (QDECL **entryPoint)(int, ...),
+//				  int (QDECL *systemcalls)(int, ...) );
+//void	Sys_UnloadDll( void *dllHandle );
 
 void	Sys_UnloadGame( void );
 void	*Sys_GetGameAPI( void *parms );

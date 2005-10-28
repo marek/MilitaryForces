@@ -20,6 +20,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 #include "client.h"
+#include "../ui/ui.h"
+#include "../cgame/cg.h"
 
 /*
 
@@ -679,7 +681,7 @@ Returns a key number to be used to index keys[] by looking at
 the given string.  Single ascii characters return themselves, while
 the K_* names are matched up.
 
-0x11 will be interpreted as raw hex, which will allow new controlers
+0x11 will be interpreted as raw hex, which will allow New controlers
 
 to be configured even if they don't have defined names.
 ===================
@@ -792,7 +794,7 @@ void Key_SetBinding( int keynum, const char *binding ) {
 		Z_Free( keys[ keynum ].binding );
 	}
 		
-	// allocate memory for new binding
+	// allocate memory for New binding
 	keys[keynum].binding = CopyString( binding );
 
 	// consider this like modifying an archived cvar, so the
@@ -1019,7 +1021,7 @@ CL_KeyEvent
 Called by the system for both key up and key down events
 ===================
 */
-void CL_KeyEvent (int key, int down, unsigned time) {
+void CL_KeyEvent (int key, bool down, unsigned time) {
 	char	*kb;
 	char	cmd[1024];
 
@@ -1095,23 +1097,27 @@ void CL_KeyEvent (int key, int down, unsigned time) {
 		// escape always gets out of CGAME stuff
 		if (cls.keyCatchers & KEYCATCH_CGAME) {
 			cls.keyCatchers &= ~KEYCATCH_CGAME;
-			VM_Call (cgvm, CG_EVENT_HANDLING, CGAME_EVENT_NONE);
+			//VM_Call (cgvm, CG_EVENT_HANDLING, CGAME_EVENT_NONE);
+			theCG.eventHandling( CGAME_EVENT_NONE );
 			return;
 		}
 
 		if ( !( cls.keyCatchers & KEYCATCH_UI ) ) {
 			if ( cls.state == CA_ACTIVE && !clc.demoplaying ) {
-				VM_Call( uivm, UI_SET_ACTIVE_MENU, UIMENU_INGAME );
+				//VM_Call( uivm, UI_SET_ACTIVE_MENU, UIMENU_INGAME );
+				theUI.setActiveMenu( UserInterface::MenuCommand::UIMENU_INGAME );
 			}
 			else {
 				CL_Disconnect_f();
 				S_StopAllSounds();
-				VM_Call( uivm, UI_SET_ACTIVE_MENU, UIMENU_MAIN );
+				//VM_Call( uivm, UI_SET_ACTIVE_MENU, UIMENU_MAIN );
+				theUI.setActiveMenu( UserInterface::MenuCommand::UIMENU_MAIN );
 			}
 			return;
 		}
 
-		VM_Call( uivm, UI_KEY_EVENT, key, down );
+		//VM_Call( uivm, UI_KEY_EVENT, key, down );
+		theUI.keyEvent( key, down );
 		return;
 	}
 
@@ -1126,10 +1132,15 @@ void CL_KeyEvent (int key, int down, unsigned time) {
 
 		CL_AddKeyUpCommands( key, kb );
 
-		if ( cls.keyCatchers & KEYCATCH_UI && uivm ) {
-			VM_Call( uivm, UI_KEY_EVENT, key, down );
-		} else if ( cls.keyCatchers & KEYCATCH_CGAME && cgvm ) {
-			VM_Call( cgvm, CG_KEY_EVENT, key, down );
+		if ( (cls.keyCatchers & KEYCATCH_UI) && theUI.isInitialized() ) //&& uivm ) 
+		{
+			//VM_Call( uivm, UI_KEY_EVENT, key, down );
+			theUI.keyEvent( key, down );
+		}
+		else if ( (cls.keyCatchers & KEYCATCH_CGAME) && theCG.isInitialized() ) //&& cgvm ) 
+		{
+			//VM_Call( cgvm, CG_KEY_EVENT, key, down );
+			theCG.keyEvent( key, down );
 		} 
 
 		return;
@@ -1137,56 +1148,85 @@ void CL_KeyEvent (int key, int down, unsigned time) {
 
 
 	// distribute the key down event to the apropriate handler
-	if ( cls.keyCatchers & KEYCATCH_CONSOLE ) {
+	if ( cls.keyCatchers & KEYCATCH_CONSOLE ) 
+	{
 		Console_Key( key );
-	} else if ( cls.keyCatchers & KEYCATCH_UI ) {
-		if ( uivm ) {
-			VM_Call( uivm, UI_KEY_EVENT, key, down );
-		} 
-	} else if ( cls.keyCatchers & KEYCATCH_CGAME ) {
-		if ( cgvm ) {
-			VM_Call( cgvm, CG_KEY_EVENT, key, down );
-		} 
-	} else if ( cls.keyCatchers & KEYCATCH_MESSAGE ) {
+	} 
+	else if ( cls.keyCatchers & KEYCATCH_UI ) 
+	{
+//		if ( uivm ) 
+//		{
+			//VM_Call( uivm, UI_KEY_EVENT, key, down );
+		if( theUI.isInitialized() )
+			theUI.keyEvent( key, down );
+//		} 
+	} 
+	else if ( cls.keyCatchers & KEYCATCH_CGAME ) 
+	{
+		//if ( cgvm ) 
+		//{
+		//	VM_Call( cgvm, CG_KEY_EVENT, key, down );
+		//} 
+		if( theCG.isInitialized() )
+			theCG.keyEvent( key, down );
+	} 
+	else if ( cls.keyCatchers & KEYCATCH_MESSAGE ) 
+	{
 		Message_Key( key );
-	} else if ( cls.state == CA_DISCONNECTED ) {
+	} 
+	else if ( cls.state == CA_DISCONNECTED ) 
+	{
 		Console_Key( key );
-	} else {
+	} 
+	else 
+	{
 		// send the bound action
 		kb = keys[key].binding;
-		if ( !kb ) {
-			if (key >= 200) {
+		if ( !kb ) 
+		{
+			if (key >= 200) 
+			{
 				Com_Printf ("%s is unbound, use controls menu to set.\n"
 					, Key_KeynumToString( key ) );
 			}
-		} else if (kb[0] == '+') {	
+		} 
+		else if (kb[0] == '+') 
+		{	
 			int i;
 			char button[1024], *buttonPtr;
 			buttonPtr = button;
-			for ( i = 0; ; i++ ) {
-				if ( kb[i] == ';' || !kb[i] ) {
+			for ( i = 0; ; i++ ) 
+			{
+				if ( kb[i] == ';' || !kb[i] ) 
+				{
 					*buttonPtr = '\0';
 					if ( button[0] == '+') {
 						// button commands add keynum and time as parms so that multiple
 						// sources can be discriminated and subframe corrected
 						Com_sprintf (cmd, sizeof(cmd), "%s %i %i\n", button, key, time);
 						Cbuf_AddText (cmd);
-					} else {
+					} 
+					else 
+					{
 						// down-only command
 						Cbuf_AddText (button);
 						Cbuf_AddText ("\n");
 					}
 					buttonPtr = button;
-					while ( (kb[i] <= ' ' || kb[i] == ';') && kb[i] != 0 ) {
+					while ( (kb[i] <= ' ' || kb[i] == ';') && kb[i] != 0 ) 
+					{
 						i++;
 					}
 				}
 				*buttonPtr++ = kb[i];
-				if ( !kb[i] ) {
+				if ( !kb[i] ) 
+				{
 					break;
 				}
 			}
-		} else {
+		} 
+		else 
+		{
 			// down-only command
 			Cbuf_AddText (kb);
 			Cbuf_AddText ("\n");
@@ -1202,9 +1242,11 @@ CL_CharEvent
 Normal keyboard characters, already shifted / capslocked / etc
 ===================
 */
-void CL_CharEvent( int key ) {
+void CL_CharEvent( int key ) 
+{
 	// the console key should never be used as a char
-	if ( key == '`' || key == '~' ) {
+	if ( key == '`' || key == '~' ) 
+	{
 		return;
 	}
 
@@ -1215,7 +1257,8 @@ void CL_CharEvent( int key ) {
 	}
 	else if ( cls.keyCatchers & KEYCATCH_UI )
 	{
-		VM_Call( uivm, UI_KEY_EVENT, key | K_CHAR_FLAG, true );
+		//VM_Call( uivm, UI_KEY_EVENT, key | K_CHAR_FLAG, true );
+		theUI.keyEvent( key | K_CHAR_FLAG, true );
 	}
 	else if ( cls.keyCatchers & KEYCATCH_MESSAGE ) 
 	{

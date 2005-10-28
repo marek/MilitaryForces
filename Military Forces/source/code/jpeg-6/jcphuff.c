@@ -248,7 +248,7 @@ emit_bits (phuff_entropy_ptr entropy, unsigned int code, int size)
 
   put_buffer &= (((INT32) 1)<<size) - 1; /* mask off any extra bits in code */
   
-  put_bits += size;		/* new number of bits in buffer */
+  put_bits += size;		/* New number of bits in buffer */
   
   put_buffer <<= 24 - put_bits; /* align incoming bits */
 
@@ -756,7 +756,7 @@ finish_pass_phuff (j_compress_ptr cinfo)
 
 
 /*
- * Finish up a statistics-gathering pass and create the new Huffman tables.
+ * Finish up a statistics-gathering pass and create the New Huffman tables.
  */
 
 METHODDEF void

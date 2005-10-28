@@ -228,9 +228,9 @@ out_of_memory (j_common_ptr cinfo, int which)
 /*
  * Allocation of "small" objects.
  *
- * For these, we use pooled storage.  When a new pool must be created,
+ * For these, we use pooled storage.  When a New pool must be created,
  * we try to get enough space for the current request plus a "slop" factor,
- * where the slop will be the amount of leftover space in the new pool.
+ * where the slop will be the amount of leftover space in the New pool.
  * The speed vs. space tradeoff is largely determined by the slop values.
  * A different slop value is provided for each pool class (lifetime),
  * and we also distinguish the first pool of a class from later ones.
@@ -283,7 +283,7 @@ alloc_small (j_common_ptr cinfo, int pool_id, size_t sizeofobject)
     hdr_ptr = hdr_ptr->hdr.next;
   }
 
-  /* Time to make a new pool? */
+  /* Time to make a New pool? */
   if (hdr_ptr == NULL) {
     /* min_request is what we need now, slop is what will be leftover */
     min_request = sizeofobject + SIZEOF(small_pool_hdr);
@@ -304,7 +304,7 @@ alloc_small (j_common_ptr cinfo, int pool_id, size_t sizeofobject)
 	out_of_memory(cinfo, 2); /* jpeg_get_small failed */
     }
     mem->total_space_allocated += min_request + slop;
-    /* Success, initialize the new pool header and add to end of list */
+    /* Success, initialize the New pool header and add to end of list */
     hdr_ptr->hdr.next = NULL;
     hdr_ptr->hdr.bytes_used = 0;
     hdr_ptr->hdr.bytes_left = sizeofobject + slop;
@@ -355,7 +355,7 @@ alloc_large (j_common_ptr cinfo, int pool_id, size_t sizeofobject)
   if (odd_bytes > 0)
     sizeofobject += SIZEOF(ALIGN_TYPE) - odd_bytes;
 
-  /* Always make a new pool */
+  /* Always make a New pool */
   if (pool_id < 0 || pool_id >= JPOOL_NUMPOOLS)
     ERREXIT1(cinfo, JERR_BAD_POOL_ID, pool_id);	/* safety check */
 
@@ -365,7 +365,7 @@ alloc_large (j_common_ptr cinfo, int pool_id, size_t sizeofobject)
     out_of_memory(cinfo, 4);	/* jpeg_get_large failed */
   mem->total_space_allocated += sizeofobject + SIZEOF(large_pool_hdr);
 
-  /* Success, initialize the new pool header and add to list */
+  /* Success, initialize the New pool header and add to list */
   hdr_ptr->hdr.next = mem->large_list[pool_id];
   /* We maintain space counts in each pool header for statistical purposes,
    * even though they are not needed for allocation.

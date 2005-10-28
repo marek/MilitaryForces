@@ -16,7 +16,7 @@
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)..\compiler_output\Debug\ui"
 			IntermediateDirectory="$(SolutionDir)..\compiler_output\Debug\ui"
-			ConfigurationType="2"
+			ConfigurationType="4"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="FALSE"
 			CharacterSet="2">
@@ -24,7 +24,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				OptimizeForProcessor="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;UI_EXPORTS;MISSIONPACK"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_WINDOWS"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				RuntimeTypeInfo="TRUE"
@@ -41,19 +41,7 @@
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="odbc32.lib odbccp32.lib"
-				OutputFile="$(SolutionDir)..\..\mfdata\uix86.dll"
-				LinkIncremental="1"
-				SuppressStartupBanner="TRUE"
-				ModuleDefinitionFile=".\ui.def"
-				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(IntDir)\uix86_new.pdb"
-				GenerateMapFile="TRUE"
-				MapFileName="$(IntDir)\uix86_new.map"
-				BaseAddress="0x40000000"
-				ImportLibrary="$(IntDir)\uix86_new.lib"
-				TargetMachine="1"/>
+				Name="VCLibrarianTool"/>
 			<Tool
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="_DEBUG"
@@ -77,8 +65,6 @@
 			<Tool
 				Name="VCXMLDataGeneratorTool"/>
 			<Tool
-				Name="VCWebDeploymentTool"/>
-			<Tool
 				Name="VCManagedWrapperGeneratorTool"/>
 			<Tool
 				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
@@ -87,7 +73,7 @@
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)..\compiler_output\Release\ui"
 			IntermediateDirectory="$(SolutionDir)..\compiler_output\Release\ui"
-			ConfigurationType="2"
+			ConfigurationType="4"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="FALSE"
 			CharacterSet="2">
@@ -96,7 +82,7 @@
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				OptimizeForProcessor="2"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;UI_EXPORTS;"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_WINDOWS"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="TRUE"
@@ -112,18 +98,8 @@
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="odbc32.lib odbccp32.lib"
-				OutputFile="$(SolutionDir)..\..\mfdata\uix86.dll"
-				LinkIncremental="1"
-				SuppressStartupBanner="TRUE"
-				ModuleDefinitionFile=".\ui.def"
-				ProgramDatabaseFile="$(IntDir)\uix86_new.pdb"
-				GenerateMapFile="TRUE"
-				MapFileName="$(IntDir)\uix86_new.map"
-				BaseAddress="0x40000000"
-				ImportLibrary="$(IntDir)\uix86_new.lib"
-				TargetMachine="1"/>
+				Name="VCLibrarianTool"
+				OutputFile="$(IntDir)\ui.lib"/>
 			<Tool
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="NDEBUG"
@@ -147,8 +123,6 @@
 			<Tool
 				Name="VCXMLDataGeneratorTool"/>
 			<Tool
-				Name="VCWebDeploymentTool"/>
-			<Tool
 				Name="VCManagedWrapperGeneratorTool"/>
 			<Tool
 				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
@@ -157,15 +131,15 @@
 			Name="ReleaseWithDebugInfo|Win32"
 			OutputDirectory="$(SolutionDir)..\compiler_output\ReleaseWithDebugInfo\ui"
 			IntermediateDirectory="$(SolutionDir)..\compiler_output\ReleaseWithDebugInfo\ui"
-			ConfigurationType="2"
+			ConfigurationType="4"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="FALSE"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				OptimizeForProcessor="3"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;UI_EXPORTS;MISSIONPACK"
+				OptimizeForProcessor="0"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_WINDOWS"
 				StringPooling="FALSE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -184,19 +158,8 @@
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="odbc32.lib odbccp32.lib"
-				OutputFile="$(SolutionDir)..\..\mfdata\uix86.dll"
-				LinkIncremental="1"
-				SuppressStartupBanner="TRUE"
-				ModuleDefinitionFile=".\ui.def"
-				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(IntDir)\uix86_new.pdb"
-				GenerateMapFile="TRUE"
-				MapFileName="$(IntDir)\uix86_new.map"
-				BaseAddress="0x40000000"
-				ImportLibrary="$(IntDir)\uix86_new.lib"
-				TargetMachine="1"/>
+				Name="VCLibrarianTool"
+				OutputFile="$(IntDir)\ui.lib"/>
 			<Tool
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="_DEBUG"
@@ -220,8 +183,6 @@
 			<Tool
 				Name="VCXMLDataGeneratorTool"/>
 			<Tool
-				Name="VCWebDeploymentTool"/>
-			<Tool
 				Name="VCManagedWrapperGeneratorTool"/>
 			<Tool
 				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
@@ -234,49 +195,13 @@
 			Name="Source Files"
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat">
 			<File
-				RelativePath="..\game\bg_lib.c">
-				<FileConfiguration
-					Name="Debug|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCLCompilerTool"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCLCompilerTool"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="ReleaseWithDebugInfo|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCLCompilerTool"/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\game\bg_loadouts.c">
-			</File>
-			<File
-				RelativePath="..\game\bg_md3util.c">
-			</File>
-			<File
-				RelativePath="..\game\bg_mfq3util.c">
-			</File>
-			<File
-				RelativePath="..\game\bg_misc.c">
-			</File>
-			<File
-				RelativePath="..\game\bg_vehicledata.c">
-			</File>
-			<File
-				RelativePath="..\game\bg_weapondata.c">
-			</File>
-			<File
 				RelativePath="..\game\q_math.c">
 			</File>
 			<File
 				RelativePath="..\game\q_shared.c">
+			</File>
+			<File
+				RelativePath=".\ui.cpp">
 			</File>
 			<File
 				RelativePath=".\ui_atoms.c">
@@ -305,6 +230,9 @@
 			</File>
 			<File
 				RelativePath=".\menudef.h">
+			</File>
+			<File
+				RelativePath=".\ui.h">
 			</File>
 			<File
 				RelativePath=".\ui_local.h">

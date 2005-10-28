@@ -1,5 +1,5 @@
 /*
- * $Id: g_target.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: g_target.c,v 1.3 2005-10-28 13:06:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -162,7 +162,7 @@ void SP_target_speaker( gentity_t *ent ) {
 
 	// must link the entity so we get areas and clusters so
 	// the server can determine who to send updates to
-	trap_LinkEntity( ent );
+	trap_LinkEntity( &ent->s, &ent->r );
 }
 
 

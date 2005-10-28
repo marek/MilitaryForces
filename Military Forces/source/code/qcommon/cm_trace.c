@@ -1146,8 +1146,9 @@ void CM_TraceThroughTree( traceWork_t *tw, int num, float p1f, float p2f, vec3_t
 CM_Trace
 ==================
 */
-void CM_Trace( trace_t *results, const vec3_t start, const vec3_t end, vec3_t mins, vec3_t maxs,
-						  clipHandle_t model, const vec3_t origin, int brushmask, int capsule, sphere_t *sphere ) {
+void CM_Trace( trace_t *results, const vec3_t start, const vec3_t end, const vec3_t mins, const vec3_t maxs,
+						  clipHandle_t model, const vec3_t origin, int brushmask, bool capsule, sphere_t *sphere ) 
+{
 	int			i;
 	traceWork_t	tw;
 	vec3_t		offset;
@@ -1197,7 +1198,7 @@ void CM_Trace( trace_t *results, const vec3_t start, const vec3_t end, vec3_t mi
 		tw.sphere = *sphere;
 	}
 	else {
-		tw.sphere.use = capsule!=0;
+		tw.sphere.use = capsule;
 		tw.sphere.radius = ( tw.size[1][0] > tw.size[1][2] ) ? tw.size[1][2]: tw.size[1][0];
 		tw.sphere.halfheight = tw.size[1][2];
 		VectorSet( tw.sphere.offset, 0, 0, tw.size[1][2] - tw.sphere.radius );
@@ -1365,8 +1366,9 @@ CM_BoxTrace
 ==================
 */
 void CM_BoxTrace( trace_t *results, const vec3_t start, const vec3_t end,
-						  vec3_t mins, vec3_t maxs,
-						  clipHandle_t model, int brushmask, int capsule ) {
+				  const vec3_t mins, const vec3_t maxs,
+				  clipHandle_t model, int brushmask, bool capsule ) 
+{
 	CM_Trace( results, start, end, mins, maxs, model, vec3_origin, brushmask, capsule, NULL );
 }
 
@@ -1379,9 +1381,10 @@ rotating entities
 ==================
 */
 void CM_TransformedBoxTrace( trace_t *results, const vec3_t start, const vec3_t end,
-						  vec3_t mins, vec3_t maxs,
-						  clipHandle_t model, int brushmask,
-						  const vec3_t origin, const vec3_t angles, int capsule ) {
+							 const vec3_t mins, const vec3_t maxs,
+							 clipHandle_t model, int brushmask,
+							 const vec3_t origin, const vec3_t angles, bool capsule ) 
+{
 	trace_t		trace;
 	vec3_t		start_l, end_l;
 	bool	rotated;
@@ -1427,7 +1430,7 @@ void CM_TransformedBoxTrace( trace_t *results, const vec3_t start, const vec3_t 
 	halfwidth = symetricSize[ 1 ][ 0 ];
 	halfheight = symetricSize[ 1 ][ 2 ];
 
-	sphere.use = capsule!=0;
+	sphere.use = capsule;
 	sphere.radius = ( halfwidth > halfheight ) ? halfheight : halfwidth;
 	sphere.halfheight = halfheight;
 	t = halfheight - sphere.radius;

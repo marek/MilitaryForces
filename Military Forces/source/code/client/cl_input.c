@@ -22,6 +22,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // cl.input.c  -- builds an intended movement command to send to the server
 
 #include "client.h"
+#include "../ui/ui.h"
+#include "../cgame/cg.h"
 
 unsigned	frame_msec;
 int			old_com_frameTime;
@@ -350,12 +352,20 @@ void CL_KeyMove( usercmd_t *cmd ) {
 CL_MouseEvent
 =================
 */
-void CL_MouseEvent( int dx, int dy, int time ) {
-	if ( cls.keyCatchers & KEYCATCH_UI ) {
-		VM_Call( uivm, UI_MOUSE_EVENT, dx, dy );
-	} else if (cls.keyCatchers & KEYCATCH_CGAME) {
-		VM_Call (cgvm, CG_MOUSE_EVENT, dx, dy);
-	} else {
+void CL_MouseEvent( int dx, int dy )//, int time ) 
+{
+	if ( cls.keyCatchers & KEYCATCH_UI ) 
+	{
+		//VM_Call( uivm, UI_MOUSE_EVENT, dx, dy );
+		theUI.mouseEvent( dx, dy );
+	}
+	else if (cls.keyCatchers & KEYCATCH_CGAME) 
+	{
+		//VM_Call (cgvm, CG_MOUSE_EVENT, dx, dy);
+		theCG.mouseEvent( dx, dy );
+	}
+	else 
+	{
 		cl.mouseDx[cl.mouseIndex] += dx;
 		cl.mouseDy[cl.mouseIndex] += dy;
 	}
@@ -574,7 +584,7 @@ usercmd_t CL_CreateCmd( void ) {
 =================
 CL_CreateNewCommands
 
-Create a new usercmd_t structure for this frame
+Create a New usercmd_t structure for this frame
 =================
 */
 void CL_CreateNewCommands( void ) {

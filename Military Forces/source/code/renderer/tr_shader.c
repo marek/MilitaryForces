@@ -86,7 +86,7 @@ void R_RemapShader(const char *shaderName, const char *newShaderName, const char
 	}
 
 	if (sh2 == NULL || sh2 == tr.defaultShader) {
-		ri.Printf( PRINT_WARNING, "WARNING: R_RemapShader: new shader %s not found\n", newShaderName );
+		ri.Printf( PRINT_WARNING, "WARNING: R_RemapShader: New shader %s not found\n", newShaderName );
 		return;
 	}
 
@@ -1837,7 +1837,7 @@ static bool CollapseMultitexture( void ) {
 		stages[0].bundle[1] = stages[1].bundle[0];
 	}
 
-	// set the new blend state bits
+	// set the New blend state bits
 	shader.multitextureEnv = collapse[i].multitextureEnv;
 	stages[0].stateBits &= ~( GLS_DSTBLEND_BITS | GLS_SRCBLEND_BITS );
 	stages[0].stateBits |= collapse[i].multitextureBlend;
@@ -2362,7 +2362,7 @@ shader_t *R_FindShaderByName( const char *name ) {
 		// NOTE: if there was no shader or image available with the name strippedName
 		// then a default shader is created with lightmapIndex == LIGHTMAP_NONE, so we
 		// have to check all default shaders otherwise for every call to R_FindShader
-		// with that same strippedName a new default shader is created.
+		// with that same strippedName a New default shader is created.
 		if (Q_stricmp(sh->name, strippedName) == 0) {
 			// match found
 			return sh;
@@ -2430,7 +2430,7 @@ shader_t *R_FindShader( const char *name, int lightmapIndex, bool mipRawImage ) 
 		// NOTE: if there was no shader or image available with the name strippedName
 		// then a default shader is created with lightmapIndex == LIGHTMAP_NONE, so we
 		// have to check all default shaders otherwise for every call to R_FindShader
-		// with that same strippedName a new default shader is created.
+		// with that same strippedName a New default shader is created.
 		if ( (sh->lightmapIndex == lightmapIndex || sh->defaultShader) &&
 		     !Q_stricmp(sh->name, strippedName)) {
 			// match found
@@ -2560,7 +2560,7 @@ qhandle_t RE_RegisterShaderFromImage(const char *name, int lightmapIndex, image_
 		// NOTE: if there was no shader or image available with the name strippedName
 		// then a default shader is created with lightmapIndex == LIGHTMAP_NONE, so we
 		// have to check all default shaders otherwise for every call to R_FindShader
-		// with that same strippedName a new default shader is created.
+		// with that same strippedName a New default shader is created.
 		if ( (sh->lightmapIndex == lightmapIndex || sh->defaultShader) &&
 			// index by name
 			!Q_stricmp(sh->name, name)) {

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_servercmds.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: cg_servercmds.c,v 1.3 2005-10-28 13:06:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -240,7 +240,7 @@ static void CG_ConfigStringModified( void ) {
 	num = atoi( CG_Argv( 1 ) );
 
 	// get the gamestate from the client system, which will have the
-	// new configstring already integrated
+	// New configstring already integrated
 	trap_GetGameState( &cgs.gameState );
 
 	// look up the individual string that was modified
@@ -386,7 +386,7 @@ static void CG_AddToTeamChat( const char *str ) {
 CG_MapRestart
 
 The server has issued a map_restart, so the next snapshot
-is completely new and should not be interpolated to.
+is completely New and should not be interpolated to.
 
 A tournement restart will clear everything, but doesn't
 require a reload of all the media

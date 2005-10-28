@@ -207,7 +207,7 @@ cvar_t *Cvar_Get( const char *var_name, const char *var_value, int flags ) {
 	var = Cvar_FindVar (var_name);
 	if ( var ) {
 		// if the C code is now specifying a variable that the user already
-		// set a value for, take the new value as the reset value
+		// set a value for, take the New value as the reset value
 		if ( ( var->flags & CVAR_USER_CREATED ) && !( flags & CVAR_USER_CREATED )
 			&& var_value[0] ) {
 			var->flags &= ~CVAR_USER_CREATED;
@@ -250,7 +250,7 @@ cvar_t *Cvar_Get( const char *var_name, const char *var_value, int flags ) {
 	}
 
 	//
-	// allocate a new cvar
+	// allocate a New cvar
 	//
 	if ( cvar_numIndexes >= MAX_CVARS ) {
 		Com_Error( ERR_FATAL, "MAX_CVARS" );

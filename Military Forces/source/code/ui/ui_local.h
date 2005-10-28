@@ -1,5 +1,5 @@
 /*
- * $Id: ui_local.h,v 1.5 2005-10-16 15:12:33 thebjoern Exp $
+ * $Id: ui_local.h,v 1.6 2005-10-28 13:07:04 thebjoern Exp $
 */
 //
 #ifndef __UI_LOCAL_H__
@@ -12,6 +12,7 @@
 #include "../qcommon/qfiles.h"
 #include "../game/bg_public.h"
 #include "ui_shared.h"
+#include "ui.h"
 
 
 // global display context
@@ -33,7 +34,7 @@ extern vmCvar_t	ui_ctf_timelimit;
 extern vmCvar_t	ui_ctf_friendly;
 
 extern vmCvar_t	ui_arenasFile;
-extern vmCvar_t	ui_botsFile;
+//extern vmCvar_t	ui_botsFile;
 extern vmCvar_t	ui_spScores1;
 extern vmCvar_t	ui_spScores2;
 extern vmCvar_t	ui_spScores3;
@@ -340,7 +341,7 @@ extern sfxHandle_t	MenuField_Key( menufield_s* m, int* key );
 void UI_Report();
 void UI_Load();
 void UI_LoadMenus(const char *menuFile, bool reset);
-void _UI_SetActiveMenu( uiMenuCommand_t menu );
+void _UI_SetActiveMenu( UserInterface::MenuCommand menu );
 int UI_AdjustTimeByGame(int time);
 void UI_ShowPostGame(bool newHigh);
 void UI_ClearScores();
@@ -387,7 +388,7 @@ extern void TeamMain_Cache( void );
 //
 // ui_connect.c
 //
-extern void UI_DrawConnectScreen( int overlay );
+extern void UI_DrawConnectScreen( bool overlay );
 
 //
 // ui_controls2.c
@@ -559,7 +560,7 @@ bool UI_RegisterClientModelname( playerInfo_t *pi, const char *modelSkinName , c
 //
 // ui_atoms.c
 //
-// this is only used in the old ui, the new ui has it's own version
+// this is only used in the old ui, the New ui has it's own version
 typedef struct {
 	int					frametime;
 	int					realtime;
@@ -585,7 +586,7 @@ typedef struct {
 } uiStatic_t;
 
 
-// new ui stuff
+// New ui stuff
 #define UI_NUMFX 7
 #define MAX_HEADS 64
 #define MAX_ALIASES 64
@@ -862,7 +863,7 @@ extern bool 	UI_CursorInRect (int x, int y, int width, int height);
 extern void			UI_AdjustFrom640( float *x, float *y, float *w, float *h );
 extern void			UI_DrawTextBox (int x, int y, int width, int lines);
 extern bool		UI_IsFullscreen( void );
-extern void			UI_SetActiveMenu( uiMenuCommand_t menu );
+extern void			UI_SetActiveMenu( UserInterface::MenuCommand menu );
 extern void			UI_PushMenu ( menuframework_s *menu );
 extern void			UI_PopMenu (void);
 extern void			UI_ForceMenuOff (void);
@@ -1053,11 +1054,11 @@ int UI_GetNumArenas( void );
 int UI_GetNumSPArenas( void );
 int UI_GetNumSPTiers( void );
 
-char *UI_GetBotInfoByNumber( int num );
-char *UI_GetBotInfoByName( const char *name );
-int UI_GetNumBots( void );
-void UI_LoadBots( void );
-char *UI_GetBotNameByNumber( int num );
+//char *UI_GetBotInfoByNumber( int num );
+//char *UI_GetBotInfoByName( const char *name );
+//int UI_GetNumBots( void );
+//void UI_LoadBots( void );
+//char *UI_GetBotNameByNumber( int num );
 
 void UI_GetBestScore( int level, int *score, int *skill );
 void UI_SetBestScore( int level, int score );
@@ -1093,7 +1094,7 @@ void RankStatus_Cache( void );
 void UI_RankStatusMenu( void );
 
 
-// new ui 
+// New ui 
 
 #define ASSET_BACKGROUND "uiBackground"
 

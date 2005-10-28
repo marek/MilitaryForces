@@ -1,9 +1,9 @@
 /*
- * $Id: ui_util.c,v 1.2 2005-08-31 19:20:23 thebjoern Exp $
+ * $Id: ui_util.c,v 1.3 2005-10-28 13:07:05 thebjoern Exp $
 */
 //
 // origin: rad
-// new ui support stuff
+// New ui support stuff
 // 
 // memory, string alloc
 

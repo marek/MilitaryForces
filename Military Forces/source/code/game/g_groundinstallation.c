@@ -1,5 +1,5 @@
 /*
- * $Id: g_groundinstallation.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: g_groundinstallation.c,v 1.3 2005-10-28 13:06:54 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -45,7 +45,7 @@ void groundinstallation_die( gentity_t *self, gentity_t *inflictor, gentity_t *a
 
 	G_RadiusDamage( self->r.currentOrigin, self, 150, 150, self, MOD_VEHICLEEXPLOSION, CAT_ANY );
 
-	trap_LinkEntity( self );
+	trap_LinkEntity( &self->s, &self->r );
 	
 }
 
@@ -245,6 +245,6 @@ void GroundInstallation_Think( gentity_t* ent )
 
 	ent->nextthink = level.time + 50;
 	ent->s.pos.trTime = level.time;
-	trap_LinkEntity (ent);
+	trap_LinkEntity (&ent->s, &ent->r);
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_public.h,v 1.3 2005-09-02 08:00:21 thebjoern Exp $
+ * $Id: cg_public.h,v 1.4 2005-10-28 13:06:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -175,8 +175,8 @@ functions exported to the main executable
 ==================================================================
 */
 
-typedef enum {
-	CG_INIT,
+//typedef enum {
+//	CG_INIT,
 //	void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum )
 	// called when the level loads or when the renderer is restarted
 	// all media should be registered at this time
@@ -185,36 +185,36 @@ typedef enum {
 	// reliableCommandSequence will be 0 on fresh loads, but higher for
 	// demos, tourney restarts, or vid_restarts
 
-	CG_SHUTDOWN,
+//	CG_SHUTDOWN,
 //	void (*CG_Shutdown)( void );
 	// oportunity to flush and close any open files
 
-	CG_CONSOLE_COMMAND,
+//	CG_CONSOLE_COMMAND,
 //	bool (*CG_ConsoleCommand)( void );
 	// a console command has been issued locally that is not recognized by the
 	// main game system.
 	// use Cmd_Argc() / Cmd_Argv() to read the command, return false if the
 	// command is not known to the game
 
-	CG_DRAW_ACTIVE_FRAME,
+//	CG_DRAW_ACTIVE_FRAME,
 //	void (*CG_DrawActiveFrame)( int serverTime, stereoFrame_t stereoView, bool demoPlayback );
 	// Generates and draws a game scene and status information at the given time.
 	// If demoPlayback is set, local movement prediction will not be enabled
 
-	CG_CROSSHAIR_PLAYER,
+//	CG_CROSSHAIR_PLAYER,
 //	int (*CG_CrosshairPlayer)( void );
 
-	CG_LAST_ATTACKER,
+//	CG_LAST_ATTACKER,
 //	int (*CG_LastAttacker)( void );
 
-	CG_KEY_EVENT, 
+//	CG_KEY_EVENT, 
 //	void	(*CG_KeyEvent)( int key, bool down );
 
-	CG_MOUSE_EVENT,
+//	CG_MOUSE_EVENT,
 //	void	(*CG_MouseEvent)( int dx, int dy );
-	CG_EVENT_HANDLING
+//	CG_EVENT_HANDLING
 //	void (*CG_EventHandling)(int type);
-} cgameExport_t;
+//} cgameExport_t;
 
 // ----------------------------------------------
 

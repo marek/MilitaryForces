@@ -1,5 +1,5 @@
 /*
- * $Id: cg_predict.c,v 1.3 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: cg_predict.c,v 1.4 2005-10-28 13:06:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -22,7 +22,7 @@ static	centity_t	*cg_triggerEntities[MAX_ENTITIES_IN_SNAPSHOT];
 ====================
 CG_BuildSolidList
 
-When a new cg.snap has been set, this function builds a sublist
+When a New cg.snap has been set, this function builds a sublist
 of the entities that are actually solid, to make for more
 efficient collision detection
 ====================
@@ -367,8 +367,8 @@ playerState_t.
 For normal gameplay, it will be the result of predicted usercmd_t on
 top of the most recent playerState_t received from the server.
 
-Each new snapshot will usually have one or more new usercmd over the last,
-but we simulate all unacknowledged commands each time, not just the new ones.
+Each New snapshot will usually have one or more New usercmd over the last,
+but we simulate all unacknowledged commands each time, not just the New ones.
 This means that on an internet connection, quite a few pmoves may be issued
 each frame.
 

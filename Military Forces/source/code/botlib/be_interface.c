@@ -381,7 +381,7 @@ bool BotLibSetup(char *str)
 //	{
 //		botimport.Print(PRT_MESSAGE, "origin = %f, %f, %f\n", origin[0], origin[1], origin[2]);
 //		area = newarea;
-//		botimport.Print(PRT_MESSAGE, "new area %d, cluster %d, presence type %d\n",
+//		botimport.Print(PRT_MESSAGE, "New area %d, cluster %d, presence type %d\n",
 //					area, AAS_AreaCluster(area), AAS_PointPresenceType(origin));
 //		botimport.Print(PRT_MESSAGE, "area contents: ");
 //		if (aasworld.areasettings[area].contents & AREACONTENTS_WATER)
@@ -433,7 +433,7 @@ bool BotLibSetup(char *str)
 //		/*
 //		botlibglobals.goalareanum = newarea;
 //		VectorCopy(parm2, botlibglobals.goalorigin);
-//		botimport.Print(PRT_MESSAGE, "new goal %2.1f %2.1f %2.1f area %d\n",
+//		botimport.Print(PRT_MESSAGE, "New goal %2.1f %2.1f %2.1f area %d\n",
 //								origin[0], origin[1], origin[2], newarea);
 //		*/
 //	} //end if
@@ -451,7 +451,7 @@ bool BotLibSetup(char *str)
 //		{
 //			botlibglobals.goalareanum = newarea;
 //			VectorCopy(parm2, botlibglobals.goalorigin);
-//			botimport.Print(PRT_MESSAGE, "new goal %2.1f %2.1f %2.1f area %d\n",
+//			botimport.Print(PRT_MESSAGE, "New goal %2.1f %2.1f %2.1f area %d\n",
 //									origin[0], origin[1], origin[2], newarea);
 //		}
 //	} //end if*/

@@ -110,7 +110,7 @@ qhandle_t RE_RegisterModel( const char *name ) {
 		}
 	}
 
-	// allocate a new model_t
+	// allocate a New model_t
 
 	if ( ( mod = R_AllocModel() ) == NULL ) {
 		ri.Printf( PRINT_WARNING, "RE_RegisterModel: R_AllocModel() failed for '%s'\n", name);
@@ -526,7 +526,8 @@ static bool R_LoadMD4( model_t *mod, void *buffer, const char *mod_name ) {
 /*
 ** RE_BeginRegistration
 */
-void RE_BeginRegistration( glconfig_t *glconfigOut ) {
+void RE_BeginRegistration( glconfig_t *glconfigOut ) 
+{
 
 	R_Init();
 
@@ -589,7 +590,7 @@ void R_Modellist_f( void ) {
 	}
 	ri.Printf( PRINT_ALL, "%8i : Total models\n", total );
 
-#if	0		// not working right with new hunk
+#if	0		// not working right with New hunk
 	if ( tr.world ) {
 		ri.Printf( PRINT_ALL, "\n%8i : %s\n", tr.world->dataSize, tr.world->name );
 	}

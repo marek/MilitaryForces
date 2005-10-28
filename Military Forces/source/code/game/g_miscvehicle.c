@@ -1,5 +1,5 @@
 /*
- * $Id: g_miscvehicle.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: g_miscvehicle.c,v 1.3 2005-10-28 13:06:54 thebjoern Exp $
 */
 
 
@@ -37,7 +37,7 @@ void misc_vehicle_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacke
 
 	G_RadiusDamage( self->r.currentOrigin, self, 150, 150, self, MOD_VEHICLEEXPLOSION, CAT_ANY );
 
-	trap_LinkEntity( self );
+	trap_LinkEntity( &self->s, &self->r );
 	
 }
 
@@ -128,7 +128,7 @@ static void SP_misc_plane( gentity_t *ent )
 	ent->updateBay = true;
 
 	ent->s.pos.trTime = level.time;
-	trap_LinkEntity (ent);
+	trap_LinkEntity (&ent->s, &ent->r);
 
 }
 
@@ -177,7 +177,7 @@ static void SP_misc_gv( gentity_t *ent )
 
 	} 
 
-	trap_LinkEntity (ent);
+	trap_LinkEntity (&ent->s, &ent->r);
 
 	// set functions
 //	ent->touch = Touch_Plane;
@@ -237,7 +237,7 @@ static void SP_misc_helo( gentity_t *ent )
 
 	} 
 
-	trap_LinkEntity (ent);
+	trap_LinkEntity (&ent->s, &ent->r);
 
 	// set functions
 //	ent->touch = Touch_Plane;
@@ -290,7 +290,7 @@ static void SP_misc_boat( gentity_t *ent )
 
 	} 
 
-	trap_LinkEntity (ent);
+	trap_LinkEntity (&ent->s, &ent->r);
 
 	// set functions
 //	ent->touch = Touch_Plane;
@@ -445,7 +445,7 @@ void SP_misc_vehicle( gentity_t *sp_ent )
 
 	ent->idxScriptBegin = ent->idxScriptEnd = -1;
 
-	trap_LinkEntity (ent);
+	trap_LinkEntity (&ent->s, &ent->r);
 
 	G_FreeEntity(sp_ent);
 }
@@ -520,7 +520,7 @@ void SP_misc_groundinstallation( gentity_t *sp_ent )
 
 	ent->s.ONOFF = OO_RADAR;
 
-	trap_LinkEntity (ent);
+	trap_LinkEntity (&ent->s, &ent->r);
 
 	G_FreeEntity(sp_ent);
 }

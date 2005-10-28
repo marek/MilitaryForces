@@ -398,7 +398,7 @@ typedef struct ai_export_s
 } ai_export_t;
 
 //bot AI library imported functions
-typedef struct botlib_export_s
+struct botlib_export_t
 {
 	//Area Awareness System functions
 	aas_export_t aas;
@@ -424,13 +424,13 @@ typedef struct botlib_export_s
 
 	//start a frame in the bot library
 	int (*BotLibStartFrame)(float time);
-	//load a new map in the bot library
+	//load a New map in the bot library
 	int (*BotLibLoadMap)(const char *mapname);
 	//entity updates
 	int (*BotLibUpdateEntity)(int ent, bot_entitystate_t *state);
 	//just for testing
 	int (*Test)(int parm0, char *parm1, vec3_t parm2, vec3_t parm3);
-} botlib_export_t;
+};
 
 //linking of bot library
 botlib_export_t *GetBotLibAPI( int apiVersion, botlib_import_t *import );

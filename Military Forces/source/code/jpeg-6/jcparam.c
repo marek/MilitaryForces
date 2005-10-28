@@ -242,7 +242,7 @@ std_huff_tables (j_compress_ptr cinfo)
  * Applications that don't choose to use this routine must do their
  * own setup of all these parameters.  Alternately, you can call this
  * to establish defaults and then alter parameters selectively.  This
- * is the recommended approach since, if we add any new parameters,
+ * is the recommended approach since, if we add any New parameters,
  * your code will still work (they'll be set to reasonable defaults).
  */
 

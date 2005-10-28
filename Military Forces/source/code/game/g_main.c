@@ -143,10 +143,10 @@ cvarTable_t		gameCvarTable[] = {
 int		gameCvarTableSize = sizeof( gameCvarTable ) / sizeof( gameCvarTable[0] );
 
 
-void G_InitGame( int levelTime, int randomSeed, int restart );
+void G_InitGame( int levelTime, int randomSeed );
 void G_RunFrame( int levelTime );
-void G_ShutdownGame( int restart );
-void CheckExitRules( void );
+void G_ShutdownGame();
+void CheckExitRules();
 
 
 /*
@@ -157,42 +157,42 @@ This is the only way control passes into the module.
 This must be the very first function compiled into the .q3vm file
 ================
 */
-int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11  ) {
-	switch ( command ) {
-	case GAME_INIT:
-		G_InitGame( arg0, arg1, arg2 );
-		return 0;
-	case GAME_SHUTDOWN:
-		G_ShutdownGame( arg0 );
-		return 0;
-	case GAME_CLIENT_CONNECT:
-		return reinterpret_cast<int>(MF_ClientConnect( arg0, arg1, arg2 ));
-	case GAME_CLIENT_THINK:
-		ClientThink( arg0 );
-		return 0;
-	case GAME_CLIENT_USERINFO_CHANGED:
-		ClientUserinfoChanged( arg0 );
-		return 0;
-	case GAME_CLIENT_DISCONNECT:
-		ClientDisconnect( arg0 );
-		return 0;
-	case GAME_CLIENT_BEGIN:
-		MF_ClientBegin( arg0 );
-		return 0;
-	case GAME_CLIENT_COMMAND:
-		ClientCommand( arg0 );
-		return 0;
-	case GAME_RUN_FRAME:
-		G_RunFrame( arg0 );
-		return 0;
-	case GAME_CONSOLE_COMMAND:
-		return ConsoleCommand();
-	case BOTAI_START_FRAME:
-		return true;// before: BotAIStartFrame( arg0 );
-	}
-
-	return -1;
-}
+//int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11  ) {
+//	switch ( command ) {
+	//case GAME_INIT:
+	//	G_InitGame( arg0, arg1, arg2 );
+	//	return 0;
+	//case GAME_SHUTDOWN:
+	//	G_ShutdownGame( arg0 );
+	//	return 0;
+	//case GAME_CLIENT_CONNECT:
+	//	return reinterpret_cast<int>(MF_ClientConnect( arg0, arg1, arg2 ));
+	//case GAME_CLIENT_THINK:
+	//	ClientThink( arg0 );
+	//	return 0;
+	//case GAME_CLIENT_USERINFO_CHANGED:
+	//	ClientUserinfoChanged( arg0 );
+	//	return 0;
+	//case GAME_CLIENT_DISCONNECT:
+	//	ClientDisconnect( arg0 );
+	//	return 0;
+	//case GAME_CLIENT_BEGIN:
+	//	MF_ClientBegin( arg0 );
+	//	return 0;
+	//case GAME_CLIENT_COMMAND:
+	//	ClientCommand( arg0 );
+	//	return 0;
+	//case GAME_RUN_FRAME:
+	//	G_RunFrame( arg0 );
+	//	return 0;
+	//case GAME_CONSOLE_COMMAND:
+	//	return ConsoleCommand();
+	//case BOTAI_START_FRAME:
+	//	return true;// before: BotAIStartFrame( arg0 );
+//	}
+//
+//	return -1;
+//}
 
 
 void QDECL G_Printf( const char *fmt, ... ) {
@@ -203,7 +203,7 @@ void QDECL G_Printf( const char *fmt, ... ) {
 	vsprintf (text, fmt, argptr);
 	va_end (argptr);
 
-	trap_Printf( text );
+	trap_Print( text );
 }
 
 void QDECL G_Error( const char *fmt, ... ) {
@@ -352,7 +352,7 @@ G_InitGame
 
 ============
 */
-void G_InitGame( int levelTime, int randomSeed, int restart ) {
+void G_InitGame( int levelTime, int randomSeed ) {
 	int					i;
 
 	G_Printf ("------- Game Initialization -------\n");
@@ -426,7 +426,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	level.num_entities = MAX_CLIENTS;
 
 	// let the server system know where the entites are
-	trap_LocateGameData( level.gentities, level.num_entities, sizeof( gentity_t ), 
+	trap_LocateGameData( (void*)level.gentities, level.num_entities, sizeof( gentity_t ), 
 		&level.clients[0].ps, sizeof( level.clients[0] ) );
 
 	ClearRegisteredItems();
@@ -480,7 +480,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 G_ShutdownGame
 =================
 */
-void G_ShutdownGame( int restart ) {
+void G_ShutdownGame() {
 	G_Printf ("==== ShutdownGame ====\n");
 
 	if ( level.logFile ) {
@@ -501,32 +501,32 @@ void G_ShutdownGame( int restart ) {
 
 //===================================================================
 
-#ifndef GAME_HARD_LINKED
-// this is only here so the functions in q_shared.c and bg_*.c can link
-
-void QDECL Com_Error ( int level, const char *error, ... ) {
-	va_list		argptr;
-	char		text[1024];
-
-	va_start (argptr, error);
-	vsprintf (text, error, argptr);
-	va_end (argptr);
-
-	G_Error( "%s", text);
-}
-
-void QDECL Com_Printf( const char *msg, ... ) {
-	va_list		argptr;
-	char		text[1024];
-
-	va_start (argptr, msg);
-	vsprintf (text, msg, argptr);
-	va_end (argptr);
-
-	G_Printf ("%s", text);
-}
-
-#endif
+//#ifndef GAME_HARD_LINKED
+//// this is only here so the functions in q_shared.c and bg_*.c can link
+//
+//void QDECL Com_Error ( int level, const char *error, ... ) {
+//	va_list		argptr;
+//	char		text[1024];
+//
+//	va_start (argptr, error);
+//	vsprintf (text, error, argptr);
+//	va_end (argptr);
+//
+//	G_Error( "%s", text);
+//}
+//
+//void QDECL Com_Printf( const char *msg, ... ) {
+//	va_list		argptr;
+//	char		text[1024];
+//
+//	va_start (argptr, msg);
+//	vsprintf (text, msg, argptr);
+//	va_end (argptr);
+//
+//	G_Printf ("%s", text);
+//}
+//
+//#endif
 
 /*
 ========================================================================
@@ -826,7 +826,7 @@ void CalculateRanks( void ) {
 	// see if it is time to end the level
 	CheckExitRules();
 
-	// if we are at the intermission, send the new info to everyone
+	// if we are at the intermission, send the New info to everyone
 	if ( level.intermissiontime ) {
 		SendScoreboardMessageToAllClients();
 	}
@@ -864,7 +864,7 @@ void SendScoreboardMessageToAllClients( void ) {
 MoveClientToIntermission
 
 When the intermission starts, this will be called for all players.
-If a new client connects, this will be called after the spawn function.
+If a New client connects, this will be called after the spawn function.
 ========================
 */
 void MoveClientToIntermission( gentity_t *ent )
@@ -971,7 +971,7 @@ void BeginIntermission( void ) {
 ExitLevel
 
 When the intermission has been exited, the server is either killed
-or moved to a new level based on the "nextmap" cvar 
+or moved to a New level based on the "nextmap" cvar 
 
 =============
 */
@@ -987,7 +987,7 @@ void ExitLevel (void) {
 	if ( g_gametype.integer == GT_TOURNAMENT  ) {
 		if ( !level.restarted ) {
 			RemoveTournamentLoser();
-			trap_SendConsoleCommand( EXEC_APPEND, "map_restart 0\n" );
+			trap_Cmd_ExecuteText( EXEC_APPEND, "map_restart 0\n" );
 			level.restarted = true;
 			level.changemap = NULL;
 			level.intermissiontime = 0;
@@ -996,7 +996,7 @@ void ExitLevel (void) {
 	}
 
 
-	trap_SendConsoleCommand( EXEC_APPEND, "vstr nextmap\n" );
+	trap_Cmd_ExecuteText( EXEC_APPEND, "vstr nextmap\n" );
 	level.changemap = NULL;
 	level.intermissiontime = 0;
 
@@ -1377,7 +1377,7 @@ void CheckTournament( void ) {
 		if ( level.time > level.warmupTime ) {
 			level.warmupTime += 10000;
 			trap_Cvar_Set( "g_restarted", "1" );
-			trap_SendConsoleCommand( EXEC_APPEND, "map_restart 0\n" );
+			trap_Cmd_ExecuteText( EXEC_APPEND, "map_restart 0\n" );
 			level.restarted = true;
 			return;
 		}
@@ -1428,7 +1428,7 @@ void CheckTournament( void ) {
 		if ( level.time > level.warmupTime ) {
 			level.warmupTime += 10000;
 			trap_Cvar_Set( "g_restarted", "1" );
-			trap_SendConsoleCommand( EXEC_APPEND, "map_restart 0\n" );
+			trap_Cmd_ExecuteText( EXEC_APPEND, "map_restart 0\n" );
 			level.restarted = true;
 			return;
 		}
@@ -1446,7 +1446,7 @@ CheckVote
 void CheckVote( void ) {
 	if ( level.voteExecuteTime && level.voteExecuteTime < level.time ) {
 		level.voteExecuteTime = 0;
-		trap_SendConsoleCommand( EXEC_APPEND, va("%s\n", level.voteString ) );
+		trap_Cmd_ExecuteText( EXEC_APPEND, va("%s\n", level.voteString ) );
 	}
 	if ( !level.voteTime ) {
 		return;
@@ -1512,7 +1512,7 @@ void SetLeader(int team, int client) {
 	}
 	level.clients[client].sess.teamLeader = true;
 	ClientUserinfoChanged( client );
-	PrintTeam(team, va("print \"%s is the new team leader\n\"", level.clients[client].pers.netname) );
+	PrintTeam(team, va("print \"%s is the New team leader\n\"", level.clients[client].pers.netname) );
 }
 
 /*
@@ -1577,7 +1577,7 @@ void CheckTeamVote( int team ) {
 				SetLeader(team, atoi(level.teamVoteString[cs_offset] + 7));
 			}
 			else {
-				trap_SendConsoleCommand( EXEC_APPEND, va("%s\n", level.teamVoteString[cs_offset] ) );
+				trap_Cmd_ExecuteText( EXEC_APPEND, va("%s\n", level.teamVoteString[cs_offset] ) );
 			}
 		} else if ( level.teamVoteNo[cs_offset] >= level.numteamVotingClients[cs_offset]/2 ) {
 			// same behavior as a timeout
@@ -1690,7 +1690,7 @@ void G_RunFrame( int levelTime ) {
 			} else if ( ent->unlinkAfterEvent ) {
 				// items that will respawn will hide themselves after their pickup event
 				ent->unlinkAfterEvent = false;
-				trap_UnlinkEntity( ent );
+				trap_UnlinkEntity( &ent->s, &ent->r );
 			}
 		}
 

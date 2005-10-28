@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.3 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: cg_drawnewhud.c,v 1.4 2005-10-28 13:06:54 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -216,7 +216,7 @@ static int CG_DrawString_MFQ3( int x, int y, const char *string, const float *se
 	if( !string )
 		return 0;
 	
-	lowerstring = reinterpret_cast<char*>(malloc(strlen(string)+1));
+	lowerstring = new char[strlen(string)+1];
 	strcpy(lowerstring, string);
 
 	charWidth = HUDNUM_WIDTH;
@@ -239,7 +239,7 @@ static int CG_DrawString_MFQ3( int x, int y, const char *string, const float *se
 	}
 	trap_R_SetColor( NULL );
 
-	free(lowerstring);
+	delete [] lowerstring;
 	return (xx-x);
 }
 

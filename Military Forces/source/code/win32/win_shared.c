@@ -142,8 +142,8 @@ static int IsPentium( void )
 		test	eax, 0x00200000		// check ID bit
 		jz		set21				// bit 21 is not set, so jump to set_21
 		and		eax, 0xffdfffff		// clear bit 21
-		push	eax					// save new value in register
-		popfd						// store new value in flags
+		push	eax					// save New value in register
+		popfd						// store New value in flags
 		pushfd
 		pop		eax
 		test	eax, 0x00200000		// check ID bit
@@ -151,8 +151,8 @@ static int IsPentium( void )
 		jmp		err					// cpuid not supported
 set21:
 		or		eax, 0x00200000		// set ID bit
-		push	eax					// store new value
-		popfd						// store new value in EFLAGS
+		push	eax					// store New value
+		popfd						// store New value in EFLAGS
 		pushfd
 		pop		eax
 		test	eax, 0x00200000		// if bit 21 is on

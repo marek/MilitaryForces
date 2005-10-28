@@ -874,7 +874,7 @@ typedef struct {
 typedef struct {
 	bool				registered;		// cleared at shutdown, set at beginRegistration
 
-	int						visCount;		// incremented every time a new vis cluster is entered
+	int						visCount;		// incremented every time a New vis cluster is entered
 	int						frameCount;		// incremented every frame
 	int						sceneCount;		// incremented every scene
 	int						viewCount;		// incremented every view (twice a scene if portaled)

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_missioneditor.c,v 1.3 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: cg_missioneditor.c,v 1.4 2005-10-28 13:06:54 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -18,7 +18,7 @@ IGME_vehicle_t* ME_GetSelectedVehicle();
 
 
 
-void ME_KeyEvent(int key, int down)
+void ME_KeyEvent(int key, bool down)
 {
 	if( key == K_MOUSE1 && !down ) {
 		trap_Key_SetCatcher( trap_Key_GetCatcher() & ~KEYCATCH_CGAME );
@@ -1081,7 +1081,7 @@ void ME_ImportScript( const char* scriptname )
 	// clean out old stuff
 	memset( &cgs.IGME, 0, sizeof(cgs.IGME) );
 
-	// spawn new stuff
+	// spawn New stuff
 	ME_SpawnMissionVehicles(vehicles);
 	ME_SpawnMissionGroundInstallations(installations);
 

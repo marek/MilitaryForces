@@ -146,7 +146,7 @@ void RB_AddFlare( void *surface, int fogNum, vec3_t point, vec3_t color, vec3_t 
 		}
 	}
 
-	// allocate a new one
+	// allocate a New one
 	if (!f ) {
 		if ( !r_inactiveFlares ) {
 			// the list is completely full

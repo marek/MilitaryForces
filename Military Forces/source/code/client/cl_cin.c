@@ -33,6 +33,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "client.h"
 #include "snd_local.h"
+#include "../ui/ui.h"
 
 #define MAXSIZE				8
 #define MINSIZE				4
@@ -1187,7 +1188,7 @@ static void RoQInterrupt(void)
 
 	framedata = cin.file;
 //
-// new frame is ready
+// New frame is ready
 //
 redump:
 	switch(cinTable[currentHandle].roq_id) 
@@ -1534,9 +1535,11 @@ int CIN_PlayCinematic( const char *arg, int x, int y, int w, int h, int systemBi
 
 	if (cinTable[currentHandle].alterGameState) {
 		// close the menu
-		if ( uivm ) {
-			VM_Call( uivm, UI_SET_ACTIVE_MENU, UIMENU_NONE );
-		}
+		//if ( uivm ) {
+		//	VM_Call( uivm, UI_SET_ACTIVE_MENU, UIMENU_NONE );
+		//}
+		if( theUI.isInitialized() )
+			theUI.setActiveMenu( UserInterface::MenuCommand::UIMENU_NONE );
 	} else {
 		cinTable[currentHandle].playonwalls = cl_inGameVideo->integer;
 	}

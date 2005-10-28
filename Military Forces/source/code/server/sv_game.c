@@ -24,6 +24,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "server.h"
 
 #include "../botlib/botlib.h"
+#include "../game/game.h"
+
 
 botlib_export_t	*botlib_export;
 
@@ -61,11 +63,13 @@ playerState_t *SV_GameClientNum( int num ) {
 	return ps;
 }
 
-svEntity_t	*SV_SvEntityForGentity( sharedEntity_t *gEnt ) {
-	if ( !gEnt || gEnt->s.number < 0 || gEnt->s.number >= MAX_GENTITIES ) {
+svEntity_t	*SV_SvEntityForGentity( const entityState_t* s, const entityShared_t* r ) 
+{
+	if ( !s || !r || s->number < 0 || s->number >= MAX_GENTITIES ) 
+	{
 		Com_Error( ERR_DROP, "SV_SvEntityForGentity: bad gEnt" );
 	}
-	return &sv.svEntities[ gEnt->s.number ];
+	return &sv.svEntities[ s->number ];
 }
 
 sharedEntity_t *SV_GEntityForSvEntity( svEntity_t *svEnt ) {
@@ -116,7 +120,7 @@ SV_SetBrushModel
 sets mins and maxs for inline bmodels
 =================
 */
-void SV_SetBrushModel( sharedEntity_t *ent, const char *name ) {
+void SV_SetBrushModel( entityState_t* s, entityShared_t* r, const char *name ) {
 	clipHandle_t	h;
 	vec3_t			mins, maxs;
 
@@ -129,17 +133,17 @@ void SV_SetBrushModel( sharedEntity_t *ent, const char *name ) {
 	}
 
 
-	ent->s.modelindex = atoi( name + 1 );
+	s->modelindex = atoi( name + 1 );
 
-	h = CM_InlineModel( ent->s.modelindex );
+	h = CM_InlineModel( s->modelindex );
 	CM_ModelBounds( h, mins, maxs );
-	VectorCopy (mins, ent->r.mins);
-	VectorCopy (maxs, ent->r.maxs);
-	ent->r.bmodel = true;
+	VectorCopy (mins, r->mins);
+	VectorCopy (maxs, r->maxs);
+	r->bmodel = true;
 
-	ent->r.contents = -1;		// we don't know exactly what is in the brushes
+	r->contents = -1;		// we don't know exactly what is in the brushes
 
-	SV_LinkEntity( ent );		// FIXME: remove
+	SV_LinkEntity( s, r );		// FIXME: remove
 }
 
 
@@ -209,10 +213,10 @@ bool SV_inPVSIgnorePortals( const vec3_t p1, const vec3_t p2)
 SV_AdjustAreaPortalState
 ========================
 */
-void SV_AdjustAreaPortalState( sharedEntity_t *ent, int open ) {
+void SV_AdjustAreaPortalState( const entityState_t* s, const entityShared_t* r, int open ) {
 	svEntity_t	*svEnt;
 
-	svEnt = SV_SvEntityForGentity( ent );
+	svEnt = SV_SvEntityForGentity( s, r );
 	if ( svEnt->areanum2 == -1 ) {
 		return;
 	}
@@ -225,16 +229,17 @@ void SV_AdjustAreaPortalState( sharedEntity_t *ent, int open ) {
 SV_GameAreaEntities
 ==================
 */
-bool	SV_EntityContact( vec3_t mins, vec3_t maxs, const sharedEntity_t *gEnt, int capsule ) {
+bool SV_EntityContact( const vec3_t mins, const vec3_t maxs, const entityState_t* s, const entityShared_t* r, bool capsule ) 
+{
 	const float	*origin, *angles;
 	clipHandle_t	ch;
 	trace_t			trace;
 
 	// check for exact collision
-	origin = gEnt->r.currentOrigin;
-	angles = gEnt->r.currentAngles;
+	origin = r->currentOrigin;
+	angles = r->currentAngles;
 
-	ch = SV_ClipHandleForEntity( gEnt );
+	ch = SV_ClipHandleForEntity( s, r );
 	CM_TransformedBoxTrace ( &trace, vec3_origin, vec3_origin, mins, maxs,
 		ch, -1, origin, angles, capsule );
 
@@ -261,9 +266,9 @@ SV_LocateGameData
 
 ===============
 */
-void SV_LocateGameData( sharedEntity_t *gEnts, int numGEntities, int sizeofGEntity_t,
+void SV_LocateGameData( void* gEnts, int numGEntities, int sizeofGEntity_t,
 					   playerState_t *clients, int sizeofGameClient ) {
-	sv.gentities = gEnts;
+	sv.gentities = (sharedEntity_t*)gEnts;
 	sv.gentitySize = sizeofGEntity_t;
 	sv.num_entities = numGEntities;
 
@@ -287,179 +292,179 @@ void SV_GetUsercmd( int clientNum, usercmd_t *cmd ) {
 
 //==============================================
 
-static int	FloatAsInt( float f ) {
-	union
-	{
-	    int i;
-	    float f;
-	} temp;
-	
-	temp.f = f;
-	return temp.i;
-}
+//static int	FloatAsInt( float f ) {
+//	union
+//	{
+//	    int i;
+//	    float f;
+//	} temp;
+//	
+//	temp.f = f;
+//	return temp.i;
+//}
 
-/*
-====================
-SV_GameSystemCalls
-
-The module is making a system call
-====================
-*/
+///*
+//====================
+//SV_GameSystemCalls
+//
+//The module is making a system call
+//====================
+//*/
 //rcg010207 - see my comments in VM_DllSyscall(), in qcommon/vm.c ...
-#if ((defined __linux__) && (defined __powerpc__))
-#define VMA(x) ((void *) args[x])
-#else
-#define	VMA(x) VM_ArgPtr(args[x])
-#endif
+//#if ((defined __linux__) && (defined __powerpc__))
+//#define VMA(x) ((void *) args[x])
+//#else
+//#define	VMA(x) VM_ArgPtr(args[x])
+//#endif
+//
+//#define	VMF(x)	((float *)args)[x]
 
-#define	VMF(x)	((float *)args)[x]
-
-int SV_GameSystemCalls( int *args ) {
-	switch( args[0] ) {
-	case G_PRINT:
-		Com_Printf( "%s", VMA(1) );
-		return 0;
-	case G_ERROR:
-		Com_Error( ERR_DROP, "%s", VMA(1) );
-		return 0;
-	case G_MILLISECONDS:
-		return Sys_Milliseconds();
-	case G_CVAR_REGISTER:
-		Cvar_Register( reinterpret_cast<vmCvar_t*>(VMA(1)), 
-					   reinterpret_cast<const char*>(VMA(2)), 
-					   reinterpret_cast<const char*>(VMA(3)), 
-					   args[4] ); 
-		return 0;
-	case G_CVAR_UPDATE:
-		Cvar_Update( reinterpret_cast<vmCvar_t*>(VMA(1)) );
-		return 0;
-	case G_CVAR_SET:
-		Cvar_Set( (const char *)VMA(1), (const char *)VMA(2) );
-		return 0;
-	case G_CVAR_VARIABLE_INTEGER_VALUE:
-		return Cvar_VariableIntegerValue( (const char *)VMA(1) );
-	case G_CVAR_VARIABLE_STRING_BUFFER:
-		Cvar_VariableStringBuffer( reinterpret_cast<const char*>(VMA(1)), 
-								   reinterpret_cast<char*>(VMA(2)), 
-								   args[3] );
-		return 0;
-	case G_ARGC:
-		return Cmd_Argc();
-	case G_ARGV:
-		Cmd_ArgvBuffer( args[1], reinterpret_cast<char*>(VMA(2)), args[3] );
-		return 0;
-	case G_SEND_CONSOLE_COMMAND:
-		Cbuf_ExecuteText( args[1], reinterpret_cast<const char*>(VMA(2)));
-		return 0;
-
-	case G_FS_FOPEN_FILE:
-		return FS_FOpenFileByMode( reinterpret_cast<const char*>(VMA(1)), 
-								   reinterpret_cast<fileHandle_t*>(VMA(2)), 
-								   static_cast<fsMode_t>(args[3]) );
-	case G_FS_READ:
-		FS_Read2( VMA(1), args[2], args[3] );
-		return 0;
-	case G_FS_WRITE:
-		FS_Write( VMA(1), args[2], args[3] );
-		return 0;
-	case G_FS_FCLOSE_FILE:
-		FS_FCloseFile( args[1] );
-		return 0;
-	case G_FS_GETFILELIST:
-		return FS_GetFileList( reinterpret_cast<const char*>(VMA(1)), 
-							   reinterpret_cast<const char*>(VMA(2)), 
-							   reinterpret_cast<char*>(VMA(3)), 
-							   args[4] );
-	case G_FS_SEEK:
-		return FS_Seek( args[1], args[2], args[3] );
-
-	case G_LOCATE_GAME_DATA:
-		SV_LocateGameData( reinterpret_cast<sharedEntity_t*>(VMA(1)), 
-						   args[2], 
-						   args[3], 
-						   reinterpret_cast<playerState_t*>(VMA(4)), 
-						   args[5] );
-		return 0;
-	case G_DROP_CLIENT:
-		SV_GameDropClient( args[1], reinterpret_cast<const char*>(VMA(2)) );
-		return 0;
-	case G_SEND_SERVER_COMMAND:
-		SV_GameSendServerCommand( args[1], reinterpret_cast<const char*>(VMA(2)) );
-		return 0;
-	case G_LINKENTITY:
-		SV_LinkEntity( reinterpret_cast<sharedEntity_t*>(VMA(1)) );
-		return 0;
-	case G_UNLINKENTITY:
-		SV_UnlinkEntity( reinterpret_cast<sharedEntity_t*>(VMA(1)) );
-		return 0;
-	case G_ENTITIES_IN_BOX:
-		return SV_AreaEntities( reinterpret_cast<float*>(VMA(1)), 
-								reinterpret_cast<float*>(VMA(2)), 
-								reinterpret_cast<int*>(VMA(3)), 
-								args[4] );
-	case G_ENTITY_CONTACT:
-		return SV_EntityContact( reinterpret_cast<float*>(VMA(1)), 
-								 reinterpret_cast<float*>(VMA(2)), 
-								 reinterpret_cast<const sharedEntity_t*>(VMA(3)), 
-								 /*int capsule*/ false );
-	case G_ENTITY_CONTACTCAPSULE:
-		return SV_EntityContact( reinterpret_cast<float*>(VMA(1)), 
-								 reinterpret_cast<float*>(VMA(2)), 
-								 reinterpret_cast<const sharedEntity_t*>(VMA(3)), 
-								 /*int capsule*/ true );
-	case G_TRACE:
-		SV_Trace( reinterpret_cast<trace_t*>(VMA(1)), 
-				  reinterpret_cast<const float*>(VMA(2)), 
-				  reinterpret_cast<float*>(VMA(3)), 
-				  reinterpret_cast<float*>(VMA(4)), 
-				  reinterpret_cast<const float*>(VMA(5)), 
-				  args[6], 
-				  args[7], 
-				  /*int capsule*/ false );
-		return 0;
-	case G_TRACECAPSULE:
-		SV_Trace( reinterpret_cast<trace_t*>(VMA(1)), 
-				  reinterpret_cast<const float*>(VMA(2)), 
-				  reinterpret_cast<float*>(VMA(3)), 
-				  reinterpret_cast<float*>(VMA(4)), 
-				  reinterpret_cast<const float*>(VMA(5)), 
-				  args[6], 
-				  args[7], 
-				  /*int capsule*/ true );
-		return 0;
-	case G_POINT_CONTENTS:
-		return SV_PointContents( reinterpret_cast<const float*>(VMA(1)), args[2] );
-	case G_SET_BRUSH_MODEL:
-		SV_SetBrushModel( reinterpret_cast<sharedEntity_t*>(VMA(1)), 
-						  reinterpret_cast<const char*>(VMA(2)) );
-		return 0;
-	case G_IN_PVS:
-		return SV_inPVS( reinterpret_cast<const float*>(VMA(1)), 
-						 reinterpret_cast<const float*>(VMA(2)) );
-	case G_IN_PVS_IGNORE_PORTALS:
-		return SV_inPVSIgnorePortals( reinterpret_cast<const float*>(VMA(1)), 
-									  reinterpret_cast<const float*>(VMA(2)) );
-
-	case G_SET_CONFIGSTRING:
-		SV_SetConfigstring( args[1], reinterpret_cast<const char*>(VMA(2)) );
-		return 0;
-	case G_GET_CONFIGSTRING:
-		SV_GetConfigstring( args[1], reinterpret_cast<char*>(VMA(2)), args[3] );
-		return 0;
-	case G_SET_USERINFO:
-		SV_SetUserinfo( args[1], reinterpret_cast<const char*>(VMA(2)) );
-		return 0;
-	case G_GET_USERINFO:
-		SV_GetUserinfo( args[1], reinterpret_cast<char*>(VMA(2)), args[3] );
-		return 0;
-	case G_GET_SERVERINFO:
-		SV_GetServerinfo( reinterpret_cast<char*>(VMA(1)), args[2] );
-		return 0;
-	case G_ADJUST_AREA_PORTAL_STATE:
-		SV_AdjustAreaPortalState( reinterpret_cast<sharedEntity_t*>(VMA(1)), args[2] );
-		return 0;
-	case G_AREAS_CONNECTED:
-		return CM_AreasConnected( args[1], args[2] );
+//int SV_GameSystemCalls( int *args ) {
+//	switch( args[0] ) {
+//	case G_PRINT:
+//		Com_Printf( "%s", VMA(1) );
+//		return 0;
+//	case G_ERROR:
+//		Com_Error( ERR_DROP, "%s", VMA(1) );
+//		return 0;
+//	case G_MILLISECONDS:
+//		return Sys_Milliseconds();
+//	case G_CVAR_REGISTER:
+//		Cvar_Register( reinterpret_cast<vmCvar_t*>(VMA(1)), 
+//					   reinterpret_cast<const char*>(VMA(2)), 
+//					   reinterpret_cast<const char*>(VMA(3)), 
+//					   args[4] ); 
+//		return 0;
+//	case G_CVAR_UPDATE:
+//		Cvar_Update( reinterpret_cast<vmCvar_t*>(VMA(1)) );
+//		return 0;
+//	case G_CVAR_SET:
+//		Cvar_Set( (const char *)VMA(1), (const char *)VMA(2) );
+//		return 0;
+//	case G_CVAR_VARIABLE_INTEGER_VALUE:
+//		return Cvar_VariableIntegerValue( (const char *)VMA(1) );
+//	case G_CVAR_VARIABLE_STRING_BUFFER:
+//		Cvar_VariableStringBuffer( reinterpret_cast<const char*>(VMA(1)), 
+//								   reinterpret_cast<char*>(VMA(2)), 
+//								   args[3] );
+//		return 0;
+//	case G_ARGC:
+//		return Cmd_Argc();
+//	case G_ARGV:
+//		Cmd_ArgvBuffer( args[1], reinterpret_cast<char*>(VMA(2)), args[3] );
+//		return 0;
+//	case G_SEND_CONSOLE_COMMAND:
+//		Cbuf_ExecuteText( args[1], reinterpret_cast<const char*>(VMA(2)));
+//		return 0;
+//
+//	case G_FS_FOPEN_FILE:
+//		return FS_FOpenFileByMode( reinterpret_cast<const char*>(VMA(1)), 
+//								   reinterpret_cast<fileHandle_t*>(VMA(2)), 
+//								   static_cast<fsMode_t>(args[3]) );
+//	case G_FS_READ:
+//		FS_Read2( VMA(1), args[2], args[3] );
+//		return 0;
+//	case G_FS_WRITE:
+//		FS_Write( VMA(1), args[2], args[3] );
+//		return 0;
+//	case G_FS_FCLOSE_FILE:
+//		FS_FCloseFile( args[1] );
+//		return 0;
+//	case G_FS_GETFILELIST:
+//		return FS_GetFileList( reinterpret_cast<const char*>(VMA(1)), 
+//							   reinterpret_cast<const char*>(VMA(2)), 
+//							   reinterpret_cast<char*>(VMA(3)), 
+//							   args[4] );
+//	case G_FS_SEEK:
+//		return FS_Seek( args[1], args[2], args[3] );
+//
+//	case G_LOCATE_GAME_DATA:
+//		SV_LocateGameData( reinterpret_cast<sharedEntity_t*>(VMA(1)), 
+//						   args[2], 
+//						   args[3], 
+//						   reinterpret_cast<playerState_t*>(VMA(4)), 
+//						   args[5] );
+//		return 0;
+//	case G_DROP_CLIENT:
+//		SV_GameDropClient( args[1], reinterpret_cast<const char*>(VMA(2)) );
+//		return 0;
+//	case G_SEND_SERVER_COMMAND:
+//		SV_GameSendServerCommand( args[1], reinterpret_cast<const char*>(VMA(2)) );
+//		return 0;
+//	case G_LINKENTITY:
+//		SV_LinkEntity( reinterpret_cast<sharedEntity_t*>(VMA(1)) );
+//		return 0;
+//	case G_UNLINKENTITY:
+//		SV_UnlinkEntity( reinterpret_cast<sharedEntity_t*>(VMA(1)) );
+//		return 0;
+//	case G_ENTITIES_IN_BOX:
+//		return SV_AreaEntities( reinterpret_cast<float*>(VMA(1)), 
+//								reinterpret_cast<float*>(VMA(2)), 
+//								reinterpret_cast<int*>(VMA(3)), 
+//								args[4] );
+//	case G_ENTITY_CONTACT:
+//		return SV_EntityContact( reinterpret_cast<float*>(VMA(1)), 
+//								 reinterpret_cast<float*>(VMA(2)), 
+//								 reinterpret_cast<const sharedEntity_t*>(VMA(3)), 
+//								 /*int capsule*/ false );
+//	case G_ENTITY_CONTACTCAPSULE:
+//		return SV_EntityContact( reinterpret_cast<float*>(VMA(1)), 
+//								 reinterpret_cast<float*>(VMA(2)), 
+//								 reinterpret_cast<const sharedEntity_t*>(VMA(3)), 
+//								 /*int capsule*/ true );
+//	case G_TRACE:
+//		SV_Trace( reinterpret_cast<trace_t*>(VMA(1)), 
+//				  reinterpret_cast<const float*>(VMA(2)), 
+//				  reinterpret_cast<float*>(VMA(3)), 
+//				  reinterpret_cast<float*>(VMA(4)), 
+//				  reinterpret_cast<const float*>(VMA(5)), 
+//				  args[6], 
+//				  args[7], 
+//				  /*int capsule*/ false );
+//		return 0;
+//	case G_TRACECAPSULE:
+//		SV_Trace( reinterpret_cast<trace_t*>(VMA(1)), 
+//				  reinterpret_cast<const float*>(VMA(2)), 
+//				  reinterpret_cast<float*>(VMA(3)), 
+//				  reinterpret_cast<float*>(VMA(4)), 
+//				  reinterpret_cast<const float*>(VMA(5)), 
+//				  args[6], 
+//				  args[7], 
+//				  /*int capsule*/ true );
+//		return 0;
+//	case G_POINT_CONTENTS:
+//		return SV_PointContents( reinterpret_cast<const float*>(VMA(1)), args[2] );
+//	case G_SET_BRUSH_MODEL:
+//		SV_SetBrushModel( reinterpret_cast<sharedEntity_t*>(VMA(1)), 
+//						  reinterpret_cast<const char*>(VMA(2)) );
+//		return 0;
+//	case G_IN_PVS:
+//		return SV_inPVS( reinterpret_cast<const float*>(VMA(1)), 
+//						 reinterpret_cast<const float*>(VMA(2)) );
+//	case G_IN_PVS_IGNORE_PORTALS:
+//		return SV_inPVSIgnorePortals( reinterpret_cast<const float*>(VMA(1)), 
+//									  reinterpret_cast<const float*>(VMA(2)) );
+//
+//	case G_SET_CONFIGSTRING:
+//		SV_SetConfigstring( args[1], reinterpret_cast<const char*>(VMA(2)) );
+//		return 0;
+//	case G_GET_CONFIGSTRING:
+//		SV_GetConfigstring( args[1], reinterpret_cast<char*>(VMA(2)), args[3] );
+//		return 0;
+//	case G_SET_USERINFO:
+//		SV_SetUserinfo( args[1], reinterpret_cast<const char*>(VMA(2)) );
+//		return 0;
+//	case G_GET_USERINFO:
+//		SV_GetUserinfo( args[1], reinterpret_cast<char*>(VMA(2)), args[3] );
+//		return 0;
+//	case G_GET_SERVERINFO:
+//		SV_GetServerinfo( reinterpret_cast<char*>(VMA(1)), args[2] );
+//		return 0;
+//	case G_ADJUST_AREA_PORTAL_STATE:
+//		SV_AdjustAreaPortalState( reinterpret_cast<sharedEntity_t*>(VMA(1)), args[2] );
+//		return 0;
+//	case G_AREAS_CONNECTED:
+//		return CM_AreasConnected( args[1], args[2] );
 
 	//case G_BOT_ALLOCATE_CLIENT:
 	//	return SV_BotAllocateClient();
@@ -467,32 +472,32 @@ int SV_GameSystemCalls( int *args ) {
 	//	SV_BotFreeClient( args[1] );
 	//	return 0;
 
-	case G_GET_USERCMD:
-		SV_GetUsercmd( args[1], reinterpret_cast<usercmd_t*>(VMA(2)) );
-		return 0;
-	case G_GET_ENTITY_TOKEN:
-		{
-			const char	*s;
+	//case G_GET_USERCMD:
+	//	SV_GetUsercmd( args[1], reinterpret_cast<usercmd_t*>(VMA(2)) );
+	//	return 0;
+	//case G_GET_ENTITY_TOKEN:
+	//	{
+	//		const char	*s;
 
-			s = COM_Parse( &sv.entityParsePoint );
-			Q_strncpyz( reinterpret_cast<char*>(VMA(1)), s, args[2] );
-			if ( !sv.entityParsePoint && !s[0] ) {
-				return false;
-			} else {
-				return true;
-			}
-		}
+	//		s = COM_Parse( &sv.entityParsePoint );
+	//		Q_strncpyz( reinterpret_cast<char*>(VMA(1)), s, args[2] );
+	//		if ( !sv.entityParsePoint && !s[0] ) {
+	//			return false;
+	//		} else {
+	//			return true;
+	//		}
+	//	}
 
 	//case G_DEBUG_POLYGON_CREATE:
 	//	return BotImport_DebugPolygonCreate( args[1], args[2], VMA(3) );
 	//case G_DEBUG_POLYGON_DELETE:
 	//	BotImport_DebugPolygonDelete( args[1] );
 	//	return 0;
-	case G_REAL_TIME:
-		return Com_RealTime( reinterpret_cast<qtime_t*>(VMA(1)) );
-	case G_SNAPVECTOR:
-		Sys_SnapVector( reinterpret_cast<float*>(VMA(1)) );
-		return 0;
+	//case G_REAL_TIME:
+	//	return Com_RealTime( reinterpret_cast<qtime_t*>(VMA(1)) );
+	//case G_SNAPVECTOR:
+	//	Sys_SnapVector( reinterpret_cast<float*>(VMA(1)) );
+	//	return 0;
 
 		//====================================
 /*
@@ -905,11 +910,11 @@ int SV_GameSystemCalls( int *args ) {
 		return FloatAsInt( ceil( VMF(1) ) );
 */
 
-	default:
-		Com_Error( ERR_DROP, "Bad game system trap: %i", args[0] );
-	}
-	return -1;
-}
+//	default:
+//		Com_Error( ERR_DROP, "Bad game system trap: %i", args[0] );
+//	}
+//	return -1;
+//}
 
 /*
 ===============
@@ -919,22 +924,25 @@ Called every time a map changes
 ===============
 */
 void SV_ShutdownGameProgs( void ) {
-	if ( !gvm ) {
+	if( !theSG.isInitialized() )
 		return;
-	}
-	VM_Call( gvm, GAME_SHUTDOWN, false );
-	VM_Free( gvm );
-	gvm = NULL;
+	//if ( !gvm ) {
+	//	return;
+	//}
+	//VM_Call( gvm, GAME_SHUTDOWN, false );
+	theSG.shutdown();
+	//VM_Free( gvm );
+	//gvm = NULL;
 }
 
 /*
 ==================
-SV_InitGameVM
+SV_InitGame
 
 Called for both a full init and a restart
 ==================
 */
-static void SV_InitGameVM( bool restart ) {
+static void SV_InitGame() {
 	int		i;
 
 	// start the entity parsing at the beginning
@@ -950,7 +958,8 @@ static void SV_InitGameVM( bool restart ) {
 	
 	// use the current msec count for a random seed
 	// init for this gamestate
-	VM_Call( gvm, GAME_INIT, svs.time, Com_Milliseconds(), restart );
+	//VM_Call( gvm, GAME_INIT, svs.time, Com_Milliseconds(), restart );
+	theSG.init( svs.time, Com_Milliseconds() );
 }
 
 
@@ -963,18 +972,21 @@ Called on a map_restart, but not on a normal map change
 ===================
 */
 void SV_RestartGameProgs( void ) {
-	if ( !gvm ) {
+	if( !theSG.isInitialized() )
 		return;
-	}
-	VM_Call( gvm, GAME_SHUTDOWN, true );
+	//if ( !gvm ) {
+	//	return;
+	//}
+	//VM_Call( gvm, GAME_SHUTDOWN, true );
+	theSG.shutdown();
 
 	// do a restart instead of a free
-	gvm = VM_Restart( gvm );
-	if ( !gvm ) { // bk001212 - as done below
-		Com_Error( ERR_FATAL, "VM_Restart on game failed" );
-	}
+	//gvm = VM_Restart( gvm );
+	//if ( !gvm ) { // bk001212 - as done below
+	//	Com_Error( ERR_FATAL, "VM_Restart on game failed" );
+	//}
 
-	SV_InitGameVM( true );
+	SV_InitGame();
 }
 
 
@@ -999,12 +1011,12 @@ void SV_InitGameProgs( void ) {
 	//}
 
 	// load the dll or bytecode
-	gvm = VM_Create( "qagame", SV_GameSystemCalls, static_cast<vmInterpret_t>(Cvar_VariableIntegerValue( "vm_game" )) );
-	if ( !gvm ) {
-		Com_Error( ERR_FATAL, "VM_Create on game failed" );
-	}
+	//gvm = VM_Create( "qagame", SV_GameSystemCalls, static_cast<vmInterpret_t>(Cvar_VariableIntegerValue( "vm_game" )) );
+	//if ( !gvm ) {
+	//	Com_Error( ERR_FATAL, "VM_Create on game failed" );
+	//}
 
-	SV_InitGameVM( false );
+	SV_InitGame();
 }
 
 
@@ -1015,11 +1027,12 @@ SV_GameCommand
 See if the current console command is claimed by the game
 ====================
 */
-bool SV_GameCommand( void ) {
-	if ( sv.state != SS_GAME ) {
+bool SV_GameCommand() 
+{
+	if ( sv.state != SS_GAME ) 
 		return false;
-	}
 
-	return (VM_Call( gvm, GAME_CONSOLE_COMMAND )!=0);
+	//return (VM_Call( gvm, GAME_CONSOLE_COMMAND )!=0);
+	return theSG.consoleCommand();
 }
 

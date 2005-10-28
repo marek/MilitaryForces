@@ -1,5 +1,5 @@
 /*
- * $Id: cg_consolecmds.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: cg_consolecmds.c,v 1.3 2005-10-28 13:06:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -430,7 +430,7 @@ static void CG_ScoresDown_f( void ) {
 
 	if ( cg.scoresRequestTime + 2000 < cg.time ) {
 		// the scores are more than two seconds out of data,
-		// so request new ones
+		// so request New ones
 		cg.scoresRequestTime = cg.time;
 		trap_SendClientCommand( "score" );
 

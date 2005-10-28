@@ -99,7 +99,7 @@ static unsigned char PADDING[64] = {
 #define HH(a, b, c, d, x, s) {(a) += H ((b), (c), (d)) + (x) + (UINT4)0x6ed9eba1; (a) = ROTATE_LEFT ((a), (s));}
 
 
-/* MD4 initialization. Begins an MD4 operation, writing a new context. */
+/* MD4 initialization. Begins an MD4 operation, writing a New context. */
 void MD4Init (MD4_CTX *context)
 {
 	context->count[0] = context->count[1] = 0;

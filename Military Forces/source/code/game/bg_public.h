@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.14 2005-09-05 11:30:08 thebjoern Exp $
+ * $Id: bg_public.h,v 1.15 2005-10-28 13:06:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -91,7 +91,7 @@ typedef enum { GENDER_MALE, GENDER_FEMALE, GENDER_NEUTER } gender_t;
 
 PMOVE MODULE
 
-The pmove code takes a player_state_t and a usercmd_t and generates a new player_state_t
+The pmove code takes a player_state_t and a usercmd_t and generates a New player_state_t
 and some other output data.  Used for local prediction on the client game and true
 movement on the server game.
 ===================================================================================
