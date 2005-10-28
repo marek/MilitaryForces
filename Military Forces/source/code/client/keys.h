@@ -27,7 +27,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	MAX_KEYS		256
 
 typedef struct {
-	int			down;
+	bool		down;
 	int			repeats;		// if > 1, it is autorepeating
 	char		*binding;
 } qkey_t;

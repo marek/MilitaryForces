@@ -425,16 +425,16 @@ void BotClientCommand( int client, char *command ) {
 }
 
 /*
-==================
-SV_BotFrame
-==================
+//==================
+//SV_BotFrame
+//==================
 */
-void SV_BotFrame( int time ) {
-	if (!bot_enable) return;
-	//NOTE: maybe the game is already shutdown
-	if (!gvm) return;
-	VM_Call( gvm, BOTAI_START_FRAME, time );
-}
+//void SV_BotFrame( int time ) {
+//	if (!bot_enable) return;
+//	//NOTE: maybe the game is already shutdown
+//	if (!gvm) return;
+//	VM_Call( gvm, BOTAI_START_FRAME, time );
+//}
 
 /*
 ===============

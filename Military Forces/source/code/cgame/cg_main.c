@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.9 2005-10-15 14:05:23 minkis Exp $
+ * $Id: cg_main.c,v 1.10 2005-10-28 13:06:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,7 @@
 
 #include "../ui/ui_shared.h"
 
-// display context for new ui stuff
+// display context for New ui stuff
 displayContextDef_t cgDC;
 
 int forceModelModificationCount = -1;
@@ -26,39 +26,39 @@ This is the only way control passes into the module.
 This must be the very first function compiled into the .q3vm file
 ================
 */
-int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11  ) {
-
-	switch ( command ) {
-	case CG_INIT:
-		CG_Init( arg0, arg1, arg2 );
-		return 0;
-	case CG_SHUTDOWN:
-		CG_Shutdown();
-		return 0;
-	case CG_CONSOLE_COMMAND:
-		return CG_ConsoleCommand();
-	case CG_DRAW_ACTIVE_FRAME:
-		CG_DrawActiveFrame( arg0, static_cast<stereoFrame_t>(arg1), arg2 );
-		return 0;
-	case CG_CROSSHAIR_PLAYER:
-		return CG_CrosshairPlayer();
-	case CG_LAST_ATTACKER:
-		return CG_LastAttacker();
-	case CG_KEY_EVENT:
-		CG_KeyEvent(arg0, arg1);
-		return 0;
-	case CG_MOUSE_EVENT:
-		CG_MouseEvent(arg0, arg1);
-		return 0;
-	case CG_EVENT_HANDLING:
-		CG_EventHandling(arg0);
-		return 0;
-	default:
-		CG_Error( "vmMain: unknown command %i", command );
-		break;
-	}
-	return -1;
-}
+//int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11  ) {
+//
+//	switch ( command ) {
+//	case CG_INIT:
+//		CG_Init( arg0, arg1, arg2 );
+//		return 0;
+//	case CG_SHUTDOWN:
+//		CG_Shutdown();
+//		return 0;
+//	case CG_CONSOLE_COMMAND:
+//		return CG_ConsoleCommand();
+//	case CG_DRAW_ACTIVE_FRAME:
+//		CG_DrawActiveFrame( arg0, static_cast<stereoFrame_t>(arg1), arg2 );
+//		return 0;
+//	case CG_CROSSHAIR_PLAYER:
+//		return CG_CrosshairPlayer();
+	//case CG_LAST_ATTACKER:
+	//	return CG_LastAttacker();
+//	case CG_KEY_EVENT:
+//		CG_KeyEvent(arg0, arg1);
+//		return 0;
+//	case CG_MOUSE_EVENT:
+//		CG_MouseEvent(arg0, arg1);
+//		return 0;
+//	case CG_EVENT_HANDLING:
+//		CG_EventHandling(arg0);
+//		return 0;
+//	default:
+//		CG_Error( "vmMain: unknown command %i", command );
+//		break;
+//	}
+//	return -1;
+//}
 
 
 cg_t				cg;
@@ -132,8 +132,8 @@ vmCvar_t	cg_drawFriend;
 vmCvar_t	cg_teamChatsOnly;
 vmCvar_t	cg_hudFiles;
 vmCvar_t 	cg_smoothClients;
-vmCvar_t	pmove_fixed;
-vmCvar_t	pmove_msec;
+//vmCvar_t	pmove_fixed;
+//vmCvar_t	pmove_msec;
 vmCvar_t	cg_pmove_msec;
 vmCvar_t	cg_cameraMode;
 vmCvar_t	cg_timescaleFadeEnd;
@@ -457,32 +457,32 @@ void QDECL CG_Error( const char *msg, ... ) {
 	trap_Error( text );
 }
 
-#ifndef CGAME_HARD_LINKED
-// this is only here so the functions in q_shared.c and bg_*.c can link (FIXME)
-
-void QDECL Com_Error( int level, const char *error, ... ) {
-	va_list		argptr;
-	char		text[1024];
-
-	va_start (argptr, error);
-	vsprintf (text, error, argptr);
-	va_end (argptr);
-
-	CG_Error( "%s", text);
-}
-
-void QDECL Com_Printf( const char *msg, ... ) {
-	va_list		argptr;
-	char		text[1024];
-
-	va_start (argptr, msg);
-	vsprintf (text, msg, argptr);
-	va_end (argptr);
-
-	CG_Printf ("%s", text);
-}
-
-#endif
+//#ifndef CGAME_HARD_LINKED
+//// this is only here so the functions in q_shared.c and bg_*.c can link (FIXME)
+//
+//void QDECL Com_Error( int level, const char *error, ... ) {
+//	va_list		argptr;
+//	char		text[1024];
+//
+//	va_start (argptr, error);
+//	vsprintf (text, error, argptr);
+//	va_end (argptr);
+//
+//	CG_Error( "%s", text);
+//}
+//
+//void QDECL Com_Printf( const char *msg, ... ) {
+//	va_list		argptr;
+//	char		text[1024];
+//
+//	va_start (argptr, msg);
+//	vsprintf (text, msg, argptr);
+//	va_end (argptr);
+//
+//	CG_Printf ("%s", text);
+//}
+//
+//#endif
 
 /*
 ================
@@ -667,7 +667,7 @@ static void CG_RegisterSounds( void ) {
 	cgs.media.nukeShockWave = trap_R_RegisterModel( "models/weaphits/nukeshockwave.md3" );
 	cgs.media.nukeCloudModel = trap_R_RegisterModel( "models/weaphits/nukecloud.md3" );
 
-	// MFQ3: new sounds
+	// MFQ3: New sounds
 	cgs.media.planeDeath[0] = trap_S_RegisterSound( "sound/explosions/explode1.wav", false );	
 	cgs.media.planeDeath[1] = trap_S_RegisterSound( "sound/explosions/explode2.wav", false );	
 	cgs.media.planeDeath[2] = trap_S_RegisterSound( "sound/explosions/explode3.wav", false );	
@@ -1005,7 +1005,7 @@ static void CG_RegisterGraphics( void ) {
 	}
 	// end MFQ3 HUD
 
-	// MFQ3 new HUD
+	// MFQ3 New HUD
 	cgs.media.HUDheading = trap_R_RegisterShaderNoMip( "newhud/heading_tape.tga" );
 	cgs.media.HUDvaluebox = trap_R_RegisterShaderNoMip( "newhud/valuebox.tga" );
 	cgs.media.HUDvaluebox2 = trap_R_RegisterShaderNoMip( "newhud/valuebox2.tga" );
@@ -1043,7 +1043,7 @@ static void CG_RegisterGraphics( void ) {
 	for ( i=0 ; i<HR_MAX ; i++) {
 		cgs.media.HUDreticles[i] = trap_R_RegisterShaderNoMip( mfq3_hudrets[i] );
 	}
-	// end MFQ3 new HUD
+	// end MFQ3 New HUD
 
 	// MFQ3 IGME
 	if( cgs.gametype == GT_MISSION_EDITOR ) {
@@ -1171,7 +1171,7 @@ static void CG_RegisterClients( void ) {
 	CG_BuildSpectatorString();
 }
 
-	// NOTE: functions copied from v1.29h code to enable new scoreboard method
+	// NOTE: functions copied from v1.29h code to enable New scoreboard method
 
 /*
 =================
@@ -1376,7 +1376,7 @@ void CG_ParseMenu(const char *menuFile) {
 		}
 
 		if (Q_stricmp(token.string, "menudef") == 0) {
-			// start a new menu
+			// start a New menu
 			Menu_New(handle);
 		}
 	}
@@ -1818,7 +1818,7 @@ static void CG_FeederSelection(float feederID, int index) {
 	}
 }
 
-// NOTE: functions copied from v1.29h code to enable new scoreboard method
+// NOTE: functions copied from v1.29h code to enable New scoreboard method
 
 //===========================================================================
 
@@ -1854,7 +1854,7 @@ void CG_StartMusic( void ) {
 	trap_S_StartBackgroundTrack( parm1, parm2 );
 }
 
-// NOTE: functions copied from v1.29h code to enable new scoreboard method
+// NOTE: functions copied from v1.29h code to enable New scoreboard method
 
 /*
 =================
@@ -1989,7 +1989,7 @@ void CG_AssetCache()
 	cgDC.Assets.sliderThumb = trap_R_RegisterShaderNoMip( ASSET_SLIDER_THUMB );
 }
 
-// NOTE: functions copied from v1.29h code to enable new scoreboard method
+// NOTE: functions copied from v1.29h code to enable New scoreboard method
 
 /*
 =================
@@ -2096,7 +2096,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 
 	CG_ParseServerinfo();
 
-	// load the new map
+	// load the New map
 	CG_LoadingString( "collision map" );
 
 	trap_CM_LoadMap( cgs.mapname );
@@ -2115,7 +2115,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	CG_RegisterClients();
 
 	CG_AssetCache();       // cache UI gfx
-	CG_LoadHudMenu();      // load new hud stuff
+	CG_LoadHudMenu();      // load New hud stuff
 
 	CG_InitLocalEntities();
 
@@ -2236,7 +2236,7 @@ void CG_EventHandling(int type)
 CG_KeyEvent
 =================
 */
-void CG_KeyEvent(int key, int down)
+void CG_KeyEvent(int key, bool down)
 {
 	if( cgs.gametype == GT_MISSION_EDITOR ) {
 		ME_KeyEvent(key, down);

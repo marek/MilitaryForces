@@ -151,7 +151,7 @@ void R_IssueRenderCommands( bool runPerformanceCounters ) {
 
 	// actually start the commands going
 	if ( !r_skipBackEnd->integer ) {
-		// let it start on the new batch
+		// let it start on the New batch
 		if ( !glConfig.smpActive ) {
 			RB_ExecuteRenderCommands( cmdList->cmds );
 		} else {

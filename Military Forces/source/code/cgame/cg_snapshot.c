@@ -1,5 +1,5 @@
 /*
- * $Id: cg_snapshot.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: cg_snapshot.c,v 1.3 2005-10-28 13:06:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -181,7 +181,7 @@ static void CG_TransitionSnapshot( void ) {
 ===================
 CG_SetNextSnap
 
-A new snapshot has just been read in from the client system.
+A New snapshot has just been read in from the client system.
 ===================
 */
 static void CG_SetNextSnap( snapshot_t *snap ) {
@@ -238,7 +238,7 @@ static void CG_SetNextSnap( snapshot_t *snap ) {
 ========================
 CG_ReadNextSnapshot
 
-This is the only place new snapshots are requested
+This is the only place New snapshots are requested
 This may increment cgs.processedSnapshotNum multiple
 times if the client system fails to return a
 valid snapshot.
@@ -347,7 +347,7 @@ void CG_ProcessSnapshots( void ) {
 	// greater than cg.time to interpolate towards, or we run
 	// out of available snapshots
 	do {
-		// if we don't have a nextframe, try and read a new one in
+		// if we don't have a nextframe, try and read a New one in
 		if ( !cg.nextSnap ) {
 			snap = CG_ReadNextSnapshot();
 

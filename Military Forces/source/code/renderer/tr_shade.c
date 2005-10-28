@@ -95,7 +95,7 @@ static void R_DrawStripElements( int numIndexes, const glIndex_t *indexes, void 
 				even = true;
 			}
 			// otherwise we're done with this strip so finish it and start
-			// a new one
+			// a New one
 			else
 			{
 				qglEnd();
@@ -123,7 +123,7 @@ static void R_DrawStripElements( int numIndexes, const glIndex_t *indexes, void 
 				even = false;
 			}
 			// otherwise we're done with this strip so finish it and start
-			// a new one
+			// a New one
 			else
 			{
 				qglEnd();

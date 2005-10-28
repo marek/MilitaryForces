@@ -747,7 +747,7 @@ void RE_StretchRaw (int x, int y, int w, int h, int cols, int rows, const byte *
 
 	GL_Bind( tr.scratchImage[client] );
 
-	// if the scratchImage isn't in the format we want, specify it as a new texture
+	// if the scratchImage isn't in the format we want, specify it as a New texture
 	if ( cols != tr.scratchImage[client]->width || rows != tr.scratchImage[client]->height ) {
 		tr.scratchImage[client]->width = tr.scratchImage[client]->uploadWidth = cols;
 		tr.scratchImage[client]->height = tr.scratchImage[client]->uploadHeight = rows;
@@ -789,7 +789,7 @@ void RE_UploadCinematic (int w, int h, int cols, int rows, const byte *data, int
 
 	GL_Bind( tr.scratchImage[client] );
 
-	// if the scratchImage isn't in the format we want, specify it as a new texture
+	// if the scratchImage isn't in the format we want, specify it as a New texture
 	if ( cols != tr.scratchImage[client]->width || rows != tr.scratchImage[client]->height ) {
 		tr.scratchImage[client]->width = tr.scratchImage[client]->uploadWidth = cols;
 		tr.scratchImage[client]->height = tr.scratchImage[client]->uploadHeight = rows;

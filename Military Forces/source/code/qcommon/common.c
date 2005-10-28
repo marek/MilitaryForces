@@ -1182,7 +1182,7 @@ Goals:
   If we have any in-use temp memory, additional temp allocations must come from
   that side.
 
-  If not, we can choose to make either side the new temp side and push future
+  If not, we can choose to make either side the New temp side and push future
   permanent allocations to the other side.  Permanent allocations should be
   kept on the side that has the current greatest wasted highwater mark.
 
@@ -1598,7 +1598,7 @@ void SV_ShutdownGameProgs( void );
 =================
 Hunk_Clear
 
-The server calls this before shutting down or loading a new map
+The server calls this before shutting down or loading a New map
 =================
 */
 void Hunk_Clear( void ) {
@@ -1625,7 +1625,7 @@ void Hunk_Clear( void ) {
 	hunk_temp = &hunk_high;
 
 	Com_Printf( "Hunk_Clear: reset the hunk ok\n" );
-	VM_Clear();
+	//VM_Clear();
 #ifdef HUNK_DEBUG
 	hunkblocks = NULL;
 #endif
@@ -2099,13 +2099,13 @@ int Com_EventLoop( void ) {
         case SE_NONE:
             break;
 		case SE_KEY:
-			CL_KeyEvent( ev.evValue, ev.evValue2, ev.evTime );
+			CL_KeyEvent( ev.evValue, (ev.evValue2!=0), ev.evTime );
 			break;
 		case SE_CHAR:
 			CL_CharEvent( ev.evValue );
 			break;
 		case SE_MOUSE:
-			CL_MouseEvent( ev.evValue, ev.evValue2, ev.evTime );
+			CL_MouseEvent( ev.evValue, ev.evValue2 );//, ev.evTime );
 			break;
 		case SE_JOYSTICK_AXIS:
 			CL_JoystickEvent( ev.evValue, ev.evValue2, ev.evTime );
@@ -2463,7 +2463,7 @@ void Com_Init( char *commandLine ) {
 
 	Sys_Init();
 	Netchan_Init( Com_Milliseconds() & 0xffff );	// pick a port value that should be nice and random
-	VM_Init();
+	//VM_Init();
 	SV_Init();
 
 	com_dedicated->modified = false;
@@ -2938,7 +2938,7 @@ loopMisAligned:
 		and		edi,~31
 		add		ebx,edi					// increase src pointer
 		add		edx,edi					// increase dst pointer
-		and		ecx,31					// new count
+		and		ecx,31					// New count
 		jz		outta					// if count = 0, get outta here
 
 padding:
@@ -3143,7 +3143,7 @@ int i;
 i = 1065353246;
 acos(*(float*) &i) == -1.#IND0
 
-	This should go in q_math but it is too late to add new traps
+	This should go in q_math but it is too late to add New traps
 	to game and ui
 =====================
 */

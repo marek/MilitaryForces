@@ -1,5 +1,5 @@
 /*
- * $Id: g_scripts.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: g_scripts.c,v 1.3 2005-10-28 13:06:54 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -186,11 +186,11 @@ int LoadVehicleScripts( gentity_t* ent, char *filename ) {
 
 	len = trap_FS_FOpenFile( filename, &f, FS_READ );
 	if ( !f ) {
-		trap_Printf( va( S_COLOR_RED "file not found: %s\n", filename ) );
+		trap_Print( va( S_COLOR_RED "file not found: %s\n", filename ) );
 		return 0;
 	}
 	if ( len >= MAX_BOTS_TEXT ) {
-		trap_Printf( va( S_COLOR_RED "file too large: %s is %i, max allowed is %i", filename, len, MAX_BOTS_TEXT ) );
+		trap_Print( va( S_COLOR_RED "file too large: %s is %i, max allowed is %i", filename, len, MAX_BOTS_TEXT ) );
 		trap_FS_FCloseFile( f );
 		return 0;
 	}

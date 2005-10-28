@@ -281,7 +281,7 @@ emit_bits (working_state * state, unsigned int code, int size)
 
   put_buffer &= (((INT32) 1)<<size) - 1; /* mask off any extra bits in code */
   
-  put_bits += size;		/* new number of bits in buffer */
+  put_bits += size;		/* New number of bits in buffer */
   
   put_buffer <<= 24 - put_bits; /* align incoming bits */
 
@@ -737,13 +737,13 @@ jpeg_gen_optimal_table (j_compress_ptr cinfo, JHUFF_TBL * htbl, long freq[])
   
   for (i = MAX_CLEN; i > 16; i--) {
     while (bits[i] > 0) {
-      j = i - 2;		/* find length of new prefix to be used */
+      j = i - 2;		/* find length of New prefix to be used */
       while (bits[j] == 0)
 	j--;
       
       bits[i] -= 2;		/* remove two symbols */
       bits[i-1]++;		/* one goes in this length */
-      bits[j+1] += 2;		/* two new symbols in this length */
+      bits[j+1] += 2;		/* two New symbols in this length */
       bits[j]--;		/* symbol of this length is now a prefix */
     }
   }
@@ -776,7 +776,7 @@ jpeg_gen_optimal_table (j_compress_ptr cinfo, JHUFF_TBL * htbl, long freq[])
 
 
 /*
- * Finish up a statistics-gathering pass and create the new Huffman tables.
+ * Finish up a statistics-gathering pass and create the New Huffman tables.
  */
 
 METHODDEF void

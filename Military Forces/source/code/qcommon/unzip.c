@@ -595,7 +595,7 @@ static int deflateParams OF((z_streamp strm,
    used to switch between compression and straight copy of the input data, or
    to switch to a different kind of input data requiring a different
    strategy. If the compression level is changed, the input available so far
-   is compressed with the old level (and may be flushed); the new level will
+   is compressed with the old level (and may be flushed); the New level will
    take effect only at the next call of deflate().
 
      Before the call of deflateParams, the stream state must be set as for
@@ -851,12 +851,12 @@ long gzseek OF((gzFile file,
    the value SEEK_END is not supported.
      If the file is opened for reading, this function is emulated but can be
    extremely slow. If the file is opened for writing, only forward seeks are
-   supported; gzseek then compresses a sequence of zeroes up to the new
+   supported; gzseek then compresses a sequence of zeroes up to the New
    starting position.
 
       gzseek returns the resulting offset location as measured in bytes from
    the beginning of the uncompressed stream, or -1 in case of error, in
-   particular if the file is opened for writing and the new starting position
+   particular if the file is opened for writing and the New starting position
    would be before the current position.
 */
 
@@ -3143,7 +3143,7 @@ static int huft_build(uInt *b, uInt n, uInt s, const uInt *d, const uInt *e, inf
         }
         z = 1 << j;             /* table entries for j-bit table */
 
-        /* allocate new table */
+        /* allocate New table */
         if (*hn + z > MANY)     /* (note: doesn't matter for fixed) */
           return Z_MEM_ERROR;   /* not enough memory */
         u[h] = q = hp + *hn;
@@ -3676,7 +3676,7 @@ inflate_codes_statef *inflate_codes_new(uInt bl, uInt bd, inflate_huft *tl, infl
     c->dbits = (Byte)bd;
     c->ltree = tl;
     c->dtree = td;
-    Tracev(("inflate:       codes new\n"));
+    Tracev(("inflate:       codes New\n"));
   }
   return c;
 }
@@ -4259,7 +4259,7 @@ int inflateSync(z_streamp z)
   z->avail_in = n;
   z->state->sub.marker = m;
 
-  /* return no joy or set up to restart on a new block */
+  /* return no joy or set up to restart on a New block */
   if (m != 4)
     return Z_DATA_ERROR;
   r = z->total_in;  w = z->total_out;

@@ -1,5 +1,5 @@
 /*
- * $Id: g_cmds.c,v 1.3 2005-09-02 08:45:17 thebjoern Exp $
+ * $Id: g_cmds.c,v 1.4 2005-10-28 13:06:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1096,7 +1096,7 @@ void Cmd_CallVote_f( gentity_t *ent ) {
 	// if there is still a vote to be executed
 	if ( level.voteExecuteTime ) {
 		level.voteExecuteTime = 0;
-		trap_SendConsoleCommand( EXEC_APPEND, va("%s\n", level.voteString ) );
+		trap_Cmd_ExecuteText( EXEC_APPEND, va("%s\n", level.voteString ) );
 	}
 
 	// special case for g_gametype, check for bad values

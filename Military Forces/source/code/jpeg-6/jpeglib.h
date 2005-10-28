@@ -286,7 +286,7 @@ struct jpeg_compress_struct {
    * jpeg_start_compress().  We recommend calling jpeg_set_defaults() to
    * initialize everything to reasonable defaults, then changing anything
    * the application specifically wants to change.  That way you won't get
-   * burnt when new parameters are added.  Also note that there are several
+   * burnt when New parameters are added.  Also note that there are several
    * helper routines to simplify changing parameters.
    */
 
@@ -637,7 +637,7 @@ struct jpeg_error_mgr {
   /* Format a message string for the most recent JPEG error or message */
   JMETHOD(void, format_message, (j_common_ptr cinfo, char * buffer));
 #define JMSG_LENGTH_MAX  200	/* recommended size of format_message buffer */
-  /* Reset error state variables at start of a new image */
+  /* Reset error state variables at start of a New image */
   JMETHOD(void, reset_error_mgr, (j_common_ptr cinfo));
   
   /* The message ID code and any parameters are saved here.
@@ -953,7 +953,7 @@ EXTERN void jpeg_new_colormap JPP((j_decompress_ptr cinfo));
 EXTERN int jpeg_consume_input JPP((j_decompress_ptr cinfo));
 /* Return value is one of: */
 /* #define JPEG_SUSPENDED	0    Suspended due to lack of input data */
-#define JPEG_REACHED_SOS	1 /* Reached start of new scan */
+#define JPEG_REACHED_SOS	1 /* Reached start of New scan */
 #define JPEG_REACHED_EOI	2 /* Reached end of image */
 #define JPEG_ROW_COMPLETED	3 /* Completed one iMCU row */
 #define JPEG_SCAN_COMPLETED	4 /* Completed last iMCU row of a scan */

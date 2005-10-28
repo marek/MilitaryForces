@@ -101,7 +101,7 @@ typedef struct {
 } clientSnapshot_t;
 
 typedef enum {
-	CS_FREE,		// can be reused for a new connection
+	CS_FREE,		// can be reused for a New connection
 	CS_ZOMBIE,		// client has been disconnected, but don't reuse
 					// connection for a couple seconds
 	CS_CONNECTED,	// has been assigned to a client_t, but no gamestate yet
@@ -216,7 +216,10 @@ typedef struct {
 
 extern	serverStatic_t	svs;				// persistant server info across maps
 extern	server_t		sv;					// cleared each map
-extern	vm_t			*gvm;				// game virtual machine
+//extern	vm_t			*gvm;				// game virtual machine
+
+struct ServerGame;
+extern ServerGame& theSG;
 
 #define	MAX_MASTER_SERVERS	5
 
@@ -264,6 +267,7 @@ void SV_RemoveOperatorCommands (void);
 void SV_MasterHeartbeat (void);
 void SV_MasterShutdown (void);
 
+bool SV_GetEntityToken( char *buffer, int bufferSize );
 
 
 
@@ -322,12 +326,22 @@ void SV_SendClientSnapshot( client_t *client );
 int	SV_NumForGentity( sharedEntity_t *ent );
 sharedEntity_t *SV_GentityNum( int num );
 playerState_t *SV_GameClientNum( int num );
-svEntity_t	*SV_SvEntityForGentity( sharedEntity_t *gEnt );
+svEntity_t	*SV_SvEntityForGentity( const entityState_t* s, const entityShared_t* r);
 sharedEntity_t *SV_GEntityForSvEntity( svEntity_t *svEnt );
-void		SV_InitGameProgs ( void );
-void		SV_ShutdownGameProgs ( void );
-void		SV_RestartGameProgs( void );
-bool	SV_inPVS (const vec3_t p1, const vec3_t p2);
+void SV_InitGameProgs ( void );
+void SV_ShutdownGameProgs ( void );
+void SV_RestartGameProgs( void );
+bool SV_inPVS (const vec3_t p1, const vec3_t p2);
+void SV_GetUsercmd( int clientNum, usercmd_t *cmd );
+bool SV_EntityContact( const vec3_t mins, const vec3_t maxs, const entityState_t* s, const entityShared_t* r, bool capsule );
+bool SV_inPVSIgnorePortals( const vec3_t p1, const vec3_t p2);
+void SV_GetServerinfo( char *buffer, int bufferSize );
+void SV_GameSendServerCommand( int clientNum, const char *text );
+void SV_GameDropClient( int clientNum, const char *reason );
+void SV_AdjustAreaPortalState( const entityState_t* s, const entityShared_t* r, int open );
+void SV_SetBrushModel( entityState_t* s, entityShared_t* r, const char *name );
+void SV_LocateGameData( void* gEnts, int numGEntities, int sizeofGEntity_t,
+					   playerState_t *clients, int sizeofGameClient );
 
 //
 // sv_bot.c
@@ -353,11 +367,11 @@ bool	SV_inPVS (const vec3_t p1, const vec3_t p2);
 void SV_ClearWorld (void);
 // called after the world model has been loaded, before linking any entities
 
-void SV_UnlinkEntity( sharedEntity_t *ent );
+void SV_UnlinkEntity( entityState_t* s, entityShared_t* r );
 // call before removing an entity, and before trying to move one,
 // so it doesn't clip against itself
 
-void SV_LinkEntity( sharedEntity_t *ent );
+void SV_LinkEntity( entityState_t* s, entityShared_t* r );
 // Needs to be called any time an entity changes origin, mins, maxs,
 // or solid.  Automatically unlinks if needed.
 // sets ent->v.absmin and ent->v.absmax
@@ -365,7 +379,7 @@ void SV_LinkEntity( sharedEntity_t *ent );
 // is not solid
 
 
-clipHandle_t SV_ClipHandleForEntity( const sharedEntity_t *ent );
+clipHandle_t SV_ClipHandleForEntity( const entityState_t* s, const entityShared_t* r );
 
 
 void SV_SectorList_f( void );
@@ -384,7 +398,7 @@ int SV_PointContents( const vec3_t p, int passEntityNum );
 // returns the CONTENTS_* value from the world and all entities at the given point.
 
 
-void SV_Trace( trace_t *results, const vec3_t start, vec3_t mins, vec3_t maxs, const vec3_t end, int passEntityNum, int contentmask, int capsule );
+void SV_Trace( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentmask, bool capsule );
 // mins and maxs are relative
 
 // if the entire move stays in a solid volume, trace.allsolid will be set,
@@ -396,7 +410,8 @@ void SV_Trace( trace_t *results, const vec3_t start, vec3_t mins, vec3_t maxs, c
 // passEntityNum is explicitly excluded from clipping checks (normally ENTITYNUM_NONE)
 
 
-void SV_ClipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int entityNum, int contentmask, int capsule );
+void SV_ClipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, const vec3_t maxs, 
+					  const vec3_t end, int entityNum, int contentmask, bool capsule );
 // clip to a specific entity
 
 //
@@ -405,5 +420,6 @@ void SV_ClipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, con
 void SV_Netchan_Transmit( client_t *client, msg_t *msg);
 void SV_Netchan_TransmitNextFragment( client_t *client );
 bool SV_Netchan_Process( client_t *client, msg_t *msg );
+
 
 #endif // __SERVER_H__

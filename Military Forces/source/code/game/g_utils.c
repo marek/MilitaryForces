@@ -1,5 +1,5 @@
 /*
- * $Id: g_utils.c,v 1.3 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: g_utils.c,v 1.4 2005-10-28 13:06:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -359,7 +359,7 @@ void G_InitGentity( gentity_t *e ) {
 =================
 G_Spawn
 
-Either finds a free entity, or allocates a new one.
+Either finds a free entity, or allocates a New one.
 
   The slots from 0 to MAX_CLIENTS-1 are always reserved for clients, and will
 never be used by anything else.
@@ -406,11 +406,11 @@ gentity_t *G_Spawn( void ) {
 		G_Error( "G_Spawn: no free entities" );
 	}
 	
-	// open up a new slot
+	// open up a New slot
 	level.num_entities++;
 
 	// let the server system know that there are more entities
-	trap_LocateGameData( level.gentities, level.num_entities, sizeof( gentity_t ), 
+	trap_LocateGameData( (void*)level.gentities, level.num_entities, sizeof( gentity_t ), 
 		&level.clients[0].ps, sizeof( level.clients[0] ) );
 
 	G_InitGentity( e );
@@ -446,7 +446,7 @@ Marks the entity as free
 =================
 */
 void G_FreeEntity( gentity_t *ed ) {
-	trap_UnlinkEntity (ed);		// unlink from world
+	trap_UnlinkEntity (&ed->s, &ed->r);		// unlink from world
 
 	if ( ed->neverFree ) {
 		return;
@@ -483,7 +483,7 @@ gentity_t *G_TempEntity( vec3_t origin, int event ) {
 	G_SetOrigin( e, snapped );
 
 	// find cluster for PVS
-	trap_LinkEntity( e );
+	trap_LinkEntity( &e->s, &e->r );
 
 	return e;
 }
@@ -502,7 +502,7 @@ Kill box
 =================
 G_KillBox
 
-Kills all entities that would touch the proposed new positioning
+Kills all entities that would touch the proposed New positioning
 of ent.  Ent should be unlinked before calling this!
 =================
 */
@@ -662,41 +662,41 @@ void G_SetOrigin( gentity_t *ent, vec3_t origin ) {
 	VectorCopy( origin, ent->r.currentOrigin );
 }
 
-/*
-================
-DebugLine
-
-  debug polygons only work when running a local game
-  with r_debugSurface set to 2
-================
-*/
-int DebugLine(vec3_t start, vec3_t end, int color) {
-	vec3_t points[4], dir, cross, up = {0, 0, 1};
-	float dot;
-
-	VectorCopy(start, points[0]);
-	VectorCopy(start, points[1]);
-	//points[1][2] -= 2;
-	VectorCopy(end, points[2]);
-	//points[2][2] -= 2;
-	VectorCopy(end, points[3]);
-
-
-	VectorSubtract(end, start, dir);
-	VectorNormalize(dir);
-	dot = DotProduct(dir, up);
-	if (dot > 0.99 || dot < -0.99) VectorSet(cross, 1, 0, 0);
-	else CrossProduct(dir, up, cross);
-
-	VectorNormalize(cross);
-
-	VectorMA(points[0], 2, cross, points[0]);
-	VectorMA(points[1], -2, cross, points[1]);
-	VectorMA(points[2], -2, cross, points[2]);
-	VectorMA(points[3], 2, cross, points[3]);
-
-	return trap_DebugPolygonCreate(color, 4, points);
-}
+///*
+//================
+//DebugLine
+//
+//  debug polygons only work when running a local game
+//  with r_debugSurface set to 2
+//================
+//*/
+//int DebugLine(vec3_t start, vec3_t end, int color) {
+//	vec3_t points[4], dir, cross, up = {0, 0, 1};
+//	float dot;
+//
+//	VectorCopy(start, points[0]);
+//	VectorCopy(start, points[1]);
+//	//points[1][2] -= 2;
+//	VectorCopy(end, points[2]);
+//	//points[2][2] -= 2;
+//	VectorCopy(end, points[3]);
+//
+//
+//	VectorSubtract(end, start, dir);
+//	VectorNormalize(dir);
+//	dot = DotProduct(dir, up);
+//	if (dot > 0.99 || dot < -0.99) VectorSet(cross, 1, 0, 0);
+//	else CrossProduct(dir, up, cross);
+//
+//	VectorNormalize(cross);
+//
+//	VectorMA(points[0], 2, cross, points[0]);
+//	VectorMA(points[1], -2, cross, points[1]);
+//	VectorMA(points[2], -2, cross, points[2]);
+//	VectorMA(points[3], 2, cross, points[3]);
+//
+//	return trap_DebugPolygonCreate(color, 4, points);
+//}
 
 
 // --------------------

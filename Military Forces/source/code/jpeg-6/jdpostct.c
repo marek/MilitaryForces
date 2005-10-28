@@ -177,7 +177,7 @@ post_process_prepass (j_decompress_ptr cinfo,
 		input_buf, in_row_group_ctr, in_row_groups_avail,
 		post->buffer, &post->next_row, post->strip_height);
 
-  /* Allow quantizer to scan new data.  No data is emitted, */
+  /* Allow quantizer to scan New data.  No data is emitted, */
   /* but we advance out_row_ctr so outer loop can tell when we're done. */
   if (post->next_row > old_next_row) {
     num_rows = post->next_row - old_next_row;

@@ -14,7 +14,7 @@
 #define IDI_ICON2                       132
 #define IDI_ICON1                       132
 
-// Next default values for new objects
+// Next default values for New objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS

@@ -1,5 +1,5 @@
 /*
- * $Id: ui_shared.c,v 1.5 2005-09-22 23:31:17 minkis Exp $
+ * $Id: ui_shared.c,v 1.6 2005-10-28 13:07:04 thebjoern Exp $
 */
 // 
 // string allocation/managment
@@ -142,39 +142,41 @@ static int strHandleCount = 0;
 static stringDef_t *strHandle[HASH_TABLE_SIZE];
 
 
-const char *String_Alloc(const char *p) {
+const char *String_Alloc(const char *p) 
+{
 	int len;
 	long hash;
 	stringDef_t *str, *last;
 	static const char *staticNULL = "";
 
-	if (p == NULL) {
+	if (p == NULL) 
 		return NULL;
-	}
 
-	if (*p == 0) {
+	if (*p == 0) 
 		return staticNULL;
-	}
 
 	hash = hashForString(p);
 
 	str = strHandle[hash];
-	while (str) {
-		if (strcmp(p, str->str) == 0) {
+	while (str) 
+	{
+		if (strcmp(p, str->str) == 0) 
 			return str->str;
-		}
+
 		str = str->next;
 	}
 
 	len = strlen(p);
-	if (len + strPoolIndex + 1 < STRING_POOL_SIZE) {
+	if (len + strPoolIndex + 1 < STRING_POOL_SIZE) 
+	{
 		int ph = strPoolIndex;
 		strcpy(&strPool[strPoolIndex], p);
 		strPoolIndex += len + 1;
 
 		str = strHandle[hash];
 		last = str;
-		while (str && str->next) {
+		while (str && str->next) 
+		{
 			last = str;
 			str = str->next;
 		}
@@ -182,11 +184,11 @@ const char *String_Alloc(const char *p) {
 		str  = reinterpret_cast<stringDef_t*>(UI_Alloc(sizeof(stringDef_t)));
 		str->next = NULL;
 		str->str = &strPool[ph];
-		if (last) {
+		if (last) 
 			last->next = str;
-		} else {
+		else 
 			strHandle[hash] = str;
-		}
+		
 		return &strPool[ph];
 	}
 	return NULL;
@@ -3173,7 +3175,7 @@ void Item_Multi_Paint(itemDef_t *item) {
 
 typedef struct {
 	char	*command;
-	char	*label;		// MFQ3: new
+	char	*label;		// MFQ3: New
 	int		id;
 	int		defaultbind1;
 	int		defaultbind2;

@@ -6,7 +6,7 @@
  * For conditions of distribution and use, see the accompanying README file.
  *
  * This file defines the error and message codes for the JPEG library.
- * Edit this file to add new codes, or to translate the message strings to
+ * Edit this file to add New codes, or to translate the message strings to
  * some other language.
  * A set of error-reporting macros are defined too.  Some applications using
  * the JPEG library may wish to include this file to get the error codes

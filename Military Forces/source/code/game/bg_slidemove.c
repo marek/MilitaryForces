@@ -1,5 +1,5 @@
 /*
- * $Id: bg_slidemove.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: bg_slidemove.c,v 1.3 2005-10-28 13:06:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -163,7 +163,7 @@ bool	PM_SlideMove( bool gravity ) {
 			// slide along the plane
 			PM_ClipVelocity (endVelocity, planes[i], endClipVelocity, OVERCLIP );
 
-			// see if there is a second plane that the new move enters
+			// see if there is a second plane that the New move enters
 			for ( j = 0 ; j < numplanes ; j++ ) {
 				if ( j == i ) {
 					continue;
@@ -192,7 +192,7 @@ bool	PM_SlideMove( bool gravity ) {
 				d = DotProduct( dir, endVelocity );
 				VectorScale( dir, d, endClipVelocity );
 
-				// see if there is a third plane the the new move enters
+				// see if there is a third plane the the New move enters
 				for ( k = 0 ; k < numplanes ; k++ ) {
 					if ( k == i || k == j ) {
 						continue;

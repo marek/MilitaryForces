@@ -22,6 +22,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // sv_client.c -- server code for dealing with clients
 
 #include "server.h"
+#include "../game/game.h"
+
 
 static void SV_CloseDownload( client_t *cl );
 
@@ -400,8 +402,8 @@ void SV_DirectConnect( netadr_t from ) {
 	cl->reliableSequence = 0;
 
 gotnewcl:	
-	// build a new connection
-	// accept the new client
+	// build a New connection
+	// accept the New client
 	// this is the only place a client_t is ever initialized
 	*newcl = temp;
 	clientNum = newcl - svs.clients;
@@ -420,10 +422,12 @@ gotnewcl:
 	Q_strncpyz( newcl->userinfo, userinfo, sizeof(newcl->userinfo) );
 
 	// get the game a chance to reject this connection or modify the userinfo
-	denied = (char *)VM_Call( gvm, GAME_CLIENT_CONNECT, clientNum, true, false ); // firstTime = true
-	if ( denied ) {
+	//denied = (char *)VM_Call( gvm, GAME_CLIENT_CONNECT, clientNum, true, false ); // firstTime = true
+	denied = theSG.clientConnect( clientNum, true, false );
+	if ( denied ) 
+	{
 		// we can't just use VM_ArgPtr, because that is only valid inside a VM_Call
-		denied = reinterpret_cast<char*>(VM_ExplicitArgPtr( gvm, (int)denied ));
+		//denied = reinterpret_cast<char*>(VM_ExplicitArgPtr( gvm, (int)denied ));
 
 		NET_OutOfBandPrint( NS_SERVER, from, "print\n%s\n", denied );
 		Com_DPrintf ("Game rejected a connection: %s.\n", denied);
@@ -506,7 +510,8 @@ void SV_DropClient( client_t *drop, const char *reason ) {
 
 	// call the prog function for removing a client
 	// this will remove the body, among other things
-	VM_Call( gvm, GAME_CLIENT_DISCONNECT, drop - svs.clients );
+	//VM_Call( gvm, GAME_CLIENT_DISCONNECT, drop - svs.clients );
+	theSG.clientDisconnect( drop - svs.clients );
 
 	// add the disconnect command
 	SV_SendServerCommand( drop, "disconnect \"%s\"", reason);
@@ -537,7 +542,7 @@ void SV_DropClient( client_t *drop, const char *reason ) {
 SV_SendClientGameState
 
 Sends the first message from the server to a connected client.
-This will be sent on the initial connection and upon each new map load.
+This will be sent on the initial connection and upon each New map load.
 
 It will be resent if the client acknowledges a later message but has
 the wrong gamestate.
@@ -631,7 +636,8 @@ void SV_ClientEnterWorld( client_t *client, usercmd_t *cmd ) {
 	client->lastUsercmd = *cmd;
 
 	// call the game begin function
-	VM_Call( gvm, GAME_CLIENT_BEGIN, client - svs.clients );
+	//VM_Call( gvm, GAME_CLIENT_BEGIN, client - svs.clients );
+	theSG.clientBegin( client - svs.clients );
 }
 
 /*
@@ -1188,7 +1194,8 @@ static void SV_UpdateUserinfo_f( client_t *cl ) {
 
 	SV_UserinfoChanged( cl );
 	// call prog code to allow overrides
-	VM_Call( gvm, GAME_CLIENT_USERINFO_CHANGED, cl - svs.clients );
+	//VM_Call( gvm, GAME_CLIENT_USERINFO_CHANGED, cl - svs.clients );
+	theSG.clientUserInfoChanged( cl - svs.clients );
 }
 
 typedef struct {
@@ -1216,25 +1223,31 @@ SV_ExecuteClientCommand
 Also called by bot code
 ==================
 */
-void SV_ExecuteClientCommand( client_t *cl, const char *s, bool clientOK ) {
+void SV_ExecuteClientCommand( client_t *cl, const char *s, bool clientOK ) 
+{
 	ucmd_t	*u;
 	bool bProcessed = false;
 	
 	Cmd_TokenizeString( s );
 
 	// see if it is a server level command
-	for (u=ucmds ; u->name ; u++) {
-		if (!strcmp (Cmd_Argv(0), u->name) ) {
+	for (u=ucmds ; u->name ; u++) 
+	{
+		if (!strcmp (Cmd_Argv(0), u->name) ) 
+		{
 			u->func( cl );
 			bProcessed = true;
 			break;
 		}
 	}
 
-	if (clientOK) {
+	if (clientOK) 
+	{
 		// pass unknown strings to the game
-		if (!u->name && sv.state == SS_GAME) {
-			VM_Call( gvm, GAME_CLIENT_COMMAND, cl - svs.clients );
+		if (!u->name && sv.state == SS_GAME) 
+		{
+			//VM_Call( gvm, GAME_CLIENT_COMMAND, cl - svs.clients );
+			theSG.clientCommand( cl - svs.clients );
 		}
 	}
 	else if (!bProcessed)
@@ -1314,7 +1327,8 @@ void SV_ClientThink (client_t *cl, usercmd_t *cmd) {
 		return;		// may have been kicked during the last usercmd
 	}
 
-	VM_Call( gvm, GAME_CLIENT_THINK, cl - svs.clients );
+	//VM_Call( gvm, GAME_CLIENT_THINK, cl - svs.clients );
+	theSG.clientThink( cl - svs.clients );
 }
 
 /*
@@ -1374,7 +1388,7 @@ static void SV_UserMove( client_t *cl, msg_t *msg, bool delta ) {
 
 	// TTimo
 	// catch the no-cp-yet situation before SV_ClientEnterWorld
-	// if CS_ACTIVE, then it's time to trigger a new gamestate emission
+	// if CS_ACTIVE, then it's time to trigger a New gamestate emission
 	// if not, then we are getting remaining parasite usermove commands, which we should ignore
 	if (sv_pure->integer != 0 && cl->pureAuthentic == 0 && !cl->gotCP) {
 		if (cl->state == CS_ACTIVE)
@@ -1479,7 +1493,7 @@ void SV_ExecuteClientMessage( client_t *cl, msg_t *msg ) {
 	// if the client was downloading, let it stay at whatever serverId and
 	// gamestate it was at.  This allows it to keep downloading even when
 	// the gamestate changes.  After the download is finished, we'll
-	// notice and send it a new game state
+	// notice and send it a New game state
 	//
 	// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=536
 	// don't drop as long as previous command was a nextdl, after a dl is done, downloadName is set back to ""

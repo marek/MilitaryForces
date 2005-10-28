@@ -623,7 +623,7 @@ void idCameraDef::buildCamera() {
 		totalTime += waits[i];
 	}
 
-	// on a new target switch, we need to take time to this point ( since last target switch ) 
+	// on a New target switch, we need to take time to this point ( since last target switch ) 
 	// and allocate it across the active target, then reset time to this point
 	long timeSoFar = 0;
 	long total = (int)(totalTime * 1000);

@@ -1,5 +1,5 @@
 /*
- * $Id: g_public.h,v 1.3 2005-09-02 08:00:21 thebjoern Exp $
+ * $Id: g_public.h,v 1.4 2005-10-28 13:06:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -376,37 +376,37 @@ typedef enum {
 //
 // functions exported by the game subsystem
 //
-typedef enum {
-	GAME_INIT,	// ( int levelTime, int randomSeed, int restart );
+//typedef enum {
+//	GAME_INIT,	// ( int levelTime, int randomSeed, int restart );
 	// init and shutdown will be called every single level
 	// The game should call G_GET_ENTITY_TOKEN to parse through all the
 	// entity configuration text and spawn gentities.
 
-	GAME_SHUTDOWN,	// (void);
+//	GAME_SHUTDOWN,	// (void);
 
-	GAME_CLIENT_CONNECT,	// ( int clientNum, bool firstTime, bool isBot );
+//	GAME_CLIENT_CONNECT,	// ( int clientNum, bool firstTime, bool isBot );
 	// return NULL if the client is allowed to connect, otherwise return
 	// a text string with the reason for denial
 
-	GAME_CLIENT_BEGIN,				// ( int clientNum );
+	//GAME_CLIENT_BEGIN,				// ( int clientNum );
 
-	GAME_CLIENT_USERINFO_CHANGED,	// ( int clientNum );
+	//GAME_CLIENT_USERINFO_CHANGED,	// ( int clientNum );
 
-	GAME_CLIENT_DISCONNECT,			// ( int clientNum );
+	//GAME_CLIENT_DISCONNECT,			// ( int clientNum );
 
-	GAME_CLIENT_COMMAND,			// ( int clientNum );
+	//GAME_CLIENT_COMMAND,			// ( int clientNum );
 
-	GAME_CLIENT_THINK,				// ( int clientNum );
+	//GAME_CLIENT_THINK,				// ( int clientNum );
 
-	GAME_RUN_FRAME,					// ( int levelTime );
+	//GAME_RUN_FRAME,					// ( int levelTime );
 
-	GAME_CONSOLE_COMMAND,			// ( void );
+	//GAME_CONSOLE_COMMAND,			// ( void );
 	// ConsoleCommand will be called when a command has been issued
 	// that is not recognized as a builtin function.
 	// The game can issue trap_argc() / trap_argv() commands to get the command
 	// and parameters.  Return false if the game doesn't recognize it as a command.
 
-	BOTAI_START_FRAME				// ( int time );
-} gameExport_t;
+	//BOTAI_START_FRAME				// ( int time );
+//} gameExport_t;
 
 #endif // __G_PUBLIC_H__

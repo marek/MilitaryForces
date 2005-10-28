@@ -29,7 +29,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 // these are the functions exported by the refresh module
 //
-typedef struct {
+struct refexport_t 
+{
 	// called before the library is unloaded
 	// if the system is just reconfiguring, pass destroyWindow = false,
 	// which will keep the screen from flashing to the desktop.
@@ -97,7 +98,7 @@ typedef struct {
 	void	(*RemapShader)(const char *oldShader, const char *newShader, const char *offsetTime);
 	bool (*GetEntityToken)( char *buffer, int size );
 	bool (*inPVS)( const vec3_t p1, const vec3_t p2 );
-} refexport_t;
+};
 
 //
 // these are the functions imported by the refresh module

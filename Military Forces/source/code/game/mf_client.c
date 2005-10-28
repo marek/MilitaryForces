@@ -1,5 +1,5 @@
 /*
- * $Id: mf_client.c,v 1.7 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: mf_client.c,v 1.8 2005-10-28 13:06:54 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -25,7 +25,7 @@ to the server machine, but false on map changes and tournement
 restarts.
 ============
 */
-char *MF_ClientConnect( int clientNum, int firstTime, int isBot ) {
+char *MF_ClientConnect( int clientNum, bool firstTime, bool isBot ) {
 	char		*value;
 	gclient_t	*client;
 	char		userinfo[MAX_INFO_STRING];
@@ -126,7 +126,7 @@ void MF_ClientBegin( int clientNum ) {
 	client = level.clients + clientNum;
 
 	if ( ent->r.linked ) {
-		trap_UnlinkEntity( ent );
+		trap_UnlinkEntity( &ent->s, &ent->r );
 	}
 	G_InitGentity( ent );
 	ent->client = client;
@@ -139,7 +139,7 @@ void MF_ClientBegin( int clientNum ) {
 	// cause this to happen with a valid entity, and we
 	// want to make sure the teleport bit is set right
 	// so the viewpoint doesn't interpolate through the
-	// world to the new position
+	// world to the New position
 	flags = client->ps.eFlags;
 	memset( &client->ps, 0, sizeof( client->ps ) );
 	client->ps.eFlags = flags;
@@ -486,7 +486,7 @@ void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 	// the respawned flag will be cleared after the attack and jump keys come up
 	client->ps.pm_flags |= PMF_RESPAWNED;
 
-	trap_GetUsercmd( client - level.clients, &ent->client->pers.cmd );
+	trap_GetClientUsercmd( client - level.clients, &ent->client->pers.cmd );
 	SetClientViewAngle( ent, spawn_angles );
 
 	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
@@ -494,7 +494,7 @@ void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 	} else {
 		if(!(cs_flags & CS_NOKILL))
 			G_KillBox( ent );
-		trap_LinkEntity (ent);
+		trap_LinkEntity (&ent->s, &ent->r);
 	}
 
 	// reset radar
@@ -533,7 +533,7 @@ void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 	if( ent->client->sess.sessionTeam != TEAM_SPECTATOR ) {
 		BG_PlayerStateToEntityState( &client->ps, &ent->s, true );
 		VectorCopy( ent->client->ps.origin, ent->r.currentOrigin );
-		trap_LinkEntity( ent );
+		trap_LinkEntity( &ent->s, &ent->r );
 	}
 
 	// run the presend to set anything else

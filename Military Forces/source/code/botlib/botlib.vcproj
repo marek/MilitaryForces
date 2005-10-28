@@ -383,9 +383,6 @@
 				RelativePath="..\qcommon\qfiles.h">
 			</File>
 			<File
-				RelativePath="..\server\server.h">
-			</File>
-			<File
 				RelativePath="..\game\surfaceflags.h">
 			</File>
 		</Filter>

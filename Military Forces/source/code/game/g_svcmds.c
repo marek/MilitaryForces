@@ -1,5 +1,5 @@
 /*
- * $Id: g_svcmds.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: g_svcmds.c,v 1.3 2005-10-28 13:06:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -408,7 +408,7 @@ ConsoleCommand
 
 =================
 */
-bool	ConsoleCommand( void ) {
+bool	ConsoleCommand() {
 	char	cmd[MAX_TOKEN_CHARS];
 
 	trap_Argv( 0, cmd, sizeof( cmd ) );
@@ -449,7 +449,7 @@ bool	ConsoleCommand( void ) {
 	}
 
 	if (Q_stricmp (cmd, "listip") == 0) {
-		trap_SendConsoleCommand( EXEC_INSERT, "g_banIPs\n" );
+		trap_Cmd_ExecuteText( EXEC_INSERT, "g_banIPs\n" );
 		return true;
 	}
 

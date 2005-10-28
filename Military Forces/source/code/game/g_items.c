@@ -1,5 +1,5 @@
 /*
- * $Id: g_items.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: g_items.c,v 1.3 2005-10-28 13:06:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -136,7 +136,7 @@ void RespawnItem( gentity_t *ent ) {
 	ent->r.contents = CONTENTS_TRIGGER;
 	ent->s.eFlags &= ~EF_NODRAW;
 	ent->r.svFlags &= ~SVF_NOCLIENT;
-	trap_LinkEntity (ent);
+	trap_LinkEntity (&ent->s, &ent->r);
 
 	// play the normal respawn sound only to nearby clients
 	G_AddEvent( ent, EV_ITEM_RESPAWN, 0, true );
@@ -267,7 +267,7 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 		ent->nextthink = level.time + respawn * 1000;
 		ent->think = RespawnItem;
 	}
-	trap_LinkEntity( ent );
+	trap_LinkEntity( &ent->s, &ent->r );
 }
 
 
@@ -315,7 +315,7 @@ gentity_t *LaunchItem( gitem_t *item, vec3_t origin, vec3_t velocity ) {
 
 	dropped->flags = FL_DROPPED_ITEM;
 
-	trap_LinkEntity (dropped);
+	trap_LinkEntity (&dropped->s, &dropped->r);
 
 	return dropped;
 }
@@ -407,7 +407,7 @@ void FinishSpawningItem( gentity_t *ent ) {
 		return;
 	}
 
-	trap_LinkEntity (ent);
+	trap_LinkEntity (&ent->s, &ent->r);
 }
 
 
@@ -444,6 +444,7 @@ ClearRegisteredItems
 ==============
 */
 void ClearRegisteredItems( void ) {
+#pragma message("this should probably be removed!")
 	memset( itemRegistered, 0, sizeof( itemRegistered ) );
 	// Always load health/ammo/fuel pickups
 	RegisterItem( BG_FindItem( "5 Health" ) );
@@ -607,7 +608,7 @@ void G_RunItem( gentity_t *ent ) {
 		tr.fraction = 0;
 	}
 
-	trap_LinkEntity( ent );	// FIXME: avoid this for stationary?
+	trap_LinkEntity( &ent->s, &ent->r );	// FIXME: avoid this for stationary?
 
 	// check think function
 	G_RunThink( ent );

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_loadouts.c,v 1.5 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: bg_loadouts.c,v 1.6 2005-10-28 13:06:54 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -129,11 +129,7 @@ void MF_getDefaultLoadoutForVehicle( int idx, completeLoadout_t* loadout, player
 
 	if( idx < 0 ) 
 		return;
-//#ifdef QAGAME
-//	strcpy( where, "server" );
-//#else
-//	strcpy( where, "client" );
-//#endif
+
 //	Com_Printf("Getting default loadout for %s (%s)\n", availableVehicles[idx].descriptiveName, where );
 	memcpy( loadout, &availableLoadouts[idx], sizeof(completeLoadout_t) );
 	for( i = 0; i < 32; ++i )

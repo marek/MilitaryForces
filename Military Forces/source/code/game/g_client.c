@@ -1,5 +1,5 @@
 /*
- * $Id: g_client.c,v 1.3 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: g_client.c,v 1.4 2005-10-28 13:06:54 thebjoern Exp $
 */
 
 //null cvs upload test, comment placed for a difference.
@@ -766,7 +766,7 @@ void ClientDisconnect( int clientNum ) {
 		ClientUserinfoChanged( level.sortedClients[0] );
 	}
 
-	trap_UnlinkEntity (ent);
+	trap_UnlinkEntity (&ent->s, &ent->r);
 	ent->s.modelindex = 0;
 	ent->inuse = false;
 	ent->classname = "disconnected";

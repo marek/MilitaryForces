@@ -1,5 +1,5 @@
 /*
- * $Id: cg_localents.c,v 1.3 2005-09-22 23:31:17 minkis Exp $
+ * $Id: cg_localents.c,v 1.4 2005-10-28 13:06:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -182,10 +182,10 @@ void CG_AddFragment( localEntity_t *le ) {
 		return;
 	}
 
-	// calculate new position
+	// calculate New position
 	BG_EvaluateTrajectory( &le->pos, cg.time, newOrigin );
 
-	// trace a line from previous position to new position
+	// trace a line from previous position to New position
 	CG_Trace( &trace, le->refEntity.origin, NULL, NULL, newOrigin, -1, CONTENTS_SOLID );
 	if ( trace.fraction == 1.0 ) {
 		// still in free fall
@@ -594,7 +594,7 @@ CG_AddLocalEntities
 void CG_AddLocalEntities( void ) {
 	localEntity_t	*le, *next;
 
-	// walk the list backwards, so any new local entities generated
+	// walk the list backwards, so any New local entities generated
 	// (trails, marks, etc) will be present this frame
 	le = cg_activeLocalEntities.prev;
 	for ( ; le != &cg_activeLocalEntities ; le = next ) {

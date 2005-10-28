@@ -343,7 +343,7 @@ static void CM_SubdivideGridColumns( cGrid_t *grid ) {
 
 		grid->width += 2;
 
-		// the new aproximating point at i+1 may need to be removed
+		// the New aproximating point at i+1 may need to be removed
 		// or subdivided farther, so don't advance i
 	}
 }
@@ -495,7 +495,7 @@ int CM_FindPlane2(float plane[4], int *flipped) {
 		if (CM_PlaneEqual(&planes[i], plane, flipped)) return i;
 	}
 
-	// add a new plane
+	// add a New plane
 	if ( numPlanes == MAX_PATCH_PLANES ) {
 		Com_Error( ERR_DROP, "MAX_PATCH_PLANES" );
 	}
@@ -549,7 +549,7 @@ static int CM_FindPlane( float *p1, float *p2, float *p3 ) {
 		return i;
 	}
 
-	// add a new plane
+	// add a New plane
 	if ( numPlanes == MAX_PATCH_PLANES ) {
 		Com_Error( ERR_DROP, "MAX_PATCH_PLANES" );
 	}

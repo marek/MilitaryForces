@@ -21,10 +21,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #include "server.h"
+#include "../game/game.h"
+
 
 serverStatic_t	svs;				// persistant server info
 server_t		sv;					// local server
-vm_t			*gvm = NULL;				// game virtual machine // bk001212 init
+//vm_t			*gvm = NULL;				// game virtual machine // bk001212 init
+ServerGame& theSG = ServerGame::getInstance();
 
 cvar_t	*sv_fps;				// time rate for running non-clients
 cvar_t	*sv_timeout;			// seconds without any message
@@ -531,7 +534,7 @@ void SV_ConnectionlessPacket( netadr_t from, msg_t *msg ) {
 		SVC_RemoteCommand( from, msg );
 	} else if (!Q_stricmp(c, "disconnect")) {
 		// if a client starts up a local server, we may see some spurious
-		// server disconnect messages when their new server sees our final
+		// server disconnect messages when their New server sees our final
 		// sequenced messages to the old client
 	} else {
 		Com_DPrintf ("bad connectionless packet from %s:\n%s\n"
@@ -835,7 +838,8 @@ void SV_Frame( int msec ) {
 		svs.time += frameMsec;
 
 		// let everything in the world think and move
-		VM_Call( gvm, GAME_RUN_FRAME, svs.time );
+		//VM_Call( gvm, GAME_RUN_FRAME, svs.time );
+		theSG.gameRunFrame( svs.time );
 	}
 
 	if ( com_speeds->integer ) {
@@ -854,3 +858,15 @@ void SV_Frame( int msec ) {
 
 //============================================================================
 
+bool SV_GetEntityToken( char *buffer, int bufferSize )
+{
+	const char	*s;
+
+	s = COM_Parse( &sv.entityParsePoint );
+	Q_strncpyz( buffer, s, bufferSize );
+	if ( !sv.entityParsePoint && !s[0] ) {
+		return false;
+	} else {
+		return true;
+	}
+}

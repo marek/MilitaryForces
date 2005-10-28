@@ -108,7 +108,7 @@ static void AddSkyPolygon (int nump, vec3_t vecs)
 			axis = 4;
 	}
 
-	// project new texture coords
+	// project New texture coords
 	for (i=0 ; i<nump ; i++, vecs+=3)
 	{
 		j = vec_to_st[axis][2];

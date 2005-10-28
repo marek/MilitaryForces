@@ -42,7 +42,7 @@ sometimes remap the client's source port on a packet during gameplay.
 
 If the base part of the net address matches and the qport matches, then the
 channel matches even if the IP port differs.  The IP port should be updated
-to the new value before sending out any replies.
+to the New value before sending out any replies.
 
 */
 

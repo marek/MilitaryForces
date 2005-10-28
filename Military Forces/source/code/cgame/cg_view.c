@@ -1,5 +1,5 @@
 /*
- * $Id: cg_view.c,v 1.4 2005-10-15 14:05:23 minkis Exp $
+ * $Id: cg_view.c,v 1.5 2005-10-28 13:06:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -626,7 +626,7 @@ CG_DrawActiveFrame
 Generates and draws a game scene and status information at the given time.
 =================
 */
-void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, int demoPlayback ) {
+void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, bool demoPlayback ) {
 	int		inwater;
 
 	cg.time = serverTime;

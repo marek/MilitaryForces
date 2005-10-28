@@ -1,5 +1,5 @@
 /*
- * $Id: g_active.c,v 1.5 2005-09-02 08:45:17 thebjoern Exp $
+ * $Id: g_active.c,v 1.6 2005-10-28 13:06:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -258,7 +258,7 @@ void	G_TouchTriggers( gentity_t *ent ) {
 				continue;
 			}
 		} else {
-			if ( !trap_EntityContact( mins, maxs, hit ) ) {
+			if ( !trap_EntityContact( mins, maxs, &hit->s, &hit->r ) ) {
 				continue;
 			}
 		}
@@ -305,7 +305,7 @@ void NotSelectedThink( gentity_t *ent, usercmd_t *ucmd ) {
 //	VectorCopy( client->ps.origin, ent->s.origin );
 
 	G_TouchTriggers( ent );
-	trap_UnlinkEntity( ent );
+	trap_UnlinkEntity( &ent->s, &ent->r );
 
 	client->oldbuttons = client->buttons;
 	client->buttons = ucmd->buttons;
@@ -345,7 +345,7 @@ void SpectatorThink( gentity_t *ent, usercmd_t *ucmd ) {
 		VectorCopy( client->ps.origin, ent->s.origin );
 
 		G_TouchTriggers( ent );
-		trap_UnlinkEntity( ent );
+		trap_UnlinkEntity( &ent->s, &ent->r );
 	}
 
 	client->oldbuttons = client->buttons;
@@ -387,7 +387,7 @@ void MissionEditorThink( gentity_t *ent, usercmd_t *ucmd ) {
 		VectorCopy( client->ps.origin, ent->s.origin );
 
 		G_TouchTriggers( ent );
-		trap_UnlinkEntity( ent );
+		trap_UnlinkEntity( &ent->s, &ent->r );
 	}
 
 	client->oldbuttons = client->buttons;
@@ -852,7 +852,7 @@ void ClientThink_real( gentity_t *ent ) {
 	ClientEvents( ent, oldEventSequence );
 
 	// link entity now, after any personal teleporters have been used
-	trap_LinkEntity (ent);
+	trap_LinkEntity (&ent->s, &ent->r);
 	if ( !ent->client->noclip ) {
 		G_TouchTriggers( ent );
 	}
@@ -900,14 +900,14 @@ void ClientThink_real( gentity_t *ent ) {
 ==================
 ClientThink
 
-A new command has arrived from the client
+A New command has arrived from the client
 ==================
 */
 void ClientThink( int clientNum ) {
 	gentity_t *ent;
 
 	ent = g_entities + clientNum;
-	trap_GetUsercmd( clientNum, &ent->client->pers.cmd );
+	trap_GetClientUsercmd( clientNum, &ent->client->pers.cmd );
 
 	// mark the time we got info, so we can display the
 	// phone jack if they don't get any for a while

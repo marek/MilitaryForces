@@ -1,5 +1,5 @@
 /*
- * $Id: menudef.h,v 1.2 2005-09-02 08:00:21 thebjoern Exp $
+ * $Id: menudef.h,v 1.3 2005-10-28 13:07:04 thebjoern Exp $
 */
 
 #ifndef __MENUDEF_H__
@@ -243,8 +243,8 @@
 #define UI_ALLMAPS_SELECTION 236
 #define UI_OPPONENT_NAME 237
 #define UI_VOTE_KICK 238
-#define UI_BOTNAME 239
-#define UI_BOTSKILL 240
+//#define UI_BOTNAME 239
+//#define UI_BOTSKILL 240
 #define UI_REDBLUE 241
 #define UI_CROSSHAIR 242
 #define UI_SELECTEDPLAYER 243

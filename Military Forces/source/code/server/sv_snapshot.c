@@ -95,14 +95,14 @@ static void SV_EmitPacketEntities( clientSnapshot_t *from, clientSnapshot_t *to,
 		}
 
 		if ( newnum < oldnum ) {
-			// this is a new entity, send it from the baseline
+			// this is a New entity, send it from the baseline
 			MSG_WriteDeltaEntity (msg, &sv.svEntities[newnum].baseline, newent, true );
 			newindex++;
 			continue;
 		}
 
 		if ( newnum > oldnum ) {
-			// the old entity isn't present in the new message
+			// the old entity isn't present in the New message
 			MSG_WriteDeltaEntity (msg, oldent, NULL, true );
 			oldindex++;
 			continue;
@@ -348,7 +348,7 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 				continue;
 		}
 
-		svEnt = SV_SvEntityForGentity( ent );
+		svEnt = SV_SvEntityForGentity( &ent->s, &ent->r );
 
 		// don't double add an entity through portals
 		if ( svEnt->snapshotCounter == sv.snapshotCounter ) {
@@ -675,7 +675,7 @@ void SV_SendClientMessages( void ) {
 			continue;
 		}
 
-		// generate and send a new message
+		// generate and send a New message
 		SV_SendClientSnapshot( c );
 	}
 }

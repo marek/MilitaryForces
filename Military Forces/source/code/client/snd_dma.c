@@ -273,7 +273,7 @@ static long S_HashSFXName(const char *name) {
 ==================
 S_FindName
 
-Will allocate a new sfx if it isn't found
+Will allocate a New sfx if it isn't found
 ==================
 */
 static sfx_t *S_FindName( const char *name ) {
@@ -1113,7 +1113,7 @@ void S_Respatialize( int entityNum, const vec3_t head, vec3_t axis[3], int inwat
 ========================
 S_ScanChannelStarts
 
-Returns true if any new sounds were started since the last mix
+Returns true if any New sounds were started since the last mix
 ========================
 */
 bool S_ScanChannelStarts( void ) {
@@ -1253,7 +1253,7 @@ void S_Update_(void) {
 	ot = s_soundtime;
 
 	// clear any sound effects that end before the current time,
-	// and start any new sounds
+	// and start any New sounds
 	S_ScanChannelStarts();
 
 	sane = thisTime - lastTime;

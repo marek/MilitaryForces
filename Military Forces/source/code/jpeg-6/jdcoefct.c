@@ -77,7 +77,7 @@ METHODDEF int decompress_smooth_data
 
 LOCAL void
 start_iMCU_row (j_decompress_ptr cinfo)
-/* Reset within-iMCU-row counters for a new row (input side) */
+/* Reset within-iMCU-row counters for a New row (input side) */
 {
   my_coef_ptr coef = (my_coef_ptr) cinfo->coef;
 
@@ -389,7 +389,7 @@ decompress_data (j_decompress_ptr cinfo, JSAMPIMAGE output_buf)
  * Determine whether block smoothing is applicable and safe.
  * We also latch the current states of the coef_bits[] entries for the
  * AC coefficients; otherwise, if the input side of the decompressor
- * advances into a new scan, we might think the coefficients are known
+ * advances into a New scan, we might think the coefficients are known
  * more accurately than they really are.
  */
 

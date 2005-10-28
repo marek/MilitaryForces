@@ -451,7 +451,7 @@ prepare_for_output_pass (j_decompress_ptr cinfo)
 #endif /* QUANT_2PASS_SUPPORTED */
   } else {
     if (cinfo->quantize_colors && cinfo->colormap == NULL) {
-      /* Select new quantization method */
+      /* Select New quantization method */
       if (cinfo->two_pass_quantize && cinfo->enable_2pass_quant) {
 	cinfo->cquantize = master->quantizer_2pass;
 	master->pub.is_dummy_pass = TRUE;
@@ -508,7 +508,7 @@ finish_output_pass (j_decompress_ptr cinfo)
 #ifdef D_MULTISCAN_FILES_SUPPORTED
 
 /*
- * Switch to a new external colormap between output passes.
+ * Switch to a New external colormap between output passes.
  */
 
 GLOBAL void

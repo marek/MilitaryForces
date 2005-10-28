@@ -1,5 +1,5 @@
 /*
- * $Id: g_combat.c,v 1.3 2005-09-02 08:45:17 thebjoern Exp $
+ * $Id: g_combat.c,v 1.4 2005-10-28 13:06:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -739,5 +739,5 @@ void Vehicle_Death( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, 
 		self->client->respawnTime = level.time + 30000;
 	}
 
-	trap_LinkEntity( self );
+	trap_LinkEntity( &self->s, &self->r );
 }

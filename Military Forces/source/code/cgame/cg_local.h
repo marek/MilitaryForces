@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.14 2005-10-16 15:12:33 thebjoern Exp $
+ * $Id: cg_local.h,v 1.15 2005-10-28 13:06:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -432,7 +432,7 @@ typedef struct {
 
 	int			clientNum;
 	
-	int			demoPlayback;
+	bool		demoPlayback;
 	bool		levelShot;			// taking a level menu screenshot
 	int			deferredPlayerLoading;
 	int			intermissionStarted;	// don't play voice rewards, because game will end shortly
@@ -1228,7 +1228,7 @@ void CG_UpdateCvars( void );
 int CG_CrosshairPlayer( void );
 int CG_LastAttacker( void );
 void CG_LoadMenus(const char *menuFile);
-void CG_KeyEvent(int key, int down);
+void CG_KeyEvent(int key, bool down);
 void CG_MouseEvent(int x, int y);
 void CG_EventHandling(int type);
 void CG_RankRunFrame( void );
@@ -1268,7 +1268,7 @@ void CG_TestModelPrevSkin_f (void);
 void CG_ZoomDown_f( void );
 void CG_ZoomUp_f( void );
 void CG_AddBufferedSound( sfxHandle_t sfx);
-void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, int demoPlayback );
+void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, bool demoPlayback );
 bool CG_WorldToScreenCoords( vec3_t worldPoint, int * pX, int * pY, bool virtualXY );
 
 //
@@ -1562,7 +1562,7 @@ void ME_SpawnGroundInstallation( int idx );
 void ME_ExportToScript( const char* scriptname );
 void ME_ImportScript( const char* scriptname );
 void CG_Draw_IGME();
-void ME_KeyEvent(int key, int down);
+void ME_KeyEvent(int key, bool down);
 void ME_MouseEvent(int x, int y);
 void ME_Init_MissionEditor();
 
@@ -1715,7 +1715,7 @@ int			trap_GetServerCommand( int serverCommandNumber );
 // this will always be at least one higher than the number in the current
 // snapshot, and it may be quite a few higher if it is a fast computer on
 // a lagged connection
-int			trap_GetCurrentCmdNumber( void );	
+int			trap_GetCurrentCmdNumber();	
 
 int			trap_GetUserCmd( int cmdNumber, usercmd_t *ucmd );
 
@@ -1822,7 +1822,7 @@ typedef struct particle_s
 	float				alphaDecayEndValue;
 } particle_t;
 
-// Particle emitters spawn new particles in a certain way
+// Particle emitters spawn New particles in a certain way
 typedef struct particleEmitter_s
 {
 	bool					dead;

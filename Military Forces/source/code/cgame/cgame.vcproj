@@ -14,14 +14,14 @@
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)..\compiler_output\Debug\cgame"
 			IntermediateDirectory="$(SolutionDir)..\compiler_output\Debug\cgame"
-			ConfigurationType="2"
+			ConfigurationType="4"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="FALSE">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				OptimizeForProcessor="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;MISSIONPACK;_MENU_SCOREBOARD"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_WINDOWS"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				RuntimeTypeInfo="TRUE"
@@ -38,20 +38,8 @@
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="odbc32.lib odbccp32.lib"
-				OutputFile="$(SolutionDir)..\..\mfdata\cgamex86.dll"
-				LinkIncremental="1"
-				SuppressStartupBanner="TRUE"
-				ModuleDefinitionFile=".\cgame.def"
-				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(IntDir)\cgamex86.pdb"
-				GenerateMapFile="TRUE"
-				MapFileName="$(IntDir)\cgamex86.map"
-				SubSystem="2"
-				BaseAddress="0x30000000"
-				ImportLibrary="$(IntDir)\cgamex86.lib"
-				TargetMachine="1"/>
+				Name="VCLibrarianTool"
+				OutputFile="$(IntDir)\cgame.lib"/>
 			<Tool
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="_DEBUG"
@@ -75,8 +63,6 @@
 			<Tool
 				Name="VCXMLDataGeneratorTool"/>
 			<Tool
-				Name="VCWebDeploymentTool"/>
-			<Tool
 				Name="VCManagedWrapperGeneratorTool"/>
 			<Tool
 				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
@@ -85,7 +71,7 @@
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)..\compiler_output\Release\cgame"
 			IntermediateDirectory="$(SolutionDir)..\compiler_output\Release\cgame"
-			ConfigurationType="2"
+			ConfigurationType="4"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="FALSE">
 			<Tool
@@ -93,7 +79,7 @@
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				OptimizeForProcessor="2"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;MISSIONPACK"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_WINDOWS"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="TRUE"
@@ -109,19 +95,8 @@
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="odbc32.lib odbccp32.lib"
-				OutputFile="$(SolutionDir)..\..\mfdata\cgamex86.dll"
-				LinkIncremental="1"
-				SuppressStartupBanner="TRUE"
-				ModuleDefinitionFile=".\cgame.def"
-				ProgramDatabaseFile="$(IntDir)\cgamex86.pdb"
-				GenerateMapFile="TRUE"
-				MapFileName="$(IntDir)\cgamex86.map"
-				SubSystem="2"
-				BaseAddress="0x30000000"
-				ImportLibrary="$(IntDir)\cgamex86.lib"
-				TargetMachine="1"/>
+				Name="VCLibrarianTool"
+				OutputFile="$(IntDir)\cgame.lib"/>
 			<Tool
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="NDEBUG"
@@ -145,8 +120,6 @@
 			<Tool
 				Name="VCXMLDataGeneratorTool"/>
 			<Tool
-				Name="VCWebDeploymentTool"/>
-			<Tool
 				Name="VCManagedWrapperGeneratorTool"/>
 			<Tool
 				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
@@ -155,14 +128,14 @@
 			Name="ReleaseWithDebugInfo|Win32"
 			OutputDirectory="$(SolutionDir)..\compiler_output\ReleaseWithDebugInfo\cgame"
 			IntermediateDirectory="$(SolutionDir)..\compiler_output\ReleaseWithDebugInfo\cgame"
-			ConfigurationType="2"
+			ConfigurationType="4"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="FALSE">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				OptimizeForProcessor="3"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;MISSIONPACK;_MENU_SCOREBOARD"
+				OptimizeForProcessor="0"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_WINDOWS"
 				StringPooling="FALSE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -181,20 +154,8 @@
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="odbc32.lib odbccp32.lib"
-				OutputFile="$(SolutionDir)..\..\mfdata\cgamex86.dll"
-				LinkIncremental="1"
-				SuppressStartupBanner="TRUE"
-				ModuleDefinitionFile=".\cgame.def"
-				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(IntDir)\cgamex86.pdb"
-				GenerateMapFile="TRUE"
-				MapFileName="$(IntDir)\cgamex86.map"
-				SubSystem="2"
-				BaseAddress="0x30000000"
-				ImportLibrary="$(IntDir)\cgamex86.lib"
-				TargetMachine="1"/>
+				Name="VCLibrarianTool"
+				OutputFile="$(IntDir)\cgame.lib"/>
 			<Tool
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="_DEBUG"
@@ -218,8 +179,6 @@
 			<Tool
 				Name="VCXMLDataGeneratorTool"/>
 			<Tool
-				Name="VCWebDeploymentTool"/>
-			<Tool
 				Name="VCManagedWrapperGeneratorTool"/>
 			<Tool
 				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
@@ -232,64 +191,7 @@
 			Name="Source Files"
 			Filter="c">
 			<File
-				RelativePath="..\game\bg_boatmove.c">
-			</File>
-			<File
-				RelativePath="..\game\bg_groundmove.c">
-			</File>
-			<File
-				RelativePath="..\game\bg_helomove.c">
-			</File>
-			<File
-				RelativePath="..\game\bg_lib.c">
-				<FileConfiguration
-					Name="Debug|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCLCompilerTool"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCLCompilerTool"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="ReleaseWithDebugInfo|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCLCompilerTool"/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\game\bg_loadouts.c">
-			</File>
-			<File
-				RelativePath="..\game\bg_lqmmove.c">
-			</File>
-			<File
-				RelativePath="..\game\bg_md3util.c">
-			</File>
-			<File
-				RelativePath="..\game\bg_mfq3util.c">
-			</File>
-			<File
-				RelativePath="..\game\bg_misc.c">
-			</File>
-			<File
-				RelativePath="..\game\bg_planemove.c">
-			</File>
-			<File
-				RelativePath="..\game\bg_pmove.c">
-			</File>
-			<File
-				RelativePath="..\game\bg_slidemove.c">
-			</File>
-			<File
-				RelativePath="..\game\bg_vehicledata.c">
-			</File>
-			<File
-				RelativePath="..\game\bg_weapondata.c">
+				RelativePath=".\cg.cpp">
 			</File>
 			<File
 				RelativePath=".\cg_boat.c">
@@ -396,15 +298,15 @@
 			<File
 				RelativePath="..\game\q_shared.c">
 			</File>
-			<File
-				RelativePath="..\ui\ui_shared.c">
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h">
 			<File
 				RelativePath="..\game\bg_public.h">
+			</File>
+			<File
+				RelativePath=".\cg.h">
 			</File>
 			<File
 				RelativePath=".\cg_local.h">

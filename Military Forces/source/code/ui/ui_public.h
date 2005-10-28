@@ -1,10 +1,10 @@
 /*
- * $Id: ui_public.h,v 1.3 2005-09-02 08:00:21 thebjoern Exp $
+ * $Id: ui_public.h,v 1.4 2005-10-28 13:07:04 thebjoern Exp $
 */
 #ifndef __UI_PUBLIC_H__
 #define __UI_PUBLIC_H__
 
-#define UI_API_VERSION	6
+//#define UI_API_VERSION	6
 
 typedef struct {
 	connstate_t		connState;
@@ -117,15 +117,15 @@ typedef enum {
 	UI_CEIL
 } uiImport_t;
 
-typedef enum {
-	UIMENU_NONE,
-	UIMENU_MAIN,
-	UIMENU_INGAME,
-	UIMENU_NEED_CD,
-	UIMENU_BAD_CD_KEY,
-	UIMENU_TEAM,
-	UIMENU_POSTGAME
-} uiMenuCommand_t;
+//typedef enum {
+//	UIMENU_NONE,
+//	UIMENU_MAIN,
+//	UIMENU_INGAME,
+//	UIMENU_NEED_CD,
+//	UIMENU_BAD_CD_KEY,
+//	UIMENU_TEAM,
+//	UIMENU_POSTGAME
+//} uiMenuCommand_t;
 
 #define SORT_HOST			0
 #define SORT_MAP			1
@@ -134,35 +134,35 @@ typedef enum {
 #define SORT_PING			4
 
 typedef enum {
-	UI_GETAPIVERSION = 0,	// system reserved
+//	UI_GETAPIVERSION = 0,	// system reserved
 
-	UI_INIT,
+//	UI_INIT,
 //	void	UI_Init( void );
 
-	UI_SHUTDOWN,
+//	UI_SHUTDOWN,
 //	void	UI_Shutdown( void );
 
-	UI_KEY_EVENT,
+//	UI_KEY_EVENT,
 //	void	UI_KeyEvent( int key );
 
-	UI_MOUSE_EVENT,
+//	UI_MOUSE_EVENT,
 //	void	UI_MouseEvent( int dx, int dy );
 
-	UI_REFRESH,
+//	UI_REFRESH,
 //	void	UI_Refresh( int time );
 
-	UI_IS_FULLSCREEN,
+//	UI_IS_FULLSCREEN,
 //	bool UI_IsFullscreen( void );
 
-	UI_SET_ACTIVE_MENU,
+//	UI_SET_ACTIVE_MENU,
 //	void	UI_SetActiveMenu( uiMenuCommand_t menu );
 
-	UI_CONSOLE_COMMAND,
+//	UI_CONSOLE_COMMAND,
 //	bool UI_ConsoleCommand( int realTime );
 
-	UI_DRAW_CONNECT_SCREEN,
+//	UI_DRAW_CONNECT_SCREEN,
 //	void	UI_DrawConnectScreen( bool overlay );
-	UI_HASUNIQUECDKEY
+//	UI_HASUNIQUECDKEY
 // if !overlay, the background will be drawn, otherwise it will be
 // overlayed over whatever the cgame has drawn.
 // a GetClientState syscall will be made to get the current strings

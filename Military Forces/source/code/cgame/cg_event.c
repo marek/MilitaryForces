@@ -1,5 +1,5 @@
 /*
- * $Id: cg_event.c,v 1.4 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: cg_event.c,v 1.5 2005-10-28 13:06:54 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -56,7 +56,7 @@ const char	*CG_PlaceString( int rank ) {
 ================
 CG_ItemPickup
 
-A new item was picked up this frame
+A New item was picked up this frame
 ================
 */
 static void CG_ItemPickup( int itemNum ) {
@@ -346,7 +346,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position )
 				cent->gearAnimFrame = availableVehicles[cent->currentState.modelindex].maxGearFrame;
 			}
 			*/
-			// new version
+			// New version
 			clientInfo_t	*ci;
 			int				clientNum;
 			clientNum = cent->currentState.clientNum;

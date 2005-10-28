@@ -1,5 +1,5 @@
 /*
- * $Id: tr_types.h,v 1.3 2005-09-02 08:00:21 thebjoern Exp $
+ * $Id: tr_types.h,v 1.4 2005-10-28 13:06:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -113,11 +113,11 @@ typedef struct {
 } refdef_t;
 
 
-typedef enum {
+enum stereoFrame_t {
 	STEREO_CENTER,
 	STEREO_LEFT,
 	STEREO_RIGHT
-} stereoFrame_t;
+};
 
 
 /*

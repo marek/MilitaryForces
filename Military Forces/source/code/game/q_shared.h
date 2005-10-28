@@ -262,8 +262,8 @@ static inline float LittleFloat (const float l) { return FloatSwap(&l); }
 // bk001205 - try
 #ifdef Q3_STATIC
 #define	GAME_HARD_LINKED
-#define	CGAME_HARD_LINKED
-#define	UI_HARD_LINKED
+//#define	CGAME_HARD_LINKED
+//#define	UI_HARD_LINKED
 #define	BOTLIB_HARD_LINKED
 #endif
 
@@ -1325,7 +1325,7 @@ typedef struct playerState_s {
 	// mfq3 weapons/vwep
 	int			numWeaponsOnMount[32];	// number of weapons actually on this mount; note: each of these are just 5 bit numbers (ie 32)
 										// 32 = MAX_MOUNTS_PER_VEHICLE 
-										// shouldnt be hardcoded like this, but want to get new system to work first
+										// shouldnt be hardcoded like this, but want to get New system to work first
 
 	// not communicated over the net at all
 	int			ping;			// server to game info for scoreboard

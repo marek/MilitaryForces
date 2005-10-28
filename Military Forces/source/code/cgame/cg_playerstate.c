@@ -1,10 +1,10 @@
 /*
- * $Id: cg_playerstate.c,v 1.4 2005-09-02 08:45:17 thebjoern Exp $
+ * $Id: cg_playerstate.c,v 1.5 2005-10-28 13:06:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
 //
-// cg_playerstate.c -- this file acts on changes in a new playerState_t
+// cg_playerstate.c -- this file acts on changes in a New playerState_t
 // With normal play, this will be done after local prediction, but when
 // following another player or playing back a demo, it will be checked
 // when the snapshot transitions like all the other entities
@@ -148,7 +148,7 @@ void CG_CheckPlayerstateEvents( playerState_t *ps, playerState_t *ops ) {
 	cent = &cg.predictedPlayerEntity; // cg_entities[ ps->clientNum ];
 	// go through the predictable events buffer
 	for ( i = ps->eventSequence - MAX_PS_EVENTS ; i < ps->eventSequence ; i++ ) {
-		// if we have a new predictable event
+		// if we have a New predictable event
 		if ( i >= ops->eventSequence
 			// or the server told us to play another event instead of a predicted event we already issued
 			// or something the server told us changed our prediction causing a different event
@@ -184,7 +184,7 @@ void CG_CheckChangedPredictableEvents( playerState_t *ps ) {
 		}
 		// if this event is not further back in than the maximum predictable events we remember
 		if (i > cg.eventSequence - MAX_PREDICTED_EVENTS) {
-			// if the new playerstate event is different from a previously predicted one
+			// if the New playerstate event is different from a previously predicted one
 			if ( ps->events[i & (MAX_PS_EVENTS-1)] != cg.predictableEvents[i & (MAX_PREDICTED_EVENTS-1) ] ) {
 
 				event = ps->events[ i & (MAX_PS_EVENTS-1) ];

@@ -489,7 +489,7 @@ int PS_ReadString(script_t *script, token_t *token, int quote)
 				script->line = tmpline;
 				break;
 			} //end if
-			//step over the new leading double quote
+			//step over the New leading double quote
 			script->script_p++;
 		} //end if
 		else

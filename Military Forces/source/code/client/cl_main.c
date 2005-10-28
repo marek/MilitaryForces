@@ -23,6 +23,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "client.h"
 #include <limits.h>
+#include "../ui/ui.h"
+#include "../cgame/cg.h"
 
 cvar_t	*cl_nodelta;
 cvar_t	*cl_debugMove;
@@ -72,7 +74,8 @@ cvar_t	*cl_trn;
 clientActive_t		cl;
 clientConnection_t	clc;
 clientStatic_t		cls;
-vm_t				*cgvm;
+//vm_t				*cgvm;
+ClientGame& theCG = ClientGame::getInstance();
 
 // Structure containing functions exported from refresh DLL
 refexport_t	re;
@@ -744,9 +747,11 @@ void CL_Disconnect( bool showMainMenu ) {
 		clc.demofile = 0;
 	}
 
-	if ( uivm && showMainMenu ) {
-		VM_Call( uivm, UI_SET_ACTIVE_MENU, UIMENU_NONE );
-	}
+	//if ( uivm && showMainMenu ) {
+	//	VM_Call( uivm, UI_SET_ACTIVE_MENU, UIMENU_NONE );
+	//}
+	if( theUI.isInitialized() && showMainMenu )
+		theUI.setActiveMenu( UserInterface::MenuCommand::UIMENU_NONE );
 
 	SCR_StopCinematic ();
 	S_ClearSoundBuffer();
@@ -1195,7 +1200,7 @@ void CL_Vid_Restart_f( void ) {
 	CL_ShutdownCGame();
 	// shutdown the renderer and clear the renderer interface
 	CL_ShutdownRef();
-	// client is no longer pure untill new checksums are sent
+	// client is no longer pure untill New checksums are sent
 	CL_ResetPureClientAtServer();
 	// clear pak references
 	FS_ClearPakReferences( FS_UI_REF | FS_CGAME_REF );
@@ -1325,10 +1330,10 @@ void CL_DownloadsComplete( void ) {
 
 		FS_Restart(clc.checksumFeed); // We possibly downloaded a pak, restart the file system to load it
 
-		// inform the server so we get new gamestate info
+		// inform the server so we get New gamestate info
 		CL_AddReliableCommand( "donedl" );
 
-		// by sending the donedl command we request a new gamestate
+		// by sending the donedl command we request a New gamestate
 		// so we don't want to load stuff yet
 		return;
 	}
@@ -1390,7 +1395,7 @@ void CL_BeginDownload( const char *localName, const char *remoteName ) {
 	Cvar_Set( "cl_downloadCount", "0" );
 	Cvar_SetValue( "cl_downloadTime", cls.realtime );
 
-	clc.downloadBlock = 0; // Starting new file
+	clc.downloadBlock = 0; // Starting New file
 	clc.downloadCount = 0;
 
 	CL_AddReliableCommand( va("download %s", remoteName) );
@@ -1794,7 +1799,7 @@ void CL_ConnectionlessPacket( netadr_t from, msg_t *msg ) {
 			clc.connectPacketCount = 0;
 			clc.connectTime = -99999;
 
-			// take this address as the new server address.  This allows
+			// take this address as the New server address.  This allows
 			// a server proxy to hand off connections to multiple servers
 			clc.serverAddress = from;
 			Com_DPrintf ("challengeResponse: %d\n", clc.challenge);
@@ -1994,34 +1999,39 @@ CL_Frame
 
 ==================
 */
-void CL_Frame ( int msec ) {
+void CL_Frame ( int msec ) 
+{
 
-	if ( !com_cl_running->integer ) {
+	if ( !com_cl_running->integer ) 
 		return;
-	}
 
-	if ( cls.cddialog ) {
+	if ( cls.cddialog ) 
+	{
 		// bring up the cd error dialog if needed
 		cls.cddialog = false;
-		VM_Call( uivm, UI_SET_ACTIVE_MENU, UIMENU_NEED_CD );
-	} else	if ( cls.state == CA_DISCONNECTED && !( cls.keyCatchers & KEYCATCH_UI )
-		&& !com_sv_running->integer ) {
+		//VM_Call( uivm, UI_SET_ACTIVE_MENU, UIMENU_NEED_CD );
+		theUI.setActiveMenu( UserInterface::MenuCommand::UIMENU_NEED_CD );
+	} 
+	else	if ( cls.state == CA_DISCONNECTED && !( cls.keyCatchers & KEYCATCH_UI )
+		&& !com_sv_running->integer ) 
+	{
 		// if disconnected, bring up the menu
 		S_StopAllSounds();
-		VM_Call( uivm, UI_SET_ACTIVE_MENU, UIMENU_MAIN );
+		//VM_Call( uivm, UI_SET_ACTIVE_MENU, UIMENU_MAIN );
+		theUI.setActiveMenu( UserInterface::MenuCommand::UIMENU_MAIN );
 	}
 
 	// if recording an avi, lock to a fixed fps
-	if ( cl_avidemo->integer && msec) {
+	if ( cl_avidemo->integer && msec) 
+	{
 		// save the current screen
-		if ( cls.state == CA_ACTIVE || cl_forceavidemo->integer) {
+		if ( cls.state == CA_ACTIVE || cl_forceavidemo->integer) 
 			Cbuf_ExecuteText( EXEC_NOW, "screenshot silent\n" );
-		}
+
 		// fixed time for next frame'
 		msec = (1000 / cl_avidemo->integer) * com_timescale->value;
-		if (msec == 0) {
+		if (msec == 0) 
 			msec = 1;
-		}
 	}
 	
 	// save the msec before checking pause
@@ -2032,9 +2042,8 @@ void CL_Frame ( int msec ) {
 
 	cls.realtime += cls.frametime;
 
-	if ( cl_timegraph->integer ) {
+	if ( cl_timegraph->integer ) 
 		SCR_DebugGraph ( cls.realFrametime * 0.25, 0 );
-	}
 
 	// see if we need to update any userinfo
 	CL_CheckUserinfo();
@@ -2652,7 +2661,7 @@ serverStatus_t *CL_GetServerStatus( netadr_t from ) {
 CL_ServerStatus
 ===================
 */
-int CL_ServerStatus( char *serverAddress, char *serverStatusString, int maxLen ) {
+int CL_ServerStatus( const char *serverAddress, char *serverStatusString, int maxLen ) {
 	int i;
 	netadr_t	to;
 	serverStatus_t *serverStatus;

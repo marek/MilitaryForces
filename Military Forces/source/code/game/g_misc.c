@@ -1,5 +1,5 @@
 /*
- * $Id: g_misc.c,v 1.1 2005-08-22 16:06:50 thebjoern Exp $
+ * $Id: g_misc.c,v 1.2 2005-10-28 13:06:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -63,7 +63,7 @@ void SP_misc_model( gentity_t *ent ) {
 	ent->s.modelindex = G_ModelIndex( ent->model );
 	VectorSet (ent->mins, -16, -16, -16);
 	VectorSet (ent->maxs, 16, 16, 16);
-	trap_LinkEntity (ent);
+	trap_LinkEntity (&ent->s, &ent->r);
 
 	G_SetOrigin( ent, ent->s.origin );
 	VectorCopy( ent->s.angles, ent->s.apos.trBase );
@@ -121,7 +121,7 @@ This must be within 64 world units of the surface!
 void SP_misc_portal_surface(gentity_t *ent) {
 	VectorClear( ent->r.mins );
 	VectorClear( ent->r.maxs );
-	trap_LinkEntity (ent);
+	trap_LinkEntity (&ent->s, &ent->r);
 
 	ent->r.svFlags = SVF_PORTAL;
 	ent->s.eType = ET_PORTAL;
@@ -143,7 +143,7 @@ void SP_misc_portal_camera(gentity_t *ent) {
 
 	VectorClear( ent->r.mins );
 	VectorClear( ent->r.maxs );
-	trap_LinkEntity (ent);
+	trap_LinkEntity (&ent->s, &ent->r);
 
 	G_SpawnFloat( "roll", "0", &roll );
 

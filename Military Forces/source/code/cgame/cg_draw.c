@@ -1,5 +1,5 @@
 /*
- * $Id: cg_draw.c,v 1.4 2005-09-22 23:31:16 minkis Exp $
+ * $Id: cg_draw.c,v 1.5 2005-10-28 13:06:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -631,7 +631,7 @@ static float CG_DrawTimer( float y ) {
 	// alter the draw position?
 	if( CG_NewHUDActive() )
 	{
-		// fit around the new HUD (draw bottom middle-right)
+		// fit around the New HUD (draw bottom middle-right)
 		dx = 480;
 		dy = 460;
 	}
@@ -699,7 +699,7 @@ static float CG_DrawCountdownTimer( float y ) {
 	// alter the draw position?
 	if( CG_NewHUDActive() )
 	{
-		// fit around the new HUD (draw bottom middle-left)
+		// fit around the New HUD (draw bottom middle-left)
 		dx = 160;
 		dy = 460;
 	}
@@ -949,7 +949,7 @@ static void CG_DrawLagometer( float y )
 	// draw the graph
 	//
 	
-	// is the new HUD active?
+	// is the New HUD active?
 	if( CG_NewHUDActive() ) {
 		x = 80;
 		y = 250;
@@ -1051,7 +1051,7 @@ static void CG_DrawLagometer( float y )
 =====================
 CG_NewHUDActive
 
-Is the new HUD actually being draw?
+Is the New HUD actually being draw?
 =====================
 */
 
@@ -2104,7 +2104,7 @@ static bool CG_DrawFollow( void )
 		return false;
 	}
 
-	// new style
+	// New style
 
 	// draw label
 	DrawStringNewAlpha( 320, 48, "following ", 1.0f, RIGHT_JUSTIFY );
@@ -2317,7 +2317,7 @@ static void CG_Draw2D_MFQ3( void ) {
 			 cg.snap->ps.stats[STAT_HEALTH] > 0 &&
 			 !(cg.snap->ps.pm_flags & PMF_VEHICLESELECT) )
 		{
-			// old or new HUD?
+			// old or New HUD?
 			if( cg_oldHUD.integer )
 			{
 				CG_DrawStatusBar_MFQ3();
@@ -2924,4 +2924,4 @@ void CG_OwnerDraw( float x, float y, float w, float h, float text_x, float text_
 */
   }
 }
-	// NOTE: functions copied from v1.29h code to enable new scoreboard method
+	// NOTE: functions copied from v1.29h code to enable New scoreboard method

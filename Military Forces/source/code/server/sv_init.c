@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #include "server.h"
+#include "../game/game.h"
 
 /*
 ===============
@@ -51,7 +52,7 @@ void SV_SetConfigstring (int index, const char *val) {
 	sv.configstrings[index] = CopyString( val );
 
 	// send it to all the clients if we aren't
-	// spawning a new server
+	// spawning a New server
 	if ( sv.state == SS_GAME || sv.restarting ) {
 
 		// send the data to all relevent clients
@@ -278,7 +279,7 @@ void SV_ChangeMaxClients( void ) {
 	// free old clients arrays
 	Z_Free( svs.clients );
 
-	// allocate new clients
+	// allocate New clients
 	svs.clients = reinterpret_cast<client_t*>(Z_Malloc ( sv_maxclients->integer * sizeof(client_t) ));
 	Com_Memset( svs.clients, 0, sv_maxclients->integer * sizeof(client_t) );
 
@@ -292,7 +293,7 @@ void SV_ChangeMaxClients( void ) {
 	// free the old clients on the hunk
 	Hunk_FreeTempMemory( oldClients );
 	
-	// allocate new snapshot entities
+	// allocate New snapshot entities
 	if ( com_dedicated->integer ) {
 		svs.numSnapshotEntities = sv_maxclients->integer * PACKET_BACKUP * 64;
 	} else {
@@ -339,7 +340,7 @@ void SV_TouchCGame(void) {
 ================
 SV_SpawnServer
 
-Change the server to a new map, taking all connected
+Change the server to a New map, taking all connected
 clients along with it.
 This is NOT called for map_restart
 ================
@@ -405,7 +406,7 @@ void SV_SpawnServer( char *server, bool killBots ) {
 	// make sure we are not paused
 	Cvar_Set("cl_paused", "0");
 
-	// get a new checksum feed and restart the file system
+	// get a New checksum feed and restart the file system
 	srand(Com_Milliseconds());
 	sv.checksumFeed = ( ((int) rand() << 16) ^ rand() ) ^ Com_Milliseconds();
 	FS_Restart( sv.checksumFeed );
@@ -439,7 +440,8 @@ void SV_SpawnServer( char *server, bool killBots ) {
 
 	// run a few frames to allow everything to settle
 	for ( i = 0 ;i < 3 ; i++ ) {
-		VM_Call( gvm, GAME_RUN_FRAME, svs.time );
+		//VM_Call( gvm, GAME_RUN_FRAME, svs.time );
+		theSG.gameRunFrame( svs.time );
 //		SV_BotFrame( svs.time );
 		svs.time += 100;
 	}
@@ -448,7 +450,7 @@ void SV_SpawnServer( char *server, bool killBots ) {
 	SV_CreateBaseline ();
 
 	for (i=0 ; i<sv_maxclients->integer ; i++) {
-		// send the new gamestate to all connected clients
+		// send the New gamestate to all connected clients
 		if (svs.clients[i].state >= CS_CONNECTED) {
 			char	*denied;
 
@@ -464,7 +466,8 @@ void SV_SpawnServer( char *server, bool killBots ) {
 			}
 
 			// connect the client again
-			denied = reinterpret_cast<char*>(VM_ExplicitArgPtr( gvm, VM_Call( gvm, GAME_CLIENT_CONNECT, i, false, isBot ) ));	// firstTime = false
+			//denied = reinterpret_cast<char*>(VM_ExplicitArgPtr( gvm, VM_Call( gvm, GAME_CLIENT_CONNECT, i, false, isBot ) ));	// firstTime = false
+			denied = theSG.clientConnect( i, false, isBot );
 			if ( denied ) {
 				// this generally shouldn't happen, because the client
 				// was connected before the level change
@@ -472,7 +475,7 @@ void SV_SpawnServer( char *server, bool killBots ) {
 			} else {
 				if( !isBot ) {
 					// when we get the next packet from a connected client,
-					// the new gamestate will be sent
+					// the New gamestate will be sent
 					svs.clients[i].state = CS_CONNECTED;
 				}
 				else {
@@ -488,14 +491,16 @@ void SV_SpawnServer( char *server, bool killBots ) {
 					client->deltaMessage = -1;
 					client->nextSnapshotTime = svs.time;	// generate a snapshot immediately
 
-					VM_Call( gvm, GAME_CLIENT_BEGIN, i );
+					//VM_Call( gvm, GAME_CLIENT_BEGIN, i );
+					theSG.clientBegin( i );
 				}
 			}
 		}
 	}	
 
 	// run another frame to allow things to look at all the players
-	VM_Call( gvm, GAME_RUN_FRAME, svs.time );
+	//VM_Call( gvm, GAME_RUN_FRAME, svs.time );
+	theSG.gameRunFrame( svs.time );
 //	SV_BotFrame( svs.time );
 	svs.time += 100;
 

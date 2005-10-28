@@ -1,5 +1,5 @@
 /*
- * $Id: g_droneplane.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: g_droneplane.c,v 1.3 2005-10-28 13:06:54 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -88,7 +88,7 @@ void Drone_Plane_Think( gentity_t* ent ) {
 		}
 
 		ent->nextthink = level.time + 100;
-		trap_LinkEntity (ent);
+		trap_LinkEntity (&ent->s, &ent->r);
 
 		VectorCopy( angles, ent->s.angles );
 		VectorCopy( ent->s.angles, ent->s.apos.trBase );
@@ -178,7 +178,7 @@ void Drone_Plane_Think( gentity_t* ent ) {
 	}
 
 	ent->nextthink = level.time + 100;
-	trap_LinkEntity (ent);
+	trap_LinkEntity (&ent->s, &ent->r);
 
 	AngleVectors( angles, forward, 0, 0 );
 	VectorScale( forward, ent->speed, ent->s.pos.trDelta );
@@ -252,7 +252,7 @@ void Drone_Plane_Think( gentity_t* ent ) {
 		}
 
 		ent->nextthink = level.time + 50;
-		trap_LinkEntity (ent);
+		trap_LinkEntity (&ent->s, &ent->r);
 
 		VectorCopy( angles, ent->s.angles );
 		VectorCopy( ent->s.angles, ent->s.apos.trBase );

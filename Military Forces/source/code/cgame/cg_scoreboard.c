@@ -1,5 +1,5 @@
 /*
- * $Id: cg_scoreboard.c,v 1.3 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: cg_scoreboard.c,v 1.4 2005-10-28 13:06:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -43,7 +43,7 @@
 #define SB_TIME_X			(SB_SCORELINE_X + 17 * BIGCHAR_WIDTH + 8) // width 5
 #define SB_NAME_X			(SB_SCORELINE_X + 22 * BIGCHAR_WIDTH) // width 15
 
-// The new and improved score board
+// The New and improved score board
 //
 // In cases where the number of clients is high, the score board heads are interleaved
 // here's the layout

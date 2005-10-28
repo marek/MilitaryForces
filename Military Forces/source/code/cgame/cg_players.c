@@ -1,5 +1,5 @@
 /*
- * $Id: cg_players.c,v 1.3 2005-09-02 08:45:17 thebjoern Exp $
+ * $Id: cg_players.c,v 1.4 2005-10-28 13:06:54 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -191,7 +191,7 @@ void CG_NewClientInfo( int clientNum ) {
 	    return;
 	}
 
-	// replace whatever was there with the new one
+	// replace whatever was there with the New one
 	newInfo.infoValid = true;
 	*ci = newInfo;
 }
