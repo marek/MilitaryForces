@@ -339,24 +339,6 @@
 				RelativePath=".\ui_utils_cg.h">
 			</File>
 		</Filter>
-		<File
-			RelativePath=".\cg_syscalls.asm">
-		</File>
-		<File
-			RelativePath="cgame.def">
-			<FileConfiguration
-				Name="Debug|Win32"
-				ExcludedFromBuild="TRUE">
-				<Tool
-					Name="VCCustomBuildTool"/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="ReleaseWithDebugInfo|Win32"
-				ExcludedFromBuild="TRUE">
-				<Tool
-					Name="VCCustomBuildTool"/>
-			</FileConfiguration>
-		</File>
 	</Files>
 	<Globals>
 	</Globals>

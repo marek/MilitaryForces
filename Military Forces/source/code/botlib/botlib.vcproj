@@ -350,9 +350,6 @@
 				RelativePath="..\qcommon\cm_public.h">
 			</File>
 			<File
-				RelativePath="..\game\g_public.h">
-			</File>
-			<File
 				RelativePath="l_crc.h">
 			</File>
 			<File
