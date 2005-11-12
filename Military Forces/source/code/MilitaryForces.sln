@@ -1,8 +1,4 @@
 Microsoft Visual Studio Solution File, Format Version 8.00
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Splines", "splines\Splines.vcproj", "{DBAF2C53-3858-455D-A1AE-3FC093515314}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cgame", "cgame\cgame.vcproj", "{C878E295-CB82-4B40-8ECF-5CE5525466FA}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
@@ -22,7 +18,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MilitaryForces", "MilitaryForces.vcproj", "{6834203A-96E2-48FE-9BEC-9B2CF2B832DB}"
 	ProjectSection(ProjectDependencies) = postProject
 		{B549420F-50C8-4959-AA30-DA8E7E515091} = {B549420F-50C8-4959-AA30-DA8E7E515091}
-		{DBAF2C53-3858-455D-A1AE-3FC093515314} = {DBAF2C53-3858-455D-A1AE-3FC093515314}
 		{AB424155-FBED-4D8D-B007-5B6CF93EA395} = {AB424155-FBED-4D8D-B007-5B6CF93EA395}
 		{0E65018D-61C6-44DF-BB76-941DD61679CE} = {0E65018D-61C6-44DF-BB76-941DD61679CE}
 		{A8EAC38E-C7DA-42F8-811D-77FD092B9D19} = {A8EAC38E-C7DA-42F8-811D-77FD092B9D19}
@@ -50,12 +45,6 @@ Global
 		ReleaseWithDebugInfo = ReleaseWithDebugInfo
 	EndGlobalSection
 	GlobalSection(ProjectConfiguration) = postSolution
-		{DBAF2C53-3858-455D-A1AE-3FC093515314}.Debug.ActiveCfg = Debug|Win32
-		{DBAF2C53-3858-455D-A1AE-3FC093515314}.Debug.Build.0 = Debug|Win32
-		{DBAF2C53-3858-455D-A1AE-3FC093515314}.Release.ActiveCfg = Release|Win32
-		{DBAF2C53-3858-455D-A1AE-3FC093515314}.Release.Build.0 = Release|Win32
-		{DBAF2C53-3858-455D-A1AE-3FC093515314}.ReleaseWithDebugInfo.ActiveCfg = ReleaseWithDebugInfo|Win32
-		{DBAF2C53-3858-455D-A1AE-3FC093515314}.ReleaseWithDebugInfo.Build.0 = ReleaseWithDebugInfo|Win32
 		{C878E295-CB82-4B40-8ECF-5CE5525466FA}.Debug.ActiveCfg = Debug|Win32
 		{C878E295-CB82-4B40-8ECF-5CE5525466FA}.Debug.Build.0 = Debug|Win32
 		{C878E295-CB82-4B40-8ECF-5CE5525466FA}.Release.ActiveCfg = Release|Win32

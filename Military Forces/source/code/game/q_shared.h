@@ -147,13 +147,11 @@ float	FloatSwap (const float *f);
 #endif
 #endif
 
-#define ID_INLINE __inline 
-
-static ID_INLINE short BigShort( short l) { return ShortSwap(l); }
+static inline short BigShort( short l) { return ShortSwap(l); }
 #define LittleShort
-static ID_INLINE int BigLong(int l) { LongSwap(l); }
+static inline int BigLong(int l) { LongSwap(l); }
 #define LittleLong
-static ID_INLINE float BigFloat(const float *l) { FloatSwap(l); }
+static inline float BigFloat(const float *l) { FloatSwap(l); }
 #define LittleFloat
 
 #define	PATH_SEP '\\'
@@ -168,7 +166,6 @@ static ID_INLINE float BigFloat(const float *l) { FloatSwap(l); }
 #define __cdecl
 #define __declspec(x)
 #define stricmp strcasecmp
-#define ID_INLINE inline 
 
 #ifdef __ppc__
 #define CPUSTRING	"MacOSX-ppc"
@@ -220,7 +217,6 @@ static inline float LittleFloat (const float l) { return FloatSwap(&l); }
 
 #include <MacTypes.h>
 #define	MAC_STATIC
-#define ID_INLINE inline 
 
 #define	CPUSTRING	"MacOS-PPC"
 
@@ -247,7 +243,6 @@ static inline float LittleFloat (const float l) { return FloatSwap(&l); }
 #define stricmp strcasecmp
 
 #define	MAC_STATIC // bk: FIXME
-#define ID_INLINE inline 
 
 #ifdef __i386__
 #define	CPUSTRING	"linux-i386"
@@ -258,14 +253,6 @@ static inline float LittleFloat (const float l) { return FloatSwap(&l); }
 #endif
 
 #define	PATH_SEP '/'
-
-// bk001205 - try
-#ifdef Q3_STATIC
-//#define	GAME_HARD_LINKED
-//#define	CGAME_HARD_LINKED
-//#define	UI_HARD_LINKED
-#define	BOTLIB_HARD_LINKED
-#endif
 
 #if !idppc
 inline static short BigShort( short l) { return ShortSwap(l); }
@@ -291,7 +278,6 @@ inline static float LittleFloat (const float *l) { return FloatSwap(l); }
 #define stricmp strcasecmp
 
 #define MAC_STATIC
-#define ID_INLINE inline 
 
 #ifdef __i386__
 #define CPUSTRING       "freebsd-i386"
@@ -631,7 +617,6 @@ typedef struct {
 	float	v[3];
 } vec3struct_t;
 #define VectorCopy(a,b)	(*(vec3struct_t *)b=*(vec3struct_t *)a)
-#define ID_INLINE static
 #endif
 #endif
 
@@ -643,6 +628,7 @@ typedef struct {
 #define Vector4Copy(a,b)			((b)[0]=(a)[0],(b)[1]=(a)[1],(b)[2]=(a)[2],(b)[3]=(a)[3])
 
 #define	SnapVector(v) {v[0]=((int)(v[0]));v[1]=((int)(v[1]));v[2]=((int)(v[2]));}
+
 // just in case you do't want to use the macros
 vec_t _DotProduct( const vec3_t v1, const vec3_t v2 );
 void _VectorSubtract( const vec3_t veca, const vec3_t vecb, vec3_t out );
@@ -661,29 +647,29 @@ void ClearBounds( vec3_t mins, vec3_t maxs );
 void AddPointToBounds( const vec3_t v, vec3_t mins, vec3_t maxs );
 
 #ifndef __LCC__
-static ID_INLINE int VectorCompare( const vec3_t v1, const vec3_t v2 ) {
+static inline int VectorCompare( const vec3_t v1, const vec3_t v2 ) {
 	if (v1[0] != v2[0] || v1[1] != v2[1] || v1[2] != v2[2]) {
 		return 0;
 	}			
 	return 1;
 }
 
-static ID_INLINE vec_t VectorLength( const vec3_t v ) {
+static inline vec_t VectorLength( const vec3_t v ) {
 	return (vec_t)sqrt (v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
 }
 
-static ID_INLINE vec_t VectorLengthSquared( const vec3_t v ) {
+static inline vec_t VectorLengthSquared( const vec3_t v ) {
 	return (v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
 }
 
-static ID_INLINE vec_t Distance( const vec3_t p1, const vec3_t p2 ) {
+static inline vec_t Distance( const vec3_t p1, const vec3_t p2 ) {
 	vec3_t	v;
 
 	VectorSubtract (p2, p1, v);
 	return VectorLength( v );
 }
 
-static ID_INLINE vec_t DistanceSquared( const vec3_t p1, const vec3_t p2 ) {
+static inline vec_t DistanceSquared( const vec3_t p1, const vec3_t p2 ) {
 	vec3_t	v;
 
 	VectorSubtract (p2, p1, v);
@@ -692,7 +678,7 @@ static ID_INLINE vec_t DistanceSquared( const vec3_t p1, const vec3_t p2 ) {
 
 // fast vector normalize routine that does not check to make sure
 // that length != 0, nor does it return length, uses rsqrt approximation
-static ID_INLINE void VectorNormalizeFast( vec3_t v )
+static inline void VectorNormalizeFast( vec3_t v )
 {
 	float ilength;
 
@@ -703,13 +689,13 @@ static ID_INLINE void VectorNormalizeFast( vec3_t v )
 	v[2] *= ilength;
 }
 
-static ID_INLINE void VectorInverse( vec3_t v ){
+static inline void VectorInverse( vec3_t v ){
 	v[0] = -v[0];
 	v[1] = -v[1];
 	v[2] = -v[2];
 }
 
-static ID_INLINE void CrossProduct( const vec3_t v1, const vec3_t v2, vec3_t cross ) {
+static inline void CrossProduct( const vec3_t v1, const vec3_t v2, vec3_t cross ) {
 	cross[0] = v1[1]*v2[2] - v1[2]*v2[1];
 	cross[1] = v1[2]*v2[0] - v1[0]*v2[2];
 	cross[2] = v1[0]*v2[1] - v1[1]*v2[0];
