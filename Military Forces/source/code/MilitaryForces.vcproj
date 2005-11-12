@@ -1209,9 +1209,6 @@
 				RelativePath="game\bg_public.h">
 			</File>
 			<File
-				RelativePath="cgame\cg_public.h">
-			</File>
-			<File
 				RelativePath="client\client.h">
 			</File>
 			<File
