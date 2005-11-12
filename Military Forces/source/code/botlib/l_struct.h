@@ -20,15 +20,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-/*****************************************************************************
- * name:		l_struct.h
- *
- * desc:		structure reading/writing
- *
- * $Archive: /source/code/botlib/l_struct.h $
- *
- *****************************************************************************/
-
 #ifndef __L_STRUCT_H__
 #define __L_STRUCT_H__
 

@@ -402,9 +402,6 @@
 				RelativePath=".\inv.h">
 			</File>
 			<File
-				RelativePath=".\q_shared.h">
-			</File>
-			<File
 				RelativePath=".\surfaceflags.h">
 			</File>
 			<File

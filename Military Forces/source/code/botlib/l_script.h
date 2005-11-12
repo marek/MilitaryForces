@@ -20,15 +20,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-/*****************************************************************************
- * name:		l_script.h
- *
- * desc:		lexicographical parser
- *
- * $Archive: /source/code/botlib/l_script.h $
- *
- *****************************************************************************/
-
 #ifndef __L_SCRIPT_H__
 #define __L_SCRIPT_H__
 

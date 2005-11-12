@@ -741,9 +741,6 @@
 				RelativePath="..\win32\glw_win.h">
 			</File>
 			<File
-				RelativePath="..\game\q_shared.h">
-			</File>
-			<File
 				RelativePath="..\qcommon\qcommon.h">
 			</File>
 			<File

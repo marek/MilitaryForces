@@ -278,9 +278,6 @@
 				RelativePath=".\cg_snapshot.c">
 			</File>
 			<File
-				RelativePath=".\cg_syscalls.c">
-			</File>
-			<File
 				RelativePath=".\cg_testmodel.c">
 			</File>
 			<File
@@ -325,9 +322,6 @@
 			</File>
 			<File
 				RelativePath=".\cg_public.h">
-			</File>
-			<File
-				RelativePath="..\game\q_shared.h">
 			</File>
 			<File
 				RelativePath="..\game\surfaceflags.h">

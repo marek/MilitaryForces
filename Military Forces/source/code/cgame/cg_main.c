@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.11 2005-11-12 14:28:13 thebjoern Exp $
+ * $Id: cg_main.c,v 1.12 2005-11-12 21:26:16 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -389,7 +389,8 @@ static void CG_ForceModelChange( void ) {
 CG_UpdateCvars
 =================
 */
-void CG_UpdateCvars( void ) {
+void CG_UpdateCvars( void ) 
+{
 	int			i;
 	cvarTable_t	*cv;
 
@@ -401,12 +402,16 @@ void CG_UpdateCvars( void ) {
 
 	// If team overlay is on, ask for updates from the server.  If its off,
 	// let the server know so we don't receive it
-	if ( drawTeamOverlayModificationCount != cg_drawTeamOverlay.modificationCount ) {
+	if ( drawTeamOverlayModificationCount != cg_drawTeamOverlay.modificationCount ) 
+	{
 		drawTeamOverlayModificationCount = cg_drawTeamOverlay.modificationCount;
 
-		if ( cg_drawTeamOverlay.integer > 0 ) {
+		if ( cg_drawTeamOverlay.integer > 0 ) 
+		{
 			trap_Cvar_Set( "teamoverlay", "1" );
-		} else {
+		} 
+		else 
+		{
 			trap_Cvar_Set( "teamoverlay", "0" );
 		}
 		// FIXME E3 HACK
@@ -414,28 +419,32 @@ void CG_UpdateCvars( void ) {
 	}
 
 	// if force model changed
-	if ( forceModelModificationCount != cg_forceModel.modificationCount ) {
+	if ( forceModelModificationCount != cg_forceModel.modificationCount ) 
+	{
 		forceModelModificationCount = cg_forceModel.modificationCount;
 		CG_ForceModelChange();
 	}
 	cg.tracernum = (cg_tracer.integer > 0) ? cg_tracer.integer : 3;
 }
 
-int CG_CrosshairPlayer( void ) {
-	if ( cg.time > ( cg.crosshairClientTime + 1000 ) ) {
+int CG_CrosshairPlayer( void ) 
+{
+	if ( cg.time > ( cg.crosshairClientTime + 1000 ) )
 		return -1;
-	}
+	
 	return cg.crosshairClientNum;
 }
 
-int CG_LastAttacker( void ) {
-	if ( !cg.attackerTime ) {
+int CG_LastAttacker( void ) 
+{
+	if ( !cg.attackerTime ) 
 		return -1;
-	}
+
 	return cg.snap->ps.persistant[PERS_ATTACKER];
 }
 
-void QDECL CG_Printf( const char *msg, ... ) {
+void QDECL CG_Printf( const char *msg, ... ) 
+{
 	va_list		argptr;
 	char		text[1024];
 
@@ -450,7 +459,8 @@ void QDECL CG_Printf( const char *msg, ... ) {
 	trap_Print( text );
 }
 
-void QDECL CG_Error( const char *msg, ... ) {
+void QDECL CG_Error( const char *msg, ... ) 
+{
 	va_list		argptr;
 	char		text[1024];
 
@@ -461,39 +471,13 @@ void QDECL CG_Error( const char *msg, ... ) {
 	trap_Error( text );
 }
 
-//#ifndef CGAME_HARD_LINKED
-//// this is only here so the functions in q_shared.c and bg_*.c can link (FIXME)
-//
-//void QDECL Com_Error( int level, const char *error, ... ) {
-//	va_list		argptr;
-//	char		text[1024];
-//
-//	va_start (argptr, error);
-//	vsprintf (text, error, argptr);
-//	va_end (argptr);
-//
-//	CG_Error( "%s", text);
-//}
-//
-//void QDECL Com_Printf( const char *msg, ... ) {
-//	va_list		argptr;
-//	char		text[1024];
-//
-//	va_start (argptr, msg);
-//	vsprintf (text, msg, argptr);
-//	va_end (argptr);
-//
-//	CG_Printf ("%s", text);
-//}
-//
-//#endif
-
 /*
 ================
 CG_Argv
 ================
 */
-const char *CG_Argv( int arg ) {
+const char *CG_Argv( int arg ) 
+{
 	static char	buffer[MAX_STRING_CHARS];
 
 	trap_Argv( arg, buffer, sizeof( buffer ) );

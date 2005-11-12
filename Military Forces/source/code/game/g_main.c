@@ -492,41 +492,13 @@ void G_ShutdownGame() {
 	// write all the client session data so we can get it back
 	G_WriteSessionData();
 
-//	if ( trap_Cvar_VariableIntegerValue( "bot_enable" ) ) {
-//		BotAIShutdown( restart );
-//	}
 }
 
 
 
 //===================================================================
 
-//#ifndef GAME_HARD_LINKED
-//// this is only here so the functions in q_shared.c and bg_*.c can link
-//
-//void QDECL Com_Error ( int level, const char *error, ... ) {
-//	va_list		argptr;
-//	char		text[1024];
-//
-//	va_start (argptr, error);
-//	vsprintf (text, error, argptr);
-//	va_end (argptr);
-//
-//	G_Error( "%s", text);
-//}
-//
-//void QDECL Com_Printf( const char *msg, ... ) {
-//	va_list		argptr;
-//	char		text[1024];
-//
-//	va_start (argptr, msg);
-//	vsprintf (text, msg, argptr);
-//	va_end (argptr);
-//
-//	G_Printf ("%s", text);
-//}
-//
-//#endif
+
 
 /*
 ========================================================================

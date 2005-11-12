@@ -131,9 +131,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define	PATH_SEP	'/'
 
-#define	GAME_HARD_LINKED
-//#define	CGAME_HARD_LINKED
-//#define	UI_HARD_LINKED
 #define _alloca alloca
 
 #undef ALIGN_ON
@@ -207,9 +204,6 @@ void Sys_PumpEvents( void );
 
 // bk001205 - try
 #ifdef Q3_STATIC
-#define	GAME_HARD_LINKED
-//#define	CGAME_HARD_LINKED
-//#define	UI_HARD_LINKED
 #define	BOTLIB_HARD_LINKED
 #endif
 
