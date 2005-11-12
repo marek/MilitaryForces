@@ -328,7 +328,6 @@ sharedEntity_t *SV_GentityNum( int num );
 playerState_t *SV_GameClientNum( int num );
 svEntity_t	*SV_SvEntityForGentity( const entityState_t* s, const entityShared_t* r);
 sharedEntity_t *SV_GEntityForSvEntity( svEntity_t *svEnt );
-void SV_InitGameProgs ( void );
 void SV_ShutdownGameProgs ( void );
 void SV_RestartGameProgs( void );
 bool SV_inPVS (const vec3_t p1, const vec3_t p2);

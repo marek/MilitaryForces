@@ -341,9 +341,6 @@
 				RelativePath=".\g_svcmds.c">
 			</File>
 			<File
-				RelativePath=".\g_syscalls.c">
-			</File>
-			<File
 				RelativePath=".\g_target.c">
 			</File>
 			<File
@@ -418,9 +415,6 @@
 			Name="Resource Files"
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe">
 		</Filter>
-		<File
-			RelativePath=".\g_syscalls.asm">
-		</File>
 	</Files>
 	<Globals>
 	</Globals>
