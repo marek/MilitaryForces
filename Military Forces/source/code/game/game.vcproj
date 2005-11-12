@@ -22,6 +22,7 @@
 				Optimization="0"
 				OptimizeForProcessor="0"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_WINDOWS"
+				ExceptionHandling="FALSE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				RuntimeTypeInfo="TRUE"
@@ -34,7 +35,8 @@
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
 				DebugInformationFormat="3"
-				CompileAs="2"/>
+				CompileAs="2"
+				DisableSpecificWarnings="4530"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -81,6 +83,7 @@
 				OptimizeForProcessor="2"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_WINDOWS"
 				StringPooling="TRUE"
+				ExceptionHandling="FALSE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="TRUE"
 				RuntimeTypeInfo="TRUE"
@@ -91,7 +94,8 @@
 				ProgramDataBaseFileName="$(IntDir)\"
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
-				CompileAs="2"/>
+				CompileAs="2"
+				DisableSpecificWarnings="4530"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -137,6 +141,7 @@
 				OptimizeForProcessor="0"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_WINDOWS"
 				StringPooling="FALSE"
+				ExceptionHandling="FALSE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				EnableFunctionLevelLinking="FALSE"
@@ -150,7 +155,8 @@
 				WarningLevel="4"
 				SuppressStartupBanner="TRUE"
 				DebugInformationFormat="3"
-				CompileAs="2"/>
+				CompileAs="2"
+				DisableSpecificWarnings="4530"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool

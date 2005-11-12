@@ -26,6 +26,7 @@
 				Optimization="0"
 				OptimizeForProcessor="1"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
+				ExceptionHandling="FALSE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				RuntimeTypeInfo="TRUE"
@@ -101,6 +102,7 @@
 				OptimizeForProcessor="2"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				StringPooling="TRUE"
+				ExceptionHandling="FALSE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="TRUE"
 				RuntimeTypeInfo="TRUE"
@@ -171,6 +173,7 @@
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				IgnoreStandardIncludePath="FALSE"
 				StringPooling="FALSE"
+				ExceptionHandling="FALSE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				EnableFunctionLevelLinking="FALSE"
@@ -1264,9 +1267,6 @@
 			</File>
 			<File
 				RelativePath="renderer\tr_public.h">
-			</File>
-			<File
-				RelativePath="cgame\tr_types.h">
 			</File>
 			<File
 				RelativePath="ui\ui_public.h">

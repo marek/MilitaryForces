@@ -1,5 +1,5 @@
 /*
- * $Id: ui_gameinfo.c,v 1.4 2005-10-28 13:07:04 thebjoern Exp $
+ * $Id: ui_gameinfo.c,v 1.5 2005-11-12 14:28:14 thebjoern Exp $
 */
 //
 // gameinfo.c
@@ -72,7 +72,8 @@ int UI_ParseInfos( char *buf, int max, char *infos[] )
 			Info_SetValueForKey( info, key, token );
 		}
 		//NOTE: extra space for arena number
-		infos[count] = reinterpret_cast<char*>(UI_Alloc(strlen(info) + strlen("\\num\\") + strlen(va("%d", MAX_ARENAS)) + 1));
+		infos[count] = reinterpret_cast<char*>(uiInfo.uiUtils.alloc(strlen(info) + strlen("\\num\\") + 
+			strlen(va("%d", MAX_ARENAS)) + 1));
 		if (infos[count]) 
 		{
 			strcpy(infos[count], info);
@@ -159,7 +160,7 @@ void UI_LoadArenas( void ) {
 		UI_LoadArenasFromFile(filename);
 	}
 	trap_Print( va( "%i arenas parsed\n", ui_numArenas ) );
-	if (UI_OutOfMemory()) {
+	if (uiInfo.uiUtils.outOfMemory()) {
 		trap_Print(S_COLOR_YELLOW"WARNING: not anough memory in pool to load all arenas\n");
 	}
 
@@ -176,10 +177,10 @@ void UI_LoadArenas( void ) {
 		// determine type
 
 		uiInfo.mapList[uiInfo.mapCount].cinematic = -1;
-		uiInfo.mapList[uiInfo.mapCount].mapLoadName = String_Alloc(Info_ValueForKey(ui_arenaInfos[n], "map"));
-		uiInfo.mapList[uiInfo.mapCount].mapName = String_Alloc(Info_ValueForKey(ui_arenaInfos[n], "longname"));
+		uiInfo.mapList[uiInfo.mapCount].mapLoadName = uiInfo.uiUtils.string_Alloc(Info_ValueForKey(ui_arenaInfos[n], "map"));
+		uiInfo.mapList[uiInfo.mapCount].mapName = uiInfo.uiUtils.string_Alloc(Info_ValueForKey(ui_arenaInfos[n], "longname"));
 		uiInfo.mapList[uiInfo.mapCount].levelShot = -1;
-		uiInfo.mapList[uiInfo.mapCount].imageName = String_Alloc(va("levelshots/%s", uiInfo.mapList[uiInfo.mapCount].mapLoadName));
+		uiInfo.mapList[uiInfo.mapCount].imageName = uiInfo.uiUtils.string_Alloc(va("levelshots/%s", uiInfo.mapList[uiInfo.mapCount].mapLoadName));
 		uiInfo.mapList[uiInfo.mapCount].typeBits = 0;
 
 		type = Info_ValueForKey( ui_arenaInfos[n], "type" );

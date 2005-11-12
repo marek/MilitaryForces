@@ -1,5 +1,5 @@
 /*
- * $Id: tr_types.h,v 1.4 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: tr_types.h,v 1.5 2005-11-12 14:28:13 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -55,7 +55,8 @@ typedef enum {
 	RT_MAX_REF_ENTITY_TYPE
 } refEntityType_t;
 
-typedef struct {
+struct refEntity_t 
+{
 	refEntityType_t	reType;
 	int			renderfx;
 
@@ -88,7 +89,7 @@ typedef struct {
 	// extra sprite information
 	float		radius;
 	float		rotation;
-} refEntity_t;
+};
 
 
 #define	MAX_RENDER_STRINGS			8

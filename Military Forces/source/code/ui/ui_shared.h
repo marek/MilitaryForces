@@ -1,5 +1,5 @@
 /*
- * $Id: ui_shared.h,v 1.4 2005-09-02 08:00:21 thebjoern Exp $
+ * $Id: ui_shared.h,v 1.5 2005-11-12 14:28:14 thebjoern Exp $
 */
 #ifndef __UI_SHARED_H__
 #define __UI_SHARED_H__
@@ -48,64 +48,10 @@ typedef enum {
 } textJustify_t;
 
 // simple timing macros
-#define CG_FRAME_SECOND_FRACTION (cg.frametime/1000.0f)
-#define UI_FRAME_SECOND_FRACTION (uiInfo.uiDC.frameTime/1000.0f)
+//#define CG_FRAME_SECOND_FRACTION (cg.frametime/1000.0f)
+//#define UI_FRAME_SECOND_FRACTION (uiInfo.dcUI.frameTime_/1000.0f)
 
-// bindable actions
-#define ID_SHOWSCORES	0
-#define ID_FORWARD		1	
-#define ID_BACKPEDAL	2
-#define ID_MOVELEFT		3
-#define ID_MOVERIGHT	4
-#define ID_MOVEUP		5	
-#define ID_MOVEDOWN		6
-#define ID_LEFT			7	
-#define ID_RIGHT		8	
-#define ID_LOOKUP		9	
-#define ID_LOOKDOWN		10
-#define ID_ZOOMVIEW		11
-#define ID_ATTACK		12
-#define ID_ATTACK2		13
-#define ID_WEAPPREV		14
-#define ID_WEAPNEXT		15
-#define ID_CHAT			16
-#define ID_CHAT2		17
-#define ID_CHAT3		18
-#define ID_CHAT4		19
 
-// mfq3 specific bindable actions
-#define ID_GEAR			20
-#define ID_BRAKE		21
-#define ID_FREECAM		22
-#define ID_INCREASE		23
-#define ID_DECREASE		24
-#define ID_WEAPON_MG	25
-#define ID_WEAPON_1		26
-#define ID_WEAPON_2		27
-#define ID_WEAPON_3		28
-#define ID_WEAPON_4		29
-#define ID_WEAPON_5		30
-#define ID_WEAPON_6		31
-#define ID_WEAPON_FLARE	32
-#define ID_ENCYC		33
-#define ID_VEHSEL		34
-#define ID_GPS			35
-#define ID_TOGGLEVIEW	36
-#define ID_CAMERAUP		37
-#define ID_CAMERADOWN	38
-#define ID_ZOOMIN		39
-#define ID_ZOOMOUT		40
-#define ID_CONTACTTOWER 41
-#define ID_RADAR		42
-#define ID_EXTINFO		43
-#define ID_RADARRANGE	44
-#define ID_UNLOCK		45
-#define ID_TEAMSEL		46
-#define	ID_SPEEDUP		47
-#define	ID_BOMBCAMERA	48
-#define	ID_CYCLEMFD1	49
-#define	ID_CYCLEMFD2	50
-#define ID_EJECT		51
 
 #define MAX_MENUNAME 32
 #define MAX_ITEMTEXT 64
@@ -190,12 +136,13 @@ typedef struct {
 } scriptDef_t;
 
 
-typedef struct {
-  float x;    // horiz position
-  float y;    // vert position
-  float w;    // width
-  float h;    // height;
-} rectDef_t;
+struct rectDef_t
+{
+	float x;    // horiz position
+	float y;    // vert position
+	float w;    // width
+	float h;    // height;
+} ;
 
 typedef rectDef_t Rectangle;
 
@@ -297,7 +244,8 @@ typedef struct modelDef_s {
 #define CVAR_SHOW			0x00000004
 #define CVAR_HIDE			0x00000008
 
-typedef struct itemDef_s {
+struct itemDef_t 
+{
   Window window;                 // common positional, border, style, layout info
   Rectangle textRect;            // rectangle the text ( if any ) consumes     
   int type;                      // text, button, radiobutton, checkbox, textfield, listbox, combo
@@ -327,7 +275,7 @@ typedef struct itemDef_s {
 	float special;								 // used for feeder id's etc.. diff per type
   int cursorPos;                 // cursor position in characters
 	void *typeData;								 // type specific data ptr's	
-} itemDef_t;
+};
 
 typedef struct {
   Window window;
@@ -349,7 +297,8 @@ typedef struct {
   itemDef_t *items[MAX_MENUITEMS];	// items this menu contains   
 } menuDef_t;
 
-typedef struct {
+struct cachedAssets_t
+{
   const char *fontStr;
   const char *cursorStr;
   const char *cursorStrWait;
@@ -392,140 +341,142 @@ typedef struct {
   qhandle_t fxBasePic;
   qhandle_t fxPic[7];
   qhandle_t	crosshairShader[NUM_CROSSHAIRS];
+};
 
-} cachedAssets_t;
+//struct commandDef_t 
+//{
+//	const char *name;
+//	void (*handler) (itemDef_t *item, char** args);
+//};
 
-typedef struct {
-  const char *name;
-  void (*handler) (itemDef_t *item, char** args);
-} commandDef_t;
+//typedef struct {
+//  qhandle_t (*registerShaderNoMip) (const char *p);
+//  void (*setColor) (const vec4_t v);
+//  void (*drawHandlePic) (float x, float y, float w, float h, qhandle_t asset);
+//  void (*drawStretchPic) (float x, float y, float w, float h, float s1, float t1, float s2, float t2, qhandle_t hShader );
+//  void (*drawText) (float x, float y, float scale, const vec4_t color, const char *text, float adjust, int limit, int style );
+//  int (*textWidth) (const char *text, float scale, int limit);
+//  int (*textHeight) (const char *text, float scale, int limit);
+//  qhandle_t (*registerModel) (const char *p);
+//  void (*modelBounds) (qhandle_t model, vec3_t min, vec3_t max);
+//  void (*fillRect) ( float x, float y, float w, float h, const vec4_t color);
+//  void (*drawRect) ( float x, float y, float w, float h, float size, const vec4_t color);
+//  void (*drawSides) (float x, float y, float w, float h, float size);
+//  void (*drawTopBottom) (float x, float y, float w, float h, float size);
+//  void (*clearScene) ();
+//  void (*addRefEntityToScene) (const refEntity_t *re );
+//  void (*renderScene) ( const refdef_t *fd );
+//  void (*registerFont) (const char *pFontname, int pointSize, fontInfo_t *font);
+//  void (*ownerDrawItem) (float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, int ownerDrawFlags, int align, float special, float scale, const vec4_t color, qhandle_t shader, int textStyle, itemDef_t *item);
+//	float (*getValue) (int ownerDraw);
+//	bool (*ownerDrawVisible) (int flags);
+//  void (*runScript)(char **p);
+//  void (*getTeamColor)(vec4_t *color);
+//  void (*getCVarString)(const char *cvar, char *buffer, int bufsize);
+//  float (*getCVarValue)(const char *cvar);
+//  void (*setCVar)(const char *cvar, const char *value);
+//  void (*drawTextWithCursor)(float x, float y, float scale, const vec4_t color, const char *text, int cursorPos, char cursor, int limit, int style);
+//  void (*setOverstrikeMode)(bool b);
+//  int (*getOverstrikeMode)();
+//  void (*startLocalSound)( sfxHandle_t sfx, int channelNum );
+//  bool (*ownerDrawHandleKey)(int ownerDraw, int flags, float *special, int key);
+//  int (*feederCount)(float feederID);
+//  const char *(*feederItemText)(float feederID, int index, int column, qhandle_t *handle);
+//  qhandle_t (*feederItemImage)(float feederID, int index);
+//  void (*feederSelection)(float feederID, int index);
+//	void (*keynumToStringBuf)( int keynum, char *buf, int buflen );
+//	void (*getBindingBuf)( int keynum, char *buf, int buflen );
+//	void (*setBinding)( int keynum, const char *binding );
+//	void (*executeText)(int exec_when, const char *text );	
+//	void (*Error)(int level, const char *error, ...);
+//	void (*Print)(const char *msg, ...);
+//	void (*Pause)(bool b);
+//	int (*ownerDrawWidth)(int ownerDraw, float scale);
+//	sfxHandle_t (*registerSound)(const char *name, bool compressed);
+//	void (*startBackgroundTrack)( const char *intro, const char *loop);
+//	void (*stopBackgroundTrack)();
+//	int (*playCinematic)(const char *name, float x, float y, float w, float h);
+//	void (*stopCinematic)(int handle);
+//	void (*drawCinematic)(int handle, float x, float y, float w, float h);
+//	void (*runCinematicFrame)(int handle);
+//
+//  float			yscale;
+//  float			xscale;
+//  float			bias;
+//  int				realTime;
+//  int				frameTime;
+//	int				cursorx;
+//	int				cursory;
+//	int				cursorEnum;
+//	bool	debug;
+//
+//  cachedAssets_t Assets;
+//
+//	glconfig_t glconfig;
+//	qhandle_t	whiteShader;
+//  qhandle_t gradientImage;
+//  qhandle_t cursor;
+//	float FPS;
+//
+//} displayContextDef_t;
 
-typedef struct {
-  qhandle_t (*registerShaderNoMip) (const char *p);
-  void (*setColor) (const vec4_t v);
-  void (*drawHandlePic) (float x, float y, float w, float h, qhandle_t asset);
-  void (*drawStretchPic) (float x, float y, float w, float h, float s1, float t1, float s2, float t2, qhandle_t hShader );
-  void (*drawText) (float x, float y, float scale, vec4_t color, const char *text, float adjust, int limit, int style );
-  int (*textWidth) (const char *text, float scale, int limit);
-  int (*textHeight) (const char *text, float scale, int limit);
-  qhandle_t (*registerModel) (const char *p);
-  void (*modelBounds) (qhandle_t model, vec3_t min, vec3_t max);
-  void (*fillRect) ( float x, float y, float w, float h, const vec4_t color);
-  void (*drawRect) ( float x, float y, float w, float h, float size, const vec4_t color);
-  void (*drawSides) (float x, float y, float w, float h, float size);
-  void (*drawTopBottom) (float x, float y, float w, float h, float size);
-  void (*clearScene) ();
-  void (*addRefEntityToScene) (const refEntity_t *re );
-  void (*renderScene) ( const refdef_t *fd );
-  void (*registerFont) (const char *pFontname, int pointSize, fontInfo_t *font);
-  void (*ownerDrawItem) (float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, int ownerDrawFlags, int align, float special, float scale, vec4_t color, qhandle_t shader, int textStyle, itemDef_t *item);
-	float (*getValue) (int ownerDraw);
-	bool (*ownerDrawVisible) (int flags);
-  void (*runScript)(char **p);
-  void (*getTeamColor)(vec4_t *color);
-  void (*getCVarString)(const char *cvar, char *buffer, int bufsize);
-  float (*getCVarValue)(const char *cvar);
-  void (*setCVar)(const char *cvar, const char *value);
-  void (*drawTextWithCursor)(float x, float y, float scale, vec4_t color, const char *text, int cursorPos, char cursor, int limit, int style);
-  void (*setOverstrikeMode)(bool b);
-  int (*getOverstrikeMode)();
-  void (*startLocalSound)( sfxHandle_t sfx, int channelNum );
-  bool (*ownerDrawHandleKey)(int ownerDraw, int flags, float *special, int key);
-  int (*feederCount)(float feederID);
-  const char *(*feederItemText)(float feederID, int index, int column, qhandle_t *handle);
-  qhandle_t (*feederItemImage)(float feederID, int index);
-  void (*feederSelection)(float feederID, int index);
-	void (*keynumToStringBuf)( int keynum, char *buf, int buflen );
-	void (*getBindingBuf)( int keynum, char *buf, int buflen );
-	void (*setBinding)( int keynum, const char *binding );
-	void (*executeText)(int exec_when, const char *text );	
-	void (*Error)(int level, const char *error, ...);
-	void (*Print)(const char *msg, ...);
-	void (*Pause)(bool b);
-	int (*ownerDrawWidth)(int ownerDraw, float scale);
-	sfxHandle_t (*registerSound)(const char *name, bool compressed);
-	void (*startBackgroundTrack)( const char *intro, const char *loop);
-	void (*stopBackgroundTrack)();
-	int (*playCinematic)(const char *name, float x, float y, float w, float h);
-	void (*stopCinematic)(int handle);
-	void (*drawCinematic)(int handle, float x, float y, float w, float h);
-	void (*runCinematicFrame)(int handle);
+//struct UI_DisplayContext;
+//
+//const char *String_Alloc(const char *p);
+//void String_Init();
+//void String_Report();
+//void Init_Display(UI_DisplayContext* dc);
+//void Display_ExpandMacros(char * buff);
+//void Menu_Init(menuDef_t *menu);
+//void Item_Init(itemDef_t *item);
+//void Menu_PostParse(menuDef_t *menu);
+//menuDef_t *Menu_GetFocused();
+//void Menu_HandleKey(menuDef_t *menu, int key, int down);
+//void Menu_HandleMouseMove(menuDef_t *menu, float x, float y);
+//void Menu_ScrollFeeder(menuDef_t *menu, int feeder, int down);
+//bool Float_Parse(char **p, float *f);
+//bool Color_Parse(char **p, vec4_t *c);
+//bool Int_Parse(char **p, int *i);
+//bool Rect_Parse(char **p, rectDef_t *r);
+//bool String_Parse(char **p, const char **out);
+//bool Script_Parse(char **p, const char **out);
+//bool PC_Float_Parse(int handle, float *f);
+//bool PC_Color_Parse(int handle, vec4_t *c);
+//bool PC_Int_Parse(int handle, int *i);
+//bool PC_Rect_Parse(int handle, rectDef_t *r);
+//bool PC_String_Parse(int handle, const char **out);
+//bool PC_Script_Parse(int handle, const char **out);
+//int Menu_Count();
+//void Menu_New(int handle);
+//void Menu_PaintAll();
+//menuDef_t *Menus_ActivateByName(const char *p);
+//void Menu_Reset();
+//bool Menus_AnyFullScreenVisible();
+//void  Menus_Activate(menuDef_t *menu);
 
-  float			yscale;
-  float			xscale;
-  float			bias;
-  int				realTime;
-  int				frameTime;
-	int				cursorx;
-	int				cursory;
-	int				cursorEnum;
-	bool	debug;
+//UI_DisplayContext* Display_GetContext();
+//void *Display_CaptureItem(int x, int y);
+//bool Display_MouseMove(void *p, int x, int y);
+//int Display_CursorType(int x, int y);
+//bool Display_KeyBindPending();
+//void Menus_OpenByName(const char *p);
+//menuDef_t *Menus_FindByName(const char *p);
+//void Menus_ShowByName(const char *p);
+//void Menus_CloseByName(const char *p);
+//void Display_HandleKey(int key, bool down, int x, int y);
+//void LerpColor(const vec4_t a, const vec4_t b, vec4_t c, float t);
+//void Menus_CloseAll();
+//void Menu_Paint(menuDef_t *menu, bool forcePaint);
+//void Menu_SetFeederSelection(menuDef_t *menu, int feeder, int index, const char *name);
+//void Display_CacheAll();
 
-  cachedAssets_t Assets;
+//void *UI_Alloc( int size );
+//void UI_InitMemory( void );
+//int UI_OutOfMemory();
 
-	glconfig_t glconfig;
-	qhandle_t	whiteShader;
-  qhandle_t gradientImage;
-  qhandle_t cursor;
-	float FPS;
-
-} displayContextDef_t;
-
-const char *String_Alloc(const char *p);
-void String_Init();
-void String_Report();
-void Init_Display(displayContextDef_t *dc);
-void Display_ExpandMacros(char * buff);
-void Menu_Init(menuDef_t *menu);
-void Item_Init(itemDef_t *item);
-void Menu_PostParse(menuDef_t *menu);
-menuDef_t *Menu_GetFocused();
-void Menu_HandleKey(menuDef_t *menu, int key, int down);
-void Menu_HandleMouseMove(menuDef_t *menu, float x, float y);
-void Menu_ScrollFeeder(menuDef_t *menu, int feeder, int down);
-bool Float_Parse(char **p, float *f);
-bool Color_Parse(char **p, vec4_t *c);
-bool Int_Parse(char **p, int *i);
-bool Rect_Parse(char **p, rectDef_t *r);
-bool String_Parse(char **p, const char **out);
-bool Script_Parse(char **p, const char **out);
-bool PC_Float_Parse(int handle, float *f);
-bool PC_Color_Parse(int handle, vec4_t *c);
-bool PC_Int_Parse(int handle, int *i);
-bool PC_Rect_Parse(int handle, rectDef_t *r);
-bool PC_String_Parse(int handle, const char **out);
-bool PC_Script_Parse(int handle, const char **out);
-int Menu_Count();
-void Menu_New(int handle);
-void Menu_PaintAll();
-menuDef_t *Menus_ActivateByName(const char *p);
-void Menu_Reset();
-bool Menus_AnyFullScreenVisible();
-void  Menus_Activate(menuDef_t *menu);
-
-displayContextDef_t *Display_GetContext();
-void *Display_CaptureItem(int x, int y);
-bool Display_MouseMove(void *p, int x, int y);
-int Display_CursorType(int x, int y);
-bool Display_KeyBindPending();
-void Menus_OpenByName(const char *p);
-menuDef_t *Menus_FindByName(const char *p);
-void Menus_ShowByName(const char *p);
-void Menus_CloseByName(const char *p);
-void Display_HandleKey(int key, bool down, int x, int y);
-void LerpColor(vec4_t a, vec4_t b, vec4_t c, float t);
-void Menus_CloseAll();
-void Menu_Paint(menuDef_t *menu, bool forcePaint);
-void Menu_SetFeederSelection(menuDef_t *menu, int feeder, int index, const char *name);
-void Display_CacheAll();
-
-void *UI_Alloc( int size );
-void UI_InitMemory( void );
-int UI_OutOfMemory();
-
-void Controls_GetConfig( void );
-void Controls_SetConfig(bool restart);
-void Controls_SetDefaults( void );
+//void Controls_GetConfig( void );
+//void Controls_SetConfig(bool restart);
+//void Controls_SetDefaults( void );
 
 int			trap_PC_AddGlobalDefine( char *define );
 int			trap_PC_LoadSource( const char *filename );
@@ -533,17 +484,16 @@ int			trap_PC_FreeSource( int handle );
 int			trap_PC_ReadToken( int handle, pc_token_t *pc_token );
 int			trap_PC_SourceFileAndLine( int handle, char *filename, int *line );
 
-void GradientBar_Paint(rectDef_t *rect, vec4_t color);
-void VerticalGradient_Paint(rectDef_t *rect, vec4_t color);
+//void VerticalGradient_Paint(rectDef_t *rect, vec4_t color);
 
-void Item_Text_AutoWrapped_Paint(itemDef_t *item);
+//void Item_Text_AutoWrapped_Paint( itemDef_t *item );
 
-vec4_t * CreateColourVector( float r, float g, float b, float a, vec4_t * pVector );
-unsigned char * CreateColourChar( unsigned char r, unsigned char g, unsigned char b, unsigned char a, unsigned char * pArray );
+//vec4_t * CreateColourVector( float r, float g, float b, float a, vec4_t * pVector );
+//unsigned char * CreateColourChar( unsigned char r, unsigned char g, unsigned char b, unsigned char a, unsigned char * pArray );
 
-void DrawStringNew( int x, int y, float scale, vec4_t colour, const char * pText, int unknown, int hSpacing, int style, textJustify_t formatting );
-void DrawStringNewAlpha( int x, int y, const char * pText, float alpha, textJustify_t formatting );
-void DrawStringNewColour( int x, int y, const char * pText, vec4_t colour, textJustify_t formatting );
-void DrawStringNewBasic( int x, int y, float scale, const char * pText );
+//void DrawStringNew( int x, int y, float scale, vec4_t colour, const char * pText, int unknown, int hSpacing, int style, textJustify_t formatting );
+//void DrawStringNewAlpha( int x, int y, const char * pText, float alpha, textJustify_t formatting );
+//void DrawStringNewColour( int x, int y, const char * pText, vec4_t colour, textJustify_t formatting );
+//void DrawStringNewBasic( int x, int y, float scale, const char * pText );
 
 #endif	// __UI_SHARED_H__

@@ -2,6 +2,7 @@
 #ifndef __BG_VEHICLEINFO_H__
 #define __BG_VEHICLEINFO_H__
 
+
 #include "bg_vehicleextra.h"
 #include "bg_datamanager.h"
 #include <string>

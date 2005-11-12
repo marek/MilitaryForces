@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.15 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: cg_local.h,v 1.16 2005-11-12 14:28:13 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -15,7 +15,7 @@
 #include "../ui/ui_shared.h"
 
 // used for 2D drawing using the shared UI code
-extern displayContextDef_t * DC;
+//extern displayContextDef_t * DC;
 
 // global client enumerations
 
@@ -1305,7 +1305,7 @@ bool CG_GenericShadow( BasicDrawInfo_t *drawInfo, float *shadowPlane );
 void CG_ResetReticles( void );
 void CG_AddReticleEntityToScene( refEntity_t * pReticle, centity_t * pTarget );
 void CG_Draw_Reticles();
-void CG_Draw_HUD_Label( int x, int y, char * pText, float alpha );
+//void CG_Draw_HUD_Label( int x, int y, char * pText, float alpha );
 localEntity_t * CG_Generic_Smoke( centity_t * cent, vec3_t smokePosition, int density );
 
 //
@@ -1324,8 +1324,10 @@ void CG_CenterPrint( const char *str, int y, int charWidth );
 void CG_DrawActive( stereoFrame_t stereoView );
 void CG_DrawFlagModel( float x, float y, float w, float h, int team, bool force2D );
 void CG_DrawTeamBackground( int x, int y, int w, int h, float alpha, int team );
-void CG_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, int ownerDrawFlags, int align, float special, float scale, vec4_t color, qhandle_t shader, int textStyle, itemDef_t * item );
-void CG_Text_Paint(float x, float y, float scale, vec4_t color, const char *text, float adjust, int limit, int style);
+void CG_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, int ownerDrawFlags, 
+				  int align, float special, float scale, const vec4_t color, qhandle_t shader, int textStyle, 
+				  itemDef_t * item );
+void CG_Text_Paint(float x, float y, float scale, const vec4_t color, const char *text, float adjust, int limit, int style);
 int CG_Text_Width(const char *text, float scale, int limit);
 int CG_Text_Height(const char *text, float scale, int limit);
 void CG_SelectPrevPlayer();

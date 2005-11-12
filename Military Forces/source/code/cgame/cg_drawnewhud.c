@@ -1,8 +1,11 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.4 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: cg_drawnewhud.c,v 1.5 2005-11-12 14:28:13 thebjoern Exp $
 */
 
 #include "cg_local.h"
+#include "ui_utils_cg.h"
+
+extern UI_UtilsCG cgUtils;
 
 
 // there are a couple of duplicate functions here
@@ -1826,14 +1829,14 @@ void CG_DrawStatusBar_MFQ3_new( void ) {
 			availableVehicles[vehicle].cat != CAT_HELO) {
 			float stallscale = 1.0f;
 			if( speed >= stallspeed && !(cent->currentState.ONOFF & OO_STALLED) ) stallscale = 2.0f - ((float)speed/(float)stallspeed);
-			DrawStringNew( 320, 360, stallscale, HUDColors[stallcolor], "STALL!", 0, 0, 3, CENTRE_JUSTIFY );
+			cgUtils.drawStringNew( 320, 360, stallscale, HUDColors[stallcolor], "STALL!", 0, 0, 3, CENTRE_JUSTIFY );
 		}
 
 		// lock warning
 		if( ps->stats[STAT_LOCKINFO] & LI_BEING_LAUNCHED ) {
-			DrawStringNew( 320, 60, 0.8f, HUDColors[HUD_RED], "LAUNCH!", 0, 0, 3, CENTRE_JUSTIFY );
+			cgUtils.drawStringNew( 320, 60, 0.8f, HUDColors[HUD_RED], "LAUNCH!", 0, 0, 3, CENTRE_JUSTIFY );
 		} else if( ps->stats[STAT_LOCKINFO] & LI_BEING_LOCKED ) {
-			DrawStringNew( 320, 60, 1.0f, HUDColors[HUD_YELLOW], "LOCK!", 0, 0, 3, CENTRE_JUSTIFY );
+			cgUtils.drawStringNew( 320, 60, 1.0f, HUDColors[HUD_YELLOW], "LOCK!", 0, 0, 3, CENTRE_JUSTIFY );
 		}
 	}
 

@@ -1,12 +1,15 @@
 /*
- * $Id: cg_drawtools.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: cg_drawtools.c,v 1.3 2005-11-12 14:28:13 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
 //
 // cg_drawtools.c -- helper functions called by cg_draw, cg_scoreboard, cg_info, etc
 #include "cg_local.h"
+#include "../ui/ui_displaycontext.h"
+#include "ui_utils_cg.h"
 
+extern UI_UtilsCG cgUtils;
 
 
 void CG_DrawProgressBar( rectDef_t *rect, vec4_t color, vec4_t textcolor, float scale, int textStyle, float progress )
@@ -1254,7 +1257,7 @@ void CG_AddReticleEntityToScene( refEntity_t * pReticle, centity_t * pTarget )
 	pReticle->renderfx |= RF_FIRST_PERSON;
 
 	// colour as TGA specified
-	CreateColourChar( 255, 255, 255, 255, &pReticle->shaderRGBA[0] );
+	cgUtils.createColourChar( 255, 255, 255, 255, &pReticle->shaderRGBA[0] );
 
 	// don't add reticles when not drawing main view
 	if( !cg.drawingMFD )
@@ -1342,7 +1345,7 @@ void CG_Parse_Reticle_Target( reticle_t * pR )
 	// draw label?
 	if( pText )
 	{
-		CG_Draw_HUD_Label( pR[0].ox, pR[0].y - HUD_LABEL_OFFSET, pText, 0.80f );
+		cgUtils.draw_HUD_Label( pR[0].ox, pR[0].y - HUD_LABEL_OFFSET, pText, 0.80f );
 	}
 }
 
@@ -1375,39 +1378,7 @@ void CG_Draw_Reticles( void )
 	}
 }
 
-/*
-================
-CG_Draw_HUD_Label
 
-Draws a HUD label (x & y defines the centre point)
-================
-*/
-
-#define HUD_LABEL_SCALE		0.25f
-#define	HUD_LABEL_TL		2
-#define	HUD_LABEL_BR		(HUD_LABEL_TL*2)
-
-void CG_Draw_HUD_Label( int x, int y, char * pText, float alpha )
-{
-	int labelWidth = 0;
-	int labelHeight = 0;
-
-	// get dimensions
-	labelWidth = DC->textWidth( pText, HUD_LABEL_SCALE, 0 );
-	labelHeight = DC->textHeight( pText, HUD_LABEL_SCALE, 0 );
-
-	// draw background
-	DC->fillRect( x-(labelWidth/2)-HUD_LABEL_TL, y-HUD_LABEL_TL,
-		labelWidth+HUD_LABEL_BR, labelHeight+HUD_LABEL_BR,
-		*CreateColourVector( 0,0,0,(0.5f * alpha),NULL ) );
-
-	DC->drawRect( x-(labelWidth/2)-HUD_LABEL_TL, y-HUD_LABEL_TL,
-		labelWidth+HUD_LABEL_BR, labelHeight+HUD_LABEL_BR,
-		1, *CreateColourVector( 0,0,0,(0.75f * alpha),NULL ) );
-
-	// draw timer string
-	DrawStringNew( x, (y+1), HUD_LABEL_SCALE, *CreateColourVector( 0,0,0,(1.0f * alpha),NULL ), pText, 0, 0, ITEM_TEXTSTYLE_NORMAL, CENTRE_JUSTIFY );
-}
 
 /*
 ================

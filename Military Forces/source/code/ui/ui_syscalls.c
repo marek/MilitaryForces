@@ -1,5 +1,5 @@
 /*
- * $Id: ui_syscalls.c,v 1.4 2005-10-28 13:07:04 thebjoern Exp $
+ * $Id: ui_syscalls.c,v 1.5 2005-11-12 14:28:14 thebjoern Exp $
 */
 #include "ui_local.h"
 #include "..\cgame\cg_public.h"
@@ -484,7 +484,7 @@ int trap_Key_IsDown( int keynum )
 	return Key_IsDown( keynum );
 }
 
-int trap_Key_GetOverstrikeMode( void ) 
+bool trap_Key_GetOverstrikeMode( void ) 
 {
 	//return syscall( UI_KEY_GETOVERSTRIKEMODE );
 	return Key_GetOverstrikeMode();

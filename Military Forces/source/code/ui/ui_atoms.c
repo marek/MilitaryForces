@@ -1,5 +1,5 @@
 /*
- * $Id: ui_atoms.c,v 1.4 2005-10-28 13:07:04 thebjoern Exp $
+ * $Id: ui_atoms.c,v 1.5 2005-11-12 14:28:14 thebjoern Exp $
 */
 
 /**********************************************************************
@@ -176,8 +176,9 @@ void UI_ClearScores() {
 
 
 
-static void	UI_Cache_f() {
-	Display_CacheAll();
+static void	UI_Cache_f() 
+{
+	uiInfo.uiUtils.display_CacheAll();
 }
 
 /*
@@ -252,7 +253,7 @@ static void UI_CalcPostGameStats() {
 
 	if  (newHigh) {
 		// if so write out the New one
-		uiInfo.newHighScoreTime = uiInfo.uiDC.realTime + 20000;
+		uiInfo.newHighScoreTime = uiInfo.uiUtils.getDisplayContext()->realTime_ + 20000;
 		if (trap_FS_FOpenFile(fileName, &f, FS_WRITE) >= 0) {
 			size = sizeof(postGameInfo_t);
 			trap_FS_Write(&size, sizeof(int), f);
@@ -262,7 +263,7 @@ static void UI_CalcPostGameStats() {
 	}
 
 	if (newInfo.time < oldInfo.time) {
-		uiInfo.newBestTime = uiInfo.uiDC.realTime + 20000;
+		uiInfo.newBestTime = uiInfo.uiUtils.getDisplayContext()->realTime_ + 20000;
 	}
  
 	// put back all the ui overrides
@@ -303,8 +304,8 @@ UI_ConsoleCommand
 bool UI_ConsoleCommand( int realTime ) {
 	char	*cmd;
 
-	uiInfo.uiDC.frameTime = realTime - uiInfo.uiDC.realTime;
-	uiInfo.uiDC.realTime = realTime;
+	uiInfo.uiUtils.getDisplayContext()->frameTime_ = realTime - uiInfo.uiUtils.getDisplayContext()->realTime_;
+	uiInfo.uiUtils.getDisplayContext()->realTime_ = realTime;
 
 	cmd = UI_Argv( 0 );
 
@@ -362,9 +363,9 @@ bool UI_ConsoleCommand( int realTime ) {
 	{
 		trap_Cvar_Set( "cl_paused", "1" );
 		trap_Key_SetCatcher( KEYCATCH_UI );
-		Menus_CloseAll();
+		uiInfo.uiUtils.menu_CloseAll();
 
-		Menus_ActivateByName( "ingame_select_team" );
+		uiInfo.uiUtils.menu_ActivateByName( "ingame_select_team" );
 
 		return true;
 	}
@@ -374,9 +375,9 @@ bool UI_ConsoleCommand( int realTime ) {
 	{
 		trap_Cvar_Set( "cl_paused", "1" );
 		trap_Key_SetCatcher( KEYCATCH_UI );
-		Menus_CloseAll();
+		uiInfo.uiUtils.menu_CloseAll();
 
-		Menus_ActivateByName( "ingame_select_vehicle" );
+		uiInfo.uiUtils.menu_ActivateByName( "ingame_select_vehicle" );
 
 		return true;
 	}
@@ -439,10 +440,10 @@ void UI_AdjustFrom640( float *x, float *y, float *w, float *h ) {
 	*h *= uiInfo.uiDC.scale;
 #endif
 
-	*x *= uiInfo.uiDC.xscale;
-	*y *= uiInfo.uiDC.yscale;
-	*w *= uiInfo.uiDC.xscale;
-	*h *= uiInfo.uiDC.yscale;
+	*x *= uiInfo.uiUtils.getDisplayContext()->xScale_;
+	*y *= uiInfo.uiUtils.getDisplayContext()->yScale_;
+	*w *= uiInfo.uiUtils.getDisplayContext()->xScale_;
+	*h *= uiInfo.uiUtils.getDisplayContext()->yScale_;
 
 }
 
@@ -491,25 +492,28 @@ UI_FillRect
 Coordinates are 640*480 virtual values
 =================
 */
-void UI_FillRect( float x, float y, float width, float height, const float *color ) {
+void UI_FillRect( float x, float y, float width, float height, const float *color ) 
+{
 	trap_R_SetColor( color );
 
 	UI_AdjustFrom640( &x, &y, &width, &height );
-	trap_R_DrawStretchPic( x, y, width, height, 0, 0, 0, 0, uiInfo.uiDC.whiteShader );
+	trap_R_DrawStretchPic( x, y, width, height, 0, 0, 0, 0, uiInfo.uiUtils.getDisplayContext()->whiteShader_ );
 
 	trap_R_SetColor( NULL );
 }
 
-void UI_DrawSides(float x, float y, float w, float h) {
+void UI_DrawSides(float x, float y, float w, float h) 
+{
 	UI_AdjustFrom640( &x, &y, &w, &h );
-	trap_R_DrawStretchPic( x, y, 1, h, 0, 0, 0, 0, uiInfo.uiDC.whiteShader );
-	trap_R_DrawStretchPic( x + w - 1, y, 1, h, 0, 0, 0, 0, uiInfo.uiDC.whiteShader );
+	trap_R_DrawStretchPic( x, y, 1, h, 0, 0, 0, 0, uiInfo.uiUtils.getDisplayContext()->whiteShader_ );
+	trap_R_DrawStretchPic( x + w - 1, y, 1, h, 0, 0, 0, 0, uiInfo.uiUtils.getDisplayContext()->whiteShader_ );
 }
 
-void UI_DrawTopBottom(float x, float y, float w, float h) {
+void UI_DrawTopBottom(float x, float y, float w, float h) 
+{
 	UI_AdjustFrom640( &x, &y, &w, &h );
-	trap_R_DrawStretchPic( x, y, w, 1, 0, 0, 0, 0, uiInfo.uiDC.whiteShader );
-	trap_R_DrawStretchPic( x, y + h - 1, w, 1, 0, 0, 0, 0, uiInfo.uiDC.whiteShader );
+	trap_R_DrawStretchPic( x, y, w, 1, 0, 0, 0, 0, uiInfo.uiUtils.getDisplayContext()->whiteShader_ );
+	trap_R_DrawStretchPic( x, y + h - 1, w, 1, 0, 0, 0, 0, uiInfo.uiUtils.getDisplayContext()->whiteShader_ );
 }
 /*
 ================
@@ -544,10 +548,10 @@ void UI_DrawTextBox (int x, int y, int width, int lines)
 
 bool UI_CursorInRect (int x, int y, int width, int height)
 {
-	if (uiInfo.uiDC.cursorx < x ||
-		uiInfo.uiDC.cursory < y ||
-		uiInfo.uiDC.cursorx > x+width ||
-		uiInfo.uiDC.cursory > y+height)
+	if (uiInfo.uiUtils.getDisplayContext()->cursorX_ < x ||
+		uiInfo.uiUtils.getDisplayContext()->cursorY_ < y ||
+		uiInfo.uiUtils.getDisplayContext()->cursorX_ > x+width ||
+		uiInfo.uiUtils.getDisplayContext()->cursorY_ > y+height)
 		return false;
 
 	return true;

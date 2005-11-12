@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.10 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: cg_main.c,v 1.11 2005-11-12 14:28:13 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -8,9 +8,13 @@
 #include "cg_local.h"
 
 #include "../ui/ui_shared.h"
+#include "ui_displaycontext_cg.h"
+#include "ui_utils_cg.h"
 
 // display context for New ui stuff
-displayContextDef_t cgDC;
+//displayContextDef_t cgDC;
+//UI_DisplayContextCG cgUtils.getDisplayContext();
+UI_UtilsCG cgUtils;
 
 int forceModelModificationCount = -1;
 
@@ -1199,134 +1203,137 @@ bool CG_Asset_Parse(int handle) {
 		// font
 		if (Q_stricmp(token.string, "font") == 0) {
 			int pointSize;
-			if (!PC_String_Parse(handle, &tempStr) || !PC_Int_Parse(handle, &pointSize)) {
+			if (!cgUtils.pc_String_Parse(handle, &tempStr) || 
+				!cgUtils.pc_Int_Parse(handle, &pointSize)) {
 				return false;
 			}
-			cgDC.registerFont(tempStr, pointSize, &cgDC.Assets.textFont);
+			cgUtils.getDisplayContext()->registerFont(tempStr, pointSize, &cgUtils.getDisplayContext()->assets_.textFont);
 			continue;
 		}
 
 		// smallFont
 		if (Q_stricmp(token.string, "smallFont") == 0) {
 			int pointSize;
-			if (!PC_String_Parse(handle, &tempStr) || !PC_Int_Parse(handle, &pointSize)) {
+			if (!cgUtils.pc_String_Parse(handle, &tempStr) || 
+				!cgUtils.pc_Int_Parse(handle, &pointSize)) {
 				return false;
 			}
-			cgDC.registerFont(tempStr, pointSize, &cgDC.Assets.smallFont);
+			cgUtils.getDisplayContext()->registerFont(tempStr, pointSize, &cgUtils.getDisplayContext()->assets_.smallFont);
 			continue;
 		}
 
 		// font
 		if (Q_stricmp(token.string, "bigfont") == 0) {
 			int pointSize;
-			if (!PC_String_Parse(handle, &tempStr) || !PC_Int_Parse(handle, &pointSize)) {
+			if (!cgUtils.pc_String_Parse(handle, &tempStr) || 
+				!cgUtils.pc_Int_Parse(handle, &pointSize)) {
 				return false;
 			}
-			cgDC.registerFont(tempStr, pointSize, &cgDC.Assets.bigFont);
+			cgUtils.getDisplayContext()->registerFont(tempStr, pointSize, &cgUtils.getDisplayContext()->assets_.bigFont);
 			continue;
 		}
 
 		// gradientbar
 		if (Q_stricmp(token.string, "gradientbar") == 0) {
-			if (!PC_String_Parse(handle, &tempStr)) {
+			if (!cgUtils.pc_String_Parse(handle, &tempStr)) {
 				return false;
 			}
-			cgDC.Assets.gradientBar = trap_R_RegisterShaderNoMip(tempStr);
+			cgUtils.getDisplayContext()->assets_.gradientBar = trap_R_RegisterShaderNoMip(tempStr);
 			continue;
 		}
 
 		// enterMenuSound
 		if (Q_stricmp(token.string, "menuEnterSound") == 0) {
-			if (!PC_String_Parse(handle, &tempStr)) {
+			if (!cgUtils.pc_String_Parse(handle, &tempStr)) {
 				return false;
 			}
-			cgDC.Assets.menuEnterSound = trap_S_RegisterSound( tempStr, false );
+			cgUtils.getDisplayContext()->assets_.menuEnterSound = trap_S_RegisterSound( tempStr, false );
 			continue;
 		}
 
 		// exitMenuSound
 		if (Q_stricmp(token.string, "menuExitSound") == 0) {
-			if (!PC_String_Parse(handle, &tempStr)) {
+			if (!cgUtils.pc_String_Parse(handle, &tempStr)) {
 				return false;
 			}
-			cgDC.Assets.menuExitSound = trap_S_RegisterSound( tempStr, false );
+			cgUtils.getDisplayContext()->assets_.menuExitSound = trap_S_RegisterSound( tempStr, false );
 			continue;
 		}
 
 		// itemFocusSound
 		if (Q_stricmp(token.string, "itemFocusSound") == 0) {
-			if (!PC_String_Parse(handle, &tempStr)) {
+			if (!cgUtils.pc_String_Parse(handle, &tempStr)) {
 				return false;
 			}
-			cgDC.Assets.itemFocusSound = trap_S_RegisterSound( tempStr, false );
+			cgUtils.getDisplayContext()->assets_.itemFocusSound = trap_S_RegisterSound( tempStr, false );
 			continue;
 		}
 
 		// menuBuzzSound
 		if (Q_stricmp(token.string, "menuBuzzSound") == 0) {
-			if (!PC_String_Parse(handle, &tempStr)) {
+			if (!cgUtils.pc_String_Parse(handle, &tempStr)) {
 				return false;
 			}
-			cgDC.Assets.menuBuzzSound = trap_S_RegisterSound( tempStr, false );
+			cgUtils.getDisplayContext()->assets_.menuBuzzSound = trap_S_RegisterSound( tempStr, false );
 			continue;
 		}
 
 		if (Q_stricmp(token.string, "cursor") == 0) {
-			if (!PC_String_Parse(handle, &cgDC.Assets.cursorStr)) {
+			if (!cgUtils.pc_String_Parse(handle, &cgUtils.getDisplayContext()->assets_.cursorStr)) {
 				return false;
 			}
-			cgDC.Assets.cursor = trap_R_RegisterShaderNoMip( cgDC.Assets.cursorStr);
+			cgUtils.getDisplayContext()->assets_.cursor = trap_R_RegisterShaderNoMip( cgUtils.getDisplayContext()->assets_.cursorStr);
 			continue;
 		}
 
 		if (Q_stricmp(token.string, "cursorWait") == 0) {
-			if (!PC_String_Parse(handle, &cgDC.Assets.cursorStrWait)) {
+			if (!cgUtils.pc_String_Parse(handle, &cgUtils.getDisplayContext()->assets_.cursorStrWait)) {
 				return false;
 			}
-			cgDC.Assets.cursorWait = trap_R_RegisterShaderNoMip( cgDC.Assets.cursorStrWait );
+			cgUtils.getDisplayContext()->assets_.cursorWait = trap_R_RegisterShaderNoMip( cgUtils.getDisplayContext()->assets_.cursorStrWait );
 			continue;
 		}
 
 		if (Q_stricmp(token.string, "fadeClamp") == 0) {
-			if (!PC_Float_Parse(handle, &cgDC.Assets.fadeClamp)) {
+			if (!cgUtils.pc_Float_Parse(handle, &cgUtils.getDisplayContext()->assets_.fadeClamp)) {
 				return false;
 			}
 			continue;
 		}
 
 		if (Q_stricmp(token.string, "fadeCycle") == 0) {
-			if (!PC_Int_Parse(handle, &cgDC.Assets.fadeCycle)) {
+			if (!cgUtils.pc_Int_Parse(handle, &cgUtils.getDisplayContext()->assets_.fadeCycle)) {
 				return false;
 			}
 			continue;
 		}
 
 		if (Q_stricmp(token.string, "fadeAmount") == 0) {
-			if (!PC_Float_Parse(handle, &cgDC.Assets.fadeAmount)) {
+			if (!cgUtils.pc_Float_Parse(handle, &cgUtils.getDisplayContext()->assets_.fadeAmount)) {
 				return false;
 			}
 			continue;
 		}
 
 		if (Q_stricmp(token.string, "shadowX") == 0) {
-			if (!PC_Float_Parse(handle, &cgDC.Assets.shadowX)) {
+			if (!cgUtils.pc_Float_Parse(handle, &cgUtils.getDisplayContext()->assets_.shadowX)) {
 				return false;
 			}
 			continue;
 		}
 
 		if (Q_stricmp(token.string, "shadowY") == 0) {
-			if (!PC_Float_Parse(handle, &cgDC.Assets.shadowY)) {
+			if (!cgUtils.pc_Float_Parse(handle, &cgUtils.getDisplayContext()->assets_.shadowY)) {
 				return false;
 			}
 			continue;
 		}
 
 		if (Q_stricmp(token.string, "shadowColor") == 0) {
-			if (!PC_Color_Parse(handle, &cgDC.Assets.shadowColor)) {
+			if (!cgUtils.pc_Color_Parse(handle, &cgUtils.getDisplayContext()->assets_.shadowColor)) {
 				return false;
 			}
-			cgDC.Assets.shadowFadeClamp = cgDC.Assets.shadowColor[3];
+			cgUtils.getDisplayContext()->assets_.shadowFadeClamp = cgUtils.getDisplayContext()->assets_.shadowColor[3];
 			continue;
 		}
 	}
@@ -1377,7 +1384,7 @@ void CG_ParseMenu(const char *menuFile) {
 
 		if (Q_stricmp(token.string, "menudef") == 0) {
 			// start a New menu
-			Menu_New(handle);
+			cgUtils.menu_New(handle);
 		}
 	}
 	trap_PC_FreeSource(handle);
@@ -1449,7 +1456,7 @@ void CG_LoadMenus(const char *menuFile) {
 	
 	COM_Compress(buf);
 
-	Menu_Reset();
+	cgUtils.menu_Reset();
 
 	p = buf;
 
@@ -1580,9 +1587,9 @@ void CG_SetScoreSelection(void *p) {
 			feeder = FEEDER_BLUETEAM_LIST;
 			i = blue;
 		}
-		Menu_SetFeederSelection(menu, feeder, i, NULL);
+		cgUtils.menu_SetFeederSelection(menu, feeder, i, NULL);
 	} else {
-		Menu_SetFeederSelection(menu, FEEDER_SCOREBOARD, cg.selectedScore, NULL);
+		cgUtils.menu_SetFeederSelection(menu, FEEDER_SCOREBOARD, cg.selectedScore, NULL);
 	}
 }
 
@@ -1614,7 +1621,8 @@ static clientInfo_t * CG_InfoFromScoreIndex(int index, int team, int *scoreIndex
 CG_FeederItemText
 =================
 */
-static const char *CG_FeederItemText(float feederID, int index, int column, qhandle_t *handle) {
+const char *CG_FeederItemText(float feederID, int index, int column, qhandle_t *handle) 
+{
 	//gitem_t *item;
 	clientInfo_t *info = NULL;
 	int scoreIndex = 0;
@@ -1800,7 +1808,8 @@ static const char *CG_FeederItemText(float feederID, int index, int column, qhan
 CG_FeederSelection
 =================
 */
-static void CG_FeederSelection(float feederID, int index) {
+void CG_FeederSelection(float feederID, int index) 
+{
 	if ( cgs.gametype >= GT_TEAM ) {
 		int i, count;
 		int team = (feederID == FEEDER_REDTEAM_LIST) ? TEAM_RED : TEAM_BLUE;
@@ -1861,7 +1870,8 @@ void CG_StartMusic( void ) {
 CG_OwnerDrawWidth();
 =================
 */
-static int CG_OwnerDrawWidth(int ownerDraw, float scale) {
+int CG_OwnerDrawWidth(int ownerDraw, float scale) 
+{
 	switch (ownerDraw)
 	{
 	  case CG_GAME_TYPE:
@@ -1893,59 +1903,59 @@ void CG_LoadHudMenu() {
 	char buff[1024];
 	const char *hudSet;
 
-	cgDC.registerShaderNoMip = &trap_R_RegisterShaderNoMip;
-	cgDC.setColor = &trap_R_SetColor;
-	cgDC.drawHandlePic = &CG_DrawPic;
-	cgDC.drawStretchPic = &trap_R_DrawStretchPic;
-	cgDC.drawText = &CG_Text_Paint;
-	cgDC.textWidth = &CG_Text_Width;
-	cgDC.textHeight = &CG_Text_Height;
-	cgDC.registerModel = &trap_R_RegisterModel;
-	cgDC.modelBounds = &trap_R_ModelBounds;
-	cgDC.fillRect = &CG_FillRect;
-	cgDC.drawRect = &CG_DrawRect;   
-	cgDC.drawSides = &CG_DrawSides;
-	cgDC.drawTopBottom = &CG_DrawTopBottom;
-	cgDC.clearScene = &trap_R_ClearScene;
-	cgDC.addRefEntityToScene = &trap_R_AddRefEntityToScene;
-	cgDC.renderScene = &trap_R_RenderScene;
-	cgDC.registerFont = &trap_R_RegisterFont;
-	cgDC.ownerDrawItem = &CG_OwnerDraw;
-	//cgDC.getValue = &CG_GetValue;
-	//cgDC.ownerDrawVisible = &CG_OwnerDrawVisible;
-	//cgDC.runScript = &CG_RunMenuScript;
-	//cgDC.getTeamColor = &CG_GetTeamColor;
-	cgDC.setCVar = trap_Cvar_Set;
-	cgDC.getCVarString = trap_Cvar_VariableStringBuffer;
-	cgDC.getCVarValue = CG_Cvar_Get;
-	//cgDC.drawTextWithCursor = &CG_Text_PaintWithCursor;
-	//cgDC.setOverstrikeMode = &trap_Key_SetOverstrikeMode;
-	//cgDC.getOverstrikeMode = &trap_Key_GetOverstrikeMode;
-	cgDC.startLocalSound = &trap_S_StartLocalSound;
-	//cgDC.ownerDrawHandleKey = &CG_OwnerDrawHandleKey;
-	cgDC.feederCount = &CG_FeederCount;
-	//cgDC.feederItemImage = &CG_FeederItemImage;
-	cgDC.feederItemText = &CG_FeederItemText;
-	cgDC.feederSelection = &CG_FeederSelection;
-	//cgDC.setBinding = &trap_Key_SetBinding;
-	//cgDC.getBindingBuf = &trap_Key_GetBindingBuf;
-	//cgDC.keynumToStringBuf = &trap_Key_KeynumToStringBuf;
-	//cgDC.executeText = &trap_Cmd_ExecuteText;
-	cgDC.Error = &Com_Error; 
-	cgDC.Print = &Com_Printf; 
-	cgDC.ownerDrawWidth = &CG_OwnerDrawWidth;
-	//cgDC.Pause = &CG_Pause;
-	cgDC.registerSound = &trap_S_RegisterSound;
-	cgDC.startBackgroundTrack = &trap_S_StartBackgroundTrack;
-	cgDC.stopBackgroundTrack = &trap_S_StopBackgroundTrack;
-	//cgDC.playCinematic = &CG_PlayCinematic;
-	//cgDC.stopCinematic = &CG_StopCinematic;
-	//cgDC.drawCinematic = &CG_DrawCinematic;
-	//cgDC.runCinematicFrame = &CG_RunCinematicFrame;
+	//cgUtils.getDisplayContext().registerShaderNoMip = &trap_R_RegisterShaderNoMip;
+	//cgDC.setColor = &trap_R_SetColor;
+	//cgDC.drawHandlePic = &CG_DrawPic;
+	//cgDC.drawStretchPic = &trap_R_DrawStretchPic;
+	//cgDC.drawText = &CG_Text_Paint;
+	//cgDC.textWidth = &CG_Text_Width;
+	//cgDC.textHeight = &CG_Text_Height;
+	//cgDC.registerModel = &trap_R_RegisterModel;
+	//cgDC.modelBounds = &trap_R_ModelBounds;
+	//cgDC.fillRect = &CG_FillRect;
+	//cgDC.drawRect = &CG_DrawRect;   
+	//cgDC.drawSides = &CG_DrawSides;
+	//cgDC.drawTopBottom = &CG_DrawTopBottom;
+	//cgDC.clearScene = &trap_R_ClearScene;
+	//cgDC.addRefEntityToScene = &trap_R_AddRefEntityToScene;
+	//cgDC.renderScene = &trap_R_RenderScene;
+	//cgDC.registerFont = &trap_R_RegisterFont;
+	//cgDC.ownerDrawItem = &CG_OwnerDraw;
+	////cgDC.getValue = &CG_GetValue;
+	////cgDC.ownerDrawVisible = &CG_OwnerDrawVisible;
+	////cgDC.runScript = &CG_RunMenuScript;
+	////cgDC.getTeamColor = &CG_GetTeamColor;
+	//cgDC.setCVar = trap_Cvar_Set;
+	//cgDC.getCVarString = trap_Cvar_VariableStringBuffer;
+	//cgDC.getCVarValue = CG_Cvar_Get;
+	////cgDC.drawTextWithCursor = &CG_Text_PaintWithCursor;
+	////cgDC.setOverstrikeMode = &trap_Key_SetOverstrikeMode;
+	////cgDC.getOverstrikeMode = &trap_Key_GetOverstrikeMode;
+	//cgDC.startLocalSound = &trap_S_StartLocalSound;
+	////cgDC.ownerDrawHandleKey = &CG_OwnerDrawHandleKey;
+	//cgDC.feederCount = &CG_FeederCount;
+	////cgDC.feederItemImage = &CG_FeederItemImage;
+	//cgDC.feederItemText = &CG_FeederItemText;
+	//cgDC.feederSelection = &CG_FeederSelection;
+	////cgDC.setBinding = &trap_Key_SetBinding;
+	////cgDC.getBindingBuf = &trap_Key_GetBindingBuf;
+	////cgDC.keynumToStringBuf = &trap_Key_KeynumToStringBuf;
+	////cgDC.executeText = &trap_Cmd_ExecuteText;
+	//cgDC.Error = &Com_Error; 
+	//cgDC.Print = &Com_Printf; 
+	//cgDC.ownerDrawWidth = &CG_OwnerDrawWidth;
+	////cgDC.Pause = &CG_Pause;
+	//cgDC.registerSound = &trap_S_RegisterSound;
+	//cgDC.startBackgroundTrack = &trap_S_StartBackgroundTrack;
+	//cgDC.stopBackgroundTrack = &trap_S_StopBackgroundTrack;
+	////cgDC.playCinematic = &CG_PlayCinematic;
+	////cgDC.stopCinematic = &CG_StopCinematic;
+	////cgDC.drawCinematic = &CG_DrawCinematic;
+	////cgDC.runCinematicFrame = &CG_RunCinematicFrame;
 	
-	Init_Display(&cgDC);
+	//cgUtils.init_Display(cgUtils.getDisplayContext());
 
-	Menu_Reset();
+	cgUtils.menu_Reset();
 	
 	trap_Cvar_VariableStringBuffer("cg_hudFiles", buff, sizeof(buff));
 	hudSet = buff;
@@ -1969,24 +1979,24 @@ void CG_AssetCache()
 	//}
 	//Assets.background = trap_R_RegisterShaderNoMip( ASSET_BACKGROUND );
 	//Com_Printf("Menu Size: %i bytes\n", sizeof(Menus));
-	cgDC.Assets.gradientBar = trap_R_RegisterShaderNoMip( ASSET_GRADIENTBAR );
-	cgDC.Assets.verticalGradient = trap_R_RegisterShaderNoMip( ASSET_VERTICALGRADIENT );
-	cgDC.Assets.fxBasePic = trap_R_RegisterShaderNoMip( ART_FX_BASE );
-	cgDC.Assets.fxPic[0] = trap_R_RegisterShaderNoMip( ART_FX_RED );
-	cgDC.Assets.fxPic[1] = trap_R_RegisterShaderNoMip( ART_FX_YELLOW );
-	cgDC.Assets.fxPic[2] = trap_R_RegisterShaderNoMip( ART_FX_GREEN );
-	cgDC.Assets.fxPic[3] = trap_R_RegisterShaderNoMip( ART_FX_TEAL );
-	cgDC.Assets.fxPic[4] = trap_R_RegisterShaderNoMip( ART_FX_BLUE );
-	cgDC.Assets.fxPic[5] = trap_R_RegisterShaderNoMip( ART_FX_CYAN );
-	cgDC.Assets.fxPic[6] = trap_R_RegisterShaderNoMip( ART_FX_WHITE );
-	cgDC.Assets.scrollBar = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR );
-	cgDC.Assets.scrollBarArrowDown = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWDOWN );
-	cgDC.Assets.scrollBarArrowUp = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWUP );
-	cgDC.Assets.scrollBarArrowLeft = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWLEFT );
-	cgDC.Assets.scrollBarArrowRight = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWRIGHT );
-	cgDC.Assets.scrollBarThumb = trap_R_RegisterShaderNoMip( ASSET_SCROLL_THUMB );
-	cgDC.Assets.sliderBar = trap_R_RegisterShaderNoMip( ASSET_SLIDER_BAR );
-	cgDC.Assets.sliderThumb = trap_R_RegisterShaderNoMip( ASSET_SLIDER_THUMB );
+	cgUtils.getDisplayContext()->assets_.gradientBar = trap_R_RegisterShaderNoMip( ASSET_GRADIENTBAR );
+	cgUtils.getDisplayContext()->assets_.verticalGradient = trap_R_RegisterShaderNoMip( ASSET_VERTICALGRADIENT );
+	cgUtils.getDisplayContext()->assets_.fxBasePic = trap_R_RegisterShaderNoMip( ART_FX_BASE );
+	cgUtils.getDisplayContext()->assets_.fxPic[0] = trap_R_RegisterShaderNoMip( ART_FX_RED );
+	cgUtils.getDisplayContext()->assets_.fxPic[1] = trap_R_RegisterShaderNoMip( ART_FX_YELLOW );
+	cgUtils.getDisplayContext()->assets_.fxPic[2] = trap_R_RegisterShaderNoMip( ART_FX_GREEN );
+	cgUtils.getDisplayContext()->assets_.fxPic[3] = trap_R_RegisterShaderNoMip( ART_FX_TEAL );
+	cgUtils.getDisplayContext()->assets_.fxPic[4] = trap_R_RegisterShaderNoMip( ART_FX_BLUE );
+	cgUtils.getDisplayContext()->assets_.fxPic[5] = trap_R_RegisterShaderNoMip( ART_FX_CYAN );
+	cgUtils.getDisplayContext()->assets_.fxPic[6] = trap_R_RegisterShaderNoMip( ART_FX_WHITE );
+	cgUtils.getDisplayContext()->assets_.scrollBar = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR );
+	cgUtils.getDisplayContext()->assets_.scrollBarArrowDown = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWDOWN );
+	cgUtils.getDisplayContext()->assets_.scrollBarArrowUp = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWUP );
+	cgUtils.getDisplayContext()->assets_.scrollBarArrowLeft = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWLEFT );
+	cgUtils.getDisplayContext()->assets_.scrollBarArrowRight = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWRIGHT );
+	cgUtils.getDisplayContext()->assets_.scrollBarThumb = trap_R_RegisterShaderNoMip( ASSET_SCROLL_THUMB );
+	cgUtils.getDisplayContext()->assets_.sliderBar = trap_R_RegisterShaderNoMip( ASSET_SLIDER_BAR );
+	cgUtils.getDisplayContext()->assets_.sliderThumb = trap_R_RegisterShaderNoMip( ASSET_SLIDER_THUMB );
 }
 
 // NOTE: functions copied from v1.29h code to enable New scoreboard method
@@ -2101,7 +2111,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 
 	trap_CM_LoadMap( cgs.mapname );
 
-	String_Init();
+	cgUtils.string_Init();
 
 	CG_LoadingString( "sounds" );
 	CG_LoadingString( "graphics" );

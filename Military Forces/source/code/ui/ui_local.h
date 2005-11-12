@@ -1,5 +1,5 @@
 /*
- * $Id: ui_local.h,v 1.6 2005-10-28 13:07:04 thebjoern Exp $
+ * $Id: ui_local.h,v 1.7 2005-11-12 14:28:14 thebjoern Exp $
 */
 //
 #ifndef __UI_LOCAL_H__
@@ -13,11 +13,15 @@
 #include "../game/bg_public.h"
 #include "ui_shared.h"
 #include "ui.h"
+#include "ui_displaycontext_ui.h"
+#include "ui_utils_ui.h"
 
+struct UI_Utils;
 
 // global display context
 
-extern displayContextDef_t * DC;
+//extern displayContextDef_t * DC;
+//extern UI_DisplayContext* gDC;
 
 extern vmCvar_t	ui_ffa_fraglimit;
 extern vmCvar_t	ui_ffa_timelimit;
@@ -346,7 +350,6 @@ int UI_AdjustTimeByGame(int time);
 void UI_ShowPostGame(bool newHigh);
 void UI_ClearScores();
 void UI_LoadArenas(void);
-void UI_CustomChatDraw( void );
 
 //
 // ui_menu.c
@@ -394,7 +397,7 @@ extern void UI_DrawConnectScreen( bool overlay );
 // ui_controls2.c
 //
 extern void UI_ControlsMenu( void );
-extern void Controls_Cache( void );
+//extern void Controls_Cache( void );
 
 //
 // ui_demo2.c
@@ -719,28 +722,34 @@ typedef struct {
 	bool	valid;
 } pendingServer_t;
 
-typedef struct {
+struct pendingServerStatus_t
+{
 	int num;
 	pendingServer_t server[MAX_SERVERSTATUSREQUESTS];
-} pendingServerStatus_t;
+};
 
-typedef struct {
+struct serverStatusInfo_t
+{
 	char address[MAX_ADDRESSLENGTH];
 	char *lines[MAX_SERVERSTATUS_LINES][4];
 	char text[MAX_SERVERSTATUS_TEXT];
 	char pings[MAX_CLIENTS * 3];
 	int numLines;
-} serverStatusInfo_t;
+};
 
-typedef struct {
+struct modInfo_t
+{
 	const char *modName;
 	const char *modDescr;
-} modInfo_t;
+};
 
 #define MAX_CREDITS_LINES 128	// max character pointers to allocate
 
-typedef struct {
-	displayContextDef_t uiDC;
+struct uiInfo_t
+{
+	//displayContextDef_t uiDC;
+	//UI_DisplayContextUI dcUI;
+	UI_UtilsUI uiUtils;
 	int newHighScoreTime;
 	int newBestTime;
 	int showPostGameTime;
@@ -832,7 +841,7 @@ typedef struct {
 	char * pCredits[ MAX_CREDITS_LINES ];	// credits line list
 	int creditLines;						// active lines in the list
 
-}	uiInfo_t;
+};
 
 extern uiInfo_t uiInfo;
 
@@ -944,7 +953,7 @@ void			trap_Key_KeynumToStringBuf( int keynum, char *buf, int buflen );
 void			trap_Key_GetBindingBuf( int keynum, char *buf, int buflen );
 void			trap_Key_SetBinding( int keynum, const char *binding );
 int				trap_Key_IsDown( int keynum );
-int				trap_Key_GetOverstrikeMode( void );
+bool			trap_Key_GetOverstrikeMode( void );
 void			trap_Key_SetOverstrikeMode( bool state );
 void			trap_Key_ClearStates( void );
 int				trap_Key_GetCatcher( void );
