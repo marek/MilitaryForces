@@ -1,5 +1,5 @@
 /*
- * $Id: menudef.h,v 1.3 2005-10-28 13:07:04 thebjoern Exp $
+ * $Id: menudef.h,v 1.4 2005-11-12 14:28:14 thebjoern Exp $
 */
 
 #ifndef __MENUDEF_H__
@@ -42,7 +42,7 @@
 #define WINDOW_STYLE_FILLED 1             // filled with background color
 #define WINDOW_STYLE_GRADIENT 2           // gradient bar based on background color 
 #define WINDOW_STYLE_SHADER   3           // gradient bar based on background color 
-#define WINDOW_STYLE_TEAMCOLOR 4          // team color
+//#define WINDOW_STYLE_TEAMCOLOR 4          // team color
 #define WINDOW_STYLE_CINEMATIC 5          // cinematic
 
 #define MENU_TRUE 1                       // uh.. true

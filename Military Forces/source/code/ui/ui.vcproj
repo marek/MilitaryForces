@@ -25,6 +25,7 @@
 				Optimization="0"
 				OptimizeForProcessor="0"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_WINDOWS"
+				ExceptionHandling="FALSE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				RuntimeTypeInfo="TRUE"
@@ -37,7 +38,8 @@
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
 				DebugInformationFormat="3"
-				CompileAs="2"/>
+				CompileAs="2"
+				DisableSpecificWarnings="4530"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -84,6 +86,7 @@
 				OptimizeForProcessor="2"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_WINDOWS"
 				StringPooling="TRUE"
+				ExceptionHandling="FALSE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="TRUE"
 				RuntimeTypeInfo="TRUE"
@@ -94,7 +97,8 @@
 				ProgramDataBaseFileName="$(IntDir)\"
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
-				CompileAs="2"/>
+				CompileAs="2"
+				DisableSpecificWarnings="4530"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -141,6 +145,7 @@
 				OptimizeForProcessor="0"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_WINDOWS"
 				StringPooling="FALSE"
+				ExceptionHandling="FALSE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				EnableFunctionLevelLinking="FALSE"
@@ -154,7 +159,8 @@
 				WarningLevel="4"
 				SuppressStartupBanner="TRUE"
 				DebugInformationFormat="3"
-				CompileAs="2"/>
+				CompileAs="2"
+				DisableSpecificWarnings="4530"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -207,19 +213,43 @@
 				RelativePath=".\ui_atoms.c">
 			</File>
 			<File
+				RelativePath=".\ui_commanddef.cpp">
+			</File>
+			<File
+				RelativePath=".\ui_controls.cpp">
+			</File>
+			<File
+				RelativePath=".\ui_displaycontext.cpp">
+			</File>
+			<File
+				RelativePath=".\ui_displaycontext_ui.cpp">
+			</File>
+			<File
 				RelativePath=".\ui_gameinfo.c">
 			</File>
 			<File
-				RelativePath=".\ui_main.c">
+				RelativePath=".\ui_hashutils.cpp">
 			</File>
 			<File
-				RelativePath=".\ui_shared.c">
+				RelativePath=".\ui_itemcapture.cpp">
+			</File>
+			<File
+				RelativePath=".\ui_keywordhash.cpp">
+			</File>
+			<File
+				RelativePath=".\ui_main.c">
 			</File>
 			<File
 				RelativePath=".\ui_syscalls.c">
 			</File>
 			<File
 				RelativePath=".\ui_util.c">
+			</File>
+			<File
+				RelativePath=".\ui_utils.cpp">
+			</File>
+			<File
+				RelativePath=".\ui_utils_ui.cpp">
 			</File>
 		</Filter>
 		<Filter
@@ -235,13 +265,43 @@
 				RelativePath=".\ui.h">
 			</File>
 			<File
+				RelativePath=".\ui_commanddef.h">
+			</File>
+			<File
+				RelativePath=".\ui_controls.h">
+			</File>
+			<File
+				RelativePath=".\ui_displaycontext.h">
+			</File>
+			<File
+				RelativePath=".\ui_displaycontext_ui.h">
+			</File>
+			<File
+				RelativePath=".\ui_hashutils.h">
+			</File>
+			<File
+				RelativePath=".\ui_itemcapture.h">
+			</File>
+			<File
+				RelativePath=".\ui_keywordhash.h">
+			</File>
+			<File
 				RelativePath=".\ui_local.h">
 			</File>
 			<File
 				RelativePath=".\ui_public.h">
 			</File>
 			<File
+				RelativePath=".\ui_scrollinfo.h">
+			</File>
+			<File
 				RelativePath=".\ui_shared.h">
+			</File>
+			<File
+				RelativePath=".\ui_utils.h">
+			</File>
+			<File
+				RelativePath=".\ui_utils_ui.h">
 			</File>
 		</Filter>
 		<Filter

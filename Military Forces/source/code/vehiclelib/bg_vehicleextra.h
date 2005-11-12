@@ -1,6 +1,7 @@
 #ifndef __BG_VEHICLEEXTRA_H__
 #define __BG_VEHICLEEXTRA_H__
 
+
 #include "../game/q_shared.h"
 #include "../qcommon/qfiles.h"
 #include <string>

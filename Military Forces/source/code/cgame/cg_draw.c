@@ -1,5 +1,5 @@
 /*
- * $Id: cg_draw.c,v 1.5 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: cg_draw.c,v 1.6 2005-11-12 14:28:13 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -11,9 +11,14 @@
 #include "..\ui\ui_public.h"
 
 #include "../ui/ui_shared.h"
+#include "ui_displaycontext_cg.h"
+#include "ui_utils_cg.h"
 
 // used for scoreboard
-extern displayContextDef_t cgDC;
+//extern displayContextDef_t cgDC;
+//extern UI_DisplayContextCG cgUtils.getDisplayContext();
+extern UI_UtilsCG cgUtils;
+
 menuDef_t *menuScoreboard = NULL;
 menuDef_t *menuSpectator = NULL;
 
@@ -96,11 +101,11 @@ int CG_Text_Width(const char *text, float scale, int limit) {
 // FIXME: see ui_main.c, same problem
 //	const unsigned char *s = text;
 	const char *s = text;
-	fontInfo_t *font = &cgDC.Assets.textFont;
+	fontInfo_t *font = &cgUtils.getDisplayContext()->assets_.textFont;
 	if (scale <= cg_smallFont.value) {
-		font = &cgDC.Assets.smallFont;
+		font = &cgUtils.getDisplayContext()->assets_.smallFont;
 	} else if (scale > cg_bigFont.value) {
-		font = &cgDC.Assets.bigFont;
+		font = &cgUtils.getDisplayContext()->assets_.bigFont;
 	}
 	useScale = scale * font->glyphScale;
   out = 0;
@@ -138,11 +143,11 @@ int CG_Text_Height(const char *text, float scale, int limit) {
 // TTimo: FIXME
 //	const unsigned char *s = text;
 	const char *s = text;
-	fontInfo_t *font = &cgDC.Assets.textFont;
+	fontInfo_t *font = &cgUtils.getDisplayContext()->assets_.textFont;
 	if (scale <= cg_smallFont.value) {
-		font = &cgDC.Assets.smallFont;
+		font = &cgUtils.getDisplayContext()->assets_.smallFont;
 	} else if (scale > cg_bigFont.value) {
-		font = &cgDC.Assets.bigFont;
+		font = &cgUtils.getDisplayContext()->assets_.bigFont;
 	}
 	useScale = scale * font->glyphScale;
   max = 0;
@@ -187,19 +192,19 @@ void CG_Text_PaintChar(float x, float y, float width, float height, float scale,
 CG_Text_Paint
 ==============
 */
-void CG_Text_Paint(float x, float y, float scale, vec4_t color, const char *text, float adjust, int limit, int style)
+void CG_Text_Paint(float x, float y, float scale, const vec4_t color, const char *text, float adjust, int limit, int style)
 {
 	int ix = 0, iy = 0;
 	int len, count;
 	vec4_t newColor;
 	glyphInfo_t *glyph;
 	float useScale;
-	fontInfo_t *font = &cgDC.Assets.textFont;
+	fontInfo_t *font = &cgUtils.getDisplayContext()->assets_.textFont;
 
 	if (scale <= cg_smallFont.value) {
-		font = &cgDC.Assets.smallFont;
+		font = &cgUtils.getDisplayContext()->assets_.smallFont;
 	} else if (scale > cg_bigFont.value) {
-		font = &cgDC.Assets.bigFont;
+		font = &cgUtils.getDisplayContext()->assets_.bigFont;
 	}
 	useScale = scale * font->glyphScale;
 
@@ -520,7 +525,7 @@ static float CG_DrawSnapshot( float y ) {
 		cg.latestSnapshotNum, cgs.serverCommandSequence );
 	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 
-	DrawStringNew( 320, 430, 0.35f, colorWhite, s, 0, 0, ITEM_TEXTSTYLE_SHADOWED, CENTRE_JUSTIFY );
+	cgUtils.drawStringNew( 320, 430, 0.35f, colorWhite, s, 0, 0, ITEM_TEXTSTYLE_SHADOWED, CENTRE_JUSTIFY );
 
 	return y;
 }
@@ -581,7 +586,7 @@ static float CG_DrawFPS( float y ) {
 		w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 
 
-		DrawStringNew( 635, y + 2, 0.5f, *CreateColourVector(1,1,1,1,NULL), s, 0, 0, 3, RIGHT_JUSTIFY );
+		cgUtils.drawStringNew( 635, y + 2, 0.5f, *cgUtils.createColourVector(1,1,1,1,NULL), s, 0, 0, 3, RIGHT_JUSTIFY );
 
 	}
 
@@ -595,133 +600,11 @@ static float CG_DrawParticleStats( float y ) {
 	s = va( "# Particles: %i", pw.numParticles );
 	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 
-	DrawStringNew( 635, y + 2, 0.5f, *CreateColourVector(1,1,1,1,NULL), s, 0, 0, 3, RIGHT_JUSTIFY );
+	cgUtils.drawStringNew( 635, y + 2, 0.5f, *cgUtils.createColourVector(1,1,1,1,NULL), s, 0, 0, 3, RIGHT_JUSTIFY );
 	
 	return y + BIGCHAR_HEIGHT + 4;
 }
 
-/*
-=================
-CG_DrawTimer
-=================
-*/
-
-#define TIMER_WIDTH		60
-#define	TIMER_HEIGHT	20
-
-static float CG_DrawTimer( float y ) {
-	char		*s;
-	int			dx = 0, dy = 0, w = 0;
-	int			mins, seconds, tens;
-	int			msec;
-
-	// calc milliseconds
-	msec = cg.time - cgs.levelStartTime;
-
-	// convert msec to time components
-	seconds = msec / 1000;
-	mins = seconds / 60;
-	seconds -= mins * 60;
-	tens = seconds / 10;
-	seconds -= tens * 10;
-
-	s = va( "%i:%i%i", mins, tens, seconds );
-	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
-
-	// alter the draw position?
-	if( CG_NewHUDActive() )
-	{
-		// fit around the New HUD (draw bottom middle-right)
-		dx = 480;
-		dy = 460;
-	}
-	else
-	{
-		// draw top right
-		dx = 604;
-		dy = y + 8;
-	}
-
-	// draw the timer background (TODO: possibly replace this with HUD when near/in the HUD)
-	DC->fillRect( dx-(TIMER_WIDTH/2), dy-4, TIMER_WIDTH, TIMER_HEIGHT, *CreateColourVector( 0,0.5f,0,0.75f,NULL ) );
-	DC->drawRect( dx-(TIMER_WIDTH/2), dy-4, TIMER_WIDTH, TIMER_HEIGHT, 1, *CreateColourVector( 0,0,0,1.0f,NULL ) );
-
-	// draw timer string
-	DrawStringNew( dx, dy, 0.35f, colorWhite, s, 0, 0, ITEM_TEXTSTYLE_SHADOWED, CENTRE_JUSTIFY );
-
-	return y + TIMER_HEIGHT + 4;
-}
-
-/*
-=================
-CG_DrawCountdownTimer
-=================
-*/
-
-#define TIMER_WIDTH		60
-#define	TIMER_HEIGHT	20
-
-static float CG_DrawCountdownTimer( float y ) {
-	char		*s;
-	int			dx = 0, dy = 0, w = 0;
-	int			mins, seconds, tens;
-	int			msec;
-	bool	flash = false;
-
-	// no need for the countdown timer?
-	if( cgs.timelimit == 0 )
-	{
-		return y;
-	}
-
-	// calc milliseconds
-	msec = (cgs.timelimit * 60 * 1000) - (cg.time - cgs.levelStartTime) + 1000;	// the +1000 is just a correction offset
-	
-	// rubbish msec value? (i.e. negative)
-	if( msec < 0 ) msec = 0;
-	
-	// convert msec to time components
-	seconds = msec / 1000;
-	mins = seconds / 60;
-	seconds -= mins * 60;
-	tens = seconds / 10;
-	seconds -= tens * 10;
-
-	// flashing countdown? (within last minute of play)
-	if( msec <= (60*1000) && (msec & 0x100) )
-	{
-		flash = true;
-	}
-
-	s = va( "%i:%i%i", mins, tens, seconds );
-	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
-
-	// alter the draw position?
-	if( CG_NewHUDActive() )
-	{
-		// fit around the New HUD (draw bottom middle-left)
-		dx = 160;
-		dy = 460;
-	}
-	else
-	{
-		// draw top right
-		dx = 604;
-		dy = y + 8;
-	}
-
-	// draw the timer background (TODO: possibly replace this with HUD when near/in the HUD)
-	DC->fillRect( dx-(TIMER_WIDTH/2), dy-4, TIMER_WIDTH, TIMER_HEIGHT, *CreateColourVector( 0.7f,0,0,0.75f,NULL ) );
-	DC->drawRect( dx-(TIMER_WIDTH/2), dy-4, TIMER_WIDTH, TIMER_HEIGHT, 1, *CreateColourVector( 0,0,0,1.0f,NULL ) );
-
-	// draw timer string
-	if( !flash )
-	{
-		DrawStringNew( dx, dy, 0.35f, colorWhite, s, 0, 0, ITEM_TEXTSTYLE_SHADOWED, CENTRE_JUSTIFY );
-	}
-
-	return y + TIMER_HEIGHT + 4;
-}
 
 /*
 =================
@@ -909,7 +792,7 @@ static void CG_DrawDisconnect( void ) {
 	s = "Connection Interrupted";
 	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 
-	DrawStringNewAlpha( 320, 100, s, 1.0f, CENTRE_JUSTIFY );
+	cgUtils.drawStringNewAlpha( 320, 100, s, 1.0f, CENTRE_JUSTIFY );
 
 	// blink the icon
 	if ( ( cg.time >> 9 ) & 1 ) {
@@ -1116,7 +999,8 @@ static void CG_DrawCustomConsole( void )
 
 			// draw line
 			// NOTE: use *CG_CreateColour(1,1,1,alpha) to fade out whilst scrolling up
-			DrawStringNew( cox, coy, 0.25f, *CreateColourVector(1,1,1,alpha,NULL), consoleLine[drawIdx].text, 0, 0, cg_consoleTextStyle.integer, LEFT_JUSTIFY );
+			cgUtils.drawStringNew( cox, coy, 0.25f, *cgUtils.createColourVector(1,1,1,alpha,NULL), 
+				consoleLine[drawIdx].text, 0, 0, cg_consoleTextStyle.integer, LEFT_JUSTIFY );
 
 			// reduce life based upon time
 			consoleLine[drawIdx].life -= (0.1f * cg.frameInterpolation );
@@ -1214,12 +1098,14 @@ static void CG_DrawUpperRight( bool scoreboard )
 
 	// countdown timer
 	if ( cg_drawTimer.integer || scoreboard ) {
-		y = CG_DrawCountdownTimer( y );
+		//y = CG_DrawCountdownTimer( y );
+		y = cgUtils.drawCountdownTimer( y );
 	}
 
 	// elapsed timer
 	if ( cg_drawTimer.integer || scoreboard ) {
-		y = CG_DrawTimer( y );
+		//y = CG_DrawTimer( y );
+		y = cgUtils.drawTimer( y );
 	}
 
 	// the lagometer
@@ -1687,7 +1573,7 @@ static void CG_DrawCenterString( void ) {
 
 		x = ( SCREEN_WIDTH - w ) / 2;
 
-		DrawStringNewColour( 320, y, linebuffer, color, CENTRE_JUSTIFY );
+		cgUtils.drawStringNewColour( 320, y, linebuffer, color, CENTRE_JUSTIFY );
 
 		y += cg.centerPrintCharWidth * 1.5;
 
@@ -1834,7 +1720,7 @@ static void CG_DrawCrosshairNames( void ) {
 	name = cgs.clientinfo[ cg.crosshairClientNum ].name;
 	w = CG_DrawStrlen( name ) * BIGCHAR_WIDTH;
 
-	DrawStringNew( 320, 170, 0.5f, color, name, 0, 0, ITEM_TEXTSTYLE_OUTLINED, CENTRE_JUSTIFY );
+	cgUtils.drawStringNew( 320, 170, 0.5f, color, name, 0, 0, ITEM_TEXTSTYLE_OUTLINED, CENTRE_JUSTIFY );
 
 	trap_R_SetColor( NULL );
 }
@@ -1852,7 +1738,7 @@ static void CG_DrawSpectator(void) {
 	// this is where we load the spectator menu script
 	if( menuSpectator == NULL)
 	{
-		menuSpectator = Menus_FindByName("spectator_menu");
+		menuSpectator = cgUtils.menu_FindByName("spectator_menu");
 	}
 
 	// spectator menu loaded?
@@ -1888,7 +1774,7 @@ static void CG_DrawSpectator(void) {
 		}
 
 		// draw
-		Menu_Paint( menuSpectator, true );
+		cgUtils.menu_Paint( menuSpectator, true );
 	}
 
 	if( cgs.gametype == GT_MISSION_EDITOR ) {
@@ -2040,11 +1926,11 @@ static bool CG_DrawScoreboard()
 	{
 		if ( cgs.gametype >= GT_TEAM )
 		{
-			menuScoreboard = Menus_FindByName("teamscore_menu");
+			menuScoreboard = cgUtils.menu_FindByName("teamscore_menu");
 		}
 		else
 		{
-			menuScoreboard = Menus_FindByName("score_menu");
+			menuScoreboard = cgUtils.menu_FindByName("score_menu");
 		}
 	}
 
@@ -2057,7 +1943,7 @@ static bool CG_DrawScoreboard()
 		}
 
 		// draw
-		Menu_Paint( menuScoreboard, true );
+		cgUtils.menu_Paint( menuScoreboard, true );
 	}
 
 	// load any models that have been deferred
@@ -2107,26 +1993,26 @@ static bool CG_DrawFollow( void )
 	// New style
 
 	// draw label
-	DrawStringNewAlpha( 320, 48, "following ", 1.0f, RIGHT_JUSTIFY );
+	cgUtils.drawStringNewAlpha( 320, 48, "following ", 1.0f, RIGHT_JUSTIFY );
 
 	// default colour
-	pColor = CreateColourVector( 0.0f, 0.75f, 0.0f, 1.0f, NULL );	// default: green
+	pColor = cgUtils.createColourVector( 0.0f, 0.75f, 0.0f, 1.0f, NULL );	// default: green
 
 	// team colour?
 	if( cgs.clientinfo[ cg.snap->ps.clientNum ].team == 1 )
 	{
-		pColor = CreateColourVector( 0.75f, 0.0f, 0.0f, 1.0f, NULL );	// team: red
+		pColor = cgUtils.createColourVector( 0.75f, 0.0f, 0.0f, 1.0f, NULL );	// team: red
 	}
 	else if( cgs.clientinfo[ cg.snap->ps.clientNum ].team == 2 )
 	{
-		pColor = CreateColourVector( 0.0f, 0.0f, 0.75f, 1.0f, NULL );	// team: blue
+		pColor = cgUtils.createColourVector( 0.0f, 0.0f, 0.75f, 1.0f, NULL );	// team: blue
 	}
 
 	// get name of player being followed
 	name = cgs.clientinfo[ cg.snap->ps.clientNum ].name;
 
 	// draw name
-	DrawStringNewColour( 320, 48, name, pColor[0], LEFT_JUSTIFY );
+	cgUtils.drawStringNewColour( 320, 48, name, pColor[0], LEFT_JUSTIFY );
 
 	return true;
 }
@@ -2155,7 +2041,7 @@ static void CG_DrawWarmup( void ) {
 		w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 		cg.warmupCount = 0;
 
-		DrawStringNew( 320, 64, 0.5f, *CreateColourVector(1,1,1,1,NULL), s, 0, 0, 3, CENTRE_JUSTIFY );
+		cgUtils.drawStringNew( 320, 64, 0.5f, *cgUtils.createColourVector(1,1,1,1,NULL), s, 0, 0, 3, CENTRE_JUSTIFY );
 
 		return;
 	}
@@ -2348,51 +2234,6 @@ static void CG_Draw2D_MFQ3( void ) {
 	CG_DrawCenterString();
 }
 
-/*
-=====================
-CG_DrawDevelop
-
-Draw debugging (ONLY) text
-=====================
-*/
-void CG_DrawDevelop( void )
-{
-	clientInfo_t * ci = NULL;
-	int y = 96;
-
-	// get client information
-	ci = &cgs.clientinfo[ cg.snap->ps.clientNum ];
-
-	// shadow testing on?
-	if( cg_shadowDebug.value )
-	{
-		DC->fillRect( 64-4, y-4, 128+32, 128, *CreateColourVector(0,0,0,0.4f,NULL) );
-		DC->fillRect( 64-4, y-4, 128+32, 16, *CreateColourVector(0,0,0,0.4f,NULL) );
-		DrawStringNewBasic( 64, y, 0.25f, "Shadow Debug" );
-		y+=16;
-		DrawStringNewBasic( 64, y, 0.25f, va( "X=%1.f Y=%1.f Z=%1.f", cg.snap->ps.origin[0], cg.snap->ps.origin[1], cg.snap->ps.origin[2] ) );
-		
-		if( cg.snap->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR )
-		{
-			y+=12;
-			DrawStringNewBasic( 64, y, 0.25f, va( "X Offset=%1.f", availableVehicles[ ci->vehicle ].shadowCoords[ SHC_XOFFSET ] ) );
-			y+=12;
-			DrawStringNewBasic( 64, y, 0.25f, va( "Y Offset=%1.f", availableVehicles[ ci->vehicle ].shadowCoords[ SHC_YOFFSET ] ) );
-			y+=12;
-			DrawStringNewBasic( 64, y, 0.25f, va( "X Adjuster=%1.f", availableVehicles[ ci->vehicle ].shadowCoords[ SHC_XADJUST ] ) );
-			y+=12;
-			DrawStringNewBasic( 64, y, 0.25f, va( "Y Adjuster=%1.f", availableVehicles[ ci->vehicle ].shadowCoords[ SHC_YADJUST ] ) );
-			y+=12;
-			DrawStringNewBasic( 64, y, 0.25f, va( "Pitch Max=%1.f", availableVehicles[ ci->vehicle ].shadowAdjusts[ SHO_PITCHMAX ] ) );
-			y+=12;
-			DrawStringNewBasic( 64, y, 0.25f, va( "Roll Max=%1.f", availableVehicles[ ci->vehicle ].shadowAdjusts[ SHO_ROLLMAX ] ) );
-			y+=12;
-			DrawStringNewBasic( 64, y, 0.25f, va( "Pitch Modifier=%1.2f", availableVehicles[ ci->vehicle ].shadowAdjusts[ SHO_PITCHMOD ] ) );
-			y+=12;
-			DrawStringNewBasic( 64, y, 0.25f, va( "Roll Modifier=%1.2f", availableVehicles[ ci->vehicle ].shadowAdjusts[ SHO_ROLLMOD ] ) );
-		}
-	}
-}
 
 /*
 =====================
@@ -2454,7 +2295,6 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 	// draw status bar and other floating elements
 // 	CG_Draw2D();
 	CG_Draw2D_MFQ3();
-	CG_DrawDevelop();		// draw debugging (ONLY) text
 }
 
 
@@ -2568,7 +2408,7 @@ const char *CG_GameTypeString()
 CG_DrawGameType
 =====================
 */
-static void CG_DrawGameType(rectDef_t *rect, float scale, vec4_t color, qhandle_t shader, int textStyle )
+static void CG_DrawGameType(rectDef_t *rect, float scale, const vec4_t color, qhandle_t shader, int textStyle )
 {
 	CG_Text_Paint(rect->x, rect->y + rect->h, scale, color, CG_GameTypeString(), 0, 0, textStyle);
 }
@@ -2584,7 +2424,7 @@ static void CG_DrawGameMisc( itemDef_t * item )
 	item->text = CG_GameMiscString();
 
 	// draw
-	Item_Text_AutoWrapped_Paint( item );
+	cgUtils.item_Text_AutoWrapped_Paint( item );
 }
 
 /*
@@ -2618,7 +2458,7 @@ static void CG_DrawTeamScore( itemDef_t * item, int team )
 	}
 
 	// draw
-	Item_Text_AutoWrapped_Paint( item );
+	cgUtils.item_Text_AutoWrapped_Paint( item );
 }
 
 /*
@@ -2682,7 +2522,7 @@ static void CG_DrawTeamCount( itemDef_t * item, int team )
 	}
 
 	// draw
-	Item_Text_AutoWrapped_Paint( item );
+	cgUtils.item_Text_AutoWrapped_Paint( item );
 }
 
 /*
@@ -2690,7 +2530,7 @@ static void CG_DrawTeamCount( itemDef_t * item, int team )
 CG_DrawGameStatus
 =====================
 */
-static void CG_DrawGameStatus(rectDef_t *rect, float scale, vec4_t color, qhandle_t shader, int textStyle )
+static void CG_DrawGameStatus(rectDef_t *rect, float scale, const vec4_t color, qhandle_t shader, int textStyle )
 {
 	CG_Text_Paint(rect->x, rect->y + rect->h, scale, color, CG_GetGameStatusText(), 0, 0, textStyle);
 }
@@ -2700,7 +2540,9 @@ static void CG_DrawGameStatus(rectDef_t *rect, float scale, vec4_t color, qhandl
 CG_OwnerDraw
 =====================
 */
-void CG_OwnerDraw( float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, int ownerDrawFlags, int align, float special, float scale, vec4_t color, qhandle_t shader, int textStyle, itemDef_t * item )
+void CG_OwnerDraw( float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, int ownerDrawFlags, 
+				  int align, float special, float scale, const vec4_t color, qhandle_t shader, int textStyle, 
+				  itemDef_t * item )
 {
 	rectDef_t rect;
 
