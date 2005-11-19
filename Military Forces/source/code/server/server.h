@@ -342,22 +342,6 @@ void SV_SetBrushModel( entityState_t* s, entityShared_t* r, const char *name );
 void SV_LocateGameData( void* gEnts, int numGEntities, int sizeofGEntity_t,
 					   playerState_t *clients, int sizeofGameClient );
 
-//
-// sv_bot.c
-//
-//void		SV_BotFrame( int time );
-//int			SV_BotAllocateClient(void);
-//void		SV_BotFreeClient( int clientNum );
-//
-//void		SV_BotInitCvars(void);
-//int			SV_BotLibSetup( void );
-//int			SV_BotLibShutdown( void );
-//int			SV_BotGetSnapshotEntity( int client, int ent );
-//int			SV_BotGetConsoleMessage( int client, char *buf, int size );
-//
-//int BotImport_DebugPolygonCreate(int color, int numPoints, vec3_t *points);
-//void BotImport_DebugPolygonDelete(int id);
-
 //============================================================
 //
 // high level object sorting to reduce interaction tests

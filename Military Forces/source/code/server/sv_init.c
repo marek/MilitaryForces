@@ -444,7 +444,6 @@ void SV_SpawnServer( char *server, bool killBots ) {
 	for ( i = 0 ;i < 3 ; i++ ) {
 		//VM_Call( gvm, GAME_RUN_FRAME, svs.time );
 		theSG.gameRunFrame( svs.time );
-//		SV_BotFrame( svs.time );
 		svs.time += 100;
 	}
 
@@ -503,7 +502,6 @@ void SV_SpawnServer( char *server, bool killBots ) {
 	// run another frame to allow things to look at all the players
 	//VM_Call( gvm, GAME_RUN_FRAME, svs.time );
 	theSG.gameRunFrame( svs.time );
-//	SV_BotFrame( svs.time );
 	svs.time += 100;
 
 	if ( sv_pure->integer ) {
@@ -562,7 +560,6 @@ SV_Init
 Only called at main exe startup, not for each game
 ===============
 */
-void SV_BotInitBotLib(void);
 
 void SV_Init (void) {
 	SV_AddOperatorCommands ();
@@ -616,11 +613,6 @@ void SV_Init (void) {
 	sv_lanForceRate = Cvar_Get ("sv_lanForceRate", "1", CVAR_ARCHIVE );
 	sv_strictAuth = Cvar_Get ("sv_strictAuth", "1", CVAR_ARCHIVE );
 
-	// initialize bot cvars so they are listed and can be set before loading the botlib
-//	SV_BotInitCvars();
-
-	// init the botlib here because we need the pre-compiler in the UI
-	SV_BotInitBotLib();
 }
 
 

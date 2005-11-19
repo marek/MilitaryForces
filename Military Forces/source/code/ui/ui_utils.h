@@ -10,6 +10,9 @@
 struct UI_HashUtils;
 struct ControlUtils;
 struct UI_CaptureBase;
+struct UI_PrecompilerTools;
+
+
 
 struct UI_Utils
 {
@@ -195,6 +198,8 @@ struct UI_Utils
 
 	UI_DisplayContext*			getDisplayContext() { return dc_; }
 
+	UI_PrecompilerTools*		getPrecompilerTools() { return precomp_; }
+
 	static const int			SCROLL_TIME_START =	500;
 	static const int			SCROLL_TIME_ADJUST = 150;
 	static const int			SCROLL_TIME_ADJUSTOFFSET = 40;
@@ -256,6 +261,7 @@ protected:
 	int							strHandleCount_;
 	StringDef*					strHandle_[HASH_TABLE_SIZE];
 
+	UI_PrecompilerTools*		precomp_;
 
 private:
 	// disable	

@@ -240,6 +240,12 @@
 				RelativePath=".\ui_main.c">
 			</File>
 			<File
+				RelativePath=".\ui_memtools.cpp">
+			</File>
+			<File
+				RelativePath=".\ui_precomp.cpp">
+			</File>
+			<File
 				RelativePath=".\ui_syscalls.c">
 			</File>
 			<File
@@ -289,6 +295,12 @@
 				RelativePath=".\ui_local.h">
 			</File>
 			<File
+				RelativePath=".\ui_memtools.h">
+			</File>
+			<File
+				RelativePath=".\ui_precomp.h">
+			</File>
+			<File
 				RelativePath=".\ui_public.h">
 			</File>
 			<File
@@ -308,9 +320,6 @@
 			Name="Resource Files"
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe">
 		</Filter>
-		<File
-			RelativePath=".\ui_syscalls.asm">
-		</File>
 	</Files>
 	<Globals>
 	</Globals>

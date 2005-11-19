@@ -35,7 +35,6 @@ private:
 	static const int			k_CURSOR_OY;
 	static const int			k_CURSOR_W;
 	static const int			k_CURSOR_H;
-
 };
 
 

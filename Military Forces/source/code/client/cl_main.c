@@ -99,7 +99,6 @@ int serverStatusCount;
 	void hA3Dg_ExportRenderGeom (refexport_t *incoming_re);
 #endif
 
-//extern void SV_BotFrame( int time );
 void CL_CheckForResend( void );
 void CL_ShowIP_f(void);
 void CL_ServerStatus_f(void);
@@ -2168,7 +2167,7 @@ void CL_StartHunkUsers( void ) {
 
 	if ( !cls.uiStarted ) {
 		cls.uiStarted = true;
-		CL_InitUI();
+		theUI.init( (cls.state >= CA_AUTHORIZING && cls.state < CA_ACTIVE) );
 	}
 }
 

@@ -741,9 +741,6 @@
 				RelativePath="..\win32\glw_win.h">
 			</File>
 			<File
-				RelativePath="..\qcommon\qcommon.h">
-			</File>
-			<File
 				RelativePath="..\qcommon\qfiles.h">
 			</File>
 			<File

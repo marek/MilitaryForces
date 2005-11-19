@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.9 2005-11-12 14:28:14 thebjoern Exp $
+ * $Id: ui_main.c,v 1.10 2005-11-19 09:52:38 thebjoern Exp $
 */
 /*
 =======================================================================
@@ -12,6 +12,7 @@ USER INTERFACE MAIN
 #include "ui_local.h"
 #include "ui_utils.h"
 #include "ui_controls.h"
+#include "ui_precomp.h"
 
 uiInfo_t uiInfo;
 
@@ -810,29 +811,30 @@ char *GetMenuBuffer(const char *filename) {
 
 }
 
-bool Asset_Parse(int handle) {
-	pc_token_t token;
+bool Asset_Parse(int handle) 
+{
+	UI_PrecompilerTools::PC_Token  token;
 	const char *tempStr;
 
-	if (!trap_PC_ReadToken(handle, &token))
+	if (!uiInfo.uiUtils.getPrecompilerTools()->readTokenHandle(handle, &token))
 		return false;
-	if (Q_stricmp(token.string, "{") != 0) {
+	if (Q_stricmp(token.string_, "{") != 0) {
 		return false;
 	}
     
 	while ( 1 ) {
 
-		memset(&token, 0, sizeof(pc_token_t));
+		memset(&token, 0, sizeof(UI_PrecompilerTools::PC_Token ));
 
-		if (!trap_PC_ReadToken(handle, &token))
+		if (!uiInfo.uiUtils.getPrecompilerTools()->readTokenHandle(handle, &token))
 			return false;
 
-		if (Q_stricmp(token.string, "}") == 0) {
+		if (Q_stricmp(token.string_, "}") == 0) {
 			return true;
 		}
 
 		// font
-		if (Q_stricmp(token.string, "font") == 0) {
+		if (Q_stricmp(token.string_, "font") == 0) {
 			int pointSize;
 			if (!uiInfo.uiUtils.pc_String_Parse(handle, &tempStr) || !uiInfo.uiUtils.pc_Int_Parse(handle,&pointSize)) {
 				return false;
@@ -842,7 +844,7 @@ bool Asset_Parse(int handle) {
 			continue;
 		}
 
-		if (Q_stricmp(token.string, "smallFont") == 0) {
+		if (Q_stricmp(token.string_, "smallFont") == 0) {
 			int pointSize;
 			if (!uiInfo.uiUtils.pc_String_Parse(handle, &tempStr) || !uiInfo.uiUtils.pc_Int_Parse(handle,&pointSize)) {
 				return false;
@@ -851,7 +853,7 @@ bool Asset_Parse(int handle) {
 			continue;
 		}
 
-		if (Q_stricmp(token.string, "bigFont") == 0) {
+		if (Q_stricmp(token.string_, "bigFont") == 0) {
 			int pointSize;
 			if (!uiInfo.uiUtils.pc_String_Parse(handle, &tempStr) || !uiInfo.uiUtils.pc_Int_Parse(handle,&pointSize)) {
 				return false;
@@ -862,7 +864,7 @@ bool Asset_Parse(int handle) {
 
 
 		// gradientbar
-		if (Q_stricmp(token.string, "gradientbar") == 0) {
+		if (Q_stricmp(token.string_, "gradientbar") == 0) {
 			if (!uiInfo.uiUtils.pc_String_Parse(handle, &tempStr)) {
 				return false;
 			}
@@ -871,7 +873,7 @@ bool Asset_Parse(int handle) {
 		}
 
 		// enterMenuSound
-		if (Q_stricmp(token.string, "menuEnterSound") == 0) {
+		if (Q_stricmp(token.string_, "menuEnterSound") == 0) {
 			if (!uiInfo.uiUtils.pc_String_Parse(handle, &tempStr)) {
 				return false;
 			}
@@ -880,7 +882,7 @@ bool Asset_Parse(int handle) {
 		}
 
 		// exitMenuSound
-		if (Q_stricmp(token.string, "menuExitSound") == 0) {
+		if (Q_stricmp(token.string_, "menuExitSound") == 0) {
 			if (!uiInfo.uiUtils.pc_String_Parse(handle, &tempStr)) {
 				return false;
 			}
@@ -889,7 +891,7 @@ bool Asset_Parse(int handle) {
 		}
 
 		// itemFocusSound
-		if (Q_stricmp(token.string, "itemFocusSound") == 0) {
+		if (Q_stricmp(token.string_, "itemFocusSound") == 0) {
 			if (!uiInfo.uiUtils.pc_String_Parse(handle, &tempStr)) {
 				return false;
 			}
@@ -898,7 +900,7 @@ bool Asset_Parse(int handle) {
 		}
 
 		// menuBuzzSound
-		if (Q_stricmp(token.string, "menuBuzzSound") == 0) {
+		if (Q_stricmp(token.string_, "menuBuzzSound") == 0) {
 			if (!uiInfo.uiUtils.pc_String_Parse(handle, &tempStr)) {
 				return false;
 			}
@@ -906,7 +908,7 @@ bool Asset_Parse(int handle) {
 			continue;
 		}
 
-		if (Q_stricmp(token.string, "cursor") == 0) {
+		if (Q_stricmp(token.string_, "cursor") == 0) {
 			if (!uiInfo.uiUtils.pc_String_Parse(handle, &uiInfo.uiUtils.getDisplayContext()->assets_.cursorStr )) {
 				return false;
 			}
@@ -914,7 +916,7 @@ bool Asset_Parse(int handle) {
 			continue;
 		}
 
-		if (Q_stricmp(token.string, "cursorWait") == 0) {
+		if (Q_stricmp(token.string_, "cursorWait") == 0) {
 			if (!uiInfo.uiUtils.pc_String_Parse(handle, &uiInfo.uiUtils.getDisplayContext()->assets_.cursorStrWait )) {
 				return false;
 			}
@@ -922,42 +924,42 @@ bool Asset_Parse(int handle) {
 			continue;
 		}
 
-		if (Q_stricmp(token.string, "fadeClamp") == 0) {
+		if (Q_stricmp(token.string_, "fadeClamp") == 0) {
 			if (!uiInfo.uiUtils.pc_Float_Parse(handle, &uiInfo.uiUtils.getDisplayContext()->assets_.fadeClamp)) {
 				return false;
 			}
 			continue;
 		}
 
-		if (Q_stricmp(token.string, "fadeCycle") == 0) {
+		if (Q_stricmp(token.string_, "fadeCycle") == 0) {
 			if (!uiInfo.uiUtils.pc_Int_Parse(handle, &uiInfo.uiUtils.getDisplayContext()->assets_.fadeCycle)) {
 				return false;
 			}
 			continue;
 		}
 
-		if (Q_stricmp(token.string, "fadeAmount") == 0) {
+		if (Q_stricmp(token.string_, "fadeAmount") == 0) {
 			if (!uiInfo.uiUtils.pc_Float_Parse(handle, &uiInfo.uiUtils.getDisplayContext()->assets_.fadeAmount)) {
 				return false;
 			}
 			continue;
 		}
 
-		if (Q_stricmp(token.string, "shadowX") == 0) {
+		if (Q_stricmp(token.string_, "shadowX") == 0) {
 			if (!uiInfo.uiUtils.pc_Float_Parse(handle, &uiInfo.uiUtils.getDisplayContext()->assets_.shadowX)) {
 				return false;
 			}
 			continue;
 		}
 
-		if (Q_stricmp(token.string, "shadowY") == 0) {
+		if (Q_stricmp(token.string_, "shadowY") == 0) {
 			if (!uiInfo.uiUtils.pc_Float_Parse(handle, &uiInfo.uiUtils.getDisplayContext()->assets_.shadowY)) {
 				return false;
 			}
 			continue;
 		}
 
-		if (Q_stricmp(token.string, "shadowColor") == 0) {
+		if (Q_stricmp(token.string_, "shadowColor") == 0) {
 			if (!uiInfo.uiUtils.pc_Color_Parse(handle, &uiInfo.uiUtils.getDisplayContext()->assets_.shadowColor)) {
 				return false;
 			}
@@ -987,20 +989,21 @@ void UI_Report()
 
 }
 
-void UI_ParseMenu(const char *menuFile) {
+void UI_ParseMenu(const char *menuFile) 
+{
 	int handle;
-	pc_token_t token;
+	UI_PrecompilerTools::PC_Token  token;
 
 	Com_Printf("Parsing menu file:%s\n", menuFile);
 
-	handle = trap_PC_LoadSource(menuFile);
+	handle = uiInfo.uiUtils.getPrecompilerTools()->loadSourceHandle(menuFile);
 	if (!handle) {
 		return;
 	}
 
 	while ( 1 ) {
-		memset(&token, 0, sizeof(pc_token_t));
-		if (!trap_PC_ReadToken( handle, &token )) {
+		memset(&token, 0, sizeof(UI_PrecompilerTools::PC_Token ));
+		if (!uiInfo.uiUtils.getPrecompilerTools()->readTokenHandle( handle, &token )) {
 			break;
 		}
 
@@ -1014,11 +1017,11 @@ void UI_ParseMenu(const char *menuFile) {
 		//	break;
 		//}
 
-		if ( token.string[0] == '}' ) {
+		if ( token.string_[0] == '}' ) {
 			break;
 		}
 
-		if (Q_stricmp(token.string, "assetGlobalDef") == 0) {
+		if (Q_stricmp(token.string_, "assetGlobalDef") == 0) {
 			if (Asset_Parse(handle)) {
 				continue;
 			} else {
@@ -1026,52 +1029,54 @@ void UI_ParseMenu(const char *menuFile) {
 			}
 		}
 
-		if (Q_stricmp(token.string, "menudef") == 0) {
+		if (Q_stricmp(token.string_, "menudef") == 0) {
 			// start a New menu
 			uiInfo.uiUtils.menu_New(handle);
 		}
 	}
-	trap_PC_FreeSource(handle);
+	uiInfo.uiUtils.getPrecompilerTools()->freeSourceHandle(handle);
 }
 
-bool Load_Menu(int handle) {
-	pc_token_t token;
+bool Load_Menu(int handle) 
+{
+	UI_PrecompilerTools::PC_Token  token;
 
-	if (!trap_PC_ReadToken(handle, &token))
+	if (!uiInfo.uiUtils.getPrecompilerTools()->readTokenHandle(handle, &token))
 		return false;
-	if (token.string[0] != '{') {
+	if (token.string_[0] != '{') {
 		return false;
 	}
 
 	while ( 1 ) {
 
-		if (!trap_PC_ReadToken(handle, &token))
+		if (!uiInfo.uiUtils.getPrecompilerTools()->readTokenHandle(handle, &token))
 			return false;
     
-		if ( token.string[0] == 0 ) {
+		if ( token.string_[0] == 0 ) {
 			return false;
 		}
 
-		if ( token.string[0] == '}' ) {
+		if ( token.string_[0] == '}' ) {
 			return true;
 		}
 
-		UI_ParseMenu(token.string); 
+		UI_ParseMenu(token.string_); 
 	}
 	return false;
 }
 
-void UI_LoadMenus(const char *menuFile, bool reset) {
-	pc_token_t token;
+void UI_LoadMenus(const char *menuFile, bool reset) 
+{
+	UI_PrecompilerTools::PC_Token  token;
 	int handle;
 	int start;
 
 	start = trap_Milliseconds();
 
-	handle = trap_PC_LoadSource( menuFile );
+	handle = uiInfo.uiUtils.getPrecompilerTools()->loadSourceHandle( menuFile );
 	if (!handle) {
 		trap_Error( va( S_COLOR_YELLOW "menu file not found: %s, using default\n", menuFile ) );
-		handle = trap_PC_LoadSource( "ui/menus.txt" );
+		handle = uiInfo.uiUtils.getPrecompilerTools()->loadSourceHandle( "ui/menus.txt" );
 		if (!handle) {
 			trap_Error( va( S_COLOR_RED "default menu file not found: ui/menus.txt, unable to continue!\n", menuFile ) );
 		}
@@ -1084,17 +1089,17 @@ void UI_LoadMenus(const char *menuFile, bool reset) {
 	}
 
 	while ( 1 ) {
-		if (!trap_PC_ReadToken(handle, &token))
+		if (!uiInfo.uiUtils.getPrecompilerTools()->readTokenHandle(handle, &token))
 			break;
-		if( token.string[0] == 0 || token.string[0] == '}') {
-			break;
-		}
-
-		if ( token.string[0] == '}' ) {
+		if( token.string_[0] == 0 || token.string_[0] == '}') {
 			break;
 		}
 
-		if (Q_stricmp(token.string, "loadmenu") == 0) {
+		if ( token.string_[0] == '}' ) {
+			break;
+		}
+
+		if (Q_stricmp(token.string_, "loadmenu") == 0) {
 			if (Load_Menu(handle)) {
 				continue;
 			} else {
@@ -1105,7 +1110,7 @@ void UI_LoadMenus(const char *menuFile, bool reset) {
 
 	//Com_Printf("UI menu load time = %d milli seconds\n", ServerUIApi::milliseconds() - start);
 
-	trap_PC_FreeSource( handle );
+	uiInfo.uiUtils.getPrecompilerTools()->freeSourceHandle( handle );
 }
 
 void UI_Load() 

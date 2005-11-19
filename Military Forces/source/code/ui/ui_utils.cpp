@@ -4,7 +4,7 @@
 #include "ui_keywordhash.h"
 #include "ui_controls.h"
 #include "ui_itemcapture.h"
-
+#include "ui_precomp.h"
 
 
 
@@ -51,6 +51,8 @@ UI_Utils::UI_Utils() :
 
 	Vector4Set( colourVector_, 1, 1, 1, 1 );
 	colourCharArray_[0] = colourCharArray_[1] = colourCharArray_[2] = colourCharArray_[3] = 255;
+
+	precomp_ = new UI_PrecompilerTools;
 }
 
 UI_Utils::~UI_Utils() 
@@ -63,6 +65,8 @@ UI_Utils::~UI_Utils()
 	commands_.clear();
 
 	delete hashUtils_;
+
+	delete precomp_;
 }
 
 //void 
@@ -484,35 +488,35 @@ UI_Utils::item_CorrectedTextRect(itemDef_t *item)
 bool 
 UI_Utils::item_Parse( int handle, itemDef_t *item ) 
 {
-	pc_token_t token;
+	UI_PrecompilerTools::PC_Token token;
 //	keywordHash_t *key;
 
-	if (!trap_PC_ReadToken(handle, &token))
+	if (!getPrecompilerTools()->readTokenHandle(handle, &token))
 		return false;
 
-	if (*token.string != '{')
+	if (*token.string_ != '{')
 		return false;
 
 	while ( 1 ) 
 	{
-		if (!trap_PC_ReadToken(handle, &token)) 
+		if (!getPrecompilerTools()->readTokenHandle(handle, &token)) 
 		{
 			pc_SourceError(handle, "end of file inside menu item\n");
 			return false;
 		}
 
-		if (*token.string == '}')
+		if (*token.string_ == '}')
 			return true;
 
-		KeywordHash* key = hashUtils_->findItemKeyword( token.string );
+		KeywordHash* key = hashUtils_->findItemKeyword( token.string_ );
 		if (!key) 
 		{
-			pc_SourceError(handle, "unknown menu item keyword %s", token.string);
+			pc_SourceError(handle, "unknown menu item keyword %s", token.string_);
 			continue;
 		}
 		if ( !key->func(item, handle) ) 
 		{
-			pc_SourceError(handle, "couldn't parse menu item keyword %s", token.string);
+			pc_SourceError(handle, "couldn't parse menu item keyword %s", token.string_);
 			return false;
 		}
 	}
@@ -3275,36 +3279,36 @@ UI_Utils::menu_Init(menuDef_t *menu)
 bool 
 UI_Utils::menu_Parse( int handle, menuDef_t *menu ) 
 {
-	pc_token_t token;
+	UI_PrecompilerTools::PC_Token  token;
 //	keywordHash_t *key;
 
-	if (!trap_PC_ReadToken(handle, &token))
+	if (!getPrecompilerTools()->readTokenHandle(handle, &token))
 		return false;
-	if (*token.string != '{')
+	if (*token.string_ != '{')
 		return false;
     
 	while ( 1 ) 
 	{
-		memset(&token, 0, sizeof(pc_token_t));
-		if (!trap_PC_ReadToken(handle, &token)) 
+		memset(&token, 0, sizeof(UI_PrecompilerTools::PC_Token ));
+		if (!getPrecompilerTools()->readTokenHandle(handle, &token)) 
 		{
 			pc_SourceError(handle, "end of file inside menu\n");
 			return false;
 		}
 
-		if (*token.string == '}') 
+		if (*token.string_ == '}') 
 			return true;
 
-		KeywordHash* key = hashUtils_->findMenuKeyword( token.string );
+		KeywordHash* key = hashUtils_->findMenuKeyword( token.string_ );
 
 		if (!key)
 		{
-			pc_SourceError(handle, "unknown menu keyword %s", token.string);
+			pc_SourceError(handle, "unknown menu keyword %s", token.string_);
 			continue;
 		}
 		if ( !key->func((itemDef_t*)menu, handle) ) 
 		{
-			pc_SourceError(handle, "couldn't parse menu keyword %s", token.string);
+			pc_SourceError(handle, "couldn't parse menu keyword %s", token.string_);
 			return false;
 		}
 	}
@@ -3963,7 +3967,7 @@ UI_Utils::pc_SourceError(int handle, char *format, ...)
 
 	filename[0] = '\0';
 	line = 0;
-	trap_PC_SourceFileAndLine(handle, filename, &line);
+	getPrecompilerTools()->sourceFileAndLine(handle, filename, &line);
 
 	Com_Printf(S_COLOR_RED "ERROR: %s, line %d: %s\n", filename, line, string);
 }
@@ -3971,26 +3975,26 @@ UI_Utils::pc_SourceError(int handle, char *format, ...)
 bool 
 UI_Utils::pc_Float_Parse( int handle, float *f ) 
 {
-	pc_token_t token;
+	UI_PrecompilerTools::PC_Token  token;
 	int negative = false;
 
-	if (!trap_PC_ReadToken(handle, &token))
+	if (!getPrecompilerTools()->readTokenHandle(handle, &token))
 		return false;
-	if (token.string[0] == '-') 
+	if (token.string_[0] == '-') 
 	{
-		if (!trap_PC_ReadToken(handle, &token))
+		if (!getPrecompilerTools()->readTokenHandle(handle, &token))
 			return false;
 		negative = true;
 	}
-	if (token.type != TT_NUMBER) 
+	if (token.type_ != UI_PrecompilerTools::TT_NUMBER) 
 	{
-		pc_SourceError(handle, "expected float but found %s\n", token.string);
+		pc_SourceError(handle, "expected float but found %s\n", token.string_);
 		return false;
 	}
 	if (negative)
-		*f = -token.floatvalue;
+		*f = -token.floatvalue_;
 	else
-		*f = token.floatvalue;
+		*f = token.floatvalue_;
 	return true;
 }
 
@@ -4014,23 +4018,23 @@ UI_Utils::pc_Color_Parse( int handle, vec4_t *c )
 bool 
 UI_Utils::pc_Int_Parse( int handle, int *i )
 {
-	pc_token_t token;
+	UI_PrecompilerTools::PC_Token  token;
 	int negative = false;
 
-	if (!trap_PC_ReadToken(handle, &token))
+	if (!getPrecompilerTools()->readTokenHandle(handle, &token))
 		return false;
-	if (token.string[0] == '-') 
+	if (token.string_[0] == '-') 
 	{
-		if (!trap_PC_ReadToken(handle, &token))
+		if (!getPrecompilerTools()->readTokenHandle(handle, &token))
 			return false;
 		negative = true;
 	}
-	if (token.type != TT_NUMBER) 
+	if (token.type_ != UI_PrecompilerTools::TT_NUMBER) 
 	{
-		pc_SourceError(handle, "expected integer but found %s\n", token.string);
+		pc_SourceError(handle, "expected integer but found %s\n", token.string_);
 		return false;
 	}
-	*i = token.intvalue;
+	*i = token.intvalue_;
 	if (negative)
 		*i = - *i;
 	return true;
@@ -4056,12 +4060,12 @@ UI_Utils::pc_Rect_Parse( int handle, rectDef_t *r )
 bool 
 UI_Utils::pc_String_Parse(int handle, const char **out) 
 {
-	pc_token_t token;
+	UI_PrecompilerTools::PC_Token  token;
 
-	if (!trap_PC_ReadToken(handle, &token))
+	if (!getPrecompilerTools()->readTokenHandle(handle, &token))
 		return false;
 	
-	*(out) = string_Alloc(token.string);
+	*(out) = string_Alloc(token.string_);
     return true;
 }
 
@@ -4069,31 +4073,31 @@ bool
 UI_Utils::pc_Script_Parse(int handle, const char **out) 
 {
 	char script[1024];
-	pc_token_t token;
+	UI_PrecompilerTools::PC_Token  token;
 
 	memset(script, 0, sizeof(script));
 	// scripts start with { and have ; separated command lists.. commands are command, arg.. 
 	// basically we want everything between the { } as it will be interpreted at run time
   
-	if (!trap_PC_ReadToken(handle, &token))
+	if (!getPrecompilerTools()->readTokenHandle(handle, &token))
 		return false;
-	if (Q_stricmp(token.string, "{") != 0) {
+	if (Q_stricmp(token.string_, "{") != 0) {
 	    return false;
 	}
 
 	while ( 1 ) {
-		if (!trap_PC_ReadToken(handle, &token))
+		if (!getPrecompilerTools()->readTokenHandle(handle, &token))
 			return false;
 
-		if (Q_stricmp(token.string, "}") == 0) {
+		if (Q_stricmp(token.string_, "}") == 0) {
 			*out = string_Alloc(script);
 			return true;
 		}
 
-		if (token.string[1] != '\0') {
-			Q_strcat(script, 1024, va("\"%s\"", token.string));
+		if (token.string_[1] != '\0') {
+			Q_strcat(script, 1024, va("\"%s\"", token.string_));
 		} else {
-			Q_strcat(script, 1024, token.string);
+			Q_strcat(script, 1024, token.string_);
 		}
 		Q_strcat(script, 1024, " ");
 	}

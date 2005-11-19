@@ -820,7 +820,8 @@ For some reason, other dll's can't just cal fclose()
 on files returned by FS_FOpenFile...
 ==============
 */
-void FS_FCloseFile( fileHandle_t f ) {
+void FS_FCloseFile( fileHandle_t f ) 
+{
 	if ( !fs_searchpaths ) {
 		Com_Error( ERR_FATAL, "Filesystem call made without initialization\n" );
 	}
@@ -1236,7 +1237,8 @@ FS_Read
 Properly handles partial reads
 =================
 */
-int FS_Read2( void *buffer, int len, fileHandle_t f ) {
+int FS_Read2( void *buffer, int len, fileHandle_t f ) 
+{
 	if ( !fs_searchpaths ) {
 		Com_Error( ERR_FATAL, "Filesystem call made without initialization\n" );
 	}
@@ -3353,7 +3355,8 @@ Handle based file calls for virtual machines
 ========================================================================================
 */
 
-int		FS_FOpenFileByMode( const char *qpath, fileHandle_t *f, fsMode_t mode ) {
+int		FS_FOpenFileByMode( const char *qpath, fileHandle_t *f, fsMode_t mode ) 
+{
 	int		r;
 	bool	sync;
 
