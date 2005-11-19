@@ -772,7 +772,7 @@ temp file loading
 
 */
 
-#if defined(_DEBUG) && !defined(BSPC)
+#if defined(_DEBUG) 
 	#define ZONE_DEBUG
 #endif
 
@@ -949,9 +949,6 @@ void	Sys_UnloadUI( void );
 void	*Sys_GetUIAPI( void );
 
 //bot libraries
-void	Sys_UnloadBotLib( void );
-void	*Sys_GetBotLibAPI( void *parms );
-
 char	*Sys_GetCurrentUser( void );
 
 void	QDECL Sys_Error( const char *error, ...);

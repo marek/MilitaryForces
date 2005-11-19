@@ -1,5 +1,5 @@
 /*
- * $Id: g_utils.c,v 1.4 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: g_utils.c,v 1.5 2005-11-19 09:52:38 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -662,41 +662,6 @@ void G_SetOrigin( gentity_t *ent, vec3_t origin ) {
 	VectorCopy( origin, ent->r.currentOrigin );
 }
 
-///*
-//================
-//DebugLine
-//
-//  debug polygons only work when running a local game
-//  with r_debugSurface set to 2
-//================
-//*/
-//int DebugLine(vec3_t start, vec3_t end, int color) {
-//	vec3_t points[4], dir, cross, up = {0, 0, 1};
-//	float dot;
-//
-//	VectorCopy(start, points[0]);
-//	VectorCopy(start, points[1]);
-//	//points[1][2] -= 2;
-//	VectorCopy(end, points[2]);
-//	//points[2][2] -= 2;
-//	VectorCopy(end, points[3]);
-//
-//
-//	VectorSubtract(end, start, dir);
-//	VectorNormalize(dir);
-//	dot = DotProduct(dir, up);
-//	if (dot > 0.99 || dot < -0.99) VectorSet(cross, 1, 0, 0);
-//	else CrossProduct(dir, up, cross);
-//
-//	VectorNormalize(cross);
-//
-//	VectorMA(points[0], 2, cross, points[0]);
-//	VectorMA(points[1], -2, cross, points[1]);
-//	VectorMA(points[2], -2, cross, points[2]);
-//	VectorMA(points[3], 2, cross, points[3]);
-//
-//	return trap_DebugPolygonCreate(color, 4, points);
-//}
 
 
 // --------------------

@@ -1,5 +1,5 @@
 /*
- * $Id: ui_shared.h,v 1.5 2005-11-12 14:28:14 thebjoern Exp $
+ * $Id: ui_shared.h,v 1.6 2005-11-19 09:52:38 thebjoern Exp $
 */
 #ifndef __UI_SHARED_H__
 #define __UI_SHARED_H__
@@ -478,11 +478,11 @@ struct cachedAssets_t
 //void Controls_SetConfig(bool restart);
 //void Controls_SetDefaults( void );
 
-int			trap_PC_AddGlobalDefine( char *define );
-int			trap_PC_LoadSource( const char *filename );
-int			trap_PC_FreeSource( int handle );
-int			trap_PC_ReadToken( int handle, pc_token_t *pc_token );
-int			trap_PC_SourceFileAndLine( int handle, char *filename, int *line );
+//int			trap_PC_AddGlobalDefine( char *define );
+//int			trap_PC_LoadSource( const char *filename );
+//int			trap_PC_FreeSource( int handle );
+//int			trap_PC_ReadToken( int handle, pc_token_t *pc_token );
+//int			trap_PC_SourceFileAndLine( int handle, char *filename, int *line );
 
 //void VerticalGradient_Paint(rectDef_t *rect, vec4_t color);
 

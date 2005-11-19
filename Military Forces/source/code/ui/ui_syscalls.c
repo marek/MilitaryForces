@@ -1,5 +1,5 @@
 /*
- * $Id: ui_syscalls.c,v 1.5 2005-11-12 14:28:14 thebjoern Exp $
+ * $Id: ui_syscalls.c,v 1.6 2005-11-19 09:52:38 thebjoern Exp $
 */
 #include "ui_local.h"
 #include "..\cgame\cg_public.h"
@@ -7,7 +7,7 @@
 #include "..\renderer\tr_public.h"
 #include "..\server\server.h"
 #include "..\client\client.h"
-#include "..\botlib\botlib.h"
+//#include "..\botlib\botlib.h"
 
 // this file is only included when building a dll
 // syscalls.asm is included instead when building a qvm
@@ -71,7 +71,7 @@ struct gentity_t;
 
 
 extern refexport_t	re;
-extern botlib_export_t	*botlib_export;
+
 
 void trap_Print( const char *string ) 
 {
@@ -666,29 +666,29 @@ void trap_SetCDKey( char *buf )
 //	return syscall( UI_PC_ADD_GLOBAL_DEFINE, define );
 //}
 
-int trap_PC_LoadSource( const char *filename ) 
-{
-	//return syscall( UI_PC_LOAD_SOURCE, filename );
-	return botlib_export->PC_LoadSourceHandle( filename );
-}
+//int trap_PC_LoadSource( const char *filename ) 
+//{
+//	//return syscall( UI_PC_LOAD_SOURCE, filename );
+//	return botlib_export->PC_LoadSourceHandle( filename );
+//}
 
-int trap_PC_FreeSource( int handle ) 
-{
-	//return syscall( UI_PC_FREE_SOURCE, handle );
-	return botlib_export->PC_FreeSourceHandle( handle );
-}
+//int trap_PC_FreeSource( int handle ) 
+//{
+//	//return syscall( UI_PC_FREE_SOURCE, handle );
+//	return botlib_export->PC_FreeSourceHandle( handle );
+//}
 
-int trap_PC_ReadToken( int handle, pc_token_t *pc_token ) 
-{
-	//return syscall( UI_PC_READ_TOKEN, handle, pc_token );
-	return botlib_export->PC_ReadTokenHandle( handle, pc_token );
-}
+//int trap_PC_ReadToken( int handle, pc_token_t *pc_token ) 
+//{
+//	//return syscall( UI_PC_READ_TOKEN, handle, pc_token );
+//	return botlib_export->PC_ReadTokenHandle( handle, pc_token );
+//}
 
-int trap_PC_SourceFileAndLine( int handle, char *filename, int *line ) 
-{
-	//return syscall( UI_PC_SOURCE_FILE_AND_LINE, handle, filename, line );
-	return botlib_export->PC_SourceFileAndLine( handle, filename, line );
-}
+//int trap_PC_SourceFileAndLine( int handle, char *filename, int *line ) 
+//{
+//	//return syscall( UI_PC_SOURCE_FILE_AND_LINE, handle, filename, line );
+//	return botlib_export->PC_SourceFileAndLine( handle, filename, line );
+//}
 
 int trap_RealTime(qtime_t *qtime) 
 {

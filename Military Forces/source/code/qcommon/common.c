@@ -793,7 +793,8 @@ int Z_AvailableZoneMemory( memzone_t *zone ) {
 Z_AvailableMemory
 ========================
 */
-int Z_AvailableMemory( void ) {
+int Z_AvailableMemory( void ) 
+{
 	return Z_AvailableZoneMemory( mainzone );
 }
 

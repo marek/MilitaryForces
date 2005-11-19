@@ -1,5 +1,7 @@
 #include "ui_keywordhash.h"
 #include "ui_utils.h"
+#include "ui_precomp.h"
+
 
 
 UI_Utils* KeywordHash::utils_ = 0;
@@ -754,7 +756,7 @@ ItemKeyword_CvarStrList::ItemKeyword_CvarStrList() : KeywordHash( "cvarStrList" 
 bool
 ItemKeyword_CvarStrList::func( itemDef_t *item, int handle )
 {
-	pc_token_t token;
+	UI_PrecompilerTools::PC_Token token;
 	multiDef_t *multiPtr;
 	int pass;
 	
@@ -765,34 +767,34 @@ ItemKeyword_CvarStrList::func( itemDef_t *item, int handle )
 	multiPtr->count = 0;
 	multiPtr->strDef = true;
 
-	if (!trap_PC_ReadToken(handle, &token))
+	if (!utils_->getPrecompilerTools()->readTokenHandle(handle, &token))
 		return false;
-	if (*token.string != '{')
+	if (*token.string_ != '{')
 		return false;
 
 	pass = 0;
 	while ( 1 ) 
 	{
-		if (!trap_PC_ReadToken(handle, &token)) 
+		if (!utils_->getPrecompilerTools()->readTokenHandle(handle, &token)) 
 		{
 			utils_->pc_SourceError(handle, "end of file inside menu item\n");
 			return false;
 		}
 
-		if (*token.string == '}')
+		if (*token.string_ == '}')
 			return true;
 
-		if (*token.string == ',' || *token.string == ';') 
+		if (*token.string_ == ',' || *token.string_ == ';') 
 			continue;
 
 		if (pass == 0) 
 		{
-			multiPtr->cvarList[multiPtr->count] = utils_->string_Alloc(token.string);
+			multiPtr->cvarList[multiPtr->count] = utils_->string_Alloc(token.string_);
 			pass = 1;
 		} 
 		else 
 		{
-			multiPtr->cvarStr[multiPtr->count] = utils_->string_Alloc(token.string);
+			multiPtr->cvarStr[multiPtr->count] = utils_->string_Alloc(token.string_);
 			pass = 0;
 			multiPtr->count++;
 			if (multiPtr->count >= MAX_MULTI_CVARS)
@@ -808,7 +810,7 @@ ItemKeyword_CvarFloatList::ItemKeyword_CvarFloatList() : KeywordHash( "cvarFloat
 bool
 ItemKeyword_CvarFloatList::func( itemDef_t *item, int handle )
 {
-	pc_token_t token;
+	UI_PrecompilerTools::PC_Token  token;
 	multiDef_t *multiPtr;
 	
 	utils_->item_ValidateTypeData(item);
@@ -818,26 +820,26 @@ ItemKeyword_CvarFloatList::func( itemDef_t *item, int handle )
 	multiPtr->count = 0;
 	multiPtr->strDef = false;
 
-	if (!trap_PC_ReadToken(handle, &token))
+	if (!utils_->getPrecompilerTools()->readTokenHandle(handle, &token))
 		return false;
-	if (*token.string != '{')
+	if (*token.string_ != '{')
 		return false;
 
 	while ( 1 ) 
 	{
-		if (!trap_PC_ReadToken(handle, &token)) 
+		if (!utils_->getPrecompilerTools()->readTokenHandle(handle, &token)) 
 		{
 			utils_->pc_SourceError(handle, "end of file inside menu item\n");
 			return false;
 		}
 
-		if (*token.string == '}')
+		if (*token.string_ == '}')
 			return true;
 
-		if (*token.string == ',' || *token.string == ';')
+		if (*token.string_ == ',' || *token.string_ == ';')
 			continue;
 
-		multiPtr->cvarList[multiPtr->count] = utils_->string_Alloc(token.string);
+		multiPtr->cvarList[multiPtr->count] = utils_->string_Alloc(token.string_);
 		if (!utils_->pc_Float_Parse(handle, &multiPtr->cvarValue[multiPtr->count]))
 			return false;
 

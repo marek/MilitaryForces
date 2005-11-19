@@ -418,7 +418,7 @@ typedef enum {
 #define UI_INVERSE		0x00002000
 #define UI_PULSE		0x00004000
 
-#if defined(_DEBUG) && !defined(BSPC)
+#if defined(_DEBUG) 
 	#define HUNK_DEBUG
 #endif
 
@@ -827,23 +827,23 @@ void	COM_ParseWarning( char *format, ... );
 
 #define MAX_TOKENLENGTH		1024
 
-#ifndef TT_STRING
-//token types
-#define TT_STRING					1			// string
-#define TT_LITERAL					2			// literal
-#define TT_NUMBER					3			// number
-#define TT_NAME						4			// name
-#define TT_PUNCTUATION				5			// punctuation
-#endif
+//#ifndef TT_STRING
+////token types
+//#define TT_STRING					1			// string
+//#define TT_LITERAL					2			// literal
+//#define TT_NUMBER					3			// number
+//#define TT_NAME						4			// name
+//#define TT_PUNCTUATION				5			// punctuation
+//#endif
 
-typedef struct pc_token_s
-{
-	int type;
-	int subtype;
-	int intvalue;
-	float floatvalue;
-	char string[MAX_TOKENLENGTH];
-} pc_token_t;
+//typedef struct pc_token_s
+//{
+//	int type;
+//	int subtype;
+//	int intvalue;
+//	float floatvalue;
+//	char string[MAX_TOKENLENGTH];
+//} pc_token_t;
 
 // data is an in/out parm, returns a parsed out token
 

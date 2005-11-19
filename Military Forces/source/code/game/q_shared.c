@@ -312,7 +312,8 @@ static char *SkipWhitespace( char *data, bool *hasNewLines ) {
 	return data;
 }
 
-int COM_Compress( char *data_p ) {
+int COM_Compress( char *data_p ) 
+{
 	char *in, *out;
 	int c;
 	bool newline = false, whitespace = false;
