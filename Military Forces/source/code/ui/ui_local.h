@@ -1,5 +1,5 @@
 /*
- * $Id: ui_local.h,v 1.7 2005-11-12 14:28:14 thebjoern Exp $
+ * $Id: ui_local.h,v 1.8 2005-11-20 11:21:38 thebjoern Exp $
 */
 //
 #ifndef __UI_LOCAL_H__
@@ -910,12 +910,15 @@ void UI_SPPostgameMenu_f( void );
 void UI_SPSkillMenu( const char *arenaInfo );
 void UI_SPSkillMenu_Cache( void );
 
+// system calls
+int Sys_Milliseconds ();
+
 //
 // ui_syscalls.c
 //
-void			trap_Print( const char *string );
-void			trap_Error( const char *string );
-int				trap_Milliseconds( void );
+//void			trap_Print( const char *string );
+//void			trap_Error( const char *string );
+//int				trap_Milliseconds( void );
 void			trap_Cvar_Register( vmCvar_t *vmCvar, const char *varName, const char *defaultValue, int flags );
 void			trap_Cvar_Update( vmCvar_t *vmCvar );
 void			trap_Cvar_Set( const char *var_name, const char *value );

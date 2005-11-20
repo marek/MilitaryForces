@@ -1,5 +1,5 @@
 /*
- * $Id: g_waypoint.c,v 1.1 2005-08-22 16:07:29 thebjoern Exp $
+ * $Id: g_waypoint.c,v 1.2 2005-11-20 11:21:38 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -23,7 +23,7 @@ void AddToWaypointManager( gentity_t *wp )
 	Q_strncpyz( w->name, wp->targetname, MAX_NAME_LENGTH );
 	VectorCopy( wp->s.origin, w->pos );
 	
-	G_Printf( "Found waypoint %s (%d)\n", w->name, idx );
+	Com_Printf( "Found waypoint %s (%d)\n", w->name, idx );
 
 	// increment
 	level.waypointList.usedWPs++;

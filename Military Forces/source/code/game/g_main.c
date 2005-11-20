@@ -195,27 +195,27 @@ This must be the very first function compiled into the .q3vm file
 //}
 
 
-void QDECL G_Printf( const char *fmt, ... ) {
-	va_list		argptr;
-	char		text[1024];
+//void QDECL Com_Printf( const char *fmt, ... ) {
+//	va_list		argptr;
+//	char		text[1024];
+//
+//	va_start (argptr, fmt);
+//	vsprintf (text, fmt, argptr);
+//	va_end (argptr);
+//
+//	Com_Printf( "%s", text );
+//}
 
-	va_start (argptr, fmt);
-	vsprintf (text, fmt, argptr);
-	va_end (argptr);
-
-	trap_Print( text );
-}
-
-void QDECL G_Error( const char *fmt, ... ) {
-	va_list		argptr;
-	char		text[1024];
-
-	va_start (argptr, fmt);
-	vsprintf (text, fmt, argptr);
-	va_end (argptr);
-
-	trap_Error( text );
-}
+//void QDECL G_Error( const char *fmt, ... ) {
+//	va_list		argptr;
+//	char		text[1024];
+//
+//	va_start (argptr, fmt);
+//	vsprintf (text, fmt, argptr);
+//	va_end (argptr);
+//
+//	trap_Error( text );
+//}
 
 /*
 ================
@@ -270,7 +270,7 @@ void G_FindTeams( void ) {
 		}
 	}
 
-	G_Printf ("%i teams with %i entities\n", c, c2);
+	Com_Printf ("%i teams with %i entities\n", c, c2);
 }
 
 void G_RemapTeamShaders() {
@@ -304,7 +304,7 @@ void G_RegisterCvars( void ) {
 
 	// check some things
 	if ( g_gametype.integer < 0 || g_gametype.integer >= GT_MAX_GAME_TYPE ) {
-		G_Printf( "g_gametype %i is out of range, defaulting to 0\n", g_gametype.integer );
+		Com_Printf( "g_gametype %i is out of range, defaulting to 0\n", g_gametype.integer );
 		trap_Cvar_Set( "g_gametype", "0" );
 	}
 	
@@ -352,13 +352,14 @@ G_InitGame
 
 ============
 */
-void G_InitGame( int levelTime, int randomSeed ) {
+void G_InitGame( int levelTime, int randomSeed ) 
+{
 	int					i;
 
-	G_Printf ("------- Game Initialization -------\n");
-	G_Printf ("gamename: %s\n", GAME_IDENTIFIER);
-	G_Printf ("gamedate: %s\n",  __DATE__ );
-	G_Printf ("mfq3 version: %s\n", GAME_VERSION );
+	Com_Printf ("------- Game Initialization -------\n");
+	Com_Printf ("gamename: %s\n", GAME_IDENTIFIER);
+	Com_Printf ("gamedate: %s\n",  __DATE__ );
+	Com_Printf ("mf version: %s\n", MF_VERSION );
 
 	srand( randomSeed );
 
@@ -369,7 +370,7 @@ void G_InitGame( int levelTime, int randomSeed ) {
 	G_InitMemory();
 
 	// MFQ3: set the game version into a server var (that can be viewed as server-info)
-	trap_Cvar_Set( "mf_version", GAME_VERSION );
+	trap_Cvar_Set( "mf_version", MF_VERSION );
 
 	// MFQ3: (for now) always set the 'g_synchronousClients' var to 0, as setting to 1
 	// causes glitching/flickering with the models
@@ -391,7 +392,7 @@ void G_InitGame( int levelTime, int randomSeed ) {
 			trap_FS_FOpenFile( g_log.string, &level.logFile, FS_APPEND );
 		}
 		if ( !level.logFile ) {
-			G_Printf( "WARNING: Couldn't open logfile: %s\n", g_log.string );
+			Com_Printf( "WARNING: Couldn't open logfile: %s\n", g_log.string );
 		} else {
 			char	serverinfo[MAX_INFO_STRING];
 
@@ -401,7 +402,7 @@ void G_InitGame( int levelTime, int randomSeed ) {
 			G_LogPrintf("InitGame: %s\n", serverinfo );
 		}
 	} else {
-		G_Printf( "Not logging to disk.\n" );
+		Com_Printf( "Not logging to disk.\n" );
 	}
 
 	G_InitWorldSession();
@@ -433,7 +434,7 @@ void G_InitGame( int levelTime, int randomSeed ) {
 
 	// MFQ3 data
 	MF_LoadAllVehicleData();
-	DataManager::getInstance().createAllData();
+	//DataManager::getInstance().createAllData();
 
 	// parse the key/value pairs and spawn gentities
 	G_SpawnEntitiesFromString();
@@ -448,7 +449,7 @@ void G_InitGame( int levelTime, int randomSeed ) {
 
 	SaveRegisteredItems();
 
-	G_Printf ("-----------------------------------\n");
+	Com_Printf ("-----------------------------------\n");
 
 	if( g_gametype.integer == GT_SINGLE_PLAYER || trap_Cvar_VariableIntegerValue( "com_buildScript" ) ) {
 		G_SoundIndex( "sound/player/gurp1.wav" );
@@ -481,7 +482,7 @@ G_ShutdownGame
 =================
 */
 void G_ShutdownGame() {
-	G_Printf ("==== ShutdownGame ====\n");
+	Com_Printf ("==== ShutdownGame ====\n");
 
 	if ( level.logFile ) {
 		G_LogPrintf("ShutdownGame:\n" );
@@ -1022,7 +1023,7 @@ void QDECL G_LogPrintf( const char *fmt, ... ) {
 	va_end( argptr );
 
 	if ( g_dedicated.integer ) {
-		G_Printf( "%s", string + 7 );
+		Com_Printf( "%s", string + 7 );
 	}
 
 	if ( !level.logFile ) {
@@ -1603,7 +1604,7 @@ void G_RunThink (gentity_t *ent) {
 	
 	ent->nextthink = 0;
 	if (!ent->think) {
-		G_Error ( "NULL ent->think");
+		Com_Error( ERR_DROP, "NULL ent->think");
 	}
 	ent->think (ent);
 }
@@ -1637,7 +1638,7 @@ void G_RunFrame( int levelTime ) {
 	//
 	// go through all allocated objects
 	//
-	start = trap_Milliseconds();
+	start = Sys_Milliseconds();
 	ent = &g_entities[0];
 	for (i=0 ; i<level.num_entities ; i++, ent++) {
 		if ( !ent->inuse ) {
@@ -1698,9 +1699,9 @@ void G_RunFrame( int levelTime ) {
 
 		G_RunThink( ent );
 	}
-end = trap_Milliseconds();
+end = Sys_Milliseconds();
 
-start = trap_Milliseconds();
+start = Sys_Milliseconds();
 	// perform final fixups on the players
 	ent = &g_entities[0];
 	for (i=0 ; i < level.maxclients ; i++, ent++ ) {
@@ -1708,7 +1709,7 @@ start = trap_Milliseconds();
 			ClientEndFrame( ent );
 		}
 	}
-end = trap_Milliseconds();
+end = Sys_Milliseconds();
 
 	// see if it is time to do a tournement restart
 	CheckTournament();
@@ -1731,7 +1732,7 @@ end = trap_Milliseconds();
 
 	if (g_listEntity.integer) {
 		for (i = 0; i < MAX_GENTITIES; i++) {
-			G_Printf("%4i: %s\n", i, g_entities[i].classname);
+			Com_Printf("%4i: %s\n", i, g_entities[i].classname);
 		}
 		trap_Cvar_Set("g_listEntity", "0");
 	}

@@ -1,5 +1,5 @@
 /*
- * $Id: ui_atoms.c,v 1.5 2005-11-12 14:28:14 thebjoern Exp $
+ * $Id: ui_atoms.c,v 1.6 2005-11-20 11:21:38 thebjoern Exp $
 */
 
 /**********************************************************************
@@ -253,7 +253,7 @@ static void UI_CalcPostGameStats() {
 
 	if  (newHigh) {
 		// if so write out the New one
-		uiInfo.newHighScoreTime = uiInfo.uiUtils.getDisplayContext()->realTime_ + 20000;
+		uiInfo.newHighScoreTime = uiInfo.uiUtils.dc_->realTime_ + 20000;
 		if (trap_FS_FOpenFile(fileName, &f, FS_WRITE) >= 0) {
 			size = sizeof(postGameInfo_t);
 			trap_FS_Write(&size, sizeof(int), f);
@@ -263,7 +263,7 @@ static void UI_CalcPostGameStats() {
 	}
 
 	if (newInfo.time < oldInfo.time) {
-		uiInfo.newBestTime = uiInfo.uiUtils.getDisplayContext()->realTime_ + 20000;
+		uiInfo.newBestTime = uiInfo.uiUtils.dc_->realTime_ + 20000;
 	}
  
 	// put back all the ui overrides
@@ -304,8 +304,8 @@ UI_ConsoleCommand
 bool UI_ConsoleCommand( int realTime ) {
 	char	*cmd;
 
-	uiInfo.uiUtils.getDisplayContext()->frameTime_ = realTime - uiInfo.uiUtils.getDisplayContext()->realTime_;
-	uiInfo.uiUtils.getDisplayContext()->realTime_ = realTime;
+	uiInfo.uiUtils.dc_->frameTime_ = realTime - uiInfo.uiUtils.dc_->realTime_;
+	uiInfo.uiUtils.dc_->realTime_ = realTime;
 
 	cmd = UI_Argv( 0 );
 
@@ -440,10 +440,10 @@ void UI_AdjustFrom640( float *x, float *y, float *w, float *h ) {
 	*h *= uiInfo.uiDC.scale;
 #endif
 
-	*x *= uiInfo.uiUtils.getDisplayContext()->xScale_;
-	*y *= uiInfo.uiUtils.getDisplayContext()->yScale_;
-	*w *= uiInfo.uiUtils.getDisplayContext()->xScale_;
-	*h *= uiInfo.uiUtils.getDisplayContext()->yScale_;
+	*x *= uiInfo.uiUtils.dc_->xScale_;
+	*y *= uiInfo.uiUtils.dc_->yScale_;
+	*w *= uiInfo.uiUtils.dc_->xScale_;
+	*h *= uiInfo.uiUtils.dc_->yScale_;
 
 }
 
@@ -497,7 +497,7 @@ void UI_FillRect( float x, float y, float width, float height, const float *colo
 	trap_R_SetColor( color );
 
 	UI_AdjustFrom640( &x, &y, &width, &height );
-	trap_R_DrawStretchPic( x, y, width, height, 0, 0, 0, 0, uiInfo.uiUtils.getDisplayContext()->whiteShader_ );
+	trap_R_DrawStretchPic( x, y, width, height, 0, 0, 0, 0, uiInfo.uiUtils.dc_->whiteShader_ );
 
 	trap_R_SetColor( NULL );
 }
@@ -505,15 +505,15 @@ void UI_FillRect( float x, float y, float width, float height, const float *colo
 void UI_DrawSides(float x, float y, float w, float h) 
 {
 	UI_AdjustFrom640( &x, &y, &w, &h );
-	trap_R_DrawStretchPic( x, y, 1, h, 0, 0, 0, 0, uiInfo.uiUtils.getDisplayContext()->whiteShader_ );
-	trap_R_DrawStretchPic( x + w - 1, y, 1, h, 0, 0, 0, 0, uiInfo.uiUtils.getDisplayContext()->whiteShader_ );
+	trap_R_DrawStretchPic( x, y, 1, h, 0, 0, 0, 0, uiInfo.uiUtils.dc_->whiteShader_ );
+	trap_R_DrawStretchPic( x + w - 1, y, 1, h, 0, 0, 0, 0, uiInfo.uiUtils.dc_->whiteShader_ );
 }
 
 void UI_DrawTopBottom(float x, float y, float w, float h) 
 {
 	UI_AdjustFrom640( &x, &y, &w, &h );
-	trap_R_DrawStretchPic( x, y, w, 1, 0, 0, 0, 0, uiInfo.uiUtils.getDisplayContext()->whiteShader_ );
-	trap_R_DrawStretchPic( x, y + h - 1, w, 1, 0, 0, 0, 0, uiInfo.uiUtils.getDisplayContext()->whiteShader_ );
+	trap_R_DrawStretchPic( x, y, w, 1, 0, 0, 0, 0, uiInfo.uiUtils.dc_->whiteShader_ );
+	trap_R_DrawStretchPic( x, y + h - 1, w, 1, 0, 0, 0, 0, uiInfo.uiUtils.dc_->whiteShader_ );
 }
 /*
 ================
@@ -548,10 +548,10 @@ void UI_DrawTextBox (int x, int y, int width, int lines)
 
 bool UI_CursorInRect (int x, int y, int width, int height)
 {
-	if (uiInfo.uiUtils.getDisplayContext()->cursorX_ < x ||
-		uiInfo.uiUtils.getDisplayContext()->cursorY_ < y ||
-		uiInfo.uiUtils.getDisplayContext()->cursorX_ > x+width ||
-		uiInfo.uiUtils.getDisplayContext()->cursorY_ > y+height)
+	if (uiInfo.uiUtils.dc_->cursorX_ < x ||
+		uiInfo.uiUtils.dc_->cursorY_ < y ||
+		uiInfo.uiUtils.dc_->cursorX_ > x+width ||
+		uiInfo.uiUtils.dc_->cursorY_ > y+height)
 		return false;
 
 	return true;

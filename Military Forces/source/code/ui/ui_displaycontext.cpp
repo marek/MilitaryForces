@@ -3,6 +3,10 @@
 
 
 
+UI_DisplayContext::UI_DisplayContext()
+{
+	memset( &assets_, 0, sizeof(assets_) );
+}
 
 
 qhandle_t

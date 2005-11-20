@@ -1,5 +1,5 @@
 /*
- * $Id: ui_syscalls.c,v 1.6 2005-11-19 09:52:38 thebjoern Exp $
+ * $Id: ui_syscalls.c,v 1.7 2005-11-20 11:21:38 thebjoern Exp $
 */
 #include "ui_local.h"
 #include "..\cgame\cg_public.h"
@@ -7,22 +7,6 @@
 #include "..\renderer\tr_public.h"
 #include "..\server\server.h"
 #include "..\client\client.h"
-//#include "..\botlib\botlib.h"
-
-// this file is only included when building a dll
-// syscalls.asm is included instead when building a qvm
-
-//static int (QDECL *syscall)( int arg, ... ) = (int (QDECL *)( int, ...))-1;
-
-//void dllEntry( int (QDECL *syscallptr)( int arg,... ) ) {
-//	syscall = syscallptr;
-//}
-
-//int PASSFLOAT( float x ) {
-//	float	floatTemp;
-//	floatTemp = x;
-//	return *(int *)&floatTemp;
-//}
 
 //decls
 void Key_KeynumToStringBuf( int keynum, char *buf, int buflen );
@@ -73,23 +57,13 @@ struct gentity_t;
 extern refexport_t	re;
 
 
-void trap_Print( const char *string ) 
-{
-	//syscall( UI_PRINT, string );
-	Com_Printf( "%s", string );
-}
 
-void trap_Error( const char *string ) 
-{
-	//syscall( UI_ERROR, string );
-	Com_Error( ERR_DROP, "%s", string );
-}
 
-int trap_Milliseconds( void ) 
-{
-	//return syscall( UI_MILLISECONDS ); 
-	return Sys_Milliseconds();
-}
+//int trap_Milliseconds( void ) 
+//{
+//	//return syscall( UI_MILLISECONDS ); 
+//	return Sys_Milliseconds();
+//}
 
 void trap_Cvar_Register( vmCvar_t *cvar, const char *var_name, const char *value, int flags ) 
 {

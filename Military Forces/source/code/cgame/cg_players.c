@@ -1,5 +1,5 @@
 /*
- * $Id: cg_players.c,v 1.4 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: cg_players.c,v 1.5 2005-11-20 11:21:38 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -49,7 +49,7 @@ sfxHandle_t	CG_CustomSound( int clientNum, const char *soundName ) {
 		}
 	}
 
-	CG_Error( "Unknown custom sound: %s", soundName );
+	Com_Error( ERR_DROP, "Unknown custom sound: %s", soundName );
 	return 0;
 }
 

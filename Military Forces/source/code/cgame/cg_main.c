@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.13 2005-11-19 09:52:38 thebjoern Exp $
+ * $Id: cg_main.c,v 1.14 2005-11-20 11:21:38 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -14,7 +14,7 @@
 
 // display context for New ui stuff
 //displayContextDef_t cgDC;
-//UI_DisplayContextCG cgUtils.getDisplayContext();
+//UI_DisplayContextCG cgUtils.dc_;
 UI_UtilsCG cgUtils;
 
 int forceModelModificationCount = -1;
@@ -457,20 +457,20 @@ void QDECL CG_Printf( const char *msg, ... )
 	CG_Add_Console_Line( text );
 
 	// write the text into the console (only displayed if the cVar 'con_notifytime' is not -1)
-	trap_Print( text );
+	Com_Printf( "%s", text );
 }
 
-void QDECL CG_Error( const char *msg, ... ) 
-{
-	va_list		argptr;
-	char		text[1024];
-
-	va_start (argptr, msg);
-	vsprintf (text, msg, argptr);
-	va_end (argptr);
-
-	trap_Error( text );
-}
+//void QDECL CG_Error( const char *msg, ... ) 
+//{
+//	va_list		argptr;
+//	char		text[1024];
+//
+//	va_start (argptr, msg);
+//	vsprintf (text, msg, argptr);
+//	va_end (argptr);
+//
+//	trap_Error( text );
+//}
 
 /*
 ================
@@ -521,7 +521,7 @@ static void CG_RegisterItemSounds( int itemNum ) {
 
 		len = s-start;
 		if (len >= MAX_QPATH || len < 5) {
-			CG_Error( "PrecacheItem: %s has bad precache string", 
+			Com_Error( ERR_DROP, "PrecacheItem: %s has bad precache string", 
 				item->classname);
 			return;
 		}
@@ -1049,12 +1049,6 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.bulletFlashModel = trap_R_RegisterModel( "models/weaphits/bullet.md3");
 	cgs.media.dishFlashModel = trap_R_RegisterModel( "models/weaphits/boom01.md3");
 
-	cgs.media.medalImpressive = trap_R_RegisterShaderNoMip( "medal_impressive" );
-	cgs.media.medalExcellent = trap_R_RegisterShaderNoMip("medal_excellent" );
-	cgs.media.medalDefend = trap_R_RegisterShaderNoMip( "medal_defend" );
-	cgs.media.medalAssist = trap_R_RegisterShaderNoMip( "medal_assist" );
-	cgs.media.medalCapture = trap_R_RegisterShaderNoMip( "medal_capture" );
-
 	memset( cg_items, 0, sizeof( cg_items ) );
 	memset( cg_weapons, 0, sizeof( cg_weapons ) );
 
@@ -1192,7 +1186,7 @@ bool CG_Asset_Parse(int handle) {
 				!cgUtils.pc_Int_Parse(handle, &pointSize)) {
 				return false;
 			}
-			cgUtils.getDisplayContext()->registerFont(tempStr, pointSize, &cgUtils.getDisplayContext()->assets_.textFont);
+			cgUtils.dc_->registerFont(tempStr, pointSize, &cgUtils.dc_->assets_.textFont);
 			continue;
 		}
 
@@ -1203,7 +1197,7 @@ bool CG_Asset_Parse(int handle) {
 				!cgUtils.pc_Int_Parse(handle, &pointSize)) {
 				return false;
 			}
-			cgUtils.getDisplayContext()->registerFont(tempStr, pointSize, &cgUtils.getDisplayContext()->assets_.smallFont);
+			cgUtils.dc_->registerFont(tempStr, pointSize, &cgUtils.dc_->assets_.smallFont);
 			continue;
 		}
 
@@ -1214,7 +1208,7 @@ bool CG_Asset_Parse(int handle) {
 				!cgUtils.pc_Int_Parse(handle, &pointSize)) {
 				return false;
 			}
-			cgUtils.getDisplayContext()->registerFont(tempStr, pointSize, &cgUtils.getDisplayContext()->assets_.bigFont);
+			cgUtils.dc_->registerFont(tempStr, pointSize, &cgUtils.dc_->assets_.bigFont);
 			continue;
 		}
 
@@ -1223,7 +1217,7 @@ bool CG_Asset_Parse(int handle) {
 			if (!cgUtils.pc_String_Parse(handle, &tempStr)) {
 				return false;
 			}
-			cgUtils.getDisplayContext()->assets_.gradientBar = trap_R_RegisterShaderNoMip(tempStr);
+			cgUtils.dc_->assets_.gradientBar = trap_R_RegisterShaderNoMip(tempStr);
 			continue;
 		}
 
@@ -1232,7 +1226,7 @@ bool CG_Asset_Parse(int handle) {
 			if (!cgUtils.pc_String_Parse(handle, &tempStr)) {
 				return false;
 			}
-			cgUtils.getDisplayContext()->assets_.menuEnterSound = trap_S_RegisterSound( tempStr, false );
+			cgUtils.dc_->assets_.menuEnterSound = trap_S_RegisterSound( tempStr, false );
 			continue;
 		}
 
@@ -1241,7 +1235,7 @@ bool CG_Asset_Parse(int handle) {
 			if (!cgUtils.pc_String_Parse(handle, &tempStr)) {
 				return false;
 			}
-			cgUtils.getDisplayContext()->assets_.menuExitSound = trap_S_RegisterSound( tempStr, false );
+			cgUtils.dc_->assets_.menuExitSound = trap_S_RegisterSound( tempStr, false );
 			continue;
 		}
 
@@ -1250,7 +1244,7 @@ bool CG_Asset_Parse(int handle) {
 			if (!cgUtils.pc_String_Parse(handle, &tempStr)) {
 				return false;
 			}
-			cgUtils.getDisplayContext()->assets_.itemFocusSound = trap_S_RegisterSound( tempStr, false );
+			cgUtils.dc_->assets_.itemFocusSound = trap_S_RegisterSound( tempStr, false );
 			continue;
 		}
 
@@ -1259,66 +1253,66 @@ bool CG_Asset_Parse(int handle) {
 			if (!cgUtils.pc_String_Parse(handle, &tempStr)) {
 				return false;
 			}
-			cgUtils.getDisplayContext()->assets_.menuBuzzSound = trap_S_RegisterSound( tempStr, false );
+			cgUtils.dc_->assets_.menuBuzzSound = trap_S_RegisterSound( tempStr, false );
 			continue;
 		}
 
 		if (Q_stricmp(token.string_, "cursor") == 0) {
-			if (!cgUtils.pc_String_Parse(handle, &cgUtils.getDisplayContext()->assets_.cursorStr)) {
+			if (!cgUtils.pc_String_Parse(handle, &cgUtils.dc_->assets_.cursorStr)) {
 				return false;
 			}
-			cgUtils.getDisplayContext()->assets_.cursor = trap_R_RegisterShaderNoMip( cgUtils.getDisplayContext()->assets_.cursorStr);
+			cgUtils.dc_->assets_.cursor = trap_R_RegisterShaderNoMip( cgUtils.dc_->assets_.cursorStr);
 			continue;
 		}
 
 		if (Q_stricmp(token.string_, "cursorWait") == 0) {
-			if (!cgUtils.pc_String_Parse(handle, &cgUtils.getDisplayContext()->assets_.cursorStrWait)) {
+			if (!cgUtils.pc_String_Parse(handle, &cgUtils.dc_->assets_.cursorStrWait)) {
 				return false;
 			}
-			cgUtils.getDisplayContext()->assets_.cursorWait = trap_R_RegisterShaderNoMip( cgUtils.getDisplayContext()->assets_.cursorStrWait );
+			cgUtils.dc_->assets_.cursorWait = trap_R_RegisterShaderNoMip( cgUtils.dc_->assets_.cursorStrWait );
 			continue;
 		}
 
 		if (Q_stricmp(token.string_, "fadeClamp") == 0) {
-			if (!cgUtils.pc_Float_Parse(handle, &cgUtils.getDisplayContext()->assets_.fadeClamp)) {
+			if (!cgUtils.pc_Float_Parse(handle, &cgUtils.dc_->assets_.fadeClamp)) {
 				return false;
 			}
 			continue;
 		}
 
 		if (Q_stricmp(token.string_, "fadeCycle") == 0) {
-			if (!cgUtils.pc_Int_Parse(handle, &cgUtils.getDisplayContext()->assets_.fadeCycle)) {
+			if (!cgUtils.pc_Int_Parse(handle, &cgUtils.dc_->assets_.fadeCycle)) {
 				return false;
 			}
 			continue;
 		}
 
 		if (Q_stricmp(token.string_, "fadeAmount") == 0) {
-			if (!cgUtils.pc_Float_Parse(handle, &cgUtils.getDisplayContext()->assets_.fadeAmount)) {
+			if (!cgUtils.pc_Float_Parse(handle, &cgUtils.dc_->assets_.fadeAmount)) {
 				return false;
 			}
 			continue;
 		}
 
 		if (Q_stricmp(token.string_, "shadowX") == 0) {
-			if (!cgUtils.pc_Float_Parse(handle, &cgUtils.getDisplayContext()->assets_.shadowX)) {
+			if (!cgUtils.pc_Float_Parse(handle, &cgUtils.dc_->assets_.shadowX)) {
 				return false;
 			}
 			continue;
 		}
 
 		if (Q_stricmp(token.string_, "shadowY") == 0) {
-			if (!cgUtils.pc_Float_Parse(handle, &cgUtils.getDisplayContext()->assets_.shadowY)) {
+			if (!cgUtils.pc_Float_Parse(handle, &cgUtils.dc_->assets_.shadowY)) {
 				return false;
 			}
 			continue;
 		}
 
 		if (Q_stricmp(token.string_, "shadowColor") == 0) {
-			if (!cgUtils.pc_Color_Parse(handle, &cgUtils.getDisplayContext()->assets_.shadowColor)) {
+			if (!cgUtils.pc_Color_Parse(handle, &cgUtils.dc_->assets_.shadowColor)) {
 				return false;
 			}
-			cgUtils.getDisplayContext()->assets_.shadowFadeClamp = cgUtils.getDisplayContext()->assets_.shadowColor[3];
+			cgUtils.dc_->assets_.shadowFadeClamp = cgUtils.dc_->assets_.shadowColor[3];
 			continue;
 		}
 	}
@@ -1418,19 +1412,19 @@ void CG_LoadMenus(const char *menuFile) {
 	fileHandle_t	f;
 	static char buf[MAX_MENUDEFFILE];
 
-	start = trap_Milliseconds();
+	start = Sys_Milliseconds();
 
 	len = trap_FS_FOpenFile( menuFile, &f, FS_READ );
 	if ( !f ) {
-		trap_Error( va( S_COLOR_YELLOW "menu file not found: %s, using default\n", menuFile ) );
+		Com_Error( ERR_DROP, S_COLOR_YELLOW "menu file not found: %s, using default\n", menuFile );
 		len = trap_FS_FOpenFile( "ui/hud.txt", &f, FS_READ );
 		if (!f) {
-			trap_Error( va( S_COLOR_RED "default menu file not found: ui/hud.txt, unable to continue!\n", menuFile ) );
+			Com_Error( ERR_DROP, S_COLOR_RED "default menu file not found: ui/hud.txt, unable to continue!\n", menuFile );
 		}
 	}
 
 	if ( len >= MAX_MENUDEFFILE ) {
-		trap_Error( va( S_COLOR_RED "menu file too large: %s is %i, max allowed is %i", menuFile, len, MAX_MENUDEFFILE ) );
+		Com_Error( ERR_DROP, S_COLOR_RED "menu file too large: %s is %i, max allowed is %i", menuFile, len, MAX_MENUDEFFILE );
 		trap_FS_FCloseFile( f );
 		return;
 	}
@@ -1823,7 +1817,7 @@ CG_ConfigString
 */
 const char *CG_ConfigString( int index ) {
 	if ( index < 0 || index >= MAX_CONFIGSTRINGS ) {
-		CG_Error( "CG_ConfigString: bad index: %i", index );
+		Com_Error( ERR_DROP, "CG_ConfigString: bad index: %i", index );
 	}
 	return cgs.gameState.stringData + cgs.gameState.stringOffsets[ index ];
 }
@@ -1888,7 +1882,7 @@ void CG_LoadHudMenu() {
 	char buff[1024];
 	const char *hudSet;
 
-	//cgUtils.getDisplayContext().registerShaderNoMip = &trap_R_RegisterShaderNoMip;
+	//cgUtils.dc_.registerShaderNoMip = &trap_R_RegisterShaderNoMip;
 	//cgDC.setColor = &trap_R_SetColor;
 	//cgDC.drawHandlePic = &CG_DrawPic;
 	//cgDC.drawStretchPic = &trap_R_DrawStretchPic;
@@ -1938,7 +1932,7 @@ void CG_LoadHudMenu() {
 	////cgDC.drawCinematic = &CG_DrawCinematic;
 	////cgDC.runCinematicFrame = &CG_RunCinematicFrame;
 	
-	//cgUtils.init_Display(cgUtils.getDisplayContext());
+	//cgUtils.init_Display(cgUtils.dc_);
 
 	cgUtils.menu_Reset();
 	
@@ -1964,24 +1958,24 @@ void CG_AssetCache()
 	//}
 	//Assets.background = trap_R_RegisterShaderNoMip( ASSET_BACKGROUND );
 	//Com_Printf("Menu Size: %i bytes\n", sizeof(Menus));
-	cgUtils.getDisplayContext()->assets_.gradientBar = trap_R_RegisterShaderNoMip( ASSET_GRADIENTBAR );
-	cgUtils.getDisplayContext()->assets_.verticalGradient = trap_R_RegisterShaderNoMip( ASSET_VERTICALGRADIENT );
-	cgUtils.getDisplayContext()->assets_.fxBasePic = trap_R_RegisterShaderNoMip( ART_FX_BASE );
-	cgUtils.getDisplayContext()->assets_.fxPic[0] = trap_R_RegisterShaderNoMip( ART_FX_RED );
-	cgUtils.getDisplayContext()->assets_.fxPic[1] = trap_R_RegisterShaderNoMip( ART_FX_YELLOW );
-	cgUtils.getDisplayContext()->assets_.fxPic[2] = trap_R_RegisterShaderNoMip( ART_FX_GREEN );
-	cgUtils.getDisplayContext()->assets_.fxPic[3] = trap_R_RegisterShaderNoMip( ART_FX_TEAL );
-	cgUtils.getDisplayContext()->assets_.fxPic[4] = trap_R_RegisterShaderNoMip( ART_FX_BLUE );
-	cgUtils.getDisplayContext()->assets_.fxPic[5] = trap_R_RegisterShaderNoMip( ART_FX_CYAN );
-	cgUtils.getDisplayContext()->assets_.fxPic[6] = trap_R_RegisterShaderNoMip( ART_FX_WHITE );
-	cgUtils.getDisplayContext()->assets_.scrollBar = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR );
-	cgUtils.getDisplayContext()->assets_.scrollBarArrowDown = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWDOWN );
-	cgUtils.getDisplayContext()->assets_.scrollBarArrowUp = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWUP );
-	cgUtils.getDisplayContext()->assets_.scrollBarArrowLeft = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWLEFT );
-	cgUtils.getDisplayContext()->assets_.scrollBarArrowRight = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWRIGHT );
-	cgUtils.getDisplayContext()->assets_.scrollBarThumb = trap_R_RegisterShaderNoMip( ASSET_SCROLL_THUMB );
-	cgUtils.getDisplayContext()->assets_.sliderBar = trap_R_RegisterShaderNoMip( ASSET_SLIDER_BAR );
-	cgUtils.getDisplayContext()->assets_.sliderThumb = trap_R_RegisterShaderNoMip( ASSET_SLIDER_THUMB );
+	cgUtils.dc_->assets_.gradientBar = trap_R_RegisterShaderNoMip( ASSET_GRADIENTBAR );
+	cgUtils.dc_->assets_.verticalGradient = trap_R_RegisterShaderNoMip( ASSET_VERTICALGRADIENT );
+	cgUtils.dc_->assets_.fxBasePic = trap_R_RegisterShaderNoMip( ART_FX_BASE );
+	cgUtils.dc_->assets_.fxPic[0] = trap_R_RegisterShaderNoMip( ART_FX_RED );
+	cgUtils.dc_->assets_.fxPic[1] = trap_R_RegisterShaderNoMip( ART_FX_YELLOW );
+	cgUtils.dc_->assets_.fxPic[2] = trap_R_RegisterShaderNoMip( ART_FX_GREEN );
+	cgUtils.dc_->assets_.fxPic[3] = trap_R_RegisterShaderNoMip( ART_FX_TEAL );
+	cgUtils.dc_->assets_.fxPic[4] = trap_R_RegisterShaderNoMip( ART_FX_BLUE );
+	cgUtils.dc_->assets_.fxPic[5] = trap_R_RegisterShaderNoMip( ART_FX_CYAN );
+	cgUtils.dc_->assets_.fxPic[6] = trap_R_RegisterShaderNoMip( ART_FX_WHITE );
+	cgUtils.dc_->assets_.scrollBar = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR );
+	cgUtils.dc_->assets_.scrollBarArrowDown = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWDOWN );
+	cgUtils.dc_->assets_.scrollBarArrowUp = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWUP );
+	cgUtils.dc_->assets_.scrollBarArrowLeft = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWLEFT );
+	cgUtils.dc_->assets_.scrollBarArrowRight = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWRIGHT );
+	cgUtils.dc_->assets_.scrollBarThumb = trap_R_RegisterShaderNoMip( ASSET_SCROLL_THUMB );
+	cgUtils.dc_->assets_.sliderBar = trap_R_RegisterShaderNoMip( ASSET_SLIDER_BAR );
+	cgUtils.dc_->assets_.sliderThumb = trap_R_RegisterShaderNoMip( ASSET_SLIDER_THUMB );
 }
 
 // NOTE: functions copied from v1.29h code to enable New scoreboard method
@@ -2048,8 +2042,8 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 
 	// check version
 	s = CG_ConfigString( CS_GAME_VERSION );
-	if ( strcmp( s, GAME_VERSION ) ) {
-		CG_Error( "Client/Server game mismatch: %s/%s", GAME_VERSION, s );
+	if ( strcmp( s, MF_VERSION ) ) {
+		Com_Error( ERR_DROP, "Client/Server game mismatch: %s/%s", MF_VERSION, s );
 	}
 
 	s = CG_ConfigString( CS_LEVEL_START_TIME );

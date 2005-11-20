@@ -10,7 +10,7 @@
 
 struct UI_DisplayContext
 {
-							UI_DisplayContext() {}
+							UI_DisplayContext();
 	virtual					~UI_DisplayContext() {}
 
 	virtual qhandle_t		registerShaderNoMip( const char* p );

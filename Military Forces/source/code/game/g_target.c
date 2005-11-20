@@ -1,5 +1,5 @@
 /*
- * $Id: g_target.c,v 1.3 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: g_target.c,v 1.4 2005-11-20 11:21:38 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -124,7 +124,7 @@ void SP_target_speaker( gentity_t *ent ) {
 	G_SpawnFloat( "random", "0", &ent->random );
 
 	if ( !G_SpawnString( "noise", "NOSOUND", &s ) ) {
-		G_Error( "target_speaker without a noise key at %s", vtos( ent->s.origin ) );
+		Com_Error( ERR_DROP, "target_speaker without a noise key at %s", vtos( ent->s.origin ) );
 	}
 
 	// force all client reletive sounds to be "activator" speakers that

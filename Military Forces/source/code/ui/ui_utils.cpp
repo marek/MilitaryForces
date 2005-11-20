@@ -8,6 +8,9 @@
 
 
 
+
+UI_PrecompilerTools	UI_Utils::precomp_;
+
 UI_Utils::UI_Utils() : 
 	menuCount_(0),
 	openMenuCount_(0),
@@ -24,6 +27,7 @@ UI_Utils::UI_Utils() :
 	strPoolIndex_(0),
 	strHandleCount_(0)
 {
+	UI_CaptureBase::setUtils(this);
 	UI_HashUtils::setUtils(this);
 	hashUtils_ = new UI_HashUtils;
 	ControlUtils::setUtils(this);
@@ -52,7 +56,7 @@ UI_Utils::UI_Utils() :
 	Vector4Set( colourVector_, 1, 1, 1, 1 );
 	colourCharArray_[0] = colourCharArray_[1] = colourCharArray_[2] = colourCharArray_[3] = 255;
 
-	precomp_ = new UI_PrecompilerTools;
+	//precomp_ = new UI_PrecompilerTools;
 }
 
 UI_Utils::~UI_Utils() 
@@ -66,7 +70,7 @@ UI_Utils::~UI_Utils()
 
 	delete hashUtils_;
 
-	delete precomp_;
+	//delete precomp_;
 }
 
 //void 
@@ -491,7 +495,7 @@ UI_Utils::item_Parse( int handle, itemDef_t *item )
 	UI_PrecompilerTools::PC_Token token;
 //	keywordHash_t *key;
 
-	if (!getPrecompilerTools()->readTokenHandle(handle, &token))
+	if (!precomp_.readTokenHandle(handle, &token))
 		return false;
 
 	if (*token.string_ != '{')
@@ -499,7 +503,7 @@ UI_Utils::item_Parse( int handle, itemDef_t *item )
 
 	while ( 1 ) 
 	{
-		if (!getPrecompilerTools()->readTokenHandle(handle, &token)) 
+		if (!precomp_.readTokenHandle(handle, &token)) 
 		{
 			pc_SourceError(handle, "end of file inside menu item\n");
 			return false;
@@ -3282,7 +3286,7 @@ UI_Utils::menu_Parse( int handle, menuDef_t *menu )
 	UI_PrecompilerTools::PC_Token  token;
 //	keywordHash_t *key;
 
-	if (!getPrecompilerTools()->readTokenHandle(handle, &token))
+	if (!precomp_.readTokenHandle(handle, &token))
 		return false;
 	if (*token.string_ != '{')
 		return false;
@@ -3290,7 +3294,7 @@ UI_Utils::menu_Parse( int handle, menuDef_t *menu )
 	while ( 1 ) 
 	{
 		memset(&token, 0, sizeof(UI_PrecompilerTools::PC_Token ));
-		if (!getPrecompilerTools()->readTokenHandle(handle, &token)) 
+		if (!precomp_.readTokenHandle(handle, &token)) 
 		{
 			pc_SourceError(handle, "end of file inside menu\n");
 			return false;
@@ -3967,7 +3971,7 @@ UI_Utils::pc_SourceError(int handle, char *format, ...)
 
 	filename[0] = '\0';
 	line = 0;
-	getPrecompilerTools()->sourceFileAndLine(handle, filename, &line);
+	precomp_.sourceFileAndLine(handle, filename, &line);
 
 	Com_Printf(S_COLOR_RED "ERROR: %s, line %d: %s\n", filename, line, string);
 }
@@ -3978,11 +3982,11 @@ UI_Utils::pc_Float_Parse( int handle, float *f )
 	UI_PrecompilerTools::PC_Token  token;
 	int negative = false;
 
-	if (!getPrecompilerTools()->readTokenHandle(handle, &token))
+	if (!precomp_.readTokenHandle(handle, &token))
 		return false;
 	if (token.string_[0] == '-') 
 	{
-		if (!getPrecompilerTools()->readTokenHandle(handle, &token))
+		if (!precomp_.readTokenHandle(handle, &token))
 			return false;
 		negative = true;
 	}
@@ -4021,11 +4025,11 @@ UI_Utils::pc_Int_Parse( int handle, int *i )
 	UI_PrecompilerTools::PC_Token  token;
 	int negative = false;
 
-	if (!getPrecompilerTools()->readTokenHandle(handle, &token))
+	if (!precomp_.readTokenHandle(handle, &token))
 		return false;
 	if (token.string_[0] == '-') 
 	{
-		if (!getPrecompilerTools()->readTokenHandle(handle, &token))
+		if (!precomp_.readTokenHandle(handle, &token))
 			return false;
 		negative = true;
 	}
@@ -4062,7 +4066,7 @@ UI_Utils::pc_String_Parse(int handle, const char **out)
 {
 	UI_PrecompilerTools::PC_Token  token;
 
-	if (!getPrecompilerTools()->readTokenHandle(handle, &token))
+	if (!precomp_.readTokenHandle(handle, &token))
 		return false;
 	
 	*(out) = string_Alloc(token.string_);
@@ -4079,14 +4083,14 @@ UI_Utils::pc_Script_Parse(int handle, const char **out)
 	// scripts start with { and have ; separated command lists.. commands are command, arg.. 
 	// basically we want everything between the { } as it will be interpreted at run time
   
-	if (!getPrecompilerTools()->readTokenHandle(handle, &token))
+	if (!precomp_.readTokenHandle(handle, &token))
 		return false;
 	if (Q_stricmp(token.string_, "{") != 0) {
 	    return false;
 	}
 
 	while ( 1 ) {
-		if (!getPrecompilerTools()->readTokenHandle(handle, &token))
+		if (!precomp_.readTokenHandle(handle, &token))
 			return false;
 
 		if (Q_stricmp(token.string_, "}") == 0) {

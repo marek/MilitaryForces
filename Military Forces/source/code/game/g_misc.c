@@ -1,5 +1,5 @@
 /*
- * $Id: g_misc.c,v 1.2 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: g_misc.c,v 1.3 2005-11-20 11:21:38 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -81,7 +81,7 @@ void locateCamera( gentity_t *ent ) {
 
 	owner = G_PickTarget( ent->target );
 	if ( !owner ) {
-		G_Printf( "Couldn't find target for misc_partal_surface\n" );
+		Com_Printf( "Couldn't find target for misc_partal_surface\n" );
 		G_FreeEntity( ent );
 		return;
 	}

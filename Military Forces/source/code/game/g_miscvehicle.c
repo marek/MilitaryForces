@@ -1,5 +1,5 @@
 /*
- * $Id: g_miscvehicle.c,v 1.3 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: g_miscvehicle.c,v 1.4 2005-11-20 11:21:38 thebjoern Exp $
 */
 
 
@@ -341,7 +341,7 @@ void SP_misc_vehicle( gentity_t *sp_ent )
 
 	if( i < 0 || i >= bg_numberOfVehicles ) 
 	{
-		G_Printf ("%s (%s) cannot be spawned - index out of range\n", ent->classname, ent->model);
+		Com_Printf ("%s (%s) cannot be spawned - index out of range\n", ent->classname, ent->model);
 		G_FreeEntity(ent);
 		G_FreeEntity(sp_ent);
 		return;
@@ -389,7 +389,7 @@ void SP_misc_vehicle( gentity_t *sp_ent )
 		}
 	}
 	if( !found ) {
-		G_Printf ("%s (%s) cannot be spawned\n", ent->classname, ent->model);
+		Com_Printf ("%s (%s) cannot be spawned\n", ent->classname, ent->model);
 		G_FreeEntity(ent);
 		return;
 	}*/
@@ -410,7 +410,7 @@ void SP_misc_vehicle( gentity_t *sp_ent )
 		Com_sprintf(modelname, 127, "models/vehicles/ground/%s/%s.md3", availableVehicles[i].modelName,
 			availableVehicles[i].modelName );
 	}
-	G_Printf( "Spawning a %s\n", modelname );
+	Com_Printf( "Spawning a %s\n", modelname );
 
 	ent->s.eType = ET_MISC_VEHICLE;
 	ent->s.modelindex = i;
@@ -467,7 +467,7 @@ void SP_misc_groundinstallation( gentity_t *sp_ent )
 
 	if( i < 0 || i >= bg_numberOfGroundInstallations ) 
 	{
-		G_Printf ("%s (%s) cannot be spawned - index out of range\n", ent->classname, ent->model);
+		Com_Printf ("%s (%s) cannot be spawned - index out of range\n", ent->classname, ent->model);
 		G_FreeEntity(ent);
 		G_FreeEntity(sp_ent);
 		return;
@@ -475,7 +475,7 @@ void SP_misc_groundinstallation( gentity_t *sp_ent )
 
 	Com_sprintf(modelname, 127, "models/vehicles/npc/%s/%s.md3", availableGroundInstallations[i].modelName,
 		availableGroundInstallations[i].modelName );
-	G_Printf( "Spawning a %s\n", modelname );
+	Com_Printf( "Spawning a %s\n", modelname );
 
 	ent->s.eType = ET_MISC_VEHICLE;
 	ent->s.modelindex = 255;

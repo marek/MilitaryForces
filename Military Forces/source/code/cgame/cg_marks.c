@@ -1,5 +1,5 @@
 /*
- * $Id: cg_marks.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: cg_marks.c,v 1.3 2005-11-20 11:21:38 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -50,7 +50,7 @@ CG_FreeMarkPoly
 */
 void CG_FreeMarkPoly( markPoly_t *le ) {
 	if ( !le->prevMark ) {
-		CG_Error( "CG_FreeLocalEntity: not active" );
+		Com_Error( ERR_DROP, "CG_FreeLocalEntity: not active" );
 	}
 
 	// remove from the doubly linked active list
@@ -154,7 +154,7 @@ return;
 	// rubbish radius?
 	if ( xRadius <= 0 || yRadius <= 0 )
 	{
-		CG_Error( "CG_ImpactMarkEx called with xradius AND/OR yradius <= 0" );
+		Com_Error( ERR_DROP, "CG_ImpactMarkEx called with xradius AND/OR yradius <= 0" );
 	}
 
 	// create the texture axis

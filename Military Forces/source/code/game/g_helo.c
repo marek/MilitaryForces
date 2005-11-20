@@ -1,5 +1,5 @@
 /*
- * $Id: g_helo.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: g_helo.c,v 1.3 2005-11-20 11:21:38 thebjoern Exp $
 */
 
 
@@ -70,8 +70,8 @@ void checkTakeoffLandingHelo( gentity_t *self )
 
 void Touch_Helo( gentity_t *self, gentity_t *other, trace_t *trace ) 
 {
-	G_Printf( "You crashed into a %s\n", other->classname );
-//	G_Printf( "You crashed into a %.1f\n", self->client->ps.velocity[1] );
+	Com_Printf( "You crashed into a %s\n", other->classname );
+//	Com_Printf( "You crashed into a %.1f\n", self->client->ps.velocity[1] );
 //	self->client->ps.velocity[2] = 50;
 	// instead of dying on every collision we take damage depending on the speed
 	// with which we crashed into an obstacle, and this should be rather low...

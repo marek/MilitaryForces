@@ -1,5 +1,5 @@
 /*
- * $Id: g_mover.c,v 1.3 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: g_mover.c,v 1.4 2005-11-20 11:21:38 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -77,7 +77,7 @@ bool	G_TryPushingEntity( gentity_t *check, gentity_t *pusher, vec3_t move, vec3_
 
 	// save off the old position
 	if (pushed_p > &pushed[MAX_GENTITIES]) {
-		G_Error( "pushed_p > &pushed[MAX_GENTITIES]" );
+		Com_Error( ERR_DROP, "pushed_p > &pushed[MAX_GENTITIES]" );
 	}
 	pushed_p->ent = check;
 	VectorCopy (check->s.pos.trBase, pushed_p->origin);
@@ -478,7 +478,7 @@ void Reached_BinaryMover( gentity_t *ent ) {
 			trap_AdjustAreaPortalState( &ent->s, &ent->r, false );
 		}
 	} else {
-		G_Error( "Reached_BinaryMover: bad moverState" );
+		Com_Error( ERR_DROP, "Reached_BinaryMover: bad moverState" );
 	}
 }
 
@@ -1161,7 +1161,7 @@ void Think_SetupTrainTargets( gentity_t *ent ) {
 
 	ent->nextTrain = G_Find( NULL, FOFS(targetname), ent->target );
 	if ( !ent->nextTrain ) {
-		G_Printf( "func_train at %s with an unfound target\n",
+		Com_Printf( "func_train at %s with an unfound target\n",
 			vtos(ent->r.absmin) );
 		return;
 	}
@@ -1173,7 +1173,7 @@ void Think_SetupTrainTargets( gentity_t *ent ) {
 		}
 
 		if ( !path->target ) {
-			G_Printf( "Train corner at %s without a target\n",
+			Com_Printf( "Train corner at %s without a target\n",
 				vtos(path->s.origin) );
 			return;
 		}
@@ -1185,7 +1185,7 @@ void Think_SetupTrainTargets( gentity_t *ent ) {
 		do {
 			next = G_Find( next, FOFS(targetname), path->target );
 			if ( !next ) {
-				G_Printf( "Train corner at %s without a target path_corner\n",
+				Com_Printf( "Train corner at %s without a target path_corner\n",
 					vtos(path->s.origin) );
 				return;
 			}
@@ -1208,7 +1208,7 @@ Target: next path corner and other targets to fire
 */
 void SP_path_corner( gentity_t *self ) {
 	if ( !self->targetname ) {
-		G_Printf ("path_corner with no targetname at %s\n", vtos(self->s.origin));
+		Com_Printf ("path_corner with no targetname at %s\n", vtos(self->s.origin));
 		G_FreeEntity( self );
 		return;
 	}
@@ -1245,7 +1245,7 @@ void SP_func_train (gentity_t *self) {
 	}
 
 	if ( !self->target ) {
-		G_Printf ("func_train without a target at %s\n", vtos(self->r.absmin));
+		Com_Printf ("func_train without a target at %s\n", vtos(self->r.absmin));
 		G_FreeEntity( self );
 		return;
 	}

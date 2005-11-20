@@ -1,5 +1,5 @@
 /*
- * $Id: cg_event.c,v 1.5 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: cg_event.c,v 1.6 2005-11-20 11:21:38 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -338,7 +338,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position )
 				int				clientNum;
 			    clientNum = cent->currentState.clientNum;
 				if ( clientNum < 0 || clientNum >= MAX_CLIENTS ) {
-					trap_Error( "Bad clientNum on player entity (EV_GEAR_DOWN_FULL)");
+					Com_Error( ERR_DROP, "Bad clientNum on player entity (EV_GEAR_DOWN_FULL)");
 				}
 				ci = &cgs.clientinfo[ clientNum ];
 				cent->gearAnimFrame = availableVehicles[ci->vehicle].maxGearFrame;
@@ -526,7 +526,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position )
 
 	default:
 		DEBUGNAME("UNKNOWN");
-		CG_Error( "Unknown event: %i", event );
+		Com_Error( ERR_DROP, "Unknown event: %i", event );
 		break;
 	}
 

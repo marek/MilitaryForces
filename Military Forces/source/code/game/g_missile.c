@@ -647,7 +647,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 	if(availableWeapons[ent->s.weaponIndex].type == WT_NUKEBOMB || availableWeapons[ent->s.weaponIndex].type == WT_NUKEMISSILE)
 	{
 		if (!ent->think)
-			G_Error ( "NULL ent->think");
+			Com_Error( ERR_DROP, "NULL ent->think");
 		else
 			ent->think (ent);
 	}
@@ -860,7 +860,7 @@ static void follow_target( gentity_t *missile ) {
 		hit->ONOFF = 0; // disable the flare
 		prob = rand() % 100;
 		vulner = missile->basicECMVulnerability - missile->tracktarget->s.frame;
-		//G_Printf("TT: %d, vulner: %d, prob: %d\n", missile->tracktarget->s.frame, vulner, prob);
+		//Com_Printf("TT: %d, vulner: %d, prob: %d\n", missile->tracktarget->s.frame, vulner, prob);
 		if( prob < vulner ) {
 			if( missile->tracktarget->client )
 				missile->tracktarget->client->ps.stats[STAT_LOCKINFO] &= ~LI_BEING_LAUNCHED;
@@ -1244,7 +1244,7 @@ void fire_autocannon (gentity_t *self, bool main) {
 	spreadY = ((rand() % (unsigned int)spreadY) - spreadY/2)/10;
 	spreadangle[0] += spreadX;
 	spreadangle[1] += spreadY;
-//	G_Printf( "spread %.1f %.1f\n", spreadX, spreadY );
+//	Com_Printf( "spread %.1f %.1f\n", spreadX, spreadY );
 
 	VectorCopy( availableVehicles[self->client->vehicle].gunoffset, offset );
 	VectorCopy( self->s.pos.trBase, start );
@@ -1786,7 +1786,7 @@ void LaunchMissile_GI( gentity_t* ent )
 	vec3_t		dir, start;
 
 	ent->count--;
-//	G_Printf("Launching GI missile....%d left\n", ent->count);
+//	Com_Printf("Launching GI missile....%d left\n", ent->count);
 
 	VectorCopy( ent->s.pos.trBase, start );
 	start[2] += 10;

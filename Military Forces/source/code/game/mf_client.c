@@ -1,5 +1,5 @@
 /*
- * $Id: mf_client.c,v 1.8 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: mf_client.c,v 1.9 2005-11-20 11:21:38 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -253,7 +253,7 @@ void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 				}
 	
 				if( i > 25) {
-					G_Printf(S_COLOR_YELLOW "WARNING: Couldn't find a spawn point after over 25 tries (Check mf_lvcat?) \n");
+					Com_Printf(S_COLOR_YELLOW "WARNING: Couldn't find a spawn point after over 25 tries (Check mf_lvcat?) \n");
 					client->ps.pm_flags &= ~PMF_VEHICLESPAWN;
 					return;
 					break;

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.15 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: bg_public.h,v 1.16 2005-11-20 11:21:38 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -12,7 +12,7 @@
 #ifndef __BG_PUBLIC_H__
 #define __BG_PUBLIC_H__
 
-#define	GAME_VERSION		"v0.8c"
+//#define	GAME_VERSION		"v0.9"
 #define	GAME_IDENTIFIER		"mfgame"			// use to identify mfq3 servers
 
 #define	DEFAULT_GRAVITY		800.0f

@@ -1,5 +1,5 @@
 /*
- * $Id: ui_gameinfo.c,v 1.5 2005-11-12 14:28:14 thebjoern Exp $
+ * $Id: ui_gameinfo.c,v 1.6 2005-11-20 11:21:38 thebjoern Exp $
 */
 //
 // gameinfo.c
@@ -95,11 +95,11 @@ static void UI_LoadArenasFromFile( char *filename ) {
 
 	len = trap_FS_FOpenFile( filename, &f, FS_READ );
 	if ( !f ) {
-		trap_Print( va( S_COLOR_RED "file not found: %s\n", filename ) );
+		Com_Printf( S_COLOR_RED "file not found: %s\n", filename );
 		return;
 	}
 	if ( len >= MAX_ARENAS_TEXT ) {
-		trap_Print( va( S_COLOR_RED "file too large: %s is %i, max allowed is %i", filename, len, MAX_ARENAS_TEXT ) );
+		Com_Printf( S_COLOR_RED "file too large: %s is %i, max allowed is %i", filename, len, MAX_ARENAS_TEXT );
 		trap_FS_FCloseFile( f );
 		return;
 	}
@@ -159,9 +159,9 @@ void UI_LoadArenas( void ) {
 		strcat(filename, dirptr);
 		UI_LoadArenasFromFile(filename);
 	}
-	trap_Print( va( "%i arenas parsed\n", ui_numArenas ) );
+	Com_Printf( "%i arenas parsed\n", ui_numArenas );
 	if (uiInfo.uiUtils.outOfMemory()) {
-		trap_Print(S_COLOR_YELLOW"WARNING: not anough memory in pool to load all arenas\n");
+		Com_Printf(S_COLOR_YELLOW"WARNING: not anough memory in pool to load all arenas\n");
 	}
 
 	for( n = 0; n < ui_numArenas; n++ )

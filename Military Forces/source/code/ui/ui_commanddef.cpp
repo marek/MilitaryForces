@@ -31,8 +31,8 @@ UI_Utils::Command_SetFocus::handler( itemDef_t *item, char** args )
 			focusItem->window.flags |= WINDOW_HASFOCUS;
 			if (focusItem->onFocus) 
 				utils_->item_RunScript(focusItem, focusItem->onFocus);
-			if (utils_->getDisplayContext()->assets_.itemFocusSound) 
-				utils_->getDisplayContext()->startLocalSound( utils_->getDisplayContext()->assets_.itemFocusSound, CHAN_LOCAL_SOUND );
+			if (utils_->dc_->assets_.itemFocusSound) 
+				utils_->dc_->startLocalSound( utils_->dc_->assets_.itemFocusSound, CHAN_LOCAL_SOUND );
 		}
 	}
 }
@@ -145,7 +145,7 @@ UI_Utils::Command_SetBackground::handler( itemDef_t *item, char** args )
 	// expecting name to set asset to
 	if (utils_->string_Parse(args, &name)) 
 	{
-		item->window.background = utils_->getDisplayContext()->registerShaderNoMip(name);
+		item->window.background = utils_->dc_->registerShaderNoMip(name);
 	}
 }
 
@@ -208,7 +208,7 @@ UI_Utils::Command_SetPlayerModel::handler( itemDef_t *item, char** args )
 	const char *name;
 	if (utils_->string_Parse(args, &name)) 
 	{
-		utils_->getDisplayContext()->setCVar("team_model", name);
+		utils_->dc_->setCVar("team_model", name);
 	}
 }
 
@@ -217,7 +217,7 @@ UI_Utils::Command_SetPlayerHead::handler( itemDef_t *item, char** args )
 {
 	const char *name;
 	if (utils_->string_Parse(args, &name)) 
-		utils_->getDisplayContext()->setCVar("team_headmodel", name);
+		utils_->dc_->setCVar("team_headmodel", name);
 }
 
 void
@@ -245,7 +245,7 @@ UI_Utils::Command_SetCvar::handler( itemDef_t *item, char** args )
 {
 	const char *cvar, *val;
 	if (utils_->string_Parse(args, &cvar) && utils_->string_Parse(args, &val)) 
-		utils_->getDisplayContext()->setCVar(cvar, val);
+		utils_->dc_->setCVar(cvar, val);
 }
 
 void
@@ -254,7 +254,7 @@ UI_Utils::Command_Exec::handler( itemDef_t *item, char** args )
 	const char *val;
 	if (utils_->string_Parse(args, &val)) 
 	{
-		utils_->getDisplayContext()->executeText(EXEC_APPEND, va("%s ; ", val));
+		utils_->dc_->executeText(EXEC_APPEND, va("%s ; ", val));
 	}
 }
 
@@ -263,7 +263,7 @@ UI_Utils::Command_Play::handler( itemDef_t *item, char** args )
 {
 	const char *val;
 	if (utils_->string_Parse(args, &val)) 
-		utils_->getDisplayContext()->startLocalSound(utils_->getDisplayContext()->registerSound(val, false), CHAN_LOCAL_SOUND);
+		utils_->dc_->startLocalSound(utils_->dc_->registerSound(val, false), CHAN_LOCAL_SOUND);
 }
 
 void
@@ -272,8 +272,8 @@ UI_Utils::Command_PlayLooped::handler( itemDef_t *item, char** args )
 	const char *val;
 	if (utils_->string_Parse(args, &val)) 
 	{
-		utils_->getDisplayContext()->stopBackgroundTrack();
-		utils_->getDisplayContext()->startBackgroundTrack(val, val);
+		utils_->dc_->stopBackgroundTrack();
+		utils_->dc_->startBackgroundTrack(val, val);
 	}
 }
 

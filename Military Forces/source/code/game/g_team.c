@@ -1,5 +1,5 @@
 /*
- * $Id: g_team.c,v 1.3 2005-09-02 08:45:17 thebjoern Exp $
+ * $Id: g_team.c,v 1.4 2005-11-20 11:21:38 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -86,7 +86,7 @@ void QDECL PrintMsg( gentity_t *ent, const char *fmt, ... ) {
 	
 	va_start (argptr,fmt);
 	if (vsprintf (msg, fmt, argptr) > sizeof(msg)) {
-		G_Error ( "PrintMsg overrun" );
+		Com_Error( ERR_DROP, "PrintMsg overrun" );
 	}
 	va_end (argptr);
 
@@ -352,7 +352,7 @@ void Team_ReturnFlagSound( gentity_t *ent, int team ) {
 	gentity_t	*te;
 
 	if (ent == NULL) {
-		G_Printf ("Warning:  NULL passed to Team_ReturnFlagSound\n");
+		Com_Printf ("Warning:  NULL passed to Team_ReturnFlagSound\n");
 		return;
 	}
 
@@ -370,7 +370,7 @@ void Team_TakeFlagSound( gentity_t *ent, int team ) {
 	gentity_t	*te;
 
 	if (ent == NULL) {
-		G_Printf ("Warning:  NULL passed to Team_TakeFlagSound\n");
+		Com_Printf ("Warning:  NULL passed to Team_TakeFlagSound\n");
 		return;
 	}
 
@@ -408,7 +408,7 @@ void Team_CaptureFlagSound( gentity_t *ent, int team ) {
 	gentity_t	*te;
 
 	if (ent == NULL) {
-		G_Printf ("Warning:  NULL passed to Team_CaptureFlagSound\n");
+		Com_Printf ("Warning:  NULL passed to Team_CaptureFlagSound\n");
 		return;
 	}
 

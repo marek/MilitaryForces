@@ -1,5 +1,5 @@
 /*
- * $Id: cg_draw.c,v 1.6 2005-11-12 14:28:13 thebjoern Exp $
+ * $Id: cg_draw.c,v 1.7 2005-11-20 11:21:38 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -16,7 +16,7 @@
 
 // used for scoreboard
 //extern displayContextDef_t cgDC;
-//extern UI_DisplayContextCG cgUtils.getDisplayContext();
+//extern UI_DisplayContextCG cgUtils.dc_;
 extern UI_UtilsCG cgUtils;
 
 menuDef_t *menuScoreboard = NULL;
@@ -101,11 +101,11 @@ int CG_Text_Width(const char *text, float scale, int limit) {
 // FIXME: see ui_main.c, same problem
 //	const unsigned char *s = text;
 	const char *s = text;
-	fontInfo_t *font = &cgUtils.getDisplayContext()->assets_.textFont;
+	fontInfo_t *font = &cgUtils.dc_->assets_.textFont;
 	if (scale <= cg_smallFont.value) {
-		font = &cgUtils.getDisplayContext()->assets_.smallFont;
+		font = &cgUtils.dc_->assets_.smallFont;
 	} else if (scale > cg_bigFont.value) {
-		font = &cgUtils.getDisplayContext()->assets_.bigFont;
+		font = &cgUtils.dc_->assets_.bigFont;
 	}
 	useScale = scale * font->glyphScale;
   out = 0;
@@ -143,11 +143,11 @@ int CG_Text_Height(const char *text, float scale, int limit) {
 // TTimo: FIXME
 //	const unsigned char *s = text;
 	const char *s = text;
-	fontInfo_t *font = &cgUtils.getDisplayContext()->assets_.textFont;
+	fontInfo_t *font = &cgUtils.dc_->assets_.textFont;
 	if (scale <= cg_smallFont.value) {
-		font = &cgUtils.getDisplayContext()->assets_.smallFont;
+		font = &cgUtils.dc_->assets_.smallFont;
 	} else if (scale > cg_bigFont.value) {
-		font = &cgUtils.getDisplayContext()->assets_.bigFont;
+		font = &cgUtils.dc_->assets_.bigFont;
 	}
 	useScale = scale * font->glyphScale;
   max = 0;
@@ -199,12 +199,12 @@ void CG_Text_Paint(float x, float y, float scale, const vec4_t color, const char
 	vec4_t newColor;
 	glyphInfo_t *glyph;
 	float useScale;
-	fontInfo_t *font = &cgUtils.getDisplayContext()->assets_.textFont;
+	fontInfo_t *font = &cgUtils.dc_->assets_.textFont;
 
 	if (scale <= cg_smallFont.value) {
-		font = &cgUtils.getDisplayContext()->assets_.smallFont;
+		font = &cgUtils.dc_->assets_.smallFont;
 	} else if (scale > cg_bigFont.value) {
-		font = &cgUtils.getDisplayContext()->assets_.bigFont;
+		font = &cgUtils.dc_->assets_.bigFont;
 	}
 	useScale = scale * font->glyphScale;
 
@@ -551,7 +551,7 @@ static float CG_DrawFPS( float y ) {
 
 	// don't use serverTime, because that will be drifting to
 	// correct for internet lag changes, timescales, timedemos, etc
-	t = trap_Milliseconds();
+	t = Sys_Milliseconds();
 	frameTime = t - previous;
 	previous = t;
 
@@ -2271,7 +2271,7 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 		break;
 	default:
 		separation = 0;
-		CG_Error( "CG_DrawActive: Undefined stereoView" );
+		Com_Error( ERR_DROP, "CG_DrawActive: Undefined stereoView" );
 	}
 
 

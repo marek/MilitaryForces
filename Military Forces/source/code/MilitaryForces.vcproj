@@ -1206,9 +1206,6 @@
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;fi;fd">
 			<File
-				RelativePath="game\bg_public.h">
-			</File>
-			<File
 				RelativePath="client\client.h">
 			</File>
 			<File
@@ -1222,9 +1219,6 @@
 			</File>
 			<File
 				RelativePath="qcommon\cm_public.h">
-			</File>
-			<File
-				RelativePath="ui\keycodes.h">
 			</File>
 			<File
 				RelativePath="client\keys.h">

@@ -1,5 +1,5 @@
 /*
- * $Id: g_mfq3ents.c,v 1.4 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: g_mfq3ents.c,v 1.5 2005-11-20 11:21:38 thebjoern Exp $
 */
 
 
@@ -44,14 +44,14 @@ void explosive_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, 
 		gentity_t* t = NULL;
 		while ( (t = G_Find (t, FOFS(targetname), ent->target)) != NULL ) {
 			if ( t == ent ) {
-				G_Printf ("WARNING: Entity used itself.\n");
+				Com_Printf ("WARNING: Entity used itself.\n");
 			} else {
 				if ( t->die ) {
 					t->die(t, inflictor, attacker, damage, meansOfDeath);
 				}
 			}
 			if ( !ent->inuse ) {
-				G_Printf("entity was removed while using targets\n");
+				Com_Printf("entity was removed while using targets\n");
 				break;
 			}
 		}
@@ -89,7 +89,7 @@ void SP_func_runway( gentity_t *ent )
 			ent->s.generic1 = TEAM_BLUE;	
 		}
 	}
-//	G_Printf( "runway: %d, %.1f %.1f %.1f - %.1f %.1f %.1f\n", ent->health, ent->r.mins[0],
+//	Com_Printf( "runway: %d, %.1f %.1f %.1f - %.1f %.1f %.1f\n", ent->health, ent->r.mins[0],
 //		ent->r.mins[1], ent->r.mins[2], ent->r.maxs[0], ent->r.maxs[1], ent->r.maxs[2] );
 
 	trap_LinkEntity (&ent->s, &ent->r);

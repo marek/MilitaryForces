@@ -1,5 +1,5 @@
 /*
- * $Id: g_client.c,v 1.4 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: g_client.c,v 1.5 2005-11-20 11:21:38 thebjoern Exp $
 */
 
 //null cvs upload test, comment placed for a difference.
@@ -209,7 +209,7 @@ gentity_t *SelectRandomFurthestSpawnPoint ( vec3_t avoidPoint, vec3_t origin, ve
 	if (!numSpots) {
 		spot = G_Find( NULL, FOFS(classname), "info_player_deathmatch");
 		if (!spot)
-			G_Error( "Couldn't find a spawn point" );
+			Com_Error( ERR_DROP, "Couldn't find a spawn point" );
 		VectorCopy (spot->s.origin, origin);
 		origin[2] += 9;
 		VectorCopy (spot->s.angles, angles);

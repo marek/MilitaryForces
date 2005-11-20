@@ -196,15 +196,16 @@ struct UI_Utils
 
 	ControlUtils*				getControlUtils() { return controlUtils_; }						
 
-	UI_DisplayContext*			getDisplayContext() { return dc_; }
-
-	UI_PrecompilerTools*		getPrecompilerTools() { return precomp_; }
+	UI_PrecompilerTools*		getPrecompilerTools() { return &precomp_; }
 
 	static const int			SCROLL_TIME_START =	500;
 	static const int			SCROLL_TIME_ADJUST = 150;
 	static const int			SCROLL_TIME_ADJUSTOFFSET = 40;
 	static const int			SCROLL_TIME_FLOOR = 20;
 	static const int			DOUBLE_CLICK_DELAY = 300;
+	
+	// allow public access
+	UI_DisplayContext*			dc_;
 
 protected:
 
@@ -215,8 +216,6 @@ protected:
 	typedef std::map<std::string,Command*>::iterator CommandMapIter;
 
 	// data members
-	UI_DisplayContext*			dc_;
-
 	CommandMap					commands_;
 
 	menuDef_t					menus_[MAX_MENUS];      // defined menus
@@ -261,7 +260,7 @@ protected:
 	int							strHandleCount_;
 	StringDef*					strHandle_[HASH_TABLE_SIZE];
 
-	UI_PrecompilerTools*		precomp_;
+	static UI_PrecompilerTools	precomp_;
 
 private:
 	// disable	
