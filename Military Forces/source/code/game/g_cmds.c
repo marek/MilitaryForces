@@ -1,5 +1,5 @@
 /*
- * $Id: g_cmds.c,v 1.4 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: g_cmds.c,v 1.5 2005-11-20 11:21:38 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -799,7 +799,7 @@ void Cmd_FollowCycle_f( gentity_t *ent, int dir ) {
 	}
 
 	if ( dir != 1 && dir != -1 ) {
-		G_Error( "Cmd_FollowCycle_f: bad dir %i", dir );
+		Com_Error( ERR_DROP, "Cmd_FollowCycle_f: bad dir %i", dir );
 	}
 
 	clientnum = ent->client->sess.spectatorClient;
@@ -916,7 +916,7 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 
 	// echo the text to the console
 	if ( g_dedicated.integer ) {
-		G_Printf( "%s%s\n", name, text);
+		Com_Printf( "%s%s\n", name, text);
 	}
 
 	// send it to all the apropriate clients

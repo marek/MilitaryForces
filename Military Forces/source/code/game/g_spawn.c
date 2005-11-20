@@ -1,5 +1,5 @@
 /*
- * $Id: g_spawn.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: g_spawn.c,v 1.3 2005-11-20 11:21:38 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -271,7 +271,7 @@ bool G_CallSpawn( gentity_t *ent ) {
 	gitem_t	*item;
 
 	if ( !ent->classname ) {
-		G_Printf ("G_CallSpawn: NULL classname\n");
+		Com_Printf ("G_CallSpawn: NULL classname\n");
 		return false;
 	}
 
@@ -293,7 +293,7 @@ bool G_CallSpawn( gentity_t *ent ) {
 			return true;
 		}
 	}
-	G_Printf ("%s doesn't have a spawn function\n", ent->classname);
+	Com_Printf ("%s doesn't have a spawn function\n", ent->classname);
 	return false;
 }
 
@@ -474,7 +474,7 @@ char *G_AddSpawnVarToken( const char *string ) {
 
 	l = strlen( string );
 	if ( level.numSpawnVarChars + l + 1 > MAX_SPAWN_VARS_CHARS ) {
-		G_Error( "G_AddSpawnVarToken: MAX_SPAWN_VARS" );
+		Com_Error( ERR_DROP, "G_AddSpawnVarToken: MAX_SPAWN_VARS" );
 	}
 
 	dest = level.spawnVarChars + level.numSpawnVarChars;
@@ -508,14 +508,14 @@ bool G_ParseSpawnVars( void ) {
 		return false;
 	}
 	if ( com_token[0] != '{' ) {
-		G_Error( "G_ParseSpawnVars: found %s when expecting {",com_token );
+		Com_Error( ERR_DROP, "G_ParseSpawnVars: found %s when expecting {",com_token );
 	}
 
 	// go through all the key / value pairs
 	while ( 1 ) {	
 		// parse key
 		if ( !trap_GetEntityToken( keyname, sizeof( keyname ) ) ) {
-			G_Error( "G_ParseSpawnVars: EOF without closing brace" );
+			Com_Error( ERR_DROP, "G_ParseSpawnVars: EOF without closing brace" );
 		}
 
 		if ( keyname[0] == '}' ) {
@@ -524,14 +524,14 @@ bool G_ParseSpawnVars( void ) {
 		
 		// parse value	
 		if ( !trap_GetEntityToken( com_token, sizeof( com_token ) ) ) {
-			G_Error( "G_ParseSpawnVars: EOF without closing brace" );
+			Com_Error( ERR_DROP, "G_ParseSpawnVars: EOF without closing brace" );
 		}
 
 		if ( com_token[0] == '}' ) {
-			G_Error( "G_ParseSpawnVars: closing brace without data" );
+			Com_Error( ERR_DROP, "G_ParseSpawnVars: closing brace without data" );
 		}
 		if ( level.numSpawnVars == MAX_SPAWN_VARS ) {
-			G_Error( "G_ParseSpawnVars: MAX_SPAWN_VARS" );
+			Com_Error( ERR_DROP, "G_ParseSpawnVars: MAX_SPAWN_VARS" );
 		}
 		level.spawnVars[ level.numSpawnVars ][0] = G_AddSpawnVarToken( keyname );
 		level.spawnVars[ level.numSpawnVars ][1] = G_AddSpawnVarToken( com_token );
@@ -555,11 +555,11 @@ void SP_worldspawn( void ) {
 
 	G_SpawnString( "classname", "", &s );
 	if ( Q_stricmp( s, "worldspawn" ) ) {
-		G_Error( "SP_worldspawn: The first entity isn't 'worldspawn'" );
+		Com_Error( ERR_DROP, "SP_worldspawn: The first entity isn't 'worldspawn'" );
 	}
 
 	// make some data visible to connecting client
-	trap_SetConfigstring( CS_GAME_VERSION, GAME_VERSION );
+	trap_SetConfigstring( CS_GAME_VERSION, MF_VERSION );
 
 	trap_SetConfigstring( CS_LEVEL_START_TIME, va("%i", level.startTime ) );
 
@@ -613,7 +613,7 @@ void G_SpawnEntitiesFromString( void ) {
 	// has a "spawn" function to perform any global setup
 	// needed by a level (setting configstrings or cvars, etc)
 	if ( !G_ParseSpawnVars() ) {
-		G_Error( "SpawnEntities: no entities" );
+		Com_Error( ERR_DROP, "SpawnEntities: no entities" );
 	}
 	SP_worldspawn();
 

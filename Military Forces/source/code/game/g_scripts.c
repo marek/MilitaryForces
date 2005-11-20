@@ -1,5 +1,5 @@
 /*
- * $Id: g_scripts.c,v 1.3 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: g_scripts.c,v 1.4 2005-11-20 11:21:38 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -12,11 +12,11 @@ static int setState( gentity_t* ent, const char* token, bool taskaction ) {
 	} else {	// only to be performed on startup
 		if( strcmp( token, "landed" ) == 0 ) {
 			ent->s.ONOFF |= OO_LANDED;
-			G_Printf( "Set %s's state to landed\n", ent->targetname );
+			Com_Printf( "Set %s's state to landed\n", ent->targetname );
 			return 1;
 		} else if( strcmp( token, "airborne" ) == 0 ) {
 			ent->s.ONOFF &= ~OO_LANDED;
-			G_Printf( "Set %s's state to airborne\n", ent->targetname );
+			Com_Printf( "Set %s's state to airborne\n", ent->targetname );
 			return 1;
 		}
 	}
@@ -32,7 +32,7 @@ static int addToGeneralBehaviour( gentity_t* ent, actionTypes_t at, const char* 
 		i = findWaypoint(token);
 		if( i >= 0 ) {
 			ent->nextWaypoint = &level.waypointList.waypoints[i];
-			G_Printf( "Set %s's next waypoint to %s\n", ent->targetname, ent->nextWaypoint->name );
+			Com_Printf( "Set %s's next waypoint to %s\n", ent->targetname, ent->nextWaypoint->name );
 			return 1;
 		}
 		break;
@@ -54,7 +54,7 @@ static int addToTask( scripttask_t* st, actionTypes_t at, const char* token ) {
 		i = findWaypoint(token);
 		if( i >= 0 ) {
 			st->nextWp = &level.waypointList.waypoints[i];
-			G_Printf( "Added 'next_Waypoint' task (with wp %s) to current task\n", st->nextWp->name );
+			Com_Printf( "Added 'next_Waypoint' task (with wp %s) to current task\n", st->nextWp->name );
 			return 1;
 		}
 		break;
@@ -71,11 +71,11 @@ static scripttask_t* addWaypointEvent( gentity_t* ent, const char* wp ) {
 	scripttask_t*  st = &level.scriptList.scripts[level.scriptList.usedSTs];
 	int idx;
 
-	G_Printf( "Found waypoint event: %s\n", wp );
+	Com_Printf( "Found waypoint event: %s\n", wp );
 
 	idx = findWaypoint( wp );
 	if( idx < 0 ) {
-		G_Printf( "Unable to find waypoint %s - no scripts for this drone\n", wp );
+		Com_Printf( "Unable to find waypoint %s - no scripts for this drone\n", wp );
 		return 0;
 	}
 
@@ -186,11 +186,11 @@ int LoadVehicleScripts( gentity_t* ent, char *filename ) {
 
 	len = trap_FS_FOpenFile( filename, &f, FS_READ );
 	if ( !f ) {
-		trap_Print( va( S_COLOR_RED "file not found: %s\n", filename ) );
+		Com_Printf( S_COLOR_RED "file not found: %s\n", filename );
 		return 0;
 	}
 	if ( len >= MAX_BOTS_TEXT ) {
-		trap_Print( va( S_COLOR_RED "file too large: %s is %i, max allowed is %i", filename, len, MAX_BOTS_TEXT ) );
+		Com_Printf( S_COLOR_RED "file too large: %s is %i, max allowed is %i", filename, len, MAX_BOTS_TEXT );
 		trap_FS_FCloseFile( f );
 		return 0;
 	}

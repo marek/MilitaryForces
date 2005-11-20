@@ -1,5 +1,5 @@
 /*
- * $Id: cg_ents.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: cg_ents.c,v 1.3 2005-11-20 11:21:38 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -217,7 +217,7 @@ static void CG_Item( centity_t *cent ) {
 
 	es = &cent->currentState;
 	if ( es->modelindex >= bg_numItems ) {
-		CG_Error( "Bad item index %i on entity", es->modelindex );
+		Com_Error( ERR_DROP, "Bad item index %i on entity", es->modelindex );
 	}
 
 	// if set to invisible, skip
@@ -626,7 +626,7 @@ static void CG_InterpolateEntityPosition( centity_t *cent ) {
 	// it would be an internal error to find an entity that interpolates without
 	// a snapshot ahead of the current one
 	if ( cg.nextSnap == NULL ) {
-		CG_Error( "CG_InterpoateEntityPosition: cg.nextSnap == NULL" );
+		Com_Error( ERR_DROP, "CG_InterpoateEntityPosition: cg.nextSnap == NULL" );
 	}
 
 	f = cg.frameInterpolation;
@@ -711,7 +711,7 @@ static void CG_AddCEntity( centity_t *cent ) {
 
 	switch ( cent->currentState.eType ) {
 	default:
-		CG_Error( "Bad entity type: %i\n", cent->currentState.eType );
+		Com_Error( ERR_DROP, "Bad entity type: %i\n", cent->currentState.eType );
 		break;
 	case ET_INVISIBLE:
 	case ET_TELEPORT_TRIGGER:

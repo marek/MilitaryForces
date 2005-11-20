@@ -1,5 +1,5 @@
 /*
- * $Id: cg_miscvehicle.c,v 1.4 2005-09-02 08:45:17 thebjoern Exp $
+ * $Id: cg_miscvehicle.c,v 1.5 2005-11-20 11:21:38 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -513,7 +513,7 @@ void CG_Misc_Vehicle( centity_t *cent )
 		CG_Misc_Boat( cent );
 	}
 	else {
-		trap_Error( "Error: CG_Misc_Vehicle got wrong CAT!\n" );
+		Com_Error( ERR_DROP, "Error: CG_Misc_Vehicle got wrong CAT!\n" );
 	}
 }
 

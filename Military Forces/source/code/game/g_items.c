@@ -1,5 +1,5 @@
 /*
- * $Id: g_items.c,v 1.3 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: g_items.c,v 1.4 2005-11-20 11:21:38 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -120,7 +120,7 @@ void RespawnItem( gentity_t *ent ) {
 		int choice;
 
 		if ( !ent->teammaster ) {
-			G_Error( "RespawnItem: bad teammaster");
+			Com_Error( ERR_DROP, "RespawnItem: bad teammaster");
 		}
 		master = ent->teammaster;
 
@@ -389,7 +389,7 @@ void FinishSpawningItem( gentity_t *ent ) {
 		VectorSet( dest, ent->s.origin[0], ent->s.origin[1], ent->s.origin[2] - 4096 );
 		trap_Trace( &tr, ent->s.origin, ent->r.mins, ent->r.maxs, dest, ent->s.number, MASK_SOLID );
 		if ( tr.startsolid ) {
-			G_Printf ("FinishSpawningItem: %s startsolid at %s\n", ent->classname, vtos(ent->s.origin));
+			Com_Printf ("FinishSpawningItem: %s startsolid at %s\n", ent->classname, vtos(ent->s.origin));
 			G_FreeEntity( ent );
 			return;
 		}
@@ -429,11 +429,11 @@ void G_CheckTeamItems( void ) {
 		// check for the two flags
 		item = BG_FindItem( "Red Flag" );
 		if ( !item || !itemRegistered[ item - bg_itemlist ] ) {
-			G_Printf( S_COLOR_YELLOW "WARNING: No team_CTF_redflag in map" );
+			Com_Printf( S_COLOR_YELLOW "WARNING: No team_CTF_redflag in map" );
 		}
 		item = BG_FindItem( "Blue Flag" );
 		if ( !item || !itemRegistered[ item - bg_itemlist ] ) {
-			G_Printf( S_COLOR_YELLOW "WARNING: No team_CTF_blueflag in map" );
+			Com_Printf( S_COLOR_YELLOW "WARNING: No team_CTF_blueflag in map" );
 		}
 	}
 }
@@ -467,7 +467,7 @@ The item will be added to the precache list
 */
 void RegisterItem( gitem_t *item ) {
 	if ( !item ) {
-		G_Error( "RegisterItem: NULL" );
+		Com_Error( ERR_DROP, "RegisterItem: NULL" );
 	}
 	itemRegistered[ item - bg_itemlist ] = true;
 }
@@ -497,7 +497,7 @@ void SaveRegisteredItems( void ) {
 	}
 	string[ bg_numItems ] = 0;
 
-	G_Printf( "%i items registered\n", count );
+	Com_Printf( "%i items registered\n", count );
 	trap_SetConfigstring(CS_ITEMS, string);
 }
 

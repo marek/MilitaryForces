@@ -1,5 +1,5 @@
 /*
- * $Id: g_svcmds.c,v 1.3 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: g_svcmds.c,v 1.4 2005-11-20 11:21:38 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -75,7 +75,7 @@ static bool StringToFilter (char *s, ipFilter_t *f)
 	{
 		if (*s < '0' || *s > '9')
 		{
-			G_Printf( "Bad filter address: %s\n", s );
+			Com_Printf( "Bad filter address: %s\n", s );
 			return false;
 		}
 		
@@ -175,7 +175,7 @@ static void AddIP( char *str )
 	{
 		if (numIPFilters == MAX_IPFILTERS)
 		{
-			G_Printf ("IP filter list is full\n");
+			Com_Printf ("IP filter list is full\n");
 			return;
 		}
 		numIPFilters++;
@@ -222,7 +222,7 @@ void Svcmd_AddIP_f (void)
 	char		str[MAX_TOKEN_CHARS];
 
 	if ( trap_Argc() < 2 ) {
-		G_Printf("Usage:  addip <ip-mask>\n");
+		Com_Printf("Usage:  addip <ip-mask>\n");
 		return;
 	}
 
@@ -244,7 +244,7 @@ void Svcmd_RemoveIP_f (void)
 	char		str[MAX_TOKEN_CHARS];
 
 	if ( trap_Argc() < 2 ) {
-		G_Printf("Usage:  sv removeip <ip-mask>\n");
+		Com_Printf("Usage:  sv removeip <ip-mask>\n");
 		return;
 	}
 
@@ -257,14 +257,14 @@ void Svcmd_RemoveIP_f (void)
 		if (ipFilters[i].mask == f.mask	&&
 			ipFilters[i].compare == f.compare) {
 			ipFilters[i].compare = 0xffffffffu;
-			G_Printf ("Removed.\n");
+			Com_Printf ("Removed.\n");
 
 			UpdateIPBans();
 			return;
 		}
 	}
 
-	G_Printf ( "Didn't find %s.\n", str );
+	Com_Printf ( "Didn't find %s.\n", str );
 }
 
 /*
@@ -281,62 +281,62 @@ void	Svcmd_EntityList_f (void) {
 		if ( !check->inuse ) {
 			continue;
 		}
-		G_Printf("%3i:", e);
+		Com_Printf("%3i:", e);
 		switch ( check->s.eType ) {
 		case ET_GENERAL:
-			G_Printf("ET_GENERAL          ");
+			Com_Printf("ET_GENERAL          ");
 			break;
 		case ET_PLAYER:
-			G_Printf("ET_PLAYER           ");
+			Com_Printf("ET_PLAYER           ");
 			break;
 		case ET_ITEM:
-			G_Printf("ET_ITEM             ");
+			Com_Printf("ET_ITEM             ");
 			break;
 		case ET_MISSILE:
-			G_Printf("ET_MISSILE          ");
+			Com_Printf("ET_MISSILE          ");
 			break;
 		case ET_BULLET:
-			G_Printf("ET_BULLET           ");
+			Com_Printf("ET_BULLET           ");
 			break;
 		case ET_MOVER:
-			G_Printf("ET_MOVER            ");
+			Com_Printf("ET_MOVER            ");
 			break;
 		case ET_BEAM:
-			G_Printf("ET_BEAM             ");
+			Com_Printf("ET_BEAM             ");
 			break;
 		case ET_PORTAL:
-			G_Printf("ET_PORTAL           ");
+			Com_Printf("ET_PORTAL           ");
 			break;
 		case ET_SPEAKER:
-			G_Printf("ET_SPEAKER          ");
+			Com_Printf("ET_SPEAKER          ");
 			break;
 		case ET_TELEPORT_TRIGGER:
-			G_Printf("ET_TELEPORT_TRIGGER ");
+			Com_Printf("ET_TELEPORT_TRIGGER ");
 			break;
 		case ET_INVISIBLE:
-			G_Printf("ET_INVISIBLE        ");
+			Com_Printf("ET_INVISIBLE        ");
 			break;
 //		case ET_GRAPPLE:
-//			G_Printf("ET_GRAPPLE          ");
+//			Com_Printf("ET_GRAPPLE          ");
 //			break;
 		case ET_VEHICLE:
-			G_Printf("ET_VEHICLE          ");
+			Com_Printf("ET_VEHICLE          ");
 			break;
 		case ET_MISC_VEHICLE:
-			G_Printf("ET_MISC_VEHICLE          ");
+			Com_Printf("ET_MISC_VEHICLE          ");
 			break;
 		case ET_EXPLOSIVE:
-			G_Printf("ET_EXPLOSIVE        ");
+			Com_Printf("ET_EXPLOSIVE        ");
 			break;
 		default:
-			G_Printf("%3i                 ", check->s.eType);
+			Com_Printf("%3i                 ", check->s.eType);
 			break;
 		}
 
 		if ( check->classname ) {
-			G_Printf("%s", check->classname);
+			Com_Printf("%s", check->classname);
 		}
-		G_Printf("\n");
+		Com_Printf("\n");
 	}
 }
 
@@ -355,7 +355,7 @@ gclient_t	*ClientForString( const char *s ) {
 
 		cl = &level.clients[idnum];
 		if ( cl->pers.connected == CON_DISCONNECTED ) {
-			G_Printf( "Client %i is not connected\n", idnum );
+			Com_Printf( "Client %i is not connected\n", idnum );
 			return NULL;
 		}
 		return cl;
@@ -372,7 +372,7 @@ gclient_t	*ClientForString( const char *s ) {
 		}
 	}
 
-	G_Printf( "User %s is not on the server\n", s );
+	Com_Printf( "User %s is not on the server\n", s );
 
 	return NULL;
 }

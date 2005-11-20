@@ -43,7 +43,31 @@ ControlUtils::ControlUtils()
 	bindings_.push_back( new Binding("mfd1_mode",		"Cycle MFD1 Mode",				ID_CYCLEMFD1,		-1,				-1,			-1, -1) );
 	bindings_.push_back( new Binding("mfd2_mode",		"Cycle MFD2 Mode",				ID_CYCLEMFD2,		-1,				-1,			-1, -1) );
 	bindings_.push_back( new Binding("eject",			"Eject",						ID_EJECT,			-1,				'o',		-1,	-1) );
+
+	bindings_.push_back( new Binding("+forward", 		"Forward (Max)",				ID_FORWARD,			'w',			-1,			-1, -1) );
+	bindings_.push_back( new Binding("+back", 			"Back/Stop (Min)",				ID_BACKPEDAL,		's',			-1,			-1, -1) );
+	bindings_.push_back( new Binding("+moveleft", 		"Turn left (tank)",				ID_MOVELEFT,		'a',			-1,			-1, -1) );
+	bindings_.push_back( new Binding("+moveright", 		"Turn right (tank)",			ID_MOVERIGHT,		'd',			-1,			-1, -1) );
+	bindings_.push_back( new Binding("+moveup",			"up / jump",					ID_MOVEUP,			-1,				-1,			-1, -1) );
+	bindings_.push_back( new Binding("+movedown",		"down / crouch",				ID_MOVEDOWN,		-1,				-1,			-1, -1) );
+	bindings_.push_back( new Binding("+left", 			"Left (view)",					ID_LEFT,			K_LEFTARROW,	-1,			-1, -1) );
+	bindings_.push_back( new Binding("+right", 			"Right (view)", 				ID_RIGHT,			K_RIGHTARROW,	-1,			-1, -1) );
+	bindings_.push_back( new Binding("+lookup", 		"Up (view)",					ID_LOOKUP,			K_PGUP,			-1,			-1, -1) );
+	bindings_.push_back( new Binding("+lookdown", 		"Down (view)",					ID_LOOKDOWN,		K_PGDN,			-1,			-1, -1) );
+	bindings_.push_back( new Binding("+zoom", 			"Zoom View",					ID_ZOOMVIEW,		K_SHIFT,		-1,			-1, -1) );
+	bindings_.push_back( new Binding("+attack", 		"Fire MG",						ID_ATTACK,			K_CTRL,			-1,			-1, -1) );
+	bindings_.push_back( new Binding("+button2", 		"Fire Main Weapon",				ID_ATTACK2,			K_ENTER,		K_MOUSE4,	-1, -1) );
+	bindings_.push_back( new Binding("+button7",		"Landing Gear",					ID_GEAR,			'g',			-1,			-1, -1) );
+	bindings_.push_back( new Binding("+button8",	 	"(Speed)Brakes",				ID_BRAKE,			K_ALT,			-1,			-1, -1) );
+	bindings_.push_back( new Binding("+button9",	 	"Freelook Camera",				ID_FREECAM,			-1,				-1,			-1, -1) );
+	bindings_.push_back( new Binding("+button5", 		"Throttle Up",					ID_INCREASE,		'q',			-1,			-1, -1) );
+	bindings_.push_back( new Binding("+button6", 		"Throttle Down",				ID_DECREASE,		'e',			-1,			-1, -1) );
+	bindings_.push_back( new Binding("unlock",			"Unlock Target",				ID_UNLOCK,			K_CTRL,			-1,			-1, -1) );
+	bindings_.push_back( new Binding("+bombcam",		"Bomb Camera",					ID_BOMBCAMERA,		-1,				-1,			-1, -1) );
 	
+
+	// until this is finished and works it will be disabled
+/*
 	bindings_.push_back( new Binding("+AP_forward", 		"Forward (Max)",			ID_FORWARD,			'w',			-1,			-1, -1) );
 	bindings_.push_back( new Binding("+AP_back", 			"Back/Stop (Min)",			ID_BACKPEDAL,		's',			-1,			-1, -1) );
 	bindings_.push_back( new Binding("+AP_moveleft", 		"Turn left (tank)",			ID_MOVELEFT,		'a',			-1,			-1, -1) );
@@ -103,6 +127,7 @@ ControlUtils::ControlUtils()
 	bindings_.push_back( new Binding("+GV_button5", 		"Throttle Up",				ID_INCREASE,		'q',			-1,			-1, -1) );
 	bindings_.push_back( new Binding("+GV_button6", 		"Throttle Down",			ID_DECREASE,		'e',			-1,			-1, -1) );
 	bindings_.push_back( new Binding("GV_unlock",			"Unlock Target",			ID_UNLOCK,			K_CTRL,			-1,			-1, -1) );
+*/
 }
 
 
@@ -135,7 +160,7 @@ ControlUtils::getKeyAssignment( const char* command, int* twokeys )
 
 	for ( j = 0; j < 256; j++ )
 	{
-		utils_->getDisplayContext()->getBindingBuf( j, b, 256 );
+		utils_->dc_->getBindingBuf( j, b, 256 );
 		if ( *b == 0 ) 
 			continue;
 
@@ -177,14 +202,14 @@ ControlUtils::setConfig( bool restart )
 	{
 		if( bindings_[i]->bind1_ != -1 )
 		{	
-			utils_->getDisplayContext()->setBinding( bindings_[i]->bind1_, bindings_[i]->command_ );
+			utils_->dc_->setBinding( bindings_[i]->bind1_, bindings_[i]->command_ );
 
 			if( bindings_[i]->bind2_ != -1 )
-				utils_->getDisplayContext()->setBinding( bindings_[i]->bind2_, bindings_[i]->command_ );
+				utils_->dc_->setBinding( bindings_[i]->bind2_, bindings_[i]->command_ );
 		}
 	}
 
-	utils_->getDisplayContext()->executeText( EXEC_APPEND, "in_restart\n" );
+	utils_->dc_->executeText( EXEC_APPEND, "in_restart\n" );
 }
 
 void 
@@ -232,13 +257,13 @@ ControlUtils::bindingFromName( const char *cvar )
 			if (b1 == -1) 
 				break;
 
-			utils_->getDisplayContext()->keynumToStringBuf( b1, nameBind1_, 32 );
+			utils_->dc_->keynumToStringBuf( b1, nameBind1_, 32 );
 			Q_strupr( nameBind1_ );
 
 			b2 = bindings_[i]->bind2_;
 			if (b2 != -1)
 			{
-				utils_->getDisplayContext()->keynumToStringBuf( b2, nameBind2_, 32 );
+				utils_->dc_->keynumToStringBuf( b2, nameBind2_, 32 );
 				Q_strupr( nameBind2_ );
 				strcat( nameBind1_, " or " );
 				strcat( nameBind1_, nameBind2_ );

@@ -66,7 +66,7 @@ ItemKeyword_Asset_Model::func( itemDef_t *item, int handle )
 	if (!utils_->pc_String_Parse(handle, &temp)) 
 		return false;
 
-	item->asset = utils_->getDisplayContext()->registerModel(temp);
+	item->asset = utils_->dc_->registerModel(temp);
 	modelPtr->angle = rand() % 360;
 	return true;
 }
@@ -82,7 +82,7 @@ ItemKeyword_Asset_Shader::func( itemDef_t *item, int handle )
 	if (!utils_->pc_String_Parse(handle, &temp)) 
 		return false;
 
-	item->asset = utils_->getDisplayContext()->registerShaderNoMip(temp);
+	item->asset = utils_->dc_->registerShaderNoMip(temp);
 	return true;
 }
 
@@ -550,7 +550,7 @@ ItemKeyword_Background::func( itemDef_t *item, int handle )
 
 	if (!utils_->pc_String_Parse(handle, &temp)) 
 		return false;
-	item->window.background = utils_->getDisplayContext()->registerShaderNoMip(temp);
+	item->window.background = utils_->dc_->registerShaderNoMip(temp);
 	return true;
 }
 
@@ -724,7 +724,7 @@ ItemKeyword_FocusSound::func( itemDef_t *item, int handle )
 	if (!utils_->pc_String_Parse(handle, &temp)) 
 		return false;
 
-	item->focusSound = utils_->getDisplayContext()->registerSound(temp, false);
+	item->focusSound = utils_->dc_->registerSound(temp, false);
 	return true;
 }
 
@@ -1002,10 +1002,10 @@ MenuKeyword_Font::func( itemDef_t *item, int handle )
 	if (!utils_->pc_String_Parse(handle, &menu->font)) 
 		return false;
 	
-	if (!utils_->getDisplayContext()->assets_.fontRegistered) 
+	if (!utils_->dc_->assets_.fontRegistered) 
 	{
-		utils_->getDisplayContext()->registerFont(menu->font, 48, &utils_->getDisplayContext()->assets_.textFont);
-		utils_->getDisplayContext()->assets_.fontRegistered = true;
+		utils_->dc_->registerFont(menu->font, 48, &utils_->dc_->assets_.textFont);
+		utils_->dc_->assets_.fontRegistered = true;
 	}
 	return true;
 }
@@ -1268,7 +1268,7 @@ MenuKeyword_Background::func( itemDef_t *item, int handle )
 	if (!utils_->pc_String_Parse(handle, &buff)) 
 		return false;
 	
-	menu->window.background = utils_->getDisplayContext()->registerShaderNoMip(buff);
+	menu->window.background = utils_->dc_->registerShaderNoMip(buff);
 	return true;
 }
 

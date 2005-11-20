@@ -312,9 +312,6 @@
 			Name="Header Files"
 			Filter="h">
 			<File
-				RelativePath="..\game\bg_public.h">
-			</File>
-			<File
 				RelativePath=".\cg.h">
 			</File>
 			<File
@@ -322,9 +319,6 @@
 			</File>
 			<File
 				RelativePath=".\cg_public.h">
-			</File>
-			<File
-				RelativePath="..\game\surfaceflags.h">
 			</File>
 			<File
 				RelativePath=".\ui_displaycontext_cg.h">

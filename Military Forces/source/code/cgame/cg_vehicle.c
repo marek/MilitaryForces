@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicle.c,v 1.7 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: cg_vehicle.c,v 1.8 2005-11-20 11:21:38 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -27,7 +27,7 @@ void trap_Cache_Error( char * pString )
 	Com_Printf( pString );
 #else
 	// (release builds, VM builds, ...)
-	trap_Error( pString );
+	Com_Error( ERR_DROP, "%s", pString );
 #endif
 }
 
@@ -603,8 +603,8 @@ void CG_CacheVehicles()
 					CG_CacheBoat(i);
 			}
 			else {
-				trap_Error( va("Invalid Vehicle type in CG_CacheVehicles (%d,%d)", 
-					i, availableVehicles[i].cat));
+				Com_Error( ERR_DROP, "Invalid Vehicle type in CG_CacheVehicles (%d,%d)", 
+					i, availableVehicles[i].cat );
 			}
 		}
 	}
@@ -643,7 +643,7 @@ void CG_RegisterVehicle( clientInfo_t *ci )
 		CG_RegisterBoat(ci);
 	}
 	else
-		CG_Error( "Invalid vehicle type in register vehicle" );
+		Com_Error( ERR_DROP, "Invalid vehicle type in register vehicle" );
 }
 
 /*
@@ -660,7 +660,7 @@ void CG_Vehicle( centity_t *cent )
     clientNum = cent->currentState.clientNum;
     if ( clientNum < 0 || clientNum >= MAX_CLIENTS )
 	{
-		trap_Error( "Bad clientNum on player entity");
+		Com_Error( ERR_DROP, "Bad clientNum on player entity");
     }
     ci = &cgs.clientinfo[ clientNum ];
 	//Com_Printf( "Vehicle = %i\n" ,ci->vehicle);    
@@ -720,7 +720,7 @@ void CG_Vehicle( centity_t *cent )
 	}
 	else
 	{
-		trap_Error( "Error: CG_Vehicle got wrong CAT!\n" );
+		Com_Error( ERR_DROP, "Error: CG_Vehicle got wrong CAT!\n" );
 	}
 }
 
@@ -736,7 +736,7 @@ void CG_VehicleObituary( entityState_t *ent )
     int		        clientNum = ent->otherEntityNum;
 
     if ( clientNum < 0 || clientNum >= MAX_CLIENTS ) {
-	    CG_Error( "CG_VehicleObituary: target out of range" );
+		Com_Error( ERR_DROP, "CG_VehicleObituary: target out of range" );
     }
     ci = &cgs.clientinfo[clientNum];
 

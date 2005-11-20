@@ -1,5 +1,5 @@
 /*
- * $Id: g_utils.c,v 1.5 2005-11-19 09:52:38 thebjoern Exp $
+ * $Id: g_utils.c,v 1.6 2005-11-20 11:21:38 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -88,7 +88,7 @@ int G_FindConfigstringIndex( char *name, int start, int max, bool create ) {
 	}
 
 	if ( i == max ) {
-		G_Error( "G_FindConfigstringIndex: overflow" );
+		Com_Error( ERR_DROP, "G_FindConfigstringIndex: overflow" );
 	}
 
 	trap_SetConfigstring( start + i, name );
@@ -181,7 +181,7 @@ gentity_t *G_PickTarget (char *targetname)
 
 	if (!targetname)
 	{
-		G_Printf("G_PickTarget called with NULL targetname\n");
+		Com_Printf("G_PickTarget called with NULL targetname\n");
 		return NULL;
 	}
 
@@ -197,7 +197,7 @@ gentity_t *G_PickTarget (char *targetname)
 
 	if (!num_choices)
 	{
-		G_Printf("G_PickTarget: target %s not found\n", targetname);
+		Com_Printf("G_PickTarget: target %s not found\n", targetname);
 		return NULL;
 	}
 
@@ -236,14 +236,14 @@ void G_UseTargets( gentity_t *ent, gentity_t *activator ) {
 	t = NULL;
 	while ( (t = G_Find (t, FOFS(targetname), ent->target)) != NULL ) {
 		if ( t == ent ) {
-			G_Printf ("WARNING: Entity used itself.\n");
+			Com_Printf ("WARNING: Entity used itself.\n");
 		} else {
 			if ( t->use ) {
 				t->use (t, ent, activator);
 			}
 		}
 		if ( !ent->inuse ) {
-			G_Printf("entity was removed while using targets\n");
+			Com_Printf("entity was removed while using targets\n");
 			return;
 		}
 	}
@@ -401,9 +401,9 @@ gentity_t *G_Spawn( void ) {
 	}
 	if ( i == ENTITYNUM_MAX_NORMAL ) {
 		for (i = 0; i < MAX_GENTITIES; i++) {
-			G_Printf("%4i: %s\n", i, g_entities[i].classname);
+			Com_Printf("%4i: %s\n", i, g_entities[i].classname);
 		}
-		G_Error( "G_Spawn: no free entities" );
+		Com_Error( ERR_DROP, "G_Spawn: no free entities" );
 	}
 	
 	// open up a New slot
@@ -573,7 +573,7 @@ void G_AddEventToQueue( gentity_t* ent, int event, int eventParm ) {
 	int i = ent->currentEventToAdd;
 
 	if( ent->eventQueue[i].used ) {
-		G_Printf( "Event queue full! Event lost!\n" );
+		Com_Printf( "Event queue full! Event lost!\n" );
 		return;
 	}
 	ent->eventQueue[i].event = event;
@@ -597,7 +597,7 @@ void G_AddEvent( gentity_t *ent, int event, int eventParm, bool addToQueue )
 	int bits = 0;
 
 	if ( !event ) {
-		G_Printf( "G_AddEvent: zero event added for entity %i\n", ent->s.number );
+		Com_Printf( "G_AddEvent: zero event added for entity %i\n", ent->s.number );
 		return;
 	}
 

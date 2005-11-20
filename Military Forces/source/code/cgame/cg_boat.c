@@ -1,5 +1,5 @@
 /*
- * $Id: cg_boat.c,v 1.4 2005-09-02 08:45:17 thebjoern Exp $
+ * $Id: cg_boat.c,v 1.5 2005-11-20 11:21:38 thebjoern Exp $
 */
 
 
@@ -303,7 +303,7 @@ void CG_BoatObituary( entityState_t *ent, clientInfo_t *ci )
 		Q_strncpyz( targetName, Info_ValueForKey( targetInfo, "n" ), sizeof(targetName) - 2);
 	}
 	else {
-		trap_Error( "MFQ3 Error (3): Invalid targetinfo\n" );
+		Com_Error( ERR_DROP, "MFQ3 Error (3): Invalid targetinfo\n" );
 	}	
     strcat( targetName, S_COLOR_WHITE );
 
@@ -382,7 +382,7 @@ void CG_BoatObituary( entityState_t *ent, clientInfo_t *ci )
 			Q_strncpyz( attackerName, Info_ValueForKey( attackerInfo, "n" ), sizeof(attackerName) - 2);
 		}
 		else {
-			trap_Error( "MFQ3 Error (1): Bad attackerInfo!\n" );
+			Com_Error( ERR_DROP, "MFQ3 Error (1): Bad attackerInfo!\n" );
 		}
 	    strcat( attackerName, S_COLOR_WHITE );
 	    // check for kill messages about the current clientNum
@@ -391,7 +391,7 @@ void CG_BoatObituary( entityState_t *ent, clientInfo_t *ci )
 				Q_strncpyz( cg.killerName, attackerName, sizeof( cg.killerName ) );
 			}
 			else {
-				trap_Error( "MFQ3 Error (2): No attackerName!\n" );
+				Com_Error( ERR_DROP, "MFQ3 Error (2): No attackerName!\n" );
 			}
 	    }
     }

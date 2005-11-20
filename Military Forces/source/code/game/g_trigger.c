@@ -1,5 +1,5 @@
 /*
- * $Id: g_trigger.c,v 1.2 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: g_trigger.c,v 1.3 2005-11-20 11:21:38 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -81,7 +81,7 @@ void SP_trigger_multiple( gentity_t *ent ) {
 
 	if ( ent->random >= ent->wait && ent->wait >= 0 ) {
 		ent->random = ent->wait - FRAMETIME;
-		G_Printf( "trigger_multiple has random >= wait\n" );
+		Com_Printf( "trigger_multiple has random >= wait\n" );
 	}
 
 	ent->touch = Touch_Multi;
@@ -164,7 +164,7 @@ void SP_func_timer( gentity_t *self ) {
 
 	if ( self->random >= self->wait ) {
 		self->random = self->wait - FRAMETIME;
-		G_Printf( "func_timer at %s has random >= wait\n", vtos( self->s.origin ) );
+		Com_Printf( "func_timer at %s has random >= wait\n", vtos( self->s.origin ) );
 	}
 
 	if ( self->spawnflags & 1 ) {

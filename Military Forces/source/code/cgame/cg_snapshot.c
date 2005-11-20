@@ -1,5 +1,5 @@
 /*
- * $Id: cg_snapshot.c,v 1.3 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: cg_snapshot.c,v 1.4 2005-11-20 11:21:38 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -119,10 +119,10 @@ static void CG_TransitionSnapshot( void ) {
 	int					i;
 
 	if ( !cg.snap ) {
-		CG_Error( "CG_TransitionSnapshot: NULL cg.snap" );
+		Com_Error( ERR_DROP, "CG_TransitionSnapshot: NULL cg.snap" );
 	}
 	if ( !cg.nextSnap ) {
-		CG_Error( "CG_TransitionSnapshot: NULL cg.nextSnap" );
+		Com_Error( ERR_DROP, "CG_TransitionSnapshot: NULL cg.nextSnap" );
 	}
 
 	// execute any server string commands before transitioning entities
@@ -321,7 +321,7 @@ void CG_ProcessSnapshots( void ) {
 	if ( n != cg.latestSnapshotNum ) {
 		if ( n < cg.latestSnapshotNum ) {
 			// this should never happen
-			CG_Error( "CG_ProcessSnapshots: n < cg.latestSnapshotNum" );
+			Com_Error( ERR_DROP, "CG_ProcessSnapshots: n < cg.latestSnapshotNum" );
 		}
 		cg.latestSnapshotNum = n;
 	}
@@ -362,7 +362,7 @@ void CG_ProcessSnapshots( void ) {
 
 			// if time went backwards, we have a level restart
 			if ( cg.nextSnap->serverTime < cg.snap->serverTime ) {
-				CG_Error( "CG_ProcessSnapshots: Server time went backwards" );
+				Com_Error( ERR_DROP, "CG_ProcessSnapshots: Server time went backwards" );
 			}
 		}
 
@@ -377,14 +377,14 @@ void CG_ProcessSnapshots( void ) {
 
 	// assert our valid conditions upon exiting
 	if ( cg.snap == NULL ) {
-		CG_Error( "CG_ProcessSnapshots: cg.snap == NULL" );
+		Com_Error( ERR_DROP, "CG_ProcessSnapshots: cg.snap == NULL" );
 	}
 	if ( cg.time < cg.snap->serverTime ) {
 		// this can happen right after a vid_restart
 		cg.time = cg.snap->serverTime;
 	}
 	if ( cg.nextSnap != NULL && cg.nextSnap->serverTime <= cg.time ) {
-		CG_Error( "CG_ProcessSnapshots: cg.nextSnap->serverTime <= cg.time" );
+		Com_Error( ERR_DROP, "CG_ProcessSnapshots: cg.nextSnap->serverTime <= cg.time" );
 	}
 
 }

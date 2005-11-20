@@ -1,5 +1,5 @@
 /*
- * $Id: g_mfq3util.c,v 1.4 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: g_mfq3util.c,v 1.5 2005-11-20 11:21:38 thebjoern Exp $
 */
 
 
@@ -62,7 +62,7 @@ void updateTargetTracking( gentity_t *ent )
 	gentity_t		*test;
 	float			cone = 0.0f;
 	
-//	G_Printf( "updateTargetTracking for %s\n", ent->client->pers.netname );
+//	Com_Printf( "updateTargetTracking for %s\n", ent->client->pers.netname );
 
 	// what can we lock on ?
 	if(	ent->client->ps.ONOFF & OO_RADAR_AIR ) {

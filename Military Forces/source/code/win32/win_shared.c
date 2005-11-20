@@ -39,7 +39,7 @@ Sys_Milliseconds
 ================
 */
 int			sys_timeBase;
-int Sys_Milliseconds (void)
+int Sys_Milliseconds ()
 {
 	int			sys_curtime;
 	static bool	initialized = false;

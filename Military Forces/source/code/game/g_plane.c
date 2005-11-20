@@ -1,5 +1,5 @@
 /*
- * $Id: g_plane.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: g_plane.c,v 1.3 2005-11-20 11:21:38 thebjoern Exp $
 */
 
 
@@ -29,7 +29,7 @@ void checkTakeoffLandingPlane( gentity_t *self )
 		} else {
 			vec3_t angles;
 			vectoangles( trace.plane.normal, angles );
-//			G_Printf( "maxs = %.1f, trace = %.1f\n", g_entities[trace.entityNum].r.maxs[2], trace.endpos[2]); 
+//			Com_Printf( "maxs = %.1f, trace = %.1f\n", g_entities[trace.entityNum].r.maxs[2], trace.endpos[2]); 
 //			self->client->ps.origin[2] = g_entities[trace.entityNum].r.maxs[2] + 
 //				fabs(self->r.mins[2]) + ( (self->client->ps.powerups[PW_ONOFF]&OO_GEAR) ?
 //				self->gearheight : 0 );
@@ -61,7 +61,7 @@ void checkTakeoffLandingPlane( gentity_t *self )
 
 void Touch_Plane( gentity_t *self, gentity_t *other, trace_t *trace ) 
 {
-//	G_Printf( "You crashed into a %s\n", other->classname );
+//	Com_Printf( "You crashed into a %s\n", other->classname );
     G_Damage( self, NULL, self, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 
 /*	if( self->ONOFF & OO_LANDED ) {

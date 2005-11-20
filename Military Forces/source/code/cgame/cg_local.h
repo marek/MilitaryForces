@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.16 2005-11-12 14:28:13 thebjoern Exp $
+ * $Id: cg_local.h,v 1.17 2005-11-20 11:21:38 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -773,13 +773,6 @@ typedef struct {
 	sfxHandle_t nukeImplodeSound;
 	sfxHandle_t nukeFarSound;
 
-	// medals shown during gameplay
-	qhandle_t	medalImpressive;
-	qhandle_t	medalExcellent;
-	qhandle_t	medalDefend;
-	qhandle_t	medalAssist;
-	qhandle_t	medalCapture;
-
 	// gib explosions
 	sfxHandle_t	gibSound;
 	qhandle_t	gibAbdomen;
@@ -1219,7 +1212,7 @@ const char *CG_ConfigString( int index );
 const char *CG_Argv( int arg );
 
 void QDECL CG_Printf( const char *msg, ... );
-void QDECL CG_Error( const char *msg, ... );
+//void QDECL CG_Error( const char *msg, ... );
 
 void CG_StartMusic( void );
 
@@ -1570,20 +1563,24 @@ void ME_Init_MissionEditor();
 
 //===============================================
 
+// system calls
+int Sys_Milliseconds ();
+
+
 //
 // system traps
 // These functions are how the cgame communicates with the main game system
 //
 
 // print message on the local console
-void		trap_Print( const char *fmt );
+//void		trap_Print( const char *fmt );
 
 // abort the game
-void		trap_Error( const char *fmt );
+//void		trap_Error( const char *fmt );
 
 // milliseconds should only be used for performance tuning, never
 // for anything game related.  Get time from the CG_DrawActiveFrame parameter
-int			trap_Milliseconds( void );
+//int			trap_Milliseconds( void );
 
 // console variable interaction
 void		trap_Cvar_Register( vmCvar_t *vmCvar, const char *varName, const char *defaultValue, int flags );

@@ -1,5 +1,5 @@
 /*
- * $Id: g_missions.c,v 1.3 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: g_missions.c,v 1.4 2005-11-20 11:21:38 thebjoern Exp $
  */
 
  
@@ -71,12 +71,12 @@ static bool G_LoadOverviewAndEntities( char *filename,
 	len = trap_FS_FOpenFile( filename, &f, FS_READ );
 	if ( !f ) 
 	{
-		trap_Print( va( S_COLOR_RED "file not found: %s\n", filename ) );
+		Com_Printf( S_COLOR_RED "file not found: %s\n", filename );
 		return false;
 	}
 	if ( len >= MAX_MISSION_TEXT ) 
 	{
-		trap_Print( va( S_COLOR_RED "file too large: %s is %i, max allowed is %i", filename, len, MAX_MISSION_TEXT ) );
+		Com_Printf( S_COLOR_RED "file too large: %s is %i, max allowed is %i", filename, len, MAX_MISSION_TEXT );
 		trap_FS_FCloseFile( f );
 		return false;
 	}
@@ -85,7 +85,7 @@ static bool G_LoadOverviewAndEntities( char *filename,
 	inbuffer[len] = 0;
 	trap_FS_FCloseFile( f );
 
-	trap_Print( va(S_COLOR_GREEN "Successfully opened mission script: %s\n", filename) );
+	Com_Printf( S_COLOR_GREEN "Successfully opened mission script: %s\n", filename );
 
 	MF_ParseMissionScripts(inbuffer, overview, vehs, gis);
 

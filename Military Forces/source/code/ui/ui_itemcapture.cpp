@@ -26,18 +26,18 @@ UI_Capture_ListBoxAuto::UI_Capture_ListBoxAuto( UI_ScrollInfo* si ) :
 void
 UI_Capture_ListBoxAuto::capture()
 {
-	if (utils_->getDisplayContext()->realTime_ > scrollInfo_->nextScrollTime_) 
+	if (utils_->dc_->realTime_ > scrollInfo_->nextScrollTime_) 
 	{ 
 		// need to scroll which is done by simulating a click to the item
 		// this is done a bit sideways as the autoscroll "knows" that the item is a listbox
 		// so it calls it directly
 		utils_->item_ListBox_HandleKey(scrollInfo_->item_, scrollInfo_->scrollKey_, 1, false);
-		scrollInfo_->nextScrollTime_ = utils_->getDisplayContext()->realTime_ + scrollInfo_->adjustValue_; 
+		scrollInfo_->nextScrollTime_ = utils_->dc_->realTime_ + scrollInfo_->adjustValue_; 
 	}
 
-	if (utils_->getDisplayContext()->realTime_ > scrollInfo_->nextAdjustTime_) 
+	if (utils_->dc_->realTime_ > scrollInfo_->nextAdjustTime_) 
 	{
-		scrollInfo_->nextAdjustTime_ = utils_->getDisplayContext()->realTime_ + UI_Utils::SCROLL_TIME_ADJUST;
+		scrollInfo_->nextAdjustTime_ = utils_->dc_->realTime_ + UI_Utils::SCROLL_TIME_ADJUST;
 		if (scrollInfo_->adjustValue_ > UI_Utils::SCROLL_TIME_FLOOR) 
 			scrollInfo_->adjustValue_ -= UI_Utils::SCROLL_TIME_ADJUSTOFFSET;
 	}
@@ -57,7 +57,7 @@ UI_Capture_ListBoxThumb::capture()
 	listBoxDef_t *listPtr = (listBoxDef_t*)scrollInfo_->item_->typeData;
 	if (scrollInfo_->item_->window.flags & WINDOW_HORIZONTAL) 
 	{
-		if (utils_->getDisplayContext()->cursorX_ == scrollInfo_->xStart_) 
+		if (utils_->dc_->cursorX_ == scrollInfo_->xStart_) 
 		{
 			return;
 		}
@@ -67,16 +67,16 @@ UI_Capture_ListBoxThumb::capture()
 		r.w = scrollInfo_->item_->window.rect.w - (SCROLLBAR_SIZE*2) - 2;
 		max = utils_->item_ListBox_MaxScroll(scrollInfo_->item_);
 		//
-		pos = (utils_->getDisplayContext()->cursorX_ - r.x - SCROLLBAR_SIZE/2) * max / (r.w - SCROLLBAR_SIZE);
+		pos = (utils_->dc_->cursorX_ - r.x - SCROLLBAR_SIZE/2) * max / (r.w - SCROLLBAR_SIZE);
 		if (pos < 0) 
 			pos = 0;
 		else if (pos > max) 
 			pos = max;
 
 		listPtr->startPos = pos;
-		scrollInfo_->xStart_ = utils_->getDisplayContext()->cursorX_;
+		scrollInfo_->xStart_ = utils_->dc_->cursorX_;
 	}
-	else if (utils_->getDisplayContext()->cursorY_ != scrollInfo_->yStart_) 
+	else if (utils_->dc_->cursorY_ != scrollInfo_->yStart_) 
 	{
 
 		r.x = scrollInfo_->item_->window.rect.x + scrollInfo_->item_->window.rect.w - SCROLLBAR_SIZE - 1;
@@ -85,27 +85,27 @@ UI_Capture_ListBoxThumb::capture()
 		r.w = SCROLLBAR_SIZE;
 		max = utils_->item_ListBox_MaxScroll(scrollInfo_->item_);
 		//
-		pos = (utils_->getDisplayContext()->cursorY_ - r.y - SCROLLBAR_SIZE/2) * max / (r.h - SCROLLBAR_SIZE);
+		pos = (utils_->dc_->cursorY_ - r.y - SCROLLBAR_SIZE/2) * max / (r.h - SCROLLBAR_SIZE);
 		if (pos < 0) 
 			pos = 0;
 		else if (pos > max) 
 			pos = max;
 		
 		listPtr->startPos = pos;
-		scrollInfo_->yStart_ = utils_->getDisplayContext()->cursorY_;
+		scrollInfo_->yStart_ = utils_->dc_->cursorY_;
 	}
 
-	if (utils_->getDisplayContext()->realTime_ > scrollInfo_->nextScrollTime_) 
+	if (utils_->dc_->realTime_ > scrollInfo_->nextScrollTime_) 
 	{ 
 		// need to scroll which is done by simulating a click to the item
 		// this is done a bit sideways as the autoscroll "knows" that the item is a listbox
 		// so it calls it directly
 		utils_->item_ListBox_HandleKey(scrollInfo_->item_, scrollInfo_->scrollKey_, 1, false);
-		scrollInfo_->nextScrollTime_ = utils_->getDisplayContext()->realTime_ + scrollInfo_->adjustValue_; 
+		scrollInfo_->nextScrollTime_ = utils_->dc_->realTime_ + scrollInfo_->adjustValue_; 
 	}
 
-	if (utils_->getDisplayContext()->realTime_ > scrollInfo_->nextAdjustTime_) {
-		scrollInfo_->nextAdjustTime_ = utils_->getDisplayContext()->realTime_ + UI_Utils::SCROLL_TIME_ADJUST;
+	if (utils_->dc_->realTime_ > scrollInfo_->nextAdjustTime_) {
+		scrollInfo_->nextAdjustTime_ = utils_->dc_->realTime_ + UI_Utils::SCROLL_TIME_ADJUST;
 		if (scrollInfo_->adjustValue_ > UI_Utils::SCROLL_TIME_FLOOR) {
 			scrollInfo_->adjustValue_ -= UI_Utils::SCROLL_TIME_ADJUSTOFFSET;
 		}
@@ -128,7 +128,7 @@ UI_Capture_SliderThumb::capture()
 	else 
 		x = scrollInfo_->item_->window.rect.x;
 
-	cursorx = utils_->getDisplayContext()->cursorX_;
+	cursorx = utils_->dc_->cursorX_;
 
 	if (cursorx < x) 
 		cursorx = x;
@@ -139,7 +139,7 @@ UI_Capture_SliderThumb::capture()
 	value /= SLIDER_WIDTH;
 	value *= (editDef->maxVal - editDef->minVal);
 	value += editDef->minVal;
-	utils_->getDisplayContext()->setCVar(scrollInfo_->item_->cvar, va("%f", value));
+	utils_->dc_->setCVar(scrollInfo_->item_->cvar, va("%f", value));
 }
 
 

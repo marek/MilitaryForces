@@ -1,5 +1,5 @@
 /*
- * $Id: cg_effects.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: cg_effects.c,v 1.3 2005-11-20 11:21:38 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -258,7 +258,7 @@ localEntity_t *CG_MakeExplosion( vec3_t origin, vec3_t dir,
 	vec3_t			tmpVec, newOrigin;
 
 	if ( duration <= 0 ) {
-		CG_Error( "CG_MakeExplosion: duration = %i", duration );
+		Com_Error( ERR_DROP, "CG_MakeExplosion: duration = %i", duration );
 	}
 
 	// skew the time a bit so they aren't all in sync

@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.10 2005-11-19 09:52:38 thebjoern Exp $
+ * $Id: ui_main.c,v 1.11 2005-11-20 11:21:38 thebjoern Exp $
 */
 /*
 =======================================================================
@@ -216,27 +216,27 @@ bool _UI_IsFullscreen( void );
 void AssetCache() 
 {
 	int n;
-	uiInfo.uiUtils.getDisplayContext()->assets_.gradientBar = trap_R_RegisterShaderNoMip( ASSET_GRADIENTBAR );
-	uiInfo.uiUtils.getDisplayContext()->assets_.verticalGradient = trap_R_RegisterShaderNoMip( ASSET_VERTICALGRADIENT );
-	uiInfo.uiUtils.getDisplayContext()->assets_.fxBasePic = trap_R_RegisterShaderNoMip( ART_FX_BASE );
-	uiInfo.uiUtils.getDisplayContext()->assets_.fxPic[0] = trap_R_RegisterShaderNoMip( ART_FX_RED );
-	uiInfo.uiUtils.getDisplayContext()->assets_.fxPic[1] = trap_R_RegisterShaderNoMip( ART_FX_YELLOW );
-	uiInfo.uiUtils.getDisplayContext()->assets_.fxPic[2] = trap_R_RegisterShaderNoMip( ART_FX_GREEN );
-	uiInfo.uiUtils.getDisplayContext()->assets_.fxPic[3] = trap_R_RegisterShaderNoMip( ART_FX_TEAL );
-	uiInfo.uiUtils.getDisplayContext()->assets_.fxPic[4] = trap_R_RegisterShaderNoMip( ART_FX_BLUE );
-	uiInfo.uiUtils.getDisplayContext()->assets_.fxPic[5] = trap_R_RegisterShaderNoMip( ART_FX_CYAN );
-	uiInfo.uiUtils.getDisplayContext()->assets_.fxPic[6] = trap_R_RegisterShaderNoMip( ART_FX_WHITE );
-	uiInfo.uiUtils.getDisplayContext()->assets_.scrollBar = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR );
-	uiInfo.uiUtils.getDisplayContext()->assets_.scrollBarArrowDown = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWDOWN );
-	uiInfo.uiUtils.getDisplayContext()->assets_.scrollBarArrowUp = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWUP );
-	uiInfo.uiUtils.getDisplayContext()->assets_.scrollBarArrowLeft = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWLEFT );
-	uiInfo.uiUtils.getDisplayContext()->assets_.scrollBarArrowRight = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWRIGHT );
-	uiInfo.uiUtils.getDisplayContext()->assets_.scrollBarThumb = trap_R_RegisterShaderNoMip( ASSET_SCROLL_THUMB );
-	uiInfo.uiUtils.getDisplayContext()->assets_.sliderBar = trap_R_RegisterShaderNoMip( ASSET_SLIDER_BAR );
-	uiInfo.uiUtils.getDisplayContext()->assets_.sliderThumb = trap_R_RegisterShaderNoMip( ASSET_SLIDER_THUMB );
+	uiInfo.uiUtils.dc_->assets_.gradientBar = trap_R_RegisterShaderNoMip( ASSET_GRADIENTBAR );
+	uiInfo.uiUtils.dc_->assets_.verticalGradient = trap_R_RegisterShaderNoMip( ASSET_VERTICALGRADIENT );
+	uiInfo.uiUtils.dc_->assets_.fxBasePic = trap_R_RegisterShaderNoMip( ART_FX_BASE );
+	uiInfo.uiUtils.dc_->assets_.fxPic[0] = trap_R_RegisterShaderNoMip( ART_FX_RED );
+	uiInfo.uiUtils.dc_->assets_.fxPic[1] = trap_R_RegisterShaderNoMip( ART_FX_YELLOW );
+	uiInfo.uiUtils.dc_->assets_.fxPic[2] = trap_R_RegisterShaderNoMip( ART_FX_GREEN );
+	uiInfo.uiUtils.dc_->assets_.fxPic[3] = trap_R_RegisterShaderNoMip( ART_FX_TEAL );
+	uiInfo.uiUtils.dc_->assets_.fxPic[4] = trap_R_RegisterShaderNoMip( ART_FX_BLUE );
+	uiInfo.uiUtils.dc_->assets_.fxPic[5] = trap_R_RegisterShaderNoMip( ART_FX_CYAN );
+	uiInfo.uiUtils.dc_->assets_.fxPic[6] = trap_R_RegisterShaderNoMip( ART_FX_WHITE );
+	uiInfo.uiUtils.dc_->assets_.scrollBar = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR );
+	uiInfo.uiUtils.dc_->assets_.scrollBarArrowDown = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWDOWN );
+	uiInfo.uiUtils.dc_->assets_.scrollBarArrowUp = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWUP );
+	uiInfo.uiUtils.dc_->assets_.scrollBarArrowLeft = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWLEFT );
+	uiInfo.uiUtils.dc_->assets_.scrollBarArrowRight = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWRIGHT );
+	uiInfo.uiUtils.dc_->assets_.scrollBarThumb = trap_R_RegisterShaderNoMip( ASSET_SCROLL_THUMB );
+	uiInfo.uiUtils.dc_->assets_.sliderBar = trap_R_RegisterShaderNoMip( ASSET_SLIDER_BAR );
+	uiInfo.uiUtils.dc_->assets_.sliderThumb = trap_R_RegisterShaderNoMip( ASSET_SLIDER_THUMB );
 
 	for( n = 0; n < NUM_CROSSHAIRS; n++ ) {
-		uiInfo.uiUtils.getDisplayContext()->assets_.crosshairShader[n] = trap_R_RegisterShaderNoMip( va("gfx/2d/crosshair%c", 'a' + n ) );
+		uiInfo.uiUtils.dc_->assets_.crosshairShader[n] = trap_R_RegisterShaderNoMip( va("gfx/2d/crosshair%c", 'a' + n ) );
 	}
 
 	uiInfo.newHighScoreSound = trap_S_RegisterSound("sound/feedback/voc_newhighscore.wav", false);
@@ -245,17 +245,17 @@ void AssetCache()
 void _UI_DrawSides(float x, float y, float w, float h, float size) 
 {
 	UI_AdjustFrom640( &x, &y, &w, &h );
-	size *= uiInfo.uiUtils.getDisplayContext()->xScale_;
-	trap_R_DrawStretchPic( x, y, size, h, 0, 0, 0, 0, uiInfo.uiUtils.getDisplayContext()->whiteShader_ );
-	trap_R_DrawStretchPic( x + w - size, y, size, h, 0, 0, 0, 0, uiInfo.uiUtils.getDisplayContext()->whiteShader_ );
+	size *= uiInfo.uiUtils.dc_->xScale_;
+	trap_R_DrawStretchPic( x, y, size, h, 0, 0, 0, 0, uiInfo.uiUtils.dc_->whiteShader_ );
+	trap_R_DrawStretchPic( x + w - size, y, size, h, 0, 0, 0, 0, uiInfo.uiUtils.dc_->whiteShader_ );
 }
 
 void _UI_DrawTopBottom(float x, float y, float w, float h, float size) 
 {
 	UI_AdjustFrom640( &x, &y, &w, &h );
-	size *= uiInfo.uiUtils.getDisplayContext()->yScale_;
-	trap_R_DrawStretchPic( x, y, w, size, 0, 0, 0, 0, uiInfo.uiUtils.getDisplayContext()->whiteShader_ );
-	trap_R_DrawStretchPic( x, y + h - size, w, size, 0, 0, 0, 0, uiInfo.uiUtils.getDisplayContext()->whiteShader_ );
+	size *= uiInfo.uiUtils.dc_->yScale_;
+	trap_R_DrawStretchPic( x, y, w, size, 0, 0, 0, 0, uiInfo.uiUtils.dc_->whiteShader_ );
+	trap_R_DrawStretchPic( x, y + h - size, w, size, 0, 0, 0, 0, uiInfo.uiUtils.dc_->whiteShader_ );
 }
 
 /*
@@ -288,14 +288,14 @@ int Text_Width(const char *text, float scale, int limit)
 // but use const char to build with lcc..
 // const unsigned char *s = text; // bk001206 - unsigned
 	const char *s = text;
-	fontInfo_t *font = &uiInfo.uiUtils.getDisplayContext()->assets_.textFont;
+	fontInfo_t *font = &uiInfo.uiUtils.dc_->assets_.textFont;
 	if (scale <= ui_smallFont.value) 
 	{
-		font = &uiInfo.uiUtils.getDisplayContext()->assets_.smallFont;
+		font = &uiInfo.uiUtils.dc_->assets_.smallFont;
 	} 
 	else if (scale >= ui_bigFont.value) 
 	{
-		font = &uiInfo.uiUtils.getDisplayContext()->assets_.bigFont;
+		font = &uiInfo.uiUtils.dc_->assets_.bigFont;
 	}
 	useScale = scale * font->glyphScale;
 	out = 0;
@@ -335,14 +335,14 @@ int Text_Height(const char *text, float scale, int limit)
 // TTimo: FIXME
 //	const unsigned char *s = text; // bk001206 - unsigned
 	const char *s = text; // bk001206 - unsigned
-	fontInfo_t *font = &uiInfo.uiUtils.getDisplayContext()->assets_.textFont;
+	fontInfo_t *font = &uiInfo.uiUtils.dc_->assets_.textFont;
 	if (scale <= ui_smallFont.value) 
 	{
-		font = &uiInfo.uiUtils.getDisplayContext()->assets_.smallFont;
+		font = &uiInfo.uiUtils.dc_->assets_.smallFont;
 	} 
 	else if (scale >= ui_bigFont.value) 
 	{
-		font = &uiInfo.uiUtils.getDisplayContext()->assets_.bigFont;
+		font = &uiInfo.uiUtils.dc_->assets_.bigFont;
 	}
 	useScale = scale * font->glyphScale;
 	max = 0;
@@ -391,14 +391,14 @@ void Text_Paint(float x, float y, float scale, const vec4_t color, const char *t
 	vec4_t newColor;
 	glyphInfo_t *glyph;
 	float useScale;
-	fontInfo_t *font = &uiInfo.uiUtils.getDisplayContext()->assets_.textFont;
+	fontInfo_t *font = &uiInfo.uiUtils.dc_->assets_.textFont;
 	if (scale <= ui_smallFont.value) 
 	{
-		font = &uiInfo.uiUtils.getDisplayContext()->assets_.smallFont;
+		font = &uiInfo.uiUtils.dc_->assets_.smallFont;
 	} 
 	else if (scale >= ui_bigFont.value) 
 	{
-		font = &uiInfo.uiUtils.getDisplayContext()->assets_.bigFont;
+		font = &uiInfo.uiUtils.dc_->assets_.bigFont;
 	}
 	useScale = scale * font->glyphScale;
 	if (text) 
@@ -473,11 +473,11 @@ void Text_PaintWithCursor(float x, float y, float scale, const vec4_t color, con
 	glyphInfo_t *glyph, *glyph2;
 	float yadj;
 	float useScale;
-	fontInfo_t *font = &uiInfo.uiUtils.getDisplayContext()->assets_.textFont;
+	fontInfo_t *font = &uiInfo.uiUtils.dc_->assets_.textFont;
 	if (scale <= ui_smallFont.value) {
-		font = &uiInfo.uiUtils.getDisplayContext()->assets_.smallFont;
+		font = &uiInfo.uiUtils.dc_->assets_.smallFont;
 	} else if (scale >= ui_bigFont.value) {
-		font = &uiInfo.uiUtils.getDisplayContext()->assets_.bigFont;
+		font = &uiInfo.uiUtils.dc_->assets_.bigFont;
 	}
 	useScale = scale * font->glyphScale;
 	if (text) 
@@ -539,7 +539,7 @@ void Text_PaintWithCursor(float x, float y, float scale, const vec4_t color, con
 
 				// CG_DrawPic(x, y - yadj, scale * uiDC.Assets.textFont.glyphs[text[i]].imageWidth, scale * uiDC.Assets.textFont.glyphs[text[i]].imageHeight, uiDC.Assets.textFont.glyphs[text[i]].glyph);
 			yadj = useScale * glyph2->top;
-		    if (count == cursorPos && !((uiInfo.uiUtils.getDisplayContext()->realTime_/BLINK_DIVISOR) & 1)) 
+		    if (count == cursorPos && !((uiInfo.uiUtils.dc_->realTime_/BLINK_DIVISOR) & 1)) 
 			{
 					Text_PaintChar(x, y - yadj, 
 														glyph2->imageWidth,
@@ -558,7 +558,7 @@ void Text_PaintWithCursor(float x, float y, float scale, const vec4_t color, con
 			}
 		}
 		// need to paint cursor at end of text
-		if (cursorPos == len && !((uiInfo.uiUtils.getDisplayContext()->realTime_/BLINK_DIVISOR) & 1)) 
+		if (cursorPos == len && !((uiInfo.uiUtils.dc_->realTime_/BLINK_DIVISOR) & 1)) 
 		{
 			yadj = useScale * glyph2->top;
 			Text_PaintChar(x, y - yadj, 
@@ -590,14 +590,14 @@ static void Text_Paint_Limit(float *maxX, float x, float y, float scale, const v
 		const char *s = text; // bk001206 - unsigned
 		float max = *maxX;
 		float useScale;
-		fontInfo_t *font = &uiInfo.uiUtils.getDisplayContext()->assets_.textFont;
+		fontInfo_t *font = &uiInfo.uiUtils.dc_->assets_.textFont;
 		if (scale <= ui_smallFont.value) 
 		{
-			font = &uiInfo.uiUtils.getDisplayContext()->assets_.smallFont;
+			font = &uiInfo.uiUtils.dc_->assets_.smallFont;
 		} 
 		else if (scale > ui_bigFont.value) 
 		{
-			font = &uiInfo.uiUtils.getDisplayContext()->assets_.bigFont;
+			font = &uiInfo.uiUtils.dc_->assets_.bigFont;
 		}
 		useScale = scale * font->glyphScale;
 		trap_R_SetColor( color );
@@ -686,17 +686,17 @@ void UI_DrawMouse( void )
 	UI_SetColor( NULL );
 
 	// select cursor to draw
-	switch( uiInfo.uiUtils.getDisplayContext()->cursorEnum_ )
+	switch( uiInfo.uiUtils.dc_->cursorEnum_ )
 	{
 	default:
 	case CURSOR_NORMAL:
-		cursorHandle = uiInfo.uiUtils.getDisplayContext()->assets_.cursor;
+		cursorHandle = uiInfo.uiUtils.dc_->assets_.cursor;
 		offsetX = 0;
 		offsetY = 0;
 		break;
 
 	case CURSOR_WAIT:
-		cursorHandle = uiInfo.uiUtils.getDisplayContext()->assets_.cursorWait;
+		cursorHandle = uiInfo.uiUtils.dc_->assets_.cursorWait;
 		offsetX = -7;
 		offsetY = -12;
 		break;
@@ -705,7 +705,7 @@ void UI_DrawMouse( void )
 	// draw cursor (not during loading/chat)
 	if( uiInfo.uiUtils.menu_Count() > 0 && cstate.connState != CA_LOADING && !uiInfo.customChat.active )
 	{
-		UI_DrawHandlePic( uiInfo.uiUtils.getDisplayContext()->cursorX_ + offsetX, uiInfo.uiUtils.getDisplayContext()->cursorY_ + offsetY, 32, 32, cursorHandle );
+		UI_DrawHandlePic( uiInfo.uiUtils.dc_->cursorX_ + offsetX, uiInfo.uiUtils.dc_->cursorY_ + offsetY, 32, 32, cursorHandle );
 	}
 
 #ifndef NDEBUG
@@ -738,10 +738,10 @@ void _UI_Refresh( int realtime )
 		return;
 	}
 */
-	uiInfo.uiUtils.getDisplayContext()->frameTime_ = realtime - uiInfo.uiUtils.getDisplayContext()->realTime_;
-	uiInfo.uiUtils.getDisplayContext()->realTime_ = realtime;
+	uiInfo.uiUtils.dc_->frameTime_ = realtime - uiInfo.uiUtils.dc_->realTime_;
+	uiInfo.uiUtils.dc_->realTime_ = realtime;
 
-	previousTimes[index % UI_FPS_FRAMES] = uiInfo.uiUtils.getDisplayContext()->frameTime_;
+	previousTimes[index % UI_FPS_FRAMES] = uiInfo.uiUtils.dc_->frameTime_;
 	index++;
 	if ( index > UI_FPS_FRAMES ) {
 		int i, total;
@@ -753,7 +753,7 @@ void _UI_Refresh( int realtime )
 		if ( !total ) {
 			total = 1;
 		}
-		uiInfo.uiUtils.getDisplayContext()->fps_ = 1000 * UI_FPS_FRAMES / total;
+		uiInfo.uiUtils.dc_->fps_ = 1000 * UI_FPS_FRAMES / total;
 	}
 
 	UI_UpdateCvars();
@@ -794,11 +794,11 @@ char *GetMenuBuffer(const char *filename) {
 
 	len = trap_FS_FOpenFile( filename, &f, FS_READ );
 	if ( !f ) {
-		trap_Print( va( S_COLOR_RED "menu file not found: %s, using default\n", filename ) );
+		Com_Printf( S_COLOR_RED "menu file not found: %s, using default\n", filename );
 		return defaultMenu;
 	}
 	if ( len >= MAX_MENUFILE ) {
-		trap_Print( va( S_COLOR_RED "menu file too large: %s is %i, max allowed is %i", filename, len, MAX_MENUFILE ) );
+		Com_Printf( S_COLOR_RED "menu file too large: %s is %i, max allowed is %i", filename, len, MAX_MENUFILE );
 		trap_FS_FCloseFile( f );
 		return defaultMenu;
 	}
@@ -839,8 +839,8 @@ bool Asset_Parse(int handle)
 			if (!uiInfo.uiUtils.pc_String_Parse(handle, &tempStr) || !uiInfo.uiUtils.pc_Int_Parse(handle,&pointSize)) {
 				return false;
 			}
-			trap_R_RegisterFont(tempStr, pointSize, &uiInfo.uiUtils.getDisplayContext()->assets_.textFont);
-			uiInfo.uiUtils.getDisplayContext()->assets_.fontRegistered = true;
+			trap_R_RegisterFont(tempStr, pointSize, &uiInfo.uiUtils.dc_->assets_.textFont);
+			uiInfo.uiUtils.dc_->assets_.fontRegistered = true;
 			continue;
 		}
 
@@ -849,7 +849,7 @@ bool Asset_Parse(int handle)
 			if (!uiInfo.uiUtils.pc_String_Parse(handle, &tempStr) || !uiInfo.uiUtils.pc_Int_Parse(handle,&pointSize)) {
 				return false;
 			}
-			trap_R_RegisterFont(tempStr, pointSize, &uiInfo.uiUtils.getDisplayContext()->assets_.smallFont);
+			trap_R_RegisterFont(tempStr, pointSize, &uiInfo.uiUtils.dc_->assets_.smallFont);
 			continue;
 		}
 
@@ -858,7 +858,7 @@ bool Asset_Parse(int handle)
 			if (!uiInfo.uiUtils.pc_String_Parse(handle, &tempStr) || !uiInfo.uiUtils.pc_Int_Parse(handle,&pointSize)) {
 				return false;
 			}
-			trap_R_RegisterFont(tempStr, pointSize, &uiInfo.uiUtils.getDisplayContext()->assets_.bigFont);
+			trap_R_RegisterFont(tempStr, pointSize, &uiInfo.uiUtils.dc_->assets_.bigFont);
 			continue;
 		}
 
@@ -868,7 +868,7 @@ bool Asset_Parse(int handle)
 			if (!uiInfo.uiUtils.pc_String_Parse(handle, &tempStr)) {
 				return false;
 			}
-			uiInfo.uiUtils.getDisplayContext()->assets_.gradientBar = trap_R_RegisterShaderNoMip(tempStr);
+			uiInfo.uiUtils.dc_->assets_.gradientBar = trap_R_RegisterShaderNoMip(tempStr);
 			continue;
 		}
 
@@ -877,7 +877,7 @@ bool Asset_Parse(int handle)
 			if (!uiInfo.uiUtils.pc_String_Parse(handle, &tempStr)) {
 				return false;
 			}
-			uiInfo.uiUtils.getDisplayContext()->assets_.menuEnterSound = trap_S_RegisterSound( tempStr, false );
+			uiInfo.uiUtils.dc_->assets_.menuEnterSound = trap_S_RegisterSound( tempStr, false );
 			continue;
 		}
 
@@ -886,7 +886,7 @@ bool Asset_Parse(int handle)
 			if (!uiInfo.uiUtils.pc_String_Parse(handle, &tempStr)) {
 				return false;
 			}
-			uiInfo.uiUtils.getDisplayContext()->assets_.menuExitSound = trap_S_RegisterSound( tempStr, false );
+			uiInfo.uiUtils.dc_->assets_.menuExitSound = trap_S_RegisterSound( tempStr, false );
 			continue;
 		}
 
@@ -895,7 +895,7 @@ bool Asset_Parse(int handle)
 			if (!uiInfo.uiUtils.pc_String_Parse(handle, &tempStr)) {
 				return false;
 			}
-			uiInfo.uiUtils.getDisplayContext()->assets_.itemFocusSound = trap_S_RegisterSound( tempStr, false );
+			uiInfo.uiUtils.dc_->assets_.itemFocusSound = trap_S_RegisterSound( tempStr, false );
 			continue;
 		}
 
@@ -904,66 +904,66 @@ bool Asset_Parse(int handle)
 			if (!uiInfo.uiUtils.pc_String_Parse(handle, &tempStr)) {
 				return false;
 			}
-			uiInfo.uiUtils.getDisplayContext()->assets_.menuBuzzSound = trap_S_RegisterSound( tempStr, false );
+			uiInfo.uiUtils.dc_->assets_.menuBuzzSound = trap_S_RegisterSound( tempStr, false );
 			continue;
 		}
 
 		if (Q_stricmp(token.string_, "cursor") == 0) {
-			if (!uiInfo.uiUtils.pc_String_Parse(handle, &uiInfo.uiUtils.getDisplayContext()->assets_.cursorStr )) {
+			if (!uiInfo.uiUtils.pc_String_Parse(handle, &uiInfo.uiUtils.dc_->assets_.cursorStr )) {
 				return false;
 			}
-			uiInfo.uiUtils.getDisplayContext()->assets_.cursor = trap_R_RegisterShaderNoMip( uiInfo.uiUtils.getDisplayContext()->assets_.cursorStr );
+			uiInfo.uiUtils.dc_->assets_.cursor = trap_R_RegisterShaderNoMip( uiInfo.uiUtils.dc_->assets_.cursorStr );
 			continue;
 		}
 
 		if (Q_stricmp(token.string_, "cursorWait") == 0) {
-			if (!uiInfo.uiUtils.pc_String_Parse(handle, &uiInfo.uiUtils.getDisplayContext()->assets_.cursorStrWait )) {
+			if (!uiInfo.uiUtils.pc_String_Parse(handle, &uiInfo.uiUtils.dc_->assets_.cursorStrWait )) {
 				return false;
 			}
-			uiInfo.uiUtils.getDisplayContext()->assets_.cursorWait = trap_R_RegisterShaderNoMip( uiInfo.uiUtils.getDisplayContext()->assets_.cursorStrWait );
+			uiInfo.uiUtils.dc_->assets_.cursorWait = trap_R_RegisterShaderNoMip( uiInfo.uiUtils.dc_->assets_.cursorStrWait );
 			continue;
 		}
 
 		if (Q_stricmp(token.string_, "fadeClamp") == 0) {
-			if (!uiInfo.uiUtils.pc_Float_Parse(handle, &uiInfo.uiUtils.getDisplayContext()->assets_.fadeClamp)) {
+			if (!uiInfo.uiUtils.pc_Float_Parse(handle, &uiInfo.uiUtils.dc_->assets_.fadeClamp)) {
 				return false;
 			}
 			continue;
 		}
 
 		if (Q_stricmp(token.string_, "fadeCycle") == 0) {
-			if (!uiInfo.uiUtils.pc_Int_Parse(handle, &uiInfo.uiUtils.getDisplayContext()->assets_.fadeCycle)) {
+			if (!uiInfo.uiUtils.pc_Int_Parse(handle, &uiInfo.uiUtils.dc_->assets_.fadeCycle)) {
 				return false;
 			}
 			continue;
 		}
 
 		if (Q_stricmp(token.string_, "fadeAmount") == 0) {
-			if (!uiInfo.uiUtils.pc_Float_Parse(handle, &uiInfo.uiUtils.getDisplayContext()->assets_.fadeAmount)) {
+			if (!uiInfo.uiUtils.pc_Float_Parse(handle, &uiInfo.uiUtils.dc_->assets_.fadeAmount)) {
 				return false;
 			}
 			continue;
 		}
 
 		if (Q_stricmp(token.string_, "shadowX") == 0) {
-			if (!uiInfo.uiUtils.pc_Float_Parse(handle, &uiInfo.uiUtils.getDisplayContext()->assets_.shadowX)) {
+			if (!uiInfo.uiUtils.pc_Float_Parse(handle, &uiInfo.uiUtils.dc_->assets_.shadowX)) {
 				return false;
 			}
 			continue;
 		}
 
 		if (Q_stricmp(token.string_, "shadowY") == 0) {
-			if (!uiInfo.uiUtils.pc_Float_Parse(handle, &uiInfo.uiUtils.getDisplayContext()->assets_.shadowY)) {
+			if (!uiInfo.uiUtils.pc_Float_Parse(handle, &uiInfo.uiUtils.dc_->assets_.shadowY)) {
 				return false;
 			}
 			continue;
 		}
 
 		if (Q_stricmp(token.string_, "shadowColor") == 0) {
-			if (!uiInfo.uiUtils.pc_Color_Parse(handle, &uiInfo.uiUtils.getDisplayContext()->assets_.shadowColor)) {
+			if (!uiInfo.uiUtils.pc_Color_Parse(handle, &uiInfo.uiUtils.dc_->assets_.shadowColor)) {
 				return false;
 			}
-			uiInfo.uiUtils.getDisplayContext()->assets_.shadowFadeClamp = uiInfo.uiUtils.getDisplayContext()->assets_.shadowColor[3];
+			uiInfo.uiUtils.dc_->assets_.shadowFadeClamp = uiInfo.uiUtils.dc_->assets_.shadowColor[3];
 			continue;
 		}
 
@@ -978,7 +978,7 @@ void Font_Report()
 	Com_Printf("=========\n");
 	for ( i = 32; i < 96; i++) 
 	{
-		Com_Printf("Glyph handle %i: %i\n", i, uiInfo.uiUtils.getDisplayContext()->assets_.textFont.glyphs[i].glyph);
+		Com_Printf("Glyph handle %i: %i\n", i, uiInfo.uiUtils.dc_->assets_.textFont.glyphs[i].glyph);
 	}
 }
 
@@ -1071,14 +1071,14 @@ void UI_LoadMenus(const char *menuFile, bool reset)
 	int handle;
 	int start;
 
-	start = trap_Milliseconds();
+	start = Sys_Milliseconds();
 
 	handle = uiInfo.uiUtils.getPrecompilerTools()->loadSourceHandle( menuFile );
 	if (!handle) {
-		trap_Error( va( S_COLOR_YELLOW "menu file not found: %s, using default\n", menuFile ) );
+		Com_Error( ERR_DROP, S_COLOR_YELLOW "menu file not found: %s, using default\n", menuFile );
 		handle = uiInfo.uiUtils.getPrecompilerTools()->loadSourceHandle( "ui/menus.txt" );
 		if (!handle) {
-			trap_Error( va( S_COLOR_RED "default menu file not found: ui/menus.txt, unable to continue!\n", menuFile ) );
+			Com_Error( ERR_DROP, S_COLOR_RED "default menu file not found: ui/menus.txt, unable to continue!\n", menuFile );
 		}
 	}
 
@@ -1328,9 +1328,9 @@ static void UI_DrawTeamMember(rectDef_t *rect, float scale, const vec4_t color, 
 
 static void UI_DrawEffects(rectDef_t *rect, float scale, const vec4_t color) 
 {
-	UI_DrawHandlePic( rect->x, rect->y - 14, 128, 8, uiInfo.uiUtils.getDisplayContext()->assets_.fxBasePic );
+	UI_DrawHandlePic( rect->x, rect->y - 14, 128, 8, uiInfo.uiUtils.dc_->assets_.fxBasePic );
 	UI_DrawHandlePic( rect->x + uiInfo.effectsColor * 16 + 8, rect->y - 16, 16, 12, 
-		uiInfo.uiUtils.getDisplayContext()->assets_.fxPic[uiInfo.effectsColor] );
+		uiInfo.uiUtils.dc_->assets_.fxPic[uiInfo.effectsColor] );
 }
 
 static void UI_DrawMapPreview(rectDef_t *rect, float scale, const vec4_t color, bool net) 
@@ -1833,7 +1833,7 @@ static void UI_DrawCrosshair(rectDef_t *rect, float scale, const vec4_t color) {
 	if (uiInfo.currentCrosshair < 0 || uiInfo.currentCrosshair >= NUM_CROSSHAIRS) {
 		uiInfo.currentCrosshair = 0;
 	}
-	UI_DrawHandlePic( rect->x, rect->y - rect->h, rect->w, rect->h, uiInfo.uiUtils.getDisplayContext()->assets_.crosshairShader[uiInfo.currentCrosshair]);
+	UI_DrawHandlePic( rect->x, rect->y - rect->h, rect->w, rect->h, uiInfo.uiUtils.dc_->assets_.crosshairShader[uiInfo.currentCrosshair]);
  	trap_R_SetColor( NULL );
 }
 
@@ -1893,8 +1893,8 @@ static void UI_BuildPlayerList()
 
 static void UI_DrawSelectedPlayer(rectDef_t *rect, float scale, const vec4_t color, int textStyle) 
 {
-	if (uiInfo.uiUtils.getDisplayContext()->realTime_ > uiInfo.playerRefresh) {
-		uiInfo.playerRefresh = uiInfo.uiUtils.getDisplayContext()->realTime_ + 3000;
+	if (uiInfo.uiUtils.dc_->realTime_ > uiInfo.playerRefresh) {
+		uiInfo.playerRefresh = uiInfo.uiUtils.dc_->realTime_ + 3000;
 		UI_BuildPlayerList();
 	}
   Text_Paint(rect->x, rect->y, scale, color, (uiInfo.teamLeader) ? UI_Cvar_VariableString("cg_selectedPlayerName") : 
@@ -1910,7 +1910,7 @@ static void UI_DrawServerRefreshDate(rectDef_t *rect, float scale, const vec4_t 
 		lowLight[1] = 0.8 * color[1]; 
 		lowLight[2] = 0.8 * color[2]; 
 		lowLight[3] = 0.8 * color[3]; 
-		uiInfo.uiUtils.lerpColor(color,lowLight,newColor,0.5f+0.5f*sinf(uiInfo.uiUtils.getDisplayContext()->realTime_ / PULSE_DIVISOR));
+		uiInfo.uiUtils.lerpColor(color,lowLight,newColor,0.5f+0.5f*sinf(uiInfo.uiUtils.dc_->realTime_ / PULSE_DIVISOR));
 	  Text_Paint(rect->x, rect->y, scale, newColor, va("Getting info for %d servers (ESC to cancel)", trap_LAN_GetServerCount(ui_netSource.integer)), 0, 0, textStyle);
 	} 
 	else 
@@ -1937,8 +1937,8 @@ static void UI_DrawServerMOTD(rectDef_t *rect, float scale, const vec4_t color) 
 			uiInfo.serverStatus.motdPaintX2 = -1;
 		}
 
-		if (uiInfo.uiUtils.getDisplayContext()->realTime_ > uiInfo.serverStatus.motdTime) {
-			uiInfo.serverStatus.motdTime = uiInfo.uiUtils.getDisplayContext()->realTime_ + 10;
+		if (uiInfo.uiUtils.dc_->realTime_ > uiInfo.serverStatus.motdTime) {
+			uiInfo.serverStatus.motdTime = uiInfo.uiUtils.dc_->realTime_ + 10;
 			if (uiInfo.serverStatus.motdPaintX <= rect->x + 2) {
 				if (uiInfo.serverStatus.motdOffset < uiInfo.serverStatus.motdLen) {
 					uiInfo.serverStatus.motdPaintX += Text_Width(&uiInfo.serverStatus.motd[uiInfo.serverStatus.motdOffset], scale, 1) - 1;
@@ -2000,18 +2000,18 @@ static void UI_DrawGLInfo(rectDef_t *rect, float scale, const vec4_t color, int 
 	const char *lines[64];
 	int y, numLines, i;
 
-	Text_Paint(rect->x + 2, rect->y, scale, color, va("VENDOR: %s", uiInfo.uiUtils.getDisplayContext()->glConfig_.vendor_string), 0, 30, textStyle);
-	Text_Paint(rect->x + 2, rect->y + 15, scale, color, va("VERSION: %s: %s", uiInfo.uiUtils.getDisplayContext()->glConfig_.version_string,
-		uiInfo.uiUtils.getDisplayContext()->glConfig_.renderer_string), 0, 30, textStyle);
+	Text_Paint(rect->x + 2, rect->y, scale, color, va("VENDOR: %s", uiInfo.uiUtils.dc_->glConfig_.vendor_string), 0, 30, textStyle);
+	Text_Paint(rect->x + 2, rect->y + 15, scale, color, va("VERSION: %s: %s", uiInfo.uiUtils.dc_->glConfig_.version_string,
+		uiInfo.uiUtils.dc_->glConfig_.renderer_string), 0, 30, textStyle);
 	Text_Paint(rect->x + 2, rect->y + 30, scale, color, va ("PIXELFORMAT: color(%d-bits) Z(%d-bits) stencil(%d-bits)", 
-		uiInfo.uiUtils.getDisplayContext()->glConfig_.colorBits, uiInfo.uiUtils.getDisplayContext()->glConfig_.depthBits, uiInfo.uiUtils.getDisplayContext()->glConfig_.stencilBits), 0, 30,
+		uiInfo.uiUtils.dc_->glConfig_.colorBits, uiInfo.uiUtils.dc_->glConfig_.depthBits, uiInfo.uiUtils.dc_->glConfig_.stencilBits), 0, 30,
 		textStyle);
 
 	// build null terminated extension strings
   // TTimo: https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=399
   // in TA this was not directly crashing, but displaying a nasty broken shader right in the middle
   // brought down the string size to 1024, there's not much that can be shown on the screen anyway
-	Q_strncpyz(buff, uiInfo.uiUtils.getDisplayContext()->glConfig_.extensions_string, 1024);
+	Q_strncpyz(buff, uiInfo.uiUtils.dc_->glConfig_.extensions_string, 1024);
 	eptr = buff;
 	y = rect->y + 45;
 	numLines = 0;
@@ -2083,7 +2083,7 @@ static void UI_DrawVehiclePreview( rectDef_t *rect, float scale, const vec4_t co
 
 	refdef.fov_x = 58;
 	refdef.fov_y = 8;
-	refdef.time = uiInfo.uiUtils.getDisplayContext()->realTime_;
+	refdef.time = uiInfo.uiUtils.dc_->realTime_;
 
 	trap_R_ClearScene();
 
@@ -2257,7 +2257,7 @@ static void UI_DrawCredits( rectDef_t *rect, float scale, const vec4_t inColor, 
 	}
 	
 	// scroll
-	z -= (float)uiInfo.uiUtils.getDisplayContext()->frameTime_/SPEED_DIVIDER;
+	z -= (float)uiInfo.uiUtils.dc_->frameTime_/SPEED_DIVIDER;
 }
 
 /*
@@ -2523,7 +2523,7 @@ bool UI_OwnerDrawVisible(int flags)
 			flags &= ~UI_SHOW_NETANYNONTEAMGAME;
 		} 
 		if (flags & UI_SHOW_NEWHIGHSCORE) {
-			if (uiInfo.newHighScoreTime < uiInfo.uiUtils.getDisplayContext()->realTime_) {
+			if (uiInfo.newHighScoreTime < uiInfo.uiUtils.dc_->realTime_) {
 				vis = false;
 			} else {
 				if (uiInfo.soundHighScore) {
@@ -2537,7 +2537,7 @@ bool UI_OwnerDrawVisible(int flags)
 			flags &= ~UI_SHOW_NEWHIGHSCORE;
 		} 
 		if (flags & UI_SHOW_NEWBESTTIME) {
-			if (uiInfo.newBestTime < uiInfo.uiUtils.getDisplayContext()->realTime_) {
+			if (uiInfo.newBestTime < uiInfo.uiUtils.dc_->realTime_) {
 				vis = false;
 			}
 			flags &= ~UI_SHOW_NEWBESTTIME;
@@ -4380,7 +4380,7 @@ void UI_RunMenuScript(char **args)
 		else if( Q_stricmp(name, "normalCursor") == 0 )
 		{
 			// reset cursor
-			uiInfo.uiUtils.getDisplayContext()->cursorEnum_ = CURSOR_NORMAL;
+			uiInfo.uiUtils.dc_->cursorEnum_ = CURSOR_NORMAL;
 		}
 		else if( Q_stricmp(name, "uiInitialise") == 0 )
 		{
@@ -4593,7 +4593,7 @@ static void UI_BuildServerDisplayList(int force)
 //	bool startRefresh = true; TTimo: unused
 	static int numinvisible;
 
-	if (!(force || uiInfo.uiUtils.getDisplayContext()->realTime_ > uiInfo.serverStatus.nextDisplayRefresh)) 
+	if (!(force || uiInfo.uiUtils.dc_->realTime_ > uiInfo.serverStatus.nextDisplayRefresh)) 
 		return;
 
 	// if we shouldn't reset
@@ -4633,7 +4633,7 @@ static void UI_BuildServerDisplayList(int force)
 		// still waiting on a response from the master
 		uiInfo.serverStatus.numDisplayServers = 0;
 		uiInfo.serverStatus.numPlayersOnServers = 0;
-		uiInfo.serverStatus.nextDisplayRefresh = uiInfo.uiUtils.getDisplayContext()->realTime_ + 500;
+		uiInfo.serverStatus.nextDisplayRefresh = uiInfo.uiUtils.dc_->realTime_ + 500;
 		return;
 	}
 
@@ -4711,7 +4711,7 @@ static void UI_BuildServerDisplayList(int force)
 		}
 	}
 
-	uiInfo.serverStatus.refreshtime = uiInfo.uiUtils.getDisplayContext()->realTime_;
+	uiInfo.serverStatus.refreshtime = uiInfo.uiUtils.dc_->realTime_;
 
 	// if there were no servers visible for ping updates
 	//if (!visible) {
@@ -4903,7 +4903,7 @@ static void UI_BuildFindPlayerList(bool force) {
 	char infoString[MAX_STRING_CHARS];
 
 	if (!force) {
-		if (!uiInfo.nextFindPlayerRefresh || uiInfo.nextFindPlayerRefresh > uiInfo.uiUtils.getDisplayContext()->realTime_) {
+		if (!uiInfo.nextFindPlayerRefresh || uiInfo.nextFindPlayerRefresh > uiInfo.uiUtils.dc_->realTime_) {
 			return;
 		}
 	}
@@ -4978,7 +4978,7 @@ static void UI_BuildFindPlayerList(bool force) {
 		}
 		// if empty pending slot or timed out
 		if (!uiInfo.pendingServerStatus.server[i].valid ||
-			uiInfo.pendingServerStatus.server[i].startTime < uiInfo.uiUtils.getDisplayContext()->realTime_ - ui_serverStatusTimeOut.integer) {
+			uiInfo.pendingServerStatus.server[i].startTime < uiInfo.uiUtils.dc_->realTime_ - ui_serverStatusTimeOut.integer) {
 			if (uiInfo.pendingServerStatus.server[i].valid) {
 				numTimeOuts++;
 			}
@@ -4988,7 +4988,7 @@ static void UI_BuildFindPlayerList(bool force) {
 			uiInfo.pendingServerStatus.server[i].valid = false;
 			// if we didn't try to get the status of all servers in the main browser yet
 			if (uiInfo.pendingServerStatus.num < uiInfo.serverStatus.numDisplayServers) {
-				uiInfo.pendingServerStatus.server[i].startTime = uiInfo.uiUtils.getDisplayContext()->realTime_;
+				uiInfo.pendingServerStatus.server[i].startTime = uiInfo.uiUtils.dc_->realTime_;
 				trap_LAN_GetServerAddressString(ui_netSource.integer, uiInfo.serverStatus.displayServers[uiInfo.pendingServerStatus.num],
 							uiInfo.pendingServerStatus.server[i].adrstr, sizeof(uiInfo.pendingServerStatus.server[i].adrstr));
 				trap_LAN_GetServerInfo(ui_netSource.integer, uiInfo.serverStatus.displayServers[uiInfo.pendingServerStatus.num], infoString, sizeof(infoString));
@@ -5008,7 +5008,7 @@ static void UI_BuildFindPlayerList(bool force) {
 	}
 	// if still trying to retrieve server status info
 	if (i < MAX_SERVERSTATUSREQUESTS) {
-		uiInfo.nextFindPlayerRefresh = uiInfo.uiUtils.getDisplayContext()->realTime_ + 25;
+		uiInfo.nextFindPlayerRefresh = uiInfo.uiUtils.dc_->realTime_ + 25;
 	}
 	else {
 		// add a line that shows the number of servers found
@@ -5047,7 +5047,7 @@ static void UI_BuildServerStatus(bool force)
 	if( !force ) 
 	{
 		// still waiting?
-		if( !uiInfo.nextServerStatusRefresh || uiInfo.nextServerStatusRefresh > uiInfo.uiUtils.getDisplayContext()->realTime_ )
+		if( !uiInfo.nextServerStatusRefresh || uiInfo.nextServerStatusRefresh > uiInfo.uiUtils.dc_->realTime_ )
 		{
 			return;
 		}
@@ -5078,7 +5078,7 @@ static void UI_BuildServerStatus(bool force)
 			// special case: in game popup
 
 			// change to the wait cursor
-			uiInfo.uiUtils.getDisplayContext()->cursorEnum_ = CURSOR_WAIT;
+			uiInfo.uiUtils.dc_->cursorEnum_ = CURSOR_WAIT;
 			UI_DrawMouse();
 
 			// get client information
@@ -5088,7 +5088,7 @@ static void UI_BuildServerStatus(bool force)
 			pAddressName = cstate.servername;
 
 			// do refresh in 50ms
-			uiInfo.nextServerStatusRefresh = uiInfo.uiUtils.getDisplayContext()->realTime_ + 50;
+			uiInfo.nextServerStatusRefresh = uiInfo.uiUtils.dc_->realTime_ + 50;
 
 			// pend it (don't do it immediatley)
 			pending = true;
@@ -5118,7 +5118,7 @@ static void UI_BuildServerStatus(bool force)
 	else
 	{
 		// try again in 500ms
-		uiInfo.nextServerStatusRefresh = uiInfo.uiUtils.getDisplayContext()->realTime_ + 500;
+		uiInfo.nextServerStatusRefresh = uiInfo.uiUtils.dc_->realTime_ + 500;
 	}
 }
 
@@ -5144,14 +5144,14 @@ int UI_FeederCount(float feederID)
 	} else if (feederID == FEEDER_FINDPLAYER) {
 		return uiInfo.numFoundPlayerServers;
 	} else if (feederID == FEEDER_PLAYER_LIST) {
-		if (uiInfo.uiUtils.getDisplayContext()->realTime_ > uiInfo.playerRefresh) {
-			uiInfo.playerRefresh = uiInfo.uiUtils.getDisplayContext()->realTime_ + 3000;
+		if (uiInfo.uiUtils.dc_->realTime_ > uiInfo.playerRefresh) {
+			uiInfo.playerRefresh = uiInfo.uiUtils.dc_->realTime_ + 3000;
 			UI_BuildPlayerList();
 		}
 		return uiInfo.playerCount;
 	} else if (feederID == FEEDER_TEAM_LIST) {
-		if (uiInfo.uiUtils.getDisplayContext()->realTime_ > uiInfo.playerRefresh) {
-			uiInfo.playerRefresh = uiInfo.uiUtils.getDisplayContext()->realTime_ + 3000;
+		if (uiInfo.uiUtils.dc_->realTime_ > uiInfo.playerRefresh) {
+			uiInfo.playerRefresh = uiInfo.uiUtils.dc_->realTime_ + 3000;
 			UI_BuildPlayerList();
 		}
 		return uiInfo.myTeamCount;
@@ -5214,7 +5214,7 @@ static int UI_GetIndexFromSelection(int actual) {
 static void UI_UpdatePendingPings() { 
 	trap_LAN_ResetPings(ui_netSource.integer);
 	uiInfo.serverStatus.refreshActive = true;
-	uiInfo.serverStatus.refreshtime = uiInfo.uiUtils.getDisplayContext()->realTime_ + 1000;
+	uiInfo.serverStatus.refreshtime = uiInfo.uiUtils.dc_->realTime_ + 1000;
 
 }
 
@@ -5294,10 +5294,10 @@ const char *UI_FeederItemText(float feederID, int index, int column, qhandle_t *
 	} else if (feederID == FEEDER_SERVERS) {
 		if (index >= 0 && index < uiInfo.serverStatus.numDisplayServers) {
 			int ping;
-			if (lastColumn != column || lastTime > uiInfo.uiUtils.getDisplayContext()->realTime_ + 5000) {
+			if (lastColumn != column || lastTime > uiInfo.uiUtils.dc_->realTime_ + 5000) {
 				trap_LAN_GetServerInfo(ui_netSource.integer, uiInfo.serverStatus.displayServers[index], info, MAX_STRING_CHARS);
 				lastColumn = column;
-				lastTime = uiInfo.uiUtils.getDisplayContext()->realTime_;
+				lastTime = uiInfo.uiUtils.dc_->realTime_;
 			}
 			ping = atoi(Info_ValueForKey(info, "ping"));
 			if (ping == -1) {
@@ -5354,7 +5354,7 @@ const char *UI_FeederItemText(float feederID, int index, int column, qhandle_t *
 			if ( column >= 0 && column < 4 ) {
 
 				// make sure cursor is reset when we have finished
-				uiInfo.uiUtils.getDisplayContext()->cursorEnum_ = CURSOR_NORMAL;
+				uiInfo.uiUtils.dc_->cursorEnum_ = CURSOR_NORMAL;
 
 				return uiInfo.serverStatusInfo.lines[index][column];
 			}
@@ -5995,18 +5995,18 @@ void _UI_Init( bool inGameLoad )
 	uiInfo.uiUtils.initMemory();
 
 	// cache redundant calulations
-	trap_GetGlconfig( &uiInfo.uiUtils.getDisplayContext()->glConfig_ );
+	trap_GetGlconfig( &uiInfo.uiUtils.dc_->glConfig_ );
 
 	// for 640x480 virtualized screen
-	uiInfo.uiUtils.getDisplayContext()->yScale_ = uiInfo.uiUtils.getDisplayContext()->glConfig_.vidHeight * (1.0/480.0);
-	uiInfo.uiUtils.getDisplayContext()->xScale_ = uiInfo.uiUtils.getDisplayContext()->glConfig_.vidWidth * (1.0/640.0);
-	if ( uiInfo.uiUtils.getDisplayContext()->glConfig_.vidWidth * 480 > uiInfo.uiUtils.getDisplayContext()->glConfig_.vidHeight * 640 ) {
+	uiInfo.uiUtils.dc_->yScale_ = uiInfo.uiUtils.dc_->glConfig_.vidHeight * (1.0/480.0);
+	uiInfo.uiUtils.dc_->xScale_ = uiInfo.uiUtils.dc_->glConfig_.vidWidth * (1.0/640.0);
+	if ( uiInfo.uiUtils.dc_->glConfig_.vidWidth * 480 > uiInfo.uiUtils.dc_->glConfig_.vidHeight * 640 ) {
 		// wide screen
-		uiInfo.uiUtils.getDisplayContext()->bias_ = 0.5 * ( uiInfo.uiUtils.getDisplayContext()->glConfig_.vidWidth - ( uiInfo.uiUtils.getDisplayContext()->glConfig_.vidHeight * (640.0/480.0) ) );
+		uiInfo.uiUtils.dc_->bias_ = 0.5 * ( uiInfo.uiUtils.dc_->glConfig_.vidWidth - ( uiInfo.uiUtils.dc_->glConfig_.vidHeight * (640.0/480.0) ) );
 	}
 	else {
 		// no wide screen
-		uiInfo.uiUtils.getDisplayContext()->bias_ = 0;
+		uiInfo.uiUtils.dc_->bias_ = 0;
 	}
 
 
@@ -6066,13 +6066,13 @@ void _UI_Init( bool inGameLoad )
 
 	uiInfo.uiUtils.string_Init();
   
-	uiInfo.uiUtils.getDisplayContext()->whiteShader_ = trap_R_RegisterShaderNoMip( "white" );
-	uiInfo.uiUtils.getDisplayContext()->cursor_	= trap_R_RegisterShaderNoMip( "menu/art/cursor" );
-	uiInfo.uiUtils.getDisplayContext()->cursorEnum_ = CURSOR_NORMAL;
+	uiInfo.uiUtils.dc_->whiteShader_ = trap_R_RegisterShaderNoMip( "white" );
+	uiInfo.uiUtils.dc_->cursor_	= trap_R_RegisterShaderNoMip( "menu/art/cursor" );
+	uiInfo.uiUtils.dc_->cursorEnum_ = CURSOR_NORMAL;
 
 	AssetCache();
 
-	start = trap_Milliseconds();
+	start = Sys_Milliseconds();
 
 	uiInfo.teamCount = 0;
 	uiInfo.characterCount = 0;
@@ -6123,7 +6123,7 @@ void _UI_Init( bool inGameLoad )
 	trap_Cvar_Set("ui_actualNetGameType", va("%d", ui_netGameType.integer));
 
 	// set the MFQ3 version string
-	trap_Cvar_Set( "ui_mfq3Version", GAME_VERSION );
+	trap_Cvar_Set( "ui_mfq3Version", MF_VERSION );
 
 	// MFQ3 data
 	MF_LoadAllVehicleData();
@@ -6183,22 +6183,22 @@ UI_MouseEvent
 void _UI_MouseEvent( int dx, int dy )
 {
 	// update mouse screen position
-	uiInfo.uiUtils.getDisplayContext()->cursorX_ += dx;
-	if (uiInfo.uiUtils.getDisplayContext()->cursorX_ < 0)
-		uiInfo.uiUtils.getDisplayContext()->cursorX_ = 0;
-	else if (uiInfo.uiUtils.getDisplayContext()->cursorX_ > SCREEN_WIDTH)
-		uiInfo.uiUtils.getDisplayContext()->cursorX_ = SCREEN_WIDTH;
+	uiInfo.uiUtils.dc_->cursorX_ += dx;
+	if (uiInfo.uiUtils.dc_->cursorX_ < 0)
+		uiInfo.uiUtils.dc_->cursorX_ = 0;
+	else if (uiInfo.uiUtils.dc_->cursorX_ > SCREEN_WIDTH)
+		uiInfo.uiUtils.dc_->cursorX_ = SCREEN_WIDTH;
 
-	uiInfo.uiUtils.getDisplayContext()->cursorY_ += dy;
-	if (uiInfo.uiUtils.getDisplayContext()->cursorY_ < 0)
-		uiInfo.uiUtils.getDisplayContext()->cursorY_ = 0;
-	else if (uiInfo.uiUtils.getDisplayContext()->cursorY_ > SCREEN_HEIGHT)
-		uiInfo.uiUtils.getDisplayContext()->cursorY_ = SCREEN_HEIGHT;
+	uiInfo.uiUtils.dc_->cursorY_ += dy;
+	if (uiInfo.uiUtils.dc_->cursorY_ < 0)
+		uiInfo.uiUtils.dc_->cursorY_ = 0;
+	else if (uiInfo.uiUtils.dc_->cursorY_ > SCREEN_HEIGHT)
+		uiInfo.uiUtils.dc_->cursorY_ = SCREEN_HEIGHT;
 
   if (uiInfo.uiUtils.menu_Count() > 0) {
     //menuDef_t *menu = Menu_GetFocused();
     //Menu_HandleMouseMove(menu, uiInfo.uiDC.cursorx, uiInfo.uiDC.cursory);
-		uiInfo.uiUtils.display_MouseMove(NULL, uiInfo.uiUtils.getDisplayContext()->cursorX_, uiInfo.uiUtils.getDisplayContext()->cursorY_);
+		uiInfo.uiUtils.display_MouseMove(NULL, uiInfo.uiUtils.dc_->cursorX_, uiInfo.uiUtils.dc_->cursorY_);
   }
 
 }
@@ -6378,9 +6378,9 @@ static void UI_DisplayDownloadInfo( const char *downloadName, float centerPoint,
 	}
 	else
 	{
-		if ((uiInfo.uiUtils.getDisplayContext()->realTime_ - downloadTime) / 1000)
+		if ((uiInfo.uiUtils.dc_->realTime_ - downloadTime) / 1000)
 		{
-			xferRate = downloadCount / ((uiInfo.uiUtils.getDisplayContext()->realTime_ - downloadTime) / 1000);
+			xferRate = downloadCount / ((uiInfo.uiUtils.dc_->realTime_ - downloadTime) / 1000);
 		}
 		else
 		{
@@ -6468,11 +6468,11 @@ void UI_DrawConnectScreen( bool overlay )
 	trap_GetClientState( &cstate );
 
 	// got the mid-panel shader?
-	if( uiInfo.uiUtils.getDisplayContext()->assets_.midPanelGfx )
+	if( uiInfo.uiUtils.dc_->assets_.midPanelGfx )
 	{
 		// draw gfx
 		// NOTE: this only gets drawn until CGame takes over the drawing of this
-		UI_DrawHandlePic( 0, 160, 640, 160, uiInfo.uiUtils.getDisplayContext()->assets_.midPanelGfx );
+		UI_DrawHandlePic( 0, 160, 640, 160, uiInfo.uiUtils.dc_->assets_.midPanelGfx );
 	}
 	else
 	{
@@ -6491,10 +6491,10 @@ void UI_DrawConnectScreen( bool overlay )
 				if( gameset < numGamesets )
 				{
 					// attempt load - once only!
-					uiInfo.uiUtils.getDisplayContext()->assets_.midPanelGfx = trap_R_RegisterShaderNoMip( va( "ui\\assets\\mid-%s", pGameset ) );
+					uiInfo.uiUtils.dc_->assets_.midPanelGfx = trap_R_RegisterShaderNoMip( va( "ui\\assets\\mid-%s", pGameset ) );
 
 					// didn't work?
-					if( !uiInfo.uiUtils.getDisplayContext()->assets_.midPanelGfx )
+					if( !uiInfo.uiUtils.dc_->assets_.midPanelGfx )
 					{
 						// don't try again
 						giveUpLoadingGfx = true;
@@ -6972,7 +6972,7 @@ static void UI_DoServerRefresh( void )
 		}
 	}
 
-	if (uiInfo.uiUtils.getDisplayContext()->realTime_ < uiInfo.serverStatus.refreshtime) {
+	if (uiInfo.uiUtils.dc_->realTime_ < uiInfo.serverStatus.refreshtime) {
 		if (wait) {
 			return;
 		}
@@ -6980,7 +6980,7 @@ static void UI_DoServerRefresh( void )
 
 	// if still trying to retrieve pings
 	if (trap_LAN_UpdateVisiblePings(ui_netSource.integer)) {
-		uiInfo.serverStatus.refreshtime = uiInfo.uiUtils.getDisplayContext()->realTime_ + 1000;
+		uiInfo.serverStatus.refreshtime = uiInfo.uiUtils.dc_->realTime_ + 1000;
 	} else if (!wait) {
 		// get the last servers in the list
 		UI_BuildServerDisplayList(2);
@@ -7011,7 +7011,7 @@ static void UI_StartServerRefresh(bool full)
 	}
 
 	uiInfo.serverStatus.refreshActive = true;
-	uiInfo.serverStatus.nextDisplayRefresh = uiInfo.uiUtils.getDisplayContext()->realTime_ + 1000;
+	uiInfo.serverStatus.nextDisplayRefresh = uiInfo.uiUtils.dc_->realTime_ + 1000;
 	// clear number of displayed servers
 	uiInfo.serverStatus.numDisplayServers = 0;
 	uiInfo.serverStatus.numPlayersOnServers = 0;
@@ -7022,11 +7022,11 @@ static void UI_StartServerRefresh(bool full)
 	//
 	if( ui_netSource.integer == AS_LOCAL ) {
 		trap_Cmd_ExecuteText( EXEC_NOW, "localservers\n" );
-		uiInfo.serverStatus.refreshtime = uiInfo.uiUtils.getDisplayContext()->realTime_ + 1000;
+		uiInfo.serverStatus.refreshtime = uiInfo.uiUtils.dc_->realTime_ + 1000;
 		return;
 	}
 
-	uiInfo.serverStatus.refreshtime = uiInfo.uiUtils.getDisplayContext()->realTime_ + 5000;
+	uiInfo.serverStatus.refreshtime = uiInfo.uiUtils.dc_->realTime_ + 5000;
 	if( ui_netSource.integer == AS_GLOBAL || ui_netSource.integer == AS_MPLAYER ) {
 		if( ui_netSource.integer == AS_GLOBAL ) {
 			i = 0;

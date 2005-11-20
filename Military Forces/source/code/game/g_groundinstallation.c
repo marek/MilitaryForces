@@ -1,5 +1,5 @@
 /*
- * $Id: g_groundinstallation.c,v 1.3 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: g_groundinstallation.c,v 1.4 2005-11-20 11:21:38 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -239,7 +239,7 @@ void GroundInstallation_Think( gentity_t* ent )
 			 ent->count < availableGroundInstallations[ent->s.modelindex2].ammo ) 
 	{
 		ent->count++;
-//		G_Printf("Reloading: %d\n", ent->count);
+//		Com_Printf("Reloading: %d\n", ent->count);
 		ent->gi_reloadTime = level.time + availableGroundInstallations[ent->s.modelindex2].reloadTime;
 	}
 

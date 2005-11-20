@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.10 2005-11-19 09:52:38 thebjoern Exp $
+ * $Id: g_local.h,v 1.11 2005-11-20 11:21:38 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -789,8 +789,8 @@ void CheckTeamLeader( int team );
 void G_RunThink (gentity_t *ent);
 void QDECL G_LogPrintf( const char *fmt, ... );
 void SendScoreboardMessageToAllClients( void );
-void QDECL G_Printf( const char *fmt, ... );
-void QDECL G_Error( const char *fmt, ... );
+void QDECL Com_Printf( const char *fmt, ... );
+//void QDECL G_Error( const char *fmt, ... );
 
 //
 // g_client.c
@@ -896,9 +896,12 @@ extern  vmCvar_t	mf_mission;
 extern	vmCvar_t	mf_allowNukes;
 
 
-void	trap_Print( const char *fmt );
-void	trap_Error( const char *fmt );
-int		trap_Milliseconds( void );
+// system calls
+int Sys_Milliseconds ();
+
+//void	trap_Print( const char *fmt );
+//void	trap_Error( const char *fmt );
+//int		trap_Milliseconds( void );
 int		trap_Argc( void );
 void	trap_Argv( int n, char *buffer, int bufferLength );
 void	trap_Args( char *buffer, int bufferLength );

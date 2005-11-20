@@ -1,5 +1,5 @@
 /*
- * $Id: g_active.c,v 1.6 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: g_active.c,v 1.7 2005-11-20 11:21:38 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -630,11 +630,11 @@ void ClientThink_real( gentity_t *ent ) {
 	// sanity check the command time to prevent speedup cheating
 	if ( ucmd->serverTime > level.time + 200 ) {
 		ucmd->serverTime = level.time + 200;
-//		G_Printf("serverTime <<<<<\n" );
+//		Com_Printf("serverTime <<<<<\n" );
 	}
 	if ( ucmd->serverTime < level.time - 1000 ) {
 		ucmd->serverTime = level.time - 1000;
-//		G_Printf("serverTime >>>>>\n" );
+//		Com_Printf("serverTime >>>>>\n" );
 	} 
 
 	msec = ucmd->serverTime - client->ps.commandTime;

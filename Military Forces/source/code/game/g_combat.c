@@ -1,5 +1,5 @@
 /*
- * $Id: g_combat.c,v 1.4 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: g_combat.c,v 1.5 2005-11-20 11:21:38 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -331,7 +331,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 	save = 0;
 
 	if ( g_debugDamage.integer ) {
-		G_Printf( "%i: client:%i health:%i damage:%i\n", level.time, targ->s.number,
+		Com_Printf( "%i: client:%i health:%i damage:%i\n", level.time, targ->s.number,
 			targ->health, take );
 	}
 
