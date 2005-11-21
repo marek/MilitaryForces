@@ -1,5 +1,5 @@
 /*
- * $Id: g_missions.c,v 1.4 2005-11-20 11:21:38 thebjoern Exp $
+ * $Id: g_missions.c,v 1.5 2005-11-21 17:28:20 thebjoern Exp $
  */
 
  
@@ -68,7 +68,7 @@ static bool G_LoadOverviewAndEntities( char *filename,
 	char				inbuffer[MAX_MISSION_TEXT];
 
 	// open the file, fill it into buffer and close it, afterwards parse it
-	len = trap_FS_FOpenFile( filename, &f, FS_READ );
+	len = FS_FOpenFileByMode( filename, &f, FS_READ );
 	if ( !f ) 
 	{
 		Com_Printf( S_COLOR_RED "file not found: %s\n", filename );
@@ -77,13 +77,13 @@ static bool G_LoadOverviewAndEntities( char *filename,
 	if ( len >= MAX_MISSION_TEXT ) 
 	{
 		Com_Printf( S_COLOR_RED "file too large: %s is %i, max allowed is %i", filename, len, MAX_MISSION_TEXT );
-		trap_FS_FCloseFile( f );
+		FS_FCloseFile( f );
 		return false;
 	}
 
-	trap_FS_Read( inbuffer, len, f );
+	FS_Read2( inbuffer, len, f );
 	inbuffer[len] = 0;
-	trap_FS_FCloseFile( f );
+	FS_FCloseFile( f );
 
 	Com_Printf( S_COLOR_GREEN "Successfully opened mission script: %s\n", filename );
 
@@ -119,7 +119,7 @@ void G_LoadMissionScripts()
 	}
 
 	// for now just load the default mission
-	trap_Cvar_VariableStringBuffer("mapname", buffer, 32);
+	Cvar_VariableStringBuffer("mapname", buffer, 32);
 	Com_sprintf( filename, MAX_FILEPATH, "missions/%s/%s.mis", buffer, missionname );
 
 	if( !G_LoadOverviewAndEntities(filename, &overview, vehicles, installations) )
@@ -129,7 +129,6 @@ void G_LoadMissionScripts()
 
 	G_SpawnMissionGroundInstallations(installations);
 
-//	trap_Print( va("Loaded: %s\n", inbuffer) );
 }
 
 

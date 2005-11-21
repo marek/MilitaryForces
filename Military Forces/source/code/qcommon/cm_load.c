@@ -671,33 +671,38 @@ cmodel_t	*CM_ClipHandleToModel( clipHandle_t handle ) {
 CM_InlineModel
 ==================
 */
-clipHandle_t	CM_InlineModel( int index ) {
-	if ( index < 0 || index >= cm.numSubModels ) {
+clipHandle_t CM_InlineModel( int index ) 
+{
+	if ( index < 0 || index >= cm.numSubModels ) 
 		Com_Error (ERR_DROP, "CM_InlineModel: bad number");
-	}
 	return index;
 }
 
-int		CM_NumClusters( void ) {
+int	CM_NumClusters() 
+{
 	return cm.numClusters;
 }
 
-int		CM_NumInlineModels( void ) {
+int	CM_NumInlineModels() 
+{
 	return cm.numSubModels;
 }
 
-char	*CM_EntityString( void ) {
+char *CM_EntityString() 
+{
 	return cm.entityString;
 }
 
-int		CM_LeafCluster( int leafnum ) {
+int	CM_LeafCluster( int leafnum ) 
+{
 	if (leafnum < 0 || leafnum >= cm.numLeafs) {
 		Com_Error (ERR_DROP, "CM_LeafCluster: bad number");
 	}
 	return cm.leafs[leafnum].cluster;
 }
 
-int		CM_LeafArea( int leafnum ) {
+int	CM_LeafArea( int leafnum ) 
+{
 	if ( leafnum < 0 || leafnum >= cm.numLeafs ) {
 		Com_Error (ERR_DROP, "CM_LeafArea: bad number");
 	}
@@ -769,7 +774,8 @@ BSP trees instead of being compared directly.
 Capsules are handled differently though.
 ===================
 */
-clipHandle_t CM_TempBoxModel( const vec3_t mins, const vec3_t maxs, bool capsule ) {
+clipHandle_t CM_TempBoxModel( const vec3_t mins, const vec3_t maxs, bool capsule ) 
+{
 
 	VectorCopy( mins, box_model.mins );
 	VectorCopy( maxs, box_model.maxs );

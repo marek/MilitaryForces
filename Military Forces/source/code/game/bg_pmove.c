@@ -1,5 +1,5 @@
 /*
- * $Id: bg_pmove.c,v 1.4 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: bg_pmove.c,v 1.5 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -11,6 +11,8 @@
 #include "../qcommon/qfiles.h"
 #include "bg_public.h"
 #include "bg_local.h"
+
+void Sys_SnapVector( float *v );
 
 pmove_t		*pm;
 pml_t		pml;
@@ -436,7 +438,8 @@ static void PM_SetWaterLevel( void ) {
 								0, 
 								end, 
 								pm->ps->clientNum, 
-								MASK_WATER );
+								MASK_WATER,
+								false);
 					if( tr.fraction < 1.0f && pm->ps->origin[2] < tr.endpos[2]) {
 						pm->ps->origin[2] = tr.endpos[2];
 					}
@@ -924,8 +927,6 @@ PmoveSingle
 
 ================
 */
-void trap_SnapVector( float *v );
-
 void PmoveSingle (pmove_t *pmove) {
 	pm = pmove;
 
@@ -1044,7 +1045,7 @@ void PmoveSingle (pmove_t *pmove) {
 	PM_WaterEvents();
 
 	// snap some parts of playerstate to save network bandwidth
-	trap_SnapVector( pm->ps->velocity );
+	Sys_SnapVector( pm->ps->velocity );
 }
 
 

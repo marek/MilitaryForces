@@ -159,15 +159,15 @@ UI_UtilsUI::customChatEnd( bool sendText )
 	// send the text?
 	if( sendText && pMode )
 	{
-		trap_Cmd_ExecuteText( EXEC_APPEND, va( "%s %s", pMode, uiInfo.customChat.text ) );
+		Cbuf_ExecuteText( EXEC_APPEND, va( "%s %s", pMode, uiInfo.customChat.text ) );
 	}
 
 	// disable chat
 	uiInfo.customChat.active = false;
 
 	// re-enable normal keyboard operation
-	trap_Key_SetCatcher( trap_Key_GetCatcher() & ~KEYCATCH_UI );
-	trap_Key_ClearStates();
+	Key_SetCatcher( Key_GetCatcher() & ~KEYCATCH_UI );
+	Key_ClearStates();
 }
 
 void 

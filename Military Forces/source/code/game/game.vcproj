@@ -367,12 +367,6 @@
 			<File
 				RelativePath=".\mf_vehiclespawn.c">
 			</File>
-			<File
-				RelativePath=".\q_math.c">
-			</File>
-			<File
-				RelativePath=".\q_shared.c">
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -400,9 +394,6 @@
 			</File>
 			<File
 				RelativePath=".\inv.h">
-			</File>
-			<File
-				RelativePath=".\surfaceflags.h">
 			</File>
 			<File
 				RelativePath=".\syn.h">

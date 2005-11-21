@@ -1,8 +1,11 @@
 /*
- * $Id: cg_vehicle.c,v 1.8 2005-11-20 11:21:38 thebjoern Exp $
+ * $Id: cg_vehicle.c,v 1.9 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 #include "cg_local.h"
+
+
+
 
 #define MAX_LQM_MODELS	32
 typedef struct LQMAnimations_s
@@ -12,24 +15,6 @@ typedef struct LQMAnimations_s
 } LQMAnimations_t;
 LQMAnimations_t availableLQMAnimations;
 
-/*
-===============
-CG_Cache_Error
-
-Wrapper for model errors, so that don't always have to prevent loading because
-one (or more) model(s) may be missing.
-===============
-*/
-void trap_Cache_Error( char * pString )
-{
-#ifdef _DEBUG
-	// just notify in console when developing
-	Com_Printf( pString );
-#else
-	// (release builds, VM builds, ...)
-	Com_Error( ERR_DROP, "%s", pString );
-#endif
-}
 
 /*
 ======================
@@ -53,7 +38,7 @@ static animation_t * CG_ParseLQMAnimationFile( const char *filename ) {
 	animations = (animation_t *)&availableLQMAnimations.anim[availableLQMAnimations.numAnimations];
 
 	// load the file
-	len = trap_FS_FOpenFile( filename, &f, FS_READ );
+	len = FS_FOpenFileByMode( filename, &f, FS_READ );
 	if ( len <= 0 ) {
 		return NULL;
 	}
@@ -61,9 +46,9 @@ static animation_t * CG_ParseLQMAnimationFile( const char *filename ) {
 		CG_Printf( "File %s too long\n", filename );
 		return NULL;
 	}
-	trap_FS_Read( text, len, f );
+	FS_Read2( text, len, f );
 	text[len] = 0;
-	trap_FS_FCloseFile( f );
+	FS_FCloseFile( f );
 
 	// parse the text
 	text_p = text;
@@ -225,7 +210,7 @@ static void CG_CachePlane(int index)
 			break;
 		}
 
-		availableVehicles[index].handle[i] = trap_R_RegisterModel(name);
+		availableVehicles[index].handle[i] = refExport.RegisterModel(name);
 
 //		if( !availableVehicles[index].handle[i] ) {
 //			CG_Printf( "MFQ3 Warning: Unable to load model '%s'\n", name );
@@ -234,7 +219,7 @@ static void CG_CachePlane(int index)
 
 	// only thing that always has to be there is body
 	if( !availableVehicles[index].handle[BP_PLANE_BODY] ) {
-		trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
+		Com_Error( ERR_DROP, "MFQ3 Error: Invalid handle for body %s.md3\n", basename );
 	}
 }
 
@@ -285,7 +270,7 @@ static void CG_CacheGroundVehicle(int index)
 			Com_sprintf( name, sizeof(name), "%s_w6.md3", basename );
 			break;
 		}
-		availableVehicles[index].handle[i] = trap_R_RegisterModel(name);
+		availableVehicles[index].handle[i] = refExport.RegisterModel(name);
 //		if( !availableVehicles[index].handle[i] ) {
 //			CG_Printf( "MFQ3 Warning: Unable to load model '%s'\n", name );
 //		}
@@ -293,7 +278,7 @@ static void CG_CacheGroundVehicle(int index)
 
 	// only thing that always has to be there is body
 	if( !availableVehicles[index].handle[BP_GV_BODY] ) {
-		trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
+		Com_Error( ERR_DROP, "MFQ3 Error: Invalid handle for body %s.md3\n", basename );
 	}
 }
 
@@ -339,12 +324,12 @@ static void CG_CacheHelo(int index)
 			Com_sprintf( name, sizeof(name), "%s_gun2.md3", basename );
 			break;
 		}
-		availableVehicles[index].handle[i] = trap_R_RegisterModel(name);
+		availableVehicles[index].handle[i] = refExport.RegisterModel(name);
 	}
 
 	// only thing that always has to be there is body
 	if( !availableVehicles[index].handle[BP_HELO_BODY] ) {
-		trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
+		Com_Error( ERR_DROP, "MFQ3 Error: Invalid handle for body %s.md3\n", basename );
 	}
 }
 
@@ -378,19 +363,19 @@ static void CG_CacheLQM(int index)
 			Com_sprintf( name, sizeof(name), "%s_head.md3", basename );
 			break;
 		}
-		availableVehicles[index].handle[i] = trap_R_RegisterModel(name);
+		availableVehicles[index].handle[i] = refExport.RegisterModel(name);
 	}
 
 	// only thing that always has to be there is body
 	if( !availableVehicles[index].handle[BP_LQM_TORSO] ) {
-		trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s_torso.md3\n", basename) );
+		Com_Error( ERR_DROP, "MFQ3 Error: Invalid handle for body %s_torso.md3\n", basename );
 	}
 
 	// Parse LQM Animations
 	Com_sprintf( name, sizeof(name), "models/vehicles/lqms/%s/animation.cfg",  availableVehicles[index].modelName );
 	availableVehicles[index].animations = CG_ParseLQMAnimationFile(name);
 	if(!availableVehicles[index].animations) 
-		trap_Cache_Error( va("MFQ3 Error: Cannot parse %s: animation.cfg\n", basename) );
+		Com_Error( ERR_DROP, "MFQ3 Error: Cannot parse %s: animation.cfg\n", basename );
 }
 
 
@@ -451,7 +436,7 @@ static void CG_CacheBoat(int index)
 			Com_sprintf( name, sizeof(name), "%s_gun4.md3", basename );
 			break;
 		}
-		availableVehicles[index].handle[i] = trap_R_RegisterModel(name);
+		availableVehicles[index].handle[i] = refExport.RegisterModel(name);
 
 		if( !availableVehicles[index].handle[i] ) {
 			CG_Printf( "MFQ3 Warning: Unable to load model '%s'\n", name );
@@ -460,7 +445,6 @@ static void CG_CacheBoat(int index)
 
 	// only thing that always has to be there is body
 	if( !availableVehicles[index].handle[BP_BOAT_BODY] ) {
-		//trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
 	}
 }
 
@@ -499,7 +483,7 @@ static void CG_CacheGroundInstallation(int index)
 			Com_sprintf( name, sizeof(name), "%s_upg.md3", basename );
 			break;
 		}
-		availableGroundInstallations[index].handle[i] = trap_R_RegisterModel(name);
+		availableGroundInstallations[index].handle[i] = refExport.RegisterModel(name);
 //		if( !availableVehicles[index].handle[i] ) {
 //			CG_Printf( "MFQ3 Warning: Unable to load model '%s'\n", name );
 //		}
@@ -507,7 +491,6 @@ static void CG_CacheGroundInstallation(int index)
 
 	// only thing that always has to be there is body
 	if( !availableGroundInstallations[index].handle[BP_GV_BODY] ) {
-		//trap_Cache_Error( va("MFQ3 Error: Invalid handle for body %s.md3\n", basename) );
 	}
 }
 
@@ -529,7 +512,7 @@ void CG_InitShadows( void )
 	for( vehicle = 0; vehicle < bg_numberOfVehicles; vehicle++ )
 	{
 		// try to load custom shader
-		customShadowShader = trap_R_RegisterShader( va( "%sShadow", availableVehicles[ vehicle ].modelName ) );
+		customShadowShader = refExport.RegisterShader( va( "%sShadow", availableVehicles[ vehicle ].modelName ) );
 		
 		// replace SHADOW_x fallback op. with the custom shader handle?
 		if( customShadowShader )
@@ -762,7 +745,6 @@ void CG_VehicleObituary( entityState_t *ent )
 	}
 	else {
 		CG_PlaneObituary( ent, ci );
-//		trap_Error( va("Invalid vehicle type in Vehicle obituary %s-%d\n", ci->name, ci->vehicle) );
 	}
 
 }
@@ -808,7 +790,7 @@ void CG_VehicleMuzzleFlash( int weaponIdx, const refEntity_t *parent, qhandle_t 
 			strcpy( tag, "tag_gun" );
 		}
 		CG_PositionRotatedEntityOnTag( &flash[i], parent, parentModel, tag);
-		trap_R_AddRefEntityToScene( &flash[i] );
+		refExport.AddRefEntityToScene( &flash[i] );
 	}
 }
 

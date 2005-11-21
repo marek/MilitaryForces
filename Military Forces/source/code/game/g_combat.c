@@ -1,5 +1,5 @@
 /*
- * $Id: g_combat.c,v 1.5 2005-11-20 11:21:38 thebjoern Exp $
+ * $Id: g_combat.c,v 1.6 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -405,7 +405,7 @@ bool CanDamage (gentity_t *targ, vec3_t origin) {
 	VectorScale (midpoint, 0.5, midpoint);
 
 	VectorCopy (midpoint, dest);
-	trap_Trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID);
+	SV_Trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID, false);
 	if (tr.fraction == 1.0 || tr.entityNum == targ->s.number)
 		return true;
 
@@ -414,28 +414,28 @@ bool CanDamage (gentity_t *targ, vec3_t origin) {
 	VectorCopy (midpoint, dest);
 	dest[0] += 15.0;
 	dest[1] += 15.0;
-	trap_Trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID);
+	SV_Trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID, false);
 	if (tr.fraction == 1.0)
 		return true;
 
 	VectorCopy (midpoint, dest);
 	dest[0] += 15.0;
 	dest[1] -= 15.0;
-	trap_Trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID);
+	SV_Trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID, false);
 	if (tr.fraction == 1.0)
 		return true;
 
 	VectorCopy (midpoint, dest);
 	dest[0] -= 15.0;
 	dest[1] += 15.0;
-	trap_Trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID);
+	SV_Trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID, false);
 	if (tr.fraction == 1.0)
 		return true;
 
 	VectorCopy (midpoint, dest);
 	dest[0] -= 15.0;
 	dest[1] -= 15.0;
-	trap_Trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID);
+	SV_Trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID, false);
 	if (tr.fraction == 1.0)
 		return true;
 
@@ -470,7 +470,7 @@ bool G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, float ra
 		maxs[i] = origin[i] + radius;
 	}
 
-	numListedEntities = trap_EntitiesInBox( mins, maxs, entityList, MAX_GENTITIES );
+	numListedEntities = SV_AreaEntities( mins, maxs, entityList, MAX_GENTITIES );
 
 	for ( e = 0 ; e < numListedEntities ; e++ ) {
 		ent = &g_entities[entityList[ e ]];
@@ -652,7 +652,7 @@ void Vehicle_Death( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, 
 	}
 
 	// if client is in a nodrop area, don't drop anything (but return CTF flags!)
-	contents = trap_PointContents( self->r.currentOrigin, -1 );
+	contents = SV_PointContents( self->r.currentOrigin, -1 );
 	if ( !( contents & CONTENTS_NODROP )) {
 		if( g_gametype.integer == GT_CTF ) {
 			TossVehicleFlags( self );
@@ -739,5 +739,5 @@ void Vehicle_Death( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, 
 		self->client->respawnTime = level.time + 30000;
 	}
 
-	trap_LinkEntity( &self->s, &self->r );
+	SV_LinkEntity( &self->s, &self->r );
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: g_spawn.c,v 1.3 2005-11-20 11:21:38 thebjoern Exp $
+ * $Id: g_spawn.c,v 1.4 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -255,7 +255,7 @@ int G_ItemDisabled( gitem_t *item ) {
 	char name[128];
 
 	Com_sprintf(name, sizeof(name), "disable_%s", item->classname);
-	return trap_Cvar_VariableIntegerValue( name );
+	return Cvar_VariableIntegerValue( name );
 }
 
 /*
@@ -503,7 +503,7 @@ bool G_ParseSpawnVars( void ) {
 	level.numSpawnVarChars = 0;
 
 	// parse the opening brace
-	if ( !trap_GetEntityToken( com_token, sizeof( com_token ) ) ) {
+	if ( !SV_GetEntityToken( com_token, sizeof( com_token ) ) ) {
 		// end of spawn string
 		return false;
 	}
@@ -514,7 +514,7 @@ bool G_ParseSpawnVars( void ) {
 	// go through all the key / value pairs
 	while ( 1 ) {	
 		// parse key
-		if ( !trap_GetEntityToken( keyname, sizeof( keyname ) ) ) {
+		if ( !SV_GetEntityToken( keyname, sizeof( keyname ) ) ) {
 			Com_Error( ERR_DROP, "G_ParseSpawnVars: EOF without closing brace" );
 		}
 
@@ -523,7 +523,7 @@ bool G_ParseSpawnVars( void ) {
 		}
 		
 		// parse value	
-		if ( !trap_GetEntityToken( com_token, sizeof( com_token ) ) ) {
+		if ( !SV_GetEntityToken( com_token, sizeof( com_token ) ) ) {
 			Com_Error( ERR_DROP, "G_ParseSpawnVars: EOF without closing brace" );
 		}
 
@@ -559,38 +559,38 @@ void SP_worldspawn( void ) {
 	}
 
 	// make some data visible to connecting client
-	trap_SetConfigstring( CS_GAME_VERSION, MF_VERSION );
+	SV_SetConfigstring( CS_GAME_VERSION, MF_VERSION );
 
-	trap_SetConfigstring( CS_LEVEL_START_TIME, va("%i", level.startTime ) );
+	SV_SetConfigstring( CS_LEVEL_START_TIME, va("%i", level.startTime ) );
 
 	G_SpawnString( "music", "", &s );
-	trap_SetConfigstring( CS_MUSIC, s );
+	SV_SetConfigstring( CS_MUSIC, s );
 
 	G_SpawnString( "message", "", &s );
-	trap_SetConfigstring( CS_MESSAGE, s );				// map specific message
+	SV_SetConfigstring( CS_MESSAGE, s );				// map specific message
 
-	trap_SetConfigstring( CS_MOTD, g_motd.string );		// message of the day
+	SV_SetConfigstring( CS_MOTD, g_motd.string );		// message of the day
 
 	G_SpawnString( "gravity", "800", &s );
-	trap_Cvar_Set( "g_gravity", s );
+	Cvar_Set( "g_gravity", s );
 
 	G_SpawnString( "enableDust", "0", &s );
-	trap_Cvar_Set( "g_enableDust", s );
+	Cvar_Set( "g_enableDust", s );
 
 	G_SpawnString( "enableBreath", "0", &s );
-	trap_Cvar_Set( "g_enableBreath", s );
+	Cvar_Set( "g_enableBreath", s );
 
 	g_entities[ENTITYNUM_WORLD].s.number = ENTITYNUM_WORLD;
 	g_entities[ENTITYNUM_WORLD].classname = "worldspawn";
 
 	// see if we want a warmup time
-	trap_SetConfigstring( CS_WARMUP, "" );
+	SV_SetConfigstring( CS_WARMUP, "" );
 	if ( g_restarted.integer ) {
-		trap_Cvar_Set( "g_restarted", "0" );
+		Cvar_Set( "g_restarted", "0" );
 		level.warmupTime = 0;
 	} else if ( g_doWarmup.integer ) { // Turn it on
 		level.warmupTime = -1;
-		trap_SetConfigstring( CS_WARMUP, va("%i", level.warmupTime) );
+		SV_SetConfigstring( CS_WARMUP, va("%i", level.warmupTime) );
 		G_LogPrintf( "Warmup:\n" );
 	}
 

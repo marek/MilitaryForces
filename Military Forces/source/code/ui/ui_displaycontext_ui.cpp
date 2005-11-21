@@ -122,7 +122,7 @@ UI_DisplayContextUI::runScript( char **p )
 float
 UI_DisplayContextUI::getCVarValue( const char *cvar )
 {
-	return trap_Cvar_VariableValue( cvar );
+	return Cvar_VariableValue( cvar );
 }
 
 void
@@ -135,13 +135,13 @@ UI_DisplayContextUI::drawTextWithCursor( float x, float y, float scale, vec4_t c
 void
 UI_DisplayContextUI::setOverstrikeMode( bool b )
 {
-	trap_Key_SetOverstrikeMode( b );
+	Key_SetOverstrikeMode( b );
 }
 
 bool
 UI_DisplayContextUI::getOverstrikeMode()
 {
-	return trap_Key_GetOverstrikeMode();
+	return Key_GetOverstrikeMode();
 }
 
 bool
@@ -177,25 +177,25 @@ UI_DisplayContextUI::feederSelection( float feederID, int index )
 void
 UI_DisplayContextUI::keynumToStringBuf( int keynum, char *buf, int buflen )
 {
-	trap_Key_KeynumToStringBuf( keynum, buf, buflen );
+	Key_KeynumToStringBuf( keynum, buf, buflen );
 }
 
 void
 UI_DisplayContextUI::getBindingBuf( int keynum, char *buf, int buflen )
 {
-	trap_Key_GetBindingBuf( keynum, buf, buflen );
+	Key_GetBindingBuf( keynum, buf, buflen );
 }
 
 void
 UI_DisplayContextUI::setBinding( int keynum, const char *binding )
 {
-	trap_Key_SetBinding( keynum, binding );
+	Key_SetBinding( keynum, binding );
 }
 
 void
 UI_DisplayContextUI::executeText( int exec_when, const char *text )
 {
-	trap_Cmd_ExecuteText( exec_when, text );
+	Cbuf_ExecuteText( exec_when, text );
 }
 
 void

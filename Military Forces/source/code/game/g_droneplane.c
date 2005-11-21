@@ -1,5 +1,5 @@
 /*
- * $Id: g_droneplane.c,v 1.3 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: g_droneplane.c,v 1.4 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -30,7 +30,7 @@ void Drone_Plane_Think( gentity_t* ent ) {
 		BG_EvaluateTrajectory( &ent->s.apos, level.time, angles );
 
 		// trace a line from the previous position to the current position
-		trap_Trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, origin, ent->s.number, ent->clipmask );
+		SV_Trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, origin, ent->s.number, ent->clipmask, false );
 		VectorCopy( tr.endpos, ent->r.currentOrigin );
 
 		// check position relative to target
@@ -88,7 +88,7 @@ void Drone_Plane_Think( gentity_t* ent ) {
 		}
 
 		ent->nextthink = level.time + 100;
-		trap_LinkEntity (&ent->s, &ent->r);
+		SV_LinkEntity (&ent->s, &ent->r);
 
 		VectorCopy( angles, ent->s.angles );
 		VectorCopy( ent->s.angles, ent->s.apos.trBase );
@@ -117,7 +117,7 @@ void Drone_Plane_Think( gentity_t* ent ) {
 	BG_EvaluateTrajectory( &ent->s.apos, level.time, angles );
 
 	// trace a line from the previous position to the current position
-	trap_Trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, origin, ent->s.number, ent->clipmask );
+	SV_Trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, origin, ent->s.number, ent->clipmask, false );
 	VectorCopy( tr.endpos, ent->r.currentOrigin );
 	VectorCopy( angles, ent->r.currentAngles );
 
@@ -178,7 +178,7 @@ void Drone_Plane_Think( gentity_t* ent ) {
 	}
 
 	ent->nextthink = level.time + 100;
-	trap_LinkEntity (&ent->s, &ent->r);
+	SV_LinkEntity (&ent->s, &ent->r);
 
 	AngleVectors( angles, forward, 0, 0 );
 	VectorScale( forward, ent->speed, ent->s.pos.trDelta );
@@ -204,7 +204,7 @@ void Drone_Plane_Think( gentity_t* ent ) {
 		BG_EvaluateTrajectory( &ent->s.apos, level.time, angles );
 
 		// trace a line from the previous position to the current position
-		trap_Trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, origin, ent->s.number, ent->clipmask );
+		SV_Trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, origin, ent->s.number, ent->clipmask, false );
 		VectorCopy( tr.endpos, ent->r.currentOrigin );
 
 		// check position relative to target
@@ -252,7 +252,7 @@ void Drone_Plane_Think( gentity_t* ent ) {
 		}
 
 		ent->nextthink = level.time + 50;
-		trap_LinkEntity (&ent->s, &ent->r);
+		SV_LinkEntity (&ent->s, &ent->r);
 
 		VectorCopy( angles, ent->s.angles );
 		VectorCopy( ent->s.angles, ent->s.apos.trBase );

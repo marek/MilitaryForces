@@ -1310,7 +1310,8 @@ FS_Write
 Properly handles partial writes
 =================
 */
-int FS_Write( const void *buffer, int len, fileHandle_t h ) {
+int FS_Write( const void *buffer, int len, fileHandle_t h ) 
+{
 	int		block, remaining;
 	int		written;
 	byte	*buf;
@@ -1373,7 +1374,8 @@ FS_Seek
 
 =================
 */
-int FS_Seek( fileHandle_t f, long offset, int origin ) {
+int FS_Seek( fileHandle_t f, long offset, int origin ) 
+{
 	int		_origin;
 	char	foo[65536];
 
@@ -2009,7 +2011,8 @@ void FS_FreeFileList( char **list ) {
 FS_GetFileList
 ================
 */
-int	FS_GetFileList(  const char *path, const char *extension, char *listbuf, int bufsize ) {
+int	FS_GetFileList(  const char *path, const char *extension, char *listbuf, int bufsize ) 
+{
 	int		nFiles, i, nTotal, nLen;
 	char **pFiles = NULL;
 
@@ -3355,7 +3358,7 @@ Handle based file calls for virtual machines
 ========================================================================================
 */
 
-int		FS_FOpenFileByMode( const char *qpath, fileHandle_t *f, fsMode_t mode ) 
+int FS_FOpenFileByMode( const char *qpath, fileHandle_t *f, fsMode_t mode ) 
 {
 	int		r;
 	bool	sync;

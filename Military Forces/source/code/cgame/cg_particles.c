@@ -390,7 +390,7 @@ void CG_RenderParticle(particle_t * p)
 	// world lighting
 	if(p->reallight)
 	{
-		trap_R_LightForPoint( p->trBase, alight, dlight, lightdir );
+		refExport.LightForPoint( p->trBase, alight, dlight, lightdir );
 		for( i = 0; i < 3; i++ )
 			shaderRGBA[ i ] = (int)alight[ i ];
 	}
@@ -435,7 +435,7 @@ void CG_RenderParticle(particle_t * p)
 	verts[3].st[0] = 1;
 	verts[3].st[1] = 0;
 
-	trap_R_AddPolyToScene( p->shaders[0], 4, verts );
+	refExport.AddPolyToScene( p->shaders[0], 4, verts, 1 );
 
 }
 

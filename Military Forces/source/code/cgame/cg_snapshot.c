@@ -1,5 +1,5 @@
 /*
- * $Id: cg_snapshot.c,v 1.4 2005-11-20 11:21:38 thebjoern Exp $
+ * $Id: cg_snapshot.c,v 1.5 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -263,9 +263,9 @@ static snapshot_t *CG_ReadNextSnapshot( void ) {
 
 		// try to read the snapshot from the client system
 		cgs.processedSnapshotNum++;
-		r = trap_GetSnapshot( cgs.processedSnapshotNum, dest );
+		r = CL_GetSnapshot( cgs.processedSnapshotNum, dest );
 
-		// FIXME: why would trap_GetSnapshot return a snapshot with the same server time
+		// FIXME: why would CL_GetSnapshot return a snapshot with the same server time
 		if ( cg.snap && r && dest->serverTime == cg.snap->serverTime ) {
 			//continue;
 		}
@@ -317,7 +317,7 @@ void CG_ProcessSnapshots( void ) {
 	int				n;
 
 	// see what the latest snapshot the client system has is
-	trap_GetCurrentSnapshotNumber( &n, &cg.latestSnapshotTime );
+	CL_GetCurrentSnapshotNumber( &n, &cg.latestSnapshotTime );
 	if ( n != cg.latestSnapshotNum ) {
 		if ( n < cg.latestSnapshotNum ) {
 			// this should never happen

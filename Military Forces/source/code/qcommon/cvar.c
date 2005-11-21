@@ -104,7 +104,8 @@ static cvar_t *Cvar_FindVar( const char *var_name ) {
 Cvar_VariableValue
 ============
 */
-float Cvar_VariableValue( const char *var_name ) {
+float Cvar_VariableValue( const char *var_name ) 
+{
 	cvar_t	*var;
 	
 	var = Cvar_FindVar (var_name);
@@ -119,7 +120,8 @@ float Cvar_VariableValue( const char *var_name ) {
 Cvar_VariableIntegerValue
 ============
 */
-int Cvar_VariableIntegerValue( const char *var_name ) {
+int Cvar_VariableIntegerValue( const char *var_name ) 
+{
 	cvar_t	*var;
 	
 	var = Cvar_FindVar (var_name);
@@ -149,7 +151,8 @@ char *Cvar_VariableString( const char *var_name ) {
 Cvar_VariableStringBuffer
 ============
 */
-void Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize ) {
+void Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize ) 
+{
 	cvar_t *var;
 	
 	var = Cvar_FindVar (var_name);
@@ -394,7 +397,8 @@ cvar_t *Cvar_Set2( const char *var_name, const char *value, bool force ) {
 Cvar_Set
 ============
 */
-void Cvar_Set( const char *var_name, const char *value) {
+void Cvar_Set( const char *var_name, const char *value) 
+{
 	Cvar_Set2 (var_name, value, true);
 }
 
@@ -403,7 +407,8 @@ void Cvar_Set( const char *var_name, const char *value) {
 Cvar_SetLatched
 ============
 */
-void Cvar_SetLatched( const char *var_name, const char *value) {
+void Cvar_SetLatched( const char *var_name, const char *value) 
+{
 	Cvar_Set2 (var_name, value, false);
 }
 
@@ -412,7 +417,8 @@ void Cvar_SetLatched( const char *var_name, const char *value) {
 Cvar_SetValue
 ============
 */
-void Cvar_SetValue( const char *var_name, float value) {
+void Cvar_SetValue( const char *var_name, float value) 
+{
 	char	val[32];
 
 	if ( value == (int)value ) {
@@ -830,7 +836,8 @@ Cvar_Register
 basically a slightly modified Cvar_Get for the interpreted modules
 =====================
 */
-void	Cvar_Register( vmCvar_t *vmCvar, const char *varName, const char *defaultValue, int flags ) {
+void Cvar_Register( vmCvar_t *vmCvar, const char *varName, const char *defaultValue, int flags ) 
+{
 	cvar_t	*cv;
 
 	cv = Cvar_Get( varName, defaultValue, flags );
@@ -850,7 +857,8 @@ Cvar_Register
 updates an interpreted modules' version of a cvar
 =====================
 */
-void	Cvar_Update( vmCvar_t *vmCvar ) {
+void Cvar_Update( vmCvar_t *vmCvar ) 
+{
 	cvar_t	*cv = NULL; // bk001129
 	assert(vmCvar); // bk
 

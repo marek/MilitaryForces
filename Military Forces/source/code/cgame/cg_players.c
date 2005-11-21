@@ -1,5 +1,5 @@
 /*
- * $Id: cg_players.c,v 1.5 2005-11-20 11:21:38 thebjoern Exp $
+ * $Id: cg_players.c,v 1.6 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -35,7 +35,7 @@ sfxHandle_t	CG_CustomSound( int clientNum, const char *soundName ) {
 	int			i;
 
 	if ( soundName[0] != '*' ) {
-		return trap_S_RegisterSound( soundName, false );
+		return S_RegisterSound( soundName, false );
 	}
 
 	if ( clientNum < 0 || clientNum >= MAX_CLIENTS ) {
@@ -138,8 +138,8 @@ void CG_NewClientInfo( int clientNum ) {
 		// MFQ3: team changed so reset the vehicle trigger
 		// Make sure it only happens to the player changing teams, otherwise all vehicle's reset 
 		// (UserInfoChanged on g will reset all players)
-		trap_Cvar_Set( "cg_vehicle", "-1" );
-		trap_Cvar_Set( "cg_nextVehicle", va( "%d", -1 ) );
+		Cvar_Set( "cg_vehicle", "-1" );
+		Cvar_Set( "cg_nextVehicle", va( "%d", -1 ) );
 	}
 
 	// team task
@@ -160,23 +160,23 @@ void CG_NewClientInfo( int clientNum ) {
 	v = Info_ValueForKey( configstring, "ac" );
 	newInfo.advancedControls = atoi(v);
 	if( newInfo.advancedControls )
-		trap_SendConsoleCommand( "+strafe" );
-//		trap_Cvar_Set( "cl_freelook", "0" );
+		Cbuf_AddText( "+strafe" );
+//		Cvar_Set( "cl_freelook", "0" );
 	else
-		trap_SendConsoleCommand( "-strafe" );
-//		trap_Cvar_Set( "cl_freelook", "1" );
+		Cbuf_AddText( "-strafe" );
+//		Cvar_Set( "cl_freelook", "1" );
 
 	// MFQ3: vehicle
 	v = Info_ValueForKey( configstring, "v" );
 	newInfo.vehicle = atoi( v );
 	if( newInfo.vehicle >= 0 && clientNum == cg.predictedPlayerEntity.currentState.clientNum )
 	{
-		trap_Cvar_Set( "cg_vehicle", va( "%d", newInfo.vehicle ) );
+		Cvar_Set( "cg_vehicle", va( "%d", newInfo.vehicle ) );
 		// only set "cg_nextvehicle" to the same as "cg_vehicle" when we currently don't have
 		// a vehicle index in it.
 		if( CG_Cvar_Get( "cg_nextVehicle" ) == -1 )
 		{
-			trap_Cvar_Set( "cg_nextVehicle", va( "%d", newInfo.vehicle ) );
+			Cvar_Set( "cg_nextVehicle", va( "%d", newInfo.vehicle ) );
 		}
 	}
 
@@ -218,7 +218,7 @@ void CG_TrailItem( centity_t *cent, qhandle_t hModel ) {
 	AnglesToAxis( angles, ent.axis );
 
 	ent.hModel = hModel;
-	trap_R_AddRefEntityToScene( &ent );
+	refExport.AddRefEntityToScene( &ent );
 }
 
 
@@ -238,7 +238,7 @@ int CG_LightVerts( vec3_t normal, int numVerts, polyVert_t *verts )
 	vec3_t			lightDir;
 	vec3_t			directedLight;
 
-	trap_R_LightForPoint( verts[0].xyz, ambientLight, directedLight, lightDir );
+	refExport.LightForPoint( verts[0].xyz, ambientLight, directedLight, lightDir );
 
 	for (i = 0; i < numVerts; i++) {
 		incoming = DotProduct (normal, lightDir);

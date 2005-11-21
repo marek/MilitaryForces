@@ -78,7 +78,7 @@ void G_ExplodeMissile( gentity_t *ent ) {
 		}
 	}
 
-	trap_LinkEntity( &ent->s, &ent->r );
+	SV_LinkEntity( &ent->s, &ent->r );
 }
 
 
@@ -117,7 +117,7 @@ void G_ExplodeFlak( gentity_t *ent ) {
 		}
 	}
 
-	trap_LinkEntity( &ent->s, &ent->r );
+	SV_LinkEntity( &ent->s, &ent->r );
 }
 
 
@@ -170,7 +170,7 @@ void G_ExplodeCFlare( gentity_t *ent ) {
 	VectorSet(dir, 0 + 5 * Q_random(&seed),	0 + 5 * Q_random(&seed),	120 * Q_random(&seed));
 	fire_flare2(ent->parent, ent->r.currentOrigin, dir, 2000 + 1000 * Q_random(&seed) );
 
-	trap_LinkEntity( &ent->s, &ent->r );
+	SV_LinkEntity( &ent->s, &ent->r );
 }
 
 /*
@@ -199,7 +199,7 @@ static void NukeRadiusDamage( vec3_t origin, gentity_t *attacker, float damage, 
 		maxs[i] = origin[i] + radius;
 	}
 
-	numListedEntities = trap_EntitiesInBox( mins, maxs, entityList, MAX_GENTITIES );
+	numListedEntities = SV_AreaEntities( mins, maxs, entityList, MAX_GENTITIES );
 
 	for ( e = 0 ; e < numListedEntities ; e++ ) {
 		ent = &g_entities[entityList[ e ]];
@@ -233,13 +233,12 @@ static void NukeRadiusDamage( vec3_t origin, gentity_t *attacker, float damage, 
 		if(strcmp(ent->classname, "player") == 0)
 		{
 			// Try a trace
-			// trap_Trace (&trace, origin, ent->r.absmin, ent->r.absmax,  ent->r.currentOrigin, ENTITYNUM_NONE, MASK_SOLID);
-			trap_Trace (&trace, origin, NULL, NULL,  ent->r.currentOrigin, ent->s.number, MASK_SOLID);
+			SV_Trace (&trace, origin, NULL, NULL,  ent->r.currentOrigin, ent->s.number, MASK_SOLID, false);
 		
 			// Also don't let them get away to easily so check slightly above the origin, and see if it reaches) It may have to be a big hill.
 			VectorCopy(origin, temp);
 			temp[2] += radius / 2;
-			trap_Trace (&trace2, temp, NULL, NULL, ent->r.currentOrigin, ent->s.number, MASK_SOLID);
+			SV_Trace (&trace2, temp, NULL, NULL, ent->r.currentOrigin, ent->s.number, MASK_SOLID, false);
 		}
 		else
 		{
@@ -284,7 +283,7 @@ static void NukeShockWave( vec3_t origin, gentity_t *attacker, float damage, flo
 		maxs[i] = origin[i] + radius;
 	}
 
-	numListedEntities = trap_EntitiesInBox( mins, maxs, entityList, MAX_GENTITIES );
+	numListedEntities = SV_AreaEntities( mins, maxs, entityList, MAX_GENTITIES );
 
 	for ( e = 0 ; e < numListedEntities ; e++ ) {
 		ent = &g_entities[entityList[ e ]];
@@ -549,7 +548,7 @@ void G_ExplodeNuke( gentity_t *ent ) {
 
 	VectorClear(explosion->movedir);
 
-	trap_LinkEntity( &explosion->s, &explosion->r );
+	SV_LinkEntity( &explosion->s, &explosion->r );
 
 	explosion->activator = ent->parent;		// Activator is the owner of the bomb/missile 
 
@@ -674,7 +673,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 		}
 	}
 
-	trap_LinkEntity( &ent->s, &ent->r );
+	SV_LinkEntity( &ent->s, &ent->r );
 }
 
 /*
@@ -699,18 +698,18 @@ void G_RunMissile( gentity_t *ent ) {
 		passent = ent->r.ownerNum;
 	}
 	// trace a line from the previous position to the current position
-	trap_Trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, origin, passent, ent->clipmask );
+	SV_Trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, origin, passent, ent->clipmask, false );
 
 	if ( tr.startsolid || tr.allsolid ) {
 		// make sure the tr.entityNum is set to the entity we're stuck in
-		trap_Trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, ent->r.currentOrigin, passent, ent->clipmask );
+		SV_Trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, ent->r.currentOrigin, passent, ent->clipmask, false );
 		tr.fraction = 0;
 	}
 	else {
 		VectorCopy( tr.endpos, ent->r.currentOrigin );
 	}
 
-	trap_LinkEntity( &ent->s, &ent->r );
+	SV_LinkEntity( &ent->s, &ent->r );
 
 	if ( tr.fraction != 1) {
 		// never explode or bounce on sky
@@ -771,7 +770,7 @@ void G_CrateThink( gentity_t *ent ) {
 	ent->nextthink = level.time + 5;
 	ent->lastDist = VectorNormalize(dir);
 
-	trap_LinkEntity( &ent->s, &ent->r );
+	SV_LinkEntity( &ent->s, &ent->r );
 }
 
 //=============================================================================
@@ -843,7 +842,7 @@ static void follow_target( gentity_t *missile ) {
 	// check for flares
 	VectorSubtract( missile->r.currentOrigin, range, mins );
 	VectorAdd( missile->r.currentOrigin, range, maxs );
-	num = trap_EntitiesInBox( mins, maxs, touch, MAX_GENTITIES );
+	num = SV_AreaEntities( mins, maxs, touch, MAX_GENTITIES );
 
 	for ( i=0 ; i<num ; i++ ) {
 		hit = &g_entities[touch[i]];
@@ -887,7 +886,7 @@ static void follow_target( gentity_t *missile ) {
 	}
 
 	// LOS
-	trap_Trace( &tr, missile->r.currentOrigin, 0, 0, mid, missile->tracktarget->s.number, MASK_SOLID );
+	SV_Trace( &tr, missile->r.currentOrigin, 0, 0, mid, missile->tracktarget->s.number, MASK_SOLID, false );
 	if( tr.fraction < 1.0f ) {
 		on_target_lost(missile);
 		return;
@@ -917,7 +916,7 @@ static void follow_target( gentity_t *missile ) {
 	}
 
 
-	trap_LinkEntity( &missile->s, &missile->r );
+	SV_LinkEntity( &missile->s, &missile->r );
 }
 
 

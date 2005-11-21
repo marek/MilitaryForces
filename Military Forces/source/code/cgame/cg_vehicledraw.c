@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicledraw.c,v 1.5 2005-10-16 15:12:33 thebjoern Exp $
+ * $Id: cg_vehicledraw.c,v 1.6 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -110,7 +110,7 @@ static void CG_PlanePilot( const refEntity_t *parent, qhandle_t parentModel, int
 			AxisCopy( axisDefault, pilot[k].axis );
 			Com_sprintf( tag, 12, "tag_pilot%d", i+1 );
 			CG_PositionRotatedEntityOnTag( &pilot[k], parent, parentModel, tag);
-			trap_R_AddRefEntityToScene( &pilot[k] );
+			refExport.AddRefEntityToScene( &pilot[k] );
 		}
 	}
 }
@@ -170,7 +170,7 @@ void CG_DrawPlane(DrawInfo_Plane_t* drawInfo)
     part[BP_PLANE_BODY].renderfx = renderfx;
     VectorCopy (part[BP_PLANE_BODY].origin, part[BP_PLANE_BODY].oldorigin);
 	part[BP_PLANE_BODY].frame = drawInfo->bodyFrame;
-	trap_R_AddRefEntityToScene( &part[BP_PLANE_BODY] );
+	refExport.AddRefEntityToScene( &part[BP_PLANE_BODY] );
 	
 	// if the model failed, allow the default nullmodel to be displayed, but nothing else
 	if (!part[BP_PLANE_BODY].hModel) 
@@ -195,7 +195,7 @@ void CG_DrawPlane(DrawInfo_Plane_t* drawInfo)
 				CG_PositionRotatedEntityOnTag( &engine, &part[BP_PLANE_BODY], veh->handle[BP_PLANE_BODY], engine_tags[ii-1] );
 				engine.shadowPlane = shadowPlane;
 				engine.renderfx = renderfx;
-				trap_R_AddRefEntityToScene( &engine );
+				refExport.AddRefEntityToScene( &engine );
 			}
 		}
 		if( (veh->caps & HC_SWINGWING) && 
@@ -210,7 +210,7 @@ void CG_DrawPlane(DrawInfo_Plane_t* drawInfo)
 		CG_PositionRotatedEntityOnTag( &part[i], &part[BP_PLANE_BODY], veh->handle[BP_PLANE_BODY], plane_tags[i] );
 		part[i].shadowPlane = shadowPlane;
 		part[i].renderfx = renderfx;
-		trap_R_AddRefEntityToScene( &part[i] );
+		refExport.AddRefEntityToScene( &part[i] );
 	}
 	// pilot
 	CG_PlanePilot( &part[BP_PLANE_BODY], veh->handle[BP_PLANE_BODY], drawInfo->basicInfo.vehicleIndex );
@@ -234,7 +234,7 @@ void CG_DrawPlane(DrawInfo_Plane_t* drawInfo)
 						drawInfo->basicInfo.usedLoadout->mounts[i].tag.name );
 				vwep.shadowPlane = shadowPlane;
 				vwep.renderfx = renderfx;
-				trap_R_AddRefEntityToScene( &vwep );
+				refExport.AddRefEntityToScene( &vwep );
 			}
 		}
 	}
@@ -254,7 +254,7 @@ void CG_DrawPlane(DrawInfo_Plane_t* drawInfo)
 		CG_PositionEntityOnTag( &vapor, &part[BP_PLANE_BODY], veh->handle[BP_PLANE_BODY], "tag_vapor1" );
 		vapor.shadowPlane = shadowPlane;
 		vapor.renderfx = renderfx;
-		trap_R_AddRefEntityToScene( &vapor );
+		refExport.AddRefEntityToScene( &vapor );
 	}
 	
 	// throttle/afterburner
@@ -267,7 +267,7 @@ void CG_DrawPlane(DrawInfo_Plane_t* drawInfo)
 		burner.shadowPlane = shadowPlane;
 		burner.renderfx = renderfx;
 		burner.frame = drawInfo->bodyFrame;
-		trap_R_AddRefEntityToScene( &burner );
+		refExport.AddRefEntityToScene( &burner );
 		if( veh->engines > 1 ) 
 		{
 			burner2.hModel = cgs.media.afterburner[veh->effectModel];
@@ -277,7 +277,7 @@ void CG_DrawPlane(DrawInfo_Plane_t* drawInfo)
 			burner2.shadowPlane = shadowPlane;
 			burner2.renderfx = renderfx;
 			burner2.frame = drawInfo->bodyFrame;
-			trap_R_AddRefEntityToScene( &burner2 );
+			refExport.AddRefEntityToScene( &burner2 );
 		}
 	}
 
@@ -285,18 +285,18 @@ void CG_DrawPlane(DrawInfo_Plane_t* drawInfo)
 	if( drawInfo->basicInfo.entityNum >= 0 ) 
 	{
 		if ( veh->caps & HC_PROP ) {
-			trap_S_AddLoopingSound( drawInfo->basicInfo.entityNum, drawInfo->basicInfo.origin, vec3_origin, 
+			S_AddLoopingSound( drawInfo->basicInfo.entityNum, drawInfo->basicInfo.origin, vec3_origin, 
 									cgs.media.engineProp );
 		}
 		else {
 			if( drawInfo->basicInfo.throttle > 10 ) 
 			{
-				trap_S_AddLoopingSound( drawInfo->basicInfo.entityNum, drawInfo->basicInfo.origin, vec3_origin, 
+				S_AddLoopingSound( drawInfo->basicInfo.entityNum, drawInfo->basicInfo.origin, vec3_origin, 
 										cgs.media.engineJetAB );
 			}
 			else 
 			{
-				trap_S_AddLoopingSound( drawInfo->basicInfo.entityNum, drawInfo->basicInfo.origin, vec3_origin,
+				S_AddLoopingSound( drawInfo->basicInfo.entityNum, drawInfo->basicInfo.origin, vec3_origin,
 										cgs.media.engineJet );
 			}
 		}
@@ -348,7 +348,7 @@ void CG_DrawGV(DrawInfo_GV_t* drawInfo)
     part[BP_GV_BODY].shadowPlane = shadowPlane;
     part[BP_GV_BODY].renderfx = renderfx;
     VectorCopy (part[BP_GV_BODY].origin, part[BP_GV_BODY].oldorigin);
-    trap_R_AddRefEntityToScene( &part[BP_GV_BODY] );
+    refExport.AddRefEntityToScene( &part[BP_GV_BODY] );
 
     //
     // turret
@@ -361,7 +361,7 @@ void CG_DrawGV(DrawInfo_GV_t* drawInfo)
 	part[BP_GV_TURRET].shadowPlane = shadowPlane;
     part[BP_GV_TURRET].renderfx = renderfx;
     VectorCopy (part[BP_GV_TURRET].origin, part[BP_GV_TURRET].oldorigin);
-    trap_R_AddRefEntityToScene( &part[BP_GV_TURRET] );
+    refExport.AddRefEntityToScene( &part[BP_GV_TURRET] );
 
     //
     // gun
@@ -374,7 +374,7 @@ void CG_DrawGV(DrawInfo_GV_t* drawInfo)
 	part[BP_GV_GUNBARREL].shadowPlane = shadowPlane;
     part[BP_GV_GUNBARREL].renderfx = renderfx;
     VectorCopy (part[BP_GV_GUNBARREL].origin, part[BP_GV_GUNBARREL].oldorigin);
-    trap_R_AddRefEntityToScene( &part[BP_GV_GUNBARREL] );
+    refExport.AddRefEntityToScene( &part[BP_GV_GUNBARREL] );
 
 	//
 	// wheels
@@ -416,7 +416,7 @@ void CG_DrawGV(DrawInfo_GV_t* drawInfo)
 			
 			CG_PositionRotatedEntityOnTag( &part[BP_GV_WHEEL+ii], &part[BP_GV_BODY], veh->handle[BP_GV_BODY], gv_tags[BP_GV_WHEEL+ii] );
 			
-			trap_R_AddRefEntityToScene( &part[BP_GV_WHEEL+ii] );
+			refExport.AddRefEntityToScene( &part[BP_GV_WHEEL+ii] );
 		}
 	}
 
@@ -424,7 +424,7 @@ void CG_DrawGV(DrawInfo_GV_t* drawInfo)
 	if( drawInfo->basicInfo.entityNum >= 0 ) {
 		tanksound = drawInfo->basicInfo.speed * NUM_TANKSOUNDS / veh->maxspeed;
 		if( tanksound >= NUM_TANKSOUNDS ) tanksound = NUM_TANKSOUNDS - 1;
-		trap_S_AddLoopingSound( drawInfo->basicInfo.entityNum, 
+		S_AddLoopingSound( drawInfo->basicInfo.entityNum, 
 								drawInfo->basicInfo.origin, 
 								vec3_origin, 
 								cgs.media.engineTank[tanksound] );
@@ -474,7 +474,7 @@ void CG_DrawBoat(DrawInfo_Boat_t* drawInfo)
     part[BP_BOAT_BODY].shadowPlane = shadowPlane;
     part[BP_BOAT_BODY].renderfx = renderfx;
     VectorCopy (part[BP_BOAT_BODY].origin, part[BP_BOAT_BODY].oldorigin);
-    trap_R_AddRefEntityToScene( &part[BP_BOAT_BODY] );
+    refExport.AddRefEntityToScene( &part[BP_BOAT_BODY] );
 
     //
     // turrets
@@ -491,7 +491,7 @@ void CG_DrawBoat(DrawInfo_Boat_t* drawInfo)
 		part[BP_BOAT_TURRET+j].shadowPlane = shadowPlane;
 		part[BP_BOAT_TURRET+j].renderfx = renderfx;
 		VectorCopy (part[BP_BOAT_TURRET+j].origin, part[BP_BOAT_TURRET+j].oldorigin);
-		trap_R_AddRefEntityToScene( &part[BP_BOAT_TURRET+j] );
+		refExport.AddRefEntityToScene( &part[BP_BOAT_TURRET+j] );
 		// gun
 		part[BP_BOAT_GUNBARREL+j].hModel = veh->handle[BP_BOAT_GUNBARREL+j];
 		VectorCopy( drawInfo->basicInfo.origin, part[BP_BOAT_GUNBARREL+j].lightingOrigin );
@@ -501,7 +501,7 @@ void CG_DrawBoat(DrawInfo_Boat_t* drawInfo)
 		part[BP_BOAT_GUNBARREL+j].shadowPlane = shadowPlane;
 		part[BP_BOAT_GUNBARREL+j].renderfx = renderfx;
 		VectorCopy (part[BP_BOAT_GUNBARREL+j].origin, part[BP_BOAT_GUNBARREL+j].oldorigin);
-		trap_R_AddRefEntityToScene( &part[BP_BOAT_GUNBARREL+j] );
+		refExport.AddRefEntityToScene( &part[BP_BOAT_GUNBARREL+j] );
 
 	}
 
@@ -509,7 +509,7 @@ void CG_DrawBoat(DrawInfo_Boat_t* drawInfo)
 	if( drawInfo->basicInfo.entityNum >= 0 ) {
 		tanksound = drawInfo->basicInfo.speed * NUM_TANKSOUNDS / veh->maxspeed;
 		if( tanksound >= NUM_TANKSOUNDS ) tanksound = NUM_TANKSOUNDS - 1;
-		trap_S_AddLoopingSound( drawInfo->basicInfo.entityNum, 
+		S_AddLoopingSound( drawInfo->basicInfo.entityNum, 
 								drawInfo->basicInfo.origin, 
 								vec3_origin, 
 								cgs.media.engineTank[tanksound] );
@@ -548,7 +548,7 @@ refEntity_t	    part[BP_HELO_MAX_PARTS];
     part[BP_HELO_BODY].shadowPlane = shadowPlane;
     part[BP_HELO_BODY].renderfx = renderfx;
     VectorCopy (part[BP_HELO_BODY].origin, part[BP_HELO_BODY].oldorigin);
-    trap_R_AddRefEntityToScene( &part[BP_HELO_BODY] );
+    refExport.AddRefEntityToScene( &part[BP_HELO_BODY] );
 
 
 
@@ -568,7 +568,7 @@ refEntity_t	    part[BP_HELO_MAX_PARTS];
 		CG_PositionRotatedEntityOnTag( &part[i], &part[BP_HELO_BODY], veh->handle[BP_HELO_BODY], helo_tags[i] );
 		part[i].shadowPlane = shadowPlane;
 		part[i].renderfx = renderfx;
-		trap_R_AddRefEntityToScene( &part[i] );
+		refExport.AddRefEntityToScene( &part[i] );
 	}
 
 
@@ -587,7 +587,7 @@ refEntity_t	    part[BP_HELO_MAX_PARTS];
 		part[BP_HELO_TURRET+j].shadowPlane = shadowPlane;
 		part[BP_HELO_TURRET+j].renderfx = renderfx;
 		VectorCopy (part[BP_HELO_TURRET+j].origin, part[BP_HELO_TURRET+j].oldorigin);
-		trap_R_AddRefEntityToScene( &part[BP_HELO_TURRET+j] );
+		refExport.AddRefEntityToScene( &part[BP_HELO_TURRET+j] );
 		// gun
 		part[BP_HELO_GUNBARREL+j].hModel = veh->handle[BP_HELO_GUNBARREL+j];
 		VectorCopy( drawInfo->basicInfo.origin, part[BP_HELO_GUNBARREL+j].lightingOrigin );
@@ -597,13 +597,13 @@ refEntity_t	    part[BP_HELO_MAX_PARTS];
 		part[BP_HELO_GUNBARREL+j].shadowPlane = shadowPlane;
 		part[BP_HELO_GUNBARREL+j].renderfx = renderfx;
 		VectorCopy (part[BP_HELO_GUNBARREL+j].origin, part[BP_HELO_GUNBARREL+j].oldorigin);
-		trap_R_AddRefEntityToScene( &part[BP_HELO_GUNBARREL+j] );
+		refExport.AddRefEntityToScene( &part[BP_HELO_GUNBARREL+j] );
 
 	}
 
 	// sound
 	if( drawInfo->basicInfo.entityNum >= 0 ) {
-			trap_S_AddLoopingSound( drawInfo->basicInfo.entityNum, drawInfo->basicInfo.origin, vec3_origin, 
+			S_AddLoopingSound( drawInfo->basicInfo.entityNum, drawInfo->basicInfo.origin, vec3_origin, 
 									cgs.media.engineHelo );
 	}
 
@@ -891,7 +891,7 @@ void CG_DrawLQM(DrawInfo_LQM_t* drawInfo)
     part[BP_LQM_LEGS].shadowPlane = shadowPlane;
     part[BP_LQM_LEGS].renderfx = renderfx;
     VectorCopy (part[BP_LQM_LEGS].origin, part[BP_LQM_LEGS].oldorigin);
-    trap_R_AddRefEntityToScene( &part[BP_LQM_LEGS] );
+    refExport.AddRefEntityToScene( &part[BP_LQM_LEGS] );
 
 	//
 	// Add Torso
@@ -920,7 +920,7 @@ void CG_DrawLQM(DrawInfo_LQM_t* drawInfo)
 	CG_PositionRotatedEntityOnTag( &part[BP_LQM_TORSO], &part[BP_LQM_LEGS], veh->handle[BP_LQM_LEGS], lqm_tags[BP_LQM_TORSO] );
 	part[BP_LQM_TORSO].shadowPlane = shadowPlane;
 	part[BP_LQM_TORSO].renderfx = renderfx;
-	trap_R_AddRefEntityToScene( &part[BP_LQM_TORSO] );
+	refExport.AddRefEntityToScene( &part[BP_LQM_TORSO] );
 
 	// Add Head
 	part[BP_LQM_HEAD].hModel = veh->handle[BP_LQM_HEAD];
@@ -934,7 +934,7 @@ void CG_DrawLQM(DrawInfo_LQM_t* drawInfo)
 	CG_PositionRotatedEntityOnTag( &part[BP_LQM_HEAD], &part[BP_LQM_TORSO], veh->handle[BP_LQM_TORSO], lqm_tags[BP_LQM_HEAD] );
 	part[BP_LQM_HEAD].shadowPlane = shadowPlane;
 	part[BP_LQM_HEAD].renderfx = renderfx;
-	trap_R_AddRefEntityToScene( &part[BP_LQM_HEAD] );
+	refExport.AddRefEntityToScene( &part[BP_LQM_HEAD] );
 
 	// Add Weapon
 	part[BP_LQM_MAX_PARTS].hModel = availableWeapons[drawInfo->weaponIndex].modelHandle;
@@ -943,7 +943,7 @@ void CG_DrawLQM(DrawInfo_LQM_t* drawInfo)
 	CG_PositionRotatedEntityOnTag( &part[BP_LQM_MAX_PARTS], &part[BP_LQM_TORSO], veh->handle[BP_LQM_TORSO], "tag_weap" );
 	part[BP_LQM_MAX_PARTS].shadowPlane = shadowPlane;
 	part[BP_LQM_MAX_PARTS].renderfx = renderfx;
-	trap_R_AddRefEntityToScene( &part[BP_LQM_MAX_PARTS] );
+	refExport.AddRefEntityToScene( &part[BP_LQM_MAX_PARTS] );
 
 	// muzzleflash
 	if( drawInfo->basicInfo.drawMuzzleFlash ) {
@@ -969,7 +969,7 @@ void CG_DrawGI(DrawInfo_GI_t* drawInfo)
 	VectorCopy( drawInfo->basicInfo.origin, part[BP_GI_BODY].origin );	
 	VectorCopy( drawInfo->basicInfo.origin, part[BP_GI_BODY].oldorigin);
 	AxisCopy( drawInfo->basicInfo.axis, part[BP_GI_BODY].axis );
-	trap_R_AddRefEntityToScene( &part[BP_GI_BODY] );
+	refExport.AddRefEntityToScene( &part[BP_GI_BODY] );
 
 	// other parts
 	for( i = 1; i < BP_GI_MAX_PARTS; i++ ) 
@@ -1011,6 +1011,6 @@ void CG_DrawGI(DrawInfo_GI_t* drawInfo)
 			CG_PositionRotatedEntityOnTag( &part[i], &part[BP_GI_BODY], 
 				veh->handle[BP_GI_BODY], gi_tags[i] );
 		}
-		trap_R_AddRefEntityToScene( &part[i] );
+		refExport.AddRefEntityToScene( &part[i] );
 	}
 }

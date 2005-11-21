@@ -649,12 +649,14 @@ void Message_Key( int key ) {
 //============================================================================
 
 
-bool Key_GetOverstrikeMode( void ) {
+bool Key_GetOverstrikeMode() 
+{
 	return key_overstrikeMode;
 }
 
 
-void Key_SetOverstrikeMode( bool state ) {
+void Key_SetOverstrikeMode( bool state ) 
+{
 	key_overstrikeMode = state;
 }
 
@@ -664,7 +666,8 @@ void Key_SetOverstrikeMode( bool state ) {
 Key_IsDown
 ===================
 */
-bool Key_IsDown( int keynum ) {
+bool Key_IsDown( int keynum ) 
+{
 	if ( keynum == -1 ) {
 		return false;
 	}
@@ -784,7 +787,8 @@ char *Key_KeynumToString( int keynum ) {
 Key_SetBinding
 ===================
 */
-void Key_SetBinding( int keynum, const char *binding ) {
+void Key_SetBinding( int keynum, const char *binding ) 
+{
 	if ( keynum == -1 ) {
 		return;
 	}
@@ -1276,7 +1280,7 @@ void CL_CharEvent( int key )
 Key_ClearStates
 ===================
 */
-void Key_ClearStates (void)
+void Key_ClearStates()
 {
 	int		i;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: g_target.c,v 1.4 2005-11-20 11:21:38 thebjoern Exp $
+ * $Id: g_target.c,v 1.5 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -62,7 +62,7 @@ If "private", only the activator gets the message.  If no checks, all clients ge
 */
 void Use_Target_Print (gentity_t *ent, gentity_t *other, gentity_t *activator) {
 	if ( activator->client && ( ent->spawnflags & 4 ) ) {
-		trap_SendServerCommand( activator-g_entities, va("cp \"%s\"", ent->message ));
+		SV_GameSendServerCommand( activator-g_entities, va("cp \"%s\"", ent->message ));
 		return;
 	}
 
@@ -76,7 +76,7 @@ void Use_Target_Print (gentity_t *ent, gentity_t *other, gentity_t *activator) {
 		return;
 	}
 
-	trap_SendServerCommand( -1, va("cp \"%s\"", ent->message ));
+	SV_GameSendServerCommand( -1, va("cp \"%s\"", ent->message ));
 }
 
 void SP_target_print( gentity_t *ent ) {
@@ -162,7 +162,7 @@ void SP_target_speaker( gentity_t *ent ) {
 
 	// must link the entity so we get areas and clusters so
 	// the server can determine who to send updates to
-	trap_LinkEntity( &ent->s, &ent->r );
+	SV_LinkEntity( &ent->s, &ent->r );
 }
 
 
@@ -232,7 +232,7 @@ static void target_location_linkup(gentity_t *ent)
 
 	level.locationHead = NULL;
 
-	trap_SetConfigstring( CS_LOCATIONS, "unknown" );
+	SV_SetConfigstring( CS_LOCATIONS, "unknown" );
 
 	for (i = 0, ent = g_entities, n = 1;
 			i < level.num_entities;
@@ -240,7 +240,7 @@ static void target_location_linkup(gentity_t *ent)
 		if (ent->classname && !Q_stricmp(ent->classname, "target_location")) {
 			// lets overload some variables!
 			ent->health = n; // use for location marking
-			trap_SetConfigstring( CS_LOCATIONS + n, ent->message );
+			SV_SetConfigstring( CS_LOCATIONS + n, ent->message );
 			n++;
 			ent->nextTrain = level.locationHead;
 			level.locationHead = ent;

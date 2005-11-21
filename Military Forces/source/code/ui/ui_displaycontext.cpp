@@ -12,74 +12,74 @@ UI_DisplayContext::UI_DisplayContext()
 qhandle_t
 UI_DisplayContext::registerShaderNoMip( const char* p )
 {
-	return trap_R_RegisterShaderNoMip( p );
+	return refExport.RegisterShaderNoMip( p );
 }
 
 void
 UI_DisplayContext::setColor( const float* v )
 {
-	trap_R_SetColor( v );
+	refExport.SetColor( v );
 }
 
 void
 UI_DisplayContext::drawStretchPic( float x, float y, float w, float h, 
 								   float s1, float t1, float s2, float t2, qhandle_t hShader )
 {
-	trap_R_DrawStretchPic( x, y, w, h, s1, t1, s2, t2, hShader );
+	refExport.DrawStretchPic( x, y, w, h, s1, t1, s2, t2, hShader );
 }
 
 qhandle_t
 UI_DisplayContext::registerModel( const char *p )
 {
-	return trap_R_RegisterModel( p );
+	return refExport.RegisterModel( p );
 }
 
 void
 UI_DisplayContext::modelBounds( qhandle_t model, vec3_t min, vec3_t max )
 {
-	trap_R_ModelBounds( model, min, max );
+	refExport.ModelBounds( model, min, max );
 }
 
 void
 UI_DisplayContext::clearScene()
 {
-	trap_R_ClearScene();
+	refExport.ClearScene();
 }
 
 void
 UI_DisplayContext::addRefEntityToScene( const refEntity_t *re )
 {
-	trap_R_AddRefEntityToScene( re );
+	refExport.AddRefEntityToScene( re );
 }
 
 void
 UI_DisplayContext::renderScene( const refdef_t *fd )
 {
-	trap_R_RenderScene( fd );
+	refExport.RenderScene( fd );
 }
 
 void
 UI_DisplayContext::registerFont( const char *pFontname, int pointSize, fontInfo_t *font )
 {
-	trap_R_RegisterFont( pFontname, pointSize, font );
+	refExport.RegisterFont( pFontname, pointSize, font );
 }	
 
 void
 UI_DisplayContext::getCVarString( const char *cvar, char *buffer, int bufsize )
 {
-	trap_Cvar_VariableStringBuffer( cvar, buffer, bufsize );
+	Cvar_VariableStringBuffer( cvar, buffer, bufsize );
 }
 
 void
 UI_DisplayContext::setCVar( const char *cvar, const char *value )
 {
-	trap_Cvar_Set( cvar, value );
+	Cvar_Set( cvar, value );
 }
 
 void
 UI_DisplayContext::startLocalSound( sfxHandle_t sfx, int channelNum )
 {
-	trap_S_StartLocalSound( sfx, channelNum );
+	S_StartLocalSound( sfx, channelNum );
 }
 
 //void
@@ -91,19 +91,19 @@ UI_DisplayContext::startLocalSound( sfxHandle_t sfx, int channelNum )
 sfxHandle_t
 UI_DisplayContext::registerSound( const char *name, bool compressed )
 {
-	return trap_S_RegisterSound( name, compressed );
+	return S_RegisterSound( name, compressed );
 }
 
 void
 UI_DisplayContext::startBackgroundTrack( const char *intro, const char *loop )
 {
-	trap_S_StartBackgroundTrack( intro, loop );
+	S_StartBackgroundTrack( intro, loop );
 }
 
 void
 UI_DisplayContext::stopBackgroundTrack()
 {
-	trap_S_StopBackgroundTrack();
+	S_StopBackgroundTrack();
 }
 
 

@@ -44,9 +44,9 @@ void SCR_DrawNamedPic( float x, float y, float width, float height, const char *
 
 	assert( width != 0 );
 
-	hShader = re.RegisterShader( picname );
+	hShader = refExport.RegisterShader( picname );
 	SCR_AdjustFrom640( &x, &y, &width, &height );
-	re.DrawStretchPic( x, y, width, height, 0, 0, 1, 1, hShader );
+	refExport.DrawStretchPic( x, y, width, height, 0, 0, 1, 1, hShader );
 }
 
 
@@ -93,12 +93,12 @@ Coordinates are 640*480 virtual values
 =================
 */
 void SCR_FillRect( float x, float y, float width, float height, const float *color ) {
-	re.SetColor( color );
+	refExport.SetColor( color );
 
 	SCR_AdjustFrom640( &x, &y, &width, &height );
-	re.DrawStretchPic( x, y, width, height, 0, 0, 0, 0, cls.whiteShader );
+	refExport.DrawStretchPic( x, y, width, height, 0, 0, 0, 0, cls.whiteShader );
 
-	re.SetColor( NULL );
+	refExport.SetColor( NULL );
 }
 
 
@@ -111,7 +111,7 @@ Coordinates are 640*480 virtual values
 */
 void SCR_DrawPic( float x, float y, float width, float height, qhandle_t hShader ) {
 	SCR_AdjustFrom640( &x, &y, &width, &height );
-	re.DrawStretchPic( x, y, width, height, 0, 0, 1, 1, hShader );
+	refExport.DrawStretchPic( x, y, width, height, 0, 0, 1, 1, hShader );
 }
 
 
@@ -148,7 +148,7 @@ static void SCR_DrawChar( int x, int y, float size, int ch ) {
 	fcol = col*0.0625;
 	size = 0.0625;
 
-	re.DrawStretchPic( ax, ay, aw, ah,
+	refExport.DrawStretchPic( ax, ay, aw, ah,
 					   fcol, frow, 
 					   fcol + size, frow + size, 
 					   cls.charSetShader );
@@ -180,7 +180,7 @@ void SCR_DrawSmallChar( int x, int y, int ch ) {
 	fcol = col*0.0625;
 	size = 0.0625;
 
-	re.DrawStretchPic( x, y, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT,
+	refExport.DrawStretchPic( x, y, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT,
 					   fcol, frow, 
 					   fcol + size, frow + size, 
 					   cls.charSetShader );
@@ -205,7 +205,7 @@ void SCR_DrawStringExt( int x, int y, float size, const char *string, float *set
 	// draw the drop shadow
 	color[0] = color[1] = color[2] = 0;
 	color[3] = setColor[3];
-	re.SetColor( color );
+	refExport.SetColor( color );
 	s = string;
 	xx = x;
 	while ( *s ) {
@@ -222,13 +222,13 @@ void SCR_DrawStringExt( int x, int y, float size, const char *string, float *set
 	// draw the colored text
 	s = string;
 	xx = x;
-	re.SetColor( setColor );
+	refExport.SetColor( setColor );
 	while ( *s ) {
 		if ( Q_IsColorString( s ) ) {
 			if ( !forceColor ) {
 				Com_Memcpy( color, g_color_table[ColorIndex(*(s+1))], sizeof( color ) );
 				color[3] = setColor[3];
-				re.SetColor( color );
+				refExport.SetColor( color );
 			}
 			s += 2;
 			continue;
@@ -237,7 +237,7 @@ void SCR_DrawStringExt( int x, int y, float size, const char *string, float *set
 		xx += size;
 		s++;
 	}
-	re.SetColor( NULL );
+	refExport.SetColor( NULL );
 }
 
 
@@ -272,13 +272,13 @@ void SCR_DrawSmallStringExt( int x, int y, const char *string, float *setColor, 
 	// draw the colored text
 	s = string;
 	xx = x;
-	re.SetColor( setColor );
+	refExport.SetColor( setColor );
 	while ( *s ) {
 		if ( Q_IsColorString( s ) ) {
 			if ( !forceColor ) {
 				Com_Memcpy( color, g_color_table[ColorIndex(*(s+1))], sizeof( color ) );
 				color[3] = setColor[3];
-				re.SetColor( color );
+				refExport.SetColor( color );
 			}
 			s += 2;
 			continue;
@@ -287,7 +287,7 @@ void SCR_DrawSmallStringExt( int x, int y, const char *string, float *setColor, 
 		xx += SMALLCHAR_WIDTH;
 		s++;
 	}
-	re.SetColor( NULL );
+	refExport.SetColor( NULL );
 }
 
 
@@ -390,10 +390,10 @@ void SCR_DrawDebugGraph (void)
 	w = cls.glconfig.vidWidth;
 	x = 0;
 	y = cls.glconfig.vidHeight;
-	re.SetColor( g_color_table[0] );
-	re.DrawStretchPic(x, y - cl_graphheight->integer, 
+	refExport.SetColor( g_color_table[0] );
+	refExport.DrawStretchPic(x, y - cl_graphheight->integer, 
 		w, cl_graphheight->integer, 0, 0, 0, 0, cls.whiteShader );
-	re.SetColor( NULL );
+	refExport.SetColor( NULL );
 
 	for (a=0 ; a<w ; a++)
 	{
@@ -405,7 +405,7 @@ void SCR_DrawDebugGraph (void)
 		if (v < 0)
 			v += cl_graphheight->integer * (1+(int)(-v / cl_graphheight->integer));
 		h = (int)v % cl_graphheight->integer;
-		re.DrawStretchPic( x+w-1-a, y - h, 1, h, 0, 0, 0, 0, cls.whiteShader );
+		refExport.DrawStretchPic( x+w-1-a, y - h, 1, h, 0, 0, 0, 0, cls.whiteShader );
 	}
 }
 
@@ -438,7 +438,7 @@ This will be called twice if rendering in stereo mode
 */
 void SCR_DrawScreenField( stereoFrame_t stereoFrame ) 
 {
-	re.BeginFrame( stereoFrame );
+	refExport.BeginFrame( stereoFrame );
 
 	// wide aspect ratio screens need to have the sides cleared
 	// unless they are displaying game renderings
@@ -446,9 +446,9 @@ void SCR_DrawScreenField( stereoFrame_t stereoFrame )
 	{
 		if ( cls.glconfig.vidWidth * 480 > cls.glconfig.vidHeight * 640 ) 
 		{
-			re.SetColor( g_color_table[0] );
-			re.DrawStretchPic( 0, 0, cls.glconfig.vidWidth, cls.glconfig.vidHeight, 0, 0, 0, 0, cls.whiteShader );
-			re.SetColor( NULL );
+			refExport.SetColor( g_color_table[0] );
+			refExport.DrawStretchPic( 0, 0, cls.glconfig.vidWidth, cls.glconfig.vidHeight, 0, 0, 0, 0, cls.whiteShader );
+			refExport.SetColor( NULL );
 		}
 	}
 
@@ -532,7 +532,8 @@ This is called every frame, and can also be called explicitly to flush
 text to the screen.
 ==================
 */
-void SCR_UpdateScreen( void ) {
+void SCR_UpdateScreen() 
+{
 	static int	recursive;
 
 	if ( !scr_initialized ) {
@@ -553,9 +554,9 @@ void SCR_UpdateScreen( void ) {
 	}
 
 	if ( com_speeds->integer ) {
-		re.EndFrame( &time_frontend, &time_backend );
+		refExport.EndFrame( &time_frontend, &time_backend );
 	} else {
-		re.EndFrame( NULL, NULL );
+		refExport.EndFrame( NULL, NULL );
 	}
 
 	recursive = 0;

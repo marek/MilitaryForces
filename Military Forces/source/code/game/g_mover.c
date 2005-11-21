@@ -1,5 +1,5 @@
 /*
- * $Id: g_mover.c,v 1.4 2005-11-20 11:21:38 thebjoern Exp $
+ * $Id: g_mover.c,v 1.5 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -44,9 +44,9 @@ gentity_t	*G_TestEntityPosition( gentity_t *ent ) {
 		mask = MASK_SOLID;
 	}
 	if ( ent->client ) {
-		trap_Trace( &tr, ent->client->ps.origin, ent->r.mins, ent->r.maxs, ent->client->ps.origin, ent->s.number, mask );
+		SV_Trace( &tr, ent->client->ps.origin, ent->r.mins, ent->r.maxs, ent->client->ps.origin, ent->s.number, mask, false );
 	} else {
-		trap_Trace( &tr, ent->s.pos.trBase, ent->r.mins, ent->r.maxs, ent->s.pos.trBase, ent->s.number, mask );
+		SV_Trace( &tr, ent->s.pos.trBase, ent->r.mins, ent->r.maxs, ent->s.pos.trBase, ent->s.number, mask, false );
 	}
 	
 	if (tr.startsolid)
@@ -124,7 +124,7 @@ bool	G_TryPushingEntity( gentity_t *check, gentity_t *pusher, vec3_t move, vec3_
 		} else {
 			VectorCopy( check->s.pos.trBase, check->r.currentOrigin );
 		}
-		trap_LinkEntity (&check->s, &check->r);
+		SV_LinkEntity (&check->s, &check->r);
 		return true;
 	}
 
@@ -199,14 +199,14 @@ bool G_MoverPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **obst
 	}
 
 	// unlink the pusher so we don't get it in the entityList
-	trap_UnlinkEntity( &pusher->s, &pusher->r );
+	SV_UnlinkEntity( &pusher->s, &pusher->r );
 
-	listedEntities = trap_EntitiesInBox( totalMins, totalMaxs, entityList, MAX_GENTITIES );
+	listedEntities = SV_AreaEntities( totalMins, totalMaxs, entityList, MAX_GENTITIES );
 
 	// move the pusher to it's final position
 	VectorAdd( pusher->r.currentOrigin, move, pusher->r.currentOrigin );
 	VectorAdd( pusher->r.currentAngles, amove, pusher->r.currentAngles );
-	trap_LinkEntity( &pusher->s, &pusher->r );
+	SV_LinkEntity( &pusher->s, &pusher->r );
 
 	// see if any solid entities are inside the final position
 	for ( e = 0 ; e < listedEntities ; e++ ) {
@@ -262,7 +262,7 @@ bool G_MoverPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **obst
 				p->ent->client->ps.delta_angles[YAW] = p->deltayaw;
 				VectorCopy (p->origin, p->ent->client->ps.origin);
 			}
-			trap_LinkEntity (&p->ent->s, &p->ent->r);
+			SV_LinkEntity (&p->ent->s, &p->ent->r);
 		}
 		return false;
 	}
@@ -305,7 +305,7 @@ void G_MoverTeam( gentity_t *ent ) {
 			part->s.apos.trTime += level.time - level.previousTime;
 			BG_EvaluateTrajectory( &part->s.pos, level.time, part->r.currentOrigin );
 			BG_EvaluateTrajectory( &part->s.apos, level.time, part->r.currentAngles );
-			trap_LinkEntity( &part->s, &part->r );
+			SV_LinkEntity( &part->s, &part->r );
 		}
 
 		// if the pusher has a "blocked" function, call it
@@ -397,7 +397,7 @@ void SetMoverState( gentity_t *ent, moverState_t moverState, int time ) {
 		break;
 	}
 	BG_EvaluateTrajectory( &ent->s.pos, level.time, ent->r.currentOrigin );	
-	trap_LinkEntity( &ent->s, &ent->r );
+	SV_LinkEntity( &ent->s, &ent->r );
 }
 
 /*
@@ -475,7 +475,7 @@ void Reached_BinaryMover( gentity_t *ent ) {
 
 		// close areaportals
 		if ( ent->teammaster == ent || !ent->teammaster ) {
-			trap_AdjustAreaPortalState( &ent->s, &ent->r, false );
+			SV_AdjustAreaPortalState( &ent->s, &ent->r, false );
 		}
 	} else {
 		Com_Error( ERR_DROP, "Reached_BinaryMover: bad moverState" );
@@ -515,7 +515,7 @@ void Use_BinaryMover( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 
 		// open areaportal
 		if ( ent->teammaster == ent || !ent->teammaster ) {
-			trap_AdjustAreaPortalState( &ent->s, &ent->r, true );
+			SV_AdjustAreaPortalState( &ent->s, &ent->r, true );
 		}
 		return;
 	}
@@ -621,7 +621,7 @@ void InitMover( gentity_t *ent ) {
 	ent->r.svFlags = SVF_USE_CURRENT_ORIGIN;
 	ent->s.eType = ET_MOVER;
 	VectorCopy (ent->pos1, ent->r.currentOrigin);
-	trap_LinkEntity (&ent->s, &ent->r);
+	SV_LinkEntity (&ent->s, &ent->r);
 
 	ent->s.pos.trType = TR_STATIONARY;
 	VectorCopy( ent->pos1, ent->s.pos.trBase );
@@ -740,7 +740,7 @@ void Think_SpawnNewDoorTrigger( gentity_t *ent ) {
 	other->touch = Touch_DoorTrigger;
 	// remember the thinnest axis
 	other->count = best;
-	trap_LinkEntity (&other->s, &other->r);
+	SV_LinkEntity (&other->s, &other->r);
 
 	MatchTeam( ent, ent->moverState, level.time );
 }
@@ -797,7 +797,7 @@ void SP_func_door (gentity_t *ent) {
 	VectorCopy( ent->s.origin, ent->pos1 );
 
 	// calculate second position
-	trap_SetBrushModel( &ent->s, &ent->r, ent->model );
+	SV_SetBrushModel( &ent->s, &ent->r, ent->model );
 	G_SetMovedir (ent->s.angles, ent->movedir);
 	abs_movedir[0] = fabs(ent->movedir[0]);
 	abs_movedir[1] = fabs(ent->movedir[1]);
@@ -922,7 +922,7 @@ void SpawnPlatTrigger( gentity_t *ent ) {
 	VectorCopy (tmin, trigger->r.mins);
 	VectorCopy (tmax, trigger->r.maxs);
 
-	trap_LinkEntity (&trigger->s, &trigger->r);
+	SV_LinkEntity (&trigger->s, &trigger->r);
 }
 
 
@@ -955,7 +955,7 @@ void SP_func_plat (gentity_t *ent) {
 	if( ent->speed > 20 ) ent->speed = 20;
 
 	// create second position
-	trap_SetBrushModel( &ent->s, &ent->r, ent->model );
+	SV_SetBrushModel( &ent->s, &ent->r, ent->model );
 
 	if ( !G_SpawnFloat( "height", "0", &height ) ) {
 		height = (ent->r.maxs[2] - ent->r.mins[2]) - lip;
@@ -1042,7 +1042,7 @@ void SP_func_button( gentity_t *ent ) {
 	VectorCopy( ent->s.origin, ent->pos1 );
 
 	// calculate second position
-	trap_SetBrushModel( &ent->s, &ent->r, ent->model );
+	SV_SetBrushModel( &ent->s, &ent->r, ent->model );
 
 	G_SpawnFloat( "lip", "4", &lip );
 
@@ -1250,7 +1250,7 @@ void SP_func_train (gentity_t *self) {
 		return;
 	}
 
-	trap_SetBrushModel( &self->s, &self->r, self->model );
+	SV_SetBrushModel( &self->s, &self->r, self->model );
 	InitMover( self );
 
 	self->reached = Reached_Train;
@@ -1276,8 +1276,9 @@ A bmodel that just sits there, doing nothing.  Can be used for conditional walls
 "color"		constantLight color
 "light"		constantLight radius
 */
-void SP_func_static( gentity_t *ent ) {
-	trap_SetBrushModel( &ent->s, &ent->r, ent->model );
+void SP_func_static( gentity_t *ent )
+{
+	SV_SetBrushModel( &ent->s, &ent->r, ent->model );
 	InitMover( ent );
 	VectorCopy( ent->s.origin, ent->s.pos.trBase );
 	VectorCopy( ent->s.origin, ent->r.currentOrigin );
@@ -1324,14 +1325,14 @@ void SP_func_rotating (gentity_t *ent) {
 		ent->damage = 2;
 	}
 
-	trap_SetBrushModel( &ent->s, &ent->r, ent->model );
+	SV_SetBrushModel( &ent->s, &ent->r, ent->model );
 	InitMover( ent );
 
 	VectorCopy( ent->s.origin, ent->s.pos.trBase );
 	VectorCopy( ent->s.pos.trBase, ent->r.currentOrigin );
 	VectorCopy( ent->s.apos.trBase, ent->r.currentAngles );
 
-	trap_LinkEntity( &ent->s, &ent->r );
+	SV_LinkEntity( &ent->s, &ent->r );
 }
 
 
@@ -1362,7 +1363,8 @@ static void func_bobbing_touch( gentity_t *self, gentity_t *other, trace_t *trac
 
 }
 
-void SP_func_bobbing (gentity_t *ent) {
+void SP_func_bobbing (gentity_t *ent) 
+{
 	float		height;
 	float		phase;
 
@@ -1371,7 +1373,7 @@ void SP_func_bobbing (gentity_t *ent) {
 	G_SpawnInt( "dmg", "2", &ent->damage );
 	G_SpawnFloat( "phase", "0", &phase );
 
-	trap_SetBrushModel( &ent->s, &ent->r, ent->model );
+	SV_SetBrushModel( &ent->s, &ent->r, ent->model );
 	InitMover( ent );
 
 	VectorCopy( ent->s.origin, ent->s.pos.trBase );
@@ -1414,7 +1416,8 @@ Pendulum frequency is a physical constant based on the length of the beam and gr
 "color"		constantLight color
 "light"		constantLight radius
 */
-void SP_func_pendulum(gentity_t *ent) {
+void SP_func_pendulum(gentity_t *ent) 
+{
 	float		freq;
 	float		length;
 	float		phase;
@@ -1424,7 +1427,7 @@ void SP_func_pendulum(gentity_t *ent) {
 	G_SpawnInt( "dmg", "2", &ent->damage );
 	G_SpawnFloat( "phase", "0", &phase );
 
-	trap_SetBrushModel( &ent->s, &ent->r, ent->model );
+	SV_SetBrushModel( &ent->s, &ent->r, ent->model );
 
 	// find pendulum length
 	length = fabs( ent->r.mins[2] );

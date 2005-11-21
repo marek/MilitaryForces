@@ -1,5 +1,5 @@
 /*
- * $Id: cg_draw.c,v 1.7 2005-11-20 11:21:38 thebjoern Exp $
+ * $Id: cg_draw.c,v 1.8 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -184,7 +184,7 @@ void CG_Text_PaintChar(float x, float y, float width, float height, float scale,
   w = width * scale;
   h = height * scale;
   CG_AdjustFrom640( &x, &y, &w, &h );
-  trap_R_DrawStretchPic( x, y, w, h, s, t, s2, t2, hShader );
+  refExport.DrawStretchPic( x, y, w, h, s, t, s2, t2, hShader );
 }
 
 /*
@@ -213,7 +213,7 @@ void CG_Text_Paint(float x, float y, float scale, const vec4_t color, const char
 // TTimo: FIXME
 //		const unsigned char *s = text;
 		const char *s = text;
-		trap_R_SetColor( color );
+		refExport.SetColor( color );
 		memcpy(&newColor[0], &color[0], sizeof(vec4_t));
     len = strlen(text);
 		if (limit > 0 && len > limit) {
@@ -231,7 +231,7 @@ void CG_Text_Paint(float x, float y, float scale, const vec4_t color, const char
 			{
 				memcpy( newColor, g_color_table[ColorIndex(*(s+1))], sizeof( newColor ) );
 				newColor[3] = color[3];
-				trap_R_SetColor( newColor );
+				refExport.SetColor( newColor );
 				s += 2;
 				continue;
 			}
@@ -243,7 +243,7 @@ void CG_Text_Paint(float x, float y, float scale, const vec4_t color, const char
 				if (style == ITEM_TEXTSTYLE_SHADOWED || style == ITEM_TEXTSTYLE_SHADOWEDMORE) {
 					int ofs = style == ITEM_TEXTSTYLE_SHADOWED ? 1 : 2;
 					colorBlack[3] = newColor[3];
-					trap_R_SetColor( colorBlack );
+					refExport.SetColor( colorBlack );
 					CG_Text_PaintChar(x + ofs, y - yadj + ofs, 
 									glyph->imageWidth,
 									glyph->imageHeight,
@@ -255,7 +255,7 @@ void CG_Text_Paint(float x, float y, float scale, const vec4_t color, const char
 									glyph->glyph);
 
 					colorBlack[3] = 1.0;
-					trap_R_SetColor( newColor );
+					refExport.SetColor( newColor );
 				}
 
 				// outline?
@@ -263,7 +263,7 @@ void CG_Text_Paint(float x, float y, float scale, const vec4_t color, const char
 				{
 //					int ofs = style == ITEM_TEXTSTYLE_SHADOWED ? 1 : 2;
 					colorBlack[3] = newColor[3];
-					trap_R_SetColor( colorBlack );
+					refExport.SetColor( colorBlack );
 
 					// create the outline
 					for( iy = -1; iy<2; iy++ )
@@ -287,7 +287,7 @@ void CG_Text_Paint(float x, float y, float scale, const vec4_t color, const char
 					}	// iy
 
 					colorBlack[3] = 1.0;
-					trap_R_SetColor( newColor );
+					refExport.SetColor( newColor );
 				}
 
 				// print the actual text
@@ -308,7 +308,7 @@ void CG_Text_Paint(float x, float y, float scale, const vec4_t color, const char
 			}
     }
 	 
-	trap_R_SetColor( NULL );
+	refExport.SetColor( NULL );
 	}
 }
 
@@ -413,9 +413,9 @@ void CG_Draw3DModel( float x, float y, float w, float h, qhandle_t model, qhandl
 
 	refdef.time = cg.time;
 
-	trap_R_ClearScene();
-	trap_R_AddRefEntityToScene( &ent );
-	trap_R_RenderScene( &refdef );
+	refExport.ClearScene();
+	refExport.AddRefEntityToScene( &ent );
+	refExport.RenderScene( &refdef );
 }
 
 /*
@@ -439,7 +439,7 @@ void CG_DrawFlagModel( float x, float y, float w, float h, int team, bool force2
 		cm = cgs.media.redFlagModel;
 
 		// offset the origin y and z to center the flag
-		trap_R_ModelBounds( cm, mins, maxs );
+		refExport.ModelBounds( cm, mins, maxs );
 
 		origin[2] = -0.5 * ( mins[2] + maxs[2] );
 		origin[1] = 0.5 * ( mins[1] + maxs[1] );
@@ -497,9 +497,9 @@ void CG_DrawTeamBackground( int x, int y, int w, int h, float alpha, int team )
 	} else {
 		return;
 	}
-	trap_R_SetColor( hcolor );
+	refExport.SetColor( hcolor );
 	CG_DrawPic( x, y, w, h, cgs.media.teamStatusBar );
-	trap_R_SetColor( NULL );
+	refExport.SetColor( NULL );
 }
 
 
@@ -694,9 +694,9 @@ CG_DrawTeamOverlay
 //		hcolor[2] = 1;
 //		hcolor[3] = 0.33f;
 //	}
-//	trap_R_SetColor( hcolor );
+//	refExport.SetColor( hcolor );
 //	CG_DrawPic( x, y, w, h, cgs.media.teamStatusBar );
-//	trap_R_SetColor( NULL );
+//	refExport.SetColor( NULL );
 //
 //	for (i = 0; i < count; i++) {
 //		ci = cgs.clientinfo + sortedTeamPlayers[i];
@@ -748,7 +748,7 @@ CG_DrawTeamOverlay
 //
 //					if (item) {
 //						CG_DrawPic( xx, y, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 
-//						trap_R_RegisterShader( item->icon ) );
+//						refExport.RegisterShader( item->icon ) );
 //						if (right) {
 //							xx -= TINYCHAR_WIDTH;
 //						} else {
@@ -781,8 +781,8 @@ static void CG_DrawDisconnect( void ) {
 	int			w;
 
 	// draw the phone jack if we are completely past our buffers
-	cmdNum = trap_GetCurrentCmdNumber() - CMD_BACKUP + 1;
-	trap_GetUserCmd( cmdNum, &cmd );
+	cmdNum = CL_GetCurrentCmdNumber() - CMD_BACKUP + 1;
+	CL_GetUserCmd( cmdNum, &cmd );
 	if ( cmd.serverTime <= cg.snap->ps.commandTime
 		|| cmd.serverTime > cg.time ) {	// special check for map_restart
 		return;
@@ -802,7 +802,7 @@ static void CG_DrawDisconnect( void ) {
 	x = 640 - 48;
 	y = 480 - 48;
 
-	CG_DrawPic( x, y, 48, 48, trap_R_RegisterShader("gfx/2d/net.tga" ) );
+	CG_DrawPic( x, y, 48, 48, refExport.RegisterShader("gfx/2d/net.tga" ) );
 }
 
 #define	MAX_LAGOMETER_PING	900
@@ -844,7 +844,7 @@ static void CG_DrawLagometer( float y )
 		y += 2;
 	}
 
-	trap_R_SetColor( NULL );
+	refExport.SetColor( NULL );
 	CG_DrawPic( x, y, 48, 48, cgs.media.lagometerShader );
 
 	ax = x;
@@ -867,22 +867,22 @@ static void CG_DrawLagometer( float y )
 		if ( v > 0 ) {
 			if ( color != 1 ) {
 				color = 1;
-				trap_R_SetColor( g_color_table[ColorIndex(COLOR_YELLOW)] );
+				refExport.SetColor( g_color_table[ColorIndex(COLOR_YELLOW)] );
 			}
 			if ( v > range ) {
 				v = range;
 			}
-			trap_R_DrawStretchPic ( ax + aw - a, mid - v, 1, v, 0, 0, 0, 0, cgs.media.whiteShader );
+			refExport.DrawStretchPic ( ax + aw - a, mid - v, 1, v, 0, 0, 0, 0, cgs.media.whiteShader );
 		} else if ( v < 0 ) {
 			if ( color != 2 ) {
 				color = 2;
-				trap_R_SetColor( g_color_table[ColorIndex(COLOR_BLUE)] );
+				refExport.SetColor( g_color_table[ColorIndex(COLOR_BLUE)] );
 			}
 			v = -v;
 			if ( v > range ) {
 				v = range;
 			}
-			trap_R_DrawStretchPic( ax + aw - a, mid, 1, v, 0, 0, 0, 0, cgs.media.whiteShader );
+			refExport.DrawStretchPic( ax + aw - a, mid, 1, v, 0, 0, 0, 0, cgs.media.whiteShader );
 		}
 	}
 
@@ -897,29 +897,29 @@ static void CG_DrawLagometer( float y )
 			if ( lagometer.snapshotFlags[i] & SNAPFLAG_RATE_DELAYED ) {
 				if ( color != 5 ) {
 					color = 5;	// YELLOW for rate delay
-					trap_R_SetColor( g_color_table[ColorIndex(COLOR_YELLOW)] );
+					refExport.SetColor( g_color_table[ColorIndex(COLOR_YELLOW)] );
 				}
 			} else {
 				if ( color != 3 ) {
 					color = 3;
-					trap_R_SetColor( g_color_table[ColorIndex(COLOR_GREEN)] );
+					refExport.SetColor( g_color_table[ColorIndex(COLOR_GREEN)] );
 				}
 			}
 			v = v * vscale;
 			if ( v > range ) {
 				v = range;
 			}
-			trap_R_DrawStretchPic( ax + aw - a, ay + ah - v, 1, v, 0, 0, 0, 0, cgs.media.whiteShader );
+			refExport.DrawStretchPic( ax + aw - a, ay + ah - v, 1, v, 0, 0, 0, 0, cgs.media.whiteShader );
 		} else if ( v < 0 ) {
 			if ( color != 4 ) {
 				color = 4;		// RED for dropped snapshots
-				trap_R_SetColor( g_color_table[ColorIndex(COLOR_RED)] );
+				refExport.SetColor( g_color_table[ColorIndex(COLOR_RED)] );
 			}
-			trap_R_DrawStretchPic( ax + aw - a, ay + ah - range, 1, range, 0, 0, 0, 0, cgs.media.whiteShader );
+			refExport.DrawStretchPic( ax + aw - a, ay + ah - range, 1, range, 0, 0, 0, 0, cgs.media.whiteShader );
 		}
 	}
 
-	trap_R_SetColor( NULL );
+	refExport.SetColor( NULL );
 
 	if ( cg_nopredict.integer || cg_synchronousClients.integer ) {
 		CG_DrawBigString( ax, ay, "snc", 1.0 );
@@ -1295,10 +1295,10 @@ CG_DrawPickupItem
 //		fadeColor = CG_FadeColor( cg.itemPickupTime, 3000 );
 //		if ( fadeColor ) {
 //			CG_RegisterItemVisuals( value );
-//			trap_R_SetColor( fadeColor );
+//			refExport.SetColor( fadeColor );
 //			CG_DrawPic( 8, y, ICON_SIZE, ICON_SIZE, cg_items[ value ].icon );
 //			CG_DrawBigString( ICON_SIZE + 16, y + (ICON_SIZE/2 - BIGCHAR_HEIGHT/2), bg_itemlist[ value ].pickup_name, fadeColor[0] );
-//			trap_R_SetColor( NULL );
+//			refExport.SetColor( NULL );
 //		}
 //	}
 //	
@@ -1382,9 +1382,9 @@ CG_DrawTeamInfo
 //			hcolor[3] = 0.33f;
 //		}
 //
-//		trap_R_SetColor( hcolor );
+//		refExport.SetColor( hcolor );
 //		CG_DrawPic( CHATLOC_X, CHATLOC_Y - h, 640, h, cgs.media.teamStatusBar );
-//		trap_R_SetColor( NULL );
+//		refExport.SetColor( NULL );
 //
 //		hcolor[0] = hcolor[1] = hcolor[2] = 1.0;
 //		hcolor[3] = 1.0;
@@ -1425,13 +1425,13 @@ CG_DrawReward
 //			cg.rewardTime = cg.time;
 //			cg.rewardStack--;
 //			color = CG_FadeColor( cg.rewardTime, REWARD_TIME );
-//			trap_S_StartLocalSound(cg.rewardSound[0], CHAN_ANNOUNCER);
+//			S_StartLocalSound(cg.rewardSound[0], CHAN_ANNOUNCER);
 //		} else {
 //			return;
 //		}
 //	}
 //
-//	trap_R_SetColor( color );
+//	refExport.SetColor( color );
 //
 //	if ( cg.rewardCount[0] >= 10 ) {
 //		y = 56;
@@ -1453,7 +1453,7 @@ CG_DrawReward
 //			x += ICON_SIZE;
 //		}
 //	}
-//	trap_R_SetColor( NULL );
+//	refExport.SetColor( NULL );
 //}
 
 /*
@@ -1552,7 +1552,7 @@ static void CG_DrawCenterString( void ) {
 		return;
 	}
 
-	trap_R_SetColor( color );
+	refExport.SetColor( color );
 
 	start = cg.centerPrint;
 
@@ -1586,7 +1586,7 @@ static void CG_DrawCenterString( void ) {
 		start++;
 	}
 
-	trap_R_SetColor( NULL );
+	refExport.SetColor( NULL );
 }
 
 
@@ -1625,7 +1625,7 @@ static void CG_DrawCrosshair(void) {
 	}
 
 	// set color based on health
-	trap_R_SetColor( NULL );
+	refExport.SetColor( NULL );
 
 	w = h = cg_crosshairSize.value;
 
@@ -1647,7 +1647,7 @@ static void CG_DrawCrosshair(void) {
 	}
 	hShader = cgs.media.crosshairShader[ ca % NUM_CROSSHAIRS ];
 
-	trap_R_DrawStretchPic( x + cg.refdef.x + 0.5 * (cg.refdef.width - w), 
+	refExport.DrawStretchPic( x + cg.refdef.x + 0.5 * (cg.refdef.width - w), 
 		y + cg.refdef.y + 0.5 * (cg.refdef.height - h), 
 		w, h, 0, 0, 1, 1, hShader );
 }
@@ -1674,7 +1674,7 @@ static void CG_ScanForCrosshairEntity( void ) {
 	}
 
 	// if the player is in fog, don't show it
-	content = trap_CM_PointContents( trace.endpos, 0 );
+	content = CM_PointContents( trace.endpos, 0 );
 	if ( content & CONTENTS_FOG ) {
 		return;
 	}
@@ -1712,7 +1712,7 @@ static void CG_DrawCrosshairNames( void ) {
 	color = CG_FadeColor( cg.crosshairClientTime, 1000 );
 	if ( !color )
 	{
-		trap_R_SetColor( NULL );
+		refExport.SetColor( NULL );
 		return;
 	}
 
@@ -1722,7 +1722,7 @@ static void CG_DrawCrosshairNames( void ) {
 
 	cgUtils.drawStringNew( 320, 170, 0.5f, color, name, 0, 0, ITEM_TEXTSTYLE_OUTLINED, CENTRE_JUSTIFY );
 
-	trap_R_SetColor( NULL );
+	refExport.SetColor( NULL );
 }
 
 
@@ -1750,27 +1750,27 @@ static void CG_DrawSpectator(void) {
 		if( cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR )
 		{
 			if( cgs.gametype != GT_MISSION_EDITOR ) {
-				trap_Cvar_Set( "ui_spectatorTitleTxt", "Spectator" );
-				trap_Cvar_Set( "ui_spectatorLine1Txt", "Press FIRE to switch view." );
+				Cvar_Set( "ui_spectatorTitleTxt", "Spectator" );
+				Cvar_Set( "ui_spectatorLine1Txt", "Press FIRE to switch view." );
 				
 				// team game?
 				if ( cgs.gametype >= GT_TEAM )
-					trap_Cvar_Set( "ui_spectatorLine2Txt", "Choose a team from the 'Team' dialog to play." );
+					Cvar_Set( "ui_spectatorLine2Txt", "Choose a team from the 'Team' dialog to play." );
 				else
-					trap_Cvar_Set( "ui_spectatorLine2Txt", "Select 'Join' from the 'Team' dialog to play." );
+					Cvar_Set( "ui_spectatorLine2Txt", "Select 'Join' from the 'Team' dialog to play." );
 			} else {
-				trap_Cvar_Set( "ui_spectatorTitleTxt", "Mission Editor" );
-				trap_Cvar_Set( "ui_spectatorLine1Txt", "Use Vehicle Selection to spawn a vehicle" );
-				trap_Cvar_Set( "ui_spectatorLine2Txt", "Press FIRE2 to select what you are looking at" );
+				Cvar_Set( "ui_spectatorTitleTxt", "Mission Editor" );
+				Cvar_Set( "ui_spectatorLine1Txt", "Use Vehicle Selection to spawn a vehicle" );
+				Cvar_Set( "ui_spectatorLine2Txt", "Press FIRE2 to select what you are looking at" );
 
 			}
 		}
 		else
 		{
 			// we have a team (or don't need one) but no vehicle
-			trap_Cvar_Set( "ui_spectatorTitleTxt", "Limbo" );
-			trap_Cvar_Set( "ui_spectatorLine1Txt", "Choose a vehicle to join in the game or" );
-			trap_Cvar_Set( "ui_spectatorLine2Txt", "select 'Specator' from the 'Team' dialog." );
+			Cvar_Set( "ui_spectatorTitleTxt", "Limbo" );
+			Cvar_Set( "ui_spectatorLine1Txt", "Choose a vehicle to join in the game or" );
+			Cvar_Set( "ui_spectatorLine2Txt", "select 'Specator' from the 'Team' dialog." );
 		}
 
 		// draw
@@ -1790,7 +1790,7 @@ static void CG_DrawSpectator(void) {
 
 		hShader = cgs.media.crosshairShader[8];
 
-		trap_R_DrawStretchPic( x + cg.refdef.x + 0.5 * (cg.refdef.width - w), 
+		refExport.DrawStretchPic( x + cg.refdef.x + 0.5 * (cg.refdef.width - w), 
 			y + cg.refdef.y + 0.5 * (cg.refdef.height - h), 
 		w, h, 0, 0, 1, 1, hShader );
 	}
@@ -1812,7 +1812,7 @@ static void CG_DrawVote(void) {
 	// play a talk beep whenever it is modified
 	if ( cgs.voteModified ) {
 		cgs.voteModified = false;
-		trap_S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
+		S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
 	}
 
 	sec = ( VOTE_TIME - ( cg.time - cgs.voteTime ) ) / 1000;
@@ -1846,7 +1846,7 @@ static void CG_DrawTeamVote(void) {
 	// play a talk beep whenever it is modified
 	if ( cgs.teamVoteModified[cs_offset] ) {
 		cgs.teamVoteModified[cs_offset] = false;
-		trap_S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
+		S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
 	}
 
 	sec = ( VOTE_TIME - ( cg.time - cgs.teamVoteTime[cs_offset] ) ) / 1000;
@@ -2106,13 +2106,13 @@ static void CG_DrawWarmup( void ) {
 		if( cgs.gametype != GT_MISSION_EDITOR ) {
 			switch ( sec ) {
 			case 0:
-				trap_S_StartLocalSound( cgs.media.count1Sound, CHAN_ANNOUNCER );
+				S_StartLocalSound( cgs.media.count1Sound, CHAN_ANNOUNCER );
 				break;
 			case 1:
-				trap_S_StartLocalSound( cgs.media.count2Sound, CHAN_ANNOUNCER );
+				S_StartLocalSound( cgs.media.count2Sound, CHAN_ANNOUNCER );
 				break;
 			case 2:
-				trap_S_StartLocalSound( cgs.media.count3Sound, CHAN_ANNOUNCER );
+				S_StartLocalSound( cgs.media.count3Sound, CHAN_ANNOUNCER );
 				break;
 			default:
 				break;
@@ -2285,7 +2285,7 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 	}
 
 	// draw 3D view
-	trap_R_RenderScene( &cg.refdef );
+	refExport.RenderScene( &cg.refdef );
 
 	// restore original viewpoint if running stereo
 	if ( separation != 0 ) {

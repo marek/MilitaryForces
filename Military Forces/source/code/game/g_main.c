@@ -151,74 +151,6 @@ void CheckExitRules();
 
 /*
 ================
-vmMain
-
-This is the only way control passes into the module.
-This must be the very first function compiled into the .q3vm file
-================
-*/
-//int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11  ) {
-//	switch ( command ) {
-	//case GAME_INIT:
-	//	G_InitGame( arg0, arg1, arg2 );
-	//	return 0;
-	//case GAME_SHUTDOWN:
-	//	G_ShutdownGame( arg0 );
-	//	return 0;
-	//case GAME_CLIENT_CONNECT:
-	//	return reinterpret_cast<int>(MF_ClientConnect( arg0, arg1, arg2 ));
-	//case GAME_CLIENT_THINK:
-	//	ClientThink( arg0 );
-	//	return 0;
-	//case GAME_CLIENT_USERINFO_CHANGED:
-	//	ClientUserinfoChanged( arg0 );
-	//	return 0;
-	//case GAME_CLIENT_DISCONNECT:
-	//	ClientDisconnect( arg0 );
-	//	return 0;
-	//case GAME_CLIENT_BEGIN:
-	//	MF_ClientBegin( arg0 );
-	//	return 0;
-	//case GAME_CLIENT_COMMAND:
-	//	ClientCommand( arg0 );
-	//	return 0;
-	//case GAME_RUN_FRAME:
-	//	G_RunFrame( arg0 );
-	//	return 0;
-	//case GAME_CONSOLE_COMMAND:
-	//	return ConsoleCommand();
-	//case BOTAI_START_FRAME:
-	//	return true;// before: BotAIStartFrame( arg0 );
-//	}
-//
-//	return -1;
-//}
-
-
-//void QDECL Com_Printf( const char *fmt, ... ) {
-//	va_list		argptr;
-//	char		text[1024];
-//
-//	va_start (argptr, fmt);
-//	vsprintf (text, fmt, argptr);
-//	va_end (argptr);
-//
-//	Com_Printf( "%s", text );
-//}
-
-//void QDECL G_Error( const char *fmt, ... ) {
-//	va_list		argptr;
-//	char		text[1024];
-//
-//	va_start (argptr, fmt);
-//	vsprintf (text, fmt, argptr);
-//	va_end (argptr);
-//
-//	trap_Error( text );
-//}
-
-/*
-================
 G_FindTeams
 
 Chain together all entities with a matching team field.
@@ -288,7 +220,7 @@ void G_RegisterCvars( void ) {
 	bool remapped = false;
 
 	for ( i = 0, cv = gameCvarTable ; i < gameCvarTableSize ; i++, cv++ ) {
-		trap_Cvar_Register( cv->vmCvar, cv->cvarName,
+		Cvar_Register( cv->vmCvar, cv->cvarName,
 			cv->defaultString, cv->cvarFlags );
 		if ( cv->vmCvar )
 			cv->modificationCount = cv->vmCvar->modificationCount;
@@ -305,7 +237,7 @@ void G_RegisterCvars( void ) {
 	// check some things
 	if ( g_gametype.integer < 0 || g_gametype.integer >= GT_MAX_GAME_TYPE ) {
 		Com_Printf( "g_gametype %i is out of range, defaulting to 0\n", g_gametype.integer );
-		trap_Cvar_Set( "g_gametype", "0" );
+		Cvar_Set( "g_gametype", "0" );
 	}
 	
 	level.warmupModificationCount = g_warmup.modificationCount;
@@ -324,13 +256,13 @@ void G_UpdateCvars( void ) {
 
 	for ( i = 0, cv = gameCvarTable ; i < gameCvarTableSize ; i++, cv++ ) {
 		if ( cv->vmCvar ) {
-			trap_Cvar_Update( cv->vmCvar );
+			Cvar_Update( cv->vmCvar );
 
 			if ( cv->modificationCount != cv->vmCvar->modificationCount ) {
 				cv->modificationCount = cv->vmCvar->modificationCount;
 
 				if ( cv->trackChange ) {
-					trap_SendServerCommand( -1, va("print \"Server: %s changed to %s\n\"", 
+					SV_GameSendServerCommand( -1, va("print \"Server: %s changed to %s\n\"", 
 						cv->cvarName, cv->vmCvar->string ) );
 				}
 
@@ -370,12 +302,12 @@ void G_InitGame( int levelTime, int randomSeed )
 	G_InitMemory();
 
 	// MFQ3: set the game version into a server var (that can be viewed as server-info)
-	trap_Cvar_Set( "mf_version", MF_VERSION );
+	Cvar_Set( "mf_version", MF_VERSION );
 
 	// MFQ3: (for now) always set the 'g_synchronousClients' var to 0, as setting to 1
 	// causes glitching/flickering with the models
 #pragma message( "g_synchronousClients is always being set to 0 in G_InitGame()" )
-	trap_Cvar_Set( "g_synchronousClients", "0" );
+	Cvar_Set( "g_synchronousClients", "0" );
 
 	// set some level globals
 	memset( &level, 0, sizeof( level ) );
@@ -387,16 +319,16 @@ void G_InitGame( int levelTime, int randomSeed )
 	if ( g_gametype.integer != GT_SINGLE_PLAYER && g_gametype.integer != GT_MISSION_EDITOR &&
 			g_log.string[0] ) {
 		if ( g_logSync.integer ) {
-			trap_FS_FOpenFile( g_log.string, &level.logFile, FS_APPEND_SYNC );
+			FS_FOpenFileByMode( g_log.string, &level.logFile, FS_APPEND_SYNC );
 		} else {
-			trap_FS_FOpenFile( g_log.string, &level.logFile, FS_APPEND );
+			FS_FOpenFileByMode( g_log.string, &level.logFile, FS_APPEND );
 		}
 		if ( !level.logFile ) {
 			Com_Printf( "WARNING: Couldn't open logfile: %s\n", g_log.string );
 		} else {
 			char	serverinfo[MAX_INFO_STRING];
 
-			trap_GetServerinfo( serverinfo, sizeof( serverinfo ) );
+			SV_GetServerinfo( serverinfo, sizeof( serverinfo ) );
 
 			G_LogPrintf("------------------------------------------------------------\n" );
 			G_LogPrintf("InitGame: %s\n", serverinfo );
@@ -427,7 +359,7 @@ void G_InitGame( int levelTime, int randomSeed )
 	level.num_entities = MAX_CLIENTS;
 
 	// let the server system know where the entites are
-	trap_LocateGameData( (void*)level.gentities, level.num_entities, sizeof( gentity_t ), 
+	SV_LocateGameData( (void*)level.gentities, level.num_entities, sizeof( gentity_t ), 
 		&level.clients[0].ps, sizeof( level.clients[0] ) );
 
 	ClearRegisteredItems();
@@ -451,16 +383,10 @@ void G_InitGame( int levelTime, int randomSeed )
 
 	Com_Printf ("-----------------------------------\n");
 
-	if( g_gametype.integer == GT_SINGLE_PLAYER || trap_Cvar_VariableIntegerValue( "com_buildScript" ) ) {
+	if( g_gametype.integer == GT_SINGLE_PLAYER || Cvar_VariableIntegerValue( "com_buildScript" ) ) {
 		G_SoundIndex( "sound/player/gurp1.wav" );
 		G_SoundIndex( "sound/player/gurp2.wav" );
 	}
-
-//	if ( trap_Cvar_VariableIntegerValue( "bot_enable" ) ) {
-//		BotAISetup( restart );
-//		BotAILoadMap( restart );
-//		G_InitBots( restart );
-//	}
 
 	G_RemapTeamShaders();
 
@@ -487,7 +413,7 @@ void G_ShutdownGame() {
 	if ( level.logFile ) {
 		G_LogPrintf("ShutdownGame:\n" );
 		G_LogPrintf("------------------------------------------------------------\n" );
-		trap_FS_FCloseFile( level.logFile );
+		FS_FCloseFile( level.logFile );
 	}
 
 	// write all the client session data so we can get it back
@@ -781,18 +707,18 @@ void CalculateRanks( void ) {
 
 	// set the CS_SCORES1/2 configstrings, which will be visible to everyone
 	if ( g_gametype.integer >= GT_TEAM ) {
-		trap_SetConfigstring( CS_SCORES1, va("%i", level.teamScores[TEAM_RED] ) );
-		trap_SetConfigstring( CS_SCORES2, va("%i", level.teamScores[TEAM_BLUE] ) );
+		SV_SetConfigstring( CS_SCORES1, va("%i", level.teamScores[TEAM_RED] ) );
+		SV_SetConfigstring( CS_SCORES2, va("%i", level.teamScores[TEAM_BLUE] ) );
 	} else {
 		if ( level.numConnectedClients == 0 ) {
-			trap_SetConfigstring( CS_SCORES1, va("%i", SCORE_NOT_PRESENT) );
-			trap_SetConfigstring( CS_SCORES2, va("%i", SCORE_NOT_PRESENT) );
+			SV_SetConfigstring( CS_SCORES1, va("%i", SCORE_NOT_PRESENT) );
+			SV_SetConfigstring( CS_SCORES2, va("%i", SCORE_NOT_PRESENT) );
 		} else if ( level.numConnectedClients == 1 ) {
-			trap_SetConfigstring( CS_SCORES1, va("%i", level.clients[ level.sortedClients[0] ].ps.persistant[PERS_SCORE] ) );
-			trap_SetConfigstring( CS_SCORES2, va("%i", SCORE_NOT_PRESENT) );
+			SV_SetConfigstring( CS_SCORES1, va("%i", level.clients[ level.sortedClients[0] ].ps.persistant[PERS_SCORE] ) );
+			SV_SetConfigstring( CS_SCORES2, va("%i", SCORE_NOT_PRESENT) );
 		} else {
-			trap_SetConfigstring( CS_SCORES1, va("%i", level.clients[ level.sortedClients[0] ].ps.persistant[PERS_SCORE] ) );
-			trap_SetConfigstring( CS_SCORES2, va("%i", level.clients[ level.sortedClients[1] ].ps.persistant[PERS_SCORE] ) );
+			SV_SetConfigstring( CS_SCORES1, va("%i", level.clients[ level.sortedClients[0] ].ps.persistant[PERS_SCORE] ) );
+			SV_SetConfigstring( CS_SCORES2, va("%i", level.clients[ level.sortedClients[1] ].ps.persistant[PERS_SCORE] ) );
 		}
 	}
 
@@ -960,7 +886,7 @@ void ExitLevel (void) {
 	if ( g_gametype.integer == GT_TOURNAMENT  ) {
 		if ( !level.restarted ) {
 			RemoveTournamentLoser();
-			trap_Cmd_ExecuteText( EXEC_APPEND, "map_restart 0\n" );
+			Cbuf_ExecuteText( EXEC_APPEND, "map_restart 0\n" );
 			level.restarted = true;
 			level.changemap = NULL;
 			level.intermissiontime = 0;
@@ -969,7 +895,7 @@ void ExitLevel (void) {
 	}
 
 
-	trap_Cmd_ExecuteText( EXEC_APPEND, "vstr nextmap\n" );
+	Cbuf_ExecuteText( EXEC_APPEND, "vstr nextmap\n" );
 	level.changemap = NULL;
 	level.intermissiontime = 0;
 
@@ -1030,7 +956,7 @@ void QDECL G_LogPrintf( const char *fmt, ... ) {
 		return;
 	}
 
-	trap_FS_Write( string, strlen( string ), level.logFile );
+	FS_Write( string, strlen( string ), level.logFile );
 }
 
 /*
@@ -1051,7 +977,7 @@ void LogExit( const char *string ) {
 
 	// this will keep the clients from playing any voice sounds
 	// that will get cut off when the queued intermission starts
-	trap_SetConfigstring( CS_INTERMISSION, "1" );
+	SV_SetConfigstring( CS_INTERMISSION, "1" );
 
 	// don't send more than 32 scores (FIXME?)
 	numSorted = level.numConnectedClients;
@@ -1227,7 +1153,7 @@ void CheckExitRules( void ) {
 
 	if ( g_timelimit.integer && !level.warmupTime ) {
 		if ( level.time - level.startTime >= g_timelimit.integer*60000 ) {
-			trap_SendServerCommand( -1, "print \"Timelimit hit.\n\" \"<scoreboard>\"");
+			SV_GameSendServerCommand( -1, "print \"Timelimit hit.\n\" \"<scoreboard>\"");
 			LogExit( "Timelimit hit." );
 			return;
 		}
@@ -1239,13 +1165,13 @@ void CheckExitRules( void ) {
 
 	if ( g_gametype.integer < GT_CTF && g_fraglimit.integer ) {
 		if ( level.teamScores[TEAM_RED] >= g_fraglimit.integer ) {
-			trap_SendServerCommand( -1, "print \"Red hit the fraglimit.\n\" \"<scoreboard>\"" );
+			SV_GameSendServerCommand( -1, "print \"Red hit the fraglimit.\n\" \"<scoreboard>\"" );
 			LogExit( "Fraglimit hit." );
 			return;
 		}
 
 		if ( level.teamScores[TEAM_BLUE] >= g_fraglimit.integer ) {
-			trap_SendServerCommand( -1, "print \"Blue hit the fraglimit.\n\" \"<scoreboard>\"" );
+			SV_GameSendServerCommand( -1, "print \"Blue hit the fraglimit.\n\" \"<scoreboard>\"" );
 			LogExit( "Fraglimit hit." );
 			return;
 		}
@@ -1261,7 +1187,7 @@ void CheckExitRules( void ) {
 
 			if ( cl->ps.persistant[PERS_SCORE] >= g_fraglimit.integer ) {
 				LogExit( "Fraglimit hit." );
-				trap_SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " hit the fraglimit.\n\" \"<scoreboard>\"",
+				SV_GameSendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " hit the fraglimit.\n\" \"<scoreboard>\"",
 					cl->pers.netname ) );
 				return;
 			}
@@ -1271,13 +1197,13 @@ void CheckExitRules( void ) {
 	if ( g_gametype.integer >= GT_CTF && g_capturelimit.integer ) {
 
 		if ( level.teamScores[TEAM_RED] >= g_capturelimit.integer ) {
-			trap_SendServerCommand( -1, "print \"Red hit the capturelimit.\n\" \"<scoreboard>\"" );
+			SV_GameSendServerCommand( -1, "print \"Red hit the capturelimit.\n\" \"<scoreboard>\"" );
 			LogExit( "Capturelimit hit." );
 			return;
 		}
 
 		if ( level.teamScores[TEAM_BLUE] >= g_capturelimit.integer ) {
-			trap_SendServerCommand( -1, "print \"Blue hit the capturelimit.\n\" \"<scoreboard>\"" );
+			SV_GameSendServerCommand( -1, "print \"Blue hit the capturelimit.\n\" \"<scoreboard>\"" );
 			LogExit( "Capturelimit hit." );
 			return;
 		}
@@ -1320,7 +1246,7 @@ void CheckTournament( void ) {
 		if ( level.numPlayingClients != 2 ) {
 			if ( level.warmupTime != -1 ) {
 				level.warmupTime = -1;
-				trap_SetConfigstring( CS_WARMUP, va("%i", level.warmupTime) );
+				SV_SetConfigstring( CS_WARMUP, va("%i", level.warmupTime) );
 				G_LogPrintf( "Warmup:\n" );
 			}
 			return;
@@ -1341,7 +1267,7 @@ void CheckTournament( void ) {
 			if ( level.numPlayingClients == 2 ) {
 				// fudge by -1 to account for extra delays
 				level.warmupTime = level.time + ( g_warmup.integer - 1 ) * 1000;
-				trap_SetConfigstring( CS_WARMUP, va("%i", level.warmupTime) );
+				SV_SetConfigstring( CS_WARMUP, va("%i", level.warmupTime) );
 			}
 			return;
 		}
@@ -1349,8 +1275,8 @@ void CheckTournament( void ) {
 		// if the warmup time has counted down, restart
 		if ( level.time > level.warmupTime ) {
 			level.warmupTime += 10000;
-			trap_Cvar_Set( "g_restarted", "1" );
-			trap_Cmd_ExecuteText( EXEC_APPEND, "map_restart 0\n" );
+			Cvar_Set( "g_restarted", "1" );
+			Cbuf_ExecuteText( EXEC_APPEND, "map_restart 0\n" );
 			level.restarted = true;
 			return;
 		}
@@ -1373,7 +1299,7 @@ void CheckTournament( void ) {
 		if ( notEnough ) {
 			if ( level.warmupTime != -1 ) {
 				level.warmupTime = -1;
-				trap_SetConfigstring( CS_WARMUP, va("%i", level.warmupTime) );
+				SV_SetConfigstring( CS_WARMUP, va("%i", level.warmupTime) );
 				G_LogPrintf( "Warmup:\n" );
 			}
 			return; // still waiting for team members
@@ -1393,15 +1319,15 @@ void CheckTournament( void ) {
 		if ( level.warmupTime < 0 ) {
 			// fudge by -1 to account for extra delays
 			level.warmupTime = level.time + ( g_warmup.integer - 1 ) * 1000;
-			trap_SetConfigstring( CS_WARMUP, va("%i", level.warmupTime) );
+			SV_SetConfigstring( CS_WARMUP, va("%i", level.warmupTime) );
 			return;
 		}
 
 		// if the warmup time has counted down, restart
 		if ( level.time > level.warmupTime ) {
 			level.warmupTime += 10000;
-			trap_Cvar_Set( "g_restarted", "1" );
-			trap_Cmd_ExecuteText( EXEC_APPEND, "map_restart 0\n" );
+			Cvar_Set( "g_restarted", "1" );
+			Cbuf_ExecuteText( EXEC_APPEND, "map_restart 0\n" );
 			level.restarted = true;
 			return;
 		}
@@ -1419,28 +1345,28 @@ CheckVote
 void CheckVote( void ) {
 	if ( level.voteExecuteTime && level.voteExecuteTime < level.time ) {
 		level.voteExecuteTime = 0;
-		trap_Cmd_ExecuteText( EXEC_APPEND, va("%s\n", level.voteString ) );
+		Cbuf_ExecuteText( EXEC_APPEND, va("%s\n", level.voteString ) );
 	}
 	if ( !level.voteTime ) {
 		return;
 	}
 	if ( level.time - level.voteTime >= VOTE_TIME ) {
-		trap_SendServerCommand( -1, "print \"Vote failed.\n\"" );
+		SV_GameSendServerCommand( -1, "print \"Vote failed.\n\"" );
 	} else {
 		if ( level.voteYes > level.numVotingClients/2 ) {
 			// execute the command, then remove the vote
-			trap_SendServerCommand( -1, "print \"Vote passed.\n\"" );
+			SV_GameSendServerCommand( -1, "print \"Vote passed.\n\"" );
 			level.voteExecuteTime = level.time + 3000;
 		} else if ( level.voteNo >= level.numVotingClients/2 ) {
 			// same behavior as a timeout
-			trap_SendServerCommand( -1, "print \"Vote failed.\n\"" );
+			SV_GameSendServerCommand( -1, "print \"Vote failed.\n\"" );
 		} else {
 			// still waiting for a majority
 			return;
 		}
 	}
 	level.voteTime = 0;
-	trap_SetConfigstring( CS_VOTE_TIME, "" );
+	SV_SetConfigstring( CS_VOTE_TIME, "" );
 
 }
 
@@ -1455,7 +1381,7 @@ void PrintTeam(int team, char *message) {
 	for ( i = 0 ; i < level.maxclients ; i++ ) {
 		if (level.clients[i].sess.sessionTeam != team)
 			continue;
-		trap_SendServerCommand( i, message );
+		SV_GameSendServerCommand( i, message );
 	}
 }
 
@@ -1539,29 +1465,29 @@ void CheckTeamVote( int team ) {
 		return;
 	}
 	if ( level.time - level.teamVoteTime[cs_offset] >= VOTE_TIME ) {
-		trap_SendServerCommand( -1, "print \"Team vote failed.\n\"" );
+		SV_GameSendServerCommand( -1, "print \"Team vote failed.\n\"" );
 	} else {
 		if ( level.teamVoteYes[cs_offset] > level.numteamVotingClients[cs_offset]/2 ) {
 			// execute the command, then remove the vote
-			trap_SendServerCommand( -1, "print \"Team vote passed.\n\"" );
+			SV_GameSendServerCommand( -1, "print \"Team vote passed.\n\"" );
 			//
 			if ( !Q_strncmp( "leader", level.teamVoteString[cs_offset], 6) ) {
 				//set the team leader
 				SetLeader(team, atoi(level.teamVoteString[cs_offset] + 7));
 			}
 			else {
-				trap_Cmd_ExecuteText( EXEC_APPEND, va("%s\n", level.teamVoteString[cs_offset] ) );
+				Cbuf_ExecuteText( EXEC_APPEND, va("%s\n", level.teamVoteString[cs_offset] ) );
 			}
 		} else if ( level.teamVoteNo[cs_offset] >= level.numteamVotingClients[cs_offset]/2 ) {
 			// same behavior as a timeout
-			trap_SendServerCommand( -1, "print \"Team vote failed.\n\"" );
+			SV_GameSendServerCommand( -1, "print \"Team vote failed.\n\"" );
 		} else {
 			// still waiting for a majority
 			return;
 		}
 	}
 	level.teamVoteTime[cs_offset] = 0;
-	trap_SetConfigstring( CS_TEAMVOTE_TIME + cs_offset, "" );
+	SV_SetConfigstring( CS_TEAMVOTE_TIME + cs_offset, "" );
 
 }
 
@@ -1577,9 +1503,9 @@ void CheckCvars( void ) {
 	if ( g_password.modificationCount != lastMod ) {
 		lastMod = g_password.modificationCount;
 		if ( *g_password.string && Q_stricmp( g_password.string, "none" ) ) {
-			trap_Cvar_Set( "g_needpass", "1" );
+			Cvar_Set( "g_needpass", "1" );
 		} else {
-			trap_Cvar_Set( "g_needpass", "0" );
+			Cvar_Set( "g_needpass", "0" );
 		}
 	}
 }
@@ -1663,7 +1589,7 @@ void G_RunFrame( int levelTime ) {
 			} else if ( ent->unlinkAfterEvent ) {
 				// items that will respawn will hide themselves after their pickup event
 				ent->unlinkAfterEvent = false;
-				trap_UnlinkEntity( &ent->s, &ent->r );
+				SV_UnlinkEntity( &ent->s, &ent->r );
 			}
 		}
 
@@ -1734,6 +1660,6 @@ end = Sys_Milliseconds();
 		for (i = 0; i < MAX_GENTITIES; i++) {
 			Com_Printf("%4i: %s\n", i, g_entities[i].classname);
 		}
-		trap_Cvar_Set("g_listEntity", "0");
+		Cvar_Set("g_listEntity", "0");
 	}
 }

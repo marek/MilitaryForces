@@ -1163,11 +1163,11 @@ GetRefAPI
 @@@@@@@@@@@@@@@@@@@@@
 */
 refexport_t *GetRefAPI ( int apiVersion, refimport_t *rimp ) {
-	static refexport_t	re;
+	static refexport_t	refExport;
 
 	ri = *rimp;
 
-	Com_Memset( &re, 0, sizeof( re ) );
+	Com_Memset( &refExport, 0, sizeof( refExport ) );
 
 	if ( apiVersion != REF_API_VERSION ) {
 		ri.Printf(PRINT_ALL, "Mismatched REF_API_VERSION: expected %i, got %i\n", 
@@ -1177,41 +1177,41 @@ refexport_t *GetRefAPI ( int apiVersion, refimport_t *rimp ) {
 
 	// the RE_ functions are Renderer Entry points
 
-	re.Shutdown = RE_Shutdown;
+	refExport.Shutdown = RE_Shutdown;
 
-	re.BeginRegistration = RE_BeginRegistration;
-	re.RegisterModel = RE_RegisterModel;
-	re.RegisterSkin = RE_RegisterSkin;
-	re.RegisterShader = RE_RegisterShader;
-	re.RegisterShaderNoMip = RE_RegisterShaderNoMip;
-	re.LoadWorld = RE_LoadWorldMap;
-	re.SetWorldVisData = RE_SetWorldVisData;
-	re.EndRegistration = RE_EndRegistration;
+	refExport.BeginRegistration = RE_BeginRegistration;
+	refExport.RegisterModel = RE_RegisterModel;
+	refExport.RegisterSkin = RE_RegisterSkin;
+	refExport.RegisterShader = RE_RegisterShader;
+	refExport.RegisterShaderNoMip = RE_RegisterShaderNoMip;
+	refExport.LoadWorld = RE_LoadWorldMap;
+	refExport.SetWorldVisData = RE_SetWorldVisData;
+	refExport.EndRegistration = RE_EndRegistration;
 
-	re.BeginFrame = RE_BeginFrame;
-	re.EndFrame = RE_EndFrame;
+	refExport.BeginFrame = RE_BeginFrame;
+	refExport.EndFrame = RE_EndFrame;
 
-	re.MarkFragments = R_MarkFragments;
-	re.LerpTag = R_LerpTag;
-	re.ModelBounds = R_ModelBounds;
+	refExport.MarkFragments = R_MarkFragments;
+	refExport.LerpTag = R_LerpTag;
+	refExport.ModelBounds = R_ModelBounds;
 
-	re.ClearScene = RE_ClearScene;
-	re.AddRefEntityToScene = RE_AddRefEntityToScene;
-	re.AddPolyToScene = RE_AddPolyToScene;
-	re.LightForPoint = R_LightForPoint;
-	re.AddLightToScene = RE_AddLightToScene;
-	re.AddAdditiveLightToScene = RE_AddAdditiveLightToScene;
-	re.RenderScene = RE_RenderScene;
+	refExport.ClearScene = RE_ClearScene;
+	refExport.AddRefEntityToScene = RE_AddRefEntityToScene;
+	refExport.AddPolyToScene = RE_AddPolyToScene;
+	refExport.LightForPoint = R_LightForPoint;
+	refExport.AddLightToScene = RE_AddLightToScene;
+	refExport.AddAdditiveLightToScene = RE_AddAdditiveLightToScene;
+	refExport.RenderScene = RE_RenderScene;
 
-	re.SetColor = RE_SetColor;
-	re.DrawStretchPic = RE_StretchPic;
-	re.DrawStretchRaw = RE_StretchRaw;
-	re.UploadCinematic = RE_UploadCinematic;
+	refExport.SetColor = RE_SetColor;
+	refExport.DrawStretchPic = RE_StretchPic;
+	refExport.DrawStretchRaw = RE_StretchRaw;
+	refExport.UploadCinematic = RE_UploadCinematic;
 
-	re.RegisterFont = RE_RegisterFont;
-	re.RemapShader = R_RemapShader;
-	re.GetEntityToken = R_GetEntityToken;
-	re.inPVS = R_inPVS;
+	refExport.RegisterFont = RE_RegisterFont;
+	refExport.RemapShader = R_RemapShader;
+	refExport.GetEntityToken = R_GetEntityToken;
+	refExport.inPVS = R_inPVS;
 
-	return &re;
+	return &refExport;
 }

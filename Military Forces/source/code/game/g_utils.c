@@ -1,5 +1,5 @@
 /*
- * $Id: g_utils.c,v 1.6 2005-11-20 11:21:38 thebjoern Exp $
+ * $Id: g_utils.c,v 1.7 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -74,7 +74,7 @@ int G_FindConfigstringIndex( char *name, int start, int max, bool create ) {
 	}
 
 	for ( i=1 ; i<max ; i++ ) {
-		trap_GetConfigstring( start + i, s, sizeof( s ) );
+		SV_GetConfigstring( start + i, s, sizeof( s ) );
 		if ( !s[0] ) {
 			break;
 		}
@@ -91,7 +91,7 @@ int G_FindConfigstringIndex( char *name, int start, int max, bool create ) {
 		Com_Error( ERR_DROP, "G_FindConfigstringIndex: overflow" );
 	}
 
-	trap_SetConfigstring( start + i, name );
+	SV_SetConfigstring( start + i, name );
 
 	return i;
 }
@@ -121,7 +121,7 @@ void G_TeamCommand( team_t team, char *cmd ) {
 	for ( i = 0 ; i < level.maxclients ; i++ ) {
 		if ( level.clients[i].pers.connected == CON_CONNECTED ) {
 			if ( level.clients[i].sess.sessionTeam == team ) {
-				trap_SendServerCommand( i, va("%s", cmd ));
+				SV_GameSendServerCommand( i, va("%s", cmd ));
 			}
 		}
 	}
@@ -226,7 +226,7 @@ void G_UseTargets( gentity_t *ent, gentity_t *activator ) {
 	if (ent->targetShaderName && ent->targetShaderNewName) {
 		float f = level.time * 0.001;
 		AddRemap(ent->targetShaderName, ent->targetShaderNewName, f);
-		trap_SetConfigstring(CS_SHADERSTATE, BuildShaderStateConfig());
+		SV_SetConfigstring(CS_SHADERSTATE, BuildShaderStateConfig());
 	}
 
 	if ( !ent->target ) {
@@ -410,7 +410,7 @@ gentity_t *G_Spawn( void ) {
 	level.num_entities++;
 
 	// let the server system know that there are more entities
-	trap_LocateGameData( (void*)level.gentities, level.num_entities, sizeof( gentity_t ), 
+	SV_LocateGameData( (void*)level.gentities, level.num_entities, sizeof( gentity_t ), 
 		&level.clients[0].ps, sizeof( level.clients[0] ) );
 
 	G_InitGentity( e );
@@ -445,8 +445,9 @@ G_FreeEntity
 Marks the entity as free
 =================
 */
-void G_FreeEntity( gentity_t *ed ) {
-	trap_UnlinkEntity (&ed->s, &ed->r);		// unlink from world
+void G_FreeEntity( gentity_t *ed ) 
+{
+	SV_UnlinkEntity (&ed->s, &ed->r);		// unlink from world
 
 	if ( ed->neverFree ) {
 		return;
@@ -483,7 +484,7 @@ gentity_t *G_TempEntity( vec3_t origin, int event ) {
 	G_SetOrigin( e, snapped );
 
 	// find cluster for PVS
-	trap_LinkEntity( &e->s, &e->r );
+	SV_LinkEntity( &e->s, &e->r );
 
 	return e;
 }
@@ -514,7 +515,7 @@ void G_KillBox (gentity_t *ent) {
 
 	VectorAdd( ent->client->ps.origin, ent->r.mins, mins );
 	VectorAdd( ent->client->ps.origin, ent->r.maxs, maxs );
-	num = trap_EntitiesInBox( mins, maxs, touch, MAX_GENTITIES );
+	num = SV_AreaEntities( mins, maxs, touch, MAX_GENTITIES );
 
 	for (i=0 ; i<num ; i++) {
 		hit = &g_entities[touch[i]];
@@ -673,7 +674,7 @@ unsigned long G_GetGameset()
 {
 	char buffer[33];
 
-	trap_Cvar_VariableStringBuffer("mf_gameset", buffer, 32);
+	Cvar_VariableStringBuffer("mf_gameset", buffer, 32);
 
 	if( strcmp( buffer, "modern" ) == 0 ) {
 		return MF_GAMESET_MODERN;
@@ -686,7 +687,7 @@ unsigned long G_GetGameset()
 	}
 	else {	// default gameset
 		Com_Printf( "mf_gameset is not valid, defaulting 'modern'\n" );
-		trap_Cvar_Set("mf_gameset", "modern");
+		Cvar_Set("mf_gameset", "modern");
 		return MF_GAMESET_MODERN;
 	}
 }

@@ -201,12 +201,6 @@
 			Name="Source Files"
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat">
 			<File
-				RelativePath="..\game\q_math.c">
-			</File>
-			<File
-				RelativePath="..\game\q_shared.c">
-			</File>
-			<File
 				RelativePath=".\ui.cpp">
 			</File>
 			<File
@@ -244,9 +238,6 @@
 			</File>
 			<File
 				RelativePath=".\ui_precomp.cpp">
-			</File>
-			<File
-				RelativePath=".\ui_syscalls.c">
 			</File>
 			<File
 				RelativePath=".\ui_util.c">

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_servercmds.c,v 1.3 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: cg_servercmds.c,v 1.4 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -110,7 +110,7 @@ void CG_ParseServerinfo( void ) {
 
 	info = CG_ConfigString( CS_SERVERINFO );
 	cgs.gametype = static_cast<gametype_t>(atoi( Info_ValueForKey( info, "g_gametype" ) ));
-	trap_Cvar_Set("g_gametype", va("%i", cgs.gametype));
+	Cvar_Set("g_gametype", va("%i", cgs.gametype));
 	cgs.dmflags = atoi( Info_ValueForKey( info, "dmflags" ) );
 	cgs.teamflags = atoi( Info_ValueForKey( info, "teamflags" ) );
 	cgs.fraglimit = atoi( Info_ValueForKey( info, "fraglimit" ) );
@@ -120,9 +120,9 @@ void CG_ParseServerinfo( void ) {
 	mapname = Info_ValueForKey( info, "mapname" );
 	Com_sprintf( cgs.mapname, sizeof( cgs.mapname ), "maps/%s.bsp", mapname );
 	Q_strncpyz( cgs.redTeam, Info_ValueForKey( info, "g_redTeam" ), sizeof(cgs.redTeam) );
-	trap_Cvar_Set("g_redTeam", cgs.redTeam);
+	Cvar_Set("g_redTeam", cgs.redTeam);
 	Q_strncpyz( cgs.blueTeam, Info_ValueForKey( info, "g_blueTeam" ), sizeof(cgs.blueTeam) );
-	trap_Cvar_Set("g_blueTeam", cgs.blueTeam);
+	Cvar_Set("g_blueTeam", cgs.blueTeam);
 	
 	// mfq3
 	Q_strncpyz( gs, Info_ValueForKey( info, "mf_gameset" ), sizeof(gs) );
@@ -135,7 +135,7 @@ void CG_ParseServerinfo( void ) {
 	// gameset changed>
 	if( cgs.gameset && newset != cgs.gameset )
 	{	
-		trap_SendConsoleCommand(";vid_restart\n" );  // Leading ' ; ' Previous command getting stuck?
+		Cbuf_AddText(";vid_restart\n" );  // Leading ' ; ' Previous command getting stuck?
 		Com_Printf("The gameset has changed to %s\n", gs );
 	}
 	cgs.gameset = newset;
@@ -159,7 +159,7 @@ static void CG_ParseWarmup( void ) {
 
 	} else if ( warmup > 0 && cg.warmup <= 0 && cgs.gametype != GT_MISSION_EDITOR ) {
 		{
-			trap_S_StartLocalSound( cgs.media.countPrepareSound, CHAN_ANNOUNCER );
+			S_StartLocalSound( cgs.media.countPrepareSound, CHAN_ANNOUNCER );
 		}
 	}
 
@@ -219,7 +219,7 @@ void CG_ShaderStateChanged(void) {
 				strncpy(timeOffset, t, o-t);
 				timeOffset[o-t] = 0;
 				o++;
-				trap_R_RemapShader( originalShader, newShader, timeOffset );
+				refExport.RemapShader( originalShader, newShader, timeOffset );
 			}
 		} else {
 			break;
@@ -241,7 +241,7 @@ static void CG_ConfigStringModified( void ) {
 
 	// get the gamestate from the client system, which will have the
 	// New configstring already integrated
-	trap_GetGameState( &cgs.gameState );
+	CL_GetGameState( &cgs.gameState );
 
 	// look up the individual string that was modified
 	str = CG_ConfigString( num );
@@ -284,10 +284,10 @@ static void CG_ConfigStringModified( void ) {
 	} else if ( num == CS_INTERMISSION ) {
 		cg.intermissionStarted = atoi( str );
 	} else if ( num >= CS_MODELS && num < CS_MODELS+MAX_MODELS ) {
-		cgs.gameModels[ num-CS_MODELS ] = trap_R_RegisterModel( str );
+		cgs.gameModels[ num-CS_MODELS ] = refExport.RegisterModel( str );
 	} else if ( num >= CS_SOUNDS && num < CS_SOUNDS+MAX_MODELS ) {
 		if ( str[0] != '*' ) {	// player specific sounds don't register here
-			cgs.gameSounds[ num-CS_SOUNDS] = trap_S_RegisterSound( str, false );
+			cgs.gameSounds[ num-CS_SOUNDS] = S_RegisterSound( str, false );
 		}
 	} else if ( num >= CS_PLAYERS && num < CS_PLAYERS+MAX_CLIENTS ) {
 		CG_NewClientInfo( num - CS_PLAYERS );
@@ -414,21 +414,21 @@ static void CG_MapRestart( void ) {
 
 	CG_StartMusic();
 
-	trap_S_ClearLoopingSounds(true);
+	S_ClearLoopingSounds(true);
 
 	// MFQ3 vehicle needs to be reset
 	if( cg_vehicle.integer != -1 ) {
-		trap_Cvar_Set( "cg_vehicle", "-1" );
+		Cvar_Set( "cg_vehicle", "-1" );
 	}
 	if( cg_nextVehicle.integer != -1 ) {
-		trap_Cvar_Set( "cg_nextVehicle", "-1" );
+		Cvar_Set( "cg_nextVehicle", "-1" );
 	}
 
 	// we really should clear more parts of cg here and stop sounds
 
 	// play the "fight" sound if this is a restart without warmup
 	if ( cg.warmup == 0 && cgs.gametype != GT_MISSION_EDITOR /* && cgs.gametype == GT_TOURNAMENT */) {
-		trap_S_StartLocalSound( cgs.media.countFightSound, CHAN_ANNOUNCER );
+		S_StartLocalSound( cgs.media.countFightSound, CHAN_ANNOUNCER );
 		CG_CenterPrint( "FIGHT!", 120, GIANTCHAR_WIDTH*2 );
 	} else if ( cgs.gametype == GT_MISSION_EDITOR ) {
 		CG_CenterPrint( "EDIT!", 120, GIANTCHAR_WIDTH*2 );
@@ -512,7 +512,7 @@ static void CG_ServerCommand( void ) {
 
 	if ( !strcmp( cmd, "chat" ) ) {
 		if ( !cg_teamChatsOnly.integer ) {
-			trap_S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
+			S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
 			Q_strncpyz( text, CG_Argv(1), MAX_SAY_TEXT );
 			CG_RemoveChatEscapeChar( text );
 			CG_Printf( "%s\n", text );
@@ -521,7 +521,7 @@ static void CG_ServerCommand( void ) {
 	}
 
 	if ( !strcmp( cmd, "tchat" ) ) {
-		trap_S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
+		S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
 		Q_strncpyz( text, CG_Argv(1), MAX_SAY_TEXT );
 		CG_RemoveChatEscapeChar( text );
 		CG_AddToTeamChat( text );
@@ -545,8 +545,8 @@ static void CG_ServerCommand( void ) {
 	}
 
   if ( Q_stricmp (cmd, "remapShader") == 0 ) {
-		if (trap_Argc() == 4) {
-			trap_R_RemapShader(CG_Argv(1), CG_Argv(2), CG_Argv(3));
+		if (Cmd_Argc() == 4) {
+			refExport.RemapShader(CG_Argv(1), CG_Argv(2), CG_Argv(3));
 		}
 	}
 
@@ -558,7 +558,7 @@ static void CG_ServerCommand( void ) {
 	}
 
 	if( !strcmp( cmd, "me_spawnvehicle" ) ) {
-		if( trap_Argc() == 2 ) {
+		if( Cmd_Argc() == 2 ) {
 			int idx = atoi(CG_Argv(1));
 			ME_SpawnVehicle(idx);
 		}
@@ -566,7 +566,7 @@ static void CG_ServerCommand( void ) {
 	}
 
 	if( !strcmp( cmd, "me_spawnvehiclegi" ) ) {
-		if( trap_Argc() == 2 ) {
+		if( Cmd_Argc() == 2 ) {
 			int idx = atoi(CG_Argv(1));
 			ME_SpawnGroundInstallation(idx);
 		}
@@ -585,10 +585,11 @@ Execute all of the server commands that were received along
 with this this snapshot.
 ====================
 */
-void CG_ExecuteNewServerCommands( int latestSequence ) {
-	while ( cgs.serverCommandSequence < latestSequence ) {
-		if ( trap_GetServerCommand( ++cgs.serverCommandSequence ) ) {
+void CG_ExecuteNewServerCommands( int latestSequence ) 
+{
+	while ( cgs.serverCommandSequence < latestSequence ) 
+	{
+		if ( CL_GetServerCommand( ++cgs.serverCommandSequence ) ) 
 			CG_ServerCommand();
-		}
 	}
 }

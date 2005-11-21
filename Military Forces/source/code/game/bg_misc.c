@@ -1,5 +1,5 @@
 /*
- * $Id: bg_misc.c,v 1.5 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: bg_misc.c,v 1.6 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -586,14 +586,14 @@ Handles the sequence numbers
 ===============
 */
 
-void	trap_Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize );
+void	Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize );
 
 void BG_AddPredictableEventToPlayerstate( int newEvent, int eventParm, playerState_t *ps ) {
 
 #ifdef _DEBUG
 	{
 		char buf[256];
-		trap_Cvar_VariableStringBuffer("showevents", buf, sizeof(buf));
+		Cvar_VariableStringBuffer("showevents", buf, sizeof(buf));
 		if ( atof(buf) != 0 ) {
 		}
 	}

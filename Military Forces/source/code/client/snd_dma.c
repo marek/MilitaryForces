@@ -389,7 +389,8 @@ S_RegisterSound
 Creates a default buzz sound if the file can't be loaded
 ==================
 */
-sfxHandle_t	S_RegisterSound( const char *name, bool compressed ) {
+sfxHandle_t	S_RegisterSound( const char *name, bool compressed ) 
+{
 	sfx_t	*sfx;
 
 	compressed = false;
@@ -509,7 +510,8 @@ if pos is NULL, the sound will be dynamically sourced from the entity
 Entchannel 0 will never override a playing sound
 ====================
 */
-void S_StartSound(vec3_t origin, int entityNum, int entchannel, sfxHandle_t sfxHandle ) {
+void S_StartSound(vec3_t origin, int entityNum, int entchannel, sfxHandle_t sfxHandle ) 
+{
 	channel_t	*ch;
 	sfx_t		*sfx;
   int i, oldest, chosen, time;
@@ -630,7 +632,8 @@ void S_StartSound(vec3_t origin, int entityNum, int entchannel, sfxHandle_t sfxH
 S_StartLocalSound
 ==================
 */
-void S_StartLocalSound( sfxHandle_t sfxHandle, int channelNum ) {
+void S_StartLocalSound( sfxHandle_t sfxHandle, int channelNum ) 
+{
 	if ( !s_soundStarted || s_soundMuted ) {
 		return;
 	}
@@ -718,7 +721,8 @@ S_ClearLoopingSounds
 
 ==================
 */
-void S_ClearLoopingSounds( bool killall ) {
+void S_ClearLoopingSounds( bool killall ) 
+{
 	int i;
 	for ( i = 0 ; i < MAX_GENTITIES ; i++) {
 		if (killall || loopSounds[i].kill == true || (loopSounds[i].sfx && loopSounds[i].sfx->soundLength == 0)) {
@@ -737,7 +741,8 @@ Called during entity generation for a frame
 Include velocity in case I get around to doing doppler...
 ==================
 */
-void S_AddLoopingSound( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfxHandle ) {
+void S_AddLoopingSound( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfxHandle ) 
+{
 	sfx_t *sfx;
 
 	if ( !s_soundStarted || s_soundMuted ) {
@@ -798,7 +803,8 @@ Called during entity generation for a frame
 Include velocity in case I get around to doing doppler...
 ==================
 */
-void S_AddRealLoopingSound( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfxHandle ) {
+void S_AddRealLoopingSound( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfxHandle ) 
+{
 	sfx_t *sfx;
 
 	if ( !s_soundStarted || s_soundMuted ) {
@@ -1053,7 +1059,8 @@ S_UpdateEntityPosition
 let the sound system know where an entity currently is
 ======================
 */
-void S_UpdateEntityPosition( int entityNum, const vec3_t origin ) {
+void S_UpdateEntityPosition( int entityNum, const vec3_t origin ) 
+{
 	if ( entityNum < 0 || entityNum > MAX_GENTITIES ) {
 		Com_Error( ERR_DROP, "S_UpdateEntityPosition: bad entitynum %i", entityNum );
 	}
@@ -1068,7 +1075,8 @@ S_Respatialize
 Change the volumes of all the playing sounds for changes in their positions
 ============
 */
-void S_Respatialize( int entityNum, const vec3_t head, vec3_t axis[3], int inwater ) {
+void S_Respatialize( int entityNum, const vec3_t head, vec3_t axis[3], int inwater ) 
+{
 	int			i;
 	channel_t	*ch;
 	vec3_t		origin;
@@ -1416,7 +1424,8 @@ int S_FindWavChunk( fileHandle_t f, char *chunk ) {
 S_StopBackgroundTrack
 ======================
 */
-void S_StopBackgroundTrack( void ) {
+void S_StopBackgroundTrack() 
+{
 	if ( !s_backgroundFile ) {
 		return;
 	}
@@ -1431,7 +1440,8 @@ void S_StopBackgroundTrack( void ) {
 S_StartBackgroundTrack
 ======================
 */
-void S_StartBackgroundTrack( const char *intro, const char *loop ){
+void S_StartBackgroundTrack( const char *intro, const char *loop )
+{
 	int		len;
 	char	dump[16];
 	char	name[MAX_QPATH];

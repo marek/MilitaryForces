@@ -1,5 +1,5 @@
 /*
- * $Id: cg_missioneditor.c,v 1.4 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: cg_missioneditor.c,v 1.5 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -21,7 +21,7 @@ IGME_vehicle_t* ME_GetSelectedVehicle();
 void ME_KeyEvent(int key, bool down)
 {
 	if( key == K_MOUSE1 && !down ) {
-		trap_Key_SetCatcher( trap_Key_GetCatcher() & ~KEYCATCH_CGAME );
+		Key_SetCatcher( Key_GetCatcher() & ~KEYCATCH_CGAME );
 		cgs.IGME.dragmode = false;
 	}
 }
@@ -164,19 +164,19 @@ void CG_Draw_IGME()
 	IGME_vehicle_t* veh;
 
 	// check for selections
-	cmdNum = trap_GetCurrentCmdNumber();
-	trap_GetUserCmd( cmdNum, &cmd );
-	if( trap_Key_IsDown(K_MOUSE1) && !trap_Key_GetCatcher() ) {
+	cmdNum = CL_GetCurrentCmdNumber();
+	CL_GetUserCmd( cmdNum, &cmd );
+	if( Key_IsDown(K_MOUSE1) && !Key_GetCatcher() ) {
 		if( (cgs.IGME.waypointmode && cgs.IGME.numWptSelections) ||
 			(!cgs.IGME.waypointmode && cgs.IGME.numSelections) ) {
-			trap_Key_SetCatcher( KEYCATCH_CGAME );
+			Key_SetCatcher( KEYCATCH_CGAME );
 			cgs.IGME.dragmode = true;
 		}
-	} else if( (trap_Key_IsDown(K_MOUSE3) || trap_Key_IsDown(K_SPACE)) &&
+	} else if( (Key_IsDown(K_MOUSE3) || Key_IsDown(K_SPACE)) &&
 				cg.time >= cgs.IGME.selectionTime ) {
 		ME_CheckForSelection();
 		cgs.IGME.selectionTime = cg.time + 250;
-	} else if( trap_Key_IsDown(K_BACKSPACE) && !trap_Key_GetCatcher() && cg.time >= cgs.IGME.selectionTime ) {
+	} else if( Key_IsDown(K_BACKSPACE) && !Key_GetCatcher() && cg.time >= cgs.IGME.selectionTime ) {
 		ME_DeleteSelection();
 		cgs.IGME.selectionTime = cg.time + 250;
 	} else if( (cmd.buttons & BUTTON_GEAR) && cg.time >= cgs.IGME.selectionTime ) {
@@ -190,11 +190,11 @@ void CG_Draw_IGME()
 				cg.time >= cgs.IGME.selectionTime ) {
 		ME_ToggleWaypointDisplay();
 		cgs.IGME.selectionTime = cg.time + 250;
-	} else if( !cgs.IGME.dragmode && trap_Key_IsDown(K_CTRL) && trap_Key_IsDown('c') && 
+	} else if( !cgs.IGME.dragmode && Key_IsDown(K_CTRL) && Key_IsDown('c') && 
 				cg.time >= cgs.IGME.selectionTime ) {
 		ME_CopySelection();
 		cgs.IGME.selectionTime = cg.time + 500;
-	} else if( !cgs.IGME.dragmode && trap_Key_IsDown(K_CTRL) && trap_Key_IsDown('v') &&
+	} else if( !cgs.IGME.dragmode && Key_IsDown(K_CTRL) && Key_IsDown('v') &&
 				cg.time >= cgs.IGME.selectionTime ) {
 		ME_PasteSelection();
 		cgs.IGME.selectionTime = cg.time + 500;
@@ -307,7 +307,7 @@ void ME_DeselectAll()
 
 void ME_SelectVehicle( IGME_vehicle_t* veh )
 {
-	int multisel = trap_Key_IsDown(K_CTRL);
+	int multisel = Key_IsDown(K_CTRL);
 
 	if( !veh ) {
 		if( !multisel ) ME_DeselectAll();
@@ -345,7 +345,7 @@ void ME_DeselectAllWaypoints()
 
 void ME_SelectWaypoint( IGME_waypoint_t* wpt )
 {
-	int multisel = trap_Key_IsDown(K_CTRL);
+	int multisel = Key_IsDown(K_CTRL);
 
 	if( !wpt ) {
 		if( !multisel ) ME_DeselectAllWaypoints();
@@ -538,8 +538,8 @@ void ME_DragSelection( int x, int y )
 {
 	vec3_t			angles, forward, right;
 	int				i;
-	int			vertical = trap_Key_IsDown(K_CTRL);
-	int			rotate = trap_Key_IsDown(K_SHIFT);
+	int			vertical = Key_IsDown(K_CTRL);
+	int			rotate = Key_IsDown(K_SHIFT);
 
 	if( vertical ) {
 		// move vertically
@@ -591,7 +591,7 @@ void ME_SpawnWaypoint()
 	IGME_vehicle_t* veh = ME_GetVehicleUnderCrosshair();
 	IGME_vehicle_t* selveh = ME_GetSelectedVehicle();
 	int				i;
-	int			insert = trap_Key_IsDown(K_CTRL);
+	int			insert = Key_IsDown(K_CTRL);
 		
 	// vehicle following
 	if( veh && !veh->selected ) {
@@ -793,7 +793,7 @@ void ME_DrawVehicle( IGME_vehicle_t* veh )
 			VectorScale( sel.axis[j], veh->selectorScale[j], sel.axis[j] );
 		}
 		sel.nonNormalizedAxes = true;
-		trap_R_AddRefEntityToScene( &sel );
+		refExport.AddRefEntityToScene( &sel );
 	}
 	// draw waypoints
 	if( cgs.IGME.waypointmode && (veh->selected || cgs.IGME.showAllWaypoints) ) {
@@ -820,7 +820,7 @@ void ME_DrawVehicle( IGME_vehicle_t* veh )
 			} else {
 				wpt.customShader = cgs.media.IGME_waypoint2;
 			}
-			trap_R_AddRefEntityToScene( &wpt );
+			refExport.AddRefEntityToScene( &wpt );
 			// draw link
 			VectorSubtract( wpt.origin, lastpos, dir );
 			dist = VectorNormalize( dir );
@@ -837,7 +837,7 @@ void ME_DrawVehicle( IGME_vehicle_t* veh )
 			VectorScale( lnk.axis[2], 0.01f, lnk.axis[2] );
 			lnk.nonNormalizedAxes = true;
 			lnk.customShader = cgs.media.IGME_waypoint2;
-			trap_R_AddRefEntityToScene( &lnk );
+			refExport.AddRefEntityToScene( &lnk );
 			VectorCopy( veh->waypoints[k].origin, lastpos );
 		}
 	}
@@ -864,7 +864,7 @@ void ME_ExportToScript( const char* scriptname )
 	mapname = Info_ValueForKey( info, "mapname" );
 	Com_sprintf(scriptfile, 255, "missions/%s/%s.mis", mapname, scriptname);
 
-	if( trap_FS_FOpenFile(scriptfile, &f, FS_WRITE) < 0 ) {
+	if( FS_FOpenFileByMode(scriptfile, &f, FS_WRITE) < 0 ) {
 		CG_Printf("Unable to write to file %s. Exporting to script cancelled.", scriptfile);
 		return;
 	}
@@ -873,110 +873,105 @@ void ME_ExportToScript( const char* scriptname )
 
 	// first line comment
 	Com_sprintf( outstring, sizeof(outstring), "//Missionscript for map %s\n\n",mapname );
-	trap_FS_Write( outstring, strlen(outstring), f );
+	FS_Write( outstring, strlen(outstring), f );
 
 	// header
 	Com_sprintf( outstring, sizeof(outstring), "Overview\n{\n\tmap\t%s\n", mapname );
-	trap_FS_Write( outstring, strlen(outstring), f );
+	FS_Write( outstring, strlen(outstring), f );
 
 	Com_sprintf( outstring, sizeof(outstring), "\tgameset\t%d\n", cgs.gameset );
-	trap_FS_Write( outstring, strlen(outstring), f );
+	FS_Write( outstring, strlen(outstring), f );
 
 	Com_sprintf( outstring, sizeof(outstring), "\tgametype\t%d\n", cgs.gametype );
-	trap_FS_Write( outstring, strlen(outstring), f );
+	FS_Write( outstring, strlen(outstring), f );
 
 	Com_sprintf( outstring, sizeof(outstring), "\tmission\t%s\n", scriptname );
-	trap_FS_Write( outstring, strlen(outstring), f );
+	FS_Write( outstring, strlen(outstring), f );
 
 	Com_sprintf( outstring, sizeof(outstring), "\tgoal\tSearchAndDestroy\n}\n\n" );
-	trap_FS_Write( outstring, strlen(outstring), f );
+	FS_Write( outstring, strlen(outstring), f );
 
 	// entities and groundinstallations
 	Com_sprintf( outstring, sizeof(outstring), "Entities\n{\n", mapname );
-	trap_FS_Write( outstring, strlen(outstring), f );
+	FS_Write( outstring, strlen(outstring), f );
 	for( i = 0; i < IGME_MAX_VEHICLES; ++i ) {
 		veh = &cgs.IGME.vehicles[i]; 
 		if( !veh->active ) continue;
 		if( veh->groundInstallation	)
 		{
 			Com_sprintf( outstring, sizeof(outstring), "\tGroundInstallation\n\t{\n", mapname );
-			trap_FS_Write( outstring, strlen(outstring), f );
+			FS_Write( outstring, strlen(outstring), f );
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\tIndex\t%d\n", veh->vehidx );
-			trap_FS_Write( outstring, strlen(outstring), f );
+			FS_Write( outstring, strlen(outstring), f );
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\tName\tSAM Turret\n" );
-			trap_FS_Write( outstring, strlen(outstring), f );
+			FS_Write( outstring, strlen(outstring), f );
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\tTeam\t?\n" ); // ADD TEAM HERE!
-			trap_FS_Write( outstring, strlen(outstring), f );
+			FS_Write( outstring, strlen(outstring), f );
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\tOrigin\t%f;%f;%f\n", veh->origin[0],
 				veh->origin[1], veh->origin[2]);
-			trap_FS_Write( outstring, strlen(outstring), f );
+			FS_Write( outstring, strlen(outstring), f );
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\tAngles\t%f;%f;%f\n", veh->angles[0],
 				veh->angles[1], veh->angles[2]);
-			trap_FS_Write( outstring, strlen(outstring), f );
+			FS_Write( outstring, strlen(outstring), f );
 
 			Com_sprintf( outstring, sizeof(outstring), "\t}\n\n", mapname );
-			trap_FS_Write( outstring, strlen(outstring), f );
+			FS_Write( outstring, strlen(outstring), f );
 		}
 		else
 		{
 			Com_sprintf( outstring, sizeof(outstring), "\tVehicle\n\t{\n", mapname );
-			trap_FS_Write( outstring, strlen(outstring), f );
+			FS_Write( outstring, strlen(outstring), f );
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\tIndex\t%d\n", veh->vehidx );
-			trap_FS_Write( outstring, strlen(outstring), f );
+			FS_Write( outstring, strlen(outstring), f );
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\tName\t%s\n", availableVehicles[veh->vehidx].modelName );
-			trap_FS_Write( outstring, strlen(outstring), f );
+			FS_Write( outstring, strlen(outstring), f );
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\tTeam\t%d\n", availableVehicles[veh->vehidx].team ); 
-			trap_FS_Write( outstring, strlen(outstring), f );
+			FS_Write( outstring, strlen(outstring), f );
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\tOrigin\t%f;%f;%f\n", veh->origin[0],
 				veh->origin[1], veh->origin[2]);
-			trap_FS_Write( outstring, strlen(outstring), f );
+			FS_Write( outstring, strlen(outstring), f );
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\tAngles\t%f;%f;%f\n", veh->angles[0],
 				veh->angles[1], veh->angles[2]);
-			trap_FS_Write( outstring, strlen(outstring), f );
+			FS_Write( outstring, strlen(outstring), f );
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\tWaypoints\n\t\t{\n" );
-			trap_FS_Write( outstring, strlen(outstring), f );
+			FS_Write( outstring, strlen(outstring), f );
 
 			for( j = 0; j < IGME_MAX_WAYPOINTS; ++j ) 
 			{
 				if( !veh->waypoints[j].active ) break;//as they are in a row
 				Com_sprintf( outstring, sizeof(outstring), "\t\t\tOrigin\t%f;%f;%f\n", veh->waypoints[j].origin[0],
 					veh->waypoints[j].origin[1], veh->waypoints[j].origin[2]);
-				trap_FS_Write( outstring, strlen(outstring), f );
+				FS_Write( outstring, strlen(outstring), f );
 
 			}
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\t}\n\t}\n\n", mapname );
-			trap_FS_Write( outstring, strlen(outstring), f );
+			FS_Write( outstring, strlen(outstring), f );
 		}
 	}
 	Com_sprintf( outstring, sizeof(outstring), "}\n", mapname );
-	trap_FS_Write( outstring, strlen(outstring), f );
+	FS_Write( outstring, strlen(outstring), f );
 
 
 
 	CG_Printf("Successfully saved to script\n");
 
-	trap_FS_FCloseFile(f);
+	FS_FCloseFile(f);
 
 
 
 
-
-
-
-	// also possible to send it to ui like this:
-//	trap_SendConsoleCommand("ui_save_to_script whatever");
 }
 
 
@@ -1031,7 +1026,7 @@ static bool ME_LoadOverviewAndEntities( char *filename,
 	char				inbuffer[MAX_MISSION_TEXT];
 
 	// open the file, fill it into buffer and close it, afterwards parse it
-	len = trap_FS_FOpenFile( filename, &f, FS_READ );
+	len = FS_FOpenFileByMode( filename, &f, FS_READ );
 	if ( !f ) 
 	{
 		Com_Printf( va( S_COLOR_RED "file not found: %s\n", filename ) );
@@ -1040,13 +1035,13 @@ static bool ME_LoadOverviewAndEntities( char *filename,
 	if ( len >= MAX_MISSION_TEXT ) 
 	{
 		Com_Printf( va( S_COLOR_RED "file too large: %s is %i, max allowed is %i", filename, len, MAX_MISSION_TEXT ) );
-		trap_FS_FCloseFile( f );
+		FS_FCloseFile( f );
 		return false;
 	}
 
-	trap_FS_Read( inbuffer, len, f );
+	FS_Read2( inbuffer, len, f );
 	inbuffer[len] = 0;
-	trap_FS_FCloseFile( f );
+	FS_FCloseFile( f );
 
 	Com_Printf( va(S_COLOR_GREEN "Successfully opened mission script: %s\n", filename) );
 
@@ -1084,8 +1079,6 @@ void ME_ImportScript( const char* scriptname )
 	// spawn New stuff
 	ME_SpawnMissionVehicles(vehicles);
 	ME_SpawnMissionGroundInstallations(installations);
-
-//	trap_Printf( va("Loaded: %s\n", inbuffer) );
 }
 
 // loads up initial mission (specified in mf_mission)

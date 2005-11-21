@@ -1378,7 +1378,8 @@ static void RoQShutdown( void ) {
 SCR_StopCinematic
 ==================
 */
-e_status CIN_StopCinematic(int handle) {
+e_status CIN_StopCinematic(int handle) 
+{
 	
 	if (handle < 0 || handle>= MAX_VIDEO_HANDLES || cinTable[handle].status == FMV_EOF) return FMV_EOF;
 	currentHandle = handle;
@@ -1485,7 +1486,8 @@ CL_PlayCinematic
 
 ==================
 */
-int CIN_PlayCinematic( const char *arg, int x, int y, int w, int h, int systemBits ) {
+int CIN_PlayCinematic( const char *arg, int x, int y, int w, int h, int systemBits ) 
+{
 	unsigned short RoQID;
 	char	name[MAX_OSPATH];
 	int		i;
@@ -1575,7 +1577,8 @@ int CIN_PlayCinematic( const char *arg, int x, int y, int w, int h, int systemBi
 	return -1;
 }
 
-void CIN_SetExtents (int handle, int x, int y, int w, int h) {
+void CIN_SetExtents (int handle, int x, int y, int w, int h) 
+{
 	if (handle < 0 || handle>= MAX_VIDEO_HANDLES || cinTable[handle].status == FMV_EOF) return;
 	cinTable[handle].xpos = x;
 	cinTable[handle].ypos = y;
@@ -1595,7 +1598,8 @@ SCR_DrawCinematic
 
 ==================
 */
-void CIN_DrawCinematic (int handle) {
+void CIN_DrawCinematic (int handle) 
+{
 	float	x, y, w, h;
 	byte	*buf;
 
@@ -1661,13 +1665,13 @@ void CIN_DrawCinematic (int handle) {
                             }
                     }
                 }
-		re.DrawStretchRaw( x, y, w, h, 256, 256, (byte *)buf2, handle, true);
+		refExport.DrawStretchRaw( x, y, w, h, 256, 256, (byte *)buf2, handle, true);
 		cinTable[handle].dirty = false;
 		Hunk_FreeTempMemory(buf2);
 		return;
 	}
 
-	re.DrawStretchRaw( x, y, w, h, cinTable[handle].drawX, cinTable[handle].drawY, buf, handle, cinTable[handle].dirty);
+	refExport.DrawStretchRaw( x, y, w, h, cinTable[handle].drawX, cinTable[handle].drawY, buf, handle, cinTable[handle].dirty);
 	cinTable[handle].dirty = false;
 }
 
@@ -1740,7 +1744,7 @@ void CIN_UploadCinematic(int handle) {
 				}
 			}
 		}
-		re.UploadCinematic( 256, 256, 256, 256, cinTable[handle].buf, handle, cinTable[handle].dirty);
+		refExport.UploadCinematic( 256, 256, 256, 256, cinTable[handle].buf, handle, cinTable[handle].dirty);
 		if (cl_inGameVideo->integer == 0 && cinTable[handle].playonwalls == 1) {
 			cinTable[handle].playonwalls--;
 		}

@@ -1,5 +1,5 @@
 /*
- * $Id: g_miscvehicle.c,v 1.4 2005-11-20 11:21:38 thebjoern Exp $
+ * $Id: g_miscvehicle.c,v 1.5 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 
@@ -37,7 +37,7 @@ void misc_vehicle_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacke
 
 	G_RadiusDamage( self->r.currentOrigin, self, 150, 150, self, MOD_VEHICLEEXPLOSION, CAT_ANY );
 
-	trap_LinkEntity( &self->s, &self->r );
+	SV_LinkEntity( &self->s, &self->r );
 	
 }
 
@@ -66,7 +66,7 @@ static void SP_misc_plane( gentity_t *ent )
 	startpos[2] += 64;
 	VectorCopy( ent->s.origin, endpos );
 	endpos[2] -= 256;
-	trap_Trace (&trace, startpos, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_SOLID );
+	SV_Trace (&trace, startpos, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_SOLID, false );
 	if( trace.entityNum != ENTITYNUM_NONE ) {
 		test = &g_entities[trace.entityNum];
 		if( canLandOnIt(test) ) {
@@ -92,7 +92,7 @@ static void SP_misc_plane( gentity_t *ent )
 	if( ent->targetname ) {
 		char filename[MAX_FILEPATH];
 		char buffer[33];
-		trap_Cvar_VariableStringBuffer("mapname", buffer, 32);
+		Cvar_VariableStringBuffer("mapname", buffer, 32);
 		Com_sprintf( filename, MAX_FILEPATH, "dronefiles/%s/%s.drone", buffer, ent->targetname );
 		if( LoadVehicleScripts( ent, filename ) ) {
 			if( !(ent->s.ONOFF & OO_LANDED) && landed ) landed = false;
@@ -128,7 +128,7 @@ static void SP_misc_plane( gentity_t *ent )
 	ent->updateBay = true;
 
 	ent->s.pos.trTime = level.time;
-	trap_LinkEntity (&ent->s, &ent->r);
+	SV_LinkEntity (&ent->s, &ent->r);
 
 }
 
@@ -143,7 +143,7 @@ static void SP_misc_gv( gentity_t *ent )
 	startpos[2] += 64;
 	VectorCopy( ent->s.origin, endpos );
 	endpos[2] -= 512;
-	trap_Trace (&trace, startpos, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_SOLID );
+	SV_Trace (&trace, startpos, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_SOLID, false );
 	if( trace.entityNum != ENTITYNUM_NONE ) {
 		test = &g_entities[trace.entityNum];
 		ent->s.origin[2] = trace.endpos[2] - availableVehicles[vehIndex].mins[2] + 1;
@@ -162,7 +162,7 @@ static void SP_misc_gv( gentity_t *ent )
 	if( ent->targetname ) {
 		char filename[MAX_FILEPATH];
 		char buffer[33];
-		trap_Cvar_VariableStringBuffer("mapname", buffer, 32);
+		Cvar_VariableStringBuffer("mapname", buffer, 32);
 		Com_sprintf( filename, MAX_FILEPATH, "dronefiles/%s/%s.drone", buffer, ent->targetname );
 		if( LoadVehicleScripts( ent, filename ) ) {
 			faceFirstWaypoint(ent);
@@ -177,7 +177,7 @@ static void SP_misc_gv( gentity_t *ent )
 
 	} 
 
-	trap_LinkEntity (&ent->s, &ent->r);
+	SV_LinkEntity (&ent->s, &ent->r);
 
 	// set functions
 //	ent->touch = Touch_Plane;
@@ -196,7 +196,7 @@ static void SP_misc_helo( gentity_t *ent )
 	startpos[2] += 64;
 	VectorCopy( ent->s.origin, endpos );
 	endpos[2] -= 512;
-	trap_Trace (&trace, startpos, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_SOLID );
+	SV_Trace (&trace, startpos, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_SOLID, false );
 	if( trace.entityNum != ENTITYNUM_NONE ) {
 		test = &g_entities[trace.entityNum];
 		ent->s.origin[2] = trace.endpos[2] - availableVehicles[vehIndex].mins[2] + 1;
@@ -222,7 +222,7 @@ static void SP_misc_helo( gentity_t *ent )
 	if( ent->targetname ) {
 		char filename[MAX_FILEPATH];
 		char buffer[33];
-		trap_Cvar_VariableStringBuffer("mapname", buffer, 32);
+		Cvar_VariableStringBuffer("mapname", buffer, 32);
 		Com_sprintf( filename, MAX_FILEPATH, "dronefiles/%s/%s.drone", buffer, ent->targetname );
 		if( LoadVehicleScripts( ent, filename ) ) {
 			faceFirstWaypoint(ent);
@@ -237,7 +237,7 @@ static void SP_misc_helo( gentity_t *ent )
 
 	} 
 
-	trap_LinkEntity (&ent->s, &ent->r);
+	SV_LinkEntity (&ent->s, &ent->r);
 
 	// set functions
 //	ent->touch = Touch_Plane;
@@ -256,7 +256,7 @@ static void SP_misc_boat( gentity_t *ent )
 	startpos[2] += 64;
 	VectorCopy( ent->s.origin, endpos );
 	endpos[2] -= 512;
-	trap_Trace (&trace, startpos, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_SOLID );
+	SV_Trace (&trace, startpos, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_SOLID, false );
 	if( trace.entityNum != ENTITYNUM_NONE ) {
 		test = &g_entities[trace.entityNum];
 		ent->s.origin[2] = trace.endpos[2] - availableVehicles[vehIndex].mins[2] + 1;
@@ -275,7 +275,7 @@ static void SP_misc_boat( gentity_t *ent )
 	if( ent->targetname ) {
 		char filename[MAX_FILEPATH];
 		char buffer[33];
-		trap_Cvar_VariableStringBuffer("mapname", buffer, 32);
+		Cvar_VariableStringBuffer("mapname", buffer, 32);
 		Com_sprintf( filename, MAX_FILEPATH, "dronefiles/%s/%s.drone", buffer, ent->targetname );
 		if( LoadVehicleScripts( ent, filename ) ) {
 			faceFirstWaypoint(ent);
@@ -290,7 +290,7 @@ static void SP_misc_boat( gentity_t *ent )
 
 	} 
 
-	trap_LinkEntity (&ent->s, &ent->r);
+	SV_LinkEntity (&ent->s, &ent->r);
 
 	// set functions
 //	ent->touch = Touch_Plane;
@@ -445,7 +445,7 @@ void SP_misc_vehicle( gentity_t *sp_ent )
 
 	ent->idxScriptBegin = ent->idxScriptEnd = -1;
 
-	trap_LinkEntity (&ent->s, &ent->r);
+	SV_LinkEntity (&ent->s, &ent->r);
 
 	G_FreeEntity(sp_ent);
 }
@@ -520,7 +520,7 @@ void SP_misc_groundinstallation( gentity_t *sp_ent )
 
 	ent->s.ONOFF = OO_RADAR;
 
-	trap_LinkEntity (&ent->s, &ent->r);
+	SV_LinkEntity (&ent->s, &ent->r);
 
 	G_FreeEntity(sp_ent);
 }

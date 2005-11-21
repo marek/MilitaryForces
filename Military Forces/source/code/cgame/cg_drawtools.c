@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawtools.c,v 1.3 2005-11-12 14:28:13 thebjoern Exp $
+ * $Id: cg_drawtools.c,v 1.4 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -27,12 +27,12 @@ void CG_DrawProgressBar( rectDef_t *rect, vec4_t color, vec4_t textcolor, float 
 	doneWidth = ( rect->w - 2 * rimWidth ) * progress;
 	leftWidth = ( rect->w - 2 * rimWidth ) - doneWidth;
   
-	trap_R_SetColor( color );
+	refExport.SetColor( color );
 	CG_DrawPic( rect->x, rect->y, rimWidth + doneWidth, rect->h, cgs.media.whiteShader );
 	CG_DrawPic( rimWidth + rect->x + doneWidth, rect->y, leftWidth, rimWidth, cgs.media.whiteShader );
 	CG_DrawPic( rimWidth + rect->x + doneWidth, rect->y + rect->h - rimWidth, leftWidth, rimWidth, cgs.media.whiteShader );
 	CG_DrawPic( rect->x + rect->w - rimWidth, rect->y, rimWidth, rect->h, cgs.media.whiteShader );
-	trap_R_SetColor( NULL );
+	refExport.SetColor( NULL );
   
 	//draw text
 	if( scale > 0.0 )
@@ -74,12 +74,12 @@ Coordinates are 640*480 virtual values
 =================
 */
 void CG_FillRect( float x, float y, float width, float height, const float *color ) {
-	trap_R_SetColor( color );
+	refExport.SetColor( color );
 
 	CG_AdjustFrom640( &x, &y, &width, &height );
-	trap_R_DrawStretchPic( x, y, width, height, 0, 0, 0, 0, cgs.media.whiteShader );
+	refExport.DrawStretchPic( x, y, width, height, 0, 0, 0, 0, cgs.media.whiteShader );
 
-	trap_R_SetColor( NULL );
+	refExport.SetColor( NULL );
 }
 
 /*
@@ -92,15 +92,15 @@ Coords are virtual 640x480
 void CG_DrawSides(float x, float y, float w, float h, float size) {
 	CG_AdjustFrom640( &x, &y, &w, &h );
 	size *= cgs.screenXScale;
-	trap_R_DrawStretchPic( x, y, size, h, 0, 0, 0, 0, cgs.media.whiteShader );
-	trap_R_DrawStretchPic( x + w - size, y, size, h, 0, 0, 0, 0, cgs.media.whiteShader );
+	refExport.DrawStretchPic( x, y, size, h, 0, 0, 0, 0, cgs.media.whiteShader );
+	refExport.DrawStretchPic( x + w - size, y, size, h, 0, 0, 0, 0, cgs.media.whiteShader );
 }
 
 void CG_DrawTopBottom(float x, float y, float w, float h, float size) {
 	CG_AdjustFrom640( &x, &y, &w, &h );
 	size *= cgs.screenYScale;
-	trap_R_DrawStretchPic( x, y, w, size, 0, 0, 0, 0, cgs.media.whiteShader );
-	trap_R_DrawStretchPic( x, y + h - size, w, size, 0, 0, 0, 0, cgs.media.whiteShader );
+	refExport.DrawStretchPic( x, y, w, size, 0, 0, 0, 0, cgs.media.whiteShader );
+	refExport.DrawStretchPic( x, y + h - size, w, size, 0, 0, 0, 0, cgs.media.whiteShader );
 }
 /*
 ================
@@ -110,12 +110,12 @@ Coordinates are 640*480 virtual values
 =================
 */
 void CG_DrawRect( float x, float y, float width, float height, float size, const float *color ) {
-	trap_R_SetColor( color );
+	refExport.SetColor( color );
 
   CG_DrawTopBottom(x, y, width, height, size);
   CG_DrawSides(x, y, width, height, size);
 
-	trap_R_SetColor( NULL );
+	refExport.SetColor( NULL );
 }
 
 
@@ -129,7 +129,7 @@ Coordinates are 640*480 virtual values
 */
 void CG_DrawPic( float x, float y, float width, float height, qhandle_t hShader ) {
 	CG_AdjustFrom640( &x, &y, &width, &height );
-	trap_R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, hShader );
+	refExport.DrawStretchPic( x, y, width, height, 0, 0, 1, 1, hShader );
 }
 
 
@@ -166,7 +166,7 @@ void CG_DrawChar( int x, int y, int width, int height, int ch ) {
 	fcol = col*0.0625;
 	size = 0.0625;
 
-	trap_R_DrawStretchPic( ax, ay, aw, ah,
+	refExport.DrawStretchPic( ax, ay, aw, ah,
 					   fcol, frow, 
 					   fcol + size, frow + size, 
 					   cgs.media.charsetShader );
@@ -197,7 +197,7 @@ void CG_DrawStringExt( int x, int y, const char *string, const float *setColor,
 	if (shadow) {
 		color[0] = color[1] = color[2] = 0;
 		color[3] = setColor[3];
-		trap_R_SetColor( color );
+		refExport.SetColor( color );
 		s = string;
 		xx = x;
 		cnt = 0;
@@ -217,13 +217,13 @@ void CG_DrawStringExt( int x, int y, const char *string, const float *setColor,
 	s = string;
 	xx = x;
 	cnt = 0;
-	trap_R_SetColor( setColor );
+	refExport.SetColor( setColor );
 	while ( *s && cnt < maxChars) {
 		if ( Q_IsColorString( s ) ) {
 			if ( !forceColor ) {
 				memcpy( color, g_color_table[ColorIndex(*(s+1))], sizeof( color ) );
 				color[3] = setColor[3];
-				trap_R_SetColor( color );
+				refExport.SetColor( color );
 			}
 			s += 2;
 			continue;
@@ -233,7 +233,7 @@ void CG_DrawStringExt( int x, int y, const char *string, const float *setColor,
 		cnt++;
 		s++;
 	}
-	trap_R_SetColor( NULL );
+	refExport.SetColor( NULL );
 }
 
 void CG_DrawBigString( int x, int y, const char *s, float alpha ) {
@@ -298,7 +298,7 @@ static void CG_TileClearBox( int x, int y, int w, int h, qhandle_t hShader ) {
 	t1 = y/64.0;
 	s2 = (x+w)/64.0;
 	t2 = (y+h)/64.0;
-	trap_R_DrawStretchPic( x, y, w, h, s1, t1, s2, t2, hShader );
+	refExport.DrawStretchPic( x, y, w, h, s1, t1, s2, t2, hShader );
 }
 
 
@@ -566,7 +566,7 @@ static void UI_DrawBannerString2( int x, int y, const char* str, vec4_t color )
 	float	fheight;
 
 	// draw the colored text
-	trap_R_SetColor( color );
+	refExport.SetColor( color );
 	
 	ax = x * cgs.screenXScale + cgs.screenXBias;
 	ay = y * cgs.screenXScale;
@@ -586,13 +586,13 @@ static void UI_DrawBannerString2( int x, int y, const char* str, vec4_t color )
 			fheight = (float)PROPB_HEIGHT / 256.0f;
 			aw = (float)propMapB[ch][2] * cgs.screenXScale;
 			ah = (float)PROPB_HEIGHT * cgs.screenXScale;
-			trap_R_DrawStretchPic( ax, ay, aw, ah, fcol, frow, fcol+fwidth, frow+fheight, cgs.media.charsetPropB );
+			refExport.DrawStretchPic( ax, ay, aw, ah, fcol, frow, fcol+fwidth, frow+fheight, cgs.media.charsetPropB );
 			ax += (aw + (float)PROPB_GAP_WIDTH * cgs.screenXScale);
 		}
 		s++;
 	}
 
-	trap_R_SetColor( NULL );
+	refExport.SetColor( NULL );
 }
 
 void UI_DrawBannerString( int x, int y, const char* str, int style, vec4_t color ) {
@@ -676,7 +676,7 @@ static void UI_DrawProportionalString2( int x, int y, const char* str, vec4_t co
 	float	fheight;
 
 	// draw the colored text
-	trap_R_SetColor( color );
+	refExport.SetColor( color );
 	
 	ax = x * cgs.screenXScale + cgs.screenXBias;
 	ay = y * cgs.screenXScale;
@@ -694,7 +694,7 @@ static void UI_DrawProportionalString2( int x, int y, const char* str, vec4_t co
 			fheight = (float)PROP_HEIGHT / 256.0f;
 			aw = (float)propMap[ch][2] * cgs.screenXScale * sizeScale;
 			ah = (float)PROP_HEIGHT * cgs.screenXScale * sizeScale;
-			trap_R_DrawStretchPic( ax, ay, aw, ah, fcol, frow, fcol+fwidth, frow+fheight, charset );
+			refExport.DrawStretchPic( ax, ay, aw, ah, fcol, frow, fcol+fwidth, frow+fheight, charset );
 		} else {
 			aw = 0;
 		}
@@ -703,7 +703,7 @@ static void UI_DrawProportionalString2( int x, int y, const char* str, vec4_t co
 		s++;
 	}
 
-	trap_R_SetColor( NULL );
+	refExport.SetColor( NULL );
 }
 
 /*
@@ -819,75 +819,6 @@ int CG_GetVehicleShadowShader( int vehicle )
 	return shaderHandle;
 }
 
-/*
-===============
-CG_MarkGeneratedShadow
-
-Uses the wall-marks system of Q3 to draw shadows
-===============
-*/
-//static bool CG_MarkGeneratedShadow( BasicDrawInfo_t *drawInfo, float *shadowPlane )
-//{
-//	vec3_t		start, end, mins = {-15, -15, 0}, maxs = {15, 15, 2};
-//	trace_t		trace;
-//	float		alpha;
-//	float		xRad, yRad;
-//	float		xAlter, yAlter;
-//	qhandle_t	shaderHandle = -1;
-//
-//	*shadowPlane = 0;
-//
-//	// send a trace down from the player to the ground
-//	VectorCopy( drawInfo->origin, start );
-//	VectorCopy( drawInfo->origin, end );
-//	start[2] += 64;	// move start-point's Z upwards a little
-//	end[2] -= 256;	// move end-point's Z downwards somewhat
-//	trap_CM_BoxTrace( &trace, start, end, mins, maxs, 0, MASK_PLAYERSOLID );
-//
-//	// no shadow if too high from the ground
-//	if( trace.fraction == 1.0 )
-//	{
-//		return false;
-//	}
-//
-//	// set the shadow plane value
-//	*shadowPlane = trace.endpos[2] + 1;
-//
-//	// fade the shadow out with height
-//	alpha = 1.0f - trace.fraction;
-//	MF_LimitFloat( &alpha, 0.0f, 1.0f );
-//
-//	// get the shader handle
-//	shaderHandle = CG_GetVehicleShadowShader( drawInfo->vehicleIndex );
-//	if( !shaderHandle )
-//	{
-//		return true;
-//	}
-//
-//	// assign the x/y radius values based on the vehicle bounding box
-//	// NOTE: we might need to setup dedicated values in availableVehicles[] for this later
-//	xRad = availableVehicles[ drawInfo->vehicleIndex ].maxs[ 0 ];
-//	yRad = availableVehicles[ drawInfo->vehicleIndex ].maxs[ 1 ];
-//
-//	// PLANES ONLY: alter the radius values based upon the vehicles pitch & roll
-//	if( (availableVehicles[ drawInfo->vehicleIndex ].cat & CAT_PLANE) || 
-//		(availableVehicles[ drawInfo->vehicleIndex ].cat & CAT_HELO) ) {
-//		xAlter = fabs( drawInfo->angles[0] / 30.0f );
-//		yAlter = fabs( drawInfo->angles[2] / 90.0f );
-//		MF_LimitFloat( &xAlter, 0.0f, 1.0f );
-//		MF_LimitFloat( &yAlter, 0.0f, 1.0f );
-//		xRad *= 1.0f - ( 0.9f * xAlter );
-//		yRad *= 1.0f - ( 0.5f * yAlter );
-//	}
-//
-//	// add the mark as a temporary, so it goes directly to the renderer
-//	// without taking a spot in the cg_marks array
-//	CG_ImpactMarkEx( shaderHandle, trace.endpos, trace.plane.normal, 
-//					 (drawInfo->angles[1]-180), alpha, alpha, alpha, 1, false, xRad, yRad, true );
-//
-//	return true;
-//}
-	
 /*
 ===============
 CG_PolyMeshGeneratedShadow
@@ -1103,7 +1034,7 @@ static bool CG_PolyMeshGeneratedShadow( BasicDrawInfo_t *drawInfo, float *shadow
 			memcpy( &vertBuff[0], &verts[y+1][x], sizeof( polyVert_t ) );
 	
 			// add the current temporary verts as a polygon
-			trap_R_AddPolyToScene( shaderHandle, 4, vertBuff );
+			refExport.AddPolyToScene( shaderHandle, 4, vertBuff, 1 );
 		}
 	}
 
@@ -1264,7 +1195,7 @@ void CG_AddReticleEntityToScene( refEntity_t * pReticle, centity_t * pTarget )
 	{
 		// if added to the scene and drawn as a RT_SPRITE
 #ifndef _DRAW_AS_HUD
-		trap_R_AddRefEntityToScene( pRecticle );
+		refExport.AddRefEntityToScene( pRecticle );
 #else
 		// if HUD image
 		if( CG_WorldToScreenCoords( pReticle->origin, &cg.HUDReticle[cg.reticleIdx].x, &cg.HUDReticle[cg.reticleIdx].y, true ) )

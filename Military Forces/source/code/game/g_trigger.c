@@ -1,5 +1,5 @@
 /*
- * $Id: g_trigger.c,v 1.3 2005-11-20 11:21:38 thebjoern Exp $
+ * $Id: g_trigger.c,v 1.4 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -7,12 +7,13 @@
 #include "g_local.h"
 
 
-void InitTrigger( gentity_t *self ) {
+void InitTrigger( gentity_t *self ) 
+{
 	if (!VectorCompare (self->s.angles, vec3_origin))
 		G_SetMovedir (self->s.angles, self->movedir);
 
-	trap_SetBrushModel( &self->s, &self->r, self->model );
-	self->r.contents = CONTENTS_TRIGGER;		// replaces the -1 from trap_SetBrushModel
+	SV_SetBrushModel( &self->s, &self->r, self->model );
+	self->r.contents = CONTENTS_TRIGGER;		// replaces the -1 from SV_SetBrushModel
 	self->r.svFlags = SVF_NOCLIENT;
 }
 
@@ -88,7 +89,7 @@ void SP_trigger_multiple( gentity_t *ent ) {
 	ent->use = Use_Multi;
 
 	InitTrigger( ent );
-	trap_LinkEntity (&ent->s, &ent->r);
+	SV_LinkEntity (&ent->s, &ent->r);
 }
 
 

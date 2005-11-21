@@ -1,5 +1,5 @@
 /*
- * $Id: g_mfq3util.c,v 1.5 2005-11-20 11:21:38 thebjoern Exp $
+ * $Id: g_mfq3util.c,v 1.6 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 
@@ -100,7 +100,7 @@ void updateTargetTracking( gentity_t *ent )
 	// no target yet
 	if( !ent->tracktarget ) {
 		VectorMA( ent->r.currentOrigin, radarrange, forward, endpos );
-		trap_Trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, endpos, ent->s.number, MASK_ALL );
+		SV_Trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, endpos, ent->s.number, MASK_ALL, false );
 		// nothing found
 		if( tr.entityNum == ENTITYNUM_NONE ) {
 			return;
@@ -173,7 +173,7 @@ void updateTargetTracking( gentity_t *ent )
 			
 		// check LOS
 		VectorMA( ent->r.currentOrigin, dist, diff, endpos );
-		trap_Trace( &tr, ent->r.currentOrigin, 0, 0, endpos, ent->s.number, MASK_PLAYERSOLID  );
+		SV_Trace( &tr, ent->r.currentOrigin, 0, 0, endpos, ent->s.number, MASK_PLAYERSOLID, false );
 		if( tr.fraction < 1 && tr.entityNum != ent->s.tracktarget ) {
 			untrack(ent);
 			return;

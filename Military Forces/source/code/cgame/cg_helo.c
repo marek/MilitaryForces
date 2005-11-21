@@ -1,5 +1,5 @@
 /*
- * $Id: cg_helo.c,v 1.4 2005-11-20 11:21:38 thebjoern Exp $
+ * $Id: cg_helo.c,v 1.5 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 
@@ -70,7 +70,7 @@ void CG_HeloPilot( centity_t *cent, const refEntity_t *parent, qhandle_t parentM
 			AxisCopy( axisDefault, pilot[k].axis );
 			Com_sprintf( tag, 12, "tag_pilot%d", i+1 );
 			CG_PositionRotatedEntityOnTag( &pilot[k], parent, parentModel, tag);
-			trap_R_AddRefEntityToScene( &pilot[k] );
+			refExport.AddRefEntityToScene( &pilot[k] );
 		}
 	}*/
 }
@@ -95,13 +95,13 @@ static void CG_HeloFlags( centity_t *cent ) {
 	// redflag
 	if ( powerups & OB_REDFLAG ) {
 		CG_TrailItem( cent, cgs.media.redFlagModel );
-//		trap_R_AddLightToScene( cent->lerpOrigin, 200 + (rand()&31), 1.0, 0.2f, 0.2f );
+//		refExport.AddLightToScene( cent->lerpOrigin, 200 + (rand()&31), 1.0, 0.2f, 0.2f );
 	}
 
 	// blueflag
 	if ( powerups & OB_BLUEFLAG ) {
 		CG_TrailItem( cent, cgs.media.blueFlagModel );
-//		trap_R_AddLightToScene( cent->lerpOrigin, 200 + (rand()&31), 0.2f, 0.2f, 1.0 );
+//		refExport.AddLightToScene( cent->lerpOrigin, 200 + (rand()&31), 0.2f, 0.2f, 1.0 );
 	}*/
 }
 

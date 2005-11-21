@@ -1,5 +1,5 @@
 /*
- * $Id: g_helo.c,v 1.3 2005-11-20 11:21:38 thebjoern Exp $
+ * $Id: g_helo.c,v 1.4 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 
@@ -26,7 +26,7 @@ void checkTakeoffLandingHelo( gentity_t *self )
 	}
 	VectorCopy( startpos, endpos );
 	endpos[2] -= height;
-	trap_Trace (&trace, startpos, NULL, NULL, endpos, self->s.number, MASK_PLAYERSOLID );
+	SV_Trace (&trace, startpos, NULL, NULL, endpos, self->s.number, MASK_PLAYERSOLID, false );
 
 	// check for takeoff
 	if((self->client->ps.ONOFF & OO_LANDEDTERRAIN) && throttle) {

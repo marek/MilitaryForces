@@ -1,5 +1,5 @@
 /*
- * $Id: g_public.h,v 1.5 2005-11-12 21:26:17 thebjoern Exp $
+ * $Id: g_public.h,v 1.6 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -48,8 +48,8 @@ typedef struct
 	int			svFlags;			// SVF_NOCLIENT, SVF_BROADCAST, etc
 	int			singleClient;		// only send to this client when SVF_SINGLECLIENT is set
 
-	bool	bmodel;				// if false, assume an explicit mins / maxs bounding box
-									// only set by trap_SetBrushModel
+	bool	bmodel;					// if false, assume an explicit mins / maxs bounding box
+									// only set by SetBrushModel
 	vec3_t		mins, maxs;
 	int			contents;			// CONTENTS_TRIGGER, CONTENTS_SOLID, CONTENTS_BODY, etc
 									// a non-solid entity should set to 0

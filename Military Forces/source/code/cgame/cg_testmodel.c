@@ -1,5 +1,5 @@
 /*
- * $Id: cg_testmodel.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: cg_testmodel.c,v 1.3 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -58,14 +58,14 @@ void CG_TestModel_f (void) {
 	vec3_t		angles;
 
 	memset( &cg.testModelEntity, 0, sizeof(cg.testModelEntity) );
-	if ( trap_Argc() < 2 ) {
+	if ( Cmd_Argc() < 2 ) {
 		return;
 	}
 
 	Q_strncpyz (cg.testModelName, CG_Argv( 1 ), MAX_QPATH );
-	cg.testModelEntity.hModel = trap_R_RegisterModel( cg.testModelName );
+	cg.testModelEntity.hModel = refExport.RegisterModel( cg.testModelName );
 
-	if ( trap_Argc() == 3 ) {
+	if ( Cmd_Argc() == 3 ) {
 		cg.testModelEntity.backlerp = atof( CG_Argv( 2 ) );
 		cg.testModelEntity.frame = 1;
 		cg.testModelEntity.oldframe = 0;
@@ -129,7 +129,7 @@ void CG_AddTestModel (void) {
 	int		i;
 
 	// re-register the model, because the level may have changed
-	cg.testModelEntity.hModel = trap_R_RegisterModel( cg.testModelName );
+	cg.testModelEntity.hModel = refExport.RegisterModel( cg.testModelName );
 	if (! cg.testModelEntity.hModel ) {
 		CG_Printf ("Can't register model\n");
 		return;
@@ -150,7 +150,7 @@ void CG_AddTestModel (void) {
 		}
 	}
 
-	trap_R_AddRefEntityToScene( &cg.testModelEntity );
+	refExport.AddRefEntityToScene( &cg.testModelEntity );
 }
 
 static void registerTestVehicle()
@@ -197,7 +197,7 @@ static void registerTestVehicle()
 					Com_sprintf( name, sizeof(name), "%s_prop.md3", basename );
 					break;
 				}
-				cg.testVehicleParts[i].hModel = trap_R_RegisterModel( name );
+				cg.testVehicleParts[i].hModel = refExport.RegisterModel( name );
 			}
 		}
 		cg.testBurner.hModel = cgs.media.afterburner[cg.testBurnerNum];
@@ -238,7 +238,7 @@ static void registerTestVehicle()
 					Com_sprintf( name, sizeof(name), "%s_w6.md3", basename );
 					break;
 				}
-				cg.testVehicleParts[i].hModel = trap_R_RegisterModel( name );
+				cg.testVehicleParts[i].hModel = refExport.RegisterModel( name );
 			}
 		}
 		break;
@@ -256,7 +256,7 @@ void CG_AddTestVehicle (void) {
 		return;
 	}
 
-	trap_R_AddRefEntityToScene( &cg.testVehicleParts[0] );
+	refExport.AddRefEntityToScene( &cg.testVehicleParts[0] );
 
 	switch( cg.testVehicleCat ) {
 		case CAT_PLANE:
@@ -275,15 +275,15 @@ void CG_AddTestVehicle (void) {
 							cg.testVehicleParts[BP_PLANE_CONTROLS].frame -= 9;
 						}
 					}
-					trap_R_AddRefEntityToScene( &cg.testVehicleParts[i] );
+					refExport.AddRefEntityToScene( &cg.testVehicleParts[i] );
 					if( cg.testVehicleParts[BP_PLANE_BODY].frame ) {
 						CG_PositionEntityOnTag( &cg.testBurner, &cg.testVehicleParts[0], 
 												cg.testVehicleParts[0].hModel, "tag_ab1" );
-						trap_R_AddRefEntityToScene( &cg.testBurner );
+						refExport.AddRefEntityToScene( &cg.testBurner );
 						if( cg.testNumBurners ) {
 							CG_PositionEntityOnTag( &cg.testBurner2, &cg.testVehicleParts[0], 
 													cg.testVehicleParts[0].hModel, "tag_ab2" );
-							trap_R_AddRefEntityToScene( &cg.testBurner2 );
+							refExport.AddRefEntityToScene( &cg.testBurner2 );
 						}
 
 					}
@@ -291,7 +291,7 @@ void CG_AddTestVehicle (void) {
 						cg.testVapor.frame = cg.testVaporFrame-1;
 						CG_PositionEntityOnTag( &cg.testVapor, &cg.testVehicleParts[0], 
 												cg.testVehicleParts[0].hModel, "tag_vapor1" );
-						trap_R_AddRefEntityToScene( &cg.testVapor );
+						refExport.AddRefEntityToScene( &cg.testVapor );
 					}
 				}
 			}
@@ -302,10 +302,10 @@ void CG_AddTestVehicle (void) {
 					if( ! cg.testVehicleParts[i].hModel ) continue;
 					CG_PositionEntityOnTag( &cg.testVehicleParts[1], &cg.testVehicleParts[0], 
 						cg.testVehicleParts[0].hModel, gv_tags[1] );
-					trap_R_AddRefEntityToScene( &cg.testVehicleParts[1] );
+					refExport.AddRefEntityToScene( &cg.testVehicleParts[1] );
 					CG_PositionEntityOnTag( &cg.testVehicleParts[2], &cg.testVehicleParts[1], 
 						cg.testVehicleParts[1].hModel, gv_tags[2] );
-					trap_R_AddRefEntityToScene( &cg.testVehicleParts[2] );
+					refExport.AddRefEntityToScene( &cg.testVehicleParts[2] );
 				}
 			}
 			break;
@@ -326,7 +326,7 @@ void CG_TestVehicle (long cat) {
 		memset( &cg.testVehicleParts[i], 0, sizeof(cg.testVehicleParts[i]) );
 	}
 
-	if ( trap_Argc() < 2 ) {
+	if ( Cmd_Argc() < 2 ) {
 		return;
 	}
 
@@ -334,7 +334,7 @@ void CG_TestVehicle (long cat) {
 
 	registerTestVehicle();
 
-/*	if ( trap_Argc() == 3 ) {
+/*	if ( Cmd_Argc() == 3 ) {
 		cg.testModelEntity.backlerp = atof( CG_Argv( 2 ) );
 		cg.testModelEntity.frame = 1;
 		cg.testModelEntity.oldframe = 0;
@@ -365,7 +365,7 @@ void CG_TestPlaneCmd_f (void) {
 		return;
 	}
 
-	if ( trap_Argc() < 2 ) {
+	if ( Cmd_Argc() < 2 ) {
 		return;
 	}
 
@@ -430,7 +430,7 @@ void CG_TestGVCmd_f (void) {
 		return;
 	}
 
-	if ( trap_Argc() < 2 ) {
+	if ( Cmd_Argc() < 2 ) {
 		return;
 	}
 
