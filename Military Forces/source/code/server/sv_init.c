@@ -31,7 +31,8 @@ SV_SetConfigstring
 
 ===============
 */
-void SV_SetConfigstring (int index, const char *val) {
+void SV_SetConfigstring (int index, const char *val) 
+{
 	int		len, i;
 	int		maxChunkSize = MAX_STRING_CHARS - 24;
 	client_t	*client;
@@ -107,7 +108,8 @@ SV_GetConfigstring
 
 ===============
 */
-void SV_GetConfigstring( int index, char *buffer, int bufferSize ) {
+void SV_GetConfigstring( int index, char *buffer, int bufferSize ) 
+{
 	if ( bufferSize < 1 ) {
 		Com_Error( ERR_DROP, "SV_GetConfigstring: bufferSize == %i", bufferSize );
 	}
@@ -129,7 +131,8 @@ SV_SetUserinfo
 
 ===============
 */
-void SV_SetUserinfo( int index, const char *val ) {
+void SV_SetUserinfo( int index, const char *val ) 
+{
 	if ( index < 0 || index >= sv_maxclients->integer ) {
 		Com_Error (ERR_DROP, "SV_SetUserinfo: bad index %i\n", index);
 	}
@@ -150,7 +153,8 @@ SV_GetUserinfo
 
 ===============
 */
-void SV_GetUserinfo( int index, char *buffer, int bufferSize ) {
+void SV_GetUserinfo( int index, char *buffer, int bufferSize ) 
+{
 	if ( bufferSize < 1 ) {
 		Com_Error( ERR_DROP, "SV_GetUserinfo: bufferSize == %i", bufferSize );
 	}

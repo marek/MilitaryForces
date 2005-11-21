@@ -1,5 +1,5 @@
 /*
- * $Id: bg_boatmove.c,v 1.4 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: bg_boatmove.c,v 1.5 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -330,7 +330,8 @@ bool PM_SlideMove_Boat() {
 			   0,
 			   down,
 			   pm->ps->clientNum,
-			   MASK_ALL );
+			   MASK_ALL,
+			   false);
 	pm->ps->origin[2] = trace.endpos[2];
 
 	// calculate position we are trying to move to
@@ -343,7 +344,8 @@ bool PM_SlideMove_Boat() {
 				pm->maxs, 
 				end, 
 				pm->ps->clientNum, 
-				pm->tracemask);
+				pm->tracemask,
+				false);
 
 	if( trace.allsolid ) {
 
@@ -353,7 +355,8 @@ bool PM_SlideMove_Boat() {
 					0, 
 					end, 
 					pm->ps->clientNum, 
-					pm->tracemask);
+					pm->tracemask,
+					false);
 
 		if( trace.allsolid ) {
 			// entity is completely trapped in another solid

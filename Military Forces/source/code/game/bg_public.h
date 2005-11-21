@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.16 2005-11-20 11:21:38 thebjoern Exp $
+ * $Id: bg_public.h,v 1.17 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -159,7 +159,7 @@ typedef struct {
 
 	// callbacks to test the world
 	// these will be different functions during game and cgame
-	void		(*trace)( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentMask );
+	void		(*trace)( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentMask, bool capsule );
 	int			(*pointcontents)( const vec3_t point, int passEntityNum );
 } pmove_t;
 

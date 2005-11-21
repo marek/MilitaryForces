@@ -1,5 +1,5 @@
 /*
- * $Id: cg_scoreboard.c,v 1.4 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: cg_scoreboard.c,v 1.5 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -241,7 +241,7 @@ void CG_DrawOldTourneyScoreboard( void ) {
 	// request more scores regularly
 	if ( cg.scoresRequestTime + 2000 < cg.time ) {
 		cg.scoresRequestTime = cg.time;
-		trap_SendClientCommand( "score" );
+		CL_AddReliableCommand( "score" );
 	}
 
 	color[0] = 1;

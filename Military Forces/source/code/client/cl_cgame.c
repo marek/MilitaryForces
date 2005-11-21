@@ -36,7 +36,8 @@ extern bool getCameraInfo(int time, vec3_t *origin, vec3_t *angles);
 CL_GetGameState
 ====================
 */
-void CL_GetGameState( gameState_t *gs ) {
+void CL_GetGameState( gameState_t *gs ) 
+{
 	*gs = cl.gameState;
 }
 
@@ -45,7 +46,8 @@ void CL_GetGameState( gameState_t *gs ) {
 CL_GetGlconfig
 ====================
 */
-void CL_GetGlconfig( glconfig_t *glconfig ) {
+void CL_GetGlconfig( glconfig_t *glconfig ) 
+{
 	*glconfig = cls.glconfig;
 }
 
@@ -55,7 +57,8 @@ void CL_GetGlconfig( glconfig_t *glconfig ) {
 CL_GetUserCmd
 ====================
 */
-bool CL_GetUserCmd( int cmdNumber, usercmd_t *ucmd ) {
+bool CL_GetUserCmd( int cmdNumber, usercmd_t *ucmd ) 
+{
 	// cmds[cmdNumber] is the last properly generated command
 
 	// can't return anything that we haven't created yet
@@ -74,7 +77,8 @@ bool CL_GetUserCmd( int cmdNumber, usercmd_t *ucmd ) {
 	return true;
 }
 
-int CL_GetCurrentCmdNumber() {
+int CL_GetCurrentCmdNumber() 
+{
 	return cl.cmdNumber;
 }
 
@@ -105,7 +109,8 @@ bool	CL_GetParseEntityState( int parseEntityNumber, entityState_t *state ) {
 CL_GetCurrentSnapshotNumber
 ====================
 */
-void	CL_GetCurrentSnapshotNumber( int *snapshotNumber, int *serverTime ) {
+void CL_GetCurrentSnapshotNumber( int *snapshotNumber, int *serverTime ) 
+{
 	*snapshotNumber = cl.snap.messageNum;
 	*serverTime = cl.snap.serverTime;
 }
@@ -115,7 +120,8 @@ void	CL_GetCurrentSnapshotNumber( int *snapshotNumber, int *serverTime ) {
 CL_GetSnapshot
 ====================
 */
-bool	CL_GetSnapshot( int snapshotNumber, snapshot_t *snapshot ) {
+bool	CL_GetSnapshot( int snapshotNumber, snapshot_t *snapshot ) 
+{
 	clSnapshot_t	*clSnap;
 	int				i, count;
 
@@ -168,7 +174,8 @@ bool	CL_GetSnapshot( int snapshotNumber, snapshot_t *snapshot ) {
 CL_SetUserCmdValue
 =====================
 */
-void CL_SetUserCmdValue( int userCmdValue, float sensitivityScale ) {
+void CL_SetUserCmdValue( int userCmdValue, float sensitivityScale ) 
+{
 	cl.cgameUserCmdValue = userCmdValue;
 	cl.cgameSensitivity = sensitivityScale;
 }
@@ -178,7 +185,8 @@ void CL_SetUserCmdValue( int userCmdValue, float sensitivityScale ) {
 CL_AddCgameCommand
 =====================
 */
-void CL_AddCgameCommand( const char *cmdName ) {
+void CL_AddCgameCommand( const char *cmdName ) 
+{
 	Cmd_AddCommand( cmdName, NULL );
 }
 
@@ -261,7 +269,8 @@ CL_GetServerCommand
 Set up argc/argv for the given command
 ===================
 */
-bool CL_GetServerCommand( int serverCommandNumber ) {
+bool CL_GetServerCommand( int serverCommandNumber ) 
+{
 	char	*s;
 	char	*cmd;
 	static char bigConfigString[BIG_INFO_STRING];
@@ -374,7 +383,8 @@ CL_CM_LoadMap
 Just adds default parameters that cgame doesn't need to know about
 ====================
 */
-void CL_CM_LoadMap( const char *mapname ) {
+void CL_CM_LoadMap( const char *mapname ) 
+{
 	int		checksum;
 
 	CM_LoadMap( mapname, true, &checksum );
@@ -438,7 +448,7 @@ void CL_InitCGame()
 
 	// have the renderer touch all its images, so they are present
 	// on the card even if the driver does deferred loading
-	re.EndRegistration();
+	refExport.EndRegistration();
 
 	// make sure everything is paged in
 	if (!Sys_LowPhysicalMemory()) {

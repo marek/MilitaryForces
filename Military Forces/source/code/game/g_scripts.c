@@ -1,5 +1,5 @@
 /*
- * $Id: g_scripts.c,v 1.4 2005-11-20 11:21:38 thebjoern Exp $
+ * $Id: g_scripts.c,v 1.5 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -184,20 +184,20 @@ int LoadVehicleScripts( gentity_t* ent, char *filename ) {
 	char			buf[MAX_BOTS_TEXT];
 	unsigned int	stidx = level.scriptList.usedSTs;
 
-	len = trap_FS_FOpenFile( filename, &f, FS_READ );
+	len = FS_FOpenFileByMode( filename, &f, FS_READ );
 	if ( !f ) {
 		Com_Printf( S_COLOR_RED "file not found: %s\n", filename );
 		return 0;
 	}
 	if ( len >= MAX_BOTS_TEXT ) {
 		Com_Printf( S_COLOR_RED "file too large: %s is %i, max allowed is %i", filename, len, MAX_BOTS_TEXT );
-		trap_FS_FCloseFile( f );
+		FS_FCloseFile( f );
 		return 0;
 	}
 
-	trap_FS_Read( buf, len, f );
+	FS_Read2( buf, len, f );
 	buf[len] = 0;
-	trap_FS_FCloseFile( f );
+	FS_FCloseFile( f );
 
 	if( ParseScripts( ent, buf ) < 0 ) {
 		ent->idxScriptBegin = ent->idxScriptEnd = -1;

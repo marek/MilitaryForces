@@ -1,5 +1,5 @@
 /*
- * $Id: g_local.h,v 1.11 2005-11-20 11:21:38 thebjoern Exp $
+ * $Id: g_local.h,v 1.12 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -898,49 +898,41 @@ extern	vmCvar_t	mf_allowNukes;
 
 // system calls
 int Sys_Milliseconds ();
+void Cvar_Register( vmCvar_t *vmCvar, const char *varName, const char *defaultValue, int flags );
+void Cvar_Update( vmCvar_t *vmCvar );
+void Cvar_Set( const char *var_name, const char *value );
+void Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize );
+int Cvar_VariableIntegerValue( const char *var_name );
+int	Cmd_Argc();
+void Cmd_ArgvBuffer( int arg, char *buffer, int bufferLength );
+void Cbuf_ExecuteText (int exec_when, const char *text);
+int FS_FOpenFileByMode( const char *qpath, fileHandle_t *f, fsMode_t mode );
+void FS_FCloseFile( fileHandle_t f );
+int FS_Read2( void *buffer, int len, fileHandle_t f );
+int FS_Write( const void *buffer, int len, fileHandle_t h );
+void SV_GetUsercmd( int clientNum, usercmd_t *cmd );
+void Sys_SnapVector( float *v );
+bool SV_GetEntityToken( char *buffer, int bufferSize );
+bool SV_EntityContact( const vec3_t mins, const vec3_t maxs, const entityState_t* s, const entityShared_t* r, bool capsule );
+int SV_AreaEntities( const vec3_t mins, const vec3_t maxs, int *entityList, int maxcount );
+void SV_LinkEntity( entityState_t* s, entityShared_t* r );
+void SV_UnlinkEntity( entityState_t* s, entityShared_t* r );
+bool SV_inPVS (const vec3_t p1, const vec3_t p2);
+int SV_PointContents( const vec3_t p, int passEntityNum );
+void SV_Trace( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentmask, bool capsule );
+void SV_GetServerinfo( char *buffer, int bufferSize );
+void SV_SetUserinfo( int index, const char *val );
+void SV_GetUserinfo( int index, char *buffer, int bufferSize );
+void SV_GetConfigstring( int index, char *buffer, int bufferSize );
+void SV_SetConfigstring (int index, const char *val);
+void SV_GameSendServerCommand( int clientNum, const char *text );
+void SV_GameDropClient( int clientNum, const char *reason );
+void SV_AdjustAreaPortalState( const entityState_t* s, const entityShared_t* r, int open );
+void SV_SetBrushModel( entityState_t* s, entityShared_t* r, const char *name );
+void SV_LocateGameData( void* gEnts, int numGEntities, int sizeofGEntity_t,
+					   playerState_t *clients, int sizeofGameClient );
 
-//void	trap_Print( const char *fmt );
-//void	trap_Error( const char *fmt );
-//int		trap_Milliseconds( void );
-int		trap_Argc( void );
-void	trap_Argv( int n, char *buffer, int bufferLength );
-void	trap_Args( char *buffer, int bufferLength );
-int		trap_FS_FOpenFile( const char *qpath, fileHandle_t *f, fsMode_t mode );
-void	trap_FS_Read( void *buffer, int len, fileHandle_t f );
-void	trap_FS_Write( const void *buffer, int len, fileHandle_t f );
-void	trap_FS_FCloseFile( fileHandle_t f );
-int		trap_FS_GetFileList( const char *path, const char *extension, char *listbuf, int bufsize );
-int		trap_FS_Seek( fileHandle_t f, long offset, int origin ); // fsOrigin_t
-void	trap_Cmd_ExecuteText( int exec_when, const char *text );
-void	trap_Cvar_Register( vmCvar_t *cvar, const char *var_name, const char *value, int flags );
-void	trap_Cvar_Update( vmCvar_t *cvar );
-void	trap_Cvar_Set( const char *var_name, const char *value );
-int		trap_Cvar_VariableIntegerValue( const char *var_name );
-float	trap_Cvar_VariableValue( const char *var_name );
-void	trap_Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize );
-void	trap_LocateGameData( void* gEnts, int numGEntities, int sizeofGEntity_t, playerState_t *gameClients, int sizeofGameClient );
-void	trap_DropClient( int clientNum, const char *reason );
-void	trap_SendServerCommand( int clientNum, const char *text );
-void	trap_SetConfigstring( int num, const char *string );
-void	trap_GetConfigstring( int num, char *buffer, int bufferSize );
-void	trap_GetUserinfo( int num, char *buffer, int bufferSize );
-void	trap_SetUserinfo( int num, const char *buffer );
-void	trap_GetServerinfo( char *buffer, int bufferSize );
-void	trap_SetBrushModel( entityState_t* s, entityShared_t* r, const char *name );
-void	trap_Trace( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentmask );
-int		trap_PointContents( const vec3_t point, int passEntityNum );
-int		trap_InPVS( const vec3_t p1, const vec3_t p2 );
-int		trap_InPVSIgnorePortals( const vec3_t p1, const vec3_t p2 );
-void	trap_AdjustAreaPortalState( const entityState_t* s, const entityShared_t* r, bool open );
-int		trap_AreasConnected( int area1, int area2 );
-void	trap_LinkEntity( entityState_t* s, entityShared_t* r );
-void	trap_UnlinkEntity( entityState_t* s, entityShared_t* r );
-int		trap_EntitiesInBox( const vec3_t mins, const vec3_t maxs, int *entityList, int maxcount );
-int		trap_EntityContact( const vec3_t mins, const vec3_t maxs,  const entityState_t* s, const entityShared_t* r );
-void	trap_GetClientUsercmd( int clientNum, usercmd_t *cmd );
-bool	trap_GetEntityToken( char *buffer, int bufferSize );
 
-void	trap_SnapVector( float *v );
 
 
 

@@ -78,7 +78,7 @@ clientStatic_t		cls;
 ClientGame& theCG = ClientGame::getInstance();
 
 // Structure containing functions exported from refresh DLL
-refexport_t	re;
+refexport_t	refExport;
 
 ping_t	cl_pinglist[MAX_PINGREQUESTS];
 
@@ -132,7 +132,8 @@ The given command will be transmitted to the server, and is gauranteed to
 not have future usercmd_t executed before it is executed
 ======================
 */
-void CL_AddReliableCommand( const char *cmd ) {
+void CL_AddReliableCommand( const char *cmd ) 
+{
 	int		index;
 
 	// if we would be losing an old command that hasn't been acknowledged,
@@ -617,8 +618,8 @@ void CL_ShutdownAll(void) {
 	CL_ShutdownUI();
 
 	// shutdown the renderer
-	if ( re.Shutdown ) {
-		re.Shutdown( false );		// don't destroy window or context
+	if ( refExport.Shutdown ) {
+		refExport.Shutdown( false );		// don't destroy window or context
 	}
 
 	cls.uiStarted = false;
@@ -2109,11 +2110,11 @@ CL_ShutdownRef
 ============
 */
 void CL_ShutdownRef( void ) {
-	if ( !re.Shutdown ) {
+	if ( !refExport.Shutdown ) {
 		return;
 	}
-	re.Shutdown( true );
-	Com_Memset( &re, 0, sizeof( re ) );
+	refExport.Shutdown( true );
+	Com_Memset( &refExport, 0, sizeof( refExport ) );
 }
 
 /*
@@ -2123,12 +2124,12 @@ CL_InitRenderer
 */
 void CL_InitRenderer( void ) {
 	// this sets up the renderer and calls R_Init
-	re.BeginRegistration( &cls.glconfig );
+	refExport.BeginRegistration( &cls.glconfig );
 
 	// load character sets
-	cls.charSetShader = re.RegisterShader( "gfx/2d/bigchars" );
-	cls.whiteShader = re.RegisterShader( "white" );
-	cls.consoleShader = re.RegisterShader( "console" );
+	cls.charSetShader = refExport.RegisterShader( "gfx/2d/bigchars" );
+	cls.whiteShader = refExport.RegisterShader( "white" );
+	cls.consoleShader = refExport.RegisterShader( "console" );
 	g_console_field_width = cls.glconfig.vidWidth / SMALLCHAR_WIDTH - 2;
 	g_consoleField.widthInChars = g_console_field_width;
 }
@@ -2241,7 +2242,7 @@ void CL_InitRef( void ) {
 		Com_Error (ERR_FATAL, "Couldn't initialize refresh" );
 	}
 
-	re = *ret;
+	refExport = *ret;
 
 	// unpause so the cgame definately gets a snapshot and renders a frame
 	Cvar_Set( "cl_paused", "0" );
@@ -3270,7 +3271,8 @@ void CL_ShowIP_f(void) {
 bool CL_CDKeyValidate
 =================
 */
-bool CL_CDKeyValidate( const char *key, const char *checksum ) {
+bool CL_CDKeyValidate( const char *key, const char *checksum ) 
+{
 	char	ch;
 	byte	sum;
 	char	chs[3];

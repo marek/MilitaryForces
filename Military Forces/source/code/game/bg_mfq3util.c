@@ -1,5 +1,5 @@
 /*
- * $Id: bg_mfq3util.c,v 1.6 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: bg_mfq3util.c,v 1.7 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -7,12 +7,10 @@
 #include "bg_public.h"
 
 // externals
-//extern void	trap_Cvar_Set( const char *var_name, const char *value );
-//extern void	trap_Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize );
 
-int		trap_FS_FOpenFile( const char *qpath, fileHandle_t *f, fsMode_t mode );
-void	trap_FS_Read( void *buffer, int len, fileHandle_t f );
-void	trap_FS_FCloseFile( fileHandle_t f );
+int FS_FOpenFileByMode( const char *qpath, fileHandle_t *f, fsMode_t mode );
+int FS_Read2( void *buffer, int len, fileHandle_t f );
+void FS_FCloseFile( fileHandle_t f );
 
 /*
 =================
@@ -408,13 +406,13 @@ void MF_LoadAllVehicleData()
 			// gear
 			Com_sprintf( name, sizeof(name), "%s_gear.md3", modelbasename );
 
-			trap_FS_FOpenFile(name, &f, FS_READ);
+			FS_FOpenFileByMode(name, &f, FS_READ);
 
 			if(f &&  MF_getNumberOfFrames( name, &num ) ) 
 			{
 				vec3_t min1, min2;
 
-				trap_FS_FCloseFile(f);
+				FS_FCloseFile(f);
 				availableVehicles[i].maxGearFrame = num - 1;
 				
 				if(!availableVehicles[i].gearheight)
@@ -442,11 +440,11 @@ void MF_LoadAllVehicleData()
 			// bay
 			Com_sprintf( name, sizeof(name), "%s_bay.md3", modelbasename );
 
-			trap_FS_FOpenFile(name, &f, FS_READ);
+			FS_FOpenFileByMode(name, &f, FS_READ);
 
 			if(f && MF_getNumberOfFrames( name, &num ) ) 
 			{
-				trap_FS_FCloseFile(f);
+				FS_FCloseFile(f);
 				availableVehicles[i].maxBayFrame = num - 1;
 			}
 			else 
@@ -470,12 +468,12 @@ void MF_LoadAllVehicleData()
 			// gear
 			Com_sprintf( name, sizeof(name), "%s_gear.md3", modelbasename );
 
-			trap_FS_FOpenFile(name, &f, FS_READ);
+			FS_FOpenFileByMode(name, &f, FS_READ);
 
 			if(f &&  MF_getNumberOfFrames( name, &num ) ) {
 				vec3_t min1, min2;
 
-				trap_FS_FCloseFile(f);
+				FS_FCloseFile(f);
 				availableVehicles[i].maxGearFrame = num - 1;
 
 				
@@ -509,10 +507,10 @@ void MF_LoadAllVehicleData()
 			if(availableVehicles[i].wheels)
 			{
 				Com_sprintf( name, sizeof(name), "%s_w1.md3", modelbasename );
-				trap_FS_FOpenFile(name, &f, FS_READ);
+				FS_FOpenFileByMode(name, &f, FS_READ);
 				if(f)
 				{
-					trap_FS_FCloseFile(f);
+					FS_FCloseFile(f);
 		
 					MF_findTag(name, "tag_wheel", &tag);
 					MF_getDimensions( name, 0, &max, &min );
@@ -575,7 +573,6 @@ static void MF_ParseOverview( char **buf, mission_overview_t* overview )
 	token = COM_Parse( buf );
 	if( !token[0] ) 
 	{
-		//trap_Print(va("Token: '%s' - END\n", token));
 		return;
 	}
 //	Com_Printf(va("O-Token: '%s' - VALID\n", token));
@@ -662,7 +659,6 @@ static void MF_ParseWaypoints( char **buf, mission_vehicle_t* veh )
 	token = COM_Parse( buf );
 	if( !token[0] ) 
 	{
-		//trap_Print(va("Token: '%s' - END\n", token));
 		return;
 	}
 //	Com_Printf(va("W-Token: '%s' - VALID\n", token));
@@ -712,7 +708,6 @@ static void MF_ParseVehicle( char **buf, mission_vehicle_t* veh )
 	token = COM_Parse( buf );
 	if( !token[0] ) 
 	{
-		//trap_Print(va("Token: '%s' - END\n", token));
 		return;
 	}
 //	Com_Printf(va("V-Token: '%s' - VALID\n", token));
@@ -803,7 +798,6 @@ static void MF_ParseGroundInstallation( char **buf, mission_groundInstallation_t
 	token = COM_Parse( buf );
 	if( !token[0] ) 
 	{
-		//trap_Print(va("Token: '%s' - END\n", token));
 		return;
 	}
 //	Com_Printf(va("GV-Token: '%s' - VALID\n", token));
@@ -894,7 +888,6 @@ static void MF_ParseEntities( char **buf,
 	token = COM_Parse( buf );
 	if( !token[0] ) 
 	{
-		//trap_Print(va("Token: '%s' - END\n", token));
 		return;
 	};
 //	Com_Printf(va("E-Token: '%s' - VALID\n", token));

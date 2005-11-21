@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawnewhud.c,v 1.5 2005-11-12 14:28:13 thebjoern Exp $
+ * $Id: cg_drawnewhud.c,v 1.6 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -76,10 +76,10 @@ Coordinates are 640*480 virtual values
 =================
 */
 static void CG_DrawHUDPic( float x, float y, float width, float height, qhandle_t hShader, vec4_t color ) {
-	trap_R_SetColor( color );
+	refExport.SetColor( color );
 	CG_AdjustFrom640( &x, &y, &width, &height );
-	trap_R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, hShader );
-	trap_R_SetColor( NULL );
+	refExport.DrawStretchPic( x, y, width, height, 0, 0, 1, 1, hShader );
+	refExport.SetColor( NULL );
 }
 
 /*
@@ -183,14 +183,14 @@ static int CG_DrawChar_MFQ3( int x, int y, int ch, bool right ) {
 	CG_AdjustFrom640( &ax, &ay, &aw, &ah );
 
 	if( num ) {
-		trap_R_DrawStretchPic( ax, ay, aw, ah,
+		refExport.DrawStretchPic( ax, ay, aw, ah,
 							   fcol, 0, 
 							   fcol + size * number_spaces[col], 1, 
 							   cgs.media.HUDnumberline );
 
 		return number_spaces[col];
 	} else {
-		trap_R_DrawStretchPic( ax, ay, aw, ah,
+		refExport.DrawStretchPic( ax, ay, aw, ah,
 							   fcol, 0, 
 							   fcol + size * alphabet_spaces[col], 1, 
 							   cgs.media.HUDalphabet );
@@ -233,14 +233,14 @@ static int CG_DrawString_MFQ3( int x, int y, const char *string, const float *se
 	// draw the colored text
 	s = lowerstring;
 	cnt = 0;
-	trap_R_SetColor( setColor );
+	refExport.SetColor( setColor );
 	while ( *s && cnt < maxChars) {
 		charWidth = CG_DrawChar_MFQ3( xx, y, *s, false );
 		xx += charWidth;
 		cnt++;
 		s++;
 	}
-	trap_R_SetColor( NULL );
+	refExport.SetColor( NULL );
 
 	delete [] lowerstring;
 	return (xx-x);
@@ -290,14 +290,14 @@ static int CG_DrawString_MFQ3_R( int x, int y, const char *string, const float *
 	s = invstring;
 	xx = x;
 	cnt = 0;
-	trap_R_SetColor( setColor );
+	refExport.SetColor( setColor );
 	while ( *s && cnt < maxChars) {
 		charWidth = CG_DrawChar_MFQ3( xx, y, *s, true );
 		xx -= charWidth;
 		cnt++;
 		s++;
 	}
-	trap_R_SetColor( NULL );
+	refExport.SetColor( NULL );
 	return (xx-x);
 }
 
@@ -317,7 +317,7 @@ static void CG_MFQ3HUD_Numbers (int x, int y, int width, int value, bool percent
 		return;
 	}
 
-	trap_R_SetColor( color );
+	refExport.SetColor( color );
 	
 	// draw number string
 	if ( width > 7 ) {
@@ -387,7 +387,7 @@ static void CG_MFQ3HUD_Numbers (int x, int y, int width, int value, bool percent
 		CG_DrawPic( x,y, 2*HUDNUM_WIDTH, HUDNUM_HEIGHT, cgs.media.HUDnumbers[STAT_PERCENT] );
 	}
 
-	trap_R_SetColor( NULL );
+	refExport.SetColor( NULL );
 
 }
 */
@@ -1225,7 +1225,7 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 	CG_AddLocalEntities();
 
 	// render
-	trap_R_RenderScene( &cg.HUDCamera );
+	refExport.RenderScene( &cg.HUDCamera );
 
 	// draw zoom amount
 	Com_sprintf(buffer, 11, "ZOOM: X%d", cg.zoomAmount);
@@ -1286,9 +1286,9 @@ static void CG_Draw_MFD(int mfdnum, int vehicle, centity_t * cent, int targetran
 		}
 
 		// draw background
-		trap_R_SetColor( HUDColors[cg.MFDColor] );
+		refExport.SetColor( HUDColors[cg.MFDColor] );
 		CG_DrawPic( x, y, width, height, cgs.media.HUDrwr );
-		trap_R_SetColor( NULL );
+		refExport.SetColor( NULL );
 		// draw contents
 		if( radarmode & OO_RADAR_AIR ) {
 			CG_DrawRadarSymbols_AIR_new(vehicle, range, x+60, y+60);
@@ -1442,10 +1442,10 @@ static void CG_Draw_AltTape( int value ) {
 	y = 46;
 	width = 16;
 	height = 256;
-	trap_R_SetColor( HUDColors[cg.HUDColor] );
+	refExport.SetColor( HUDColors[cg.HUDColor] );
 	CG_AdjustFrom640( &x, &y, &width, &height );
-	trap_R_DrawStretchPic( x, y, width, height, 0, 0.125f+offset, 1, 0.625f+offset, cgs.media.HUDalt );
-	trap_R_SetColor( NULL );
+	refExport.DrawStretchPic( x, y, width, height, 0, 0.125f+offset, 1, 0.625f+offset, cgs.media.HUDalt );
+	refExport.SetColor( NULL );
 		// alt indicater
 	x = 578;
 	y = 171;
@@ -1525,10 +1525,10 @@ static void CG_Draw_SpeedTape( int value, int stallspeed, int gearspeed, int sca
 	y = 46;
 	width = 16;
 	height = 256;
-	trap_R_SetColor( HUDColors[cg.HUDColor] );
+	refExport.SetColor( HUDColors[cg.HUDColor] );
 	CG_AdjustFrom640( &x, &y, &width, &height );
-	trap_R_DrawStretchPic( x, y, width, height, 0, 0.125f+offset, 1, 0.625f+offset, cgs.media.HUDspeed );
-	trap_R_SetColor( NULL );
+	refExport.DrawStretchPic( x, y, width, height, 0, 0.125f+offset, 1, 0.625f+offset, cgs.media.HUDspeed );
+	refExport.SetColor( NULL );
 		// speed indicater
 	x = 55;
 	y = 171;
@@ -1599,7 +1599,7 @@ static void CG_Draw_SpeedTape( int value, int stallspeed, int gearspeed, int sca
 			y = 171+(value2*64/scale);
 			width = height = 8;
 			CG_AdjustFrom640( &x, &y, &width, &height );
-			trap_R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, cgs.media.HUDcaret_v_r_l );
+			refExport.DrawStretchPic( x, y, width, height, 0, 0, 1, 1, cgs.media.HUDcaret_v_r_l );
 		}
 	}
 }
@@ -1629,10 +1629,10 @@ static void CG_Draw_HeadingTape( int value, int targetheading ) {
 	y = 10;
 	width = 448;
 	height = 16;
-	trap_R_SetColor( HUDColors[cg.HUDColor] );
+	refExport.SetColor( HUDColors[cg.HUDColor] );
 	CG_AdjustFrom640( &x, &y, &width, &height );
-	trap_R_DrawStretchPic( x, y, width, height, 0.125f-offset, 0, 1-offset, 1, cgs.media.HUDheading );
-	trap_R_SetColor( NULL );
+	refExport.DrawStretchPic( x, y, width, height, 0.125f-offset, 0, 1-offset, 1, cgs.media.HUDheading );
+	refExport.SetColor( NULL );
 		// draw heading value box
 	x = 304;
 	y = 28;

@@ -223,7 +223,8 @@ CM_PointContents
 
 ==================
 */
-int CM_PointContents( const vec3_t p, clipHandle_t model ) {
+int CM_PointContents( const vec3_t p, clipHandle_t model ) 
+{
 	int			leafnum;
 	int			i, k;
 	int			brushnum;
@@ -276,7 +277,8 @@ Handles offseting and rotation of the end points for moving and
 rotating entities
 ==================
 */
-int	CM_TransformedPointContents( const vec3_t p, clipHandle_t model, const vec3_t origin, const vec3_t angles) {
+int	CM_TransformedPointContents( const vec3_t p, clipHandle_t model, const vec3_t origin, const vec3_t angles) 
+{
 	vec3_t		p_l;
 	vec3_t		temp;
 	vec3_t		forward, right, up;

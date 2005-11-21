@@ -1,5 +1,5 @@
 /*
- * $Id: g_items.c,v 1.4 2005-11-20 11:21:38 thebjoern Exp $
+ * $Id: g_items.c,v 1.5 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -136,7 +136,7 @@ void RespawnItem( gentity_t *ent ) {
 	ent->r.contents = CONTENTS_TRIGGER;
 	ent->s.eFlags &= ~EF_NODRAW;
 	ent->r.svFlags &= ~SVF_NOCLIENT;
-	trap_LinkEntity (&ent->s, &ent->r);
+	SV_LinkEntity (&ent->s, &ent->r);
 
 	// play the normal respawn sound only to nearby clients
 	G_AddEvent( ent, EV_ITEM_RESPAWN, 0, true );
@@ -267,7 +267,7 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 		ent->nextthink = level.time + respawn * 1000;
 		ent->think = RespawnItem;
 	}
-	trap_LinkEntity( &ent->s, &ent->r );
+	SV_LinkEntity( &ent->s, &ent->r );
 }
 
 
@@ -315,7 +315,7 @@ gentity_t *LaunchItem( gitem_t *item, vec3_t origin, vec3_t velocity ) {
 
 	dropped->flags = FL_DROPPED_ITEM;
 
-	trap_LinkEntity (&dropped->s, &dropped->r);
+	SV_LinkEntity (&dropped->s, &dropped->r);
 
 	return dropped;
 }
@@ -387,7 +387,7 @@ void FinishSpawningItem( gentity_t *ent ) {
 	} else {
 		// drop to floor
 		VectorSet( dest, ent->s.origin[0], ent->s.origin[1], ent->s.origin[2] - 4096 );
-		trap_Trace( &tr, ent->s.origin, ent->r.mins, ent->r.maxs, dest, ent->s.number, MASK_SOLID );
+		SV_Trace( &tr, ent->s.origin, ent->r.mins, ent->r.maxs, dest, ent->s.number, MASK_SOLID, false );
 		if ( tr.startsolid ) {
 			Com_Printf ("FinishSpawningItem: %s startsolid at %s\n", ent->classname, vtos(ent->s.origin));
 			G_FreeEntity( ent );
@@ -407,7 +407,7 @@ void FinishSpawningItem( gentity_t *ent ) {
 		return;
 	}
 
-	trap_LinkEntity (&ent->s, &ent->r);
+	SV_LinkEntity (&ent->s, &ent->r);
 }
 
 
@@ -498,7 +498,7 @@ void SaveRegisteredItems( void ) {
 	string[ bg_numItems ] = 0;
 
 	Com_Printf( "%i items registered\n", count );
-	trap_SetConfigstring(CS_ITEMS, string);
+	SV_SetConfigstring(CS_ITEMS, string);
 }
 
 /*
@@ -599,8 +599,8 @@ void G_RunItem( gentity_t *ent ) {
 	} else {
 		mask = MASK_PLAYERSOLID & ~CONTENTS_BODY;//MASK_SOLID;
 	}
-	trap_Trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, origin, 
-		ent->r.ownerNum, mask );
+	SV_Trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, origin, 
+		ent->r.ownerNum, mask, false );
 
 	VectorCopy( tr.endpos, ent->r.currentOrigin );
 
@@ -608,7 +608,7 @@ void G_RunItem( gentity_t *ent ) {
 		tr.fraction = 0;
 	}
 
-	trap_LinkEntity( &ent->s, &ent->r );	// FIXME: avoid this for stationary?
+	SV_LinkEntity( &ent->s, &ent->r );	// FIXME: avoid this for stationary?
 
 	// check think function
 	G_RunThink( ent );
@@ -618,7 +618,7 @@ void G_RunItem( gentity_t *ent ) {
 	}
 
 	// if it is in a nodrop volume, remove it
-	contents = trap_PointContents( ent->r.currentOrigin, -1 );
+	contents = SV_PointContents( ent->r.currentOrigin, -1 );
 	if ( contents & CONTENTS_NODROP ) {
 		if (ent->item && ent->item->giType == IT_TEAM) {
 			Team_FreeEntity(ent);

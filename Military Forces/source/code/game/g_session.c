@@ -1,5 +1,5 @@
 /*
- * $Id: g_session.c,v 1.3 2005-11-20 11:21:38 thebjoern Exp $
+ * $Id: g_session.c,v 1.4 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -40,7 +40,7 @@ void G_WriteClientSessionData( gclient_t *client ) {
 
 	var = va( "session%i", client - level.clients );
 
-	trap_Cvar_Set( var, s );
+	Cvar_Set( var, s );
 }
 
 /*
@@ -55,7 +55,7 @@ void G_ReadSessionData( gclient_t *client ) {
 	const char	*var;
 
 	var = va( "session%i", client - level.clients );
-	trap_Cvar_VariableStringBuffer( var, s, sizeof(s) );
+	Cvar_VariableStringBuffer( var, s, sizeof(s) );
 
 	sscanf( s, "%i %i %i %i %i %i %i",
 		&client->sess.sessionTeam,
@@ -140,7 +140,7 @@ void G_InitWorldSession(void) {
 	char	s[MAX_STRING_CHARS];
 	int			gt;
 
-	trap_Cvar_VariableStringBuffer( "session", s, sizeof(s) );
+	Cvar_VariableStringBuffer( "session", s, sizeof(s) );
 	gt = atoi( s );
 	
 	// if the gametype changed since the last session, don't use any
@@ -161,7 +161,7 @@ G_WriteSessionData
 void G_WriteSessionData( void ) {
 	int		i;
 
-	trap_Cvar_Set( "session", va("%i", g_gametype.integer) );
+	Cvar_Set( "session", va("%i", g_gametype.integer) );
 
 	for ( i = 0 ; i < level.maxclients ; i++ ) {
 		if ( level.clients[i].pers.connected == CON_CONNECTED ) {

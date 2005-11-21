@@ -1,5 +1,5 @@
 /*
- * $Id: g_svcmds.c,v 1.4 2005-11-20 11:21:38 thebjoern Exp $
+ * $Id: g_svcmds.c,v 1.5 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -122,7 +122,7 @@ static void UpdateIPBans (void)
 			"%i.%i.%i.%i ", b[0], b[1], b[2], b[3]);
 	}
 
-	trap_Cvar_Set( "g_banIPs", iplist );
+	Cvar_Set( "g_banIPs", iplist );
 }
 
 /*
@@ -221,12 +221,12 @@ void Svcmd_AddIP_f (void)
 {
 	char		str[MAX_TOKEN_CHARS];
 
-	if ( trap_Argc() < 2 ) {
+	if ( Cmd_Argc() < 2 ) {
 		Com_Printf("Usage:  addip <ip-mask>\n");
 		return;
 	}
 
-	trap_Argv( 1, str, sizeof( str ) );
+	Cmd_ArgvBuffer( 1, str, sizeof( str ) );
 
 	AddIP( str );
 
@@ -243,12 +243,12 @@ void Svcmd_RemoveIP_f (void)
 	int			i;
 	char		str[MAX_TOKEN_CHARS];
 
-	if ( trap_Argc() < 2 ) {
+	if ( Cmd_Argc() < 2 ) {
 		Com_Printf("Usage:  sv removeip <ip-mask>\n");
 		return;
 	}
 
-	trap_Argv( 1, str, sizeof( str ) );
+	Cmd_ArgvBuffer( 1, str, sizeof( str ) );
 
 	if (!StringToFilter (str, &f))
 		return;
@@ -389,14 +389,14 @@ void	Svcmd_ForceTeam_f( void ) {
 	char		str[MAX_TOKEN_CHARS];
 
 	// find the player
-	trap_Argv( 1, str, sizeof( str ) );
+	Cmd_ArgvBuffer( 1, str, sizeof( str ) );
 	cl = ClientForString( str );
 	if ( !cl ) {
 		return;
 	}
 
 	// set the team
-	trap_Argv( 2, str, sizeof( str ) );
+	Cmd_ArgvBuffer( 2, str, sizeof( str ) );
 	SetTeam( &g_entities[cl - level.clients], str );
 }
 
@@ -411,7 +411,7 @@ ConsoleCommand
 bool	ConsoleCommand() {
 	char	cmd[MAX_TOKEN_CHARS];
 
-	trap_Argv( 0, cmd, sizeof( cmd ) );
+	Cmd_ArgvBuffer( 0, cmd, sizeof( cmd ) );
 
 	if ( Q_stricmp (cmd, "entitylist") == 0 ) {
 		Svcmd_EntityList_f();
@@ -449,17 +449,17 @@ bool	ConsoleCommand() {
 	}
 
 	if (Q_stricmp (cmd, "listip") == 0) {
-		trap_Cmd_ExecuteText( EXEC_INSERT, "g_banIPs\n" );
+		Cbuf_ExecuteText( EXEC_INSERT, "g_banIPs\n" );
 		return true;
 	}
 
 	if (g_dedicated.integer) {
 		if (Q_stricmp (cmd, "say") == 0) {
-			trap_SendServerCommand( -1, va("print \"^3Server:^7 %s\"", ConcatArgs(1) ) );
+			SV_GameSendServerCommand( -1, va("print \"^3Server:^7 %s\"", ConcatArgs(1) ) );
 			return true;
 		}
 		// everything else will also be printed as a say command
-		trap_SendServerCommand( -1, va("print \"^3Server:^7 %s\"", ConcatArgs(0) ) );
+		SV_GameSendServerCommand( -1, va("print \"^3Server:^7 %s\"", ConcatArgs(0) ) );
 		return true;
 	}
 

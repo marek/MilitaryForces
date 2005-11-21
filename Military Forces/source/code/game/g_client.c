@@ -1,5 +1,5 @@
 /*
- * $Id: g_client.c,v 1.5 2005-11-20 11:21:38 thebjoern Exp $
+ * $Id: g_client.c,v 1.6 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 //null cvs upload test, comment placed for a difference.
@@ -29,7 +29,7 @@ void SP_info_player_deathmatch( gentity_t *ent ) {
 	// update level information
 	level.ent_category |= ent->ent_category;
 
-	trap_Cvar_Set( "mf_lvcat", va("%i", level.ent_category) );
+	Cvar_Set( "mf_lvcat", va("%i", level.ent_category) );
 
 	G_SpawnInt( "nobots", "0", &i);
 	if ( i ) {
@@ -80,7 +80,7 @@ bool SpotWouldTelefrag( gentity_t *spot ) {
 
 	VectorAdd( spot->s.origin, playerMins, mins );
 	VectorAdd( spot->s.origin, playerMaxs, maxs );
-	num = trap_EntitiesInBox( mins, maxs, touch, MAX_GENTITIES );
+	num = SV_AreaEntities( mins, maxs, touch, MAX_GENTITIES );
 
 	for (i=0 ; i<num ; i++) {
 		hit = &g_entities[touch[i]];
@@ -544,7 +544,7 @@ ClientUserInfoChanged
 Called from ClientConnect when the player first connects and
 directly by the server system when the player updates a userinfo variable.
 
-The game can override any of the settings and call trap_SetUserinfo
+The game can override any of the settings and call SetUserinfo
 if desired.
 ============
 */
@@ -564,7 +564,7 @@ void ClientUserinfoChanged( int clientNum ) {
 	ent = g_entities + clientNum;
 	client = ent->client;
 
-	trap_GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
+	SV_GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
 
 	// check for malformed or illegal info strings
 	if ( !Info_Validate(userinfo) ) {
@@ -598,7 +598,7 @@ void ClientUserinfoChanged( int clientNum ) {
 
 	if ( client->pers.connected == CON_CONNECTED ) {
 		if ( strcmp( oldname, client->pers.netname ) ) {
-			trap_SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " renamed to %s\n\"", oldname, 
+			SV_GameSendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " renamed to %s\n\"", oldname, 
 				client->pers.netname) );
 		}
 	}
@@ -712,7 +712,7 @@ void ClientUserinfoChanged( int clientNum ) {
 			vehicle, nextVehicle, client->advancedControls ); // MFQ3: send current/next vehicle indexes
 	}
 
-	trap_SetConfigstring( CS_PLAYERS+clientNum, s );
+	SV_SetConfigstring( CS_PLAYERS+clientNum, s );
 
 	G_LogPrintf( "ClientUserinfoChanged: %i %s\n", clientNum, s );
 }
@@ -725,7 +725,7 @@ Called when a player drops from the server.
 Will not be called between levels.
 
 This should NOT be called directly by any game logic,
-call trap_DropClient(), which will call this and do
+call SV_GameDropClient(), which will call this and do
 server system housekeeping.
 ============
 */
@@ -766,7 +766,7 @@ void ClientDisconnect( int clientNum ) {
 		ClientUserinfoChanged( level.sortedClients[0] );
 	}
 
-	trap_UnlinkEntity (&ent->s, &ent->r);
+	SV_UnlinkEntity (&ent->s, &ent->r);
 	ent->s.modelindex = 0;
 	ent->inuse = false;
 	ent->classname = "disconnected";
@@ -774,7 +774,7 @@ void ClientDisconnect( int clientNum ) {
 	ent->client->ps.persistant[PERS_TEAM] = TEAM_FREE;
 	ent->client->sess.sessionTeam = TEAM_FREE;
 
-	trap_SetConfigstring( CS_PLAYERS + clientNum, "");
+	SV_SetConfigstring( CS_PLAYERS + clientNum, "");
 
 	CalculateRanks();
 

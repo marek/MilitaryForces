@@ -1,5 +1,5 @@
 /*
- * $Id: mf_client.c,v 1.9 2005-11-20 11:21:38 thebjoern Exp $
+ * $Id: mf_client.c,v 1.10 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -41,7 +41,7 @@ char *MF_ClientConnect( int clientNum, bool firstTime, bool isBot ) {
 
 	ent = &g_entities[ clientNum ];
 
-	trap_GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
+	SV_GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
 
 	// check to see if they are on the banned IP list
 	value = Info_ValueForKey (userinfo, "ip");
@@ -82,7 +82,7 @@ char *MF_ClientConnect( int clientNum, bool firstTime, bool isBot ) {
 	// init vehicle
 	Info_SetValueForKey( userinfo, "cg_vehicle", "-1" );
 	Info_SetValueForKey( userinfo, "cg_nextVehicle", "-1" );
-	trap_SetUserinfo( clientNum, userinfo );
+	SV_SetUserinfo( clientNum, userinfo );
 
 	// get and distribute relevent paramters
 	G_LogPrintf( "MF_ClientConnect: %i\n", clientNum );
@@ -90,7 +90,7 @@ char *MF_ClientConnect( int clientNum, bool firstTime, bool isBot ) {
 
 	// don't do the "xxx connected" messages if they were caried over from previous level
 	if ( firstTime ) {
-		trap_SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " connected\n\"", client->pers.netname) );
+		SV_GameSendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " connected\n\"", client->pers.netname) );
 	}
 
 	if ( g_gametype.integer >= GT_TEAM &&
@@ -116,7 +116,8 @@ and on transition between teams, but doesn't happen on respawns
 Special Version for MFQ3
 ============
 */
-void MF_ClientBegin( int clientNum ) {
+void MF_ClientBegin( int clientNum ) 
+{
 	gentity_t	*ent;
 	gclient_t	*client;
 	int			flags;
@@ -126,7 +127,7 @@ void MF_ClientBegin( int clientNum ) {
 	client = level.clients + clientNum;
 
 	if ( ent->r.linked ) {
-		trap_UnlinkEntity( &ent->s, &ent->r );
+		SV_UnlinkEntity( &ent->s, &ent->r );
 	}
 	G_InitGentity( ent );
 	ent->client = client;
@@ -152,7 +153,7 @@ void MF_ClientBegin( int clientNum ) {
 
 	if ( client->sess.sessionTeam != TEAM_SPECTATOR ) {
 		if ( g_gametype.integer != GT_TOURNAMENT  ) {
-			trap_SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " entered the game\n\"", client->pers.netname) );
+			SV_GameSendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " entered the game\n\"", client->pers.netname) );
 		}
 	}
 	G_LogPrintf( "ClientBegin: %i\n", clientNum );
@@ -199,7 +200,7 @@ void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 	index = ent - g_entities;
 	client = ent->client;
 
-	trap_GetUserinfo( index, userinfo, sizeof(userinfo) );
+	SV_GetUserinfo( index, userinfo, sizeof(userinfo) );
 	// vehicle index for next spawning
 	vehIndex = atoi( Info_ValueForKey( userinfo, "cg_nextVehicle" ) );
 
@@ -287,7 +288,7 @@ void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 		vec3_t	endpos;
 		VectorCopy( spawn_origin, endpos );
 		endpos[2] -= 512;
-		trap_Trace (&trace, spawn_origin, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_WATER );
+		SV_Trace (&trace, spawn_origin, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_WATER, false );
 		if((cs_flags & CS_LASTPOS) && trace.entityNum != ENTITYNUM_NONE ) { // Check for water if respawning in current location
 			client->ps.pm_flags &= ~PMF_VEHICLESPAWN;
 			return;							// Fuck that! dont do shit ;p
@@ -368,7 +369,7 @@ void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 		MF_getDefaultLoadoutForVehicle( vehIndex, &ent->loadout, &ent->client->ps );
 
 		Info_SetValueForKey( userinfo, "cg_vehicle", va( "%d", vehIndex ) );
-		trap_SetUserinfo( index, userinfo );
+		SV_SetUserinfo( index, userinfo );
 		ClientUserinfoChanged( index );
 
 		// cat specific stuff
@@ -380,7 +381,7 @@ void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 			gentity_t *test;
 			VectorCopy( spawn_origin, endpos );
 			endpos[2] -= 128;
-			trap_Trace (&trace, spawn_origin, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_SOLID );
+			SV_Trace (&trace, spawn_origin, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_SOLID, false );
 			if( trace.entityNum != ENTITYNUM_NONE ) {
 				test = &g_entities[trace.entityNum];
 				if( canLandOnIt(test) ) {
@@ -397,7 +398,7 @@ void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 			VectorCopy( spawn_origin, endpos );
 			endpos[2] -= 512;
 
-			trap_Trace (&trace, spawn_origin, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_SOLID );
+			SV_Trace (&trace, spawn_origin, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_SOLID, false );
 			if( trace.entityNum != ENTITYNUM_NONE ) {
 				test = &g_entities[trace.entityNum];
 					spawn_origin[2] = trace.endpos[2] - availableVehicles[vehIndex].mins[2] + 1;
@@ -412,7 +413,7 @@ void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 			VectorCopy( spawn_origin, endpos );
 			endpos[2] -= 512;
 
-			trap_Trace (&trace, spawn_origin, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_SOLID );
+			SV_Trace(&trace, spawn_origin, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_SOLID, false );
 			if( trace.entityNum != ENTITYNUM_NONE ) {
 				test = &g_entities[trace.entityNum];
 					spawn_origin[2] = trace.endpos[2] - availableVehicles[vehIndex].mins[2] + 0.1;
@@ -424,7 +425,7 @@ void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 			gentity_t *test;
 			VectorCopy( spawn_origin, endpos );
 			endpos[2] -= 512;
-			trap_Trace (&trace, spawn_origin, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_ALL );
+			SV_Trace(&trace, spawn_origin, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_ALL, false );
 			if( trace.entityNum != ENTITYNUM_NONE ) {
 				test = &g_entities[trace.entityNum];
 					spawn_origin[2] = trace.endpos[2];
@@ -486,7 +487,7 @@ void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 	// the respawned flag will be cleared after the attack and jump keys come up
 	client->ps.pm_flags |= PMF_RESPAWNED;
 
-	trap_GetClientUsercmd( client - level.clients, &ent->client->pers.cmd );
+	SV_GetUsercmd( client - level.clients, &ent->client->pers.cmd );
 	SetClientViewAngle( ent, spawn_angles );
 
 	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
@@ -494,7 +495,7 @@ void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 	} else {
 		if(!(cs_flags & CS_NOKILL))
 			G_KillBox( ent );
-		trap_LinkEntity (&ent->s, &ent->r);
+		SV_LinkEntity (&ent->s, &ent->r);
 	}
 
 	// reset radar
@@ -533,7 +534,7 @@ void MF_ClientSpawn(gentity_t *ent, long cs_flags) {
 	if( ent->client->sess.sessionTeam != TEAM_SPECTATOR ) {
 		BG_PlayerStateToEntityState( &client->ps, &ent->s, true );
 		VectorCopy( ent->client->ps.origin, ent->r.currentOrigin );
-		trap_LinkEntity( &ent->s, &ent->r );
+		SV_LinkEntity( &ent->s, &ent->r );
 	}
 
 	// run the presend to set anything else

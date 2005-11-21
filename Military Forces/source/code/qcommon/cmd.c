@@ -85,7 +85,8 @@ Cbuf_AddText
 Adds command text at the end of the buffer, does NOT add a final \n
 ============
 */
-void Cbuf_AddText( const char *text ) {
+void Cbuf_AddText( const char *text ) 
+{
 	int		l;
 	
 	l = strlen (text);
@@ -326,7 +327,8 @@ static	cmd_function_t	*cmd_functions;		// possible commands to execute
 Cmd_Argc
 ============
 */
-int		Cmd_Argc( void ) {
+int	Cmd_Argc()
+{
 	return cmd_argc;
 }
 
@@ -350,7 +352,8 @@ The interpreted versions use this because
 they can't have pointers returned to them
 ============
 */
-void	Cmd_ArgvBuffer( int arg, char *buffer, int bufferLength ) {
+void Cmd_ArgvBuffer( int arg, char *buffer, int bufferLength ) 
+{
 	Q_strncpyz( buffer, Cmd_Argv( arg ), bufferLength );
 }
 
@@ -409,7 +412,8 @@ The interpreted versions use this because
 they can't have pointers returned to them
 ============
 */
-void	Cmd_ArgsBuffer( char *buffer, int bufferLength ) {
+void Cmd_ArgsBuffer( char *buffer, int bufferLength ) 
+{
 	Q_strncpyz( buffer, Cmd_Args(), bufferLength );
 }
 

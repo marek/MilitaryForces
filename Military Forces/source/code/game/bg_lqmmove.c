@@ -1,5 +1,5 @@
 /*
- * $Id: bg_lqmmove.c,v 1.3 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: bg_lqmmove.c,v 1.4 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -35,7 +35,7 @@ void PM_LQMGroundTrace( void )
 
 	VectorSet( end, pm->ps->origin[0], (float)pm->ps->origin[1], (float)pm->ps->origin[2] + (float)pm->mins[2] + 2);
 
-	pm->trace (&trace, pm->ps->origin, pm->mins, pm->maxs, end, pm->ps->clientNum, MASK_SOLID);
+	pm->trace (&trace, pm->ps->origin, pm->mins, pm->maxs, end, pm->ps->clientNum, MASK_SOLID, false);
 	pml.groundTrace = trace;
 
 	// if the trace didn't hit anything, we are in free fall
@@ -297,7 +297,8 @@ bool	PM_SlideMove_LQM() {
 					pm->maxs, 
 					end, 
 					pm->ps->clientNum, 
-					pm->tracemask);
+					pm->tracemask,
+					false);
 
 		if (trace.allsolid) {
 
@@ -307,7 +308,8 @@ bool	PM_SlideMove_LQM() {
 					0, 
 					end, 
 					pm->ps->clientNum, 
-					pm->tracemask);
+					pm->tracemask,
+					false);
 
 			if( trace.allsolid ) {
 				// entity is completely trapped in another solid
@@ -456,7 +458,7 @@ void PM_StepSlideMove_LQM() {
 
 	VectorCopy(start_o, down);
 	down[2] -= STEPSIZE;
-	pm->trace (&trace, start_o, pm->mins, pm->maxs, down, pm->ps->clientNum, pm->tracemask);
+	pm->trace (&trace, start_o, pm->mins, pm->maxs, down, pm->ps->clientNum, pm->tracemask, false);
 	VectorSet(up, 0, 0, 1);
 	// never step up when you still have up velocity
 	if ( pm->ps->velocity[2] > 0 && (trace.fraction == 1.0 || DotProduct(trace.plane.normal, up) < 0.7))
@@ -469,7 +471,7 @@ void PM_StepSlideMove_LQM() {
 	up[2] += STEPSIZE;
 
 	// test the player position if they were a stepheight higher
-	pm->trace (&trace, start_o, pm->mins, pm->maxs, up, pm->ps->clientNum, pm->tracemask);
+	pm->trace (&trace, start_o, pm->mins, pm->maxs, up, pm->ps->clientNum, pm->tracemask, false);
 	if ( trace.allsolid )
 		return;		// can't step up
 
@@ -483,7 +485,7 @@ void PM_StepSlideMove_LQM() {
 	// push down the final amount
 	VectorCopy (pm->ps->origin, down);
 	down[2] -= stepSize;
-	pm->trace (&trace, pm->ps->origin, pm->mins, pm->maxs, down, pm->ps->clientNum, pm->tracemask);
+	pm->trace (&trace, pm->ps->origin, pm->mins, pm->maxs, down, pm->ps->clientNum, pm->tracemask, false);
 	if ( !trace.allsolid )
 		VectorCopy (trace.endpos, pm->ps->origin);
 	if ( trace.fraction < 1.0 )

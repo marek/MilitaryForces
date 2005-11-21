@@ -164,7 +164,8 @@ SV_UnlinkEntity
 
 ===============
 */
-void SV_UnlinkEntity( entityState_t* s, entityShared_t* r ) {
+void SV_UnlinkEntity( entityState_t* s, entityShared_t* r ) 
+{
 	svEntity_t		*ent;
 	svEntity_t		*scan;
 	worldSector_t	*ws;
@@ -443,7 +444,8 @@ void SV_AreaEntities_r( worldSector_t *node, areaParms_t *ap ) {
 SV_AreaEntities
 ================
 */
-int SV_AreaEntities( const vec3_t mins, const vec3_t maxs, int *entityList, int maxcount ) {
+int SV_AreaEntities( const vec3_t mins, const vec3_t maxs, int *entityList, int maxcount ) 
+{
 	areaParms_t		ap;
 
 	ap.mins = mins;
@@ -672,7 +674,8 @@ void SV_Trace( trace_t *results, const vec3_t start, const vec3_t mins, const ve
 SV_PointContents
 =============
 */
-int SV_PointContents( const vec3_t p, int passEntityNum ) {
+int SV_PointContents( const vec3_t p, int passEntityNum ) 
+{
 	int			touch[MAX_GENTITIES];
 	sharedEntity_t *hit;
 	int			i, num;

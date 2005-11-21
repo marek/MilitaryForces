@@ -1,5 +1,5 @@
 /*
- * $Id: g_groundinstallation.c,v 1.4 2005-11-20 11:21:38 thebjoern Exp $
+ * $Id: g_groundinstallation.c,v 1.5 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 #include "g_local.h"
@@ -45,7 +45,7 @@ void groundinstallation_die( gentity_t *self, gentity_t *inflictor, gentity_t *a
 
 	G_RadiusDamage( self->r.currentOrigin, self, 150, 150, self, MOD_VEHICLEEXPLOSION, CAT_ANY );
 
-	trap_LinkEntity( &self->s, &self->r );
+	SV_LinkEntity( &self->s, &self->r );
 	
 }
 
@@ -77,7 +77,7 @@ static void Update_GI_Targets( gentity_t* ent )
 				VectorSet( rangevec, range, range, range );
 				VectorSubtract( ent->r.currentOrigin, rangevec, mins );
 				VectorAdd( ent->r.currentOrigin, rangevec, maxs );
-				num = trap_EntitiesInBox( mins, maxs, touch, MAX_GENTITIES );
+				num = SV_AreaEntities( mins, maxs, touch, MAX_GENTITIES );
 
 				//Com_Printf("GI scanning...%d\n", num);
 				for ( i=0 ; i<num ; i++ ) 
@@ -96,7 +96,7 @@ static void Update_GI_Targets( gentity_t* ent )
 					// wrong category
 					if( !(cat & CAT_PLANE) && !(cat & CAT_HELO) ) continue;
 					// check LOS
-					trap_Trace( &tr, ent->r.currentOrigin, 0, 0, hit->r.currentOrigin, ent->s.number, MASK_PLAYERSOLID );
+					SV_Trace( &tr, ent->r.currentOrigin, 0, 0, hit->r.currentOrigin, ent->s.number, MASK_PLAYERSOLID, false );
 					if( tr.fraction < 1 && tr.entityNum != hit->s.number ) continue;
 					// check dist
 					VectorSubtract(hit->r.currentOrigin, ent->r.currentOrigin, dir);
@@ -146,7 +146,7 @@ static void Update_GI_Targets( gentity_t* ent )
 				return;
 			}
 			// check LOS
-			trap_Trace( &tr, ent->r.currentOrigin, 0, 0, ent->tracktarget->r.currentOrigin, ent->s.number, MASK_PLAYERSOLID );
+			SV_Trace( &tr, ent->r.currentOrigin, 0, 0, ent->tracktarget->r.currentOrigin, ent->s.number, MASK_PLAYERSOLID, false );
 			if( tr.fraction < 1 && tr.entityNum != ent->tracktarget->s.number ) 
 			{
 				loselock(ent);
@@ -245,6 +245,6 @@ void GroundInstallation_Think( gentity_t* ent )
 
 	ent->nextthink = level.time + 50;
 	ent->s.pos.trTime = level.time;
-	trap_LinkEntity (&ent->s, &ent->r);
+	SV_LinkEntity (&ent->s, &ent->r);
 }
 

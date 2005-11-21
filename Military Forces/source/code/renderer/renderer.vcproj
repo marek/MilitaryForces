@@ -741,13 +741,7 @@
 				RelativePath="..\win32\glw_win.h">
 			</File>
 			<File
-				RelativePath="..\qcommon\qfiles.h">
-			</File>
-			<File
 				RelativePath="qgl.h">
-			</File>
-			<File
-				RelativePath="..\game\surfaceflags.h">
 			</File>
 			<File
 				RelativePath="tr_local.h">

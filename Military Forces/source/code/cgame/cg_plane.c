@@ -1,5 +1,5 @@
 /*
- * $Id: cg_plane.c,v 1.4 2005-11-20 11:21:38 thebjoern Exp $
+ * $Id: cg_plane.c,v 1.5 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 
@@ -48,13 +48,13 @@ static void CG_PlaneFlags( centity_t *cent ) {
 	// redflag
 	if ( powerups & OB_REDFLAG ) {
 		CG_TrailItem( cent, cgs.media.redFlagModel );
-//		trap_R_AddLightToScene( cent->lerpOrigin, 200 + (rand()&31), 1.0, 0.2f, 0.2f );
+//		refExport.AddLightToScene( cent->lerpOrigin, 200 + (rand()&31), 1.0, 0.2f, 0.2f );
 	}
 
 	// blueflag
 	if ( powerups & OB_BLUEFLAG ) {
 		CG_TrailItem( cent, cgs.media.blueFlagModel );
-//		trap_R_AddLightToScene( cent->lerpOrigin, 200 + (rand()&31), 0.2f, 0.2f, 1.0 );
+//		refExport.AddLightToScene( cent->lerpOrigin, 200 + (rand()&31), 0.2f, 0.2f, 1.0 );
 	}
 }
 

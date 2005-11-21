@@ -1,5 +1,5 @@
 /*
- * $Id: g_team.c,v 1.4 2005-11-20 11:21:38 thebjoern Exp $
+ * $Id: g_team.c,v 1.5 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -94,7 +94,7 @@ void QDECL PrintMsg( gentity_t *ent, const char *fmt, ... ) {
 	while ((p = strchr(msg, '"')) != NULL)
 		*p = '\'';
 
-	trap_SendServerCommand ( ( (ent == NULL) ? -1 : ent-g_entities ), va("print \"%s\"", msg ));
+	SV_GameSendServerCommand ( ( (ent == NULL) ? -1 : ent-g_entities ), va("print \"%s\"", msg ));
 }
 
 /*
@@ -208,7 +208,7 @@ void Team_SetFlagStatus( int team, flagStatus_t status ) {
 			st[1] = 0;
 		}
 
-		trap_SetConfigstring( CS_FLAGSTATUS, st );
+		SV_SetConfigstring( CS_FLAGSTATUS, st );
 	}
 }
 
@@ -591,7 +591,7 @@ gentity_t *Team_GetLocation(gentity_t *ent)
 			continue;
 		}
 
-		if ( !trap_InPVS( origin, eloc->r.currentOrigin ) ) {
+		if ( !SV_inPVS( origin, eloc->r.currentOrigin ) ) {
 			continue;
 		}
 
@@ -781,7 +781,7 @@ void TeamplayInfoMessage( gentity_t *ent ) {
 		}
 	}
 
-	trap_SendServerCommand( ent-g_entities, va("tinfo %i %s", cnt, string) );
+	SV_GameSendServerCommand( ent-g_entities, va("tinfo %i %s", cnt, string) );
 }
 
 void CheckTeamStatus(void) {
@@ -834,7 +834,7 @@ void SP_team_CTF_redplayer( gentity_t *ent ) {
 	// update level information
 	level.ent_category |= ent->ent_category;
 
-	trap_Cvar_Set( "mf_lvcat", va("%i", level.ent_category) );
+	Cvar_Set( "mf_lvcat", va("%i", level.ent_category) );
 }
 
 
@@ -848,7 +848,7 @@ void SP_team_CTF_blueplayer( gentity_t *ent ) {
 	// update level information
 	level.ent_category |= ent->ent_category;
 
-	trap_Cvar_Set( "mf_lvcat", va("%i", level.ent_category) );
+	Cvar_Set( "mf_lvcat", va("%i", level.ent_category) );
 }
 
 
@@ -863,7 +863,7 @@ void SP_team_CTF_redspawn(gentity_t *ent) {
 	// update level information
 	level.ent_category |= ent->ent_category;
 
-	trap_Cvar_Set( "mf_lvcat", va("%i", level.ent_category) );
+	Cvar_Set( "mf_lvcat", va("%i", level.ent_category) );
 }
 
 /*QUAKED team_CTF_bluespawn (0 0 1) (-16 -16 -24) (16 16 32)
@@ -877,6 +877,6 @@ void SP_team_CTF_bluespawn(gentity_t *ent) {
 	// update level information
 	level.ent_category |= ent->ent_category;
 
-	trap_Cvar_Set( "mf_lvcat", va("%i", level.ent_category) );
+	Cvar_Set( "mf_lvcat", va("%i", level.ent_category) );
 }
 

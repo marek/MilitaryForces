@@ -1,5 +1,5 @@
 /*
- * $Id: cg_marks.c,v 1.3 2005-11-20 11:21:38 thebjoern Exp $
+ * $Id: cg_marks.c,v 1.4 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -141,7 +141,7 @@ void CG_ImpactMarkEx( qhandle_t markShader, const vec3_t origin, const vec3_t di
 //	bool		flip = false;
 
 
-// MFQ3: disable ALL impact marks because currently the essential trap_CM_MarkFragments() call does not
+// MFQ3: disable ALL impact marks because currently the essential CM_MarkFragments() call does not
 // work with most of our MFQ3 specific entities
 return;
 
@@ -181,7 +181,7 @@ return;
 
 	// get the fragments
 	VectorScale( dir, -20, projection );
-	numFragments = trap_CM_MarkFragments( 4, 
+	numFragments = refExport.MarkFragments( 4, 
 										  originalPoints,
 										  projection, 
 										  MAX_MARK_POINTS, 
@@ -227,7 +227,7 @@ return;
 		// if it is a temporary (shadow) mark, add it immediately and forget about it
 		if ( temporary )
 		{
-			trap_R_AddPolyToScene( markShader, mf->numPoints, verts );
+			refExport.AddPolyToScene( markShader, mf->numPoints, verts, 1 );
 			continue;
 		}
 
@@ -295,7 +295,7 @@ void CG_AddMarks( void ) {
 		}
 
 
-		trap_R_AddPolyToScene( mp->markShader, mp->poly.numVerts, mp->verts );
+		refExport.AddPolyToScene( mp->markShader, mp->poly.numVerts, mp->verts, 1 );
 	}
 }
 

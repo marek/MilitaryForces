@@ -1,5 +1,5 @@
 /*
- * $Id: cg_localents.c,v 1.5 2005-11-20 11:21:38 thebjoern Exp $
+ * $Id: cg_localents.c,v 1.6 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -173,10 +173,10 @@ void CG_AddFragment( localEntity_t *le ) {
 			le->refEntity.renderfx |= RF_LIGHTING_ORIGIN;
 			oldZ = le->refEntity.origin[2];
 			le->refEntity.origin[2] -= 16 * ( 1.0 - (float)t / SINK_TIME );
-			trap_R_AddRefEntityToScene( &le->refEntity );
+			refExport.AddRefEntityToScene( &le->refEntity );
 			le->refEntity.origin[2] = oldZ;
 		} else {
-			trap_R_AddRefEntityToScene( &le->refEntity );
+			refExport.AddRefEntityToScene( &le->refEntity );
 		}
 
 		return;
@@ -198,7 +198,7 @@ void CG_AddFragment( localEntity_t *le ) {
 			AnglesToAxis( angles, le->refEntity.axis );
 		}
 
-		trap_R_AddRefEntityToScene( &le->refEntity );
+		refExport.AddRefEntityToScene( &le->refEntity );
 
 		return;
 	}
@@ -206,7 +206,7 @@ void CG_AddFragment( localEntity_t *le ) {
 	// if it is in a nodrop zone, remove it
 	// this keeps gibs from waiting at the bottom of pits of death
 	// and floating levels
-	if ( trap_CM_PointContents( trace.endpos, 0 ) & CONTENTS_NODROP ) {
+	if ( CM_PointContents( trace.endpos, 0 ) & CONTENTS_NODROP ) {
 		CG_FreeLocalEntity( le );
 		return;
 	}
@@ -217,7 +217,7 @@ void CG_AddFragment( localEntity_t *le ) {
 	// reflect the velocity on the trace plane
 	CG_ReflectVelocity( le, &trace );
 
-	trap_R_AddRefEntityToScene( &le->refEntity );
+	refExport.AddRefEntityToScene( &le->refEntity );
 }
 
 /*
@@ -248,7 +248,7 @@ void CG_AddFadeRGB( localEntity_t *le ) {
 	re->shaderRGBA[2] = le->color[2] * c;
 	re->shaderRGBA[3] = le->color[3] * c;
 
-	trap_R_AddRefEntityToScene( re );
+	refExport.AddRefEntityToScene( re );
 }
 
 /*
@@ -291,7 +291,7 @@ static void CG_AddMoveScaleFade( localEntity_t *le ) {
 		return;
 	}
 
-	trap_R_AddRefEntityToScene( re );
+	refExport.AddRefEntityToScene( re );
 }
 
 
@@ -328,7 +328,7 @@ static void CG_AddScaleFade( localEntity_t *le ) {
 		return;
 	}
 
-	trap_R_AddRefEntityToScene( re );
+	refExport.AddRefEntityToScene( re );
 }
 
 /*
@@ -342,7 +342,7 @@ static void CG_AddExplosion( localEntity_t *ex ) {
 	ent = &ex->refEntity;
 
 	// add the entity
-	trap_R_AddRefEntityToScene(ent);
+	refExport.AddRefEntityToScene(ent);
 
 	// add the dlight
 	if ( ex->light ) {
@@ -355,7 +355,7 @@ static void CG_AddExplosion( localEntity_t *ex ) {
 			light = 1.0 - ( light - 0.5 ) * 2;
 		}
 		light = ex->light * light;
-		trap_R_AddLightToScene(ent->origin, light, ex->lightColor[0], ex->lightColor[1], ex->lightColor[2] );
+		refExport.AddLightToScene(ent->origin, light, ex->lightColor[0], ex->lightColor[1], ex->lightColor[2] );
 	}
 }
 
@@ -396,7 +396,7 @@ static void CG_AddSpriteExplosion( localEntity_t *le ) {
 		re.radius *= le->radius;
 	}
 
-	trap_R_AddRefEntityToScene( &re );
+	refExport.AddRefEntityToScene( &re );
 
 	// add the dlight
 	if ( le->light ) {
@@ -409,7 +409,7 @@ static void CG_AddSpriteExplosion( localEntity_t *le ) {
 			light = 1.0 - ( light - 0.5 ) * 2;
 		}
 		light = le->light * light;
-		trap_R_AddLightToScene(re.origin, light, le->lightColor[0], le->lightColor[1], le->lightColor[2] );
+		refExport.AddLightToScene(re.origin, light, le->lightColor[0], le->lightColor[1], le->lightColor[2] );
 	}
 }
 
@@ -445,8 +445,8 @@ void CG_AddNuke( localEntity_t *le ) {
 	if (t > NUKE_SHOCKWAVE_STARTTIME && t < NUKE_SHOCKWAVE_ENDTIME) {
 
 		if (!(le->leFlags & LEF_SOUND1)) {
-//			trap_S_StartSound (re->origin, ENTITYNUM_WORLD, CHAN_AUTO, cgs.media.nukeExplodeSound );
-			trap_S_StartLocalSound(cgs.media.nukeExplodeSound, CHAN_AUTO);
+//			S_StartSound (re->origin, ENTITYNUM_WORLD, CHAN_AUTO, cgs.media.nukeExplodeSound );
+			S_StartLocalSound(cgs.media.nukeExplodeSound, CHAN_AUTO);
 			le->leFlags |= LEF_SOUND1;
 		}
 		// 1st nuke shockwave
@@ -474,7 +474,7 @@ void CG_AddNuke( localEntity_t *le ) {
 		shockwave.shaderRGBA[2] = 0xff - c;
 		shockwave.shaderRGBA[3] = 0xff - c;
 
-		trap_R_AddRefEntityToScene( &shockwave );
+		refExport.AddRefEntityToScene( &shockwave );
 	}
 
 	if (t > NUKE_EXPLODE_STARTTIME && t < NUKE_IMPLODE_ENDTIME) {
@@ -491,8 +491,8 @@ void CG_AddNuke( localEntity_t *le ) {
 		}
 		else {
 			if (!(le->leFlags & LEF_SOUND2)) {
-//				trap_S_StartSound (re->origin, ENTITYNUM_WORLD, CHAN_AUTO, cgs.media.nukeImplodeSound );
-				trap_S_StartLocalSound(cgs.media.nukeImplodeSound, CHAN_AUTO);
+//				S_StartSound (re->origin, ENTITYNUM_WORLD, CHAN_AUTO, cgs.media.nukeImplodeSound );
+				S_StartLocalSound(cgs.media.nukeImplodeSound, CHAN_AUTO);
 				le->leFlags |= LEF_SOUND2;
 			}
 			c = (float)(NUKE_IMPLODE_ENDTIME - t) / (float) (NUKE_IMPLODE_ENDTIME - NUKE_IMPLODE_STARTTIME);
@@ -502,9 +502,9 @@ void CG_AddNuke( localEntity_t *le ) {
 		VectorScale( axis[2], c * rad / NUKE_BOOMSPHEREMODEL_RADIUS, re->axis[2] );
 		re->nonNormalizedAxes = true;
 
-		trap_R_AddRefEntityToScene( re );
+		refExport.AddRefEntityToScene( re );
 		// add the dlight
-		trap_R_AddLightToScene( re->origin, c * 1000.0, 1.0, 1.0, c );
+		refExport.AddLightToScene( re->origin, c * 1000.0, 1.0, 1.0, c );
 	}
 
 	if (t > NUKE_SHOCKWAVE2_STARTTIME && t < NUKE_SHOCKWAVE2_ENDTIME) {
@@ -548,7 +548,7 @@ void CG_AddNuke( localEntity_t *le ) {
 		shockwave.shaderRGBA[2] = 0xff - c;
 		shockwave.shaderRGBA[3] = 0xff - c;
 
-		trap_R_AddRefEntityToScene( &shockwave );
+		refExport.AddRefEntityToScene( &shockwave );
 	}
 
 	if (t > NUKE_CLOUD_STARTTIME && t < NUKE_CLOUD_ENDTIME) {
@@ -579,7 +579,7 @@ void CG_AddNuke( localEntity_t *le ) {
 		cloud.shaderRGBA[2] = 0xff - c;
 		cloud.shaderRGBA[3] = 0xff - c;
 
-		trap_R_AddRefEntityToScene( &cloud );
+		refExport.AddRefEntityToScene( &cloud );
 	}
 }
 

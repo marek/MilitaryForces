@@ -1,5 +1,5 @@
 /*
- * $Id: bg_planemove.c,v 1.4 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: bg_planemove.c,v 1.5 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -857,7 +857,8 @@ bool	PM_SlideMove_Plane() {
 					pm->maxs, 
 					end, 
 					pm->ps->clientNum, 
-					pm->tracemask);
+					pm->tracemask,
+					false);
 
 		if (trace.allsolid) {
 
@@ -867,7 +868,8 @@ bool	PM_SlideMove_Plane() {
 					0, 
 					end, 
 					pm->ps->clientNum, 
-					pm->tracemask);
+					pm->tracemask,
+					false);
 
 			if( trace.allsolid ) {
 				// entity is completely trapped in another solid

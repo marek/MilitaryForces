@@ -1,5 +1,5 @@
 /*
- * $Id: bg_groundmove.c,v 1.4 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: bg_groundmove.c,v 1.5 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -186,7 +186,8 @@ static void PM_AdjustToTerrain( void )
 				0,//availableVehicles[pm->vehicle].maxs, 
 				end[0], 
 				pm->ps->clientNum, 
-				MASK_SOLID );
+				MASK_SOLID,
+				false);
 	height = tr.endpos[2] - availableVehicles[pm->vehicle].mins[2] + 1;
 
 	if( tr.fraction < 1.0f ) {
@@ -225,7 +226,8 @@ static void PM_AdjustToTerrain( void )
 						vec3_origin,
 						end[i], 
 						pm->ps->clientNum, 
-						MASK_SOLID );
+						MASK_SOLID,
+						false);
 			VectorCopy( tr.endpos, end[i] ); // New
 			if( tr.fraction == 1 ) fall = true;
 		}
@@ -554,7 +556,8 @@ bool	PM_SlideMove_GV() {
 					pm->maxs, 
 					end, 
 					pm->ps->clientNum, 
-					pm->tracemask);
+					pm->tracemask,
+					false);
 
 		if (trace.allsolid) {
 
@@ -564,7 +567,8 @@ bool	PM_SlideMove_GV() {
 					0, 
 					end, 
 					pm->ps->clientNum, 
-					pm->tracemask);
+					pm->tracemask,
+					false);
 
 			if( trace.allsolid ) {
 				// entity is completely trapped in another solid

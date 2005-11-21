@@ -1,5 +1,5 @@
 /*
- * $Id: cg_ents.c,v 1.3 2005-11-20 11:21:38 thebjoern Exp $
+ * $Id: cg_ents.c,v 1.4 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -23,7 +23,7 @@ void CG_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent,
 	orientation_t	lerped;
 	
 	// lerp the tag
-	trap_R_LerpTag( &lerped, parentModel, parent->oldframe, parent->frame,
+	refExport.LerpTag( &lerped, parentModel, parent->oldframe, parent->frame,
 		1.0 - parent->backlerp, tagName );
 
 	// FIXME: allow origin offsets along tag?
@@ -54,7 +54,7 @@ void CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *pare
 
 //AxisClear( entity->axis );
 	// lerp the tag
-	trap_R_LerpTag( &lerped, parentModel, parent->oldframe, parent->frame,
+	refExport.LerpTag( &lerped, parentModel, parent->oldframe, parent->frame,
 		1.0 - parent->backlerp, tagName );
 
 	// FIXME: allow origin offsets along tag?
@@ -92,9 +92,9 @@ void CG_SetEntitySoundPosition( centity_t *cent ) {
 
 		v = cgs.inlineModelMidpoints[ cent->currentState.modelindex ];
 		VectorAdd( cent->lerpOrigin, v, origin );
-		trap_S_UpdateEntityPosition( cent->currentState.number, origin );
+		S_UpdateEntityPosition( cent->currentState.number, origin );
 	} else {
-		trap_S_UpdateEntityPosition( cent->currentState.number, cent->lerpOrigin );
+		S_UpdateEntityPosition( cent->currentState.number, cent->lerpOrigin );
 	}
 }
 
@@ -113,10 +113,10 @@ static void CG_EntityEffects( centity_t *cent ) {
 	// add loop sound
 	if ( cent->currentState.loopSound ) {
 		if (cent->currentState.eType != ET_SPEAKER) {
-			trap_S_AddLoopingSound( cent->currentState.number, cent->lerpOrigin, vec3_origin, 
+			S_AddLoopingSound( cent->currentState.number, cent->lerpOrigin, vec3_origin, 
 				cgs.gameSounds[ cent->currentState.loopSound ] );
 		} else {
-			trap_S_AddRealLoopingSound( cent->currentState.number, cent->lerpOrigin, vec3_origin, 
+			S_AddRealLoopingSound( cent->currentState.number, cent->lerpOrigin, vec3_origin, 
 				cgs.gameSounds[ cent->currentState.loopSound ] );
 		}
 	}
@@ -132,7 +132,7 @@ static void CG_EntityEffects( centity_t *cent ) {
 		g = ( cl >> 8 ) & 255;
 		b = ( cl >> 16 ) & 255;
 		i = ( ( cl >> 24 ) & 255 ) * 4;
-		trap_R_AddLightToScene( cent->lerpOrigin, i, r, g, b );
+		refExport.AddLightToScene( cent->lerpOrigin, i, r, g, b );
 	}*/
 
 }
@@ -176,7 +176,7 @@ static void CG_General( centity_t *cent ) {
 	AnglesToAxis( cent->lerpAngles, ent.axis );
 
 	// add to refresh list
-	trap_R_AddRefEntityToScene (&ent);
+	refExport.AddRefEntityToScene (&ent);
 }
 
 /*
@@ -195,7 +195,7 @@ static void CG_Speaker( centity_t *cent ) {
 		return;
 	}
 
-	trap_S_StartSound (NULL, cent->currentState.number, CHAN_ITEM, cgs.gameSounds[cent->currentState.eventParm] );
+	S_StartSound (NULL, cent->currentState.number, CHAN_ITEM, cgs.gameSounds[cent->currentState.eventParm] );
 
 	//	ent->s.frame = ent->wait * 10;
 	//	ent->s.clientNum = ent->random * 10;
@@ -236,7 +236,7 @@ static void CG_Item( centity_t *cent ) {
 		ent.shaderRGBA[1] = 255;
 		ent.shaderRGBA[2] = 255;
 		ent.shaderRGBA[3] = 255;
-		trap_R_AddRefEntityToScene(&ent);
+		refExport.AddRefEntityToScene(&ent);
 		return;
 	}
 
@@ -275,7 +275,7 @@ static void CG_Item( centity_t *cent ) {
 	}
 
 	// add to refresh list
-	trap_R_AddRefEntityToScene(&ent);
+	refExport.AddRefEntityToScene(&ent);
 
 	// accompanying rings / spheres for powerups
 	if ( !cg_simpleItems.integer ) 
@@ -297,7 +297,7 @@ static void CG_Item( centity_t *cent ) {
 					VectorScale( ent.axis[2], frac, ent.axis[2] );
 					ent.nonNormalizedAxes = true;
 				}
-				trap_R_AddRefEntityToScene( &ent );
+				refExport.AddRefEntityToScene( &ent );
 			}
 		}
 	}
@@ -341,7 +341,7 @@ static void CG_Missile( centity_t *cent ) {
 
 	// add dynamic light
 	if ( weapon->missileDlight ) {
-		trap_R_AddLightToScene(cent->lerpOrigin, weapon->missileDlight, 
+		refExport.AddLightToScene(cent->lerpOrigin, weapon->missileDlight, 
 			weapon->missileDlightColor[0], weapon->missileDlightColor[1], weapon->missileDlightColor[2] );
 	}
 
@@ -351,7 +351,7 @@ static void CG_Missile( centity_t *cent ) {
 
 		BG_EvaluateTrajectoryDelta( &cent->currentState.pos, cg.time, velocity );
 
-		trap_S_AddLoopingSound( cent->currentState.number, cent->lerpOrigin, velocity, weapon->missileSound );
+		S_AddLoopingSound( cent->currentState.number, cent->lerpOrigin, velocity, weapon->missileSound );
 	}
 
 	// create the render entity
@@ -392,7 +392,7 @@ static void CG_Missile( centity_t *cent ) {
 	
 
 	// add to refresh list
-	trap_R_AddRefEntityToScene( &ent );
+	refExport.AddRefEntityToScene( &ent );
 
 }
 
@@ -430,7 +430,7 @@ static void CG_Bullet_Tracer( centity_t *cent ) {
 	}
 	RotateAroundDirection( ent.axis, s1->time );
 
-	trap_R_AddRefEntityToScene( &ent );
+	refExport.AddRefEntityToScene( &ent );
 }
 
 /*
@@ -463,13 +463,13 @@ static void CG_Mover( centity_t *cent ) {
 	}
 
 	// add to refresh list
-	trap_R_AddRefEntityToScene(&ent);
+	refExport.AddRefEntityToScene(&ent);
 
 	// add the secondary model
 	if ( s1->modelindex2 ) {
 		ent.skinNum = 0;
 		ent.hModel = cgs.gameModels[s1->modelindex2];
-		trap_R_AddRefEntityToScene(&ent);
+		refExport.AddRefEntityToScene(&ent);
 	}
 
 }
@@ -511,7 +511,7 @@ static void CG_Explosive( centity_t *cent ) {
 	}
 
 	// add to refresh list
-	trap_R_AddRefEntityToScene(&ent);
+	refExport.AddRefEntityToScene(&ent);
 
 }
 
@@ -539,7 +539,7 @@ void CG_Beam( centity_t *cent ) {
 	ent.renderfx = RF_NOSHADOW;
 
 	// add to refresh list
-	trap_R_AddRefEntityToScene(&ent);
+	refExport.AddRefEntityToScene(&ent);
 }
 
 
@@ -572,7 +572,7 @@ static void CG_Portal( centity_t *cent ) {
 	ent.skinNum = s1->clientNum/256.0 * 360;	// roll offset
 
 	// add to refresh list
-	trap_R_AddRefEntityToScene(&ent);
+	refExport.AddRefEntityToScene(&ent);
 }
 
 

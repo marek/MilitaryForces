@@ -1,5 +1,5 @@
 /*
- * $Id: g_arenas.c,v 1.4 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: g_arenas.c,v 1.5 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -71,7 +71,7 @@ void UpdateTournamentInfo( void ) {
 		}
 		strcat( msg, buf );
 	}
-	trap_Cmd_ExecuteText( EXEC_APPEND, msg );
+	Cbuf_ExecuteText( EXEC_APPEND, msg );
 }
 
 

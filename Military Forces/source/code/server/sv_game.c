@@ -86,7 +86,8 @@ SV_GameSendServerCommand
 Sends a command string to a client
 ===============
 */
-void SV_GameSendServerCommand( int clientNum, const char *text ) {
+void SV_GameSendServerCommand( int clientNum, const char *text ) 
+{
 	if ( clientNum == -1 ) {
 		SV_SendServerCommand( NULL, "%s", text );
 	} else {
@@ -105,7 +106,8 @@ SV_GameDropClient
 Disconnects the client with a message
 ===============
 */
-void SV_GameDropClient( int clientNum, const char *reason ) {
+void SV_GameDropClient( int clientNum, const char *reason ) 
+{
 	if ( clientNum < 0 || clientNum >= sv_maxclients->integer ) {
 		return;
 	}
@@ -120,7 +122,8 @@ SV_SetBrushModel
 sets mins and maxs for inline bmodels
 =================
 */
-void SV_SetBrushModel( entityState_t* s, entityShared_t* r, const char *name ) {
+void SV_SetBrushModel( entityState_t* s, entityShared_t* r, const char *name ) 
+{
 	clipHandle_t	h;
 	vec3_t			mins, maxs;
 
@@ -213,7 +216,8 @@ bool SV_inPVSIgnorePortals( const vec3_t p1, const vec3_t p2)
 SV_AdjustAreaPortalState
 ========================
 */
-void SV_AdjustAreaPortalState( const entityState_t* s, const entityShared_t* r, int open ) {
+void SV_AdjustAreaPortalState( const entityState_t* s, const entityShared_t* r, int open ) 
+{
 	svEntity_t	*svEnt;
 
 	svEnt = SV_SvEntityForGentity( s, r );
@@ -253,7 +257,8 @@ SV_GetServerinfo
 
 ===============
 */
-void SV_GetServerinfo( char *buffer, int bufferSize ) {
+void SV_GetServerinfo( char *buffer, int bufferSize ) 
+{
 	if ( bufferSize < 1 ) {
 		Com_Error( ERR_DROP, "SV_GetServerinfo: bufferSize == %i", bufferSize );
 	}
@@ -267,7 +272,8 @@ SV_LocateGameData
 ===============
 */
 void SV_LocateGameData( void* gEnts, int numGEntities, int sizeofGEntity_t,
-					   playerState_t *clients, int sizeofGameClient ) {
+					   playerState_t *clients, int sizeofGameClient ) 
+{
 	sv.gentities = (sharedEntity_t*)gEnts;
 	sv.gentitySize = sizeofGEntity_t;
 	sv.num_entities = numGEntities;
@@ -283,7 +289,8 @@ SV_GetUsercmd
 
 ===============
 */
-void SV_GetUsercmd( int clientNum, usercmd_t *cmd ) {
+void SV_GetUsercmd( int clientNum, usercmd_t *cmd ) 
+{
 	if ( clientNum < 0 || clientNum >= sv_maxclients->integer ) {
 		Com_Error( ERR_DROP, "SV_GetUsercmd: bad clientNum:%i", clientNum );
 	}

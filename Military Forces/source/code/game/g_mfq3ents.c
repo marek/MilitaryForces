@@ -1,5 +1,5 @@
 /*
- * $Id: g_mfq3ents.c,v 1.5 2005-11-20 11:21:38 thebjoern Exp $
+ * $Id: g_mfq3ents.c,v 1.6 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 
@@ -57,7 +57,7 @@ void explosive_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, 
 		}
 	}
 
-	trap_UnlinkEntity( &self->s, &self->r );
+	SV_UnlinkEntity( &self->s, &self->r );
 	
 }
 
@@ -67,7 +67,7 @@ A bmodel that just sits there, doing nothing, for planes to land on
 */
 void SP_func_runway( gentity_t *ent ) 
 {
-	trap_SetBrushModel( &ent->s, &ent->r, ent->model );
+	SV_SetBrushModel( &ent->s, &ent->r, ent->model );
 	ent->r.svFlags = SVF_USE_CURRENT_ORIGIN;
 	ent->s.eType = ET_EXPLOSIVE;
 	ent->s.pos.trType = TR_STATIONARY;
@@ -92,7 +92,7 @@ void SP_func_runway( gentity_t *ent )
 //	Com_Printf( "runway: %d, %.1f %.1f %.1f - %.1f %.1f %.1f\n", ent->health, ent->r.mins[0],
 //		ent->r.mins[1], ent->r.mins[2], ent->r.maxs[0], ent->r.maxs[1], ent->r.maxs[2] );
 
-	trap_LinkEntity (&ent->s, &ent->r);
+	SV_LinkEntity (&ent->s, &ent->r);
 }
 
 
@@ -111,7 +111,7 @@ health = well, health :-)
 */
 void SP_func_explosive( gentity_t *ent ) 
 {
-	trap_SetBrushModel( &ent->s, &ent->r, ent->model );
+	SV_SetBrushModel( &ent->s, &ent->r, ent->model );
 	ent->r.svFlags = SVF_USE_CURRENT_ORIGIN;
 	ent->s.eType = ET_EXPLOSIVE;
 	ent->s.pos.trType = TR_STATIONARY;
@@ -134,7 +134,7 @@ void SP_func_explosive( gentity_t *ent )
 			ent->s.generic1 = TEAM_BLUE;	
 		}
 	}
-	trap_LinkEntity (&ent->s, &ent->r);
+	SV_LinkEntity (&ent->s, &ent->r);
 }
 
 
@@ -220,7 +220,7 @@ void SP_trigger_recharge( gentity_t *self ) {
 	if( !self->ent_category ) self->ent_category = CAT_ANY;
 //	else self->ent_category <<= 8;
 
-	trap_SetBrushModel( &self->s, &self->r, self->model );
+	SV_SetBrushModel( &self->s, &self->r, self->model );
 	self->clipmask = self->r.contents = CONTENTS_TRIGGER;
 	self->r.svFlags = SVF_NOCLIENT;
 	self->touch = recharge_touch;
@@ -235,7 +235,7 @@ void SP_trigger_recharge( gentity_t *self ) {
 	} else {
 		self->s.generic1 = TEAM_FREE;
 	}
-	trap_LinkEntity (&self->s, &self->r);
+	SV_LinkEntity (&self->s, &self->r);
 }
 
 
@@ -282,8 +282,9 @@ by the tower (elevators, catapults etc)
 target - the entity triggered
 message - the message to be displayed (radio comm)
 */
-void SP_trigger_radio( gentity_t *self ) {
-	trap_SetBrushModel( &self->s, &self->r, self->model );
+void SP_trigger_radio( gentity_t *self ) 
+{
+	SV_SetBrushModel( &self->s, &self->r, self->model );
 	self->clipmask = self->r.contents = CONTENTS_TRIGGER;
 	self->r.svFlags = SVF_NOCLIENT;
 	self->touch = radio_tower;
@@ -298,7 +299,7 @@ void SP_trigger_radio( gentity_t *self ) {
 	} else {
 		self->s.generic1 = TEAM_FREE;
 	}
-	trap_LinkEntity (&self->s, &self->r);
+	SV_LinkEntity (&self->s, &self->r);
 }
 
 

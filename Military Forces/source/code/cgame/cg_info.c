@@ -1,5 +1,5 @@
 /*
- * $Id: cg_info.c,v 1.3 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: cg_info.c,v 1.4 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -44,7 +44,7 @@ CG_LoadingString
 void CG_LoadingString( const char *s ) {
 	Q_strncpyz( cg.infoScreenText, s, sizeof( cg.infoScreenText ) );
 
-	trap_UpdateScreen();
+	SCR_UpdateScreen();
 }
 
 
@@ -59,7 +59,7 @@ void CG_LoadingItem( int itemNum ) {
 	item = &bg_itemlist[itemNum];
 	
 	if ( item->icon && loadingItemIconCount < MAX_LOADING_ITEM_ICONS ) {
-		loadingItemIcons[loadingItemIconCount++] = trap_R_RegisterShaderNoMip( item->icon );
+		loadingItemIcons[loadingItemIconCount++] = refExport.RegisterShaderNoMip( item->icon );
 	}
 
 	CG_LoadingString( item->pickup_name );
@@ -90,18 +90,18 @@ void CG_DrawInformation( void ) {
 
 	// try to load the loading shot for this map
 	// NOTE: changed from 'levelshots', because only use now use the levelshots for small map previews (MM)
-	loadingshot = trap_R_RegisterShaderNoMip( va( "loadingshots/%s.jpg", s ) );	
+	loadingshot = refExport.RegisterShaderNoMip( va( "loadingshots/%s.jpg", s ) );	
 
 	// load background
-	background = trap_R_RegisterShaderNoMip( "ui/assets/backscreen.jpg" );	
+	background = refExport.RegisterShaderNoMip( "ui/assets/backscreen.jpg" );	
 	if( !background )
 	{
 		// use default
-		background = trap_R_RegisterShaderNoMip( "textures/sfx/logo512" );
+		background = refExport.RegisterShaderNoMip( "textures/sfx/logo512" );
 	}
 
 	// full screen render
-	trap_R_SetColor( NULL );
+	refExport.SetColor( NULL );
 	CG_DrawPic( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, background );
 
 	// alpha blend the 1024x256 loading shot (or gameset artwork) over the picture frame
@@ -111,7 +111,7 @@ void CG_DrawInformation( void ) {
 		pGameset = Info_ValueForKey( info, "mf_gameset" );
 		if( pGameset[0] )
 		{
-			loadingshot = trap_R_RegisterShaderNoMip( va( "ui\\assets\\mid-%s", pGameset ) );
+			loadingshot = refExport.RegisterShaderNoMip( va( "ui\\assets\\mid-%s", pGameset ) );
 		}
 	}
 
@@ -152,7 +152,7 @@ void CG_DrawInformation( void ) {
 	y = 348;
 
 	// server information (OPTIONAL - if not a local game)
-	trap_Cvar_VariableStringBuffer( "sv_running", buf, sizeof( buf ) );
+	Cvar_VariableStringBuffer( "sv_running", buf, sizeof( buf ) );
 	if( !atoi( buf ) )
 	{		
 		// pure?

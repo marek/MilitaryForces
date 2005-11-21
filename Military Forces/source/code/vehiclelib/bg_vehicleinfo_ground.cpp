@@ -7,8 +7,8 @@
 
 
 // decls
-int		trap_FS_FOpenFile( const char *qpath, fileHandle_t *f, fsMode_t mode );
-void	trap_FS_FCloseFile( fileHandle_t f );
+int FS_FOpenFileByMode( const char *qpath, fileHandle_t *f, fsMode_t mode );
+void FS_FCloseFile( fileHandle_t f );
 
 
 GameObjectInfo_GroundVehicle::GameObjectInfo_GroundVehicle() :

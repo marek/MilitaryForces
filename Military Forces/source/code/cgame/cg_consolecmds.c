@@ -1,5 +1,5 @@
 /*
- * $Id: cg_consolecmds.c,v 1.3 2005-10-28 13:06:54 thebjoern Exp $
+ * $Id: cg_consolecmds.c,v 1.4 2005-11-21 17:28:20 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -35,8 +35,8 @@ void CG_TargetCommand_f( void ) {
 		return;
 	}
 
-	trap_Argv( 1, test, 4 );
-	trap_SendConsoleCommand( va( "gc %i %i", targetNum, atoi( test ) ) );
+	Cmd_ArgvBuffer( 1, test, 4 );
+	Cbuf_AddText( va( "gc %i %i", targetNum, atoi( test ) ) );
 }
 
 
@@ -81,15 +81,15 @@ static void CG_Set_MFD_Mode( int num ) {
 		if( cg.Mode_MFD[num] >= MFD_MAX ) cg.Mode_MFD[num] = MFD_OFF;
 		value = cg.Mode_MFD[num];
 		if( num ) value += MFD_MAX;
-		trap_Cvar_VariableStringBuffer( cycleCvars[value], buffer, 32 );
+		Cvar_VariableStringBuffer( cycleCvars[value], buffer, 32 );
 		value = atoi(buffer);
 		if( value ) found = true;
 	}
 
 	if( num == MFD_1 )
-		trap_Cvar_Set( "mfd1_defaultpage", va("%d", cg.Mode_MFD[num]) );
+		Cvar_Set( "mfd1_defaultpage", va("%d", cg.Mode_MFD[num]) );
 	else if( num == MFD_2 )
-		trap_Cvar_Set( "mfd2_defaultpage", va("%d", cg.Mode_MFD[num]) );
+		Cvar_Set( "mfd2_defaultpage", va("%d", cg.Mode_MFD[num]) );
 }
 
 static void CG_Set_MFD1_Mode_f( void ) {
@@ -120,7 +120,7 @@ MFQ3 MFD Mode setting
 static void CG_Set_MFD_Page( int num ) {
 	int page;
 
-	if( trap_Argc() < 2 ) {
+	if( Cmd_Argc() < 2 ) {
 		return;
 	}
 
@@ -132,9 +132,9 @@ static void CG_Set_MFD_Page( int num ) {
 	cg.Mode_MFD[num] = page;
 
 	if( num == MFD_1 )
-		trap_Cvar_Set( "mfd1_defaultpage", va("%d", page) );
+		Cvar_Set( "mfd1_defaultpage", va("%d", page) );
 	else if( num == MFD_2 )
-		trap_Cvar_Set( "mfd2_defaultpage", va("%d", page) );
+		Cvar_Set( "mfd2_defaultpage", va("%d", page) );
 
 }
 
@@ -183,7 +183,7 @@ static void CG_Cycle_HUD_Color_f( void ) {
 	if( cg.HUDColor >= HUD_MAX || cg.HUDColor < 0 ) {
 		cg.HUDColor = 0;
 	}
-	trap_Cvar_Set( "hud_color", va("%d", cg.HUDColor) );
+	Cvar_Set( "hud_color", va("%d", cg.HUDColor) );
 
 	cg.HUDColorTime = cg.time + 100;
 }
@@ -210,7 +210,7 @@ static void CG_Toggle_MFD1_f( void ) {
 	int mfd1 = hud_mfd.integer;
 
 	mfd1 = mfd1 ? 0 : 1;
-	trap_Cvar_Set( "hud_mfd", va("%d", mfd1) );
+	Cvar_Set( "hud_mfd", va("%d", mfd1) );
 	
 }
 
@@ -218,7 +218,7 @@ static void CG_Toggle_MFD2_f( void ) {
 	int mfd2 = hud_mfd2.integer;
 
 	mfd2 = mfd2 ? 0 : 1;
-	trap_Cvar_Set( "hud_mfd2", va("%d", mfd2) );
+	Cvar_Set( "hud_mfd2", va("%d", mfd2) );
 
 }
 
@@ -238,7 +238,7 @@ static void CG_Cycle_MFD_Color_f( void ) {
 	if( cg.MFDColor >= HUD_MAX || cg.MFDColor < 0 ) {
 		cg.MFDColor = 0;
 	}
-	trap_Cvar_Set( "mfd_color", va("%d", cg.MFDColor) );
+	Cvar_Set( "mfd_color", va("%d", cg.MFDColor) );
 
 	cg.MFDColorTime = cg.time + 100;
 }
@@ -273,7 +273,7 @@ static void CG_Set_Camera_Mode_f( void ) {
 		return;
 	}
 
-	if( trap_Argc() < 2 ) {
+	if( Cmd_Argc() < 2 ) {
 		return;
 	}
 
@@ -337,9 +337,9 @@ static void CG_ToggleView_f( void ) {
 	}
 
 	if( !cg_thirdPerson.integer ) {
-    	trap_Cvar_Set("cg_thirdPerson", va("%i",1));
+    	Cvar_Set("cg_thirdPerson", va("%i",1));
 	} else {
-    	trap_Cvar_Set("cg_thirdPerson", va("%i",0));
+    	Cvar_Set("cg_thirdPerson", va("%i",0));
 	}
 	cg.toggleViewTime = cg.time + 500;
 }
@@ -396,7 +396,7 @@ Keybinding command
 =================
 */
 static void CG_SizeUp_f (void) {
-	trap_Cvar_Set("cg_viewsize", va("%i",(int)(cg_viewsize.integer+10)));
+	Cvar_Set("cg_viewsize", va("%i",(int)(cg_viewsize.integer+10)));
 }
 
 
@@ -408,7 +408,7 @@ Keybinding command
 =================
 */
 static void CG_SizeDown_f (void) {
-	trap_Cvar_Set("cg_viewsize", va("%i",(int)(cg_viewsize.integer-10)));
+	Cvar_Set("cg_viewsize", va("%i",(int)(cg_viewsize.integer-10)));
 }
 
 
@@ -432,7 +432,7 @@ static void CG_ScoresDown_f( void ) {
 		// the scores are more than two seconds out of data,
 		// so request New ones
 		cg.scoresRequestTime = cg.time;
-		trap_SendClientCommand( "score" );
+		CL_AddReliableCommand( "score" );
 
 		// leave the current scores up if they were already
 		// displayed, but if this is the first hit, clear them out
@@ -464,9 +464,9 @@ static void CG_TellTarget_f( void ) {
 		return;
 	}
 
-	trap_Args( message, 128 );
+	Cmd_ArgsBuffer( message, 128 );
 	Com_sprintf( command, 128, "tell %i %s", clientNum, message );
-	trap_SendClientCommand( command );
+	CL_AddReliableCommand( command );
 }
 
 static void CG_TellAttacker_f( void ) {
@@ -479,9 +479,9 @@ static void CG_TellAttacker_f( void ) {
 		return;
 	}
 
-	trap_Args( message, 128 );
+	Cmd_ArgsBuffer( message, 128 );
 	Com_sprintf( command, 128, "tell %i %s", clientNum, message );
-	trap_SendClientCommand( command );
+	CL_AddReliableCommand( command );
 }
 
 static void CG_TestPlane_f( void ) {
@@ -495,7 +495,7 @@ static void CG_TestGV_f( void ) {
 static void CG_Spawn_GI_f( void ) {
 	int idx;
 
-	if( trap_Argc() < 2 ) return;
+	if( Cmd_Argc() < 2 ) return;
 
 	idx = atoi( CG_Argv(1) );
 
@@ -509,7 +509,7 @@ static void CG_Spawn_GI_f( void ) {
 }
 
 static void CG_ExportToScript_f( void ) {
-	if( trap_Argc() < 2 ) 
+	if( Cmd_Argc() < 2 ) 
 	{
 		CG_Printf("Scriptname not specified!");
 		return;
@@ -520,7 +520,7 @@ static void CG_ExportToScript_f( void ) {
 }
 
 static void CG_ImportScript_f( void ) {
-	if( trap_Argc() < 2 )
+	if( Cmd_Argc() < 2 )
 	{
 		CG_Printf("Scriptname not specified!");
 		return;
@@ -715,39 +715,39 @@ void CG_InitConsoleCommands( void ) {
 	int		i;
 
 	for ( i = 0 ; i < sizeof( commands ) / sizeof( commands[0] ) ; i++ ) {
-		trap_AddCommand( commands[i].cmd );
+		CL_AddCgameCommand( commands[i].cmd );
 	}
 
 	//
 	// the game server will interpret these commands, which will be automatically
 	// forwarded to the server after they are not recognized locally
 	//
-	trap_AddCommand ("kill");
-	trap_AddCommand ("say");
-	trap_AddCommand ("say_team");
-	trap_AddCommand ("tell");
-	trap_AddCommand ("vsay");
-	trap_AddCommand ("vsay_team");
-	trap_AddCommand ("vtell");
-	trap_AddCommand ("vtaunt");
-	trap_AddCommand ("vosay");
-	trap_AddCommand ("vosay_team");
-	trap_AddCommand ("votell");
-	trap_AddCommand ("noclip");
-	trap_AddCommand ("team");
-	trap_AddCommand ("follow");
-	trap_AddCommand ("levelshot");
-	trap_AddCommand ("addbot");
-	trap_AddCommand ("setviewpos");
-	trap_AddCommand ("callvote");
-	trap_AddCommand ("vote");
-	trap_AddCommand ("callteamvote");
-	trap_AddCommand ("teamvote");
-	trap_AddCommand ("stats");
-	trap_AddCommand ("teamtask");
-	trap_AddCommand ("loaddefered");	// spelled wrong, but not changing for demo
-	trap_AddCommand ("contact_tower");
-	trap_AddCommand ("radar");
-	trap_AddCommand ("unlock");
+	CL_AddCgameCommand ("kill");
+	CL_AddCgameCommand ("say");
+	CL_AddCgameCommand ("say_team");
+	CL_AddCgameCommand ("tell");
+	CL_AddCgameCommand ("vsay");
+	CL_AddCgameCommand ("vsay_team");
+	CL_AddCgameCommand ("vtell");
+	CL_AddCgameCommand ("vtaunt");
+	CL_AddCgameCommand ("vosay");
+	CL_AddCgameCommand ("vosay_team");
+	CL_AddCgameCommand ("votell");
+	CL_AddCgameCommand ("noclip");
+	CL_AddCgameCommand ("team");
+	CL_AddCgameCommand ("follow");
+	CL_AddCgameCommand ("levelshot");
+	CL_AddCgameCommand ("addbot");
+	CL_AddCgameCommand ("setviewpos");
+	CL_AddCgameCommand ("callvote");
+	CL_AddCgameCommand ("vote");
+	CL_AddCgameCommand ("callteamvote");
+	CL_AddCgameCommand ("teamvote");
+	CL_AddCgameCommand ("stats");
+	CL_AddCgameCommand ("teamtask");
+	CL_AddCgameCommand ("loaddefered");	// spelled wrong, but not changing for demo
+	CL_AddCgameCommand ("contact_tower");
+	CL_AddCgameCommand ("radar");
+	CL_AddCgameCommand ("unlock");
 
 }

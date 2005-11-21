@@ -296,12 +296,6 @@
 				RelativePath=".\cg_weapons.c">
 			</File>
 			<File
-				RelativePath="..\game\q_math.c">
-			</File>
-			<File
-				RelativePath="..\game\q_shared.c">
-			</File>
-			<File
 				RelativePath=".\ui_displaycontext_cg.cpp">
 			</File>
 			<File

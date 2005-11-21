@@ -6,9 +6,9 @@
 #include "../game/bg_public.h"
 
 // decls
-int		trap_FS_FOpenFile( const char *qpath, fileHandle_t *f, fsMode_t mode );
-void	trap_FS_Read( void *buffer, int len, fileHandle_t f );
-void	trap_FS_FCloseFile( fileHandle_t f );
+int FS_FOpenFileByMode( const char *qpath, fileHandle_t *f, fsMode_t mode );
+int FS_Read2( void *buffer, int len, fileHandle_t f );
+void FS_FCloseFile( fileHandle_t f );
 
 
 
@@ -38,7 +38,7 @@ GameObjectInfo_Aircraft::setupBoundingBox()
 
 	fileHandle_t fileVehicle;
 
-	if( trap_FS_FOpenFile((modelBaseName + ".md3").c_str(), &fileVehicle, FS_READ) < 0 ) 
+	if( FS_FOpenFileByMode((modelBaseName + ".md3").c_str(), &fileVehicle, FS_READ) < 0 ) 
 	{
 		Com_Error(ERR_FATAL, "Unable to open model file %s\n", modelBaseName.c_str() );
 		return false;
@@ -55,7 +55,7 @@ GameObjectInfo_Aircraft::setupBoundingBox()
 		{
 			// gear
 			fileHandle_t fileGear;
-			if( trap_FS_FOpenFile((modelBaseName + "_gear.md3").c_str(), &fileGear, FS_READ) >= 0 ) 
+			if( FS_FOpenFileByMode((modelBaseName + "_gear.md3").c_str(), &fileGear, FS_READ) >= 0 ) 
 			{
 				// gear animations
 				int frames = Md3Utils::getNumberOfFrames( fileGear );
@@ -83,7 +83,7 @@ GameObjectInfo_Aircraft::setupBoundingBox()
 						success = false;
 				}
 
-				trap_FS_FCloseFile(fileGear);
+				FS_FCloseFile(fileGear);
 			}
 			else
 			{
@@ -94,13 +94,13 @@ GameObjectInfo_Aircraft::setupBoundingBox()
 		else
 			success = false;
 	}
-	trap_FS_FCloseFile(fileVehicle);
+	FS_FCloseFile(fileVehicle);
 
 	if( success && bayAnim_ )
 	{
 		// gear
 		fileHandle_t fileBay;
-		if( trap_FS_FOpenFile((modelBaseName + "_bay.md3").c_str(), &fileBay, FS_READ) >= 0 ) 
+		if( FS_FOpenFileByMode((modelBaseName + "_bay.md3").c_str(), &fileBay, FS_READ) >= 0 ) 
 		{
 			// gear animations
 			int frames = Md3Utils::getNumberOfFrames( fileBay );
@@ -109,7 +109,7 @@ GameObjectInfo_Aircraft::setupBoundingBox()
 			else
 				bayAnim_->maxFrame_ = frames - 1;
 
-			trap_FS_FCloseFile(fileBay);
+			FS_FCloseFile(fileBay);
 		}
 		else
 			success = false;

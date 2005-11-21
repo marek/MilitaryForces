@@ -1,5 +1,5 @@
 /*
- * $Id: ui_local.h,v 1.8 2005-11-20 11:21:38 thebjoern Exp $
+ * $Id: ui_local.h,v 1.9 2005-11-21 17:28:32 thebjoern Exp $
 */
 //
 #ifndef __UI_LOCAL_H__
@@ -15,6 +15,7 @@
 #include "ui.h"
 #include "ui_displaycontext_ui.h"
 #include "ui_utils_ui.h"
+#include "../renderer/tr_public.h"
 
 struct UI_Utils;
 
@@ -22,6 +23,9 @@ struct UI_Utils;
 
 //extern displayContextDef_t * DC;
 //extern UI_DisplayContext* gDC;
+
+extern refexport_t	refExport;
+
 
 extern vmCvar_t	ui_ffa_fraglimit;
 extern vmCvar_t	ui_ffa_timelimit;
@@ -912,91 +916,60 @@ void UI_SPSkillMenu_Cache( void );
 
 // system calls
 int Sys_Milliseconds ();
-
-//
-// ui_syscalls.c
-//
-//void			trap_Print( const char *string );
-//void			trap_Error( const char *string );
-//int				trap_Milliseconds( void );
-void			trap_Cvar_Register( vmCvar_t *vmCvar, const char *varName, const char *defaultValue, int flags );
-void			trap_Cvar_Update( vmCvar_t *vmCvar );
-void			trap_Cvar_Set( const char *var_name, const char *value );
-float			trap_Cvar_VariableValue( const char *var_name );
-void			trap_Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize );
-void			trap_Cvar_SetValue( const char *var_name, float value );
-void			trap_Cvar_Reset( const char *name );
-void			trap_Cvar_Create( const char *var_name, const char *var_value, int flags );
-void			trap_Cvar_InfoStringBuffer( int bit, char *buffer, int bufsize );
-int				trap_Argc( void );
-void			trap_Argv( int n, char *buffer, int bufferLength );
-void			trap_Cmd_ExecuteText( int exec_when, const char *text );	// don't use EXEC_NOW!
-int				trap_FS_FOpenFile( const char *qpath, fileHandle_t *f, fsMode_t mode );
-void			trap_FS_Read( void *buffer, int len, fileHandle_t f );
-void			trap_FS_Write( const void *buffer, int len, fileHandle_t f );
-void			trap_FS_FCloseFile( fileHandle_t f );
-int				trap_FS_GetFileList(  const char *path, const char *extension, char *listbuf, int bufsize );
-int				trap_FS_Seek( fileHandle_t f, long offset, int origin ); // fsOrigin_t
-qhandle_t		trap_R_RegisterModel( const char *name );
-qhandle_t		trap_R_RegisterSkin( const char *name );
-qhandle_t		trap_R_RegisterShaderNoMip( const char *name );
-void			trap_R_ClearScene( void );
-void			trap_R_AddRefEntityToScene( const refEntity_t *re );
-void			trap_R_AddPolyToScene( qhandle_t hShader , int numVerts, const polyVert_t *verts );
-void			trap_R_AddLightToScene( const vec3_t org, float intensity, float r, float g, float b );
-void			trap_R_RenderScene( const refdef_t *fd );
-void			trap_R_SetColor( const float *rgba );
-void			trap_R_DrawStretchPic( float x, float y, float w, float h, float s1, float t1, float s2, float t2, qhandle_t hShader );
-void			trap_R_ModelBounds( clipHandle_t model, vec3_t mins, vec3_t maxs );
-void			trap_UpdateScreen( void );
-int				trap_CM_LerpTag( orientation_t *tag, clipHandle_t mod, int startFrame, int endFrame, float frac, const char *tagName );
-void			trap_S_StartLocalSound( sfxHandle_t sfx, int channelNum );
-sfxHandle_t		trap_S_RegisterSound( const char *sample, bool compressed );
-void			trap_Key_KeynumToStringBuf( int keynum, char *buf, int buflen );
-void			trap_Key_GetBindingBuf( int keynum, char *buf, int buflen );
-void			trap_Key_SetBinding( int keynum, const char *binding );
-int				trap_Key_IsDown( int keynum );
-bool			trap_Key_GetOverstrikeMode( void );
-void			trap_Key_SetOverstrikeMode( bool state );
-void			trap_Key_ClearStates( void );
-int				trap_Key_GetCatcher( void );
-void			trap_Key_SetCatcher( int catcher );
-void			trap_GetClipboardData( char *buf, int bufsize );
-void			trap_GetClientState( uiClientState_t *state );
-void			trap_GetGlconfig( glconfig_t *glconfig );
-int				trap_GetConfigString( int index, char* buff, int buffsize );
-int				trap_LAN_GetServerCount( int source );
-void			trap_LAN_GetServerAddressString( int source, int n, char *buf, int buflen );
-void			trap_LAN_GetServerInfo( int source, int n, char *buf, int buflen );
-int				trap_LAN_GetServerPing( int source, int n );
-int				trap_LAN_GetPingQueueCount( void );
-void			trap_LAN_ClearPing( int n );
-void			trap_LAN_GetPing( int n, char *buf, int buflen, int *pingtime );
-void			trap_LAN_GetPingInfo( int n, char *buf, int buflen );
-void			trap_LAN_LoadCachedServers();
-void			trap_LAN_SaveCachedServers();
-void			trap_LAN_MarkServerVisible(int source, int n, bool visible);
-int				trap_LAN_ServerIsVisible( int source, int n);
-int				trap_LAN_UpdateVisiblePings( int source );
-int				trap_LAN_AddServer(int source, const char *name, const char *addr);
-void			trap_LAN_RemoveServer(int source, const char *addr);
-void			trap_LAN_ResetPings(int n);
-int				trap_LAN_ServerStatus( const char *serverAddress, char *serverStatus, int maxLen );
-int				trap_LAN_CompareServers( int source, int sortKey, int sortDir, int s1, int s2 );
-int				trap_MemoryRemaining( void );
-void			trap_GetCDKey( char *buf, int buflen );
-void			trap_SetCDKey( char *buf );
-void			trap_R_RegisterFont(const char *pFontname, int pointSize, fontInfo_t *font);
-void			trap_S_StopBackgroundTrack( void );
-void			trap_S_StartBackgroundTrack( const char *intro, const char *loop);
-int				trap_CIN_PlayCinematic( const char *arg0, int xpos, int ypos, int width, int height, int bits);
-e_status		trap_CIN_StopCinematic(int handle);
-e_status		trap_CIN_RunCinematic (int handle);
-void			trap_CIN_DrawCinematic (int handle);
-void			trap_CIN_SetExtents (int handle, int x, int y, int w, int h);
-int				trap_RealTime(qtime_t *qtime);
-void			trap_R_RemapShader( const char *oldShader, const char *newShader, const char *timeOffset );
-int				trap_VerifyCDKey( const char *key, const char *chksum);
+void Cvar_Register( vmCvar_t *vmCvar, const char *varName, const char *defaultValue, int flags );
+void Cvar_Update( vmCvar_t *vmCvar );
+void Cvar_Set( const char *var_name, const char *value );
+float Cvar_VariableValue( const char *var_name );
+void Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize );
+void Cvar_SetValue( const char *var_name, float value);
+int	Cmd_Argc();
+void Cmd_ArgvBuffer( int arg, char *buffer, int bufferLength );
+void Cbuf_ExecuteText (int exec_when, const char *text);
+int FS_FOpenFileByMode( const char *qpath, fileHandle_t *f, fsMode_t mode );
+void FS_FCloseFile( fileHandle_t f );
+int FS_Read2( void *buffer, int len, fileHandle_t f );
+int FS_Write( const void *buffer, int len, fileHandle_t h );
+int	FS_GetFileList(  const char *path, const char *extension, char *listbuf, int bufsize );
+void SCR_UpdateScreen();
+void S_StartLocalSound( sfxHandle_t sfxHandle, int channelNum );
+sfxHandle_t	S_RegisterSound( const char *name, bool compressed );
+void S_StopBackgroundTrack();
+void S_StartBackgroundTrack( const char *intro, const char *loop );
+void Key_KeynumToStringBuf( int keynum, char *buf, int buflen );
+void Key_GetBindingBuf( int keynum, char *buf, int buflen );
+void Key_SetBinding( int keynum, const char *binding );
+bool Key_IsDown( int keynum );
+bool Key_GetOverstrikeMode();
+void Key_SetOverstrikeMode( bool state );
+void Key_ClearStates();
+int Key_GetCatcher();
+void Key_SetCatcher( int catcher );
+void CL_GetGlconfig( glconfig_t *glconfig );
+int GetConfigString(int index, char *buf, int size);
+int LAN_GetServerCount( int source );
+void LAN_GetServerAddressString( int source, int n, char *buf, int buflen );
+void LAN_GetServerInfo( int source, int n, char *buf, int buflen );
+int LAN_GetServerPing( int source, int n );
+void LAN_SaveServersToCache();
+void LAN_LoadCachedServers();
+void LAN_ResetPings(int source);
+void LAN_MarkServerVisible(int source, int n, bool visible );
+int LAN_ServerIsVisible(int source, int n );
+bool LAN_UpdateVisiblePings(int source );
+int LAN_AddServer(int source, const char *name, const char *address);
+void LAN_RemoveServer(int source, const char *addr);
+int LAN_CompareServers( int source, int sortKey, int sortDir, int s1, int s2 );
+int LAN_GetServerStatus( const char *serverAddress, char *serverStatus, int maxLen );
+void CLUI_GetCDKey( char *buf, int buflen );
+void CLUI_SetCDKey( char *buf );
+int Com_RealTime(qtime_t *qtime);
+int CIN_PlayCinematic( const char *arg, int x, int y, int w, int h, int systemBits );
+e_status CIN_StopCinematic(int handle);
+e_status CIN_RunCinematic (int handle);
+void CIN_DrawCinematic (int handle);
+void CIN_SetExtents (int handle, int x, int y, int w, int h);
+bool CL_CDKeyValidate( const char *key, const char *checksum );
+void GetClientState( uiClientState_t *state );
 
 //
 // ui_addbots.c
