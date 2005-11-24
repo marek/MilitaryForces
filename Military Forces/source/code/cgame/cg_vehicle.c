@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicle.c,v 1.9 2005-11-21 17:28:20 thebjoern Exp $
+ * $Id: cg_vehicle.c,v 1.10 2005-11-24 10:46:53 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -58,7 +58,7 @@ static animation_t * CG_ParseLQMAnimationFile( const char *filename ) {
 	while ( 1 ) {
 		prev = text_p;	// so we can unget
 		token = COM_Parse( &text_p );
-		if ( !token ) {
+		if ( !token[0] ) {
 			break;
 		}
 

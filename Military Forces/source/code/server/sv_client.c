@@ -946,7 +946,8 @@ This routine would be a bit simpler with a goto but i abstained
 
 =================
 */
-static void SV_VerifyPaks_f( client_t *cl ) {
+static void SV_VerifyPaks_f( client_t *cl ) 
+{
 	int nChkSum1, nChkSum2, nClientPaks, nServerPaks, i, j, nCurArg;
 	int nClientChkSum[1024];
 	int nServerChkSum[1024];
@@ -962,9 +963,9 @@ static void SV_VerifyPaks_f( client_t *cl ) {
 		bGood = true;
 		nChkSum1 = nChkSum2 = 0;
 		// we run the game, so determine which cgame and ui the client "should" be running
-		bGood = (FS_FileIsInPAK("vm/cgame.qvm", &nChkSum1) == 1);
-		if (bGood)
-			bGood = (FS_FileIsInPAK("vm/ui.qvm", &nChkSum2) == 1);
+		//bGood = (FS_FileIsInPAK("vm/cgame.qvm", &nChkSum1) == 1);
+		//if (bGood)
+		//	bGood = (FS_FileIsInPAK("vm/ui.qvm", &nChkSum2) == 1);
 
 		nClientPaks = Cmd_Argc();
 

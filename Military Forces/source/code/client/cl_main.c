@@ -1147,29 +1147,29 @@ void CL_Rcon_f( void ) {
 	NET_SendPacket (NS_CLIENT, strlen(message)+1, message, to);
 }
 
-/*
-=================
-CL_SendPureChecksums
-=================
-*/
-void CL_SendPureChecksums( void ) {
-	const char *pChecksums;
-	char cMsg[MAX_INFO_VALUE];
-	int i;
-
-	// if we are pure we need to send back a command with our referenced pk3 checksums
-	pChecksums = FS_ReferencedPakPureChecksums();
-
-	// "cp"
-	// "Yf"
-	Com_sprintf(cMsg, sizeof(cMsg), "Yf ");
-	Q_strcat(cMsg, sizeof(cMsg), va("%d ", cl.serverId) );
-	Q_strcat(cMsg, sizeof(cMsg), pChecksums);
-	for (i = 0; i < 2; i++) {
-		cMsg[i] += 10;
-	}
-	CL_AddReliableCommand( cMsg );
-}
+///*
+//=================
+//CL_SendPureChecksums
+//=================
+//*/
+//void CL_SendPureChecksums( void ) {
+//	const char *pChecksums;
+//	char cMsg[MAX_INFO_VALUE];
+//	int i;
+//
+//	// if we are pure we need to send back a command with our referenced pk3 checksums
+//	pChecksums = FS_ReferencedPakPureChecksums();
+//
+//	// "cp"
+//	// "Yf"
+//	Com_sprintf(cMsg, sizeof(cMsg), "Yf ");
+//	Q_strcat(cMsg, sizeof(cMsg), va("%d ", cl.serverId) );
+//	Q_strcat(cMsg, sizeof(cMsg), pChecksums);
+//	for (i = 0; i < 2; i++) {
+//		cMsg[i] += 10;
+//	}
+//	CL_AddReliableCommand( cMsg );
+//}
 
 /*
 =================
@@ -1203,7 +1203,7 @@ void CL_Vid_Restart_f( void ) {
 	// client is no longer pure untill New checksums are sent
 	CL_ResetPureClientAtServer();
 	// clear pak references
-	FS_ClearPakReferences( FS_UI_REF | FS_CGAME_REF );
+	//FS_ClearPakReferences( FS_UI_REF | FS_CGAME_REF );
 	// reinitialize the filesystem if the game directory or checksum has changed
 	FS_ConditionalRestart( clc.checksumFeed );
 
@@ -1236,7 +1236,7 @@ void CL_Vid_Restart_f( void ) {
 		cls.cgameStarted = true;
 		CL_InitCGame();
 		// send pure checksums
-		CL_SendPureChecksums();
+		//CL_SendPureChecksums();
 	}
 }
 
@@ -1364,7 +1364,7 @@ void CL_DownloadsComplete( void ) {
 	CL_InitCGame();
 
 	// set pure checksums
-	CL_SendPureChecksums();
+	//CL_SendPureChecksums();
 
 	CL_WritePacket();
 	CL_WritePacket();

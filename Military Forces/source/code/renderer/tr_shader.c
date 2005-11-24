@@ -23,6 +23,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // tr_shader.c -- this file deals with the parsing and definition of shaders
 
+// good idea ? bad idea ?
+#ifdef WIN32
+#ifndef GL_VERSION_1_2
+#define GL_CLAMP_TO_EDGE                  0x812F
+#endif
+#endif
+
 static char *s_shaderText;
 
 // the shader is parsed into these global variables, then copied into
@@ -1227,7 +1234,12 @@ static void ParseSkyParms( char **text ) {
 		for (i=0 ; i<6 ; i++) {
 			Com_sprintf( pathname, sizeof(pathname), "%s_%s.tga"
 				, token, suf[i] );
-			shader.sky.outerbox[i] = R_FindImageFile( ( char * ) pathname, true, true, GL_CLAMP );
+#ifdef GL_CLAMP_TO_EDGE
+			shader.sky.outerbox[i] = R_FindImageFile ((char *) pathname, true, true, GL_CLAMP_TO_EDGE);
+#else
+			shader.sky.outerbox[i] = R_FindImageFile ((char *) pathname, true, true, GL_CLAMP);
+#endif
+
 			if ( !shader.sky.outerbox[i] ) {
 				shader.sky.outerbox[i] = tr.defaultImage;
 			}
@@ -1425,6 +1437,12 @@ static bool ParseShader( char **text )
 		// stage definition
 		else if ( token[0] == '{' )
 		{
+			// 20051019 misantropia -- fix buffer overrun.
+			if ( s == MAX_SHADER_STAGES )
+			{
+				ri.Printf( PRINT_WARNING, "WARNING: too many stages in shader %s\n", shader.name );
+				return false;
+			} 
 			if ( !ParseStage( &stages[s], text ) )
 			{
 				return false;
@@ -2342,14 +2360,14 @@ Will always return a valid shader, but it might be the
 default shader if the real one can't be found.
 ==================
 */
-shader_t *R_FindShaderByName( const char *name ) {
+shader_t *R_FindShaderByName( const char *name ) 
+{
 	char		strippedName[MAX_QPATH];
 	int			hash;
 	shader_t	*sh;
 
-	if ( (name==NULL) || (name[0] == 0) ) {  // bk001205
+	if ( (name==NULL) || (name[0] == 0) ) 
 		return tr.defaultShader;
-	}
 
 	COM_StripExtension( name, strippedName );
 
@@ -2358,12 +2376,14 @@ shader_t *R_FindShaderByName( const char *name ) {
 	//
 	// see if the shader is already loaded
 	//
-	for (sh=hashTable[hash]; sh; sh=sh->next) {
+	for (sh=hashTable[hash]; sh; sh=sh->next) 
+	{
 		// NOTE: if there was no shader or image available with the name strippedName
 		// then a default shader is created with lightmapIndex == LIGHTMAP_NONE, so we
 		// have to check all default shaders otherwise for every call to R_FindShader
 		// with that same strippedName a New default shader is created.
-		if (Q_stricmp(sh->name, strippedName) == 0) {
+		if (Q_stricmp(sh->name, strippedName) == 0) 
+		{
 			// match found
 			return sh;
 		}
@@ -2553,6 +2573,13 @@ qhandle_t RE_RegisterShaderFromImage(const char *name, int lightmapIndex, image_
 
 	hash = generateHashValue(name, FILE_HASH_SIZE);
 	
+
+	// 20051020 misantropia -- probably not necessary since this function
+	// only gets called from tr_font.c with lightmapIndex == LIGHTMAP_2D
+	// but better safe than sorry.
+	if ( lightmapIndex >= tr.numLightmaps ) 
+		lightmapIndex = LIGHTMAP_WHITEIMAGE; 	
+
 	//
 	// see if the shader is already loaded
 	//

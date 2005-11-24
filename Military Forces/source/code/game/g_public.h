@@ -1,5 +1,5 @@
 /*
- * $Id: g_public.h,v 1.6 2005-11-21 17:28:20 thebjoern Exp $
+ * $Id: g_public.h,v 1.7 2005-11-24 10:46:53 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -80,6 +80,14 @@ typedef struct {
 } sharedEntity_t;
 
 
+struct EntityBase
+{
+					EntityBase() {}
+	virtual			~EntityBase() {}
+
+	entityState_t	s;				// communicated by server to clients
+	entityShared_t	r;				// shared by both the server system and game
+};
 
 
 #endif // __G_PUBLIC_H__

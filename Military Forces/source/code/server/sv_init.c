@@ -324,23 +324,23 @@ void SV_ClearServer(void) {
 	Com_Memset (&sv, 0, sizeof(sv));
 }
 
-/*
-================
-SV_TouchCGame
-
-  touch the cgame.vm so that a pure client can load it if it's in a seperate pk3
-================
-*/
-void SV_TouchCGame(void) {
-	fileHandle_t	f;
-	char filename[MAX_QPATH];
-
-	Com_sprintf( filename, sizeof(filename), "vm/%s.qvm", "cgame" );
-	FS_FOpenFileRead( filename, &f, false );
-	if ( f ) {
-		FS_FCloseFile( f );
-	}
-}
+///*
+//================
+//SV_TouchCGame
+//
+//  touch the cgame.vm so that a pure client can load it if it's in a seperate pk3
+//================
+//*/
+//void SV_TouchCGame(void) {
+//	fileHandle_t	f;
+//	char filename[MAX_QPATH];
+//
+//	Com_sprintf( filename, sizeof(filename), "vm/%s.qvm", "cgame" );
+//	FS_FOpenFileRead( filename, &f, false );
+//	if ( f ) {
+//		FS_FCloseFile( f );
+//	}
+//}
 
 /*
 ================
@@ -521,9 +521,9 @@ void SV_SpawnServer( char *server, bool killBots ) {
 
 		// if a dedicated pure server we need to touch the cgame because it could be in a
 		// seperate pk3 file and the client will need to load the latest cgame.qvm
-		if ( com_dedicated->integer ) {
-			SV_TouchCGame();
-		}
+		//if ( com_dedicated->integer ) {
+		//	SV_TouchCGame();
+		//}
 	}
 	else {
 		Cvar_Set( "sv_paks", "" );

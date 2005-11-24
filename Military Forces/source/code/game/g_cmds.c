@@ -1,5 +1,5 @@
 /*
- * $Id: g_cmds.c,v 1.6 2005-11-21 17:28:20 thebjoern Exp $
+ * $Id: g_cmds.c,v 1.7 2005-11-24 10:46:53 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -97,13 +97,22 @@ void Cmd_Score_f( gentity_t *ent ) {
 CheatsOk
 ==================
 */
-bool	CheatsOk( gentity_t *ent ) {
-	if ( !g_cheats.integer ) {
+bool CheatsOk( gentity_t *ent ) 
+{
+	if ( !g_cheats.integer ) 
+	{
 		SV_GameSendServerCommand( ent-g_entities, va("print \"Cheats are not enabled on this server.\n\""));
 		return false;
 	}
-	if ( ent->health <= 0 ) {
+	if ( ent->health <= 0 ) 
+	{
 		SV_GameSendServerCommand( ent-g_entities, va("print \"You must be alive to use this command.\n\""));
+		return false;
+	}
+	// ensiform fix
+	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) 
+	{
+		SV_GameSendServerCommand( ent-g_entities, va("print \"Spectators can't use this command.\n\""));
 		return false;
 	}
 	return true;

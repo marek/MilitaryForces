@@ -1100,34 +1100,34 @@ int FS_FOpenFileRead( const char *filename, fileHandle_t *file, bool uniqueFILE 
 					// these are loaded from all pk3s 
 					// from every pk3 file.. 
 					l = strlen( filename );
-					if ( !(pak->referenced & FS_GENERAL_REF)) {
-						if ( Q_stricmp(filename + l - 7, ".shader") != 0 &&
-							Q_stricmp(filename + l - 4, ".txt") != 0 &&
-							Q_stricmp(filename + l - 4, ".cfg") != 0 &&
-							Q_stricmp(filename + l - 7, ".config") != 0 &&
-							strstr(filename, "levelshots") == NULL &&
-							Q_stricmp(filename + l - 4, ".bot") != 0 &&
-							Q_stricmp(filename + l - 6, ".arena") != 0 &&
-							Q_stricmp(filename + l - 5, ".menu") != 0) {
-							pak->referenced |= FS_GENERAL_REF;
-						}
-					}
+					//if ( !(pak->referenced & FS_GENERAL_REF)) {
+					//	if ( Q_stricmp(filename + l - 7, ".shader") != 0 &&
+					//		Q_stricmp(filename + l - 4, ".txt") != 0 &&
+					//		Q_stricmp(filename + l - 4, ".cfg") != 0 &&
+					//		Q_stricmp(filename + l - 7, ".config") != 0 &&
+					//		strstr(filename, "levelshots") == NULL &&
+					//		Q_stricmp(filename + l - 4, ".bot") != 0 &&
+					//		Q_stricmp(filename + l - 6, ".arena") != 0 &&
+					//		Q_stricmp(filename + l - 5, ".menu") != 0) {
+					//		pak->referenced |= FS_GENERAL_REF;
+					//	}
+					//}
 
-					// qagame.qvm	- 13
-					// dTZT`X!di`
-					if (!(pak->referenced & FS_QAGAME_REF) && FS_ShiftedStrStr(filename, "dTZT`X!di`", 13)) {
-						pak->referenced |= FS_QAGAME_REF;
-					}
-					// cgame.qvm	- 7
-					// \`Zf^'jof
-					if (!(pak->referenced & FS_CGAME_REF) && FS_ShiftedStrStr(filename , "\\`Zf^'jof", 7)) {
-						pak->referenced |= FS_CGAME_REF;
-					}
-					// ui.qvm		- 5
-					// pd)lqh
-					if (!(pak->referenced & FS_UI_REF) && FS_ShiftedStrStr(filename , "pd)lqh", 5)) {
-						pak->referenced |= FS_UI_REF;
-					}
+					//// qagame.qvm	- 13
+					//// dTZT`X!di`
+					//if (!(pak->referenced & FS_QAGAME_REF) && FS_ShiftedStrStr(filename, "dTZT`X!di`", 13)) {
+					//	pak->referenced |= FS_QAGAME_REF;
+					//}
+					//// cgame.qvm	- 7
+					//// \`Zf^'jof
+					//if (!(pak->referenced & FS_CGAME_REF) && FS_ShiftedStrStr(filename , "\\`Zf^'jof", 7)) {
+					//	pak->referenced |= FS_CGAME_REF;
+					//}
+					//// ui.qvm		- 5
+					//// pd)lqh
+					//if (!(pak->referenced & FS_UI_REF) && FS_ShiftedStrStr(filename , "pd)lqh", 5)) {
+					//	pak->referenced |= FS_UI_REF;
+					//}
 
 					if ( uniqueFILE ) {
 						// open a New file on the pakfile
@@ -2835,92 +2835,6 @@ static void FS_Startup( const char *gameName ) {
 	Com_Printf( "%d files in pk3 files\n", fs_packFiles );
 }
 
-
-///*
-//===================
-//FS_SetRestrictions
-//
-//Looks for product keys and restricts media add on ability
-//if the full version is not found
-//===================
-//*/
-//static void FS_SetRestrictions( void ) {
-//	searchpath_t	*path;
-//
-//#ifndef PRE_RELEASE_DEMO
-//	char	*productId;
-//
-//	// if fs_restrict is set, don't even look for the id file,
-//	// which allows the demo release to be tested even if
-//	// the full game is present
-//	if ( !fs_restrict->integer ) {
-//		// look for the full game id
-//		FS_ReadFile( "productid.txt", (void **)&productId );
-//		if ( productId ) {
-//			// check against the hardcoded string
-//			int		seed, i;
-//
-//			seed = 5000;
-//			for ( i = 0 ; i < sizeof( fs_scrambledProductId ) ; i++ ) {
-//				if ( ( fs_scrambledProductId[i] ^ (seed&255) ) != productId[i] ) {
-//					break;
-//				}
-//				seed = (69069 * seed + 1);
-//			}
-//
-//			FS_FreeFile( productId );
-//
-//			if ( i == sizeof( fs_scrambledProductId ) ) {
-//				return;	// no restrictions
-//			}
-//			Com_Error( ERR_FATAL, "Invalid product identification" );
-//		}
-//	}
-//#endif
-//	Cvar_Set( "fs_restrict", "1" );
-//
-//	Com_Printf( "\nRunning in restricted demo mode.\n\n" );
-//
-//	// restart the filesystem with just the demo directory
-//	FS_Shutdown(false);
-//	FS_Startup( DEMOGAME );
-//
-//	// make sure that the pak file has the header checksum we expect
-//	for ( path = fs_searchpaths ; path ; path = path->next ) {
-//		if ( path->pack ) {
-//			// a tiny attempt to keep the checksum from being scannable from the exe
-//			if ( (path->pack->checksum ^ 0x02261994u) != (DEMO_PAK_CHECKSUM ^ 0x02261994u) ) {
-//				Com_Error( ERR_FATAL, "Corrupted pak0.pk3: %u", path->pack->checksum );
-//			}
-//		}
-//	}
-//}
-
-/*
-=====================
-FS_GamePureChecksum
-
-Returns the checksum of the pk3 from which the server loaded the qagame.qvm
-=====================
-*/
-const char *FS_GamePureChecksum( void ) {
-	static char	info[MAX_STRING_TOKENS];
-	searchpath_t *search;
-
-	info[0] = 0;
-
-	for ( search = fs_searchpaths ; search ; search = search->next ) {
-		// is the element a pak file?
-		if ( search->pack ) {
-			if (search->pack->referenced & FS_QAGAME_REF) {
-				Com_sprintf(info, sizeof(info), "%d", search->pack->checksum);
-			}
-		}
-	}
-
-	return info;
-}
-
 /*
 =====================
 FS_LoadedPakChecksums
@@ -3040,46 +2954,46 @@ Servers with sv_pure set will get this string back from clients for pure validat
 The string has a specific order, "cgame ui @ ref1 ref2 ref3 ..."
 =====================
 */
-const char *FS_ReferencedPakPureChecksums( void ) {
-	static char	info[BIG_INFO_STRING];
-	searchpath_t	*search;
-	int nFlags, numPaks, checksum;
-
-	info[0] = 0;
-
-	checksum = fs_checksumFeed;
-	numPaks = 0;
-	for (nFlags = FS_CGAME_REF; nFlags; nFlags = nFlags >> 1) {
-		if (nFlags & FS_GENERAL_REF) {
-			// add a delimter between must haves and general refs
-			//Q_strcat(info, sizeof(info), "@ ");
-			info[strlen(info)+1] = '\0';
-			info[strlen(info)+2] = '\0';
-			info[strlen(info)] = '@';
-			info[strlen(info)] = ' ';
-		}
-		for ( search = fs_searchpaths ; search ; search = search->next ) {
-			// is the element a pak file and has it been referenced based on flag?
-			if ( search->pack && (search->pack->referenced & nFlags)) {
-				Q_strcat( info, sizeof( info ), va("%i ", search->pack->pure_checksum ) );
-				if (nFlags & (FS_CGAME_REF | FS_UI_REF)) {
-					break;
-				}
-				checksum ^= search->pack->pure_checksum;
-				numPaks++;
-			}
-		}
-		if (fs_fakeChkSum != 0) {
-			// only added if a non-pure file is referenced
-			Q_strcat( info, sizeof( info ), va("%i ", fs_fakeChkSum ) );
-		}
-	}
-	// last checksum is the encoded number of referenced pk3s
-	checksum ^= numPaks;
-	Q_strcat( info, sizeof( info ), va("%i ", checksum ) );
-
-	return info;
-}
+//const char *FS_ReferencedPakPureChecksums( void ) {
+//	static char	info[BIG_INFO_STRING];
+//	searchpath_t	*search;
+//	int nFlags, numPaks, checksum;
+//
+//	info[0] = 0;
+//
+//	checksum = fs_checksumFeed;
+//	numPaks = 0;
+//	for (nFlags = FS_CGAME_REF; nFlags; nFlags = nFlags >> 1) {
+//		if (nFlags & FS_GENERAL_REF) {
+//			// add a delimter between must haves and general refs
+//			//Q_strcat(info, sizeof(info), "@ ");
+//			info[strlen(info)+1] = '\0';
+//			info[strlen(info)+2] = '\0';
+//			info[strlen(info)] = '@';
+//			info[strlen(info)] = ' ';
+//		}
+//		for ( search = fs_searchpaths ; search ; search = search->next ) {
+//			// is the element a pak file and has it been referenced based on flag?
+//			if ( search->pack && (search->pack->referenced & nFlags)) {
+//				Q_strcat( info, sizeof( info ), va("%i ", search->pack->pure_checksum ) );
+//				if (nFlags & (FS_CGAME_REF | FS_UI_REF)) {
+//					break;
+//				}
+//				checksum ^= search->pack->pure_checksum;
+//				numPaks++;
+//			}
+//		}
+//		if (fs_fakeChkSum != 0) {
+//			// only added if a non-pure file is referenced
+//			Q_strcat( info, sizeof( info ), va("%i ", fs_fakeChkSum ) );
+//		}
+//	}
+//	// last checksum is the encoded number of referenced pk3s
+//	checksum ^= numPaks;
+//	Q_strcat( info, sizeof( info ), va("%i ", checksum ) );
+//
+//	return info;
+//}
 
 /*
 =====================
