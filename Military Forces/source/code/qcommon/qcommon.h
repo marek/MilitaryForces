@@ -505,10 +505,10 @@ issues.
 
 // referenced flags
 // these are in loop specific order so don't change the order
-#define FS_GENERAL_REF	0x01
-#define FS_UI_REF		0x02
-#define FS_CGAME_REF	0x04
-#define FS_QAGAME_REF	0x08
+//#define FS_GENERAL_REF	0x01
+//#define FS_UI_REF		0x02
+//#define FS_CGAME_REF	0x04
+//#define FS_QAGAME_REF	0x08
 // number of id paks that will never be autodownloaded from mfdata
 #define NUM_ID_PAKS		9
 
@@ -612,7 +612,7 @@ const char *FS_LoadedPakPureChecksums( void );
 
 const char *FS_ReferencedPakNames( void );
 const char *FS_ReferencedPakChecksums( void );
-const char *FS_ReferencedPakPureChecksums( void );
+//const char *FS_ReferencedPakPureChecksums( void );
 // Returns a space separated string containing the checksums of all loaded 
 // AND referenced pk3 files. Servers with sv_pure set will get this string 
 // back from clients for pure validation 

@@ -1005,63 +1005,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="qcommon\vm.c">
-				<FileConfiguration
-					Name="Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="ReleaseWithDebugInfo|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="qcommon\vm_interpreted.c">
-				<FileConfiguration
-					Name="Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="ReleaseWithDebugInfo|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="qcommon\vm_x86.c">
-				<FileConfiguration
-					Name="Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="ReleaseWithDebugInfo|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						PreprocessorDefinitions=""
-						BrowseInformation="1"/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath="win32\win_input.c">
 				<FileConfiguration
 					Name="Debug|Win32">
@@ -1249,9 +1192,6 @@
 			</File>
 			<File
 				RelativePath="qcommon\unzip.h">
-			</File>
-			<File
-				RelativePath="qcommon\vm_local.h">
 			</File>
 			<File
 				RelativePath="win32\win_local.h">

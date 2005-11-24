@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.12 2005-11-21 17:28:32 thebjoern Exp $
+ * $Id: ui_main.c,v 1.13 2005-11-24 10:46:54 thebjoern Exp $
 */
 /*
 =======================================================================
@@ -130,14 +130,7 @@ int ProcessNewUI( int command, int arg0, int arg1, int arg2, int arg3, int arg4,
 
 void UI_CustomChatInit( void );
 
-/*
-================
-vmMain
 
-This is the only way control passes into the module.
-This must be the very first function compiled into the .qvm file
-================
-*/
 vmCvar_t  ui_new;
 vmCvar_t  ui_debug;
 vmCvar_t  ui_initialized;
@@ -149,67 +142,6 @@ void _UI_KeyEvent( int key, int down );
 void _UI_MouseEvent( int dx, int dy );
 void _UI_Refresh( int realtime );
 bool _UI_IsFullscreen( void );
-
-//int vmMain( int command, 
-//		    int arg0, 
-//			int arg1, 
-//			int arg2, 
-//			int arg3, 
-//			int arg4, 
-//			int arg5, 
-//			int arg6, 
-//			int arg7, 
-//			int arg8, 
-//			int arg9, 
-//			int arg10, 
-//			int arg11  ) 
-//{
-//	switch ( command ) 
-//	{
-//		case UI_GETAPIVERSION:
-//			return UI_API_VERSION;
-
-//		case UI_INIT:
-//			_UI_Init(arg0);
-//			return 0;
-
-//		case UI_SHUTDOWN:
-//			_UI_Shutdown();
-//			return 0;
-
-//		case UI_KEY_EVENT:
-//			_UI_KeyEvent( arg0, arg1 );
-//			return 0;
-
-//		case UI_MOUSE_EVENT:
-//			_UI_MouseEvent( arg0, arg1 );
-//			return 0;
-
-//		case UI_REFRESH:
-//			_UI_Refresh( arg0 );
-//			return 0;
-
-//		case UI_IS_FULLSCREEN:
-//			return _UI_IsFullscreen();
-
-//		case UI_SET_ACTIVE_MENU:
-//			_UI_SetActiveMenu( static_cast<uiMenuCommand_t>(arg0) );
-//			return 0;
-
-//		case UI_CONSOLE_COMMAND:
-//			return UI_ConsoleCommand(arg0);
-
-//		case UI_DRAW_CONNECT_SCREEN:
-//			UI_DrawConnectScreen( arg0 );
-//			return 0;
-
-//			case UI_HASUNIQUECDKEY: // mod authors need to observe this
-//			return false; // bk010117 - change this to false for mods! (MFQ3: changed to false - MM)
-
-//	}
-//
-//	return -1;
-//}
 
 
 
