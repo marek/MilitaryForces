@@ -680,7 +680,6 @@ void S_ClearSoundBuffer( void ) {
     // TTimo: due to a particular bug workaround in linux sound code,
     //   have to optionally use a custom C implementation of Com_Memset
     //   not affecting win32, we have #define Snd_Memset Com_Memset
-    // https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=371
 		Snd_Memset(dma.buffer, clear, dma.samples * dma.samplebits/8);
 	SNDDMA_Submit ();
 }

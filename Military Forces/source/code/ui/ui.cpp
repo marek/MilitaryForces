@@ -89,11 +89,11 @@ UserInterface::drawConnectScreen( bool overlay ) const
 	UI_DrawConnectScreen( overlay );
 }
 
-bool
-UserInterface::hasUniqueCDKey() const
-{
-	return false;
-}
+//bool
+//UserInterface::hasUniqueCDKey() const
+//{
+//	return false;
+//}
 
 bool
 UserInterface::isInitialized() const

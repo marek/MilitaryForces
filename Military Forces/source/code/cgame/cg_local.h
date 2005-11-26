@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.18 2005-11-21 17:28:20 thebjoern Exp $
+ * $Id: cg_local.h,v 1.19 2005-11-26 10:06:29 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -91,8 +91,8 @@ typedef enum {
 #define TEAM_OVERLAY_MAXNAME_WIDTH	12
 #define TEAM_OVERLAY_MAXLOCATION_WIDTH	16
 
-#define DEFAULT_REDTEAM_NAME		"Stroggs"
-#define DEFAULT_BLUETEAM_NAME		"Pagans"
+#define DEFAULT_REDTEAM_NAME		"Warsaw Pact"
+#define DEFAULT_BLUETEAM_NAME		"NATO"
 
 typedef enum {
 	IMPACTSOUND_DEFAULT,

@@ -331,7 +331,6 @@ void SV_InitGame()
 
 	// clear all gentity pointers that might still be set from
 	// a previous level
-	// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=522
 	//   now done before GAME_INIT call
 	for ( i = 0 ; i < sv_maxclients->integer ; i++ ) {
 		svs.clients[i].gentity = NULL;

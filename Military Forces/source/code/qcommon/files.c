@@ -248,10 +248,10 @@ static	char		fs_gamedir[MAX_OSPATH];	// this will be a single file name with no 
 static	cvar_t		*fs_debug;
 static	cvar_t		*fs_homepath;
 static	cvar_t		*fs_basepath;
-static	cvar_t		*fs_basegame;
+//static	cvar_t		*fs_basegame;
 static	cvar_t		*fs_cdpath;
 static	cvar_t		*fs_copyfiles;
-static	cvar_t		*fs_gamedirvar;
+//static	cvar_t		*fs_gamedirvar;
 //static	cvar_t		*fs_restrict;
 static	searchpath_t	*fs_searchpaths;
 static	int			fs_readCount;			// total bytes read
@@ -285,7 +285,6 @@ typedef struct {
 
 static fileHandleData_t	fsh[MAX_FILE_HANDLES];
 
-// TTimo - https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=540
 // wether we did a reorder on the current search path when joining the server
 static bool fs_reordered;
 
@@ -301,8 +300,8 @@ static int		fs_serverReferencedPaks[MAX_SEARCH_PATHS];			// checksums
 static char		*fs_serverReferencedPakNames[MAX_SEARCH_PATHS];		// pk3 names
 
 // last valid game folder used
-char lastValidBase[MAX_OSPATH];
-char lastValidGame[MAX_OSPATH];
+//char lastValidBase[MAX_OSPATH];
+//char lastValidGame[MAX_OSPATH];
 
 // productId: This file is copyright 1999 Id Software, and may not be duplicated except during a licensed installation of the full commercial version of Quake 3:Arena
 static byte fs_scrambledProductId[152] = {
@@ -1170,7 +1169,6 @@ int FS_FOpenFileRead( const char *filename, fileHandle_t *file, bool uniqueFILE 
       // FIXME TTimo I'm not sure about the fs_numServerPaks test
       // if you are using FS_ReadFile to find out if a file exists,
       //   this test can make the search fail although the file is in the directory
-      // I had the problem on https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=8
       // turned out I used FS_FileExists instead
 			if ( /*fs_restrict->integer ||*/ fs_numServerPaks ) {
 
@@ -2698,14 +2696,14 @@ void FS_Shutdown( bool closemfp ) {
 #endif
 }
 
-void Com_AppendCDKey( const char *filename );
-void Com_ReadCDKey( const char *filename );
+//void Com_AppendCDKey( const char *filename );
+//void Com_ReadCDKey( const char *filename );
  
 /*
 ================
 FS_ReorderPurePaks
 NOTE TTimo: the reordering that happens here is not reflected in the cvars (\cvarlist *pak*)
-  this can lead to misleading situations, see https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=540
+  this can lead to misleading situations
 ================
 */
 static void FS_ReorderPurePaks()
@@ -2746,9 +2744,10 @@ static void FS_ReorderPurePaks()
 FS_Startup
 ================
 */
-static void FS_Startup( const char *gameName ) {
-        const char *homePath;
-	cvar_t	*fs;
+static void FS_Startup() // const char *gameName ) 
+{
+    const char *homePath;
+	//cvar_t	*fs;
 
 	Com_Printf( "----- FS_Startup -----\n" );
 
@@ -2756,59 +2755,59 @@ static void FS_Startup( const char *gameName ) {
 	fs_copyfiles = Cvar_Get( "fs_copyfiles", "0", CVAR_INIT );
 	fs_cdpath = Cvar_Get ("fs_cdpath", Sys_DefaultCDPath(), CVAR_INIT );
 	fs_basepath = Cvar_Get ("fs_basepath", Sys_DefaultInstallPath(), CVAR_INIT );
-	fs_basegame = Cvar_Get ("fs_basegame", "", CVAR_INIT );
+	//fs_basegame = Cvar_Get ("fs_basegame", "", CVAR_INIT );
   homePath = Sys_DefaultHomePath();
   if (!homePath || !homePath[0]) {
 		homePath = fs_basepath->string;
 	}
 	fs_homepath = Cvar_Get ("fs_homepath", homePath, CVAR_INIT );
-	fs_gamedirvar = Cvar_Get ("fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
+	//fs_gamedirvar = Cvar_Get ("fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
 	//fs_restrict = Cvar_Get ("fs_restrict", "", CVAR_INIT );
 
 	// add search path elements in reverse priority order
 	if (fs_cdpath->string[0]) {
-		FS_AddGameDirectory( fs_cdpath->string, gameName );
+		FS_AddGameDirectory( fs_cdpath->string, BASEGAME );//gameName );
 	}
 	if (fs_basepath->string[0]) {
-		FS_AddGameDirectory( fs_basepath->string, gameName );
+		FS_AddGameDirectory( fs_basepath->string, BASEGAME );//gameName );
 	}
   // fs_homepath is somewhat particular to *nix systems, only add if relevant
   // NOTE: same filtering below for mods and basegame
 	if (fs_basepath->string[0] && Q_stricmp(fs_homepath->string,fs_basepath->string)) {
-		FS_AddGameDirectory ( fs_homepath->string, gameName );
+		FS_AddGameDirectory ( fs_homepath->string, BASEGAME );//gameName );
 	}
         
 	// check for additional base game so mods can be based upon other mods
-	if ( fs_basegame->string[0] && !Q_stricmp( gameName, BASEGAME ) && Q_stricmp( fs_basegame->string, gameName ) ) {
-		if (fs_cdpath->string[0]) {
-			FS_AddGameDirectory(fs_cdpath->string, fs_basegame->string);
-		}
-		if (fs_basepath->string[0]) {
-			FS_AddGameDirectory(fs_basepath->string, fs_basegame->string);
-		}
-		if (fs_homepath->string[0] && Q_stricmp(fs_homepath->string,fs_basepath->string)) {
-			FS_AddGameDirectory(fs_homepath->string, fs_basegame->string);
-		}
-	}
+	//if ( fs_basegame->string[0] && !Q_stricmp( gameName, BASEGAME ) && Q_stricmp( fs_basegame->string, gameName ) ) {
+	//	if (fs_cdpath->string[0]) {
+	//		FS_AddGameDirectory(fs_cdpath->string, fs_basegame->string);
+	//	}
+	//	if (fs_basepath->string[0]) {
+	//		FS_AddGameDirectory(fs_basepath->string, fs_basegame->string);
+	//	}
+	//	if (fs_homepath->string[0] && Q_stricmp(fs_homepath->string,fs_basepath->string)) {
+	//		FS_AddGameDirectory(fs_homepath->string, fs_basegame->string);
+	//	}
+	//}
 
 	// check for additional game folder for mods
-	if ( fs_gamedirvar->string[0] && !Q_stricmp( gameName, BASEGAME ) && Q_stricmp( fs_gamedirvar->string, gameName ) ) {
-		if (fs_cdpath->string[0]) {
-			FS_AddGameDirectory(fs_cdpath->string, fs_gamedirvar->string);
-		}
-		if (fs_basepath->string[0]) {
-			FS_AddGameDirectory(fs_basepath->string, fs_gamedirvar->string);
-		}
-		if (fs_homepath->string[0] && Q_stricmp(fs_homepath->string,fs_basepath->string)) {
-			FS_AddGameDirectory(fs_homepath->string, fs_gamedirvar->string);
-		}
-	}
+	//if ( fs_gamedirvar->string[0] && !Q_stricmp( gameName, BASEGAME ) && Q_stricmp( fs_gamedirvar->string, gameName ) ) {
+	//	if (fs_cdpath->string[0]) {
+	//		FS_AddGameDirectory(fs_cdpath->string, fs_gamedirvar->string);
+	//	}
+	//	if (fs_basepath->string[0]) {
+	//		FS_AddGameDirectory(fs_basepath->string, fs_gamedirvar->string);
+	//	}
+	//	if (fs_homepath->string[0] && Q_stricmp(fs_homepath->string,fs_basepath->string)) {
+	//		FS_AddGameDirectory(fs_homepath->string, fs_gamedirvar->string);
+	//	}
+	//}
 
-	Com_ReadCDKey( "mfdata" );
-	fs = Cvar_Get ("fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
-	if (fs && fs->string[0] != 0) {
-		Com_AppendCDKey( fs->string );
-	}
+	//Com_ReadCDKey( "mfdata" );
+	//fs = Cvar_Get ("fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
+	//if (fs && fs->string[0] != 0) {
+	//	Com_AppendCDKey( fs->string );
+	//}
 
 	// add our commands
 	Cmd_AddCommand ("path", FS_Path_f);
@@ -2816,14 +2815,13 @@ static void FS_Startup( const char *gameName ) {
 	Cmd_AddCommand ("fdir", FS_NewDir_f );
 	Cmd_AddCommand ("touchFile", FS_TouchFile_f );
 
-	// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=506
 	// reorder the pure pk3 files according to server order
 	FS_ReorderPurePaks();
 	
 	// print the current search paths
 	FS_Path_f();
 
-	fs_gamedirvar->modified = false; // We just loaded, it's not modified
+	//fs_gamedirvar->modified = false; // We just loaded, it's not modified
 
 	Com_Printf( "----------------------\n" );
 
@@ -3081,7 +3079,6 @@ void FS_PureServerSetLoadedPaks( const char *pakSums, const char *pakNames ) {
 	{
 		if (fs_reordered)
 		{
-			// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=540
 			// force a restart to make sure the search order will be correct
 			Com_DPrintf( "FS search reorder is required\n" );
 			FS_Restart(fs_checksumFeed);
@@ -3175,7 +3172,7 @@ void FS_InitFilesystem( void ) {
 	//Com_StartupVariable( "fs_restrict" );
 
 	// try to start up normally
-	FS_Startup( BASEGAME );
+	FS_Startup();// BASEGAME );
 
 	// see if we are going to allow add-ons
 	//FS_SetRestrictions();
@@ -3188,8 +3185,8 @@ void FS_InitFilesystem( void ) {
 		// bk001208 - SafeMode see below, FIXME?
 	}
 
-	Q_strncpyz(lastValidBase, fs_basepath->string, sizeof(lastValidBase));
-	Q_strncpyz(lastValidGame, fs_gamedirvar->string, sizeof(lastValidGame));
+	//Q_strncpyz(lastValidBase, fs_basepath->string, sizeof(lastValidBase));
+	//Q_strncpyz(lastValidGame, fs_gamedirvar->string, sizeof(lastValidGame));
 
   // bk001208 - SafeMode see below, FIXME?
 }
@@ -3212,7 +3209,7 @@ void FS_Restart( int checksumFeed ) {
 	FS_ClearPakReferences(0);
 
 	// try to start up normally
-	FS_Startup( BASEGAME );
+	FS_Startup();// BASEGAME );
 
 	// see if we are going to allow add-ons
 	//FS_SetRestrictions();
@@ -3220,33 +3217,34 @@ void FS_Restart( int checksumFeed ) {
 	// if we can't find default.cfg, assume that the paths are
 	// busted and error out now, rather than getting an unreadable
 	// graphics screen when the font fails to load
-	if ( FS_ReadFile( "default.cfg", NULL ) <= 0 ) {
-		// this might happen when connecting to a pure server not using BASEGAME/pak0.pk3
-		// (for instance a TA demo server)
-		if (lastValidBase[0]) {
-			FS_PureServerSetLoadedPaks("", "");
-			Cvar_Set("fs_basepath", lastValidBase);
-			Cvar_Set("fs_gamedirvar", lastValidGame);
-			lastValidBase[0] = '\0';
-			lastValidGame[0] = '\0';
-			//Cvar_Set( "fs_restrict", "0" );
-			FS_Restart(checksumFeed);
-			Com_Error( ERR_DROP, "Invalid game folder\n" );
-			return;
-		}
-		Com_Error( ERR_FATAL, "Couldn't load default.cfg" );
-	}
+	//if ( FS_ReadFile( "default.cfg", NULL ) <= 0 ) {
+	//	// this might happen when connecting to a pure server not using BASEGAME/pak0.pk3
+	//	// (for instance a TA demo server)
+	//	if (lastValidBase[0]) 
+	//	{
+	//		FS_PureServerSetLoadedPaks("", "");
+	//		Cvar_Set("fs_basepath", lastValidBase);
+	//		//Cvar_Set("fs_gamedirvar", lastValidGame);
+	//		lastValidBase[0] = '\0';
+	//		//lastValidGame[0] = '\0';
+	//		//Cvar_Set( "fs_restrict", "0" );
+	//		FS_Restart(checksumFeed);
+	//		Com_Error( ERR_DROP, "Invalid game folder\n" );
+	//		return;
+	//	}
+	//	Com_Error( ERR_FATAL, "Couldn't load default.cfg" );
+	//}
 
 	// bk010116 - New check before safeMode
-	if ( Q_stricmp(fs_gamedirvar->string, lastValidGame) ) {
-		// skip the mfconfig.cfg if "safe" is on the command line
-		if ( !Com_SafeMode() ) {
-			Cbuf_AddText ("exec mfconfig.cfg\n");
-		}
-	}
+	//if ( Q_stricmp(fs_gamedirvar->string, lastValidGame) ) {
+	//	// skip the mfconfig.cfg if "safe" is on the command line
+	//	if ( !Com_SafeMode() ) {
+	//		Cbuf_AddText ("exec mfconfig.cfg\n");
+	//	}
+	//}
 
-	Q_strncpyz(lastValidBase, fs_basepath->string, sizeof(lastValidBase));
-	Q_strncpyz(lastValidGame, fs_gamedirvar->string, sizeof(lastValidGame));
+	//Q_strncpyz(lastValidBase, fs_basepath->string, sizeof(lastValidBase));
+	//Q_strncpyz(lastValidGame, fs_gamedirvar->string, sizeof(lastValidGame));
 
 }
 
@@ -3256,8 +3254,11 @@ FS_ConditionalRestart
 restart if necessary
 =================
 */
-bool FS_ConditionalRestart( int checksumFeed ) {
-	if( fs_gamedirvar->modified || checksumFeed != fs_checksumFeed ) {
+bool FS_ConditionalRestart( int checksumFeed ) 
+{
+	if( //fs_gamedirvar->modified || 
+		checksumFeed != fs_checksumFeed ) 
+	{
 		FS_Restart( checksumFeed );
 		return true;
 	}

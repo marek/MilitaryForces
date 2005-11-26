@@ -26,7 +26,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // q_shared.h -- included first by ALL program modules.
 // A user mod should never modify this file
 
-#define	MF_VERSION		"MF 1.0.6"
+#define	MF_VERSION		"MF 1.0.7"
 
 #define MAX_TEAMNAME 32
 
@@ -429,7 +429,6 @@ void *Hunk_Alloc( int size, ha_pref preference );
 #endif
 
 #ifdef __linux__
-// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=371
 // custom Snd_Memset implementation for glibc memset bug workaround
 void Snd_Memset (void* dest, const int val, const size_t count);
 #else
@@ -1448,7 +1447,7 @@ typedef struct entityState_s {
 typedef enum {
 	CA_UNINITIALIZED,
 	CA_DISCONNECTED, 	// not talking to a server
-	CA_AUTHORIZING,		// not used any more, was checking cd key 
+	//CA_AUTHORIZING,		// not used any more, was checking cd key 
 	CA_CONNECTING,		// sending request packets to the server
 	CA_CHALLENGING,		// sending challenge packets to the server
 	CA_CONNECTED,		// netchan_t established, getting gamestate
@@ -1544,8 +1543,8 @@ typedef enum _flag_status {
 #define SAY_TEAM	1
 #define SAY_TELL	2
 
-#define CDKEY_LEN 16
-#define CDCHKSUM_LEN 2
+//#define CDKEY_LEN 16
+//#define CDCHKSUM_LEN 2
 
 
 // generic random number functions (based upon calling Rand())

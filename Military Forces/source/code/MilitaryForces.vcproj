@@ -1170,6 +1170,9 @@
 				RelativePath="game\q_shared.h">
 			</File>
 			<File
+				RelativePath=".\qcommon\qcommon.h">
+			</File>
+			<File
 				RelativePath="qcommon\qfiles.h">
 			</File>
 			<File

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.15 2005-11-21 17:28:20 thebjoern Exp $
+ * $Id: cg_main.c,v 1.16 2005-11-26 10:06:29 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -905,9 +905,10 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.missileTrail2Shader = refExport.RegisterShader( "missileTrail2" );
 	cgs.media.nukePuffShader = refExport.RegisterShader( "nukePuff" );
 
-	for( i = 0; i < NUKE_CLOUD_FRAMES; i++) {
-		cgs.media.nukeCloud[i] = refExport.RegisterShader( va("nukecloud%d", i) );
-	}
+	// disable for now for faster loading and less mem use
+	//for( i = 0; i < NUKE_CLOUD_FRAMES; i++) {
+	//	cgs.media.nukeCloud[i] = refExport.RegisterShader( va("nukecloud%d", i) );
+	//}
 	
 	cgs.media.selectShader = refExport.RegisterShader( "gfx/2d/select" );
 

@@ -1193,7 +1193,6 @@ void		R_GammaCorrect( byte *buffer, int bufSize );
 
 void	R_ImageList_f( void );
 void	R_SkinList_f( void );
-// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=516
 const void *RB_TakeScreenshotCmd( const void *data );
 void	R_ScreenShot_f( void );
 

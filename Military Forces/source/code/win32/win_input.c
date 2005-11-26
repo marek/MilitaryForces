@@ -322,7 +322,6 @@ bool IN_InitDIMouse( void ) {
 	hr = g_pMouse->SetCooperativeLevel( g_wv.hWnd,
 			DISCL_EXCLUSIVE | DISCL_FOREGROUND);
 
-	// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=50
 	if (FAILED(hr)) {
 		Com_Printf ("Couldn't set DI coop level\n");
 		return false;
@@ -463,7 +462,6 @@ void IN_DIMouse( int *mx, int *my ) {
 			else
 				Sys_QueEvent( od.dwTimeStamp, SE_KEY, K_MOUSE4, false, 0, NULL );
 			break;      
-    // https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=50
 		case DIMOFS_Z:
 			value = od.dwData;
 			if (value == 0) {

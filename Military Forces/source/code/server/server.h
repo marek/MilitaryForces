@@ -60,7 +60,6 @@ typedef struct {
 	int				serverId;			// changes each server start
 	int				restartedServerId;	// serverId before a map_restart
 	int				checksumFeed;		// the feed key that we use to compute the pure checksum strings
-	// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=475
 	// the serverId associated with the current checksumFeed (always <= serverId)
 	int       checksumFeedServerId;	
 	int				snapshotCounter;	// incremented for each snapshot built
@@ -178,7 +177,7 @@ typedef struct client_s {
 // out before legitimate users connected
 #define	MAX_CHALLENGES	1024
 
-#define	AUTHORIZE_TIMEOUT	5000
+//#define	AUTHORIZE_TIMEOUT	2000
 
 typedef struct {
 	netadr_t	adr;
@@ -190,7 +189,7 @@ typedef struct {
 } challenge_t;
 
 
-#define	MAX_MASTERS	8				// max recipients for heartbeat packets
+//#define	MAX_MASTERS	8				// max recipients for heartbeat packets
 
 
 // this structure will be cleared only when the game dll changes
@@ -221,7 +220,7 @@ extern	server_t		sv;					// cleared each map
 struct ServerGame;
 extern ServerGame& theSG;
 
-#define	MAX_MASTER_SERVERS	5
+//#define	MAX_MASTER_SERVERS	5
 
 extern	cvar_t	*sv_fps;
 extern	cvar_t	*sv_timeout;
@@ -233,7 +232,7 @@ extern	cvar_t	*sv_maxclients;
 
 extern	cvar_t	*sv_privateClients;
 extern	cvar_t	*sv_hostname;
-extern	cvar_t	*sv_master[MAX_MASTER_SERVERS];
+//extern	cvar_t	*sv_master[MAX_MASTER_SERVERS];
 extern	cvar_t	*sv_reconnectlimit;
 extern	cvar_t	*sv_showloss;
 extern	cvar_t	*sv_padPackets;
@@ -264,8 +263,8 @@ void SV_AddOperatorCommands (void);
 void SV_RemoveOperatorCommands (void);
 
 
-void SV_MasterHeartbeat (void);
-void SV_MasterShutdown (void);
+//void SV_MasterHeartbeat (void);
+//void SV_MasterShutdown (void);
 
 bool SV_GetEntityToken( char *buffer, int bufferSize );
 

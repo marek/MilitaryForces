@@ -39,7 +39,7 @@ cvar_t	*sv_maxclients;
 
 cvar_t	*sv_privateClients;		// number of clients reserved for password
 cvar_t	*sv_hostname;
-cvar_t	*sv_master[MAX_MASTER_SERVERS];		// master server ip address
+//cvar_t	*sv_master[MAX_MASTER_SERVERS];		// master server ip address
 cvar_t	*sv_reconnectlimit;		// minimum seconds between connect messages
 cvar_t	*sv_showloss;			// report when usercmds are lost
 cvar_t	*sv_padPackets;			// add nop bytes to messages
@@ -204,91 +204,91 @@ MASTER SERVER FUNCTIONS
 ==============================================================================
 */
 
-/*
-================
-SV_MasterHeartbeat
+///*
+//================
+//SV_MasterHeartbeat
+//
+//Send a message to the masters every few minutes to
+//let it know we are alive, and log information.
+//We will also have a heartbeat sent when a server
+//changes from empty to non-empty, and full to non-full,
+//but not on every player enter or exit.
+//================
+//*/
+////#define	HEARTBEAT_MSEC	300*1000
+////#define	HEARTBEAT_GAME	"QuakeArena-1"
+//void SV_MasterHeartbeat( void ) {
+//	static netadr_t	adr[MAX_MASTER_SERVERS];
+//	int			i;
+//
+//	// "dedicated 1" is for lan play, "dedicated 2" is for inet public play
+//	if ( !com_dedicated || com_dedicated->integer != 2 ) {
+//		return;		// only dedicated servers send heartbeats
+//	}
+//
+//	// if not time yet, don't send anything
+//	if ( svs.time < svs.nextHeartbeatTime ) {
+//		return;
+//	}
+//	svs.nextHeartbeatTime = svs.time + HEARTBEAT_MSEC;
+//
+//
+//	// send to group masters
+//	for ( i = 0 ; i < MAX_MASTER_SERVERS ; i++ ) {
+//		if ( !sv_master[i]->string[0] ) {
+//			continue;
+//		}
+//
+//		// see if we haven't already resolved the name
+//		// resolving usually causes hitches on win95, so only
+//		// do it when needed
+//		if ( sv_master[i]->modified ) {
+//			sv_master[i]->modified = false;
+//	
+//			Com_Printf( "Resolving %s\n", sv_master[i]->string );
+//			if ( !NET_StringToAdr( sv_master[i]->string, &adr[i] ) ) {
+//				// if the address failed to resolve, clear it
+//				// so we don't take repeated dns hits
+//				Com_Printf( "Couldn't resolve address: %s\n", sv_master[i]->string );
+//				Cvar_Set( sv_master[i]->name, "" );
+//				sv_master[i]->modified = false;
+//				continue;
+//			}
+//			if ( !strstr( ":", sv_master[i]->string ) ) {
+//				adr[i].port = BigShort( PORT_MASTER );
+//			}
+//			Com_Printf( "%s resolved to %i.%i.%i.%i:%i\n", sv_master[i]->string,
+//				adr[i].ip[0], adr[i].ip[1], adr[i].ip[2], adr[i].ip[3],
+//				BigShort( adr[i].port ) );
+//		}
+//
+//
+//		Com_Printf ("Sending heartbeat to %s\n", sv_master[i]->string );
+//		// this command should be changed if the server info / status format
+//		// ever incompatably changes
+//		NET_OutOfBandPrint( NS_SERVER, adr[i], "heartbeat %s\n", HEARTBEAT_GAME );
+//	}
+//}
 
-Send a message to the masters every few minutes to
-let it know we are alive, and log information.
-We will also have a heartbeat sent when a server
-changes from empty to non-empty, and full to non-full,
-but not on every player enter or exit.
-================
-*/
-#define	HEARTBEAT_MSEC	300*1000
-#define	HEARTBEAT_GAME	"QuakeArena-1"
-void SV_MasterHeartbeat( void ) {
-	static netadr_t	adr[MAX_MASTER_SERVERS];
-	int			i;
-
-	// "dedicated 1" is for lan play, "dedicated 2" is for inet public play
-	if ( !com_dedicated || com_dedicated->integer != 2 ) {
-		return;		// only dedicated servers send heartbeats
-	}
-
-	// if not time yet, don't send anything
-	if ( svs.time < svs.nextHeartbeatTime ) {
-		return;
-	}
-	svs.nextHeartbeatTime = svs.time + HEARTBEAT_MSEC;
-
-
-	// send to group masters
-	for ( i = 0 ; i < MAX_MASTER_SERVERS ; i++ ) {
-		if ( !sv_master[i]->string[0] ) {
-			continue;
-		}
-
-		// see if we haven't already resolved the name
-		// resolving usually causes hitches on win95, so only
-		// do it when needed
-		if ( sv_master[i]->modified ) {
-			sv_master[i]->modified = false;
-	
-			Com_Printf( "Resolving %s\n", sv_master[i]->string );
-			if ( !NET_StringToAdr( sv_master[i]->string, &adr[i] ) ) {
-				// if the address failed to resolve, clear it
-				// so we don't take repeated dns hits
-				Com_Printf( "Couldn't resolve address: %s\n", sv_master[i]->string );
-				Cvar_Set( sv_master[i]->name, "" );
-				sv_master[i]->modified = false;
-				continue;
-			}
-			if ( !strstr( ":", sv_master[i]->string ) ) {
-				adr[i].port = BigShort( PORT_MASTER );
-			}
-			Com_Printf( "%s resolved to %i.%i.%i.%i:%i\n", sv_master[i]->string,
-				adr[i].ip[0], adr[i].ip[1], adr[i].ip[2], adr[i].ip[3],
-				BigShort( adr[i].port ) );
-		}
-
-
-		Com_Printf ("Sending heartbeat to %s\n", sv_master[i]->string );
-		// this command should be changed if the server info / status format
-		// ever incompatably changes
-		NET_OutOfBandPrint( NS_SERVER, adr[i], "heartbeat %s\n", HEARTBEAT_GAME );
-	}
-}
-
-/*
-=================
-SV_MasterShutdown
-
-Informs all masters that this server is going down
-=================
-*/
-void SV_MasterShutdown( void ) {
-	// send a hearbeat right now
-	svs.nextHeartbeatTime = -9999;
-	SV_MasterHeartbeat();
-
-	// send it again to minimize chance of drops
-	svs.nextHeartbeatTime = -9999;
-	SV_MasterHeartbeat();
-
-	// when the master tries to poll the server, it won't respond, so
-	// it will be removed from the list
-}
+///*
+//=================
+//SV_MasterShutdown
+//
+//Informs all masters that this server is going down
+//=================
+//*/
+//void SV_MasterShutdown( void ) {
+//	// send a hearbeat right now
+//	svs.nextHeartbeatTime = -9999;
+//	SV_MasterHeartbeat();
+//
+//	// send it again to minimize chance of drops
+//	svs.nextHeartbeatTime = -9999;
+//	SV_MasterHeartbeat();
+//
+//	// when the master tries to poll the server, it won't respond, so
+//	// it will be removed from the list
+//}
 
 
 /*
@@ -444,7 +444,6 @@ void SVC_RemoteCommand( netadr_t from, msg_t *msg ) {
 	static unsigned int lasttime = 0;
 	char *cmd_aux;
 
-	// TTimo - https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=534
 	time = Com_Milliseconds();
 	if (time<(lasttime+500)) {
 		return;
@@ -471,7 +470,6 @@ void SVC_RemoteCommand( netadr_t from, msg_t *msg ) {
 	} else {
 		remaining[0] = 0;
 		
-		// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=543
 		// get the command directly, "rcon <pass> <command>" to avoid quoting issues
 		// extract the command by walking
 		// since the cmd formatting can fuckup (amount of spaces), using a dumb step by step parsing
@@ -528,8 +526,8 @@ void SV_ConnectionlessPacket( netadr_t from, msg_t *msg ) {
 		SV_GetChallenge( from );
 	} else if (!Q_stricmp(c, "connect")) {
 		SV_DirectConnect( from );
-	} else if (!Q_stricmp(c, "ipAuthorize")) {
-		SV_AuthorizeIpPacket( from );
+	//} else if (!Q_stricmp(c, "ipAuthorize")) {
+	//	SV_AuthorizeIpPacket( from );
 	} else if (!Q_stricmp(c, "rcon")) {
 		SVC_RemoteCommand( from, msg );
 	} else if (!Q_stricmp(c, "disconnect")) {
@@ -849,7 +847,7 @@ void SV_Frame( int msec ) {
 	SV_SendClientMessages();
 
 	// send a heartbeat to the master if needed
-	SV_MasterHeartbeat();
+	//SV_MasterHeartbeat();
 }
 
 //============================================================================
