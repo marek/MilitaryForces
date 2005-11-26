@@ -39,7 +39,7 @@ struct UserInterface
 
 	void						drawConnectScreen( bool overlay ) const;
 
-	bool						hasUniqueCDKey() const;
+	//bool						hasUniqueCDKey() const;
 
 	// --
 

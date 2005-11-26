@@ -1,5 +1,5 @@
 /*
- * $Id: ui_main.c,v 1.13 2005-11-24 10:46:54 thebjoern Exp $
+ * $Id: ui_main.c,v 1.14 2005-11-26 10:06:29 thebjoern Exp $
 */
 /*
 =======================================================================
@@ -1941,7 +1941,6 @@ static void UI_DrawGLInfo(rectDef_t *rect, float scale, const vec4_t color, int 
 		textStyle);
 
 	// build null terminated extension strings
-  // TTimo: https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=399
   // in TA this was not directly crashing, but displaying a nasty broken shader right in the middle
   // brought down the string size to 1024, there's not much that can be shown on the screen anyway
 	Q_strncpyz(buff, uiInfo.uiUtils.dc_->glConfig_.extensions_string, 1024);
@@ -3811,35 +3810,6 @@ void UI_RunMenuScript(char **args)
 			}
 
 			Cvar_Set("sv_maxClients", va("%d",clients));
-
-			//for (i = 0; i < PLAYERS_PER_TEAM; i++) 
-			//{
-			//	int bot = Cvar_VariableValue( va("ui_blueteam%i", i+1));
-			//	if (bot > 1) 
-			//	{
-			//		if (ui_actualNetGameType.integer >= GT_TEAM) 
-			//		{
-			//			Com_sprintf( buff, sizeof(buff), "addbot %s %f %s\n", uiInfo.characterList[bot-2].name, skill, "Blue");
-			//		} 
-			//		else 
-			//		{
-			//			Com_sprintf( buff, sizeof(buff), "addbot %s %f \n", UI_GetBotNameByNumber(bot-2), skill);
-			//		}
-			//		Cbuf_ExecuteText( EXEC_APPEND, buff );
-			//	}
-			//	bot = Cvar_VariableValue( va("ui_redteam%i", i+1));
-			//	if (bot > 1) 
-			//	{
-			//		if (ui_actualNetGameType.integer >= GT_TEAM) {
-			//			Com_sprintf( buff, sizeof(buff), "addbot %s %f %s\n", uiInfo.characterList[bot-2].name, skill, "Red");
-			//		} 
-			//		else 
-			//		{
-			//			Com_sprintf( buff, sizeof(buff), "addbot %s %f \n", UI_GetBotNameByNumber(bot-2), skill);
-			//		}
-			//		Cbuf_ExecuteText( EXEC_APPEND, buff );
-			//	}
-			//}
 		} 
 		else if (Q_stricmp(name, "updateSPMenu") == 0) 
 		{
@@ -3861,41 +3831,41 @@ void UI_RunMenuScript(char **args)
 		} 
 		else if (Q_stricmp(name, "getCDKey") == 0) 
 		{
-			char out[17];
-			CLUI_GetCDKey(buff, 17);
-			Cvar_Set("cdkey1", "");
-			Cvar_Set("cdkey2", "");
-			Cvar_Set("cdkey3", "");
-			Cvar_Set("cdkey4", "");
-			if (strlen(buff) == CDKEY_LEN) {
-				Q_strncpyz(out, buff, 5);
-				Cvar_Set("cdkey1", out);
-				Q_strncpyz(out, buff + 4, 5);
-				Cvar_Set("cdkey2", out);
-				Q_strncpyz(out, buff + 8, 5);
-				Cvar_Set("cdkey3", out);
-				Q_strncpyz(out, buff + 12, 5);
-				Cvar_Set("cdkey4", out);
-			}
+			//char out[17];
+			//CLUI_GetCDKey(buff, 17);
+			//Cvar_Set("cdkey1", "");
+			//Cvar_Set("cdkey2", "");
+			//Cvar_Set("cdkey3", "");
+			//Cvar_Set("cdkey4", "");
+			//if (strlen(buff) == CDKEY_LEN) {
+			//	Q_strncpyz(out, buff, 5);
+			//	Cvar_Set("cdkey1", out);
+			//	Q_strncpyz(out, buff + 4, 5);
+			//	Cvar_Set("cdkey2", out);
+			//	Q_strncpyz(out, buff + 8, 5);
+			//	Cvar_Set("cdkey3", out);
+			//	Q_strncpyz(out, buff + 12, 5);
+			//	Cvar_Set("cdkey4", out);
+			//}
 
 		} 
 		else if (Q_stricmp(name, "verifyCDKey") == 0) 
 		{
-			buff[0] = '\0';
-			Q_strcat(buff, 1024, UI_Cvar_VariableString("cdkey1")); 
-			Q_strcat(buff, 1024, UI_Cvar_VariableString("cdkey2")); 
-			Q_strcat(buff, 1024, UI_Cvar_VariableString("cdkey3")); 
-			Q_strcat(buff, 1024, UI_Cvar_VariableString("cdkey4")); 
-			Cvar_Set("cdkey", buff);
-			if (CL_CDKeyValidate(buff, UI_Cvar_VariableString("cdkeychecksum"))) 
-			{
-				Cvar_Set("ui_cdkeyvalid", "CD Key Appears to be valid.");
-				CLUI_SetCDKey(buff);
-			} 
-			else 
-			{
-				Cvar_Set("ui_cdkeyvalid", "CD Key does not appear to be valid.");
-			}
+			//buff[0] = '\0';
+			//Q_strcat(buff, 1024, UI_Cvar_VariableString("cdkey1")); 
+			//Q_strcat(buff, 1024, UI_Cvar_VariableString("cdkey2")); 
+			//Q_strcat(buff, 1024, UI_Cvar_VariableString("cdkey3")); 
+			//Q_strcat(buff, 1024, UI_Cvar_VariableString("cdkey4")); 
+			//Cvar_Set("cdkey", buff);
+			//if (CL_CDKeyValidate(buff, UI_Cvar_VariableString("cdkeychecksum"))) 
+			//{
+			//	Cvar_Set("ui_cdkeyvalid", "CD Key Appears to be valid.");
+			//	CLUI_SetCDKey(buff);
+			//} 
+			//else 
+			//{
+			//	Cvar_Set("ui_cdkeyvalid", "CD Key does not appear to be valid.");
+			//}
 		} 
 		else if (Q_stricmp(name, "loadArenas") == 0) 
 		{
@@ -3961,19 +3931,9 @@ void UI_RunMenuScript(char **args)
 			}
 			Cbuf_ExecuteText( EXEC_APPEND, va("cinematic %s.roq 2\n", uiInfo.movieList[uiInfo.movieIndex]));
 		} 
-		else if (Q_stricmp(name, "RunMod") == 0) 
-		{
-			Cvar_Set( "fs_game", uiInfo.modList[uiInfo.modIndex].modName);
-			Cbuf_ExecuteText( EXEC_APPEND, "vid_restart;" );
-		} 
 		else if (Q_stricmp(name, "RunDemo") == 0) 
 		{
 			Cbuf_ExecuteText( EXEC_APPEND, va("demo %s\n", uiInfo.demoList[uiInfo.demoIndex]));
-		} 
-		else if (Q_stricmp(name, "Quake3") == 0) 
-		{
-			Cvar_Set( "fs_game", "");
-			Cbuf_ExecuteText( EXEC_APPEND, "vid_restart;" );
 		} 
 		else if (Q_stricmp(name, "closeJoin") == 0) 
 		{
@@ -4121,17 +4081,6 @@ void UI_RunMenuScript(char **args)
 				Cbuf_ExecuteText( EXEC_APPEND, va("callteamvote leader %s\n",uiInfo.teamNames[uiInfo.teamIndex]) );
 			}
 		} 
-		//else if (Q_stricmp(name, "addBot") == 0) 
-		//{
-		//	if (Cvar_VariableValue("g_gametype") >= GT_TEAM)
-		//	{
-		//		Cbuf_ExecuteText( EXEC_APPEND, va("addbot %s %i %s\n", uiInfo.characterList[uiInfo.botIndex].name, uiInfo.skillIndex+1, (uiInfo.redBlue == 0) ? "Red" : "Blue") );
-		//	} 
-		//	else
-		//	{
-		//		Cbuf_ExecuteText( EXEC_APPEND, va("addbot %s %i %s\n", UI_GetBotNameByNumber(uiInfo.botIndex), uiInfo.skillIndex+1, (uiInfo.redBlue == 0) ? "Red" : "Blue") );
-		//	}
-		//} 
 		else if (Q_stricmp(name, "addFavorite") == 0) 
 		{
 			if (ui_netSource.integer != AS_FAVORITES)
@@ -6531,7 +6480,7 @@ vmCvar_t	ui_server14;
 vmCvar_t	ui_server15;
 vmCvar_t	ui_server16;
 
-vmCvar_t	ui_cdkeychecked;
+//vmCvar_t	ui_cdkeychecked;
 
 vmCvar_t	ui_redteam;
 vmCvar_t	ui_redteam1;
@@ -6688,14 +6637,14 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_server14, "server14", "", CVAR_ARCHIVE },
 	{ &ui_server15, "server15", "", CVAR_ARCHIVE },
 	{ &ui_server16, "server16", "", CVAR_ARCHIVE },
-	{ &ui_cdkeychecked, "ui_cdkeychecked", "0", CVAR_ROM },
+	//{ &ui_cdkeychecked, "ui_cdkeychecked", "0", CVAR_ROM },
 	{ &ui_new, "ui_new", "0", CVAR_TEMP },
 	{ &ui_debug, "ui_debug", "0", CVAR_TEMP },
 	{ &ui_initialized, "ui_initialized", "0", CVAR_TEMP },
-	{ &ui_teamName, "ui_teamName", "Pagans", CVAR_ARCHIVE },
-	{ &ui_opponentName, "ui_opponentName", "Stroggs", CVAR_ARCHIVE },
-	{ &ui_redteam, "ui_redteam", "Pagans", CVAR_ARCHIVE },
-	{ &ui_blueteam, "ui_blueteam", "Stroggs", CVAR_ARCHIVE },
+	{ &ui_teamName, "ui_teamName", "NATO", CVAR_ARCHIVE },
+	{ &ui_opponentName, "ui_opponentName", "Warsaw Pact", CVAR_ARCHIVE },
+	{ &ui_redteam, "ui_redteam", "Warsaw Pact", CVAR_ARCHIVE },
+	{ &ui_blueteam, "ui_blueteam", "NATO", CVAR_ARCHIVE },
 	{ &ui_dedicated, "ui_dedicated", "0", CVAR_ARCHIVE },
 	{ &ui_gameType, "ui_gametype", "0", CVAR_ARCHIVE },
 	{ &ui_joinGameType, "ui_joinGametype", "0", CVAR_ARCHIVE },
@@ -6866,8 +6815,8 @@ UI_StartServerRefresh
 */
 static void UI_StartServerRefresh(bool full)
 {
-	int		i;
-	char	*ptr;
+	//int		i;
+	//char	*ptr;
 
 	qtime_t q;
 	Com_RealTime(&q);
@@ -6895,22 +6844,22 @@ static void UI_StartServerRefresh(bool full)
 	}
 
 	uiInfo.serverStatus.refreshtime = uiInfo.uiUtils.dc_->realTime_ + 5000;
-	if( ui_netSource.integer == AS_GLOBAL || ui_netSource.integer == AS_MPLAYER ) {
-		if( ui_netSource.integer == AS_GLOBAL ) {
-			i = 0;
-		}
-		else {
-			i = 1;
-		}
+	//if( ui_netSource.integer == AS_GLOBAL || ui_netSource.integer == AS_MPLAYER ) {
+	//	if( ui_netSource.integer == AS_GLOBAL ) {
+	//		i = 0;
+	//	}
+	//	else {
+	//		i = 1;
+	//	}
 
-		ptr = UI_Cvar_VariableString("debug_protocol");
-		if (strlen(ptr)) {
-			Cbuf_ExecuteText( EXEC_NOW, va( "globalservers %d %s full empty\n", i, ptr));
-		}
-		else {
-			Cbuf_ExecuteText( EXEC_NOW, va( "globalservers %d %d full empty\n", i, Cvar_VariableValue( "protocol" ) ) );
-		}
-	}
+	//	ptr = UI_Cvar_VariableString("debug_protocol");
+	//	if (strlen(ptr)) {
+	//		Cbuf_ExecuteText( EXEC_NOW, va( "globalservers %d %s full empty\n", i, ptr));
+	//	}
+	//	else {
+	//		Cbuf_ExecuteText( EXEC_NOW, va( "globalservers %d %d full empty\n", i, Cvar_VariableValue( "protocol" ) ) );
+	//	}
+	//}
 }
 
 

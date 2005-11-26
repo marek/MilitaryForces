@@ -702,45 +702,45 @@ void Key_SetCatcher( int catcher )
 }
 
 
-/*
-====================
-CLUI_GetCDKey
-====================
-*/
-void CLUI_GetCDKey( char *buf, int buflen ) 
-{
-	cvar_t	*fs;
-	fs = Cvar_Get ("fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
-	if (UI_usesUniqueCDKey() && fs && fs->string[0] != 0) {
-		Com_Memcpy( buf, &cl_cdkey[16], 16);
-		buf[16] = 0;
-	} else {
-		Com_Memcpy( buf, cl_cdkey, 16);
-		buf[16] = 0;
-	}
-}
+///*
+//====================
+//CLUI_GetCDKey
+//====================
+//*/
+//void CLUI_GetCDKey( char *buf, int buflen ) 
+//{
+//	cvar_t	*fs;
+//	fs = Cvar_Get ("fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
+//	if (UI_usesUniqueCDKey() && fs && fs->string[0] != 0) {
+//		Com_Memcpy( buf, &cl_cdkey[16], 16);
+//		buf[16] = 0;
+//	} else {
+//		Com_Memcpy( buf, cl_cdkey, 16);
+//		buf[16] = 0;
+//	}
+//}
 
 
-/*
-====================
-CLUI_SetCDKey
-====================
-*/
-void CLUI_SetCDKey( char *buf ) 
-{
-	cvar_t	*fs;
-	fs = Cvar_Get ("fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
-	if (UI_usesUniqueCDKey() && fs && fs->string[0] != 0) {
-		Com_Memcpy( &cl_cdkey[16], buf, 16 );
-		cl_cdkey[32] = 0;
-		// set the flag so the fle will be written at the next opportunity
-		cvar_modifiedFlags |= CVAR_ARCHIVE;
-	} else {
-		Com_Memcpy( cl_cdkey, buf, 16 );
-		// set the flag so the fle will be written at the next opportunity
-		cvar_modifiedFlags |= CVAR_ARCHIVE;
-	}
-}
+///*
+//====================
+//CLUI_SetCDKey
+//====================
+//*/
+//void CLUI_SetCDKey( char *buf ) 
+//{
+//	cvar_t	*fs;
+//	fs = Cvar_Get ("fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
+//	if (UI_usesUniqueCDKey() && fs && fs->string[0] != 0) {
+//		Com_Memcpy( &cl_cdkey[16], buf, 16 );
+//		cl_cdkey[32] = 0;
+//		// set the flag so the fle will be written at the next opportunity
+//		cvar_modifiedFlags |= CVAR_ARCHIVE;
+//	} else {
+//		Com_Memcpy( cl_cdkey, buf, 16 );
+//		// set the flag so the fle will be written at the next opportunity
+//		cvar_modifiedFlags |= CVAR_ARCHIVE;
+//	}
+//}
 
 /*
 ====================
@@ -772,33 +772,24 @@ int GetConfigString(int index, char *buf, int size)
 CL_ShutdownUI
 ====================
 */
-void CL_ShutdownUI( void ) {
+void CL_ShutdownUI() 
+{
 	cls.keyCatchers &= ~KEYCATCH_UI;
 	cls.uiStarted = false;
-	//if ( !uivm ) {
-	//	return;
-	//}
+
 	if( !theUI.isInitialized() )
 		return;
 
 	theUI.shutdown();
-	//VM_Call( uivm, UI_SHUTDOWN );
-	//VM_Free( uivm );
-	//uivm = NULL;
 }
 
-bool UI_usesUniqueCDKey() 
-{
-	if( theUI.isInitialized() )
-		return theUI.hasUniqueCDKey();
-
-	return false;
-
-//	if (uivm) 
-//		return (VM_Call( uivm, UI_HASUNIQUECDKEY) != 0);
-//	else 
-//		return false;
-}
+//bool UI_usesUniqueCDKey() 
+//{
+//	if( theUI.isInitialized() )
+//		return theUI.hasUniqueCDKey();
+//
+//	return false;
+//}
 
 /*
 ====================
@@ -809,13 +800,8 @@ See if the current console command is claimed by the ui
 */
 bool UI_GameCommand( void ) 
 {
-	//if ( !uivm ) {
-	//	return false;
-	//}
-
 	if( !theUI.isInitialized() )
 		return false;
 
-	//return (VM_Call( uivm, UI_CONSOLE_COMMAND, cls.realtime )!=0);
 	return theUI.consoleCommand( cls.realtime );
 }

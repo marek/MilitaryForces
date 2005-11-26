@@ -1,5 +1,5 @@
 /*
- * $Id: ui_local.h,v 1.9 2005-11-21 17:28:32 thebjoern Exp $
+ * $Id: ui_local.h,v 1.10 2005-11-26 10:06:29 thebjoern Exp $
 */
 //
 #ifndef __UI_LOCAL_H__
@@ -82,8 +82,8 @@ extern vmCvar_t	ui_server14;
 extern vmCvar_t	ui_server15;
 extern vmCvar_t	ui_server16;
 
-extern vmCvar_t	ui_cdkey;
-extern vmCvar_t	ui_cdkeychecked;
+//extern vmCvar_t	ui_cdkey;
+//extern vmCvar_t	ui_cdkeychecked;
 
 extern vmCvar_t	ui_captureLimit;
 extern vmCvar_t	ui_fragLimit;
@@ -425,9 +425,9 @@ extern void UI_ModsMenu_Cache( void );
 //
 // ui_cdkey.c
 //
-extern void UI_CDKeyMenu( void );
-extern void UI_CDKeyMenu_Cache( void );
-extern void UI_CDKeyMenu_f( void );
+//extern void UI_CDKeyMenu( void );
+//extern void UI_CDKeyMenu_Cache( void );
+//extern void UI_CDKeyMenu_f( void );
 
 //
 // ui_playermodel.c
@@ -960,15 +960,15 @@ int LAN_AddServer(int source, const char *name, const char *address);
 void LAN_RemoveServer(int source, const char *addr);
 int LAN_CompareServers( int source, int sortKey, int sortDir, int s1, int s2 );
 int LAN_GetServerStatus( const char *serverAddress, char *serverStatus, int maxLen );
-void CLUI_GetCDKey( char *buf, int buflen );
-void CLUI_SetCDKey( char *buf );
+//void CLUI_GetCDKey( char *buf, int buflen );
+//void CLUI_SetCDKey( char *buf );
 int Com_RealTime(qtime_t *qtime);
 int CIN_PlayCinematic( const char *arg, int x, int y, int w, int h, int systemBits );
 e_status CIN_StopCinematic(int handle);
 e_status CIN_RunCinematic (int handle);
 void CIN_DrawCinematic (int handle);
 void CIN_SetExtents (int handle, int x, int y, int w, int h);
-bool CL_CDKeyValidate( const char *key, const char *checksum );
+//bool CL_CDKeyValidate( const char *key, const char *checksum );
 void GetClientState( uiClientState_t *state );
 
 //

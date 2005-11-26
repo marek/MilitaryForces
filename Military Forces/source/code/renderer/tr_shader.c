@@ -1873,7 +1873,6 @@ static bool CollapseMultitexture( void ) {
 =============
 
 FixRenderCommandList
-https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=493
 Arnout: this is a nasty issue. Shaders can be registered after drawsurfaces are generated
 but before the frame is rendered. This will, for the duration of one frame, cause drawsurfaces
 to be rendered with bad shaders. To fix this, need to go through all render commands and fix
@@ -1970,7 +1969,6 @@ static void SortNewShader( void ) {
 	}
 
 	// Arnout: fix rendercommandlist
-	// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=493
 	FixRenderCommandList( i+1 );
 
 	newShader->sortedIndex = i+1;

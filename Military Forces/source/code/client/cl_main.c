@@ -666,23 +666,26 @@ screen to let the user know about it, then dump all client
 memory on the hunk from cgame, ui, and renderer
 =====================
 */
-void CL_MapLoading( void ) {
-	if ( !com_cl_running->integer ) {
+void CL_MapLoading() 
+{
+	if ( !com_cl_running->integer ) 
 		return;
-	}
 
 	Con_Close();
 	cls.keyCatchers = 0;
 
 	// if we are already connected to the local host, stay connected
-	if ( cls.state >= CA_CONNECTED && !Q_stricmp( cls.servername, "localhost" ) ) {
+	if ( cls.state >= CA_CONNECTED && !Q_stricmp( cls.servername, "localhost" ) ) 
+	{
 		cls.state = CA_CONNECTED;		// so the connect screen is drawn
 		Com_Memset( cls.updateInfoString, 0, sizeof( cls.updateInfoString ) );
 		Com_Memset( clc.serverMessage, 0, sizeof( clc.serverMessage ) );
 		Com_Memset( &cl.gameState, 0, sizeof( cl.gameState ) );
 		clc.lastPacketSentTime = -9999;
 		SCR_UpdateScreen();
-	} else {
+	} 
+	else 
+	{
 		// clear nextmap so the cinematic shutdown doesn't execute it
 		Cvar_Set( "nextmap", "" );
 		CL_Disconnect( true );
@@ -810,130 +813,129 @@ void CL_ForwardCommandToServer( const char *string ) {
 		CL_AddReliableCommand( cmd );
 	}
 }
+//
+///*
+//===================
+//CL_RequestMotd
+//
+//===================
+//*/
+//void CL_RequestMotd( void ) {
+//	char		info[MAX_INFO_STRING];
+//
+//	if ( !cl_motd->integer ) {
+//		return;
+//	}
+//	Com_Printf( "Resolving %s\n", UPDATE_SERVER_NAME );
+//	if ( !NET_StringToAdr( UPDATE_SERVER_NAME, &cls.updateServer  ) ) {
+//		Com_Printf( "Couldn't resolve address\n" );
+//		return;
+//	}
+//	cls.updateServer.port = BigShort( PORT_UPDATE );
+//	Com_Printf( "%s resolved to %i.%i.%i.%i:%i\n", UPDATE_SERVER_NAME,
+//		cls.updateServer.ip[0], cls.updateServer.ip[1],
+//		cls.updateServer.ip[2], cls.updateServer.ip[3],
+//		BigShort( cls.updateServer.port ) );
+//	
+//	info[0] = 0;
+//  // NOTE TTimo xoring against Com_Milliseconds, otherwise we may not have a true randomization
+//  // only srand I could catch before here is tr_noise.c l:26 srand(1001)
+//  // NOTE: the Com_Milliseconds xoring only affects the lower 16-bit word,
+//  //   but I decided it was enough randomization
+//	Com_sprintf( cls.updateChallenge, sizeof( cls.updateChallenge ), "%i", ((rand() << 16) ^ rand()) ^ Com_Milliseconds());
+//
+//	Info_SetValueForKey( info, "challenge", cls.updateChallenge );
+//	Info_SetValueForKey( info, "renderer", cls.glconfig.renderer_string );
+//	Info_SetValueForKey( info, "version", com_version->string );
+//
+//	NET_OutOfBandPrint( NS_CLIENT, cls.updateServer, "getmotd \"%s\"\n", info );
+//}
 
-/*
-===================
-CL_RequestMotd
-
-===================
-*/
-void CL_RequestMotd( void ) {
-	char		info[MAX_INFO_STRING];
-
-	if ( !cl_motd->integer ) {
-		return;
-	}
-	Com_Printf( "Resolving %s\n", UPDATE_SERVER_NAME );
-	if ( !NET_StringToAdr( UPDATE_SERVER_NAME, &cls.updateServer  ) ) {
-		Com_Printf( "Couldn't resolve address\n" );
-		return;
-	}
-	cls.updateServer.port = BigShort( PORT_UPDATE );
-	Com_Printf( "%s resolved to %i.%i.%i.%i:%i\n", UPDATE_SERVER_NAME,
-		cls.updateServer.ip[0], cls.updateServer.ip[1],
-		cls.updateServer.ip[2], cls.updateServer.ip[3],
-		BigShort( cls.updateServer.port ) );
-	
-	info[0] = 0;
-  // NOTE TTimo xoring against Com_Milliseconds, otherwise we may not have a true randomization
-  // only srand I could catch before here is tr_noise.c l:26 srand(1001)
-  // https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=382
-  // NOTE: the Com_Milliseconds xoring only affects the lower 16-bit word,
-  //   but I decided it was enough randomization
-	Com_sprintf( cls.updateChallenge, sizeof( cls.updateChallenge ), "%i", ((rand() << 16) ^ rand()) ^ Com_Milliseconds());
-
-	Info_SetValueForKey( info, "challenge", cls.updateChallenge );
-	Info_SetValueForKey( info, "renderer", cls.glconfig.renderer_string );
-	Info_SetValueForKey( info, "version", com_version->string );
-
-	NET_OutOfBandPrint( NS_CLIENT, cls.updateServer, "getmotd \"%s\"\n", info );
-}
-
-/*
-===================
-CL_RequestAuthorization
-
-Authorization server protocol
------------------------------
-
-All commands are text in Q3 out of band packets (leading 0xff 0xff 0xff 0xff).
-
-Whenever the client tries to get a challenge from the server it wants to
-connect to, it also blindly fires off a packet to the authorize server:
-
-getKeyAuthorize <challenge> <cdkey>
-
-cdkey may be "demo"
-
-
-#OLD The authorize server returns a:
-#OLD 
-#OLD keyAthorize <challenge> <accept | deny>
-#OLD 
-#OLD A client will be accepted if the cdkey is valid and it has not been used by any other IP
-#OLD address in the last 15 minutes.
-
-
-The server sends a:
-
-getIpAuthorize <challenge> <ip>
-
-The authorize server returns a:
-
-ipAuthorize <challenge> <accept | deny | demo | unknown >
-
-A client will be accepted if a valid cdkey was sent by that ip (only) in the last 15 minutes.
-If no response is received from the authorize server after two tries, the client will be let
-in anyway.
-===================
-*/
-void CL_RequestAuthorization( void ) {
-	char	nums[64];
-	int		i, j, l;
-	cvar_t	*fs;
-
-	if ( !cls.authorizeServer.port ) {
-		Com_Printf( "Resolving %s\n", AUTHORIZE_SERVER_NAME );
-		if ( !NET_StringToAdr( AUTHORIZE_SERVER_NAME, &cls.authorizeServer  ) ) {
-			Com_Printf( "Couldn't resolve address\n" );
-			return;
-		}
-
-		cls.authorizeServer.port = BigShort( PORT_AUTHORIZE );
-		Com_Printf( "%s resolved to %i.%i.%i.%i:%i\n", AUTHORIZE_SERVER_NAME,
-			cls.authorizeServer.ip[0], cls.authorizeServer.ip[1],
-			cls.authorizeServer.ip[2], cls.authorizeServer.ip[3],
-			BigShort( cls.authorizeServer.port ) );
-	}
-	if ( cls.authorizeServer.type == NA_BAD ) {
-		return;
-	}
-
-	//if ( Cvar_VariableValue( "fs_restrict" ) ) {
-	//	Q_strncpyz( nums, "mfdemo", sizeof( nums ) );
-	//} else {
-		// only grab the alphanumeric values from the cdkey, to avoid any dashes or spaces
-		j = 0;
-		l = strlen( cl_cdkey );
-		if ( l > 32 ) {
-			l = 32;
-		}
-		for ( i = 0 ; i < l ; i++ ) {
-			if ( ( cl_cdkey[i] >= '0' && cl_cdkey[i] <= '9' )
-				|| ( cl_cdkey[i] >= 'a' && cl_cdkey[i] <= 'z' )
-				|| ( cl_cdkey[i] >= 'A' && cl_cdkey[i] <= 'Z' )
-				) {
-				nums[j] = cl_cdkey[i];
-				j++;
-			}
-		}
-		nums[j] = 0;
-	//}
-
-	fs = Cvar_Get ("cl_anonymous", "0", CVAR_INIT|CVAR_SYSTEMINFO );
-
-	NET_OutOfBandPrint(NS_CLIENT, cls.authorizeServer, va("getKeyAuthorize %i %s", fs->integer, nums) );
-}
+///*
+//===================
+//CL_RequestAuthorization
+//
+//Authorization server protocol
+//-----------------------------
+//
+//All commands are text in Q3 out of band packets (leading 0xff 0xff 0xff 0xff).
+//
+//Whenever the client tries to get a challenge from the server it wants to
+//connect to, it also blindly fires off a packet to the authorize server:
+//
+//getKeyAuthorize <challenge> <cdkey>
+//
+//cdkey may be "demo"
+//
+//
+//#OLD The authorize server returns a:
+//#OLD 
+//#OLD keyAthorize <challenge> <accept | deny>
+//#OLD 
+//#OLD A client will be accepted if the cdkey is valid and it has not been used by any other IP
+//#OLD address in the last 15 minutes.
+//
+//
+//The server sends a:
+//
+//getIpAuthorize <challenge> <ip>
+//
+//The authorize server returns a:
+//
+//ipAuthorize <challenge> <accept | deny | demo | unknown >
+//
+//A client will be accepted if a valid cdkey was sent by that ip (only) in the last 15 minutes.
+//If no response is received from the authorize server after two tries, the client will be let
+//in anyway.
+//===================
+//*/
+//void CL_RequestAuthorization( void ) {
+//	char	nums[64];
+//	int		i, j, l;
+//	cvar_t	*fs;
+//
+//	if ( !cls.authorizeServer.port ) {
+//		Com_Printf( "Resolving %s\n", AUTHORIZE_SERVER_NAME );
+//		if ( !NET_StringToAdr( AUTHORIZE_SERVER_NAME, &cls.authorizeServer  ) ) {
+//			Com_Printf( "Couldn't resolve address\n" );
+//			return;
+//		}
+//
+//		cls.authorizeServer.port = BigShort( PORT_AUTHORIZE );
+//		Com_Printf( "%s resolved to %i.%i.%i.%i:%i\n", AUTHORIZE_SERVER_NAME,
+//			cls.authorizeServer.ip[0], cls.authorizeServer.ip[1],
+//			cls.authorizeServer.ip[2], cls.authorizeServer.ip[3],
+//			BigShort( cls.authorizeServer.port ) );
+//	}
+//	if ( cls.authorizeServer.type == NA_BAD ) {
+//		return;
+//	}
+//
+//	//if ( Cvar_VariableValue( "fs_restrict" ) ) {
+//	//	Q_strncpyz( nums, "mfdemo", sizeof( nums ) );
+//	//} else {
+//		// only grab the alphanumeric values from the cdkey, to avoid any dashes or spaces
+//		j = 0;
+//		l = strlen( cl_cdkey );
+//		if ( l > 32 ) {
+//			l = 32;
+//		}
+//		for ( i = 0 ; i < l ; i++ ) {
+//			if ( ( cl_cdkey[i] >= '0' && cl_cdkey[i] <= '9' )
+//				|| ( cl_cdkey[i] >= 'a' && cl_cdkey[i] <= 'z' )
+//				|| ( cl_cdkey[i] >= 'A' && cl_cdkey[i] <= 'Z' )
+//				) {
+//				nums[j] = cl_cdkey[i];
+//				j++;
+//			}
+//		}
+//		nums[j] = 0;
+//	//}
+//
+//	fs = Cvar_Get ("cl_anonymous", "0", CVAR_INIT|CVAR_SYSTEMINFO );
+//
+//	NET_OutOfBandPrint(NS_CLIENT, cls.authorizeServer, va("getKeyAuthorize %i %s", fs->integer, nums) );
+//}
 
 /*
 ======================================================================
@@ -1030,10 +1032,12 @@ CL_Connect_f
 
 ================
 */
-void CL_Connect_f( void ) {
+void CL_Connect_f()
+{
 	char	*server;
 
-	if ( Cmd_Argc() != 2 ) {
+	if ( Cmd_Argc() != 2 ) 
+	{
 		Com_Printf( "usage: connect [server]\n");
 		return;	
 	}
@@ -1041,14 +1045,15 @@ void CL_Connect_f( void ) {
 	Cvar_Set("ui_singlePlayerActive", "0");
 
 	// fire a message off to the motd server
-	CL_RequestMotd();
+	//CL_RequestMotd();
 
 	// clear any previous "server full" type messages
 	clc.serverMessage[0] = 0;
 
 	server = Cmd_Argv (1);
 
-	if ( com_sv_running->integer && !strcmp( server, "localhost" ) ) {
+	if ( com_sv_running->integer && !strcmp( server, "localhost" ) ) 
+	{
 		// if running a local server, kill it
 		SV_Shutdown( "Server quit\n" );
 	}
@@ -1066,14 +1071,15 @@ void CL_Connect_f( void ) {
 
 	Q_strncpyz( cls.servername, server, sizeof(cls.servername) );
 
-	if (!NET_StringToAdr( cls.servername, &clc.serverAddress) ) {
+	if (!NET_StringToAdr( cls.servername, &clc.serverAddress) )
+	{
 		Com_Printf ("Bad server address\n");
 		cls.state = CA_DISCONNECTED;
 		return;
 	}
-	if (clc.serverAddress.port == 0) {
+	if (clc.serverAddress.port == 0) 
 		clc.serverAddress.port = BigShort( PORT_SERVER );
-	}
+
 	Com_Printf( "%s resolved to %i.%i.%i.%i:%i\n", cls.servername,
 		clc.serverAddress.ip[0], clc.serverAddress.ip[1],
 		clc.serverAddress.ip[2], clc.serverAddress.ip[3],
@@ -1125,7 +1131,6 @@ void CL_Rcon_f( void ) {
 	strcat (message, rcon_client_password->string);
 	strcat (message, " ");
 
-	// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=543
 	strcat (message, Cmd_Cmd()+5);
 
 	if ( cls.state >= CA_CONNECTED ) {
@@ -1495,35 +1500,34 @@ CL_CheckForResend
 Resend a connect message if the last one has timed out
 =================
 */
-void CL_CheckForResend( void ) {
+void CL_CheckForResend() 
+{
 	int		port, i;
 	char	info[MAX_INFO_STRING];
 	char	data[MAX_INFO_STRING];
 
 	// don't send anything if playing back a demo
-	if ( clc.demoplaying ) {
+	if ( clc.demoplaying )
 		return;
-	}
 
 	// resend if we haven't gotten a reply yet
-	if ( cls.state != CA_CONNECTING && cls.state != CA_CHALLENGING ) {
+	if ( cls.state != CA_CONNECTING && 
+		cls.state != CA_CHALLENGING ) 
 		return;
-	}
 
-	if ( cls.realtime - clc.connectTime < RETRANSMIT_TIMEOUT ) {
+	if ( cls.realtime - clc.connectTime < RETRANSMIT_TIMEOUT ) 
 		return;
-	}
 
 	clc.connectTime = cls.realtime;	// for retransmit requests
 	clc.connectPacketCount++;
 
 
-	switch ( cls.state ) {
+	switch ( cls.state ) 
+	{
 	case CA_CONNECTING:
 		// requesting a challenge
-		if ( !Sys_IsLANAddress( clc.serverAddress ) ) {
-			CL_RequestAuthorization();
-		}
+		//if ( !Sys_IsLANAddress( clc.serverAddress ) ) 
+		//	CL_RequestAuthorization();
 		NET_OutOfBandPrint(NS_CLIENT, clc.serverAddress, "getchallenge");
 		break;
 		
@@ -1537,17 +1541,17 @@ void CL_CheckForResend( void ) {
 		Info_SetValueForKey( info, "challenge", va("%i", clc.challenge ) );
 		
 		strcpy(data, "connect ");
-    // TTimo adding " " around the userinfo string to avoid truncated userinfo on the server
-    //   (Com_TokenizeString tokenizes around spaces)
-    data[8] = '"';
+		// TTimo adding " " around the userinfo string to avoid truncated userinfo on the server
+		//   (Com_TokenizeString tokenizes around spaces)
+		data[8] = '"';
 
-		for(i=0;i<strlen(info);i++) {
+		for(i=0;i<strlen(info);i++) 
 			data[9+i] = info[i];	// + (clc.challenge)&0x3;
-		}
-    data[9+i] = '"';
+
+		data[9+i] = '"';
 		data[10+i] = 0;
 
-    // NOTE TTimo don't forget to set the right data length!
+		// NOTE TTimo don't forget to set the right data length!
 		NET_OutOfBandData( NS_CLIENT, clc.serverAddress, reinterpret_cast<byte*>(&data[0]), i+10 );
 		// the most current userinfo has been sent, so watch for any
 		// newer changes to userinfo variables
@@ -1569,21 +1573,19 @@ to the server, the server will send out of band disconnect packets
 to the client so it doesn't have to wait for the full timeout period.
 ===================
 */
-void CL_DisconnectPacket( netadr_t from ) {
-	if ( cls.state < CA_AUTHORIZING ) {
+void CL_DisconnectPacket( netadr_t from ) 
+{
+	if ( cls.state < CA_CONNECTING ) 
 		return;
-	}
 
 	// if not from our server, ignore it
-	if ( !NET_CompareAdr( from, clc.netchan.remoteAddress ) ) {
+	if ( !NET_CompareAdr( from, clc.netchan.remoteAddress ) ) 
 		return;
-	}
 
 	// if we have received packets within three seconds, ignore it
 	// (it might be a malicious spoof)
-	if ( cls.realtime - clc.lastPacketTime < 3000 ) {
+	if ( cls.realtime - clc.lastPacketTime < 3000 ) 
 		return;
-	}
 
 	// drop the connection
 	Com_Printf( "Server disconnected for unknown reason\n" );
@@ -1789,10 +1791,14 @@ void CL_ConnectionlessPacket( netadr_t from, msg_t *msg ) {
 	Com_DPrintf ("CL packet %s: %s\n", NET_AdrToString(from), c);
 
 	// challenge from the server we are connecting to
-	if ( !Q_stricmp(c, "challengeResponse") ) {
-		if ( cls.state != CA_CONNECTING ) {
+	if ( !Q_stricmp(c, "challengeResponse") ) 
+	{
+		if ( cls.state != CA_CONNECTING ) 
+		{
 			Com_Printf( "Unwanted challenge response received.  Ignored.\n" );
-		} else {
+		}
+		else 
+		{
 			// start sending challenge repsonse instead of challenge request packets
 			clc.challenge = atoi(Cmd_Argv(1));
 			cls.state = CA_CHALLENGING;
@@ -1976,7 +1982,8 @@ CL_CheckUserinfo
 
 ==================
 */
-void CL_CheckUserinfo( void ) {
+void CL_CheckUserinfo() 
+{
 	// don't add reliable commands when not yet connected
 	if ( cls.state < CA_CHALLENGING ) {
 		return;
@@ -2142,33 +2149,36 @@ After the server has cleared the hunk, these will need to be restarted
 This is the only place that any of these functions are called from
 ============================
 */
-void CL_StartHunkUsers( void ) {
-	if (!com_cl_running) {
+void CL_StartHunkUsers() 
+{
+	if (!com_cl_running) 
 		return;
-	}
 
-	if ( !com_cl_running->integer ) {
+	if ( !com_cl_running->integer ) 
 		return;
-	}
 
-	if ( !cls.rendererStarted ) {
+	if ( !cls.rendererStarted ) 
+	{
 		cls.rendererStarted = true;
 		CL_InitRenderer();
 	}
 
-	if ( !cls.soundStarted ) {
+	if ( !cls.soundStarted ) 
+	{
 		cls.soundStarted = true;
 		S_Init();
 	}
 
-	if ( !cls.soundRegistered ) {
+	if ( !cls.soundRegistered ) 
+	{
 		cls.soundRegistered = true;
 		S_BeginRegistration();
 	}
 
-	if ( !cls.uiStarted ) {
+	if ( !cls.uiStarted ) 
+	{
 		cls.uiStarted = true;
-		theUI.init( (cls.state >= CA_AUTHORIZING && cls.state < CA_ACTIVE) );
+		theUI.init( (cls.state >= CA_CHALLENGING && cls.state < CA_ACTIVE) );
 	}
 }
 
@@ -2360,8 +2370,8 @@ void CL_Init( void ) {
 	Cvar_Get ("headmodel", "sarge", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("team_model", "james", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("team_headmodel", "*james", CVAR_USERINFO | CVAR_ARCHIVE );
-	Cvar_Get ("g_redTeam", "Stroggs", CVAR_SERVERINFO | CVAR_ARCHIVE);
-	Cvar_Get ("g_blueTeam", "Pagans", CVAR_SERVERINFO | CVAR_ARCHIVE);
+	Cvar_Get ("g_redTeam", "Warsaw Pact", CVAR_SERVERINFO | CVAR_ARCHIVE);
+	Cvar_Get ("g_blueTeam", "NATO", CVAR_SERVERINFO | CVAR_ARCHIVE);
 	Cvar_Get ("color1",  "4", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("color2", "5", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("handicap", "100", CVAR_USERINFO | CVAR_ARCHIVE );
@@ -2392,7 +2402,7 @@ void CL_Init( void ) {
 	Cmd_AddCommand ("connect", CL_Connect_f);
 	Cmd_AddCommand ("reconnect", CL_Reconnect_f);
 	Cmd_AddCommand ("localservers", CL_LocalServers_f);
-	Cmd_AddCommand ("globalservers", CL_GlobalServers_f);
+	//Cmd_AddCommand ("globalservers", CL_GlobalServers_f);
 	Cmd_AddCommand ("rcon", CL_Rcon_f);
 	Cmd_AddCommand ("setenv", CL_Setenv_f );
 	Cmd_AddCommand ("ping", CL_Ping_f );
@@ -2449,7 +2459,7 @@ void CL_Shutdown( void ) {
 	Cmd_RemoveCommand ("stoprecord");
 	Cmd_RemoveCommand ("connect");
 	Cmd_RemoveCommand ("localservers");
-	Cmd_RemoveCommand ("globalservers");
+	//Cmd_RemoveCommand ("globalservers");
 	Cmd_RemoveCommand ("rcon");
 	Cmd_RemoveCommand ("setenv");
 	Cmd_RemoveCommand ("ping");
@@ -2857,58 +2867,60 @@ void CL_LocalServers_f( void ) {
 	}
 }
 
-/*
-==================
-CL_GlobalServers_f
-==================
-*/
-void CL_GlobalServers_f( void ) {
-	netadr_t	to;
-	int			i;
-	int			count;
-	char		*buffptr;
-	char		command[1024];
-	
-	if ( Cmd_Argc() < 3) {
-		Com_Printf( "usage: globalservers <master# 0-1> <protocol> [keywords]\n");
-		return;	
-	}
-
-	cls.masterNum = atoi( Cmd_Argv(1) );
-
-	Com_Printf( "Requesting servers from the master...\n");
-
-	// reset the list, waiting for response
-	// -1 is used to distinguish a "no response"
-
-	if( cls.masterNum == 1 ) {
-		NET_StringToAdr( MASTER_SERVER_NAME, &to );
-		cls.nummplayerservers = -1;
-		cls.pingUpdateSource = AS_MPLAYER;
-	}
-	else {
-		NET_StringToAdr( MASTER_SERVER_NAME, &to );
-		cls.numglobalservers = -1;
-		cls.pingUpdateSource = AS_GLOBAL;
-	}
-	to.type = NA_IP;
-	to.port = BigShort(PORT_MASTER);
-
-	sprintf( command, "getservers %s", Cmd_Argv(2) );
-
-	// tack on keywords
-	buffptr = command + strlen( command );
-	count   = Cmd_Argc();
-	for (i=3; i<count; i++)
-		buffptr += sprintf( buffptr, " %s", Cmd_Argv(i) );
-
-	// if we are a demo, automatically add a "demo" keyword
-	//if ( Cvar_VariableValue( "fs_restrict" ) ) {
-	//	buffptr += sprintf( buffptr, " demo" );
-	//}
-
-	NET_OutOfBandPrint( NS_SERVER, to, command );
-}
+///*
+//==================
+//CL_GlobalServers_f
+//==================
+//*/
+//void CL_GlobalServers_f()
+//{
+//	netadr_t	to;
+//	int			i;
+//	int			count;
+//	char		*buffptr;
+//	char		command[1024];
+//	
+//	if ( Cmd_Argc() < 3) 
+//	{
+//		Com_Printf( "usage: globalservers <master# 0-1> <protocol> [keywords]\n");
+//		return;	
+//	}
+//
+//	cls.masterNum = atoi( Cmd_Argv(1) );
+//
+//	Com_Printf( "Requesting servers from the master...\n");
+//
+//	// reset the list, waiting for response
+//	// -1 is used to distinguish a "no response"
+//
+//	if( cls.masterNum == 1 ) {
+//		NET_StringToAdr( MASTER_SERVER_NAME, &to );
+//		cls.nummplayerservers = -1;
+//		cls.pingUpdateSource = AS_MPLAYER;
+//	}
+//	else {
+//		NET_StringToAdr( MASTER_SERVER_NAME, &to );
+//		cls.numglobalservers = -1;
+//		cls.pingUpdateSource = AS_GLOBAL;
+//	}
+//	to.type = NA_IP;
+//	to.port = BigShort(PORT_MASTER);
+//
+//	sprintf( command, "getservers %s", Cmd_Argv(2) );
+//
+//	// tack on keywords
+//	buffptr = command + strlen( command );
+//	count   = Cmd_Argc();
+//	for (i=3; i<count; i++)
+//		buffptr += sprintf( buffptr, " %s", Cmd_Argv(i) );
+//
+//	// if we are a demo, automatically add a "demo" keyword
+//	//if ( Cvar_VariableValue( "fs_restrict" ) ) {
+//	//	buffptr += sprintf( buffptr, " demo" );
+//	//}
+//
+//	NET_OutOfBandPrint( NS_SERVER, to, command );
+//}
 
 
 /*
@@ -3266,69 +3278,69 @@ void CL_ShowIP_f(void) {
 	Sys_ShowIP();
 }
 
-/*
-=================
-bool CL_CDKeyValidate
-=================
-*/
-bool CL_CDKeyValidate( const char *key, const char *checksum ) 
-{
-	char	ch;
-	byte	sum;
-	char	chs[3];
-	int i, len;
-
-	len = strlen(key);
-	if( len != CDKEY_LEN ) {
-		return false;
-	}
-
-	if( checksum && strlen( checksum ) != CDCHKSUM_LEN ) {
-		return false;
-	}
-
-	sum = 0;
-	// for loop gets rid of conditional assignment warning
-	for (i = 0; i < len; i++) {
-		ch = *key++;
-		if (ch>='a' && ch<='z') {
-			ch -= 32;
-		}
-		switch( ch ) {
-		case '2':
-		case '3':
-		case '7':
-		case 'A':
-		case 'B':
-		case 'C':
-		case 'D':
-		case 'G':
-		case 'H':
-		case 'J':
-		case 'L':
-		case 'P':
-		case 'R':
-		case 'S':
-		case 'T':
-		case 'W':
-			sum += ch;
-			continue;
-		default:
-			return false;
-		}
-	}
-
-	sprintf(chs, "%02x", sum);
-	
-	if (checksum && !Q_stricmp(chs, checksum)) {
-		return true;
-	}
-
-	if (!checksum) {
-		return true;
-	}
-
-	return false;
-}
+///*
+//=================
+//bool CL_CDKeyValidate
+//=================
+//*/
+//bool CL_CDKeyValidate( const char *key, const char *checksum ) 
+//{
+//	char	ch;
+//	byte	sum;
+//	char	chs[3];
+//	int i, len;
+//
+//	len = strlen(key);
+//	if( len != CDKEY_LEN ) {
+//		return false;
+//	}
+//
+//	if( checksum && strlen( checksum ) != CDCHKSUM_LEN ) {
+//		return false;
+//	}
+//
+//	sum = 0;
+//	// for loop gets rid of conditional assignment warning
+//	for (i = 0; i < len; i++) {
+//		ch = *key++;
+//		if (ch>='a' && ch<='z') {
+//			ch -= 32;
+//		}
+//		switch( ch ) {
+//		case '2':
+//		case '3':
+//		case '7':
+//		case 'A':
+//		case 'B':
+//		case 'C':
+//		case 'D':
+//		case 'G':
+//		case 'H':
+//		case 'J':
+//		case 'L':
+//		case 'P':
+//		case 'R':
+//		case 'S':
+//		case 'T':
+//		case 'W':
+//			sum += ch;
+//			continue;
+//		default:
+//			return false;
+//		}
+//	}
+//
+//	sprintf(chs, "%02x", sum);
+//	
+//	if (checksum && !Q_stricmp(chs, checksum)) {
+//		return true;
+//	}
+//
+//	if (!checksum) {
+//		return true;
+//	}
+//
+//	return false;
+//}
 
 

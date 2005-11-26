@@ -329,12 +329,11 @@ void CL_SystemInfoChanged( void ) {
 	const char		*s, *t;
 	char			key[BIG_INFO_KEY];
 	char			value[BIG_INFO_VALUE];
-	bool		gameSet;
+	//bool		gameSet;
 
 	systemInfo = cl.gameState.stringData + cl.gameState.stringOffsets[ CS_SYSTEMINFO ];
 	// NOTE TTimo:
 	// when the serverId changes, any further messages we send to the server will use this New serverId
-	// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=475
 	// in some cases, outdated cp commands might get sent with this news serverId
 	cl.serverId = atoi( Info_ValueForKey( systemInfo, "sv_serverid" ) );
 
@@ -357,7 +356,7 @@ void CL_SystemInfoChanged( void ) {
 	t = Info_ValueForKey( systemInfo, "sv_referencedPakNames" );
 	FS_PureServerSetReferencedPaks( s, t );
 
-	gameSet = false;
+	//gameSet = false;
 	// scan through all the variables in the systeminfo and locally set cvars to match
 	s = systemInfo;
 	while ( s ) {
@@ -366,16 +365,16 @@ void CL_SystemInfoChanged( void ) {
 			break;
 		}
 		// ehw!
-		if ( !Q_stricmp( key, "fs_game" ) ) {
-			gameSet = true;
-		}
+		//if ( !Q_stricmp( key, "fs_game" ) ) {
+		//	gameSet = true;
+		//}
 
 		Cvar_Set( key, value );
 	}
 	// if game folder should not be set and it is set at the client side
-	if ( !gameSet && *Cvar_VariableString("fs_game") ) {
-		Cvar_Set( "fs_game", "" );
-	}
+	//if ( !gameSet && *Cvar_VariableString("fs_game") ) {
+	//	Cvar_Set( "fs_game", "" );
+	//}
 	cl_connectedToPureServer = Cvar_VariableValue( "sv_pure" );
 }
 

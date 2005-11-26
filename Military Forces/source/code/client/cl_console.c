@@ -71,9 +71,11 @@ vec4_t	console_color = {1.0, 1.0, 1.0, 1.0};
 Con_ToggleConsole_f
 ================
 */
-void Con_ToggleConsole_f (void) {
+void Con_ToggleConsole_f () 
+{
 	// closing a full screen console restarts the demo loop
-	if ( cls.state == CA_DISCONNECTED && cls.keyCatchers == KEYCATCH_CONSOLE ) {
+	if ( cls.state == CA_DISCONNECTED && cls.keyCatchers == KEYCATCH_CONSOLE )
+	{
 		CL_StartDemoLoop();
 		return;
 	}
@@ -477,12 +479,12 @@ Con_DrawInput
 Draw the editline after a ] prompt
 ================
 */
-void Con_DrawInput (void) {
+void Con_DrawInput () 
+{
 	int		y;
 
-	if ( cls.state != CA_DISCONNECTED && !(cls.keyCatchers & KEYCATCH_CONSOLE ) ) {
+	if ( cls.state != CA_DISCONNECTED && !(cls.keyCatchers & KEYCATCH_CONSOLE ) ) 
 		return;
-	}
 
 	y = con.vislines - ( SMALLCHAR_HEIGHT * 2 );
 
@@ -695,25 +697,30 @@ void Con_DrawSolidConsole( float frac ) {
 Con_DrawConsole
 ==================
 */
-void Con_DrawConsole( void ) {
+void Con_DrawConsole() 
+{
 	// check for console width changes from a vid mode change
 	Con_CheckResize ();
 
 	// if disconnected, render console full screen
-	if ( cls.state == CA_DISCONNECTED ) {
-		if ( !( cls.keyCatchers & (KEYCATCH_UI | KEYCATCH_CGAME)) ) {
+	if ( cls.state == CA_DISCONNECTED ) 
+	{
+		if ( !( cls.keyCatchers & (KEYCATCH_UI | KEYCATCH_CGAME)) ) 
+		{
 			Con_DrawSolidConsole( 1.0 );
 			return;
 		}
 	}
 
-	if ( con.displayFrac ) {
+	if ( con.displayFrac ) 
+	{
 		Con_DrawSolidConsole( con.displayFrac );
-	} else {
+	} 
+	else 
+	{
 		// draw notify lines
-		if ( cls.state == CA_ACTIVE ) {
+		if ( cls.state == CA_ACTIVE )
 			Con_DrawNotify ();
-		}
 	}
 }
 

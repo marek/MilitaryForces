@@ -208,7 +208,6 @@ void RE_AddRefEntityToScene( const refEntity_t *ent ) {
 	if ( !tr.registered ) {
 		return;
 	}
-  // https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=402
 	if ( r_numentities >= MAX_RENTITIES) { //ENTITYNUM_WORLD ) {
 		return;
 	}

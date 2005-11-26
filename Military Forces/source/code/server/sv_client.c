@@ -45,7 +45,8 @@ When an authorizeip is returned, a challenge response will be
 sent to that ip.
 =================
 */
-void SV_GetChallenge( netadr_t from ) {
+void SV_GetChallenge( netadr_t from ) 
+{
 	int		i;
 	int		oldest;
 	int		oldestTime;
@@ -84,57 +85,57 @@ void SV_GetChallenge( netadr_t from ) {
 	}
 
 	// if they are on a lan address, send the challengeResponse immediately
-	if ( Sys_IsLANAddress( from ) ) {
+	//if ( Sys_IsLANAddress( from ) ) {
 		challenge->pingTime = svs.time;
 		NET_OutOfBandPrint( NS_SERVER, from, "challengeResponse %i", challenge->challenge );
 		return;
-	}
+	//}
 
-	// look up the authorize server's IP
-	if ( !svs.authorizeAddress.ip[0] && svs.authorizeAddress.type != NA_BAD ) {
-		Com_Printf( "Resolving %s\n", AUTHORIZE_SERVER_NAME );
-		if ( !NET_StringToAdr( AUTHORIZE_SERVER_NAME, &svs.authorizeAddress ) ) {
-			Com_Printf( "Couldn't resolve address\n" );
-			return;
-		}
-		svs.authorizeAddress.port = BigShort( PORT_AUTHORIZE );
-		Com_Printf( "%s resolved to %i.%i.%i.%i:%i\n", AUTHORIZE_SERVER_NAME,
-			svs.authorizeAddress.ip[0], svs.authorizeAddress.ip[1],
-			svs.authorizeAddress.ip[2], svs.authorizeAddress.ip[3],
-			BigShort( svs.authorizeAddress.port ) );
-	}
+	//// look up the authorize server's IP
+	//if ( !svs.authorizeAddress.ip[0] && svs.authorizeAddress.type != NA_BAD ) {
+	//	Com_Printf( "Resolving %s\n", AUTHORIZE_SERVER_NAME );
+	//	if ( !NET_StringToAdr( AUTHORIZE_SERVER_NAME, &svs.authorizeAddress ) ) {
+	//		Com_Printf( "Couldn't resolve address\n" );
+	//		return;
+	//	}
+	//	svs.authorizeAddress.port = BigShort( PORT_AUTHORIZE );
+	//	Com_Printf( "%s resolved to %i.%i.%i.%i:%i\n", AUTHORIZE_SERVER_NAME,
+	//		svs.authorizeAddress.ip[0], svs.authorizeAddress.ip[1],
+	//		svs.authorizeAddress.ip[2], svs.authorizeAddress.ip[3],
+	//		BigShort( svs.authorizeAddress.port ) );
+	//}
 
 	// if they have been challenging for a long time and we
 	// haven't heard anything from the authorize server, go ahead and
 	// let them in, assuming the id server is down
-	if ( svs.time - challenge->firstTime > AUTHORIZE_TIMEOUT ) {
-		Com_DPrintf( "authorize server timed out\n" );
+	//if ( svs.time - challenge->firstTime > AUTHORIZE_TIMEOUT ) {
+	//	Com_DPrintf( "authorize server timed out\n" );
 
-		challenge->pingTime = svs.time;
-		NET_OutOfBandPrint( NS_SERVER, challenge->adr, 
-			"challengeResponse %i", challenge->challenge );
-		return;
-	}
+	//	challenge->pingTime = svs.time;
+	//	NET_OutOfBandPrint( NS_SERVER, challenge->adr, 
+	//		"challengeResponse %i", challenge->challenge );
+	//	return;
+	//}
 
-	// otherwise send their ip to the authorize server
-	if ( svs.authorizeAddress.type != NA_BAD ) {
-		cvar_t	*fs;
-		char	game[1024];
+	//// otherwise send their ip to the authorize server
+	//if ( svs.authorizeAddress.type != NA_BAD ) {
+	//	cvar_t	*fs;
+	//	char	game[1024];
 
-		Com_DPrintf( "sending getIpAuthorize for %s\n", NET_AdrToString( from ));
-		
-		strcpy(game, BASEGAME);
-		fs = Cvar_Get ("fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
-		if (fs && fs->string[0] != 0) {
-			strcpy(game, fs->string);
-		}
-		
-		// the 0 is for backwards compatibility with obsolete sv_allowanonymous flags
-		// getIpAuthorize <challenge> <IP> <game> 0 <auth-flag>
-		NET_OutOfBandPrint( NS_SERVER, svs.authorizeAddress,
-			"getIpAuthorize %i %i.%i.%i.%i %s 0 %s",  svs.challenges[i].challenge,
-			from.ip[0], from.ip[1], from.ip[2], from.ip[3], game, sv_strictAuth->string );
-	}
+	//	Com_DPrintf( "sending getIpAuthorize for %s\n", NET_AdrToString( from ));
+	//	
+	//	strcpy(game, BASEGAME);
+	//	fs = Cvar_Get ("fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
+	//	if (fs && fs->string[0] != 0) {
+	//		strcpy(game, fs->string);
+	//	}
+	//	
+	//	// the 0 is for backwards compatibility with obsolete sv_allowanonymous flags
+	//	// getIpAuthorize <challenge> <IP> <game> 0 <auth-flag>
+	//	NET_OutOfBandPrint( NS_SERVER, svs.authorizeAddress,
+	//		"getIpAuthorize %i %i.%i.%i.%i %s 0 %s",  svs.challenges[i].challenge,
+	//		from.ip[0], from.ip[1], from.ip[2], from.ip[3], game, sv_strictAuth->string );
+	//}
 }
 
 /*
@@ -225,11 +226,12 @@ A "connect" OOB command has been received
 ==================
 */
 
-#define PB_MESSAGE "PunkBuster Anti-Cheat software must be installed " \
-				"and Enabled in order to join this server. An updated game patch can be downloaded from " \
-				"www.idsoftware.com"
+//#define PB_MESSAGE "PunkBuster Anti-Cheat software must be installed " \
+//				"and Enabled in order to join this server. An updated game patch can be downloaded from " \
+//				"www.idsoftware.com"
 
-void SV_DirectConnect( netadr_t from ) {
+void SV_DirectConnect( netadr_t from ) 
+{
 	char		userinfo[MAX_INFO_STRING];
 	int			i;
 	client_t	*cl, *newcl;
@@ -249,7 +251,8 @@ void SV_DirectConnect( netadr_t from ) {
 	Q_strncpyz( userinfo, Cmd_Argv(1), sizeof(userinfo) );
 
 	version = atoi( Info_ValueForKey( userinfo, "protocol" ) );
-	if ( version != PROTOCOL_VERSION ) {
+	if ( version != PROTOCOL_VERSION ) 
+	{
 		NET_OutOfBandPrint( NS_SERVER, from, "print\nServer uses protocol version %i.\n", PROTOCOL_VERSION );
 		Com_DPrintf ("    rejected connect from version %i\n", version);
 		return;
@@ -259,15 +262,18 @@ void SV_DirectConnect( netadr_t from ) {
 	qport = atoi( Info_ValueForKey( userinfo, "qport" ) );
 
 	// quick reject
-	for (i=0,cl=svs.clients ; i < sv_maxclients->integer ; i++,cl++) {
-		if ( cl->state == CS_FREE ) {
+	for (i=0,cl=svs.clients ; i < sv_maxclients->integer ; i++,cl++) 
+	{
+		if ( cl->state == CS_FREE ) 
 			continue;
-		}
+
 		if ( NET_CompareBaseAdr( from, cl->netchan.remoteAddress )
 			&& ( cl->netchan.qport == qport 
-			|| from.port == cl->netchan.remoteAddress.port ) ) {
+			|| from.port == cl->netchan.remoteAddress.port ) ) 
+		{
 			if (( svs.time - cl->lastConnectTime) 
-				< (sv_reconnectlimit->integer * 1000)) {
+				< (sv_reconnectlimit->integer * 1000)) 
+			{
 				Com_DPrintf ("%s:reconnect rejected : too soon\n", NET_AdrToString (from));
 				return;
 			}
@@ -276,17 +282,20 @@ void SV_DirectConnect( netadr_t from ) {
 	}
 
 	// see if the challenge is valid (LAN clients don't need to challenge)
-	if ( !NET_IsLocalAddress (from) ) {
+	if ( !NET_IsLocalAddress (from) ) 
+	{
 		int		ping;
 
-		for (i=0 ; i<MAX_CHALLENGES ; i++) {
-			if (NET_CompareAdr(from, svs.challenges[i].adr)) {
-				if ( challenge == svs.challenges[i].challenge ) {
+		for (i=0 ; i<MAX_CHALLENGES ; i++) 
+		{
+			if (NET_CompareAdr(from, svs.challenges[i].adr)) 
+			{
+				if ( challenge == svs.challenges[i].challenge ) 
 					break;		// good
-				}
 			}
 		}
-		if (i == MAX_CHALLENGES) {
+		if (i == MAX_CHALLENGES) 
+		{
 			NET_OutOfBandPrint( NS_SERVER, from, "print\nNo or bad challenge for address.\n" );
 			return;
 		}
@@ -298,8 +307,10 @@ void SV_DirectConnect( netadr_t from ) {
 		svs.challenges[i].connected = true;
 
 		// never reject a LAN client based on ping
-		if ( !Sys_IsLANAddress( from ) ) {
-			if ( sv_minPing->value && ping < sv_minPing->value ) {
+		if ( !Sys_IsLANAddress( from ) ) 
+		{
+			if ( sv_minPing->value && ping < sv_minPing->value ) 
+			{
 				// don't let them keep trying until they get a big delay
 				NET_OutOfBandPrint( NS_SERVER, from, "print\nServer is for high pings only\n" );
 				Com_DPrintf ("Client %i rejected on a too low ping\n", i);
@@ -308,13 +319,16 @@ void SV_DirectConnect( netadr_t from ) {
 				svs.challenges[i].adr.port = 0;
 				return;
 			}
-			if ( sv_maxPing->value && ping > sv_maxPing->value ) {
+			if ( sv_maxPing->value && ping > sv_maxPing->value ) 
+			{
 				NET_OutOfBandPrint( NS_SERVER, from, "print\nServer is for low pings only\n" );
 				Com_DPrintf ("Client %i rejected on a too high ping\n", i);
 				return;
 			}
 		}
-	} else {
+	} 
+	else 
+	{
 		// force the "ip" info key to "localhost"
 		Info_SetValueForKey( userinfo, "ip", "localhost" );
 	}
@@ -323,13 +337,15 @@ void SV_DirectConnect( netadr_t from ) {
 	Com_Memset (newcl, 0, sizeof(client_t));
 
 	// if there is already a slot for this ip, reuse it
-	for (i=0,cl=svs.clients ; i < sv_maxclients->integer ; i++,cl++) {
-		if ( cl->state == CS_FREE ) {
+	for (i=0,cl=svs.clients ; i < sv_maxclients->integer ; i++,cl++)
+	{
+		if ( cl->state == CS_FREE ) 
 			continue;
-		}
+
 		if ( NET_CompareBaseAdr( from, cl->netchan.remoteAddress )
 			&& ( cl->netchan.qport == qport 
-			|| from.port == cl->netchan.remoteAddress.port ) ) {
+			|| from.port == cl->netchan.remoteAddress.port ) ) 
+		{
 			Com_Printf ("%s:reconnect\n", NET_AdrToString (from));
 			newcl = cl;
 
@@ -355,42 +371,52 @@ void SV_DirectConnect( netadr_t from ) {
 
 	// check for privateClient password
 	password = Info_ValueForKey( userinfo, "password" );
-	if ( !strcmp( password, sv_privatePassword->string ) ) {
+	if ( !strcmp( password, sv_privatePassword->string ) ) 
+	{
 		startIndex = 0;
-	} else {
+	} 
+	else
+	{
 		// skip past the reserved slots
 		startIndex = sv_privateClients->integer;
 	}
 
 	newcl = NULL;
-	for ( i = startIndex; i < sv_maxclients->integer ; i++ ) {
+	for ( i = startIndex; i < sv_maxclients->integer ; i++ ) 
+	{
 		cl = &svs.clients[i];
-		if (cl->state == CS_FREE) {
+		if (cl->state == CS_FREE) 
+		{
 			newcl = cl;
 			break;
 		}
 	}
 
-	if ( !newcl ) {
-		if ( NET_IsLocalAddress( from ) ) {
+	if ( !newcl )
+	{
+		if ( NET_IsLocalAddress( from ) ) 
+		{
 			count = 0;
-			for ( i = startIndex; i < sv_maxclients->integer ; i++ ) {
+			for ( i = startIndex; i < sv_maxclients->integer ; i++ ) 
+			{
 				cl = &svs.clients[i];
-				if (cl->netchan.remoteAddress.type == NA_BOT) {
+				if (cl->netchan.remoteAddress.type == NA_BOT) 
 					count++;
-				}
 			}
 			// if they're all bots
-			if (count >= sv_maxclients->integer - startIndex) {
+			if (count >= sv_maxclients->integer - startIndex) 
+			{
 				SV_DropClient(&svs.clients[sv_maxclients->integer - 1], "only bots on server");
 				newcl = &svs.clients[sv_maxclients->integer - 1];
 			}
-			else {
+			else 
+			{
 				Com_Error( ERR_FATAL, "server is full on local connect\n" );
 				return;
 			}
 		}
-		else {
+		else 
+		{
 			NET_OutOfBandPrint( NS_SERVER, from, "print\nServer is full.\n" );
 			Com_DPrintf ("Rejected a connection.\n");
 			return;
@@ -454,14 +480,13 @@ gotnewcl:
 	// if this was the first client on the server, or the last client
 	// the server can hold, send a heartbeat to the master.
 	count = 0;
-	for (i=0,cl=svs.clients ; i < sv_maxclients->integer ; i++,cl++) {
-		if ( svs.clients[i].state >= CS_CONNECTED ) {
+	for (i=0,cl=svs.clients ; i < sv_maxclients->integer ; i++,cl++) 
+	{
+		if ( svs.clients[i].state >= CS_CONNECTED )
 			count++;
-		}
 	}
-	if ( count == 1 || count == sv_maxclients->integer ) {
+	if ( count == 1 || count == sv_maxclients->integer )
 		SV_Heartbeat_f();
-	}
 }
 
 
@@ -978,7 +1003,6 @@ static void SV_VerifyPaks_f( client_t *cl )
 		}
 		else
 		{
-			// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=475
 			// we may get incoming cp sequences from a previous checksumFeed, which we need to ignore
 			// since serverId is a frame count, it always goes up
 			if (atoi(pArg) < sv.checksumFeedServerId)
@@ -1492,7 +1516,6 @@ void SV_ExecuteClientMessage( client_t *cl, msg_t *msg ) {
 	// the gamestate changes.  After the download is finished, we'll
 	// notice and send it a New game state
 	//
-	// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=536
 	// don't drop as long as previous command was a nextdl, after a dl is done, downloadName is set back to ""
 	// but we still need to read the next message to move to next download or send gamestate
 	// I don't like this hack though, it must have been working fine at some point, suspecting the fix is somewhere else

@@ -294,7 +294,7 @@ typedef struct {
 	char		updateChallenge[MAX_TOKEN_CHARS];
 	char		updateInfoString[MAX_INFO_STRING];
 
-	netadr_t	authorizeServer;
+	//netadr_t	authorizeServer;
 
 	// rendering info
 	glconfig_t	glconfig;
@@ -388,7 +388,7 @@ int CL_GetPingQueueCount( void );
 
 void CL_ShutdownRef( void );
 void CL_InitRef( void );
-bool CL_CDKeyValidate( const char *key, const char *checksum );
+//bool CL_CDKeyValidate( const char *key, const char *checksum );
 int CL_ServerStatus( const char *serverAddress, char *serverStatusString, int maxLen );
 
 
@@ -432,7 +432,7 @@ void CL_ParseServerMessage( msg_t *msg );
 
 void	CL_ServerInfoPacket( netadr_t from, msg_t *msg );
 void	CL_LocalServers_f( void );
-void	CL_GlobalServers_f( void );
+//void	CL_GlobalServers_f( void );
 void	CL_FavoriteServers_f( void );
 void	CL_Ping_f( void );
 bool CL_UpdateVisiblePings_f( int source );

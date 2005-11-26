@@ -1,5 +1,5 @@
 /*
- * $Id: g_public.h,v 1.7 2005-11-24 10:46:53 thebjoern Exp $
+ * $Id: g_public.h,v 1.8 2005-11-26 10:06:29 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -18,8 +18,6 @@
 // special server behaviors
 #define	SVF_NOCLIENT			0x00000001	// don't send entity to clients, even if it has effects
 
-// TTimo
-// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=551
 #define SVF_CLIENTMASK			0x00000002
 
 #define SVF_BOT					0x00000008	// set if the entity is a bot
