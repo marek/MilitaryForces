@@ -1,7 +1,9 @@
 #include "g_local.h"
 #include "..\vehiclelib\bg_datamanager.h"
+#include "g_level.h"
 
-level_locals_t	level;
+//level_locals_t	level;
+LevelLocals& theLevel = LevelLocals::getInstance();
 
 typedef struct {
 	vmCvar_t	*vmCvar;
@@ -13,8 +15,8 @@ typedef struct {
   bool teamShader;        // track and if changed, update shader state
 } cvarTable_t;
 
-gentity_t		g_entities[MAX_GENTITIES];
-gclient_t		g_clients[MAX_CLIENTS];
+//gentity_t		g_entities[MAX_GENTITIES];
+//gclient_t		g_clients[MAX_CLIENTS];
 
 vmCvar_t	g_gametype;
 vmCvar_t	g_dmflags;
@@ -160,43 +162,49 @@ All but the first will have the FL_TEAMSLAVE flag set and teammaster field set
 All but the last will have the teamchain field set to the next one
 ================
 */
-void G_FindTeams( void ) {
-	gentity_t	*e, *e2;
-	int		i, j;
-	int		c, c2;
+void G_FindTeams() 
+{
+	GameEntity	*e, *e2;
+	int			i, j;
+	int			c, c2;
 
 	c = 0;
 	c2 = 0;
-	for ( i=1, e=g_entities+i ; i < level.num_entities ; i++,e++ ){
-		if (!e->inuse)
+	//for ( i=1, e=g_entities+i ; i < level.num_entities ; i++,e++ )
+	for( i=1; i < theLevel.num_entities_; i++ )
+	{
+		e = theLevel.getEntity(i);
+		if( !e || !e->inuse_ )
 			continue;
-		if (!e->team)
+		if( !e->team_ )
 			continue;
-		if (e->flags & FL_TEAMSLAVE)
+		if( e->flags_ & FL_TEAMSLAVE )
 			continue;
-		e->teammaster = e;
+		e->teammaster_ = e;
 		c++;
 		c2++;
-		for (j=i+1, e2=e+1 ; j < level.num_entities ; j++,e2++)
+		for( j=i+1; j < theLevel.num_entities_ ; j++ )
 		{
-			if (!e2->inuse)
+			e2 = theLevel.getEntity(j);
+			if (!e2 || !e2->inuse_)
 				continue;
-			if (!e2->team)
+			if (!e2->team_)
 				continue;
-			if (e2->flags & FL_TEAMSLAVE)
+			if (e2->flags_ & FL_TEAMSLAVE)
 				continue;
-			if (!strcmp(e->team, e2->team))
+			if (!strcmp(e->team_, e2->team_))
 			{
 				c2++;
-				e2->teamchain = e->teamchain;
-				e->teamchain = e2;
-				e2->teammaster = e;
-				e2->flags |= FL_TEAMSLAVE;
+				e2->teamchain_ = e->teamchain_;
+				e->teamchain_ = e2;
+				e2->teammaster_ = e;
+				e2->flags_ |= FL_TEAMSLAVE;
 
 				// make sure that targets only point at the master
-				if ( e2->targetname ) {
-					e->targetname = e2->targetname;
-					e2->targetname = NULL;
+				if ( e2->targetname_ ) 
+				{
+					e->targetname_ = e2->targetname_;
+					e2->targetname_ = NULL;
 				}
 			}
 		}
@@ -205,7 +213,8 @@ void G_FindTeams( void ) {
 	Com_Printf ("%i teams with %i entities\n", c, c2);
 }
 
-void G_RemapTeamShaders() {
+void G_RemapTeamShaders() 
+{
 }
 
 
@@ -214,68 +223,69 @@ void G_RemapTeamShaders() {
 G_RegisterCvars
 =================
 */
-void G_RegisterCvars( void ) {
+void G_RegisterCvars() 
+{
 	int			i;
 	cvarTable_t	*cv;
 	bool remapped = false;
 
-	for ( i = 0, cv = gameCvarTable ; i < gameCvarTableSize ; i++, cv++ ) {
+	for ( i = 0, cv = gameCvarTable ; i < gameCvarTableSize ; i++, cv++ ) 
+	{
 		Cvar_Register( cv->vmCvar, cv->cvarName,
 			cv->defaultString, cv->cvarFlags );
 		if ( cv->vmCvar )
 			cv->modificationCount = cv->vmCvar->modificationCount;
 
-		if (cv->teamShader) {
+		if (cv->teamShader) 
 			remapped = true;
-		}
 	}
 
-	if (remapped) {
+	if (remapped) 
 		G_RemapTeamShaders();
-	}
 
 	// check some things
-	if ( g_gametype.integer < 0 || g_gametype.integer >= GT_MAX_GAME_TYPE ) {
+	if ( g_gametype.integer < 0 || g_gametype.integer >= GT_MAX_GAME_TYPE ) 
+	{
 		Com_Printf( "g_gametype %i is out of range, defaulting to 0\n", g_gametype.integer );
 		Cvar_Set( "g_gametype", "0" );
 	}
-	
-	level.warmupModificationCount = g_warmup.modificationCount;
-	
-  }
+	theLevel.warmupModificationCount_ = g_warmup.modificationCount;
+}
 
 /*
 =================
 G_UpdateCvars
 =================
 */
-void G_UpdateCvars( void ) {
+void G_UpdateCvars() 
+{
 	int			i;
 	cvarTable_t	*cv;
 	bool remapped = false;
 
-	for ( i = 0, cv = gameCvarTable ; i < gameCvarTableSize ; i++, cv++ ) {
-		if ( cv->vmCvar ) {
+	for( i = 0, cv = gameCvarTable ; i < gameCvarTableSize ; i++, cv++ )
+	{
+		if( cv->vmCvar ) 
+		{
 			Cvar_Update( cv->vmCvar );
 
-			if ( cv->modificationCount != cv->vmCvar->modificationCount ) {
+			if( cv->modificationCount != cv->vmCvar->modificationCount )
+			{
 				cv->modificationCount = cv->vmCvar->modificationCount;
 
-				if ( cv->trackChange ) {
+				if( cv->trackChange ) 
+				{
 					SV_GameSendServerCommand( -1, va("print \"Server: %s changed to %s\n\"", 
 						cv->cvarName, cv->vmCvar->string ) );
 				}
 
-				if (cv->teamShader) {
+				if( cv->teamShader ) 
 					remapped = true;
-				}
 			}
 		}
 	}
-
-	if (remapped) {
+	if( remapped ) 
 		G_RemapTeamShaders();
-	}
 }
 
 /*
@@ -286,8 +296,6 @@ G_InitGame
 */
 void G_InitGame( int levelTime, int randomSeed ) 
 {
-	int					i;
-
 	Com_Printf ("------- Game Initialization -------\n");
 	Com_Printf ("gamename: %s\n", GAME_IDENTIFIER);
 	Com_Printf ("gamedate: %s\n",  __DATE__ );
@@ -310,57 +318,64 @@ void G_InitGame( int levelTime, int randomSeed )
 	Cvar_Set( "g_synchronousClients", "0" );
 
 	// set some level globals
-	memset( &level, 0, sizeof( level ) );
-	level.time = levelTime;
-	level.startTime = levelTime;
+	//memset( &level, 0, sizeof( level ) );
+	theLevel.resetAll();
+	theLevel.time_ = levelTime;
+	theLevel.startTime_ = levelTime;
 
-	level.snd_fry = G_SoundIndex("sound/player/fry.wav");	// FIXME standing in lava / slime
+	//level.snd_fry = G_SoundIndex("sound/player/fry.wav");	// FIXME standing in lava / slime
 
 	if ( g_gametype.integer != GT_SINGLE_PLAYER && g_gametype.integer != GT_MISSION_EDITOR &&
-			g_log.string[0] ) {
-		if ( g_logSync.integer ) {
-			FS_FOpenFileByMode( g_log.string, &level.logFile, FS_APPEND_SYNC );
-		} else {
-			FS_FOpenFileByMode( g_log.string, &level.logFile, FS_APPEND );
-		}
-		if ( !level.logFile ) {
+			g_log.string[0] ) 
+	{
+		if ( g_logSync.integer ) 
+			FS_FOpenFileByMode( g_log.string, &theLevel.logFile_, FS_APPEND_SYNC );
+		else
+			FS_FOpenFileByMode( g_log.string, &theLevel.logFile_, FS_APPEND );
+
+		if ( !theLevel.logFile_ )
 			Com_Printf( "WARNING: Couldn't open logfile: %s\n", g_log.string );
-		} else {
-			char	serverinfo[MAX_INFO_STRING];
+		else 
+		{
+			char serverinfo[MAX_INFO_STRING];
 
 			SV_GetServerinfo( serverinfo, sizeof( serverinfo ) );
 
 			G_LogPrintf("------------------------------------------------------------\n" );
 			G_LogPrintf("InitGame: %s\n", serverinfo );
 		}
-	} else {
+	} 
+	else
 		Com_Printf( "Not logging to disk.\n" );
-	}
 
 	G_InitWorldSession();
 
 	// initialize all entities for this game
-	memset( g_entities, 0, MAX_GENTITIES * sizeof(g_entities[0]) );
-	level.gentities = g_entities;
+	//memset( g_entities, 0, MAX_GENTITIES * sizeof(g_entities[0]) );
+	//level.gentities = g_entities;
 
 	// initialize all clients for this game
-	level.maxclients = g_maxclients.integer;
-	memset( g_clients, 0, MAX_CLIENTS * sizeof(g_clients[0]) );
-	level.clients = g_clients;
+	theLevel.maxclients_ = g_maxclients.integer;
+	//memset( g_clients, 0, MAX_CLIENTS * sizeof(g_clients[0]) );
+	//level.clients = g_clients;
 
 	// set client fields on player ents
-	for ( i=0 ; i<level.maxclients ; i++ ) {
-		g_entities[i].client = level.clients + i;
-	}
+#pragma message("cant do this with the new system.... find solution!!")
+	//for( int i=1 ; i <= theLevel.maxclients_ ; i++ ) 
+	//{
+	//	//g_entities[i].client = level.clients + i;
+	//	reinterpret_cast<GameEntity*>(theLevel.gameEntities_.at(i))->client_ = theLevel.clients_.at(i);
+	//}
 
 	// always leave room for the max number of clients,
 	// even if they aren't all used, so numbers inside that
 	// range are NEVER anything but clients
-	level.num_entities = MAX_CLIENTS;
+	//theLevel.num_entities_ = 0;//MAX_CLIENTS;
 
 	// let the server system know where the entites are
-	SV_LocateGameData( (void*)level.gentities, level.num_entities, sizeof( gentity_t ), 
-		&level.clients[0].ps, sizeof( level.clients[0] ) );
+//	SV_LocateGameData( (void*)level.gentities, level.num_entities, sizeof( gentity_t ), 
+//		&level.clients[0].ps, sizeof( level.clients[0] ) );
+	theLevel.setServerGameData();//	SV_LocateGameData( &theLevel.gameEntities_, &theLevel.clients_ );
 
 	ClearRegisteredItems();
 
@@ -375,15 +390,15 @@ void G_InitGame( int levelTime, int randomSeed )
 	G_FindTeams();
 
 	// make sure we have flags for CTF, etc
-	if( g_gametype.integer >= GT_TEAM ) {
+	if( g_gametype.integer >= GT_TEAM ) 
 		G_CheckTeamItems();
-	}
 
 	SaveRegisteredItems();
 
 	Com_Printf ("-----------------------------------\n");
 
-	if( g_gametype.integer == GT_SINGLE_PLAYER || Cvar_VariableIntegerValue( "com_buildScript" ) ) {
+	if( g_gametype.integer == GT_SINGLE_PLAYER || Cvar_VariableIntegerValue( "com_buildScript" ) ) 
+	{
 		G_SoundIndex( "sound/player/gurp1.wav" );
 		G_SoundIndex( "sound/player/gurp2.wav" );
 	}
@@ -393,10 +408,10 @@ void G_InitGame( int levelTime, int randomSeed )
 	if( g_gametype.integer != GT_MISSION_EDITOR )
 	{
 		// MFQ3 mission scripts
-		G_LoadMissionScripts();
+		//G_LoadMissionScripts();
 
 		// init some MFQ3 stuff
-		DroneInit();
+		//DroneInit();
 	}
 }
 
@@ -407,18 +422,19 @@ void G_InitGame( int levelTime, int randomSeed )
 G_ShutdownGame
 =================
 */
-void G_ShutdownGame() {
+void G_ShutdownGame() 
+{
 	Com_Printf ("==== ShutdownGame ====\n");
 
-	if ( level.logFile ) {
+	if ( theLevel.logFile_ ) 
+	{
 		G_LogPrintf("ShutdownGame:\n" );
 		G_LogPrintf("------------------------------------------------------------\n" );
-		FS_FCloseFile( level.logFile );
+		FS_FCloseFile( theLevel.logFile_ );
 	}
 
 	// write all the client session data so we can get it back
 	G_WriteSessionData();
-
 }
 
 
@@ -443,49 +459,41 @@ If there are less than two tournament players, put a
 spectator in the game and restart
 =============
 */
-void AddTournamentPlayer( void ) {
-	int			i;
-	gclient_t	*client;
-	gclient_t	*nextInLine;
-
-	if ( level.numPlayingClients >= 2 ) {
+void AddTournamentPlayer()
+{
+	if ( theLevel.numPlayingClients_ >= 2 ) 
 		return;
-	}
 
 	// never change during intermission
-	if ( level.intermissiontime ) {
+	if ( theLevel.intermissiontime_ ) 
 		return;
-	}
 
-	nextInLine = NULL;
-
-	for ( i = 0 ; i < level.maxclients ; i++ ) {
-		client = &level.clients[i];
-		if ( client->pers.connected != CON_CONNECTED ) {
+	GameClient *nextInLine = 0;
+	GameClient	*client = 0;
+	for ( int i = 1 ; i <= theLevel.maxclients_ ; i++ ) 
+	{
+		client = theLevel.getClient(i);
+		if( !client || client->pers_.connected_ != GameClient::ClientPersistant::CON_CONNECTED ) 
 			continue;
-		}
-		if ( client->sess.sessionTeam != TEAM_SPECTATOR ) {
+		if( client->sess_.sessionTeam_ != ClientBase::TEAM_SPECTATOR ) 
 			continue;
-		}
 		// never select the dedicated follow or scoreboard clients
-		if ( client->sess.spectatorState == SPECTATOR_SCOREBOARD || 
-			client->sess.spectatorClient < 0  ) {
+		if( client->sess_.spectatorState_ == GameClient::ClientSession::SPECTATOR_SCOREBOARD || 
+			client->sess_.spectatorClient_ < 0  ) 
 			continue;
-		}
 
-		if ( !nextInLine || client->sess.spectatorTime < nextInLine->sess.spectatorTime ) {
+		if ( !nextInLine || client->sess_.spectatorTime_ < nextInLine->sess_.spectatorTime_ ) 
 			nextInLine = client;
-		}
 	}
 
-	if ( !nextInLine ) {
+	if ( !nextInLine ) 
 		return;
-	}
 
-	level.warmupTime = -1;
+	theLevel.warmupTime_ = -1;
 
 	// set them to free-for-all team
-	SetTeam( &g_entities[ nextInLine - level.clients ], "f" );
+	//SetTeam( &g_entities[ nextInLine - level.clients ], "f" );
+	SetTeam( theLevel.getEntity(nextInLine->ps_.clientNum), "f" );
 }
 
 /*
@@ -495,21 +503,19 @@ RemoveTournamentLoser
 Make the loser a spectator at the back of the line
 =======================
 */
-void RemoveTournamentLoser( void ) {
-	int			clientNum;
-
-	if ( level.numPlayingClients != 2 ) {
+void RemoveTournamentLoser() 
+{
+	if( theLevel.numPlayingClients_ != 2 ) 
 		return;
-	}
 
-	clientNum = level.sortedClients[1];
+	int clientNum = theLevel.sortedClients_[1];
 
-	if ( level.clients[ clientNum ].pers.connected != CON_CONNECTED ) {
+	if( theLevel.getClient(clientNum)->pers_.connected_ != GameClient::ClientPersistant::CON_CONNECTED ) 
 		return;
-	}
 
 	// make them a spectator
-	SetTeam( &g_entities[ clientNum ], "s" );
+	//SetTeam( &g_entities[ clientNum ], "s" );
+	SetTeam( theLevel.getEntity(clientNum), "s" );
 }
 
 /*
@@ -517,21 +523,19 @@ void RemoveTournamentLoser( void ) {
 RemoveTournamentWinner
 =======================
 */
-void RemoveTournamentWinner( void ) {
-	int			clientNum;
-
-	if ( level.numPlayingClients != 2 ) {
+void RemoveTournamentWinner() 
+{
+	if( theLevel.numPlayingClients_ != 2 ) 
 		return;
-	}
 
-	clientNum = level.sortedClients[0];
+	int clientNum = theLevel.sortedClients_[0];
 
-	if ( level.clients[ clientNum ].pers.connected != CON_CONNECTED ) {
+	if( theLevel.getClient(clientNum)->pers_.connected_ != GameClient::ClientPersistant::CON_CONNECTED ) 
 		return;
-	}
 
 	// make them a spectator
-	SetTeam( &g_entities[ clientNum ], "s" );
+	//SetTeam( &g_entities[ clientNum ], "s" );
+	SetTeam( theLevel.getEntity(clientNum), "s" );
 }
 
 /*
@@ -539,21 +543,25 @@ void RemoveTournamentWinner( void ) {
 AdjustTournamentScores
 =======================
 */
-void AdjustTournamentScores( void ) {
-	int			clientNum;
+void AdjustTournamentScores() 
+{
+	int clientNum = theLevel.sortedClients_[0];
+	GameClient* client = theLevel.getClient(clientNum);
 
-	clientNum = level.sortedClients[0];
-	if ( level.clients[ clientNum ].pers.connected == CON_CONNECTED ) {
-		level.clients[ clientNum ].sess.wins++;
+	if( client->pers_.connected_ == GameClient::ClientPersistant::CON_CONNECTED ) 
+	{
+		client->sess_.wins_++;
 		ClientUserinfoChanged( clientNum );
 	}
 
-	clientNum = level.sortedClients[1];
-	if ( level.clients[ clientNum ].pers.connected == CON_CONNECTED ) {
-		level.clients[ clientNum ].sess.losses++;
+	clientNum = theLevel.sortedClients_[1];
+	client = theLevel.getClient(clientNum);
+
+	if( client->pers_.connected_ == GameClient::ClientPersistant::CON_CONNECTED ) 
+	{
+		client->sess_.losses_++;
 		ClientUserinfoChanged( clientNum );
 	}
-
 }
 
 /*
@@ -562,55 +570,52 @@ SortRanks
 
 =============
 */
-int QDECL SortRanks( const void *a, const void *b ) {
-	gclient_t	*ca, *cb;
-
-	ca = &level.clients[*(int *)a];
-	cb = &level.clients[*(int *)b];
+int QDECL SortRanks( const void *a, const void *b ) 
+{
+	GameClient	*ca = theLevel.getClient(*(int *)a);
+	GameClient	*cb = theLevel.getClient(*(int *)b);
 
 	// sort special clients last
-	if ( ca->sess.spectatorState == SPECTATOR_SCOREBOARD || ca->sess.spectatorClient < 0 ) {
+	if( ca->sess_.spectatorState_ == GameClient::ClientSession::SPECTATOR_SCOREBOARD || ca->sess_.spectatorClient_ < 0 ) 
 		return 1;
-	}
-	if ( cb->sess.spectatorState == SPECTATOR_SCOREBOARD || cb->sess.spectatorClient < 0  ) {
+
+	if( cb->sess_.spectatorState_ == GameClient::ClientSession::SPECTATOR_SCOREBOARD || cb->sess_.spectatorClient_ < 0  ) 
 		return -1;
-	}
 
 	// then connecting clients
-	if ( ca->pers.connected == CON_CONNECTING ) {
+	if( ca->pers_.connected_ == GameClient::ClientPersistant::CON_CONNECTING ) 
 		return 1;
-	}
-	if ( cb->pers.connected == CON_CONNECTING ) {
-		return -1;
-	}
 
+	if( cb->pers_.connected_ == GameClient::ClientPersistant::CON_CONNECTING ) 
+		return -1;
 
 	// then spectators
-	if ( ca->sess.sessionTeam == TEAM_SPECTATOR && cb->sess.sessionTeam == TEAM_SPECTATOR ) {
-		if ( ca->sess.spectatorTime < cb->sess.spectatorTime ) {
+	if( ca->sess_.sessionTeam_ == ClientBase::TEAM_SPECTATOR && 
+		cb->sess_.sessionTeam_ == ClientBase::TEAM_SPECTATOR ) 
+	{
+		if( ca->sess_.spectatorTime_ < cb->sess_.spectatorTime_ ) 
 			return -1;
-		}
-		if ( ca->sess.spectatorTime > cb->sess.spectatorTime ) {
+
+		if ( ca->sess_.spectatorTime_ > cb->sess_.spectatorTime_ )
 			return 1;
-		}
+
 		return 0;
 	}
-	if ( ca->sess.sessionTeam == TEAM_SPECTATOR ) {
+	if ( ca->sess_.sessionTeam_ == ClientBase::TEAM_SPECTATOR ) 
 		return 1;
-	}
-	if ( cb->sess.sessionTeam == TEAM_SPECTATOR ) {
+
+	if ( cb->sess_.sessionTeam_ == ClientBase::TEAM_SPECTATOR ) 
 		return -1;
-	}
 
 	// then sort by score
-	if ( ca->ps.persistant[PERS_SCORE]
-		> cb->ps.persistant[PERS_SCORE] ) {
+	if ( ca->ps_.persistant[PERS_SCORE]
+		> cb->ps_.persistant[PERS_SCORE] ) 
 		return -1;
-	}
-	if ( ca->ps.persistant[PERS_SCORE]
-		< cb->ps.persistant[PERS_SCORE] ) {
+
+	if ( ca->ps_.persistant[PERS_SCORE]
+		< cb->ps_.persistant[PERS_SCORE] ) 
 		return 1;
-	}
+
 	return 0;
 }
 
@@ -623,102 +628,116 @@ This will be called on every client connect, begin, disconnect, death,
 and team change.
 ============
 */
-void CalculateRanks( void ) {
-	int		i;
-	int		rank;
-	int		score;
-	int		newScore;
-	gclient_t	*cl;
+void CalculateRanks()
+{
+	theLevel.follow1_ = -1;
+	theLevel.follow2_ = -1;
+	theLevel.numConnectedClients_ = 0;
+	theLevel.numNonSpectatorClients_ = 0;
+	theLevel.numPlayingClients_ = 0;
+	theLevel.numVotingClients_ = 0;		// don't count bots
+	for( int i = 0; i < ClientBase::TEAM_NUM_TEAMS; i++ ) 
+		theLevel.numteamVotingClients_[i] = 0;
 
-	level.follow1 = -1;
-	level.follow2 = -1;
-	level.numConnectedClients = 0;
-	level.numNonSpectatorClients = 0;
-	level.numPlayingClients = 0;
-	level.numVotingClients = 0;		// don't count bots
-	for ( i = 0; i < TEAM_NUM_TEAMS; i++ ) {
-		level.numteamVotingClients[i] = 0;
-	}
-	for ( i = 0 ; i < level.maxclients ; i++ ) {
-		if ( level.clients[i].pers.connected != CON_DISCONNECTED ) {
-			level.sortedClients[level.numConnectedClients] = i;
-			level.numConnectedClients++;
+	for( int i = 1 ; i <= theLevel.maxclients_ ; i++ ) 
+	{
+		GameClient* client = theLevel.getClient(i);
+		if( client && client->pers_.connected_ != GameClient::ClientPersistant::CON_DISCONNECTED ) 
+		{
+			theLevel.sortedClients_[theLevel.numConnectedClients_] = i;
+			theLevel.numConnectedClients_++;
 
-			if ( level.clients[i].sess.sessionTeam != TEAM_SPECTATOR ) {
-				level.numNonSpectatorClients++;
+			if( client->sess_.sessionTeam_ != ClientBase::TEAM_SPECTATOR ) 
+			{
+				theLevel.numNonSpectatorClients_++;
 			
 				// decide if this should be auto-followed
-				if ( level.clients[i].pers.connected == CON_CONNECTED ) {
-					level.numPlayingClients++;
-					if ( !(g_entities[i].r.svFlags & SVF_BOT) ) {
-						level.numVotingClients++;
-						if ( level.clients[i].sess.sessionTeam == TEAM_RED )
-							level.numteamVotingClients[0]++;
-						else if ( level.clients[i].sess.sessionTeam == TEAM_BLUE )
-							level.numteamVotingClients[1]++;
+				if ( client->pers_.connected_ == GameClient::ClientPersistant::CON_CONNECTED ) 
+				{
+					theLevel.numPlayingClients_++;
+					if( !(theLevel.getEntity(i)->r.svFlags & SVF_BOT) ) 
+					{
+						theLevel.numVotingClients_++;
+						if( client->sess_.sessionTeam_ == ClientBase::TEAM_RED )
+							theLevel.numteamVotingClients_[0]++;
+						else if( client->sess_.sessionTeam_ == ClientBase::TEAM_BLUE )
+							theLevel.numteamVotingClients_[1]++;
 					}
-					if ( level.follow1 == -1 ) {
-						level.follow1 = i;
-					} else if ( level.follow2 == -1 ) {
-						level.follow2 = i;
-					}
+					if( theLevel.follow1_ == -1 ) 
+						theLevel.follow1_ = i;
+					else if( theLevel.follow2_ == -1 ) 
+						theLevel.follow2_ = i;
 				}
 			}
 		}
 	}
 
-	qsort( level.sortedClients, level.numConnectedClients, 
-		sizeof(level.sortedClients[0]), SortRanks );
+	qsort( theLevel.sortedClients_, theLevel.numConnectedClients_, 
+		sizeof(theLevel.sortedClients_[0]), SortRanks );
 
 	// set the rank value for all clients that are connected and not spectators
-	if ( g_gametype.integer >= GT_TEAM ) {
+	if( g_gametype.integer >= GT_TEAM ) 
+	{
 		// in team games, rank is just the order of the teams, 0=red, 1=blue, 2=tied
-		for ( i = 0;  i < level.numConnectedClients; i++ ) {
-			cl = &level.clients[ level.sortedClients[i] ];
-			if ( level.teamScores[TEAM_RED] == level.teamScores[TEAM_BLUE] ) {
-				cl->ps.persistant[PERS_RANK] = 2;
-			} else if ( level.teamScores[TEAM_RED] > level.teamScores[TEAM_BLUE] ) {
-				cl->ps.persistant[PERS_RANK] = 0;
-			} else {
-				cl->ps.persistant[PERS_RANK] = 1;
-			}
+		for ( int i = 0;  i < theLevel.numConnectedClients_; i++ ) 
+		{
+			GameClient *cl =  theLevel.getClient(theLevel.sortedClients_[i]);
+			if( theLevel.teamScores_[ClientBase::TEAM_RED] == theLevel.teamScores_[ClientBase::TEAM_BLUE] ) 
+				cl->ps_.persistant[PERS_RANK] = 2;
+			else if( theLevel.teamScores_[ClientBase::TEAM_RED] > theLevel.teamScores_[ClientBase::TEAM_BLUE] ) 
+				cl->ps_.persistant[PERS_RANK] = 0;
+			else
+				cl->ps_.persistant[PERS_RANK] = 1;
 		}
-	} else {	
-		rank = -1;
-		score = 0;
-		for ( i = 0;  i < level.numPlayingClients; i++ ) {
-			cl = &level.clients[ level.sortedClients[i] ];
-			newScore = cl->ps.persistant[PERS_SCORE];
-			if ( i == 0 || newScore != score ) {
+	} 
+	else 
+	{	
+		int rank = -1;
+		int score = 0;
+		for( int i = 0;  i < theLevel.numPlayingClients_; i++ ) 
+		{
+			GameClient *cl = theLevel.getClient(theLevel.sortedClients_[i]);
+			int newScore = cl->ps_.persistant[PERS_SCORE];
+			if( i == 0 || newScore != score ) 
+			{
 				rank = i;
 				// assume we aren't tied until the next client is checked
-				level.clients[ level.sortedClients[i] ].ps.persistant[PERS_RANK] = rank;
-			} else {
+				theLevel.getClient(theLevel.sortedClients_[i])->ps_.persistant[PERS_RANK] = rank;
+			} 
+			else 
+			{
 				// we are tied with the previous client
-				level.clients[ level.sortedClients[i-1] ].ps.persistant[PERS_RANK] = rank | RANK_TIED_FLAG;
-				level.clients[ level.sortedClients[i] ].ps.persistant[PERS_RANK] = rank | RANK_TIED_FLAG;
+				theLevel.getClient(theLevel.sortedClients_[i-1])->ps_.persistant[PERS_RANK] = rank | RANK_TIED_FLAG;
+				theLevel.getClient(theLevel.sortedClients_[i])->ps_.persistant[PERS_RANK] = rank | RANK_TIED_FLAG;
 			}
 			score = newScore;
-			if ( g_gametype.integer == GT_SINGLE_PLAYER && level.numPlayingClients == 1 ) {
-				level.clients[ level.sortedClients[i] ].ps.persistant[PERS_RANK] = rank | RANK_TIED_FLAG;
-			}
+			if( g_gametype.integer == GT_SINGLE_PLAYER && theLevel.numPlayingClients_ == 1 ) 
+				theLevel.getClient(theLevel.sortedClients_[i])->ps_.persistant[PERS_RANK] = rank | RANK_TIED_FLAG;
 		}
 	}
 
 	// set the CS_SCORES1/2 configstrings, which will be visible to everyone
-	if ( g_gametype.integer >= GT_TEAM ) {
-		SV_SetConfigstring( CS_SCORES1, va("%i", level.teamScores[TEAM_RED] ) );
-		SV_SetConfigstring( CS_SCORES2, va("%i", level.teamScores[TEAM_BLUE] ) );
-	} else {
-		if ( level.numConnectedClients == 0 ) {
+	if( g_gametype.integer >= GT_TEAM ) 
+	{
+		SV_SetConfigstring( CS_SCORES1, va("%i", theLevel.teamScores_[ClientBase::TEAM_RED] ) );
+		SV_SetConfigstring( CS_SCORES2, va("%i", theLevel.teamScores_[ClientBase::TEAM_BLUE] ) );
+	} 
+	else
+	{
+		if( theLevel.numConnectedClients_ == 0 ) 
+		{
 			SV_SetConfigstring( CS_SCORES1, va("%i", SCORE_NOT_PRESENT) );
 			SV_SetConfigstring( CS_SCORES2, va("%i", SCORE_NOT_PRESENT) );
-		} else if ( level.numConnectedClients == 1 ) {
-			SV_SetConfigstring( CS_SCORES1, va("%i", level.clients[ level.sortedClients[0] ].ps.persistant[PERS_SCORE] ) );
+		}
+		else if( theLevel.numConnectedClients_ == 1 ) 
+		{
+			SV_SetConfigstring( CS_SCORES1, va("%i", theLevel.getClient(theLevel.sortedClients_[0])->ps_.persistant[PERS_SCORE] ) );
 			SV_SetConfigstring( CS_SCORES2, va("%i", SCORE_NOT_PRESENT) );
-		} else {
-			SV_SetConfigstring( CS_SCORES1, va("%i", level.clients[ level.sortedClients[0] ].ps.persistant[PERS_SCORE] ) );
-			SV_SetConfigstring( CS_SCORES2, va("%i", level.clients[ level.sortedClients[1] ].ps.persistant[PERS_SCORE] ) );
+		} 
+		else
+		{
+			SV_SetConfigstring( CS_SCORES1, va("%i", theLevel.getClient(theLevel.sortedClients_[0])->ps_.persistant[PERS_SCORE] ) );
+			SV_SetConfigstring( CS_SCORES2, va("%i", theLevel.getClient(theLevel.sortedClients_[1])->ps_.persistant[PERS_SCORE] ) );
 		}
 	}
 
@@ -726,9 +745,8 @@ void CalculateRanks( void ) {
 	CheckExitRules();
 
 	// if we are at the intermission, send the New info to everyone
-	if ( level.intermissiontime ) {
+	if( theLevel.intermissiontime_ ) 
 		SendScoreboardMessageToAllClients();
-	}
 }
 
 
@@ -748,13 +766,15 @@ Do this at BeginIntermission time and whenever ranks are recalculated
 due to enters/exits/forced team changes
 ========================
 */
-void SendScoreboardMessageToAllClients( void ) {
+void SendScoreboardMessageToAllClients() 
+{
 	int		i;
 
-	for ( i = 0 ; i < level.maxclients ; i++ ) {
-		if ( level.clients[ i ].pers.connected == CON_CONNECTED ) {
-			DeathmatchScoreboardMessage( g_entities + i );
-		}
+	for( i = 1 ; i <= theLevel.maxclients_ ; i++ ) 
+	{
+		GameClient* client = theLevel.getClient(i);
+		if( client && client->pers_.connected_ == GameClient::ClientPersistant::CON_CONNECTED ) 
+			DeathmatchScoreboardMessage( theLevel.getEntity(i) );
 	}
 }
 
@@ -766,23 +786,22 @@ When the intermission starts, this will be called for all players.
 If a New client connects, this will be called after the spawn function.
 ========================
 */
-void MoveClientToIntermission( gentity_t *ent )
+void MoveClientToIntermission( GameEntity *ent )
 {
 	// take out of follow mode if needed
-	if ( ent->client->sess.spectatorState == SPECTATOR_FOLLOW ) {
+	if ( ent->client_->sess_.spectatorState_ == GameClient::ClientSession::SPECTATOR_FOLLOW ) 
 		StopFollowing( ent );
-	}
 
 	// move to the spot
-	VectorCopy( level.intermission_origin, ent->s.origin );
-	VectorCopy( level.intermission_origin, ent->client->ps.origin );
-	VectorCopy (level.intermission_angle, ent->client->ps.viewangles);
-	ent->client->ps.pm_type = PM_INTERMISSION;
+	VectorCopy( theLevel.intermission_origin_, ent->s.origin );
+	VectorCopy( theLevel.intermission_origin_, ent->client_->ps_.origin );
+	VectorCopy( theLevel.intermission_angle_, ent->client_->ps_.viewangles);
+	ent->client_->ps_.pm_type = PM_INTERMISSION;
 
 	// clean up objective info
-	ent->client->ps.objectives = 0;
+	ent->client_->ps_.objectives = 0;
 
-	ent->client->ps.eFlags = 0;
+	ent->client_->ps_.eFlags = 0;
 	ent->s.eFlags = 0;
 	ent->s.eType = ET_GENERAL;
 	ent->s.modelindex = 0;
@@ -798,27 +817,31 @@ FindIntermissionPoint
 This is also used for spectator spawns
 ==================
 */
-void FindIntermissionPoint( void ) {
-	gentity_t	*ent, *target;
-	vec3_t		dir;
-
+void FindIntermissionPoint() 
+{
 	// find the intermission spot
-	ent = G_Find (NULL, FOFS(classname), "info_player_intermission");
-	if ( !ent ) {	// the map creator forgot to put in an intermission point...
-		SelectSpawnPoint ( vec3_origin, level.intermission_origin, level.intermission_angle, -1 );
-	} else {
-		VectorCopy (ent->s.origin, level.intermission_origin);
-		VectorCopy (ent->s.angles, level.intermission_angle);
+	GameEntity *ent = G_Find (NULL, FOFS(classname_), "info_player_intermission");
+	if ( !ent ) 
+	{	
+		// the map creator forgot to put in an intermission point...
+		SelectSpawnPoint ( vec3_origin, theLevel.intermission_origin_, theLevel.intermission_angle_, -1 );
+	} 
+	else 
+	{
+		VectorCopy( ent->s.origin, theLevel.intermission_origin_ );
+		VectorCopy( ent->s.angles, theLevel.intermission_angle_ );
 		// if it has a target, look towards it
-		if ( ent->target ) {
-			target = G_PickTarget( ent->target );
-			if ( target ) {
-				VectorSubtract( target->s.origin, level.intermission_origin, dir );
-				vectoangles( dir, level.intermission_angle );
+		if ( ent->target_ ) 
+		{
+			GameEntity *target = G_PickTarget( ent->target_ );
+			if ( target ) 
+			{
+				vec3_t		dir;
+				VectorSubtract( target->s.origin, theLevel.intermission_origin_, dir );
+				vectoangles( dir, theLevel.intermission_angle_ );
 			}
 		}
 	}
-
 }
 
 /*
@@ -826,36 +849,32 @@ void FindIntermissionPoint( void ) {
 BeginIntermission
 ==================
 */
-void BeginIntermission( void ) {
-	int			i;
-	gentity_t	*client;
-
-	if ( level.intermissiontime ) {
+void BeginIntermission()
+{
+	if ( theLevel.intermissiontime_ ) 
 		return;		// already active
-	}
 
 	// if in tournement mode, change the wins / losses
-	if ( g_gametype.integer == GT_TOURNAMENT ) {
+	if ( g_gametype.integer == GT_TOURNAMENT ) 
 		AdjustTournamentScores();
-	}
 
-	level.intermissiontime = level.time;
+	theLevel.intermissiontime_ = theLevel.time_;
 	FindIntermissionPoint();
 
 	// if single player game
-	if ( g_gametype.integer == GT_SINGLE_PLAYER ) {
+	if ( g_gametype.integer == GT_SINGLE_PLAYER ) 
 		UpdateTournamentInfo();
-	}
 
 	// move all clients to the intermission point
-	for (i=0 ; i< level.maxclients ; i++) {
-		client = g_entities + i;
-		if (!client->inuse)
+	for( int i=1 ; i<= theLevel.maxclients_ ; i++ ) 
+	{
+		GameEntity* client = theLevel.getEntity(i);
+		if( !client || !client->inuse_ )
 			continue;
 		// respawn if dead
-		if (client->health <= 0) {
+		if( client->health_ <= 0 ) 
 			respawn(client);
-		}
+
 		MoveClientToIntermission( client );
 	}
 
@@ -874,40 +893,39 @@ or moved to a New level based on the "nextmap" cvar
 
 =============
 */
-void ExitLevel (void) {
-	int		i;
-	gclient_t *cl;
-
+void ExitLevel() 
+{
 	//bot interbreeding
 //	BotInterbreedEndMatch();
 
 	// if we are running a tournement map, kick the loser to spectator status,
 	// which will automatically grab the next spectator and restart
-	if ( g_gametype.integer == GT_TOURNAMENT  ) {
-		if ( !level.restarted ) {
+	if ( g_gametype.integer == GT_TOURNAMENT  ) 
+	{
+		if ( !theLevel.restarted_ ) 
+		{
 			RemoveTournamentLoser();
 			Cbuf_ExecuteText( EXEC_APPEND, "map_restart 0\n" );
-			level.restarted = true;
-			level.changemap = NULL;
-			level.intermissiontime = 0;
+			theLevel.restarted_ = true;
+			theLevel.changemap_ = 0;
+			theLevel.intermissiontime_ = 0;
 		}
 		return;	
 	}
 
-
 	Cbuf_ExecuteText( EXEC_APPEND, "vstr nextmap\n" );
-	level.changemap = NULL;
-	level.intermissiontime = 0;
+	theLevel.changemap_ = 0;
+	theLevel.intermissiontime_ = 0;
 
 	// reset all the scores so we don't enter the intermission again
-	level.teamScores[TEAM_RED] = 0;
-	level.teamScores[TEAM_BLUE] = 0;
-	for ( i=0 ; i< g_maxclients.integer ; i++ ) {
-		cl = level.clients + i;
-		if ( cl->pers.connected != CON_CONNECTED ) {
+	theLevel.teamScores_[ClientBase::TEAM_RED] = 0;
+	theLevel.teamScores_[ClientBase::TEAM_BLUE] = 0;
+	for( int i=1 ; i<= g_maxclients.integer ; i++ )
+	{
+		GameClient *cl = theLevel.getClient(i);
+		if ( !cl || cl->pers_.connected_ != GameClient::ClientPersistant::CON_CONNECTED ) 
 			continue;
-		}
-		cl->ps.persistant[PERS_SCORE] = 0;
+		cl->ps_.persistant[PERS_SCORE] = 0;
 	}
 
 	// we need to do this here before chaning to CON_CONNECTING
@@ -915,10 +933,11 @@ void ExitLevel (void) {
 
 	// change all client states to connecting, so the early players into the
 	// next level will know the others aren't done reconnecting
-	for (i=0 ; i< g_maxclients.integer ; i++) {
-		if ( level.clients[i].pers.connected == CON_CONNECTED ) {
-			level.clients[i].pers.connected = CON_CONNECTING;
-		}
+	for( int i=1 ; i<= g_maxclients.integer ; i++ ) 
+	{
+		GameClient *cl = theLevel.getClient(i);
+		if( cl->pers_.connected_ == GameClient::ClientPersistant::CON_CONNECTED ) 
+			cl->pers_.connected_ = GameClient::ClientPersistant::CON_CONNECTING;
 	}
 
 }
@@ -930,12 +949,13 @@ G_LogPrintf
 Print to the logfile with a time stamp if it is open
 =================
 */
-void QDECL G_LogPrintf( const char *fmt, ... ) {
+void QDECL G_LogPrintf( const char *fmt, ... ) 
+{
 	va_list		argptr;
 	char		string[1024];
 	int			min, tens, sec;
 
-	sec = level.time / 1000;
+	sec = theLevel.time_ / 1000;
 
 	min = sec / 60;
 	sec -= min * 60;
@@ -948,15 +968,13 @@ void QDECL G_LogPrintf( const char *fmt, ... ) {
 	vsprintf( string +7 , fmt,argptr );
 	va_end( argptr );
 
-	if ( g_dedicated.integer ) {
+	if ( g_dedicated.integer )
 		Com_Printf( "%s", string + 7 );
-	}
 
-	if ( !level.logFile ) {
+	if ( !theLevel.logFile_ ) 
 		return;
-	}
 
-	FS_Write( string, strlen( string ), level.logFile );
+	FS_Write( string, strlen( string ), theLevel.logFile_ );
 }
 
 /*
@@ -966,48 +984,46 @@ LogExit
 Append information about this game to the log file
 ================
 */
-void LogExit( const char *string ) {
-	int				i, numSorted;
-	gclient_t		*cl;
+void LogExit( const char *string )
+{
 //	bool won = true;
 
 	G_LogPrintf( "Exit: %s\n", string );
 
-	level.intermissionQueued = level.time;
+	theLevel.intermissionQueued_ = theLevel.time_;
 
 	// this will keep the clients from playing any voice sounds
 	// that will get cut off when the queued intermission starts
 	SV_SetConfigstring( CS_INTERMISSION, "1" );
 
 	// don't send more than 32 scores (FIXME?)
-	numSorted = level.numConnectedClients;
-	if ( numSorted > 32 ) {
+	int numSorted = theLevel.numConnectedClients_;
+	if( numSorted > 32 ) 
 		numSorted = 32;
-	}
 
-	if ( g_gametype.integer >= GT_TEAM ) {
+	if( g_gametype.integer >= GT_TEAM )
+	{
 		G_LogPrintf( "red:%i  blue:%i\n",
-			level.teamScores[TEAM_RED], level.teamScores[TEAM_BLUE] );
+			theLevel.teamScores_[ClientBase::TEAM_RED], 
+			theLevel.teamScores_[ClientBase::TEAM_BLUE] );
 	}
 
-	for (i=0 ; i < numSorted ; i++) {
+	for( int i=0 ; i < numSorted ; i++ )
+	{
 		int		ping;
 
-		cl = &level.clients[level.sortedClients[i]];
+		GameClient *cl = theLevel.getClient(theLevel.sortedClients_[i]);
 
-		if ( cl->sess.sessionTeam == TEAM_SPECTATOR ) {
+		if ( cl->sess_.sessionTeam_ == ClientBase::TEAM_SPECTATOR ) 
 			continue;
-		}
-		if ( cl->pers.connected == CON_CONNECTING ) {
+
+		if ( cl->pers_.connected_ == GameClient::ClientPersistant::CON_CONNECTING ) 
 			continue;
-		}
 
-		ping = cl->ps.ping < 999 ? cl->ps.ping : 999;
+		ping = cl->ps_.ping < 999 ? cl->ps_.ping : 999;
 
-		G_LogPrintf( "score: %i  ping: %i  client: %i %s\n", cl->ps.persistant[PERS_SCORE], ping, level.sortedClients[i],	cl->pers.netname );
-
+		G_LogPrintf( "score: %i  ping: %i  client: %i %s\n", cl->ps_.persistant[PERS_SCORE], ping, theLevel.sortedClients_[i],	cl->pers_.netname_ );
 	}
-
 }
 
 
@@ -1021,77 +1037,76 @@ If one or more players have not acknowledged the continue, the game will
 wait 10 seconds before going on.
 =================
 */
-void CheckIntermissionExit( void ) {
-	int			ready, notReady;
-	int			i;
-	gclient_t	*cl;
-	int			readyMask;
-
-	if ( g_gametype.integer == GT_SINGLE_PLAYER || g_gametype.integer == GT_MISSION_EDITOR ) {
+void CheckIntermissionExit() 
+{
+	if ( g_gametype.integer == GT_SINGLE_PLAYER || g_gametype.integer == GT_MISSION_EDITOR ) 
 		return;
-	}
 
 	// see which players are ready
-	ready = 0;
-	notReady = 0;
-	readyMask = 0;
-	for (i=0 ; i< g_maxclients.integer ; i++) {
-		cl = level.clients + i;
-		if ( cl->pers.connected != CON_CONNECTED ) {
+	int ready = 0;
+	int notReady = 0;
+	int readyMask = 0;
+	for( int i=1 ; i<= g_maxclients.integer ; i++) 
+	{
+		GameClient *cl = theLevel.getClient(i);
+		if ( !cl || cl->pers_.connected_ != GameClient::ClientPersistant::CON_CONNECTED ) 
 			continue;
-		}
-		if ( g_entities[cl->ps.clientNum].r.svFlags & SVF_BOT ) {
-			continue;
-		}
 
-		if ( cl->readyToExit ) {
+		if ( theLevel.getEntity(cl->ps_.clientNum)->r.svFlags & SVF_BOT ) 
+			continue;
+
+		if ( cl->readyToExit_ ) 
+		{
 			ready++;
-			if ( i < 16 ) {
+			if ( i < 16 ) 
 				readyMask |= 1 << i;
-			}
-		} else {
+		} 
+		else 
+		{
 			notReady++;
 		}
 	}
 
 	// copy the readyMask to each player's stats so
 	// it can be displayed on the scoreboard
-	for (i=0 ; i< g_maxclients.integer ; i++) {
-		cl = level.clients + i;
-		if ( cl->pers.connected != CON_CONNECTED ) {
+	for( i=1 ; i<= g_maxclients.integer ; i++ ) 
+	{
+		GameClient* cl = theLevel.getClient(i);
+		if( !cl || cl->pers_.connected_ != GameClient::ClientPersistant::CON_CONNECTED ) 
 			continue;
-		}
-		cl->ps.stats[STAT_CLIENTS_READY] = readyMask;
+
+		cl->ps_.stats[STAT_CLIENTS_READY] = readyMask;
 	}
 
 	// never exit in less than five seconds
-	if ( level.time < level.intermissiontime + 5000 ) {
+	if ( theLevel.time_ < theLevel.intermissiontime_ + 5000 ) 
 		return;
-	}
 
 	// if nobody wants to go, clear timer
-	if ( !ready ) {
-		level.readyToExit = false;
+	if ( !ready ) 
+	{
+		theLevel.readyToExit_ = false;
 		return;
 	}
 
 	// if everyone wants to go, go now
-	if ( !notReady ) {
+	if ( !notReady ) 
+	{
 		ExitLevel();
 		return;
 	}
 
 	// the first person to ready starts the ten second timeout
-	if ( !level.readyToExit ) {
-		level.readyToExit = true;
-		level.exitTime = level.time;
+	if ( !theLevel.readyToExit_ )
+	{
+		theLevel.readyToExit_ = true;
+		theLevel.exitTime_ = theLevel.time_;
 	}
 
 	// if we have waited ten seconds since at least one player
 	// wanted to exit, go ahead
-	if ( level.time < level.exitTime + 10000 ) {
+	if ( theLevel.time_ < theLevel.exitTime_ + 10000 ) 
 		return;
-	}
 
 	ExitLevel();
 }
@@ -1101,19 +1116,16 @@ void CheckIntermissionExit( void ) {
 ScoreIsTied
 =============
 */
-bool ScoreIsTied( void ) {
-	int		a, b;
-
-	if ( level.numPlayingClients < 2 ) {
+bool ScoreIsTied() 
+{
+	if( theLevel.numPlayingClients_ < 2 ) 
 		return false;
-	}
 	
-	if ( g_gametype.integer >= GT_TEAM ) {
-		return level.teamScores[TEAM_RED] == level.teamScores[TEAM_BLUE];
-	}
+	if ( g_gametype.integer >= GT_TEAM ) 
+		return theLevel.teamScores_[ClientBase::TEAM_RED] == theLevel.teamScores_[ClientBase::TEAM_BLUE];
 
-	a = level.clients[level.sortedClients[0]].ps.persistant[PERS_SCORE];
-	b = level.clients[level.sortedClients[1]].ps.persistant[PERS_SCORE];
+	int a = theLevel.getClient(theLevel.sortedClients_[0])->ps_.persistant[PERS_SCORE];
+	int b = theLevel.getClient(theLevel.sortedClients_[1])->ps_.persistant[PERS_SCORE];
 
 	return a == b;
 }
@@ -1127,82 +1139,93 @@ and the time everyone is moved to the intermission spot, so you
 can see the last frag.
 =================
 */
-void CheckExitRules( void ) {
- 	int			i;
-	gclient_t	*cl;
+void CheckExitRules() 
+{
 	// if at the intermission, wait for all non-bots to
 	// signal ready, then go to next level
-	if ( level.intermissiontime ) {
+	if( theLevel.intermissiontime_ ) 
+	{
 		CheckIntermissionExit ();
 		return;
 	}
 
-	if ( level.intermissionQueued ) {
-		if ( level.time - level.intermissionQueued >= INTERMISSION_DELAY_TIME ) {
-			level.intermissionQueued = 0;
+	if( theLevel.intermissionQueued_ ) 
+	{
+		if ( theLevel.time_ - theLevel.intermissionQueued_ >= INTERMISSION_DELAY_TIME ) 
+		{
+			theLevel.intermissionQueued_ = 0;
 			BeginIntermission();
 		}
 		return;
 	}
 
 	// check for sudden death
-	if ( ScoreIsTied() ) {
+	if( ScoreIsTied() )
+	{
 		// always wait for sudden death
 		return;
 	}
 
-	if ( g_timelimit.integer && !level.warmupTime ) {
-		if ( level.time - level.startTime >= g_timelimit.integer*60000 ) {
+	if( g_timelimit.integer && !theLevel.warmupTime_ ) 
+	{
+		if( theLevel.time_ - theLevel.startTime_ >= g_timelimit.integer*60000 ) 
+		{
 			SV_GameSendServerCommand( -1, "print \"Timelimit hit.\n\" \"<scoreboard>\"");
 			LogExit( "Timelimit hit." );
 			return;
 		}
 	}
 
-	if ( level.numPlayingClients < 2 ) {
+	if( theLevel.numPlayingClients_ < 2 ) 
 		return;
-	}
 
-	if ( g_gametype.integer < GT_CTF && g_fraglimit.integer ) {
-		if ( level.teamScores[TEAM_RED] >= g_fraglimit.integer ) {
+	if( g_gametype.integer < GT_CTF && g_fraglimit.integer ) 
+	{
+		if( theLevel.teamScores_[ClientBase::TEAM_RED] >= g_fraglimit.integer ) 
+		{
 			SV_GameSendServerCommand( -1, "print \"Red hit the fraglimit.\n\" \"<scoreboard>\"" );
 			LogExit( "Fraglimit hit." );
 			return;
 		}
 
-		if ( level.teamScores[TEAM_BLUE] >= g_fraglimit.integer ) {
+		if( theLevel.teamScores_[ClientBase::TEAM_BLUE] >= g_fraglimit.integer ) 
+		{
 			SV_GameSendServerCommand( -1, "print \"Blue hit the fraglimit.\n\" \"<scoreboard>\"" );
 			LogExit( "Fraglimit hit." );
 			return;
 		}
 
-		for ( i=0 ; i< g_maxclients.integer ; i++ ) {
-			cl = level.clients + i;
-			if ( cl->pers.connected != CON_CONNECTED ) {
+		for( int i=1 ; i<= g_maxclients.integer ; i++ ) 
+		{
+			GameClient *cl = theLevel.getClient(i);
+			if( !cl || cl->pers_.connected_ != GameClient::ClientPersistant::CON_CONNECTED ) 
 				continue;
-			}
-			if ( cl->sess.sessionTeam != TEAM_FREE ) {
-				continue;
-			}
 
-			if ( cl->ps.persistant[PERS_SCORE] >= g_fraglimit.integer ) {
+			if( cl->sess_.sessionTeam_ != ClientBase::TEAM_FREE ) 
+				continue;
+
+			if( cl->ps_.persistant[PERS_SCORE] >= g_fraglimit.integer )
+			{
 				LogExit( "Fraglimit hit." );
 				SV_GameSendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " hit the fraglimit.\n\" \"<scoreboard>\"",
-					cl->pers.netname ) );
+					cl->pers_.netname_ ) );
 				return;
 			}
 		}
 	}
 
-	if ( g_gametype.integer >= GT_CTF && g_capturelimit.integer ) {
+	if( g_gametype.integer >= GT_CTF && g_capturelimit.integer )
+	{
 
-		if ( level.teamScores[TEAM_RED] >= g_capturelimit.integer ) {
+		if( theLevel.teamScores_[ClientBase::TEAM_RED] >= g_capturelimit.integer )
+		{
 			SV_GameSendServerCommand( -1, "print \"Red hit the capturelimit.\n\" \"<scoreboard>\"" );
 			LogExit( "Capturelimit hit." );
 			return;
 		}
 
-		if ( level.teamScores[TEAM_BLUE] >= g_capturelimit.integer ) {
+		if( theLevel.teamScores_[ClientBase::TEAM_BLUE] >= g_capturelimit.integer )
+		{
 			SV_GameSendServerCommand( -1, "print \"Blue hit the capturelimit.\n\" \"<scoreboard>\"" );
 			LogExit( "Capturelimit hit." );
 			return;
@@ -1228,107 +1251,117 @@ CheckTournament
 Once a frame, check for changes in tournement player state
 =============
 */
-void CheckTournament( void ) {
+void CheckTournament() 
+{
 	// check because we run 3 game frames before calling Connect and/or ClientBegin
 	// for clients on a map_restart
-	if ( level.numPlayingClients == 0 ) {
+	if( theLevel.numPlayingClients_ == 0 ) 
 		return;
-	}
 
-	if ( g_gametype.integer == GT_TOURNAMENT ) {
-
+	if( g_gametype.integer == GT_TOURNAMENT ) 
+	{
 		// pull in a spectator if needed
-		if ( level.numPlayingClients < 2 ) {
+		if( theLevel.numPlayingClients_ < 2 ) 
 			AddTournamentPlayer();
-		}
 
 		// if we don't have two players, go back to "waiting for players"
-		if ( level.numPlayingClients != 2 ) {
-			if ( level.warmupTime != -1 ) {
-				level.warmupTime = -1;
-				SV_SetConfigstring( CS_WARMUP, va("%i", level.warmupTime) );
+		if( theLevel.numPlayingClients_ != 2 )
+		{
+			if( theLevel.warmupTime_ != -1 ) 
+			{
+				theLevel.warmupTime_ = -1;
+				SV_SetConfigstring( CS_WARMUP, va("%i", theLevel.warmupTime_) );
 				G_LogPrintf( "Warmup:\n" );
 			}
 			return;
 		}
 
-		if ( level.warmupTime == 0 ) {
+		if( theLevel.warmupTime_ == 0 ) 
 			return;
-		}
 
 		// if the warmup is changed at the console, restart it
-		if ( g_warmup.modificationCount != level.warmupModificationCount ) {
-			level.warmupModificationCount = g_warmup.modificationCount;
-			level.warmupTime = -1;
+		if( g_warmup.modificationCount != theLevel.warmupModificationCount_ ) 
+		{
+			theLevel.warmupModificationCount_ = g_warmup.modificationCount;
+			theLevel.warmupTime_ = -1;
 		}
 
 		// if all players have arrived, start the countdown
-		if ( level.warmupTime < 0 ) {
-			if ( level.numPlayingClients == 2 ) {
+		if( theLevel.warmupTime_ < 0 ) 
+		{
+			if( theLevel.numPlayingClients_ == 2 ) 
+			{
 				// fudge by -1 to account for extra delays
-				level.warmupTime = level.time + ( g_warmup.integer - 1 ) * 1000;
-				SV_SetConfigstring( CS_WARMUP, va("%i", level.warmupTime) );
+				theLevel.warmupTime_ = theLevel.time_ + ( g_warmup.integer - 1 ) * 1000;
+				SV_SetConfigstring( CS_WARMUP, va("%i", theLevel.warmupTime_) );
 			}
 			return;
 		}
 
 		// if the warmup time has counted down, restart
-		if ( level.time > level.warmupTime ) {
-			level.warmupTime += 10000;
+		if( theLevel.time_ > theLevel.warmupTime_ ) 
+		{
+			theLevel.warmupTime_ += 10000;
 			Cvar_Set( "g_restarted", "1" );
 			Cbuf_ExecuteText( EXEC_APPEND, "map_restart 0\n" );
-			level.restarted = true;
+			theLevel.restarted_ = true;
 			return;
 		}
-	} else if ( g_gametype.integer != GT_SINGLE_PLAYER && g_gametype.integer != GT_MISSION_EDITOR &&
-					level.warmupTime != 0 ) {
-		int		counts[TEAM_NUM_TEAMS];
-		bool	notEnough = false;
+	} 
+	else if( g_gametype.integer != GT_SINGLE_PLAYER && g_gametype.integer != GT_MISSION_EDITOR &&
+			 theLevel.warmupTime_ != 0 ) 
+	{
+		int	 counts[ClientBase::TEAM_NUM_TEAMS];
+		bool notEnough = false;
 
-		if ( g_gametype.integer > GT_TEAM ) {
-			counts[TEAM_BLUE] = TeamCount( -1, TEAM_BLUE );
-			counts[TEAM_RED] = TeamCount( -1, TEAM_RED );
+		if( g_gametype.integer > GT_TEAM ) 
+		{
+			counts[ClientBase::TEAM_BLUE] = TeamCount( -1, ClientBase::TEAM_BLUE );
+			counts[ClientBase::TEAM_RED] = TeamCount( -1, ClientBase::TEAM_RED );
 
-			if (counts[TEAM_RED] < 1 || counts[TEAM_BLUE] < 1) {
+			if (counts[ClientBase::TEAM_RED] < 1 || counts[ClientBase::TEAM_BLUE] < 1) 
 				notEnough = true;
-			}
-		} else if ( level.numPlayingClients < 2 ) {
-			notEnough = true;
 		}
+		else if( theLevel.numPlayingClients_ < 2 ) 
+			notEnough = true;
 
-		if ( notEnough ) {
-			if ( level.warmupTime != -1 ) {
-				level.warmupTime = -1;
-				SV_SetConfigstring( CS_WARMUP, va("%i", level.warmupTime) );
+		if( notEnough ) 
+		{
+			if( theLevel.warmupTime_ != -1 ) 
+			{
+				theLevel.warmupTime_ = -1;
+				SV_SetConfigstring( CS_WARMUP, va("%i", theLevel.warmupTime_) );
 				G_LogPrintf( "Warmup:\n" );
 			}
 			return; // still waiting for team members
 		}
 
-		if ( level.warmupTime == 0 ) {
+		if( theLevel.warmupTime_ == 0 ) 
 			return;
-		}
 
 		// if the warmup is changed at the console, restart it
-		if ( g_warmup.modificationCount != level.warmupModificationCount ) {
-			level.warmupModificationCount = g_warmup.modificationCount;
-			level.warmupTime = -1;
+		if( g_warmup.modificationCount != theLevel.warmupModificationCount_ ) 
+		{
+			theLevel.warmupModificationCount_ = g_warmup.modificationCount;
+			theLevel.warmupTime_ = -1;
 		}
 
 		// if all players have arrived, start the countdown
-		if ( level.warmupTime < 0 ) {
+		if( theLevel.warmupTime_ < 0 ) 
+		{
 			// fudge by -1 to account for extra delays
-			level.warmupTime = level.time + ( g_warmup.integer - 1 ) * 1000;
-			SV_SetConfigstring( CS_WARMUP, va("%i", level.warmupTime) );
+			theLevel.warmupTime_ = theLevel.time_ + ( g_warmup.integer - 1 ) * 1000;
+			SV_SetConfigstring( CS_WARMUP, va("%i", theLevel.warmupTime_) );
 			return;
 		}
 
 		// if the warmup time has counted down, restart
-		if ( level.time > level.warmupTime ) {
-			level.warmupTime += 10000;
+		if( theLevel.time_ > theLevel.warmupTime_ ) 
+		{
+			theLevel.warmupTime_ += 10000;
 			Cvar_Set( "g_restarted", "1" );
 			Cbuf_ExecuteText( EXEC_APPEND, "map_restart 0\n" );
-			level.restarted = true;
+			theLevel.restarted_ = true;
 			return;
 		}
 	}
@@ -1342,30 +1375,40 @@ void CheckTournament( void ) {
 CheckVote
 ==================
 */
-void CheckVote( void ) {
-	if ( level.voteExecuteTime && level.voteExecuteTime < level.time ) {
-		level.voteExecuteTime = 0;
-		Cbuf_ExecuteText( EXEC_APPEND, va("%s\n", level.voteString ) );
+void CheckVote() 
+{
+	if( theLevel.voteExecuteTime_ && theLevel.voteExecuteTime_ < theLevel.time_ ) 
+	{
+		theLevel.voteExecuteTime_ = 0;
+		Cbuf_ExecuteText( EXEC_APPEND, va("%s\n", theLevel.voteString_ ) );
 	}
-	if ( !level.voteTime ) {
+	if( !theLevel.voteTime_ ) 
 		return;
-	}
-	if ( level.time - level.voteTime >= VOTE_TIME ) {
+
+	if( theLevel.time_ - theLevel.voteTime_ >= VOTE_TIME ) 
+	{
 		SV_GameSendServerCommand( -1, "print \"Vote failed.\n\"" );
-	} else {
-		if ( level.voteYes > level.numVotingClients/2 ) {
+	}
+	else 
+	{
+		if( theLevel.voteYes_ > theLevel.numVotingClients_/2 ) 
+		{
 			// execute the command, then remove the vote
 			SV_GameSendServerCommand( -1, "print \"Vote passed.\n\"" );
-			level.voteExecuteTime = level.time + 3000;
-		} else if ( level.voteNo >= level.numVotingClients/2 ) {
+			theLevel.voteExecuteTime_ = theLevel.time_ + 3000;
+		}
+		else if( theLevel.voteNo_ >= theLevel.numVotingClients_/2 ) 
+		{
 			// same behavior as a timeout
 			SV_GameSendServerCommand( -1, "print \"Vote failed.\n\"" );
-		} else {
+		}
+		else 
+		{
 			// still waiting for a majority
 			return;
 		}
 	}
-	level.voteTime = 0;
+	theLevel.voteTime_ = 0;
 	SV_SetConfigstring( CS_VOTE_TIME, "" );
 
 }
@@ -1375,11 +1418,12 @@ void CheckVote( void ) {
 PrintTeam
 ==================
 */
-void PrintTeam(int team, char *message) {
-	int i;
-
-	for ( i = 0 ; i < level.maxclients ; i++ ) {
-		if (level.clients[i].sess.sessionTeam != team)
+void PrintTeam( int team, char *message ) 
+{
+	for( int i = 1 ; i <= theLevel.maxclients_ ; i++ ) 
+	{
+		GameClient* cl = theLevel.getClient(i);
+		if( !cl || cl->sess_.sessionTeam_ != team )
 			continue;
 		SV_GameSendServerCommand( i, message );
 	}
@@ -1390,28 +1434,34 @@ void PrintTeam(int team, char *message) {
 SetLeader
 ==================
 */
-void SetLeader(int team, int client) {
-	int i;
+void SetLeader( int team, int client )
+{
+	GameClient* cl = theLevel.getClient(client);
 
-	if ( level.clients[client].pers.connected == CON_DISCONNECTED ) {
-		PrintTeam(team, va("print \"%s is not connected\n\"", level.clients[client].pers.netname) );
+	if( !cl || cl->pers_.connected_ == GameClient::ClientPersistant::CON_DISCONNECTED ) 
+	{
+		PrintTeam(team, va("print \"%s is not connected\n\"", cl->pers_.netname_) );
 		return;
 	}
-	if (level.clients[client].sess.sessionTeam != team) {
-		PrintTeam(team, va("print \"%s is not on the team anymore\n\"", level.clients[client].pers.netname) );
+	if( cl->sess_.sessionTeam_ != team ) 
+	{
+		PrintTeam(team, va("print \"%s is not on the team anymore\n\"", cl->pers_.netname_) );
 		return;
 	}
-	for ( i = 0 ; i < level.maxclients ; i++ ) {
-		if (level.clients[i].sess.sessionTeam != team)
+	for( int i = 1 ; i <= theLevel.maxclients_ ; i++ )
+	{
+		GameClient* currCl = theLevel.getClient(i);
+		if( !currCl || currCl->sess_.sessionTeam_ != team )
 			continue;
-		if (level.clients[i].sess.teamLeader) {
-			level.clients[i].sess.teamLeader = false;
+		if( currCl->sess_.teamLeader_ )
+		{
+			currCl->sess_.teamLeader_ = false;
 			ClientUserinfoChanged(i);
 		}
 	}
-	level.clients[client].sess.teamLeader = true;
+	cl->sess_.teamLeader_ = true;
 	ClientUserinfoChanged( client );
-	PrintTeam(team, va("print \"%s is the New team leader\n\"", level.clients[client].pers.netname) );
+	PrintTeam(team, va("print \"%s is the New team leader\n\"", cl->pers_.netname_) );
 }
 
 /*
@@ -1419,28 +1469,35 @@ void SetLeader(int team, int client) {
 CheckTeamLeader
 ==================
 */
-void CheckTeamLeader( int team ) {
-	int i;
-
-	for ( i = 0 ; i < level.maxclients ; i++ ) {
-		if (level.clients[i].sess.sessionTeam != team)
+void CheckTeamLeader( int team ) 
+{
+	for( int i = 1 ; i <= theLevel.maxclients_ ; i++ ) 
+	{
+		GameClient* cl = theLevel.getClient(i);
+		if( cl->sess_.sessionTeam_ != team )
 			continue;
-		if (level.clients[i].sess.teamLeader)
+		if( cl->sess_.teamLeader_ )
 			break;
 	}
-	if (i >= level.maxclients) {
-		for ( i = 0 ; i < level.maxclients ; i++ ) {
-			if (level.clients[i].sess.sessionTeam != team)
+	if( i > theLevel.maxclients_ ) 
+	{
+		for( i = 1 ; i <= theLevel.maxclients_ ; i++ ) 
+		{
+			GameClient* cl = theLevel.getClient(i);
+			if( !cl || cl->sess_.sessionTeam_ != team )
 				continue;
-			if (!(g_entities[i].r.svFlags & SVF_BOT)) {
-				level.clients[i].sess.teamLeader = true;
+			if( !(theLevel.getEntity(i)->r.svFlags & SVF_BOT) ) 
+			{
+				cl->sess_.teamLeader_ = true;
 				break;
 			}
 		}
-		for ( i = 0 ; i < level.maxclients ; i++ ) {
-			if (level.clients[i].sess.sessionTeam != team)
+		for( i = 1 ; i <= theLevel.maxclients_ ; i++ ) 
+		{
+			GameClient* cl = theLevel.getClient(i);
+			if( !cl || cl->sess_.sessionTeam_ != team )
 				continue;
-			level.clients[i].sess.teamLeader = true;
+			cl->sess_.teamLeader_ = true;
 			break;
 		}
 	}
@@ -1451,44 +1508,52 @@ void CheckTeamLeader( int team ) {
 CheckTeamVote
 ==================
 */
-void CheckTeamVote( int team ) {
+void CheckTeamVote( int team ) 
+{
 	int cs_offset;
 
-	if ( team == TEAM_RED )
+	if( team == ClientBase::TEAM_RED )
 		cs_offset = 0;
-	else if ( team == TEAM_BLUE )
+	else if( team == ClientBase::TEAM_BLUE )
 		cs_offset = 1;
 	else
 		return;
 
-	if ( !level.teamVoteTime[cs_offset] ) {
+	if( !theLevel.teamVoteTime_[cs_offset] ) 
 		return;
-	}
-	if ( level.time - level.teamVoteTime[cs_offset] >= VOTE_TIME ) {
+
+	if( theLevel.time_ - theLevel.teamVoteTime_[cs_offset] >= VOTE_TIME ) 
+	{
 		SV_GameSendServerCommand( -1, "print \"Team vote failed.\n\"" );
-	} else {
-		if ( level.teamVoteYes[cs_offset] > level.numteamVotingClients[cs_offset]/2 ) {
+	}
+	else
+	{
+		if( theLevel.teamVoteYes_[cs_offset] > theLevel.numteamVotingClients_[cs_offset]/2 ) 
+		{
 			// execute the command, then remove the vote
 			SV_GameSendServerCommand( -1, "print \"Team vote passed.\n\"" );
 			//
-			if ( !Q_strncmp( "leader", level.teamVoteString[cs_offset], 6) ) {
+			if( !Q_strncmp( "leader", theLevel.teamVoteString_[cs_offset], 6) ) 
+			{
 				//set the team leader
-				SetLeader(team, atoi(level.teamVoteString[cs_offset] + 7));
+				SetLeader(team, atoi(theLevel.teamVoteString_[cs_offset] + 7));
 			}
-			else {
-				Cbuf_ExecuteText( EXEC_APPEND, va("%s\n", level.teamVoteString[cs_offset] ) );
-			}
-		} else if ( level.teamVoteNo[cs_offset] >= level.numteamVotingClients[cs_offset]/2 ) {
+			else
+				Cbuf_ExecuteText( EXEC_APPEND, va("%s\n", theLevel.teamVoteString_[cs_offset] ) );
+		}
+		else if( theLevel.teamVoteNo_[cs_offset] >= theLevel.numteamVotingClients_[cs_offset]/2 ) 
+		{
 			// same behavior as a timeout
 			SV_GameSendServerCommand( -1, "print \"Team vote failed.\n\"" );
-		} else {
+		}
+		else 
+		{
 			// still waiting for a majority
 			return;
 		}
 	}
-	level.teamVoteTime[cs_offset] = 0;
+	theLevel.teamVoteTime_[cs_offset] = 0;
 	SV_SetConfigstring( CS_TEAMVOTE_TIME + cs_offset, "" );
-
 }
 
 
@@ -1517,22 +1582,22 @@ G_RunThink
 Runs thinking code for this frame if necessary
 =============
 */
-void G_RunThink (gentity_t *ent) {
+void G_RunThink( GameEntity *ent )
+{
 	float	thinktime;
 
-	thinktime = ent->nextthink;
-	if (thinktime <= 0) {
+	thinktime = ent->nextthink_;
+	if( thinktime <= 0 ) 
 		return;
-	}
-	if (thinktime > level.time) {
+
+	if( thinktime > theLevel.time_ )
 		return;
-	}
 	
-	ent->nextthink = 0;
-	if (!ent->think) {
+	ent->nextthink_ = 0;
+	if( !ent->thinkFunc_ ) 
 		Com_Error( ERR_DROP, "NULL ent->think");
-	}
-	ent->think (ent);
+
+	ent->thinkFunc_->execute();
 }
 
 /*
@@ -1542,21 +1607,16 @@ G_RunFrame
 Advances the non-player objects in the world
 ================
 */
-void G_RunFrame( int levelTime ) {
-	int			i;
-	gentity_t	*ent;
-	int			msec;
-	int start, end;
-
+void G_RunFrame( int levelTime ) 
+{
 	// if we are waiting for the level to restart, do nothing
-	if( level.restarted ) {
+	if( theLevel.restarted_ )
 		return;
-	}
 
-	level.framenum++;
-	level.previousTime = level.time;
-	level.time = levelTime;
-	msec = level.time - level.previousTime;
+	theLevel.framenum_++;
+	theLevel.previousTime_ = theLevel.time_;
+	theLevel.time_ = levelTime;
+	int msec = theLevel.time_ - theLevel.previousTime_;
 
 	// get any cvar changes
 	G_UpdateCvars();
@@ -1564,78 +1624,81 @@ void G_RunFrame( int levelTime ) {
 	//
 	// go through all allocated objects
 	//
-	start = Sys_Milliseconds();
-	ent = &g_entities[0];
-	for (i=0 ; i<level.num_entities ; i++, ent++) {
-		if ( !ent->inuse ) {
+	int start = Sys_Milliseconds();
+	GameEntity* ent = 0;//&g_entities[0];
+	for( int i=0 ; i<theLevel.num_entities_ ; i++ )
+	{
+		ent = theLevel.getEntity(i);
+		if( !ent || !ent->inuse_ ) 
 			continue;
-		}
 
 		// clear events that are too old
-		if ( level.time - ent->eventTime > EVENT_VALID_MSEC ) {
-			if ( ent->s.event ) {
+		if( theLevel.time_ - ent->eventTime_ > EVENT_VALID_MSEC ) 
+		{
+			if( ent->s.event ) 
+			{
 				ent->s.event = 0;	// &= EV_EVENT_BITS;
-				if ( ent->client ) {
-					ent->client->ps.externalEvent = 0;
+				if( ent->client_ ) 
+				{
+					ent->client_->ps_.externalEvent = 0;
 					// predicted events should never be set to zero
 					//ent->client->ps.events[0] = 0;
 					//ent->client->ps.events[1] = 0;
 				}
 			}
-			if ( ent->freeAfterEvent ) {
+			if( ent->freeAfterEvent_ ) 
+			{
 				// tempEntities or dropped items completely go away after their event
-				G_FreeEntity( ent );
+				ent->freeUp();// former G_FreeEntity
 				continue;
-			} else if ( ent->unlinkAfterEvent ) {
+			} 
+			else if( ent->unlinkAfterEvent_ ) 
+			{
 				// items that will respawn will hide themselves after their pickup event
-				ent->unlinkAfterEvent = false;
-				SV_UnlinkEntity( &ent->s, &ent->r );
+				ent->unlinkAfterEvent_ = false;
+				SV_UnlinkEntity( ent );
 			}
 		}
-
 		// temporary entities don't think
-		if ( ent->freeAfterEvent ) {
+		if( ent->freeAfterEvent_ ) 
 			continue;
-		}
-
-		if ( !ent->r.linked && ent->neverFree ) {
+		if( !ent->r.linked ) //&& ent->neverFree_ ) 
 			continue;
-		}
-
-		if ( ent->s.eType == ET_MISSILE ||
-			 ent->s.eType == ET_BULLET ) {
+		if( ent->s.eType == ET_MISSILE ||
+			 ent->s.eType == ET_BULLET ) 
+		{
 			G_RunMissile( ent );
 			continue;
 		}
-
-		if ( ent->s.eType == ET_ITEM || ent->physicsObject ) {
+		if( ent->s.eType == ET_ITEM || ent->physicsObject_ ) 
+		{
 			G_RunItem( ent );
 			continue;
 		}
-
-		if ( ent->s.eType == ET_MOVER ) {
+		if( ent->s.eType == ET_MOVER )
+		{
 			G_RunMover( ent );
 			continue;
 		}
-
-		if ( i < MAX_CLIENTS ) {
+		if( ent->client_ )
+		{
 			G_RunClient( ent );
 			continue;
 		}
-
 		G_RunThink( ent );
 	}
-end = Sys_Milliseconds();
+	int end = Sys_Milliseconds();
 
-start = Sys_Milliseconds();
+	start = Sys_Milliseconds();
 	// perform final fixups on the players
-	ent = &g_entities[0];
-	for (i=0 ; i < level.maxclients ; i++, ent++ ) {
-		if ( ent->inuse ) {
+	//ent = &g_entities[0];
+	for( i=1 ; i <= theLevel.maxclients_ ; i++ ) 
+	{
+		ent = theLevel.getEntity(i);
+		if( ent && ent->inuse_ ) 
 			ClientEndFrame( ent );
-		}
 	}
-end = Sys_Milliseconds();
+	end = Sys_Milliseconds();
 
 	// see if it is time to do a tournement restart
 	CheckTournament();
@@ -1650,15 +1713,18 @@ end = Sys_Milliseconds();
 	CheckVote();
 
 	// check team votes
-	CheckTeamVote( TEAM_RED );
-	CheckTeamVote( TEAM_BLUE );
+	CheckTeamVote( ClientBase::TEAM_RED );
+	CheckTeamVote( ClientBase::TEAM_BLUE );
 
 	// for tracking changes
 	CheckCvars();
 
-	if (g_listEntity.integer) {
-		for (i = 0; i < MAX_GENTITIES; i++) {
-			Com_Printf("%4i: %s\n", i, g_entities[i].classname);
+	if( g_listEntity.integer ) 
+	{
+		for( i = 0; i < MAX_GENTITIES; i++ )
+		{
+			ent = theLevel.getEntity(i);
+			Com_Printf("%4i: %s\n", i, ent->classname_);
 		}
 		Cvar_Set("g_listEntity", "0");
 	}

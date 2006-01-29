@@ -1099,16 +1099,6 @@ plyer_state_t communication
 // using the stringizing operator to save typing...
 #define	PSF(x) #x,(int)&((playerState_t*)0)->x
 
-/*
-typedef struct playerState_s {
-	int			stats[MAX_STATS];
-	int			persistant[MAX_PERSISTANT];	// stats that aren't cleared on death
-	int			timers[MAX_TIMERS];			// MFQ3 timers etc
-	int			ammo[MAX_WEAPONS_PER_VEHICLE*2];// 0-7 actual ammo of weapon 8-15 maxammo of weapon
-} playerState_t;
-
-
-*/
 
 netField_t	playerStateFields[] = 
 {

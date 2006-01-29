@@ -1,5 +1,5 @@
 /*
- * $Id: bg_planemove.c,v 1.5 2005-11-21 17:28:20 thebjoern Exp $
+ * $Id: bg_planemove.c,v 1.6 2006-01-29 14:03:41 thebjoern Exp $
 */
 
 #include "q_shared.h"
@@ -691,9 +691,6 @@ void PM_PlaneMoveAdvanced( void )
 	    else 
 		{
 //			Com_Printf("moves: %d %d %d\n", pm->cmd.forwardmove, pm->cmd.rightmove, pm->cmd.upmove );
-#ifdef HIER_BUB
-	Du dummer Bub!
-#endif
 
 			ratepitch = (float)pm->cmd.forwardmove/127;
 			rateyaw = (float)pm->cmd.upmove/127;

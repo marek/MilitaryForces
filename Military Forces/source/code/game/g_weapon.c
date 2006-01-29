@@ -1,5 +1,5 @@
 /*
- * $Id: g_weapon.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: g_weapon.c,v 1.3 2006-01-29 14:03:41 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -8,6 +8,7 @@
 // perform the server side effects of a weapon firing
 
 #include "g_local.h"
+#include "g_entity.h"
 
 /*
 ================
@@ -15,7 +16,8 @@ G_BounceProjectile
 ================
 */
 // might later be of use for MFQ3
-void G_BounceProjectile( vec3_t start, vec3_t impact, vec3_t dir, vec3_t endout ) {
+void G_BounceProjectile( vec3_t start, vec3_t impact, vec3_t dir, vec3_t endout ) 
+{
 	vec3_t v, newv;
 	float dot;
 
@@ -38,15 +40,16 @@ rather than blindly truncating.  This prevents it from truncating
 into a wall.
 ======================
 */
-void SnapVectorTowards( vec3_t v, vec3_t to ) {
+void SnapVectorTowards( vec3_t v, vec3_t to ) 
+{
 	int		i;
 
-	for ( i = 0 ; i < 3 ; i++ ) {
-		if ( to[i] <= v[i] ) {
+	for ( i = 0 ; i < 3 ; i++ ) 
+	{
+		if ( to[i] <= v[i] ) 
 			v[i] = (int)v[i];
-		} else {
+		else 
 			v[i] = (int)v[i] + 1;
-		}
 	}
 }
 
@@ -55,30 +58,25 @@ void SnapVectorTowards( vec3_t v, vec3_t to ) {
 LogAccuracyHit
 ===============
 */
-bool LogAccuracyHit( gentity_t *target, gentity_t *attacker ) {
-	if( !target->takedamage ) {
+bool LogAccuracyHit( GameEntity* target, GameEntity* attacker )
+{
+	if( !target->takedamage_ ) 
 		return false;
-	}
 
-	if ( target == attacker ) {
+	if ( target == attacker ) 
 		return false;
-	}
 
-	if( !target->client ) {
+	if( !target->client_ ) 
 		return false;
-	}
 
-	if( !attacker->client ) {
+	if( !attacker->client_ ) 
 		return false;
-	}
 
-	if( target->client->ps.stats[STAT_HEALTH] <= 0 ) {
+	if( target->client_->ps_.stats[STAT_HEALTH] <= 0 ) 
 		return false;
-	}
 
-	if ( OnSameTeam( target, attacker ) ) {
+	if ( OnSameTeam( target, attacker ) ) 
 		return false;
-	}
 
 	return true;
 }
@@ -89,11 +87,13 @@ bool LogAccuracyHit( gentity_t *target, gentity_t *attacker ) {
 FireWeapon
 ===============
 */
-void FireWeapon( gentity_t *ent ) {
-	ent->client->accuracy_shots++;
+void FireWeapon( GameEntity *ent ) 
+{
+	ent->client_->accuracy_shots_++;
 
 	// fire the specific weapon
-	switch( availableWeapons[ent->s.weaponIndex].type ) {
+	switch( availableWeapons[ent->s.weaponIndex].type ) 
+	{
 	case WT_ANTIAIRMISSILE:
 		fire_antiair( ent );
 		break;
@@ -110,9 +110,8 @@ void FireWeapon( gentity_t *ent ) {
 		break;
 	case WT_MACHINEGUN:
 		fire_autocannon(ent, true);
-		if( availableVehicles[ent->client->vehicle].caps & HC_DUALGUNS ) {
+		if( availableVehicles[ent->client_->vehicle_].caps & HC_DUALGUNS ) 
 			fire_autocannon(ent, true);
-		}
 		break;
 	case WT_BALLISTICGUN:
 		fire_maingun( ent );
@@ -147,12 +146,14 @@ void FireWeapon( gentity_t *ent ) {
 FireWeapon_GI
 ===============
 */
-void FireWeapon_GI( gentity_t *ent ) {
+void FireWeapon_GI( GameEntity *ent ) 
+{
 	if(ent->s.eType != ET_MISC_VEHICLE)
-		ent->client->accuracy_shots++;
+		ent->client_->accuracy_shots_++;
 
 	// fire the specific weapon
-	switch( availableWeapons[ent->s.weaponIndex].type ) {
+	switch( availableWeapons[ent->s.weaponIndex].type )
+	{
 	case WT_ANTIAIRMISSILE:
 		LaunchMissile_GI( ent );
 		break;

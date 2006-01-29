@@ -406,37 +406,44 @@ void CL_ParseGamestate( msg_t *msg ) {
 	while ( 1 ) {
 		cmd = MSG_ReadByte( msg );
 
-		if ( cmd == svc_EOF ) {
+		// debug line
+		if( cmd == -1 )
+			int debug = 1;
+
+		if( cmd == svc_EOF ) 
 			break;
-		}
 		
-		if ( cmd == svc_configstring ) {
+		if( cmd == svc_configstring ) 
+		{
 			int		len;
 
 			i = MSG_ReadShort( msg );
-			if ( i < 0 || i >= MAX_CONFIGSTRINGS ) {
+			if ( i < 0 || i >= MAX_CONFIGSTRINGS ) 
 				Com_Error( ERR_DROP, "configstring > MAX_CONFIGSTRINGS" );
-			}
+
 			s = MSG_ReadBigString( msg );
 			len = strlen( s );
 
-			if ( len + 1 + cl.gameState.dataCount > MAX_GAMESTATE_CHARS ) {
+			if ( len + 1 + cl.gameState.dataCount > MAX_GAMESTATE_CHARS ) 
 				Com_Error( ERR_DROP, "MAX_GAMESTATE_CHARS exceeded" );
-			}
 
 			// append it to the gameState string buffer
 			cl.gameState.stringOffsets[ i ] = cl.gameState.dataCount;
 			Com_Memcpy( cl.gameState.stringData + cl.gameState.dataCount, s, len + 1 );
 			cl.gameState.dataCount += len + 1;
-		} else if ( cmd == svc_baseline ) {
+		}
+		else if( cmd == svc_baseline )
+		{
 			newnum = MSG_ReadBits( msg, GENTITYNUM_BITS );
-			if ( newnum < 0 || newnum >= MAX_GENTITIES ) {
+			if ( newnum < 0 || newnum >= MAX_GENTITIES ) 
 				Com_Error( ERR_DROP, "Baseline number out of range: %i", newnum );
-			}
+
 			Com_Memset (&nullstate, 0, sizeof(nullstate));
 			es = &cl.entityBaselines[ newnum ];
 			MSG_ReadDeltaEntity( msg, &nullstate, es, newnum );
-		} else {
+		} 
+		else 
+		{
 			Com_Error( ERR_DROP, "CL_ParseGamestate: bad command byte" );
 		}
 	}

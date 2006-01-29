@@ -1,5 +1,5 @@
 /*
- * $Id: g_svcmds.c,v 1.5 2005-11-21 17:28:20 thebjoern Exp $
+ * $Id: g_svcmds.c,v 1.6 2006-01-29 14:03:41 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -8,7 +8,7 @@
 // this file holds commands that can be executed by the server console, but not remote clients
 
 #include "g_local.h"
-
+#include "g_level.h"
 
 /*
 ==============================================================================
@@ -105,7 +105,7 @@ static bool StringToFilter (char *s, ipFilter_t *f)
 UpdateIPBans
 =================
 */
-static void UpdateIPBans (void)
+static void UpdateIPBans ()
 {
 	byte	b[4];
 	int		i;
@@ -192,7 +192,7 @@ static void AddIP( char *str )
 G_ProcessIPBans
 =================
 */
-void G_ProcessIPBans(void) 
+void G_ProcessIPBans() 
 {
 	char *s, *t;
 	char		str[MAX_TOKEN_CHARS];
@@ -217,7 +217,7 @@ void G_ProcessIPBans(void)
 Svcmd_AddIP_f
 =================
 */
-void Svcmd_AddIP_f (void)
+void Svcmd_AddIP_f ()
 {
 	char		str[MAX_TOKEN_CHARS];
 
@@ -237,7 +237,7 @@ void Svcmd_AddIP_f (void)
 Svcmd_RemoveIP_f
 =================
 */
-void Svcmd_RemoveIP_f (void)
+void Svcmd_RemoveIP_f ()
 {
 	ipFilter_t	f;
 	int			i;
@@ -272,17 +272,18 @@ void Svcmd_RemoveIP_f (void)
 Svcmd_EntityList_f
 ===================
 */
-void	Svcmd_EntityList_f (void) {
-	int			e;
-	gentity_t		*check;
+void Svcmd_EntityList_f() 
+{
+	for( int e = 1; e < theLevel.num_entities_ ; e++ ) //, check++ ) 
+	{
+		GameEntity* check = theLevel.getEntity(e);// g_entities+1;
 
-	check = g_entities+1;
-	for (e = 1; e < level.num_entities ; e++, check++) {
-		if ( !check->inuse ) {
+		if ( !check || !check->inuse_ ) 
 			continue;
-		}
+
 		Com_Printf("%3i:", e);
-		switch ( check->s.eType ) {
+		switch ( check->s.eType ) 
+		{
 		case ET_GENERAL:
 			Com_Printf("ET_GENERAL          ");
 			break;
@@ -333,28 +334,32 @@ void	Svcmd_EntityList_f (void) {
 			break;
 		}
 
-		if ( check->classname ) {
-			Com_Printf("%s", check->classname);
-		}
+		if ( check->classname_ ) 
+			Com_Printf("%s", check->classname_);
+
 		Com_Printf("\n");
 	}
 }
 
-gclient_t	*ClientForString( const char *s ) {
-	gclient_t	*cl;
+GameClient* ClientForString( const char *s ) 
+{
+	GameClient*	cl;
 	int			i;
 	int			idnum;
 
 	// numeric values are just slot numbers
-	if ( s[0] >= '0' && s[0] <= '9' ) {
+	if ( s[0] >= '0' && s[0] <= '9' ) 
+	{
 		idnum = atoi( s );
-		if ( idnum < 0 || idnum >= level.maxclients ) {
+		if ( idnum < 1 || idnum > theLevel.maxclients_ ) 
+		{
 			Com_Printf( "Bad client slot: %i\n", idnum );
 			return NULL;
 		}
 
-		cl = &level.clients[idnum];
-		if ( cl->pers.connected == CON_DISCONNECTED ) {
+		cl = theLevel.getClient(idnum);// &level.clients[idnum];
+		if( cl && cl->pers_.connected_ == GameClient::ClientPersistant::CON_DISCONNECTED ) 
+		{
 			Com_Printf( "Client %i is not connected\n", idnum );
 			return NULL;
 		}
@@ -362,14 +367,14 @@ gclient_t	*ClientForString( const char *s ) {
 	}
 
 	// check for a name match
-	for ( i=0 ; i < level.maxclients ; i++ ) {
-		cl = &level.clients[i];
-		if ( cl->pers.connected == CON_DISCONNECTED ) {
+	for( i=1 ; i <= theLevel.maxclients_ ; i++ ) 
+	{
+		cl = theLevel.getClient(i);// &level.clients[i];
+		if ( !cl || cl->pers_.connected_ == GameClient::ClientPersistant::CON_DISCONNECTED ) 
 			continue;
-		}
-		if ( !Q_stricmp( cl->pers.netname, s ) ) {
+
+		if ( !Q_stricmp( cl->pers_.netname_, s ) ) 
 			return cl;
-		}
 	}
 
 	Com_Printf( "User %s is not on the server\n", s );
@@ -384,23 +389,23 @@ Svcmd_ForceTeam_f
 forceteam <player> <team>
 ===================
 */
-void	Svcmd_ForceTeam_f( void ) {
-	gclient_t	*cl;
+void Svcmd_ForceTeam_f() 
+{
+	GameClient*	cl;
 	char		str[MAX_TOKEN_CHARS];
 
 	// find the player
 	Cmd_ArgvBuffer( 1, str, sizeof( str ) );
 	cl = ClientForString( str );
-	if ( !cl ) {
+	if ( !cl ) 
 		return;
-	}
 
 	// set the team
 	Cmd_ArgvBuffer( 2, str, sizeof( str ) );
-	SetTeam( &g_entities[cl - level.clients], str );
+	SetTeam( theLevel.getEntity(cl->ps_.clientNum), str );// &g_entities[cl - level.clients], str );
 }
 
-char	*ConcatArgs( int start );
+char *ConcatArgs( int start );
 
 /*
 =================
@@ -408,22 +413,26 @@ ConsoleCommand
 
 =================
 */
-bool	ConsoleCommand() {
+bool ConsoleCommand() 
+{
 	char	cmd[MAX_TOKEN_CHARS];
 
 	Cmd_ArgvBuffer( 0, cmd, sizeof( cmd ) );
 
-	if ( Q_stricmp (cmd, "entitylist") == 0 ) {
+	if ( Q_stricmp (cmd, "entitylist") == 0 ) 
+	{
 		Svcmd_EntityList_f();
 		return true;
 	}
 
-	if ( Q_stricmp (cmd, "forceteam") == 0 ) {
+	if ( Q_stricmp (cmd, "forceteam") == 0 ) 
+	{
 		Svcmd_ForceTeam_f();
 		return true;
 	}
 
-	if (Q_stricmp (cmd, "game_memory") == 0) {
+	if (Q_stricmp (cmd, "game_memory") == 0) 
+	{
 		Svcmd_GameMem_f();
 		return true;
 	}
@@ -438,23 +447,28 @@ bool	ConsoleCommand() {
 		return true;
 	}
 */
-	if (Q_stricmp (cmd, "addip") == 0) {
+	if (Q_stricmp (cmd, "addip") == 0) 
+	{
 		Svcmd_AddIP_f();
 		return true;
 	}
 
-	if (Q_stricmp (cmd, "removeip") == 0) {
+	if (Q_stricmp (cmd, "removeip") == 0) 
+	{
 		Svcmd_RemoveIP_f();
 		return true;
 	}
 
-	if (Q_stricmp (cmd, "listip") == 0) {
+	if (Q_stricmp (cmd, "listip") == 0) 
+	{
 		Cbuf_ExecuteText( EXEC_INSERT, "g_banIPs\n" );
 		return true;
 	}
 
-	if (g_dedicated.integer) {
-		if (Q_stricmp (cmd, "say") == 0) {
+	if (g_dedicated.integer) 
+	{
+		if (Q_stricmp (cmd, "say") == 0) 
+		{
 			SV_GameSendServerCommand( -1, va("print \"^3Server:^7 %s\"", ConcatArgs(1) ) );
 			return true;
 		}

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.17 2005-11-21 17:28:20 thebjoern Exp $
+ * $Id: bg_public.h,v 1.18 2006-01-29 14:03:41 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -11,6 +11,9 @@
 
 #ifndef __BG_PUBLIC_H__
 #define __BG_PUBLIC_H__
+
+#include "../qcommon/qfiles.h"
+
 
 //#define	GAME_VERSION		"v0.9"
 #define	GAME_IDENTIFIER		"mfgame"			// use to identify mfq3 servers
@@ -412,14 +415,14 @@ typedef struct animation_s {
 	int		flipflop;			// true if animation should flipflop back to base
 } animation_t;
 
-typedef enum {
-	TEAM_FREE,
-	TEAM_RED,
-	TEAM_BLUE,
-	TEAM_SPECTATOR,
-
-	TEAM_NUM_TEAMS
-} team_t;
+//typedef enum {
+//	TEAM_FREE,
+//	TEAM_RED,
+//	TEAM_BLUE,
+//	TEAM_SPECTATOR,
+//
+//	TEAM_NUM_TEAMS
+//} team_t;
 
 // Time between location updates
 #define TEAM_LOCATION_UPDATE_TIME		1000

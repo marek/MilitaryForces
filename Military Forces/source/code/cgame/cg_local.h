@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.19 2005-11-26 10:06:29 thebjoern Exp $
+ * $Id: cg_local.h,v 1.20 2006-01-29 14:03:40 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -330,7 +330,7 @@ typedef struct {
 	bool		infoValid;
 
 	char			name[MAX_QPATH];
-	team_t			team;
+	ClientBase::eTeam team;
 
 	int				botSkill;		// 0 = not bot, 1-5 = bot
 

@@ -40,7 +40,8 @@
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
 				DebugInformationFormat="3"
-				CompileAs="2"/>
+				CompileAs="2"
+				DisableSpecificWarnings="4530"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -113,7 +114,8 @@
 				ProgramDataBaseFileName="$(IntDir)\"
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
-				CompileAs="2"/>
+				CompileAs="2"
+				DisableSpecificWarnings="4530"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -188,7 +190,8 @@
 				WarningLevel="4"
 				SuppressStartupBanner="TRUE"
 				DebugInformationFormat="3"
-				CompileAs="2"/>
+				CompileAs="2"
+				DisableSpecificWarnings="4530"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -872,6 +875,30 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\server\sv_client.cpp">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseWithDebugInfo|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\server\sv_entity.cpp">
+			</File>
+			<File
 				RelativePath="server\sv_game.c">
 				<FileConfiguration
 					Name="Debug|Win32">
@@ -946,6 +973,9 @@
 						PreprocessorDefinitions=""
 						BrowseInformation="1"/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\server\sv_server.cpp">
 			</File>
 			<File
 				RelativePath="server\sv_snapshot.c">
@@ -1192,6 +1222,15 @@
 			</File>
 			<File
 				RelativePath="game\surfaceflags.h">
+			</File>
+			<File
+				RelativePath=".\server\sv_client.h">
+			</File>
+			<File
+				RelativePath=".\server\sv_entity.h">
+			</File>
+			<File
+				RelativePath=".\server\sv_server.h">
 			</File>
 			<File
 				RelativePath="qcommon\unzip.h">

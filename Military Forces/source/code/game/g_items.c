@@ -1,11 +1,14 @@
 /*
- * $Id: g_items.c,v 1.5 2005-11-21 17:28:20 thebjoern Exp $
+ * $Id: g_items.c,v 1.6 2006-01-29 14:03:41 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
 //
 #include "g_local.h"
 #include <algorithm>
+#include "g_entity.h"
+#include "g_level.h"
+#include "g_item.h"
 
 /*
 
@@ -29,22 +32,22 @@
 
 //======================================================================
 
-int Pickup_Ammo (gentity_t *ent, gentity_t *other)
+int Pickup_Ammo( GameEntity *ent, GameEntity *other )
 {
 	int		quantity, i;
 
-	if ( ent->count ) {
-		quantity = ent->count;
-	} else {
-		quantity = ent->item->quantity;
-	}
+	if( ent->count_ ) 
+		quantity = ent->count_;
+	else 
+		quantity = ent->item_->quantity;
 
-	for( i = WP_MACHINEGUN; i <= WP_FLARE; i++ ) {
-		if( availableWeapons[availableVehicles[other->client->vehicle].weapons[i]].type == ent->item->giTag ) {
-			other->client->ps.ammo[i] += quantity;
-			if( other->client->ps.ammo[i] > other->client->ps.ammo[i+8] ) {
-				other->client->ps.ammo[i] = other->client->ps.ammo[i+8];
-			}
+	for( i = WP_MACHINEGUN; i <= WP_FLARE; i++ )
+	{
+		if( availableWeapons[availableVehicles[other->client_->vehicle_].weapons[i]].type == ent->item_->giTag )
+		{
+			other->client_->ps_.ammo[i] += quantity;
+			if( other->client_->ps_.ammo[i] > other->client_->ps_.ammo[i+8] ) 
+				other->client_->ps_.ammo[i] = other->client_->ps_.ammo[i+8];
 			break;
 		}
 	}
@@ -54,33 +57,31 @@ int Pickup_Ammo (gentity_t *ent, gentity_t *other)
 
 //======================================================================
 
-int Pickup_Health (gentity_t *ent, gentity_t *other) {
+int Pickup_Health( GameEntity *ent, GameEntity *other )
+{
 	int			max;
 	int			quantity;
 
 	// small and mega healths will go over the max
-	if ( ent->item->quantity != 5 && ent->item->quantity != 100 ) {
-		max = other->client->ps.stats[STAT_MAX_HEALTH];
-	} else {
-		max = other->client->ps.stats[STAT_MAX_HEALTH] * 2;
-	}
+	if( ent->item_->quantity != 5 && ent->item_->quantity != 100 ) 
+		max = other->client_->ps_.stats[STAT_MAX_HEALTH];
+	else 
+		max = other->client_->ps_.stats[STAT_MAX_HEALTH] * 2;
 
-	if ( ent->count ) {
-		quantity = ent->count;
-	} else {
-		quantity = ent->item->quantity;
-	}
+	if( ent->count_ ) 
+		quantity = ent->count_;
+	else 
+		quantity = ent->item_->quantity;
 
-	other->health += (other->client->ps.stats[STAT_MAX_HEALTH] * quantity / 100);
+	other->health_ += (other->client_->ps_.stats[STAT_MAX_HEALTH] * quantity / 100);
 
-	if (other->health > max ) {
-		other->health = max;
-	}
-	other->client->ps.stats[STAT_HEALTH] = other->health;
+	if( other->health_ > max ) 
+		other->health_ = max;
 
-	if ( ent->item->quantity == 100 ) {		// mega health respawns slow
+	other->client_->ps_.stats[STAT_HEALTH] = other->health_;
+
+	if( ent->item_->quantity == 100 ) 		// mega health respawns slow
 		return RESPAWN_MEGAHEALTH;
-	}
 
 	return RESPAWN_HEALTH;
 }
@@ -88,18 +89,19 @@ int Pickup_Health (gentity_t *ent, gentity_t *other) {
 
 //======================================================================
 
-int Pickup_Fuel (gentity_t *ent, gentity_t *other) {
+int Pickup_Fuel( GameEntity *ent, GameEntity *other ) 
+{
 	int			max;
 	int			quantity;
 
-	max = other->client->ps.stats[STAT_MAX_FUEL] ;
+	max = other->client_->ps_.stats[STAT_MAX_FUEL] ;
 
-	if ( ent->count )
-		quantity = ent->count;
+	if( ent->count_ )
+		quantity = ent->count_;
 	else 
-		quantity = ent->item->quantity;
+		quantity = ent->item_->quantity;
 
-	other->client->ps.stats[STAT_FUEL] = std::min(other->client->ps.stats[STAT_FUEL]+quantity,max);
+	other->client_->ps_.stats[STAT_FUEL] = std::min(other->client_->ps_.stats[STAT_FUEL]+quantity,max);
 
 	return RESPAWN_FUEL;
 }
@@ -112,166 +114,190 @@ int Pickup_Fuel (gentity_t *ent, gentity_t *other) {
 RespawnItem
 ===============
 */
-void RespawnItem( gentity_t *ent ) {
+void RespawnItem( GameEntity *ent ) 
+{
 	// randomly select from teamed entities
-	if (ent->team) {
-		gentity_t	*master;
+	if( ent->team_ ) 
+	{
+		GameEntity	*master;
 		int	count;
 		int choice;
 
-		if ( !ent->teammaster ) {
+		if( !ent->teammaster_ ) 
 			Com_Error( ERR_DROP, "RespawnItem: bad teammaster");
-		}
-		master = ent->teammaster;
 
-		for (count = 0, ent = master; ent; ent = ent->teamchain, count++)
+		master = ent->teammaster_;
+
+		for( count = 0, ent = master; ent; ent = ent->teamchain_, count++ )
 			;
 
 		choice = rand() % count;
 
-		for (count = 0, ent = master; count < choice; ent = ent->teamchain, count++)
+		for( count = 0, ent = master; count < choice; ent = ent->teamchain_, count++ )
 			;
 	}
 
 	ent->r.contents = CONTENTS_TRIGGER;
 	ent->s.eFlags &= ~EF_NODRAW;
 	ent->r.svFlags &= ~SVF_NOCLIENT;
-	SV_LinkEntity (&ent->s, &ent->r);
+	SV_LinkEntity(ent);
 
 	// play the normal respawn sound only to nearby clients
 	G_AddEvent( ent, EV_ITEM_RESPAWN, 0, true );
 
-	ent->nextthink = 0;
+	ent->nextthink_ = 0;
 }
 
+
+struct Think_RespawnItem : public GameEntity::EntityFunc_Think
+{
+	virtual void execute()
+	{
+		RespawnItem(self_);
+	}
+};
 
 /*
 ===============
 Touch_Item
 ===============
 */
-void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
-	int			respawn;
-	bool	predict;
 
-	if (!other->client)
-		return;
-	if (other->health < 1)
-		return;		// dead people can't pickup
-	if( other->client->ps.pm_type == PM_SPECTATOR )
-		return;
+struct Touch_ItemTouch : public GameEntity::EntityFunc_Touch
+{
+	virtual void execute( GameEntity *other, trace_t *trace ) 
+	{
+		int		respawn;
+		bool	predict;
 
-	// the same pickup rules are used for client side and server side
-	if ( !BG_CanItemBeGrabbed( g_gametype.integer, &ent->s, &other->client->ps, other->client->vehicle ) ) {
-		return;
-	}
+		if( !other->client_ )
+			return;
+		if( other->health_ < 1 )
+			return;		// dead people can't pickup
+		if( other->client_->ps_.pm_type == PM_SPECTATOR )
+			return;
 
-	G_LogPrintf( "Item: %i %s\n", other->s.number, ent->item->classname );
+		// the same pickup rules are used for client side and server side
+		if ( !BG_CanItemBeGrabbed( g_gametype.integer, &self_->s, &other->client_->ps_, other->client_->vehicle_ ) ) 
+			return;
 
-	predict = other->client->pers.predictItemPickup;
+		G_LogPrintf( "Item: %i %s\n", other->s.number, self_->item_->classname );
 
-	// call the item-specific pickup function
-	switch( ent->item->giType ) {
-	case IT_AMMO:
-		respawn = Pickup_Ammo(ent, other);
-		break;
-	case IT_HEALTH:
-		respawn = Pickup_Health(ent, other);
-		break;
-	case IT_FUEL:
-		respawn = Pickup_Fuel(ent, other);
-		break;
-	case IT_TEAM:
-		respawn = Pickup_Team(ent, other);
-		break;
-	default:
-		return;
-	}
+		predict = other->client_->pers_.predictItemPickup_;
 
-	if ( !respawn ) {
-		return;
-	}
-
-	// play the normal pickup sound
-	if (predict) {
-		G_AddPredictableEvent( other, EV_ITEM_PICKUP, ent->s.modelindex );
-	} else {
-		G_AddEvent( other, EV_ITEM_PICKUP, ent->s.modelindex, true );
-	}
-
-	// powerup pickups are global broadcasts
-	if ( ent->item->giType == IT_TEAM) {
-		// if we want the global sound to play
-		if (!ent->speed) {
-			gentity_t	*te;
-
-			te = G_TempEntity( ent->s.pos.trBase, EV_GLOBAL_ITEM_PICKUP );
-			te->s.eventParm = ent->s.modelindex;
-			te->r.svFlags |= SVF_BROADCAST;
-		} else {
-			gentity_t	*te;
-
-			te = G_TempEntity( ent->s.pos.trBase, EV_GLOBAL_ITEM_PICKUP );
-			te->s.eventParm = ent->s.modelindex;
-			// only send this temp entity to a single client
-			te->r.svFlags |= SVF_SINGLECLIENT;
-			te->r.singleClient = other->s.number;
+		// call the item-specific pickup function
+		switch( self_->item_->giType )
+		{
+		case IT_AMMO:
+			respawn = Pickup_Ammo(self_, other);
+			break;
+		case IT_HEALTH:
+			respawn = Pickup_Health(self_, other);
+			break;
+		case IT_FUEL:
+			respawn = Pickup_Fuel(self_, other);
+			break;
+		case IT_TEAM:
+			respawn = Pickup_Team(self_, other);
+			break;
+		default:
+			return;
 		}
-	}
 
-	// fire item targets
-	G_UseTargets (ent, other);
+		if ( !respawn ) 
+			return;
 
-	// wait of -1 will not respawn
-	if ( ent->wait == -1 ) {
-		ent->r.svFlags |= SVF_NOCLIENT;
-		ent->s.eFlags |= EF_NODRAW;
-		ent->r.contents = 0;
-		ent->unlinkAfterEvent = true;
-		return;
-	}
+		// play the normal pickup sound
+		if( predict ) 
+			G_AddPredictableEvent( other, EV_ITEM_PICKUP, self_->s.modelindex );
+		else 
+			G_AddEvent( other, EV_ITEM_PICKUP, self_->s.modelindex, true );
 
-	// non zero wait overrides respawn time
-	if ( ent->wait ) {
-		respawn = ent->wait;
-	}
-
-	// random can be used to vary the respawn time
-	if ( ent->random ) {
-		respawn += crandom() * ent->random;
-		if ( respawn < 1 ) {
-			respawn = 1;
+		// powerup pickups are global broadcasts
+		if( self_->item_->giType == IT_TEAM) 
+		{
+			// if we want the global sound to play
+			if( !self_->speed_ ) 
+			{
+				GameEntity	*te;
+				te = G_TempEntity( self_->s.pos.trBase, EV_GLOBAL_ITEM_PICKUP );
+				te->s.eventParm = self_->s.modelindex;
+				te->r.svFlags |= SVF_BROADCAST;
+			} 
+			else 
+			{
+				GameEntity	*te;
+				te = G_TempEntity( self_->s.pos.trBase, EV_GLOBAL_ITEM_PICKUP );
+				te->s.eventParm = self_->s.modelindex;
+				// only send this temp entity to a single client
+				te->r.svFlags |= SVF_SINGLECLIENT;
+				te->r.singleClient = other->s.number;
+			}
 		}
+
+		// fire item targets
+		G_UseTargets (self_, other);
+
+		// wait of -1 will not respawn
+		if( self_->wait_ == -1 ) 
+		{
+			self_->r.svFlags |= SVF_NOCLIENT;
+			self_->s.eFlags |= EF_NODRAW;
+			self_->r.contents = 0;
+			self_->unlinkAfterEvent_ = true;
+			return;
+		}
+
+		// non zero wait overrides respawn time
+		if( self_->wait_ ) 
+			respawn = self_->wait_;
+
+		// random can be used to vary the respawn time
+		if( self_->random_ ) 
+		{
+			respawn += crandom() * self_->random_;
+			if ( respawn < 1 ) 
+				respawn = 1;
+		}
+
+		// dropped items will not respawn
+		if( self_->flags_ & FL_DROPPED_ITEM ) 
+			self_->freeAfterEvent_ = true;
+
+		// picked up items still stay around, they just don't
+		// draw anything.  This allows respawnable items
+		// to be placed on movers.
+		self_->r.svFlags |= SVF_NOCLIENT;
+		self_->s.eFlags |= EF_NODRAW;
+		self_->r.contents = 0;
+
+		// ZOID
+		// A negative respawn times means to never respawn this item (but don't 
+		// delete it).  This is used by items that are respawned by third party 
+		// events such as ctf flags
+		if( respawn <= 0 ) 
+		{
+			self_->nextthink_ = 0;
+			self_->setThink(0);
+		} 
+		else 
+		{
+			self_->nextthink_ = theLevel.time_ + respawn * 1000;
+			self_->setThink(new Think_RespawnItem);
+		}
+		SV_LinkEntity( self_ );
 	}
-
-	// dropped items will not respawn
-	if ( ent->flags & FL_DROPPED_ITEM ) {
-		ent->freeAfterEvent = true;
-	}
-
-	// picked up items still stay around, they just don't
-	// draw anything.  This allows respawnable items
-	// to be placed on movers.
-	ent->r.svFlags |= SVF_NOCLIENT;
-	ent->s.eFlags |= EF_NODRAW;
-	ent->r.contents = 0;
-
-	// ZOID
-	// A negative respawn times means to never respawn this item (but don't 
-	// delete it).  This is used by items that are respawned by third party 
-	// events such as ctf flags
-	if ( respawn <= 0 ) {
-		ent->nextthink = 0;
-		ent->think = 0;
-	} else {
-		ent->nextthink = level.time + respawn * 1000;
-		ent->think = RespawnItem;
-	}
-	SV_LinkEntity( &ent->s, &ent->r );
-}
-
+};
 
 //======================================================================
+
+struct Think_Team_DroppedFlagThink : public GameEntity::EntityFunc_Think
+{
+	virtual void execute()
+	{
+		Team_DroppedFlagThink(self_);
+	}
+};
 
 /*
 ================
@@ -280,42 +306,48 @@ LaunchItem
 Spawns an item and tosses it forward
 ================
 */
-gentity_t *LaunchItem( gitem_t *item, vec3_t origin, vec3_t velocity ) {
-	gentity_t	*dropped;
+GameEntity *LaunchItem( gitem_t *item, vec3_t origin, vec3_t velocity ) 
+{
+	GameEntity	*dropped;
 
-	dropped = G_Spawn();
+	dropped = theLevel.spawnEntity();
 
 	dropped->s.eType = ET_ITEM;
 	dropped->s.modelindex = item - bg_itemlist;	// store item number in modelindex
 	dropped->s.modelindex2 = 1; // This is non-zero is it's a dropped item
 
-	dropped->classname = item->classname;
-	dropped->item = item;
-	VectorSet (dropped->r.mins, -ITEM_RADIUS, -ITEM_RADIUS, -ITEM_RADIUS);
-	VectorSet (dropped->r.maxs, ITEM_RADIUS, ITEM_RADIUS, ITEM_RADIUS);
+	dropped->classname_ = item->classname;
+	dropped->item_ = item;
+	VectorSet( dropped->r.mins, -ITEM_RADIUS, -ITEM_RADIUS, -ITEM_RADIUS );
+	VectorSet( dropped->r.maxs, ITEM_RADIUS, ITEM_RADIUS, ITEM_RADIUS );
 	dropped->r.contents = CONTENTS_TRIGGER;
 
-	dropped->touch = Touch_Item;
+	dropped->setTouch(new Touch_ItemTouch);
 
 	G_SetOrigin( dropped, origin );
 	dropped->s.pos.trType = TR_GRAVITY;
-	dropped->s.pos.trTime = level.time;
+	dropped->s.pos.trTime = theLevel.time_;
 	VectorCopy( velocity, dropped->s.pos.trDelta );
 
 	dropped->s.eFlags |= EF_BOUNCE_HALF;
 
-	if (g_gametype.integer == GT_CTF && item->giType == IT_TEAM) { // Special case for CTF flags
-		dropped->think = Team_DroppedFlagThink;
-		dropped->nextthink = level.time + 180000;
+	if( g_gametype.integer == GT_CTF && item->giType == IT_TEAM) 
+	{ 
+		// Special case for CTF flags
+		dropped->setThink(new Think_Team_DroppedFlagThink);
+		dropped->nextthink_ = theLevel.time_ + 180000;
 		Team_CheckDroppedItem( dropped );
-	} else { // auto-remove after 30 seconds
-		dropped->think = G_FreeEntity;
-		dropped->nextthink = level.time + 30000;
+	} 
+	else
+	{
+		// auto-remove after 30 seconds
+		dropped->setThink(new GameEntity::EntityFunc_Free);
+		dropped->nextthink_ = theLevel.time_ + 30000;
 	}
 
-	dropped->flags = FL_DROPPED_ITEM;
+	dropped->flags_ = FL_DROPPED_ITEM;
 
-	SV_LinkEntity (&dropped->s, &dropped->r);
+	SV_LinkEntity( dropped );
 
 	return dropped;
 }
@@ -327,7 +359,8 @@ Drop_Item
 Spawns an item and tosses it forward
 ================
 */
-gentity_t *Drop_Item( gentity_t *ent, gitem_t *item, float angle ) {
+GameEntity *Drop_Item( GameEntity *ent, gitem_t *item, float angle ) 
+{
 	vec3_t	velocity;
 	vec3_t	angles;
 
@@ -350,9 +383,13 @@ Use_Item
 Respawn the item
 ================
 */
-void Use_Item( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
-	RespawnItem( ent );
-}
+struct Use_ItemUse : public GameEntity::EntityFunc_Use
+{
+	virtual void execute( GameEntity *other, GameEntity *activator )
+	{
+		RespawnItem( self_ );
+	}
+};
 
 //======================================================================
 
@@ -364,52 +401,58 @@ Traces down to find where an item should rest, instead of letting them
 free fall from their spawn points
 ================
 */
-void FinishSpawningItem( gentity_t *ent ) {
+void GameItem::Think_FinishSpawningItem::execute() 
+{
 	trace_t		tr;
 	vec3_t		dest;
 
-	VectorSet( ent->r.mins, -ITEM_RADIUS, -ITEM_RADIUS, -ITEM_RADIUS );
-	VectorSet( ent->r.maxs, ITEM_RADIUS, ITEM_RADIUS, ITEM_RADIUS );
+	VectorSet( self_->r.mins, -ITEM_RADIUS, -ITEM_RADIUS, -ITEM_RADIUS );
+	VectorSet( self_->r.maxs, ITEM_RADIUS, ITEM_RADIUS, ITEM_RADIUS );
 
-	ent->s.eType = ET_ITEM;
-	ent->s.modelindex = ent->item - bg_itemlist;		// store item number in modelindex
-	ent->s.modelindex2 = 0; // zero indicates this isn't a dropped item
+	self_->s.eType = ET_ITEM;
+	self_->s.modelindex = self_->item_ - bg_itemlist;		// store item number in modelindex
+	self_->s.modelindex2 = 0; // zero indicates this isn't a dropped item
 
-	ent->r.contents = CONTENTS_TRIGGER;
-	ent->touch = Touch_Item;
+	self_->r.contents = CONTENTS_TRIGGER;
+	self_->setTouch(new Touch_ItemTouch);
 
 	// useing an item causes it to respawn
-	ent->use = Use_Item;
+	self_->setUse(new Use_ItemUse);
 
-	if ( ent->spawnflags & 1 ) {
+	if( self_->spawnflags_ & 1 ) 
+	{
 		// suspended
-		G_SetOrigin( ent, ent->s.origin );
-	} else {
+		G_SetOrigin( self_, self_->s.origin );
+	} 
+	else 
+	{
 		// drop to floor
-		VectorSet( dest, ent->s.origin[0], ent->s.origin[1], ent->s.origin[2] - 4096 );
-		SV_Trace( &tr, ent->s.origin, ent->r.mins, ent->r.maxs, dest, ent->s.number, MASK_SOLID, false );
-		if ( tr.startsolid ) {
-			Com_Printf ("FinishSpawningItem: %s startsolid at %s\n", ent->classname, vtos(ent->s.origin));
-			G_FreeEntity( ent );
+		VectorSet( dest, self_->s.origin[0], self_->s.origin[1], self_->s.origin[2] - 4096 );
+		SV_Trace( &tr, self_->s.origin, self_->r.mins, self_->r.maxs, dest, self_->s.number, MASK_SOLID, false );
+		if( tr.startsolid ) 
+		{
+			Com_Printf ("FinishSpawningItem: %s startsolid at %s\n", self_->classname_, vtos(self_->s.origin));
+			//theLevel.removeEntity(self_);
+			self_->freeUp();
 			return;
 		}
 
 		// allow to ride movers
-		ent->s.groundEntityNum = tr.entityNum;
+		self_->s.groundEntityNum = tr.entityNum;
 
-		G_SetOrigin( ent, tr.endpos );
+		G_SetOrigin( self_, tr.endpos );
 	}
 
 	// team slaves and targeted items aren't present at start
-	if ( ( ent->flags & FL_TEAMSLAVE ) || ent->targetname ) {
-		ent->s.eFlags |= EF_NODRAW;
-		ent->r.contents = 0;
+	if( ( self_->flags_ & FL_TEAMSLAVE ) || self_->targetname_ ) 
+	{
+		self_->s.eFlags |= EF_NODRAW;
+		self_->r.contents = 0;
 		return;
 	}
 
-	SV_LinkEntity (&ent->s, &ent->r);
+	SV_LinkEntity( self_ );
 }
-
 
 bool	itemRegistered[MAX_ITEMS];
 
@@ -418,7 +461,8 @@ bool	itemRegistered[MAX_ITEMS];
 G_CheckTeamItems
 ==================
 */
-void G_CheckTeamItems( void ) {
+void G_CheckTeamItems() 
+{
 
 	// Set up team stuff
 	Team_InitGame();
@@ -443,7 +487,8 @@ void G_CheckTeamItems( void ) {
 ClearRegisteredItems
 ==============
 */
-void ClearRegisteredItems( void ) {
+void ClearRegisteredItems() 
+{
 #pragma message("this should probably be removed!")
 	memset( itemRegistered, 0, sizeof( itemRegistered ) );
 	// Always load health/ammo/fuel pickups
@@ -465,7 +510,8 @@ RegisterItem
 The item will be added to the precache list
 ===============
 */
-void RegisterItem( gitem_t *item ) {
+void RegisterItem( gitem_t *item )
+{
 	if ( !item ) {
 		Com_Error( ERR_DROP, "RegisterItem: NULL" );
 	}
@@ -481,17 +527,22 @@ Write the needed items to a config string
 so the client will know which ones to precache
 ===============
 */
-void SaveRegisteredItems( void ) {
+void SaveRegisteredItems()
+{
 	char	string[MAX_ITEMS+1];
 	int		i;
 	int		count;
 
 	count = 0;
-	for ( i = 0 ; i < bg_numItems ; i++ ) {
-		if ( itemRegistered[i] ) {
+	for ( i = 0 ; i < bg_numItems ; i++ )
+	{
+		if ( itemRegistered[i] )
+		{
 			count++;
 			string[i] = '1';
-		} else {
+		} 
+		else 
+		{
 			string[i] = '0';
 		}
 	}
@@ -501,32 +552,33 @@ void SaveRegisteredItems( void ) {
 	SV_SetConfigstring(CS_ITEMS, string);
 }
 
-/*
-============
-G_SpawnItem
-
-Sets the clipping size and plants the object on the floor.
-
-Items can't be immediately dropped to floor, because they might
-be on an entity that hasn't spawned yet.
-============
-*/
-void G_SpawnItem (gentity_t *ent, gitem_t *item) {
-	G_SpawnFloat( "random", "0", &ent->random );
-	G_SpawnFloat( "wait", "0", &ent->wait );
-
-	RegisterItem( item );
-//	if ( G_ItemDisabled(item) )		// MFQ3
-//		return;
-
-	ent->item = item;
-	// some movers spawn on the second frame, so delay item
-	// spawns until the third frame so they can ride trains
-	ent->nextthink = level.time + FRAMETIME * 2;
-	ent->think = FinishSpawningItem;
-
-	ent->physicsBounce = 0.50;		// items are bouncy
-}
+///*
+//============
+//G_SpawnItem
+//
+//Sets the clipping size and plants the object on the floor.
+//
+//Items can't be immediately dropped to floor, because they might
+//be on an entity that hasn't spawned yet.
+//============
+//*/
+//void G_SpawnItem( SpawnFieldHolder *sfh, gitem_t *item ) 
+//{
+//	G_SpawnFloat( "random", "0", &ent->random_ );
+//	G_SpawnFloat( "wait", "0", &ent->wait_ );
+//
+//	RegisterItem( item );
+////	if ( G_ItemDisabled(item) )		// MFQ3
+////		return;
+//
+//	ent->item_ = item;
+//	// some movers spawn on the second frame, so delay item
+//	// spawns until the third frame so they can ride trains
+//	ent->nextthink_ = theLevel.time_ + FRAMETIME * 2;
+//	ent->setThink(new Think_FinishSpawningItem);
+//
+//	ent->physicsBounce_ = 0.50;		// items are bouncy
+//}
 
 
 /*
@@ -535,22 +587,24 @@ G_BounceItem
 
 ================
 */
-void G_BounceItem( gentity_t *ent, trace_t *trace ) {
+void G_BounceItem( GameEntity *ent, trace_t *trace ) 
+{
 	vec3_t	velocity;
 	float	dot;
 	int		hitTime;
 
 	// reflect the velocity on the trace plane
-	hitTime = level.previousTime + ( level.time - level.previousTime ) * trace->fraction;
+	hitTime = theLevel.previousTime_ + ( theLevel.time_ - theLevel.previousTime_ ) * trace->fraction;
 	BG_EvaluateTrajectoryDelta( &ent->s.pos, hitTime, velocity );
 	dot = DotProduct( velocity, trace->plane.normal );
 	VectorMA( velocity, -2*dot, trace->plane.normal, ent->s.pos.trDelta );
 
 	// cut the velocity to keep from bouncing forever
-	VectorScale( ent->s.pos.trDelta, ent->physicsBounce, ent->s.pos.trDelta );
+	VectorScale( ent->s.pos.trDelta, ent->physicsBounce_, ent->s.pos.trDelta );
 
 	// check for stop
-	if ( trace->plane.normal[2] > 0 && ent->s.pos.trDelta[2] < 40 ) {
+	if( trace->plane.normal[2] > 0 && ent->s.pos.trDelta[2] < 40 )
+	{
 		trace->endpos[2] += 1.0;	// make sure it is off ground
 		SnapVector( trace->endpos );
 		G_SetOrigin( ent, trace->endpos );
@@ -560,7 +614,7 @@ void G_BounceItem( gentity_t *ent, trace_t *trace ) {
 
 	VectorAdd( ent->r.currentOrigin, trace->plane.normal, ent->r.currentOrigin);
 	VectorCopy( ent->r.currentOrigin, ent->s.pos.trBase );
-	ent->s.pos.trTime = level.time;
+	ent->s.pos.trTime = theLevel.time_;
 }
 
 
@@ -570,61 +624,63 @@ G_RunItem
 
 ================
 */
-void G_RunItem( gentity_t *ent ) {
+void G_RunItem( GameEntity *ent )
+{
 	vec3_t		origin;
 	trace_t		tr;
 	int			contents;
 	int			mask;
 
 	// if groundentity has been set to -1, it may have been pushed off an edge
-	if ( ent->s.groundEntityNum == -1 ) {
-		if ( ent->s.pos.trType != TR_GRAVITY ) {
+	if ( ent->s.groundEntityNum == -1 ) 
+	{
+		if ( ent->s.pos.trType != TR_GRAVITY )
+		{
 			ent->s.pos.trType = TR_GRAVITY;
-			ent->s.pos.trTime = level.time;
+			ent->s.pos.trTime = theLevel.time_;
 		}
 	}
 
-	if ( ent->s.pos.trType == TR_STATIONARY ) {
+	if ( ent->s.pos.trType == TR_STATIONARY )
+	{
 		// check think function
 		G_RunThink( ent );
 		return;
 	}
 
 	// get current position
-	BG_EvaluateTrajectory( &ent->s.pos, level.time, origin );
+	BG_EvaluateTrajectory( &ent->s.pos, theLevel.time_, origin );
 
 	// trace a line from the previous position to the current position
-	if ( ent->clipmask ) {
-		mask = ent->clipmask;
-	} else {
+	if ( ent->clipmask_ ) 
+		mask = ent->clipmask_;
+	else 
 		mask = MASK_PLAYERSOLID & ~CONTENTS_BODY;//MASK_SOLID;
-	}
+
 	SV_Trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, origin, 
 		ent->r.ownerNum, mask, false );
 
 	VectorCopy( tr.endpos, ent->r.currentOrigin );
 
-	if ( tr.startsolid ) {
+	if ( tr.startsolid ) 
 		tr.fraction = 0;
-	}
 
-	SV_LinkEntity( &ent->s, &ent->r );	// FIXME: avoid this for stationary?
+	SV_LinkEntity( ent );	// FIXME: avoid this for stationary?
 
 	// check think function
 	G_RunThink( ent );
 
-	if ( tr.fraction == 1 ) {
+	if ( tr.fraction == 1 ) 
 		return;
-	}
 
 	// if it is in a nodrop volume, remove it
 	contents = SV_PointContents( ent->r.currentOrigin, -1 );
-	if ( contents & CONTENTS_NODROP ) {
-		if (ent->item && ent->item->giType == IT_TEAM) {
+	if ( contents & CONTENTS_NODROP ) 
+	{
+		if (ent->item_ && ent->item_->giType == IT_TEAM) 
 			Team_FreeEntity(ent);
-		} else {
-			G_FreeEntity( ent );
-		}
+		else 
+			ent->freeUp();
 		return;
 	}
 

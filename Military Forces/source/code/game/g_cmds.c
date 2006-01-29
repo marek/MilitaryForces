@@ -1,11 +1,12 @@
 /*
- * $Id: g_cmds.c,v 1.7 2005-11-24 10:46:53 thebjoern Exp $
+ * $Id: g_cmds.c,v 1.8 2006-01-29 14:03:41 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
 //
 #include "g_local.h"
-
+#include "g_level.h"
+#include "g_mfq3ents.h"
 
 /*
 ==================
@@ -13,12 +14,13 @@ DeathmatchScoreboardMessage
 
 ==================
 */
-void DeathmatchScoreboardMessage( gentity_t *ent ) {
+void DeathmatchScoreboardMessage( GameEntity *ent ) 
+{
 	char		entry[1024];
 	char		string[1400];
 	int			stringlength;
 	int			i, j;
-	gclient_t	*cl;
+	GameClient	*cl;
 	int			numSorted, scoreFlags, accuracy, perfect;
 
 	// send the latest information on all clients
@@ -26,36 +28,35 @@ void DeathmatchScoreboardMessage( gentity_t *ent ) {
 	stringlength = 0;
 	scoreFlags = 0;
 
-	numSorted = level.numConnectedClients;
+	numSorted = theLevel.numConnectedClients_;
 	
-	for (i=0 ; i < numSorted ; i++) {
+	for( i=0 ; i < numSorted ; i++ )
+	{
 		int		ping;
 
-		cl = &level.clients[level.sortedClients[i]];
+		cl = theLevel.getClient(theLevel.sortedClients_[i]);// &level.clients[level.sortedClients[i]];
 
-		if ( cl->pers.connected == CON_CONNECTING ) {
+		if( cl->pers_.connected_ == GameClient::ClientPersistant::CON_CONNECTING ) 
 			ping = -1;
-		} else {
-			ping = cl->ps.ping < 999 ? cl->ps.ping : 999;
-		}
+		else 
+			ping = cl->ps_.ping < 999 ? cl->ps_.ping : 999;
 
-		if( cl->accuracy_shots ) {
-			accuracy = cl->accuracy_hits * 100 / cl->accuracy_shots;
-		}
-		else {
+		if( cl->accuracy_shots_ ) 
+			accuracy = cl->accuracy_hits_ * 100 / cl->accuracy_shots_;
+		else 
 			accuracy = 0;
-		}
-		perfect = ( cl->ps.persistant[PERS_RANK] == 0 && cl->ps.persistant[PERS_KILLED] == 0 ) ? 1 : 0;
+
+		perfect = ( cl->ps_.persistant[PERS_RANK] == 0 && cl->ps_.persistant[PERS_KILLED] == 0 ) ? 1 : 0;
 
 		// SCORE_BLOCK = 15 parameters (make sure this ties with the value used in CG_ParseScores())
 		Com_sprintf( entry, sizeof(entry),
 			" %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i",
-			level.sortedClients[i],
-			cl->ps.persistant[PERS_SCORE],
+			theLevel.sortedClients_[i],
+			cl->ps_.persistant[PERS_SCORE],
 			ping,
-			(level.time - cl->pers.enterTime)/60000,
+			(theLevel.time_ - cl->pers_.enterTime_)/60000,
 			scoreFlags,
-			g_entities[level.sortedClients[i]].s.objectives,
+			theLevel.getEntity(theLevel.sortedClients_[i])->s.objectives,// g_entities[theLevel.sortedClients_[i]].s.objectives,
 			accuracy, 
 			0,
 			0,
@@ -63,19 +64,22 @@ void DeathmatchScoreboardMessage( gentity_t *ent ) {
 			0, 
 			0, 
 			perfect,
-			cl->ps.persistant[PERS_CAPTURES],
-			cl->ps.persistant[PERS_DEATHS] );
+			cl->ps_.persistant[PERS_CAPTURES],
+			cl->ps_.persistant[PERS_DEATHS] );
 
 		j = strlen(entry);
-		if (stringlength + j > 1024)
+		if( stringlength + j > 1024 )
 			break;
-		strcpy (string + stringlength, entry);
+		strcpy( string + stringlength, entry );
 		stringlength += j;
 	}
 
-	SV_GameSendServerCommand( ent-g_entities, va("scores %i %i %i%s", i, 
-		level.teamScores[TEAM_RED], level.teamScores[TEAM_BLUE],
-		string ) );
+	SV_GameSendServerCommand( ent->s.number,// ok ? before: ent-g_entities, 
+							  va("scores %i %i %i%s", 
+							  i, 
+							  theLevel.teamScores_[ClientBase::TEAM_RED], 
+							  theLevel.teamScores_[ClientBase::TEAM_BLUE],
+							  string ) );
 }
 
 
@@ -86,7 +90,8 @@ Cmd_Score_f
 Request current scoreboard information
 ==================
 */
-void Cmd_Score_f( gentity_t *ent ) {
+void Cmd_Score_f( GameEntity *ent ) 
+{
 	DeathmatchScoreboardMessage( ent );
 }
 
@@ -97,22 +102,25 @@ void Cmd_Score_f( gentity_t *ent ) {
 CheatsOk
 ==================
 */
-bool CheatsOk( gentity_t *ent ) 
+bool CheatsOk( GameEntity *ent ) 
 {
 	if ( !g_cheats.integer ) 
 	{
-		SV_GameSendServerCommand( ent-g_entities, va("print \"Cheats are not enabled on this server.\n\""));
+		SV_GameSendServerCommand( ent->s.number,//ent-g_entities, 
+								  va("print \"Cheats are not enabled on this server.\n\""));
 		return false;
 	}
-	if ( ent->health <= 0 ) 
+	if ( ent->health_ <= 0 ) 
 	{
-		SV_GameSendServerCommand( ent-g_entities, va("print \"You must be alive to use this command.\n\""));
+		SV_GameSendServerCommand( ent->s.number,//ent-g_entities, 
+								  va("print \"You must be alive to use this command.\n\""));
 		return false;
 	}
 	// ensiform fix
-	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) 
+	if ( ent->client_->sess_.sessionTeam_ == ClientBase::TEAM_SPECTATOR ) 
 	{
-		SV_GameSendServerCommand( ent-g_entities, va("print \"Spectators can't use this command.\n\""));
+		SV_GameSendServerCommand( ent->s.number,//ent-g_entities, 
+								  va("print \"Spectators can't use this command.\n\""));
 		return false;
 	}
 	return true;
@@ -124,7 +132,8 @@ bool CheatsOk( gentity_t *ent )
 ConcatArgs
 ==================
 */
-char	*ConcatArgs( int start ) {
+char	*ConcatArgs( int start ) 
+{
 	int		i, c, tlen;
 	static char	line[MAX_STRING_CHARS];
 	int		len;
@@ -132,15 +141,17 @@ char	*ConcatArgs( int start ) {
 
 	len = 0;
 	c = Cmd_Argc();
-	for ( i = start ; i < c ; i++ ) {
+	for ( i = start ; i < c ; i++ ) 
+	{
 		Cmd_ArgvBuffer( i, arg, sizeof( arg ) );
 		tlen = strlen( arg );
-		if ( len + tlen >= MAX_STRING_CHARS - 1 ) {
+		if ( len + tlen >= MAX_STRING_CHARS - 1 ) 
 			break;
-		}
+
 		memcpy( line + len, arg, tlen );
 		len += tlen;
-		if ( i != c - 1 ) {
+		if ( i != c - 1 ) 
+		{
 			line[len] = ' ';
 			len++;
 		}
@@ -158,13 +169,17 @@ SanitizeString
 Remove case and control characters
 ==================
 */
-void SanitizeString( char *in, char *out ) {
-	while ( *in ) {
-		if ( *in == 27 ) {
+void SanitizeString( char *in, char *out ) 
+{
+	while ( *in )
+	{
+		if ( *in == 27 )
+		{
 			in += 2;		// skip color code
 			continue;
 		}
-		if ( *in < 32 ) {
+		if ( *in < 32 )
+		{
 			in++;
 			continue;
 		}
@@ -182,23 +197,31 @@ Returns a player number for either a number or name string
 Returns -1 if invalid
 ==================
 */
-int ClientNumberFromString( gentity_t *to, char *s ) {
-	gclient_t	*cl;
+int ClientNumberFromString( GameEntity *to, char *s ) 
+{
+	GameClient	*cl;
 	int			idnum;
 	char		s2[MAX_STRING_CHARS];
 	char		n2[MAX_STRING_CHARS];
 
 	// numeric values are just slot numbers
-	if (s[0] >= '0' && s[0] <= '9') {
+	if( s[0] >= '0' && s[0] <= '9' )
+	{
 		idnum = atoi( s );
-		if ( idnum < 0 || idnum >= level.maxclients ) {
-			SV_GameSendServerCommand( to-g_entities, va("print \"Bad client slot: %i\n\"", idnum));
+		if( idnum < 1 || idnum > theLevel.maxclients_ ) 
+		{
+			SV_GameSendServerCommand( to->s.number,//to-g_entities, 
+									  va("print \"Bad client slot: %i\n\"", 
+									  idnum));
 			return -1;
 		}
 
-		cl = &level.clients[idnum];
-		if ( cl->pers.connected != CON_CONNECTED ) {
-			SV_GameSendServerCommand( to-g_entities, va("print \"Client %i is not active\n\"", idnum));
+		cl = theLevel.getClient(idnum);//&level.clients[idnum];
+		if( cl->pers_.connected_ != GameClient::ClientPersistant::CON_CONNECTED ) 
+		{
+			SV_GameSendServerCommand( to->s.number,//to-g_entities, 
+									  va("print \"Client %i is not active\n\"", 
+									  idnum));
 			return -1;
 		}
 		return idnum;
@@ -206,17 +229,21 @@ int ClientNumberFromString( gentity_t *to, char *s ) {
 
 	// check for a name match
 	SanitizeString( s, s2 );
-	for ( idnum=0,cl=level.clients ; idnum < level.maxclients ; idnum++,cl++ ) {
-		if ( cl->pers.connected != CON_CONNECTED ) {
+	for( idnum=1; idnum <= theLevel.maxclients_ ; idnum++ ) 
+	{
+		cl = theLevel.getClient(idnum);
+		if( !cl || cl->pers_.connected_ != GameClient::ClientPersistant::CON_CONNECTED ) 
 			continue;
-		}
-		SanitizeString( cl->pers.netname, n2 );
-		if ( !strcmp( n2, s2 ) ) {
+
+		SanitizeString( cl->pers_.netname_, n2 );
+		if( !strcmp( n2, s2 ) ) {
 			return idnum;
 		}
 	}
 
-	SV_GameSendServerCommand( to-g_entities, va("print \"User %s is not on the server\n\"", s));
+	SV_GameSendServerCommand( to->s.number,//to-g_entities, 
+							  va("print \"User %s is not on the server\n\"", 
+							  s));
 	return -1;
 }
 
@@ -228,21 +255,23 @@ Cmd_Noclip_f
 argv(0) noclip
 ==================
 */
-void Cmd_Noclip_f( gentity_t *ent ) {
+void Cmd_Noclip_f( GameEntity *ent ) 
+{
 	char	*msg;
 
-	if ( !CheatsOk( ent ) ) {
+	if( !CheatsOk( ent ) )
 		return;
-	}
 
-	if ( ent->client->noclip ) {
+	if( ent->client_->noclip_ ) 
 		msg = "noclip OFF\n";
-	} else {
+	else 
 		msg = "noclip ON\n";
-	}
-	ent->client->noclip = !ent->client->noclip;
+	
+	ent->client_->noclip_ = !ent->client_->noclip_;
 
-	SV_GameSendServerCommand( ent-g_entities, va("print \"%s\"", msg));
+	SV_GameSendServerCommand( ent->s.number,//ent-g_entities, 
+							  va("print \"%s\"", 
+							  msg));
 }
 
 
@@ -256,20 +285,22 @@ and sends over a command to the client to resize the view,
 hide the scoreboard, and take a special screenshot
 ==================
 */
-void Cmd_LevelShot_f( gentity_t *ent ) {
-	if ( !CheatsOk( ent ) ) {
+void Cmd_LevelShot_f( GameEntity *ent )
+{
+	if( !CheatsOk( ent ) ) 
 		return;
-	}
 
 	// doesn't work in single player
-	if ( g_gametype.integer != 0 ) {
-		SV_GameSendServerCommand( ent-g_entities, 
+	if( g_gametype.integer != 0 ) 
+	{
+		SV_GameSendServerCommand( ent->s.number,// ent-g_entities, 
 			"print \"Must be in g_gametype 0 for levelshot\n\"" );
 		return;
 	}
 
 	BeginIntermission();
-	SV_GameSendServerCommand( ent-g_entities, "clientLevelShot" );
+	SV_GameSendServerCommand( ent->s.number,//ent-g_entities, 
+							  "clientLevelShot" );
 }
 
 
@@ -283,15 +314,16 @@ and sends over a command to the client to resize the view,
 hide the scoreboard, and take a special screenshot
 ==================
 */
-void Cmd_TeamTask_f( gentity_t *ent ) {
+void Cmd_TeamTask_f( GameEntity *ent )
+{
 	char userinfo[MAX_INFO_STRING];
 	char		arg[MAX_TOKEN_CHARS];
 	int task;
-	int client = ent->client - level.clients;
+	int client = ent->s.number;// ok ? before: ent->client_ - theLevel.clients_;
 
-	if ( Cmd_Argc() != 2 ) {
+	if ( Cmd_Argc() != 2 ) 
 		return;
-	}
+
 	Cmd_ArgvBuffer( 1, arg, sizeof( arg ) );
 	task = atoi( arg );
 
@@ -308,21 +340,25 @@ void Cmd_TeamTask_f( gentity_t *ent ) {
 Cmd_Kill_f
 =================
 */
-void Cmd_Kill_f( gentity_t *ent ) {
-	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
+void Cmd_Kill_f( GameEntity *ent ) 
+{
+	if( ent->client_->sess_.sessionTeam_ == ClientBase::TEAM_SPECTATOR ) 
 		return;
-	}
-	if (ent->health <= 0) {
+
+	if( ent->health_ <= 0 ) 
 		return;
+
+	ent->flags_ &= ~FL_GODMODE;
+	if( (availableVehicles[ent->client_->vehicle_].cat & CAT_PLANE) ||
+		(availableVehicles[ent->client_->vehicle_].cat & CAT_HELO) ) 
+	{
+		ent->client_->ps_.stats[STAT_HEALTH] = ent->health_ = -20;
 	}
-	ent->flags &= ~FL_GODMODE;
-	if( (availableVehicles[ent->client->vehicle].cat & CAT_PLANE) ||
-		(availableVehicles[ent->client->vehicle].cat & CAT_HELO) ) {
-		ent->client->ps.stats[STAT_HEALTH] = ent->health = -20;
-	} else {
-		ent->client->ps.stats[STAT_HEALTH] = ent->health = -999;
+	else 
+	{
+		ent->client_->ps_.stats[STAT_HEALTH] = ent->health_ = -999;
 	}
-	Vehicle_Death( ent, ent, ent, 100000, MOD_SUICIDE );
+	VehicleDeathImpl( ent, ent, ent, 100000, MOD_SUICIDE );
 }
 
 
@@ -331,26 +367,33 @@ void Cmd_Kill_f( gentity_t *ent ) {
 Cmd_Tower_f
 =================
 */
-void Cmd_Tower_f( gentity_t *ent ) {
-	if( !ent->radio_target ) {
+void Cmd_Tower_f( GameEntity *ent ) 
+{
+	if( !ent->radio_target_ ) 
 		return;
-	}
-	if( ent->health <= 0 ) {
-		return;
-	}
-	if( ent->radio_target->wait > 0 ) {
-		ent->radio_target->think = radio_comply;
-		ent->radio_target->nextthink = level.time + 1000 * ent->radio_target->wait;
-	} else {
-		G_UseTargets( ent->radio_target, ent );
-	}
 
-	if( !ent->radio_target->message ) {
-		SV_GameSendServerCommand( ent-g_entities, va("print \"Tower, request operation of %s\n\"",
-			ent->radio_target->classname) );
-	} else {
-		SV_GameSendServerCommand( ent-g_entities, va("print \"Tower, %s\n\"", 
-			ent->radio_target->message) );
+	if( ent->health_ <= 0 ) 
+		return;
+
+	if( ent->radio_target_->wait_ > 0 )
+	{
+		ent->radio_target_->setThink(new Think_RadioComply);
+		ent->radio_target_->nextthink_ = theLevel.time_ + 1000 * ent->radio_target_->wait_;
+	} 
+	else 
+		G_UseTargets( ent->radio_target_, ent );
+
+	if( !ent->radio_target_->message_ ) 
+	{
+		SV_GameSendServerCommand( ent->s.number,//ent-g_entities, 
+								  va("print \"Tower, request operation of %s\n\"",
+								  ent->radio_target_->classname_) );
+	} 
+	else 
+	{
+		SV_GameSendServerCommand( ent->s.number,//ent-g_entities, 
+								  va("print \"Tower, %s\n\"", 
+								  ent->radio_target_->message_) );
 	}
 }
 
@@ -361,35 +404,38 @@ void Cmd_Tower_f( gentity_t *ent ) {
 Cmd_Radar_f
 =================
 */
-void Cmd_Radar_f( gentity_t *ent ) {
-	if( ent->health <= 0 ) {
+void Cmd_Radar_f( GameEntity *ent ) 
+{
+	if( ent->health_ <= 0 ) 
 		return;
-	}
 
-	if( level.time < ent->radartime ) {
+	if( theLevel.time_ < ent->radartime_ ) 
 		return;
-	}
 
-	if( !(ent->client->ps.ONOFF & OO_RADAR) ) {
-		if( availableVehicles[ent->client->vehicle].radarRange > 0 ) {
-			ent->client->ps.ONOFF |= OO_RADAR_AIR;
-		} else if( availableVehicles[ent->client->vehicle].radarRange2 > 0 ) {
-			ent->client->ps.ONOFF |= OO_RADAR_GROUND;
-		}
-	} else if( ent->client->ps.ONOFF & OO_RADAR_AIR ) {
-		if( availableVehicles[ent->client->vehicle].radarRange2 > 0 ) {
-			ent->client->ps.ONOFF |= OO_RADAR_GROUND;
-			ent->client->ps.ONOFF &= ~OO_RADAR_AIR;
-		} else {
-			ent->client->ps.ONOFF &= ~OO_RADAR;
-		}
-	} else if( ent->client->ps.ONOFF & OO_RADAR_GROUND ) {
-		ent->client->ps.ONOFF &= ~OO_RADAR;
-	}
+	if( !(ent->client_->ps_.ONOFF & OO_RADAR) ) 
+	{
+		if( availableVehicles[ent->client_->vehicle_].radarRange > 0 ) 
+			ent->client_->ps_.ONOFF |= OO_RADAR_AIR;
+		else if( availableVehicles[ent->client_->vehicle_].radarRange2 > 0 ) 
+			ent->client_->ps_.ONOFF |= OO_RADAR_GROUND;
+	} 
+	else if( ent->client_->ps_.ONOFF & OO_RADAR_AIR ) 
+	{
+		if( availableVehicles[ent->client_->vehicle_].radarRange2 > 0 ) 
+		{
+			ent->client_->ps_.ONOFF |= OO_RADAR_GROUND;
+			ent->client_->ps_.ONOFF &= ~OO_RADAR_AIR;
+		} 
+		else 
+			ent->client_->ps_.ONOFF &= ~OO_RADAR;
+	} 
+	else if( ent->client_->ps_.ONOFF & OO_RADAR_GROUND ) 
+		ent->client_->ps_.ONOFF &= ~OO_RADAR;
+
 	untrack(ent);
-	ent->radartime = level.time + 200;
+	ent->radartime_ = theLevel.time_ + 200;
 
-	ent->client->pers.lastRadar = (ent->client->ps.ONOFF & OO_RADAR);
+	ent->client_->pers_.lastRadar_ = (ent->client_->ps_.ONOFF & OO_RADAR);
 }
 
 /*
@@ -397,8 +443,9 @@ void Cmd_Radar_f( gentity_t *ent ) {
 Cmd_Unlock_f
 =================
 */
-void Cmd_Unlock_f( gentity_t *ent ) {
-	if( ent->health <= 0 ) {
+void Cmd_Unlock_f( GameEntity *ent ) 
+{
+	if( ent->health_ <= 0 ) {
 		return;
 	}
 	untrack(ent);
@@ -411,29 +458,29 @@ BroadCastTeamChange
 Let everyone know about a team change
 =================
 */
-void BroadcastTeamChange( gclient_t *client, int oldTeam )
+void BroadcastTeamChange( GameClient *client, int oldTeam )
 {
 	const char * pTeam = NULL;
 
 	// work out what to shout
-	switch( client->sess.sessionTeam )
+	switch( client->sess_.sessionTeam_ )
 	{
-	case TEAM_RED:
+	case ClientBase::TEAM_RED:
 		pTeam = "red team";
 		break;
 
-	case TEAM_BLUE:
+	case ClientBase::TEAM_BLUE:
 		pTeam = "blue team";
 		break;
 
-	case TEAM_SPECTATOR:
+	case ClientBase::TEAM_SPECTATOR:
 		// make sure we are changing TO spectator mode
-		if( oldTeam != TEAM_SPECTATOR )
+		if( oldTeam != ClientBase::TEAM_SPECTATOR )
 		{
 			pTeam = "spectators";
 		}
 		break;
-	case TEAM_FREE:
+	case ClientBase::TEAM_FREE:
 		pTeam = "the battle";
 		break;
 	}
@@ -441,8 +488,8 @@ void BroadcastTeamChange( gclient_t *client, int oldTeam )
 	// send centre print and console trace
 	if( pTeam )
 	{
-		SV_GameSendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE " joined the %s\n\"", client->pers.netname, pTeam) );
-		SV_GameSendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " joined the %s\n\"", client->pers.netname, pTeam) );
+		SV_GameSendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE " joined the %s\n\"", client->pers_.netname_, pTeam) );
+		SV_GameSendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " joined the %s\n\"", client->pers_.netname_, pTeam) );
 	}
 }
 
@@ -451,76 +498,79 @@ void BroadcastTeamChange( gclient_t *client, int oldTeam )
 SetTeam
 =================
 */
-void SetTeam( gentity_t *ent, char *s ) {
-	int					team, oldTeam;
-	gclient_t			*client;
+void SetTeam( GameEntity *ent, char *s ) 
+{
+	ClientBase::eTeam	team, oldTeam;
+	GameClient			*client;
 	int					clientNum;
-	spectatorState_t	specState;
+	GameClient::ClientSession::eSpectatorState specState;
 	int					specClient;
 	int					teamLeader;
 	char				userinfo[MAX_INFO_STRING];
-	bool			dontBalance = false;
+	bool				dontBalance = false;
 	int					balanceNum = 0;
 	const char *		pTeam = NULL;
 
 	// only spect int mission editor
-	if( g_gametype.integer == GT_MISSION_EDITOR ) return;
+	if( g_gametype.integer == GT_MISSION_EDITOR )
+		return;
 
 	//
 	// see what change is requested
 	//
-	client = ent->client;
-	oldTeam = client->sess.sessionTeam;
+	client = ent->client_;
+	oldTeam = client->sess_.sessionTeam_;
 
-	clientNum = client - level.clients;
+	clientNum = ent->s.number;// ok ? before: client - level.clients_;
 	specClient = 0;
-	specState = SPECTATOR_NOT;
+	specState = GameClient::ClientSession::SPECTATOR_NOT;
 
 	if ( !Q_stricmp( s, "scoreboard" ) || !Q_stricmp( s, "score" )  )
 	{
-		team = TEAM_SPECTATOR;
-		specState = SPECTATOR_SCOREBOARD;
+		team = ClientBase::TEAM_SPECTATOR;
+		specState = GameClient::ClientSession::SPECTATOR_SCOREBOARD;
 	}
 	else if ( !Q_stricmp( s, "follow1" ) )
 	{
-		team = TEAM_SPECTATOR;
-		specState = SPECTATOR_FOLLOW;
+		team = ClientBase::TEAM_SPECTATOR;
+		specState = GameClient::ClientSession::SPECTATOR_FOLLOW;
 		specClient = -1;
 	}
 	else if ( !Q_stricmp( s, "follow2" ) )
 	{
-		team = TEAM_SPECTATOR;
-		specState = SPECTATOR_FOLLOW;
+		team = ClientBase::TEAM_SPECTATOR;
+		specState = GameClient::ClientSession::SPECTATOR_FOLLOW;
 		specClient = -2;
 	}
 	else if ( !Q_stricmp( s, "spectator" ) || !Q_stricmp( s, "s" ) )
 	{
-		team = TEAM_SPECTATOR;
-		specState = SPECTATOR_FREE;
+		team = ClientBase::TEAM_SPECTATOR;
+		specState = GameClient::ClientSession::SPECTATOR_FREE;
 	}
 	else if ( g_gametype.integer >= GT_TEAM )
 	{
 		// if running a team game, assign player to one of the teams
-		specState = SPECTATOR_NOT;
+		specState = GameClient::ClientSession::SPECTATOR_NOT;
 		
 		// request to join red?
 		if ( !Q_stricmp( s, "red" ) || !Q_stricmp( s, "r" ) )
 		{
-			team = TEAM_RED;
+			team = ClientBase::TEAM_RED;
 		}
 		// request to join blue?
 		else if ( !Q_stricmp( s, "blue" ) || !Q_stricmp( s, "b" ) )
 		{
-			team = TEAM_BLUE;
+			team = ClientBase::TEAM_BLUE;
 		}
 		else
 		{
 			// AUTOJOIN: pick a best team for the player
 
 			// have we already joined the game? (i.e. are on a playable team?)
-			if( oldTeam == TEAM_RED || oldTeam == TEAM_BLUE )
+			if( oldTeam == ClientBase::TEAM_RED || 
+				oldTeam == ClientBase::TEAM_BLUE )
 			{
-				SV_GameSendServerCommand( ent->client->ps.clientNum, "cp \"Can't auto-join, you are already on a team!\n\"" );
+				SV_GameSendServerCommand( ent->client_->ps_.clientNum, "cp \"Can't auto-join, you are already on a team!\n\"" );
 				
 				return; // ignore the request
 			}
@@ -534,28 +584,32 @@ void SetTeam( gentity_t *ent, char *s ) {
 		// force team balance? (stop very uneven teams for being allowed)
 		if( g_teamForceBalance.integer && !dontBalance )
 		{
-			int counts[TEAM_NUM_TEAMS];
+			int counts[ClientBase::TEAM_NUM_TEAMS];
 
-			counts[TEAM_BLUE] = TeamCount( ent->client->ps.clientNum, TEAM_BLUE );
-			counts[TEAM_RED] = TeamCount( ent->client->ps.clientNum, TEAM_RED );
+			counts[ClientBase::TEAM_BLUE] = TeamCount( ent->client_->ps_.clientNum, ClientBase::TEAM_BLUE );
+			counts[ClientBase::TEAM_RED] = TeamCount( ent->client_->ps_.clientNum, ClientBase::TEAM_RED );
 
 			// work out the balanceNum
 			balanceNum = g_teamForceBalanceNum.integer - 1;
-			if( balanceNum < 0 ) balanceNum = 0;
+			if( balanceNum < 0 ) 
+				balanceNum = 0;
 
 			// we allow a spread of g_teamForceBalanceNum, so if the value is 1 then there can never be
 			// a spread of more than 1, this would allow 3-2 - but if another player joined then that player
 			// would be forced to join the team with 2.
-			if( team == TEAM_RED && counts[TEAM_RED] - counts[TEAM_BLUE] > balanceNum )
+			if( team == ClientBase::TEAM_RED && counts[ClientBase::TEAM_RED] - 
+					counts[ClientBase::TEAM_BLUE] > balanceNum )
 			{
-				SV_GameSendServerCommand( ent->client->ps.clientNum,"cp \"Red team has too many players.\n\"" );
+				SV_GameSendServerCommand( ent->client_->ps_.clientNum,"cp \"Red team has too many players.\n\"" );
 
 				return; // ignore the request
 			}
 
-			if( team == TEAM_BLUE && counts[TEAM_BLUE] - counts[TEAM_RED] > balanceNum )
+			if( team == ClientBase::TEAM_BLUE && 
+				counts[ClientBase::TEAM_BLUE] - 
+					counts[ClientBase::TEAM_RED] > balanceNum )
 			{
-				SV_GameSendServerCommand( ent->client->ps.clientNum, "cp \"Red team has too many players.\n\"" );
+				SV_GameSendServerCommand( ent->client_->ps_.clientNum, "cp \"Red team has too many players.\n\"" );
 				return; // ignore the request
 			}
 
@@ -567,17 +621,17 @@ void SetTeam( gentity_t *ent, char *s ) {
 	else
 	{
 		// force them to spectators if there aren't any spots free
-		team = TEAM_FREE;
+		team = ClientBase::TEAM_FREE;
 	}
 
 	// override decision if limiting the players
-	if ( (g_gametype.integer == GT_TOURNAMENT) && level.numNonSpectatorClients >= 2 )
+	if( (g_gametype.integer == GT_TOURNAMENT) && theLevel.numNonSpectatorClients_ >= 2 )
 	{
-		team = TEAM_SPECTATOR;
+		team = ClientBase::TEAM_SPECTATOR;
 	}
-	else if ( g_maxGameClients.integer > 0 && level.numNonSpectatorClients >= g_maxGameClients.integer )
+	else if ( g_maxGameClients.integer > 0 && theLevel.numNonSpectatorClients_ >= g_maxGameClients.integer )
 	{
-		team = TEAM_SPECTATOR;
+		team = ClientBase::TEAM_SPECTATOR;
 	}
 
 	//
@@ -588,16 +642,16 @@ void SetTeam( gentity_t *ent, char *s ) {
 		// decided what to say
 		switch( team )
 		{
-		case TEAM_FREE:
+		case ClientBase::TEAM_FREE:
 			pTeam = " in the game.";
 			break;
-		case TEAM_SPECTATOR:
+		case ClientBase::TEAM_SPECTATOR:
 			pTeam = " a spectator.";
 			break;
-		case TEAM_RED:
+		case ClientBase::TEAM_RED:
 			pTeam = " on red.";
 			break;
-		case TEAM_BLUE:
+		case ClientBase::TEAM_BLUE:
 			pTeam = " on blue.";
 			break;
 		}
@@ -605,38 +659,41 @@ void SetTeam( gentity_t *ent, char *s ) {
 		// say something?
 		if( pTeam )
 		{
-			SV_GameSendServerCommand( ent->client->ps.clientNum, va( "cp \"You are already %s\n\"", pTeam ) );
+			SV_GameSendServerCommand( ent->client_->ps_.clientNum, va( "cp \"You are already %s\n\"", pTeam ) );
 		}
 		return; // ignore the request
 	}
 
 
 	// 
-	if(team == TEAM_SPECTATOR)
+	if( team == ClientBase::TEAM_SPECTATOR )
 	{
-		team = TEAM_FREE;
+		team = ClientBase::TEAM_FREE;
 	}
 	//
 	// execute the team change
 	//
 
 	// he starts at 'base'
-	client->pers.teamState.state = TEAM_BEGIN;
-	if ( oldTeam != TEAM_SPECTATOR ) {
+	client->pers_.teamState_.state_ = GameClient::ClientPersistant::PlayerTeamState::TEAM_BEGIN;
+	if( oldTeam != ClientBase::TEAM_SPECTATOR ) 
+	{
 		// Kill him (makes sure he loses flags, etc)
-		ent->flags &= ~FL_GODMODE;
-		ent->client->ps.stats[STAT_HEALTH] = ent->health = 0;
-		Vehicle_Death( ent, ent, ent, 100000, MOD_SUICIDE );
+		ent->flags_ &= ~FL_GODMODE;
+		ent->client_->ps_.stats[STAT_HEALTH] = ent->health_ = 0;
+		VehicleDeathImpl( ent, ent, ent, 100000, MOD_SUICIDE );
 
 	}
 	// they go to the end of the line for tournements
-	if ( team == TEAM_SPECTATOR ) {
-		client->sess.spectatorTime = level.time;
-		client->ps.pm_flags &= ~(PMF_VEHICLESELECT|PMF_VEHICLESPAWN);// MFQ3
+	if( team == ClientBase::TEAM_SPECTATOR ) 
+	{
+		client->sess_.spectatorTime_ = theLevel.time_;
+		client->ps_.pm_flags &= ~(PMF_VEHICLESELECT|PMF_VEHICLESPAWN);// MFQ3
 	}
-	else {
+	else
+	{
 		if( !(ent->r.svFlags & SVF_BOT) )// MFQ3
-			client->ps.pm_flags |= PMF_VEHICLESELECT;// MFQ3
+			client->ps_.pm_flags |= PMF_VEHICLESELECT;// MFQ3
 	}
 	// init vehicle
 	SV_GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
@@ -644,22 +701,26 @@ void SetTeam( gentity_t *ent, char *s ) {
 	Info_SetValueForKey( userinfo, "cg_nextVehicle", "-1" );
 	SV_SetUserinfo( clientNum, userinfo );
 
-	client->sess.sessionTeam = static_cast<team_t>(team);
-	client->sess.spectatorState = specState;
-	client->sess.spectatorClient = specClient;
+	client->sess_.sessionTeam_ = team; //static_cast<team_t>(team);
+	client->sess_.spectatorState_ = specState;
+	client->sess_.spectatorClient_ = specClient;
 
-	client->sess.teamLeader = false;
-	if ( team == TEAM_RED || team == TEAM_BLUE ) {
+	client->sess_.teamLeader_ = false;
+	if( team == ClientBase::TEAM_RED ||
+		team == ClientBase::TEAM_BLUE )
+	{
 		teamLeader = TeamLeader( team );
 		// if there is no team leader or the team leader is a bot and this client is not a bot
-		if ( teamLeader == -1 || ( !(g_entities[clientNum].r.svFlags & SVF_BOT) && (g_entities[teamLeader].r.svFlags & SVF_BOT) ) ) {
+		if ( teamLeader == -1 || ( !(theLevel.getEntity(clientNum)->r.svFlags & SVF_BOT) && 
+			(theLevel.getEntity(teamLeader)->r.svFlags & SVF_BOT) ) )
+		{
 			SetLeader( team, clientNum );
 		}
 	}
 	// make sure there is a team leader on the team the player came from
-	if ( oldTeam == TEAM_RED || oldTeam == TEAM_BLUE ) {
+	if( oldTeam == ClientBase::TEAM_RED || 
+		oldTeam == ClientBase::TEAM_BLUE ) 
 		CheckTeamLeader( oldTeam );
-	}
 
 	// tell everyone about the team change for this client
 	BroadcastTeamChange( client, oldTeam );
@@ -678,13 +739,14 @@ If the client being followed leaves the game, or you just want to drop
 to free floating spectator mode
 =================
 */
-void StopFollowing( gentity_t *ent ) {
-	ent->client->ps.persistant[ PERS_TEAM ] = TEAM_SPECTATOR;	
-	ent->client->sess.sessionTeam = TEAM_SPECTATOR;	
-	ent->client->sess.spectatorState = SPECTATOR_FREE;
-	ent->client->ps.pm_flags &= ~PMF_FOLLOW;
+void StopFollowing( GameEntity *ent ) 
+{
+	ent->client_->ps_.persistant[ PERS_TEAM ] = ClientBase::TEAM_SPECTATOR;	
+	ent->client_->sess_.sessionTeam_ = ClientBase::TEAM_SPECTATOR;	
+	ent->client_->sess_.spectatorState_ = GameClient::ClientSession::SPECTATOR_FREE;
+	ent->client_->ps_.pm_flags &= ~PMF_FOLLOW;
 	ent->r.svFlags &= ~SVF_BOT;
-	ent->client->ps.clientNum = ent - g_entities;
+	ent->client_->ps_.clientNum = ent->s.number;// ent - g_entities;
 }
 
 /*
@@ -692,26 +754,27 @@ void StopFollowing( gentity_t *ent ) {
 Cmd_Team_f
 =================
 */
-void Cmd_Team_f( gentity_t *ent ) {
-	int			oldTeam;
+void Cmd_Team_f( GameEntity *ent )
+{
+	ClientBase::eTeam oldTeam;
 	char		s[MAX_TOKEN_CHARS];
 
 	if ( Cmd_Argc() != 2 )
 	{
-		oldTeam = ent->client->sess.sessionTeam;
+		oldTeam = ent->client_->sess_.sessionTeam_;
 		switch ( oldTeam )
 		{
-		case TEAM_BLUE:
-			SV_GameSendServerCommand( ent-g_entities, "print \"Blue team\n\"" );
+		case ClientBase::TEAM_BLUE:
+			SV_GameSendServerCommand( ent->s.number, "print \"Blue team\n\"" );
 			break;
-		case TEAM_RED:
-			SV_GameSendServerCommand( ent-g_entities, "print \"Red team\n\"" );
+		case ClientBase::TEAM_RED:
+			SV_GameSendServerCommand( ent->s.number, "print \"Red team\n\"" );
 			break;
-		case TEAM_FREE:
-			SV_GameSendServerCommand( ent-g_entities, "print \"Free team\n\"" );
+		case ClientBase::TEAM_FREE:
+			SV_GameSendServerCommand( ent->s.number, "print \"Free team\n\"" );
 			break;
-		case TEAM_SPECTATOR:
-			SV_GameSendServerCommand( ent-g_entities, "print \"Spectator team\n\"" );
+		case ClientBase::TEAM_SPECTATOR:
+			SV_GameSendServerCommand( ent->s.number, "print \"Spectator team\n\"" );
 			break;
 		}		
 		
@@ -719,16 +782,17 @@ void Cmd_Team_f( gentity_t *ent ) {
 	}
 
 	// stop people changing teams too much
-	if( ent->client->switchTeamTime > level.time )
+	if( ent->client_->switchTeamTime_ > theLevel.time_ )
 	{
-		SV_GameSendServerCommand( ent-g_entities, "print \"May not request to switch teams more than once per 5 seconds.\n\"" );
+		SV_GameSendServerCommand( ent->s.number, "print \"May not request to switch teams more than once per 5 seconds.\n\"" );
 		return;
 	}
 
 	// if they are playing a tournement game, count as a loss
-	if ( (g_gametype.integer == GT_TOURNAMENT ) && ent->client->sess.sessionTeam == TEAM_FREE )
+	if( (g_gametype.integer == GT_TOURNAMENT ) && 
+		ent->client_->sess_.sessionTeam_ == ClientBase::TEAM_FREE )
 	{
-		ent->client->sess.losses++;
+		ent->client_->sess_.losses_++;
 	}
 
 	Cmd_ArgvBuffer( 1, s, sizeof( s ) );
@@ -737,7 +801,7 @@ void Cmd_Team_f( gentity_t *ent ) {
 	SetTeam( ent, s );
 
 	// set the time when the next request will be allowed (level time plus 5 seconds)
-	ent->client->switchTeamTime = level.time + 5000;
+	ent->client_->switchTeamTime_ = theLevel.time_ + 5000;
 }
 
 
@@ -746,46 +810,44 @@ void Cmd_Team_f( gentity_t *ent ) {
 Cmd_Follow_f
 =================
 */
-void Cmd_Follow_f( gentity_t *ent ) {
+void Cmd_Follow_f( GameEntity *ent ) 
+{
 	int		i;
 	char	arg[MAX_TOKEN_CHARS];
 
-	if ( Cmd_Argc() != 2 ) {
-		if ( ent->client->sess.spectatorState == SPECTATOR_FOLLOW ) {
+	if( Cmd_Argc() != 2 ) 
+	{
+		if( ent->client_->sess_.spectatorState_ == GameClient::ClientSession::SPECTATOR_FOLLOW ) 
 			StopFollowing( ent );
-		}
 		return;
 	}
 
 	Cmd_ArgvBuffer( 1, arg, sizeof( arg ) );
 	i = ClientNumberFromString( ent, arg );
-	if ( i == -1 ) {
+	if( i == -1 ) 
 		return;
-	}
 
 	// can't follow self
-	if ( &level.clients[ i ] == ent->client ) {
+	if( theLevel.getClient(i) == ent->client_ ) 
 		return;
-	}
 
 	// can't follow another spectator
-	if ( level.clients[ i ].sess.sessionTeam == TEAM_SPECTATOR ) {
+	if( theLevel.getClient(i)->sess_.sessionTeam_ == ClientBase::TEAM_SPECTATOR ) 
 		return;
-	}
 
 	// if they are playing a tournement game, count as a loss
-	if ( (g_gametype.integer == GT_TOURNAMENT )
-		&& ent->client->sess.sessionTeam == TEAM_FREE ) {
-		ent->client->sess.losses++;
+	if( (g_gametype.integer == GT_TOURNAMENT )
+		&& ent->client_->sess_.sessionTeam_ == ClientBase::TEAM_FREE ) 
+	{
+		ent->client_->sess_.losses_++;
 	}
 
 	// first set them to spectator
-	if ( ent->client->sess.sessionTeam != TEAM_SPECTATOR ) {
+	if( ent->client_->sess_.sessionTeam_ != ClientBase::TEAM_SPECTATOR ) 
 		SetTeam( ent, "spectator" );
-	}
 
-	ent->client->sess.spectatorState = SPECTATOR_FOLLOW;
-	ent->client->sess.spectatorClient = i;
+	ent->client_->sess_.spectatorState_ = GameClient::ClientSession::SPECTATOR_FOLLOW;
+	ent->client_->sess_.spectatorClient_ = i;
 }
 
 /*
@@ -793,50 +855,46 @@ void Cmd_Follow_f( gentity_t *ent ) {
 Cmd_FollowCycle_f
 =================
 */
-void Cmd_FollowCycle_f( gentity_t *ent, int dir ) {
-	int		clientnum;
-	int		original;
-
+void Cmd_FollowCycle_f( GameEntity *ent, int dir )
+{
 	// if they are playing a tournement game, count as a loss
-	if ( (g_gametype.integer == GT_TOURNAMENT )
-		&& ent->client->sess.sessionTeam == TEAM_FREE ) {
-		ent->client->sess.losses++;
+	if( (g_gametype.integer == GT_TOURNAMENT )
+		&& ent->client_->sess_.sessionTeam_ == ClientBase::TEAM_FREE ) 
+	{
+		ent->client_->sess_.losses_++;
 	}
 	// first set them to spectator
-	if ( ent->client->sess.spectatorState == SPECTATOR_NOT ) {
+	if( ent->client_->sess_.spectatorState_ == GameClient::ClientSession::SPECTATOR_NOT ) 
 		SetTeam( ent, "spectator" );
-	}
 
-	if ( dir != 1 && dir != -1 ) {
+	if( dir != 1 && dir != -1 ) 
 		Com_Error( ERR_DROP, "Cmd_FollowCycle_f: bad dir %i", dir );
-	}
 
-	clientnum = ent->client->sess.spectatorClient;
-	original = clientnum;
+	int clientnum = ent->client_->sess_.spectatorClient_;
+	int original = clientnum;
 	do {
 		clientnum += dir;
-		if ( clientnum >= level.maxclients ) {
-			clientnum = 0;
-		}
-		if ( clientnum < 0 ) {
-			clientnum = level.maxclients - 1;
-		}
+		if( clientnum > theLevel.maxclients_ ) 
+			clientnum = 1;
+
+		if( clientnum < 1 ) 
+			clientnum = theLevel.maxclients_;
+
+		GameClient* currCl = theLevel.getClient(clientnum);
 
 		// can only follow connected clients
-		if ( level.clients[ clientnum ].pers.connected != CON_CONNECTED ) {
+		if( !currCl || currCl->pers_.connected_ != GameClient::ClientPersistant::CON_CONNECTED ) 
 			continue;
-		}
 
 		// can't follow another spectator
-		if ( level.clients[ clientnum ].sess.sessionTeam == TEAM_SPECTATOR ) {
+		if( currCl->sess_.sessionTeam_ == ClientBase::TEAM_SPECTATOR ) 
 			continue;
-		}
 
 		// this is good, we can use it
-		ent->client->sess.spectatorClient = clientnum;
-		ent->client->sess.spectatorState = SPECTATOR_FOLLOW;
+		ent->client_->sess_.spectatorClient_ = clientnum;
+		ent->client_->sess_.spectatorState_ = GameClient::ClientSession::SPECTATOR_FOLLOW;
 		return;
-	} while ( clientnum != original );
+	} while( clientnum != original );
 
 	// leave it where it was
 }
@@ -848,89 +906,91 @@ G_Say
 ==================
 */
 
-static void G_SayTo( gentity_t *ent, gentity_t *other, int mode, int color, const char *name, const char *message ) {
-	if (!other) {
+static void G_SayTo( GameEntity *ent, GameEntity *other, int mode, int color, const char *name, const char *message )
+{
+	if( !other ) 
 		return;
-	}
-	if (!other->inuse) {
+	if( !other->inuse_ ) 
 		return;
-	}
-	if (!other->client) {
+	if( !other->client_ )
 		return;
-	}
-	if ( mode == SAY_TEAM  && !OnSameTeam(ent, other) ) {
+	if( mode == SAY_TEAM  && !OnSameTeam(ent, other) ) 
 		return;
-	}
+
 	// no chatting to players in tournements
-	if ( (g_gametype.integer == GT_TOURNAMENT )
-		&& other->client->sess.sessionTeam == TEAM_FREE
-		&& ent->client->sess.sessionTeam != TEAM_FREE ) {
+	if( (g_gametype.integer == GT_TOURNAMENT )
+		&& other->client_->sess_.sessionTeam_ == ClientBase::TEAM_FREE
+		&& ent->client_->sess_.sessionTeam_ != ClientBase::TEAM_FREE ) 
+	{
 		return;
 	}
 
-	SV_GameSendServerCommand( other-g_entities, va("%s \"%s%c%c%s\"", 
-		mode == SAY_TEAM ? "tchat" : "chat",
-		name, Q_COLOR_ESCAPE, color, message));
+	SV_GameSendServerCommand( other->s.number,// other-g_entities, 
+							  va("%s \"%s%c%c%s\"", 
+							  mode == SAY_TEAM ? "tchat" : "chat",
+							  name, Q_COLOR_ESCAPE, color, message));
 }
 
 #define EC		"\x19"
 
-void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) {
-	int			j;
-	gentity_t	*other;
+void G_Say( GameEntity *ent, GameEntity *target, int mode, const char *chatText ) 
+{
 	int			color;
 	char		name[64];
 	// don't let text be too long for malicious reasons
 	char		text[MAX_SAY_TEXT];
 	char		location[64];
 
-	if ( g_gametype.integer < GT_TEAM && mode == SAY_TEAM ) {
+	if ( g_gametype.integer < GT_TEAM && mode == SAY_TEAM ) 
 		mode = SAY_ALL;
-	}
 
-	switch ( mode ) {
+	switch( mode ) 
+	{
 	default:
 	case SAY_ALL:
-		G_LogPrintf( "say: %s: %s\n", ent->client->pers.netname, chatText );
-		Com_sprintf (name, sizeof(name), "%s%c%c"EC": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
+		G_LogPrintf( "say: %s: %s\n", ent->client_->pers_.netname_, chatText );
+		Com_sprintf (name, sizeof(name), "%s%c%c"EC": ", ent->client_->pers_.netname_, Q_COLOR_ESCAPE, COLOR_WHITE );
 		color = COLOR_GREEN;
 		break;
 	case SAY_TEAM:
-		G_LogPrintf( "sayteam: %s: %s\n", ent->client->pers.netname, chatText );
-		if (Team_GetLocationMsg(ent, location, sizeof(location)))
+		G_LogPrintf( "sayteam: %s: %s\n", ent->client_->pers_.netname_, chatText );
+		if( Team_GetLocationMsg(ent, location, sizeof(location)) )
 			Com_sprintf (name, sizeof(name), EC"(%s%c%c"EC") (%s)"EC": ", 
-				ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE, location);
+				ent->client_->pers_.netname_, Q_COLOR_ESCAPE, COLOR_WHITE, location);
 		else
-			Com_sprintf (name, sizeof(name), EC"(%s%c%c"EC")"EC": ", 
-				ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
+			Com_sprintf( name, sizeof(name), EC"(%s%c%c"EC")"EC": ", 
+				ent->client_->pers_.netname_, Q_COLOR_ESCAPE, COLOR_WHITE );
 		color = COLOR_CYAN;
 		break;
 	case SAY_TELL:
-		if (target && g_gametype.integer >= GT_TEAM &&
-			target->client->sess.sessionTeam == ent->client->sess.sessionTeam &&
-			Team_GetLocationMsg(ent, location, sizeof(location)))
-			Com_sprintf (name, sizeof(name), EC"[%s%c%c"EC"] (%s)"EC": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE, location );
+		if( target && g_gametype.integer >= GT_TEAM &&
+			target->client_->sess_.sessionTeam_ == ent->client_->sess_.sessionTeam_ &&
+			Team_GetLocationMsg(ent, location, sizeof(location)) )
+			Com_sprintf( name, sizeof(name), EC"[%s%c%c"EC"] (%s)"EC": ", ent->client_->pers_.netname_, Q_COLOR_ESCAPE, COLOR_WHITE, location );
 		else
-			Com_sprintf (name, sizeof(name), EC"[%s%c%c"EC"]"EC": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
+			Com_sprintf( name, sizeof(name), EC"[%s%c%c"EC"]"EC": ", ent->client_->pers_.netname_, Q_COLOR_ESCAPE, COLOR_WHITE );
 		color = COLOR_MAGENTA;
 		break;
 	}
 
 	Q_strncpyz( text, chatText, sizeof(text) );
 
-	if ( target ) {
+	if( target ) 
+	{
 		G_SayTo( ent, target, mode, color, name, text );
 		return;
 	}
 
 	// echo the text to the console
-	if ( g_dedicated.integer ) {
+	if( g_dedicated.integer ) 
 		Com_Printf( "%s%s\n", name, text);
-	}
 
 	// send it to all the apropriate clients
-	for (j = 0; j < level.maxclients; j++) {
-		other = &g_entities[j];
+	for( int j = 1; j <= theLevel.maxclients_; j++ ) 
+	{
+		GameEntity* other = theLevel.getEntity(j);
+		if( !other )
+			continue;
 		G_SayTo( ent, other, mode, color, name, text );
 	}
 }
@@ -941,21 +1001,17 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 Cmd_Say_f
 ==================
 */
-static void Cmd_Say_f( gentity_t *ent, int mode, bool arg0 ) {
+static void Cmd_Say_f( GameEntity *ent, int mode, bool arg0 ) 
+{
 	char		*p;
 
-	if ( Cmd_Argc () < 2 && !arg0 ) {
+	if( Cmd_Argc () < 2 && !arg0 ) 
 		return;
-	}
 
-	if (arg0)
-	{
+	if( arg0 )
 		p = ConcatArgs( 0 );
-	}
 	else
-	{
 		p = ConcatArgs( 1 );
-	}
 
 	G_Say( ent, NULL, mode, p );
 }
@@ -965,36 +1021,30 @@ static void Cmd_Say_f( gentity_t *ent, int mode, bool arg0 ) {
 Cmd_Tell_f
 ==================
 */
-static void Cmd_Tell_f( gentity_t *ent ) {
-	int			targetNum;
-	gentity_t	*target;
-	char		*p;
-	char		arg[MAX_TOKEN_CHARS];
-
-	if ( Cmd_Argc () < 2 ) {
+static void Cmd_Tell_f( GameEntity* ent ) 
+{
+	if( Cmd_Argc () < 2 ) 
 		return;
-	}
+
+	char arg[MAX_TOKEN_CHARS];
 
 	Cmd_ArgvBuffer( 1, arg, sizeof( arg ) );
-	targetNum = atoi( arg );
-	if ( targetNum < 0 || targetNum >= level.maxclients ) {
+	int targetNum = atoi( arg );
+	if( targetNum < 1 || targetNum > theLevel.maxclients_ ) 
 		return;
-	}
 
-	target = &g_entities[targetNum];
-	if ( !target || !target->inuse || !target->client ) {
+	GameEntity* target = theLevel.getEntity(targetNum);
+	if( !target || !target->inuse_ || !target->client_ ) 
 		return;
-	}
 
-	p = ConcatArgs( 2 );
+	char* p = ConcatArgs( 2 );
 
-	G_LogPrintf( "tell: %s to %s: %s\n", ent->client->pers.netname, target->client->pers.netname, p );
+	G_LogPrintf( "tell: %s to %s: %s\n", ent->client_->pers_.netname_, target->client_->pers_.netname_, p );
 	G_Say( ent, target, SAY_TELL, p );
 	// don't tell to the player self if it was already directed to this player
 	// also don't send the chat back to a bot
-	if ( ent != target && !(ent->r.svFlags & SVF_BOT)) {
+	if ( ent != target && !(ent->r.svFlags & SVF_BOT)) 
 		G_Say( ent, ent, SAY_TELL, p );
-	}
 }
 
 
@@ -1008,23 +1058,20 @@ static char	*gc_orders[] = {
 	"report"
 };
 
-void Cmd_GameCommand_f( gentity_t *ent ) {
-	int		player;
-	int		order;
+void Cmd_GameCommand_f( GameEntity *ent ) 
+{
 	char	str[MAX_TOKEN_CHARS];
 
 	Cmd_ArgvBuffer( 1, str, sizeof( str ) );
-	player = atoi( str );
+	int player = atoi( str );
 	Cmd_ArgvBuffer( 2, str, sizeof( str ) );
-	order = atoi( str );
+	int order = atoi( str );
 
-	if ( player < 0 || player >= MAX_CLIENTS ) {
+	if( player < 1 || player > MAX_CLIENTS ) 
 		return;
-	}
-	if ( order < 0 || order > sizeof(gc_orders)/sizeof(char *) ) {
+	if( order < 0 || order > sizeof(gc_orders)/sizeof(char *) ) 
 		return;
-	}
-	G_Say( ent, &g_entities[player], SAY_TELL, gc_orders[order] );
+	G_Say( ent, theLevel.getEntity(player), SAY_TELL, gc_orders[order] );
 	G_Say( ent, ent, SAY_TELL, gc_orders[order] );
 }
 
@@ -1033,8 +1080,9 @@ void Cmd_GameCommand_f( gentity_t *ent ) {
 Cmd_Where_f
 ==================
 */
-void Cmd_Where_f( gentity_t *ent ) {
-	SV_GameSendServerCommand( ent-g_entities, va("print \"%s\n\"", vtos( ent->s.origin ) ) );
+void Cmd_Where_f( GameEntity *ent )
+{
+	SV_GameSendServerCommand( ent->s.number, va("print \"%s\n\"", vtos( ent->s.origin ) ) );
 }
 
 static const char *gameNames[] = {
@@ -1054,120 +1102,159 @@ static const char *gameNames[] = {
 Cmd_CallVote_f
 ==================
 */
-void Cmd_CallVote_f( gentity_t *ent ) {
-	int		i;
+void Cmd_CallVote_f( GameEntity *ent ) 
+{
+	if( !g_allowVote.integer )
+	{
+		SV_GameSendServerCommand( ent->s.number, "print \"Voting not allowed here.\n\"" );
+		return;
+	}
+
+	if( theLevel.voteTime_ ) 
+	{
+		SV_GameSendServerCommand( ent->s.number, "print \"A vote is already in progress.\n\"" );
+		return;
+	}
+	if( ent->client_->pers_.voteCount_ >= MAX_VOTE_COUNT ) 
+	{
+		SV_GameSendServerCommand( ent->s.number, "print \"You have called the maximum number of votes.\n\"" );
+		return;
+	}
+	if( ent->client_->sess_.sessionTeam_ == ClientBase::TEAM_SPECTATOR ) 
+	{
+		SV_GameSendServerCommand( ent->s.number, "print \"Not allowed to call a vote as spectator.\n\"" );
+		return;
+	}
+
 	char	arg1[MAX_STRING_TOKENS];
 	char	arg2[MAX_STRING_TOKENS];
-
-	if ( !g_allowVote.integer ) {
-		SV_GameSendServerCommand( ent-g_entities, "print \"Voting not allowed here.\n\"" );
-		return;
-	}
-
-	if ( level.voteTime ) {
-		SV_GameSendServerCommand( ent-g_entities, "print \"A vote is already in progress.\n\"" );
-		return;
-	}
-	if ( ent->client->pers.voteCount >= MAX_VOTE_COUNT ) {
-		SV_GameSendServerCommand( ent-g_entities, "print \"You have called the maximum number of votes.\n\"" );
-		return;
-	}
-	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
-		SV_GameSendServerCommand( ent-g_entities, "print \"Not allowed to call a vote as spectator.\n\"" );
-		return;
-	}
 
 	// make sure it is a valid command to vote on
 	Cmd_ArgvBuffer( 1, arg1, sizeof( arg1 ) );
 	Cmd_ArgvBuffer( 2, arg2, sizeof( arg2 ) );
 
-	if( strchr( arg1, ';' ) || strchr( arg2, ';' ) ) {
-		SV_GameSendServerCommand( ent-g_entities, "print \"Invalid vote string.\n\"" );
+	if( strchr( arg1, ';' ) || strchr( arg2, ';' ) ) 
+	{
+		SV_GameSendServerCommand( ent->s.number, "print \"Invalid vote string.\n\"" );
 		return;
 	}
 
-	if ( !Q_stricmp( arg1, "map_restart" ) ) {
-	} else if ( !Q_stricmp( arg1, "nextmap" ) ) {
-	} else if ( !Q_stricmp( arg1, "map" ) ) {
-	} else if ( !Q_stricmp( arg1, "g_gametype" ) ) {
-	} else if ( !Q_stricmp( arg1, "kick" ) ) {
-	} else if ( !Q_stricmp( arg1, "clientkick" ) ) {
-	} else if ( !Q_stricmp( arg1, "g_doWarmup" ) ) {
-	} else if ( !Q_stricmp( arg1, "timelimit" ) ) {
-	} else if ( !Q_stricmp( arg1, "fraglimit" ) ) {
-	} else if ( !Q_stricmp( arg1, "mf_gameset" ) ) {
-	} else {
-		SV_GameSendServerCommand( ent-g_entities, "print \"Invalid vote string.\n\"" );
-		SV_GameSendServerCommand( ent-g_entities, "print \"Vote commands are: map_restart, nextmap, map <mapname>, g_gametype <n>, kick <player>, clientkick <clientnum>, g_doWarmup, timelimit <time>, fraglimit <frags>, mf_gameset <set>.\n\"" );
+	if( !Q_stricmp( arg1, "map_restart" ) ) 
+	{
+	} 
+	else if( !Q_stricmp( arg1, "nextmap" ) )
+	{
+	} 
+	else if( !Q_stricmp( arg1, "map" ) ) 
+	{
+	} 
+	else if( !Q_stricmp( arg1, "g_gametype" ) ) 
+	{
+	} 
+	else if( !Q_stricmp( arg1, "kick" ) ) 
+	{
+	} 
+	else if( !Q_stricmp( arg1, "clientkick" ) ) 
+	{
+	} 
+	else if( !Q_stricmp( arg1, "g_doWarmup" ) ) 
+	{
+	} 
+	else if( !Q_stricmp( arg1, "timelimit" ) ) 
+	{
+	} 
+	else if( !Q_stricmp( arg1, "fraglimit" ) ) 
+	{
+	} 
+	else if( !Q_stricmp( arg1, "mf_gameset" ) ) 
+	{
+	} 
+	else 
+	{
+		SV_GameSendServerCommand( ent->s.number, "print \"Invalid vote string.\n\"" );
+		SV_GameSendServerCommand( ent->s.number, "print \"Vote commands are: map_restart, nextmap, map <mapname>, g_gametype <n>, kick <player>, clientkick <clientnum>, g_doWarmup, timelimit <time>, fraglimit <frags>, mf_gameset <set>.\n\"" );
 		return;
 	}
 
 	// if there is still a vote to be executed
-	if ( level.voteExecuteTime ) {
-		level.voteExecuteTime = 0;
-		Cbuf_ExecuteText( EXEC_APPEND, va("%s\n", level.voteString ) );
+	if( theLevel.voteExecuteTime_ ) 
+	{
+		theLevel.voteExecuteTime_ = 0;
+		Cbuf_ExecuteText( EXEC_APPEND, va("%s\n", theLevel.voteString_ ) );
 	}
 
+	int i = 0;
 	// special case for g_gametype, check for bad values
-	if ( !Q_stricmp( arg1, "g_gametype" ) ) {
+	if( !Q_stricmp( arg1, "g_gametype" ) )
+	{
 		i = atoi( arg2 );
-		if( i == GT_SINGLE_PLAYER || i == GT_MISSION_EDITOR || i < GT_FFA || i >= GT_MAX_GAME_TYPE) {
-			SV_GameSendServerCommand( ent-g_entities, "print \"Invalid gametype.\n\"" );
+		if( i == GT_SINGLE_PLAYER || i == GT_MISSION_EDITOR || i < GT_FFA || i >= GT_MAX_GAME_TYPE ) 
+		{
+			SV_GameSendServerCommand( ent->s.number, "print \"Invalid gametype.\n\"" );
 			return;
 		}
 
-		Com_sprintf( level.voteString, sizeof( level.voteString ), "%s %d", arg1, i );
-		Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s %s", arg1, gameNames[i] );
-	} else if( !(Q_stricmp( arg1, "mf_gameset") ) ) {
+		Com_sprintf( theLevel.voteString_, sizeof( theLevel.voteString_ ), "%s %d", arg1, i );
+		Com_sprintf( theLevel.voteDisplayString_, sizeof( theLevel.voteDisplayString_ ), "%s %s", arg1, gameNames[i] );
+	}
+	else if( !(Q_stricmp( arg1, "mf_gameset") ) ) 
+	{
 		if( Q_stricmp( arg2, "modern" ) != 0 && Q_stricmp( arg2, "ww2" ) != 0 &&
 			Q_stricmp( arg2, "ww1" ) != 0 ) {
 			return;
 		}
-		Com_sprintf( level.voteString, sizeof( level.voteString ), "%s \"%s\"", arg1, arg2 );
-		Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s", level.voteString );
-	} else if ( !Q_stricmp( arg1, "map" ) ) {
+		Com_sprintf( theLevel.voteString_, sizeof( theLevel.voteString_ ), "%s \"%s\"", arg1, arg2 );
+		Com_sprintf( theLevel.voteDisplayString_, sizeof( theLevel.voteDisplayString_ ), "%s", theLevel.voteString_ );
+	}
+	else if( !Q_stricmp( arg1, "map" ) ) 
+	{
 		// special case for map changes, we want to reset the nextmap setting
 		// this allows a player to change maps, but not upset the map rotation
 		char	s[MAX_STRING_CHARS];
 
 		Cvar_VariableStringBuffer( "nextmap", s, sizeof(s) );
-		if (*s) {
-			Com_sprintf( level.voteString, sizeof( level.voteString ), "%s %s; set nextmap \"%s\"", arg1, arg2, s );
-		} else {
-			Com_sprintf( level.voteString, sizeof( level.voteString ), "%s %s", arg1, arg2 );
-		}
-		Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s", level.voteString );
-	} else if ( !Q_stricmp( arg1, "nextmap" ) ) {
+		if( *s )
+			Com_sprintf( theLevel.voteString_, sizeof( theLevel.voteString_ ), "%s %s; set nextmap \"%s\"", arg1, arg2, s );
+		else
+			Com_sprintf( theLevel.voteString_, sizeof( theLevel.voteString_ ), "%s %s", arg1, arg2 );
+		Com_sprintf( theLevel.voteDisplayString_, sizeof( theLevel.voteDisplayString_ ), "%s", theLevel.voteString_ );
+	} 
+	else if( !Q_stricmp( arg1, "nextmap" ) )
+	{
 		char	s[MAX_STRING_CHARS];
 
 		Cvar_VariableStringBuffer( "nextmap", s, sizeof(s) );
-		if (!*s) {
-			SV_GameSendServerCommand( ent-g_entities, "print \"nextmap not set.\n\"" );
+		if( !*s )
+		{
+			SV_GameSendServerCommand( ent->s.number, "print \"nextmap not set.\n\"" );
 			return;
 		}
-		Com_sprintf( level.voteString, sizeof( level.voteString ), "vstr nextmap");
-		Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s", level.voteString );
-	} else {
-		Com_sprintf( level.voteString, sizeof( level.voteString ), "%s \"%s\"", arg1, arg2 );
-		Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s", level.voteString );
+		Com_sprintf( theLevel.voteString_, sizeof( theLevel.voteString_ ), "vstr nextmap");
+		Com_sprintf( theLevel.voteDisplayString_, sizeof( theLevel.voteDisplayString_ ), "%s", theLevel.voteString_ );
+	} 
+	else 
+	{
+		Com_sprintf( theLevel.voteString_, sizeof( theLevel.voteString_ ), "%s \"%s\"", arg1, arg2 );
+		Com_sprintf( theLevel.voteDisplayString_, sizeof( theLevel.voteDisplayString_ ), "%s", theLevel.voteString_ );
 	}
 
-	SV_GameSendServerCommand( -1, va("print \"%s called a vote.\n\"", ent->client->pers.netname ) );
+	SV_GameSendServerCommand( -1, va("print \"%s called a vote.\n\"", ent->client_->pers_.netname_ ) );
 
 	// start the voting, the caller autoamtically votes yes
-	level.voteTime = level.time;
-	level.voteYes = 1;
-	level.voteNo = 0;
+	theLevel.voteTime_ = theLevel.time_;
+	theLevel.voteYes_ = 1;
+	theLevel.voteNo_ = 0;
 
-	for ( i = 0 ; i < level.maxclients ; i++ ) {
-		level.clients[i].ps.eFlags &= ~EF_VOTED;
+	for( i = 1 ; i <= theLevel.maxclients_ ; i++ ) 
+	{
+		theLevel.getClient(i)->ps_.eFlags &= ~EF_VOTED;
 	}
-	ent->client->ps.eFlags |= EF_VOTED;
+	ent->client_->ps_.eFlags |= EF_VOTED;
 
-	SV_SetConfigstring( CS_VOTE_TIME, va("%i", level.voteTime ) );
-	SV_SetConfigstring( CS_VOTE_STRING, level.voteDisplayString );	
-	SV_SetConfigstring( CS_VOTE_YES, va("%i", level.voteYes ) );
-	SV_SetConfigstring( CS_VOTE_NO, va("%i", level.voteNo ) );	
+	SV_SetConfigstring( CS_VOTE_TIME, va("%i", theLevel.voteTime_ ) );
+	SV_SetConfigstring( CS_VOTE_STRING, theLevel.voteDisplayString_ );	
+	SV_SetConfigstring( CS_VOTE_YES, va("%i", theLevel.voteYes_ ) );
+	SV_SetConfigstring( CS_VOTE_NO, va("%i", theLevel.voteNo_ ) );	
 }
 
 /*
@@ -1175,34 +1262,41 @@ void Cmd_CallVote_f( gentity_t *ent ) {
 Cmd_Vote_f
 ==================
 */
-void Cmd_Vote_f( gentity_t *ent ) {
-	char		msg[64];
+void Cmd_Vote_f( GameEntity *ent ) 
+{
+	char msg[64];
 
-	if ( !level.voteTime ) {
-		SV_GameSendServerCommand( ent-g_entities, "print \"No vote in progress.\n\"" );
+	if( !theLevel.voteTime_ ) 
+	{
+		SV_GameSendServerCommand( ent->s.number, "print \"No vote in progress.\n\"" );
 		return;
 	}
-	if ( ent->client->ps.eFlags & EF_VOTED ) {
-		SV_GameSendServerCommand( ent-g_entities, "print \"Vote already cast.\n\"" );
+	if( ent->client_->ps_.eFlags & EF_VOTED ) 
+	{
+		SV_GameSendServerCommand( ent->s.number, "print \"Vote already cast.\n\"" );
 		return;
 	}
-	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
-		SV_GameSendServerCommand( ent-g_entities, "print \"Not allowed to vote as spectator.\n\"" );
+	if( ent->client_->sess_.sessionTeam_ == ClientBase::TEAM_SPECTATOR ) 
+	{
+		SV_GameSendServerCommand( ent->s.number, "print \"Not allowed to vote as spectator.\n\"" );
 		return;
 	}
 
-	SV_GameSendServerCommand( ent-g_entities, "print \"Vote cast.\n\"" );
+	SV_GameSendServerCommand( ent->s.number, "print \"Vote cast.\n\"" );
 
-	ent->client->ps.eFlags |= EF_VOTED;
+	ent->client_->ps_.eFlags |= EF_VOTED;
 
 	Cmd_ArgvBuffer( 1, msg, sizeof( msg ) );
 
-	if ( msg[0] == 'y' || msg[1] == 'Y' || msg[1] == '1' ) {
-		level.voteYes++;
-		SV_SetConfigstring( CS_VOTE_YES, va("%i", level.voteYes ) );
-	} else {
-		level.voteNo++;
-		SV_SetConfigstring( CS_VOTE_NO, va("%i", level.voteNo ) );	
+	if( msg[0] == 'y' || msg[1] == 'Y' || msg[1] == '1' )
+	{
+		theLevel.voteYes_++;
+		SV_SetConfigstring( CS_VOTE_YES, va("%i", theLevel.voteYes_ ) );
+	} 
+	else 
+	{
+		theLevel.voteNo_++;
+		SV_SetConfigstring( CS_VOTE_NO, va("%i", theLevel.voteNo_ ) );	
 	}
 
 	// a majority will be determined in CheckVote, which will also account
@@ -1214,126 +1308,149 @@ void Cmd_Vote_f( gentity_t *ent ) {
 Cmd_CallTeamVote_f
 ==================
 */
-void Cmd_CallTeamVote_f( gentity_t *ent ) {
-	int		i, team, cs_offset;
-	char	arg1[MAX_STRING_TOKENS];
-	char	arg2[MAX_STRING_TOKENS];
+void Cmd_CallTeamVote_f( GameEntity *ent ) 
+{
+	int		cs_offset;
+	ClientBase::eTeam team = ent->client_->sess_.sessionTeam_;
 
-	team = ent->client->sess.sessionTeam;
-	if ( team == TEAM_RED )
+	if( team == ClientBase::TEAM_RED )
 		cs_offset = 0;
-	else if ( team == TEAM_BLUE )
+	else if( team == ClientBase::TEAM_BLUE )
 		cs_offset = 1;
 	else
 		return;
 
-	if ( !g_allowVote.integer ) {
-		SV_GameSendServerCommand( ent-g_entities, "print \"Voting not allowed here.\n\"" );
+	if( !g_allowVote.integer ) 
+	{
+		SV_GameSendServerCommand( ent->s.number, "print \"Voting not allowed here.\n\"" );
 		return;
 	}
 
-	if ( level.teamVoteTime[cs_offset] ) {
-		SV_GameSendServerCommand( ent-g_entities, "print \"A team vote is already in progress.\n\"" );
+	if( theLevel.teamVoteTime_[cs_offset] ) 
+	{
+		SV_GameSendServerCommand( ent->s.number, "print \"A team vote is already in progress.\n\"" );
 		return;
 	}
-	if ( ent->client->pers.teamVoteCount >= MAX_VOTE_COUNT ) {
-		SV_GameSendServerCommand( ent-g_entities, "print \"You have called the maximum number of team votes.\n\"" );
+	if( ent->client_->pers_.teamVoteCount_ >= MAX_VOTE_COUNT ) 
+	{
+		SV_GameSendServerCommand( ent->s.number, "print \"You have called the maximum number of team votes.\n\"" );
 		return;
 	}
-	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
-		SV_GameSendServerCommand( ent-g_entities, "print \"Not allowed to call a vote as spectator.\n\"" );
+	if( ent->client_->sess_.sessionTeam_ == ClientBase::TEAM_SPECTATOR ) 
+	{
+		SV_GameSendServerCommand( ent->s.number, "print \"Not allowed to call a vote as spectator.\n\"" );
 		return;
 	}
+
+	char	arg1[MAX_STRING_TOKENS];
+	char	arg2[MAX_STRING_TOKENS];
 
 	// make sure it is a valid command to vote on
 	Cmd_ArgvBuffer( 1, arg1, sizeof( arg1 ) );
 	arg2[0] = '\0';
-	for ( i = 2; i < Cmd_Argc(); i++ ) {
-		if (i > 2)
+	int i;
+	for( i = 2; i < Cmd_Argc(); i++ ) 
+	{
+		if( i > 2 )
 			strcat(arg2, " ");
 		Cmd_ArgvBuffer( i, &arg2[strlen(arg2)], sizeof( arg2 ) - strlen(arg2) );
 	}
 
-	if( strchr( arg1, ';' ) || strchr( arg2, ';' ) ) {
-		SV_GameSendServerCommand( ent-g_entities, "print \"Invalid vote string.\n\"" );
+	if( strchr( arg1, ';' ) || strchr( arg2, ';' ) ) 
+	{
+		SV_GameSendServerCommand( ent->s.number, "print \"Invalid vote string.\n\"" );
 		return;
 	}
 
-	if ( !Q_stricmp( arg1, "leader" ) ) {
+	if( !Q_stricmp( arg1, "leader" ) ) 
+	{
 		char netname[MAX_NETNAME], leader[MAX_NETNAME];
 
-		if ( !arg2[0] ) {
-			i = ent->client->ps.clientNum;
-		}
-		else {
+		if( !arg2[0] ) 
+			i = ent->client_->ps_.clientNum;
+		else 
+		{
 			// numeric values are just slot numbers
-			for (i = 0; i < 3; i++) {
+			for( i = 0; i < 3; i++ )
+			{
 				if ( !arg2[i] || arg2[i] < '0' || arg2[i] > '9' )
 					break;
 			}
-			if ( i >= 3 || !arg2[i]) {
+			if( i >= 3 || !arg2[i]) 
+			{
 				i = atoi( arg2 );
-				if ( i < 0 || i >= level.maxclients ) {
-					SV_GameSendServerCommand( ent-g_entities, va("print \"Bad client slot: %i\n\"", i) );
+				if( i < 1 || i > theLevel.maxclients_ ) 
+				{
+					SV_GameSendServerCommand( ent->s.number, va("print \"Bad client slot: %i\n\"", i) );
 					return;
 				}
 
-				if ( !g_entities[i].inuse ) {
-					SV_GameSendServerCommand( ent-g_entities, va("print \"Client %i is not active\n\"", i) );
+				if( !theLevel.getEntity(i) || !theLevel.getEntity(i)->inuse_ ) 
+				{
+					SV_GameSendServerCommand( ent->s.number, va("print \"Client %i is not active\n\"", i) );
 					return;
 				}
 			}
-			else {
+			else 
+			{
 				Q_strncpyz(leader, arg2, sizeof(leader));
 				Q_CleanStr(leader);
-				for ( i = 0 ; i < level.maxclients ; i++ ) {
-					if ( level.clients[i].pers.connected == CON_DISCONNECTED )
+				for( i = 1 ; i <= theLevel.maxclients_ ; i++ ) 
+				{
+					GameClient* currCl = theLevel.getClient(i);
+					if( !currCl || currCl->pers_.connected_ == GameClient::ClientPersistant::CON_DISCONNECTED )
 						continue;
-					if (level.clients[i].sess.sessionTeam != team)
+					if( currCl->sess_.sessionTeam_ != team)
 						continue;
-					Q_strncpyz(netname, level.clients[i].pers.netname, sizeof(netname));
+					Q_strncpyz(netname, currCl->pers_.netname_, sizeof(netname));
 					Q_CleanStr(netname);
-					if ( !Q_stricmp(netname, leader) ) {
+					if( !Q_stricmp(netname, leader) ) 
 						break;
-					}
 				}
-				if ( i >= level.maxclients ) {
-					SV_GameSendServerCommand( ent-g_entities, va("print \"%s is not a valid player on your team.\n\"", arg2) );
+				if ( i > theLevel.maxclients_ ) 
+				{
+					SV_GameSendServerCommand( ent->s.number, va("print \"%s is not a valid player on your team.\n\"", arg2) );
 					return;
 				}
 			}
 		}
 		Com_sprintf(arg2, sizeof(arg2), "%d", i);
-	} else {
-		SV_GameSendServerCommand( ent-g_entities, "print \"Invalid vote string.\n\"" );
-		SV_GameSendServerCommand( ent-g_entities, "print \"Team vote commands are: leader <player>.\n\"" );
+	} 
+	else 
+	{
+		SV_GameSendServerCommand( ent->s.number, "print \"Invalid vote string.\n\"" );
+		SV_GameSendServerCommand( ent->s.number, "print \"Team vote commands are: leader <player>.\n\"" );
 		return;
 	}
 
-	Com_sprintf( level.teamVoteString[cs_offset], sizeof( level.teamVoteString[cs_offset] ), "%s %s", arg1, arg2 );
+	Com_sprintf( theLevel.teamVoteString_[cs_offset], sizeof( theLevel.teamVoteString_[cs_offset] ), "%s %s", arg1, arg2 );
 
-	for ( i = 0 ; i < level.maxclients ; i++ ) {
-		if ( level.clients[i].pers.connected == CON_DISCONNECTED )
+	for( i = 1 ; i <= theLevel.maxclients_ ; i++ ) 
+	{
+		GameClient* currCl = theLevel.getClient(i);
+		if( !currCl || currCl->pers_.connected_ == GameClient::ClientPersistant::CON_DISCONNECTED )
 			continue;
-		if (level.clients[i].sess.sessionTeam == team)
-			SV_GameSendServerCommand( i, va("print \"%s called a team vote.\n\"", ent->client->pers.netname ) );
+		if( currCl->sess_.sessionTeam_ == team )
+			SV_GameSendServerCommand( i, va("print \"%s called a team vote.\n\"", ent->client_->pers_.netname_ ) );
 	}
 
 	// start the voting, the caller autoamtically votes yes
-	level.teamVoteTime[cs_offset] = level.time;
-	level.teamVoteYes[cs_offset] = 1;
-	level.teamVoteNo[cs_offset] = 0;
+	theLevel.teamVoteTime_[cs_offset] = theLevel.time_;
+	theLevel.teamVoteYes_[cs_offset] = 1;
+	theLevel.teamVoteNo_[cs_offset] = 0;
 
-	for ( i = 0 ; i < level.maxclients ; i++ ) {
-		if (level.clients[i].sess.sessionTeam == team)
-			level.clients[i].ps.eFlags &= ~EF_TEAMVOTED;
+	for( i = 1 ; i <= theLevel.maxclients_; i++ ) 
+	{
+		GameClient* currCl = theLevel.getClient(i);
+		if( currCl && currCl->sess_.sessionTeam_ == team )
+			currCl->ps_.eFlags &= ~EF_TEAMVOTED;
 	}
-	ent->client->ps.eFlags |= EF_TEAMVOTED;
+	ent->client_->ps_.eFlags |= EF_TEAMVOTED;
 
-	SV_SetConfigstring( CS_TEAMVOTE_TIME + cs_offset, va("%i", level.teamVoteTime[cs_offset] ) );
-	SV_SetConfigstring( CS_TEAMVOTE_STRING + cs_offset, level.teamVoteString[cs_offset] );
-	SV_SetConfigstring( CS_TEAMVOTE_YES + cs_offset, va("%i", level.teamVoteYes[cs_offset] ) );
-	SV_SetConfigstring( CS_TEAMVOTE_NO + cs_offset, va("%i", level.teamVoteNo[cs_offset] ) );
+	SV_SetConfigstring( CS_TEAMVOTE_TIME + cs_offset, va("%i", theLevel.teamVoteTime_[cs_offset] ) );
+	SV_SetConfigstring( CS_TEAMVOTE_STRING + cs_offset, theLevel.teamVoteString_[cs_offset] );
+	SV_SetConfigstring( CS_TEAMVOTE_YES + cs_offset, va("%i", theLevel.teamVoteYes_[cs_offset] ) );
+	SV_SetConfigstring( CS_TEAMVOTE_NO + cs_offset, va("%i", theLevel.teamVoteNo_[cs_offset] ) );
 }
 
 /*
@@ -1341,43 +1458,50 @@ void Cmd_CallTeamVote_f( gentity_t *ent ) {
 Cmd_TeamVote_f
 ==================
 */
-void Cmd_TeamVote_f( gentity_t *ent ) {
+void Cmd_TeamVote_f( GameEntity *ent )
+{
 	int			team, cs_offset;
 	char		msg[64];
 
-	team = ent->client->sess.sessionTeam;
-	if ( team == TEAM_RED )
+	team = ent->client_->sess_.sessionTeam_;
+	if( team == ClientBase::TEAM_RED )
 		cs_offset = 0;
-	else if ( team == TEAM_BLUE )
+	else if( team == ClientBase::TEAM_BLUE )
 		cs_offset = 1;
 	else
 		return;
 
-	if ( !level.teamVoteTime[cs_offset] ) {
-		SV_GameSendServerCommand( ent-g_entities, "print \"No team vote in progress.\n\"" );
+	if( !theLevel.teamVoteTime_[cs_offset] ) 
+	{
+		SV_GameSendServerCommand( ent->s.number, "print \"No team vote in progress.\n\"" );
 		return;
 	}
-	if ( ent->client->ps.eFlags & EF_TEAMVOTED ) {
-		SV_GameSendServerCommand( ent-g_entities, "print \"Team vote already cast.\n\"" );
+	if( ent->client_->ps_.eFlags & EF_TEAMVOTED ) 
+	{
+		SV_GameSendServerCommand( ent->s.number, "print \"Team vote already cast.\n\"" );
 		return;
 	}
-	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
-		SV_GameSendServerCommand( ent-g_entities, "print \"Not allowed to vote as spectator.\n\"" );
+	if( ent->client_->sess_.sessionTeam_ == ClientBase::TEAM_SPECTATOR ) 
+	{
+		SV_GameSendServerCommand( ent->s.number, "print \"Not allowed to vote as spectator.\n\"" );
 		return;
 	}
 
-	SV_GameSendServerCommand( ent-g_entities, "print \"Team vote cast.\n\"" );
+	SV_GameSendServerCommand( ent->s.number, "print \"Team vote cast.\n\"" );
 
-	ent->client->ps.eFlags |= EF_TEAMVOTED;
+	ent->client_->ps_.eFlags |= EF_TEAMVOTED;
 
 	Cmd_ArgvBuffer( 1, msg, sizeof( msg ) );
 
-	if ( msg[0] == 'y' || msg[1] == 'Y' || msg[1] == '1' ) {
-		level.teamVoteYes[cs_offset]++;
-		SV_SetConfigstring( CS_TEAMVOTE_YES + cs_offset, va("%i", level.teamVoteYes[cs_offset] ) );
-	} else {
-		level.teamVoteNo[cs_offset]++;
-		SV_SetConfigstring( CS_TEAMVOTE_NO + cs_offset, va("%i", level.teamVoteNo[cs_offset] ) );	
+	if( msg[0] == 'y' || msg[1] == 'Y' || msg[1] == '1' ) 
+	{
+		theLevel.teamVoteYes_[cs_offset]++;
+		SV_SetConfigstring( CS_TEAMVOTE_YES + cs_offset, va("%i", theLevel.teamVoteYes_[cs_offset] ) );
+	} 
+	else 
+	{
+		theLevel.teamVoteNo_[cs_offset]++;
+		SV_SetConfigstring( CS_TEAMVOTE_NO + cs_offset, va("%i", theLevel.teamVoteNo_[cs_offset] ) );	
 	}
 
 	// a majority will be determined in TeamCheckVote, which will also account
@@ -1390,9 +1514,9 @@ void Cmd_TeamVote_f( gentity_t *ent ) {
 Cmd_Eject_f
 =================
 */
-void Cmd_Eject_f( gentity_t *ent ) 
+void Cmd_Eject_f( GameEntity *ent ) 
 {
-	gentity_t	*veh;
+	GameEntity	*veh;
 //	gclient_t	*client;
 //	char	userinfo[MAX_INFO_STRING];
 //	int index = ent - g_entities;
@@ -1400,35 +1524,33 @@ void Cmd_Eject_f( gentity_t *ent )
 //	int i;
 
 	Com_Printf ("eject!!\n");
-	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
+	if( ent->client_->sess_.sessionTeam_ == ClientBase::TEAM_SPECTATOR ) 
 		return;
-	}
-	if (ent->health <= 0) {
+
+	if( ent->health_ <= 0) 
 		return;
-	}
 
 	VectorCopy( ent->s.pos.trBase, start );
 	SnapVector( start );
 
-
-	ent->flags &= ~FL_GODMODE;
-	if( (availableVehicles[ent->client->vehicle].cat & CAT_PLANE) ||
-		(availableVehicles[ent->client->vehicle].cat & CAT_HELO) ) 
+	ent->flags_ &= ~FL_GODMODE;
+	if( (availableVehicles[ent->client_->vehicle_].cat & CAT_PLANE) ||
+		(availableVehicles[ent->client_->vehicle_].cat & CAT_HELO) ) 
 	{
-		veh = G_Spawn();
-		G_InitGentity( veh );
-		veh->classname = "misc_vehicle";
-		veh->health = 0;
-		veh->client = NULL;
-		veh->think = ExplodeVehicle;
-		veh->nextthink = level.time + 10000;
-		veh->tracktarget = NULL;
-		veh->parent = ent;
-		veh->r.ownerNum = veh->parent->s.number;
+		veh = theLevel.spawnEntity();
+		veh->init(-1);
+		veh->classname_ = "misc_vehicle";
+		veh->health_ = 0;
+		veh->client_ = NULL;
+		veh->setThink(new Think_ExplodeVehicle);
+		veh->nextthink_ = theLevel.time_ + 10000;
+		veh->tracktarget_ = NULL;
+		veh->parent_ = ent;
+		veh->r.ownerNum = veh->parent_->s.number;
 		veh->s.eType = ET_MISC_VEHICLE;
 		veh->r.svFlags = SVF_USE_CURRENT_ORIGIN;
 		veh->s.modelindex2 = 255;
-		veh->s.modelindex = ent->client->vehicle;
+		veh->s.modelindex = ent->client_->vehicle_;
 		VectorCopy( start, veh->s.pos.trBase );
 		VectorCopy(start, veh->r.currentOrigin);
 	}
@@ -1440,7 +1562,8 @@ void Cmd_Eject_f( gentity_t *ent )
 Cmd_ME_Spawn_f
 =================
 */
-void Cmd_ME_Spawn_f( gentity_t *ent ) {
+void Cmd_ME_Spawn_f( GameEntity *ent ) 
+{
 
 	int		idx;
 	char	arg1[MAX_STRING_TOKENS];
@@ -1448,8 +1571,8 @@ void Cmd_ME_Spawn_f( gentity_t *ent ) {
 	Cmd_ArgvBuffer( 1, arg1, sizeof( arg1 ) );
 
 	idx = atoi(arg1);
-	if( idx < 0 || idx >= bg_numberOfVehicles ) return;
-
+	if( idx < 0 || idx >= bg_numberOfVehicles ) 
+		return;
 
 	SV_GameSendServerCommand( -1, va("me_spawnvehicle %d\n", idx) );
 }
@@ -1459,7 +1582,8 @@ void Cmd_ME_Spawn_f( gentity_t *ent ) {
 Cmd_ME_SpawnGI_f
 =================
 */
-void Cmd_ME_SpawnGI_f( gentity_t *ent ) {
+void Cmd_ME_SpawnGI_f( GameEntity *ent ) 
+{
 
 	int		idx;
 	char	arg1[MAX_STRING_TOKENS];
@@ -1467,8 +1591,8 @@ void Cmd_ME_SpawnGI_f( gentity_t *ent ) {
 	Cmd_ArgvBuffer( 1, arg1, sizeof( arg1 ) );
 
 	idx = atoi(arg1);
-	if( idx < 0 || idx >= bg_numberOfGroundInstallations ) return;
-
+	if( idx < 0 || idx >= bg_numberOfGroundInstallations ) 
+		return;
 
 	SV_GameSendServerCommand( -1, va("me_spawnvehiclegi %d\n", idx) );
 }
@@ -1478,80 +1602,84 @@ void Cmd_ME_SpawnGI_f( gentity_t *ent ) {
 ClientCommand
 =================
 */
-void ClientCommand( int clientNum ) {
-	gentity_t *ent;
+void ClientCommand( int clientNum )
+{
+	GameEntity *ent;
 	char	cmd[MAX_TOKEN_CHARS];
 
-	ent = g_entities + clientNum;
-	if ( !ent->client ) {
+	ent = theLevel.getEntity(clientNum);
+	if( !ent || !ent->client_ ) 
 		return;		// not fully in game yet
-	}
-
 
 	Cmd_ArgvBuffer( 0, cmd, sizeof( cmd ) );
 
-	if (Q_stricmp (cmd, "say") == 0) {
-		Cmd_Say_f (ent, SAY_ALL, false);
+	if( Q_stricmp( cmd, "say") == 0 ) 
+	{
+		Cmd_Say_f( ent, SAY_ALL, false );
 		return;
 	}
-	if (Q_stricmp (cmd, "say_team") == 0) {
-		Cmd_Say_f (ent, SAY_TEAM, false);
+	if( Q_stricmp( cmd, "say_team" ) == 0 ) 
+	{
+		Cmd_Say_f( ent, SAY_TEAM, false );
 		return;
 	}
-	if (Q_stricmp (cmd, "tell") == 0) {
-		Cmd_Tell_f ( ent );
+	if( Q_stricmp( cmd, "tell" ) == 0 )
+	{
+		Cmd_Tell_f( ent );
 		return;
 	}
-	if (Q_stricmp (cmd, "score") == 0) {
-		Cmd_Score_f (ent);
+	if( Q_stricmp( cmd, "score" ) == 0 )
+	{
+		Cmd_Score_f( ent );
 		return;
 	}
 
 	// ignore all other commands when at intermission
-	if (level.intermissiontime) {
+	if( theLevel.intermissiontime_ )
+	{
 		Cmd_Say_f (ent, false, true);
 		return;
 	}
 
-	if (Q_stricmp (cmd, "noclip") == 0)
+	if( Q_stricmp (cmd, "noclip") == 0 )
 		Cmd_Noclip_f (ent);
-	else if (Q_stricmp (cmd, "kill") == 0)
+	else if( Q_stricmp (cmd, "kill") == 0 )
 		Cmd_Kill_f (ent);
-	else if (Q_stricmp (cmd, "contact_tower") == 0)
+	else if( Q_stricmp (cmd, "contact_tower") == 0 )
 		Cmd_Tower_f (ent);
-	else if (Q_stricmp (cmd, "radar") == 0)
+	else if( Q_stricmp (cmd, "radar") == 0 )
 		Cmd_Radar_f (ent);
-	else if (Q_stricmp (cmd, "unlock") == 0)
+	else if( Q_stricmp (cmd, "unlock") == 0 )
 		Cmd_Unlock_f (ent);
-	else if (Q_stricmp (cmd, "teamtask") == 0)
+	else if( Q_stricmp (cmd, "teamtask") == 0 )
 		Cmd_TeamTask_f (ent);
-	else if (Q_stricmp (cmd, "levelshot") == 0)
+	else if( Q_stricmp (cmd, "levelshot") == 0 )
 		Cmd_LevelShot_f (ent);
-	else if (Q_stricmp (cmd, "follow") == 0)
+	else if( Q_stricmp (cmd, "follow") == 0 )
 		Cmd_Follow_f (ent);
-	else if (Q_stricmp (cmd, "follownext") == 0)
+	else if( Q_stricmp (cmd, "follownext") == 0 )
 		Cmd_FollowCycle_f (ent, 1);
-	else if (Q_stricmp (cmd, "followprev") == 0)
+	else if( Q_stricmp (cmd, "followprev") == 0 )
 		Cmd_FollowCycle_f (ent, -1);
-	else if (Q_stricmp (cmd, "team") == 0)
+	else if( Q_stricmp (cmd, "team") == 0 )
 		Cmd_Team_f (ent);
-	else if (Q_stricmp (cmd, "where") == 0)
+	else if( Q_stricmp (cmd, "where") == 0 )
 		Cmd_Where_f (ent);
-	else if (Q_stricmp (cmd, "callvote") == 0)
+	else if( Q_stricmp (cmd, "callvote") == 0 )
 		Cmd_CallVote_f (ent);
-	else if (Q_stricmp (cmd, "vote") == 0)
+	else if( Q_stricmp (cmd, "vote") == 0 )
 		Cmd_Vote_f (ent);
-	else if (Q_stricmp (cmd, "callteamvote") == 0)
+	else if( Q_stricmp (cmd, "callteamvote") == 0 )
 		Cmd_CallTeamVote_f (ent);
-	else if (Q_stricmp (cmd, "teamvote") == 0)
+	else if( Q_stricmp (cmd, "teamvote") == 0 )
 		Cmd_TeamVote_f (ent);
-	else if (Q_stricmp (cmd, "gc") == 0)
+	else if( Q_stricmp (cmd, "gc") == 0 )
 		Cmd_GameCommand_f( ent );
-	else if (Q_stricmp (cmd, "me_spawn") == 0)
+	else if( Q_stricmp (cmd, "me_spawn") == 0 )
 		Cmd_ME_Spawn_f( ent );
-	else if (Q_stricmp (cmd, "me_spawngi") == 0)
+	else if( Q_stricmp (cmd, "me_spawngi") == 0 )
 		Cmd_ME_SpawnGI_f( ent );
-	else if (Q_stricmp (cmd, "eject") == 0)
+	else if( Q_stricmp (cmd, "eject") == 0 )
 		Cmd_Eject_f( ent );
 
 	else

@@ -1,5 +1,5 @@
 /*
- * $Id: bg_misc.c,v 1.6 2005-11-21 17:28:20 thebjoern Exp $
+ * $Id: bg_misc.c,v 1.7 2006-01-29 14:03:41 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,6 +9,7 @@
 #include "q_shared.h"
 #include "../qcommon/qfiles.h"
 #include "bg_public.h"
+#include "g_client.h"
 
 /*QUAKED item_***** ( 0 0 0 ) (-16 -16 -16) (16 16 16) suspended
 DO NOT USE THIS CLASS, IT JUST HOLDS GENERAL INFORMATION.
@@ -372,12 +373,12 @@ bool BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const playerSt
 			// we need to know this because we can pick up our dropped flag (and return it)
 			// but we can't pick up our flag at base
 			if( availableVehicles[idx].cat & CAT_GROUND ) {
-				if (ps->persistant[PERS_TEAM] == TEAM_RED) {
+				if (ps->persistant[PERS_TEAM] == ClientBase::TEAM_RED) {
 					if (item->giTag == OB_BLUEFLAG ||
 						(item->giTag == OB_REDFLAG && ent->modelindex2) ||
 						(item->giTag == OB_REDFLAG && (ps->objectives&OB_BLUEFLAG)) )
 						return true;
-				} else if (ps->persistant[PERS_TEAM] == TEAM_BLUE) {
+				} else if (ps->persistant[PERS_TEAM] == ClientBase::TEAM_BLUE) {
 					if (item->giTag == OB_REDFLAG ||
 						(item->giTag == OB_BLUEFLAG && ent->modelindex2) ||
 						(item->giTag == OB_BLUEFLAG && (ps->objectives&OB_REDFLAG)) )

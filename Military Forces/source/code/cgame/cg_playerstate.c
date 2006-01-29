@@ -1,5 +1,5 @@
 /*
- * $Id: cg_playerstate.c,v 1.6 2005-11-21 17:28:20 thebjoern Exp $
+ * $Id: cg_playerstate.c,v 1.7 2006-01-29 14:03:40 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -330,7 +330,7 @@ void CG_TransitionPlayerState( playerState_t *ps, playerState_t *ops ) {
 	}
 
 	if ( cg.snap->ps.pm_type != PM_INTERMISSION 
-		&& ps->persistant[PERS_TEAM] != TEAM_SPECTATOR ) {
+		&& ps->persistant[PERS_TEAM] != ClientBase::TEAM_SPECTATOR ) {
 		CG_CheckLocalSounds( ps, ops );
 	}
 

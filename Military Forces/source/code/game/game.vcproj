@@ -242,10 +242,49 @@
 				RelativePath=".\g_arenas.c">
 			</File>
 			<File
-				RelativePath=".\g_boat.c">
+				RelativePath=".\g_boat.cpp">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseWithDebugInfo|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\g_client.c">
+			</File>
+			<File
+				RelativePath=".\g_client.cpp">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseWithDebugInfo|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\g_cmds.c">
@@ -254,28 +293,79 @@
 				RelativePath=".\g_combat.c">
 			</File>
 			<File
-				RelativePath=".\g_droneground.c">
-			</File>
-			<File
-				RelativePath=".\g_droneplane.c">
-			</File>
-			<File
-				RelativePath=".\g_droneutil.c">
+				RelativePath=".\g_entity.cpp">
 			</File>
 			<File
 				RelativePath=".\g_groundinstallation.c">
 			</File>
 			<File
-				RelativePath=".\g_groundvehicle.c">
+				RelativePath=".\g_groundvehicle.cpp">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseWithDebugInfo|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\g_helo.c">
+				RelativePath=".\g_helo.cpp">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseWithDebugInfo|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\g_items.c">
 			</File>
 			<File
-				RelativePath=".\g_lqm.c">
+				RelativePath=".\g_level.cpp">
+			</File>
+			<File
+				RelativePath=".\g_lqm.cpp">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseWithDebugInfo|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\g_main.c">
@@ -305,7 +395,25 @@
 				RelativePath=".\g_mover.c">
 			</File>
 			<File
-				RelativePath=".\g_plane.c">
+				RelativePath=".\g_plane.cpp">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseWithDebugInfo|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\g_scripts.c">
@@ -332,10 +440,16 @@
 				RelativePath=".\g_utils.c">
 			</File>
 			<File
+				RelativePath=".\g_vehicle.cpp">
+			</File>
+			<File
 				RelativePath=".\g_waypoint.c">
 			</File>
 			<File
 				RelativePath=".\g_weapon.c">
+			</File>
+			<File
+				RelativePath=".\g_world.cpp">
 			</File>
 			<File
 				RelativePath=".\game.cpp">
@@ -357,13 +471,49 @@
 				RelativePath=".\bg_public.h">
 			</File>
 			<File
+				RelativePath=".\g_boat.h">
+			</File>
+			<File
+				RelativePath=".\g_client.h">
+			</File>
+			<File
+				RelativePath=".\g_entity.h">
+			</File>
+			<File
+				RelativePath=".\g_groundvehicle.h">
+			</File>
+			<File
+				RelativePath=".\g_helo.h">
+			</File>
+			<File
+				RelativePath=".\g_item.h">
+			</File>
+			<File
+				RelativePath=".\g_level.h">
+			</File>
+			<File
 				RelativePath=".\g_local.h">
+			</File>
+			<File
+				RelativePath=".\g_lqm.h">
+			</File>
+			<File
+				RelativePath=".\g_mfq3ents.h">
+			</File>
+			<File
+				RelativePath=".\g_plane.h">
 			</File>
 			<File
 				RelativePath=".\g_public.h">
 			</File>
 			<File
 				RelativePath=".\g_team.h">
+			</File>
+			<File
+				RelativePath=".\g_vehicle.h">
+			</File>
+			<File
+				RelativePath=".\g_world.h">
 			</File>
 			<File
 				RelativePath=".\game.h">
@@ -379,6 +529,9 @@
 			Name="Resource Files"
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe">
 		</Filter>
+		<File
+			RelativePath=".\todo.txt">
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

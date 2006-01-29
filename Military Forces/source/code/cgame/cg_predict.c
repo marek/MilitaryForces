@@ -1,5 +1,5 @@
 /*
- * $Id: cg_predict.c,v 1.5 2005-11-21 17:28:20 thebjoern Exp $
+ * $Id: cg_predict.c,v 1.6 2006-01-29 14:03:40 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -277,10 +277,10 @@ static void CG_TouchItem( centity_t *cent ) {
 	// Special case for flags.  
 	// We don't predict touching our own flag
 	if( cgs.gametype == GT_CTF ) {
-		if (cg.predictedPlayerState.persistant[PERS_TEAM] == TEAM_RED &&
+		if (cg.predictedPlayerState.persistant[PERS_TEAM] == ClientBase::TEAM_RED &&
 			item->giTag == OB_REDFLAG)
 			return;
-		if (cg.predictedPlayerState.persistant[PERS_TEAM] == TEAM_BLUE &&
+		if (cg.predictedPlayerState.persistant[PERS_TEAM] == ClientBase::TEAM_BLUE &&
 			item->giTag == OB_BLUEFLAG)
 			return;
 	}
@@ -421,7 +421,7 @@ void CG_PredictPlayerState( void ) {
 	else {
 		cg_pmove.tracemask = MASK_PLAYERSOLID;
 	}
-	if ( cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR ) {
+	if ( cg.snap->ps.persistant[PERS_TEAM] == ClientBase::TEAM_SPECTATOR ) {
 		cg_pmove.tracemask &= ~CONTENTS_BODY;	// spectators can fly through bodies
 	}
 

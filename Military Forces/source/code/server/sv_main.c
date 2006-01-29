@@ -22,12 +22,16 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "server.h"
 #include "../game/game.h"
+#include "sv_server.h"
+#include "sv_client.h"
 
+//serverStatic_t	svs;				// persistant server info
+//server_t		sv;					// local server
 
-serverStatic_t	svs;				// persistant server info
-server_t		sv;					// local server
-//vm_t			*gvm = NULL;				// game virtual machine // bk001212 init
 ServerGame& theSG = ServerGame::getInstance();
+
+Server& theSV = Server::getInstance();
+ServerStatic& theSVS = ServerStatic::getInstance(); 
 
 cvar_t	*sv_fps;				// time rate for running non-clients
 cvar_t	*sv_timeout;			// seconds without any message
@@ -98,17 +102,18 @@ SV_ReplacePendingServerCommands
   This is ugly
 ======================
 */
-int SV_ReplacePendingServerCommands( client_t *client, const char *cmd ) {
+int SV_ReplacePendingServerCommands( SV_Client *client, const char *cmd ) 
+{
 	int i, index, csnum1, csnum2;
 
-	for ( i = client->reliableSent+1; i <= client->reliableSequence; i++ ) {
+	for ( i = client->reliableSent_+1; i <= client->reliableSequence_; i++ ) {
 		index = i & ( MAX_RELIABLE_COMMANDS - 1 );
 		//
-		if ( !Q_strncmp(cmd, client->reliableCommands[ index ], strlen("cs")) ) {
+		if ( !Q_strncmp(cmd, client->reliableCommands_[ index ], strlen("cs")) ) {
 			sscanf(cmd, "cs %i", &csnum1);
-			sscanf(client->reliableCommands[ index ], "cs %i", &csnum2);
+			sscanf(client->reliableCommands_[ index ], "cs %i", &csnum2);
 			if ( csnum1 == csnum2 ) {
-				Q_strncpyz( client->reliableCommands[ index ], cmd, sizeof( client->reliableCommands[ index ] ) );
+				Q_strncpyz( client->reliableCommands_[ index ], cmd, sizeof( client->reliableCommands_[ index ] ) );
 				/*
 				if ( client->netchan.remoteAddress.type != NA_BOT ) {
 					Com_Printf( "WARNING: client %i removed double pending config string %i: %s\n", client-svs.clients, csnum1, cmd );
@@ -129,7 +134,8 @@ The given command will be transmitted to the client, and is guaranteed to
 not have future snapshot_t executed before it is executed
 ======================
 */
-void SV_AddServerCommand( client_t *client, const char *cmd ) {
+void SV_AddServerCommand( SV_Client *client, const char *cmd ) 
+{
 	int		index, i;
 
 	// this is very ugly but it's also a waste to for instance send multiple config string updates
@@ -138,22 +144,24 @@ void SV_AddServerCommand( client_t *client, const char *cmd ) {
 //		return;
 //	}
 
-	client->reliableSequence++;
+	client->reliableSequence_++;
 	// if we would be losing an old command that hasn't been acknowledged,
 	// we must drop the connection
 	// we check == instead of >= so a broadcast print added by SV_DropClient()
 	// doesn't cause a recursive drop client
-	if ( client->reliableSequence - client->reliableAcknowledge == MAX_RELIABLE_COMMANDS + 1 ) {
+	if ( client->reliableSequence_ - client->reliableAcknowledge_ == MAX_RELIABLE_COMMANDS + 1 ) 
+	{
 		Com_Printf( "===== pending server commands =====\n" );
-		for ( i = client->reliableAcknowledge + 1 ; i <= client->reliableSequence ; i++ ) {
-			Com_Printf( "cmd %5d: %s\n", i, client->reliableCommands[ i & (MAX_RELIABLE_COMMANDS-1) ] );
+		for ( i = client->reliableAcknowledge_ + 1 ; i <= client->reliableSequence_ ; i++ ) 
+		{
+			Com_Printf( "cmd %5d: %s\n", i, client->reliableCommands_[ i & (MAX_RELIABLE_COMMANDS-1) ] );
 		}
 		Com_Printf( "cmd %5d: %s\n", i, cmd );
 		SV_DropClient( client, "Server command overflow" );
 		return;
 	}
-	index = client->reliableSequence & ( MAX_RELIABLE_COMMANDS - 1 );
-	Q_strncpyz( client->reliableCommands[ index ], cmd, sizeof( client->reliableCommands[ index ] ) );
+	index = client->reliableSequence_ & ( MAX_RELIABLE_COMMANDS - 1 );
+	Q_strncpyz( client->reliableCommands_[ index ], cmd, sizeof( client->reliableCommands_[ index ] ) );
 }
 
 
@@ -166,31 +174,35 @@ the client game module: "cp", "print", "chat", etc
 A NULL client will broadcast to all clients
 =================
 */
-void QDECL SV_SendServerCommand(client_t *cl, const char *fmt, ...) {
+void QDECL SV_SendServerCommand( SV_Client *cl, const char *fmt, ... ) 
+{
 	va_list		argptr;
 	byte		message[MAX_MSGLEN];
-	client_t	*client;
-	int			j;
 	
 	va_start (argptr,fmt);
 	Q_vsnprintf ((char *)message, sizeof(message), fmt,argptr);
 	va_end (argptr);
 
-	if ( cl != NULL ) {
+	if( cl != NULL ) 
+	{
 		SV_AddServerCommand( cl, (char *)message );
 		return;
 	}
 
 	// hack to echo broadcast prints to console
-	if ( com_dedicated->integer && !strncmp( (char *)message, "print", 5) ) {
+	if( com_dedicated->integer && !strncmp( (char *)message, "print", 5) ) 
+	{
 		Com_Printf ("broadcast: %s\n", SV_ExpandNewlines((char *)message) );
 	}
 
 	// send the data to all relevent clients
-	for (j = 0, client = svs.clients; j < sv_maxclients->integer ; j++, client++) {
-		if ( client->state < CS_PRIMED ) {
+	for( int j = 1; j <= sv_maxclients->integer; j++ )
+	{
+		SV_Client* client = theSVS.svClients_.at(j);
+
+		if( !client || client->state_ < SV_Client::CS_PRIMED ) 
 			continue;
-		}
+
 		SV_AddServerCommand( client, (char *)message );
 	}
 }
@@ -308,21 +320,13 @@ and all connected players.  Used for getting detailed information after
 the simple info query.
 ================
 */
-void SVC_Status( netadr_t from ) {
-	char	player[1024];
-	char	status[MAX_MSGLEN];
-	int		i;
-	client_t	*cl;
-	playerState_t	*ps;
-	int		statusLength;
-	int		playerLength;
-	char	infostring[MAX_INFO_STRING];
-
+void SVC_Status( netadr_t from ) 
+{
 	// ignore if we are in single player
-	if ( Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER ) {
+	if ( Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER ) 
 		return;
-	}
 
+	char	infostring[MAX_INFO_STRING];
 	strcpy( infostring, Cvar_InfoString( CVAR_SERVERINFO ) );
 
 	// echo back the parameter to status. so master servers can use it as a challenge
@@ -338,19 +342,25 @@ void SVC_Status( netadr_t from ) {
 	//	Info_SetValueForKey( infostring, "sv_keywords", keywords );
 	//}
 
+	char	status[MAX_MSGLEN];
 	status[0] = 0;
-	statusLength = 0;
+	int statusLength = 0;
 
-	for (i=0 ; i < sv_maxclients->integer ; i++) {
-		cl = &svs.clients[i];
-		if ( cl->state >= CS_CONNECTED ) {
-			ps = SV_GameClientNum( i );
+	char	player[1024];
+//	playerState_t	*ps;
+
+	for( int i = 1; i <= sv_maxclients->integer; i++ )
+	{
+		SV_Client* cl = theSVS.svClients_.at(i);
+		if( cl && cl->state_ >= SV_Client::CS_CONNECTED ) 
+		{
+			ClientBase* clientBase = theSV.getClientByNum( i );
 			Com_sprintf (player, sizeof(player), "%i %i \"%s\"\n", 
-				ps->persistant[PERS_SCORE], cl->ping, cl->name);
-			playerLength = strlen(player);
-			if (statusLength + playerLength >= sizeof(status) ) {
+				clientBase->ps_.persistant[PERS_SCORE], cl->ping_, cl->name_);
+			int playerLength = strlen(player);
+			if (statusLength + playerLength >= sizeof(status) ) 
 				break;		// can't hold any more
-			}
+
 			strcpy (status + statusLength, player);
 			statusLength += playerLength;
 		}
@@ -367,24 +377,24 @@ Responds with a short info message that should be enough to determine
 if a user is interested in a server to do a full status
 ================
 */
-void SVC_Info( netadr_t from ) {
-	int		i, count;
-	char	*gamedir;
-	char	infostring[MAX_INFO_STRING];
-
+void SVC_Info( netadr_t from ) 
+{
 	// ignore if we are in single player
-	if ( Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER || Cvar_VariableValue("ui_singlePlayerActive")) {
+	if ( Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER || Cvar_VariableValue("ui_singlePlayerActive")) 
 		return;
-	}
 
 	// don't count privateclients
-	count = 0;
-	for ( i = sv_privateClients->integer ; i < sv_maxclients->integer ; i++ ) {
-		if ( svs.clients[i].state >= CS_CONNECTED ) {
+	int count = 0;
+	for( int i = sv_privateClients->integer ; i <= sv_maxclients->integer ; i++ ) 
+	{
+		SV_Client* cl = theSVS.svClients_.at(i);
+		if( !cl )
+			continue;
+		if( cl->state_ >= SV_Client::CS_CONNECTED ) 
 			count++;
-		}
 	}
 
+	char	infostring[MAX_INFO_STRING];
 	infostring[0] = 0;
 
 	// echo back the parameter to status. so servers can use it as a challenge
@@ -400,16 +410,15 @@ void SVC_Info( netadr_t from ) {
 	Info_SetValueForKey( infostring, "gametype", va("%i", sv_gametype->integer ) );
 	Info_SetValueForKey( infostring, "pure", va("%i", sv_pure->integer ) );
 
-	if( sv_minPing->integer ) {
+	if( sv_minPing->integer ) 
 		Info_SetValueForKey( infostring, "minPing", va("%i", sv_minPing->integer) );
-	}
-	if( sv_maxPing->integer ) {
+
+	if( sv_maxPing->integer ) 
 		Info_SetValueForKey( infostring, "maxPing", va("%i", sv_maxPing->integer) );
-	}
-	gamedir = Cvar_VariableString( "fs_game" );
-	if( *gamedir ) {
+
+	char* gamedir = Cvar_VariableString( "fs_game" );
+	if( *gamedir ) 
 		Info_SetValueForKey( infostring, "game", gamedir );
-	}
 
 	NET_OutOfBandPrint( NS_SERVER, from, "infoResponse\n%s", infostring );
 }
@@ -420,8 +429,9 @@ SVC_FlushRedirect
 
 ================
 */
-void SV_FlushRedirect( char *outputbuf ) {
-	NET_OutOfBandPrint( NS_SERVER, svs.redirectAddress, "print\n%s", outputbuf );
+void SV_FlushRedirect( char *outputbuf ) 
+{
+	NET_OutOfBandPrint( NS_SERVER, theSVS.redirectAddress_, "print\n%s", outputbuf );
 }
 
 /*
@@ -433,7 +443,8 @@ Shift down the remaining args
 Redirect all printfs
 ===============
 */
-void SVC_RemoteCommand( netadr_t from, msg_t *msg ) {
+void SVC_RemoteCommand( netadr_t from, msg_t *msg ) 
+{
 	bool	valid;
 	unsigned int time;
 	char		remaining[1024];
@@ -445,29 +456,37 @@ void SVC_RemoteCommand( netadr_t from, msg_t *msg ) {
 	char *cmd_aux;
 
 	time = Com_Milliseconds();
-	if (time<(lasttime+500)) {
+	if (time<(lasttime+500)) 
 		return;
-	}
+
 	lasttime = time;
 
 	if ( !strlen( sv_rconPassword->string ) ||
-		strcmp (Cmd_Argv(1), sv_rconPassword->string) ) {
+		strcmp (Cmd_Argv(1), sv_rconPassword->string) ) 
+	{
 		valid = false;
 		Com_Printf ("Bad rcon from %s:\n%s\n", NET_AdrToString (from), Cmd_Argv(2) );
-	} else {
+	} 
+	else 
+	{
 		valid = true;
 		Com_Printf ("Rcon from %s:\n%s\n", NET_AdrToString (from), Cmd_Argv(2) );
 	}
 
 	// start redirecting all print outputs to the packet
-	svs.redirectAddress = from;
+	theSVS.redirectAddress_ = from;
 	Com_BeginRedirect (sv_outputbuf, SV_OUTPUTBUF_LENGTH, SV_FlushRedirect);
 
-	if ( !strlen( sv_rconPassword->string ) ) {
+	if ( !strlen( sv_rconPassword->string ) ) 
+	{
 		Com_Printf ("No rconpassword set on the server.\n");
-	} else if ( !valid ) {
+	} 
+	else if ( !valid ) 
+	{
 		Com_Printf ("Bad rconpassword.\n");
-	} else {
+	} 
+	else 
+	{
 		remaining[0] = 0;
 		
 		// get the command directly, "rcon <pass> <command>" to avoid quoting issues
@@ -547,13 +566,11 @@ void SV_ConnectionlessPacket( netadr_t from, msg_t *msg ) {
 SV_ReadPackets
 =================
 */
-void SV_PacketEvent( netadr_t from, msg_t *msg ) {
-	int			i;
-	client_t	*cl;
-	int			qport;
-
+void SV_PacketEvent( netadr_t from, msg_t *msg ) 
+{
 	// check for connectionless packet (0xffffffff) first
-	if ( msg->cursize >= 4 && *(int *)msg->data == -1) {
+	if( msg->cursize >= 4 && *(int *)msg->data == -1) 
+	{
 		SV_ConnectionlessPacket( from, msg );
 		return;
 	}
@@ -562,37 +579,43 @@ void SV_PacketEvent( netadr_t from, msg_t *msg ) {
 	// stupid address translating routers
 	MSG_BeginReadingOOB( msg );
 	MSG_ReadLong( msg );				// sequence number
-	qport = MSG_ReadShort( msg ) & 0xffff;
+	int qport = MSG_ReadShort( msg ) & 0xffff;
 
 	// find which client the message is from
-	for (i=0, cl=svs.clients ; i < sv_maxclients->integer ; i++,cl++) {
-		if (cl->state == CS_FREE) {
+	for( int i = 1; i <= sv_maxclients->integer ; i++ ) 
+	{
+		SV_Client *cl = theSVS.svClients_.at(i);
+
+		if( !cl || cl->state_ == SV_Client::CS_FREE ) 
 			continue;
-		}
-		if ( !NET_CompareBaseAdr( from, cl->netchan.remoteAddress ) ) {
+		
+		if( !NET_CompareBaseAdr( from, cl->netchan_.remoteAddress ) ) 
 			continue;
-		}
+		
 		// it is possible to have multiple clients from a single IP
 		// address, so they are differentiated by the qport variable
-		if (cl->netchan.qport != qport) {
+		if( cl->netchan_.qport != qport ) 
 			continue;
-		}
+		
 
 		// the IP port can't be used to differentiate them, because
 		// some address translating routers periodically change UDP
 		// port assignments
-		if (cl->netchan.remoteAddress.port != from.port) {
+		if( cl->netchan_.remoteAddress.port != from.port )
+		{
 			Com_Printf( "SV_PacketEvent: fixing up a translated port\n" );
-			cl->netchan.remoteAddress.port = from.port;
+			cl->netchan_.remoteAddress.port = from.port;
 		}
 
 		// make sure it is a valid, in sequence packet
-		if (SV_Netchan_Process(cl, msg)) {
+		if( SV_Netchan_Process(cl, msg) ) 
+		{
 			// zombie clients still need to do the Netchan_Process
 			// to make sure they don't need to retransmit the final
 			// reliable message, but they don't do any other processing
-			if (cl->state != CS_ZOMBIE) {
-				cl->lastPacketTime = svs.time;	// don't timeout
+			if( cl->state_ != SV_Client::CS_ZOMBIE )
+			{
+				cl->lastPacketTime_ = theSVS.time_;	// don't timeout
 				SV_ExecuteClientMessage( cl, msg );
 			}
 		}
@@ -612,50 +635,62 @@ SV_CalcPings
 Updates the cl->ping variables
 ===================
 */
-void SV_CalcPings( void ) {
-	int			i, j;
-	client_t	*cl;
+void SV_CalcPings() 
+{
 	int			total, count;
 	int			delta;
-	playerState_t	*ps;
 
-	for (i=0 ; i < sv_maxclients->integer ; i++) {
-		cl = &svs.clients[i];
-		if ( cl->state != CS_ACTIVE ) {
-			cl->ping = 999;
+	for( int i = 1; i <= sv_maxclients->integer ; i++ ) 
+	{
+		SV_Client *cl = theSVS.svClients_.at(i);
+
+		if( !cl )
+			continue;
+
+		if( cl->state_ != SV_Client::CS_ACTIVE ) 
+		{
+			cl->ping_ = 999;
 			continue;
 		}
-		if ( !cl->gentity ) {
-			cl->ping = 999;
+		EntityBase* gentity = theSV.getEntityByNum(i);
+		if( !gentity ) 
+		{
+			cl->ping_ = 999;
 			continue;
 		}
-		if ( cl->gentity->r.svFlags & SVF_BOT ) {
-			cl->ping = 0;
+		if( gentity->r.svFlags & SVF_BOT ) 
+		{
+			cl->ping_ = 0;
 			continue;
 		}
 
 		total = 0;
 		count = 0;
-		for ( j = 0 ; j < PACKET_BACKUP ; j++ ) {
-			if ( cl->frames[j].messageAcked <= 0 ) {
+		for( int j = 0 ; j < PACKET_BACKUP ; j++ ) 
+		{
+			if ( cl->frames_[j].messageAcked_ <= 0 ) 
 				continue;
-			}
-			delta = cl->frames[j].messageAcked - cl->frames[j].messageSent;
+
+			delta = cl->frames_[j].messageAcked_ - cl->frames_[j].messageSent_;
 			count++;
 			total += delta;
 		}
-		if (!count) {
-			cl->ping = 999;
-		} else {
-			cl->ping = total/count;
-			if ( cl->ping > 999 ) {
-				cl->ping = 999;
+		if( !count ) 
+		{
+			cl->ping_ = 999;
+		} 
+		else 
+		{
+			cl->ping_ = total/count;
+			if ( cl->ping_ > 999 )
+			{
+				cl->ping_ = 999;
 			}
 		}
 
 		// let the game dll know about the ping
-		ps = SV_GameClientNum( i );
-		ps->ping = cl->ping;
+		ClientBase* cb = theSV.getClientByNum( i );
+		cb->ps_.ping = cl->ping_;
 	}
 }
 
@@ -672,37 +707,42 @@ for a few seconds to make sure any final reliable message gets resent
 if necessary
 ==================
 */
-void SV_CheckTimeouts( void ) {
-	int		i;
-	client_t	*cl;
-	int			droppoint;
-	int			zombiepoint;
+void SV_CheckTimeouts() 
+{
+	int droppoint = theSVS.time_ - 1000 * sv_timeout->integer;
+	int zombiepoint = theSVS.time_ - 1000 * sv_zombietime->integer;
 
-	droppoint = svs.time - 1000 * sv_timeout->integer;
-	zombiepoint = svs.time - 1000 * sv_zombietime->integer;
+	for( int i = 1; i <= sv_maxclients->integer ; i++) 
+	{
+		SV_Client* cl = theSVS.svClients_.at(i);
+		if( !cl )
+			continue;
 
-	for (i=0,cl=svs.clients ; i < sv_maxclients->integer ; i++,cl++) {
 		// message times may be wrong across a changelevel
-		if (cl->lastPacketTime > svs.time) {
-			cl->lastPacketTime = svs.time;
-		}
+		if( cl->lastPacketTime_ > theSVS.time_ ) 
+			cl->lastPacketTime_ = theSVS.time_;
 
-		if (cl->state == CS_ZOMBIE
-		&& cl->lastPacketTime < zombiepoint) {
+		if( cl->state_ == SV_Client::CS_ZOMBIE
+			&& cl->lastPacketTime_ < zombiepoint ) 
+		{
 			// using the client id cause the cl->name is empty at this point
 			Com_DPrintf( "Going from CS_ZOMBIE to CS_FREE for client %d\n", i );
-			cl->state = CS_FREE;	// can now be reused
+			cl->state_ = SV_Client::CS_FREE;	// can now be reused
 			continue;
 		}
-		if ( cl->state >= CS_CONNECTED && cl->lastPacketTime < droppoint) {
+		if( cl->state_ >= SV_Client::CS_CONNECTED && cl->lastPacketTime_ < droppoint ) 
+		{
 			// wait several frames so a debugger session doesn't
 			// cause a timeout
-			if ( ++cl->timeoutCount > 5 ) {
+			if( ++cl->timeoutCount_ > 5 ) 
+			{
 				SV_DropClient (cl, "timed out"); 
-				cl->state = CS_FREE;	// don't bother with zombie state
+				cl->state_ = SV_Client::CS_FREE;	// don't bother with zombie state
 			}
-		} else {
-			cl->timeoutCount = 0;
+		}
+		else 
+		{
+			cl->timeoutCount_ = 0;
 		}
 	}
 }
@@ -713,24 +753,25 @@ void SV_CheckTimeouts( void ) {
 SV_CheckPaused
 ==================
 */
-bool SV_CheckPaused( void ) {
-	int		count;
-	client_t	*cl;
-	int		i;
-
-	if ( !cl_paused->integer ) {
+bool SV_CheckPaused() 
+{
+	if ( !cl_paused->integer ) 
 		return false;
-	}
 
 	// only pause if there is just a single client connected
-	count = 0;
-	for (i=0,cl=svs.clients ; i < sv_maxclients->integer ; i++,cl++) {
-		if ( cl->state >= CS_CONNECTED && cl->netchan.remoteAddress.type != NA_BOT ) {
+	int count = 0;
+	for( int i = 1; i <= sv_maxclients->integer ; i++ ) 
+	{
+		SV_Client	*cl = theSVS.svClients_.at(i);
+		if( !cl )
+			continue;
+
+		if( cl->state_ >= SV_Client::CS_CONNECTED && cl->netchan_.remoteAddress.type != NA_BOT ) 
 			count++;
-		}
 	}
 
-	if ( count > 1 ) {
+	if( count > 1 ) 
+	{
 		// don't pause
 		if (sv_paused->integer)
 			Cvar_Set("sv_paused", "0");
@@ -750,38 +791,39 @@ Player movement occurs as a result of packet events, which
 happen before SV_Frame is called
 ==================
 */
-void SV_Frame( int msec ) {
+void SV_Frame( int msec ) 
+{
 	int		frameMsec;
 	int		startTime;
 
 	// the menu kills the server with this cvar
-	if ( sv_killserver->integer ) {
+	if ( sv_killserver->integer ) 
+	{
 		SV_Shutdown ("Server was killed.\n");
 		Cvar_Set( "sv_killserver", "0" );
 		return;
 	}
 
-	if ( !com_sv_running->integer ) {
+	if ( !com_sv_running->integer ) 
 		return;
-	}
 
 	// allow pause if only the local client is connected
-	if ( SV_CheckPaused() ) {
+	if ( SV_CheckPaused() ) 
 		return;
-	}
 
 	// if it isn't time for the next frame, do nothing
-	if ( sv_fps->integer < 1 ) {
+	if ( sv_fps->integer < 1 ) 
 		Cvar_Set( "sv_fps", "10" );
-	}
+
 	frameMsec = 1000 / sv_fps->integer ;
 
-	sv.timeResidual += msec;
+	theSV.timeResidual_ += msec;
 
-	if ( com_dedicated->integer && sv.timeResidual < frameMsec ) {
+	if ( com_dedicated->integer && theSV.timeResidual_ < frameMsec ) 
+	{
 		// NET_Sleep will give the OS time slices until either get a packet
 		// or time enough for a server frame has gone by
-		NET_Sleep(frameMsec - sv.timeResidual);
+		NET_Sleep(frameMsec - theSV.timeResidual_);
 		return;
 	}
 
@@ -789,37 +831,45 @@ void SV_Frame( int msec ) {
 	// and clear sv.time, rather
 	// than checking for negative time wraparound everywhere.
 	// 2giga-milliseconds = 23 days, so it won't be too often
-	if ( svs.time > 0x70000000 ) {
+	if ( theSVS.time_ > 0x70000000 )
+	{
 		SV_Shutdown( "Restarting server due to time wrapping" );
 		Cbuf_AddText( "vstr nextmap\n" );
 		return;
 	}
 	// this can happen considerably earlier when lots of clients play and the map doesn't change
-	if ( svs.nextSnapshotEntities >= 0x7FFFFFFE - svs.numSnapshotEntities ) {
+	if ( theSVS.nextSnapshotEntities_ >= 0x7FFFFFFE - theSVS.numSnapshotEntities_ )
+	{
 		SV_Shutdown( "Restarting server due to numSnapshotEntities wrapping" );
 		Cbuf_AddText( "vstr nextmap\n" );
 		return;
 	}
 
-	if( sv.restartTime && svs.time >= sv.restartTime ) {
-		sv.restartTime = 0;
+	if( theSV.restartTime_ && theSVS.time_ >= theSV.restartTime_ ) 
+	{
+		theSV.restartTime_ = 0;
 		Cbuf_AddText( "map_restart 0\n" );
 		return;
 	}
 
 	// update infostrings if anything has been changed
-	if ( cvar_modifiedFlags & CVAR_SERVERINFO ) {
+	if ( cvar_modifiedFlags & CVAR_SERVERINFO ) 
+	{
 		SV_SetConfigstring( CS_SERVERINFO, Cvar_InfoString( CVAR_SERVERINFO ) );
 		cvar_modifiedFlags &= ~CVAR_SERVERINFO;
 	}
-	if ( cvar_modifiedFlags & CVAR_SYSTEMINFO ) {
+	if ( cvar_modifiedFlags & CVAR_SYSTEMINFO ) 
+	{
 		SV_SetConfigstring( CS_SYSTEMINFO, Cvar_InfoString_Big( CVAR_SYSTEMINFO ) );
 		cvar_modifiedFlags &= ~CVAR_SYSTEMINFO;
 	}
 
-	if ( com_speeds->integer ) {
+	if ( com_speeds->integer ) 
+	{
 		startTime = Sys_Milliseconds ();
-	} else {
+	}
+	else 
+	{
 		startTime = 0;	// quite a compiler warning
 	}
 
@@ -827,18 +877,18 @@ void SV_Frame( int msec ) {
 	SV_CalcPings();
 
 	// run the game simulation in chunks
-	while ( sv.timeResidual >= frameMsec ) {
-		sv.timeResidual -= frameMsec;
-		svs.time += frameMsec;
+	while ( theSV.timeResidual_ >= frameMsec ) 
+	{
+		theSV.timeResidual_ -= frameMsec;
+		theSVS.time_ += frameMsec;
 
 		// let everything in the world think and move
 		//VM_Call( gvm, GAME_RUN_FRAME, svs.time );
-		theSG.gameRunFrame( svs.time );
+		theSG.gameRunFrame( theSVS.time_ );
 	}
 
-	if ( com_speeds->integer ) {
+	if ( com_speeds->integer ) 
 		time_game = Sys_Milliseconds () - startTime;
-	}
 
 	// check timeouts
 	SV_CheckTimeouts();
@@ -856,11 +906,14 @@ bool SV_GetEntityToken( char *buffer, int bufferSize )
 {
 	const char	*s;
 
-	s = COM_Parse( &sv.entityParsePoint );
+	s = COM_Parse( &theSV.entityParsePoint_ );
 	Q_strncpyz( buffer, s, bufferSize );
-	if ( !sv.entityParsePoint && !s[0] ) {
+	if ( !theSV.entityParsePoint_ && !s[0] ) 
+	{
 		return false;
-	} else {
+	}
+	else 
+	{
 		return true;
 	}
 }

@@ -1,180 +1,211 @@
 /*
- * $Id: g_mfq3util.c,v 1.6 2005-11-21 17:28:20 thebjoern Exp $
+ * $Id: g_mfq3util.c,v 1.7 2006-01-29 14:03:41 thebjoern Exp $
 */
 
 
 
 #include "g_local.h"
+#include "g_entity.h"
+#include "g_level.h"
 
 
 
-
-int canLandOnIt( gentity_t *ent )
+int canLandOnIt( GameEntity *ent )
 {
-	if( strcmp( ent->classname, "func_runway" ) == 0 ||
-		strcmp( ent->classname, "func_plat" ) == 0 ||
-		strcmp( ent->classname, "func_train" ) == 0 ||
-		strcmp( ent->classname, "func_door" ) == 0 ) {
+	if( strcmp( ent->classname_, "func_runway" ) == 0 ||
+		strcmp( ent->classname_, "func_plat" ) == 0 ||
+		strcmp( ent->classname_, "func_train" ) == 0 ||
+		strcmp( ent->classname_, "func_door" ) == 0 ) {
 		return 1;
 	}
 	return 0;
 }
 
-void unlock( gentity_t* ent )
+void unlock( GameEntity* ent )
 {
 	// update target
-	if( ent->tracktarget && ent->tracktarget->client ) {
-		ent->tracktarget->client->ps.stats[STAT_LOCKINFO] &= ~LI_BEING_LOCKED;
-	}
-	ent->locktime = level.time;
-	ent->client->ps.stats[STAT_LOCKINFO] &= ~LI_LOCKING;
+	if( ent->tracktarget_ && ent->tracktarget_->client_ ) 
+		ent->tracktarget_->client_->ps_.stats[STAT_LOCKINFO] &= ~LI_BEING_LOCKED;
+
+	ent->locktime_ = theLevel.time_;
+	ent->client_->ps_.stats[STAT_LOCKINFO] &= ~LI_LOCKING;
 }
 
-void untrack( gentity_t* ent )
+void untrack( GameEntity* ent )
 {
 	// update target
-	if( ent->tracktarget && ent->tracktarget->client ) {
-		ent->tracktarget->client->ps.stats[STAT_LOCKINFO] &= ~LI_BEING_LOCKED;
-	}
-	ent->locktime = level.time;
-	ent->tracktarget = 0;
+	if( ent->tracktarget_ && ent->tracktarget_->client_ ) 
+		ent->tracktarget_->client_->ps_.stats[STAT_LOCKINFO] &= ~LI_BEING_LOCKED;
+
+	ent->locktime_ = theLevel.time_;
+	ent->tracktarget_ = 0;
 	ent->s.tracktarget = ENTITYNUM_NONE;
-	ent->client->ps.stats[STAT_LOCKINFO] &= ~(LI_TRACKING|LI_LOCKING);
-	ent->client->ps.tracktarget = ENTITYNUM_NONE;
+	ent->client_->ps_.stats[STAT_LOCKINFO] &= ~(LI_TRACKING|LI_LOCKING);
+	ent->client_->ps_.tracktarget = ENTITYNUM_NONE;
 }
 
-void track( gentity_t* ent, gentity_t* target )
+void track( GameEntity* ent, GameEntity* target )
 {
-	ent->tracktarget = target;
-	ent->locktime = level.time;
-	ent->s.tracktarget = ent->tracktarget->s.number;
-	ent->client->ps.stats[STAT_LOCKINFO] |= LI_TRACKING;
-	ent->client->ps.tracktarget = ent->tracktarget->s.number;
+	ent->tracktarget_ = target;
+	ent->locktime_ = theLevel.time_;
+	ent->s.tracktarget = ent->tracktarget_->s.number;
+	ent->client_->ps_.stats[STAT_LOCKINFO] |= LI_TRACKING;
+	ent->client_->ps_.tracktarget = ent->tracktarget_->s.number;
 }
 
-void updateTargetTracking( gentity_t *ent )
+void updateTargetTracking( GameEntity *ent )
 {
 	unsigned long	targetcat = 0;
 	trace_t			tr;
 	vec3_t			forward, endpos, dir;
 	float			radarrange = 0;
-	bool		buildings = false, groundinstallations = false;
-	gentity_t		*test;
+	bool			buildings = false, groundinstallations = false;
+	GameEntity		*test;
 	float			cone = 0.0f;
 	
 //	Com_Printf( "updateTargetTracking for %s\n", ent->client->pers.netname );
 
 	// what can we lock on ?
-	if(	ent->client->ps.ONOFF & OO_RADAR_AIR ) {
+	if(	ent->client_->ps_.ONOFF & OO_RADAR_AIR )
+	{
 		targetcat = CAT_PLANE|CAT_HELO;
-		radarrange = availableVehicles[ent->client->vehicle].radarRange;
-		cone = availableVehicles[ent->client->vehicle].trackCone;
-	} else if( ent->client->ps.ONOFF & OO_RADAR_GROUND ) {
+		radarrange = availableVehicles[ent->client_->vehicle_].radarRange;
+		cone = availableVehicles[ent->client_->vehicle_].trackCone;
+	} 
+	else if( ent->client_->ps_.ONOFF & OO_RADAR_GROUND ) 
+	{
 		targetcat = CAT_GROUND|CAT_BOAT;
 		buildings = true;
 		groundinstallations = true;
-		radarrange = availableVehicles[ent->client->vehicle].radarRange2;
-		cone = availableVehicles[ent->client->vehicle].trackCone2;
+		radarrange = availableVehicles[ent->client_->vehicle_].radarRange2;
+		cone = availableVehicles[ent->client_->vehicle_].trackCone2;
 	}
 	
-	if( !targetcat ) {
-		if( ent->client->ps.stats[STAT_LOCKINFO] ) untrack(ent);
+	if( !targetcat ) 
+	{
+		if( ent->client_->ps_.stats[STAT_LOCKINFO] ) 
+			untrack(ent);
 		return;
 	}
 
 	// weapon range and vehicle direction
-	if( (availableVehicles[ent->client->vehicle].cat & CAT_GROUND) ||
-		(availableVehicles[ent->client->vehicle].cat & CAT_BOAT)) {
+	if( (availableVehicles[ent->client_->vehicle_].cat & CAT_GROUND) ||
+		(availableVehicles[ent->client_->vehicle_].cat & CAT_BOAT)) 
+	{
 		vec3_t	right, up, temp;
-		AngleVectors( ent->client->ps.vehicleAngles, forward, right, up );
-		RotatePointAroundVector( temp, up, forward, ent->client->ps.turretAngle );
+		AngleVectors( ent->client_->ps_.vehicleAngles, forward, right, up );
+		RotatePointAroundVector( temp, up, forward, ent->client_->ps_.turretAngle );
 		CrossProduct( up, temp, right );
-		RotatePointAroundVector( dir, right, temp, ent->client->ps.gunAngle );
+		RotatePointAroundVector( dir, right, temp, ent->client_->ps_.gunAngle );
 		VectorCopy( dir, forward );
-	} else {
+	} 
+	else
+	{
 		VectorCopy( ent->s.angles, dir );
 		AngleVectors( dir, forward, 0, 0 );
 	}
 
-
 	// no target yet
-	if( !ent->tracktarget ) {
+	if( !ent->tracktarget_ ) 
+	{
 		VectorMA( ent->r.currentOrigin, radarrange, forward, endpos );
 		SV_Trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, endpos, ent->s.number, MASK_ALL, false );
 		// nothing found
-		if( tr.entityNum == ENTITYNUM_NONE ) {
+		if( tr.entityNum == ENTITYNUM_NONE ) 
 			return;
-		}
+
 		// found something
-		test = &g_entities[tr.entityNum];
-		if( test->s.eType == ET_VEHICLE && test->client && 
-			(availableVehicles[test->client->vehicle].cat & targetcat) ) {
+		test = theLevel.getEntity(tr.entityNum);// &g_entities[tr.entityNum];
+		if( test->s.eType == ET_VEHICLE && test->client_ && 
+			(availableVehicles[test->client_->vehicle_].cat & targetcat) ) 
+		{
 			track(ent, test);
-		} else if( test->s.eType == ET_MISC_VEHICLE ) {
+		} 
+		else if( test->s.eType == ET_MISC_VEHICLE )
+		{
 			if( (test->s.modelindex == 255 && groundinstallations) || // ground installations
 			    (availableVehicles[test->s.modelindex].cat & targetcat) ) 
 				track(ent, test);
-		} else {
-			if( buildings ) {
-				if( test->s.eType == ET_EXPLOSIVE && test->takedamage ) {
+		} 
+		else
+		{
+			if( buildings ) 
+			{
+				if( test->s.eType == ET_EXPLOSIVE && test->takedamage_ ) 
 					track(ent, test);
-				}
-			} else {
+			}
+			else 
+			{
 				return;
 			}
 		}
-	} else { // update existing target
+	} 
+	else 
+	{ 
+		// update existing target
 		vec3_t diff;
 		float dot, dist;
 		int actualcat = 0;
 
-		if( ent->tracktarget->s.eType == ET_EXPLOSIVE ) {
+		if( ent->tracktarget_->s.eType == ET_EXPLOSIVE ) 
+		{
 			vec3_t	mid;
 			actualcat = CAT_GROUND;
-			VectorAdd( ent->tracktarget->r.absmax, ent->tracktarget->r.absmin, mid );
+			VectorAdd( ent->tracktarget_->r.absmax, ent->tracktarget_->r.absmin, mid );
 			VectorScale( mid, 0.5f, mid );
 			VectorSubtract( mid, ent->r.currentOrigin, diff );
-		} else {
-			if( ent->tracktarget->s.eType == ET_MISC_VEHICLE ) {
-				if( ent->tracktarget->s.modelindex == 255 )// groundinstallation
+		} 
+		else 
+		{
+			if( ent->tracktarget_->s.eType == ET_MISC_VEHICLE )
+			{
+				if( ent->tracktarget_->s.modelindex == 255 )// groundinstallation
 				{
 					actualcat = CAT_GROUND;
 					groundinstallations = true;
 				}
 				else
-					actualcat = availableVehicles[ent->tracktarget->s.modelindex].cat;
-			} else if( ent->tracktarget->s.eType == ET_VEHICLE && ent->tracktarget->client ) {
-				actualcat =	availableVehicles[ent->tracktarget->client->vehicle].cat;
+					actualcat = availableVehicles[ent->tracktarget_->s.modelindex].cat;
+			} 
+			else if( ent->tracktarget_->s.eType == ET_VEHICLE && ent->tracktarget_->client_ ) 
+			{
+				actualcat =	availableVehicles[ent->tracktarget_->client_->vehicle_].cat;
 			}
-			VectorSubtract( ent->tracktarget->r.currentOrigin, ent->r.currentOrigin, diff );
+			VectorSubtract( ent->tracktarget_->r.currentOrigin, ent->r.currentOrigin, diff );
 		}
-		if( !actualcat ) {
+		if( !actualcat ) 
+		{
 			untrack(ent);
 			return;
 		}
 			
 		// check within range
 		dist = VectorNormalize( diff );
-		if( dist > radarrange ) {
+		if( dist > radarrange )
+		{
 			untrack(ent);
 			return;
 		}
 		// check within cone
 		dot = DotProduct( forward, diff );
-		if( dot < cone ) {
+		if( dot < cone ) 
+		{
 			untrack(ent);
 			return;
-		} else if( dot < availableWeapons[ent->s.weaponIndex].lockcone ) {
-			if( ent->client->ps.stats[STAT_LOCKINFO] & LI_LOCKING )	
+		} 
+		else if( dot < availableWeapons[ent->s.weaponIndex].lockcone ) 
+		{
+			if( ent->client_->ps_.stats[STAT_LOCKINFO] & LI_LOCKING )	
 				unlock(ent);
-			ent->locktime = level.time;
+			ent->locktime_ = theLevel.time_;
 			return;
 		}
 			
 		// check LOS
 		VectorMA( ent->r.currentOrigin, dist, diff, endpos );
 		SV_Trace( &tr, ent->r.currentOrigin, 0, 0, endpos, ent->s.number, MASK_PLAYERSOLID, false );
-		if( tr.fraction < 1 && tr.entityNum != ent->s.tracktarget ) {
+		if( tr.fraction < 1 && tr.entityNum != ent->s.tracktarget ) 
+		{
 			untrack(ent);
 			return;
 		}
@@ -183,37 +214,47 @@ void updateTargetTracking( gentity_t *ent )
 		if( availableWeapons[ent->s.weaponIndex].type != WT_GUIDEDBOMB &&
 			availableWeapons[ent->s.weaponIndex].type != WT_ANTIAIRMISSILE &&
 			availableWeapons[ent->s.weaponIndex].type != WT_ANTIGROUNDMISSILE &&
-			availableWeapons[ent->s.weaponIndex].type != WT_ANTIRADARMISSILE ) {
+			availableWeapons[ent->s.weaponIndex].type != WT_ANTIRADARMISSILE )
+		{
 			//untrack(ent);
-			if( ent->client->ps.stats[STAT_LOCKINFO] & LI_LOCKING ) unlock(ent);
+			if( ent->client_->ps_.stats[STAT_LOCKINFO] & LI_LOCKING )
+				unlock(ent);
 			return;
 		}
 
 		// what can we lock on ?
 		targetcat = 0;
 		if(	availableWeapons[ent->s.weaponIndex].type == WT_ANTIAIRMISSILE &&
-			(ent->client->ps.ONOFF & OO_RADAR_AIR) ) {
+			(ent->client_->ps_.ONOFF & OO_RADAR_AIR) ) 
+		{
 			targetcat = CAT_PLANE|CAT_HELO;
-		} else if( availableWeapons[ent->s.weaponIndex].type != WT_ANTIAIRMISSILE &&
-			(ent->client->ps.ONOFF & OO_RADAR_GROUND) ) {
+		} 
+		else if( availableWeapons[ent->s.weaponIndex].type != WT_ANTIAIRMISSILE &&
+			(ent->client_->ps_.ONOFF & OO_RADAR_GROUND) )
+		{
 			targetcat = CAT_GROUND|CAT_BOAT;
 			buildings = true;
 		}
-		if( !targetcat ) {
+		if( !targetcat ) 
+		{
 			unlock(ent);
 			//untrack(ent);
 			return;
-		} else if( !(targetcat & actualcat) ) {
+		} 
+		else if( !(targetcat & actualcat) ) 
+		{
 			unlock(ent);
 			return;			
 		}
 		// check time
-		if( level.time > ent->locktime + availableWeapons[ent->s.weaponIndex].lockdelay ) {
-			ent->client->ps.stats[STAT_LOCKINFO] |= LI_LOCKING;
+		if( theLevel.time_ > ent->locktime_ + availableWeapons[ent->s.weaponIndex].lockdelay )
+		{
+			ent->client_->ps_.stats[STAT_LOCKINFO] |= LI_LOCKING;
 		}
 		// update target
-		if( ent->tracktarget->client && (ent->client->ps.stats[STAT_LOCKINFO] & LI_LOCKING) ) {
-			ent->tracktarget->client->ps.stats[STAT_LOCKINFO] |= LI_BEING_LOCKED;
+		if( ent->tracktarget_->client_ && (ent->client_->ps_.stats[STAT_LOCKINFO] & LI_LOCKING) )
+		{
+			ent->tracktarget_->client_->ps_.stats[STAT_LOCKINFO] |= LI_BEING_LOCKED;
 		}
 	}
 }
