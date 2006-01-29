@@ -26,7 +26,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // q_shared.h -- included first by ALL program modules.
 // A user mod should never modify this file
 
-#define	MF_VERSION		"MF 1.0.7"
+#define	MF_VERSION		"MF 1.0.9"
 
 #define MAX_TEAMNAME 32
 
@@ -1116,10 +1116,12 @@ typedef enum {
 // entitynums are communicated with GENTITY_BITS, so any reserved
 // values that are going to be communcated over the net need to
 // also be in this range
-#define	ENTITYNUM_NONE		(MAX_GENTITIES-1)
-#define	ENTITYNUM_WORLD		(MAX_GENTITIES-2)
-#define	ENTITYNUM_MAX_NORMAL	(MAX_GENTITIES-2)
-
+//#define	ENTITYNUM_NONE		(MAX_GENTITIES-1)
+//#define	ENTITYNUM_WORLD		(MAX_GENTITIES-2)
+//#define	ENTITYNUM_MAX_NORMAL	(MAX_GENTITIES-2)
+#define	ENTITYNUM_NONE			(-1)
+#define	ENTITYNUM_WORLD			(0)
+#define	ENTITYNUM_MAX_NORMAL	(MAX_GENTITIES)
 
 #define	MAX_MODELS			256		// these are sent over the net as 8 bits
 #define	MAX_SOUNDS			256		// so they cannot be blindly increased
@@ -1172,74 +1174,6 @@ typedef struct {
 // playerState_t is a full superset of entityState_t as it is used by players,
 // so if a playerState_t is transmitted, the entityState_t can be fully derived
 // from it.
-//typedef struct playerState_s {
-//	int			commandTime;	// cmd->serverTime of last executed command
-//	int			pm_type;
-//	int			bobCycle;		// for view bobbing and footstep generation
-//	int			pm_flags;		// ducked, jump_held, etc
-//	int			pm_time;
-//
-//	vec3_t		origin;
-//	vec3_t		velocity;
-//	int			weaponTime;
-//	int			gravity;
-//	int			speed;
-//	int			delta_angles[3];	// add to command angles to get view direction
-//									// changed by spawns, rotating objects, and teleporters
-//
-//	int			groundEntityNum;// ENTITYNUM_NONE = in air
-//
-//	int			legsTimer;		// don't change low priority animations until this runs out
-//	int			legsAnim;		// mask off ANIM_TOGGLEBIT
-//
-//	int			torsoTimer;		// don't change low priority animations until this runs out
-//	int			torsoAnim;		// mask off ANIM_TOGGLEBIT
-//
-//	int			movementDir;	// a number 0 to 7 that represents the reletive angle
-//								// of movement to the view angle (axial and diagonals)
-//								// when at rest, the value will remain unchanged
-//								// used to twist the legs during strafing
-//
-//	vec3_t		grapplePoint;	// location of grapple to pull towards if PMF_GRAPPLE_PULL
-//
-//	int			eFlags;			// copied to entityState_t->eFlags
-//
-//	int			eventSequence;	// pmove generated events
-//	int			events[MAX_PS_EVENTS];
-//	int			eventParms[MAX_PS_EVENTS];
-//
-//	int			externalEvent;	// events set on player from another source
-//	int			externalEventParm;
-//	int			externalEventTime;
-//
-//	int			clientNum;		// ranges from 0 to MAX_CLIENTS-1
-//	int			weapon;			// copied to entityState_t->weapon
-//	int			weaponstate;
-//
-//	vec3_t		viewangles;		// for fixed views
-//	int			viewheight;
-//
-//	// damage feedback
-//	int			damageEvent;	// when it changes, latch the other parms
-//	int			damageYaw;
-//	int			damagePitch;
-//	int			damageCount;
-//
-//	int			stats[MAX_STATS];
-//	int			persistant[MAX_PERSISTANT];	// stats that aren't cleared on death
-//	int			powerups[MAX_POWERUPS];	// level.time that the powerup runs out
-//	int			ammo[MAX_WEAPONS];
-//
-//	int			generic1;
-//	int			loopSound;
-//	int			jumppad_ent;	// jumppad entity hit this frame
-//
-//	// not communicated over the net at all
-//	int			ping;			// server to game info for scoreboard
-//	int			pmove_framecount;	// FIXME: don't transmit over the network
-//	int			jumppad_frame;
-//	int			entityEventSequence;
-//} playerState_t;
 
 typedef struct playerState_s {
 	int			commandTime;	// cmd->serverTime of last executed command
@@ -1312,7 +1246,98 @@ typedef struct playerState_s {
 	int			entityEventSequence;
 } playerState_t;
 
+struct PlayerState
+{
+	int			commandTime_;	// cmd->serverTime of last executed command
+	int			pm_type_;
+	int			throttle_;		// MFQ3 actual throttle (ie maybe overridden fixed_throttle)
+	int			pm_flags_;		// ducked, jump_held, etc
+	int			pm_time_;
 
+	vec3_t		origin_;
+	vec3_t		velocity_;
+	int			tracktarget_;
+	float		gunAngle_;
+	int			speed_;
+	int			delta_angles_[3];	// add to command angles to get view direction
+									// changed by spawns, rotating objects, and teleporters
+
+	int			groundEntityNum_;// ENTITYNUM_NONE = in air
+
+	int			objectives_;		// MFQ3 for game objectives like CTF flags
+	int			vehicleAnim_;	// set vehicle specific animations
+
+	float		turretAngle_;	// MFQ3 used for turret
+	int			ONOFF_;			// ON/OFF flags
+
+	int			fixed_throttle_;	// MFQ3 for throttle settings by increase/decrease
+
+	vec3_t		vehicleAngles_;	// used for vehicles in MFQ3
+
+	int			eFlags_;			// copied to entityState_t->eFlags
+
+	int			eventSequence_;	// pmove generated events
+	int			events_[MAX_PS_EVENTS];
+	int			eventParms_[MAX_PS_EVENTS];
+
+	int			externalEvent_;	// events set on player from another source
+	int			externalEventParm_;
+	int			externalEventTime_;
+
+	int			clientNum_;		// ranges from 0 to MAX_CLIENTS-1
+	int			weaponIndex_;	// copied to entityState_t->weaponIndex
+	int			weaponNum_;
+
+	vec3_t		viewangles_;		// for fixed views
+	int			viewheight_;		// --- useless, can be (carefully) replaced ---
+
+	// damage feedback
+	int			damageEvent_;	// when it changes, latch the other parms
+	int			damageYaw_;
+	int			damagePitch_;
+	int			damageCount_;
+
+	int			stats_[MAX_STATS];
+	int			persistant_[MAX_PERSISTANT];	// stats that aren't cleared on death
+	int			timers_[MAX_TIMERS];			// MFQ3 timers etc
+	int			ammo_[MAX_WEAPONS_PER_VEHICLE*2];// 0-7 actual ammo of weapon 8-15 maxammo of weapon
+
+	int			generic1_;
+	int			loopSound_;
+	int			jumppad_ent_;	// jumppad entity hit this frame
+
+	// mfq3 weapons/vwep
+	int			numWeaponsOnMount_[32];	// number of weapons actually on this mount; note: each of these are just 5 bit numbers (ie 32)
+										// 32 = MAX_MOUNTS_PER_VEHICLE 
+										// shouldnt be hardcoded like this, but want to get New system to work first
+
+	// not communicated over the net at all
+	int			ping_;			// server to game info for scoreboard
+	int			pmove_framecount_;	// FIXME: don't transmit over the network
+	int			jumppad_frame_;
+	int			entityEventSequence_;
+};
+
+struct ClientBase
+{
+	enum eTeam
+	{
+		TEAM_FREE,
+		TEAM_RED,
+		TEAM_BLUE,
+		TEAM_SPECTATOR,
+
+		TEAM_NUM_TEAMS
+	};
+
+					ClientBase() 
+					{
+						memset( &ps_, 0, sizeof(ps_) );
+					}
+	virtual			~ClientBase() {}
+
+	playerState_t	ps_;
+};
 
 //====================================================================
 

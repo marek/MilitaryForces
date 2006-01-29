@@ -1,5 +1,5 @@
 /*
- * $Id: cg_main.c,v 1.16 2005-11-26 10:06:29 thebjoern Exp $
+ * $Id: cg_main.c,v 1.17 2006-01-29 14:03:40 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -1107,7 +1107,7 @@ void CG_BuildSpectatorString() {
 	int i;
 	cg.spectatorList[0] = 0;
 	for (i = 0; i < MAX_CLIENTS; i++) {
-		if (cgs.clientinfo[i].infoValid && cgs.clientinfo[i].team == TEAM_SPECTATOR ) {
+		if (cgs.clientinfo[i].infoValid && cgs.clientinfo[i].team == ClientBase::TEAM_SPECTATOR ) {
 			Q_strcat(cg.spectatorList, sizeof(cg.spectatorList), va("%s     ", cgs.clientinfo[i].name));
 		}
 	}
@@ -1476,7 +1476,7 @@ int CG_FeederCount(float feederID) {
 		for (i = 0; i < cg.numScores; i++)
 		{
 			// only count red
-			if (cg.scores[i].team == TEAM_RED)
+			if (cg.scores[i].team == ClientBase::TEAM_RED)
 			{
 				count++;
 			}
@@ -1488,7 +1488,7 @@ int CG_FeederCount(float feederID) {
 		for (i = 0; i < cg.numScores; i++)
 		{
 			// only count blue
-			if (cg.scores[i].team == TEAM_BLUE)
+			if (cg.scores[i].team == ClientBase::TEAM_BLUE)
 			{
 				count++;
 			}
@@ -1500,7 +1500,7 @@ int CG_FeederCount(float feederID) {
 		for (i = 0; i < cg.numScores; i++)
 		{
 			// DONT count spectators
-			if (cg.scores[i].team != TEAM_SPECTATOR)
+			if (cg.scores[i].team != ClientBase::TEAM_SPECTATOR)
 			{
 				count++;
 			}
@@ -1512,7 +1512,7 @@ int CG_FeederCount(float feederID) {
 		for (i = 0; i < cg.numScores; i++)
 		{
 			// only count spectators
-			if (cg.scores[i].team == TEAM_SPECTATOR)
+			if (cg.scores[i].team == ClientBase::TEAM_SPECTATOR)
 			{
 				count++;
 			}
@@ -1534,9 +1534,9 @@ void CG_SetScoreSelection(void *p) {
 	int i, red, blue;
 	red = blue = 0;
 	for (i = 0; i < cg.numScores; i++) {
-		if (cg.scores[i].team == TEAM_RED) {
+		if (cg.scores[i].team == ClientBase::TEAM_RED) {
 			red++;
-		} else if (cg.scores[i].team == TEAM_BLUE) {
+		} else if (cg.scores[i].team == ClientBase::TEAM_BLUE) {
 			blue++;
 		}
 		if (ps->clientNum == cg.scores[i].client) {
@@ -1552,7 +1552,7 @@ void CG_SetScoreSelection(void *p) {
 	if ( cgs.gametype >= GT_TEAM ) {
 		int feeder = FEEDER_REDTEAM_LIST;
 		i = red;
-		if (cg.scores[cg.selectedScore].team == TEAM_BLUE) {
+		if (cg.scores[cg.selectedScore].team == ClientBase::TEAM_BLUE) {
 			feeder = FEEDER_BLUETEAM_LIST;
 			i = blue;
 		}
@@ -1605,18 +1605,18 @@ const char *CG_FeederItemText(float feederID, int index, int column, qhandle_t *
 	*handle = -1;
 
 	if (feederID == FEEDER_REDTEAM_LIST) {
-		team = TEAM_RED;
+		team = ClientBase::TEAM_RED;
 	} else if (feederID == FEEDER_BLUETEAM_LIST) {
-		team = TEAM_BLUE;
+		team = ClientBase::TEAM_BLUE;
 	} else if (feederID == FEEDER_SPECTATOR_LIST) {
-		team = TEAM_SPECTATOR;
+		team = ClientBase::TEAM_SPECTATOR;
 	}
 
 	info = CG_InfoFromScoreIndex(index, team, &scoreIndex);
 	sp = &cg.scores[scoreIndex];
 
 	// spectator?
-	if (info->infoValid && info->team == TEAM_SPECTATOR )
+	if (info->infoValid && info->team == ClientBase::TEAM_SPECTATOR )
 	{
 		spectator = true;
 	}
@@ -1781,7 +1781,7 @@ void CG_FeederSelection(float feederID, int index)
 {
 	if ( cgs.gametype >= GT_TEAM ) {
 		int i, count;
-		int team = (feederID == FEEDER_REDTEAM_LIST) ? TEAM_RED : TEAM_BLUE;
+		int team = (feederID == FEEDER_REDTEAM_LIST) ? ClientBase::TEAM_RED : ClientBase::TEAM_BLUE;
 		count = 0;
 		for (i = 0; i < cg.numScores; i++) {
 			if (cg.scores[i].team == team) {

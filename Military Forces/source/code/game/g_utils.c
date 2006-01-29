@@ -1,5 +1,5 @@
 /*
- * $Id: g_utils.c,v 1.7 2005-11-21 17:28:20 thebjoern Exp $
+ * $Id: g_utils.c,v 1.8 2006-01-29 14:03:41 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -7,6 +7,8 @@
 // g_utils.c -- misc utility functions for game module
 
 #include "g_local.h"
+#include "g_level.h"
+
 
 typedef struct {
   char oldShader[MAX_QPATH];
@@ -65,31 +67,29 @@ G_FindConfigstringIndex
 
 ================
 */
-int G_FindConfigstringIndex( char *name, int start, int max, bool create ) {
+int G_FindConfigstringIndex( char *name, int start, int max, bool create ) 
+{
 	int		i;
 	char	s[MAX_STRING_CHARS];
 
-	if ( !name || !name[0] ) {
+	if ( !name || !name[0] ) 
 		return 0;
-	}
 
-	for ( i=1 ; i<max ; i++ ) {
+	for ( i=1 ; i<max ; i++ ) 
+	{
 		SV_GetConfigstring( start + i, s, sizeof( s ) );
-		if ( !s[0] ) {
+		if ( !s[0] ) 
 			break;
-		}
-		if ( !strcmp( s, name ) ) {
+
+		if ( !strcmp( s, name ) ) 
 			return i;
-		}
 	}
 
-	if ( !create ) {
+	if ( !create ) 
 		return 0;
-	}
 
-	if ( i == max ) {
+	if ( i == max ) 
 		Com_Error( ERR_DROP, "G_FindConfigstringIndex: overflow" );
-	}
 
 	SV_SetConfigstring( start + i, name );
 
@@ -97,11 +97,13 @@ int G_FindConfigstringIndex( char *name, int start, int max, bool create ) {
 }
 
 
-int G_ModelIndex( char *name ) {
+int G_ModelIndex( char *name ) 
+{
 	return G_FindConfigstringIndex (name, CS_MODELS, MAX_MODELS, true);
 }
 
-int G_SoundIndex( char *name ) {
+int G_SoundIndex( char *name ) 
+{
 	return G_FindConfigstringIndex (name, CS_SOUNDS, MAX_SOUNDS, true);
 }
 
@@ -115,14 +117,18 @@ G_TeamCommand
 Broadcasts a command to only a specific team
 ================
 */
-void G_TeamCommand( team_t team, char *cmd ) {
-	int		i;
+void G_TeamCommand( ClientBase::eTeam team, char *cmd ) 
+{
+	int			i;
+	GameClient*	client;	
 
-	for ( i = 0 ; i < level.maxclients ; i++ ) {
-		if ( level.clients[i].pers.connected == CON_CONNECTED ) {
-			if ( level.clients[i].sess.sessionTeam == team ) {
+	for ( i = 1 ; i <= theLevel.maxclients_ ; i++ ) 
+	{
+		client = theLevel.getClient(i);
+		if( client && client->pers_.connected_ == GameClient::ClientPersistant::CON_CONNECTED ) 
+		{
+			if ( client->sess_.sessionTeam_ == team )
 				SV_GameSendServerCommand( i, va("%s", cmd ));
-			}
 		}
 	}
 }
@@ -140,27 +146,40 @@ NULL will be returned if the end of the list is reached.
 
 =============
 */
-gentity_t *G_Find (gentity_t *from, int fieldofs, const char *match)
+GameEntity* G_Find( GameEntity *from, int fieldofs, const char *match )
 {
-	char	*s;
+	//char	*s;
 
-	if (!from)
-		from = g_entities;
+	//if (!from)
+	//	from = theLevel.gameEntities_.at(0);// g_entities;
+	//else
+	//	theLevel.gameEntities_[from->s.number+1];	//from++;
+
+	//for ( ; from < theLevel.gameEntities_[theLevel.num_entities_]; from++ ) // &g_entities[level.num_entities] ; from++)
+	size_t i;
+	if( !from )
+		i = 0;
 	else
-		from++;
+		i = from->s.number + 1;
 
-	for ( ; from < &g_entities[level.num_entities] ; from++)
+	for( ; i < theLevel.num_entities_; ++i )
 	{
-		if (!from->inuse)
+		GameEntity* search = theLevel.getEntity(i);
+
+		if( !search || !search->inuse_ )
 			continue;
-		s = *(char **) ((byte *)from + fieldofs);
+
+		char *s = *(char **) ((byte *)search + fieldofs);
 		if (!s)
 			continue;
 		if (!Q_stricmp (s, match))
+		{
+			from = search;
 			return from;
+		}
 	}
 
-	return NULL;
+	return 0;
 }
 
 
@@ -173,11 +192,11 @@ Selects a random entity from among the targets
 */
 #define MAXCHOICES	32
 
-gentity_t *G_PickTarget (char *targetname)
+GameEntity* G_PickTarget( char *targetname )
 {
-	gentity_t	*ent = NULL;
-	int		num_choices = 0;
-	gentity_t	*choice[MAXCHOICES];
+	GameEntity*	ent = 0;
+	int			num_choices = 0;
+	GameEntity*	choice[MAXCHOICES];
 
 	if (!targetname)
 	{
@@ -187,7 +206,7 @@ gentity_t *G_PickTarget (char *targetname)
 
 	while(1)
 	{
-		ent = G_Find (ent, FOFS(targetname), targetname);
+		ent = G_Find (ent, FOFS(targetname_), targetname);
 		if (!ent)
 			break;
 		choice[num_choices++] = ent;
@@ -216,33 +235,37 @@ match (string)self.target and call their .use function
 
 ==============================
 */
-void G_UseTargets( gentity_t *ent, gentity_t *activator ) {
-	gentity_t		*t;
+void G_UseTargets( GameEntity *ent, GameEntity *activator ) 
+{
+	GameEntity		*t;
 	
-	if ( !ent ) {
+	if ( !ent ) 
 		return;
-	}
 
-	if (ent->targetShaderName && ent->targetShaderNewName) {
-		float f = level.time * 0.001;
-		AddRemap(ent->targetShaderName, ent->targetShaderNewName, f);
+	if (ent->targetShaderName_ && ent->targetShaderNewName_) 
+	{
+		float f = theLevel.time_ * 0.001;
+		AddRemap(ent->targetShaderName_, ent->targetShaderNewName_, f);
 		SV_SetConfigstring(CS_SHADERSTATE, BuildShaderStateConfig());
 	}
 
-	if ( !ent->target ) {
+	if ( !ent->target_ ) 
 		return;
-	}
 
 	t = NULL;
-	while ( (t = G_Find (t, FOFS(targetname), ent->target)) != NULL ) {
-		if ( t == ent ) {
+	while ( (t = G_Find (t, FOFS(targetname_), ent->target_)) != NULL ) 
+	{
+		if ( t == ent )
+		{
 			Com_Printf ("WARNING: Entity used itself.\n");
-		} else {
-			if ( t->use ) {
-				t->use (t, ent, activator);
-			}
+		} 
+		else
+		{
+			//if ( t->use ) 
+			t->useFunc_->execute( ent, activator );
 		}
-		if ( !ent->inuse ) {
+		if ( !ent->inuse_ ) 
+		{
 			Com_Printf("entity was removed while using targets\n");
 			return;
 		}
@@ -258,7 +281,8 @@ This is just a convenience function
 for making temporary vectors for function calls
 =============
 */
-float	*tv( float x, float y, float z ) {
+float	*tv( float x, float y, float z )
+{
 	static	int		index;
 	static	vec3_t	vecs[8];
 	float	*v;
@@ -284,7 +308,8 @@ This is just a convenience function
 for printing vectors
 =============
 */
-char	*vtos( const vec3_t v ) {
+char	*vtos( const vec3_t v ) 
+{
 	static	int		index;
 	static	char	str[8][32];
 	char	*s;
@@ -309,155 +334,160 @@ Angles will be cleared, because it is being used to represent a direction
 instead of an orientation.
 ===============
 */
-void G_SetMovedir( vec3_t angles, vec3_t movedir ) {
+void G_SetMovedir( vec3_t angles, vec3_t movedir ) 
+{
 	static vec3_t VEC_UP		= {0, -1, 0};
 	static vec3_t MOVEDIR_UP	= {0, 0, 1};
 	static vec3_t VEC_DOWN		= {0, -2, 0};
 	static vec3_t MOVEDIR_DOWN	= {0, 0, -1};
 
-	if ( VectorCompare (angles, VEC_UP) ) {
+	if ( VectorCompare (angles, VEC_UP) ) 
+	{
 		VectorCopy (MOVEDIR_UP, movedir);
-	} else if ( VectorCompare (angles, VEC_DOWN) ) {
+	} 
+	else if ( VectorCompare (angles, VEC_DOWN) )
+	{
 		VectorCopy (MOVEDIR_DOWN, movedir);
-	} else {
+	} 
+	else 
+	{
 		AngleVectors (angles, movedir, NULL, NULL);
 	}
 	VectorClear( angles );
 }
 
 
-float vectoyaw( const vec3_t vec ) {
+float vectoyaw( const vec3_t vec ) 
+{
 	float	yaw;
 	
-	if (vec[YAW] == 0 && vec[PITCH] == 0) {
+	if (vec[YAW] == 0 && vec[PITCH] == 0) 
+	{
 		yaw = 0;
-	} else {
-		if (vec[PITCH]) {
+	} 
+	else
+	{
+		if (vec[PITCH])
 			yaw = ( atan2( vec[YAW], vec[PITCH]) * 180 / M_PI );
-		} else if (vec[YAW] > 0) {
+		else if (vec[YAW] > 0)
 			yaw = 90;
-		} else {
+		else 
 			yaw = 270;
-		}
-		if (yaw < 0) {
+		if (yaw < 0) 
 			yaw += 360;
-		}
 	}
 
 	return yaw;
 }
 
 
-void G_InitGentity( gentity_t *e ) {
-	e->inuse = true;
-	e->classname = "noclass";
-	e->s.number = e - g_entities;
-	e->r.ownerNum = ENTITYNUM_NONE;
-}
-
-/*
-=================
-G_Spawn
-
-Either finds a free entity, or allocates a New one.
-
-  The slots from 0 to MAX_CLIENTS-1 are always reserved for clients, and will
-never be used by anything else.
-
-Try to avoid reusing an entity that was recently freed, because it
-can cause the client to think the entity morphed into something else
-instead of being removed and recreated, which can cause interpolated
-angles and bad trails.
-=================
-*/
-gentity_t *G_Spawn( void ) {
-	int			i, force;
-	gentity_t	*e;
-
-	e = NULL;	// shut up warning
-	i = 0;		// shut up warning
-	for ( force = 0 ; force < 2 ; force++ ) {
-		// if we go through all entities and can't find one to free,
-		// override the normal minimum times before use
-		e = &g_entities[MAX_CLIENTS];
-		for ( i = MAX_CLIENTS ; i<level.num_entities ; i++, e++) {
-			if ( e->inuse ) {
-				continue;
-			}
-
-			// the first couple seconds of server time can involve a lot of
-			// freeing and allocating, so relax the replacement policy
-			if ( !force && e->freetime > level.startTime + 2000 && level.time - e->freetime < 1000 ) {
-				continue;
-			}
-
-			// reuse this slot
-			G_InitGentity( e );
-			return e;
-		}
-		if ( i != MAX_GENTITIES ) {
-			break;
-		}
-	}
-	if ( i == ENTITYNUM_MAX_NORMAL ) {
-		for (i = 0; i < MAX_GENTITIES; i++) {
-			Com_Printf("%4i: %s\n", i, g_entities[i].classname);
-		}
-		Com_Error( ERR_DROP, "G_Spawn: no free entities" );
-	}
-	
-	// open up a New slot
-	level.num_entities++;
-
-	// let the server system know that there are more entities
-	SV_LocateGameData( (void*)level.gentities, level.num_entities, sizeof( gentity_t ), 
-		&level.clients[0].ps, sizeof( level.clients[0] ) );
-
-	G_InitGentity( e );
-	return e;
-}
+///*
+//=================
+//G_Spawn
+//
+//Either finds a free entity, or allocates a New one.
+//
+//  The slots from 0 to MAX_CLIENTS-1 are always reserved for clients, and will
+//never be used by anything else.
+//
+//Try to avoid reusing an entity that was recently freed, because it
+//can cause the client to think the entity morphed into something else
+//instead of being removed and recreated, which can cause interpolated
+//angles and bad trails.
+//=================
+//*/
+//GameEntity*	G_Spawn() 
+//{
+//	int			i = 0;
+//	GameEntity*	e = 0;
+//
+//	for( int force = 0 ; force < 2 ; force++ ) 
+//	{
+//		// if we go through all entities and can't find one to free,
+//		// override the normal minimum times before use
+//		//e = theLevel.gameEntities_.at(MAX_CLIENTS);// &g_entities[MAX_CLIENTS];
+//		for( i = MAX_CLIENTS + 1 ; i < theLevel.num_entities_ ; i++ ) //, e++ ) 
+//		{
+//			e = theLevel.getEntity(i);
+//
+//			if( e->inuse_ ) 
+//				continue;
+//
+//			// the first couple seconds of server time can involve a lot of
+//			// freeing and allocating, so relax the replacement policy
+//			if( !force && e->freetime_ > theLevel.startTime_ + 2000 && theLevel.time_ - e->freetime_ < 1000 )
+//				continue;
+//
+//			// reuse this slot
+//			e->init(-1);
+//			return e;
+//		}
+//		if ( i != MAX_GENTITIES ) 
+//			break;
+//	}
+//	if( i == ENTITYNUM_MAX_NORMAL ) 
+//	{
+//		for( i = 0; i < MAX_GENTITIES; i++ ) 
+//		{
+//			GameEntity* currEnt = theLevel.getEntity(i);
+//			Com_Printf("%4i: %s\n", i, currEnt->classname_);// g_entities[i].classname);
+//		}
+//		Com_Error( ERR_DROP, "G_Spawn: no free entities" );
+//	}
+//	
+//	// open up a New slot
+//	theLevel.num_entities_++;
+//
+//	// let the server system know that there are more entities
+//#pragma message("shouldnt need to call SV_LocateGameData here anymore..")
+//	//SV_LocateGameData( &theLevel.gameEntities_, &theLevel.clients_ );
+//	//SV_LocateGameData( (void*)level.gentities, level.num_entities, sizeof( gentity_t ), 
+//	//	&level.clients[0].ps, sizeof( level.clients[0] ) );
+//
+//	e->init(-1);
+//	return e;
+//}
 
 /*
 =================
 G_EntitiesFree
 =================
 */
-bool G_EntitiesFree( void ) {
-	int			i;
-	gentity_t	*e;
-
-	e = &g_entities[MAX_CLIENTS];
-	for ( i = MAX_CLIENTS; i < level.num_entities; i++, e++) {
-		if ( e->inuse ) {
-			continue;
-		}
-		// slot available
+bool G_EntitiesFree() 
+{
+	if( theLevel.num_entities_ < MAX_GENTITIES )
 		return true;
+
+	for( int i = MAX_CLIENTS + 1; i < theLevel.num_entities_; i++ ) 
+	{
+		GameEntity* e = theLevel.getEntity(i);
+		if( !e || !e->inuse_ )
+			return true;
 	}
 	return false;
 }
 
 
-/*
-=================
-G_FreeEntity
-
-Marks the entity as free
-=================
-*/
-void G_FreeEntity( gentity_t *ed ) 
-{
-	SV_UnlinkEntity (&ed->s, &ed->r);		// unlink from world
-
-	if ( ed->neverFree ) {
-		return;
-	}
-
-	memset (ed, 0, sizeof(*ed));
-	ed->classname = "freed";
-	ed->freetime = level.time;
-	ed->inuse = false;
-}
+///*
+//=================
+//G_FreeEntity
+//
+//Marks the entity as free
+//=================
+//*/
+//void G_FreeEntity( GameEntity *ed ) 
+//{
+//	SV_UnlinkEntity( ed );		// unlink from world
+//
+//	if( ed->neverFree_ ) 
+//		return;
+//
+//	//memset( ed, 0, sizeof(*ed) );
+//	ed->cleanAll();
+//	ed->classname_ = "freed";
+//	ed->freetime_ = theLevel.time_;
+//	ed->inuse_ = false;
+//}
 
 /*
 =================
@@ -468,23 +498,24 @@ The origin will be snapped to save net bandwidth, so care
 must be taken if the origin is right on a surface (snap towards start vector first)
 =================
 */
-gentity_t *G_TempEntity( vec3_t origin, int event ) {
-	gentity_t		*e;
+GameEntity *G_TempEntity( vec3_t origin, int event ) 
+{
+	GameEntity	*e;
 	vec3_t		snapped;
 
-	e = G_Spawn();
+	e = theLevel.spawnEntity();
 	e->s.eType = ET_EVENTS + event;
 
-	e->classname = "tempEntity";
-	e->eventTime = level.time;
-	e->freeAfterEvent = true;
+	e->classname_ = "tempEntity";
+	e->eventTime_ = theLevel.time_;
+	e->freeAfterEvent_ = true;
 
 	VectorCopy( origin, snapped );
 	SnapVector( snapped );		// save network bandwidth
 	G_SetOrigin( e, snapped );
 
 	// find cluster for PVS
-	SV_LinkEntity( &e->s, &e->r );
+	SV_LinkEntity( e );
 
 	return e;
 }
@@ -507,27 +538,26 @@ Kills all entities that would touch the proposed New positioning
 of ent.  Ent should be unlinked before calling this!
 =================
 */
-void G_KillBox (gentity_t *ent) {
+void G_KillBox( GameEntity *ent )
+{
 	int			i, num;
 	int			touch[MAX_GENTITIES];
-	gentity_t	*hit;
+	GameEntity	*hit;
 	vec3_t		mins, maxs;
 
-	VectorAdd( ent->client->ps.origin, ent->r.mins, mins );
-	VectorAdd( ent->client->ps.origin, ent->r.maxs, maxs );
+	VectorAdd( ent->client_->ps_.origin, ent->r.mins, mins );
+	VectorAdd( ent->client_->ps_.origin, ent->r.maxs, maxs );
 	num = SV_AreaEntities( mins, maxs, touch, MAX_GENTITIES );
 
-	for (i=0 ; i<num ; i++) {
-		hit = &g_entities[touch[i]];
-		if ( !hit->client ) {
+	for( i=0 ; i<num ; i++ )
+	{
+		hit = theLevel.getEntity(i);// &g_entities[touch[i]];
+		if( !hit->client_ ) 
 			continue;
-		}
 
 		// nail it
-		G_Damage ( hit, ent, ent, NULL, NULL,
-			100000, DAMAGE_NO_PROTECTION, MOD_TELEFRAG, CAT_ANY);
+		G_Damage ( hit, ent, ent, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_TELEFRAG, CAT_ANY );
 	}
-
 }
 
 //==============================================================================
@@ -541,11 +571,12 @@ client side: jumppads and item pickups
 Adds an event+parm and twiddles the event counter
 ===============
 */
-void G_AddPredictableEvent( gentity_t *ent, int event, int eventParm ) {
-	if ( !ent->client ) {
+void G_AddPredictableEvent( GameEntity *ent, int event, int eventParm )
+{
+	if( !ent->client_ ) 
 		return;
-	}
-	BG_AddPredictableEventToPlayerstate( event, eventParm, &ent->client->ps );
+
+	BG_AddPredictableEventToPlayerstate( event, eventParm, &ent->client_->ps_ );
 }
 
 /*
@@ -554,36 +585,40 @@ Event queue
 ===============
 */
 
-void G_SendEventFromQueue( gentity_t* ent ) {
-	int i = ent->currentEventToSend;
+void G_SendEventFromQueue( GameEntity* ent )
+{
+	int i = ent->currentEventToSend_;
 
 	// nothing to be done
-	if( !ent->eventQueue[i].used ) 
+	if( !ent->eventQueue_[i].used_ ) 
 		return;
 
-	G_AddEvent( ent, ent->eventQueue[i].event, ent->eventQueue[i].eventParm, false );
-	ent->eventQueue[i].used = false;
+	G_AddEvent( ent, ent->eventQueue_[i].event_, ent->eventQueue_[i].eventParm_, false );
+	ent->eventQueue_[i].used_ = false;
 
 	i++;
-	if( i >= MAX_EVENT_QUEUE_SIZE ) 
+	if( i >= GameEntity::k_MAX_EVENT_QUEUE_SIZE ) 
 		i = 0;
-	ent->currentEventToSend = i;
+	ent->currentEventToSend_ = i;
 }
 
-void G_AddEventToQueue( gentity_t* ent, int event, int eventParm ) {
-	int i = ent->currentEventToAdd;
+void G_AddEventToQueue( GameEntity* ent, int event, int eventParm )
+{
+	int i = ent->currentEventToAdd_;
 
-	if( ent->eventQueue[i].used ) {
+	if( ent->eventQueue_[i].used_ ) 
+	{
 		Com_Printf( "Event queue full! Event lost!\n" );
 		return;
 	}
-	ent->eventQueue[i].event = event;
-	ent->eventQueue[i].eventParm = eventParm;
-	ent->eventQueue[i].used = true;
+	ent->eventQueue_[i].event_ = event;
+	ent->eventQueue_[i].eventParm_ = eventParm;
+	ent->eventQueue_[i].used_ = true;
 
 	i++;
-	if( i >= MAX_EVENT_QUEUE_SIZE ) i = 0;
-	ent->currentEventToAdd = i;
+	if( i >= GameEntity::k_MAX_EVENT_QUEUE_SIZE ) 
+		i = 0;
+	ent->currentEventToAdd_ = i;
 }
 
 /*
@@ -593,30 +628,31 @@ G_AddEvent
 Adds an event+parm and twiddles the event counter
 ===============
 */
-void G_AddEvent( gentity_t *ent, int event, int eventParm, bool addToQueue )
+void G_AddEvent( GameEntity *ent, int event, int eventParm, bool addToQueue )
 {
 	int bits = 0;
 
-	if ( !event ) {
+	if( !event ) 
+	{
 		Com_Printf( "G_AddEvent: zero event added for entity %i\n", ent->s.number );
 		return;
 	}
 
-	if( ent->eventSent ) {
-		if( addToQueue ) {
-			G_AddEventToQueue(ent, event, eventParm);
-		}
+	if( ent->eventSent_ ) 
+	{
+		if( addToQueue ) 
+			G_AddEventToQueue( ent, event, eventParm );
 		return;
 	}
 
 	// clients need to add the event in playerState_t instead of entityState_t
-	if ( ent->client )
+	if ( ent->client_ )
 	{
-		bits = ent->client->ps.externalEvent & EV_EVENT_BITS;
+		bits = ent->client_->ps_.externalEvent & EV_EVENT_BITS;
 		bits = ( bits + EV_EVENT_BIT1 ) & EV_EVENT_BITS;
-		ent->client->ps.externalEvent = event | bits;
-		ent->client->ps.externalEventParm = eventParm;
-		ent->client->ps.externalEventTime = level.time;
+		ent->client_->ps_.externalEvent = event | bits;
+		ent->client_->ps_.externalEventParm = eventParm;
+		ent->client_->ps_.externalEventTime = theLevel.time_;
 	}
 	else
 	{
@@ -625,8 +661,8 @@ void G_AddEvent( gentity_t *ent, int event, int eventParm, bool addToQueue )
 		ent->s.event = event | bits;
 		ent->s.eventParm = eventParm;
 	}
-	ent->eventTime = level.time;
-	ent->eventSent = true;
+	ent->eventTime_ = theLevel.time_;
+	ent->eventSent_ = true;
 }
 
 
@@ -635,8 +671,10 @@ void G_AddEvent( gentity_t *ent, int event, int eventParm, bool addToQueue )
 G_Sound
 =============
 */
-void G_Sound( gentity_t *ent, int channel, int soundIndex ) {
-	gentity_t	*te;
+void G_Sound( GameEntity *ent, int channel, int soundIndex ) 
+{
+	GameEntity
+		*te;
 
 	te = G_TempEntity( ent->r.currentOrigin, EV_GENERAL_SOUND );
 	te->s.eventParm = soundIndex;
@@ -653,7 +691,8 @@ G_SetOrigin
 Sets the pos trajectory for a fixed position
 ================
 */
-void G_SetOrigin( gentity_t *ent, vec3_t origin ) {
+void G_SetOrigin( GameEntity *ent, vec3_t origin ) 
+{
 	VectorCopy( origin, ent->s.pos.trBase );
 	ent->s.pos.trType = TR_STATIONARY;
 	ent->s.pos.trTime = 0;
@@ -676,16 +715,15 @@ unsigned long G_GetGameset()
 
 	Cvar_VariableStringBuffer("mf_gameset", buffer, 32);
 
-	if( strcmp( buffer, "modern" ) == 0 ) {
+	if( strcmp( buffer, "modern" ) == 0 ) 
 		return MF_GAMESET_MODERN;
-	}
-	else if( strcmp( buffer, "ww2" ) == 0 ) {
+	else if( strcmp( buffer, "ww2" ) == 0 ) 
 		return MF_GAMESET_WW2;
-	}
-	else if( strcmp( buffer, "ww1" ) == 0 ) {
+	else if( strcmp( buffer, "ww1" ) == 0 ) 
 		return MF_GAMESET_WW1;
-	}
-	else {	// default gameset
+	else 
+	{	
+		// default gameset
 		Com_Printf( "mf_gameset is not valid, defaulting 'modern'\n" );
 		Cvar_Set("mf_gameset", "modern");
 		return MF_GAMESET_MODERN;

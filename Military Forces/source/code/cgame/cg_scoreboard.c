@@ -1,5 +1,5 @@
 /*
- * $Id: cg_scoreboard.c,v 1.5 2005-11-21 17:28:20 thebjoern Exp $
+ * $Id: cg_scoreboard.c,v 1.6 2006-01-29 14:03:40 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -79,17 +79,17 @@ CG_DrawScoreboard
 //	// draw the handicap or bot skill marker (unless player has flag)
 //	if ( ci->objectives & OB_REDFLAG ) {
 //		if( largeFormat ) {
-//			CG_DrawFlagModel( iconx, y - ( 32 - BIGCHAR_HEIGHT ) / 2, 32, 32, TEAM_RED, false );
+//			CG_DrawFlagModel( iconx, y - ( 32 - BIGCHAR_HEIGHT ) / 2, 32, 32, ClientBase::TEAM_RED, false );
 //		}
 //		else {
-//			CG_DrawFlagModel( iconx, y, 16, 16, TEAM_RED, false );
+//			CG_DrawFlagModel( iconx, y, 16, 16, ClientBase::TEAM_RED, false );
 //		}
 //	} else if ( ci->objectives & OB_BLUEFLAG ) {
 //		if( largeFormat ) {
-//			CG_DrawFlagModel( iconx, y - ( 32 - BIGCHAR_HEIGHT ) / 2, 32, 32, TEAM_BLUE, false );
+//			CG_DrawFlagModel( iconx, y - ( 32 - BIGCHAR_HEIGHT ) / 2, 32, 32, ClientBase::TEAM_BLUE, false );
 //		}
 //		else {
-//			CG_DrawFlagModel( iconx, y, 16, 16, TEAM_BLUE, false );
+//			CG_DrawFlagModel( iconx, y, 16, 16, ClientBase::TEAM_BLUE, false );
 //		}
 //	} else {
 ////		if ( ci->botSkill > 0 && ci->botSkill <= 5 ) {
@@ -118,7 +118,7 @@ CG_DrawScoreboard
 //	if ( score->ping == -1 ) {
 //		Com_sprintf(string, sizeof(string),
 //			" connecting    %s", ci->name);
-//	} else if ( ci->team == TEAM_SPECTATOR ) {
+//	} else if ( ci->team == ClientBase::TEAM_SPECTATOR ) {
 //		Com_sprintf(string, sizeof(string),
 //			" SPECT %3i %4i %s", score->ping, score->time, ci->name);
 //	} else {
@@ -133,7 +133,7 @@ CG_DrawScoreboard
 //
 //		localClient = true;
 //
-//		if ( cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR 
+//		if ( cg.snap->ps.persistant[PERS_TEAM] == ClientBase::TEAM_SPECTATOR 
 //			|| cgs.gametype >= GT_TEAM ) {
 //			rank = -1;
 //		} else {
@@ -299,7 +299,7 @@ void CG_DrawOldTourneyScoreboard( void ) {
 			if ( !ci->infoValid ) {
 				continue;
 			}
-			if ( ci->team != TEAM_FREE ) {
+			if ( ci->team != ClientBase::TEAM_FREE ) {
 				continue;
 			}
 

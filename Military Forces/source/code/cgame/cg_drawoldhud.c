@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawoldhud.c,v 1.2 2005-08-31 19:20:06 thebjoern Exp $
+ * $Id: cg_drawoldhud.c,v 1.3 2006-01-29 14:03:40 thebjoern Exp $
 */
 
 #include "cg_local.h"
@@ -350,9 +350,9 @@ void CG_DrawStatusBar_MFQ3( void ) {
 	// flag
 	//
 	if( cg.predictedPlayerState.objectives & OB_REDFLAG ) {
-		CG_DrawStatusBarFlag( 640 - ICON_SIZE, TEAM_RED );
+		CG_DrawStatusBarFlag( 640 - ICON_SIZE, ClientBase::TEAM_RED );
 	} else if( cg.predictedPlayerState.objectives & OB_BLUEFLAG ) {
-		CG_DrawStatusBarFlag( 640 - ICON_SIZE, TEAM_BLUE );
+		CG_DrawStatusBarFlag( 640 - ICON_SIZE, ClientBase::TEAM_BLUE );
 	}
 
 	//

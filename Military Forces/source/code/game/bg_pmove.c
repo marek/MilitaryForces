@@ -1,5 +1,5 @@
 /*
- * $Id: bg_pmove.c,v 1.5 2005-11-21 17:28:20 thebjoern Exp $
+ * $Id: bg_pmove.c,v 1.6 2006-01-29 14:03:41 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -11,6 +11,7 @@
 #include "../qcommon/qfiles.h"
 #include "bg_public.h"
 #include "bg_local.h"
+#include "g_client.h"
 
 void Sys_SnapVector( float *v );
 
@@ -512,7 +513,7 @@ static void PM_Flare( void ) {
 	}
 
 	// ignore if spectator
-	if( pm->ps->persistant[PERS_TEAM] == TEAM_SPECTATOR ) {
+	if( pm->ps->persistant[PERS_TEAM] == ClientBase::TEAM_SPECTATOR ) {
 		return;
 	}
 
@@ -559,7 +560,7 @@ static void PM_Weapon( void ) {
 	}
 
 	// ignore if spectator
-	if( pm->ps->persistant[PERS_TEAM] == TEAM_SPECTATOR ) {
+	if( pm->ps->persistant[PERS_TEAM] == ClientBase::TEAM_SPECTATOR ) {
 		return;
 	}
 
@@ -779,55 +780,6 @@ static void PM_VehicleBoundingBox (void)
 
 
 }
-
-/*
-void PM_Throttle_Up( gentity_t *vehicle )
-{
-	if( level.time < vehicle->client->throttleTimer ) {
-		return;
-	}
-	if( vehicle->client->ps.stats[STAT_FUEL] <= 0 ) {
-		return;
-	}
-
-	// ughh argh ouch
-	if( vehicle->THROTTLE > availableVehicles[vehicle->client->vehicle].maxthrottle ) {
-		vehicle->THROTTLE  = -(vehicle->THROTTLE - availableVehicles[vehicle->client->vehicle].maxthrottle);
-	}
-
-    if(vehicle->THROTTLE < availableVehicles[vehicle->client->vehicle].maxthrottle ) {
-		vehicle->THROTTLE++;
-    }
-
-	// cant handle negative -> workaround
-	if( vehicle->THROTTLE < 0 ) {
-		vehicle->THROTTLE = availableVehicles[vehicle->client->vehicle].maxthrottle - vehicle->THROTTLE;
-	}
-
-	vehicle->client->throttleTimer = level.time + 250;
-}
-
-void PM_Throttle_Down( gentity_t *vehicle )
-{
-	if( level.time < vehicle->client->throttleTimer ) {
-		return;
-	}
-
-	// ughh argh ouch
-	if( vehicle->THROTTLE > availableVehicles[vehicle->client->vehicle].maxthrottle ) {
-		vehicle->THROTTLE  = -(vehicle->THROTTLE - availableVehicles[vehicle->client->vehicle].maxthrottle);
-	}
-
-    if(vehicle->THROTTLE > availableVehicles[vehicle->client->vehicle].minthrottle ) {
-		vehicle->THROTTLE--;
-    }
-	// cant handle negative -> workaround
-	if( vehicle->THROTTLE < 0 ) {
-		vehicle->THROTTLE = availableVehicles[vehicle->client->vehicle].maxthrottle - vehicle->THROTTLE;
-	}
-
-	vehicle->client->throttleTimer = level.time + 250;
-}*/
 
 void PM_Throttle_Up()
 {

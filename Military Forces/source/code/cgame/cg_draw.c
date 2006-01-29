@@ -1,5 +1,5 @@
 /*
- * $Id: cg_draw.c,v 1.8 2005-11-21 17:28:20 thebjoern Exp $
+ * $Id: cg_draw.c,v 1.9 2006-01-29 14:03:40 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -451,9 +451,9 @@ void CG_DrawFlagModel( float x, float y, float w, float h, int team, bool force2
 
 		angles[YAW] = 60 * sin( cg.time / 2000.0 );;
 
-		if( team == TEAM_RED ) {
+		if( team == ClientBase::TEAM_RED ) {
 			handle = cgs.media.redFlagModel;
-		} else if( team == TEAM_BLUE ) {
+		} else if( team == ClientBase::TEAM_BLUE ) {
 			handle = cgs.media.blueFlagModel;
 		} else {
 			return;
@@ -462,9 +462,9 @@ void CG_DrawFlagModel( float x, float y, float w, float h, int team, bool force2
 	} else if ( cg_drawIcons.integer ) {
 		gitem_t *item;
 
-		if( team == TEAM_RED ) {
+		if( team == ClientBase::TEAM_RED ) {
 			item = BG_FindItemForPowerup( OB_REDFLAG );
-		} else if( team == TEAM_BLUE ) {
+		} else if( team == ClientBase::TEAM_BLUE ) {
 			item = BG_FindItemForPowerup( OB_BLUEFLAG );
 		} else {
 			return;
@@ -486,11 +486,11 @@ void CG_DrawTeamBackground( int x, int y, int w, int h, float alpha, int team )
 	vec4_t		hcolor;
 
 	hcolor[3] = alpha;
-	if ( team == TEAM_RED ) {
+	if ( team == ClientBase::TEAM_RED ) {
 		hcolor[0] = 1;
 		hcolor[1] = 0;
 		hcolor[2] = 0;
-	} else if ( team == TEAM_BLUE ) {
+	} else if ( team == ClientBase::TEAM_BLUE ) {
 		hcolor[0] = 0;
 		hcolor[1] = 0;
 		hcolor[2] = 1;
@@ -628,7 +628,7 @@ CG_DrawTeamOverlay
 //		return y;
 //	}
 //
-//	if ( cg.snap->ps.persistant[PERS_TEAM] != TEAM_RED && cg.snap->ps.persistant[PERS_TEAM] != TEAM_BLUE ) {
+//	if ( cg.snap->ps.persistant[PERS_TEAM] != ClientBase::TEAM_RED && cg.snap->ps.persistant[PERS_TEAM] != ClientBase::TEAM_BLUE ) {
 //		return y; // Not on any team
 //	}
 //
@@ -683,12 +683,12 @@ CG_DrawTeamOverlay
 //		ret_y = y;
 //	}
 //
-//	if ( cg.snap->ps.persistant[PERS_TEAM] == TEAM_RED ) {
+//	if ( cg.snap->ps.persistant[PERS_TEAM] == ClientBase::TEAM_RED ) {
 //		hcolor[0] = 1;
 //		hcolor[1] = 0;
 //		hcolor[2] = 0;
 //		hcolor[3] = 0.33f;
-//	} else { // if ( cg.snap->ps.persistant[PERS_TEAM] == TEAM_BLUE )
+//	} else { // if ( cg.snap->ps.persistant[PERS_TEAM] == ClientBase::TEAM_BLUE )
 //		hcolor[0] = 0;
 //		hcolor[1] = 0;
 //		hcolor[2] = 1;
@@ -1155,7 +1155,7 @@ Draw the small two score display
 //		w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH + 8;
 //		x -= w;
 //		CG_FillRect( x, y-4,  w, BIGCHAR_HEIGHT+8, color );
-//		if ( cg.snap->ps.persistant[PERS_TEAM] == TEAM_BLUE ) {
+//		if ( cg.snap->ps.persistant[PERS_TEAM] == ClientBase::TEAM_BLUE ) {
 //			CG_DrawPic( x, y-4, w, BIGCHAR_HEIGHT+8, cgs.media.selectShader );
 //		}
 //		CG_DrawBigString( x + 4, y, s, 1.0F);
@@ -1180,7 +1180,7 @@ Draw the small two score display
 //		w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH + 8;
 //		x -= w;
 //		CG_FillRect( x, y-4,  w, BIGCHAR_HEIGHT+8, color );
-//		if ( cg.snap->ps.persistant[PERS_TEAM] == TEAM_RED ) {
+//		if ( cg.snap->ps.persistant[PERS_TEAM] == ClientBase::TEAM_RED ) {
 //			CG_DrawPic( x, y-4, w, BIGCHAR_HEIGHT+8, cgs.media.selectShader );
 //		}
 //		CG_DrawBigString( x + 4, y, s, 1.0F);
@@ -1214,7 +1214,7 @@ Draw the small two score display
 //
 //		x = 640;
 //		score = cg.snap->ps.persistant[PERS_SCORE];
-//		spectator = ( cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR );
+//		spectator = ( cg.snap->ps.persistant[PERS_TEAM] == ClientBase::TEAM_SPECTATOR );
 //
 //		// always show your score in the second box if not in first place
 //		if ( s1 != score ) {
@@ -1365,12 +1365,12 @@ CG_DrawTeamInfo
 //		w *= TINYCHAR_WIDTH;
 //		w += TINYCHAR_WIDTH * 2;
 //
-//		if ( cg.snap->ps.persistant[PERS_TEAM] == TEAM_RED ) {
+//		if ( cg.snap->ps.persistant[PERS_TEAM] == ClientBase::TEAM_RED ) {
 //			hcolor[0] = 1;
 //			hcolor[1] = 0;
 //			hcolor[2] = 0;
 //			hcolor[3] = 0.33f;
-//		} else if ( cg.snap->ps.persistant[PERS_TEAM] == TEAM_BLUE ) {
+//		} else if ( cg.snap->ps.persistant[PERS_TEAM] == ClientBase::TEAM_BLUE ) {
 //			hcolor[0] = 0;
 //			hcolor[1] = 0;
 //			hcolor[2] = 1;
@@ -1616,7 +1616,7 @@ static void CG_DrawCrosshair(void) {
 		return;
 	}
 
-	if ( cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR) {
+	if ( cg.snap->ps.persistant[PERS_TEAM] == ClientBase::TEAM_SPECTATOR) {
 		return;
 	}
 
@@ -1747,7 +1747,7 @@ static void CG_DrawSpectator(void) {
 		// decide what to place into the three textual placeholders in the spectator menu
 		
 		// still a spectator?
-		if( cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR )
+		if( cg.snap->ps.persistant[PERS_TEAM] == ClientBase::TEAM_SPECTATOR )
 		{
 			if( cgs.gametype != GT_MISSION_EDITOR ) {
 				Cvar_Set( "ui_spectatorTitleTxt", "Spectator" );
@@ -1832,9 +1832,9 @@ static void CG_DrawTeamVote(void) {
 	char	*s;
 	int		sec, cs_offset;
 
-	if ( cgs.clientinfo->team == TEAM_RED )
+	if ( cgs.clientinfo->team == ClientBase::TEAM_RED )
 		cs_offset = 0;
-	else if ( cgs.clientinfo->team == TEAM_BLUE )
+	else if ( cgs.clientinfo->team == ClientBase::TEAM_BLUE )
 		cs_offset = 1;
 	else
 		return;
@@ -2051,7 +2051,7 @@ static void CG_DrawWarmup( void ) {
 		ci1 = NULL;
 		ci2 = NULL;
 		for ( i = 0 ; i < cgs.maxclients ; i++ ) {
-			if ( cgs.clientinfo[i].infoValid && cgs.clientinfo[i].team == TEAM_FREE ) {
+			if ( cgs.clientinfo[i].infoValid && cgs.clientinfo[i].team == ClientBase::TEAM_FREE ) {
 				if ( !ci1 ) {
 					ci1 = &cgs.clientinfo[i];
 				} else {
@@ -2190,7 +2190,7 @@ static void CG_Draw2D_MFQ3( void ) {
 	}
 
 	// are we in spectator mode, or awaiting vehicle selection?
-	if( cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR || cg_vehicle.integer == -1 )
+	if( cg.snap->ps.persistant[PERS_TEAM] == ClientBase::TEAM_SPECTATOR || cg_vehicle.integer == -1 )
 	{
 		CG_DrawSpectator();
 //		CG_DrawCrosshair();
@@ -2253,7 +2253,7 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 	}
 
 	// optionally draw the tournement scoreboard instead
-	if ( cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR &&
+	if ( cg.snap->ps.persistant[PERS_TEAM] == ClientBase::TEAM_SPECTATOR &&
 		( cg.snap->ps.pm_flags & PMF_SCOREBOARD ) ) {
 		CG_DrawTourneyScoreboard();
 		return;
@@ -2314,7 +2314,7 @@ const char *CG_GetGameStatusText()
 	if ( cgs.gametype == GT_FFA )
 	{
 		// Deathmatch
-		if (cg.snap->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR )
+		if (cg.snap->ps.persistant[PERS_TEAM] != ClientBase::TEAM_SPECTATOR )
 		{
 			s = va("%s place with %i",CG_PlaceString( cg.snap->ps.persistant[PERS_RANK] + 1 ),cg.snap->ps.persistant[PERS_SCORE] );
 		}

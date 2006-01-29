@@ -48,10 +48,11 @@ typedef struct {
 	int			numLeafSurfaces;
 } cLeaf_t;
 
-typedef struct cmodel_s {
+struct cmodel_t 
+{
 	vec3_t		mins, maxs;
 	cLeaf_t		leaf;			// submodels don't reference the main tree
-} cmodel_t;
+};
 
 typedef struct {
 	cplane_t	*plane;

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_drawtools.c,v 1.4 2005-11-21 17:28:20 thebjoern Exp $
+ * $Id: cg_drawtools.c,v 1.5 2006-01-29 14:03:40 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -385,11 +385,11 @@ float *CG_TeamColor( int team ) {
 	static vec4_t	spectator = {0.7f, 0.7f, 0.7f, 1};
 
 	switch ( team ) {
-	case TEAM_RED:
+	case ClientBase::TEAM_RED:
 		return red;
-	case TEAM_BLUE:
+	case ClientBase::TEAM_BLUE:
 		return blue;
-	case TEAM_SPECTATOR:
+	case ClientBase::TEAM_SPECTATOR:
 		return spectator;
 	default:
 		return other;

@@ -1,5 +1,5 @@
 /*
- * $Id: cg_players.c,v 1.6 2005-11-21 17:28:20 thebjoern Exp $
+ * $Id: cg_players.c,v 1.7 2006-01-29 14:03:40 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -132,7 +132,7 @@ void CG_NewClientInfo( int clientNum ) {
 
 	// team
 	v = Info_ValueForKey( configstring, "t" );
-	newInfo.team = static_cast<team_t>(atoi( v ));
+	newInfo.team = static_cast<ClientBase::eTeam>(atoi( v ));
 	if(cg.clientNum == clientNum && ci->team != newInfo.team ) // use cg.predictedPlayerEntity.currentState.clientNum instead?
 	{
 		// MFQ3: team changed so reset the vehicle trigger

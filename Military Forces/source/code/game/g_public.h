@@ -1,5 +1,5 @@
 /*
- * $Id: g_public.h,v 1.8 2005-11-26 10:06:29 thebjoern Exp $
+ * $Id: g_public.h,v 1.9 2006-01-29 14:03:41 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -72,15 +72,19 @@ typedef struct
 
 
 // the server looks at a sharedEntity, which is the start of the game's gentity_t structure
-typedef struct {
-	entityState_t	s;				// communicated by server to clients
-	entityShared_t	r;				// shared by both the server system and game
-} sharedEntity_t;
+//typedef struct {
+//	entityState_t	s;				// communicated by server to clients
+//	entityShared_t	r;				// shared by both the server system and game
+//} sharedEntity_t;
 
 
 struct EntityBase
 {
-					EntityBase() {}
+					EntityBase() 
+					{
+						memset(&s, 0, sizeof(s));
+						memset(&r, 0, sizeof(r));
+					}
 	virtual			~EntityBase() {}
 
 	entityState_t	s;				// communicated by server to clients

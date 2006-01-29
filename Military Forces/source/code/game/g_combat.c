@@ -1,5 +1,5 @@
 /*
- * $Id: g_combat.c,v 1.6 2005-11-21 17:28:20 thebjoern Exp $
+ * $Id: g_combat.c,v 1.7 2006-01-29 14:03:41 thebjoern Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -7,7 +7,8 @@
 // g_combat.c
 
 #include "g_local.h"
-
+#include "g_entity.h"
+#include "g_level.h"
 
 /*
 ============
@@ -16,26 +17,22 @@ AddScore
 Adds score to both the client (and his team)
 ============
 */
-void AddScore( gentity_t *ent, vec3_t origin, int score )
+void AddScore( GameEntity* ent, vec3_t origin, int score )
 {
-	if( !ent->client )
-	{
+	if( !ent->client_ )
 		return;
-	}
 
 	// no scoring during pre-match warmup
-	if( level.warmupTime )
-	{
+	if( theLevel.warmupTime_ )
 		return;
-	}
 
 	// add to player's personal score
-	ent->client->ps.persistant[PERS_SCORE] += score;
+	ent->client_->ps_.persistant[PERS_SCORE] += score;
 	
 	// if team-deathmatch, add player's scoring onto team score
 	if( g_gametype.integer == GT_TEAM )
 	{
-		level.teamScores[ ent->client->ps.persistant[PERS_TEAM] ] += score;
+		theLevel.teamScores_[ ent->client_->ps_.persistant[PERS_TEAM] ] += score;
 	}
 
 	// calculate rankings
@@ -49,64 +46,33 @@ ExplodeVehicle
 Explode our vehicle
 ==================
 */
-void ExplodeVehicle( gentity_t *self )
+void ExplodeVehicle( GameEntity* self )
 {
 	// create the client vehicle explosion event
 	G_AddEvent( self, EV_VEHICLE_GIB, 0, true );
 
-	self->takedamage = false;
+	self->takedamage_ = false;
 	self->s.eType = ET_INVISIBLE;
 	self->r.contents = 0;
 
-	if( self->client )
+	if( self->client_ )
 	{
 		// no death counting during warmup
-		if( !level.warmupTime )
+		if( !theLevel.warmupTime_ )
 		{
-			self->client->ps.persistant[PERS_DEATHS]++;
+			self->client_->ps_.persistant[PERS_DEATHS]++;
 		}
 
 		// enable vehicle selection
-		self->client->ps.pm_flags |= PMF_VEHICLESELECT;
-		self->client->ps.pm_type = PM_DEAD;
+		self->client_->ps_.pm_flags |= PMF_VEHICLESELECT;
+		self->client_->ps_.pm_type = PM_DEAD;
 
 		// prevent early respawn (1.5 seconds lock-out)
-		self->client->respawnTime = level.time + 1500;
+		self->client_->respawnTime_ = theLevel.time_ + 1500;
 	}
 }
 
-/*
-==================
-Vehicle_Die
-==================
-*/
-void Vehicle_Die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int meansOfDeath )
-{
-	if( self->health > GIB_HEALTH )
-		return;
-	ExplodeVehicle( self );
-}
 
-// these are just for logging, the client prints its own messages
-char * modNames[] = {
-	"MOD_UNKNOWN",
-	"MOD_WATER",
-	"MOD_SLIME",
-	"MOD_LAVA",
-	"MOD_CRUSH",
-	"MOD_TELEFRAG",
-	"MOD_FALLING",
-	"MOD_SUICIDE",
-	// now MFQ3 (not grappling was removed!)
-	"MOD_FFAR",
-	"MOD_FFAR_SPLASH",
-	"MOD_IRONBOMB",
-	"MOD_IRONBOMB_SPLASH",
-	"MOD_AUTOCANNON",
-	"MOD_MAINGUN",
-	"MOD_VEHICLEEXPLOSION",
-	"MOD_CRASH"
-};
 
 
 /*
@@ -169,63 +135,65 @@ dflags		these flags are used to control how T_Damage works
 ============
 */
 
-void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
-			   vec3_t dir, vec3_t point, int damage, int dflags, int mod, long cat ) {
-	gclient_t	*client;
+void G_Damage( GameEntity *targ, GameEntity *inflictor, GameEntity* attacker,
+			   vec3_t dir, vec3_t point, int damage, int dflags, int mod, long cat ) 
+{
+	GameClient* client;
 	int			take;
 	int			save;
 	int			knockback;
 	int			max;
 
-	if (!targ->takedamage) {
+	if (!targ->takedamage_) 
 		return;
-	}
 
 	// the intermission has allready been qualified for, so don't
 	// allow any extra scoring
-	if ( level.intermissionQueued ) {
+	if ( theLevel.intermissionQueued_ ) 
 		return;
-	}
 
-	if ( !inflictor ) {
-		inflictor = &g_entities[ENTITYNUM_WORLD];
-	}
-	if ( !attacker ) {
-		attacker = &g_entities[ENTITYNUM_WORLD];
-	}
+	if ( !inflictor ) 
+		inflictor = theLevel.getEntity(ENTITYNUM_WORLD);// &g_entities[ENTITYNUM_WORLD];
+
+	if ( !attacker ) 
+		attacker = theLevel.getEntity(ENTITYNUM_WORLD);//&g_entities[ENTITYNUM_WORLD];
 
 	// shootable doors / buttons don't actually have any health
-	if ( targ->s.eType == ET_MOVER ) {
-		if ( targ->use && targ->moverState == MOVER_POS1 ) {
-			targ->use( targ, inflictor, attacker );
-		}
+	if ( targ->s.eType == ET_MOVER ) 
+	{
+		if ( targ->moverState_ == GameEntity::MOVER_POS1 ) //&& targ->use ) 
+			targ->useFunc_->execute( inflictor, attacker );
 		return;
 	}
 
 	// runways and explosives
 	// later define when damage is done (for example only by anti-ground weapons
 	// or runway bombs etc)
-	if( targ->s.eType == ET_EXPLOSIVE ) {
-		if( damage > targ->count ) {
-			targ->health -= damage;
-			if( targ->health < 0 && targ->die ) {
-				targ->die( targ, inflictor, attacker, 0, 0 );
-			}
+	if( targ->s.eType == ET_EXPLOSIVE ) 
+	{
+		if( damage > targ->count_ ) 
+		{
+			targ->health_ -= damage;
+			if( targ->health_ < 0 ) //&& targ->die ) 
+				targ->dieFunc_->execute( inflictor, attacker, 0, 0 );
 		}
 		return;
 	}
 
 	// wrong cat ?
-	if( cat && cat != CAT_ANY ) {
-		if( targ->client ) {
-			if( !(availableVehicles[targ->client->vehicle].cat & cat) ) {
-				damage *= inflictor->catmodifier;
-			}
-		} else {
-			if( targ->s.eType == ET_MISC_VEHICLE ) {
-				if( !(availableVehicles[targ->s.modelindex].cat & cat) ) {
-					damage *= inflictor->catmodifier;
-				}
+	if( cat && cat != CAT_ANY ) 
+	{
+		if( targ->client_ ) 
+		{
+			if( !(availableVehicles[targ->client_->vehicle_].cat & cat) ) 
+				damage *= inflictor->catmodifier_;
+		} 
+		else 
+		{
+			if( targ->s.eType == ET_MISC_VEHICLE ) 
+			{
+				if( !(availableVehicles[targ->s.modelindex].cat & cat) )
+					damage *= inflictor->catmodifier_;
 			}
 		}
 	}
@@ -233,156 +201,162 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 	// reduce damage by the attacker's handicap value
 	// unless they are rocket jumping
 	// MFQ3 not for vehicles
-	if ( attacker->client && attacker != targ && attacker->client->vehicle < 0 ) {
-		max = attacker->client->ps.stats[STAT_MAX_HEALTH];
+	if ( attacker->client_ && attacker != targ && attacker->client_->vehicle_ < 0 )
+	{
+		max = attacker->client_->ps_.stats[STAT_MAX_HEALTH];
 		damage = damage * max / 100;
 	}
 
-	client = targ->client;
+	client = targ->client_;
 
-	if ( client ) {
-		if ( client->noclip ) {
+	if ( client ) 
+	{
+		if ( client->noclip_ )
 			return;
-		}
 	}
 
-	if ( !dir ) {
+	if ( !dir )
 		dflags |= DAMAGE_NO_KNOCKBACK;
-	} else {
+	else
 		VectorNormalize(dir);
-	}
 
 	knockback = damage;
-	if ( knockback > 200 ) {
+	if ( knockback > 200 ) 
 		knockback = 200;
-	}
-	if ( targ->flags & FL_NO_KNOCKBACK ) {
+
+	if ( targ->flags_ & FL_NO_KNOCKBACK ) 
 		knockback = 0;
-	}
-	if ( dflags & DAMAGE_NO_KNOCKBACK ) {
+
+	if ( dflags & DAMAGE_NO_KNOCKBACK ) 
 		knockback = 0;
-	}
 
 	// figure momentum add, even if the damage won't be taken
-	if ( knockback && targ->client ) {
+	if ( knockback && targ->client_ )
+	{
 		vec3_t	kvel;
 		float	mass;
 
 		mass = 200;
 
 		VectorScale (dir, g_knockback.value * (float)knockback / mass, kvel);
-		VectorAdd (targ->client->ps.velocity, kvel, targ->client->ps.velocity);
+		VectorAdd (targ->client_->ps_.velocity, kvel, targ->client_->ps_.velocity);
 
 		// set the timer so that the other client can't cancel
 		// out the movement immediately
-		if ( !targ->client->ps.pm_time ) {
+		if ( !targ->client_->ps_.pm_time ) 
+		{
 			int		t;
 
 			t = knockback * 2;
-			if ( t < 50 ) {
+			if ( t < 50 ) 
 				t = 50;
-			}
-			if ( t > 200 ) {
+	
+			if ( t > 200 ) 
 				t = 200;
-			}
-			targ->client->ps.pm_time = t;
-			targ->client->ps.pm_flags |= PMF_TIME_KNOCKBACK;
+
+			targ->client_->ps_.pm_time = t;
+			targ->client_->ps_.pm_flags |= PMF_TIME_KNOCKBACK;
 		}
 	}
 
 	// check for completely getting out of the damage
-	if ( !(dflags & DAMAGE_NO_PROTECTION) ) {
+	if ( !(dflags & DAMAGE_NO_PROTECTION) ) 
+	{
 
 		// if TF_NO_FRIENDLY_FIRE is set, don't do damage to the target
 		// if the attacker was on the same team
-		if ( targ != attacker && OnSameTeam (targ, attacker)  ) {
-			if ( !g_friendlyFire.integer ) {
+		if ( targ != attacker && OnSameTeam (targ, attacker)  ) 
+		{
+			if ( !g_friendlyFire.integer ) 
 				return;
-			}
 		}
 		// check for godmode
-		if ( targ->flags & FL_GODMODE ) {
+		if ( targ->flags_ & FL_GODMODE ) 
 			return;
-		}
 	}
 
 	// add to the attacker's hit counter (if the target isn't a general entity like a prox mine)
-	if ( attacker->client && targ != attacker && targ->health > 0
+	if ( attacker->client_ && targ != attacker && targ->health_ > 0
 			&& targ->s.eType != ET_MISSILE
 			&& targ->s.eType != ET_BULLET
-			&& targ->s.eType != ET_GENERAL) {
-		if ( OnSameTeam( targ, attacker ) ) {
-			attacker->client->ps.persistant[PERS_HITS]--;
-		} else {
-			attacker->client->ps.persistant[PERS_HITS]++;
-		}
+			&& targ->s.eType != ET_GENERAL) 
+	{
+		if ( OnSameTeam( targ, attacker ) ) 
+			attacker->client_->ps_.persistant[PERS_HITS]--;
+		else
+			attacker->client_->ps_.persistant[PERS_HITS]++;
 	}
 
 	// always give half damage if hurting self
 	// calculated after knockback, so rocket jumping works
-	if ( targ == attacker ) {
+	if ( targ == attacker ) 
 		damage *= 0.5;
-	}
 
-	if ( damage < 1 ) {
+	if ( damage < 1 ) 
 		damage = 1;
-	}
+
 	take = damage;
 	save = 0;
 
-	if ( g_debugDamage.integer ) {
-		Com_Printf( "%i: client:%i health:%i damage:%i\n", level.time, targ->s.number,
-			targ->health, take );
+	if ( g_debugDamage.integer ) 
+	{
+		Com_Printf( "%i: client:%i health:%i damage:%i\n", theLevel.time_, targ->s.number,
+			targ->health_, take );
 	}
 
 	// add to the damage inflicted on a player this frame
 	// the total will be turned into screen blends and view angle kicks
 	// at the end of the frame
-	if ( client ) {
-		if ( attacker ) {
-			client->ps.persistant[PERS_ATTACKER] = attacker->s.number;
-		} else {
-			client->ps.persistant[PERS_ATTACKER] = ENTITYNUM_WORLD;
+	if ( client ) 
+	{
+		if ( attacker ) 
+			client->ps_.persistant[PERS_ATTACKER] = attacker->s.number;
+		else 
+			client->ps_.persistant[PERS_ATTACKER] = ENTITYNUM_WORLD;
+
+		client->damage_done_ += take;
+		client->damage_knockback_ += knockback;
+		if ( dir ) 
+		{
+			VectorCopy ( dir, client->damage_from_ );
+			client->damage_fromWorld_ = false;
 		}
-		client->damage_done += take;
-		client->damage_knockback += knockback;
-		if ( dir ) {
-			VectorCopy ( dir, client->damage_from );
-			client->damage_fromWorld = false;
-		} else {
-			VectorCopy ( targ->r.currentOrigin, client->damage_from );
-			client->damage_fromWorld = true;
+		else 
+		{
+			VectorCopy ( targ->r.currentOrigin, client->damage_from_ );
+			client->damage_fromWorld_ = true;
 		}
 	}
 
-	if (targ->client) {
+	if (targ->client_)
+	{
 		// set the last client who damaged the target
-		targ->client->lasthurt_client = attacker->s.number;
-		targ->client->lasthurt_mod = mod;
+		targ->client_->lasthurt_client_ = attacker->s.number;
+		targ->client_->lasthurt_mod_ = mod;
 	}
 
 	// do the damage
-	if (take) {
-		targ->health = targ->health - take;
-		if ( targ->client ) {
-			targ->client->ps.stats[STAT_HEALTH] = targ->health;
-		}
+	if (take) 
+	{
+		targ->health_ = targ->health_ - take;
+		if ( targ->client_ ) 
+			targ->client_->ps_.stats[STAT_HEALTH] = targ->health_;
 			
-		if ( targ->health <= 0 ) {
+		if ( targ->health_ <= 0 )
+		{
 			if ( client )
-				targ->flags |= FL_NO_KNOCKBACK;
+				targ->flags_ |= FL_NO_KNOCKBACK;
 
-			if( targ->health < -999)
-				targ->health = -999;
+			if( targ->health_ < -999)
+				targ->health_ = -999;
 
-			targ->enemy = attacker;
-			targ->die (targ, inflictor, attacker, take, mod);
+			targ->enemy_ = attacker;
+			targ->dieFunc_->execute( inflictor, attacker, take, mod );
 			return;
-		} else if ( targ->pain ) {
-			targ->pain (targ, attacker, take);
 		}
+		else //if ( targ->pain ) 
+			targ->painFunc_->execute( attacker, take );
 	}
-
 }
 
 
@@ -394,7 +368,8 @@ Returns true if the inflictor can directly damage the target.  Used for
 explosions and melee attacks.
 ============
 */
-bool CanDamage (gentity_t *targ, vec3_t origin) {
+bool CanDamage( GameEntity* targ, vec3_t origin ) 
+{
 	vec3_t	dest;
 	trace_t	tr;
 	vec3_t	midpoint;
@@ -449,59 +424,60 @@ bool CanDamage (gentity_t *targ, vec3_t origin) {
 G_RadiusDamage
 ============
 */
-bool G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, float radius,
-					 gentity_t *ignore, int mod, long cat) {
+bool G_RadiusDamage ( vec3_t origin, GameEntity* attacker, float damage, float radius,
+					  GameEntity* ignore, int mod, long cat) {
 	float		points, dist;
-	gentity_t	*ent;
+	GameEntity* ent;
 	int			entityList[MAX_GENTITIES];
 	int			numListedEntities;
 	vec3_t		mins, maxs;
 	vec3_t		v;
 	vec3_t		dir;
 	int			i, e;
-	bool	hitClient = false;
+	bool		hitClient = false;
 
-	if ( radius < 1 ) {
+	if ( radius < 1 ) 
 		radius = 1;
-	}
 
-	for ( i = 0 ; i < 3 ; i++ ) {
+	for ( i = 0 ; i < 3 ; i++ ) 
+	{
 		mins[i] = origin[i] - radius;
 		maxs[i] = origin[i] + radius;
 	}
 
 	numListedEntities = SV_AreaEntities( mins, maxs, entityList, MAX_GENTITIES );
 
-	for ( e = 0 ; e < numListedEntities ; e++ ) {
-		ent = &g_entities[entityList[ e ]];
+	for ( e = 0 ; e < numListedEntities ; e++ ) 
+	{
+		ent = theLevel.getEntity(entityList[e]);// &g_entities[entityList[ e ]];
 
-		if (ent == ignore)
+		if( !ent || ent == ignore )
 			continue;
-		if (!ent->takedamage)
-			continue;
+		//if (!ent->takedamage)
+		//	continue;
 
 		// find the distance from the edge of the bounding box
-		for ( i = 0 ; i < 3 ; i++ ) {
-			if ( origin[i] < ent->r.absmin[i] ) {
+		for ( i = 0 ; i < 3 ; i++ ) 
+		{
+			if ( origin[i] < ent->r.absmin[i] ) 
 				v[i] = ent->r.absmin[i] - origin[i];
-			} else if ( origin[i] > ent->r.absmax[i] ) {
+			else if ( origin[i] > ent->r.absmax[i] ) 
 				v[i] = origin[i] - ent->r.absmax[i];
-			} else {
+			else 
 				v[i] = 0;
-			}
 		}
 
 		dist = VectorLength( v );
-		if ( dist >= radius ) {
+		if ( dist >= radius ) 
 			continue;
-		}
 
 		points = damage * ( 1.0 - dist / radius );
 
-		if( CanDamage (ent, origin) ) {
-			if( LogAccuracyHit( ent, attacker ) ) {
+		if( CanDamage (ent, origin) )
+		{
+			if( LogAccuracyHit( ent, attacker ) ) 
 				hitClient = true;
-			}
+
 			VectorSubtract (ent->r.currentOrigin, origin, dir);
 			// push the center of mass higher than the origin so players
 			// get knocked into the air more
@@ -519,225 +495,29 @@ TossVehicleFlags (MFQ3)
 ==================
 */
 
-void TossVehicleFlags( gentity_t *self ) {
-	gitem_t		*item;
+void TossVehicleFlags( GameEntity *self ) 
+{
+	gitem_t*	item;
 	float		angle;
 	int			i;
-	gentity_t	*drop;
+	GameEntity*	drop;
 
 	// drop all the objectives if not in teamplay
-	if ( g_gametype.integer != GT_TEAM ) {
+	if ( g_gametype.integer != GT_TEAM ) 
+	{
 		angle = 45;
-		for ( i = OB_REDFLAG; i <= OB_BLUEFLAG ; i<<=1 ) {
-			if ( self->client->ps.objectives & i ) {
+		for ( i = OB_REDFLAG; i <= OB_BLUEFLAG ; i<<=1 ) 
+		{
+			if ( self->client_->ps_.objectives & i ) 
+			{
 				item = BG_FindItemForPowerup( static_cast<objective_t>(i) );
-				if ( !item ) {
+				if ( !item ) 
 					continue;
-				}
 				drop = Drop_Item( self, item, angle );
 				angle += 45;
 			}
 		}
 	}
 }
-	
-/*
-================== 
-Vehicle_Death (MFQ3)
-==================
-*/
-void Vehicle_Death( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int meansOfDeath )
-{
-	gentity_t	*ent;
-	int			contents;
-	int			killer;
-	int			i;
-	char		*killerName, *obit;
-		
-	if ( self->client->ps.pm_type == PM_DEAD ) {
-		return;
-	}
 
-	if ( level.intermissiontime ) {
-		return;
-	}
 
-	if ( attacker ) {
-		killer = attacker->s.number;
-		if ( attacker->client ) {
-			killerName = attacker->client->pers.netname;
-		} else {
-			killerName = "<non-client>";
-		}
-	} else {
-		killer = ENTITYNUM_WORLD;
-		killerName = "<world>";
-	}
-
-	if ( killer < 0 || killer >= MAX_CLIENTS ) {
-		killer = ENTITYNUM_WORLD;
-		killerName = "<world>";
-	}
-
-	if ( meansOfDeath < 0 || meansOfDeath >= sizeof( modNames ) / sizeof( modNames[0] ) ) {
-		obit = "<bad obituary>";
-	} else {
-		obit = modNames[ meansOfDeath ];
-	}
-
-	G_LogPrintf( "Kill: %i %i %i: %s killed %s by %s\n", killer, self->s.number, meansOfDeath, killerName, 
-				 self->client->pers.netname, obit );
-
-	// broadcast the death event to everyone
-	ent = G_TempEntity( self->r.currentOrigin, EV_OBITUARY );
-	ent->s.eventParm = meansOfDeath;
-	ent->s.otherEntityNum = self->s.number;
-	ent->s.otherEntityNum2 = killer;
-	ent->r.svFlags = SVF_BROADCAST;	// send to everyone
-
-	self->enemy = attacker;
-
-	self->client->ps.persistant[PERS_KILLED]++;
-	
-	if( attacker && attacker->client )
-	{
-		attacker->client->lastkilled_client = self->s.number;
-
-		if ( attacker == self || OnSameTeam (self, attacker ) )
-		{
-			AddScore( attacker, self->r.currentOrigin, -1 );
-		}
-		else
-		{
-			if( attacker->r.svFlags & SVF_BOT )
-			{
-				AddScore( attacker, self->r.currentOrigin, 1 );
-			}
-			else
-			{
-				if( meansOfDeath != MOD_VEHICLEEXPLOSION && 
-					meansOfDeath != MOD_CRASH )
-				{
-					AddScore( attacker, self->r.currentOrigin, 1 );
-				}
-				// Easy way to prevent enemy from lossing score in collision as well cause he kills "himself"
-				else
-				{
-					AddScore( attacker, self->r.currentOrigin, 1 );
-				}
-
-			}
-
-			attacker->client->lastKillTime = level.time;
-		}
-	}
-	else
-	{
-		AddScore( self, self->r.currentOrigin, -1 );
-	}
-
-	// add team bonuses
-	Team_FragBonuses(self, inflictor, attacker);
-
-	// if I committed suicide, the flag does not fall, it returns.
-	if (meansOfDeath == MOD_SUICIDE) {
-		if ( self->client->ps.objectives & OB_REDFLAG ) {		// only happens in standard CTF
-			Team_ReturnFlag( TEAM_RED );
-			self->client->ps.objectives &= ~OB_REDFLAG;
-		}
-		else if ( self->client->ps.objectives & OB_BLUEFLAG ) {	// only happens in standard CTF
-			Team_ReturnFlag( TEAM_BLUE );
-			self->client->ps.objectives &= ~OB_BLUEFLAG;
-		}
-	}
-
-	// if client is in a nodrop area, don't drop anything (but return CTF flags!)
-	contents = SV_PointContents( self->r.currentOrigin, -1 );
-	if ( !( contents & CONTENTS_NODROP )) {
-		if( g_gametype.integer == GT_CTF ) {
-			TossVehicleFlags( self );
-		}
-	} else {
-		if ( contents & CONTENTS_NODROP ) {
-			if ( self->client->ps.objectives & OB_REDFLAG ) {		// only happens in standard CTF
-				Team_ReturnFlag( TEAM_RED );
-			}
-			else if ( self->client->ps.objectives & OB_BLUEFLAG ) {	// only happens in standard CTF
-				Team_ReturnFlag( TEAM_BLUE );
-			}
-		}
-	}
-
-	// update scores
-	Cmd_Score_f( self );
-	
-	// send updated scores to any clients that are following this one,
-	// or they would get stale scoreboards
-	for ( i = 0 ; i < level.maxclients ; i++ )
-	{
-		gclient_t	*client;
-
-		client = &level.clients[i];
-		if ( client->pers.connected != CON_CONNECTED ) {
-			continue;
-		}
-		if ( client->sess.sessionTeam != TEAM_SPECTATOR ) {
-			continue;
-		}
-		if ( client->sess.spectatorClient == self->s.number ) {
-			Cmd_Score_f( g_entities + i );
-		}
-	}
-
-	self->takedamage = true;	// can still be gibbed
-	self->r.contents = CONTENTS_CORPSE;
-	self->s.objectives = 0;
-	self->s.loopSound = 0;
-	self->r.maxs[2] = -8;
-
-	// remove powerups
-/*
-	memset( self->client->ps.powerups, 0, sizeof(self->client->ps.powerups) );
-*/
-
-	if( (self->ONOFF & OO_LANDED) && self->health > GIB_HEALTH ) {
-		self->health = GIB_HEALTH - 1;
-	}
-	// always gib ground vehicles and lqms
-	if(availableVehicles[self->client->vehicle].cat & CAT_GROUND) {
-		self->health = GIB_HEALTH - 1;
-	}
-
-	// Adjust gib for LQM's
-	if(self->health < 0 && self->health > GIB_HEALTH+20)
-		self->health = GIB_HEALTH+5;
-
-	// to gib or not to gib? 
-	if ( self->health <= GIB_HEALTH ) /* && !(contents & CONTENTS_NODROP) ) // never gib in a nodrop */
-	{
-		// create vehicle explosion
-		ExplodeVehicle( self );
-
-		// create radius explosion damage
-		G_RadiusDamage( self->r.currentOrigin, self, 150, 150, self, MOD_VEHICLEEXPLOSION, CAT_ANY );
-
-	}
-	else if (availableVehicles[self->client->vehicle].cat & CAT_LQM) 
-	{
-		self->die = Vehicle_Die;
-		self->client->respawnTime = level.time + 3000;
-	}
-	else
-	{
-		// create a smaller vehicle explosion
-		G_AddEvent( self, EV_VEHICLE_DIE, 0, true );
-
-		// wreck can be blown up (i.e on crash into ground)
-		self->die = Vehicle_Die;
-
-		// prevent early respawning during death anim (allows 30 seconds)
-		self->client->respawnTime = level.time + 30000;
-	}
-
-	SV_LinkEntity( &self->s, &self->r );
-}

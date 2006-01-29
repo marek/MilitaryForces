@@ -22,6 +22,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // world.c -- world query functions
 
 #include "server.h"
+#include "sv_entity.h"
+#include "sv_server.h"
+
 
 /*
 ================
@@ -32,18 +35,21 @@ given entity.  If the entity is a bsp model, the headnode will
 be returned, otherwise a custom box tree will be constructed.
 ================
 */
-clipHandle_t SV_ClipHandleForEntity( const entityState_t* s, const entityShared_t* r ) {
-	if ( r->bmodel ) {
+clipHandle_t SV_ClipHandleForEntity( EntityBase* gameEnt )
+{
+	if ( gameEnt->r.bmodel ) 
+	{
 		// explicit hulls in the BSP model
-		return CM_InlineModel( s->modelindex );
+		return CM_InlineModel( gameEnt->s.modelindex );
 	}
-	if ( r->svFlags & SVF_CAPSULE ) {
+	if ( gameEnt->r.svFlags & SVF_CAPSULE ) 
+	{
 		// create a temp capsule from bounding box sizes
-		return CM_TempBoxModel( r->mins, r->maxs, true );
+		return CM_TempBoxModel( gameEnt->r.mins, gameEnt->r.maxs, true );
 	}
 
 	// create a temp tree from bounding box sizes
-	return CM_TempBoxModel( r->mins, r->maxs, false );
+	return CM_TempBoxModel( gameEnt->r.mins, gameEnt->r.maxs, false );
 }
 
 
@@ -61,12 +67,16 @@ them, which prevents having to deal with multiple fragments of a single entity.
 ===============================================================================
 */
 
-typedef struct worldSector_s {
+#include "sv_entity.h"
+
+struct worldSector_t 
+{
 	int		axis;		// -1 = leaf node
 	float	dist;
-	struct worldSector_s	*children[2];
-	svEntity_t	*entities;
-} worldSector_t;
+	worldSector_t	*children[2];
+//	svEntity_t	*entities;
+	SV_Entity	*entities;
+};
 
 #define	AREA_DEPTH	4
 #define	AREA_NODES	64
@@ -80,18 +90,20 @@ int			sv_numworldSectors;
 SV_SectorList_f
 ===============
 */
-void SV_SectorList_f( void ) {
+void SV_SectorList_f() 
+{
 	int				i, c;
 	worldSector_t	*sec;
-	svEntity_t		*ent;
+//	svEntity_t		*ent;
+	SV_Entity		*ent;
 
 	for ( i = 0 ; i < AREA_NODES ; i++ ) {
 		sec = &sv_worldSectors[i];
 
 		c = 0;
-		for ( ent = sec->entities ; ent ; ent = ent->nextEntityInWorldSector ) {
+		for ( ent = sec->entities ; ent ; ent = ent->nextEntityInWorldSector_ ) 
 			c++;
-		}
+
 		Com_Printf( "sector %i: %i entities\n", i, c );
 	}
 }
@@ -164,30 +176,33 @@ SV_UnlinkEntity
 
 ===============
 */
-void SV_UnlinkEntity( entityState_t* s, entityShared_t* r ) 
+void SV_UnlinkEntity( EntityBase* gameEnt ) 
 {
-	svEntity_t		*ent;
-	svEntity_t		*scan;
+//	svEntity_t		*ent;
+//	svEntity_t		*scan;
+	SV_Entity		*ent;
+	SV_Entity		*scan;
 	worldSector_t	*ws;
 
-	ent = SV_SvEntityForGentity( s, r );
+//	ent = SV_SvEntityForGentity( s, r );
+	ent = theSV.SVEntityForGameEntity( gameEnt );
 
-	r->linked = false;
+	gameEnt->r.linked = false;
 
-	ws = ent->worldSector;
+	ws = ent->worldSector_;
 	if ( !ws ) {
 		return;		// not linked in anywhere
 	}
-	ent->worldSector = NULL;
+	ent->worldSector_ = NULL;
 
 	if ( ws->entities == ent ) {
-		ws->entities = ent->nextEntityInWorldSector;
+		ws->entities = ent->nextEntityInWorldSector_;
 		return;
 	}
 
-	for ( scan = ws->entities ; scan ; scan = scan->nextEntityInWorldSector ) {
-		if ( scan->nextEntityInWorldSector == ent ) {
-			scan->nextEntityInWorldSector = ent->nextEntityInWorldSector;
+	for ( scan = ws->entities ; scan ; scan = scan->nextEntityInWorldSector_ ) {
+		if ( scan->nextEntityInWorldSector_ == ent ) {
+			scan->nextEntityInWorldSector_ = ent->nextEntityInWorldSector_;
 			return;
 		}
 	}
@@ -203,102 +218,103 @@ SV_LinkEntity
 ===============
 */
 #define MAX_TOTAL_ENT_LEAFS		128
-void SV_LinkEntity( entityState_t* s, entityShared_t* r ) 
+void SV_LinkEntity( EntityBase* gameEnt ) 
 {
 	worldSector_t	*node;
-	int			leafs[MAX_TOTAL_ENT_LEAFS];
-	int			cluster;
-	int			num_leafs;
-	int			i, j, k;
-	int			area;
-	int			lastLeaf;
-	float		*origin, *angles;
-	svEntity_t	*ent;
+	int				leafs[MAX_TOTAL_ENT_LEAFS];
+	int				cluster;
+	int				num_leafs;
+	int				i, j, k;
+	int				area;
+	int				lastLeaf;
+	float			*origin, *angles;
+	SV_Entity		*ent;
 
-	ent = SV_SvEntityForGentity( s, r );
+//	ent = SV_SvEntityForGentity( s, r );
+	ent = theSV.SVEntityForGameEntity( gameEnt );
 
-	if ( ent->worldSector ) 
+	if ( ent->worldSector_ ) 
 	{
-		SV_UnlinkEntity( s, r );	// unlink from old position
+		SV_UnlinkEntity( gameEnt );	// unlink from old position
 	}
 
 	// encode the size into the entityState_t for client prediction
-	if ( r->bmodel ) 
+	if ( gameEnt->r.bmodel ) 
 	{
-		s->solid = SOLID_BMODEL;		// a solid_box will never create this value
+		gameEnt->s.solid = SOLID_BMODEL;		// a solid_box will never create this value
 	} 
-	else if ( r->contents & ( CONTENTS_SOLID | CONTENTS_BODY ) ) 
+	else if ( gameEnt->r.contents & ( CONTENTS_SOLID | CONTENTS_BODY ) ) 
 	{
 		// assume that x/y are equal and symetric
-		i = r->maxs[0];
+		i = gameEnt->r.maxs[0];
 		if (i<1)
 			i = 1;
 		if (i>255)
 			i = 255;
 
 		// z is not symetric
-		j = (-r->mins[2]);
+		j = (-gameEnt->r.mins[2]);
 		if (j<1)
 			j = 1;
 		if (j>255)
 			j = 255;
 
 		// and z maxs can be negative...
-		k = (r->maxs[2]+32);
+		k = (gameEnt->r.maxs[2]+32);
 		if (k<1)
 			k = 1;
 		if (k>255)
 			k = 255;
 
-		s->solid = (k<<16) | (j<<8) | i;
+		gameEnt->s.solid = (k<<16) | (j<<8) | i;
 	} 
 	else 
 	{
-		s->solid = 0;
+		gameEnt->s.solid = 0;
 	}
 
 	// get the position
-	origin = r->currentOrigin;
-	angles = r->currentAngles;
+	origin = gameEnt->r.currentOrigin;
+	angles = gameEnt->r.currentAngles;
 
 	// set the abs box
-	if ( r->bmodel && (angles[0] || angles[1] || angles[2]) ) 
+	if ( gameEnt->r.bmodel && (angles[0] || angles[1] || angles[2]) ) 
 	{
 		// expand for rotation
 		float		max;
 		int			i;
 
-		max = RadiusFromBounds( r->mins, r->maxs );
+		max = RadiusFromBounds( gameEnt->r.mins, gameEnt->r.maxs );
 		for (i=0 ; i<3 ; i++) 
 		{
-			r->absmin[i] = origin[i] - max;
-			r->absmax[i] = origin[i] + max;
+			gameEnt->r.absmin[i] = origin[i] - max;
+			gameEnt->r.absmax[i] = origin[i] + max;
 		}
 	} 
 	else 
 	{
 		// normal
-		VectorAdd (origin, r->mins, r->absmin);	
-		VectorAdd (origin, r->maxs, r->absmax);
+		VectorAdd (origin, gameEnt->r.mins, gameEnt->r.absmin);	
+		VectorAdd (origin, gameEnt->r.maxs, gameEnt->r.absmax);
 	}
 
 	// because movement is clipped an epsilon away from an actual edge,
 	// we must fully check even when bounding boxes don't quite touch
-	r->absmin[0] -= 1;
-	r->absmin[1] -= 1;
-	r->absmin[2] -= 1;
-	r->absmax[0] += 1;
-	r->absmax[1] += 1;
-	r->absmax[2] += 1;
+	gameEnt->r.absmin[0] -= 1;
+	gameEnt->r.absmin[1] -= 1;
+	gameEnt->r.absmin[2] -= 1;
+	gameEnt->r.absmax[0] += 1;
+	gameEnt->r.absmax[1] += 1;
+	gameEnt->r.absmax[2] += 1;
 
 	// link to PVS leafs
-	ent->numClusters = 0;
-	ent->lastCluster = 0;
-	ent->areanum = -1;
-	ent->areanum2 = -1;
+	ent->numClusters_ = 0;
+	ent->lastCluster_ = 0;
+	ent->areanum_ = -1;
+	ent->areanum2_ = -1;
 
 	//get all leafs, including solids
-	num_leafs = CM_BoxLeafnums( r->absmin, r->absmax,
+	num_leafs = CM_BoxLeafnums( gameEnt->r.absmin, gameEnt->r.absmax,
 		leafs, MAX_TOTAL_ENT_LEAFS, &lastLeaf );
 
 	// if none of the leafs were inside the map, the
@@ -314,41 +330,41 @@ void SV_LinkEntity( entityState_t* s, entityShared_t* r )
 		{
 			// doors may legally straggle two areas,
 			// but nothing should evern need more than that
-			if (ent->areanum != -1 && ent->areanum != area) 
+			if (ent->areanum_ != -1 && ent->areanum_ != area) 
 			{
-				if (ent->areanum2 != -1 && ent->areanum2 != area && sv.state == SS_LOADING) 
+				if (ent->areanum2_ != -1 && ent->areanum2_ != area && theSV.state_ == Server::SS_LOADING) 
 				{
 					Com_DPrintf ("Object %i touching 3 areas at %f %f %f\n",
-					s->number,
-					r->absmin[0], r->absmin[1], r->absmin[2]);
+					gameEnt->s.number,
+					gameEnt->r.absmin[0], gameEnt->r.absmin[1], gameEnt->r.absmin[2]);
 				}
-				ent->areanum2 = area;
+				ent->areanum2_ = area;
 			} 
 			else 
 			{
-				ent->areanum = area;
+				ent->areanum_ = area;
 			}
 		}
 	}
 
 	// store as many explicit clusters as we can
-	ent->numClusters = 0;
+	ent->numClusters_ = 0;
 	for (i=0 ; i < num_leafs ; i++) 
 	{
 		cluster = CM_LeafCluster( leafs[i] );
 		if ( cluster != -1 ) 
 		{
-			ent->clusternums[ent->numClusters++] = cluster;
-			if ( ent->numClusters == MAX_ENT_CLUSTERS ) 
+			ent->clusternums_[ent->numClusters_++] = cluster;
+			if ( ent->numClusters_ == SV_Entity::k_MAX_ENT_CLUSTERS ) 
 				break;
 		}
 	}
 
 	// store off a last cluster if we need to
 	if ( i != num_leafs ) 
-		ent->lastCluster = CM_LeafCluster( lastLeaf );
+		ent->lastCluster_ = CM_LeafCluster( lastLeaf );
 
-	r->linkcount++;
+	gameEnt->r.linkcount++;
 
 	// find the first world sector node that the ent's box crosses
 	node = sv_worldSectors;
@@ -356,20 +372,20 @@ void SV_LinkEntity( entityState_t* s, entityShared_t* r )
 	{
 		if (node->axis == -1)
 			break;
-		if ( r->absmin[node->axis] > node->dist)
+		if ( gameEnt->r.absmin[node->axis] > node->dist)
 			node = node->children[0];
-		else if ( r->absmax[node->axis] < node->dist)
+		else if ( gameEnt->r.absmax[node->axis] < node->dist)
 			node = node->children[1];
 		else
 			break;		// crosses the node
 	}
 	
 	// link it in
-	ent->worldSector = node;
-	ent->nextEntityInWorldSector = node->entities;
+	ent->worldSector_ = node;
+	ent->nextEntityInWorldSector_ = node->entities;
 	node->entities = ent;
 
-	r->linked = true;
+	gameEnt->r.linked = true;
 }
 
 /*
@@ -396,45 +412,50 @@ SV_AreaEntities_r
 
 ====================
 */
-void SV_AreaEntities_r( worldSector_t *node, areaParms_t *ap ) {
-	svEntity_t	*check, *next;
-	sharedEntity_t *gcheck;
+void SV_AreaEntities_r( worldSector_t *node, areaParms_t *ap ) 
+{
+	SV_Entity	*check;
+	SV_Entity	*next;
+	EntityBase*	gcheck;
 	int			count;
 
 	count = 0;
 
 	for ( check = node->entities  ; check ; check = next ) {
-		next = check->nextEntityInWorldSector;
+		next = check->nextEntityInWorldSector_;
 
-		gcheck = SV_GEntityForSvEntity( check );
+		gcheck = theSV.GameEntityForSVEntity( check );
 
 		if ( gcheck->r.absmin[0] > ap->maxs[0]
-		|| gcheck->r.absmin[1] > ap->maxs[1]
-		|| gcheck->r.absmin[2] > ap->maxs[2]
-		|| gcheck->r.absmax[0] < ap->mins[0]
-		|| gcheck->r.absmax[1] < ap->mins[1]
-		|| gcheck->r.absmax[2] < ap->mins[2]) {
+			|| gcheck->r.absmin[1] > ap->maxs[1]
+			|| gcheck->r.absmin[2] > ap->maxs[2]
+			|| gcheck->r.absmax[0] < ap->mins[0]
+			|| gcheck->r.absmax[1] < ap->mins[1]
+			|| gcheck->r.absmax[2] < ap->mins[2]) 
+		{
 			continue;
 		}
 
-		if ( ap->count == ap->maxcount ) {
+		if ( ap->count == ap->maxcount ) 
+		{
 			Com_Printf ("SV_AreaEntities: MAXCOUNT\n");
 			return;
 		}
 
-		ap->list[ap->count] = check - sv.svEntities;
+		ap->list[ap->count] = check - theSV.serverEntities_;
 		ap->count++;
 	}
 	
-	if (node->axis == -1) {
+	if (node->axis == -1) 
 		return;		// terminal node
-	}
 
 	// recurse down both sides
-	if ( ap->maxs[node->axis] > node->dist ) {
+	if ( ap->maxs[node->axis] > node->dist ) 
+	{
 		SV_AreaEntities_r ( node->children[0], ap );
 	}
-	if ( ap->mins[node->axis] < node->dist ) {
+	if ( ap->mins[node->axis] < node->dist ) 
+	{
 		SV_AreaEntities_r ( node->children[1], ap );
 	}
 }
@@ -484,12 +505,13 @@ SV_ClipToEntity
 ====================
 */
 void SV_ClipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, const vec3_t maxs,
-					  const vec3_t end, int entityNum, int contentmask, bool capsule ) {
-	sharedEntity_t	*touch;
+					  const vec3_t end, int entityNum, int contentmask, bool capsule ) 
+{
+	EntityBase*		touch;
 	clipHandle_t	clipHandle;
 	float			*origin, *angles;
 
-	touch = SV_GentityNum( entityNum );
+	touch = theSV.getEntityByNum( entityNum );
 
 	Com_Memset(trace, 0, sizeof(trace_t));
 
@@ -501,7 +523,7 @@ void SV_ClipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, con
 	}
 
 	// might intersect, so do an exact clip
-	clipHandle = SV_ClipHandleForEntity (&touch->s, &touch->r);
+	clipHandle = SV_ClipHandleForEntity (touch);
 
 	origin = touch->r.currentOrigin;
 	angles = touch->r.currentAngles;
@@ -526,19 +548,20 @@ SV_ClipMoveToEntities
 
 ====================
 */
-void SV_ClipMoveToEntities( moveclip_t *clip ) {
+void SV_ClipMoveToEntities( moveclip_t *clip ) 
+{
 	int			i, num;
 	int			touchlist[MAX_GENTITIES];
-	sharedEntity_t *touch;
+	EntityBase*	touch;
 	int			passOwnerNum;
 	trace_t		trace;
-	clipHandle_t	clipHandle;
+	clipHandle_t clipHandle;
 	float		*origin, *angles;
 
 	num = SV_AreaEntities( clip->boxmins, clip->boxmaxs, touchlist, MAX_GENTITIES);
 
 	if ( clip->passEntityNum != ENTITYNUM_NONE ) {
-		passOwnerNum = ( SV_GentityNum( clip->passEntityNum ) )->r.ownerNum;
+		passOwnerNum = ( theSV.getEntityByNum( clip->passEntityNum ) )->r.ownerNum;
 		if ( passOwnerNum == ENTITYNUM_NONE ) {
 			passOwnerNum = -1;
 		}
@@ -550,7 +573,7 @@ void SV_ClipMoveToEntities( moveclip_t *clip ) {
 		if ( clip->trace.allsolid ) {
 			return;
 		}
-		touch = SV_GentityNum( touchlist[i] );
+		touch = theSV.getEntityByNum( touchlist[i] );
 
 		// see if we should ignore this entity
 		if ( clip->passEntityNum != ENTITYNUM_NONE ) {
@@ -572,7 +595,7 @@ void SV_ClipMoveToEntities( moveclip_t *clip ) {
 		}
 
 		// might intersect, so do an exact clip
-		clipHandle = SV_ClipHandleForEntity (&touch->s, &touch->r);
+		clipHandle = SV_ClipHandleForEntity (touch);
 
 		origin = touch->r.currentOrigin;
 		angles = touch->r.currentAngles;
@@ -677,10 +700,10 @@ SV_PointContents
 int SV_PointContents( const vec3_t p, int passEntityNum ) 
 {
 	int			touch[MAX_GENTITIES];
-	sharedEntity_t *hit;
+	EntityBase*	hit;
 	int			i, num;
 	int			contents, c2;
-	clipHandle_t	clipHandle;
+	clipHandle_t clipHandle;
 	float		*angles;
 
 	// get base contents from world
@@ -693,9 +716,9 @@ int SV_PointContents( const vec3_t p, int passEntityNum )
 		if ( touch[i] == passEntityNum ) {
 			continue;
 		}
-		hit = SV_GentityNum( touch[i] );
+		hit = theSV.getEntityByNum( touch[i] );
 		// might intersect, so do an exact clip
-		clipHandle = SV_ClipHandleForEntity( &hit->s, &hit->r );
+		clipHandle = SV_ClipHandleForEntity( hit );
 		angles = hit->s.angles;
 		if ( !hit->r.bmodel ) {
 			angles = vec3_origin;	// boxes don't rotate
