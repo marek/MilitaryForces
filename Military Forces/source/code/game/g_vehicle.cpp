@@ -158,17 +158,17 @@ VehicleDeathImpl( GameEntity* self, GameEntity* inflictor, GameEntity* attacker,
 	
 	// send updated scores to any clients that are following this one,
 	// or they would get stale scoreboards
-	for ( i = 1 ; i <= theLevel.maxclients_ ; i++ )
+	for( i = 1 ; i <= theLevel.maxclients_ ; i++ )
 	{
 		GameClient* client = theLevel.getClient(i);// &level.clients[i];
 
-		if ( client->pers_.connected_ != GameClient::ClientPersistant::CON_CONNECTED ) 
+		if( !client || client->pers_.connected_ != GameClient::ClientPersistant::CON_CONNECTED ) 
 			continue;
 
-		if ( client->sess_.sessionTeam_ != ClientBase::TEAM_SPECTATOR ) 
+		if( client->sess_.sessionTeam_ != ClientBase::TEAM_SPECTATOR ) 
 			continue;
 
-		if ( client->sess_.spectatorClient_ == self->s.number ) 
+		if( client->sess_.spectatorClient_ == self->s.number ) 
 			Cmd_Score_f( theLevel.getEntity(i) );// g_entities + i );
 	}
 
