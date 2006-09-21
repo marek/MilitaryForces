@@ -974,7 +974,7 @@ char *FS_ShiftedStrStr(const char *string, const char *substring, int shift) {
 		buf[i] = substring[i] + shift;
 	}
 	buf[i] = '\0';
-	return reinterpret_cast<char *>strstr(string, buf);
+	return const_cast<char *>(strstr(string, buf));
 }
 
 /*
