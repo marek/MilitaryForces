@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.1 2005-08-22 16:05:58 thebjoern Exp $
+ * $Id: bg_vehicledata.c,v 1.2 2006-09-21 00:13:24 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -3003,7 +3003,7 @@ completeVehicleData_t availableVehicles[] =
 	// ---------------------------------------------
 	// Infantry
 	// ---------------------------------------------
-
+	/*
 	{	"Sarge",	// descriptiveName
 	"Soldier",					// tinyName
 	"sarge",					// modelName
@@ -3103,7 +3103,7 @@ completeVehicleData_t availableVehicles[] =
 	{0,0,0,0},					// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
     },
-
+	*/
 
 	// ---------------------------------------------
 	// Boats

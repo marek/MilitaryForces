@@ -282,8 +282,9 @@ void SV_DirectConnect( netadr_t from )
 	if( !NET_IsLocalAddress (from) ) 
 	{
 		int		ping;
+		int		i;
 
-		for( int i = 0; i < ServerStatic::k_MAX_CHALLENGES ; i++ ) 
+		for(i = 0; i < ServerStatic::k_MAX_CHALLENGES ; i++ ) 
 		{
 			if( NET_CompareAdr(from, theSVS.challenges_[i].adr_) ) 
 			{
@@ -407,6 +408,7 @@ void SV_DirectConnect( netadr_t from )
 		if( NET_IsLocalAddress( from ) ) 
 		{
 			count = 0;
+			int i;
 			for( i = startIndex; i <= sv_maxclients->integer ; i++ ) 
 			{
 				cl = theSVS.svClients_.at(i);

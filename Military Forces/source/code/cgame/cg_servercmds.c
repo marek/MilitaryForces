@@ -1,5 +1,5 @@
 /*
- * $Id: cg_servercmds.c,v 1.4 2005-11-21 17:28:20 thebjoern Exp $
+ * $Id: cg_servercmds.c,v 1.5 2006-09-21 00:13:24 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -201,7 +201,7 @@ void CG_ShaderStateChanged(void) {
 
 	o = CG_ConfigString( CS_SHADERSTATE );
 	while (o && *o) {
-		n = strstr(o, "=");
+		n = reinterpret_cast<char *>strstr(o, "=");
 		if (n && *n) {
 			strncpy(originalShader, o, n-o);
 			originalShader[n-o] = 0;

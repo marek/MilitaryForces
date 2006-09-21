@@ -1,193 +1,262 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="7.10"
+	Version="8.00"
 	Name="game"
-	SccProjectName="&quot;$/MissionPack/code/game&quot;, CYAAAAAA"
-	SccLocalPath=".">
+	ProjectGUID="{F9EE10DA-2404-4154-B904-F93C936C040A}"
+	>
 	<Platforms>
 		<Platform
-			Name="Win32"/>
+			Name="Win32"
+		/>
 	</Platforms>
+	<ToolFiles>
+	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)..\compiler_output\Debug\game"
 			IntermediateDirectory="$(SolutionDir)..\compiler_output\Debug\game"
 			ConfigurationType="4"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="FALSE">
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="_DEBUG"
+				MkTypLibCompatible="true"
+				SuppressStartupBanner="true"
+				TargetEnvironment="1"
+				TypeLibraryName=".\Debug/game.tlb"
+				HeaderFileName=""
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				OptimizeForProcessor="0"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_WINDOWS"
-				ExceptionHandling="FALSE"
+				ExceptionHandling="0"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				RuntimeTypeInfo="TRUE"
-				UsePrecompiledHeader="2"
+				RuntimeTypeInfo="true"
+				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile="$(IntDir)\game.pch"
 				AssemblerListingLocation="$(IntDir)\"
 				ObjectFile="$(IntDir)\"
 				ProgramDataBaseFileName="$(IntDir)\"
 				BrowseInformation="1"
 				WarningLevel="3"
-				SuppressStartupBanner="TRUE"
+				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
 				CompileAs="2"
-				DisableSpecificWarnings="4530"/>
+				DisableSpecificWarnings="4530"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
-			<Tool
-				Name="VCLibrarianTool"
-				OutputFile="$(IntDir)\game.lib"/>
-			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="_DEBUG"
-				MkTypLibCompatible="TRUE"
-				SuppressStartupBanner="TRUE"
-				TargetEnvironment="1"
-				TypeLibraryName=".\Debug/game.tlb"
-				HeaderFileName=""/>
-			<Tool
-				Name="VCPostBuildEventTool"/>
-			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_DEBUG"
-				Culture="1033"/>
+				Culture="1033"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCLibrarianTool"
+				OutputFile="$(IntDir)\game.lib"
+			/>
 			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)..\compiler_output\Release\game"
 			IntermediateDirectory="$(SolutionDir)..\compiler_output\Release\game"
 			ConfigurationType="4"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="FALSE">
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="NDEBUG"
+				MkTypLibCompatible="true"
+				SuppressStartupBanner="true"
+				TargetEnvironment="1"
+				TypeLibraryName=".\Release/game.tlb"
+				HeaderFileName=""
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				OptimizeForProcessor="2"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_WINDOWS"
-				StringPooling="TRUE"
-				ExceptionHandling="FALSE"
+				StringPooling="true"
+				ExceptionHandling="0"
 				RuntimeLibrary="2"
-				EnableFunctionLevelLinking="TRUE"
-				RuntimeTypeInfo="TRUE"
-				UsePrecompiledHeader="2"
+				EnableFunctionLevelLinking="true"
+				RuntimeTypeInfo="true"
+				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile="$(IntDir)\game.pch"
 				AssemblerListingLocation="$(IntDir)\"
 				ObjectFile="$(IntDir)\"
 				ProgramDataBaseFileName="$(IntDir)\"
 				WarningLevel="3"
-				SuppressStartupBanner="TRUE"
+				SuppressStartupBanner="true"
 				CompileAs="2"
-				DisableSpecificWarnings="4530"/>
+				DisableSpecificWarnings="4530"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
-			<Tool
-				Name="VCLibrarianTool"
-				OutputFile="$(IntDir)\game.lib"/>
-			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="NDEBUG"
-				MkTypLibCompatible="TRUE"
-				SuppressStartupBanner="TRUE"
-				TargetEnvironment="1"
-				TypeLibraryName=".\Release/game.tlb"
-				HeaderFileName=""/>
-			<Tool
-				Name="VCPostBuildEventTool"/>
-			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NDEBUG"
-				Culture="1033"/>
+				Culture="1033"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCLibrarianTool"
+				OutputFile="$(IntDir)\game.lib"
+			/>
 			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="ReleaseWithDebugInfo|Win32"
 			OutputDirectory="$(SolutionDir)..\compiler_output\ReleaseWithDebugInfo\game"
 			IntermediateDirectory="$(SolutionDir)..\compiler_output\ReleaseWithDebugInfo\game"
 			ConfigurationType="4"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="FALSE">
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="_DEBUG"
+				MkTypLibCompatible="true"
+				SuppressStartupBanner="true"
+				TargetEnvironment="1"
+				TypeLibraryName=".\Debug/game.tlb"
+				HeaderFileName=""
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				OptimizeForProcessor="0"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_WINDOWS"
-				StringPooling="FALSE"
-				ExceptionHandling="FALSE"
+				StringPooling="false"
+				ExceptionHandling="0"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				EnableFunctionLevelLinking="FALSE"
-				RuntimeTypeInfo="TRUE"
-				UsePrecompiledHeader="2"
+				EnableFunctionLevelLinking="false"
+				RuntimeTypeInfo="true"
+				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile="$(IntDir)\game.pch"
 				AssemblerListingLocation="$(IntDir)\"
 				ObjectFile="$(IntDir)\"
 				ProgramDataBaseFileName="$(IntDir)\"
 				BrowseInformation="1"
 				WarningLevel="4"
-				SuppressStartupBanner="TRUE"
+				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
 				CompileAs="2"
-				DisableSpecificWarnings="4530"/>
+				DisableSpecificWarnings="4530"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
-			<Tool
-				Name="VCLibrarianTool"
-				OutputFile="$(IntDir)\game.lib"/>
-			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="_DEBUG"
-				MkTypLibCompatible="TRUE"
-				SuppressStartupBanner="TRUE"
-				TargetEnvironment="1"
-				TypeLibraryName=".\Debug/game.tlb"
-				HeaderFileName=""/>
-			<Tool
-				Name="VCPostBuildEventTool"/>
-			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_DEBUG"
-				Culture="1033"/>
+				Culture="1033"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCLibrarianTool"
+				OutputFile="$(IntDir)\game.lib"
+			/>
 			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 	</Configurations>
 	<References>
@@ -195,342 +264,454 @@
 	<Files>
 		<Filter
 			Name="Source Files"
-			Filter="cpp;c;cxx;rc;def;r;odl;hpj;bat;for;f90">
+			Filter="cpp;c;cxx;rc;def;r;odl;hpj;bat;for;f90"
+			>
 			<File
-				RelativePath=".\bg_boatmove.c">
+				RelativePath=".\bg_boatmove.c"
+				>
 			</File>
 			<File
-				RelativePath=".\bg_groundmove.c">
+				RelativePath=".\bg_groundmove.c"
+				>
 			</File>
 			<File
-				RelativePath=".\bg_helomove.c">
+				RelativePath=".\bg_helomove.c"
+				>
 			</File>
 			<File
-				RelativePath=".\bg_loadouts.c">
+				RelativePath=".\bg_loadouts.c"
+				>
 			</File>
 			<File
-				RelativePath=".\bg_lqmmove.c">
+				RelativePath=".\bg_lqmmove.c"
+				>
 			</File>
 			<File
-				RelativePath=".\bg_md3util.c">
+				RelativePath=".\bg_md3util.c"
+				>
 			</File>
 			<File
-				RelativePath=".\bg_mfq3util.c">
+				RelativePath=".\bg_mfq3util.c"
+				>
 			</File>
 			<File
-				RelativePath=".\bg_misc.c">
+				RelativePath=".\bg_misc.c"
+				>
 			</File>
 			<File
-				RelativePath=".\bg_planemove.c">
+				RelativePath=".\bg_planemove.c"
+				>
 			</File>
 			<File
-				RelativePath=".\bg_pmove.c">
+				RelativePath=".\bg_pmove.c"
+				>
 			</File>
 			<File
-				RelativePath=".\bg_slidemove.c">
+				RelativePath=".\bg_slidemove.c"
+				>
 			</File>
 			<File
-				RelativePath=".\bg_vehicledata.c">
+				RelativePath=".\bg_vehicledata.c"
+				>
 			</File>
 			<File
-				RelativePath=".\bg_weapondata.c">
+				RelativePath=".\bg_weapondata.c"
+				>
 			</File>
 			<File
-				RelativePath=".\g_active.c">
+				RelativePath=".\g_active.c"
+				>
 			</File>
 			<File
-				RelativePath=".\g_arenas.c">
+				RelativePath=".\g_arenas.c"
+				>
 			</File>
 			<File
-				RelativePath=".\g_boat.cpp">
+				RelativePath=".\g_boat.cpp"
+				>
 				<FileConfiguration
-					Name="Debug|Win32">
+					Name="Debug|Win32"
+					>
 					<Tool
 						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+						ObjectFile="$(IntDir)/$(InputName)1.obj"
+					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release|Win32">
+					Name="Release|Win32"
+					>
 					<Tool
 						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+						ObjectFile="$(IntDir)/$(InputName)1.obj"
+					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="ReleaseWithDebugInfo|Win32">
+					Name="ReleaseWithDebugInfo|Win32"
+					>
 					<Tool
 						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\g_client.c">
-			</File>
-			<File
-				RelativePath=".\g_client.cpp">
-				<FileConfiguration
-					Name="Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="ReleaseWithDebugInfo|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\g_cmds.c">
-			</File>
-			<File
-				RelativePath=".\g_combat.c">
-			</File>
-			<File
-				RelativePath=".\g_entity.cpp">
-			</File>
-			<File
-				RelativePath=".\g_groundinstallation.c">
-			</File>
-			<File
-				RelativePath=".\g_groundvehicle.cpp">
-				<FileConfiguration
-					Name="Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="ReleaseWithDebugInfo|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+						ObjectFile="$(IntDir)/$(InputName)1.obj"
+					/>
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\g_helo.cpp">
-				<FileConfiguration
-					Name="Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="ReleaseWithDebugInfo|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-				</FileConfiguration>
+				RelativePath=".\g_client.c"
+				>
 			</File>
 			<File
-				RelativePath=".\g_items.c">
-			</File>
-			<File
-				RelativePath=".\g_level.cpp">
-			</File>
-			<File
-				RelativePath=".\g_lqm.cpp">
+				RelativePath=".\g_client.cpp"
+				>
 				<FileConfiguration
-					Name="Debug|Win32">
+					Name="Debug|Win32"
+					>
 					<Tool
 						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+						ObjectFile="$(IntDir)/$(InputName)1.obj"
+					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release|Win32">
+					Name="Release|Win32"
+					>
 					<Tool
 						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+						ObjectFile="$(IntDir)/$(InputName)1.obj"
+					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="ReleaseWithDebugInfo|Win32">
+					Name="ReleaseWithDebugInfo|Win32"
+					>
 					<Tool
 						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+						ObjectFile="$(IntDir)/$(InputName)1.obj"
+					/>
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\g_main.c">
+				RelativePath=".\g_cmds.c"
+				>
 			</File>
 			<File
-				RelativePath=".\g_mem.c">
+				RelativePath=".\g_combat.c"
+				>
 			</File>
 			<File
-				RelativePath=".\g_mfq3ents.c">
+				RelativePath=".\g_entity.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\g_mfq3util.c">
+				RelativePath=".\g_groundinstallation.c"
+				>
 			</File>
 			<File
-				RelativePath=".\g_misc.c">
-			</File>
-			<File
-				RelativePath=".\g_miscvehicle.c">
-			</File>
-			<File
-				RelativePath=".\g_missile.c">
-			</File>
-			<File
-				RelativePath=".\g_missions.c">
-			</File>
-			<File
-				RelativePath=".\g_mover.c">
-			</File>
-			<File
-				RelativePath=".\g_plane.cpp">
+				RelativePath=".\g_groundvehicle.cpp"
+				>
 				<FileConfiguration
-					Name="Debug|Win32">
+					Name="Debug|Win32"
+					>
 					<Tool
 						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+						ObjectFile="$(IntDir)/$(InputName)1.obj"
+					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release|Win32">
+					Name="Release|Win32"
+					>
 					<Tool
 						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+						ObjectFile="$(IntDir)/$(InputName)1.obj"
+					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="ReleaseWithDebugInfo|Win32">
+					Name="ReleaseWithDebugInfo|Win32"
+					>
 					<Tool
 						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+						ObjectFile="$(IntDir)/$(InputName)1.obj"
+					/>
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\g_scripts.c">
+				RelativePath=".\g_helo.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseWithDebugInfo|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\g_session.c">
+				RelativePath=".\g_items.c"
+				>
 			</File>
 			<File
-				RelativePath=".\g_spawn.c">
+				RelativePath=".\g_level.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\g_svcmds.c">
+				RelativePath=".\g_lqm.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseWithDebugInfo|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\g_target.c">
+				RelativePath=".\g_main.c"
+				>
 			</File>
 			<File
-				RelativePath=".\g_team.c">
+				RelativePath=".\g_mem.c"
+				>
 			</File>
 			<File
-				RelativePath=".\g_trigger.c">
+				RelativePath=".\g_mfq3ents.c"
+				>
 			</File>
 			<File
-				RelativePath=".\g_utils.c">
+				RelativePath=".\g_mfq3util.c"
+				>
 			</File>
 			<File
-				RelativePath=".\g_vehicle.cpp">
+				RelativePath=".\g_misc.c"
+				>
 			</File>
 			<File
-				RelativePath=".\g_waypoint.c">
+				RelativePath=".\g_miscvehicle.c"
+				>
 			</File>
 			<File
-				RelativePath=".\g_weapon.c">
+				RelativePath=".\g_missile.c"
+				>
 			</File>
 			<File
-				RelativePath=".\g_world.cpp">
+				RelativePath=".\g_missions.c"
+				>
 			</File>
 			<File
-				RelativePath=".\game.cpp">
+				RelativePath=".\g_mover.c"
+				>
 			</File>
 			<File
-				RelativePath=".\mf_client.c">
+				RelativePath=".\g_plane.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="ReleaseWithDebugInfo|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\mf_vehiclespawn.c">
+				RelativePath=".\g_scripts.c"
+				>
+			</File>
+			<File
+				RelativePath=".\g_session.c"
+				>
+			</File>
+			<File
+				RelativePath=".\g_spawn.c"
+				>
+			</File>
+			<File
+				RelativePath=".\g_svcmds.c"
+				>
+			</File>
+			<File
+				RelativePath=".\g_target.c"
+				>
+			</File>
+			<File
+				RelativePath=".\g_team.c"
+				>
+			</File>
+			<File
+				RelativePath=".\g_trigger.c"
+				>
+			</File>
+			<File
+				RelativePath=".\g_utils.c"
+				>
+			</File>
+			<File
+				RelativePath=".\g_vehicle.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\g_waypoint.c"
+				>
+			</File>
+			<File
+				RelativePath=".\g_weapon.c"
+				>
+			</File>
+			<File
+				RelativePath=".\g_world.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\game.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\mf_client.c"
+				>
+			</File>
+			<File
+				RelativePath=".\mf_vehiclespawn.c"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;fi;fd">
+			Filter="h;hpp;hxx;hm;inl;fi;fd"
+			>
 			<File
-				RelativePath=".\bg_local.h">
+				RelativePath=".\bg_local.h"
+				>
 			</File>
 			<File
-				RelativePath=".\bg_public.h">
+				RelativePath=".\bg_public.h"
+				>
 			</File>
 			<File
-				RelativePath=".\g_boat.h">
+				RelativePath=".\g_boat.h"
+				>
 			</File>
 			<File
-				RelativePath=".\g_client.h">
+				RelativePath=".\g_client.h"
+				>
 			</File>
 			<File
-				RelativePath=".\g_entity.h">
+				RelativePath=".\g_entity.h"
+				>
 			</File>
 			<File
-				RelativePath=".\g_groundvehicle.h">
+				RelativePath=".\g_groundvehicle.h"
+				>
 			</File>
 			<File
-				RelativePath=".\g_helo.h">
+				RelativePath=".\g_helo.h"
+				>
 			</File>
 			<File
-				RelativePath=".\g_item.h">
+				RelativePath=".\g_item.h"
+				>
 			</File>
 			<File
-				RelativePath=".\g_level.h">
+				RelativePath=".\g_level.h"
+				>
 			</File>
 			<File
-				RelativePath=".\g_local.h">
+				RelativePath=".\g_local.h"
+				>
 			</File>
 			<File
-				RelativePath=".\g_lqm.h">
+				RelativePath=".\g_lqm.h"
+				>
 			</File>
 			<File
-				RelativePath=".\g_mfq3ents.h">
+				RelativePath=".\g_mfq3ents.h"
+				>
 			</File>
 			<File
-				RelativePath=".\g_plane.h">
+				RelativePath=".\g_plane.h"
+				>
 			</File>
 			<File
-				RelativePath=".\g_public.h">
+				RelativePath=".\g_public.h"
+				>
 			</File>
 			<File
-				RelativePath=".\g_team.h">
+				RelativePath=".\g_team.h"
+				>
 			</File>
 			<File
-				RelativePath=".\g_vehicle.h">
+				RelativePath=".\g_vehicle.h"
+				>
 			</File>
 			<File
-				RelativePath=".\g_world.h">
+				RelativePath=".\g_world.h"
+				>
 			</File>
 			<File
-				RelativePath=".\game.h">
+				RelativePath=".\game.h"
+				>
 			</File>
 			<File
-				RelativePath=".\inv.h">
+				RelativePath=".\inv.h"
+				>
 			</File>
 			<File
-				RelativePath=".\syn.h">
+				RelativePath=".\syn.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
-			Filter="ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe">
+			Filter="ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe"
+			>
 		</Filter>
 		<File
-			RelativePath=".\todo.txt">
+			RelativePath=".\todo.txt"
+			>
 		</File>
 	</Files>
 	<Globals>

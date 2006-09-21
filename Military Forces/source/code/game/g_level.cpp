@@ -295,7 +295,9 @@ LevelLocals::spawnEntity()
 {
 	// find if there was an empty one
 	size_t numEnts = gameEntities_.size();
-	for( size_t i = MAX_CLIENTS + 1 ; i < numEnts ; i++ )
+	size_t i;
+
+	for( i = MAX_CLIENTS + 1 ; i < numEnts ; i++ )
 	{
 		GameEntity* ent = reinterpret_cast<GameEntity*>(gameEntities_.at(i));
 		if( !ent )

@@ -1046,7 +1046,8 @@ void CheckIntermissionExit()
 	int ready = 0;
 	int notReady = 0;
 	int readyMask = 0;
-	for( int i=1 ; i<= g_maxclients.integer ; i++) 
+	int i;
+	for( i=1 ; i<= g_maxclients.integer ; i++) 
 	{
 		GameClient *cl = theLevel.getClient(i);
 		if ( !cl || cl->pers_.connected_ != GameClient::ClientPersistant::CON_CONNECTED ) 
@@ -1471,7 +1472,8 @@ CheckTeamLeader
 */
 void CheckTeamLeader( int team ) 
 {
-	for( int i = 1 ; i <= theLevel.maxclients_ ; i++ ) 
+	int i;
+	for( i = 1 ; i <= theLevel.maxclients_ ; i++ ) 
 	{
 		GameClient* cl = theLevel.getClient(i);
 		if( cl->sess_.sessionTeam_ != team )
@@ -1609,6 +1611,7 @@ Advances the non-player objects in the world
 */
 void G_RunFrame( int levelTime ) 
 {
+	int i;
 	// if we are waiting for the level to restart, do nothing
 	if( theLevel.restarted_ )
 		return;
@@ -1626,7 +1629,7 @@ void G_RunFrame( int levelTime )
 	//
 	int start = Sys_Milliseconds();
 	GameEntity* ent = 0;//&g_entities[0];
-	for( int i=0 ; i<theLevel.num_entities_ ; i++ )
+	for( i=0 ; i<theLevel.num_entities_ ; i++ )
 	{
 		ent = theLevel.getEntity(i);
 		if( !ent || !ent->inuse_ ) 

@@ -445,7 +445,7 @@ void CG_ParticleWorldThink(particleWorld_t * w)
 	int i;
 
 	// Think particles
-	for(i = 0; i < sizeof(w->particles)/sizeof(w->particles[0]); i++)
+	for(i = 0; i < MAX_WORLD_PARTICLES; i++)
 	{
 		if(!w->particles[i].dead)
 		{
@@ -454,14 +454,14 @@ void CG_ParticleWorldThink(particleWorld_t * w)
 	}
 
 	// Think systems
-	for(i = 0; i < sizeof(w->systems)/sizeof(w->systems[0]); i++)
+	for(i = 0; i < MAX_WORLD_SYSTEMS; i++)
 	{
 		if(!w->systems[i].dead)
 			CG_ParticleSystemThink(w, &w->systems[i]);
 	}
 
 	// Think emitters
-	for(i = 0; i < sizeof(w->emitters)/sizeof(w->emitters[0]); i++)
+	for(i = 0; i < MAX_WORLD_EMITTERS; i++)
 	{
 		if(!w->emitters[i].dead )
 		{
@@ -477,7 +477,7 @@ void CG_ParticleWorldRender(particleWorld_t * w)
 	int i, j;
 
 	// Render particles
-	for(i = 0, j = 0; i < sizeof(w->particles)/sizeof(w->particles[0]) && j < w->numParticles; i++)
+	for(i = 0, j = 0; i < MAX_WORLD_PARTICLES && j < w->numParticles; i++)
 	{
 		if(!w->particles[i].dead)
 		{
@@ -492,19 +492,19 @@ void CG_ParticleWorldInit(particleWorld_t * w)
 int i;
 
 	// Think particles
-	for(i = 0; i < sizeof(w->particles)/sizeof(w->particles[0]); i++)
+	for(i = 0; i < MAX_WORLD_PARTICLES; i++)
 	{
 		w->particles[i].dead = true;
 	}
 
 	// Think systems
-	for(i = 0; i < sizeof(w->systems)/sizeof(w->systems[0]); i++)
+	for(i = 0; i < MAX_WORLD_SYSTEMS; i++)
 	{
 		w->systems[i].dead = true;
 	}
 
 	// Think emitters
-	for(i = 0; i < sizeof(w->emitters)/sizeof(w->emitters[0]); i++)
+	for(i = 0; i < MAX_WORLD_EMITTERS; i++)
 	{
 		w->emitters[i].dead = true;
 	}
