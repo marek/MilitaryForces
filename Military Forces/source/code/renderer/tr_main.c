@@ -632,7 +632,7 @@ bool R_GetPortalOrientations( drawSurf_t *drawSurf, int entityNum,
 	// rotate the plane if necessary
 	if ( entityNum != ENTITYNUM_WORLD ) {
 		tr.currentEntityNum = entityNum;
-		tr.currentEntity = &tr.refdef.entities[entityNum];
+		tr.currentEntity = &tr.refdef.entities[entityNum-1];
 
 		// get the orientation of the entity
 		R_RotateForEntity( tr.currentEntity, &tr.viewParms, &tr.or );
@@ -750,7 +750,7 @@ static bool IsMirror( const drawSurf_t *drawSurf, int entityNum )
 	if ( entityNum != ENTITYNUM_WORLD ) 
 	{
 		tr.currentEntityNum = entityNum;
-		tr.currentEntity = &tr.refdef.entities[entityNum];
+		tr.currentEntity = &tr.refdef.entities[entityNum-1];
 
 		// get the orientation of the entity
 		R_RotateForEntity( tr.currentEntity, &tr.viewParms, &tr.or );
@@ -1294,10 +1294,10 @@ void R_AddEntitySurfaces (void) {
 		return;
 	}
 
-	for ( tr.currentEntityNum = 0; 
+	for ( tr.currentEntityNum = 1; 
 	      tr.currentEntityNum < tr.refdef.num_entities; 
 		  tr.currentEntityNum++ ) {
-		ent = tr.currentEntity = &tr.refdef.entities[tr.currentEntityNum];
+		ent = tr.currentEntity = &tr.refdef.entities[tr.currentEntityNum-1];
 
 		ent->needDlights = false;
 

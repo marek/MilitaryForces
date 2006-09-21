@@ -1,197 +1,264 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="7.10"
+	Version="8.00"
 	Name="ui"
-	SccProjectName="&quot;$/MissionPack/code/ui&quot;, AOBAAAAA"
-	SccAuxPath=""
-	SccLocalPath="."
-	SccProvider="MSSCCI:Perforce SCM">
+	ProjectGUID="{A8EAC38E-C7DA-42F8-811D-77FD092B9D19}"
+	>
 	<Platforms>
 		<Platform
-			Name="Win32"/>
+			Name="Win32"
+		/>
 	</Platforms>
+	<ToolFiles>
+	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)..\compiler_output\Debug\ui"
 			IntermediateDirectory="$(SolutionDir)..\compiler_output\Debug\ui"
 			ConfigurationType="4"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="FALSE"
-			CharacterSet="2">
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="_DEBUG"
+				MkTypLibCompatible="true"
+				SuppressStartupBanner="true"
+				TargetEnvironment="1"
+				TypeLibraryName=".\Debug/ui.tlb"
+				HeaderFileName=""
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				OptimizeForProcessor="0"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_WINDOWS"
-				ExceptionHandling="FALSE"
+				ExceptionHandling="0"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				RuntimeTypeInfo="TRUE"
-				UsePrecompiledHeader="2"
+				RuntimeTypeInfo="true"
+				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile="$(IntDir)\ui.pch"
 				AssemblerListingLocation="$(IntDir)\"
 				ObjectFile="$(IntDir)\"
 				ProgramDataBaseFileName="$(IntDir)\"
 				BrowseInformation="1"
 				WarningLevel="3"
-				SuppressStartupBanner="TRUE"
+				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
 				CompileAs="2"
-				DisableSpecificWarnings="4530"/>
+				DisableSpecificWarnings="4530"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
-			<Tool
-				Name="VCLibrarianTool"/>
-			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="_DEBUG"
-				MkTypLibCompatible="TRUE"
-				SuppressStartupBanner="TRUE"
-				TargetEnvironment="1"
-				TypeLibraryName=".\Debug/ui.tlb"
-				HeaderFileName=""/>
-			<Tool
-				Name="VCPostBuildEventTool"/>
-			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_DEBUG"
-				Culture="1033"/>
+				Culture="1033"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCLibrarianTool"
+			/>
 			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)..\compiler_output\Release\ui"
 			IntermediateDirectory="$(SolutionDir)..\compiler_output\Release\ui"
 			ConfigurationType="4"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="FALSE"
-			CharacterSet="2">
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="NDEBUG"
+				MkTypLibCompatible="true"
+				SuppressStartupBanner="true"
+				TargetEnvironment="1"
+				TypeLibraryName=".\Release/ui.tlb"
+				HeaderFileName=""
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				OptimizeForProcessor="2"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_WINDOWS"
-				StringPooling="TRUE"
-				ExceptionHandling="FALSE"
+				StringPooling="true"
+				ExceptionHandling="0"
 				RuntimeLibrary="2"
-				EnableFunctionLevelLinking="TRUE"
-				RuntimeTypeInfo="TRUE"
-				UsePrecompiledHeader="2"
+				EnableFunctionLevelLinking="true"
+				RuntimeTypeInfo="true"
+				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile="$(IntDir)\ui.pch"
 				AssemblerListingLocation="$(IntDir)\"
 				ObjectFile="$(IntDir)\"
 				ProgramDataBaseFileName="$(IntDir)\"
 				WarningLevel="3"
-				SuppressStartupBanner="TRUE"
+				SuppressStartupBanner="true"
 				CompileAs="2"
-				DisableSpecificWarnings="4530"/>
+				DisableSpecificWarnings="4530"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
-			<Tool
-				Name="VCLibrarianTool"
-				OutputFile="$(IntDir)\ui.lib"/>
-			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="NDEBUG"
-				MkTypLibCompatible="TRUE"
-				SuppressStartupBanner="TRUE"
-				TargetEnvironment="1"
-				TypeLibraryName=".\Release/ui.tlb"
-				HeaderFileName=""/>
-			<Tool
-				Name="VCPostBuildEventTool"/>
-			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NDEBUG"
-				Culture="1033"/>
+				Culture="1033"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCLibrarianTool"
+				OutputFile="$(IntDir)\ui.lib"
+			/>
 			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="ReleaseWithDebugInfo|Win32"
 			OutputDirectory="$(SolutionDir)..\compiler_output\ReleaseWithDebugInfo\ui"
 			IntermediateDirectory="$(SolutionDir)..\compiler_output\ReleaseWithDebugInfo\ui"
 			ConfigurationType="4"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="FALSE"
-			CharacterSet="2">
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="_DEBUG"
+				MkTypLibCompatible="true"
+				SuppressStartupBanner="true"
+				TargetEnvironment="1"
+				TypeLibraryName=".\Debug/ui.tlb"
+				HeaderFileName=""
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				OptimizeForProcessor="0"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_WINDOWS"
-				StringPooling="FALSE"
-				ExceptionHandling="FALSE"
+				StringPooling="false"
+				ExceptionHandling="0"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				EnableFunctionLevelLinking="FALSE"
-				RuntimeTypeInfo="TRUE"
-				UsePrecompiledHeader="2"
+				EnableFunctionLevelLinking="false"
+				RuntimeTypeInfo="true"
+				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile="$(IntDir)\ui.pch"
 				AssemblerListingLocation="$(IntDir)\"
 				ObjectFile="$(IntDir)\"
 				ProgramDataBaseFileName="$(IntDir)\"
 				BrowseInformation="1"
 				WarningLevel="4"
-				SuppressStartupBanner="TRUE"
+				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
 				CompileAs="2"
-				DisableSpecificWarnings="4530"/>
+				DisableSpecificWarnings="4530"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
-			<Tool
-				Name="VCLibrarianTool"
-				OutputFile="$(IntDir)\ui.lib"/>
-			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="_DEBUG"
-				MkTypLibCompatible="TRUE"
-				SuppressStartupBanner="TRUE"
-				TargetEnvironment="1"
-				TypeLibraryName=".\Debug/ui.tlb"
-				HeaderFileName=""/>
-			<Tool
-				Name="VCPostBuildEventTool"/>
-			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_DEBUG"
-				Culture="1033"/>
+				Culture="1033"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCLibrarianTool"
+				OutputFile="$(IntDir)\ui.lib"
+			/>
 			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 	</Configurations>
 	<References>
@@ -199,117 +266,154 @@
 	<Files>
 		<Filter
 			Name="Source Files"
-			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat">
+			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
+			>
 			<File
-				RelativePath=".\ui.cpp">
+				RelativePath=".\ui.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ui_atoms.c">
+				RelativePath=".\ui_atoms.c"
+				>
 			</File>
 			<File
-				RelativePath=".\ui_commanddef.cpp">
+				RelativePath=".\ui_commanddef.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ui_controls.cpp">
+				RelativePath=".\ui_controls.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ui_displaycontext.cpp">
+				RelativePath=".\ui_displaycontext.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ui_displaycontext_ui.cpp">
+				RelativePath=".\ui_displaycontext_ui.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ui_gameinfo.c">
+				RelativePath=".\ui_gameinfo.c"
+				>
 			</File>
 			<File
-				RelativePath=".\ui_hashutils.cpp">
+				RelativePath=".\ui_hashutils.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ui_itemcapture.cpp">
+				RelativePath=".\ui_itemcapture.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ui_keywordhash.cpp">
+				RelativePath=".\ui_keywordhash.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ui_main.c">
+				RelativePath=".\ui_main.c"
+				>
 			</File>
 			<File
-				RelativePath=".\ui_memtools.cpp">
+				RelativePath=".\ui_memtools.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ui_precomp.cpp">
+				RelativePath=".\ui_precomp.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ui_util.c">
+				RelativePath=".\ui_util.c"
+				>
 			</File>
 			<File
-				RelativePath=".\ui_utils.cpp">
+				RelativePath=".\ui_utils.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\ui_utils_ui.cpp">
+				RelativePath=".\ui_utils_ui.cpp"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl">
+			Filter="h;hpp;hxx;hm;inl"
+			>
 			<File
-				RelativePath=".\keycodes.h">
+				RelativePath=".\keycodes.h"
+				>
 			</File>
 			<File
-				RelativePath=".\menudef.h">
+				RelativePath=".\menudef.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ui.h">
+				RelativePath=".\ui.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ui_commanddef.h">
+				RelativePath=".\ui_commanddef.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ui_controls.h">
+				RelativePath=".\ui_controls.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ui_displaycontext.h">
+				RelativePath=".\ui_displaycontext.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ui_displaycontext_ui.h">
+				RelativePath=".\ui_displaycontext_ui.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ui_hashutils.h">
+				RelativePath=".\ui_hashutils.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ui_itemcapture.h">
+				RelativePath=".\ui_itemcapture.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ui_keywordhash.h">
+				RelativePath=".\ui_keywordhash.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ui_local.h">
+				RelativePath=".\ui_local.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ui_memtools.h">
+				RelativePath=".\ui_memtools.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ui_precomp.h">
+				RelativePath=".\ui_precomp.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ui_public.h">
+				RelativePath=".\ui_public.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ui_scrollinfo.h">
+				RelativePath=".\ui_scrollinfo.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ui_shared.h">
+				RelativePath=".\ui_shared.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ui_utils.h">
+				RelativePath=".\ui_utils.h"
+				>
 			</File>
 			<File
-				RelativePath=".\ui_utils_ui.h">
+				RelativePath=".\ui_utils_ui.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
-			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe">
+			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
+			>
 		</Filter>
 	</Files>
 	<Globals>

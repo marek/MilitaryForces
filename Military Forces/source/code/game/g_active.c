@@ -1,5 +1,5 @@
 /*
- * $Id: g_active.c,v 1.9 2006-01-29 14:03:41 thebjoern Exp $
+ * $Id: g_active.c,v 1.10 2006-09-21 00:13:24 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -192,7 +192,8 @@ void ClientImpacts( GameEntity *ent, pmove_t *pm )
 
 	for( int i=0 ; i<pm->numtouch ; i++ ) 
 	{
-		for( int j=0 ; j<i ; j++ ) 
+		int j;
+		for( j=0 ; j<i ; j++ ) 
 		{
 			if( pm->touchents[j] == pm->touchents[i] ) 
 				break;

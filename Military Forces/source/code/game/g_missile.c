@@ -1326,7 +1326,6 @@ void fire_autocannon( GameEntity *self, bool main )
 	vec3_t		start, offset;
 	vec3_t		spreadangle;
 	int			weapIdx = (main ? self->client_->ps_.weaponIndex : availableVehicles[self->client_->vehicle_].weapons[0]);
-//	float		spreadX = availableWeapons[availableVehicles[self->client->vehicle].weapons[0]].spread; 
 	float		spreadX = availableWeapons[weapIdx].spread; 
 	float		spreadY = spreadX;
 
