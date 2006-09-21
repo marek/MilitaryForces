@@ -1,5 +1,5 @@
 /*
- * $Id: bg_pmove.c,v 1.6 2006-01-29 14:03:41 thebjoern Exp $
+ * $Id: bg_pmove.c,v 1.7 2006-09-21 01:19:00 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -633,10 +633,11 @@ static void PM_Weapon( void ) {
 	// fire machinegun
 	if( canShootMG && (pm->cmd.buttons & BUTTON_ATTACK) ) {
 		// check for out of ammo
-		if ( pm->ps->ammo[WP_MACHINEGUN] > 0 ) {
+		int wpnIndex = availableVehicles[pm->vehicle].weapons[WP_MACHINEGUN];
+		if ( wpnIndex > 0 && pm->ps->ammo[WP_MACHINEGUN] > 0 ) {
 			pm->ps->ammo[WP_MACHINEGUN]--;
 			PM_AddEvent( EV_FIRE_MG );
-			pm->ps->timers[TIMER_MACHINEGUN] += availableWeapons[availableVehicles[pm->vehicle].weapons[WP_MACHINEGUN]].fireInterval;
+			pm->ps->timers[TIMER_MACHINEGUN] += availableWeapons[wpnIndex].fireInterval;
 		}
 	} 
 	// fire main weapon
