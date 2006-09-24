@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.2 2006-09-21 00:13:24 minkis Exp $
+ * $Id: bg_vehicledata.c,v 1.3 2006-09-24 17:01:13 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -2561,8 +2561,55 @@ completeVehicleData_t availableVehicles[] =
 	{0,0,0,0},					// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
     },*/
+{	"Fast Attack Vehicle",				// descriptiveName
+	"FAV",						// tinyName
+	"fav",				// modelName
+	SHADOW_DEFAULT,				// alpha shadow
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_ANY,
+	CAT_GROUND,
+	CLASS_GROUND_RECON,
+	0,							// flags
+	HC_WHEELS,					// capabilities
+	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
+	{50, 100, 100},				// turnspeed around the three axis
+	{0, 100, 30},				// camera distance {min,max,default}
+	{0, 100, 10},				// camera height {min,max,default}
+	0,							// stallspeed
+	120,						    // maxspeed
+	-5,							// min throttle
+	10,						    // max throttle
+	1,							// engines
+	4,							// wheels
+	8,							// wheel circumference
+	50,							// acceleration
+	130,						// health
+	{8, 0, 2},					// gun tag
+	160,						// max fuel
+	300,						// max gun pitch (upwards = negative) <- gearheight
+	6,							// min gun pitch (downwards = positive) <- tailangle
+	WI_MG_12_7MM, 0, 0, 0, 0, 0, 0, WI_CFLARE,// weapons
+	800, 0, 0, 0, 0, 0, 0, 20,	// ammo
+	0,0,0,0,0,0,0,0,			// turret
+	{0, 0, 10},					// cameraposition for cockpit view
+	0,							// effect model
+	8000,						// radar range
+	4000,						// radar range ground
+	-1,							// trackcone
+	0,							// trackcone ground
+	0,							// swingangle
+	1400,						// geartime
+	0,							// max gear frame
+	1000,						// baytime
+	0,							// max bay frame
+	0,							// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
+    },
 
-    {	"Hummer",				// descriptiveName
+    {	"Humvee",				// descriptiveName
 	"HMV",						// tinyName
 	"humvee_50cal",				// modelName
 	SHADOW_DEFAULT,				// alpha shadow
@@ -2611,7 +2658,7 @@ completeVehicleData_t availableVehicles[] =
     },
 
 
-    {	"Hummer (AA)",			// descriptiveName
+    {	"Humvee (AA)",			// descriptiveName
 	"HMVAA",						// tinyName
 	"humvee_avng",				// modelName
 	SHADOW_DEFAULT,				// alpha shadow

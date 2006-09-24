@@ -412,55 +412,6 @@ struct Think_NukeDamage : public GameEntity::EntityFunc_Think
 
 /*
 ================
-G_burningManExplode
-================
-*/
-void G_burningManExplode( GameEntity *ent ) 
-{
-	vec3_t		start, dir;
-	int i;
-	GameEntity	*bolt;
-	static int	seed = 0x92;
-
-
-	VectorCopy(ent->r.currentOrigin, start);
-	// we don't have a valid direction, so just point straight up
-	dir[0] = dir[1] = 0;
-	dir[2] = 1;
-
-
-	for(i = 0; i < 75; i++)
-	{
-		VectorSet(dir, (30 - (-30) + 1) * Q_random(&seed) + -30,	(30 - (-30) + 1) * Q_random(&seed) + -30,		40 * Q_random(&seed));
-	
-		bolt = theLevel.spawnEntity();
-		bolt->classname_ = "burningman";
-		bolt->nextthink_ = theLevel.time_ + 10000 + 4000 * Q_random(&seed);
-		bolt->setThink(new Think_ExplodeMissile);// think = G_ExplodeMissile;
-		bolt->s.eType = ET_MISSILE;
-		bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
-		bolt->s.weaponIndex = WI_BURNINGMAN;
-		
-		// bolt->parent = self;	// No parent
-	//	bolt->r.ownerNum = self->s.number;
-
-		bolt->damage_ = bolt->splashDamage_ = 0;
-		bolt->splashRadius_ = 0;
-		bolt->clipmask_ = MASK_SHOT;
-		bolt->ONOFF_ = 1;// not used
-
-		bolt->s.pos.trType = TR_GRAVITY_10;
-		bolt->s.pos.trTime = theLevel.time_;// - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
-		VectorCopy( start, bolt->s.pos.trBase );
-		VectorScale( dir, 15, bolt->s.pos.trDelta );
-		SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
-		VectorCopy (start, bolt->r.currentOrigin);
-	}
-}
-
-
-/*
-================
 G_CrateDropItems
 ================
 */
@@ -548,8 +499,6 @@ struct Think_ExplodeNuke : public GameEntity::EntityFunc_Think
 		GameEntity	*explosion;
 		GameEntity	*te;
 		vec3_t		snapped;
-		static int	seed = 0x94;
-		int rndnum;
 
 		// start up the explosion logic
 		explosion = theLevel.spawnEntity();
@@ -580,13 +529,6 @@ struct Think_ExplodeNuke : public GameEntity::EntityFunc_Think
 		explosion->activator_ = self_->parent_;		// Activator is the owner of the bomb/missile 
 
 		self_->freeAfterEvent_ = true;
-
-		// Easter egg
-		rndnum = (35 - (1) + 1) * Q_random(&seed) + 1;
-		if(rndnum == 2)	// Magic number supplied by Cannon ¬_¬
-		{
-			G_burningManExplode(self_);
-		}
 
 		// play global sound at all clients
 		te = G_TempEntity(snapped, EV_GLOBAL_TEAM_SOUND );

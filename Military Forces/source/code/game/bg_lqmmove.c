@@ -1,5 +1,5 @@
 /*
- * $Id: bg_lqmmove.c,v 1.4 2005-11-21 17:28:20 thebjoern Exp $
+ * $Id: bg_lqmmove.c,v 1.5 2006-09-24 17:01:13 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -444,14 +444,12 @@ bool	PM_SlideMove_LQM() {
 }
 
 void PM_StepSlideMove_LQM() {
-	vec3_t		start_o, start_v;
-	vec3_t		down_o, down_v;
+	vec3_t		start_o;
 	trace_t		trace;
 	vec3_t		up, down;
 	float		stepSize;
 
 	VectorCopy (pm->ps->origin, start_o);
-	VectorCopy (pm->ps->velocity, start_v);
 
 	if ( PM_SlideMove_LQM() == 0 )
 		return;		// we got exactly where we wanted to go first try	
@@ -464,9 +462,6 @@ void PM_StepSlideMove_LQM() {
 	if ( pm->ps->velocity[2] > 0 && (trace.fraction == 1.0 || DotProduct(trace.plane.normal, up) < 0.7))
 		return;
 
-	VectorCopy (pm->ps->origin, down_o);
-	VectorCopy (pm->ps->velocity, down_v);
-
 	VectorCopy (start_o, up);
 	up[2] += STEPSIZE;
 
@@ -478,7 +473,6 @@ void PM_StepSlideMove_LQM() {
 	stepSize = trace.endpos[2] - start_o[2];
 	// try slidemove from this position
 	VectorCopy (trace.endpos, pm->ps->origin);
-	VectorCopy (start_v, pm->ps->velocity);
 
 	PM_SlideMove_LQM();
 

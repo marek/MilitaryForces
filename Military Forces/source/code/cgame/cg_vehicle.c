@@ -1,5 +1,5 @@
 /*
- * $Id: cg_vehicle.c,v 1.10 2005-11-24 10:46:53 thebjoern Exp $
+ * $Id: cg_vehicle.c,v 1.11 2006-09-24 17:01:13 minkis Exp $
 */
 
 #include "cg_local.h"
@@ -763,7 +763,6 @@ void CG_VehicleMuzzleFlash( int weaponIdx, const refEntity_t *parent, qhandle_t 
 	unsigned int	flashes;
 	char			tag[10];
 
-//	flashes = availableWeapons[availableVehicles[idx].weapons[0]].barrels;
 	flashes = availableWeapons[weaponIdx].barrels;
 
 	if( flashes > MAX_MUZZLEFLASHES ) flashes = MAX_MUZZLEFLASHES;
