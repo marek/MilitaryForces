@@ -1665,8 +1665,7 @@ void G_RunFrame( int levelTime )
 		// temporary entities don't think
 		if( ent->freeAfterEvent_ ) 
 			continue;
-		if( !ent->r.linked ) //&& ent->neverFree_ ) 
-			continue;
+
 		if( ent->s.eType == ET_MISSILE ||
 			 ent->s.eType == ET_BULLET ) 
 		{
