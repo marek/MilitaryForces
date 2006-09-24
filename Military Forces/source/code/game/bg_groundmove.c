@@ -1,5 +1,5 @@
 /*
- * $Id: bg_groundmove.c,v 1.5 2005-11-21 17:28:20 thebjoern Exp $
+ * $Id: bg_groundmove.c,v 1.6 2006-09-24 17:01:13 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -207,6 +207,8 @@ static void PM_AdjustToTerrain( void )
 			VectorCopy( start[i], end[i] );
 			start[i][2] = pm->ps->origin[2] + 20;
 			end[i][2] = pm->ps->origin[2] - 40;
+		//	start[i][2] = availableVehicles[pm->vehicle].mins[2];
+		//	end[i][2] = availableVehicles[pm->vehicle].mins[2]-2;
 		}
 		// get the projected length&width
 		VectorSubtract( start[PFRONT], start[PBACK], forward );
@@ -351,7 +353,6 @@ void PM_GroundVehicleMove( void )
 	// speed
 	speed = (float)pm->ps->speed/10;
 	if( pm->ps->ONOFF & OO_STALLED ) {
-//		speed *= -1;
 		AngleVectors( pm->ps->vehicleAngles, forward, NULL, NULL );
 		VectorNegate( forward, forward );
 	} else {
@@ -590,7 +591,6 @@ bool	PM_SlideMove_GV() {
 		if(	trace.entityNum != ENTITYNUM_WORLD ||
 			pm->ps->stats[STAT_HEALTH] <= 0 ||
 			(trace.entityNum == ENTITYNUM_WORLD &&
-//				!(trace.surfaceFlags & SURF_NOIMPACT) &&
 			!(trace.surfaceFlags & SURF_SKY)) ) {
 			PM_AddTouchEnt_GV( trace.entityNum );
 		}
