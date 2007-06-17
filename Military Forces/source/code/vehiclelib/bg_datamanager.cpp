@@ -69,6 +69,24 @@ DataManager::findWeaponByName( std::string const& lookupName )
 	}
 	return -1;
 }
+/*
+Loadout const &
+DataManager::findLoadoutByVehicleNum(const int vehicleNum)
+{
+	return allGameObjects_[(VehicleNum & 0x000FFC00) >> 10]->;
+}
+
+VehicleInfo const &
+DataManager::findVehicleByVehicleNum(const int vehicleNum)
+{
+	return (VehicleNum & 0xFFF00000) >> 20;
+}
+
+WeaponInfo const &
+DataManager::findWeaponByVehicleNum(const int vehicleNum)
+{
+	return VehicleNum & 0x000003FF;
+}*/
 
 void
 DataManager::setupAllVehicles()

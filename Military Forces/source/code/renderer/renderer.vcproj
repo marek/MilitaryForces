@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="renderer"
 	ProjectGUID="{AB424155-FBED-4D8D-B007-5B6CF93EA395}"
+	RootNamespace="renderer"
 	>
 	<Platforms>
 		<Platform
@@ -45,7 +46,7 @@
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				StringPooling="true"
 				ExceptionHandling="0"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"

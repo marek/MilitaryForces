@@ -1,5 +1,5 @@
 /*
- * $Id: g_active.c,v 1.10 2006-09-21 00:13:24 minkis Exp $
+ * $Id: g_active.c,v 1.11 2007-06-17 17:11:12 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,7 +9,6 @@
 #include "g_level.h"
 #include "g_plane.h"
 #include "g_helo.h"
-
 
 /*
 ===============

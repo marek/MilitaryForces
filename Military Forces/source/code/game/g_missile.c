@@ -769,13 +769,15 @@ struct Think_No_Fuel_Flight : public GameEntity::EntityFunc_Think
 {
 	virtual void execute()
 	{
-		// update target
-		if( self_->tracktarget_ && self_->tracktarget_->client_ ) 
-			self_->tracktarget_->client_->ps_.stats[STAT_LOCKINFO] &= ~LI_BEING_LAUNCHED;
+		GameEntity*	self = self_;  // Since we may delete our current think()
 
-		self_->s.pos.trType = TR_GRAVITY;
-		self_->setThink(new Think_ExplodeMissile);//think = G_ExplodeMissile;
-		self_->nextthink_ = theLevel.time_ + 5000;
+		// update target
+		if( self->tracktarget_ && self->tracktarget_->client_ ) 
+			self->tracktarget_->client_->ps_.stats[STAT_LOCKINFO] &= ~LI_BEING_LAUNCHED;
+
+		self->s.pos.trType = TR_GRAVITY;
+		self->setThink(new Think_ExplodeMissile);//think = G_ExplodeMissile;
+		self->nextthink_ = theLevel.time_ + 5000;
 	}
 };
 
@@ -805,48 +807,49 @@ struct Think_FollowTarget : public GameEntity::EntityFunc_Think
 		int		i, prob, num, touch[MAX_GENTITIES], vulner;
 		static vec3_t range = { 500, 500, 500 };
 		GameEntity* hit;
+		GameEntity*	self = self_;  // Since we may delete our current think()
 
 		// target invalid
-		if( !self_->tracktarget_ ) 
+		if( !self->tracktarget_ ) 
 		{
-			on_target_lost(self_);
+			on_target_lost(self);
 			return;
 		} 
-		else if( !self_->tracktarget_->inuse_ ) 
+		else if( !self->tracktarget_->inuse_ ) 
 		{
-			on_target_lost(self_);
+			on_target_lost(self);
 			return;
 		}
 
 		// out of fuel
-		if( theLevel.time_ >= self_->wait_ ) 
+		if( theLevel.time_ >= self->wait_ ) 
 		{
-			on_target_lost(self_);
+			on_target_lost(self);
 			return;
 		}
 
 		// direction vector and range
-		if( self_->tracktarget_->s.eType == ET_EXPLOSIVE ) 
+		if( self->tracktarget_->s.eType == ET_EXPLOSIVE ) 
 		{
-			VectorAdd( self_->tracktarget_->r.absmin, self_->tracktarget_->r.absmax, mid );
+			VectorAdd( self->tracktarget_->r.absmin, self->tracktarget_->r.absmax, mid );
 			VectorScale( mid, 0.5f, mid );
 		} 
 		else 
-			VectorCopy( self_->tracktarget_->r.currentOrigin, mid );
+			VectorCopy( self->tracktarget_->r.currentOrigin, mid );
 
-		VectorSubtract( mid, self_->r.currentOrigin, targdir );
+		VectorSubtract( mid, self->r.currentOrigin, targdir );
 		dist = VectorNormalize(targdir);
 
 		// out of range (if ever possible)
-		if( dist > self_->range_ ) 
+		if( dist > self->range_ ) 
 		{
-			on_target_lost(self_);
+			on_target_lost(self);
 			return;
 		}
 
 		// check for flares
-		VectorSubtract( self_->r.currentOrigin, range, mins );
-		VectorAdd( self_->r.currentOrigin, range, maxs );
+		VectorSubtract( self->r.currentOrigin, range, mins );
+		VectorAdd( self->r.currentOrigin, range, maxs );
 		num = SV_AreaEntities( mins, maxs, touch, MAX_GENTITIES );
 
 		for ( i=0 ; i<num ; i++ ) 
@@ -860,72 +863,72 @@ struct Think_FollowTarget : public GameEntity::EntityFunc_Think
 				continue;
 			if( !hit->ONOFF_ ) 
 				continue;
-			if( hit->r.ownerNum == self_->r.ownerNum ) 
+			if( hit->r.ownerNum == self->r.ownerNum ) 
 				continue; 
 			hit->ONOFF_ = 0; // disable the flare
 			prob = rand() % 100;
-			vulner = self_->basicECMVulnerability_ - self_->tracktarget_->s.frame;
+			vulner = self->basicECMVulnerability_ - self->tracktarget_->s.frame;
 			//Com_Printf("TT: %d, vulner: %d, prob: %d\n", missile->tracktarget->s.frame, vulner, prob);
 			if( prob < vulner ) 
 			{
-				if( self_->tracktarget_->client_ )
-					self_->tracktarget_->client_->ps_.stats[STAT_LOCKINFO] &= ~LI_BEING_LAUNCHED;
-				self_->tracktarget_ = hit;
-				self_->lastDist_ = 0;
-				self_->nextthink_ = theLevel.time_ + 10;
+				if( self->tracktarget_->client_ )
+					self->tracktarget_->client_->ps_.stats[STAT_LOCKINFO] &= ~LI_BEING_LAUNCHED;
+				self->tracktarget_ = hit;
+				self->lastDist_ = 0;
+				self->nextthink_ = theLevel.time_ + 10;
 				return;
 			}
 		}
 
 		// close miss
-		if( self_->lastDist_ && dist > self_->lastDist_ && dist < self_->splashRadius_ ) 
+		if( self->lastDist_ && dist > self->lastDist_ && dist < self->splashRadius_ ) 
 		{
-			self_->nextthink_ = theLevel.time_ + 10;
-			self_->setThink(new Think_ExplodeMissile);//think = G_ExplodeMissile;
+			self->nextthink_ = theLevel.time_ + 10;
+			self->setThink(new Think_ExplodeMissile);//think = G_ExplodeMissile;
 		}
 
 		// out of seeker cone
-		VectorCopy( self_->s.pos.trDelta, dir );
+		VectorCopy( self->s.pos.trDelta, dir );
 		VectorNormalize( dir );
 		dot = DotProduct( dir, targdir );
-		if( dot < self_->followcone_ ) 
+		if( dot < self->followcone_ ) 
 		{ 
 			// roughly 5 degrees
-			on_target_lost(self_);
+			on_target_lost(self);
 			return;
 		}
 
 		// LOS
-		SV_Trace( &tr, self_->r.currentOrigin, 0, 0, mid, self_->tracktarget_->s.number, MASK_SOLID, false );
+		SV_Trace( &tr, self->r.currentOrigin, 0, 0, mid, self->tracktarget_->s.number, MASK_SOLID, false );
 		if( tr.fraction < 1.0f ) 
 		{
-			on_target_lost(self_);
+			on_target_lost(self);
 			return;
 		}
 
 		// adjust course/speed
 		VectorMA( dir, 1.85f, targdir, targdir );
 		VectorNormalize( targdir );
-		VectorScale( targdir, self_->speed_, dir );
+		VectorScale( targdir, self->speed_, dir );
 		
 		vectoangles( dir, targdir );
-		VectorCopy( targdir, self_->s.angles );
-		VectorCopy( self_->s.angles, self_->s.apos.trBase );
-		VectorCopy( self_->s.angles, self_->r.currentAngles );
-		self_->s.apos.trTime = theLevel.time_;
+		VectorCopy( targdir, self->s.angles );
+		VectorCopy( self->s.angles, self->s.apos.trBase );
+		VectorCopy( self->s.angles, self->r.currentAngles );
+		self->s.apos.trTime = theLevel.time_;
 
-		VectorCopy( self_->r.currentOrigin, self_->s.pos.trBase );
-		VectorCopy( dir, self_->s.pos.trDelta );
-		self_->s.pos.trTime = theLevel.time_;
+		VectorCopy( self->r.currentOrigin, self->s.pos.trBase );
+		VectorCopy( dir, self->s.pos.trDelta );
+		self->s.pos.trTime = theLevel.time_;
 
-		self_->nextthink_ = theLevel.time_ + 100;
-		self_->lastDist_ = dist;
+		self->nextthink_ = theLevel.time_ + 100;
+		self->lastDist_ = dist;
 
 		// update target
-		if( self_->tracktarget_->client_ ) 
-			self_->tracktarget_->client_->ps_.stats[STAT_LOCKINFO] |= LI_BEING_LAUNCHED;
+		if( self->tracktarget_->client_ ) 
+			self->tracktarget_->client_->ps_.stats[STAT_LOCKINFO] |= LI_BEING_LAUNCHED;
 
-		SV_LinkEntity( self_ );
+		SV_LinkEntity( self );
 	}
 };
 
@@ -933,21 +936,23 @@ struct Think_DropToNormalTransition : public GameEntity::EntityFunc_Think
 {
 	virtual void execute()
 	{
-		self_->s.pos.trType = TR_ACCEL;//TR_LINEAR;
-		self_->s.pos.trTime = theLevel.time_;
-		self_->s.pos.trDuration = 500;
+		GameEntity*	self = self_;  // Since we may delete our current think()
 
-		VectorCopy( self_->r.currentOrigin, self_->s.pos.trBase );
-		VectorNormalize( self_->s.pos.trDelta );
-		VectorScale( self_->s.pos.trDelta, self_->speed_, self_->s.pos.trDelta );
-		if( self_->tracktarget_ )
+		self->s.pos.trType = TR_ACCEL;//TR_LINEAR;
+		self->s.pos.trTime = theLevel.time_;
+		self->s.pos.trDuration = 500;
+
+		VectorCopy( self->r.currentOrigin, self->s.pos.trBase );
+		VectorNormalize( self->s.pos.trDelta );
+		VectorScale( self->s.pos.trDelta, self->speed_, self->s.pos.trDelta );
+		if( self->tracktarget_ )
 		{
-			self_->wait_ = theLevel.time_ + availableWeapons[self_->s.weaponIndex].fuelrange;
-			self_->setThink(new Think_FollowTarget);
-			self_->nextthink_ = theLevel.time_ + 50;
+			self->wait_ = theLevel.time_ + availableWeapons[self->s.weaponIndex].fuelrange;
+			self->setThink(new Think_FollowTarget);
+			self->nextthink_ = theLevel.time_ + 50;
 		} else {
-			self_->setThink(new Think_ExplodeMissile);//think = G_ExplodeMissile;
-			self_->nextthink_ = theLevel.time_ + availableWeapons[self_->s.weaponIndex].fuelrange;
+			self->setThink(new Think_ExplodeMissile);//think = G_ExplodeMissile;
+			self->nextthink_ = theLevel.time_ + availableWeapons[self->s.weaponIndex].fuelrange;
 		}
 	}
 };
@@ -1636,11 +1641,13 @@ struct Die_CrateDie : public GameEntity::EntityFunc_Die
 {
 	virtual void execute( GameEntity *inflictor, GameEntity *attacker, int damage, int mod )
 	{
-			if (inflictor == self_)
-					return;
-			self_->takedamage_ = false;
-			self_->setThink(new Think_ExplodeMissile);//think = G_ExplodeMissile;
-			self_->nextthink_ = theLevel.time_ + 10;
+		GameEntity*	self = self_;  // Since we may delete our current think()
+
+		if (inflictor == self)
+				return;
+		self->takedamage_ = false;
+		self->setThink(new Think_ExplodeMissile);//think = G_ExplodeMissile;
+		self->nextthink_ = theLevel.time_ + 10;
 	}
 };
 

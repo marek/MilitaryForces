@@ -1,5 +1,5 @@
 /*
- * $Id: g_mover.c,v 1.6 2006-01-29 14:03:41 thebjoern Exp $
+ * $Id: g_mover.c,v 1.7 2007-06-17 17:11:13 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -467,40 +467,42 @@ struct Reached_BinaryMover : public GameEntity::EntityFunc_Reached
 {
 	virtual void execute()
 	{
-		// stop the looping sound
-		self_->s.loopSound = self_->soundLoop_;
+		GameEntity*	self = self_;  // Since we may delete our current think()
 
-		if ( self_->moverState_ == GameEntity::MOVER_1TO2 ) 
+		// stop the looping sound
+		self->s.loopSound = self->soundLoop_;
+
+		if ( self->moverState_ == GameEntity::MOVER_1TO2 ) 
 		{
 			// reached pos2
-			SetMoverState( self_, GameEntity::MOVER_POS2, theLevel.time_ );
+			SetMoverState( self, GameEntity::MOVER_POS2, theLevel.time_ );
 
 			// play sound
-			if ( self_->soundPos2_ ) 
-				G_AddEvent( self_, EV_GENERAL_SOUND, self_->soundPos2_, true );
+			if ( self->soundPos2_ ) 
+				G_AddEvent( self, EV_GENERAL_SOUND, self->soundPos2_, true );
 
 			// return to pos1 after a delay
-			self_->setThink(new Think_ReturnToPos1);
-			self_->nextthink_ = theLevel.time_ + self_->wait_;
+			self->setThink(new Think_ReturnToPos1);
+			self->nextthink_ = theLevel.time_ + self->wait_;
 
 			// fire targets
-			if ( !self_->activator_ ) 
-				self_->activator_ = self_;
+			if ( !self->activator_ ) 
+				self->activator_ = self;
 
-			G_UseTargets( self_, self_->activator_ );
+			G_UseTargets( self, self->activator_ );
 		} 
-		else if ( self_->moverState_ == GameEntity::MOVER_2TO1 ) 
+		else if ( self->moverState_ == GameEntity::MOVER_2TO1 ) 
 		{
 			// reached pos1
-			SetMoverState( self_, GameEntity::MOVER_POS1, theLevel.time_ );
+			SetMoverState( self, GameEntity::MOVER_POS1, theLevel.time_ );
 
 			// play sound
-			if ( self_->soundPos1_ ) 
-				G_AddEvent( self_, EV_GENERAL_SOUND, self_->soundPos1_, true );
+			if ( self->soundPos1_ ) 
+				G_AddEvent( self, EV_GENERAL_SOUND, self->soundPos1_, true );
 
 			// close areaportals
-			if ( self_->teammaster_ == self_ || !self_->teammaster_ ) 
-				SV_AdjustAreaPortalState( self_, false );
+			if ( self->teammaster_ == self || !self->teammaster_ ) 
+				SV_AdjustAreaPortalState( self, false );
 
 		} 
 		else 

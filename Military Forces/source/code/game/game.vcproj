@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="game"
 	ProjectGUID="{F9EE10DA-2404-4154-B904-F93C936C040A}"
+	RootNamespace="game"
 	>
 	<Platforms>
 		<Platform
@@ -131,7 +132,7 @@
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_WINDOWS"
 				StringPooling="true"
 				ExceptionHandling="0"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"

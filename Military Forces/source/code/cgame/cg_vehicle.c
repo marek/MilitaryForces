@@ -1,11 +1,8 @@
 /*
- * $Id: cg_vehicle.c,v 1.11 2006-09-24 17:01:13 minkis Exp $
+ * $Id: cg_vehicle.c,v 1.12 2007-06-17 17:11:12 minkis Exp $
 */
 
 #include "cg_local.h"
-
-
-
 
 #define MAX_LQM_MODELS	32
 typedef struct LQMAnimations_s
@@ -306,10 +303,10 @@ static void CG_CacheHelo(int index)
 			Com_sprintf( name, sizeof(name), "%s.md3", basename );
 			break;
 		case BP_HELO_MAINROTOR:
-			Com_sprintf( name, sizeof(name), "%s_mrotor.md3", basename );
+			Com_sprintf( name, sizeof(name), "%s_mrotor_blur.md3", basename );
 			break;
 		case BP_HELO_TAILROTOR:
-			Com_sprintf( name, sizeof(name), "%s_trotor.md3", basename );
+			Com_sprintf( name, sizeof(name), "%s_trotor_blur.md3", basename );
 			break;
 		case BP_HELO_TURRET:
 			Com_sprintf( name, sizeof(name), "%s_tur.md3", basename );
