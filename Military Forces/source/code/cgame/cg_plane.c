@@ -1,11 +1,9 @@
 /*
- * $Id: cg_plane.c,v 1.5 2005-11-21 17:28:20 thebjoern Exp $
+ * $Id: cg_plane.c,v 1.6 2007-06-17 17:11:12 minkis Exp $
 */
 
 
 #include "cg_local.h"
-
-
 
 /*
 ==========================

@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="ui"
 	ProjectGUID="{A8EAC38E-C7DA-42F8-811D-77FD092B9D19}"
+	RootNamespace="ui"
 	>
 	<Platforms>
 		<Platform
@@ -132,7 +133,7 @@
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_WINDOWS"
 				StringPooling="true"
 				ExceptionHandling="0"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"

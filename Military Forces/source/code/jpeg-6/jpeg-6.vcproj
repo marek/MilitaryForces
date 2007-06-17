@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="jpeg-6"
 	ProjectGUID="{0E65018D-61C6-44DF-BB76-941DD61679CE}"
+	RootNamespace="jpeg-6"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -115,7 +116,7 @@
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				StringPooling="true"
 				ExceptionHandling="0"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"

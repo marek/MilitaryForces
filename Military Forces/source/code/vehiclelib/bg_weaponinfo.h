@@ -3,6 +3,7 @@
 
 #include "../game/q_shared.h"
 #include "bg_datamanager.h"
+//#include "../game/bg_public.h"
 #include <string>
 
 

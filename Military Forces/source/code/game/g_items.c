@@ -1,5 +1,5 @@
 /*
- * $Id: g_items.c,v 1.6 2006-01-29 14:03:41 thebjoern Exp $
+ * $Id: g_items.c,v 1.7 2007-06-17 17:11:13 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -169,6 +169,7 @@ struct Touch_ItemTouch : public GameEntity::EntityFunc_Touch
 	{
 		int		respawn;
 		bool	predict;
+		GameEntity*	self = self_;  // Since we may delete our current think()
 
 		if( !other->client_ )
 			return;
@@ -178,27 +179,27 @@ struct Touch_ItemTouch : public GameEntity::EntityFunc_Touch
 			return;
 
 		// the same pickup rules are used for client side and server side
-		if ( !BG_CanItemBeGrabbed( g_gametype.integer, &self_->s, &other->client_->ps_, other->client_->vehicle_ ) ) 
+		if ( !BG_CanItemBeGrabbed( g_gametype.integer, &self->s, &other->client_->ps_, other->client_->vehicle_ ) ) 
 			return;
 
-		G_LogPrintf( "Item: %i %s\n", other->s.number, self_->item_->classname );
+		G_LogPrintf( "Item: %i %s\n", other->s.number, self->item_->classname );
 
 		predict = other->client_->pers_.predictItemPickup_;
 
 		// call the item-specific pickup function
-		switch( self_->item_->giType )
+		switch( self->item_->giType )
 		{
 		case IT_AMMO:
-			respawn = Pickup_Ammo(self_, other);
+			respawn = Pickup_Ammo(self, other);
 			break;
 		case IT_HEALTH:
-			respawn = Pickup_Health(self_, other);
+			respawn = Pickup_Health(self, other);
 			break;
 		case IT_FUEL:
-			respawn = Pickup_Fuel(self_, other);
+			respawn = Pickup_Fuel(self, other);
 			break;
 		case IT_TEAM:
-			respawn = Pickup_Team(self_, other);
+			respawn = Pickup_Team(self, other);
 			break;
 		default:
 			return;
@@ -209,26 +210,26 @@ struct Touch_ItemTouch : public GameEntity::EntityFunc_Touch
 
 		// play the normal pickup sound
 		if( predict ) 
-			G_AddPredictableEvent( other, EV_ITEM_PICKUP, self_->s.modelindex );
+			G_AddPredictableEvent( other, EV_ITEM_PICKUP, self->s.modelindex );
 		else 
-			G_AddEvent( other, EV_ITEM_PICKUP, self_->s.modelindex, true );
+			G_AddEvent( other, EV_ITEM_PICKUP, self->s.modelindex, true );
 
 		// powerup pickups are global broadcasts
-		if( self_->item_->giType == IT_TEAM) 
+		if( self->item_->giType == IT_TEAM) 
 		{
 			// if we want the global sound to play
-			if( !self_->speed_ ) 
+			if( !self->speed_ ) 
 			{
 				GameEntity	*te;
-				te = G_TempEntity( self_->s.pos.trBase, EV_GLOBAL_ITEM_PICKUP );
-				te->s.eventParm = self_->s.modelindex;
+				te = G_TempEntity( self->s.pos.trBase, EV_GLOBAL_ITEM_PICKUP );
+				te->s.eventParm = self->s.modelindex;
 				te->r.svFlags |= SVF_BROADCAST;
 			} 
 			else 
 			{
 				GameEntity	*te;
-				te = G_TempEntity( self_->s.pos.trBase, EV_GLOBAL_ITEM_PICKUP );
-				te->s.eventParm = self_->s.modelindex;
+				te = G_TempEntity( self->s.pos.trBase, EV_GLOBAL_ITEM_PICKUP );
+				te->s.eventParm = self->s.modelindex;
 				// only send this temp entity to a single client
 				te->r.svFlags |= SVF_SINGLECLIENT;
 				te->r.singleClient = other->s.number;
@@ -236,40 +237,40 @@ struct Touch_ItemTouch : public GameEntity::EntityFunc_Touch
 		}
 
 		// fire item targets
-		G_UseTargets (self_, other);
+		G_UseTargets (self, other);
 
 		// wait of -1 will not respawn
-		if( self_->wait_ == -1 ) 
+		if( self->wait_ == -1 ) 
 		{
-			self_->r.svFlags |= SVF_NOCLIENT;
-			self_->s.eFlags |= EF_NODRAW;
-			self_->r.contents = 0;
-			self_->unlinkAfterEvent_ = true;
+			self->r.svFlags |= SVF_NOCLIENT;
+			self->s.eFlags |= EF_NODRAW;
+			self->r.contents = 0;
+			self->unlinkAfterEvent_ = true;
 			return;
 		}
 
 		// non zero wait overrides respawn time
-		if( self_->wait_ ) 
-			respawn = self_->wait_;
+		if( self->wait_ ) 
+			respawn = self->wait_;
 
 		// random can be used to vary the respawn time
-		if( self_->random_ ) 
+		if( self->random_ ) 
 		{
-			respawn += crandom() * self_->random_;
+			respawn += crandom() * self->random_;
 			if ( respawn < 1 ) 
 				respawn = 1;
 		}
 
 		// dropped items will not respawn
-		if( self_->flags_ & FL_DROPPED_ITEM ) 
-			self_->freeAfterEvent_ = true;
+		if( self->flags_ & FL_DROPPED_ITEM ) 
+			self->freeAfterEvent_ = true;
 
 		// picked up items still stay around, they just don't
 		// draw anything.  This allows respawnable items
 		// to be placed on movers.
-		self_->r.svFlags |= SVF_NOCLIENT;
-		self_->s.eFlags |= EF_NODRAW;
-		self_->r.contents = 0;
+		self->r.svFlags |= SVF_NOCLIENT;
+		self->s.eFlags |= EF_NODRAW;
+		self->r.contents = 0;
 
 		// ZOID
 		// A negative respawn times means to never respawn this item (but don't 
@@ -277,15 +278,15 @@ struct Touch_ItemTouch : public GameEntity::EntityFunc_Touch
 		// events such as ctf flags
 		if( respawn <= 0 ) 
 		{
-			self_->nextthink_ = 0;
-			self_->setThink(0);
+			self->nextthink_ = 0;
+			self->setThink(0);
 		} 
 		else 
 		{
-			self_->nextthink_ = theLevel.time_ + respawn * 1000;
-			self_->setThink(new Think_RespawnItem);
+			self->nextthink_ = theLevel.time_ + respawn * 1000;
+			self->setThink(new Think_RespawnItem);
 		}
-		SV_LinkEntity( self_ );
+		SV_LinkEntity( self );
 	}
 };
 

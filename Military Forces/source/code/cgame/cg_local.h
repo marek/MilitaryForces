@@ -1,5 +1,5 @@
 /*
- * $Id: cg_local.h,v 1.20 2006-01-29 14:03:40 thebjoern Exp $
+ * $Id: cg_local.h,v 1.21 2007-06-17 17:11:12 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -14,6 +14,9 @@
 #include "cg_public.h"
 #include "../ui/ui_shared.h"
 #include "../renderer/tr_public.h"
+#include "../vehiclelib/bg_datamanager.h"
+#include "../vehiclelib/bg_vehicleinfo.h"
+#include "../vehiclelib/bg_weaponinfo.h"
 
 // used for 2D drawing using the shared UI code
 //extern displayContextDef_t * DC;

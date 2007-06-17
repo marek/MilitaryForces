@@ -1,5 +1,5 @@
 /*
- * $Id: bg_vehicledata.c,v 1.3 2006-09-24 17:01:13 minkis Exp $
+ * $Id: bg_vehicledata.c,v 1.4 2007-06-17 17:11:12 minkis Exp $
 */
 
 #include "q_shared.h"
@@ -2609,8 +2609,8 @@ completeVehicleData_t availableVehicles[] =
 	{0,0,0,0}					// shadow orientation adjusters
     },
 
-    {	"Humvee",				// descriptiveName
-	"HMV",						// tinyName
+    {	"HMMWV",				// descriptiveName
+	"HMMWV",						// tinyName
 	"humvee_50cal",				// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
@@ -2658,7 +2658,7 @@ completeVehicleData_t availableVehicles[] =
     },
 
 
-    {	"Humvee (AA)",			// descriptiveName
+    {	"HMMWV (AA)",			// descriptiveName
 	"HMVAA",						// tinyName
 	"humvee_avng",				// modelName
 	SHADOW_DEFAULT,				// alpha shadow
@@ -3002,6 +3002,54 @@ completeVehicleData_t availableVehicles[] =
 	{	"UH-1 \"Huey\"",			// descriptiveName
 	"UH-1",						// tinyName
 	"UH-1",						// modelName
+	SHADOW_DEFAULT,				// alpha shadow
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_2,
+	CAT_HELO,
+	CLASS_HELO_RECON,
+	0,							// flags
+	0,	// capabilities
+	{0,0,0,0,0,0,0,0,0,0},		// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
+	{50, 125, 70},				// turnspeed around the three axis
+	{0, 100, 80},				// camera distance {min,max,default}
+	{0, 100, 25},				// camera height {min,max,default}
+	0,							// stallspeed
+	300,						// maxspeed
+	-5,							// min throttle
+	10,						    // max throttle
+	1,							// engines
+	0,							// wheels
+	0,							// wheel circumference
+	33,							// acceleration
+	170,						// health
+	{3, 1, 6},					// gun tag
+	160,						// max fuel
+	285,						// max gun pitch (upwards = negative) <- gearheight
+	5,							// min gun pitch (downwards = positive) <- tailangle
+	0, WI_MGT_7_62MM, WI_FUELCRATE, WI_HEALTHCRATE, WI_AMMOCRATE, 0, 0, WI_FLARE,// weapons
+	0, 1500, 3, 3, 3, 0, 0, 20,	// ammo
+	1,0,0,0,0,0,0,0,			// turret
+	{0, 0, 10},					// cameraposition for cockpit view
+	0,							// effect model
+	8000,						// radar range
+	5000,						// radar range ground
+	-1,							// trackcone
+	0,							// trackcone ground
+	0,							// swingangle
+	0,							// geartime
+	0,							// max gear frame
+	0,							// baytime
+	0,							// max bay frame
+	0,							// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
+    },
+
+	{	"RAH-66 Comanche",			// descriptiveName
+	"RAH-66",						// tinyName
+	"comanche",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
 	MF_TEAM_2,

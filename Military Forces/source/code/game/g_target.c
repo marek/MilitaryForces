@@ -1,5 +1,5 @@
 /*
- * $Id: g_target.c,v 1.6 2006-01-29 14:03:41 thebjoern Exp $
+ * $Id: g_target.c,v 1.7 2007-06-17 17:11:13 minkis Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -27,9 +27,11 @@ struct Use_TargetDelay : public GameEntity::EntityFunc_Use
 {
 	virtual void execute( GameEntity *other, GameEntity *activator )
 	{
-		self_->nextthink_ = theLevel.time_ + ( self_->wait_ + self_->random_ * crandom() ) * 1000;
-		self_->setThink(new Think_TargetDelay);
-		self_->activator_ = activator;
+		GameEntity*	self = self_;  // Since we may delete our current think()
+
+		self->nextthink_ = theLevel.time_ + ( self->wait_ + self->random_ * crandom() ) * 1000;
+		self->setThink(new Think_TargetDelay);
+		self->activator_ = activator;
 	}
 };
 
