@@ -15,6 +15,14 @@ are NOT licensed under the GPL and are not open source. They are part of
 Military Forces only and may not be used, copied, modified, redistributed or
 used to create derivative works outside of the Military Forces project.
 
+The assets were created by many different artists and designers over the
+life of the project and remain the property of their creators. Many of those
+contributors can no longer be reached, and the project maintainer cannot make
+licensing decisions on their behalf. In keeping with the wishes of the
+original content creators, the assets may not be used in any independent
+fork of Military Forces without permission from their original creator.
+Forks are free to use the code under the GPL but must supply their own assets.
+
 ================================================================================
 
 		    GNU GENERAL PUBLIC LICENSE
