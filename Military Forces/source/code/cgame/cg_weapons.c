@@ -1,14 +1,11 @@
 /*
- * $Id: cg_weapons.c,v 1.10 2005-11-21 17:28:20 thebjoern Exp $
+ * $Id: cg_weapons.c,v 1.4 2016-04-04 osfpsproject Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
 //
 // cg_weapons.c -- events and effects dealing with weapons
 #include "cg_local.h"
-
-
-
 
 /*
 ==========================
@@ -167,17 +164,17 @@ static void CG_MissileTrail2( centity_t * cent, const weaponInfo_t *wi ) {
 	if(cent->TimeSinceLastTrail <= cg.time - 100)
 	{
 
-		// If the trail seems a bit to old, give it a starting origin, and skip this round
+		// If the trail seems a bit to old, give it a starting origin
 		if(cent->TimeSinceLastTrail <= cg.time - 200)
 		{
-			cent->TimeSinceLastTrail = cg.time;
-			VectorCopy(cent->lerpOrigin, cent->lastDrawnTrailPos);
-			return;
+			VectorCopy(cent->lerpOrigin, start); 
 		}
 	
 		le = CG_AllocLocalEntity();
 		le->leFlags = LEF_PUFF_DONT_SCALE;
 		re = &le->refEntity;
+
+
 
 		le->leType = LE_FADE_RGB;
 		le->startTime = cg.time;
@@ -186,13 +183,13 @@ static void CG_MissileTrail2( centity_t * cent, const weaponInfo_t *wi ) {
 		le->lifeRate = 1.0 / (le->endTime - le->startTime);
  
 		re->shaderTime = cg.time / 1000.0f;
-		re->reType = RT_LIGHTNING;
+		re->reType = RT_LIGHTNING; //RT_RAIL_CORE; //RT_BEAM; // RT_RAIL_CORE;
 		re->customShader = cgs.media.railCoreShader;
 	//	re->customShader = cgs.media.missileTrail2Shader;
 
 		VectorCopy(start, re->origin);
 		VectorCopy(start, le->pos.trBase);
-		VectorClear(le->pos.trDelta);
+	//	VectorCopy(end, le->pos.trDelta);
 		VectorCopy(end, re->oldorigin);
 
 		re->shaderRGBA[0] = 0.3f;
@@ -205,6 +202,9 @@ static void CG_MissileTrail2( centity_t * cent, const weaponInfo_t *wi ) {
 		le->color[2] = 1.0f;
 		le->color[3] = 1.0f;
 
+		AxisClear( re->axis );
+
+	
 		// Update last time & Pos
 		cent->TimeSinceLastTrail = cg.time;
 		VectorCopy(cent->lerpOrigin, cent->lastDrawnTrailPos);
@@ -214,40 +214,41 @@ static void CG_MissileTrail2( centity_t * cent, const weaponInfo_t *wi ) {
 }
 
 
+
 /*
 ==========================
 CG_NukeTrail
 ==========================
 */
-//static void CG_NukeTrail( centity_t * cent, const weaponInfo_t *wi )
-//{
-//	if(cent->TimeSinceLastTrail <= cg.time - 200)
-//	{
-//		localEntity_t	* smoke;
-//		vec3_t			up, pos, velocity;
-//	
-//		VectorCopy( cent->lerpOrigin, pos );
-//	
-//		// draw smoke slightly behind the entitiy position (using -velocity of the entity)
-//		VectorCopy( cent->currentState.pos.trDelta, velocity );
-//		VectorNormalize( velocity );
-//
-//		// calc adjusted position
-//		VectorScale( velocity, -24.0f, velocity );		// -24.0f is just an arbitary distance which works OK with all current rocket models
-//		VectorAdd( pos, velocity, pos );
-//
-//		// draw trail
-//
-//		smoke = CG_SmokePuff( pos, up, 
-//							20, 
-//							0.0f, 0.0f, 0.0f, 0.8f,
-//							8000, 
-//							cg.time, 6000,
-//							LEF_PUFF_DONT_SCALE, 
-//							cgs.media.nukePuffShader );	
-//		cent->TimeSinceLastTrail = cg.time;
-//	}
-//}
+static void CG_NukeTrail( centity_t * cent, const weaponInfo_t *wi )
+{
+	if(cent->TimeSinceLastTrail <= cg.time - 200)
+	{
+		localEntity_t	* smoke;
+		vec3_t			up, pos, velocity;
+	
+		VectorCopy( cent->lerpOrigin, pos );
+	
+		// draw smoke slightly behind the entitiy position (using -velocity of the entity)
+		VectorCopy( cent->currentState.pos.trDelta, velocity );
+		VectorNormalize( velocity );
+
+		// calc adjusted position
+		VectorScale( velocity, -24.0f, velocity );		// -24.0f is just an arbitary distance which works OK with all current rocket models
+		VectorAdd( pos, velocity, pos );
+
+		// draw trail
+
+		smoke = CG_SmokePuff( pos, up, 
+							20, 
+							0.0f, 0.0f, 0.0f, 0.8f,
+							8000, 
+							cg.time, 6000,
+							LEF_PUFF_DONT_SCALE, 
+							cgs.media.nukePuffShader );	
+		cent->TimeSinceLastTrail = cg.time;
+	}
+}
 
 
 /*
@@ -263,16 +264,16 @@ void CG_RegisterWeapons() {
 	int				i;
 	
 	// common
-	cgs.media.grenadeExplosionShader = refExport.RegisterShader( "grenadeExplosion" );
-	cgs.media.rocketExplosionShader[0] = refExport.RegisterShader( "rocketExplosion" );
-	cgs.media.rocketExplosionShader[1] = refExport.RegisterShader( "quakeRocketExplosion" );
+	CG_RegisterItemShader(&cgs.media.grenadeExplosionShader,  "grenadeExplosion" );
+	CG_RegisterItemShader(&cgs.media.rocketExplosionShader[0], "rocketExplosion" );
+	CG_RegisterItemShader(&cgs.media.rocketExplosionShader[1], "quakeRocketExplosion" );
 
 	// for all weapon indexes in cg_weapons[]
 	for( i = 0; i < WI_MAX; i++ )
 	{
 		weaponInfo = &cg_weapons[i];
 		memset( weaponInfo, 0, sizeof( *weaponInfo ) );
-		weaponInfo->registered = true;
+		weaponInfo->registered = qtrue;
 
 		for ( ammo = bg_itemlist + 1 ; ammo->classname ; ammo++ ) {
 			if ( ammo->giType == IT_AMMO && ammo->giTag == availableWeapons[i].type ) {
@@ -280,7 +281,7 @@ void CG_RegisterWeapons() {
 			}
 		}
 		if ( ammo->classname && ammo->world_model[0] ) {
-			weaponInfo->ammoModel = refExport.RegisterModel( ammo->world_model[0] );
+			CG_RegisterItemModel(&weaponInfo->ammoModel, ammo->world_model[0] );
 		}
 
 		// switch on weapon type
@@ -288,14 +289,14 @@ void CG_RegisterWeapons() {
 		{
 		case WT_ROCKET:
 			// find out which model to use
-			weaponInfo->missileModel = refExport.RegisterModel( availableWeapons[i].modelName );
+			CG_RegisterItemModel(&weaponInfo->missileModel , availableWeapons[i].modelName );
 			
-			// MFQ3: New sound
-			weaponInfo->missileSound = S_RegisterSound( "sound/weapons/rocket/rocketFly1.wav", false );
+			// MFQ3: new sound
+			CG_RegisterItemSound(&weaponInfo->missileSound, "sound/weapons/rocket/rocketFly1.wav", qfalse );
 			if( !weaponInfo->missileSound )
 			{
 				// MFQ3: old quake3 sound (backup)
-				weaponInfo->missileSound = S_RegisterSound( "sound/weapons/rocket/rockfly.wav", false );
+				CG_RegisterItemSound(&weaponInfo->missileSound, "sound/weapons/rocket/rockfly.wav", qfalse );
 			}
 
 			// FFAR trail with no dynamic lighting
@@ -306,18 +307,18 @@ void CG_RegisterWeapons() {
 			MAKERGB( weaponInfo->missileDlightColor, 1, 0.75f, 0 );
 			//MAKERGB( weaponInfo->flashDlightColor, 1, 0.75f, 0 );
 
-			// MFQ3: New sound
-			weaponInfo->flashSound[0] = S_RegisterSound( "sound/weapons/rocket/rocketFire1.wav", false );
+			// MFQ3: new sound
+			CG_RegisterItemSound(&weaponInfo->flashSound[0], "sound/weapons/rocket/rocketFire1.wav", qfalse );
 
 			break;
 		case WT_ANTIAIRMISSILE:
 		case WT_ANTIGROUNDMISSILE:
 		case WT_ANTIRADARMISSILE:
 			// find out which model to use
-			weaponInfo->missileModel = refExport.RegisterModel( availableWeapons[i].modelName );
+			CG_RegisterItemModel(&weaponInfo->missileModel, availableWeapons[i].modelName );
 			
-			// MFQ3: New sound
-			weaponInfo->missileSound = S_RegisterSound( "sound/weapons/rocket/rocketFly1.wav", false );
+			// MFQ3: new sound
+			CG_RegisterItemSound(&weaponInfo->missileSound, "sound/weapons/rocket/rocketFly1.wav", qfalse );
 
 
 			// FFAR trail with no dynamic lighting
@@ -327,48 +328,50 @@ void CG_RegisterWeapons() {
 			MAKERGB( weaponInfo->missileDlightColor, 1, 0.75f, 0 );
 			//MAKERGB( weaponInfo->flashDlightColor, 1, 0.75f, 0 );
 
-			// MFQ3: New sound
-			weaponInfo->flashSound[0] = S_RegisterSound( "sound/weapons/rocket/rocketFire1.wav", false );
+			// MFQ3: new sound
+			CG_RegisterItemSound(&weaponInfo->flashSound[0], "sound/weapons/rocket/rocketFire1.wav", qfalse );
 
 			break;
 
 		case WT_IRONBOMB:
 		case WT_GUIDEDBOMB:
 			// find out which model to use
-			weaponInfo->missileModel = refExport.RegisterModel( availableWeapons[i].modelName );
-			weaponInfo->missileSound = S_RegisterSound( "sound/weapons/rocket/rockfly.wav", false );
-			weaponInfo->flashSound[0] = S_RegisterSound( "sound/weapons/rocket/rocklf1a.wav", false );
+			CG_RegisterItemModel(&weaponInfo->missileModel, availableWeapons[i].modelName );
+			CG_RegisterItemSound(&weaponInfo->missileSound, "sound/weapons/rocket/rockfly.wav", qfalse );
+			CG_RegisterItemSound(&weaponInfo->flashSound[0], "sound/weapons/rocket/rocklf1a.wav", qfalse );
 			break;
 
 		case WT_MACHINEGUN:
 			// MAKERGB( weaponInfo->flashDlightColor, 1, 1, 0 );
 
-			// MFQ3: New sounds
+			// MFQ3: new sounds
 			switch( i )
 			{
-			case WI_MG_2XCAL303:
-			case WI_MG_2XCAL312:
-			case WI_MG_8XCAL50:
-			case WI_MG_6XCAL50:
-				// olden sound
-				weaponInfo->flashSound[0] = S_RegisterSound( "sound/weapons/machinegun/machineGun2.wav", false );
+			case WI_MG_2X7_62MM:
+			case WI_MG_2X7_92MM:
+			case WI_MG_4X12_7MM:
+			case WI_MG_8X7_62MM:
+				// old sound
+				CG_RegisterItemSound(&weaponInfo->flashSound[0], "sound/weapons/machinegun/machineGun2.wav", qfalse );
 				break;
 
-			case WI_MG_12_7MM:
-			case WI_MG_14_5MM:
+			case WI_MG_1X12_7MM:
+			case WI_MG_1X14_5MM:
 				// modern sound (noisey)
-				weaponInfo->flashSound[0] = S_RegisterSound( "sound/weapons/machinegun/machineGun3.wav", false );
+				CG_RegisterItemSound(&weaponInfo->flashSound[0], "sound/weapons/machinegun/machineGun3.wav", qfalse );
 				break;
 
-			case WI_MGT_7_62MM:
-				weaponInfo->flashSound[0] = S_RegisterSound( "sound/weapons/machinegun/minigun.wav", false );
+			case WI_MG_1X7_62MM:
+				CG_RegisterItemSound(&weaponInfo->flashSound[0], "sound/weapons/machinegun/minigun.wav", qfalse );
 				break;
 			
-			case WI_MG_20MM:
-			case WI_MG_M4A1:
+			case WI_ACN_1X20MM:
+			case WI_ACN_1X25MM:
+			case WI_ACN_1X27MM:
+			case WI_ACN_1X30MM:
 			default:
 				// modern sound (silenced)
-				weaponInfo->flashSound[0] = S_RegisterSound( "sound/weapons/machinegun/machineGun1.wav", false );
+				CG_RegisterItemSound(&weaponInfo->flashSound[0], "sound/weapons/machinegun/machineGun1.wav", qfalse );
 				break;
 			}
 
@@ -379,19 +382,19 @@ void CG_RegisterWeapons() {
 
 			// MFQ3: old quake3 sounds (backup)
 
-			cgs.media.bulletExplosionShader = refExport.RegisterShader( "bulletExplosion" );
+			CG_RegisterItemShader(&cgs.media.bulletExplosionShader, "bulletExplosion" );
 			break;
 
 		case WT_BALLISTICGUN:
-			weaponInfo->missileModel = refExport.RegisterModel( availableWeapons[i].modelName );
-			weaponInfo->missileSound = S_RegisterSound( "sound/weapons/rocket/rockfly.wav", false );
+			CG_RegisterItemModel(&weaponInfo->missileModel, availableWeapons[i].modelName );
+			CG_RegisterItemSound(&weaponInfo->missileSound, "sound/weapons/rocket/rockfly.wav", qfalse );
 
 			// no dynamic lighting
 			weaponInfo->missileDlight = 0;
 			
 			MAKERGB( weaponInfo->missileDlightColor, 1, 0.75f, 0 );
 
-			weaponInfo->flashSound[0] = S_RegisterSound( "sound/weapons/rocket/rocklf1a.wav", false );
+			CG_RegisterItemSound(&weaponInfo->flashSound[0], "sound/weapons/rocket/rocklf1a.wav", qfalse );
 			break;
 
 		case WT_FLARE:
@@ -401,63 +404,46 @@ void CG_RegisterWeapons() {
 				
 					weaponInfo->missileTrailFunc = CG_FlareTrail;
 					break;
-				case WI_BURNINGMAN:
-					weaponInfo->missileSound = S_RegisterSound( "sound/misc/scream.wav", false );
+				case WI_ICB_ANM50:
+					CG_RegisterItemSound(&weaponInfo->missileSound, "sound/misc/scream.wav", qfalse );
 					break;
 				default:
 				break;
 			}
 
-			weaponInfo->missileModel = refExport.RegisterModel( availableWeapons[i].modelName );
+			CG_RegisterItemModel(&weaponInfo->missileModel, availableWeapons[i].modelName );
 			weaponInfo->missileDlight = 100;
 			MAKERGB( weaponInfo->missileDlightColor, 1, 0.75f, 0 );
 			
 			break;
 
 		case WT_FUELTANK:
-			weaponInfo->missileModel = refExport.RegisterModel( availableWeapons[i].modelName );
+			CG_RegisterItemModel(&weaponInfo->missileModel, availableWeapons[i].modelName );
 			weaponInfo->missileDlight = 0;
 			break;		
 
 		case WT_FLAK:
-			weaponInfo->missileModel = refExport.RegisterModel( availableWeapons[i].modelName );
+			CG_RegisterItemModel(&weaponInfo->missileModel, availableWeapons[i].modelName );
 			weaponInfo->missileDlight = 0;
 			break;
 
 		case WT_NUKEBOMB:
 			// find out which model to use
-			weaponInfo->missileModel = refExport.RegisterModel( availableWeapons[i].modelName );
-			weaponInfo->missileSound = S_RegisterSound( "sound/weapons/rocket/rockfly.wav", false );
-			weaponInfo->flashSound[0] = S_RegisterSound( "sound/weapons/rocket/rocklf1a.wav", false );
-			break;
-		case WT_NUKEMISSILE:
-			//switch(i)
-			//{
-			//	default:
-			//		{
-
-						// find out which model to use
-						weaponInfo->missileModel = refExport.RegisterModel( availableWeapons[i].modelName );
-						weaponInfo->missileSound = S_RegisterSound( "sound/weapons/rocket/rockfly.wav", false );
-						weaponInfo->flashSound[0] = S_RegisterSound( "sound/weapons/rocket/rocklf1a.wav", false );
-						weaponInfo->missileTrailFunc = CG_MissileTrail;
-			//		}
-			//		break;
-			//}
-
+			CG_RegisterItemModel(&weaponInfo->missileModel, availableWeapons[i].modelName );
+			CG_RegisterItemSound(&weaponInfo->missileSound, "sound/weapons/rocket/rockfly.wav", qfalse );
+			CG_RegisterItemSound(&weaponInfo->flashSound[0], "sound/weapons/rocket/rocklf1a.wav", qfalse );
 			break;
 
 		// Pickup creates
-		case WT_FUELCRATE:
 		case WT_AMMOCRATE:
 		case WT_HEALTHCRATE:
-			weaponInfo->missileModel = refExport.RegisterModel( availableWeapons[i].modelName );
-			weaponInfo->flashSound[0] = S_RegisterSound( "sound/weapons/rocket/rocklf1a.wav", false );
+			CG_RegisterItemModel(&weaponInfo->missileModel, availableWeapons[i].modelName );
+			CG_RegisterItemSound(&weaponInfo->flashSound[0], "sound/weapons/rocket/rocklf1a.wav", qfalse );
 			break;
 
 		default:
 			//MAKERGB( weaponInfo->flashDlightColor, 1, 1, 1 );
-			weaponInfo->flashSound[0] = S_RegisterSound( "sound/weapons/rocket/rocklf1a.wav", false );
+			CG_RegisterItemSound(&weaponInfo->flashSound[0], "sound/weapons/rocket/rocklf1a.wav", qfalse );
 			break;
 		}
 	}
@@ -482,18 +468,18 @@ void CG_RegisterItemVisuals( int itemNum ) {
 	item = &bg_itemlist[ itemNum ];
 
 	memset( itemInfo, 0, sizeof( &itemInfo ) );
-	itemInfo->registered = true;
+	itemInfo->registered = qtrue;
 
-	itemInfo->models[0] = refExport.RegisterModel( item->world_model[0] );
+	itemInfo->models[0] = trap_R_RegisterModel( item->world_model[0] );
 
-	itemInfo->icon = refExport.RegisterShader( item->icon );
+	itemInfo->icon = trap_R_RegisterShader( item->icon );
 
 	//
 	// powerups have an accompanying ring or sphere
 	//
 	if ( item->giType == IT_HEALTH ) {
 		if ( item->world_model[1] ) {
-			itemInfo->models[1] = refExport.RegisterModel( item->world_model[1] );
+			itemInfo->models[1] = trap_R_RegisterModel( item->world_model[1] );
 		}
 	}
 }
@@ -596,7 +582,7 @@ CG_FireWeapon
 Caused by an EV_FIRE_MG event
 ================
 */
-void CG_FireMachinegun( centity_t *cent, bool main )
+void CG_FireMachinegun( centity_t *cent, qboolean main )
 {
 	entityState_t * ent;
 	weaponInfo_t * weap;
@@ -648,7 +634,7 @@ void CG_FireMachinegun( centity_t *cent, bool main )
 		if ( weap->flashSound[c] )
 		{
 			// play
-			S_StartSound( NULL, ent->number, CHAN_WEAPON, weap->flashSound[c] );
+			trap_S_StartSound( NULL, ent->number, CHAN_WEAPON, weap->flashSound[c] );
 		}
 	}
 }
@@ -670,8 +656,14 @@ void CG_FireWeapon( centity_t *cent ) {
 		return;
 	}
 
+	if( availableWeapons[ent->weaponIndex].type == WT_FUELTANK ) {
+		while( MF_findWeaponsOfType(ent->weaponIndex, &cg_loadouts[ent->number]) )
+			MF_removeWeaponFromLoadout(ent->weaponIndex, &cg_loadouts[ent->number], 0, 0, 0 );
+		return;
+	}
+
 	if( availableWeapons[ent->weaponIndex].type == WT_MACHINEGUN ) {
-		CG_FireMachinegun(cent, true);
+		CG_FireMachinegun(cent, qtrue);
 		return;	
 	}
 	weap = &cg_weapons[ent->weaponIndex];
@@ -687,10 +679,10 @@ void CG_FireWeapon( centity_t *cent ) {
 		c = rand() % c;
 		if ( weap->flashSound[c] )
 		{
-			S_StartSound( NULL, ent->number, CHAN_WEAPON, weap->flashSound[c] );
+			trap_S_StartSound( NULL, ent->number, CHAN_WEAPON, weap->flashSound[c] );
 		}
 	}
-	//MF_removeWeaponFromLoadout(ent->weaponIndex, &cg_loadouts[ent->number], 0, 0, 0 );
+	MF_removeWeaponFromLoadout(ent->weaponIndex, &cg_loadouts[ent->number], 0, 0, 0 );
 }
 
 
@@ -711,7 +703,7 @@ void CG_MissileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_t di
 	vec3_t			lightColor;
 	localEntity_t	*le;
 	int				r;
-	bool		isSprite;
+	qboolean		isSprite;
 	int				duration;
 
 	mark = 0;
@@ -725,46 +717,45 @@ void CG_MissileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_t di
 	lightColor[2] = 0;
 
 	// set defaults
-	isSprite = false;
+	isSprite = qfalse;
 	duration = 600;
 
 	switch ( weaponIndex ) {
 	default:
-	case WI_FFAR:
-	case WI_FFAR_SMALL:
-	case WI_FFAR_LARGE:
-	case WI_SIDEWINDER:
-	case WI_SPARROW:
-	case WI_AMRAAM:
-	case WI_PHOENIX:
-	case WI_STINGER:
-	case WI_ATOLL:
-	case WI_ARCHER:
-	case WI_ALAMO:
-	case WI_HELLFIRE:
-	case WI_MAVERICK:
-	case WI_HARM:
-	case WI_AASAM:
+	case WI_AAM_7KG:
+	case WI_AAM_11KG:
+	case WI_AAM_23KG:
+	case WI_AAM_39KG:
+	case WI_AAM_40KG:
+	case WI_AAM_60KG:
+	case WI_SAM_3KG:
+	case WI_ASM_8KG:
+	case WI_ASM_9KG:
+	case WI_ASM_57KG:
+	case WI_ASM_66KG:
+	case WI_SSM_0_6KG:
+	case WI_SSM_0_7KG:
+	case WI_SSM_90KG:
 		mod = cgs.media.dishFlashModel;
 		shader = cgs.media.grenadeExplosionShader;
 		sfx = cgs.media.sfx_rockexp;
 		mark = cgs.media.burnMarkShader;
 		radius = 0.75;
 		light = 200;
-		isSprite = true;
+		isSprite = qtrue;
 		duration = 600;
 		lightColor[0] = 1;
 		lightColor[1] = 0.75;
 		lightColor[2] = 0.0;
 		break;
 
-	case WI_MK82:
-	case WI_MK82R:
-	case WI_MK83:
-	case WI_MK83R:
-	case WI_MK84:
-	case WI_GBU15:
-	case WI_DURANDAL:
+	case WI_BMB_227KG:
+	case WI_BMB_460KG:
+	case WI_BMB_940KG:
+	case WI_ICB_ANM50:
+	case WI_GBMB_GBU15:
+	case WI_GBMB_GBU31:
+	case WI_GBMB_BLU107
 	case WI_ECM:
 	case WI_LASE:
 	case WI_CM:
@@ -776,26 +767,31 @@ void CG_MissileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_t di
 		mark = cgs.media.burnMarkShader;
 		radius = 2;
 		light = 400;
-		isSprite = true;
+		isSprite = qtrue;
 		duration = 1000;
 		lightColor[0] = 1;
 		lightColor[1] = 0.75;
 		lightColor[2] = 0.0;
 		break;
 
-	case WI_MG_2XCAL303:
-	case WI_MG_2XCAL312:
-	case WI_MG_8XCAL50:
-	case WI_MG_6XCAL50:
-	case WI_MG_12_7MM:
-	case WI_MG_14_5MM:
-	case WI_MG_M4A1:
-	case WI_MG_4X14_5MM:
-	case WI_MG_20MM:
-	case WI_MG_2X20MM:
-	case WI_MGT_7_62MM:
-	case WI_MGT_2X30MM:
-	case WI_MGT_12_7MM:
+	case WI_MG_1X7_62MM,
+	case WI_MG_1X12_7MM
+	case WI_MG_1X14_5MM	
+	case WI_AR_1X5_45MM,
+	case WI_AR_1X5_56MM,
+	case WI_SMG_1X5_7MM,
+	case WI_R_1X7_62MM,
+	case WI_MG_2X7_62MM:
+	case WI_MG_2X7_92MM:
+	case WI_MG_4X12_7MM:
+	case WI_MG_8X7_62MM:
+	case WI_ACN_1X20MM
+	case WI_ACN_1X25MM
+	case WI_ACN_1X27MM
+	case WI_ACN_1X30MM
+	case WI_ACN_2X20MM
+	case WI_ACN_2X23MM
+	case WI_ACN_4X23MM
 		mod = cgs.media.bulletFlashModel;
 		shader = cgs.media.bulletExplosionShader;
 		mark = cgs.media.bulletMarkShader;
@@ -810,17 +806,20 @@ void CG_MissileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_t di
 		}
 
 		radius = 0.2f; //radius = 8;
-		duration = 300;
 		break;
 
-	case WI_125MM_GUN:
+	case WI_CNN_1X50MM
+	case WI_CNN_1X75MM
+	case WI_CNN_1X100MM
+	case WI_CNN_1X120MM
+	case WI_HOW_1X203MM:
 		mod = cgs.media.dishFlashModel;
 		shader = cgs.media.rocketExplosionShader[0];
 		sfx = cgs.media.sfx_rockexp;
 		mark = cgs.media.burnMarkShader;
 		radius = 1;
 		light = 200;
-		isSprite = true;
+		isSprite = qtrue;
 		duration = 1000;
 		lightColor[0] = 1;
 		lightColor[1] = 0.75;
@@ -833,19 +832,14 @@ void CG_MissileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_t di
 		mark = cgs.media.burnMarkShader;
 		radius = 0.50;
 		light = 200;
-		isSprite = true;
+		isSprite = qtrue;
 		duration = 600;
 		lightColor[0] = 1;
 		lightColor[1] = 0.75;
 		lightColor[2] = 0.0;
 		break;
 	case WI_FLARE:
-	case WI_NB10MT:
-	case WI_NB5MT:
-	case WI_NB1MT:
-	case WI_NM10MT:
-	case WI_NM5MT:
-	case WI_NM1MT:
+	case WI_NB_B82:
 		break;
 	}
 
@@ -854,7 +848,7 @@ void CG_MissileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_t di
 	//
 	if( sfx )
 	{
-		S_StartSound( origin, ENTITYNUM_WORLD, CHAN_AUTO, sfx );
+		trap_S_StartSound( origin, ENTITYNUM_WORLD, CHAN_AUTO, sfx );
 	}
 
 	// MFQ3: disable dynamic lighting? (it makes MF looks much too quakey)
@@ -882,7 +876,7 @@ void CG_MissileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_t di
 	//
 	// impact mark
 	//
-	CG_ImpactMark( mark, origin, dir, random()*360, 1,1,1,1, false, radius, false );
+	CG_ImpactMark( mark, origin, dir, random()*360, 1,1,1,1, qfalse, radius, qfalse );
 }
 
 /*
@@ -950,7 +944,7 @@ void CG_GenericExplosion( vec3_t origin, int type )
 							   cgs.media.dishFlashModel,	
 							   cgs.media.rocketExplosionShader[ rand() & 0x01 ],
 							   offset, 900, 
-							   true );
+							   qtrue );
 
 		// apply radius modifier
 		le->radius = radiusModifier;
@@ -1005,7 +999,7 @@ void CG_GenericExplosion( vec3_t origin, int type )
 
 	// play 1 of the x explosion sounds
 	soundIdx = rand() % NUM_EXPLOSION_SOUNDS;
-	S_StartSound( origin, ENTITYNUM_WORLD, CHAN_AUTO, cgs.media.planeDeath[ soundIdx ] );
+	trap_S_StartSound( origin, ENTITYNUM_WORLD, CHAN_AUTO, cgs.media.planeDeath[ soundIdx ] );
 
 	// if building, play more sound
 	if( type == 2 )
@@ -1022,7 +1016,7 @@ void CG_GenericExplosion( vec3_t origin, int type )
 		}
 
 		// play additional sound
-		S_StartSound( adjust, ENTITYNUM_WORLD, CHAN_AUTO, cgs.media.planeDeath[ soundIdx ] );
+		trap_S_StartSound( adjust, ENTITYNUM_WORLD, CHAN_AUTO, cgs.media.planeDeath[ soundIdx ] );
 	}
 
 }
