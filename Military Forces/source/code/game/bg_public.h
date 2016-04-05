@@ -1,5 +1,5 @@
 /*
- * $Id: bg_public.h,v 1.18 2006-01-29 14:03:41 thebjoern Exp $
+ * $Id: bg_public.h,v 1.2 2016-04-04 osfpsproject Exp $
 */
 
 // Copyright (C) 1999-2000 Id Software, Inc.
@@ -9,16 +9,10 @@
 // because games can change separately from the main system version, we need a
 // second version that must match between game and cgame
 
-#ifndef __BG_PUBLIC_H__
-#define __BG_PUBLIC_H__
+#define	GAME_VERSION		"mfq3 v0.78"
+#define	GAME_IDENTIFIER		"mfq3"			// use to identify mfq3 servers
 
-#include "../qcommon/qfiles.h"
-
-
-//#define	GAME_VERSION		"v0.9"
-#define	GAME_IDENTIFIER		"mfgame"			// use to identify mfq3 servers
-
-#define	DEFAULT_GRAVITY		800.0f
+#define	DEFAULT_GRAVITY		800
 
 #define	GIB_HEALTH			-50
 
@@ -94,7 +88,7 @@ typedef enum { GENDER_MALE, GENDER_FEMALE, GENDER_NEUTER } gender_t;
 
 PMOVE MODULE
 
-The pmove code takes a player_state_t and a usercmd_t and generates a New player_state_t
+The pmove code takes a player_state_t and a usercmd_t and generates a new player_state_t
 and some other output data.  Used for local prediction on the client game and true
 movement on the server game.
 ===================================================================================
@@ -151,18 +145,18 @@ typedef struct {
 	int			waterlevel;
 
 	// for fixed msec Pmove
-	int			pmove_msec;
 	int			pmove_fixed;
+	int			pmove_msec;
 
 	int			vehicle;		// MFQ3
-	bool	updateGear;
-	bool	updateBay;
+	qboolean	updateGear;
+	qboolean	updateBay;
 
 	int			advancedControls;	// MFQ3
 
 	// callbacks to test the world
 	// these will be different functions during game and cgame
-	void		(*trace)( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentMask, bool capsule );
+	void		(*trace)( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentMask );
 	int			(*pointcontents)( const vec3_t point, int passEntityNum );
 } pmove_t;
 
@@ -218,6 +212,11 @@ typedef enum {
 	PERS_PLAYEREVENTS,				// 16 bits that can be flipped for events
 	PERS_ATTACKER,					// clientnum of last damage inflicter
 	PERS_KILLED,					// count of the number of times you died
+	// player awards tracking
+	PERS_IMPRESSIVE_COUNT,			// two railgun hits in a row
+	PERS_EXCELLENT_COUNT,			// two successive kills in a short amount of time
+	PERS_DEFEND_COUNT,				// defend awards
+	PERS_ASSIST_COUNT,				// assist awards
 	PERS_CAPTURES,					// captures
 	PERS_DEATHS						// deaths
 } persEnum_t;
@@ -226,6 +225,7 @@ typedef enum {
 // entityState_t->eFlags
 #define	EF_DEAD				0x00000001		// don't draw a foe marker over players with EF_DEAD
 #define	EF_TELEPORT_BIT		0x00000004		// toggled every time the origin abruptly changes
+#define	EF_AWARD_EXCELLENT	0x00000008		// draw an excellent sprite
 #define EF_PLAYER_EVENT		0x00000010
 #define	EF_BOUNCE			0x00000010		// for missiles
 #define	EF_BOUNCE_HALF		0x00000020		// for missiles
@@ -234,8 +234,14 @@ typedef enum {
 #define	EF_MFQ3_FREE2		0x00000100		// --- not used ---
 #define	EF_MFQ3_FREE3		0x00000200		// --- not used ---
 #define	EF_MOVER_STOP		0x00000400		// will push otherwise
+#define EF_AWARD_CAP		0x00000800		// draw the capture sprite
+#define	EF_TALK				0x00001000		// draw a talk balloon
 #define	EF_CONNECTION		0x00002000		// draw a connection trouble sprite
 #define	EF_VOTED			0x00004000		// already cast a vote
+#define	EF_AWARD_IMPRESSIVE	0x00008000		// draw an impressive sprite
+#define	EF_AWARD_DEFEND		0x00010000		// draw a defend sprite
+#define	EF_AWARD_ASSIST		0x00020000		// draw a assist sprite
+#define EF_AWARD_DENIED		0x00040000		// denied
 #define EF_TEAMVOTED		0x00080000		// already cast a team vote
 
 // NOTE: may not have more than 16
@@ -256,6 +262,11 @@ typedef enum {
 	WP_WEAPON6,
 	WP_FLARE
 } weapon_t;
+
+
+// reward sounds (stored in ps->persistant[PERS_PLAYEREVENTS])
+#define	PLAYEREVENT_DENIEDREWARD		0x0001
+#define PLAYEREVENT_HOLYSHIT			0x0004
 
 // entityState_t->event values
 // entity events are for effects that take place reletive
@@ -323,6 +334,9 @@ typedef enum {
 	EV_BAY_UP_FULL,			// close fully
 	EV_BAY_DOWN_FULL,		// open fully
 	EV_BAY_STOP,			// stop bay anim as it is
+
+	EV_GET_DEFAULT_LOADOUT,	// weapon loadout
+	EV_ADD_WEAPON_TO_LOADOUT,// weapon loadout
 
 	EV_NUKE,
 
@@ -415,14 +429,14 @@ typedef struct animation_s {
 	int		flipflop;			// true if animation should flipflop back to base
 } animation_t;
 
-//typedef enum {
-//	TEAM_FREE,
-//	TEAM_RED,
-//	TEAM_BLUE,
-//	TEAM_SPECTATOR,
-//
-//	TEAM_NUM_TEAMS
-//} team_t;
+typedef enum {
+	TEAM_FREE,
+	TEAM_RED,
+	TEAM_BLUE,
+	TEAM_SPECTATOR,
+
+	TEAM_NUM_TEAMS
+} team_t;
 
 // Time between location updates
 #define TEAM_LOCATION_UPDATE_TIME		1000
@@ -503,7 +517,7 @@ gitem_t	*BG_FindItem( const char *pickupName );
 gitem_t	*BG_FindItemForPowerup( objective_t pw );
 #define	ITEM_INDEX(x) ((x)-bg_itemlist)
 
-bool	BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const playerState_t *ps, int idx );
+qboolean	BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const playerState_t *ps, int idx );
 
 
 // g_dmflags->integer flags
@@ -552,10 +566,10 @@ void	BG_EvaluateTrajectoryDelta( const trajectory_t *tr, int atTime, vec3_t resu
 
 void	BG_AddPredictableEventToPlayerstate( int newEvent, int eventParm, playerState_t *ps );
 
-void	BG_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, bool snap );
-void	BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s, int time, bool snap );
+void	BG_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, qboolean snap );
+void	BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s, int time, qboolean snap );
 
-bool	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTime );
+qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTime );
 
 
 #define ARENAS_PER_TIER		4
@@ -569,6 +583,43 @@ bool	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTime );
 
 // MFQ3 
 // (everything below)
+
+
+// MD3 related stuff
+typedef struct {
+	int			ident;
+	int			version;
+
+	char		name[MAX_QPATH];	// model name
+
+	int			flags;
+
+	int			numFrames;
+	int			numTags;			
+	int			numSurfaces;
+
+	int			numSkins;
+
+	int			ofsFrames;			// offset for first frame
+	int			ofsTags;			// numFrames * numTags
+	int			ofsSurfaces;		// first surface, others follow
+
+	int			ofsEnd;				// end of file
+} md3Header_t;
+
+typedef struct md3Frame_s {
+	vec3_t		bounds[2];
+	vec3_t		localOrigin;
+	float		radius;
+	char		name[16];
+} md3Frame_t;
+
+typedef struct md3Tag_s {
+	char		name[MAX_QPATH];	// tag name
+	vec3_t		origin;
+	vec3_t		axis[3];
+} md3Tag_t;
+
 
 // number of sounds for things
 #define NUM_TANKSOUNDS			9
@@ -632,8 +683,7 @@ bool	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTime );
 #define	CLASS_GROUND_RECON			  0x0002 
 #define	CLASS_GROUND_APC			  0x0004 
 #define	CLASS_GROUND_SAM			  0x0008 
-#define	CLASS_GROUND_ARTY			  0x0016 
-#define	CLASS_GROUND_MAX			  0x0016
+#define	CLASS_GROUND_MAX			  0x0008
 
 // LQM classes					
 #define CLASS_LQM_SPECIAL			  0x0001 
@@ -775,7 +825,7 @@ enum ShadowOrientationAdjusts {
 #define MAX_LOADOUTS			100
 #define MAX_MOUNTS_PER_VEHICLE	32
 
-struct mountInfo_t
+typedef struct mountInfo_s
 {
 	int			pos;	// pos on the wing
 	int			group;	// group if any
@@ -784,18 +834,18 @@ struct mountInfo_t
 	md3Tag_t	tag;	// tag
 	int			weapon;	// what is actually on
 	int			num;	// how many are actually on
-};
+} mountInfo_t;
 
-struct completeLoadout_t
+typedef struct completeLoadout_s
 {
 	mountInfo_t	mounts[MAX_MOUNTS_PER_VEHICLE];
 	int			usedMounts;
-	animation_t	animations[MAX_TOTALANIMATIONS];
-};
+	animation_t		animations[MAX_TOTALANIMATIONS];
+} completeLoadout_t;
 
 
 // list of vehicles (data)
-struct completeVehicleData_t
+typedef struct completeVehicleData_s
 {
     char		    *descriptiveName;	// long descriptive name
 	char			*tinyName;			// small ident name
@@ -845,7 +895,7 @@ struct completeVehicleData_t
 	vec4_t			shadowCoords;	// shadow apply coords { offsetX, offsetY, xAdjust, yAdjust }
 	vec4_t			shadowAdjusts;	// shadow apply adjustments { pitchMax, rollMax, pitchMod, rollMod }
 	animation_t		*animations;	// Animation pointer
-};
+}completeVehicleData_t;
 
 extern completeVehicleData_t availableVehicles[];
 
@@ -855,8 +905,7 @@ extern int bg_numberOfVehicles;
 extern completeLoadout_t availableLoadouts[MAX_LOADOUTS];
 
 // types of weapons
-enum weaponType_t {
-	WT_NONE = -1,
+typedef enum {
 	WT_MACHINEGUN,
 	WT_BALLISTICGUN,
 	WT_ROCKET,
@@ -867,13 +916,11 @@ enum weaponType_t {
 	WT_ANTIRADARMISSILE,
 	WT_FUELTANK,
 	WT_FLARE,
-	WT_FLAK,
 	WT_NUKEBOMB,
-	WT_NUKEMISSILE,
 	WT_FUELCRATE,
 	WT_AMMOCRATE,
 	WT_HEALTHCRATE
-};
+}weaponType_t;
 
 // weaponflags
 #define	WF_NONE						0
@@ -882,7 +929,7 @@ enum weaponType_t {
 
 
 // list of ground installations
-struct groundInstallationData_t
+typedef struct groundInstallationData_s
 {
     char		    *descriptiveName;	// long descriptive name
 	char			*tinyName;			// small ident name
@@ -903,7 +950,7 @@ struct groundInstallationData_t
 	float			trackCone2;		// how can ground radar track it
 	unsigned int	upgrades;		// for larger models (for double, triple etc load);
 	int				reloadTime;		// how long after last firing it takes to reload a weapon
-};
+} groundInstallationData_t;
 
 extern groundInstallationData_t availableGroundInstallations[];
 
@@ -912,7 +959,7 @@ extern int bg_numberOfGroundInstallations;
 
 
 // list of weapons
-struct completeWeaponData_t
+typedef struct completeWeaponData_s
 {
 	weaponType_t	type;				// behaviour
 	unsigned int	gameset;			// in which epoche can it appear
@@ -950,7 +997,7 @@ struct completeWeaponData_t
 	unsigned int	fitsPylon;			// on which type of pylon does this go 
 	unsigned int	basicECMVulnerability;// how likely in percent to be distracted
 	unsigned int	flags;
-};
+}completeWeaponData_t;
 
 
 // list of weapons...
@@ -959,128 +1006,115 @@ extern completeWeaponData_t	availableWeapons[];
 // number of available vehicles
 extern int bg_numberOfWeapons;
 
-// ...and their index (make sure in symc with availableWeapons[] !!
-enum weaponIndex_t
+// ...and their index (make sure in sync with availableWeapons[] !!
+typedef enum
 {
-	WI_NONE,			// 0
-	WI_MG_2XCAL303,
-	WI_MG_2XCAL312,
-	WI_MG_8XCAL50,
-	WI_MG_6XCAL50,
-	WI_MG_12_7MM,
-	WI_MG_14_5MM,
-	WI_MG_4X14_5MM,
-	WI_MG_20MM,
-	WI_MG_30MM,
-	WI_MG_2X20MM,
-	WI_MG_M4A1,
-	WI_MGT_2X30MM,		// 10
-	WI_MGT_7_62MM,
-	WI_MGT_12_7MM,
-	WI_FFAR,
-	WI_FFAR_SMALL,
-	WI_FFAR_LARGE,
-	WI_100MM_GUN,
-	WI_125MM_GUN,
-	WI_MK82,
-	WI_MK82R,
-	WI_MK83,
-	WI_MK83R,			// 20
-	WI_MK84,
-	WI_GBU15,			
-	WI_DURANDAL,		
-	WI_SIDEWINDER,
-	WI_AMRAAM,
-	WI_SPARROW,
-	WI_PHOENIX,
-	WI_STINGER,
-	WI_ATOLL,			
-	WI_ARCHER,			// 30
-	WI_ALAMO,
-	WI_HELLFIRE,	
-	WI_MAVERICK,
-	WI_HARM,
-	WI_AASAM,
+	WI_AR_1X5_45MM,
+	WI_AR_1X5_56MM,
+	WI_SMG_1X5_7MM,
+	WI_R_1X7_62MM,
+	WI_MG_1X7_62MM,
+	WI_MG_1X12_7MM
+	WI_MG_1X14_5MM
+	WI_MG_2X7_62MM
+	WI_MG_2X7_92MM
+	WI_MG_1X13MM
+	WI_MG_2X13MM
+	WI_MG_4X12_7MM
+	WI_MG_8X7_62MM
+	WI_ACN_1X20MM
+	WI_ACN_1X25MM
+	WI_ACN_1X27MM
+	WI_ACN_1X30MM
+	WI_ACN_2X20MM
+	WI_ACN_2X23MM
+	WI_ACN_4X23MM
+	WI_CNN_1X50MM
+	WI_CNN_1X75MM
+	WI_CNN_1X100MM
+	WI_CNN_1X120MM
+	WI_HOW_1X203MM
+	WI_AAM_7KG
+	WI_AAM_11KG
+	WI_AAM_23KG
+	WI_AAM_39KG
+	WI_AAM_40KG
+	WI_AAM_60KG
+	WI_SAM_3KG
+	WI_ASM_8KG
+	WI_ASM_9KG
+	WI_ASM_57KG
+	WI_ASM_66KG
+	WI_SSM_0_6KG
+	WI_SSM_0_7KG
+	WI_SSM_90KG
+	WI_BMB_227KG
+	WI_BMB_460KG
+	WI_BMB_940KG
+	WI_ICB_ANM50
+	WI_NB_B82
+	WI_GBMB_GBU15
+	WI_GBMB_GBU31
+	WI_GBMB_BLU107
 	WI_ECM,
+	WI_CM, 				//This is like WI_FLARE, but will show up on a pylon instead of just being a value concerning the internal flare count
 	WI_LASE,
-	WI_CM,				//This is like WI_FLARE, but will show up on a pylon instead of just being a value concerning the internal flare count
 	WI_DROPTANK,
-	WI_DROPTANK_PAIR,	// 40
-	WI_DROPTANK_SMALL,	
-	WI_DROPTANK_SMALL_PAIR,
-	WI_FUELCRATE,
+	WI_DROPTANK_SMALL,
+	WI_DROPTANK_PAIR,
 	WI_HEALTHCRATE,
 	WI_AMMOCRATE,
 	WI_FLARE,	
 	WI_CFLARE,
-	WI_BURNINGMAN,
-	WI_NB10MT,
-	WI_NB5MT,
-	WI_NB1MT,
-	WI_NM10MT,
-	WI_NM5MT,
-	WI_NM1MT,
-	WI_FLAK,
-	WI_MAX
-};
+}weaponIndex_t;
 
 
 // IGME
 #define IGME_MAX_VEHICLES		64
 #define IGME_MAX_WAYPOINTS		32
 
-struct mission_waypoint_t {
-	bool		used;
+typedef struct mission_waypoint_s {
+	qboolean		used;
 	vec3_t			origin;
-};
+}mission_waypoint_t;
 
 // mission scripts
-struct mission_overview_t {
+typedef struct mission_overview_s {
 	char			mapname[MAX_NAME_LENGTH];
 	int				gameset;
 	int				gametype;			
 	char			missionname[MAX_NAME_LENGTH];
 	char			objective[MAX_NAME_LENGTH];
-	bool		valid;
-};
+	qboolean		valid;
+}mission_overview_t;
 
-struct mission_groundInstallation_t {
-	bool		used;
+typedef struct mission_groundInstallation_s {
+	qboolean		used;
 	int				index;
 	char			objectname[MAX_NAME_LENGTH];
 	char			teamname[MAX_NAME_LENGTH];
 	vec3_t			origin;
 	vec3_t			angles;
-};
+}mission_groundInstallation_t;
 
 
-struct mission_vehicle_t {
-	bool		used;
+typedef struct mission_vehicle_s {
+	qboolean		used;
 	int				index;
 	char			objectname[MAX_NAME_LENGTH];
 	int				team;
 	vec3_t			origin;
 	vec3_t			angles;
 	mission_waypoint_t waypoints[IGME_MAX_WAYPOINTS];
-};
-
-
-
-
-
-
-
-
-
-
+}mission_vehicle_t;
 
 
 void MF_ParseMissionScripts( char *buf, mission_overview_t* overview, 
 		mission_vehicle_t* vehs, mission_groundInstallation_t* gis);
-void MF_CheckMissionScriptOverviewValid( mission_overview_t* overview, bool updateFormat );
+void MF_CheckMissionScriptOverviewValid( mission_overview_t* overview, qboolean updateFormat );
 void MF_SetMissionScriptOverviewDefaults( mission_overview_t* overview );
-int MF_getIndexOfVehicle( int start, int gameset, int team, int cat, int cls, int vehicleType, int change_vehicle, bool allowNukes );
-int MF_getIndexOfVehicleEx( int start, int gameset, int team, int cat, int cls, int vehicleType, int change_vehicle, bool allowNukes );
+int MF_getIndexOfVehicle( int start, int gameset, int team, int cat, int cls, int vehicleType, int change_vehicle );
+int MF_getIndexOfVehicleEx( int start, int gameset, int team, int cat, int cls, int vehicleType, int change_vehicle );
 int MF_getIndexOfGI( int start, int gameset, int GIType, int mode);
 int MF_getItemIndexFromHex(int hexValue);
 int MF_getNumberOfItems(const char **itemlist);
@@ -1089,17 +1123,17 @@ char * MF_CreateGIPathname( int vehicle, char * pFormatString );
 void MF_LimitFloat( float * value, float min, float max );
 void MF_LimitInt( int * value, int min, int max );
 int MF_ExtractEnumFromId( int vehicle, unsigned int op );
-bool MF_findTag(const char* fileName, const char* tagname, md3Tag_t* tag);
-bool MF_distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout );
+qboolean MF_findTag(const char* fileName, const char* tagname, md3Tag_t* tag);
+qboolean MF_distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout );
 void MF_calculateAllDefaultLoadouts();
-void MF_getDefaultLoadoutForVehicle( int idx, completeLoadout_t* loadout, playerState_t* ps );
-bool MF_removeWeaponFromLoadout( int weaponIndex, completeLoadout_t* loadout, playerState_t* ps,
-									 bool* wingtip, vec3_t pos, int launchPos );
-int MF_addWeaponToLoadout( int weaponIndex, completeLoadout_t* loadout, playerState_t* ps );
-bool MF_getNumberOfFrames(const char* fileName, int* number);
-bool MF_getNumberOfTags(const char* fileName, int* number);
+void MF_getDefaultLoadoutForVehicle( int idx, completeLoadout_t* loadout );
+qboolean MF_removeWeaponFromLoadout( int weaponIndex, completeLoadout_t* loadout, qboolean* wingtip, 
+									vec3_t pos, int launchPos );
+int MF_addWeaponToLoadout( int weaponIndex, completeLoadout_t* loadout );
+qboolean MF_getNumberOfFrames(const char* fileName, int* number);
+qboolean MF_getNumberOfTags(const char* fileName, int* number);
 int MF_getTagsContaining(const char* fileName, const char* str, md3Tag_t* tags, int num);
-bool MF_getDimensions(const char* fileName, int frame, vec3_t* maxs, vec3_t* mins);
+qboolean MF_getDimensions(const char* fileName, int frame, vec3_t* maxs, vec3_t* mins);
 void MF_LoadAllVehicleData();
 int MF_findWeaponsOfType( int weaponIndex, completeLoadout_t* loadout );
 
@@ -1228,6 +1262,3 @@ typedef enum {
 #define NUKE_SHOCKWAVE_MAXRADIUS		1000
 #define NUKE_SHOCKWAVE2_MAXRADIUS		1000
 
-
-
-#endif // __BG_PUBLIC_H__
