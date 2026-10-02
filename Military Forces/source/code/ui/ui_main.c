@@ -102,8 +102,7 @@ static const int numSortKeys = sizeof(sortKeys) / sizeof(const char*);
 static char* netnames[] = {
 	"???",
 	"UDP",
-	"IPX",
-	NULL
+	"UDP6"
 };
 
 static int gamecodetoui[] = {4,2,3,0,5,1,6};

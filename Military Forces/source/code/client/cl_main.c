@@ -704,7 +704,7 @@ void CL_MapLoading()
 		cls.keyCatchers = 0;
 		SCR_UpdateScreen();
 		clc.connectTime = -RETRANSMIT_TIMEOUT;
-		NET_StringToAdr( cls.servername, &clc.serverAddress);
+		NET_StringToAdr( cls.servername, &clc.serverAddress, NA_UNSPEC);
 		// we don't need a challenge on the localhost
 
 		CL_CheckForResend();
@@ -1081,7 +1081,7 @@ void CL_Connect_f()
 
 	Q_strncpyz( cls.servername, server, sizeof(cls.servername) );
 
-	if (!NET_StringToAdr( cls.servername, &clc.serverAddress) )
+	if (!NET_StringToAdr( cls.servername, &clc.serverAddress, NA_UNSPEC) )
 	{
 		Com_Printf ("Bad server address\n");
 		cls.state = CA_DISCONNECTED;
@@ -1154,7 +1154,7 @@ void CL_Rcon_f( void ) {
 
 			return;
 		}
-		NET_StringToAdr (rconAddress->string, &to);
+		NET_StringToAdr (rconAddress->string, &to, NA_UNSPEC);
 		if (to.port == 0) {
 			to.port = BigShort (PORT_SERVER);
 		}
@@ -1822,7 +1822,7 @@ void CL_ConnectionlessPacket( netadr_t from, msg_t *msg ) {
 
 	c = Cmd_Argv(0);
 
-	Com_DPrintf ("CL packet %s: %s\n", NET_AdrToString(from), c);
+	Com_DPrintf ("CL packet %s: %s\n", NET_AdrToStringwPort(from), c);
 
 	// challenge from the server we are connecting to
 	if ( !Q_stricmp(c, "challengeResponse") ) 
@@ -1859,8 +1859,8 @@ void CL_ConnectionlessPacket( netadr_t from, msg_t *msg ) {
 		}
 		if ( !NET_CompareBaseAdr( from, clc.serverAddress ) ) {
 			Com_Printf( "connectResponse from a different address.  Ignored.\n" );
-			Com_Printf( "%s should have been %s\n", NET_AdrToString( from ), 
-				NET_AdrToString( clc.serverAddress ) );
+			Com_Printf( "%s should have been %s\n", NET_AdrToStringwPort( from ), 
+				NET_AdrToStringwPort( clc.serverAddress ) );
 			return;
 		}
 		Netchan_Setup (NS_CLIENT, &clc.netchan, from, Cvar_VariableValue( "net_qport" ) );
@@ -1946,7 +1946,7 @@ void CL_PacketEvent( netadr_t from, msg_t *msg ) {
 	}
 
 	if ( msg->cursize < 4 ) {
-		Com_Printf ("%s: Runt packet\n",NET_AdrToString( from ));
+		Com_Printf ("%s: Runt packet\n",NET_AdrToStringwPort( from ));
 		return;
 	}
 
@@ -1955,7 +1955,7 @@ void CL_PacketEvent( netadr_t from, msg_t *msg ) {
 	//
 	if ( !NET_CompareAdr( from, clc.netchan.remoteAddress ) ) {
 		Com_DPrintf ("%s:sequenced packet without connection\n"
-			,NET_AdrToString( from ) );
+			,NET_AdrToStringwPort( from ) );
 		// FIXME: send a client disconnect?
 		return;
 	}
@@ -2605,9 +2605,8 @@ void CL_ServerInfoPacket( netadr_t from, msg_t *msg ) {
 					type = 1;
 					break;
 
-				case NA_IPX:
-				case NA_BROADCAST_IPX:
-					str = "ipx";
+				case NA_IP6:
+					str = "udp6";
 					type = 2;
 					break;
 
@@ -2664,7 +2663,7 @@ void CL_ServerInfoPacket( netadr_t from, msg_t *msg ) {
 		if (info[strlen(info)-1] != '\n') {
 			Q_strcat(info, sizeof(info), "\n");
 		}
-		Com_Printf( "%s: %s", NET_AdrToString( from ), info );
+		Com_Printf( "%s: %s", NET_AdrToStringwPort( from ), info );
 	}
 }
 
@@ -2722,7 +2721,7 @@ int CL_ServerStatus( const char *serverAddress, char *serverStatusString, int ma
 		return false;
 	}
 	// get the address
-	if ( !NET_StringToAdr( serverAddress, &to ) ) {
+	if ( !NET_StringToAdr( serverAddress, &to, NA_UNSPEC ) ) {
 		return false;
 	}
 	serverStatus = CL_GetServerStatus( to );
@@ -2898,7 +2897,7 @@ void CL_LocalServers_f( void ) {
 			to.type = NA_BROADCAST;
 			NET_SendPacket( NS_CLIENT, strlen( message ), message, to );
 
-			to.type = NA_BROADCAST_IPX;
+			to.type = NA_MULTICAST6;
 			NET_SendPacket( NS_CLIENT, strlen( message ), message, to );
 		}
 	}
@@ -2979,7 +2978,7 @@ void CL_GetPing( int n, char *buf, int buflen, int *pingtime )
 		return;
 	}
 
-	str = NET_AdrToString( cl_pinglist[n].adr );
+	str = NET_AdrToStringwPort( cl_pinglist[n].adr );
 	Q_strncpyz( buf, str, buflen );
 
 	time = cl_pinglist[n].time;
@@ -3148,7 +3147,7 @@ void CL_Ping_f( void ) {
 
 	server = Cmd_Argv(1);
 
-	if ( !NET_StringToAdr( server, &to ) ) {
+	if ( !NET_StringToAdr( server, &to, NA_UNSPEC ) ) {
 		return;
 	}
 
@@ -3294,7 +3293,7 @@ void CL_ServerStatus_f(void) {
 		server = Cmd_Argv(1);
 	}
 
-	if ( !NET_StringToAdr( server, &to ) ) {
+	if ( !NET_StringToAdr( server, &to, NA_UNSPEC ) ) {
 		return;
 	}
 

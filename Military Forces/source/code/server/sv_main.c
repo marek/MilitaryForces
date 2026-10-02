@@ -802,6 +802,29 @@ bool SV_CheckPaused()
 
 /*
 ==================
+SV_FrameMsec
+Return time in millseconds until processing of the next server frame.
+==================
+*/
+int SV_FrameMsec(void)
+{
+	if(sv_fps)
+	{
+		int frameMsec;
+		
+		frameMsec = 1000.0f / sv_fps->value;
+		
+		if(frameMsec < theSV.timeResidual_)
+			return 0;
+		else
+			return frameMsec - theSV.timeResidual_;
+	}
+	else
+		return 1;
+}
+
+/*
+==================
 SV_Frame
 
 Player movement occurs as a result of packet events, which
@@ -835,14 +858,6 @@ void SV_Frame( int msec )
 	frameMsec = 1000 / sv_fps->integer ;
 
 	theSV.timeResidual_ += msec;
-
-	if ( com_dedicated->integer && theSV.timeResidual_ < frameMsec ) 
-	{
-		// NET_Sleep will give the OS time slices until either get a packet
-		// or time enough for a server frame has gone by
-		NET_Sleep(frameMsec - theSV.timeResidual_);
-		return;
-	}
 
 	// if time is about to hit the 32nd bit, kick all clients
 	// and clear sv.time, rather

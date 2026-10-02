@@ -113,6 +113,14 @@ NET
 ==============================================================
 */
 
+#define NET_ENABLEV4            0x01
+#define NET_ENABLEV6            0x02
+// if this flag is set, always attempt ipv6 connections instead of ipv4 if a v6 address is found.
+#define NET_PRIOV6              0x04
+// disables ipv6 multicast support if set.
+#define NET_DISABLEMCAST        0x08
+
+
 #define	PACKET_BACKUP	32	// number of old messages that must be kept on client and
 							// server for delta comrpession and ping estimation
 #define	PACKET_MASK		(PACKET_BACKUP-1)
@@ -126,13 +134,14 @@ NET
 #define	MAX_RELIABLE_COMMANDS	64			// max string commands buffered for restransmit
 
 typedef enum {
+	NA_BAD = 0,					// an address lookup failed
 	NA_BOT,
-	NA_BAD,					// an address lookup failed
 	NA_LOOPBACK,
 	NA_BROADCAST,
 	NA_IP,
-	NA_IPX,
-	NA_BROADCAST_IPX
+	NA_IP6,
+	NA_MULTICAST6,
+	NA_UNSPEC
 } netadrtype_t;
 
 typedef enum {
@@ -140,30 +149,36 @@ typedef enum {
 	NS_SERVER
 } netsrc_t;
 
+#define NET_ADDRSTRMAXLEN 48	// maximum length of an IPv6 address string including trailing '\0'
 typedef struct {
 	netadrtype_t	type;
 
 	byte	ip[4];
-	byte	ipx[10];
+	byte	ip6[16];
 
 	unsigned short	port;
+	unsigned long	scope_id;	// Needed for IPv6 link-local addresses
 } netadr_t;
 
 void		NET_Init( void );
 void		NET_Shutdown( void );
-void		NET_Restart( void );
+void		NET_Restart_f( void );
 void		NET_Config( bool enableNetworking );
-
+void		NET_FlushPacketQueue(void);
 void		NET_SendPacket (netsrc_t sock, int length, const void *data, netadr_t to);
 void		QDECL NET_OutOfBandPrint( netsrc_t net_socket, netadr_t adr, const char *format, ...) Q_PRINTF_FUNC(3, 4);
 void		QDECL NET_OutOfBandData( netsrc_t sock, netadr_t adr, byte *format, int len );
 
 bool	NET_CompareAdr (netadr_t a, netadr_t b);
+bool	NET_CompareBaseAdrMask(netadr_t a, netadr_t b, int netmask);
 bool	NET_CompareBaseAdr (netadr_t a, netadr_t b);
 bool	NET_IsLocalAddress (netadr_t adr);
 const char	*NET_AdrToString (netadr_t a);
-bool	NET_StringToAdr ( const char *s, netadr_t *a);
+const char	*NET_AdrToStringwPort (netadr_t a);
+int		NET_StringToAdr ( const char *s, netadr_t *a, netadrtype_t family);
 bool	NET_GetLoopPacket (netsrc_t sock, netadr_t *net_from, msg_t *net_message);
+void		NET_JoinMulticast6(void);
+void		NET_LeaveMulticast6(void);
 void		NET_Sleep(int msec);
 
 
@@ -697,6 +712,7 @@ void 		QDECL Com_Printf( const char *fmt, ... ) Q_PRINTF_FUNC(1, 2);
 void 		QDECL Com_DPrintf( const char *fmt, ... ) Q_PRINTF_FUNC(1, 2);
 void 		QDECL Com_Error( int code, const char *fmt, ... ) Q_PRINTF_FUNC(2, 3);
 void 		Com_Quit_f( void );
+void		Com_RunAndTimeServerPacket(netadr_t *evFrom, msg_t *buf);
 int			Com_EventLoop( void );
 int			Com_Milliseconds( void );	// will be journaled properly
 unsigned	Com_BlockChecksum( const void *buffer, int length );
@@ -715,6 +731,8 @@ extern	cvar_t	*com_developer;
 extern	cvar_t	*com_dedicated;
 extern	cvar_t	*com_speeds;
 extern	cvar_t	*com_timescale;
+extern	cvar_t	*cl_packetdelay;
+extern	cvar_t	*sv_packetdelay;
 extern	cvar_t	*com_sv_running;
 extern	cvar_t	*com_cl_running;
 extern	cvar_t	*com_viewlog;			// 0 = hidden, 1 = visible, 2 = minimized
@@ -881,6 +899,9 @@ void SCR_DebugGraph (float value, int color);	// FIXME: move logging to common?
 void SV_Init( void );
 void SV_Shutdown( char *finalmsg );
 void SV_Frame( int msec );
+int SV_FrameMsec(void);
+
+void IN_Frame( void );
 void SV_PacketEvent( netadr_t from, msg_t *msg );
 bool SV_GameCommand();
 
@@ -916,8 +937,7 @@ typedef enum {
 	SE_CHAR,	// evValue is an ascii char
 	SE_MOUSE,	// evValue and evValue2 are reletive signed x / y moves
 	SE_JOYSTICK_AXIS,	// evValue is an axis number and evValue2 is the current state (-127 to 127)
-	SE_CONSOLE,	// evPtr is a char*
-	SE_PACKET	// evPtr is a netadr_t followed by data bytes to evPtrLength
+	SE_CONSOLE	// evPtr is a char*
 } sysEventType_t;
 
 typedef struct {
@@ -976,7 +996,7 @@ void	Sys_SetErrorText( const char *text );
 
 void	Sys_SendPacket( int length, const void *data, netadr_t to );
 
-bool	Sys_StringToAdr( const char *s, netadr_t *a );
+bool	Sys_StringToAdr( const char *s, netadr_t *a, netadrtype_t family );
 //Does NOT parse port numbers, only base addresses.
 
 bool	Sys_IsLANAddress (netadr_t adr);

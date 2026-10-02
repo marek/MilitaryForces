@@ -48,7 +48,6 @@ static char homePath[ MAX_OSPATH ] = { 0 };
 
 static sysEvent_t	eventQue[MAX_QUED_EVENTS];
 static int			eventHead, eventTail;
-static byte			sys_packetReceived[MAX_MSGLEN];
 
 /*
 =================
@@ -361,8 +360,6 @@ Sys_GetEvent
 sysEvent_t Sys_GetEvent( void ) {
 	sysEvent_t	ev;
 	char		*s;
-	msg_t		netmsg;
-	netadr_t	adr;
 
 	// return if we have data
 	if ( eventHead > eventTail ) {
@@ -380,21 +377,6 @@ sysEvent_t Sys_GetEvent( void ) {
 		b = reinterpret_cast<char*>(Z_Malloc( len ));
 		Q_strncpyz( b, s, len );
 		Sys_QueEvent( 0, SE_CONSOLE, 0, 0, len, b );
-	}
-
-	// check for network packets
-	MSG_Init( &netmsg, sys_packetReceived, sizeof( sys_packetReceived ) );
-	if ( Sys_GetPacket ( &adr, &netmsg ) ) {
-		netadr_t		*buf;
-		int				len;
-
-		// copy out to a seperate buffer for qeueing
-		// the readcount stepahead is for SOCKS support
-		len = sizeof( netadr_t ) + netmsg.cursize - netmsg.readcount;
-		buf = reinterpret_cast<netadr_t*>(Z_Malloc( len ));
-		*buf = adr;
-		memcpy( buf+1, &netmsg.data[netmsg.readcount], netmsg.cursize - netmsg.readcount );
-		Sys_QueEvent( 0, SE_PACKET, 0, 0, len, buf );
 	}
 
 	// return if we have data
@@ -566,7 +548,6 @@ int main( int argc, char **argv )
 
 	while( 1 )
 	{
-		IN_Frame( );
 		Com_Frame( );
 	}
 

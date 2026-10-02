@@ -883,6 +883,19 @@ void Q_strcat( char *dest, int size, const char *src ) {
 }
 
 
+int Q_CountChar(const char *string, char tocount)
+{
+	int count;
+	
+	for(count = 0; *string; string++)
+	{
+		if(*string == tocount)
+			count++;
+	}
+	
+	return count;
+}
+
 int Q_PrintStrlen( const char *string ) {
 	int			len;
 	const char	*p;
