@@ -367,6 +367,8 @@ void CL_SystemInfoChanged( void ) {
 	// scan through all the variables in the systeminfo and locally set cvars to match
 	s = systemInfo;
 	while ( s ) {
+		int cvar_flags;
+		
 		Info_NextPair( &s, key, value );
 		if ( !key[0] ) {
 			break;
@@ -376,7 +378,23 @@ void CL_SystemInfoChanged( void ) {
 		//	gameSet = true;
 		//}
 
-		Cvar_Set( key, value );
+		if((cvar_flags = Cvar_Flags(key)) == CVAR_NONEXISTENT)
+			Cvar_Get(key, value, CVAR_SERVER_CREATED | CVAR_ROM);
+		else
+		{
+			// If this cvar may not be modified by a server discard the value.
+			if(!(cvar_flags & (CVAR_SYSTEMINFO | CVAR_SERVER_CREATED | CVAR_USER_CREATED)))
+			{
+				if(Q_stricmp(key, "g_synchronousClients") && Q_stricmp(key, "pmove_fixed") &&
+				   Q_stricmp(key, "pmove_msec"))
+				{
+					Com_Printf(S_COLOR_YELLOW "WARNING: server is not allowed to set %s=%s\n", key, value);
+					continue;
+				}
+			}
+
+			Cvar_Set(key, value);
+		}
 	}
 	// if game folder should not be set and it is set at the client side
 	//if ( !gameSet && *Cvar_VariableString("fs_game") ) {
@@ -462,8 +480,12 @@ void CL_ParseGamestate( msg_t *msg ) {
 	// parse serverId and other cvars
 	CL_SystemInfoChanged();
 
+	// stop recording before FS_Restart closes the demo file
+	if(clc.demorecording)
+		CL_StopRecord_f();
+	
 	// reinitialize the filesystem if the game directory has changed
-  FS_ConditionalRestart( clc.checksumFeed );
+	FS_ConditionalRestart( clc.checksumFeed );
 
 	// This used to call CL_StartHunkUsers, but now we enter the download state before loading the
 	// cgame
@@ -557,8 +579,6 @@ void CL_ParseDownload ( msg_t *msg ) {
 			// rename the file
 			FS_SV_Rename ( clc.downloadTempName, clc.downloadName, false );
 		}
-		*clc.downloadTempName = *clc.downloadName = 0;
-		Cvar_Set( "cl_downloadName", "" );
 
 		// send intentions now
 		// We need this because without it, we would hold the last nextdl and then start

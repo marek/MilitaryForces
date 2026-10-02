@@ -581,7 +581,6 @@ static void Text_Paint_Limit(float *maxX, float x, float y, float scale, const v
 void UI_ShowPostGame(bool newHigh) {
 	Cvar_Set ("cg_cameraOrbit", "0");
 	Cvar_Set("cg_thirdPerson", "0");
-	Cvar_Set( "sv_killserver", "1" );
 	uiInfo.soundHighScore = newHigh;
 	_UI_SetActiveMenu(UserInterface::MenuCommand::UIMENU_POSTGAME);
 }
@@ -1008,7 +1007,7 @@ void UI_LoadMenus(const char *menuFile, bool reset)
 
 	handle = uiInfo.uiUtils.getPrecompilerTools()->loadSourceHandle( menuFile );
 	if (!handle) {
-		Com_Error( ERR_DROP, S_COLOR_YELLOW "menu file not found: %s, using default\n", menuFile );
+		Com_Printf( S_COLOR_YELLOW "menu file not found: %s, using default\n", menuFile );
 		handle = uiInfo.uiUtils.getPrecompilerTools()->loadSourceHandle( "ui/menus.txt" );
 		if (!handle) {
 			Com_Error( ERR_DROP, S_COLOR_RED "default menu file not found: ui/menus.txt, unable to continue!\n", menuFile );
@@ -2497,7 +2496,7 @@ static bool UI_Handicap_HandleKey(int flags, float *special, int key) {
 		}
     if (h > 100) {
       h = 5;
-    } else if (h < 0) {
+    } else if (h < 5) {
 			h = 100;
 		}
   	Cvar_Set( "handicap", va( "%i", h) );
@@ -5194,9 +5193,15 @@ const char *UI_FeederItemText(float feederID, int index, int column, qhandle_t *
 					else
 					{
 						if ( ui_netSource.integer == AS_LOCAL ) {
+							int nettype = atoi(Info_ValueForKey(info, "nettype"));
+
+							if (nettype < 0 || nettype >= ARRAY_LEN(netnames)) {
+								nettype = 0;
+							}
+
 							Com_sprintf( hostname, sizeof(hostname), "%s [%s]",
 											Info_ValueForKey(info, "hostname"),
-											netnames[atoi(Info_ValueForKey(info, "nettype"))] );
+											netnames[nettype] );
 							return hostname;
 						}
 						else {

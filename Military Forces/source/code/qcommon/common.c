@@ -51,8 +51,7 @@ char	*com_argv[MAX_NUM_ARGVS+1];
 jmp_buf abortframe;		// an ERR_DROP occured, exit the entire frame
 
 
-FILE *debuglogfile;
-static fileHandle_t logfile;
+fileHandle_t	logfile;
 fileHandle_t	com_journalFile;			// events are written here
 fileHandle_t	com_journalDataFile;		// config files are written here
 
@@ -247,9 +246,6 @@ void QDECL Com_Error( int code, const char *fmt, ... ) {
 		code = ERR_FATAL;
 	}
 
-	// make sure we can get at our local stuff
-	FS_PureServerSetLoadedPaks( "", "" );
-
 	// if we are getting a solid stream of ERR_DROP, do an ERR_FATAL
 	currentTime = Sys_Milliseconds();
 	if ( currentTime - lastErrorTime < 100 ) {
@@ -275,8 +271,11 @@ void QDECL Com_Error( int code, const char *fmt, ... ) {
 	}
 
 	if ( code == ERR_SERVERDISCONNECT ) {
+		SV_Shutdown( "Server disconnected" );
 		CL_Disconnect( true );
 		CL_FlushMemory( );
+		// make sure we can get at our local stuff
+		FS_PureServerSetLoadedPaks("", "");
 		com_errorEntered = false;
 		longjmp (abortframe, -1);
 	} else if ( code == ERR_DROP || code == ERR_DISCONNECT ) {
@@ -284,6 +283,7 @@ void QDECL Com_Error( int code, const char *fmt, ... ) {
 		SV_Shutdown (va("Server crashed: %s\n",  com_errorMessage));
 		CL_Disconnect( true );
 		CL_FlushMemory( );
+		FS_PureServerSetLoadedPaks("", "");
 		com_errorEntered = false;
 		longjmp (abortframe, -1);
 	} else if ( code == ERR_NEED_CD ) {
@@ -296,6 +296,7 @@ void QDECL Com_Error( int code, const char *fmt, ... ) {
 		} else {
 			Com_Printf("Server didn't have CD\n" );
 		}
+		FS_PureServerSetLoadedPaks("", "");
 		longjmp (abortframe, -1);
 	} else {
 		CL_Shutdown ();
@@ -418,7 +419,6 @@ be after execing the config and default.
 void Com_StartupVariable( const char *match ) {
 	int		i;
 	char	*s;
-	cvar_t	*cv;
 
 	for (i=0 ; i < com_numConsoleLines ; i++) {
 		Cmd_TokenizeString( com_consoleLines[i] );
@@ -427,11 +427,13 @@ void Com_StartupVariable( const char *match ) {
 		}
 
 		s = Cmd_Argv(1);
-		if ( !match || !strcmp( s, match ) ) {
-			Cvar_Set( s, Cmd_Argv(2) );
-			cv = Cvar_Get( s, "", 0 );
-			cv->flags |= CVAR_USER_CREATED;
-//			com_consoleLines[i] = 0;
+		
+		if(!match || !strcmp(s, match))
+		{
+			if(Cvar_Flags(s) == CVAR_NONEXISTENT)
+				Cvar_Get(s, Cmd_ArgsFrom(2), CVAR_USER_CREATED);
+			else
+				Cvar_Set2(s, Cmd_ArgsFrom(2), false);
 		}
 	}
 }
@@ -474,8 +476,8 @@ bool Com_AddStartupCommands( void ) {
 //============================================================================
 
 void Info_Print( const char *s ) {
-	char	key[512];
-	char	value[512];
+	char	key[BIG_INFO_KEY];
+	char	value[BIG_INFO_VALUE];
 	char	*o;
 	int		l;
 
@@ -495,7 +497,7 @@ void Info_Print( const char *s ) {
 		}
 		else
 			*o = 0;
-		Com_Printf ("%s", key);
+		Com_Printf ("%s ", key);
 
 		if (!*s)
 		{
@@ -559,7 +561,7 @@ int Com_Filter(char *filter, char *name, int casesensitive)
 		if (*filter == '*') {
 			filter++;
 			for (i = 0; *filter; i++) {
-				if (*filter == '*' || *filter == '?') break;
+				if (*filter == '*' || *filter == '?' || *filter == '[') break;
 				buf[i] = *filter;
 				filter++;
 			}
@@ -654,22 +656,6 @@ int Com_FilterPath(char *filter, char *name, int casesensitive)
 	}
 	new_name[i] = '\0';
 	return Com_Filter(new_filter, new_name, casesensitive);
-}
-
-/*
-============
-Com_HashKey
-============
-*/
-int Com_HashKey(char *string, int maxlen) {
-	int register hash, i;
-
-	hash = 0;
-	for (i = 0; i < maxlen && string[i] != '\0'; i++) {
-		hash += string[i] * (119 + i);
-	}
-	hash = (hash ^ (hash >> 10) ^ (hash >> 20));
-	return hash;
 }
 
 /*
@@ -859,9 +845,6 @@ void Z_Free( void *ptr ) {
 		block->size += other->size;
 		block->next = other->next;
 		block->next->prev = block;
-		if (other == zone->rover) {
-			zone->rover = block;
-		}
 	}
 }
 
@@ -1243,7 +1226,7 @@ void Com_Meminfo_f( void ) {
 	for (block = mainzone->blocklist.next ; ; block = block->next) {
 		if ( Cmd_Argc() != 1 ) {
 			Com_Printf ("block:%p    size:%7i    tag:%3i\n",
-				block, block->size, block->tag);
+				(void *)block, block->size, block->tag);
 		}
 		if ( block->tag ) {
 			zoneBytes += block->size;
@@ -2753,6 +2736,13 @@ void Com_Frame( void ) {
 			timeAfter = Sys_Milliseconds ();
 		}
 	}
+	else {
+		if ( com_speeds->integer ) {
+			timeAfter = Sys_Milliseconds ();
+			timeBeforeEvents = timeAfter;
+			timeBeforeClient = timeAfter;
+		}
+	}
 
 	//
 	// report timing information
@@ -3197,7 +3187,12 @@ static void FindMatches( const char *s ) {
 	}
 
 	// cut shortestMatch to the amount common with s
-	for ( i = 0 ; s[i] ; i++ ) {
+	for ( i = 0 ; shortestMatch[i] ; i++ ) {
+		if ( i >= strlen( s ) ) {
+			shortestMatch[i] = 0;
+			break;
+		}
+
 		if ( tolower(shortestMatch[i]) != tolower(s[i]) ) {
 			shortestMatch[i] = 0;
 		}

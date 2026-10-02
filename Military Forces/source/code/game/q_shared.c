@@ -23,6 +23,28 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // q_shared.c -- stateless support routines that are included in each code dll
 #include "q_shared.h"
 
+// ^[0-9a-zA-Z]
+bool Q_IsColorString(const char *p) {
+	if (!p)
+		return false;
+
+	if (p[0] != Q_COLOR_ESCAPE)
+		return false;
+
+	if (p[1] == 0)
+		return false;
+
+	// isalnum expects a signed integer in the range -1 (EOF) to 255, or it might assert on undefined behaviour
+	// a dereferenced char pointer has the range -128 to 127, so we just need to rangecheck the negative part
+	if (p[1] < 0)
+		return false;
+
+	if (isalnum(p[1]) == 0)
+		return false;
+
+	return true;
+}
+
 float Com_Clamp( float min, float max, float value ) {
 	if ( value < min ) {
 		return min;
@@ -278,7 +300,7 @@ static	int		com_lines;
 
 void COM_BeginParseSession( const char *name )
 {
-	com_lines = 0;
+	com_lines = 1;
 	Com_sprintf(com_parsename, sizeof(com_parsename), "%s", name);
 }
 
@@ -462,6 +484,10 @@ char *COM_ParseExt( char **data_p, bool allowLineBreaks )
 			data += 2;
 			while ( *data && ( *data != '*' || data[1] != '/' ) ) 
 			{
+				if ( *data == '\n' )
+				{
+					com_lines++;
+				}
 				data++;
 			}
 			if ( *data ) 
@@ -488,6 +514,10 @@ char *COM_ParseExt( char **data_p, bool allowLineBreaks )
 				*data_p = ( char * ) data;
 				return com_token;
 			}
+			if ( c == '\n' )
+			{
+				com_lines++;
+			}
 			if (len < MAX_TOKEN_CHARS - 1)
 			{
 				com_token[len] = c;
@@ -506,8 +536,6 @@ char *COM_ParseExt( char **data_p, bool allowLineBreaks )
 		}
 		data++;
 		c = *data;
-		if ( c == '\n' )
-			com_lines++;
 	} while (c>32);
 
 	com_token[len] = 0;
@@ -624,6 +652,10 @@ void SkipRestOfLine ( char **data ) {
 	int		c;
 
 	p = *data;
+
+	if ( !*p )
+		return;
+
 	while ( (c = *p++) != 0 ) {
 		if ( c == '\n' ) {
 			com_lines++;
@@ -1143,7 +1175,7 @@ void Info_RemoveKey_Big( char *s, const char *key ) {
 
 		if (!strcmp (key, pkey) )
 		{
-			strcpy (start, s);	// remove this part
+			memmove(start, s, strlen(s) + 1); // remove this part
 			return;
 		}
 
@@ -1227,6 +1259,7 @@ void Info_SetValueForKey( char *s, const char *key, const char *value ) {
 Info_SetValueForKey_Big
 
 Changes or adds a key/value pair
+Includes and retains zero-length values
 ==================
 */
 void Info_SetValueForKey_Big( char *s, const char *key, const char *value ) {
@@ -1255,7 +1288,7 @@ void Info_SetValueForKey_Big( char *s, const char *key, const char *value ) {
 	}
 
 	Info_RemoveKey_Big (s, key);
-	if (!value || !strlen(value))
+	if (!value)
 		return;
 
 	Com_sprintf (newi, sizeof(newi), "\\%s\\%s", key, value);

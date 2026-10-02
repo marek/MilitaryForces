@@ -67,6 +67,7 @@ void MSG_WriteFloat (msg_t *sb, float f);
 void MSG_WriteString (msg_t *sb, const char *s);
 void MSG_WriteBigString (msg_t *sb, const char *s);
 void MSG_WriteAngle16 (msg_t *sb, float f);
+int MSG_HashKey(const char *string, int maxlen);
 
 void	MSG_BeginReading (msg_t *sb);
 void	MSG_BeginReadingOOB(msg_t *sb);
@@ -441,6 +442,7 @@ void	Cvar_Update( vmCvar_t *vmCvar );
 // updates an interpreted modules' version of a cvar
 
 void 	Cvar_Set( const char *var_name, const char *value );
+cvar_t	*Cvar_Set2(const char *var_name, const char *value, bool force);
 // will create the variable with no flags if it doesn't exist
 
 void Cvar_SetLatched( const char *var_name, const char *value);
@@ -451,11 +453,14 @@ void	Cvar_SetValue( const char *var_name, float value );
 
 float	Cvar_VariableValue( const char *var_name );
 int		Cvar_VariableIntegerValue( const char *var_name );
+int	Cvar_Flags(const char *var_name);
+// returns CVAR_NONEXISTENT if cvar doesn't exist or the flags of that particular CVAR.
 // returns 0 if not defined or non numeric
 
 char	*Cvar_VariableString( const char *var_name );
 void	Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize );
 // returns an empty string if not defined
+
 
 void	Cvar_CommandCompletion( void(*callback)(const char *s) );
 // callback with each valid string
@@ -625,6 +630,9 @@ void FS_PureServerSetLoadedPaks( const char *pakSums, const char *pakNames );
 // separated checksums will be checked for files, with the
 // sole exception of .cfg files.
 
+bool FS_CheckDirTraversal(const char *checkdir);
+bool FS_CompareZipChecksum(const char *zipfile);
+char   *FS_BuildOSPath( const char *base, const char *game, const char *qpath );
 bool FS_idPak( char *pak, char *base );
 bool FS_ComparePaks( char *neededpaks, int len, bool dlstring );
 
@@ -690,7 +698,6 @@ void 		Com_Quit_f( void );
 int			Com_EventLoop( void );
 int			Com_Milliseconds( void );	// will be journaled properly
 unsigned	Com_BlockChecksum( const void *buffer, int length );
-int			Com_HashKey(char *string, int maxlen);
 int			Com_Filter(char *filter, char *name, int casesensitive);
 int			Com_FilterPath(char *filter, char *name, int casesensitive);
 int			Com_RealTime(qtime_t *qtime);
@@ -729,6 +736,7 @@ extern	int		com_frameMsec;
 
 extern	bool	com_errorEntered;
 
+extern	fileHandle_t	logfile;
 extern	fileHandle_t	com_journalFile;
 extern	fileHandle_t	com_journalDataFile;
 

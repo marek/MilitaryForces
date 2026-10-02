@@ -695,7 +695,7 @@ Examine or change the serverinfo string
 static void SV_Systeminfo_f() 
 {
 	Com_Printf ("System info settings:\n");
-	Info_Print ( Cvar_InfoString( CVAR_SYSTEMINFO ) );
+	Info_Print ( Cvar_InfoString_Big( CVAR_SYSTEMINFO ) );
 }
 
 

@@ -35,7 +35,6 @@ int			cvar_numIndexes;
 #define FILE_HASH_SIZE		256
 static	cvar_t*		hashTable[FILE_HASH_SIZE];
 
-cvar_t *Cvar_Set2( const char *var_name, const char *value, bool force);
 
 /*
 ================
@@ -146,6 +145,26 @@ char *Cvar_VariableString( const char *var_name ) {
 }
 
 
+
+/*
+============
+Cvar_Flags
+============
+*/
+int Cvar_Flags(const char *var_name)
+{
+	cvar_t *var;
+	
+	if(!(var = Cvar_FindVar(var_name)))
+		return CVAR_NONEXISTENT;
+	else
+	{
+		if(var->modified)
+			return var->flags | CVAR_MODIFIED;
+		else
+			return var->flags;
+	}
+}
 /*
 ============
 Cvar_VariableStringBuffer
@@ -228,6 +247,16 @@ cvar_t *Cvar_Get( const char *var_name, const char *var_value, int flags ) {
 			// we don't have a reset string yet
 			Z_Free( var->resetString );
 			var->resetString = CopyString( var_value );
+			
+			// if there is no reset string yet this means the variable was set by the user,
+			// so force it to value given by the engine.
+			if(var->flags & CVAR_ROM)
+			{
+				if(var->latchedString)
+					Z_Free(var->latchedString);
+				
+				var->latchedString = CopyString(var_value);
+			}
 		} else if ( var_value[0] && strcmp( var->resetString, var_value ) ) {
 			Com_DPrintf( "Warning: cvar \"%s\" given initial values: \"%s\" and \"%s\"\n",
 				var_name, var->resetString, var_value );
@@ -242,13 +271,6 @@ cvar_t *Cvar_Get( const char *var_name, const char *var_value, int flags ) {
 			Z_Free( s );
 		}
 
-// use a CVAR_SET for rom sets, get won't override
-#if 0
-		// CVAR_ROM always overrides
-		if ( flags & CVAR_ROM ) {
-			Cvar_Set2( var_name, var_value, true );
-		}
-#endif
 		return var;
 	}
 
@@ -273,6 +295,8 @@ cvar_t *Cvar_Get( const char *var_name, const char *var_value, int flags ) {
 	cvar_vars = var;
 
 	var->flags = flags;
+	// note what types of cvars have been modified (userinfo, archive, serverinfo, systeminfo)
+	cvar_modifiedFlags |= var->flags;
 
 	hash = generateHashValue(var_name);
 	var->hashNext = hashTable[hash];
@@ -320,7 +344,11 @@ cvar_t *Cvar_Set2( const char *var_name, const char *value, bool force ) {
 		value = var->resetString;
 	}
 
-	if (!strcmp(value,var->string)) {
+	if((var->flags & CVAR_LATCH) && var->latchedString) {
+		if(!strcmp(value,var->latchedString))
+			return var;
+	}
+	else if (!strcmp(value,var->string)) {
 		return var;
 	}
 	// note what types of cvars have been modified (userinfo, archive, serverinfo, systeminfo)
@@ -839,6 +867,13 @@ basically a slightly modified Cvar_Get for the interpreted modules
 void Cvar_Register( vmCvar_t *vmCvar, const char *varName, const char *defaultValue, int flags ) 
 {
 	cvar_t	*cv;
+
+	// There is code in Cvar_Get to prevent CVAR_ROM cvars being changed by the
+	// user. In other words CVAR_ARCHIVE and CVAR_ROM are mutually exclusive
+	// flags. Unfortunately some historical game code (including single player
+	// baseq3) sets both flags. We unset CVAR_ROM for such cvars.
+	if ((flags & (CVAR_ARCHIVE | CVAR_ROM)) == (CVAR_ARCHIVE | CVAR_ROM))
+		flags &= ~CVAR_ROM;
 
 	cv = Cvar_Get( varName, defaultValue, flags );
 	if ( !vmCvar ) {

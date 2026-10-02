@@ -864,6 +864,8 @@ void SV_WriteDownloadToClient( SV_Client *cl , msg_t *msg )
 			}
 		}
 
+		cl->download_ = 0;
+
 		// We open the file here
 		if ( !sv_allowDownload->integer || idPack || unreferenced ||
 			( cl->downloadSize_ = FS_SV_FOpenFileRead( cl->downloadName_, &cl->download_ ) ) <= 0 )
@@ -924,6 +926,10 @@ void SV_WriteDownloadToClient( SV_Client *cl , msg_t *msg )
 			MSG_WriteString( msg, errorMessage );
 
 			*cl->downloadName_ = 0;
+			
+			if(cl->download_)
+				FS_FCloseFile(cl->download_);
+			
 			return;
 		}
  
@@ -1535,7 +1541,7 @@ static void SV_UserMove( SV_Client *cl, msg_t *msg, bool delta )
 	// also use the message acknowledge
 	key ^= cl->messageAcknowledge_;
 	// also use the last acknowledged server command in the key
-	key ^= Com_HashKey(cl->reliableCommands_[ cl->reliableAcknowledge_ & (MAX_RELIABLE_COMMANDS-1) ], 32);
+	key ^= MSG_HashKey(cl->reliableCommands_[ cl->reliableAcknowledge_ & (MAX_RELIABLE_COMMANDS-1) ], 32);
 
 	Com_Memset( &nullcmd, 0, sizeof(nullcmd) );
 	oldcmd = &nullcmd;

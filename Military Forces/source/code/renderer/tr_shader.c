@@ -1578,7 +1578,7 @@ static bool ParseShader( char **text )
 		// light <value> determines flaring in q3map, not needed here
 		else if ( !Q_stricmp(token, "light") ) 
 		{
-			token = COM_ParseExt( text, false );
+			(void)COM_ParseExt( text, false );
 			continue;
 		}
 		// cull <face>
