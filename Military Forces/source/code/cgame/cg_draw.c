@@ -120,7 +120,7 @@ int CG_Text_Width(const char *text, float scale, int limit) {
 				s += 2;
 				continue;
 			} else {
-				glyph = &font->glyphs[(int)*s]; // TTimo: FIXME: getting nasty warnings without the cast, hopefully this doesn't break the VM build
+				glyph = &font->glyphs[*s & 255];
 				out += glyph->xSkip;
 				s++;
 				count++;
@@ -162,7 +162,7 @@ int CG_Text_Height(const char *text, float scale, int limit) {
 				s += 2;
 				continue;
 			} else {
-				glyph = &font->glyphs[(int)*s]; // TTimo: FIXME: getting nasty warnings without the cast, hopefully this doesn't break the VM build
+				glyph = &font->glyphs[*s & 255];
 	      if (max < glyph->height) {
 		      max = glyph->height;
 			  }
@@ -221,7 +221,7 @@ void CG_Text_Paint(float x, float y, float scale, const vec4_t color, const char
 		}
 		count = 0;
 		while (s && *s && count < len) {
-			glyph = &font->glyphs[(int)*s];
+			glyph = &font->glyphs[*s & 255];
 			
 			// TTimo: FIXME: getting nasty warnings without the cast, hopefully this doesn't break the VM build
 			//int yadj = Assets.textFont.glyphs[text[i]].bottom + Assets.textFont.glyphs[text[i]].top;
@@ -1650,6 +1650,8 @@ static void CG_DrawCrosshair(void) {
 	refExport.DrawStretchPic( x + cg.refdef.x + 0.5 * (cg.refdef.width - w), 
 		y + cg.refdef.y + 0.5 * (cg.refdef.height - h), 
 		w, h, 0, 0, 1, 1, hShader );
+
+	refExport.SetColor( NULL );
 }
 */
 

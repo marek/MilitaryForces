@@ -94,8 +94,11 @@ UI_Utils::window_Paint( Window *w, float fadeAmount, float fadeClamp, float fade
 {
 	//float bordersize = 0;
 	vec4_t color;
-	rectDef_t fillRect = w->rect;
+	rectDef_t fillRect;
 
+	if ( w == NULL ) {
+		return;
+	}
 
 	if (debugMode_) 
 	{
@@ -103,8 +106,10 @@ UI_Utils::window_Paint( Window *w, float fadeAmount, float fadeClamp, float fade
 		dc_->drawRect(w->rect.x, w->rect.y, w->rect.w, w->rect.h, 1, color);
 	}
 
-	if (w == NULL || (w->style == 0 && w->border == 0)) 
+	if (w->style == 0 && w->border == 0) 
 		return;
+
+	fillRect = w->rect;
 
 	if (w->border != 0) 
 	{
@@ -1733,7 +1738,7 @@ UI_Utils::item_Slider_ThumbPosition( itemDef_t *item )
 	else 
 		x = item->window.rect.x;
 
-	if (editDef == NULL && item->cvar) 
+	if (!editDef || !item->cvar) 
 		return x;
 
 	value = dc_->getCVarValue(item->cvar);
@@ -4484,6 +4489,9 @@ UI_Utils::string_Alloc( const char *p )
 		}
 
 		str  = reinterpret_cast<StringDef*>(alloc(sizeof(StringDef)));
+		if (!str) {
+			return NULL;
+		}
 		str->next = NULL;
 		str->str = &strPool_[ph];
 		if (last) 

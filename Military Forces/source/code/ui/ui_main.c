@@ -248,7 +248,7 @@ int Text_Width(const char *text, float scale, int limit)
 			}
 			else 
 			{
-				glyph = &font->glyphs[(int)*s]; // TTimo: FIXME: getting nasty warnings without the cast, hopefully this doesn't break the VM build
+				glyph = &font->glyphs[*s & 255];
 				out += glyph->xSkip;
 				s++;
 				count++;
@@ -295,7 +295,7 @@ int Text_Height(const char *text, float scale, int limit)
 			} 
 			else 
 			{
-				glyph = &font->glyphs[(int)*s]; // TTimo: FIXME: getting nasty warnings without the cast, hopefully this doesn't break the VM build
+				glyph = &font->glyphs[*s & 255];
 				if (max < glyph->height)
 				{
 					max = glyph->height;
@@ -347,7 +347,7 @@ void Text_Paint(float x, float y, float scale, const vec4_t color, const char *t
 		count = 0;
 		while (s && *s && count < len) 
 		{
-			glyph = &font->glyphs[(int)*s]; // TTimo: FIXME: getting nasty warnings without the cast, hopefully this doesn't break the VM build
+			glyph = &font->glyphs[*s & 255];
       //int yadj = Assets.textFont.glyphs[text[i]].bottom + Assets.textFont.glyphs[text[i]].top;
       //float yadj = scale * (Assets.textFont.glyphs[text[i]].imageHeight - Assets.textFont.glyphs[text[i]].height);
 			if ( Q_IsColorString( s ) ) 
@@ -428,7 +428,7 @@ void Text_PaintWithCursor(float x, float y, float scale, const vec4_t color, con
 		glyph2 = &font->glyphs[ (int) cursor]; // bk001206 - possible signed char
 		while (s && *s && count < len) 
 		{
-			glyph = &font->glyphs[(int)*s]; // TTimo: FIXME: getting nasty warnings without the cast, hopefully this doesn't break the VM build
+			glyph = &font->glyphs[*s & 255];
       //int yadj = Assets.textFont.glyphs[text[i]].bottom + Assets.textFont.glyphs[text[i]].top;
       //float yadj = scale * (Assets.textFont.glyphs[text[i]].imageHeight - Assets.textFont.glyphs[text[i]].height);
 			if ( Q_IsColorString( s ) ) 
@@ -541,7 +541,7 @@ static void Text_Paint_Limit(float *maxX, float x, float y, float scale, const v
 		count = 0;
 		while (s && *s && count < len) 
 		{
-			glyph = &font->glyphs[(int)*s]; // TTimo: FIXME: getting nasty warnings without the cast, hopefully this doesn't break the VM build
+			glyph = &font->glyphs[*s & 255];
 			if ( Q_IsColorString( s ) ) 
 			{
 				memcpy( newColor, g_color_table[ColorIndex(*(s+1))], sizeof( newColor ) );
@@ -553,7 +553,7 @@ static void Text_Paint_Limit(float *maxX, float x, float y, float scale, const v
 			else 
 			{
 				float yadj = useScale * glyph->top;
-				if (Text_Width(s, useScale, 1) + x > max) 
+				if (Text_Width(s, scale, 1) + x > max) 
 				{
 					*maxX = 0;
 					break;
@@ -1402,7 +1402,7 @@ static void UI_DrawNetMapCinematic(rectDef_t *rect, float scale, const vec4_t co
 
 
 static void UI_DrawNetFilter(rectDef_t *rect, float scale, const vec4_t color, int textStyle) {
-	if (ui_serverFilterType.integer < 0 || ui_serverFilterType.integer > numServerFilters) {
+	if (ui_serverFilterType.integer < 0 || ui_serverFilterType.integer >= numServerFilters) {
 		ui_serverFilterType.integer = 0;
 	}
   Text_Paint(rect->x, rect->y, scale, color, va("Filter: %s", serverFilters[ui_serverFilterType.integer].description), 0, 0, textStyle);
@@ -1449,7 +1449,7 @@ static void UI_DrawTierMapName(rectDef_t *rect, float scale, const vec4_t color,
     i = 0;
   }
 	j = Cvar_VariableValue("ui_currentMap");
-	if (j < 0 || j > MAPS_PER_TIER) {
+	if (j < 0 || j >= MAPS_PER_TIER) {
 		j = 0;
 	}
 
@@ -1463,7 +1463,7 @@ static void UI_DrawTierGameType(rectDef_t *rect, float scale, const vec4_t color
     i = 0;
   }
 	j = Cvar_VariableValue("ui_currentMap");
-	if (j < 0 || j > MAPS_PER_TIER) {
+	if (j < 0 || j >= MAPS_PER_TIER) {
 		j = 0;
 	}
 
@@ -1691,7 +1691,7 @@ int UI_OwnerDrawWidth(int ownerDraw, float scale)
 			s = va("Source: %s", netSources[ui_netSource.integer]);
 			break;
 		case UI_NETFILTER:
-			if (ui_serverFilterType.integer < 0 || ui_serverFilterType.integer > numServerFilters) {
+			if (ui_serverFilterType.integer < 0 || ui_serverFilterType.integer >= numServerFilters) {
 				ui_serverFilterType.integer = 0;
 			}
 			s = va("Filter: %s", serverFilters[ui_serverFilterType.integer].description );
@@ -3046,6 +3046,9 @@ void UI_ServersSort(int column, bool force) {
 
 	uiInfo.serverStatus.sortKey = column;
 	qsort( &uiInfo.serverStatus.displayServers[0], uiInfo.serverStatus.numDisplayServers, sizeof(int), UI_ServersQsortCompare);
+
+	// update displayed levelshot
+	UI_FeederSelection( FEEDER_SERVERS, uiInfo.serverStatus.currentServer );
 }
 
 /*
@@ -3057,7 +3060,7 @@ static void UI_StartSinglePlayer() {
     i = 0;
   }
 	j = Cvar_VariableValue("ui_currentMap");
-	if (j < 0 || j > MAPS_PER_TIER) {
+	if (j < 0 || j >= MAPS_PER_TIER) {
 		j = 0;
 	}
 
@@ -4400,6 +4403,11 @@ static void UI_InsertServerIntoDisplayList(int num, int position) {
 		uiInfo.serverStatus.displayServers[i] = uiInfo.serverStatus.displayServers[i-1];
 	}
 	uiInfo.serverStatus.displayServers[position] = num;
+
+	// update displayed levelshot
+	if ( position == uiInfo.serverStatus.currentServer ) {
+		UI_FeederSelection( FEEDER_SERVERS, uiInfo.serverStatus.currentServer );
+	}
 }
 
 /*
@@ -5415,6 +5423,11 @@ static bool Team_Parse(char **p) {
     }
 
     if (token[0] == '{') {
+      if (uiInfo.teamCount == MAX_TEAMS) {
+        uiInfo.teamCount--;
+        Com_Printf("Too many teams, last team replaced!\n");
+      }
+
       // seven tokens per line, team name and icon, and 5 team member names
       if (!uiInfo.uiUtils.string_Parse(p, &uiInfo.teamList[uiInfo.teamCount].teamName) || 
 		  !uiInfo.uiUtils.string_Parse(p, &tempStr)) {
@@ -5437,11 +5450,8 @@ static bool Team_Parse(char **p) {
 			}
 
       Com_Printf("Loaded team %s with team icon %s.\n", uiInfo.teamList[uiInfo.teamCount].teamName, tempStr);
-      if (uiInfo.teamCount < MAX_TEAMS) {
-        uiInfo.teamCount++;
-      } else {
-        Com_Printf("Too many teams, last team replaced!\n");
-      }
+      uiInfo.teamCount++;
+
       token = COM_ParseExt(p, true);
       if (token[0] != '}') {
         return false;
@@ -5475,6 +5485,11 @@ static bool Character_Parse(char **p) {
     }
 
     if (token[0] == '{') {
+      if (uiInfo.characterCount == MAX_HEADS) {
+        uiInfo.characterCount--;
+        Com_Printf("Too many characters, last character replaced!\n");
+      }
+
       // two tokens per line, character name and sex
       if (!uiInfo.uiUtils.string_Parse(p, &uiInfo.characterList[uiInfo.characterCount].name) || 
 		  !uiInfo.uiUtils.string_Parse(p, &tempStr)) {
@@ -5495,11 +5510,7 @@ static bool Character_Parse(char **p) {
 	  }
 
       Com_Printf("Loaded %s character %s.\n", uiInfo.characterList[uiInfo.characterCount].base, uiInfo.characterList[uiInfo.characterCount].name);
-      if (uiInfo.characterCount < MAX_HEADS) {
-        uiInfo.characterCount++;
-      } else {
-        Com_Printf("Too many characters, last character replaced!\n");
-      }
+      uiInfo.characterCount++;
      
       token = COM_ParseExt(p, true);
       if (token[0] != '}') {
@@ -5533,6 +5544,11 @@ static bool Alias_Parse(char **p) {
     }
 
     if (token[0] == '{') {
+      if (uiInfo.aliasCount == MAX_ALIASES) {
+        uiInfo.aliasCount--;
+        Com_Printf("Too many aliases, last alias replaced!\n");
+      }
+
       // three tokens per line, character name, bot alias, and preferred action a - all purpose, d - defense, o - offense
       if (!uiInfo.uiUtils.string_Parse(p, &uiInfo.aliasList[uiInfo.aliasCount].name) || 
 		  !uiInfo.uiUtils.string_Parse(p, &uiInfo.aliasList[uiInfo.aliasCount].ai) || 
@@ -5542,11 +5558,7 @@ static bool Alias_Parse(char **p) {
     
       Com_Printf("Loaded character alias %s using character ai %s.\n", uiInfo.aliasList[uiInfo.aliasCount].name, 
 		  uiInfo.aliasList[uiInfo.aliasCount].ai);
-      if (uiInfo.aliasCount < MAX_ALIASES) {
-        uiInfo.aliasCount++;
-      } else {
-        Com_Printf("Too many aliases, last alias replaced!\n");
-      }
+      uiInfo.aliasCount++;
      
       token = COM_ParseExt(p, true);
       if (token[0] != '}') {

@@ -17,7 +17,7 @@ DeathmatchScoreboardMessage
 void DeathmatchScoreboardMessage( GameEntity *ent ) 
 {
 	char		entry[1024];
-	char		string[1400];
+	char		string[1000];
 	int			stringlength;
 	int			i, j;
 	GameClient	*cl;
@@ -295,6 +295,13 @@ void Cmd_LevelShot_f( GameEntity *ent )
 	{
 		SV_GameSendServerCommand( ent->s.number,// ent-g_entities, 
 			"print \"Must be in g_gametype 0 for levelshot\n\"" );
+		return;
+	}
+
+	if(!ent->client_->pers_.localClient_)
+	{
+		SV_GameSendServerCommand( ent->s.number,
+		"print \"The levelshot command must be executed by a local client\n\"");
 		return;
 	}
 
@@ -1294,7 +1301,7 @@ void Cmd_Vote_f( GameEntity *ent )
 
 	Cmd_ArgvBuffer( 1, msg, sizeof( msg ) );
 
-	if( msg[0] == 'y' || msg[1] == 'Y' || msg[1] == '1' )
+	if( tolower( msg[0] ) == 'y' || msg[0] == '1' )
 	{
 		theLevel.voteYes_++;
 		SV_SetConfigstring( CS_VOTE_YES, va("%i", theLevel.voteYes_ ) );
@@ -1505,7 +1512,7 @@ void Cmd_TeamVote_f( GameEntity *ent )
 
 	Cmd_ArgvBuffer( 1, msg, sizeof( msg ) );
 
-	if( msg[0] == 'y' || msg[1] == 'Y' || msg[1] == '1' ) 
+	if( tolower( msg[0] ) == 'y' || msg[0] == '1' ) 
 	{
 		theLevel.teamVoteYes_[cs_offset]++;
 		SV_SetConfigstring( CS_TEAMVOTE_YES + cs_offset, va("%i", theLevel.teamVoteYes_[cs_offset] ) );

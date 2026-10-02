@@ -306,7 +306,7 @@ static void CG_ConfigStringModified( void ) {
 		cg.intermissionStarted = atoi( str );
 	} else if ( num >= CS_MODELS && num < CS_MODELS+MAX_MODELS ) {
 		cgs.gameModels[ num-CS_MODELS ] = refExport.RegisterModel( str );
-	} else if ( num >= CS_SOUNDS && num < CS_SOUNDS+MAX_MODELS ) {
+	} else if ( num >= CS_SOUNDS && num < CS_SOUNDS+MAX_SOUNDS ) {
 		if ( str[0] != '*' ) {	// player specific sounds don't register here
 			cgs.gameSounds[ num-CS_SOUNDS] = S_RegisterSound( str, false );
 		}
@@ -426,6 +426,8 @@ static void CG_MapRestart( void ) {
 	cg.fraglimitWarnings = 0;
 
 	cg.timelimitWarnings = 0;
+	cg.rewardTime = 0;
+	cg.rewardStack = 0;
 
 	cg.intermissionStarted = false;
 

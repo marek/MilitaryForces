@@ -113,7 +113,7 @@ void CG_DrawRect( float x, float y, float width, float height, float size, const
 	refExport.SetColor( color );
 
   CG_DrawTopBottom(x, y, width, height, size);
-  CG_DrawSides(x, y, width, height, size);
+  CG_DrawSides(x, y + size, width, height - size * 2, size);
 
 	refExport.SetColor( NULL );
 }

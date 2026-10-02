@@ -413,6 +413,8 @@ void G_InitGame( int levelTime, int randomSeed )
 		// init some MFQ3 stuff
 		//DroneInit();
 	}
+
+	SV_SetConfigstring( CS_INTERMISSION, "" );
 }
 
 
@@ -1167,6 +1169,12 @@ void CheckExitRules()
 		return;
 	}
 
+	if ( g_timelimit.integer < 0 || g_timelimit.integer > INT_MAX / 60000 ) {
+		Com_Printf( "timelimit %i is out of range, defaulting to 0\n", g_timelimit.integer );
+		Cvar_Set( "timelimit", "0" );
+		Cvar_Update( &g_timelimit );
+	}
+
 	if( g_timelimit.integer && !theLevel.warmupTime_ ) 
 	{
 		if( theLevel.time_ - theLevel.startTime_ >= g_timelimit.integer*60000 ) 
@@ -1179,6 +1187,12 @@ void CheckExitRules()
 
 	if( theLevel.numPlayingClients_ < 2 ) 
 		return;
+
+	if ( g_fraglimit.integer < 0 ) {
+		Com_Printf( "fraglimit %i is out of range, defaulting to 0\n", g_fraglimit.integer );
+		Cvar_Set( "fraglimit", "0" );
+		Cvar_Update( &g_fraglimit );
+	}
 
 	if( g_gametype.integer < GT_CTF && g_fraglimit.integer ) 
 	{
@@ -1213,6 +1227,12 @@ void CheckExitRules()
 				return;
 			}
 		}
+	}
+
+	if ( g_capturelimit.integer < 0 ) {
+		Com_Printf( "capturelimit %i is out of range, defaulting to 0\n", g_capturelimit.integer );
+		Cvar_Set( "capturelimit", "0" );
+		Cvar_Update( &g_capturelimit );
 	}
 
 	if( g_gametype.integer >= GT_CTF && g_capturelimit.integer )
@@ -1293,7 +1313,12 @@ void CheckTournament()
 			if( theLevel.numPlayingClients_ == 2 ) 
 			{
 				// fudge by -1 to account for extra delays
-				theLevel.warmupTime_ = theLevel.time_ + ( g_warmup.integer - 1 ) * 1000;
+				if ( g_warmup.integer > 1 ) {
+					theLevel.warmupTime_ = theLevel.time_ + ( g_warmup.integer - 1 ) * 1000;
+				} else {
+					theLevel.warmupTime_ = 0;
+				}
+
 				SV_SetConfigstring( CS_WARMUP, va("%i", theLevel.warmupTime_) );
 			}
 			return;
@@ -1351,7 +1376,12 @@ void CheckTournament()
 		if( theLevel.warmupTime_ < 0 ) 
 		{
 			// fudge by -1 to account for extra delays
-			theLevel.warmupTime_ = theLevel.time_ + ( g_warmup.integer - 1 ) * 1000;
+			if ( g_warmup.integer > 1 ) {
+				theLevel.warmupTime_ = theLevel.time_ + ( g_warmup.integer - 1 ) * 1000;
+			} else {
+				theLevel.warmupTime_ = 0;
+			}
+
 			SV_SetConfigstring( CS_WARMUP, va("%i", theLevel.warmupTime_) );
 			return;
 		}

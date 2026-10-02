@@ -656,9 +656,15 @@ void ClientThink_real( GameEntity *ent )
 		msec = 200;
 
 	if( pmove_msec.integer < 8 ) 
+	{
 		Cvar_Set("pmove_msec", "8");
+		Cvar_Update(&pmove_msec);
+	}
 	else if( pmove_msec.integer > 33 ) 
+	{
 		Cvar_Set("pmove_msec", "33");
+		Cvar_Update(&pmove_msec);
+	}
 
 	if( pmove_fixed.integer || client->pers_.pmoveFixed_ ) 
 	{
