@@ -9,7 +9,9 @@ open source software. You may use, modify and redistribute it under the terms
 of the GNU GPL v2, the full text of which follows below.
 
 A few files keep their own GPL-compatible licenses, noted in the files:
-  qcommon/unzip.c      zlib license
+  qcommon/unzip.c      zlib license (minizip)
+  qcommon/ioapi.c      zlib license (minizip)
+  thirdparty/zlib-*/   zlib license (see zlib.h)
   jpeg-6/              IJG license (see jpeg-6/README)
   client/snd_adpcm.c   Stichting Mathematisch Centrum license
 

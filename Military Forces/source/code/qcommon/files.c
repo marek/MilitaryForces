@@ -215,6 +215,7 @@ or configs will never get loaded from disk!
 typedef struct fileInPack_s {
 	char					*name;		// name of the file
 	unsigned long			pos;		// file info position in zip
+	unsigned long			len;		// uncompress file size
 	struct	fileInPack_s*	next;		// next file in the hash
 } fileInPack_t;
 
@@ -278,6 +279,7 @@ typedef struct {
 	int			baseOffset;
 	int			fileSize;
 	int			zipFilePos;
+	int			zipFileLen;
 	bool	zipFile;
 	bool	streamed;
 	char		name[MAX_ZPATH];
@@ -1055,7 +1057,6 @@ int FS_FOpenFileRead( const char *filename, fileHandle_t *file, bool uniqueFILE 
 	fileInPack_t	*pakFile;
 	directory_t		*dir;
 	long			hash;
-	unz_s			*zfi;
 	FILE			*temp;
 	int				l;
 	char demoExt[16];
@@ -1187,35 +1188,35 @@ int FS_FOpenFileRead( const char *filename, fileHandle_t *file, bool uniqueFILE 
 					//	pak->referenced |= FS_UI_REF;
 					//}
 
-					if ( uniqueFILE ) {
-						// open a New file on the pakfile
-						fsh[*file].handleFiles.file.z = unzReOpen (pak->pakFilename, pak->handle);
-						if (fsh[*file].handleFiles.file.z == NULL) {
-							Com_Error (ERR_FATAL, "Couldn't reopen %s", pak->pakFilename);
-						}
-					} else {
-						fsh[*file].handleFiles.file.z = pak->handle;
-					}
-					Q_strncpyz( fsh[*file].name, filename, sizeof( fsh[*file].name ) );
-					fsh[*file].zipFile = true;
-					zfi = (unz_s *)fsh[*file].handleFiles.file.z;
-					// in case the file was New
-					temp = zfi->file;
-					// set the file position in the zip file (also sets the current file info)
-					unzSetCurrentFileInfoPosition(pak->handle, pakFile->pos);
-					// copy the file info into the unzip structure
-					Com_Memcpy( zfi, pak->handle, sizeof(unz_s) );
-					// we copy this back into the structure
-					zfi->file = temp;
-					// open the file in the zip
-					unzOpenCurrentFile( fsh[*file].handleFiles.file.z );
-					fsh[*file].zipFilePos = pakFile->pos;
+					if(uniqueFILE)
+					{
+						// open a new file on the pakfile
+						fsh[*file].handleFiles.file.z = unzOpen(pak->pakFilename);
 
-					if ( fs_debug->integer ) {
-						Com_Printf( "FS_FOpenFileRead: %s (found in '%s')\n", 
-							filename, pak->pakFilename );
+						if(fsh[*file].handleFiles.file.z == NULL)
+							Com_Error(ERR_FATAL, "Couldn't open %s", pak->pakFilename);
 					}
-					return zfi->cur_file_info.uncompressed_size;
+					else
+						fsh[*file].handleFiles.file.z = pak->handle;
+
+					Q_strncpyz(fsh[*file].name, filename, sizeof(fsh[*file].name));
+					fsh[*file].zipFile = true;
+
+					// set the file position in the zip file (also sets the current file info)
+					unzSetOffset(fsh[*file].handleFiles.file.z, pakFile->pos);
+
+					// open the file in the zip
+					unzOpenCurrentFile(fsh[*file].handleFiles.file.z);
+					fsh[*file].zipFilePos = pakFile->pos;
+					fsh[*file].zipFileLen = pakFile->len;
+
+					if(fs_debug->integer)
+					{
+						Com_Printf("FS_FOpenFileRead: %s (found in '%s')\n", 
+								filename, pak->pakFilename);
+					}
+
+					return pakFile->len;
 				}
 				pakFile = pakFile->next;
 			} while(pakFile != NULL);
@@ -1435,39 +1436,59 @@ FS_Seek
 
 =================
 */
-int FS_Seek( fileHandle_t f, long offset, int origin ) 
-{
-	int		_origin;
-
+int FS_Seek( fileHandle_t f, long offset, int origin ) {
 	if ( !fs_searchpaths ) {
-		Com_Error( ERR_FATAL, "Filesystem call made without initialization\n" );
+		Com_Error( ERR_FATAL, "Filesystem call made without initialization" );
 		return -1;
 	}
 
-	if (fsh[f].streamed) {
-		fsh[f].streamed = false;
-		Sys_StreamSeek( f, offset, origin );
-		fsh[f].streamed = true;
-	}
-
 	if (fsh[f].zipFile == true) {
-    //FIXME: this is incomplete and really, really
-    //crappy (but better than what was here before)
+		//FIXME: this is really, really crappy
+		//(but better than what was here before)
 		byte	buffer[PK3_SEEK_BUFFER_SIZE];
-		int		remainder = offset;
+		int		remainder;
+		int		currentPosition = FS_FTell( f );
 
-		if( offset < 0 || origin == FS_SEEK_END ) {
-			Com_Error( ERR_FATAL, "Negative offsets and FS_SEEK_END not implemented "
-					"for FS_Seek on pk3 file contents\n" );
-			return -1;
+		// change negative offsets into FS_SEEK_SET
+		if ( offset < 0 ) {
+			switch( origin ) {
+				case FS_SEEK_END:
+					remainder = fsh[f].zipFileLen + offset;
+					break;
+
+				case FS_SEEK_CUR:
+					remainder = currentPosition + offset;
+					break;
+
+				case FS_SEEK_SET:
+				default:
+					remainder = 0;
+					break;
+			}
+
+			if ( remainder < 0 ) {
+				remainder = 0;
+			}
+
+			origin = FS_SEEK_SET;
+		} else {
+			if ( origin == FS_SEEK_END ) {
+				remainder = fsh[f].zipFileLen - currentPosition + offset;
+			} else {
+				remainder = offset;
+			}
 		}
 
 		switch( origin ) {
 			case FS_SEEK_SET:
-				unzSetCurrentFileInfoPosition(fsh[f].handleFiles.file.z, fsh[f].zipFilePos);
+				if ( remainder == currentPosition ) {
+					return offset;
+				}
+				unzSetOffset(fsh[f].handleFiles.file.z, fsh[f].zipFilePos);
 				unzOpenCurrentFile(fsh[f].handleFiles.file.z);
 				//fallthrough
 
+			case FS_SEEK_END:
 			case FS_SEEK_CUR:
 				while( remainder > PK3_SEEK_BUFFER_SIZE ) {
 					FS_Read( buffer, PK3_SEEK_BUFFER_SIZE, f );
@@ -1475,16 +1496,15 @@ int FS_Seek( fileHandle_t f, long offset, int origin )
 				}
 				FS_Read( buffer, remainder, f );
 				return offset;
-				break;
 
 			default:
-				Com_Error( ERR_FATAL, "Bad origin in FS_Seek\n" );
+				Com_Error( ERR_FATAL, "Bad origin in FS_Seek" );
 				return -1;
-				break;
 		}
 	} else {
 		FILE *file;
 		file = FS_FileForHandle(f);
+		int _origin = SEEK_SET;
 		switch( origin ) {
 		case FS_SEEK_CUR:
 			_origin = SEEK_CUR;
@@ -1496,8 +1516,7 @@ int FS_Seek( fileHandle_t f, long offset, int origin )
 			_origin = SEEK_SET;
 			break;
 		default:
-			_origin = SEEK_CUR;
-			Com_Error( ERR_FATAL, "Bad origin in FS_Seek\n" );
+			Com_Error( ERR_FATAL, "Bad origin in FS_Seek" );
 			break;
 		}
 
@@ -1842,7 +1861,8 @@ static pack_t *FS_LoadZipFile(const char *zipfile, const char *basename)
 		strcpy( buildBuffer[i].name, filename_inzip );
 		namePtr += strlen(filename_inzip) + 1;
 		// store the file position in the zip
-		unzGetCurrentFileInfoPosition(uf, &buildBuffer[i].pos);
+		buildBuffer[i].pos = unzGetOffset(uf);
+		buildBuffer[i].len = file_info.uncompressed_size;
 		//
 		buildBuffer[i].next = pack->hashTable[hash];
 		pack->hashTable[hash] = &buildBuffer[i];
