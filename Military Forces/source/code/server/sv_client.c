@@ -1721,6 +1721,13 @@ void SV_ExecuteClientMessage( SV_Client *cl, msg_t *msg )
 		return;
 	}
 
+	// this client has acknowledged the new gamestate so it's
+	// safe to start sending it the real time again
+	if( cl->oldServerTime_ && serverId == theSV.serverId_ ){
+		Com_DPrintf( "%s acknowledged gamestate\n", cl->name_ );
+		cl->oldServerTime_ = 0;
+	}
+
 	// read optional clientCommand strings
 	do 
 	{

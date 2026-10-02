@@ -17,7 +17,8 @@ Server::Server() :
 	entityParsePoint_(0),
 	gameEntities_(0),
 	gameClients_(0),
-	restartTime_(0)
+	restartTime_(0),
+	time_(0)
 {
 	for( int i = 0; i < MAX_MODELS; ++i )
 		models_[i] = 0;
@@ -47,6 +48,7 @@ Server::clear()
 	gameEntities_ = 0;
 	gameClients_ = 0;
 	restartTime_ = 0;
+	time_ = 0;
 
 	memset(	models_, 0, sizeof(models_) );
 	memset(	configstrings_, 0, sizeof(configstrings_) );

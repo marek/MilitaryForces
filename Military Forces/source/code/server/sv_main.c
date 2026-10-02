@@ -877,7 +877,7 @@ void SV_Frame( int msec )
 		return;
 	}
 
-	if( theSV.restartTime_ && theSVS.time_ >= theSV.restartTime_ ) 
+	if( theSV.restartTime_ && theSV.time_ >= theSV.restartTime_ ) 
 	{
 		theSV.restartTime_ = 0;
 		Cbuf_AddText( "map_restart 0\n" );
@@ -913,10 +913,11 @@ void SV_Frame( int msec )
 	{
 		theSV.timeResidual_ -= frameMsec;
 		theSVS.time_ += frameMsec;
+		theSV.time_ += frameMsec;
 
 		// let everything in the world think and move
 		//VM_Call( gvm, GAME_RUN_FRAME, svs.time );
-		theSG.gameRunFrame( theSVS.time_ );
+		theSG.gameRunFrame( theSV.time_ );
 	}
 
 	if ( com_speeds->integer ) 

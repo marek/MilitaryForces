@@ -105,6 +105,8 @@ struct SV_Client
 	// buffer them into this queue, and hand them out to netchan as needed
 	Netchan_Buffer*		netchan_start_queue_;
 	Netchan_Buffer**	netchan_end_queue_;
+
+	int					oldServerTime_;
 };
 
 

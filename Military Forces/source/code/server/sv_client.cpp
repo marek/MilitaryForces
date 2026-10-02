@@ -57,7 +57,8 @@ SV_Client::SV_Client() :
 	pureAuthentic_(0),
 	gotCP_(false),
 	netchan_start_queue_(0),
-	netchan_end_queue_(0)
+	netchan_end_queue_(0),
+	oldServerTime_(0)
 {
 	memset( userinfo_, 0, sizeof( userinfo_ ) );
 	memset( reliableCommands_, 0, sizeof(reliableCommands_) );
@@ -112,6 +113,7 @@ SV_Client::clear()
 	gotCP_ = false;
 	netchan_start_queue_ = 0;
 	netchan_end_queue_ = 0;
+	oldServerTime_ = 0;
 
 	memset( userinfo_, 0, sizeof( userinfo_ ) );
 	memset( reliableCommands_, 0, sizeof(reliableCommands_) );

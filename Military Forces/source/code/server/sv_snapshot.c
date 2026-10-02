@@ -182,7 +182,17 @@ static void SV_WriteSnapshotToClient( SV_Client *client, msg_t *msg )
 
 	// send over the current server time so the client can drift
 	// its view of time to try to match
-	MSG_WriteLong (msg, theSVS.time_);
+	if( client->oldServerTime_ ) {
+		// The server has not yet got an acknowledgement of the
+		// new gamestate from this client, so continue to send it
+		// a time as if the server has not restarted. Note from
+		// the client's perspective this time is strictly speaking
+		// incorrect, but since it'll be busy loading a map at
+		// the time it doesn't really matter.
+		MSG_WriteLong (msg, theSV.time_ + client->oldServerTime_);
+	} else {
+		MSG_WriteLong (msg, theSV.time_);
+	}
 
 	// what we are delta'ing from
 	MSG_WriteByte (msg, lastframe);

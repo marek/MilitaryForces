@@ -344,7 +344,7 @@ void SV_InitGame()
 	// use the current msec count for a random seed
 	// init for this gamestate
 	//VM_Call( gvm, GAME_INIT, svs.time, Com_Milliseconds(), restart );
-	theSG.init( theSVS.time_, Com_Milliseconds() );
+	theSG.init( theSV.time_, Com_Milliseconds() );
 }
 
 

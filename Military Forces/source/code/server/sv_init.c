@@ -410,6 +410,14 @@ void SV_SpawnServer( char *server, bool killBots )
 	Cvar_Set( "nextmap", "map_restart 0");
 //	Cvar_Set( "nextmap", va("map %s", server) );
 
+	for( int i = 1; i <= sv_maxclients->integer ; i++ ) 
+	{
+		// save when the server started for each client already connected
+		SV_Client* client = theSVS.svClients_.at(i);
+		if( client && client->state_ >= SV_Client::CS_CONNECTED ) 
+			client->oldServerTime_ = theSV.time_;
+	}
+
 	// wipe the entire per-level structure
 	SV_ClearServer();
 	for ( i = 0 ; i < MAX_CONFIGSTRINGS ; i++ ) {
@@ -455,7 +463,8 @@ void SV_SpawnServer( char *server, bool killBots )
 	for ( i = 0 ;i < 3 ; i++ ) 
 	{
 		//VM_Call( gvm, GAME_RUN_FRAME, svs.time );
-		theSG.gameRunFrame( theSVS.time_ );
+		theSG.gameRunFrame( theSV.time_ );
+		theSV.time_ += 100;
 		theSVS.time_ += 100;
 	}
 
@@ -527,7 +536,8 @@ void SV_SpawnServer( char *server, bool killBots )
 
 	// run another frame to allow things to look at all the players
 	//VM_Call( gvm, GAME_RUN_FRAME, svs.time );
-	theSG.gameRunFrame( theSVS.time_ );
+	theSG.gameRunFrame( theSV.time_ );
+	theSV.time_ += 100;
 	theSVS.time_ += 100;
 
 	if ( sv_pure->integer ) 

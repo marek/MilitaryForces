@@ -239,7 +239,7 @@ static void SV_MapRestart_f()
 
 	if( delay && !Cvar_VariableValue("g_doWarmup") ) 
 	{
-		theSV.restartTime_ = theSVS.time_ + delay * 1000;
+		theSV.restartTime_ = theSV.time_ + delay * 1000;
 		SV_SetConfigstring( CS_WARMUP, va("%i", theSV.restartTime_) );
 		return;
 	}
@@ -267,6 +267,16 @@ static void SV_MapRestart_f()
 	theSV.serverId_ = com_frameTime;
 	Cvar_Set( "sv_serverid", va("%i", theSV.serverId_ ) );
 
+	// if a map_restart occurs while a client is changing maps, we need
+	// to give them the correct time so that when they finish loading
+	// they don't violate the backwards time check in cl_cgame.c
+	for( int i = 1; i <= sv_maxclients->integer ; i++ ) 
+	{
+		SV_Client* client = theSVS.svClients_.at(i);
+		if( client && client->state_ == SV_Client::CS_PRIMED ) 
+			client->oldServerTime_ = theSV.restartTime_;
+	}
+
 	// reset all the vm data in place without changing memory allocation
 	// note that we do NOT set sv.state = SS_LOADING, so configstrings that
 	// had been changed from their default values will generate broadcast updates
@@ -279,7 +289,8 @@ static void SV_MapRestart_f()
 	for( int i = 0 ;i < 3 ; i++ ) 
 	{
 		//VM_Call( gvm, GAME_RUN_FRAME, svs.time );
-		theSG.gameRunFrame( theSVS.time_ );
+		theSG.gameRunFrame( theSV.time_ );
+		theSV.time_ += 100;
 		theSVS.time_ += 100;
 	}
 
@@ -330,7 +341,8 @@ static void SV_MapRestart_f()
 
 	// run another frame to allow things to look at all the players
 	//VM_Call( gvm, GAME_RUN_FRAME, svs.time );
-	theSG.gameRunFrame( theSVS.time_ );
+	theSG.gameRunFrame( theSV.time_ );
+	theSV.time_ += 100;
 	theSVS.time_ += 100;
 }
 

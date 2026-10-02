@@ -55,6 +55,7 @@ struct Server
 	ClientList*		gameClients_;				// replacement for gameClients
 
 	int				restartTime_;
+	int				time_;
 
 protected:
 					Server();
