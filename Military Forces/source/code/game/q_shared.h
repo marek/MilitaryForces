@@ -115,6 +115,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define id386	0
 #endif
 
+#if (defined(_M_X64) || defined(__x86_64__)) && !defined(C_ONLY)
+#define idx64	1
+#else
+#define idx64	0
+#endif
+
 #define idppc	0
 #define idppc_altivec 0
 

@@ -36,6 +36,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <pwd.h>
 #include <libgen.h>
 #include <signal.h>
+#include <fenv.h>
 
 bool stdinIsATTY;
 
@@ -511,6 +512,12 @@ bool Sys_SetMaxFileLimit( void )
 	return false;
 }
 
+void Sys_SetFloatEnv(void)
+{
+	// rounding toward nearest
+	fesetround(FE_TONEAREST);
+}
+
 /*
 ==============
 Sys_PlatformInit
@@ -527,6 +534,8 @@ void Sys_PlatformInit( void )
 	signal( SIGTRAP, Sys_SigHandler );
 	signal( SIGABRT, Sys_SigHandler );
 	signal( SIGBUS, Sys_SigHandler );
+
+	Sys_SetFloatEnv();
 
 	Sys_SetMaxFileLimit( );
 
