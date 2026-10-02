@@ -819,26 +819,62 @@ void SV_WriteDownloadToClient( SV_Client *cl , msg_t *msg )
 	int curindex;
 	int rate;
 	int blockspersnap;
-	int idPack, missionPack;
+	int idPack = 0, missionPack = 0, unreferenced = 1;
 	char errorMessage[1024];
+	char pakbuf[MAX_QPATH], *pakptr;
+	int numRefPaks;
 
 	if (!*cl->downloadName_)
 		return;	// Nothing being downloaded
 
 	if (!cl->download_) 
 	{
+ 		// Chop off filename extension.
+		Com_sprintf(pakbuf, sizeof(pakbuf), "%s", cl->downloadName_);
+		pakptr = Q_strrchr(pakbuf, '.');
+		
+		if(pakptr)
+		{
+			*pakptr = '\0';
+
+			// Check for pk3 filename extension
+			if(!Q_stricmp(pakptr + 1, "pk3"))
+			{
+				const char *referencedPaks = FS_ReferencedPakNames();
+
+				// Check whether the file appears in the list of referenced
+				// paks to prevent downloading of arbitrary files.
+				Cmd_TokenizeString(referencedPaks);
+				numRefPaks = Cmd_Argc();
+
+				for(curindex = 0; curindex < numRefPaks; curindex++)
+				{
+					if(!FS_FilenameCompare(Cmd_Argv(curindex), pakbuf))
+					{
+						unreferenced = 0;
+
+						// now that we know the file is referenced,
+						// check whether it's legal to download it.
+						missionPack = FS_idPak(pakbuf, "missionpack");
+						idPack = missionPack || FS_idPak(pakbuf, "mfdata");
+
+						break;
+					}
+				}
+			}
+		}
+
 		// We open the file here
-
-		Com_Printf( "clientDownload: %d : begining \"%s\"\n", cl->clientNum_, cl->downloadName_ );
-
-		missionPack = FS_idPak(cl->downloadName_, "missionpack");
-		idPack = missionPack || FS_idPak(cl->downloadName_, "mfdata");
-
-		if ( !sv_allowDownload->integer || idPack ||
+		if ( !sv_allowDownload->integer || idPack || unreferenced ||
 			( cl->downloadSize_ = FS_SV_FOpenFileRead( cl->downloadName_, &cl->download_ ) ) <= 0 )
 		{
 			// cannot auto-download file
-			if (idPack) 
+			if(unreferenced)
+			{
+				Com_Printf("clientDownload: %d : \"%s\" is not referenced and cannot be downloaded.\n", cl->clientNum_, cl->downloadName_);
+				Com_sprintf(errorMessage, sizeof(errorMessage), "File \"%s\" is not referenced and cannot be downloaded.", cl->downloadName_);
+			}
+			else if (idPack) 
 			{
 				Com_Printf("clientDownload: %d : \"%s\" cannot download id pk3 files\n", cl->clientNum_, 
 					cl->downloadName_);
@@ -891,6 +927,8 @@ void SV_WriteDownloadToClient( SV_Client *cl , msg_t *msg )
 			return;
 		}
  
+		Com_Printf( "clientDownload: %d : beginning \"%s\"\n", cl->clientNum_, cl->downloadName_ );
+		
 		// Init
 		cl->downloadCurrentBlock_ = cl->downloadClientBlock_ = cl->downloadXmitBlock_ = 0;
 		cl->downloadCount_ = 0;
@@ -1363,8 +1401,9 @@ void SV_ExecuteClientCommand( SV_Client *cl, const char *s, bool clientOK )
 	if (clientOK) 
 	{
 		// pass unknown strings to the game
-		if (!u->name && theSV.state_ == Server::SS_GAME) 
+		if (!u->name && theSV.state_ == Server::SS_GAME && (cl->state_ == SV_Client::CS_ACTIVE || cl->state_ == SV_Client::CS_PRIMED)) 
 		{
+			Cmd_Args_Sanitize();
 			//VM_Call( gvm, GAME_CLIENT_COMMAND, cl - svs.clients );
 			theSG.clientCommand( cl->clientNum_ );
 		}
@@ -1609,7 +1648,7 @@ void SV_ExecuteClientMessage( SV_Client *cl, msg_t *msg )
 	// NOTE: when the client message is fux0red the acknowledgement numbers
 	// can be out of range, this could cause the server to send thousands of server
 	// commands which the server thinks are not yet acknowledged in SV_UpdateServerCommandsToClient
-	if (cl->reliableAcknowledge_ < cl->reliableSequence_ - MAX_RELIABLE_COMMANDS)
+	if ((cl->reliableSequence_ - cl->reliableAcknowledge_ >= MAX_RELIABLE_COMMANDS) || (cl->reliableSequence_ - cl->reliableAcknowledge_ < 0))
 	{
 		// usually only hackers create messages like this
 		// it is more annoying for them to let them hanging
@@ -1640,7 +1679,7 @@ void SV_ExecuteClientMessage( SV_Client *cl, msg_t *msg )
 		}
 		// if we can tell that the client has dropped the last
 		// gamestate we sent them, resend it
-		if ( cl->messageAcknowledge_ > cl->gamestateMessageNum_ ) 
+		if ( cl->state_ != SV_Client::CS_ACTIVE && cl->messageAcknowledge_ > cl->gamestateMessageNum_ ) 
 		{
 			Com_DPrintf( "%s : dropped gamestate, resending\n", cl->name_ );
 			SV_SendClientGameState( cl );

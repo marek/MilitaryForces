@@ -1215,7 +1215,7 @@ extern	vmCvar_t		cg_shadowDebug;
 const char *CG_ConfigString( int index );
 const char *CG_Argv( int arg );
 
-void QDECL CG_Printf( const char *msg, ... );
+void QDECL CG_Printf( const char *msg, ... ) Q_PRINTF_FUNC(1, 2);
 //void QDECL CG_Error( const char *msg, ... );
 
 void CG_StartMusic( void );
@@ -1579,7 +1579,7 @@ void Cmd_ArgvBuffer( int arg, char *buffer, int bufferLength );
 void Cmd_ArgsBuffer( char *buffer, int bufferLength );
 void Cbuf_AddText( const char *text );
 void CL_AddCgameCommand( const char *cmdName );
-void CL_AddReliableCommand( const char *cmd );
+void CL_AddReliableCommand(const char *cmd, bool isDisconnectCmd = false);
 int FS_FOpenFileByMode( const char *qpath, fileHandle_t *f, fsMode_t mode );
 void FS_FCloseFile( fileHandle_t f );
 int FS_Read2( void *buffer, int len, fileHandle_t f );

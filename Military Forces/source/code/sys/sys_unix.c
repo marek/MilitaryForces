@@ -422,6 +422,55 @@ void Sys_FreeFileList( char **list )
 }
 
 /*
+=================
+Sys_DllExtension
+
+Check if filename should be allowed to be loaded as a DLL.
+=================
+*/
+bool Sys_DllExtension( const char *name ) {
+	const char *p;
+	char c = 0;
+
+	if ( COM_CompareExtension( name, DLL_EXT ) ) {
+		return true;
+	}
+
+#ifdef __APPLE__
+	// Allow system frameworks without dylib extensions
+	// i.e., /System/Library/Frameworks/OpenAL.framework/OpenAL
+	if ( strncmp( name, "/System/Library/Frameworks/", 27 ) == 0 ) {
+		return true;
+	}
+#endif
+
+	// Check for format of filename.so.1.2.3
+	p = strstr( name, DLL_EXT "." );
+
+	if ( p ) {
+		p += strlen( DLL_EXT );
+
+		// Check if .so is only followed for periods and numbers.
+		while ( *p ) {
+			c = *p;
+
+			if ( !isdigit( c ) && c != '.' ) {
+				return false;
+			}
+
+			p++;
+		}
+
+		// Don't allow filename to end in a period. file.so., file.so.0., etc
+		if ( c != '.' ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/*
 ==============
 Sys_ErrorDialog
 

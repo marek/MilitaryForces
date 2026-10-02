@@ -365,7 +365,7 @@ extern	cvar_t	*cl_inGameVideo;
 void CL_Init (void);
 void CL_FlushMemory(void);
 void CL_ShutdownAll(void);
-void CL_AddReliableCommand( const char *cmd );
+void CL_AddReliableCommand(const char *cmd, bool isDisconnectCmd = false);
 
 void CL_StartHunkUsers( void );
 

@@ -1583,6 +1583,7 @@ extern	volatile bool	renderThreadActive;
 
 
 void *R_GetCommandBuffer( int bytes );
+void *R_GetCommandBufferReserved( int bytes, int reservedBytes );
 void RB_ExecuteRenderCommands( const void *data );
 
 void R_InitCommandBuffers( void );

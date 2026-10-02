@@ -1053,7 +1053,7 @@ void UI_Load()
 
 	char *menuSet = UI_Cvar_VariableString("ui_menuFiles");
 	if (menu && menu->window.name) {
-		strcpy(lastName, menu->window.name);
+		Q_strncpyz(lastName, menu->window.name, sizeof(lastName));
 	}
 	if (menuSet == NULL || menuSet[0] == '\0') {
 		menuSet = "ui/menus.txt";
@@ -4086,13 +4086,13 @@ void UI_RunMenuScript(char **args)
 			if (ui_netSource.integer != AS_FAVORITES)
 			{
 				char name[MAX_NAME_LENGTH];
-				char addr[MAX_NAME_LENGTH];
+				char addr[MAX_ADDRESSLENGTH];
 				int res;
 
 				LAN_GetServerInfo(ui_netSource.integer, uiInfo.serverStatus.displayServers[uiInfo.serverStatus.currentServer], buff, MAX_STRING_CHARS);
 				name[0] = addr[0] = '\0';
-				Q_strncpyz(name, 	Info_ValueForKey(buff, "hostname"), MAX_NAME_LENGTH);
-				Q_strncpyz(addr, 	Info_ValueForKey(buff, "addr"), MAX_NAME_LENGTH);
+				Q_strncpyz(name, 	Info_ValueForKey(buff, "hostname"), sizeof ( name ) );
+				Q_strncpyz(addr, 	Info_ValueForKey(buff, "addr"), sizeof ( addr ) );
 				if (strlen(name) > 0 && strlen(addr) > 0) 
 				{
 					res = LAN_AddServer(AS_FAVORITES, name, addr);
@@ -4118,10 +4118,10 @@ void UI_RunMenuScript(char **args)
 		{
 			if (ui_netSource.integer == AS_FAVORITES)
 			{
-				char addr[MAX_NAME_LENGTH];
+				char addr[MAX_ADDRESSLENGTH];
 				LAN_GetServerInfo(ui_netSource.integer, uiInfo.serverStatus.displayServers[uiInfo.serverStatus.currentServer], buff, MAX_STRING_CHARS);
 				addr[0] = '\0';
-				Q_strncpyz(addr, 	Info_ValueForKey(buff, "addr"), MAX_NAME_LENGTH);
+				Q_strncpyz(addr, 	Info_ValueForKey(buff, "addr"), sizeof ( addr ) );
 				if (strlen(addr) > 0) 
 				{
 					LAN_RemoveServer(AS_FAVORITES, addr);
@@ -4133,12 +4133,12 @@ void UI_RunMenuScript(char **args)
 			if (ui_netSource.integer == AS_FAVORITES)
 			{
 				char name[MAX_NAME_LENGTH];
-				char addr[MAX_NAME_LENGTH];
+				char addr[MAX_ADDRESSLENGTH];
 				int res;
 
 				name[0] = addr[0] = '\0';
-				Q_strncpyz(name, 	UI_Cvar_VariableString("ui_favoriteName"), MAX_NAME_LENGTH);
-				Q_strncpyz(addr, 	UI_Cvar_VariableString("ui_favoriteAddress"), MAX_NAME_LENGTH);
+				Q_strncpyz(name, 	UI_Cvar_VariableString("ui_favoriteName"), sizeof ( name ) );
+				Q_strncpyz(addr, 	UI_Cvar_VariableString("ui_favoriteAddress"), sizeof ( addr ) );
 				if (strlen(name) > 0 && strlen(addr) > 0) 
 				{
 					res = LAN_AddServer(AS_FAVORITES, name, addr);
@@ -4168,8 +4168,8 @@ void UI_RunMenuScript(char **args)
 				int selectedPlayer = Cvar_VariableValue("cg_selectedPlayer");
 				if (selectedPlayer < uiInfo.myTeamCount) 
 				{
-					strcpy(buff, orders);
-					Cbuf_ExecuteText( EXEC_APPEND, va(buff, uiInfo.teamClientNums[selectedPlayer]) );
+					Com_sprintf( buff, sizeof( buff ), orders, uiInfo.teamClientNums[selectedPlayer] );
+					Cbuf_ExecuteText( EXEC_APPEND, buff );
 					Cbuf_ExecuteText( EXEC_APPEND, "\n" );
 				} 
 				else 
@@ -4181,8 +4181,8 @@ void UI_RunMenuScript(char **args)
 						{
 							continue;
 						}
-						strcpy(buff, orders);
-						Cbuf_ExecuteText( EXEC_APPEND, va(buff, uiInfo.teamNames[i]) );
+						Com_sprintf( buff, sizeof( buff ), orders, uiInfo.teamNames[i] );
+						Cbuf_ExecuteText( EXEC_APPEND, buff );
 						Cbuf_ExecuteText( EXEC_APPEND, "\n" );
 					}
 				}
@@ -4216,8 +4216,8 @@ void UI_RunMenuScript(char **args)
 				int selectedPlayer = Cvar_VariableValue("cg_selectedPlayer");
 				if (selectedPlayer < uiInfo.myTeamCount)
 				{
-					strcpy(buff, orders);
-					Cbuf_ExecuteText( EXEC_APPEND, va(buff, uiInfo.teamClientNums[selectedPlayer]) );
+					Com_sprintf( buff, sizeof( buff ), orders, uiInfo.teamClientNums[selectedPlayer] );
+					Cbuf_ExecuteText( EXEC_APPEND, buff );
 					Cbuf_ExecuteText( EXEC_APPEND, "\n" );
 				}
 				Key_SetCatcher( Key_GetCatcher() & ~KEYCATCH_UI );
@@ -4310,7 +4310,7 @@ static int UI_MapCountByGameType(bool singlePlayer) {
 }
 
 bool UI_hasSkinForBase(const char *base, const char *team) {
-	char	test[1024];
+	char	test[MAX_QPATH];
 	
 	Com_sprintf( test, sizeof( test ), "models/players/%s/%s/lower_default.skin", base, team );
 
@@ -6759,7 +6759,7 @@ static void UI_StopServerRefresh( void )
 	if (count - uiInfo.serverStatus.numDisplayServers > 0) {
 		Com_Printf("%d servers not listed due to packet loss or pings higher than %d\n",
 						count - uiInfo.serverStatus.numDisplayServers,
-						Cvar_VariableValue("cl_maxPing"));
+						(int)Cvar_VariableValue("cl_maxPing"));
 	}
 
 }

@@ -275,7 +275,7 @@ extern	cvar_t	*sv_strictAuth;
 //
 void SV_FinalMessage (char *message);
 //void QDECL SV_SendServerCommand( client_t *cl, const char *fmt, ...);
-void QDECL SV_SendServerCommand( SV_Client *cl, const char *fmt, ...);
+void QDECL SV_SendServerCommand( SV_Client *cl, const char *fmt, ...) Q_PRINTF_FUNC(2, 3);
 
 
 void SV_AddOperatorCommands (void);

@@ -3006,7 +3006,7 @@ UI_PrecompilerTools::Directive_eval::func( SourceFile* source )
 	token.whitespace_p_ = source->scriptstack_->script_p_;
 	token.endwhitespace_p_ = source->scriptstack_->script_p_;
 	token.linescrossed_ = 0;
-	sprintf(token.string_, "%d", abs(value));
+	sprintf(token.string_, "%ld", labs(value));
 	token.type_ = TT_NUMBER;
 	token.subtype_ = TT_INTEGER|TT_LONG|TT_DECIMAL;
 	tools_->unreadSourceToken(source, &token);
@@ -3048,7 +3048,7 @@ UI_PrecompilerTools::DollarDirective_evalint::func( SourceFile* source )
 	token.whitespace_p_ = source->scriptstack_->script_p_;
 	token.endwhitespace_p_ = source->scriptstack_->script_p_;
 	token.linescrossed_ = 0;
-	sprintf(token.string_, "%d", abs(value));
+	sprintf(token.string_, "%ld", labs(value));
 	token.type_ = TT_NUMBER;
 	token.subtype_ = TT_INTEGER|TT_LONG|TT_DECIMAL;
 	token.intvalue_ = value;

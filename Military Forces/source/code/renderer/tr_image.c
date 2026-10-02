@@ -1359,6 +1359,8 @@ static void LoadJPG( const char *filename, unsigned char **pic, int *width, int 
   /* More stuff */
   JSAMPARRAY buffer;		/* Output row buffer */
   int row_stride;		/* physical row width in output buffer */
+  unsigned pixelcount;
+  unsigned char *out_converted;
   unsigned char *out;
   byte	*fbuffer;
   byte  *bbuf;
@@ -1419,11 +1421,10 @@ static void LoadJPG( const char *filename, unsigned char **pic, int *width, int 
    * In this example, we need to make an output work buffer of the right size.
    */ 
   /* JSAMPLEs per row in output buffer */
+  pixelcount = cinfo.output_width * cinfo.output_height;
   row_stride = cinfo.output_width * cinfo.output_components;
+  out = reinterpret_cast<unsigned char*>(ri.Malloc(pixelcount * 4));
 
-  out = reinterpret_cast<unsigned char*>(ri.Malloc(cinfo.output_width*cinfo.output_height*cinfo.output_components));
-
-  *pic = out;
   *width = cinfo.output_width;
   *height = cinfo.output_height;
 
@@ -1442,19 +1443,44 @@ static void LoadJPG( const char *filename, unsigned char **pic, int *width, int 
 	buffer = &bbuf;
     (void) jpeg_read_scanlines(&cinfo, buffer, 1);
   }
-
-  // clear all the alphas to 255
+  
+  // If we are processing an 8-bit JPEG (greyscale), we'll have to convert
+  // the greyscale values to RGBA.
+  if(cinfo.output_components == 1)
   {
+  	int sindex, dindex = 0;
+	unsigned char greyshade;
+
+	// allocate a new buffer for the transformed image
+  	out_converted = reinterpret_cast<unsigned char*>(ri.Malloc(pixelcount*4));
+
+	for(sindex = 0; sindex < pixelcount; sindex++)
+	{
+		greyshade = out[sindex];
+		out_converted[dindex++] = greyshade;
+		out_converted[dindex++] = greyshade;
+		out_converted[dindex++] = greyshade;
+		out_converted[dindex++] = 255;		
+	}
+	
+	ri.Free(out);
+	out = out_converted;
+  }
+  else
+  {
+	  // clear all the alphas to 255
 	  int	i, j;
 		byte	*buf;
 
-		buf = *pic;
+		buf = out;
 
 	  j = cinfo.output_width * cinfo.output_height * 4;
 	  for ( i = 3 ; i < j ; i+=4 ) {
 		  buf[i] = 255;
 	  }
   }
+
+  *pic = out;
 
   /* Step 7: Finish decompression */
 

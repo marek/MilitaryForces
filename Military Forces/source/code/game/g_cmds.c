@@ -1133,10 +1133,16 @@ void Cmd_CallVote_f( GameEntity *ent )
 	Cmd_ArgvBuffer( 1, arg1, sizeof( arg1 ) );
 	Cmd_ArgvBuffer( 2, arg2, sizeof( arg2 ) );
 
-	if( strchr( arg1, ';' ) || strchr( arg2, ';' ) ) 
-	{
-		SV_GameSendServerCommand( ent->s.number, "print \"Invalid vote string.\n\"" );
-		return;
+	// check for command separators in arg2
+	for( char *c = arg2; *c; ++c) {
+		switch(*c) {
+			case '\n':
+			case '\r':
+			case ';':
+				SV_GameSendServerCommand( ent->s.number, "print \"Invalid vote string.\n\"" );
+				return;
+			break;
+		}
 	}
 
 	if( !Q_stricmp( arg1, "map_restart" ) ) 
@@ -1356,10 +1362,16 @@ void Cmd_CallTeamVote_f( GameEntity *ent )
 		Cmd_ArgvBuffer( i, &arg2[strlen(arg2)], sizeof( arg2 ) - strlen(arg2) );
 	}
 
-	if( strchr( arg1, ';' ) || strchr( arg2, ';' ) ) 
-	{
-		SV_GameSendServerCommand( ent->s.number, "print \"Invalid vote string.\n\"" );
-		return;
+	// check for command separators in arg2
+	for( char *c = arg2; *c; ++c) {
+		switch(*c) {
+			case '\n':
+			case '\r':
+			case ';':
+				SV_GameSendServerCommand( ent->s.number, "print \"Invalid vote string.\n\"" );
+				return;
+			break;
+		}
 	}
 
 	if( !Q_stricmp( arg1, "leader" ) ) 

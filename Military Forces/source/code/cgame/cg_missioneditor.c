@@ -879,7 +879,7 @@ void ME_ExportToScript( const char* scriptname )
 	Com_sprintf( outstring, sizeof(outstring), "Overview\n{\n\tmap\t%s\n", mapname );
 	FS_Write( outstring, strlen(outstring), f );
 
-	Com_sprintf( outstring, sizeof(outstring), "\tgameset\t%d\n", cgs.gameset );
+	Com_sprintf( outstring, sizeof(outstring), "\tgameset\t%d\n", (int)cgs.gameset );
 	FS_Write( outstring, strlen(outstring), f );
 
 	Com_sprintf( outstring, sizeof(outstring), "\tgametype\t%d\n", cgs.gametype );
@@ -1029,12 +1029,12 @@ static bool ME_LoadOverviewAndEntities( char *filename,
 	len = FS_FOpenFileByMode( filename, &f, FS_READ );
 	if ( !f ) 
 	{
-		Com_Printf( va( S_COLOR_RED "file not found: %s\n", filename ) );
+		Com_Printf( S_COLOR_RED "file not found: %s\n", filename );
 		return false;
 	}
 	if ( len >= MAX_MISSION_TEXT ) 
 	{
-		Com_Printf( va( S_COLOR_RED "file too large: %s is %i, max allowed is %i", filename, len, MAX_MISSION_TEXT ) );
+		Com_Printf( S_COLOR_RED "file too large: %s is %i, max allowed is %i", filename, len, MAX_MISSION_TEXT );
 		FS_FCloseFile( f );
 		return false;
 	}
@@ -1043,7 +1043,7 @@ static bool ME_LoadOverviewAndEntities( char *filename,
 	inbuffer[len] = 0;
 	FS_FCloseFile( f );
 
-	Com_Printf( va(S_COLOR_GREEN "Successfully opened mission script: %s\n", filename) );
+	Com_Printf( S_COLOR_GREEN "Successfully opened mission script: %s\n", filename );
 
 	MF_ParseMissionScripts(inbuffer, overview, vehs, gis);
 

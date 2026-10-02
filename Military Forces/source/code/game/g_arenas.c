@@ -24,7 +24,6 @@ void UpdateTournamentInfo()
 	GameEntity* player = 0;
 	int			playerClientNum;
 	int			n, accuracy, perfect,	msglen;
-	int			buflen;//, score1, score2;
 //	bool won;
 	char		buf[32];
 	char		msg[MAX_STRING_CHARS];
@@ -70,8 +69,8 @@ void UpdateTournamentInfo()
 		n = theLevel.sortedClients_[i];
 		Com_sprintf( buf, sizeof(buf), " %i %i %i", n, theLevel.getClient(n)->ps_.persistant[PERS_RANK], 
 							theLevel.getClient(n)->ps_.persistant[PERS_SCORE] );
-		buflen = strlen( buf );
-		if( msglen + buflen + 1 >= sizeof(msg) ) 
+		msglen += strlen( buf );
+		if( msglen >= sizeof(msg) ) 
 			break;
 
 		strcat( msg, buf );

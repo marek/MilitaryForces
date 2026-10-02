@@ -319,7 +319,7 @@ LevelLocals::spawnEntity()
 		for( i = 0; i < MAX_GENTITIES; i++ ) 
 		{
 			GameEntity* currEnt = getEntity(i);
-			Com_Printf("%4i: %s\n", i, currEnt->classname_);// g_entities[i].classname);
+			Com_Printf("%4i: %s\n", (int)i, currEnt->classname_);// g_entities[i].classname);
 		}
 		Com_Error( ERR_DROP, "LevelLocals::spawnEntity: no free entities" );
 	}

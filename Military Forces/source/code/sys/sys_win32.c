@@ -435,6 +435,17 @@ void Sys_FreeFileList( char **list )
 }
 
 /*
+=================
+Sys_DllExtension
+
+Check if filename should be allowed to be loaded as a DLL.
+=================
+*/
+bool Sys_DllExtension( const char *name ) {
+	return COM_CompareExtension( name, DLL_EXT );
+}
+
+/*
 ==============
 Sys_ErrorDialog
 

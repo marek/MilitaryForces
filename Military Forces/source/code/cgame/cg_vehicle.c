@@ -41,6 +41,7 @@ static animation_t * CG_ParseLQMAnimationFile( const char *filename ) {
 	}
 	if ( len >= sizeof( text ) - 1 ) {
 		CG_Printf( "File %s too long\n", filename );
+		FS_FCloseFile( f );
 		return NULL;
 	}
 	FS_Read2( text, len, f );

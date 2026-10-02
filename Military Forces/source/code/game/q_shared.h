@@ -85,6 +85,29 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 
+#ifdef __GNUC__
+#define Q_UNUSED_VAR __attribute__((unused))
+#define Q_NO_RETURN __attribute__((noreturn))
+
+#ifdef __MINGW32__
+// For some reason MinGW wants both gnu_printf and ms_printf
+#define Q_PRINTF_FUNC(fmt, va) \
+	__attribute__((format(gnu_printf, fmt, va))) \
+	__attribute__((format(ms_printf, fmt, va)))
+#else
+#define Q_PRINTF_FUNC(fmt, va) __attribute__((format(printf, fmt, va)))
+#endif
+
+#define Q_SCANF_FUNC(fmt, va) __attribute__((format(scanf, fmt, va)))
+#define Q_ALIGN(x) __attribute__((aligned(x)))
+#else
+#define Q_UNUSED_VAR
+#define Q_NO_RETURN
+#define Q_PRINTF_FUNC(fmt, va)
+#define Q_SCANF_FUNC(fmt, va)
+#define Q_ALIGN(x)
+#endif
+
 // this is the define for determining if we have an asm version of a C function
 #if defined(_MSC_VER) && defined(_M_IX86) && !defined(C_ONLY)
 #define id386	1
@@ -107,6 +130,8 @@ float	FloatSwap (const float *f);
 
 #define	QDECL	__cdecl
 
+#define DLL_EXT ".dll"
+
 #define	PATH_SEP '\\'
 #define OS_STRING "win"
 
@@ -122,6 +147,12 @@ float	FloatSwap (const float *f);
 
 #define stricmp strcasecmp
 #define strnicmp strncasecmp
+
+#ifdef __APPLE__
+#define DLL_EXT ".dylib"
+#else
+#define DLL_EXT ".so"
+#endif
 
 #if defined(__APPLE__)
 #define OS_STRING "macos"
@@ -157,11 +188,15 @@ float	FloatSwap (const float *f);
 
 #define Q3_LITTLE_ENDIAN
 
+#define Q_vsnprintf vsnprintf
+
 #define ID_INLINE inline
 
 #define LittleShort(x) (x)
 #define LittleLong(x) (x)
 #define LittleFloat(x) (x)
+#define CopyLittleShort(dest, src) Com_Memcpy(dest, src, 2)
+#define CopyLittleLong(dest, src) Com_Memcpy(dest, src, 4)
 static inline short BigShort( short l ) { return ShortSwap( l ); }
 static inline int BigLong( int l ) { return LongSwap( l ); }
 static inline float BigFloat( float l ) { return FloatSwap( &l ); }
@@ -668,7 +703,9 @@ bool RayIntersectBox( const ray3_t* ray, const box3_t* bbox );
 float Com_Clamp( float min, float max, float value );
 
 char	*COM_SkipPath( char *pathname );
-void	COM_StripExtension( const char *in, char *out );
+void	COM_StripExtension(const char *in, char *out, int destsize);
+const char	*COM_GetExtension( const char *name );
+bool	COM_CompareExtension(const char *in, const char *ext);
 void	COM_DefaultExtension( char *path, int maxSize, const char *extension );
 
 void	COM_BeginParseSession( const char *name );
@@ -711,7 +748,7 @@ void Parse1DMatrix (char **buf_p, int x, float *m);
 void Parse2DMatrix (char **buf_p, int y, int x, float *m);
 void Parse3DMatrix (char **buf_p, int z, int y, int x, float *m);
 
-void	QDECL Com_sprintf (char *dest, int size, const char *fmt, ...);
+void	QDECL Com_sprintf (char *dest, int size, const char *fmt, ...) Q_PRINTF_FUNC(3, 4);
 
 
 // mode parm for FS_FOpenFile
@@ -781,7 +818,7 @@ float	LittleFloat (const float *l);
 
 void	Swap_Init (void);
 */
-char	* QDECL va(const char *format, ...);
+char	* QDECL va(const char *format, ...) Q_PRINTF_FUNC(1, 2);
 
 //=============================================
 
@@ -797,8 +834,8 @@ bool Info_Validate( const char *s );
 void Info_NextPair( const char **s, char *key, char *value );
 
 // this is only here so the functions in q_shared.c and bg_*.c can link
-void	QDECL Com_Error( int level, const char *error, ... );
-void	QDECL Com_Printf( const char *msg, ... );
+void	QDECL Com_Error( int level, const char *error, ... ) Q_PRINTF_FUNC(2, 3);
+void	QDECL Com_Printf( const char *msg, ... ) Q_PRINTF_FUNC(1, 2);
 
 
 /*

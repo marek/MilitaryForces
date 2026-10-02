@@ -80,9 +80,20 @@ static void CG_ParseTeamInfo( void ) {
 	int		client;
 
 	numSortedTeamPlayers = atoi( CG_Argv( 1 ) );
+	if( numSortedTeamPlayers < 0 || numSortedTeamPlayers > TEAM_MAXOVERLAY )
+	{
+		Com_Error( ERR_DROP, "CG_ParseTeamInfo: numSortedTeamPlayers out of range (%d)",
+				numSortedTeamPlayers );
+		return;
+	}
 
 	for ( i = 0 ; i < numSortedTeamPlayers ; i++ ) {
 		client = atoi( CG_Argv( i * 6 + 2 ) );
+		if( client < 0 || client >= MAX_CLIENTS )
+		{
+		  Com_Error( ERR_DROP, "CG_ParseTeamInfo: bad client number: %d", client );
+		  return;
+		}
 
 		sortedTeamPlayers[i] = client;
 
@@ -198,26 +209,36 @@ void CG_ShaderStateChanged(void) {
 	char timeOffset[16];
 	const char *o;
 	char *n,*t;
+	int length;
 
 	o = CG_ConfigString( CS_SHADERSTATE );
 	while (o && *o) {
 		n = const_cast<char *>(strstr(o, "="));
 		if (n && *n) {
-			strncpy(originalShader, o, n-o);
-			originalShader[n-o] = 0;
+			length = n-o+1;
+			if (length > sizeof(originalShader)) {
+				length = sizeof(originalShader);
+			}
+			Q_strncpyz(originalShader, o, length);
 			n++;
 			t = strstr(n, ":");
 			if (t && *t) {
-				strncpy(newShader, n, t-n);
-				newShader[t-n] = 0;
+				length = t-n+1;
+				if (length > sizeof(newShader)) {
+					length = sizeof(newShader);
+				}
+				Q_strncpyz(newShader, n, length);
 			} else {
 				break;
 			}
 			t++;
 			o = strstr(t, "@");
 			if (o) {
-				strncpy(timeOffset, t, o-t);
-				timeOffset[o-t] = 0;
+				length = o-t+1;
+				if (length > sizeof(timeOffset)) {
+					length = sizeof(timeOffset);
+				}
+				Q_strncpyz(timeOffset, t, length);
 				o++;
 				refExport.RemapShader( originalShader, newShader, timeOffset );
 			}
@@ -280,7 +301,7 @@ static void CG_ConfigStringModified( void ) {
 		cgs.teamVoteNo[num-CS_TEAMVOTE_NO] = atoi( str );
 		cgs.teamVoteModified[num-CS_TEAMVOTE_NO] = true;
 	} else if ( num >= CS_TEAMVOTE_STRING && num <= CS_TEAMVOTE_STRING + 1) {
-		Q_strncpyz( cgs.teamVoteString[num-CS_TEAMVOTE_STRING], str, sizeof( cgs.teamVoteString ) );
+		Q_strncpyz( cgs.teamVoteString[num-CS_TEAMVOTE_STRING], str, sizeof( cgs.teamVoteString[0] ) );
 	} else if ( num == CS_INTERMISSION ) {
 		cg.intermissionStarted = atoi( str );
 	} else if ( num >= CS_MODELS && num < CS_MODELS+MAX_MODELS ) {

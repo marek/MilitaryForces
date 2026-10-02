@@ -510,6 +510,26 @@ FS_CopyFile
 Copy a fully specified file from one place to another
 =================
 */
+/*
+=================
+FS_CheckFilenameIsMutable
+
+ERR_FATAL if trying to maniuplate a file with the platform library, QVM, or pk3 extension
+=================
+ */
+static void FS_CheckFilenameIsMutable( const char *filename,
+		const char *function )
+{
+	// Check if the filename ends with the library, QVM, or pk3 extension
+	if( Sys_DllExtension( filename )
+		|| COM_CompareExtension( filename, ".qvm" )
+		|| COM_CompareExtension( filename, ".pk3" ) )
+	{
+		Com_Error( ERR_FATAL, "%s: Not allowed to manipulate '%s' due "
+			"to %s extension", function, filename, COM_GetExtension( filename ) );
+	}
+}
+
 static void FS_CopyFile( char *fromOSPath, char *toOSPath ) 
 {
 	FILE	*f;
@@ -517,6 +537,8 @@ static void FS_CopyFile( char *fromOSPath, char *toOSPath )
 	byte	*buf;
 
 	Com_Printf( "copy %s to %s\n", fromOSPath, toOSPath );
+
+	FS_CheckFilenameIsMutable( toOSPath, __func__ );
 
 	if (strstr(fromOSPath, "journal.dat") || strstr(fromOSPath, "journaldata.dat")) 
 	{
@@ -564,6 +586,8 @@ FS_Remove
 ===========
 */
 static void FS_Remove( const char *osPath ) {
+	FS_CheckFilenameIsMutable( osPath, __func__ );
+
 	remove( osPath );
 }
 
@@ -639,6 +663,8 @@ fileHandle_t FS_SV_FOpenFileWrite( const char *filename ) {
 	if ( fs_debug->integer ) {
 		Com_Printf( "FS_SV_FOpenFileWrite: %s\n", ospath );
 	}
+
+	FS_CheckFilenameIsMutable( ospath, __func__ );
 
 	if( FS_CreatePath( ospath ) ) {
 		return 0;
@@ -746,7 +772,7 @@ FS_SV_Rename
 
 ===========
 */
-void FS_SV_Rename( const char *from, const char *to ) {
+void FS_SV_Rename( const char *from, const char *to, bool safe ) {
 	char			*from_ospath, *to_ospath;
 
 	if ( !fs_searchpaths ) {
@@ -763,6 +789,10 @@ void FS_SV_Rename( const char *from, const char *to ) {
 
 	if ( fs_debug->integer ) {
 		Com_Printf( "FS_SV_Rename: %s --> %s\n", from_ospath, to_ospath );
+	}
+
+	if ( safe ) {
+		FS_CheckFilenameIsMutable( to_ospath, __func__ );
 	}
 
 	if (rename( from_ospath, to_ospath )) {
@@ -796,6 +826,8 @@ void FS_Rename( const char *from, const char *to ) {
 	if ( fs_debug->integer ) {
 		Com_Printf( "FS_Rename: %s --> %s\n", from_ospath, to_ospath );
 	}
+
+	FS_CheckFilenameIsMutable( to_ospath, __func__ );
 
 	if (rename( from_ospath, to_ospath )) {
 		// Failed, try copying it and deleting the original
@@ -862,6 +894,8 @@ fileHandle_t FS_FOpenFileWrite( const char *filename ) {
 		Com_Printf( "FS_FOpenFileWrite: %s\n", ospath );
 	}
 
+	FS_CheckFilenameIsMutable( ospath, __func__ );
+
 	if( FS_CreatePath( ospath ) ) {
 		return 0;
 	}
@@ -908,6 +942,8 @@ fileHandle_t FS_FOpenFileAppend( const char *filename ) {
 		Com_Printf( "FS_FOpenFileAppend: %s\n", ospath );
 	}
 
+	FS_CheckFilenameIsMutable( ospath, __func__ );
+
 	if( FS_CreatePath( ospath ) ) {
 		return 0;
 	}
@@ -949,11 +985,11 @@ int FS_FilenameCompare( const char *s1, const char *s2 ) {
 		}
 		
 		if (c1 != c2) {
-			return -1;		// strings not equal
+			return true;		// strings not equal
 		}
 	} while (c1);
 	
-	return 0;		// strings are equal
+	return false;		// strings are equal
 }
 
 /*

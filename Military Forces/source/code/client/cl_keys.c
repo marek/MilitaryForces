@@ -636,7 +636,7 @@ void Message_Key( int key ) {
 
 
 
-			CL_AddReliableCommand( buffer );
+			CL_AddReliableCommand(buffer, false);
 		}
 		cls.keyCatchers &= ~KEYCATCH_MESSAGE;
 		Field_Clear( &chatField );
@@ -979,7 +979,7 @@ void CL_InitKeyCommands( void ) {
 CL_AddKeyUpCommands
 ===================
 */
-void CL_AddKeyUpCommands( int key, char *kb ) {
+void CL_AddKeyUpCommands( int key, char *kb, unsigned time ) {
 	int i;
 	char button[1024], *buttonPtr;
 	char	cmd[1024];
@@ -1134,7 +1134,7 @@ void CL_KeyEvent (int key, bool down, unsigned time) {
 	if (!down) {
 		kb = keys[key].binding;
 
-		CL_AddKeyUpCommands( key, kb );
+		CL_AddKeyUpCommands( key, kb, time );
 
 		if ( (cls.keyCatchers & KEYCATCH_UI) && theUI.isInitialized() ) //&& uivm ) 
 		{
@@ -1284,7 +1284,7 @@ void Key_ClearStates()
 {
 	int		i;
 
-	anykeydown = false;
+	anykeydown = 0;
 
 	for ( i=0 ; i < MAX_KEYS ; i++ ) {
 		if ( keys[i].down ) {

@@ -903,7 +903,7 @@ static void MF_ParseEntities( char **buf,
 		token = COM_Parse( buf );
 		if( !token[0] ) 
 		{
-			Com_Printf(va("Token: '%s' - END\n", token));
+			Com_Printf("Token: '%s' - END\n", token);
 			break;
 		}
 		else if( !strcmp(token, "Vehicle" ) )
@@ -920,12 +920,12 @@ static void MF_ParseEntities( char **buf,
 		}
 		else if( !strcmp( token, "}" ) ) 
 		{
-			Com_Printf(va("End of Entities\n"));
+			Com_Printf("End of Entities\n");
 			break;
 		}
 		else
 		{
-			Com_Printf(va(S_COLOR_RED "Invalid Token - parsing cancelled", token));
+			Com_Printf(S_COLOR_RED "Invalid Token '%s' - parsing cancelled\n", token);
 			break;
 		}
 	}
@@ -946,7 +946,7 @@ void MF_ParseMissionScripts( char *buf,
 		token = COM_Parse( &buf );
 		if( !token[0] ) 
 		{
-			//Com_Printf(va("Token: '%s' - END\n", token));
+			//Com_Printf("Token: '%s' - END\n", token);
 			break;
 		}
 		else if( !strcmp(token, "Overview" ) )
@@ -961,7 +961,7 @@ void MF_ParseMissionScripts( char *buf,
 		}
 		else
 		{
-			Com_Printf(va(S_COLOR_RED "Invalid Token - parsing cancelled", token));
+			Com_Printf(S_COLOR_RED "Invalid Token '%s' - parsing cancelled\n", token);
 			break;
 		}
 	}

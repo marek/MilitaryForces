@@ -1518,6 +1518,7 @@ UI_Utils::item_Text_Wrapped_Paint( itemDef_t *item )
 	char text[1024];
 	const char *p, *start, *textPtr;
 	char buff[1024];
+	int length;
 	int width, height;
 	float x, y;
 	vec4_t color;
@@ -1552,11 +1553,14 @@ UI_Utils::item_Text_Wrapped_Paint( itemDef_t *item )
 	p = strchr(textPtr, '\r');
 	while (p && *p) 
 	{
-		strncpy(buff, start, p-start+1);
-		buff[p-start] = '\0';
+		length = p-start+1;
+		if (length > sizeof(buff)) {
+			length = sizeof(buff);
+		}
+		Q_strncpyz(buff, start, length);
 		dc_->drawText(x, y, item->textscale, color, buff, 0, 0, item->textStyle);
 		y += height + 5;
-		start += p - start + 1;
+		start += length;
 		p = strchr(p+1, '\r');
 	}
 	dc_->drawText(x, y, item->textscale, color, start, 0, 0, item->textStyle);
@@ -3966,7 +3970,7 @@ UI_Utils::pc_SourceError(int handle, char *format, ...)
 	static char string[4096];
 
 	va_start (argptr, format);
-	vsprintf (string, format, argptr);
+	Q_vsnprintf (string, sizeof(string), format, argptr);
 	va_end (argptr);
 
 	filename[0] = '\0';

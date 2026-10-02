@@ -132,18 +132,26 @@ The given command will be transmitted to the server, and is gauranteed to
 not have future usercmd_t executed before it is executed
 ======================
 */
-void CL_AddReliableCommand( const char *cmd ) 
+void CL_AddReliableCommand(const char *cmd, bool isDisconnectCmd)
 {
-	int		index;
-
+	int unacknowledged = clc.reliableSequence - clc.reliableAcknowledge;
+	
 	// if we would be losing an old command that hasn't been acknowledged,
 	// we must drop the connection
-	if ( clc.reliableSequence - clc.reliableAcknowledge > MAX_RELIABLE_COMMANDS ) {
-		Com_Error( ERR_DROP, "Client command overflow" );
+	// also leave one slot open for the disconnect command in this case.
+	
+	if (!com_errorEntered &&
+		(
+			(isDisconnectCmd && unacknowledged > MAX_RELIABLE_COMMANDS) ||
+			(!isDisconnectCmd && unacknowledged >= MAX_RELIABLE_COMMANDS)
+		)
+	   )
+	{
+		Com_Error(ERR_DROP, "Client command overflow");
 	}
-	clc.reliableSequence++;
-	index = clc.reliableSequence & ( MAX_RELIABLE_COMMANDS - 1 );
-	Q_strncpyz( clc.reliableCommands[ index ], cmd, sizeof( clc.reliableCommands[ index ] ) );
+
+	Q_strncpyz(clc.reliableCommands[++clc.reliableSequence & (MAX_RELIABLE_COMMANDS - 1)],
+		   cmd, sizeof(*clc.reliableCommands));
 }
 
 /*
@@ -226,7 +234,7 @@ void CL_StopRecord_f( void ) {
 CL_DemoFilename
 ================== 
 */  
-void CL_DemoFilename( int number, char *fileName ) {
+void CL_DemoFilename( int number, char *fileName, int fileNameSize ) {
 	int		a,b,c,d;
 
 	if ( number < 0 || number > 9999 ) {
@@ -242,7 +250,7 @@ void CL_DemoFilename( int number, char *fileName ) {
 	number -= c*10;
 	d = number;
 
-	Com_sprintf( fileName, MAX_OSPATH, "demo%i%i%i%i"
+	Com_sprintf( fileName, fileNameSize, "demo%i%i%i%i"
 		, a, b, c, d );
 }
 
@@ -297,7 +305,7 @@ void CL_Record_f( void ) {
 
 		// scan for a free demo name
 		for ( number = 0 ; number <= 9999 ; number++ ) {
-			CL_DemoFilename( number, demoName );
+			CL_DemoFilename( number, demoName, sizeof( demoName ) );
 			Com_sprintf (name, sizeof(name), "demos/%s.dm_%d", demoName, PROTOCOL_VERSION );
 
 			len = FS_ReadFile( name, NULL );
@@ -762,7 +770,7 @@ void CL_Disconnect( bool showMainMenu ) {
 	// send a disconnect message to the server
 	// send it a few times in case one is dropped
 	if ( cls.state >= CA_CONNECTED ) {
-		CL_AddReliableCommand( "disconnect" );
+		CL_AddReliableCommand("disconnect", true);
 		CL_WritePacket();
 		CL_WritePacket();
 		CL_WritePacket();
@@ -808,9 +816,9 @@ void CL_ForwardCommandToServer( const char *string ) {
 	}
 
 	if ( Cmd_Argc() > 1 ) {
-		CL_AddReliableCommand( string );
+		CL_AddReliableCommand(string, false);
 	} else {
-		CL_AddReliableCommand( cmd );
+		CL_AddReliableCommand(cmd, false);
 	}
 }
 //
@@ -958,7 +966,7 @@ void CL_ForwardToServer_f( void ) {
 	
 	// don't forward the first argument
 	if ( Cmd_Argc() > 1 ) {
-		CL_AddReliableCommand( Cmd_Args() );
+		CL_AddReliableCommand(Cmd_Args(), false);
 	}
 }
 
@@ -1101,6 +1109,7 @@ void CL_Connect_f()
 	Cvar_Set( "cl_currentServerAddress", server );
 }
 
+#define MAX_RCON_MESSAGE 1024
 
 /*
 =====================
@@ -1111,7 +1120,7 @@ CL_Rcon_f
 =====================
 */
 void CL_Rcon_f( void ) {
-	char	message[1024];
+	char	message[MAX_RCON_MESSAGE];
 	netadr_t	to;
 
 	if ( !rcon_client_password->string ) {
@@ -1126,12 +1135,12 @@ void CL_Rcon_f( void ) {
 	message[3] = -1;
 	message[4] = 0;
 
-	strcat (message, "rcon ");
+	Q_strcat (message, MAX_RCON_MESSAGE, "rcon ");
 
-	strcat (message, rcon_client_password->string);
-	strcat (message, " ");
+	Q_strcat (message, MAX_RCON_MESSAGE, rcon_client_password->string);
+	Q_strcat (message, MAX_RCON_MESSAGE, " ");
 
-	strcat (message, Cmd_Cmd()+5);
+	Q_strcat (message, MAX_RCON_MESSAGE, Cmd_Cmd()+5);
 
 	if ( cls.state >= CA_CONNECTED ) {
 		to = clc.netchan.remoteAddress;
@@ -1182,7 +1191,7 @@ CL_ResetPureClientAtServer
 =================
 */
 void CL_ResetPureClientAtServer( void ) {
-	CL_AddReliableCommand( va("vdr") );
+	CL_AddReliableCommand(va("vdr"), false);
 }
 
 /*
@@ -1403,7 +1412,7 @@ void CL_BeginDownload( const char *localName, const char *remoteName ) {
 	clc.downloadBlock = 0; // Starting New file
 	clc.downloadCount = 0;
 
-	CL_AddReliableCommand( va("download %s", remoteName) );
+	CL_AddReliableCommand(va("download %s", remoteName), false);
 }
 
 /*
@@ -1502,9 +1511,9 @@ Resend a connect message if the last one has timed out
 */
 void CL_CheckForResend() 
 {
-	int		port, i;
+	int		port;
 	char	info[MAX_INFO_STRING];
-	char	data[MAX_INFO_STRING];
+	char	data[MAX_INFO_STRING + 10];
 
 	// don't send anything if playing back a demo
 	if ( clc.demoplaying )
@@ -1540,19 +1549,8 @@ void CL_CheckForResend()
 		Info_SetValueForKey( info, "qport", va("%i", port ) );
 		Info_SetValueForKey( info, "challenge", va("%i", clc.challenge ) );
 		
-		strcpy(data, "connect ");
-		// TTimo adding " " around the userinfo string to avoid truncated userinfo on the server
-		//   (Com_TokenizeString tokenizes around spaces)
-		data[8] = '"';
-
-		for(i=0;i<strlen(info);i++) 
-			data[9+i] = info[i];	// + (clc.challenge)&0x3;
-
-		data[9+i] = '"';
-		data[10+i] = 0;
-
-		// NOTE TTimo don't forget to set the right data length!
-		NET_OutOfBandData( NS_CLIENT, clc.serverAddress, reinterpret_cast<byte*>(&data[0]), i+10 );
+		Com_sprintf( data, sizeof(data), "connect \"%s\"", info );
+		NET_OutOfBandData( NS_CLIENT, clc.serverAddress, reinterpret_cast<byte*>(data), strlen ( data ) );
 		// the most current userinfo has been sent, so watch for any
 		// newer changes to userinfo variables
 		cvar_modifiedFlags &= ~CVAR_USERINFO;
@@ -1995,7 +1993,7 @@ void CL_CheckUserinfo()
 	// send a reliable userinfo update if needed
 	if ( cvar_modifiedFlags & CVAR_USERINFO ) {
 		cvar_modifiedFlags &= ~CVAR_USERINFO;
-		CL_AddReliableCommand( va("userinfo \"%s\"", Cvar_InfoString( CVAR_USERINFO ) ) );
+		CL_AddReliableCommand(va("userinfo \"%s\"", Cvar_InfoString( CVAR_USERINFO ) ), false);
 	}
 
 }

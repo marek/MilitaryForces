@@ -183,6 +183,14 @@ void QDECL SV_SendServerCommand( SV_Client *cl, const char *fmt, ... )
 	Q_vsnprintf ((char *)message, sizeof(message), fmt,argptr);
 	va_end (argptr);
 
+	// Fix to http://aluigi.altervista.org/adv/q3msgboom-adv.txt
+	// The actual cause of the bug is probably further downstream
+	// and should maybe be addressed later, but this certainly
+	// fixes the problem for now
+	if ( strlen ((char *)message) > 1022 ) {
+		return;
+	}
+
 	if( cl != NULL ) 
 	{
 		SV_AddServerCommand( cl, (char *)message );
@@ -323,7 +331,7 @@ the simple info query.
 void SVC_Status( netadr_t from ) 
 {
 	// ignore if we are in single player
-	if ( Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER ) 
+	if ( Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER || Cvar_VariableValue("ui_singlePlayerActive")) 
 		return;
 
 	char	infostring[MAX_INFO_STRING];
@@ -456,7 +464,7 @@ void SVC_RemoteCommand( netadr_t from, msg_t *msg )
 	char *cmd_aux;
 
 	time = Com_Milliseconds();
-	if (time<(lasttime+500)) 
+	if ( (unsigned)( time - lasttime ) < 500u ) 
 		return;
 
 	lasttime = time;

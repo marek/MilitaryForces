@@ -106,13 +106,10 @@ int	overflows;
 // negative bit values include signs
 void MSG_WriteBits( msg_t *msg, int value, int bits ) {
 	int	i;
-//	FILE*	fp;
 
 	oldsize += bits;
 
-	// this isn't an exact overflow check, but close enough
-	if ( msg->maxsize - msg->cursize < 4 ) {
-		msg->overflowed = true;
+	if ( msg->overflowed ) {
 		return;
 	}
 
@@ -120,64 +117,60 @@ void MSG_WriteBits( msg_t *msg, int value, int bits ) {
 		Com_Error( ERR_DROP, "MSG_WriteBits: bad bits %i", bits );
 	}
 
-	// check for overflows
-	if ( bits != 32 ) {
-		if ( bits > 0 ) {
-			if ( value > ( ( 1 << bits ) - 1 ) || value < 0 ) {
-				overflows++;
-			}
-		} else {
-			int	r;
-
-			r = 1 << (bits-1);
-
-			if ( value >  r - 1 || value < -r ) {
-				overflows++;
-			}
-		}
-	}
 	if ( bits < 0 ) {
 		bits = -bits;
 	}
-	if (msg->oob) {
-		if (bits==8) {
+
+	if ( msg->oob ) {
+		if ( msg->cursize + ( bits >> 3 ) > msg->maxsize ) {
+			msg->overflowed = true;
+			return;
+		}
+
+		if ( bits == 8 ) {
 			msg->data[msg->cursize] = value;
 			msg->cursize += 1;
 			msg->bit += 8;
-		} else if (bits==16) {
-			unsigned short *sp = (unsigned short *)&msg->data[msg->cursize];
-			*sp = LittleShort(value);
+		} else if ( bits == 16 ) {
+			short temp = value;
+
+			CopyLittleShort( &msg->data[msg->cursize], &temp );
 			msg->cursize += 2;
 			msg->bit += 16;
-		} else if (bits==32) {
-			unsigned int *ip = (unsigned int *)&msg->data[msg->cursize];
-			*ip = LittleLong(value);
+		} else if ( bits==32 ) {
+			CopyLittleLong( &msg->data[msg->cursize], &value );
 			msg->cursize += 4;
-			msg->bit += 8;
+			msg->bit += 32;
 		} else {
-			Com_Error(ERR_DROP, "can't read %d bits\n", bits);
+			Com_Error( ERR_DROP, "can't write %d bits", bits );
 		}
 	} else {
-//		fp = fopen("c:\\netchan.bin", "a");
-		value &= (0xffffffff>>(32-bits));
-		if (bits&7) {
+		value &= (0xffffffff >> (32 - bits));
+		if ( bits&7 ) {
 			int nbits;
 			nbits = bits&7;
-			for(i=0;i<nbits;i++) {
-				Huff_putBit((value&1), msg->data, &msg->bit);
-				value = (value>>1);
+			if ( msg->bit + nbits >= msg->maxsize << 3 ) {
+				msg->overflowed = true;
+				return;
+			}
+			for( i = 0; i < nbits; i++ ) {
+				Huff_putBit( (value & 1), msg->data, &msg->bit );
+				value = (value >> 1);
 			}
 			bits = bits - nbits;
 		}
-		if (bits) {
-			for(i=0;i<bits;i+=8) {
-//				fwrite(bp, 1, 1, fp);
-				Huff_offsetTransmit (&msgHuff.compressor, (value&0xff), msg->data, &msg->bit);
-				value = (value>>8);
+		if ( bits ) {
+			for( i = 0; i < bits; i += 8 ) {
+				Huff_offsetTransmit( &msgHuff.compressor, (value & 0xff), msg->data, &msg->bit, msg->maxsize << 3 );
+				value = (value >> 8);
+
+				if ( msg->bit >= msg->maxsize << 3 ) {
+					msg->overflowed = true;
+					return;
+				}
 			}
 		}
-		msg->cursize = (msg->bit>>3)+1;
-//		fclose(fp);
+		msg->cursize = (msg->bit >> 3) + 1;
 	}
 }
 
@@ -187,6 +180,10 @@ int MSG_ReadBits( msg_t *msg, int bits ) {
 	bool	sgn;
 	int			i, nbits;
 //	FILE*	fp;
+
+	if ( msg->readcount > msg->cursize ) {
+		return 0;
+	}
 
 	value = 0;
 
@@ -198,27 +195,42 @@ int MSG_ReadBits( msg_t *msg, int bits ) {
 	}
 
 	if (msg->oob) {
-		if (bits==8) {
+		if (msg->readcount + (bits>>3) > msg->cursize) {
+			msg->readcount = msg->cursize + 1;
+			return 0;
+		}
+
+		if(bits==8)
+		{
 			value = msg->data[msg->readcount];
 			msg->readcount += 1;
 			msg->bit += 8;
-		} else if (bits==16) {
-			unsigned short *sp = (unsigned short *)&msg->data[msg->readcount];
-			value = LittleShort(*sp);
+		}
+		else if(bits==16)
+		{
+			short temp;
+			
+			CopyLittleShort(&temp, &msg->data[msg->readcount]);
+			value = temp;
 			msg->readcount += 2;
 			msg->bit += 16;
-		} else if (bits==32) {
-			unsigned int *ip = (unsigned int *)&msg->data[msg->readcount];
-			value = LittleLong(*ip);
+		}
+		else if(bits==32)
+		{
+			CopyLittleLong(&value, &msg->data[msg->readcount]);
 			msg->readcount += 4;
 			msg->bit += 32;
-		} else {
-			Com_Error(ERR_DROP, "can't read %d bits\n", bits);
 		}
+		else
+			Com_Error(ERR_DROP, "can't read %d bits", bits);
 	} else {
 		nbits = 0;
 		if (bits&7) {
 			nbits = bits&7;
+			if (msg->bit + nbits > msg->cursize << 3) {
+				msg->readcount = msg->cursize + 1;
+				return 0;
+			}
 			for(i=0;i<nbits;i++) {
 				value |= (Huff_getBit(msg->data, &msg->bit)<<i);
 			}
@@ -227,15 +239,20 @@ int MSG_ReadBits( msg_t *msg, int bits ) {
 		if (bits) {
 //			fp = fopen("c:\\netchan.bin", "a");
 			for(i=0;i<bits;i+=8) {
-				Huff_offsetReceive (msgHuff.decompressor.tree, &get, msg->data, &msg->bit);
+				Huff_offsetReceive (msgHuff.decompressor.tree, &get, msg->data, &msg->bit, msg->cursize<<3);
 //				fwrite(&get, 1, 1, fp);
 				value |= (get<<(i+nbits));
+
+				if (msg->bit > msg->cursize<<3) {
+					msg->readcount = msg->cursize + 1;
+					return 0;
+				}
 			}
 //			fclose(fp);
 		}
 		msg->readcount = (msg->bit>>3)+1;
 	}
-	if ( sgn ) {
+	if ( sgn && bits > 0 && bits < 32 ) {
 		if ( value & ( 1 << ( bits - 1 ) ) ) {
 			value |= -1 ^ ( ( 1 << bits ) - 1 );
 		}
@@ -673,8 +690,14 @@ void MSG_ReadDeltaUsercmd( msg_t *msg, usercmd_t *from, usercmd_t *to ) {
 	to->angles[1] = MSG_ReadDelta( msg, from->angles[1], 16);
 	to->angles[2] = MSG_ReadDelta( msg, from->angles[2], 16);
 	to->forwardmove = MSG_ReadDelta( msg, from->forwardmove, 8);
+	if( to->forwardmove == -128 )
+		to->forwardmove = -127;
 	to->rightmove = MSG_ReadDelta( msg, from->rightmove, 8);
+	if( to->rightmove == -128 )
+		to->rightmove = -127;
 	to->upmove = MSG_ReadDelta( msg, from->upmove, 8);
+	if( to->upmove == -128 )
+		to->upmove = -127;
 	to->buttons = MSG_ReadDelta( msg, from->buttons, 16);
 	to->weapon = MSG_ReadDelta( msg, from->weapon, 8);
 }
@@ -734,8 +757,14 @@ void MSG_ReadDeltaUsercmdKey( msg_t *msg, int key, usercmd_t *from, usercmd_t *t
 		to->angles[1] = MSG_ReadDeltaKey( msg, key, from->angles[1], 16);
 		to->angles[2] = MSG_ReadDeltaKey( msg, key, from->angles[2], 16);
 		to->forwardmove = MSG_ReadDeltaKey( msg, key, from->forwardmove, 8);
+		if( to->forwardmove == -128 )
+			to->forwardmove = -127;
 		to->rightmove = MSG_ReadDeltaKey( msg, key, from->rightmove, 8);
+		if( to->rightmove == -128 )
+			to->rightmove = -127;
 		to->upmove = MSG_ReadDeltaKey( msg, key, from->upmove, 8);
+		if( to->upmove == -128 )
+			to->upmove = -127;
 		to->buttons = MSG_ReadDeltaKey( msg, key, from->buttons, 16);
 		to->weapon = MSG_ReadDeltaKey( msg, key, from->weapon, 8);
 	} else {
@@ -1013,6 +1042,10 @@ void MSG_ReadDeltaEntity( msg_t *msg, entityState_t *from, entityState_t *to,
 
 	numFields = sizeof(entityStateFields)/sizeof(entityStateFields[0]);
 	lc = MSG_ReadByte(msg);
+
+	if ( lc > numFields || lc < 0 ) {
+		Com_Error( ERR_DROP, "invalid entityState field count" );
+	}
 
 	// shownet 2/3 will interleave with other printed info, -1 will
 	// just print the delta records`
@@ -1369,6 +1402,10 @@ void MSG_ReadDeltaPlayerstate (msg_t *msg, playerState_t *from, playerState_t *t
 
 	numFields = sizeof( playerStateFields ) / sizeof( playerStateFields[0] );
 	lc = MSG_ReadByte(msg);
+
+	if ( lc > numFields || lc < 0 ) {
+		Com_Error( ERR_DROP, "invalid playerState field count" );
+	}
 
 	for ( i = 0, field = playerStateFields ; i < lc ; i++, field++ ) {
 		fromF = (int *)( (byte *)from + field->offset );
