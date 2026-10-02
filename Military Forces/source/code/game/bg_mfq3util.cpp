@@ -689,7 +689,7 @@ static void MF_ParseWaypoints( char **buf, mission_vehicle_t* veh )
 		if( !strcmp( token, "Origin" ) )
 		{
 			token = COM_ParseExt( buf, false );
-			if( token[0] )
+			if( token[0] && num < IGME_MAX_WAYPOINTS )
 			{
 				sscanf(token, "%f;%f;%f", &veh->waypoints[num].origin[0],
 					&veh->waypoints[num].origin[1], &veh->waypoints[num].origin[2]);

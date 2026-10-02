@@ -165,6 +165,175 @@ static void SP_misc_boat( GameEntity *ent )
 	SV_LinkEntity (ent);
 }
 
+void Drone_Think::execute()
+{
+	GameEntity* ent = self_;
+	unsigned int vehIndex = ent->s.modelindex;
+	unsigned long cat = availableVehicles[vehIndex].cat;
+	bool flying = (cat & CAT_PLANE) || (cat & CAT_HELO);
+	float dt = (theLevel.time_ - ent->s.pos.trTime) * 0.001f;
+	vec3_t origin, dir, bearing, angles, vel;
+	trace_t tr;
+
+	BG_EvaluateTrajectory( &ent->s.pos, theLevel.time_, origin );
+
+	if( flying )
+	{
+		SV_Trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, origin, ent->s.number, MASK_SOLID, false );
+		if( tr.startsolid || tr.fraction < 1.0f )
+		{
+			G_Damage( ent, 0, ent, 0, 0, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
+			return;
+		}
+	}
+	else
+	{
+		vec3_t from, to;
+		VectorCopy( ent->r.currentOrigin, from );
+		VectorCopy( origin, to );
+		float raise = (ent->r.maxs[2] - ent->r.mins[2]) * 0.5f;
+		from[2] += raise;
+		to[2] += raise;
+		SV_Trace( &tr, from, ent->r.mins, ent->r.maxs, to, ent->s.number, MASK_SOLID, false );
+		if( !tr.startsolid && tr.fraction < 1.0f )
+		{
+			VectorCopy( ent->r.currentOrigin, origin );
+			if( ++blocked_ >= 40 )
+			{
+				next_ = (next_ + 1) % count_;
+				blocked_ = 0;
+			}
+		}
+		else
+		{
+			blocked_ = 0;
+		}
+		VectorCopy( origin, from );
+		VectorCopy( origin, to );
+		from[2] += 64;
+		to[2] -= 512;
+		SV_Trace( &tr, from, 0, 0, to, ent->s.number, (cat & CAT_BOAT) ? (MASK_SOLID|MASK_WATER) : MASK_SOLID, false );
+		if( tr.fraction < 1.0f )
+			origin[2] = tr.endpos[2] - ent->r.mins[2] + 1;
+	}
+
+	VectorSubtract( route_[next_], origin, dir );
+	if( !flying ) dir[2] = 0;
+	float arrive = (cat & CAT_PLANE) ? speed_ : 150;
+	if( VectorLength( dir ) < arrive )
+	{
+		next_ = (next_ + 1) % count_;
+		VectorSubtract( route_[next_], origin, dir );
+		if( !flying ) dir[2] = 0;
+	}
+	VectorNormalize( dir );
+	vectoangles( dir, bearing );
+
+	VectorCopy( ent->s.angles, angles );
+	float step = availableVehicles[vehIndex].turnspeed[YAW] * dt;
+	float yawdiff = AngleNormalize180( bearing[YAW] - angles[YAW] );
+	if( yawdiff > step ) angles[YAW] += step;
+	else if( yawdiff < -step ) angles[YAW] -= step;
+	else angles[YAW] = bearing[YAW];
+	angles[YAW] = AngleMod( angles[YAW] );
+
+	if( cat & CAT_PLANE )
+	{
+		float targpitch = AngleNormalize180( bearing[PITCH] );
+		if( targpitch > 45 ) targpitch = 45;
+		else if( targpitch < -45 ) targpitch = -45;
+		float pitch = AngleNormalize180( angles[PITCH] );
+		step = availableVehicles[vehIndex].turnspeed[PITCH] * dt;
+		if( targpitch - pitch > step ) pitch += step;
+		else if( targpitch - pitch < -step ) pitch -= step;
+		else pitch = targpitch;
+		angles[PITCH] = pitch;
+
+		float targroll = 0;
+		if( yawdiff > 1 ) targroll = -60;
+		else if( yawdiff < -1 ) targroll = 60;
+		float roll = AngleNormalize180( angles[ROLL] );
+		step = availableVehicles[vehIndex].turnspeed[ROLL] * dt;
+		if( targroll - roll > step ) roll += step;
+		else if( targroll - roll < -step ) roll -= step;
+		else roll = targroll;
+		angles[ROLL] = roll;
+
+		AngleVectors( angles, vel, 0, 0 );
+	}
+	else
+	{
+		angles[PITCH] = angles[ROLL] = 0;
+		if( cat & CAT_HELO )
+		{
+			VectorCopy( dir, vel );
+		}
+		else
+		{
+			AngleVectors( angles, vel, 0, 0 );
+		}
+	}
+	VectorScale( vel, speed_, vel );
+
+	VectorCopy( angles, ent->s.angles );
+	VectorCopy( angles, ent->s.apos.trBase );
+	VectorCopy( angles, ent->r.currentAngles );
+	ent->s.apos.trTime = theLevel.time_;
+
+	VectorCopy( origin, ent->r.currentOrigin );
+	VectorCopy( origin, ent->s.pos.trBase );
+	VectorCopy( vel, ent->s.pos.trDelta );
+	ent->s.pos.trType = TR_LINEAR;
+	ent->s.pos.trTime = theLevel.time_;
+
+	ent->nextthink_ = theLevel.time_ + 50;
+	SV_LinkEntity( ent );
+}
+
+void MiscVehicle_SetRoute( GameEntity *ent, const mission_waypoint_t *wps )
+{
+	int count = 0;
+	while( count < IGME_MAX_WAYPOINTS && wps[count].used ) ++count;
+	if( !count ) return;
+
+	unsigned int vehIndex = ent->s.modelindex;
+	unsigned long cat = availableVehicles[vehIndex].cat;
+
+	Drone_Think* think = new Drone_Think;
+	for( int i = 0; i < count; ++i )
+		VectorCopy( wps[i].origin, think->route_[i] );
+	think->count_ = count;
+	think->next_ = 0;
+	think->blocked_ = 0;
+
+	if( cat & CAT_PLANE ) {
+		think->speed_ = availableVehicles[vehIndex].maxspeed * 0.7f;
+		ent->s.ONOFF = (availableVehicles[vehIndex].caps & HC_GEAR) ? OO_NOTHING_ON : OO_GEAR;
+		ent->s.frame = MF_THROTTLE_MILITARY;
+	} else {
+		think->speed_ = availableVehicles[vehIndex].maxspeed * 0.5f;
+		ent->s.frame = MF_THROTTLE_MILITARY;
+	}
+
+	vec3_t dir;
+	VectorSubtract( think->route_[0], ent->s.origin, dir );
+	if( !(cat & CAT_PLANE) ) dir[2] = 0;
+	if( VectorNormalize( dir ) > 0 ) {
+		vec3_t angles;
+		vectoangles( dir, angles );
+		ent->s.angles[YAW] = angles[YAW];
+	}
+	ent->s.angles[PITCH] = ent->s.angles[ROLL] = 0;
+	VectorCopy( ent->s.angles, ent->s.apos.trBase );
+
+	ent->s.eFlags |= EF_PILOT_ONBOARD;
+	ent->s.pos.trType = TR_LINEAR;
+	VectorClear( ent->s.pos.trDelta );
+	ent->s.pos.trTime = theLevel.time_;
+	ent->setThink( think );
+	ent->nextthink_ = theLevel.time_ + 1000;
+}
+
 void DroneInit()
 {
 	// finish placing the vehicles spawned by the mission
@@ -174,6 +343,7 @@ void DroneInit()
 		if( Q_stricmp( ent->classname_, "misc_vehicle" ) != 0 ) continue;
 		if( ent->s.modelindex == 255 ) continue; // ground installation
 		unsigned long cat = availableVehicles[ent->s.modelindex].cat;
+		if( (ent->s.eFlags & EF_PILOT_ONBOARD) && ((cat & CAT_PLANE) || (cat & CAT_HELO)) ) continue;
 		if( cat & CAT_PLANE ) {
 			SP_misc_plane( ent );
 		} else if( cat & CAT_HELO ) {
@@ -199,7 +369,7 @@ static void MiscVehicle_SetTeam( GameEntity *ent )
 
 /*QUAKED misc_vehicle (0 .5 .8) (-32 -32 0) (32 32 32)
 */
-void SP_misc_vehicle( GameEntity *sp_ent )
+GameEntity* SP_misc_vehicle( GameEntity *sp_ent )
 {
 	int i = sp_ent->s.modelindex;
 
@@ -207,7 +377,7 @@ void SP_misc_vehicle( GameEntity *sp_ent )
 	{
 		Com_Printf ("%s (%s) cannot be spawned - index out of range\n", sp_ent->classname_, sp_ent->model_);
 		sp_ent->freeUp();
-		return;
+		return 0;
 	}
 
 	GameEntity* ent = theLevel.spawnEntity();
@@ -249,6 +419,8 @@ void SP_misc_vehicle( GameEntity *sp_ent )
 	SV_LinkEntity (ent);
 
 	sp_ent->freeUp();
+
+	return ent;
 }
 
 void SP_misc_groundinstallation( GameEntity *sp_ent )

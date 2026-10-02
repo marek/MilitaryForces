@@ -18,7 +18,19 @@ struct GroundInstallation_Think : public GameEntity::EntityFunc_Think
 	virtual void	execute();
 };
 
-void SP_misc_vehicle( GameEntity *sp_ent );
+struct Drone_Think : public GameEntity::EntityFunc_Think
+{
+	virtual void	execute();
+
+	vec3_t			route_[IGME_MAX_WAYPOINTS];
+	int				count_;
+	int				next_;
+	int				blocked_;
+	float			speed_;
+};
+
+GameEntity* SP_misc_vehicle( GameEntity *sp_ent );
+void MiscVehicle_SetRoute( GameEntity *ent, const mission_waypoint_t *wps );
 void SP_misc_groundinstallation( GameEntity *sp_ent );
 void DroneInit();
 void G_LoadMissionScripts();
