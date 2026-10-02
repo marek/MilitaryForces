@@ -317,9 +317,15 @@ static void SV_MapRestart_f()
 			continue;
 		}
 
-		client->state_ = SV_Client::CS_ACTIVE;
-
-		SV_ClientEnterWorld( client, &client->lastUsercmd_ );
+		if(client->state_ == SV_Client::CS_ACTIVE)
+			SV_ClientEnterWorld(client, &client->lastUsercmd_);
+		else
+		{
+			// If we don't reset client->lastUsercmd and are restarting during map load,
+			// the client will hang because we'll use the last Usercmd from the previous map,
+			// which is wrong obviously.
+			SV_ClientEnterWorld(client, NULL);
+		}
 	}	
 
 	// run another frame to allow things to look at all the players

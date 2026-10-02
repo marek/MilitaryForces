@@ -391,6 +391,15 @@ void SVC_Info( netadr_t from )
 	if ( Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER || Cvar_VariableValue("ui_singlePlayerActive")) 
 		return;
 
+	/*
+	 * Check whether Cmd_Argv(1) has a sane length. This was not done in the original Quake3 version which led
+	 * to the Infostring bug discovered by Luigi Auriemma. See http://aluigi.altervista.org/ for the advisory.
+	 */
+
+	// A maximum challenge length of 128 should be more than plenty.
+	if(strlen(Cmd_Argv(1)) > 128)
+		return;
+
 	// don't count privateclients
 	int count = 0;
 	for( int i = sv_privateClients->integer ; i <= sv_maxclients->integer ; i++ ) 
@@ -842,14 +851,14 @@ void SV_Frame( int msec )
 	if ( theSVS.time_ > 0x70000000 )
 	{
 		SV_Shutdown( "Restarting server due to time wrapping" );
-		Cbuf_AddText( "vstr nextmap\n" );
+		Cbuf_AddText( va( "map %s\n", Cvar_VariableString( "mapname" ) ) );
 		return;
 	}
 	// this can happen considerably earlier when lots of clients play and the map doesn't change
 	if ( theSVS.nextSnapshotEntities_ >= 0x7FFFFFFE - theSVS.numSnapshotEntities_ )
 	{
 		SV_Shutdown( "Restarting server due to numSnapshotEntities wrapping" );
-		Cbuf_AddText( "vstr nextmap\n" );
+		Cbuf_AddText( va( "map %s\n", Cvar_VariableString( "mapname" ) ) );
 		return;
 	}
 

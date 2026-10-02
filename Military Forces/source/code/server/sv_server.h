@@ -78,6 +78,7 @@ struct ServerStatic
 		int			time_;				// time the last packet was sent to the autherize server
 		int			pingTime_;			// time the challenge response was sent to client
 		int			firstTime_;			// time the adr was first used, for authorize timeout checks
+		bool		wasrefused_;
 		bool		connected_;
 	};
 

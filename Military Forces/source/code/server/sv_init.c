@@ -697,7 +697,7 @@ void SV_Shutdown( char *finalmsg )
 	if ( !com_sv_running || !com_sv_running->integer ) 
 		return;
 
-	Com_Printf( "----- Server Shutdown -----\n" );
+	Com_Printf( "----- Server Shutdown (%s) -----\n", finalmsg );
 
 	if( theSVS.svClients_.size() && !com_errorEntered ) {
 		SV_FinalMessage( finalmsg );

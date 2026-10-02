@@ -108,6 +108,7 @@ ServerStatic::Challenge::Challenge() :
 	time_(0),
 	pingTime_(0),
 	firstTime_(0),
+	wasrefused_(false),
 	connected_(false)
 {
 }

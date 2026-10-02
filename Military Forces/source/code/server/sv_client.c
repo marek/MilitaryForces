@@ -81,13 +81,16 @@ void SV_GetChallenge( netadr_t from )
 		// this is the first time this client has asked for a challenge
 		challenge = &theSVS.challenges_[oldest];
 
-		challenge->challenge_ = ( (rand() << 16) ^ rand() ) ^ theSVS.time_;
 		challenge->adr_ = from;
 		challenge->firstTime_ = theSVS.time_;
 		challenge->time_ = theSVS.time_;
 		challenge->connected_ = false;
 		i = oldest;
 	}
+
+	// always generate a new challenge number, so the client cannot circumvent sv_maxping
+	challenge->challenge_ = ( (rand() << 16) ^ rand() ) ^ theSVS.time_;
+	challenge->wasrefused_ = false;
 
 	// if they are on a lan address, send the challengeResponse immediately
 	//if ( Sys_IsLANAddress( from ) ) {
@@ -273,6 +276,20 @@ void SV_DirectConnect( netadr_t from )
 			break;
 		}
 	}
+	
+	// don't let "ip" overflow userinfo string
+	const char *ip;
+	if ( NET_IsLocalAddress (from) )
+		ip = "localhost";
+	else
+		ip = NET_AdrToString( from );
+	if( ( strlen( ip ) + strlen( userinfo ) + 4 ) >= MAX_INFO_STRING ) {
+		NET_OutOfBandPrint( NS_SERVER, from,
+			"print\nUserinfo string length exceeded.  "
+			"Try removing setu cvars from your config.\n" );
+		return;
+	}
+	Info_SetValueForKey( userinfo, "ip", ip );
 
 	// see if the challenge is valid (LAN clients don't need to challenge)
 	if( !NET_IsLocalAddress (from) ) 
@@ -290,41 +307,41 @@ void SV_DirectConnect( netadr_t from )
 		}
 		if( i == ServerStatic::k_MAX_CHALLENGES ) 
 		{
-			NET_OutOfBandPrint( NS_SERVER, from, "print\nNo or bad challenge for address.\n" );
+			NET_OutOfBandPrint( NS_SERVER, from, "print\nNo or bad challenge for your address.\n" );
 			return;
 		}
-		// force the IP key/value pair so the game can filter based on ip
-		Info_SetValueForKey( userinfo, "ip", NET_AdrToString( from ) );
 
-		ping = theSVS.time_ - theSVS.challenges_[i].pingTime_;
-		Com_Printf( "Client %i connecting with %i challenge ping\n", i, ping );
-		theSVS.challenges_[i].connected_ = true;
+		ServerStatic::Challenge *challengeptr = &theSVS.challenges_[i];
+
+		if(challengeptr->wasrefused_)
+		{
+			// Return silently, so that error messages written by the server keep being displayed.
+			return;
+		}
+
+		ping = theSVS.time_ - challengeptr->pingTime_;
 
 		// never reject a LAN client based on ping
 		if ( !Sys_IsLANAddress( from ) ) 
 		{
 			if ( sv_minPing->value && ping < sv_minPing->value ) 
 			{
-				// don't let them keep trying until they get a big delay
 				NET_OutOfBandPrint( NS_SERVER, from, "print\nServer is for high pings only\n" );
 				Com_DPrintf ("Client %i rejected on a too low ping\n", i);
-				// reset the address otherwise their ping will keep increasing
-				// with each connect message and they'd eventually be able to connect
-				theSVS.challenges_[i].adr_.port = 0;
+				challengeptr->wasrefused_ = true;
 				return;
 			}
 			if ( sv_maxPing->value && ping > sv_maxPing->value ) 
 			{
 				NET_OutOfBandPrint( NS_SERVER, from, "print\nServer is for low pings only\n" );
 				Com_DPrintf ("Client %i rejected on a too high ping\n", i);
+				challengeptr->wasrefused_ = true;
 				return;
 			}
 		}
-	} 
-	else 
-	{
-		// force the "ip" info key to "localhost"
-		Info_SetValueForKey( userinfo, "ip", "localhost" );
+
+		Com_Printf("Client %i connecting with %i challenge ping\n", i, ping);
+		challengeptr->connected_ = true;
 	}
 
 	//MAC_STATIC SV_Client temp;
@@ -523,8 +540,7 @@ void SV_DropClient( SV_Client *drop, const char *reason )
 		return;		// already dropped
 
 	int i;
-	EntityBase* gentity = theSV.getEntityByNum( drop->clientNum_ );
-	if( !gentity || !(gentity->r.svFlags & SVF_BOT) ) 
+	if( drop->netchan_.remoteAddress.type != NA_BOT ) 
 	{
 		// see if we already have a challenge for this ip
 		ServerStatic::Challenge	*challenge = &theSVS.challenges_[0];
@@ -545,9 +561,6 @@ void SV_DropClient( SV_Client *drop, const char *reason )
 	// tell everyone why they got dropped
 	SV_SendServerCommand( NULL, "print \"%s" S_COLOR_WHITE " %s\n\"", drop->name_, reason );
 
-	Com_DPrintf( "Going to CS_ZOMBIE for %s\n", drop->name_ );
-	drop->state_ = SV_Client::CS_ZOMBIE;		// become free in a few seconds
-
 	if( drop->download_ )	
 	{
 		FS_FCloseFile( drop->download_ );
@@ -564,6 +577,9 @@ void SV_DropClient( SV_Client *drop, const char *reason )
 
 	// nuke user info
 	SV_SetUserinfo( drop->clientNum_, "" );
+	
+	Com_DPrintf( "Going to CS_ZOMBIE for %s\n", drop->name_ );
+	drop->state_ = SV_Client::CS_ZOMBIE;		// become free in a few seconds
 
 	// if this was the last client on the server, send a heartbeat
 	// to the master so it is known the server is empty
@@ -682,7 +698,10 @@ void SV_ClientEnterWorld( SV_Client *client, usercmd_t *cmd )
 
 	client->deltaMessage_ = -1;
 	client->nextSnapshotTime_ = theSVS.time_;	// generate a snapshot immediately
-	client->lastUsercmd_ = *cmd;
+	if(cmd)
+		memcpy(&client->lastUsercmd_, cmd, sizeof(client->lastUsercmd_));
+	else
+		memset(&client->lastUsercmd_, '\0', sizeof(client->lastUsercmd_));
 
 	// call the game begin function
 	//VM_Call( gvm, GAME_CLIENT_BEGIN, client - svs.clients );
@@ -751,6 +770,9 @@ Downloads are finished
 */
 void SV_DoneDownload_f( SV_Client *cl ) 
 {
+	if ( cl->state_ == SV_Client::CS_ACTIVE )
+		return;
+
 	Com_DPrintf( "clientDownload: %s Done\n", cl->name_);
 	// resend the game state to update any clients that entered during the download
 	SV_SendClientGameState(cl);
@@ -1317,9 +1339,9 @@ void SV_UserinfoChanged( SV_Client *cl )
 		{
 			i = 1;
 		} 
-		else if ( i > 30 ) 
+		else if ( i > sv_fps->integer ) 
 		{
-			i = 30;
+			i = sv_fps->integer;
 		}
 		cl->snapshotMsec_ = 1000/i;
 	} 
@@ -1330,18 +1352,24 @@ void SV_UserinfoChanged( SV_Client *cl )
 	
 	// TTimo
 	// maintain the IP information
-	// this is set in SV_DirectConnect (directly on the server, not transmitted), may be lost when client updates it's userinfo
 	// the banning code relies on this being consistently present
-	val = Info_ValueForKey (cl->userinfo_, "ip");
-	if (!val[0])
-	{
-		//Com_DPrintf("Maintain IP in userinfo for '%s'\n", cl->name);
-		if ( !NET_IsLocalAddress(cl->netchan_.remoteAddress) )
-			Info_SetValueForKey( cl->userinfo_, "ip", NET_AdrToString( cl->netchan_.remoteAddress ) );
-		else
-			// force the "ip" info key to "localhost" for local clients
-			Info_SetValueForKey( cl->userinfo_, "ip", "localhost" );
-	}
+	const char *ip;
+	int len;
+	if( NET_IsLocalAddress(cl->netchan_.remoteAddress) )
+		ip = "localhost";
+	else
+		ip = NET_AdrToString( cl->netchan_.remoteAddress );
+
+	val = Info_ValueForKey( cl->userinfo_, "ip" );
+	if( val[0] )
+		len = strlen( ip ) - strlen( val ) + strlen( cl->userinfo_ );
+	else
+		len = strlen( ip ) + 4 + strlen( cl->userinfo_ );
+
+	if( len >= MAX_INFO_STRING )
+		SV_DropClient( cl, "userinfo string length exceeded" );
+	else
+		Info_SetValueForKey( cl->userinfo_, "ip", ip );
 }
 
 

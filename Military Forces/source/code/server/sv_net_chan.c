@@ -141,7 +141,7 @@ void SV_Netchan_TransmitNextFragment( SV_Client *client )
 	if (!client->netchan_.unsentFragments)
 	{
 		// make sure the netchan queue has been properly initialized (you never know)
-		if (!client->netchan_end_queue_) 
+		if ((!client->netchan_end_queue_) && (client->state_ >= SV_Client::CS_CONNECTED)) 
 		{
 			Com_Error(ERR_DROP, "netchan queue is not properly initialized in SV_Netchan_TransmitNextFragment\n");
 		}
