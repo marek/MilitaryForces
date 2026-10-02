@@ -205,6 +205,12 @@ static inline float BigFloat( float l ) { return FloatSwap( &l ); }
 
 typedef unsigned char 		byte;
 
+typedef union {
+	float f;
+	int i;
+	unsigned int ui;
+} floatint_t;
+
 typedef int		qhandle_t;
 typedef int		sfxHandle_t;
 typedef int		fileHandle_t;
@@ -624,6 +630,8 @@ void Vector4Scale( const vec4_t in, vec_t scale, vec4_t out );
 void VectorRotate( vec3_t in, vec3_t matrix[3], vec3_t out );
 int Q_log2(int val);
 
+int Q_isnan(float x);
+
 float Q_acos(float c);
 
 int		Q_rand( int *seed );
@@ -1025,7 +1033,6 @@ typedef enum {
 
 #define	GENTITYNUM_BITS		10		// don't need to send any more
 #define	MAX_GENTITIES		(1<<GENTITYNUM_BITS)
-#define MAX_RENTITIES		4096
 // entitynums are communicated with GENTITY_BITS, so any reserved
 // values that are going to be communcated over the net need to
 // also be in this range

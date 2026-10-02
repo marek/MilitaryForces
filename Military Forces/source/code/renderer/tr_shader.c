@@ -825,6 +825,8 @@ static bool ParseStage( shaderStage_t *stage, char **text )
 			{
 				vec3_t	color;
 
+				VectorClear( color );
+
 				ParseVector( text, 3, color );
 				stage->constantColor[0] = 255 * color[0];
 				stage->constantColor[1] = 255 * color[1];
@@ -1922,7 +1924,7 @@ static void FixRenderCommandList( int newShader ) {
                     sortedIndex = (( drawSurf->sort >> QSORT_SHADERNUM_SHIFT ) & (MAX_SHADERS-1));
 					if( sortedIndex >= newShader ) {
 						sortedIndex++;
-						drawSurf->sort = (sortedIndex << QSORT_SHADERNUM_SHIFT) | entityNum | ( fogNum << QSORT_FOGNUM_SHIFT ) | (int)dlightMap;
+						drawSurf->sort = (sortedIndex << QSORT_SHADERNUM_SHIFT) | (entityNum << QSORT_REFENTITYNUM_SHIFT) | ( fogNum << QSORT_FOGNUM_SHIFT ) | (int)dlightMap;
 					}
 				}
 				curCmd = (const void *)(ds_cmd + 1);
@@ -2291,9 +2293,8 @@ static shader_t *FinishShader( void ) {
 	shader.numUnfoggedPasses = stage;
 
 	// fogonly shaders don't have any normal passes
-	if ( stage == 0 ) {
+	if (stage == 0 && !shader.isSky)
 		shader.sort = SS_FOG;
-	}
 
 	// determine which stage iterator function is appropriate
 	ComputeStageIteratorFunc();
@@ -2322,6 +2323,9 @@ static char *FindShaderInShaderText( const char *shadername ) {
 	int i, hash;
 
 	hash = generateHashValue(shadername, MAX_SHADERTEXT_HASH);
+
+	if(!shaderTextHashTable[hash])
+		return NULL;
 
 	for (i = 0; shaderTextHashTable[hash][i]; i++) {
 		p = shaderTextHashTable[hash][i];
@@ -3026,6 +3030,17 @@ static void CreateInternalShaders( void ) {
 static void CreateExternalShaders( void ) {
 	tr.projectionShadowShader = R_FindShader( "projectionShadow", LIGHTMAP_NONE, true );
 	tr.flareShader = R_FindShader( "flareShader", LIGHTMAP_NONE, true );
+
+	// Hack to make fogging work correctly on flares. Fog colors are calculated
+	// in tr_flare.c already.
+	if(!tr.flareShader->defaultShader)
+	{
+		int index;
+		
+		for(index = 0; index < tr.flareShader->numUnfoggedPasses; index++)
+			tr.flareShader->stages[index]->adjustColorsForFog = ACFF_NONE;
+	}
+
 	tr.sunShader = R_FindShader( "sun", LIGHTMAP_NONE, true );
 }
 

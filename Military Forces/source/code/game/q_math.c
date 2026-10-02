@@ -937,6 +937,24 @@ int Q_log2( int val ) {
 	return answer;
 }
 
+/*
+=====================
+Q_isnan
+
+Don't pass doubles to this
+================
+*/
+int Q_isnan( float x )
+{
+	floatint_t fi;
+
+	fi.f = x;
+	fi.ui &= 0x7FFFFFFF;
+	fi.ui = 0x7F800000 - fi.ui;
+
+	return (int)( (unsigned int)fi.ui >> 31 );
+}
+
 
 
 /*
