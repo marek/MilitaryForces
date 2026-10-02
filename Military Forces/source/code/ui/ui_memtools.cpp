@@ -1,5 +1,6 @@
 #include "ui_memtools.h"
 #include <memory>
+#include <cstring>
 
 
 
@@ -19,14 +20,14 @@ void*
 UI_Memtools::getMemory( unsigned long size )
 {
 	void *ptr;
-	unsigned long int *memid;
+	intptr_t *memid;
 
-	ptr = BotImport_GetMemory(size + sizeof(unsigned long int));
+	ptr = BotImport_GetMemory(size + sizeof(intptr_t));
 	if (!ptr) 
 		return 0;
-	memid = (unsigned long int *) ptr;
+	memid = (intptr_t *) ptr;
 	*memid = MEM_ID;
-	return (unsigned long int *) ((char *) ptr + sizeof(unsigned long int));
+	return (intptr_t *) ((char *) ptr + sizeof(intptr_t));
 } 
 
 void*
@@ -42,13 +43,13 @@ void*
 UI_Memtools::getHunkMemory( unsigned long size )
 {
 	void *ptr;
-	unsigned long int *memid;
+	intptr_t *memid;
 
-	ptr = BotImport_HunkAlloc(size + sizeof(unsigned long int));
+	ptr = BotImport_HunkAlloc(size + sizeof(intptr_t));
 	if (!ptr) return NULL;
-	memid = (unsigned long int *) ptr;
+	memid = (intptr_t *) ptr;
 	*memid = HUNK_ID;
-	return (unsigned long int *) ((char *) ptr + sizeof(unsigned long int));
+	return (intptr_t *) ((char *) ptr + sizeof(intptr_t));
 } 
 
 void*
@@ -63,9 +64,9 @@ UI_Memtools::getClearedHunkMemory( unsigned long size )
 void 
 UI_Memtools::freeMemory( void *ptr )
 {
-	unsigned long int *memid;
+	intptr_t *memid;
 
-	memid = (unsigned long int *) ((char *) ptr - sizeof(unsigned long int));
+	memid = (intptr_t *) ((char *) ptr - sizeof(intptr_t));
 
 	if (*memid == MEM_ID)
 		BotImport_FreeMemory(memid);

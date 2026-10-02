@@ -250,7 +250,7 @@ protected:
 	static const int			MEM_POOL_SIZE = 1024 * 1024;
 	static const int			HASH_TABLE_SIZE = 2048;
 
-	char						memoryPool_[MEM_POOL_SIZE];
+	alignas(16) char			memoryPool_[MEM_POOL_SIZE];
 	int							allocPoint_;
 	bool						outOfMemory_;
 

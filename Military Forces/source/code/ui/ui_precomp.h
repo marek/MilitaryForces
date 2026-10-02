@@ -224,7 +224,7 @@ protected:
 
 	int					nameHash( char *name );
 	void				stripDoubleQuotes( char *string );
-	void				numberValue( char *string, int subtype, unsigned long int *intvalue, long double *floatvalue );
+	void				numberValue( char *string, int subtype, unsigned long int *intvalue, double *floatvalue );
 	void				convertPath( char *path );
 	int					operatorPriority( int op );
 	int					whiteSpaceBeforeToken( Token* token );
@@ -271,7 +271,7 @@ struct UI_PrecompilerTools::Token
 	int					type_;					//last read token type
 	int					subtype_;				//last read token sub type
 	unsigned long int	intvalue_;				//integer value
-	long double			floatvalue_;			//floating point value
+	double				floatvalue_;			//floating point value
 	char*				whitespace_p_;			//start of white space before token
 	char*				endwhitespace_p_;		//start of white space before token
 	int					line_;					//line the token was on

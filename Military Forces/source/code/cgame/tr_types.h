@@ -114,7 +114,7 @@ typedef struct {
 } refdef_t;
 
 
-enum stereoFrame_t {
+enum stereoFrame_t : int {
 	STEREO_CENTER,
 	STEREO_LEFT,
 	STEREO_RIGHT

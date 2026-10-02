@@ -26,7 +26,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #ifndef __QGL_H__
 #define __QGL_H__
 
-#if defined( __LINT__ )
+#if defined( USE_SDL )
+
+#include <SDL_opengl.h>
+
+#elif defined( __LINT__ )
 
 #include <GL/gl.h>
 
@@ -129,7 +133,7 @@ typedef void (APIENTRY * PFNGLCLIENTACTIVETEXTUREARBPROC) (GLenum target);
 #endif
 
 // TTimo - VC7 / XP ?
-#ifdef WIN32
+#if defined( WIN32 ) && !defined( USE_SDL )
 typedef void (APIENTRY * PFNGLMULTITEXCOORD2FARBPROC) (GLenum target, GLfloat s, GLfloat t);
 typedef void (APIENTRY * PFNGLACTIVETEXTUREARBPROC) (GLenum target);
 typedef void (APIENTRY * PFNGLCLIENTACTIVETEXTUREARBPROC) (GLenum target);
@@ -157,7 +161,7 @@ extern	void ( APIENTRY * qglUnlockArraysEXT) (void);
 //===========================================================================
 
 // non-windows systems will just redefine qgl* to gl*
-#if !defined( _WIN32 ) && !defined(MACOS_X) && !defined( __linux__ ) && !defined( __FreeBSD__ ) // rb010123
+#if defined( USE_SDL ) || ( !defined( _WIN32 ) && !defined(MACOS_X) && !defined( __linux__ ) && !defined( __FreeBSD__ ) ) // rb010123
 
 #include "qgl_linked.h"
 

@@ -24,14 +24,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../game/q_shared.h"
 #include "qcommon.h"
 #include <setjmp.h>
-#ifdef __linux__
-#include <netinet/in.h>
-#else
-#if defined(MACOS_X)
-#include <netinet/in.h>
-#else
+#ifdef _WIN32
 #include <winsock.h>
-#endif
+#else
+#include <netinet/in.h>
 #endif
 
 int demo_protocols[] =
@@ -932,7 +928,7 @@ void *Z_TagMalloc( int size, int tag ) {
 	//
 	size += sizeof(memblock_t);	// account for size of block header
 	size += 4;					// space for memory trash tester
-	size = (size + 3) & ~3;		// align to 32 bit boundary
+	size = (size + sizeof(intptr_t)-1) & ~(sizeof(intptr_t)-1);		// align to 32 bit boundary
 	
 	base = rover = zone->rover;
 	start = base->prev;
@@ -1529,7 +1525,7 @@ void Com_InitHunkMemory( void ) {
 		Com_Error( ERR_FATAL, "Hunk data failed to allocate %i megs", s_hunkTotal / (1024*1024) );
 	}
 	// cacheline align
-	s_hunkData = (byte *) ( ( (int)s_hunkData + 31 ) & ~31 );
+	s_hunkData = (byte *) ( ( (intptr_t)s_hunkData + 31 ) & ~31 );
 	Hunk_Clear();
 
 	Cmd_AddCommand( "meminfo", Com_Meminfo_f );
@@ -2816,7 +2812,6 @@ void Com_Shutdown (void) {
 }
 
 #if !( defined __VECTORC )
-#if !( defined __linux__ || defined __FreeBSD__ )  // r010123 - include FreeBSD 
 #if ((!id386) && (!defined __i386__)) // rcg010212 - for PPC
 
 void Com_Memcpy (void* dest, const void* src, const size_t count)
@@ -3128,7 +3123,6 @@ skipClamp:
 	}
 }
 #endif
-#endif 
 #endif // bk001208 - memset/memcpy assembly, Q_acos needed (RC4)
 //------------------------------------------------------------------------
 

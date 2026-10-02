@@ -1,5 +1,5 @@
 #include "g_local.h"
-#include "..\vehiclelib\bg_datamanager.h"
+#include "../vehiclelib/bg_datamanager.h"
 #include "g_level.h"
 
 //level_locals_t	level;

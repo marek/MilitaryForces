@@ -2260,7 +2260,7 @@ UI_PrecompilerTools::stripDoubleQuotes( char *string )
 {
 	if (*string == '\"')
 	{
-		strcpy(string, string+1);
+		memmove(string, string+1, strlen(string));
 	}
 	if (string[strlen(string)-1] == '\"')
 	{
@@ -2269,7 +2269,7 @@ UI_PrecompilerTools::stripDoubleQuotes( char *string )
 }
 
 void 
-UI_PrecompilerTools::numberValue( char *string, int subtype, unsigned long int *intvalue, long double *floatvalue )
+UI_PrecompilerTools::numberValue( char *string, int subtype, unsigned long int *intvalue, double *floatvalue )
 {
 	unsigned long int dotfound = 0;
 
@@ -2289,12 +2289,12 @@ UI_PrecompilerTools::numberValue( char *string, int subtype, unsigned long int *
 			} 
 			if (dotfound)
 			{
-				*floatvalue = *floatvalue + (long double) (*string - '0') /	(long double) dotfound;
+				*floatvalue = *floatvalue + (double) (*string - '0') /	(double) dotfound;
 				dotfound *= 10;
 			}
 			else
 			{
-				*floatvalue = *floatvalue * 10.0 + (long double) (*string - '0');
+				*floatvalue = *floatvalue * 10.0 + (double) (*string - '0');
 			}
 			string++;
 		} 

@@ -2,7 +2,7 @@
 #define __CG_H__
 
 
-enum stereoFrame_t;
+enum stereoFrame_t : int;
 
 
 struct ClientGame

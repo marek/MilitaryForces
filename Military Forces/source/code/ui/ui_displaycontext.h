@@ -2,9 +2,9 @@
 #define __UI_DISPLAYCONTEXT_H__
 
 
-#include "..\game\q_shared.h"
-#include "..\cgame\tr_types.h"
-#include "..\ui\ui_shared.h"
+#include "../game/q_shared.h"
+#include "../cgame/tr_types.h"
+#include "../ui/ui_shared.h"
 
 
 

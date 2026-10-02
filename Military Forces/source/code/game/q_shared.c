@@ -72,24 +72,12 @@ COM_DefaultExtension
 ==================
 */
 void COM_DefaultExtension (char *path, int maxSize, const char *extension ) {
-	char	oldPath[MAX_QPATH];
-	char    *src;
+	const char *dot = strrchr( path, '.' ), *slash;
 
-//
-// if path doesn't have a .EXT, append extension
-// (extension should include the .)
-//
-	src = path + strlen(path) - 1;
+	if ( dot && ( !( slash = strrchr( path, '/' ) ) || slash < dot ) )
+		return;
 
-	while (*src != '/' && src != path) {
-		if ( *src == '.' ) {
-			return;                 // it has an extension
-		}
-		src--;
-	}
-
-	Q_strncpyz( oldPath, path, sizeof( oldPath ) );
-	Com_sprintf( path, maxSize, "%s%s", oldPath, extension );
+	Q_strcat( path, maxSize, extension );
 }
 
 /*
@@ -881,7 +869,7 @@ void QDECL Com_sprintf( char *dest, int size, const char *fmt, ...) {
 	}
 	if (len >= size) {
 		Com_Printf ("Com_sprintf: overflow of %i in %i\n", len, size);
-#ifdef	_DEBUG
+#if defined( _DEBUG ) && id386
 		__asm {
 			int 3;
 		}
@@ -900,7 +888,7 @@ varargs versions of all text functions.
 FIXME: make this buffer size safe someday
 ============
 */
-char	* QDECL va( char *format, ... ) {
+char	* QDECL va( const char *format, ... ) {
 	va_list		argptr;
 	static char		string[2][32000];	// in case va is called by nested functions
 	static int		index = 0;

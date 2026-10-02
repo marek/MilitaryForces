@@ -8,7 +8,7 @@
 // active (after loading) gameplay
 
 #include "cg_local.h"
-#include "..\ui\ui_public.h"
+#include "../ui/ui_public.h"
 
 #include "../ui/ui_shared.h"
 #include "ui_displaycontext_cg.h"

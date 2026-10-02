@@ -373,7 +373,8 @@ void SV_DirectConnect( netadr_t from )
 
 	// check for privateClient password
 	int	startIndex;
-	char* password = Info_ValueForKey( userinfo, "password" );
+	char* password;
+	password = Info_ValueForKey( userinfo, "password" );
 	if ( !strcmp( password, sv_privatePassword->string ) ) 
 	{
 		startIndex = 1;
