@@ -1,11 +1,3 @@
-set(JPEG_SOURCES
-    jcapimin.c jccoefct.c jccolor.c jcdctmgr.c jchuff.c jcinit.c jcmainct.c jcmarker.c
-    jcmaster.c jcomapi.c jcparam.c jcphuff.c jcprepct.c jcsample.c jctrans.c jdapimin.c
-    jdapistd.c jdatadst.c jdatasrc.c jdcoefct.c jdcolor.c jddctmgr.c jdhuff.c jdinput.c
-    jdmainct.c jdmarker.c jdmaster.c jdpostct.c jdsample.c jdtrans.c jerror.c jfdctflt.c
-    jidctflt.c jmemmgr.c jmemnobs.c jutils.c)
-list(TRANSFORM JPEG_SOURCES PREPEND "${SOURCE_DIR}/jpeg-6/")
-
 set(VEHICLELIB_SOURCES
     bg_datamanager.cpp bg_md3utils.cpp bg_vehicleextra.cpp bg_vehicleinfo.cpp
     bg_vehicleinfo_boats.cpp bg_vehicleinfo_ground.cpp bg_vehicleinfo_helos.cpp
@@ -43,7 +35,7 @@ list(TRANSFORM UI_SOURCES PREPEND "${SOURCE_DIR}/ui/")
 
 set(RENDERER_SOURCES
     tr_animation.c tr_backend.c tr_bsp.c tr_cmds.c tr_curve.c tr_flares.c tr_font.c
-    tr_image.c tr_init.c tr_light.c tr_main.c tr_marks.c tr_mesh.c tr_model.c tr_noise.c
+    tr_image.c tr_image_jpg.c tr_init.c tr_light.c tr_main.c tr_marks.c tr_mesh.c tr_model.c tr_noise.c
     tr_scene.c tr_shade.c tr_shade_calc.c tr_shader.c tr_shadows.c tr_sky.c tr_surface.c
     tr_world.c)
 list(TRANSFORM RENDERER_SOURCES PREPEND "${SOURCE_DIR}/renderer/")

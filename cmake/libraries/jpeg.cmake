@@ -1,0 +1,17 @@
+option(USE_INTERNAL_JPEG "Use internal copy of libjpeg" ON)
+
+set(JPEG_VERSION 9f)
+set(INTERNAL_JPEG_DIR ${SOURCE_DIR}/thirdparty/jpeg-${JPEG_VERSION})
+
+if(USE_INTERNAL_JPEG)
+    file(GLOB JPEG_SOURCES ${INTERNAL_JPEG_DIR}/j*.c)
+    add_library(internal_jpeg STATIC ${JPEG_SOURCES})
+    target_compile_options(internal_jpeg PRIVATE -w)
+    target_include_directories(internal_jpeg PUBLIC ${INTERNAL_JPEG_DIR})
+    list(APPEND CLIENT_LIBRARIES internal_jpeg)
+    list(APPEND CLIENT_INCLUDE_DIRS ${INTERNAL_JPEG_DIR})
+    list(APPEND CLIENT_DEFINITIONS USE_INTERNAL_JPEG)
+else()
+    find_package(JPEG REQUIRED)
+    list(APPEND CLIENT_LIBRARIES JPEG::JPEG)
+endif()

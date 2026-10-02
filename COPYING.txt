@@ -12,7 +12,7 @@ A few files keep their own GPL-compatible licenses, noted in the files:
   qcommon/unzip.c      zlib license (minizip)
   qcommon/ioapi.c      zlib license (minizip)
   thirdparty/zlib-*/   zlib license (see zlib.h)
-  jpeg-6/              IJG license (see jpeg-6/README)
+  thirdparty/jpeg-*/   IJG license (see thirdparty/jpeg-*/README)
   client/snd_adpcm.c   Stichting Mathematisch Centrum license
 
 GAME ASSETS

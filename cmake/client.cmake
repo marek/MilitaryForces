@@ -1,6 +1,5 @@
-set(MF_LIBRARIES jpeg6 vehiclelib game cgame ui renderer)
+set(MF_LIBRARIES vehiclelib game cgame ui renderer)
 
-add_library(jpeg6 OBJECT ${JPEG_SOURCES})
 add_library(vehiclelib OBJECT ${VEHICLELIB_SOURCES})
 add_library(game OBJECT ${GAME_SOURCES})
 add_library(cgame OBJECT ${CGAME_SOURCES})

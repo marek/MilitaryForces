@@ -977,6 +977,7 @@ extern cvar_t	*r_flareFade;
 // coefficient for the flare intensity falloff function.
 #define FLARE_STDCOEFF "150"
 extern cvar_t	*r_flareCoeff;
+extern cvar_t	*r_screenshotJpegQuality;
 
 extern cvar_t	*r_railWidth;
 extern cvar_t	*r_railCoreWidth;
@@ -1606,7 +1607,11 @@ void RE_StretchPic ( float x, float y, float w, float h,
 					  float s1, float t1, float s2, float t2, qhandle_t hShader );
 void RE_BeginFrame( stereoFrame_t stereoFrame );
 void RE_EndFrame( int *frontEndMsec, int *backEndMsec );
-void SaveJPG(char * filename, int quality, int image_width, int image_height, unsigned char *image_buffer);
+void R_LoadJPG( const char *name, byte **pic, int *width, int *height );
+void RE_SaveJPG(char * filename, int quality, int image_width, int image_height,
+                unsigned char *image_buffer, int padding);
+size_t RE_SaveJPGToBuffer(byte *buffer, size_t bufSize, int quality,
+		          int image_width, int image_height, byte *image_buffer, int padding);
 
 // font stuff
 void R_InitFreeType();

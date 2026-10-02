@@ -31,6 +31,7 @@ static void GfxInfo_f( void );
 cvar_t	*r_flareSize;
 cvar_t	*r_flareFade;
 cvar_t	*r_flareCoeff;
+cvar_t	*r_screenshotJpegQuality;
 
 cvar_t	*r_railWidth;
 cvar_t	*r_railCoreWidth;
@@ -411,22 +412,44 @@ void RB_TakeScreenshot( int x, int y, int width, int height, char *fileName ) {
 RB_TakeScreenshotJPEG
 ================== 
 */  
-void RB_TakeScreenshotJPEG( int x, int y, int width, int height, char *fileName ) {
-	byte		*buffer;
+byte *RB_ReadPixels(int x, int y, int width, int height, size_t *offset, int *padlen)
+{
+	byte *buffer, *bufstart;
+	int padwidth, linelen;
+	GLint packAlign;
+	
+	qglGetIntegerv(GL_PACK_ALIGNMENT, &packAlign);
+	
+	linelen = width * 3;
+	padwidth = PAD(linelen, packAlign);
+	
+	// Allocate a few more bytes so that we can choose an alignment we like
+	buffer = reinterpret_cast<byte*>(ri.Hunk_AllocateTempMemory(padwidth * height + *offset + packAlign - 1));
+	
+	bufstart = reinterpret_cast<byte*>(PADP((intptr_t) buffer + *offset, packAlign));
+	qglReadPixels(x, y, width, height, GL_RGB, GL_UNSIGNED_BYTE, bufstart);
+	
+	*offset = bufstart - buffer;
+	*padlen = padwidth - linelen;
+	
+	return buffer;
+}
 
-	buffer = reinterpret_cast<byte*>(ri.Hunk_AllocateTempMemory(glConfig.vidWidth*glConfig.vidHeight*4));
+void RB_TakeScreenshotJPEG(int x, int y, int width, int height, char *fileName)
+{
+	byte *buffer;
+	size_t offset = 0, memcount;
+	int padlen;
 
-	qglReadPixels( x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer ); 
+	buffer = RB_ReadPixels(x, y, width, height, &offset, &padlen);
+	memcount = (width * 3 + padlen) * height;
 
 	// gamma correct
-	if ( ( tr.overbrightBits > 0 ) && glConfig.deviceSupportsGamma ) {
-		R_GammaCorrect( buffer, glConfig.vidWidth * glConfig.vidHeight * 4 );
-	}
+	if(glConfig.deviceSupportsGamma)
+		R_GammaCorrect(buffer + offset, memcount);
 
-	ri.FS_WriteFile( fileName, buffer, 1 );		// create path
-	SaveJPG( fileName, 95, glConfig.vidWidth, glConfig.vidHeight, buffer);
-
-	ri.Hunk_FreeTempMemory( buffer );
+	RE_SaveJPG(fileName, r_screenshotJpegQuality->integer, width, height, buffer + offset, padlen);
+	ri.Hunk_FreeTempMemory(buffer);
 }
 
 /*
@@ -965,6 +988,7 @@ void R_Register( void )
 	r_flareSize = ri.Cvar_Get ("r_flareSize", "40", CVAR_CHEAT);
 	r_flareFade = ri.Cvar_Get ("r_flareFade", "7", CVAR_CHEAT);
 	r_flareCoeff = ri.Cvar_Get ("r_flareCoeff", FLARE_STDCOEFF, CVAR_CHEAT);
+	r_screenshotJpegQuality = ri.Cvar_Get("r_screenshotJpegQuality", "90", CVAR_ARCHIVE);
 
 	r_showSmp = ri.Cvar_Get ("r_showSmp", "0", CVAR_CHEAT);
 	r_skipBackEnd = ri.Cvar_Get ("r_skipBackEnd", "0", CVAR_CHEAT);
