@@ -144,6 +144,10 @@ void SV_AddServerCommand( SV_Client *client, const char *cmd )
 //		return;
 //	}
 
+	// do not send commands until the gamestate has been sent
+	if( client->state_ < SV_Client::CS_PRIMED )
+		return;
+
 	client->reliableSequence_++;
 	// if we would be losing an old command that hasn't been acknowledged,
 	// we must drop the connection
@@ -208,7 +212,7 @@ void QDECL SV_SendServerCommand( SV_Client *cl, const char *fmt, ... )
 	{
 		SV_Client* client = theSVS.svClients_.at(j);
 
-		if( !client || client->state_ < SV_Client::CS_PRIMED ) 
+		if( !client ) 
 			continue;
 
 		SV_AddServerCommand( client, (char *)message );

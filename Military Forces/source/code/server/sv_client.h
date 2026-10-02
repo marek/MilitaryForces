@@ -107,6 +107,7 @@ struct SV_Client
 	Netchan_Buffer**	netchan_end_queue_;
 
 	int					oldServerTime_;
+	bool				csUpdated_[MAX_CONFIGSTRINGS];
 };
 
 

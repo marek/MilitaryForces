@@ -29,6 +29,81 @@ void SV_InitGame();
 
 /*
 ===============
+SV_SendConfigstring
+
+Creates and sends the server command necessary to update the CS index for the
+given client
+===============
+*/
+static void SV_SendConfigstring(SV_Client *client, int index)
+{
+	int maxChunkSize = MAX_STRING_CHARS - 24;
+	int len;
+
+	len = strlen(theSV.configstrings_[index]);
+
+	if( len >= maxChunkSize ) {
+		int		sent = 0;
+		int		remaining = len;
+		const char	*cmd;
+		char	buf[MAX_STRING_CHARS];
+
+		while (remaining > 0 ) {
+			if ( sent == 0 ) {
+				cmd = "bcs0";
+			}
+			else if( remaining < maxChunkSize ) {
+				cmd = "bcs2";
+			}
+			else {
+				cmd = "bcs1";
+			}
+			Q_strncpyz( buf, &theSV.configstrings_[index][sent],
+				maxChunkSize );
+
+			SV_SendServerCommand( client, "%s %i \"%s\"\n", cmd,
+				index, buf );
+
+			sent += (maxChunkSize - 1);
+			remaining -= (maxChunkSize - 1);
+		}
+	} else {
+		// standard cs, just send it
+		SV_SendServerCommand( client, "cs %i \"%s\"\n", index,
+			theSV.configstrings_[index] );
+	}
+}
+
+/*
+===============
+SV_UpdateConfigstrings
+
+Called when a client goes from CS_PRIMED to CS_ACTIVE.  Updates all
+Configstring indexes that have changed while the client was in CS_PRIMED
+===============
+*/
+void SV_UpdateConfigstrings(SV_Client *client)
+{
+	int index;
+
+	for( index = 0; index < MAX_CONFIGSTRINGS; index++ ) {
+		// if the CS hasn't changed since we went to CS_PRIMED, ignore
+		if(!client->csUpdated_[index])
+			continue;
+
+		// do not always send server info to all clients
+		EntityBase* gentity = theSV.getEntityByNum(client->clientNum_);
+		if ( index == CS_SERVERINFO && gentity &&
+			(gentity->r.svFlags & SVF_NOSERVERINFO) ) {
+			continue;
+		}
+		SV_SendConfigstring(client, index);
+		client->csUpdated_[index] = false;
+	}
+}
+
+/*
+===============
 SV_SetConfigstring
 
 ===============
@@ -53,51 +128,26 @@ void SV_SetConfigstring( int index, const char *val )
 	// spawning a New server
 	if( theSV.state_ == Server::SS_GAME || theSV.restarting_ ) 
 	{
-		int	maxChunkSize = MAX_STRING_CHARS - 24;
-
-		// send the data to all relevent clients
+		// send the data to all relevant clients
 		for( int i = 1; i <= sv_maxclients->integer ; i++ ) 
 		{
 			SV_Client* client = theSVS.svClients_.at(i);
 
-			if( !client || client->state_ < SV_Client::CS_PRIMED ) 
+			if( !client )
 				continue;
+
+			if( client->state_ < SV_Client::CS_ACTIVE ) {
+				if( client->state_ == SV_Client::CS_PRIMED )
+					client->csUpdated_[ index ] = true;
+				continue;
+			}
 
 			// do not always send server info to all clients
 			EntityBase* gentity = theSV.getEntityByNum(client->clientNum_);
 			if( index == CS_SERVERINFO && gentity && (gentity->r.svFlags & SVF_NOSERVERINFO) ) 
 				continue;
 
-			int len = strlen( val );
-			if( len >= maxChunkSize ) 
-			{
-				int		sent = 0;
-				int		remaining = len;
-				char	*cmd;
-				char	buf[MAX_STRING_CHARS];
-
-				while (remaining > 0 ) 
-				{
-					if ( sent == 0 ) 
-						cmd = "bcs0";
-					else if( remaining < maxChunkSize ) 
-						cmd = "bcs2";
-					else 
-						cmd = "bcs1";
-	
-					Q_strncpyz( buf, &val[sent], maxChunkSize );
-
-					SV_SendServerCommand( client, "%s %i \"%s\"\n", cmd, index, buf );
-
-					sent += (maxChunkSize - 1);
-					remaining -= (maxChunkSize - 1);
-				}
-			} 
-			else 
-			{
-				// standard cs, just send it
-				SV_SendServerCommand( client, "cs %i \"%s\"\n", index, val );
-			}
+			SV_SendConfigstring(client, index);
 		}
 	}
 }

@@ -703,6 +703,10 @@ void SV_ClientEnterWorld( SV_Client *client, usercmd_t *cmd )
 	else
 		memset(&client->lastUsercmd_, '\0', sizeof(client->lastUsercmd_));
 
+	// resend all configstrings using the cs commands since these are
+	// no longer sent when the client is CS_PRIMED
+	SV_UpdateConfigstrings( client );
+
 	// call the game begin function
 	//VM_Call( gvm, GAME_CLIENT_BEGIN, client - svs.clients );
 	theSG.clientBegin( client->clientNum_ );

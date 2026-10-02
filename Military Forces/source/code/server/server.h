@@ -293,6 +293,7 @@ bool SV_GetEntityToken( char *buffer, int bufferSize );
 // sv_init.c
 //
 void SV_SetConfigstring( int index, const char *val );
+void SV_UpdateConfigstrings( SV_Client *client );
 void SV_GetConfigstring( int index, char *buffer, int bufferSize );
 
 void SV_SetUserinfo( int index, const char *val );

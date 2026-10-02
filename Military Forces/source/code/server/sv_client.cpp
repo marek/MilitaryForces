@@ -60,6 +60,7 @@ SV_Client::SV_Client() :
 	netchan_end_queue_(0),
 	oldServerTime_(0)
 {
+	memset( csUpdated_, 0, sizeof( csUpdated_ ) );
 	memset( userinfo_, 0, sizeof( userinfo_ ) );
 	memset( reliableCommands_, 0, sizeof(reliableCommands_) );
 	memset( &lastUsercmd_, 0, sizeof(lastUsercmd_) );
@@ -115,6 +116,7 @@ SV_Client::clear()
 	netchan_end_queue_ = 0;
 	oldServerTime_ = 0;
 
+	memset( csUpdated_, 0, sizeof( csUpdated_ ) );
 	memset( userinfo_, 0, sizeof( userinfo_ ) );
 	memset( reliableCommands_, 0, sizeof(reliableCommands_) );
 	memset( &lastUsercmd_, 0, sizeof(lastUsercmd_) );
