@@ -777,6 +777,8 @@ image_t *R_CreateImage( const char *name, const byte *pic, int width, int height
 	qglTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, glWrapClampMode );
 	qglTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, glWrapClampMode );
 
+	// FIXME: this stops fog from setting border color?
+	glState.currenttextures[glState.currenttmu] = 0;
 	qglBindTexture( GL_TEXTURE_2D, 0 );
 
 	if ( image->TMU == 1 ) {
@@ -900,6 +902,12 @@ static void LoadBMP( const char *name, byte **pic, int *width, int *height )
 		rows = -rows;
 	numPixels = columns * rows;
 
+	if(!columns || !rows || numPixels > 0x1FFFFFFF) // 4*1FFFFFFF == 0x7FFFFFFC < 0x7FFFFFFF
+	{
+	  ri.Error (ERR_DROP, "LoadBMP: %s has an invalid image size\n", name);
+	}
+
+
 	if ( width ) 
 		*width = columns;
 	if ( height )
@@ -990,7 +998,7 @@ static void LoadPCX ( const char *filename, byte **pic, byte **palette, int *wid
 	int		len;
 	int		dataByte, runLength;
 	byte	*out, *pix;
-	int		xmax, ymax;
+	unsigned		xmax, ymax;
 
 	*pic = NULL;
 	*palette = NULL;
@@ -1119,7 +1127,7 @@ LoadTGA
 */
 static void LoadTGA ( const char *name, byte **pic, int *width, int *height)
 {
-	int		columns, rows, numPixels;
+	unsigned	columns, rows, numPixels;
 	byte	*pixbuf;
 	int		row, column;
 	byte	*buf_p;
@@ -1181,14 +1189,19 @@ static void LoadTGA ( const char *name, byte **pic, int *width, int *height)
 
 	columns = targa_header.width;
 	rows = targa_header.height;
-	numPixels = columns * rows;
+	numPixels = columns * rows * 4;
 
 	if (width)
 		*width = columns;
 	if (height)
 		*height = rows;
 
-	targa_rgba = reinterpret_cast<byte*>(ri.Malloc (numPixels*4));
+	if(!columns || !rows || numPixels > 0x7FFFFFFF)
+	{
+		ri.Error (ERR_DROP, "LoadTGA: %s has an invalid image size\n", name);
+	}
+
+	targa_rgba = reinterpret_cast<byte*>(ri.Malloc (numPixels));
 	*pic = targa_rgba;
 
 	if (targa_header.id_length != 0)
@@ -1344,7 +1357,7 @@ static void LoadJPG( const char *filename, unsigned char **pic, int *width, int 
   /* This struct contains the JPEG decompression parameters and pointers to
    * working space (which is allocated as needed by the JPEG library).
    */
-  struct jpeg_decompress_struct cinfo;
+  struct jpeg_decompress_struct cinfo = {0};
   /* We use our private extension JPEG error handler.
    * Note that this struct must live as long as the main JPEG parameter
    * struct, to avoid dangling-pointer problems.
@@ -1360,7 +1373,7 @@ static void LoadJPG( const char *filename, unsigned char **pic, int *width, int 
   struct jpeg_error_mgr jerr;
   /* More stuff */
   JSAMPARRAY buffer;		/* Output row buffer */
-  int row_stride;		/* physical row width in output buffer */
+  unsigned row_stride;		/* physical row width in output buffer */
   unsigned pixelcount;
   unsigned char *out_converted;
   unsigned char *out;
@@ -1425,6 +1438,14 @@ static void LoadJPG( const char *filename, unsigned char **pic, int *width, int 
   /* JSAMPLEs per row in output buffer */
   pixelcount = cinfo.output_width * cinfo.output_height;
   row_stride = cinfo.output_width * cinfo.output_components;
+
+
+  if(!cinfo.output_width || !cinfo.output_height
+      || pixelcount > 0x1FFFFFFF || cinfo.output_components > 4) // 4*1FFFFFFF == 0x7FFFFFFC < 0x7FFFFFFF
+  {
+    ri.Error (ERR_DROP, "LoadJPG: %s has an invalid image size\n", filename);
+  }
+
   out = reinterpret_cast<unsigned char*>(ri.Malloc(pixelcount * 4));
 
   *width = cinfo.output_width;
@@ -2299,12 +2320,15 @@ static char *CommaParse( char **data_p ) {
 		// skip double slash comments
 		if ( c == '/' && data[1] == '/' )
 		{
-			while (*data && *data != '\n')
+			data += 2;
+			while (*data && *data != '\n') {
 				data++;
+			}
 		}
 		// skip /* */ comments
 		else if ( c=='/' && data[1] == '*' ) 
 		{
+			data += 2;
 			while ( *data && ( *data != '*' || data[1] != '/' ) ) 
 			{
 				data++;
@@ -2337,7 +2361,7 @@ static char *CommaParse( char **data_p ) {
 				*data_p = ( char * ) data;
 				return com_token;
 			}
-			if (len < MAX_TOKEN_CHARS)
+			if (len < MAX_TOKEN_CHARS - 1)
 			{
 				com_token[len] = c;
 				len++;
@@ -2348,7 +2372,7 @@ static char *CommaParse( char **data_p ) {
 	// parse a regular word
 	do
 	{
-		if (len < MAX_TOKEN_CHARS)
+		if (len < MAX_TOKEN_CHARS - 1)
 		{
 			com_token[len] = c;
 			len++;
@@ -2357,11 +2381,6 @@ static char *CommaParse( char **data_p ) {
 		c = *data;
 	} while (c>32 && c != ',' );
 
-	if (len == MAX_TOKEN_CHARS)
-	{
-//		Com_Printf ("Token exceeded %i chars, discarded.\n", MAX_TOKEN_CHARS);
-		len = 0;
-	}
 	com_token[len] = 0;
 
 	*data_p = ( char * ) data;
@@ -2422,7 +2441,7 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 	// If not a .skin file, load as a single shader
 	if ( strcmp( name + strlen( name ) - 5, ".skin" ) ) {
 		skin->numSurfaces = 1;
-		skin->surfaces[0] = reinterpret_cast<skinSurface_t*>(ri.Hunk_Alloc( sizeof(skin->surfaces[0]), h_low ));
+		skin->surfaces[0] = reinterpret_cast<skinSurface_t*>(ri.Hunk_Alloc( sizeof( *skin->surfaces[0] ), h_low ));
 		skin->surfaces[0]->shader = R_FindShader( name, LIGHTMAP_NONE, true );
 		return hSkin;
 	}
@@ -2456,6 +2475,11 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 		// parse the shader name
 		token = CommaParse( &text_p );
 
+		if ( skin->numSurfaces >= MD3_MAX_SURFACES ) {
+			ri.Printf( PRINT_WARNING, "WARNING: Ignoring surfaces in '%s', the max is %d surfaces!\n", name, MD3_MAX_SURFACES );
+			break;
+		}
+
 		surf = skin->surfaces[ skin->numSurfaces ] = reinterpret_cast<skinSurface_t*>(ri.Hunk_Alloc( sizeof( *skin->surfaces[0] ), h_low ));
 		Q_strncpyz( surf->name, surfName, sizeof( surf->name ) );
 		surf->shader = R_FindShader( token, LIGHTMAP_NONE, true );
@@ -2488,7 +2512,7 @@ void	R_InitSkins( void ) {
 	skin = tr.skins[0] = reinterpret_cast<skin_t*>(ri.Hunk_Alloc( sizeof( skin_t ), h_low ));
 	Q_strncpyz( skin->name, "<default skin>", sizeof( skin->name )  );
 	skin->numSurfaces = 1;
-	skin->surfaces[0] = reinterpret_cast<skinSurface_t*>(ri.Hunk_Alloc( sizeof( *skin->surfaces ), h_low ));
+	skin->surfaces[0] = reinterpret_cast<skinSurface_t*>(ri.Hunk_Alloc( sizeof( *skin->surfaces[0] ), h_low ));
 	skin->surfaces[0]->shader = tr.defaultShader;
 }
 

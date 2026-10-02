@@ -2324,14 +2324,15 @@ static char *FindShaderInShaderText( const char *shadername ) {
 
 	hash = generateHashValue(shadername, MAX_SHADERTEXT_HASH);
 
-	if(!shaderTextHashTable[hash])
-		return NULL;
-
-	for (i = 0; shaderTextHashTable[hash][i]; i++) {
-		p = shaderTextHashTable[hash][i];
-		token = COM_ParseExt(&p, true);
-		if ( !Q_stricmp( token, shadername ) ) {
-			return p;
+	if(shaderTextHashTable[hash])
+	{
+		for (i = 0; shaderTextHashTable[hash][i]; i++)
+		{
+			p = shaderTextHashTable[hash][i];
+			token = COM_ParseExt(&p, true);
+		
+			if(!Q_stricmp(token, shadername))
+				return p;
 		}
 	}
 
@@ -2585,6 +2586,13 @@ qhandle_t RE_RegisterShaderFromImage(const char *name, int lightmapIndex, image_
 	shader_t	*sh;
 
 	hash = generateHashValue(name, FILE_HASH_SIZE);
+
+	// probably not necessary since this function
+	// only gets called from tr_font.c with lightmapIndex == LIGHTMAP_2D
+	// but better safe than sorry.
+	if ( lightmapIndex >= tr.numLightmaps ) {
+		lightmapIndex = LIGHTMAP_WHITEIMAGE;
+	}
 	
 
 	// 20051020 misantropia -- probably not necessary since this function

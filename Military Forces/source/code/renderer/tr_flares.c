@@ -366,7 +366,7 @@ void RB_RenderFlare( flare_t *f ) {
 	
 	intensity = flareCoeff * size * size / (factor * factor);
 
-	VectorScale(f->color, f->drawIntensity * tr.identityLight * intensity, color);
+	VectorScale(f->color, f->drawIntensity * intensity, color);
 
 // Calculations for fogging
 	if(f->fogNum)
