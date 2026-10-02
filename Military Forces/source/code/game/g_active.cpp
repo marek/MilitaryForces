@@ -842,7 +842,9 @@ void ClientThink_real( GameEntity *ent )
 		if( client->ps_.ONOFF & OO_VAPOR ) 
 		{
 			client->ps_.ONOFF &= ~OO_VAPOR;
-			G_Damage( ent, 0, ent, 0, 0, client->ps_.speed/5, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
+			float impact = -client->ps_.velocity[2] - 100;
+			if( impact > 0 )
+				G_Damage( ent, 0, ent, 0, 0, impact/2, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 		}
 	}
 

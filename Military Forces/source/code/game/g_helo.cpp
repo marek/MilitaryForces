@@ -10,8 +10,7 @@ Entity_Helicopter::checkForTakeoffOrLanding()
 	trace_t	trace;
 	vec3_t	startpos;
 	vec3_t	endpos;
-	vec3_t	vel;
-	float	height = (client_->ps_.ONOFF & OO_LANDED) ? 3 : 1;
+	float	height = (client_->ps_.ONOFF & OO_LANDED) ? 3 : 1 + MAX( 0.0f, -client_->ps_.velocity[2] ) * 0.1f;
     float	throttle = client_->ps_.fixed_throttle;
     int		maxthrottle = availableVehicles[client_->vehicle_].maxthrottle;
 
@@ -40,12 +39,7 @@ Entity_Helicopter::checkForTakeoffOrLanding()
 			if( trace.fraction == 1.0 || (trace.entityNum != ENTITYNUM_NONE &&
 				!canLandOnIt(theLevel.getEntity(trace.entityNum)) ) ) 
 			{
-					//if(self->client->airOutTime < level.time) {
-						G_Damage( this, NULL, this, NULL, NULL, availableVehicles[client_->vehicle_].maxhealth/3, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
-					//	self->client->airOutTime = level.time + 1000;
-					//}
-					VectorNegate(client_->ps_.velocity, vel);
-					VectorAdd(vel, client_->ps_.origin,  client_->ps_.origin);
+				client_->ps_.ONOFF &= ~OO_LANDED;
 			}
 		}
 	} 
@@ -57,7 +51,7 @@ Entity_Helicopter::checkForTakeoffOrLanding()
 		if( trace.entityNum != ENTITYNUM_NONE && (client_->ps_.ONOFF & OO_GEAR) ) 
 		{
 			if( client_->ps_.vehicleAngles[0] < 30 &&
-				client_->ps_.vehicleAngles[0] >= 0 )
+				client_->ps_.vehicleAngles[0] >= -20 )
 			{
 
 				if( fabs( client_->ps_.vehicleAngles[2] ) < 20 )
@@ -73,7 +67,7 @@ Entity_Helicopter::checkForTakeoffOrLanding()
 					G_Damage( this, NULL, this, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 				}
 			} 
-			else if ( client_->ps_.vehicleAngles[0] >= 30 ) 
+			else
 			{
 				G_Damage( this, NULL, this, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 			}
@@ -85,7 +79,6 @@ Entity_Helicopter::checkForTakeoffOrLanding()
 void
 Entity_Helicopter::Entity_Helicopter_Touch::execute( GameEntity* other, trace_t *trace )
 {
-	Com_Printf( "You crashed into a %s\n", other->classname_ );
 	G_Damage( self_, NULL, self_, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 }
 

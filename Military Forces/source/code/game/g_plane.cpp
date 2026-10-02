@@ -10,7 +10,7 @@ Entity_Plane::checkForTakeoffOrLanding()
 	trace_t	trace;
 	vec3_t	startpos;
 	vec3_t	endpos;
-	float height = (client_->ps_.ONOFF & OO_LANDED) ? 3 : 1;
+	float height = (client_->ps_.ONOFF & OO_LANDED) ? 3 : 1 + MAX( 0.0f, -client_->ps_.velocity[2] ) * 0.1f;
 
 	VectorSet( startpos, s.pos.trBase[0], s.pos.trBase[1], s.pos.trBase[2] + r.mins[2]);
 	if( client_->ps_.ONOFF & OO_GEAR ) 
@@ -52,7 +52,7 @@ Entity_Plane::checkForTakeoffOrLanding()
 			(client_->ps_.ONOFF & OO_GEAR) ) 
 		{
 			if( client_->ps_.vehicleAngles[0] < 30 &&
-				client_->ps_.vehicleAngles[0] >= 0 ) 
+				client_->ps_.vehicleAngles[0] >= -15 ) 
 			{
 				if( fabs( client_->ps_.vehicleAngles[2] ) < 20 ) 
 				{
@@ -63,7 +63,7 @@ Entity_Plane::checkForTakeoffOrLanding()
 				    G_Damage( this, NULL, this, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 				}
 			} 
-			else if ( client_->ps_.vehicleAngles[0] >= 30 ) 
+			else
 			{
 			    G_Damage( this, NULL, this, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 			}
