@@ -41,6 +41,7 @@ typedef enum
 SDL_Window *SDL_window = NULL;
 static SDL_GLContext SDL_glContext = NULL;
 
+cvar_t *r_allowResize; // make window resizable
 cvar_t *r_centerWindow;
 cvar_t *r_sdlDriver;
 
@@ -85,7 +86,7 @@ void GLimp_LogComment( char *comment )
 GLimp_SetMode
 ===============
 */
-static int GLimp_SetMode( int mode, bool fullscreen )
+static int GLimp_SetMode( int mode, bool fullscreen, bool noborder )
 {
 	const char *glstring;
 	int perChannelColorBits;
@@ -98,6 +99,9 @@ static int GLimp_SetMode( int mode, bool fullscreen )
 	SDL_Surface *icon = NULL;
 
 	ri.Printf( PRINT_ALL, "Initializing OpenGL display\n" );
+
+	if ( r_allowResize->integer )
+		flags |= SDL_WINDOW_RESIZABLE;
 
 #ifdef USE_ICON
 	icon = SDL_CreateRGBSurfaceFrom(
@@ -148,6 +152,9 @@ static int GLimp_SetMode( int mode, bool fullscreen )
 	}
 	else
 	{
+		if( noborder )
+			flags |= SDL_WINDOW_BORDERLESS;
+
 		glConfig.isFullscreen = false;
 	}
 
@@ -326,7 +333,7 @@ static int GLimp_SetMode( int mode, bool fullscreen )
 GLimp_StartDriverAndSetMode
 ===============
 */
-static bool GLimp_StartDriverAndSetMode( int mode, bool fullscreen )
+static bool GLimp_StartDriverAndSetMode( int mode, bool fullscreen, bool noborder )
 {
 	rserr_t err;
 
@@ -345,7 +352,7 @@ static bool GLimp_StartDriverAndSetMode( int mode, bool fullscreen )
 		ri.Cvar_Set( "r_sdlDriver", driverName );
 	}
 
-	err = (rserr_t)GLimp_SetMode( mode, fullscreen );
+	err = (rserr_t)GLimp_SetMode( mode, fullscreen, noborder );
 
 	switch( err )
 	{
@@ -487,6 +494,7 @@ void GLimp_Init( void )
 	ri.Printf( PRINT_DEVELOPER, "Glimp_Init( )\n" );
 
 	r_sdlDriver = ri.Cvar_Get( "r_sdlDriver", "", CVAR_ROM );
+	r_allowResize = ri.Cvar_Get( "r_allowResize", "0", CVAR_ARCHIVE | CVAR_LATCH );
 	r_centerWindow = ri.Cvar_Get( "r_centerWindow", "0", CVAR_ARCHIVE | CVAR_LATCH );
 
 	if( ri.Cvar_Get( "com_abnormalExit", "0", CVAR_ROM )->integer )
@@ -497,14 +505,14 @@ void GLimp_Init( void )
 		ri.Cvar_Set( "com_abnormalExit", "0" );
 	}
 
-	if( GLimp_StartDriverAndSetMode( r_mode->integer, r_fullscreen->integer != 0 ) )
+	if( GLimp_StartDriverAndSetMode( r_mode->integer, r_fullscreen->integer != 0, r_noborder->integer != 0 ) )
 		goto success;
 
 	if( r_mode->integer != 3 )
 	{
 		ri.Printf( PRINT_ALL, "Setting r_mode %d failed, falling back on r_mode %d\n", r_mode->integer, 3 );
 
-		if( GLimp_StartDriverAndSetMode( 3, false ) )
+		if( GLimp_StartDriverAndSetMode( 3, false, false ) )
 			goto success;
 	}
 

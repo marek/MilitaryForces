@@ -66,6 +66,10 @@ cvar_t	*com_fixedtime;
 cvar_t	*com_journal;
 cvar_t	*com_maxfps;
 cvar_t	*com_busyWait;
+cvar_t	*com_unfocused;
+cvar_t	*com_maxfpsUnfocused;
+cvar_t	*com_minimized;
+cvar_t	*com_maxfpsMinimized;
 cvar_t	*com_timedemo;
 cvar_t	*com_sv_running;
 cvar_t	*com_cl_running;
@@ -2369,6 +2373,10 @@ void Com_Init( char *commandLine ) {
 	//
 	com_maxfps = Cvar_Get ("com_maxfps", "85", CVAR_ARCHIVE);
 	com_busyWait = Cvar_Get("com_busyWait", "0", CVAR_ARCHIVE);
+	com_unfocused = Cvar_Get( "com_unfocused", "0", CVAR_ROM );
+	com_maxfpsUnfocused = Cvar_Get( "com_maxfpsUnfocused", "0", CVAR_ARCHIVE );
+	com_minimized = Cvar_Get( "com_minimized", "0", CVAR_ROM );
+	com_maxfpsMinimized = Cvar_Get( "com_maxfpsMinimized", "0", CVAR_ARCHIVE );
 	com_blood = Cvar_Get ("com_blood", "1", CVAR_ARCHIVE);
 
 	com_developer = Cvar_Get ("developer", "0", CVAR_TEMP );
@@ -2659,7 +2667,11 @@ void Com_Frame( void ) {
 			minMsec = SV_FrameMsec();
 		else
 		{
-			if(com_maxfps->integer > 0)
+			if(com_minimized->integer && com_maxfpsMinimized->integer > 0)
+				minMsec = 1000 / com_maxfpsMinimized->integer;
+			else if(com_unfocused->integer && com_maxfpsUnfocused->integer > 0)
+				minMsec = 1000 / com_maxfpsUnfocused->integer;
+			else if(com_maxfps->integer > 0)
 				minMsec = 1000 / com_maxfps->integer;
 			else
 				minMsec = 1;

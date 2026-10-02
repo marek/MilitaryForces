@@ -40,6 +40,8 @@ static SDL_Joystick *stick = NULL;
 static bool mouseAvailable = false;
 static bool mouseActive = false;
 
+static int vidRestartTime = 0;
+
 static cvar_t *in_mouse             = NULL;
 static cvar_t *in_nograb;
 
@@ -575,6 +577,47 @@ static void IN_ProcessEvents( void )
 				}
 				break;
 
+			case SDL_WINDOWEVENT:
+				switch( e.window.event )
+				{
+					case SDL_WINDOWEVENT_RESIZED:
+						{
+							int width, height;
+
+							width = e.window.data1;
+							height = e.window.data2;
+
+							// ignore this event on fullscreen
+							if( cls.glconfig.isFullscreen )
+							{
+								break;
+							}
+
+							// check if size actually changed
+							if( cls.glconfig.vidWidth == width && cls.glconfig.vidHeight == height )
+							{
+								break;
+							}
+
+							Cvar_SetValue( "r_customwidth", width );
+							Cvar_SetValue( "r_customheight", height );
+							Cvar_Set( "r_mode", "-1" );
+
+							// Wait until user stops dragging for 1 second, so
+							// we aren't constantly recreating the GL context while
+							// he tries to drag...
+							vidRestartTime = Sys_Milliseconds( ) + 1000;
+						}
+						break;
+
+					case SDL_WINDOWEVENT_MINIMIZED:    Cvar_SetValue( "com_minimized", 1 ); break;
+					case SDL_WINDOWEVENT_RESTORED:
+					case SDL_WINDOWEVENT_MAXIMIZED:    Cvar_SetValue( "com_minimized", 0 ); break;
+					case SDL_WINDOWEVENT_FOCUS_LOST:   Cvar_SetValue( "com_unfocused", 1 ); break;
+					case SDL_WINDOWEVENT_FOCUS_GAINED: Cvar_SetValue( "com_unfocused", 0 ); break;
+				}
+				break;
+
 			case SDL_QUIT:
 				Cbuf_ExecuteText(EXEC_NOW, "quit Closed window\n");
 				break;
@@ -627,6 +670,13 @@ void IN_Frame( void )
 
 	// Set event time for next frame to earliest possible time an event could happen
 	in_eventTime = Sys_Milliseconds( );
+
+	// In case we had to delay actual restart of video system
+	if( ( vidRestartTime != 0 ) && ( vidRestartTime < Sys_Milliseconds( ) ) )
+	{
+		vidRestartTime = 0;
+		Cbuf_AddText( "vid_restart\n" );
+	}
 }
 
 /*
