@@ -33,6 +33,10 @@ endforeach()
 target_link_libraries(${CLIENT_NAME} PRIVATE ${MF_LIBRARIES}
     ${CLIENT_LIBRARIES} ${RENDERER_LIBRARIES} ${COMMON_LIBRARIES})
 
+if(APPLE AND BUILD_MACOS_APP)
+    finish_macos_app()
+endif()
+
 if(WIN32 AND TARGET SDL2::SDL2)
     add_custom_command(TARGET ${CLIENT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:SDL2::SDL2> $<TARGET_FILE_DIR:${CLIENT_NAME}>)

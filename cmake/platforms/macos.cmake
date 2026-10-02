@@ -8,3 +8,36 @@ endif()
 
 list(APPEND CLIENT_DEFINITIONS GL_SILENCE_DEPRECATION)
 list(APPEND COMMON_LIBRARIES "-framework Cocoa")
+
+option(BUILD_MACOS_APP "Deploy as a macOS .app" ON)
+
+set(MACOS_ICON_PATH ${CMAKE_SOURCE_DIR}/misc/macos/mfq3.icns)
+set(MACOS_BUNDLE_ID org.militaryforces.${CLIENT_NAME})
+
+if(BUILD_MACOS_APP)
+    set(CLIENT_EXECUTABLE_OPTIONS MACOSX_BUNDLE)
+endif()
+
+function(finish_macos_app)
+    get_filename_component(MACOS_ICON_FILE ${MACOS_ICON_PATH} NAME)
+
+    set(MACOS_APP_BUNDLE_NAME "Military Forces")
+    set(MACOS_APP_EXECUTABLE_NAME ${CLIENT_NAME})
+    set(MACOS_APP_GUI_IDENTIFIER ${MACOS_BUNDLE_ID})
+    set(MACOS_APP_ICON_FILE ${MACOS_ICON_FILE})
+    set(MACOS_APP_SHORT_VERSION_STRING ${PROJECT_VERSION})
+    set(MACOS_APP_BUNDLE_VERSION ${PROJECT_VERSION})
+    set(MACOS_APP_DEPLOYMENT_TARGET ${CMAKE_OSX_DEPLOYMENT_TARGET})
+    set(MACOS_APP_COPYRIGHT "")
+
+    configure_file(${CMAKE_SOURCE_DIR}/cmake/Info.plist.in
+        ${CMAKE_BINARY_DIR}/Info.plist @ONLY)
+
+    set_target_properties(${CLIENT_NAME} PROPERTIES
+        MACOSX_BUNDLE_INFO_PLIST ${CMAKE_BINARY_DIR}/Info.plist)
+
+    set(RESOURCES_DIR $<TARGET_FILE_DIR:${CLIENT_NAME}>/../Resources)
+    add_custom_command(TARGET ${CLIENT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${RESOURCES_DIR}
+        COMMAND ${CMAKE_COMMAND} -E copy ${MACOS_ICON_PATH} ${RESOURCES_DIR})
+endfunction()

@@ -23,6 +23,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <SDL.h>
 
 #include "../renderer/tr_local.h"
+#include "sdl_icon.h"
 
 void IN_Init( void );
 void IN_Shutdown( void );
@@ -94,8 +95,24 @@ static int GLimp_SetMode( int mode, bool fullscreen )
 	SDL_DisplayMode desktopMode;
 	int display = 0;
 	int x = SDL_WINDOWPOS_UNDEFINED, y = SDL_WINDOWPOS_UNDEFINED;
+	SDL_Surface *icon = NULL;
 
 	ri.Printf( PRINT_ALL, "Initializing OpenGL display\n" );
+
+#ifdef USE_ICON
+	icon = SDL_CreateRGBSurfaceFrom(
+			(void *)CLIENT_WINDOW_ICON.pixel_data,
+			CLIENT_WINDOW_ICON.width,
+			CLIENT_WINDOW_ICON.height,
+			CLIENT_WINDOW_ICON.bytes_per_pixel * 8,
+			CLIENT_WINDOW_ICON.bytes_per_pixel * CLIENT_WINDOW_ICON.width,
+#ifdef Q3_LITTLE_ENDIAN
+			0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000
+#else
+			0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF
+#endif
+			);
+#endif
 
 	if( SDL_GetDesktopDisplayMode( display, &desktopMode ) != 0 )
 	{
@@ -113,6 +130,7 @@ static int GLimp_SetMode( int mode, bool fullscreen )
 	else if( !R_GetModeInfo( &glConfig.vidWidth, &glConfig.vidHeight, &glConfig.windowAspect, mode ) )
 	{
 		ri.Printf( PRINT_ALL, " invalid mode\n" );
+		SDL_FreeSurface( icon );
 		return RSERR_INVALID_MODE;
 	}
 	ri.Printf( PRINT_ALL, " %d %d\n", glConfig.vidWidth, glConfig.vidHeight );
@@ -255,6 +273,8 @@ static int GLimp_SetMode( int mode, bool fullscreen )
 			}
 		}
 
+		SDL_SetWindowIcon( SDL_window, icon );
+
 		if( ( SDL_glContext = SDL_GL_CreateContext( SDL_window ) ) == NULL )
 		{
 			ri.Printf( PRINT_DEVELOPER, "SDL_GL_CreateContext failed: %s\n", SDL_GetError() );
@@ -284,6 +304,8 @@ static int GLimp_SetMode( int mode, bool fullscreen )
 				glConfig.colorBits, glConfig.depthBits, glConfig.stencilBits );
 		break;
 	}
+
+	SDL_FreeSurface( icon );
 
 	if( !SDL_window )
 	{
