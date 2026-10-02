@@ -170,12 +170,7 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 	}
 
 	// loadout
-	drawInfo.basicInfo.usedLoadout = &availableLoadouts[drawInfo.basicInfo.vehicleIndex];
-	for( i = 0; i < drawInfo.basicInfo.usedLoadout->usedMounts; ++i ) 
-	{
-		if( drawInfo.basicInfo.usedLoadout->mounts[i].weapon ) 
-			drawInfo.basicInfo.numWeaponsOnMount[i] = cg.snap->ps.numWeaponsOnMount[i];
-	}
+	CG_SetDrawLoadout( cent, &drawInfo.basicInfo );
 
 	// smoke
 	if( cent->currentState.generic1 ) 

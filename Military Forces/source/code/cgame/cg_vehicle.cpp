@@ -628,6 +628,47 @@ void CG_RegisterVehicle( clientInfo_t *ci )
 		Com_Error( ERR_DROP, "Invalid vehicle type in register vehicle" );
 }
 
+static int CG_LoadoutVehicle( centity_t* cent )
+{
+	if( cent->currentState.eType == ET_VEHICLE ) 
+	{
+		int clientNum = cent->currentState.clientNum;
+		if( clientNum < 0 || clientNum >= MAX_CLIENTS ) 
+			return -1;
+		return cgs.clientinfo[clientNum].vehicle;
+	}
+	if( cent->currentState.eType == ET_MISC_VEHICLE && cent->currentState.modelindex < 255 ) 
+		return cent->currentState.modelindex;
+	return -1;
+}
+
+completeLoadout_t* CG_EntityLoadout( centity_t* cent )
+{
+	int idx = CG_LoadoutVehicle( cent );
+	if( idx < 0 || idx >= bg_numberOfVehicles ) 
+		return 0;
+
+	int n = cent->currentState.number;
+	int key = ((idx + 1) << 1) | ((cent->currentState.eFlags & EF_TELEPORT_BIT) ? 1 : 0);
+	if( cg_loadoutKeys[n] != key ) 
+	{
+		MF_getDefaultLoadoutForVehicle( idx, &cg_loadouts[n], 0 );
+		cg_loadoutKeys[n] = key;
+	}
+	return &cg_loadouts[n];
+}
+
+void CG_SetDrawLoadout( centity_t* cent, BasicDrawInfo_t* info )
+{
+	info->usedLoadout = CG_EntityLoadout( cent );
+	if( !info->usedLoadout ) 
+		return;
+
+	bool local = cent->currentState.eType == ET_VEHICLE && cent->currentState.clientNum == cg.snap->ps.clientNum;
+	for( int i = 0; i < info->usedLoadout->usedMounts; ++i ) 
+		info->numWeaponsOnMount[i] = local ? cg.snap->ps.numWeaponsOnMount[i] : info->usedLoadout->mounts[i].num;
+}
+
 /*
 ===============
 CG_Vehicle

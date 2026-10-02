@@ -670,6 +670,13 @@ void CG_FireWeapon( centity_t *cent ) {
 		return;
 	}
 
+	completeLoadout_t* loadout = CG_EntityLoadout( cent );
+	if( loadout && availableWeapons[ent->weaponIndex].type == WT_FUELTANK ) {
+		while( MF_findWeaponsOfType( ent->weaponIndex, loadout ) )
+			MF_removeWeaponFromLoadout( ent->weaponIndex, loadout, 0, 0, 0, 0 );
+		return;
+	}
+
 	if( availableWeapons[ent->weaponIndex].type == WT_MACHINEGUN ) {
 		CG_FireMachinegun(cent, true);
 		return;	
@@ -690,7 +697,8 @@ void CG_FireWeapon( centity_t *cent ) {
 			S_StartSound( NULL, ent->number, CHAN_WEAPON, weap->flashSound[c] );
 		}
 	}
-	//MF_removeWeaponFromLoadout(ent->weaponIndex, &cg_loadouts[ent->number], 0, 0, 0 );
+	if( loadout )
+		MF_removeWeaponFromLoadout( ent->weaponIndex, loadout, 0, 0, 0, 0 );
 }
 
 

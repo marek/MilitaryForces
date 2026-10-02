@@ -238,7 +238,7 @@ spawn_t	spawns[] = {
 	{"trigger_radio", SP_trigger_radio},
 
 	{"func_catapult", SP_func_catapult},
-	{"func_explosive", SP_func_wires},
+	{"func_wires", SP_func_wires},
 
 	{"ai_radar", SP_ai_radar},
 	{"ai_sam", SP_ai_sam},

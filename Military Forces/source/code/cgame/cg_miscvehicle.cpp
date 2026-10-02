@@ -117,7 +117,7 @@ static void CG_Misc_Plane( centity_t *cent )
 	}
 
 	// loadout
-	drawInfo.basicInfo.usedLoadout = 0;//&cg_loadouts[cent->currentState.number];
+	CG_SetDrawLoadout( cent, &drawInfo.basicInfo );
 
 	// smoke
 	if( cent->currentState.generic1 ) {
@@ -196,7 +196,7 @@ static void CG_Misc_GV( centity_t *cent )
 	VectorCopy( cent->lerpAngles, drawInfo.basicInfo.angles );
 
 	// loadout
-	drawInfo.basicInfo.usedLoadout = 0;//&cg_loadouts[cent->currentState.number];
+	CG_SetDrawLoadout( cent, &drawInfo.basicInfo );
 
 	// turret/gun angle
 	drawInfo.gunAngle = cent->currentState.angles2[PITCH];
@@ -287,7 +287,7 @@ static void CG_Misc_Helo( centity_t *cent )
 	VectorCopy( cent->lerpAngles, drawInfo.basicInfo.angles );
    
 	// loadout
-	drawInfo.basicInfo.usedLoadout = 0;//&cg_loadouts[cent->currentState.number];
+	CG_SetDrawLoadout( cent, &drawInfo.basicInfo );
 
 	// turret/gun angle
 	for(i = 0; i < 4; i++)
@@ -370,7 +370,7 @@ static void CG_Misc_Boat( centity_t *cent )
 	VectorCopy( cent->lerpAngles, drawInfo.basicInfo.angles );
    
 	// loadout
-	drawInfo.basicInfo.usedLoadout = 0;//&cg_loadouts[cent->currentState.number];
+	CG_SetDrawLoadout( cent, &drawInfo.basicInfo );
 
 	// turret/gun angle
 	for(i = 0; i < 4; i++)

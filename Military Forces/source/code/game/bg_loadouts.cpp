@@ -132,8 +132,9 @@ void MF_getDefaultLoadoutForVehicle( int idx, completeLoadout_t* loadout, player
 
 //	Com_Printf("Getting default loadout for %s (%s)\n", availableVehicles[idx].descriptiveName, where );
 	memcpy( loadout, &availableLoadouts[idx], sizeof(completeLoadout_t) );
-	for( i = 0; i < 32; ++i )
-		ps->numWeaponsOnMount[i] = loadout->mounts[i].num;
+	if( ps )
+		for( i = 0; i < 32; ++i )
+			ps->numWeaponsOnMount[i] = loadout->mounts[i].num;
 }
 
 
@@ -162,7 +163,8 @@ bool MF_removeWeaponFromLoadout( int weaponIndex, completeLoadout_t* loadout, pl
 			if( !(availableWeapons[loadout->mounts[i].weapon].fitsPylon & PF_DONT_REMOVE) ) 
 			{
 				loadout->mounts[i].num--;
-				ps->numWeaponsOnMount[i]--;// for now keep them both in parallel
+				if( ps )
+					ps->numWeaponsOnMount[i]--;// for now keep them both in parallel
 			}
 			if( wingtip ) 
 				*wingtip = ((loadout->mounts[i].flags & PF_DONT_DROP) != 0);
@@ -199,7 +201,8 @@ int MF_addWeaponToLoadout( int weaponIndex, completeLoadout_t* loadout, playerSt
 			!(availableWeapons[loadout->mounts[i].weapon].fitsPylon & PF_DONT_REMOVE) ) 
 		{
 			loadout->mounts[i].num++;
-			ps->numWeaponsOnMount[i]++;
+			if( ps )
+				ps->numWeaponsOnMount[i]++;
 			added++;
 		}
 	}

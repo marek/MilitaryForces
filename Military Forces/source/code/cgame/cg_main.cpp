@@ -72,6 +72,7 @@ cg_t				cg;
 cgs_t				cgs;
 centity_t			cg_entities[MAX_GENTITIES];
 completeLoadout_t	cg_loadouts[MAX_GENTITIES];
+int					cg_loadoutKeys[MAX_GENTITIES];
 weaponInfo_t		cg_weapons[WI_MAX];
 itemInfo_t			cg_items[MAX_ITEMS];
 particleWorld_t		pw;
@@ -1929,6 +1930,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	memset( &cg, 0, sizeof( cg ) );
 	memset( cg_entities, 0, sizeof(cg_entities) );
 	memset( cg_loadouts, 0, sizeof(cg_loadouts) );
+	memset( cg_loadoutKeys, 0, sizeof(cg_loadoutKeys) );
 	memset( cg_weapons, 0, sizeof(cg_weapons) );
 	memset( cg_items, 0, sizeof(cg_items) );
 

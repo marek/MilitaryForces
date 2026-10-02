@@ -502,7 +502,7 @@ void PM_HeloMove( void )
 				if(vehdir[PITCH] > 0)
 					vehdir[PITCH] -= std::min(vehdir[PITCH], turnspeed[PITCH]*1.05f);
 				else if(vehdir[PITCH] < 0)
-					vehdir[PITCH] += std::max(vehdir[PITCH], turnspeed[PITCH]*1.05f);
+					vehdir[PITCH] += std::min(-vehdir[PITCH], turnspeed[PITCH]*1.05f);
 			}
 
 			// roll

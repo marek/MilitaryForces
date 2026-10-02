@@ -1093,6 +1093,7 @@ extern	markPoly_t		cg_markPolys[MAX_MARK_POLYS];
 
 // MFQ3
 extern	completeLoadout_t cg_loadouts[MAX_GENTITIES];
+extern	int cg_loadoutKeys[MAX_GENTITIES];
 // -MFQ3
 
 extern	vmCvar_t		cg_centertime;
@@ -1368,6 +1369,8 @@ void CG_RegisterVehicle( clientInfo_t *ci );
 void CG_VehicleObituary( entityState_t *ent );
 void CG_VehicleMuzzleFlash( int weaponIdx, const refEntity_t *parent, qhandle_t parentModel, int idx );
 void CG_Misc_Vehicle( centity_t *cent );
+completeLoadout_t* CG_EntityLoadout( centity_t* cent );
+void CG_SetDrawLoadout( centity_t* cent, BasicDrawInfo_t* info );
 void CG_InitShadows( void );
 
 
