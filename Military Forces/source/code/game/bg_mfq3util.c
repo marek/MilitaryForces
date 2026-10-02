@@ -908,12 +908,26 @@ static void MF_ParseEntities( char **buf,
 		}
 		else if( !strcmp(token, "Vehicle" ) )
 		{
+			if( numVeh >= IGME_MAX_VEHICLES )
+			{
+				mission_vehicle_t skipped;
+				Com_Printf( "Too many vehicles in mission, ignoring the rest\n" );
+				MF_ParseVehicle(buf, &skipped);
+				continue;
+			}
 			MF_ParseVehicle(buf, &vehs[numVeh]);
 			++numVeh;
 			continue;
 		}
 		else if( !strcmp(token, "GroundInstallation" ) )
 		{
+			if( numGI >= IGME_MAX_VEHICLES )
+			{
+				mission_groundInstallation_t skipped;
+				Com_Printf( "Too many ground installations in mission, ignoring the rest\n" );
+				MF_ParseGroundInstallation(buf, &skipped);
+				continue;
+			}
 			MF_ParseGroundInstallation(buf, &gis[numGI]);
 			++numGI;
 			continue;

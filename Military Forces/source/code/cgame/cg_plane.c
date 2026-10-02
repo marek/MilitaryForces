@@ -241,7 +241,7 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 			AnglesToAxis( ang, reticle.axis );
 			VectorMA( cent->lerpOrigin, 2000, forward, end );
 			CG_Trace( &tr, cent->lerpOrigin, 0, 0, end, cg.snap->ps.clientNum, MASK_SOLID ); 
-			if ( tr.entityNum < MAX_CLIENTS )
+			if ( tr.entityNum > ENTITYNUM_WORLD && tr.entityNum < MAX_CLIENTS )
 			{
 				cg.crosshairClientNum = tr.entityNum;
 				cg.crosshairClientTime = cg.time;
@@ -317,7 +317,7 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 			AngleVectors(cent->currentState.angles, forward, 0, 0);
 			VectorMA( cent->lerpOrigin, 2000, forward, end );
 			CG_Trace( &tr, cent->lerpOrigin, 0, 0, end, cg.snap->ps.clientNum, MASK_SOLID ); 
-			if ( tr.entityNum < MAX_CLIENTS ) {
+			if ( tr.entityNum > ENTITYNUM_WORLD && tr.entityNum < MAX_CLIENTS ) {
 				cg.crosshairClientNum = tr.entityNum;
 				cg.crosshairClientTime = cg.time;
 			}

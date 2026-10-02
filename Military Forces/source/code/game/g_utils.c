@@ -551,8 +551,8 @@ void G_KillBox( GameEntity *ent )
 
 	for( i=0 ; i<num ; i++ )
 	{
-		hit = theLevel.getEntity(i);// &g_entities[touch[i]];
-		if( !hit->client_ ) 
+		hit = theLevel.getEntity(touch[i]);
+		if( !hit || !hit->client_ ) 
 			continue;
 
 		// nail it

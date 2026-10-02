@@ -1,4 +1,5 @@
 #include "g_local.h"
+#include "g_miscvehicle.h"
 #include "../vehiclelib/bg_datamanager.h"
 #include "g_level.h"
 
@@ -408,10 +409,10 @@ void G_InitGame( int levelTime, int randomSeed )
 	if( g_gametype.integer != GT_MISSION_EDITOR )
 	{
 		// MFQ3 mission scripts
-		//G_LoadMissionScripts();
+		G_LoadMissionScripts();
 
 		// init some MFQ3 stuff
-		//DroneInit();
+		DroneInit();
 	}
 
 	SV_SetConfigstring( CS_INTERMISSION, "" );

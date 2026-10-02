@@ -1557,7 +1557,6 @@ void Cmd_Eject_f( GameEntity *ent )
 		(availableVehicles[ent->client_->vehicle_].cat & CAT_HELO) ) 
 	{
 		veh = theLevel.spawnEntity();
-		veh->init(-1);
 		veh->classname_ = "misc_vehicle";
 		veh->health_ = 0;
 		veh->client_ = NULL;

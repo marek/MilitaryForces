@@ -905,7 +905,7 @@ void ME_ExportToScript( const char* scriptname )
 			Com_sprintf( outstring, sizeof(outstring), "\t\tIndex\t%d\n", veh->vehidx );
 			FS_Write( outstring, strlen(outstring), f );
 
-			Com_sprintf( outstring, sizeof(outstring), "\t\tName\tSAM Turret\n" );
+			Com_sprintf( outstring, sizeof(outstring), "\t\tName\t\"%s\"\n", availableGroundInstallations[veh->vehidx].descriptiveName );
 			FS_Write( outstring, strlen(outstring), f );
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\tTeam\t?\n" ); // ADD TEAM HERE!
@@ -930,7 +930,7 @@ void ME_ExportToScript( const char* scriptname )
 			Com_sprintf( outstring, sizeof(outstring), "\t\tIndex\t%d\n", veh->vehidx );
 			FS_Write( outstring, strlen(outstring), f );
 
-			Com_sprintf( outstring, sizeof(outstring), "\t\tName\t%s\n", availableVehicles[veh->vehidx].modelName );
+			Com_sprintf( outstring, sizeof(outstring), "\t\tName\t\"%s\"\n", availableVehicles[veh->vehidx].modelName );
 			FS_Write( outstring, strlen(outstring), f );
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\tTeam\t%d\n", availableVehicles[veh->vehidx].team ); 
@@ -979,7 +979,7 @@ static void ME_SpawnMissionGroundInstallations(mission_groundInstallation_t* gis
 {
 	int	i;
 
-	for( i = 0; i < IGME_MAX_VEHICLES/4; ++i )
+	for( i = 0; i < IGME_MAX_VEHICLES; ++i )
 	{
 		if( !gis[i].used ) break;
 		ME_SpawnGroundInstallationAt(gis[i].index,
@@ -991,16 +991,17 @@ static void ME_SpawnMissionGroundInstallations(mission_groundInstallation_t* gis
 
 static void ME_SpawnMissionVehicles(mission_vehicle_t* vehs)
 {
-	int	i, j, k = 0;
+	int	i, j, k;
 	IGME_vehicle_t* veh;
 
-	for( i = 0; i < IGME_MAX_VEHICLES/4; ++i )
+	for( i = 0; i < IGME_MAX_VEHICLES; ++i )
 	{
 		if( !vehs[i].used ) break;
 		veh = ME_SpawnVehicleAt(vehs[i].index,
 					 		    vehs[i].origin,
 								vehs[i].angles);
 		if( !veh ) continue;
+		k = 0;
 		for( j = 0; j < IGME_MAX_WAYPOINTS; ++j )
 		{
 			if( vehs[i].waypoints[j].used )
@@ -1054,8 +1055,8 @@ void ME_ImportScript( const char* scriptname )
 {
 	char				filename[256];
 	mission_overview_t	overview;
-	mission_vehicle_t	vehicles[IGME_MAX_VEHICLES/4];
-	mission_groundInstallation_t installations[IGME_MAX_VEHICLES/4];
+	mission_vehicle_t	vehicles[IGME_MAX_VEHICLES];
+	mission_groundInstallation_t installations[IGME_MAX_VEHICLES];
 	const char			*info, *mapname;
 
 	memset(&overview, 0, sizeof(overview));

@@ -308,7 +308,7 @@ LevelLocals::spawnEntity()
 		}
 		if( ent->inuse_ )
 			continue;
-		if( ent->freetime_ > startTime_ + 2000 || time_ - ent->freetime_ < 1000 )
+		if( ent->freetime_ > startTime_ + 2000 && time_ - ent->freetime_ < 1000 )
 			continue;
 		ent->init(i);
 		return ent;

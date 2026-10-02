@@ -174,7 +174,7 @@ void G_Damage( GameEntity *targ, GameEntity *inflictor, GameEntity* attacker,
 		if( damage > targ->count_ ) 
 		{
 			targ->health_ -= damage;
-			if( targ->health_ < 0 ) //&& targ->die ) 
+			if( targ->health_ < 0 && targ->dieFunc_ )
 				targ->dieFunc_->execute( inflictor, attacker, 0, 0 );
 		}
 		return;
@@ -351,10 +351,11 @@ void G_Damage( GameEntity *targ, GameEntity *inflictor, GameEntity* attacker,
 				targ->health_ = -999;
 
 			targ->enemy_ = attacker;
-			targ->dieFunc_->execute( inflictor, attacker, take, mod );
+			if( targ->dieFunc_ )
+				targ->dieFunc_->execute( inflictor, attacker, take, mod );
 			return;
 		}
-		else //if ( targ->pain ) 
+		else if( targ->painFunc_ )
 			targ->painFunc_->execute( attacker, take );
 	}
 }

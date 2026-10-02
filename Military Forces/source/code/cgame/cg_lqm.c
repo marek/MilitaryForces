@@ -154,7 +154,7 @@ void CG_LQM( centity_t *cent, clientInfo_t *ci )
 		AnglesToAxis( ang, reticle.axis );
 		CG_Trace( &tr, start, 0, 0, end, cg.snap->ps.clientNum, MASK_SOLID ); 
 
-		if( tr.entityNum < MAX_CLIENTS )
+		if( tr.entityNum > ENTITYNUM_WORLD && tr.entityNum < MAX_CLIENTS )
 		{
 			cg.crosshairClientNum = tr.entityNum;
 			cg.crosshairClientTime = cg.time;
