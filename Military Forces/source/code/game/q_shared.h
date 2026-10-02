@@ -180,6 +180,8 @@ typedef int		clipHandle_t;
 #define NULL ((void *)0)
 #endif
 
+#define ARRAY_LEN(x)			(sizeof(x) / sizeof(*(x)))
+
 #define PAD(base, alignment)	(((base)+(alignment)-1) & ~((alignment)-1))
 
 #define	MAX_QINT			0x7fffffff

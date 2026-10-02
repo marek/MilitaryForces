@@ -616,7 +616,7 @@ void RB_CalcColorFromOneMinusEntity( unsigned char *dstColors )
 {
 	int	i;
 	int *pColors = ( int * ) dstColors;
-	unsigned char invModulate[3];
+	unsigned char invModulate[4];
 	int c;
 
 	if ( !backEnd.currentEntity )
@@ -631,7 +631,7 @@ void RB_CalcColorFromOneMinusEntity( unsigned char *dstColors )
 
 	for ( i = 0; i < tess.numVertexes; i++, pColors++ )
 	{
-		*pColors = * ( int * ) invModulate;
+		*pColors = c;
 	}
 }
 

@@ -233,7 +233,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 	int vehIndex = atoi( Info_ValueForKey( userinfo, "cg_nextVehicle" ) );
 
 	GameEntity* ent;
-	switch( availableVehicles[vehIndex].cat )
+	switch( vehIndex >= 0 ? availableVehicles[vehIndex].cat : 0 )
 	{
 	case CAT_PLANE:
 		ent = new Entity_Plane;

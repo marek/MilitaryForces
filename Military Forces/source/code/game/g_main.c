@@ -636,7 +636,7 @@ void CalculateRanks()
 	theLevel.numNonSpectatorClients_ = 0;
 	theLevel.numPlayingClients_ = 0;
 	theLevel.numVotingClients_ = 0;		// don't count bots
-	for( int i = 0; i < ClientBase::TEAM_NUM_TEAMS; i++ ) 
+	for( int i = 0; i < ARRAY_LEN( theLevel.numteamVotingClients_ ); i++ ) 
 		theLevel.numteamVotingClients_[i] = 0;
 
 	for( int i = 1 ; i <= theLevel.maxclients_ ; i++ ) 

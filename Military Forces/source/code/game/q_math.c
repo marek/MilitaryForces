@@ -1413,7 +1413,7 @@ Create a random integer
 int RandomInt( int min, int max )
 {
 	// create a fp modifier
-	float modifier = (float)rand()/(RAND_MAX+1);
+	float modifier = (float)rand()/((float)RAND_MAX+1.0f);
 	
 	// spread the modifier over the integer range
 	int range = (max - min) + 1;

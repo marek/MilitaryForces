@@ -942,7 +942,7 @@ static void CG_RegisterGraphics( void ) {
 	// MFQ3 stuff
 	cgs.media.vapor = refExport.RegisterModel( "models/effects/vapor.md3" );
 	cgs.media.vaporBig = refExport.RegisterModel( "models/effects/vapor_big.md3" );
-	cgs.media.vaporShader = refExport.RegisterModel( "models/effects/turbulence" );
+	cgs.media.vaporShader = refExport.RegisterShader( "models/effects/turbulence" );
 	cgs.media.afterburner[AB_BALL] = refExport.RegisterModel( "models/effects/burner_ball.md3" );
 	cgs.media.afterburner[AB_BLUE] = refExport.RegisterModel( "models/effects/burner_blue.md3" );
 	cgs.media.afterburner[AB_RED] = refExport.RegisterModel( "models/effects/burner_red.md3" );

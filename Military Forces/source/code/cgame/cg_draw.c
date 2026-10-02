@@ -1788,7 +1788,7 @@ static void CG_DrawSpectator(void) {
 
 		CG_AdjustFrom640( &x, &y, &w, &h );
 
-		hShader = cgs.media.crosshairShader[8];
+		hShader = cgs.media.crosshairShader[0];
 
 		refExport.DrawStretchPic( x + cg.refdef.x + 0.5 * (cg.refdef.width - w), 
 			y + cg.refdef.y + 0.5 * (cg.refdef.height - h), 

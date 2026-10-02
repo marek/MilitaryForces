@@ -195,10 +195,10 @@ static void CG_MissileTrail2( centity_t * cent, const weaponInfo_t *wi ) {
 		VectorClear(le->pos.trDelta);
 		VectorCopy(end, re->oldorigin);
 
-		re->shaderRGBA[0] = 0.3f;
-		re->shaderRGBA[1] = 0.3f;
-		re->shaderRGBA[2] = 0.3f;
-		re->shaderRGBA[3] = 0.3f;
+		re->shaderRGBA[0] = 0.3f * 255;
+		re->shaderRGBA[1] = 0.3f * 255;
+		re->shaderRGBA[2] = 0.3f * 255;
+		re->shaderRGBA[3] = 0.3f * 255;
 
 		le->color[0] = 1.0f;
 		le->color[1] = 1.0f;
