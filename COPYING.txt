@@ -8,6 +8,11 @@ in this repository, including the Military Forces modifications, is free and
 open source software. You may use, modify and redistribute it under the terms
 of the GNU GPL v2, the full text of which follows below.
 
+A few files keep their own GPL-compatible licenses, noted in the files:
+  qcommon/unzip.c      zlib license
+  jpeg-6/              IJG license (see jpeg-6/README)
+  client/snd_adpcm.c   Stichting Mathematisch Centrum license
+
 GAME ASSETS
 The Military Forces game assets (models, textures, maps, sounds, music,
 artwork and all other media, including the contents of any .pk3 archives)

@@ -233,10 +233,6 @@ A "connect" OOB command has been received
 ==================
 */
 
-//#define PB_MESSAGE "PunkBuster Anti-Cheat software must be installed " \
-//				"and Enabled in order to join this server. An updated game patch can be downloaded from " \
-//				"www.idsoftware.com"
-
 void SV_DirectConnect( netadr_t from ) 
 {
 	Com_DPrintf ("SVC_DirectConnect ()\n");
