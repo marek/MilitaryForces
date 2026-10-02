@@ -237,10 +237,8 @@ CL_DemoFilename
 void CL_DemoFilename( int number, char *fileName, int fileNameSize ) {
 	int		a,b,c,d;
 
-	if ( number < 0 || number > 9999 ) {
-		Com_sprintf( fileName, MAX_OSPATH, "demo9999.tga" );
-		return;
-	}
+	if(number < 0 || number > 9999)
+		number = 9999;
 
 	a = number / 1000;
 	number -= a*1000;
@@ -511,21 +509,25 @@ void CL_PlayDemo_f( void ) {
 	char		retry[MAX_OSPATH];
 
 	if (Cmd_Argc() != 2) {
-		Com_Printf ("playdemo <demoname>\n");
+		Com_Printf ("demo <demoname>\n");
 		return;
 	}
 
 	// make sure a local server is killed
-	Cvar_Set( "sv_killserver", "1" );
-
-	CL_Disconnect( true );
+	// 2 means don't force disconnect of local client
+	Cvar_Set( "sv_killserver", "2" );
 
 	// open the demo file
 	arg = Cmd_Argv(1);
 	
+	CL_Disconnect( true );
+
 	// check for an extension .dm_?? (?? is protocol)
 	ext_test = arg + strlen(arg) - 6;
-	if ((strlen(arg) > 6) && (ext_test[0] == '.') && ((ext_test[1] == 'd') || (ext_test[1] == 'D')) && ((ext_test[2] == 'm') || (ext_test[2] == 'M')) && (ext_test[3] == '_'))
+	if ((strlen(arg) > 6) && (ext_test[0] == '.') &&
+		((ext_test[1] == 'd') || (ext_test[1] == 'D')) &&
+		((ext_test[2] == 'm') || (ext_test[2] == 'M')) &&
+		(ext_test[3] == '_'))
 	{
 		protocol = atoi(ext_test+4);
 		i=0;
@@ -553,7 +555,7 @@ void CL_PlayDemo_f( void ) {
 		Com_Error( ERR_DROP, "couldn't open %s", name);
 		return;
 	}
-	Q_strncpyz( clc.demoName, Cmd_Argv(1), sizeof( clc.demoName ) );
+	Q_strncpyz( clc.demoName, arg, sizeof( clc.demoName ) );
 
 	Con_Close();
 
@@ -1123,7 +1125,7 @@ void CL_Rcon_f( void ) {
 	char	message[MAX_RCON_MESSAGE];
 	netadr_t	to;
 
-	if ( !rcon_client_password->string ) {
+	if ( !rcon_client_password->string[0] ) {
 		Com_Printf ("You must set 'rconpassword' before\n"
 					"issuing an rcon command.\n");
 		return;
@@ -1674,7 +1676,7 @@ CL_ServersResponsePacket
 ===================
 */
 void CL_ServersResponsePacket( netadr_t from, msg_t *msg ) {
-	int				i, count, max, total;
+	int				i, j, count, max, total;
 	serverAddress_t addresses[MAX_SERVERSPERPACKET];
 	int				numservers;
 	byte*			buffptr;
@@ -1753,6 +1755,19 @@ void CL_ServersResponsePacket( netadr_t from, msg_t *msg ) {
 	for (i = 0; i < numservers && count < max; i++) {
 		// build net address
 		serverInfo_t *server = (cls.masterNum == 0) ? &cls.globalServers[count] : &cls.mplayerServers[count];
+		serverInfo_t *servers = (cls.masterNum == 0) ? cls.globalServers : cls.mplayerServers;
+
+		// Tequila: It's possible to have sent many master server requests. Then
+		// we may receive many times the same addresses from the master server.
+		// We just avoid to add a server if it is still in the global servers list.
+		for (j = 0; j < count; j++)
+		{
+			if (!memcmp(servers[j].adr.ip, addresses[i].ip, 4) && servers[j].adr.port == addresses[i].port)
+				break;
+		}
+
+		if (j < count)
+			continue;
 
 		CL_InitServerInfo( server, &addresses[i] );
 		// advance to next slot
@@ -2123,8 +2138,10 @@ void QDECL CL_RefPrintf( int print_level, const char *fmt, ...) {
 		Com_Printf ("%s", msg);
 	} else if ( print_level == PRINT_WARNING ) {
 		Com_Printf (S_COLOR_YELLOW "%s", msg);		// yellow
+	} else if ( print_level == PRINT_ERROR ) {
+		Com_Printf (S_COLOR_RED "%s", msg);			// red
 	} else if ( print_level == PRINT_DEVELOPER ) {
-		Com_DPrintf (S_COLOR_RED "%s", msg);		// red
+		Com_DPrintf (S_COLOR_RED "%s", msg);		// red - developer only
 	}
 }
 
@@ -2569,7 +2586,10 @@ void CL_ServerInfoPacket( netadr_t from, msg_t *msg ) {
 		if ( cl_pinglist[i].adr.port && !cl_pinglist[i].time && NET_CompareAdr( from, cl_pinglist[i].adr ) )
 		{
 			// calc ping time
-			cl_pinglist[i].time = cls.realtime - cl_pinglist[i].start + 1;
+			if (cl_pinglist[i].start == cls.realtime)
+				cl_pinglist[i].time = Sys_Milliseconds() - cl_pinglist[i].start + 1;
+			else
+				cl_pinglist[i].time = cls.realtime - cl_pinglist[i].start + 1;
 			Com_DPrintf( "ping time %dms from %s\n", cl_pinglist[i].time, NET_AdrToString( from ) );
 
 			// save of info

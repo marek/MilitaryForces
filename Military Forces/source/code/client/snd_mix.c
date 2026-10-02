@@ -121,21 +121,21 @@ void S_TransferStereo16 (unsigned long *pbuf, int endtime)
 	while (ls_paintedtime < endtime)
 	{
 	// handle recirculating buffer issues
-		lpos = ls_paintedtime & ((dma.samples>>1)-1);
+		lpos = ls_paintedtime % dma.fullsamples;
 
-		snd_out = (short *) pbuf + (lpos<<1);
+		snd_out = (short *) pbuf + (lpos<<1); // lpos * dma.channels
 
-		snd_linear_count = (dma.samples>>1) - lpos;
+		snd_linear_count = dma.fullsamples - lpos;
 		if (ls_paintedtime + snd_linear_count > endtime)
 			snd_linear_count = endtime - ls_paintedtime;
 
-		snd_linear_count <<= 1;
+		snd_linear_count <<= 1; // snd_linear_count *= dma.channels
 
 	// write a linear blast of samples
 		S_WriteLinearBlastStereo16 ();
 
 		snd_p += snd_linear_count;
-		ls_paintedtime += (snd_linear_count>>1);
+		ls_paintedtime += (snd_linear_count>>1); // snd_linear_count / dma.channels
 	}
 }
 
@@ -149,19 +149,16 @@ void S_TransferPaintBuffer(int endtime)
 {
 	int 	out_idx;
 	int 	count;
-	int 	out_mask;
 	int 	*p;
 	int 	step;
 	int		val;
+	int		i;
 	unsigned long *pbuf;
 
 	pbuf = (unsigned long *)dma.buffer;
 
 
 	if ( s_testsound->integer ) {
-		int		i;
-		int		count;
-
 		// write a fixed sine wave
 		count = (endtime - s_paintedtime);
 		for (i=0 ; i<count ; i++)
@@ -177,38 +174,51 @@ void S_TransferPaintBuffer(int endtime)
 	{	// general case
 		p = (int *) paintbuffer;
 		count = (endtime - s_paintedtime) * dma.channels;
-		out_mask = dma.samples - 1; 
-		out_idx = s_paintedtime * dma.channels & out_mask;
-		step = 3 - dma.channels;
+		out_idx = ((unsigned int)s_paintedtime * dma.channels) % dma.samples;
+		step = 3 - MIN(dma.channels, 2);
 
 		if (dma.samplebits == 16)
 		{
 			short *out = (short *) pbuf;
-			while (count--)
+			for (i=0 ; i<count ; i++)
 			{
-				val = *p >> 8;
-				p+= step;
+				if ((i % dma.channels) >= 2)
+				{
+					val = 0;
+				}
+				else
+				{
+					val = *p >> 8;
+					p+= step;
+				}
 				if (val > 0x7fff)
 					val = 0x7fff;
 				else if (val < -32768)
 					val = -32768;
 				out[out_idx] = val;
-				out_idx = (out_idx + 1) & out_mask;
+				out_idx = (out_idx + 1) % dma.samples;
 			}
 		}
 		else if (dma.samplebits == 8)
 		{
 			unsigned char *out = (unsigned char *) pbuf;
-			while (count--)
+			for (i=0 ; i<count ; i++)
 			{
-				val = *p >> 8;
-				p+= step;
+				if ((i % dma.channels) >= 2)
+				{
+					val = 0;
+				}
+				else
+				{
+					val = *p >> 8;
+					p+= step;
+				}
 				if (val > 0x7fff)
 					val = 0x7fff;
 				else if (val < -32768)
 					val = -32768;
 				out[out_idx] = (val>>8) + 128;
-				out_idx = (out_idx + 1) & out_mask;
+				out_idx = (out_idx + 1) % dma.samples;
 			}
 		}
 	}

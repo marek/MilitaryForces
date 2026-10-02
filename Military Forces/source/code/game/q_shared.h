@@ -217,6 +217,14 @@ typedef int		clipHandle_t;
 
 #define ARRAY_LEN(x)			(sizeof(x) / sizeof(*(x)))
 
+#ifndef MAX
+#define MAX(x,y) ((x)>(y)?(x):(y))
+#endif
+
+#ifndef MIN
+#define MIN(x,y) ((x)<(y)?(x):(y))
+#endif
+
 #define PAD(base, alignment)	(((base)+(alignment)-1) & ~((alignment)-1))
 
 #define	MAX_QINT			0x7fffffff

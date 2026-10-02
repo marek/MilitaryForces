@@ -195,7 +195,7 @@ EDIT FIELDS
 Field_Draw
 
 Handles horizontal scrolling and cursor blinking
-x, y, amd width are in pixels
+x, y, and width are in pixels
 ===================
 */
 void Field_VariableSizeDraw( field_t *edit, int x, int y, int width, int size, bool showCursor ) {
@@ -206,8 +206,8 @@ void Field_VariableSizeDraw( field_t *edit, int x, int y, int width, int size, b
 	char	str[MAX_STRING_CHARS];
 	int		i;
 
-	drawLen = edit->widthInChars;
-	len = strlen( edit->buffer ) + 1;
+	drawLen = edit->widthInChars - 1; // - 1 so there is always a space for the cursor
+	len = strlen( edit->buffer );
 
 	// guarantee that cursor will be visible
 	if ( len <= drawLen ) {
@@ -220,14 +220,6 @@ void Field_VariableSizeDraw( field_t *edit, int x, int y, int width, int size, b
 			}
 		}
 		prestep = edit->scroll;
-
-/*
-		if ( edit->cursor < len - drawLen ) {
-			prestep = edit->cursor;	// cursor at start
-		} else {
-			prestep = len - drawLen;
-		}
-*/
 	}
 
 	if ( prestep + drawLen > len ) {
@@ -268,7 +260,7 @@ void Field_VariableSizeDraw( field_t *edit, int x, int y, int width, int size, b
 		cursorChar = 10;
 	}
 
-	i = drawLen - ( Q_PrintStrlen( str ) + 1 );
+	i = drawLen - Q_PrintStrlen( str );
 
 	if ( size == SMALLCHAR_WIDTH ) {
 		SCR_DrawSmallChar( x + ( edit->cursor - prestep - i ) * size, y, cursorChar );
@@ -333,54 +325,50 @@ void Field_KeyDownEvent( field_t *edit, int key ) {
 		return;
 	}
 
+	key = tolower( key );
 	len = strlen( edit->buffer );
 
-	if ( key == K_DEL ) {
-		if ( edit->cursor < len ) {
-			memmove( edit->buffer + edit->cursor, 
-				edit->buffer + edit->cursor + 1, len - edit->cursor );
-		}
-		return;
+	switch ( key ) {
+		case K_DEL:
+			if ( edit->cursor < len ) {
+				memmove( edit->buffer + edit->cursor, 
+					edit->buffer + edit->cursor + 1, len - edit->cursor );
+			}
+			break;
+
+		case K_RIGHTARROW:
+			if ( edit->cursor < len ) {
+				edit->cursor++;
+			}
+			break;
+
+		case K_LEFTARROW:
+			if ( edit->cursor > 0 ) {
+				edit->cursor--;
+			}
+			break;
+
+		case K_HOME:
+			edit->cursor = 0;
+			break;
+
+		case K_END:
+			edit->cursor = len;
+			break;
+
+		case K_INS:
+			key_overstrikeMode = !key_overstrikeMode;
+			break;
+
+		default:
+			break;
 	}
 
-	if ( key == K_RIGHTARROW ) 
-	{
-		if ( edit->cursor < len ) {
-			edit->cursor++;
-		}
-
-		if ( edit->cursor >= edit->scroll + edit->widthInChars && edit->cursor <= len )
-		{
-			edit->scroll++;
-		}
-		return;
-	}
-
-	if ( key == K_LEFTARROW ) 
-	{
-		if ( edit->cursor > 0 ) {
-			edit->cursor--;
-		}
-		if ( edit->cursor < edit->scroll )
-		{
-			edit->scroll--;
-		}
-		return;
-	}
-
-	if ( key == K_HOME || ( tolower(key) == 'a' && keys[K_CTRL].down ) ) {
-		edit->cursor = 0;
-		return;
-	}
-
-	if ( key == K_END || ( tolower(key) == 'e' && keys[K_CTRL].down ) ) {
-		edit->cursor = len;
-		return;
-	}
-
-	if ( key == K_INS ) {
-		key_overstrikeMode = !key_overstrikeMode;
-		return;
+	// Change scroll is cursor if no longer visible
+	if ( edit->cursor < edit->scroll ) {
+		edit->scroll = edit->cursor;
+	} else if ( edit->cursor >= edit->scroll + edit->widthInChars && edit->cursor <= len ) {
+		edit->scroll = edit->cursor - edit->widthInChars + 1;
 	}
 }
 
@@ -437,12 +425,14 @@ void Field_CharEvent( field_t *edit, int ch ) {
 	}
 
 	if ( key_overstrikeMode ) {	
-		if ( edit->cursor == MAX_EDIT_LINE - 1 )
+		// - 2 to leave room for the leading slash and trailing \0
+		if ( edit->cursor == MAX_EDIT_LINE - 2 )
 			return;
 		edit->buffer[edit->cursor] = ch;
 		edit->cursor++;
 	} else {	// insert mode
-		if ( len == MAX_EDIT_LINE - 1 ) {
+		// - 2 to leave room for the leading slash and trailing \0
+		if ( len == MAX_EDIT_LINE - 2 ) {
 			return; // all full
 		}
 		memmove( edit->buffer + edit->cursor + 1, 
@@ -486,8 +476,10 @@ void Console_Key (int key) {
 	// enter finishes the line
 	if ( key == K_ENTER || key == K_KP_ENTER ) {
 		// if not in the game explicitly prepent a slash if needed
-		if ( cls.state != CA_ACTIVE && g_consoleField.buffer[0] != '\\' 
-			&& g_consoleField.buffer[0] != '/' ) {
+		if ( cls.state != CA_ACTIVE &&
+				g_consoleField.buffer[0] &&
+				g_consoleField.buffer[0] != '\\' &&
+				g_consoleField.buffer[0] != '/' ) {
 			char	temp[MAX_STRING_CHARS];
 
 			Q_strncpyz( temp, g_consoleField.buffer, sizeof( temp ) );
@@ -548,9 +540,13 @@ void Console_Key (int key) {
 
 	if ( (key == K_MWHEELDOWN && keys[K_SHIFT].down) || ( key == K_DOWNARROW ) || ( key == K_KP_DOWNARROW ) ||
 		 ( ( tolower(key) == 'n' ) && keys[K_CTRL].down ) ) {
-		if (historyLine == nextHistoryLine)
-			return;
 		historyLine++;
+		if (historyLine >= nextHistoryLine) {
+			historyLine = nextHistoryLine;
+			Field_Clear( &g_consoleField );
+			g_consoleField.widthInChars = g_console_field_width;
+			return;
+		}
 		g_consoleField = historyEditLines[ historyLine % COMMAND_HISTORY ];
 		return;
 	}
@@ -668,7 +664,7 @@ Key_IsDown
 */
 bool Key_IsDown( int keynum ) 
 {
-	if ( keynum == -1 ) {
+	if ( keynum < 0 || keynum >= MAX_KEYS ) {
 		return false;
 	}
 
@@ -696,7 +692,7 @@ int Key_StringToKeynum( char *str ) {
 		return -1;
 	}
 	if ( !str[1] ) {
-		return str[0];
+		return tolower( str[0] );
 	}
 
 	// check for hex code
@@ -746,7 +742,7 @@ char *Key_KeynumToString( int keynum ) {
 	static	char	tinystr[5];
 	int			i, j;
 
-	if ( keynum == -1 ) {
+	if ( keynum < 0 || keynum >= MAX_KEYS ) {
 		return "<KEY NOT FOUND>";
 	}
 
@@ -789,7 +785,7 @@ Key_SetBinding
 */
 void Key_SetBinding( int keynum, const char *binding ) 
 {
-	if ( keynum == -1 ) {
+	if ( keynum < 0 || keynum >= MAX_KEYS ) {
 		return;
 	}
 
@@ -813,7 +809,7 @@ Key_GetBinding
 ===================
 */
 char *Key_GetBinding( int keynum ) {
-	if ( keynum == -1 ) {
+	if ( keynum < 0 || keynum >= MAX_KEYS ) {
 		return "";
 	}
 
@@ -830,7 +826,7 @@ int Key_GetKey(const char *binding) {
   int i;
 
   if (binding) {
-  	for (i=0 ; i<256 ; i++) {
+  	for (i=0 ; i < MAX_KEYS ; i++) {
       if (keys[i].binding && Q_stricmp(binding, keys[i].binding) == 0) {
         return i;
       }
@@ -873,7 +869,7 @@ void Key_Unbindall_f (void)
 {
 	int		i;
 	
-	for (i=0 ; i<256 ; i++)
+	for (i=0 ; i < MAX_KEYS ; i++)
 		if (keys[i].binding)
 			Key_SetBinding (i, "");
 }
@@ -905,7 +901,7 @@ void Key_Bind_f (void)
 
 	if (c == 2)
 	{
-		if (keys[b].binding)
+		if (keys[b].binding && keys[b].binding[0])
 			Com_Printf ("\"%s\" = \"%s\"\n", Cmd_Argv(1), keys[b].binding );
 		else
 			Com_Printf ("\"%s\" is not bound\n", Cmd_Argv(1) );
@@ -935,7 +931,7 @@ void Key_WriteBindings( fileHandle_t f ) {
 	int		i;
 
 	FS_Printf (f, "unbindall\n" );
-	for (i=0 ; i<256; i++) {
+	for (i=0 ; i < MAX_KEYS; i++) {
 		if (keys[i].binding && keys[i].binding[0] ) {
 			FS_Printf (f, "bind %s \"%s\"\n", Key_KeynumToString(i), keys[i].binding);
 
@@ -1251,6 +1247,12 @@ void CL_CharEvent( int key )
 	// the console key should never be used as a char
 	if ( key == '`' || key == '~' ) 
 	{
+		return;
+	}
+
+	// delete is not a printable character and is
+	// otherwise handled by Field_KeyDownEvent
+	if ( key == 127 ) {
 		return;
 	}
 

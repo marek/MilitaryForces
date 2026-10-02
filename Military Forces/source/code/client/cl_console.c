@@ -63,8 +63,6 @@ cvar_t		*con_notifytime;
 
 #define	DEFAULT_CONSOLE_WIDTH	78
 
-vec4_t	console_color = {1.0, 1.0, 1.0, 1.0};
-
 
 /*
 ================
@@ -373,9 +371,9 @@ If no console is visible, the text will appear at the top of the game window
 ================
 */
 void CL_ConsolePrint( char *txt ) {
-	int		y;
-	int		c, l;
-	int		color;
+	int		y, l;
+	unsigned char	c;
+	unsigned short	color;
 	bool skipnotify = false;		// NERVE - SMF
 	int prev;							// NERVE - SMF
 
@@ -403,7 +401,7 @@ void CL_ConsolePrint( char *txt ) {
 
 	color = ColorIndex(COLOR_WHITE);
 
-	while ( (c = *txt) != 0 ) {
+	while ( (c = *((unsigned char *) txt)) != 0 ) {
 		if ( Q_IsColorString( txt ) ) {
 			color = ColorIndex( *(txt+1) );
 			txt += 2;

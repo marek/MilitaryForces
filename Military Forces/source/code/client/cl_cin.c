@@ -335,28 +335,14 @@ long RllDecodeStereoToMono(unsigned char *from,short *to,unsigned int size,char 
 
 static void move8_32( byte *src, byte *dst, int spl )
 {
-	double *dsrc, *ddst;
-	int dspl;
+	int i;
 
-	dsrc = (double *)src;
-	ddst = (double *)dst;
-	dspl = spl>>3;
-
-	ddst[0] = dsrc[0]; ddst[1] = dsrc[1]; ddst[2] = dsrc[2]; ddst[3] = dsrc[3];
-	dsrc += dspl; ddst += dspl;
-	ddst[0] = dsrc[0]; ddst[1] = dsrc[1]; ddst[2] = dsrc[2]; ddst[3] = dsrc[3];
-	dsrc += dspl; ddst += dspl;
-	ddst[0] = dsrc[0]; ddst[1] = dsrc[1]; ddst[2] = dsrc[2]; ddst[3] = dsrc[3];
-	dsrc += dspl; ddst += dspl;
-	ddst[0] = dsrc[0]; ddst[1] = dsrc[1]; ddst[2] = dsrc[2]; ddst[3] = dsrc[3];
-	dsrc += dspl; ddst += dspl;
-	ddst[0] = dsrc[0]; ddst[1] = dsrc[1]; ddst[2] = dsrc[2]; ddst[3] = dsrc[3];
-	dsrc += dspl; ddst += dspl;
-	ddst[0] = dsrc[0]; ddst[1] = dsrc[1]; ddst[2] = dsrc[2]; ddst[3] = dsrc[3];
-	dsrc += dspl; ddst += dspl;
-	ddst[0] = dsrc[0]; ddst[1] = dsrc[1]; ddst[2] = dsrc[2]; ddst[3] = dsrc[3];
-	dsrc += dspl; ddst += dspl;
-	ddst[0] = dsrc[0]; ddst[1] = dsrc[1]; ddst[2] = dsrc[2]; ddst[3] = dsrc[3];
+	for(i = 0; i < 8; ++i)
+	{
+		memcpy(dst, src, 32);
+		src += spl;
+		dst += spl;
+	}
 }
 
 /******************************************************************************
@@ -369,20 +355,14 @@ static void move8_32( byte *src, byte *dst, int spl )
 
 static void move4_32( byte *src, byte *dst, int spl  )
 {
-	double *dsrc, *ddst;
-	int dspl;
+	int i;
 
-	dsrc = (double *)src;
-	ddst = (double *)dst;
-	dspl = spl>>3;
-
-	ddst[0] = dsrc[0]; ddst[1] = dsrc[1];
-	dsrc += dspl; ddst += dspl;
-	ddst[0] = dsrc[0]; ddst[1] = dsrc[1];
-	dsrc += dspl; ddst += dspl;
-	ddst[0] = dsrc[0]; ddst[1] = dsrc[1];
-	dsrc += dspl; ddst += dspl;
-	ddst[0] = dsrc[0]; ddst[1] = dsrc[1];
+	for(i = 0; i < 4; ++i)
+	{
+		memcpy(dst, src, 16);
+		src += spl;
+		dst += spl;
+	}
 }
 
 /******************************************************************************
@@ -395,28 +375,14 @@ static void move4_32( byte *src, byte *dst, int spl  )
 
 static void blit8_32( byte *src, byte *dst, int spl  )
 {
-	double *dsrc, *ddst;
-	int dspl;
+	int i;
 
-	dsrc = (double *)src;
-	ddst = (double *)dst;
-	dspl = spl>>3;
-
-	ddst[0] = dsrc[0]; ddst[1] = dsrc[1]; ddst[2] = dsrc[2]; ddst[3] = dsrc[3];
-	dsrc += 4; ddst += dspl;
-	ddst[0] = dsrc[0]; ddst[1] = dsrc[1]; ddst[2] = dsrc[2]; ddst[3] = dsrc[3];
-	dsrc += 4; ddst += dspl;
-	ddst[0] = dsrc[0]; ddst[1] = dsrc[1]; ddst[2] = dsrc[2]; ddst[3] = dsrc[3];
-	dsrc += 4; ddst += dspl;
-	ddst[0] = dsrc[0]; ddst[1] = dsrc[1]; ddst[2] = dsrc[2]; ddst[3] = dsrc[3];
-	dsrc += 4; ddst += dspl;
-	ddst[0] = dsrc[0]; ddst[1] = dsrc[1]; ddst[2] = dsrc[2]; ddst[3] = dsrc[3];
-	dsrc += 4; ddst += dspl;
-	ddst[0] = dsrc[0]; ddst[1] = dsrc[1]; ddst[2] = dsrc[2]; ddst[3] = dsrc[3];
-	dsrc += 4; ddst += dspl;
-	ddst[0] = dsrc[0]; ddst[1] = dsrc[1]; ddst[2] = dsrc[2]; ddst[3] = dsrc[3];
-	dsrc += 4; ddst += dspl;
-	ddst[0] = dsrc[0]; ddst[1] = dsrc[1]; ddst[2] = dsrc[2]; ddst[3] = dsrc[3];
+	for(i = 0; i < 8; ++i)
+	{
+		memcpy(dst, src, 32);
+		src += 32;
+		dst += spl;
+	}
 }
 
 /******************************************************************************
@@ -426,23 +392,16 @@ static void blit8_32( byte *src, byte *dst, int spl  )
 * Description:	
 *
 ******************************************************************************/
-#define movs double
 static void blit4_32( byte *src, byte *dst, int spl  )
 {
-	movs *dsrc, *ddst;
-	int dspl;
+	int i;
 
-	dsrc = (movs *)src;
-	ddst = (movs *)dst;
-	dspl = spl>>3;
-
-	ddst[0] = dsrc[0]; ddst[1] = dsrc[1];
-	dsrc += 2; ddst += dspl;
-	ddst[0] = dsrc[0]; ddst[1] = dsrc[1];
-	dsrc += 2; ddst += dspl;
-	ddst[0] = dsrc[0]; ddst[1] = dsrc[1];
-	dsrc += 2; ddst += dspl;
-	ddst[0] = dsrc[0]; ddst[1] = dsrc[1];
+	for(i = 0; i < 4; ++i)
+	{
+		memmove(dst, src, 16);
+		src += 16;
+		dst += spl;
+	}
 }
 
 /******************************************************************************
@@ -455,15 +414,8 @@ static void blit4_32( byte *src, byte *dst, int spl  )
 
 static void blit2_32( byte *src, byte *dst, int spl  )
 {
-	double *dsrc, *ddst;
-	int dspl;
-
-	dsrc = (double *)src;
-	ddst = (double *)dst;
-	dspl = spl>>3;
-
-	ddst[0] = dsrc[0];
-	ddst[dspl] = dsrc[1];
+	memcpy(dst, src, 8);
+	memcpy(dst+spl, src+8, 8);
 }
 
 /******************************************************************************
@@ -675,7 +627,7 @@ static unsigned int yuv_to_rgb24( long y, long u, long v )
 	if (r<0) r = 0; if (g<0) g = 0; if (b<0) b = 0;
 	if (r > 255) r = 255; if (g > 255) g = 255; if (b > 255) b = 255;
 	
-	return LittleLong ((r)|(g<<8)|(b<<16)|(255<<24));
+	return LittleLong ((unsigned long)((r)|(g<<8)|(b<<16))|(255UL<<24));
 }
 #endif
 
@@ -1567,7 +1519,9 @@ int CIN_PlayCinematic( const char *arg, int x, int y, int w, int h, int systemBi
 		
 		Con_Close();
 
-		s_rawend = s_soundtime;
+		if (!cinTable[currentHandle].silent) {
+			s_rawend = s_soundtime;
+		}
 
 		return currentHandle;
 	}
@@ -1747,6 +1701,9 @@ void CIN_UploadCinematic(int handle) {
 		refExport.UploadCinematic( 256, 256, 256, 256, cinTable[handle].buf, handle, cinTable[handle].dirty);
 		if (cl_inGameVideo->integer == 0 && cinTable[handle].playonwalls == 1) {
 			cinTable[handle].playonwalls--;
+		}
+		else if (cl_inGameVideo->integer != 0 && cinTable[handle].playonwalls != 1) {
+			cinTable[handle].playonwalls = 1;
 		}
 	}
 }

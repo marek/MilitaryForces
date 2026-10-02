@@ -569,10 +569,10 @@ usercmd_t CL_CreateCmd( void ) {
 	// draw debug graphs of turning for mouse testing
 	if ( cl_debugMove->integer ) {
 		if ( cl_debugMove->integer == 1 ) {
-			SCR_DebugGraph( abs(cl.viewangles[YAW] - oldAngles[YAW]), 0 );
+			SCR_DebugGraph( fabs(cl.viewangles[YAW] - oldAngles[YAW]), 0 );
 		}
 		if ( cl_debugMove->integer == 2 ) {
-			SCR_DebugGraph( abs(cl.viewangles[PITCH] - oldAngles[PITCH]), 0 );
+			SCR_DebugGraph( fabs(cl.viewangles[PITCH] - oldAngles[PITCH]), 0 );
 		}
 	}
 
@@ -597,6 +597,12 @@ void CL_CreateNewCommands( void ) {
 	}
 
 	frame_msec = com_frameTime - old_com_frameTime;
+
+	// if running over 1000fps, act as if each frame is 1ms
+	// prevents divisions by zero
+	if ( frame_msec < 1 ) {
+		frame_msec = 1;
+	}
 
 	// if running less than 5fps, truncate the extra time to prevent
 	// unexpected moves after a hitch

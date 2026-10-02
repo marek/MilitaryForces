@@ -66,6 +66,7 @@ typedef struct sfx_s {
 typedef struct {
 	int			channels;
 	int			samples;				// mono samples in buffer
+	int			fullsamples;			// samples with all channels in buffer (samples divided by channels)
 	int			submission_chunk;		// don't mix less than this #
 	int			samplebits;
 	int			speed;
@@ -73,6 +74,8 @@ typedef struct {
 } dma_t;
 
 #define START_SAMPLE_IMMEDIATE	0x7fffffff
+
+#define MAX_DOPPLER_SCALE 50.0f //arbitrary
 
 typedef struct loopSound_s {
 	vec3_t		origin;
@@ -159,7 +162,6 @@ extern	portable_samplepair_t	s_rawsamples[MAX_RAW_SAMPLES];
 
 extern cvar_t	*s_volume;
 extern cvar_t	*s_nosound;
-extern cvar_t	*s_khz;
 extern cvar_t	*s_show;
 extern cvar_t	*s_mixahead;
 

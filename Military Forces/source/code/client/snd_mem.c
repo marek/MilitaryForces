@@ -272,7 +272,7 @@ static void ResampleSfx( sfx_t *sfx, int inrate, int inwidth, byte *data, bool c
 		} 
 		else 
 		{
-			sample = (int)( (unsigned char)(data[srcsample]) - 128) << 8;
+			sample = (unsigned int)( (unsigned char)(data[srcsample]) - 128) << 8;
 		}
 		part  = (i&(SND_CHUNK_SIZE-1));
 		if (part == 0) {
@@ -327,7 +327,7 @@ static int ResampleSfxRaw( short *sfx, int inrate, int inwidth, int samples, byt
 		} 
 		else 
 		{
-			sample = (int)( (unsigned char)(data[srcsample]) - 128) << 8;
+			sample = (unsigned int)( (unsigned char)(data[srcsample]) - 128) << 8;
 		}
 		sfx[i] = sample;
 	}

@@ -84,7 +84,6 @@ static	sfx_t		*sfxHash[LOOP_HASH];
 
 cvar_t		*s_volume;
 cvar_t		*s_testsound;
-cvar_t		*s_khz;
 cvar_t		*s_show;
 cvar_t		*s_mixahead;
 cvar_t		*s_mixPreStep;
@@ -146,7 +145,6 @@ void S_Init( void ) {
 	s_musicVolume = Cvar_Get ("s_musicvolume", "0.25", CVAR_ARCHIVE);
 	s_separation = Cvar_Get ("s_separation", "0.5", CVAR_ARCHIVE);
 	s_doppler = Cvar_Get ("s_doppler", "1", CVAR_ARCHIVE);
-	s_khz = Cvar_Get ("s_khz", "22", CVAR_ARCHIVE);
 	s_mixahead = Cvar_Get ("s_mixahead", "0.2", CVAR_ARCHIVE);
 
 	s_mixPreStep = Cvar_Get ("s_mixPreStep", "0.05", CVAR_ARCHIVE);
@@ -788,6 +786,8 @@ void S_AddLoopingSound( int entityNum, const vec3_t origin, const vec3_t velocit
 		loopSounds[entityNum].dopplerScale = lenb/(lena*100);
 		if (loopSounds[entityNum].dopplerScale<=1.0) {
 			loopSounds[entityNum].doppler = false;			// don't bother doing the math
+		} else if (loopSounds[entityNum].dopplerScale>MAX_DOPPLER_SCALE) {
+			loopSounds[entityNum].dopplerScale = MAX_DOPPLER_SCALE;
 		}
 	}
 
@@ -1198,9 +1198,6 @@ void S_GetSoundtime(void)
 	int		samplepos;
 	static	int		buffers;
 	static	int		oldsamplepos;
-	int		fullsamples;
-	
-	fullsamples = dma.samples / dma.channels;
 
 	// it is possible to miscount buffers if it has wrapped twice between
 	// calls to S_Update.  Oh well.
@@ -1212,13 +1209,13 @@ void S_GetSoundtime(void)
 		if (s_paintedtime > 0x40000000)
 		{	// time to chop things off to avoid 32 bit limits
 			buffers = 0;
-			s_paintedtime = fullsamples;
+			s_paintedtime = dma.fullsamples;
 			S_StopAllSounds ();
 		}
 	}
 	oldsamplepos = samplepos;
 
-	s_soundtime = buffers*fullsamples + samplepos/dma.channels;
+	s_soundtime = buffers*dma.fullsamples + samplepos/dma.channels;
 
 #if 0
 // check to make sure that we haven't overshot
@@ -1239,7 +1236,6 @@ void S_GetSoundtime(void)
 
 void S_Update_(void) {
 	unsigned        endtime;
-	int				samps;
 	static			float	lastTime = 0.0f;
 	float			ma, op;
 	float			thisTime, sane;
@@ -1283,9 +1279,9 @@ void S_Update_(void) {
 		& ~(dma.submission_chunk-1);
 
 	// never mix more than the complete buffer
-	samps = dma.samples >> (dma.channels-1);
-	if (endtime - s_soundtime > samps)
-		endtime = s_soundtime + samps;
+	// never mix more than the complete buffer
+	if (endtime - s_soundtime > dma.fullsamples)
+		endtime = s_soundtime + dma.fullsamples;
 
 
 
@@ -1537,17 +1533,14 @@ void S_UpdateBackgroundTrack( void ) {
 	byte	raw[30000];		// just enough to fit in a mac stack frame
 	int		fileBytes;
 	int		r;
-	static	float	musicVolume = 0.5f;
 
 	if ( !s_backgroundFile ) {
 		return;
 	}
 
-	// graeme see if this is OK
-	musicVolume = (musicVolume + (s_musicVolume->value * 2))/4.0f;
 
 	// don't bother playing anything if musicvolume is 0
-	if ( musicVolume <= 0 ) {
+	if ( s_musicVolume->value <= 0 ) {
 		return;
 	}
 
@@ -1586,7 +1579,7 @@ void S_UpdateBackgroundTrack( void ) {
 
 		// add to raw buffer
 		S_RawSamples( fileSamples, s_backgroundInfo.rate, 
-			s_backgroundInfo.width, s_backgroundInfo.channels, raw, musicVolume );
+			s_backgroundInfo.width, s_backgroundInfo.channels, raw, s_musicVolume->value );
 
 		s_backgroundSamples -= fileSamples;
 		if ( !s_backgroundSamples ) {

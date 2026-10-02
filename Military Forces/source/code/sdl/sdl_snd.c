@@ -227,6 +227,7 @@ bool SNDDMA_Init(void)
 	dma.samplebits = SDL_AUDIO_BITSIZE(obtained.format);
 	dma.channels = obtained.channels;
 	dma.samples = tmp;
+	dma.fullsamples = dma.samples / dma.channels;
 	dma.submission_chunk = 1;
 	dma.speed = obtained.freq;
 	dmasize = (dma.samples * (dma.samplebits/8));
