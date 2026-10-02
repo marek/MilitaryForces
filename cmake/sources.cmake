@@ -7,65 +7,65 @@ set(VEHICLELIB_SOURCES
 list(TRANSFORM VEHICLELIB_SOURCES PREPEND "${SOURCE_DIR}/vehiclelib/")
 
 set(GAME_SOURCES
-    bg_boatmove.c bg_groundmove.c bg_helomove.c bg_loadouts.c bg_lqmmove.c bg_md3util.c
-    bg_mfq3util.c bg_misc.c bg_planemove.c bg_pmove.c bg_slidemove.c bg_vehicledata.c
-    bg_weapondata.c g_active.c g_arenas.c g_boat.cpp g_client.c g_client.cpp g_cmds.c
-    g_combat.c g_entity.cpp g_groundinstallation.c g_groundvehicle.cpp g_helo.cpp g_items.c
-    g_level.cpp g_lqm.cpp g_main.c g_mem.c g_mfq3ents.c g_mfq3util.c g_misc.c
-    g_miscvehicle.c g_missile.c g_missions.c g_mover.c g_plane.cpp g_scripts.c g_session.c
-    g_spawn.c g_svcmds.c g_target.c g_team.c g_trigger.c g_utils.c g_vehicle.cpp
-    g_waypoint.c g_weapon.c g_world.cpp game.cpp mf_client.c mf_vehiclespawn.c)
+    bg_boatmove.cpp bg_groundmove.cpp bg_helomove.cpp bg_loadouts.cpp bg_lqmmove.cpp bg_md3util.cpp
+    bg_mfq3util.cpp bg_misc.cpp bg_planemove.cpp bg_pmove.cpp bg_slidemove.cpp bg_vehicledata.cpp
+    bg_weapondata.cpp g_active.cpp g_arenas.cpp g_boat.cpp g_client.cpp g_cmds.cpp
+    g_combat.cpp g_entity.cpp g_groundinstallation.cpp g_groundvehicle.cpp g_helo.cpp g_items.cpp
+    g_level.cpp g_lqm.cpp g_main.cpp g_mem.cpp g_mfq3ents.cpp g_mfq3util.cpp g_misc.cpp
+    g_miscvehicle.cpp g_missile.cpp g_missions.cpp g_mover.cpp g_plane.cpp g_scripts.cpp g_session.cpp
+    g_spawn.cpp g_svcmds.cpp g_target.cpp g_team.cpp g_trigger.cpp g_utils.cpp g_vehicle.cpp
+    g_waypoint.cpp g_weapon.cpp g_world.cpp game.cpp mf_client.cpp mf_vehiclespawn.cpp)
 list(TRANSFORM GAME_SOURCES PREPEND "${SOURCE_DIR}/game/")
 
 set(CGAME_SOURCES
-    cg.cpp cg_boat.c cg_consolecmds.c cg_draw.c cg_drawnewhud.c cg_drawoldhud.c
-    cg_drawtools.c cg_effects.c cg_ents.c cg_event.c cg_groundvehicle.c cg_helo.c cg_info.c
-    cg_localents.c cg_lqm.c cg_main.c cg_marks.c cg_miscvehicle.c cg_missioneditor.c
-    cg_particles.c cg_plane.c cg_players.c cg_playerstate.c cg_predict.c cg_scoreboard.c
-    cg_servercmds.c cg_snapshot.c cg_testmodel.c cg_util.c cg_vehicle.c cg_vehicledraw.c
-    cg_view.c cg_weapons.c ui_displaycontext_cg.cpp ui_utils_cg.cpp)
+    cg.cpp cg_boat.cpp cg_consolecmds.cpp cg_draw.cpp cg_drawnewhud.cpp cg_drawoldhud.cpp
+    cg_drawtools.cpp cg_effects.cpp cg_ents.cpp cg_event.cpp cg_groundvehicle.cpp cg_helo.cpp cg_info.cpp
+    cg_localents.cpp cg_lqm.cpp cg_main.cpp cg_marks.cpp cg_miscvehicle.cpp cg_missioneditor.cpp
+    cg_particles.cpp cg_plane.cpp cg_players.cpp cg_playerstate.cpp cg_predict.cpp cg_scoreboard.cpp
+    cg_servercmds.cpp cg_snapshot.cpp cg_testmodel.cpp cg_util.cpp cg_vehicle.cpp cg_vehicledraw.cpp
+    cg_view.cpp cg_weapons.cpp ui_displaycontext_cg.cpp ui_utils_cg.cpp)
 list(TRANSFORM CGAME_SOURCES PREPEND "${SOURCE_DIR}/cgame/")
 
 set(UI_SOURCES
-    ui.cpp ui_atoms.c ui_commanddef.cpp ui_controls.cpp ui_displaycontext.cpp
-    ui_displaycontext_ui.cpp ui_gameinfo.c ui_hashutils.cpp ui_itemcapture.cpp
-    ui_keywordhash.cpp ui_main.c ui_memtools.cpp ui_precomp.cpp ui_util.c ui_utils.cpp
+    ui.cpp ui_atoms.cpp ui_commanddef.cpp ui_controls.cpp ui_displaycontext.cpp
+    ui_displaycontext_ui.cpp ui_gameinfo.cpp ui_hashutils.cpp ui_itemcapture.cpp
+    ui_keywordhash.cpp ui_main.cpp ui_memtools.cpp ui_precomp.cpp ui_util.cpp ui_utils.cpp
     ui_utils_ui.cpp)
 list(TRANSFORM UI_SOURCES PREPEND "${SOURCE_DIR}/ui/")
 
 set(RENDERER_SOURCES
-    tr_animation.c tr_backend.c tr_bsp.c tr_cmds.c tr_curve.c tr_flares.c tr_font.c
-    tr_image.c tr_image_jpg.c tr_init.c tr_light.c tr_main.c tr_marks.c tr_mesh.c tr_model.c tr_noise.c
-    tr_scene.c tr_shade.c tr_shade_calc.c tr_shader.c tr_shadows.c tr_sky.c tr_surface.c
-    tr_world.c)
+    tr_animation.cpp tr_backend.cpp tr_bsp.cpp tr_cmds.cpp tr_curve.cpp tr_flares.cpp tr_font.cpp
+    tr_image.cpp tr_image_jpg.cpp tr_init.cpp tr_light.cpp tr_main.cpp tr_marks.cpp tr_mesh.cpp tr_model.cpp tr_noise.cpp
+    tr_scene.cpp tr_shade.cpp tr_shade_calc.cpp tr_shader.cpp tr_shadows.cpp tr_sky.cpp tr_surface.cpp
+    tr_world.cpp)
 list(TRANSFORM RENDERER_SOURCES PREPEND "${SOURCE_DIR}/renderer/")
 
 set(QCOMMON_SOURCES
-    qcommon/cm_load.c qcommon/cm_patch.c qcommon/cm_polylib.c qcommon/cm_test.c
-    qcommon/cm_trace.c qcommon/cmd.c qcommon/common.c qcommon/cvar.c qcommon/files.c
-    qcommon/huffman.c qcommon/md4.c qcommon/msg.c qcommon/net_chan.c qcommon/unzip.c
-    game/q_math.c game/q_shared.c)
+    qcommon/cm_load.cpp qcommon/cm_patch.cpp qcommon/cm_polylib.cpp qcommon/cm_test.cpp
+    qcommon/cm_trace.cpp qcommon/cmd.cpp qcommon/common.cpp qcommon/cvar.cpp qcommon/files.cpp
+    qcommon/huffman.cpp qcommon/md4.cpp qcommon/msg.cpp qcommon/net_chan.cpp qcommon/unzip.cpp
+    game/q_math.cpp game/q_shared.cpp)
 list(TRANSFORM QCOMMON_SOURCES PREPEND "${SOURCE_DIR}/")
 
 set(SERVER_SOURCES
-    sv_bot.c sv_ccmds.c sv_client.c sv_client.cpp sv_entity.cpp sv_game.c sv_init.c
-    sv_main.c sv_net_chan.c sv_server.cpp sv_snapshot.c sv_world.c)
+    sv_bot.cpp sv_ccmds.cpp sv_client.cpp sv_entity.cpp sv_game.cpp sv_init.cpp
+    sv_main.cpp sv_net_chan.cpp sv_server.cpp sv_snapshot.cpp sv_world.cpp)
 list(TRANSFORM SERVER_SOURCES PREPEND "${SOURCE_DIR}/server/")
 
 set(CLIENT_SOURCES
-    cl_cgame.c cl_cin.c cl_console.c cl_input.c cl_keys.c cl_main.c cl_net_chan.c
-    cl_parse.c cl_scrn.c cl_ui.c snd_adpcm.c snd_dma.c snd_mem.c snd_mix.c snd_wavelet.c)
+    cl_cgame.cpp cl_cin.cpp cl_console.cpp cl_input.cpp cl_keys.cpp cl_main.cpp cl_net_chan.cpp
+    cl_parse.cpp cl_scrn.cpp cl_ui.cpp snd_adpcm.cpp snd_dma.cpp snd_mem.cpp snd_mix.cpp snd_wavelet.cpp)
 list(TRANSFORM CLIENT_SOURCES PREPEND "${SOURCE_DIR}/client/")
 
 set(SYSTEM_SOURCES
-    ${SOURCE_DIR}/sys/sys_main.c
-    ${SOURCE_DIR}/sys/con_log.c
-    ${SOURCE_DIR}/qcommon/net_ip.c)
+    ${SOURCE_DIR}/sys/sys_main.cpp
+    ${SOURCE_DIR}/sys/con_log.cpp
+    ${SOURCE_DIR}/qcommon/net_ip.cpp)
 
 set(SDL_SOURCES
-    ${SOURCE_DIR}/sdl/sdl_input.c
-    ${SOURCE_DIR}/sdl/sdl_snd.c)
+    ${SOURCE_DIR}/sdl/sdl_input.cpp
+    ${SOURCE_DIR}/sdl/sdl_snd.cpp)
 
 set(SDL_RENDERER_SOURCES
-    ${SOURCE_DIR}/sdl/sdl_glimp.c
-    ${SOURCE_DIR}/sdl/sdl_gamma.c)
+    ${SOURCE_DIR}/sdl/sdl_glimp.cpp
+    ${SOURCE_DIR}/sdl/sdl_gamma.cpp)

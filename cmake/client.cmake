@@ -18,12 +18,6 @@ set(CLIENT_ALL_SOURCES
 add_executable(${CLIENT_NAME} ${CLIENT_EXECUTABLE_OPTIONS} ${CLIENT_ALL_SOURCES})
 
 foreach(TARGET IN LISTS MF_LIBRARIES ITEMS ${CLIENT_NAME})
-    get_target_property(TARGET_SOURCES ${TARGET} SOURCES)
-    foreach(SRC IN LISTS TARGET_SOURCES)
-        if(SRC MATCHES "\\.c$")
-            set_source_files_properties(${SRC} TARGET_DIRECTORY ${TARGET} PROPERTIES LANGUAGE CXX)
-        endif()
-    endforeach()
     target_compile_definitions(${TARGET} PRIVATE ${CLIENT_DEFINITIONS} $<$<CONFIG:Debug>:_DEBUG> $<$<NOT:$<CONFIG:Debug>>:NDEBUG>)
     target_include_directories(${TARGET} PRIVATE ${CLIENT_INCLUDE_DIRS})
     target_link_libraries(${TARGET} PRIVATE ${CLIENT_LIBRARIES} ${RENDERER_LIBRARIES})

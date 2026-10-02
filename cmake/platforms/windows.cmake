@@ -3,8 +3,8 @@ if(NOT WIN32)
 endif()
 
 list(APPEND SYSTEM_PLATFORM_SOURCES
-    ${SOURCE_DIR}/sys/sys_win32.c
-    ${SOURCE_DIR}/sys/con_passive.c
+    ${SOURCE_DIR}/sys/sys_win32.cpp
+    ${SOURCE_DIR}/sys/con_passive.cpp
     ${SOURCE_DIR}/win32/winquake.rc)
 
 list(APPEND COMMON_LIBRARIES ws2_32 winmm psapi)
