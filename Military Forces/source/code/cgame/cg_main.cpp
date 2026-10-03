@@ -1973,6 +1973,12 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	CL_GetGlconfig( &cgs.glconfig );
 	cgs.screenXScale = cgs.glconfig.vidWidth / 640.0;
 	cgs.screenYScale = cgs.glconfig.vidHeight / 480.0;
+	cgs.screenScale = cgs.screenXScale < cgs.screenYScale ? cgs.screenXScale : cgs.screenYScale;
+	cgs.screenXOffset = 0.5f * ( cgs.glconfig.vidWidth - 640.0f * cgs.screenScale );
+	cgs.screenYOffset = 0.5f * ( cgs.glconfig.vidHeight - 480.0f * cgs.screenScale );
+	cgUtils.dc_->glConfig_ = cgs.glconfig;
+	cgUtils.dc_->xScale_ = cgs.screenXScale;
+	cgUtils.dc_->yScale_ = cgs.screenYScale;
 
 	// get the gamestate from the client system
 	CL_GetGameState( &cgs.gameState );

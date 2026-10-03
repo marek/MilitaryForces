@@ -52,18 +52,43 @@ CG_AdjustFrom640
 Adjusted for resolution and screen aspect ratio
 ================
 */
+static screenPlacement_e cg_screenPlacement = PLACE_CENTER;
+
+void CG_SetScreenPlacement( screenPlacement_e placement ) {
+	cg_screenPlacement = placement;
+}
+
+screenPlacement_e CG_GetScreenPlacement( void ) {
+	return cg_screenPlacement;
+}
+
 void CG_AdjustFrom640( float *x, float *y, float *w, float *h ) {
-#if 0
-	// adjust for wide screens
-	if ( cgs.glconfig.vidWidth * 480 > cgs.glconfig.vidHeight * 640 ) {
-		*x += 0.5 * ( cgs.glconfig.vidWidth - ( cgs.glconfig.vidHeight * 640 / 480 ) );
+	if ( cg_screenPlacement == PLACE_STRETCH || ( *x <= 0 && *x + *w >= 640 ) ) {
+		*x *= cgs.screenXScale;
+		*w *= cgs.screenXScale;
+	} else {
+		if ( cg_screenPlacement == PLACE_LEFT ) {
+			*x *= cgs.screenScale;
+		} else if ( cg_screenPlacement == PLACE_RIGHT ) {
+			*x = cgs.glconfig.vidWidth - ( 640 - *x ) * cgs.screenScale;
+		} else {
+			*x = *x * cgs.screenScale + cgs.screenXOffset;
+		}
+		*w *= cgs.screenScale;
 	}
-#endif
-	// scale for screen sizes
-	*x *= cgs.screenXScale;
-	*y *= cgs.screenYScale;
-	*w *= cgs.screenXScale;
-	*h *= cgs.screenYScale;
+
+	if ( cg_screenPlacement == PLACE_STRETCH || ( *y <= 0 && *y + *h >= 480 ) ) {
+		*y *= cgs.screenYScale;
+		*h *= cgs.screenYScale;
+	} else {
+		*y = *y * cgs.screenScale + cgs.screenYOffset;
+		*h *= cgs.screenScale;
+	}
+}
+
+void CG_VirtualFromScreen( float *x, float *y ) {
+	*x = ( *x - cgs.screenXOffset ) / cgs.screenScale;
+	*y = ( *y - cgs.screenYOffset ) / cgs.screenScale;
 }
 
 /*
@@ -91,14 +116,14 @@ Coords are virtual 640x480
 */
 void CG_DrawSides(float x, float y, float w, float h, float size) {
 	CG_AdjustFrom640( &x, &y, &w, &h );
-	size *= cgs.screenXScale;
+	size *= cgs.screenScale;
 	refExport.DrawStretchPic( x, y, size, h, 0, 0, 0, 0, cgs.media.whiteShader );
 	refExport.DrawStretchPic( x + w - size, y, size, h, 0, 0, 0, 0, cgs.media.whiteShader );
 }
 
 void CG_DrawTopBottom(float x, float y, float w, float h, float size) {
 	CG_AdjustFrom640( &x, &y, &w, &h );
-	size *= cgs.screenYScale;
+	size *= cgs.screenScale;
 	refExport.DrawStretchPic( x, y, w, size, 0, 0, 0, 0, cgs.media.whiteShader );
 	refExport.DrawStretchPic( x, y + h - size, w, size, 0, 0, 0, 0, cgs.media.whiteShader );
 }
@@ -568,15 +593,17 @@ static void UI_DrawBannerString2( int x, int y, const char* str, vec4_t color )
 	// draw the colored text
 	refExport.SetColor( color );
 	
-	ax = x * cgs.screenXScale + cgs.screenXBias;
-	ay = y * cgs.screenXScale;
+	ax = x;
+	ay = y;
+	aw = ah = 0;
+	CG_AdjustFrom640( &ax, &ay, &aw, &ah );
 
 	s = str;
 	while ( *s )
 	{
 		ch = *s & 127;
 		if ( ch == ' ' ) {
-			ax += ((float)PROPB_SPACE_WIDTH + (float)PROPB_GAP_WIDTH)* cgs.screenXScale;
+			ax += ((float)PROPB_SPACE_WIDTH + (float)PROPB_GAP_WIDTH)* cgs.screenScale;
 		}
 		else if ( ch >= 'A' && ch <= 'Z' ) {
 			ch -= 'A';
@@ -584,10 +611,10 @@ static void UI_DrawBannerString2( int x, int y, const char* str, vec4_t color )
 			frow = (float)propMapB[ch][1] / 256.0f;
 			fwidth = (float)propMapB[ch][2] / 256.0f;
 			fheight = (float)PROPB_HEIGHT / 256.0f;
-			aw = (float)propMapB[ch][2] * cgs.screenXScale;
-			ah = (float)PROPB_HEIGHT * cgs.screenXScale;
+			aw = (float)propMapB[ch][2] * cgs.screenScale;
+			ah = (float)PROPB_HEIGHT * cgs.screenScale;
 			refExport.DrawStretchPic( ax, ay, aw, ah, fcol, frow, fcol+fwidth, frow+fheight, cgs.media.charsetPropB );
-			ax += (aw + (float)PROPB_GAP_WIDTH * cgs.screenXScale);
+			ax += (aw + (float)PROPB_GAP_WIDTH * cgs.screenScale);
 		}
 		s++;
 	}
@@ -678,28 +705,30 @@ static void UI_DrawProportionalString2( int x, int y, const char* str, vec4_t co
 	// draw the colored text
 	refExport.SetColor( color );
 	
-	ax = x * cgs.screenXScale + cgs.screenXBias;
-	ay = y * cgs.screenXScale;
+	ax = x;
+	ay = y;
+	aw = ah = 0;
+	CG_AdjustFrom640( &ax, &ay, &aw, &ah );
 
 	s = str;
 	while ( *s )
 	{
 		ch = *s & 127;
 		if ( ch == ' ' ) {
-			aw = (float)PROP_SPACE_WIDTH * cgs.screenXScale * sizeScale;
+			aw = (float)PROP_SPACE_WIDTH * cgs.screenScale * sizeScale;
 		} else if ( propMap[ch][2] != -1 ) {
 			fcol = (float)propMap[ch][0] / 256.0f;
 			frow = (float)propMap[ch][1] / 256.0f;
 			fwidth = (float)propMap[ch][2] / 256.0f;
 			fheight = (float)PROP_HEIGHT / 256.0f;
-			aw = (float)propMap[ch][2] * cgs.screenXScale * sizeScale;
-			ah = (float)PROP_HEIGHT * cgs.screenXScale * sizeScale;
+			aw = (float)propMap[ch][2] * cgs.screenScale * sizeScale;
+			ah = (float)PROP_HEIGHT * cgs.screenScale * sizeScale;
 			refExport.DrawStretchPic( ax, ay, aw, ah, fcol, frow, fcol+fwidth, frow+fheight, charset );
 		} else {
 			aw = 0;
 		}
 
-		ax += (aw + (float)PROP_GAP_WIDTH * cgs.screenXScale * sizeScale);
+		ax += (aw + (float)PROP_GAP_WIDTH * cgs.screenScale * sizeScale);
 		s++;
 	}
 

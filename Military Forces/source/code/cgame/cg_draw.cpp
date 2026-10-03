@@ -1058,7 +1058,9 @@ static void CG_DrawUpperLeft( void )
 */
 
 	// draw our custom console
+	CG_SetScreenPlacement( PLACE_LEFT );
 	CG_DrawCustomConsole();
+	CG_SetScreenPlacement( PLACE_CENTER );
 }
 
 
@@ -1071,6 +1073,8 @@ CG_DrawUpperRight
 static void CG_DrawUpperRight( bool scoreboard )
 {
 	float y = 2;
+
+	CG_SetScreenPlacement( PLACE_RIGHT );
 
 // MFQ3: no room for this because of our extensive HUD!
 //	if ( cgs.gametype >= GT_TEAM && cg_drawTeamOverlay.integer == 1 ) {
@@ -1110,6 +1114,8 @@ static void CG_DrawUpperRight( bool scoreboard )
 
 	// the lagometer
 	CG_DrawLagometer( y );
+
+	CG_SetScreenPlacement( PLACE_CENTER );
 }
 
 /*

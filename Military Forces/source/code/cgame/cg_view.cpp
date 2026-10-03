@@ -791,12 +791,6 @@ bool CG_WorldToScreenCoords( vec3_t worldPoint, int * pX, int * pY, bool virtual
 	w = cg.refdef.width;
 	h = cg.refdef.height;
 
-	// use 640x480 instead of our current viewport?
-	if( virtualXY )
-	{
-		w = 640;
-		h = 480;
-	}
 
 	cv = h * 0.5f;
 	ch = w * 0.5f;
@@ -807,6 +801,13 @@ bool CG_WorldToScreenCoords( vec3_t worldPoint, int * pX, int * pY, bool virtual
 	   p[0] = ch - w * n[0] / 2;
 	   p[1] = cv - h * n[2] / 2;
 	   p[2] = 0;
+
+	   if( virtualXY )
+	   {
+		   p[0] += cg.refdef.x;
+		   p[1] += cg.refdef.y;
+		   CG_VirtualFromScreen( &p[0], &p[1] );
+	   }
 
 	   // convert 
 	   *pX = (int)p[0];

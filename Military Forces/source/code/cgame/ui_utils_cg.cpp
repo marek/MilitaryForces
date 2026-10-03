@@ -43,9 +43,12 @@ UI_UtilsCG::drawTimer( float y )
 	s = va( "%i:%i%i", mins, tens, seconds );
 	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 
+	screenPlacement_e placement = CG_GetScreenPlacement();
+
 	// alter the draw position?
 	if( CG_NewHUDActive() )
 	{
+		CG_SetScreenPlacement( PLACE_CENTER );
 		// fit around the New HUD (draw bottom middle-right)
 		dx = 480;
 		dy = 460;
@@ -63,6 +66,8 @@ UI_UtilsCG::drawTimer( float y )
 
 	// draw timer string
 	drawStringNew( dx, dy, 0.35f, colorWhite, s, 0, 0, ITEM_TEXTSTYLE_SHADOWED, CENTRE_JUSTIFY );
+
+	CG_SetScreenPlacement( placement );
 
 	return y + k_TIMER_HEIGHT + 4;	
 }
@@ -104,9 +109,12 @@ UI_UtilsCG::drawCountdownTimer( float y )
 	s = va( "%i:%i%i", mins, tens, seconds );
 	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 
+	screenPlacement_e placement = CG_GetScreenPlacement();
+
 	// alter the draw position?
 	if( CG_NewHUDActive() )
 	{
+		CG_SetScreenPlacement( PLACE_CENTER );
 		// fit around the New HUD (draw bottom middle-left)
 		dx = 160;
 		dy = 460;
@@ -127,6 +135,8 @@ UI_UtilsCG::drawCountdownTimer( float y )
 	{
 		drawStringNew( dx, dy, 0.35f, colorWhite, s, 0, 0, ITEM_TEXTSTYLE_SHADOWED, CENTRE_JUSTIFY );
 	}
+
+	CG_SetScreenPlacement( placement );
 
 	return y + k_TIMER_HEIGHT + 4;
 }

@@ -1001,6 +1001,9 @@ typedef struct {
 	float			screenXScale;		// derived from glconfig
 	float			screenYScale;
 	float			screenXBias;
+	float			screenScale;
+	float			screenXOffset;
+	float			screenYOffset;
 
 	int				serverCommandSequence;	// reliable command stream counter
 	int				processedSnapshotNum;// the number of snapshots cgame has requested
@@ -1278,7 +1281,17 @@ bool CG_WorldToScreenCoords( vec3_t worldPoint, int * pX, int * pY, bool virtual
 // cg_drawtools.c
 //
 void CG_DrawProgressBar( rectDef_t *rect, vec4_t color, vec4_t textcolor, float scale, int textStyle, float progress );
+typedef enum {
+	PLACE_CENTER,
+	PLACE_LEFT,
+	PLACE_RIGHT,
+	PLACE_STRETCH
+} screenPlacement_e;
+
+void CG_SetScreenPlacement( screenPlacement_e placement );
+screenPlacement_e CG_GetScreenPlacement( void );
 void CG_AdjustFrom640( float *x, float *y, float *w, float *h );
+void CG_VirtualFromScreen( float *x, float *y );
 void CG_FillRect( float x, float y, float width, float height, const float *color );
 void CG_DrawPic( float x, float y, float width, float height, qhandle_t hShader );
 void CG_DrawString( float x, float y, const char *string, 

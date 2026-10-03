@@ -945,6 +945,7 @@ static void CG_Draw_Redundant(int vehicle, int health, int throttle, int ammo[16
 
 		// draw health
 	if( hud_health.integer ) {
+		CG_SetScreenPlacement( PLACE_RIGHT );
 		CG_DrawHUDPic( 516, 318, 32, 8, cgs.media.HUDhealthtext, HUDColors[cg.HUDColor] ); 
 		Com_sprintf(buffer, 5, "%d%%", health);
 		CG_DrawString_MFQ3( 560, 318, buffer, HUDColors[cg.HUDColor], 0 );
@@ -952,6 +953,7 @@ static void CG_Draw_Redundant(int vehicle, int health, int throttle, int ammo[16
 
 		// draw throttle
 	if( hud_throttle.integer ) {
+		CG_SetScreenPlacement( PLACE_RIGHT );
 		CG_DrawHUDPic( 516, 330, 32, 8, cgs.media.HUDthrottletext, HUDColors[cg.HUDColor] ); 
 
 		if( availableVehicles[vehicle].engines > 1 ) {
@@ -982,6 +984,7 @@ static void CG_Draw_Redundant(int vehicle, int health, int throttle, int ammo[16
 				actualstring = availableWeapons[availableVehicles[vehicle].weapons[0]].shortName;
 			}
 			Com_sprintf( ammostring, 32, "%s: %d", actualstring, ammo[0] );
+			CG_SetScreenPlacement( PLACE_LEFT );
 			CG_DrawString_MFQ3( 4, 318, ammostring, HUDColors[cg.HUDColor], 0);
 		}
 
@@ -994,10 +997,12 @@ static void CG_Draw_Redundant(int vehicle, int health, int throttle, int ammo[16
 				actualstring = availableWeapons[availableVehicles[vehicle].weapons[selweap]].shortName;
 			}
 			Com_sprintf( ammostring, 32, "%s: %d", actualstring, ammo[selweap] );
+			CG_SetScreenPlacement( PLACE_LEFT );
 			CG_DrawString_MFQ3( 4, 330, ammostring, HUDColors[cg.HUDColor], 0);
 		}
 	}
 
+	CG_SetScreenPlacement( PLACE_CENTER );
 }
 
 
@@ -1770,8 +1775,10 @@ void CG_DrawStatusBar_MFQ3_new( void ) {
 			if( (availableVehicles[vehicle].cat & CAT_GROUND) || 
 				(availableVehicles[vehicle].cat & CAT_BOAT) ) value = 10;
 			else value = 50;
+			CG_SetScreenPlacement( PLACE_LEFT );
 			CG_Draw_SpeedTape( ps->speed/10, availableVehicles[vehicle].stallspeed,
 					availableVehicles[vehicle].stallspeed * SPEED_GREEN_ARC, value );
+			CG_SetScreenPlacement( PLACE_CENTER );
 		}
 
 		// altitude (not for ground-vehicles)
@@ -1786,7 +1793,9 @@ void CG_DrawStatusBar_MFQ3_new( void ) {
 			end[2] -= 20000;
 			CG_Trace( &tr, start, vec3_origin, vec3_origin, end, cg.snap->ps.clientNum, MASK_SOLID|MASK_WATER );
 			altitude = (int)(tr.fraction * 20000);
+			CG_SetScreenPlacement( PLACE_RIGHT );
 			CG_Draw_AltTape(altitude);
+			CG_SetScreenPlacement( PLACE_CENTER );
 		}
 
 		// stall related
@@ -1796,12 +1805,16 @@ void CG_DrawStatusBar_MFQ3_new( void ) {
 
 		// mfd 1
 		if( hud_mfd.integer ) {
+			CG_SetScreenPlacement( PLACE_LEFT );
 			CG_Draw_MFD(MFD_1, vehicle, cent, targetrange, targetheading, altitude, ps, stallcolor);
+			CG_SetScreenPlacement( PLACE_CENTER );
 		}
 
 		// mfd 2
 		if( hud_mfd2.integer ) {
+			CG_SetScreenPlacement( PLACE_RIGHT );
 			CG_Draw_MFD(MFD_2, vehicle, cent, targetrange, targetheading, altitude, ps, stallcolor);
+			CG_SetScreenPlacement( PLACE_CENTER );
 		}
 
 		// solid middle section

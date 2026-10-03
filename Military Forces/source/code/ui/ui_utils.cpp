@@ -4258,11 +4258,29 @@ UI_Utils::rect_ToWindowCoords( rectDef_t *rect, windowDef_t *window )
 void 
 UI_Utils::adjustFrom640( float *x, float *y, float *w, float *h ) 
 {
-	//*x = *x * DC->scale + DC->bias;
-	*x *= dc_->xScale_;
-	*y *= dc_->yScale_;
-	*w *= dc_->xScale_;
-	*h *= dc_->yScale_;
+	float scale = dc_->xScale_ < dc_->yScale_ ? dc_->xScale_ : dc_->yScale_;
+
+	if( *x <= 0 && *x + *w >= 640 )
+	{
+		*x *= dc_->xScale_;
+		*w *= dc_->xScale_;
+	}
+	else
+	{
+		*x = *x * scale + 0.5f * ( dc_->glConfig_.vidWidth - 640.0f * scale );
+		*w *= scale;
+	}
+
+	if( *y <= 0 && *y + *h >= 480 )
+	{
+		*y *= dc_->yScale_;
+		*h *= dc_->yScale_;
+	}
+	else
+	{
+		*y = *y * scale + 0.5f * ( dc_->glConfig_.vidHeight - 480.0f * scale );
+		*h *= scale;
+	}
 }
 
 void 

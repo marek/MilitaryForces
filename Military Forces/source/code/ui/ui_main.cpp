@@ -176,7 +176,7 @@ void AssetCache()
 void _UI_DrawSides(float x, float y, float w, float h, float size) 
 {
 	UI_AdjustFrom640( &x, &y, &w, &h );
-	size *= uiInfo.uiUtils.dc_->xScale_;
+	size *= ( uiInfo.uiUtils.dc_->xScale_ < uiInfo.uiUtils.dc_->yScale_ ? uiInfo.uiUtils.dc_->xScale_ : uiInfo.uiUtils.dc_->yScale_ );
 	refExport.DrawStretchPic( x, y, size, h, 0, 0, 0, 0, uiInfo.uiUtils.dc_->whiteShader_ );
 	refExport.DrawStretchPic( x + w - size, y, size, h, 0, 0, 0, 0, uiInfo.uiUtils.dc_->whiteShader_ );
 }
@@ -184,7 +184,7 @@ void _UI_DrawSides(float x, float y, float w, float h, float size)
 void _UI_DrawTopBottom(float x, float y, float w, float h, float size) 
 {
 	UI_AdjustFrom640( &x, &y, &w, &h );
-	size *= uiInfo.uiUtils.dc_->yScale_;
+	size *= ( uiInfo.uiUtils.dc_->xScale_ < uiInfo.uiUtils.dc_->yScale_ ? uiInfo.uiUtils.dc_->xScale_ : uiInfo.uiUtils.dc_->yScale_ );
 	refExport.DrawStretchPic( x, y, w, size, 0, 0, 0, 0, uiInfo.uiUtils.dc_->whiteShader_ );
 	refExport.DrawStretchPic( x, y + h - size, w, size, 0, 0, 0, 0, uiInfo.uiUtils.dc_->whiteShader_ );
 }
@@ -3381,7 +3381,6 @@ static void UI_Update(const char *name) {
 				Cvar_SetValue( "r_colorbits", 32 );
 				Cvar_SetValue( "r_depthbits", 24 );
 				Cvar_SetValue( "r_picmip", 0 );
-				Cvar_SetValue( "r_mode", 4 );
 				Cvar_SetValue( "r_texturebits", 32 );
 				Cvar_SetValue( "r_fastSky", 0 );
 				Cvar_SetValue( "r_inGameVideo", 1 );
@@ -3397,7 +3396,6 @@ static void UI_Update(const char *name) {
 				Cvar_SetValue( "r_colorbits", 0 );
 				Cvar_SetValue( "r_depthbits", 24 );
 				Cvar_SetValue( "r_picmip", 1 );
-				Cvar_SetValue( "r_mode", 3 );
 				Cvar_SetValue( "r_texturebits", 0 );
 				Cvar_SetValue( "r_fastSky", 0 );
 				Cvar_SetValue( "r_inGameVideo", 1 );
@@ -3413,7 +3411,6 @@ static void UI_Update(const char *name) {
 				Cvar_SetValue( "r_colorbits", 0 );
 				Cvar_SetValue( "r_depthbits", 0 );
 				Cvar_SetValue( "r_picmip", 1 );
-				Cvar_SetValue( "r_mode", 3 );
 				Cvar_SetValue( "r_texturebits", 0 );
 				Cvar_SetValue( "cg_shadows", 0 );
 				Cvar_SetValue( "r_fastSky", 1 );
@@ -3428,7 +3425,6 @@ static void UI_Update(const char *name) {
 				Cvar_SetValue( "r_lodbias", 2 );
 				Cvar_SetValue( "r_colorbits", 16 );
 				Cvar_SetValue( "r_depthbits", 16 );
-				Cvar_SetValue( "r_mode", 3 );
 				Cvar_SetValue( "r_picmip", 2 );
 				Cvar_SetValue( "r_texturebits", 16 );
 				Cvar_SetValue( "cg_shadows", 0 );

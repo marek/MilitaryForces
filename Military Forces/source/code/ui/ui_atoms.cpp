@@ -405,19 +405,7 @@ Adjusted for resolution and screen aspect ratio
 ================
 */
 void UI_AdjustFrom640( float *x, float *y, float *w, float *h ) {
-	// expect valid pointers
-#if 0
-	*x = *x * uiInfo.uiDC.scale + uiInfo.uiDC.bias;
-	*y *= uiInfo.uiDC.scale;
-	*w *= uiInfo.uiDC.scale;
-	*h *= uiInfo.uiDC.scale;
-#endif
-
-	*x *= uiInfo.uiUtils.dc_->xScale_;
-	*y *= uiInfo.uiUtils.dc_->yScale_;
-	*w *= uiInfo.uiUtils.dc_->xScale_;
-	*h *= uiInfo.uiUtils.dc_->yScale_;
-
+	uiInfo.uiUtils.adjustFrom640( x, y, w, h );
 }
 
 void UI_DrawNamedPic( float x, float y, float width, float height, const char *picname ) {
@@ -454,6 +442,21 @@ void UI_DrawHandlePic( float x, float y, float w, float h, qhandle_t hShader ) {
 		t1 = 1;
 	}
 	
+	if( x <= 0 && y <= 0 && x + w >= 640 && y + h >= 480 )
+	{
+		float vidW = uiInfo.uiUtils.dc_->glConfig_.vidWidth;
+		float vidH = uiInfo.uiUtils.dc_->glConfig_.vidHeight;
+		float cover = uiInfo.uiUtils.dc_->xScale_ > uiInfo.uiUtils.dc_->yScale_ ? uiInfo.uiUtils.dc_->xScale_ : uiInfo.uiUtils.dc_->yScale_;
+		float visibleS = vidW / ( w * cover );
+		float visibleT = vidH / ( h * cover );
+		float ds = s1 - s0;
+		float dt = t1 - t0;
+		float cropS = 0.5f * ( 1.0f - visibleS );
+
+		refExport.DrawStretchPic( 0, 0, vidW, vidH, s0 + ds * cropS, t0, s1 - ds * cropS, t0 + dt * visibleT, hShader );
+		return;
+	}
+
 	UI_AdjustFrom640( &x, &y, &w, &h );
 	refExport.DrawStretchPic( x, y, w, h, s0, t0, s1, t1, hShader );
 }

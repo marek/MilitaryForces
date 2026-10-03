@@ -420,7 +420,7 @@ static int GLimp_SetMode(int mode, bool fullscreen, bool noborder, bool fixedFun
 	int samples;
 	int i = 0;
 	SDL_Surface *icon = NULL;
-	Uint32 flags = SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL;
+	Uint32 flags = SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI;
 	SDL_DisplayMode desktopMode;
 	int display = 0;
 	int x = SDL_WINDOWPOS_UNDEFINED, y = SDL_WINDOWPOS_UNDEFINED;
@@ -842,6 +842,10 @@ static int GLimp_SetMode(int mode, bool fullscreen, bool noborder, bool fixedFun
 	}
 
 	SDL_ShowWindow( SDL_window );
+
+	SDL_GL_GetDrawableSize( SDL_window, &glConfig.vidWidth, &glConfig.vidHeight );
+	glConfig.windowAspect = (float)glConfig.vidWidth / (float)glConfig.vidHeight;
+	ri.Printf( PRINT_ALL, "Drawable size: %d x %d\n", glConfig.vidWidth, glConfig.vidHeight );
 
 	GLimp_DetectAvailableModes();
 
