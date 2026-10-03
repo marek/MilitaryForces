@@ -386,6 +386,8 @@ typedef void (*xcommand_t) (void);
 
 void	Cmd_Init (void);
 
+typedef void (*completionFunc_t)( char *args, int argNum );
+
 void	Cmd_AddCommand( const char *cmd_name, xcommand_t function );
 // called by the init functions of other parts of the program to
 // register commands and functions to call for them.
@@ -394,6 +396,12 @@ void	Cmd_AddCommand( const char *cmd_name, xcommand_t function );
 // as a clc_clientCommand instead of executed locally
 
 void	Cmd_RemoveCommand( const char *cmd_name );
+void Cmd_CommandCompletion( void(*callback)(const char *s) );
+// callback with each valid string
+void Cmd_SetCommandCompletionFunc( const char *command,
+	completionFunc_t complete );
+void Cmd_CompleteArgument( const char *command, char *args, int argNum );
+void Cmd_CompleteCfgName( char *args, int argNum );
 
 void	Cmd_CommandCompletion( void(*callback)(const char *s) );
 // callback with each valid string
@@ -411,6 +419,7 @@ void	Cmd_Args_Sanitize( void );
 // if arg > argc, so string operations are allways safe.
 
 void	Cmd_TokenizeString( const char *text );
+void	Cmd_TokenizeStringIgnoreQuotes( const char *text_in );
 // Takes a null terminated string.  Does not need to be /n terminated.
 // breaks the string up into arg tokens.
 
@@ -461,6 +470,9 @@ void	Cvar_Update( vmCvar_t *vmCvar );
 void 	Cvar_Set( const char *var_name, const char *value );
 void	Cvar_SetSafe( const char *var_name, const char *value );
 void	Cvar_ForceReset( const char *var_name );
+void	Cvar_CheckRange( cvar_t *cv, float minVal, float maxVal, bool shouldBeIntegral );
+void	Cvar_SetDescription( cvar_t *var, const char *var_description );
+void Cvar_CompleteCvarName( char *args, int argNum );
 cvar_t	*Cvar_Set2(const char *var_name, const char *value, bool force);
 // will create the variable with no flags if it doesn't exist
 
@@ -695,7 +707,15 @@ typedef struct {
 } field_t;
 
 void Field_Clear( field_t *edit );
-void Field_CompleteCommand( field_t *edit );
+void Field_Clear( field_t *edit );
+void Field_AutoComplete( field_t *edit );
+void Field_CompleteKeyname( void );
+void Field_CompleteFilename( const char *dir, const char *ext,
+		char *filter, bool stripExt,
+		bool allowNonPureFilesOnDisk );
+void Field_CompleteCommand( char *cmd,
+		bool doCommands, bool doCvars );
+void Field_CompletePlayerName( const char **names, int count );
 
 /*
 ==============================================================
@@ -733,7 +753,7 @@ void		Com_BeginRedirect (char *buffer, int buffersize, void (*flush)(char *));
 void		Com_EndRedirect( void );
 void 		QDECL Com_Printf( const char *fmt, ... ) Q_PRINTF_FUNC(1, 2);
 void 		QDECL Com_DPrintf( const char *fmt, ... ) Q_PRINTF_FUNC(1, 2);
-void 		QDECL Com_Error( int code, const char *fmt, ... ) Q_PRINTF_FUNC(2, 3);
+void 		QDECL Com_Error( int code, const char *fmt, ... ) Q_NO_RETURN Q_PRINTF_FUNC(2, 3);
 void 		Com_Quit_f( void );
 void		Com_RunAndTimeServerPacket(netadr_t *evFrom, msg_t *buf);
 int			Com_EventLoop( void );
@@ -757,6 +777,7 @@ extern	cvar_t	*com_speeds;
 
 extern	cvar_t	*com_timescale;
 extern	cvar_t	*com_basegame;
+extern	cvar_t	*con_autochat;
 extern	cvar_t	*com_homepath;
 extern	cvar_t	*com_unfocused;
 extern	cvar_t	*com_maxfpsUnfocused;
@@ -870,6 +891,11 @@ CLIENT / SERVER SYSTEMS
 // client interface
 //
 void CL_InitKeyCommands( void );
+
+void IN_Init( void *windowData );
+void IN_Shutdown( void );
+void IN_Restart( void );
+void Key_KeynameCompletion( void(*callback)(const char *s) );
 // the keyboard binding interface must be setup before execing
 // config files, but the rest of client startup will happen later
 
@@ -984,6 +1010,8 @@ void	Com_ExecuteCfg( void );
 void	Com_GameRestart( int checksumFeed, bool disconnect );
 
 void	Sys_Init (void);
+void	Sys_GLimpSafeInit( void );
+void	Sys_GLimpInit( void );
 
 bool Sys_RandomBytes( byte *string, int len );
 FILE	*Sys_FOpen( const char *ospath, const char *mode );

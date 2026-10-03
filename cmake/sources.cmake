@@ -33,12 +33,19 @@ set(UI_SOURCES
     ui_utils_ui.cpp)
 list(TRANSFORM UI_SOURCES PREPEND "${SOURCE_DIR}/ui/")
 
-set(RENDERER_SOURCES
-    tr_animation.cpp tr_backend.cpp tr_bsp.cpp tr_cmds.cpp tr_curve.cpp tr_flares.cpp tr_font.cpp
-    tr_image.cpp tr_image_jpg.cpp tr_init.cpp tr_light.cpp tr_main.cpp tr_marks.cpp tr_mesh.cpp tr_model.cpp tr_noise.cpp
-    tr_scene.cpp tr_shade.cpp tr_shade_calc.cpp tr_shader.cpp tr_shadows.cpp tr_sky.cpp tr_surface.cpp
-    tr_world.cpp)
-list(TRANSFORM RENDERER_SOURCES PREPEND "${SOURCE_DIR}/renderer/")
+set(RENDERER_COMMON_SOURCES
+    tr_font.cpp tr_image_bmp.cpp tr_image_jpg.cpp tr_image_pcx.cpp tr_image_png.cpp
+    tr_image_pvr.cpp tr_image_tga.cpp tr_noise.cpp puff.cpp)
+list(TRANSFORM RENDERER_COMMON_SOURCES PREPEND "${SOURCE_DIR}/renderercommon/")
+
+set(RENDERER_GL1_SOURCES
+    tr_animation.cpp tr_backend.cpp tr_bsp.cpp tr_cmds.cpp tr_curve.cpp tr_flares.cpp
+    tr_image.cpp tr_init.cpp tr_light.cpp tr_main.cpp tr_marks.cpp tr_mesh.cpp tr_model.cpp
+    tr_model_iqm.cpp tr_scene.cpp tr_shade.cpp tr_shade_calc.cpp tr_shader.cpp tr_shadows.cpp
+    tr_sky.cpp tr_surface.cpp tr_world.cpp)
+list(TRANSFORM RENDERER_GL1_SOURCES PREPEND "${SOURCE_DIR}/renderergl1/")
+
+set(RENDERER_SOURCES ${RENDERER_COMMON_SOURCES} ${RENDERER_GL1_SOURCES})
 
 set(QCOMMON_SOURCES
     qcommon/cm_load.cpp qcommon/cm_patch.cpp qcommon/cm_polylib.cpp qcommon/cm_test.cpp

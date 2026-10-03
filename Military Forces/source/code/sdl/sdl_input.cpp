@@ -684,13 +684,15 @@ void IN_Frame( void )
 IN_Init
 ===============
 */
-void IN_Init( void )
+void IN_Init( void *windowData )
 {
-	if( !SDL_WasInit( SDL_INIT_VIDEO ) || !SDL_window )
+	if( !SDL_WasInit( SDL_INIT_VIDEO ) )
 	{
 		Com_Error( ERR_FATAL, "IN_Init called before SDL_Init( SDL_INIT_VIDEO )" );
 		return;
 	}
+
+	SDL_window = (SDL_Window *)windowData;
 
 	Com_DPrintf( "\n------- Input Initialization -------\n" );
 
@@ -727,4 +729,15 @@ void IN_Shutdown( void )
 	mouseAvailable = false;
 
 	IN_ShutdownJoystick( );
+}
+
+/*
+===============
+IN_Restart
+===============
+*/
+void IN_Restart( void )
+{
+	IN_ShutdownJoystick( );
+	IN_Init( SDL_window );
 }

@@ -38,8 +38,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 extern bool com_fullyInitialized;
 
 void IN_Frame( void );
-void IN_Shutdown( void );
-void IN_Init( void );
+void IN_Restart( void );
 
 static char binaryPath[ MAX_OSPATH ] = { 0 };
 static char installPath[ MAX_OSPATH ] = { 0 };
@@ -130,8 +129,7 @@ void Sys_In_Restart_f( void )
 		return;
 	}
 #endif
-	IN_Shutdown();
-	IN_Init();
+	IN_Restart();
 }
 
 /*

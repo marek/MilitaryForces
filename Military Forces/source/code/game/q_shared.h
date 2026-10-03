@@ -401,6 +401,8 @@ typedef vec_t vec3_t[3];
 typedef vec_t vec4_t[4];
 typedef vec_t vec5_t[5];
 
+typedef vec_t quat_t[4];
+
 typedef	int	fixed4_t;
 typedef	int	fixed8_t;
 typedef	int	fixed16_t;
@@ -782,7 +784,7 @@ void	COM_ParseWarning( char *format, ... );
 
 void	COM_MatchToken( char**buf_p, char *match );
 
-void SkipBracedSection (char **program);
+bool SkipBracedSection (char **program, int depth);
 void SkipRestOfLine ( char **data );
 
 void Parse1DMatrix (char **buf_p, int x, float *m);
@@ -876,7 +878,7 @@ bool Info_Validate( const char *s );
 void Info_NextPair( const char **s, char *key, char *value );
 
 // this is only here so the functions in q_shared.c and bg_*.c can link
-void	QDECL Com_Error( int level, const char *error, ... ) Q_PRINTF_FUNC(2, 3);
+void	QDECL Com_Error( int level, const char *error, ... ) Q_NO_RETURN Q_PRINTF_FUNC(2, 3);
 void	QDECL Com_Printf( const char *msg, ... ) Q_PRINTF_FUNC(1, 2);
 
 
@@ -910,6 +912,7 @@ default values.
 #define CVAR_CHEAT			512	// can not be changed if cheats are disabled
 #define CVAR_NORESTART		1024	// do not clear when a cvar_restart is issued
 #define CVAR_SERVER_CREATED	2048	// cvar was created by a server the client connected to.
+#define CVAR_VM_CREATED	0x1000	// cvar was created exclusively in one of the VMs.
 #define CVAR_PROTECTED		0x2000	// prevent modifying this var from VMs or the server
 
 // These flags are only returned by the Cvar_Flags() function
@@ -917,19 +920,30 @@ default values.
 #define CVAR_NONEXISTENT	0x80000000	// Cvar doesn't exist.
 
 // nothing outside the Cvar_*() functions should modify these fields!
-typedef struct cvar_s {
-	char		*name;
-	char		*string;
-	char		*resetString;		// cvar_restart will reset to this value
-	char		*latchedString;		// for CVAR_LATCH vars
-	int			flags;
+typedef struct cvar_s cvar_t;
+
+struct cvar_s {
+	char			*name;
+	char			*string;
+	char			*resetString;		// cvar_restart will reset to this value
+	char			*latchedString;		// for CVAR_LATCH vars
+	int				flags;
 	bool	modified;			// set each time the cvar is changed
-	int			modificationCount;	// incremented each time the cvar is changed
-	float		value;				// atof( string )
-	int			integer;			// atoi( string )
-	struct cvar_s *next;
-	struct cvar_s *hashNext;
-} cvar_t;
+	int				modificationCount;	// incremented each time the cvar is changed
+	float			value;				// atof( string )
+	int				integer;			// atoi( string )
+	bool	validate;
+	bool	integral;
+	float			min;
+	float			max;
+	char			*description;
+
+	cvar_t *next;
+	cvar_t *prev;
+	cvar_t *hashNext;
+	cvar_t *hashPrev;
+	int			hashIndex;
+};
 
 #define	MAX_CVAR_VALUE_STRING	256
 
@@ -1526,4 +1540,18 @@ int ahextoi( const char* string );
 
 
 
+#define QuatCopy(a,b)			((b)[0]=(a)[0],(b)[1]=(a)[1],(b)[2]=(a)[2],(b)[3]=(a)[3])
+#define LERP( a, b, w ) ( ( a ) * ( 1.0f - ( w ) ) + ( b ) * ( w ) )
+#define LUMA( red, green, blue ) ( 0.2126f * ( red ) + 0.7152f * ( green ) + 0.0722f * ( blue ) )
+
+char *Com_SkipTokens( char *s, int numTokens, char *sep );
+char *Com_SkipCharset( char *s, char *sep );
+bool Q_isanumber( const char *s );
+bool Q_isintegral( float f );
+
+bool Com_CharIsOneOfCharset( char c, char *set );
+int Com_HexStrToInt( const char *str );
+#define TRUNCATE_LENGTH	64
+void Com_TruncateLongString( char *buffer, const char *s );
+long Q_ftol( float f );
 #endif	// __Q_SHARED_H__

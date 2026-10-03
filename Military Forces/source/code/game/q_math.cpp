@@ -1293,5 +1293,7 @@ bool RayIntersectBox( const ray3_t* ray, const box3_t* bbox )
 	return true;
 }
 
-
-
+long Q_ftol( float f )
+{
+	return (long)f;
+}

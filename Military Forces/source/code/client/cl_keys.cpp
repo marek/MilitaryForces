@@ -522,7 +522,7 @@ void Console_Key (int key) {
 	// command completion
 
 	if (key == K_TAB) {
-		Field_CompleteCommand(&g_consoleField);
+		Field_AutoComplete(&g_consoleField);
 		return;
 	}
 
@@ -874,6 +874,18 @@ void Key_Unbindall_f (void)
 			Key_SetBinding (i, "");
 }
 
+
+/*
+============
+Key_KeynameCompletion
+============
+*/
+void Key_KeynameCompletion( void(*callback)(const char *s) ) {
+	int		i;
+
+	for( i = 0; keynames[ i ].name != NULL; i++ )
+		callback( keynames[ i ].name );
+}
 
 /*
 ===================

@@ -15,7 +15,7 @@
 #include "ui.h"
 #include "ui_displaycontext_ui.h"
 #include "ui_utils_ui.h"
-#include "../renderer/tr_public.h"
+#include "../renderercommon/tr_public.h"
 
 struct UI_Utils;
 

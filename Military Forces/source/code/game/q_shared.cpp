@@ -624,11 +624,9 @@ Skips until a matching close brace is found.
 Internal brace depths are properly skipped.
 =================
 */
-void SkipBracedSection (char **program) {
+bool SkipBracedSection (char **program, int depth) {
 	char			*token;
-	int				depth;
 
-	depth = 0;
 	do {
 		token = COM_ParseExt( program, true );
 		if( token[1] == 0 ) {
@@ -640,6 +638,8 @@ void SkipBracedSection (char **program) {
 			}
 		}
 	} while( depth && *program );
+
+	return ( depth == 0 );
 }
 
 /*
@@ -1354,4 +1354,141 @@ int ahextoi( const char* string ) {
 	return value;
 }
 
+bool Com_CharIsOneOfCharset( char c, char *set )
+{
+	int i;
 
+	for( i = 0; i < strlen( set ); i++ )
+	{
+		if( set[ i ] == c )
+			return true;
+	}
+
+	return false;
+}
+
+/*
+==================
+Com_SkipCharset
+==================
+*/
+char *Com_SkipCharset( char *s, char *sep )
+{
+	char	*p = s;
+
+	while( p )
+	{
+		if( Com_CharIsOneOfCharset( *p, sep ) )
+			p++;
+		else
+			break;
+	}
+
+	return p;
+}
+
+/*
+==================
+Com_SkipTokens
+==================
+*/
+char *Com_SkipTokens( char *s, int numTokens, char *sep )
+{
+	int		sepCount = 0;
+	char	*p = s;
+
+	while( sepCount < numTokens )
+	{
+		if( Com_CharIsOneOfCharset( *p++, sep ) )
+		{
+			sepCount++;
+			while( Com_CharIsOneOfCharset( *p, sep ) )
+				p++;
+		}
+		else if( *p == '\0' )
+			break;
+	}
+
+	if( sepCount == numTokens )
+		return p;
+	else
+		return s;
+}
+
+/*
+===================
+Com_HexStrToInt
+===================
+*/
+int Com_HexStrToInt( const char *str )
+{
+	if ( !str )
+		return -1;
+
+	// check for hex code
+	if( str[ 0 ] == '0' && str[ 1 ] == 'x' && str[ 2 ] != '\0' )
+	{
+		int i, n = 0, len = strlen( str );
+
+		for( i = 2; i < len; i++ )
+		{
+			char digit;
+
+			n *= 16;
+
+			digit = tolower( str[ i ] );
+
+			if( digit >= '0' && digit <= '9' )
+				digit -= '0';
+			else if( digit >= 'a' && digit <= 'f' )
+				digit = digit - 'a' + 10;
+			else
+				return -1;
+
+			n += digit;
+		}
+
+		return n;
+	}
+
+	return -1;
+}
+
+bool Q_isanumber( const char *s )
+{
+	char *p;
+	double Q_UNUSED_VAR d;
+
+	if( *s == '\0' )
+		return false;
+
+	d = strtod( s, &p );
+
+	return *p == '\0';
+}
+
+bool Q_isintegral( float f )
+{
+	return (int)f == f;
+}
+
+/*
+============
+Com_TruncateLongString
+
+Assumes buffer is atleast TRUNCATE_LENGTH big
+============
+*/
+void Com_TruncateLongString( char *buffer, const char *s )
+{
+	int length = strlen( s );
+
+	if( length <= TRUNCATE_LENGTH )
+		Q_strncpyz( buffer, s, TRUNCATE_LENGTH );
+	else
+	{
+		Q_strncpyz( buffer, s, ( TRUNCATE_LENGTH / 2 ) - 3 );
+		Q_strcat( buffer, TRUNCATE_LENGTH, " ... " );
+		Q_strcat( buffer, TRUNCATE_LENGTH, s + length - ( TRUNCATE_LENGTH / 2 ) + 3 );
+	}
+}

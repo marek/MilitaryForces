@@ -20,9 +20,14 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-#include <SDL.h>
+#ifdef USE_INTERNAL_SDL_HEADERS
+#	include "SDL.h"
+#else
+#	include <SDL.h>
+#endif
 
-#include "../renderer/tr_local.h"
+#include "../renderercommon/tr_common.h"
+#include "../qcommon/qcommon.h"
 
 extern SDL_Window *SDL_window;
 
@@ -35,9 +40,6 @@ void GLimp_SetGamma( unsigned char red[256], unsigned char green[256], unsigned 
 {
 	Uint16 table[3][256];
 	int i, j;
-
-	if( !SDL_window )
-		return;
 
 	if( !glConfig.deviceSupportsGamma || r_ignorehwgamma->integer > 0 )
 		return;

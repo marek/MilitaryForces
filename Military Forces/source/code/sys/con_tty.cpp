@@ -379,7 +379,7 @@ char *CON_Input( void )
 				if (key == '\t')
 				{
 					CON_Hide();
-					Field_CompleteCommand( &TTY_con );
+					Field_AutoComplete( &TTY_con );
 					CON_Show();
 					return NULL;
 				}

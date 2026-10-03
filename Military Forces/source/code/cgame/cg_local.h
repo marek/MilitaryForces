@@ -13,7 +13,7 @@
 #include "../game/bg_public.h"
 #include "cg_public.h"
 #include "../ui/ui_shared.h"
-#include "../renderer/tr_public.h"
+#include "../renderercommon/tr_public.h"
 #include "../vehiclelib/bg_datamanager.h"
 #include "../vehiclelib/bg_vehicleinfo.h"
 #include "../vehiclelib/bg_weaponinfo.h"

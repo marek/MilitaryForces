@@ -15,7 +15,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Foobar; if not, write to the Free Software
+along with Quake III Arena source code; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../game/q_shared.h"
 #include "qcommon.h"
 
-#define	MAX_CMD_BUFFER	16384
+#define	MAX_CMD_BUFFER  128*1024
 #define	MAX_CMD_LINE	1024
 
 typedef struct {
@@ -87,8 +87,7 @@ Cbuf_AddText
 Adds command text at the end of the buffer, does NOT add a final \n
 ============
 */
-void Cbuf_AddText( const char *text ) 
-{
+void Cbuf_AddText( const char *text ) {
 	int		l;
 	
 	l = strlen (text);
@@ -126,7 +125,7 @@ void Cbuf_InsertText( const char *text ) {
 		cmd_text.data[ i + len ] = cmd_text.data[ i ];
 	}
 
-	// copy the New text in
+	// copy the new text in
 	Com_Memcpy( cmd_text.data, text, len - 1 );
 
 	// add a \n
@@ -147,9 +146,11 @@ void Cbuf_ExecuteText (int exec_when, const char *text)
 	{
 	case EXEC_NOW:
 		if (text && strlen(text) > 0) {
+			Com_DPrintf(S_COLOR_YELLOW "EXEC_NOW %s\n", text);
 			Cmd_ExecuteString (text);
 		} else {
 			Cbuf_Execute();
+			Com_DPrintf(S_COLOR_YELLOW "EXEC_NOW %s\n", cmd_text.data);
 		}
 		break;
 	case EXEC_INSERT:
@@ -264,27 +265,34 @@ Cmd_Exec_f
 ===============
 */
 void Cmd_Exec_f( void ) {
-	char	*f;
-	int		len;
+	bool quiet;
+	union {
+		char	*c;
+		void	*v;
+	} f;
 	char	filename[MAX_QPATH];
 
+	quiet = !Q_stricmp(Cmd_Argv(0), "execq");
+
 	if (Cmd_Argc () != 2) {
-		Com_Printf ("exec <filename> : execute a script file\n");
+		Com_Printf ("exec%s <filename> : execute a script file%s\n",
+		            quiet ? "q" : "", quiet ? " without notification" : "");
 		return;
 	}
 
 	Q_strncpyz( filename, Cmd_Argv(1), sizeof( filename ) );
-	COM_DefaultExtension( filename, sizeof( filename ), ".cfg" ); 
-	len = FS_ReadFile( filename, (void **)&f);
-	if (!f) {
-		Com_Printf ("couldn't exec %s\n",Cmd_Argv(1));
+	COM_DefaultExtension( filename, sizeof( filename ), ".cfg" );
+	FS_ReadFile( filename, &f.v);
+	if (!f.c) {
+		Com_Printf ("couldn't exec %s\n", filename);
 		return;
 	}
-	Com_Printf ("execing %s\n",Cmd_Argv(1));
+	if (!quiet)
+		Com_Printf ("execing %s\n", filename);
 	
-	Cbuf_InsertText (f);
+	Cbuf_InsertText (f.c);
 
-	FS_FreeFile (f);
+	FS_FreeFile (f.v);
 }
 
 
@@ -317,11 +325,7 @@ Just prints the rest of the line to the console
 */
 void Cmd_Echo_f (void)
 {
-	int		i;
-	
-	for (i=1 ; i<Cmd_Argc() ; i++)
-		Com_Printf ("%s ",Cmd_Argv(i));
-	Com_Printf ("\n");
+	Com_Printf ("%s\n", Cmd_Args());
 }
 
 
@@ -338,6 +342,7 @@ typedef struct cmd_function_s
 	struct cmd_function_s	*next;
 	char					*name;
 	xcommand_t				function;
+	completionFunc_t	complete;
 } cmd_function_t;
 
 
@@ -353,8 +358,7 @@ static	cmd_function_t	*cmd_functions;		// possible commands to execute
 Cmd_Argc
 ============
 */
-int	Cmd_Argc()
-{
+int		Cmd_Argc( void ) {
 	return cmd_argc;
 }
 
@@ -378,8 +382,7 @@ The interpreted versions use this because
 they can't have pointers returned to them
 ============
 */
-void Cmd_ArgvBuffer( int arg, char *buffer, int bufferLength ) 
-{
+void	Cmd_ArgvBuffer( int arg, char *buffer, int bufferLength ) {
 	Q_strncpyz( buffer, Cmd_Argv( arg ), bufferLength );
 }
 
@@ -438,8 +441,7 @@ The interpreted versions use this because
 they can't have pointers returned to them
 ============
 */
-void Cmd_ArgsBuffer( char *buffer, int bufferLength ) 
-{
+void	Cmd_ArgsBuffer( char *buffer, int bufferLength ) {
 	Q_strncpyz( buffer, Cmd_Args(), bufferLength );
 }
 
@@ -449,9 +451,10 @@ Cmd_Cmd
 
 Retrieve the unmodified command string
 For rcon use when you want to transmit without altering quoting
+https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=543
 ============
 */
-char *Cmd_Cmd()
+char *Cmd_Cmd(void)
 {
 	return cmd_cmd;
 }
@@ -486,14 +489,14 @@ void Cmd_Args_Sanitize(void)
 Cmd_TokenizeString
 
 Parses the given string into command line tokens.
-The text is copied to a seperate buffer and 0 characters
-are inserted in the apropriate place, The argv array
+The text is copied to a separate buffer and 0 characters
+are inserted in the appropriate place, The argv array
 will point into this temporary buffer.
 ============
 */
 // NOTE TTimo define that to track tokenization issues
 //#define TKN_DBG
-void Cmd_TokenizeString( const char *text_in ) {
+static void Cmd_TokenizeString2( const char *text_in, bool ignoreQuotes ) {
 	const char	*text;
 	char	*textOut;
 
@@ -549,7 +552,7 @@ void Cmd_TokenizeString( const char *text_in ) {
 
 		// handle quoted strings
     // NOTE TTimo this doesn't handle \" escaping
-		if ( *text == '"' ) {
+		if ( !ignoreQuotes && *text == '"' ) {
 			cmd_argv[cmd_argc] = textOut;
 			cmd_argc++;
 			text++;
@@ -570,7 +573,7 @@ void Cmd_TokenizeString( const char *text_in ) {
 
 		// skip until whitespace, quote, or command
 		while ( *text > ' ' ) {
-			if ( text[0] == '"' ) {
+			if ( !ignoreQuotes && text[0] == '"' ) {
 				break;
 			}
 
@@ -595,6 +598,37 @@ void Cmd_TokenizeString( const char *text_in ) {
 	
 }
 
+/*
+============
+Cmd_TokenizeString
+============
+*/
+void Cmd_TokenizeString( const char *text_in ) {
+	Cmd_TokenizeString2( text_in, false );
+}
+
+/*
+============
+Cmd_TokenizeStringIgnoreQuotes
+============
+*/
+void Cmd_TokenizeStringIgnoreQuotes( const char *text_in ) {
+	Cmd_TokenizeString2( text_in, true );
+}
+
+/*
+============
+Cmd_FindCommand
+============
+*/
+cmd_function_t *Cmd_FindCommand( const char *cmd_name )
+{
+	cmd_function_t *cmd;
+	for( cmd = cmd_functions; cmd; cmd = cmd->next )
+		if( !Q_stricmp( cmd_name, cmd->name ) )
+			return cmd;
+	return NULL;
+}
 
 /*
 ============
@@ -605,22 +639,37 @@ void	Cmd_AddCommand( const char *cmd_name, xcommand_t function ) {
 	cmd_function_t	*cmd;
 	
 	// fail if the command already exists
-	for ( cmd = cmd_functions ; cmd ; cmd=cmd->next ) {
-		if ( !strcmp( cmd_name, cmd->name ) ) {
-			// allow completion-only commands to be silently doubled
-			if ( function != NULL ) {
-				Com_Printf ("Cmd_AddCommand: %s already defined\n", cmd_name);
-			}
-			return;
-		}
+	if( Cmd_FindCommand( cmd_name ) )
+	{
+		// allow completion-only commands to be silently doubled
+		if( function != NULL )
+			Com_Printf( "Cmd_AddCommand: %s already defined\n", cmd_name );
+		return;
 	}
 
 	// use a small malloc to avoid zone fragmentation
-	cmd = reinterpret_cast<cmd_function_t*>(S_Malloc (sizeof(cmd_function_t)));
+	cmd = (cmd_function_t *)S_Malloc (sizeof(cmd_function_t));
 	cmd->name = CopyString( cmd_name );
 	cmd->function = function;
+	cmd->complete = NULL;
 	cmd->next = cmd_functions;
 	cmd_functions = cmd;
+}
+
+/*
+============
+Cmd_SetCommandCompletionFunc
+============
+*/
+void Cmd_SetCommandCompletionFunc( const char *command, completionFunc_t complete ) {
+	cmd_function_t	*cmd;
+
+	for( cmd = cmd_functions; cmd; cmd = cmd->next ) {
+		if( !Q_stricmp( command, cmd->name ) ) {
+			cmd->complete = complete;
+			return;
+		}
+	}
 }
 
 /*
@@ -640,9 +689,7 @@ void	Cmd_RemoveCommand( const char *cmd_name ) {
 		}
 		if ( !strcmp( cmd_name, cmd->name ) ) {
 			*back = cmd->next;
-			if (cmd->name) {
-				Z_Free(cmd->name);
-			}
+			Z_Free (cmd->name);
 			Z_Free (cmd);
 			return;
 		}
@@ -650,6 +697,28 @@ void	Cmd_RemoveCommand( const char *cmd_name ) {
 	}
 }
 
+/*
+============
+Cmd_RemoveCommandSafe
+
+Only remove commands with no associated function
+============
+*/
+void Cmd_RemoveCommandSafe( const char *cmd_name )
+{
+	cmd_function_t *cmd = Cmd_FindCommand( cmd_name );
+
+	if( !cmd )
+		return;
+	if( cmd->function )
+	{
+		Com_Error( ERR_DROP, "Restricted source tried to remove "
+			"system command \"%s\"", cmd_name );
+		return;
+	}
+
+	Cmd_RemoveCommand( cmd_name );
+}
 
 /*
 ============
@@ -661,6 +730,24 @@ void	Cmd_CommandCompletion( void(*callback)(const char *s) ) {
 	
 	for (cmd=cmd_functions ; cmd ; cmd=cmd->next) {
 		callback( cmd->name );
+	}
+}
+
+/*
+============
+Cmd_CompleteArgument
+============
+*/
+void Cmd_CompleteArgument( const char *command, char *args, int argNum ) {
+	cmd_function_t	*cmd;
+
+	for( cmd = cmd_functions; cmd; cmd = cmd->next ) {
+		if( !Q_stricmp( command, cmd->name ) ) {
+			if ( cmd->complete ) {
+				cmd->complete( args, argNum );
+			}
+			return;
+		}
 	}
 }
 
@@ -755,6 +842,17 @@ void Cmd_List_f (void)
 }
 
 /*
+==================
+Cmd_CompleteCfgName
+==================
+*/
+void Cmd_CompleteCfgName( char *args, int argNum ) {
+	if( argNum == 2 ) {
+		Field_CompleteFilename( "", "cfg", NULL, false, true );
+	}
+}
+
+/*
 ============
 Cmd_Init
 ============
@@ -762,7 +860,11 @@ Cmd_Init
 void Cmd_Init (void) {
 	Cmd_AddCommand ("cmdlist",Cmd_List_f);
 	Cmd_AddCommand ("exec",Cmd_Exec_f);
+	Cmd_AddCommand ("execq",Cmd_Exec_f);
+	Cmd_SetCommandCompletionFunc( "exec", Cmd_CompleteCfgName );
+	Cmd_SetCommandCompletionFunc( "execq", Cmd_CompleteCfgName );
 	Cmd_AddCommand ("vstr",Cmd_Vstr_f);
+	Cmd_SetCommandCompletionFunc( "vstr", Cvar_CompleteCvarName );
 	Cmd_AddCommand ("echo",Cmd_Echo_f);
 	Cmd_AddCommand ("wait", Cmd_Wait_f);
 }
