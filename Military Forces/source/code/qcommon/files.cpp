@@ -1050,7 +1050,7 @@ bool FS_IsDemoExt(const char *filename, int namelen)
 	{
 		protocol = atoi(ext_test + ARRAY_LEN(DEMOEXT));
 
-		if(protocol == PROTOCOL_VERSION)
+		if(protocol == com_protocol->integer)
 			return true;
 
 #ifdef LEGACY_PROTOCOL

@@ -87,7 +87,7 @@ send "\b \b"
 static void CON_Back( void )
 {
 	char key;
-	size_t size;
+	size_t Q_UNUSED_VAR size;
 
 	key = '\b';
 	size = write(STDOUT_FILENO, &key, 1);
@@ -148,7 +148,7 @@ static void CON_Show( void )
 		ttycon_hide--;
 		if (ttycon_hide == 0)
 		{
-			size_t size;
+			size_t Q_UNUSED_VAR size;
 			size = write(STDOUT_FILENO, TTY_CONSOLE_PROMPT, strlen(TTY_CONSOLE_PROMPT));
 			if (TTY_con.cursor)
 			{
@@ -337,7 +337,7 @@ char *CON_Input( void )
 	int avail;
 	char key;
 	field_t *history;
-	size_t size;
+	size_t Q_UNUSED_VAR size;
 
 	if(ttycon_on)
 	{
@@ -362,10 +362,26 @@ char *CON_Input( void )
 			{
 				if (key == '\n')
 				{
+#ifndef DEDICATED
+					// if not in the game explicitly prepend a slash if needed
+					if (clc.state != CA_ACTIVE && con_autochat->integer && TTY_con.cursor &&
+						TTY_con.buffer[0] != '/' && TTY_con.buffer[0] != '\\')
+					{
+						memmove(TTY_con.buffer + 1, TTY_con.buffer, sizeof(TTY_con.buffer) - 1);
+						TTY_con.buffer[0] = '\\';
+						TTY_con.cursor++;
+					}
+
 					if (TTY_con.buffer[0] == '/' || TTY_con.buffer[0] == '\\') {
 						Q_strncpyz(text, TTY_con.buffer + 1, sizeof(text));
+					} else if (TTY_con.cursor) {
+						if (con_autochat->integer) {
+							Com_sprintf(text, sizeof(text), "cmd say %s", TTY_con.buffer);
+						} else {
+							Q_strncpyz(text, TTY_con.buffer, sizeof(text));
+						}
 					} else {
-						Q_strncpyz(text, TTY_con.buffer, sizeof(text));
+						text[0] = '\0';
 					}
 
 					// push it in history
@@ -374,6 +390,15 @@ char *CON_Input( void )
 					Com_Printf("%s%s\n", TTY_CONSOLE_PROMPT, TTY_con.buffer);
 					Field_Clear(&TTY_con);
 					CON_Show();
+#else
+					// push it in history
+					Hist_Add(&TTY_con);
+					Q_strncpyz(text, TTY_con.buffer, sizeof(text));
+					Field_Clear(&TTY_con);
+					key = '\n';
+					size = write(STDOUT_FILENO, &key, 1);
+					size = write(STDOUT_FILENO, TTY_CONSOLE_PROMPT, strlen(TTY_CONSOLE_PROMPT));
+#endif
 					return text;
 				}
 				if (key == '\t')
@@ -483,7 +508,10 @@ void CON_Print( const char *msg )
 
 	CON_Hide( );
 
-	fputs( msg, stderr );
+	if( com_ansiColor && com_ansiColor->integer )
+		Sys_AnsiColorPrint( msg );
+	else
+		fputs( msg, stderr );
 
 	if (!ttycon_on) {
 		// CON_Hide didn't do anything.
