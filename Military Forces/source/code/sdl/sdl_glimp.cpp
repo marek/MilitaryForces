@@ -44,6 +44,16 @@ static SDL_GLContext SDL_glContext = NULL;
 cvar_t *r_allowResize; // make window resizable
 cvar_t *r_centerWindow;
 cvar_t *r_sdlDriver;
+cvar_t *r_glDebug;
+
+#define GLIMP_DEBUG_OUTPUT_SYNCHRONOUS	0x8242
+#define GLIMP_DEBUG_OUTPUT				0x92E0
+#define GLIMP_DEBUG_SEVERITY_HIGH		0x9146
+#define GLIMP_DEBUG_SEVERITY_MEDIUM		0x9147
+#define GLIMP_DEBUG_SEVERITY_LOW		0x9148
+
+typedef void ( APIENTRY *GLimp_DebugProc )( GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const char *message, const void *userParam );
+typedef void ( APIENTRY *GLimp_DebugMessageCallbackProc )( GLimp_DebugProc callback, const void *userParam );
 
 /*
 ===============
@@ -282,6 +292,9 @@ static int GLimp_SetMode( int mode, bool fullscreen, bool noborder )
 
 		SDL_SetWindowIcon( SDL_window, icon );
 
+		if( r_glDebug->integer )
+			SDL_GL_SetAttribute( SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG );
+
 		if( ( SDL_glContext = SDL_GL_CreateContext( SDL_window ) ) == NULL )
 		{
 			ri.Printf( PRINT_DEVELOPER, "SDL_GL_CreateContext failed: %s\n", SDL_GetError() );
@@ -374,6 +387,55 @@ static bool GLimp_StartDriverAndSetMode( int mode, bool fullscreen, bool noborde
 GLimp_InitExtensions
 ===============
 */
+static void APIENTRY GLimp_DebugCallback( GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const char *message, const void *userParam )
+{
+	const char *level;
+
+	switch( severity )
+	{
+		case GLIMP_DEBUG_SEVERITY_HIGH:		level = "high"; break;
+		case GLIMP_DEBUG_SEVERITY_MEDIUM:	level = "medium"; break;
+		case GLIMP_DEBUG_SEVERITY_LOW:		level = "low"; break;
+		default:
+			if( r_glDebug->integer < 2 )
+				return;
+			level = "info";
+			break;
+	}
+
+	ri.Printf( severity == GLIMP_DEBUG_SEVERITY_HIGH ? PRINT_WARNING : PRINT_ALL, "GL debug (%s, 0x%x): %s\n", level, id, message );
+}
+
+static void GLimp_InitDebugOutput( void )
+{
+	void *proc = NULL;
+	bool khr = false;
+
+	if( !r_glDebug->integer )
+		return;
+
+	if( SDL_GL_ExtensionSupported( "GL_KHR_debug" ) )
+	{
+		proc = SDL_GL_GetProcAddress( "glDebugMessageCallback" );
+		khr = proc != NULL;
+	}
+	if( !proc && SDL_GL_ExtensionSupported( "GL_ARB_debug_output" ) )
+		proc = SDL_GL_GetProcAddress( "glDebugMessageCallbackARB" );
+
+	if( !proc )
+	{
+		ri.Printf( PRINT_ALL, "...GL debug output not available\n" );
+		return;
+	}
+
+	( ( GLimp_DebugMessageCallbackProc )proc )( GLimp_DebugCallback, NULL );
+	qglEnable( GLIMP_DEBUG_OUTPUT_SYNCHRONOUS );
+	if( khr )
+		qglEnable( GLIMP_DEBUG_OUTPUT );
+
+	ri.Printf( PRINT_ALL, "...using GL debug output (%s)\n", khr ? "GL_KHR_debug" : "GL_ARB_debug_output" );
+}
+
 static void GLimp_InitExtensions( void )
 {
 	if( !r_allowExtensions->integer )
@@ -495,6 +557,7 @@ void GLimp_Init( void )
 
 	r_sdlDriver = ri.Cvar_Get( "r_sdlDriver", "", CVAR_ROM );
 	r_allowResize = ri.Cvar_Get( "r_allowResize", "0", CVAR_ARCHIVE | CVAR_LATCH );
+	r_glDebug = ri.Cvar_Get( "r_glDebug", "0", CVAR_ARCHIVE | CVAR_LATCH );
 	r_centerWindow = ri.Cvar_Get( "r_centerWindow", "0", CVAR_ARCHIVE | CVAR_LATCH );
 
 	if( ri.Cvar_Get( "com_abnormalExit", "0", CVAR_ROM )->integer )
@@ -533,6 +596,7 @@ success:
 	Q_strncpyz( glConfig.extensions_string, (char *) qglGetString( GL_EXTENSIONS ), sizeof( glConfig.extensions_string ) );
 
 	GLimp_InitExtensions();
+	GLimp_InitDebugOutput();
 
 	ri.Cvar_Get( "r_availableModes", "", CVAR_ROM );
 
