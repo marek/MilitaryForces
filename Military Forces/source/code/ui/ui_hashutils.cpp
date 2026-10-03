@@ -151,7 +151,7 @@ UI_HashUtils::findMenuKeyword( const char* keyword )
 int 
 UI_HashUtils::getKey( const char* keyword ) 
 {
-	int register hash, i;
+	int hash, i;
 
 	hash = 0;
 	for (i = 0; keyword[i] != '\0'; i++) 

@@ -2242,7 +2242,7 @@ UI_PrecompilerTools::evaluateTokens( SourceFile* source, Token* tokens, signed l
 int 
 UI_PrecompilerTools::nameHash( char *name )
 {
-	int register hash, i;
+	int hash, i;
 
 	hash = 0;
 	for (i = 0; name[i] != '\0'; i++)

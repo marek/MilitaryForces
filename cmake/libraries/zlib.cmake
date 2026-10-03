@@ -18,7 +18,7 @@ else()
     list(APPEND CLIENT_LIBRARIES ZLIB::ZLIB)
 endif()
 
-add_library(minizip_ioapi STATIC ${SOURCE_DIR}/qcommon/ioapi.c)
+add_library(minizip_ioapi STATIC ${SOURCE_DIR}/qcommon/ioapi.cpp)
 if(USE_INTERNAL_ZLIB)
     target_link_libraries(minizip_ioapi PUBLIC internal_zlib)
 else()
