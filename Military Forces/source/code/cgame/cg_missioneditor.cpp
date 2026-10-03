@@ -21,7 +21,7 @@ IGME_vehicle_t* ME_GetSelectedVehicle();
 void ME_KeyEvent(int key, bool down)
 {
 	if( key == K_MOUSE1 && !down ) {
-		Key_SetCatcher( Key_GetCatcher() & ~KEYCATCH_CGAME );
+		Key_SetCatcher( ( Key_GetCatcher() & ~KEYCATCH_CGAME ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
 		cgs.IGME.dragmode = false;
 	}
 }
@@ -169,7 +169,7 @@ void CG_Draw_IGME()
 	if( Key_IsDown(K_MOUSE1) && !Key_GetCatcher() ) {
 		if( (cgs.IGME.waypointmode && cgs.IGME.numWptSelections) ||
 			(!cgs.IGME.waypointmode && cgs.IGME.numSelections) ) {
-			Key_SetCatcher( KEYCATCH_CGAME );
+			Key_SetCatcher( ( KEYCATCH_CGAME ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
 			cgs.IGME.dragmode = true;
 		}
 	} else if( (Key_IsDown(K_MOUSE3) || Key_IsDown(K_SPACE)) &&

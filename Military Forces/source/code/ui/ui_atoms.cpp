@@ -263,7 +263,7 @@ MFQ3 Custom Chat
 static void UI_Chat( int mode )
 {
 	// reset & begin
-	Key_SetCatcher( KEYCATCH_UI );
+	Key_SetCatcher( ( KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
 	uiInfo.customChat.active = true;
 	uiInfo.customChat.text[0] = 0;
 	uiInfo.customChat.cindex = 0;
@@ -335,7 +335,7 @@ bool UI_ConsoleCommand( int realTime ) {
 	if( Q_stricmp (cmd, "teamselect") == 0 ) 
 	{
 		Cvar_Set( "cl_paused", "1" );
-		Key_SetCatcher( KEYCATCH_UI );
+		Key_SetCatcher( ( KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
 		uiInfo.uiUtils.menu_CloseAll();
 
 		uiInfo.uiUtils.menu_ActivateByName( "ingame_select_team" );
@@ -347,7 +347,7 @@ bool UI_ConsoleCommand( int realTime ) {
 	if( Q_stricmp (cmd, "vehicleselect") == 0 ) 
 	{
 		Cvar_Set( "cl_paused", "1" );
-		Key_SetCatcher( KEYCATCH_UI );
+		Key_SetCatcher( ( KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
 		uiInfo.uiUtils.menu_CloseAll();
 
 		uiInfo.uiUtils.menu_ActivateByName( "ingame_select_vehicle" );

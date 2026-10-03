@@ -4006,19 +4006,19 @@ void UI_RunMenuScript(char **args)
 		else if (Q_stricmp(name, "Quit") == 0) 
 		{
 			Cvar_Set("ui_singlePlayerActive", "0");
-			Cbuf_ExecuteText( EXEC_NOW, "quit");
+			Cbuf_ExecuteText( EXEC_INSERT, "quit");
 		}
 		else if (Q_stricmp(name, "Controls") == 0)
 		{
 		  Cvar_Set( "cl_paused", "1" );
-			Key_SetCatcher( KEYCATCH_UI );
+			Key_SetCatcher( ( KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
 			uiInfo.uiUtils.menu_CloseAll();
 			uiInfo.uiUtils.menu_ActivateByName("setup_menu2");
 		} 
 		else if (Q_stricmp(name, "Leave") == 0) 
 		{
 			Cbuf_ExecuteText( EXEC_APPEND, "disconnect\n" );
-			Key_SetCatcher( KEYCATCH_UI );
+			Key_SetCatcher( ( KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
 			uiInfo.uiUtils.menu_CloseAll();
 			uiInfo.uiUtils.menu_ActivateByName("main");
 		} 
@@ -4046,7 +4046,7 @@ void UI_RunMenuScript(char **args)
 		} 
 		else if (Q_stricmp(name, "closeingame") == 0) 
 		{
-			Key_SetCatcher( Key_GetCatcher() & ~KEYCATCH_UI );
+			Key_SetCatcher( ( Key_GetCatcher() & ~KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
 			Key_ClearStates();
 			Cvar_Set( "cl_paused", "0" );
 			uiInfo.uiUtils.menu_CloseAll();
@@ -4187,7 +4187,7 @@ void UI_RunMenuScript(char **args)
 						Cbuf_ExecuteText( EXEC_APPEND, "\n" );
 					}
 				}
-				Key_SetCatcher( Key_GetCatcher() & ~KEYCATCH_UI );
+				Key_SetCatcher( ( Key_GetCatcher() & ~KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
 				Key_ClearStates();
 				Cvar_Set( "cl_paused", "0" );
 				uiInfo.uiUtils.menu_CloseAll();
@@ -4203,7 +4203,7 @@ void UI_RunMenuScript(char **args)
 					Cbuf_ExecuteText( EXEC_APPEND, orders );
 					Cbuf_ExecuteText( EXEC_APPEND, "\n" );
 				}
-				Key_SetCatcher( Key_GetCatcher() & ~KEYCATCH_UI );
+				Key_SetCatcher( ( Key_GetCatcher() & ~KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
 				Key_ClearStates();
 				Cvar_Set( "cl_paused", "0" );
 				uiInfo.uiUtils.menu_CloseAll();
@@ -4221,7 +4221,7 @@ void UI_RunMenuScript(char **args)
 					Cbuf_ExecuteText( EXEC_APPEND, buff );
 					Cbuf_ExecuteText( EXEC_APPEND, "\n" );
 				}
-				Key_SetCatcher( Key_GetCatcher() & ~KEYCATCH_UI );
+				Key_SetCatcher( ( Key_GetCatcher() & ~KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
 				Key_ClearStates();
 				Cvar_Set( "cl_paused", "0" );
 				uiInfo.uiUtils.menu_CloseAll();
@@ -5802,10 +5802,10 @@ void UI_Pause(bool b)
 	if (b) {
 		// pause the game and set the ui keycatcher
 	  Cvar_Set( "cl_paused", "1" );
-		Key_SetCatcher( KEYCATCH_UI );
+		Key_SetCatcher( ( KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
 	} else {
 		// unpause the game and clear the ui keycatcher
-		Key_SetCatcher( Key_GetCatcher() & ~KEYCATCH_UI );
+		Key_SetCatcher( ( Key_GetCatcher() & ~KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
 		Key_ClearStates();
 		Cvar_Set( "cl_paused", "0" );
 	}
@@ -6003,7 +6003,7 @@ void _UI_KeyEvent( int key, bool down )
 		}
 		else
 		{
-			Key_SetCatcher( Key_GetCatcher() & ~KEYCATCH_UI );
+			Key_SetCatcher( ( Key_GetCatcher() & ~KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
 			Key_ClearStates();
 			Cvar_Set( "cl_paused", "0" );
 		}
@@ -6063,7 +6063,7 @@ void _UI_SetActiveMenu( UserInterface::MenuCommand menu ) {
 		v[0] = v[1] = v[2] = 0;
 	  switch ( menu ) {
 	  case UserInterface::MenuCommand::UIMENU_NONE:
-			Key_SetCatcher( Key_GetCatcher() & ~KEYCATCH_UI );
+			Key_SetCatcher( ( Key_GetCatcher() & ~KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
 			Key_ClearStates();
 			Cvar_Set( "cl_paused", "0" );
 			uiInfo.uiUtils.menu_CloseAll();
@@ -6071,7 +6071,7 @@ void _UI_SetActiveMenu( UserInterface::MenuCommand menu ) {
 		  return;
 	  case UserInterface::MenuCommand::UIMENU_MAIN:
 			//Cvar_Set( "sv_killserver", "1" );
-			Key_SetCatcher( KEYCATCH_UI );
+			Key_SetCatcher( ( KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
 			//S_StartLocalSound( S_RegisterSound("sound/misc/menu_background.wav", false) , CHAN_LOCAL_SOUND );
 			//S_StartBackgroundTrack("sound/misc/menu_background.wav", NULL);
 			if (uiInfo.inGameLoad) {
@@ -6089,7 +6089,7 @@ void _UI_SetActiveMenu( UserInterface::MenuCommand menu ) {
 			}
 		  return;
 	  case UserInterface::MenuCommand::UIMENU_TEAM:
-			Key_SetCatcher( KEYCATCH_UI );
+			Key_SetCatcher( ( KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
 			uiInfo.uiUtils.menu_ActivateByName("team");
 		  return;
 	  case UserInterface::MenuCommand::UIMENU_NEED_CD:
@@ -6098,7 +6098,7 @@ void _UI_SetActiveMenu( UserInterface::MenuCommand menu ) {
 		  return;
 	  case UserInterface::MenuCommand::UIMENU_POSTGAME:
 			//Cvar_Set( "sv_killserver", "1" );
-			Key_SetCatcher( KEYCATCH_UI );
+			Key_SetCatcher( ( KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
 			if (uiInfo.inGameLoad) {
 				UI_LoadNonIngame();
 			}
@@ -6108,7 +6108,7 @@ void _UI_SetActiveMenu( UserInterface::MenuCommand menu ) {
 		  return;
 	  case UserInterface::MenuCommand::UIMENU_INGAME:
 		  Cvar_Set( "cl_paused", "1" );
-			Key_SetCatcher( KEYCATCH_UI );
+			Key_SetCatcher( ( KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
 			UI_BuildPlayerList();
 			uiInfo.uiUtils.menu_CloseAll();
 			uiInfo.uiUtils.menu_ActivateByName("ingame");
