@@ -20,7 +20,7 @@ completeVehicleData_t availableVehicles[] =
 	"f-16",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_2,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
@@ -69,7 +69,7 @@ completeVehicleData_t availableVehicles[] =
 	"f-16",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_2,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
@@ -120,7 +120,7 @@ completeVehicleData_t availableVehicles[] =
 	"f-16",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_2,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
@@ -170,7 +170,7 @@ completeVehicleData_t availableVehicles[] =
 	"f-16",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_2,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
@@ -220,7 +220,7 @@ completeVehicleData_t availableVehicles[] =
 	"f-16",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_2,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
@@ -270,7 +270,7 @@ completeVehicleData_t availableVehicles[] =
 	"f-16",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_2,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
@@ -320,7 +320,7 @@ completeVehicleData_t availableVehicles[] =
 	"f-16",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_2,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
@@ -371,7 +371,7 @@ completeVehicleData_t availableVehicles[] =
 	"jas-39",					// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_1,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
@@ -420,7 +420,7 @@ completeVehicleData_t availableVehicles[] =
 	"jas-39",					// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_1,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
@@ -470,7 +470,7 @@ completeVehicleData_t availableVehicles[] =
 	"jas-39",					// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_1,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
@@ -520,7 +520,7 @@ completeVehicleData_t availableVehicles[] =
 	"jas-39",					// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_1,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
@@ -570,7 +570,7 @@ completeVehicleData_t availableVehicles[] =
 	"jas-39",					// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_1,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
@@ -621,7 +621,7 @@ completeVehicleData_t availableVehicles[] =
 	"gr7",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_1,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
@@ -671,7 +671,7 @@ completeVehicleData_t availableVehicles[] =
 	"a10",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_2,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_BOMBER,
 	0,							// flags
@@ -722,7 +722,7 @@ completeVehicleData_t availableVehicles[] =
 	"a10",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_2,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_BOMBER,
 	0,							// flags
@@ -772,7 +772,7 @@ completeVehicleData_t availableVehicles[] =
 	"a10",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_2,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_BOMBER,
 	0,							// flags
@@ -822,7 +822,7 @@ completeVehicleData_t availableVehicles[] =
 	"a10",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_2,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_BOMBER,
 	0,							// flags
@@ -872,7 +872,7 @@ completeVehicleData_t availableVehicles[] =
 	"a10",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_2,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_BOMBER,
 	0,							// flags
@@ -922,7 +922,7 @@ completeVehicleData_t availableVehicles[] =
 	"f-105",					// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_2,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_BOMBER,
 	0,							// flags
@@ -973,7 +973,7 @@ completeVehicleData_t availableVehicles[] =
 	"f-5",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_2,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
@@ -1023,7 +1023,7 @@ completeVehicleData_t availableVehicles[] =
 	"f-5",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_2,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
@@ -1073,7 +1073,7 @@ completeVehicleData_t availableVehicles[] =
 	"f-5",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_2,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
@@ -1123,7 +1123,7 @@ completeVehicleData_t availableVehicles[] =
 	"f-5",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_2,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
@@ -1173,7 +1173,7 @@ completeVehicleData_t availableVehicles[] =
 	"f-5",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_2,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
@@ -1223,7 +1223,7 @@ completeVehicleData_t availableVehicles[] =
 	"f-15",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_1,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_BOMBER,
 	0,							// flags
@@ -1272,7 +1272,7 @@ completeVehicleData_t availableVehicles[] =
 	"f-14",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_2,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
@@ -1322,7 +1322,7 @@ completeVehicleData_t availableVehicles[] =
 	"f-14",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_2,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
@@ -1372,7 +1372,7 @@ completeVehicleData_t availableVehicles[] =
 	"f-18",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_1,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
@@ -1423,7 +1423,7 @@ completeVehicleData_t availableVehicles[] =
 	"f-18",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_1,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
@@ -1474,7 +1474,7 @@ completeVehicleData_t availableVehicles[] =
 	"f-18",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_1,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
@@ -1524,7 +1524,7 @@ completeVehicleData_t availableVehicles[] =
 	"f-18",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_1,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
@@ -1574,7 +1574,7 @@ completeVehicleData_t availableVehicles[] =
 	"f-18",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_1,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
@@ -1624,7 +1624,7 @@ completeVehicleData_t availableVehicles[] =
 	"f-22",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_1,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
@@ -1674,7 +1674,7 @@ completeVehicleData_t availableVehicles[] =
 	"yf-23",					// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_2,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
@@ -1724,7 +1724,7 @@ completeVehicleData_t availableVehicles[] =
 	"su-27",					// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_2,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_FIGHTER,
 	0,							// flags
@@ -1774,7 +1774,7 @@ completeVehicleData_t availableVehicles[] =
 	"b-2",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_1,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_BOMBER,
 	VF_STEALTH,							// flags
@@ -1823,7 +1823,7 @@ completeVehicleData_t availableVehicles[] =
 	"b-2",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_1,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_BOMBER,
 	VF_STEALTH,							// flags
@@ -1872,7 +1872,7 @@ completeVehicleData_t availableVehicles[] =
 	"b-2",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_1,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_BOMBER,
 	VF_STEALTH,							// flags
@@ -1921,7 +1921,7 @@ completeVehicleData_t availableVehicles[] =
 	"b-2",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_1,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_BOMBER,
 	VF_STEALTH,							// flags
@@ -1970,7 +1970,7 @@ completeVehicleData_t availableVehicles[] =
 	"b-2",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_1,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_BOMBER,
 	VF_STEALTH,							// flags
@@ -2019,7 +2019,7 @@ completeVehicleData_t availableVehicles[] =
 	"b-2",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_1,
+	MF_TEAM_ANY,
 	CAT_PLANE,
 	CLASS_PLANE_BOMBER,
 	VF_STEALTH,							// flags
@@ -2423,7 +2423,7 @@ completeVehicleData_t availableVehicles[] =
 	"m1",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_1,
+	MF_TEAM_ANY,
 	CAT_GROUND,
 	CLASS_GROUND_MBT,
 	0,							// flags
@@ -2471,7 +2471,7 @@ completeVehicleData_t availableVehicles[] =
 	"t-90",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_2,
+	MF_TEAM_ANY,
 	CAT_GROUND,
 	CLASS_GROUND_MBT,
 	0,							// flags
@@ -2519,7 +2519,7 @@ completeVehicleData_t availableVehicles[] =
 	"bmp-3",					// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_1,
+	MF_TEAM_ANY,
 	CAT_GROUND,
 	CLASS_GROUND_RECON,
 	0,							// flags
@@ -2614,7 +2614,7 @@ completeVehicleData_t availableVehicles[] =
 	"humvee_50cal",				// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_1,
+	MF_TEAM_ANY,
 	CAT_GROUND,
 	CLASS_GROUND_RECON,
 	0,							// flags
@@ -2663,7 +2663,7 @@ completeVehicleData_t availableVehicles[] =
 	"humvee_avng",				// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_1,
+	MF_TEAM_ANY,
 	CAT_GROUND,
 	CLASS_GROUND_SAM,
 	0,							// flags
@@ -2711,7 +2711,7 @@ completeVehicleData_t availableVehicles[] =
 	"brdm2",					// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_2,
+	MF_TEAM_ANY,
 	CAT_GROUND,
 	CLASS_GROUND_RECON,
 	0,							// flags
@@ -2759,7 +2759,7 @@ completeVehicleData_t availableVehicles[] =
 	"ZSU-23",					// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_2,
+	MF_TEAM_ANY,
 	CAT_GROUND,
 	CLASS_GROUND_SAM,
 	0,							// flags
@@ -2904,7 +2904,7 @@ completeVehicleData_t availableVehicles[] =
 	"mlrs",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,				// id
-	MF_TEAM_1,
+	MF_TEAM_ANY,
 	CAT_GROUND,
 	CLASS_GROUND_SAM,
 	0,							// flags
@@ -2956,7 +2956,7 @@ completeVehicleData_t availableVehicles[] =
 	"helo",					// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_2,
+	MF_TEAM_ANY,
 	CAT_HELO,
 	CLASS_HELO_RECON,
 	0,							// flags
@@ -3004,7 +3004,7 @@ completeVehicleData_t availableVehicles[] =
 	"UH-1",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_2,
+	MF_TEAM_ANY,
 	CAT_HELO,
 	CLASS_HELO_RECON,
 	0,							// flags
@@ -3052,7 +3052,7 @@ completeVehicleData_t availableVehicles[] =
 	"comanche",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_1,
+	MF_TEAM_ANY,
 	CAT_HELO,
 	CLASS_HELO_ATTACK,
 	VF_STEALTH,							// flags
@@ -3100,7 +3100,7 @@ completeVehicleData_t availableVehicles[] =
 	"comanche",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_1,
+	MF_TEAM_ANY,
 	CAT_HELO,
 	CLASS_HELO_ATTACK,
 	VF_STEALTH,							// flags
@@ -3148,7 +3148,7 @@ completeVehicleData_t availableVehicles[] =
 	"comanche",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_1,
+	MF_TEAM_ANY,
 	CAT_HELO,
 	CLASS_HELO_ATTACK,
 	VF_STEALTH,							// flags
@@ -3196,7 +3196,7 @@ completeVehicleData_t availableVehicles[] =
 	"mi-24",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_2,
+	MF_TEAM_ANY,
 	CAT_HELO,
 	CLASS_HELO_ATTACK,
 	0,							// flags
@@ -3244,7 +3244,7 @@ completeVehicleData_t availableVehicles[] =
 	"mi-24",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_2,
+	MF_TEAM_ANY,
 	CAT_HELO,
 	CLASS_HELO_ATTACK,
 	0,							// flags
@@ -3292,7 +3292,7 @@ completeVehicleData_t availableVehicles[] =
 	"mi-35",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_2,
+	MF_TEAM_ANY,
 	CAT_HELO,
 	CLASS_HELO_ATTACK,
 	0,							// flags
@@ -3344,7 +3344,7 @@ completeVehicleData_t availableVehicles[] =
 	"sarge",					// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_2,
+	MF_TEAM_ANY,
 	CAT_LQM,
 	CLASS_LQM_INFANTRY,
 	0,							// flags
@@ -3394,7 +3394,7 @@ completeVehicleData_t availableVehicles[] =
 	"major",					// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_2,
+	MF_TEAM_ANY,
 	CAT_LQM,
 	CLASS_LQM_INFANTRY,
 	0,							// flags
@@ -3448,7 +3448,7 @@ completeVehicleData_t availableVehicles[] =
 	"pbr31mk2",					// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_1,
+	MF_TEAM_ANY,
 	CAT_BOAT,
 	CLASS_BOAT_PATROL,
 	0,							// flags

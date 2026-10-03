@@ -944,7 +944,7 @@ static void MF_ResolveMissionVehicle( mission_vehicle_t* veh )
 		{
 			if( !availableVehicles[i].modelName || Q_stricmp( availableVehicles[i].modelName, veh->objectname ) )
 				continue;
-			if( veh->team && availableVehicles[i].team != veh->team )
+			if( veh->team && !(availableVehicles[i].team & veh->team) )
 				continue;
 			if( best < 0 || abs( i - veh->index ) < abs( best - veh->index ) )
 				best = i;
