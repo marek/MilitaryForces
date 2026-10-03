@@ -69,7 +69,7 @@ typedef enum {
 #define	MAX_STEP_CHANGE		32
 
 #define	MAX_VERTS_ON_POLY	10
-#define	MAX_MARK_POLYS		256
+#define	MAX_MARK_POLYS		1024
 
 #define STAT_MINUS			10	// num frame for '-' stats digit
 #define STAT_COLON			11	// num frame for ':' stats digit
@@ -1660,7 +1660,7 @@ typedef enum {
 
 
 
-#define MAX_WORLD_PARTICLES 		4096
+#define MAX_WORLD_PARTICLES 		16384
 #define	MAX_WORLD_EMITTERS			500
 #define MAX_WORLD_SYSTEMS			200
 #define MAX_PARTICLE_SHADERS		100

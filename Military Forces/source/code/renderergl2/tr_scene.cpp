@@ -129,13 +129,13 @@ void RE_AddPolyToScene( qhandle_t hShader, int numVerts, const polyVert_t *verts
 
 	for ( j = 0; j < numPolys; j++ ) {
 		if ( r_numpolyverts + numVerts > max_polyverts || r_numpolys >= max_polys ) {
-      /*
-      NOTE TTimo this was initially a PRINT_WARNING
-      but it happens a lot with high fighting scenes and particles
-      since we don't plan on changing the const and making for room for those effects
-      simply cut this message to developer only
-      */
-			ri.Printf( PRINT_DEVELOPER, "WARNING: RE_AddPolyToScene: r_max_polys or r_max_polyverts reached\n");
+			static int	lastWarning;
+			int			now = ri.Milliseconds();
+
+			if ( now - lastWarning > 1000 ) {
+				lastWarning = now;
+				ri.Printf( PRINT_WARNING, "WARNING: RE_AddPolyToScene: r_maxpolys or r_maxpolyverts reached\n");
+			}
 			return;
 		}
 
@@ -207,7 +207,13 @@ void RE_AddRefEntityToScene( const refEntity_t *ent ) {
 		return;
 	}
 	if ( r_numentities >= MAX_REFENTITIES ) {
-		ri.Printf(PRINT_DEVELOPER, "RE_AddRefEntityToScene: Dropping refEntity, reached MAX_REFENTITIES\n");
+		static int	lastWarning;
+		int			now = ri.Milliseconds();
+
+		if ( now - lastWarning > 1000 ) {
+			lastWarning = now;
+			ri.Printf( PRINT_WARNING, "WARNING: RE_AddRefEntityToScene: dropping refEntity, reached MAX_REFENTITIES\n");
+		}
 		return;
 	}
 	if ( Q_isnan(ent->origin[0]) || Q_isnan(ent->origin[1]) || Q_isnan(ent->origin[2]) ) {

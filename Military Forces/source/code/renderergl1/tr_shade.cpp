@@ -426,7 +426,7 @@ static void ProjectDlightTexture_scalar( void ) {
 	for ( l = 0 ; l < backEnd.refdef.num_dlights ; l++ ) {
 		dlight_t	*dl;
 
-		if ( !( tess.dlightBits & ( 1 << l ) ) ) {
+		if ( !( tess.dlightBits & ( (uint64_t)1 << l ) ) ) {
 			continue;	// this surface definitely doesn't have any of this light
 		}
 		texCoords = texCoordsArray[0];

@@ -299,12 +299,12 @@ void SV_Startup()
 	theSVS.initClients(sv_maxclients->integer);	// initializes clients to 0 (will be allocated once they join)
 	if( com_dedicated->integer ) 
 	{
-		theSVS.numSnapshotEntities_ = sv_maxclients->integer * PACKET_BACKUP * 64;
+		theSVS.numSnapshotEntities_ = sv_maxclients->integer * PACKET_BACKUP * (MAX_SNAPSHOT_ENTITIES/4);
 	} 
 	else 
 	{
 		// we don't need nearly as many when playing locally
-		theSVS.numSnapshotEntities_ = sv_maxclients->integer * 4 * 64;
+		theSVS.numSnapshotEntities_ = sv_maxclients->integer * 4 * MAX_SNAPSHOT_ENTITIES;
 	}
 	theSVS.initialized_ = true;
 
@@ -354,12 +354,12 @@ void SV_ChangeMaxClients()
 	// allocate New snapshot entities
 	if( com_dedicated->integer )
 	{
-		theSVS.numSnapshotEntities_ = sv_maxclients->integer * PACKET_BACKUP * 64;
+		theSVS.numSnapshotEntities_ = sv_maxclients->integer * PACKET_BACKUP * (MAX_SNAPSHOT_ENTITIES/4);
 	} 
 	else 
 	{
 		// we don't need nearly as many when playing locally
-		theSVS.numSnapshotEntities_ = sv_maxclients->integer * 4 * 64;
+		theSVS.numSnapshotEntities_ = sv_maxclients->integer * 4 * MAX_SNAPSHOT_ENTITIES;
 	}
 }
 
@@ -712,6 +712,7 @@ void SV_Init (void) {
 	sv_reconnectlimit = Cvar_Get ("sv_reconnectlimit", "3", 0);
 	sv_showloss = Cvar_Get ("sv_showloss", "0", 0);
 	sv_padPackets = Cvar_Get ("sv_padPackets", "0", 0);
+	sv_snapshotBudget = Cvar_Get ("sv_snapshotBudget", "1100", CVAR_ARCHIVE);
 	sv_killserver = Cvar_Get ("sv_killserver", "0", 0);
 	sv_mapChecksum = Cvar_Get ("sv_mapChecksum", "", CVAR_ROM);
 	sv_lanForceRate = Cvar_Get ("sv_lanForceRate", "1", CVAR_ARCHIVE );

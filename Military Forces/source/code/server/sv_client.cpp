@@ -1420,8 +1420,8 @@ void SV_UserinfoChanged( SV_Client *cl ) {
 			cl->rate_ = i;
 			if (cl->rate_ < 1000) {
 				cl->rate_ = 1000;
-			} else if (cl->rate_ > 90000) {
-				cl->rate_ = 90000;
+			} else if (cl->rate_ > 1000000) {
+				cl->rate_ = 1000000;
 			}
 		} else {
 			cl->rate_ = 3000;
@@ -2109,6 +2109,9 @@ SV_Client::SV_Client() :
 	memset( downloadBlocks_, 0, sizeof(downloadBlocks_) );
 	memset( downloadBlockSize_, 0, sizeof(downloadBlockSize_) );
 	memset( frames_, 0, sizeof(frames_) );
+	lastSnapshotSequence_ = -1;
+	snapshotNoDeltaCount_ = 0;
+	memset( snapshotPriority_, 0, sizeof(snapshotPriority_) );
 	memset( &netchan_, 0, sizeof(netchan_ ) );
 #ifdef USE_VOIP
 	hasVoip_ = false;
@@ -2173,6 +2176,9 @@ SV_Client::clear()
 	memset( downloadBlocks_, 0, sizeof(downloadBlocks_) );
 	memset( downloadBlockSize_, 0, sizeof(downloadBlockSize_) );
 	memset( frames_, 0, sizeof(frames_) );
+	lastSnapshotSequence_ = -1;
+	snapshotNoDeltaCount_ = 0;
+	memset( snapshotPriority_, 0, sizeof(snapshotPriority_) );
 	memset( &netchan_, 0, sizeof(netchan_ ) );
 #ifdef USE_VOIP
 	hasVoip_ = false;

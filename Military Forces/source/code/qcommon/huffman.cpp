@@ -403,7 +403,7 @@ void Huff_Compress(msg_t *mbuf, int offset) {
 	size = mbuf->cursize - offset;
 	buffer = mbuf->data + offset;
 
-	if (size<=0) {
+	if (size<=0 || size > 65535) {
 		return;
 	}
 

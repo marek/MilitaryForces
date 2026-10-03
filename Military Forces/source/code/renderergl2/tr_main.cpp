@@ -1430,7 +1430,7 @@ static ID_INLINE void R_Radix( int offset, int size, drawSurf_t *source, drawSur
 ===============
 R_RadixSort
 
-Radix sort with 4 byte size buckets
+Radix sort with 6 byte size buckets
 ===============
 */
 static void R_RadixSort( drawSurf_t *source, int size )
@@ -1441,11 +1441,15 @@ static void R_RadixSort( drawSurf_t *source, int size )
   R_Radix( 1, size, scratch, source );
   R_Radix( 2, size, source, scratch );
   R_Radix( 3, size, scratch, source );
+  R_Radix( 4, size, source, scratch );
+  R_Radix( 5, size, scratch, source );
 #else
+  R_Radix( 7, size, source, scratch );
+  R_Radix( 6, size, scratch, source );
+  R_Radix( 5, size, source, scratch );
+  R_Radix( 4, size, scratch, source );
   R_Radix( 3, size, source, scratch );
   R_Radix( 2, size, scratch, source );
-  R_Radix( 1, size, source, scratch );
-  R_Radix( 0, size, scratch, source );
 #endif //Q3_LITTLE_ENDIAN
 }
 
@@ -1463,9 +1467,9 @@ void R_AddDrawSurf( surfaceType_t *surface, shader_t *shader,
 	// instead of checking for overflow, we just mask the index
 	// so it wraps around
 	index = tr.refdef.numDrawSurfs & DRAWSURF_MASK;
-	// the sort data is packed into a single 32 bit value so it can be
+	// the sort data is packed into a single 64 bit value so it can be
 	// compared quickly during the qsorting process
-	tr.refdef.drawSurfs[index].sort = (shader->sortedIndex << QSORT_SHADERNUM_SHIFT) 
+	tr.refdef.drawSurfs[index].sort = ((uint64_t)shader->sortedIndex << QSORT_SHADERNUM_SHIFT) 
 		| tr.shiftedEntityNum | ( fogIndex << QSORT_FOGNUM_SHIFT ) 
 		| ((int)pshadowMap << QSORT_PSHADOW_SHIFT) | (int)dlightMap;
 	tr.refdef.drawSurfs[index].cubemapIndex = cubemap;
@@ -1478,7 +1482,7 @@ void R_AddDrawSurf( surfaceType_t *surface, shader_t *shader,
 R_DecomposeSort
 =================
 */
-void R_DecomposeSort( unsigned sort, int *entityNum, shader_t **shader, 
+void R_DecomposeSort( uint64_t sort, int *entityNum, shader_t **shader, 
 					 int *fogNum, int *dlightMap, int *pshadowMap ) {
 	*fogNum = ( sort >> QSORT_FOGNUM_SHIFT ) & 31;
 	*shader = tr.sortedShaders[ ( sort >> QSORT_SHADERNUM_SHIFT ) & (MAX_SHADERS-1) ];
@@ -1786,7 +1790,7 @@ void R_RenderDlightCubemaps(const refdef_t *fd)
 		int j;
 
 		// use previous frame to determine visible dlights
-		if ((1 << i) & tr.refdef.dlightMask)
+		if (((uint64_t)1 << i) & tr.refdef.dlightMask)
 			continue;
 
 		Com_Memset( &shadowParms, 0, sizeof( shadowParms ) );

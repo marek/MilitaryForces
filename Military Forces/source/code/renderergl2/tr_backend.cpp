@@ -433,7 +433,7 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	bool		depthRange, oldDepthRange, isCrosshair, wasCrosshair;
 	int				i;
 	drawSurf_t		*drawSurf;
-	int				oldSort;
+	uint64_t		oldSort;
 	double			originalTime;
 	FBO_t*			fbo = NULL;
 
@@ -452,12 +452,12 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	oldDlighted = false;
 	oldPshadowed = false;
 	oldCubemapIndex = -1;
-	oldSort = -1;
+	oldSort = ~(uint64_t)0;
 
 	backEnd.pc.c_surfaces += numDrawSurfs;
 
 	for (i = 0, drawSurf = drawSurfs ; i < numDrawSurfs ; i++, drawSurf++) {
-		if ( drawSurf->sort == (unsigned)oldSort && drawSurf->cubemapIndex == oldCubemapIndex) {
+		if ( drawSurf->sort == oldSort && drawSurf->cubemapIndex == oldCubemapIndex) {
 			if (backEnd.depthFill && shader && (shader->sort != SS_OPAQUE && shader->sort != SS_PORTAL))
 				continue;
 
@@ -465,7 +465,7 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 			rb_surfaceTable[ *drawSurf->surface ]( drawSurf->surface );
 			continue;
 		}
-		oldSort = (int)drawSurf->sort;
+		oldSort = drawSurf->sort;
 		R_DecomposeSort( drawSurf->sort, &entityNum, &shader, &fogNum, &dlighted, &pshadowed );
 		cubemapIndex = drawSurf->cubemapIndex;
 

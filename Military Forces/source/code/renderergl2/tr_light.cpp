@@ -61,7 +61,7 @@ Determine which dynamic lights may effect this bmodel
 void R_DlightBmodel( bmodel_t *bmodel ) {
 	int			i, j;
 	dlight_t	*dl;
-	int			mask;
+	uint64_t	mask;
 	msurface_t	*surf;
 
 	// transform all the lights
@@ -85,7 +85,7 @@ void R_DlightBmodel( bmodel_t *bmodel ) {
 		}
 
 		// we need to check this light
-		mask |= 1 << i;
+		mask |= (uint64_t)1 << i;
 	}
 
 	tr.currentEntity->needDlights = (mask != 0);

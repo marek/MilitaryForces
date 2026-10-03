@@ -508,7 +508,7 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	bool		depthRange, oldDepthRange, isCrosshair, wasCrosshair;
 	int				i;
 	drawSurf_t		*drawSurf;
-	int				oldSort;
+	uint64_t		oldSort;
 	double			originalTime;
 
 	// save original time for entity shader offsets
@@ -525,18 +525,18 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	oldDepthRange = false;
 	wasCrosshair = false;
 	oldDlighted = false;
-	oldSort = -1;
+	oldSort = ~(uint64_t)0;
 	depthRange = false;
 
 	backEnd.pc.c_surfaces += numDrawSurfs;
 
 	for (i = 0, drawSurf = drawSurfs ; i < numDrawSurfs ; i++, drawSurf++) {
-		if ( drawSurf->sort == (unsigned)oldSort ) {
+		if ( drawSurf->sort == oldSort ) {
 			// fast path, same as previous sort
 			rb_surfaceTable[ *drawSurf->surface ]( drawSurf->surface );
 			continue;
 		}
-		oldSort = (int)drawSurf->sort;
+		oldSort = drawSurf->sort;
 		R_DecomposeSort( drawSurf->sort, &entityNum, &shader, &fogNum, &dlighted );
 
 		//

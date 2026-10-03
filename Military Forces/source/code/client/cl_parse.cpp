@@ -77,7 +77,7 @@ void CL_DeltaEntity (msg_t *msg, clSnapshot_t *frame, int newnum, entityState_t 
 		MSG_ReadDeltaEntity( msg, old, state, newnum );
 	}
 
-	if ( state->number == (MAX_GENTITIES-1) ) {
+	if ( state->number == ENTITYNUM_WIRE_END ) {
 		return;		// entity was delta removed
 	}
 	cl.parseEntitiesNum++;
@@ -117,7 +117,7 @@ void CL_ParsePacketEntities( msg_t *msg, clSnapshot_t *oldframe, clSnapshot_t *n
 		// read the entity index number
 		newnum = MSG_ReadBits( msg, GENTITYNUM_BITS );
 
-		if ( newnum == (MAX_GENTITIES-1) ) {
+		if ( newnum == ENTITYNUM_WIRE_END ) {
 			break;
 		}
 

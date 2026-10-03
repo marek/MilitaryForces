@@ -266,6 +266,7 @@ extern	cvar_t	*sv_hostname;
 extern	cvar_t	*sv_reconnectlimit;
 extern	cvar_t	*sv_showloss;
 extern	cvar_t	*sv_padPackets;
+extern	cvar_t	*sv_snapshotBudget;
 extern	cvar_t	*sv_killserver;
 extern	cvar_t	*sv_mapname;
 extern	cvar_t	*sv_mapChecksum;

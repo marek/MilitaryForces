@@ -1096,7 +1096,7 @@ typedef enum {
 #define	MAX_CLIENTS			64		// absolute limit
 #define MAX_LOCATIONS		64
 
-#define	GENTITYNUM_BITS		10		// don't need to send any more
+#define	GENTITYNUM_BITS		12
 #define	MAX_GENTITIES		(1<<GENTITYNUM_BITS)
 
 // entitynums are communicated with GENTITY_BITS, so any reserved
@@ -1104,7 +1104,8 @@ typedef enum {
 // also be in this range
 #define	ENTITYNUM_NONE			(-1)
 #define	ENTITYNUM_WORLD			(0)
-#define	ENTITYNUM_MAX_NORMAL	(MAX_GENTITIES)
+#define	ENTITYNUM_MAX_NORMAL	(MAX_GENTITIES-1)
+#define	ENTITYNUM_WIRE_END		(MAX_GENTITIES-1)
 
 
 #define	MAX_MODELS			256		// these are sent over the net as 8 bits

@@ -312,7 +312,7 @@ static void RB_SurfacePolychain( srfPoly_t *p ) {
 	tess.numVertexes = numv;
 }
 
-static void RB_SurfaceVertsAndIndexes( int numVerts, srfVert_t *verts, int numIndexes, glIndex_t *indexes, int dlightBits, int pshadowBits)
+static void RB_SurfaceVertsAndIndexes( int numVerts, srfVert_t *verts, int numIndexes, glIndex_t *indexes, uint64_t dlightBits, int pshadowBits)
 {
 	int             i;
 	glIndex_t      *inIndex;
@@ -403,7 +403,7 @@ static void RB_SurfaceVertsAndIndexes( int numVerts, srfVert_t *verts, int numIn
 	tess.numVertexes += numVerts;
 }
 
-static bool RB_SurfaceVaoCached(int numVerts, srfVert_t *verts, int numIndexes, glIndex_t *indexes, int dlightBits, int pshadowBits)
+static bool RB_SurfaceVaoCached(int numVerts, srfVert_t *verts, int numIndexes, glIndex_t *indexes, uint64_t dlightBits, int pshadowBits)
 {
 	bool recycleVertexBuffer = false;
 	bool recycleIndexBuffer = false;
@@ -956,9 +956,9 @@ static void RB_SurfaceGrid( srfBspSurface_t *srf ) {
 	float	lodError;
 	int		lodWidth, lodHeight;
 	int		numVertexes;
-	int		dlightBits;
+	uint64_t		dlightBits;
 	int     pshadowBits;
-	//int		*vDlightBits;
+	//uint64_t		*vDlightBits;
 
 	if (RB_SurfaceVaoCached(srf->numVerts, srf->verts, srf->numIndexes,
 		srf->indexes, srf->dlightBits, srf->pshadowBits))

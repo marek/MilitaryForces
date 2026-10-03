@@ -29,7 +29,7 @@ packet header
 -------------
 4	outgoing sequence.  high bit will be set if this is a fragmented message
 [2	qport (only for client to server)]
-[2	fragment start byte]
+[4	fragment start byte]
 [2	fragment length. if < FRAGMENT_SIZE, this is the last fragment]
 
 if the sequence number is -1, the packet should be handled as an out-of-band
@@ -74,6 +74,7 @@ void Netchan_Init( int port ) {
 	showpackets = Cvar_Get ("showpackets", "0", CVAR_TEMP );
 	showdrop = Cvar_Get ("showdrop", "0", CVAR_TEMP );
 	net_qport = Cvar_Get ("net_qport", va("%i", port), CVAR_INIT );
+	MSG_InitHuffStats();
 }
 
 /*
@@ -134,7 +135,7 @@ void Netchan_TransmitNextFragment( netchan_t *chan ) {
 		fragmentLength = chan->unsentLength - chan->unsentFragmentStart;
 	}
 
-	MSG_WriteShort( &send, chan->unsentFragmentStart );
+	MSG_WriteLong( &send, chan->unsentFragmentStart );
 	MSG_WriteShort( &send, fragmentLength );
 	MSG_WriteData( &send, chan->unsentBuffer + chan->unsentFragmentStart, fragmentLength );
 
@@ -279,7 +280,7 @@ bool Netchan_Process( netchan_t *chan, msg_t *msg ) {
 
 	// read the fragment information
 	if ( fragmented ) {
-		fragmentStart = MSG_ReadShort( msg );
+		fragmentStart = MSG_ReadLong( msg );
 		fragmentLength = MSG_ReadShort( msg );
 	} else {
 		fragmentStart = 0;		// stop warning message
@@ -572,7 +573,7 @@ Sends a text message in an out-of-band datagram
 */
 void QDECL NET_OutOfBandPrint( netsrc_t sock, netadr_t adr, const char *format, ... ) {
 	va_list		argptr;
-	char		string[MAX_MSGLEN];
+	static char	string[MAX_MSGLEN];
 
 
 	// set the header
@@ -597,7 +598,7 @@ Sends a data message in an out-of-band datagram (only used for "connect")
 ================
 */
 void QDECL NET_OutOfBandData( netsrc_t sock, netadr_t adr, byte *format, int len ) {
-	byte		string[MAX_MSGLEN*2];
+	static byte	string[MAX_MSGLEN*2];
 	int			i;
 	msg_t		mbuf;
 

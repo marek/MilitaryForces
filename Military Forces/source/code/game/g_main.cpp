@@ -1754,10 +1754,11 @@ void G_RunFrame( int levelTime )
 
 	if( g_listEntity.integer ) 
 	{
-		for( i = 0; i < MAX_GENTITIES; i++ )
+		for( i = 0; i < theLevel.num_entities_; i++ )
 		{
 			ent = theLevel.getEntity(i);
-			Com_Printf("%4i: %s\n", i, ent->classname_);
+			if( ent )
+				Com_Printf("%4i: %s\n", i, ent->classname_);
 		}
 		Cvar_Set("g_listEntity", "0");
 	}

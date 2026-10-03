@@ -28,6 +28,10 @@ static bool			msgInit = false;
 
 int pcount[256];
 
+cvar_t			*msg_huffstats;
+int				msg_huffstatsHold;
+static int		msg_huffCounts[256];
+
 /*
 ==============================================================================
 
@@ -161,6 +165,9 @@ void MSG_WriteBits( msg_t *msg, int value, int bits ) {
 		}
 		if ( bits ) {
 			for( i = 0; i < bits; i += 8 ) {
+				if ( msg_huffstats && msg_huffstats->integer && !msg_huffstatsHold ) {
+					msg_huffCounts[value & 0xff]++;
+				}
 				Huff_offsetTransmit( &msgHuff.compressor, (value & 0xff), msg->data, &msg->bit, msg->maxsize << 3 );
 				value = (value >> 8);
 
@@ -179,6 +186,7 @@ int MSG_ReadBits( msg_t *msg, int bits ) {
 	int			get;
 	bool	sgn;
 	int			i, nbits;
+	int			totalBits;
 //	FILE*	fp;
 
 	if ( msg->readcount > msg->cursize ) {
@@ -193,6 +201,7 @@ int MSG_ReadBits( msg_t *msg, int bits ) {
 	} else {
 		sgn = false;
 	}
+	totalBits = bits;
 
 	if (msg->oob) {
 		if (msg->readcount + (bits>>3) > msg->cursize) {
@@ -252,9 +261,9 @@ int MSG_ReadBits( msg_t *msg, int bits ) {
 		}
 		msg->readcount = (msg->bit>>3)+1;
 	}
-	if ( sgn && bits > 0 && bits < 32 ) {
-		if ( value & ( 1 << ( bits - 1 ) ) ) {
-			value |= -1 ^ ( ( 1 << bits ) - 1 );
+	if ( sgn && totalBits > 0 && totalBits < 32 ) {
+		if ( value & ( 1 << ( totalBits - 1 ) ) ) {
+			value |= -1 ^ ( ( 1 << totalBits ) - 1 );
 		}
 	}
 
@@ -749,32 +758,68 @@ typedef struct {
 	int		bits;		// 0 = float
 } netField_t;
 
+#define	NETF_POS	100
+#define	NETF_ANG	101
+#define	NETF_POS_BITS	22
+#define	NETF_ANG_BITS	16
+
+static bool MSG_QuantizeFloat( int kind, float f, int *q ) {
+	float	v;
+	int		bits;
+
+	if ( kind == NETF_POS ) {
+		v = f * 8.0f;
+		bits = NETF_POS_BITS;
+	} else {
+		v = f * 64.0f;
+		bits = NETF_ANG_BITS;
+	}
+	if ( !( v > -( 1 << ( bits - 1 ) ) + 1 && v < ( 1 << ( bits - 1 ) ) - 1 ) ) {
+		return false;
+	}
+	*q = (int)floorf( v + 0.5f );
+	return true;
+}
+
+static bool MSG_FieldSame( const netField_t *field, const int *fromF, const int *toF ) {
+	int		a, b;
+
+	if ( *fromF == *toF ) {
+		return true;
+	}
+	if ( field->bits < NETF_POS ) {
+		return false;
+	}
+	return MSG_QuantizeFloat( field->bits, *(const float *)fromF, &a )
+		&& MSG_QuantizeFloat( field->bits, *(const float *)toF, &b ) && a == b;
+}
+
 // using the stringizing operator to save typing...
 #define	NETF(x) #x,(int)(intptr_t)&((entityState_t*)0)->x
 
 netField_t	entityStateFields[] = 
 {
 { NETF(pos.trTime), 32 },
-{ NETF(pos.trBase[0]), 0 },
-{ NETF(pos.trBase[1]), 0 },
-{ NETF(pos.trDelta[0]), 0 },
-{ NETF(pos.trDelta[1]), 0 },
-{ NETF(pos.trBase[2]), 0 },
-{ NETF(apos.trBase[1]), 0 },
-{ NETF(pos.trDelta[2]), 0 },
-{ NETF(apos.trBase[0]), 0 },
+{ NETF(pos.trBase[0]), NETF_POS },
+{ NETF(pos.trBase[1]), NETF_POS },
+{ NETF(pos.trDelta[0]), NETF_POS },
+{ NETF(pos.trDelta[1]), NETF_POS },
+{ NETF(pos.trBase[2]), NETF_POS },
+{ NETF(apos.trBase[1]), NETF_ANG },
+{ NETF(pos.trDelta[2]), NETF_POS },
+{ NETF(apos.trBase[0]), NETF_ANG },
 { NETF(event), 16 },
-{ NETF(angles2[1]), 0 },
+{ NETF(angles2[1]), NETF_ANG },
 { NETF(eType), 8 },
 { NETF(eventParm), 8 },
 { NETF(tracktarget), 32 },
-{ NETF(groundEntityNum), GENTITYNUM_BITS },
+{ NETF(groundEntityNum), -(GENTITYNUM_BITS+1) },
 { NETF(pos.trType), 8 },
 { NETF(eFlags), 32 },
-{ NETF(otherEntityNum), GENTITYNUM_BITS },
+{ NETF(otherEntityNum), -(GENTITYNUM_BITS+1) },
 { NETF(ONOFF), 32 },
 { NETF(clientNum), 8 },
-{ NETF(angles[1]), 0 },
+{ NETF(angles[1]), NETF_ANG },
 { NETF(pos.trDuration), 32 },
 { NETF(apos.trType), 8 },
 { NETF(origin[0]), 0 },
@@ -783,25 +828,25 @@ netField_t	entityStateFields[] =
 { NETF(solid), 24 },
 { NETF(objectives), 8 },
 { NETF(modelindex), 8 },
-{ NETF(otherEntityNum2), GENTITYNUM_BITS },
+{ NETF(otherEntityNum2), -(GENTITYNUM_BITS+1) },
 { NETF(loopSound), 16 },
 { NETF(generic1), 8 },
 { NETF(origin2[2]), 0 },
 { NETF(origin2[0]), 0 },
 { NETF(origin2[1]), 0 },
 { NETF(modelindex2), 8 },
-{ NETF(angles[0]), 0 },
+{ NETF(angles[0]), NETF_ANG },
 { NETF(time), 32 },
 { NETF(apos.trTime), 32 },
 { NETF(apos.trDuration), 32 },
-{ NETF(apos.trBase[2]), 0 },
-{ NETF(apos.trDelta[0]), 0 },
-{ NETF(apos.trDelta[1]), 0 },
-{ NETF(apos.trDelta[2]), 0 },
+{ NETF(apos.trBase[2]), NETF_ANG },
+{ NETF(apos.trDelta[0]), NETF_POS },
+{ NETF(apos.trDelta[1]), NETF_POS },
+{ NETF(apos.trDelta[2]), NETF_POS },
 { NETF(weaponIndex), 16 },
-{ NETF(angles[2]), 0 },
-{ NETF(angles2[0]), 0 },
-{ NETF(angles2[2]), 0 },
+{ NETF(angles[2]), NETF_ANG },
+{ NETF(angles2[0]), NETF_ANG },
+{ NETF(angles2[2]), NETF_ANG },
 { NETF(vehicleAnim), 16 },
 { NETF(frame), 16 },
 { NETF(weaponNum), 16 }
@@ -860,7 +905,7 @@ void MSG_WriteDeltaEntity( msg_t *msg, struct entityState_s *from, struct entity
 	for ( i = 0, field = entityStateFields ; i < numFields ; i++, field++ ) {
 		fromF = (int *)( (byte *)from + field->offset );
 		toF = (int *)( (byte *)to + field->offset );
-		if ( *fromF != *toF ) {
+		if ( !MSG_FieldSame( field, fromF, toF ) ) {
 			lc = i+1;
 		}
 	}
@@ -889,15 +934,17 @@ void MSG_WriteDeltaEntity( msg_t *msg, struct entityState_s *from, struct entity
 		fromF = (int *)( (byte *)from + field->offset );
 		toF = (int *)( (byte *)to + field->offset );
 
-		if ( *fromF == *toF ) {
+		if ( MSG_FieldSame( field, fromF, toF ) ) {
 			MSG_WriteBits( msg, 0, 1 );	// no change
 			continue;
 		}
 
 		MSG_WriteBits( msg, 1, 1 );	// changed
 
-		if ( field->bits == 0 ) {
+		if ( field->bits == 0 || field->bits >= NETF_POS ) {
 			// float
+			int		quantized;
+
 			fullFloat = *(float *)toF;
 			trunc = (int)fullFloat;
 
@@ -910,7 +957,14 @@ void MSG_WriteDeltaEntity( msg_t *msg, struct entityState_s *from, struct entity
 					trunc + FLOAT_INT_BIAS < ( 1 << FLOAT_INT_BITS ) ) {
 					// send as small integer
 					MSG_WriteBits( msg, 0, 1 );
+					if ( field->bits >= NETF_POS ) {
+						MSG_WriteBits( msg, 0, 1 );
+					}
 					MSG_WriteBits( msg, trunc + FLOAT_INT_BIAS, FLOAT_INT_BITS );
+				} else if ( field->bits >= NETF_POS && MSG_QuantizeFloat( field->bits, fullFloat, &quantized ) ) {
+					MSG_WriteBits( msg, 0, 1 );
+					MSG_WriteBits( msg, 1, 1 );
+					MSG_WriteBits( msg, quantized, field->bits == NETF_POS ? -NETF_POS_BITS : -NETF_ANG_BITS );
 				} else {
 					// send as full floating point value
 					MSG_WriteBits( msg, 1, 1 );
@@ -966,7 +1020,7 @@ void MSG_ReadDeltaEntity( msg_t *msg, entityState_t *from, entityState_t *to,
 	// check for a remove
 	if ( MSG_ReadBits( msg, 1 ) == 1 ) {
 		Com_Memset( to, 0, sizeof( *to ) );	
-		to->number = MAX_GENTITIES - 1;
+		to->number = ENTITYNUM_WIRE_END;
 		if ( cl_shownet && ( cl_shownet->integer >= 2 || cl_shownet->integer == -1 ) ) {
 			Com_Printf( "%3i: #%-3i remove\n", msg->readcount, number );
 		}
@@ -1006,19 +1060,30 @@ void MSG_ReadDeltaEntity( msg_t *msg, entityState_t *from, entityState_t *to,
 			// no change
 			*toF = *fromF;
 		} else {
-			if ( field->bits == 0 ) {
+			if ( field->bits == 0 || field->bits >= NETF_POS ) {
 				// float
 				if ( MSG_ReadBits( msg, 1 ) == 0 ) {
 						*(float *)toF = 0.0f; 
 				} else {
 					if ( MSG_ReadBits( msg, 1 ) == 0 ) {
-						// integral float
-						trunc = MSG_ReadBits( msg, FLOAT_INT_BITS );
-						// bias to allow equal parts positive and negative
-						trunc -= FLOAT_INT_BIAS;
-						*(float *)toF = trunc; 
-						if ( print ) {
-							Com_Printf( "%s:%i ", field->name, trunc );
+						if ( field->bits >= NETF_POS && MSG_ReadBits( msg, 1 ) == 1 ) {
+							if ( field->bits == NETF_POS ) {
+								*(float *)toF = MSG_ReadBits( msg, -NETF_POS_BITS ) / 8.0f;
+							} else {
+								*(float *)toF = MSG_ReadBits( msg, -NETF_ANG_BITS ) / 64.0f;
+							}
+							if ( print ) {
+								Com_Printf( "%s:%f ", field->name, *(float *)toF );
+							}
+						} else {
+							// integral float
+							trunc = MSG_ReadBits( msg, FLOAT_INT_BITS );
+							// bias to allow equal parts positive and negative
+							trunc -= FLOAT_INT_BIAS;
+							*(float *)toF = trunc; 
+							if ( print ) {
+								Com_Printf( "%s:%i ", field->name, trunc );
+							}
 						}
 					} else {
 						// full floating point value
@@ -1096,7 +1161,7 @@ netField_t	playerStateFields[] =
 { PSF(gunAngle), 32 },	
 { PSF(events[1]), 8 },	
 { PSF(pm_flags), 32 },	
-{ PSF(groundEntityNum), GENTITYNUM_BITS },	
+{ PSF(groundEntityNum), -(GENTITYNUM_BITS+1) },	
 { PSF(fixed_throttle), 8 },
 { PSF(eFlags), 32 },	
 { PSF(externalEvent), 10 },	
@@ -1732,38 +1797,27 @@ void MSG_initHuffman() {
 }
 
 /*
-void MSG_NUinitHuffman() {
-	byte	*data;
-	int		size, i, ch;
-	int		array[256];
+==================
+MSG_HuffStats_f
 
-	msgInit = true;
-
-	Huff_Init(&msgHuff);
-	// load it in
-	size = FS_ReadFile( "netchan/netchan.bin", (void **)&data );
-
-	for(i=0;i<256;i++) {
-		array[i] = 0;
-	}
-	for(i=0;i<size;i++) {
-		ch = data[i];
-		Huff_addRef(&msgHuff.compressor,	ch);			// Do update
-		Huff_addRef(&msgHuff.decompressor,	ch);			// Do update
-		array[ch]++;
-	}
-	Com_Printf("msg_hData {\n");
-	for(i=0;i<256;i++) {
-		if (array[i] == 0) {
-			Huff_addRef(&msgHuff.compressor,	i);			// Do update
-			Huff_addRef(&msgHuff.decompressor,	i);			// Do update
-		}
-		Com_Printf("%d,			// %d\n", array[i], i);
-	}
-	Com_Printf("};\n");
-	FS_FreeFile( data );
-	Cbuf_AddText( "condump dump.txt\n" );
-}
+Writes the byte counts gathered with msg_huffstats 1 as a msg_hData table
+==================
 */
+void MSG_HuffStats_f( void ) {
+	char	out[256 * 32];
+	int		i;
+
+	out[0] = 0;
+	for ( i = 0 ; i < 256 ; i++ ) {
+		Q_strcat( out, sizeof( out ), va( "%d,\t\t\t// %d\n", msg_huffCounts[i], i ) );
+	}
+	FS_WriteFile( "huffstats.txt", out, strlen( out ) );
+	Com_Printf( "wrote huffstats.txt\n" );
+}
+
+void MSG_InitHuffStats( void ) {
+	msg_huffstats = Cvar_Get( "msg_huffstats", "0", CVAR_TEMP );
+	Cmd_AddCommand( "huffstats", MSG_HuffStats_f );
+}
 
 //===========================================================================

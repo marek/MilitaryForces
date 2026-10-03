@@ -455,7 +455,7 @@ G_EntitiesFree
 */
 bool G_EntitiesFree() 
 {
-	if( theLevel.num_entities_ < MAX_GENTITIES )
+	if( theLevel.num_entities_ < ENTITYNUM_MAX_NORMAL )
 		return true;
 
 	for( int i = MAX_CLIENTS + 1; i < theLevel.num_entities_; i++ ) 

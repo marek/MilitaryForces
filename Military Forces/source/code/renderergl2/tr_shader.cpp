@@ -2699,7 +2699,7 @@ static void FixRenderCommandList( int newShader ) {
                     sortedIndex = (( drawSurf->sort >> QSORT_SHADERNUM_SHIFT ) & (MAX_SHADERS-1));
 					if( sortedIndex >= newShader ) {
 						sortedIndex++;
-						drawSurf->sort = (sortedIndex << QSORT_SHADERNUM_SHIFT) | entityNum | ( fogNum << QSORT_FOGNUM_SHIFT ) | ( (int)pshadowMap << QSORT_PSHADOW_SHIFT) | (int)dlightMap;
+						drawSurf->sort += (uint64_t)1 << QSORT_SHADERNUM_SHIFT;
 					}
 				}
 				curCmd = (const void *)(ds_cmd + 1);

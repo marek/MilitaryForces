@@ -497,7 +497,7 @@ typedef enum {
 } surfaceType_t;
 
 typedef struct drawSurf_s {
-	unsigned			sort;			// bit combination for fast compares
+	uint64_t			sort;			// bit combination for fast compares
 	surfaceType_t		*surface;		// any of surface*_t
 } drawSurf_t;
 
@@ -528,7 +528,7 @@ typedef struct srfGridMesh_s {
 	surfaceType_t	surfaceType;
 
 	// dynamic lighting information
-	int				dlightBits;
+	uint64_t				dlightBits;
 
 	// culling information
 	vec3_t			meshBounds[2];
@@ -558,7 +558,7 @@ typedef struct {
 	cplane_t	plane;
 
 	// dynamic lighting information
-	int			dlightBits;
+	uint64_t			dlightBits;
 
 	// triangle definitions (no normals at points)
 	int			numPoints;
@@ -574,7 +574,7 @@ typedef struct {
 	surfaceType_t	surfaceType;
 
 	// dynamic lighting information
-	int				dlightBits;
+	uint64_t				dlightBits;
 
 	// culling information (FIXME: use this!)
 	vec3_t			bounds[2];
@@ -786,7 +786,7 @@ void		R_Modellist_f (void);
 #define	MAX_SKINS				1024
 
 
-#define	MAX_DRAWSURFS			0x10000
+#define	MAX_DRAWSURFS			0x40000
 #define	DRAWSURF_MASK			(MAX_DRAWSURFS-1)
 
 /*
@@ -811,7 +811,7 @@ the bits are allocated as follows:
 #define	QSORT_FOGNUM_SHIFT	2
 #define	QSORT_REFENTITYNUM_SHIFT	7
 #define	QSORT_SHADERNUM_SHIFT	(QSORT_REFENTITYNUM_SHIFT+REFENTITYNUM_BITS)
-#if (QSORT_SHADERNUM_SHIFT+SHADERNUM_BITS) > 32
+#if (QSORT_SHADERNUM_SHIFT+SHADERNUM_BITS) > 48
 	#error "Need to update sorting, too many bits."
 #endif
 
@@ -1094,7 +1094,7 @@ void R_AddLightningBoltSurfaces( trRefEntity_t *e );
 
 void R_AddPolygonSurfaces( void );
 
-void R_DecomposeSort( unsigned sort, int *entityNum, shader_t **shader, 
+void R_DecomposeSort( uint64_t sort, int *entityNum, shader_t **shader, 
 					 int *fogNum, int *dlightMap );
 
 void R_AddDrawSurf( surfaceType_t *surface, shader_t *shader, int fogIndex, int dlightMap );
@@ -1231,7 +1231,7 @@ typedef struct shaderCommands_s
 	vec4_t		normal[SHADER_MAX_VERTEXES] Q_ALIGN(16);
 	vec2_t		texCoords[SHADER_MAX_VERTEXES][2] Q_ALIGN(16);
 	color4ub_t	vertexColors[SHADER_MAX_VERTEXES] Q_ALIGN(16);
-	int			vertexDlightBits[SHADER_MAX_VERTEXES] Q_ALIGN(16);
+	uint64_t			vertexDlightBits[SHADER_MAX_VERTEXES] Q_ALIGN(16);
 
 	stageVars_t	svars Q_ALIGN(16);
 
@@ -1241,7 +1241,7 @@ typedef struct shaderCommands_s
 	double		shaderTime;
 	int			fogNum;
 
-	int			dlightBits;	// or together of all vertexDlightBits
+	uint64_t			dlightBits;	// or together of all vertexDlightBits
 
 	int			numIndexes;
 	int			numVertexes;
@@ -1565,8 +1565,8 @@ typedef enum {
 // these are sort of arbitrary limits.
 // the limits apply to the sum of all scenes in a frame --
 // the main view, all the 3D icons, etc
-#define	MAX_POLYS		600
-#define	MAX_POLYVERTS	3000
+#define	MAX_POLYS		16384
+#define	MAX_POLYVERTS	65536
 
 // all of the information needed by the back end must be
 // contained in a backEndData_t

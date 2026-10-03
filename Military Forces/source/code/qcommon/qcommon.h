@@ -101,6 +101,8 @@ void MSG_ReadDeltaPlayerstate( msg_t *msg, struct playerState_s *from, struct pl
 
 
 void MSG_ReportChangeVectors_f( void );
+void MSG_InitHuffStats( void );
+extern int msg_huffstatsHold;
 
 //============================================================================
 
@@ -126,7 +128,7 @@ NET
 
 #define	MAX_PACKET_USERCMDS		32		// max number of usercmd_t in a packet
 
-#define	MAX_SNAPSHOT_ENTITIES	256
+#define	MAX_SNAPSHOT_ENTITIES	2048
 
 #define	PORT_ANY			-1
 
@@ -181,7 +183,7 @@ void		NET_LeaveMulticast6(void);
 void		NET_Sleep(int msec);
 
 
-#define	MAX_MSGLEN				16384		// max length of a message, which may
+#define	MAX_MSGLEN				0x20000		// max length of a message, which may
 											// be fragmented into multiple packets
 
 #define MAX_DOWNLOAD_WINDOW		48	// ACK window of 48 download chunks. Cannot set this higher, or clients
@@ -244,7 +246,7 @@ PROTOCOL
 ==============================================================
 */
 
-#define	PROTOCOL_VERSION	06
+#define	PROTOCOL_VERSION	07
 // 1.31 - 67
 
 // maintain a list of compatible protocols for demo playing

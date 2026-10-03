@@ -766,7 +766,7 @@ typedef struct {
 	int			numDrawSurfs;
 	struct drawSurf_s	*drawSurfs;
 
-	unsigned int dlightMask;
+	uint64_t dlightMask;
 	int         num_pshadows;
 	struct pshadow_s *pshadows;
 
@@ -886,7 +886,7 @@ typedef enum {
 } surfaceType_t;
 
 typedef struct drawSurf_s {
-	unsigned int		sort;			// bit combination for fast compares
+	uint64_t			sort;			// bit combination for fast compares
 	int                 cubemapIndex;
 	surfaceType_t		*surface;		// any of surface*_t
 } drawSurf_t;
@@ -937,7 +937,7 @@ typedef struct srfBspSurface_s
 	surfaceType_t   surfaceType;
 
 	// dynamic lighting information
-	int				dlightBits;
+	uint64_t				dlightBits;
 	int             pshadowBits;
 
 	// culling information
@@ -1180,7 +1180,7 @@ typedef struct {
 	int			numsurfaces;
 	msurface_t	*surfaces;
 	int         *surfacesViewCount;
-	int         *surfacesDlightBits;
+	uint64_t         *surfacesDlightBits;
 	int			*surfacesPshadowBits;
 
 	int			nummarksurfaces;
@@ -1319,7 +1319,7 @@ void		R_Modellist_f (void);
 #define	MAX_SKINS				1024
 
 
-#define	MAX_DRAWSURFS			0x10000
+#define	MAX_DRAWSURFS			0x40000
 #define	DRAWSURF_MASK			(MAX_DRAWSURFS-1)
 
 /*
@@ -1351,7 +1351,7 @@ the bits are allocated as follows:
 #define	QSORT_FOGNUM_SHIFT	2
 #define	QSORT_REFENTITYNUM_SHIFT	7
 #define	QSORT_SHADERNUM_SHIFT	(QSORT_REFENTITYNUM_SHIFT+REFENTITYNUM_BITS)
-#if (QSORT_SHADERNUM_SHIFT+SHADERNUM_BITS) > 32
+#if (QSORT_SHADERNUM_SHIFT+SHADERNUM_BITS) > 48
 	#error "Need to update sorting, too many bits."
 #endif
 #define QSORT_PSHADOW_SHIFT     1
@@ -1910,7 +1910,7 @@ void R_AddLightningBoltSurfaces( trRefEntity_t *e );
 
 void R_AddPolygonSurfaces( void );
 
-void R_DecomposeSort( unsigned sort, int *entityNum, shader_t **shader, 
+void R_DecomposeSort( uint64_t sort, int *entityNum, shader_t **shader, 
 					 int *fogNum, int *dlightMap, int *pshadowMap );
 
 void R_AddDrawSurf( surfaceType_t *surface, shader_t *shader, 
@@ -2070,7 +2070,7 @@ typedef struct shaderCommands_s
 	vec2_t		lightCoords[SHADER_MAX_VERTEXES] Q_ALIGN(16);
 	uint16_t	color[SHADER_MAX_VERTEXES][4] Q_ALIGN(16);
 	int16_t		lightdir[SHADER_MAX_VERTEXES][4] Q_ALIGN(16);
-	//int			vertexDlightBits[SHADER_MAX_VERTEXES] Q_ALIGN(16);
+	//uint64_t			vertexDlightBits[SHADER_MAX_VERTEXES] Q_ALIGN(16);
 
 	void *attribPointers[ATTR_INDEX_COUNT];
 	vao_t       *vao;
@@ -2086,7 +2086,7 @@ typedef struct shaderCommands_s
 	int			fogNum;
 	int         cubemapIndex;
 
-	int			dlightBits;	// or together of all vertexDlightBits
+	uint64_t			dlightBits;	// or together of all vertexDlightBits
 	int         pshadowBits;
 
 	int			firstIndex;
@@ -2494,8 +2494,8 @@ typedef enum {
 // these are sort of arbitrary limits.
 // the limits apply to the sum of all scenes in a frame --
 // the main view, all the 3D icons, etc
-#define	MAX_POLYS		600
-#define	MAX_POLYVERTS	3000
+#define	MAX_POLYS		16384
+#define	MAX_POLYVERTS	65536
 
 // all of the information needed by the back end must be
 // contained in a backEndData_t

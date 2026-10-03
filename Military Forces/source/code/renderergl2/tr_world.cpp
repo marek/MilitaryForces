@@ -154,7 +154,7 @@ that is touched by one or more dlights, so try to throw out
 more dlights if possible.
 ====================
 */
-static int R_DlightSurface( msurface_t *surf, int dlightBits ) {
+static uint64_t R_DlightSurface( msurface_t *surf, uint64_t dlightBits ) {
 	float       d;
 	int         i;
 	dlight_t    *dl;
@@ -162,14 +162,14 @@ static int R_DlightSurface( msurface_t *surf, int dlightBits ) {
 	if ( surf->cullinfo.type & CULLINFO_PLANE )
 	{
 		for ( i = 0 ; i < tr.refdef.num_dlights ; i++ ) {
-			if ( ! ( dlightBits & ( 1 << i ) ) ) {
+			if ( ! ( dlightBits & ( (uint64_t)1 << i ) ) ) {
 				continue;
 			}
 			dl = &tr.refdef.dlights[i];
 			d = DotProduct( dl->origin, surf->cullinfo.plane.normal ) - surf->cullinfo.plane.dist;
 			if ( d < -dl->radius || d > dl->radius ) {
 				// dlight doesn't reach the plane
-				dlightBits &= ~( 1 << i );
+				dlightBits &= ~( (uint64_t)1 << i );
 			}
 		}
 	}
@@ -177,7 +177,7 @@ static int R_DlightSurface( msurface_t *surf, int dlightBits ) {
 	if ( surf->cullinfo.type & CULLINFO_BOX )
 	{
 		for ( i = 0 ; i < tr.refdef.num_dlights ; i++ ) {
-			if ( ! ( dlightBits & ( 1 << i ) ) ) {
+			if ( ! ( dlightBits & ( (uint64_t)1 << i ) ) ) {
 				continue;
 			}
 			dl = &tr.refdef.dlights[i];
@@ -188,7 +188,7 @@ static int R_DlightSurface( msurface_t *surf, int dlightBits ) {
 				|| dl->origin[2] - dl->radius > surf->cullinfo.bounds[1][2]
 				|| dl->origin[2] + dl->radius < surf->cullinfo.bounds[0][2] ) {
 				// dlight doesn't reach the bounds
-				dlightBits &= ~( 1 << i );
+				dlightBits &= ~( (uint64_t)1 << i );
 			}
 		}
 	}
@@ -196,14 +196,14 @@ static int R_DlightSurface( msurface_t *surf, int dlightBits ) {
 	if ( surf->cullinfo.type & CULLINFO_SPHERE )
 	{
 		for ( i = 0 ; i < tr.refdef.num_dlights ; i++ ) {
-			if ( ! ( dlightBits & ( 1 << i ) ) ) {
+			if ( ! ( dlightBits & ( (uint64_t)1 << i ) ) ) {
 				continue;
 			}
 			dl = &tr.refdef.dlights[i];
 			if (!SpheresIntersect(dl->origin, dl->radius, surf->cullinfo.localOrigin, surf->cullinfo.radius))
 			{
 				// dlight doesn't reach the bounds
-				dlightBits &= ~( 1 << i );
+				dlightBits &= ~( (uint64_t)1 << i );
 			}
 		}
 	}
@@ -319,7 +319,7 @@ static int R_PshadowSurface( msurface_t *surf, int pshadowBits ) {
 R_AddWorldSurface
 ======================
 */
-static void R_AddWorldSurface( msurface_t *surf, int dlightBits, int pshadowBits ) {
+static void R_AddWorldSurface( msurface_t *surf, uint64_t dlightBits, int pshadowBits ) {
 	// FIXME: bmodel fog?
 
 	// try to cull before dlighting or adding
@@ -399,10 +399,10 @@ void R_AddBrushModelSurfaces ( trRefEntity_t *ent ) {
 R_RecursiveWorldNode
 ================
 */
-static void R_RecursiveWorldNode( mnode_t *node, uint32_t planeBits, uint32_t dlightBits, uint32_t pshadowBits ) {
+static void R_RecursiveWorldNode( mnode_t *node, uint32_t planeBits, uint64_t dlightBits, uint32_t pshadowBits ) {
 
 	do {
-		uint32_t newDlights[2];
+		uint64_t newDlights[2];
 		uint32_t newPShadows[2];
 
 		// if the node wasn't marked as potentially visible, exit
@@ -485,15 +485,15 @@ static void R_RecursiveWorldNode( mnode_t *node, uint32_t planeBits, uint32_t dl
 				dlight_t	*dl;
 				float		dist;
 
-				if ( dlightBits & ( 1 << i ) ) {
+				if ( dlightBits & ( (uint64_t)1 << i ) ) {
 					dl = &tr.refdef.dlights[i];
 					dist = DotProduct( dl->origin, node->plane->normal ) - node->plane->dist;
 					
 					if ( dist > -dl->radius ) {
-						newDlights[0] |= ( 1 << i );
+						newDlights[0] |= ( (uint64_t)1 << i );
 					}
 					if ( dist < dl->radius ) {
-						newDlights[1] |= ( 1 << i );
+						newDlights[1] |= ( (uint64_t)1 << i );
 					}
 				}
 			}
@@ -739,7 +739,8 @@ R_AddWorldSurfaces
 =============
 */
 void R_AddWorldSurfaces (void) {
-	uint32_t planeBits, dlightBits, pshadowBits;
+	uint32_t planeBits, pshadowBits;
+	uint64_t dlightBits;
 
 	if ( !r_drawworld->integer ) {
 		return;
@@ -777,12 +778,12 @@ void R_AddWorldSurfaces (void) {
 	}
 	else if ( !(tr.viewParms.flags & VPF_SHADOWMAP) )
 	{
-		dlightBits = ( 1ULL << tr.refdef.num_dlights ) - 1;
+		dlightBits = tr.refdef.num_dlights >= 64 ? ~(uint64_t)0 : ( (uint64_t)1 << tr.refdef.num_dlights ) - 1;
 		pshadowBits = ( 1ULL << tr.refdef.num_pshadows ) - 1;
 	}
 	else
 	{
-		dlightBits = ( 1ULL << tr.refdef.num_dlights ) - 1;
+		dlightBits = tr.refdef.num_dlights >= 64 ? ~(uint64_t)0 : ( (uint64_t)1 << tr.refdef.num_dlights ) - 1;
 		pshadowBits = 0;
 	}
 

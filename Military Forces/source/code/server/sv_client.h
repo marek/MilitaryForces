@@ -108,6 +108,9 @@ struct SV_Client
 	bool				rateDelayed_;				// true if nextSnapshotTime was set based on rate instead of snapshotMsec
 	int					timeoutCount_;				// must timeout a few frames in a row so debugging doesn't break
 	ClientSnapshot		frames_[PACKET_BACKUP];		// updates can be delta'd from here
+	int					lastSnapshotSequence_;
+	int					snapshotNoDeltaCount_;
+	float				snapshotPriority_[MAX_GENTITIES];
 	int					ping_;
 	int					rate_;						// bytes / second
 	int					snapshotMsec_;				// requests a snapshot every snapshotMsec unless rate choked
