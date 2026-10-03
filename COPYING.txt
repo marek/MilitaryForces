@@ -15,6 +15,7 @@ A few files keep their own GPL-compatible licenses, noted in the files:
   thirdparty/jpeg-*/   IJG license (see the file headers)
   client/snd_adpcm.cpp Stichting Mathematisch Centrum license
   thirdparty/openal-soft-*/  OpenAL Soft API headers, GNU LGPL (from OpenAL Soft)
+  thirdparty/curl-*/   curl headers, curl license (see the file headers)
 
 GAME ASSETS
 The Military Forces game assets (models, textures, maps, sounds, music,

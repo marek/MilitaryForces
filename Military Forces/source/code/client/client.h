@@ -33,6 +33,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../cgame/cg_public.h"
 #include "../game/bg_public.h"
 
+#ifdef USE_HTTP
+#include "cl_http.h"
+#endif /* USE_HTTP */
+
 #define	RETRANSMIT_TIMEOUT	3000	// time between connection packet retransmits
 
 
@@ -192,6 +196,13 @@ typedef struct {
 	int			downloadSize;	// how many bytes we got
 	char		downloadList[MAX_INFO_STRING]; // list of paks we need to download
 	bool	downloadRestart;	// if true, we need to do another FS_Restart because we downloaded a pak
+#ifdef USE_HTTP
+	bool	httpUsed;
+	bool	disconnectedForHttpDownload;
+	char		downloadURL[MAX_OSPATH];
+#endif /* USE_HTTP */
+	int		sv_allowDownload;
+	char		sv_dlURL[MAX_CVAR_VALUE_STRING];
 
 	// demo information
 	char		demoName[MAX_QPATH];

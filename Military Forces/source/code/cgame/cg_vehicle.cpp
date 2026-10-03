@@ -60,6 +60,24 @@ static animation_t * CG_ParseLQMAnimationFile( const char *filename ) {
 			break;
 		}
 
+		if ( !Q_stricmp( token, "footsteps" ) || !Q_stricmp( token, "sex" ) ) {
+			token = COM_Parse( &text_p );
+			if ( !token[0] ) {
+				break;
+			}
+			continue;
+		} else if ( !Q_stricmp( token, "headoffset" ) || !Q_stricmp( token, "headOffset" ) ) {
+			for ( i = 0 ; i < 3 ; i++ ) {
+				token = COM_Parse( &text_p );
+				if ( !token[0] ) {
+					break;
+				}
+			}
+			continue;
+		} else if ( !Q_stricmp( token, "fixedlegs" ) || !Q_stricmp( token, "fixedtorso" ) ) {
+			continue;
+		}
+
 		// if it is a number, start parsing animations
 		if ( token[0] >= '0' && token[0] <= '9' ) {
 			text_p = prev;	// unget the token

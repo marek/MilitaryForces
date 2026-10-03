@@ -42,6 +42,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // A user mod should never modify this file
 
 #define	MF_VERSION		"MF 1.0.9"
+#define	Q3_VERSION		MF_VERSION
 
 #define MAX_TEAMNAME 32
 

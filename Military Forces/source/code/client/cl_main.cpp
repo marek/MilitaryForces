@@ -1358,16 +1358,32 @@ Called when all downloading has been completed
 */
 void CL_DownloadsComplete( void ) {
 
+#ifdef USE_HTTP
+	// if we downloaded with HTTP
+	if(clc.httpUsed) {
+		clc.httpUsed = false;
+		if( clc.disconnectedForHttpDownload ) {
+			if(clc.downloadRestart) {
+				FS_Restart(clc.checksumFeed);
+				clc.downloadRestart = false;
+			}
+			clc.disconnectedForHttpDownload = false;
+			CL_Reconnect_f();
+			return;
+		}
+	}
+#endif
+
 	// if we downloaded files we need to restart the file system
 	if (clc.downloadRestart) {
 		clc.downloadRestart = false;
 
 		FS_Restart(clc.checksumFeed); // We possibly downloaded a pak, restart the file system to load it
 
-		// inform the server so we get New gamestate info
-		CL_AddReliableCommand( "donedl" );
+		// inform the server so we get new gamestate info
+		CL_AddReliableCommand("donedl", false);
 
-		// by sending the donedl command we request a New gamestate
+		// by sending the donedl command we request a new gamestate
 		// so we don't want to load stuff yet
 		return;
 	}
@@ -1407,33 +1423,72 @@ void CL_DownloadsComplete( void ) {
 
 /*
 =================
+CL_InitDownload
+=================
+*/
+static void CL_InitDownload( const char *localName ) {
+	Q_strncpyz ( clc.downloadName, localName, sizeof(clc.downloadName) );
+	Com_sprintf( clc.downloadTempName, sizeof(clc.downloadTempName), "%s.tmp", localName );
+
+	// Set so UI gets access to it
+	Cvar_Set( "cl_downloadName", localName );
+	Cvar_Set( "cl_downloadSize", "0" );
+	Cvar_Set( "cl_downloadCount", "0" );
+	Cvar_SetValue( "cl_downloadTime", cls.realtime );
+
+	clc.downloadBlock = 0; // Starting new file
+	clc.downloadCount = 0;
+}
+
+/*
+=================
 CL_BeginDownload
 
 Requests a file to download from the server.  Stores it in the current
 game directory.
 =================
 */
-void CL_BeginDownload( const char *localName, const char *remoteName ) {
-
-	Com_DPrintf("***** CL_BeginDownload *****\n"
-				"Localname: %s\n"
-				"Remotename: %s\n"
-				"****************************\n", localName, remoteName);
-
-	Q_strncpyz ( clc.downloadName, localName, sizeof(clc.downloadName) );
-	Com_sprintf( clc.downloadTempName, sizeof(clc.downloadTempName), "%s.tmp", localName );
-
-	// Set so UI gets access to it
-	Cvar_Set( "cl_downloadName", remoteName );
-	Cvar_Set( "cl_downloadSize", "0" );
-	Cvar_Set( "cl_downloadCount", "0" );
-	Cvar_SetValue( "cl_downloadTime", cls.realtime );
-
-	clc.downloadBlock = 0; // Starting New file
-	clc.downloadCount = 0;
-
+static void CL_BeginDownload( const char *remoteName ) {
 	CL_AddReliableCommand(va("download %s", remoteName), false);
 }
+
+#ifdef USE_HTTP
+/*
+=================
+CL_BeginHttpDownload
+=================
+*/
+static void CL_BeginHttpDownload( const char *remoteURL ) {
+	if(Q_strncmp(remoteURL, "http://", strlen("http://")) != 0 &&
+		Q_strncmp(remoteURL, "https://", strlen("https://")) != 0) {
+		Com_Error(ERR_DROP, "Download Error: %s is a malformed/"
+			"unsupported URL", remoteURL);
+	}
+
+	Com_Printf("URL: %s\n", remoteURL);
+
+	CL_HTTP_BeginDownload(remoteURL);
+	Q_strncpyz(clc.downloadURL, remoteURL, sizeof(clc.downloadURL));
+
+	clc.download = FS_BaseDir_FOpenFileWrite_HomeData(clc.downloadTempName);
+	if(!clc.download) {
+		Com_Error(ERR_DROP, "CL_BeginHTTPDownload: failed to open "
+			"%s for writing", clc.downloadTempName);
+	}
+
+	if(!(clc.sv_allowDownload & DLF_NO_DISCONNECT) &&
+		!clc.disconnectedForHttpDownload) {
+
+		CL_AddReliableCommand("disconnect", true);
+		CL_WritePacket();
+		CL_WritePacket();
+		CL_WritePacket();
+		clc.disconnectedForHttpDownload = true;
+	}
+
+	clc.httpUsed = true;
+}
+#endif /* USE_HTTP */
 
 /*
 =================
@@ -1446,12 +1501,12 @@ void CL_NextDownload(void)
 {
 	char *s;
 	char *remoteName, *localName;
+	bool usedHTTP = false;
 
 	// A download has finished, check whether this matches a referenced checksum
 	if(*clc.downloadName)
 	{
-		char *zippath = FS_BuildOSPath(Cvar_VariableString("fs_homepath"), clc.downloadName, "");
-		zippath[strlen(zippath)-1] = '\0';
+		char *zippath = FS_BaseDir_BuildOSPath(Cvar_VariableString("fs_homedatapath"), clc.downloadName);
 
 		if(!FS_CompareZipChecksum(zippath))
 			Com_Error(ERR_DROP, "Incorrect checksum for file: %s", clc.downloadName);
@@ -1482,9 +1537,47 @@ void CL_NextDownload(void)
 			*s++ = 0;
 		else
 			s = localName + strlen(localName); // point at the nul byte
+#ifdef USE_HTTP
+		if(!(cl_allowDownload->integer & DLF_NO_REDIRECT)) {
+			if(clc.sv_allowDownload & DLF_NO_REDIRECT) {
+				Com_Printf("WARNING: server does not "
+					"allow download redirection "
+					"(sv_allowDownload is %d)\n",
+					clc.sv_allowDownload);
+			}
+			else if(!*clc.sv_dlURL) {
+				Com_Printf("WARNING: server allows "
+					"download redirection, but does not "
+					"have sv_dlURL set\n");
+			}
+			else if(CL_HTTP_Available()) {
+				CL_InitDownload(localName);
+				CL_BeginHttpDownload(va("%s/%s",
+					clc.sv_dlURL, remoteName));
 
-		CL_BeginDownload( localName, remoteName );
-
+				usedHTTP = true;
+			}
+		}
+		else if(!(clc.sv_allowDownload & DLF_NO_REDIRECT)) {
+			Com_Printf("WARNING: server allows download "
+				"redirection, but it disabled by client "
+				"configuration (cl_allowDownload is %d)\n",
+				cl_allowDownload->integer);
+		}
+#endif /* USE_HTTP */
+		if(!usedHTTP) {
+			if((cl_allowDownload->integer & DLF_NO_UDP)) {
+				Com_Error(ERR_DROP, "UDP Downloads are "
+					"disabled on your client. "
+					"(cl_allowDownload is %d)",
+					cl_allowDownload->integer);
+				return;	
+			}
+			else {
+				CL_InitDownload( localName );
+				CL_BeginDownload( remoteName );
+			}
+		}
 		clc.downloadRestart = true;
 
 		// move over the rest
@@ -1507,7 +1600,7 @@ and determine if we need to download them
 void CL_InitDownloads(void) {
   char missingfiles[1024];
 
-  if ( !cl_allowDownload->integer )
+  if ( !(cl_allowDownload->integer & DLF_ENABLE) )
   {
     // autodownload is disabled on the client
     // but it's possible that some referenced files on the server are missing
@@ -2061,6 +2154,37 @@ void CL_Frame ( int msec )
 	if ( !com_cl_running->integer ) 
 		return;
 
+#ifdef USE_HTTP
+	if(clc.httpUsed) {
+		bool finished = CL_HTTP_PerformDownload();
+
+		if(finished) {
+			if(clc.download) {
+				FS_FCloseFile(clc.download);
+				clc.download = 0;
+			}
+
+			FS_BaseDir_Rename_HomeData(clc.downloadTempName, clc.downloadName, false);
+			clc.downloadRestart = true;
+			CL_NextDownload();
+		}
+
+		// we can't process frames normally when in disconnected
+		// download mode since the ui vm expects clc.state to be
+		// CA_CONNECTED
+		if(clc.disconnectedForHttpDownload) {
+			cls.realFrametime = msec;
+			cls.frametime = msec;
+			cls.realtime += cls.frametime;
+			SCR_UpdateScreen();
+			S_Update();
+			Con_RunConsole();
+			cls.framecount++;
+			return;
+		}
+	}
+#endif
+
 	if ( cls.cddialog ) 
 	{
 		// bring up the cd error dialog if needed
@@ -2453,6 +2577,11 @@ void CL_Init( void ) {
 	cl_showMouseRate = Cvar_Get ("cl_showmouserate", "0", 0);
 
 	cl_allowDownload = Cvar_Get ("cl_allowDownload", "0", CVAR_ARCHIVE);
+#ifdef USE_HTTP
+	if(!CL_HTTP_Init()) {
+		Com_Printf("WARNING: couldn't initialize HTTP download support\n");
+	}
+#endif
 
 	cl_conXOffset = Cvar_Get ("cl_conXOffset", "0", 0);
 #ifdef MACOS_X
@@ -2570,6 +2699,10 @@ void CL_Shutdown( void ) {
 	CL_ShutdownRef();
 	
 	CL_ShutdownUI();
+
+#ifdef USE_HTTP
+	CL_HTTP_Shutdown();
+#endif
 
 	Cmd_RemoveCommand ("cmd");
 	Cmd_RemoveCommand ("configstrings");

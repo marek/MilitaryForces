@@ -1,0 +1,28 @@
+option(USE_HTTP "HTTP download support" ON)
+
+if(NOT USE_HTTP)
+    return()
+endif()
+
+list(APPEND CLIENT_DEFINITIONS USE_HTTP)
+
+if(WIN32)
+    list(APPEND CLIENT_PLATFORM_SOURCES ${SOURCE_DIR}/client/cl_http_windows.cpp)
+    list(APPEND CLIENT_LIBRARIES wininet)
+    return()
+endif()
+
+list(APPEND CLIENT_PLATFORM_SOURCES ${SOURCE_DIR}/client/cl_http_curl.cpp)
+
+set(CURL_VERSION 8.15.0)
+set(INTERNAL_CURL_DIR ${SOURCE_DIR}/thirdparty/curl-${CURL_VERSION})
+
+find_package(CURL QUIET)
+
+if(NOT CURL_FOUND)
+    set(CURL_DEFINITIONS USE_INTERNAL_CURL_HEADERS)
+    set(CURL_INCLUDE_DIRS ${INTERNAL_CURL_DIR}/include)
+endif()
+
+list(APPEND CLIENT_DEFINITIONS ${CURL_DEFINITIONS})
+list(APPEND CLIENT_INCLUDE_DIRS ${CURL_INCLUDE_DIRS})

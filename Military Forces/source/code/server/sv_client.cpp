@@ -893,7 +893,9 @@ void SV_WriteDownloadToClient( SV_Client *cl , msg_t *msg )
 		cl->download_ = 0;
 
 		// We open the file here
-		if ( !sv_allowDownload->integer || idPack || unreferenced ||
+		if ( !(sv_allowDownload->integer & DLF_ENABLE) ||
+			(sv_allowDownload->integer & DLF_NO_UDP) ||
+			idPack || unreferenced ||
 			( cl->downloadSize_ = FS_BaseDir_FOpenFileRead( cl->downloadName_, &cl->download_ ) ) <= 0 )
 		{
 			// cannot auto-download file
@@ -918,7 +920,8 @@ void SV_WriteDownloadToClient( SV_Client *cl , msg_t *msg )
 						cl->downloadName_);
 				}
 			} 
-			else if ( !sv_allowDownload->integer ) 
+			else if ( !(sv_allowDownload->integer & DLF_ENABLE) ||
+				(sv_allowDownload->integer & DLF_NO_UDP) ) 
 			{
 				Com_Printf("clientDownload: %d : \"%s\" download disabled", cl->clientNum_, cl->downloadName_);
 				if (sv_pure->integer) 
