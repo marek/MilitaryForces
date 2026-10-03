@@ -1129,6 +1129,9 @@ void CL_Connect_f()
 		cls.state = CA_CHALLENGING;
 	} else {
 		cls.state = CA_CONNECTING;
+		
+		// Set a client challenge number that ideally is mirrored back by the server.
+		clc.challenge = (((unsigned int)rand() << 16) ^ (unsigned int)rand()) ^ Com_Milliseconds();
 	}
 
 	cls.keyCatchers = 0;
@@ -1686,7 +1689,12 @@ void CL_CheckForResend()
 		// requesting a challenge
 		//if ( !Sys_IsLANAddress( clc.serverAddress ) ) 
 		//	CL_RequestAuthorization();
-		NET_OutOfBandPrint(NS_CLIENT, clc.serverAddress, "getchallenge");
+		// The challenge request shall be followed by a client challenge so no malicious server can hijack this connection.
+		// Add the gamename so the server knows we're running the correct game or can reject the client
+		// with a meaningful message
+		Com_sprintf(data, sizeof(data), "getchallenge %d %s", clc.challenge, com_gamename->string);
+
+		NET_OutOfBandPrint(NS_CLIENT, clc.serverAddress, "%s", data);
 		break;
 		
 	case CA_CHALLENGING:
@@ -1694,7 +1702,7 @@ void CL_CheckForResend()
 		port = Cvar_VariableValue ("net_qport");
 
 		Q_strncpyz( info, Cvar_InfoString( CVAR_USERINFO ), sizeof( info ) );
-		Info_SetValueForKey( info, "protocol", va("%i", PROTOCOL_VERSION ) );
+		Info_SetValueForKey(info, "protocol", va("%i", com_protocol->integer));
 		Info_SetValueForKey( info, "qport", va("%i", port ) );
 		Info_SetValueForKey( info, "challenge", va("%i", clc.challenge ) );
 		
@@ -1938,6 +1946,7 @@ Responses to broadcasts, etc
 void CL_ConnectionlessPacket( netadr_t from, msg_t *msg ) {
 	char	*s;
 	char	*c;
+	int challenge = 0;
 
 	MSG_BeginReadingOOB( msg );
 	MSG_ReadLong( msg );	// skip the -1
@@ -1951,45 +1960,91 @@ void CL_ConnectionlessPacket( netadr_t from, msg_t *msg ) {
 	Com_DPrintf ("CL packet %s: %s\n", NET_AdrToStringwPort(from), c);
 
 	// challenge from the server we are connecting to
-	if ( !Q_stricmp(c, "challengeResponse") ) 
+	if (!Q_stricmp(c, "challengeResponse"))
 	{
-		if ( cls.state != CA_CONNECTING ) 
+		char *strver;
+		int ver;
+	
+		if (cls.state != CA_CONNECTING)
 		{
-			Com_Printf( "Unwanted challenge response received.  Ignored.\n" );
+			Com_DPrintf("Unwanted challenge response received. Ignored.\n");
+			return;
 		}
-		else 
-		{
-			// start sending challenge repsonse instead of challenge request packets
-			clc.challenge = atoi(Cmd_Argv(1));
-			cls.state = CA_CHALLENGING;
-			clc.connectPacketCount = 0;
-			clc.connectTime = -99999;
+		
+		c = Cmd_Argv(2);
+		if(*c)
+			challenge = atoi(c);
 
-			// take this address as the New server address.  This allows
-			// a server proxy to hand off connections to multiple servers
-			clc.serverAddress = from;
-			Com_DPrintf ("challengeResponse: %d\n", clc.challenge);
+		strver = Cmd_Argv(3);
+		if(*strver)
+		{
+			ver = atoi(strver);
+			
+			if(ver != com_protocol->integer)
+			{
+				{
+					Com_Printf(S_COLOR_YELLOW "Warning: Server reports protocol version %d, we have %d. "
+						   "Trying anyways.\n", ver, com_protocol->integer);
+				}
+			}
 		}
+		{
+			if(!*c || challenge != clc.challenge)
+			{
+				Com_Printf("Bad challenge for challengeResponse. Ignored.\n");
+				return;
+			}
+		}
+
+		// start sending challenge response instead of challenge request packets
+		clc.challenge = atoi(Cmd_Argv(1));
+		cls.state = CA_CHALLENGING;
+		clc.connectPacketCount = 0;
+		clc.connectTime = -99999;
+
+		// take this address as the new server address.  This allows
+		// a server proxy to hand off connections to multiple servers
+		clc.serverAddress = from;
+		Com_DPrintf ("challengeResponse: %d\n", clc.challenge);
 		return;
 	}
 
 	// server connection
 	if ( !Q_stricmp(c, "connectResponse") ) {
 		if ( cls.state >= CA_CONNECTED ) {
-			Com_Printf ("Dup connect received.  Ignored.\n");
+			Com_Printf ("Dup connect received. Ignored.\n");
 			return;
 		}
 		if ( cls.state != CA_CHALLENGING ) {
-			Com_Printf ("connectResponse packet while not connecting.  Ignored.\n");
+			Com_Printf ("connectResponse packet while not connecting. Ignored.\n");
 			return;
 		}
-		if ( !NET_CompareBaseAdr( from, clc.serverAddress ) ) {
-			Com_Printf( "connectResponse from a different address.  Ignored.\n" );
-			Com_Printf( "%s should have been %s\n", NET_AdrToStringwPort( from ), 
-				NET_AdrToStringwPort( clc.serverAddress ) );
+		if ( !NET_CompareAdr( from, clc.serverAddress ) ) {
+			Com_Printf( "connectResponse from wrong address. Ignored.\n" );
 			return;
 		}
-		Netchan_Setup (NS_CLIENT, &clc.netchan, from, Cvar_VariableValue( "net_qport" ) );
+
+		{
+			c = Cmd_Argv(1);
+
+			if(*c)
+				challenge = atoi(c);
+			else
+			{
+				Com_Printf("Bad connectResponse received. Ignored.\n");
+				return;
+			}
+			
+			if(challenge != clc.challenge)
+			{
+				Com_Printf("ConnectResponse with bad challenge received. Ignored.\n");
+				return;
+			}
+		}
+
+		Netchan_Setup(NS_CLIENT, &clc.netchan, from, Cvar_VariableValue("net_qport"),
+			      clc.challenge, false);
+
 		cls.state = CA_CONNECTED;
 		clc.lastPacketSentTime = -9999;		// send first packet immediately
 		return;
@@ -2890,12 +2945,27 @@ void CL_ServerInfoPacket( netadr_t from, msg_t *msg ) {
 	char*	str;
 	char	*infoString;
 	int		prot;
+	char	*gamename;
+	bool gameMismatch;
 
 	infoString = MSG_ReadString( msg );
 
+	// if this isn't the correct gamename, ignore it
+	gamename = Info_ValueForKey( infoString, "gamename" );
+
+	gameMismatch = !*gamename || strcmp(gamename, com_gamename->string) != 0;
+
+	if (gameMismatch)
+	{
+		Com_DPrintf( "Game mismatch in info packet: %s\n", infoString );
+		return;
+	}
+
 	// if this isn't the correct protocol version, ignore it
 	prot = atoi( Info_ValueForKey( infoString, "protocol" ) );
-	if ( prot != PROTOCOL_VERSION ) {
+
+	if(prot != com_protocol->integer)
+	{
 		Com_DPrintf( "Different protocol info packet: %s\n", infoString );
 		return;
 	}

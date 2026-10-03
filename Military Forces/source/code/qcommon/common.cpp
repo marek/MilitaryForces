@@ -79,6 +79,8 @@ cvar_t	*com_cl_running;
 cvar_t	*com_logfile;		// 1 = buffer log, 2 = flush after each print
 cvar_t	*com_showtrace;
 cvar_t	*com_version;
+cvar_t	*com_gamename;
+cvar_t	*com_protocol;
 cvar_t	*com_blood;
 cvar_t	*com_buildScript;	// for automated data building scripts
 cvar_t	*com_introPlayed;
@@ -2618,6 +2620,9 @@ void Com_Init( char *commandLine ) {
 
 	s = va("%s %s %s", MF_VERSION, CPUSTRING, __DATE__ );
 	com_version = Cvar_Get ("version", s, CVAR_ROM | CVAR_SERVERINFO );
+	com_gamename = Cvar_Get("com_gamename", GAMENAME_FOR_MASTER, CVAR_SERVERINFO | CVAR_INIT);
+	com_protocol = Cvar_Get("com_protocol", va("%i", PROTOCOL_VERSION), CVAR_SERVERINFO | CVAR_INIT);
+	Cvar_Get("protocol", com_protocol->string, CVAR_ROM);
 
 	Sys_Init();
 	Netchan_Init( Com_Milliseconds() & 0xffff );	// pick a port value that should be nice and random
@@ -2813,7 +2818,7 @@ Com_Frame
 void Com_Frame( void ) {
 
 	int		msec, minMsec;
-	int		timeVal;
+	int		timeVal, timeValSV;
 	static int	lastTime = 0, bias = 0;
  
 	int		timeBeforeFirstEvents;
@@ -2889,7 +2894,17 @@ void Com_Frame( void ) {
 
 	do
 	{
-		timeVal = Com_TimeVal(minMsec);
+		if(com_sv_running->integer)
+		{
+			timeValSV = SV_SendQueuedPackets();
+			
+			timeVal = Com_TimeVal(minMsec);
+
+			if(timeValSV < timeVal)
+				timeVal = timeValSV;
+		}
+		else
+			timeVal = Com_TimeVal(minMsec);
 		
 		if(com_busyWait->integer || timeVal < 1)
 			NET_Sleep(0);
@@ -2971,6 +2986,8 @@ void Com_Frame( void ) {
 			timeBeforeClient = timeAfter;
 		}
 	}
+
+	NET_FlushPacketQueue();
 
 	//
 	// report timing information

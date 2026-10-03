@@ -1,6 +1,7 @@
 #include "sv_server.h"
 #include "../game/g_public.h"
 #include "sv_client.h"
+#include "server.h"
 
 
 
@@ -107,6 +108,7 @@ Server::GameEntityForSVEntity( SV_Entity* svEnt )
 
 ServerStatic::Challenge::Challenge() :
 	challenge_(0),
+	clientChallenge_(0),
 	time_(0),
 	pingTime_(0),
 	firstTime_(0),
@@ -162,6 +164,8 @@ ServerStatic::clearClients()
 {
 	for( size_t i = 0; i < svClients_.size(); ++i )
 	{
+		if( svClients_.at(i) )
+			SV_FreeClient( svClients_.at(i) );
 		delete svClients_.at(i);
 		svClients_.at(i) = 0;
 	}

@@ -575,7 +575,7 @@ void SV_SpawnServer( char *server, bool killBots )
 					//cl->gentity_ = ent;
 
 					cl->deltaMessage_ = -1;
-					cl->nextSnapshotTime_ = theSVS.time_;	// generate a snapshot immediately
+					cl->lastSnapshotTime_ = 0;	// generate a snapshot immediately
 
 					//VM_Call( gvm, GAME_CLIENT_BEGIN, i );
 					theSG.clientBegin( i );
@@ -659,13 +659,14 @@ void SV_Init (void) {
 	sv_gametype = Cvar_Get ("g_gametype", "0", CVAR_SERVERINFO | CVAR_LATCH );
 	sv_gameset = Cvar_Get ("mf_gameset", "modern", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_LATCH );
 	Cvar_Get ("sv_keywords", "", CVAR_SERVERINFO);
-	Cvar_Get ("protocol", va("%i", PROTOCOL_VERSION), CVAR_SERVERINFO | CVAR_ROM);
 	sv_mapname = Cvar_Get ("mapname", "nomap", CVAR_SERVERINFO | CVAR_ROM);
 	sv_privateClients = Cvar_Get ("sv_privateClients", "0", CVAR_SERVERINFO);
 	sv_hostname = Cvar_Get ("sv_hostname", "noname", CVAR_SERVERINFO | CVAR_ARCHIVE );
 	sv_maxclients = Cvar_Get ("sv_maxclients", "8", CVAR_SERVERINFO | CVAR_LATCH);
 
+	sv_minRate = Cvar_Get ("sv_minRate", "0", CVAR_ARCHIVE | CVAR_SERVERINFO );
 	sv_maxRate = Cvar_Get ("sv_maxRate", "0", CVAR_ARCHIVE | CVAR_SERVERINFO );
+	sv_dlRate = Cvar_Get("sv_dlRate", "100", CVAR_ARCHIVE | CVAR_SERVERINFO);
 	sv_minPing = Cvar_Get ("sv_minPing", "0", CVAR_ARCHIVE | CVAR_SERVERINFO );
 	sv_maxPing = Cvar_Get ("sv_maxPing", "0", CVAR_ARCHIVE | CVAR_SERVERINFO );
 	sv_floodProtect = Cvar_Get ("sv_floodProtect", "1", CVAR_ARCHIVE | CVAR_SERVERINFO );
@@ -737,7 +738,7 @@ void SV_FinalMessage( char *message )
 					SV_SendServerCommand( cl, "disconnect" );
 				}
 				// force a snapshot to be sent
-				cl->nextSnapshotTime_ = -1;
+				cl->lastSnapshotTime_ = 0;
 				SV_SendClientSnapshot( cl );
 			}
 		}

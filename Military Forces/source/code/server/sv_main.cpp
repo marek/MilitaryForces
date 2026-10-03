@@ -51,7 +51,9 @@ cvar_t	*sv_killserver;			// menu system can set to 1 to shut server down
 cvar_t	*sv_mapname;
 cvar_t	*sv_mapChecksum;
 cvar_t	*sv_serverid;
+cvar_t	*sv_minRate;
 cvar_t	*sv_maxRate;
+cvar_t	*sv_dlRate;
 cvar_t	*sv_minPing;
 cvar_t	*sv_maxPing;
 cvar_t	*sv_gametype;
@@ -323,6 +325,167 @@ CONNECTIONLESS COMMANDS
 ==============================================================================
 */
 
+// This is deliberately quite large to make it more of an effort to DoS
+#define MAX_BUCKETS			16384
+#define MAX_HASHES			1024
+
+static leakyBucket_t buckets[ MAX_BUCKETS ];
+static leakyBucket_t *bucketHashes[ MAX_HASHES ];
+leakyBucket_t outboundLeakyBucket;
+
+/*
+================
+SVC_HashForAddress
+================
+*/
+static long SVC_HashForAddress( netadr_t address ) {
+	byte 		*ip = NULL;
+	size_t	size = 0;
+	int			i;
+	long		hash = 0;
+
+	switch ( address.type ) {
+		case NA_IP:  ip = address.ip;  size = 4; break;
+		case NA_IP6: ip = address.ip6; size = 16; break;
+		default: break;
+	}
+
+	for ( i = 0; i < size; i++ ) {
+		hash += (long)( ip[ i ] ) * ( i + 119 );
+	}
+
+	hash = ( hash ^ ( hash >> 10 ) ^ ( hash >> 20 ) );
+	hash &= ( MAX_HASHES - 1 );
+
+	return hash;
+}
+
+/*
+================
+SVC_BucketForAddress
+
+Find or allocate a bucket for an address
+================
+*/
+static leakyBucket_t *SVC_BucketForAddress( netadr_t address, int burst, int period ) {
+	leakyBucket_t	*bucket = NULL;
+	int						i;
+	long					hash = SVC_HashForAddress( address );
+	int						now = Sys_Milliseconds();
+
+	for ( bucket = bucketHashes[ hash ]; bucket; bucket = bucket->next ) {
+		switch ( bucket->type ) {
+			case NA_IP:
+				if ( memcmp( bucket->ipv._4, address.ip, 4 ) == 0 ) {
+					return bucket;
+				}
+				break;
+
+			case NA_IP6:
+				if ( memcmp( bucket->ipv._6, address.ip6, 16 ) == 0 ) {
+					return bucket;
+				}
+				break;
+
+			default:
+				break;
+		}
+	}
+
+	for ( i = 0; i < MAX_BUCKETS; i++ ) {
+		int interval;
+
+		bucket = &buckets[ i ];
+		interval = now - bucket->lastTime;
+
+		// Reclaim expired buckets
+		if ( bucket->lastTime > 0 && ( interval > ( burst * period ) ||
+					interval < 0 ) ) {
+			if ( bucket->prev != NULL ) {
+				bucket->prev->next = bucket->next;
+			} else {
+				bucketHashes[ bucket->hash ] = bucket->next;
+			}
+			
+			if ( bucket->next != NULL ) {
+				bucket->next->prev = bucket->prev;
+			}
+
+			Com_Memset( bucket, 0, sizeof( leakyBucket_t ) );
+		}
+
+		if ( bucket->type == NA_BAD ) {
+			bucket->type = address.type;
+			switch ( address.type ) {
+				case NA_IP:  Com_Memcpy( bucket->ipv._4, address.ip, 4 );   break;
+				case NA_IP6: Com_Memcpy( bucket->ipv._6, address.ip6, 16 ); break;
+				default: break;
+			}
+
+			bucket->lastTime = now;
+			bucket->burst = 0;
+			bucket->hash = hash;
+
+			// Add to the head of the relevant hash chain
+			bucket->next = bucketHashes[ hash ];
+			if ( bucketHashes[ hash ] != NULL ) {
+				bucketHashes[ hash ]->prev = bucket;
+			}
+
+			bucket->prev = NULL;
+			bucketHashes[ hash ] = bucket;
+
+			return bucket;
+		}
+	}
+
+	// Couldn't allocate a bucket for this address
+	return NULL;
+}
+
+/*
+================
+SVC_RateLimit
+================
+*/
+bool SVC_RateLimit( leakyBucket_t *bucket, int burst, int period ) {
+	if ( bucket != NULL ) {
+		int now = Sys_Milliseconds();
+		int interval = now - bucket->lastTime;
+		int expired = interval / period;
+		int expiredRemainder = interval % period;
+
+		if ( expired > bucket->burst || interval < 0 ) {
+			bucket->burst = 0;
+			bucket->lastTime = now;
+		} else {
+			bucket->burst -= expired;
+			bucket->lastTime = now - expiredRemainder;
+		}
+
+		if ( bucket->burst < burst ) {
+			bucket->burst++;
+
+			return false;
+		}
+	}
+
+	return true;
+}
+
+/*
+================
+SVC_RateLimitAddress
+
+Rate limit for a particular address
+================
+*/
+bool SVC_RateLimitAddress( netadr_t from, int burst, int period ) {
+	leakyBucket_t *bucket = SVC_BucketForAddress( from, burst, period );
+
+	return SVC_RateLimit( bucket, burst, period );
+}
+
 /*
 ================
 SVC_Status
@@ -336,6 +499,24 @@ void SVC_Status( netadr_t from )
 {
 	// ignore if we are in single player
 	if ( Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER || Cvar_VariableValue("ui_singlePlayerActive")) 
+		return;
+
+	// Prevent using getstatus as an amplifier
+	if ( SVC_RateLimitAddress( from, 10, 1000 ) ) {
+		Com_DPrintf( "SVC_Status: rate limit from %s exceeded, dropping request\n",
+			NET_AdrToString( from ) );
+		return;
+	}
+
+	// Allow getstatus to be DoSed relatively easily, but prevent
+	// excess outbound bandwidth usage when being flooded inbound
+	if ( SVC_RateLimit( &outboundLeakyBucket, 10, 100 ) ) {
+		Com_DPrintf( "SVC_Status: rate limit exceeded, dropping request\n" );
+		return;
+	}
+
+	// A maximum challenge length of 128 should be more than plenty.
+	if(strlen(Cmd_Argv(1)) > 128)
 		return;
 
 	char	infostring[MAX_INFO_STRING];
@@ -395,6 +576,20 @@ void SVC_Info( netadr_t from )
 	if ( Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER || Cvar_VariableValue("ui_singlePlayerActive")) 
 		return;
 
+	// Prevent using getinfo as an amplifier
+	if ( SVC_RateLimitAddress( from, 10, 1000 ) ) {
+		Com_DPrintf( "SVC_Info: rate limit from %s exceeded, dropping request\n",
+			NET_AdrToString( from ) );
+		return;
+	}
+
+	// Allow getinfo to be DoSed relatively easily, but prevent
+	// excess outbound bandwidth usage when being flooded inbound
+	if ( SVC_RateLimit( &outboundLeakyBucket, 10, 100 ) ) {
+		Com_DPrintf( "SVC_Info: rate limit exceeded, dropping request\n" );
+		return;
+	}
+
 	/*
 	 * Check whether Cmd_Argv(1) has a sane length. This was not done in the original Quake3 version which led
 	 * to the Infostring bug discovered by Luigi Auriemma. See http://aluigi.altervista.org/ for the advisory.
@@ -422,7 +617,8 @@ void SVC_Info( netadr_t from )
 	// to prevent timed spoofed reply packets that add ghost servers
 	Info_SetValueForKey( infostring, "challenge", Cmd_Argv(1) );
 
-	Info_SetValueForKey( infostring, "protocol", va("%i", PROTOCOL_VERSION) );
+	Info_SetValueForKey( infostring, "gamename", com_gamename->string );
+	Info_SetValueForKey(infostring, "protocol", va("%i", com_protocol->integer));
 	Info_SetValueForKey( infostring, "hostname", sv_hostname->string );
 	Info_SetValueForKey( infostring, "mapname", sv_mapname->string );
 	Info_SetValueForKey( infostring, "clients", va("%i", count) );
@@ -430,6 +626,7 @@ void SVC_Info( netadr_t from )
 		va("%i", sv_maxclients->integer - sv_privateClients->integer ) );
 	Info_SetValueForKey( infostring, "gametype", va("%i", sv_gametype->integer ) );
 	Info_SetValueForKey( infostring, "pure", va("%i", sv_pure->integer ) );
+	Info_SetValueForKey(infostring, "g_needpass", va("%d", Cvar_VariableIntegerValue("g_needpass")));
 
 	if( sv_minPing->integer ) 
 		Info_SetValueForKey( infostring, "minPing", va("%i", sv_minPing->integer) );
@@ -467,31 +664,35 @@ Redirect all printfs
 void SVC_RemoteCommand( netadr_t from, msg_t *msg ) 
 {
 	bool	valid;
-	unsigned int time;
 	char		remaining[1024];
 	// TTimo - scaled down to accumulate, but not overflow anything network wise, print wise etc.
 	// (OOB messages are the bottleneck here)
 #define SV_OUTPUTBUF_LENGTH (1024 - 16)
 	char		sv_outputbuf[SV_OUTPUTBUF_LENGTH];
-	static unsigned int lasttime = 0;
 	char *cmd_aux;
 
-	time = Com_Milliseconds();
-	if ( (unsigned)( time - lasttime ) < 500u ) 
+	// Prevent using rcon as an amplifier and make dictionary attacks impractical
+	if ( SVC_RateLimitAddress( from, 10, 1000 ) ) {
+		Com_DPrintf( "SVC_RemoteCommand: rate limit from %s exceeded, dropping request\n",
+			NET_AdrToString( from ) );
 		return;
-
-	lasttime = time;
+	}
 
 	if ( !strlen( sv_rconPassword->string ) ||
-		strcmp (Cmd_Argv(1), sv_rconPassword->string) ) 
-	{
+		strcmp (Cmd_Argv(1), sv_rconPassword->string) ) {
+		static leakyBucket_t bucket;
+
+		// Make DoS via rcon impractical
+		if ( SVC_RateLimit( &bucket, 10, 1000 ) ) {
+			Com_DPrintf( "SVC_RemoteCommand: rate limit exceeded, dropping request\n" );
+			return;
+		}
+
 		valid = false;
-		Com_Printf ("Bad rcon from %s:\n%s\n", NET_AdrToString (from), Cmd_Argv(2) );
-	} 
-	else 
-	{
+		Com_Printf ("Bad rcon from %s: %s\n", NET_AdrToString (from), Cmd_ArgsFrom(2) );
+	} else {
 		valid = true;
-		Com_Printf ("Rcon from %s:\n%s\n", NET_AdrToString (from), Cmd_Argv(2) );
+		Com_Printf ("Rcon from %s: %s\n", NET_AdrToString (from), Cmd_ArgsFrom(2) );
 	}
 
 	// start redirecting all print outputs to the packet
@@ -642,10 +843,6 @@ void SV_PacketEvent( netadr_t from, msg_t *msg )
 		}
 		return;
 	}
-	
-	// if we received a sequenced packet from an address we don't recognize,
-	// send an out of band disconnect packet to it
-	NET_OutOfBandPrint( NS_SERVER, from, "disconnect" );
 }
 
 
@@ -935,6 +1132,136 @@ void SV_Frame( int msec )
 
 	// send a heartbeat to the master if needed
 	//SV_MasterHeartbeat();
+}
+
+/*
+====================
+SV_RateMsec
+
+Return the number of msec until another message can be sent to
+a client based on its rate settings
+====================
+*/
+
+#define UDPIP_HEADER_SIZE 28
+#define UDPIP6_HEADER_SIZE 48
+
+int SV_RateMsec(SV_Client *client)
+{
+	int rate, rateMsec;
+	int messageSize;
+	
+	messageSize = client->netchan_.lastSentSize;
+	rate = client->rate_;
+
+	if(sv_maxRate->integer)
+	{
+		if(sv_maxRate->integer < 1000)
+			Cvar_Set( "sv_MaxRate", "1000" );
+		if(sv_maxRate->integer < rate)
+			rate = sv_maxRate->integer;
+	}
+
+	if(sv_minRate->integer)
+	{
+		if(sv_minRate->integer < 1000)
+			Cvar_Set("sv_minRate", "1000");
+		if(sv_minRate->integer > rate)
+			rate = sv_minRate->integer;
+	}
+
+	if(client->netchan_.remoteAddress.type == NA_IP6)
+		messageSize += UDPIP6_HEADER_SIZE;
+	else
+		messageSize += UDPIP_HEADER_SIZE;
+		
+	rateMsec = messageSize * 1000 / ((int) (rate * com_timescale->value));
+	rate = Sys_Milliseconds() - client->netchan_.lastSentTime;
+	
+	if(rate > rateMsec)
+		return 0;
+	else
+		return rateMsec - rate;
+}
+
+/*
+====================
+SV_SendQueuedPackets
+
+Send download messages and queued packets in the time that we're idle, i.e.
+not computing a server frame or sending client snapshots.
+Return the time in msec until we expect to be called next
+====================
+*/
+
+int SV_SendQueuedPackets(void)
+{
+	int numBlocks;
+	int dlStart, deltaT, delayT;
+	static int dlNextRound = 0;
+	int timeVal = INT_MAX;
+
+	// Send out fragmented packets now that we're idle
+	delayT = SV_SendQueuedMessages();
+	if(delayT >= 0)
+		timeVal = delayT;
+
+	if(sv_dlRate->integer)
+	{
+		// Rate limiting. This is very imprecise for high
+		// download rates due to millisecond timedelta resolution
+		dlStart = Sys_Milliseconds();
+		deltaT = dlNextRound - dlStart;
+
+		if(deltaT > 0)
+		{
+			if(deltaT < timeVal)
+				timeVal = deltaT + 1;
+		}
+		else
+		{
+			numBlocks = SV_SendDownloadMessages();
+
+			if(numBlocks)
+			{
+				// There are active downloads
+				deltaT = Sys_Milliseconds() - dlStart;
+
+				delayT = 1000 * numBlocks * MAX_DOWNLOAD_BLKSIZE;
+				delayT /= sv_dlRate->integer * 1024;
+
+				if(delayT <= deltaT + 1)
+				{
+					// Sending the last round of download messages
+					// took too long for given rate, don't wait for
+					// next round, but always enforce a 1ms delay
+					// between DL message rounds so we don't hog
+					// all of the bandwidth. This will result in an
+					// effective maximum rate of 1MB/s per user, but the
+					// low download window size limits this anyways.
+					if(timeVal > 2)
+						timeVal = 2;
+
+					dlNextRound = dlStart + deltaT + 1;
+				}
+				else
+				{
+					dlNextRound = dlStart + delayT;
+					delayT -= deltaT;
+
+					if(delayT < timeVal)
+						timeVal = delayT;
+				}
+			}
+		}
+	}
+	else
+	{
+		if(SV_SendDownloadMessages())
+			timeVal = 0;
+	}
+
+	return timeVal;
 }
 
 //============================================================================

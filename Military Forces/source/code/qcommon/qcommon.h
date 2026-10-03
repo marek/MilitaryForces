@@ -185,8 +185,11 @@ void		NET_Sleep(int msec);
 #define	MAX_MSGLEN				16384		// max length of a message, which may
 											// be fragmented into multiple packets
 
-#define MAX_DOWNLOAD_WINDOW			8		// max of eight download frames
-#define MAX_DOWNLOAD_BLKSIZE		2048	// 2048 byte block chunks
+#define MAX_DOWNLOAD_WINDOW		48	// ACK window of 48 download chunks. Cannot set this higher, or clients
+						// will overflow the reliable commands buffer
+#define MAX_DOWNLOAD_BLKSIZE		1024	// 896 byte block chunks
+
+#define NETCHAN_GENCHECKSUM(challenge, sequence) ((challenge) ^ ((sequence) * (challenge)))
  
 
 /*
@@ -216,10 +219,14 @@ typedef struct {
 	int			unsentFragmentStart;
 	int			unsentLength;
 	byte		unsentBuffer[MAX_MSGLEN];
+
+	int			challenge;
+	int		lastSentTime;
+	int		lastSentSize;
 } netchan_t;
 
 void Netchan_Init( int qport );
-void Netchan_Setup( netsrc_t sock, netchan_t *chan, netadr_t adr, int qport );
+void Netchan_Setup(netsrc_t sock, netchan_t *chan, netadr_t adr, int qport, int challenge, bool compat);
 
 void Netchan_Transmit( netchan_t *chan, int length, const byte *data );
 void Netchan_TransmitNextFragment( netchan_t *chan );
@@ -235,7 +242,7 @@ PROTOCOL
 ==============================================================
 */
 
-#define	PROTOCOL_VERSION	05
+#define	PROTOCOL_VERSION	06
 
 // maintain a list of compatible protocols for demo playing
 // NOTE: that stuff only works with two digits protocols
@@ -788,6 +795,8 @@ extern	cvar_t	*com_sv_running;
 extern	cvar_t	*com_cl_running;
 extern	cvar_t	*com_viewlog;			// 0 = hidden, 1 = visible, 2 = minimized
 extern	cvar_t	*com_version;
+extern	cvar_t	*com_gamename;
+extern	cvar_t	*com_protocol;
 extern	cvar_t	*com_blood;
 extern	cvar_t	*com_buildScript;		// for building release pak files
 extern	cvar_t	*com_journal;
@@ -956,6 +965,7 @@ void SV_Init( void );
 void SV_Shutdown( char *finalmsg );
 void SV_Frame( int msec );
 int SV_FrameMsec(void);
+int SV_SendQueuedPackets(void);
 
 void IN_Frame( void );
 void SV_PacketEvent( netadr_t from, msg_t *msg );

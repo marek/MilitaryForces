@@ -26,145 +26,74 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "sv_client.h"
 
 /*
-==============
-SV_Netchan_Encode
-
-	// first four bytes of the data are always:
-	long reliableAcknowledge;
-
-==============
+=================
+SV_Netchan_FreeQueue
+=================
 */
-static void SV_Netchan_Encode( SV_Client *client, msg_t *msg )
+void SV_Netchan_FreeQueue(SV_Client *client)
 {
-	long reliableAcknowledge, i, index;
-	byte key, *string;
-        int	srdc, sbit;
-		bool soob;
-        
-	if ( msg->cursize < SV_ENCODE_START ) 
-		return;
-
-    srdc = msg->readcount;
-    sbit = msg->bit;
-    soob = msg->oob;
-    
-    msg->bit = 0;
-    msg->readcount = 0;
-    msg->oob = 0;
-        
-	reliableAcknowledge = MSG_ReadLong(msg);
-
-    msg->oob = soob;
-    msg->bit = sbit;
-    msg->readcount = srdc;
-        
-	string = (byte *)client->lastClientCommandString_;
-	index = 0;
-	// xor the client challenge with the netchan sequence number
-	key = client->challenge_ ^ client->netchan_.outgoingSequence;
-	for (i = SV_ENCODE_START; i < msg->cursize; i++) 
+	SV_Client::Netchan_Buffer *netbuf, *next;
+	
+	for(netbuf = client->netchan_start_queue_; netbuf; netbuf = next)
 	{
-		// modify the key with the last received and with this message acknowledged client command
-		if (!string[index])
-			index = 0;
-		if (string[index] > 127 || string[index] == '%') 
-			key ^= '.' << (i & 1);
-		else 
-			key ^= string[index] << (i & 1);
-
-		index++;
-		// encode the data with this key
-		*(msg->data + i) = *(msg->data + i) ^ key;
+		next = netbuf->next_;
+		Z_Free(netbuf);
 	}
+	
+	client->netchan_start_queue_ = NULL;
+	client->netchan_end_queue_ = &client->netchan_start_queue_;
 }
 
 /*
-==============
-SV_Netchan_Decode
-
-	// first 12 bytes of the data are always:
-	long serverId;
-	long messageAcknowledge;
-	long reliableAcknowledge;
-
-==============
+=================
+SV_Netchan_TransmitNextInQueue
+=================
 */
-static void SV_Netchan_Decode( SV_Client *client, msg_t *msg )
+void SV_Netchan_TransmitNextInQueue(SV_Client *client)
 {
-	int serverId, messageAcknowledge, reliableAcknowledge;
-	int i, index, srdc, sbit;
-	bool soob;
-	byte key, *string;
+	SV_Client::Netchan_Buffer *netbuf;
+		
+	Com_DPrintf("#462 Netchan_TransmitNextFragment: popping a queued message for transmit\n");
+	netbuf = client->netchan_start_queue_;
 
-    srdc = msg->readcount;
-    sbit = msg->bit;
-    soob = msg->oob;
-    
-    msg->oob = 0;
-    
-    serverId = MSG_ReadLong(msg);
-	messageAcknowledge = MSG_ReadLong(msg);
-	reliableAcknowledge = MSG_ReadLong(msg);
+	Netchan_Transmit(&client->netchan_, netbuf->msg_.cursize, netbuf->msg_.data);
 
-    msg->oob = soob;
-    msg->bit = sbit;
-    msg->readcount = srdc;
-    
-	string = (byte *)client->reliableCommands_[ reliableAcknowledge & (MAX_RELIABLE_COMMANDS-1) ];
-	index = 0;
-	//
-	key = client->challenge_ ^ serverId ^ messageAcknowledge;
-	for (i = msg->readcount + SV_DECODE_START; i < msg->cursize; i++) {
-		// modify the key with the last sent and acknowledged server command
-		if (!string[index])
-			index = 0;
-		if (string[index] > 127 || string[index] == '%') {
-			key ^= '.' << (i & 1);
-		}
-		else {
-			key ^= string[index] << (i & 1);
-		}
-		index++;
-		// decode the data with this key
-		*(msg->data + i) = *(msg->data + i) ^ key;
+	// pop from queue
+	client->netchan_start_queue_ = netbuf->next_;
+	if(!client->netchan_start_queue_)
+	{
+		Com_DPrintf("#462 Netchan_TransmitNextFragment: emptied queue\n");
+		client->netchan_end_queue_ = &client->netchan_start_queue_;
 	}
+	else
+		Com_DPrintf("#462 Netchan_TransmitNextFragment: remaining queued message\n");
+
+	Z_Free(netbuf);
 }
 
 /*
 =================
 SV_Netchan_TransmitNextFragment
+Transmit the next fragment and the next queued packet
+Return number of ms until next message can be sent based on throughput given by client rate,
+-1 if no packet was sent.
 =================
 */
-void SV_Netchan_TransmitNextFragment( SV_Client *client ) 
+
+int SV_Netchan_TransmitNextFragment(SV_Client *client)
 {
-	Netchan_TransmitNextFragment( &client->netchan_ );
-	if (!client->netchan_.unsentFragments)
+	if(client->netchan_.unsentFragments)
 	{
-		// make sure the netchan queue has been properly initialized (you never know)
-		if ((!client->netchan_end_queue_) && (client->state_ >= SV_Client::CS_CONNECTED)) 
-		{
-			Com_Error(ERR_DROP, "netchan queue is not properly initialized in SV_Netchan_TransmitNextFragment\n");
-		}
-		// the last fragment was transmitted, check wether we have queued messages
-		if (client->netchan_start_queue_) 
-		{
-			SV_Client::Netchan_Buffer *netbuf;
-			Com_DPrintf("#462 Netchan_TransmitNextFragment: popping a queued message for transmit\n");
-			netbuf = client->netchan_start_queue_;
-			SV_Netchan_Encode( client, &netbuf->msg_ );
-			Netchan_Transmit( &client->netchan_, netbuf->msg_.cursize, netbuf->msg_.data );
-			// pop from queue
-			client->netchan_start_queue_ = netbuf->next_;
-			if (!client->netchan_start_queue_)
-			{
-				Com_DPrintf("#462 Netchan_TransmitNextFragment: emptied queue\n");
-				client->netchan_end_queue_ = &client->netchan_start_queue_;
-			}
-			else
-				Com_DPrintf("#462 Netchan_TransmitNextFragment: remaining queued message\n");
-			Z_Free(netbuf);
-		} 
-	}	
+		Netchan_TransmitNextFragment(&client->netchan_);
+		return SV_RateMsec(client);
+	}
+	else if(client->netchan_start_queue_)
+	{
+		SV_Netchan_TransmitNextInQueue(client);
+		return SV_RateMsec(client);
+	}
+	
+	return -1;
 }
 
 
@@ -172,30 +101,31 @@ void SV_Netchan_TransmitNextFragment( SV_Client *client )
 ===============
 SV_Netchan_Transmit
 TTimo
+https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=462
 if there are some unsent fragments (which may happen if the snapshots
 and the gamestate are fragmenting, and collide on send for instance)
 then buffer them and make sure they get sent in correct order
 ================
 */
 
-void SV_Netchan_Transmit( SV_Client *client, msg_t *msg ) 
-{	//int length, const byte *data ) {
+void SV_Netchan_Transmit( SV_Client *client, msg_t *msg)
+{
 	MSG_WriteByte( msg, svc_EOF );
-	if (client->netchan_.unsentFragments) 
+
+	if(client->netchan_.unsentFragments || client->netchan_start_queue_)
 	{
 		SV_Client::Netchan_Buffer *netbuf;
 		Com_DPrintf("#462 SV_Netchan_Transmit: unsent fragments, stacked\n");
-		netbuf = (SV_Client::Netchan_Buffer *)Z_Malloc(sizeof(SV_Client::Netchan_Buffer));
+		netbuf = (SV_Client::Netchan_Buffer *) Z_Malloc(sizeof(SV_Client::Netchan_Buffer));
 		// store the msg, we can't store it encoded, as the encoding depends on stuff we still have to finish sending
 		MSG_Copy(&netbuf->msg_, netbuf->msgBuffer_, sizeof( netbuf->msgBuffer_ ), msg);
 		netbuf->next_ = NULL;
 		// insert it in the queue, the message will be encoded and sent later
 		*client->netchan_end_queue_ = netbuf;
 		client->netchan_end_queue_ = &(*client->netchan_end_queue_)->next_;
-		// emit the next fragment of the current message for now
-		Netchan_TransmitNextFragment(&client->netchan_);
-	} else {
-		SV_Netchan_Encode( client, msg );
+	}
+	else
+	{
 		Netchan_Transmit( &client->netchan_, msg->cursize, msg->data );
 	}
 }
@@ -211,7 +141,7 @@ bool SV_Netchan_Process( SV_Client *client, msg_t *msg )
 	ret = Netchan_Process( &client->netchan_, msg );
 	if (!ret)
 		return false;
-	SV_Netchan_Decode( client, msg );
+
 	return true;
 }
 

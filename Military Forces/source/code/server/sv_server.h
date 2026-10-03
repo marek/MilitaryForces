@@ -76,6 +76,7 @@ struct ServerStatic
 
 		netadr_t	adr_;
 		int			challenge_;
+		int			clientChallenge_;		// challenge number coming from the client
 		int			time_;				// time the last packet was sent to the autherize server
 		int			pingTime_;			// time the challenge response was sent to client
 		int			firstTime_;			// time the adr was first used, for authorize timeout checks
@@ -83,7 +84,8 @@ struct ServerStatic
 		bool		connected_;
 	};
 
-	static const int k_MAX_CHALLENGES	= 1024;
+	static const int k_MAX_CHALLENGES	= 2048;
+	static const int k_MAX_CHALLENGES_MULTI	= k_MAX_CHALLENGES / 2;
 
 	static ServerStatic& getInstance();
 

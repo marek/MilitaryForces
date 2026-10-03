@@ -15,7 +15,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Foobar; if not, write to the Free Software
+along with Quake III Arena source code; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
@@ -24,6 +24,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../qcommon/qcommon.h"
 #include "client.h"
 
+#ifdef LEGACY_PROTOCOL
 /*
 ==============
 CL_Netchan_Encode
@@ -37,8 +38,7 @@ CL_Netchan_Encode
 */
 static void CL_Netchan_Encode( msg_t *msg ) {
 	int serverId, messageAcknowledge, reliableAcknowledge;
-	int i, index, srdc, sbit;
-	bool soob;
+	int i, index, srdc, sbit, soob;
 	byte key, *string;
 
 	if ( msg->cursize <= CL_ENCODE_START ) {
@@ -93,8 +93,7 @@ CL_Netchan_Decode
 static void CL_Netchan_Decode( msg_t *msg ) {
 	long reliableAcknowledge, i, index;
 	byte key, *string;
-        int	srdc, sbit;
-		bool soob;
+        int	srdc, sbit, soob;
 
         srdc = msg->readcount;
         sbit = msg->bit;
@@ -108,7 +107,7 @@ static void CL_Netchan_Decode( msg_t *msg ) {
         msg->bit = sbit;
         msg->readcount = srdc;
 
-	string = reinterpret_cast<byte*>(clc.reliableCommands[ reliableAcknowledge & (MAX_RELIABLE_COMMANDS-1) ]);
+	string = (byte *) clc.reliableCommands[ reliableAcknowledge & (MAX_RELIABLE_COMMANDS-1) ];
 	index = 0;
 	// xor the client challenge with the netchan sequence number (need something that changes every message)
 	key = clc.challenge ^ LittleLong( *(unsigned *)msg->data );
@@ -127,14 +126,22 @@ static void CL_Netchan_Decode( msg_t *msg ) {
 		*(msg->data + i) = *(msg->data + i) ^ key;
 	}
 }
+#endif
 
 /*
 =================
 CL_Netchan_TransmitNextFragment
 =================
 */
-void CL_Netchan_TransmitNextFragment( netchan_t *chan ) {
-	Netchan_TransmitNextFragment( chan );
+bool CL_Netchan_TransmitNextFragment(netchan_t *chan)
+{
+	if(chan->unsentFragments)
+	{
+		Netchan_TransmitNextFragment(chan);
+		return true;
+	}
+	
+	return false;
 }
 
 /*
@@ -145,12 +152,19 @@ CL_Netchan_Transmit
 void CL_Netchan_Transmit( netchan_t *chan, msg_t* msg ) {
 	MSG_WriteByte( msg, clc_EOF );
 
-	CL_Netchan_Encode( msg );
-	Netchan_Transmit( chan, msg->cursize, msg->data );
-}
+#ifdef LEGACY_PROTOCOL
+	if(chan->compat)
+		CL_Netchan_Encode(msg);
+#endif
 
-extern 	int oldsize;
-int newsize = 0;
+	Netchan_Transmit(chan, msg->cursize, msg->data);
+	
+	// Transmit all fragments without delay
+	while(CL_Netchan_TransmitNextFragment(chan))
+	{
+		Com_DPrintf("WARNING: #462 unsent fragments (not supposed to happen!)\n");
+	}
+}
 
 /*
 =================
@@ -163,7 +177,11 @@ bool CL_Netchan_Process( netchan_t *chan, msg_t *msg ) {
 	ret = Netchan_Process( chan, msg );
 	if (!ret)
 		return false;
-	CL_Netchan_Decode( msg );
-	newsize += msg->cursize;
+
+#ifdef LEGACY_PROTOCOL
+	if(chan->compat)
+		CL_Netchan_Decode(msg);
+#endif
+
 	return true;
 }

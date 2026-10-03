@@ -89,7 +89,7 @@ struct SV_Client
 	int					nextReliableTime_;			// svs.time when another reliable command will be allowed
 	int					lastPacketTime_;				// svs.time when packet was last received
 	int					lastConnectTime_;			// svs.time when connection started
-	int					nextSnapshotTime_;			// send another snapshot when svs.time >= nextSnapshotTime
+	int					lastSnapshotTime_;			// svs.time of last sent snapshot
 	bool				rateDelayed_;				// true if nextSnapshotTime was set based on rate instead of snapshotMsec
 	int					timeoutCount_;				// must timeout a few frames in a row so debugging doesn't break
 	ClientSnapshot		frames_[PACKET_BACKUP];		// updates can be delta'd from here

@@ -258,7 +258,9 @@ extern	cvar_t	*sv_killserver;
 extern	cvar_t	*sv_mapname;
 extern	cvar_t	*sv_mapChecksum;
 extern	cvar_t	*sv_serverid;
+extern	cvar_t	*sv_minRate;
 extern	cvar_t	*sv_maxRate;
+extern	cvar_t	*sv_dlRate;
 extern	cvar_t	*sv_minPing;
 extern	cvar_t	*sv_maxPing;
 extern	cvar_t	*sv_gametype;
@@ -274,6 +276,30 @@ extern	cvar_t	*sv_strictAuth;
 // sv_main.c
 //
 void SV_FinalMessage (char *message);
+typedef struct leakyBucket_s leakyBucket_t;
+struct leakyBucket_s {
+	netadrtype_t	type;
+
+	union {
+		byte	_4[4];
+		byte	_6[16];
+	} ipv;
+
+	int						lastTime;
+	signed char		burst;
+
+	long					hash;
+
+	leakyBucket_t *prev, *next;
+};
+
+extern leakyBucket_t outboundLeakyBucket;
+
+bool SVC_RateLimit( leakyBucket_t *bucket, int burst, int period );
+bool SVC_RateLimitAddress( netadr_t from, int burst, int period );
+
+int SV_RateMsec(SV_Client *client);
+
 //void QDECL SV_SendServerCommand( client_t *cl, const char *fmt, ...);
 void QDECL SV_SendServerCommand( SV_Client *cl, const char *fmt, ...) Q_PRINTF_FUNC(2, 3);
 
@@ -333,7 +359,9 @@ void SV_DropClient( SV_Client *drop, const char *reason );
 void SV_ExecuteClientCommand( SV_Client *cl, const char *s, bool clientOK );
 void SV_ClientThink (SV_Client *cl, usercmd_t *cmd);
 
-void SV_WriteDownloadToClient( SV_Client *cl , msg_t *msg );
+int SV_WriteDownloadToClient(SV_Client *cl, msg_t *msg);
+int SV_SendQueuedMessages(void);
+int SV_SendDownloadMessages(void);
 
 //
 // sv_ccmds.c
@@ -446,7 +474,9 @@ void SV_ClipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, con
 //bool SV_Netchan_Process( client_t *client, msg_t *msg );
 
 void SV_Netchan_Transmit( SV_Client *client, msg_t *msg);
-void SV_Netchan_TransmitNextFragment( SV_Client *client );
+int SV_Netchan_TransmitNextFragment(SV_Client *client);
+void SV_Netchan_FreeQueue(SV_Client *client);
+void SV_FreeClient(SV_Client *client);
 bool SV_Netchan_Process( SV_Client *client, msg_t *msg );
 
 #endif // __SERVER_H__
