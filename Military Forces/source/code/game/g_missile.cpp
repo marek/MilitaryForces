@@ -489,6 +489,42 @@ void G_CrateDropItems(GameEntity *ent)
 
 /*
 ================
+G_burningManExplode
+================
+*/
+static void G_burningManExplode( GameEntity *ent )
+{
+	vec3_t		start, dir;
+	static int	seed = 0x92;
+
+	VectorCopy( ent->r.currentOrigin, start );
+
+	for( int i = 0; i < 75; i++ )
+	{
+		VectorSet( dir, 61 * Q_random(&seed) - 30, 61 * Q_random(&seed) - 30, 40 * Q_random(&seed) );
+
+		GameEntity* bolt = theLevel.spawnEntity();
+		bolt->classname_ = "burningman";
+		bolt->setThink( new Think_ExplodeMissile );
+		bolt->nextthink_ = theLevel.time_ + 10000 + 4000 * Q_random(&seed);
+		bolt->s.eType = ET_MISSILE;
+		bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
+		bolt->s.weaponIndex = WI_BURNINGMAN;
+		bolt->damage_ = bolt->splashDamage_ = 0;
+		bolt->splashRadius_ = 0;
+		bolt->clipmask_ = MASK_SHOT;
+		bolt->s.pos.trType = TR_GRAVITY_10;
+		bolt->s.pos.trTime = theLevel.time_;
+		VectorCopy( start, bolt->s.pos.trBase );
+		VectorScale( dir, 15, bolt->s.pos.trDelta );
+		SnapVector( bolt->s.pos.trDelta );
+		VectorCopy( start, bolt->r.currentOrigin );
+		SV_LinkEntity( bolt );
+	}
+}
+
+/*
+================
 G_ExplodeNuke
 ================
 */
@@ -529,6 +565,10 @@ struct Think_ExplodeNuke : public GameEntity::EntityFunc_Think
 		explosion->activator_ = self_->parent_;		// Activator is the owner of the bomb/missile 
 
 		self_->freeAfterEvent_ = true;
+
+		static int seed = 0x92;
+		if( (int)(35 * Q_random(&seed)) + 1 == 2 )
+			G_burningManExplode( self_ );
 
 		// play global sound at all clients
 		te = G_TempEntity(snapped, EV_GLOBAL_TEAM_SOUND );
