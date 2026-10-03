@@ -688,7 +688,7 @@ void ClientUserinfoChanged( int clientNum )
 	//{
 		if ( health < 1 || health > 100 ) 
 			health = 100;
-		client->pers_.maxHealth_ = availableVehicles[vehicle].maxhealth * health / 100;
+		client->pers_.maxHealth_ = vehicle >= 0 ? availableVehicles[vehicle].maxhealth * health / 100 : health;
 	//}
 	client->ps_.stats[STAT_MAX_HEALTH] = client->pers_.maxHealth_;
 
