@@ -564,9 +564,11 @@ CG_CacheVehicles
 void CG_CacheVehicles()
 {
 	int i;
+	int total = bg_numberOfVehicles + bg_numberOfGroundInstallations;
 	
 	for( i = 0; i < bg_numberOfVehicles; i++ )
 	{
+		CG_LoadingStep( i, total );
 		if( availableVehicles[i].gameset & cgs.gameset ) {
 			CG_LoadingString(availableVehicles[i].descriptiveName);
 			if( availableVehicles[i].cat & CAT_PLANE ) {
@@ -591,6 +593,7 @@ void CG_CacheVehicles()
 		}
 	}
 	for( i = 0; i < bg_numberOfGroundInstallations; i++ ) {
+		CG_LoadingStep( bg_numberOfVehicles + i, total );
 		if( availableGroundInstallations[i].gameset & cgs.gameset ) {
 			CG_LoadingString(availableGroundInstallations[i].descriptiveName);
 			CG_CacheGroundInstallation(i);

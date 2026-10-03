@@ -41,10 +41,39 @@ CG_LoadingString
 
 ======================
 */
+static void CG_LoadingRefresh( bool force ) {
+	int hz = cgs.glconfig.displayFrequency > 0 ? cgs.glconfig.displayFrequency : 60;
+	int now = Sys_Milliseconds();
+
+	if ( !force && now - cg.infoLoadRefreshTime < 1000 / hz ) {
+		return;
+	}
+	cg.infoLoadRefreshTime = now;
+
+	SCR_UpdateScreen();
+}
+
 void CG_LoadingString( const char *s ) {
 	Q_strncpyz( cg.infoScreenText, s, sizeof( cg.infoScreenText ) );
 
-	SCR_UpdateScreen();
+	CG_LoadingRefresh( false );
+}
+
+void CG_LoadingStage( const char *s, float start, float end ) {
+	Q_strncpyz( cg.infoScreenText, s, sizeof( cg.infoScreenText ) );
+	cg.infoLoadStart = start;
+	cg.infoLoadEnd = end;
+	cg.infoLoadFraction = start;
+
+	CG_LoadingRefresh( true );
+}
+
+void CG_LoadingStep( int done, int total ) {
+	if ( total > 0 ) {
+		cg.infoLoadFraction = cg.infoLoadStart + ( cg.infoLoadEnd - cg.infoLoadStart ) * done / total;
+	}
+
+	CG_LoadingRefresh( false );
 }
 
 
@@ -135,6 +164,19 @@ void CG_DrawInformation( void ) {
 	if ( cg.infoScreenText[0] )
 	{
 		UI_DrawProportionalString( 320, 170, va("Loading... %s", cg.infoScreenText), UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
+		if ( cg.infoLoadFraction > 0 )
+		{
+			rectDef_t p;
+
+			if ( !cgs.media.whiteShader )
+				cgs.media.whiteShader = refExport.RegisterShader( "white" );
+
+			p.x = 0;
+			p.y = 323;
+			p.h = 15;
+			p.w = 640;
+			CG_DrawProgressBar( &p, colorDkGrey, colorWhite, 12.0f, UI_SMALLFONT|UI_INVERSE|UI_CENTER, cg.infoLoadFraction );
+		}
 	}
 	else
 	{

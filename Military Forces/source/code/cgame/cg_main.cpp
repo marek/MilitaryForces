@@ -623,6 +623,7 @@ static void CG_RegisterSounds( void ) {
 			continue;	// custom sound
 		}
 		cgs.gameSounds[i] = S_RegisterSound( soundName, false );
+		CG_LoadingStep( i, MAX_SOUNDS );
 	}
 
 	// FIXME: only needed with item
@@ -1088,10 +1089,11 @@ static void CG_RegisterGraphics( void ) {
 			break;
 		}
 		cgs.gameModels[i] = refExport.RegisterModel( modelName);
+		CG_LoadingStep( i, MAX_MODELS );
 	}
 
 	// MFQ3 register all the vehicles
-	CG_LoadingString( "MFQ3 vehicles" );
+	CG_LoadingStage( "MFQ3 vehicles", 0.35f, 0.85f );
 	CG_CacheVehicles();
 
 }
@@ -2021,20 +2023,22 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	CG_ParseServerinfo();
 
 	// load the New map
-	CG_LoadingString( "collision map" );
+	CG_LoadingStage( "collision map", 0.0f, 0.1f );
 
 	CL_CM_LoadMap( cgs.mapname );
 
 	cgUtils.string_Init();
 
-	CG_LoadingString( "sounds" );
-	CG_LoadingString( "graphics" );
-
+	CG_LoadingStage( "sounds", 0.1f, 0.2f );
 	CG_RegisterSounds();
+
+	CG_LoadingStage( "graphics", 0.2f, 0.35f );
 	CG_RegisterGraphics();
+
+	CG_LoadingStage( "weapons", 0.85f, 0.95f );
 	CG_RegisterWeapons();
 
-	CG_LoadingString( "clients" );
+	CG_LoadingStage( "clients", 0.95f, 1.0f );
 
 	CG_RegisterClients();
 
@@ -2048,6 +2052,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 
 	// remove the last loading update
 	cg.infoScreenText[0] = 0;
+	cg.infoLoadFraction = 0;
 
 	// Make sure we have update values (scores)
 	CG_SetConfigValues();

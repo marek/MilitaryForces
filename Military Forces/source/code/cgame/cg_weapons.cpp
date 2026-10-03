@@ -270,6 +270,7 @@ void CG_RegisterWeapons() {
 	// for all weapon indexes in cg_weapons[]
 	for( i = 0; i < WI_MAX; i++ )
 	{
+		CG_LoadingStep( i, WI_MAX );
 		weaponInfo = &cg_weapons[i];
 		memset( weaponInfo, 0, sizeof( *weaponInfo ) );
 		weaponInfo->registered = true;

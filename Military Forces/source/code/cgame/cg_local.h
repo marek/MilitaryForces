@@ -507,6 +507,10 @@ typedef struct {
 
 	// information screen text during loading
 	char		infoScreenText[MAX_STRING_CHARS];
+	float		infoLoadFraction;
+	float		infoLoadStart;
+	float		infoLoadEnd;
+	int			infoLoadRefreshTime;
 
 	// scoreboard
 	int			scoresRequestTime;
@@ -1528,6 +1532,8 @@ void CG_ProcessSnapshots( void );
 // cg_info.c
 //
 void CG_LoadingString( const char *s );
+void CG_LoadingStage( const char *s, float start, float end );
+void CG_LoadingStep( int done, int total );
 void CG_DrawInformation( void );
 
 //
