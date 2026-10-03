@@ -611,7 +611,10 @@ typedef struct {
 	void	(*function)(void);
 } consoleCommand_t;
 
+static void CG_TmpVeh_f( void ) { Cvar_Set( "cg_nextVehicle", CG_Argv( 1 ) ); }
+
 static consoleCommand_t	commands[] = {
+	{ "tmpveh", CG_TmpVeh_f },
 	{ "testgun", CG_TestGun_f },
 	{ "testmodel", CG_TestModel_f },
 	{ "nextframe", CG_TestModelNextFrame_f },

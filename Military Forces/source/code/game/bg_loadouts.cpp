@@ -33,6 +33,7 @@ bool MF_distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout )
 	md3Tag_t tags[MAX_MOUNTS_PER_VEHICLE];
 
 	if( idx < 0 ) return false;
+	if( availableVehicles[idx].cat & CAT_LQM ) return false;
 
 	modelname = MF_CreateModelPathname( idx, "models/vehicles/%s/%s/%s.md3" );
 

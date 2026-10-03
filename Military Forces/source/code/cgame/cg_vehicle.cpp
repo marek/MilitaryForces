@@ -181,11 +181,25 @@ static animation_t * CG_ParseLQMAnimationFile( const char *filename ) {
 	return animations;
 }
 
+static qhandle_t CG_RegisterVehiclePart( const char *name, bool expected )
+{
+	fileHandle_t f;
+
+	if( FS_FOpenFileByMode( name, &f, FS_READ ) < 0 ) {
+		if( expected )
+			CG_Printf( "MFQ3 Warning: Unable to load model '%s'\n", name );
+		return 0;
+	}
+	FS_FCloseFile( f );
+	return refExport.RegisterModel( name );
+}
+
 static void CG_CachePlane(int index)
 {
 	char name[128];
 	char basename[128];
 	int i;
+	unsigned int caps = availableVehicles[index].caps;
 
 	Com_sprintf( basename, sizeof(basename), "models/vehicles/planes/%s/%s", availableVehicles[index].modelName,
 			availableVehicles[index].modelName );
@@ -226,7 +240,12 @@ static void CG_CachePlane(int index)
 			break;
 		}
 
-		availableVehicles[index].handle[i] = refExport.RegisterModel(name);
+		availableVehicles[index].handle[i] = CG_RegisterVehiclePart( name, 
+			( i == BP_PLANE_GEAR && ( caps & HC_GEAR ) ) ||
+			( i == BP_PLANE_BRAKES && ( caps & HC_SPEEDBRAKE ) ) ||
+			( i == BP_PLANE_BAY && ( caps & HC_WEAPONBAY ) ) ||
+			( ( i == BP_PLANE_WINGLEFT || i == BP_PLANE_WINGRIGHT ) && ( caps & HC_SWINGWING ) ) ||
+			( i == BP_PLANE_PROP && ( caps & HC_PROP ) ) );
 
 //		if( !availableVehicles[index].handle[i] ) {
 //			CG_Printf( "MFQ3 Warning: Unable to load model '%s'\n", name );
@@ -286,7 +305,8 @@ static void CG_CacheGroundVehicle(int index)
 			Com_sprintf( name, sizeof(name), "%s_w6.md3", basename );
 			break;
 		}
-		availableVehicles[index].handle[i] = refExport.RegisterModel(name);
+		availableVehicles[index].handle[i] = CG_RegisterVehiclePart( name, 
+			i >= BP_GV_WHEEL && ( availableVehicles[index].caps & HC_WHEELS ) && i - BP_GV_WHEEL < availableVehicles[index].wheels );
 //		if( !availableVehicles[index].handle[i] ) {
 //			CG_Printf( "MFQ3 Warning: Unable to load model '%s'\n", name );
 //		}
@@ -340,7 +360,7 @@ static void CG_CacheHelo(int index)
 			Com_sprintf( name, sizeof(name), "%s_gun2.md3", basename );
 			break;
 		}
-		availableVehicles[index].handle[i] = refExport.RegisterModel(name);
+		availableVehicles[index].handle[i] = CG_RegisterVehiclePart( name, false );
 	}
 
 	// only thing that always has to be there is body
@@ -379,7 +399,7 @@ static void CG_CacheLQM(int index)
 			Com_sprintf( name, sizeof(name), "%s_head.md3", basename );
 			break;
 		}
-		availableVehicles[index].handle[i] = refExport.RegisterModel(name);
+		availableVehicles[index].handle[i] = CG_RegisterVehiclePart( name, true );
 	}
 
 	// only thing that always has to be there is body
@@ -408,6 +428,7 @@ static void CG_CacheBoat(int index)
 {
 	char name[128];
 	char basename[128];
+	char body[128];
 	int i;
 
 	Com_sprintf( basename, sizeof(basename), "models/vehicles/sea/%s/%s", availableVehicles[index].modelName,
@@ -453,10 +474,17 @@ static void CG_CacheBoat(int index)
 			Com_sprintf( name, sizeof(name), "%s_gun4.md3", basename );
 			break;
 		}
-		availableVehicles[index].handle[i] = refExport.RegisterModel(name);
+		if( i == BP_BOAT_BODY ) {
+			availableVehicles[index].handle[i] = refExport.RegisterModel(name);
+		} else if( i & 1 ) {
+			static const char *turretTags[] = { "tag_turret", "tag_turret2", "tag_turret3", "tag_turret4" };
+			md3Tag_t tag;
 
-		if( !availableVehicles[index].handle[i] ) {
-			CG_Printf( "MFQ3 Warning: Unable to load model '%s'\n", name );
+			Com_sprintf( body, sizeof(body), "%s.md3", basename );
+			availableVehicles[index].handle[i] = CG_RegisterVehiclePart( name, 
+				availableVehicles[index].handle[BP_BOAT_BODY] && MF_findTag( body, turretTags[i/2], &tag ) );
+		} else {
+			availableVehicles[index].handle[i] = CG_RegisterVehiclePart( name, availableVehicles[index].handle[i-1] != 0 );
 		}
 	}
 
@@ -500,7 +528,7 @@ static void CG_CacheGroundInstallation(int index)
 			Com_sprintf( name, sizeof(name), "%s_upg.md3", basename );
 			break;
 		}
-		availableGroundInstallations[index].handle[i] = refExport.RegisterModel(name);
+		availableGroundInstallations[index].handle[i] = CG_RegisterVehiclePart( name, false );
 //		if( !availableVehicles[index].handle[i] ) {
 //			CG_Printf( "MFQ3 Warning: Unable to load model '%s'\n", name );
 //		}

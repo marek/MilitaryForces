@@ -231,6 +231,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 
 	// vehicle index for next spawning
 	int vehIndex = atoi( Info_ValueForKey( userinfo, "cg_nextVehicle" ) );
+	Com_Printf("DBG spawn vehIndex %d cat %d\n", vehIndex, vehIndex >= 0 ? availableVehicles[vehIndex].cat : -1);
 
 	GameEntity* ent;
 	switch( vehIndex >= 0 ? availableVehicles[vehIndex].cat : 0 )
@@ -366,6 +367,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 		}
 	}
 
+	Com_Printf("DBG spawn reached active, origin %f %f %f\n", spawn_origin[0], spawn_origin[1], spawn_origin[2]);
 	client->pers_.teamState_.state_ = GameClient::ClientPersistant::PlayerTeamState::TEAM_ACTIVE;
 
 	// toggle the teleport bit so the client knows to not lerp

@@ -392,7 +392,8 @@ void MF_LoadAllVehicleData()
 		modelbasename = MF_CreateModelPathname( i, "models/vehicles/%s/%s/%s" );	
 		// boundingbox
 		Com_sprintf( name, sizeof(name), "%s.md3", modelbasename );
-		MF_getDimensions( name, 0, &availableVehicles[i].maxs, &availableVehicles[i].mins );
+		if( !(availableVehicles[i].cat & CAT_LQM) )
+			MF_getDimensions( name, 0, &availableVehicles[i].maxs, &availableVehicles[i].mins );
 		availableVehicles[i].mins[2] += 1;// to look better ?
 
 		// helo/plane specific
