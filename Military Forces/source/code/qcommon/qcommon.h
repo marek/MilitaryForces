@@ -976,15 +976,7 @@ NON-PORTABLE SYSTEM SERVICES
 ==============================================================
 */
 
-typedef enum {
-	AXIS_SIDE,
-	AXIS_FORWARD,
-	AXIS_UP,
-	AXIS_ROLL,
-	AXIS_YAW,
-	AXIS_PITCH,
-	MAX_JOYSTICK_AXIS
-} joystickAxis_t;
+#define MAX_JOYSTICK_AXIS 16
 
 typedef enum {
   // bk001129 - make sure SE_NONE is zero
@@ -1003,6 +995,10 @@ typedef struct {
 	int				evPtrLength;	// bytes of data pointed to by evPtr, for journaling
 	void			*evPtr;			// this must be manually freed if not NULL
 } sysEvent_t;
+
+void	Com_QueueEvent( int time, sysEventType_t type, int value, int value2, int ptrLength, void *ptr );
+sysEvent_t	Com_GetSystemEvent( void );
+
 
 sysEvent_t	Sys_GetEvent( void );
 

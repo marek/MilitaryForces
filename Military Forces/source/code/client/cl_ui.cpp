@@ -680,25 +680,6 @@ void Key_GetBindingBuf( int keynum, char *buf, int buflen )
 	}
 }
 
-/*
-====================
-Key_GetCatcher
-====================
-*/
-int Key_GetCatcher() 
-{
-	return cls.keyCatchers;
-}
-
-/*
-====================
-Ket_SetCatcher
-====================
-*/
-void Key_SetCatcher( int catcher ) 
-{
-	cls.keyCatchers = catcher;
-}
 
 
 ///*

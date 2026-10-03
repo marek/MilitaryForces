@@ -158,7 +158,7 @@ ControlUtils::getKeyAssignment( const char* command, int* twokeys )
 	twokeys[0] = twokeys[1] = -1;
 	count = 0;
 
-	for ( j = 0; j < 256; j++ )
+	for ( j = 0; j < K_LAST_KEY; j++ )
 	{
 		utils_->dc_->getBindingBuf( j, b, 256 );
 		if ( *b == 0 ) 

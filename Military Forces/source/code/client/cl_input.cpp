@@ -391,13 +391,15 @@ CL_JoystickMove
 =================
 */
 void CL_JoystickMove( usercmd_t *cmd ) {
-	int		movespeed;
 	float	anglespeed;
 
-	if ( in_speed.active ^ cl_run->integer ) {
-		movespeed = 2;
-	} else {
-		movespeed = 1;
+	float yaw     = j_yaw->value     * cl.joystickAxis[j_yaw_axis->integer];
+	float right   = j_side->value    * cl.joystickAxis[j_side_axis->integer];
+	float forward = j_forward->value * cl.joystickAxis[j_forward_axis->integer];
+	float pitch   = j_pitch->value   * cl.joystickAxis[j_pitch_axis->integer];
+	float up      = j_up->value      * cl.joystickAxis[j_up_axis->integer];
+
+	if ( !(in_speed.active ^ cl_run->integer) ) {
 		cmd->buttons |= BUTTON_XXX2;
 	}
 
@@ -408,18 +410,22 @@ void CL_JoystickMove( usercmd_t *cmd ) {
 	}
 
 	if ( !in_strafe.active ) {
-		cl.viewangles[YAW] += anglespeed * cl_yawspeed->value * cl.joystickAxis[AXIS_SIDE];
+		cl.viewangles[YAW] += anglespeed * yaw;
+		cmd->rightmove = ClampChar( cmd->rightmove + (int)right );
 	} else {
-		cmd->rightmove = ClampChar( cmd->rightmove + cl.joystickAxis[AXIS_SIDE] );
+		cl.viewangles[YAW] += anglespeed * right;
+		cmd->rightmove = ClampChar( cmd->rightmove + (int)yaw );
 	}
 
 	if ( in_mlooking ) {
-		cl.viewangles[PITCH] += anglespeed * cl_pitchspeed->value * cl.joystickAxis[AXIS_FORWARD];
+		cl.viewangles[PITCH] += anglespeed * forward;
+		cmd->forwardmove = ClampChar( cmd->forwardmove + (int)pitch );
 	} else {
-		cmd->forwardmove = ClampChar( cmd->forwardmove + cl.joystickAxis[AXIS_FORWARD] );
+		cl.viewangles[PITCH] += anglespeed * pitch;
+		cmd->forwardmove = ClampChar( cmd->forwardmove + (int)forward );
 	}
 
-	cmd->upmove = ClampChar( cmd->upmove + cl.joystickAxis[AXIS_UP] );
+	cmd->upmove = ClampChar( cmd->upmove + (int)up );
 }
 
 /*
@@ -569,10 +575,10 @@ usercmd_t CL_CreateCmd( void ) {
 	// draw debug graphs of turning for mouse testing
 	if ( cl_debugMove->integer ) {
 		if ( cl_debugMove->integer == 1 ) {
-			SCR_DebugGraph( fabs(cl.viewangles[YAW] - oldAngles[YAW]), 0 );
+			SCR_DebugGraph( fabs(cl.viewangles[YAW] - oldAngles[YAW]) );
 		}
 		if ( cl_debugMove->integer == 2 ) {
-			SCR_DebugGraph( fabs(cl.viewangles[PITCH] - oldAngles[PITCH]), 0 );
+			SCR_DebugGraph( fabs(cl.viewangles[PITCH] - oldAngles[PITCH]) );
 		}
 	}
 

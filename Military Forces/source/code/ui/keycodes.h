@@ -1,6 +1,25 @@
 /*
- * $Id: keycodes.h,v 1.2 2005-09-02 08:00:21 thebjoern Exp $
+===========================================================================
+Copyright (C) 1999-2005 Id Software, Inc.
+
+This file is part of Quake III Arena source code.
+
+Quake III Arena source code is free software; you can redistribute it
+and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 2 of the License,
+or (at your option) any later version.
+
+Quake III Arena source code is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Quake III Arena source code; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+===========================================================================
 */
+//
 #ifndef __KEYCODES_H__
 #define __KEYCODES_H__
 
@@ -132,13 +151,164 @@ typedef enum {
 	K_AUX15,
 	K_AUX16,
 
-	K_LAST_KEY		// this had better be <256!
+	K_WORLD_0,
+	K_WORLD_1,
+	K_WORLD_2,
+	K_WORLD_3,
+	K_WORLD_4,
+	K_WORLD_5,
+	K_WORLD_6,
+	K_WORLD_7,
+	K_WORLD_8,
+	K_WORLD_9,
+	K_WORLD_10,
+	K_WORLD_11,
+	K_WORLD_12,
+	K_WORLD_13,
+	K_WORLD_14,
+	K_WORLD_15,
+	K_WORLD_16,
+	K_WORLD_17,
+	K_WORLD_18,
+	K_WORLD_19,
+	K_WORLD_20,
+	K_WORLD_21,
+	K_WORLD_22,
+	K_WORLD_23,
+	K_WORLD_24,
+	K_WORLD_25,
+	K_WORLD_26,
+	K_WORLD_27,
+	K_WORLD_28,
+	K_WORLD_29,
+	K_WORLD_30,
+	K_WORLD_31,
+	K_WORLD_32,
+	K_WORLD_33,
+	K_WORLD_34,
+	K_WORLD_35,
+	K_WORLD_36,
+	K_WORLD_37,
+	K_WORLD_38,
+	K_WORLD_39,
+	K_WORLD_40,
+	K_WORLD_41,
+	K_WORLD_42,
+	K_WORLD_43,
+	K_WORLD_44,
+	K_WORLD_45,
+	K_WORLD_46,
+	K_WORLD_47,
+	K_WORLD_48,
+	K_WORLD_49,
+	K_WORLD_50,
+	K_WORLD_51,
+	K_WORLD_52,
+	K_WORLD_53,
+	K_WORLD_54,
+	K_WORLD_55,
+	K_WORLD_56,
+	K_WORLD_57,
+	K_WORLD_58,
+	K_WORLD_59,
+	K_WORLD_60,
+	K_WORLD_61,
+	K_WORLD_62,
+	K_WORLD_63,
+	K_WORLD_64,
+	K_WORLD_65,
+	K_WORLD_66,
+	K_WORLD_67,
+	K_WORLD_68,
+	K_WORLD_69,
+	K_WORLD_70,
+	K_WORLD_71,
+	K_WORLD_72,
+	K_WORLD_73,
+	K_WORLD_74,
+	K_WORLD_75,
+	K_WORLD_76,
+	K_WORLD_77,
+	K_WORLD_78,
+	K_WORLD_79,
+	K_WORLD_80,
+	K_WORLD_81,
+	K_WORLD_82,
+	K_WORLD_83,
+	K_WORLD_84,
+	K_WORLD_85,
+	K_WORLD_86,
+	K_WORLD_87,
+	K_WORLD_88,
+	K_WORLD_89,
+	K_WORLD_90,
+	K_WORLD_91,
+	K_WORLD_92,
+	K_WORLD_93,
+	K_WORLD_94,
+	K_WORLD_95,
+
+	K_SUPER,
+	K_COMPOSE,
+	K_MODE,
+	K_HELP,
+	K_PRINT,
+	K_SYSREQ,
+	K_SCROLLOCK,
+	K_BREAK,
+	K_MENU,
+	K_EURO,
+	K_UNDO,
+
+	// Gamepad controls
+	K_PAD0_A,
+	K_PAD0_B,
+	K_PAD0_X,
+	K_PAD0_Y,
+	K_PAD0_BACK,
+	K_PAD0_GUIDE,
+	K_PAD0_START,
+	K_PAD0_LEFTSTICK_CLICK,
+	K_PAD0_RIGHTSTICK_CLICK,
+	K_PAD0_LEFTSHOULDER,
+	K_PAD0_RIGHTSHOULDER,
+	K_PAD0_DPAD_UP,
+	K_PAD0_DPAD_DOWN,
+	K_PAD0_DPAD_LEFT,
+	K_PAD0_DPAD_RIGHT,
+
+	K_PAD0_LEFTSTICK_LEFT,
+	K_PAD0_LEFTSTICK_RIGHT,
+	K_PAD0_LEFTSTICK_UP,
+	K_PAD0_LEFTSTICK_DOWN,
+	K_PAD0_RIGHTSTICK_LEFT,
+	K_PAD0_RIGHTSTICK_RIGHT,
+	K_PAD0_RIGHTSTICK_UP,
+	K_PAD0_RIGHTSTICK_DOWN,
+	K_PAD0_LEFTTRIGGER,
+	K_PAD0_RIGHTTRIGGER,
+
+	K_PAD0_MISC1,    /* Xbox Series X share button, PS5 microphone button, Nintendo Switch Pro capture button, Amazon Luna microphone button */
+	K_PAD0_PADDLE1,  /* Xbox Elite paddle P1 */
+	K_PAD0_PADDLE2,  /* Xbox Elite paddle P3 */
+	K_PAD0_PADDLE3,  /* Xbox Elite paddle P2 */
+	K_PAD0_PADDLE4,  /* Xbox Elite paddle P4 */
+	K_PAD0_TOUCHPAD, /* PS4/PS5 touchpad button */
+
+	// Pseudo-key that brings the console down
+	K_CONSOLE,
+
+	MAX_KEYS
 } keyNum_t;
 
+// MAX_KEYS replaces K_LAST_KEY, however some mods may have used K_LAST_KEY
+// in detecting binds, so we leave it defined to the old hardcoded value
+// of maxiumum keys to prevent mods from crashing older versions of the engine
+#define K_LAST_KEY              256
 
 // The menu code needs to get both key and char events, but
 // to avoid duplicating the paths, the char events are just
 // distinguished by or'ing in K_CHAR_FLAG (ugly)
 #define	K_CHAR_FLAG		1024
 
-#endif	// __KEYCODES_H__
+#endif

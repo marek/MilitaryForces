@@ -44,11 +44,6 @@ static char binaryPath[ MAX_OSPATH ] = { 0 };
 static char installPath[ MAX_OSPATH ] = { 0 };
 static char cdPath[ MAX_OSPATH ] = { 0 };
 
-#define	MAX_QUED_EVENTS		256
-#define	MASK_QUED_EVENTS	( MAX_QUED_EVENTS - 1 )
-
-static sysEvent_t	eventQue[MAX_QUED_EVENTS];
-static int			eventHead, eventTail;
 
 /*
 =================
@@ -442,82 +437,6 @@ void QDECL Sys_Error( const char *error, ... )
 	Sys_Exit( 3 );
 }
 
-/*
-================
-Sys_QueEvent
-
-A time of 0 will get the current time
-Ptr should either be null, or point to a block of data that can
-be freed by the game later.
-================
-*/
-void Sys_QueEvent( int time, sysEventType_t type, int value, int value2, int ptrLength, void *ptr ) {
-	sysEvent_t	*ev;
-
-	ev = &eventQue[ eventHead & MASK_QUED_EVENTS ];
-	if ( eventHead - eventTail >= MAX_QUED_EVENTS ) {
-		Com_Printf("Sys_QueEvent: overflow\n");
-		// we are discarding an event, but don't leak memory
-		if ( ev->evPtr ) {
-			Z_Free( ev->evPtr );
-		}
-		eventTail++;
-	}
-
-	eventHead++;
-
-	if ( time == 0 ) {
-		time = Sys_Milliseconds();
-	}
-
-	ev->evTime = time;
-	ev->evType = type;
-	ev->evValue = value;
-	ev->evValue2 = value2;
-	ev->evPtrLength = ptrLength;
-	ev->evPtr = ptr;
-}
-
-/*
-================
-Sys_GetEvent
-================
-*/
-sysEvent_t Sys_GetEvent( void ) {
-	sysEvent_t	ev;
-	char		*s;
-
-	// return if we have data
-	if ( eventHead > eventTail ) {
-		eventTail++;
-		return eventQue[ ( eventTail - 1 ) & MASK_QUED_EVENTS ];
-	}
-
-	// check for console commands
-	s = Sys_ConsoleInput();
-	if ( s ) {
-		char	*b;
-		int		len;
-
-		len = strlen( s ) + 1;
-		b = reinterpret_cast<char*>(Z_Malloc( len ));
-		Q_strncpyz( b, s, len );
-		Sys_QueEvent( 0, SE_CONSOLE, 0, 0, len, b );
-	}
-
-	// return if we have data
-	if ( eventHead > eventTail ) {
-		eventTail++;
-		return eventQue[ ( eventTail - 1 ) & MASK_QUED_EVENTS ];
-	}
-
-	// create an empty event to return
-
-	memset( &ev, 0, sizeof( ev ) );
-	ev.evTime = Sys_Milliseconds();
-
-	return ev;
-}
 
 void Sys_SnapVector( float *v )
 {

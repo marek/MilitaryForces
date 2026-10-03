@@ -457,7 +457,8 @@ bool Q_IsColorString(const char *p);  // ^[0-9a-zA-Z]
 #define COLOR_CYAN		'5'
 #define COLOR_MAGENTA	'6'
 #define COLOR_WHITE		'7'
-#define ColorIndex(c)	( ( (c) - '0' ) & 7 )
+#define ColorIndexForNumber(c) ((c) & 0x07)
+#define ColorIndex(c) (ColorIndexForNumber((c) - '0'))
 
 #define S_COLOR_BLACK	"^0"
 #define S_COLOR_RED		"^1"

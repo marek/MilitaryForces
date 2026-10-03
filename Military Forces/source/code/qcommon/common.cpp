@@ -2006,6 +2006,112 @@ void Com_InitJournaling( void ) {
 	}
 }
 
+#define MAX_QUEUED_EVENTS  256
+#define MASK_QUEUED_EVENTS ( MAX_QUEUED_EVENTS - 1 )
+
+static sysEvent_t  eventQueue[ MAX_QUEUED_EVENTS ];
+static int         eventHead = 0;
+static int         eventTail = 0;
+
+/*
+================
+Com_QueueEvent
+
+A time of 0 will get the current time
+Ptr should either be null, or point to a block of data that can
+be freed by the game later.
+================
+*/
+void Com_QueueEvent( int time, sysEventType_t type, int value, int value2, int ptrLength, void *ptr )
+{
+	sysEvent_t  *ev;
+
+	// combine mouse movement with previous mouse event
+	if ( type == SE_MOUSE && eventHead != eventTail )
+	{
+		ev = &eventQueue[ ( eventHead + MAX_QUEUED_EVENTS - 1 ) & MASK_QUEUED_EVENTS ];
+
+		if ( ev->evType == SE_MOUSE )
+		{
+			ev->evValue += value;
+			ev->evValue2 += value2;
+			return;
+		}
+	}
+
+	ev = &eventQueue[ eventHead & MASK_QUEUED_EVENTS ];
+
+	if ( eventHead - eventTail >= MAX_QUEUED_EVENTS )
+	{
+		Com_Printf("Com_QueueEvent: overflow\n");
+		// we are discarding an event, but don't leak memory
+		if ( ev->evPtr )
+		{
+			Z_Free( ev->evPtr );
+		}
+		eventTail++;
+	}
+
+	eventHead++;
+
+	if ( time == 0 )
+	{
+		time = Sys_Milliseconds();
+	}
+
+	ev->evTime = time;
+	ev->evType = type;
+	ev->evValue = value;
+	ev->evValue2 = value2;
+	ev->evPtrLength = ptrLength;
+	ev->evPtr = ptr;
+}
+
+/*
+================
+Com_GetSystemEvent
+
+================
+*/
+sysEvent_t Com_GetSystemEvent( void )
+{
+	sysEvent_t  ev;
+	char        *s;
+
+	// return if we have data
+	if ( eventHead > eventTail )
+	{
+		eventTail++;
+		return eventQueue[ ( eventTail - 1 ) & MASK_QUEUED_EVENTS ];
+	}
+
+	// check for console commands
+	s = Sys_ConsoleInput();
+	if ( s )
+	{
+		char  *b;
+		int   len;
+
+		len = strlen( s ) + 1;
+		b = (char *)Z_Malloc( len );
+		strcpy( b, s );
+		Com_QueueEvent( 0, SE_CONSOLE, 0, 0, len, b );
+	}
+
+	// return if we have data
+	if ( eventHead > eventTail )
+	{
+		eventTail++;
+		return eventQueue[ ( eventTail - 1 ) & MASK_QUEUED_EVENTS ];
+	}
+
+	// create an empty event to return
+	memset( &ev, 0, sizeof( ev ) );
+	ev.evTime = Sys_Milliseconds();
+
+	return ev;
+}
+
 /*
 =================
 Com_GetRealEvent
@@ -2029,7 +2135,7 @@ sysEvent_t	Com_GetRealEvent( void ) {
 			}
 		}
 	} else {
-		ev = Sys_GetEvent();
+		ev = Com_GetSystemEvent();
 
 		// write the journal value out if needed
 		if ( com_journal->integer == 1 ) {

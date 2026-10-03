@@ -479,7 +479,7 @@ void Con_Close( void );
 void	SCR_Init (void);
 void	SCR_UpdateScreen (void);
 
-void	SCR_DebugGraph (float value, int color);
+void	SCR_DebugGraph (float value);
 
 int		SCR_GetBigStringWidth( const char *str );	// returns in virtual 640x480 coordinates
 
@@ -489,11 +489,33 @@ void	SCR_FillRect( float x, float y, float width, float height,
 void	SCR_DrawPic( float x, float y, float width, float height, qhandle_t hShader );
 void	SCR_DrawNamedPic( float x, float y, float width, float height, const char *picname );
 
-void	SCR_DrawBigString( int x, int y, const char *s, float alpha );			// draws a string with embedded color control characters with fade
-void	SCR_DrawBigStringColor( int x, int y, const char *s, vec4_t color );	// ignores embedded color control characters
-void	SCR_DrawSmallStringExt( int x, int y, const char *string, float *setColor, bool forceColor );
+void	SCR_DrawBigString( int x, int y, const char *s, float alpha, bool noColorEscape );			// draws a string with embedded color control characters with fade
+void	SCR_DrawBigStringColor( int x, int y, const char *s, vec4_t color, bool noColorEscape );	// ignores embedded color control characters
+void	SCR_DrawSmallStringExt( int x, int y, const char *string, float *setColor, bool forceColor, bool noColorEscape );
 void	SCR_DrawSmallChar( int x, int y, int ch );
 
+
+
+extern	cvar_t	*cl_mouseAccelOffset;
+extern	cvar_t	*cl_mouseAccelStyle;
+extern	cvar_t	*j_pitch;
+extern	cvar_t	*j_yaw;
+extern	cvar_t	*j_forward;
+extern	cvar_t	*j_side;
+extern	cvar_t	*j_up;
+extern	cvar_t	*j_pitch_axis;
+extern	cvar_t	*j_yaw_axis;
+extern	cvar_t	*j_forward_axis;
+extern	cvar_t	*j_side_axis;
+extern	cvar_t	*j_up_axis;
+extern	cvar_t	*cl_consoleKeys;
+
+int Key_StringToKeynum( char *str );
+extern int g_smallchar_width;
+extern int g_smallchar_height;
+void Con_Shutdown(void);
+void CL_LoadConsoleHistory( void );
+void CL_SaveConsoleHistory( void );
 
 //
 // cl_cin.c

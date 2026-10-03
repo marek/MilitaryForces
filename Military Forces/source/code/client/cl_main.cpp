@@ -50,6 +50,19 @@ cvar_t	*cl_timedemo;
 cvar_t	*cl_renderer;
 static void	*rendererLib = NULL;
 #endif
+cvar_t	*cl_mouseAccelOffset;
+cvar_t	*cl_mouseAccelStyle;
+cvar_t	*j_pitch;
+cvar_t	*j_yaw;
+cvar_t	*j_forward;
+cvar_t	*j_side;
+cvar_t	*j_up;
+cvar_t	*j_pitch_axis;
+cvar_t	*j_yaw_axis;
+cvar_t	*j_forward_axis;
+cvar_t	*j_side_axis;
+cvar_t	*j_up_axis;
+cvar_t	*cl_consoleKeys;
 cvar_t	*cl_aviFrameRate;
 cvar_t	*cl_aviMotionJpeg;
 cvar_t	*cl_forceavidemo;
@@ -2229,7 +2242,7 @@ void CL_Frame ( int msec )
 	cls.realtime += cls.frametime;
 
 	if ( cl_timegraph->integer ) 
-		SCR_DebugGraph ( cls.realFrametime * 0.25, 0 );
+		SCR_DebugGraph ( cls.realFrametime * 0.25 );
 
 	// see if we need to update any userinfo
 	CL_CheckUserinfo();
@@ -2639,6 +2652,28 @@ void CL_Init( void ) {
 	cl_showMouseRate = Cvar_Get ("cl_showmouserate", "0", 0);
 
 	cl_allowDownload = Cvar_Get ("cl_allowDownload", "0", CVAR_ARCHIVE);
+
+	j_pitch =        Cvar_Get ("j_pitch",        "0.022", CVAR_ARCHIVE);
+	j_yaw =          Cvar_Get ("j_yaw",          "-0.022", CVAR_ARCHIVE);
+	j_forward =      Cvar_Get ("j_forward",      "-0.25", CVAR_ARCHIVE);
+	j_side =         Cvar_Get ("j_side",         "0.25", CVAR_ARCHIVE);
+	j_up =           Cvar_Get ("j_up",           "0", CVAR_ARCHIVE);
+
+	j_pitch_axis =   Cvar_Get ("j_pitch_axis",   "3", CVAR_ARCHIVE);
+	j_yaw_axis =     Cvar_Get ("j_yaw_axis",     "2", CVAR_ARCHIVE);
+	j_forward_axis = Cvar_Get ("j_forward_axis", "1", CVAR_ARCHIVE);
+	j_side_axis =    Cvar_Get ("j_side_axis",    "0", CVAR_ARCHIVE);
+	j_up_axis =      Cvar_Get ("j_up_axis",      "4", CVAR_ARCHIVE);
+
+	Cvar_CheckRange(j_pitch_axis, 0, MAX_JOYSTICK_AXIS-1, true);
+	Cvar_CheckRange(j_yaw_axis, 0, MAX_JOYSTICK_AXIS-1, true);
+	Cvar_CheckRange(j_forward_axis, 0, MAX_JOYSTICK_AXIS-1, true);
+	Cvar_CheckRange(j_side_axis, 0, MAX_JOYSTICK_AXIS-1, true);
+	Cvar_CheckRange(j_up_axis, 0, MAX_JOYSTICK_AXIS-1, true);
+
+	// ~ and `, as keys and characters
+	cl_consoleKeys = Cvar_Get( "cl_consoleKeys", "~ ` 0x7e 0x60", CVAR_ARCHIVE);
+
 #ifdef USE_HTTP
 	if(!CL_HTTP_Init()) {
 		Com_Printf("WARNING: couldn't initialize HTTP download support\n");
