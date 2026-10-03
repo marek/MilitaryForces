@@ -425,7 +425,7 @@ void SV_SpawnServer( char *server, bool killBots )
 	CL_MapLoading();
 
 	// make sure all the client stuff is unloaded
-	CL_ShutdownAll();
+	CL_ShutdownAll(false);
 
 	// clear the whole hunk because we're (re)loading the server
 	Hunk_Clear();
@@ -716,7 +716,7 @@ not just stuck on the outgoing message list, because the server is going
 to totally exit after returning from this function.
 ==================
 */
-void SV_FinalMessage( char *message ) 
+void SV_FinalMessage( const char *message ) 
 {
 
 	// send it twice, ignoring rate
@@ -754,7 +754,7 @@ Called when each game quits,
 before Sys_Quit or Sys_Error
 ================
 */
-void SV_Shutdown( char *finalmsg ) 
+void SV_Shutdown( const char *finalmsg ) 
 {
 	if ( !com_sv_running || !com_sv_running->integer ) 
 		return;

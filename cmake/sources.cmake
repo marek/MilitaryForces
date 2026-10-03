@@ -50,7 +50,7 @@ set(RENDERER_SOURCES ${RENDERER_COMMON_SOURCES} ${RENDERER_GL1_SOURCES})
 set(QCOMMON_SOURCES
     qcommon/cm_load.cpp qcommon/cm_patch.cpp qcommon/cm_polylib.cpp qcommon/cm_test.cpp
     qcommon/cm_trace.cpp qcommon/cmd.cpp qcommon/common.cpp qcommon/cvar.cpp qcommon/files.cpp
-    qcommon/huffman.cpp qcommon/md4.cpp qcommon/msg.cpp qcommon/net_chan.cpp qcommon/unzip.cpp
+    qcommon/huffman.cpp qcommon/md4.cpp qcommon/md5.cpp qcommon/msg.cpp qcommon/net_chan.cpp qcommon/unzip.cpp
     game/q_math.cpp game/q_shared.cpp)
 list(TRANSFORM QCOMMON_SOURCES PREPEND "${SOURCE_DIR}/")
 

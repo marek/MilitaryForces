@@ -15,7 +15,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Foobar; if not, write to the Free Software
+along with Quake III Arena source code; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
@@ -37,8 +37,15 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "cl_http.h"
 #endif /* USE_HTTP */
 
-#define	RETRANSMIT_TIMEOUT	3000	// time between connection packet retransmits
+#ifdef USE_VOIP
+#include <opus.h>
+#endif
 
+// file full of random crap that gets used to create cl_guid
+#define QKEY_FILE "qkey"
+#define QKEY_SIZE 2048
+
+#define	RETRANSMIT_TIMEOUT	3000	// time between connection packet retransmits
 
 // snapshots are a view of the server at a given time
 typedef struct {
@@ -68,7 +75,7 @@ typedef struct {
 =============================================================================
 
 the clientActive_t structure is wiped completely at every
-New gamestate_t, potentially several times during an established connection
+new gamestate_t, potentially several times during an established connection
 
 =============================================================================
 */
@@ -153,13 +160,17 @@ demo through a file.
 =============================================================================
 */
 
+#define MAX_TIMEDEMO_DURATIONS	4096
 
 typedef struct {
+
+	connstate_t	state;				// connection status
 
 	int			clientNum;
 	int			lastPacketSentTime;			// for retransmits during connection
 	int			lastPacketTime;				// for timeouts
 
+	char		servername[MAX_OSPATH];		// name of server from original connect (used by reconnect)
 	netadr_t	serverAddress;
 	int			connectTime;				// for connection retransmits
 	int			connectPacketCount;			// for display on connection dialog
@@ -190,12 +201,6 @@ typedef struct {
 	fileHandle_t download;
 	char		downloadTempName[MAX_OSPATH];
 	char		downloadName[MAX_OSPATH];
-	int			downloadNumber;
-	int			downloadBlock;	// block we are waiting for
-	int			downloadCount;	// how many bytes we got
-	int			downloadSize;	// how many bytes we got
-	char		downloadList[MAX_INFO_STRING]; // list of paks we need to download
-	bool	downloadRestart;	// if true, we need to do another FS_Restart because we downloaded a pak
 #ifdef USE_HTTP
 	bool	httpUsed;
 	bool	disconnectedForHttpDownload;
@@ -203,6 +208,12 @@ typedef struct {
 #endif /* USE_HTTP */
 	int		sv_allowDownload;
 	char		sv_dlURL[MAX_CVAR_VALUE_STRING];
+	int			downloadNumber;
+	int			downloadBlock;	// block we are waiting for
+	int			downloadCount;	// how many bytes we got
+	int			downloadSize;	// how many bytes we got
+	char		downloadList[MAX_INFO_STRING]; // list of paks we need to download
+	bool	downloadRestart;	// if true, we need to do another FS_Restart because we downloaded a pak
 
 	// demo information
 	char		demoName[MAX_QPATH];
@@ -216,9 +227,44 @@ typedef struct {
 	int			timeDemoFrames;		// counter of rendered frames
 	int			timeDemoStart;		// cls.realtime before first frame
 	int			timeDemoBaseTime;	// each frame will be at this time + frameNum * 50
+	int			timeDemoLastFrame;// time the last frame was rendered
+	int			timeDemoMinDuration;	// minimum frame duration
+	int			timeDemoMaxDuration;	// maximum frame duration
+	unsigned char	timeDemoDurations[ MAX_TIMEDEMO_DURATIONS ];	// log of frame durations
 
 	float		aviVideoFrameRemainder;
 	float		aviSoundFrameRemainder;
+
+#ifdef USE_VOIP
+	bool voipEnabled;
+	bool voipCodecInitialized;
+
+	// incoming data...
+	// !!! FIXME: convert from parallel arrays to array of a struct.
+	OpusDecoder *opusDecoder[MAX_CLIENTS];
+	byte voipIncomingGeneration[MAX_CLIENTS];
+	int voipIncomingSequence[MAX_CLIENTS];
+	float voipGain[MAX_CLIENTS];
+	bool voipIgnore[MAX_CLIENTS];
+	bool voipMuteAll;
+
+	// outgoing data...
+	// if voipTargets[i / 8] & (1 << (i % 8)),
+	// then we are sending to clientnum i.
+	uint8_t voipTargets[(MAX_CLIENTS + 7) / 8];
+	uint8_t voipFlags;
+	OpusEncoder *opusEncoder;
+	int voipOutgoingDataSize;
+	int voipOutgoingDataFrames;
+	int voipOutgoingSequence;
+	byte voipOutgoingGeneration;
+	byte voipOutgoingData[1024];
+	float voipPower;
+#endif
+
+#ifdef LEGACY_PROTOCOL
+	bool compat;
+#endif
 
 	// big stuff at end of structure so most offsets are 15 bits or less
 	netchan_t	netchan;
@@ -231,6 +277,7 @@ extern	clientConnection_t clc;
 
 the clientStatic_t structure is never wiped, and is used even when
 no client connection is active at all
+(except when CL_Shutdown is called)
 
 ==================================================================
 */
@@ -244,7 +291,7 @@ typedef struct {
 
 typedef struct {
 	netadr_t	adr;
-	char	  	hostName[MAX_NAME_LENGTH];
+	char	  	hostName[MAX_HOSTNAME_LENGTH];
 	char	  	mapName[MAX_NAME_LENGTH];
 	char	  	game[MAX_NAME_LENGTH];
 	int			netType;
@@ -255,20 +302,13 @@ typedef struct {
 	int			maxPing;
 	int			ping;
 	bool	visible;
+	int			punkbuster;
+	int			g_humanplayers;
+	int			g_needpass;
 } serverInfo_t;
 
 typedef struct {
-	byte	ip[4];
-	unsigned short	port;
-} serverAddress_t;
-
-typedef struct {
-	connstate_t	state;				// connection status
-	int			keyCatchers;		// bit flags
-
 	bool	cddialog;			// bring up the cd needed dialog next frame
-
-	char		servername[MAX_OSPATH];		// name of server from original connect (used by reconnect)
 
 	// when the server clears the hunk, all of these must be restarted
 	bool	rendererStarted;
@@ -290,24 +330,21 @@ typedef struct {
 	serverInfo_t  globalServers[MAX_GLOBAL_SERVERS];
 	// additional global servers
 	int			numGlobalServerAddresses;
-	serverAddress_t		globalServerAddresses[MAX_GLOBAL_SERVERS];
+	netadr_t		globalServerAddresses[MAX_GLOBAL_SERVERS];
 
 	int			numfavoriteservers;
 	serverInfo_t	favoriteServers[MAX_OTHER_SERVERS];
 
-	int			nummplayerservers;
-	serverInfo_t	mplayerServers[MAX_OTHER_SERVERS];
-
 	int pingUpdateSource;		// source currently pinging or updating
-
-	int masterNum;
 
 	// update server info
 	netadr_t	updateServer;
 	char		updateChallenge[MAX_TOKEN_CHARS];
 	char		updateInfoString[MAX_INFO_STRING];
 
-	//netadr_t	authorizeServer;
+	netadr_t	authorizeServer;
+
+	netadr_t	rconAddress;
 
 	// rendering info
 	glconfig_t	glconfig;
@@ -318,10 +355,11 @@ typedef struct {
 
 extern	clientStatic_t		cls;
 
+extern	char		cl_oldGame[MAX_QPATH];
+extern	bool	cl_oldGameSet;
+
 //=============================================================================
 
-//extern	vm_t			*cgvm;	// interface to cgame dll or vm
-//extern	vm_t			*uivm;	// interface to ui dll or vm
 extern	refexport_t		refExport;		// interface to refresh .dll
 
 struct UserInterface;
@@ -329,6 +367,7 @@ extern UserInterface& theUI;
 
 struct ClientGame;
 extern ClientGame& theCG;
+
 
 //
 // cvars
@@ -354,6 +393,8 @@ extern	cvar_t	*cl_sensitivity;
 extern	cvar_t	*cl_freelook;
 
 extern	cvar_t	*cl_mouseAccel;
+extern	cvar_t	*cl_mouseAccelOffset;
+extern	cvar_t	*cl_mouseAccelStyle;
 extern	cvar_t	*cl_showMouseRate;
 
 extern	cvar_t	*m_pitch;
@@ -362,13 +403,58 @@ extern	cvar_t	*m_forward;
 extern	cvar_t	*m_side;
 extern	cvar_t	*m_filter;
 
+extern	cvar_t	*j_pitch;
+extern	cvar_t	*j_yaw;
+extern	cvar_t	*j_forward;
+extern	cvar_t	*j_side;
+extern	cvar_t	*j_up;
+extern	cvar_t	*j_pitch_axis;
+extern	cvar_t	*j_yaw_axis;
+extern	cvar_t	*j_forward_axis;
+extern	cvar_t	*j_side_axis;
+extern	cvar_t	*j_up_axis;
+
 extern	cvar_t	*cl_timedemo;
+extern	cvar_t	*cl_aviFrameRate;
+extern	cvar_t	*cl_aviMotionJpeg;
 
 extern	cvar_t	*cl_activeAction;
 
 extern	cvar_t	*cl_allowDownload;
+extern  cvar_t  *cl_downloadMethod;
 extern	cvar_t	*cl_conXOffset;
 extern	cvar_t	*cl_inGameVideo;
+
+extern	cvar_t	*cl_lanForcePackets;
+extern	cvar_t	*cl_autoRecordDemo;
+
+extern	cvar_t	*cl_consoleKeys;
+
+#ifdef USE_MUMBLE
+extern	cvar_t	*cl_useMumble;
+extern	cvar_t	*cl_mumbleScale;
+#endif
+
+#ifdef USE_VOIP
+// cl_voipSendTarget is a string: "all" to broadcast to everyone, "none" to
+//  send to no one, or a comma-separated list of client numbers:
+//  "0,7,2,23" ... an empty string is treated like "all".
+extern	cvar_t	*cl_voipUseVAD;
+extern	cvar_t	*cl_voipVADThreshold;
+extern	cvar_t	*cl_voipSend;
+extern	cvar_t	*cl_voipSendTarget;
+extern	cvar_t	*cl_voipGainDuringCapture;
+extern	cvar_t	*cl_voipCaptureMult;
+extern	cvar_t	*cl_voipShowMeter;
+extern	cvar_t	*cl_voip;
+
+// 20ms at 48k
+#define VOIP_MAX_FRAME_SAMPLES		( 20 * 48 )
+
+// 3 frame is 60ms of audio, the max opus will encode at once
+#define VOIP_MAX_PACKET_FRAMES		3
+#define VOIP_MAX_PACKET_SAMPLES		( VOIP_MAX_FRAME_SAMPLES * VOIP_MAX_PACKET_FRAMES )
+#endif
 
 //=================================================
 
@@ -377,11 +463,9 @@ extern	cvar_t	*cl_inGameVideo;
 //
 
 void CL_Init (void);
-void CL_FlushMemory(void);
-void CL_ShutdownAll(void);
 void CL_AddReliableCommand(const char *cmd, bool isDisconnectCmd = false);
 
-void CL_StartHunkUsers( void );
+void CL_StartHunkUsers( bool rendererOnly );
 
 void CL_Disconnect_f (void);
 void CL_GetChallengePacket (void);
@@ -402,9 +486,9 @@ int CL_GetPingQueueCount( void );
 
 void CL_ShutdownRef( void );
 void CL_InitRef( void );
-//bool CL_CDKeyValidate( const char *key, const char *checksum );
 int CL_ServerStatus( const char *serverAddress, char *serverStatusString, int maxLen );
 
+bool CL_CheckPaused(void);
 
 //
 // cl_input
@@ -413,15 +497,12 @@ typedef struct {
 	int			down[2];		// key nums holding it down
 	unsigned	downtime;		// msec timestamp
 	unsigned	msec;			// msec down this frame if both a down and up happened
-	int		active;			// current state
+	bool	active;			// current state
 	bool	wasPressed;		// set when down, not cleared when up
 } kbutton_t;
 
-extern	kbutton_t	in_mlook, in_klook;
-extern 	kbutton_t 	in_strafe;
-extern 	kbutton_t 	in_speed;
-
-void CL_InitInput (void);
+void CL_InitInput(void);
+void CL_ShutdownInput(void);
 void CL_SendCmd (void);
 void CL_ClearState (void);
 void CL_ReadPackets (void);
@@ -432,6 +513,7 @@ void IN_CenterView (void);
 void CL_VerifyCode( void );
 
 float CL_KeyState (kbutton_t *key);
+int Key_StringToKeynum( char *str );
 char *Key_KeynumToString (int keynum);
 
 //
@@ -440,6 +522,10 @@ char *Key_KeynumToString (int keynum);
 extern int cl_connectedToPureServer;
 extern int cl_connectedToCheatServer;
 
+#ifdef USE_VOIP
+void CL_Voip_f( void );
+#endif
+
 void CL_SystemInfoChanged( void );
 void CL_ParseServerMessage( msg_t *msg );
 
@@ -447,7 +533,7 @@ void CL_ParseServerMessage( msg_t *msg );
 
 void	CL_ServerInfoPacket( netadr_t from, msg_t *msg );
 void	CL_LocalServers_f( void );
-//void	CL_GlobalServers_f( void );
+void	CL_GlobalServers_f( void );
 void	CL_FavoriteServers_f( void );
 void	CL_Ping_f( void );
 bool CL_UpdateVisiblePings_f( int source );
@@ -456,10 +542,14 @@ bool CL_UpdateVisiblePings_f( int source );
 //
 // console
 //
+extern int g_smallchar_width;
+extern int g_smallchar_height;
+
 void Con_DrawCharacter (int cx, int line, int num);
 
 void Con_CheckResize (void);
-void Con_Init (void);
+void Con_Init(void);
+void Con_Shutdown(void);
 void Con_Clear_f (void);
 void Con_ToggleConsole_f (void);
 void Con_DrawNotify (void);
@@ -472,6 +562,8 @@ void Con_Top( void );
 void Con_Bottom( void );
 void Con_Close( void );
 
+void CL_LoadConsoleHistory( void );
+void CL_SaveConsoleHistory( void );
 
 //
 // cl_scrn.c
@@ -494,28 +586,6 @@ void	SCR_DrawBigStringColor( int x, int y, const char *s, vec4_t color, bool noC
 void	SCR_DrawSmallStringExt( int x, int y, const char *string, float *setColor, bool forceColor, bool noColorEscape );
 void	SCR_DrawSmallChar( int x, int y, int ch );
 
-
-
-extern	cvar_t	*cl_mouseAccelOffset;
-extern	cvar_t	*cl_mouseAccelStyle;
-extern	cvar_t	*j_pitch;
-extern	cvar_t	*j_yaw;
-extern	cvar_t	*j_forward;
-extern	cvar_t	*j_side;
-extern	cvar_t	*j_up;
-extern	cvar_t	*j_pitch_axis;
-extern	cvar_t	*j_yaw_axis;
-extern	cvar_t	*j_forward_axis;
-extern	cvar_t	*j_side_axis;
-extern	cvar_t	*j_up_axis;
-extern	cvar_t	*cl_consoleKeys;
-
-int Key_StringToKeynum( char *str );
-extern int g_smallchar_width;
-extern int g_smallchar_height;
-void Con_Shutdown(void);
-void CL_LoadConsoleHistory( void );
-void CL_SaveConsoleHistory( void );
 
 //
 // cl_cin.c
@@ -548,11 +618,12 @@ void CL_ShaderStateChanged(void);
 //
 // cl_ui.c
 //
+void CL_InitUI( void );
 void CL_ShutdownUI( void );
 int Key_GetCatcher( void );
 void Key_SetCatcher( int catcher );
-void LAN_LoadCachedServers();
-void LAN_SaveServersToCache();
+void LAN_LoadCachedServers( void );
+void LAN_SaveServersToCache( void );
 
 
 //
@@ -561,8 +632,6 @@ void LAN_SaveServersToCache();
 void CL_Netchan_Transmit( netchan_t *chan, msg_t* msg);	//int length, const byte *data );
 bool CL_Netchan_Process( netchan_t *chan, msg_t *msg );
 
-
-#endif // __CLIENT_H__
 //
 // cl_avi.c
 //
@@ -573,7 +642,9 @@ void CL_WriteAVIAudioFrame( const byte *pcmBuffer, int size );
 bool CL_CloseAVI( void );
 bool CL_VideoRecording( void );
 
-extern	cvar_t	*cl_aviFrameRate;
-extern	cvar_t	*cl_aviMotionJpeg;
+//
+// cl_main.c
+//
+void CL_WriteDemoMessage ( msg_t *msg, int headerBytes );
 
-
+#endif // __CLIENT_H__

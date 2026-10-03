@@ -23,12 +23,24 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../game/q_shared.h"
 #include "../qcommon/qcommon.h"
 
-#include <SDL_version.h>
+#ifndef DEDICATED
+#ifdef USE_INTERNAL_SDL_HEADERS
+#	include "SDL_version.h"
+#else
+#	include <SDL_version.h>
+#endif
 
+// Require a minimum version of SDL
 #define MINSDL_MAJOR 2
 #define MINSDL_MINOR 0
+#if SDL_VERSION_ATLEAST( 2, 0, 5 )
 #define MINSDL_PATCH 5
+#else
+#define MINSDL_PATCH 0
+#endif
+#endif
 
+// Console
 void CON_Shutdown( void );
 void CON_Init( void );
 char *CON_Input( void );
@@ -39,24 +51,31 @@ unsigned int CON_LogWrite( const char *in );
 unsigned int CON_LogRead( char *out, unsigned int outSize );
 
 char *Sys_BinaryPath( void );
-const char *Sys_Basename( char *path );
-const char *Sys_Dirname( char *path );
+char *Sys_BinaryPathRelative( const char *relative );
 
 #ifdef __APPLE__
 char *Sys_StripAppBundle( char *pwd );
 #endif
 
+void Sys_GLimpSafeInit( void );
+void Sys_GLimpInit( void );
 void Sys_PlatformInit( void );
 void Sys_PlatformExit( void );
-void Sys_SigHandler( int signal );
+void Sys_SigHandler( int signal ) Q_NO_RETURN;
 void Sys_ErrorDialog( const char *error );
 void Sys_AnsiColorPrint( const char *msg );
 
-bool Sys_SetMaxFileLimit( void );
-
-bool Sys_GetPacket( netadr_t *net_from, msg_t *net_message );
-bool Sys_RandomBytes( byte *string, int len );
-
 int Sys_PID( void );
 bool Sys_PIDIsRunning( int pid );
+
 bool Sys_OpenFolderInPlatformFileManager( const char *path );
+
+bool Sys_SetMaxFileLimit( void );
+
+#ifdef PROTOCOL_HANDLER
+char *Sys_ParseProtocolUri( const char *uri );
+#endif
+
+#ifdef USE_AUTOUPDATER
+void Sys_LaunchAutoupdater(int argc, char **argv);
+#endif

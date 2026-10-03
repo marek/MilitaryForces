@@ -949,7 +949,6 @@ void FS_FCloseFile( fileHandle_t f );
 int FS_Read( void *buffer, int len, fileHandle_t f );
 int FS_Write( const void *buffer, int len, fileHandle_t h );
 void SV_GetUsercmd( int clientNum, usercmd_t *cmd );
-void Sys_SnapVector( float *v );
 bool SV_GetEntityToken( char *buffer, int bufferSize );
 bool SV_EntityContact( const vec3_t mins, const vec3_t maxs, EntityBase* gameEnt, bool capsule );
 int SV_AreaEntities( const vec3_t mins, const vec3_t maxs, int *entityList, int maxcount );

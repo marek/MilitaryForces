@@ -275,7 +275,7 @@ extern	cvar_t	*sv_strictAuth;
 //
 // sv_main.c
 //
-void SV_FinalMessage (char *message);
+void SV_FinalMessage (const char *message);
 typedef struct leakyBucket_s leakyBucket_t;
 struct leakyBucket_s {
 	netadrtype_t	type;

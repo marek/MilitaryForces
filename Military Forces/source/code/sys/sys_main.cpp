@@ -27,23 +27,32 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <stdarg.h>
 #include <stdio.h>
 #include <sys/stat.h>
+#include <string.h>
 #include <ctype.h>
 #include <errno.h>
 
-#include <SDL.h>
+#ifdef __EMSCRIPTEN__
+#include <emscripten/emscripten.h>
+#endif
+
+#ifndef DEDICATED
+#ifdef USE_INTERNAL_SDL_HEADERS
+#	include "SDL.h"
+#	include "SDL_cpuinfo.h"
+#else
+#	include <SDL.h>
+#	include <SDL_cpuinfo.h>
+#endif
+#endif
 
 #include "sys_local.h"
 #include "sys_loadlib.h"
 
-extern bool com_fullyInitialized;
-
-void IN_Frame( void );
-void IN_Restart( void );
+#include "../game/q_shared.h"
+#include "../qcommon/qcommon.h"
 
 static char binaryPath[ MAX_OSPATH ] = { 0 };
 static char installPath[ MAX_OSPATH ] = { 0 };
-static char cdPath[ MAX_OSPATH ] = { 0 };
-
 
 /*
 =================
@@ -88,16 +97,6 @@ char *Sys_DefaultInstallPath(void)
 		return Sys_Cwd();
 }
 
-void Sys_SetDefaultCDPath(const char *path)
-{
-	Q_strncpyz(cdPath, path, sizeof(cdPath));
-}
-
-char *Sys_DefaultCDPath(void)
-{
-	return cdPath;
-}
-
 /*
 =================
 Sys_DefaultAppPath
@@ -124,7 +123,8 @@ void Sys_In_Restart_f( void )
 		return;
 	}
 #endif
-	IN_Restart();
+
+	IN_Restart( );
 }
 
 /*
@@ -146,6 +146,9 @@ Sys_GetClipboardData
 */
 char *Sys_GetClipboardData(void)
 {
+#ifdef DEDICATED
+	return NULL;
+#else
 	char *data = NULL;
 	char *cliptext;
 
@@ -153,14 +156,16 @@ char *Sys_GetClipboardData(void)
 		if ( cliptext[0] != '\0' ) {
 			size_t bufsize = strlen( cliptext ) + 1;
 
-			data = reinterpret_cast<char*>(Z_Malloc( bufsize ));
+			data = (char *)Z_Malloc( bufsize );
 			Q_strncpyz( data, cliptext, bufsize );
 
+			// find first listed char and set to '\0'
 			strtok( data, "\n\r\b" );
 		}
 		SDL_free( cliptext );
 	}
 	return data;
+#endif
 }
 
 #ifdef DEDICATED
@@ -295,11 +300,13 @@ Sys_Exit
 Single exit point (regular exit or in case of error)
 =================
 */
-static void Sys_Exit( int exitCode )
+static Q_NO_RETURN void Sys_Exit( int exitCode )
 {
 	CON_Shutdown( );
 
+#ifndef DEDICATED
 	SDL_Quit( );
+#endif
 
 	if( exitCode < 2 && com_fullyInitialized )
 	{
@@ -326,6 +333,27 @@ void Sys_Quit( void )
 
 /*
 =================
+Sys_GetProcessorFeatures
+=================
+*/
+cpuFeatures_t Sys_GetProcessorFeatures( void )
+{
+	cpuFeatures_t features = (cpuFeatures_t)0;
+
+#ifndef DEDICATED
+	if( SDL_HasRDTSC( ) )      features |= CF_RDTSC;
+	if( SDL_Has3DNow( ) )      features |= CF_3DNOW;
+	if( SDL_HasMMX( ) )        features |= CF_MMX;
+	if( SDL_HasSSE( ) )        features |= CF_SSE;
+	if( SDL_HasSSE2( ) )       features |= CF_SSE2;
+	if( SDL_HasAltiVec( ) )    features |= CF_ALTIVEC;
+#endif
+
+	return features;
+}
+
+/*
+=================
 Sys_Init
 =================
 */
@@ -334,8 +362,6 @@ void Sys_Init(void)
 	Cmd_AddCommand( "in_restart", Sys_In_Restart_f );
 	Cvar_Set( "arch", OS_STRING " " ARCH_STRING );
 	Cvar_Set( "username", Sys_GetCurrentUser( ) );
-	Cvar_Get( "sys_cpustring", "generic", 0 );
-	Cvar_SetValue( "sys_cpuid", CPUID_GENERIC );
 }
 
 /*
@@ -423,7 +449,7 @@ void Sys_Print( const char *msg )
 Sys_Error
 =================
 */
-void QDECL Sys_Error( const char *error, ... )
+void Sys_Error( const char *error, ... )
 {
 	va_list argptr;
 	char    string[1024];
@@ -437,71 +463,42 @@ void QDECL Sys_Error( const char *error, ... )
 	Sys_Exit( 3 );
 }
 
-
-void Sys_SnapVector( float *v )
+#if 0
+/*
+=================
+Sys_Warn
+=================
+*/
+static Q_PRINTF_FUNC(1, 2) void Sys_Warn( char *warning, ... )
 {
-	v[0] = rint( v[0] );
-	v[1] = rint( v[1] );
-	v[2] = rint( v[2] );
+	va_list argptr;
+	char    string[1024];
+
+	va_start (argptr,warning);
+	Q_vsnprintf (string, sizeof(string), warning, argptr);
+	va_end (argptr);
+
+	CON_Print( va( "Warning: %s", string ) );
+}
+#endif
+
+/*
+============
+Sys_FileTime
+
+returns -1 if not present
+============
+*/
+int Sys_FileTime( char *path )
+{
+	struct stat buf;
+
+	if (stat (path,&buf) == -1)
+		return -1;
+
+	return buf.st_mtime;
 }
 
-int Sys_GetProcessorId( void )
-{
-	return CPUID_GENERIC;
-}
-
-unsigned int Sys_ProcessorCount()
-{
-	return SDL_GetCPUCount();
-}
-
-int Sys_MonkeyShouldBeSpanked( void )
-{
-	return 0;
-}
-
-bool Sys_CheckCD( void )
-{
-	return true;
-}
-
-void Sys_BeginProfiling( void )
-{
-}
-
-void Sys_EndProfiling( void )
-{
-}
-
-void Sys_ShowConsole( int level, bool quitOnClose )
-{
-}
-
-void Sys_DisplaySystemConsole( bool show )
-{
-}
-
-void Sys_SetErrorText( const char *text )
-{
-}
-
-void Sys_BeginStreamedFile( fileHandle_t f, int readahead )
-{
-}
-
-void Sys_EndStreamedFile( fileHandle_t f )
-{
-}
-
-int Sys_StreamedRead( void *buffer, int size, int count, fileHandle_t f )
-{
-	return FS_Read( buffer, size * count, f );
-}
-
-void Sys_StreamSeek( fileHandle_t f, int offset, int origin )
-{
-	FS_Seek( f, offset, origin );
-}
 
 /*
 =================
@@ -579,6 +576,114 @@ void *Sys_LoadDll(const char *name, bool useSystemLib)
 	return dllhandle;
 }
 
+
+/*
+=================
+Sys_ParseArgs
+=================
+*/
+void Sys_ParseArgs( int argc, char **argv )
+{
+	if( argc == 2 )
+	{
+		if( !strcmp( argv[1], "--version" ) ||
+				!strcmp( argv[1], "-v" ) )
+		{
+			const char* date = PRODUCT_DATE;
+#ifdef DEDICATED
+			fprintf( stdout, Q3_VERSION " dedicated server (%s)\n", date );
+#else
+			fprintf( stdout, Q3_VERSION " client (%s)\n", date );
+#endif
+			Sys_Exit( 0 );
+		}
+	}
+}
+
+#ifdef PROTOCOL_HANDLER
+/*
+=================
+Sys_ParseProtocolUri
+
+This parses a protocol URI, e.g. "quake3://connect/example.com:27950"
+to a string that can be run in the console, or a null pointer if the
+operation is invalid or unsupported.
+At the moment only the "connect" command is supported.
+=================
+*/
+char *Sys_ParseProtocolUri( const char *uri )
+{
+	// Both "quake3://" and "quake3:" can be used
+	if ( Q_strncmp( uri, PROTOCOL_HANDLER ":", strlen( PROTOCOL_HANDLER ":" ) ) )
+	{
+		Com_Printf( "Sys_ParseProtocolUri: unsupported protocol.\n" );
+		return NULL;
+	}
+	uri += strlen( PROTOCOL_HANDLER ":" );
+	if ( !Q_strncmp( uri, "//", strlen( "//" ) ) )
+	{
+		uri += strlen( "//" );
+	}
+	Com_Printf( "Sys_ParseProtocolUri: %s\n", uri );
+
+	// At the moment, only "connect/hostname:port" is supported
+	if ( !Q_strncmp( uri, "connect/", strlen( "connect/" ) ) )
+	{
+		int i, bufsize;
+		char *out;
+
+		uri += strlen( "connect/" );
+		if ( *uri == '\0' || *uri == '?' )
+		{
+			Com_Printf( "Sys_ParseProtocolUri: missing argument.\n" );
+			return NULL;
+		}
+
+		// Check for any unsupported characters
+		// For safety reasons, the "hostname:port" part can only
+		// contain characters from: a-zA-Z0-9.:-[]
+		for ( i=0; uri[i] != '\0'; i++ )
+		{
+			if ( uri[i] == '?' )
+			{
+				// For forwards compatibility, any query string parameters are ignored (e.g. "?password=abcd")
+				// However, these are not passed on macOS, so it may be a bad idea to add them.
+				break;
+			}
+
+			if ( isalpha( uri[i] ) == 0 && isdigit( uri[i] ) == 0
+				&& uri[i] != '.' && uri[i] != ':' && uri[i] != '-'
+				&& uri[i] != '[' && uri[i] != ']' )
+			{
+				Com_Printf( "Sys_ParseProtocolUri: hostname contains unsupported character.\n" );
+				return NULL;
+			}
+		}
+
+		bufsize = strlen( "connect " ) + i + 1;
+		out = malloc( bufsize );
+		strcpy( out, "connect " );
+		strncat( out, uri, i );
+		return out;
+	}
+	else
+	{
+		Com_Printf( "Sys_ParseProtocolUri: unsupported command.\n" );
+		return NULL;
+	}
+}
+#endif
+
+#ifndef DEFAULT_BASEDIR
+#	if defined(DEFAULT_RELATIVE_BASEDIR)
+#		define DEFAULT_BASEDIR Sys_BinaryPathRelative(DEFAULT_RELATIVE_BASEDIR)
+#	elif defined(__APPLE__)
+#		define DEFAULT_BASEDIR Sys_StripAppBundle(Sys_BinaryPath())
+#	else
+#		define DEFAULT_BASEDIR Sys_BinaryPath()
+#	endif
+#endif
+
 /*
 =================
 Sys_SigHandler
@@ -596,7 +701,9 @@ void Sys_SigHandler( int signal )
 	else
 	{
 		signalcaught = true;
-		CL_Shutdown();
+#ifndef DEDICATED
+		CL_Shutdown(va("Received signal %d", signal), true, true);
+#endif
 		SV_Shutdown(va("Received signal %d", signal) );
 	}
 
@@ -605,12 +712,6 @@ void Sys_SigHandler( int signal )
 	else
 		Sys_Exit( 2 );
 }
-
-#ifdef __APPLE__
-#	define DEFAULT_BASEDIR Sys_StripAppBundle(Sys_BinaryPath())
-#else
-#	define DEFAULT_BASEDIR Sys_BinaryPath()
-#endif
 
 /*
 =================
@@ -621,13 +722,44 @@ int main( int argc, char **argv )
 {
 	int   i;
 	char  commandLine[ MAX_STRING_CHARS ] = { 0 };
-	char  exePath[ MAX_OSPATH ];
+#ifdef PROTOCOL_HANDLER
+	char *protocolCommand = NULL;
+#endif
 
+#ifdef USE_AUTOUPDATER
+	Sys_LaunchAutoupdater(argc, argv);
+#endif
+
+#ifndef DEDICATED
+	// SDL version check
+
+	// Compile time
 #	if !SDL_VERSION_ATLEAST(MINSDL_MAJOR,MINSDL_MINOR,MINSDL_PATCH)
 #		error A more recent version of SDL is required
 #	endif
 
+	// Run time
+	SDL_version ver;
+	SDL_GetVersion( &ver );
+
+#define MINSDL_VERSION \
+	XSTRING(MINSDL_MAJOR) "." \
+	XSTRING(MINSDL_MINOR) "." \
+	XSTRING(MINSDL_PATCH)
+
+	if( SDL_VERSIONNUM( ver.major, ver.minor, ver.patch ) <
+			SDL_VERSIONNUM( MINSDL_MAJOR, MINSDL_MINOR, MINSDL_PATCH ) )
+	{
+		Sys_Dialog( DT_ERROR, va( "SDL version " MINSDL_VERSION " or greater is required, "
+			"but only version %d.%d.%d was found. You may be able to obtain a more recent copy "
+			"from https://www.libsdl.org/.", ver.major, ver.minor, ver.patch ), "SDL Library Too Old" );
+
+		Sys_Exit( 1 );
+	}
+#endif
+
 	Sys_PlatformInit( );
+	Sys_SetMaxFileLimit( );
 
 	// Set the initial time base
 	Sys_Milliseconds( );
@@ -638,14 +770,29 @@ int main( int argc, char **argv )
 		argc = 1;
 #endif
 
-	Q_strncpyz( exePath, argv[ 0 ], sizeof( exePath ) );
-	Sys_SetBinaryPath( Sys_Dirname( exePath ) );
+	Sys_ParseArgs( argc, argv );
+	Sys_SetBinaryPath( Sys_Dirname( argv[ 0 ] ) );
 	Sys_SetDefaultInstallPath( DEFAULT_BASEDIR );
 
 	// Concatenate the command line for passing to Com_Init
 	for( i = 1; i < argc; i++ )
 	{
-		const bool containsSpaces = strchr(argv[i], ' ') != NULL;
+		bool containsSpaces;
+
+		// For security reasons we always detect --uri, even when PROTOCOL_HANDLER is undefined
+		// Any arguments after "--uri quake3://..." is ignored
+		if ( !strcmp( argv[i], "--uri" ) )
+		{
+#ifdef PROTOCOL_HANDLER
+			if ( argc > i+1 )
+			{
+				protocolCommand = Sys_ParseProtocolUri( argv[i+1] );
+			}
+#endif
+			break;
+		}
+
+		containsSpaces = strchr(argv[i], ' ') != NULL;
 		if (containsSpaces)
 			Q_strcat( commandLine, sizeof( commandLine ), "\"" );
 
@@ -657,6 +804,15 @@ int main( int argc, char **argv )
 		Q_strcat( commandLine, sizeof( commandLine ), " " );
 	}
 
+#ifdef PROTOCOL_HANDLER
+	if ( protocolCommand != NULL )
+	{
+		Q_strcat( commandLine, sizeof( commandLine ), "+" );
+		Q_strcat( commandLine, sizeof( commandLine ), protocolCommand );
+		free( protocolCommand );
+	}
+#endif
+
 	CON_Init( );
 	Com_Init( commandLine );
 	NET_Init( );
@@ -667,10 +823,14 @@ int main( int argc, char **argv )
 	signal( SIGTERM, Sys_SigHandler );
 	signal( SIGINT, Sys_SigHandler );
 
+#ifdef __EMSCRIPTEN__
+	emscripten_set_main_loop( Com_Frame, 0, 1 );
+#else
 	while( 1 )
 	{
 		Com_Frame( );
 	}
+#endif
 
 	return 0;
 }

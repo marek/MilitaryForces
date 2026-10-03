@@ -13,8 +13,6 @@
 #include "bg_local.h"
 #include "g_client.h"
 
-void Sys_SnapVector( float *v );
-
 pmove_t		*pm;
 pml_t		pml;
 
@@ -998,7 +996,7 @@ void PmoveSingle (pmove_t *pmove) {
 	PM_WaterEvents();
 
 	// snap some parts of playerstate to save network bandwidth
-	Sys_SnapVector( pm->ps->velocity );
+	Q_SnapVector( pm->ps->velocity );
 }
 
 

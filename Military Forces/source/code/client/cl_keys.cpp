@@ -622,7 +622,7 @@ void Console_Key (int key) {
 	// enter finishes the line
 	if ( key == K_ENTER || key == K_KP_ENTER ) {
 		// if not in the game explicitly prepend a slash if needed
-		if ( cls.state != CA_ACTIVE && con_autochat->integer &&
+		if ( clc.state != CA_ACTIVE && con_autochat->integer &&
 				g_consoleField.buffer[0] &&
 				g_consoleField.buffer[0] != '\\' &&
 				g_consoleField.buffer[0] != '/' ) {
@@ -664,7 +664,7 @@ void Console_Key (int key) {
 
 		CL_SaveConsoleHistory( );
 
-		if ( cls.state == CA_DISCONNECTED ) {
+		if ( clc.state == CA_DISCONNECTED ) {
 			SCR_UpdateScreen ();	// force an update, because the command
 		}							// may take some time
 		return;
@@ -770,7 +770,7 @@ void Message_Key( int key ) {
 
 	if ( key == K_ENTER || key == K_KP_ENTER )
 	{
-		if ( chatField.buffer[0] && cls.state == CA_ACTIVE ) {
+		if ( chatField.buffer[0] && clc.state == CA_ACTIVE ) {
 			if (chat_playerNum != -1 )
 
 				Com_sprintf( buffer, sizeof( buffer ), "tell %i \"%s\"\n", chat_playerNum, chatField.buffer );
@@ -1188,7 +1188,7 @@ void CL_ParseBinding( int key, bool down, unsigned time )
 	char buf[ MAX_STRING_CHARS ], *p = buf, *end;
 	bool allCommands, allowUpCmds;
 
-	if( cls.state == CA_DISCONNECTED && Key_GetCatcher( ) == 0 )
+	if( clc.state == CA_DISCONNECTED && Key_GetCatcher( ) == 0 )
 		return;
 	if( !keys[key].binding || !keys[key].binding[0] )
 		return;
@@ -1198,7 +1198,7 @@ void CL_ParseBinding( int key, bool down, unsigned time )
 	allCommands = ( Key_GetCatcher( ) == 0 );
 
 	// allow button up commands if in game even if key catcher is set
-	allowUpCmds = ( cls.state != CA_DISCONNECTED );
+	allowUpCmds = ( clc.state != CA_DISCONNECTED );
 
 	while( 1 )
 	{
@@ -1270,7 +1270,7 @@ void CL_KeyDownEvent( int key, unsigned time )
 
 	// keys can still be used for bound actions
 	if ( ( key < 128 || key == K_MOUSE1 ) &&
-		( clc.demoplaying || cls.state == CA_CINEMATIC ) && Key_GetCatcher( ) == 0 ) {
+		( clc.demoplaying || clc.state == CA_CINEMATIC ) && Key_GetCatcher( ) == 0 ) {
 
 		if (Cvar_VariableValue ("com_cameraMode") == 0) {
 			Cvar_Set ("nextdemo","");
@@ -1294,10 +1294,10 @@ void CL_KeyDownEvent( int key, unsigned time )
 		}
 
 		if ( !( Key_GetCatcher( ) & KEYCATCH_UI ) ) {
-			if ( cls.state == CA_ACTIVE && !clc.demoplaying ) {
+			if ( clc.state == CA_ACTIVE && !clc.demoplaying ) {
 				theUI.setActiveMenu( UserInterface::MenuCommand::UIMENU_INGAME );
 			}
-			else if ( cls.state != CA_DISCONNECTED ) {
+			else if ( clc.state != CA_DISCONNECTED ) {
 				CL_Disconnect_f();
 				S_StopAllSounds();
 				theUI.setActiveMenu( UserInterface::MenuCommand::UIMENU_MAIN );
@@ -1325,7 +1325,7 @@ void CL_KeyDownEvent( int key, unsigned time )
 		} 
 	} else if ( Key_GetCatcher( ) & KEYCATCH_MESSAGE ) {
 		Message_Key( key );
-	} else if ( cls.state == CA_DISCONNECTED ) {
+	} else if ( clc.state == CA_DISCONNECTED ) {
 		Console_Key( key );
 	}
 }
@@ -1407,7 +1407,7 @@ void CL_CharEvent( int key ) {
 	{
 		Field_CharEvent( &chatField, key );
 	}
-	else if ( cls.state == CA_DISCONNECTED )
+	else if ( clc.state == CA_DISCONNECTED )
 	{
 		Field_CharEvent( &g_consoleField, key );
 	}

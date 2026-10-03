@@ -2,6 +2,11 @@ if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND NOT CMAKE_CXX_COMPILER_ID MATCHE
     return()
 endif()
 
+set(ASM_SOURCES
+    ${SOURCE_DIR}/asm/ftola.cpp
+    ${SOURCE_DIR}/asm/snapvector.cpp
+)
+
 add_compile_options(-fno-strict-aliasing -fwrapv -pipe -fno-operator-names -Wno-narrowing)
 
 if(MF_WARNINGS)

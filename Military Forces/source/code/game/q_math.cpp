@@ -15,42 +15,54 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Foobar; if not, write to the Free Software
+along with Quake III Arena source code; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 //
 // q_math.c -- stateless support routines that are included in each code module
+
+// Some of the vector functions are static inline in q_shared.h. q3asm
+// doesn't understand static functions though, so we only want them in
+// one file. That's what this is about.
+#ifdef Q3_VM
+#define __Q3_VM_MATH
+#endif
+
 #include "q_shared.h"
 
+vec3_t	vec3_origin = {0.0f, 0.0f, 0.0f};
+vec3_t	axisDefault[3] =
+{
+	{1.0f, 0.0f, 0.0f},
+	{0.0f, 1.0f, 0.0f},
+	{0.0f, 0.0f, 1.0f}
+};
 
-vec3_t	vec3_origin = {0,0,0};
-vec3_t	axisDefault[3] = { { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 } };
 
-
-vec4_t		colorBlack	= {0, 0, 0, 1};
-vec4_t		colorRed	= {1, 0, 0, 1};
-vec4_t		colorGreen	= {0, 1, 0, 1};
-vec4_t		colorBlue	= {0, 0, 1, 1};
-vec4_t		colorYellow	= {1, 1, 0, 1};
-vec4_t		colorMagenta= {1, 0, 1, 1};
-vec4_t		colorCyan	= {0, 1, 1, 1};
-vec4_t		colorWhite	= {1, 1, 1, 1};
-vec4_t		colorLtGrey	= {0.75, 0.75, 0.75, 1};
-vec4_t		colorMdGrey	= {0.5, 0.5, 0.5, 1};
-vec4_t		colorDkGrey	= {0.25, 0.25, 0.25, 1};
+vec4_t	colorBlack  = {0.0f,  0.0f,  0.0f,  1.0f};
+vec4_t	colorRed    = {1.0f,  0.0f,  0.0f,  1.0f};
+vec4_t	colorGreen  = {0.0f,  1.0f,  0.0f,  1.0f};
+vec4_t	colorBlue   = {0.0f,  0.0f,  1.0f,  1.0f};
+vec4_t	colorYellow = {1.0f,  1.0f,  0.0f,  1.0f};
+vec4_t	colorMagenta= {1.0f,  0.0f,  1.0f,  1.0f};
+vec4_t	colorCyan   = {0.0f,  1.0f,  1.0f,  1.0f};
+vec4_t	colorWhite  = {1.0f,  1.0f,  1.0f,  1.0f};
+vec4_t	colorLtGrey = {0.75f, 0.75f, 0.75f, 1.0f};
+vec4_t	colorMdGrey = {0.5f,  0.5f,  0.5f,  1.0f};
+vec4_t	colorDkGrey = {0.25f, 0.25f, 0.25f, 1.0f};
 
 vec4_t	g_color_table[8] =
-	{
-	{0.0, 0.0, 0.0, 1.0},
-	{1.0, 0.0, 0.0, 1.0},
-	{0.0, 1.0, 0.0, 1.0},
-	{1.0, 1.0, 0.0, 1.0},
-	{0.0, 0.0, 1.0, 1.0},
-	{0.0, 1.0, 1.0, 1.0},
-	{1.0, 0.0, 1.0, 1.0},
-	{1.0, 1.0, 1.0, 1.0},
-	};
+{
+	{0.0f, 0.0f, 0.0f, 1.0f},
+	{1.0f, 0.0f, 0.0f, 1.0f},
+	{0.0f, 1.0f, 0.0f, 1.0f},
+	{1.0f, 1.0f, 0.0f, 1.0f},
+	{0.0f, 0.0f, 1.0f, 1.0f},
+	{0.0f, 1.0f, 1.0f, 1.0f},
+	{1.0f, 0.0f, 1.0f, 1.0f},
+	{1.0f, 1.0f, 1.0f, 1.0f},
+};
 
 
 vec3_t	bytedirs[NUMVERTEXNORMALS] =
@@ -141,7 +153,7 @@ vec3_t	bytedirs[NUMVERTEXNORMALS] =
 //==============================================================
 
 int		Q_rand( int *seed ) {
-	*seed = (69069 * *seed + 1);
+	*seed = (69069U * *seed + 1U);
 	return *seed;
 }
 
@@ -152,63 +164,6 @@ float	Q_random( int *seed ) {
 float	Q_crandom( int *seed ) {
 	return 2.0 * ( Q_random( seed ) - 0.5 );
 }
-
-#ifdef __LCC__
-
-int VectorCompare( const vec3_t v1, const vec3_t v2 ) {
-	if (v1[0] != v2[0] || v1[1] != v2[1] || v1[2] != v2[2]) {
-		return 0;
-	}			
-	return 1;
-}
-
-vec_t VectorLength( const vec3_t v ) {
-	return (vec_t)sqrt (v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
-}
-
-vec_t VectorLengthSquared( const vec3_t v ) {
-	return (v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
-}
-
-vec_t Distance( const vec3_t p1, const vec3_t p2 ) {
-	vec3_t	v;
-
-	VectorSubtract (p2, p1, v);
-	return VectorLength( v );
-}
-
-vec_t DistanceSquared( const vec3_t p1, const vec3_t p2 ) {
-	vec3_t	v;
-
-	VectorSubtract (p2, p1, v);
-	return v[0]*v[0] + v[1]*v[1] + v[2]*v[2];
-}
-
-// fast vector normalize routine that does not check to make sure
-// that length != 0, nor does it return length, uses rsqrt approximation
-void VectorNormalizeFast( vec3_t v )
-{
-	float ilength;
-
-	ilength = Q_rsqrt( DotProduct( v, v ) );
-
-	v[0] *= ilength;
-	v[1] *= ilength;
-	v[2] *= ilength;
-}
-
-void VectorInverse( vec3_t v ){
-	v[0] = -v[0];
-	v[1] = -v[1];
-	v[2] = -v[2];
-}
-
-void CrossProduct( const vec3_t v1, const vec3_t v2, vec3_t cross ) {
-	cross[0] = v1[1]*v2[2] - v1[2]*v2[1];
-	cross[1] = v1[2]*v2[0] - v1[0]*v2[2];
-	cross[2] = v1[0]*v2[1] - v1[1]*v2[0];
-}
-#endif
 
 //=======================================================
 
@@ -418,54 +373,6 @@ void RotateAroundDirection( vec3_t axis[3], float yaw ) {
 
 
 
-/*
-===============
-RotateAroundYaw - MFQ3
-===============
-*/
-void RotateAroundYaw( vec3_t axis[3], float angle ) {
-
-	if( Q_fabs(angle) == 0.0f )
-		return;
-		
-	// create an arbitrary axis[1] 
-	PerpendicularVector( axis[0], axis[2] );
-
-	// rotate it around axis[0] by yaw
-	if ( angle ) {
-		vec3_t	temp;
-
-		VectorCopy( axis[0], temp );
-		RotatePointAroundVector( axis[0], axis[2], temp, angle );
-	}
-
-	// cross to get axis[2]
-	CrossProduct( axis[2], axis[0], axis[1] );
-}
-
-/*
-===============
-RotateAroundPitch - MFQ3
-===============
-*/
-void RotateAroundPitch( vec3_t axis[3], float angle ) {
-
-	// create an arbitrary axis[1] 
-	PerpendicularVector( axis[0], axis[1] );
-
-	// rotate it around axis[0] by yaw
-	if ( angle ) {
-		vec3_t	temp;
-
-		VectorCopy( axis[0], temp );
-		RotatePointAroundVector( axis[0], axis[1], temp, angle );
-	}
-
-	// cross to get axis[2]
-	CrossProduct( axis[0], axis[1], axis[2] );
-}
-
-
 void vectoangles( const vec3_t value1, vec3_t angles ) {
 	float	forward;
 	float	yaw, pitch;
@@ -544,14 +451,9 @@ void ProjectPointOnPlane( vec3_t dst, const vec3_t p, const vec3_t normal )
 	float inv_denom;
 
 	inv_denom =  DotProduct( normal, normal );
-
-	//CORNCOBMAN
-	if(inv_denom == 0.0f)
-		inv_denom = 0.1f;
-	//END CORNCOBMAN
-
-	assert( Q_fabs(inv_denom) != 0.0f ); // bk010122 - zero vectors get here
-
+#ifndef Q3_VM
+	assert( Q_fabs(inv_denom) != 0.0f ); // zero vectors get here
+#endif
 	inv_denom = 1.0f / inv_denom;
 
 	d = DotProduct( normal, p ) * inv_denom;
@@ -604,10 +506,7 @@ void VectorRotate( vec3_t in, vec3_t matrix[3], vec3_t out )
 */
 float Q_rsqrt( float number )
 {
-	union {
-		float f;
-		int i;
-	} t;
+	floatint_t t;
 	float x2, y;
 	const float threehalfs = 1.5F;
 
@@ -618,16 +517,14 @@ float Q_rsqrt( float number )
 	y  = y * ( threehalfs - ( x2 * y * y ) );   // 1st iteration
 //	y  = y * ( threehalfs - ( x2 * y * y ) );   // 2nd iteration, this can be removed
 
-#ifdef __linux__
-	assert( !isnan(y) ); // bk010122 - FPE?
-#endif
 	return y;
 }
 
 float Q_fabs( float f ) {
-	int tmp = * ( int * ) &f;
-	tmp &= 0x7FFFFFFF;
-	return * ( float * ) &tmp;
+	floatint_t fi;
+	fi.f = f;
+	fi.i &= 0x7FFFFFFF;
+	return fi.f;
 }
 #endif
 
@@ -793,6 +690,7 @@ int BoxOnPlaneSide(vec3_t emins, vec3_t emaxs, struct cplane_s *p)
 	return sides;
 }
 
+
 /*
 =================
 RadiusFromBounds
@@ -841,16 +739,65 @@ void AddPointToBounds( const vec3_t v, vec3_t mins, vec3_t maxs ) {
 	}
 }
 
+bool BoundsIntersect(const vec3_t mins, const vec3_t maxs,
+		const vec3_t mins2, const vec3_t maxs2)
+{
+	if ( maxs[0] < mins2[0] ||
+		maxs[1] < mins2[1] ||
+		maxs[2] < mins2[2] ||
+		mins[0] > maxs2[0] ||
+		mins[1] > maxs2[1] ||
+		mins[2] > maxs2[2])
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool BoundsIntersectSphere(const vec3_t mins, const vec3_t maxs,
+		const vec3_t origin, vec_t radius)
+{
+	if ( origin[0] - radius > maxs[0] ||
+		origin[0] + radius < mins[0] ||
+		origin[1] - radius > maxs[1] ||
+		origin[1] + radius < mins[1] ||
+		origin[2] - radius > maxs[2] ||
+		origin[2] + radius < mins[2])
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool BoundsIntersectPoint(const vec3_t mins, const vec3_t maxs,
+		const vec3_t origin)
+{
+	if ( origin[0] > maxs[0] ||
+		origin[0] < mins[0] ||
+		origin[1] > maxs[1] ||
+		origin[1] < mins[1] ||
+		origin[2] > maxs[2] ||
+		origin[2] < mins[2])
+	{
+		return false;
+	}
+
+	return true;
+}
 
 vec_t VectorNormalize( vec3_t v ) {
 	// NOTE: TTimo - Apple G4 altivec source uses double?
 	float	length, ilength;
 
 	length = v[0]*v[0] + v[1]*v[1] + v[2]*v[2];
-	length = sqrt (length);
 
 	if ( length ) {
-		ilength = 1/length;
+		/* writing it this way allows gcc to recognize that rsqrt can be used */
+		ilength = 1/(float)sqrt (length);
+		/* sqrt(length) = length * (1 / sqrt(length)) */
+		length *= ilength;
 		v[0] *= ilength;
 		v[1] *= ilength;
 		v[2] *= ilength;
@@ -863,20 +810,17 @@ vec_t VectorNormalize2( const vec3_t v, vec3_t out) {
 	float	length, ilength;
 
 	length = v[0]*v[0] + v[1]*v[1] + v[2]*v[2];
-	length = sqrt (length);
 
 	if (length)
 	{
-//	  assert( ((Q_fabs(v[0])!=0.0f) || (Q_fabs(v[1])!=0.0f) || (Q_fabs(v[2])!=0.0f)) );
-
-		ilength = 1/length;
+		/* writing it this way allows gcc to recognize that rsqrt can be used */
+		ilength = 1/(float)sqrt (length);
+		/* sqrt(length) = length * (1 / sqrt(length)) */
+		length *= ilength;
 		out[0] = v[0]*ilength;
 		out[1] = v[1]*ilength;
 		out[2] = v[2]*ilength;
 	} else {
-
-//	  assert( ((Q_fabs(v[0])==0.0f) && (Q_fabs(v[1])==0.0f) && (Q_fabs(v[2])==0.0f)) );
-
 		VectorClear( out );
 	}
 		
@@ -935,24 +879,6 @@ int Q_log2( int val ) {
 		answer++;
 	}
 	return answer;
-}
-
-/*
-=====================
-Q_isnan
-
-Don't pass doubles to this
-================
-*/
-int Q_isnan( float x )
-{
-	floatint_t fi;
-
-	fi.f = x;
-	fi.ui &= 0x7FFFFFFF;
-	fi.ui = 0x7F800000 - fi.ui;
-
-	return (int)( (unsigned int)fi.ui >> 31 );
 }
 
 
@@ -1073,6 +999,99 @@ void PerpendicularVector( vec3_t dst, const vec3_t src )
 	VectorNormalize( dst );
 }
 
+/*
+================
+Q_isnan
+
+Don't pass doubles to this
+================
+*/
+int Q_isnan( float x )
+{
+	floatint_t fi;
+
+	fi.f = x;
+	fi.ui &= 0x7FFFFFFF;
+	fi.ui = 0x7F800000 - fi.ui;
+
+	return (int)( (unsigned int)fi.ui >> 31 );
+}
+//------------------------------------------------------------------------
+
+#ifndef Q3_VM
+/*
+=====================
+Q_acos
+
+the msvc acos doesn't always return a value between -PI and PI:
+
+int i;
+i = 1065353246;
+acos(*(float*) &i) == -1.#IND0
+
+=====================
+*/
+float Q_acos(float c) {
+	float angle;
+
+	angle = acos(c);
+
+	if (angle > M_PI) {
+		return (float)M_PI;
+	}
+	if (angle < -M_PI) {
+		return (float)M_PI;
+	}
+	return angle;
+}
+#endif
+
+/*
+===============
+RotateAroundYaw - MFQ3
+===============
+*/
+void RotateAroundYaw( vec3_t axis[3], float angle ) {
+
+	if( Q_fabs(angle) == 0.0f )
+		return;
+		
+	// create an arbitrary axis[1] 
+	PerpendicularVector( axis[0], axis[2] );
+
+	// rotate it around axis[0] by yaw
+	if ( angle ) {
+		vec3_t	temp;
+
+		VectorCopy( axis[0], temp );
+		RotatePointAroundVector( axis[0], axis[2], temp, angle );
+	}
+
+	// cross to get axis[2]
+	CrossProduct( axis[2], axis[0], axis[1] );
+}
+
+/*
+===============
+RotateAroundPitch - MFQ3
+===============
+*/
+void RotateAroundPitch( vec3_t axis[3], float angle ) {
+
+	// create an arbitrary axis[1] 
+	PerpendicularVector( axis[0], axis[1] );
+
+	// rotate it around axis[0] by yaw
+	if ( angle ) {
+		vec3_t	temp;
+
+		VectorCopy( axis[0], temp );
+		RotatePointAroundVector( axis[0], axis[1], temp, angle );
+	}
+
+	// cross to get axis[2]
+	CrossProduct( axis[0], axis[1], axis[2] );
+}
 
 /*
 ===============
@@ -1140,7 +1159,6 @@ int RandomInt( int min, int max )
 	return result;
 }
 
-
 /*
 ===============
 RandomFloat
@@ -1197,7 +1215,6 @@ void MakeBoxFromExtents( box3_t* box, const vec3_t mins, const vec3_t maxs, cons
 
 }
 
-// expand box to contain this point
 void AddToBox( sbox3_t* box, const vec3_t p )
 {
     if( p[0] > box->maxs[0] ) box->maxs[0] = p[0];
@@ -1291,37 +1308,4 @@ bool RayIntersectBox( const ray3_t* ray, const box3_t* bbox )
 	}
 
 	return true;
-}
-
-long Q_ftol( float f )
-{
-	return (long)f;
-}
-
-/*
-=====================
-Q_acos
-
-the msvc acos doesn't always return a value between -PI and PI:
-
-int i;
-i = 1065353246;
-acos(*(float*) &i) == -1.#IND0
-
-	This should go in q_math but it is too late to add New traps
-	to game and ui
-=====================
-*/
-float Q_acos(float c) {
-	float angle;
-
-	angle = acos(c);
-
-	if (angle > M_PI) {
-		return (float)M_PI;
-	}
-	if (angle < -M_PI) {
-		return (float)M_PI;
-	}
-	return angle;
 }

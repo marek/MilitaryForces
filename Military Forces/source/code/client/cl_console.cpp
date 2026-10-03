@@ -74,7 +74,7 @@ Con_ToggleConsole_f
 */
 void Con_ToggleConsole_f (void) {
 	// Can't toggle the console when it's the only thing available
-	if ( cls.state == CA_DISCONNECTED && Key_GetCatcher( ) == KEYCATCH_CONSOLE ) {
+	if ( clc.state == CA_DISCONNECTED && Key_GetCatcher( ) == KEYCATCH_CONSOLE ) {
 		return;
 	}
 
@@ -554,7 +554,7 @@ Draw the editline after a ] prompt
 void Con_DrawInput (void) {
 	int		y;
 
-	if ( cls.state != CA_DISCONNECTED && !(Key_GetCatcher( ) & KEYCATCH_CONSOLE ) ) {
+	if ( clc.state != CA_DISCONNECTED && !(Key_GetCatcher( ) & KEYCATCH_CONSOLE ) ) {
 		return;
 	}
 
@@ -778,7 +778,7 @@ void Con_DrawConsole( void ) {
 	Con_CheckResize ();
 
 	// if disconnected, render console full screen
-	if ( cls.state == CA_DISCONNECTED ) {
+	if ( clc.state == CA_DISCONNECTED ) {
 		if ( !( Key_GetCatcher( ) & (KEYCATCH_UI | KEYCATCH_CGAME)) ) {
 			Con_DrawSolidConsole( 1.0 );
 			return;
@@ -789,7 +789,7 @@ void Con_DrawConsole( void ) {
 		Con_DrawSolidConsole( con.displayFrac );
 	} else {
 		// draw notify lines
-		if ( cls.state == CA_ACTIVE ) {
+		if ( clc.state == CA_ACTIVE ) {
 			Con_DrawNotify ();
 		}
 	}
