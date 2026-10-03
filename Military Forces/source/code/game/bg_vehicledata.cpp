@@ -2129,8 +2129,8 @@ completeVehicleData_t availableVehicles[] =
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{80, 80, 240},				// turnspeed around the three axis
-	{0, 100, 50},				// camera distance {min,max,default}
-	{0, 100, 10},				// camera height {min,max,default}
+	{0, 100, 65},				// camera distance {min,max,default}
+	{0, 100, 13},				// camera height {min,max,default}
 	85,						    // stallspeed
 	400,					    // maxspeed
 	0,							// min throttle
@@ -2140,14 +2140,14 @@ completeVehicleData_t availableVehicles[] =
 	0,							// wheel circumference
 	220,						// acceleration
 	100,						// health
-	{2.518f, -7.371f, -0.155f},	// gun tag
+	{3.3, -9.6, -0.2},	// gun tag
 	60,							// max fuel
 	0,							// gearheight - SET AUTOMATICALLY
 	-14,							// tailangle
 	WI_MG_8XCAL50, 0, 0, 0, 0, 0, 0, 0,		// weapons
 	450, 0, 0, 0, 0, 0, 0, 0,	// ammo
 	0,0,0,0,0,0,0,0,			// turret
-	{-4, 0, 6},					// cameraposition for cockpit view
+	{-5.2, 0, 7.8},					// cameraposition for cockpit view
 	0,							// effect model
 	0,							// radar range
 	0,							// radar range ground
@@ -2159,7 +2159,7 @@ completeVehicleData_t availableVehicles[] =
 	1000,						// baytime
 	0,							// max bay frame
 	0,							// renderflags
-	{-4,0,22,20},				// shadow coordinates
+	{-5.2, 0, 28.6, 26},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
     },
 
@@ -2179,8 +2179,8 @@ completeVehicleData_t availableVehicles[] =
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{70, 65, 240},				// turnspeed around the three axis
-	{0, 100, 50},				// camera distance {min,max,default}
-	{0, 100, 10},				// camera height {min,max,default}
+	{0, 100, 68},				// camera distance {min,max,default}
+	{0, 100, 13.6},				// camera height {min,max,default}
 	90,						    // stallspeed
 	410,					    // maxspeed
 	0,							// min throttle
@@ -2190,14 +2190,14 @@ completeVehicleData_t availableVehicles[] =
 	0,							// wheel circumference
 	220,						// acceleration
 	100,						// health
-	{2.518f, -7.371f, -0.155f},	// gun tag
+	{3.4, -10, -0.2},	// gun tag
 	60,							// max fuel
 	0,							// gearheight - SET AUTOMATICALLY
 	-14,							// tailangle
 	WI_MG_8XCAL50, 0, 0, 0, 0, 0, 0, 0,		// weapons
 	450, 0, 0, 0, 0, 0, 0, 0,	// ammo
 	0,0,0,0,0,0,0,0,			// turret
-	{-4, 0, 6},					// cameraposition for cockpit view
+	{-5.4, 0, 8.2},					// cameraposition for cockpit view
 	0,							// effect model
 	0,							// radar range
 	0,							// radar range ground
@@ -2209,7 +2209,7 @@ completeVehicleData_t availableVehicles[] =
 	1000,						// baytime
 	0,							// max bay frame
 	0,							// renderflags
-	{-3,0,18,16},				// shadow coordinates
+	{-4.1, 0, 24.5, 21.8},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
     },
 
@@ -2229,8 +2229,8 @@ completeVehicleData_t availableVehicles[] =
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{60, 60, 220},				// turnspeed around the three axis
-	{0, 100, 50},				// camera distance {min,max,default}
-	{0, 100, 10},				// camera height {min,max,default}
+	{0, 100, 74.5},				// camera distance {min,max,default}
+	{0, 100, 14.9},				// camera height {min,max,default}
 	90,						    // stallspeed
 	420,					    // maxspeed
 	0,							// min throttle
@@ -2240,14 +2240,14 @@ completeVehicleData_t availableVehicles[] =
 	0,							// wheel circumference
 	220,						// acceleration
 	100,						// health
-	{2.518f, -7.371f, -0.155f},	// gun tag
+	{3.8, -11, -0.2},	// gun tag
 	60,							// max fuel
 	0,							// gearheight - SET AUTOMATICALLY
 	-14,							// tailangle
 	WI_MG_8XCAL50, 0, 0, 0, 0, 0, 0, 0,		// weapons
 	450, 0, 0, 0, 0, 0, 0, 0,	// ammo
 	0,0,0,0,0,0,0,0,			// turret
-	{-4, 0, 6},					// cameraposition for cockpit view
+	{-6, 0, 8.9},					// cameraposition for cockpit view
 	0,							// effect model
 	0,							// radar range
 	0,							// radar range ground
@@ -2259,7 +2259,7 @@ completeVehicleData_t availableVehicles[] =
 	1000,						// baytime
 	0,							// max bay frame
 	0,							// renderflags
-	{-2,0,18,18},				// shadow coordinates
+	{-3, 0, 26.8, 26.8},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
     },
 
@@ -2280,8 +2280,8 @@ completeVehicleData_t availableVehicles[] =
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{40, 30, 100},				// turnspeed around the three axis
-	{0, 100, 80},				// camera distance {min,max,default}
-	{0, 100, 10},				// camera height {min,max,default}
+	{0, 100, 97.6},				// camera distance {min,max,default}
+	{0, 100, 12.2},				// camera height {min,max,default}
 	100,					    // stallspeed
 	320,					    // maxspeed
 	0,							// min throttle
@@ -2291,14 +2291,14 @@ completeVehicleData_t availableVehicles[] =
 	0,							// wheel circumference
 	220,						// acceleration
 	1500,						// health
-	{2.518f, -7.371f, -0.155f},	// gun tag
+	{3.1, -9, -0.2},	// gun tag
 	60,							// max fuel
 	0,							// gearheight - SET AUTOMATICALLY
 	-8,							// tailangle
 	WI_MG_8XCAL50, WI_MK83, WI_MK83, 0, 0, 0, 0, 0,		// weapons
 	450, 16, 16, 0, 0, 0, 0, 0,	// ammo
 	0,0,0,0,0,0,0,0,			// turret
-	{-4, 0, 6},					// cameraposition for cockpit view
+	{-4.9, 0, 7.3},					// cameraposition for cockpit view
 	0,							// effect model
 	0,							// radar range
 	0,							// radar range ground
@@ -2310,7 +2310,7 @@ completeVehicleData_t availableVehicles[] =
 	500,						// baytime
 	0,							// max bay frame
 	0,							// renderflags
-	{-12,0,60,60},				// shadow coordinates
+	{-14.6, 0, 73.2, 73.2},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
 	},
 
@@ -2330,8 +2330,8 @@ completeVehicleData_t availableVehicles[] =
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{70, 80, 320},				// turnspeed around the three axis
-	{0, 100, 30},				// camera distance {min,max,default}
-	{0, 100, 10},				// camera height {min,max,default}
+	{0, 100, 43.2},				// camera distance {min,max,default}
+	{0, 100, 14.4},				// camera height {min,max,default}
 	50,						    // stallspeed
 	150,					    // maxspeed
 	0,							// min throttle
@@ -2341,14 +2341,14 @@ completeVehicleData_t availableVehicles[] =
 	0,							// wheel circumference
 	220,						// acceleration
 	100,						// health
-	{2.518f, -1.371f, -0.155f},	// gun tag
+	{3.6, -2, -0.2},	// gun tag
 	60,							// max fuel
 	0,							// gearheight - SET AUTOMATICALLY
 	-14,							// tailangle
 	WI_MG_2XCAL312, 0, 0, 0, 0, 0, 0, 0,		// weapons
 	450, 0, 0, 0, 0, 0, 0, 0,	// ammo
 	0,0,0,0,0,0,0,0,			// turret
-	{-4, 0, 6},					// cameraposition for cockpit view
+	{-5.8, 0, 8.6},					// cameraposition for cockpit view
 	0,							// effect model
 	0,							// radar range
 	0,							// radar range ground
@@ -2360,7 +2360,7 @@ completeVehicleData_t availableVehicles[] =
 	1000,						// baytime
 	0,							// max bay frame
 	0,							// renderflags
-	{-3,0,13,12},				// shadow coordinates
+	{-4.3, 0, 18.7, 17.3},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
     },
 
@@ -2380,8 +2380,8 @@ completeVehicleData_t availableVehicles[] =
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{60, 70, 260},				// turnspeed around the three axis
-	{0, 100, 30},				// camera distance {min,max,default}
-	{0, 100, 10},				// camera height {min,max,default}
+	{0, 100, 42.3},				// camera distance {min,max,default}
+	{0, 100, 14.1},				// camera height {min,max,default}
 	55,						    // stallspeed
 	170,					    // maxspeed
 	0,							// min throttle
@@ -2391,14 +2391,14 @@ completeVehicleData_t availableVehicles[] =
 	0,							// wheel circumference
 	220,						// acceleration
 	100,						// health
-	{2.518f, -1.371f, -0.155f},	// gun tag
+	{3.6, -1.9, -0.2},	// gun tag
 	60,							// max fuel
 	0,							// gearheight - SET AUTOMATICALLY
 	-14,							// tailangle
 	WI_MG_2XCAL303, 0, 0, 0, 0, 0, 0, 0,		// weapons
 	450, 0, 0, 0, 0, 0, 0, 0,	// ammo
 	0,0,0,0,0,0,0,0,			// turret
-	{-4, 0, 6},					// cameraposition for cockpit view
+	{-5.6, 0, 8.5},					// cameraposition for cockpit view
 	0,							// effect model
 	0,							// radar range
 	0,							// radar range ground
@@ -2410,7 +2410,7 @@ completeVehicleData_t availableVehicles[] =
 	1000,						// baytime
 	0,							// max bay frame
 	0,							// renderflags
-	{-1,0,15,14},				// shadow coordinates
+	{-1.4, 0, 21.1, 19.7},				// shadow coordinates
 	{0,0,0,0}					// shadow orientation adjusters
     },
 
@@ -2816,8 +2816,8 @@ completeVehicleData_t availableVehicles[] =
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{50, 100, 100},				// turnspeed around the three axis
-	{0, 100, 30},				// camera distance {min,max,default}
-	{0, 100, 10},				// camera height {min,max,default}
+	{0, 100, 40.5},				// camera distance {min,max,default}
+	{0, 100, 13.5},				// camera height {min,max,default}
 	0,							// stallspeed
 	60,						    // maxspeed
 	-5,							// min throttle
@@ -2827,14 +2827,14 @@ completeVehicleData_t availableVehicles[] =
 	0,							// wheel circumference
 	20,							// acceleration
 	400,						// health
-	{5, 0, 8},					// gun tag
+	{6.8, 0, 10.8},					// gun tag
 	150,						// max fuel
 	335,						// max gun pitch (upwards = negative) <- gearheight
 	3,							// min gun pitch (downwards = positive) <- tailangle
 	WI_MG_12_7MM, WI_125MM_GUN, 0, 0, 0, 0, 0, 0,// weapons
 	500, 40, 0, 0, 0, 0, 0, 0,	// ammo
 	0,0,0,0,0,0,0,0,			// turret
-	{0, 0, 14},					// cameraposition for cockpit view
+	{0, 0, 18.9},					// cameraposition for cockpit view
 	0,							// effect model
 	8000,						// radar range
 	4000,						// radar range ground
@@ -2865,8 +2865,8 @@ completeVehicleData_t availableVehicles[] =
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
 	{50, 100, 100},				// turnspeed around the three axis
-	{0, 100, 30},				// camera distance {min,max,default}
-	{0, 100, 10},				// camera height {min,max,default}
+	{0, 100, 21.9},				// camera distance {min,max,default}
+	{0, 100, 7.3},				// camera height {min,max,default}
 	0,							// stallspeed
 	60,						    // maxspeed
 	-5,							// min throttle
@@ -2876,14 +2876,14 @@ completeVehicleData_t availableVehicles[] =
 	0,							// wheel circumference
 	20,							// acceleration
 	350,						// health
-	{5, 0, 8},					// gun tag
+	{3.6, 0, 5.8},					// gun tag
 	150,						// max fuel
 	335,						// max gun pitch (upwards = negative) <- gearheight
 	3,							// min gun pitch (downwards = positive) <- tailangle
 	WI_MG_12_7MM, WI_125MM_GUN, 0, 0, 0, 0, 0, 0,// weapons
 	500, 40, 0, 0, 0, 0, 0, 0,	// ammo
 	0,0,0,0,0,0,0,0,			// turret
-	{0, 0, 14},					// cameraposition for cockpit view
+	{0, 0, 10.2},					// cameraposition for cockpit view
 	0,							// effect model
 	8000,						// radar range
 	4000,						// radar range ground
