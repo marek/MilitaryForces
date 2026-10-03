@@ -153,6 +153,7 @@ ServerStatic::clear()
 	nextSnapshotEntities_ = 0;
 	snapshotEntities_ = 0;
 	nextHeartbeatTime_ = 0;
+	memset( masterResolveTime_, 0, sizeof(masterResolveTime_) );
 
 	memset( challenges_, 0, sizeof(challenges_) );
 	memset( &redirectAddress_, 0, sizeof(redirectAddress_) );	

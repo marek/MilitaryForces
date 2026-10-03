@@ -240,6 +240,18 @@ struct SV_Client;
 
 //#define	MAX_MASTER_SERVERS	5
 
+#define SERVER_MAXBANS	1024
+// Structure for managing bans
+typedef struct
+{
+	netadr_t ip;
+	// For a CIDR-Notation type suffix
+	int subnet;
+	
+	bool isexception;
+} serverBan_t;
+
+
 extern	cvar_t	*sv_fps;
 extern	cvar_t	*sv_timeout;
 extern	cvar_t	*sv_zombietime;
@@ -269,6 +281,11 @@ extern	cvar_t	*sv_pure;
 extern	cvar_t	*sv_floodProtect;
 extern	cvar_t	*sv_lanForceRate;
 extern	cvar_t	*sv_strictAuth;
+extern	cvar_t	*sv_banFile;
+extern	cvar_t	*sv_master[MAX_MASTER_SERVERS];
+
+extern	serverBan_t serverBans[SERVER_MAXBANS];
+extern	int serverBansCount;
 
 //===========================================================
 
@@ -305,11 +322,11 @@ void QDECL SV_SendServerCommand( SV_Client *cl, const char *fmt, ...) Q_PRINTF_F
 
 
 void SV_AddOperatorCommands (void);
-//void SV_RemoveOperatorCommands (void);
+void SV_RemoveOperatorCommands (void);
 
 
 //void SV_MasterHeartbeat (void);
-//void SV_MasterShutdown (void);
+void SV_MasterShutdown (void);
 
 bool SV_GetEntityToken( char *buffer, int bufferSize );
 

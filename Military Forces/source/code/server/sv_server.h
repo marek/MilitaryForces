@@ -109,6 +109,7 @@ struct ServerStatic
 	int				nextSnapshotEntities_;		// next snapshotEntities to use
 	entityState_t*	snapshotEntities_;			// [numSnapshotEntities]
 	int				nextHeartbeatTime_;
+	int				masterResolveTime_[MAX_MASTER_SERVERS]; // next svs.time that server should do dns lookup for master server
 	Challenge		challenges_[k_MAX_CHALLENGES];// to prevent invalid IPs from connecting
 	netadr_t		redirectAddress_;			// for rcon return messages
 

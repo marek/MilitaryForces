@@ -226,6 +226,40 @@ void SV_GetChallenge(netadr_t from)
 
 /*
 ==================
+SV_IsBanned
+
+Check whether a certain address is banned
+==================
+*/
+
+static bool SV_IsBanned(netadr_t *from, bool isexception)
+{
+	int index;
+	serverBan_t *curban;
+	
+	if(!isexception)
+	{
+		// If this is a query for a ban, first check whether the client is excepted
+		if(SV_IsBanned(from, true))
+			return false;
+	}
+	
+	for(index = 0; index < serverBansCount; index++)
+	{
+		curban = &serverBans[index];
+		
+		if(curban->isexception == isexception)
+		{
+			if(NET_CompareBaseAdrMask(curban->ip, *from, curban->subnet))
+				return true;
+		}
+	}
+	
+	return false;
+}
+
+/*
+==================
 SV_DirectConnect
 
 A "connect" OOB command has been received
@@ -235,6 +269,13 @@ A "connect" OOB command has been received
 void SV_DirectConnect( netadr_t from ) 
 {
 	Com_DPrintf ("SVC_DirectConnect ()\n");
+
+	// Check whether this client is banned.
+	if(SV_IsBanned(&from, false))
+	{
+		NET_OutOfBandPrint(NS_SERVER, from, "print\nYou are banned from this server.\n");
+		return;
+	}
 
 	char		userinfo[MAX_INFO_STRING];
 	Q_strncpyz( userinfo, Cmd_Argv(1), sizeof(userinfo) );
@@ -385,14 +426,14 @@ void SV_DirectConnect( netadr_t from )
 	int	startIndex;
 	char* password;
 	password = Info_ValueForKey( userinfo, "password" );
-	if ( !strcmp( password, sv_privatePassword->string ) ) 
+	if ( *password && !strcmp( password, sv_privatePassword->string ) ) 
 	{
 		startIndex = 1;
 	} 
 	else
 	{
 		// skip past the reserved slots
-		startIndex = sv_privateClients->integer;
+		startIndex = sv_privateClients->integer + 1;
 	}
 
 	newcl = 0;
@@ -423,7 +464,7 @@ void SV_DirectConnect( netadr_t from )
 			for( i = startIndex; i <= sv_maxclients->integer ; i++ ) 
 			{
 				cl = theSVS.svClients_.at(i);
-				if( cl->netchan_.remoteAddress.type == NA_BOT ) 
+				if( cl && cl->netchan_.remoteAddress.type == NA_BOT ) 
 					count++;
 			}
 			// if they're all bots
@@ -1317,7 +1358,10 @@ static void SV_VerifyPaks_f( SV_Client *cl )
 			cl->lastSnapshotTime_ = 0;
 			cl->state_ = SV_Client::CS_ACTIVE;
 			SV_SendClientSnapshot( cl );
-			SV_DropClient( cl, "Unpure client detected. Invalid .PK3 files referenced!" );
+			SV_DropClient( cl, "Unpure Client. "
+				"You may need to enable in-game downloads "
+				"to connect to this server (set "
+				"cl_allowDownload 1)" );
 		}
 	}
 }
@@ -1341,10 +1385,11 @@ Pull specific info from a newly changed userinfo string
 into a more C friendly form.
 =================
 */
-void SV_UserinfoChanged( SV_Client *cl ) 
-{
+void SV_UserinfoChanged( SV_Client *cl ) {
 	char	*val;
+	char	*ip;
 	int		i;
+	int	len;
 
 	// name for C code
 	Q_strncpyz( cl->name_, Info_ValueForKey (cl->userinfo_, "name"), sizeof(cl->name_) );
@@ -1353,69 +1398,73 @@ void SV_UserinfoChanged( SV_Client *cl )
 
 	// if the client is on the same subnet as the server and we aren't running an
 	// internet public server, assume they don't need a rate choke
-	if ( Sys_IsLANAddress( cl->netchan_.remoteAddress ) && com_dedicated->integer != 2 && sv_lanForceRate->integer == 1) 
-	{
+	if ( Sys_IsLANAddress( cl->netchan_.remoteAddress ) && com_dedicated->integer != 2 && sv_lanForceRate->integer == 1) {
 		cl->rate_ = 99999;	// lans should not rate limit
-	} 
-	else 
-	{
+	} else {
 		val = Info_ValueForKey (cl->userinfo_, "rate");
-		if (strlen(val))
-		{
+		if (strlen(val)) {
 			i = atoi(val);
 			cl->rate_ = i;
-			if (cl->rate_ < 1000)
-			{
+			if (cl->rate_ < 1000) {
 				cl->rate_ = 1000;
-			} else if (cl->rate_ > 90000)
-			{
+			} else if (cl->rate_ > 90000) {
 				cl->rate_ = 90000;
 			}
-		} 
-		else 
-		{
+		} else {
 			cl->rate_ = 3000;
 		}
 	}
 	val = Info_ValueForKey (cl->userinfo_, "handicap");
-	if (strlen(val)) 
-	{
+	if (strlen(val)) {
 		i = atoi(val);
-		if (i<=0 || i>100 || strlen(val) > 4)
-		{
+		if (i<=0 || i>100 || strlen(val) > 4) {
 			Info_SetValueForKey( cl->userinfo_, "handicap", "100" );
 		}
 	}
 
 	// snaps command
 	val = Info_ValueForKey (cl->userinfo_, "snaps");
-	if (strlen(val)) 
+	
+	if(strlen(val))
 	{
 		i = atoi(val);
-		if ( i < 1 ) 
-		{
+		
+		if(i < 1)
 			i = 1;
-		} 
-		else if ( i > sv_fps->integer ) 
-		{
+		else if(i > sv_fps->integer)
 			i = sv_fps->integer;
-		}
-		cl->snapshotMsec_ = 1000/i;
-	} 
-	else 
+
+		i = 1000 / i;
+	}
+	else
+		i = 50;
+
+	if(i != cl->snapshotMsec_)
 	{
-		cl->snapshotMsec_ = 50;
+		// Reset last sent snapshot so we avoid desync between server frame time and snapshot send time
+		cl->lastSnapshotTime_ = 0;
+		cl->snapshotMsec_ = i;		
 	}
 	
+#ifdef USE_VOIP
+#ifdef LEGACY_PROTOCOL
+	if(cl->compat)
+		cl->hasVoip = false;
+	else
+#endif
+	{
+		val = Info_ValueForKey(cl->userinfo_, "cl_voipProtocol");
+		cl->hasVoip = !Q_stricmp( val, "opus" );
+	}
+#endif
+
 	// TTimo
 	// maintain the IP information
 	// the banning code relies on this being consistently present
-	const char *ip;
-	int len;
 	if( NET_IsLocalAddress(cl->netchan_.remoteAddress) )
 		ip = "localhost";
 	else
-		ip = NET_AdrToString( cl->netchan_.remoteAddress );
+		ip = (char*)NET_AdrToString( cl->netchan_.remoteAddress );
 
 	val = Info_ValueForKey( cl->userinfo_, "ip" );
 	if( val[0] )
@@ -1427,6 +1476,7 @@ void SV_UserinfoChanged( SV_Client *cl )
 		SV_DropClient( cl, "userinfo string length exceeded" );
 	else
 		Info_SetValueForKey( cl->userinfo_, "ip", ip );
+
 }
 
 

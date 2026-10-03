@@ -62,6 +62,11 @@ cvar_t	*sv_pure;
 cvar_t	*sv_floodProtect;
 cvar_t	*sv_lanForceRate; // dedicated 1 (LAN) server forces local client rates to 99999 (bug #491)
 cvar_t	*sv_strictAuth;
+cvar_t	*sv_banFile;
+cvar_t	*sv_master[MAX_MASTER_SERVERS];	// master server ip address
+
+serverBan_t serverBans[SERVER_MAXBANS];
+int serverBansCount = 0;
 
 /*
 =============================================================================
@@ -104,8 +109,7 @@ SV_ReplacePendingServerCommands
   This is ugly
 ======================
 */
-int SV_ReplacePendingServerCommands( SV_Client *client, const char *cmd ) 
-{
+int SV_ReplacePendingServerCommands( SV_Client *client, const char *cmd ) {
 	int i, index, csnum1, csnum2;
 
 	for ( i = client->reliableSent_+1; i <= client->reliableSequence_; i++ ) {
@@ -117,8 +121,8 @@ int SV_ReplacePendingServerCommands( SV_Client *client, const char *cmd )
 			if ( csnum1 == csnum2 ) {
 				Q_strncpyz( client->reliableCommands_[ index ], cmd, sizeof( client->reliableCommands_[ index ] ) );
 				/*
-				if ( client->netchan.remoteAddress.type != NA_BOT ) {
-					Com_Printf( "WARNING: client %i removed double pending config string %i: %s\n", client-svs.clients, csnum1, cmd );
+				if ( client->netchan_.remoteAddress.type != NA_BOT ) {
+					Com_Printf( "WARNING: client %i removed double pending config string %i: %s\n", client->clientNum_, csnum1, cmd );
 				}
 				*/
 				return true;
@@ -136,8 +140,7 @@ The given command will be transmitted to the client, and is guaranteed to
 not have future snapshot_t executed before it is executed
 ======================
 */
-void SV_AddServerCommand( SV_Client *client, const char *cmd ) 
-{
+void SV_AddServerCommand( SV_Client *client, const char *cmd ) {
 	int		index, i;
 
 	// this is very ugly but it's also a waste to for instance send multiple config string updates
@@ -155,11 +158,15 @@ void SV_AddServerCommand( SV_Client *client, const char *cmd )
 	// we must drop the connection
 	// we check == instead of >= so a broadcast print added by SV_DropClient()
 	// doesn't cause a recursive drop client
-	if ( client->reliableSequence_ - client->reliableAcknowledge_ == MAX_RELIABLE_COMMANDS + 1 ) 
-	{
+	if ( client->reliableSequence_ - client->reliableAcknowledge_ == MAX_RELIABLE_COMMANDS + 1 ) {
+		if ( client->gamestateMessageNum_ == -1 )  {
+			// invalid game state message 
+			// this can occur in SV_DropClient() to avoid calling it more than once
+			return;
+		}
+
 		Com_Printf( "===== pending server commands =====\n" );
-		for ( i = client->reliableAcknowledge_ + 1 ; i <= client->reliableSequence_ ; i++ ) 
-		{
+		for ( i = client->reliableAcknowledge_ + 1 ; i <= client->reliableSequence_ ; i++ ) {
 			Com_Printf( "cmd %5d: %s\n", i, client->reliableCommands_[ i & (MAX_RELIABLE_COMMANDS-1) ] );
 		}
 		Com_Printf( "cmd %5d: %s\n", i, cmd );
@@ -230,91 +237,126 @@ MASTER SERVER FUNCTIONS
 ==============================================================================
 */
 
-///*
-//================
-//SV_MasterHeartbeat
-//
-//Send a message to the masters every few minutes to
-//let it know we are alive, and log information.
-//We will also have a heartbeat sent when a server
-//changes from empty to non-empty, and full to non-full,
-//but not on every player enter or exit.
-//================
-//*/
-////#define	HEARTBEAT_MSEC	300*1000
-////#define	HEARTBEAT_GAME	"QuakeArena-1"
-//void SV_MasterHeartbeat( void ) {
-//	static netadr_t	adr[MAX_MASTER_SERVERS];
-//	int			i;
-//
-//	// "dedicated 1" is for lan play, "dedicated 2" is for inet public play
-//	if ( !com_dedicated || com_dedicated->integer != 2 ) {
-//		return;		// only dedicated servers send heartbeats
-//	}
-//
-//	// if not time yet, don't send anything
-//	if ( svs.time < svs.nextHeartbeatTime ) {
-//		return;
-//	}
-//	svs.nextHeartbeatTime = svs.time + HEARTBEAT_MSEC;
-//
-//
-//	// send to group masters
-//	for ( i = 0 ; i < MAX_MASTER_SERVERS ; i++ ) {
-//		if ( !sv_master[i]->string[0] ) {
-//			continue;
-//		}
-//
-//		// see if we haven't already resolved the name
-//		// resolving usually causes hitches on win95, so only
-//		// do it when needed
-//		if ( sv_master[i]->modified ) {
-//			sv_master[i]->modified = false;
-//	
-//			Com_Printf( "Resolving %s\n", sv_master[i]->string );
-//			if ( !NET_StringToAdr( sv_master[i]->string, &adr[i] ) ) {
-//				// if the address failed to resolve, clear it
-//				// so we don't take repeated dns hits
-//				Com_Printf( "Couldn't resolve address: %s\n", sv_master[i]->string );
-//				Cvar_Set( sv_master[i]->name, "" );
-//				sv_master[i]->modified = false;
-//				continue;
-//			}
-//			if ( !strstr( ":", sv_master[i]->string ) ) {
-//				adr[i].port = BigShort( PORT_MASTER );
-//			}
-//			Com_Printf( "%s resolved to %i.%i.%i.%i:%i\n", sv_master[i]->string,
-//				adr[i].ip[0], adr[i].ip[1], adr[i].ip[2], adr[i].ip[3],
-//				BigShort( adr[i].port ) );
-//		}
-//
-//
-//		Com_Printf ("Sending heartbeat to %s\n", sv_master[i]->string );
-//		// this command should be changed if the server info / status format
-//		// ever incompatably changes
-//		NET_OutOfBandPrint( NS_SERVER, adr[i], "heartbeat %s\n", HEARTBEAT_GAME );
-//	}
-//}
+/*
+================
+SV_MasterHeartbeat
 
-///*
-//=================
-//SV_MasterShutdown
-//
-//Informs all masters that this server is going down
-//=================
-//*/
-//void SV_MasterShutdown( void ) {
-//	// send a hearbeat right now
-//	svs.nextHeartbeatTime = -9999;
-//	SV_MasterHeartbeat();
-//
-//	// send it again to minimize chance of drops
-//	svs.nextHeartbeatTime = -9999;
-//	SV_MasterHeartbeat();
-//
-//	// when the master tries to poll the server, it won't respond, so
-//	// it will be removed from the list
-//}
+Send a message to the masters every few minutes to
+let it know we are alive, and log information.
+We will also have a heartbeat sent when a server
+changes from empty to non-empty, and full to non-full,
+but not on every player enter or exit.
+================
+*/
+#define	HEARTBEAT_MSEC	300*1000
+#define	MASTERDNS_MSEC	24*60*60*1000
+void SV_MasterHeartbeat(const char *message)
+{
+	static netadr_t	adr[MAX_MASTER_SERVERS][2]; // [2] for v4 and v6 address for the same address string.
+	int			i;
+	int			res;
+	int			netenabled;
+
+	netenabled = Cvar_VariableIntegerValue("net_enabled");
+
+	// "dedicated 1" is for lan play, "dedicated 2" is for inet public play
+	if (!com_dedicated || com_dedicated->integer != 2 || !(netenabled & (NET_ENABLEV4 | NET_ENABLEV6)))
+		return;		// only dedicated servers send heartbeats
+
+	// if not time yet, don't send anything
+	if ( theSVS.time_ < theSVS.nextHeartbeatTime_ )
+		return;
+
+	if ( !Q_stricmp( com_gamename->string, LEGACY_MASTER_GAMENAME ) )
+		message = LEGACY_HEARTBEAT_FOR_MASTER;
+
+	theSVS.nextHeartbeatTime_ = theSVS.time_ + HEARTBEAT_MSEC;
+
+	// send to group masters
+	for (i = 0; i < MAX_MASTER_SERVERS; i++)
+	{
+		if(!sv_master[i]->string[0])
+			continue;
+
+		// see if we haven't already resolved the name or if it's been over 24 hours
+		// resolving usually causes hitches on win95, so only do it when needed
+		if (sv_master[i]->modified || theSVS.time_ > theSVS.masterResolveTime_[i])
+		{
+			sv_master[i]->modified = false;
+			theSVS.masterResolveTime_[i] = theSVS.time_ + MASTERDNS_MSEC;
+			
+			if(netenabled & NET_ENABLEV4)
+			{
+				Com_Printf("Resolving %s (IPv4)\n", sv_master[i]->string);
+				res = NET_StringToAdr(sv_master[i]->string, &adr[i][0], NA_IP);
+
+				if(res == 2)
+				{
+					// if no port was specified, use the default master port
+					adr[i][0].port = BigShort(PORT_MASTER);
+				}
+				
+				if(res)
+					Com_Printf( "%s resolved to %s\n", sv_master[i]->string, NET_AdrToStringwPort(adr[i][0]));
+				else
+					Com_Printf( "%s has no IPv4 address.\n", sv_master[i]->string);
+			}
+			
+			if(netenabled & NET_ENABLEV6)
+			{
+				Com_Printf("Resolving %s (IPv6)\n", sv_master[i]->string);
+				res = NET_StringToAdr(sv_master[i]->string, &adr[i][1], NA_IP6);
+
+				if(res == 2)
+				{
+					// if no port was specified, use the default master port
+					adr[i][1].port = BigShort(PORT_MASTER);
+				}
+				
+				if(res)
+					Com_Printf( "%s resolved to %s\n", sv_master[i]->string, NET_AdrToStringwPort(adr[i][1]));
+				else
+					Com_Printf( "%s has no IPv6 address.\n", sv_master[i]->string);
+			}
+		}
+
+		if(adr[i][0].type == NA_BAD && adr[i][1].type == NA_BAD)
+		{
+			continue;
+		}
+
+
+		Com_Printf ("Sending heartbeat to %s\n", sv_master[i]->string );
+
+		// this command should be changed if the server info / status format
+		// ever incompatably changes
+
+		if(adr[i][0].type != NA_BAD)
+			NET_OutOfBandPrint( NS_SERVER, adr[i][0], "heartbeat %s\n", message);
+		if(adr[i][1].type != NA_BAD)
+			NET_OutOfBandPrint( NS_SERVER, adr[i][1], "heartbeat %s\n", message);
+	}
+}
+
+/*
+=================
+SV_MasterShutdown
+
+Informs all masters that this server is going down
+=================
+*/
+void SV_MasterShutdown( void ) {
+	// send a heartbeat right now
+	theSVS.nextHeartbeatTime_ = -9999;
+	SV_MasterHeartbeat(HEARTBEAT_FOR_MASTER);
+
+	// send it again to minimize chance of drops
+	theSVS.nextHeartbeatTime_ = -9999;
+	SV_MasterHeartbeat(HEARTBEAT_FOR_MASTER);
+
+	// when the master tries to poll the server, it won't respond, so
+	// it will be removed from the list
+}
 
 
 /*
@@ -600,14 +642,18 @@ void SVC_Info( netadr_t from )
 		return;
 
 	// don't count privateclients
-	int count = 0;
-	for( int i = sv_privateClients->integer ; i <= sv_maxclients->integer ; i++ ) 
+	int count = 0, humans = 0;
+	for( int i = sv_privateClients->integer + 1 ; i <= sv_maxclients->integer ; i++ ) 
 	{
 		SV_Client* cl = theSVS.svClients_.at(i);
 		if( !cl )
 			continue;
-		if( cl->state_ >= SV_Client::CS_CONNECTED ) 
+		if( cl->state_ >= SV_Client::CS_CONNECTED ) {
 			count++;
+			if (cl->netchan_.remoteAddress.type != NA_BOT) {
+				humans++;
+			}
+		}
 	}
 
 	char	infostring[MAX_INFO_STRING];
@@ -622,6 +668,7 @@ void SVC_Info( netadr_t from )
 	Info_SetValueForKey( infostring, "hostname", sv_hostname->string );
 	Info_SetValueForKey( infostring, "mapname", sv_mapname->string );
 	Info_SetValueForKey( infostring, "clients", va("%i", count) );
+	Info_SetValueForKey(infostring, "g_humanplayers", va("%i", humans));
 	Info_SetValueForKey( infostring, "sv_maxclients", 
 		va("%i", sv_maxclients->integer - sv_privateClients->integer ) );
 	Info_SetValueForKey( infostring, "gametype", va("%i", sv_gametype->integer ) );
@@ -1040,7 +1087,7 @@ void SV_Frame( int msec )
 	// the menu kills the server with this cvar
 	if ( sv_killserver->integer ) 
 	{
-		SV_Shutdown ("Server was killed.\n");
+		SV_Shutdown ("Server was killed");
 		Cvar_Set( "sv_killserver", "0" );
 		return;
 	}
@@ -1056,7 +1103,13 @@ void SV_Frame( int msec )
 	if ( sv_fps->integer < 1 ) 
 		Cvar_Set( "sv_fps", "10" );
 
-	frameMsec = 1000 / sv_fps->integer ;
+	frameMsec = 1000 / sv_fps->integer * com_timescale->value;
+	// don't let it scale below 1ms
+	if(frameMsec < 1)
+	{
+		Cvar_Set("timescale", va("%f", sv_fps->integer / 1000.0f));
+		frameMsec = 1;
+	}
 
 	theSV.timeResidual_ += msec;
 
@@ -1131,7 +1184,7 @@ void SV_Frame( int msec )
 	SV_SendClientMessages();
 
 	// send a heartbeat to the master if needed
-	//SV_MasterHeartbeat();
+	SV_MasterHeartbeat(HEARTBEAT_FOR_MASTER);
 }
 
 /*
