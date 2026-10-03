@@ -368,6 +368,8 @@ Get the catagory/class enum from the vehicle index (use CAT_ANY & CLASS_ANY to d
 =================
 */
 
+static void MF_findDeck( const char *name, completeVehicleData_t *veh );
+
 void MF_LoadAllVehicleData()
 {
 	int i, j, num;
@@ -395,6 +397,8 @@ void MF_LoadAllVehicleData()
 		if( !(availableVehicles[i].cat & CAT_LQM) )
 			MF_getDimensions( name, 0, &availableVehicles[i].maxs, &availableVehicles[i].mins );
 		availableVehicles[i].mins[2] += 1;// to look better ?
+		if( availableVehicles[i].cat & CAT_BOAT ) 
+			MF_findDeck( name, &availableVehicles[i] );
 
 		// helo/plane specific
 		if(availableVehicles[i].cat & CAT_PLANE) 
@@ -1081,6 +1085,105 @@ void MF_ParseMissionScripts( char *buf,
 			break;
 		}
 	}
+}
+
+long	FS_ReadFile( const char *qpath, void **buffer );
+void	FS_FreeFile( void *buffer );
+
+#define DECK_GRID	12
+
+static void MF_findDeck( const char *name, completeVehicleData_t *veh )
+{
+	void	*buf;
+	float	cell[DECK_GRID][DECK_GRID];
+	bool	used[DECK_GRID][DECK_GRID];
+	float	heights[DECK_GRID*DECK_GRID];
+	int		num = 0;
+
+	veh->hasDeck = false;
+	if( FS_ReadFile( name, &buf ) <= 0 || !buf ) 
+		return;
+
+	md3Header_t *header = (md3Header_t*)buf;
+	float sx = veh->maxs[0] - veh->mins[0];
+	float sy = veh->maxs[1] - veh->mins[1];
+	if( header->ident != MD3_IDENT || sx <= 0 || sy <= 0 ) {
+		FS_FreeFile( buf );
+		return;
+	}
+	memset( used, 0, sizeof(used) );
+
+	md3Surface_t *surf = (md3Surface_t*)((byte*)header + header->ofsSurfaces);
+	for( int i = 0; i < header->numSurfaces; i++ ) {
+		md3Triangle_t *tri = (md3Triangle_t*)((byte*)surf + surf->ofsTriangles);
+		md3XyzNormal_t *xyz = (md3XyzNormal_t*)((byte*)surf + surf->ofsXyzNormals);
+		for( int j = 0; j < surf->numTriangles; j++, tri++ ) {
+			vec3_t v[3], e1, e2, normal;
+			for( int k = 0; k < 3; k++ ) {
+				v[k][0] = xyz[tri->indexes[k]].xyz[0] * MD3_XYZ_SCALE;
+				v[k][1] = xyz[tri->indexes[k]].xyz[1] * MD3_XYZ_SCALE;
+				v[k][2] = xyz[tri->indexes[k]].xyz[2] * MD3_XYZ_SCALE;
+			}
+			VectorSubtract( v[1], v[0], e1 );
+			VectorSubtract( v[2], v[0], e2 );
+			CrossProduct( e1, e2, normal );
+			if( VectorNormalize( normal ) == 0 || fabs( normal[2] ) < 0.7f ) 
+				continue;
+			for( int a = 0; a <= 4; a++ ) {
+				for( int b = 0; a + b <= 4; b++ ) {
+					float wa = a * 0.25f, wb = b * 0.25f, wc = 1.0f - wa - wb;
+					float x = v[0][0]*wa + v[1][0]*wb + v[2][0]*wc;
+					float y = v[0][1]*wa + v[1][1]*wb + v[2][1]*wc;
+					float z = v[0][2]*wa + v[1][2]*wb + v[2][2]*wc;
+					int cx = (int)( (x - veh->mins[0]) / sx * DECK_GRID );
+					int cy = (int)( (y - veh->mins[1]) / sy * DECK_GRID );
+					if( cx < 0 || cy < 0 || cx >= DECK_GRID || cy >= DECK_GRID ) 
+						continue;
+					if( !used[cx][cy] || z > cell[cx][cy] ) {
+						cell[cx][cy] = z;
+						used[cx][cy] = true;
+					}
+				}
+			}
+		}
+		surf = (md3Surface_t*)((byte*)surf + surf->ofsEnd);
+	}
+	FS_FreeFile( buf );
+
+	for( int cx = 1; cx < DECK_GRID - 1; cx++ ) {
+		for( int cy = 2; cy < DECK_GRID - 2; cy++ ) {
+			if( used[cx][cy] ) 
+				heights[num++] = cell[cx][cy];
+		}
+	}
+	if( num < 4 ) 
+		return;
+	for( int i = 1; i < num; i++ ) {
+		float h = heights[i];
+		int j = i - 1;
+		while( j >= 0 && heights[j] > h ) {
+			heights[j+1] = heights[j];
+			j--;
+		}
+		heights[j+1] = h;
+	}
+	float deck = heights[num * 3 / 10];
+	float tolerance = (veh->maxs[2] - veh->mins[2]) * 0.08f;
+	float px = 0, py = 0;
+	int count = 0;
+	for( int cx = 1; cx < DECK_GRID - 1; cx++ ) {
+		for( int cy = 2; cy < DECK_GRID - 2; cy++ ) {
+			if( used[cx][cy] && fabs( cell[cx][cy] - deck ) <= tolerance ) {
+				px += veh->mins[0] + (cx + 0.5f) * sx / DECK_GRID;
+				py += veh->mins[1] + (cy + 0.5f) * sy / DECK_GRID;
+				count++;
+			}
+		}
+	}
+	if( !count ) 
+		return;
+	VectorSet( veh->deckPos, px / count, py / count, deck );
+	veh->hasDeck = true;
 }
 
 bool MF_StealthHidden( int vehicle, int revealTime, int time, float dist, float radarRange )

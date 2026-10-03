@@ -857,6 +857,8 @@ struct completeVehicleData_t
 	vec4_t			shadowCoords;	// shadow apply coords { offsetX, offsetY, xAdjust, yAdjust }
 	vec4_t			shadowAdjusts;	// shadow apply adjustments { pitchMax, rollMax, pitchMod, rollMod }
 	animation_t		*animations;	// Animation pointer
+	bool			hasDeck;
+	vec3_t			deckPos;
 };
 
 extern completeVehicleData_t availableVehicles[];

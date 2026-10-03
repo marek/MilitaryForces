@@ -31,6 +31,7 @@ void MiscVehicle_Die::execute( GameEntity *inflictor, GameEntity *attacker, int 
 		AddScore( attacker, pos, MiscVehicle_TeamScore( self_, attacker ) );
 	}
 
+	MiscVehicle_FreeDecks( self_ );
 	ExplodeVehicle(self_);
 	self_->freeAfterEvent_ = true;
 
@@ -343,7 +344,10 @@ void Abandoned_Think::execute()
 	if( ent->s.pos.trType == TR_STATIONARY )
 	{
 		if( theLevel.time_ > expire_ )
+		{
+			MiscVehicle_FreeDecks( ent );
 			ent->freeUp();
+		}
 		else
 			ent->nextthink_ = theLevel.time_ + 1000;
 		return;
@@ -403,7 +407,7 @@ void MiscVehicle_Abandon( GameEntity *ent )
 		think->ownerTeam_ = client->sess_.sessionTeam_;
 		memcpy( think->ammo_, client->ps_.ammo, sizeof(think->ammo_) );
 		memcpy( think->mounts_, client->ps_.numWeaponsOnMount, sizeof(think->mounts_) );
-		veh->r.contents = CONTENTS_BODY;
+		veh->r.contents = availableVehicles[vehicle].hasDeck ? CONTENTS_CORPSE : CONTENTS_BODY;
 		veh->takedamage_ = true;
 		veh->health_ = ent->health_;
 		veh->s.seatMask = SEATMASK_ENTERABLE;
@@ -414,6 +418,54 @@ void MiscVehicle_Abandon( GameEntity *ent )
 	veh->nextthink_ = theLevel.time_ + 50;
 
 	SV_LinkEntity( veh );
+
+	if( landed && availableVehicles[vehicle].hasDeck ) 
+	{
+		completeVehicleData_t* data = &availableVehicles[vehicle];
+		vec3_t forward, yawOnly;
+		float halfLength = ( data->maxs[0] - data->mins[0] ) * 0.5f;
+		float half = ( data->maxs[1] - data->mins[1] ) * 0.45f;
+		float centre = ( data->maxs[0] + data->mins[0] ) * 0.5f;
+		if( half > 120 ) half = 120;
+		if( half > halfLength ) half = halfLength;
+		int count = (int)ceil( halfLength / half );
+		if( count > MAX_VEHICLE_DECKS ) count = MAX_VEHICLE_DECKS;
+		VectorSet( yawOnly, 0, veh->s.angles[YAW], 0 );
+		AngleVectors( yawOnly, forward, 0, 0 );
+		for( int i = 0; i < count; i++ ) 
+		{
+			float along = count > 1 ? centre - (halfLength - half) + i * 2 * (halfLength - half) / (count - 1) : centre;
+			vec3_t origin;
+			GameEntity* deck = theLevel.spawnEntity();
+			deck->classname_ = "vehicle_deck";
+			deck->s.eType = ET_INVISIBLE;
+			deck->parent_ = veh;
+			VectorSet( deck->r.mins, -half, -half, data->mins[2] );
+			VectorSet( deck->r.maxs, half, half, data->deckPos[2] );
+			VectorMA( veh->r.currentOrigin, along, forward, origin );
+			G_SetOrigin( deck, origin );
+			deck->r.contents = CONTENTS_BODY;
+			deck->takedamage_ = true;
+			deck->health_ = 1;
+			SV_LinkEntity( deck );
+			think->decks_[i] = deck;
+		}
+	}
+}
+
+void MiscVehicle_FreeDecks( GameEntity *veh )
+{
+	Abandoned_Think* think = dynamic_cast<Abandoned_Think*>( veh->thinkFunc_ );
+	if( !think ) 
+		return;
+	for( int i = 0; i < MAX_VEHICLE_DECKS; i++ ) 
+	{
+		if( think->decks_[i] ) 
+		{
+			think->decks_[i]->freeUp();
+			think->decks_[i] = 0;
+		}
+	}
 }
 
 void DroneInit()

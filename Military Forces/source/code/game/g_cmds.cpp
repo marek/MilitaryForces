@@ -1580,6 +1580,7 @@ static void Cmd_Enter( GameEntity *ent )
 	VectorCopy( best->r.currentOrigin, client->ps_.origin );
 	client->ps_.origin[2] -= 24;
 	VectorCopy( best->s.angles, client->ps_.vehicleAngles );
+	MiscVehicle_FreeDecks( best );
 	best->freeUp();
 
 	int clientNum = ent->s.number;
@@ -1638,7 +1639,16 @@ void Cmd_Eject_f( GameEntity *ent )
 
 	MiscVehicle_Abandon( ent );
 
-	if( parked ) 
+	if( parked && availableVehicles[vehicle].hasDeck ) 
+	{
+		vec3_t forward, right, yawOnly;
+		VectorSet( yawOnly, 0, client->ps_.vehicleAngles[YAW], 0 );
+		AngleVectors( yawOnly, forward, right, 0 );
+		VectorMA( client->ps_.origin, availableVehicles[vehicle].deckPos[0], forward, client->ps_.origin );
+		VectorMA( client->ps_.origin, -availableVehicles[vehicle].deckPos[1], right, client->ps_.origin );
+		client->ps_.origin[2] += availableVehicles[vehicle].deckPos[2];
+	}
+	else if( parked ) 
 	{
 		vec3_t right;
 		AngleVectors( client->ps_.vehicleAngles, 0, right, 0 );

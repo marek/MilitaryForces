@@ -29,12 +29,15 @@ struct Drone_Think : public GameEntity::EntityFunc_Think
 	float			speed_;
 };
 
+#define MAX_VEHICLE_DECKS	8
+
 struct Abandoned_Think : public GameEntity::EntityFunc_Think
 {
 	Abandoned_Think() : expire_(0), enterable_(false), fuel_(0), ownerTeam_(0)
 	{
 		memset( ammo_, 0, sizeof(ammo_) );
 		memset( mounts_, 0, sizeof(mounts_) );
+		memset( decks_, 0, sizeof(decks_) );
 	}
 
 	virtual void	execute();
@@ -45,10 +48,12 @@ struct Abandoned_Think : public GameEntity::EntityFunc_Think
 	int				ownerTeam_;
 	int				ammo_[MAX_WEAPONS_PER_VEHICLE*2];
 	int				mounts_[32];
+	GameEntity*		decks_[MAX_VEHICLE_DECKS];
 };
 
 GameEntity* SP_misc_vehicle( GameEntity *sp_ent );
 void MiscVehicle_Abandon( GameEntity *ent );
+void MiscVehicle_FreeDecks( GameEntity *veh );
 void MiscVehicle_SetRoute( GameEntity *ent, const mission_waypoint_t *wps );
 void SP_misc_groundinstallation( GameEntity *sp_ent );
 void DroneInit();

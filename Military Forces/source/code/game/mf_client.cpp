@@ -494,7 +494,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 			VectorCopy( spawn_origin, endpos );
 			endpos[2] -= 512;
 
-			SV_Trace(&trace, spawn_origin, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_SOLID, false );
+			SV_Trace(&trace, spawn_origin, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_PLAYERSOLID, false );
 			if( trace.entityNum != ENTITYNUM_NONE ) 
 			{
 				test = theLevel.getEntity(trace.entityNum);// &g_entities[trace.entityNum];

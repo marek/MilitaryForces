@@ -200,6 +200,8 @@ void ClientImpacts( GameEntity *ent, pmove_t *pm )
 		if( j != i ) 
 			continue;	// duplicated
 
+		if( pm->touchents[i] < 0 ) 
+			continue;
 		GameEntity* other = theLevel.getEntity(pm->touchents[i]);
 
 		if( (( ent->r.svFlags & SVF_BOT || (ent->client_->vehicle_ >= 0) ) && ( ent->touchFunc_ )) ) 
