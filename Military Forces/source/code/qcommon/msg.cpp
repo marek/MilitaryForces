@@ -869,14 +869,15 @@ If force is not set, then nothing at all will be generated if the entity is
 identical, under the assumption that the in-order delta code will catch it.
 ==================
 */
-void MSG_WriteDeltaEntity( msg_t *msg, struct entityState_s *from, struct entityState_s *to, 
-						   bool force ) {
+static bool MSG_WriteEntity( msg_t *msg, struct entityState_s *from, struct entityState_s *to, 
+						   bool force, int create, uint64_t forced, uint64_t *written ) {
 	int			i, lc;
 	int			numFields;
 	netField_t	*field;
 	int			trunc;
 	float		fullFloat;
 	int			*fromF, *toF;
+	uint64_t	mask;
 
 	numFields = sizeof(entityStateFields)/sizeof(entityStateFields[0]);
 
@@ -889,11 +890,14 @@ void MSG_WriteDeltaEntity( msg_t *msg, struct entityState_s *from, struct entity
 	// a NULL to is a delta remove message
 	if ( to == NULL ) {
 		if ( from == NULL ) {
-			return;
+			return false;
 		}
 		MSG_WriteBits( msg, from->number, GENTITYNUM_BITS );
+		if ( create >= 0 ) {
+			MSG_WriteBits( msg, 0, 1 );
+		}
 		MSG_WriteBits( msg, 1, 1 );
-		return;
+		return true;
 	}
 
 	if ( to->number < 0 || to->number >= MAX_GENTITIES ) {
@@ -905,7 +909,7 @@ void MSG_WriteDeltaEntity( msg_t *msg, struct entityState_s *from, struct entity
 	for ( i = 0, field = entityStateFields ; i < numFields ; i++, field++ ) {
 		fromF = (int *)( (byte *)from + field->offset );
 		toF = (int *)( (byte *)to + field->offset );
-		if ( !MSG_FieldSame( field, fromF, toF ) ) {
+		if ( ( ( forced >> i ) & 1 ) || !MSG_FieldSame( field, fromF, toF ) ) {
 			lc = i+1;
 		}
 	}
@@ -913,33 +917,41 @@ void MSG_WriteDeltaEntity( msg_t *msg, struct entityState_s *from, struct entity
 	if ( lc == 0 ) {
 		// nothing at all changed
 		if ( !force ) {
-			return;		// nothing at all
+			return false;		// nothing at all
 		}
 		// write two bits for no change
 		MSG_WriteBits( msg, to->number, GENTITYNUM_BITS );
+		if ( create >= 0 ) {
+			MSG_WriteBits( msg, create, 1 );
+		}
 		MSG_WriteBits( msg, 0, 1 );		// not removed
 		MSG_WriteBits( msg, 0, 1 );		// no delta
-		return;
+		return true;
 	}
 
 	MSG_WriteBits( msg, to->number, GENTITYNUM_BITS );
+	if ( create >= 0 ) {
+		MSG_WriteBits( msg, create, 1 );
+	}
 	MSG_WriteBits( msg, 0, 1 );			// not removed
 	MSG_WriteBits( msg, 1, 1 );			// we have a delta
 
 	MSG_WriteByte( msg, lc );	// # of changes
 
 	oldsize += numFields;
+	mask = 0;
 
 	for ( i = 0, field = entityStateFields ; i < lc ; i++, field++ ) {
 		fromF = (int *)( (byte *)from + field->offset );
 		toF = (int *)( (byte *)to + field->offset );
 
-		if ( MSG_FieldSame( field, fromF, toF ) ) {
+		if ( !( ( forced >> i ) & 1 ) && MSG_FieldSame( field, fromF, toF ) ) {
 			MSG_WriteBits( msg, 0, 1 );	// no change
 			continue;
 		}
 
 		MSG_WriteBits( msg, 1, 1 );	// changed
+		mask |= (uint64_t)1 << i;
 
 		if ( field->bits == 0 || field->bits >= NETF_POS ) {
 			// float
@@ -981,6 +993,34 @@ void MSG_WriteDeltaEntity( msg_t *msg, struct entityState_s *from, struct entity
 			}
 		}
 	}
+
+	if ( written ) {
+		*written = mask;
+	}
+	return true;
+}
+
+void MSG_WriteDeltaEntity( msg_t *msg, struct entityState_s *from, struct entityState_s *to, 
+						   bool force ) {
+	MSG_WriteEntity( msg, from, to, force, -1, 0, NULL );
+}
+
+/*
+==================
+MSG_WriteEntityUpdate
+
+Writes one entity of a snapshot: the fields that differ from what the
+client has plus the forced ones. A create is a full state from the baseline.
+If to is NULL, a remove entity update will be sent
+Returns false when nothing was written
+==================
+*/
+bool MSG_WriteEntityUpdate( msg_t *msg, struct entityState_s *from, struct entityState_s *to, 
+						   bool create, uint64_t forced, uint64_t *written ) {
+	if ( written ) {
+		*written = 0;
+	}
+	return MSG_WriteEntity( msg, from, to, create, create ? 1 : 0, forced, written );
 }
 
 /*

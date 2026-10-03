@@ -24,6 +24,40 @@ typedef struct voipServerPacket_s
 } voipServerPacket_t;
 #endif
 
+#define	MAX_SENT_ENTITIES	512
+
+#define	SENT_UPDATE		0
+#define	SENT_CREATE		1
+#define	SENT_REMOVE		2
+
+#define	ENTITY_KNOWN	1
+#define	ENTITY_REMOVE	2
+
+struct SnapshotEntityTable
+{
+	struct SentEntity
+	{
+		unsigned short	number;
+		byte			type;
+		uint64_t		mask;
+	};
+
+	struct SentFrame
+	{
+		int				sequence;
+		bool			pending;
+		bool			overflow;
+		int				count;
+		SentEntity		entities[MAX_SENT_ENTITIES];
+	};
+
+	entityState_t		sent[MAX_GENTITIES];
+	uint64_t			forced[MAX_GENTITIES];
+	byte				flags[MAX_GENTITIES];
+	float				priority[MAX_GENTITIES];
+	SentFrame			frames[PACKET_BACKUP];
+};
+
 struct SV_Client
 {
 	enum eClientState
@@ -108,9 +142,11 @@ struct SV_Client
 	bool				rateDelayed_;				// true if nextSnapshotTime was set based on rate instead of snapshotMsec
 	int					timeoutCount_;				// must timeout a few frames in a row so debugging doesn't break
 	ClientSnapshot		frames_[PACKET_BACKUP];		// updates can be delta'd from here
-	int					lastSnapshotSequence_;
-	int					snapshotNoDeltaCount_;
-	float				snapshotPriority_[MAX_GENTITIES];
+	SnapshotEntityTable*	entityTable_;
+	bool				entityReset_;
+	bool				entityResetDone_;
+	int					entityAck_;
+	int					entityAckBits_;
 	int					ping_;
 	int					rate_;						// bytes / second
 	int					snapshotMsec_;				// requests a snapshot every snapshotMsec unless rate choked

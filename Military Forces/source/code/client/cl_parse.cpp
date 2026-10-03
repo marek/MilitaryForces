@@ -64,7 +64,7 @@ to the current frame
 ==================
 */
 void CL_DeltaEntity (msg_t *msg, clSnapshot_t *frame, int newnum, entityState_t *old, 
-					 bool unchanged) {
+					 bool unchanged, bool discard = false) {
 	entityState_t	*state;
 
 	// save the parsed entity state into the big circular buffer so
@@ -80,6 +80,9 @@ void CL_DeltaEntity (msg_t *msg, clSnapshot_t *frame, int newnum, entityState_t 
 	if ( state->number == ENTITYNUM_WIRE_END ) {
 		return;		// entity was delta removed
 	}
+	if ( discard ) {
+		return;
+	}
 	cl.parseEntitiesNum++;
 	frame->numEntities++;
 }
@@ -94,6 +97,7 @@ void CL_ParsePacketEntities( msg_t *msg, clSnapshot_t *oldframe, clSnapshot_t *n
 	int			newnum;
 	entityState_t	*oldstate;
 	int			oldindex, oldnum;
+	bool		create;
 
 	newframe->parseEntitiesNum = cl.parseEntitiesNum;
 	newframe->numEntities = 0;
@@ -125,6 +129,8 @@ void CL_ParsePacketEntities( msg_t *msg, clSnapshot_t *oldframe, clSnapshot_t *n
 			Com_Error (ERR_DROP,"CL_ParsePacketEntities: end of message");
 		}
 
+		create = MSG_ReadBits( msg, 1 ) != 0;
+
 		while ( oldnum < newnum ) {
 			// one or more entities from the old packet are unchanged
 			if ( cl_shownet->integer == 3 ) {
@@ -147,7 +153,7 @@ void CL_ParsePacketEntities( msg_t *msg, clSnapshot_t *oldframe, clSnapshot_t *n
 			if ( cl_shownet->integer == 3 ) {
 				Com_Printf ("%3i:  delta: %i\n", msg->readcount, newnum);
 			}
-			CL_DeltaEntity( msg, newframe, newnum, oldstate, false );
+			CL_DeltaEntity( msg, newframe, newnum, create ? &cl.entityBaselines[newnum] : oldstate, false );
 
 			oldindex++;
 
@@ -166,7 +172,7 @@ void CL_ParsePacketEntities( msg_t *msg, clSnapshot_t *oldframe, clSnapshot_t *n
 			if ( cl_shownet->integer == 3 ) {
 				Com_Printf ("%3i:  baseline: %i\n", msg->readcount, newnum);
 			}
-			CL_DeltaEntity( msg, newframe, newnum, &cl.entityBaselines[newnum], false );
+			CL_DeltaEntity( msg, newframe, newnum, &cl.entityBaselines[newnum], false, !create );
 			continue;
 		}
 
@@ -245,7 +251,9 @@ void CL_ParseSnapshot( msg_t *msg ) {
 	if ( newSnap.deltaNum <= 0 ) {
 		newSnap.valid = true;		// uncompressed frame
 		old = NULL;
-		clc.demowaiting = false;	// we can start recording now
+		if ( newSnap.snapFlags & SNAPFLAG_ENTITY_RESET ) {
+			clc.demowaiting = false;	// we can start recording now
+		}
 	} else {
 		old = &cl.snapshots[newSnap.deltaNum & PACKET_MASK];
 		if ( !old->valid ) {
@@ -255,8 +263,6 @@ void CL_ParseSnapshot( msg_t *msg ) {
 			// The frame that the server did the delta from
 			// is too old, so we can't reconstruct it properly.
 			Com_Printf ("Delta frame too old.\n");
-		} else if ( cl.parseEntitiesNum - old->parseEntitiesNum > MAX_PARSE_ENTITIES - MAX_SNAPSHOT_ENTITIES ) {
-			Com_Printf ("Delta parseEntitiesNum too old.\n");
 		} else {
 			newSnap.valid = true;	// valid delta parse
 		}
@@ -283,7 +289,11 @@ void CL_ParseSnapshot( msg_t *msg ) {
 
 	// read packet entities
 	SHOWNET( msg, "packet entities" );
-	CL_ParsePacketEntities( msg, old, &newSnap );
+	if ( ( newSnap.snapFlags & SNAPFLAG_ENTITY_RESET ) || !cl.snap.valid ) {
+		CL_ParsePacketEntities( msg, NULL, &newSnap );
+	} else {
+		CL_ParsePacketEntities( msg, &cl.snap, &newSnap );
+	}
 
 	// if not valid, dump the entire thing now that it has
 	// been properly read
@@ -302,6 +312,17 @@ void CL_ParseSnapshot( msg_t *msg ) {
 	}
 	for ( ; oldMessageNum < newSnap.messageNum ; oldMessageNum++ ) {
 		cl.snapshots[oldMessageNum & PACKET_MASK].valid = false;
+	}
+
+	if ( cl.snap.valid ) {
+		i = newSnap.messageNum - cl.snap.messageNum;
+		if ( i >= 1 && i <= 32 ) {
+			cl.entityAckBits = ( i == 32 ? 0 : cl.entityAckBits << i ) | ( 1 << ( i - 1 ) );
+		} else {
+			cl.entityAckBits = 0;
+		}
+	} else {
+		cl.entityAckBits = 0;
 	}
 
 	// copy to the current good spot

@@ -93,6 +93,8 @@ void MSG_ReadDeltaUsercmdKey( msg_t *msg, int key, usercmd_t *from, usercmd_t *t
 
 void MSG_WriteDeltaEntity( msg_t *msg, struct entityState_s *from, struct entityState_s *to
 						   , bool force );
+bool MSG_WriteEntityUpdate( msg_t *msg, struct entityState_s *from, struct entityState_s *to,
+						   bool create, uint64_t forced, uint64_t *written );
 void MSG_ReadDeltaEntity( msg_t *msg, entityState_t *from, entityState_t *to, 
 						 int number );
 
@@ -246,7 +248,7 @@ PROTOCOL
 ==============================================================
 */
 
-#define	PROTOCOL_VERSION	07
+#define	PROTOCOL_VERSION	8
 // 1.31 - 67
 
 // maintain a list of compatible protocols for demo playing

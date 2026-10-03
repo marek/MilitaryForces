@@ -297,15 +297,7 @@ void SV_Startup()
 
 	//theSVS.clients_ = reinterpret_cast<SV_Client*>(Z_Malloc (sizeof(SV_Client) * sv_maxclients->integer ));
 	theSVS.initClients(sv_maxclients->integer);	// initializes clients to 0 (will be allocated once they join)
-	if( com_dedicated->integer ) 
-	{
-		theSVS.numSnapshotEntities_ = sv_maxclients->integer * PACKET_BACKUP * (MAX_SNAPSHOT_ENTITIES/4);
-	} 
-	else 
-	{
-		// we don't need nearly as many when playing locally
-		theSVS.numSnapshotEntities_ = sv_maxclients->integer * 4 * MAX_SNAPSHOT_ENTITIES;
-	}
+	theSVS.numSnapshotEntities_ = sv_maxclients->integer * 2 * MAX_SNAPSHOT_ENTITIES;
 	theSVS.initialized_ = true;
 
 	// Don't respect sv_killserver unless a server is actually running
@@ -352,15 +344,7 @@ void SV_ChangeMaxClients()
 	theSVS.changeMaxNumClients( sv_maxclients->integer, count );
 	
 	// allocate New snapshot entities
-	if( com_dedicated->integer )
-	{
-		theSVS.numSnapshotEntities_ = sv_maxclients->integer * PACKET_BACKUP * (MAX_SNAPSHOT_ENTITIES/4);
-	} 
-	else 
-	{
-		// we don't need nearly as many when playing locally
-		theSVS.numSnapshotEntities_ = sv_maxclients->integer * 4 * MAX_SNAPSHOT_ENTITIES;
-	}
+	theSVS.numSnapshotEntities_ = sv_maxclients->integer * 2 * MAX_SNAPSHOT_ENTITIES;
 }
 
 /*

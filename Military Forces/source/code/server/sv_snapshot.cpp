@@ -47,103 +47,20 @@ A normal server packet will look like:
 =============================================================================
 */
 
-/*
-=============
-SV_EmitPacketEntities
-
-Writes a delta update of an entityState_t list to the message.
-=============
-*/
-static void SV_EmitPacketEntities( SV_Client::ClientSnapshot *from, SV_Client::ClientSnapshot *to, msg_t *msg )
-{
-	entityState_t	*oldent, *newent;
-	int		oldindex, newindex;
-	int		oldnum, newnum;
-	int		from_num_entities;
-
-	// generate the delta update
-	if ( !from ) 
-	{
-		from_num_entities = 0;
-	} 
-	else 
-	{
-		from_num_entities = from->num_entities_;
-	}
-
-	newent = NULL;
-	oldent = NULL;
-	newindex = 0;
-	oldindex = 0;
-	while ( newindex < to->num_entities_ || oldindex < from_num_entities ) 
-	{
-		if ( newindex >= to->num_entities_ ) 
-		{
-			newnum = 9999;
-		} 
-		else 
-		{
-			newent = &theSVS.snapshotEntities_[(to->first_entity_+newindex) % theSVS.numSnapshotEntities_];
-			newnum = newent->number;
-		}
-
-		if ( oldindex >= from_num_entities ) 
-		{
-			oldnum = 9999;
-		} 
-		else 
-		{
-			oldent = &theSVS.snapshotEntities_[(from->first_entity_+oldindex) % theSVS.numSnapshotEntities_];
-			oldnum = oldent->number;
-		}
-
-		if ( newnum == oldnum ) 
-		{
-			// delta update from old position
-			// because the force parm is false, this will not result
-			// in any bytes being emited if the entity has not changed at all
-			MSG_WriteDeltaEntity (msg, oldent, newent, false );
-			oldindex++;
-			newindex++;
-			continue;
-		}
-
-		if ( newnum < oldnum ) 
-		{
-			// this is a New entity, send it from the baseline
-			MSG_WriteDeltaEntity (msg, &theSV.serverEntities_[newnum].baseline_, newent, true );
-			newindex++;
-			continue;
-		}
-
-		if ( newnum > oldnum )
-		{
-			// the old entity isn't present in the New message
-			MSG_WriteDeltaEntity (msg, oldent, NULL, true );
-			oldindex++;
-			continue;
-		}
-	}
-
-	MSG_WriteBits( msg, ENTITYNUM_WIRE_END, GENTITYNUM_BITS );	// end of packetentities
-}
-
-
-
 typedef struct {
-	int		index;
+	int		number;
 	int		bits;
 	float	priority;
 } snapshotCandidate_t;
 
-static int SV_DeltaEntityBits( entityState_t *from, entityState_t *to, bool force ) 
+static int SV_EntityUpdateBits( entityState_t *from, entityState_t *to, bool create, uint64_t forced ) 
 {
 	byte	buf[1024];
 	msg_t	msg;
 
 	MSG_Init( &msg, buf, sizeof( buf ) );
 	msg_huffstatsHold++;
-	MSG_WriteDeltaEntity( &msg, from, to, force );
+	MSG_WriteEntityUpdate( &msg, from, to, create, forced, NULL );
 	msg_huffstatsHold--;
 	return msg.bit;
 }
@@ -159,7 +76,7 @@ static int QDECL SV_QsortSnapshotCandidates( const void *a, const void *b )
 	if ( ca->priority < cb->priority ) {
 		return 1;
 	}
-	return ca->index - cb->index;
+	return ca->number - cb->number;
 }
 
 static float SV_SnapshotEntityWeight( const playerState_t *ps, const vec3_t forward, 
@@ -212,163 +129,263 @@ static float SV_SnapshotEntityWeight( const playerState_t *ps, const vec3_t forw
 	return weight;
 }
 
-static void SV_BudgetSnapshotEntities( SV_Client *client, SV_Client::ClientSnapshot *base, 
-									   SV_Client::ClientSnapshot *frame, msg_t *msg ) 
+static SnapshotEntityTable *SV_ClientEntityTable( SV_Client *client ) 
 {
-	static entityState_t		*baseLookup[MAX_GENTITIES];
-	static entityState_t		*prevLookup[MAX_GENTITIES];
-	static byte					present[MAX_GENTITIES];
+	if ( !client->entityTable_ ) {
+		client->entityTable_ = new SnapshotEntityTable;
+		Com_Memset( client->entityTable_, 0, sizeof( *client->entityTable_ ) );
+	}
+	return client->entityTable_;
+}
+
+/*
+=============
+SV_SnapshotFrameLost
+
+The client never applied this snapshot, so what it carried is sent again
+=============
+*/
+static void SV_SnapshotFrameLost( SV_Client *client, SnapshotEntityTable::SentFrame *sent ) 
+{
+	SnapshotEntityTable				*table = client->entityTable_;
+	SnapshotEntityTable::SentEntity	*ent;
+	int								i;
+
+	sent->pending = false;
+
+	if ( sent->overflow ) {
+		client->entityReset_ = true;
+		return;
+	}
+
+	for ( i = 0, ent = sent->entities ; i < sent->count ; i++, ent++ ) {
+		switch ( ent->type ) {
+		case SENT_CREATE:
+			table->flags[ent->number] = ENTITY_REMOVE;
+			break;
+		case SENT_UPDATE:
+			table->forced[ent->number] |= ent->mask;
+			table->priority[ent->number] += 4.0f;
+			break;
+		case SENT_REMOVE:
+			if ( !( table->flags[ent->number] & ENTITY_KNOWN ) ) {
+				table->flags[ent->number] |= ENTITY_REMOVE;
+			}
+			break;
+		}
+	}
+}
+
+/*
+=============
+SV_SnapshotAcks
+
+Sorts the snapshots sent so far into applied and lost ones from the
+client's last report
+=============
+*/
+static void SV_SnapshotAcks( SV_Client *client ) 
+{
+	SnapshotEntityTable				*table = client->entityTable_;
+	SnapshotEntityTable::SentFrame	*sent;
+	int								i, behind;
+
+	if ( client->entityAck_ <= client->gamestateMessageNum_ 
+		|| client->entityAck_ >= client->netchan_.outgoingSequence ) {
+		return;
+	}
+
+	for ( i = 0, sent = table->frames ; i < PACKET_BACKUP ; i++, sent++ ) {
+		if ( !sent->pending ) {
+			continue;
+		}
+		behind = client->entityAck_ - sent->sequence;
+		if ( behind < 0 ) {
+			continue;
+		}
+		if ( behind == 0 || ( behind <= 32 && ( ( client->entityAckBits_ >> ( behind - 1 ) ) & 1 ) ) ) {
+			sent->pending = false;
+		} else {
+			SV_SnapshotFrameLost( client, sent );
+		}
+	}
+}
+
+/*
+=============
+SV_SnapshotEntityReset
+
+Returns true if this snapshot has to carry every entity
+=============
+*/
+static bool SV_SnapshotEntityReset( SV_Client *client, bool requested ) 
+{
+	SnapshotEntityTable	*table = SV_ClientEntityTable( client );
+	int					i;
+
+	SV_SnapshotAcks( client );
+
+	if ( !requested ) {
+		client->entityResetDone_ = false;
+	} else if ( !client->entityResetDone_ ) {
+		client->entityReset_ = true;
+	}
+
+	if ( !client->entityReset_ ) {
+		return false;
+	}
+
+	client->entityReset_ = false;
+	client->entityResetDone_ = requested;
+
+	Com_Memset( table->flags, 0, sizeof( table->flags ) );
+	Com_Memset( table->forced, 0, sizeof( table->forced ) );
+	Com_Memset( table->priority, 0, sizeof( table->priority ) );
+	for ( i = 0 ; i < PACKET_BACKUP ; i++ ) {
+		table->frames[i].pending = false;
+	}
+	return true;
+}
+
+/*
+=============
+SV_EmitPacketEntities
+
+Writes the entity updates of a snapshot. Every update is sent once and the
+client reports which snapshots it applied; what a lost snapshot carried is
+sent again. Without the reset the snapshot is kept under sv_snapshotBudget
+bytes: updates that do not fit wait and gain priority.
+=============
+*/
+static void SV_EmitPacketEntities( SV_Client *client, SV_Client::ClientSnapshot *frame, msg_t *msg, bool reset )
+{
+	static entityState_t		*states[MAX_GENTITIES];
+	static byte					action[MAX_GENTITIES];
 	static snapshotCandidate_t	candidates[MAX_SNAPSHOT_ENTITIES];
-	static byte					wait[MAX_SNAPSHOT_ENTITIES];
-	SV_Client::ClientSnapshot	*prev;
-	entityState_t				*state, *known, *last;
+	SnapshotEntityTable			*table = client->entityTable_;
+	SnapshotEntityTable::SentFrame	*sent;
+	entityState_t				*state;
+	entityState_t				removed;
 	vec3_t						forward;
+	uint64_t					mask;
+	bool						unlimited;
 	int							numCandidates;
 	int							remaining;
 	int							bits;
-	bool						inFlight;
-	int							i, j;
+	int							num;
+	int							i;
 
-	prev = NULL;
-	if ( client->lastSnapshotSequence_ >= 0 
-		&& client->netchan_.outgoingSequence - client->lastSnapshotSequence_ < PACKET_BACKUP 
-		&& ( base || client->snapshotNoDeltaCount_ > 0 ) ) 
-	{
-		prev = &client->frames_[ client->lastSnapshotSequence_ & PACKET_MASK ];
-		if ( prev->first_entity_ <= theSVS.nextSnapshotEntities_ - theSVS.numSnapshotEntities_ ) {
-			prev = NULL;
-		}
-	}
-	if ( base && ( !prev || client->deltaMessage_ >= client->lastSnapshotSequence_ ) ) {
-		prev = base;
-	}
-
-	client->lastSnapshotSequence_ = client->netchan_.outgoingSequence;
-	if ( base ) {
-		client->snapshotNoDeltaCount_ = 0;
-	} else {
-		client->snapshotNoDeltaCount_++;
-	}
-
-	if ( sv_snapshotBudget->integer <= 0 || frame->num_entities_ > MAX_SNAPSHOT_ENTITIES ) {
-		return;
-	}
-	if ( client->snapshotNoDeltaCount_ > PACKET_BACKUP / 4 ) {
-		return;
-	}
-	if ( client->netchan_.remoteAddress.type == NA_LOOPBACK || 
-		( sv_lanForceRate->integer && Sys_IsLANAddress( client->netchan_.remoteAddress ) ) ) {
-		return;
-	}
+	unlimited = reset || sv_snapshotBudget->integer <= 0 
+		|| client->netchan_.remoteAddress.type == NA_LOOPBACK 
+		|| ( sv_lanForceRate->integer && Sys_IsLANAddress( client->netchan_.remoteAddress ) );
 
 	remaining = sv_snapshotBudget->integer * 8 - msg->bit - GENTITYNUM_BITS - 8;
-
-	if ( base ) {
-		for ( i = 0 ; i < base->num_entities_ ; i++ ) {
-			state = &theSVS.snapshotEntities_[(base->first_entity_+i) % theSVS.numSnapshotEntities_];
-			baseLookup[state->number] = state;
-		}
-	}
-	if ( prev ) {
-		for ( i = 0 ; i < prev->num_entities_ ; i++ ) {
-			state = &theSVS.snapshotEntities_[(prev->first_entity_+i) % theSVS.numSnapshotEntities_];
-			prevLookup[state->number] = state;
-		}
-	}
 
 	AngleVectors( frame->ps_.viewangles, forward, NULL, NULL );
 
 	numCandidates = 0;
-	inFlight = false;
 	for ( i = 0 ; i < frame->num_entities_ ; i++ ) {
 		state = &theSVS.snapshotEntities_[(frame->first_entity_+i) % theSVS.numSnapshotEntities_];
-		known = baseLookup[state->number];
-		last = prevLookup[state->number];
-		present[state->number] = 1;
-		wait[i] = 0;
+		num = state->number;
+		states[num] = state;
 
-		if ( known ) {
-			bits = SV_DeltaEntityBits( known, state, false );
+		if ( !( table->flags[num] & ENTITY_KNOWN ) ) {
+			action[num] = 1 + SENT_CREATE;
+			bits = SV_EntityUpdateBits( &theSV.serverEntities_[num].baseline_, state, true, 0 );
 		} else {
-			bits = SV_DeltaEntityBits( &theSV.serverEntities_[state->number].baseline_, state, true );
+			bits = SV_EntityUpdateBits( &table->sent[num], state, false, table->forced[num] );
+			if ( !bits ) {
+				table->priority[num] = 0;
+				continue;
+			}
+			action[num] = 1 + SENT_UPDATE;
 		}
 
-		if ( last != known && !( last && known && !SV_DeltaEntityBits( known, last, false ) ) ) {
-			if ( !last ) {
-				remaining -= bits;
-				continue;
-			}
-			if ( known ) {
-				remaining -= SV_DeltaEntityBits( known, last, false );
-			} else {
-				remaining -= SV_DeltaEntityBits( &theSV.serverEntities_[state->number].baseline_, last, true );
-			}
-			inFlight = true;
-			if ( !SV_DeltaEntityBits( last, state, false ) ) {
-				client->snapshotPriority_[state->number] = 0;
-				continue;
-			}
-		} else if ( known && !bits ) {
-			client->snapshotPriority_[state->number] = 0;
+		if ( unlimited || numCandidates == MAX_SNAPSHOT_ENTITIES ) {
 			continue;
 		}
 
-		client->snapshotPriority_[state->number] += SV_SnapshotEntityWeight( &frame->ps_, forward, state, last );
-		candidates[numCandidates].index = i;
+		table->priority[num] += SV_SnapshotEntityWeight( &frame->ps_, forward, state, 
+			( table->flags[num] & ENTITY_KNOWN ) ? &table->sent[num] : NULL );
+		candidates[numCandidates].number = num;
 		candidates[numCandidates].bits = bits;
-		candidates[numCandidates].priority = client->snapshotPriority_[state->number];
+		candidates[numCandidates].priority = table->priority[num];
 		numCandidates++;
 	}
 
-	if ( base ) {
-		for ( i = 0 ; i < base->num_entities_ ; i++ ) {
-			state = &theSVS.snapshotEntities_[(base->first_entity_+i) % theSVS.numSnapshotEntities_];
-			if ( !present[state->number] ) {
-				remaining -= GENTITYNUM_BITS + 1;
-			}
-			baseLookup[state->number] = NULL;
+	for ( num = 0 ; num < MAX_GENTITIES ; num++ ) {
+		if ( table->flags[num] && !states[num] ) {
+			action[num] = 1 + SENT_REMOVE;
+			remaining -= GENTITYNUM_BITS + 2;
 		}
 	}
 
-	if ( !inFlight && remaining < 200 * 8 ) {
+	if ( remaining < 200 * 8 ) {
 		remaining = 200 * 8;
 	}
 
 	qsort( candidates, numCandidates, sizeof( candidates[0] ), SV_QsortSnapshotCandidates );
 
 	for ( i = 0 ; i < numCandidates ; i++ ) {
-		state = &theSVS.snapshotEntities_[(frame->first_entity_+candidates[i].index) % theSVS.numSnapshotEntities_];
 		if ( candidates[i].bits <= remaining ) {
 			remaining -= candidates[i].bits;
-			client->snapshotPriority_[state->number] = 0;
 		} else {
-			wait[candidates[i].index] = 1;
+			action[candidates[i].number] = 0;
 		}
 	}
 
-	for ( i = 0, j = 0 ; i < frame->num_entities_ ; i++ ) {
+	sent = &table->frames[ client->netchan_.outgoingSequence & PACKET_MASK ];
+	if ( sent->pending ) {
+		SV_SnapshotFrameLost( client, sent );
+	}
+	sent->sequence = client->netchan_.outgoingSequence;
+	sent->pending = true;
+	sent->overflow = reset;
+	sent->count = 0;
+
+	for ( num = 0 ; num < MAX_GENTITIES ; num++ ) {
+		if ( !action[num] ) {
+			continue;
+		}
+		state = states[num];
+		mask = 0;
+
+		switch ( action[num] - 1 ) {
+		case SENT_UPDATE:
+			MSG_WriteEntityUpdate( msg, &table->sent[num], state, false, table->forced[num], &mask );
+			table->sent[num] = *state;
+			break;
+		case SENT_CREATE:
+			MSG_WriteEntityUpdate( msg, &theSV.serverEntities_[num].baseline_, state, true, 0, NULL );
+			table->sent[num] = *state;
+			table->flags[num] = ENTITY_KNOWN;
+			break;
+		case SENT_REMOVE:
+			removed.number = num;
+			MSG_WriteEntityUpdate( msg, &removed, NULL, false, 0, NULL );
+			table->flags[num] = 0;
+			break;
+		}
+		table->forced[num] = 0;
+		table->priority[num] = 0;
+
+		if ( sent->count < MAX_SENT_ENTITIES ) {
+			sent->entities[sent->count].number = num;
+			sent->entities[sent->count].type = action[num] - 1;
+			sent->entities[sent->count].mask = mask;
+			sent->count++;
+		} else {
+			sent->overflow = true;
+		}
+		action[num] = 0;
+	}
+
+	for ( i = 0 ; i < frame->num_entities_ ; i++ ) {
 		state = &theSVS.snapshotEntities_[(frame->first_entity_+i) % theSVS.numSnapshotEntities_];
-		last = prevLookup[state->number];
-		present[state->number] = 0;
-
-		if ( wait[i] ) {
-			if ( !last ) {
-				continue;
-			}
-			theSVS.snapshotEntities_[(frame->first_entity_+j) % theSVS.numSnapshotEntities_] = *last;
-		} else if ( i != j ) {
-			theSVS.snapshotEntities_[(frame->first_entity_+j) % theSVS.numSnapshotEntities_] = *state;
-		}
-		j++;
+		states[state->number] = NULL;
 	}
-	frame->num_entities_ = j;
 
-	if ( prev ) {
-		for ( i = 0 ; i < prev->num_entities_ ; i++ ) {
-			state = &theSVS.snapshotEntities_[(prev->first_entity_+i) % theSVS.numSnapshotEntities_];
-			prevLookup[state->number] = NULL;
-		}
-	}
+	MSG_WriteBits( msg, ENTITYNUM_WIRE_END, GENTITYNUM_BITS );	// end of packetentities
 }
 
 /*
@@ -382,6 +399,7 @@ static void SV_WriteSnapshotToClient( SV_Client *client, msg_t *msg )
 	int					lastframe;
 	int					i;
 	int					snapFlags;
+	bool				reset;
 
 	// this is the snapshot we are creating
 	frame = &client->frames_[ client->netchan_.outgoingSequence & PACKET_MASK ];
@@ -407,12 +425,6 @@ static void SV_WriteSnapshotToClient( SV_Client *client, msg_t *msg )
 		oldframe = &client->frames_[ client->deltaMessage_ & PACKET_MASK ];
 		lastframe = client->netchan_.outgoingSequence - client->deltaMessage_;
 
-		// the snapshot's entities may still have rolled off the buffer, though
-		if ( oldframe->first_entity_ <= theSVS.nextSnapshotEntities_ - theSVS.numSnapshotEntities_ ) {
-			Com_DPrintf ("%s: Delta request from out of date entities.\n", client->name_);
-			oldframe = NULL;
-			lastframe = 0;
-		}
 	}
 
 	MSG_WriteByte (msg, svc_snapshot);
@@ -448,6 +460,12 @@ static void SV_WriteSnapshotToClient( SV_Client *client, msg_t *msg )
 		snapFlags |= SNAPFLAG_NOT_ACTIVE;
 	}
 
+	reset = SV_SnapshotEntityReset( client, client->deltaMessage_ <= 0 || client->state_ != SV_Client::CS_ACTIVE );
+	if ( reset ) 
+	{
+		snapFlags |= SNAPFLAG_ENTITY_RESET;
+	}
+
 	MSG_WriteByte (msg, snapFlags);
 
 	// send over the areabits
@@ -462,8 +480,7 @@ static void SV_WriteSnapshotToClient( SV_Client *client, msg_t *msg )
 	}
 
 	// delta encode the entities
-	SV_BudgetSnapshotEntities( client, oldframe, frame, msg );
-	SV_EmitPacketEntities (oldframe, frame, msg);
+	SV_EmitPacketEntities( client, frame, msg, reset );
 
 	// padding for rate debugging
 	if ( sv_padPackets->integer ) 

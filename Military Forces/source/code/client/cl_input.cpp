@@ -775,6 +775,9 @@ void CL_WritePacket( void ) {
 	// write the last reliable message we received
 	MSG_WriteLong( &buf, clc.serverCommandSequence );
 
+	MSG_WriteLong( &buf, cl.snap.valid ? cl.snap.messageNum : 0 );
+	MSG_WriteLong( &buf, cl.entityAckBits );
+
 	// write any unacknowledged clientCommands
 	for ( i = clc.reliableAcknowledge + 1 ; i <= clc.reliableSequence ; i++ ) {
 		MSG_WriteByte( &buf, clc_clientCommand );

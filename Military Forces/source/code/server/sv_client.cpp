@@ -701,6 +701,8 @@ void SV_SendClientGameState( SV_Client *client )
 	// notice that it is from a different serverid and that the
 	// gamestate message was not just sent, forcing a retransmit
 	client->gamestateMessageNum_ = client->netchan_.outgoingSequence;
+	client->entityReset_ = true;
+	client->entityResetDone_ = false;
 
 	MSG_Init( &msg, msgBuffer, sizeof( msgBuffer ) );
 
@@ -1946,6 +1948,8 @@ void SV_ExecuteClientMessage( SV_Client *cl, msg_t *msg )
 	}
 
 	cl->reliableAcknowledge_ = MSG_ReadLong( msg );
+	cl->entityAck_ = MSG_ReadLong( msg );
+	cl->entityAckBits_ = MSG_ReadLong( msg );
 
 	// NOTE: when the client message is fux0red the acknowledgement numbers
 	// can be out of range, this could cause the server to send thousands of server
@@ -2109,9 +2113,11 @@ SV_Client::SV_Client() :
 	memset( downloadBlocks_, 0, sizeof(downloadBlocks_) );
 	memset( downloadBlockSize_, 0, sizeof(downloadBlockSize_) );
 	memset( frames_, 0, sizeof(frames_) );
-	lastSnapshotSequence_ = -1;
-	snapshotNoDeltaCount_ = 0;
-	memset( snapshotPriority_, 0, sizeof(snapshotPriority_) );
+	entityTable_ = 0;
+	entityReset_ = true;
+	entityResetDone_ = false;
+	entityAck_ = 0;
+	entityAckBits_ = 0;
 	memset( &netchan_, 0, sizeof(netchan_ ) );
 #ifdef USE_VOIP
 	hasVoip_ = false;
@@ -2126,6 +2132,7 @@ SV_Client::SV_Client() :
 
 SV_Client::~SV_Client()
 {
+	delete entityTable_;
 }
 
 void
@@ -2176,9 +2183,10 @@ SV_Client::clear()
 	memset( downloadBlocks_, 0, sizeof(downloadBlocks_) );
 	memset( downloadBlockSize_, 0, sizeof(downloadBlockSize_) );
 	memset( frames_, 0, sizeof(frames_) );
-	lastSnapshotSequence_ = -1;
-	snapshotNoDeltaCount_ = 0;
-	memset( snapshotPriority_, 0, sizeof(snapshotPriority_) );
+	entityReset_ = true;
+	entityResetDone_ = false;
+	entityAck_ = 0;
+	entityAckBits_ = 0;
 	memset( &netchan_, 0, sizeof(netchan_ ) );
 #ifdef USE_VOIP
 	hasVoip_ = false;
