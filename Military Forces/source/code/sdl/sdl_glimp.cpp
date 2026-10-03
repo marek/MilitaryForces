@@ -868,6 +868,10 @@ static bool GLimp_StartDriverAndSetMode(int mode, bool fullscreen, bool noborder
 	{
 		const char *driverName;
 
+#ifdef _WIN32
+		SDL_SetHint( "SDL_WINDOWS_DPI_AWARENESS", "permonitorv2" );
+#endif
+
 		if (SDL_Init(SDL_INIT_VIDEO) != 0)
 		{
 			ri.Printf( PRINT_ALL, "SDL_Init( SDL_INIT_VIDEO ) FAILED (%s)\n", SDL_GetError());

@@ -949,8 +949,8 @@ bool CG_NewHUDActive( void )
 		return false;
 	}
 
-	// do we have a valid current vehicle index and the 'Retro' HUD is not being used?
-	return( cg_vehicle.integer != -1 && !cg_oldHUD.integer );
+	// do we have a valid current vehicle index?
+	return( cg_vehicle.integer != -1 );
 }
 
 /*
@@ -2211,15 +2211,7 @@ static void CG_Draw2D_MFQ3( void ) {
 			 cg.snap->ps.stats[STAT_HEALTH] > 0 &&
 			 !(cg.snap->ps.pm_flags & PMF_VEHICLESELECT) )
 		{
-			// old or New HUD?
-			if( cg_oldHUD.integer )
-			{
-				CG_DrawStatusBar_MFQ3();
-			}
-			else
-			{
-      			CG_DrawStatusBar_MFQ3_new();
-			}
+			CG_DrawStatusBar_MFQ3_new();
 
 //			CG_DrawCrosshair();
 			CG_DrawCrosshairNames();

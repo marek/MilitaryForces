@@ -1181,7 +1181,6 @@ extern	vmCvar_t		cg_radarTargets;
 extern  vmCvar_t		cg_tracer;
 extern  vmCvar_t		cg_smoke;
 
-extern	vmCvar_t		cg_oldHUD;
 
 extern	vmCvar_t		hud_heading;
 extern	vmCvar_t		hud_speed;
@@ -1365,7 +1364,6 @@ bool CG_YourTeamHasFlag();
 bool CG_OtherTeamHasFlag();
 qhandle_t CG_StatusHandle(int task);
 
-void CG_DrawStatusBar_MFQ3();
 void CG_DrawStatusBar_MFQ3_new();
 
 void CG_Add_Console_Line( char * pText );

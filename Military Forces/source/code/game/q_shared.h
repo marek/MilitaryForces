@@ -35,7 +35,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
   #define HOMEPATH_NAME				"MilitaryForces"
   #define GAMENAME_FOR_MASTER		"MilitaryForces"	// must NOT contain whitespace
   #define CONFIG_PREFIX			"mfconfig"
-  #define MASTER_SERVER_NAME		""
+  #define MASTER_SERVER_NAME		"dpmaster.deathmask.net"
 #else
   #define PRODUCT_NAME				"ioq3"
   #define BASEGAME					"baseq3"

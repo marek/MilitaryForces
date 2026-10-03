@@ -159,7 +159,6 @@ vmCvar_t	cg_radarTargets;
 vmCvar_t	cg_tracer;
 vmCvar_t	cg_smoke;
 
-vmCvar_t	cg_oldHUD;
 
 vmCvar_t	hud_heading;
 vmCvar_t	hud_speed;
@@ -282,7 +281,6 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_tracer, "cg_tracer", "3", CVAR_ARCHIVE },
 	{ &cg_smoke, "cg_smoke", "1", CVAR_ARCHIVE },
 
-	{ &cg_oldHUD, "cg_oldHUD", "0", CVAR_ARCHIVE },
 
 	{ &hud_heading, "hud_heading", "1", CVAR_ARCHIVE },
 	{ &hud_speed, "hud_speed", "1", CVAR_ARCHIVE },

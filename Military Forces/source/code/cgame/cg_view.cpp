@@ -427,9 +427,10 @@ static int CG_CalcFov( void ) {
 		}*/
 //	}
 
-	x = cg.refdef.width / tan( fov_x / 360 * M_PI );
-	fov_y = atan2( cg.refdef.height, x );
+	x = 640 / tan( fov_x / 360 * M_PI );
+	fov_y = atan2( 480, x );
 	fov_y = fov_y * 360 / M_PI;
+	fov_x = atan( tan( fov_y / 360 * M_PI ) * cg.refdef.width / cg.refdef.height ) * 360 / M_PI;
 
 	// warp if underwater
 	contents = CG_PointContents( cg.refdef.vieworg, -1 );

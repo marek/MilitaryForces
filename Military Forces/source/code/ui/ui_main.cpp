@@ -6856,22 +6856,15 @@ static void UI_StartServerRefresh(bool full)
 	}
 
 	uiInfo.serverStatus.refreshtime = uiInfo.uiUtils.dc_->realTime_ + 5000;
-	//if( ui_netSource.integer == AS_GLOBAL || ui_netSource.integer == AS_MPLAYER ) {
-	//	if( ui_netSource.integer == AS_GLOBAL ) {
-	//		i = 0;
-	//	}
-	//	else {
-	//		i = 1;
-	//	}
-
-	//	ptr = UI_Cvar_VariableString("debug_protocol");
-	//	if (strlen(ptr)) {
-	//		Cbuf_ExecuteText( EXEC_NOW, va( "globalservers %d %s full empty\n", i, ptr));
-	//	}
-	//	else {
-	//		Cbuf_ExecuteText( EXEC_NOW, va( "globalservers %d %d full empty\n", i, Cvar_VariableValue( "protocol" ) ) );
-	//	}
-	//}
+	if( ui_netSource.integer == AS_GLOBAL ) {
+		const char *ptr = UI_Cvar_VariableString("debug_protocol");
+		if (strlen(ptr)) {
+			Cbuf_ExecuteText( EXEC_NOW, va( "globalservers 0 %s full empty\n", ptr ) );
+		}
+		else {
+			Cbuf_ExecuteText( EXEC_NOW, va( "globalservers 0 %d full empty\n", (int)Cvar_VariableValue( "protocol" ) ) );
+		}
+	}
 }
 
 
