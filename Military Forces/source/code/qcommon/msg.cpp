@@ -308,13 +308,9 @@ void MSG_WriteLong( msg_t *sb, int c ) {
 }
 
 void MSG_WriteFloat( msg_t *sb, float f ) {
-	union {
-		float	f;
-		int	l;
-	} dat;
-	
+	floatint_t dat;
 	dat.f = f;
-	MSG_WriteBits( sb, dat.l, 32 );
+	MSG_WriteBits( sb, dat.i, 32 );
 }
 
 void MSG_WriteString( msg_t *sb, const char *s ) {
@@ -406,6 +402,17 @@ int MSG_ReadByte( msg_t *msg ) {
 	return c;
 }
 
+int MSG_LookaheadByte( msg_t *msg ) {
+	const int bloc = Huff_getBloc();
+	const int readcount = msg->readcount;
+	const int bit = msg->bit;
+	int c = MSG_ReadByte(msg);
+	Huff_setBloc(bloc);
+	msg->readcount = readcount;
+	msg->bit = bit;
+	return c;
+}
+
 int MSG_ReadShort( msg_t *msg ) {
 	int	c;
 	
@@ -429,13 +436,9 @@ int MSG_ReadLong( msg_t *msg ) {
 }
 
 float MSG_ReadFloat( msg_t *msg ) {
-	union {
-		byte	b[4];
-		float	f;
-		int	l;
-	} dat;
+	floatint_t dat;
 	
-	dat.l = MSG_ReadBits( msg, 32 );
+	dat.i = MSG_ReadBits( msg, 32 );
 	if ( msg->readcount > msg->cursize ) {
 		dat.f = -1;
 	}	
@@ -487,6 +490,10 @@ char *MSG_ReadBigString( msg_t *msg ) {
 		if ( c == '%' ) {
 			c = '.';
 		}
+		// don't allow higher ascii values
+		if ( c > 127 ) {
+			c = '.';
+		}
 		// break only after reading all expected data from bitstream
 		if ( l >= sizeof(string)-1 ) {
 			break;
@@ -511,6 +518,10 @@ char *MSG_ReadStringLine( msg_t *msg ) {
 		}
 		// translate all fmt spec to avoid crash bugs
 		if ( c == '%' ) {
+			c = '.';
+		}
+		// don't allow higher ascii values
+		if ( c > 127 ) {
 			c = '.';
 		}
 		// break only after reading all expected data from bitstream
@@ -566,41 +577,6 @@ extern cvar_t *cl_shownet;
 
 #define	LOG(x) if( cl_shownet && cl_shownet->integer == 4 ) { Com_Printf("%s ", x ); };
 
-void MSG_WriteDelta( msg_t *msg, int oldV, int newV, int bits ) {
-	if ( oldV == newV ) {
-		MSG_WriteBits( msg, 0, 1 );
-		return;
-	}
-	MSG_WriteBits( msg, 1, 1 );
-	MSG_WriteBits( msg, newV, bits );
-}
-
-int	MSG_ReadDelta( msg_t *msg, int oldV, int bits ) {
-	if ( MSG_ReadBits( msg, 1 ) ) {
-		return MSG_ReadBits( msg, bits );
-	}
-	return oldV;
-}
-
-void MSG_WriteDeltaFloat( msg_t *msg, float oldV, float newV ) {
-	if ( oldV == newV ) {
-		MSG_WriteBits( msg, 0, 1 );
-		return;
-	}
-	MSG_WriteBits( msg, 1, 1 );
-	MSG_WriteBits( msg, *(int *)&newV, 32 );
-}
-
-float MSG_ReadDeltaFloat( msg_t *msg, float oldV ) {
-	if ( MSG_ReadBits( msg, 1 ) ) {
-		float	newV;
-
-		*(int *)&newV = MSG_ReadBits( msg, 32 );
-		return newV;
-	}
-	return oldV;
-}
-
 /*
 =============================================================================
 
@@ -637,20 +613,22 @@ int	MSG_ReadDeltaKey( msg_t *msg, int key, int oldV, int bits ) {
 }
 
 void MSG_WriteDeltaKeyFloat( msg_t *msg, int key, float oldV, float newV ) {
+	floatint_t fi;
 	if ( oldV == newV ) {
 		MSG_WriteBits( msg, 0, 1 );
 		return;
 	}
 	MSG_WriteBits( msg, 1, 1 );
-	MSG_WriteBits( msg, (*(int *)&newV) ^ key, 32 );
+	fi.f = newV;
+	MSG_WriteBits( msg, fi.i ^ key, 32 );
 }
 
 float MSG_ReadDeltaKeyFloat( msg_t *msg, int key, float oldV ) {
 	if ( MSG_ReadBits( msg, 1 ) ) {
-		float	newV;
+		floatint_t fi;
 
-		*(int *)&newV = MSG_ReadBits( msg, 32 ) ^ key;
-		return newV;
+		fi.i = MSG_ReadBits( msg, 32 ) ^ key;
+		return fi.f;
 	}
 	return oldV;
 }
@@ -664,70 +642,9 @@ usercmd_t communication
 ============================================================================
 */
 
-// ms is allways sent, the others are optional
-#define	CM_ANGLE1 	(1<<0)
-#define	CM_ANGLE2 	(1<<1)
-#define	CM_ANGLE3 	(1<<2)
-#define	CM_FORWARD	(1<<3)
-#define	CM_SIDE		(1<<4)
-#define	CM_UP		(1<<5)
-#define	CM_BUTTONS	(1<<6)
-#define CM_WEAPON	(1<<7)
-
 /*
 =====================
-MSG_WriteDeltaUsercmd
-=====================
-*/
-void MSG_WriteDeltaUsercmd( msg_t *msg, usercmd_t *from, usercmd_t *to ) {
-	if ( to->serverTime - from->serverTime < 256 ) {
-		MSG_WriteBits( msg, 1, 1 );
-		MSG_WriteBits( msg, to->serverTime - from->serverTime, 8 );
-	} else {
-		MSG_WriteBits( msg, 0, 1 );
-		MSG_WriteBits( msg, to->serverTime, 32 );
-	}
-	MSG_WriteDelta( msg, from->angles[0], to->angles[0], 16 );
-	MSG_WriteDelta( msg, from->angles[1], to->angles[1], 16 );
-	MSG_WriteDelta( msg, from->angles[2], to->angles[2], 16 );
-	MSG_WriteDelta( msg, from->forwardmove, to->forwardmove, 8 );
-	MSG_WriteDelta( msg, from->rightmove, to->rightmove, 8 );
-	MSG_WriteDelta( msg, from->upmove, to->upmove, 8 );
-	MSG_WriteDelta( msg, from->buttons, to->buttons, 16 );
-	MSG_WriteDelta( msg, from->weapon, to->weapon, 8 );
-}
-
-
-/*
-=====================
-MSG_ReadDeltaUsercmd
-=====================
-*/
-void MSG_ReadDeltaUsercmd( msg_t *msg, usercmd_t *from, usercmd_t *to ) {
-	if ( MSG_ReadBits( msg, 1 ) ) {
-		to->serverTime = from->serverTime + MSG_ReadBits( msg, 8 );
-	} else {
-		to->serverTime = MSG_ReadBits( msg, 32 );
-	}
-	to->angles[0] = MSG_ReadDelta( msg, from->angles[0], 16);
-	to->angles[1] = MSG_ReadDelta( msg, from->angles[1], 16);
-	to->angles[2] = MSG_ReadDelta( msg, from->angles[2], 16);
-	to->forwardmove = MSG_ReadDelta( msg, from->forwardmove, 8);
-	if( to->forwardmove == -128 )
-		to->forwardmove = -127;
-	to->rightmove = MSG_ReadDelta( msg, from->rightmove, 8);
-	if( to->rightmove == -128 )
-		to->rightmove = -127;
-	to->upmove = MSG_ReadDelta( msg, from->upmove, 8);
-	if( to->upmove == -128 )
-		to->upmove = -127;
-	to->buttons = MSG_ReadDelta( msg, from->buttons, 16);
-	to->weapon = MSG_ReadDelta( msg, from->weapon, 8);
-}
-
-/*
-=====================
-MSG_WriteDeltaUsercmd
+MSG_WriteDeltaUsercmdKey
 =====================
 */
 void MSG_WriteDeltaUsercmdKey( msg_t *msg, int key, usercmd_t *from, usercmd_t *to ) {
@@ -765,7 +682,7 @@ void MSG_WriteDeltaUsercmdKey( msg_t *msg, int key, usercmd_t *from, usercmd_t *
 
 /*
 =====================
-MSG_ReadDeltaUsercmd
+MSG_ReadDeltaUsercmdKey
 =====================
 */
 void MSG_ReadDeltaUsercmdKey( msg_t *msg, int key, usercmd_t *from, usercmd_t *to ) {

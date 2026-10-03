@@ -84,10 +84,9 @@ char	*MSG_ReadBigString (msg_t *sb);
 char	*MSG_ReadStringLine (msg_t *sb);
 float	MSG_ReadAngle16 (msg_t *sb);
 void	MSG_ReadData (msg_t *sb, void *buffer, int size);
+int		MSG_LookaheadByte (msg_t *msg);
 
 
-void MSG_WriteDeltaUsercmd( msg_t *msg, struct usercmd_s *from, struct usercmd_s *to );
-void MSG_ReadDeltaUsercmd( msg_t *msg, struct usercmd_s *from, struct usercmd_s *to );
 
 void MSG_WriteDeltaUsercmdKey( msg_t *msg, int key, usercmd_t *from, usercmd_t *to );
 void MSG_ReadDeltaUsercmdKey( msg_t *msg, int key, usercmd_t *from, usercmd_t *to );
@@ -1173,6 +1172,10 @@ void	Huff_offsetReceive (node_t *node, int *ch, byte *fin, int *offset, int maxo
 void	Huff_offsetTransmit (huff_t *huff, int ch, byte *fout, int *offset, int maxoffset);
 void	Huff_putBit( int bit, byte *fout, int *offset);
 int		Huff_getBit( byte *fout, int *offset);
+
+// don't use if you don't know what you're doing.
+int		Huff_getBloc(void);
+void	Huff_setBloc(int _bloc);
 
 extern huffman_t clientHuffTables;
 
