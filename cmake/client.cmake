@@ -1,3 +1,8 @@
+option(USE_MUMBLE "Mumble support" ON)
+if(USE_MUMBLE)
+    list(APPEND CLIENT_DEFINITIONS USE_MUMBLE)
+endif()
+
 set(MF_LIBRARIES vehiclelib game cgame ui)
 if(NOT USE_RENDERER_DLOPEN)
     list(APPEND MF_LIBRARIES renderer)

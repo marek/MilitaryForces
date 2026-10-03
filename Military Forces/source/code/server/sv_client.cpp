@@ -572,6 +572,19 @@ Destructor for data allocated in a client structure
 */
 void SV_FreeClient(SV_Client *client)
 {
+#ifdef USE_VOIP
+	int index;
+	
+	for(index = client->queuedVoipIndex_; index < client->queuedVoipPackets_; index++)
+	{
+		index %= ARRAY_LEN(client->voipPacket_);
+		
+		Z_Free(client->voipPacket_[index]);
+	}
+	
+	client->queuedVoipPackets_ = 0;
+#endif
+
 	SV_Netchan_FreeQueue(client);
 	SV_CloseDownload(client);
 }
@@ -1449,12 +1462,12 @@ void SV_UserinfoChanged( SV_Client *cl ) {
 #ifdef USE_VOIP
 #ifdef LEGACY_PROTOCOL
 	if(cl->compat)
-		cl->hasVoip = false;
+		cl->hasVoip_ = false;
 	else
 #endif
 	{
 		val = Info_ValueForKey(cl->userinfo_, "cl_voipProtocol");
-		cl->hasVoip = !Q_stricmp( val, "opus" );
+		cl->hasVoip_ = !Q_stricmp( val, "opus" );
 	}
 #endif
 
@@ -1495,6 +1508,38 @@ static void SV_UpdateUserinfo_f( SV_Client *cl )
 	theSG.clientUserInfoChanged( cl->clientNum_ );
 }
 
+#ifdef USE_VOIP
+static
+void SV_UpdateVoipIgnore(SV_Client *cl, const char *idstr, bool ignore)
+{
+	if ((*idstr >= '0') && (*idstr <= '9')) {
+		const int id = atoi(idstr);
+		if ((id >= 0) && (id < MAX_CLIENTS)) {
+			cl->ignoreVoipFromClient_[id] = ignore;
+		}
+	}
+}
+
+/*
+==================
+SV_Voip_f
+==================
+*/
+static void SV_Voip_f( SV_Client *cl ) {
+	const char *cmd = Cmd_Argv(1);
+	if (strcmp(cmd, "ignore") == 0) {
+		SV_UpdateVoipIgnore(cl, Cmd_Argv(2), true);
+	} else if (strcmp(cmd, "unignore") == 0) {
+		SV_UpdateVoipIgnore(cl, Cmd_Argv(2), false);
+	} else if (strcmp(cmd, "muteall") == 0) {
+		cl->muteAllVoip_ = true;
+	} else if (strcmp(cmd, "unmuteall") == 0) {
+		cl->muteAllVoip_ = false;
+	}
+}
+#endif
+
+
 typedef struct 
 {
 	char	*name;
@@ -1510,6 +1555,10 @@ static ucmd_t ucmds[] = {
 	{"nextdl", SV_NextDownload_f},
 	{"stopdl", SV_StopDownload_f},
 	{"donedl", SV_DoneDownload_f},
+
+#ifdef USE_VOIP
+	{"voip", SV_Voip_f},
+#endif
 
 	{NULL, NULL}
 };
@@ -1757,6 +1806,118 @@ USER CMD EXECUTION
 ===========================================================================
 */
 
+#ifdef USE_VOIP
+/*
+==================
+SV_ShouldIgnoreVoipSender
+
+Blocking of voip packets based on source client
+==================
+*/
+
+static bool SV_ShouldIgnoreVoipSender(const SV_Client *cl)
+{
+	if (!sv_voip->integer)
+		return true;  // VoIP disabled on this server.
+	else if (!cl->hasVoip_)  // client doesn't have VoIP support?!
+		return true;
+    
+	// !!! FIXME: implement player blacklist.
+
+	return false;  // don't ignore.
+}
+
+static
+void SV_UserVoip(SV_Client *cl, msg_t *msg, bool ignoreData)
+{
+	int sender, generation, sequence, frames, packetsize;
+	uint8_t recips[(MAX_CLIENTS + 7) / 8];
+	int flags;
+	byte encoded[sizeof(cl->voipPacket_[0]->data)];
+	SV_Client *client = NULL;
+	voipServerPacket_t *packet = NULL;
+	int i;
+
+	sender = cl->clientNum_;
+	generation = MSG_ReadByte(msg);
+	sequence = MSG_ReadLong(msg);
+	frames = MSG_ReadByte(msg);
+	MSG_ReadData(msg, recips, sizeof(recips));
+	flags = MSG_ReadByte(msg);
+	packetsize = MSG_ReadShort(msg);
+
+	if (msg->readcount > msg->cursize)
+		return;   // short/invalid packet, bail.
+
+	if (packetsize > sizeof (encoded)) {  // overlarge packet?
+		int bytesleft = packetsize;
+		while (bytesleft) {
+			int br = bytesleft;
+			if (br > sizeof (encoded))
+				br = sizeof (encoded);
+			MSG_ReadData(msg, encoded, br);
+			bytesleft -= br;
+		}
+		return;   // overlarge packet, bail.
+	}
+
+	MSG_ReadData(msg, encoded, packetsize);
+
+	if (ignoreData || SV_ShouldIgnoreVoipSender(cl))
+		return;   // Blacklisted, disabled, etc.
+
+	// !!! FIXME: see if we read past end of msg...
+
+	// !!! FIXME: reject if not opus data.
+	// !!! FIXME: decide if this is bogus data?
+
+	// decide who needs this VoIP packet sent to them...
+	for (i = 1; i <= sv_maxclients->integer ; i++) {
+		client = theSVS.svClients_.at(i);
+		if (!client)
+			continue;
+		if (client->state_ != SV_Client::CS_ACTIVE)
+			continue;  // not in the game yet, don't send to this guy.
+		else if (i == sender)
+			continue;  // don't send voice packet back to original author.
+		else if (!client->hasVoip_)
+			continue;  // no VoIP support, or unsupported protocol
+		else if (client->muteAllVoip_)
+			continue;  // client is ignoring everyone.
+		else if (client->ignoreVoipFromClient_[sender])
+			continue;  // client is ignoring this talker.
+		else if (*cl->downloadName_)   // !!! FIXME: possible to DoS?
+			continue;  // no VoIP allowed if downloading, to save bandwidth.
+
+		if(Com_IsVoipTarget(recips, sizeof(recips), i))
+			flags |= VOIP_DIRECT;
+		else
+			flags &= ~VOIP_DIRECT;
+
+		if (!(flags & (VOIP_SPATIAL | VOIP_DIRECT)))
+			continue;  // not addressed to this player.
+
+		// Transmit this packet to the client.
+		if (client->queuedVoipPackets_ >= ARRAY_LEN(client->voipPacket_)) {
+			Com_Printf("Too many VoIP packets queued for client #%d\n", i);
+			continue;  // no room for another packet right now.
+		}
+
+		packet = (voipServerPacket_t *)Z_Malloc(sizeof(*packet));
+		packet->sender = sender;
+		packet->frames = frames;
+		packet->len = packetsize;
+		packet->generation = generation;
+		packet->sequence = sequence;
+		packet->flags = flags;
+		memcpy(packet->data, encoded, packetsize);
+
+		client->voipPacket_[(client->queuedVoipIndex_ + client->queuedVoipPackets_) % ARRAY_LEN(client->voipPacket_)] = packet;
+		client->queuedVoipPackets_++;
+	}
+}
+#endif
+
 /*
 ===================
 SV_ExecuteClientMessage
@@ -1853,6 +2014,22 @@ void SV_ExecuteClientMessage( SV_Client *cl, msg_t *msg )
 
 	} while ( 1 );
 
+	// skip legacy speex voip data
+	if ( c == clc_voipSpeex ) {
+#ifdef USE_VOIP
+		SV_UserVoip( cl, msg, true );
+		c = MSG_ReadByte( msg );
+#endif
+	}
+
+	// read optional voip data
+	if ( c == clc_voipOpus ) {
+#ifdef USE_VOIP
+		SV_UserVoip( cl, msg, false );
+		c = MSG_ReadByte( msg );
+#endif
+	}
+
 	// read the usercmd_t
 	if ( c == clc_move ) 
 		SV_UserMove( cl, msg, true );
@@ -1933,6 +2110,14 @@ SV_Client::SV_Client() :
 	memset( downloadBlockSize_, 0, sizeof(downloadBlockSize_) );
 	memset( frames_, 0, sizeof(frames_) );
 	memset( &netchan_, 0, sizeof(netchan_ ) );
+#ifdef USE_VOIP
+	hasVoip_ = false;
+	muteAllVoip_ = false;
+	memset( ignoreVoipFromClient_, 0, sizeof(ignoreVoipFromClient_) );
+	memset( voipPacket_, 0, sizeof(voipPacket_) );
+	queuedVoipPackets_ = 0;
+	queuedVoipIndex_ = 0;
+#endif
 }
 
 
@@ -1989,5 +2174,13 @@ SV_Client::clear()
 	memset( downloadBlockSize_, 0, sizeof(downloadBlockSize_) );
 	memset( frames_, 0, sizeof(frames_) );
 	memset( &netchan_, 0, sizeof(netchan_ ) );
+#ifdef USE_VOIP
+	hasVoip_ = false;
+	muteAllVoip_ = false;
+	memset( ignoreVoipFromClient_, 0, sizeof(ignoreVoipFromClient_) );
+	memset( voipPacket_, 0, sizeof(voipPacket_) );
+	queuedVoipPackets_ = 0;
+	queuedVoipIndex_ = 0;
+#endif
 }
 

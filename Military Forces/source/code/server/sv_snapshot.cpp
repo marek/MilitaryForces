@@ -560,6 +560,53 @@ static void SV_BuildClientSnapshot( SV_Client *client )
 }
 
 
+#ifdef USE_VOIP
+/*
+==================
+SV_WriteVoipToClient
+
+Check to see if there is any VoIP queued for a client, and send if there is.
+==================
+*/
+static void SV_WriteVoipToClient(SV_Client *cl, msg_t *msg)
+{
+	int totalbytes = 0;
+	int i;
+	voipServerPacket_t *packet;
+
+	if(cl->queuedVoipPackets_)
+	{
+		// Write as many VoIP packets as we reasonably can...
+		for(i = 0; i < cl->queuedVoipPackets_; i++)
+		{
+			packet = cl->voipPacket_[(i + cl->queuedVoipIndex_) % ARRAY_LEN(cl->voipPacket_)];
+
+			if(!*cl->downloadName_)
+			{
+        			totalbytes += packet->len;
+	        		if (totalbytes > (msg->maxsize - msg->cursize) / 2)
+		        		break;
+
+        			MSG_WriteByte(msg, svc_voipOpus);
+        			MSG_WriteShort(msg, packet->sender);
+	        		MSG_WriteByte(msg, (byte) packet->generation);
+		        	MSG_WriteLong(msg, packet->sequence);
+		        	MSG_WriteByte(msg, packet->frames);
+        			MSG_WriteShort(msg, packet->len);
+        			MSG_WriteBits(msg, packet->flags, VOIP_FLAGCNT);
+	        		MSG_WriteData(msg, packet->data, packet->len);
+                        }
+
+			Z_Free(packet);
+		}
+
+		cl->queuedVoipPackets_ -= i;
+		cl->queuedVoipIndex_ += i;
+		cl->queuedVoipIndex_ %= ARRAY_LEN(cl->voipPacket_);
+	}
+}
+#endif
+
 /*
 =======================
 SV_SendMessageToClient
@@ -614,6 +661,10 @@ void SV_SendClientSnapshot( SV_Client *client )
 	// send over all the relevant entityState_t
 	// and the playerState_t
 	SV_WriteSnapshotToClient( client, &msg );
+
+#ifdef USE_VOIP
+	SV_WriteVoipToClient( client, &msg );
+#endif
 
 	// check for overflow
 	if ( msg.overflowed ) 

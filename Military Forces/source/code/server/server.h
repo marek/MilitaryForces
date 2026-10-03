@@ -287,6 +287,11 @@ extern	cvar_t	*sv_master[MAX_MASTER_SERVERS];
 extern	serverBan_t serverBans[SERVER_MAXBANS];
 extern	int serverBansCount;
 
+#ifdef USE_VOIP
+extern	cvar_t	*sv_voip;
+extern	cvar_t	*sv_voipProtocol;
+#endif
+
 //===========================================================
 
 //

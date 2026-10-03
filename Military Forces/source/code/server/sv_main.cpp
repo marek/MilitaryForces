@@ -68,6 +68,11 @@ cvar_t	*sv_master[MAX_MASTER_SERVERS];	// master server ip address
 serverBan_t serverBans[SERVER_MAXBANS];
 int serverBansCount = 0;
 
+#ifdef USE_VOIP
+cvar_t *sv_voip;
+cvar_t *sv_voipProtocol;
+#endif
+
 /*
 =============================================================================
 

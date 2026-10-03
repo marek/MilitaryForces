@@ -1,0 +1,27 @@
+option(USE_INTERNAL_VORBIS "Use internal copy of libvorbis" ON)
+
+if(NOT USE_CODEC_VORBIS)
+    return()
+endif()
+
+set(VORBIS_VERSION 1.3.7)
+set(INTERNAL_VORBIS_DIR ${SOURCE_DIR}/thirdparty/libvorbis-${VORBIS_VERSION})
+
+if(USE_INTERNAL_VORBIS)
+    file(GLOB_RECURSE VORBIS_SOURCES ${INTERNAL_VORBIS_DIR}/*.c)
+    add_library(internal_vorbis STATIC ${VORBIS_SOURCES})
+    set_target_properties(internal_vorbis PROPERTIES LINKER_LANGUAGE C)
+    target_compile_options(internal_vorbis PRIVATE -w)
+    target_include_directories(internal_vorbis PUBLIC ${INTERNAL_VORBIS_DIR}/include PRIVATE ${INTERNAL_VORBIS_DIR}/lib)
+    target_link_libraries(internal_vorbis PUBLIC internal_ogg)
+    list(APPEND CLIENT_LIBRARIES internal_vorbis)
+    list(APPEND CLIENT_INCLUDE_DIRS ${INTERNAL_VORBIS_DIR}/include)
+else()
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(VORBIS REQUIRED vorbis)
+    pkg_check_modules(VORBISFILE REQUIRED vorbisfile)
+    list(APPEND CLIENT_LIBRARIES ${VORBIS_LINK_LIBRARIES} ${VORBISFILE_LINK_LIBRARIES})
+    list(APPEND CLIENT_INCLUDE_DIRS ${VORBIS_INCLUDE_DIRS} ${VORBISFILE_INCLUDE_DIRS})
+endif()
+
+list(APPEND CLIENT_DEFINITIONS USE_CODEC_VORBIS)

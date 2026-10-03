@@ -26,6 +26,8 @@
 	<string>NSApplication</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>@MACOS_APP_DEPLOYMENT_TARGET@</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Military Forces uses the microphone for in-game voice chat.</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.games</string>
 </dict>

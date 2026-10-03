@@ -9,6 +9,21 @@
 
 struct EntityBase;
 
+#ifdef USE_VOIP
+#define VOIP_QUEUE_LENGTH 64
+
+typedef struct voipServerPacket_s
+{
+	int generation;
+	int sequence;
+	int frames;
+	int len;
+	int sender;
+	int flags;
+	byte data[4000];
+} voipServerPacket_t;
+#endif
+
 struct SV_Client
 {
 	enum eClientState
@@ -105,6 +120,15 @@ struct SV_Client
 	// buffer them into this queue, and hand them out to netchan as needed
 	Netchan_Buffer*		netchan_start_queue_;
 	Netchan_Buffer**	netchan_end_queue_;
+
+#ifdef USE_VOIP
+	bool				hasVoip_;
+	bool				muteAllVoip_;
+	bool				ignoreVoipFromClient_[MAX_CLIENTS];
+	voipServerPacket_t*	voipPacket_[VOIP_QUEUE_LENGTH];
+	int					queuedVoipPackets_;
+	int					queuedVoipIndex_;
+#endif
 
 	int					oldServerTime_;
 	bool				csUpdated_[MAX_CONFIGSTRINGS];
