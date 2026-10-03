@@ -661,6 +661,7 @@ extern const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1];
 
 #define	SEATMASK_PILOT				0x0001
 #define	SEATMASK_ENTERABLE			0x8000
+#define	SEATMASK_DECK				0x4000
 
 #define	STEALTH_RANGE_FACTOR		0.25f
 

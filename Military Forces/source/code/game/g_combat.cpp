@@ -144,8 +144,12 @@ void G_Damage( GameEntity *targ, GameEntity *inflictor, GameEntity* attacker,
 	int			knockback;
 	int			max;
 
-	if( targ->parent_ && targ->classname_ && !strcmp( targ->classname_, "vehicle_deck" ) ) 
-		targ = targ->parent_;
+	if( targ->r.svFlags & SVF_DECK ) 
+	{
+		targ = theLevel.getEntity( targ->s.otherEntityNum );
+		if( !targ || !targ->inuse_ ) 
+			return;
+	}
 
 	if (!targ->takedamage_) 
 		return;

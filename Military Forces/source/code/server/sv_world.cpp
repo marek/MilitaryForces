@@ -278,7 +278,7 @@ void SV_LinkEntity( EntityBase* gameEnt )
 	angles = gameEnt->r.currentAngles;
 
 	// set the abs box
-	if ( gameEnt->r.bmodel && (angles[0] || angles[1] || angles[2]) ) 
+	if ( (gameEnt->r.bmodel || (gameEnt->r.svFlags & SVF_DECK)) && (angles[0] || angles[1] || angles[2]) ) 
 	{
 		// expand for rotation
 		float		max;
@@ -583,7 +583,7 @@ void SV_ClipMoveToEntities( moveclip_t *clip )
 			if ( touch->r.ownerNum == clip->passEntityNum ) {
 				continue;	// don't clip against own missiles
 			}
-			if ( touch->r.ownerNum == passOwnerNum ) {
+			if ( touch->r.ownerNum == passOwnerNum && !(touch->r.svFlags & SVF_DECK) ) {
 				continue;	// don't clip against other missiles from our owner
 			}
 		}
@@ -601,7 +601,7 @@ void SV_ClipMoveToEntities( moveclip_t *clip )
 		angles = touch->r.currentAngles;
 
 
-		if ( !touch->r.bmodel ) {
+		if ( !touch->r.bmodel && !(touch->r.svFlags & SVF_DECK) ) {
 			angles = vec3_origin;	// boxes don't rotate
 		}
 

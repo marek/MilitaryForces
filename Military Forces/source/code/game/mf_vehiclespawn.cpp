@@ -3,6 +3,7 @@
 */
 
 #include "g_local.h"
+#include "g_miscvehicle.h"
 #include "g_entity.h"
 #include "g_plane.h"
 #include "g_groundvehicle.h"
@@ -115,6 +116,12 @@ void MF_Spawn_Boat(GameEntity *ent, int idx)
 
 	// set functions
 	ent->setPain(new Entity_Boat::Entity_Boat_Pain);
+
+	if( availableVehicles[idx].hasDeck ) 
+	{
+		ent->r.contents = CONTENTS_CORPSE;
+		MiscVehicle_SpawnDecks( ent, idx );
+	}
 
 }
 

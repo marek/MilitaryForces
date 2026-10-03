@@ -35,7 +35,7 @@ void PM_LQMGroundTrace( void )
 
 	VectorSet( end, pm->ps->origin[0], (float)pm->ps->origin[1], (float)pm->ps->origin[2] + (float)pm->mins[2] + 2);
 
-	pm->trace (&trace, pm->ps->origin, pm->mins, pm->maxs, end, pm->ps->clientNum, MASK_SOLID, false);
+	pm->trace (&trace, pm->ps->origin, pm->mins, pm->maxs, end, pm->ps->clientNum, pm->tracemask, false);
 	pml.groundTrace = trace;
 
 	// if the trace didn't hit anything, we are in free fall
@@ -46,6 +46,7 @@ void PM_LQMGroundTrace( void )
 			pm->ps->ONOFF |= OO_STALLED;	// start landing
 		}
 
+		pm->ps->groundEntityNum = ENTITYNUM_NONE;
 		pml.groundPlane = false;
 		pml.walking = false;
 		return;
@@ -73,8 +74,7 @@ void PM_LQMGroundTrace( void )
 
 	pml.groundPlane = true;
 	pml.walking = true;
-
-		
+	pm->ps->groundEntityNum = trace.entityNum;
 }
 
 void PM_LQMMove( void ) 

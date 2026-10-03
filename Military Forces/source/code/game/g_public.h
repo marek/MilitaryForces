@@ -31,6 +31,7 @@
 											// lagging clients
 #define SVF_CAPSULE				0x00000400	// use capsule for collision detection instead of bbox
 #define SVF_NOTSINGLECLIENT		0x00000800	// send entity to everyone but one client
+#define SVF_DECK				0x00001000	// box that rotates with r.currentAngles, also clips entities sharing its owner
 											// (entityShared_t->singleClient)
 
 //===============================================================

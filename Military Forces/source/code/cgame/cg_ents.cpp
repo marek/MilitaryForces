@@ -634,7 +634,7 @@ void CG_AdjustPositionForMover( const vec3_t in, int moverNum, int fromTime, int
 	}
 
 	cent = &cg_entities[ moverNum ];
-	if ( cent->currentState.eType != ET_MOVER ) {
+	if ( cent->currentState.eType != ET_MOVER && !(cent->currentState.seatMask & SEATMASK_DECK) ) {
 		VectorCopy( in, out );
 		return;
 	}

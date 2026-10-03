@@ -1531,6 +1531,16 @@ void Cmd_TeamVote_f( GameEntity *ent )
 }
 
 
+static void Rider_SetVehicle( int clientNum, int vehicle )
+{
+	char userinfo[MAX_INFO_STRING];
+	SV_GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
+	Info_SetValueForKey( userinfo, "cg_vehicle", va( "%d", vehicle ) );
+	Info_SetValueForKey( userinfo, "cg_nextVehicle", va( "%d", vehicle ) );
+	SV_SetUserinfo( clientNum, userinfo );
+	ClientUserinfoChanged( clientNum );
+}
+
 /*
 =================
 Rider_Leave
@@ -1574,6 +1584,7 @@ void Rider_Leave( GameEntity *ent, bool forced )
 	client->sess_.seat_ = 0;
 	if( pilot && pilot->pers_.connected_ == GameClient::ClientPersistant::CON_CONNECTED ) 
 		SV_GameSendServerCommand( pilotNum, va( "print \"%s^7 left your vehicle\n\"", client->pers_.netname_ ) );
+	Rider_SetVehicle( ent->s.number, client->vehicle_ );
 	switch_vehicle( ent );
 }
 
@@ -1593,6 +1604,7 @@ void Rider_KillAll( GameEntity *vehicle, GameEntity *attacker )
 		VectorCopy( vehicle->r.currentOrigin, rider->ps_.origin );
 		rider->sess_.ridingClient_ = -1;
 		rider->sess_.seat_ = 0;
+		Rider_SetVehicle( i, rider->vehicle_ );
 		switch_vehicle( theLevel.getEntity( i ) );
 		GameEntity* body = theLevel.getEntity( i );
 		if( body && body->health_ > 0 ) 
@@ -1707,7 +1719,6 @@ static void Cmd_Enter( GameEntity *ent )
 	VectorCopy( best->r.currentOrigin, client->ps_.origin );
 	client->ps_.origin[2] -= 24;
 	VectorCopy( best->s.angles, client->ps_.vehicleAngles );
-	MiscVehicle_FreeDecks( best );
 	best->freeUp();
 
 	int clientNum = ent->s.number;

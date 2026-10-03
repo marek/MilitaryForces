@@ -31,7 +31,6 @@ void MiscVehicle_Die::execute( GameEntity *inflictor, GameEntity *attacker, int 
 		AddScore( attacker, pos, MiscVehicle_TeamScore( self_, attacker ) );
 	}
 
-	MiscVehicle_FreeDecks( self_ );
 	ExplodeVehicle(self_);
 	self_->freeAfterEvent_ = true;
 
@@ -344,10 +343,7 @@ void Abandoned_Think::execute()
 	if( ent->s.pos.trType == TR_STATIONARY )
 	{
 		if( theLevel.time_ > expire_ )
-		{
-			MiscVehicle_FreeDecks( ent );
 			ent->freeUp();
-		}
 		else
 			ent->nextthink_ = theLevel.time_ + 1000;
 		return;
@@ -420,51 +416,137 @@ void MiscVehicle_Abandon( GameEntity *ent )
 	SV_LinkEntity( veh );
 
 	if( landed && availableVehicles[vehicle].hasDeck ) 
-	{
-		completeVehicleData_t* data = &availableVehicles[vehicle];
-		vec3_t forward, yawOnly;
-		float halfLength = ( data->maxs[0] - data->mins[0] ) * 0.5f;
-		float half = ( data->maxs[1] - data->mins[1] ) * 0.45f;
-		float centre = ( data->maxs[0] + data->mins[0] ) * 0.5f;
-		if( half > 120 ) half = 120;
-		if( half > halfLength ) half = halfLength;
-		int count = (int)ceil( halfLength / half );
-		if( count > MAX_VEHICLE_DECKS ) count = MAX_VEHICLE_DECKS;
-		VectorSet( yawOnly, 0, veh->s.angles[YAW], 0 );
-		AngleVectors( yawOnly, forward, 0, 0 );
-		for( int i = 0; i < count; i++ ) 
-		{
-			float along = count > 1 ? centre - (halfLength - half) + i * 2 * (halfLength - half) / (count - 1) : centre;
-			vec3_t origin;
-			GameEntity* deck = theLevel.spawnEntity();
-			deck->classname_ = "vehicle_deck";
-			deck->s.eType = ET_INVISIBLE;
-			deck->parent_ = veh;
-			VectorSet( deck->r.mins, -half, -half, data->mins[2] );
-			VectorSet( deck->r.maxs, half, half, data->deckPos[2] );
-			VectorMA( veh->r.currentOrigin, along, forward, origin );
-			G_SetOrigin( deck, origin );
-			deck->r.contents = CONTENTS_BODY;
-			deck->takedamage_ = true;
-			deck->health_ = 1;
-			SV_LinkEntity( deck );
-			think->decks_[i] = deck;
-		}
-	}
+		MiscVehicle_SpawnDecks( veh, vehicle );
 }
 
-void MiscVehicle_FreeDecks( GameEntity *veh )
+void Deck_Think::execute()
 {
-	Abandoned_Think* think = dynamic_cast<Abandoned_Think*>( veh->thinkFunc_ );
-	if( !think ) 
-		return;
-	for( int i = 0; i < MAX_VEHICLE_DECKS; i++ ) 
+	GameEntity* deck = self_;
+	GameEntity* parent = theLevel.getEntity( parentNum_ );
+	if( parent != parentPtr_ || !parent || !parent->inuse_ ) 
 	{
-		if( think->decks_[i] ) 
+		deck->freeUp();
+		return;
+	}
+
+	vec3_t origin, angles, velocity, forward, pos;
+	VectorCopy( parent->r.currentOrigin, origin );
+	VectorCopy( parent->s.angles, angles );
+	VectorClear( velocity );
+	if( parent->client_ ) 
+		VectorCopy( parent->client_->ps_.velocity, velocity );
+
+	if( first_ ) 
+	{
+		for( int i = 1; i <= theLevel.maxclients_; i++ ) 
 		{
-			think->decks_[i]->freeUp();
-			think->decks_[i] = 0;
+			GameClient* cl = theLevel.getClient( i );
+			GameEntity* ent = theLevel.getEntity( i );
+			if( !cl || !ent || cl->pers_.connected_ != GameClient::ClientPersistant::CON_CONNECTED ) 
+				continue;
+			if( cl->vehicle_ < 0 || !(availableVehicles[cl->vehicle_].cat & CAT_LQM) || ent->health_ <= 0 || cl->sess_.ridingClient_ >= 0 ) 
+				continue;
+
+			bool on = false;
+			int ground = cl->ps_.groundEntityNum;
+			if( ground > 0 && ground < MAX_GENTITIES ) 
+			{
+				GameEntity* ge = theLevel.getEntity( ground );
+				if( ge && ge->inuse_ && (ge->r.svFlags & SVF_DECK) && ge->s.otherEntityNum == parentNum_ ) 
+					on = true;
+			}
+			if( !on ) 
+			{
+				if( ent->r.ownerNum == parentNum_ ) 
+					ent->r.ownerNum = ENTITYNUM_NONE;
+				continue;
+			}
+			ent->r.ownerNum = parentNum_;
+			if( !hasLast_ ) 
+				continue;
+
+			vec3_t oldAxis[3], newAxis[3], rel, moved;
+			AnglesToAxis( lastAngles_, oldAxis );
+			AnglesToAxis( angles, newAxis );
+			VectorSubtract( cl->ps_.origin, lastOrigin_, rel );
+			VectorCopy( origin, moved );
+			for( int k = 0; k < 3; k++ ) 
+				VectorMA( moved, DotProduct( rel, oldAxis[k] ), newAxis[k], moved );
+			VectorCopy( moved, cl->ps_.origin );
+			VectorCopy( moved, ent->r.currentOrigin );
+			VectorCopy( moved, ent->s.pos.trBase );
+			cl->ps_.delta_angles[YAW] += ANGLE2SHORT( AngleSubtract( angles[YAW], lastAngles_[YAW] ) );
+			SV_LinkEntity( ent );
 		}
+	}
+
+	AngleVectors( angles, forward, 0, 0 );
+	VectorMA( origin, along_, forward, pos );
+
+	deck->s.pos.trType = TR_LINEAR;
+	deck->s.pos.trTime = theLevel.time_;
+	deck->s.pos.trDuration = 0;
+	VectorCopy( pos, deck->s.pos.trBase );
+	VectorCopy( velocity, deck->s.pos.trDelta );
+	VectorCopy( pos, deck->r.currentOrigin );
+
+	deck->s.apos.trType = TR_LINEAR;
+	deck->s.apos.trTime = theLevel.time_;
+	deck->s.apos.trDuration = 0;
+	VectorCopy( angles, deck->s.apos.trBase );
+	VectorClear( deck->s.apos.trDelta );
+	if( hasLast_ && theLevel.time_ > lastTime_ ) 
+	{
+		float scale = 1000.0f / ( theLevel.time_ - lastTime_ );
+		for( int k = 0; k < 3; k++ ) 
+			deck->s.apos.trDelta[k] = AngleSubtract( angles[k], lastAngles_[k] ) * scale;
+	}
+	VectorCopy( angles, deck->s.angles );
+	VectorCopy( angles, deck->r.currentAngles );
+
+	VectorCopy( origin, lastOrigin_ );
+	VectorCopy( angles, lastAngles_ );
+	lastTime_ = theLevel.time_;
+	hasLast_ = true;
+
+	SV_LinkEntity( deck );
+	deck->nextthink_ = theLevel.time_ + 1;
+}
+
+void MiscVehicle_SpawnDecks( GameEntity *parent, int vehicle )
+{
+	completeVehicleData_t* data = &availableVehicles[vehicle];
+	float halfLength = ( data->maxs[0] - data->mins[0] ) * 0.5f;
+	float half = ( data->maxs[1] - data->mins[1] ) * 0.45f;
+	float centre = ( data->maxs[0] + data->mins[0] ) * 0.5f;
+	if( half > 120 ) half = 120;
+	if( half > halfLength ) half = halfLength;
+	int count = (int)ceil( halfLength / half );
+	if( count > MAX_VEHICLE_DECKS ) count = MAX_VEHICLE_DECKS;
+
+	for( int i = 0; i < count; i++ ) 
+	{
+		GameEntity* deck = theLevel.spawnEntity();
+		deck->classname_ = "vehicle_deck";
+		deck->s.eType = ET_INVISIBLE;
+		deck->s.seatMask = SEATMASK_DECK;
+		deck->s.otherEntityNum = parent->s.number;
+		deck->r.ownerNum = parent->s.number;
+		deck->r.svFlags = SVF_DECK | SVF_USE_CURRENT_ORIGIN;
+		VectorSet( deck->r.mins, -half, -half, data->mins[2] );
+		VectorSet( deck->r.maxs, half, half, data->deckPos[2] );
+		deck->r.contents = CONTENTS_BODY;
+		deck->takedamage_ = true;
+		deck->health_ = 1;
+
+		Deck_Think* think = new Deck_Think;
+		think->parentNum_ = parent->s.number;
+		think->parentPtr_ = parent;
+		think->along_ = count > 1 ? centre - (halfLength - half) + i * 2 * (halfLength - half) / (count - 1) : centre;
+		think->first_ = i == 0;
+		deck->setThink( think );
+		G_SetOrigin( deck, parent->r.currentOrigin );
+		think->execute();
 	}
 }
 
@@ -489,6 +571,7 @@ void DroneInit()
 		}
 	}
 }
+
 
 static void MiscVehicle_SetTeam( GameEntity *ent )
 {

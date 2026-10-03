@@ -83,6 +83,12 @@ static void CG_ClipMoveToEntities ( const vec3_t start, const vec3_t mins, const
 		if ( ent->number == skipNumber ) {
 			continue;
 		}
+		if ( (ent->seatMask & SEATMASK_DECK) && ent->otherEntityNum == skipNumber ) {
+			continue;
+		}
+		if ( ent->vehicleEnt == skipNumber && skipNumber > 0 && ent->seat == 0 ) {
+			continue;
+		}
 
 		if ( ent->solid == SOLID_BMODEL ) {
 			// special value for bmodel
@@ -101,8 +107,13 @@ static void CG_ClipMoveToEntities ( const vec3_t start, const vec3_t mins, const
 			bmaxs[2] = zu;
 
 			cmodel = CM_TempBoxModel( bmins, bmaxs, false );
-			VectorCopy( vec3_origin, angles );
-			VectorCopy( cent->lerpOrigin, origin );
+			if ( ent->seatMask & SEATMASK_DECK ) {
+				BG_EvaluateTrajectory( &cent->currentState.apos, cg.physicsTime, angles );
+				BG_EvaluateTrajectory( &cent->currentState.pos, cg.physicsTime, origin );
+			} else {
+				VectorCopy( vec3_origin, angles );
+				VectorCopy( cent->lerpOrigin, origin );
+			}
 		}
 
 

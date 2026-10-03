@@ -1118,7 +1118,7 @@ void ClientEndFrame( GameEntity *ent )
 	}
 
 	ent->s.seatMask = SEATMASK_PILOT;
-	ent->s.vehicleEnt = 0;
+	ent->s.vehicleEnt = ent->r.ownerNum > 0 ? ent->r.ownerNum : 0;
 	ent->s.seat = 0;
 	for( int r = 1; r <= theLevel.maxclients_; r++ ) 
 	{
