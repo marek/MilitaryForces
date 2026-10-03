@@ -90,6 +90,8 @@ struct GameClient : public ClientBase
 		int					wins_;				// tournament stats
 		int					losses_;			// tournament stats
 		int					teamLeader_;		// true when this client is a team leader
+		int					ridingClient_;		// client whose vehicle this player rides in, -1 = none
+		int					seat_;
 	};
 
 						GameClient();

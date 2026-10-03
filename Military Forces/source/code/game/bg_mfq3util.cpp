@@ -399,6 +399,14 @@ void MF_LoadAllVehicleData()
 		availableVehicles[i].mins[2] += 1;// to look better ?
 		if( availableVehicles[i].cat & CAT_BOAT ) 
 			MF_findDeck( name, &availableVehicles[i] );
+		if( availableVehicles[i].cat & (CAT_HELO|CAT_BOAT) ) 
+			availableVehicles[i].seats = 4;
+		else if( availableVehicles[i].cat & CAT_GROUND ) 
+			availableVehicles[i].seats = (availableVehicles[i].caps & HC_WHEELS) ? 3 : 1;
+		else 
+			availableVehicles[i].seats = 0;
+		if( !Q_stricmp( availableVehicles[i].modelName, "comanche" ) ) 
+			availableVehicles[i].seats = 1;
 
 		// helo/plane specific
 		if(availableVehicles[i].cat & CAT_PLANE) 
@@ -1195,4 +1203,16 @@ bool MF_StealthHidden( int vehicle, int revealTime, int time, float dist, float 
 	if( time < revealTime ) 
 		return false;
 	return dist > radarRange * STEALTH_RANGE_FACTOR;
+}
+
+bool MF_VehicleHasTurret( int vehicle )
+{
+	if( vehicle < 0 || vehicle >= bg_numberOfVehicles ) 
+		return false;
+	for( int i = 0; i < MAX_WEAPONS_PER_VEHICLE; i++ ) 
+	{
+		if( availableVehicles[vehicle].weapons[i] && availableWeapons[availableVehicles[vehicle].weapons[i]].turret ) 
+			return true;
+	}
+	return false;
 }

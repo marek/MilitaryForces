@@ -196,7 +196,7 @@ void PM_BoatMove( void )
 		VectorCopy( turretdir, viewdir );
 	}
 	else { // normal - turret follows camera
-		VectorCopy( pm->ps->viewangles, viewdir );
+		VectorCopy( pm->gunnerAngles ? pm->gunnerAngles : pm->ps->viewangles, viewdir );
 	}
 
 	// set to 0<=x<=360

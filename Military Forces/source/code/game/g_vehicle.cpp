@@ -172,6 +172,8 @@ VehicleDeathImpl( GameEntity* self, GameEntity* inflictor, GameEntity* attacker,
 			Cmd_Score_f( theLevel.getEntity(i) );// g_entities + i );
 	}
 
+	Rider_KillAll( self, attacker );
+
 	self->takedamage_ = true;	// can still be gibbed
 	self->r.contents = CONTENTS_CORPSE;
 	self->s.objectives = 0;

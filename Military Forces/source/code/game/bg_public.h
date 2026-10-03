@@ -157,6 +157,7 @@ typedef struct {
 	int			vehicle;		// MFQ3
 	bool	updateGear;
 	bool	updateBay;
+	float		*gunnerAngles;
 
 	int			advancedControls;	// MFQ3
 
@@ -660,7 +661,6 @@ extern const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1];
 
 #define	SEATMASK_PILOT				0x0001
 #define	SEATMASK_ENTERABLE			0x8000
-#define	VEHICLE_ENTER_RANGE			45.0f
 
 #define	STEALTH_RANGE_FACTOR		0.25f
 
@@ -859,11 +859,13 @@ struct completeVehicleData_t
 	animation_t		*animations;	// Animation pointer
 	bool			hasDeck;
 	vec3_t			deckPos;
+	int				seats;
 };
 
 extern completeVehicleData_t availableVehicles[];
 
 bool MF_StealthHidden( int vehicle, int revealTime, int time, float dist, float radarRange );
+bool MF_VehicleHasTurret( int vehicle );
 
 // number of available vehicles
 extern int bg_numberOfVehicles;

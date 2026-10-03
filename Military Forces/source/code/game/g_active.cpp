@@ -610,6 +610,61 @@ void SendPendingPredictableEvents( playerState_t *ps )
 	}
 }
 
+static void RiderAngles( GameClient *rider, GameClient *pilot, vec3_t out )
+{
+	for( int i = 0; i < 3; i++ ) 
+		out[i] = SHORT2ANGLE( (short)( rider->pers_.cmd_.angles[i] + pilot->ps_.delta_angles[i] ) );
+}
+
+static bool RiderVehicleValid( GameClient *pilot, GameEntity *veh )
+{
+	if( !pilot || !veh || pilot->pers_.connected_ != GameClient::ClientPersistant::CON_CONNECTED ) 
+		return false;
+	if( pilot->sess_.sessionTeam_ == ClientBase::TEAM_SPECTATOR || pilot->sess_.ridingClient_ >= 0 ) 
+		return false;
+	if( pilot->vehicle_ < 0 || (availableVehicles[pilot->vehicle_].cat & CAT_LQM) ) 
+		return false;
+	if( veh->health_ <= 0 || (pilot->ps_.pm_flags & PMF_VEHICLESELECT) ) 
+		return false;
+	return true;
+}
+
+static void RiderThink( GameEntity *ent )
+{
+	GameClient* client = ent->client_;
+	int pilotNum = client->sess_.ridingClient_;
+
+	client->ps_.commandTime = client->pers_.cmd_.serverTime;
+	if( !RiderVehicleValid( theLevel.getClient( pilotNum ), theLevel.getEntity( pilotNum ) ) ) 
+		Rider_Leave( ent, true );
+}
+
+static void RiderEndFrame( GameEntity *ent )
+{
+	GameClient* client = ent->client_;
+	int pilotNum = client->sess_.ridingClient_;
+	GameClient* pilot = theLevel.getClient( pilotNum );
+
+	if( !RiderVehicleValid( pilot, theLevel.getEntity( pilotNum ) ) ) 
+		return;
+
+	int flags = (pilot->ps_.eFlags & ~(EF_VOTED | EF_TEAMVOTED)) | (client->ps_.eFlags & (EF_VOTED | EF_TEAMVOTED));
+	int commandTime = client->ps_.commandTime;
+	client->ps_ = pilot->ps_;
+	client->ps_.pm_flags |= PMF_FOLLOW;
+	client->ps_.eFlags = flags;
+	client->ps_.commandTime = commandTime;
+	if( client->sess_.seat_ == 1 && MF_VehicleHasTurret( pilot->vehicle_ ) ) 
+		RiderAngles( client, pilot, client->ps_.viewangles );
+
+	ent->s.eType = ET_INVISIBLE;
+	ent->s.vehicleEnt = pilotNum;
+	ent->s.seat = client->sess_.seat_;
+	ent->r.contents = 0;
+	ent->takedamage_ = false;
+	SV_UnlinkEntity( ent );
+}
+
 /*
 ==============
 ClientThink
@@ -647,6 +702,12 @@ void ClientThink_real( GameEntity *ent )
 		ucmd->serverTime = theLevel.time_ - 1000;
 //		Com_Printf("serverTime >>>>>\n" );
 	} 
+
+	if( client->sess_.ridingClient_ >= 0 ) 
+	{
+		RiderThink( ent );
+		return;
+	}
 
 	int msec = ucmd->serverTime - client->ps_.commandTime;
 	// following others may result in bad times, but we still want
@@ -814,6 +875,27 @@ void ClientThink_real( GameEntity *ent )
 	pm.vehicle = client->vehicle_;
 	pm.updateGear = ent->updateGear_;
 	pm.updateBay = ent->updateBay_;
+
+	static vec3_t gunnerAngles;
+	if( client->vehicle_ >= 0 && MF_VehicleHasTurret( client->vehicle_ ) ) 
+	{
+		for( int r = 1; r <= theLevel.maxclients_; r++ ) 
+		{
+			GameClient* rider = theLevel.getClient( r );
+			if( !rider || rider->pers_.connected_ != GameClient::ClientPersistant::CON_CONNECTED ||
+				rider->sess_.ridingClient_ != ent->s.number || rider->sess_.seat_ != 1 ) 
+				continue;
+			RiderAngles( rider, client, gunnerAngles );
+			pm.gunnerAngles = gunnerAngles;
+			if( availableWeapons[client->ps_.weaponIndex].turret ) 
+			{
+				pm.cmd.buttons &= ~BUTTON_ATTACK_MAIN;
+				if( rider->pers_.cmd_.buttons & (BUTTON_ATTACK|BUTTON_ATTACK_MAIN) ) 
+					pm.cmd.buttons |= BUTTON_ATTACK_MAIN;
+			}
+			break;
+		}
+	}
 	VectorCopy( ent->s.angles, pm.ps->vehicleAngles );
 	pm.ps->speed = client->ps_.speed;
 	pm.ps->gunAngle = client->ps_.gunAngle;
@@ -1027,6 +1109,23 @@ void ClientEndFrame( GameEntity *ent )
 	{
 		SpectatorClientEndFrame( ent );
 		return;
+	}
+
+	if( ent->client_->sess_.ridingClient_ >= 0 ) 
+	{
+		RiderEndFrame( ent );
+		return;
+	}
+
+	ent->s.seatMask = SEATMASK_PILOT;
+	ent->s.vehicleEnt = 0;
+	ent->s.seat = 0;
+	for( int r = 1; r <= theLevel.maxclients_; r++ ) 
+	{
+		GameClient* rider = theLevel.getClient( r );
+		if( rider && rider->pers_.connected_ == GameClient::ClientPersistant::CON_CONNECTED &&
+			rider->sess_.ridingClient_ == ent->s.number && rider->sess_.seat_ > 0 && rider->sess_.seat_ < 15 ) 
+			ent->s.seatMask |= (1 << rider->sess_.seat_);
 	}
 
 	//

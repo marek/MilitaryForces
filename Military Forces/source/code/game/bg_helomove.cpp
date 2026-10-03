@@ -588,7 +588,7 @@ void PM_HeloMove( void )
 	// Show turrets
 	// get the angle difference
 	for( i = PITCH; i <= YAW; i++ ) {
-		diff[i] = pm->ps->viewangles[i] - turretdir[i];
+		diff[i] = ( pm->gunnerAngles ? pm->gunnerAngles[i] : pm->ps->viewangles[i] ) - turretdir[i];
 		if( diff[i] > 180 ) diff[i] -= 360;
 		else if( diff[i] < -180 ) diff[i] += 360;
 	}	

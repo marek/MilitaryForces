@@ -34,6 +34,7 @@ vmCvar_t	g_speed;
 vmCvar_t	g_gravity;
 vmCvar_t	g_stealthPenalty;
 vmCvar_t	g_abandonTime;
+vmCvar_t	g_enterRange;
 vmCvar_t	g_cheats;
 vmCvar_t	g_knockback;
 vmCvar_t	g_forcerespawn;
@@ -125,6 +126,7 @@ cvarTable_t		gameCvarTable[] = {
 	{ &g_gravity, "g_gravity", "800", 0, 0, true  },
 	{ &g_stealthPenalty, "g_stealthPenalty", "30", 0, 0, true  },
 	{ &g_abandonTime, "g_abandonTime", "300", 0, 0, true  },
+	{ &g_enterRange, "g_enterRange", "45", 0, 0, true  },
 	{ &g_knockback, "g_knockback", "1000", 0, 0, true  },
 	{ &g_weaponRespawn, "g_weaponrespawn", "5", 0, 0, true  },
 	{ &g_weaponTeamRespawn, "g_weaponTeamRespawn", "30", 0, 0, true },

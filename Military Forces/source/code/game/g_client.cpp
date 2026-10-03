@@ -859,7 +859,9 @@ GameClient::ClientSession::ClientSession() :
 	spectatorClient_(0),
 	wins_(0),
 	losses_(0),
-	teamLeader_(0)
+	teamLeader_(0),
+	ridingClient_(-1),
+	seat_(0)
 {
 }
 

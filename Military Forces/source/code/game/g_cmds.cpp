@@ -711,6 +711,8 @@ void SetTeam( GameEntity *ent, char *s )
 
 	client->sess_.sessionTeam_ = team; //static_cast<team_t>(team);
 	client->sess_.spectatorState_ = specState;
+	client->sess_.ridingClient_ = -1;
+	client->sess_.seat_ = 0;
 	client->sess_.spectatorClient_ = specClient;
 
 	client->sess_.teamLeader_ = false;
@@ -1531,6 +1533,128 @@ void Cmd_TeamVote_f( GameEntity *ent )
 
 /*
 =================
+Rider_Leave
+=================
+*/
+void Rider_Leave( GameEntity *ent, bool forced )
+{
+	GameClient* client = ent->client_;
+	int pilotNum = client->sess_.ridingClient_;
+	if( pilotNum < 0 ) 
+		return;
+
+	GameClient* pilot = theLevel.getClient( pilotNum );
+	if( pilot && pilot->pers_.connected_ == GameClient::ClientPersistant::CON_CONNECTED ) 
+	{
+		bool parked = (pilot->ps_.ONOFF & OO_LANDED) != 0 || VectorLength( pilot->ps_.velocity ) < 60;
+		if( !forced && !parked ) 
+			return;
+
+		vec3_t forward, right, yawOnly, origin;
+		int vehicle = pilot->vehicle_;
+		VectorSet( yawOnly, 0, pilot->ps_.vehicleAngles[YAW], 0 );
+		AngleVectors( yawOnly, forward, right, 0 );
+		VectorCopy( pilot->ps_.origin, origin );
+		if( vehicle >= 0 && availableVehicles[vehicle].hasDeck && (availableVehicles[vehicle].cat & CAT_LQM) == 0 ) 
+		{
+			VectorMA( origin, availableVehicles[vehicle].deckPos[0], forward, origin );
+			VectorMA( origin, -availableVehicles[vehicle].deckPos[1], right, origin );
+			origin[2] += availableVehicles[vehicle].deckPos[2];
+		}
+		else if( vehicle >= 0 && !(availableVehicles[vehicle].cat & CAT_LQM) ) 
+		{
+			float side = (client->sess_.seat_ & 1) ? 1.0f : -1.0f;
+			VectorMA( origin, side * (availableVehicles[vehicle].maxs[1] + 10), right, origin );
+		}
+		VectorCopy( origin, client->ps_.origin );
+		VectorCopy( yawOnly, client->ps_.vehicleAngles );
+	}
+
+	client->sess_.ridingClient_ = -1;
+	client->sess_.seat_ = 0;
+	if( pilot && pilot->pers_.connected_ == GameClient::ClientPersistant::CON_CONNECTED ) 
+		SV_GameSendServerCommand( pilotNum, va( "print \"%s^7 left your vehicle\n\"", client->pers_.netname_ ) );
+	switch_vehicle( ent );
+}
+
+/*
+=================
+Rider_KillAll
+=================
+*/
+void Rider_KillAll( GameEntity *vehicle, GameEntity *attacker )
+{
+	for( int i = 1; i <= theLevel.maxclients_; i++ ) 
+	{
+		GameClient* rider = theLevel.getClient( i );
+		if( !rider || rider->pers_.connected_ != GameClient::ClientPersistant::CON_CONNECTED ||
+			rider->sess_.ridingClient_ != vehicle->s.number ) 
+			continue;
+		VectorCopy( vehicle->r.currentOrigin, rider->ps_.origin );
+		rider->sess_.ridingClient_ = -1;
+		rider->sess_.seat_ = 0;
+		switch_vehicle( theLevel.getEntity( i ) );
+		GameEntity* body = theLevel.getEntity( i );
+		if( body && body->health_ > 0 ) 
+			G_Damage( body, vehicle, attacker, 0, 0, 100000, DAMAGE_NO_PROTECTION, MOD_VEHICLEEXPLOSION, CAT_ANY );
+	}
+}
+
+/*
+=================
+Rider_Board
+=================
+*/
+static bool Rider_Board( GameEntity *ent )
+{
+	GameClient* client = ent->client_;
+
+	for( int i = 1; i <= theLevel.maxclients_; i++ ) 
+	{
+		GameClient* pilot = theLevel.getClient( i );
+		GameEntity* veh = theLevel.getEntity( i );
+		if( !pilot || !veh || pilot == client || pilot->pers_.connected_ != GameClient::ClientPersistant::CON_CONNECTED ) 
+			continue;
+		if( pilot->sess_.sessionTeam_ == ClientBase::TEAM_SPECTATOR || pilot->sess_.ridingClient_ >= 0 ) 
+			continue;
+		if( pilot->vehicle_ < 0 || veh->health_ <= 0 || (pilot->ps_.pm_flags & PMF_VEHICLESELECT) ) 
+			continue;
+		int seats = availableVehicles[pilot->vehicle_].seats;
+		if( seats <= 0 || (availableVehicles[pilot->vehicle_].cat & CAT_LQM) ) 
+			continue;
+		if( g_gametype.integer >= GT_TEAM && pilot->sess_.sessionTeam_ != client->sess_.sessionTeam_ ) 
+			continue;
+		if( !(pilot->ps_.ONOFF & OO_LANDED) && VectorLength( pilot->ps_.velocity ) > 60 ) 
+			continue;
+		float reach = g_enterRange.value + availableVehicles[pilot->vehicle_].maxs[1];
+		if( Distance( pilot->ps_.origin, client->ps_.origin ) > reach ) 
+			continue;
+
+		int taken = 0;
+		for( int r = 1; r <= theLevel.maxclients_; r++ ) 
+		{
+			GameClient* other = theLevel.getClient( r );
+			if( other && other->pers_.connected_ == GameClient::ClientPersistant::CON_CONNECTED && other->sess_.ridingClient_ == i ) 
+				taken |= (1 << other->sess_.seat_);
+		}
+		for( int seat = 1; seat <= seats && seat < 15; seat++ ) 
+		{
+			if( taken & (1 << seat) ) 
+				continue;
+			client->sess_.ridingClient_ = i;
+			client->sess_.seat_ = seat;
+			bool gunner = seat == 1 && MF_VehicleHasTurret( pilot->vehicle_ );
+			SV_GameSendServerCommand( ent->s.number, va( "print \"You are %s in %s^7's %s\n\"", gunner ? "the gunner" : "a passenger",
+				pilot->pers_.netname_, availableVehicles[pilot->vehicle_].descriptiveName ) );
+			SV_GameSendServerCommand( i, va( "print \"%s^7 boarded as %s\n\"", client->pers_.netname_, gunner ? "gunner" : "passenger" ) );
+			return true;
+		}
+	}
+	return false;
+}
+
+/*
+=================
 Cmd_Enter
 =================
 */
@@ -1542,8 +1666,8 @@ static void Cmd_Enter( GameEntity *ent )
 
 	for( int i = 0; i < 3; i++ ) 
 	{
-		mins[i] = client->ps_.origin[i] - VEHICLE_ENTER_RANGE;
-		maxs[i] = client->ps_.origin[i] + VEHICLE_ENTER_RANGE;
+		mins[i] = client->ps_.origin[i] - g_enterRange.value;
+		maxs[i] = client->ps_.origin[i] + g_enterRange.value;
 	}
 	int num = SV_AreaEntities( mins, maxs, touch, MAX_GENTITIES );
 
@@ -1567,7 +1691,10 @@ static void Cmd_Enter( GameEntity *ent )
 		}
 	}
 	if( !best ) 
+	{
+		Rider_Board( ent );
 		return;
+	}
 
 	int vehicle = best->s.modelindex;
 	int health = best->health_;
@@ -1618,6 +1745,12 @@ void Cmd_Eject_f( GameEntity *ent )
 
 	if( client->sess_.sessionTeam_ == ClientBase::TEAM_SPECTATOR ) 
 		return;
+
+	if( client->sess_.ridingClient_ >= 0 ) 
+	{
+		Rider_Leave( ent, false );
+		return;
+	}
 
 	if( ent->health_ <= 0 || client->vehicle_ < 0 ) 
 		return;
