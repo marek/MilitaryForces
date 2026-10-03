@@ -1413,6 +1413,8 @@ typedef struct {
 // The messages are delta compressed, so it doesn't really matter if
 // the structure size is fairly large
 
+#define	MAX_VEHICLE_TURRETS	4
+
 typedef struct entityState_s {
 	int		number;			// entity index
 	int		eType;			// entityType_t
@@ -1455,6 +1457,14 @@ typedef struct entityState_s {
 	int		weaponNum;
 
 	int		generic1;
+
+	int		vehicleEnt;		// vehicle this player rides, 0 = none
+	int		seat;
+	int		seatMask;
+	int		mountMask;
+	int		revealTime;
+	float	turretYaw[MAX_VEHICLE_TURRETS];
+	float	gunPitch[MAX_VEHICLE_TURRETS];
 } entityState_t;
 
 typedef enum {

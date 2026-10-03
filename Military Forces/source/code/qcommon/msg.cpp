@@ -849,7 +849,20 @@ netField_t	entityStateFields[] =
 { NETF(angles2[2]), NETF_ANG },
 { NETF(vehicleAnim), 16 },
 { NETF(frame), 16 },
-{ NETF(weaponNum), 16 }
+{ NETF(weaponNum), 16 },
+{ NETF(vehicleEnt), GENTITYNUM_BITS },
+{ NETF(seat), 4 },
+{ NETF(seatMask), 16 },
+{ NETF(mountMask), 32 },
+{ NETF(revealTime), 32 },
+{ NETF(turretYaw[0]), NETF_ANG },
+{ NETF(turretYaw[1]), NETF_ANG },
+{ NETF(turretYaw[2]), NETF_ANG },
+{ NETF(turretYaw[3]), NETF_ANG },
+{ NETF(gunPitch[0]), NETF_ANG },
+{ NETF(gunPitch[1]), NETF_ANG },
+{ NETF(gunPitch[2]), NETF_ANG },
+{ NETF(gunPitch[3]), NETF_ANG }
 };
 
 

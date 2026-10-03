@@ -248,7 +248,7 @@ PROTOCOL
 ==============================================================
 */
 
-#define	PROTOCOL_VERSION	8
+#define	PROTOCOL_VERSION	9
 // 1.31 - 67
 
 // maintain a list of compatible protocols for demo playing
