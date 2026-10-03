@@ -658,6 +658,10 @@ extern const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1];
 #define	VF_NOTSELECTABLE			1		// cannot be selected (turrets, etc)
 #define	VF_STEALTH					2
 
+#define	SEATMASK_PILOT				0x0001
+#define	SEATMASK_ENTERABLE			0x8000
+#define	VEHICLE_ENTER_RANGE			45.0f
+
 #define	STEALTH_RANGE_FACTOR		0.25f
 
 // border speeds

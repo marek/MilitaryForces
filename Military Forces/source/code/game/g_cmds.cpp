@@ -1531,6 +1531,83 @@ void Cmd_TeamVote_f( GameEntity *ent )
 
 /*
 =================
+Cmd_Enter
+=================
+*/
+static void Cmd_Enter( GameEntity *ent )
+{
+	GameClient* client = ent->client_;
+	int touch[MAX_GENTITIES];
+	vec3_t mins, maxs;
+
+	for( int i = 0; i < 3; i++ ) 
+	{
+		mins[i] = client->ps_.origin[i] - VEHICLE_ENTER_RANGE;
+		maxs[i] = client->ps_.origin[i] + VEHICLE_ENTER_RANGE;
+	}
+	int num = SV_AreaEntities( mins, maxs, touch, MAX_GENTITIES );
+
+	GameEntity* best = 0;
+	Abandoned_Think* bestThink = 0;
+	float bestDist = 0;
+	for( int i = 0; i < num; i++ ) 
+	{
+		GameEntity* hit = theLevel.getEntity( touch[i] );
+		if( !hit || !hit->inuse_ || hit->s.eType != ET_MISC_VEHICLE || hit->health_ <= 0 ) 
+			continue;
+		Abandoned_Think* think = dynamic_cast<Abandoned_Think*>( hit->thinkFunc_ );
+		if( !think || !think->enterable_ ) 
+			continue;
+		float dist = Distance( hit->r.currentOrigin, client->ps_.origin );
+		if( !best || dist < bestDist ) 
+		{
+			best = hit;
+			bestThink = think;
+			bestDist = dist;
+		}
+	}
+	if( !best ) 
+		return;
+
+	int vehicle = best->s.modelindex;
+	int health = best->health_;
+	int fuel = bestThink->fuel_;
+	int ammo[MAX_WEAPONS_PER_VEHICLE*2];
+	int mounts[32];
+	memcpy( ammo, bestThink->ammo_, sizeof(ammo) );
+	memcpy( mounts, bestThink->mounts_, sizeof(mounts) );
+
+	VectorCopy( best->r.currentOrigin, client->ps_.origin );
+	client->ps_.origin[2] -= 24;
+	VectorCopy( best->s.angles, client->ps_.vehicleAngles );
+	best->freeUp();
+
+	int clientNum = ent->s.number;
+	char userinfo[MAX_INFO_STRING];
+	SV_GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
+	Info_SetValueForKey( userinfo, "cg_vehicle", va( "%d", vehicle ) );
+	Info_SetValueForKey( userinfo, "cg_nextVehicle", va( "%d", vehicle ) );
+	SV_SetUserinfo( clientNum, userinfo );
+	ClientUserinfoChanged( clientNum );
+
+	switch_vehicle( ent );
+
+	GameEntity* veh = theLevel.getEntity( clientNum );
+	GameClient* cl = theLevel.getClient( clientNum );
+	if( !veh || !cl || cl->vehicle_ != vehicle ) 
+		return;
+	veh->health_ = cl->ps_.stats[STAT_HEALTH] = health;
+	cl->ps_.stats[STAT_FUEL] = fuel;
+	memcpy( cl->ps_.ammo, ammo, sizeof(ammo) );
+	for( int i = 0; i < 32; i++ ) 
+	{
+		cl->ps_.numWeaponsOnMount[i] = mounts[i];
+		veh->loadout_.mounts[i].num = mounts[i];
+	}
+}
+
+/*
+=================
 Cmd_Eject_f
 =================
 */
@@ -1545,14 +1622,28 @@ void Cmd_Eject_f( GameEntity *ent )
 		return;
 
 	int vehicle = client->vehicle_;
-	if( !(availableVehicles[vehicle].cat & CAT_PLANE) && !(availableVehicles[vehicle].cat & CAT_HELO) ) 
+	if( availableVehicles[vehicle].cat & CAT_LQM ) 
+	{
+		Cmd_Enter( ent );
 		return;
+	}
+	bool onGround = (availableVehicles[vehicle].cat & (CAT_GROUND|CAT_BOAT)) != 0;
+	if( onGround && VectorLength( client->ps_.velocity ) > 40 ) 
+		return;
+	bool parked = onGround || (client->ps_.ONOFF & OO_LANDED) != 0;
 
 	int infantry = MF_getIndexOfVehicle( -1, availableVehicles[vehicle].gameset, availableVehicles[vehicle].team, CAT_LQM, 0, -1, 0, true );
 	if( infantry < 0 ) 
 		return;
 
 	MiscVehicle_Abandon( ent );
+
+	if( parked ) 
+	{
+		vec3_t right;
+		AngleVectors( client->ps_.vehicleAngles, 0, right, 0 );
+		VectorMA( client->ps_.origin, availableVehicles[vehicle].maxs[1] + 10, right, client->ps_.origin );
+	}
 
 	int clientNum = ent->s.number;
 	char userinfo[MAX_INFO_STRING];

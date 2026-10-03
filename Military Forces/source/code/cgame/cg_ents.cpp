@@ -791,6 +791,35 @@ static void CG_CalcEntityLerpPositions( centity_t *cent ) {
 	}
 }
 
+static void CG_EmptyVehicleIcon( centity_t *cent )
+{
+	static qhandle_t	icon;
+	refEntity_t			ent;
+	int					vehicle = cent->currentState.modelindex;
+	static const byte	colors[3][3] = { { 255, 255, 255 }, { 255, 70, 60 }, { 70, 130, 255 } };
+	int					team = cent->currentState.generic1;
+
+	if( vehicle < 0 || vehicle >= bg_numberOfVehicles ) 
+		return;
+	if( !icon ) 
+		icon = refExport.RegisterShader( "gfx/hud/vehicle_empty" );
+	if( team < 0 || team > 2 || cgs.gametype < GT_TEAM ) 
+		team = 0;
+
+	memset( &ent, 0, sizeof(ent) );
+	VectorCopy( cent->lerpOrigin, ent.origin );
+	ent.origin[2] += availableVehicles[vehicle].maxs[2] + 10;
+	ent.reType = RT_SPRITE;
+	ent.customShader = icon;
+	ent.radius = 6;
+	ent.renderfx = RF_DEPTHHACK;
+	ent.shaderRGBA[0] = colors[team][0];
+	ent.shaderRGBA[1] = colors[team][1];
+	ent.shaderRGBA[2] = colors[team][2];
+	ent.shaderRGBA[3] = 255;
+	refExport.AddRefEntityToScene( &ent );
+}
+
 /*
 ===============
 CG_AddCEntity
@@ -850,6 +879,8 @@ static void CG_AddCEntity( centity_t *cent ) {
 		break;
 	case ET_MISC_VEHICLE:
 		CG_Misc_Vehicle( cent );
+		if( (cent->currentState.seatMask & SEATMASK_ENTERABLE) && !(cent->currentState.seatMask & SEATMASK_PILOT) ) 
+			CG_EmptyVehicleIcon( cent );
 		break;
 	}
 }

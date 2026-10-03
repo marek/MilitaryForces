@@ -368,7 +368,8 @@ void MiscVehicle_Abandon( GameEntity *ent )
 {
 	GameClient* client = ent->client_;
 	int vehicle = client->vehicle_;
-	bool landed = (client->ps_.ONOFF & OO_LANDED) != 0;
+	bool landed = (client->ps_.ONOFF & OO_LANDED) != 0 ||
+		(availableVehicles[vehicle].cat & (CAT_GROUND|CAT_BOAT)) != 0;
 
 	GameEntity* veh = theLevel.spawnEntity();
 	veh->classname_ = "misc_vehicle";
@@ -394,7 +395,21 @@ void MiscVehicle_Abandon( GameEntity *ent )
 	veh->setDie( new MiscVehicle_Die );
 
 	Abandoned_Think* think = new Abandoned_Think;
-	think->expire_ = theLevel.time_ + (landed ? 60000 : 10000);
+	think->expire_ = theLevel.time_ + (landed ? g_abandonTime.integer * 1000 : 10000);
+	if( landed )
+	{
+		think->enterable_ = true;
+		think->fuel_ = client->ps_.stats[STAT_FUEL];
+		think->ownerTeam_ = client->sess_.sessionTeam_;
+		memcpy( think->ammo_, client->ps_.ammo, sizeof(think->ammo_) );
+		memcpy( think->mounts_, client->ps_.numWeaponsOnMount, sizeof(think->mounts_) );
+		veh->r.contents = CONTENTS_BODY;
+		veh->takedamage_ = true;
+		veh->health_ = ent->health_;
+		veh->s.seatMask = SEATMASK_ENTERABLE;
+		veh->s.mountMask = ent->s.mountMask;
+		veh->s.generic1 = client->sess_.sessionTeam_;
+	}
 	veh->setThink( think );
 	veh->nextthink_ = theLevel.time_ + 50;
 
