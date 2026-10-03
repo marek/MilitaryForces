@@ -1,3 +1,6 @@
+#ifndef __CM_POLYLIB_H__
+#define __CM_POLYLIB_H__
+
 /*
 ===========================================================================
 Copyright (C) 1999-2005 Id Software, Inc.
@@ -15,13 +18,10 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Foobar; if not, write to the Free Software
+along with Quake III Arena source code; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
-
-#ifndef __CM_POLYLIB_H__
-#define __CM_POLYLIB_H__
 
 // this is only used for visualization tools in cm_ debug functions
 
@@ -70,4 +70,4 @@ void	ChopWindingInPlace (winding_t **w, vec3_t normal, vec_t dist, vec_t epsilon
 
 void pw(winding_t *w);
 
-#endif //__CM_POLYLIB_H__
+#endif // __CM_POLYLIB_H__

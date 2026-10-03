@@ -15,7 +15,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Foobar; if not, write to the Free Software
+along with Quake III Arena source code; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
@@ -203,7 +203,7 @@ int CM_BoxBrushes( const vec3_t mins, const vec3_t maxs, cbrush_t **list, int li
 	VectorCopy( maxs, ll.bounds[1] );
 	ll.count = 0;
 	ll.maxcount = listsize;
-	ll.list = reinterpret_cast<int*>(list);
+	ll.list = (int *)(void *)list;
 	ll.storeLeafs = CM_StoreBrushes;
 	ll.lastLeaf = 0;
 	ll.overflowed = false;
@@ -223,8 +223,7 @@ CM_PointContents
 
 ==================
 */
-int CM_PointContents( const vec3_t p, clipHandle_t model ) 
-{
+int CM_PointContents( const vec3_t p, clipHandle_t model ) {
 	int			leafnum;
 	int			i, k;
 	int			brushnum;
@@ -250,6 +249,10 @@ int CM_PointContents( const vec3_t p, clipHandle_t model )
 	for (k=0 ; k<leaf->numLeafBrushes ; k++) {
 		brushnum = cm.leafbrushes[leaf->firstLeafBrush+k];
 		b = &cm.brushes[brushnum];
+
+		if ( !CM_BoundsIntersectPoint( b->bounds[0], b->bounds[1], p ) ) {
+			continue;
+		}
 
 		// see if the point is in the brush
 		for ( i = 0 ; i < b->numsides ; i++ ) {
@@ -277,8 +280,7 @@ Handles offseting and rotation of the end points for moving and
 rotating entities
 ==================
 */
-int	CM_TransformedPointContents( const vec3_t p, clipHandle_t model, const vec3_t origin, const vec3_t angles) 
-{
+int	CM_TransformedPointContents( const vec3_t p, clipHandle_t model, const vec3_t origin, const vec3_t angles) {
 	vec3_t		p_l;
 	vec3_t		temp;
 	vec3_t		forward, right, up;
@@ -384,7 +386,7 @@ CM_AdjustAreaPortalState
 
 ====================
 */
-void	CM_AdjustAreaPortalState( int area1, int area2, int open ) {
+void	CM_AdjustAreaPortalState( int area1, int area2, bool open ) {
 	if ( area1 < 0 || area2 < 0 ) {
 		return;
 	}
@@ -414,9 +416,11 @@ CM_AreasConnected
 ====================
 */
 bool	CM_AreasConnected( int area1, int area2 ) {
+#ifndef BSPC
 	if ( cm_noAreas->integer ) {
 		return true;
 	}
+#endif
 
 	if ( area1 < 0 || area2 < 0 ) {
 		return false;
@@ -455,7 +459,11 @@ int CM_WriteAreaBits (byte *buffer, int area)
 
 	bytes = (cm.numAreas+7)>>3;
 
+#ifndef BSPC
 	if (cm_noAreas->integer || area == -1)
+#else
+	if ( area == -1)
+#endif
 	{	// for debugging, send everything
 		Com_Memset (buffer, 255, bytes);
 	}
@@ -472,3 +480,42 @@ int CM_WriteAreaBits (byte *buffer, int area)
 	return bytes;
 }
 
+/*
+====================
+CM_BoundsIntersect
+====================
+*/
+bool CM_BoundsIntersect( const vec3_t mins, const vec3_t maxs, const vec3_t mins2, const vec3_t maxs2 )
+{
+	if (maxs[0] < mins2[0] - SURFACE_CLIP_EPSILON ||
+		maxs[1] < mins2[1] - SURFACE_CLIP_EPSILON ||
+		maxs[2] < mins2[2] - SURFACE_CLIP_EPSILON ||
+		mins[0] > maxs2[0] + SURFACE_CLIP_EPSILON ||
+		mins[1] > maxs2[1] + SURFACE_CLIP_EPSILON ||
+		mins[2] > maxs2[2] + SURFACE_CLIP_EPSILON)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+/*
+====================
+CM_BoundsIntersectPoint
+====================
+*/
+bool CM_BoundsIntersectPoint( const vec3_t mins, const vec3_t maxs, const vec3_t point )
+{
+	if (maxs[0] < point[0] - SURFACE_CLIP_EPSILON ||
+		maxs[1] < point[1] - SURFACE_CLIP_EPSILON ||
+		maxs[2] < point[2] - SURFACE_CLIP_EPSILON ||
+		mins[0] > point[0] + SURFACE_CLIP_EPSILON ||
+		mins[1] > point[1] + SURFACE_CLIP_EPSILON ||
+		mins[2] > point[2] + SURFACE_CLIP_EPSILON)
+	{
+		return false;
+	}
+
+	return true;
+}

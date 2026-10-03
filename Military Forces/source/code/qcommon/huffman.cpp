@@ -15,7 +15,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Foobar; if not, write to the Free Software
+along with Quake III Arena source code; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
@@ -37,6 +37,16 @@ void	Huff_putBit( int bit, byte *fout, int *offset) {
 	fout[(bloc>>3)] |= bit << (bloc&7);
 	bloc++;
 	*offset = bloc;
+}
+
+int		Huff_getBloc(void)
+{
+	return bloc;
+}
+
+void	Huff_setBloc(int _bloc)
+{
+	bloc = _bloc;
 }
 
 int		Huff_getBit( byte *fin, int *offset) {
@@ -263,7 +273,7 @@ int Huff_Receive (node_t *node, int *ch, byte *fin) {
 	}
 	if (!node) {
 		return 0;
-//		Com_Error(ERR_DROP, "Illegal tree!\n");
+//		Com_Error(ERR_DROP, "Illegal tree!");
 	}
 	return (*ch = node->symbol);
 }
@@ -286,7 +296,7 @@ void Huff_offsetReceive (node_t *node, int *ch, byte *fin, int *offset, int maxo
 	if (!node) {
 		*ch = 0;
 		return;
-//		Com_Error(ERR_DROP, "Illegal tree!\n");
+//		Com_Error(ERR_DROP, "Illegal tree!");
 	}
 	*ch = node->symbol;
 	*offset = bloc;
@@ -361,7 +371,7 @@ void Huff_Decompress(msg_t *mbuf, int offset) {
 	for ( j = 0; j < cch; j++ ) {
 		ch = 0;
 		// don't overflow reading from the messages
-		// FIXME: would it be better to have a overflow check in get_bit ?
+		// FIXME: would it be better to have an overflow check in get_bit ?
 		if ( (bloc >> 3) > size ) {
 			seq[j] = 0;
 			break;
@@ -391,7 +401,7 @@ void Huff_Compress(msg_t *mbuf, int offset) {
 	huff_t		huff;
 
 	size = mbuf->cursize - offset;
-	buffer = mbuf->data+ + offset;
+	buffer = mbuf->data + offset;
 
 	if (size<=0) {
 		return;

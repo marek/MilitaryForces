@@ -1,3 +1,6 @@
+#ifndef __CM_LOCAL_H__
+#define __CM_LOCAL_H__
+
 /*
 ===========================================================================
 Copyright (C) 1999-2005 Id Software, Inc.
@@ -15,13 +18,10 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Foobar; if not, write to the Free Software
+along with Quake III Arena source code; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
-
-#ifndef __CM_LOCAL_H__
-#define __CM_LOCAL_H__
 
 #include "../game/q_shared.h"
 #include "qcommon.h"
@@ -48,11 +48,10 @@ typedef struct {
 	int			numLeafSurfaces;
 } cLeaf_t;
 
-struct cmodel_t 
-{
+typedef struct cmodel_s {
 	vec3_t		mins, maxs;
 	cLeaf_t		leaf;			// submodels don't reference the main tree
-};
+} cmodel_t;
 
 typedef struct {
 	cplane_t	*plane;
@@ -189,6 +188,8 @@ void CM_StoreBrushes( leafList_t *ll, int nodenum );
 void CM_BoxLeafnums_r( leafList_t *ll, int nodenum );
 
 cmodel_t	*CM_ClipHandleToModel( clipHandle_t handle );
+bool CM_BoundsIntersect( const vec3_t mins, const vec3_t maxs, const vec3_t mins2, const vec3_t maxs2 );
+bool CM_BoundsIntersectPoint( const vec3_t mins, const vec3_t maxs, const vec3_t point );
 
 // cm_patch.c
 

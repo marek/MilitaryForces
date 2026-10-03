@@ -107,7 +107,7 @@ static void CG_ClipMoveToEntities ( const vec3_t start, const vec3_t mins, const
 
 
 		CM_TransformedBoxTrace ( &trace, start, end,
-			mins, maxs, cmodel,  mask, origin, angles, false);
+			(float *)mins, (float *)maxs, cmodel,  mask, origin, angles, false);
 
 		if (trace.allsolid || trace.fraction < tr->fraction) {
 			trace.entityNum = ent->number;
@@ -131,7 +131,7 @@ void	CG_Trace( trace_t *result, const vec3_t start, const vec3_t mins, const vec
 {
 	trace_t	t;
 
-	CM_BoxTrace ( &t, start, end, mins, maxs, 0, mask, capsule);
+	CM_BoxTrace ( &t, start, end, (float *)mins, (float *)maxs, 0, mask, capsule);
 	t.entityNum = t.fraction != 1.0 ? ENTITYNUM_WORLD : ENTITYNUM_NONE;
 	// check all other solid models
 	CG_ClipMoveToEntities (start, mins, maxs, end, skipNumber, mask, &t);

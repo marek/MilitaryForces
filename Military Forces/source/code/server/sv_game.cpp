@@ -252,7 +252,7 @@ bool SV_EntityContact( const vec3_t mins, const vec3_t maxs, EntityBase* gameEnt
 	angles = gameEnt->r.currentAngles;
 
 	ch = SV_ClipHandleForEntity( gameEnt );
-	CM_TransformedBoxTrace ( &trace, vec3_origin, vec3_origin, mins, maxs,
+	CM_TransformedBoxTrace ( &trace, vec3_origin, vec3_origin, (float *)mins, (float *)maxs,
 		ch, -1, origin, angles, capsule );
 
 	return trace.startsolid;

@@ -1599,16 +1599,16 @@ void SCR_UpdateScreen();
 void CL_CM_LoadMap( const char *mapname );
 int	CM_NumInlineModels();
 clipHandle_t CM_InlineModel( int index );
-clipHandle_t CM_TempBoxModel( const vec3_t mins, const vec3_t maxs, bool capsule );
+clipHandle_t CM_TempBoxModel( const vec3_t mins, const vec3_t maxs, int capsule );
 int CM_PointContents( const vec3_t p, clipHandle_t model );
 int	CM_TransformedPointContents( const vec3_t p, clipHandle_t model, const vec3_t origin, const vec3_t angles);
-void CM_BoxTrace( trace_t *results, const vec3_t start, const vec3_t end,
-				  const vec3_t mins, const vec3_t maxs,
-				  clipHandle_t model, int brushmask, bool capsule ); 
-void CM_TransformedBoxTrace( trace_t *results, const vec3_t start, const vec3_t end,
-							 const vec3_t mins, const vec3_t maxs,
-							 clipHandle_t model, int brushmask,
-							 const vec3_t origin, const vec3_t angles, bool capsule );
+void		CM_BoxTrace ( trace_t *results, const vec3_t start, const vec3_t end,
+						  vec3_t mins, vec3_t maxs,
+						  clipHandle_t model, int brushmask, int capsule ); 
+void		CM_TransformedBoxTrace( trace_t *results, const vec3_t start, const vec3_t end,
+						  vec3_t mins, vec3_t maxs,
+						  clipHandle_t model, int brushmask,
+						  const vec3_t origin, const vec3_t angles, int capsule );
 void S_StartLocalSound( sfxHandle_t sfxHandle, int channelNum );
 void S_StartSound(vec3_t origin, int entityNum, int entchannel, sfxHandle_t sfxHandle );
 sfxHandle_t	S_RegisterSound( const char *name, bool compressed );
