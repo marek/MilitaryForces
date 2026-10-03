@@ -102,7 +102,7 @@ void SV_GameSendServerCommand( int clientNum, const char *text )
 	} 
 	else 
 	{
-		if ( clientNum < 1 || clientNum > sv_maxclients->integer ) 
+		if ( clientNum < 1 || clientNum > sv_maxclients->integer || !theSVS.svClients_.at(clientNum) ) 
 			return;
 
 		SV_SendServerCommand( theSVS.svClients_.at(clientNum), "%s", text );	
@@ -119,7 +119,7 @@ Disconnects the client with a message
 */
 void SV_GameDropClient( int clientNum, const char *reason ) 
 {
-	if ( clientNum < 1 || clientNum > sv_maxclients->integer ) 
+	if ( clientNum < 1 || clientNum > sv_maxclients->integer || !theSVS.svClients_.at(clientNum) ) 
 		return;
 
 	SV_DropClient( theSVS.svClients_.at(clientNum), reason );	
@@ -298,7 +298,7 @@ SV_GetUsercmd
 */
 void SV_GetUsercmd( int clientNum, usercmd_t *cmd ) 
 {
-	if ( clientNum < 1 || clientNum > sv_maxclients->integer ) 
+	if ( clientNum < 1 || clientNum > sv_maxclients->integer || !theSVS.svClients_.at(clientNum) ) 
 	{
 		Com_Error( ERR_DROP, "SV_GetUsercmd: bad clientNum:%i", clientNum );
 	}

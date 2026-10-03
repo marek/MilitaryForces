@@ -314,6 +314,9 @@ void SV_Startup()
 	}
 
 	Cvar_Set( "sv_running", "1" );
+	
+	// Join the ipv6 multicast group now that a map is running so clients can scan for us on the local network.
+	NET_JoinMulticast6();
 }
 
 
@@ -478,8 +481,7 @@ void SV_SpawnServer( char *server, bool killBots )
 	Cvar_Set("cl_paused", "0");
 
 	// get a New checksum feed and restart the file system
-	srand(Com_Milliseconds());
-	theSV.checksumFeed_ = ( ((int) rand() << 16) ^ rand() ) ^ Com_Milliseconds();
+	theSV.checksumFeed_ = ( ((unsigned int)rand() << 16) ^ (unsigned int)rand() ) ^ Com_Milliseconds();
 	FS_Restart( theSV.checksumFeed_ );
 
 	CM_LoadMap( va("maps/%s.bsp", server), false, &checksum );
@@ -638,6 +640,14 @@ void SV_SpawnServer( char *server, bool killBots )
 
 	Hunk_SetMark();
 
+#ifndef DEDICATED
+	if ( com_dedicated->integer ) {
+		// restart renderer in order to show console for dedicated servers
+		// launched through the regular binary
+		CL_StartHunkUsers( true );
+	}
+#endif
+
 	Com_Printf ("-----------------------------------\n");
 }
 
@@ -735,8 +745,8 @@ void SV_FinalMessage( const char *message )
 				// don't send a disconnect to a local client
 				if( cl->netchan_.remoteAddress.type != NA_LOOPBACK ) 
 				{
-					SV_SendServerCommand( cl, "print \"%s\"", message );
-					SV_SendServerCommand( cl, "disconnect" );
+					SV_SendServerCommand( cl, "print \"%s\n\"\n", message );
+					SV_SendServerCommand( cl, "disconnect \"%s\"", message );
 				}
 				// force a snapshot to be sent
 				cl->lastSnapshotTime_ = 0;
@@ -761,6 +771,8 @@ void SV_Shutdown( const char *finalmsg )
 		return;
 
 	Com_Printf( "----- Server Shutdown (%s) -----\n", finalmsg );
+
+	NET_LeaveMulticast6();
 
 	if( theSVS.svClients_.size() && !com_errorEntered ) {
 		SV_FinalMessage( finalmsg );

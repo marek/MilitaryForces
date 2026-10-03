@@ -36,7 +36,7 @@ set(DYNAMIC_RENDERER_SOURCES
     ${SOURCE_DIR}/game/q_math.cpp)
 
 if(APPLE)
-    list(APPEND RENDERER_LIBRARIES "-framework OpenGL")
+    list(APPEND RENDERER_LIBRARIES "-framework OpenGL" "-framework CoreGraphics")
 endif()
 
 function(add_mf_renderer NAME)

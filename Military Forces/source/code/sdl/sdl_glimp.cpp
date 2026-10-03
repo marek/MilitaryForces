@@ -31,6 +31,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <stdlib.h>
 #include <math.h>
 
+#ifdef __APPLE__
+#include <CoreGraphics/CoreGraphics.h>
+#endif
+
 #include "../renderercommon/tr_common.h"
 #include "../sys/sys_local.h"
 #include "sdl_icon.h"
@@ -1246,8 +1250,55 @@ GLimp_EndFrame
 Responsible for doing a swapbuffers
 ===============
 */
+#ifdef __APPLE__
+static bool GLimp_DisplaysAsleep( void )
+{
+	CGDirectDisplayID displays[ 16 ];
+	uint32_t count = 0;
+	uint32_t i;
+
+	if( CGGetOnlineDisplayList( 16, displays, &count ) != kCGErrorSuccess )
+		return false;
+
+	for( i = 0; i < count; i++ )
+	{
+		if( !CGDisplayIsAsleep( displays[ i ] ) )
+			return false;
+	}
+
+	return count > 0;
+}
+
+static void GLimp_CheckDisplaySleep( void )
+{
+	static bool vsyncSuspended = false;
+	static int nextCheck = 0;
+	int now = ri.Milliseconds( );
+	bool asleep;
+
+	if( !r_swapInterval->integer && !vsyncSuspended )
+		return;
+
+	if( now < nextCheck && now > nextCheck - 1000 )
+		return;
+
+	nextCheck = now + 500;
+	asleep = GLimp_DisplaysAsleep( );
+
+	if( asleep != vsyncSuspended )
+	{
+		SDL_GL_SetSwapInterval( asleep ? 0 : r_swapInterval->integer );
+		vsyncSuspended = asleep;
+	}
+}
+#endif
+
 void GLimp_EndFrame( void )
 {
+#ifdef __APPLE__
+	GLimp_CheckDisplaySleep( );
+#endif
+
 	// don't flip if drawing to front buffer
 	if ( Q_stricmp( r_drawBuffer->string, "GL_FRONT" ) != 0 )
 	{
