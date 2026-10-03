@@ -1048,6 +1048,7 @@ struct mission_groundInstallation_t {
 	bool		used;
 	int				index;
 	char			objectname[MAX_NAME_LENGTH];
+	char			descriptivename[MAX_QPATH];
 	char			teamname[MAX_NAME_LENGTH];
 	vec3_t			origin;
 	vec3_t			angles;
@@ -1058,6 +1059,7 @@ struct mission_vehicle_t {
 	bool		used;
 	int				index;
 	char			objectname[MAX_NAME_LENGTH];
+	char			descriptivename[MAX_QPATH];
 	int				team;
 	char			side[MAX_NAME_LENGTH];
 	vec3_t			origin;

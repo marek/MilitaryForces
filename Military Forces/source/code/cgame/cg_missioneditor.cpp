@@ -937,6 +937,9 @@ void ME_ExportToScript( const char* scriptname )
 			Com_sprintf( outstring, sizeof(outstring), "\t\tName\t\"%s\"\n", availableVehicles[veh->vehidx].modelName );
 			FS_Write( outstring, strlen(outstring), f );
 
+			Com_sprintf( outstring, sizeof(outstring), "\t\tDescriptive\t\"%s\"\n", availableVehicles[veh->vehidx].descriptiveName );
+			FS_Write( outstring, strlen(outstring), f );
+
 			Com_sprintf( outstring, sizeof(outstring), "\t\tTeam\t%d\n", availableVehicles[veh->vehidx].team ); 
 			FS_Write( outstring, strlen(outstring), f );
 

@@ -738,6 +738,15 @@ static void MF_ParseVehicle( char **buf, mission_vehicle_t* veh )
 				continue;
 			}
 		}
+		else if( !strcmp( token, "Descriptive" ) )
+		{
+			token = COM_ParseExt( buf, false );
+			if( token[0] )
+			{
+				Q_strncpyz(veh->descriptivename, token, MAX_QPATH );
+				continue;
+			}
+		}
 		else if( !strcmp( token, "Name" ) )
 		{
 			token = COM_ParseExt( buf, false );
@@ -837,6 +846,15 @@ static void MF_ParseGroundInstallation( char **buf, mission_groundInstallation_t
 				continue;
 			}
 		}
+		else if( !strcmp( token, "Descriptive" ) )
+		{
+			token = COM_ParseExt( buf, false );
+			if( token[0] )
+			{
+				Q_strncpyz(gi->descriptivename, token, MAX_QPATH );
+				continue;
+			}
+		}
 		else if( !strcmp( token, "Name" ) )
 		{
 			token = COM_ParseExt( buf, false );
@@ -879,6 +897,61 @@ static void MF_ParseGroundInstallation( char **buf, mission_groundInstallation_t
 	gi->used = true;
 }
 
+static void MF_ResolveMissionVehicle( mission_vehicle_t* veh )
+{
+	int i, best = -1;
+
+	if( veh->descriptivename[0] )
+	{
+		for( i = 0; i < bg_numberOfVehicles; i++ )
+		{
+			if( availableVehicles[i].descriptiveName && !Q_stricmp( availableVehicles[i].descriptiveName, veh->descriptivename ) )
+			{
+				veh->index = i;
+				return;
+			}
+		}
+	}
+
+	if( veh->objectname[0] )
+	{
+		for( i = 0; i < bg_numberOfVehicles; i++ )
+		{
+			if( !availableVehicles[i].modelName || Q_stricmp( availableVehicles[i].modelName, veh->objectname ) )
+				continue;
+			if( veh->team && availableVehicles[i].team != veh->team )
+				continue;
+			if( best < 0 || abs( i - veh->index ) < abs( best - veh->index ) )
+				best = i;
+		}
+		if( best >= 0 )
+		{
+			veh->index = best;
+			return;
+		}
+		Com_Printf( S_COLOR_YELLOW "Mission vehicle '%s' not found, using index %d\n", veh->objectname, veh->index );
+	}
+}
+
+static void MF_ResolveMissionGroundInstallation( mission_groundInstallation_t* gi )
+{
+	int i;
+	const char *name = gi->descriptivename[0] ? gi->descriptivename : gi->objectname;
+
+	if( !name[0] )
+		return;
+
+	for( i = 0; i < bg_numberOfGroundInstallations; i++ )
+	{
+		if( availableGroundInstallations[i].descriptiveName && !Q_stricmp( availableGroundInstallations[i].descriptiveName, name ) )
+		{
+			gi->index = i;
+			return;
+		}
+	}
+	Com_Printf( S_COLOR_YELLOW "Mission ground installation '%s' not found, using index %d\n", name, gi->index );
+}
+
 static void MF_ParseEntities( char **buf, 
 						  mission_vehicle_t* vehs, 
 						  mission_groundInstallation_t* gis ) 
@@ -918,6 +991,7 @@ static void MF_ParseEntities( char **buf,
 				continue;
 			}
 			MF_ParseVehicle(buf, &vehs[numVeh]);
+			MF_ResolveMissionVehicle(&vehs[numVeh]);
 			++numVeh;
 			continue;
 		}
@@ -931,6 +1005,7 @@ static void MF_ParseEntities( char **buf,
 				continue;
 			}
 			MF_ParseGroundInstallation(buf, &gis[numGI]);
+			MF_ResolveMissionGroundInstallation(&gis[numGI]);
 			++numGI;
 			continue;
 		}
