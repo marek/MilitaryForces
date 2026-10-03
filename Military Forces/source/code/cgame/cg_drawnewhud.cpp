@@ -449,6 +449,7 @@ static void CG_DrawRadarSymbols_AIR_new( int vehicle, float range, int x, int y 
 	int			icon;
 	int			drawnTargets = 0;
 	trace_t		res;
+	float		fullRange = range;
 
 	// current range
 	if( cg.RADARRangeSetting ) {
@@ -494,6 +495,9 @@ static void CG_DrawRadarSymbols_AIR_new( int vehicle, float range, int x, int y 
 		dist = VectorNormalize(dir);
 		// check out of range
 		if( dist > range ) 
+			continue;
+		if( cg.radarEnts[i]->currentState.eType == ET_VEHICLE &&
+			MF_StealthHidden( otherveh, cg.radarEnts[i]->currentState.revealTime, cg.snap->serverTime, dist, fullRange ) ) 
 			continue;
 		// scale dist to radar screen
 		dist /= scale;
@@ -564,6 +568,7 @@ static void CG_DrawRadarSymbols_GROUND_new( int vehicle, float range, int x, int
 	int			drawnTargets = 0;
 	trace_t		res;
 	bool	groundinstallation = 0;
+	float		fullRange = range;
 
 	if( cg.RADARRangeSetting ) {
 		range /= (2 * cg.RADARRangeSetting);
@@ -619,6 +624,9 @@ static void CG_DrawRadarSymbols_GROUND_new( int vehicle, float range, int x, int
 			dist = VectorNormalize(dir);
 			// check out of range
 			if( dist > range ) 
+				continue;
+			if( cg.radarEnts[i]->currentState.eType == ET_VEHICLE &&
+				MF_StealthHidden( otherveh, cg.radarEnts[i]->currentState.revealTime, cg.snap->serverTime, dist, fullRange ) ) 
 				continue;
 			// scale dist to radar screen
 			dist /= scale;
@@ -1337,6 +1345,16 @@ static void CG_Draw_MFD(int mfdnum, int vehicle, centity_t * cent, int targetran
 		CG_DrawString_MFQ3( x+4, y+80, "FUEL:", HUDColors[cg.MFDColor], 0);
 		Com_sprintf(buffer, 6, "%d", fuel);
 		CG_DrawString_MFQ3_R( x+122, y+80, buffer, HUDColors[cg.MFDColor], 0);
+		if( availableVehicles[vehicle].flags & VF_STEALTH ) {
+			int left = ( ps->timers[TIMER_REVEAL] - cg.snap->serverTime + 999 ) / 1000;
+			CG_DrawString_MFQ3( x+4, y+90, "STEALTH:", HUDColors[cg.MFDColor], 0);
+			if( left > 0 ) {
+				Com_sprintf(buffer, 6, "%dS", left);
+				CG_DrawString_MFQ3_R( x+122, y+90, buffer, HUDColors[cg.MFDColor], 0);
+			} else {
+				CG_DrawString_MFQ3_R( x+122, y+90, "ON", HUDColors[cg.MFDColor], 0);
+			}
+		}
 	} else if( mode == MFD_INVENTORY ) {
 		char	invline[33];
 		int		i;

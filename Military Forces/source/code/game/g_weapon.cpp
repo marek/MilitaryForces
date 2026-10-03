@@ -9,6 +9,7 @@
 
 #include "g_local.h"
 #include "g_entity.h"
+#include "g_level.h"
 
 /*
 ================
@@ -90,6 +91,9 @@ FireWeapon
 void FireWeapon( GameEntity *ent ) 
 {
 	ent->client_->accuracy_shots_++;
+
+	if( availableVehicles[ent->client_->vehicle_].flags & VF_STEALTH ) 
+		ent->client_->ps_.timers[TIMER_REVEAL] = theLevel.time_ + g_stealthPenalty.integer * 1000;
 
 	// fire the specific weapon
 	switch( availableWeapons[ent->s.weaponIndex].type ) 

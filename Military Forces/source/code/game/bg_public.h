@@ -202,7 +202,8 @@ typedef enum {
 	TIMER_BAY,
 	TIMER_BAYANIM,
 	TIMER_BAYCLOSE,
-	TIMER_FLARE
+	TIMER_FLARE,
+	TIMER_REVEAL
 } timerIndex_t;
 
 // player_state->persistant[] indexes
@@ -655,6 +656,9 @@ extern const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1];
 
 // Vehicle flags
 #define	VF_NOTSELECTABLE			1		// cannot be selected (turrets, etc)
+#define	VF_STEALTH					2
+
+#define	STEALTH_RANGE_FACTOR		0.25f
 
 // border speeds
 #define SPEED_YELLOW_ARC			1.3f
@@ -852,6 +856,8 @@ struct completeVehicleData_t
 };
 
 extern completeVehicleData_t availableVehicles[];
+
+bool MF_StealthHidden( int vehicle, int revealTime, int time, float dist, float radarRange );
 
 // number of available vehicles
 extern int bg_numberOfVehicles;

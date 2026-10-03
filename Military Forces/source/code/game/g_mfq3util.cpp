@@ -55,6 +55,7 @@ void track( GameEntity* ent, GameEntity* target )
 
 void updateTargetTracking( GameEntity *ent )
 {
+
 	unsigned long	targetcat = 0;
 	trace_t			tr;
 	vec3_t			forward, endpos, dir;
@@ -119,6 +120,9 @@ void updateTargetTracking( GameEntity *ent )
 		if( test->s.eType == ET_VEHICLE && test->client_ && 
 			(availableVehicles[test->client_->vehicle_].cat & targetcat) ) 
 		{
+			if( MF_StealthHidden( test->client_->vehicle_, test->client_->ps_.timers[TIMER_REVEAL], theLevel.time_,
+					Distance( ent->r.currentOrigin, test->r.currentOrigin ), radarrange ) ) 
+				return;
 			track(ent, test);
 		} 
 		else if( test->s.eType == ET_MISC_VEHICLE )
@@ -182,6 +186,13 @@ void updateTargetTracking( GameEntity *ent )
 		// check within range
 		dist = VectorNormalize( diff );
 		if( dist > radarrange )
+		{
+			untrack(ent);
+			return;
+		}
+		if( ent->tracktarget_->s.eType == ET_VEHICLE && ent->tracktarget_->client_ &&
+			MF_StealthHidden( ent->tracktarget_->client_->vehicle_, ent->tracktarget_->client_->ps_.timers[TIMER_REVEAL],
+				theLevel.time_, dist, radarrange ) ) 
 		{
 			untrack(ent);
 			return;

@@ -632,6 +632,7 @@ void BG_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, bool snap
 		s->angles2[ROLL] = ps->turretAngle;
 		s->vehicleAnim = ps->vehicleAnim;
 		s->tracktarget = ps->tracktarget;
+		s->revealTime = ps->timers[TIMER_REVEAL];
 		s->mountMask = 0;
 		for( int m = 0; m < 32; ++m ) {
 			if( ps->numWeaponsOnMount[m] ) s->mountMask |= (1 << m);
@@ -719,6 +720,7 @@ void BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s
 		s->angles2[ROLL] = ps->turretAngle;
 		s->vehicleAnim = ps->vehicleAnim;
 		s->tracktarget = ps->tracktarget;
+		s->revealTime = ps->timers[TIMER_REVEAL];
 		s->mountMask = 0;
 		for( int m = 0; m < 32; ++m ) {
 			if( ps->numWeaponsOnMount[m] ) s->mountMask |= (1 << m);

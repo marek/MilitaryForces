@@ -1777,7 +1777,7 @@ completeVehicleData_t availableVehicles[] =
 	MF_TEAM_1,
 	CAT_PLANE,
 	CLASS_PLANE_BOMBER,
-	0,							// flags
+	VF_STEALTH,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
 	HC_VAPOR|HC_WEAPONBAY,		// capabilities
 	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
@@ -1826,7 +1826,7 @@ completeVehicleData_t availableVehicles[] =
 	MF_TEAM_1,
 	CAT_PLANE,
 	CLASS_PLANE_BOMBER,
-	0,							// flags
+	VF_STEALTH,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
 	HC_VAPOR|HC_WEAPONBAY,		// capabilities
 	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
@@ -1875,7 +1875,7 @@ completeVehicleData_t availableVehicles[] =
 	MF_TEAM_1,
 	CAT_PLANE,
 	CLASS_PLANE_BOMBER,
-	0,							// flags
+	VF_STEALTH,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
 	HC_VAPOR|HC_WEAPONBAY,		// capabilities
 	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
@@ -1924,7 +1924,7 @@ completeVehicleData_t availableVehicles[] =
 	MF_TEAM_1,
 	CAT_PLANE,
 	CLASS_PLANE_BOMBER,
-	0,							// flags
+	VF_STEALTH,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
 	HC_VAPOR|HC_WEAPONBAY,		// capabilities
 	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
@@ -1973,7 +1973,7 @@ completeVehicleData_t availableVehicles[] =
 	MF_TEAM_1,
 	CAT_PLANE,
 	CLASS_PLANE_BOMBER,
-	0,							// flags
+	VF_STEALTH,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
 	HC_VAPOR|HC_WEAPONBAY,		// capabilities
 	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
@@ -2022,7 +2022,7 @@ completeVehicleData_t availableVehicles[] =
 	MF_TEAM_1,
 	CAT_PLANE,
 	CLASS_PLANE_BOMBER,
-	0,							// flags
+	VF_STEALTH,							// flags
 	HC_GEAR|HC_SPEEDBRAKE|
 	HC_VAPOR|HC_WEAPONBAY,		// capabilities
 	{0,0,0,0,0,0,0,0,0,0},			// handles - SET AUTOMATICALLY
@@ -3055,7 +3055,7 @@ completeVehicleData_t availableVehicles[] =
 	MF_TEAM_1,
 	CAT_HELO,
 	CLASS_HELO_ATTACK,
-	0,							// flags
+	VF_STEALTH,							// flags
 	HC_GEAR|HC_WEAPONBAY,				// capabilities
 	{0,0,0,0,0,0,0,0,0,0},		// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
@@ -3103,7 +3103,7 @@ completeVehicleData_t availableVehicles[] =
 	MF_TEAM_1,
 	CAT_HELO,
 	CLASS_HELO_ATTACK,
-	0,							// flags
+	VF_STEALTH,							// flags
 	HC_GEAR|HC_WEAPONBAY,				// capabilities
 	{0,0,0,0,0,0,0,0,0,0},		// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
@@ -3151,7 +3151,7 @@ completeVehicleData_t availableVehicles[] =
 	MF_TEAM_1,
 	CAT_HELO,
 	CLASS_HELO_ATTACK,
-	0,							// flags
+	VF_STEALTH,							// flags
 	HC_GEAR|HC_WEAPONBAY,				// capabilities
 	{0,0,0,0,0,0,0,0,0,0},		// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY

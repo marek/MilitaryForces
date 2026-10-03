@@ -1082,3 +1082,14 @@ void MF_ParseMissionScripts( char *buf,
 		}
 	}
 }
+
+bool MF_StealthHidden( int vehicle, int revealTime, int time, float dist, float radarRange )
+{
+	if( vehicle < 0 || vehicle >= bg_numberOfVehicles ) 
+		return false;
+	if( !(availableVehicles[vehicle].flags & VF_STEALTH) ) 
+		return false;
+	if( time < revealTime ) 
+		return false;
+	return dist > radarRange * STEALTH_RANGE_FACTOR;
+}
