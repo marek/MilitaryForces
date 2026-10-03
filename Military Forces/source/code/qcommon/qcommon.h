@@ -460,6 +460,7 @@ void	Cvar_Update( vmCvar_t *vmCvar );
 
 void 	Cvar_Set( const char *var_name, const char *value );
 void	Cvar_SetSafe( const char *var_name, const char *value );
+void	Cvar_ForceReset( const char *var_name );
 cvar_t	*Cvar_Set2(const char *var_name, const char *value, bool force);
 // will create the variable with no flags if it doesn't exist
 
@@ -526,23 +527,27 @@ issues.
 
 // referenced flags
 // these are in loop specific order so don't change the order
-//#define FS_GENERAL_REF	0x01
-//#define FS_UI_REF		0x02
-//#define FS_CGAME_REF	0x04
-//#define FS_QAGAME_REF	0x08
-// number of id paks that will never be autodownloaded from mfdata
+#define FS_GENERAL_REF	0x01
+#define FS_UI_REF		0x02
+#define FS_CGAME_REF	0x04
+// number of id paks that will never be autodownloaded from baseq3/missionpack
 #define NUM_ID_PAKS		9
+#define NUM_TA_PAKS		4
 
 #define	MAX_FILE_HANDLES	64
 
-#define BASEGAME "mfdata"
+#ifdef DEDICATED
+#	define Q3CONFIG_CFG CONFIG_PREFIX "_server.cfg"
+#else
+#	define Q3CONFIG_CFG CONFIG_PREFIX ".cfg"
+#endif
 
-bool FS_Initialized();
+bool FS_Initialized( void );
 
-void	FS_InitFilesystem (void);
+void	FS_InitFilesystem ( void );
 void	FS_Shutdown( bool closemfp );
 
-bool	FS_ConditionalRestart( int checksumFeed );
+bool FS_ConditionalRestart(int checksumFeed, bool disconnect);
 void	FS_Restart( int checksumFeed );
 // shutdown and restart the filesystem so changes to fs_gamedir can take effect
 
@@ -553,23 +558,36 @@ char	**FS_ListFiles( const char *directory, const char *extension, int *numfiles
 
 void	FS_FreeFileList( char **list );
 
-bool FS_FileExists( const char *file );
+bool FS_FileExists_HomeData( const char *file );
 
-int		FS_LoadStack();
+bool FS_CreatePath (const char *OSPath);
+
+
+char	*FS_BaseDir_BuildOSPath( const char *base, const char *qpath );
+char	*FS_BuildOSPath( const char *base, const char *game, const char *qpath );
+bool FS_CompareZipChecksum(const char *zipfile);
+
+int		FS_LoadStack( void );
 
 int		FS_GetFileList(  const char *path, const char *extension, char *listbuf, int bufsize );
 int		FS_GetModList(  char *listbuf, int bufsize );
 
-fileHandle_t	FS_FOpenFileWrite( const char *qpath );
-void	FS_HomeRemove( const char *homePath );
+void	FS_GetModDescription( const char *modDir, char *description, int descriptionLen );
+
+fileHandle_t	FS_FOpenFileWrite_HomeConfig( const char *filename );
+fileHandle_t	FS_FOpenFileWrite_HomeData( const char *filename );
+fileHandle_t	FS_FOpenFileWrite_HomeState( const char *filename );
+fileHandle_t	FS_FOpenFileAppend_HomeData( const char *filename );
+fileHandle_t	FS_FCreateOpenPipeFile( const char *filename );
 // will properly create any needed paths and deal with seperater character issues
 
-int		FS_filelength( fileHandle_t f );
-fileHandle_t FS_SV_FOpenFileWrite( const char *filename );
-int		FS_SV_FOpenFileRead( const char *filename, fileHandle_t *fp );
-void	FS_SV_Rename( const char *from, const char *to, bool safe );
-int		FS_FOpenFileRead( const char *qpath, fileHandle_t *file, bool uniqueFILE );
-// if uniqueFILE is true, then a New FILE will be fopened even if the file
+fileHandle_t FS_BaseDir_FOpenFileWrite_HomeConfig( const char *filename );
+fileHandle_t FS_BaseDir_FOpenFileWrite_HomeData( const char *filename );
+fileHandle_t FS_BaseDir_FOpenFileWrite_HomeState( const char *filename );
+long		FS_BaseDir_FOpenFileRead( const char *filename, fileHandle_t *fp );
+void	FS_BaseDir_Rename_HomeData( const char *from, const char *to, bool safe );
+long		FS_FOpenFileRead( const char *qpath, fileHandle_t *file, bool uniqueFILE );
+// if uniqueFILE is true, then a new FILE will be fopened even if the file
 // is found in an already open pak file.  If uniqueFILE is false, you must call
 // FS_FCloseFile instead of fclose, otherwise the pak FILE would be improperly closed
 // It is generally safe to always set uniqueFILE to true, because the majority of
@@ -580,17 +598,17 @@ int		FS_FileIsInPAK(const char *filename, int *pChecksum );
 
 int		FS_Write( const void *buffer, int len, fileHandle_t f );
 
-int		FS_Read2( void *buffer, int len, fileHandle_t f );
 int		FS_Read( void *buffer, int len, fileHandle_t f );
 // properly handles partial reads and reads from other dlls
 
 void	FS_FCloseFile( fileHandle_t f );
 // note: you can't just fclose from another DLL, due to MS libc issues
 
-int		FS_ReadFile( const char *qpath, void **buffer );
+long	FS_ReadFileDir(const char *qpath, void *searchPath, bool unpure, void **buffer);
+long	FS_ReadFile(const char *qpath, void **buffer);
 // returns the length of the file
 // a null buffer will just return the file length without loading
-// as a quick check for existance. -1 length == not present
+// as a quick check for existence. -1 length == not present
 // A 0 byte will always be appended at the end, so string ops are safe.
 // the buffer should be considered read-only, because it may be cached
 // for other uses.
@@ -604,7 +622,7 @@ void	FS_FreeFile( void *buffer );
 void	FS_WriteFile( const char *qpath, const void *buffer, int size );
 // writes a complete file, creating any subdirectories needed
 
-int		FS_filelength( fileHandle_t f );
+long FS_filelength(fileHandle_t f);
 // doesn't work for files that are opened from a pack file
 
 int		FS_FTell( fileHandle_t f );
@@ -612,19 +630,16 @@ int		FS_FTell( fileHandle_t f );
 
 void	FS_Flush( fileHandle_t f );
 
-void 	QDECL FS_Printf( fileHandle_t f, const char *fmt, ... );
+void 	QDECL FS_Printf( fileHandle_t f, const char *fmt, ... ) Q_PRINTF_FUNC(2, 3);
 // like fprintf
 
 int		FS_FOpenFileByMode( const char *qpath, fileHandle_t *f, fsMode_t mode );
 // opens a file for reading, writing, or appending depending on the value of mode
 
 int		FS_Seek( fileHandle_t f, long offset, int origin );
-// seek on a file (doesn't work for zip files!!!!!!!!)
+// seek on a file
 
-int FS_FilenameCompare( const char *s1, const char *s2 );
-
-const char *FS_GamePureChecksum( void );
-// Returns the checksum of the pk3 from which the server loaded the qagame.qvm
+bool FS_FilenameCompare( const char *s1, const char *s2 );
 
 const char *FS_LoadedPakNames( void );
 const char *FS_LoadedPakChecksums( void );
@@ -634,7 +649,7 @@ const char *FS_LoadedPakPureChecksums( void );
 
 const char *FS_ReferencedPakNames( void );
 const char *FS_ReferencedPakChecksums( void );
-//const char *FS_ReferencedPakPureChecksums( void );
+const char *FS_ReferencedPakPureChecksums( void );
 // Returns a space separated string containing the checksums of all loaded 
 // AND referenced pk3 files. Servers with sv_pure set will get this string 
 // back from clients for pure validation 
@@ -650,12 +665,18 @@ void FS_PureServerSetLoadedPaks( const char *pakSums, const char *pakNames );
 // sole exception of .cfg files.
 
 bool FS_CheckDirTraversal(const char *checkdir);
-bool FS_CompareZipChecksum(const char *zipfile);
-char   *FS_BuildOSPath( const char *base, const char *game, const char *qpath );
-bool FS_idPak( char *pak, char *base );
+bool FS_InvalidGameDir(const char *gamedir);
+bool FS_idPak(char *pak, char *base, int numPaks);
 bool FS_ComparePaks( char *neededpaks, int len, bool dlstring );
 
-void FS_Rename( const char *from, const char *to );
+void FS_Remove( const char *osPath );
+void FS_Remove_HomeData( const char *homePath );
+
+void	FS_FilenameCompletion( const char *dir, const char *ext, char *filter,
+		bool stripExt, void(*callback)(const char *s), bool allowNonPureFilesOnDisk );
+
+const char *FS_GetCurrentGameDir(void);
+bool FS_Which(const char *filename, void *searchPath);
 
 /*
 ==============================================================
@@ -735,6 +756,8 @@ extern	cvar_t	*com_speeds;
 #define AVI_LINE_PADDING 4
 
 extern	cvar_t	*com_timescale;
+extern	cvar_t	*com_basegame;
+extern	cvar_t	*com_homepath;
 extern	cvar_t	*com_unfocused;
 extern	cvar_t	*com_maxfpsUnfocused;
 extern	cvar_t	*com_minimized;
@@ -957,7 +980,47 @@ typedef struct {
 
 sysEvent_t	Sys_GetEvent( void );
 
+void	Com_ExecuteCfg( void );
+void	Com_GameRestart( int checksumFeed, bool disconnect );
+
 void	Sys_Init (void);
+
+bool Sys_RandomBytes( byte *string, int len );
+FILE	*Sys_FOpen( const char *ospath, const char *mode );
+FILE	*Sys_Mkfifo( const char *ospath );
+char	*Sys_SteamPath(void);
+char	*Sys_GogPath(void);
+char	*Sys_MicrosoftStorePath(void);
+char    *Sys_DefaultAppPath(void);
+char	*Sys_DefaultHomeConfigPath(void);
+char	*Sys_DefaultHomeDataPath(void);
+char	*Sys_DefaultHomeStatePath(void);
+const char *Sys_Dirname( char *path );
+const char *Sys_Basename( char *path );
+char *Sys_ConsoleInput(void);
+void	Sys_Sleep(int msec);
+void Sys_SetEnv(const char *name, const char *value);
+bool Sys_OpenFolderInFileManager( const char *path, bool create );
+void Sys_RemovePIDFile( const char *gamedir );
+void Sys_InitPIDFile( const char *gamedir );
+typedef enum
+{
+	DR_YES = 0,
+	DR_NO = 1,
+	DR_OK = 0,
+	DR_CANCEL = 1
+} dialogResult_t;
+
+typedef enum
+{
+	DT_INFO,
+	DT_WARNING,
+	DT_ERROR,
+	DT_YES_NO,
+	DT_OK_CANCEL
+} dialogType_t;
+dialogResult_t Sys_Dialog( dialogType_t type, const char *message, const char *title );
+
 
 // general development dll loading for virtual machine testing
 //void	* QDECL Sys_LoadDll( const char *name, char *fqpath , int (QDECL **entryPoint)(int, ...),
@@ -1012,14 +1075,12 @@ void		Sys_ShowIP(void);
 bool	Sys_CheckCD( void );
 bool	Sys_DllExtension( const char *name );
 
-void	Sys_Mkdir( const char *path );
+bool	Sys_Mkdir( const char *path );
 char	*Sys_Cwd( void );
 void	Sys_SetDefaultCDPath(const char *path);
 char	*Sys_DefaultCDPath(void);
 void	Sys_SetDefaultInstallPath(const char *path);
 char	*Sys_DefaultInstallPath(void);
-void  Sys_SetDefaultHomePath(const char *path);
-char	*Sys_DefaultHomePath(void);
 
 char **Sys_ListFiles( const char *directory, const char *extension, char *filter, int *numfiles, bool wantsubs );
 void	Sys_FreeFileList( char **list );

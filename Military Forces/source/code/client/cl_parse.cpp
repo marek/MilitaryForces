@@ -487,7 +487,7 @@ void CL_ParseGamestate( msg_t *msg ) {
 		CL_StopRecord_f();
 	
 	// reinitialize the filesystem if the game directory has changed
-	FS_ConditionalRestart( clc.checksumFeed );
+	FS_ConditionalRestart( clc.checksumFeed, false );
 
 	// This used to call CL_StartHunkUsers, but now we enter the download state before loading the
 	// cgame
@@ -552,7 +552,7 @@ void CL_ParseDownload ( msg_t *msg ) {
 	// open the file if not opened yet
 	if (!clc.download)
 	{
-		clc.download = FS_SV_FOpenFileWrite( clc.downloadTempName );
+		clc.download = FS_BaseDir_FOpenFileWrite_HomeData( clc.downloadTempName );
 
 		if (!clc.download) {
 			Com_Printf( "Could not create %s\n", clc.downloadTempName );
@@ -579,7 +579,7 @@ void CL_ParseDownload ( msg_t *msg ) {
 			clc.download = 0;
 
 			// rename the file
-			FS_SV_Rename ( clc.downloadTempName, clc.downloadName, false );
+			FS_BaseDir_Rename_HomeData ( clc.downloadTempName, clc.downloadName, false );
 		}
 
 		// send intentions now

@@ -44,7 +44,7 @@ static animation_t * CG_ParseLQMAnimationFile( const char *filename ) {
 		FS_FCloseFile( f );
 		return NULL;
 	}
-	FS_Read2( text, len, f );
+	FS_Read( text, len, f );
 	text[len] = 0;
 	FS_FCloseFile( f );
 

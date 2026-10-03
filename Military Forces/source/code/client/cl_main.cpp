@@ -317,7 +317,7 @@ void CL_Record_f( void ) {
 	// open the demo file
 
 	Com_Printf ("recording to %s.\n", name);
-	clc.demofile = FS_FOpenFileWrite( name );
+	clc.demofile = FS_FOpenFileWrite_HomeData( name );
 	if ( !clc.demofile ) {
 		Com_Printf ("ERROR: couldn't open.\n");
 		return;
@@ -1239,7 +1239,7 @@ void CL_Vid_Restart_f( void ) {
 	// clear pak references
 	//FS_ClearPakReferences( FS_UI_REF | FS_CGAME_REF );
 	// reinitialize the filesystem if the game directory or checksum has changed
-	FS_ConditionalRestart( clc.checksumFeed );
+	FS_ConditionalRestart( clc.checksumFeed, false );
 
 	cls.rendererStarted = false;
 	cls.uiStarted = false;
@@ -2282,7 +2282,7 @@ void CL_InitRef( void ) {
 	ri.FS_FreeFileList = FS_FreeFileList;
 	ri.FS_ListFiles = FS_ListFiles;
 	ri.FS_FileIsInPAK = FS_FileIsInPAK;
-	ri.FS_FileExists = FS_FileExists;
+	ri.FS_FileExists = FS_FileExists_HomeData;
 	ri.Cvar_Get = Cvar_Get;
 	ri.Cvar_Set = Cvar_Set;
 
@@ -2373,7 +2373,7 @@ void CL_Video_f( void )
       Com_sprintf( filename, MAX_OSPATH, "videos/video%d%d%d%d.avi",
           a, b, c, d );
 
-      if( !FS_FileExists( filename ) )
+      if( !FS_FileExists_HomeData( filename ) )
         break; // file doesn't exist
     }
 

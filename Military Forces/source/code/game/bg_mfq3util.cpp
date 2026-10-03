@@ -5,11 +5,11 @@
 #include "q_shared.h"
 #include "../qcommon/qfiles.h"
 #include "bg_public.h"
+int FS_Read( void *buffer, int len, fileHandle_t f );
 
 // externals
 
 int FS_FOpenFileByMode( const char *qpath, fileHandle_t *f, fsMode_t mode );
-int FS_Read2( void *buffer, int len, fileHandle_t f );
 void FS_FCloseFile( fileHandle_t f );
 
 /*

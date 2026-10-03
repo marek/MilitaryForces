@@ -1423,7 +1423,7 @@ void CG_LoadMenus(const char *menuFile) {
 		return;
 	}
 
-	FS_Read2( buf, len, f );
+	FS_Read( buf, len, f );
 	buf[len] = 0;
 	FS_FCloseFile( f );
 	

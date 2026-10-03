@@ -186,7 +186,7 @@ void Con_Dump_f (void)
 
 	Com_Printf ("Dumped console text to %s.\n", Cmd_Argv(1) );
 
-	f = FS_FOpenFileWrite( Cmd_Argv( 1 ) );
+	f = FS_FOpenFileWrite_HomeData( Cmd_Argv( 1 ) );
 	if (!f)
 	{
 		Com_Printf ("ERROR: couldn't open.\n");

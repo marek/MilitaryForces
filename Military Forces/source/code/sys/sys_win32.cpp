@@ -20,22 +20,35 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
+// Use EnumProcesses() with Windows XP compatibility
+#define PSAPI_VERSION 1
+
 #include "../game/q_shared.h"
 #include "../qcommon/qcommon.h"
 #include "sys_local.h"
 
 #include <windows.h>
-#include <mmsystem.h>
-#include <wincrypt.h>
+#include <lmerr.h>
+#include <lmcons.h>
+#include <lmwksta.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <direct.h>
 #include <io.h>
-#include <signal.h>
+#include <conio.h>
+#include <wincrypt.h>
+#include <shlobj.h>
+#include <psapi.h>
 #include <float.h>
 
+#ifndef KEY_WOW64_32KEY
+#define KEY_WOW64_32KEY 0x0200
+#endif
+
+#ifndef DEDICATED
 static UINT timerResolution = 0;
+#endif
 
 /*
 ================
@@ -53,7 +66,7 @@ Set FPU control word to default value
   #define _RC_NEAR      0x00000000U
   #define _PC_53	0x00010000U
   
-  unsigned int _controlfp(unsigned int newval, unsigned int mask);
+  unsigned int _controlfp(unsigned int new, unsigned int mask);
 #endif
 
 #define FPUCWMASK1 (_MCW_RC | _MCW_EM)
@@ -71,15 +84,170 @@ void Sys_SetFloatEnv(void)
 }
 
 /*
-==================
-Sys_PlatformHomePath
-==================
+================
+Sys_DefaultHomePath
+================
 */
-char *Sys_PlatformHomePath( void )
+static char *Sys_DefaultHomePath( void )
 {
-	static char homePath[] = "";
+	static char homePath[ MAX_OSPATH ] = { 0 };
+
+	if(!*homePath && com_homepath)
+	{
+		TCHAR szPath[MAX_PATH];
+
+		if( !SUCCEEDED( SHGetFolderPathA( NULL, CSIDL_APPDATA,
+						NULL, 0, szPath ) ) )
+		{
+			Com_Printf("Unable to detect CSIDL_APPDATA\n");
+			return NULL;
+		}
+		
+		Com_sprintf(homePath, sizeof(homePath), "%s%c", szPath, PATH_SEP);
+
+		if(com_homepath->string[0])
+			Q_strcat(homePath, sizeof(homePath), com_homepath->string);
+		else
+			Q_strcat(homePath, sizeof(homePath), HOMEPATH_NAME);
+	}
 
 	return homePath;
+}
+
+char *Sys_DefaultHomeConfigPath(void) { return Sys_DefaultHomePath(); }
+char *Sys_DefaultHomeDataPath(void)   { return Sys_DefaultHomePath(); }
+char *Sys_DefaultHomeStatePath(void)  { return Sys_DefaultHomePath(); }
+
+/*
+================
+Sys_SteamPath
+================
+*/
+char *Sys_SteamPath( void )
+{
+#ifndef STANDALONE
+
+#define STEAMPATH_NAME "Quake 3 Arena"
+#define STEAMPATH_APPID "2200"
+
+	static char steamPath[ MAX_OSPATH ] = { 0 };
+
+	HKEY steamRegKey;
+	DWORD pathLen = MAX_OSPATH;
+	bool finishPath = false;
+
+	// Assuming Steam is a 32-bit app
+	if (!steamPath[0] && !RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Steam App "
+		STEAMPATH_APPID, 0, KEY_QUERY_VALUE | KEY_WOW64_32KEY, &steamRegKey))
+	{
+		pathLen = MAX_OSPATH;
+		if (RegQueryValueEx(steamRegKey, "InstallLocation", NULL, NULL, (LPBYTE)steamPath, &pathLen))
+			steamPath[0] = '\0';
+
+		RegCloseKey(steamRegKey);
+	}
+
+	if (!steamPath[0] && !RegOpenKeyEx(HKEY_CURRENT_USER, "Software\\Valve\\Steam", 0, KEY_QUERY_VALUE, &steamRegKey))
+	{
+		pathLen = MAX_OSPATH;
+		if (RegQueryValueEx(steamRegKey, "SteamPath", NULL, NULL, (LPBYTE)steamPath, &pathLen))
+			if (RegQueryValueEx(steamRegKey, "InstallPath", NULL, NULL, (LPBYTE)steamPath, &pathLen))
+				steamPath[0] = '\0';
+
+		if (steamPath[0])
+			finishPath = true;
+
+		RegCloseKey(steamRegKey);
+	}
+
+	if (steamPath[0])
+	{
+		if (pathLen == MAX_OSPATH)
+			pathLen--;
+
+		steamPath[pathLen] = '\0';
+
+		if (finishPath)
+			Q_strcat(steamPath, MAX_OSPATH, "\\SteamApps\\common\\" STEAMPATH_NAME );
+	}
+
+	return steamPath;
+#else
+	return "";
+#endif
+}
+
+/*
+================
+Sys_GogPath
+================
+*/
+char *Sys_GogPath( void )
+{
+#ifndef STANDALONE
+
+#define GOGPATH_ID "1441704920"
+
+	static char gogPath[ MAX_OSPATH ] = { 0 };
+
+	HKEY gogRegKey;
+	DWORD pathLen = MAX_OSPATH;
+
+	if (!gogPath[0] && !RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\GOG.com\\Games\\" GOGPATH_ID, 0, KEY_QUERY_VALUE | KEY_WOW64_32KEY, &gogRegKey))
+	{
+		pathLen = MAX_OSPATH;
+		if (RegQueryValueEx(gogRegKey, "PATH", NULL, NULL, (LPBYTE)gogPath, &pathLen))
+			gogPath[0] = '\0';
+
+		RegCloseKey(gogRegKey);
+	}
+
+	if (gogPath[0])
+	{
+		if (pathLen == MAX_OSPATH)
+			pathLen--;
+
+		gogPath[pathLen] = '\0';
+	}
+
+	return gogPath;
+#else
+	return "";
+#endif
+}
+
+/*
+================
+Sys_MicrosoftStorePath
+================
+*/
+char* Sys_MicrosoftStorePath(void)
+{
+#ifndef STANDALONE
+
+#define MSSTORE_PATH "Quake 3"
+
+	static char microsoftStorePath[MAX_OSPATH] = { 0 };
+
+	if (!microsoftStorePath[0]) 
+	{
+		TCHAR szPath[MAX_PATH];
+
+		if( !SUCCEEDED( SHGetFolderPathA( NULL, CSIDL_PROGRAM_FILES,
+						NULL, 0, szPath ) ) )
+		{
+			Com_Printf("Unable to detect CSIDL_PROGRAM_FILES\n");
+			return microsoftStorePath;
+		}
+
+		// default: C:\Program Files\ModifiableWindowsApps\Quake 3\EN
+		Com_sprintf(microsoftStorePath, sizeof(microsoftStorePath), "%s%cModifiableWindowsApps%c%s%cEN", szPath, PATH_SEP, PATH_SEP, MSSTORE_PATH, PATH_SEP);
+	}
+
+	return microsoftStorePath;
+#else
+	return "";
+#endif
 }
 
 /*
@@ -133,9 +301,9 @@ Sys_GetCurrentUser
 char *Sys_GetCurrentUser( void )
 {
 	static char s_userName[1024];
-	DWORD size = sizeof( s_userName );
+	unsigned long size = sizeof( s_userName );
 
-	if( !GetUserNameA( s_userName, &size ) )
+	if( !GetUserName( s_userName, &size ) )
 		strcpy( s_userName, "player" );
 
 	if( !s_userName[0] )
@@ -155,10 +323,9 @@ Sys_LowPhysicalMemory
 */
 bool Sys_LowPhysicalMemory( void )
 {
-	MEMORYSTATUSEX stat;
-	stat.dwLength = sizeof( stat );
-	GlobalMemoryStatusEx (&stat);
-	return (stat.ullTotalPhys <= MEM_THRESHOLD) ? true : false;
+	MEMORYSTATUS stat;
+	GlobalMemoryStatus (&stat);
+	return (stat.dwTotalPhys <= MEM_THRESHOLD) ? true : false;
 }
 
 /*
@@ -204,7 +371,7 @@ const char *Sys_Dirname( char *path )
 	Q_strncpyz( dir, path, sizeof( dir ) );
 	length = strlen( dir ) - 1;
 
-	while( length > 0 && dir[ length ] != '\\' && dir[ length ] != '/' )
+	while( length > 0 && dir[ length ] != '\\' )
 		length--;
 
 	dir[ length ] = '\0';
@@ -214,12 +381,46 @@ const char *Sys_Dirname( char *path )
 
 /*
 ==============
+Sys_FOpen
+==============
+*/
+FILE *Sys_FOpen( const char *ospath, const char *mode ) {
+	size_t length;
+
+	// Windows API ignores all trailing spaces and periods which can get around Quake 3 file system restrictions.
+	length = strlen( ospath );
+	if ( length == 0 || ospath[length-1] == ' ' || ospath[length-1] == '.' ) {
+		return NULL;
+	}
+
+	return fopen( ospath, mode );
+}
+
+/*
+==============
 Sys_Mkdir
 ==============
 */
-void Sys_Mkdir( const char *path )
+bool Sys_Mkdir( const char *path )
 {
-	_mkdir( path );
+	if( !CreateDirectory( path, NULL ) )
+	{
+		if( GetLastError( ) != ERROR_ALREADY_EXISTS )
+			return false;
+	}
+
+	return true;
+}
+
+/*
+==================
+Sys_Mkfifo
+Noop on windows because named pipes do not function the same way
+==================
+*/
+FILE *Sys_Mkfifo( const char *ospath )
+{
+	return NULL;
 }
 
 /*
@@ -234,6 +435,25 @@ char *Sys_Cwd( void ) {
 	cwd[MAX_OSPATH-1] = 0;
 
 	return cwd;
+}
+
+/*
+==============
+Sys_BinaryPathRelative
+==============
+*/
+char *Sys_BinaryPathRelative(const char *relative)
+{
+	static char resolved[MAX_OSPATH];
+	char combined[MAX_OSPATH];
+
+	snprintf(combined, sizeof(combined), "%s\\%s", Sys_BinaryPath(), relative);
+
+	DWORD len = GetFullPathNameA(combined, MAX_OSPATH, resolved, NULL);
+	if (len == 0 || len >= MAX_OSPATH)
+		return NULL;
+
+	return resolved;
 }
 
 /*
@@ -346,12 +566,11 @@ char **Sys_ListFiles( const char *directory, const char *extension, char *filter
 	int			flag;
 	int			i;
 	int			extLen;
-	char		emptyString[] = "";
 
 	if (filter) {
 
 		nfiles = 0;
-		Sys_ListFilteredFiles( directory, emptyString, filter, list, &nfiles );
+		Sys_ListFilteredFiles( directory, "", filter, list, &nfiles );
 
 		list[ nfiles ] = 0;
 		*numfiles = nfiles;
@@ -359,7 +578,7 @@ char **Sys_ListFiles( const char *directory, const char *extension, char *filter
 		if (!nfiles)
 			return NULL;
 
-		listCopy = reinterpret_cast<char**>(Z_Malloc( ( nfiles + 1 ) * sizeof( *listCopy ) ));
+		listCopy = Z_Malloc( ( nfiles + 1 ) * sizeof( *listCopy ) );
 		for ( i = 0 ; i < nfiles ; i++ ) {
 			listCopy[i] = list[i];
 		}
@@ -427,7 +646,7 @@ char **Sys_ListFiles( const char *directory, const char *extension, char *filter
 		return NULL;
 	}
 
-	listCopy = reinterpret_cast<char**>(Z_Malloc( ( nfiles + 1 ) * sizeof( *listCopy ) ));
+	listCopy = Z_Malloc( ( nfiles + 1 ) * sizeof( *listCopy ) );
 	for ( i = 0 ; i < nfiles ; i++ ) {
 		listCopy[i] = list[i];
 	}
@@ -468,15 +687,31 @@ void Sys_FreeFileList( char **list )
 	Z_Free( list );
 }
 
-/*
-=================
-Sys_DllExtension
 
-Check if filename should be allowed to be loaded as a DLL.
-=================
+/*
+==============
+Sys_Sleep
+
+Block execution for msec or until input is received.
+==============
 */
-bool Sys_DllExtension( const char *name ) {
-	return COM_CompareExtension( name, DLL_EXT );
+void Sys_Sleep( int msec )
+{
+	if( msec == 0 )
+		return;
+
+#ifdef DEDICATED
+	if( msec < 0 )
+		WaitForSingleObject( GetStdHandle( STD_INPUT_HANDLE ), INFINITE );
+	else
+		WaitForSingleObject( GetStdHandle( STD_INPUT_HANDLE ), msec );
+#else
+	// Client Sys_Sleep doesn't support waiting on stdin
+	if( msec < 0 )
+		return;
+
+	Sleep( msec );
+#endif
 }
 
 /*
@@ -490,7 +725,89 @@ void Sys_ErrorDialog( const char *error )
 {
 	Sys_Print( va( "%s\n", error ) );
 
-	MessageBoxA( NULL, error, "Error", MB_ICONERROR|MB_OK );
+	if( Sys_Dialog( DT_YES_NO, va( "%s. Copy console log to clipboard?", error ),
+			"Error" ) == DR_YES )
+	{
+		HGLOBAL memoryHandle;
+		char *clipMemory;
+
+		memoryHandle = GlobalAlloc( GMEM_MOVEABLE|GMEM_DDESHARE, CON_LogSize( ) + 1 );
+		clipMemory = (char *)GlobalLock( memoryHandle );
+
+		if( clipMemory )
+		{
+			char *p = clipMemory;
+			char buffer[ 1024 ];
+			unsigned int size;
+
+			while( ( size = CON_LogRead( buffer, sizeof( buffer ) ) ) > 0 )
+			{
+				Com_Memcpy( p, buffer, size );
+				p += size;
+			}
+
+			*p = '\0';
+
+			if( OpenClipboard( NULL ) && EmptyClipboard( ) )
+				SetClipboardData( CF_TEXT, memoryHandle );
+
+			GlobalUnlock( clipMemory );
+			CloseClipboard( );
+		}
+	}
+}
+
+/*
+==============
+Sys_Dialog
+
+Display a win32 dialog box
+==============
+*/
+dialogResult_t Sys_Dialog( dialogType_t type, const char *message, const char *title )
+{
+	UINT uType;
+
+	switch( type )
+	{
+		default:
+		case DT_INFO:      uType = MB_ICONINFORMATION|MB_OK; break;
+		case DT_WARNING:   uType = MB_ICONWARNING|MB_OK; break;
+		case DT_ERROR:     uType = MB_ICONERROR|MB_OK; break;
+		case DT_YES_NO:    uType = MB_ICONQUESTION|MB_YESNO; break;
+		case DT_OK_CANCEL: uType = MB_ICONWARNING|MB_OKCANCEL; break;
+	}
+
+	switch( MessageBox( NULL, message, title, uType ) )
+	{
+		default:
+		case IDOK:      return DR_OK;
+		case IDCANCEL:  return DR_CANCEL;
+		case IDYES:     return DR_YES;
+		case IDNO:      return DR_NO;
+	}
+}
+
+/*
+==============
+Sys_GLimpSafeInit
+
+Windows specific "safe" GL implementation initialisation
+==============
+*/
+void Sys_GLimpSafeInit( void )
+{
+}
+
+/*
+==============
+Sys_GLimpInit
+
+Windows specific GL implementation initialisation
+==============
+*/
+void Sys_GLimpInit( void )
+{
 }
 
 /*
@@ -502,18 +819,28 @@ Windows specific initialisation
 */
 void Sys_PlatformInit( void )
 {
+#ifndef DEDICATED
 	TIMECAPS ptc;
+#endif
 
 	Sys_SetFloatEnv();
 
+#ifndef DEDICATED
 	if(timeGetDevCaps(&ptc, sizeof(ptc)) == MMSYSERR_NOERROR)
 	{
 		timerResolution = ptc.wPeriodMin;
 
-		timeBeginPeriod(timerResolution);
+		if(timerResolution > 1)
+		{
+			Com_Printf("Warning: Minimum supported timer resolution is %ums "
+				"on this system, recommended resolution 1ms\n", timerResolution);
+		}
+		
+		timeBeginPeriod(timerResolution);				
 	}
 	else
 		timerResolution = 0;
+#endif
 }
 
 /*
@@ -525,8 +852,82 @@ Windows specific initialisation
 */
 void Sys_PlatformExit( void )
 {
+#ifndef DEDICATED
 	if(timerResolution)
 		timeEndPeriod(timerResolution);
+#endif
+}
+
+/*
+==============
+Sys_SetEnv
+
+set/unset environment variables (empty value removes it)
+==============
+*/
+void Sys_SetEnv(const char *name, const char *value)
+{
+	if(value)
+		_putenv(va("%s=%s", name, value));
+	else
+		_putenv(va("%s=", name));
+}
+
+/*
+==============
+Sys_PID
+==============
+*/
+int Sys_PID( void )
+{
+	return GetCurrentProcessId( );
+}
+
+/*
+==============
+Sys_PIDIsRunning
+==============
+*/
+bool Sys_PIDIsRunning( int pid )
+{
+	DWORD processes[ 1024 ];
+	DWORD numBytes, numProcesses;
+	int i;
+
+	if( !EnumProcesses( processes, sizeof( processes ), &numBytes ) )
+		return false; // Assume it's not running
+
+	numProcesses = numBytes / sizeof( DWORD );
+
+	// Search for the pid
+	for( i = 0; i < numProcesses; i++ )
+	{
+		if( (int)processes[ i ] == pid )
+			return true;
+	}
+
+	return false;
+}
+
+/*
+=================
+Sys_DllExtension
+
+Check if filename should be allowed to be loaded as a DLL.
+=================
+*/
+bool Sys_DllExtension( const char *name ) {
+	return COM_CompareExtension( name, DLL_EXT );
+}
+
+/*
+==============
+Sys_OpenFolderInPlatformFileManager
+==============
+*/
+bool Sys_OpenFolderInPlatformFileManager( const char *path )
+{
+	return ShellExecute( NULL, "explore", path, NULL, NULL, SW_SHOWDEFAULT ) > (HINSTANCE)32;
 }
 
 /*

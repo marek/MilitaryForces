@@ -35,6 +35,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "sys_local.h"
 #include "sys_loadlib.h"
 
+extern bool com_fullyInitialized;
+
 void IN_Frame( void );
 void IN_Shutdown( void );
 void IN_Init( void );
@@ -42,7 +44,6 @@ void IN_Init( void );
 static char binaryPath[ MAX_OSPATH ] = { 0 };
 static char installPath[ MAX_OSPATH ] = { 0 };
 static char cdPath[ MAX_OSPATH ] = { 0 };
-static char homePath[ MAX_OSPATH ] = { 0 };
 
 #define	MAX_QUED_EVENTS		256
 #define	MASK_QUED_EVENTS	( MAX_QUED_EVENTS - 1 )
@@ -103,19 +104,14 @@ char *Sys_DefaultCDPath(void)
 	return cdPath;
 }
 
-void Sys_SetDefaultHomePath(const char *path)
+/*
+=================
+Sys_DefaultAppPath
+=================
+*/
+char *Sys_DefaultAppPath(void)
 {
-	Q_strncpyz(homePath, path, sizeof(homePath));
-}
-
-char *Sys_PlatformHomePath( void );
-
-char *Sys_DefaultHomePath(void)
-{
-	if (*homePath)
-		return homePath;
-	else
-		return Sys_PlatformHomePath();
+	return Sys_BinaryPath();
 }
 
 /*
@@ -174,6 +170,131 @@ char *Sys_GetClipboardData(void)
 	return data;
 }
 
+#ifdef DEDICATED
+#	define PID_FILENAME PRODUCT_NAME "_server.pid"
+#else
+#	define PID_FILENAME PRODUCT_NAME ".pid"
+#endif
+
+/*
+=================
+Sys_PIDFileName
+=================
+*/
+static char *Sys_PIDFileName( const char *gamedir )
+{
+	const char *homeStatePath = Cvar_VariableString( "fs_homestatepath" );
+
+	if( *homeStatePath != '\0' )
+		return va( "%s/%s/%s", homeStatePath, gamedir, PID_FILENAME );
+
+	return NULL;
+}
+
+/*
+=================
+Sys_RemovePIDFile
+=================
+*/
+void Sys_RemovePIDFile( const char *gamedir )
+{
+	char *pidFile = Sys_PIDFileName( gamedir );
+
+	if( pidFile != NULL )
+		remove( pidFile );
+}
+
+/*
+=================
+Sys_WritePIDFile
+
+Return true if there is an existing stale PID file
+=================
+*/
+static bool Sys_WritePIDFile( const char *gamedir )
+{
+	char      *pidFile = Sys_PIDFileName( gamedir );
+	FILE      *f;
+	bool  stale = false;
+
+	if( pidFile == NULL )
+		return false;
+
+	// First, check if the pid file is already there
+	if( ( f = fopen( pidFile, "r" ) ) != NULL )
+	{
+		char  pidBuffer[ 64 ] = { 0 };
+		int   pid;
+
+		pid = fread( pidBuffer, sizeof( char ), sizeof( pidBuffer ) - 1, f );
+		fclose( f );
+
+		if(pid > 0)
+		{
+			pid = atoi( pidBuffer );
+			if( !Sys_PIDIsRunning( pid ) )
+				stale = true;
+		}
+		else
+			stale = true;
+	}
+
+	if( FS_CreatePath( pidFile ) ) {
+		return 0;
+	}
+
+	if( ( f = fopen( pidFile, "w" ) ) != NULL )
+	{
+		fprintf( f, "%d", Sys_PID( ) );
+		fclose( f );
+	}
+	else
+		Com_Printf( S_COLOR_YELLOW "Couldn't write %s.\n", pidFile );
+
+	return stale;
+}
+
+/*
+=================
+Sys_InitPIDFile
+=================
+*/
+void Sys_InitPIDFile( const char *gamedir ) {
+	if( Sys_WritePIDFile( gamedir ) ) {
+#ifndef DEDICATED
+		char message[1024];
+		char modName[MAX_OSPATH];
+
+		FS_GetModDescription( gamedir, modName, sizeof ( modName ) );
+		Q_CleanStr( modName );
+
+		Com_sprintf( message, sizeof (message), "The last time %s ran, "
+			"it didn't exit properly. This may be due to inappropriate video "
+			"settings. Would you like to start with \"safe\" video settings?", modName );
+
+		if( Sys_Dialog( DT_YES_NO, message, "Abnormal Exit" ) == DR_YES ) {
+			Cvar_Set( "com_abnormalExit", "1" );
+		}
+#endif
+	}
+}
+
+/*
+=================
+Sys_OpenFolderInFileManager
+=================
+*/
+bool Sys_OpenFolderInFileManager( const char *path, bool create )
+{
+	if( create )
+	{
+		if( FS_CreatePath( path ) )
+			return false;
+	}
+
+	return Sys_OpenFolderInPlatformFileManager( path );
+}
+
 /*
 =================
 Sys_Exit
@@ -186,6 +307,12 @@ static void Sys_Exit( int exitCode )
 	CON_Shutdown( );
 
 	SDL_Quit( );
+
+	if( exitCode < 2 && com_fullyInitialized )
+	{
+		// Normal exit
+		Sys_RemovePIDFile( FS_GetCurrentGameDir() );
+	}
 
 	NET_Shutdown( );
 

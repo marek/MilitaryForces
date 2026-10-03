@@ -66,6 +66,8 @@ cvar_t	*com_fixedtime;
 cvar_t	*com_journal;
 cvar_t	*com_maxfps;
 cvar_t	*com_busyWait;
+cvar_t	*com_basegame;
+cvar_t	*com_homepath;
 cvar_t	*com_unfocused;
 cvar_t	*com_maxfpsUnfocused;
 cvar_t	*com_minimized;
@@ -97,6 +99,8 @@ int			com_frameNumber;
 
 bool	com_errorEntered;
 bool	com_fullyInitialized;
+bool	com_gameRestarting = false;
+bool	com_gameClientRestarting = false;
 
 char	com_errorMessage[MAXPRINTMSG];
 
@@ -183,7 +187,7 @@ void QDECL Com_Printf( const char *fmt, ... ) {
 			time( &aclock );
 			newtime = localtime( &aclock );
 
-			logfile = FS_FOpenFileWrite( "qconsole.log" );
+			logfile = FS_FOpenFileWrite_HomeData( "qconsole.log" );
 			Com_Printf( "logfile opened on %s\n", asctime( newtime ) );
 			if ( com_logfile->integer > 1 ) {
 				// force it to not buffer so we get valid
@@ -1356,6 +1360,96 @@ void Com_TouchMemory( void ) {
 
 /*
 =================
+Com_ExecuteCfg
+
+For controlling environment variables
+=================
+*/
+void Com_ExecuteCfg(void)
+{
+	Cbuf_ExecuteText(EXEC_NOW, "exec default.cfg\n");
+	Cbuf_Execute(); // Always execute after exec to prevent text buffer overflowing
+
+	if(!Com_SafeMode())
+	{
+		// skip the q3config.cfg and autoexec.cfg if "safe" is on the command line
+		Cbuf_ExecuteText(EXEC_NOW, "exec " Q3CONFIG_CFG "\n");
+		Cbuf_Execute();
+		Cbuf_ExecuteText(EXEC_NOW, "exec autoexec.cfg\n");
+		Cbuf_Execute();
+	}
+}
+
+/*
+==================
+Com_GameRestart
+
+Change to a new mod properly with cleaning up cvars before switching.
+==================
+*/
+
+void Com_GameRestart(int checksumFeed, bool disconnect)
+{
+	// make sure no recursion can be triggered
+	if(!com_gameRestarting && com_fullyInitialized)
+	{
+		com_gameRestarting = true;
+		com_gameClientRestarting = com_cl_running->integer;
+
+		// Kill server if we have one
+		if(com_sv_running->integer)
+			SV_Shutdown((char *)"Game directory changed");
+
+		if(com_gameClientRestarting)
+		{
+			if(disconnect)
+				CL_Disconnect(false);
+				
+			CL_Shutdown();
+		}
+
+		FS_Restart(checksumFeed);
+	
+		// Clean out any user and VM created cvars
+		Cvar_Restart_f();
+		Com_ExecuteCfg();
+
+		if(disconnect)
+		{
+			// We don't want to change any network settings if gamedir
+			// change was triggered by a connect to server because the
+			// new network settings might make the connection fail.
+			NET_Restart_f();
+		}
+
+		if(com_gameClientRestarting)
+		{
+			CL_Init();
+			CL_StartHunkUsers();
+		}
+		
+		com_gameRestarting = false;
+		com_gameClientRestarting = false;
+	}
+}
+
+/*
+==================
+Com_GameRestart_f
+
+Expose possibility to change current running mod to the user
+==================
+*/
+
+void Com_GameRestart_f(void)
+{
+	Cvar_Set("fs_game", Cmd_Argv(1));
+
+	Com_GameRestart(0, true);
+}
+
+/*
+=================
 Com_InitZoneMemory
 =================
 */
@@ -1895,8 +1989,8 @@ void Com_InitJournaling( void ) {
 
 	if ( com_journal->integer == 1 ) {
 		Com_Printf( "Journaling events\n");
-		com_journalFile = FS_FOpenFileWrite( "journal.dat" );
-		com_journalDataFile = FS_FOpenFileWrite( "journaldata.dat" );
+		com_journalFile = FS_FOpenFileWrite_HomeState( "journal.dat" );
+		com_journalDataFile = FS_FOpenFileWrite_HomeState( "journaldata.dat" );
 	} else if ( com_journal->integer == 2 ) {
 		Com_Printf( "Replaying journaled events\n");
 		FS_FOpenFileRead( "journal.dat", &com_journalFile, true );
@@ -2337,20 +2431,14 @@ void Com_Init( char *commandLine ) {
 	// done early so bind command exists
 	CL_InitKeyCommands();
 
+	com_basegame = Cvar_Get("com_basegame", BASEGAME, CVAR_INIT);
+	com_homepath = Cvar_Get("com_homepath", "", CVAR_INIT|CVAR_PROTECTED);
+
 	FS_InitFilesystem ();
 
 	Com_InitJournaling();
 
-	Cbuf_AddText ("exec default.cfg\n");
-
-	// skip the mfconfig.cfg if "safe" is on the command line
-	if ( !Com_SafeMode() ) {
-		Cbuf_AddText ("exec mfconfig.cfg\n");
-	}
-
-	Cbuf_AddText ("exec autoexec.cfg\n");
-
-	Cbuf_Execute ();
+	Com_ExecuteCfg();
 
 	// override anything from the config files with command line args
 	Com_StartupVariable( NULL );
@@ -2418,6 +2506,7 @@ void Com_Init( char *commandLine ) {
 	Cmd_AddCommand ("quit", Com_Quit_f);
 	Cmd_AddCommand ("changeVectors", MSG_ReportChangeVectors_f );
 	Cmd_AddCommand ("writeconfig", Com_WriteConfig_f );
+	Cmd_AddCommand ("game_restart", Com_GameRestart_f);
 
 	s = va("%s %s %s", MF_VERSION, CPUSTRING, __DATE__ );
 	com_version = Cvar_Get ("version", s, CVAR_ROM | CVAR_SERVERINFO );
@@ -2467,7 +2556,7 @@ void Com_Init( char *commandLine ) {
 void Com_WriteConfigToFile( const char *filename ) {
 	fileHandle_t	f;
 
-	f = FS_FOpenFileWrite( filename );
+	f = FS_FOpenFileWrite_HomeConfig( filename );
 	if ( !f ) {
 		Com_Printf ("Couldn't write %s.\n", filename );
 		return;
@@ -2502,7 +2591,7 @@ void Com_WriteConfiguration( void ) {
 	}
 	cvar_modifiedFlags &= ~CVAR_ARCHIVE;
 
-	Com_WriteConfigToFile( "mfconfig.cfg" );
+	Com_WriteConfigToFile( Q3CONFIG_CFG );
 
 	// bk001119 - tentative "not needed for dedicated"
 //#ifndef DEDICATED

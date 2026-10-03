@@ -734,7 +734,7 @@ char *GetMenuBuffer(const char *filename) {
 		return defaultMenu;
 	}
 
-	FS_Read2( buf, len, f );
+	FS_Read( buf, len, f );
 	buf[len] = 0;
 	FS_FCloseFile( f );
 	//COM_Compress(buf);
@@ -3474,7 +3474,7 @@ static void UI_InitialiseUI( void )
 		// read in the entire credits file
 		uiInfo.pCreditsData = uiInfo.uiUtils.alloc( fileSize );
 		pCredits = (char *)uiInfo.pCreditsData;
-		FS_Read2( pCredits, fileSize, creditsFile );
+		FS_Read( pCredits, fileSize, creditsFile );
 	
 		// assign line pointers
 		do

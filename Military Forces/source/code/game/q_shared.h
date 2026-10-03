@@ -24,6 +24,21 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define __Q_SHARED_H__
 
 // q_shared.h -- included first by ALL program modules.
+
+#define DEMOEXT	"dm_"			// standard demo extension
+
+#ifdef STANDALONE
+  #define PRODUCT_NAME				"Military Forces"
+  #define BASEGAME					"mfdata"
+  #define CLIENT_WINDOW_TITLE		"Military Forces"
+  #define CLIENT_WINDOW_MIN_TITLE	"MF"
+  #define HOMEPATH_NAME_UNIX_LEGACY	".militaryforces"
+  #define HOMEPATH_NAME				"MilitaryForces"
+  #define GAMENAME_FOR_MASTER		"MilitaryForces"	// must NOT contain whitespace
+  #define CINEMATICS_LOGO		"foologo.roq"
+  #define CINEMATICS_INTRO		"intro.roq"
+  #define CONFIG_PREFIX			"mfconfig"
+#endif
 // A user mod should never modify this file
 
 #define	MF_VERSION		"MF 1.0.9"

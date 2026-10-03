@@ -97,9 +97,9 @@ void UI_LoadBestScores(const char *map, int game) {
 	Com_sprintf(fileName, MAX_QPATH, "games/%s_%i.game", map, game);
 	if (FS_FOpenFileByMode(fileName, &f, FS_READ) >= 0) {
 		int size = 0;
-		FS_Read2(&size, sizeof(int), f);
+		FS_Read(&size, sizeof(int), f);
 		if (size == sizeof(postGameInfo_t)) {
-			FS_Read2(&newInfo, sizeof(postGameInfo_t), f);
+			FS_Read(&newInfo, sizeof(postGameInfo_t), f);
 		}
 		FS_FCloseFile(f);
 	}
@@ -180,9 +180,9 @@ static void UI_CalcPostGameStats() {
 	if (FS_FOpenFileByMode(fileName, &f, FS_READ) >= 0) {
 	// if so load it
 		size = 0;
-		FS_Read2(&size, sizeof(int), f);
+		FS_Read(&size, sizeof(int), f);
 		if (size == sizeof(postGameInfo_t)) {
-			FS_Read2(&oldInfo, sizeof(postGameInfo_t), f);
+			FS_Read(&oldInfo, sizeof(postGameInfo_t), f);
 		}
 		FS_FCloseFile(f);
 	}					 

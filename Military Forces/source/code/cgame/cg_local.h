@@ -1593,7 +1593,7 @@ void CL_AddCgameCommand( const char *cmdName );
 void CL_AddReliableCommand(const char *cmd, bool isDisconnectCmd = false);
 int FS_FOpenFileByMode( const char *qpath, fileHandle_t *f, fsMode_t mode );
 void FS_FCloseFile( fileHandle_t f );
-int FS_Read2( void *buffer, int len, fileHandle_t f );
+int FS_Read( void *buffer, int len, fileHandle_t f );
 int FS_Write( const void *buffer, int len, fileHandle_t h );
 void SCR_UpdateScreen();
 void CL_CM_LoadMap( const char *mapname );

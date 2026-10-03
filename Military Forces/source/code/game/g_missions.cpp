@@ -70,7 +70,7 @@ static bool G_LoadOverviewAndEntities( char *filename,
 		return false;
 	}
 
-	FS_Read2( inbuffer, len, f );
+	FS_Read( inbuffer, len, f );
 	inbuffer[len] = 0;
 	FS_FCloseFile( f );
 

@@ -882,8 +882,7 @@ void SV_WriteDownloadToClient( SV_Client *cl , msg_t *msg )
 
 						// now that we know the file is referenced,
 						// check whether it's legal to download it.
-						missionPack = FS_idPak(pakbuf, "missionpack");
-						idPack = missionPack || FS_idPak(pakbuf, "mfdata");
+						idPack = idPack || FS_idPak(pakbuf, (char *)BASEGAME, NUM_ID_PAKS);
 
 						break;
 					}
@@ -895,7 +894,7 @@ void SV_WriteDownloadToClient( SV_Client *cl , msg_t *msg )
 
 		// We open the file here
 		if ( !sv_allowDownload->integer || idPack || unreferenced ||
-			( cl->downloadSize_ = FS_SV_FOpenFileRead( cl->downloadName_, &cl->download_ ) ) <= 0 )
+			( cl->downloadSize_ = FS_BaseDir_FOpenFileRead( cl->downloadName_, &cl->download_ ) ) <= 0 )
 		{
 			// cannot auto-download file
 			if(unreferenced)

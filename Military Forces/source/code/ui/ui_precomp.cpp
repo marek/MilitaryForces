@@ -5,7 +5,7 @@
 
 
 int	FS_FOpenFileByMode( const char *qpath, fileHandle_t *f, fsMode_t mode );
-int FS_Read2( void *buffer, int len, fileHandle_t f );
+int FS_Read( void *buffer, int len, fileHandle_t f );
 void FS_FCloseFile( fileHandle_t f );
 
 
@@ -300,7 +300,7 @@ UI_PrecompilerTools::loadScriptFile( const char *filename )
 	//
 	setScriptPunctuations(script, NULL);
 	//
-	FS_Read2(script->buffer_, length, fp);
+	FS_Read(script->buffer_, length, fp);
 	FS_FCloseFile(fp);
 	//
 	script->length_ = COM_Compress(script->buffer_);

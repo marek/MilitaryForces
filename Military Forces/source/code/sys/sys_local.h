@@ -57,3 +57,7 @@ bool Sys_SetMaxFileLimit( void );
 void Sys_QueEvent( int time, sysEventType_t type, int value, int value2, int ptrLength, void *ptr );
 bool Sys_GetPacket( netadr_t *net_from, msg_t *net_message );
 bool Sys_RandomBytes( byte *string, int len );
+
+int Sys_PID( void );
+bool Sys_PIDIsRunning( int pid );
+bool Sys_OpenFolderInPlatformFileManager( const char *path );

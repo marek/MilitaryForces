@@ -927,7 +927,7 @@ void Cmd_ArgvBuffer( int arg, char *buffer, int bufferLength );
 void Cbuf_ExecuteText (int exec_when, const char *text);
 int FS_FOpenFileByMode( const char *qpath, fileHandle_t *f, fsMode_t mode );
 void FS_FCloseFile( fileHandle_t f );
-int FS_Read2( void *buffer, int len, fileHandle_t f );
+int FS_Read( void *buffer, int len, fileHandle_t f );
 int FS_Write( const void *buffer, int len, fileHandle_t h );
 int	FS_GetFileList(  const char *path, const char *extension, char *listbuf, int bufsize );
 void SCR_UpdateScreen();
