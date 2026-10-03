@@ -91,8 +91,8 @@ void CG_GroundVehicle( centity_t *cent, clientInfo_t *ci )
 	drawInfo.basicInfo.usedLoadout = 0;//&cg_loadouts[cent->currentState.number];
 
 	// turret/gun angle
-	drawInfo.gunAngle = cent->currentState.angles2[PITCH];
-	drawInfo.turretAngle = cent->currentState.angles2[ROLL];
+	drawInfo.gunAngle = cent->lerpAngles2[PITCH];
+	drawInfo.turretAngle = cent->lerpAngles2[ROLL];
 
 	// wheels
 	if( (availableVehicles[ci->vehicle].caps & HC_WHEELS) ) {
@@ -225,9 +225,9 @@ void CG_GroundVehicle( centity_t *cent, clientInfo_t *ci )
 				reticlelock.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshairtrack];
 				
 				AngleVectors( cent->currentState.angles, forward, right, up );
-				RotatePointAroundVector( temp, up, forward, cent->currentState.angles2[ROLL] );
+				RotatePointAroundVector( temp, up, forward, cent->lerpAngles2[ROLL] );
 				CrossProduct( up, temp, right );
-				RotatePointAroundVector( forward, right, temp, cent->currentState.angles2[PITCH] );
+				RotatePointAroundVector( forward, right, temp, cent->lerpAngles2[PITCH] );
 				VectorMA( cent->lerpOrigin, availableVehicles[ci->vehicle].gunoffset[0], forward, start );
 				VectorMA( start, availableVehicles[ci->vehicle].gunoffset[1], right, start );
 				VectorMA( start, availableVehicles[ci->vehicle].gunoffset[2], up, start );
@@ -266,9 +266,9 @@ void CG_GroundVehicle( centity_t *cent, clientInfo_t *ci )
 			reticle.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshair];
 
 			AngleVectors( cent->currentState.angles, forward, right, up );
-			RotatePointAroundVector( temp, up, forward, cent->currentState.angles2[ROLL] );
+			RotatePointAroundVector( temp, up, forward, cent->lerpAngles2[ROLL] );
 			CrossProduct( up, temp, right );
-			RotatePointAroundVector( forward, right, temp, cent->currentState.angles2[PITCH] );
+			RotatePointAroundVector( forward, right, temp, cent->lerpAngles2[PITCH] );
 			VectorMA( cent->lerpOrigin, availableVehicles[ci->vehicle].gunoffset[0], forward, start );
 			VectorMA( start, availableVehicles[ci->vehicle].gunoffset[1], right, start );
 			VectorMA( start, availableVehicles[ci->vehicle].gunoffset[2], up, start );

@@ -720,21 +720,27 @@ void CG_VehicleLerpAngles( centity_t *cent ) {
 
 	if ( cent == &cg.predictedPlayerEntity || !cent->interpolate || !cg.nextSnap ) {
 		VectorCopy( cent->currentState.angles, cent->lerpAngles );
+		VectorCopy( cent->currentState.angles2, cent->lerpAngles2 );
 		return;
 	}
 
 	if ( cent->errorSnapTime == cg.nextSnap->serverTime ) {
 		VectorCopy( cent->nextState.angles, cent->lerpAngles );
+		VectorCopy( cent->nextState.angles2, cent->lerpAngles2 );
 	} else {
 		f = cg.frameInterpolation;
 		cent->lerpAngles[0] = LerpAngle( cent->currentState.angles[0], cent->nextState.angles[0], f );
 		cent->lerpAngles[1] = LerpAngle( cent->currentState.angles[1], cent->nextState.angles[1], f );
 		cent->lerpAngles[2] = LerpAngle( cent->currentState.angles[2], cent->nextState.angles[2], f );
+		cent->lerpAngles2[0] = LerpAngle( cent->currentState.angles2[0], cent->nextState.angles2[0], f );
+		cent->lerpAngles2[1] = LerpAngle( cent->currentState.angles2[1], cent->nextState.angles2[1], f );
+		cent->lerpAngles2[2] = LerpAngle( cent->currentState.angles2[2], cent->nextState.angles2[2], f );
 	}
 
 	f = CG_EntityAngleErrorFraction( cent );
 	if ( f > 0 ) {
 		VectorMA( cent->lerpAngles, f, cent->errorAngles, cent->lerpAngles );
+		VectorMA( cent->lerpAngles2, f, cent->errorAngles2, cent->lerpAngles2 );
 	}
 }
 

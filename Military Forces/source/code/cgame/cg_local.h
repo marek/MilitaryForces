@@ -202,6 +202,7 @@ typedef struct centity_s {
 	int				errorSnapTime;
 	vec3_t			errorOrigin;
 	vec3_t			errorAngles;
+	vec3_t			errorAngles2;
 	
 	bool		extrapolated;	// false if origin / angles is an interpolation
 	vec3_t			rawOrigin;
@@ -212,6 +213,7 @@ typedef struct centity_s {
 	// exact interpolated position of entity on this frame
 	vec3_t			lerpOrigin;
 	vec3_t			lerpAngles;
+	vec3_t			lerpAngles2;
 
 	bool		destroyableStructure;
 

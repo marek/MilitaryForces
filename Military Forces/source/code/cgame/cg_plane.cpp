@@ -166,7 +166,7 @@ void CG_Plane( centity_t *cent, clientInfo_t *ci )
 	// swingwings
 	if( availableVehicles[ci->vehicle].caps & HC_SWINGWING ) 
 	{
-		drawInfo.swingAngle = cent->currentState.angles2[PITCH];
+		drawInfo.swingAngle = cent->lerpAngles2[PITCH];
 	}
 
 	// loadout

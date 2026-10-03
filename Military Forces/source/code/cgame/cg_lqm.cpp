@@ -142,9 +142,9 @@ void CG_LQM( centity_t *cent, clientInfo_t *ci )
 		reticle.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshair];
 
 		AngleVectors( cent->currentState.angles, forward, right, up );
-		RotatePointAroundVector( temp, up, forward, cent->currentState.angles2[ROLL] );
+		RotatePointAroundVector( temp, up, forward, cent->lerpAngles2[ROLL] );
 		CrossProduct( up, temp, right );
-		RotatePointAroundVector( forward, right, temp, cent->currentState.angles2[PITCH] );
+		RotatePointAroundVector( forward, right, temp, cent->lerpAngles2[PITCH] );
 		VectorMA( cent->lerpOrigin, availableVehicles[ci->vehicle].gunoffset[0], forward, start );
 		VectorMA( start, availableVehicles[ci->vehicle].gunoffset[1], right, start );
 		VectorMA( start, availableVehicles[ci->vehicle].gunoffset[2], up, start );

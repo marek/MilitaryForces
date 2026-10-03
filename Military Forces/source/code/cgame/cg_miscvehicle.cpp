@@ -113,7 +113,7 @@ static void CG_Misc_Plane( centity_t *cent )
 
 	// swingwings
 	if( availableVehicles[cent->currentState.modelindex].caps & HC_SWINGWING ) {
-		drawInfo.swingAngle = cent->currentState.angles2[PITCH];
+		drawInfo.swingAngle = cent->lerpAngles2[PITCH];
 	}
 
 	// loadout
@@ -199,8 +199,8 @@ static void CG_Misc_GV( centity_t *cent )
 	CG_SetDrawLoadout( cent, &drawInfo.basicInfo );
 
 	// turret/gun angle
-	drawInfo.gunAngle = cent->currentState.angles2[PITCH];
-	drawInfo.turretAngle = cent->currentState.angles2[ROLL];
+	drawInfo.gunAngle = cent->lerpAngles2[PITCH];
+	drawInfo.turretAngle = cent->lerpAngles2[ROLL];
 
 	// wheels
 	if( (availableVehicles[cent->currentState.modelindex].caps & HC_WHEELS) ) {
@@ -292,8 +292,8 @@ static void CG_Misc_Helo( centity_t *cent )
 	// turret/gun angle
 	for(i = 0; i < 4; i++)
 	{
-		drawInfo.gunAngle[i] = cent->currentState.angles2[PITCH];
-		drawInfo.turretAngle[i] = cent->currentState.angles2[ROLL];
+		drawInfo.gunAngle[i] = cent->lerpAngles2[PITCH];
+		drawInfo.turretAngle[i] = cent->lerpAngles2[ROLL];
 	}
 
 	// muzzleflash
@@ -375,8 +375,8 @@ static void CG_Misc_Boat( centity_t *cent )
 	// turret/gun angle
 	for(i = 0; i < 4; i++)
 	{
-		drawInfo.gunAngle[i] = cent->currentState.angles2[PITCH];
-		drawInfo.turretAngle[i] = cent->currentState.angles2[ROLL];
+		drawInfo.gunAngle[i] = cent->lerpAngles2[PITCH];
+		drawInfo.turretAngle[i] = cent->lerpAngles2[ROLL];
 	}
 
 	// muzzleflash
@@ -437,8 +437,8 @@ static void CG_Misc_GI( centity_t *cent )
 	VectorCopy( cent->lerpAngles, drawInfo.basicInfo.angles );
 
 	// turret/gun angle
-	drawInfo.gunAngle = cent->currentState.angles2[PITCH];
-	drawInfo.turretAngle = cent->currentState.angles2[ROLL];
+	drawInfo.gunAngle = cent->lerpAngles2[PITCH];
+	drawInfo.turretAngle = cent->lerpAngles2[ROLL];
 
 	// upgrades
 	drawInfo.upgrades = availableGroundInstallations[drawInfo.basicInfo.vehicleIndex].upgrades;
