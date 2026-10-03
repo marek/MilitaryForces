@@ -747,6 +747,15 @@ static void MF_ParseVehicle( char **buf, mission_vehicle_t* veh )
 				continue;
 			}
 		}
+		else if( !strcmp( token, "Side" ) )
+		{
+			token = COM_ParseExt( buf, false );
+			if( token[0] )
+			{
+				Q_strncpyz(veh->side, token, MAX_NAME_LENGTH );
+				continue;
+			}
+		}
 		else if( !strcmp( token, "Team" ) )
 		{
 			token = COM_ParseExt( buf, false );

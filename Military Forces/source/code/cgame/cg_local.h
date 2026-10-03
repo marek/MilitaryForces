@@ -900,6 +900,7 @@ typedef struct {
 	bool		selected;
 	bool		groundInstallation;
 	int				vehidx;
+	char			side[8];
 	vec3_t			angles;
 	vec3_t			origin;
 	vec3_t			selectorScale;
@@ -1569,6 +1570,7 @@ IGME_vehicle_t* ME_SpawnVehicle( int idx );
 void ME_SpawnGroundInstallation( int idx );
 void ME_ExportToScript( const char* scriptname );
 void ME_ImportScript( const char* scriptname );
+void ME_SetSide( const char* side );
 void CG_Draw_IGME();
 void ME_KeyEvent(int key, bool down);
 void ME_MouseEvent(int x, int y);

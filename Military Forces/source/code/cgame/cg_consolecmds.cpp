@@ -519,6 +519,10 @@ static void CG_ExportToScript_f( void ) {
 
 }
 
+static void CG_SetSide_f( void ) {
+	ME_SetSide( CG_Argv(1) );
+}
+
 static void CG_ImportScript_f( void ) {
 	if( Cmd_Argc() < 2 )
 	{
@@ -664,6 +668,7 @@ static consoleCommand_t	commands[] = {
 	{ "me_spawn_gi", CG_Spawn_GI_f },
 	{ "me_export_to_script", CG_ExportToScript_f },
 	{ "me_import_script", CG_ImportScript_f },
+	{ "me_side", CG_SetSide_f },
 };
 
 /*

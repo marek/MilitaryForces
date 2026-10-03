@@ -20,6 +20,8 @@ static void G_SpawnMissionVehicles(mission_vehicle_t* vehs)
 		VectorCopy(vehs[i].angles, ent->s.angles);
 		ent->model_ = G_NewString(vehs[i].objectname);
 		ent->s.modelindex = vehs[i].index;
+		if( vehs[i].side[0] )
+			ent->team_ = G_NewString(vehs[i].side);
 		GameEntity* veh = SP_misc_vehicle(ent);
 		if( veh )
 			MiscVehicle_SetRoute(veh, vehs[i].waypoints);

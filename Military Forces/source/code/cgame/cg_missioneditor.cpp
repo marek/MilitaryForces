@@ -654,6 +654,7 @@ static IGME_vehicle_t* ME_SpawnVehicleAt( int vehidx, vec3_t pos, vec3_t angles 
 	veh->active = true;
 	veh->selected = false;
 	veh->groundInstallation = false;
+	veh->side[0] = 0;
 
 	for( i = 0; i < 3; ++i ) {
 		float wid = availableVehicles[veh->vehidx].maxs[i] - 
@@ -671,14 +672,14 @@ IGME_vehicle_t* ME_SpawnVehicle( int vehidx )
 							  cg.predictedPlayerState.viewangles );
 }
 
-static void ME_SpawnGroundInstallationAt( int idx, vec3_t pos, vec3_t angles )
+static IGME_vehicle_t* ME_SpawnGroundInstallationAt( int idx, vec3_t pos, vec3_t angles )
 {
 	IGME_vehicle_t*	 veh = 0;
 	int i;
 
 	if( cgs.IGME.waypointmode ) {
 		CG_Printf( "You are in waypoint mode, spawning ground installations not allowed now!\n" );
-		return;
+		return 0;
 	}
 
 	for( i = 0; i < IGME_MAX_VEHICLES; ++i ) {
@@ -689,7 +690,7 @@ static void ME_SpawnGroundInstallationAt( int idx, vec3_t pos, vec3_t angles )
 	}
 	if( !veh ) {
 		CG_Printf( "Too many vehicles spawned! Please delete one first!\n" );
-		return;
+		return 0;
 	}
 
 	VectorCopy( pos, veh->origin );
@@ -699,12 +700,15 @@ static void ME_SpawnGroundInstallationAt( int idx, vec3_t pos, vec3_t angles )
 	veh->active = true;
 	veh->selected = false;
 	veh->groundInstallation = true;
+	veh->side[0] = 0;
 
 	for( i = 0; i < 3; ++i ) {
 		float wid = availableGroundInstallations[veh->vehidx].maxs[i] - 
 					availableGroundInstallations[veh->vehidx].mins[i];
 		veh->selectorScale[i] = wid/200.0f;
 	}
+
+	return veh;
 }
 
 void ME_SpawnGroundInstallation( int idx )
@@ -908,7 +912,7 @@ void ME_ExportToScript( const char* scriptname )
 			Com_sprintf( outstring, sizeof(outstring), "\t\tName\t\"%s\"\n", availableGroundInstallations[veh->vehidx].descriptiveName );
 			FS_Write( outstring, strlen(outstring), f );
 
-			Com_sprintf( outstring, sizeof(outstring), "\t\tTeam\t?\n" ); // ADD TEAM HERE!
+			Com_sprintf( outstring, sizeof(outstring), "\t\tTeam\t%s\n", veh->side[0] ? veh->side : "?" );
 			FS_Write( outstring, strlen(outstring), f );
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\tOrigin\t%f;%f;%f\n", veh->origin[0],
@@ -935,6 +939,12 @@ void ME_ExportToScript( const char* scriptname )
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\tTeam\t%d\n", availableVehicles[veh->vehidx].team ); 
 			FS_Write( outstring, strlen(outstring), f );
+
+			if( veh->side[0] )
+			{
+				Com_sprintf( outstring, sizeof(outstring), "\t\tSide\t%s\n", veh->side ); 
+				FS_Write( outstring, strlen(outstring), f );
+			}
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\tOrigin\t%f;%f;%f\n", veh->origin[0],
 				veh->origin[1], veh->origin[2]);
@@ -982,9 +992,11 @@ static void ME_SpawnMissionGroundInstallations(mission_groundInstallation_t* gis
 	for( i = 0; i < IGME_MAX_VEHICLES; ++i )
 	{
 		if( !gis[i].used ) break;
-		ME_SpawnGroundInstallationAt(gis[i].index,
+		IGME_vehicle_t* veh = ME_SpawnGroundInstallationAt(gis[i].index,
 									 gis[i].origin,
 									 gis[i].angles);
+		if( veh && (!Q_stricmp( gis[i].teamname, "red" ) || !Q_stricmp( gis[i].teamname, "blue" )) )
+			Q_strncpyz( veh->side, gis[i].teamname, sizeof(veh->side) );
 	}
 }
 
@@ -1001,6 +1013,8 @@ static void ME_SpawnMissionVehicles(mission_vehicle_t* vehs)
 					 		    vehs[i].origin,
 								vehs[i].angles);
 		if( !veh ) continue;
+		if( !Q_stricmp( vehs[i].side, "red" ) || !Q_stricmp( vehs[i].side, "blue" ) )
+			Q_strncpyz( veh->side, vehs[i].side, sizeof(veh->side) );
 		k = 0;
 		for( j = 0; j < IGME_MAX_WAYPOINTS; ++j )
 		{
@@ -1095,3 +1109,24 @@ void ME_Init_MissionEditor()
 }
 
 
+
+
+void ME_SetSide( const char* side )
+{
+	int i, count = 0;
+
+	if( Q_stricmp( side, "red" ) && Q_stricmp( side, "blue" ) && Q_stricmp( side, "none" ) ) {
+		CG_Printf( "usage: me_side <red|blue|none>\n" );
+		return;
+	}
+	for( i = 0; i < IGME_MAX_VEHICLES; ++i ) {
+		IGME_vehicle_t* veh = &cgs.IGME.vehicles[i];
+		if( !veh->active || !veh->selected ) continue;
+		if( !Q_stricmp( side, "none" ) )
+			veh->side[0] = 0;
+		else
+			Q_strncpyz( veh->side, side, sizeof(veh->side) );
+		count++;
+	}
+	CG_Printf( "%d object(s) set to side %s\n", count, side );
+}

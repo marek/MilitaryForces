@@ -1059,6 +1059,7 @@ struct mission_vehicle_t {
 	int				index;
 	char			objectname[MAX_NAME_LENGTH];
 	int				team;
+	char			side[MAX_NAME_LENGTH];
 	vec3_t			origin;
 	vec3_t			angles;
 	mission_waypoint_t waypoints[IGME_MAX_WAYPOINTS];
