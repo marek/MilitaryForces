@@ -31,7 +31,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define CTRL(a) ((a)-'a'+1)
 
-extern SDL_Window *SDL_window;
+static SDL_Window *SDL_window = NULL;
 
 static cvar_t *in_keyboardDebug     = NULL;
 

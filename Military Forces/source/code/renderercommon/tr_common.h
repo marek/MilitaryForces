@@ -34,7 +34,7 @@ typedef enum
 	IMGTYPE_DELUXE, // normals are swizzled, deluxe are not
 } imgType_t;
 
-typedef enum
+typedef enum : int
 {
 	IMGFLAG_NONE           = 0x0000,
 	IMGFLAG_MIPMAP         = 0x0001,

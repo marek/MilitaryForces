@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // cl_main.c  -- client main loop
 
 #include "client.h"
+#include "../sys/sys_loadlib.h"
 #include <limits.h>
 #include "../ui/ui.h"
 #include "../cgame/cg.h"
@@ -45,6 +46,10 @@ cvar_t	*cl_freezeDemo;
 cvar_t	*cl_shownet;
 cvar_t	*cl_showSend;
 cvar_t	*cl_timedemo;
+#ifdef USE_RENDERER_DLOPEN
+cvar_t	*cl_renderer;
+static void	*rendererLib = NULL;
+#endif
 cvar_t	*cl_aviFrameRate;
 cvar_t	*cl_aviMotionJpeg;
 cvar_t	*cl_forceavidemo;
@@ -2293,11 +2298,18 @@ CL_ShutdownRef
 ============
 */
 void CL_ShutdownRef( void ) {
-	if ( !refExport.Shutdown ) {
-		return;
+	if ( refExport.Shutdown ) {
+		refExport.Shutdown( true );
 	}
-	refExport.Shutdown( true );
+
 	Com_Memset( &refExport, 0, sizeof( refExport ) );
+
+#ifdef USE_RENDERER_DLOPEN
+	if ( rendererLib ) {
+		Sys_UnloadLibrary( rendererLib );
+		rendererLib = NULL;
+	}
+#endif
 }
 
 /*

@@ -27,6 +27,14 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define DEMOEXT	"dm_"			// standard demo extension
 
+#if defined _WIN32
+#define Q_EXPORT extern "C" __declspec(dllexport)
+#elif ( defined __GNUC__ || defined __clang__ )
+#define Q_EXPORT extern "C" __attribute__((visibility("default")))
+#else
+#define Q_EXPORT extern "C"
+#endif
+
 #ifdef STANDALONE
   #define PRODUCT_NAME				"Military Forces"
   #define BASEGAME					"mfdata"
@@ -372,13 +380,8 @@ void *Hunk_Alloc( int size, ha_pref preference );
 
 #define Snd_Memset Com_Memset
 
-#if !( defined __VECTORC )
-void Com_Memset (void* dest, const int val, const size_t count);
-void Com_Memcpy (void* dest, const void* src, const size_t count);
-#else
 #define Com_Memset memset
 #define Com_Memcpy memcpy
-#endif
 
 #define CIN_system	1
 #define CIN_loop	2
