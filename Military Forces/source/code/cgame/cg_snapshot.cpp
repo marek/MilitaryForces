@@ -26,6 +26,7 @@ static void CG_ResetEntity( centity_t *cent )
 	}
 
 	cent->trailTime = cg.snap->serverTime;
+	cent->errorTime = 0;
 
 	VectorCopy (cent->currentState.origin, cent->lerpOrigin);
 	VectorCopy (cent->currentState.angles, cent->lerpAngles);
@@ -208,6 +209,19 @@ static void CG_SetNextSnap( snapshot_t *snap ) {
 			cent->interpolate = false;
 		} else {
 			cent->interpolate = true;
+
+			if ( cg.snap && es->pos.trType == TR_LINEAR_STOP &&
+				es->pos.trTime - cent->currentState.pos.trTime > 3 * ( snap->serverTime - cg.snap->serverTime ) / 2 ) {
+				float	f = CG_EntityAngleErrorFraction( cent );
+				int		i;
+
+				for ( i = 0 ; i < 3 ; i++ ) {
+					cent->errorAngles[i] = AngleSubtract( cent->currentState.angles[i], es->angles[i] ) 
+						+ ( f > 0 ? f * cent->errorAngles[i] : 0 );
+				}
+				cent->errorTime = cg.time;
+				cent->errorSnapTime = snap->serverTime;
+			}
 		}
 	}
 

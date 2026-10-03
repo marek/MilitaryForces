@@ -666,6 +666,19 @@ void CG_AdjustPositionForMover( const vec3_t in, int moverNum, int fromTime, int
 CG_InterpolateEntityPosition
 =============================
 */
+float CG_EntityAngleErrorFraction( const centity_t *cent ) {
+	float	f;
+
+	if ( !cent->errorTime ) {
+		return 0;
+	}
+	f = 1.0f - ( cg.time - cent->errorTime ) / (float)ANGLE_ERROR_DECAY;
+	if ( f > 1.0f ) {
+		f = 1.0f;
+	}
+	return f;
+}
+
 static void CG_InterpolateEntityPosition( centity_t *cent ) {
 	vec3_t		current, next;
 	float		f;
@@ -697,6 +710,35 @@ static void CG_InterpolateEntityPosition( centity_t *cent ) {
 }
 
 /*
+=============================
+CG_VehicleLerpAngles
+
+=============================
+*/
+void CG_VehicleLerpAngles( centity_t *cent ) {
+	float	f;
+
+	if ( cent == &cg.predictedPlayerEntity || !cent->interpolate || !cg.nextSnap ) {
+		VectorCopy( cent->currentState.angles, cent->lerpAngles );
+		return;
+	}
+
+	if ( cent->errorSnapTime == cg.nextSnap->serverTime ) {
+		VectorCopy( cent->nextState.angles, cent->lerpAngles );
+	} else {
+		f = cg.frameInterpolation;
+		cent->lerpAngles[0] = LerpAngle( cent->currentState.angles[0], cent->nextState.angles[0], f );
+		cent->lerpAngles[1] = LerpAngle( cent->currentState.angles[1], cent->nextState.angles[1], f );
+		cent->lerpAngles[2] = LerpAngle( cent->currentState.angles[2], cent->nextState.angles[2], f );
+	}
+
+	f = CG_EntityAngleErrorFraction( cent );
+	if ( f > 0 ) {
+		VectorMA( cent->lerpAngles, f, cent->errorAngles, cent->lerpAngles );
+	}
+}
+
+/*
 ===============
 CG_CalcEntityLerpPositions
 
@@ -707,7 +749,7 @@ static void CG_CalcEntityLerpPositions( centity_t *cent ) {
 	// if this player does not want to see extrapolated players
 	if ( !cg_smoothClients.integer ) {
 		// make sure the clients use TR_INTERPOLATE
-		if ( cent->currentState.number < MAX_CLIENTS ) {
+		if ( cent->currentState.number <= MAX_CLIENTS ) {
 			cent->currentState.pos.trType = TR_INTERPOLATE;
 			cent->nextState.pos.trType = TR_INTERPOLATE;
 		}
@@ -721,7 +763,7 @@ static void CG_CalcEntityLerpPositions( centity_t *cent ) {
 	// first see if we can interpolate between two snaps for
 	// linear extrapolated clients
 	if ( cent->interpolate && cent->currentState.pos.trType == TR_LINEAR_STOP &&
-											cent->currentState.number < MAX_CLIENTS) {
+											cent->currentState.number <= MAX_CLIENTS) {
 		CG_InterpolateEntityPosition( cent );
 		return;
 	}

@@ -45,7 +45,7 @@ void CG_Boat( centity_t *cent, clientInfo_t *ci )
 	drawInfo.basicInfo.entityNum = cent->currentState.number;
 
     // get the rotation information
-    VectorCopy( cent->currentState.angles, cent->lerpAngles );
+    CG_VehicleLerpAngles( cent );
     AnglesToAxis( cent->lerpAngles, drawInfo.basicInfo.axis );
 
 	// position and orientation

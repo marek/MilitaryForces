@@ -33,7 +33,7 @@ static void CG_Misc_Plane( centity_t *cent )
 	drawInfo.basicInfo.entityNum = cent->currentState.number;
 
     // get the rotation information
-    VectorCopy( cent->currentState.angles, cent->lerpAngles );
+    CG_VehicleLerpAngles( cent );
     AnglesToAxis( cent->lerpAngles, drawInfo.basicInfo.axis );
 
 	// position and orientation
@@ -188,7 +188,7 @@ static void CG_Misc_GV( centity_t *cent )
 	drawInfo.basicInfo.entityNum = cent->currentState.number;
 
     // get the rotation information
-    VectorCopy( cent->currentState.angles, cent->lerpAngles );
+    CG_VehicleLerpAngles( cent );
     AnglesToAxis( cent->lerpAngles, drawInfo.basicInfo.axis );
 
 	// position and orientation
@@ -279,7 +279,7 @@ static void CG_Misc_Helo( centity_t *cent )
 	drawInfo.basicInfo.entityNum = cent->currentState.number;
 
     // get the rotation information
-    VectorCopy( cent->currentState.angles, cent->lerpAngles );
+    CG_VehicleLerpAngles( cent );
     AnglesToAxis( cent->lerpAngles, drawInfo.basicInfo.axis );
 
 	// position and orientation
@@ -362,7 +362,7 @@ static void CG_Misc_Boat( centity_t *cent )
 	drawInfo.basicInfo.entityNum = cent->currentState.number;
 
     // get the rotation information
-    VectorCopy( cent->currentState.angles, cent->lerpAngles );
+    CG_VehicleLerpAngles( cent );
     AnglesToAxis( cent->lerpAngles, drawInfo.basicInfo.axis );
 
 	// position and orientation
@@ -429,7 +429,7 @@ static void CG_Misc_GI( centity_t *cent )
 	drawInfo.basicInfo.entityNum = cent->currentState.number;
 
     // get the rotation information
-    VectorCopy( cent->currentState.angles, cent->lerpAngles );
+    CG_VehicleLerpAngles( cent );
     AnglesToAxis( cent->lerpAngles, drawInfo.basicInfo.axis );
 
 	// position and orientation

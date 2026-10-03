@@ -176,6 +176,8 @@ typedef struct {
 
 // centity_t have a direct corespondence with gentity_t in the game, but
 // only the entityState_t is directly communicated to the cgame
+#define	ANGLE_ERROR_DECAY	150
+
 typedef struct centity_s {
 	entityState_t	currentState;	// from cg.frame
 	entityState_t	nextState;		// from cg.nextFrame, if available
@@ -197,6 +199,7 @@ typedef struct centity_s {
 	playerEntity_t	pe;
 
 	int				errorTime;		// decay the error from this time
+	int				errorSnapTime;
 	vec3_t			errorOrigin;
 	vec3_t			errorAngles;
 	
@@ -1463,6 +1466,8 @@ void CG_PainEvent( centity_t *cent, int health );
 //
 void CG_SetEntitySoundPosition( centity_t *cent );
 void CG_AddPacketEntities( void );
+float CG_EntityAngleErrorFraction( const centity_t *cent );
+void CG_VehicleLerpAngles( centity_t *cent );
 void CG_Beam( centity_t *cent );
 void CG_AdjustPositionForMover( const vec3_t in, int moverNum, int fromTime, int toTime, vec3_t out );
 
