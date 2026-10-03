@@ -2387,6 +2387,198 @@ completeWeaponData_t availableWeapons[] =
 		0,									// basicECMVulnerability
 		0,									// flags
 	},
+	{ 
+		WT_ROCKET,							// type
+		MF_GAMESET_ANY,						// gameset
+		"S-8 (20)",				// descriptiveName
+		"S-8",				// shortName
+		"FFAR",								// shortName2 (GVs)
+		"models/weapons/vwep_rocket.md3",	// modelName
+		0,									// handle
+		"models/weapons/vwep_s8.md3",				// vwepName
+		0,									// vwephandle
+		"hud/iconw_rkt.tga",				// iconName
+		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
+		1500,								// muzzleVelocity
+		0,									// range
+		5000,								// fuelrange
+		180,								// fire interval
+		45,				// damage
+		55,				// damageRadius
+		1,									// spread
+		2,									// barrels
+		0,									// barrelDistance
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_ROCKETMODE,						// crosshair
+		CH_ROCKETMODE,						// crosshair track
+		CH_ROCKETMODE,						// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
+		20,				// number per package
+		CAT_HELO,				// fits on category
+		PF_FFAR,							// fits on pylon
+		0,									// basicECMVulnerability
+		WF_HAS_FIRE_FRAME,					// flags
+	},
+	{ 
+		WT_ROCKET,							// type
+		MF_GAMESET_ANY,						// gameset
+		"S-5 (32)",				// descriptiveName
+		"S-5",				// shortName
+		"FFAR",								// shortName2 (GVs)
+		"models/weapons/vwep_rocket.md3",	// modelName
+		0,									// handle
+		"models/weapons/vwep_s5.md3",				// vwepName
+		0,									// vwephandle
+		"hud/iconw_rkt.tga",				// iconName
+		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
+		1500,								// muzzleVelocity
+		0,									// range
+		5000,								// fuelrange
+		120,				// fire interval
+		25,				// damage
+		35,				// damageRadius
+		1,									// spread
+		2,									// barrels
+		0,									// barrelDistance
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_ROCKETMODE,						// crosshair
+		CH_ROCKETMODE,						// crosshair track
+		CH_ROCKETMODE,						// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
+		32,				// number per package
+		CAT_HELO,				// fits on category
+		PF_FFAR,							// fits on pylon
+		0,									// basicECMVulnerability
+		WF_HAS_FIRE_FRAME,					// flags
+	},
+	{ 
+		WT_ANTIGROUNDMISSILE,				// type
+		MF_GAMESET_ANY,						// gameset
+		"AT-6 Spiral",				// descriptiveName
+		"AT-6",				// shortName
+		"SSM",								// shortName2 (GVs)
+		"models/weapons/vwep_hellfire.md3",// modelName
+		0,									// handle
+		"models/weapons/vwep_at6.md3",				// vwepName
+		0,									// vwephandle
+		"hud/iconw_rkt.tga",				// iconName
+		0,									// iconHandle
+		CAT_GROUND,							// cat
+		0.3f,								// non cat mod
+		1000,								// muzzleVelocity
+		4500,								// range
+		6500,								// fuelrange
+		500,								// fire interval
+		110,								// damage
+		40,									// damageRadius
+		1,									// spread
+		2,									// barrels
+		0,									// barrelDistance
+		0.985f,								// lockcone (dot)
+		0.996f,								// followcone (dot)
+		2000,								// locktime
+		CH_MISSILEMODE,						// crosshair
+		CH_MISSILEMODETRACK,				// crosshair track
+		CH_MISSILEMODELOCK,					// crosshair lock
+		0,									// turret
+		{0,0,0},							// max turret angles
+		{0,0,0},							// min turret angles
+//		{5,180,0},							// max turret angles
+//		{-40,-180,0},						// min turret angles
+		2,				// number per package
+		CAT_HELO,				// fits on category
+		PF_AG_MED|PF_GUNPOD,				// fits on pylon
+		25,									// basicECMVulnerability
+		WF_HAS_FIRE_FRAME,					// flags
+	},
+	{ 
+		WT_MACHINEGUN,						// type
+		MF_GAMESET_MODERN,					// gameset
+		"20mm Cannon",				// descriptiveName
+		"GUN",								// shortName
+		"MG",								// shortName2 (GVs)
+		"",									// modelName
+		0,									// handle
+		"",									// vwepName
+		0,									// vwephandle
+		"hud/iconw_mg.tga",					// iconName
+		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
+		2900,								// muzzleVelocity
+		0,									// range
+		0,									// fuelrange
+		80,				// fire interval
+		12,				// damage
+		0,									// damageRadius
+		10,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
+		1,									// barrels
+		0,									// barrelDistance
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_GUNMODE,							// crosshair
+		CH_GUNMODE,							// crosshair track
+		CH_GUNMODE,							// crosshair lock
+		1,									// turret
+		{60,120,0},				// max turret angles
+		{-15,-120,0},				// min turret angles
+		1,									// number per package
+		CAT_ANY,							// fits on category
+		PF_NA,								// fits on pylon
+		0,									// basicECMVulnerability
+		0,									// flags
+	},
+	{ 
+		WT_MACHINEGUN,						// type
+		MF_GAMESET_MODERN,					// gameset
+		"12.7mm Yak-B",				// descriptiveName
+		"GUN",								// shortName
+		"MG",								// shortName2 (GVs)
+		"",									// modelName
+		0,									// handle
+		"",									// vwepName
+		0,									// vwephandle
+		"hud/iconw_mg.tga",					// iconName
+		0,									// iconHandle
+		CAT_ANY,							// cat
+		0,									// non cat mod
+		2900,								// muzzleVelocity
+		0,									// range
+		0,									// fuelrange
+		40,				// fire interval
+		7,				// damage
+		0,									// damageRadius
+		10,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
+		1,									// barrels
+		0,									// barrelDistance
+		0,									// lockcone
+		0,									// followcone
+		0,									// locktime
+		CH_GUNMODE,							// crosshair
+		CH_GUNMODE,							// crosshair track
+		CH_GUNMODE,							// crosshair lock
+		1,									// turret
+		{60,60,0},				// max turret angles
+		{-20,-60,0},				// min turret angles
+		1,									// number per package
+		CAT_ANY,							// fits on category
+		PF_NA,								// fits on pylon
+		0,									// basicECMVulnerability
+		0,									// flags
+	},
 	// ****************************************************************************** 
 
 

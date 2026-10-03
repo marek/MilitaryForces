@@ -367,6 +367,44 @@ void PM_HeloMove( void )
 		pm->updateGear = false;
 	}
 
+	// bay
+	if( availableVehicles[pm->vehicle].caps & HC_WEAPONBAY ) {
+		if( !dead && (pm->cmd.buttons & BUTTON_WEAPONBAY) ) {
+			PM_Toggle_Bay();
+		}
+
+		// bayanim
+		if( !dead ) {
+			if( pm->ps->timers[TIMER_BAYANIM] ) {
+				if( pm->cmd.serverTime >= pm->ps->timers[TIMER_BAYANIM] ) {
+					pm->ps->timers[TIMER_BAYANIM] = 0;
+					if( pm->ps->ONOFF & OO_WEAPONBAY ) {
+						pm->ps->ONOFF &= ~OO_WEAPONBAY;
+					} else {
+						pm->ps->ONOFF |= OO_WEAPONBAY;
+						pm->ps->timers[TIMER_BAYCLOSE] = pm->cmd.serverTime + 10000;
+					}
+				}
+			} else {
+				if( pm->ps->timers[TIMER_BAYCLOSE] && 
+					pm->cmd.serverTime >= pm->ps->timers[TIMER_BAYCLOSE] ) {
+					PM_Toggle_Bay();
+				}
+			}
+		}
+
+		// update bay
+		if( pm->updateBay ) {
+			// sync anim
+			if( pm->ps->ONOFF & OO_WEAPONBAY ) {
+				PM_AddEvent( EV_BAY_DOWN_FULL );
+			} else {
+				PM_AddEvent( EV_BAY_UP_FULL );
+			}
+			pm->updateBay = false;
+		}
+	}
+
 	// get the actual turret angles
 	AngleVectors( pm->ps->vehicleAngles, forward, 0, up );
 	RotatePointAroundVector( temp, up, forward, turret_yaw );

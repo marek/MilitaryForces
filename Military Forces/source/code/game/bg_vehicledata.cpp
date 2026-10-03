@@ -3052,11 +3052,11 @@ completeVehicleData_t availableVehicles[] =
 	"comanche",						// modelName
 	SHADOW_DEFAULT,				// alpha shadow
 	MF_GAMESET_MODERN,			// id
-	MF_TEAM_2,
+	MF_TEAM_1,
 	CAT_HELO,
-	CLASS_HELO_RECON,
+	CLASS_HELO_ATTACK,
 	0,							// flags
-	0,	// capabilities
+	HC_GEAR|HC_WEAPONBAY,				// capabilities
 	{0,0,0,0,0,0,0,0,0,0},		// handles - SET AUTOMATICALLY
 	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
 	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
@@ -3064,20 +3064,20 @@ completeVehicleData_t availableVehicles[] =
 	{0, 100, 80},				// camera distance {min,max,default}
 	{0, 100, 25},				// camera height {min,max,default}
 	0,							// stallspeed
-	300,						// maxspeed
+	380,				// maxspeed
 	-5,							// min throttle
 	10,						    // max throttle
 	1,							// engines
 	0,							// wheels
 	0,							// wheel circumference
 	33,							// acceleration
-	170,						// health
-	{3, 1, 6},					// gun tag
+	200,				// health
+	{18, 0, -4},				// gun tag
 	160,						// max fuel
-	285,						// max gun pitch (upwards = negative) <- gearheight
-	5,							// min gun pitch (downwards = positive) <- tailangle
-	0, WI_MGT_7_62MM, WI_FUELCRATE, WI_HEALTHCRATE, WI_AMMOCRATE, 0, 0, WI_FLARE,// weapons
-	0, 1500, 3, 3, 3, 0, 0, 20,	// ammo
+	0,				// max gun pitch (upwards = negative) <- gearheight
+	0,				// min gun pitch (downwards = positive) <- tailangle
+	0, WI_MGT_20MM, WI_HELLFIRE, WI_STINGER, 0, 0, 0, WI_FLARE,				// weapons
+	0, 500, 4, 2, 0, 0, 0, 30,				// ammo
 	1,0,0,0,0,0,0,0,			// turret
 	{0, 0, 10},					// cameraposition for cockpit view
 	0,							// effect model
@@ -3086,9 +3086,249 @@ completeVehicleData_t availableVehicles[] =
 	-1,							// trackcone
 	0,							// trackcone ground
 	0,							// swingangle
-	0,							// geartime
+	1000,				// geartime
 	0,							// max gear frame
-	0,							// baytime
+	500,				// baytime
+	0,							// max bay frame
+	0,							// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
+    },
+
+	{	"RAH-66 Comanche (AT)",			// descriptiveName
+	"RAH-66",						// tinyName
+	"comanche",						// modelName
+	SHADOW_DEFAULT,				// alpha shadow
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_1,
+	CAT_HELO,
+	CLASS_HELO_ATTACK,
+	0,							// flags
+	HC_GEAR|HC_WEAPONBAY,				// capabilities
+	{0,0,0,0,0,0,0,0,0,0},		// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
+	{50, 125, 70},				// turnspeed around the three axis
+	{0, 100, 80},				// camera distance {min,max,default}
+	{0, 100, 25},				// camera height {min,max,default}
+	0,							// stallspeed
+	380,				// maxspeed
+	-5,							// min throttle
+	10,						    // max throttle
+	1,							// engines
+	0,							// wheels
+	0,							// wheel circumference
+	33,							// acceleration
+	200,				// health
+	{18, 0, -4},				// gun tag
+	160,						// max fuel
+	0,				// max gun pitch (upwards = negative) <- gearheight
+	0,				// min gun pitch (downwards = positive) <- tailangle
+	0, WI_MGT_20MM, WI_HELLFIRE, 0, 0, 0, 0, WI_FLARE,				// weapons
+	0, 500, 6, 0, 0, 0, 0, 30,				// ammo
+	1,0,0,0,0,0,0,0,			// turret
+	{0, 0, 10},					// cameraposition for cockpit view
+	0,							// effect model
+	8000,						// radar range
+	5000,						// radar range ground
+	-1,							// trackcone
+	0,							// trackcone ground
+	0,							// swingangle
+	1000,				// geartime
+	0,							// max gear frame
+	500,				// baytime
+	0,							// max bay frame
+	0,							// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
+    },
+
+	{	"RAH-66 Comanche (AA)",			// descriptiveName
+	"RAH-66",						// tinyName
+	"comanche",						// modelName
+	SHADOW_DEFAULT,				// alpha shadow
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_1,
+	CAT_HELO,
+	CLASS_HELO_ATTACK,
+	0,							// flags
+	HC_GEAR|HC_WEAPONBAY,				// capabilities
+	{0,0,0,0,0,0,0,0,0,0},		// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
+	{50, 125, 70},				// turnspeed around the three axis
+	{0, 100, 80},				// camera distance {min,max,default}
+	{0, 100, 25},				// camera height {min,max,default}
+	0,							// stallspeed
+	380,				// maxspeed
+	-5,							// min throttle
+	10,						    // max throttle
+	1,							// engines
+	0,							// wheels
+	0,							// wheel circumference
+	33,							// acceleration
+	200,				// health
+	{18, 0, -4},				// gun tag
+	160,						// max fuel
+	0,				// max gun pitch (upwards = negative) <- gearheight
+	0,				// min gun pitch (downwards = positive) <- tailangle
+	0, WI_MGT_20MM, WI_STINGER, 0, 0, 0, 0, WI_FLARE,				// weapons
+	0, 500, 6, 0, 0, 0, 0, 30,				// ammo
+	1,0,0,0,0,0,0,0,			// turret
+	{0, 0, 10},					// cameraposition for cockpit view
+	0,							// effect model
+	8000,						// radar range
+	5000,						// radar range ground
+	-1,							// trackcone
+	0,							// trackcone ground
+	0,							// swingangle
+	1000,				// geartime
+	0,							// max gear frame
+	500,				// baytime
+	0,							// max bay frame
+	0,							// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
+    },
+
+	{	"Mi-24V Hind",			// descriptiveName
+	"Mi-24",						// tinyName
+	"mi-24",						// modelName
+	SHADOW_DEFAULT,				// alpha shadow
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_2,
+	CAT_HELO,
+	CLASS_HELO_ATTACK,
+	0,							// flags
+	HC_GEAR,				// capabilities
+	{0,0,0,0,0,0,0,0,0,0},		// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
+	{50, 125, 70},				// turnspeed around the three axis
+	{0, 100, 80},				// camera distance {min,max,default}
+	{0, 100, 25},				// camera height {min,max,default}
+	0,							// stallspeed
+	400,				// maxspeed
+	-5,							// min throttle
+	10,						    // max throttle
+	1,							// engines
+	0,							// wheels
+	0,							// wheel circumference
+	33,							// acceleration
+	300,				// health
+	{23, 0, -6},				// gun tag
+	160,						// max fuel
+	0,				// max gun pitch (upwards = negative) <- gearheight
+	0,				// min gun pitch (downwards = positive) <- tailangle
+	0, WI_MGT_YAKB, WI_AT6, WI_S8, 0, 0, 0, WI_FLARE,				// weapons
+	0, 1470, 2, 4, 0, 0, 0, 30,				// ammo
+	1,0,0,0,0,0,0,0,			// turret
+	{0, 0, 10},					// cameraposition for cockpit view
+	0,							// effect model
+	8000,						// radar range
+	5000,						// radar range ground
+	-1,							// trackcone
+	0,							// trackcone ground
+	0,							// swingangle
+	1200,				// geartime
+	0,							// max gear frame
+	0,				// baytime
+	0,							// max bay frame
+	0,							// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
+    },
+
+	{	"Mi-24V Hind (CAS)",			// descriptiveName
+	"Mi-24",						// tinyName
+	"mi-24",						// modelName
+	SHADOW_DEFAULT,				// alpha shadow
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_2,
+	CAT_HELO,
+	CLASS_HELO_ATTACK,
+	0,							// flags
+	HC_GEAR,				// capabilities
+	{0,0,0,0,0,0,0,0,0,0},		// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
+	{50, 125, 70},				// turnspeed around the three axis
+	{0, 100, 80},				// camera distance {min,max,default}
+	{0, 100, 25},				// camera height {min,max,default}
+	0,							// stallspeed
+	400,				// maxspeed
+	-5,							// min throttle
+	10,						    // max throttle
+	1,							// engines
+	0,							// wheels
+	0,							// wheel circumference
+	33,							// acceleration
+	300,				// health
+	{23, 0, -6},				// gun tag
+	160,						// max fuel
+	0,				// max gun pitch (upwards = negative) <- gearheight
+	0,				// min gun pitch (downwards = positive) <- tailangle
+	0, WI_MGT_YAKB, WI_S5, WI_S8, 0, 0, 0, WI_FLARE,				// weapons
+	0, 1470, 2, 2, 0, 0, 0, 30,				// ammo
+	1,0,0,0,0,0,0,0,			// turret
+	{0, 0, 10},					// cameraposition for cockpit view
+	0,							// effect model
+	8000,						// radar range
+	5000,						// radar range ground
+	-1,							// trackcone
+	0,							// trackcone ground
+	0,							// swingangle
+	1200,				// geartime
+	0,							// max gear frame
+	0,				// baytime
+	0,							// max bay frame
+	0,							// renderflags
+	{0,0,0,0},					// shadow coordinates
+	{0,0,0,0}					// shadow orientation adjusters
+    },
+
+	{	"Mi-35 Hind",			// descriptiveName
+	"Mi-35",						// tinyName
+	"mi-35",						// modelName
+	SHADOW_DEFAULT,				// alpha shadow
+	MF_GAMESET_MODERN,			// id
+	MF_TEAM_2,
+	CAT_HELO,
+	CLASS_HELO_ATTACK,
+	0,							// flags
+	HC_GEAR,				// capabilities
+	{0,0,0,0,0,0,0,0,0,0},		// handles - SET AUTOMATICALLY
+	{0, 0, 0},					// mins (bounding box) - SET AUTOMATICALLY
+	{0, 0, 0},					// max (bounding box) - SET AUTOMATICALLY
+	{50, 125, 70},				// turnspeed around the three axis
+	{0, 100, 80},				// camera distance {min,max,default}
+	{0, 100, 25},				// camera height {min,max,default}
+	0,							// stallspeed
+	400,				// maxspeed
+	-5,							// min throttle
+	10,						    // max throttle
+	1,							// engines
+	0,							// wheels
+	0,							// wheel circumference
+	33,							// acceleration
+	300,				// health
+	{24, -2.6, -5.3},				// gun tag
+	160,						// max fuel
+	0,				// max gun pitch (upwards = negative) <- gearheight
+	0,				// min gun pitch (downwards = positive) <- tailangle
+	WI_MG_30MM, 0, WI_AT6, WI_S8, 0, 0, 0, WI_FLARE,				// weapons
+	750, 0, 2, 4, 0, 0, 0, 30,				// ammo
+	0,0,0,0,0,0,0,0,			// turret
+	{0, 0, 10},					// cameraposition for cockpit view
+	0,							// effect model
+	8000,						// radar range
+	5000,						// radar range ground
+	-1,							// trackcone
+	0,							// trackcone ground
+	0,							// swingangle
+	1200,				// geartime
+	0,							// max gear frame
+	0,				// baytime
 	0,							// max bay frame
 	0,							// renderflags
 	{0,0,0,0},					// shadow coordinates

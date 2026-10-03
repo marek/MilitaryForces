@@ -491,6 +491,30 @@ void MF_LoadAllVehicleData()
 				availableVehicles[i].maxGearFrame = GEAR_DOWN_DEFAULT;
 			}
 
+			// bay
+			Com_sprintf( name, sizeof(name), "%s_bay.md3", modelbasename );
+
+			FS_FOpenFileByMode(name, &f, FS_READ);
+
+			if(f && MF_getNumberOfFrames( name, &num ) ) 
+			{
+				FS_FCloseFile(f);
+				availableVehicles[i].maxBayFrame = num - 1;
+			}
+			else 
+				availableVehicles[i].maxBayFrame = BAY_DOWN_DEFAULT;
+
+			// correct actual loadouts
+			if( availableLoadouts[i].usedMounts ) {
+				for( j = WP_WEAPON1; j < WP_FLARE; ++j ) {
+					if( availableVehicles[i].weapons[j] &&
+						availableWeapons[availableVehicles[i].weapons[j]].type != WT_MACHINEGUN ) {
+						availableVehicles[i].ammo[j] = 
+							MF_findWeaponsOfType( availableVehicles[i].weapons[j], &availableLoadouts[i] );
+					}
+				}
+			}
+
 		} else if( (availableVehicles[i].cat & CAT_GROUND) ) {
 
 			// increaes bounding box by turret height

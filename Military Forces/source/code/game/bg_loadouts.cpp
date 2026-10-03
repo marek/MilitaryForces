@@ -41,7 +41,13 @@ bool MF_distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout )
 //	Com_Printf( "Calculating weapon stations for %s\n", availableVehicles[idx].tinyName );
 //#endif
 
+	loadout->mountsOnBay = false;
 	num = MF_getTagsContaining(modelname, "tag_P", tags, MAX_MOUNTS_PER_VEHICLE );
+	if( !num && (availableVehicles[idx].cat & CAT_HELO) ) {
+		modelname = MF_CreateModelPathname( idx, "models/vehicles/%s/%s/%s_bay.md3" );
+		num = MF_getTagsContaining(modelname, "tag_P", tags, MAX_MOUNTS_PER_VEHICLE );
+		loadout->mountsOnBay = num > 0;
+	}
 	if( !num ) return false;
 
 	for( i = 0; i < num; ++i ) {

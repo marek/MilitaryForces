@@ -142,7 +142,47 @@ void CG_Helo( centity_t *cent, clientInfo_t *ci )
 	drawInfo.basicInfo.throttle = cent->currentState.frame;
 
 	// loadout
-	drawInfo.basicInfo.usedLoadout = 0;//&cg_loadouts[cent->currentState.number];
+	CG_SetDrawLoadout( cent, &drawInfo.basicInfo );
+
+	// gear
+	if( availableVehicles[ci->vehicle].caps & HC_GEAR ) {
+		int timediff = cg.time - cent->gearAnimStartTime;
+		int geardown = availableVehicles[ci->vehicle].maxGearFrame;
+		if( cent->gearAnim == GEAR_ANIM_UP ) {
+			cent->gearAnimFrame = geardown - timediff/25;
+			if( cent->gearAnimFrame < GEAR_UP ) {
+				cent->gearAnimFrame = GEAR_UP;
+				cent->gearAnim = GEAR_ANIM_STOP;
+			}
+		} else if( cent->gearAnim == GEAR_ANIM_DOWN ) {
+			cent->gearAnimFrame = GEAR_UP + timediff/25;
+			if( cent->gearAnimFrame > geardown ) {
+				cent->gearAnimFrame = geardown;
+				cent->gearAnim = GEAR_ANIM_STOP;
+			}
+		}
+		drawInfo.gearFrame = cent->gearAnimFrame;
+	}
+
+	// bay
+	if( availableVehicles[ci->vehicle].caps & HC_WEAPONBAY ) {
+		int timediff = cg.time - cent->bayAnimStartTime;
+		int baydown = availableVehicles[ci->vehicle].maxBayFrame;
+		if( cent->bayAnim == BAY_ANIM_UP ) {
+			cent->bayAnimFrame = baydown - timediff/25;
+			if( cent->bayAnimFrame < BAY_UP ) {
+				cent->bayAnimFrame = BAY_UP;
+				cent->bayAnim = BAY_ANIM_STOP;
+			}
+		} else if( cent->bayAnim == BAY_ANIM_DOWN ) {
+			cent->bayAnimFrame = BAY_UP + timediff/25;
+			if( cent->bayAnimFrame > baydown ) {
+				cent->bayAnimFrame = baydown;
+				cent->bayAnim = BAY_ANIM_STOP;
+			}
+		}
+		drawInfo.bayFrame = cent->bayAnimFrame;
+	}
 
     // turrets
 	for( i = 0; i < 4; ++i ) {

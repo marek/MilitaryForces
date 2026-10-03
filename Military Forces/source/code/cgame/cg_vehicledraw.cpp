@@ -31,6 +31,9 @@ char *helo_tags[BP_HELO_MAX_PARTS] =
 	"tag_weap",		// gun
 	"tag_turret2",	// turret
 	"tag_weap2",	// gun
+	"tag_gear",		// gear
+	"tag_bay",		// bay
+	"tag_parts",	// variant parts
 };
 
 char *engine_tags[3] =
@@ -571,6 +574,46 @@ refEntity_t	    part[BP_HELO_MAX_PARTS];
 		refExport.AddRefEntityToScene( &part[i] );
 	}
 
+
+	// gear, bay, variant parts
+	for( i = BP_HELO_GEAR; i <= BP_HELO_PARTS; i++ ) {
+		part[i].hModel = veh->handle[i];
+		if( !part[i].hModel ) {
+			continue;
+		}
+		if( i == BP_HELO_GEAR ) part[i].frame = drawInfo->gearFrame;
+		else if( i == BP_HELO_BAY ) part[i].frame = drawInfo->bayFrame;
+		VectorCopy( drawInfo->basicInfo.origin, part[i].lightingOrigin );
+		AxisCopy( axisDefault, part[i].axis );
+		CG_PositionEntityOnTag( &part[i], &part[BP_HELO_BODY], veh->handle[BP_HELO_BODY], helo_tags[i] );
+		part[i].shadowPlane = shadowPlane;
+		part[i].renderfx = renderfx;
+		refExport.AddRefEntityToScene( &part[i] );
+	}
+
+	// vwep
+	if( (veh->renderFlags & MFR_VWEP) && drawInfo->basicInfo.usedLoadout ) 
+	{
+		refEntity_t			vwep;
+		int					parent = drawInfo->basicInfo.usedLoadout->mountsOnBay ? BP_HELO_BAY : BP_HELO_BODY;
+
+		for( i = 0; i < drawInfo->basicInfo.usedLoadout->usedMounts; ++i )
+		{
+			if( drawInfo->basicInfo.usedLoadout->mounts[i].weapon && 
+				drawInfo->basicInfo.numWeaponsOnMount[i] ) 
+			{
+				memset( &vwep, 0, sizeof(vwep) );		
+				vwep.hModel = availableWeapons[drawInfo->basicInfo.usedLoadout->mounts[i].weapon].vwepHandle;
+				VectorCopy( drawInfo->basicInfo.origin, vwep.lightingOrigin );
+				AxisCopy( axisDefault, vwep.axis );
+				CG_PositionEntityOnTag( &vwep, &part[parent], veh->handle[parent], 
+						drawInfo->basicInfo.usedLoadout->mounts[i].tag.name );
+				vwep.shadowPlane = shadowPlane;
+				vwep.renderfx = renderfx;
+				refExport.AddRefEntityToScene( &vwep );
+			}
+		}
+	}
 
 //
     // turrets

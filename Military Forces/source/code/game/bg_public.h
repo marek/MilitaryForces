@@ -716,7 +716,10 @@ extern const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1];
 #define BP_HELO_GUNBARREL		4
 #define BP_HELO_TURRET2			5
 #define BP_HELO_GUNBARREL2		6
-#define BP_HELO_MAX_PARTS		7
+#define BP_HELO_GEAR			7
+#define BP_HELO_BAY				8
+#define BP_HELO_PARTS			9
+#define BP_HELO_MAX_PARTS		10
 
 
 // ground installations
@@ -730,7 +733,7 @@ extern const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1];
 
 
 // total max parts (no cat may exceed this!)
-#define BP_MAX_PARTS			10
+#define BP_MAX_PARTS			16
 
 // fallback modes if no custom shader can be found for a vehicle
 #define	SHADOW_DEFAULT	-1
@@ -790,6 +793,7 @@ struct completeLoadout_t
 {
 	mountInfo_t	mounts[MAX_MOUNTS_PER_VEHICLE];
 	int			usedMounts;
+	bool		mountsOnBay;
 	animation_t	animations[MAX_TOTALANIMATIONS];
 };
 
@@ -1021,6 +1025,11 @@ enum weaponIndex_t
 	WI_NM5MT,
 	WI_NM1MT,
 	WI_FLAK,
+	WI_S8,
+	WI_S5,
+	WI_AT6,
+	WI_MGT_20MM,
+	WI_MGT_YAKB,
 	WI_MAX
 };
 

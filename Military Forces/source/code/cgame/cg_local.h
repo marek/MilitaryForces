@@ -973,6 +973,8 @@ typedef struct {
     BasicDrawInfo_t		basicInfo;
 	float				turretAngle[4];
 	float				gunAngle[4];
+	int					gearFrame;
+	int					bayFrame;
 } DrawInfo_Helo_t;
 
 typedef struct {

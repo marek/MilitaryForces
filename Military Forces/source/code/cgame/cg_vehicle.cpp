@@ -359,6 +359,15 @@ static void CG_CacheHelo(int index)
 		case BP_HELO_GUNBARREL2:
 			Com_sprintf( name, sizeof(name), "%s_gun2.md3", basename );
 			break;
+		case BP_HELO_GEAR:
+			Com_sprintf( name, sizeof(name), "%s_gear.md3", basename );
+			break;
+		case BP_HELO_BAY:
+			Com_sprintf( name, sizeof(name), "%s_bay.md3", basename );
+			break;
+		case BP_HELO_PARTS:
+			Com_sprintf( name, sizeof(name), "%s_parts.md3", basename );
+			break;
 		}
 		availableVehicles[index].handle[i] = CG_RegisterVehiclePart( name, false );
 	}
@@ -715,7 +724,8 @@ void CG_SetDrawLoadout( centity_t* cent, BasicDrawInfo_t* info )
 
 	bool local = cent->currentState.eType == ET_VEHICLE && cent->currentState.clientNum == cg.snap->ps.clientNum;
 	for( int i = 0; i < info->usedLoadout->usedMounts; ++i ) 
-		info->numWeaponsOnMount[i] = local ? cg.snap->ps.numWeaponsOnMount[i] : info->usedLoadout->mounts[i].num;
+		info->numWeaponsOnMount[i] = local ? cg.snap->ps.numWeaponsOnMount[i] :
+			( (cent->currentState.mountMask & (1 << i)) ? info->usedLoadout->mounts[i].num : 0 );
 }
 
 /*
