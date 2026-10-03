@@ -1125,7 +1125,7 @@ int MF_findWeaponsOfType( int weaponIndex, completeLoadout_t* loadout );
 #define	HC_WEAPONBAY			512
 
 // LQM Animations (replace instead of using frame index, and let CG read animation.cfg)
-#define LQM_SCALE				0.1f
+#define LQM_SCALE				0.14f
 #define A_LQM_STAND				0
 #define A_LQM_FORWARD			1
 #define A_LQM_BACKWARD			2
