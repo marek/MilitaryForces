@@ -216,11 +216,10 @@ static void CG_SetNextSnap( snapshot_t *snap ) {
 				int		i;
 
 				for ( i = 0 ; i < 3 ; i++ ) {
-					cent->errorAngles[i] = AngleSubtract( cent->currentState.angles[i], es->angles[i] ) 
-						+ ( f > 0 ? f * cent->errorAngles[i] : 0 );
 					cent->errorAngles2[i] = AngleSubtract( cent->currentState.angles2[i], es->angles2[i] ) 
 						+ ( f > 0 ? f * cent->errorAngles2[i] : 0 );
 				}
+				VectorCopy( cent->lerpAngles, cent->errorAngles );
 				cent->errorTime = cg.time;
 				cent->errorSnapTime = snap->serverTime;
 			}

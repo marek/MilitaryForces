@@ -669,6 +669,10 @@ float	Q_crandom( int *seed );
 
 void vectoangles( const vec3_t value1, vec3_t angles);
 void AnglesToAxis( const vec3_t angles, vec3_t axis[3] );
+void AxisToAngles( vec3_t axis[3], vec3_t angles );
+void AnglesToQuat( const vec3_t angles, quat_t q );
+void QuatToAngles( const quat_t q, vec3_t angles );
+void QuatInterpolate( const quat_t from, const quat_t to, float frac, quat_t out );
 
 void AxisClear( vec3_t axis[3] );
 void AxisCopy( vec3_t in[3], vec3_t out[3] );

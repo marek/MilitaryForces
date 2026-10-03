@@ -716,6 +716,7 @@ CG_VehicleLerpAngles
 =============================
 */
 void CG_VehicleLerpAngles( centity_t *cent ) {
+	quat_t	current, next, out;
 	float	f;
 
 	if ( cent == &cg.predictedPlayerEntity || !cent->interpolate || !cg.nextSnap ) {
@@ -724,14 +725,15 @@ void CG_VehicleLerpAngles( centity_t *cent ) {
 		return;
 	}
 
+	AnglesToQuat( cent->nextState.angles, next );
+
 	if ( cent->errorSnapTime == cg.nextSnap->serverTime ) {
-		VectorCopy( cent->nextState.angles, cent->lerpAngles );
+		QuatCopy( next, out );
 		VectorCopy( cent->nextState.angles2, cent->lerpAngles2 );
 	} else {
 		f = cg.frameInterpolation;
-		cent->lerpAngles[0] = LerpAngle( cent->currentState.angles[0], cent->nextState.angles[0], f );
-		cent->lerpAngles[1] = LerpAngle( cent->currentState.angles[1], cent->nextState.angles[1], f );
-		cent->lerpAngles[2] = LerpAngle( cent->currentState.angles[2], cent->nextState.angles[2], f );
+		AnglesToQuat( cent->currentState.angles, current );
+		QuatInterpolate( current, next, f, out );
 		cent->lerpAngles2[0] = LerpAngle( cent->currentState.angles2[0], cent->nextState.angles2[0], f );
 		cent->lerpAngles2[1] = LerpAngle( cent->currentState.angles2[1], cent->nextState.angles2[1], f );
 		cent->lerpAngles2[2] = LerpAngle( cent->currentState.angles2[2], cent->nextState.angles2[2], f );
@@ -739,9 +741,12 @@ void CG_VehicleLerpAngles( centity_t *cent ) {
 
 	f = CG_EntityAngleErrorFraction( cent );
 	if ( f > 0 ) {
-		VectorMA( cent->lerpAngles, f, cent->errorAngles, cent->lerpAngles );
+		AnglesToQuat( cent->errorAngles, current );
+		QuatInterpolate( out, current, f, out );
 		VectorMA( cent->lerpAngles2, f, cent->errorAngles2, cent->lerpAngles2 );
 	}
+
+	QuatToAngles( out, cent->lerpAngles );
 }
 
 /*

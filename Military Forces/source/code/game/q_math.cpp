@@ -426,6 +426,127 @@ void AnglesToAxis( const vec3_t angles, vec3_t axis[3] ) {
 	VectorSubtract( vec3_origin, right, axis[1] );
 }
 
+/*
+=================
+AxisToAngles
+=================
+*/
+void AxisToAngles( vec3_t axis[3], vec3_t angles ) {
+	float	sp = -axis[0][2];
+
+	if ( sp > 0.999999f || sp < -0.999999f ) {
+		angles[PITCH] = sp > 0 ? 90 : -90;
+		angles[YAW] = RAD2DEG( atan2( -axis[1][0], axis[1][1] ) );
+		angles[ROLL] = 0;
+		return;
+	}
+	angles[PITCH] = RAD2DEG( asin( sp ) );
+	angles[YAW] = RAD2DEG( atan2( axis[0][1], axis[0][0] ) );
+	angles[ROLL] = RAD2DEG( atan2( axis[1][2], axis[2][2] ) );
+}
+
+/*
+=================
+AnglesToQuat
+=================
+*/
+void AnglesToQuat( const vec3_t angles, quat_t q ) {
+	vec3_t	axis[3];
+	float	trace, s;
+
+	AnglesToAxis( angles, axis );
+
+	trace = axis[0][0] + axis[1][1] + axis[2][2];
+	if ( trace > 0 ) {
+		s = sqrt( trace + 1.0f ) * 2;
+		q[3] = 0.25f * s;
+		q[0] = ( axis[1][2] - axis[2][1] ) / s;
+		q[1] = ( axis[2][0] - axis[0][2] ) / s;
+		q[2] = ( axis[0][1] - axis[1][0] ) / s;
+	} else if ( axis[0][0] > axis[1][1] && axis[0][0] > axis[2][2] ) {
+		s = sqrt( 1.0f + axis[0][0] - axis[1][1] - axis[2][2] ) * 2;
+		q[3] = ( axis[1][2] - axis[2][1] ) / s;
+		q[0] = 0.25f * s;
+		q[1] = ( axis[1][0] + axis[0][1] ) / s;
+		q[2] = ( axis[2][0] + axis[0][2] ) / s;
+	} else if ( axis[1][1] > axis[2][2] ) {
+		s = sqrt( 1.0f + axis[1][1] - axis[0][0] - axis[2][2] ) * 2;
+		q[3] = ( axis[2][0] - axis[0][2] ) / s;
+		q[0] = ( axis[1][0] + axis[0][1] ) / s;
+		q[1] = 0.25f * s;
+		q[2] = ( axis[2][1] + axis[1][2] ) / s;
+	} else {
+		s = sqrt( 1.0f + axis[2][2] - axis[0][0] - axis[1][1] ) * 2;
+		q[3] = ( axis[0][1] - axis[1][0] ) / s;
+		q[0] = ( axis[2][0] + axis[0][2] ) / s;
+		q[1] = ( axis[2][1] + axis[1][2] ) / s;
+		q[2] = 0.25f * s;
+	}
+}
+
+/*
+=================
+QuatToAngles
+=================
+*/
+void QuatToAngles( const quat_t q, vec3_t angles ) {
+	vec3_t	axis[3];
+	float	x = q[0], y = q[1], z = q[2], w = q[3];
+
+	axis[0][0] = 1 - 2 * ( y * y + z * z );
+	axis[0][1] = 2 * ( x * y + z * w );
+	axis[0][2] = 2 * ( x * z - y * w );
+	axis[1][0] = 2 * ( x * y - z * w );
+	axis[1][1] = 1 - 2 * ( x * x + z * z );
+	axis[1][2] = 2 * ( y * z + x * w );
+	axis[2][0] = 2 * ( x * z + y * w );
+	axis[2][1] = 2 * ( y * z - x * w );
+	axis[2][2] = 1 - 2 * ( x * x + y * y );
+
+	AxisToAngles( axis, angles );
+}
+
+/*
+=================
+QuatInterpolate
+=================
+*/
+void QuatInterpolate( const quat_t from, const quat_t to, float frac, quat_t out ) {
+	quat_t	end;
+	float	dot, angle, sinAngle, a, b, len;
+	int		i;
+
+	dot = from[0] * to[0] + from[1] * to[1] + from[2] * to[2] + from[3] * to[3];
+	if ( dot < 0 ) {
+		dot = -dot;
+		for ( i = 0 ; i < 4 ; i++ ) {
+			end[i] = -to[i];
+		}
+	} else {
+		QuatCopy( to, end );
+	}
+
+	if ( dot > 0.9995f ) {
+		a = 1.0f - frac;
+		b = frac;
+	} else {
+		angle = acos( dot );
+		sinAngle = sin( angle );
+		a = sin( ( 1.0f - frac ) * angle ) / sinAngle;
+		b = sin( frac * angle ) / sinAngle;
+	}
+
+	for ( i = 0 ; i < 4 ; i++ ) {
+		out[i] = a * from[i] + b * end[i];
+	}
+	len = sqrt( out[0] * out[0] + out[1] * out[1] + out[2] * out[2] + out[3] * out[3] );
+	if ( len > 0 ) {
+		for ( i = 0 ; i < 4 ; i++ ) {
+			out[i] /= len;
+		}
+	}
+}
+
 void AxisClear( vec3_t axis[3] ) {
 	axis[0][0] = 1;
 	axis[0][1] = 0;
