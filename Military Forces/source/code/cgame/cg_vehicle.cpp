@@ -181,6 +181,9 @@ static animation_t * CG_ParseLQMAnimationFile( const char *filename ) {
 	return animations;
 }
 
+#define MAX_TEAM_SKIN_MODELS	2048
+static qhandle_t cg_teamSkins[2][MAX_TEAM_SKIN_MODELS];
+
 static qhandle_t CG_RegisterVehiclePart( const char *name, bool expected )
 {
 	fileHandle_t f;
@@ -191,7 +194,29 @@ static qhandle_t CG_RegisterVehiclePart( const char *name, bool expected )
 		return 0;
 	}
 	FS_FCloseFile( f );
-	return refExport.RegisterModel( name );
+	qhandle_t model = refExport.RegisterModel( name );
+	if( model > 0 && model < MAX_TEAM_SKIN_MODELS ) {
+		char skin[128];
+		char base[128];
+		Q_strncpyz( base, name, sizeof(base) );
+		if( strlen( base ) > 4 ) base[strlen( base ) - 4] = 0;
+		for( int t = 0; t < 2; ++t ) {
+			Com_sprintf( skin, sizeof(skin), "%s_team%d.skin", base, t + 1 );
+			cg_teamSkins[t][model] = 0;
+			if( FS_FOpenFileByMode( skin, &f, FS_READ ) >= 0 ) {
+				FS_FCloseFile( f );
+				cg_teamSkins[t][model] = refExport.RegisterSkin( skin );
+			}
+		}
+	}
+	return model;
+}
+
+qhandle_t CG_TeamSkin( qhandle_t model, int team )
+{
+	if( team < 1 || team > 2 || model <= 0 || model >= MAX_TEAM_SKIN_MODELS ) 
+		return 0;
+	return cg_teamSkins[team - 1][model];
 }
 
 static void CG_CachePlane(int index)

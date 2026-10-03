@@ -941,6 +941,7 @@ typedef struct {
 	int					throttle;
 	int					entityNum;
 	int					flashWeaponIndex;
+	int					team;
 	bool			drawMuzzleFlash;
 } BasicDrawInfo_t;
 
@@ -1395,6 +1396,7 @@ void CG_Misc_Vehicle( centity_t *cent );
 completeLoadout_t* CG_EntityLoadout( centity_t* cent );
 void CG_SetDrawLoadout( centity_t* cent, BasicDrawInfo_t* info );
 void CG_InitShadows( void );
+qhandle_t CG_TeamSkin( qhandle_t model, int team );
 
 
 //

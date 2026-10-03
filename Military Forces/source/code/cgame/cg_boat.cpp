@@ -35,6 +35,7 @@ void CG_Boat( centity_t *cent, clientInfo_t *ci )
 
 	memset( &drawInfo, 0, sizeof(drawInfo) );
 	drawInfo.basicInfo.vehicleIndex = ci->vehicle;
+	drawInfo.basicInfo.team = cgs.gametype >= GT_TEAM ? ci->team : 0;
 	drawInfo.basicInfo.ONOFF = cent->currentState.ONOFF;
 
 	// get velocity
