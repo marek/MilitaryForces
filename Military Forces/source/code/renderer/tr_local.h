@@ -978,6 +978,7 @@ extern cvar_t	*r_flareFade;
 #define FLARE_STDCOEFF "150"
 extern cvar_t	*r_flareCoeff;
 extern cvar_t	*r_screenshotJpegQuality;
+extern cvar_t	*r_aviMotionJpegQuality;
 
 extern cvar_t	*r_railWidth;
 extern cvar_t	*r_railCoreWidth;
@@ -1204,6 +1205,9 @@ void		R_GammaCorrect( byte *buffer, int bufSize );
 void	R_ImageList_f( void );
 void	R_SkinList_f( void );
 const void *RB_TakeScreenshotCmd( const void *data );
+const void *RB_TakeVideoFrameCmd( const void *data );
+void RE_TakeVideoFrame( int width, int height,
+		byte *captureBuffer, byte *encodeBuffer, bool motionJpeg );
 void	R_ScreenShot_f( void );
 
 void	R_InitFogTable( void );
@@ -1552,6 +1556,15 @@ typedef struct {
 	bool jpeg;
 } screenshotCommand_t;
 
+typedef struct {
+	int						commandId;
+	int						width;
+	int						height;
+	byte					*captureBuffer;
+	byte					*encodeBuffer;
+	bool			motionJpeg;
+} videoFrameCommand_t;
+
 typedef enum {
 	RC_END_OF_LIST,
 	RC_SET_COLOR,
@@ -1559,7 +1572,8 @@ typedef enum {
 	RC_DRAW_SURFS,
 	RC_DRAW_BUFFER,
 	RC_SWAP_BUFFERS,
-	RC_SCREENSHOT
+	RC_SCREENSHOT,
+	RC_VIDEOFRAME
 } renderCommand_t;
 
 

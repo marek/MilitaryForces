@@ -25,7 +25,7 @@ OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /*
 ** Intel/DVI ADPCM coder/decoder.
 **
-** The algorithm for this coder was taken from the IMA Compatability Project
+** The algorithm for this coder was taken from the IMA Compatibility Project
 ** proceedings, Vol 2, Number 2; May 1992.
 **
 ** Version 1.2, 18-Dec-92.
@@ -184,7 +184,7 @@ void S_AdpcmEncode( short indata[], char outdata[], int len, struct adpcm_state 
 		}
 		bufferstep = !bufferstep;
 
-		/* Step 2 - Find New index value (for later) */
+		/* Step 2 - Find new index value (for later) */
 		index += indexTable[delta];
 		if ( index < 0 ) index = 0;
 		if ( index > 88 ) index = 88;
@@ -193,7 +193,7 @@ void S_AdpcmEncode( short indata[], char outdata[], int len, struct adpcm_state 
 		sign = delta & 8;
 		delta = delta & 7;
 
-		/* Step 4 - Compute difference and New predicted value */
+		/* Step 4 - Compute difference and new predicted value */
 		/*
 		** Computes 'vpdiff = (delta+0.5)*step/4', but see comment
 		** in adpcm_coder.
@@ -278,7 +278,7 @@ void S_AdpcmGetSamples(sndBuffer *chunk, short *to) {
 
 	out = (byte *)chunk->sndChunk;
 	// get samples
-	S_AdpcmDecode( reinterpret_cast<const char*>(out), to, SND_CHUNK_SIZE_BYTE*2, &state );
+	S_AdpcmDecode((char *) out, to, SND_CHUNK_SIZE_BYTE*2, &state );
 }
 
 
@@ -322,7 +322,7 @@ void S_AdpcmEncodeSound( sfx_t *sfx, short *samples ) {
 		out = (byte *)chunk->sndChunk;
 
 		// encode the samples
-		S_AdpcmEncode( samples + inOffset, reinterpret_cast<char*>(out), n, &state );
+		S_AdpcmEncode( samples + inOffset, (char *) out, n, &state );
 
 		inOffset += n;
 		count -= n;

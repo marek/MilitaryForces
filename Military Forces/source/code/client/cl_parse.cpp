@@ -395,7 +395,7 @@ void CL_SystemInfoChanged( void ) {
 				}
 			}
 
-			Cvar_Set(key, value);
+			Cvar_SetSafe(key, value);
 		}
 	}
 	// if game folder should not be set and it is set at the client side

@@ -54,7 +54,7 @@ list(TRANSFORM SERVER_SOURCES PREPEND "${SOURCE_DIR}/server/")
 
 set(CLIENT_SOURCES
     cl_cgame.cpp cl_cin.cpp cl_console.cpp cl_input.cpp cl_keys.cpp cl_main.cpp cl_net_chan.cpp
-    cl_parse.cpp cl_scrn.cpp cl_ui.cpp snd_adpcm.cpp snd_dma.cpp snd_mem.cpp snd_mix.cpp snd_wavelet.cpp)
+    cl_parse.cpp cl_scrn.cpp cl_ui.cpp qal.cpp snd_adpcm.cpp snd_codec.cpp snd_codec_wav.cpp snd_dma.cpp snd_main.cpp snd_mem.cpp snd_mix.cpp snd_openal.cpp snd_wavelet.cpp cl_avi.cpp)
 list(TRANSFORM CLIENT_SOURCES PREPEND "${SOURCE_DIR}/client/")
 
 set(SYSTEM_SOURCES

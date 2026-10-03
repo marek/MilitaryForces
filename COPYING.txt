@@ -9,11 +9,12 @@ open source software. You may use, modify and redistribute it under the terms
 of the GNU GPL v2, the full text of which follows below.
 
 A few files keep their own GPL-compatible licenses, noted in the files:
-  qcommon/unzip.c      zlib license (minizip)
+  qcommon/unzip.cpp    zlib license (minizip)
   qcommon/ioapi.c      zlib license (minizip)
   thirdparty/zlib-*/   zlib license (see zlib.h)
   thirdparty/jpeg-*/   IJG license (see the file headers)
-  client/snd_adpcm.c   Stichting Mathematisch Centrum license
+  client/snd_adpcm.cpp Stichting Mathematisch Centrum license
+  thirdparty/openal-soft-*/  OpenAL Soft API headers, GNU LGPL (from OpenAL Soft)
 
 GAME ASSETS
 The Military Forces game assets (models, textures, maps, sounds, music,

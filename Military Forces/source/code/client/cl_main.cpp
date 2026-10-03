@@ -45,7 +45,8 @@ cvar_t	*cl_freezeDemo;
 cvar_t	*cl_shownet;
 cvar_t	*cl_showSend;
 cvar_t	*cl_timedemo;
-cvar_t	*cl_avidemo;
+cvar_t	*cl_aviFrameRate;
+cvar_t	*cl_aviMotionJpeg;
 cvar_t	*cl_forceavidemo;
 
 cvar_t	*cl_freelook;
@@ -619,6 +620,8 @@ CL_ShutdownAll
 =====================
 */
 void CL_ShutdownAll(void) {
+	if(CL_VideoRecording())
+		CL_CloseAVI();
 
 	// clear sounds
 	S_DisableSounds();
@@ -746,6 +749,13 @@ void CL_Disconnect( bool showMainMenu ) {
 
 	if ( clc.demorecording ) {
 		CL_StopRecord_f ();
+	}
+
+	// Stop recording any video
+	if( CL_VideoRecording( ) ) {
+		// Finish rendering current frame
+		SCR_UpdateScreen( );
+		CL_CloseAVI( );
 	}
 
 	if (clc.download) {
@@ -1207,6 +1217,11 @@ doesn't know what graphics to reload
 =================
 */
 void CL_Vid_Restart_f( void ) {
+
+	// Settings may have changed so stop recording now
+	if( CL_VideoRecording( ) ) {
+		CL_CloseAVI( );
+	}
 
 	if(clc.demorecording)
 		CL_StopRecord_f();
@@ -2063,16 +2078,17 @@ void CL_Frame ( int msec )
 	}
 
 	// if recording an avi, lock to a fixed fps
-	if ( cl_avidemo->integer && msec) 
-	{
+	if ( CL_VideoRecording( ) && cl_aviFrameRate->integer && msec) {
 		// save the current screen
-		if ( cls.state == CA_ACTIVE || cl_forceavidemo->integer) 
-			Cbuf_ExecuteText( EXEC_NOW, "screenshot silent\n" );
+		if ( cls.state == CA_ACTIVE || cl_forceavidemo->integer) {
+			float fps = MIN(cl_aviFrameRate->value * com_timescale->value, 1000.0f);
+			float frameDuration = MAX(1000.0f / fps, 1.0f) + clc.aviVideoFrameRemainder;
 
-		// fixed time for next frame'
-		msec = (1000 / cl_avidemo->integer) * com_timescale->value;
-		if (msec == 0) 
-			msec = 1;
+			CL_TakeVideoFrame( );
+
+			msec = (int)frameDuration;
+			clc.aviVideoFrameRemainder = frameDuration - msec;
+		}
 	}
 	
 	// save the msec before checking pause
@@ -2274,6 +2290,7 @@ void CL_InitRef( void ) {
 
 	ri.CIN_UploadCinematic = CIN_UploadCinematic;
 	ri.CIN_PlayCinematic = CIN_PlayCinematic;
+	ri.CL_WriteAVIVideoFrame = CL_WriteAVIVideoFrame;
 	ri.CIN_RunCinematic = CIN_RunCinematic;
 
 	ret = GetRefAPI( REF_API_VERSION, &ri );
@@ -2313,6 +2330,74 @@ void CL_SetModel_f( void ) {
 }
 
 /*
+===============
+CL_Video_f
+
+video
+video [filename]
+===============
+*/
+void CL_Video_f( void )
+{
+  char  filename[ MAX_OSPATH ];
+  int   i, last;
+
+  if( !clc.demoplaying )
+  {
+    Com_Printf( "The video command can only be used when playing back demos\n" );
+    return;
+  }
+
+  if( Cmd_Argc( ) == 2 )
+  {
+    // explicit filename
+    Com_sprintf( filename, MAX_OSPATH, "videos/%s.avi", Cmd_Argv( 1 ) );
+  }
+  else
+  {
+    // scan for a free filename
+    for( i = 0; i <= 9999; i++ )
+    {
+      int a, b, c, d;
+
+      last = i;
+
+      a = last / 1000;
+      last -= a * 1000;
+      b = last / 100;
+      last -= b * 100;
+      c = last / 10;
+      last -= c * 10;
+      d = last;
+
+      Com_sprintf( filename, MAX_OSPATH, "videos/video%d%d%d%d.avi",
+          a, b, c, d );
+
+      if( !FS_FileExists( filename ) )
+        break; // file doesn't exist
+    }
+
+    if( i > 9999 )
+    {
+      Com_Printf( S_COLOR_RED "ERROR: no free file names to create video\n" );
+      return;
+    }
+  }
+
+  CL_OpenAVIForWriting( filename );
+}
+
+/*
+===============
+CL_StopVideo_f
+===============
+*/
+void CL_StopVideo_f( void )
+{
+  CL_CloseAVI( );
+}
+
+/*
 ====================
 CL_Init
 ====================
@@ -2347,7 +2432,8 @@ void CL_Init( void ) {
 	cl_activeAction = Cvar_Get( "activeAction", "", CVAR_TEMP );
 
 	cl_timedemo = Cvar_Get ("timedemo", "0", 0);
-	cl_avidemo = Cvar_Get ("cl_avidemo", "0", 0);
+	cl_aviFrameRate = Cvar_Get ("cl_aviFrameRate", "25", CVAR_ARCHIVE);
+	cl_aviMotionJpeg = Cvar_Get ("cl_aviMotionJpeg", "1", CVAR_ARCHIVE);
 	cl_forceavidemo = Cvar_Get ("cl_forceavidemo", "0", 0);
 
 	rconAddress = Cvar_Get ("rconAddress", "", 0);
@@ -2433,6 +2519,8 @@ void CL_Init( void ) {
 	Cmd_AddCommand ("disconnect", CL_Disconnect_f);
 	Cmd_AddCommand ("record", CL_Record_f);
 	Cmd_AddCommand ("demo", CL_PlayDemo_f);
+	Cmd_AddCommand ("video", CL_Video_f );
+	Cmd_AddCommand ("stopvideo", CL_StopVideo_f );
 	Cmd_AddCommand ("cinematic", CL_PlayCinematic_f);
 	Cmd_AddCommand ("stoprecord", CL_StopRecord_f);
 	Cmd_AddCommand ("connect", CL_Connect_f);
@@ -2491,6 +2579,8 @@ void CL_Shutdown( void ) {
 	Cmd_RemoveCommand ("disconnect");
 	Cmd_RemoveCommand ("record");
 	Cmd_RemoveCommand ("demo");
+	Cmd_RemoveCommand ("video");
+	Cmd_RemoveCommand ("stopvideo");
 	Cmd_RemoveCommand ("cinematic");
 	Cmd_RemoveCommand ("stoprecord");
 	Cmd_RemoveCommand ("connect");

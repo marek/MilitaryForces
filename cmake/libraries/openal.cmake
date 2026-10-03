@@ -1,0 +1,27 @@
+option(USE_OPENAL "OpenAL audio" ON)
+option(USE_OPENAL_DLOPEN "Dynamically load OpenAL" ON)
+
+if(NOT USE_OPENAL)
+    return()
+endif()
+
+set(OPENAL_VERSION 1.24.3)
+set(INTERNAL_OPENAL_DIR ${SOURCE_DIR}/thirdparty/openal-soft-${OPENAL_VERSION})
+
+find_package(OpenAL QUIET)
+
+if(NOT OpenAL_FOUND)
+    set(OPENAL_DEFINITIONS USE_INTERNAL_OPENAL_HEADERS)
+    set(OPENAL_INCLUDE_DIR ${INTERNAL_OPENAL_DIR}/include)
+    set(OPENAL_LIBRARY openal)
+endif()
+
+list(APPEND CLIENT_DEFINITIONS ${OPENAL_DEFINITIONS} USE_OPENAL)
+list(APPEND CLIENT_INCLUDE_DIRS ${OPENAL_INCLUDE_DIR})
+
+if(USE_OPENAL_DLOPEN)
+    list(APPEND CLIENT_DEFINITIONS USE_OPENAL_DLOPEN)
+else()
+    find_package(Threads REQUIRED)
+    list(APPEND CLIENT_LIBRARIES Threads::Threads ${OPENAL_LIBRARY})
+endif()

@@ -206,6 +206,9 @@ typedef struct {
 	int			timeDemoStart;		// cls.realtime before first frame
 	int			timeDemoBaseTime;	// each frame will be at this time + frameNum * 50
 
+	float		aviVideoFrameRemainder;
+	float		aviSoundFrameRemainder;
+
 	// big stuff at end of structure so most offsets are 15 bits or less
 	netchan_t	netchan;
 } clientConnection_t;
@@ -528,3 +531,17 @@ bool CL_Netchan_Process( netchan_t *chan, msg_t *msg );
 
 
 #endif // __CLIENT_H__
+//
+// cl_avi.c
+//
+bool CL_OpenAVIForWriting( const char *filename );
+void CL_TakeVideoFrame( void );
+void CL_WriteAVIVideoFrame( const byte *imageBuffer, int size );
+void CL_WriteAVIAudioFrame( const byte *pcmBuffer, int size );
+bool CL_CloseAVI( void );
+bool CL_VideoRecording( void );
+
+extern	cvar_t	*cl_aviFrameRate;
+extern	cvar_t	*cl_aviMotionJpeg;
+
+

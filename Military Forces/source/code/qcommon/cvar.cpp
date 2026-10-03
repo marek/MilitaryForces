@@ -432,6 +432,28 @@ void Cvar_Set( const char *var_name, const char *value)
 
 /*
 ============
+Cvar_SetSafe
+============
+*/
+void Cvar_SetSafe( const char *var_name, const char *value )
+{
+	int flags = Cvar_Flags( var_name );
+
+	if((flags != CVAR_NONEXISTENT) && (flags & CVAR_PROTECTED))
+	{
+		if( value )
+			Com_Error( ERR_DROP, "Restricted source tried to set "
+				"\"%s\" to \"%s\"", var_name, value );
+		else
+			Com_Error( ERR_DROP, "Restricted source tried to "
+				"modify \"%s\"", var_name );
+		return;
+	}
+	Cvar_Set( var_name, value );
+}
+
+/*
+============
 Cvar_SetLatched
 ============
 */

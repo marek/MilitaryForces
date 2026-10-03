@@ -459,6 +459,7 @@ void	Cvar_Update( vmCvar_t *vmCvar );
 // updates an interpreted modules' version of a cvar
 
 void 	Cvar_Set( const char *var_name, const char *value );
+void	Cvar_SetSafe( const char *var_name, const char *value );
 cvar_t	*Cvar_Set2(const char *var_name, const char *value, bool force);
 // will create the variable with no flags if it doesn't exist
 
@@ -560,6 +561,7 @@ int		FS_GetFileList(  const char *path, const char *extension, char *listbuf, in
 int		FS_GetModList(  char *listbuf, int bufsize );
 
 fileHandle_t	FS_FOpenFileWrite( const char *qpath );
+void	FS_HomeRemove( const char *homePath );
 // will properly create any needed paths and deal with seperater character issues
 
 int		FS_filelength( fileHandle_t f );
@@ -730,7 +732,12 @@ void		Com_StartupVariable( const char *match );
 extern	cvar_t	*com_developer;
 extern	cvar_t	*com_dedicated;
 extern	cvar_t	*com_speeds;
+#define AVI_LINE_PADDING 4
+
 extern	cvar_t	*com_timescale;
+extern	cvar_t	*com_unfocused;
+extern	cvar_t	*com_maxfpsUnfocused;
+extern	cvar_t	*com_minimized;
 extern	cvar_t	*cl_packetdelay;
 extern	cvar_t	*sv_packetdelay;
 extern	cvar_t	*com_sv_running;

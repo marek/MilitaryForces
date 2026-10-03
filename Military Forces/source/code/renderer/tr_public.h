@@ -98,6 +98,8 @@ struct refexport_t
 	void	(*RemapShader)(const char *oldShader, const char *newShader, const char *offsetTime);
 	bool (*GetEntityToken)( char *buffer, int size );
 	bool (*inPVS)( const vec3_t p1, const vec3_t p2 );
+
+	void (*TakeVideoFrame)( int h, int w, byte* captureBuffer, byte *encodeBuffer, bool motionJpeg );
 };
 
 //
@@ -155,6 +157,8 @@ typedef struct {
 	// cinematic stuff
 	void	(*CIN_UploadCinematic)(int handle);
 	int		(*CIN_PlayCinematic)( const char *arg0, int xpos, int ypos, int width, int height, int bits);
+
+	void	(*CL_WriteAVIVideoFrame)( const byte *buffer, int size );
 	e_status (*CIN_RunCinematic) (int handle);
 
 } refimport_t;
