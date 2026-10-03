@@ -523,15 +523,8 @@ void MF_LoadAllVehicleData()
 		} else if( (availableVehicles[i].cat & CAT_BOAT) ) {
 			availableVehicles[i].mins[2] -= 2;
 		} else if ( availableVehicles[i].cat & CAT_LQM) {
-			// boundingbox
-			Com_sprintf( name, sizeof(name), "%s_legs.md3", modelbasename );
-			MF_getDimensions( name, LEGS_IDLE, &availableVehicles[i].maxs, &availableVehicles[i].mins );
-			Com_sprintf( name, sizeof(name), "%s_torso.md3", modelbasename );
-			MF_getDimensions( name, LEGS_IDLE, &max, &min );
-			availableVehicles[i].maxs[2] += max[2] - min[2];
-			Com_sprintf( name, sizeof(name), "%s_head.md3", modelbasename );
-			MF_getDimensions( name, LEGS_IDLE, &max, &min );
-			availableVehicles[i].maxs[2] += max[2] - min[2];
+			VectorSet( availableVehicles[i].mins, -15, -15, -24 );
+			VectorSet( availableVehicles[i].maxs, 15, 15, 32 );
 			// Scale LQMs
 			for(j = 0; j < 3; j++) {
 				availableVehicles[i].maxs[j] *= (float)LQM_SCALE;

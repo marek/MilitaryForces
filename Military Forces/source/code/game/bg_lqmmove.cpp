@@ -444,12 +444,13 @@ bool	PM_SlideMove_LQM() {
 }
 
 void PM_StepSlideMove_LQM() {
-	vec3_t		start_o;
+	vec3_t		start_o, start_v;
 	trace_t		trace;
 	vec3_t		up, down;
 	float		stepSize;
 
 	VectorCopy (pm->ps->origin, start_o);
+	VectorCopy (pm->ps->velocity, start_v);
 
 	if ( PM_SlideMove_LQM() == 0 )
 		return;		// we got exactly where we wanted to go first try	
@@ -473,6 +474,7 @@ void PM_StepSlideMove_LQM() {
 	stepSize = trace.endpos[2] - start_o[2];
 	// try slidemove from this position
 	VectorCopy (trace.endpos, pm->ps->origin);
+	VectorCopy (start_v, pm->ps->velocity);
 
 	PM_SlideMove_LQM();
 

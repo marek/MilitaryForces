@@ -334,6 +334,73 @@ void MiscVehicle_SetRoute( GameEntity *ent, const mission_waypoint_t *wps )
 	ent->nextthink_ = theLevel.time_ + 1000;
 }
 
+void Abandoned_Think::execute()
+{
+	GameEntity* ent = self_;
+	vec3_t origin;
+	trace_t tr;
+
+	if( ent->s.pos.trType == TR_STATIONARY )
+	{
+		if( theLevel.time_ > expire_ )
+			ent->freeUp();
+		else
+			ent->nextthink_ = theLevel.time_ + 1000;
+		return;
+	}
+
+	BG_EvaluateTrajectory( &ent->s.pos, theLevel.time_, origin );
+	SV_Trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, origin, ent->s.number, MASK_SOLID, false );
+	if( tr.startsolid || tr.fraction < 1.0f || theLevel.time_ > expire_ )
+	{
+		if( tr.fraction < 1.0f )
+			VectorCopy( tr.endpos, ent->r.currentOrigin );
+		ent->takedamage_ = true;
+		G_Damage( ent, 0, ent, 0, 0, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
+		return;
+	}
+	VectorCopy( origin, ent->r.currentOrigin );
+	ent->nextthink_ = theLevel.time_ + 50;
+	SV_LinkEntity( ent );
+}
+
+void MiscVehicle_Abandon( GameEntity *ent )
+{
+	GameClient* client = ent->client_;
+	int vehicle = client->vehicle_;
+	bool landed = (client->ps_.ONOFF & OO_LANDED) != 0;
+
+	GameEntity* veh = theLevel.spawnEntity();
+	veh->classname_ = "misc_vehicle";
+	veh->s.eType = ET_MISC_VEHICLE;
+	veh->s.modelindex = vehicle;
+	veh->s.modelindex2 = 0;
+	veh->s.ONOFF = client->ps_.ONOFF & (OO_GEAR|OO_LANDED);
+	VectorCopy( availableVehicles[vehicle].mins, veh->r.mins );
+	VectorCopy( availableVehicles[vehicle].maxs, veh->r.maxs );
+	G_SetOrigin( veh, client->ps_.origin );
+	VectorCopy( client->ps_.vehicleAngles, veh->s.angles );
+	VectorCopy( veh->s.angles, veh->s.apos.trBase );
+	if( !landed )
+	{
+		veh->s.pos.trType = TR_GRAVITY;
+		VectorCopy( client->ps_.velocity, veh->s.pos.trDelta );
+		veh->s.pos.trTime = theLevel.time_;
+	}
+	veh->r.svFlags = SVF_USE_CURRENT_ORIGIN;
+	veh->r.contents = 0;
+	veh->health_ = 1;
+	veh->score_ = 0;
+	veh->setDie( new MiscVehicle_Die );
+
+	Abandoned_Think* think = new Abandoned_Think;
+	think->expire_ = theLevel.time_ + (landed ? 60000 : 10000);
+	veh->setThink( think );
+	veh->nextthink_ = theLevel.time_ + 50;
+
+	SV_LinkEntity( veh );
+}
+
 void DroneInit()
 {
 	// finish placing the vehicles spawned by the mission

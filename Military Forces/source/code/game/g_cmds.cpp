@@ -7,6 +7,7 @@
 #include "g_local.h"
 #include "g_level.h"
 #include "g_mfq3ents.h"
+#include "g_miscvehicle.h"
 
 /*
 ==================
@@ -1535,43 +1536,33 @@ Cmd_Eject_f
 */
 void Cmd_Eject_f( GameEntity *ent ) 
 {
-	GameEntity	*veh;
-//	gclient_t	*client;
-//	char	userinfo[MAX_INFO_STRING];
-//	int index = ent - g_entities;
-	vec3_t start;
-//	int i;
+	GameClient* client = ent->client_;
 
-	Com_Printf ("eject!!\n");
-	if( ent->client_->sess_.sessionTeam_ == ClientBase::TEAM_SPECTATOR ) 
+	if( client->sess_.sessionTeam_ == ClientBase::TEAM_SPECTATOR ) 
 		return;
 
-	if( ent->health_ <= 0) 
+	if( ent->health_ <= 0 || client->vehicle_ < 0 ) 
 		return;
 
-	VectorCopy( ent->s.pos.trBase, start );
-	SnapVector( start );
+	int vehicle = client->vehicle_;
+	if( !(availableVehicles[vehicle].cat & CAT_PLANE) && !(availableVehicles[vehicle].cat & CAT_HELO) ) 
+		return;
 
-	ent->flags_ &= ~FL_GODMODE;
-	if( (availableVehicles[ent->client_->vehicle_].cat & CAT_PLANE) ||
-		(availableVehicles[ent->client_->vehicle_].cat & CAT_HELO) ) 
-	{
-		veh = theLevel.spawnEntity();
-		veh->classname_ = "misc_vehicle";
-		veh->health_ = 0;
-		veh->client_ = NULL;
-		veh->setThink(new Think_ExplodeVehicle);
-		veh->nextthink_ = theLevel.time_ + 10000;
-		veh->tracktarget_ = NULL;
-		veh->parent_ = ent;
-		veh->r.ownerNum = veh->parent_->s.number;
-		veh->s.eType = ET_MISC_VEHICLE;
-		veh->r.svFlags = SVF_USE_CURRENT_ORIGIN;
-		veh->s.modelindex2 = 255;
-		veh->s.modelindex = ent->client_->vehicle_;
-		VectorCopy( start, veh->s.pos.trBase );
-		VectorCopy(start, veh->r.currentOrigin);
-	}
+	int infantry = MF_getIndexOfVehicle( -1, availableVehicles[vehicle].gameset, availableVehicles[vehicle].team, CAT_LQM, 0, -1, 0, true );
+	if( infantry < 0 ) 
+		return;
+
+	MiscVehicle_Abandon( ent );
+
+	int clientNum = ent->s.number;
+	char userinfo[MAX_INFO_STRING];
+	SV_GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
+	Info_SetValueForKey( userinfo, "cg_vehicle", va( "%d", infantry ) );
+	Info_SetValueForKey( userinfo, "cg_nextVehicle", va( "%d", infantry ) );
+	SV_SetUserinfo( clientNum, userinfo );
+	ClientUserinfoChanged( clientNum );
+
+	switch_vehicle( ent );
 }
 
 

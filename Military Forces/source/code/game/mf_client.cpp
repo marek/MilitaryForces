@@ -358,7 +358,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 		VectorCopy( spawn_origin, endpos );
 		endpos[2] -= 512;
 		SV_Trace (&trace, spawn_origin, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_WATER, false );
-		if((cs_flags & CS_LASTPOS) && trace.entityNum != ENTITYNUM_NONE ) 
+		if( trace.fraction == 1.0f ) 
 		{ 
 			// Check for water if respawning in current location
 			client->ps_.pm_flags &= ~PMF_VEHICLESPAWN;
