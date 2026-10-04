@@ -733,7 +733,7 @@ If the facet isn't bounded by its borders, we screwed up.
 static bool CM_ValidateFacet( facet_t *facet ) {
 	float		plane[4];
 	int			j;
-	winding_t	*w;
+	Winding	*w;
 	vec3_t		bounds[2];
 
 	if ( facet->surfacePlane == -1 ) {
@@ -741,10 +741,10 @@ static bool CM_ValidateFacet( facet_t *facet ) {
 	}
 
 	Vector4Copy( planes[ facet->surfacePlane ].plane, plane );
-	w = BaseWindingForPlane( plane,  plane[3] );
+	w = Winding::baseForPlane( plane,  plane[3] );
 	for ( j = 0 ; j < facet->numBorders && w ; j++ ) {
 		if ( facet->borderPlanes[j] == -1 ) {
-			FreeWinding( w );
+			w->free();
 			return false;
 		}
 		Vector4Copy( planes[ facet->borderPlanes[j] ].plane, plane );
@@ -752,7 +752,7 @@ static bool CM_ValidateFacet( facet_t *facet ) {
 			VectorSubtract( vec3_origin, plane, plane );
 			plane[3] = -plane[3];
 		}
-		ChopWindingInPlace( &w, plane, plane[3], 0.1f );
+		Winding::chopInPlace( &w, plane, plane[3], 0.1f );
 	}
 
 	if ( !w ) {
@@ -760,8 +760,8 @@ static bool CM_ValidateFacet( facet_t *facet ) {
 	}
 
 	// see if the facet is unreasonably large
-	WindingBounds( w, bounds[0], bounds[1] );
-	FreeWinding( w );
+	w->bounds( bounds[0], bounds[1] );
+	w->free();
 	
 	for ( j = 0 ; j < 3 ; j++ ) {
 		if ( bounds[1][j] - bounds[0][j] > MAX_MAP_BOUNDS ) {
@@ -787,12 +787,12 @@ void CM_AddFacetBevels( facet_t *facet ) {
 	int i, j, k, l;
 	int axis, dir, flipped;
 	float plane[4], d, newplane[4];
-	winding_t *w, *w2;
+	Winding *w, *w2;
 	vec3_t mins, maxs, vec, vec2;
 
 	Vector4Copy( planes[ facet->surfacePlane ].plane, plane );
 
-	w = BaseWindingForPlane( plane,  plane[3] );
+	w = Winding::baseForPlane( plane,  plane[3] );
 	for ( j = 0 ; j < facet->numBorders && w ; j++ ) {
 		if (facet->borderPlanes[j] == facet->surfacePlane) continue;
 		Vector4Copy( planes[ facet->borderPlanes[j] ].plane, plane );
@@ -802,13 +802,13 @@ void CM_AddFacetBevels( facet_t *facet ) {
 			plane[3] = -plane[3];
 		}
 
-		ChopWindingInPlace( &w, plane, plane[3], 0.1f );
+		Winding::chopInPlace( &w, plane, plane[3], 0.1f );
 	}
 	if ( !w ) {
 		return;
 	}
 
-	WindingBounds(w, mins, maxs);
+	w->bounds( mins, maxs);
 
 	// add the axial planes
 	for ( axis = 0 ; axis < 3 ; axis++ )
@@ -913,20 +913,20 @@ void CM_AddFacetBevels( facet_t *facet ) {
 					facet->borderNoAdjust[facet->numBorders] = false;
 					facet->borderInward[facet->numBorders] = flipped;
 					//
-					w2 = CopyWinding(w);
+					w2 = w->copy();
 					Vector4Copy(planes[facet->borderPlanes[facet->numBorders]].plane, newplane);
 					if (!facet->borderInward[facet->numBorders])
 					{
 						VectorNegate(newplane, newplane);
 						newplane[3] = -newplane[3];
 					} //end if
-					ChopWindingInPlace( &w2, newplane, newplane[3], 0.1f );
+					Winding::chopInPlace( &w2, newplane, newplane[3], 0.1f );
 					if (!w2) {
 						Common::dPrintf("WARNING: CM_AddFacetBevels... invalid bevel\n");
 						continue;
 					}
 					else {
-						FreeWinding(w2);
+						w2->free();
 					}
 					//
 					facet->numBorders++;
@@ -936,7 +936,7 @@ void CM_AddFacetBevels( facet_t *facet ) {
 			}
 		}
 	}
-	FreeWinding( w );
+	w->free();
 
 #ifndef BSPC
 	//add opposite plane
@@ -1609,7 +1609,7 @@ void CollisionModel::drawDebugSurface( void (*drawPoly)(int color, int numPoints
 #endif
 	const patchCollide_t	*pc;
 	facet_t			*facet;
-	winding_t		*w;
+	Winding		*w;
 	int				i, j, k, n;
 	int				curplanenum, planenum, curinward, inward;
 	float			plane[4];
@@ -1673,7 +1673,7 @@ void CollisionModel::drawDebugSurface( void (*drawPoly)(int color, int numPoints
 			plane[3] += fabs(DotProduct(v1, v2));
 			//*/
 
-			w = BaseWindingForPlane( plane,  plane[3] );
+			w = Winding::baseForPlane( plane,  plane[3] );
 			for ( j = 0 ; j < facet->numBorders + 1 && w; j++ ) {
 				//
 				if (j < facet->numBorders) {
@@ -1704,7 +1704,7 @@ void CollisionModel::drawDebugSurface( void (*drawPoly)(int color, int numPoints
 				VectorNegate(plane, v2);
 				plane[3] -= fabs(DotProduct(v1, v2));
 
-				ChopWindingInPlace( &w, plane, plane[3], 0.1f );
+				Winding::chopInPlace( &w, plane, plane[3], 0.1f );
 			}
 			if ( w ) {
 				if ( facet == debugFacet ) {
@@ -1713,7 +1713,7 @@ void CollisionModel::drawDebugSurface( void (*drawPoly)(int color, int numPoints
 				} else {
 					drawPoly( 1, w->numpoints, w->p[0] );
 				}
-				FreeWinding( w );
+				w->free();
 			}
 			else
 				Common::printf("winding chopped away by border planes\n");

@@ -25,8 +25,27 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // this is only used for visualization tools in cm_ debug functions
 
-struct winding_t
+class Winding
 {
+public:
+	void print();
+	static Winding* alloc( int points );
+	void free();
+	void removeColinearPoints();
+	void plane( vec3_t normal, vec_t *dist );
+	vec_t area();
+	void bounds( vec3_t mins, vec3_t maxs );
+	void center( vec3_t center );
+	static Winding* baseForPlane( vec3_t normal, vec_t dist );
+	Winding* copy();
+	Winding* reverse();
+	void clipEpsilon( vec3_t normal, vec_t dist, vec_t epsilon, Winding **front, Winding **back );
+	static void chopInPlace( Winding **inout, vec3_t normal, vec_t dist, vec_t epsilon );
+	Winding* chop( vec3_t normal, vec_t dist );
+	void check();
+	int onPlaneSide( vec3_t normal, vec_t dist );
+	static void addToConvexHull( Winding *w, Winding **hull, vec3_t normal );
+
 	int		numpoints;
 	vec3_t	p[4];		// variable sized
 };
@@ -47,27 +66,6 @@ struct winding_t
 #define	ON_EPSILON	0.1f
 #endif
 
-winding_t	*AllocWinding (int points);
-vec_t	WindingArea (winding_t *w);
-void	WindingCenter (winding_t *w, vec3_t center);
-void	ClipWindingEpsilon (winding_t *in, vec3_t normal, vec_t dist, 
-				vec_t epsilon, winding_t **front, winding_t **back);
-winding_t	*ChopWinding (winding_t *in, vec3_t normal, vec_t dist);
-winding_t	*CopyWinding (winding_t *w);
-winding_t	*ReverseWinding (winding_t *w);
-winding_t	*BaseWindingForPlane (vec3_t normal, vec_t dist);
-void	CheckWinding (winding_t *w);
-void	WindingPlane (winding_t *w, vec3_t normal, vec_t *dist);
-void	RemoveColinearPoints (winding_t *w);
-int		WindingOnPlaneSide (winding_t *w, vec3_t normal, vec_t dist);
-void	FreeWinding (winding_t *w);
-void	WindingBounds (winding_t *w, vec3_t mins, vec3_t maxs);
 
-void	AddWindingToConvexHull( winding_t *w, winding_t **hull, vec3_t normal );
-
-void	ChopWindingInPlace (winding_t **w, vec3_t normal, vec_t dist, vec_t epsilon);
-// frees the original if clipped
-
-void pw(winding_t *w);
 
 #endif // __CM_POLYLIB_H__
