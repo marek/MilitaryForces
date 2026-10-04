@@ -465,16 +465,16 @@ void Deck_Think::execute()
 			if( !hasLast_ ) 
 				continue;
 
-			vec3_t oldAxis[3], newAxis[3], rel, moved;
+			vec3_t oldAxis[3], newAxis[3];
 			AnglesToAxis( lastAngles_, oldAxis );
 			AnglesToAxis( angles, newAxis );
-			VectorSubtract( cl->ps_.origin, lastOrigin_, rel );
-			VectorCopy( origin, moved );
+			const Vec3 rel = Vec3( cl->ps_.origin ) - Vec3( lastOrigin_ );
+			Vec3 moved( origin );
 			for( int k = 0; k < 3; k++ ) 
-				VectorMA( moved, DotProduct( rel, oldAxis[k] ), newAxis[k], moved );
-			VectorCopy( moved, cl->ps_.origin );
-			VectorCopy( moved, ent->r.currentOrigin );
-			VectorCopy( moved, ent->s.pos.trBase );
+				moved += Vec3( newAxis[k] ) * rel.dot( Vec3( oldAxis[k] ) );
+			moved.copyTo( cl->ps_.origin );
+			moved.copyTo( ent->r.currentOrigin );
+			moved.copyTo( ent->s.pos.trBase );
 			cl->ps_.delta_angles[YAW] += ANGLE2SHORT( AngleSubtract( angles[YAW], lastAngles_[YAW] ) );
 			SV_LinkEntity( ent );
 		}

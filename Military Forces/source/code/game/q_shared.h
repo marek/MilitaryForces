@@ -351,6 +351,51 @@ typedef vec_t vec3_t[3];
 typedef vec_t vec4_t[4];
 typedef vec_t vec5_t[5];
 
+struct Vec3
+{
+	float v[3];
+
+	constexpr Vec3() : v{ 0.0f, 0.0f, 0.0f } {}
+	constexpr Vec3( float x, float y, float z ) : v{ x, y, z } {}
+	constexpr explicit Vec3( const float *p ) : v{ p[0], p[1], p[2] } {}
+
+	constexpr operator float*() { return v; }
+	constexpr operator const float*() const { return v; }
+
+	constexpr float x() const { return v[0]; }
+	constexpr float y() const { return v[1]; }
+	constexpr float z() const { return v[2]; }
+
+	constexpr Vec3 operator+( const Vec3& o ) const { return Vec3( v[0] + o.v[0], v[1] + o.v[1], v[2] + o.v[2] ); }
+	constexpr Vec3 operator-( const Vec3& o ) const { return Vec3( v[0] - o.v[0], v[1] - o.v[1], v[2] - o.v[2] ); }
+	constexpr Vec3 operator-() const { return Vec3( -v[0], -v[1], -v[2] ); }
+	constexpr Vec3 operator*( float s ) const { return Vec3( v[0] * s, v[1] * s, v[2] * s ); }
+	constexpr Vec3 operator/( float s ) const { return Vec3( v[0] / s, v[1] / s, v[2] / s ); }
+	constexpr Vec3& operator+=( const Vec3& o ) { v[0] += o.v[0]; v[1] += o.v[1]; v[2] += o.v[2]; return *this; }
+	constexpr Vec3& operator-=( const Vec3& o ) { v[0] -= o.v[0]; v[1] -= o.v[1]; v[2] -= o.v[2]; return *this; }
+	constexpr Vec3& operator*=( float s ) { v[0] *= s; v[1] *= s; v[2] *= s; return *this; }
+	constexpr bool operator==( const Vec3& o ) const { return v[0] == o.v[0] && v[1] == o.v[1] && v[2] == o.v[2]; }
+
+	constexpr float dot( const Vec3& o ) const { return v[0] * o.v[0] + v[1] * o.v[1] + v[2] * o.v[2]; }
+	constexpr Vec3 cross( const Vec3& o ) const
+	{
+		return Vec3( v[1] * o.v[2] - v[2] * o.v[1], v[2] * o.v[0] - v[0] * o.v[2], v[0] * o.v[1] - v[1] * o.v[0] );
+	}
+	constexpr float lengthSquared() const { return dot( *this ); }
+	float length() const { return sqrtf( lengthSquared() ); }
+	Vec3 normalized() const
+	{
+		float len = length();
+		return len > 0.0f ? *this / len : Vec3();
+	}
+	constexpr void copyTo( float *out ) const { out[0] = v[0]; out[1] = v[1]; out[2] = v[2]; }
+};
+
+constexpr Vec3 operator*( float s, const Vec3& a ) { return a * s; }
+constexpr Vec3 lerp( const Vec3& a, const Vec3& b, float t ) { return a + ( b - a ) * t; }
+
+static_assert( sizeof( Vec3 ) == sizeof( vec3_t ), "Vec3 must have the layout of vec3_t" );
+
 typedef vec_t quat_t[4];
 
 typedef	int	fixed4_t;
