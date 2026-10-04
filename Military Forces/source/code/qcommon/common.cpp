@@ -932,11 +932,13 @@ void Z_FreeTags( int tag ) {
 Z_TagMalloc
 ================
 */
+void *Z_TagMalloc( int size, int tag, const std::source_location& at ) {
 #ifdef ZONE_DEBUG
-void *Z_TagMallocDebug( int size, int tag, const char *label, const char *file, int line ) {
+	// debug builds record who asked for each block: the calling function, file and line
+	const char *label = at.function_name();
+	const char *file = at.file_name();
+	const int line = static_cast<int>( at.line() );
 	int		allocSize;
-#else
-void *Z_TagMalloc( int size, int tag ) {
 #endif
 	int		extra;
 	memblock_t	*start, *rover, *newblock, *base;
@@ -1030,34 +1032,20 @@ void *Z_TagMalloc( int size, int tag ) {
 Z_Malloc
 ========================
 */
-#ifdef ZONE_DEBUG
-void *Z_MallocDebug( int size, const char *label, const char *file, int line ) {
-#else
-void *Z_Malloc( int size ) {
-#endif
+void *Z_Malloc( int size, const std::source_location& at ) {
 	void	*buf;
 	
   //Z_CheckHeap ();	// DEBUG
 
-#ifdef ZONE_DEBUG
-	buf = Z_TagMallocDebug( size, TAG_GENERAL, label, file, line );
-#else
-	buf = Z_TagMalloc( size, TAG_GENERAL );
-#endif
+	buf = Z_TagMalloc( size, TAG_GENERAL, at );
 	Com_Memset( buf, 0, size );
 
 	return buf;
 }
 
-#ifdef ZONE_DEBUG
-void *S_MallocDebug( int size, const char *label, const char *file, int line ) {
-	return Z_TagMallocDebug( size, TAG_SMALL, label, file, line );
+void *S_Malloc( int size, const std::source_location& at ) {
+	return Z_TagMalloc( size, TAG_SMALL, at );
 }
-#else
-void *S_Malloc( int size ) {
-	return Z_TagMalloc( size, TAG_SMALL );
-}
-#endif
 
 /*
 ========================
@@ -1701,10 +1689,11 @@ Hunk_Alloc
 Allocate permanent (until the hunk is cleared) memory
 =================
 */
+void *Hunk_Alloc( int size, ha_pref preference, const std::source_location& at ) {
 #ifdef HUNK_DEBUG
-void *Hunk_AllocDebug( int size, ha_pref preference, const char *label, const char *file, int line ) {
-#else
-void *Hunk_Alloc( int size, ha_pref preference ) {
+	const char *label = at.function_name();
+	const char *file = at.file_name();
+	const int line = static_cast<int>( at.line() );
 #endif
 	void	*buf;
 

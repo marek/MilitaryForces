@@ -326,15 +326,7 @@ enum ha_pref {
 	h_dontcare
 };
 
-#ifdef HUNK_DEBUG
-void *Hunk_AllocDebug( int size, ha_pref preference, const char *label, const char *file, int line );
-// debug builds record who asked for each block: the calling function, file and line
-inline void *Hunk_Alloc( int size, ha_pref preference, const std::source_location& at = std::source_location::current() ) {
-	return Hunk_AllocDebug( size, preference, at.function_name(), at.file_name(), static_cast<int>( at.line() ) );
-}
-#else
-void *Hunk_Alloc( int size, ha_pref preference );
-#endif
+void *Hunk_Alloc( int size, ha_pref preference, const std::source_location& at = std::source_location::current() );
 
 #define Com_Memset memset
 #define Com_Memcpy memcpy

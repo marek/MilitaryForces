@@ -117,14 +117,10 @@ struct refimport_t {
 
 	// stack based memory allocation for per-level things that
 	// won't be freed
-#ifdef HUNK_DEBUG
-	void	*(*Hunk_AllocDebug)( int size, ha_pref pref, const char *label, const char *file, int line );
+	void	*(*Hunk_AllocAt)( int size, ha_pref pref, const std::source_location& at );
 	void	*Hunk_Alloc( int size, ha_pref pref, const std::source_location& at = std::source_location::current() ) const {
-		return Hunk_AllocDebug( size, pref, at.function_name(), at.file_name(), static_cast<int>( at.line() ) );
+		return Hunk_AllocAt( size, pref, at );
 	}
-#else
-	void	*(*Hunk_Alloc)( int size, ha_pref pref );
-#endif
 	void	*(*Hunk_AllocateTempMemory)( int size );
 	void	(*Hunk_FreeTempMemory)( void *block );
 

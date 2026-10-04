@@ -732,25 +732,10 @@ temp file loading
 	#define ZONE_DEBUG
 #endif
 
-#ifdef ZONE_DEBUG
-void *Z_TagMallocDebug( int size, int tag, const char *label, const char *file, int line );	// NOT 0 filled memory
-void *Z_MallocDebug( int size, const char *label, const char *file, int line );			// returns 0 filled memory
-void *S_MallocDebug( int size, const char *label, const char *file, int line );			// returns 0 filled memory
-// debug builds record who asked for each block: the calling function, file and line
-inline void *Z_TagMalloc( int size, int tag, const std::source_location& at = std::source_location::current() ) {
-	return Z_TagMallocDebug( size, tag, at.function_name(), at.file_name(), static_cast<int>( at.line() ) );
-}
-inline void *Z_Malloc( int size, const std::source_location& at = std::source_location::current() ) {
-	return Z_MallocDebug( size, at.function_name(), at.file_name(), static_cast<int>( at.line() ) );
-}
-inline void *S_Malloc( int size, const std::source_location& at = std::source_location::current() ) {
-	return S_MallocDebug( size, at.function_name(), at.file_name(), static_cast<int>( at.line() ) );
-}
-#else
-void *Z_TagMalloc( int size, int tag );	// NOT 0 filled memory
-void *Z_Malloc( int size );			// returns 0 filled memory
-void *S_Malloc( int size );			// NOT 0 filled memory only for small allocations
-#endif
+// debug builds record who asked for each block (the calling function, file and line); release builds ignore it
+void *Z_TagMalloc( int size, int tag, const std::source_location& at = std::source_location::current() );	// NOT 0 filled memory
+void *Z_Malloc( int size, const std::source_location& at = std::source_location::current() );			// returns 0 filled memory
+void *S_Malloc( int size, const std::source_location& at = std::source_location::current() );			// NOT 0 filled memory only for small allocations
 void Z_Free( void *ptr );
 void Z_FreeTags( int tag );
 int Z_AvailableMemory( );
