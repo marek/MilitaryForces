@@ -92,13 +92,14 @@ bool VehicleData::distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout
 	// fill
 	for( i = WP_WEAPON1; i < WP_FLARE; ++i ) {
 		if( availableVehicles[idx].weapons[i] &&
-			availableWeapons[availableVehicles[idx].weapons[i]].type != WT_MACHINEGUN ) {
+			(availableWeapons[availableVehicles[idx].weapons[i]].type != WT_MACHINEGUN ||
+			 (availableWeapons[availableVehicles[idx].weapons[i]].fitsPylon & PF_GUNPOD)) ) {
 			j = availableVehicles[idx].ammo[i];
 			for( k = 0; k < num; ++k ) {
 				if( !loadout->mounts[k].weapon &&
 					(loadout->mounts[k].flags & availableWeapons[availableVehicles[idx].weapons[i]].fitsPylon) ) {
 					loadout->mounts[k].weapon = availableVehicles[idx].weapons[i];
-					loadout->mounts[k].num = 1;
+					loadout->mounts[k].num = VehicleData::roundsPerMount( availableVehicles[idx].weapons[i] );
 					j--;
 				}
 				if( !j ) break;
@@ -220,13 +221,13 @@ int VehicleData::addWeaponToLoadout( int weaponIndex, completeLoadout_t* loadout
 	for( i = 0; i < loadout->usedMounts; ++i ) 
 	{
 		if( loadout->mounts[i].weapon == weaponIndex &&
-			!loadout->mounts[i].num &&
+			loadout->mounts[i].num < VehicleData::roundsPerMount( weaponIndex ) &&
 			!(availableWeapons[loadout->mounts[i].weapon].fitsPylon & PF_DONT_REMOVE) ) 
 		{
-			loadout->mounts[i].num++;
+			added += VehicleData::roundsPerMount( weaponIndex ) - loadout->mounts[i].num;
+			loadout->mounts[i].num = VehicleData::roundsPerMount( weaponIndex );
 			if( ps )
-				ps->numWeaponsOnMount[i]++;
-			added++;
+				ps->numWeaponsOnMount[i] = loadout->mounts[i].num;
 		}
 	}
 
@@ -243,6 +244,18 @@ VehicleData::findWeaponsOfType
 how many of those are loaded ?
 =================
 */
+
+int VehicleData::roundsPerMount( int weaponIndex )
+{
+	if( availableWeapons[weaponIndex].fitsPylon & PF_DONT_REMOVE )
+		return 1;
+	return availableWeapons[weaponIndex].numberPerPackage > 0 ? availableWeapons[weaponIndex].numberPerPackage : 1;
+}
+
+int VehicleData::packagesOfType( int weaponIndex, completeLoadout_t* loadout )
+{
+	return VehicleData::findWeaponsOfType( weaponIndex, loadout ) / VehicleData::roundsPerMount( weaponIndex );
+}
 
 int VehicleData::findWeaponsOfType( int weaponIndex, completeLoadout_t* loadout )
 {

@@ -1348,7 +1348,15 @@ void fire_autocannon( GameEntity *self, bool main )
 		AngleVectors( spreadangle, dir, right, up );
 	}
 
-	if( availableVehicles[self->client_->vehicle_].caps & HC_DUALGUNS )
+	if( availableWeapons[weapIdx].fitsPylon & PF_GUNPOD )
+	{
+		self->bulletpos_ = ( self->bulletpos_ == 0 ? 1 : 0 );
+		if( VehicleData::removeWeaponFromLoadout( weapIdx, &self->loadout_, nullptr, nullptr, offset, self->bulletpos_ ) )
+			offset[1] *= -1;
+		else
+			VectorCopy( availableVehicles[self->client_->vehicle_].gunoffset, offset );
+	}
+	else if( availableVehicles[self->client_->vehicle_].caps & HC_DUALGUNS )
 	{
 		self->bulletpos_ = ( self->bulletpos_ == 0 ? 1 : 0 );
 		if( self->bulletpos_ ) 

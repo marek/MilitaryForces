@@ -1049,6 +1049,8 @@ enum weaponIndex_t
 	WI_AT6,
 	WI_MGT_20MM,
 	WI_MGT_YAKB,
+	WI_STINGER_PAIR,
+	WI_GUNPOD_23MM,
 	WI_MAX
 };
 
@@ -1136,6 +1138,8 @@ public:
 	static bool getDimensions(const char* fileName, int frame, vec3_t* maxs, vec3_t* mins);
 	static void loadAllVehicleData();
 	static int findWeaponsOfType( int weaponIndex, completeLoadout_t* loadout );
+	static int packagesOfType( int weaponIndex, completeLoadout_t* loadout );
+	static int roundsPerMount( int weaponIndex );
 
 private:
 	static void parseOverview( char **buf, mission_overview_t* overview );

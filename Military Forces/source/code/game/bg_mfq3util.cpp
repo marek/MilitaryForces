@@ -463,7 +463,7 @@ void VehicleData::loadAllVehicleData()
 			for( j = WP_WEAPON1; j < WP_FLARE; ++j ) {
 				if( availableVehicles[i].weapons[j] ) {
 					availableVehicles[i].ammo[j] = 
-						VehicleData::findWeaponsOfType( availableVehicles[i].weapons[j], &availableLoadouts[i] );
+						VehicleData::packagesOfType( availableVehicles[i].weapons[j], &availableLoadouts[i] );
 				}
 			}
 		} else if(availableVehicles[i].cat & CAT_HELO) {
@@ -516,9 +516,10 @@ void VehicleData::loadAllVehicleData()
 			if( availableLoadouts[i].usedMounts ) {
 				for( j = WP_WEAPON1; j < WP_FLARE; ++j ) {
 					if( availableVehicles[i].weapons[j] &&
-						availableWeapons[availableVehicles[i].weapons[j]].type != WT_MACHINEGUN ) {
+						(availableWeapons[availableVehicles[i].weapons[j]].type != WT_MACHINEGUN ||
+						 (availableWeapons[availableVehicles[i].weapons[j]].fitsPylon & PF_GUNPOD)) ) {
 						availableVehicles[i].ammo[j] = 
-							VehicleData::findWeaponsOfType( availableVehicles[i].weapons[j], &availableLoadouts[i] );
+							VehicleData::packagesOfType( availableVehicles[i].weapons[j], &availableLoadouts[i] );
 					}
 				}
 			}
