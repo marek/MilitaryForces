@@ -1591,7 +1591,7 @@ void CIN_DrawCinematic (int handle) {
 	w = cinTable[handle].width;
 	h = cinTable[handle].height;
 	buf = cinTable[handle].buf;
-	SCR_AdjustFrom640( &x, &y, &w, &h );
+	Screen::adjustFrom640( &x, &y, &w, &h );
 
 	if (cinTable[handle].dirty && (cinTable[handle].CIN_WIDTH != cinTable[handle].drawX || cinTable[handle].CIN_HEIGHT != cinTable[handle].drawY)) {
 		int *buf2;
@@ -1616,7 +1616,7 @@ void CL_PlayCinematic_f() {
 
 	Com_DPrintf("CL_PlayCinematic_f\n");
 	if (clc.state == CA_CINEMATIC) {
-		SCR_StopCinematic();
+		Screen::stopCinematic();
 	}
 
 	arg = CommandSystem::argv( 1 );
@@ -1634,26 +1634,26 @@ void CL_PlayCinematic_f() {
 	CL_handle = CIN_PlayCinematic( arg, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, bits );
 	if (CL_handle >= 0) {
 		do {
-			SCR_RunCinematic();
+			Screen::runCinematic();
 		} while (cinTable[currentHandle].buf == nullptr && cinTable[currentHandle].status == FMV_PLAY);		// wait for first frame (load codebook and sound)
 	}
 }
 
 
-void SCR_DrawCinematic () {
+void Screen::drawCinematic () {
 	if (CL_handle >= 0 && CL_handle < MAX_VIDEO_HANDLES) {
 		CIN_DrawCinematic(CL_handle);
 	}
 }
 
-void SCR_RunCinematic ()
+void Screen::runCinematic ()
 {
 	if (CL_handle >= 0 && CL_handle < MAX_VIDEO_HANDLES) {
 		CIN_RunCinematic(CL_handle);
 	}
 }
 
-void SCR_StopCinematic() {
+void Screen::stopCinematic() {
 	if (CL_handle >= 0 && CL_handle < MAX_VIDEO_HANDLES) {
 		CIN_StopCinematic(CL_handle);
 		SoundSystem::stopAllSounds ();

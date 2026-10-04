@@ -386,10 +386,10 @@ void EditField::variableSizeDraw( int x, int y, int width, int size, bool drawSm
 		float	color[4];
 
 		color[0] = color[1] = color[2] = color[3] = 1.0;
-		SCR_DrawSmallStringExt( x, y, str, color, false, noColorEscape );
+		Screen::drawSmallStringExt( x, y, str, color, false, noColorEscape );
 	} else {
 		// draw big string with drop shadow
-		SCR_DrawBigString( x, y, str, 1.0, noColorEscape );
+		Screen::drawBigString( x, y, str, 1.0, noColorEscape );
 	}
 
 	// draw the cursor
@@ -407,11 +407,11 @@ void EditField::variableSizeDraw( int x, int y, int width, int size, bool drawSm
 		i = drawLen - strlen( str );
 
 		if ( drawSmall ) {
-			SCR_DrawSmallChar( x + ( this->cursor - prestep - i ) * size, y, cursorChar );
+			Screen::drawSmallChar( x + ( this->cursor - prestep - i ) * size, y, cursorChar );
 		} else {
 			str[0] = cursorChar;
 			str[1] = 0;
-			SCR_DrawBigString( x + ( this->cursor - prestep - i ) * size, y, str, 1.0, false );
+			Screen::drawBigString( x + ( this->cursor - prestep - i ) * size, y, str, 1.0, false );
 
 		}
 	}
@@ -664,7 +664,7 @@ void Console_Key (int key) {
 		CL_SaveConsoleHistory( );
 
 		if ( clc.state == CA_DISCONNECTED ) {
-			SCR_UpdateScreen ();	// force an update, because the command
+			Screen::updateScreen ();	// force an update, because the command
 		}							// may take some time
 		return;
 	}

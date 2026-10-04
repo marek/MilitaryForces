@@ -612,10 +612,10 @@ usercmd_t CL_CreateCmd( ) {
 	// draw debug graphs of turning for mouse testing
 	if ( cl_debugMove->integer ) {
 		if ( cl_debugMove->integer == 1 ) {
-			SCR_DebugGraph( fabs(cl.viewangles[YAW] - oldAngles[YAW]) );
+			Screen::debugGraph( fabs(cl.viewangles[YAW] - oldAngles[YAW]) );
 		}
 		if ( cl_debugMove->integer == 2 ) {
-			SCR_DebugGraph( fabs(cl.viewangles[PITCH] - oldAngles[PITCH]) );
+			Screen::debugGraph( fabs(cl.viewangles[PITCH] - oldAngles[PITCH]) );
 		}
 	}
 

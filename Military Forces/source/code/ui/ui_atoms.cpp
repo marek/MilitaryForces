@@ -514,7 +514,7 @@ void UI_SetColor( const float *rgba )
 
 void UI_UpdateScreen( ) 
 {
-	SCR_UpdateScreen();
+	Screen::updateScreen();
 }
 
 

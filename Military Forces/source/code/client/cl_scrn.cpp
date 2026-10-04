@@ -35,30 +35,30 @@ cvar_t		*cl_graphshift;
 
 /*
 ================
-SCR_DrawNamedPic
+Screen::drawNamedPic
 
 Coordinates are 640*480 virtual values
 =================
 */
-void SCR_DrawNamedPic( float x, float y, float width, float height, const char *picname ) {
+void Screen::drawNamedPic( float x, float y, float width, float height, const char *picname ) {
 	qhandle_t	hShader;
 
 	assert( width != 0 );
 
 	hShader = refExport.RegisterShader( picname );
-	SCR_AdjustFrom640( &x, &y, &width, &height );
+	Screen::adjustFrom640( &x, &y, &width, &height );
 	refExport.DrawStretchPic( x, y, width, height, 0, 0, 1, 1, hShader );
 }
 
 
 /*
 ================
-SCR_AdjustFrom640
+Screen::adjustFrom640
 
 Adjusted for resolution and screen aspect ratio
 ================
 */
-void SCR_AdjustFrom640( float *x, float *y, float *w, float *h ) {
+void Screen::adjustFrom640( float *x, float *y, float *w, float *h ) {
 	float	xscale;
 	float	yscale;
 
@@ -88,15 +88,15 @@ void SCR_AdjustFrom640( float *x, float *y, float *w, float *h ) {
 
 /*
 ================
-SCR_FillRect
+Screen::fillRect
 
 Coordinates are 640*480 virtual values
 =================
 */
-void SCR_FillRect( float x, float y, float width, float height, const float *color ) {
+void Screen::fillRect( float x, float y, float width, float height, const float *color ) {
 	refExport.SetColor( color );
 
-	SCR_AdjustFrom640( &x, &y, &width, &height );
+	Screen::adjustFrom640( &x, &y, &width, &height );
 	refExport.DrawStretchPic( x, y, width, height, 0, 0, 0, 0, cls.whiteShader );
 
 	refExport.SetColor( nullptr );
@@ -105,13 +105,13 @@ void SCR_FillRect( float x, float y, float width, float height, const float *col
 
 /*
 ================
-SCR_DrawPic
+Screen::drawPic
 
 Coordinates are 640*480 virtual values
 =================
 */
-void SCR_DrawPic( float x, float y, float width, float height, qhandle_t hShader ) {
-	SCR_AdjustFrom640( &x, &y, &width, &height );
+void Screen::drawPic( float x, float y, float width, float height, qhandle_t hShader ) {
+	Screen::adjustFrom640( &x, &y, &width, &height );
 	refExport.DrawStretchPic( x, y, width, height, 0, 0, 1, 1, hShader );
 }
 
@@ -140,7 +140,7 @@ static void SCR_DrawChar( int x, int y, float size, int ch ) {
 	ay = y;
 	aw = size;
 	ah = size;
-	SCR_AdjustFrom640( &ax, &ay, &aw, &ah );
+	Screen::adjustFrom640( &ax, &ay, &aw, &ah );
 
 	row = ch>>4;
 	col = ch&15;
@@ -156,10 +156,10 @@ static void SCR_DrawChar( int x, int y, float size, int ch ) {
 }
 
 /*
-** SCR_DrawSmallChar
+** Screen::drawSmallChar
 ** small chars are drawn at native screen resolution
 */
-void SCR_DrawSmallChar( int x, int y, int ch ) {
+void Screen::drawSmallChar( int x, int y, int ch ) {
 	int row, col;
 	float frow, fcol;
 	float size;
@@ -190,7 +190,7 @@ void SCR_DrawSmallChar( int x, int y, int ch ) {
 
 /*
 ==================
-SCR_DrawBigString[Color]
+Screen::drawBigString[Color]
 
 Draws a multi-colored string with a drop shadow, optionally forcing
 to a fixed color.
@@ -245,7 +245,7 @@ void SCR_DrawStringExt( int x, int y, float size, const char *string, float *set
 }
 
 
-void SCR_DrawBigString( int x, int y, const char *s, float alpha, bool noColorEscape ) {
+void Screen::drawBigString( int x, int y, const char *s, float alpha, bool noColorEscape ) {
 	float	color[4];
 
 	color[0] = color[1] = color[2] = 1.0;
@@ -253,7 +253,7 @@ void SCR_DrawBigString( int x, int y, const char *s, float alpha, bool noColorEs
 	SCR_DrawStringExt( x, y, BIGCHAR_WIDTH, s, color, false, noColorEscape );
 }
 
-void SCR_DrawBigStringColor( int x, int y, const char *s, vec4_t color, bool noColorEscape ) {
+void Screen::drawBigStringColor( int x, int y, const char *s, vec4_t color, bool noColorEscape ) {
 	SCR_DrawStringExt( x, y, BIGCHAR_WIDTH, s, color, true, noColorEscape );
 }
 
@@ -266,7 +266,7 @@ Draws a multi-colored string with a drop shadow, optionally forcing
 to a fixed color.
 ==================
 */
-void SCR_DrawSmallStringExt( int x, int y, const char *string, float *setColor, bool forceColor,
+void Screen::drawSmallStringExt( int x, int y, const char *string, float *setColor, bool forceColor,
 		bool noColorEscape ) {
 	vec4_t		color;
 	const char	*s;
@@ -288,7 +288,7 @@ void SCR_DrawSmallStringExt( int x, int y, const char *string, float *setColor, 
 				continue;
 			}
 		}
-		SCR_DrawSmallChar( xx, y, *s );
+		Screen::drawSmallChar( xx, y, *s );
 		xx += g_smallchar_width;
 		s++;
 	}
@@ -317,9 +317,9 @@ static int SCR_Strlen( const char *str ) {
 }
 
 /*
-** SCR_GetBigStringWidth
+** Screen::getBigStringWidth
 */ 
-int	SCR_GetBigStringWidth( const char *str ) {
+int	Screen::getBigStringWidth( const char *str ) {
 	return SCR_Strlen( str ) * BIGCHAR_WIDTH;
 }
 
@@ -404,10 +404,10 @@ static	float		values[1024];
 
 /*
 ==============
-SCR_DebugGraph
+Screen::debugGraph
 ==============
 */
-void SCR_DebugGraph (float value)
+void Screen::debugGraph (float value)
 {
 	values[current] = value;
 	current = (current + 1) % ARRAY_LEN(values);
@@ -451,10 +451,10 @@ void SCR_DrawDebugGraph ()
 
 /*
 ==================
-SCR_Init
+Screen::init
 ==================
 */
-void SCR_Init( ) {
+void Screen::init( ) {
 	cl_timegraph = CvarSystem::get ("timegraph", "0", CVAR_CHEAT);
 	cl_debuggraph = CvarSystem::get ("debuggraph", "0", CVAR_CHEAT);
 	cl_graphheight = CvarSystem::get ("graphheight", "32", CVAR_CHEAT);
@@ -499,7 +499,7 @@ void SCR_DrawScreenField( stereoFrame_t stereoFrame ) {
 			Com_Error( ERR_FATAL, "SCR_DrawScreenField: bad clc.state" );
 			break;
 		case CA_CINEMATIC:
-			SCR_DrawCinematic();
+			Screen::drawCinematic();
 			break;
 		case CA_DISCONNECTED:
 			// force menu up
@@ -552,13 +552,13 @@ void SCR_DrawScreenField( stereoFrame_t stereoFrame ) {
 
 /*
 ==================
-SCR_UpdateScreen
+Screen::updateScreen
 
 This is called every frame, and can also be called explicitly to flush
 text to the screen.
 ==================
 */
-void SCR_UpdateScreen( ) {
+void Screen::updateScreen( ) {
 	static int	recursive;
 
 	if ( !scr_initialized ) {
@@ -566,7 +566,7 @@ void SCR_UpdateScreen( ) {
 	}
 
 	if ( ++recursive > 2 ) {
-		Com_Error( ERR_FATAL, "SCR_UpdateScreen: recursively called" );
+		Com_Error( ERR_FATAL, "Screen::updateScreen: recursively called" );
 	}
 	recursive = 1;
 

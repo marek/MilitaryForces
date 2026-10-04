@@ -562,7 +562,7 @@ void Con_DrawInput () {
 
 	refExport.SetColor( con.color );
 
-	SCR_DrawSmallChar( con.xadjust + 1 * g_smallchar_width, y, ']' );
+	Screen::drawSmallChar( con.xadjust + 1 * g_smallchar_width, y, ']' );
 
 	g_consoleField.draw( con.xadjust + 2 * g_smallchar_width, y, SCREEN_WIDTH - 3 * g_smallchar_width, true, true );
 }
@@ -614,7 +614,7 @@ void Console::drawNotify ()
 				currentColor = ColorIndexForNumber( text[x]>>8 );
 				refExport.SetColor( g_color_table[currentColor] );
 			}
-			SCR_DrawSmallChar( cl_conXOffset->integer + con.xadjust + (x+1)*g_smallchar_width, v, text[x] & 0xff );
+			Screen::drawSmallChar( cl_conXOffset->integer + con.xadjust + (x+1)*g_smallchar_width, v, text[x] & 0xff );
 			linelength++;
 		}
 
@@ -623,7 +623,7 @@ void Console::drawNotify ()
 		}
 	}
 
-	// v is in native coordinates, convert to 640x480 for SCR_DrawBigString
+	// v is in native coordinates, convert to 640x480 for Screen::drawBigString
 	v *= 480.0f / cls.glconfig.vidHeight;
 	v += 8;
 
@@ -638,12 +638,12 @@ void Console::drawNotify ()
 	{
 		if (chat_team)
 		{
-			SCR_DrawBigString (8, v, "say_team:", 1.0f, false );
+			Screen::drawBigString (8, v, "say_team:", 1.0f, false );
 			skip = 10;
 		}
 		else
 		{
-			SCR_DrawBigString (8, v, "say:", 1.0f, false );
+			Screen::drawBigString (8, v, "say:", 1.0f, false );
 			skip = 5;
 		}
 
@@ -678,7 +678,7 @@ void Con_DrawSolidConsole( float frac ) {
 
 	// on wide screens, we will center the text
 	con.xadjust = 0;
-	SCR_AdjustFrom640( &con.xadjust, nullptr, nullptr, nullptr );
+	Screen::adjustFrom640( &con.xadjust, nullptr, nullptr, nullptr );
 
 	// draw the background
 	y = frac * SCREEN_HEIGHT;
@@ -686,14 +686,14 @@ void Con_DrawSolidConsole( float frac ) {
 		y = 0;
 	}
 	else {
-		SCR_DrawPic( 0, 0, SCREEN_WIDTH, y, cls.consoleShader );
+		Screen::drawPic( 0, 0, SCREEN_WIDTH, y, cls.consoleShader );
 	}
 
 	color[0] = 1;
 	color[1] = 0;
 	color[2] = 0;
 	color[3] = 1;
-	SCR_FillRect( 0, y, SCREEN_WIDTH, 2, color );
+	Screen::fillRect( 0, y, SCREEN_WIDTH, 2, color );
 
 
 	// draw the version number
@@ -703,7 +703,7 @@ void Con_DrawSolidConsole( float frac ) {
 	i = strlen( Q3_VERSION );
 
 	for (x=0 ; x<i ; x++) {
-		SCR_DrawSmallChar( cls.glconfig.vidWidth - ( i - x + 1 ) * g_smallchar_width,
+		Screen::drawSmallChar( cls.glconfig.vidWidth - ( i - x + 1 ) * g_smallchar_width,
 			lines - g_smallchar_height, Q3_VERSION[x] );
 	}
 
@@ -720,7 +720,7 @@ void Con_DrawSolidConsole( float frac ) {
 	// draw arrows to show the buffer is backscrolled
 		refExport.SetColor( g_color_table[ColorIndex(COLOR_RED)] );
 		for (x=0 ; x<con.linewidth ; x+=4)
-			SCR_DrawSmallChar( con.xadjust + (x+1)*g_smallchar_width, y, '^' );
+			Screen::drawSmallChar( con.xadjust + (x+1)*g_smallchar_width, y, '^' );
 		y -= g_smallchar_height;
 		rows--;
 	}
@@ -754,7 +754,7 @@ void Con_DrawSolidConsole( float frac ) {
 				currentColor = ColorIndexForNumber( text[x]>>8 );
 				refExport.SetColor( g_color_table[currentColor] );
 			}
-			SCR_DrawSmallChar(  con.xadjust + (x+1)*g_smallchar_width, y, text[x] & 0xff );
+			Screen::drawSmallChar(  con.xadjust + (x+1)*g_smallchar_width, y, text[x] & 0xff );
 		}
 	}
 

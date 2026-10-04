@@ -1661,7 +1661,6 @@ void ME_Init_MissionEditor();
 int Sys_Milliseconds ();
 void CL_AddCgameCommand( const char *cmdName );
 void CL_AddReliableCommand(const char *cmd, bool isDisconnectCmd = false);
-void SCR_UpdateScreen();
 void CL_CM_LoadMap( const char *mapname );
 int Key_GetCatcher();
 void Key_SetCatcher( int catcher );

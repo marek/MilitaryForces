@@ -50,7 +50,7 @@ static void CG_LoadingRefresh( bool force ) {
 	}
 	cg.infoLoadRefreshTime = now;
 
-	SCR_UpdateScreen();
+	Screen::updateScreen();
 }
 
 void CG_LoadingString( const char *s ) {

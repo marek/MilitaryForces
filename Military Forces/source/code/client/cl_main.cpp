@@ -1307,7 +1307,7 @@ void CL_MapLoading( ) {
 		Com_Memset( clc.serverMessage, 0, sizeof( clc.serverMessage ) );
 		Com_Memset( &cl.gameState, 0, sizeof( cl.gameState ) );
 		clc.lastPacketSentTime = -9999;
-		SCR_UpdateScreen();
+		Screen::updateScreen();
 	} else {
 		// clear nextmap so the cinematic shutdown doesn't execute it
 		CvarSystem::set( "nextmap", "" );
@@ -1315,7 +1315,7 @@ void CL_MapLoading( ) {
 		Q_strncpyz( clc.servername, "localhost", sizeof(clc.servername) );
 		clc.state = CA_CHALLENGING;		// so the connect screen is drawn
 		Key_SetCatcher( 0 );
-		SCR_UpdateScreen();
+		Screen::updateScreen();
 		clc.connectTime = -RETRANSMIT_TIMEOUT;
 		Network::stringToAdr( clc.servername, &clc.serverAddress, NA_UNSPEC);
 		// we don't need a challenge on the localhost
@@ -1437,7 +1437,7 @@ void CL_Disconnect( bool showMainMenu ) {
 		theUI.setActiveMenu( UserInterface::MenuCommand::UIMENU_NONE );
 	}
 
-	SCR_StopCinematic ();
+	Screen::stopCinematic ();
 	SoundSystem::clearSoundBuffer();
 
 	// send a disconnect message to the server
@@ -1474,7 +1474,7 @@ void CL_Disconnect( bool showMainMenu ) {
 	// Stop recording any video
 	if( CL_VideoRecording( ) ) {
 		// Finish rendering current frame
-		SCR_UpdateScreen( );
+		Screen::updateScreen( );
 		CL_CloseAVI( );
 	}
 
@@ -1668,7 +1668,7 @@ CL_Disconnect_f
 ==================
 */
 void CL_Disconnect_f( ) {
-	SCR_StopCinematic();
+	Screen::stopCinematic();
 	CvarSystem::set("ui_singlePlayerActive", "0");
 	if ( clc.state != CA_DISCONNECTED && clc.state != CA_CINEMATIC ) {
 		Com_Error (ERR_DISCONNECT, "Disconnected from server");
@@ -2995,7 +2995,7 @@ void CL_Frame ( int msec ) {
 			cls.realFrametime = msec;
 			cls.frametime = msec;
 			cls.realtime += cls.frametime;
-			SCR_UpdateScreen();
+			Screen::updateScreen();
 			SoundSystem::update();
 			Console::runConsole();
 			cls.framecount++;
@@ -3076,7 +3076,7 @@ void CL_Frame ( int msec ) {
 	cls.realtime += cls.frametime;
 
 	if ( cl_timegraph->integer ) {
-		SCR_DebugGraph ( cls.realFrametime * 0.25 );
+		Screen::debugGraph ( cls.realFrametime * 0.25 );
 	}
 
 	// see if we need to update any userinfo
@@ -3096,7 +3096,7 @@ void CL_Frame ( int msec ) {
 	CL_SetCGameTime();
 
 	// update the screen
-	SCR_UpdateScreen();
+	Screen::updateScreen();
 
 	// update audio
 	SoundSystem::update();
@@ -3110,7 +3110,7 @@ void CL_Frame ( int msec ) {
 #endif
 
 	// advance local effects for next frame
-	SCR_RunCinematic();
+	Screen::runCinematic();
 
 	Console::runConsole();
 
@@ -3749,7 +3749,7 @@ void CL_Init( ) {
 	}
 	CL_InitRef();
 
-	SCR_Init ();
+	Screen::init ();
 
 //	CommandBuffer::execute ();
 
