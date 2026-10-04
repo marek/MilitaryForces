@@ -12,7 +12,7 @@ extern pmove_t		*pm;
 extern pml_t		pml;
 
 
-#define	MIN_WALK_NORMAL	0.4f
+constexpr float MIN_WALK_NORMAL = 0.4f;
 #define	JUMP_VELOCITY	370/3;
 #define	STEPSIZE		18*LQM_SCALE
 

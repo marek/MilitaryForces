@@ -27,9 +27,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "qcommon.h"
 #include "cm_polylib.h"
 
-#define	MAX_SUBMODELS			256
-#define	BOX_MODEL_HANDLE		255
-#define CAPSULE_MODEL_HANDLE	254
+inline constexpr int MAX_SUBMODELS = 256;
+inline constexpr int BOX_MODEL_HANDLE = 255;
+inline constexpr int CAPSULE_MODEL_HANDLE = 254;
 
 
 typedef struct {
@@ -134,7 +134,7 @@ typedef struct {
 
 // keep 1/8 unit away to keep the position valid before network snapping
 // and to avoid various numeric issues
-#define	SURFACE_CLIP_EPSILON	(0.125)
+inline constexpr double SURFACE_CLIP_EPSILON = (0.125);
 
 extern	clipMap_t	cm;
 extern	int			c_pointcontents;

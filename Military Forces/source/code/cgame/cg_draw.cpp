@@ -51,7 +51,7 @@ LAGOMETER
 ===============================================================================
 */
 
-#define	LAG_SAMPLES		128
+constexpr int LAG_SAMPLES = 128;
 
 typedef struct {
 	int		frameSamples[LAG_SAMPLES];
@@ -536,8 +536,8 @@ CG_DrawFPS
 ==================
 */
 
-#define	FPS_FRAMES	4
-#define	FPS_STROBE	50	// only show every x computes because we can't read the damn this otherwise
+constexpr int FPS_FRAMES = 4;
+constexpr int FPS_STROBE = 50; // only show every x computes because we can't read the damn this otherwise
 
 static float CG_DrawFPS( float y ) {
 	char		*s;
@@ -805,8 +805,8 @@ static void CG_DrawDisconnect( ) {
 	CG_DrawPic( x, y, 48, 48, refExport.RegisterShader("gfx/2d/net.tga" ) );
 }
 
-#define	MAX_LAGOMETER_PING	900
-#define	MAX_LAGOMETER_RANGE	300
+constexpr int MAX_LAGOMETER_PING = 900;
+constexpr int MAX_LAGOMETER_RANGE = 300;
 
 /*
 ==============
@@ -960,7 +960,7 @@ CG_DrawCustomConsole
 =====================
 */
 
-#define LINE_HEIGHT	14
+constexpr int LINE_HEIGHT = 14;
 
 static void CG_DrawCustomConsole( )
 {

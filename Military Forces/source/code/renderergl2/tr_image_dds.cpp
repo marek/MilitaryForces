@@ -52,28 +52,28 @@ typedef struct ddsHeader_s
 ddsHeader_t;
 
 // flags:
-#define _DDSFLAGS_REQUIRED     0x001007
-#define _DDSFLAGS_PITCH        0x8
-#define _DDSFLAGS_MIPMAPCOUNT  0x20000
-#define _DDSFLAGS_FIRSTMIPSIZE 0x80000
-#define _DDSFLAGS_VOLUMEDEPTH  0x800000
+constexpr int _DDSFLAGS_REQUIRED = 0x001007;
+constexpr int _DDSFLAGS_PITCH = 0x8;
+constexpr int _DDSFLAGS_MIPMAPCOUNT = 0x20000;
+constexpr int _DDSFLAGS_FIRSTMIPSIZE = 0x80000;
+constexpr int _DDSFLAGS_VOLUMEDEPTH = 0x800000;
 
 // pixelFormatFlags:
-#define DDSPF_ALPHAPIXELS 0x1
-#define DDSPF_ALPHA       0x2
-#define DDSPF_FOURCC      0x4
-#define DDSPF_RGB         0x40
-#define DDSPF_YUV         0x200
-#define DDSPF_LUMINANCE   0x20000
+constexpr int DDSPF_ALPHAPIXELS = 0x1;
+constexpr int DDSPF_ALPHA = 0x2;
+constexpr int DDSPF_FOURCC = 0x4;
+constexpr int DDSPF_RGB = 0x40;
+constexpr int DDSPF_YUV = 0x200;
+constexpr int DDSPF_LUMINANCE = 0x20000;
 
 // caps:
-#define DDSCAPS_COMPLEX  0x8
-#define DDSCAPS_MIPMAP   0x400000
-#define DDSCAPS_REQUIRED 0x1000
+constexpr int DDSCAPS_COMPLEX = 0x8;
+constexpr int DDSCAPS_MIPMAP = 0x400000;
+constexpr int DDSCAPS_REQUIRED = 0x1000;
 
 // caps2:
-#define DDSCAPS2_CUBEMAP 0xFE00
-#define DDSCAPS2_VOLUME  0x200000
+constexpr int DDSCAPS2_CUBEMAP = 0xFE00;
+constexpr int DDSCAPS2_VOLUME = 0x200000;
 
 typedef struct ddsHeaderDxt10_s
 {

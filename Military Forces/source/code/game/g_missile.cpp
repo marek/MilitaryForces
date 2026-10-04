@@ -7,7 +7,7 @@
 #include "g_local.h"
 #include "g_level.h"
 
-#define	MISSILE_PRESTEP_TIME	50
+constexpr int MISSILE_PRESTEP_TIME = 50;
 
 ///*
 //================
@@ -1936,8 +1936,8 @@ void LaunchMissile_GI( GameEntity* ent )
 fire_flak_GI
 =================
 */
-#define FLAK_DEVIATION_XY 800
-#define FLAK_DEVIATION_HEIGHT 200
+constexpr int FLAK_DEVIATION_XY = 800;
+constexpr int FLAK_DEVIATION_HEIGHT = 200;
 void fire_flak_GI (GameEntity *self)
 {
 	GameEntity	*bolt;

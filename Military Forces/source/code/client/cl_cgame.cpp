@@ -516,7 +516,7 @@ or bursted delayed packets.
 =================
 */
 
-#define	RESET_TIME	500
+constexpr int RESET_TIME = 500;
 
 void CL_AdjustTimeDelta( ) {
 	int		newDelta;

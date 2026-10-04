@@ -8,16 +8,16 @@
 #include "cg_local.h"
 
 
-#define	SCOREBOARD_X		(0)
+constexpr int SCOREBOARD_X = (0);
 
-#define SB_HEADER			86
+constexpr int SB_HEADER = 86;
 #define SB_TOP				(SB_HEADER+32)
 
 // Where the status bar starts, so we don't overwrite it
-#define SB_STATUSBAR		420
+constexpr int SB_STATUSBAR = 420;
 
-#define SB_NORMAL_HEIGHT	40
-#define SB_INTER_HEIGHT		16 // interleaved height
+constexpr int SB_NORMAL_HEIGHT = 40;
+constexpr int SB_INTER_HEIGHT = 16; // interleaved height
 
 #define SB_MAXCLIENTS_NORMAL  ((SB_STATUSBAR - SB_TOP) / SB_NORMAL_HEIGHT)
 #define SB_MAXCLIENTS_INTER   ((SB_STATUSBAR - SB_TOP) / SB_INTER_HEIGHT - 1)
@@ -34,7 +34,7 @@
 #define SB_BOTICON_X		(SCOREBOARD_X+32)
 #define SB_HEAD_X			(SCOREBOARD_X+64)
 
-#define SB_SCORELINE_X		112
+constexpr int SB_SCORELINE_X = 112;
 
 #define SB_RATING_WIDTH	    (6 * BIGCHAR_WIDTH) // width 6
 #define SB_SCORE_X			(SB_SCORELINE_X + BIGCHAR_WIDTH) // width 6

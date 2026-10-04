@@ -22,7 +22,7 @@ CG_ParseScores
 =================
 */
 
-#define	SCORE_BLOCK	15	// this value must be exactly how many parameters we expect per client score
+constexpr int SCORE_BLOCK = 15; // this value must be exactly how many parameters we expect per client score
 
 static void CG_ParseScores( )
 {

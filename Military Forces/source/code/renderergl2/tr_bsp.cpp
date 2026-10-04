@@ -198,7 +198,7 @@ R_LoadLightmaps
 
 ===============
 */
-#define	DEFAULT_LIGHTMAP_SIZE	128
+constexpr int DEFAULT_LIGHTMAP_SIZE = 128;
 static	void R_LoadLightmaps( lump_t *l, lump_t *surfs ) {
 	imgFlags_t  imgFlags = IMGFLAG_NOLIGHTSCALE | IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE;
 	byte		*buf, *buf_p;

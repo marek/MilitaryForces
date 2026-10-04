@@ -11,7 +11,7 @@
 #include "cg_local.h"
 #include <algorithm>
 
-#define	MAX_LOCAL_ENTITIES	2048
+constexpr int MAX_LOCAL_ENTITIES = 2048;
 localEntity_t	cg_localEntities[MAX_LOCAL_ENTITIES];
 localEntity_t	cg_activeLocalEntities;		// double linked list
 localEntity_t	*cg_freeLocalEntities;		// single linked list

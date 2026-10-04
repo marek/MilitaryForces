@@ -25,7 +25,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define INDEX_FILE_EXTENSION ".index.dat"
 
-#define MAX_RIFF_CHUNKS 16
+constexpr int MAX_RIFF_CHUNKS = 16;
 
 typedef struct audioFormat_s
 {
@@ -69,7 +69,7 @@ typedef struct aviFileData_s
 
 static aviFileData_t afd;
 
-#define MAX_AVI_BUFFER 2048
+constexpr int MAX_AVI_BUFFER = 2048;
 
 static byte buffer[ MAX_AVI_BUFFER ];
 static int  bufIndex;
@@ -501,7 +501,7 @@ void CL_WriteAVIVideoFrame( const byte *imageBuffer, int size )
   afd.numIndices++;
 }
 
-#define PCM_BUFFER_SIZE 44100
+constexpr int PCM_BUFFER_SIZE = 44100;
 
 /*
 ===============

@@ -10,28 +10,28 @@
 #ifndef __G_PUBLIC_H__
 #define __G_PUBLIC_H__
 
-#define	GAME_API_VERSION	8
+inline constexpr int GAME_API_VERSION = 8;
 
 // entity->svFlags
 // the server does not know how to interpret most of the values
 // in entityStates (level eType), so the game must explicitly flag
 // special server behaviors
-#define	SVF_NOCLIENT			0x00000001	// don't send entity to clients, even if it has effects
+inline constexpr int SVF_NOCLIENT = 0x00000001; // don't send entity to clients, even if it has effects
 
-#define SVF_CLIENTMASK			0x00000002
+inline constexpr int SVF_CLIENTMASK = 0x00000002;
 
-#define SVF_BOT					0x00000008	// set if the entity is a bot
-#define	SVF_BROADCAST			0x00000020	// send to all connected clients
-#define	SVF_PORTAL				0x00000040	// merge a second pvs at origin2 into snapshots
-#define	SVF_USE_CURRENT_ORIGIN	0x00000080	// entity->r.currentOrigin instead of entity->s.origin
+inline constexpr int SVF_BOT = 0x00000008; // set if the entity is a bot
+inline constexpr int SVF_BROADCAST = 0x00000020; // send to all connected clients
+inline constexpr int SVF_PORTAL = 0x00000040; // merge a second pvs at origin2 into snapshots
+inline constexpr int SVF_USE_CURRENT_ORIGIN = 0x00000080; // entity->r.currentOrigin instead of entity->s.origin
 											// for link position (missiles and movers)
-#define SVF_SINGLECLIENT		0x00000100	// only send to a single client
-#define SVF_NOSERVERINFO		0x00000200	// don't send CS_SERVERINFO updates to this client
+inline constexpr int SVF_SINGLECLIENT = 0x00000100; // only send to a single client
+inline constexpr int SVF_NOSERVERINFO = 0x00000200; // don't send CS_SERVERINFO updates to this client
 											// so that it can be updated for ping tools without
 											// lagging clients
-#define SVF_CAPSULE				0x00000400	// use capsule for collision detection instead of bbox
-#define SVF_NOTSINGLECLIENT		0x00000800	// send entity to everyone but one client
-#define SVF_DECK				0x00001000	// box that rotates with r.currentAngles, also clips entities sharing its owner
+inline constexpr int SVF_CAPSULE = 0x00000400; // use capsule for collision detection instead of bbox
+inline constexpr int SVF_NOTSINGLECLIENT = 0x00000800; // send entity to everyone but one client
+inline constexpr int SVF_DECK = 0x00001000; // box that rotates with r.currentAngles, also clips entities sharing its owner
 											// (entityShared_t->singleClient)
 
 //===============================================================

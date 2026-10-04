@@ -93,7 +93,7 @@ static void IN_PrintKey( const SDL_Keysym *keysym, int key, bool down )
 	Com_Printf( " Q:0x%02x(%s)\n", key, Key_KeynumToString( key ) );
 }
 
-#define MAX_CONSOLE_KEYS 16
+constexpr int MAX_CONSOLE_KEYS = 16;
 
 /*
 ===============

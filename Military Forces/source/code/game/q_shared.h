@@ -72,8 +72,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define Q3_VERSION PRODUCT_NAME " " PRODUCT_VERSION
 #define	MF_VERSION		Q3_VERSION
 
-#define MAX_TEAMNAME		32
-#define MAX_MASTER_SERVERS      5	// number of supported master servers
+inline constexpr int MAX_TEAMNAME = 32;
+inline constexpr int MAX_MASTER_SERVERS = 5; // number of supported master servers
 
 #define DEMOEXT	"dm_"			// standard demo extension
 
@@ -212,7 +212,7 @@ typedef int		clipHandle_t;
 // expand constants before stringifying them
 #define XSTRING(s)			STRING(s)
 
-#define	MAX_QINT			0x7fffffff
+inline constexpr int MAX_QINT = 0x7fffffff;
 #define	MIN_QINT			(-MAX_QINT-1)
 
 #define ARRAY_LEN(x)			(sizeof(x) / sizeof(*(x)))
@@ -225,17 +225,17 @@ typedef int		clipHandle_t;
 
 // the game guarantees that no string from the network will ever
 // exceed MAX_STRING_CHARS
-#define	MAX_STRING_CHARS	1024	// max length of a string passed to Cmd_TokenizeString
-#define	MAX_STRING_TOKENS	1024	// max tokens resulting from Cmd_TokenizeString
-#define	MAX_TOKEN_CHARS		1024	// max length of an individual token
+inline constexpr int MAX_STRING_CHARS = 1024; // max length of a string passed to Cmd_TokenizeString
+inline constexpr int MAX_STRING_TOKENS = 1024; // max tokens resulting from Cmd_TokenizeString
+inline constexpr int MAX_TOKEN_CHARS = 1024; // max length of an individual token
 
-#define	MAX_INFO_STRING		1024
-#define	MAX_INFO_KEY		  1024
-#define	MAX_INFO_VALUE		1024
+inline constexpr int MAX_INFO_STRING = 1024;
+inline constexpr int MAX_INFO_KEY = 1024;
+inline constexpr int MAX_INFO_VALUE = 1024;
 
-#define	BIG_INFO_STRING		8192  // used for system info key only
-#define	BIG_INFO_KEY		  8192
-#define	BIG_INFO_VALUE		8192
+inline constexpr int BIG_INFO_STRING = 8192; // used for system info key only
+inline constexpr int BIG_INFO_KEY = 8192;
+inline constexpr int BIG_INFO_VALUE = 8192;
 
 
 #define	MAX_QPATH			64		// max length of a quake game pathname
@@ -245,10 +245,10 @@ typedef int		clipHandle_t;
 #define	MAX_OSPATH			256		// max length of a filesystem pathname
 #endif
 
-#define	MAX_NAME_LENGTH		32		// max length of a client name
-#define	MAX_HOSTNAME_LENGTH	80		// max length of a host name
+inline constexpr int MAX_NAME_LENGTH = 32; // max length of a client name
+inline constexpr int MAX_HOSTNAME_LENGTH = 80; // max length of a host name
 
-#define	MAX_SAY_TEXT	150
+inline constexpr int MAX_SAY_TEXT = 150;
 
 // parameters for command buffer stuffing
 typedef enum {
@@ -290,25 +290,25 @@ typedef enum {
 
 // font rendering values used by ui and cgame
 
-#define PROP_GAP_WIDTH			3
-#define PROP_SPACE_WIDTH		8
-#define PROP_HEIGHT				27
-#define PROP_SMALL_SIZE_SCALE	0.75
+inline constexpr int PROP_GAP_WIDTH = 3;
+inline constexpr int PROP_SPACE_WIDTH = 8;
+inline constexpr int PROP_HEIGHT = 27;
+inline constexpr double PROP_SMALL_SIZE_SCALE = 0.75;
 
-#define BLINK_DIVISOR			200
-#define PULSE_DIVISOR			75
+inline constexpr int BLINK_DIVISOR = 200;
+inline constexpr int PULSE_DIVISOR = 75;
 
-#define UI_LEFT			0x00000000	// default
-#define UI_CENTER		0x00000001
-#define UI_RIGHT		0x00000002
-#define UI_FORMATMASK	0x00000007
-#define UI_SMALLFONT	0x00000010
-#define UI_BIGFONT		0x00000020	// default
-#define UI_GIANTFONT	0x00000040
-#define UI_DROPSHADOW	0x00000800
-#define UI_BLINK		0x00001000
-#define UI_INVERSE		0x00002000
-#define UI_PULSE		0x00004000
+inline constexpr int UI_LEFT = 0x00000000; // default
+inline constexpr int UI_CENTER = 0x00000001;
+inline constexpr int UI_RIGHT = 0x00000002;
+inline constexpr int UI_FORMATMASK = 0x00000007;
+inline constexpr int UI_SMALLFONT = 0x00000010;
+inline constexpr int UI_BIGFONT = 0x00000020; // default
+inline constexpr int UI_GIANTFONT = 0x00000040;
+inline constexpr int UI_DROPSHADOW = 0x00000800;
+inline constexpr int UI_BLINK = 0x00001000;
+inline constexpr int UI_INVERSE = 0x00002000;
+inline constexpr int UI_PULSE = 0x00004000;
 
 #if !defined(NDEBUG) && !defined(BSPC)
 	#define HUNK_DEBUG
@@ -330,11 +330,11 @@ void *Hunk_Alloc( int size, ha_pref preference );
 #define Com_Memset memset
 #define Com_Memcpy memcpy
 
-#define CIN_system	1
-#define CIN_loop	2
-#define	CIN_hold	4
-#define CIN_silent	8
-#define CIN_shader	16
+inline constexpr int CIN_system = 1;
+inline constexpr int CIN_loop = 2;
+inline constexpr int CIN_hold = 4;
+inline constexpr int CIN_silent = 8;
+inline constexpr int CIN_shader = 16;
 
 /*
 ==============================================================
@@ -361,25 +361,25 @@ typedef	int	fixed16_t;
 #define M_PI		3.14159265358979323846f	// matches value in gcc v2 math.h
 #endif
 
-#define NUMVERTEXNORMALS	162
+inline constexpr int NUMVERTEXNORMALS = 162;
 extern	vec3_t	bytedirs[NUMVERTEXNORMALS];
 
 // all drawing is done to a 640*480 virtual screen size
 // and will be automatically scaled to the real resolution
-#define	SCREEN_WIDTH		640
-#define	SCREEN_HEIGHT		480
+inline constexpr int SCREEN_WIDTH = 640;
+inline constexpr int SCREEN_HEIGHT = 480;
 
 #define TINYCHAR_WIDTH		(SMALLCHAR_WIDTH)
 #define TINYCHAR_HEIGHT		(SMALLCHAR_HEIGHT/2)
 
-#define SMALLCHAR_WIDTH		8
-#define SMALLCHAR_HEIGHT	16
+inline constexpr int SMALLCHAR_WIDTH = 8;
+inline constexpr int SMALLCHAR_HEIGHT = 16;
 
-#define BIGCHAR_WIDTH		16
-#define BIGCHAR_HEIGHT		16
+inline constexpr int BIGCHAR_WIDTH = 16;
+inline constexpr int BIGCHAR_HEIGHT = 16;
 
-#define	GIANTCHAR_WIDTH		32
-#define	GIANTCHAR_HEIGHT	48
+inline constexpr int GIANTCHAR_WIDTH = 32;
+inline constexpr int GIANTCHAR_HEIGHT = 48;
 
 extern	vec4_t		colorBlack;
 extern	vec4_t		colorRed;
@@ -429,7 +429,7 @@ struct cplane_s;
 extern	vec3_t	vec3_origin;
 extern	vec3_t	axisDefault[3];
 
-#define	nanmask (255<<23)
+inline constexpr int nanmask = (255<<23);
 
 #define	IS_NAN(x) (((*(int *)&x)&nanmask)==nanmask)
 
@@ -715,8 +715,8 @@ void PerpendicularVector( vec3_t dst, const vec3_t src );
 
 
 // MFQ3
-#define BOX3_MAX	2
-#define BOX3_MIN	4
+inline constexpr int BOX3_MAX = 2;
+inline constexpr int BOX3_MIN = 4;
 
 // complex box for intersection method
 typedef struct {
@@ -777,7 +777,7 @@ void	COM_ParseError( char *format, ... ) Q_PRINTF_FUNC(1, 2);
 void	COM_ParseWarning( char *format, ... ) Q_PRINTF_FUNC(1, 2);
 //int		COM_ParseInfos( char *buf, int max, char infos[][MAX_INFO_STRING] );
 
-#define MAX_TOKENLENGTH		1024
+inline constexpr int MAX_TOKENLENGTH = 1024;
 
 
 // data is an in/out parm, returns a parsed out token
@@ -872,7 +872,7 @@ void	Swap_Init (void);
 */
 char	* QDECL va(const char *format, ...) Q_PRINTF_FUNC(1, 2);
 
-#define TRUNCATE_LENGTH	64
+inline constexpr int TRUNCATE_LENGTH = 64;
 void Com_TruncateLongString( char *buffer, const char *s );
 
 //=============================================
@@ -904,31 +904,31 @@ default values.
 ==========================================================
 */
 
-#define	CVAR_ARCHIVE		0x0001	// set to cause it to be saved to vars.rc
+inline constexpr int CVAR_ARCHIVE = 0x0001; // set to cause it to be saved to vars.rc
 					// used for system variables, not for player
 					// specific configurations
-#define	CVAR_USERINFO		0x0002	// sent to server on connect or change
-#define	CVAR_SERVERINFO		0x0004	// sent in response to front end requests
-#define	CVAR_SYSTEMINFO		0x0008	// these cvars will be duplicated on all clients
-#define	CVAR_INIT		0x0010	// don't allow change from console at all,
+inline constexpr int CVAR_USERINFO = 0x0002; // sent to server on connect or change
+inline constexpr int CVAR_SERVERINFO = 0x0004; // sent in response to front end requests
+inline constexpr int CVAR_SYSTEMINFO = 0x0008; // these cvars will be duplicated on all clients
+inline constexpr int CVAR_INIT = 0x0010; // don't allow change from console at all,
 					// but can be set from the command line
-#define	CVAR_LATCH		0x0020	// will only change when C code next does
+inline constexpr int CVAR_LATCH = 0x0020; // will only change when C code next does
 					// a Cvar_Get(), so it can't be changed
 					// without proper initialization.  modified
 					// will be set, even though the value hasn't
 					// changed yet
-#define	CVAR_ROM		0x0040	// display only, cannot be set by user at all
-#define	CVAR_USER_CREATED	0x0080	// created by a set command
-#define	CVAR_TEMP		0x0100	// can be set even when cheats are disabled, but is not archived
-#define CVAR_CHEAT		0x0200	// can not be changed if cheats are disabled
-#define CVAR_NORESTART		0x0400	// do not clear when a cvar_restart is issued
+inline constexpr int CVAR_ROM = 0x0040; // display only, cannot be set by user at all
+inline constexpr int CVAR_USER_CREATED = 0x0080; // created by a set command
+inline constexpr int CVAR_TEMP = 0x0100; // can be set even when cheats are disabled, but is not archived
+inline constexpr int CVAR_CHEAT = 0x0200; // can not be changed if cheats are disabled
+inline constexpr int CVAR_NORESTART = 0x0400; // do not clear when a cvar_restart is issued
 
-#define CVAR_SERVER_CREATED	0x0800	// cvar was created by a server the client connected to.
-#define CVAR_VM_CREATED		0x1000	// cvar was created exclusively in one of the VMs.
-#define CVAR_PROTECTED		0x2000	// prevent modifying this var from VMs or the server
+inline constexpr int CVAR_SERVER_CREATED = 0x0800; // cvar was created by a server the client connected to.
+inline constexpr int CVAR_VM_CREATED = 0x1000; // cvar was created exclusively in one of the VMs.
+inline constexpr int CVAR_PROTECTED = 0x2000; // prevent modifying this var from VMs or the server
 // These flags are only returned by the Cvar_Flags() function
-#define CVAR_MODIFIED		0x40000000	// Cvar was modified
-#define CVAR_NONEXISTENT	0x80000000	// Cvar doesn't exist.
+inline constexpr int CVAR_MODIFIED = 0x40000000; // Cvar was modified
+inline constexpr unsigned int CVAR_NONEXISTENT = 0x80000000; // Cvar doesn't exist.
 
 // nothing outside the Cvar_*() functions should modify these fields!
 typedef struct cvar_s cvar_t;
@@ -956,7 +956,7 @@ struct cvar_s {
 	int			hashIndex;
 };
 
-#define	MAX_CVAR_VALUE_STRING	256
+inline constexpr int MAX_CVAR_VALUE_STRING = 256;
 
 typedef int	cvarHandle_t;
 
@@ -980,12 +980,12 @@ VoIP
 */
 
 // if you change the count of flags be sure to also change VOIP_FLAGNUM
-#define VOIP_SPATIAL		0x01		// spatialized voip message
-#define VOIP_DIRECT		0x02		// non-spatialized voip message
+inline constexpr int VOIP_SPATIAL = 0x01; // spatialized voip message
+inline constexpr int VOIP_DIRECT = 0x02; // non-spatialized voip message
 
 // number of flags voip knows. You will have to bump protocol version number if you
 // change this.
-#define VOIP_FLAGCNT		2
+inline constexpr int VOIP_FLAGCNT = 2;
 
 /*
 ==============================================================
@@ -1002,7 +1002,7 @@ COLLISION DETECTION
 #define	PLANE_X			0
 #define	PLANE_Y			1
 #define	PLANE_Z			2
-#define	PLANE_NON_AXIAL	3
+inline constexpr int PLANE_NON_AXIAL = 3;
 
 
 /*
@@ -1058,10 +1058,10 @@ typedef struct {
 
 // in order from highest priority to lowest
 // if none of the catchers are active, bound key strings will be executed
-#define KEYCATCH_CONSOLE		0x0001
-#define	KEYCATCH_UI					0x0002
-#define	KEYCATCH_MESSAGE		0x0004
-#define	KEYCATCH_CGAME			0x0008
+inline constexpr int KEYCATCH_CONSOLE = 0x0001;
+inline constexpr int KEYCATCH_UI = 0x0002;
+inline constexpr int KEYCATCH_MESSAGE = 0x0004;
+inline constexpr int KEYCATCH_CGAME = 0x0008;
 
 
 // sound channels
@@ -1090,43 +1090,43 @@ typedef enum {
 #define	ANGLE2SHORT(x)	((int)((x)*65536/360) & 65535)
 #define	SHORT2ANGLE(x)	((x)*(360.0/65536))
 
-#define	SNAPFLAG_RATE_DELAYED	1
-#define	SNAPFLAG_NOT_ACTIVE		2	// snapshot used during connection and for zombies
-#define SNAPFLAG_SERVERCOUNT	4	// toggled every map_restart so transitions can be detected
-#define SNAPFLAG_ENTITY_RESET	8
+inline constexpr int SNAPFLAG_RATE_DELAYED = 1;
+inline constexpr int SNAPFLAG_NOT_ACTIVE = 2; // snapshot used during connection and for zombies
+inline constexpr int SNAPFLAG_SERVERCOUNT = 4; // toggled every map_restart so transitions can be detected
+inline constexpr int SNAPFLAG_ENTITY_RESET = 8;
 
 //
 // per-level limits
 //
-#define	MAX_CLIENTS			64		// absolute limit
-#define MAX_LOCATIONS		64
+inline constexpr int MAX_CLIENTS = 64; // absolute limit
+inline constexpr int MAX_LOCATIONS = 64;
 
-#define	GENTITYNUM_BITS		12
+inline constexpr int GENTITYNUM_BITS = 12;
 #define	MAX_GENTITIES		(1<<GENTITYNUM_BITS)
 
 // entitynums are communicated with GENTITY_BITS, so any reserved
 // values that are going to be communcated over the net need to
 // also be in this range
-#define	ENTITYNUM_NONE			(-1)
-#define	ENTITYNUM_WORLD			(0)
+inline constexpr int ENTITYNUM_NONE = (-1);
+inline constexpr int ENTITYNUM_WORLD = (0);
 #define	ENTITYNUM_MAX_NORMAL	(MAX_GENTITIES-1)
 #define	ENTITYNUM_WIRE_END		(MAX_GENTITIES-1)
 
 
-#define	MAX_MODELS			256		// these are sent over the net as 8 bits
-#define	MAX_SOUNDS			256		// so they cannot be blindly increased
+inline constexpr int MAX_MODELS = 256; // these are sent over the net as 8 bits
+inline constexpr int MAX_SOUNDS = 256; // so they cannot be blindly increased
 
 
 #define	MAX_CONFIGSTRINGS	1024
 
 // these are the only configstrings that the system reserves, all the
 // other ones are strictly for servergame to clientgame communication
-#define	CS_SERVERINFO		0		// an info string with all the serverinfo cvars
-#define	CS_SYSTEMINFO		1		// an info string for server system to client system configuration (timescale, etc)
+inline constexpr int CS_SERVERINFO = 0; // an info string with all the serverinfo cvars
+inline constexpr int CS_SYSTEMINFO = 1; // an info string for server system to client system configuration (timescale, etc)
 
-#define	RESERVED_CONFIGSTRINGS	2	// game can't modify below this, only the system can
+inline constexpr int RESERVED_CONFIGSTRINGS = 2; // game can't modify below this, only the system can
 
-#define	MAX_GAMESTATE_CHARS	16000
+inline constexpr int MAX_GAMESTATE_CHARS = 16000;
 typedef struct {
 	int			stringOffsets[MAX_CONFIGSTRINGS];
 	char		stringData[MAX_GAMESTATE_CHARS];
@@ -1136,22 +1136,22 @@ typedef struct {
 //=========================================================
 
 // bit field limits
-#define	MAX_STATS				16
-#define	MAX_PERSISTANT			16
-#define	MAX_TIMERS				16		
+inline constexpr int MAX_STATS = 16;
+inline constexpr int MAX_PERSISTANT = 16;
+inline constexpr int MAX_TIMERS = 16;
 
-#define	MAX_PS_EVENTS			2
+inline constexpr int MAX_PS_EVENTS = 2;
 
-#define PS_PMOVEFRAMECOUNTBITS	6
+inline constexpr int PS_PMOVEFRAMECOUNTBITS = 6;
 
 //MFQ3 related
 
 // angle indexes for tanks
-#define HULL_YAW			0
-#define TURRET_YAW			1
-#define GUN_PITCH			2
+inline constexpr int HULL_YAW = 0;
+inline constexpr int TURRET_YAW = 1;
+inline constexpr int GUN_PITCH = 2;
 
-#define MAX_WEAPONS_PER_VEHICLE	8
+inline constexpr int MAX_WEAPONS_PER_VEHICLE = 8;
 // end mfq3
 
 
@@ -1356,21 +1356,21 @@ struct ClientBase
 //
 //#define	BUTTON_ANY			2048			// any key whatsoever
 
-#define	BUTTON_ATTACK		1
-#define	BUTTON_TALK			2			// displays talk balloon and disables actions
-#define	BUTTON_ATTACK_MAIN	4			// MFQ3 secondary fire "+button2"
-#define BUTTON_WEAPONBAY	8			// MFQ3 weaponbay "+button3"
-#define BUTTON_XXX2			16
-#define BUTTON_INCREASE		32			// MFQ3	throttle "+button5"
-#define BUTTON_DECREASE		64			// MFQ3 throttle "+button6"
-#define BUTTON_GEAR			128			// MFQ3 gear "+button7"
-#define BUTTON_BRAKE		256			// MFQ3 speedbrakes/brakes "+button8"
-#define BUTTON_FREELOOK		512			// MFQ3 freelook "+button9"
-#define BUTTON_FLARE		1024		// MFQ3 flare "+button10"
+inline constexpr int BUTTON_ATTACK = 1;
+inline constexpr int BUTTON_TALK = 2; // displays talk balloon and disables actions
+inline constexpr int BUTTON_ATTACK_MAIN = 4; // MFQ3 secondary fire "+button2"
+inline constexpr int BUTTON_WEAPONBAY = 8; // MFQ3 weaponbay "+button3"
+inline constexpr int BUTTON_XXX2 = 16;
+inline constexpr int BUTTON_INCREASE = 32; // MFQ3	throttle "+button5"
+inline constexpr int BUTTON_DECREASE = 64; // MFQ3 throttle "+button6"
+inline constexpr int BUTTON_GEAR = 128; // MFQ3 gear "+button7"
+inline constexpr int BUTTON_BRAKE = 256; // MFQ3 speedbrakes/brakes "+button8"
+inline constexpr int BUTTON_FREELOOK = 512; // MFQ3 freelook "+button9"
+inline constexpr int BUTTON_FLARE = 1024; // MFQ3 flare "+button10"
 
-#define	BUTTON_ANY			2048			// any key whatsoever
+inline constexpr int BUTTON_ANY = 2048; // any key whatsoever
 
-#define	MOVE_RUN			120			// if forwardmove or rightmove are >= MOVE_RUN,
+inline constexpr int MOVE_RUN = 120; // if forwardmove or rightmove are >= MOVE_RUN,
 										// then BUTTON_WALKING should be set
 
 // usercmd_t is sent to the server each client frame
@@ -1385,7 +1385,7 @@ typedef struct usercmd_s {
 //===================================================================
 
 // if entityState->solid == SOLID_BMODEL, modelindex is an inline model number
-#define	SOLID_BMODEL	0xffffff
+inline constexpr int SOLID_BMODEL = 0xffffff;
 
 typedef enum {
 	TR_STATIONARY,
@@ -1413,7 +1413,7 @@ typedef struct {
 // The messages are delta compressed, so it doesn't really matter if
 // the structure size is fairly large
 
-#define	MAX_VEHICLE_TURRETS	4
+inline constexpr int MAX_VEHICLE_TURRETS = 4;
 
 typedef struct entityState_s {
 	int		number;			// entity index
@@ -1482,10 +1482,10 @@ typedef enum {
 
 // font support 
 
-#define GLYPH_START 0
-#define GLYPH_END 255
-#define GLYPH_CHARSTART 32
-#define GLYPH_CHAREND 127
+inline constexpr int GLYPH_START = 0;
+inline constexpr int GLYPH_END = 255;
+inline constexpr int GLYPH_CHARSTART = 32;
+inline constexpr int GLYPH_CHAREND = 127;
 #define GLYPHS_PER_FONT GLYPH_END - GLYPH_START + 1
 typedef struct {
   int height;       // number of scan lines
@@ -1530,10 +1530,10 @@ typedef struct qtime_s {
 
 // server browser sources
 // TTimo: AS_MPLAYER is no longer used
-#define AS_LOCAL			0
-#define AS_MPLAYER		1
-#define AS_GLOBAL			2
-#define AS_FAVORITES	3
+inline constexpr int AS_LOCAL = 0;
+inline constexpr int AS_MPLAYER = 1;
+inline constexpr int AS_GLOBAL = 2;
+inline constexpr int AS_FAVORITES = 3;
 
 
 // cinematic states
@@ -1557,17 +1557,17 @@ typedef enum _flag_status {
 
 
 
-#define	MAX_GLOBAL_SERVERS				4096
-#define	MAX_OTHER_SERVERS					128
-#define MAX_PINGREQUESTS					32
-#define MAX_SERVERSTATUSREQUESTS	16
+inline constexpr int MAX_GLOBAL_SERVERS = 4096;
+inline constexpr int MAX_OTHER_SERVERS = 128;
+inline constexpr int MAX_PINGREQUESTS = 32;
+inline constexpr int MAX_SERVERSTATUSREQUESTS = 16;
 
-#define SAY_ALL		0
-#define SAY_TEAM	1
-#define SAY_TELL	2
+inline constexpr int SAY_ALL = 0;
+inline constexpr int SAY_TEAM = 1;
+inline constexpr int SAY_TELL = 2;
 
-#define CDKEY_LEN 16
-#define CDCHKSUM_LEN 2
+inline constexpr int CDKEY_LEN = 16;
+inline constexpr int CDCHKSUM_LEN = 2;
 
 
 #define LERP( a, b, w ) ( ( a ) * ( 1.0f - ( w ) ) + ( b ) * ( w ) )

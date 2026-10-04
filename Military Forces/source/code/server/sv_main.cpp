@@ -254,8 +254,8 @@ changes from empty to non-empty, and full to non-full,
 but not on every player enter or exit.
 ================
 */
-#define	HEARTBEAT_MSEC	300*1000
-#define	MASTERDNS_MSEC	24*60*60*1000
+constexpr int HEARTBEAT_MSEC = 300*1000;
+constexpr int MASTERDNS_MSEC = 24*60*60*1000;
 void SV_MasterHeartbeat(const char *message)
 {
 	static netadr_t	adr[MAX_MASTER_SERVERS][2]; // [2] for v4 and v6 address for the same address string.
@@ -374,8 +374,8 @@ CONNECTIONLESS COMMANDS
 */
 
 // This is deliberately quite large to make it more of an effort to DoS
-#define MAX_BUCKETS			16384
-#define MAX_HASHES			1024
+constexpr int MAX_BUCKETS = 16384;
+constexpr int MAX_HASHES = 1024;
 
 static leakyBucket_t buckets[ MAX_BUCKETS ];
 static leakyBucket_t *bucketHashes[ MAX_HASHES ];
@@ -1202,8 +1202,8 @@ a client based on its rate settings
 ====================
 */
 
-#define UDPIP_HEADER_SIZE 28
-#define UDPIP6_HEADER_SIZE 48
+constexpr int UDPIP_HEADER_SIZE = 28;
+constexpr int UDPIP6_HEADER_SIZE = 48;
 
 int SV_RateMsec(SV_Client *client)
 {

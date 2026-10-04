@@ -655,8 +655,8 @@ void RB_UpdateTessVao(unsigned int attribBits)
 
 // FIXME: This sets a limit of 65536 verts/262144 indexes per static surface
 // This is higher than the old vq3 limits but is worth noting
-#define VAOCACHE_QUEUE_MAX_SURFACES (1 << 10)
-#define VAOCACHE_QUEUE_MAX_VERTEXES (1 << 16)
+constexpr int VAOCACHE_QUEUE_MAX_SURFACES = (1 << 10);
+constexpr int VAOCACHE_QUEUE_MAX_VERTEXES = (1 << 16);
 #define VAOCACHE_QUEUE_MAX_INDEXES (VAOCACHE_QUEUE_MAX_VERTEXES * 4)
 
 typedef struct queuedSurface_s
@@ -681,14 +681,14 @@ static struct
 }
 vcq;
 
-#define VAOCACHE_MAX_SURFACES (1 << 16)
-#define VAOCACHE_MAX_BATCHES (1 << 10)
+constexpr int VAOCACHE_MAX_SURFACES = (1 << 16);
+constexpr int VAOCACHE_MAX_BATCHES = (1 << 10);
 
 // srfVert_t is 60 bytes
 // assuming each vert is referenced 4 times, need 16 bytes (4 glIndex_t) per vert
 // -> need about 4/15ths the space for indexes as vertexes
-#define VAOCACHE_VERTEX_BUFFER_SIZE (16 * 1024 * 1024)
-#define VAOCACHE_INDEX_BUFFER_SIZE (5 * 1024 * 1024)
+constexpr int VAOCACHE_VERTEX_BUFFER_SIZE = (16 * 1024 * 1024);
+constexpr int VAOCACHE_INDEX_BUFFER_SIZE = (5 * 1024 * 1024);
 
 typedef struct buffered_s
 {

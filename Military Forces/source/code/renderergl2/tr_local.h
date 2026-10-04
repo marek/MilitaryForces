@@ -62,13 +62,13 @@ typedef unsigned int vaoCacheGlIndex_t;
 #define SHADERNUM_BITS	14
 #define MAX_SHADERS		(1<<SHADERNUM_BITS)
 
-#define	MAX_FBOS      64
-#define MAX_VISCOUNTS 5
-#define MAX_VAOS      4096
+inline constexpr int MAX_FBOS = 64;
+inline constexpr int MAX_VISCOUNTS = 5;
+inline constexpr int MAX_VAOS = 4096;
 
-#define MAX_CALC_PSHADOWS    64
-#define MAX_DRAWN_PSHADOWS    16 // do not increase past 32, because bit flags are used on surfaces
-#define PSHADOW_MAP_SIZE      512
+inline constexpr int MAX_CALC_PSHADOWS = 64;
+inline constexpr int MAX_DRAWN_PSHADOWS = 16; // do not increase past 32, because bit flags are used on surfaces
+inline constexpr int PSHADOW_MAP_SIZE = 512;
 
 typedef struct cubemap_s {
 	char name[MAX_QPATH];
@@ -114,7 +114,7 @@ typedef struct {
 } orientationr_t;
 
 // Ensure this is >= the ATTR_INDEX_COUNT enum below
-#define VAO_MAX_ATTRIBS 16
+inline constexpr int VAO_MAX_ATTRIBS = 16;
 
 typedef enum
 {
@@ -1106,10 +1106,10 @@ BRUSH MODELS
 #define	SIDE_BACK	1
 #define	SIDE_ON		2
 
-#define CULLINFO_NONE   0
-#define CULLINFO_BOX    1
-#define CULLINFO_SPHERE 2
-#define CULLINFO_PLANE  4
+inline constexpr int CULLINFO_NONE = 0;
+inline constexpr int CULLINFO_BOX = 1;
+inline constexpr int CULLINFO_SPHERE = 2;
+inline constexpr int CULLINFO_PLANE = 4;
 
 typedef struct cullinfo_s {
 	int             type;
@@ -1354,7 +1354,7 @@ the bits are allocated as follows:
 #if (QSORT_SHADERNUM_SHIFT+SHADERNUM_BITS) > 48
 	#error "Need to update sorting, too many bits."
 #endif
-#define QSORT_PSHADOW_SHIFT     1
+inline constexpr int QSORT_PSHADOW_SHIFT = 1;
 
 extern	int			gl_filter_min, gl_filter_max;
 
@@ -1975,8 +1975,8 @@ void	GL_Cull( int cullType );
 
 #define GLS_DEPTHTEST_DISABLE					0x00010000
 #define GLS_DEPTHFUNC_EQUAL						0x00020000
-#define GLS_DEPTHFUNC_GREATER                   0x00040000
-#define GLS_DEPTHFUNC_BITS                      0x00060000
+inline constexpr int GLS_DEPTHFUNC_GREATER = 0x00040000;
+inline constexpr int GLS_DEPTHFUNC_BITS = 0x00060000;
 
 #define GLS_ATEST_GT_0							0x10000000
 #define GLS_ATEST_LT_80							0x20000000

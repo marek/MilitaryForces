@@ -681,7 +681,7 @@ SelectRandomDeathmatchSpawnPoint
 go to a random point that doesn't telefrag
 ================
 */
-#define	MAX_TEAM_SPAWN_POINTS	32
+constexpr int MAX_TEAM_SPAWN_POINTS = 32;
 GameEntity *SelectRandomTeamSpawnPoint( int teamstate, ClientBase::eTeam team, int idx ) 
 {
 	GameEntity	*spot;

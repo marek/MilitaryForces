@@ -273,7 +273,7 @@ typedef struct {
 	bool		isVideoMap;
 } textureBundle_t;
 
-#define NUM_TEXTURE_BUNDLES 2
+inline constexpr int NUM_TEXTURE_BUNDLES = 2;
 
 typedef struct {
 	bool		active;
@@ -552,7 +552,7 @@ typedef struct srfGridMesh_s {
 
 
 
-#define	VERTEXSIZE	8
+inline constexpr int VERTEXSIZE = 8;
 typedef struct {
 	surfaceType_t	surfaceType;
 	cplane_t	plane;

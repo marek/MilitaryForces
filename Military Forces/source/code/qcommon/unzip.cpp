@@ -73,8 +73,8 @@ woven in by Terry Thorsen 1/2003.
 # define TRYFREE(p) {if (p) Z_Free(p);}
 #endif
 
-#define SIZECENTRALDIRITEM (0x2e)
-#define SIZEZIPLOCALHEADER (0x1e)
+constexpr int SIZECENTRALDIRITEM = (0x2e);
+constexpr int SIZEZIPLOCALHEADER = (0x1e);
 
 
 

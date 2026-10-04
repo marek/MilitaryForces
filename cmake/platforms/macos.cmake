@@ -3,7 +3,7 @@ if(NOT APPLE)
 endif()
 
 if(NOT CMAKE_OSX_DEPLOYMENT_TARGET)
-    set(CMAKE_OSX_DEPLOYMENT_TARGET 11.0)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET 13.3)
 endif()
 
 enable_language(OBJCXX)

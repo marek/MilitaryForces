@@ -56,7 +56,7 @@ CG_OffsetVehicleView
 
 ===============
 */
-#define	FOCUS_DISTANCE	512
+constexpr int FOCUS_DISTANCE = 512;
 //#define	_VIEW_SETTING_DISPLAY
 
 // MFQ3
@@ -372,8 +372,8 @@ CG_CalcFov
 Fixed fov at intermissions, otherwise account for fov variable and zooms.
 ====================
 */
-#define	WAVE_AMPLITUDE	1
-#define	WAVE_FREQUENCY	0.4
+constexpr int WAVE_AMPLITUDE = 1;
+constexpr double WAVE_FREQUENCY = 0.4;
 
 static int CG_CalcFov( ) {
 	float	x;
@@ -746,7 +746,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, bool demoPlay
 	}
 }
 
-#define DTOR 0.01745329252
+constexpr double DTOR = 0.01745329252;
 
 /*
 =================

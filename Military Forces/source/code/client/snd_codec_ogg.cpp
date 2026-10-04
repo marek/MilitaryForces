@@ -38,7 +38,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // The OGG codec can return the samples in a number of different formats,
 // we use the standard signed short format.
-#define OGG_SAMPLEWIDTH 2
+constexpr int OGG_SAMPLEWIDTH = 2;
 
 // Q3 OGG codec
 snd_codec_t ogg_codec =

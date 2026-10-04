@@ -89,8 +89,8 @@ static bool	winsockInitialized = false;
 #	endif
 
 typedef int SOCKET;
-#	define INVALID_SOCKET		-1
-#	define SOCKET_ERROR			-1
+constexpr int INVALID_SOCKET = -1;
+constexpr int SOCKET_ERROR = -1;
 #	define closesocket			close
 #	define ioctlsocket			ioctl
 typedef int	ioctlarg_t;
@@ -137,7 +137,7 @@ static struct sockaddr_in6 boundto;
 // use an admin local address per default so that network admins can decide on how to handle quake3 traffic.
 #define NET_MULTICAST_IP6 "ff04::696f:7175:616b:6533"
 
-#define	MAX_IPS		32
+constexpr int MAX_IPS = 32;
 
 typedef struct
 {

@@ -61,7 +61,7 @@ static field_t TTY_con;
 
 // This is somewhat of aduplicate of the graphical console history
 // but it's safer more modular to have our own here
-#define CON_HISTORY 32
+constexpr int CON_HISTORY = 32;
 static field_t ttyEditLines[ CON_HISTORY ];
 static int hist_current = -1, hist_count = 0;
 

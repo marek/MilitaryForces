@@ -26,9 +26,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../qcommon/qcommon.h"
 #include "snd_public.h"
 
-#define	PAINTBUFFER_SIZE		4096					// this is in samples
+inline constexpr int PAINTBUFFER_SIZE = 4096; // this is in samples
 
-#define SND_CHUNK_SIZE			1024					// samples
+inline constexpr int SND_CHUNK_SIZE = 1024; // samples
 #define SND_CHUNK_SIZE_FLOAT	(SND_CHUNK_SIZE/2)		// floats
 #define SND_CHUNK_SIZE_BYTE		(SND_CHUNK_SIZE*2)		// floats
 
@@ -73,11 +73,11 @@ typedef struct {
 	byte		*buffer;
 } dma_t;
 
-#define START_SAMPLE_IMMEDIATE	0x7fffffff
+inline constexpr int START_SAMPLE_IMMEDIATE = 0x7fffffff;
 
-#define MAX_DOPPLER_SCALE 50.0f //arbitrary
+inline constexpr float MAX_DOPPLER_SCALE = 50.0f; //arbitrary
 
-#define THIRD_PERSON_THRESHOLD_SQ (48.0f*48.0f)
+inline constexpr float THIRD_PERSON_THRESHOLD_SQ = (48.0f*48.0f);
 
 typedef struct loopSound_s {
 	vec3_t		origin;
@@ -111,7 +111,7 @@ typedef struct
 } channel_t;
 
 
-#define	WAV_FORMAT_PCM		1
+inline constexpr int WAV_FORMAT_PCM = 1;
 
 
 typedef struct {
@@ -188,7 +188,7 @@ void SNDDMA_MasterGain(float val);
 
 //====================================================================
 
-#define	MAX_CHANNELS			96
+inline constexpr int MAX_CHANNELS = 96;
 
 extern	channel_t   s_channels[MAX_CHANNELS];
 extern	channel_t   loop_channels[MAX_CHANNELS];
@@ -200,7 +200,7 @@ extern	vec3_t	listener_right;
 extern	vec3_t	listener_up;
 extern	dma_t	dma;
 
-#define	MAX_RAW_SAMPLES	16384
+inline constexpr int MAX_RAW_SAMPLES = 16384;
 #define MAX_RAW_STREAMS (MAX_CLIENTS * 2 + 1)
 extern	portable_samplepair_t s_rawsamples[MAX_RAW_STREAMS][MAX_RAW_SAMPLES];
 extern	int		s_rawend[MAX_RAW_STREAMS];
@@ -233,8 +233,8 @@ void S_AdpcmGetSamples(sndBuffer *chunk, short *to);
 
 // wavelet function
 
-#define SENTINEL_MULAW_ZERO_RUN 127
-#define SENTINEL_MULAW_FOUR_BIT_RUN 126
+inline constexpr int SENTINEL_MULAW_ZERO_RUN = 127;
+inline constexpr int SENTINEL_MULAW_FOUR_BIT_RUN = 126;
 
 void S_FreeOldestSound( );
 

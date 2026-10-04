@@ -58,11 +58,11 @@ cvar_t *r_centerWindow;
 cvar_t *r_sdlDriver;
 cvar_t *r_glDebug;
 
-#define GLIMP_DEBUG_OUTPUT_SYNCHRONOUS	0x8242
-#define GLIMP_DEBUG_OUTPUT				0x92E0
-#define GLIMP_DEBUG_SEVERITY_HIGH		0x9146
-#define GLIMP_DEBUG_SEVERITY_MEDIUM		0x9147
-#define GLIMP_DEBUG_SEVERITY_LOW		0x9148
+constexpr int GLIMP_DEBUG_OUTPUT_SYNCHRONOUS = 0x8242;
+constexpr int GLIMP_DEBUG_OUTPUT = 0x92E0;
+constexpr int GLIMP_DEBUG_SEVERITY_HIGH = 0x9146;
+constexpr int GLIMP_DEBUG_SEVERITY_MEDIUM = 0x9147;
+constexpr int GLIMP_DEBUG_SEVERITY_LOW = 0x9148;
 
 typedef void ( APIENTRY *GLimp_DebugProc )( GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const char *message, const void *userParam );
 typedef void ( APIENTRY *GLimp_DebugMessageCallbackProc )( GLimp_DebugProc callback, const void *userParam );
@@ -1139,7 +1139,7 @@ static void GLimp_InitExtensions( bool fixedFunction )
 	}
 }
 
-#define R_MODE_FALLBACK 3 // 640 * 480
+constexpr int R_MODE_FALLBACK = 3; // 640 * 480
 
 /*
 ===============

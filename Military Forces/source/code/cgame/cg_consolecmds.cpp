@@ -355,7 +355,7 @@ static void CG_AdjustReset_f( ) {
 	cg.cameraAdjustAmount = 0;
 }
 
-#define MOVE_BASIC	0.4f
+constexpr float MOVE_BASIC = 0.4f;
 
 /*
 ==================

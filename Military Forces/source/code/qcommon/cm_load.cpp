@@ -43,10 +43,10 @@ void SetPlaneSignbits (cplane_t *out) {
 
 // to allow boxes to be treated as brush models, we allocate
 // some extra indexes along with those needed by the map
-#define	BOX_BRUSHES		1
-#define	BOX_SIDES		6
-#define	BOX_LEAFS		2
-#define	BOX_PLANES		12
+constexpr int BOX_BRUSHES = 1;
+constexpr int BOX_SIDES = 6;
+constexpr int BOX_LEAFS = 2;
+constexpr int BOX_PLANES = 12;
 
 #define	LL(x) x=LittleLong(x)
 
@@ -451,7 +451,7 @@ void CMod_LoadEntityString( lump_t *l ) {
 CMod_LoadVisibility
 =================
 */
-#define	VIS_HEADER	8
+constexpr int VIS_HEADER = 8;
 void CMod_LoadVisibility( lump_t *l ) {
 	int		len;
 	byte	*buf;

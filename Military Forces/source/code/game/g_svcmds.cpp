@@ -48,7 +48,7 @@ typedef struct ipFilter_s
 	unsigned	compare;
 } ipFilter_t;
 
-#define	MAX_IPFILTERS	1024
+constexpr int MAX_IPFILTERS = 1024;
 
 static ipFilter_t	ipFilters[MAX_IPFILTERS];
 static int			numIPFilters;

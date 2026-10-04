@@ -47,12 +47,12 @@ to the new value before sending out any replies.
 */
 
 
-#define	MAX_PACKETLEN			1400		// max size of a network packet
+constexpr int MAX_PACKETLEN = 1400; // max size of a network packet
 
 #define	FRAGMENT_SIZE			(MAX_PACKETLEN - 100)
-#define	PACKET_HEADER			10			// two ints and a short
+constexpr int PACKET_HEADER = 10; // two ints and a short
 
-#define	FRAGMENT_BIT	(1U<<31)
+constexpr unsigned int FRAGMENT_BIT = (1U<<31);
 
 cvar_t		*showpackets;
 cvar_t		*showdrop;
@@ -422,7 +422,7 @@ LOOPBACK BUFFERS FOR LOCAL PLAYER
 
 // there needs to be enough loopback messages to hold a complete
 // gamestate of maximum size
-#define	MAX_LOOPBACK	16
+constexpr int MAX_LOOPBACK = 16;
 
 typedef struct {
 	byte	data[MAX_PACKETLEN];

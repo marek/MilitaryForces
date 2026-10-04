@@ -32,10 +32,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 //=============================================================================
 
-#define	PERS_SCORE				0		// !!! MUST NOT CHANGE, SERVER AND
+#define PERS_SCORE 0 // !!! MUST NOT CHANGE, SERVER AND
 										// GAME BOTH REFERENCE !!!
 
-#define	MAX_ENT_CLUSTERS	16
+inline constexpr int MAX_ENT_CLUSTERS = 16;
 
 struct worldSector_t;
 
@@ -240,7 +240,7 @@ struct SV_Client;
 
 //#define	MAX_MASTER_SERVERS	5
 
-#define SERVER_MAXBANS	1024
+inline constexpr int SERVER_MAXBANS = 1024;
 // Structure for managing bans
 typedef struct
 {

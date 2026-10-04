@@ -111,25 +111,25 @@ NET
 ==============================================================
 */
 
-#define NET_ENABLEV4            0x01
-#define NET_ENABLEV6            0x02
+inline constexpr int NET_ENABLEV4 = 0x01;
+inline constexpr int NET_ENABLEV6 = 0x02;
 // if this flag is set, always attempt ipv6 connections instead of ipv4 if a v6 address is found.
-#define NET_PRIOV6              0x04
+inline constexpr int NET_PRIOV6 = 0x04;
 // disables ipv6 multicast support if set.
-#define NET_DISABLEMCAST        0x08
+inline constexpr int NET_DISABLEMCAST = 0x08;
 
 
-#define	PACKET_BACKUP	32	// number of old messages that must be kept on client and
+inline constexpr int PACKET_BACKUP = 32; // number of old messages that must be kept on client and
 							// server for delta comrpession and ping estimation
 #define	PACKET_MASK		(PACKET_BACKUP-1)
 
-#define	MAX_PACKET_USERCMDS		32		// max number of usercmd_t in a packet
+inline constexpr int MAX_PACKET_USERCMDS = 32; // max number of usercmd_t in a packet
 
-#define	MAX_SNAPSHOT_ENTITIES	2048
+inline constexpr int MAX_SNAPSHOT_ENTITIES = 2048;
 
-#define	PORT_ANY			-1
+inline constexpr int PORT_ANY = -1;
 
-#define	MAX_RELIABLE_COMMANDS	64			// max string commands buffered for restransmit
+inline constexpr int MAX_RELIABLE_COMMANDS = 64; // max string commands buffered for restransmit
 
 typedef enum {
 	NA_BAD = 0,					// an address lookup failed
@@ -147,7 +147,7 @@ typedef enum {
 	NS_SERVER
 } netsrc_t;
 
-#define NET_ADDRSTRMAXLEN 48	// maximum length of an IPv6 address string including trailing '\0'
+inline constexpr int NET_ADDRSTRMAXLEN = 48; // maximum length of an IPv6 address string including trailing '\0'
 typedef struct {
 	netadrtype_t	type;
 
@@ -180,12 +180,12 @@ void		NET_LeaveMulticast6();
 void		NET_Sleep(int msec);
 
 
-#define	MAX_MSGLEN				0x20000		// max length of a message, which may
+inline constexpr int MAX_MSGLEN = 0x20000; // max length of a message, which may
 											// be fragmented into multiple packets
 
-#define MAX_DOWNLOAD_WINDOW		48	// ACK window of 48 download chunks. Cannot set this higher, or clients
+inline constexpr int MAX_DOWNLOAD_WINDOW = 48; // ACK window of 48 download chunks. Cannot set this higher, or clients
 						// will overflow the reliable commands buffer
-#define MAX_DOWNLOAD_BLKSIZE		1024	// 896 byte block chunks
+inline constexpr int MAX_DOWNLOAD_BLKSIZE = 1024; // 896 byte block chunks
 
 #define NETCHAN_GENCHECKSUM(challenge, sequence) ((challenge) ^ ((sequence) * (challenge)))
 
@@ -247,7 +247,7 @@ PROTOCOL
 ==============================================================
 */
 
-#define	PROTOCOL_VERSION	9
+inline constexpr int PROTOCOL_VERSION = 9;
 // 1.31 - 67
 
 // maintain a list of compatible protocols for demo playing
@@ -271,10 +271,10 @@ extern int demo_protocols[];
   #endif
 #endif
 
-#define	PORT_MASTER			27950
-#define	PORT_UPDATE			27951
-#define	PORT_SERVER			27960
-#define	NUM_SERVER_PORTS	4		// broadcast scan this many ports after
+inline constexpr int PORT_MASTER = 27950;
+inline constexpr int PORT_UPDATE = 27951;
+inline constexpr int PORT_SERVER = 27960;
+inline constexpr int NUM_SERVER_PORTS = 4; // broadcast scan this many ports after
 									// PORT_SERVER so a single machine can
 									// run multiple servers
 
@@ -523,14 +523,14 @@ issues.
 
 // referenced flags
 // these are in loop specific order so don't change the order
-#define FS_GENERAL_REF	0x01
-#define FS_UI_REF		0x02
-#define FS_CGAME_REF	0x04
+inline constexpr int FS_GENERAL_REF = 0x01;
+inline constexpr int FS_UI_REF = 0x02;
+inline constexpr int FS_CGAME_REF = 0x04;
 // number of id paks that will never be autodownloaded from baseq3/missionpack
-#define NUM_ID_PAKS		9
-#define NUM_TA_PAKS		4
+inline constexpr int NUM_ID_PAKS = 9;
+inline constexpr int NUM_TA_PAKS = 4;
 
-#define	MAX_FILE_HANDLES	64
+inline constexpr int MAX_FILE_HANDLES = 64;
 
 #ifdef DEDICATED
 #	define Q3CONFIG_CFG CONFIG_PREFIX "_server.cfg"
@@ -730,7 +730,7 @@ inline cpuFeatures_t operator|( cpuFeatures_t a, cpuFeatures_t b ) { return (cpu
 inline cpuFeatures_t &operator|=( cpuFeatures_t &a, cpuFeatures_t b ) { a = a | b; return a; }
 
 // centralized and cleaned, that's the max string you can send to a Com_Printf / Com_DPrintf (above gets truncated)
-#define	MAXPRINTMSG	4096
+inline constexpr int MAXPRINTMSG = 4096;
 
 
 typedef enum {
@@ -978,7 +978,7 @@ void S_ClearSoundBuffer( );
 void SCR_DebugGraph (float value);	// FIXME: move logging to common?
 
 // AVI files have the start of pixel lines 4 byte-aligned
-#define AVI_LINE_PADDING 4
+inline constexpr int AVI_LINE_PADDING = 4;
 
 //
 // server interface
@@ -1013,7 +1013,7 @@ NON-PORTABLE SYSTEM SERVICES
 ==============================================================
 */
 
-#define MAX_JOYSTICK_AXIS 16
+inline constexpr int MAX_JOYSTICK_AXIS = 16;
 
 void	Sys_Init ();
 
@@ -1115,7 +1115,7 @@ typedef struct nodetype {
 	int		symbol;
 } node_t;
 
-#define HMAX 256 /* Maximum symbol */
+inline constexpr int HMAX = 256; /* Maximum symbol */
 
 typedef struct {
 	int			blocNode;
@@ -1154,15 +1154,15 @@ void	Huff_setBloc(int _bloc);
 
 extern huffman_t clientHuffTables;
 
-#define	SV_ENCODE_START		4
-#define SV_DECODE_START		12
-#define	CL_ENCODE_START		12
-#define CL_DECODE_START		4
+inline constexpr int SV_ENCODE_START = 4;
+inline constexpr int SV_DECODE_START = 12;
+inline constexpr int CL_ENCODE_START = 12;
+inline constexpr int CL_DECODE_START = 4;
 
 // flags for sv_allowDownload and cl_allowDownload
-#define DLF_ENABLE 1
-#define DLF_NO_REDIRECT 2
-#define DLF_NO_UDP 4
-#define DLF_NO_DISCONNECT 8
+inline constexpr int DLF_ENABLE = 1;
+inline constexpr int DLF_NO_REDIRECT = 2;
+inline constexpr int DLF_NO_UDP = 4;
+inline constexpr int DLF_NO_DISCONNECT = 8;
 
 #endif // _QCOMMON_H_

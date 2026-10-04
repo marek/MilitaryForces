@@ -26,14 +26,14 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../cgame/cg.h"
 
 
-#define	DEFAULT_CONSOLE_WIDTH	78
+constexpr int DEFAULT_CONSOLE_WIDTH = 78;
 int g_console_field_width = DEFAULT_CONSOLE_WIDTH;
 int g_smallchar_width = SMALLCHAR_WIDTH;
 int g_smallchar_height = SMALLCHAR_HEIGHT;
 
-#define	NUM_CON_TIMES 17
+constexpr int NUM_CON_TIMES = 17;
 
-#define		CON_TEXTSIZE	32768
+constexpr int CON_TEXTSIZE = 32768;
 typedef struct {
 	bool	initialized;
 

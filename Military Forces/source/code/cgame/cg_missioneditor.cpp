@@ -5,7 +5,7 @@
 #include "cg_local.h"
 
 
-#define MAX_SELECTION_DISTANCE			3000.0f
+constexpr float MAX_SELECTION_DISTANCE = 3000.0f;
 
 void ME_DrawVehicle( IGME_vehicle_t* veh );
 void ME_CheckForSelection();

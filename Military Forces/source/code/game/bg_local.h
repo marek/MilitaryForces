@@ -9,7 +9,7 @@
 #ifndef __BG_LOCAL_H__
 #define __BG_LOCAL_H__
 
-#define	OVERCLIP		1.001f
+inline constexpr float OVERCLIP = 1.001f;
 
 // all of the locals will be zeroed before each
 // pmove, just to make damn sure we don't have

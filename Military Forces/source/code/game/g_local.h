@@ -21,23 +21,23 @@
 
 #define INFINITE			1000000
 
-#define	FRAMETIME			100					// msec
+inline constexpr int FRAMETIME = 100; // msec
 #define	EVENT_VALID_MSEC	300
 
-#define	INTERMISSION_DELAY_TIME	1000
-#define	SP_INTERMISSION_DELAY_TIME	5000
+inline constexpr int INTERMISSION_DELAY_TIME = 1000;
+inline constexpr int SP_INTERMISSION_DELAY_TIME = 5000;
 
 // gentity->flags
-#define	FL_GODMODE				0x00000010
-#define	FL_NOTARGET				0x00000020
-#define	FL_TEAMSLAVE			0x00000400	// not the first on the team
-#define FL_NO_KNOCKBACK			0x00000800
-#define FL_DROPPED_ITEM			0x00001000
-#define FL_NO_BOTS				0x00002000	// spawn point not for bot use
-#define FL_NO_HUMANS			0x00004000	// spawn point just for bots
+inline constexpr int FL_GODMODE = 0x00000010;
+inline constexpr int FL_NOTARGET = 0x00000020;
+inline constexpr int FL_TEAMSLAVE = 0x00000400; // not the first on the team
+inline constexpr int FL_NO_KNOCKBACK = 0x00000800;
+inline constexpr int FL_DROPPED_ITEM = 0x00001000;
+inline constexpr int FL_NO_BOTS = 0x00002000; // spawn point not for bot use
+inline constexpr int FL_NO_HUMANS = 0x00004000; // spawn point just for bots
 
-#define CS_NOKILL				0x00000001
-#define CS_LASTPOS				0x00000002
+inline constexpr int CS_NOKILL = 0x00000001;
+inline constexpr int CS_LASTPOS = 0x00000002;
 
 // movers are things like doors, plats, buttons, etc
 //typedef enum {
@@ -239,8 +239,8 @@
 
 // the auto following clients don't follow a specific client
 // number, but instead follow the first two active players
-#define	FOLLOW_ACTIVE1	-1
-#define	FOLLOW_ACTIVE2	-2
+inline constexpr int FOLLOW_ACTIVE1 = -1;
+inline constexpr int FOLLOW_ACTIVE2 = -2;
 
 // client data that stays across multiple levels or tournament restarts
 // this is achieved by writing all the data to cvar strings at game shutdown
@@ -256,8 +256,8 @@
 //} clientSession_t;
 
 //
-#define MAX_NETNAME			36
-#define	MAX_VOTE_COUNT		3
+inline constexpr int MAX_NETNAME = 36;
+inline constexpr int MAX_VOTE_COUNT = 3;
 
 // client data that stays across multiple respawns, but is cleared
 // on each level change or team change at ClientBegin()
@@ -670,10 +670,10 @@ void Boat_Pain( GameEntity *self, GameEntity *attacker, int damage );
 
 
 // damage flags
-#define DAMAGE_RADIUS				0x00000001	// damage was indirect
-#define DAMAGE_MFQ3_FREE			0x00000002	// --- unused ---
-#define DAMAGE_NO_KNOCKBACK			0x00000004	// do not affect velocity, just view angles
-#define DAMAGE_NO_PROTECTION		0x00000008  // shields, invulnerability, and godmode have no effect
+inline constexpr int DAMAGE_RADIUS = 0x00000001; // damage was indirect
+inline constexpr int DAMAGE_MFQ3_FREE = 0x00000002; // --- unused ---
+inline constexpr int DAMAGE_NO_KNOCKBACK = 0x00000004; // do not affect velocity, just view angles
+inline constexpr int DAMAGE_NO_PROTECTION = 0x00000008; // shields, invulnerability, and godmode have no effect
 
 
 //
@@ -870,7 +870,7 @@ void G_WriteSessionData();
 //
 void UpdateTournamentInfo( );
 
-#define MAX_FILEPATH			144
+inline constexpr int MAX_FILEPATH = 144;
 
 #include "g_team.h" // teamplay specific stuff
 

@@ -1126,8 +1126,8 @@ static void FillInNormalizedZ(const byte *in, byte *out, int width, int height)
 
 
 // size must be even
-#define WORKBLOCK_SIZE     128
-#define WORKBLOCK_BORDER   4
+constexpr int WORKBLOCK_SIZE = 128;
+constexpr int WORKBLOCK_BORDER = 4;
 #define WORKBLOCK_REALSIZE (WORKBLOCK_SIZE + WORKBLOCK_BORDER * 2)
 
 // assumes that data has already been expanded into a 2x2 grid

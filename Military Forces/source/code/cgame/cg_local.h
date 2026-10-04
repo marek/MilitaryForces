@@ -40,59 +40,59 @@ typedef enum {
 // If you absolutely need something stored, it can either be kept
 // by the server in the server stored userinfos, or stashed in a cvar.
 
-#define	MAX_RETICLES		2
+inline constexpr int MAX_RETICLES = 2;
 
-#define	POWERUP_BLINKS		5
+inline constexpr int POWERUP_BLINKS = 5;
 
-#define	POWERUP_BLINK_TIME	1000
-#define	FADE_TIME			200
-#define	PULSE_TIME			200
-#define	DAMAGE_DEFLECT_TIME	100
-#define	DAMAGE_RETURN_TIME	400
-#define DAMAGE_TIME			500
-#define	LAND_DEFLECT_TIME	150
-#define	LAND_RETURN_TIME	300
-#define	STEP_TIME			200
-#define	DUCK_TIME			100
-#define	PAIN_TWITCH_TIME	200
-#define	WEAPON_SELECT_TIME	1400
-#define	ITEM_SCALEUP_TIME	1000
-#define	ZOOM_TIME			150
-#define	ITEM_BLOB_TIME		200
-#define	MUZZLE_FLASH_TIME	20
-#define	SINK_TIME			1000		// time for fragments to sink into ground before going away
-#define	ATTACKER_HEAD_TIME	10000
-#define	REWARD_TIME			3000
+inline constexpr int POWERUP_BLINK_TIME = 1000;
+inline constexpr int FADE_TIME = 200;
+inline constexpr int PULSE_TIME = 200;
+inline constexpr int DAMAGE_DEFLECT_TIME = 100;
+inline constexpr int DAMAGE_RETURN_TIME = 400;
+inline constexpr int DAMAGE_TIME = 500;
+inline constexpr int LAND_DEFLECT_TIME = 150;
+inline constexpr int LAND_RETURN_TIME = 300;
+inline constexpr int STEP_TIME = 200;
+inline constexpr int DUCK_TIME = 100;
+inline constexpr int PAIN_TWITCH_TIME = 200;
+inline constexpr int WEAPON_SELECT_TIME = 1400;
+inline constexpr int ITEM_SCALEUP_TIME = 1000;
+inline constexpr int ZOOM_TIME = 150;
+inline constexpr int ITEM_BLOB_TIME = 200;
+inline constexpr int MUZZLE_FLASH_TIME = 20;
+inline constexpr int SINK_TIME = 1000; // time for fragments to sink into ground before going away
+inline constexpr int ATTACKER_HEAD_TIME = 10000;
+inline constexpr int REWARD_TIME = 3000;
 
-#define	PULSE_SCALE			1.5			// amount to scale up the icons when activating
+inline constexpr double PULSE_SCALE = 1.5; // amount to scale up the icons when activating
 
-#define	MAX_STEP_CHANGE		32
+inline constexpr int MAX_STEP_CHANGE = 32;
 
 #define	MAX_VERTS_ON_POLY	10
-#define	MAX_MARK_POLYS		1024
+inline constexpr int MAX_MARK_POLYS = 1024;
 
-#define STAT_MINUS			10	// num frame for '-' stats digit
-#define STAT_COLON			11	// num frame for ':' stats digit
-#define STAT_PERCENT		12	// num frame for '%' stats digit
-#define STAT_POINT			13	// num frame for '.' stats digit
+inline constexpr int STAT_MINUS = 10; // num frame for '-' stats digit
+inline constexpr int STAT_COLON = 11; // num frame for ':' stats digit
+inline constexpr int STAT_PERCENT = 12; // num frame for '%' stats digit
+inline constexpr int STAT_POINT = 13; // num frame for '.' stats digit
 
-#define HUDNUM_WIDTH		8
-#define HUDNUM_HEIGHT		8
+inline constexpr int HUDNUM_WIDTH = 8;
+inline constexpr int HUDNUM_HEIGHT = 8;
 
-#define	ICON_SIZE			48
-#define	CHAR_WIDTH			32
-#define	CHAR_HEIGHT			48
-#define	TEXT_ICON_SPACE		4
+inline constexpr int ICON_SIZE = 48;
+inline constexpr int CHAR_WIDTH = 32;
+inline constexpr int CHAR_HEIGHT = 48;
+inline constexpr int TEXT_ICON_SPACE = 4;
 
-#define	TEAMCHAT_WIDTH		80
-#define TEAMCHAT_HEIGHT		8
+inline constexpr int TEAMCHAT_WIDTH = 80;
+inline constexpr int TEAMCHAT_HEIGHT = 8;
 
 // very large characters
-#define	GIANT_WIDTH			32
-#define	GIANT_HEIGHT		48
+inline constexpr int GIANT_WIDTH = 32;
+inline constexpr int GIANT_HEIGHT = 48;
 
-#define TEAM_OVERLAY_MAXNAME_WIDTH	12
-#define TEAM_OVERLAY_MAXLOCATION_WIDTH	16
+inline constexpr int TEAM_OVERLAY_MAXNAME_WIDTH = 12;
+inline constexpr int TEAM_OVERLAY_MAXLOCATION_WIDTH = 16;
 
 #define DEFAULT_REDTEAM_NAME		"Warsaw Pact"
 #define DEFAULT_BLUETEAM_NAME		"NATO"
@@ -104,24 +104,24 @@ typedef enum {
 } impactSound_t;
 
 // radar
-#define RD_GROUND_ENEMY			0
-#define RD_GROUND_FRIEND		1
-#define RD_GROUND_UNKNOWN		2
-#define RD_BUILDING_ENEMY		3
-#define RD_BUILDING_FRIEND		4
-#define RD_BUILDING_UNKNOWN		5
-#define RD_AIR_SAME_ENEMY		6
-#define RD_AIR_SAME_FRIEND		7
-#define RD_AIR_SAME_UNKNOWN		8
-#define RD_AIR_HIGH_ENEMY		9
-#define RD_AIR_HIGH_FRIEND		10
-#define RD_AIR_HIGH_UNKNOWN		11
-#define RD_AIR_LOW_ENEMY		12
-#define RD_AIR_LOW_FRIEND		13
-#define RD_AIR_LOW_UNKNOWN		14
-#define RD_MAX_ICONS			15
+inline constexpr int RD_GROUND_ENEMY = 0;
+inline constexpr int RD_GROUND_FRIEND = 1;
+inline constexpr int RD_GROUND_UNKNOWN = 2;
+inline constexpr int RD_BUILDING_ENEMY = 3;
+inline constexpr int RD_BUILDING_FRIEND = 4;
+inline constexpr int RD_BUILDING_UNKNOWN = 5;
+inline constexpr int RD_AIR_SAME_ENEMY = 6;
+inline constexpr int RD_AIR_SAME_FRIEND = 7;
+inline constexpr int RD_AIR_SAME_UNKNOWN = 8;
+inline constexpr int RD_AIR_HIGH_ENEMY = 9;
+inline constexpr int RD_AIR_HIGH_FRIEND = 10;
+inline constexpr int RD_AIR_HIGH_UNKNOWN = 11;
+inline constexpr int RD_AIR_LOW_ENEMY = 12;
+inline constexpr int RD_AIR_LOW_FRIEND = 13;
+inline constexpr int RD_AIR_LOW_UNKNOWN = 14;
+inline constexpr int RD_MAX_ICONS = 15;
 
-#define MAX_RADAR_TARGETS		32
+inline constexpr int MAX_RADAR_TARGETS = 32;
 
 // MFD
 typedef enum {
@@ -134,9 +134,9 @@ typedef enum {
 	MFD_MAX					
 } MFD_Modes;
 
-#define MFD_1					0
-#define MFD_2					1
-#define NUM_MFDS_IN_COCKPIT		2
+inline constexpr int MFD_1 = 0;
+inline constexpr int MFD_2 = 1;
+inline constexpr int NUM_MFDS_IN_COCKPIT = 2;
 
 // cameramode
 typedef enum {
@@ -176,7 +176,7 @@ typedef struct {
 
 // centity_t have a direct corespondence with gentity_t in the game, but
 // only the entityState_t is directly communicated to the cgame
-#define	ANGLE_ERROR_DECAY	150
+inline constexpr int ANGLE_ERROR_DECAY = 150;
 
 typedef struct centity_s {
 	entityState_t	currentState;	// from cg.frame
@@ -332,7 +332,7 @@ typedef struct {
 // client model and other color coded effects
 // this is regenerated each time a client's configstring changes,
 // usually as a result of a userinfo (name, model, etc) change
-#define	MAX_CUSTOM_SOUNDS	32
+inline constexpr int MAX_CUSTOM_SOUNDS = 32;
 
 typedef struct {
 	bool		infoValid;
@@ -427,14 +427,14 @@ typedef struct {
 	centity_t * pTarget;	// target entity pointer (can be NULL)
 } reticle_t;
 
-#define MAX_REWARDSTACK		10
-#define MAX_SOUNDBUFFER		20
+inline constexpr int MAX_REWARDSTACK = 10;
+inline constexpr int MAX_SOUNDBUFFER = 20;
 
 //======================================================================
 
 // occurs, and they will have visible effects for #define STEP_TIME or whatever msec after
 
-#define MAX_PREDICTED_EVENTS	16
+inline constexpr int MAX_PREDICTED_EVENTS = 16;
  
 typedef struct {
 	int			clientFrame;		// incremented each frame
@@ -1671,10 +1671,10 @@ typedef enum {
 
 
 
-#define MAX_WORLD_PARTICLES 		16384
-#define	MAX_WORLD_EMITTERS			500
-#define MAX_WORLD_SYSTEMS			200
-#define MAX_PARTICLE_SHADERS		100
+inline constexpr int MAX_WORLD_PARTICLES = 16384;
+inline constexpr int MAX_WORLD_EMITTERS = 500;
+inline constexpr int MAX_WORLD_SYSTEMS = 200;
+inline constexpr int MAX_PARTICLE_SHADERS = 100;
 
 
 

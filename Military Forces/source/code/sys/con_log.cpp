@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../qcommon/qcommon.h"
 #include "sys_local.h"
 
-#define MAX_LOG 32768
+constexpr int MAX_LOG = 32768;
 
 static char          consoleLog[ MAX_LOG ];
 static unsigned int  writePos = 0;

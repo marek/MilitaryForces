@@ -646,7 +646,7 @@ AddWindingToConvexHull
 Both w and *hull are on the same plane
 =================
 */
-#define	MAX_HULL_POINTS		128
+constexpr int MAX_HULL_POINTS = 128;
 void	AddWindingToConvexHull( winding_t *w, winding_t **hull, vec3_t normal ) {
 	int			i, j, k;
 	float		*p, *copy;

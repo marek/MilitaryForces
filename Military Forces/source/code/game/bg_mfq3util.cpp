@@ -1098,7 +1098,7 @@ void MF_ParseMissionScripts( char *buf,
 long	FS_ReadFile( const char *qpath, void **buffer );
 void	FS_FreeFile( void *buffer );
 
-#define DECK_GRID	12
+constexpr int DECK_GRID = 12;
 
 static void MF_findDeck( const char *name, completeVehicleData_t *veh )
 {

@@ -127,11 +127,11 @@ typedef struct {
 //	UIMENU_POSTGAME
 //} uiMenuCommand_t;
 
-#define SORT_HOST			0
-#define SORT_MAP			1
-#define SORT_CLIENTS		2
-#define SORT_GAME			3
-#define SORT_PING			4
+inline constexpr int SORT_HOST = 0;
+inline constexpr int SORT_MAP = 1;
+inline constexpr int SORT_CLIENTS = 2;
+inline constexpr int SORT_GAME = 3;
+inline constexpr int SORT_PING = 4;
 
 typedef enum {
 //	UI_GETAPIVERSION = 0,	// system reserved

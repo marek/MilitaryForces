@@ -28,7 +28,7 @@ cvar_t		*cvar_vars = nullptr;
 cvar_t		*cvar_cheats;
 int			cvar_modifiedFlags;
 
-#define	MAX_CVARS	2048
+constexpr int MAX_CVARS = 2048;
 cvar_t		cvar_indexes[MAX_CVARS];
 int			cvar_numIndexes;
 

@@ -15,17 +15,17 @@
 #ifndef __SYN_H__
 #define __SYN_H__
 
-#define CONTEXT_ALL						0xFFFFFFFF
-#define CONTEXT_NORMAL					1
-#define CONTEXT_NEARBYITEM				2
-#define CONTEXT_CTFREDTEAM				4
-#define CONTEXT_CTFBLUETEAM				8
-#define CONTEXT_REPLY					16
-#define CONTEXT_OBELISKREDTEAM			32
-#define CONTEXT_OBELISKBLUETEAM			64
-#define CONTEXT_HARVESTERREDTEAM		128
-#define CONTEXT_HARVESTERBLUETEAM		256
+inline constexpr unsigned int CONTEXT_ALL = 0xFFFFFFFF;
+inline constexpr int CONTEXT_NORMAL = 1;
+inline constexpr int CONTEXT_NEARBYITEM = 2;
+inline constexpr int CONTEXT_CTFREDTEAM = 4;
+inline constexpr int CONTEXT_CTFBLUETEAM = 8;
+inline constexpr int CONTEXT_REPLY = 16;
+inline constexpr int CONTEXT_OBELISKREDTEAM = 32;
+inline constexpr int CONTEXT_OBELISKBLUETEAM = 64;
+inline constexpr int CONTEXT_HARVESTERREDTEAM = 128;
+inline constexpr int CONTEXT_HARVESTERBLUETEAM = 256;
 
-#define CONTEXT_NAMES 1024
+inline constexpr int CONTEXT_NAMES = 1024;
 
 #endif // __SYN_H__

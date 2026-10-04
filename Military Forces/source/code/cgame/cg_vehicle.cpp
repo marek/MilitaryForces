@@ -4,7 +4,7 @@
 
 #include "cg_local.h"
 
-#define MAX_LQM_MODELS	32
+constexpr int MAX_LQM_MODELS = 32;
 typedef struct LQMAnimations_s
 {
 	int			numAnimations;
@@ -181,7 +181,7 @@ static animation_t * CG_ParseLQMAnimationFile( const char *filename ) {
 	return animations;
 }
 
-#define MAX_TEAM_SKIN_MODELS	2048
+constexpr int MAX_TEAM_SKIN_MODELS = 2048;
 static qhandle_t cg_teamSkins[2][MAX_TEAM_SKIN_MODELS];
 
 static qhandle_t CG_RegisterVehiclePart( const char *name, bool expected )

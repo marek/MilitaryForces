@@ -20,8 +20,8 @@ typedef enum {
 	MAX_CCHAT
 } CustomChatMode;
 
-#define	MAX_CHAT_LEN		256
-#define CHAT_TEXT_SCALE		0.25f
+inline constexpr int MAX_CHAT_LEN = 256;
+inline constexpr float CHAT_TEXT_SCALE = 0.25f;
 
 typedef struct {
 	bool active;			// active?
@@ -53,56 +53,56 @@ typedef enum {
 
 
 
-#define MAX_MENUNAME 32
-#define MAX_ITEMTEXT 64
-#define MAX_ITEMACTION 64
-#define MAX_MENUDEFFILE 4096
-#define MAX_MENUFILE 32768
-#define MAX_MENUS 64
+inline constexpr int MAX_MENUNAME = 32;
+inline constexpr int MAX_ITEMTEXT = 64;
+inline constexpr int MAX_ITEMACTION = 64;
+inline constexpr int MAX_MENUDEFFILE = 4096;
+inline constexpr int MAX_MENUFILE = 32768;
+inline constexpr int MAX_MENUS = 64;
 #define MAX_MENUITEMS 96
-#define MAX_COLOR_RANGES 10
-#define MAX_OPEN_MENUS 16
+inline constexpr int MAX_COLOR_RANGES = 10;
+inline constexpr int MAX_OPEN_MENUS = 16;
 
-#define WINDOW_MOUSEOVER			0x00000001	// mouse is over it, non exclusive
-#define WINDOW_HASFOCUS				0x00000002	// has cursor focus, exclusive
-#define WINDOW_VISIBLE				0x00000004	// is visible
-#define WINDOW_GREY						0x00000008	// is visible but grey ( non-active )
-#define WINDOW_DECORATION			0x00000010	// for decoration only, no mouse, keyboard, etc.. 
-#define WINDOW_FADINGOUT			0x00000020	// fading out, non-active
-#define WINDOW_FADINGIN				0x00000040	// fading in
-#define WINDOW_MOUSEOVERTEXT	0x00000080	// mouse is over it, non exclusive
-#define WINDOW_INTRANSITION		0x00000100	// window is in transition
-#define WINDOW_FORECOLORSET		0x00000200	// forecolor was explicitly set ( used to color alpha images or not )
-#define WINDOW_HORIZONTAL			0x00000400	// for list boxes and sliders, vertical is default this is set of horizontal
-#define WINDOW_LB_LEFTARROW		0x00000800	// mouse is over left/up arrow
-#define WINDOW_LB_RIGHTARROW	0x00001000	// mouse is over right/down arrow
-#define WINDOW_LB_THUMB				0x00002000	// mouse is over thumb
-#define WINDOW_LB_PGUP				0x00004000	// mouse is over page up
-#define WINDOW_LB_PGDN				0x00008000	// mouse is over page down
-#define WINDOW_ORBITING				0x00010000	// item is in orbit
-#define WINDOW_OOB_CLICK			0x00020000	// close on out of bounds click
-#define WINDOW_WRAPPED				0x00040000	// manually wrap text
-#define WINDOW_AUTOWRAPPED			0x00080000	// auto wrap text
-#define WINDOW_FORCED					0x00100000	// forced open
-#define WINDOW_POPUP					0x00200000	// popup
-#define WINDOW_BACKCOLORSET		0x00400000	// backcolor was explicitly set 
-#define WINDOW_TIMEDVISIBLE		0x00800000	// visibility timing ( NOT implemented )
+inline constexpr int WINDOW_MOUSEOVER = 0x00000001; // mouse is over it, non exclusive
+inline constexpr int WINDOW_HASFOCUS = 0x00000002; // has cursor focus, exclusive
+inline constexpr int WINDOW_VISIBLE = 0x00000004; // is visible
+inline constexpr int WINDOW_GREY = 0x00000008; // is visible but grey ( non-active )
+inline constexpr int WINDOW_DECORATION = 0x00000010; // for decoration only, no mouse, keyboard, etc..
+inline constexpr int WINDOW_FADINGOUT = 0x00000020; // fading out, non-active
+inline constexpr int WINDOW_FADINGIN = 0x00000040; // fading in
+inline constexpr int WINDOW_MOUSEOVERTEXT = 0x00000080; // mouse is over it, non exclusive
+inline constexpr int WINDOW_INTRANSITION = 0x00000100; // window is in transition
+inline constexpr int WINDOW_FORECOLORSET = 0x00000200; // forecolor was explicitly set ( used to color alpha images or not )
+inline constexpr int WINDOW_HORIZONTAL = 0x00000400; // for list boxes and sliders, vertical is default this is set of horizontal
+inline constexpr int WINDOW_LB_LEFTARROW = 0x00000800; // mouse is over left/up arrow
+inline constexpr int WINDOW_LB_RIGHTARROW = 0x00001000; // mouse is over right/down arrow
+inline constexpr int WINDOW_LB_THUMB = 0x00002000; // mouse is over thumb
+inline constexpr int WINDOW_LB_PGUP = 0x00004000; // mouse is over page up
+inline constexpr int WINDOW_LB_PGDN = 0x00008000; // mouse is over page down
+inline constexpr int WINDOW_ORBITING = 0x00010000; // item is in orbit
+inline constexpr int WINDOW_OOB_CLICK = 0x00020000; // close on out of bounds click
+inline constexpr int WINDOW_WRAPPED = 0x00040000; // manually wrap text
+inline constexpr int WINDOW_AUTOWRAPPED = 0x00080000; // auto wrap text
+inline constexpr int WINDOW_FORCED = 0x00100000; // forced open
+inline constexpr int WINDOW_POPUP = 0x00200000; // popup
+inline constexpr int WINDOW_BACKCOLORSET = 0x00400000; // backcolor was explicitly set
+inline constexpr int WINDOW_TIMEDVISIBLE = 0x00800000; // visibility timing ( NOT implemented )
 
 
 // CGAME cursor type bits
-#define CURSOR_NONE					0x00000001
-#define CURSOR_ARROW				0x00000002
-#define CURSOR_SIZER				0x00000004
+inline constexpr int CURSOR_NONE = 0x00000001;
+inline constexpr int CURSOR_ARROW = 0x00000002;
+inline constexpr int CURSOR_SIZER = 0x00000004;
 
 #ifdef CGAME
 #define STRING_POOL_SIZE 128*1024
 #else
 #define STRING_POOL_SIZE 384*1024
 #endif
-#define MAX_STRING_HANDLES 4096
+inline constexpr int MAX_STRING_HANDLES = 4096;
 
-#define MAX_SCRIPT_ARGS 12
-#define MAX_EDITFIELD 256
+inline constexpr int MAX_SCRIPT_ARGS = 12;
+inline constexpr int MAX_EDITFIELD = 256;
 
 #define ART_FX_BASE			"menu/art/fx_base"
 #define ART_FX_BLUE			"menu/art/fx_blue"
@@ -123,12 +123,12 @@ typedef enum {
 #define ASSET_SCROLL_THUMB          "ui/assets/scrollbar_thumb.tga"
 #define ASSET_SLIDER_BAR			"ui/assets/slider.tga"
 #define ASSET_SLIDER_THUMB			"ui/assets/sliderbutton.tga"
-#define SCROLLBAR_SIZE 16.0
-#define SLIDER_WIDTH 96.0
-#define SLIDER_HEIGHT 16.0
-#define SLIDER_THUMB_WIDTH 12.0
-#define SLIDER_THUMB_HEIGHT 20.0
-#define	NUM_CROSSHAIRS			1
+inline constexpr double SCROLLBAR_SIZE = 16.0;
+inline constexpr double SLIDER_WIDTH = 96.0;
+inline constexpr double SLIDER_HEIGHT = 16.0;
+inline constexpr double SLIDER_THUMB_WIDTH = 12.0;
+inline constexpr double SLIDER_THUMB_HEIGHT = 20.0;
+inline constexpr int NUM_CROSSHAIRS = 1;
 
 typedef struct {
   const char *command;
@@ -189,7 +189,7 @@ typedef struct {
 // the benefits of c++ in DOOM will greatly help crap like this
 // FIXME: need to put a type ptr that points to specific type info per type
 // 
-#define MAX_LB_COLUMNS 16
+inline constexpr int MAX_LB_COLUMNS = 16;
 
 typedef struct columnInfo_s {
 	int pos;
@@ -221,7 +221,7 @@ typedef struct editFieldDef_s {
 	int paintOffset;							 // 
 } editFieldDef_t;
 
-#define MAX_MULTI_CVARS 32
+inline constexpr int MAX_MULTI_CVARS = 32;
 
 typedef struct multiDef_s {
 	const char *cvarList[MAX_MULTI_CVARS];
@@ -239,10 +239,10 @@ typedef struct modelDef_s {
 	int rotationSpeed;
 } modelDef_t;
 
-#define CVAR_ENABLE		0x00000001
-#define CVAR_DISABLE	0x00000002
-#define CVAR_SHOW			0x00000004
-#define CVAR_HIDE			0x00000008
+inline constexpr int CVAR_ENABLE = 0x00000001;
+inline constexpr int CVAR_DISABLE = 0x00000002;
+inline constexpr int CVAR_SHOW = 0x00000004;
+inline constexpr int CVAR_HIDE = 0x00000008;
 
 struct itemDef_t 
 {

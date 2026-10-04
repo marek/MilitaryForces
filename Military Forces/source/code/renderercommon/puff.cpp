@@ -78,11 +78,11 @@
  * Maximums for allocations and loops.  It is not useful to change these --
  * they are fixed by the deflate format.
  */
-#define MAXBITS 15              /* maximum bits in a code */
-#define MAXLCODES 286           /* maximum number of literal/length codes */
-#define MAXDCODES 30            /* maximum number of distance codes */
+constexpr int MAXBITS = 15; /* maximum bits in a code */
+constexpr int MAXLCODES = 286; /* maximum number of literal/length codes */
+constexpr int MAXDCODES = 30; /* maximum number of distance codes */
 #define MAXCODES (MAXLCODES+MAXDCODES)  /* maximum codes lengths to read */
-#define FIXLCODES 288           /* number of fixed literal/length codes */
+constexpr int FIXLCODES = 288; /* number of fixed literal/length codes */
 
 /* input and output state */
 struct state {

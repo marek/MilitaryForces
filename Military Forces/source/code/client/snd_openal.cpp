@@ -1661,7 +1661,7 @@ ALuint S_AL_SrcGet(srcHandle_t src)
 //===========================================================================
 
 // Q3A cinematics use up to 12 buffers at once
-#define MAX_STREAM_BUFFERS 20
+constexpr int MAX_STREAM_BUFFERS = 20;
 
 static srcHandle_t streamSourceHandles[MAX_RAW_STREAMS];
 static bool streamPlaying[MAX_RAW_STREAMS];
@@ -1909,8 +1909,8 @@ void S_AL_StreamDie( int stream )
 //===========================================================================
 
 
-#define NUM_MUSIC_BUFFERS	4
-#define	MUSIC_BUFFER_SIZE 4096
+constexpr int NUM_MUSIC_BUFFERS = 4;
+constexpr int MUSIC_BUFFER_SIZE = 4096;
 
 static bool musicPlaying = false;
 static srcHandle_t musicSourceHandle = -1;

@@ -78,8 +78,8 @@ struct worldSector_t
 	SV_Entity	*entities;
 };
 
-#define	AREA_DEPTH	4
-#define	AREA_NODES	64
+constexpr int AREA_DEPTH = 4;
+constexpr int AREA_NODES = 64;
 
 worldSector_t	sv_worldSectors[AREA_NODES];
 int			sv_numworldSectors;
@@ -217,7 +217,7 @@ SV_LinkEntity
 
 ===============
 */
-#define MAX_TOTAL_ENT_LEAFS		128
+constexpr int MAX_TOTAL_ENT_LEAFS = 128;
 void SV_LinkEntity( EntityBase* gameEnt ) 
 {
 	worldSector_t	*node;

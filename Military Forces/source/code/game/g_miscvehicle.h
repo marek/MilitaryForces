@@ -29,7 +29,7 @@ struct Drone_Think : public GameEntity::EntityFunc_Think
 	float			speed_;
 };
 
-#define MAX_VEHICLE_DECKS	8
+inline constexpr int MAX_VEHICLE_DECKS = 8;
 
 struct Deck_Think : public GameEntity::EntityFunc_Think
 {

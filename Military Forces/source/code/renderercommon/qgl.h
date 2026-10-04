@@ -192,49 +192,49 @@ extern void (APIENTRYP qglUnlockArraysEXT) ();
 // GL_NVX_gpu_memory_info
 #ifndef GL_NVX_gpu_memory_info
 #define GL_NVX_gpu_memory_info
-#define GL_GPU_MEMORY_INFO_DEDICATED_VIDMEM_NVX          0x9047
-#define GL_GPU_MEMORY_INFO_TOTAL_AVAILABLE_MEMORY_NVX    0x9048
-#define GL_GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX  0x9049
-#define GL_GPU_MEMORY_INFO_EVICTION_COUNT_NVX            0x904A
-#define GL_GPU_MEMORY_INFO_EVICTED_MEMORY_NVX            0x904B
+inline constexpr int GL_GPU_MEMORY_INFO_DEDICATED_VIDMEM_NVX = 0x9047;
+inline constexpr int GL_GPU_MEMORY_INFO_TOTAL_AVAILABLE_MEMORY_NVX = 0x9048;
+inline constexpr int GL_GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX = 0x9049;
+inline constexpr int GL_GPU_MEMORY_INFO_EVICTION_COUNT_NVX = 0x904A;
+inline constexpr int GL_GPU_MEMORY_INFO_EVICTED_MEMORY_NVX = 0x904B;
 #endif
 
 // GL_ATI_meminfo
 #ifndef GL_ATI_meminfo
 #define GL_ATI_meminfo
-#define GL_VBO_FREE_MEMORY_ATI                    0x87FB
-#define GL_TEXTURE_FREE_MEMORY_ATI                0x87FC
-#define GL_RENDERBUFFER_FREE_MEMORY_ATI           0x87FD
+inline constexpr int GL_VBO_FREE_MEMORY_ATI = 0x87FB;
+inline constexpr int GL_TEXTURE_FREE_MEMORY_ATI = 0x87FC;
+inline constexpr int GL_RENDERBUFFER_FREE_MEMORY_ATI = 0x87FD;
 #endif
 
 // GL_ARB_texture_float
 #ifndef GL_ARB_texture_float
 #define GL_ARB_texture_float
-#define GL_TEXTURE_RED_TYPE_ARB             0x8C10
-#define GL_TEXTURE_GREEN_TYPE_ARB           0x8C11
-#define GL_TEXTURE_BLUE_TYPE_ARB            0x8C12
-#define GL_TEXTURE_ALPHA_TYPE_ARB           0x8C13
-#define GL_TEXTURE_LUMINANCE_TYPE_ARB       0x8C14
-#define GL_TEXTURE_INTENSITY_TYPE_ARB       0x8C15
-#define GL_TEXTURE_DEPTH_TYPE_ARB           0x8C16
-#define GL_UNSIGNED_NORMALIZED_ARB          0x8C17
-#define GL_RGBA32F_ARB                      0x8814
-#define GL_RGB32F_ARB                       0x8815
-#define GL_ALPHA32F_ARB                     0x8816
-#define GL_INTENSITY32F_ARB                 0x8817
-#define GL_LUMINANCE32F_ARB                 0x8818
-#define GL_LUMINANCE_ALPHA32F_ARB           0x8819
-#define GL_RGBA16F_ARB                      0x881A
-#define GL_RGB16F_ARB                       0x881B
-#define GL_ALPHA16F_ARB                     0x881C
-#define GL_INTENSITY16F_ARB                 0x881D
-#define GL_LUMINANCE16F_ARB                 0x881E
-#define GL_LUMINANCE_ALPHA16F_ARB           0x881F
+inline constexpr int GL_TEXTURE_RED_TYPE_ARB = 0x8C10;
+inline constexpr int GL_TEXTURE_GREEN_TYPE_ARB = 0x8C11;
+inline constexpr int GL_TEXTURE_BLUE_TYPE_ARB = 0x8C12;
+inline constexpr int GL_TEXTURE_ALPHA_TYPE_ARB = 0x8C13;
+inline constexpr int GL_TEXTURE_LUMINANCE_TYPE_ARB = 0x8C14;
+inline constexpr int GL_TEXTURE_INTENSITY_TYPE_ARB = 0x8C15;
+inline constexpr int GL_TEXTURE_DEPTH_TYPE_ARB = 0x8C16;
+inline constexpr int GL_UNSIGNED_NORMALIZED_ARB = 0x8C17;
+inline constexpr int GL_RGBA32F_ARB = 0x8814;
+inline constexpr int GL_RGB32F_ARB = 0x8815;
+inline constexpr int GL_ALPHA32F_ARB = 0x8816;
+inline constexpr int GL_INTENSITY32F_ARB = 0x8817;
+inline constexpr int GL_LUMINANCE32F_ARB = 0x8818;
+inline constexpr int GL_LUMINANCE_ALPHA32F_ARB = 0x8819;
+inline constexpr int GL_RGBA16F_ARB = 0x881A;
+inline constexpr int GL_RGB16F_ARB = 0x881B;
+inline constexpr int GL_ALPHA16F_ARB = 0x881C;
+inline constexpr int GL_INTENSITY16F_ARB = 0x881D;
+inline constexpr int GL_LUMINANCE16F_ARB = 0x881E;
+inline constexpr int GL_LUMINANCE_ALPHA16F_ARB = 0x881F;
 #endif
 
 #ifndef GL_ARB_half_float_pixel
 #define GL_ARB_half_float_pixel
-#define GL_HALF_FLOAT_ARB                   0x140B
+inline constexpr int GL_HALF_FLOAT_ARB = 0x140B;
 #endif
 
 // OpenGL 3.0 specific
@@ -265,28 +265,28 @@ extern void (APIENTRYP qglUnlockArraysEXT) ();
 
 #ifndef GL_ARB_texture_compression_rgtc
 #define GL_ARB_texture_compression_rgtc
-#define GL_COMPRESSED_RED_RGTC1                       0x8DBB
-#define GL_COMPRESSED_SIGNED_RED_RGTC1                0x8DBC
-#define GL_COMPRESSED_RG_RGTC2                        0x8DBD
-#define GL_COMPRESSED_SIGNED_RG_RGTC2                 0x8DBE
+inline constexpr int GL_COMPRESSED_RED_RGTC1 = 0x8DBB;
+inline constexpr int GL_COMPRESSED_SIGNED_RED_RGTC1 = 0x8DBC;
+inline constexpr int GL_COMPRESSED_RG_RGTC2 = 0x8DBD;
+inline constexpr int GL_COMPRESSED_SIGNED_RG_RGTC2 = 0x8DBE;
 #endif
 
 #ifndef GL_ARB_texture_compression_bptc
 #define GL_ARB_texture_compression_bptc
-#define GL_COMPRESSED_RGBA_BPTC_UNORM_ARB                 0x8E8C
-#define GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM_ARB           0x8E8D
-#define GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT_ARB           0x8E8E
-#define GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT_ARB         0x8E8F
+inline constexpr int GL_COMPRESSED_RGBA_BPTC_UNORM_ARB = 0x8E8C;
+inline constexpr int GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM_ARB = 0x8E8D;
+inline constexpr int GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT_ARB = 0x8E8E;
+inline constexpr int GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT_ARB = 0x8E8F;
 #endif
 
 #ifndef GL_ARB_depth_clamp
 #define GL_ARB_depth_clamp
-#define GL_DEPTH_CLAMP				      0x864F
+inline constexpr int GL_DEPTH_CLAMP = 0x864F;
 #endif
 
 #ifndef GL_ARB_seamless_cube_map
 #define GL_ARB_seamless_cube_map
-#define GL_TEXTURE_CUBE_MAP_SEAMLESS               0x884F
+inline constexpr int GL_TEXTURE_CUBE_MAP_SEAMLESS = 0x884F;
 #endif
 
 // GL_EXT_direct_state_access

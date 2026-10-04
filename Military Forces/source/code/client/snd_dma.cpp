@@ -47,9 +47,9 @@ static char		s_backgroundLoop[MAX_QPATH];
 // =======================================================================
 
 // only begin attenuating sound volumes when outside the FULLVOLUME range
-#define		SOUND_FULLVOLUME	80
+constexpr int SOUND_FULLVOLUME = 80;
 
-#define		SOUND_ATTENUATE		0.0008f
+constexpr float SOUND_ATTENUATE = 0.0008f;
 
 channel_t   s_channels[MAX_CHANNELS];
 channel_t   loop_channels[MAX_CHANNELS];
@@ -73,7 +73,7 @@ int   		s_paintedtime; 		// sample PAIRS
 sfx_t		s_knownSfx[MAX_SFX];
 int			s_numSfx = 0;
 
-#define		LOOP_HASH		128
+constexpr int LOOP_HASH = 128;
 static	sfx_t		*sfxHash[LOOP_HASH];
 
 cvar_t		*s_testsound;

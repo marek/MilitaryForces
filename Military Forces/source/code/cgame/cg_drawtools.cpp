@@ -568,9 +568,9 @@ static int propMapB[26][3] = {
 {158, 139, 25},
 };
 
-#define PROPB_GAP_WIDTH		4
-#define PROPB_SPACE_WIDTH	12
-#define PROPB_HEIGHT		36
+constexpr int PROPB_GAP_WIDTH = 4;
+constexpr int PROPB_SPACE_WIDTH = 12;
+constexpr int PROPB_HEIGHT = 36;
 
 /*
 =================
@@ -1263,7 +1263,7 @@ Parses and draws (if appropriate) reticle labels
 ================
 */
 
-#define HUD_LABEL_OFFSET 12
+constexpr int HUD_LABEL_OFFSET = 12;
 
 void CG_Parse_Reticle_Target( reticle_t * pR )
 {

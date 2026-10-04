@@ -652,7 +652,7 @@ void UI_DrawMouse( )
 int frameCount = 0;
 int startTime;
 
-#define	UI_FPS_FRAMES	4
+constexpr int UI_FPS_FRAMES = 4;
 
 /*
 =================
@@ -2096,11 +2096,11 @@ UI_DrawCredits
 =================
 */
 
-#define	HOFFSET			4
-#define	VOFFSET			4
-#define SVSPACER		12
-#define BVSPACER		18
-#define	SPEED_DIVIDER	40
+constexpr int HOFFSET = 4;
+constexpr int VOFFSET = 4;
+constexpr int SVSPACER = 12;
+constexpr int BVSPACER = 18;
+constexpr int SPEED_DIVIDER = 40;
 
 static void UI_DrawCredits( rectDef_t *rect, float scale, const vec4_t inColor, int textStyle )
 {

@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // tr_noise.c
 #include "tr_common.h"
 
-#define NOISE_SIZE 256
+constexpr int NOISE_SIZE = 256;
 #define NOISE_MASK ( NOISE_SIZE - 1 )
 
 #define VAL( a ) s_noise_perm[ ( a ) & ( NOISE_MASK )]

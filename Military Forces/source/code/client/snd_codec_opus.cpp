@@ -36,7 +36,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <opusfile.h>
 
 // samples are 16 bit
-#define OPUS_SAMPLEWIDTH 2
+constexpr int OPUS_SAMPLEWIDTH = 2;
 
 // Q3 Ogg Opus codec
 snd_codec_t opus_codec =

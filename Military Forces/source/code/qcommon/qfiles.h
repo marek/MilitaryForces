@@ -45,8 +45,8 @@ QVM files
 ========================================================================
 */
 
-#define	VM_MAGIC			0x12721444
-#define	VM_MAGIC_VER2	0x12721445
+inline constexpr int VM_MAGIC = 0x12721444;
+inline constexpr int VM_MAGIC_VER2 = 0x12721445;
 typedef struct {
 	int		vmMagic;
 
@@ -194,8 +194,8 @@ MDR file format
  */
 
 #define MDR_IDENT	(('5'<<24)+('M'<<16)+('D'<<8)+'R')
-#define MDR_VERSION	2
-#define	MDR_MAX_BONES	128
+inline constexpr int MDR_VERSION = 2;
+inline constexpr int MDR_MAX_BONES = 128;
 
 typedef struct {
 	int			boneIndex;	// these are indexes into the boneReferences,
@@ -308,7 +308,7 @@ typedef struct {
 #define BSP_IDENT	(('P'<<24)+('S'<<16)+('B'<<8)+'I')
 		// little-endian "IBSP"
 
-#define BSP_VERSION			46
+inline constexpr int BSP_VERSION = 46;
 
 
 // there shouldn't be any problem with increasing these values at the
@@ -317,10 +317,10 @@ typedef struct {
 #define	MAX_MAP_BRUSHES		0x8000
 #define	MAX_MAP_ENTITIES	0x800
 #define	MAX_MAP_ENTSTRING	0x40000
-#define	MAX_MAP_SHADERS		0x400
+inline constexpr int MAX_MAP_SHADERS = 0x400;
 
 #define	MAX_MAP_AREAS		0x100	// MAX_MAP_AREA_BYTES in q_shared must match!
-#define	MAX_MAP_FOGS		0x100
+inline constexpr int MAX_MAP_FOGS = 0x100;
 #define	MAX_MAP_PLANES		0x20000
 #define	MAX_MAP_NODES		0x20000
 #define	MAX_MAP_BRUSHSIDES	0x20000
@@ -329,12 +329,12 @@ typedef struct {
 #define	MAX_MAP_LEAFBRUSHES 0x40000
 #define	MAX_MAP_PORTALS		0x20000
 #define	MAX_MAP_LIGHTING	0x800000
-#define	MAX_MAP_LIGHTGRID	0x800000
+inline constexpr int MAX_MAP_LIGHTGRID = 0x800000;
 #define	MAX_MAP_VISIBILITY	0x200000
 
-#define	MAX_MAP_DRAW_SURFS	0x20000
-#define	MAX_MAP_DRAW_VERTS	0x80000
-#define	MAX_MAP_DRAW_INDEXES	0x80000
+inline constexpr int MAX_MAP_DRAW_SURFS = 0x20000;
+inline constexpr int MAX_MAP_DRAW_VERTS = 0x80000;
+inline constexpr int MAX_MAP_DRAW_INDEXES = 0x80000;
 
 
 // key / value pair sizes in the entities lump
@@ -348,8 +348,8 @@ typedef struct {
 #define	LIGHTMAP_WIDTH		128
 #define	LIGHTMAP_HEIGHT		128
 
-#define MAX_WORLD_COORD		( 128*1024 )
-#define MIN_WORLD_COORD		( -128*1024 )
+inline constexpr int MAX_WORLD_COORD = ( 128*1024 );
+inline constexpr int MIN_WORLD_COORD = ( -128*1024 );
 #define WORLD_SIZE			( MAX_WORLD_COORD - MIN_WORLD_COORD )
 
 //=============================================================================
@@ -360,21 +360,21 @@ typedef struct {
 } lump_t;
 
 #define	LUMP_ENTITIES		0
-#define	LUMP_SHADERS		1
+inline constexpr int LUMP_SHADERS = 1;
 #define	LUMP_PLANES			2
 #define	LUMP_NODES			3
 #define	LUMP_LEAFS			4
-#define	LUMP_LEAFSURFACES	5
+inline constexpr int LUMP_LEAFSURFACES = 5;
 #define	LUMP_LEAFBRUSHES	6
 #define	LUMP_MODELS			7
 #define	LUMP_BRUSHES		8
 #define	LUMP_BRUSHSIDES		9
-#define	LUMP_DRAWVERTS		10
-#define	LUMP_DRAWINDEXES	11
-#define	LUMP_FOGS			12
-#define	LUMP_SURFACES		13
-#define	LUMP_LIGHTMAPS		14
-#define	LUMP_LIGHTGRID		15
+inline constexpr int LUMP_DRAWVERTS = 10;
+inline constexpr int LUMP_DRAWINDEXES = 11;
+inline constexpr int LUMP_FOGS = 12;
+inline constexpr int LUMP_SURFACES = 13;
+inline constexpr int LUMP_LIGHTMAPS = 14;
+inline constexpr int LUMP_LIGHTGRID = 15;
 #define	LUMP_VISIBILITY		16
 #define	HEADER_LUMPS		17
 

@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "tr_types.h"
 
-#define	REF_API_VERSION		8
+inline constexpr int REF_API_VERSION = 8;
 
 //
 // these are the functions exported by the refresh module

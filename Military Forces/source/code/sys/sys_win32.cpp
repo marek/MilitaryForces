@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 // Use EnumProcesses() with Windows XP compatibility
-#define PSAPI_VERSION 1
+constexpr int PSAPI_VERSION = 1;
 
 #include "../game/q_shared.h"
 #include "../qcommon/qcommon.h"
@@ -60,11 +60,11 @@ Set FPU control word to default value
 #ifndef _RC_CHOP
 // mingw doesn't seem to have these defined :(
 
-  #define _MCW_EM	0x0008001fU
-  #define _MCW_RC	0x00000300U
-  #define _MCW_PC	0x00030000U
-  #define _RC_NEAR      0x00000000U
-  #define _PC_53	0x00010000U
+  constexpr unsigned int _MCW_EM = 0x0008001fU;
+  constexpr unsigned int _MCW_RC = 0x00000300U;
+  constexpr unsigned int _MCW_PC = 0x00030000U;
+  constexpr unsigned int _RC_NEAR = 0x00000000U;
+  constexpr unsigned int _PC_53 = 0x00010000U;
   
   unsigned int _controlfp(unsigned int new, unsigned int mask);
 #endif

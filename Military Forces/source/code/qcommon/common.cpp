@@ -34,9 +34,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 int demo_protocols[] =
 { 5, 0 };
 
-#define MAX_NUM_ARGVS	50
+constexpr int MAX_NUM_ARGVS = 50;
 
-#define MIN_DEDICATED_COMHUNKMEGS 1
+constexpr int MIN_DEDICATED_COMHUNKMEGS = 1;
 #define DEF_COMHUNKMEGS 	128
 #define MIN_COMHUNKMEGS		DEF_COMHUNKMEGS
 #define DEF_COMZONEMEGS		48

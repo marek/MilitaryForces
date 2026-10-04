@@ -10,16 +10,16 @@
 #define _ZLIBIOAPI_H
 
 
-#define ZLIB_FILEFUNC_SEEK_CUR (1)
-#define ZLIB_FILEFUNC_SEEK_END (2)
-#define ZLIB_FILEFUNC_SEEK_SET (0)
+inline constexpr int ZLIB_FILEFUNC_SEEK_CUR = (1);
+inline constexpr int ZLIB_FILEFUNC_SEEK_END = (2);
+inline constexpr int ZLIB_FILEFUNC_SEEK_SET = (0);
 
-#define ZLIB_FILEFUNC_MODE_READ      (1)
-#define ZLIB_FILEFUNC_MODE_WRITE     (2)
-#define ZLIB_FILEFUNC_MODE_READWRITEFILTER (3)
+inline constexpr int ZLIB_FILEFUNC_MODE_READ = (1);
+inline constexpr int ZLIB_FILEFUNC_MODE_WRITE = (2);
+inline constexpr int ZLIB_FILEFUNC_MODE_READWRITEFILTER = (3);
 
-#define ZLIB_FILEFUNC_MODE_EXISTING (4)
-#define ZLIB_FILEFUNC_MODE_CREATE   (8)
+inline constexpr int ZLIB_FILEFUNC_MODE_EXISTING = (4);
+inline constexpr int ZLIB_FILEFUNC_MODE_CREATE = (8);
 
 
 #ifndef ZCALLBACK

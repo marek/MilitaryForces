@@ -758,10 +758,10 @@ typedef struct {
 	int		bits;		// 0 = float
 } netField_t;
 
-#define	NETF_POS	100
-#define	NETF_ANG	101
-#define	NETF_POS_BITS	22
-#define	NETF_ANG_BITS	16
+constexpr int NETF_POS = 100;
+constexpr int NETF_ANG = 101;
+constexpr int NETF_POS_BITS = 22;
+constexpr int NETF_ANG_BITS = 16;
 
 static bool MSG_QuantizeFloat( int kind, float f, int *q ) {
 	float	v;
@@ -868,7 +868,7 @@ netField_t	entityStateFields[] =
 
 // if (int)f == f and (int)f + ( 1<<(FLOAT_INT_BITS-1) ) < ( 1 << FLOAT_INT_BITS )
 // the float will be sent with FLOAT_INT_BITS, otherwise all 32 bits will be sent
-#define	FLOAT_INT_BITS	13
+constexpr int FLOAT_INT_BITS = 13;
 #define	FLOAT_INT_BIAS	(1<<(FLOAT_INT_BITS-1))
 
 /*

@@ -26,7 +26,7 @@
 #else
 #include <unistd.h>
 #ifdef __sun
-#define _POSIX_C_SOURCE 199309L
+constexpr long _POSIX_C_SOURCE = 199309L;
 #endif
 #include <sys/mman.h>
 #include <sys/types.h>

@@ -38,7 +38,7 @@ PNG LOADING
  *  Quake 3 image format : RGBA
  */
 
-#define Q3IMAGE_BYTESPERPIXEL (4)
+constexpr int Q3IMAGE_BYTESPERPIXEL = (4);
 
 /*
  *  PNG specifications
@@ -50,7 +50,7 @@ PNG LOADING
  */
 
 #define PNG_Signature "\x89\x50\x4E\x47\xD\xA\x1A\xA"
-#define PNG_Signature_Size (8)
+constexpr int PNG_Signature_Size = (8);
 
 /*
  *  After the signature diverse chunks follow.
@@ -64,11 +64,11 @@ struct PNG_ChunkHeader
 	uint32_t Type;
 };
 
-#define PNG_ChunkHeader_Size (8)
+constexpr int PNG_ChunkHeader_Size = (8);
 
 typedef uint32_t PNG_ChunkCRC;
 
-#define PNG_ChunkCRC_Size (4)
+constexpr int PNG_ChunkCRC_Size = (4);
 
 /*
  *  We use the following ChunkTypes.
@@ -98,17 +98,17 @@ struct PNG_Chunk_IHDR
 	uint8_t  InterlaceMethod;
 };
 
-#define PNG_Chunk_IHDR_Size (13)
+constexpr int PNG_Chunk_IHDR_Size = (13);
 
 /*
  *  ColourTypes
  */
 
-#define PNG_ColourType_Grey      (0)
-#define PNG_ColourType_True      (2)
-#define PNG_ColourType_Indexed   (3)
-#define PNG_ColourType_GreyAlpha (4)
-#define PNG_ColourType_TrueAlpha (6)
+constexpr int PNG_ColourType_Grey = (0);
+constexpr int PNG_ColourType_True = (2);
+constexpr int PNG_ColourType_Indexed = (3);
+constexpr int PNG_ColourType_GreyAlpha = (4);
+constexpr int PNG_ColourType_TrueAlpha = (6);
 
 /*
  *  number of colour components
@@ -120,44 +120,44 @@ struct PNG_Chunk_IHDR
  *  TrueAlpha : 1 R, 1 G, 1 B, 1 alpha
  */
 
-#define PNG_NumColourComponents_Grey      (1)
-#define PNG_NumColourComponents_True      (3)
-#define PNG_NumColourComponents_Indexed   (1)
-#define PNG_NumColourComponents_GreyAlpha (2)
-#define PNG_NumColourComponents_TrueAlpha (4)
+constexpr int PNG_NumColourComponents_Grey = (1);
+constexpr int PNG_NumColourComponents_True = (3);
+constexpr int PNG_NumColourComponents_Indexed = (1);
+constexpr int PNG_NumColourComponents_GreyAlpha = (2);
+constexpr int PNG_NumColourComponents_TrueAlpha = (4);
 
 /*
  *  For the different ColourTypes
  *  different BitDepths are specified.
  */
 
-#define PNG_BitDepth_1  ( 1)
-#define PNG_BitDepth_2  ( 2)
-#define PNG_BitDepth_4  ( 4)
-#define PNG_BitDepth_8  ( 8)
-#define PNG_BitDepth_16 (16)
+constexpr int PNG_BitDepth_1 = ( 1);
+constexpr int PNG_BitDepth_2 = ( 2);
+constexpr int PNG_BitDepth_4 = ( 4);
+constexpr int PNG_BitDepth_8 = ( 8);
+constexpr int PNG_BitDepth_16 = (16);
 
 /*
  *  Only one valid CompressionMethod is standardized.
  */
 
-#define PNG_CompressionMethod_0 (0)
+constexpr int PNG_CompressionMethod_0 = (0);
 
 /*
  *  Only one valid FilterMethod is currently standardized.
  */
 
-#define PNG_FilterMethod_0 (0)
+constexpr int PNG_FilterMethod_0 = (0);
 
 /*
  *  This FilterMethod defines 5 FilterTypes
  */
 
-#define PNG_FilterType_None    (0)
-#define PNG_FilterType_Sub     (1)
-#define PNG_FilterType_Up      (2)
-#define PNG_FilterType_Average (3)
-#define PNG_FilterType_Paeth   (4)
+constexpr int PNG_FilterType_None = (0);
+constexpr int PNG_FilterType_Sub = (1);
+constexpr int PNG_FilterType_Up = (2);
+constexpr int PNG_FilterType_Average = (3);
+constexpr int PNG_FilterType_Paeth = (4);
 
 /*
  *  Two InterlaceMethods are standardized :
@@ -165,14 +165,14 @@ struct PNG_Chunk_IHDR
  *  1 - Interlaced
  */
 
-#define PNG_InterlaceMethod_NonInterlaced (0)
-#define PNG_InterlaceMethod_Interlaced    (1)
+constexpr int PNG_InterlaceMethod_NonInterlaced = (0);
+constexpr int PNG_InterlaceMethod_Interlaced = (1);
 
 /*
  *  The Adam7 interlace method uses 7 passes.
  */
 
-#define PNG_Adam7_NumPasses (7)
+constexpr int PNG_Adam7_NumPasses = (7);
 
 /*
  *  The compressed data starts with a header ...
@@ -184,13 +184,13 @@ struct PNG_ZlibHeader
 	uint8_t Flags;
 };
 
-#define PNG_ZlibHeader_Size (2)
+constexpr int PNG_ZlibHeader_Size = (2);
 
 /*
  *  ... and is followed by a check value
  */
 
-#define PNG_ZlibCheckValue_Size (4)
+constexpr int PNG_ZlibCheckValue_Size = (4);
 
 /*
  *  Some support functions for buffered files follow.

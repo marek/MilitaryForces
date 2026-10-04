@@ -10,7 +10,7 @@
 struct EntityBase;
 
 #ifdef USE_VOIP
-#define VOIP_QUEUE_LENGTH 64
+inline constexpr int VOIP_QUEUE_LENGTH = 64;
 
 typedef struct voipServerPacket_s
 {
@@ -24,14 +24,14 @@ typedef struct voipServerPacket_s
 } voipServerPacket_t;
 #endif
 
-#define	MAX_SENT_ENTITIES	512
+inline constexpr int MAX_SENT_ENTITIES = 512;
 
-#define	SENT_UPDATE		0
-#define	SENT_CREATE		1
-#define	SENT_REMOVE		2
+inline constexpr int SENT_UPDATE = 0;
+inline constexpr int SENT_CREATE = 1;
+inline constexpr int SENT_REMOVE = 2;
 
-#define	ENTITY_KNOWN	1
-#define	ENTITY_REMOVE	2
+inline constexpr int ENTITY_KNOWN = 1;
+inline constexpr int ENTITY_REMOVE = 2;
 
 struct SnapshotEntityTable
 {

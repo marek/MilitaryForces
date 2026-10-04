@@ -131,7 +131,7 @@ R_LoadLightmaps
 
 ===============
 */
-#define	LIGHTMAP_SIZE	128
+constexpr int LIGHTMAP_SIZE = 128;
 static	void R_LoadLightmaps( lump_t *l ) {
 	byte		*buf, *buf_p;
 	int			len;

@@ -175,7 +175,7 @@ or configs will never get loaded from disk!
 // every time a new demo pk3 file is built, this checksum must be updated.
 // the easiest way to get it is to just run the game and see what it spits out
 #ifndef STANDALONE
-#define	DEMO_PAK0_CHECKSUM	2985612116u
+constexpr unsigned int DEMO_PAK0_CHECKSUM = 2985612116u;
 static const unsigned int pak_checksums[] = {
 	1566731103u,
 	298122907u,
@@ -205,9 +205,9 @@ static const unsigned int missionpak_checksums[] =
 // NOW defined in build files
 //#define PRE_RELEASE_TADEMO
 
-#define MAX_ZPATH			256
-#define	MAX_SEARCH_PATHS	4096
-#define MAX_FILEHASH_SIZE	1024
+constexpr int MAX_ZPATH = 256;
+constexpr int MAX_SEARCH_PATHS = 4096;
+constexpr int MAX_FILEHASH_SIZE = 1024;
 
 typedef struct fileInPack_s {
 	char					*name;		// name of the file
@@ -1496,7 +1496,7 @@ void QDECL FS_Printf( fileHandle_t h, const char *fmt, ... ) {
 	FS_Write(msg, strlen(msg), h);
 }
 
-#define PK3_SEEK_BUFFER_SIZE 65536
+constexpr int PK3_SEEK_BUFFER_SIZE = 65536;
 
 /*
 =================

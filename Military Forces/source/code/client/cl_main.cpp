@@ -1783,7 +1783,7 @@ void CL_Connect_f( ) {
 	Cvar_Set( "cl_currentServerAddress", server );
 }
 
-#define MAX_RCON_MESSAGE 1024
+constexpr int MAX_RCON_MESSAGE = 1024;
 
 /*
 ==================

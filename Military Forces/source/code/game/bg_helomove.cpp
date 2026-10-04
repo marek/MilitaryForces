@@ -11,9 +11,9 @@
 extern pmove_t		*pm;
 extern pml_t		pml;
 
-#define MAX_HELO_PITCH		30.0f
-#define MAX_HELO_ROLL		40.0f
-#define MAX_HELO_TARGROLL	20	
+constexpr float MAX_HELO_PITCH = 30.0f;
+constexpr float MAX_HELO_ROLL = 40.0f;
+constexpr int MAX_HELO_TARGROLL = 20;
 #define	PFRONT		0
 #define PBACK		1
 #define PLEFT		2

@@ -18,19 +18,19 @@
 //#define	GAME_VERSION		"v0.9"
 #define	GAME_IDENTIFIER		"mfgame"			// use to identify mfq3 servers
 
-#define	DEFAULT_GRAVITY		800.0f
+inline constexpr float DEFAULT_GRAVITY = 800.0f;
 
-#define	GIB_HEALTH			-50
+inline constexpr int GIB_HEALTH = -50;
 
-#define	MAX_ITEMS			256
+inline constexpr int MAX_ITEMS = 256;
 
-#define	RANK_TIED_FLAG		0x4000
+inline constexpr int RANK_TIED_FLAG = 0x4000;
 
-#define	ITEM_RADIUS			15		// item sizes are needed for client side pickup detection
+inline constexpr int ITEM_RADIUS = 15; // item sizes are needed for client side pickup detection
 
-#define	SCORE_NOT_PRESENT	-9999	// for the CS_SCORES[12] when only one player is present
+inline constexpr int SCORE_NOT_PRESENT = -9999; // for the CS_SCORES[12] when only one player is present
 
-#define	VOTE_TIME			30000	// 30 seconds before vote times out
+inline constexpr int VOTE_TIME = 30000; // 30 seconds before vote times out
 
 //
 // config strings are a general means of communicating variable length strings
@@ -38,32 +38,32 @@
 //
 
 // CS_SERVERINFO and CS_SYSTEMINFO are defined in q_shared.h
-#define	CS_MUSIC				2
-#define	CS_MESSAGE				3		// from the map worldspawn's message field
-#define	CS_MOTD					4		// g_motd string for server message of the day
-#define	CS_WARMUP				5		// server time when the match will be restarted
-#define	CS_SCORES1				6
-#define	CS_SCORES2				7
-#define CS_VOTE_TIME			8
-#define CS_VOTE_STRING			9
-#define	CS_VOTE_YES				10
-#define	CS_VOTE_NO				11
+inline constexpr int CS_MUSIC = 2;
+inline constexpr int CS_MESSAGE = 3; // from the map worldspawn's message field
+inline constexpr int CS_MOTD = 4; // g_motd string for server message of the day
+inline constexpr int CS_WARMUP = 5; // server time when the match will be restarted
+inline constexpr int CS_SCORES1 = 6;
+inline constexpr int CS_SCORES2 = 7;
+inline constexpr int CS_VOTE_TIME = 8;
+inline constexpr int CS_VOTE_STRING = 9;
+inline constexpr int CS_VOTE_YES = 10;
+inline constexpr int CS_VOTE_NO = 11;
 
-#define CS_TEAMVOTE_TIME		12
-#define CS_TEAMVOTE_STRING		14
-#define	CS_TEAMVOTE_YES			16
-#define	CS_TEAMVOTE_NO			18
+inline constexpr int CS_TEAMVOTE_TIME = 12;
+inline constexpr int CS_TEAMVOTE_STRING = 14;
+inline constexpr int CS_TEAMVOTE_YES = 16;
+inline constexpr int CS_TEAMVOTE_NO = 18;
 
-#define	CS_GAME_VERSION			20
-#define	CS_LEVEL_START_TIME		21		// so the timer only shows the current level
-#define	CS_INTERMISSION			22		// when 1, fraglimit/timelimit has been hit and intermission will start in a second or two
-#define CS_FLAGSTATUS			23		// string indicating flag status in CTF
-#define CS_SHADERSTATE			24
-#define CS_BOTINFO				25
+inline constexpr int CS_GAME_VERSION = 20;
+inline constexpr int CS_LEVEL_START_TIME = 21; // so the timer only shows the current level
+inline constexpr int CS_INTERMISSION = 22; // when 1, fraglimit/timelimit has been hit and intermission will start in a second or two
+inline constexpr int CS_FLAGSTATUS = 23; // string indicating flag status in CTF
+inline constexpr int CS_SHADERSTATE = 24;
+inline constexpr int CS_BOTINFO = 25;
 
-#define	CS_ITEMS				27		// string of 0's and 1's that tell which items are present
+inline constexpr int CS_ITEMS = 27; // string of 0's and 1's that tell which items are present
 
-#define	CS_MODELS				32
+inline constexpr int CS_MODELS = 32;
 #define	CS_SOUNDS				(CS_MODELS+MAX_MODELS)
 #define	CS_PLAYERS				(CS_SOUNDS+MAX_SOUNDS)
 #define CS_LOCATIONS			(CS_PLAYERS+MAX_CLIENTS)
@@ -111,25 +111,25 @@ typedef enum {
 } pmtype_t;
 
 // pmove->pm_flags
-#define	PMF_MFQ3_FREE1		1
-#define	PMF_RECHARGING		2		// set when recharging
-#define PMF_VEHICLESPAWN	4		// spawning vehicle
-#define	PMF_ME_FREEZE		8		// mission editor freeze (when manipulating objects)
-#define	PMF_MFQ3_FREE3		16		// --- unused ---
-#define	PMF_MFQ3_FREE5		32		// --- unused ---
-#define	PMF_TIME_KNOCKBACK	64		// pm_time is an air-accelerate only time
-#define	PMF_MFQ3_FREE6		256		// --- unused ---
-#define	PMF_RESPAWNED		512		// clear after attack and jump buttons come up
-#define	PMF_USE_ITEM_HELD	1024
-#define PMF_MFQ3_FREE		2048	// --- unused ---
-#define PMF_FOLLOW			4096	// spectate following another player
-#define PMF_SCOREBOARD		8192	// spectate as a scoreboard
-#define PMF_VEHICLESELECT	16384	// selecting vehicle
+inline constexpr int PMF_MFQ3_FREE1 = 1;
+inline constexpr int PMF_RECHARGING = 2; // set when recharging
+inline constexpr int PMF_VEHICLESPAWN = 4; // spawning vehicle
+inline constexpr int PMF_ME_FREEZE = 8; // mission editor freeze (when manipulating objects)
+inline constexpr int PMF_MFQ3_FREE3 = 16; // --- unused ---
+inline constexpr int PMF_MFQ3_FREE5 = 32; // --- unused ---
+inline constexpr int PMF_TIME_KNOCKBACK = 64; // pm_time is an air-accelerate only time
+inline constexpr int PMF_MFQ3_FREE6 = 256; // --- unused ---
+inline constexpr int PMF_RESPAWNED = 512; // clear after attack and jump buttons come up
+inline constexpr int PMF_USE_ITEM_HELD = 1024;
+inline constexpr int PMF_MFQ3_FREE = 2048; // --- unused ---
+inline constexpr int PMF_FOLLOW = 4096; // spectate following another player
+inline constexpr int PMF_SCOREBOARD = 8192; // spectate as a scoreboard
+inline constexpr int PMF_VEHICLESELECT = 16384; // selecting vehicle
 //#define PMF_INVULEXPAND		16384	// invulnerability sphere set to full size
 
 #define	PMF_ALL_TIMES	(PMF_TIME_KNOCKBACK)
 
-#define	MAXTOUCH	32
+inline constexpr int MAXTOUCH = 32;
 typedef struct {
 	// state (in / out)
 	playerState_t	*ps;
@@ -226,19 +226,19 @@ typedef enum {
 
 
 // entityState_t->eFlags
-#define	EF_DEAD				0x00000001		// don't draw a foe marker over players with EF_DEAD
-#define	EF_TELEPORT_BIT		0x00000004		// toggled every time the origin abruptly changes
-#define EF_PLAYER_EVENT		0x00000010
-#define	EF_BOUNCE			0x00000010		// for missiles
-#define	EF_BOUNCE_HALF		0x00000020		// for missiles
-#define	EF_PILOT_ONBOARD	0x00000040		// MFQ3 to see if pilots are in this vehicle
-#define	EF_NODRAW			0x00000080		// may have an event, but no model (unspawned items)
-#define	EF_MFQ3_FREE2		0x00000100		// --- not used ---
-#define	EF_MFQ3_FREE3		0x00000200		// --- not used ---
-#define	EF_MOVER_STOP		0x00000400		// will push otherwise
-#define	EF_CONNECTION		0x00002000		// draw a connection trouble sprite
-#define	EF_VOTED			0x00004000		// already cast a vote
-#define EF_TEAMVOTED		0x00080000		// already cast a team vote
+inline constexpr int EF_DEAD = 0x00000001; // don't draw a foe marker over players with EF_DEAD
+inline constexpr int EF_TELEPORT_BIT = 0x00000004; // toggled every time the origin abruptly changes
+inline constexpr int EF_PLAYER_EVENT = 0x00000010;
+inline constexpr int EF_BOUNCE = 0x00000010; // for missiles
+inline constexpr int EF_BOUNCE_HALF = 0x00000020; // for missiles
+inline constexpr int EF_PILOT_ONBOARD = 0x00000040; // MFQ3 to see if pilots are in this vehicle
+inline constexpr int EF_NODRAW = 0x00000080; // may have an event, but no model (unspawned items)
+inline constexpr int EF_MFQ3_FREE2 = 0x00000100; // --- not used ---
+inline constexpr int EF_MFQ3_FREE3 = 0x00000200; // --- not used ---
+inline constexpr int EF_MOVER_STOP = 0x00000400; // will push otherwise
+inline constexpr int EF_CONNECTION = 0x00002000; // draw a connection trouble sprite
+inline constexpr int EF_VOTED = 0x00004000; // already cast a vote
+inline constexpr int EF_TEAMVOTED = 0x00080000; // already cast a team vote
 
 // NOTE: may not have more than 16
 typedef enum {	// NOTE: these are BITS to set and not a normal enum!!
@@ -268,8 +268,8 @@ typedef enum {
 // that an identical event started twice in a row can
 // be distinguished.  And off the value with ~EV_EVENT_BITS
 // to retrieve the actual event number
-#define	EV_EVENT_BIT1		0x00000100
-#define	EV_EVENT_BIT2		0x00000200
+inline constexpr int EV_EVENT_BIT1 = 0x00000100;
+inline constexpr int EV_EVENT_BIT2 = 0x00000200;
 #define	EV_EVENT_BITS		(EV_EVENT_BIT1|EV_EVENT_BIT2)
 
 #define	EVENT_VALID_MSEC	300
@@ -427,10 +427,10 @@ typedef struct animation_s {
 //} team_t;
 
 // Time between location updates
-#define TEAM_LOCATION_UPDATE_TIME		1000
+inline constexpr int TEAM_LOCATION_UPDATE_TIME = 1000;
 
 // How many players on the overlay
-#define TEAM_MAXOVERLAY		32
+inline constexpr int TEAM_MAXOVERLAY = 32;
 
 //team task
 typedef enum {
@@ -478,7 +478,7 @@ typedef enum {
 	IT_TEAM
 } itemType_t;
 
-#define MAX_ITEM_MODELS 4
+inline constexpr int MAX_ITEM_MODELS = 4;
 
 typedef struct gitem_s {
 	char		*classname;	// spawning name
@@ -509,12 +509,12 @@ bool	BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const playerSt
 
 
 // g_dmflags->integer flags
-#define	DF_NO_FALLING			8
-#define DF_FIXED_FOV			16
-#define	DF_NO_FOOTSTEPS			32
+inline constexpr int DF_NO_FALLING = 8;
+inline constexpr int DF_FIXED_FOV = 16;
+inline constexpr int DF_NO_FOOTSTEPS = 32;
 
 // content masks
-#define	MASK_ALL				(-1)
+inline constexpr int MASK_ALL = (-1);
 #define	MASK_SOLID				(CONTENTS_SOLID)
 #define	MASK_PLAYERSOLID		(CONTENTS_SOLID|CONTENTS_PLAYERCLIP|CONTENTS_BODY)
 #define	MASK_DEADSOLID			(CONTENTS_SOLID|CONTENTS_PLAYERCLIP)
@@ -560,92 +560,92 @@ void	BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s
 bool	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTime );
 
 
-#define ARENAS_PER_TIER		4
-#define MAX_ARENAS			1024
-#define MAX_SCRIPTS			1024
-#define	MAX_ARENAS_TEXT		8192
+inline constexpr int ARENAS_PER_TIER = 4;
+inline constexpr int MAX_ARENAS = 1024;
+inline constexpr int MAX_SCRIPTS = 1024;
+inline constexpr int MAX_ARENAS_TEXT = 8192;
 
-#define MAX_BOTS			1024
-#define MAX_BOTS_TEXT		8192
-#define MAX_MISSION_TEXT	32000
+inline constexpr int MAX_BOTS = 1024;
+inline constexpr int MAX_BOTS_TEXT = 8192;
+inline constexpr int MAX_MISSION_TEXT = 32000;
 
 // MFQ3 
 // (everything below)
 
 // number of sounds for things
-#define NUM_TANKSOUNDS			9
-#define NUM_HELOSOUNDS			1
-#define NUM_EXPLOSION_SOUNDS	4
+inline constexpr int NUM_TANKSOUNDS = 9;
+inline constexpr int NUM_HELOSOUNDS = 1;
+inline constexpr int NUM_EXPLOSION_SOUNDS = 4;
 
 // modelname strings
-#define MF_MAX_MODELNAME		128
+inline constexpr int MF_MAX_MODELNAME = 128;
 
-#define MF_MAX_GAMESETS			8
-#define MF_MAX_TEAMS			8
-#define MF_MAX_CATEGORIES		8
-#define MF_MAX_CLASSES			8
+inline constexpr int MF_MAX_GAMESETS = 8;
+inline constexpr int MF_MAX_TEAMS = 8;
+inline constexpr int MF_MAX_CATEGORIES = 8;
+inline constexpr int MF_MAX_CLASSES = 8;
 
 // Which "ui_vehicleCat" are ground installtions
-#define UI_CAT_GI				5
+inline constexpr int UI_CAT_GI = 5;
 
 // can now be any number of gamesets (full 8 byte)
 // just expand list as needed and make sure ANY is set properly
-#define	MF_GAMESET_MIN				  0x0001
-#define	MF_GAMESET_MODERN			  0x0001 
-#define	MF_GAMESET_WW2				  0x0002 
-#define	MF_GAMESET_WW1				  0x0004 
-#define	MF_GAMESET_MAX				  0x0004 
-#define	MF_GAMESET_ANY				  0xFFFF
+inline constexpr int MF_GAMESET_MIN = 0x0001;
+inline constexpr int MF_GAMESET_MODERN = 0x0001;
+inline constexpr int MF_GAMESET_WW2 = 0x0002;
+inline constexpr int MF_GAMESET_WW1 = 0x0004;
+inline constexpr int MF_GAMESET_MAX = 0x0004;
+inline constexpr int MF_GAMESET_ANY = 0xFFFF;
 
-#define	MF_TEAM_MIN					  0x0001
-#define	MF_TEAM_1					  0x0001 
-#define	MF_TEAM_2					  0x0002 
-#define	MF_TEAM_MAX					  0x0002 
-#define	MF_TEAM_ANY					  0xFFFF
+inline constexpr int MF_TEAM_MIN = 0x0001;
+inline constexpr int MF_TEAM_1 = 0x0001;
+inline constexpr int MF_TEAM_2 = 0x0002;
+inline constexpr int MF_TEAM_MAX = 0x0002;
+inline constexpr int MF_TEAM_ANY = 0xFFFF;
 
-#define CAT_MIN						  0x0001
-#define	CAT_PLANE					  0x0001 
-#define	CAT_GROUND					  0x0002 
-#define	CAT_HELO					  0x0004 
-#define	CAT_LQM						  0x0008
-#define	CAT_BOAT					  0x0010
-#define CAT_NPC						  0x0020
-#define CAT_MAX						  0x0020 
-#define	CAT_ANY						  0xFFFF
+inline constexpr int CAT_MIN = 0x0001;
+inline constexpr int CAT_PLANE = 0x0001;
+inline constexpr int CAT_GROUND = 0x0002;
+inline constexpr int CAT_HELO = 0x0004;
+inline constexpr int CAT_LQM = 0x0008;
+inline constexpr int CAT_BOAT = 0x0010;
+inline constexpr int CAT_NPC = 0x0020;
+inline constexpr int CAT_MAX = 0x0020;
+inline constexpr int CAT_ANY = 0xFFFF;
 
-#define CLASS_MIN					  0x0001
-#define CLASS_MAX					  0x0002
-#define CLASS_ANY					  0xFFFF
+inline constexpr int CLASS_MIN = 0x0001;
+inline constexpr int CLASS_MAX = 0x0002;
+inline constexpr int CLASS_ANY = 0xFFFF;
 
 // plane classes				
-#define	CLASS_PLANE_FIGHTER			  0x0001 
-#define	CLASS_PLANE_BOMBER			  0x0002 
-#define	CLASS_PLANE_TRANSPORT		  0x0004 
-#define	CLASS_PLANE_MAX				  0x0004
+inline constexpr int CLASS_PLANE_FIGHTER = 0x0001;
+inline constexpr int CLASS_PLANE_BOMBER = 0x0002;
+inline constexpr int CLASS_PLANE_TRANSPORT = 0x0004;
+inline constexpr int CLASS_PLANE_MAX = 0x0004;
 
 // helo classes					
-#define	CLASS_HELO_ATTACK			  0x0001 
-#define	CLASS_HELO_RECON			  0x0002 
-#define	CLASS_HELO_TRANSPORT		  0x0004 
-#define	CLASS_HELO_MAX				  0x0004
+inline constexpr int CLASS_HELO_ATTACK = 0x0001;
+inline constexpr int CLASS_HELO_RECON = 0x0002;
+inline constexpr int CLASS_HELO_TRANSPORT = 0x0004;
+inline constexpr int CLASS_HELO_MAX = 0x0004;
 
 // ground vehicle classes		
-#define CLASS_GROUND_MBT			  0x0001 
-#define	CLASS_GROUND_RECON			  0x0002 
-#define	CLASS_GROUND_APC			  0x0004 
-#define	CLASS_GROUND_SAM			  0x0008 
-#define	CLASS_GROUND_ARTY			  0x0016 
-#define	CLASS_GROUND_MAX			  0x0016
+inline constexpr int CLASS_GROUND_MBT = 0x0001;
+inline constexpr int CLASS_GROUND_RECON = 0x0002;
+inline constexpr int CLASS_GROUND_APC = 0x0004;
+inline constexpr int CLASS_GROUND_SAM = 0x0008;
+inline constexpr int CLASS_GROUND_ARTY = 0x0016;
+inline constexpr int CLASS_GROUND_MAX = 0x0016;
 
 // LQM classes					
-#define CLASS_LQM_SPECIAL			  0x0001 
-#define CLASS_LQM_INFANTRY			  0x0002
-#define CLASS_LQM_MAX				  0x0002 
+inline constexpr int CLASS_LQM_SPECIAL = 0x0001;
+inline constexpr int CLASS_LQM_INFANTRY = 0x0002;
+inline constexpr int CLASS_LQM_MAX = 0x0002;
 
 // boat classes					
-#define	CLASS_BOAT_PATROL			  0x0001 
-#define	CLASS_BOAT_TRANSPORT		  0x0002 
-#define	CLASS_BOAT_MAX				  0x0002
+inline constexpr int CLASS_BOAT_PATROL = 0x0001;
+inline constexpr int CLASS_BOAT_TRANSPORT = 0x0002;
+inline constexpr int CLASS_BOAT_MAX = 0x0002;
 
 // strings for categories and classes etc..
 extern const char *gameset_items[MF_MAX_GAMESETS+1];
@@ -656,97 +656,97 @@ extern const char *cat_items[MF_MAX_CATEGORIES+1];
 extern const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1];
 
 // Vehicle flags
-#define	VF_NOTSELECTABLE			1		// cannot be selected (turrets, etc)
-#define	VF_STEALTH					2
+inline constexpr int VF_NOTSELECTABLE = 1; // cannot be selected (turrets, etc)
+inline constexpr int VF_STEALTH = 2;
 
-#define	SEATMASK_PILOT				0x0001
-#define	SEATMASK_ENTERABLE			0x8000
-#define	SEATMASK_DECK				0x4000
+inline constexpr int SEATMASK_PILOT = 0x0001;
+inline constexpr int SEATMASK_ENTERABLE = 0x8000;
+inline constexpr int SEATMASK_DECK = 0x4000;
 
-#define	STEALTH_RANGE_FACTOR		0.25f
+inline constexpr float STEALTH_RANGE_FACTOR = 0.25f;
 
 // border speeds
-#define SPEED_YELLOW_ARC			1.3f
-#define SPEED_GREEN_ARC				2.0f
+inline constexpr float SPEED_YELLOW_ARC = 1.3f;
+inline constexpr float SPEED_GREEN_ARC = 2.0f;
 
 // body part defines
 // planes
-#define BP_PLANE_BODY			0
-#define BP_PLANE_CONTROLS		1
-#define BP_PLANE_COCKPIT		2
-#define BP_PLANE_GEAR			3
-#define BP_PLANE_BRAKES			4
-#define BP_PLANE_BAY			5
-#define BP_PLANE_WINGLEFT		6
-#define BP_PLANE_WINGRIGHT		7
-#define BP_PLANE_SPECIAL		8
-#define BP_PLANE_PROP			9
-#define BP_PLANE_MAX_PARTS		10
+inline constexpr int BP_PLANE_BODY = 0;
+inline constexpr int BP_PLANE_CONTROLS = 1;
+inline constexpr int BP_PLANE_COCKPIT = 2;
+inline constexpr int BP_PLANE_GEAR = 3;
+inline constexpr int BP_PLANE_BRAKES = 4;
+inline constexpr int BP_PLANE_BAY = 5;
+inline constexpr int BP_PLANE_WINGLEFT = 6;
+inline constexpr int BP_PLANE_WINGRIGHT = 7;
+inline constexpr int BP_PLANE_SPECIAL = 8;
+inline constexpr int BP_PLANE_PROP = 9;
+inline constexpr int BP_PLANE_MAX_PARTS = 10;
 
 
 // ground vehicles
-#define BP_GV_BODY				0
-#define BP_GV_TURRET			1
-#define BP_GV_GUNBARREL			2
-#define BP_GV_WHEEL				3
-#define BP_GV_WHEEL2			4
-#define BP_GV_WHEEL3			5
-#define BP_GV_WHEEL4			6
-#define BP_GV_WHEEL5			7
-#define BP_GV_WHEEL6			8
-#define BP_GV_MAX_PARTS			9
+inline constexpr int BP_GV_BODY = 0;
+inline constexpr int BP_GV_TURRET = 1;
+inline constexpr int BP_GV_GUNBARREL = 2;
+inline constexpr int BP_GV_WHEEL = 3;
+inline constexpr int BP_GV_WHEEL2 = 4;
+inline constexpr int BP_GV_WHEEL3 = 5;
+inline constexpr int BP_GV_WHEEL4 = 6;
+inline constexpr int BP_GV_WHEEL5 = 7;
+inline constexpr int BP_GV_WHEEL6 = 8;
+inline constexpr int BP_GV_MAX_PARTS = 9;
 
 // LQM
-#define BP_LQM_LEGS				0
-#define BP_LQM_TORSO			1
-#define BP_LQM_HEAD				2
+inline constexpr int BP_LQM_LEGS = 0;
+inline constexpr int BP_LQM_TORSO = 1;
+inline constexpr int BP_LQM_HEAD = 2;
 //#define BP_LQM_WEAP			3
 //#define BP_LQM_GUNBARREL		4
-#define BP_LQM_MAX_PARTS		3
+inline constexpr int BP_LQM_MAX_PARTS = 3;
 
 
 // boats
-#define BP_BOAT_BODY			0
-#define BP_BOAT_TURRET			1
-#define BP_BOAT_GUNBARREL		2
-#define BP_BOAT_TURRET2			3
-#define BP_BOAT_GUNBARREL2		4
-#define BP_BOAT_TURRET3			5
-#define BP_BOAT_GUNBARREL3		6
-#define BP_BOAT_TURRET4			7
-#define BP_BOAT_GUNBARREL4		8
-#define BP_BOAT_MAX_PARTS		9
+inline constexpr int BP_BOAT_BODY = 0;
+inline constexpr int BP_BOAT_TURRET = 1;
+inline constexpr int BP_BOAT_GUNBARREL = 2;
+inline constexpr int BP_BOAT_TURRET2 = 3;
+inline constexpr int BP_BOAT_GUNBARREL2 = 4;
+inline constexpr int BP_BOAT_TURRET3 = 5;
+inline constexpr int BP_BOAT_GUNBARREL3 = 6;
+inline constexpr int BP_BOAT_TURRET4 = 7;
+inline constexpr int BP_BOAT_GUNBARREL4 = 8;
+inline constexpr int BP_BOAT_MAX_PARTS = 9;
 
 // helos
-#define BP_HELO_BODY			0
-#define BP_HELO_MAINROTOR		1
-#define BP_HELO_TAILROTOR		2
-#define BP_HELO_TURRET			3
-#define BP_HELO_GUNBARREL		4
-#define BP_HELO_TURRET2			5
-#define BP_HELO_GUNBARREL2		6
-#define BP_HELO_GEAR			7
-#define BP_HELO_BAY				8
-#define BP_HELO_PARTS			9
-#define BP_HELO_MAX_PARTS		10
+inline constexpr int BP_HELO_BODY = 0;
+inline constexpr int BP_HELO_MAINROTOR = 1;
+inline constexpr int BP_HELO_TAILROTOR = 2;
+inline constexpr int BP_HELO_TURRET = 3;
+inline constexpr int BP_HELO_GUNBARREL = 4;
+inline constexpr int BP_HELO_TURRET2 = 5;
+inline constexpr int BP_HELO_GUNBARREL2 = 6;
+inline constexpr int BP_HELO_GEAR = 7;
+inline constexpr int BP_HELO_BAY = 8;
+inline constexpr int BP_HELO_PARTS = 9;
+inline constexpr int BP_HELO_MAX_PARTS = 10;
 
 
 // ground installations
-#define BP_GI_BODY				0
-#define BP_GI_TURRET			1
-#define BP_GI_GUNBARREL			2
-#define BP_GI_UPGRADE			3
-#define BP_GI_UPGRADE2			4
-#define BP_GI_UPGRADE3			5
-#define BP_GI_MAX_PARTS			6
+inline constexpr int BP_GI_BODY = 0;
+inline constexpr int BP_GI_TURRET = 1;
+inline constexpr int BP_GI_GUNBARREL = 2;
+inline constexpr int BP_GI_UPGRADE = 3;
+inline constexpr int BP_GI_UPGRADE2 = 4;
+inline constexpr int BP_GI_UPGRADE3 = 5;
+inline constexpr int BP_GI_MAX_PARTS = 6;
 
 
 // total max parts (no cat may exceed this!)
-#define BP_MAX_PARTS			16
+inline constexpr int BP_MAX_PARTS = 16;
 
 // fallback modes if no custom shader can be found for a vehicle
-#define	SHADOW_DEFAULT	-1
-#define	SHADOW_NONE		-2
+inline constexpr int SHADOW_DEFAULT = -1;
+inline constexpr int SHADOW_NONE = -2;
 
 enum ShadowCoords {
 	SHC_XOFFSET,
@@ -764,28 +764,28 @@ enum ShadowOrientationAdjusts {
 
 
 // pylon flags
-#define PF_NA				0x0000	// nothing
-#define PF_AA_LT			0x0001	// sidewinder, stinger
-#define PF_AA_MED			0x0002	// amraam
-#define PF_AA_HVY			0x0004	// sparrow
-#define PF_AA_PHX			0x0008	// phoenix
-#define PF_AG_LT			0x0010	// light bombs 500lb, stinger
-#define PF_AG_MED			0x0020	// 800 lb
-#define PF_AG_HVY			0x0040	// 1000lb, 2000lb
-#define PF_AG_GDA			0x0080	// can carry guided bombs
-#define PF_FFAR				0x0100	// FFAR
-#define PF_TANK_LT			0x0200	// droptank
-#define PF_TANK_HVY			0x0400	// droptank big
-#define PF_JAMMER			0x0800	// jammer
-#define PF_GUNPOD			0x1000	// gunpod
-#define PF_FLAREPOD			0x2000	// extra flares
-#define PF_DONT_DROP		0x4000	// dont drop on launch (wingtip)
-#define PF_HARM				0x8000	// harm
+inline constexpr int PF_NA = 0x0000; // nothing
+inline constexpr int PF_AA_LT = 0x0001; // sidewinder, stinger
+inline constexpr int PF_AA_MED = 0x0002; // amraam
+inline constexpr int PF_AA_HVY = 0x0004; // sparrow
+inline constexpr int PF_AA_PHX = 0x0008; // phoenix
+inline constexpr int PF_AG_LT = 0x0010; // light bombs 500lb, stinger
+inline constexpr int PF_AG_MED = 0x0020; // 800 lb
+inline constexpr int PF_AG_HVY = 0x0040; // 1000lb, 2000lb
+inline constexpr int PF_AG_GDA = 0x0080; // can carry guided bombs
+inline constexpr int PF_FFAR = 0x0100; // FFAR
+inline constexpr int PF_TANK_LT = 0x0200; // droptank
+inline constexpr int PF_TANK_HVY = 0x0400; // droptank big
+inline constexpr int PF_JAMMER = 0x0800; // jammer
+inline constexpr int PF_GUNPOD = 0x1000; // gunpod
+inline constexpr int PF_FLAREPOD = 0x2000; // extra flares
+inline constexpr int PF_DONT_DROP = 0x4000; // dont drop on launch (wingtip)
+inline constexpr int PF_HARM = 0x8000; // harm
 
-#define PF_DONT_REMOVE		0x3900
+inline constexpr int PF_DONT_REMOVE = 0x3900;
 
-#define MAX_LOADOUTS			100
-#define MAX_MOUNTS_PER_VEHICLE	32
+inline constexpr int MAX_LOADOUTS = 100;
+inline constexpr int MAX_MOUNTS_PER_VEHICLE = 32;
 
 struct mountInfo_t
 {
@@ -895,9 +895,9 @@ enum weaponType_t {
 };
 
 // weaponflags
-#define	WF_NONE						0
-#define WF_HAS_FIRE_FRAME			1		// for missiles
-#define WF_FIRE_IN_PAIRS			2		// for bombs, tanks etc
+inline constexpr int WF_NONE = 0;
+inline constexpr int WF_HAS_FIRE_FRAME = 1; // for missiles
+inline constexpr int WF_FIRE_IN_PAIRS = 2; // for bombs, tanks etc
 
 
 // list of ground installations
@@ -1050,8 +1050,8 @@ enum weaponIndex_t
 
 
 // IGME
-#define IGME_MAX_VEHICLES		64
-#define IGME_MAX_WAYPOINTS		32
+inline constexpr int IGME_MAX_VEHICLES = 64;
+inline constexpr int IGME_MAX_WAYPOINTS = 32;
 
 struct mission_waypoint_t {
 	bool		used;
@@ -1130,65 +1130,65 @@ bool MF_getDimensions(const char* fileName, int frame, vec3_t* maxs, vec3_t* min
 void MF_LoadAllVehicleData();
 int MF_findWeaponsOfType( int weaponIndex, completeLoadout_t* loadout );
 
-#define MF_THROTTLE_REVERSE		-5
-#define MF_THROTTLE_IDLE		0
-#define MF_THROTTLE_MILITARY	10
-#define MF_THROTTLE_AFTERBURNER 15
+inline constexpr int MF_THROTTLE_REVERSE = -5;
+inline constexpr int MF_THROTTLE_IDLE = 0;
+inline constexpr int MF_THROTTLE_MILITARY = 10;
+inline constexpr int MF_THROTTLE_AFTERBURNER = 15;
 
 // this is for the PW_HASCAN_FLAGS
-#define HC_NOTHING				0
-#define HC_GEAR					1
-#define HC_SPEEDBRAKE			2	
-#define HC_PROP					4
-#define HC_VAPOR				8
-#define HC_TAILDRAGGER			16
-#define HC_DUALGUNS				32	// will be removed 
-#define HC_SWINGWING			64
-#define HC_AMPHIBIOUS			128
-#define	HC_WHEELS				256	// vehicle has wheels (rather than tracks)
-#define	HC_WEAPONBAY			512
+inline constexpr int HC_NOTHING = 0;
+inline constexpr int HC_GEAR = 1;
+inline constexpr int HC_SPEEDBRAKE = 2;
+inline constexpr int HC_PROP = 4;
+inline constexpr int HC_VAPOR = 8;
+inline constexpr int HC_TAILDRAGGER = 16;
+inline constexpr int HC_DUALGUNS = 32; // will be removed
+inline constexpr int HC_SWINGWING = 64;
+inline constexpr int HC_AMPHIBIOUS = 128;
+inline constexpr int HC_WHEELS = 256; // vehicle has wheels (rather than tracks)
+inline constexpr int HC_WEAPONBAY = 512;
 
 // LQM Animations (replace instead of using frame index, and let CG read animation.cfg)
-#define LQM_SCALE				0.14f
-#define A_LQM_STAND				0
-#define A_LQM_FORWARD			1
-#define A_LQM_BACKWARD			2
-#define A_LQM_CROUCH			4
-#define A_LQM_LEFT				8
-#define A_LQM_RIGHT				16
-#define A_LQM_EJECT				32
-#define A_LQM_FLY				64
-#define A_LQM_DIE				128
+inline constexpr float LQM_SCALE = 0.14f;
+inline constexpr int A_LQM_STAND = 0;
+inline constexpr int A_LQM_FORWARD = 1;
+inline constexpr int A_LQM_BACKWARD = 2;
+inline constexpr int A_LQM_CROUCH = 4;
+inline constexpr int A_LQM_LEFT = 8;
+inline constexpr int A_LQM_RIGHT = 16;
+inline constexpr int A_LQM_EJECT = 32;
+inline constexpr int A_LQM_FLY = 64;
+inline constexpr int A_LQM_DIE = 128;
 #define A_LQM_JUMP				(A_LQM_CROUCH|A_LQM_EJECT)
 
 // this is for the PW_ONOFF_FLAGS
-#define OO_NOTHING_ON			0
-#define OO_STALLED				1
-#define OO_LANDED				2
-#define OO_SPEEDBRAKE			4
-#define OO_GEAR					8
-#define OO_VAPOR				16
-#define OO_WEAPONBAY			32
-#define OO_RADAR_AIR			64
-#define OO_RADAR_GROUND			128
-#define OO_RADAR				192	// OO_RADAR_GROUND|OO_RADAR_AIR
-#define OO_LANDEDTERRAIN		256
+inline constexpr int OO_NOTHING_ON = 0;
+inline constexpr int OO_STALLED = 1;
+inline constexpr int OO_LANDED = 2;
+inline constexpr int OO_SPEEDBRAKE = 4;
+inline constexpr int OO_GEAR = 8;
+inline constexpr int OO_VAPOR = 16;
+inline constexpr int OO_WEAPONBAY = 32;
+inline constexpr int OO_RADAR_AIR = 64;
+inline constexpr int OO_RADAR_GROUND = 128;
+inline constexpr int OO_RADAR = 192; // OO_RADAR_GROUND|OO_RADAR_AIR
+inline constexpr int OO_LANDEDTERRAIN = 256;
 
 // afterburners
-#define AB_BALL					0
-#define AB_BLUE					1
-#define AB_RED					2
-#define AB_RED_SMALL			3
-#define AB_MAX					4
+inline constexpr int AB_BALL = 0;
+inline constexpr int AB_BLUE = 1;
+inline constexpr int AB_RED = 2;
+inline constexpr int AB_RED_SMALL = 3;
+inline constexpr int AB_MAX = 4;
 
 // render flags
-#define MFR_DUALPILOT			1
-#define MFR_BIGVAPOR			2
-#define MFR_VWEP				4
+inline constexpr int MFR_DUALPILOT = 1;
+inline constexpr int MFR_BIGVAPOR = 2;
+inline constexpr int MFR_VWEP = 4;
 
 // misc
-#define MAX_MUZZLEFLASHES		8
-#define MAX_PILOTS				2
+inline constexpr int MAX_MUZZLEFLASHES = 8;
+inline constexpr int MAX_PILOTS = 2;
 
 // crosshairs
 typedef enum {
@@ -1203,57 +1203,57 @@ typedef enum {
 } CrossHairs_t;
 
 // lock flags
-#define LI_NOLOCK				0
-#define LI_TRACKING				1
-#define LI_LOCKING				2
-#define LI_BEING_LOCKED			4
-#define LI_BEING_LAUNCHED		8
+inline constexpr int LI_NOLOCK = 0;
+inline constexpr int LI_TRACKING = 1;
+inline constexpr int LI_LOCKING = 2;
+inline constexpr int LI_BEING_LOCKED = 4;
+inline constexpr int LI_BEING_LAUNCHED = 8;
 
 // gear anim frames
-#define GEAR_UP					0
-#define GEAR_DOWN_DEFAULT		47
-#define GEAR_DOWN_MAX			200
+inline constexpr int GEAR_UP = 0;
+inline constexpr int GEAR_DOWN_DEFAULT = 47;
+inline constexpr int GEAR_DOWN_MAX = 200;
 
-#define GEAR_ANIM_STOP			0
-#define GEAR_ANIM_UP			1
-#define GEAR_ANIM_DOWN			2
+inline constexpr int GEAR_ANIM_STOP = 0;
+inline constexpr int GEAR_ANIM_UP = 1;
+inline constexpr int GEAR_ANIM_DOWN = 2;
 
 // bay anim frames
-#define BAY_UP					0
-#define BAY_DOWN_DEFAULT		47
-#define BAY_DOWN_MAX			200
+inline constexpr int BAY_UP = 0;
+inline constexpr int BAY_DOWN_DEFAULT = 47;
+inline constexpr int BAY_DOWN_MAX = 200;
 
-#define BAY_ANIM_STOP			0
-#define BAY_ANIM_UP				1
-#define BAY_ANIM_DOWN			2
+inline constexpr int BAY_ANIM_STOP = 0;
+inline constexpr int BAY_ANIM_UP = 1;
+inline constexpr int BAY_ANIM_DOWN = 2;
 
 /////////////////////
 // Nuke
 /////////////////////
 // 1st shockwave times
-#define NUKE_SHOCKWAVE_STARTTIME		0
-#define NUKE_SHOCKWAVEFADE_STARTTIME	1500
-#define NUKE_SHOCKWAVE_ENDTIME			2000
+inline constexpr int NUKE_SHOCKWAVE_STARTTIME = 0;
+inline constexpr int NUKE_SHOCKWAVEFADE_STARTTIME = 1500;
+inline constexpr int NUKE_SHOCKWAVE_ENDTIME = 2000;
 // explosion/implosion times
-#define NUKE_EXPLODE_STARTTIME			250
-#define NUKE_IMPLODE_STARTTIME			2000
-#define NUKE_IMPLODE_ENDTIME			2250
+inline constexpr int NUKE_EXPLODE_STARTTIME = 250;
+inline constexpr int NUKE_IMPLODE_STARTTIME = 2000;
+inline constexpr int NUKE_IMPLODE_ENDTIME = 2250;
 // 2nd shockwave times
-#define NUKE_SHOCKWAVE2_STARTTIME		2000
-#define NUKE_SHOCKWAVE2FADE_STARTTIME	2500
-#define NUKE_SHOCKWAVE2_ENDTIME			3000
+inline constexpr int NUKE_SHOCKWAVE2_STARTTIME = 2000;
+inline constexpr int NUKE_SHOCKWAVE2FADE_STARTTIME = 2500;
+inline constexpr int NUKE_SHOCKWAVE2_ENDTIME = 3000;
 // nuke cloud times
-#define NUKE_CLOUD_FRAMES				101
-#define NUKE_CLOUD_STARTTIME			2500
-#define NUKE_CLOUD_FADETIME				20000
-#define NUKE_CLOUD_ENDTIME				30000
+inline constexpr int NUKE_CLOUD_FRAMES = 101;
+inline constexpr int NUKE_CLOUD_STARTTIME = 2500;
+inline constexpr int NUKE_CLOUD_FADETIME = 20000;
+inline constexpr int NUKE_CLOUD_ENDTIME = 30000;
 
 // radius of the models without scaling
-#define NUKE_SHOCKWAVEMODEL_RADIUS		88
-#define NUKE_BOOMSPHEREMODEL_RADIUS		72
+inline constexpr int NUKE_SHOCKWAVEMODEL_RADIUS = 88;
+inline constexpr int NUKE_BOOMSPHEREMODEL_RADIUS = 72;
 // maximum radius of the models during the effect
-#define NUKE_SHOCKWAVE_MAXRADIUS		1000
-#define NUKE_SHOCKWAVE2_MAXRADIUS		1000
+inline constexpr int NUKE_SHOCKWAVE_MAXRADIUS = 1000;
+inline constexpr int NUKE_SHOCKWAVE2_MAXRADIUS = 1000;
 
 
 
