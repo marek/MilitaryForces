@@ -84,13 +84,18 @@ bool SpotWouldTelefrag( GameEntity *spot )
 
 	VectorAdd( spot->s.origin, playerMins, mins );
 	VectorAdd( spot->s.origin, playerMaxs, maxs );
+	for( int i = 0; i < 2; i++ )
+	{
+		mins[i] -= 100;
+		maxs[i] += 100;
+	}
 	int num = SV_AreaEntities( mins, maxs, touch, MAX_GENTITIES );
 
 	for( int i=0 ; i<num ; i++ )
 	{
 		GameEntity* hit = theLevel.getEntity(touch[i]);
 		//if ( hit->client && hit->client->ps.stats[STAT_HEALTH] > 0 ) {
-		if ( hit && hit->client_ ) 
+		if ( hit && (hit->client_ || hit->s.eType == ET_MISC_VEHICLE) ) 
 			return true;
 	}
 	return false;
