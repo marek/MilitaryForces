@@ -160,6 +160,14 @@ GameEntity* Bots::findEnemy( GameEntity* ent, State& bot, Role role )
 
 		float dist = Distance( ent->r.currentOrigin, other->r.currentOrigin );
 		Seen& seen = bot.seen[i];
+		// being shot gives the shooter away: the bot knows roughly where its attacker is, seen or not
+		constexpr int grudgeTime = 8000;
+		const bool attackedBy = client->lasthurt_client_ == i && theLevel.time_ < bot.hitTime + grudgeTime;
+		if( attackedBy )
+		{
+			VectorCopy( other->r.currentOrigin, seen.position );
+			seen.time = theLevel.time_;
+		}
 		const bool sees = dist <= maxRange &&
 			!VehicleData::stealthHidden( oc->vehicle_, oc->ps_.timers[TIMER_REVEAL], theLevel.time_, dist, radarRange ) &&
 			visible( ent, ent->r.currentOrigin, other );
@@ -222,6 +230,9 @@ GameEntity* Bots::findEnemy( GameEntity* ent, State& bot, Role role )
 		}
 		if( i == bot.enemy )
 			score *= 0.7f;
+		// whoever is shooting at it comes first
+		if( attackedBy )
+			score *= 0.4f;
 		// fight what the leader is fighting
 		if( leaderTarget == i )
 			score *= 0.35f;
