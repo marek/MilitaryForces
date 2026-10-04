@@ -25,7 +25,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define __TR_FBO_H__
 
 struct image_s;
-struct shaderProgram_s;
+class ShaderProgram;
 
 class Framebuffer
 {
@@ -33,8 +33,8 @@ public:
 	bool r_CheckFBO() const;
 	void createBuffer( int format, int index, int multisample );
 	void attachImage( image_t *image, GLenum attachment, GLuint cubemapside );
-	void blitFromTexture( struct image_s *src, vec4_t inSrcTexCorners, vec2_t inSrcTexScale, ivec4_t inDstBox, struct shaderProgram_s *shaderProgram, vec4_t inColor, int blend );
-	void blit( ivec4_t inSrcBox, vec2_t srcTexScale, Framebuffer *dst, ivec4_t dstBox, struct shaderProgram_s *shaderProgram, vec4_t color, int blend ) const;
+	void blitFromTexture( struct image_s *src, vec4_t inSrcTexCorners, vec2_t inSrcTexScale, ivec4_t inDstBox, ShaderProgram *shaderProgram, vec4_t inColor, int blend );
+	void blit( ivec4_t inSrcBox, vec2_t srcTexScale, Framebuffer *dst, ivec4_t dstBox, ShaderProgram *shaderProgram, vec4_t color, int blend ) const;
 	void fastBlit( ivec4_t srcBox, Framebuffer *dst, ivec4_t dstBox, int buffers, int filter ) const;
 
 	char            name[MAX_QPATH];

@@ -487,7 +487,7 @@ void R_FBOList_f()
 	ri.Printf(PRINT_ALL, " %i FBOs\n", tr.numFBOs);
 }
 
-void Framebuffer::blitFromTexture( struct image_s *src, vec4_t inSrcTexCorners, vec2_t inSrcTexScale, ivec4_t inDstBox, struct shaderProgram_s *shaderProgram, vec4_t inColor, int blend )
+void Framebuffer::blitFromTexture( struct image_s *src, vec4_t inSrcTexCorners, vec2_t inSrcTexScale, ivec4_t inDstBox, ShaderProgram *shaderProgram, vec4_t inColor, int blend )
 {
 	ivec4_t dstBox;
 	vec4_t color;
@@ -579,20 +579,20 @@ void Framebuffer::blitFromTexture( struct image_s *src, vec4_t inSrcTexCorners, 
 
 	GL_State( blend );
 
-	GLSL_BindProgram(shaderProgram);
+	shaderProgram->bindProgram();
 	
-	GLSL_SetUniformMat4(shaderProgram, UNIFORM_MODELVIEWPROJECTIONMATRIX, projection);
-	GLSL_SetUniformVec4(shaderProgram, UNIFORM_COLOR, color);
-	GLSL_SetUniformVec2(shaderProgram, UNIFORM_INVTEXRES, invTexRes);
-	GLSL_SetUniformVec2(shaderProgram, UNIFORM_AUTOEXPOSUREMINMAX, tr.refdef.autoExposureMinMax);
-	GLSL_SetUniformVec3(shaderProgram, UNIFORM_TONEMINAVGMAXLINEAR, tr.refdef.toneMinAvgMaxLinear);
+	shaderProgram->setUniformMat4( UNIFORM_MODELVIEWPROJECTIONMATRIX, projection );
+	shaderProgram->setUniformVec4( UNIFORM_COLOR, color );
+	shaderProgram->setUniformVec2( UNIFORM_INVTEXRES, invTexRes );
+	shaderProgram->setUniformVec2( UNIFORM_AUTOEXPOSUREMINMAX, tr.refdef.autoExposureMinMax );
+	shaderProgram->setUniformVec3( UNIFORM_TONEMINAVGMAXLINEAR, tr.refdef.toneMinAvgMaxLinear );
 
 	RB_InstantQuad2(quadVerts, texCoords);
 
 	FBO_Bind(oldFbo);
 }
 
-void Framebuffer::blit( ivec4_t inSrcBox, vec2_t srcTexScale, Framebuffer *dst, ivec4_t dstBox, struct shaderProgram_s *shaderProgram, vec4_t color, int blend ) const
+void Framebuffer::blit( ivec4_t inSrcBox, vec2_t srcTexScale, Framebuffer *dst, ivec4_t dstBox, ShaderProgram *shaderProgram, vec4_t color, int blend ) const
 {
 	vec4_t srcTexCorners;
 

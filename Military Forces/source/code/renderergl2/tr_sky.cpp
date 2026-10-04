@@ -431,52 +431,52 @@ static void DrawSkySide( struct image_s *image, const int mins[2], const int max
 	RB_UpdateTessVao(ATTR_POSITION | ATTR_TEXCOORD);
 /*
 	{
-		shaderProgram_t *sp = &tr.textureColorShader;
+		ShaderProgram *sp = &tr.textureColorShader;
 
 		GLSL_VertexAttribsState(ATTR_POSITION | ATTR_TEXCOORD);
-		GLSL_BindProgram(sp);
+		sp->bindProgram();
 		
-		GLSL_SetUniformMat4(sp, UNIFORM_MODELVIEWPROJECTIONMATRIX, glState.modelviewProjection);
+		sp->setUniformMat4( UNIFORM_MODELVIEWPROJECTIONMATRIX, glState.modelviewProjection );
 		
 		color[0] = 
 		color[1] = 
 		color[2] = tr.identityLight;
 		color[3] = 1.0f;
-		GLSL_SetUniformVec4(sp, UNIFORM_COLOR, color);
+		sp->setUniformVec4( UNIFORM_COLOR, color );
 	}
 */
 	{
-		shaderProgram_t *sp = &tr.lightallShader[0];
+		ShaderProgram *sp = &tr.lightallShader[0];
 		vec4_t st[2];
 
-		GLSL_BindProgram(sp);
+		sp->bindProgram();
 		
-		GLSL_SetUniformMat4(sp, UNIFORM_MODELVIEWPROJECTIONMATRIX, glState.modelviewProjection);
+		sp->setUniformMat4( UNIFORM_MODELVIEWPROJECTIONMATRIX, glState.modelviewProjection );
 		
 		color[0] = 
 		color[1] = 
 		color[2] =
 		color[3] = 1.0f;
-		GLSL_SetUniformVec4(sp, UNIFORM_BASECOLOR, color);
+		sp->setUniformVec4( UNIFORM_BASECOLOR, color );
 
 		color[0] = 
 		color[1] = 
 		color[2] = 
 		color[3] = 0.0f;
-		GLSL_SetUniformVec4(sp, UNIFORM_VERTCOLOR, color);
+		sp->setUniformVec4( UNIFORM_VERTCOLOR, color );
 
 		VectorSet4(st[0], 1.0f, 0.0f, 0.0f, 0.0f);
 		VectorSet4(st[1], 0.0f, 1.0f, 0.0f, 0.0f);
-		GLSL_SetUniformVec4(sp, UNIFORM_DIFFUSETEXMATRIX0, st[0]);
-		GLSL_SetUniformVec4(sp, UNIFORM_DIFFUSETEXMATRIX1, st[1]);
-		GLSL_SetUniformVec4(sp, UNIFORM_DIFFUSETEXMATRIX2, st[0]);
-		GLSL_SetUniformVec4(sp, UNIFORM_DIFFUSETEXMATRIX3, st[1]);
-		GLSL_SetUniformVec4(sp, UNIFORM_DIFFUSETEXMATRIX4, st[0]);
-		GLSL_SetUniformVec4(sp, UNIFORM_DIFFUSETEXMATRIX5, st[1]);
-		GLSL_SetUniformVec4(sp, UNIFORM_DIFFUSETEXMATRIX6, st[0]);
-		GLSL_SetUniformVec4(sp, UNIFORM_DIFFUSETEXMATRIX7, st[1]);
+		sp->setUniformVec4( UNIFORM_DIFFUSETEXMATRIX0, st[0] );
+		sp->setUniformVec4( UNIFORM_DIFFUSETEXMATRIX1, st[1] );
+		sp->setUniformVec4( UNIFORM_DIFFUSETEXMATRIX2, st[0] );
+		sp->setUniformVec4( UNIFORM_DIFFUSETEXMATRIX3, st[1] );
+		sp->setUniformVec4( UNIFORM_DIFFUSETEXMATRIX4, st[0] );
+		sp->setUniformVec4( UNIFORM_DIFFUSETEXMATRIX5, st[1] );
+		sp->setUniformVec4( UNIFORM_DIFFUSETEXMATRIX6, st[0] );
+		sp->setUniformVec4( UNIFORM_DIFFUSETEXMATRIX7, st[1] );
 
-		GLSL_SetUniformInt(sp, UNIFORM_ALPHATEST, 0);
+		sp->setUniformInt( UNIFORM_ALPHATEST, 0 );
 	}
 
 	R_DrawElements(tess.numIndexes - tess.firstIndex, tess.firstIndex);

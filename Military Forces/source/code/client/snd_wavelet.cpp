@@ -119,7 +119,7 @@ void NXPutc(NXStream *stream, char out) {
 }
 
 
-void encodeWavelet( sfx_t *sfx, short *packets) {
+void SoundEffect::encodeWavelet( short *packets ) {
 	float	wksp[4097] = {0}, temp;
 	int		i, samples, size;
 	sndBuffer		*newchunk, *chunk;
@@ -133,7 +133,7 @@ void encodeWavelet( sfx_t *sfx, short *packets) {
 	}
 	chunk = nullptr;
 
-	samples = sfx->soundLength;
+	samples = this->soundLength;
 	while(samples>0) {
 		size = samples;
 		if (size>(SND_CHUNK_SIZE*2)) {
@@ -145,8 +145,8 @@ void encodeWavelet( sfx_t *sfx, short *packets) {
 		}
 
 		newchunk = SND_malloc();
-		if (sfx->soundData == nullptr) {
-			sfx->soundData = newchunk;
+		if (this->soundData == nullptr) {
+			this->soundData = newchunk;
 		} else if (chunk != nullptr) {
 			chunk->next = newchunk;
 		}
@@ -191,7 +191,7 @@ void decodeWavelet(sndBuffer *chunk, short *to) {
 }
 
 
-void encodeMuLaw( sfx_t *sfx, short *packets) {
+void SoundEffect::encodeMuLaw( short *packets ) {
 	int		i, samples, size, grade, poop;
 	sndBuffer		*newchunk, *chunk;
 	byte			*out;
@@ -204,7 +204,7 @@ void encodeMuLaw( sfx_t *sfx, short *packets) {
 	}
 
 	chunk = nullptr;
-	samples = sfx->soundLength;
+	samples = this->soundLength;
 	grade = 0;
 
 	while(samples>0) {
@@ -214,8 +214,8 @@ void encodeMuLaw( sfx_t *sfx, short *packets) {
 		}
 
 		newchunk = SND_malloc();
-		if (sfx->soundData == nullptr) {
-			sfx->soundData = newchunk;
+		if (this->soundData == nullptr) {
+			this->soundData = newchunk;
 		} else if (chunk != nullptr) {
 			chunk->next = newchunk;
 		}

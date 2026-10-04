@@ -287,7 +287,7 @@ void S_AdpcmGetSamples(sndBuffer *chunk, short *to) {
 S_AdpcmEncodeSound
 ====================
 */
-void S_AdpcmEncodeSound( sfx_t *sfx, short *samples ) {
+void SoundEffect::adpcmEncodeSound( short *samples ) {
 	adpcm_state_t	state;
 	int				inOffset;
 	int				count;
@@ -296,7 +296,7 @@ void S_AdpcmEncodeSound( sfx_t *sfx, short *samples ) {
 	byte			*out;
 
 	inOffset = 0;
-	count = sfx->soundLength;
+	count = this->soundLength;
 	state.index = 0;
 	state.sample = samples[0];
 
@@ -308,8 +308,8 @@ void S_AdpcmEncodeSound( sfx_t *sfx, short *samples ) {
 		}
 
 		newchunk = SND_malloc();
-		if (sfx->soundData == nullptr) {
-			sfx->soundData = newchunk;
+		if (this->soundData == nullptr) {
+			this->soundData = newchunk;
 		} else if (chunk != nullptr) {
 			chunk->next = newchunk;
 		}

@@ -1347,9 +1347,9 @@ CG_Generic_Smoke
 Draws generic smoke puffs (vehicles on fire)
 ================
 */
-localEntity_t * CG_Generic_Smoke( centity_t * cent, vec3_t smokePosition, int density )
+LocalEntity * CG_Generic_Smoke( centity_t * cent, vec3_t smokePosition, int density )
 {
-	localEntity_t * smoke = nullptr;
+	LocalEntity * smoke = nullptr;
 
 	// valid state to add a smoke puff local entity?
 	if( cg_smoke.integer && cent->miscTime < cg.time )

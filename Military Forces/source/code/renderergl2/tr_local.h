@@ -410,7 +410,7 @@ struct shaderStage_t {
 	bool		isDetail;
 
 	stageType_t     type;
-	struct shaderProgram_s *glslShaderGroup;
+	ShaderProgram *glslShaderGroup;
 	int glslShaderIndex;
 
 	vec4_t normalScale;
@@ -717,10 +717,26 @@ enum uniform_t
 	UNIFORM_COUNT
 };
 
-// shaderProgram_t represents a pair of one
+// ShaderProgram represents a pair of one
 // GLSL vertex and one GLSL fragment shader
-struct shaderProgram_s
+class ShaderProgram
 {
+public:
+	int initGPUShader2( const char *name, int attribs, const char *vpCode, const char *fpCode );
+	int initGPUShader( const char *name, int attribs, bool fragmentShader, const GLchar *extra, bool addHeader, const char *fallback_vp, const char *fallback_fp );
+	void initUniforms();
+	void finishGPUShader();
+	void setUniformInt( int uniformNum, GLint value );
+	void setUniformFloat( int uniformNum, GLfloat value );
+	void setUniformVec2( int uniformNum, const vec2_t v );
+	void setUniformVec3( int uniformNum, const vec3_t v );
+	void setUniformVec4( int uniformNum, const vec4_t v );
+	void setUniformFloat5( int uniformNum, const vec5_t v );
+	void setUniformMat4( int uniformNum, const mat4_t matrix );
+	void setUniformMat4BoneMatrix( int uniformNum, /*const*/ mat4_t *matrix, int numMatricies );
+	void deleteGPUShader();
+	void bindProgram();
+
 	char            name[MAX_QPATH];
 
 	GLuint          program;
@@ -733,7 +749,6 @@ struct shaderProgram_s
 	short uniformBufferOffsets[UNIFORM_COUNT]; // max 32767/64=511 uniforms
 	char  *uniformBuffer;
 };
-using shaderProgram_t = shaderProgram_s;
 
 // trRefdef_t holds everything that comes in refdef_t,
 // as well as the locally generated scene information
@@ -1634,22 +1649,22 @@ struct trGlobals_t {
 	//
 	// GPU shader programs
 	//
-	shaderProgram_t genericShader[GENERICDEF_COUNT];
-	shaderProgram_t textureColorShader;
-	shaderProgram_t fogShader[FOGDEF_COUNT];
-	shaderProgram_t dlightShader[DLIGHTDEF_COUNT];
-	shaderProgram_t lightallShader[LIGHTDEF_COUNT];
-	shaderProgram_t shadowmapShader[SHADOWMAPDEF_COUNT];
-	shaderProgram_t pshadowShader;
-	shaderProgram_t down4xShader;
-	shaderProgram_t bokehShader;
-	shaderProgram_t tonemapShader;
-	shaderProgram_t calclevels4xShader[2];
-	shaderProgram_t shadowmaskShader;
-	shaderProgram_t ssaoShader;
-	shaderProgram_t depthBlurShader[4];
-	shaderProgram_t testcubeShader;
-	shaderProgram_t greyscaleShader;
+	ShaderProgram genericShader[GENERICDEF_COUNT];
+	ShaderProgram textureColorShader;
+	ShaderProgram fogShader[FOGDEF_COUNT];
+	ShaderProgram dlightShader[DLIGHTDEF_COUNT];
+	ShaderProgram lightallShader[LIGHTDEF_COUNT];
+	ShaderProgram shadowmapShader[SHADOWMAPDEF_COUNT];
+	ShaderProgram pshadowShader;
+	ShaderProgram down4xShader;
+	ShaderProgram bokehShader;
+	ShaderProgram tonemapShader;
+	ShaderProgram calclevels4xShader[2];
+	ShaderProgram shadowmaskShader;
+	ShaderProgram ssaoShader;
+	ShaderProgram depthBlurShader[4];
+	ShaderProgram testcubeShader;
+	ShaderProgram greyscaleShader;
 
 
 	// -----------------------------------------
@@ -2137,7 +2152,7 @@ void RB_StageIteratorLightmappedMultitexture( );
 void RB_AddQuadStamp( vec3_t origin, vec3_t left, vec3_t up, float color[4] );
 void RB_AddQuadStampExt( vec3_t origin, vec3_t left, vec3_t up, float color[4], float s1, float t1, float s2, float t2 );
 void RB_InstantQuad( vec4_t quadVerts[4] );
-//void RB_InstantQuad2(vec4_t quadVerts[4], vec2_t texCoords[4], vec4_t color, shaderProgram_t *sp, vec2_t invTexRes);
+//void RB_InstantQuad2(vec4_t quadVerts[4], vec2_t texCoords[4], vec4_t color, ShaderProgram *sp, vec2_t invTexRes);
 void RB_InstantQuad2(vec4_t quadVerts[4], vec2_t texCoords[4]);
 
 void RB_ShowImages( );
@@ -2288,18 +2303,9 @@ GLSL
 void GLSL_InitGPUShaders();
 void GLSL_ShutdownGPUShaders();
 void GLSL_VertexAttribPointers(uint32_t attribBits);
-void GLSL_BindProgram(shaderProgram_t * program);
 
-void GLSL_SetUniformInt(shaderProgram_t *program, int uniformNum, GLint value);
-void GLSL_SetUniformFloat(shaderProgram_t *program, int uniformNum, GLfloat value);
-void GLSL_SetUniformFloat5(shaderProgram_t *program, int uniformNum, const vec5_t v);
-void GLSL_SetUniformVec2(shaderProgram_t *program, int uniformNum, const vec2_t v);
-void GLSL_SetUniformVec3(shaderProgram_t *program, int uniformNum, const vec3_t v);
-void GLSL_SetUniformVec4(shaderProgram_t *program, int uniformNum, const vec4_t v);
-void GLSL_SetUniformMat4(shaderProgram_t *program, int uniformNum, const mat4_t matrix);
-void GLSL_SetUniformMat4BoneMatrix(shaderProgram_t *program, int uniformNum, /*const*/ mat4_t *matrix, int numMatricies);
 
-shaderProgram_t *GLSL_GetGenericShaderProgram(int stage);
+ShaderProgram *GLSL_GetGenericShaderProgram(int stage);
 
 /*
 ============================================================

@@ -145,7 +145,7 @@ static void CG_Misc_Plane( centity_t *cent )
 
 	// smoke
 /*	if( cent->currentState.generic1 && cent->miscTime > cg.time ) {
-		localEntity_t	*smoke;
+		LocalEntity	*smoke;
 		vec3_t			up = {0, 0, 1};
 		vec3_t			pos;
 		vec3_t			forward;
@@ -236,7 +236,7 @@ static void CG_Misc_GV( centity_t *cent )
 
 	// smoke 
 	if( cent->currentState.generic1 ) {
-		localEntity_t	*smoke;
+		LocalEntity	*smoke;
 		vec3_t			up = {0, 0, 20};
 		vec3_t			pos;
 		vec3_t			forward;
@@ -308,7 +308,7 @@ static void CG_Misc_Helo( centity_t *cent )
 
 	// smoke 
 	if( cent->currentState.generic1 ) {
-		localEntity_t	*smoke;
+		LocalEntity	*smoke;
 		vec3_t			up = {0, 0, 20};
 		vec3_t			pos;
 		vec3_t			forward;
@@ -390,7 +390,7 @@ static void CG_Misc_Boat( centity_t *cent )
 
 	// smoke 
 	if( cent->currentState.generic1 ) {
-		localEntity_t	*smoke;
+		LocalEntity	*smoke;
 		vec3_t			up = {0, 0, 20};
 		vec3_t			pos;
 		vec3_t			forward;
@@ -448,7 +448,7 @@ static void CG_Misc_GI( centity_t *cent )
 
 	// smoke 
 	if( cent->currentState.generic1 ) {
-		localEntity_t	*smoke;
+		LocalEntity	*smoke;
 		vec3_t			up = {0, 0, 20};
 		vec3_t			pos;
 		vec3_t			forward;

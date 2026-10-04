@@ -12,9 +12,9 @@
 #include <algorithm>
 
 constexpr int MAX_LOCAL_ENTITIES = 2048;
-localEntity_t	cg_localEntities[MAX_LOCAL_ENTITIES];
-localEntity_t	cg_activeLocalEntities;		// double linked list
-localEntity_t	*cg_freeLocalEntities;		// single linked list
+LocalEntity	cg_localEntities[MAX_LOCAL_ENTITIES];
+LocalEntity	cg_activeLocalEntities;		// double linked list
+LocalEntity	*cg_freeLocalEntities;		// single linked list
 
 /*
 ===================
@@ -41,18 +41,18 @@ void	CG_InitLocalEntities( ) {
 CG_FreeLocalEntity
 ==================
 */
-void CG_FreeLocalEntity( localEntity_t *le ) {
-	if ( !le->prev ) {
+void LocalEntity::freeLocalEntity() {
+	if ( !this->prev ) {
 		Com_Error( ERR_DROP, "CG_FreeLocalEntity: not active" );
 	}
 
 	// remove from the doubly linked active list
-	le->prev->next = le->next;
-	le->next->prev = le->prev;
+	this->prev->next = this->next;
+	this->next->prev = this->prev;
 
 	// the free list is only singly linked
-	le->next = cg_freeLocalEntities;
-	cg_freeLocalEntities = le;
+	this->next = cg_freeLocalEntities;
+	cg_freeLocalEntities = this;
 
 	// remove any particle systems/emitters attached to this system
 
@@ -65,13 +65,13 @@ CG_AllocLocalEntity
 Will allways succeed, even if it requires freeing an old active entity
 ===================
 */
-localEntity_t	*CG_AllocLocalEntity( ) {
-	localEntity_t	*le;
+LocalEntity	*CG_AllocLocalEntity( ) {
+	LocalEntity	*le;
 
 	if ( !cg_freeLocalEntities ) {
 		// no free entities, so free the one at the end of the chain
 		// remove the oldest active entity
-		CG_FreeLocalEntity( cg_activeLocalEntities.prev );
+		cg_activeLocalEntities.prev->freeLocalEntity();
 	}
 
 	le = cg_freeLocalEntities;
@@ -106,7 +106,7 @@ or generates more localentities along a trail.
 CG_FragmentBounceMark
 ================
 */
-void CG_FragmentBounceMark( localEntity_t *le, trace_t *trace ) {
+void LocalEntity::fragmentBounceMark( trace_t *trace ) {
 	int			radius;
 
 	radius = 8 + (rand()&15);
@@ -115,7 +115,7 @@ void CG_FragmentBounceMark( localEntity_t *le, trace_t *trace ) {
 
 	// don't allow a fragment to make multiple marks, or they
 	// pile up while settling
-	le->leMarkType = LEMT_NONE;
+	this->leMarkType = LEMT_NONE;
 }
 
 /*
@@ -123,28 +123,28 @@ void CG_FragmentBounceMark( localEntity_t *le, trace_t *trace ) {
 CG_ReflectVelocity
 ================
 */
-void CG_ReflectVelocity( localEntity_t *le, trace_t *trace ) {
+void LocalEntity::reflectVelocity( trace_t *trace ) {
 	vec3_t	velocity;
 	float	dot;
 	int		hitTime;
 
 	// reflect the velocity on the trace plane
 	hitTime = cg.time - cg.frametime + cg.frametime * trace->fraction;
-	BG_EvaluateTrajectoryDelta( &le->pos, hitTime, velocity );
+	BG_EvaluateTrajectoryDelta( &this->pos, hitTime, velocity );
 	dot = DotProduct( velocity, trace->plane.normal );
-	VectorMA( velocity, -2*dot, trace->plane.normal, le->pos.trDelta );
+	VectorMA( velocity, -2*dot, trace->plane.normal, this->pos.trDelta );
 
-	VectorScale( le->pos.trDelta, le->bounceFactor, le->pos.trDelta );
+	VectorScale( this->pos.trDelta, this->bounceFactor, this->pos.trDelta );
 
-	VectorCopy( trace->endpos, le->pos.trBase );
-	le->pos.trTime = cg.time;
+	VectorCopy( trace->endpos, this->pos.trBase );
+	this->pos.trTime = cg.time;
 
 
 	// check for stop, making sure that even on low FPS systems it doesn't bobble
 	if ( trace->allsolid || 
 		( trace->plane.normal[2] > 0 && 
-		( le->pos.trDelta[2] < 40 || le->pos.trDelta[2] < -cg.frametime * le->pos.trDelta[2] ) ) ) {
-		le->pos.trType = TR_STATIONARY;
+		( this->pos.trDelta[2] < 40 || this->pos.trDelta[2] < -cg.frametime * this->pos.trDelta[2] ) ) ) {
+		this->pos.trType = TR_STATIONARY;
 	} else {
 
 	}
@@ -155,50 +155,50 @@ void CG_ReflectVelocity( localEntity_t *le, trace_t *trace ) {
 CG_AddFragment
 ================
 */
-void CG_AddFragment( localEntity_t *le ) {
+void LocalEntity::addFragment() {
 	vec3_t	newOrigin;
 	trace_t	trace;
 
-	if ( le->pos.trType == TR_STATIONARY ) {
+	if ( this->pos.trType == TR_STATIONARY ) {
 		// sink into the ground if near the removal time
 		int		t;
 		float	oldZ;
 		
-		t = le->endTime - cg.time;
+		t = this->endTime - cg.time;
 		if ( t < SINK_TIME ) {
 			// we must use an explicit lighting origin, otherwise the
 			// lighting would be lost as soon as the origin went
 			// into the ground
-			VectorCopy( le->refEntity.origin, le->refEntity.lightingOrigin );
-			le->refEntity.renderfx |= RF_LIGHTING_ORIGIN;
-			oldZ = le->refEntity.origin[2];
-			le->refEntity.origin[2] -= 16 * ( 1.0 - static_cast<float>(t) / SINK_TIME );
-			refExport.AddRefEntityToScene( &le->refEntity );
-			le->refEntity.origin[2] = oldZ;
+			VectorCopy( this->refEntity.origin, this->refEntity.lightingOrigin );
+			this->refEntity.renderfx |= RF_LIGHTING_ORIGIN;
+			oldZ = this->refEntity.origin[2];
+			this->refEntity.origin[2] -= 16 * ( 1.0 - static_cast<float>(t) / SINK_TIME );
+			refExport.AddRefEntityToScene( &this->refEntity );
+			this->refEntity.origin[2] = oldZ;
 		} else {
-			refExport.AddRefEntityToScene( &le->refEntity );
+			refExport.AddRefEntityToScene( &this->refEntity );
 		}
 
 		return;
 	}
 
 	// calculate New position
-	BG_EvaluateTrajectory( &le->pos, cg.time, newOrigin );
+	BG_EvaluateTrajectory( &this->pos, cg.time, newOrigin );
 
 	// trace a line from previous position to New position
-	CG_Trace( &trace, le->refEntity.origin, nullptr, nullptr, newOrigin, -1, CONTENTS_SOLID );
+	CG_Trace( &trace, this->refEntity.origin, nullptr, nullptr, newOrigin, -1, CONTENTS_SOLID );
 	if ( trace.fraction == 1.0 ) {
 		// still in free fall
-		VectorCopy( newOrigin, le->refEntity.origin );
+		VectorCopy( newOrigin, this->refEntity.origin );
 
-		if ( le->leFlags & LEF_TUMBLE ) {
+		if ( this->leFlags & LEF_TUMBLE ) {
 			vec3_t angles;
 
-			BG_EvaluateTrajectory( &le->angles, cg.time, angles );
-			AnglesToAxis( angles, le->refEntity.axis );
+			BG_EvaluateTrajectory( &this->angles, cg.time, angles );
+			AnglesToAxis( angles, this->refEntity.axis );
 		}
 
-		refExport.AddRefEntityToScene( &le->refEntity );
+		refExport.AddRefEntityToScene( &this->refEntity );
 
 		return;
 	}
@@ -207,17 +207,17 @@ void CG_AddFragment( localEntity_t *le ) {
 	// this keeps gibs from waiting at the bottom of pits of death
 	// and floating levels
 	if ( CM_PointContents( trace.endpos, 0 ) & CONTENTS_NODROP ) {
-		CG_FreeLocalEntity( le );
+		this->freeLocalEntity();
 		return;
 	}
 
 	// leave a mark
-	CG_FragmentBounceMark( le, &trace );
+	this->fragmentBounceMark( &trace );
 
 	// reflect the velocity on the trace plane
-	CG_ReflectVelocity( le, &trace );
+	this->reflectVelocity( &trace );
 
-	refExport.AddRefEntityToScene( &le->refEntity );
+	refExport.AddRefEntityToScene( &this->refEntity );
 }
 
 /*
@@ -234,19 +234,19 @@ These only do simple scaling or modulation before passing to the renderer
 CG_AddFadeRGB
 ====================
 */
-void CG_AddFadeRGB( localEntity_t *le ) {
+void LocalEntity::addFadeRGB() {
 	refEntity_t *re;
 	float c;
 
-	re = &le->refEntity;
+	re = &this->refEntity;
 
-	c = ( le->endTime - cg.time ) * le->lifeRate;
+	c = ( this->endTime - cg.time ) * this->lifeRate;
 	c *= 0xff;
 
-	re->shaderRGBA[0] = le->color[0] * c;
-	re->shaderRGBA[1] = le->color[1] * c;
-	re->shaderRGBA[2] = le->color[2] * c;
-	re->shaderRGBA[3] = le->color[3] * c;
+	re->shaderRGBA[0] = this->color[0] * c;
+	re->shaderRGBA[1] = this->color[1] * c;
+	re->shaderRGBA[2] = this->color[2] * c;
+	re->shaderRGBA[3] = this->color[3] * c;
 
 	refExport.AddRefEntityToScene( re );
 }
@@ -256,38 +256,38 @@ void CG_AddFadeRGB( localEntity_t *le ) {
 CG_AddMoveScaleFade
 ==================
 */
-static void CG_AddMoveScaleFade( localEntity_t *le ) {
+void LocalEntity::addMoveScaleFade() {
 	refEntity_t	*re;
 	float		c;
 	vec3_t		delta;
 	float		len;
 
-	re = &le->refEntity;
+	re = &this->refEntity;
 
-	if ( le->fadeInTime > le->startTime && cg.time < le->fadeInTime ) {
+	if ( this->fadeInTime > this->startTime && cg.time < this->fadeInTime ) {
 		// fade / grow time
-		c = 1.0 - static_cast<float>( le->fadeInTime - cg.time ) / ( le->fadeInTime - le->startTime );
+		c = 1.0 - static_cast<float>( this->fadeInTime - cg.time ) / ( this->fadeInTime - this->startTime );
 	}
 	else {
 		// fade / grow time
-		c = ( le->endTime - cg.time ) * le->lifeRate;
+		c = ( this->endTime - cg.time ) * this->lifeRate;
 	}
 
-	re->shaderRGBA[3] = 0xff * c * le->color[3];
+	re->shaderRGBA[3] = 0xff * c * this->color[3];
 
-	if ( !( le->leFlags & LEF_PUFF_DONT_SCALE ) ) {
-		re->radius = le->radius * ( 1.0 - c ) + 8;
+	if ( !( this->leFlags & LEF_PUFF_DONT_SCALE ) ) {
+		re->radius = this->radius * ( 1.0 - c ) + 8;
 	}
 
-	BG_EvaluateTrajectory( &le->pos, cg.time, re->origin );
+	BG_EvaluateTrajectory( &this->pos, cg.time, re->origin );
 
 	// if the view would be "inside" the sprite, kill the sprite
 	// so it doesn't add too much overdraw
 	VectorSubtract( re->origin, cg.refdef.vieworg, delta );
 	len = VectorLength( delta );
-	if( len < le->radius && !(le->leFlags & LEF_NO_RADIUS_KILL) )
+	if( len < this->radius && !(this->leFlags & LEF_NO_RADIUS_KILL) )
 	{
-		CG_FreeLocalEntity( le );
+		this->freeLocalEntity();
 		return;
 	}
 
@@ -304,27 +304,27 @@ removed if the view passes through them.
 There are often many of these, so it needs to be simple.
 ===================
 */
-static void CG_AddScaleFade( localEntity_t *le ) {
+void LocalEntity::addScaleFade() {
 	refEntity_t	*re;
 	float		c;
 	vec3_t		delta;
 	float		len;
 
-	re = &le->refEntity;
+	re = &this->refEntity;
 
 	// fade / grow time
-	c = ( le->endTime - cg.time ) * le->lifeRate;
+	c = ( this->endTime - cg.time ) * this->lifeRate;
 
-	re->shaderRGBA[3] = 0xff * c * le->color[3];
-	re->radius = le->radius * ( 1.0 - c ) + 8;
+	re->shaderRGBA[3] = 0xff * c * this->color[3];
+	re->radius = this->radius * ( 1.0 - c ) + 8;
 
 	// if the view would be "inside" the sprite, kill the sprite
 	// so it doesn't add too much overdraw
 	VectorSubtract( re->origin, cg.refdef.vieworg, delta );
 	len = VectorLength( delta );
-	if( len < le->radius && !(le->leFlags & LEF_NO_RADIUS_KILL) )
+	if( len < this->radius && !(this->leFlags & LEF_NO_RADIUS_KILL) )
 	{
-		CG_FreeLocalEntity( le );
+		this->freeLocalEntity();
 		return;
 	}
 
@@ -336,26 +336,26 @@ static void CG_AddScaleFade( localEntity_t *le ) {
 CG_AddExplosion
 ================
 */
-static void CG_AddExplosion( localEntity_t *ex ) {
+void LocalEntity::addExplosion() {
 	refEntity_t	*ent;
 
-	ent = &ex->refEntity;
+	ent = &this->refEntity;
 
 	// add the entity
 	refExport.AddRefEntityToScene(ent);
 
 	// add the dlight
-	if ( ex->light ) {
+	if ( this->light ) {
 		float		light;
 
-		light = static_cast<float>( cg.time - ex->startTime ) / ( ex->endTime - ex->startTime );
+		light = static_cast<float>( cg.time - this->startTime ) / ( this->endTime - this->startTime );
 		if ( light < 0.5 ) {
 			light = 1.0;
 		} else {
 			light = 1.0 - ( light - 0.5 ) * 2;
 		}
-		light = ex->light * light;
-		refExport.AddLightToScene(ent->origin, light, ex->lightColor[0], ex->lightColor[1], ex->lightColor[2] );
+		light = this->light * light;
+		refExport.AddLightToScene(ent->origin, light, this->lightColor[0], this->lightColor[1], this->lightColor[2] );
 	}
 }
 
@@ -364,20 +364,20 @@ static void CG_AddExplosion( localEntity_t *ex ) {
 CG_AddSpriteExplosion
 ================
 */
-static void CG_AddSpriteExplosion( localEntity_t *le ) {
+void LocalEntity::addSpriteExplosion() {
 	refEntity_t	re;
 	float c;
 
-	re = le->refEntity;
+	re = this->refEntity;
 
 	// MFQ3: don't add explosion sprites to the scene until their time
 	// has come
-	if( le->startTime > cg.time && le->leType == LE_SPRITE_EXPLOSION )
+	if( this->startTime > cg.time && this->leType == LE_SPRITE_EXPLOSION )
 	{
 		return;
 	}
 
-	c = ( le->endTime - cg.time ) / static_cast< float>( le->endTime - le->startTime );
+	c = ( this->endTime - cg.time ) / static_cast< float>( this->endTime - this->startTime );
 	if ( c > 1 ) {
 		c = 1.0;	// can happen during connection problems
 	}
@@ -390,26 +390,26 @@ static void CG_AddSpriteExplosion( localEntity_t *le ) {
 	re.reType = RT_SPRITE;
 	re.radius = 42 * ( 1.0 - c ) + 30;
 
-	// use the radius parameter of the localEntity_t as a scale modifier (0.0f or 1.0f will give no change)
-	if( le->radius )
+	// use the radius parameter of the LocalEntity as a scale modifier (0.0f or 1.0f will give no change)
+	if( this->radius )
 	{
-		re.radius *= le->radius;
+		re.radius *= this->radius;
 	}
 
 	refExport.AddRefEntityToScene( &re );
 
 	// add the dlight
-	if ( le->light ) {
+	if ( this->light ) {
 		float		light;
 
-		light = static_cast<float>( cg.time - le->startTime ) / ( le->endTime - le->startTime );
+		light = static_cast<float>( cg.time - this->startTime ) / ( this->endTime - this->startTime );
 		if ( light < 0.5 ) {
 			light = 1.0;
 		} else {
 			light = 1.0 - ( light - 0.5 ) * 2;
 		}
-		light = le->light * light;
-		refExport.AddLightToScene(re.origin, light, le->lightColor[0], le->lightColor[1], le->lightColor[2] );
+		light = this->light * light;
+		refExport.AddLightToScene(re.origin, light, this->lightColor[0], this->lightColor[1], this->lightColor[2] );
 	}
 }
 
@@ -418,7 +418,7 @@ static void CG_AddSpriteExplosion( localEntity_t *le ) {
 CG_AddNuke
 ====================
 */
-void CG_AddNuke( localEntity_t *le ) {
+void LocalEntity::addNuke() {
 	refEntity_t	*re;
 	refEntity_t shockwave;
 	refEntity_t cloud;
@@ -429,7 +429,7 @@ void CG_AddNuke( localEntity_t *le ) {
 
 
 
-	re = &le->refEntity;
+	re = &this->refEntity;
 
 	rad = re->radius;
 	// Set limits
@@ -438,16 +438,16 @@ void CG_AddNuke( localEntity_t *le ) {
 		rad = NUKE_BOOMSPHEREMODEL_RADIUS;
 	}
 
-	t = cg.time - le->startTime;
+	t = cg.time - this->startTime;
 	VectorClear( test );
 	AnglesToAxis( test, axis );
 
 	if (t > NUKE_SHOCKWAVE_STARTTIME && t < NUKE_SHOCKWAVE_ENDTIME) {
 
-		if (!(le->leFlags & LEF_SOUND1)) {
+		if (!(this->leFlags & LEF_SOUND1)) {
 //			S_StartSound (re->origin, ENTITYNUM_WORLD, CHAN_AUTO, cgs.media.nukeExplodeSound );
 			S_StartLocalSound(cgs.media.nukeExplodeSound, CHAN_AUTO);
-			le->leFlags |= LEF_SOUND1;
+			this->leFlags |= LEF_SOUND1;
 		}
 		// 1st nuke shockwave
 		memset(&shockwave, 0, sizeof(shockwave));
@@ -479,21 +479,21 @@ void CG_AddNuke( localEntity_t *le ) {
 
 	if (t > NUKE_EXPLODE_STARTTIME && t < NUKE_IMPLODE_ENDTIME) {
 		// explosion and implosion
-		c = ( le->endTime - cg.time ) * le->lifeRate;
+		c = ( this->endTime - cg.time ) * this->lifeRate;
 		c *= 0xff;
-		re->shaderRGBA[0] = le->color[0] * c;
-		re->shaderRGBA[1] = le->color[1] * c;
-		re->shaderRGBA[2] = le->color[2] * c;
-		re->shaderRGBA[3] = le->color[3] * c;
+		re->shaderRGBA[0] = this->color[0] * c;
+		re->shaderRGBA[1] = this->color[1] * c;
+		re->shaderRGBA[2] = this->color[2] * c;
+		re->shaderRGBA[3] = this->color[3] * c;
 
 		if( t < NUKE_IMPLODE_STARTTIME ) {
 			c = static_cast<float>(t - NUKE_EXPLODE_STARTTIME) / static_cast<float>(NUKE_IMPLODE_STARTTIME - NUKE_EXPLODE_STARTTIME);
 		}
 		else {
-			if (!(le->leFlags & LEF_SOUND2)) {
+			if (!(this->leFlags & LEF_SOUND2)) {
 //				S_StartSound (re->origin, ENTITYNUM_WORLD, CHAN_AUTO, cgs.media.nukeImplodeSound );
 				S_StartLocalSound(cgs.media.nukeImplodeSound, CHAN_AUTO);
-				le->leFlags |= LEF_SOUND2;
+				this->leFlags |= LEF_SOUND2;
 			}
 			c = static_cast<float>(NUKE_IMPLODE_ENDTIME - t) / static_cast<float>(NUKE_IMPLODE_ENDTIME - NUKE_IMPLODE_STARTTIME);
 		}
@@ -509,12 +509,12 @@ void CG_AddNuke( localEntity_t *le ) {
 
 	if (t > NUKE_SHOCKWAVE2_STARTTIME && t < NUKE_SHOCKWAVE2_ENDTIME) {
 		// 2nd nuke shockwave
-		if (le->angles.trBase[0] == 0 &&
-			le->angles.trBase[1] == 0 &&
-			le->angles.trBase[2] == 0) {
-			le->angles.trBase[0] = random() * 360;
-			le->angles.trBase[1] = random() * 360;
-			le->angles.trBase[2] = random() * 360;
+		if (this->angles.trBase[0] == 0 &&
+			this->angles.trBase[1] == 0 &&
+			this->angles.trBase[2] == 0) {
+			this->angles.trBase[0] = random() * 360;
+			this->angles.trBase[1] = random() * 360;
+			this->angles.trBase[2] = random() * 360;
 		}
 		else {
 			c = 0;
@@ -525,9 +525,9 @@ void CG_AddNuke( localEntity_t *le ) {
 		shockwave.shaderTime = re->shaderTime;
 		VectorCopy(re->origin, shockwave.origin);
 
-		test[0] = le->angles.trBase[0];
-		test[1] = le->angles.trBase[1];
-		test[2] = le->angles.trBase[2];
+		test[0] = this->angles.trBase[0];
+		test[1] = this->angles.trBase[1];
+		test[2] = this->angles.trBase[2];
 		AnglesToAxis( test, axis );
 
 		c = static_cast<float>(t - NUKE_SHOCKWAVE2_STARTTIME) / static_cast<float>(NUKE_SHOCKWAVE2_ENDTIME - NUKE_SHOCKWAVE2_STARTTIME);
@@ -592,7 +592,7 @@ CG_AddLocalEntities
 ===================
 */
 void CG_AddLocalEntities( ) {
-	localEntity_t	*le, *next;
+	LocalEntity	*le, *next;
 
 	// walk the list backwards, so any New local entities generated
 	// (trails, marks, etc) will be present this frame
@@ -605,7 +605,7 @@ void CG_AddLocalEntities( ) {
 		// kill entity because life is up?
 		if ( cg.time >= le->endTime )
 		{
-			CG_FreeLocalEntity( le );
+			le->freeLocalEntity();
 			continue;
 		}
 		switch ( le->leType ) {
@@ -617,30 +617,30 @@ void CG_AddLocalEntities( ) {
 			break;
 
 		case LE_SPRITE_EXPLOSION:
-			CG_AddSpriteExplosion( le );
+			le->addSpriteExplosion();
 			break;
 
 		case LE_EXPLOSION:
-			CG_AddExplosion( le );
+			le->addExplosion();
 			break;
 
 		case LE_FRAGMENT:			// gibs and brass
-			CG_AddFragment( le );
+			le->addFragment();
 			break;
 
 		case LE_MOVE_SCALE_FADE:		// water bubbles
-			CG_AddMoveScaleFade( le );
+			le->addMoveScaleFade();
 			break;
 
 		case LE_FADE_RGB:				// teleporters, railtrails
-			CG_AddFadeRGB( le );
+			le->addFadeRGB();
 			break;
 
 		case LE_SCALE_FADE:		// rocket trails
-			CG_AddScaleFade( le );
+			le->addScaleFade();
 			break;
 		case LE_NUKE:
-			CG_AddNuke( le );
+			le->addNuke();
 			break;
 
 		}

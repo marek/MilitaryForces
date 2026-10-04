@@ -726,10 +726,10 @@ void RE_StretchRaw (int x, int y, int w, int h, int cols, int rows, const byte *
 	VectorSet2(texCoords[2], (cols - 0.5f) / cols, (rows - 0.5f) / rows);
 	VectorSet2(texCoords[3], 0.5f / cols,          (rows - 0.5f) / rows);
 
-	GLSL_BindProgram(&tr.textureColorShader);
+	tr.textureColorShader.bindProgram();
 	
-	GLSL_SetUniformMat4(&tr.textureColorShader, UNIFORM_MODELVIEWPROJECTIONMATRIX, glState.modelviewProjection);
-	GLSL_SetUniformVec4(&tr.textureColorShader, UNIFORM_COLOR, colorWhite);
+	tr.textureColorShader.setUniformMat4( UNIFORM_MODELVIEWPROJECTIONMATRIX, glState.modelviewProjection );
+	tr.textureColorShader.setUniformVec4( UNIFORM_COLOR, colorWhite );
 
 	RB_InstantQuad2(quadVerts, texCoords);
 }
@@ -993,7 +993,7 @@ const void	*RB_DrawSurfs( const void *data ) {
 
 				GL_State(GLS_DEPTHTEST_DISABLE);
 
-				GLSL_BindProgram(&tr.shadowmaskShader);
+				tr.shadowmaskShader.bindProgram();
 
 				GL_BindToTMU(tr.renderDepthImage, TB_COLORMAP);
 
@@ -1004,18 +1004,18 @@ const void	*RB_DrawSurfs( const void *data ) {
 					GL_BindToTMU(tr.sunShadowDepthImage[2], TB_SHADOWMAP3);
 					GL_BindToTMU(tr.sunShadowDepthImage[3], TB_SHADOWMAP4);
 
-					GLSL_SetUniformMat4(&tr.shadowmaskShader, UNIFORM_SHADOWMVP, backEnd.refdef.sunShadowMvp[0]);
-					GLSL_SetUniformMat4(&tr.shadowmaskShader, UNIFORM_SHADOWMVP2, backEnd.refdef.sunShadowMvp[1]);
-					GLSL_SetUniformMat4(&tr.shadowmaskShader, UNIFORM_SHADOWMVP3, backEnd.refdef.sunShadowMvp[2]);
-					GLSL_SetUniformMat4(&tr.shadowmaskShader, UNIFORM_SHADOWMVP4, backEnd.refdef.sunShadowMvp[3]);
+					tr.shadowmaskShader.setUniformMat4( UNIFORM_SHADOWMVP, backEnd.refdef.sunShadowMvp[0] );
+					tr.shadowmaskShader.setUniformMat4( UNIFORM_SHADOWMVP2, backEnd.refdef.sunShadowMvp[1] );
+					tr.shadowmaskShader.setUniformMat4( UNIFORM_SHADOWMVP3, backEnd.refdef.sunShadowMvp[2] );
+					tr.shadowmaskShader.setUniformMat4( UNIFORM_SHADOWMVP4, backEnd.refdef.sunShadowMvp[3] );
 				}
 				else
 				{
 					GL_BindToTMU(tr.sunShadowDepthImage[3], TB_SHADOWMAP);
-					GLSL_SetUniformMat4(&tr.shadowmaskShader, UNIFORM_SHADOWMVP, backEnd.refdef.sunShadowMvp[3]);
+					tr.shadowmaskShader.setUniformMat4( UNIFORM_SHADOWMVP, backEnd.refdef.sunShadowMvp[3] );
 				}
 
-				GLSL_SetUniformVec3(&tr.shadowmaskShader, UNIFORM_VIEWORIGIN, backEnd.refdef.vieworg);
+				tr.shadowmaskShader.setUniformVec3( UNIFORM_VIEWORIGIN, backEnd.refdef.vieworg );
 				{
 					vec3_t viewVector;
 
@@ -1024,13 +1024,13 @@ const void	*RB_DrawSurfs( const void *data ) {
 					float xmax = zmax * tan(backEnd.viewParms.fovX * M_PI / 360.0f);
 
 					VectorScale(backEnd.refdef.viewaxis[0], zmax, viewVector);
-					GLSL_SetUniformVec3(&tr.shadowmaskShader, UNIFORM_VIEWFORWARD, viewVector);
+					tr.shadowmaskShader.setUniformVec3( UNIFORM_VIEWFORWARD, viewVector );
 					VectorScale(backEnd.refdef.viewaxis[1], xmax, viewVector);
-					GLSL_SetUniformVec3(&tr.shadowmaskShader, UNIFORM_VIEWLEFT, viewVector);
+					tr.shadowmaskShader.setUniformVec3( UNIFORM_VIEWLEFT, viewVector );
 					VectorScale(backEnd.refdef.viewaxis[2], ymax, viewVector);
-					GLSL_SetUniformVec3(&tr.shadowmaskShader, UNIFORM_VIEWUP, viewVector);
+					tr.shadowmaskShader.setUniformVec3( UNIFORM_VIEWUP, viewVector );
 
-					GLSL_SetUniformVec4(&tr.shadowmaskShader, UNIFORM_VIEWINFO, viewInfo);
+					tr.shadowmaskShader.setUniformVec4( UNIFORM_VIEWINFO, viewInfo );
 				}
 
 				RB_InstantQuad2(quadVerts, texCoords); //, color, shaderProgram, invTexRes);
@@ -1042,23 +1042,23 @@ const void	*RB_DrawSurfs( const void *data ) {
 
 					FBO_Bind(tr.screenScratchFbo);
 
-					GLSL_BindProgram(&tr.depthBlurShader[0]);
+					tr.depthBlurShader[0].bindProgram();
 
 					GL_BindToTMU(tr.screenShadowImage, TB_COLORMAP);
 					GL_BindToTMU(tr.hdrDepthImage, TB_LIGHTMAP);
 
-					GLSL_SetUniformVec4(&tr.depthBlurShader[0], UNIFORM_VIEWINFO, viewInfo);
+					tr.depthBlurShader[0].setUniformVec4( UNIFORM_VIEWINFO, viewInfo );
 
 					RB_InstantQuad2(quadVerts, texCoords);
 
 					FBO_Bind(tr.screenShadowFbo);
 
-					GLSL_BindProgram(&tr.depthBlurShader[1]);
+					tr.depthBlurShader[1].bindProgram();
 
 					GL_BindToTMU(tr.screenScratchImage, TB_COLORMAP);
 					GL_BindToTMU(tr.hdrDepthImage, TB_LIGHTMAP);
 
-					GLSL_SetUniformVec4(&tr.depthBlurShader[1], UNIFORM_VIEWINFO, viewInfo);
+					tr.depthBlurShader[1].setUniformVec4( UNIFORM_VIEWINFO, viewInfo );
 
 					RB_InstantQuad2(quadVerts, texCoords);
 				}
@@ -1090,11 +1090,11 @@ const void	*RB_DrawSurfs( const void *data ) {
 
 				GL_State( GLS_DEPTHTEST_DISABLE );
 
-				GLSL_BindProgram(&tr.ssaoShader);
+				tr.ssaoShader.bindProgram();
 
 				GL_BindToTMU(tr.hdrDepthImage, TB_COLORMAP);
 
-				GLSL_SetUniformVec4(&tr.ssaoShader, UNIFORM_VIEWINFO, viewInfo);
+				tr.ssaoShader.setUniformVec4( UNIFORM_VIEWINFO, viewInfo );
 
 				RB_InstantQuad2(quadVerts, texCoords); //, color, shaderProgram, invTexRes);
 
@@ -1107,12 +1107,12 @@ const void	*RB_DrawSurfs( const void *data ) {
 				qglViewport(0, 0, tr.quarterFbo[1]->width, tr.quarterFbo[1]->height);
 				qglScissor(0, 0, tr.quarterFbo[1]->width, tr.quarterFbo[1]->height);
 
-				GLSL_BindProgram(&tr.depthBlurShader[0]);
+				tr.depthBlurShader[0].bindProgram();
 
 				GL_BindToTMU(tr.quarterImage[0],  TB_COLORMAP);
 				GL_BindToTMU(tr.hdrDepthImage, TB_LIGHTMAP);
 
-				GLSL_SetUniformVec4(&tr.depthBlurShader[0], UNIFORM_VIEWINFO, viewInfo);
+				tr.depthBlurShader[0].setUniformVec4( UNIFORM_VIEWINFO, viewInfo );
 
 				RB_InstantQuad2(quadVerts, texCoords); //, color, shaderProgram, invTexRes);
 
@@ -1122,12 +1122,12 @@ const void	*RB_DrawSurfs( const void *data ) {
 				qglViewport(0, 0, tr.screenSsaoFbo->width, tr.screenSsaoFbo->height);
 				qglScissor(0, 0, tr.screenSsaoFbo->width, tr.screenSsaoFbo->height);
 
-				GLSL_BindProgram(&tr.depthBlurShader[1]);
+				tr.depthBlurShader[1].bindProgram();
 
 				GL_BindToTMU(tr.quarterImage[1],  TB_COLORMAP);
 				GL_BindToTMU(tr.hdrDepthImage, TB_LIGHTMAP);
 
-				GLSL_SetUniformVec4(&tr.depthBlurShader[1], UNIFORM_VIEWINFO, viewInfo);
+				tr.depthBlurShader[1].setUniformVec4( UNIFORM_VIEWINFO, viewInfo );
 
 
 				RB_InstantQuad2(quadVerts, texCoords); //, color, shaderProgram, invTexRes);
@@ -1376,9 +1376,9 @@ static void RB_DrawGreyscale(const Framebuffer *src)
 	qglScissor(0, 0, glConfig.vidWidth, glConfig.vidHeight);
 	GL_State(GLS_DEPTHTEST_DISABLE | GLS_SRCBLEND_ONE | GLS_DSTBLEND_ZERO);
 
-	GLSL_BindProgram(&tr.greyscaleShader);
-	GLSL_SetUniformInt(&tr.greyscaleShader, UNIFORM_TEXTUREMAP, 0);
-	GLSL_SetUniformFloat(&tr.greyscaleShader, UNIFORM_GREYSCALE, backEnd.greyscale);
+	tr.greyscaleShader.bindProgram();
+	tr.greyscaleShader.setUniformInt( UNIFORM_TEXTUREMAP, 0 );
+	tr.greyscaleShader.setUniformFloat( UNIFORM_GREYSCALE, backEnd.greyscale );
 	GL_BindToTMU(src->colorImage[0], 0);
 
 	vec4_t quadVerts[4] = {
@@ -1671,15 +1671,15 @@ const void *RB_PostProcess(const void *data)
 		viewInfo[3] = scale / (float)(tr.quarterImage[0]->height);
 
 		FBO_Bind(tr.quarterFbo[1]);
-		GLSL_BindProgram(&tr.depthBlurShader[2]);
+		tr.depthBlurShader[2].bindProgram();
 		GL_BindToTMU(tr.quarterImage[0], TB_COLORMAP);
-		GLSL_SetUniformVec4(&tr.depthBlurShader[2], UNIFORM_VIEWINFO, viewInfo);
+		tr.depthBlurShader[2].setUniformVec4( UNIFORM_VIEWINFO, viewInfo );
 		RB_InstantQuad2(quadVerts, texCoords);
 
 		FBO_Bind(tr.quarterFbo[0]);
-		GLSL_BindProgram(&tr.depthBlurShader[3]);
+		tr.depthBlurShader[3].bindProgram();
 		GL_BindToTMU(tr.quarterImage[1], TB_COLORMAP);
-		GLSL_SetUniformVec4(&tr.depthBlurShader[3], UNIFORM_VIEWINFO, viewInfo);
+		tr.depthBlurShader[3].setUniformVec4( UNIFORM_VIEWINFO, viewInfo );
 		RB_InstantQuad2(quadVerts, texCoords);
 
 		SetViewportAndScissor();

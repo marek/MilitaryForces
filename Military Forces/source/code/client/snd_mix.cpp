@@ -254,7 +254,7 @@ CHANNEL MIXING
 ===============================================================================
 */
 
-static void S_PaintChannelFrom16_scalar( channel_t *ch, const sfx_t *sc, int count, int sampleOffset, int bufferOffset ) {
+static void S_PaintChannelFrom16_scalar( channel_t *ch, const SoundEffect *sc, int count, int sampleOffset, int bufferOffset ) {
 	int						data, aoff, boff;
 	int						leftvol, rightvol;
 	int						i, j;
@@ -349,7 +349,7 @@ static void S_PaintChannelFrom16_scalar( channel_t *ch, const sfx_t *sc, int cou
 	}
 }
 
-static void S_PaintChannelFrom16( channel_t *ch, const sfx_t *sc, int count, int sampleOffset, int bufferOffset ) {
+static void S_PaintChannelFrom16( channel_t *ch, const SoundEffect *sc, int count, int sampleOffset, int bufferOffset ) {
 #if idppc_altivec
 	if (com_altivec->integer) {
 		// must be in a separate translation unit or G3 systems will crash.
@@ -360,7 +360,7 @@ static void S_PaintChannelFrom16( channel_t *ch, const sfx_t *sc, int count, int
 	S_PaintChannelFrom16_scalar( ch, sc, count, sampleOffset, bufferOffset );
 }
 
-void S_PaintChannelFromWavelet( channel_t *ch, sfx_t *sc, int count, int sampleOffset, int bufferOffset ) {
+void S_PaintChannelFromWavelet( channel_t *ch, SoundEffect *sc, int count, int sampleOffset, int bufferOffset ) {
 	int						data;
 	int						leftvol, rightvol;
 	int						i;
@@ -402,7 +402,7 @@ void S_PaintChannelFromWavelet( channel_t *ch, sfx_t *sc, int count, int sampleO
 	}
 }
 
-void S_PaintChannelFromADPCM( channel_t *ch, sfx_t *sc, int count, int sampleOffset, int bufferOffset ) {
+void S_PaintChannelFromADPCM( channel_t *ch, SoundEffect *sc, int count, int sampleOffset, int bufferOffset ) {
 	int						data;
 	int						leftvol, rightvol;
 	int						i;
@@ -449,7 +449,7 @@ void S_PaintChannelFromADPCM( channel_t *ch, sfx_t *sc, int count, int sampleOff
 	}
 }
 
-void S_PaintChannelFromMuLaw( channel_t *ch, sfx_t *sc, int count, int sampleOffset, int bufferOffset ) {
+void S_PaintChannelFromMuLaw( channel_t *ch, SoundEffect *sc, int count, int sampleOffset, int bufferOffset ) {
 	int						data;
 	int						leftvol, rightvol;
 	int						i;
@@ -513,7 +513,7 @@ void S_PaintChannels( int endtime ) {
 	int 	end;
 	int 	stream;
 	channel_t *ch;
-	sfx_t	*sc;
+	SoundEffect	*sc;
 	int		ltime, count;
 	int		sampleOffset;
 

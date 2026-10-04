@@ -16,7 +16,7 @@ CG_SmokePuff
 Adds a smoke puff localEntity.
 =====================
 */
-localEntity_t *CG_SmokePuff( const vec3_t p, const vec3_t vel, 
+LocalEntity *CG_SmokePuff( const vec3_t p, const vec3_t vel, 
 				   float radius,
 				   float r, float g, float b, float a,
 				   float duration,
@@ -25,7 +25,7 @@ localEntity_t *CG_SmokePuff( const vec3_t p, const vec3_t vel,
 				   int leFlags,
 				   qhandle_t hShader ) {
 	static int	seed = 0x92;
-	localEntity_t	*le;
+	LocalEntity	*le;
 	refEntity_t		*re;
 //	int fadeInTime = startTime + duration / 2;
 
@@ -90,7 +90,7 @@ CG_NukeCloud
 */
 //static void CG_NukeCloud( centity_t * cent, entityState_t * es )
 //{
-//	localEntity_t	* smoke;
+//	LocalEntity	* smoke;
 //	vec3_t			pos, velocity;
 //	int i, temp, puff_size;
 //	static int	seed = 0x92;
@@ -178,7 +178,7 @@ CG_NukeEffect
 ==================
 */
 void CG_NukeEffect(  centity_t * cent, entityState_t * es ) {
-	localEntity_t	*le;
+	LocalEntity	*le;
 	refEntity_t		*re;
 
 	le = CG_AllocLocalEntity();
@@ -214,7 +214,7 @@ CG_FlakEffect
 */
 void CG_FlakEffect( centity_t * cent, entityState_t * es )
 {
-	localEntity_t	* smoke;
+	LocalEntity	* smoke;
 	vec3_t			pos, velocity;
 	int i, temp, puff_size;
 	static int	seed = 0x92;
@@ -249,12 +249,12 @@ void CG_FlakEffect( centity_t * cent, entityState_t * es )
 CG_MakeExplosion
 ====================
 */
-localEntity_t *CG_MakeExplosion( vec3_t origin, vec3_t dir, 
+LocalEntity *CG_MakeExplosion( vec3_t origin, vec3_t dir, 
 								 qhandle_t hModel, qhandle_t shader,
 								 int offset, int duration, bool isSprite )
 {
 	float			ang;
-	localEntity_t	*ex;
+	LocalEntity	*ex;
 	vec3_t			tmpVec, newOrigin;
 
 	if ( duration <= 0 ) {
@@ -317,7 +317,7 @@ CG_LaunchExplode
 ==================
 */
 void CG_LaunchExplode( vec3_t origin, vec3_t velocity, qhandle_t hModel ) {
-	localEntity_t	*le;
+	LocalEntity	*le;
 	refEntity_t		*re;
 
 	le = CG_AllocLocalEntity();
@@ -349,7 +349,7 @@ CG_LaunchGib
 ==================
 */
 void CG_LaunchGib( vec3_t origin, vec3_t velocity, qhandle_t hModel ) {
-	localEntity_t	*le;
+	LocalEntity	*le;
 	refEntity_t		*re;
 	int				i;
 

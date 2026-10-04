@@ -48,7 +48,7 @@ static	int inUse = 0;
 static	int totalInUse = 0;
 
 short *sfxScratchBuffer = nullptr;
-sfx_t *sfxScratchPointer = nullptr;
+SoundEffect *sfxScratchPointer = nullptr;
 int	   sfxScratchIndex = 0;
 
 void	SND_free(sndBuffer *v) {
@@ -113,7 +113,7 @@ ResampleSfx
 resample / decimate to the current source rate
 ================
 */
-static int ResampleSfx( sfx_t *sfx, int channels, int inrate, int inwidth, int samples, byte *data, bool compressed ) {
+int SoundEffect::resampleSfx( int channels, int inrate, int inwidth, int samples, byte *data, bool compressed ) {
 	int		outcount;
 	int		srcsample;
 	float	stepscale;
@@ -129,7 +129,7 @@ static int ResampleSfx( sfx_t *sfx, int channels, int inrate, int inwidth, int s
 	srcsample = 0;
 	samplefrac = 0;
 	fracstep = stepscale * 256 * channels;
-	chunk = sfx->soundData;
+	chunk = this->soundData;
 
 	for (i=0 ; i<outcount ; i++)
 	{
@@ -148,7 +148,7 @@ static int ResampleSfx( sfx_t *sfx, int channels, int inrate, int inwidth, int s
 				sndBuffer	*newchunk;
 				newchunk = SND_malloc();
 				if (chunk == nullptr) {
-					sfx->soundData = newchunk;
+					this->soundData = newchunk;
 				} else {
 					chunk->next = newchunk;
 				}
@@ -212,7 +212,7 @@ The filename may be different than sfx->name in the case
 of a forced fallback of a player specific sound
 ==============
 */
-bool S_LoadSound( sfx_t *sfx )
+bool SoundEffect::loadSound()
 {
 	byte	*data;
 	short	*samples;
@@ -220,21 +220,21 @@ bool S_LoadSound( sfx_t *sfx )
 //	int		size;
 
 	// load it in
-	data = static_cast<byte *>(S_CodecLoad(sfx->soundName, &info));
+	data = static_cast<byte *>(S_CodecLoad(this->soundName, &info));
 	if(!data)
 		return false;
 
 	if ( info.width == 1 ) {
-		Com_DPrintf(S_COLOR_YELLOW "WARNING: %s is a 8 bit audio file\n", sfx->soundName);
+		Com_DPrintf(S_COLOR_YELLOW "WARNING: %s is a 8 bit audio file\n", this->soundName);
 	}
 
 	if ( info.rate != 22050 ) {
-		Com_DPrintf(S_COLOR_YELLOW "WARNING: %s is not a 22kHz audio file\n", sfx->soundName);
+		Com_DPrintf(S_COLOR_YELLOW "WARNING: %s is not a 22kHz audio file\n", this->soundName);
 	}
 
 	samples = static_cast<short *>(Hunk_AllocateTempMemory(info.channels * info.samples * sizeof(short) * 2));
 
-	sfx->lastTimeUsed = Com_Milliseconds()+1;
+	this->lastTimeUsed = Com_Milliseconds()+1;
 
 	// each of these compression schemes works just fine
 	// but the 16bit quality is much nicer and with a local
@@ -242,30 +242,30 @@ bool S_LoadSound( sfx_t *sfx )
 	// manager to do the right thing for us and page
 	// sound in as needed
 
-	if( info.channels == 1 && sfx->soundCompressed == true) {
-		sfx->soundCompressionMethod = 1;
-		sfx->soundData = nullptr;
-		sfx->soundLength = ResampleSfxRaw( samples, info.channels, info.rate, info.width, info.samples, data + info.dataofs );
-		S_AdpcmEncodeSound(sfx, samples);
+	if( info.channels == 1 && this->soundCompressed == true) {
+		this->soundCompressionMethod = 1;
+		this->soundData = nullptr;
+		this->soundLength = ResampleSfxRaw( samples, info.channels, info.rate, info.width, info.samples, data + info.dataofs );
+		this->adpcmEncodeSound( samples );
 #if 0
 	} else if (info.channels == 1 && info.samples>(SND_CHUNK_SIZE*16) && info.width >1) {
-		sfx->soundCompressionMethod = 3;
-		sfx->soundData = NULL;
-		sfx->soundLength = ResampleSfxRaw( samples, info.channels, info.rate, info.width, info.samples, (data + info.dataofs) );
-		encodeMuLaw( sfx, samples);
+		this->soundCompressionMethod = 3;
+		this->soundData = NULL;
+		this->soundLength = ResampleSfxRaw( samples, info.channels, info.rate, info.width, info.samples, (data + info.dataofs) );
+		this->encodeMuLaw( samples );
 	} else if (info.channels == 1 && info.samples>(SND_CHUNK_SIZE*6400) && info.width >1) {
-		sfx->soundCompressionMethod = 2;
-		sfx->soundData = NULL;
-		sfx->soundLength = ResampleSfxRaw( samples, info.channels, info.rate, info.width, info.samples, (data + info.dataofs) );
-		encodeWavelet( sfx, samples);
+		this->soundCompressionMethod = 2;
+		this->soundData = NULL;
+		this->soundLength = ResampleSfxRaw( samples, info.channels, info.rate, info.width, info.samples, (data + info.dataofs) );
+		this->encodeWavelet( samples );
 #endif
 	} else {
-		sfx->soundCompressionMethod = 0;
-		sfx->soundData = nullptr;
-		sfx->soundLength = ResampleSfx( sfx, info.channels, info.rate, info.width, info.samples, data + info.dataofs, false );
+		this->soundCompressionMethod = 0;
+		this->soundData = nullptr;
+		this->soundLength = this->resampleSfx( info.channels, info.rate, info.width, info.samples, data + info.dataofs, false );
 	}
 
-	sfx->soundChannels = info.channels;
+	this->soundChannels = info.channels;
 	
 	Hunk_FreeTempMemory(samples);
 	Hunk_FreeTempMemory(data);

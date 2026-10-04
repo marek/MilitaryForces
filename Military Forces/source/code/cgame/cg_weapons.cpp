@@ -17,7 +17,7 @@ CG_FFARTrail
 */
 static void CG_FFARTrail( centity_t * cent, const weaponInfo_t *wi )
 {
-	localEntity_t	* smoke;
+	LocalEntity	* smoke;
 	vec3_t			up, pos, smoke_pos, velocity;
 	int smoke_rad;
 	static int	seed = 0x92;
@@ -60,7 +60,7 @@ CG_MissileTrail
 */
 static void CG_MissileTrail( centity_t * cent, const weaponInfo_t *wi )
 {
-	localEntity_t	* smoke;
+	LocalEntity	* smoke;
 	vec3_t			up, pos, smoke_pos, velocity;
 	int smoke_rad;
 	static float smoke_rot = 0;
@@ -117,7 +117,7 @@ CG_FlareTrail
 */
 static void CG_FlareTrail( centity_t * cent, const weaponInfo_t *wi )
 {
-	localEntity_t	* smoke;
+	LocalEntity	* smoke;
 	vec3_t			up, pos, smoke_pos, velocity;
 	int smoke_rad;
 	static int	seed = 0x92;
@@ -154,7 +154,7 @@ static void CG_FlareTrail( centity_t * cent, const weaponInfo_t *wi )
 
 static void CG_MissileTrail2( centity_t * cent, const weaponInfo_t *wi ) {
 	vec3_t  start, end;
-	localEntity_t *le;
+	LocalEntity *le;
 	refEntity_t   *re;
 
 	VectorCopy(cent->lastDrawnTrailPos, start);
@@ -223,7 +223,7 @@ CG_NukeTrail
 //{
 //	if(cent->TimeSinceLastTrail <= cg.time - 200)
 //	{
-//		localEntity_t	* smoke;
+//		LocalEntity	* smoke;
 //		vec3_t			up, pos, velocity;
 //	
 //		VectorCopy( cent->lerpOrigin, pos );
@@ -718,7 +718,7 @@ void CG_MissileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_t di
 	float			radius;
 	float			light;
 	vec3_t			lightColor;
-	localEntity_t	*le;
+	LocalEntity	*le;
 	int				r;
 	bool		isSprite;
 	int				duration;
@@ -901,7 +901,7 @@ CG_GenericExplosion
 */
 void CG_GenericExplosion( vec3_t origin, int type )
 {
-	localEntity_t	* le = nullptr;
+	LocalEntity	* le = nullptr;
 	vec3_t			up = {0, 0, 1};
 	vec3_t			adjust = {0, 0, 0};
 	int				soundIdx = -1;
@@ -978,7 +978,7 @@ void CG_GenericExplosion( vec3_t origin, int type )
 	// and also smoke for gib/building explosion
 	if( type > 0 )
 	{
-		localEntity_t * smoke = nullptr;
+		LocalEntity * smoke = nullptr;
 
 		for( i = 1; i<=density; i++ )
 		{
@@ -1044,7 +1044,7 @@ CG_VehicleHit
 void CG_VehicleHit( vec3_t origin, int damage )
 {
 	vec3_t			up = {0, 0, 1};
-	localEntity_t	*smoke = nullptr;
+	LocalEntity	*smoke = nullptr;
 
 	// make smoke
 	smoke = CG_SmokePuff( origin, up, 

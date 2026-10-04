@@ -51,7 +51,17 @@ struct sndBuffer_s {
 };
 using sndBuffer = sndBuffer_s;
 
-struct sfx_s {
+class SoundEffect
+{
+public:
+	int resampleSfx( int channels, int inrate, int inwidth, int samples, byte *data, bool compressed );
+	bool loadSound();
+	void loadDefault();
+	void memoryLoad();
+	void adpcmEncodeSound( short *samples );
+	void encodeWavelet( short *packets );
+	void encodeMuLaw( short *packets );
+
 	sndBuffer		*soundData;
 	bool		defaultSound;			// couldn't be loaded, so use buzz
 	bool		inMemory;				// not in Memory
@@ -61,9 +71,8 @@ struct sfx_s {
 	int			soundChannels;
 	char 			soundName[MAX_QPATH];
 	int				lastTimeUsed;
-	struct sfx_s	*next;
+	SoundEffect	*next;
 };
-using sfx_t = sfx_s;
 
 struct dma_t {
 	int			channels;
@@ -85,7 +94,7 @@ inline constexpr float THIRD_PERSON_THRESHOLD_SQ = (48.0f*48.0f);
 struct loopSound_s {
 	vec3_t		origin;
 	vec3_t		velocity;
-	sfx_t		*sfx;
+	SoundEffect		*sfx;
 	int			mergeFrame;
 	bool	active;
 	bool	kill;
@@ -109,7 +118,7 @@ struct channel_t
 	float		oldDopplerScale;
 	vec3_t		origin;			// only use if fixed_origin is set
 	bool	fixed_origin;	// use origin instead of fetching entnum's origin
-	sfx_t		*thesfx;		// sfx structure
+	SoundEffect		*thesfx;		// sfx structure
 	bool	doppler;
 	bool	fullVolume;
 };
@@ -216,7 +225,6 @@ extern cvar_t *s_doppler;
 
 extern cvar_t *s_testsound;
 
-bool S_LoadSound( sfx_t *sfx );
 
 void		SND_free(sndBuffer *v);
 sndBuffer*	SND_malloc( );
@@ -225,14 +233,12 @@ void		SND_shutdown();
 
 void S_PaintChannels(int endtime);
 
-void S_memoryLoad(sfx_t *sfx);
 
 // spatializes a channel
 void S_Spatialize(channel_t *ch);
 
 // adpcm functions
 int  S_AdpcmMemoryNeeded( const wavinfo_t *info );
-void S_AdpcmEncodeSound( sfx_t *sfx, short *samples );
 void S_AdpcmGetSamples(sndBuffer *chunk, short *to);
 
 // wavelet function
@@ -244,14 +250,12 @@ void S_FreeOldestSound( );
 
 #define	NXStream byte
 
-void encodeWavelet(sfx_t *sfx, short *packets);
 void decodeWavelet( sndBuffer *stream, short *packets);
 
-void encodeMuLaw( sfx_t *sfx, short *packets);
 extern short mulawToShort[256];
 
 extern short *sfxScratchBuffer;
-extern sfx_t *sfxScratchPointer;
+extern SoundEffect *sfxScratchPointer;
 extern int	   sfxScratchIndex;
 
 bool S_Base_Init( soundInterface_t *si );
@@ -271,5 +275,5 @@ typedef int srcHandle_t;
 bool S_AL_Init( soundInterface_t *si );
 
 #ifdef idppc_altivec
-void S_PaintChannelFrom16_altivec( portable_samplepair_t paintbuffer[PAINTBUFFER_SIZE], int snd_vol, channel_t *ch, const sfx_t *sc, int count, int sampleOffset, int bufferOffset );
+void S_PaintChannelFrom16_altivec( portable_samplepair_t paintbuffer[PAINTBUFFER_SIZE], int snd_vol, channel_t *ch, const SoundEffect *sc, int count, int sampleOffset, int bufferOffset );
 #endif

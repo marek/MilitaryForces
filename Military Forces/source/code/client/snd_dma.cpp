@@ -70,11 +70,11 @@ int   		s_paintedtime; 		// sample PAIRS
 // MAX_SFX may be larger than MAX_SOUNDS because
 // of custom player sounds
 #define		MAX_SFX			4096
-sfx_t		s_knownSfx[MAX_SFX];
+SoundEffect		s_knownSfx[MAX_SFX];
 int			s_numSfx = 0;
 
 constexpr int LOOP_HASH = 128;
-static	sfx_t		*sfxHash[LOOP_HASH];
+static	SoundEffect		*sfxHash[LOOP_HASH];
 
 cvar_t		*s_testsound;
 cvar_t		*s_show;
@@ -156,7 +156,7 @@ S_Base_SoundList
 */
 void S_Base_SoundList( ) {
 	int		i;
-	sfx_t	*sfx;
+	SoundEffect	*sfx;
 	int		size, total;
 	char	type[4][16];
 	char	mem[2][16];
@@ -250,11 +250,11 @@ S_FindName
 Will allocate a new sfx if it isn't found
 ==================
 */
-static sfx_t *S_FindName( const char *name ) {
+static SoundEffect *S_FindName( const char *name ) {
 	int		i;
 	int		hash;
 
-	sfx_t	*sfx;
+	SoundEffect	*sfx;
 
 	if (!name) {
 		Com_Error(ERR_FATAL, "Sound name is NULL");
@@ -295,7 +295,7 @@ static sfx_t *S_FindName( const char *name ) {
 
 	if (i == s_numSfx) {
 		if (s_numSfx == MAX_SFX) {
-			Com_Error (ERR_FATAL, "S_FindName: out of sfx_t");
+			Com_Error (ERR_FATAL, "S_FindName: out of SoundEffect");
 		}
 		s_numSfx++;
 	}
@@ -315,17 +315,17 @@ static sfx_t *S_FindName( const char *name ) {
 S_DefaultSound
 =================
 */
-void S_DefaultSound( sfx_t *sfx ) {
+void SoundEffect::loadDefault() {
 	
 	int		i;
 
-	sfx->soundLength = 512;
-	sfx->soundData = SND_malloc();
-	sfx->soundData->next = nullptr;
+	this->soundLength = 512;
+	this->soundData = SND_malloc();
+	this->soundData->next = nullptr;
 
 
-	for ( i = 0 ; i < sfx->soundLength ; i++ ) {
-		sfx->soundData->sndChunk[i] = i;
+	for ( i = 0 ; i < this->soundLength ; i++ ) {
+		this->soundData->sndChunk[i] = i;
 	}
 }
 
@@ -351,7 +351,7 @@ Creates a default buzz sound if the file can't be loaded
 ==================
 */
 sfxHandle_t	S_Base_RegisterSound( const char *name, bool compressed ) {
-	sfx_t	*sfx;
+	SoundEffect	*sfx;
 
 	compressed = false;
 	if (!s_soundStarted) {
@@ -374,7 +374,7 @@ sfxHandle_t	S_Base_RegisterSound( const char *name, bool compressed ) {
 	sfx->inMemory = false;
 	sfx->soundCompressed = compressed;
 
-  S_memoryLoad(sfx);
+  sfx->memoryLoad();
 
 	if ( sfx->defaultSound ) {
 		Com_Printf( S_COLOR_YELLOW "WARNING: could not find %s - using default\n", sfx->soundName );
@@ -397,19 +397,19 @@ void S_Base_BeginRegistration( ) {
 		SND_setup();
 
 		Com_Memset(s_knownSfx, '\0', sizeof(s_knownSfx));
-		Com_Memset(sfxHash, '\0', sizeof(sfx_t *) * LOOP_HASH);
+		Com_Memset(sfxHash, '\0', sizeof(SoundEffect *) * LOOP_HASH);
 
 		S_Base_RegisterSound("sound/feedback/hit.wav", false);		// changed to a sound in baseq3
 	}
 }
 
-void S_memoryLoad(sfx_t	*sfx) {
+void SoundEffect::memoryLoad() {
 	// load the sound file
-	if ( !S_LoadSound ( sfx ) ) {
-//		Com_Printf( S_COLOR_YELLOW "WARNING: couldn't load sound: %s\n", sfx->soundName );
-		sfx->defaultSound = true;
+	if ( !this->loadSound() ) {
+//		Com_Printf( S_COLOR_YELLOW "WARNING: couldn't load sound: %s\n", this->soundName );
+		this->defaultSound = true;
 	}
-	sfx->inMemory = true;
+	this->inMemory = true;
 }
 
 //=============================================================================
@@ -526,7 +526,7 @@ Entchannel 0 will never override a playing sound
 */
 static void S_Base_StartSoundEx( vec3_t origin, int entityNum, int entchannel, sfxHandle_t sfxHandle, bool localSound ) {
 	channel_t	*ch;
-	sfx_t		*sfx;
+	SoundEffect		*sfx;
   int i, oldest, chosen, time;
   int	inplay, allowed;
 	bool	fullVolume;
@@ -547,7 +547,7 @@ static void S_Base_StartSoundEx( vec3_t origin, int entityNum, int entchannel, s
 	sfx = &s_knownSfx[ sfxHandle ];
 
 	if (sfx->inMemory == false) {
-		S_memoryLoad(sfx);
+		sfx->memoryLoad();
 	}
 
 	if ( s_show->integer == 1 ) {
@@ -766,7 +766,7 @@ Include velocity in case I get around to doing doppler...
 ==================
 */
 void S_Base_AddLoopingSound( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfxHandle ) {
-	sfx_t *sfx;
+	SoundEffect *sfx;
 
 	if ( !s_soundStarted || s_soundMuted ) {
 		return;
@@ -780,7 +780,7 @@ void S_Base_AddLoopingSound( int entityNum, const vec3_t origin, const vec3_t ve
 	sfx = &s_knownSfx[ sfxHandle ];
 
 	if (sfx->inMemory == false) {
-		S_memoryLoad(sfx);
+		sfx->memoryLoad();
 	}
 
 	if ( !sfx->soundLength ) {
@@ -829,7 +829,7 @@ Include velocity in case I get around to doing doppler...
 ==================
 */
 void S_Base_AddRealLoopingSound( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfxHandle ) {
-	sfx_t *sfx;
+	SoundEffect *sfx;
 
 	if ( !s_soundStarted || s_soundMuted ) {
 		return;
@@ -843,7 +843,7 @@ void S_Base_AddRealLoopingSound( int entityNum, const vec3_t origin, const vec3_
 	sfx = &s_knownSfx[ sfxHandle ];
 
 	if (sfx->inMemory == false) {
-		S_memoryLoad(sfx);
+		sfx->memoryLoad();
 	}
 
 	if ( !sfx->soundLength ) {
@@ -1506,7 +1506,7 @@ S_FreeOldestSound
 
 void S_FreeOldestSound( ) {
 	int	i, oldest, used;
-	sfx_t	*sfx;
+	SoundEffect	*sfx;
 	sndBuffer	*buffer, *nbuffer;
 
 	oldest = Com_Milliseconds();
@@ -1576,7 +1576,7 @@ bool S_Base_Init( soundInterface_t *si ) {
 		s_soundMuted = true;
 //		s_numSfx = 0;
 
-		Com_Memset(sfxHash, 0, sizeof(sfx_t *)*LOOP_HASH);
+		Com_Memset(sfxHash, 0, sizeof(SoundEffect *)*LOOP_HASH);
 
 		s_soundtime = 0;
 		s_paintedtime = 0;

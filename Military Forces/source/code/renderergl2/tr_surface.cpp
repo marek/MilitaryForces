@@ -225,10 +225,10 @@ void RB_InstantQuad(vec4_t quadVerts[4])
 	VectorSet2(texCoords[2], 1.0f, 1.0f);
 	VectorSet2(texCoords[3], 0.0f, 1.0f);
 
-	GLSL_BindProgram(&tr.textureColorShader);
+	tr.textureColorShader.bindProgram();
 	
-	GLSL_SetUniformMat4(&tr.textureColorShader, UNIFORM_MODELVIEWPROJECTIONMATRIX, glState.modelviewProjection);
-	GLSL_SetUniformVec4(&tr.textureColorShader, UNIFORM_COLOR, colorWhite);
+	tr.textureColorShader.setUniformMat4( UNIFORM_MODELVIEWPROJECTIONMATRIX, glState.modelviewProjection );
+	tr.textureColorShader.setUniformVec4( UNIFORM_COLOR, colorWhite );
 
 	RB_InstantQuad2(quadVerts, texCoords);
 }
@@ -478,7 +478,7 @@ static void RB_SurfaceBeam( )
 {
 #define NUM_BEAM_SEGS 6
 	refEntity_t *e;
-	shaderProgram_t *sp = &tr.textureColorShader;
+	ShaderProgram *sp = &tr.textureColorShader;
 	int	i;
 	vec3_t perpvec;
 	vec3_t direction, normalized_direction;
@@ -540,13 +540,13 @@ static void RB_SurfaceBeam( )
 	// FIXME: A lot of this can probably be removed for speed, and refactored into a more convenient function
 	RB_UpdateTessVao(ATTR_POSITION);
 	
-	GLSL_BindProgram(sp);
+	sp->bindProgram();
 		
-	GLSL_SetUniformMat4(sp, UNIFORM_MODELVIEWPROJECTIONMATRIX, glState.modelviewProjection);
+	sp->setUniformMat4( UNIFORM_MODELVIEWPROJECTIONMATRIX, glState.modelviewProjection );
 					
-	GLSL_SetUniformVec4(sp, UNIFORM_COLOR, colorRed);
+	sp->setUniformVec4( UNIFORM_COLOR, colorRed );
 
-	GLSL_SetUniformInt(sp, UNIFORM_ALPHATEST, 0);
+	sp->setUniformInt( UNIFORM_ALPHATEST, 0 );
 
 	R_DrawElements(tess.numIndexes, tess.firstIndex);
 
