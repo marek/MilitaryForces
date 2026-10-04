@@ -43,14 +43,6 @@ endif()
 
 mf_keep_symbols(${CLIENT_NAME})
 
-# An ad-hoc signature gives the app bundle a stable identity, so macOS remembers permissions (microphone)
-# for a given build instead of asking at every launch. A real signing identity can be set with MF_SIGN_IDENTITY.
-if(APPLE AND BUILD_MACOS_APP)
-    set(MF_SIGN_IDENTITY "-" CACHE STRING "Code signing identity for the macOS app (- for ad-hoc)")
-    add_custom_command(TARGET ${CLIENT_NAME} POST_BUILD
-        COMMAND codesign --force --deep --sign ${MF_SIGN_IDENTITY} $<TARGET_BUNDLE_DIR:${CLIENT_NAME}>
-        VERBATIM)
-endif()
 
 if(WIN32 AND TARGET SDL2::SDL2)
     add_custom_command(TARGET ${CLIENT_NAME} POST_BUILD
@@ -66,3 +58,19 @@ foreach(RENDERER IN LISTS MF_RENDERERS)
     add_custom_command(TARGET ${CLIENT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${RENDERER}> $<TARGET_FILE_DIR:${CLIENT_NAME}>)
 endforeach()
+
+# (after the renderer copies above, so what is signed is what stays in the bundle)
+# An ad-hoc signature gives the app bundle a stable identity, so macOS remembers permissions (microphone)
+# for a given build instead of asking at every launch. A real signing identity can be set with MF_SIGN_IDENTITY.
+if(APPLE AND BUILD_MACOS_APP)
+    set(MF_SIGN_IDENTITY "-" CACHE STRING "Code signing identity for the macOS app (- for ad-hoc)")
+    # the renderer libraries sit beside the executable, where --deep does not look: sign them first
+    foreach(RENDERER IN LISTS MF_RENDERERS)
+        add_custom_command(TARGET ${CLIENT_NAME} POST_BUILD
+            COMMAND codesign --force --sign ${MF_SIGN_IDENTITY} $<TARGET_FILE_DIR:${CLIENT_NAME}>/$<TARGET_FILE_NAME:${RENDERER}>
+            VERBATIM)
+    endforeach()
+    add_custom_command(TARGET ${CLIENT_NAME} POST_BUILD
+        COMMAND codesign --force --deep --sign ${MF_SIGN_IDENTITY} $<TARGET_BUNDLE_DIR:${CLIENT_NAME}>
+        VERBATIM)
+endif()
