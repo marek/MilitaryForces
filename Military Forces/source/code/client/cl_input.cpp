@@ -760,7 +760,7 @@ void Client::writePacket( ) {
 	Com_Memset( &nullcmd, 0, sizeof(nullcmd) );
 	oldcmd = &nullcmd;
 
-	buf.init( data, sizeof(data) );
+	buf = Message( data, sizeof(data) );
 
 	buf.bitstream();
 	// write the current serverId so the server
@@ -823,7 +823,7 @@ void Client::writePacket( ) {
 				const int voipSize = clc.voipOutgoingDataSize;
 				Message fakemsg;
 				byte fakedata[MAX_MSGLEN];
-				fakemsg.init( fakedata, sizeof (fakedata));
+				fakemsg = Message( fakedata, sizeof (fakedata) );
 				fakemsg.bitstream();
 				fakemsg.writeLong( clc.reliableAcknowledge);
 				fakemsg.writeByte( svc_voipOpus);
@@ -893,7 +893,7 @@ void Client::writePacket( ) {
 	clc.lastPacketSentTime = cls.realtime;
 
 	if ( cl_showSend->integer ) {
-		Common::printf( "%i ", buf.cursize );
+		Common::printf( "%i ", buf.size() );
 	}
 
 	Client::netchan_Transmit (&clc.netchan, &buf);	

@@ -346,8 +346,8 @@ void Huff_Decompress(Message *mbuf, int offset) {
 	byte*		buffer;
 	HuffmanTree		huff;
 
-	size = mbuf->cursize - offset;
-	buffer = mbuf->data + offset;
+	size = mbuf->size() - offset;
+	buffer = mbuf->data() + offset;
 
 	if ( size <= 0 ) {
 		return;
@@ -363,8 +363,8 @@ void Huff_Decompress(Message *mbuf, int offset) {
 
 	cch = buffer[0]*256 + buffer[1];
 	// don't overflow with bad messages
-	if ( cch > mbuf->maxsize - offset ) {
-		cch = mbuf->maxsize - offset;
+	if ( cch > mbuf->maxSize() - offset ) {
+		cch = mbuf->maxSize() - offset;
 	}
 	bloc = 16;
 
@@ -388,8 +388,8 @@ void Huff_Decompress(Message *mbuf, int offset) {
 
 		huff.addRef( static_cast<byte>(ch) );								/* Increment node */
 	}
-	mbuf->cursize = cch + offset;
-	Com_Memcpy(mbuf->data + offset, seq, cch);
+	mbuf->setSize( cch + offset );
+	Com_Memcpy(mbuf->data() + offset, seq, cch);
 }
 
 extern 	int oldsize;
@@ -400,8 +400,8 @@ void Huff_Compress(Message *mbuf, int offset) {
 	byte*		buffer;
 	HuffmanTree		huff;
 
-	size = mbuf->cursize - offset;
-	buffer = mbuf->data + offset;
+	size = mbuf->size() - offset;
+	buffer = mbuf->data() + offset;
 
 	if (size<=0 || size > 65535) {
 		return;
@@ -428,8 +428,8 @@ void Huff_Compress(Message *mbuf, int offset) {
 
 	bloc += 8;												// next byte
 
-	mbuf->cursize = (bloc>>3) + offset;
-	Com_Memcpy(mbuf->data+offset, seq, (bloc>>3));
+	mbuf->setSize( (bloc>>3) + offset );
+	Com_Memcpy(mbuf->data()+offset, seq, (bloc>>3));
 }
 
 void Huff_Init(huffman_t *huff) {

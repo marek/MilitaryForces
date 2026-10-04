@@ -58,11 +58,11 @@ int ServerMain::entityUpdateBits( entityState_t *from, entityState_t *to, bool c
 	byte	buf[1024];
 	Message	msg;
 
-	msg.init( buf, sizeof( buf ) );
+	msg = Message( buf, sizeof( buf ) );
 	msg_huffstatsHold++;
 	msg.writeEntityUpdate( from, to, create, forced, nullptr );
 	msg_huffstatsHold--;
-	return msg.bit;
+	return msg.bit();
 }
 
 int QDECL ServerMain::qsortSnapshotCandidates( const void *a, const void *b ) 
@@ -279,7 +279,7 @@ void SV_Client::emitPacketEntities( SV_Client::ClientSnapshot *frame, Message *m
 		|| this->netchan_.remoteAddress().type == NA_LOOPBACK 
 		|| ( sv_lanForceRate->integer && Sys_IsLANAddress( this->netchan_.remoteAddress() ) );
 
-	remaining = sv_snapshotBudget->integer * 8 - msg->bit - GENTITYNUM_BITS - 8;
+	remaining = sv_snapshotBudget->integer * 8 - msg->bit() - GENTITYNUM_BITS - 8;
 
 	AngleVectors( frame->ps_.viewangles, forward, nullptr, nullptr );
 
@@ -839,7 +839,7 @@ void SV_Client::writeVoipToClient( Message *msg )
 			if(!*this->downloadName_)
 			{
         			totalbytes += packet->len;
-	        		if (totalbytes > (msg->maxsize - msg->cursize) / 2)
+	        		if (totalbytes > (msg->maxSize() - msg->size()) / 2)
 		        		break;
 
         			msg->writeByte( svc_voipOpus);
@@ -872,7 +872,7 @@ Called by SV_SendClientSnapshot and SV_SendClientGameState
 void SV_Client::sendMessageToClient( Message *msg )
 {
 	// record information about the message
-	this->frames_[this->netchan_.outgoingSequence() & PACKET_MASK].messageSize_ = msg->cursize;
+	this->frames_[this->netchan_.outgoingSequence() & PACKET_MASK].messageSize_ = msg->size();
 	this->frames_[this->netchan_.outgoingSequence() & PACKET_MASK].messageSent_ = theSVS.time_;
 	this->frames_[this->netchan_.outgoingSequence() & PACKET_MASK].messageAcked_ = -1;
 
@@ -903,8 +903,8 @@ void SV_Client::sendClientSnapshot()
 	if( gentity && gentity->r.svFlags & SVF_BOT ) 
 		return;
 
-	msg.init( msg_buf, sizeof(msg_buf));
-	msg.allowoverflow = true;
+	msg = Message( msg_buf, sizeof(msg_buf) );
+	msg.setAllowOverflow( true );
 
 	// NOTE, MRE: all server->client messages now acknowledge
 	// let the this know which reliable clientCommands we have received
@@ -922,7 +922,7 @@ void SV_Client::sendClientSnapshot()
 #endif
 
 	// check for overflow
-	if ( msg.overflowed ) 
+	if ( msg.overflowed() ) 
 	{
 		Common::printf ("WARNING: msg overflowed for %s\n", this->name_);
 		msg.clear();

@@ -157,7 +157,7 @@ void Client::netchan_Transmit( NetChannel *chan, Message* msg ) {
 		Client::netchan_Encode(msg);
 #endif
 
-	chan->transmit( msg->cursize, msg->data );
+	chan->transmit( msg->size(), msg->data() );
 	
 	// Transmit all fragments without delay
 	while(CL_Netchan_TransmitNextFragment(chan))

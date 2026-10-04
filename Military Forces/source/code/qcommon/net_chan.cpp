@@ -114,7 +114,7 @@ void NetChannel::transmitNextFragment() {
 	int			outgoingSequence;
 
 	// write the packet header
-	send.initOOB( send_buf, sizeof(send_buf));				// <-- only do the oob here
+	send = Message::outOfBand( send_buf, sizeof(send_buf) );				// <-- only do the oob here
 
 	outgoingSequence = this->outgoingSequence_ | FRAGMENT_BIT;
 	send.writeLong( outgoingSequence);
@@ -140,16 +140,16 @@ void NetChannel::transmitNextFragment() {
 	send.writeData( this->unsentBuffer_ + this->unsentFragmentStart_, fragmentLength );
 
 	// send the datagram
-	Network::sendPacket(this->sock_, send.cursize, send.data, this->remoteAddress_);
+	Network::sendPacket(this->sock_, send.size(), send.data(), this->remoteAddress_);
 	
 	// Store send time and size of this packet for rate control
 	this->lastSentTime_ = System::milliseconds();
-	this->lastSentSize_ = send.cursize;
+	this->lastSentSize_ = send.size();
 
 	if ( showpackets->integer ) {
 		Common::printf ("%s send %4i : s=%i fragment=%i,%i\n"
 			, netsrcString[ this->sock_ ]
-			, send.cursize
+			, send.size()
 			, this->outgoingSequence_
 			, this->unsentFragmentStart_, fragmentLength);
 	}
@@ -197,7 +197,7 @@ void NetChannel::transmit( int length, const byte *data ) {
 	}
 
 	// write the packet header
-	send.initOOB( send_buf, sizeof(send_buf));
+	send = Message::outOfBand( send_buf, sizeof(send_buf) );
 
 	send.writeLong( this->outgoingSequence_ );
 
@@ -215,16 +215,16 @@ void NetChannel::transmit( int length, const byte *data ) {
 	send.writeData( data, length );
 
 	// send the datagram
-	Network::sendPacket( this->sock_, send.cursize, send.data, this->remoteAddress_ );
+	Network::sendPacket( this->sock_, send.size(), send.data(), this->remoteAddress_ );
 
 	// Store send time and size of this packet for rate control
 	this->lastSentTime_ = System::milliseconds();
-	this->lastSentSize_ = send.cursize;
+	this->lastSentSize_ = send.size();
 
 	if ( showpackets->integer ) {
 		Common::printf( "%s send %4i : s=%i ack=%i\n"
 			, netsrcString[ this->sock_ ]
-			, send.cursize
+			, send.size()
 			, this->outgoingSequence_ - 1
 			, this->incomingSequence_ );
 	}
@@ -291,13 +291,13 @@ bool NetChannel::process( Message *msg ) {
 		if ( fragmented ) {
 			Common::printf( "%s recv %4i : s=%i fragment=%i,%i\n"
 				, netsrcString[ this->sock_ ]
-				, msg->cursize
+				, msg->size()
 				, sequence
 				, fragmentStart, fragmentLength );
 		} else {
 			Common::printf( "%s recv %4i : s=%i\n"
 				, netsrcString[ this->sock_ ]
-				, msg->cursize
+				, msg->size()
 				, sequence );
 		}
 	}
@@ -356,7 +356,7 @@ bool NetChannel::process( Message *msg ) {
 		}
 
 		// copy the fragment to the fragment buffer
-		if ( fragmentLength < 0 || msg->readcount + fragmentLength > msg->cursize ||
+		if ( fragmentLength < 0 || msg->readCount() + fragmentLength > msg->size() ||
 			this->fragmentLength_ + fragmentLength > sizeof( this->fragmentBuffer_ ) ) {
 			if ( showdrop->integer || showpackets->integer ) {
 				Common::printf ("%s:illegal fragment length\n"
@@ -366,7 +366,7 @@ bool NetChannel::process( Message *msg ) {
 		}
 
 		Com_Memcpy( this->fragmentBuffer_ + this->fragmentLength_, 
-			msg->data + msg->readcount, fragmentLength );
+			msg->data() + msg->readCount(), fragmentLength );
 
 		this->fragmentLength_ += fragmentLength;
 
@@ -375,7 +375,7 @@ bool NetChannel::process( Message *msg ) {
 			return false;
 		}
 
-		if ( this->fragmentLength_ > msg->maxsize ) {
+		if ( this->fragmentLength_ > msg->maxSize() ) {
 			Common::printf( "%s:fragmentLength %i > msg->maxsize\n"
 				, Network::adrToString (this->remoteAddress_ ),
 				this->fragmentLength_ );
@@ -385,13 +385,13 @@ bool NetChannel::process( Message *msg ) {
 		// copy the full message over the partial fragment
 
 		// make sure the sequence number is still there
-		*reinterpret_cast<int *>(msg->data) = LittleLong( sequence );
+		*reinterpret_cast<int *>(msg->data()) = LittleLong( sequence );
 
-		Com_Memcpy( msg->data + 4, this->fragmentBuffer_, this->fragmentLength_ );
-		msg->cursize = this->fragmentLength_ + 4;
+		Com_Memcpy( msg->data() + 4, this->fragmentBuffer_, this->fragmentLength_ );
+		msg->setSize( this->fragmentLength_ + 4 );
 		this->fragmentLength_ = 0;
-		msg->readcount = 4;	// past the sequence number
-		msg->bit = 32;	// past the sequence number
+		msg->setReadCount( 4 );	// past the sequence number
+		msg->setBit( 32 );	// past the sequence number
 
 		// TTimo
 		// clients were not acking fragmented messages
@@ -453,8 +453,8 @@ bool	Network::getLoopPacket (netsrc_t sock, netadr_t *net_from, Message *net_mes
 	i = loop->get & (MAX_LOOPBACK-1);
 	loop->get++;
 
-	Com_Memcpy (net_message->data, loop->msgs[i].data, loop->msgs[i].datalen);
-	net_message->cursize = loop->msgs[i].datalen;
+	Com_Memcpy (net_message->data(), loop->msgs[i].data, loop->msgs[i].datalen);
+	net_message->setSize( loop->msgs[i].datalen );
 	Com_Memset (net_from, 0, sizeof(*net_from));
 	net_from->type = NA_LOOPBACK;
 	return true;
@@ -613,11 +613,11 @@ void QDECL Network::outOfBandData( netsrc_t sock, netadr_t adr, byte *format, in
 		string[i+4] = format[i];
 	}
 
-	mbuf.data = string;
-	mbuf.cursize = len+4;
+	mbuf.setData( string );
+	mbuf.setSize( len+4 );
 	Huff_Compress( &mbuf, 12);
 	// send the datagram
-	Network::sendPacket( sock, mbuf.cursize, mbuf.data, adr );
+	Network::sendPacket( sock, mbuf.size(), mbuf.data(), adr );
 }
 
 /*

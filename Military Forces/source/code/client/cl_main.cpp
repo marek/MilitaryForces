@@ -621,10 +621,10 @@ void Client::writeDemoMessage ( Message *msg, int headerBytes ) {
 	swlen = LittleLong( len );
 	FileSystem::write (&swlen, 4, clc.demofile);
 	// skip the packet sequencing information
-	len = msg->cursize - headerBytes;
+	len = msg->size() - headerBytes;
 	swlen = LittleLong(len);
 	FileSystem::write (&swlen, 4, clc.demofile);
-	FileSystem::write ( msg->data + headerBytes, len, clc.demofile );
+	FileSystem::write ( msg->data() + headerBytes, len, clc.demofile );
 }
 
 
@@ -771,7 +771,7 @@ void CL_Record_f( ) {
 	clc.demowaiting = true;
 
 	// write out the gamestate message
-	buf.init( bufData, sizeof(bufData));
+	buf = Message( bufData, sizeof(bufData) );
 	buf.bitstream();
 
 	// NOTE, MRE: all server->client messages now acknowledge
@@ -818,9 +818,9 @@ void CL_Record_f( ) {
 	len = LittleLong( clc.serverMessageSequence - 1 );
 	FileSystem::write (&len, 4, clc.demofile);
 
-	len = LittleLong (buf.cursize);
+	len = LittleLong (buf.size());
 	FileSystem::write (&len, 4, clc.demofile);
-	FileSystem::write (buf.data, buf.cursize, clc.demofile);
+	FileSystem::write (buf.data(), buf.size(), clc.demofile);
 
 	// the rest of the demo file will be copied from net messages
 }
@@ -955,31 +955,32 @@ void Client::readDemoMessage( ) {
 	clc.serverMessageSequence = LittleLong( s );
 
 	// init the message
-	buf.init( bufData, sizeof( bufData ) );
+	buf = Message( bufData, sizeof( bufData ) );
 
 	// get the length
-	r = FileSystem::read (&buf.cursize, 4, clc.demofile);
+	int length = 0;
+	r = FileSystem::read (&length, 4, clc.demofile);
 	if ( r != 4 ) {
 		CL_DemoCompleted ();
 		return;
 	}
-	buf.cursize = LittleLong( buf.cursize );
-	if ( buf.cursize == -1 ) {
+	buf.setSize( LittleLong( length ) );
+	if ( buf.size() == -1 ) {
 		CL_DemoCompleted ();
 		return;
 	}
-	if ( buf.cursize > buf.maxsize ) {
+	if ( buf.size() > buf.maxSize() ) {
 		Common::error (ERR_DROP, "CL_ReadDemoMessage: demoMsglen > MAX_MSGLEN");
 	}
-	r = FileSystem::read( buf.data, buf.cursize, clc.demofile );
-	if ( r != buf.cursize ) {
+	r = FileSystem::read( buf.data(), buf.size(), clc.demofile );
+	if ( r != buf.size() ) {
 		Common::printf( "Demo file was truncated.\n");
 		CL_DemoCompleted ();
 		return;
 	}
 
 	clc.lastPacketTime = cls.realtime;
-	buf.readcount = 0;
+	buf.setReadCount( 0 );
 	Client::parseServerMessage( &buf );
 }
 
@@ -2517,8 +2518,8 @@ void CL_ServersResponsePacket( const netadr_t* from, Message *msg, bool extended
 
 	// parse through server response string
 	numservers = 0;
-	buffptr    = msg->data;
-	buffend    = buffptr + msg->cursize;
+	buffptr    = msg->data();
+	buffend    = buffptr + msg->size();
 
 	// advance to initial token
 	do
@@ -2843,7 +2844,7 @@ void CL_PacketEvent( netadr_t from, Message *msg ) {
 
 	clc.lastPacketTime = cls.realtime;
 
-	if ( msg->cursize >= 4 && *reinterpret_cast<int *>(msg->data) == -1 ) {
+	if ( msg->size() >= 4 && *reinterpret_cast<int *>(msg->data()) == -1 ) {
 		CL_ConnectionlessPacket( from, msg );
 		return;
 	}
@@ -2852,7 +2853,7 @@ void CL_PacketEvent( netadr_t from, Message *msg ) {
 		return;		// can't be a valid sequenced packet
 	}
 
-	if ( msg->cursize < 4 ) {
+	if ( msg->size() < 4 ) {
 		Common::printf ("%s: Runt packet\n", Network::adrToStringwPort( from ));
 		return;
 	}
@@ -2872,12 +2873,12 @@ void CL_PacketEvent( netadr_t from, Message *msg ) {
 	}
 
 	// the header is different lengths for reliable and unreliable messages
-	headerBytes = msg->readcount;
+	headerBytes = msg->readCount();
 
 	// track the last message received so it can be returned in 
 	// client messages, allowing the server to detect a dropped
 	// gamestate
-	clc.serverMessageSequence = LittleLong( *reinterpret_cast<int *>(msg->data) );
+	clc.serverMessageSequence = LittleLong( *reinterpret_cast<int *>(msg->data()) );
 
 	clc.lastPacketTime = cls.realtime;
 	Client::parseServerMessage( msg );

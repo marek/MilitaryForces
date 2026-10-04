@@ -39,8 +39,25 @@ struct playerState_s;
 class Message
 {
 public:
-	void init( byte *data, int length );
-	void initOOB( byte *data, int length );
+	Message() = default;
+	Message( byte *data, int length );
+	// an out of band message: byte aligned, not Huffman coded
+	static Message outOfBand( byte *data, int length );
+
+	byte *data() const { return data_; }
+	int size() const { return curSize_; }
+	int maxSize() const { return maxSize_; }
+	int readCount() const { return readCount_; }
+	int bit() const { return bit_; }
+	bool overflowed() const { return overflowed_; }
+	bool outOfBand() const { return oob_; }
+	void setData( byte *data ) { data_ = data; }
+	void setSize( int size ) { curSize_ = size; }
+	void setReadCount( int count ) { readCount_ = count; }
+	void setBit( int bit ) { bit_ = bit; }
+	void setOutOfBand( bool oob ) { oob_ = oob; }
+	void setAllowOverflow( bool allow ) { allowOverflow_ = allow; }
+
 	void clear();
 	void bitstream();
 	void beginReading();
@@ -83,16 +100,16 @@ public:
 
 	static int hashKey( const char *string, int maxlen );
 
-	bool	allowoverflow;	// if false, do a Common::error
-	bool	overflowed;		// set to true if the buffer size failed (with allowoverflow set)
-	bool	oob;			// set to true if the buffer size failed (with allowoverflow set)
-	byte	*data;
-	int		maxsize;
-	int		cursize;
-	int		readcount;
-	int		bit;				// for bitwise reads and writes
-
 private:
+	bool	allowOverflow_ = false;	// if false, do a Common::error
+	bool	overflowed_ = false;	// set to true if the buffer size failed (with allowOverflow_ set)
+	bool	oob_ = false;			// byte aligned and not Huffman coded
+	byte	*data_ = nullptr;
+	int		maxSize_ = 0;
+	int		curSize_ = 0;
+	int		readCount_ = 0;
+	int		bit_ = 0;				// for bitwise reads and writes
+
 	bool writeEntity( struct entityState_s *from, struct entityState_s *to, bool force, int create, uint64_t forced, uint64_t *written );
 };
 

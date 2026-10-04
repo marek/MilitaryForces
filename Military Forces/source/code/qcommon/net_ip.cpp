@@ -537,7 +537,7 @@ bool NET_GetPacket(netadr_t *net_from, Message *net_message, fd_set *fdr)
 	if(ip_socket != INVALID_SOCKET && FD_ISSET(ip_socket, fdr))
 	{
 		fromlen = sizeof(from);
-		ret = recvfrom( ip_socket, reinterpret_cast<void *>(net_message->data), net_message->maxsize, 0, reinterpret_cast<struct sockaddr *>(&from), &fromlen );
+		ret = recvfrom( ip_socket, reinterpret_cast<void *>(net_message->data()), net_message->maxSize(), 0, reinterpret_cast<struct sockaddr *>(&from), &fromlen );
 		
 		if (ret == SOCKET_ERROR)
 		{
@@ -552,28 +552,28 @@ bool NET_GetPacket(netadr_t *net_from, Message *net_message, fd_set *fdr)
 			memset( (reinterpret_cast<struct sockaddr_in *>(&from))->sin_zero, 0, 8 );
 		
 			if ( usingSocks && memcmp( &from, &socksRelayAddr, fromlen ) == 0 ) {
-				if ( ret < 10 || net_message->data[0] != 0 || net_message->data[1] != 0 || net_message->data[2] != 0 || net_message->data[3] != 1 ) {
+				if ( ret < 10 || net_message->data()[0] != 0 || net_message->data()[1] != 0 || net_message->data()[2] != 0 || net_message->data()[3] != 1 ) {
 					return false;
 				}
 				net_from->type = NA_IP;
-				net_from->ip[0] = net_message->data[4];
-				net_from->ip[1] = net_message->data[5];
-				net_from->ip[2] = net_message->data[6];
-				net_from->ip[3] = net_message->data[7];
-				net_from->port = *reinterpret_cast<short *>(&net_message->data[8]);
-				net_message->readcount = 10;
+				net_from->ip[0] = net_message->data()[4];
+				net_from->ip[1] = net_message->data()[5];
+				net_from->ip[2] = net_message->data()[6];
+				net_from->ip[3] = net_message->data()[7];
+				net_from->port = *reinterpret_cast<short *>(&net_message->data()[8]);
+				net_message->setReadCount( 10 );
 			}
 			else {
 				Network::sockadrToNetadr( reinterpret_cast<struct sockaddr *>(&from), net_from );
-				net_message->readcount = 0;
+				net_message->setReadCount( 0 );
 			}
 		
-			if( ret >= net_message->maxsize ) {
+			if( ret >= net_message->maxSize() ) {
 				Common::printf( "Oversize packet from %s\n", Network::adrToString (*net_from) );
 				return false;
 			}
 			
-			net_message->cursize = ret;
+			net_message->setSize( ret );
 			return true;
 		}
 	}
@@ -581,7 +581,7 @@ bool NET_GetPacket(netadr_t *net_from, Message *net_message, fd_set *fdr)
 	if(ip6_socket != INVALID_SOCKET && FD_ISSET(ip6_socket, fdr))
 	{
 		fromlen = sizeof(from);
-		ret = recvfrom(ip6_socket, reinterpret_cast<void *>(net_message->data), net_message->maxsize, 0, reinterpret_cast<struct sockaddr *>(&from), &fromlen);
+		ret = recvfrom(ip6_socket, reinterpret_cast<void *>(net_message->data()), net_message->maxSize(), 0, reinterpret_cast<struct sockaddr *>(&from), &fromlen);
 		
 		if (ret == SOCKET_ERROR)
 		{
@@ -593,15 +593,15 @@ bool NET_GetPacket(netadr_t *net_from, Message *net_message, fd_set *fdr)
 		else
 		{
 			Network::sockadrToNetadr(reinterpret_cast<struct sockaddr *>(&from), net_from);
-			net_message->readcount = 0;
+			net_message->setReadCount( 0 );
 		
-			if(ret >= net_message->maxsize)
+			if(ret >= net_message->maxSize())
 			{
 				Common::printf( "Oversize packet from %s\n", Network::adrToString (*net_from) );
 				return false;
 			}
 			
-			net_message->cursize = ret;
+			net_message->setSize( ret );
 			return true;
 		}
 	}
@@ -609,7 +609,7 @@ bool NET_GetPacket(netadr_t *net_from, Message *net_message, fd_set *fdr)
 	if(multicast6_socket != INVALID_SOCKET && multicast6_socket != ip6_socket && FD_ISSET(multicast6_socket, fdr))
 	{
 		fromlen = sizeof(from);
-		ret = recvfrom(multicast6_socket, reinterpret_cast<void *>(net_message->data), net_message->maxsize, 0, reinterpret_cast<struct sockaddr *>(&from), &fromlen);
+		ret = recvfrom(multicast6_socket, reinterpret_cast<void *>(net_message->data()), net_message->maxSize(), 0, reinterpret_cast<struct sockaddr *>(&from), &fromlen);
 		
 		if (ret == SOCKET_ERROR)
 		{
@@ -621,15 +621,15 @@ bool NET_GetPacket(netadr_t *net_from, Message *net_message, fd_set *fdr)
 		else
 		{
 			Network::sockadrToNetadr(reinterpret_cast<struct sockaddr *>(&from), net_from);
-			net_message->readcount = 0;
+			net_message->setReadCount( 0 );
 		
-			if(ret >= net_message->maxsize)
+			if(ret >= net_message->maxSize())
 			{
 				Common::printf( "Oversize packet from %s\n", Network::adrToString (*net_from) );
 				return false;
 			}
 			
-			net_message->cursize = ret;
+			net_message->setSize( ret );
 			return true;
 		}
 	}
@@ -1631,7 +1631,7 @@ void NET_Event(fd_set *fdr)
 	
 	while(true)
 	{
-		netmsg.init( bufData, sizeof(bufData));
+		netmsg = Message( bufData, sizeof(bufData) );
 
 		if(NET_GetPacket(&from, &netmsg, fdr))
 		{

@@ -2184,7 +2184,7 @@ int Common::eventLoop( ) {
 	byte		bufData[MAX_MSGLEN];
 	Message		buf;
 
-	buf.init( bufData, sizeof( bufData ) );
+	buf = Message( bufData, sizeof( bufData ) );
 
 	while ( true ) {
 		ev = Com_GetEvent();

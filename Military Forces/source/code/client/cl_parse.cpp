@@ -42,7 +42,7 @@ char *svc_strings[256] = {
 
 void SHOWNET( Message *msg, char *s) {
 	if ( cl_shownet->integer >= 2) {
-		Common::printf ("%3i:%s\n", msg->readcount-1, s);
+		Common::printf ("%3i:%s\n", msg->readCount()-1, s);
 	}
 }
 
@@ -125,7 +125,7 @@ void CL_ParsePacketEntities( Message *msg, clSnapshot_t *oldframe, clSnapshot_t 
 			break;
 		}
 
-		if ( msg->readcount > msg->cursize ) {
+		if ( msg->readCount() > msg->size() ) {
 			Common::error (ERR_DROP,"CL_ParsePacketEntities: end of message");
 		}
 
@@ -134,7 +134,7 @@ void CL_ParsePacketEntities( Message *msg, clSnapshot_t *oldframe, clSnapshot_t 
 		while ( oldnum < newnum ) {
 			// one or more entities from the old packet are unchanged
 			if ( cl_shownet->integer == 3 ) {
-				Common::printf ("%3i:  unchanged: %i\n", msg->readcount, oldnum);
+				Common::printf ("%3i:  unchanged: %i\n", msg->readCount(), oldnum);
 			}
 			CL_DeltaEntity( msg, newframe, oldnum, oldstate, true );
 			
@@ -151,7 +151,7 @@ void CL_ParsePacketEntities( Message *msg, clSnapshot_t *oldframe, clSnapshot_t 
 		if (oldnum == newnum) {
 			// delta from previous state
 			if ( cl_shownet->integer == 3 ) {
-				Common::printf ("%3i:  delta: %i\n", msg->readcount, newnum);
+				Common::printf ("%3i:  delta: %i\n", msg->readCount(), newnum);
 			}
 			CL_DeltaEntity( msg, newframe, newnum, create ? &cl.entityBaselines[newnum] : oldstate, false );
 
@@ -170,7 +170,7 @@ void CL_ParsePacketEntities( Message *msg, clSnapshot_t *oldframe, clSnapshot_t 
 		if ( oldnum > newnum ) {
 			// delta from baseline
 			if ( cl_shownet->integer == 3 ) {
-				Common::printf ("%3i:  baseline: %i\n", msg->readcount, newnum);
+				Common::printf ("%3i:  baseline: %i\n", msg->readCount(), newnum);
 			}
 			CL_DeltaEntity( msg, newframe, newnum, &cl.entityBaselines[newnum], false, !create );
 			continue;
@@ -182,7 +182,7 @@ void CL_ParsePacketEntities( Message *msg, clSnapshot_t *oldframe, clSnapshot_t 
 	while ( oldnum != 99999 ) {
 		// one or more entities from the old packet are unchanged
 		if ( cl_shownet->integer == 3 ) {
-			Common::printf ("%3i:  unchanged: %i\n", msg->readcount, oldnum);
+			Common::printf ("%3i:  unchanged: %i\n", msg->readCount(), oldnum);
 		}
 		CL_DeltaEntity( msg, newframe, oldnum, oldstate, true );
 		
@@ -880,7 +880,7 @@ void Client::parseServerMessage( Message *msg ) {
 	int			cmd;
 
 	if ( cl_shownet->integer == 1 ) {
-		Common::printf ("%i ",msg->cursize);
+		Common::printf ("%i ",msg->size());
 	} else if ( cl_shownet->integer >= 2 ) {
 		Common::printf ("------------------\n");
 	}
@@ -898,7 +898,7 @@ void Client::parseServerMessage( Message *msg ) {
 	// parse the message
 	//
 	while ( true ) {
-		if ( msg->readcount > msg->cursize ) {
+		if ( msg->readCount() > msg->size() ) {
 			Common::error (ERR_DROP,"CL_ParseServerMessage: read past end of server message");
 			break;
 		}
@@ -912,7 +912,7 @@ void Client::parseServerMessage( Message *msg ) {
 
 		if ( cl_shownet->integer >= 2 ) {
 			if ( (cmd < 0) || (!svc_strings[cmd]) ) {
-				Common::printf( "%3i:BAD CMD %i\n", msg->readcount-1, cmd );
+				Common::printf( "%3i:BAD CMD %i\n", msg->readCount()-1, cmd );
 			} else {
 				SHOWNET( msg, svc_strings[cmd] );
 			}

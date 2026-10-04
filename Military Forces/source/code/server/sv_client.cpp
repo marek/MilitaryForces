@@ -704,7 +704,7 @@ void SV_Client::sendClientGameState()
 	this->entityReset_ = true;
 	this->entityResetDone_ = false;
 
-	msg.init( msgBuffer, sizeof( msgBuffer ) );
+	msg = Message( msgBuffer, sizeof( msgBuffer ) );
 
 	// NOTE, MRE: all server->client messages now acknowledge
 	// let the this know which reliable clientCommands we have received
@@ -1171,7 +1171,7 @@ int ServerMain::sendDownloadMessages()
 		
 		if(cl && cl->state_ && *cl->downloadName_)
 		{
-			msg.init( msgBuffer, sizeof(msgBuffer));
+			msg = Message( msgBuffer, sizeof(msgBuffer) );
 			msg.writeLong( cl->lastClientCommand_);
 			
 			retval = cl->writeDownloadToClient( &msg );
@@ -1846,7 +1846,7 @@ void SV_Client::userVoip( Message *msg, bool ignoreData )
 	flags = msg->readByte();
 	packetsize = msg->readShort();
 
-	if (msg->readcount > msg->cursize)
+	if (msg->readCount() > msg->size())
 		return;   // short/invalid packet, bail.
 
 	if (packetsize > sizeof (encoded)) {  // overlarge packet?

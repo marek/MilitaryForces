@@ -802,7 +802,7 @@ void SV_ConnectionlessPacket( netadr_t from, Message *msg ) {
 	msg->beginReadingOOB();
 	msg->readLong();		// skip the -1 marker
 
-	if (!Q_strncmp("connect", reinterpret_cast<const char*>(&msg->data[4]), 7)) {
+	if (!Q_strncmp("connect", reinterpret_cast<const char*>(&msg->data()[4]), 7)) {
 		Huff_Decompress(msg, 12);
 	}
 
@@ -844,7 +844,7 @@ SV_ReadPackets
 void SV_PacketEvent( netadr_t from, Message *msg ) 
 {
 	// check for connectionless packet (0xffffffff) first
-	if( msg->cursize >= 4 && *reinterpret_cast<int *>(msg->data) == -1) 
+	if( msg->size() >= 4 && *reinterpret_cast<int *>(msg->data()) == -1) 
 	{
 		SV_ConnectionlessPacket( from, msg );
 		return;

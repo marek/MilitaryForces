@@ -45,56 +45,49 @@ int oldsize = 0;
 
 void MSG_initHuffman();
 
-void Message::init( byte *data, int length ) {
+Message::Message( byte *data, int length ) : data_( data ), maxSize_( length ) {
 	if (!msgInit) {
 		MSG_initHuffman();
 	}
-	Com_Memset (this, 0, sizeof(*this));
-	this->data = data;
-	this->maxsize = length;
 }
 
-void Message::initOOB( byte *data, int length ) {
-	if (!msgInit) {
-		MSG_initHuffman();
-	}
-	Com_Memset (this, 0, sizeof(*this));
-	this->data = data;
-	this->maxsize = length;
-	this->oob = true;
+Message Message::outOfBand( byte *data, int length ) {
+	Message msg( data, length );
+	msg.oob_ = true;
+	return msg;
 }
 
 void Message::clear() {
-	this->cursize = 0;
-	this->overflowed = false;
-	this->bit = 0;					//<- in bits
+	this->curSize_ = 0;
+	this->overflowed_ = false;
+	this->bit_ = 0;					//<- in bits
 }
 
 
 void Message::bitstream() {
-	this->oob = false;
+	this->oob_ = false;
 }
 
 void Message::beginReading() {
-	this->readcount = 0;
-	this->bit = 0;
-	this->oob = false;
+	this->readCount_ = 0;
+	this->bit_ = 0;
+	this->oob_ = false;
 }
 
 void Message::beginReadingOOB() {
-	this->readcount = 0;
-	this->bit = 0;
-	this->oob = true;
+	this->readCount_ = 0;
+	this->bit_ = 0;
+	this->oob_ = true;
 }
 
 void Message::copy( byte *data, int length, Message *src )
 {
-	if (length<src->cursize) {
+	if (length<src->curSize_) {
 		Common::error( ERR_DROP, "MSG_Copy: can't copy into a smaller Message buffer");
 	}
 	Com_Memcpy(this, src, sizeof(Message));
-	this->data = data;
-	Com_Memcpy(this->data, src->data, src->cursize);
+	this->data_ = data;
+	Com_Memcpy(this->data_, src->data_, src->curSize_);
 }
 
 /*
@@ -113,7 +106,7 @@ void Message::writeBits( int value, int bits ) {
 
 	oldsize += bits;
 
-	if ( this->overflowed ) {
+	if ( this->overflowed_ ) {
 		return;
 	}
 
@@ -125,26 +118,26 @@ void Message::writeBits( int value, int bits ) {
 		bits = -bits;
 	}
 
-	if ( this->oob ) {
-		if ( this->cursize + ( bits >> 3 ) > this->maxsize ) {
-			this->overflowed = true;
+	if ( this->oob_ ) {
+		if ( this->curSize_ + ( bits >> 3 ) > this->maxSize_ ) {
+			this->overflowed_ = true;
 			return;
 		}
 
 		if ( bits == 8 ) {
-			this->data[this->cursize] = value;
-			this->cursize += 1;
-			this->bit += 8;
+			this->data_[this->curSize_] = value;
+			this->curSize_ += 1;
+			this->bit_ += 8;
 		} else if ( bits == 16 ) {
 			short temp = value;
 
-			CopyLittleShort( &this->data[this->cursize], &temp );
-			this->cursize += 2;
-			this->bit += 16;
+			CopyLittleShort( &this->data_[this->curSize_], &temp );
+			this->curSize_ += 2;
+			this->bit_ += 16;
 		} else if ( bits==32 ) {
-			CopyLittleLong( &this->data[this->cursize], &value );
-			this->cursize += 4;
-			this->bit += 32;
+			CopyLittleLong( &this->data_[this->curSize_], &value );
+			this->curSize_ += 4;
+			this->bit_ += 32;
 		} else {
 			Common::error( ERR_DROP, "can't write %d bits", bits );
 		}
@@ -153,12 +146,12 @@ void Message::writeBits( int value, int bits ) {
 		if ( bits&7 ) {
 			int nbits;
 			nbits = bits&7;
-			if ( this->bit + nbits >= this->maxsize << 3 ) {
-				this->overflowed = true;
+			if ( this->bit_ + nbits >= this->maxSize_ << 3 ) {
+				this->overflowed_ = true;
 				return;
 			}
 			for( i = 0; i < nbits; i++ ) {
-				Huff_putBit( (value & 1), this->data, &this->bit );
+				Huff_putBit( (value & 1), this->data_, &this->bit_ );
 				value = (value >> 1);
 			}
 			bits = bits - nbits;
@@ -168,16 +161,16 @@ void Message::writeBits( int value, int bits ) {
 				if ( msg_huffstats && msg_huffstats->integer && !msg_huffstatsHold ) {
 					msg_huffCounts[value & 0xff]++;
 				}
-				msgHuff.compressor.offsetTransmit( (value & 0xff), this->data, &this->bit, this->maxsize << 3 );
+				msgHuff.compressor.offsetTransmit( (value & 0xff), this->data_, &this->bit_, this->maxSize_ << 3 );
 				value = (value >> 8);
 
-				if ( this->bit >= this->maxsize << 3 ) {
-					this->overflowed = true;
+				if ( this->bit_ >= this->maxSize_ << 3 ) {
+					this->overflowed_ = true;
 					return;
 				}
 			}
 		}
-		this->cursize = (this->bit >> 3) + 1;
+		this->curSize_ = (this->bit_ >> 3) + 1;
 	}
 }
 
@@ -189,7 +182,7 @@ int Message::readBits( int bits ) {
 	int			totalBits;
 //	FILE*	fp;
 
-	if ( this->readcount > this->cursize ) {
+	if ( this->readCount_ > this->curSize_ ) {
 		return 0;
 	}
 
@@ -203,32 +196,32 @@ int Message::readBits( int bits ) {
 	}
 	totalBits = bits;
 
-	if (this->oob) {
-		if (this->readcount + (bits>>3) > this->cursize) {
-			this->readcount = this->cursize + 1;
+	if (this->oob_) {
+		if (this->readCount_ + (bits>>3) > this->curSize_) {
+			this->readCount_ = this->curSize_ + 1;
 			return 0;
 		}
 
 		if(bits==8)
 		{
-			value = this->data[this->readcount];
-			this->readcount += 1;
-			this->bit += 8;
+			value = this->data_[this->readCount_];
+			this->readCount_ += 1;
+			this->bit_ += 8;
 		}
 		else if(bits==16)
 		{
 			short temp;
 			
-			CopyLittleShort(&temp, &this->data[this->readcount]);
+			CopyLittleShort(&temp, &this->data_[this->readCount_]);
 			value = temp;
-			this->readcount += 2;
-			this->bit += 16;
+			this->readCount_ += 2;
+			this->bit_ += 16;
 		}
 		else if(bits==32)
 		{
-			CopyLittleLong(&value, &this->data[this->readcount]);
-			this->readcount += 4;
-			this->bit += 32;
+			CopyLittleLong(&value, &this->data_[this->readCount_]);
+			this->readCount_ += 4;
+			this->bit_ += 32;
 		}
 		else
 			Common::error(ERR_DROP, "can't read %d bits", bits);
@@ -236,30 +229,30 @@ int Message::readBits( int bits ) {
 		nbits = 0;
 		if (bits&7) {
 			nbits = bits&7;
-			if (this->bit + nbits > this->cursize << 3) {
-				this->readcount = this->cursize + 1;
+			if (this->bit_ + nbits > this->curSize_ << 3) {
+				this->readCount_ = this->curSize_ + 1;
 				return 0;
 			}
 			for(i=0;i<nbits;i++) {
-				value |= (Huff_getBit(this->data, &this->bit)<<i);
+				value |= (Huff_getBit(this->data_, &this->bit_)<<i);
 			}
 			bits = bits - nbits;
 		}
 		if (bits) {
 //			fp = fopen("c:\\netchan.bin", "a");
 			for(i=0;i<bits;i+=8) {
-				Huff_offsetReceive (msgHuff.decompressor.tree, &get, this->data, &this->bit, this->cursize<<3);
+				Huff_offsetReceive (msgHuff.decompressor.tree, &get, this->data_, &this->bit_, this->curSize_<<3);
 //				fwrite(&get, 1, 1, fp);
 				value = static_cast<unsigned int>(value) | (static_cast<unsigned int>(get)<<(i+nbits));
 
-				if (this->bit > this->cursize<<3) {
-					this->readcount = this->cursize + 1;
+				if (this->bit_ > this->curSize_<<3) {
+					this->readCount_ = this->curSize_ + 1;
 					return 0;
 				}
 			}
 //			fclose(fp);
 		}
-		this->readcount = (this->bit>>3)+1;
+		this->readCount_ = (this->bit_>>3)+1;
 	}
 	if ( sgn && totalBits > 0 && totalBits < 32 ) {
 		if ( value & ( 1 << ( totalBits - 1 ) ) ) {
@@ -394,7 +387,7 @@ int Message::readChar() {
 	int	c;
 	
 	c = static_cast<signed char>(this->readBits( 8 ));
-	if ( this->readcount > this->cursize ) {
+	if ( this->readCount_ > this->curSize_ ) {
 		c = -1;
 	}	
 	
@@ -405,7 +398,7 @@ int Message::readByte() {
 	int	c;
 	
 	c = static_cast<unsigned char>(this->readBits( 8 ));
-	if ( this->readcount > this->cursize ) {
+	if ( this->readCount_ > this->curSize_ ) {
 		c = -1;
 	}	
 	return c;
@@ -413,12 +406,12 @@ int Message::readByte() {
 
 int Message::lookaheadByte() {
 	const int bloc = Huff_getBloc();
-	const int readcount = this->readcount;
-	const int bit = this->bit;
+	const int readcount = this->readCount_;
+	const int bit = this->bit_;
 	int c = this->readByte();
 	Huff_setBloc(bloc);
-	this->readcount = readcount;
-	this->bit = bit;
+	this->readCount_ = readcount;
+	this->bit_ = bit;
 	return c;
 }
 
@@ -426,7 +419,7 @@ int Message::readShort() {
 	int	c;
 	
 	c = static_cast<short>(this->readBits( 16 ));
-	if ( this->readcount > this->cursize ) {
+	if ( this->readCount_ > this->curSize_ ) {
 		c = -1;
 	}	
 
@@ -437,7 +430,7 @@ int Message::readLong() {
 	int	c;
 	
 	c = this->readBits( 32 );
-	if ( this->readcount > this->cursize ) {
+	if ( this->readCount_ > this->curSize_ ) {
 		c = -1;
 	}	
 	
@@ -448,7 +441,7 @@ float Message::readFloat() {
 	floatint_t dat;
 	
 	dat.i = this->readBits( 32 );
-	if ( this->readcount > this->cursize ) {
+	if ( this->readCount_ > this->curSize_ ) {
 		dat.f = -1;
 	}	
 	
@@ -1060,10 +1053,10 @@ void Message::readDeltaEntity( entityState_t *from, entityState_t *to, int numbe
 		Common::error( ERR_DROP, "Bad delta entity number: %i", number );
 	}
 
-	if ( this->bit == 0 ) {
-		startBit = this->readcount * 8 - GENTITYNUM_BITS;
+	if ( this->bit_ == 0 ) {
+		startBit = this->readCount_ * 8 - GENTITYNUM_BITS;
 	} else {
-		startBit = ( this->readcount - 1 ) * 8 + this->bit - GENTITYNUM_BITS;
+		startBit = ( this->readCount_ - 1 ) * 8 + this->bit_ - GENTITYNUM_BITS;
 	}
 
 	// check for a remove
@@ -1071,7 +1064,7 @@ void Message::readDeltaEntity( entityState_t *from, entityState_t *to, int numbe
 		Com_Memset( to, 0, sizeof( *to ) );	
 		to->number = ENTITYNUM_WIRE_END;
 		if ( cl_shownet && ( cl_shownet->integer >= 2 || cl_shownet->integer == -1 ) ) {
-			Common::printf( "%3i: #%-3i remove\n", this->readcount, number );
+			Common::printf( "%3i: #%-3i remove\n", this->readCount_, number );
 		}
 		return;
 	}
@@ -1094,7 +1087,7 @@ void Message::readDeltaEntity( entityState_t *from, entityState_t *to, int numbe
 	// just print the delta records`
 	if ( cl_shownet && ( cl_shownet->integer >= 2 || cl_shownet->integer == -1 ) ) {
 		print = 1;
-		Common::printf( "%3i: #%-3i ", this->readcount, to->number );
+		Common::printf( "%3i: #%-3i ", this->readCount_, to->number );
 	} else {
 		print = 0;
 	}
@@ -1165,10 +1158,10 @@ void Message::readDeltaEntity( entityState_t *from, entityState_t *to, int numbe
 
 	// print ?
 	if ( print ) {
-		if ( this->bit == 0 ) {
-			endBit = this->readcount * 8 - GENTITYNUM_BITS;
+		if ( this->bit_ == 0 ) {
+			endBit = this->readCount_ * 8 - GENTITYNUM_BITS;
 		} else {
-			endBit = ( this->readcount - 1 ) * 8 + this->bit - GENTITYNUM_BITS;
+			endBit = ( this->readCount_ - 1 ) * 8 + this->bit_ - GENTITYNUM_BITS;
 		}
 		Common::printf( " (%i bits)\n", endBit - startBit  );
 	}
@@ -1266,7 +1259,7 @@ void Message::writeDeltaPlayerstate( struct playerState_s *from, struct playerSt
 		Com_Memset (&dummy, 0, sizeof(dummy));
 	}
 
-	c = this->cursize;
+	c = this->curSize_;
 
 	numFields = sizeof( playerStateFields ) / sizeof( playerStateFields[0] );
 
@@ -1315,7 +1308,7 @@ void Message::writeDeltaPlayerstate( struct playerState_s *from, struct playerSt
 			this->writeBits( *toF, field->bits );
 		}
 	}
-	c = this->cursize - c;
+	c = this->curSize_ - c;
 
 
 	//
@@ -1439,17 +1432,17 @@ void Message::readDeltaPlayerstate( playerState_t *from, playerState_t *to ) {
 	}
 	*to = *from;
 
-	if ( this->bit == 0 ) {
-		startBit = this->readcount * 8 - GENTITYNUM_BITS;
+	if ( this->bit_ == 0 ) {
+		startBit = this->readCount_ * 8 - GENTITYNUM_BITS;
 	} else {
-		startBit = ( this->readcount - 1 ) * 8 + this->bit - GENTITYNUM_BITS;
+		startBit = ( this->readCount_ - 1 ) * 8 + this->bit_ - GENTITYNUM_BITS;
 	}
 
 	// shownet 2/3 will interleave with other printed info, -2 will
 	// just print the delta records
 	if ( cl_shownet && ( cl_shownet->integer >= 2 || cl_shownet->integer == -2 ) ) {
 		print = 1;
-		Common::printf( "%3i: playerstate ", this->readcount );
+		Common::printf( "%3i: playerstate ", this->readCount_ );
 	} else {
 		print = 0;
 	}
@@ -1564,10 +1557,10 @@ void Message::readDeltaPlayerstate( playerState_t *from, playerState_t *to ) {
 	}
 
 	if ( print ) {
-		if ( this->bit == 0 ) {
-			endBit = this->readcount * 8 - GENTITYNUM_BITS;
+		if ( this->bit_ == 0 ) {
+			endBit = this->readCount_ * 8 - GENTITYNUM_BITS;
 		} else {
-			endBit = ( this->readcount - 1 ) * 8 + this->bit - GENTITYNUM_BITS;
+			endBit = ( this->readCount_ - 1 ) * 8 + this->bit_ - GENTITYNUM_BITS;
 		}
 		Common::printf( " (%i bits)\n", endBit - startBit  );
 	}

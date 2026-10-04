@@ -56,7 +56,7 @@ void SV_Client::netchanTransmitNextInQueue()
 	Common::dPrintf("#462 Netchan_TransmitNextFragment: popping a queued message for transmit\n");
 	netbuf = this->netchan_start_queue_;
 
-	this->netchan_.transmit( netbuf->msg_.cursize, netbuf->msg_.data );
+	this->netchan_.transmit( netbuf->msg_.size(), netbuf->msg_.data() );
 
 	// pop from queue
 	this->netchan_start_queue_ = netbuf->next_;
@@ -126,7 +126,7 @@ void SV_Client::netchanTransmit( Message *msg )
 	}
 	else
 	{
-		this->netchan_.transmit( msg->cursize, msg->data );
+		this->netchan_.transmit( msg->size(), msg->data() );
 	}
 }
 
