@@ -11,7 +11,7 @@ Entity_Infantry::Entity_Infantry_Touch::execute( GameEntity* other, trace_t *tra
 		( (g_gametype.integer >= GT_TEAM && other->team_ != self_->team_) ||
 		(g_gametype.integer < GT_MISSION_EDITOR) ) ) 
 	{
-		  G_Damage( self_, nullptr, other, nullptr, nullptr, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
+		  Game::damage( self_, nullptr, other, nullptr, nullptr, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 	}
 }
 
@@ -23,7 +23,7 @@ Entity_Infantry::Entity_Infantry_Pain::execute( GameEntity* attacker, int damage
 	if( damage > 50 ) 
 		damage = 50;
 
-	G_AddEvent( self_, EV_VEHICLE_HIT, damage, true );
+	Game::addEvent( self_, EV_VEHICLE_HIT, damage, true );
 }
 
 

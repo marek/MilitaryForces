@@ -105,13 +105,13 @@ static void PM_BoatAccelerate()
 
 /*
 ===================
-PM_BoatMove
+PlayerMove::boatMove
 
 ===================
 */
 bool	PM_SlideMove_Boat();
 
-void PM_BoatMove( ) 
+void PlayerMove::boatMove( ) 
 {
     vec3_t		viewdir;
     vec3_t		vehdir;
@@ -524,10 +524,10 @@ bool	PM_SlideMove_Boat() {
 			}
 
 			// slide along the plane
-			PM_ClipVelocity (pm->ps->velocity, planes[i], clipVelocity, OVERCLIP );
+			PlayerMove::clipVelocity (pm->ps->velocity, planes[i], clipVelocity, OVERCLIP );
 
 			// slide along the plane
-			PM_ClipVelocity (endVelocity, planes[i], endClipVelocity, OVERCLIP );
+			PlayerMove::clipVelocity (endVelocity, planes[i], endClipVelocity, OVERCLIP );
 
 			// see if there is a second plane that the New move enters
 			for ( j = 0 ; j < numplanes ; j++ ) {
@@ -539,8 +539,8 @@ bool	PM_SlideMove_Boat() {
 				}
 
 				// try clipping the move to the plane
-				PM_ClipVelocity( clipVelocity, planes[j], clipVelocity, OVERCLIP );
-				PM_ClipVelocity( endClipVelocity, planes[j], endClipVelocity, OVERCLIP );
+				PlayerMove::clipVelocity( clipVelocity, planes[j], clipVelocity, OVERCLIP );
+				PlayerMove::clipVelocity( endClipVelocity, planes[j], endClipVelocity, OVERCLIP );
 
 				// see if it goes back into the first clip plane
 				if ( DotProduct( clipVelocity, planes[i] ) >= 0 ) {

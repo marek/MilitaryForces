@@ -143,7 +143,7 @@ void RespawnItem( GameEntity *ent )
 	SV_LinkEntity(ent);
 
 	// play the normal respawn sound only to nearby clients
-	G_AddEvent( ent, EV_ITEM_RESPAWN, 0, true );
+	Game::addEvent( ent, EV_ITEM_RESPAWN, 0, true );
 
 	ent->nextthink_ = 0;
 }
@@ -182,7 +182,7 @@ struct Touch_ItemTouch : public GameEntity::EntityFunc_Touch
 		if ( !GameShared::canItemBeGrabbed( g_gametype.integer, &self->s, &other->client_->ps_, other->client_->vehicle_ ) ) 
 			return;
 
-		G_LogPrintf( "Item: %i %s\n", other->s.number, self->item_->classname );
+		Game::logPrintf( "Item: %i %s\n", other->s.number, self->item_->classname );
 
 		predict = other->client_->pers_.predictItemPickup_;
 
@@ -210,9 +210,9 @@ struct Touch_ItemTouch : public GameEntity::EntityFunc_Touch
 
 		// play the normal pickup sound
 		if( predict ) 
-			G_AddPredictableEvent( other, EV_ITEM_PICKUP, self->s.modelindex );
+			Game::addPredictableEvent( other, EV_ITEM_PICKUP, self->s.modelindex );
 		else 
-			G_AddEvent( other, EV_ITEM_PICKUP, self->s.modelindex, true );
+			Game::addEvent( other, EV_ITEM_PICKUP, self->s.modelindex, true );
 
 		// powerup pickups are global broadcasts
 		if( self->item_->giType == IT_TEAM) 
@@ -221,14 +221,14 @@ struct Touch_ItemTouch : public GameEntity::EntityFunc_Touch
 			if( !self->speed_ ) 
 			{
 				GameEntity	*te;
-				te = G_TempEntity( self->s.pos.trBase, EV_GLOBAL_ITEM_PICKUP );
+				te = Game::tempEntity( self->s.pos.trBase, EV_GLOBAL_ITEM_PICKUP );
 				te->s.eventParm = self->s.modelindex;
 				te->r.svFlags |= SVF_BROADCAST;
 			} 
 			else 
 			{
 				GameEntity	*te;
-				te = G_TempEntity( self->s.pos.trBase, EV_GLOBAL_ITEM_PICKUP );
+				te = Game::tempEntity( self->s.pos.trBase, EV_GLOBAL_ITEM_PICKUP );
 				te->s.eventParm = self->s.modelindex;
 				// only send this temp entity to a single client
 				te->r.svFlags |= SVF_SINGLECLIENT;
@@ -237,7 +237,7 @@ struct Touch_ItemTouch : public GameEntity::EntityFunc_Touch
 		}
 
 		// fire item targets
-		G_UseTargets (self, other);
+		Game::useTargets (self, other);
 
 		// wait of -1 will not respawn
 		if( self->wait_ == -1 ) 
@@ -325,7 +325,7 @@ GameEntity *LaunchItem( gitem_t *item, vec3_t origin, vec3_t velocity )
 
 	dropped->setTouch( std::make_unique<Touch_ItemTouch>());
 
-	G_SetOrigin( dropped, origin );
+	Game::setOrigin( dropped, origin );
 	dropped->s.pos.trType = TR_GRAVITY;
 	dropped->s.pos.trTime = theLevel.time_;
 	VectorCopy( velocity, dropped->s.pos.trDelta );
@@ -423,7 +423,7 @@ void GameItem::Think_FinishSpawningItem::execute()
 	if( self_->spawnflags_ & 1 ) 
 	{
 		// suspended
-		G_SetOrigin( self_, self_->s.origin );
+		Game::setOrigin( self_, self_->s.origin );
 	} 
 	else 
 	{
@@ -441,7 +441,7 @@ void GameItem::Think_FinishSpawningItem::execute()
 		// allow to ride movers
 		self_->s.groundEntityNum = tr.entityNum;
 
-		G_SetOrigin( self_, tr.endpos );
+		Game::setOrigin( self_, tr.endpos );
 	}
 
 	// team slaves and targeted items aren't present at start
@@ -459,10 +459,10 @@ bool	itemRegistered[MAX_ITEMS];
 
 /*
 ==================
-G_CheckTeamItems
+Game::checkTeamItems
 ==================
 */
-void G_CheckTeamItems() 
+void Game::checkTeamItems() 
 {
 
 	// Set up team stuff
@@ -565,8 +565,8 @@ void SaveRegisteredItems()
 //*/
 //void G_SpawnItem( SpawnFieldHolder *sfh, gitem_t *item ) 
 //{
-//	G_SpawnFloat( "random", "0", &ent->random_ );
-//	G_SpawnFloat( "wait", "0", &ent->wait_ );
+//	Game::spawnFloat( "random", "0", &ent->random_ );
+//	Game::spawnFloat( "wait", "0", &ent->wait_ );
 //
 //	RegisterItem( item );
 ////	if ( G_ItemDisabled(item) )		// MFQ3
@@ -608,7 +608,7 @@ void G_BounceItem( GameEntity *ent, trace_t *trace )
 	{
 		trace->endpos[2] += 1.0;	// make sure it is off ground
 		SnapVector( trace->endpos );
-		G_SetOrigin( ent, trace->endpos );
+		Game::setOrigin( ent, trace->endpos );
 		ent->s.groundEntityNum = trace->entityNum;
 		return;
 	}
@@ -621,11 +621,11 @@ void G_BounceItem( GameEntity *ent, trace_t *trace )
 
 /*
 ================
-G_RunItem
+Game::runItem
 
 ================
 */
-void G_RunItem( GameEntity *ent )
+void Game::runItem( GameEntity *ent )
 {
 	vec3_t		origin;
 	trace_t		tr;
@@ -645,7 +645,7 @@ void G_RunItem( GameEntity *ent )
 	if ( ent->s.pos.trType == TR_STATIONARY )
 	{
 		// check think function
-		G_RunThink( ent );
+		Game::runThink( ent );
 		return;
 	}
 
@@ -669,7 +669,7 @@ void G_RunItem( GameEntity *ent )
 	SV_LinkEntity( ent );	// FIXME: avoid this for stationary?
 
 	// check think function
-	G_RunThink( ent );
+	Game::runThink( ent );
 
 	if ( tr.fraction == 1 ) 
 		return;

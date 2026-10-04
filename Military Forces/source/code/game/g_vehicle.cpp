@@ -64,11 +64,11 @@ VehicleDeathImpl( GameEntity* self, GameEntity* inflictor, GameEntity* attacker,
 	else 
 		obit = modNames[ meansOfDeath ];
 
-	G_LogPrintf( "Kill: %i %i %i: %s killed %s by %s\n", killer, self->s.number, meansOfDeath, killerName, 
+	Game::logPrintf( "Kill: %i %i %i: %s killed %s by %s\n", killer, self->s.number, meansOfDeath, killerName, 
 				 self->client_->pers_.netname_, obit );
 
 	// broadcast the death event to everyone
-	ent = G_TempEntity( self->r.currentOrigin, EV_OBITUARY );
+	ent = Game::tempEntity( self->r.currentOrigin, EV_OBITUARY );
 	ent->s.eventParm = meansOfDeath;
 	ent->s.otherEntityNum = self->s.number;
 	ent->s.otherEntityNum2 = killer;
@@ -203,7 +203,7 @@ VehicleDeathImpl( GameEntity* self, GameEntity* inflictor, GameEntity* attacker,
 		ExplodeVehicle( self );
 
 		// create radius explosion damage
-		G_RadiusDamage( self->r.currentOrigin, self, 150, 150, self, MOD_VEHICLEEXPLOSION, CAT_ANY );
+		Game::radiusDamage( self->r.currentOrigin, self, 150, 150, self, MOD_VEHICLEEXPLOSION, CAT_ANY );
 
 	}
 	else if ( availableVehicles[self->client_->vehicle_].cat & CAT_LQM ) 
@@ -214,7 +214,7 @@ VehicleDeathImpl( GameEntity* self, GameEntity* inflictor, GameEntity* attacker,
 	else
 	{
 		// create a smaller vehicle explosion
-		G_AddEvent( self, EV_VEHICLE_DIE, 0, true );
+		Game::addEvent( self, EV_VEHICLE_DIE, 0, true );
 
 		// wreck can be blown up (i.e on crash into ground)
 		self->setDie( std::make_unique<VehicleBase::VehicleDie>());

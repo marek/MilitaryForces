@@ -295,7 +295,7 @@ bool G_MoverPush( GameEntity *pusher, vec3_t move, vec3_t amove, GameEntity **ob
 		// bobbing entities are instant-kill and never get blocked
 		if ( pusher->s.pos.trType == TR_SINE || pusher->s.apos.trType == TR_SINE )
 		{
-			G_Damage( check, pusher, pusher, nullptr, nullptr, 99999, 0, MOD_CRUSH, CAT_ANY );
+			Game::damage( check, pusher, pusher, nullptr, nullptr, 99999, 0, MOD_CRUSH, CAT_ANY );
 			continue;
 		}
 
@@ -386,11 +386,11 @@ void G_MoverTeam( GameEntity *ent )
 
 /*
 ================
-G_RunMover
+Game::runMover
 
 ================
 */
-void G_RunMover( GameEntity *ent ) 
+void Game::runMover( GameEntity *ent ) 
 {
 	// if not a team captain, don't do anything, because
 	// the captain will handle everything
@@ -402,7 +402,7 @@ void G_RunMover( GameEntity *ent )
 		G_MoverTeam( ent );
 
 	// check think function
-	G_RunThink( ent );
+	Game::runThink( ent );
 }
 
 /*
@@ -493,7 +493,7 @@ struct Think_ReturnToPos1 : public GameEntity::EntityFunc_Think
 
 		// starting sound
 		if ( self_->sound2to1_ ) 
-			G_AddEvent( self_, EV_GENERAL_SOUND, self_->sound2to1_, true );
+			Game::addEvent( self_, EV_GENERAL_SOUND, self_->sound2to1_, true );
 	}
 };
 
@@ -518,7 +518,7 @@ struct Reached_BinaryMover : public GameEntity::EntityFunc_Reached
 
 			// play sound
 			if ( self->soundPos2_ ) 
-				G_AddEvent( self, EV_GENERAL_SOUND, self->soundPos2_, true );
+				Game::addEvent( self, EV_GENERAL_SOUND, self->soundPos2_, true );
 
 			// return to pos1 after a delay
 			self->setThink( std::make_unique<Think_ReturnToPos1>());
@@ -528,7 +528,7 @@ struct Reached_BinaryMover : public GameEntity::EntityFunc_Reached
 			if ( !self->activator_ ) 
 				self->activator_ = self;
 
-			G_UseTargets( self, self->activator_ );
+			Game::useTargets( self, self->activator_ );
 		} 
 		else if ( self->moverState_ == GameEntity::MOVER_2TO1 ) 
 		{
@@ -537,7 +537,7 @@ struct Reached_BinaryMover : public GameEntity::EntityFunc_Reached
 
 			// play sound
 			if ( self->soundPos1_ ) 
-				G_AddEvent( self, EV_GENERAL_SOUND, self->soundPos1_, true );
+				Game::addEvent( self, EV_GENERAL_SOUND, self->soundPos1_, true );
 
 			// close areaportals
 			if ( self->teammaster_ == self || !self->teammaster_ ) 
@@ -575,7 +575,7 @@ void Use_BinaryMoverImpl( GameEntity *ent, GameEntity *other, GameEntity *activa
 
 		// starting sound
 		if ( ent->sound1to2_ ) 
-			G_AddEvent( ent, EV_GENERAL_SOUND, ent->sound1to2_, true );
+			Game::addEvent( ent, EV_GENERAL_SOUND, ent->sound1to2_, true );
 
 		// looping sound
 		ent->s.loopSound = ent->soundLoop_;
@@ -604,7 +604,7 @@ void Use_BinaryMoverImpl( GameEntity *ent, GameEntity *other, GameEntity *activa
 		MatchTeam( ent, GameEntity::MOVER_1TO2, theLevel.time_ - ( total - partial ) );
 
 		if ( ent->sound1to2_ ) 
-			G_AddEvent( ent, EV_GENERAL_SOUND, ent->sound1to2_, true );
+			Game::addEvent( ent, EV_GENERAL_SOUND, ent->sound1to2_, true );
 		return;
 	}
 
@@ -619,7 +619,7 @@ void Use_BinaryMoverImpl( GameEntity *ent, GameEntity *other, GameEntity *activa
 		MatchTeam( ent, GameEntity::MOVER_2TO1, theLevel.time_ - ( total - partial ) );
 
 		if ( ent->sound2to1_ ) 
-			G_AddEvent( ent, EV_GENERAL_SOUND, ent->sound2to1_, true );
+			Game::addEvent( ent, EV_GENERAL_SOUND, ent->sound2to1_, true );
 
 		return;
 	}
@@ -654,16 +654,16 @@ void InitMover( GameEntity *ent )
 	// if the "model2" key is set, use a seperate model
 	// for drawing, but clip against the brushes
 	if ( ent->model2_ ) {
-		ent->s.modelindex2 = G_ModelIndex( ent->model2_ );
+		ent->s.modelindex2 = Game::modelIndex( ent->model2_ );
 	}
 
 	// if the "loopsound" key is set, use a constant looping sound when moving
-	if ( G_SpawnString( "noise", "100", &sound ) ) 
-		ent->s.loopSound = G_SoundIndex( sound );
+	if ( Game::spawnString( "noise", "100", &sound ) ) 
+		ent->s.loopSound = Game::soundIndex( sound );
 
 	// if the "color" or "light" keys are set, setup constantLight
-	lightSet = G_SpawnFloat( "light", "100", &light );
-	colorSet = G_SpawnVector( "color", "1 1 1", color );
+	lightSet = Game::spawnFloat( "light", "100", &light );
+	colorSet = Game::spawnVector( "color", "1 1 1", color );
 	if ( lightSet || colorSet ) {
 		int		r, g, b, i;
 
@@ -741,13 +741,13 @@ struct Blocked_DoorBlocked : public GameEntity::EntityFunc_Blocked
 				Team_DroppedFlagThink( other );
 				return;
 			}
-			G_TempEntity( other->s.origin, EV_ITEM_POP );
+			Game::tempEntity( other->s.origin, EV_ITEM_POP );
 			other->freeUp();
 			return;
 		}
 
 		if ( self_->damage_ ) 
-			G_Damage( other, self_, self_, nullptr, nullptr, self_->damage_
+			Game::damage( other, self_, self_, nullptr, nullptr, self_->damage_
 			, 0, MOD_CRUSH, CAT_ANY );
 
 		if ( self_->spawnflags_ & 4 ) 
@@ -860,8 +860,8 @@ void SP_func_door (GameEntity *ent)
 	vec3_t	size;
 	float	lip;
 
-	ent->sound1to2_ = ent->sound2to1_ = G_SoundIndex("sound/movers/doors/dr1_strt.wav");
-	ent->soundPos1_ = ent->soundPos2_ = G_SoundIndex("sound/movers/doors/dr1_end.wav");
+	ent->sound1to2_ = ent->sound2to1_ = Game::soundIndex("sound/movers/doors/dr1_strt.wav");
+	ent->soundPos1_ = ent->soundPos2_ = Game::soundIndex("sound/movers/doors/dr1_end.wav");
 
 	ent->setBlocked( std::make_unique<Blocked_DoorBlocked>());
 
@@ -875,17 +875,17 @@ void SP_func_door (GameEntity *ent)
 	ent->wait_ *= 1000;
 
 	// default lip of 8 units
-	G_SpawnFloat( "lip", "8", &lip );
+	Game::spawnFloat( "lip", "8", &lip );
 
 	// default damage of 2 points
-	G_SpawnInt( "dmg", "2", &ent->damage_ );
+	Game::spawnInt( "dmg", "2", &ent->damage_ );
 
 	// first position at start
 	VectorCopy( ent->s.origin, ent->pos1_ );
 
 	// calculate second position
 	SV_SetBrushModel( ent, ent->model_ );
-	G_SetMovedir( ent->s.angles, ent->movedir_ );
+	Game::setMovedir( ent->s.angles, ent->movedir_ );
 	abs_movedir[0] = fabs(ent->movedir_[0]);
 	abs_movedir[1] = fabs(ent->movedir_[1]);
 	abs_movedir[2] = fabs(ent->movedir_[2]);
@@ -911,7 +911,7 @@ void SP_func_door (GameEntity *ent)
 	{
 		int health;
 
-		G_SpawnInt( "health", "0", &health );
+		Game::spawnInt( "health", "0", &health );
 		if ( health ) 
 			ent->takedamage_ = true;
 		if ( ent->targetname_ || health ) 
@@ -1035,16 +1035,16 @@ Plats are always drawn in the extended position so they will light correctly.
 */
 void SP_func_plat (GameEntity *ent) 
 {
-	ent->sound1to2_ = ent->sound2to1_ = G_SoundIndex("sound/movers/plats/pt1_strt.wav");
-	ent->soundPos1_ = ent->soundPos2_ = G_SoundIndex("sound/movers/plats/pt1_end.wav");
+	ent->sound1to2_ = ent->sound2to1_ = Game::soundIndex("sound/movers/plats/pt1_strt.wav");
+	ent->soundPos1_ = ent->soundPos2_ = Game::soundIndex("sound/movers/plats/pt1_end.wav");
 
 	VectorClear(ent->s.angles);
 
-	G_SpawnFloat( "speed", "20", &ent->speed_ );
-	G_SpawnInt( "dmg", "2", &ent->damage_ );
-	G_SpawnFloat( "wait", "1", &ent->wait_ );
+	Game::spawnFloat( "speed", "20", &ent->speed_ );
+	Game::spawnInt( "dmg", "2", &ent->damage_ );
+	Game::spawnFloat( "wait", "1", &ent->wait_ );
 	float lip;
-	G_SpawnFloat( "lip", "8", &lip );
+	Game::spawnFloat( "lip", "8", &lip );
 
 	ent->wait_ = 1000;
 
@@ -1055,7 +1055,7 @@ void SP_func_plat (GameEntity *ent)
 	SV_SetBrushModel( ent, ent->model_ );
 
 	float height;
-	if( !G_SpawnFloat( "height", "0", &height ) ) 
+	if( !Game::spawnFloat( "height", "0", &height ) ) 
 		height = (ent->r.maxs[2] - ent->r.mins[2]) - lip;
 
 	// pos1 is the rest (bottom) position, pos2 is the top
@@ -1120,7 +1120,7 @@ When a button is touched, it moves some distance in the direction of it's angle,
 */
 void SP_func_button( GameEntity *ent ) 
 {
-	ent->sound1to2_ = G_SoundIndex("sound/movers/switches/butn2.wav");
+	ent->sound1to2_ = Game::soundIndex("sound/movers/switches/butn2.wav");
 	
 	if( !ent->speed_ ) 
 		ent->speed_ = 40;
@@ -1136,9 +1136,9 @@ void SP_func_button( GameEntity *ent )
 	SV_SetBrushModel( ent, ent->model_ );
 
 	float lip;
-	G_SpawnFloat( "lip", "4", &lip );
+	Game::spawnFloat( "lip", "4", &lip );
 
-	G_SetMovedir( ent->s.angles, ent->movedir_ );
+	Game::setMovedir( ent->s.angles, ent->movedir_ );
 	vec3_t abs_movedir;
 	abs_movedir[0] = fabs(ent->movedir_[0]);
 	abs_movedir[1] = fabs(ent->movedir_[1]);
@@ -1211,7 +1211,7 @@ void Reached_TrainImpl( GameEntity *ent )
 		return;		// just stop
 
 	// fire all other targets
-	G_UseTargets( next, nullptr );
+	Game::useTargets( next, nullptr );
 
 	// set the New trajectory
 	ent->nextTrain_ = next->nextTrain_;
@@ -1264,7 +1264,7 @@ struct Think_SetupTrainTargets : public GameEntity::EntityFunc_Think
 	{
 		GameEntity		*path, *next;
 
-		self_->nextTrain_ = G_Find( nullptr, FOFS(targetname_), self_->target_ );
+		self_->nextTrain_ = Game::find( nullptr, FOFS(targetname_), self_->target_ );
 		if( !self_->nextTrain_ ) 
 		{
 			Common::printf( "func_train at %s with an unfound target\n",
@@ -1290,7 +1290,7 @@ struct Think_SetupTrainTargets : public GameEntity::EntityFunc_Think
 			// is reached
 			next = nullptr;
 			do {
-				next = G_Find( next, FOFS(targetname_), path->target_ );
+				next = Game::find( next, FOFS(targetname_), path->target_ );
 				if( !next ) 
 				{
 					Common::printf( "Train corner at %s without a target path_corner\n",
@@ -1480,7 +1480,7 @@ struct Touch_FuncBobbing : public GameEntity::EntityFunc_Touch
 		if( !other->client_ ) 
 			return;
 
-		G_Damage( other, nullptr, other, nullptr, nullptr, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
+		Game::damage( other, nullptr, other, nullptr, nullptr, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 
 	}
 };
@@ -1490,10 +1490,10 @@ void SP_func_bobbing (GameEntity *ent)
 	float		height;
 	float		phase;
 
-	G_SpawnFloat( "speed", "4", &ent->speed_ );
-	G_SpawnFloat( "height", "32", &height );
-	G_SpawnInt( "dmg", "2", &ent->damage_ );
-	G_SpawnFloat( "phase", "0", &phase );
+	Game::spawnFloat( "speed", "4", &ent->speed_ );
+	Game::spawnFloat( "height", "32", &height );
+	Game::spawnInt( "dmg", "2", &ent->damage_ );
+	Game::spawnFloat( "phase", "0", &phase );
 
 	SV_SetBrushModel( ent, ent->model_ );
 	InitMover( ent );
@@ -1542,9 +1542,9 @@ void SP_func_pendulum(GameEntity *ent)
 	float		phase;
 	float		speed;
 
-	G_SpawnFloat( "speed", "30", &speed );
-	G_SpawnInt( "dmg", "2", &ent->damage_ );
-	G_SpawnFloat( "phase", "0", &phase );
+	Game::spawnFloat( "speed", "30", &speed );
+	Game::spawnInt( "dmg", "2", &ent->damage_ );
+	Game::spawnFloat( "phase", "0", &phase );
 
 	SV_SetBrushModel( ent, ent->model_ );
 

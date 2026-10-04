@@ -18,7 +18,7 @@ constexpr float MIN_WALK_NORMAL = 0.4f;
 
 /*
 ===================
-PM_LQMMove
+PlayerMove::lQMMove
 
 ===================
 */
@@ -77,7 +77,7 @@ void PM_LQMGroundTrace( )
 	pm->ps->groundEntityNum = trace.entityNum;
 }
 
-void PM_LQMMove( ) 
+void PlayerMove::lQMMove( ) 
 {
     vec3_t	viewdir;
     bool	dead = (pm->ps->stats[STAT_HEALTH] <= 0);
@@ -378,10 +378,10 @@ bool	PM_SlideMove_LQM() {
 			}
 
 			// slide along the plane
-			PM_ClipVelocity (pm->ps->velocity, planes[i], clipVelocity, OVERCLIP );
+			PlayerMove::clipVelocity (pm->ps->velocity, planes[i], clipVelocity, OVERCLIP );
 
 			// slide along the plane
-			PM_ClipVelocity (endVelocity, planes[i], endClipVelocity, OVERCLIP );
+			PlayerMove::clipVelocity (endVelocity, planes[i], endClipVelocity, OVERCLIP );
 
 			// see if there is a second plane that the New move enters
 			for ( j = 0 ; j < numplanes ; j++ ) {
@@ -393,8 +393,8 @@ bool	PM_SlideMove_LQM() {
 				}
 
 				// try clipping the move to the plane
-				PM_ClipVelocity( clipVelocity, planes[j], clipVelocity, OVERCLIP );
-				PM_ClipVelocity( endClipVelocity, planes[j], endClipVelocity, OVERCLIP );
+				PlayerMove::clipVelocity( clipVelocity, planes[j], clipVelocity, OVERCLIP );
+				PlayerMove::clipVelocity( endClipVelocity, planes[j], endClipVelocity, OVERCLIP );
 
 				// see if it goes back into the first clip plane
 				if ( DotProduct( clipVelocity, planes[i] ) >= 0 ) {
@@ -485,6 +485,6 @@ void PM_StepSlideMove_LQM() {
 	if ( !trace.allsolid )
 		VectorCopy (trace.endpos, pm->ps->origin);
 	if ( trace.fraction < 1.0 )
-		PM_ClipVelocity( pm->ps->velocity, trace.plane.normal, pm->ps->velocity, OVERCLIP );
+		PlayerMove::clipVelocity( pm->ps->velocity, trace.plane.normal, pm->ps->velocity, OVERCLIP );
 
 }

@@ -64,12 +64,12 @@ Entity_Helicopter::checkForTakeoffOrLanding()
 				}
 				else 
 				{
-					G_Damage( this, nullptr, this, nullptr, nullptr, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
+					Game::damage( this, nullptr, this, nullptr, nullptr, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 				}
 			} 
 			else
 			{
-				G_Damage( this, nullptr, this, nullptr, nullptr, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
+				Game::damage( this, nullptr, this, nullptr, nullptr, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 			}
 		}
 	}
@@ -79,7 +79,7 @@ Entity_Helicopter::checkForTakeoffOrLanding()
 void
 Entity_Helicopter::Entity_Helicopter_Touch::execute( GameEntity* other, trace_t *trace )
 {
-	G_Damage( self_, nullptr, self_, nullptr, nullptr, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
+	Game::damage( self_, nullptr, self_, nullptr, nullptr, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 }
 
 void
@@ -90,7 +90,7 @@ Entity_Helicopter::Entity_Helicopter_Pain::execute( GameEntity* attacker, int da
 	if( damage > 50 ) 
 		damage = 50;
 
-	G_AddEvent( self_, EV_VEHICLE_HIT, damage, true );
+	Game::addEvent( self_, EV_VEHICLE_HIT, damage, true );
 }
 
 

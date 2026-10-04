@@ -306,13 +306,13 @@ static void PM_AdjustToTerrain( )
 
 /*
 ===================
-PM_GroundVehicleMove
+PlayerMove::groundVehicleMove
 
 ===================
 */
 bool	PM_SlideMove_GV();
 
-void PM_GroundVehicleMove( ) 
+void PlayerMove::groundVehicleMove( ) 
 {
 	// like in the q3tank mod and airq2 the left/right keys turn the hull of the tank
 	// while the mouse turns the turret/gunbarrel; and also like in airq2 we will later
@@ -637,10 +637,10 @@ bool	PM_SlideMove_GV() {
 			}
 
 			// slide along the plane
-			PM_ClipVelocity (pm->ps->velocity, planes[i], clipVelocity, OVERCLIP );
+			PlayerMove::clipVelocity (pm->ps->velocity, planes[i], clipVelocity, OVERCLIP );
 
 			// slide along the plane
-			PM_ClipVelocity (endVelocity, planes[i], endClipVelocity, OVERCLIP );
+			PlayerMove::clipVelocity (endVelocity, planes[i], endClipVelocity, OVERCLIP );
 
 			// see if there is a second plane that the New move enters
 			for ( j = 0 ; j < numplanes ; j++ ) {
@@ -652,8 +652,8 @@ bool	PM_SlideMove_GV() {
 				}
 
 				// try clipping the move to the plane
-				PM_ClipVelocity( clipVelocity, planes[j], clipVelocity, OVERCLIP );
-				PM_ClipVelocity( endClipVelocity, planes[j], endClipVelocity, OVERCLIP );
+				PlayerMove::clipVelocity( clipVelocity, planes[j], clipVelocity, OVERCLIP );
+				PlayerMove::clipVelocity( endClipVelocity, planes[j], endClipVelocity, OVERCLIP );
 
 				// see if it goes back into the first clip plane
 				if ( DotProduct( clipVelocity, planes[i] ) >= 0 ) {

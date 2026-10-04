@@ -11,7 +11,7 @@ Entity_GroundVehicle::Entity_GroundVehicle_Pain::execute( GameEntity* attacker, 
 	if( damage > 50 ) 
 		damage = 50;
 
-	G_AddEvent( self_, EV_VEHICLE_HIT, damage, true );
+	Game::addEvent( self_, EV_VEHICLE_HIT, damage, true );
 }
 
 

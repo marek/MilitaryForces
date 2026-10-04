@@ -43,14 +43,14 @@ void Die_ExplosiveDie::execute( GameEntity *inflictor, GameEntity *attacker, int
 	}
 
 	// broadcast the death event to everyone
-	ent = G_TempEntity( pos, EV_BUILDING_EXPLODE );
+	ent = Game::tempEntity( pos, EV_BUILDING_EXPLODE );
 	ent->r.svFlags = SVF_BROADCAST;	// send to everyone
 	ent->s.eventParm = 1;
 
 	if( ent->target_ ) 
 	{
 		GameEntity* t = nullptr;
-		while( (t = G_Find (t, FOFS(targetname_), ent->target_)) != nullptr ) 
+		while( (t = Game::find (t, FOFS(targetname_), ent->target_)) != nullptr ) 
 		{
 			if ( t == ent ) 
 			{
@@ -282,7 +282,7 @@ void Touch_RadioTower::execute( GameEntity *other, trace_t *trace )
 
 void Think_RadioComply::execute()
 {
-	G_UseTargets( self_, nullptr );
+	Game::useTargets( self_, nullptr );
 }
 
 

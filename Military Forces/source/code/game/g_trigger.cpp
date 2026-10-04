@@ -11,7 +11,7 @@
 void InitTrigger( GameEntity *self ) 
 {
 	if( !VectorCompare(self->s.angles, vec3_origin) )
-		G_SetMovedir (self->s.angles, self->movedir_);
+		Game::setMovedir (self->s.angles, self->movedir_);
 
 	SV_SetBrushModel( self, self->model_ );
 	self->r.contents = CONTENTS_TRIGGER;		// replaces the -1 from SV_SetBrushModel
@@ -51,7 +51,7 @@ void multi_trigger( GameEntity *ent, GameEntity *activator )
 		}
 	}
 
-	G_UseTargets(ent, ent->activator_);
+	Game::useTargets(ent, ent->activator_);
 
 	if( ent->wait_ > 0 ) 
 	{
@@ -96,8 +96,8 @@ so, the basic time between firing is a random time between
 */
 void SP_trigger_multiple( GameEntity *ent )
 {
-	G_SpawnFloat( "wait", "0.5", &ent->wait_ );
-	G_SpawnFloat( "random", "0", &ent->random_ );
+	Game::spawnFloat( "wait", "0.5", &ent->wait_ );
+	Game::spawnFloat( "random", "0", &ent->random_ );
 
 	if( ent->random_ >= ent->wait_ && ent->wait_ >= 0 ) 
 	{
@@ -126,7 +126,7 @@ struct Think_TriggerAlwaysThink : public GameEntity::EntityFunc_Think
 {
 	void execute() override 
 	{
-		G_UseTargets(self_, self_);
+		Game::useTargets(self_, self_);
 		self_->freeUp();
 	}
 };
@@ -166,7 +166,7 @@ struct Think_FuncTimer : public GameEntity::EntityFunc_Think
 {
 	void execute() override
 	{
-		G_UseTargets (self_, self_->activator_);
+		Game::useTargets (self_, self_->activator_);
 		// set time before next firing
 		self_->nextthink_ = theLevel.time_ + 1000 * ( self_->wait_ + crandom() * self_->random_ );
 	}
@@ -194,8 +194,8 @@ struct Use_FuncTimer : public GameEntity::EntityFunc_Use
 
 void SP_func_timer( GameEntity *self ) 
 {
-	G_SpawnFloat( "random", "1", &self->random_);
-	G_SpawnFloat( "wait", "1", &self->wait_ );
+	Game::spawnFloat( "random", "1", &self->random_);
+	Game::spawnFloat( "wait", "1", &self->wait_ );
 
 	self->setUse( std::make_unique<Use_FuncTimer>());
 	self->setThink( std::make_unique<Think_FuncTimer>());

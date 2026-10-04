@@ -34,20 +34,20 @@ int		c_pmove = 0;
 
 /*
 ===============
-PM_AddEvent
+PlayerMove::addEvent
 
 ===============
 */
-void PM_AddEvent( int newEvent ) {
+void PlayerMove::addEvent( int newEvent ) {
 	GameShared::addPredictableEventToPlayerstate( newEvent, 0, pm->ps );
 }
 
 /*
 ===============
-PM_AddTouchEnt
+PlayerMove::addTouchEnt
 ===============
 */
-void PM_AddTouchEnt( int entityNum ) {
+void PlayerMove::addTouchEnt( int entityNum ) {
 	int		i;
 
 	if ( entityNum == ENTITYNUM_WORLD ) {
@@ -71,12 +71,12 @@ void PM_AddTouchEnt( int entityNum ) {
 
 /*
 ==================
-PM_ClipVelocity
+PlayerMove::clipVelocity
 
 Slide off of the impacting surface
 ==================
 */
-void PM_ClipVelocity( vec3_t in, vec3_t normal, vec3_t out, float overbounce ) {
+void PlayerMove::clipVelocity( vec3_t in, vec3_t normal, vec3_t out, float overbounce ) {
 	float	backoff;
 	float	change;
 	int		i;
@@ -289,7 +289,7 @@ static void PM_FlyMove( ) {
 
 	PM_Accelerate (wishdir, wishspeed, pm_flyaccelerate);
 
-	PM_SlideMove( false );
+	PlayerMove::slideMove( false );
 }
 
 /*
@@ -471,28 +471,28 @@ static void PM_WaterEvents( ) {		// FIXME?
 	// if just entered a water volume, play a sound
 	//
 	if (!pml.previous_waterlevel && pm->waterlevel) {
-		PM_AddEvent( EV_WATER_TOUCH );
+		PlayerMove::addEvent( EV_WATER_TOUCH );
 	}
 
 	//
 	// if just completely exited a water volume, play a sound
 	//
 	if (pml.previous_waterlevel && !pm->waterlevel) {
-		PM_AddEvent( EV_WATER_LEAVE );
+		PlayerMove::addEvent( EV_WATER_LEAVE );
 	}
 
 	//
 	// check for head just going under water
 	//
 	if (pml.previous_waterlevel != 3 && pm->waterlevel == 3) {
-		PM_AddEvent( EV_WATER_UNDER );
+		PlayerMove::addEvent( EV_WATER_UNDER );
 	}
 
 	//
 	// check for head just coming out of water
 	//
 	if (pml.previous_waterlevel == 3 && pm->waterlevel != 3) {
-		PM_AddEvent( EV_WATER_CLEAR );
+		PlayerMove::addEvent( EV_WATER_CLEAR );
 	}
 }
 
@@ -535,7 +535,7 @@ static void PM_Flare( ) {
 		// check for out of ammo
 		if ( pm->ps->ammo[WP_FLARE] > 0 ) {
 			pm->ps->ammo[WP_FLARE]--;
-			PM_AddEvent( EV_FIRE_FLARE );
+			PlayerMove::addEvent( EV_FIRE_FLARE );
 			pm->ps->timers[TIMER_FLARE] += availableWeapons[availableVehicles[pm->vehicle].weapons[WP_FLARE]].fireInterval;;
 		}
 	} 
@@ -602,7 +602,7 @@ static void PM_Weapon( ) {
 	// weaponbays
 	if( availableVehicles[pm->vehicle].caps & HC_WEAPONBAY ) {
 		if( !(pm->ps->ONOFF & OO_WEAPONBAY) ) {
-			if( pm->cmd.buttons & BUTTON_ATTACK_MAIN ) PM_Toggle_Bay();
+			if( pm->cmd.buttons & BUTTON_ATTACK_MAIN ) PlayerMove::toggle_Bay();
 			canShoot = false;
 		}
 	}
@@ -634,7 +634,7 @@ static void PM_Weapon( ) {
 		int wpnIndex = availableVehicles[pm->vehicle].weapons[WP_MACHINEGUN];
 		if ( wpnIndex > 0 && pm->ps->ammo[WP_MACHINEGUN] > 0 ) {
 			pm->ps->ammo[WP_MACHINEGUN]--;
-			PM_AddEvent( EV_FIRE_MG );
+			PlayerMove::addEvent( EV_FIRE_MG );
 			pm->ps->timers[TIMER_MACHINEGUN] += availableWeapons[wpnIndex].fireInterval;
 		}
 	} 
@@ -655,13 +655,13 @@ static void PM_Weapon( ) {
 				pm->ps->ammo[pm->ps->weaponNum]--;
 				pm->ps->stats[STAT_FUEL]++;
 				if( !pm->ps->ammo[pm->ps->weaponNum] )
-					PM_AddEvent( EV_FIRE_WEAPON );
+					PlayerMove::addEvent( EV_FIRE_WEAPON );
 			}
 		}
 		else
 		{
 			pm->ps->ammo[pm->ps->weaponNum]--;
-			PM_AddEvent( EV_FIRE_WEAPON );
+			PlayerMove::addEvent( EV_FIRE_WEAPON );
 			pm->ps->timers[TIMER_BAYCLOSE] = pm->cmd.serverTime + 5000;
 		}
 		pm->ps->timers[TIMER_WEAPON] += availableWeapons[pm->ps->weaponIndex].fireInterval;
@@ -846,25 +846,25 @@ static void PM_VehicleMove( )
 	if( availableVehicles[pm->vehicle].cat & CAT_PLANE ) 
 	{
 		if( pm->advancedControls )
-			PM_PlaneMoveAdvanced();
+			PlayerMove::planeMoveAdvanced();
 		else
-			PM_PlaneMove();
+			PlayerMove::planeMove();
 	}
 	else if( availableVehicles[pm->vehicle].cat & CAT_HELO ) 
 	{
-		PM_HeloMove();
+		PlayerMove::heloMove();
 	}
 	else if( availableVehicles[pm->vehicle].cat & CAT_LQM ) 
 	{
-		PM_LQMMove();
+		PlayerMove::lQMMove();
 	}
 	else if( availableVehicles[pm->vehicle].cat & CAT_BOAT ) 
 	{
-		PM_BoatMove();
+		PlayerMove::boatMove();
 	}
 	else if( availableVehicles[pm->vehicle].cat & CAT_GROUND ) 
 	{
-		PM_GroundVehicleMove();
+		PlayerMove::groundVehicleMove();
 	}
 	else 
 	{

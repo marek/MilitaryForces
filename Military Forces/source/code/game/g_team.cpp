@@ -116,7 +116,7 @@ AddTeamScore
 */
 void AddTeamScore(vec3_t origin, int team, int score) 
 {
-	GameEntity	*te = G_TempEntity(origin, EV_GLOBAL_TEAM_SOUND );
+	GameEntity	*te = Game::tempEntity(origin, EV_GLOBAL_TEAM_SOUND );
 
 	te->r.svFlags |= SVF_BROADCAST;
 
@@ -328,7 +328,7 @@ void Team_FragBonuses( GameEntity *targ, GameEntity *inflictor, GameEntity *atta
 		carrier = nullptr;
 	}
 	flag = nullptr;
-	while ((flag = G_Find (flag, FOFS(classname_), c)) != nullptr) 
+	while ((flag = Game::find (flag, FOFS(classname_), c)) != nullptr) 
 	{
 		if (!(flag->flags_ & FL_DROPPED_ITEM))
 			break;
@@ -357,7 +357,7 @@ GameEntity* Team_ResetFlag( int team )
 	}
 
 	ent = nullptr;
-	while ((ent = G_Find (ent, FOFS(classname_), c)) != nullptr) 
+	while ((ent = Game::find (ent, FOFS(classname_), c)) != nullptr) 
 	{
 		if (ent->flags_ & FL_DROPPED_ITEM)
 			ent->freeUp();
@@ -392,7 +392,7 @@ void Team_ReturnFlagSound( GameEntity *ent, int team )
 		return;
 	}
 
-	te = G_TempEntity( ent->s.pos.trBase, EV_GLOBAL_TEAM_SOUND );
+	te = Game::tempEntity( ent->s.pos.trBase, EV_GLOBAL_TEAM_SOUND );
 	if( team == ClientBase::TEAM_BLUE ) 
 		te->s.eventParm = GTS_RED_RETURN;
 	else 
@@ -434,7 +434,7 @@ void Team_TakeFlagSound( GameEntity *ent, int team )
 			break;
 	}
 
-	te = G_TempEntity( ent->s.pos.trBase, EV_GLOBAL_TEAM_SOUND );
+	te = Game::tempEntity( ent->s.pos.trBase, EV_GLOBAL_TEAM_SOUND );
 	if( team == ClientBase::TEAM_BLUE ) 
 		te->s.eventParm = GTS_RED_TAKEN;
 	else 
@@ -453,7 +453,7 @@ void Team_CaptureFlagSound( GameEntity *ent, int team )
 		return;
 	}
 
-	te = G_TempEntity( ent->s.pos.trBase, EV_GLOBAL_TEAM_SOUND );
+	te = Game::tempEntity( ent->s.pos.trBase, EV_GLOBAL_TEAM_SOUND );
 	if( team == ClientBase::TEAM_BLUE ) 
 		te->s.eventParm = GTS_BLUE_CAPTURE;
 	else 
@@ -712,7 +712,7 @@ GameEntity *SelectRandomTeamSpawnPoint( int teamstate, ClientBase::eTeam team, i
 
 	spot = nullptr;
 
-	while ((spot = G_Find (spot, FOFS(classname_), classname)) != nullptr) 
+	while ((spot = Game::find (spot, FOFS(classname_), classname)) != nullptr) 
 	{
 		if ( SpotWouldTelefrag( spot ) ) 
 			continue;
@@ -727,7 +727,7 @@ GameEntity *SelectRandomTeamSpawnPoint( int teamstate, ClientBase::eTeam team, i
 	}
 
 	if ( !count ) 	// no spots that won't telefrag
-		return G_Find( nullptr, FOFS(classname_), classname);
+		return Game::find( nullptr, FOFS(classname_), classname);
 
 	selection = rand() % count;
 	return spots[ selection ];

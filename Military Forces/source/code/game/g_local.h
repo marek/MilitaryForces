@@ -245,7 +245,7 @@ inline constexpr int FOLLOW_ACTIVE2 = -2;
 // client data that stays across multiple levels or tournament restarts
 // this is achieved by writing all the data to cvar strings at game shutdown
 // time and reading them back at connection time.  Anything added here
-// MUST be dealt with in G_InitSessionData() / G_ReadSessionData() / G_WriteSessionData()
+// MUST be dealt with in Game::initSessionData() / Game::readSessionData() / Game::writeSessionData()
 //typedef struct {
 //	team_t		sessionTeam;
 //	int			spectatorTime;		// for determining next-in-line to play
@@ -541,13 +541,51 @@ struct spawn_t
 //
 // g_spawn.c
 //
-bool	G_SpawnString( const char *key, const char *defaultString, char **out );
+class Game
+{
+public:
+	static bool spawnString( const char *key, const char *defaultString, char **out );
+	static bool spawnFloat( const char *key, const char *defaultString, float *out );
+	static bool spawnInt( const char *key, const char *defaultString, int *out );
+	static bool spawnVector( const char *key, const char *defaultString, float *out );
+	static void spawnEntitiesFromString( );
+	static char *newString( const char *string );
+	static void checkTeamItems( );
+	static void runItem( GameEntity *ent );
+	static int modelIndex( char *name );
+	static int soundIndex( char *name );
+	static void teamCommand( ClientBase::eTeam team, char *cmd );
+	static void killBox (GameEntity *ent);
+	static GameEntity *find (GameEntity *from, int fieldofs, const char *match);
+	static GameEntity *pickTarget (char *targetname);
+	static void useTargets (GameEntity *ent, GameEntity *activator);
+	static void setMovedir ( vec3_t angles, vec3_t movedir);
+	static GameEntity *tempEntity( vec3_t origin, int event );
+	static void sound( GameEntity *ent, int channel, int soundIndex );
+	static bool entitiesFree();
+	static void touchTriggers (GameEntity *ent);
+	static void addPredictableEvent( GameEntity *ent, int event, int eventParm );
+	static void addEvent( GameEntity *ent, int event, int eventParm, bool addToQueue );
+	static void sendEventFromQueue( GameEntity* ent );
+	static void setOrigin( GameEntity *ent, vec3_t origin );
+	static unsigned long getGameset();
+	static void damage (GameEntity *targ, GameEntity *inflictor, GameEntity *attacker, vec3_t dir, vec3_t point, int damage, int dflags, int mod, long cat);
+	static bool radiusDamage (vec3_t origin, GameEntity *attacker, float damage, float radius, GameEntity *ignore, int mod, long cat);
+	static void runMissile( GameEntity *ent );
+	static void runMover( GameEntity *ent );
+	static void processIPBans();
+	static bool filterPacket (char *from);
+	static void runThink (GameEntity *ent);
+	static void QDECL logPrintf( const char *fmt, ... );
+	static void runClient( GameEntity *ent );
+	static void *alloc( int size );
+	static void initMemory( );
+	static void readSessionData( GameClient *client );
+	static void initSessionData( GameClient *client, char *userinfo );
+	static void initWorldSession();
+	static void writeSessionData();
+};
 // spawn string returns a temporary reference, you must CopyString() if you want to keep it
-bool	G_SpawnFloat( const char *key, const char *defaultString, float *out );
-bool	G_SpawnInt( const char *key, const char *defaultString, int *out );
-bool	G_SpawnVector( const char *key, const char *defaultString, float *out );
-void		G_SpawnEntitiesFromString( );
-char *G_NewString( const char *string );
 
 //
 // g_cmds.c
@@ -561,8 +599,6 @@ void Cmd_FollowCycle_f( GameEntity *ent, int dir );
 //
 // g_items.c
 //
-void G_CheckTeamItems( );
-void G_RunItem( GameEntity *ent );
 void RespawnItem( GameEntity *ent );
 
 void PrecacheItem (gitem_t *it);
@@ -581,23 +617,11 @@ void SaveRegisteredItems( );
 //
 // g_utils.c
 //
-int G_ModelIndex( char *name );
-int		G_SoundIndex( char *name );
-void	G_TeamCommand( ClientBase::eTeam team, char *cmd );
-void	G_KillBox (GameEntity *ent);
-GameEntity *G_Find (GameEntity *from, int fieldofs, const char *match);
-GameEntity *G_PickTarget (char *targetname);
-void	G_UseTargets (GameEntity *ent, GameEntity *activator);
-void	G_SetMovedir ( vec3_t angles, vec3_t movedir);
 
 //void	G_InitGentity( GameEntity *e );
 //GameEntity	*G_Spawn ();
-GameEntity *G_TempEntity( vec3_t origin, int event );
-void	G_Sound( GameEntity *ent, int channel, int soundIndex );
 //void	G_FreeEntity( GameEntity *e );
-bool	G_EntitiesFree();
 
-void	G_TouchTriggers (GameEntity *ent);
 void	G_TouchSolids (GameEntity *ent);
 
 float	*tv (float x, float y, float z);
@@ -605,22 +629,15 @@ char	*vtos( const vec3_t v );
 
 float vectoyaw( const vec3_t vec );
 
-void G_AddPredictableEvent( GameEntity *ent, int event, int eventParm );
-void G_AddEvent( GameEntity *ent, int event, int eventParm, bool addToQueue );
-void G_SendEventFromQueue( GameEntity* ent );
-void G_SetOrigin( GameEntity *ent, vec3_t origin );
 void AddRemap(const char *oldShader, const char *newShader, float timeOffset);
 const char *BuildShaderStateConfig();
 
 // MFQ3
-extern unsigned long G_GetGameset();
 
 //
 // g_combat.c
 //
 bool CanDamage (GameEntity *targ, vec3_t origin);
-void G_Damage (GameEntity *targ, GameEntity *inflictor, GameEntity *attacker, vec3_t dir, vec3_t point, int damage, int dflags, int mod, long cat);
-bool G_RadiusDamage (vec3_t origin, GameEntity *attacker, float damage, float radius, GameEntity *ignore, int mod, long cat);
 int G_InvulnerabilityEffect( GameEntity *targ, vec3_t dir, vec3_t point, vec3_t impactpoint, vec3_t bouncedir );
 
 void VehicleDeathImpl( GameEntity *self, GameEntity *inflictor, GameEntity *attacker, int damage, int meansOfDeath );
@@ -679,7 +696,6 @@ inline constexpr int DAMAGE_NO_PROTECTION = 0x00000008; // shields, invulnerabil
 //
 // g_missile.c
 //
-void G_RunMissile( GameEntity *ent );
 
 void fire_antiair (GameEntity *self);
 void fire_antiground (GameEntity *self);
@@ -701,7 +717,6 @@ void fire_autocannon_GI (GameEntity *self);
 //
 // g_mover.c
 //
-void G_RunMover( GameEntity *ent );
 
 //
 // g_trigger.c
@@ -792,8 +807,6 @@ void MF_Spawn_Boat(GameEntity *ent, int idx);
 // g_svcmds.c
 //
 bool ConsoleCommand();
-void G_ProcessIPBans();
-bool G_FilterPacket (char *from);
 
 //
 // g_weapon.c
@@ -822,8 +835,6 @@ void DeathmatchScoreboardMessage (GameEntity *client);
 void FindIntermissionPoint( );
 void SetLeader(int team, int client);
 void CheckTeamLeader( int team );
-void G_RunThink (GameEntity *ent);
-void QDECL G_LogPrintf( const char *fmt, ... );
 void SendScoreboardMessageToAllClients( );
 //void QDECL G_Error( const char *fmt, ... );
 
@@ -839,7 +850,6 @@ void ClientCommand( int clientNum );
 //
 void ClientThink( int clientNum );
 void ClientEndFrame( GameEntity *ent );
-void G_RunClient( GameEntity *ent );
 
 //
 // g_team.c
@@ -851,18 +861,12 @@ bool CheckObeliskAttack( GameEntity *obelisk, GameEntity *attacker );
 //
 // g_mem.c
 //
-void *G_Alloc( int size );
-void G_InitMemory( );
 void Svcmd_GameMem_f( );
 
 //
 // g_session.c
 //
-void G_ReadSessionData( GameClient *client );
-void G_InitSessionData( GameClient *client, char *userinfo );
 
-void G_InitWorldSession();
-void G_WriteSessionData();
 
 //
 // g_arenas.c

@@ -11,14 +11,14 @@
 #include "g_world.h"
 
 
-bool G_SpawnString( const char *key, const char *defaultString, char **out ) 
+bool Game::spawnString( const char *key, const char *defaultString, char **out ) 
 {
 	int		i;
 
 	if ( !theLevel.spawning_ ) 
 	{
 		*out = const_cast<char *>(defaultString);
-//		G_Error( "G_SpawnString() called while not spawning" );
+//		G_Error( "Game::spawnString() called while not spawning" );
 	}
 
 	for ( i = 0 ; i < theLevel.numSpawnVars_ ; i++ ) 
@@ -34,32 +34,32 @@ bool G_SpawnString( const char *key, const char *defaultString, char **out )
 	return false;
 }
 
-bool G_SpawnFloat( const char *key, const char *defaultString, float *out )
+bool Game::spawnFloat( const char *key, const char *defaultString, float *out )
 {
 	char		*s;
 	bool	present;
 
-	present = G_SpawnString( key, defaultString, &s );
+	present = Game::spawnString( key, defaultString, &s );
 	*out = atof( s );
 	return present;
 }
 
-bool G_SpawnInt( const char *key, const char *defaultString, int *out ) 
+bool Game::spawnInt( const char *key, const char *defaultString, int *out ) 
 {
 	char		*s;
 	bool	present;
 
-	present = G_SpawnString( key, defaultString, &s );
+	present = Game::spawnString( key, defaultString, &s );
 	*out = atoi( s );
 	return present;
 }
 
-bool G_SpawnVector( const char *key, const char *defaultString, float *out ) 
+bool Game::spawnVector( const char *key, const char *defaultString, float *out ) 
 {
 	char		*s;
 	bool	present;
 
-	present = G_SpawnString( key, defaultString, &s );
+	present = Game::spawnString( key, defaultString, &s );
 	sscanf( s, "%f %f %f", &out[0], &out[1], &out[2] );
 	return present;
 }
@@ -344,20 +344,20 @@ bool G_CallSpawn( SpawnFieldHolder *sfh )
 
 /*
 =============
-G_NewString
+Game::newString
 
 Builds a copy of the string, translating \n to real linefeeds
 so message texts can be multi-line
 =============
 */
-char *G_NewString( const char *string ) 
+char *Game::newString( const char *string ) 
 {
 	char	*newb, *new_p;
 	int		i,l;
 	
 	l = strlen(string) + 1;
 
-	newb = reinterpret_cast<char*>(G_Alloc( l ));
+	newb = reinterpret_cast<char*>(Game::alloc( l ));
 
 	new_p = newb;
 
@@ -407,7 +407,7 @@ void G_ParseField( const char *key, const char *value, SpawnFieldHolder *ent )
 			switch( f->type ) 
 			{
 			case F_LSTRING:
-				*reinterpret_cast<char **>(b+f->ofs) = G_NewString (value);
+				*reinterpret_cast<char **>(b+f->ofs) = Game::newString (value);
 				break;
 			case F_VECTOR:
 				sscanf (value, "%f %f %f", &vec[0], &vec[1], &vec[2]);
@@ -469,7 +469,7 @@ void G_SpawnGEntityFromSpawnVars()
 	// check for "notsingle" flag
 	if ( g_gametype.integer == GT_SINGLE_PLAYER ) 
 	{
-		G_SpawnInt( "notsingle", "0", &i );
+		Game::spawnInt( "notsingle", "0", &i );
 		if ( i ) 
 		{
 			//ent->free();
@@ -479,7 +479,7 @@ void G_SpawnGEntityFromSpawnVars()
 	// check for "notteam" flag (GT_FFA, GT_TOURNAMENT, GT_SINGLE_PLAYER)
 	if ( g_gametype.integer >= GT_TEAM )
 	{
-		G_SpawnInt( "notteam", "0", &i );
+		Game::spawnInt( "notteam", "0", &i );
 		// MFQ3 special case for flags
 		if( (g_gametype.integer != GT_CTF) &&
 			(Q_stricmp( sfh.classname_, "team_CTF_redflag" ) == 0 ||
@@ -496,7 +496,7 @@ void G_SpawnGEntityFromSpawnVars()
 	} 
 	else 
 	{
-		G_SpawnInt( "notfree", "0", &i );
+		Game::spawnInt( "notfree", "0", &i );
 		if ( i )
 		{
 			//ent->free();
@@ -504,7 +504,7 @@ void G_SpawnGEntityFromSpawnVars()
 		}
 	}
 
-	if( G_SpawnString( "gametype", nullptr, &value ) ) 
+	if( Game::spawnString( "gametype", nullptr, &value ) ) 
 	{
 		if( g_gametype.integer >= GT_FFA && g_gametype.integer < GT_MAX_GAME_TYPE ) 
 		{
@@ -620,7 +620,7 @@ void SP_worldspawn()
 {
 	char	*s;
 
-	G_SpawnString( "classname", "", &s );
+	Game::spawnString( "classname", "", &s );
 	if ( Q_stricmp( s, "worldspawn" ) ) 
 		Common::error( ERR_DROP, "SP_worldspawn: The first entity isn't 'worldspawn'" );
 
@@ -629,21 +629,21 @@ void SP_worldspawn()
 
 	SV_SetConfigstring( CS_LEVEL_START_TIME, va("%i", theLevel.startTime_ ) );
 
-	G_SpawnString( "music", "", &s );
+	Game::spawnString( "music", "", &s );
 	SV_SetConfigstring( CS_MUSIC, s );
 
-	G_SpawnString( "message", "", &s );
+	Game::spawnString( "message", "", &s );
 	SV_SetConfigstring( CS_MESSAGE, s );				// map specific message
 
 	SV_SetConfigstring( CS_MOTD, g_motd.string );		// message of the day
 
-	G_SpawnString( "gravity", "800", &s );
+	Game::spawnString( "gravity", "800", &s );
 	CvarSystem::set( "g_gravity", s );
 
-	G_SpawnString( "enableDust", "0", &s );
+	Game::spawnString( "enableDust", "0", &s );
 	CvarSystem::set( "g_enableDust", s );
 
-	G_SpawnString( "enableBreath", "0", &s );
+	Game::spawnString( "enableBreath", "0", &s );
 	CvarSystem::set( "g_enableBreath", s );
 
 	// the following is now handled in g_world.cpp
@@ -666,7 +666,7 @@ void SP_worldspawn()
 		// Turn it on
 		theLevel.warmupTime_ = -1;
 		SV_SetConfigstring( CS_WARMUP, va("%i", theLevel.warmupTime_) );
-		G_LogPrintf( "Warmup:\n" );
+		Game::logPrintf( "Warmup:\n" );
 	}
 
 }
@@ -674,12 +674,12 @@ void SP_worldspawn()
 
 /*
 ==============
-G_SpawnEntitiesFromString
+Game::spawnEntitiesFromString
 
 Parses textual entity definitions out of an entstring and spawns gentities.
 ==============
 */
-void G_SpawnEntitiesFromString()
+void Game::spawnEntitiesFromString()
 {
 	// allow calls to G_Spawn*()
 	theLevel.spawning_ = true;

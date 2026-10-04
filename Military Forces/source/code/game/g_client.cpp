@@ -35,11 +35,11 @@ void SP_info_player_deathmatch( GameEntity *ent )
 
 	CvarSystem::set( "mf_lvcat", va("%i", theLevel.ent_category_) );
 
-	G_SpawnInt( "nobots", "0", &i);
+	Game::spawnInt( "nobots", "0", &i);
 	if( i ) 
 		ent->flags_ |= FL_NO_BOTS;
 
-	G_SpawnInt( "nohumans", "0", &i );
+	Game::spawnInt( "nohumans", "0", &i );
 	if( i ) 
 		ent->flags_ |= FL_NO_HUMANS;
 }
@@ -114,7 +114,7 @@ GameEntity *SelectNearestDeathmatchSpawnPoint( vec3_t from )
 	nearestSpot = nullptr;
 	spot = nullptr;
 
-	while( (spot = G_Find (spot, FOFS(classname_), "info_player_deathmatch") ) != nullptr )
+	while( (spot = Game::find (spot, FOFS(classname_), "info_player_deathmatch") ) != nullptr )
 	{
 		VectorSubtract( spot->s.origin, from, delta );
 		dist = VectorLength( delta );
@@ -146,7 +146,7 @@ GameEntity *SelectRandomDeathmatchSpawnPoint()
 	count = 0;
 	spot = nullptr;
 
-	while( (spot = G_Find (spot, FOFS(classname_), "info_player_deathmatch")) != nullptr )
+	while( (spot = Game::find (spot, FOFS(classname_), "info_player_deathmatch")) != nullptr )
 	{
 		if( SpotWouldTelefrag( spot ) ) 
 			continue;
@@ -157,7 +157,7 @@ GameEntity *SelectRandomDeathmatchSpawnPoint()
 	if( !count ) 
 	{
 		// no spots that won't telefrag
-		return G_Find( nullptr, FOFS(classname_), "info_player_deathmatch");
+		return Game::find( nullptr, FOFS(classname_), "info_player_deathmatch");
 	}
 
 	selection = rand() % count;
@@ -183,7 +183,7 @@ GameEntity *SelectRandomFurthestSpawnPoint( vec3_t avoidPoint, vec3_t origin, ve
 	numSpots = 0;
 	spot = nullptr;
 
-	while( (spot = G_Find (spot, FOFS(classname_), "info_player_deathmatch")) != nullptr )
+	while( (spot = Game::find (spot, FOFS(classname_), "info_player_deathmatch")) != nullptr )
 	{
 		if( SpotWouldTelefrag( spot ) ) 
 			continue;
@@ -220,7 +220,7 @@ GameEntity *SelectRandomFurthestSpawnPoint( vec3_t avoidPoint, vec3_t origin, ve
 	}
 	if( !numSpots )
 	{
-		spot = G_Find( nullptr, FOFS(classname_), "info_player_deathmatch");
+		spot = Game::find( nullptr, FOFS(classname_), "info_player_deathmatch");
 		if( !spot )
 			Common::error( ERR_DROP, "Couldn't find a spawn point" );
 		VectorCopy( spot->s.origin, origin );
@@ -292,7 +292,7 @@ GameEntity *SelectInitialSpawnPoint( vec3_t origin, vec3_t angles )
 	GameEntity	*spot;
 
 	spot = nullptr;
-	while( (spot = G_Find (spot, FOFS(classname_), "info_player_deathmatch")) != nullptr )
+	while( (spot = Game::find (spot, FOFS(classname_), "info_player_deathmatch")) != nullptr )
 	{
 		if( spot->spawnflags_ & 1 ) 
 			break;
@@ -751,7 +751,7 @@ void ClientUserinfoChanged( int clientNum )
 
 	SV_SetConfigstring( CS_PLAYERS+clientNum, s );
 
-	G_LogPrintf( "ClientUserinfoChanged: %i %s\n", clientNum, s );
+	Game::logPrintf( "ClientUserinfoChanged: %i %s\n", clientNum, s );
 }
 
 /*
@@ -793,7 +793,7 @@ void ClientDisconnect( int clientNum )
 		TossVehicleFlags( ent );
 	}
 
-	G_LogPrintf( "ClientDisconnect: %i\n", clientNum );
+	Game::logPrintf( "ClientDisconnect: %i\n", clientNum );
 
 	// if we are playing in tourney mode and losing, give a win to the other player
 	if( (g_gametype.integer == GT_TOURNAMENT ) &&

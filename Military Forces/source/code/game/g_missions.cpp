@@ -18,10 +18,10 @@ static void G_SpawnMissionVehicles(mission_vehicle_t* vehs)
 		ent->classname_ = "misc_vehicle";
 		VectorCopy(vehs[i].origin, ent->s.origin);
 		VectorCopy(vehs[i].angles, ent->s.angles);
-		ent->model_ = G_NewString(vehs[i].objectname);
+		ent->model_ = Game::newString(vehs[i].objectname);
 		ent->s.modelindex = vehs[i].index;
 		if( vehs[i].side[0] )
-			ent->team_ = G_NewString(vehs[i].side);
+			ent->team_ = Game::newString(vehs[i].side);
 		GameEntity* veh = SP_misc_vehicle(ent);
 		if( veh )
 			MiscVehicle_SetRoute(veh, vehs[i].waypoints);
@@ -37,9 +37,9 @@ static void G_SpawnMissionGroundInstallations(mission_groundInstallation_t* gis)
 		ent->classname_ = "misc_vehicle";
 		VectorCopy(gis[i].origin, ent->s.origin);
 		VectorCopy(gis[i].angles, ent->s.angles);
-		ent->model_ = G_NewString(gis[i].objectname);
+		ent->model_ = Game::newString(gis[i].objectname);
 		if( gis[i].teamname[0] )
-			ent->team_ = G_NewString(gis[i].teamname);
+			ent->team_ = Game::newString(gis[i].teamname);
 		ent->s.modelindex = -1;
 		ent->s.modelindex2 = gis[i].index;
 		SP_misc_groundinstallation(ent);

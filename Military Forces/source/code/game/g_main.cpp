@@ -312,9 +312,9 @@ void G_InitGame( int levelTime, int randomSeed )
 
 	G_RegisterCvars();
 
-	G_ProcessIPBans();
+	Game::processIPBans();
 
-	G_InitMemory();
+	Game::initMemory();
 
 	// MFQ3: set the game version into a server var (that can be viewed as server-info)
 	CvarSystem::set( "mf_version", MF_VERSION );
@@ -330,7 +330,7 @@ void G_InitGame( int levelTime, int randomSeed )
 	theLevel.time_ = levelTime;
 	theLevel.startTime_ = levelTime;
 
-	//level.snd_fry = G_SoundIndex("sound/player/fry.wav");	// FIXME standing in lava / slime
+	//level.snd_fry = Game::soundIndex("sound/player/fry.wav");	// FIXME standing in lava / slime
 
 	if ( g_gametype.integer != GT_SINGLE_PLAYER && g_gametype.integer != GT_MISSION_EDITOR &&
 			g_log.string[0] ) 
@@ -348,14 +348,14 @@ void G_InitGame( int levelTime, int randomSeed )
 
 			SV_GetServerinfo( serverinfo, sizeof( serverinfo ) );
 
-			G_LogPrintf("------------------------------------------------------------\n" );
-			G_LogPrintf("InitGame: %s\n", serverinfo );
+			Game::logPrintf("------------------------------------------------------------\n" );
+			Game::logPrintf("InitGame: %s\n", serverinfo );
 		}
 	} 
 	else
 		Common::printf( "Not logging to disk.\n" );
 
-	G_InitWorldSession();
+	Game::initWorldSession();
 
 	// initialize all entities for this game
 	//memset( g_entities, 0, MAX_GENTITIES * sizeof(g_entities[0]) );
@@ -391,14 +391,14 @@ void G_InitGame( int levelTime, int randomSeed )
 	//DataManager::getInstance().createAllData();
 
 	// parse the key/value pairs and spawn gentities
-	G_SpawnEntitiesFromString();
+	Game::spawnEntitiesFromString();
 
 	// general initialization
 	G_FindTeams();
 
 	// make sure we have flags for CTF, etc
 	if( g_gametype.integer >= GT_TEAM ) 
-		G_CheckTeamItems();
+		Game::checkTeamItems();
 
 	SaveRegisteredItems();
 
@@ -406,8 +406,8 @@ void G_InitGame( int levelTime, int randomSeed )
 
 	if( g_gametype.integer == GT_SINGLE_PLAYER || CvarSystem::variableIntegerValue( "com_buildScript" ) ) 
 	{
-		G_SoundIndex( "sound/player/gurp1.wav" );
-		G_SoundIndex( "sound/player/gurp2.wav" );
+		Game::soundIndex( "sound/player/gurp1.wav" );
+		Game::soundIndex( "sound/player/gurp2.wav" );
 	}
 
 	G_RemapTeamShaders();
@@ -437,13 +437,13 @@ void G_ShutdownGame()
 
 	if ( theLevel.logFile_ ) 
 	{
-		G_LogPrintf("ShutdownGame:\n" );
-		G_LogPrintf("------------------------------------------------------------\n" );
+		Game::logPrintf("ShutdownGame:\n" );
+		Game::logPrintf("------------------------------------------------------------\n" );
 		FileSystem::fCloseFile( theLevel.logFile_ );
 	}
 
 	// write all the client session data so we can get it back
-	G_WriteSessionData();
+	Game::writeSessionData();
 }
 
 
@@ -829,7 +829,7 @@ This is also used for spectator spawns
 void FindIntermissionPoint() 
 {
 	// find the intermission spot
-	GameEntity *ent = G_Find (nullptr, FOFS(classname_), "info_player_intermission");
+	GameEntity *ent = Game::find (nullptr, FOFS(classname_), "info_player_intermission");
 	if ( !ent ) 
 	{	
 		// the map creator forgot to put in an intermission point...
@@ -842,7 +842,7 @@ void FindIntermissionPoint()
 		// if it has a target, look towards it
 		if ( ent->target_ ) 
 		{
-			GameEntity *target = G_PickTarget( ent->target_ );
+			GameEntity *target = Game::pickTarget( ent->target_ );
 			if ( target ) 
 			{
 				vec3_t		dir;
@@ -938,7 +938,7 @@ void ExitLevel()
 	}
 
 	// we need to do this here before chaning to CON_CONNECTING
-	G_WriteSessionData();
+	Game::writeSessionData();
 
 	// change all client states to connecting, so the early players into the
 	// next level will know the others aren't done reconnecting
@@ -953,12 +953,12 @@ void ExitLevel()
 
 /*
 =================
-G_LogPrintf
+Game::logPrintf
 
 Print to the logfile with a time stamp if it is open
 =================
 */
-void QDECL G_LogPrintf( const char *fmt, ... ) 
+void QDECL Game::logPrintf( const char *fmt, ... ) 
 {
 	va_list		argptr;
 	char		string[1024];
@@ -997,7 +997,7 @@ void LogExit( const char *string )
 {
 //	bool won = true;
 
-	G_LogPrintf( "Exit: %s\n", string );
+	Game::logPrintf( "Exit: %s\n", string );
 
 	theLevel.intermissionQueued_ = theLevel.time_;
 
@@ -1012,7 +1012,7 @@ void LogExit( const char *string )
 
 	if( g_gametype.integer >= GT_TEAM )
 	{
-		G_LogPrintf( "red:%i  blue:%i\n",
+		Game::logPrintf( "red:%i  blue:%i\n",
 			theLevel.teamScores_[ClientBase::TEAM_RED], 
 			theLevel.teamScores_[ClientBase::TEAM_BLUE] );
 	}
@@ -1031,7 +1031,7 @@ void LogExit( const char *string )
 
 		ping = cl->ps_.ping < 999 ? cl->ps_.ping : 999;
 
-		G_LogPrintf( "score: %i  ping: %i  client: %i %s\n", cl->ps_.persistant[PERS_SCORE], ping, theLevel.sortedClients_[i],	cl->pers_.netname_ );
+		Game::logPrintf( "score: %i  ping: %i  client: %i %s\n", cl->ps_.persistant[PERS_SCORE], ping, theLevel.sortedClients_[i],	cl->pers_.netname_ );
 	}
 }
 
@@ -1299,7 +1299,7 @@ void CheckTournament()
 			{
 				theLevel.warmupTime_ = -1;
 				SV_SetConfigstring( CS_WARMUP, va("%i", theLevel.warmupTime_) );
-				G_LogPrintf( "Warmup:\n" );
+				Game::logPrintf( "Warmup:\n" );
 			}
 			return;
 		}
@@ -1364,7 +1364,7 @@ void CheckTournament()
 			{
 				theLevel.warmupTime_ = -1;
 				SV_SetConfigstring( CS_WARMUP, va("%i", theLevel.warmupTime_) );
-				G_LogPrintf( "Warmup:\n" );
+				Game::logPrintf( "Warmup:\n" );
 			}
 			return; // still waiting for team members
 		}
@@ -1616,12 +1616,12 @@ void CheckCvars( ) {
 
 /*
 =============
-G_RunThink
+Game::runThink
 
 Runs thinking code for this frame if necessary
 =============
 */
-void G_RunThink( GameEntity *ent )
+void Game::runThink( GameEntity *ent )
 {
 	float	thinktime;
 
@@ -1707,25 +1707,25 @@ void G_RunFrame( int levelTime )
 		if( ent->s.eType == ET_MISSILE ||
 			 ent->s.eType == ET_BULLET ) 
 		{
-			G_RunMissile( ent );
+			Game::runMissile( ent );
 			continue;
 		}
 		if( ent->s.eType == ET_ITEM || ent->physicsObject_ ) 
 		{
-			G_RunItem( ent );
+			Game::runItem( ent );
 			continue;
 		}
 		if( ent->s.eType == ET_MOVER )
 		{
-			G_RunMover( ent );
+			Game::runMover( ent );
 			continue;
 		}
 		if( ent->client_ )
 		{
-			G_RunClient( ent );
+			Game::runClient( ent );
 			continue;
 		}
-		G_RunThink( ent );
+		Game::runThink( ent );
 	}
 	int end = System::milliseconds();
 

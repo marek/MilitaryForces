@@ -43,7 +43,7 @@ void GroundInstallation_Die::execute( GameEntity *inflictor, GameEntity *attacke
 	ExplodeVehicle(self_);
 	self_->freeAfterEvent_ = true;
 
-	G_RadiusDamage( self_->r.currentOrigin, self_, 150, 150, self_, MOD_VEHICLEEXPLOSION, CAT_ANY );
+	Game::radiusDamage( self_->r.currentOrigin, self_, 150, 150, self_, MOD_VEHICLEEXPLOSION, CAT_ANY );
 
 	SV_LinkEntity( self_ );
 }

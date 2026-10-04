@@ -49,7 +49,7 @@ Explode our vehicle
 void ExplodeVehicle( GameEntity* self )
 {
 	// create the client vehicle explosion event
-	G_AddEvent( self, EV_VEHICLE_GIB, 0, true );
+	Game::addEvent( self, EV_VEHICLE_GIB, 0, true );
 
 	self->takedamage_ = false;
 	self->s.eType = ET_INVISIBLE;
@@ -135,7 +135,7 @@ dflags		these flags are used to control how T_Damage works
 ============
 */
 
-void G_Damage( GameEntity *targ, GameEntity *inflictor, GameEntity* attacker,
+void Game::damage( GameEntity *targ, GameEntity *inflictor, GameEntity* attacker,
 			   vec3_t dir, vec3_t point, int damage, int dflags, int mod, long cat ) 
 {
 	GameClient* client;
@@ -429,10 +429,10 @@ bool CanDamage( GameEntity* targ, vec3_t origin )
 
 /*
 ============
-G_RadiusDamage
+Game::radiusDamage
 ============
 */
-bool G_RadiusDamage ( vec3_t origin, GameEntity* attacker, float damage, float radius,
+bool Game::radiusDamage ( vec3_t origin, GameEntity* attacker, float damage, float radius,
 					  GameEntity* ignore, int mod, long cat) {
 	float		points, dist;
 	GameEntity* ent;
@@ -490,7 +490,7 @@ bool G_RadiusDamage ( vec3_t origin, GameEntity* attacker, float damage, float r
 			// push the center of mass higher than the origin so players
 			// get knocked into the air more
 			dir[2] += 24;
-			G_Damage (ent, nullptr, attacker, dir, origin, static_cast<int>(points), DAMAGE_RADIUS, mod, cat);
+			Game::damage (ent, nullptr, attacker, dir, origin, static_cast<int>(points), DAMAGE_RADIUS, mod, cat);
 		}
 	}
 

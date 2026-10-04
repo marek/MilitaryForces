@@ -21,13 +21,13 @@ output: origin, velocity, impacts, stairup boolean
 
 /*
 ==================
-PM_SlideMove
+PlayerMove::slideMove
 
 Returns true if the velocity was clipped in some way
 ==================
 */
 #define	MAX_CLIP_PLANES	5
-bool	PM_SlideMove( bool gravity ) {
+bool	PlayerMove::slideMove( bool gravity ) {
 	int			bumpcount, numbumps;
 	vec3_t		dir;
 	float		d;
@@ -54,7 +54,7 @@ bool	PM_SlideMove( bool gravity ) {
 		primal_velocity[2] = endVelocity[2];
 		if ( pml.groundPlane ) {
 			// slide along the ground plane
-			PM_ClipVelocity (pm->ps->velocity, pml.groundTrace.plane.normal, 
+			PlayerMove::clipVelocity (pm->ps->velocity, pml.groundTrace.plane.normal, 
 				pm->ps->velocity, OVERCLIP );
 		}
 	}
@@ -116,7 +116,7 @@ bool	PM_SlideMove( bool gravity ) {
 		}
 
 		// save entity for contact
-		PM_AddTouchEnt( trace.entityNum );
+		PlayerMove::addTouchEnt( trace.entityNum );
 
 		time_left -= time_left * trace.fraction;
 
@@ -160,10 +160,10 @@ bool	PM_SlideMove( bool gravity ) {
 			}
 
 			// slide along the plane
-			PM_ClipVelocity (pm->ps->velocity, planes[i], clipVelocity, OVERCLIP );
+			PlayerMove::clipVelocity (pm->ps->velocity, planes[i], clipVelocity, OVERCLIP );
 
 			// slide along the plane
-			PM_ClipVelocity (endVelocity, planes[i], endClipVelocity, OVERCLIP );
+			PlayerMove::clipVelocity (endVelocity, planes[i], endClipVelocity, OVERCLIP );
 
 			// see if there is a second plane that the New move enters
 			for ( j = 0 ; j < numplanes ; j++ ) {
@@ -175,8 +175,8 @@ bool	PM_SlideMove( bool gravity ) {
 				}
 
 				// try clipping the move to the plane
-				PM_ClipVelocity( clipVelocity, planes[j], clipVelocity, OVERCLIP );
-				PM_ClipVelocity( endClipVelocity, planes[j], endClipVelocity, OVERCLIP );
+				PlayerMove::clipVelocity( clipVelocity, planes[j], clipVelocity, OVERCLIP );
+				PlayerMove::clipVelocity( endClipVelocity, planes[j], endClipVelocity, OVERCLIP );
 
 				// see if it goes back into the first clip plane
 				if ( DotProduct( clipVelocity, planes[i] ) >= 0 ) {

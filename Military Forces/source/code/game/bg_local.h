@@ -48,20 +48,24 @@ extern	float	pm_flightfriction;
 
 extern	int		c_pmove;
 
-void PM_ClipVelocity( vec3_t in, vec3_t normal, vec3_t out, float overbounce );
-void PM_AddTouchEnt( int entityNum );
-void PM_AddEvent( int newEvent );
+class PlayerMove
+{
+public:
+	static void clipVelocity( vec3_t in, vec3_t normal, vec3_t out, float overbounce );
+	static void addTouchEnt( int entityNum );
+	static void addEvent( int newEvent );
+	static void planeMove( );
+	static void planeMoveAdvanced( );
+	static void toggle_Bay();
+	static void groundVehicleMove( );
+	static void heloMove( );
+	static void lQMMove( );
+	static void boatMove( );
+	static bool slideMove( bool gravity );
+};
 
 // MFQ3
-void PM_PlaneMove( );
-void PM_PlaneMoveAdvanced( );
-void PM_Toggle_Bay();
-void PM_GroundVehicleMove( );
-void PM_HeloMove( );
-void PM_LQMMove( );
-void PM_BoatMove( );
 
-bool	PM_SlideMove( bool gravity );
 void		PM_StepSlideMove( bool gravity );
 
 

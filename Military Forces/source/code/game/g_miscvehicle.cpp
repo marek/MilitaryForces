@@ -34,7 +34,7 @@ void MiscVehicle_Die::execute( GameEntity *inflictor, GameEntity *attacker, int 
 	ExplodeVehicle(self_);
 	self_->freeAfterEvent_ = true;
 
-	G_RadiusDamage( self_->r.currentOrigin, self_, 150, 150, self_, MOD_VEHICLEEXPLOSION, CAT_ANY );
+	Game::radiusDamage( self_->r.currentOrigin, self_, 150, 150, self_, MOD_VEHICLEEXPLOSION, CAT_ANY );
 
 	SV_LinkEntity( self_ );
 }
@@ -182,7 +182,7 @@ void Drone_Think::execute()
 		SV_Trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, origin, ent->s.number, MASK_SOLID, false );
 		if( tr.startsolid || tr.fraction < 1.0f )
 		{
-			G_Damage( ent, nullptr, ent, nullptr, nullptr, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
+			Game::damage( ent, nullptr, ent, nullptr, nullptr, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 			return;
 		}
 	}
@@ -356,7 +356,7 @@ void Abandoned_Think::execute()
 		if( tr.fraction < 1.0f )
 			VectorCopy( tr.endpos, ent->r.currentOrigin );
 		ent->takedamage_ = true;
-		G_Damage( ent, nullptr, ent, nullptr, nullptr, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
+		Game::damage( ent, nullptr, ent, nullptr, nullptr, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 		return;
 	}
 	VectorCopy( origin, ent->r.currentOrigin );
@@ -379,7 +379,7 @@ void MiscVehicle_Abandon( GameEntity *ent )
 	veh->s.ONOFF = client->ps_.ONOFF & (OO_GEAR|OO_LANDED);
 	VectorCopy( availableVehicles[vehicle].mins, veh->r.mins );
 	VectorCopy( availableVehicles[vehicle].maxs, veh->r.maxs );
-	G_SetOrigin( veh, client->ps_.origin );
+	Game::setOrigin( veh, client->ps_.origin );
 	VectorCopy( client->ps_.vehicleAngles, veh->s.angles );
 	VectorCopy( veh->s.angles, veh->s.apos.trBase );
 	if( !landed )
@@ -545,7 +545,7 @@ void MiscVehicle_SpawnDecks( GameEntity *parent, int vehicle )
 		think->along_ = count > 1 ? centre - (halfLength - half) + i * 2 * (halfLength - half) / (count - 1) : centre;
 		think->first_ = i == 0;
 		deck->setThink( std::move( think ) );
-		G_SetOrigin( deck, parent->r.currentOrigin );
+		Game::setOrigin( deck, parent->r.currentOrigin );
 		deck->thinkFunc_->execute();
 	}
 }
@@ -613,7 +613,7 @@ GameEntity* SP_misc_vehicle( GameEntity *sp_ent )
 
 	VectorCopy(availableVehicles[i].mins, ent->r.mins);
 	VectorCopy(availableVehicles[i].maxs, ent->r.maxs);
-	G_SetOrigin( ent, ent->s.origin );
+	Game::setOrigin( ent, ent->s.origin );
 	VectorCopy( ent->s.angles, ent->s.apos.trBase );
 	VectorCopy( ent->s.origin, ent->s.pos.trBase );
 	VectorCopy( ent->s.origin, ent->r.currentOrigin );
@@ -668,7 +668,7 @@ void SP_misc_groundinstallation( GameEntity *sp_ent )
 
 	VectorCopy(availableGroundInstallations[i].mins, ent->r.mins);
 	VectorCopy(availableGroundInstallations[i].maxs, ent->r.maxs);
-	G_SetOrigin( ent, ent->s.origin );
+	Game::setOrigin( ent, ent->s.origin );
 	VectorCopy( ent->s.angles, ent->s.apos.trBase );
 	VectorCopy( ent->s.origin, ent->s.pos.trBase );
 	VectorCopy( ent->s.origin, ent->r.currentOrigin );

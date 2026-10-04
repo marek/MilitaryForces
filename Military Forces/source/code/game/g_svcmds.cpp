@@ -128,10 +128,10 @@ static void UpdateIPBans ()
 
 /*
 =================
-G_FilterPacket
+Game::filterPacket
 =================
 */
-bool G_FilterPacket (char *from)
+bool Game::filterPacket (char *from)
 {
 	int		i;
 	unsigned	in;
@@ -190,10 +190,10 @@ static void AddIP( char *str )
 
 /*
 =================
-G_ProcessIPBans
+Game::processIPBans
 =================
 */
-void G_ProcessIPBans() 
+void Game::processIPBans() 
 {
 	char *s, *t;
 	char		str[MAX_TOKEN_CHARS];

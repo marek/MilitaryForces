@@ -20,7 +20,7 @@ Used as a positional target for calculations in the utilities (spotlights, etc),
 */
 void SP_info_camp( GameEntity *self )
 {
-	G_SetOrigin( self, self->s.origin );
+	Game::setOrigin( self, self->s.origin );
 }
 
 
@@ -39,7 +39,7 @@ target_position does the same thing
 */
 void SP_info_notnull( GameEntity *self )
 {
-	G_SetOrigin( self, self->s.origin );
+	Game::setOrigin( self, self->s.origin );
 }
 
 
@@ -77,7 +77,7 @@ struct Think_LocateCamera : public GameEntity::EntityFunc_Think
 		GameEntity*	target;
 		GameEntity* owner;
 
-		owner = G_PickTarget( self_->target_ );
+		owner = Game::pickTarget( self_->target_ );
 		if ( !owner ) 
 		{
 			Common::printf( "Couldn't find target for misc_partal_surface\n" );
@@ -101,7 +101,7 @@ struct Think_LocateCamera : public GameEntity::EntityFunc_Think
 		VectorCopy( owner->s.origin, self_->s.origin2 );
 
 		// see if the portal_camera has a target
-		target = G_PickTarget( owner->target_ );
+		target = Game::pickTarget( owner->target_ );
 		if ( target ) 
 		{
 			VectorSubtract( target->s.origin, owner->s.origin, dir );
@@ -109,7 +109,7 @@ struct Think_LocateCamera : public GameEntity::EntityFunc_Think
 		} 
 		else 
 		{
-			G_SetMovedir( owner->s.angles, dir );
+			Game::setMovedir( owner->s.angles, dir );
 		}
 
 		self_->s.eventParm = DirToByte( dir );
@@ -152,7 +152,7 @@ void SP_misc_portal_camera( GameEntity* ent )
 	VectorClear( ent->r.maxs );
 	SV_LinkEntity( ent );
 
-	G_SpawnFloat( "roll", "0", &roll );
+	Game::spawnFloat( "roll", "0", &roll );
 
 	ent->s.clientNum = roll/360.0 * 256;
 }

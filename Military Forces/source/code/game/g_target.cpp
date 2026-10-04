@@ -19,7 +19,7 @@ struct Think_TargetDelay : public GameEntity::EntityFunc_Think
 {
 	void execute() override 
 	{
-		G_UseTargets( self_, self_->activator_ );
+		Game::useTargets( self_, self_->activator_ );
 	}
 };
 
@@ -38,8 +38,8 @@ struct Use_TargetDelay : public GameEntity::EntityFunc_Use
 void SP_target_delay( GameEntity *ent ) 
 {
 	// check delay for backwards compatability
-	if( !G_SpawnFloat( "delay", "0", &ent->wait_ ) ) 
-		G_SpawnFloat( "wait", "1", &ent->wait_ );
+	if( !Game::spawnFloat( "delay", "0", &ent->wait_ ) ) 
+		Game::spawnFloat( "wait", "1", &ent->wait_ );
 
 	if ( !ent->wait_ ) 
 		ent->wait_ = 1;
@@ -91,9 +91,9 @@ struct Use_TargetPrint : public GameEntity::EntityFunc_Use
 		if( self_->spawnflags_ & 3 ) 
 		{
 			if ( self_->spawnflags_ & 1 ) 
-				G_TeamCommand( ClientBase::TEAM_RED, va("cp \"%s\"", self_->message_) );
+				Game::teamCommand( ClientBase::TEAM_RED, va("cp \"%s\"", self_->message_) );
 			if ( self_->spawnflags_ & 2 ) 
-				G_TeamCommand( ClientBase::TEAM_BLUE, va("cp \"%s\"", self_->message_) );
+				Game::teamCommand( ClientBase::TEAM_BLUE, va("cp \"%s\"", self_->message_) );
 			return;
 		}
 
@@ -138,11 +138,11 @@ struct Use_TargetSpeaker : public GameEntity::EntityFunc_Use
 		{	
 			// normal sound
 			if ( self_->spawnflags_ & 8 ) 
-				G_AddEvent( activator, EV_GENERAL_SOUND, self_->noise_index_, true );
+				Game::addEvent( activator, EV_GENERAL_SOUND, self_->noise_index_, true );
 			else if (self_->spawnflags_ & 4) 
-				G_AddEvent( self_, EV_GLOBAL_SOUND, self_->noise_index_, true );
+				Game::addEvent( self_, EV_GLOBAL_SOUND, self_->noise_index_, true );
 			else 
-				G_AddEvent( self_, EV_GENERAL_SOUND, self_->noise_index_, true );
+				Game::addEvent( self_, EV_GENERAL_SOUND, self_->noise_index_, true );
 		}
 	}
 };
@@ -152,10 +152,10 @@ void SP_target_speaker( GameEntity *ent )
 	char	buffer[MAX_QPATH];
 	char	*s;
 
-	G_SpawnFloat( "wait", "0", &ent->wait_ );
-	G_SpawnFloat( "random", "0", &ent->random_ );
+	Game::spawnFloat( "wait", "0", &ent->wait_ );
+	Game::spawnFloat( "random", "0", &ent->random_ );
 
-	if ( !G_SpawnString( "noise", "NOSOUND", &s ) ) 
+	if ( !Game::spawnString( "noise", "NOSOUND", &s ) ) 
 		Common::error( ERR_DROP, "target_speaker without a noise key at %s", vtos( ent->s.origin ) );
 
 	// force all client reletive sounds to be "activator" speakers that
@@ -168,7 +168,7 @@ void SP_target_speaker( GameEntity *ent )
 	else 
 		Q_strncpyz( buffer, s, sizeof(buffer) );
 
-	ent->noise_index_ = G_SoundIndex(buffer);
+	ent->noise_index_ = Game::soundIndex(buffer);
 
 	// a repeating speaker can be done completely client side
 	ent->s.eType = ET_SPEAKER;
@@ -219,12 +219,12 @@ struct Use_TargetRelay : public GameEntity::EntityFunc_Use
 		}
 		if( self_->spawnflags_ & 4 ) 
 		{
-			GameEntity	*ent = G_PickTarget( self_->target_ );
+			GameEntity	*ent = Game::pickTarget( self_->target_ );
 			if( ent && ent->useFunc_ ) 
 				ent->useFunc_->execute( self_, activator );
 			return;
 		}
-		G_UseTargets (self_, activator);
+		Game::useTargets (self_, activator);
 	}
 };
 
@@ -243,7 +243,7 @@ struct Use_TargetKill : public GameEntity::EntityFunc_Use
 {
 	void execute( GameEntity *other, GameEntity *activator ) override 
 	{
-		G_Damage ( activator, nullptr, nullptr, nullptr, nullptr, 100000, DAMAGE_NO_PROTECTION, MOD_TELEFRAG, CAT_ANY);
+		Game::damage ( activator, nullptr, nullptr, nullptr, nullptr, 100000, DAMAGE_NO_PROTECTION, MOD_TELEFRAG, CAT_ANY);
 	}
 };
 
@@ -257,7 +257,7 @@ Used as a positional target for in-game calculation, like jumppad targets.
 */
 void SP_target_position( GameEntity *self )
 {
-	G_SetOrigin( self, self->s.origin );
+	Game::setOrigin( self, self->s.origin );
 }
 
 struct Think_TargetLocationLinkup : public GameEntity::EntityFunc_Think
@@ -304,6 +304,6 @@ void SP_target_location( GameEntity *self )
 	self->setThink( std::make_unique<Think_TargetLocationLinkup>());
 	self->nextthink_ = theLevel.time_ + 200;  // Let them all spawn first
 
-	G_SetOrigin( self, self->s.origin );
+	Game::setOrigin( self, self->s.origin );
 }
 

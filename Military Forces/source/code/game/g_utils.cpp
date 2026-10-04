@@ -97,12 +97,12 @@ int G_FindConfigstringIndex( char *name, int start, int max, bool create )
 }
 
 
-int G_ModelIndex( char *name ) 
+int Game::modelIndex( char *name ) 
 {
 	return G_FindConfigstringIndex (name, CS_MODELS, MAX_MODELS, true);
 }
 
-int G_SoundIndex( char *name ) 
+int Game::soundIndex( char *name ) 
 {
 	return G_FindConfigstringIndex (name, CS_SOUNDS, MAX_SOUNDS, true);
 }
@@ -112,12 +112,12 @@ int G_SoundIndex( char *name )
 
 /*
 ================
-G_TeamCommand
+Game::teamCommand
 
 Broadcasts a command to only a specific team
 ================
 */
-void G_TeamCommand( ClientBase::eTeam team, char *cmd ) 
+void Game::teamCommand( ClientBase::eTeam team, char *cmd ) 
 {
 	int			i;
 	GameClient*	client;	
@@ -136,7 +136,7 @@ void G_TeamCommand( ClientBase::eTeam team, char *cmd )
 
 /*
 =============
-G_Find
+Game::find
 
 Searches all active entities for the next one that holds
 the matching string at fieldofs (use the FOFS() macro) in the structure.
@@ -146,7 +146,7 @@ NULL will be returned if the end of the list is reached.
 
 =============
 */
-GameEntity* G_Find( GameEntity *from, int fieldofs, const char *match )
+GameEntity* Game::find( GameEntity *from, int fieldofs, const char *match )
 {
 	//char	*s;
 
@@ -185,14 +185,14 @@ GameEntity* G_Find( GameEntity *from, int fieldofs, const char *match )
 
 /*
 =============
-G_PickTarget
+Game::pickTarget
 
 Selects a random entity from among the targets
 =============
 */
 constexpr int MAXCHOICES = 32;
 
-GameEntity* G_PickTarget( char *targetname )
+GameEntity* Game::pickTarget( char *targetname )
 {
 	GameEntity*	ent = nullptr;
 	int			num_choices = 0;
@@ -200,13 +200,13 @@ GameEntity* G_PickTarget( char *targetname )
 
 	if (!targetname)
 	{
-		Common::printf("G_PickTarget called with NULL targetname\n");
+		Common::printf("Game::pickTarget called with NULL targetname\n");
 		return nullptr;
 	}
 
 	while(true)
 	{
-		ent = G_Find (ent, FOFS(targetname_), targetname);
+		ent = Game::find (ent, FOFS(targetname_), targetname);
 		if (!ent)
 			break;
 		choice[num_choices++] = ent;
@@ -216,7 +216,7 @@ GameEntity* G_PickTarget( char *targetname )
 
 	if (!num_choices)
 	{
-		Common::printf("G_PickTarget: target %s not found\n", targetname);
+		Common::printf("Game::pickTarget: target %s not found\n", targetname);
 		return nullptr;
 	}
 
@@ -226,7 +226,7 @@ GameEntity* G_PickTarget( char *targetname )
 
 /*
 ==============================
-G_UseTargets
+Game::useTargets
 
 "activator" should be set to the entity that initiated the firing.
 
@@ -235,7 +235,7 @@ match (string)self.target and call their .use function
 
 ==============================
 */
-void G_UseTargets( GameEntity *ent, GameEntity *activator ) 
+void Game::useTargets( GameEntity *ent, GameEntity *activator ) 
 {
 	GameEntity		*t;
 	
@@ -253,7 +253,7 @@ void G_UseTargets( GameEntity *ent, GameEntity *activator )
 		return;
 
 	t = nullptr;
-	while ( (t = G_Find (t, FOFS(targetname_), ent->target_)) != nullptr ) 
+	while ( (t = Game::find (t, FOFS(targetname_), ent->target_)) != nullptr ) 
 	{
 		if ( t == ent )
 		{
@@ -326,7 +326,7 @@ char	*vtos( const vec3_t v )
 
 /*
 ===============
-G_SetMovedir
+Game::setMovedir
 
 The editor only specifies a single value for angles (yaw),
 but we have special constants to generate an up or down direction.
@@ -334,7 +334,7 @@ Angles will be cleared, because it is being used to represent a direction
 instead of an orientation.
 ===============
 */
-void G_SetMovedir( vec3_t angles, vec3_t movedir ) 
+void Game::setMovedir( vec3_t angles, vec3_t movedir ) 
 {
 	static vec3_t VEC_UP		= {0, -1, 0};
 	static vec3_t MOVEDIR_UP	= {0, 0, 1};
@@ -450,10 +450,10 @@ float vectoyaw( const vec3_t vec )
 
 /*
 =================
-G_EntitiesFree
+Game::entitiesFree
 =================
 */
-bool G_EntitiesFree() 
+bool Game::entitiesFree() 
 {
 	if( theLevel.num_entities_ < ENTITYNUM_MAX_NORMAL )
 		return true;
@@ -491,14 +491,14 @@ bool G_EntitiesFree()
 
 /*
 =================
-G_TempEntity
+Game::tempEntity
 
 Spawns an event entity that will be auto-removed
 The origin will be snapped to save net bandwidth, so care
 must be taken if the origin is right on a surface (snap towards start vector first)
 =================
 */
-GameEntity *G_TempEntity( vec3_t origin, int event ) 
+GameEntity *Game::tempEntity( vec3_t origin, int event ) 
 {
 	GameEntity	*e;
 	vec3_t		snapped;
@@ -512,7 +512,7 @@ GameEntity *G_TempEntity( vec3_t origin, int event )
 
 	VectorCopy( origin, snapped );
 	SnapVector( snapped );		// save network bandwidth
-	G_SetOrigin( e, snapped );
+	Game::setOrigin( e, snapped );
 
 	// find cluster for PVS
 	SV_LinkEntity( e );
@@ -532,13 +532,13 @@ Kill box
 
 /*
 =================
-G_KillBox
+Game::killBox
 
 Kills all entities that would touch the proposed New positioning
 of ent.  Ent should be unlinked before calling this!
 =================
 */
-void G_KillBox( GameEntity *ent )
+void Game::killBox( GameEntity *ent )
 {
 	int			i, num;
 	int			touch[MAX_GENTITIES];
@@ -556,7 +556,7 @@ void G_KillBox( GameEntity *ent )
 			continue;
 
 		// nail it
-		G_Damage ( hit, ent, ent, nullptr, nullptr, 100000, DAMAGE_NO_PROTECTION, MOD_TELEFRAG, CAT_ANY );
+		Game::damage ( hit, ent, ent, nullptr, nullptr, 100000, DAMAGE_NO_PROTECTION, MOD_TELEFRAG, CAT_ANY );
 	}
 }
 
@@ -564,14 +564,14 @@ void G_KillBox( GameEntity *ent )
 
 /*
 ===============
-G_AddPredictableEvent
+Game::addPredictableEvent
 
 Use for non-pmove events that would also be predicted on the
 client side: jumppads and item pickups
 Adds an event+parm and twiddles the event counter
 ===============
 */
-void G_AddPredictableEvent( GameEntity *ent, int event, int eventParm )
+void Game::addPredictableEvent( GameEntity *ent, int event, int eventParm )
 {
 	if( !ent->client_ ) 
 		return;
@@ -585,7 +585,7 @@ Event queue
 ===============
 */
 
-void G_SendEventFromQueue( GameEntity* ent )
+void Game::sendEventFromQueue( GameEntity* ent )
 {
 	int i = ent->currentEventToSend_;
 
@@ -593,7 +593,7 @@ void G_SendEventFromQueue( GameEntity* ent )
 	if( !ent->eventQueue_[i].used_ ) 
 		return;
 
-	G_AddEvent( ent, ent->eventQueue_[i].event_, ent->eventQueue_[i].eventParm_, false );
+	Game::addEvent( ent, ent->eventQueue_[i].event_, ent->eventQueue_[i].eventParm_, false );
 	ent->eventQueue_[i].used_ = false;
 
 	i++;
@@ -623,18 +623,18 @@ void G_AddEventToQueue( GameEntity* ent, int event, int eventParm )
 
 /*
 ===============
-G_AddEvent
+Game::addEvent
 
 Adds an event+parm and twiddles the event counter
 ===============
 */
-void G_AddEvent( GameEntity *ent, int event, int eventParm, bool addToQueue )
+void Game::addEvent( GameEntity *ent, int event, int eventParm, bool addToQueue )
 {
 	int bits = 0;
 
 	if( !event ) 
 	{
-		Common::printf( "G_AddEvent: zero event added for entity %i\n", ent->s.number );
+		Common::printf( "Game::addEvent: zero event added for entity %i\n", ent->s.number );
 		return;
 	}
 
@@ -668,15 +668,15 @@ void G_AddEvent( GameEntity *ent, int event, int eventParm, bool addToQueue )
 
 /*
 =============
-G_Sound
+Game::sound
 =============
 */
-void G_Sound( GameEntity *ent, int channel, int soundIndex ) 
+void Game::sound( GameEntity *ent, int channel, int soundIndex ) 
 {
 	GameEntity
 		*te;
 
-	te = G_TempEntity( ent->r.currentOrigin, EV_GENERAL_SOUND );
+	te = Game::tempEntity( ent->r.currentOrigin, EV_GENERAL_SOUND );
 	te->s.eventParm = soundIndex;
 }
 
@@ -686,12 +686,12 @@ void G_Sound( GameEntity *ent, int channel, int soundIndex )
 
 /*
 ================
-G_SetOrigin
+Game::setOrigin
 
 Sets the pos trajectory for a fixed position
 ================
 */
-void G_SetOrigin( GameEntity *ent, vec3_t origin ) 
+void Game::setOrigin( GameEntity *ent, vec3_t origin ) 
 {
 	VectorCopy( origin, ent->s.pos.trBase );
 	ent->s.pos.trType = TR_STATIONARY;
@@ -709,7 +709,7 @@ void G_SetOrigin( GameEntity *ent, vec3_t origin )
 // --------------------
 
 
-unsigned long G_GetGameset()
+unsigned long Game::getGameset()
 {
 	char buffer[33];
 

@@ -31,7 +31,7 @@ constexpr int MISSILE_PRESTEP_TIME = 50;
 //		VectorScale( ent->s.pos.trDelta, 0.65, ent->s.pos.trDelta );
 //		// check for stop
 //		if ( trace->plane.normal[2] > 0.2 && VectorLength( ent->s.pos.trDelta ) < 40 ) {
-//			G_SetOrigin( ent, trace->endpos );
+//			Game::setOrigin( ent, trace->endpos );
 //			return;
 //		}
 //	}
@@ -62,21 +62,21 @@ struct Think_ExplodeMissile : public GameEntity::EntityFunc_Think
 
 		GameShared::evaluateTrajectory( &self_->s.pos, theLevel.time_, origin );
 		SnapVector( origin );
-		G_SetOrigin( self_, origin );
+		Game::setOrigin( self_, origin );
 
 		// we don't have a valid direction, so just point straight up
 		dir[0] = dir[1] = 0;
 		dir[2] = 1;
 
 		self_->s.eType = ET_GENERAL;
-		G_AddEvent( self_, EV_MISSILE_MISS, DirToByte( dir ), true );
+		Game::addEvent( self_, EV_MISSILE_MISS, DirToByte( dir ), true );
 
 		self_->freeAfterEvent_ = true;
 
 		// splash damage
 		if ( self_->splashDamage_ ) 
 		{
-			if( G_RadiusDamage( self_->r.currentOrigin, self_->parent_, self_->splashDamage_, self_->splashRadius_, 
+			if( Game::radiusDamage( self_->r.currentOrigin, self_->parent_, self_->splashDamage_, self_->splashRadius_, 
 								self_, self_->splashMethodOfDeath_, self_->targetcat_ ) )
 			{
 				//g_entities[ent->r.ownerNum].client->accuracy_hits++;
@@ -106,21 +106,21 @@ struct Think_ExplodeFlak : public GameEntity::EntityFunc_Think
 
 		GameShared::evaluateTrajectory( &self_->s.pos, theLevel.time_, origin );
 		SnapVector( origin );
-		G_SetOrigin( self_, origin );
+		Game::setOrigin( self_, origin );
 
 		// we don't have a valid direction, so just point straight up
 		dir[0] = dir[1] = 0;
 		dir[2] = 1;
 
 		self_->s.eType = ET_GENERAL;
-		G_AddEvent( self_, EV_FLAK, DirToByte( dir ), true );
+		Game::addEvent( self_, EV_FLAK, DirToByte( dir ), true );
 
 		self_->freeAfterEvent_ = true;
 
 		// splash damage
 		if ( self_->splashDamage_ ) 
 		{
-			if( G_RadiusDamage( self_->r.currentOrigin, self_->parent_, self_->splashDamage_, self_->splashRadius_, 
+			if( Game::radiusDamage( self_->r.currentOrigin, self_->parent_, self_->splashDamage_, self_->splashRadius_, 
 								self_, self_->splashMethodOfDeath_, self_->targetcat_ ) ) 
 			{
 				//g_entities[ent->r.ownerNum].client->accuracy_hits++;
@@ -151,21 +151,21 @@ struct Think_ExplodeCFlare : public GameEntity::EntityFunc_Think
 
 		GameShared::evaluateTrajectory( &self_->s.pos, theLevel.time_, origin );
 		SnapVector( origin );
-		G_SetOrigin( self_, origin );
+		Game::setOrigin( self_, origin );
 
 		// we don't have a valid direction, so just point straight up
 		dir[0] = dir[1] = 0;
 		dir[2] = 1;
 
 		self_->s.eType = ET_GENERAL;
-		G_AddEvent( self_, EV_MISSILE_MISS, DirToByte( dir ), true );
+		Game::addEvent( self_, EV_MISSILE_MISS, DirToByte( dir ), true );
 
 		self_->freeAfterEvent_ = true;
 
 		// splash damage
 		if ( self_->splashDamage_ ) 
 		{
-			if( G_RadiusDamage( self_->r.currentOrigin, self_->parent_, self_->splashDamage_, self_->splashRadius_, 
+			if( Game::radiusDamage( self_->r.currentOrigin, self_->parent_, self_->splashDamage_, self_->splashRadius_, 
 								self_, self_->splashMethodOfDeath_, self_->targetcat_ ) ) 
 			{
 				//g_entities[ent->r.ownerNum].client->accuracy_hits++;
@@ -267,9 +267,9 @@ static void NukeRadiusDamage( vec3_t origin, GameEntity *attacker, float damage,
 			// push the center of mass higher than the origin so players
 			// get knocked into the air more
 			dir[2] += 24;
-			//G_Damage( ent, NULL, attacker, dir, origin, damage, DAMAGE_RADIUS|DAMAGE_NO_TEAM_PROTECTION, MOD_NUKE, CAT_ANY );
+			//Game::damage( ent, NULL, attacker, dir, origin, damage, DAMAGE_RADIUS|DAMAGE_NO_TEAM_PROTECTION, MOD_NUKE, CAT_ANY );
 			
-			G_Damage( ent, nullptr, attacker, dir, origin, damage, DAMAGE_RADIUS, MOD_NUKE, CAT_ANY );
+			Game::damage( ent, nullptr, attacker, dir, origin, damage, DAMAGE_RADIUS, MOD_NUKE, CAT_ANY );
 			ent->nukeTime_ = theLevel.time_ + 3000;
 		}
 	}
@@ -328,8 +328,8 @@ static void NukeShockWave( vec3_t origin, GameEntity *attacker, float damage, fl
 //		if( CanDamage (ent, origin) ) {
 			VectorSubtract (ent->r.currentOrigin, origin, dir);
 			dir[2] += 24;
-		//	G_Damage( ent, NULL, attacker, dir, origin, damage, DAMAGE_RADIUS|DAMAGE_NO_TEAM_PROTECTION, MOD_NUKE, CAT_ANY );
-			G_Damage( ent, nullptr, attacker, dir, origin, damage, DAMAGE_RADIUS, MOD_NUKE, CAT_ANY );
+		//	Game::damage( ent, NULL, attacker, dir, origin, damage, DAMAGE_RADIUS|DAMAGE_NO_TEAM_PROTECTION, MOD_NUKE, CAT_ANY );
+			Game::damage( ent, nullptr, attacker, dir, origin, damage, DAMAGE_RADIUS, MOD_NUKE, CAT_ANY );
 			//
 			dir[2] = 0;
 			VectorNormalize(dir);
@@ -545,7 +545,7 @@ struct Think_ExplodeNuke : public GameEntity::EntityFunc_Think
 		VectorCopy( self_->r.currentOrigin, snapped );
 
 		SnapVector( snapped );		// save network bandwidth
-		G_SetOrigin( explosion, snapped );
+		Game::setOrigin( explosion, snapped );
 
 		explosion->classname_ = "nuke";
 		explosion->s.pos.trType = TR_STATIONARY;
@@ -571,7 +571,7 @@ struct Think_ExplodeNuke : public GameEntity::EntityFunc_Think
 			G_burningManExplode( self_ );
 
 		// play global sound at all clients
-		te = G_TempEntity(snapped, EV_GLOBAL_TEAM_SOUND );
+		te = Game::tempEntity(snapped, EV_GLOBAL_TEAM_SOUND );
 		te->r.svFlags |= SVF_BROADCAST;
 		te->s.eventParm = GTS_NUKE;
 	}
@@ -623,7 +623,7 @@ void G_MissileImpact( GameEntity *ent, trace_t *trace )
 				velocity[2] = 1;
 
 			actualdamage = ent->damage_ + ((rand() % (ent->damage_/2)) - (ent->damage_/4));
-			G_Damage( other, 
+			Game::damage( other, 
 					  ent, 
 					  theLevel.getEntity(ent->r.ownerNum),//&g_entities[ent->r.ownerNum], 
 					  velocity,
@@ -644,13 +644,13 @@ void G_MissileImpact( GameEntity *ent, trace_t *trace )
 	{
 		if ( other->takedamage_ && other->client_ ) 
 		{
-			G_AddEvent( ent, EV_MISSILE_HIT, DirToByte( trace->plane.normal ), true );
+			Game::addEvent( ent, EV_MISSILE_HIT, DirToByte( trace->plane.normal ), true );
 			ent->s.otherEntityNum = other->s.number;
 		} 
 		else if( trace->surfaceFlags & SURF_METALSTEPS ) 
-			G_AddEvent( ent, EV_MISSILE_MISS_METAL, DirToByte( trace->plane.normal ), true );
+			Game::addEvent( ent, EV_MISSILE_MISS_METAL, DirToByte( trace->plane.normal ), true );
 		else 
-			G_AddEvent( ent, EV_MISSILE_MISS, DirToByte( trace->plane.normal ), true );
+			Game::addEvent( ent, EV_MISSILE_MISS, DirToByte( trace->plane.normal ), true );
 	}
 
 	ent->freeAfterEvent_ = true;
@@ -660,7 +660,7 @@ void G_MissileImpact( GameEntity *ent, trace_t *trace )
 
 	SnapVectorTowards( trace->endpos, ent->s.pos.trBase );	// save net bandwidth
 
-	G_SetOrigin( ent, trace->endpos );
+	Game::setOrigin( ent, trace->endpos );
 
 	// Nuke specifics to execute its detonation anyways
 	if( availableWeapons[ent->s.weaponIndex].type == WT_NUKEBOMB || availableWeapons[ent->s.weaponIndex].type == WT_NUKEMISSILE )
@@ -687,7 +687,7 @@ void G_MissileImpact( GameEntity *ent, trace_t *trace )
 	// splash damage (doesn't apply to person directly hit)
 	else if ( ent->splashDamage_ )
 	{
-		if( G_RadiusDamage( trace->endpos, ent->parent_, ent->splashDamage_, ent->splashRadius_, 
+		if( Game::radiusDamage( trace->endpos, ent->parent_, ent->splashDamage_, ent->splashRadius_, 
 			other, ent->splashMethodOfDeath_, ent->targetcat_ ) ) 
 		{
 			if( !hitClient ) 
@@ -701,10 +701,10 @@ void G_MissileImpact( GameEntity *ent, trace_t *trace )
 
 /*
 ================
-G_RunMissile
+Game::runMissile
 ================
 */
-void G_RunMissile( GameEntity *ent ) 
+void Game::runMissile( GameEntity *ent ) 
 {
 	vec3_t		origin;
 	trace_t		tr;
@@ -753,7 +753,7 @@ void G_RunMissile( GameEntity *ent )
 	}
 
 	// check think function after bouncing
-	G_RunThink( ent );
+	Game::runThink( ent );
 }
 
 /*

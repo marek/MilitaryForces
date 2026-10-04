@@ -389,7 +389,7 @@ void Cmd_Tower_f( GameEntity *ent )
 		ent->radio_target_->nextthink_ = theLevel.time_ + 1000 * ent->radio_target_->wait_;
 	} 
 	else 
-		G_UseTargets( ent->radio_target_, ent );
+		Game::useTargets( ent->radio_target_, ent );
 
 	if( !ent->radio_target_->message_ ) 
 	{
@@ -958,12 +958,12 @@ void G_Say( GameEntity *ent, GameEntity *target, int mode, const char *chatText 
 	{
 	default:
 	case SAY_ALL:
-		G_LogPrintf( "say: %s: %s\n", ent->client_->pers_.netname_, chatText );
+		Game::logPrintf( "say: %s: %s\n", ent->client_->pers_.netname_, chatText );
 		Com_sprintf (name, sizeof(name), "%s%c%c" EC ": ", ent->client_->pers_.netname_, Q_COLOR_ESCAPE, COLOR_WHITE );
 		color = COLOR_GREEN;
 		break;
 	case SAY_TEAM:
-		G_LogPrintf( "sayteam: %s: %s\n", ent->client_->pers_.netname_, chatText );
+		Game::logPrintf( "sayteam: %s: %s\n", ent->client_->pers_.netname_, chatText );
 		if( Team_GetLocationMsg(ent, location, sizeof(location)) )
 			Com_sprintf (name, sizeof(name), EC "(%s%c%c" EC ") (%s)" EC ": ", 
 				ent->client_->pers_.netname_, Q_COLOR_ESCAPE, COLOR_WHITE, location);
@@ -1049,7 +1049,7 @@ static void Cmd_Tell_f( GameEntity* ent )
 
 	char* p = ConcatArgs( 2 );
 
-	G_LogPrintf( "tell: %s to %s: %s\n", ent->client_->pers_.netname_, target->client_->pers_.netname_, p );
+	Game::logPrintf( "tell: %s to %s: %s\n", ent->client_->pers_.netname_, target->client_->pers_.netname_, p );
 	G_Say( ent, target, SAY_TELL, p );
 	// don't tell to the player self if it was already directed to this player
 	// also don't send the chat back to a bot
@@ -1608,7 +1608,7 @@ void Rider_KillAll( GameEntity *vehicle, GameEntity *attacker )
 		switch_vehicle( theLevel.getEntity( i ) );
 		GameEntity* body = theLevel.getEntity( i );
 		if( body && body->health_ > 0 ) 
-			G_Damage( body, vehicle, attacker, nullptr, nullptr, 100000, DAMAGE_NO_PROTECTION, MOD_VEHICLEEXPLOSION, CAT_ANY );
+			Game::damage( body, vehicle, attacker, nullptr, nullptr, 100000, DAMAGE_NO_PROTECTION, MOD_VEHICLEEXPLOSION, CAT_ANY );
 	}
 }
 

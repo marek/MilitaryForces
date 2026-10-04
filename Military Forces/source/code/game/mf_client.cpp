@@ -46,7 +46,7 @@ char *MF_ClientConnect( int clientNum, bool firstTime, bool isBot )
 
 	// check to see if they are on the banned IP list
 	char* value = Info::valueForKey (userinfo, "ip");
-	if ( G_FilterPacket( value ) ) 
+	if ( Game::filterPacket( value ) ) 
 		return "Banned.";
 
 	// check for a password
@@ -95,9 +95,9 @@ char *MF_ClientConnect( int clientNum, bool firstTime, bool isBot )
 
 	// read or initialize the session data
 	if ( firstTime || theLevel.newSession_ ) 
-		G_InitSessionData( client, userinfo );
+		Game::initSessionData( client, userinfo );
 
-	G_ReadSessionData( client );
+	Game::readSessionData( client );
 
 	// for later
 //	if( isBot ) 
@@ -115,7 +115,7 @@ char *MF_ClientConnect( int clientNum, bool firstTime, bool isBot )
 	SV_SetUserinfo( clientNum, userinfo );
 
 	// get and distribute relevent paramters
-	G_LogPrintf( "MF_ClientConnect: %i\n", clientNum );
+	Game::logPrintf( "MF_ClientConnect: %i\n", clientNum );
 	ClientUserinfoChanged( clientNum );
 
 	// don't do the "xxx connected" messages if they were caried over from previous level
@@ -185,7 +185,7 @@ void MF_ClientBegin( int clientNum )
 			SV_GameSendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " entered the game\n\"", client->pers_.netname_) );
 		}
 	}
-	G_LogPrintf( "ClientBegin: %i\n", clientNum );
+	Game::logPrintf( "ClientBegin: %i\n", clientNum );
 
 	// count current clients and rank for scoreboard
 	CalculateRanks();
@@ -573,7 +573,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 	// health will count down towards max_health
 	ent->health_ = client->ps_.stats[STAT_HEALTH] = client->ps_.stats[STAT_MAX_HEALTH] + 25;
 
-	G_SetOrigin( ent, spawn_origin );
+	Game::setOrigin( ent, spawn_origin );
 	VectorCopy( spawn_origin, client->ps_.origin );
 
 	// the respawned flag will be cleared after the attack and jump keys come up
@@ -590,7 +590,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 	else 
 	{
 		if(!(cs_flags & CS_NOKILL))
-			G_KillBox( ent );
+			Game::killBox( ent );
 		SV_LinkEntity (ent);
 	}
 
@@ -617,7 +617,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 	else 
 	{
 		// fire the targets of the spawn point
-		G_UseTargets( spawnPoint, ent );
+		Game::useTargets( spawnPoint, ent );
 	}
 
 	// reset lockinfo

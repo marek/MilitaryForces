@@ -58,12 +58,12 @@ void P_DamageFeedback( GameEntity *player )
 	{
 		player->pain_debounce_time_ = theLevel.time_ + 700;
 
-#pragma message( "Possible future <client> event loss from calling G_AddEvent()!" )
+#pragma message( "Possible future <client> event loss from calling Game::addEvent()!" )
 /* MFQ3: don't create this event because (1) we don't need it and (2) it masks out our EV_VEHICLE_GIB event
-         approximatley 15% of the time (for some reason, possibly that the previous G_AddEvent( EV_VEHICLE_GIB ) has not
+         approximatley 15% of the time (for some reason, possibly that the previous Game::addEvent( EV_VEHICLE_GIB ) has not
 		 yet been processed and we therefore overwrite that event with this one)
 
-		G_AddEvent( player, EV_PAIN, player->health );
+		Game::addEvent( player, EV_PAIN, player->health );
 		client->ps.damageEvent++;
 */
 	}
@@ -117,17 +117,17 @@ void P_WorldEffects( GameEntity *ent )
 
 				// play a gurp sound instead of a normal pain sound
 /*				if (ent->health <= ent->damage) {
-					G_Sound(ent, CHAN_VOICE, G_SoundIndex("*drown.wav"));
+					Game::sound(ent, CHAN_VOICE, Game::soundIndex("*drown.wav"));
 				} else if (rand()&1) {
-					G_Sound(ent, CHAN_VOICE, G_SoundIndex("sound/player/gurp1.wav"));
+					Game::sound(ent, CHAN_VOICE, Game::soundIndex("sound/player/gurp1.wav"));
 				} else {
-					G_Sound(ent, CHAN_VOICE, G_SoundIndex("sound/player/gurp2.wav"));
+					Game::sound(ent, CHAN_VOICE, Game::soundIndex("sound/player/gurp2.wav"));
 				}
 */
 				// don't play a normal pain sound
 //				ent->pain_debounce_time = level.time + 200;
 
-				G_Damage (ent, nullptr, nullptr, nullptr, nullptr, 
+				Game::damage (ent, nullptr, nullptr, nullptr, nullptr, 
 					ent->damage_, DAMAGE_NO_PROTECTION, MOD_WATER, CAT_ANY);
 			}
 		}
@@ -149,12 +149,12 @@ void P_WorldEffects( GameEntity *ent )
 		{
 			if( ent->watertype_ & CONTENTS_LAVA) 
 			{
-				G_Damage (ent, nullptr, nullptr, nullptr, nullptr, 
+				Game::damage (ent, nullptr, nullptr, nullptr, nullptr, 
 					30*waterlevel, 0, MOD_LAVA, CAT_ANY);
 			}
 			if( ent->watertype_ & CONTENTS_SLIME) 
 			{
-				G_Damage (ent, nullptr, nullptr, nullptr, nullptr, 
+				Game::damage (ent, nullptr, nullptr, nullptr, nullptr, 
 					10*waterlevel, 0, MOD_SLIME, CAT_ANY);
 			}
 		}
@@ -217,13 +217,13 @@ void ClientImpacts( GameEntity *ent, pmove_t *pm )
 
 /*
 ============
-G_TouchTriggers
+Game::touchTriggers
 
 Find all trigger entities that ent's current position touches.
 Spectators will only interact with teleporters.
 ============
 */
-void	G_TouchTriggers( GameEntity *ent ) 
+void	Game::touchTriggers( GameEntity *ent ) 
 {
 	if( !ent->client_ ) 
 		return;
@@ -308,7 +308,7 @@ void NotSelectedThink( GameEntity *ent, usercmd_t *ucmd )
 	// save results of pmove
 //	VectorCopy( client->ps.origin, ent->s.origin );
 
-	G_TouchTriggers( ent );
+	Game::touchTriggers( ent );
 	SV_UnlinkEntity( ent );
 
 	client->oldbuttons_ = client->buttons_;
@@ -350,7 +350,7 @@ void SpectatorThink( GameEntity *ent, usercmd_t *ucmd )
 		// save results of pmove
 		VectorCopy( client->ps_.origin, ent->s.origin );
 
-		G_TouchTriggers( ent );
+		Game::touchTriggers( ent );
 		SV_UnlinkEntity( ent );
 	}
 
@@ -394,7 +394,7 @@ void MissionEditorThink( GameEntity *ent, usercmd_t *ucmd )
 		// save results of pmove
 		VectorCopy( client->ps_.origin, ent->s.origin );
 
-		G_TouchTriggers( ent );
+		Game::touchTriggers( ent );
 		SV_UnlinkEntity( ent );
 	}
 
@@ -593,7 +593,7 @@ void SendPendingPredictableEvents( playerState_t *ps )
 		ps->externalEvent = 0;
 
 		// create temporary entity for event
-		GameEntity* t = G_TempEntity( ps->origin, event );
+		GameEntity* t = Game::tempEntity( ps->origin, event );
 		int number = t->s.number;
 		GameShared::playerStateToEntityState( ps, &t->s, true );
 		t->s.number = number;
@@ -682,7 +682,7 @@ void ClientThink_real( GameEntity *ent )
 
 	// event queue
 	ent->eventSent_ = false;
-	G_SendEventFromQueue( ent );
+	Game::sendEventFromQueue( ent );
 
 	// don't think if the client is not yet connected (and thus not yet spawned in)
 	if( client->pers_.connected_ != GameClient::ClientPersistant::CON_CONNECTED ) 
@@ -931,7 +931,7 @@ void ClientThink_real( GameEntity *ent )
 			client->ps_.ONOFF &= ~OO_VAPOR;
 			float impact = -client->ps_.velocity[2] - 100;
 			if( impact > 0 )
-				G_Damage( ent, nullptr, ent, nullptr, nullptr, impact/2, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
+				Game::damage( ent, nullptr, ent, nullptr, nullptr, impact/2, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 		}
 	}
 
@@ -959,7 +959,7 @@ void ClientThink_real( GameEntity *ent )
 		!(availableVehicles[client->vehicle_].cat & CAT_GROUND) &&
 		!(availableVehicles[client->vehicle_].cat & CAT_BOAT) )
 	{
-	    G_Damage( ent, nullptr, ent, nullptr, nullptr, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
+	    Game::damage( ent, nullptr, ent, nullptr, nullptr, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 	}
 
 	// execute client events
@@ -968,7 +968,7 @@ void ClientThink_real( GameEntity *ent )
 	// link entity now, after any personal teleporters have been used
 	SV_LinkEntity( ent );
 	if( !ent->client_->noclip_ ) 
-		G_TouchTriggers( ent );
+		Game::touchTriggers( ent );
 
 	// NOTE: now copy the exact origin over otherwise clients can be snapped into solid
 	VectorCopy( ent->client_->ps_.origin, ent->r.currentOrigin );
@@ -1032,10 +1032,10 @@ void ClientThink( int clientNum )
 
 /*
 ==================
-G_RunClient
+Game::runClient
 ==================
 */
-void G_RunClient( GameEntity *ent ) 
+void Game::runClient( GameEntity *ent ) 
 {
 	if( !(ent->r.svFlags & SVF_BOT) && !g_synchronousClients.integer ) 
 		return;

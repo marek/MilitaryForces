@@ -17,15 +17,15 @@ constexpr int POOLSIZE = (256 * 1024);
 static char		memoryPool[POOLSIZE];
 static int		allocPoint;
 
-void *G_Alloc( int size ) {
+void *Game::alloc( int size ) {
 	char	*p;
 
 	if ( g_debugAlloc.integer ) {
-		Common::printf( "G_Alloc of %i bytes (%i left)\n", size, POOLSIZE - allocPoint - ( ( size + 31 ) & ~31 ) );
+		Common::printf( "Game::alloc of %i bytes (%i left)\n", size, POOLSIZE - allocPoint - ( ( size + 31 ) & ~31 ) );
 	}
 
 	if ( allocPoint + size > POOLSIZE ) {
-		Common::error( ERR_DROP, "G_Alloc: failed on allocation of %u bytes\n", size );
+		Common::error( ERR_DROP, "Game::alloc: failed on allocation of %u bytes\n", size );
 		return nullptr;
 	}
 
@@ -36,7 +36,7 @@ void *G_Alloc( int size ) {
 	return p;
 }
 
-void G_InitMemory( ) {
+void Game::initMemory( ) {
 	allocPoint = 0;
 }
 

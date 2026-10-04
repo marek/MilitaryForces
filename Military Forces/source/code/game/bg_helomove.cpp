@@ -212,12 +212,12 @@ void PM_Toggle_HeloGear()
 	}
 
 	if( pm->ps->ONOFF & OO_GEAR ) {
-		PM_AddEvent( EV_GEAR_UP );
+		PlayerMove::addEvent( EV_GEAR_UP );
 		pm->ps->timers[TIMER_GEARANIM] = pm->cmd.serverTime + availableVehicles[pm->vehicle].gearTime;
 //		pm->ps->ONOFF &= ~OO_GEAR;
 	}
 	else {
-		PM_AddEvent( EV_GEAR_DOWN );
+		PlayerMove::addEvent( EV_GEAR_DOWN );
 		pm->ps->timers[TIMER_GEARANIM] = pm->cmd.serverTime + availableVehicles[pm->vehicle].gearTime;
 //		pm->ps->ONOFF |= OO_GEAR;
 	}
@@ -297,13 +297,13 @@ static void PM_HeloAccelerate()
 
 /*
 ===================
-PM_HeloMove
+PlayerMove::heloMove
 
 ===================
 */
 bool	PM_SlideMove_Helo();
 
-void PM_HeloMove( ) 
+void PlayerMove::heloMove( ) 
 {
     vec3_t	viewdir;
     vec3_t	vehdir;
@@ -360,9 +360,9 @@ void PM_HeloMove( )
 	if( pm->updateGear ) {
 		// sync anim
 		if( pm->ps->ONOFF & OO_GEAR ) {
-			PM_AddEvent( EV_GEAR_DOWN_FULL );
+			PlayerMove::addEvent( EV_GEAR_DOWN_FULL );
 		} else {
-			PM_AddEvent( EV_GEAR_UP_FULL );
+			PlayerMove::addEvent( EV_GEAR_UP_FULL );
 		}
 		pm->updateGear = false;
 	}
@@ -370,7 +370,7 @@ void PM_HeloMove( )
 	// bay
 	if( availableVehicles[pm->vehicle].caps & HC_WEAPONBAY ) {
 		if( !dead && (pm->cmd.buttons & BUTTON_WEAPONBAY) ) {
-			PM_Toggle_Bay();
+			PlayerMove::toggle_Bay();
 		}
 
 		// bayanim
@@ -388,7 +388,7 @@ void PM_HeloMove( )
 			} else {
 				if( pm->ps->timers[TIMER_BAYCLOSE] && 
 					pm->cmd.serverTime >= pm->ps->timers[TIMER_BAYCLOSE] ) {
-					PM_Toggle_Bay();
+					PlayerMove::toggle_Bay();
 				}
 			}
 		}
@@ -397,9 +397,9 @@ void PM_HeloMove( )
 		if( pm->updateBay ) {
 			// sync anim
 			if( pm->ps->ONOFF & OO_WEAPONBAY ) {
-				PM_AddEvent( EV_BAY_DOWN_FULL );
+				PlayerMove::addEvent( EV_BAY_DOWN_FULL );
 			} else {
-				PM_AddEvent( EV_BAY_UP_FULL );
+				PlayerMove::addEvent( EV_BAY_UP_FULL );
 			}
 			pm->updateBay = false;
 		}
@@ -579,7 +579,7 @@ void PM_HeloMove( )
 		if( (availableVehicles[pm->vehicle].caps & HC_GEAR) && (pm->ps->ONOFF & OO_GEAR) &&
 			(pm->ps->speed > availableVehicles[pm->vehicle].stallspeed * 10 * SPEED_GREEN_ARC) &&
 			!pm->ps->timers[TIMER_GEARANIM] ) {
-			PM_AddEvent( EV_GEAR_UP );
+			PlayerMove::addEvent( EV_GEAR_UP );
 			pm->ps->timers[TIMER_GEAR] = pm->cmd.serverTime + availableVehicles[pm->vehicle].gearTime + 100;
 			pm->ps->timers[TIMER_GEARANIM] = pm->cmd.serverTime + availableVehicles[pm->vehicle].gearTime;
 		}
@@ -798,10 +798,10 @@ bool	PM_SlideMove_Helo() {
 			}
 
 			// slide along the plane
-			PM_ClipVelocity (pm->ps->velocity, planes[i], clipVelocity, OVERCLIP );
+			PlayerMove::clipVelocity (pm->ps->velocity, planes[i], clipVelocity, OVERCLIP );
 
 			// slide along the plane
-			PM_ClipVelocity (endVelocity, planes[i], endClipVelocity, OVERCLIP );
+			PlayerMove::clipVelocity (endVelocity, planes[i], endClipVelocity, OVERCLIP );
 
 			// see if there is a second plane that the New move enters
 			for ( j = 0 ; j < numplanes ; j++ ) {
@@ -813,8 +813,8 @@ bool	PM_SlideMove_Helo() {
 				}
 
 				// try clipping the move to the plane
-				PM_ClipVelocity( clipVelocity, planes[j], clipVelocity, OVERCLIP );
-				PM_ClipVelocity( endClipVelocity, planes[j], endClipVelocity, OVERCLIP );
+				PlayerMove::clipVelocity( clipVelocity, planes[j], clipVelocity, OVERCLIP );
+				PlayerMove::clipVelocity( endClipVelocity, planes[j], endClipVelocity, OVERCLIP );
 
 				// see if it goes back into the first clip plane
 				if ( DotProduct( clipVelocity, planes[i] ) >= 0 ) {

@@ -242,8 +242,8 @@ LevelLocals::createItemFromSpawnFields( SpawnFieldHolder* sfh, gitem_t* item )
 	ent->init(gameEntities_.size());
 	setEntityFromSpawnFields(ent, sfh);
 
-	G_SpawnFloat( "random", "0", &ent->random_ );
-	G_SpawnFloat( "wait", "0", &ent->wait_ );
+	Game::spawnFloat( "random", "0", &ent->random_ );
+	Game::spawnFloat( "wait", "0", &ent->wait_ );
 
 	RegisterItem( item );
 	ent->item_ = item;

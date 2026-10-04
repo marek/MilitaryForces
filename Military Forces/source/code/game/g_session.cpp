@@ -47,12 +47,12 @@ void G_WriteClientSessionData( GameClient* client )
 
 /*
 ================
-G_ReadSessionData
+Game::readSessionData
 
 Called on a reconnect
 ================
 */
-void G_ReadSessionData( GameClient* client ) 
+void Game::readSessionData( GameClient* client ) 
 {
 	char	s[MAX_STRING_CHARS];
 	const char	*var;
@@ -74,12 +74,12 @@ void G_ReadSessionData( GameClient* client )
 
 /*
 ================
-G_InitSessionData
+Game::initSessionData
 
 Called on a first-time connect
 ================
 */
-void G_InitSessionData( GameClient* client, char *userinfo ) 
+void Game::initSessionData( GameClient* client, char *userinfo ) 
 {
 	GameClient::ClientSession	*sess;
 	const char					*value;
@@ -152,11 +152,11 @@ void G_InitSessionData( GameClient* client, char *userinfo )
 
 /*
 ==================
-G_InitWorldSession
+Game::initWorldSession
 
 ==================
 */
-void G_InitWorldSession()
+void Game::initWorldSession()
 {
 	char	s[MAX_STRING_CHARS];
 	int			gt;
@@ -175,11 +175,11 @@ void G_InitWorldSession()
 
 /*
 ==================
-G_WriteSessionData
+Game::writeSessionData
 
 ==================
 */
-void G_WriteSessionData() 
+void Game::writeSessionData() 
 {
 	CvarSystem::set( "session", va("%i", g_gametype.integer) );
 
