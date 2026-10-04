@@ -64,7 +64,7 @@ Bots::Goal Bots::chooseGoal( GameEntity* ent, State& bot, const Sense& sense )
 		rearm = std::max( rearm, 0.9f );
 	if( rearm > 0 && sense.role != Role::Infantry && findPad( ent ) < 0 )
 		rearm = 0;
-	if( sense.role == Role::Infantry )
+	if( sense.role == Role::Infantry || ((sense.role == Role::Fighter || sense.role == Role::Bomber) && (!g_botLanding.integer || theLevel.time_ < bot.landGiveUp)) )
 		rearm = 0;
 
 	const float keep = 1.25f + 0.25f * who.patience;

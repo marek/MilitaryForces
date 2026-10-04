@@ -73,8 +73,19 @@ bool Bots::landPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_t
 	const float side = rel[1] * pad.axis[0] - rel[0] * pad.axis[1];
 	const float above = ent->r.currentOrigin[2] - pad.z;
 
+	if( bot.landPhase != 0 && theLevel.time_ > bot.landStart + 70000 )
+	{
+		bot.pad = -1;
+		bot.landPhase = 0;
+		bot.landGiveUp = theLevel.time_ + 90000;
+		bot.desire = Goal::Roam;
+		bot.goalEvalTime = 0;
+		bot.commitTime = 0;
+		return false;
+	}
 	if( bot.landPhase == 0 )
 	{
+		bot.landStart = theLevel.time_;
 		bot.landDir = along > 0 ? -1.0f : 1.0f;
 		float rise[2];
 		for( int k = 0; k < 2; k++ )
@@ -92,6 +103,24 @@ bool Bots::landPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_t
 			bot.landDir = -1.0f;
 		else if( rise[1] > rise[0] + 30 )
 			bot.landDir = 1.0f;
+		float clear[2];
+		for( int k = 0; k < 2; k++ )
+		{
+			const float dir = k ? 1.0f : -1.0f;
+			vec3_t from, out;
+			trace_t tr;
+			VectorMA( pad.center, -dir * (pad.halfLength - 150.0f), pad.axis, from );
+			from[2] = pad.z + 250;
+			VectorScale( pad.axis, -dir, out );
+			out[2] = 0.1f;
+			VectorNormalize( out );
+			pathBlocked( from, out, 3500, ENTITYNUM_NONE, tr );
+			clear[k] = tr.fraction * 3500.0f;
+		}
+		const int chosen = bot.landDir > 0 ? 1 : 0;
+		if( clear[chosen] < 1500 && clear[1 - chosen] > clear[chosen] )
+			bot.landDir = -bot.landDir;
+		bot.landRun = std::max( 900.0f, clear[bot.landDir > 0 ? 1 : 0] - 300.0f );
 		bot.landPhase = 1;
 	}
 	const float pos = along * bot.landDir;
@@ -106,19 +135,21 @@ bool Bots::landPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_t
 	cmd.forwardmove = 127;
 	if( bot.landPhase == 1 )
 	{
-		VectorMA( pad.center, threshold - 3500.0f, travel, target );
+		VectorMA( pad.center, threshold - bot.landRun, travel, target );
+		bot.approachHeight = pad.z + std::min( 600.0f, bot.landRun * 0.17f );
+		target[2] = bot.approachHeight;
+		VectorCopy( target, bot.goal );
+		bot.goalTime = theLevel.time_ + 3000;
 		vec3_t dir;
 		VectorSubtract( target, ent->r.currentOrigin, dir );
 		dir[2] = 0;
 		const float dist = VectorLength( dir );
-		vectoangles( dir, angles );
-		view[YAW] = angles[YAW];
-		view[PITCH] = std::clamp( (above - 600.0f) / 30.0f, -30.0f, 20.0f );
-		if( sense.height < planeMinHeight * 0.7f )
-			view[PITCH] = -25.0f;
-		if( dist < 800 || (before > 2000 && fabs( side ) < 500 && fabs( AngleSubtract( axisYaw, ps.vehicleAngles[YAW] ) ) < 25) )
+		const bool level = fabs( ent->r.currentOrigin[2] - bot.approachHeight ) < 300;
+		if( (dist < 700 && level) || (before > bot.landRun * 0.55f && fabs( side ) < 400 && fabs( AngleSubtract( axisYaw, ps.vehicleAngles[YAW] ) ) < 25 &&
+			fabs( ent->r.currentOrigin[2] - bot.approachHeight ) < 400) )
 			bot.landPhase = 2;
-		return true;
+		else
+			return false;
 	}
 
 	if( before < -pad.halfLength || (before < -200 && above > 150) || fabs( side ) > 900 )
@@ -134,19 +165,34 @@ bool Bots::landPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_t
 	vectoangles( dir, angles );
 	view[YAW] = angles[YAW];
 
-	const float wantAbove = before > 0 ? std::clamp( before * 0.15f, 10.0f, 600.0f ) : 3.0f;
+	vec3_t under;
+	VectorCopy( ent->r.currentOrigin, under );
+	under[2] = pad.z;
+	const bool overRunway = runwayAt( under );
+	const float touch = fabs( veh.mins[2] ) + veh.gearheight;
+	const float wantAbove = overRunway ? touch : std::clamp( before * 0.15f, 170.0f, 600.0f );
 	view[PITCH] = std::clamp( (above - wantAbove) / 6.0f, -10.0f, 14.0f );
-	if( above < 25 )
-		view[PITCH] = -2.0f;
-	if( before > 0 && sense.height < 45 )
-		view[PITCH] = -8.0f;
+	if( overRunway )
+		view[PITCH] = above > touch + 30 ? std::clamp( (above - touch) / 6.0f, 2.0f, 10.0f ) : 1.5f;
+	if( !overRunway )
+	{
+		vec3_t nose;
+		trace_t tr;
+		AngleVectors( ps.vehicleAngles, nose, nullptr, nullptr );
+		if( sense.height < 60 || (pathBlocked( ent->r.currentOrigin, nose, 500, ent->s.number, tr ) && tr.entityNum == ENTITYNUM_WORLD) )
+			view[PITCH] = -12.0f;
+	}
 
-	const float wantSpeed = stall * (before > 1200 ? 1.6f : 1.3f);
+	const float wantSpeed = stall * (overRunway ? 1.15f : before > 1200 ? 1.7f : 1.45f);
 	cmd.forwardmove = speed < wantSpeed ? 127 : -127;
-	if( speed > wantSpeed * 1.3f && !(ps.ONOFF & OO_SPEEDBRAKE) )
+	const bool wantBrake = speed > wantSpeed * 1.25f;
+	if( wantBrake != ((ps.ONOFF & OO_SPEEDBRAKE) != 0) )
 		cmd.buttons |= BUTTON_BRAKE;
-	if( !(ps.ONOFF & OO_GEAR) && speed < stall * SPEED_GREEN_ARC * 0.95f )
+	if( !(ps.ONOFF & OO_GEAR) && speed < stall * SPEED_GREEN_ARC * 0.95f && theLevel.time_ > bot.gearTime )
+	{
 		cmd.buttons |= BUTTON_GEAR;
+		bot.gearTime = theLevel.time_ + 4000;
+	}
 	return true;
 }
 
@@ -170,6 +216,25 @@ void Bots::thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_
 		view[PITCH] = speed > veh.stallspeed * 0.97f ? -8.0f : 0.0f;
 		if( fabs( AngleSubtract( view[YAW], ps.vehicleAngles[YAW] ) ) > 6 )
 			cmd.forwardmove = speed < 12 ? 127 : -127;
+		if( speed < veh.stallspeed * 0.5f )
+		{
+			vec3_t flat = { 0, ps.vehicleAngles[YAW], 0 }, forward;
+			AngleVectors( flat, forward, nullptr, nullptr );
+			for( int i = 1; i <= theLevel.maxclients_; i++ )
+			{
+				GameEntity* other = theLevel.getEntity( i );
+				if( other == ent || !alive( other ) || other->client_->sess_.ridingClient_ >= 0 )
+					continue;
+				vec3_t rel;
+				VectorSubtract( other->r.currentOrigin, ent->r.currentOrigin, rel );
+				const float dist = VectorNormalize( rel );
+				if( dist < 320 && fabs( rel[2] * dist ) < 120 && DotProduct( rel, forward ) > 0.4f )
+				{
+					cmd.forwardmove = speed > 1 ? -127 : 0;
+					break;
+				}
+			}
+		}
 		return;
 	}
 
@@ -275,6 +340,13 @@ void Bots::thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_
 		view[PITCH] = std::clamp( angles[PITCH], -50.0f, 35.0f );
 	else
 		view[PITCH] = std::clamp( (sense.height - cruise) / 30.0f, -30.0f, 20.0f );
+	if( bot.desire == Goal::Rearm && bot.landPhase == 1 )
+	{
+		view[PITCH] = std::clamp( (ent->r.currentOrigin[2] - bot.approachHeight) / 30.0f, -25.0f, 20.0f );
+		const float slow = veh.stallspeed * 2.2f;
+		if( speed > slow )
+			cmd.forwardmove = -127;
+	}
 	if( bombing )
 		bomb( ent, bot, sense.enemy->r.currentOrigin, cmd, view );
 	else if( bomber && !attacking && bot.desire == Goal::Roam && theLevel.time_ > bot.egressTime && sense.height > 700.0f &&
@@ -290,60 +362,104 @@ void Bots::thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_
 		}
 	}
 
-	vec3_t forward;
-	const float travel = std::max( 1200.0f, VectorLength( ps.velocity ) * 3.0f );
-	trace_t tr;
-	AngleVectors( ps.vehicleAngles, forward, nullptr, nullptr );
-	if( pathBlocked( ent->r.currentOrigin, forward, travel, ent->s.number, tr ) )
+	const float airspeed = VectorLength( ps.velocity );
+	const float ceiling = ceilingAbove( ent->r.currentOrigin, ent->s.number );
+	const float room = sense.height + ceiling;
+	const float minHeight = std::min( planeMinHeight, room * 0.3f );
+	if( room < cruise * 2.0f && !(attacking && sense.enemyAir) && !(bot.desire == Goal::Rearm && bot.landPhase == 1) )
+		view[PITCH] = std::clamp( (sense.height - room * 0.5f) / 20.0f, -25.0f, 20.0f );
+
+	const bool climbOut = sense.height < 150 && speed < veh.stallspeed * 1.6f;
+	if( climbOut )
 	{
-		if( tr.entityNum != ENTITYNUM_WORLD )
+		view[YAW] = ps.vehicleAngles[YAW];
+		if( sense.height < 150 )
+			view[PITCH] = -8.0f;
+	}
+	else
+	{
+		const float look = std::clamp( airspeed * 2.0f, 700.0f, 2500.0f );
+		vec3_t nose;
+		trace_t tr;
+		AngleVectors( ps.vehicleAngles, nose, nullptr, nullptr );
+		if( theLevel.time_ >= bot.probeTime )
 		{
-			if( tr.fraction * travel < 700 )
-			{
-				bot.avoidYaw = ps.vehicleAngles[YAW] + 50.0f;
-				bot.avoidTime = theLevel.time_ + 1200;
-				bot.egressTime = theLevel.time_ + 2500;
-				view[PITCH] = -30.0f;
-			}
+			bot.probeTime = theLevel.time_ + 150;
+			bot.probeBlocked = pathBlocked( ent->r.currentOrigin, nose, look, ent->s.number, tr ) && tr.entityNum == ENTITYNUM_WORLD;
 		}
 		else
+			bot.probeBlocked = false;
+		if( bot.probeBlocked )
 		{
-			if( fabs( tr.plane.normal[2] ) < 0.7f )
+			constexpr std::array<float, 10> offsets = { 0.0f, 25.0f, -25.0f, 50.0f, -50.0f, 80.0f, -80.0f, 120.0f, -120.0f, 180.0f };
+			constexpr std::array<float, 3> pitches = { 0.0f, -25.0f, 12.0f };
+			float best = -99999.0f;
+			for( float offset : offsets )
 			{
-				float around;
-				if( steerAround( ent, view[YAW], travel, around ) )
+				for( float pitch : pitches )
 				{
-					bot.avoidYaw = around;
-					bot.avoidTime = theLevel.time_ + 1200;
-				}
-				else
-				{
-					vec3_t home;
-					VectorSubtract( bot.home, ent->r.currentOrigin, home );
-					vectoangles( home, angles );
-					bot.avoidYaw = angles[YAW];
-					bot.avoidTime = theLevel.time_ + 3000;
-					pickGoal( ent, bot, 9000 );
+					vec3_t probe = { pitch, view[YAW] + offset, 0 }, dir;
+					trace_t pt;
+					AngleVectors( probe, dir, nullptr, nullptr );
+					pathBlocked( ent->r.currentOrigin, dir, look * 2.0f, ent->s.number, pt );
+					const float turn = fabs( AngleSubtract( probe[YAW], ps.vehicleAngles[YAW] ) );
+					const float score = pt.fraction * look * 2.0f - turn * 6.0f - fabs( offset ) * 3.0f - fabs( pitch ) * 4.0f;
+					if( score > best )
+					{
+						best = score;
+						bot.avoidYaw = probe[YAW];
+						bot.avoidPitch = pitch;
+					}
 				}
 			}
-			else
-				view[PITCH] = tr.plane.normal[2] > 0 ? -45.0f : 20.0f;
+			bot.avoidTime = theLevel.time_ + 800;
 		}
-	}
-	if( theLevel.time_ < bot.avoidTime )
-	{
-		view[YAW] = bot.avoidYaw;
-		if( attacking )
-			view[PITCH] = std::clamp( (sense.height - cruise) / 30.0f, -30.0f, 20.0f );
-	}
-	if( sense.height < planeMinHeight )
-		view[PITCH] = -40.0f;
+		if( theLevel.time_ < bot.avoidTime )
+		{
+			view[YAW] = bot.avoidYaw;
+			view[PITCH] = bot.avoidPitch;
+		}
 
-	vec3_t up = { 0, 0, 1 };
-	if( pathBlocked( ent->r.currentOrigin, up, 700, ent->s.number, tr ) && sense.height > planeMinHeight * 2 )
-		view[PITCH] = std::max( view[PITCH], 15.0f );
+		for( int i = 1; i <= theLevel.maxclients_; i++ )
+		{
+			GameEntity* other = theLevel.getEntity( i );
+			if( other == ent || !alive( other ) || other->client_->sess_.ridingClient_ >= 0 )
+				continue;
+			if( !(availableVehicles[other->client_->vehicle_].cat & (CAT_PLANE|CAT_HELO)) || (other->client_->ps_.ONOFF & OO_LANDED) )
+				continue;
+			vec3_t rel, relVel, miss;
+			VectorSubtract( other->r.currentOrigin, ent->r.currentOrigin, rel );
+			if( VectorLength( rel ) > 3000 )
+				continue;
+			VectorSubtract( other->client_->ps_.velocity, ps.velocity, relVel );
+			const float closing = DotProduct( relVel, relVel );
+			if( closing < 1.0f )
+				continue;
+			const float when = -DotProduct( rel, relVel ) / closing;
+			if( when <= 0 || when > 2.0f )
+				continue;
+			VectorMA( rel, when, relVel, miss );
+			if( VectorLength( miss ) > 260 )
+				continue;
+			vec3_t right;
+			AngleVectors( ps.vehicleAngles, nullptr, right, nullptr );
+			const float side = DotProduct( rel, right ) + DotProduct( miss, right );
+			bot.avoidYaw = ps.vehicleAngles[YAW] + (side > 0 ? 45.0f : -45.0f);
+			bot.avoidPitch = (rel[2] + miss[2] >= 0 && sense.height > minHeight + 250) ? 22.0f : -28.0f;
+			bot.avoidTime = theLevel.time_ + 700;
+			bot.egressTime = std::max( bot.egressTime, theLevel.time_ + 1500 );
+			view[YAW] = bot.avoidYaw;
+			view[PITCH] = bot.avoidPitch;
+			break;
+		}
 
-	if( speed < veh.stallspeed * 1.3f && sense.height > planeMinHeight * 2 )
+		if( sense.height < minHeight )
+			view[PITCH] = std::min( view[PITCH], -35.0f );
+		else if( ceiling < 250 )
+			view[PITCH] = std::max( view[PITCH], sense.height > minHeight + 150 ? 12.0f : 0.0f );
+	}
+
+	if( speed < veh.stallspeed * 1.3f && sense.height > minHeight * 2 )
 		view[PITCH] = std::max( view[PITCH], 5.0f );
 	else if( speed < veh.stallspeed * 1.7f )
 		view[PITCH] = std::max( view[PITCH], -10.0f );

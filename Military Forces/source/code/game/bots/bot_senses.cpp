@@ -175,6 +175,13 @@ void Bots::sense( GameEntity* ent, State& bot, Sense& out )
 			!(out.enemy->client_->ps_.ONOFF & OO_LANDED);
 	}
 	out.height = heightAboveGround( ent->r.currentOrigin, ent->s.number );
+	if( theLevel.time_ >= bot.trailTime )
+	{
+		for( int i = 5; i > 0; i-- )
+			VectorCopy( bot.trail[i - 1], bot.trail[i] );
+		VectorCopy( ent->r.currentOrigin, bot.trail[0] );
+		bot.trailTime = theLevel.time_ + 1000;
+	}
 
 	GameClient* client = ent->client_;
 	const playerState_t& ps = client->ps_;
@@ -239,6 +246,10 @@ void Bots::sense( GameEntity* ent, State& bot, Sense& out )
 	{
 		const Goal previous = bot.desire;
 		bot.desire = chooseGoal( ent, bot, out );
+		if( g_botDebug.integer >= 2 && bot.desire != previous )
+			Common::printf( "BOTGOAL t %d bot %d veh %d goal %d -> %d health %.2f enemy %d dist %.0f visible %d locked %d launched %d underfire %d blind %d threat %.0f\n",
+				theLevel.time_, ent->s.number, client->vehicle_, static_cast<int>( previous ), static_cast<int>( bot.desire ), out.health, bot.enemy,
+				out.enemyDist, out.enemyVisible, out.locked, out.launched, out.underFire, out.blindsided, out.airThreat ? out.airThreatDist : -1.0f );
 		bot.goalEvalTime = theLevel.time_ + 1000;
 		if( bot.desire != previous )
 			bot.commitTime = theLevel.time_ + 3000 + static_cast<int>( 3000 * character( bot ).patience );

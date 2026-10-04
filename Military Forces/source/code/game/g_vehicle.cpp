@@ -1,5 +1,6 @@
 #include "g_vehicle.h"
 #include "g_local.h"
+#include "bots/bot.h"
 #include "g_level.h"
 
 
@@ -67,6 +68,7 @@ VehicleDeathImpl( GameEntity* self, GameEntity* inflictor, GameEntity* attacker,
 	self->client_->sess_.paintTeam_ = 0;
 	if( self->r.contents != CONTENTS_CORPSE )
 	{
+		Bots::onDeath( self, attacker, meansOfDeath );
 		Game::logPrintf( "Kill: %i %i %i: %s killed %s by %s\n", killer, self->s.number, meansOfDeath, killerName, 
 					 self->client_->pers_.netname_, obit );
 

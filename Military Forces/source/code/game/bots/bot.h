@@ -20,6 +20,7 @@ public:
 	static void onDisconnect( int clientNum );
 	static bool isBot( int clientNum );
 	static int count();
+	static void onDeath( GameEntity* self, GameEntity* attacker, int meansOfDeath );
 
 	static void addCommand();
 	static void kickCommand();
@@ -67,6 +68,7 @@ private:
 		int		commandTime = 0;
 		int		avoidTime = 0;
 		float	avoidYaw = 0;
+		float	avoidPitch = 0;
 		float	aimPhase = 0;
 		bool	wasAlive = false;
 		int		character = 0;
@@ -83,6 +85,9 @@ private:
 		int		goalsReached = 0;
 		int		goalsExpired = 0;
 		int		leader = -1;
+		vec3_t	trail[6] = {};
+		int		trailTime = 0;
+		int		logTime = 0;
 		std::array<Seen, MAX_CLIENTS + 1> seen;
 		vec3_t	hidePoint = { 0, 0, 0 };
 		int		hideTime = 0;
@@ -94,6 +99,13 @@ private:
 		int		pad = -1;
 		int		landPhase = 0;
 		float	landDir = 1;
+		float	landRun = 3500;
+		float	approachHeight = 0;
+		int		gearTime = 0;
+		int		landStart = 0;
+		int		landGiveUp = 0;
+		int		probeTime = 0;
+		bool	probeBlocked = false;
 		float	takeoffYaw = 0;
 		int		takeoffTime = 0;
 	};

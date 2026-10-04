@@ -123,6 +123,8 @@ void Bots::thinkHelo( GameEntity* ent, State& bot, const Sense& sense, usercmd_t
 		wantThrottle = 0;
 	else if( ps.ONOFF & OO_LANDED )
 		wantThrottle = std::max( wantThrottle, veh.maxthrottle * 0.6f );
+	if( rearming && overPad && sense.height < 150 )
+		wantThrottle = -1.0f;
 	if( throttle < floor( wantThrottle ) )
 		cmd.buttons |= BUTTON_INCREASE;
 	else if( throttle > ceil( wantThrottle ) )

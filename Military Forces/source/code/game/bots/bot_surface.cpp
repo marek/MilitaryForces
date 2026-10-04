@@ -89,6 +89,21 @@ void Bots::thinkSurface( GameEntity* ent, State& bot, const Sense& sense, usercm
 	start[2] += veh.maxs[2] * 0.5f + 8;
 	if( pathBlocked( start, forward, 260, ent->s.number, tr ) && tr.plane.normal[2] < 0.6f )
 		blocked = true;
+	if( !boat && !blocked )
+	{
+		for( float reach : { 160.0f, 380.0f } )
+		{
+			vec3_t ahead, below;
+			trace_t water;
+			VectorMA( ent->r.currentOrigin, reach, forward, ahead );
+			ahead[2] += 120;
+			VectorCopy( ahead, below );
+			below[2] -= 500;
+			SV_Trace( &water, ahead, nullptr, nullptr, below, ent->s.number, MASK_SOLID|MASK_WATER, false );
+			if( water.fraction < 1.0f && (water.contents & MASK_WATER) )
+				blocked = true;
+		}
+	}
 	if( boat && !blocked )
 	{
 		vec3_t ahead;

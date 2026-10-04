@@ -37,6 +37,8 @@ vmCvar_t	g_stealthPenalty;
 vmCvar_t	g_botMinPlayers;
 vmCvar_t	g_botSkill;
 vmCvar_t	g_ruseReset;
+vmCvar_t	g_botDebug;
+vmCvar_t	g_botLanding;
 vmCvar_t	g_abandonTime;
 vmCvar_t	g_enterRange;
 vmCvar_t	g_cheats;
@@ -132,6 +134,8 @@ cvarTable_t		gameCvarTable[] = {
 	{ &g_botMinPlayers, "g_botMinPlayers", "0", CVAR_ARCHIVE, 0, false  },
 	{ &g_botSkill, "g_botSkill", "3", CVAR_ARCHIVE, 0, false  },
 	{ &g_ruseReset, "g_ruseReset", "30", 0, 0, true  },
+	{ &g_botDebug, "g_botDebug", "0", 0, 0, false  },
+	{ &g_botLanding, "g_botLanding", "0", 0, 0, false  },
 	{ &g_abandonTime, "g_abandonTime", "300", 0, 0, true  },
 	{ &g_enterRange, "g_enterRange", "45", 0, 0, true  },
 	{ &g_knockback, "g_knockback", "1000", 0, 0, true  },
