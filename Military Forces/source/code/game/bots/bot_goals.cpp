@@ -66,7 +66,10 @@ struct GoalScoring
 
 	static float evade( const Situation& s )
 	{
-		float score = s.who.caution * (hurt( s ) * 1.2f + missileThreat( s ) + takingFire( s ));
+		// damage alone is no reason to keep running once nobody is near
+		constexpr float pressedRange = 6000.0f;
+		const bool pressed = s.sense.underFire || s.sense.locked || s.sense.launched || (s.sense.enemy && s.sense.enemyDist < pressedRange);
+		float score = s.who.caution * ((pressed ? hurt( s ) * 1.2f : 0.0f) + missileThreat( s ) + takingFire( s ));
 		if( armour( s ) && s.sense.health > 0.3f )
 			score *= 0.4f;
 		if( s.sense.role == Role::Bomber && s.sense.airThreat && s.sense.airThreatDist < 3000 )
@@ -229,6 +232,9 @@ bool Bots::replenished( GameEntity* ent )
 void Bots::finishRearm( GameEntity* ent, State& bot )
 {
 	bot.takeoffTime = 0;
+	bot.taxiTime = 0;
+	bot.holdTime = 0;
+	bot.takeoffHolds = 0;
 	bot.pad = -1;
 	bot.landPhase = 0;
 	bot.goalEvalTime = 0;

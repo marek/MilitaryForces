@@ -416,6 +416,9 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 		bot.following = false;
 		bot.cornerAhead = false;
 		bot.takeoffTime = 0;
+		bot.taxiTime = 0;
+		bot.holdTime = 0;
+		bot.takeoffHolds = 0;
 		bot.hitTime = 0;
 		bot.lastHealth = ent->health_;
 		bot.exposed = false;

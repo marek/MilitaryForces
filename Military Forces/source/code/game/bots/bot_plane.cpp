@@ -151,6 +151,51 @@ struct PlaneTasks
 			c.view[PITCH] = std::clamp( c.view[PITCH], -14.0f, 14.0f );
 	}
 
+	// parked where no heading has enough runway: find the nearest spot along the taxiway that has
+	static bool findTaxiSpot( Mind& c, const vec3_t origin, float wanted )
+	{
+		constexpr float taxiStep = 100.0f, taxiMax = 800.0f, edgeRoom = 50.0f;
+		for( float dist = taxiStep; dist <= taxiMax; dist += taxiStep )
+		{
+			float best = 0;
+			for( int step = 0; step < 24; step++ )
+			{
+				const float yaw = step * 15.0f;
+				if( Bots::runwayRun( origin, yaw, dist ) < dist )
+					continue;
+				vec3_t level = { 0, yaw, 0 }, dir, spot;
+				AngleVectors( level, dir, nullptr, nullptr );
+				VectorMA( origin, dist, dir, spot );
+				// not a spot on the very edge: the aircraft has to stop and turn there
+				bool room = true;
+				for( int side = 0; side < 4 && room; side++ )
+					room = Bots::runwayRun( spot, side * 90.0f, edgeRoom ) >= edgeRoom;
+				if( !room )
+					continue;
+				for( int turn = 0; turn < 12; turn++ )
+				{
+					const float run = Bots::runwayRun( spot, turn * 30.0f, wanted + 25.0f );
+					if( run >= wanted && run > best )
+					{
+						best = run;
+						VectorCopy( spot, c.bot.taxiSpot );
+					}
+				}
+			}
+			if( best > 0 )
+			{
+				c.bot.taxiTime = theLevel.time_ + 20000;
+				c.bot.takeoffTime = 0;
+#ifdef MF_BOT_DEBUG
+				if( g_botDebug.integer >= 2 )
+					Common::printf( "BOTTAKEOFF t %d bot %d taxi %.0f to %.0f %.0f run %.0f\n", theLevel.time_, c.ent->s.number, dist, c.bot.taxiSpot[0], c.bot.taxiSpot[1], best );
+#endif
+				return true;
+			}
+		}
+		return false;
+	}
+
 	// Chooses the take-off heading: enough runway to reach flying speed, nothing standing on it, and from the lift-off
 	// point a climb, straight or turning, that fits the terrain and leads somewhere.
 	static void planDeparture( Mind& c )
@@ -174,6 +219,7 @@ struct PlaneTasks
 		const float turnRate = std::max( 10.0f, c.veh.turnspeed[YAW] ) * std::numbers::pi_v<float> / 180.0f;
 		const float radius = stall * 1.15f / turnRate;
 		float best = 0, bestRun = 0, longest = 0;
+		bool bestClear = false;
 		for( int step = 0; step < 24; step++ )
 		{
 			const float yaw = step * 15.0f;
@@ -213,6 +259,7 @@ struct PlaneTasks
 			{
 				best = score;
 				bestRun = run;
+				bestClear = rollClear;
 				c.bot.takeoffYaw = yaw;
 				c.bot.departYaw = yaw + departTurn;
 			}
@@ -222,6 +269,18 @@ struct PlaneTasks
 			Common::printf( "BOTTAKEOFF t %d bot %d veh %d at %.0f %.0f %.0f facing %.0f chose %.0f then %.0f run %.0f need %.0f longest %.0f score %.0f\n", theLevel.time_, c.ent->s.number,
 				c.client->vehicle_, origin[0], origin[1], origin[2], c.ps.vehicleAngles[YAW], c.bot.takeoffYaw, c.bot.departYaw, bestRun, groundRun, longest, best );
 #endif
+		// the run estimate is rough and a runway end is unforgiving: with less than a comfortable length, taxi to a better place
+		const float comfortable = groundRun * 1.5f + 150.0f;
+		if( bestRun < comfortable && findTaxiSpot( c, origin, comfortable ) )
+			return;
+		// someone is standing on the run: give them a moment to move before rolling
+		constexpr int holdLimit = 8;
+		if( best > 0 && !bestClear && c.bot.takeoffHolds < holdLimit )
+		{
+			c.bot.takeoffHolds++;
+			c.bot.holdTime = theLevel.time_ + 1000;
+			return;
+		}
 		if( best > 0 )
 			c.bot.takeoffTime = theLevel.time_ + 30000;
 	}
@@ -230,13 +289,42 @@ struct PlaneTasks
 	{
 		c.direct = true;
 		c.bot.groundTime = theLevel.time_;
-		if( theLevel.time_ >= c.bot.takeoffTime && c.speed < 20 )
+		if( theLevel.time_ < c.bot.holdTime )
+		{
+			c.view[YAW] = c.ps.vehicleAngles[YAW];
+			c.cmd.forwardmove = c.speed > 1 ? -moveFull : moveNone;
+			return Status::Running;
+		}
+		if( theLevel.time_ >= c.bot.taxiTime && theLevel.time_ >= c.bot.takeoffTime && c.speed < 20 )
 			planDeparture( c );
-		c.view[YAW] = theLevel.time_ < c.bot.takeoffTime ? c.bot.takeoffYaw : c.ps.vehicleAngles[YAW];
-		// leave the ground with speed in hand: lifting off right at the stall drops the aircraft back
-		c.view[PITCH] = c.speed > c.veh.stallspeed * rotateSpeed ? -8.0f : 0.0f;
-		if( fabs( AngleSubtract( c.view[YAW], c.ps.vehicleAngles[YAW] ) ) > 6 )
-			c.cmd.forwardmove = c.speed < 12 ? moveFull : -moveFull;
+		if( theLevel.time_ < c.bot.holdTime )
+			return Status::Running;
+		if( theLevel.time_ < c.bot.taxiTime )
+		{
+			constexpr float taxiSpeed = 35.0f;
+			vec3_t toSpot;
+			VectorSubtract( c.bot.taxiSpot, c.ent->r.currentOrigin, toSpot );
+			toSpot[2] = 0;
+			c.headFor( c.bot.taxiSpot );
+			c.view[PITCH] = 0.0f;
+			if( VectorLength( toSpot ) < 40 )
+			{
+				c.cmd.forwardmove = -moveFull;
+				// stopped on the spot: the next plan starts from here
+				if( c.speed <= 1 )
+					c.bot.taxiTime = 0;
+			}
+			else
+				c.cmd.forwardmove = c.speed < taxiSpeed ? moveFull : c.speed > taxiSpeed * 1.5f ? -moveFull : moveNone;
+		}
+		else
+		{
+			c.view[YAW] = theLevel.time_ < c.bot.takeoffTime ? c.bot.takeoffYaw : c.ps.vehicleAngles[YAW];
+			// leave the ground with speed in hand: lifting off right at the stall drops the aircraft back
+			c.view[PITCH] = c.speed > c.veh.stallspeed * rotateSpeed ? -8.0f : 0.0f;
+			if( fabs( AngleSubtract( c.view[YAW], c.ps.vehicleAngles[YAW] ) ) > 6 )
+				c.cmd.forwardmove = c.speed < 12 ? moveFull : -moveFull;
+		}
 		if( c.speed < c.veh.stallspeed * 0.5f )
 		{
 			vec3_t flat = { 0, c.ps.vehicleAngles[YAW], 0 }, forward;
@@ -250,6 +338,20 @@ struct PlaneTasks
 				VectorSubtract( other->r.currentOrigin, c.ent->r.currentOrigin, rel );
 				const float dist = VectorNormalize( rel );
 				if( dist < 320 && fabs( rel[2] * dist ) < 120 && DotProduct( rel, forward ) > 0.4f )
+				{
+					c.cmd.forwardmove = c.speed > 1 ? -moveFull : moveNone;
+					break;
+				}
+				// stay off the path of an aircraft on its take-off roll, unless already standing in it
+				constexpr float rollSpeed = 60.0f, rollAhead = 1500.0f, rollWidth = 250.0f, onTheLine = 60.0f;
+				vec3_t track;
+				VectorCopy( other->client_->ps_.velocity, track );
+				track[2] = 0;
+				if( !(other->client_->ps_.ONOFF & OO_LANDED) || VectorNormalize( track ) < rollSpeed )
+					continue;
+				const float along = -DotProduct( rel, track ) * dist;
+				const float aside = sqrt( std::max( 0.0f, dist * dist - along * along ) );
+				if( along > 0 && along < rollAhead && aside < rollWidth && aside > onTheLine )
 				{
 					c.cmd.forwardmove = c.speed > 1 ? -moveFull : moveNone;
 					break;
@@ -563,13 +665,16 @@ struct PlaneTasks
 				continue;
 			if( !(availableVehicles[other->client_->vehicle_].cat & (CAT_PLANE|CAT_HELO)) || (other->client_->ps_.ONOFF & OO_LANDED) )
 				continue;
-			// right of way: the bot with the higher number gives way, unless it would run into the other from behind
+			// right of way: the bot with the higher number gives way, unless it would run into the other from behind;
+			// head on there is no time for one to do it alone, so both break
 			if( Bots::isBot( i ) && i > c.ent->s.number )
 			{
+				constexpr float sameWay = 0.5f, headOn = -0.7f;
 				vec3_t mine, theirs;
 				VectorNormalize2( c.ps.velocity, mine );
 				VectorNormalize2( other->client_->ps_.velocity, theirs );
-				if( DotProduct( mine, theirs ) < 0.5f )
+				const float agreement = DotProduct( mine, theirs );
+				if( agreement < sameWay && agreement > headOn )
 					continue;
 			}
 			vec3_t predicted;

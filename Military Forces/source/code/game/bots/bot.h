@@ -139,6 +139,10 @@ public:
 		float	takeoffYaw = 0;
 		float	departYaw = 0;
 		int		takeoffTime = 0;
+		int		taxiTime = 0;
+		int		holdTime = 0;
+		int		takeoffHolds = 0;
+		vec3_t	taxiSpot = { 0, 0, 0 };
 	};
 
 	struct Pad
