@@ -90,7 +90,7 @@ bool VehicleData::distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout
 	SortArray( &loadout->mounts[0], num, VehicleData::posCompare );
 
 	// fill
-	for( i = WP_WEAPON1; i < WP_FLARE; ++i ) {
+	for( int i : secondaryWeaponSlots ) {
 		if( availableVehicles[idx].weapons[i] &&
 			(availableWeapons[availableVehicles[idx].weapons[i]].type != WT_MACHINEGUN ||
 			 (availableWeapons[availableVehicles[idx].weapons[i]].fitsPylon & PF_GUNPOD)) ) {

@@ -338,7 +338,7 @@ bool GameShared::canItemBeGrabbed( int gametype, const entityState_t *ent, const
 
 	switch( item->giType ) {
 	case IT_AMMO:
-		for( i = WP_MACHINEGUN; i <= WP_FLARE; i++ ) {
+		for( int i : allWeaponSlots ) {
 			if( item->giTag == availableWeapons[availableVehicles[idx].weapons[i]].type &&
 				ps->ammo[i] < ps->ammo[i+8] ) return true;
 		}

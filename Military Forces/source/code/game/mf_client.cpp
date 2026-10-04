@@ -529,7 +529,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 		client->ps_.timers[TIMER_FUEL] = theLevel.time_;
 
 		// which weapons do we have
-		for( i = WP_MACHINEGUN; i <= WP_FLARE; i++ ) 
+		for( int i : allWeaponSlots ) 
 		{
 			if( availableVehicles[vehIndex].weapons[i] != WI_NONE ) 
 			{
@@ -539,7 +539,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 		}
 
 		// select the first weapon
-		for( i = WP_MACHINEGUN; i <= WP_FLARE; i++ ) 
+		for( int i : allWeaponSlots ) 
 		{
 			if( availableVehicles[vehIndex].weapons[i] != WI_NONE ) 
 			{

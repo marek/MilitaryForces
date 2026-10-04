@@ -10,7 +10,7 @@ Entity_Plane::checkForTakeoffOrLanding()
 	trace_t	trace;
 	vec3_t	startpos;
 	vec3_t	endpos;
-	float height = (client_->ps_.ONOFF & OO_LANDED) ? 3 : 1 + MAX( 0.0f, -client_->ps_.velocity[2] ) * 0.1f;
+	float height = (client_->ps_.ONOFF & OO_LANDED) ? 3 : 1 + std::max( 0.0f, -client_->ps_.velocity[2] ) * 0.1f;
 
 	VectorSet( startpos, s.pos.trBase[0], s.pos.trBase[1], s.pos.trBase[2] + r.mins[2]);
 	if( client_->ps_.ONOFF & OO_GEAR ) 

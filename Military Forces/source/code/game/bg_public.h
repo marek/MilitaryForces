@@ -486,20 +486,20 @@ enum itemType_t {
 inline constexpr int MAX_ITEM_MODELS = 4;
 
 struct gitem_s {
-	char		*classname;	// spawning name
-	char		*pickup_sound;
+	const char		*classname;	// spawning name
+	const char		*pickup_sound;
 	char		*world_model[MAX_ITEM_MODELS];
 
-	char		*icon;
-	char		*pickup_name;	// for printing on pickup
+	const char		*icon;
+	const char		*pickup_name;	// for printing on pickup
 
 	int			quantity;		// for ammo how much, or duration of powerup
 	itemType_t  giType;			// IT_* flags
 
 	int			giTag;
 
-	char		*precaches;		// string of all models and images this item will use
-	char		*sounds;		// string of all sounds this item will use
+	const char		*precaches;		// string of all models and images this item will use
+	const char		*sounds;		// string of all sounds this item will use
 };
 using gitem_t = gitem_s;
 
@@ -820,9 +820,9 @@ struct completeLoadout_t
 // list of vehicles (data)
 struct completeVehicleData_t
 {
-    char		    *descriptiveName;	// long descriptive name
-	char			*tinyName;			// small ident name
-    char		    *modelName;			// just the directory of the model
+    const char		    *descriptiveName;	// long descriptive name
+	const char			*tinyName;			// small ident name
+    const char		    *modelName;			// just the directory of the model
 	qhandle_t		shadowShader;	// the shadow shader (use SHADOW_DEFAULT to use the default shader or SHADOW_NONE for no shadow)
 //    unsigned long   id;				// gameset, team, cat and class
 	unsigned int	gameset;		// gameset 
@@ -912,9 +912,9 @@ inline constexpr int WF_RADAR_GUIDED = 4;
 // list of ground installations
 struct groundInstallationData_t
 {
-    char		    *descriptiveName;	// long descriptive name
-	char			*tinyName;			// small ident name
-    char		    *modelName;			// just the directory of the model
+    const char		    *descriptiveName;	// long descriptive name
+	const char			*tinyName;			// small ident name
+    const char		    *modelName;			// just the directory of the model
 	unsigned int	gameset;		// gameset 
     qhandle_t	    handle[BP_MAX_PARTS];// ditto
     vec3_t		    mins;
@@ -944,14 +944,14 @@ struct completeWeaponData_t
 {
 	weaponType_t	type;				// behaviour
 	unsigned int	gameset;			// in which epoche can it appear
-	char			*descriptiveName;	// displayed in-game
-	char			*shortName;			// displayed in-game, short form
-	char			*shortName2;		// displayed in-game, short form, but for GVs
-	char			*modelName;			// model
+	const char			*descriptiveName;	// displayed in-game
+	const char			*shortName;			// displayed in-game, short form
+	const char			*shortName2;		// displayed in-game, short form, but for GVs
+	const char			*modelName;			// model
 	qhandle_t		modelHandle;		// handle
-	char			*vwepName;			// vwep model
+	const char			*vwepName;			// vwep model
 	qhandle_t		vwepHandle;			// vwep handle
-	char			*iconName;			// icon for HUD
+	const char			*iconName;			// icon for HUD
 	qhandle_t		iconHandle;			// handle for icon
 	unsigned int	category;			// which category can it damage
 	float			noncatmod;			// modifier for hitting wrong category

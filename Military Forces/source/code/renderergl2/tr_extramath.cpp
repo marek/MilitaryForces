@@ -186,7 +186,7 @@ void BoundingSphereOfSpheres(vec3_t origin1, float radius1, vec3_t origin2, floa
 	VectorMA(origin3, 0.5f, origin2, origin3);
 
 	VectorSubtract(origin1, origin2, diff);
-	*radius3 = VectorLength(diff) * 0.5f + MAX(radius1, radius2);
+	*radius3 = VectorLength(diff) * 0.5f + std::max(radius1, radius2);
 }
 
 int NextPowerOfTwo(int in)

@@ -674,7 +674,7 @@ void G_MissileImpact( GameEntity *ent, trace_t *trace )
 			 availableWeapons[ent->s.weaponIndex].type == WT_AMMOCRATE || 
 			 availableWeapons[ent->s.weaponIndex].type == WT_HEALTHCRATE )
 	{
-		char * classname = theLevel.getEntity(trace->entityNum)->classname_;// g_entities[trace->entityNum].classname;
+		const char * classname = theLevel.getEntity(trace->entityNum)->classname_;// g_entities[trace->entityNum].classname;
 		if( strcmp( classname, "func_runway" ) == 0 ||
 			strcmp( classname, "func_plat" ) == 0 ||
 			strcmp( classname, "func_train" ) == 0 ||

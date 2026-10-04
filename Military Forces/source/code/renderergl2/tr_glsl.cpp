@@ -399,7 +399,7 @@ static void GLSL_GetShaderHeader( GLenum shaderType, const GLchar *extra, char *
 			cubeMipSize >>= 1;
 			numRoughnessMips++;
 		}
-		numRoughnessMips = MAX(1, numRoughnessMips - 2);
+		numRoughnessMips = std::max(1, numRoughnessMips - 2);
 		Q_strcat(dest, size, va("#define ROUGHNESS_MIPS float(%d)\n", numRoughnessMips));
 	}
 

@@ -65,7 +65,7 @@ struct GameEntity : public EntityBase
 
 	bool			inuse_;
 
-	char*			classname_;			// set in QuakeEd
+	const char*			classname_;			// set in QuakeEd
 	int				spawnflags_;		// set in QuakeEd
 
 	//bool			neverFree_;			// if true, FreeEntity will only unlink

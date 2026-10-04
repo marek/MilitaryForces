@@ -803,14 +803,6 @@ bool RayIntersectBox( const ray3_t* ray, const box3_t* bbox );
 
 // end MFQ3
 
-#ifndef MAX
-#define MAX(x,y) ((x)>(y)?(x):(y))
-#endif
-
-#ifndef MIN
-#define MIN(x,y) ((x)<(y)?(x):(y))
-#endif
-
 //=============================================
 
 float Com_Clamp( float min, float max, float value );

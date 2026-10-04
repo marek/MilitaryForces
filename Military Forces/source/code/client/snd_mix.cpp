@@ -174,7 +174,7 @@ void S_TransferPaintBuffer(int endtime)
 		p = reinterpret_cast<int *>(paintbuffer);
 		count = (endtime - s_paintedtime) * dma.channels;
 		out_idx = (static_cast<unsigned int>(s_paintedtime) * dma.channels) % dma.samples;
-		step = 3 - MIN(dma.channels, 2);
+		step = 3 - std::min(dma.channels, 2);
 
 		if ((dma.isfloat) && (dma.samplebits == 32))
 		{

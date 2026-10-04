@@ -41,7 +41,7 @@ int Pickup_Ammo( GameEntity *ent, GameEntity *other )
 	else 
 		quantity = ent->item_->quantity;
 
-	for( i = WP_MACHINEGUN; i <= WP_FLARE; i++ )
+	for( int i : allWeaponSlots )
 	{
 		if( availableWeapons[availableVehicles[other->client_->vehicle_].weapons[i]].type == ent->item_->giTag )
 		{

@@ -1245,8 +1245,8 @@ void S_GetSoundtime()
 
 	if( Client::videoRecording( ) )
 	{
-		float fps = MIN(cl_aviFrameRate->value, 1000.0f);
-		float frameDuration = MAX(dma.speed / fps, 1.0f) + clc.aviSoundFrameRemainder;
+		float fps = std::min(cl_aviFrameRate->value, 1000.0f);
+		float frameDuration = std::max(dma.speed / fps, 1.0f) + clc.aviSoundFrameRemainder;
 
 		int msec = static_cast<int>(frameDuration);
 		s_soundtime += msec;

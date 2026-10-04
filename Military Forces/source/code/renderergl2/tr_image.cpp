@@ -441,7 +441,7 @@ static void RGBAtoNormal(const byte *in, byte *out, int width, int height, bool 
 			byte result = (inbyte[0] >> 2) + (inbyte[1] >> 1) + (inbyte[2] >> 2);
 			result = result * result / 255; // Make linear
 			*outbyte = result;
-			max = MAX(max, *outbyte);
+			max = std::max<int>(max, *outbyte);
 			outbyte += 4;
 			inbyte  += 4;
 		}
@@ -1148,8 +1148,8 @@ static void FCBIByBlock(byte *data, int width, int height, bool clampToEdge, boo
 			int x2, y2;
 			int workwidth, workheight, fullworkwidth, fullworkheight;
 
-			workwidth =  MIN(WORKBLOCK_SIZE, width  - x);
-			workheight = MIN(WORKBLOCK_SIZE, height - y);
+			workwidth =  std::min(WORKBLOCK_SIZE, width  - x);
+			workheight = std::min(WORKBLOCK_SIZE, height - y);
 
 			fullworkwidth =  workwidth  + WORKBLOCK_BORDER * 2;
 			fullworkheight = workheight + WORKBLOCK_BORDER * 2;
@@ -1401,12 +1401,12 @@ static void R_MipMapNormalHeight (const byte *in, byte *out, int width, int heig
 			//v[0] *= 0.25f;
 			//v[1] *= 0.25f;
 			//v[2] = 1.0f - v[0] * v[0] - v[1] * v[1];
-			//v[2] = sqrt(MAX(v[2], 0.0f));
+			//v[2] = sqrt(std::max(v[2], 0.0f));
 
 			out[sx] = FloatToOffsetByte(v[0]);
 			out[1 ] = FloatToOffsetByte(v[1]);
 			out[2 ] = FloatToOffsetByte(v[2]);
-			out[sa] = MAX(MAX(in[sa], in[sa+4]), MAX(in[sa+row], in[sa+row+4]));
+			out[sa] = std::max(std::max(in[sa], in[sa+4]), std::max(in[sa+row], in[sa+row+4]));
 		}
 	}
 }
@@ -1693,8 +1693,8 @@ static bool RawImage_ScaleToPower2( byte **data, int *inout_width, int *inout_he
 	//
 	// clamp to minimum size
 	//
-	scaled_width  = MAX(1, scaled_width);
-	scaled_height = MAX(1, scaled_height);
+	scaled_width  = std::max(1, scaled_width);
+	scaled_height = std::max(1, scaled_height);
 
 	scaled = (width != scaled_width) || (height != scaled_height);
 
@@ -1710,8 +1710,8 @@ static bool RawImage_ScaleToPower2( byte **data, int *inout_width, int *inout_he
 			else
 				R_MipMapsRGB(*data, width, height);
 
-			width  = MAX(1, width >> 1);
-			height = MAX(1, height >> 1);
+			width  = std::max(1, width >> 1);
+			height = std::max(1, height >> 1);
 		}
 	}
 
@@ -1880,8 +1880,8 @@ static void CompressMonoBlock(byte outdata[8], const byte indata[16])
 	hi = lo = indata[0];
 	for (i = 1; i < 16; i++)
 	{
-		hi = MAX(indata[i], hi);
-		lo = MIN(indata[i], lo);
+		hi = std::max<int>(indata[i], hi);
+		lo = std::min<int>(indata[i], lo);
 	}
 
 	*p++ = hi;
@@ -1929,14 +1929,14 @@ static void RawImage_UploadToRgtc2Texture(GLuint texture, int miplevel, int x, i
 	p = compressedData = static_cast<byte *>(ri.Hunk_AllocateTempMemory(size));
 	for (iy = 0; iy < height; iy += 4)
 	{
-		int oh = MIN(4, height - iy);
+		int oh = std::min(4, height - iy);
 
 		for (ix = 0; ix < width; ix += 4)
 		{
 			byte workingData[16];
 			int component;
 
-			int ow = MIN(4, width - ix);
+			int ow = std::min(4, width - ix);
 
 			for (component = 0; component < 2; component++)
 			{
@@ -2080,8 +2080,8 @@ static void RawImage_UploadTexture(GLuint texture, byte *data, int x, int y, int
 
 		x >>= 1;
 		y >>= 1;
-		width = MAX(1, width >> 1);
-		height = MAX(1, height >> 1);
+		width = std::max(1, width >> 1);
+		height = std::max(1, height >> 1);
 		miplevel++;
 
 		if (numMips > 1)
@@ -2140,8 +2140,8 @@ static void Upload32(byte *data, int x, int y, int width, int height, GLenum pic
 			for (c = numMips; c; c--)
 			{
 				data += CalculateMipSize(w2, h2, picFormat);
-				w2 = MAX(1, w2 >> 1);
-				h2 = MAX(1, h2 >> 1);
+				w2 = std::max(1, w2 >> 1);
+				h2 = std::max(1, h2 >> 1);
 			}
 		}
 	}
@@ -2265,8 +2265,8 @@ image_t *R_CreateImage2( const char *name, byte *pic, int width, int height, GLe
 			for (miplevel = r_picmip->integer; miplevel > 0 && numMips > 1; miplevel--, numMips--)
 			{
 				int size = CalculateMipSize(width, height, picFormat);
-				width = MAX(1, width >> 1);
-				height = MAX(1, height >> 1);
+				width = std::max(1, width >> 1);
+				height = std::max(1, height >> 1);
 				pic += size;
 			}
 		}
@@ -2294,8 +2294,8 @@ image_t *R_CreateImage2( const char *name, byte *pic, int width, int height, GLe
 			qglTextureImage2DEXT(image->texnum, GL_TEXTURE_2D, miplevel, internalFormat, mipWidth, mipHeight, 0, dataFormat, dataType, nullptr);
 		}
 
-		mipWidth  = MAX(1, mipWidth >> 1);
-		mipHeight = MAX(1, mipHeight >> 1);
+		mipWidth  = std::max(1, mipWidth >> 1);
+		mipHeight = std::max(1, mipHeight >> 1);
 		miplevel++;
 	}
 	while (!lastMip);
@@ -2588,7 +2588,7 @@ image_t	*R_FindImageFile( const char *name, imgType_t type, imgFlags_t flags )
 				byte *normbyte = normalPic + y * width * 4;
 				for (x = 0; x < width; x++)
 				{
-					int div = MAX(normbyte[2] - 127, 16);
+					int div = std::max(normbyte[2] - 127, 16);
 					picbyte[0] = CLAMP(picbyte[0] * 128 / div, 0, 255);
 					picbyte  += 4;
 					normbyte += 4;
@@ -2659,7 +2659,7 @@ image_t	*R_FindImageFile( const char *name, imgType_t type, imgFlags_t flags )
 	// force mipmaps off if image is compressed but doesn't have enough mips
 	if ((flags & IMGFLAG_MIPMAP) && picFormat != GL_RGBA8 && picFormat != GL_SRGB8_ALPHA8_EXT)
 	{
-		int wh = MAX(width, height);
+		int wh = std::max(width, height);
 		int neededMips = 0;
 		while (wh)
 		{

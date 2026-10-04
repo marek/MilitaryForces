@@ -10,7 +10,7 @@ Entity_Helicopter::checkForTakeoffOrLanding()
 	trace_t	trace;
 	vec3_t	startpos;
 	vec3_t	endpos;
-	float	height = (client_->ps_.ONOFF & OO_LANDED) ? 3 : 1 + MAX( 0.0f, -client_->ps_.velocity[2] ) * 0.1f;
+	float	height = (client_->ps_.ONOFF & OO_LANDED) ? 3 : 1 + std::max( 0.0f, -client_->ps_.velocity[2] ) * 0.1f;
     float	throttle = client_->ps_.fixed_throttle;
     int		maxthrottle = availableVehicles[client_->vehicle_].maxthrottle;
 

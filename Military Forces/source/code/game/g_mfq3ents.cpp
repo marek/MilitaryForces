@@ -209,7 +209,7 @@ void Touch_RechargeTouch::execute( GameEntity *other, trace_t *trace )
 			other->client_->ps_.stats[STAT_FUEL] = other->client_->ps_.stats[STAT_MAX_FUEL];
 	}
 	// reload weapons
-	for( int i = WP_MACHINEGUN; i <= WP_FLARE; i++ ) 
+	for( int i : allWeaponSlots ) 
 	{
 		if( other->client_->ps_.ammo[i] < other->client_->ps_.ammo[i+8] ) 
 		{

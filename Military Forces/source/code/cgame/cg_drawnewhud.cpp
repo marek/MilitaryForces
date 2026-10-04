@@ -982,7 +982,7 @@ void CGame::draw_Redundant(int vehicle, int health, int throttle, int ammo[16], 
 		// draw ammo
 	if( hud_weapons.integer ) {
 		char	ammostring[33];
-		char*	actualstring;
+		const char*	actualstring;
 			// mg
 		if( ammo[8] ) {
 			if( (availableVehicles[vehicle].cat & CAT_GROUND) || 
@@ -1365,7 +1365,7 @@ void ClientEntity::draw_MFD( int mfdnum, int vehicle, int targetrange, int targe
 		for( i = 0; i < 8; i++ ) {
 			// if weapon available
 			if( ps->ammo[i+8] ) {
-				char* actualstring;
+				const char* actualstring;
 				if( (availableVehicles[vehicle].cat & CAT_GROUND) ||
 					(availableVehicles[vehicle].cat & CAT_BOAT) ) {
 					actualstring = availableWeapons[availableVehicles[vehicle].weapons[i]].shortName2;

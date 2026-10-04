@@ -84,16 +84,13 @@ void BoundingSphereOfSpheres(vec3_t origin1, float radius1, vec3_t origin2, floa
 #define SGN(x) (((x) >= 0) ? !!(x) : -1)
 #endif
 
-#ifndef MAX
-#define MAX(a,b) ((a) > (b) ? (a) : (b))
-#endif
-
-#ifndef MIN
-#define MIN(a,b) ((a) < (b) ? (a) : (b))
-#endif
-
 #ifndef CLAMP
-#define CLAMP(a,b,c) MIN(MAX((a),(b)),(c))
+template<typename A, typename B, typename C>
+constexpr auto CLAMP( A a, B b, C c )
+{
+	using T = std::common_type_t<A, B, C>;
+	return std::min<T>( std::max<T>( a, b ), c );
+}
 #endif
 
 int NextPowerOfTwo(int in);

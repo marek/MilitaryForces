@@ -394,7 +394,7 @@ void R_SetupEntityLighting( const trRefdef_t *refdef, trRefEntity_t *ent ) {
 		g = ent->ambientLight[1];
 		b = ent->ambientLight[2];
 
-		max = MAX(MAX(r, g), b);
+		max = std::max(std::max(r, g), b);
 
 		if (max > 255.0f)
 		{
@@ -408,7 +408,7 @@ void R_SetupEntityLighting( const trRefdef_t *refdef, trRefEntity_t *ent ) {
 		g = ent->directedLight[1];
 		b = ent->directedLight[2];
 
-		max = MAX(MAX(r, g), b);
+		max = std::max(std::max(r, g), b);
 
 		if (max > 255.0f)
 		{

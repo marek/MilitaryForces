@@ -488,7 +488,7 @@ The server says this item is used on this level
 void CGame::registerItemSounds( int itemNum ) {
 	gitem_t			*item;
 	char			data[MAX_QPATH];
-	char			*s, *start;
+	const char			*s, *start;
 	int				len;
 
 	item = &bg_itemlist[ itemNum ];

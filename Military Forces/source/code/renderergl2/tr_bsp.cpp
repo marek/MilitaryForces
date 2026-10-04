@@ -170,8 +170,8 @@ void ColorToRGBM(const vec3_t color, unsigned char rgbm[4])
 
 	VectorCopy(color, sample);
 
-	maxComponent = MAX(sample[0], sample[1]);
-	maxComponent = MAX(maxComponent, sample[2]);
+	maxComponent = std::max(sample[0], sample[1]);
+	maxComponent = std::max(maxComponent, sample[2]);
 	maxComponent = CLAMP(maxComponent, 1.0f/255.0f, 1.0f);
 
 	rgbm[3] = static_cast<unsigned char>(ceil(maxComponent * 255.0f));
@@ -395,9 +395,9 @@ static	void R_LoadLightmaps( lump_t *l, lump_t *surfs ) {
 					vec4_t color;
 
 					//hack: convert LDR lightmap to HDR one
-					color[0] = MAX(buf_p[j*3+0], 0.499f);
-					color[1] = MAX(buf_p[j*3+1], 0.499f);
-					color[2] = MAX(buf_p[j*3+2], 0.499f);
+					color[0] = std::max<float>(buf_p[j*3+0], 0.499f);
+					color[1] = std::max<float>(buf_p[j*3+1], 0.499f);
+					color[2] = std::max<float>(buf_p[j*3+2], 0.499f);
 
 					// if under an arbitrary value (say 12) grey it out
 					// this prevents weird splotches in dimly lit areas
@@ -666,9 +666,9 @@ void LoadDrawVertToSrfVert(srfVert_t *s, drawVert_t *d, int realLightmapNum, flo
 		//hack: convert LDR vertex colors to HDR
 		if (r_hdr->integer)
 		{
-			v[0] = MAX(d->color[0], 0.499f);
-			v[1] = MAX(d->color[1], 0.499f);
-			v[2] = MAX(d->color[2], 0.499f);
+			v[0] = std::max<float>(d->color[0], 0.499f);
+			v[1] = std::max<float>(d->color[1], 0.499f);
+			v[2] = std::max<float>(d->color[2], 0.499f);
 		}
 		else
 		{

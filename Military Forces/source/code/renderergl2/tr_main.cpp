@@ -2462,8 +2462,8 @@ void R_RenderSunShadowMaps(const refdef_t *fd, int level)
 		{
 			float cascadeBound, worldUnitsPerTexel, invWorldUnitsPerTexel;
 
-			cascadeBound = MAX(lightviewBounds[1][0] - lightviewBounds[0][0], lightviewBounds[1][1] - lightviewBounds[0][1]);
-			cascadeBound = MAX(cascadeBound, lightviewBounds[1][2] - lightviewBounds[0][2]);
+			cascadeBound = std::max(lightviewBounds[1][0] - lightviewBounds[0][0], lightviewBounds[1][1] - lightviewBounds[0][1]);
+			cascadeBound = std::max(cascadeBound, lightviewBounds[1][2] - lightviewBounds[0][2]);
 			worldUnitsPerTexel = cascadeBound / tr.sunShadowFbo[level]->width;
 			invWorldUnitsPerTexel = 1.0f / worldUnitsPerTexel;
 

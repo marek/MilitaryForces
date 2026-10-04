@@ -3014,8 +3014,8 @@ void CL_Frame ( int msec ) {
 	if ( Client::videoRecording( ) && cl_aviFrameRate->integer && msec) {
 		// save the current screen
 		if ( clc.state == CA_ACTIVE || cl_forceavidemo->integer) {
-			float fps = MIN(cl_aviFrameRate->value * com_timescale->value, 1000.0f);
-			float frameDuration = MAX(1000.0f / fps, 1.0f) + clc.aviVideoFrameRemainder;
+			float fps = std::min(cl_aviFrameRate->value * com_timescale->value, 1000.0f);
+			float frameDuration = std::max(1000.0f / fps, 1.0f) + clc.aviVideoFrameRemainder;
 
 			Client::takeVideoFrame( );
 

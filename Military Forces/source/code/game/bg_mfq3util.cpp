@@ -382,7 +382,7 @@ void VehicleData::loadAllVehicleData()
 	for( i = 0; i < bg_numberOfVehicles; ++i ) 
 	{
 		// remove weapons not fitting
-		for( j = WP_WEAPON1; j < WP_FLARE; ++j ) 
+		for( int j : secondaryWeaponSlots ) 
 		{
 			if( !(availableVehicles[i].cat & availableWeapons[availableVehicles[i].weapons[j]].fitsCategory) )
 				availableVehicles[i].ammo[j] = 0;
@@ -460,7 +460,7 @@ void VehicleData::loadAllVehicleData()
 				availableVehicles[i].maxBayFrame = BAY_DOWN_DEFAULT;
 
 			// correct actual loadouts
-			for( j = WP_WEAPON1; j < WP_FLARE; ++j ) {
+			for( int j : secondaryWeaponSlots ) {
 				if( availableVehicles[i].weapons[j] ) {
 					availableVehicles[i].ammo[j] = 
 						VehicleData::packagesOfType( availableVehicles[i].weapons[j], &availableLoadouts[i] );
@@ -514,7 +514,7 @@ void VehicleData::loadAllVehicleData()
 
 			// correct actual loadouts
 			if( availableLoadouts[i].usedMounts ) {
-				for( j = WP_WEAPON1; j < WP_FLARE; ++j ) {
+				for( int j : secondaryWeaponSlots ) {
 					if( availableVehicles[i].weapons[j] &&
 						(availableWeapons[availableVehicles[i].weapons[j]].type != WT_MACHINEGUN ||
 						 (availableWeapons[availableVehicles[i].weapons[j]].fitsPylon & PF_GUNPOD)) ) {
