@@ -2,7 +2,7 @@
 #include "g_miscvehicle.h"
 #include "../vehiclelib/bg_datamanager.h"
 #include "g_level.h"
-#include "g_bot.h"
+#include "bots/bot.h"
 
 //level_locals_t	level;
 LevelLocals& theLevel = LevelLocals::getInstance();

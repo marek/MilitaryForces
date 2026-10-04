@@ -9,7 +9,7 @@
 #include "g_local.h"
 #include "g_entity.h"
 #include "g_level.h"
-#include "g_bot.h"
+#include "bots/bot.h"
 
 // g_client.c -- client functions that don't happen every frame
 

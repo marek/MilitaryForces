@@ -9,7 +9,7 @@
 
 #include "g_local.h"
 #include "g_level.h"
-#include "g_bot.h"
+#include "bots/bot.h"
 
 /*
 ==============================================================================

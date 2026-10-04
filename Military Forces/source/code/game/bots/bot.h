@@ -1,7 +1,7 @@
-#ifndef __G_BOT_H__
-#define __G_BOT_H__
+#ifndef __BOT_H__
+#define __BOT_H__
 
-#include "q_shared.h"
+#include "../q_shared.h"
 #include <array>
 #include <vector>
 
