@@ -23,7 +23,7 @@ constexpr int MISSILE_PRESTEP_TIME = 50;
 //
 //	// reflect the velocity on the trace plane
 //	hitTime = theLevel.previousTime_ + ( theLevel.time_ - theLevel.previousTime_ ) * trace->fraction;
-//	BG_EvaluateTrajectoryDelta( &ent->s.pos, hitTime, velocity );
+//	GameShared::evaluateTrajectoryDelta( &ent->s.pos, hitTime, velocity );
 //	dot = DotProduct( velocity, trace->plane.normal );
 //	VectorMA( velocity, -2*dot, trace->plane.normal, ent->s.pos.trDelta );
 //
@@ -60,7 +60,7 @@ struct Think_ExplodeMissile : public GameEntity::EntityFunc_Think
 		if( self_->tracktarget_ && self_->tracktarget_->client_ ) 
 			self_->tracktarget_->client_->ps_.stats[STAT_LOCKINFO] &= ~LI_BEING_LAUNCHED;
 
-		BG_EvaluateTrajectory( &self_->s.pos, theLevel.time_, origin );
+		GameShared::evaluateTrajectory( &self_->s.pos, theLevel.time_, origin );
 		SnapVector( origin );
 		G_SetOrigin( self_, origin );
 
@@ -104,7 +104,7 @@ struct Think_ExplodeFlak : public GameEntity::EntityFunc_Think
 		vec3_t		dir;
 		vec3_t		origin;
 
-		BG_EvaluateTrajectory( &self_->s.pos, theLevel.time_, origin );
+		GameShared::evaluateTrajectory( &self_->s.pos, theLevel.time_, origin );
 		SnapVector( origin );
 		G_SetOrigin( self_, origin );
 
@@ -149,7 +149,7 @@ struct Think_ExplodeCFlare : public GameEntity::EntityFunc_Think
 		if( self_->tracktarget_ && self_->tracktarget_->client_) 
 			self_->tracktarget_->client_->ps_.stats[STAT_LOCKINFO] &= ~LI_BEING_LAUNCHED;
 
-		BG_EvaluateTrajectory( &self_->s.pos, theLevel.time_, origin );
+		GameShared::evaluateTrajectory( &self_->s.pos, theLevel.time_, origin );
 		SnapVector( origin );
 		G_SetOrigin( self_, origin );
 
@@ -618,7 +618,7 @@ void G_MissileImpact( GameEntity *ent, trace_t *trace )
 				//g_entities[ent->r.ownerNum].client->accuracy_hits++;
 				hitClient = true;
 			}
-			BG_EvaluateTrajectoryDelta( &ent->s.pos, theLevel.time_, velocity );
+			GameShared::evaluateTrajectoryDelta( &ent->s.pos, theLevel.time_, velocity );
 			if ( VectorLength( velocity ) == 0 ) 
 				velocity[2] = 1;
 
@@ -711,7 +711,7 @@ void G_RunMissile( GameEntity *ent )
 	int			passent;
 
 	// get current position
-	BG_EvaluateTrajectory( &ent->s.pos, theLevel.time_, origin );
+	GameShared::evaluateTrajectory( &ent->s.pos, theLevel.time_, origin );
 
 	// if this missile bounced off an invulnerability sphere
 	if ( ent->target_ent_ ) 

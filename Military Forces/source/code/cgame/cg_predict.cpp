@@ -94,7 +94,7 @@ static void CG_ClipMoveToEntities ( const vec3_t start, const vec3_t mins, const
 			// special value for bmodel
 			cmodel = CollisionModel::inlineModel( ent->modelindex );
 			VectorCopy( cent->lerpAngles, angles );
-			BG_EvaluateTrajectory( &cent->currentState.pos, cg.physicsTime, origin );
+			GameShared::evaluateTrajectory( &cent->currentState.pos, cg.physicsTime, origin );
 		} else {
 			// encoded bbox
 			x = (ent->solid & 255);
@@ -108,8 +108,8 @@ static void CG_ClipMoveToEntities ( const vec3_t start, const vec3_t mins, const
 
 			cmodel = CollisionModel::tempBoxModel( bmins, bmaxs, false );
 			if ( ent->seatMask & SEATMASK_DECK ) {
-				BG_EvaluateTrajectory( &cent->currentState.apos, cg.physicsTime, angles );
-				BG_EvaluateTrajectory( &cent->currentState.pos, cg.physicsTime, origin );
+				GameShared::evaluateTrajectory( &cent->currentState.apos, cg.physicsTime, angles );
+				GameShared::evaluateTrajectory( &cent->currentState.pos, cg.physicsTime, origin );
 			} else {
 				VectorCopy( vec3_origin, angles );
 				VectorCopy( cent->lerpOrigin, origin );
@@ -268,7 +268,7 @@ void ClientEntity::touchItem() {
 	if ( !cg_predictItems.integer ) {
 		return;
 	}
-	if ( !BG_PlayerTouchesItem( &cg.predictedPlayerState, &this->currentState, cg.time ) ) {
+	if ( !GameShared::playerTouchesItem( &cg.predictedPlayerState, &this->currentState, cg.time ) ) {
 		return;
 	}
 
@@ -279,7 +279,7 @@ void ClientEntity::touchItem() {
 
 	ci = &cgs.clientinfo[cg.predictedPlayerState.clientNum];
 
-	if ( !BG_CanItemBeGrabbed( cgs.gametype, &this->currentState, &cg.predictedPlayerState, ci->vehicle ) ) {
+	if ( !GameShared::canItemBeGrabbed( cgs.gametype, &this->currentState, &cg.predictedPlayerState, ci->vehicle ) ) {
 		return;		// can't hold it
 	}
 
@@ -297,7 +297,7 @@ void ClientEntity::touchItem() {
 	}
 
 	// grab it
-	BG_AddPredictableEventToPlayerstate( EV_ITEM_PICKUP, this->currentState.modelindex , &cg.predictedPlayerState);
+	GameShared::addPredictableEventToPlayerstate( EV_ITEM_PICKUP, this->currentState.modelindex , &cg.predictedPlayerState);
 
 	// remove it from the frame so it won't be drawn
 	this->currentState.eFlags |= EF_NODRAW;

@@ -1630,13 +1630,13 @@ const char *CG_FeederItemText(float feederID, int index, int column, qhandle_t *
 			case 0:
 /*
 				if ( info->powerups & ( 1 << PW_NEUTRALFLAG ) ) {
-					item = BG_FindItemForPowerup( PW_NEUTRALFLAG );
+					item = GameShared::findItemForPowerup( PW_NEUTRALFLAG );
 					*handle = cg_items[ ITEM_INDEX(item) ].icon;
 				} else if ( info->powerups & ( 1 << PW_REDFLAG ) ) {
-					item = BG_FindItemForPowerup( PW_REDFLAG );
+					item = GameShared::findItemForPowerup( PW_REDFLAG );
 					*handle = cg_items[ ITEM_INDEX(item) ].icon;
 				} else if ( info->powerups & ( 1 << PW_BLUEFLAG ) ) {
-					item = BG_FindItemForPowerup( PW_BLUEFLAG );
+					item = GameShared::findItemForPowerup( PW_BLUEFLAG );
 					*handle = cg_items[ ITEM_INDEX(item) ].icon;
 				} else {
 					if ( info->botSkill > 0 && info->botSkill <= 5 ) {

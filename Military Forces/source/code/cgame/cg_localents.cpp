@@ -130,7 +130,7 @@ void LocalEntity::reflectVelocity( trace_t *trace ) {
 
 	// reflect the velocity on the trace plane
 	hitTime = cg.time - cg.frametime + cg.frametime * trace->fraction;
-	BG_EvaluateTrajectoryDelta( &this->pos, hitTime, velocity );
+	GameShared::evaluateTrajectoryDelta( &this->pos, hitTime, velocity );
 	dot = DotProduct( velocity, trace->plane.normal );
 	VectorMA( velocity, -2*dot, trace->plane.normal, this->pos.trDelta );
 
@@ -183,7 +183,7 @@ void LocalEntity::addFragment() {
 	}
 
 	// calculate New position
-	BG_EvaluateTrajectory( &this->pos, cg.time, newOrigin );
+	GameShared::evaluateTrajectory( &this->pos, cg.time, newOrigin );
 
 	// trace a line from previous position to New position
 	CG_Trace( &trace, this->refEntity.origin, nullptr, nullptr, newOrigin, -1, CONTENTS_SOLID );
@@ -194,7 +194,7 @@ void LocalEntity::addFragment() {
 		if ( this->leFlags & LEF_TUMBLE ) {
 			vec3_t angles;
 
-			BG_EvaluateTrajectory( &this->angles, cg.time, angles );
+			GameShared::evaluateTrajectory( &this->angles, cg.time, angles );
 			AnglesToAxis( angles, this->refEntity.axis );
 		}
 
@@ -279,7 +279,7 @@ void LocalEntity::addMoveScaleFade() {
 		re->radius = this->radius * ( 1.0 - c ) + 8;
 	}
 
-	BG_EvaluateTrajectory( &this->pos, cg.time, re->origin );
+	GameShared::evaluateTrajectory( &this->pos, cg.time, re->origin );
 
 	// if the view would be "inside" the sprite, kill the sprite
 	// so it doesn't add too much overdraw

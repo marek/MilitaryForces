@@ -518,7 +518,7 @@ void TossVehicleFlags( GameEntity *self )
 		{
 			if ( self->client_->ps_.objectives & i ) 
 			{
-				item = BG_FindItemForPowerup( static_cast<objective_t>(i) );
+				item = GameShared::findItemForPowerup( static_cast<objective_t>(i) );
 				if ( !item ) 
 					continue;
 				drop = Drop_Item( self, item, angle );

@@ -576,7 +576,7 @@ void G_AddPredictableEvent( GameEntity *ent, int event, int eventParm )
 	if( !ent->client_ ) 
 		return;
 
-	BG_AddPredictableEventToPlayerstate( event, eventParm, &ent->client_->ps_ );
+	GameShared::addPredictableEventToPlayerstate( event, eventParm, &ent->client_->ps_ );
 }
 
 /*

@@ -463,9 +463,9 @@ void CG_DrawFlagModel( float x, float y, float w, float h, int team, bool force2
 		gitem_t *item;
 
 		if( team == ClientBase::TEAM_RED ) {
-			item = BG_FindItemForPowerup( OB_REDFLAG );
+			item = GameShared::findItemForPowerup( OB_REDFLAG );
 		} else if( team == ClientBase::TEAM_BLUE ) {
-			item = BG_FindItemForPowerup( OB_BLUEFLAG );
+			item = GameShared::findItemForPowerup( OB_BLUEFLAG );
 		} else {
 			return;
 		}
@@ -744,7 +744,7 @@ CG_DrawTeamOverlay
 //			for (j = OB_REDFLAG; j <= OB_BLUEFLAG; j<<=1) {
 //				if( ci->objectives & j ) {
 //
-//					item = BG_FindItemForPowerup( static_cast<objective_t>(j) );
+//					item = GameShared::findItemForPowerup( static_cast<objective_t>(j) );
 //
 //					if (item) {
 //						CG_DrawPic( xx, y, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 
@@ -1168,7 +1168,7 @@ Draw the small two score display
 //
 //		if ( cgs.gametype == GT_CTF ) {
 //			// Display flag status
-//			item = BG_FindItemForPowerup( OB_BLUEFLAG );
+//			item = GameShared::findItemForPowerup( OB_BLUEFLAG );
 //
 //			if (item) {
 //				y1 = y - BIGCHAR_HEIGHT - 8;
@@ -1193,7 +1193,7 @@ Draw the small two score display
 //
 //		if ( cgs.gametype == GT_CTF ) {
 //			// Display flag status
-//			item = BG_FindItemForPowerup( OB_REDFLAG );
+//			item = GameShared::findItemForPowerup( OB_REDFLAG );
 //
 //			if (item) {
 //				y1 = y - BIGCHAR_HEIGHT - 8;

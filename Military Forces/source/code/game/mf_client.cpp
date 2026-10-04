@@ -632,7 +632,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 	// positively link the client, even if the command times are weird
 	if( ent->client_->sess_.sessionTeam_ != ClientBase::TEAM_SPECTATOR ) 
 	{
-		BG_PlayerStateToEntityState( &client->ps_, &ent->s, true );
+		GameShared::playerStateToEntityState( &client->ps_, &ent->s, true );
 		VectorCopy( ent->client_->ps_.origin, ent->r.currentOrigin );
 		SV_LinkEntity( ent );
 	}
@@ -641,5 +641,5 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 	ClientEndFrame( ent );
 
 	// clear entity state values
-	BG_PlayerStateToEntityState( &client->ps_, &ent->s, true );
+	GameShared::playerStateToEntityState( &client->ps_, &ent->s, true );
 }

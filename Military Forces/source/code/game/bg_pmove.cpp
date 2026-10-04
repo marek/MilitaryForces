@@ -39,7 +39,7 @@ PM_AddEvent
 ===============
 */
 void PM_AddEvent( int newEvent ) {
-	BG_AddPredictableEventToPlayerstate( newEvent, 0, pm->ps );
+	GameShared::addPredictableEventToPlayerstate( newEvent, 0, pm->ps );
 }
 
 /*

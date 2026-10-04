@@ -344,8 +344,8 @@ void G_MoverTeam( GameEntity *ent )
 	for (part = ent ; part ; part=part->teamchain_) 
 	{
 		// get current position
-		BG_EvaluateTrajectory( &part->s.pos, theLevel.time_, origin );
-		BG_EvaluateTrajectory( &part->s.apos, theLevel.time_, angles );
+		GameShared::evaluateTrajectory( &part->s.pos, theLevel.time_, origin );
+		GameShared::evaluateTrajectory( &part->s.apos, theLevel.time_, angles );
 		VectorSubtract( origin, part->r.currentOrigin, move );
 		VectorSubtract( angles, part->r.currentAngles, amove );
 		if ( !G_MoverPush( part, move, amove, &obstacle ) ) 
@@ -359,8 +359,8 @@ void G_MoverTeam( GameEntity *ent )
 		{
 			part->s.pos.trTime += theLevel.time_ - theLevel.previousTime_;
 			part->s.apos.trTime += theLevel.time_ - theLevel.previousTime_;
-			BG_EvaluateTrajectory( &part->s.pos, theLevel.time_, part->r.currentOrigin );
-			BG_EvaluateTrajectory( &part->s.apos, theLevel.time_, part->r.currentAngles );
+			GameShared::evaluateTrajectory( &part->s.pos, theLevel.time_, part->r.currentOrigin );
+			GameShared::evaluateTrajectory( &part->s.apos, theLevel.time_, part->r.currentAngles );
 			SV_LinkEntity( part );
 		}
 
@@ -453,7 +453,7 @@ void SetMoverState( GameEntity *ent, GameEntity::eMoverState moverState, int tim
 		ent->s.pos.trType = TR_LINEAR_STOP;
 		break;
 	}
-	BG_EvaluateTrajectory( &ent->s.pos, theLevel.time_, ent->r.currentOrigin );	
+	GameShared::evaluateTrajectory( &ent->s.pos, theLevel.time_, ent->r.currentOrigin );	
 	SV_LinkEntity( ent );
 }
 

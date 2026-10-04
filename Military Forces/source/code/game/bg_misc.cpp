@@ -257,10 +257,10 @@ int		bg_numItems = sizeof(bg_itemlist) / sizeof(bg_itemlist[0]) - 1;
 
 /*
 ==============
-BG_FindItemForPowerup
+GameShared::findItemForPowerup
 ==============
 */
-gitem_t	*BG_FindItemForPowerup( objective_t pw ) {
+gitem_t	*GameShared::findItemForPowerup( objective_t pw ) {
 	int		i;
 
 	for ( i = 0 ; i < bg_numItems ; i++ ) {
@@ -275,11 +275,11 @@ gitem_t	*BG_FindItemForPowerup( objective_t pw ) {
 
 /*
 ===============
-BG_FindItem
+GameShared::findItem
 
 ===============
 */
-gitem_t	*BG_FindItem( const char *pickupName ) {
+gitem_t	*GameShared::findItem( const char *pickupName ) {
 	gitem_t	*it;
 	
 	for ( it = bg_itemlist + 1 ; it->classname ; it++ ) {
@@ -292,16 +292,16 @@ gitem_t	*BG_FindItem( const char *pickupName ) {
 
 /*
 ============
-BG_PlayerTouchesItem
+GameShared::playerTouchesItem
 
 Items can be picked up without actually touching their physical bounds to make
 grabbing them easier
 ============
 */
-bool	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTime ) {
+bool	GameShared::playerTouchesItem( playerState_t *ps, entityState_t *item, int atTime ) {
 	vec3_t		origin;
 
-	BG_EvaluateTrajectory( &item->pos, atTime, origin );
+	GameShared::evaluateTrajectory( &item->pos, atTime, origin );
 
 	// we are ignoring ducked differences here
 	if ( ps->origin[0] - origin[0] > 44
@@ -320,18 +320,18 @@ bool	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTime ) 
 
 /*
 ================
-BG_CanItemBeGrabbed
+GameShared::canItemBeGrabbed
 
 Returns false if the item should not be picked up.
 This needs to be the same for client side prediction and server use.
 ================
 */
-bool BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const playerState_t *ps, int idx ) {
+bool GameShared::canItemBeGrabbed( int gametype, const entityState_t *ent, const playerState_t *ps, int idx ) {
 	gitem_t	*item;
 	int		i;
 
 	if ( ent->modelindex < 1 || ent->modelindex >= bg_numItems ) {
-		Common::error( ERR_DROP, "BG_CanItemBeGrabbed: index out of range" );
+		Common::error( ERR_DROP, "GameShared::canItemBeGrabbed: index out of range" );
 	}
 
 	item = &bg_itemlist[ent->modelindex];
@@ -390,7 +390,7 @@ bool BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const playerSt
 		return false;
 
     case IT_BAD:
-            Common::error( ERR_DROP, "BG_CanItemBeGrabbed: IT_BAD" );
+            Common::error( ERR_DROP, "GameShared::canItemBeGrabbed: IT_BAD" );
 	}
 
 	return false;
@@ -400,11 +400,11 @@ bool BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const playerSt
 
 /*
 ================
-BG_EvaluateTrajectory
+GameShared::evaluateTrajectory
 
 ================
 */
-void BG_EvaluateTrajectory( const trajectory_t *tr, int atTime, vec3_t result ) {
+void GameShared::evaluateTrajectory( const trajectory_t *tr, int atTime, vec3_t result ) {
 	float		deltaTime;
 	float		phase;
 	vec3_t		dir;
@@ -455,19 +455,19 @@ void BG_EvaluateTrajectory( const trajectory_t *tr, int atTime, vec3_t result ) 
 			VectorMA( tr->trBase, deltaTime, tr->trDelta, result );
 		break;
 	default:
-		Common::error( ERR_DROP, "BG_EvaluateTrajectory: unknown trType: %i", tr->trType );
+		Common::error( ERR_DROP, "GameShared::evaluateTrajectory: unknown trType: %i", tr->trType );
 		break;
 	}
 }
 
 /*
 ================
-BG_EvaluateTrajectoryDelta
+GameShared::evaluateTrajectoryDelta
 
 For determining velocity at a given time
 ================
 */
-void BG_EvaluateTrajectoryDelta( const trajectory_t *tr, int atTime, vec3_t result ) {
+void GameShared::evaluateTrajectoryDelta( const trajectory_t *tr, int atTime, vec3_t result ) {
 	float	deltaTime;
 	float	phase;
 	vec3_t		dir;
@@ -516,7 +516,7 @@ void BG_EvaluateTrajectoryDelta( const trajectory_t *tr, int atTime, vec3_t resu
 		break;
 
 	default:
-		Common::error( ERR_DROP, "BG_EvaluateTrajectoryDelta: unknown trType: %i", tr->trType );
+		Common::error( ERR_DROP, "GameShared::evaluateTrajectoryDelta: unknown trType: %i", tr->trType );
 		break;
 	}
 }
@@ -581,14 +581,14 @@ char *eventnames[] = {
 
 /*
 ===============
-BG_AddPredictableEventToPlayerstate
+GameShared::addPredictableEventToPlayerstate
 
 Handles the sequence numbers
 ===============
 */
 
 
-void BG_AddPredictableEventToPlayerstate( int newEvent, int eventParm, playerState_t *ps ) {
+void GameShared::addPredictableEventToPlayerstate( int newEvent, int eventParm, playerState_t *ps ) {
 
 #ifdef _DEBUG
 	{
@@ -605,13 +605,13 @@ void BG_AddPredictableEventToPlayerstate( int newEvent, int eventParm, playerSta
 
 /*
 ========================
-BG_PlayerStateToEntityState
+GameShared::playerStateToEntityState
 
 This is done after each set of usercmd_t on the server,
 and after local prediction on the client
 ========================
 */
-void BG_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, bool snap ) {
+void GameShared::playerStateToEntityState( playerState_t *ps, entityState_t *s, bool snap ) {
 
 	if ( ps->pm_type == PM_INTERMISSION || ps->pm_type == PM_SPECTATOR ) {
 		s->eType = ET_INVISIBLE;
@@ -693,13 +693,13 @@ void BG_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, bool snap
 
 /*
 ========================
-BG_PlayerStateToEntityStateExtraPolate
+GameShared::playerStateToEntityStateExtraPolate
 
 This is done after each set of usercmd_t on the server,
 and after local prediction on the client
 ========================
 */
-void BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s, int time, bool snap ) {
+void GameShared::playerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s, int time, bool snap ) {
 
 	if ( ps->pm_type == PM_INTERMISSION || ps->pm_type == PM_SPECTATOR ) {
 		s->eType = ET_INVISIBLE;

@@ -503,11 +503,21 @@ using gitem_t = gitem_s;
 extern	gitem_t	bg_itemlist[];
 extern	int		bg_numItems;
 
-gitem_t	*BG_FindItem( const char *pickupName );
-gitem_t	*BG_FindItemForPowerup( objective_t pw );
+class GameShared
+{
+public:
+	static gitem_t *findItem( const char *pickupName );
+	static gitem_t *findItemForPowerup( objective_t pw );
+	static bool canItemBeGrabbed( int gametype, const entityState_t *ent, const playerState_t *ps, int idx );
+	static void evaluateTrajectory( const trajectory_t *tr, int atTime, vec3_t result );
+	static void evaluateTrajectoryDelta( const trajectory_t *tr, int atTime, vec3_t result );
+	static void addPredictableEventToPlayerstate( int newEvent, int eventParm, playerState_t *ps );
+	static void playerStateToEntityState( playerState_t *ps, entityState_t *s, bool snap );
+	static void playerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s, int time, bool snap );
+	static bool playerTouchesItem( playerState_t *ps, entityState_t *item, int atTime );
+};
 #define	ITEM_INDEX(x) ((x)-bg_itemlist)
 
-bool	BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const playerState_t *ps, int idx );
 
 
 // g_dmflags->integer flags
@@ -551,15 +561,9 @@ enum entityType_t {
 
 
 
-void	BG_EvaluateTrajectory( const trajectory_t *tr, int atTime, vec3_t result );
-void	BG_EvaluateTrajectoryDelta( const trajectory_t *tr, int atTime, vec3_t result );
 
-void	BG_AddPredictableEventToPlayerstate( int newEvent, int eventParm, playerState_t *ps );
 
-void	BG_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, bool snap );
-void	BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s, int time, bool snap );
 
-bool	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTime );
 
 
 inline constexpr int ARENAS_PER_TIER = 4;

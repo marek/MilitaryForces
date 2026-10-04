@@ -179,7 +179,7 @@ struct Touch_ItemTouch : public GameEntity::EntityFunc_Touch
 			return;
 
 		// the same pickup rules are used for client side and server side
-		if ( !BG_CanItemBeGrabbed( g_gametype.integer, &self->s, &other->client_->ps_, other->client_->vehicle_ ) ) 
+		if ( !GameShared::canItemBeGrabbed( g_gametype.integer, &self->s, &other->client_->ps_, other->client_->vehicle_ ) ) 
 			return;
 
 		G_LogPrintf( "Item: %i %s\n", other->s.number, self->item_->classname );
@@ -472,11 +472,11 @@ void G_CheckTeamItems()
 		gitem_t	*item;
 
 		// check for the two flags
-		item = BG_FindItem( "Red Flag" );
+		item = GameShared::findItem( "Red Flag" );
 		if ( !item || !itemRegistered[ item - bg_itemlist ] ) {
 			Common::printf( S_COLOR_YELLOW "WARNING: No team_CTF_redflag in map" );
 		}
-		item = BG_FindItem( "Blue Flag" );
+		item = GameShared::findItem( "Blue Flag" );
 		if ( !item || !itemRegistered[ item - bg_itemlist ] ) {
 			Common::printf( S_COLOR_YELLOW "WARNING: No team_CTF_blueflag in map" );
 		}
@@ -493,15 +493,15 @@ void ClearRegisteredItems()
 #pragma message("this should probably be removed!")
 	memset( itemRegistered, 0, sizeof( itemRegistered ) );
 	// Always load health/ammo/fuel pickups
-	RegisterItem( BG_FindItem( "5 Health" ) );
-	RegisterItem( BG_FindItem( "25 Health" ) );
-	RegisterItem( BG_FindItem( "50 Health" ) );
-	RegisterItem( BG_FindItem( "Some Fuel" ) );
-	RegisterItem( BG_FindItem( "More Fuel" ) );
-	RegisterItem( BG_FindItem( "Shells" ) );
-	RegisterItem( BG_FindItem( "Bullets" ) );
-	RegisterItem( BG_FindItem( "Slugs" ) );
-	RegisterItem( BG_FindItem( "Rockets" ) );
+	RegisterItem( GameShared::findItem( "5 Health" ) );
+	RegisterItem( GameShared::findItem( "25 Health" ) );
+	RegisterItem( GameShared::findItem( "50 Health" ) );
+	RegisterItem( GameShared::findItem( "Some Fuel" ) );
+	RegisterItem( GameShared::findItem( "More Fuel" ) );
+	RegisterItem( GameShared::findItem( "Shells" ) );
+	RegisterItem( GameShared::findItem( "Bullets" ) );
+	RegisterItem( GameShared::findItem( "Slugs" ) );
+	RegisterItem( GameShared::findItem( "Rockets" ) );
 }
 
 /*
@@ -596,7 +596,7 @@ void G_BounceItem( GameEntity *ent, trace_t *trace )
 
 	// reflect the velocity on the trace plane
 	hitTime = theLevel.previousTime_ + ( theLevel.time_ - theLevel.previousTime_ ) * trace->fraction;
-	BG_EvaluateTrajectoryDelta( &ent->s.pos, hitTime, velocity );
+	GameShared::evaluateTrajectoryDelta( &ent->s.pos, hitTime, velocity );
 	dot = DotProduct( velocity, trace->plane.normal );
 	VectorMA( velocity, -2*dot, trace->plane.normal, ent->s.pos.trDelta );
 
@@ -650,7 +650,7 @@ void G_RunItem( GameEntity *ent )
 	}
 
 	// get current position
-	BG_EvaluateTrajectory( &ent->s.pos, theLevel.time_, origin );
+	GameShared::evaluateTrajectory( &ent->s.pos, theLevel.time_, origin );
 
 	// trace a line from the previous position to the current position
 	if ( ent->clipmask_ ) 

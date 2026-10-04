@@ -349,7 +349,7 @@ void ClientEntity::missile() {
 	if ( weapon->missileSound ) {
 		vec3_t	velocity;
 
-		BG_EvaluateTrajectoryDelta( &this->currentState.pos, cg.time, velocity );
+		GameShared::evaluateTrajectoryDelta( &this->currentState.pos, cg.time, velocity );
 
 		SoundSystem::addLoopingSound( this->currentState.number, this->lerpOrigin, velocity, weapon->missileSound );
 	}
@@ -639,11 +639,11 @@ void CG_AdjustPositionForMover( const vec3_t in, int moverNum, int fromTime, int
 		return;
 	}
 
-	BG_EvaluateTrajectory( &cent->currentState.pos, fromTime, oldOrigin );
-	BG_EvaluateTrajectory( &cent->currentState.apos, fromTime, oldAngles );
+	GameShared::evaluateTrajectory( &cent->currentState.pos, fromTime, oldOrigin );
+	GameShared::evaluateTrajectory( &cent->currentState.apos, fromTime, oldAngles );
 
-	BG_EvaluateTrajectory( &cent->currentState.pos, toTime, origin );
-	BG_EvaluateTrajectory( &cent->currentState.apos, toTime, angles );
+	GameShared::evaluateTrajectory( &cent->currentState.pos, toTime, origin );
+	GameShared::evaluateTrajectory( &cent->currentState.apos, toTime, angles );
 
 	VectorSubtract( origin, oldOrigin, deltaOrigin );
 	VectorSubtract( angles, oldAngles, deltaAngles );
@@ -693,15 +693,15 @@ void ClientEntity::interpolateEntityPosition() {
 
 	// this will linearize a sine or parabolic curve, but it is important
 	// to not extrapolate player positions if more recent data is available
-	BG_EvaluateTrajectory( &this->currentState.pos, cg.snap->serverTime, current );
-	BG_EvaluateTrajectory( &this->nextState.pos, cg.nextSnap->serverTime, next );
+	GameShared::evaluateTrajectory( &this->currentState.pos, cg.snap->serverTime, current );
+	GameShared::evaluateTrajectory( &this->nextState.pos, cg.nextSnap->serverTime, next );
 
 	this->lerpOrigin[0] = current[0] + f * ( next[0] - current[0] );
 	this->lerpOrigin[1] = current[1] + f * ( next[1] - current[1] );
 	this->lerpOrigin[2] = current[2] + f * ( next[2] - current[2] );
 
-	BG_EvaluateTrajectory( &this->currentState.apos, cg.snap->serverTime, current );
-	BG_EvaluateTrajectory( &this->nextState.apos, cg.nextSnap->serverTime, next );
+	GameShared::evaluateTrajectory( &this->currentState.apos, cg.snap->serverTime, current );
+	GameShared::evaluateTrajectory( &this->nextState.apos, cg.nextSnap->serverTime, next );
 
 	this->lerpAngles[0] = LerpAngle( current[0], next[0], f );
 	this->lerpAngles[1] = LerpAngle( current[1], next[1], f );
@@ -780,8 +780,8 @@ void ClientEntity::calcEntityLerpPositions() {
 	}
 
 	// just use the current frame and evaluate as best we can
-	BG_EvaluateTrajectory( &this->currentState.pos, cg.time, this->lerpOrigin );
-	BG_EvaluateTrajectory( &this->currentState.apos, cg.time, this->lerpAngles );
+	GameShared::evaluateTrajectory( &this->currentState.pos, cg.time, this->lerpOrigin );
+	GameShared::evaluateTrajectory( &this->currentState.apos, cg.time, this->lerpAngles );
 
 	// adjust for riding a mover if it wasn't rolled into the predicted
 	// player state
@@ -925,7 +925,7 @@ void CG_AddPacketEntities( ) {
 
 	// generate and add the entity from the playerstate
 	ps = &cg.predictedPlayerState;
-	BG_PlayerStateToEntityState( ps, &cg.predictedPlayerEntity.currentState, false );
+	GameShared::playerStateToEntityState( ps, &cg.predictedPlayerEntity.currentState, false );
 	if( !(cg.predictedPlayerState.pm_flags & PMF_VEHICLESELECT) ) {
 		cg.predictedPlayerEntity.addCEntity();
 	}

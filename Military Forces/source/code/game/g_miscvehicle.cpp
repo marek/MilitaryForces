@@ -175,7 +175,7 @@ void Drone_Think::execute()
 	vec3_t origin, dir, bearing, angles, vel;
 	trace_t tr;
 
-	BG_EvaluateTrajectory( &ent->s.pos, theLevel.time_, origin );
+	GameShared::evaluateTrajectory( &ent->s.pos, theLevel.time_, origin );
 
 	if( flying )
 	{
@@ -349,7 +349,7 @@ void Abandoned_Think::execute()
 		return;
 	}
 
-	BG_EvaluateTrajectory( &ent->s.pos, theLevel.time_, origin );
+	GameShared::evaluateTrajectory( &ent->s.pos, theLevel.time_, origin );
 	SV_Trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, origin, ent->s.number, MASK_SOLID, false );
 	if( tr.startsolid || tr.fraction < 1.0f || theLevel.time_ > expire_ )
 	{

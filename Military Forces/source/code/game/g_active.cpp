@@ -258,7 +258,7 @@ void	G_TouchTriggers( GameEntity *ent )
 		// so you don't have to actually contact its bounding box
 		if( hit->s.eType == ET_ITEM )
 		{
-			if( !BG_PlayerTouchesItem( &ent->client_->ps_, &hit->s, theLevel.time_ ) ) 
+			if( !GameShared::playerTouchesItem( &ent->client_->ps_, &hit->s, theLevel.time_ ) ) 
 				continue;
 		} 
 		else 
@@ -588,14 +588,14 @@ void SendPendingPredictableEvents( playerState_t *ps )
 		int seq = ps->entityEventSequence & (MAX_PS_EVENTS-1);
 		int event = ps->events[ seq ] | ( ( ps->entityEventSequence & 3 ) << 8 );
 
-		// set external event to zero before calling BG_PlayerStateToEntityState
+		// set external event to zero before calling GameShared::playerStateToEntityState
 		int extEvent = ps->externalEvent;
 		ps->externalEvent = 0;
 
 		// create temporary entity for event
 		GameEntity* t = G_TempEntity( ps->origin, event );
 		int number = t->s.number;
-		BG_PlayerStateToEntityState( ps, &t->s, true );
+		GameShared::playerStateToEntityState( ps, &t->s, true );
 		t->s.number = number;
 		t->s.eType = ET_EVENTS + event;
 		t->s.eFlags |= EF_PLAYER_EVENT;
@@ -940,9 +940,9 @@ void ClientThink_real( GameEntity *ent )
 		ent->eventTime_ = theLevel.time_;
 
 	if( g_smoothClients.integer ) 
-		BG_PlayerStateToEntityStateExtraPolate( &ent->client_->ps_, &ent->s, ent->client_->ps_.commandTime, true );
+		GameShared::playerStateToEntityStateExtraPolate( &ent->client_->ps_, &ent->s, ent->client_->ps_.commandTime, true );
 	else
-		BG_PlayerStateToEntityState( &ent->client_->ps_, &ent->s, true );
+		GameShared::playerStateToEntityState( &ent->client_->ps_, &ent->s, true );
 
 	SendPendingPredictableEvents( &ent->client_->ps_ );
 
@@ -1153,9 +1153,9 @@ void ClientEndFrame( GameEntity *ent )
 
 	// set the latest infor
 	if( g_smoothClients.integer ) 
-		BG_PlayerStateToEntityStateExtraPolate( &ent->client_->ps_, &ent->s, ent->client_->ps_.commandTime, true );
+		GameShared::playerStateToEntityStateExtraPolate( &ent->client_->ps_, &ent->s, ent->client_->ps_.commandTime, true );
 	else
-		BG_PlayerStateToEntityState( &ent->client_->ps_, &ent->s, true );
+		GameShared::playerStateToEntityState( &ent->client_->ps_, &ent->s, true );
 
 	SendPendingPredictableEvents( &ent->client_->ps_ );
 

@@ -573,7 +573,7 @@ void ClientEntity::checkEvents()
 	}
 
 	// calculate the position at exactly the frame time
-	BG_EvaluateTrajectory( &this->currentState.pos, cg.snap->serverTime, this->lerpOrigin );
+	GameShared::evaluateTrajectory( &this->currentState.pos, cg.snap->serverTime, this->lerpOrigin );
 	this->setEntitySoundPosition();
 
 	this->entityEvent( this->lerpOrigin );
