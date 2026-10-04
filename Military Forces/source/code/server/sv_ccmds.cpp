@@ -329,7 +329,7 @@ void ServerMain::mapRestart_f()
 		if( !client || client->state_ < SV_Client::CS_CONNECTED)
 			continue;
 
-		if( client->netchan_.remoteAddress.type == NA_BOT ) 
+		if( client->netchan_.remoteAddress().type == NA_BOT ) 
 			isBot = true;
 		else 
 			isBot = false;
@@ -401,7 +401,7 @@ void ServerMain::kick_f( ) {
 				if ( !cl->state_ ) {
 					continue;
 				}
-				if( cl->netchan_.remoteAddress.type == NA_LOOPBACK ) {
+				if( cl->netchan_.remoteAddress().type == NA_LOOPBACK ) {
 					continue;
 				}
 				cl->drop( "was kicked" );
@@ -416,7 +416,7 @@ void ServerMain::kick_f( ) {
 				if ( !cl->state_ ) {
 					continue;
 				}
-				if( cl->netchan_.remoteAddress.type != NA_BOT ) {
+				if( cl->netchan_.remoteAddress().type != NA_BOT ) {
 					continue;
 				}
 				cl->drop( "was kicked" );
@@ -425,7 +425,7 @@ void ServerMain::kick_f( ) {
 		}
 		return;
 	}
-	if( cl->netchan_.remoteAddress.type == NA_LOOPBACK ) {
+	if( cl->netchan_.remoteAddress().type == NA_LOOPBACK ) {
 		Common::printf("Cannot kick host player\n");
 		return;
 	}
@@ -512,7 +512,7 @@ void ServerMain::kickBots_f( ) {
 			continue;
 		}
 
-		if( cl->netchan_.remoteAddress.type != NA_BOT ) {
+		if( cl->netchan_.remoteAddress().type != NA_BOT ) {
 			continue;
 		}
 
@@ -545,7 +545,7 @@ void ServerMain::kickAll_f( ) {
 			continue;
 		}
 
-		if( cl->netchan_.remoteAddress.type == NA_LOOPBACK ) {
+		if( cl->netchan_.remoteAddress().type == NA_LOOPBACK ) {
 			continue;
 		}
 
@@ -579,7 +579,7 @@ void ServerMain::kickNum_f( ) {
 	if ( !cl ) {
 		return;
 	}
-	if( cl->netchan_.remoteAddress.type == NA_LOOPBACK ) {
+	if( cl->netchan_.remoteAddress().type == NA_LOOPBACK ) {
 		Common::printf("Cannot kick host player\n");
 		return;
 	}
@@ -619,7 +619,7 @@ void ServerMain::ban_f( void ) {
 		return;
 	}
 
-	if( cl->netchan_.remoteAddress.type == NA_LOOPBACK ) {
+	if( cl->netchan_.remoteAddress().type == NA_LOOPBACK ) {
 		Common::printf("Cannot kick host player\n");
 		return;
 	}
@@ -641,8 +641,8 @@ void ServerMain::ban_f( void ) {
 	// otherwise send their ip to the authorize server
 	if ( theSVS.authorizeAddress_.type != NA_BAD ) {
 		Network::outOfBandPrint( NS_SERVER, theSVS.authorizeAddress_,
-			"banUser %i.%i.%i.%i", cl->netchan_.remoteAddress.ip[0], cl->netchan_.remoteAddress.ip[1], 
-								   cl->netchan_.remoteAddress.ip[2], cl->netchan_.remoteAddress.ip[3] );
+			"banUser %i.%i.%i.%i", cl->netchan_.remoteAddress().ip[0], cl->netchan_.remoteAddress().ip[1], 
+								   cl->netchan_.remoteAddress().ip[2], cl->netchan_.remoteAddress().ip[3] );
 		Common::printf("%s was banned from coming back\n", cl->name_);
 	}
 }
@@ -673,7 +673,7 @@ void ServerMain::banNum_f( void ) {
 	if ( !cl ) {
 		return;
 	}
-	if( cl->netchan_.remoteAddress.type == NA_LOOPBACK ) {
+	if( cl->netchan_.remoteAddress().type == NA_LOOPBACK ) {
 		Common::printf("Cannot kick host player\n");
 		return;
 	}
@@ -695,8 +695,8 @@ void ServerMain::banNum_f( void ) {
 	// otherwise send their ip to the authorize server
 	if ( theSVS.authorizeAddress_.type != NA_BAD ) {
 		Network::outOfBandPrint( NS_SERVER, theSVS.authorizeAddress_,
-			"banUser %i.%i.%i.%i", cl->netchan_.remoteAddress.ip[0], cl->netchan_.remoteAddress.ip[1], 
-								   cl->netchan_.remoteAddress.ip[2], cl->netchan_.remoteAddress.ip[3] );
+			"banUser %i.%i.%i.%i", cl->netchan_.remoteAddress().ip[0], cl->netchan_.remoteAddress().ip[1], 
+								   cl->netchan_.remoteAddress().ip[2], cl->netchan_.remoteAddress().ip[3] );
 		Common::printf("%s was banned from coming back\n", cl->name_);
 	}
 }
@@ -950,7 +950,7 @@ void ServerMain::addBanToList(bool isexception)
 			return;
 		}
 		
-		ip = cl->netchan_.remoteAddress;
+		ip = cl->netchan_.remoteAddress();
 		
 		if(argc == 3)
 		{
@@ -1286,7 +1286,7 @@ void ServerMain::status_f( ) {
 
 
 		// TTimo adding a ^7 to reset the color
-		s = Network::adrToString( cl->netchan_.remoteAddress );
+		s = Network::adrToString( cl->netchan_.remoteAddress() );
 		Common::printf ("^7%s", s);
 		l = 39 - strlen(s);
 		j = 0;

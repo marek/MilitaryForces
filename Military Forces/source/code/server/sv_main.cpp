@@ -127,7 +127,7 @@ int SV_Client::replacePendingServerCommands( const char *cmd ) {
 			if ( csnum1 == csnum2 ) {
 				Q_strncpyz( this->reliableCommands_[ index ], cmd, sizeof( this->reliableCommands_[ index ] ) );
 				/*
-				if ( this->netchan_.remoteAddress.type != NA_BOT ) {
+				if ( this->netchan_.remoteAddress().type != NA_BOT ) {
 					Common::printf( "WARNING: this %i removed double pending config string %i: %s\n", this->clientNum_, csnum1, cmd );
 				}
 				*/
@@ -656,7 +656,7 @@ void SVC_Info( netadr_t from )
 			continue;
 		if( cl->state_ >= SV_Client::CS_CONNECTED ) {
 			count++;
-			if (cl->netchan_.remoteAddress.type != NA_BOT) {
+			if (cl->netchan_.remoteAddress().type != NA_BOT) {
 				humans++;
 			}
 		}
@@ -864,22 +864,22 @@ void SV_PacketEvent( netadr_t from, Message *msg )
 		if( !cl || cl->state_ == SV_Client::CS_FREE ) 
 			continue;
 		
-		if( !Network::compareBaseAdr( from, cl->netchan_.remoteAddress ) ) 
+		if( !Network::compareBaseAdr( from, cl->netchan_.remoteAddress() ) ) 
 			continue;
 		
 		// it is possible to have multiple clients from a single IP
 		// address, so they are differentiated by the qport variable
-		if( cl->netchan_.qport != qport ) 
+		if( cl->netchan_.qport() != qport ) 
 			continue;
 		
 
 		// the IP port can't be used to differentiate them, because
 		// some address translating routers periodically change UDP
 		// port assignments
-		if( cl->netchan_.remoteAddress.port != from.port )
+		if( cl->netchan_.remoteAddress().port != from.port )
 		{
 			Common::printf( "SV_PacketEvent: fixing up a translated port\n" );
-			cl->netchan_.remoteAddress.port = from.port;
+			cl->netchan_.setRemotePort( from.port );
 		}
 
 		// make sure it is a valid, in sequence packet
@@ -1037,7 +1037,7 @@ bool SV_CheckPaused()
 		if( !cl )
 			continue;
 
-		if( cl->state_ >= SV_Client::CS_CONNECTED && cl->netchan_.remoteAddress.type != NA_BOT ) 
+		if( cl->state_ >= SV_Client::CS_CONNECTED && cl->netchan_.remoteAddress().type != NA_BOT ) 
 			count++;
 	}
 
@@ -1210,7 +1210,7 @@ int SV_Client::rateMsec()
 	int rate, rateMsec;
 	int messageSize;
 	
-	messageSize = this->netchan_.lastSentSize;
+	messageSize = this->netchan_.lastSentSize();
 	rate = this->rate_;
 
 	if(sv_maxRate->integer)
@@ -1229,13 +1229,13 @@ int SV_Client::rateMsec()
 			rate = sv_minRate->integer;
 	}
 
-	if(this->netchan_.remoteAddress.type == NA_IP6)
+	if(this->netchan_.remoteAddress().type == NA_IP6)
 		messageSize += UDPIP6_HEADER_SIZE;
 	else
 		messageSize += UDPIP_HEADER_SIZE;
 		
 	rateMsec = messageSize * 1000 / (static_cast<int>(rate * com_timescale->value));
-	rate = System::milliseconds() - this->netchan_.lastSentTime;
+	rate = System::milliseconds() - this->netchan_.lastSentTime();
 	
 	if(rate > rateMsec)
 		return 0;

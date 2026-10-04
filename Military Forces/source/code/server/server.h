@@ -132,7 +132,7 @@ struct worldSector_t;
 //	int				reliableSent;			// last sent reliable message, not necesarily acknowledged yet
 //	int				messageAcknowledge;
 //
-//	int				gamestateMessageNum;	// netchan->outgoingSequence of gamestate
+//	int				gamestateMessageNum;	// netchan->outgoingSequence() of gamestate
 //	int				challenge;
 //
 //	usercmd_t		lastUsercmd;

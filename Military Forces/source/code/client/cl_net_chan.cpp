@@ -135,7 +135,7 @@ CL_Netchan_TransmitNextFragment
 */
 bool CL_Netchan_TransmitNextFragment(NetChannel *chan)
 {
-	if(chan->unsentFragments)
+	if(chan->unsentFragments())
 	{
 		chan->transmitNextFragment();
 		return true;
@@ -153,7 +153,7 @@ void Client::netchan_Transmit( NetChannel *chan, Message* msg ) {
 	msg->writeByte( clc_EOF );
 
 #ifdef LEGACY_PROTOCOL
-	if(chan->compat)
+	if(chan->compat())
 		Client::netchan_Encode(msg);
 #endif
 
@@ -179,7 +179,7 @@ bool Client::netchan_Process( NetChannel *chan, Message *msg ) {
 		return false;
 
 #ifdef LEGACY_PROTOCOL
-	if(chan->compat)
+	if(chan->compat())
 		Client::netchan_Decode(msg);
 #endif
 

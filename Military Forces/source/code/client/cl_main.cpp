@@ -1875,7 +1875,7 @@ void CL_Rcon_f( ) {
 	Q_strcat (message, MAX_RCON_MESSAGE, CommandSystem::cmd()+5);
 
 	if ( clc.state >= CA_CONNECTED ) {
-		to = clc.netchan.remoteAddress;
+		to = clc.netchan.remoteAddress();
 	} else {
 		if (!strlen(rconAddress->string)) {
 			Common::printf ("You must either be connected,\n"
@@ -2860,7 +2860,7 @@ void CL_PacketEvent( netadr_t from, Message *msg ) {
 	//
 	// packet from server
 	//
-	if ( !Network::compareAdr( from, clc.netchan.remoteAddress ) ) {
+	if ( !Network::compareAdr( from, clc.netchan.remoteAddress() ) ) {
 		Common::dPrintf ("%s:sequenced packet without connection\n"
 			, Network::adrToStringwPort( from ) );
 		// FIXME: send a client disconnect?

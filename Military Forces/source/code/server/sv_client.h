@@ -114,7 +114,7 @@ public:
 	int					reliableSent_;				// last sent reliable message, not necesarily acknowledged yet
 	int					messageAcknowledge_;
 
-	int					gamestateMessageNum_;		// netchan->outgoingSequence of gamestate
+	int					gamestateMessageNum_;		// netchan->outgoingSequence() of gamestate
 	int					challenge_;
 
 	usercmd_t			lastUsercmd_;

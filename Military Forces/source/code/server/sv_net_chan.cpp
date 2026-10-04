@@ -82,7 +82,7 @@ Return number of ms until next message can be sent based on throughput given by 
 
 int SV_Client::netchanTransmitNextFragment()
 {
-	if(this->netchan_.unsentFragments)
+	if(this->netchan_.unsentFragments())
 	{
 		this->netchan_.transmitNextFragment();
 		return this->rateMsec();
@@ -112,7 +112,7 @@ void SV_Client::netchanTransmit( Message *msg )
 {
 	msg->writeByte( svc_EOF );
 
-	if(this->netchan_.unsentFragments || this->netchan_start_queue_)
+	if(this->netchan_.unsentFragments() || this->netchan_start_queue_)
 	{
 		SV_Client::Netchan_Buffer *netbuf;
 		Common::dPrintf("#462 SV_Netchan_Transmit: unsent fragments, stacked\n");

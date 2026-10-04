@@ -102,7 +102,7 @@ int SV_BotAllocateClient()
 	theSVS.svClients_.at(i) = cl;
 	cl->state_ = SV_Client::CS_ACTIVE;
 	cl->lastPacketTime_ = theSVS.time_;
-	cl->netchan_.remoteAddress.type = NA_BOT;
+	cl->netchan_.setRemoteType( NA_BOT );
 	cl->rate_ = 16384;
 
 	return i;

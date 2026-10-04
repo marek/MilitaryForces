@@ -191,7 +191,7 @@ void SV_Client::snapshotAcks()
 	int								i, behind;
 
 	if ( this->entityAck_ <= this->gamestateMessageNum_ 
-		|| this->entityAck_ >= this->netchan_.outgoingSequence ) {
+		|| this->entityAck_ >= this->netchan_.outgoingSequence() ) {
 		return;
 	}
 
@@ -276,8 +276,8 @@ void SV_Client::emitPacketEntities( SV_Client::ClientSnapshot *frame, Message *m
 	int							i;
 
 	unlimited = reset || sv_snapshotBudget->integer <= 0 
-		|| this->netchan_.remoteAddress.type == NA_LOOPBACK 
-		|| ( sv_lanForceRate->integer && Sys_IsLANAddress( this->netchan_.remoteAddress ) );
+		|| this->netchan_.remoteAddress().type == NA_LOOPBACK 
+		|| ( sv_lanForceRate->integer && Sys_IsLANAddress( this->netchan_.remoteAddress() ) );
 
 	remaining = sv_snapshotBudget->integer * 8 - msg->bit - GENTITYNUM_BITS - 8;
 
@@ -334,11 +334,11 @@ void SV_Client::emitPacketEntities( SV_Client::ClientSnapshot *frame, Message *m
 		}
 	}
 
-	sent = &table->frames[ this->netchan_.outgoingSequence & PACKET_MASK ];
+	sent = &table->frames[ this->netchan_.outgoingSequence() & PACKET_MASK ];
 	if ( sent->pending ) {
 		this->snapshotFrameLost( sent );
 	}
-	sent->sequence = this->netchan_.outgoingSequence;
+	sent->sequence = this->netchan_.outgoingSequence();
 	sent->pending = true;
 	sent->overflow = reset;
 	sent->count = 0;
@@ -402,7 +402,7 @@ void SV_Client::writeSnapshotToClient( Message *msg )
 	bool				reset;
 
 	// this is the snapshot we are creating
-	frame = &this->frames_[ this->netchan_.outgoingSequence & PACKET_MASK ];
+	frame = &this->frames_[ this->netchan_.outgoingSequence() & PACKET_MASK ];
 
 	// try to use a previous frame as the source for delta compressing the snapshot
 	if ( this->deltaMessage_ <= 0 || this->state_ != SV_Client::CS_ACTIVE ) 
@@ -411,7 +411,7 @@ void SV_Client::writeSnapshotToClient( Message *msg )
 		oldframe = nullptr;
 		lastframe = 0;
 	} 
-	else if ( this->netchan_.outgoingSequence - this->deltaMessage_ 
+	else if ( this->netchan_.outgoingSequence() - this->deltaMessage_ 
 		>= (PACKET_BACKUP - 3) ) 
 	{
 		// this hasn't gotten a good message through in a long time
@@ -423,7 +423,7 @@ void SV_Client::writeSnapshotToClient( Message *msg )
 	{
 		// we have a valid snapshot to delta from
 		oldframe = &this->frames_[ this->deltaMessage_ & PACKET_MASK ];
-		lastframe = this->netchan_.outgoingSequence - this->deltaMessage_;
+		lastframe = this->netchan_.outgoingSequence() - this->deltaMessage_;
 
 	}
 
@@ -750,7 +750,7 @@ void SV_Client::buildClientSnapshot()
 	theSV.snapshotCounter_++;
 
 	// this is the frame we are creating
-	frame = &this->frames_[ this->netchan_.outgoingSequence & PACKET_MASK ];
+	frame = &this->frames_[ this->netchan_.outgoingSequence() & PACKET_MASK ];
 
 	// clear everything in this snapshot
 	entityNumbers.numSnapshotEntities = 0;
@@ -872,9 +872,9 @@ Called by SV_SendClientSnapshot and SV_SendClientGameState
 void SV_Client::sendMessageToClient( Message *msg )
 {
 	// record information about the message
-	this->frames_[this->netchan_.outgoingSequence & PACKET_MASK].messageSize_ = msg->cursize;
-	this->frames_[this->netchan_.outgoingSequence & PACKET_MASK].messageSent_ = theSVS.time_;
-	this->frames_[this->netchan_.outgoingSequence & PACKET_MASK].messageAcked_ = -1;
+	this->frames_[this->netchan_.outgoingSequence() & PACKET_MASK].messageSize_ = msg->cursize;
+	this->frames_[this->netchan_.outgoingSequence() & PACKET_MASK].messageSent_ = theSVS.time_;
+	this->frames_[this->netchan_.outgoingSequence() & PACKET_MASK].messageAcked_ = -1;
 
 	// send the datagram
 	this->netchanTransmit( msg );
@@ -953,14 +953,14 @@ void ServerMain::sendClientMessages()
 		if(*c->downloadName_)
 			continue;		// Client is downloading, don't send snapshots
 
-		if(c->netchan_.unsentFragments || c->netchan_start_queue_)
+		if(c->netchan_.unsentFragments() || c->netchan_start_queue_)
 		{
 			c->rateDelayed_ = true;
 			continue;		// Drop this snapshot if the packet queue is still full or delta compression will break
 		}
 
-		if(!(c->netchan_.remoteAddress.type == NA_LOOPBACK ||
-		     (sv_lanForceRate->integer && Sys_IsLANAddress(c->netchan_.remoteAddress))))
+		if(!(c->netchan_.remoteAddress().type == NA_LOOPBACK ||
+		     (sv_lanForceRate->integer && Sys_IsLANAddress(c->netchan_.remoteAddress()))))
 		{
 			// rate control for clients not on LAN 
 			if(c->rateMsec() > 0)

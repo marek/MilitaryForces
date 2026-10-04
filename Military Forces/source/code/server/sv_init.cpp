@@ -519,7 +519,7 @@ void ServerMain::spawnServer( char *server, bool killBots )
 		{
 			char	*denied;
 
-			if( cl->netchan_.remoteAddress.type == NA_BOT )
+			if( cl->netchan_.remoteAddress().type == NA_BOT )
 			{
 				if( killBots ) 
 				{
@@ -733,7 +733,7 @@ void ServerMain::finalMessage( const char *message )
 			if( cl->state_ >= SV_Client::CS_CONNECTED ) 
 			{
 				// don't send a disconnect to a local client
-				if( cl->netchan_.remoteAddress.type != NA_LOOPBACK ) 
+				if( cl->netchan_.remoteAddress().type != NA_LOOPBACK ) 
 				{
 					ServerMain::sendServerCommand( cl, "print \"%s\n\"\n", message );
 					ServerMain::sendServerCommand( cl, "disconnect \"%s\"", message );

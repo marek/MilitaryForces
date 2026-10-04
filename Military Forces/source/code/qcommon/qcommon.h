@@ -182,35 +182,50 @@ public:
 	void transmitNextFragment();
 	bool process( Message *msg );
 
-	netsrc_t	sock;
+	const netadr_t& remoteAddress() const { return remoteAddress_; }
+	void setRemoteType( netadrtype_t type ) { remoteAddress_.type = type; }
+	void setRemotePort( unsigned short port ) { remoteAddress_.port = port; }
+	int qport() const { return qport_; }
+	int dropped() const { return dropped_; }
+	int incomingSequence() const { return incomingSequence_; }
+	int outgoingSequence() const { return outgoingSequence_; }
+	bool unsentFragments() const { return unsentFragments_; }
+	int lastSentTime() const { return lastSentTime_; }
+	int lastSentSize() const { return lastSentSize_; }
+#ifdef LEGACY_PROTOCOL
+	bool compat() const { return compat_; }
+#endif
 
-	int			dropped;			// between last packet and previous
+private:
+	netsrc_t	sock_ = NS_CLIENT;
 
-	netadr_t	remoteAddress;
-	int			qport;				// qport value to write when transmitting
+	int			dropped_ = 0;			// between last packet and previous
+
+	netadr_t	remoteAddress_ = {};
+	int			qport_ = 0;				// qport value to write when transmitting
 
 	// sequencing variables
-	int			incomingSequence;
-	int			outgoingSequence;
+	int			incomingSequence_ = 0;
+	int			outgoingSequence_ = 0;
 
 	// incoming fragment assembly buffer
-	int			fragmentSequence;
-	int			fragmentLength;	
-	byte		fragmentBuffer[MAX_MSGLEN];
+	int			fragmentSequence_ = 0;
+	int			fragmentLength_ = 0;
+	byte		fragmentBuffer_[MAX_MSGLEN] = {};
 
 	// outgoing fragment buffer
 	// we need to space out the sending of large fragmented messages
-	bool	unsentFragments;
-	int			unsentFragmentStart;
-	int			unsentLength;
-	byte		unsentBuffer[MAX_MSGLEN];
+	bool		unsentFragments_ = false;
+	int			unsentFragmentStart_ = 0;
+	int			unsentLength_ = 0;
+	byte		unsentBuffer_[MAX_MSGLEN] = {};
 
-	int			challenge;
-	int		lastSentTime;
-	int		lastSentSize;
+	int			challenge_ = 0;
+	int			lastSentTime_ = 0;
+	int			lastSentSize_ = 0;
 
 #ifdef LEGACY_PROTOCOL
-	bool	compat;
+	bool		compat_ = false;
 #endif
 };
 

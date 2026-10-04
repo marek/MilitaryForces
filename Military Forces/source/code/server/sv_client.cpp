@@ -301,9 +301,9 @@ void ServerMain::directConnect( netadr_t from )
 		if( !cl || cl->state_ == SV_Client::CS_FREE ) 
 			continue;
 
-		if( Network::compareBaseAdr( from, cl->netchan_.remoteAddress )
-			&& ( cl->netchan_.qport == qport 
-			|| from.port == cl->netchan_.remoteAddress.port ) ) 
+		if( Network::compareBaseAdr( from, cl->netchan_.remoteAddress() )
+			&& ( cl->netchan_.qport() == qport 
+			|| from.port == cl->netchan_.remoteAddress().port ) ) 
 		{
 			if (( theSVS.time_ - cl->lastConnectTime_) 
 				< (sv_reconnectlimit->integer * 1000)) 
@@ -394,9 +394,9 @@ void ServerMain::directConnect( netadr_t from )
 		if( !cl || cl->state_ == SV_Client::CS_FREE ) 
 			continue;
 
-		if( Network::compareBaseAdr( from, cl->netchan_.remoteAddress )
-			&& ( cl->netchan_.qport == qport 
-			|| from.port == cl->netchan_.remoteAddress.port ) ) 
+		if( Network::compareBaseAdr( from, cl->netchan_.remoteAddress() )
+			&& ( cl->netchan_.qport() == qport 
+			|| from.port == cl->netchan_.remoteAddress().port ) ) 
 		{
 			Common::printf ("%s:reconnect\n", Network::adrToString (from));
 			newcl = cl;
@@ -464,7 +464,7 @@ void ServerMain::directConnect( netadr_t from )
 			for( i = startIndex; i <= sv_maxclients->integer ; i++ ) 
 			{
 				cl = theSVS.svClients_.at(i);
-				if( cl && cl->netchan_.remoteAddress.type == NA_BOT ) 
+				if( cl && cl->netchan_.remoteAddress().type == NA_BOT ) 
 					count++;
 			}
 			// if they're all bots
@@ -602,7 +602,7 @@ void SV_Client::drop( const char *reason )
 {
 	int		i;
 	ServerStatic::Challenge	*challenge;
-	const bool isBot = this->netchan_.remoteAddress.type == NA_BOT;
+	const bool isBot = this->netchan_.remoteAddress().type == NA_BOT;
 
 	if ( this->state_ == SV_Client::CS_ZOMBIE ) {
 		return;		// already dropped
@@ -614,7 +614,7 @@ void SV_Client::drop( const char *reason )
 
 		for (i = 0 ; i < ServerStatic::k_MAX_CHALLENGES ; i++, challenge++)
 		{
-			if(Network::compareAdr(this->netchan_.remoteAddress, challenge->adr_))
+			if(Network::compareAdr(this->netchan_.remoteAddress(), challenge->adr_))
 			{
 				Com_Memset(challenge, 0, sizeof(*challenge));
 				break;
@@ -700,7 +700,7 @@ void SV_Client::sendClientGameState()
 	// when we receive the first packet from the this, we will
 	// notice that it is from a different serverid and that the
 	// gamestate message was not just sent, forcing a retransmit
-	this->gamestateMessageNum_ = this->netchan_.outgoingSequence;
+	this->gamestateMessageNum_ = this->netchan_.outgoingSequence();
 	this->entityReset_ = true;
 	this->entityResetDone_ = false;
 
@@ -1413,7 +1413,7 @@ void SV_Client::userinfoChanged() {
 
 	// if the client is on the same subnet as the server and we aren't running an
 	// internet public server, assume they don't need a rate choke
-	if ( Sys_IsLANAddress( this->netchan_.remoteAddress ) && com_dedicated->integer != 2 && sv_lanForceRate->integer == 1) {
+	if ( Sys_IsLANAddress( this->netchan_.remoteAddress() ) && com_dedicated->integer != 2 && sv_lanForceRate->integer == 1) {
 		this->rate_ = 99999;	// lans should not rate limit
 	} else {
 		val = Info::valueForKey (this->userinfo_, "rate");
@@ -1476,10 +1476,10 @@ void SV_Client::userinfoChanged() {
 	// TTimo
 	// maintain the IP information
 	// the banning code relies on this being consistently present
-	if( Network::isLocalAddress(this->netchan_.remoteAddress) )
+	if( Network::isLocalAddress(this->netchan_.remoteAddress()) )
 		ip = "localhost";
 	else
-		ip = const_cast<char*>(Network::adrToString( this->netchan_.remoteAddress ));
+		ip = const_cast<char*>(Network::adrToString( this->netchan_.remoteAddress() ));
 
 	val = Info::valueForKey( this->userinfo_, "ip" );
 	if( val[0] )

@@ -696,12 +696,12 @@ bool CL_ReadyToSendPacket( ) {
 	}
 
 	// send every frame for loopbacks
-	if ( clc.netchan.remoteAddress.type == NA_LOOPBACK ) {
+	if ( clc.netchan.remoteAddress().type == NA_LOOPBACK ) {
 		return true;
 	}
 
 	// send every frame for LAN
-	if ( cl_lanForcePackets->integer && Sys_IsLANAddress( clc.netchan.remoteAddress ) ) {
+	if ( cl_lanForcePackets->integer && Sys_IsLANAddress( clc.netchan.remoteAddress() ) ) {
 		return true;
 	}
 
@@ -711,7 +711,7 @@ bool CL_ReadyToSendPacket( ) {
 	} else if ( cl_maxpackets->integer > 125 ) {
 		CvarSystem::set( "cl_maxpackets", "125" );
 	}
-	oldPacketNum = (clc.netchan.outgoingSequence - 1) & PACKET_MASK;
+	oldPacketNum = (clc.netchan.outgoingSequence() - 1) & PACKET_MASK;
 	delta = cls.realtime -  cl.outPackets[ oldPacketNum ].p_realtime;
 	if ( delta < 1000 / cl_maxpackets->integer ) {
 		// the accumulated commands will go out in the next packet
@@ -793,7 +793,7 @@ void Client::writePacket( ) {
 	} else if ( cl_packetdup->integer > 5 ) {
 		CvarSystem::set( "cl_packetdup", "5" );
 	}
-	oldPacketNum = (clc.netchan.outgoingSequence - 1 - cl_packetdup->integer) & PACKET_MASK;
+	oldPacketNum = (clc.netchan.outgoingSequence() - 1 - cl_packetdup->integer) & PACKET_MASK;
 	count = cl.cmdNumber - cl.outPackets[ oldPacketNum ].p_cmdNumber;
 	if ( count > MAX_PACKET_USERCMDS ) {
 		count = MAX_PACKET_USERCMDS;
@@ -886,7 +886,7 @@ void Client::writePacket( ) {
 	//
 	// deliver the message
 	//
-	packetNum = clc.netchan.outgoingSequence & PACKET_MASK;
+	packetNum = clc.netchan.outgoingSequence() & PACKET_MASK;
 	cl.outPackets[ packetNum ].p_realtime = cls.realtime;
 	cl.outPackets[ packetNum ].p_serverTime = oldcmd->serverTime;
 	cl.outPackets[ packetNum ].p_cmdNumber = cl.cmdNumber;
