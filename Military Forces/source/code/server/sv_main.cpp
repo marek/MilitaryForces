@@ -572,15 +572,15 @@ void SVC_Status( netadr_t from )
 
 	// echo back the parameter to status. so master servers can use it as a challenge
 	// to prevent timed spoofed reply packets that add ghost servers
-	Info_SetValueForKey( infostring, "challenge", CommandSystem::argv(1) );
+	Info::setValueForKey( infostring, "challenge", CommandSystem::argv(1) );
 
 	// add "demo" to the sv_keywords if restricted
 	//if ( CvarSystem::variableValue( "fs_restrict" ) ) {
 	//	char	keywords[MAX_INFO_STRING];
 
 	//	Com_sprintf( keywords, sizeof( keywords ), "demo %s",
-	//		Info_ValueForKey( infostring, "sv_keywords" ) );
-	//	Info_SetValueForKey( infostring, "sv_keywords", keywords );
+	//		Info::valueForKey( infostring, "sv_keywords" ) );
+	//	Info::setValueForKey( infostring, "sv_keywords", keywords );
 	//}
 
 	char	status[MAX_MSGLEN];
@@ -667,29 +667,29 @@ void SVC_Info( netadr_t from )
 
 	// echo back the parameter to status. so servers can use it as a challenge
 	// to prevent timed spoofed reply packets that add ghost servers
-	Info_SetValueForKey( infostring, "challenge", CommandSystem::argv(1) );
+	Info::setValueForKey( infostring, "challenge", CommandSystem::argv(1) );
 
-	Info_SetValueForKey( infostring, "gamename", com_gamename->string );
-	Info_SetValueForKey(infostring, "protocol", va("%i", com_protocol->integer));
-	Info_SetValueForKey( infostring, "hostname", sv_hostname->string );
-	Info_SetValueForKey( infostring, "mapname", sv_mapname->string );
-	Info_SetValueForKey( infostring, "clients", va("%i", count) );
-	Info_SetValueForKey(infostring, "g_humanplayers", va("%i", humans));
-	Info_SetValueForKey( infostring, "sv_maxclients", 
+	Info::setValueForKey( infostring, "gamename", com_gamename->string );
+	Info::setValueForKey(infostring, "protocol", va("%i", com_protocol->integer));
+	Info::setValueForKey( infostring, "hostname", sv_hostname->string );
+	Info::setValueForKey( infostring, "mapname", sv_mapname->string );
+	Info::setValueForKey( infostring, "clients", va("%i", count) );
+	Info::setValueForKey(infostring, "g_humanplayers", va("%i", humans));
+	Info::setValueForKey( infostring, "sv_maxclients", 
 		va("%i", sv_maxclients->integer - sv_privateClients->integer ) );
-	Info_SetValueForKey( infostring, "gametype", va("%i", sv_gametype->integer ) );
-	Info_SetValueForKey( infostring, "pure", va("%i", sv_pure->integer ) );
-	Info_SetValueForKey(infostring, "g_needpass", va("%d", CvarSystem::variableIntegerValue("g_needpass")));
+	Info::setValueForKey( infostring, "gametype", va("%i", sv_gametype->integer ) );
+	Info::setValueForKey( infostring, "pure", va("%i", sv_pure->integer ) );
+	Info::setValueForKey(infostring, "g_needpass", va("%d", CvarSystem::variableIntegerValue("g_needpass")));
 
 	if( sv_minPing->integer ) 
-		Info_SetValueForKey( infostring, "minPing", va("%i", sv_minPing->integer) );
+		Info::setValueForKey( infostring, "minPing", va("%i", sv_minPing->integer) );
 
 	if( sv_maxPing->integer ) 
-		Info_SetValueForKey( infostring, "maxPing", va("%i", sv_maxPing->integer) );
+		Info::setValueForKey( infostring, "maxPing", va("%i", sv_maxPing->integer) );
 
 	char* gamedir = CvarSystem::variableString( "fs_game" );
 	if( *gamedir ) 
-		Info_SetValueForKey( infostring, "game", gamedir );
+		Info::setValueForKey( infostring, "game", gamedir );
 
 	Network::outOfBandPrint( NS_SERVER, from, "infoResponse\n%s", infostring );
 }

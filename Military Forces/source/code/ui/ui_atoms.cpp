@@ -170,8 +170,8 @@ static void UI_CalcPostGameStats() {
 	bool newHigh = false;
 
 	GetConfigString( CS_SERVERINFO, info, sizeof(info) );
-	Q_strncpyz( map, Info_ValueForKey( info, "mapname" ), sizeof(map) );
-	game = atoi(Info_ValueForKey(info, "g_gametype"));
+	Q_strncpyz( map, Info::valueForKey( info, "mapname" ), sizeof(map) );
+	game = atoi(Info::valueForKey(info, "g_gametype"));
 
 	// compose file name
 	Com_sprintf(fileName, MAX_QPATH, "games/%s_%i.game", map, game);

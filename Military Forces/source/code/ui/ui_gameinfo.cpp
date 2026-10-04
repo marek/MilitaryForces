@@ -69,7 +69,7 @@ int UI_ParseInfos( char *buf, int max, char *infos[] )
 			if ( !token[0] ) 
 				strcpy( token, "<NULL>" );
 			
-			Info_SetValueForKey( info, key, token );
+			Info::setValueForKey( info, key, token );
 		}
 		//NOTE: extra space for arena number
 		infos[count] = reinterpret_cast<char*>(uiInfo.uiUtils.alloc(strlen(info) + strlen("\\num\\") + 
@@ -167,7 +167,7 @@ void UI_LoadArenas( ) {
 	for( n = 0; n < ui_numArenas; n++ )
 	{
 		// only allow mfq3 maps
-		game = Info_ValueForKey( ui_arenaInfos[n], "game" );
+		game = Info::valueForKey( ui_arenaInfos[n], "game" );
 		if( strcmp( game, "mfq3" ) != 0 )
 		{
 			// not a mfq3 map
@@ -177,13 +177,13 @@ void UI_LoadArenas( ) {
 		// determine type
 
 		uiInfo.mapList[uiInfo.mapCount].cinematic = -1;
-		uiInfo.mapList[uiInfo.mapCount].mapLoadName = uiInfo.uiUtils.string_Alloc(Info_ValueForKey(ui_arenaInfos[n], "map"));
-		uiInfo.mapList[uiInfo.mapCount].mapName = uiInfo.uiUtils.string_Alloc(Info_ValueForKey(ui_arenaInfos[n], "longname"));
+		uiInfo.mapList[uiInfo.mapCount].mapLoadName = uiInfo.uiUtils.string_Alloc(Info::valueForKey(ui_arenaInfos[n], "map"));
+		uiInfo.mapList[uiInfo.mapCount].mapName = uiInfo.uiUtils.string_Alloc(Info::valueForKey(ui_arenaInfos[n], "longname"));
 		uiInfo.mapList[uiInfo.mapCount].levelShot = -1;
 		uiInfo.mapList[uiInfo.mapCount].imageName = uiInfo.uiUtils.string_Alloc(va("levelshots/%s", uiInfo.mapList[uiInfo.mapCount].mapLoadName));
 		uiInfo.mapList[uiInfo.mapCount].typeBits = 0;
 
-		type = Info_ValueForKey( ui_arenaInfos[n], "type" );
+		type = Info::valueForKey( ui_arenaInfos[n], "type" );
 		
 		// if no type specified, it will be treated as "dm"
 		if( *type )

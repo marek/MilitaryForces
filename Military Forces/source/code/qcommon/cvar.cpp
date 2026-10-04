@@ -1243,7 +1243,7 @@ char *CvarSystem::infoString(int bit)
 	for(var = cvar_vars; var; var = var->next)
 	{
 		if(var->name && (var->flags & bit))
-			Info_SetValueForKey (info, var->name, var->string);
+			Info::setValueForKey (info, var->name, var->string);
 	}
 
 	return info;
@@ -1266,7 +1266,7 @@ char *CvarSystem::infoString_Big(int bit)
 	for (var = cvar_vars; var; var = var->next)
 	{
 		if(var->name && (var->flags & bit))
-			Info_SetValueForKey_Big (info, var->name, var->string);
+			Info::setValueForKey_Big (info, var->name, var->string);
 	}
 	return info;
 }

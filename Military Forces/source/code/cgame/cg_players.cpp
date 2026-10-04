@@ -107,31 +107,31 @@ void CG_NewClientInfo( int clientNum ) {
 	memset( &newInfo, 0, sizeof( newInfo ) );
 
 	// isolate the player's name
-	v = Info_ValueForKey(configstring, "n");
+	v = Info::valueForKey(configstring, "n");
 	Q_strncpyz( newInfo.name, v, sizeof( newInfo.name ) );
 
 	// colors
-	v = Info_ValueForKey( configstring, "c1" );
+	v = Info::valueForKey( configstring, "c1" );
 	CG_ColorFromString( v, newInfo.color );
 
 	// bot skill
-	v = Info_ValueForKey( configstring, "skill" );
+	v = Info::valueForKey( configstring, "skill" );
 	newInfo.botSkill = atoi( v );
 
 	// handicap
-	v = Info_ValueForKey( configstring, "hc" );
+	v = Info::valueForKey( configstring, "hc" );
 	newInfo.handicap = atoi( v );
 
 	// wins
-	v = Info_ValueForKey( configstring, "w" );
+	v = Info::valueForKey( configstring, "w" );
 	newInfo.wins = atoi( v );
 
 	// losses
-	v = Info_ValueForKey( configstring, "l" );
+	v = Info::valueForKey( configstring, "l" );
 	newInfo.losses = atoi( v );
 
 	// team
-	v = Info_ValueForKey( configstring, "t" );
+	v = Info::valueForKey( configstring, "t" );
 	newInfo.team = static_cast<ClientBase::eTeam>(atoi( v ));
 	if(cg.clientNum == clientNum && ci->team != newInfo.team ) // use cg.predictedPlayerEntity.currentState.clientNum instead?
 	{
@@ -143,21 +143,21 @@ void CG_NewClientInfo( int clientNum ) {
 	}
 
 	// team task
-	v = Info_ValueForKey( configstring, "tt" );
+	v = Info::valueForKey( configstring, "tt" );
 	newInfo.teamTask = atoi(v);
 
 	// team leader
-	v = Info_ValueForKey( configstring, "tl" );
+	v = Info::valueForKey( configstring, "tl" );
 	newInfo.teamLeader = atoi(v);
 
-	v = Info_ValueForKey( configstring, "g_redteam" );
+	v = Info::valueForKey( configstring, "g_redteam" );
 	Q_strncpyz(newInfo.redTeam, v, MAX_TEAMNAME);
 
-	v = Info_ValueForKey( configstring, "g_blueteam" );
+	v = Info::valueForKey( configstring, "g_blueteam" );
 	Q_strncpyz(newInfo.blueTeam, v, MAX_TEAMNAME);
 
 	// MFQ3: controls
-	v = Info_ValueForKey( configstring, "ac" );
+	v = Info::valueForKey( configstring, "ac" );
 	newInfo.advancedControls = atoi(v);
 	if( newInfo.advancedControls )
 		CommandBuffer::addText( "+strafe" );
@@ -167,7 +167,7 @@ void CG_NewClientInfo( int clientNum ) {
 //		CvarSystem::set( "cl_freelook", "1" );
 
 	// MFQ3: vehicle
-	v = Info_ValueForKey( configstring, "v" );
+	v = Info::valueForKey( configstring, "v" );
 	newInfo.vehicle = atoi( v );
 	if( newInfo.vehicle >= 0 && clientNum == cg.predictedPlayerEntity.currentState.clientNum )
 	{

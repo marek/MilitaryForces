@@ -280,7 +280,7 @@ void SV_DirectConnect( netadr_t from )
 	char		userinfo[MAX_INFO_STRING];
 	Q_strncpyz( userinfo, CommandSystem::argv(1), sizeof(userinfo) );
 
-	int version = atoi( Info_ValueForKey( userinfo, "protocol" ) );
+	int version = atoi( Info::valueForKey( userinfo, "protocol" ) );
 	if(version != com_protocol->integer)
 	{
 		Network::outOfBandPrint(NS_SERVER, from, "print\nServer uses protocol version %i "
@@ -289,8 +289,8 @@ void SV_DirectConnect( netadr_t from )
 		return;
 	}
 
-	int challenge = atoi( Info_ValueForKey( userinfo, "challenge" ) );
-	int qport = atoi( Info_ValueForKey( userinfo, "qport" ) );
+	int challenge = atoi( Info::valueForKey( userinfo, "challenge" ) );
+	int qport = atoi( Info::valueForKey( userinfo, "qport" ) );
 
 	// quick reject
 	SV_Client* cl;
@@ -327,7 +327,7 @@ void SV_DirectConnect( netadr_t from )
 			"Try removing setu cvars from your config.\n" );
 		return;
 	}
-	Info_SetValueForKey( userinfo, "ip", ip );
+	Info::setValueForKey( userinfo, "ip", ip );
 
 	// see if the challenge is valid (LAN clients don't need to challenge)
 	if( !Network::isLocalAddress (from) ) 
@@ -425,7 +425,7 @@ void SV_DirectConnect( netadr_t from )
 	// check for privateClient password
 	int	startIndex;
 	char* password;
-	password = Info_ValueForKey( userinfo, "password" );
+	password = Info::valueForKey( userinfo, "password" );
 	if ( *password && !strcmp( password, sv_privatePassword->string ) ) 
 	{
 		startIndex = 1;
@@ -1407,7 +1407,7 @@ void SV_Client::userinfoChanged() {
 	int	len;
 
 	// name for C code
-	Q_strncpyz( this->name_, Info_ValueForKey (this->userinfo_, "name"), sizeof(this->name_) );
+	Q_strncpyz( this->name_, Info::valueForKey (this->userinfo_, "name"), sizeof(this->name_) );
 
 	// rate command
 
@@ -1416,7 +1416,7 @@ void SV_Client::userinfoChanged() {
 	if ( Sys_IsLANAddress( this->netchan_.remoteAddress ) && com_dedicated->integer != 2 && sv_lanForceRate->integer == 1) {
 		this->rate_ = 99999;	// lans should not rate limit
 	} else {
-		val = Info_ValueForKey (this->userinfo_, "rate");
+		val = Info::valueForKey (this->userinfo_, "rate");
 		if (strlen(val)) {
 			i = atoi(val);
 			this->rate_ = i;
@@ -1429,16 +1429,16 @@ void SV_Client::userinfoChanged() {
 			this->rate_ = 3000;
 		}
 	}
-	val = Info_ValueForKey (this->userinfo_, "handicap");
+	val = Info::valueForKey (this->userinfo_, "handicap");
 	if (strlen(val)) {
 		i = atoi(val);
 		if (i<=0 || i>100 || strlen(val) > 4) {
-			Info_SetValueForKey( this->userinfo_, "handicap", "100" );
+			Info::setValueForKey( this->userinfo_, "handicap", "100" );
 		}
 	}
 
 	// snaps command
-	val = Info_ValueForKey (this->userinfo_, "snaps");
+	val = Info::valueForKey (this->userinfo_, "snaps");
 	
 	if(strlen(val))
 	{
@@ -1468,7 +1468,7 @@ void SV_Client::userinfoChanged() {
 	else
 #endif
 	{
-		val = Info_ValueForKey(this->userinfo_, "cl_voipProtocol");
+		val = Info::valueForKey(this->userinfo_, "cl_voipProtocol");
 		this->hasVoip_ = !Q_stricmp( val, "opus" );
 	}
 #endif
@@ -1481,7 +1481,7 @@ void SV_Client::userinfoChanged() {
 	else
 		ip = const_cast<char*>(Network::adrToString( this->netchan_.remoteAddress ));
 
-	val = Info_ValueForKey( this->userinfo_, "ip" );
+	val = Info::valueForKey( this->userinfo_, "ip" );
 	if( val[0] )
 		len = strlen( ip ) - strlen( val ) + strlen( this->userinfo_ );
 	else
@@ -1490,7 +1490,7 @@ void SV_Client::userinfoChanged() {
 	if( len >= MAX_INFO_STRING )
 		this->drop( "userinfo string length exceeded" );
 	else
-		Info_SetValueForKey( this->userinfo_, "ip", ip );
+		Info::setValueForKey( this->userinfo_, "ip", ip );
 
 }
 

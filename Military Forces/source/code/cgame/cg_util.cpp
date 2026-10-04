@@ -39,7 +39,7 @@ unsigned long MF_CG_GetGameset( bool asEnum )
 
 	// get info
 	pInfo = CG_ConfigString( CS_SERVERINFO );
-	pGameSet = Info_ValueForKey( pInfo, "mf_gameset" );
+	pGameSet = Info::valueForKey( pInfo, "mf_gameset" );
 
 	// compare
 	if( Q_stricmp( pGameSet, "ww1" ) == 0 )

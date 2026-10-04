@@ -143,7 +143,7 @@
 //			if( !token[0] ) {
 //				strcpy( token, "<NULL>" );
 //			}
-//			Info_SetValueForKey( info, key, token );
+//			Info::setValueForKey( info, key, token );
 //			// no token -> no action
 //			if( !token ) continue;
 //			// parse all possible keys

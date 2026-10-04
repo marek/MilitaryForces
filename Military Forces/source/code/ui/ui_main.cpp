@@ -1782,10 +1782,10 @@ static void UI_BuildPlayerList()
 	GetClientState( &cs );
 	GetConfigString( CS_PLAYERS + cs.clientNum, info, MAX_INFO_STRING );
 	uiInfo.playerNumber = cs.clientNum;
-	uiInfo.teamLeader = atoi(Info_ValueForKey(info, "tl"));
-	team = atoi(Info_ValueForKey(info, "t"));
+	uiInfo.teamLeader = atoi(Info::valueForKey(info, "tl"));
+	team = atoi(Info::valueForKey(info, "t"));
 	GetConfigString( CS_SERVERINFO, info, sizeof(info) );
-	count = atoi( Info_ValueForKey( info, "sv_maxclients" ) );
+	count = atoi( Info::valueForKey( info, "sv_maxclients" ) );
 	uiInfo.playerCount = 0;
 	uiInfo.myTeamCount = 0;
 	playerTeamNumber = 0;
@@ -1795,13 +1795,13 @@ static void UI_BuildPlayerList()
 
 		if (info[0]) 
 		{
-			Q_strncpyz( uiInfo.playerNames[uiInfo.playerCount], Info_ValueForKey( info, "n" ), MAX_NAME_LENGTH );
+			Q_strncpyz( uiInfo.playerNames[uiInfo.playerCount], Info::valueForKey( info, "n" ), MAX_NAME_LENGTH );
 			Q_CleanStr( uiInfo.playerNames[uiInfo.playerCount] );
 			uiInfo.playerCount++;
-			team2 = atoi(Info_ValueForKey(info, "t"));
+			team2 = atoi(Info::valueForKey(info, "t"));
 			if (team2 == team) 
 			{
-				Q_strncpyz( uiInfo.teamNames[uiInfo.myTeamCount], Info_ValueForKey( info, "n" ), MAX_NAME_LENGTH );
+				Q_strncpyz( uiInfo.teamNames[uiInfo.myTeamCount], Info::valueForKey( info, "n" ), MAX_NAME_LENGTH );
 				Q_CleanStr( uiInfo.teamNames[uiInfo.myTeamCount] );
 				uiInfo.teamClientNums[uiInfo.myTeamCount] = n;
 				if (uiInfo.playerNumber == n) 
@@ -3524,7 +3524,7 @@ static void UI_RefreshVehicleSelect( int change_vehicle )
 	GetConfigString( CS_SERVERINFO, info, sizeof(info) );
 
 	// Nukes
-	allowNukes = (atoi( Info_ValueForKey( info, "mf_allowNukes" ) )!=0);
+	allowNukes = (atoi( Info::valueForKey( info, "mf_allowNukes" ) )!=0);
 
 	// ----------> GAMESET & TEAM <-----------
 
@@ -3566,10 +3566,10 @@ tryCatAgain:
 	// ----------> LEVEL SPAWNS <-----------
 
 	// level check (don't allow selection of vehicles that can't spawn on the current level)
-//	if(atoi(Info_ValueForKey( info, "sv_cheats" )) == 1)
+//	if(atoi(Info::valueForKey( info, "sv_cheats" )) == 1)
 //		levelCats = CAT_ANY;
 	//else
-		levelCats = atoi( Info_ValueForKey( info, "mf_lvcat" ) );
+		levelCats = atoi( Info::valueForKey( info, "mf_lvcat" ) );
 
 	if( pCat && vehicle >= 0 && (levelCats & (1 << vehicleCat)) ) 
 	{
@@ -4088,8 +4088,8 @@ void UI_RunMenuScript(char **args)
 
 				LAN_GetServerInfo(ui_netSource.integer, uiInfo.serverStatus.displayServers[uiInfo.serverStatus.currentServer], buff, MAX_STRING_CHARS);
 				name[0] = addr[0] = '\0';
-				Q_strncpyz(name, 	Info_ValueForKey(buff, "hostname"), sizeof ( name ) );
-				Q_strncpyz(addr, 	Info_ValueForKey(buff, "addr"), sizeof ( addr ) );
+				Q_strncpyz(name, 	Info::valueForKey(buff, "hostname"), sizeof ( name ) );
+				Q_strncpyz(addr, 	Info::valueForKey(buff, "addr"), sizeof ( addr ) );
 				if (strlen(name) > 0 && strlen(addr) > 0) 
 				{
 					res = LAN_AddServer(AS_FAVORITES, name, addr);
@@ -4118,7 +4118,7 @@ void UI_RunMenuScript(char **args)
 				char addr[MAX_ADDRESSLENGTH];
 				LAN_GetServerInfo(ui_netSource.integer, uiInfo.serverStatus.displayServers[uiInfo.serverStatus.currentServer], buff, MAX_STRING_CHARS);
 				addr[0] = '\0';
-				Q_strncpyz(addr, 	Info_ValueForKey(buff, "addr"), sizeof ( addr ) );
+				Q_strncpyz(addr, 	Info::valueForKey(buff, "addr"), sizeof ( addr ) );
 				if (strlen(addr) > 0) 
 				{
 					LAN_RemoveServer(AS_FAVORITES, addr);
@@ -4535,10 +4535,10 @@ static void UI_BuildServerDisplayList(int force)
 			LAN_GetServerInfo(ui_netSource.integer, i, info, MAX_STRING_CHARS);
 
 			// mask out all but "Military Forces" servers
-			if( Q_stricmp( Info_ValueForKey( info, "game" ), GAME_IDENTIFIER ) != 0 )
+			if( Q_stricmp( Info::valueForKey( info, "game" ), GAME_IDENTIFIER ) != 0 )
 				continue;
 
-			clients = atoi(Info_ValueForKey(info, "clients"));
+			clients = atoi(Info::valueForKey(info, "clients"));
 			uiInfo.serverStatus.numPlayersOnServers += clients;
 
 			if (ui_browserShowEmpty.integer == 0) 
@@ -4552,7 +4552,7 @@ static void UI_BuildServerDisplayList(int force)
 
 			if (ui_browserShowFull.integer == 0) 
 			{
-				maxClients = atoi(Info_ValueForKey(info, "sv_maxclients"));
+				maxClients = atoi(Info::valueForKey(info, "sv_maxclients"));
 				if (clients == maxClients) 
 				{
 					LAN_MarkServerVisible(ui_netSource.integer, i, false);
@@ -4562,7 +4562,7 @@ static void UI_BuildServerDisplayList(int force)
 
 			if (uiInfo.joinGameTypes[ui_joinGameType.integer].gtEnum != -1) 
 			{
-				game = atoi(Info_ValueForKey(info, "gametype"));
+				game = atoi(Info::valueForKey(info, "gametype"));
 				if (game != uiInfo.joinGameTypes[ui_joinGameType.integer].gtEnum) 
 				{
 					LAN_MarkServerVisible(ui_netSource.integer, i, false);
@@ -4572,7 +4572,7 @@ static void UI_BuildServerDisplayList(int force)
 				
 			if (ui_serverFilterType.integer > 0) 
 			{
-				if (Q_stricmp(Info_ValueForKey(info, "game"), serverFilters[ui_serverFilterType.integer].basedir) != 0) 
+				if (Q_stricmp(Info::valueForKey(info, "game"), serverFilters[ui_serverFilterType.integer].basedir) != 0) 
 				{
 					LAN_MarkServerVisible(ui_netSource.integer, i, false);
 					continue;
@@ -4874,7 +4874,7 @@ static void UI_BuildFindPlayerList(bool force) {
 				LAN_GetServerAddressString(ui_netSource.integer, uiInfo.serverStatus.displayServers[uiInfo.pendingServerStatus.num],
 							uiInfo.pendingServerStatus.server[i].adrstr, sizeof(uiInfo.pendingServerStatus.server[i].adrstr));
 				LAN_GetServerInfo(ui_netSource.integer, uiInfo.serverStatus.displayServers[uiInfo.pendingServerStatus.num], infoString, sizeof(infoString));
-				Q_strncpyz(uiInfo.pendingServerStatus.server[i].name, Info_ValueForKey(infoString, "hostname"), sizeof(uiInfo.pendingServerStatus.server[0].name));
+				Q_strncpyz(uiInfo.pendingServerStatus.server[i].name, Info::valueForKey(infoString, "hostname"), sizeof(uiInfo.pendingServerStatus.server[0].name));
 				uiInfo.pendingServerStatus.server[i].valid = true;
 				uiInfo.pendingServerStatus.num++;
 				Com_sprintf(uiInfo.foundPlayerServerNames[uiInfo.numFoundPlayerServers-1],
@@ -5112,13 +5112,13 @@ static char * UI_CreateGameCodes( char * pInfo )
 	int gameType, gameset;
 
 	// get enums
-	gameType = atoi( Info_ValueForKey( pInfo, "gametype") );
+	gameType = atoi( Info::valueForKey( pInfo, "gametype") );
 
 	// valid?
 	if( gameType >= 0 && gameType < numTeamArenaGameTypes )
 	{
 		// get server address
-		pAddress = Info_ValueForKey( pInfo, "addr");
+		pAddress = Info::valueForKey( pInfo, "addr");
 		if( !pAddress )
 		{
 			return "(Error)";
@@ -5127,7 +5127,7 @@ static char * UI_CreateGameCodes( char * pInfo )
 		// get complete info text
 		if( LAN_GetServerStatus( pAddress, exInfo, 1024 ) )
 		{
-			pGameset = Info_ValueForKey( exInfo, "mf_gameset");
+			pGameset = Info::valueForKey( exInfo, "mf_gameset");
 
 			// convert gameset string to enum
 			gameset = MF_UI_Gameset_StringToValue( pGameset, true );
@@ -5181,7 +5181,7 @@ const char *UI_FeederItemText(float feederID, int index, int column, qhandle_t *
 				lastColumn = column;
 				lastTime = uiInfo.uiUtils.dc_->realTime_;
 			}
-			ping = atoi(Info_ValueForKey(info, "ping"));
+			ping = atoi(Info::valueForKey(info, "ping"));
 			if (ping == -1) {
 				// if we ever see a ping that is out of date, do a server refresh
 				// UI_UpdatePendingPings();
@@ -5191,39 +5191,39 @@ const char *UI_FeederItemText(float feederID, int index, int column, qhandle_t *
 				case SORT_HOST : 
 					if (ping <= 0)
 					{
-						return Info_ValueForKey(info, "addr");
+						return Info::valueForKey(info, "addr");
 					}
 					else
 					{
 						if ( ui_netSource.integer == AS_LOCAL ) {
-							int nettype = atoi(Info_ValueForKey(info, "nettype"));
+							int nettype = atoi(Info::valueForKey(info, "nettype"));
 
 							if (nettype < 0 || nettype >= ARRAY_LEN(netnames)) {
 								nettype = 0;
 							}
 
 							Com_sprintf( hostname, sizeof(hostname), "%s [%s]",
-											Info_ValueForKey(info, "hostname"),
+											Info::valueForKey(info, "hostname"),
 											netnames[nettype] );
 							return hostname;
 						}
 						else {
-							if (atoi(Info_ValueForKey(info, "sv_allowAnonymous")) != 0) {				// anonymous server
+							if (atoi(Info::valueForKey(info, "sv_allowAnonymous")) != 0) {				// anonymous server
 								Com_sprintf( hostname, sizeof(hostname), "(A) %s",
-												Info_ValueForKey(info, "hostname"));
+												Info::valueForKey(info, "hostname"));
 							} else {
 								Com_sprintf( hostname, sizeof(hostname), "%s",
-												Info_ValueForKey(info, "hostname"));
+												Info::valueForKey(info, "hostname"));
 							}
 							return hostname;
 						}
 					}
 
 				case SORT_MAP :
-					return Info_ValueForKey(info, "mapname");
+					return Info::valueForKey(info, "mapname");
 
 				case SORT_CLIENTS : 
-					Com_sprintf( clientBuff, sizeof(clientBuff), "%s (%s)", Info_ValueForKey(info, "clients"), Info_ValueForKey(info, "sv_maxclients"));
+					Com_sprintf( clientBuff, sizeof(clientBuff), "%s (%s)", Info::valueForKey(info, "clients"), Info::valueForKey(info, "sv_maxclients"));
 					return clientBuff;
 
 				case SORT_GAME :
@@ -5233,7 +5233,7 @@ const char *UI_FeederItemText(float feederID, int index, int column, qhandle_t *
 					if (ping <= 0) {
 						return "...";
 					} else {
-						return Info_ValueForKey(info, "ping");
+						return Info::valueForKey(info, "ping");
 					}
 			}
 		}
@@ -5357,12 +5357,12 @@ void UI_FeederSelection(float feederID, int index)
 		const char *mapName = nullptr;
 		uiInfo.serverStatus.currentServer = index;
 		LAN_GetServerInfo(ui_netSource.integer, uiInfo.serverStatus.displayServers[index], info, MAX_STRING_CHARS);
-		uiInfo.serverStatus.currentServerPreview = refExport.RegisterShaderNoMip(va("levelshots/%s", Info_ValueForKey(info, "mapname")));
+		uiInfo.serverStatus.currentServerPreview = refExport.RegisterShaderNoMip(va("levelshots/%s", Info::valueForKey(info, "mapname")));
 		if (uiInfo.serverStatus.currentServerCinematic >= 0) {
 		  CIN_StopCinematic(uiInfo.serverStatus.currentServerCinematic);
 			uiInfo.serverStatus.currentServerCinematic = -1;
 		}
-		mapName = Info_ValueForKey(info, "mapname");
+		mapName = Info::valueForKey(info, "mapname");
 		if (mapName && *mapName) {
 			uiInfo.serverStatus.currentServerCinematic = CIN_PlayCinematic(va("%s.roq", mapName), 0, 0, 0, 0, (CIN_loop | CIN_silent) );
 		}
@@ -6313,7 +6313,7 @@ void UI_DrawConnectScreen( bool overlay )
 			// get complete info text
 			if( LAN_GetServerStatus( cstate.servername, exInfo, 1024 ) )
 			{
-				pGameset = Info_ValueForKey( exInfo, "mf_gameset");
+				pGameset = Info::valueForKey( exInfo, "mf_gameset");
 
 				// convert gameset string to enum
 				gameset = MF_UI_Gameset_StringToValue( pGameset, true );
@@ -6346,7 +6346,7 @@ void UI_DrawConnectScreen( bool overlay )
 	info[0] = 0;
 	if( GetConfigString( CS_SERVERINFO, info, sizeof(info) ) )
 	{
-		Text_PaintCenter( centerPoint, yStart, scale, colorWhite, va( "Loading map - %s", Info_ValueForKey( info, "mapname" )), 0 );
+		Text_PaintCenter( centerPoint, yStart, scale, colorWhite, va( "Loading map - %s", Info::valueForKey( info, "mapname" )), 0 );
 	}
 
 	// connect to local server?
@@ -6365,7 +6365,7 @@ void UI_DrawConnectScreen( bool overlay )
 	UI_DrawProportionalString( 320, 96, "Press Esc to abort", UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, menu_text_color );
 
 	// display global MOTD at bottom
-	Text_PaintCenter( centerPoint, 600, scale, colorWhite, Info_ValueForKey( cstate.updateInfoString, "motd" ), 0 );
+	Text_PaintCenter( centerPoint, 600, scale, colorWhite, Info::valueForKey( cstate.updateInfoString, "motd" ), 0 );
 */	
 	// print any server info (server full, bad version, etc)
 	if( cstate.connState < CA_CONNECTED )

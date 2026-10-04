@@ -336,7 +336,7 @@ void Cmd_TeamTask_f( GameEntity *ent )
 	task = atoi( arg );
 
 	SV_GetUserinfo(client, userinfo, sizeof(userinfo));
-	Info_SetValueForKey(userinfo, "teamtask", va("%d", task));
+	Info::setValueForKey(userinfo, "teamtask", va("%d", task));
 	SV_SetUserinfo(client, userinfo);
 	ClientUserinfoChanged(client);
 }
@@ -705,8 +705,8 @@ void SetTeam( GameEntity *ent, char *s )
 	}
 	// init vehicle
 	SV_GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
-	Info_SetValueForKey( userinfo, "cg_vehicle", "-1" );
-	Info_SetValueForKey( userinfo, "cg_nextVehicle", "-1" );
+	Info::setValueForKey( userinfo, "cg_vehicle", "-1" );
+	Info::setValueForKey( userinfo, "cg_nextVehicle", "-1" );
 	SV_SetUserinfo( clientNum, userinfo );
 
 	client->sess_.sessionTeam_ = team; //static_cast<team_t>(team);
@@ -1535,8 +1535,8 @@ static void Rider_SetVehicle( int clientNum, int vehicle )
 {
 	char userinfo[MAX_INFO_STRING];
 	SV_GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
-	Info_SetValueForKey( userinfo, "cg_vehicle", va( "%d", vehicle ) );
-	Info_SetValueForKey( userinfo, "cg_nextVehicle", va( "%d", vehicle ) );
+	Info::setValueForKey( userinfo, "cg_vehicle", va( "%d", vehicle ) );
+	Info::setValueForKey( userinfo, "cg_nextVehicle", va( "%d", vehicle ) );
 	SV_SetUserinfo( clientNum, userinfo );
 	ClientUserinfoChanged( clientNum );
 }
@@ -1724,8 +1724,8 @@ static void Cmd_Enter( GameEntity *ent )
 	int clientNum = ent->s.number;
 	char userinfo[MAX_INFO_STRING];
 	SV_GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
-	Info_SetValueForKey( userinfo, "cg_vehicle", va( "%d", vehicle ) );
-	Info_SetValueForKey( userinfo, "cg_nextVehicle", va( "%d", vehicle ) );
+	Info::setValueForKey( userinfo, "cg_vehicle", va( "%d", vehicle ) );
+	Info::setValueForKey( userinfo, "cg_nextVehicle", va( "%d", vehicle ) );
 	SV_SetUserinfo( clientNum, userinfo );
 	ClientUserinfoChanged( clientNum );
 
@@ -1802,8 +1802,8 @@ void Cmd_Eject_f( GameEntity *ent )
 	int clientNum = ent->s.number;
 	char userinfo[MAX_INFO_STRING];
 	SV_GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
-	Info_SetValueForKey( userinfo, "cg_vehicle", va( "%d", infantry ) );
-	Info_SetValueForKey( userinfo, "cg_nextVehicle", va( "%d", infantry ) );
+	Info::setValueForKey( userinfo, "cg_vehicle", va( "%d", infantry ) );
+	Info::setValueForKey( userinfo, "cg_nextVehicle", va( "%d", infantry ) );
 	SV_SetUserinfo( clientNum, userinfo );
 	ClientUserinfoChanged( clientNum );
 

@@ -45,12 +45,12 @@ char *MF_ClientConnect( int clientNum, bool firstTime, bool isBot )
 	SV_GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
 
 	// check to see if they are on the banned IP list
-	char* value = Info_ValueForKey (userinfo, "ip");
+	char* value = Info::valueForKey (userinfo, "ip");
 	if ( G_FilterPacket( value ) ) 
 		return "Banned.";
 
 	// check for a password
-	value = Info_ValueForKey( userinfo, "password" );
+	value = Info::valueForKey( userinfo, "password" );
 	if( g_password.string[0] && Q_stricmp( g_password.string, "none" ) &&
 		strcmp( g_password.string, value) != 0)
 	{
@@ -61,7 +61,7 @@ char *MF_ClientConnect( int clientNum, bool firstTime, bool isBot )
 	GameClient	*client = theLevel.createNewClient(clientNum);
 
 	//// vehicle index for next spawning
-	//int vehIndex = atoi( Info_ValueForKey( userinfo, "cg_nextVehicle" ) );
+	//int vehIndex = atoi( Info::valueForKey( userinfo, "cg_nextVehicle" ) );
 
 	//GameEntity* ent;
 	//switch( availableVehicles[vehIndex].cat )
@@ -110,8 +110,8 @@ char *MF_ClientConnect( int clientNum, bool firstTime, bool isBot )
 //	}
 
 	// init vehicle
-	Info_SetValueForKey( userinfo, "cg_vehicle", "-1" );
-	Info_SetValueForKey( userinfo, "cg_nextVehicle", "-1" );
+	Info::setValueForKey( userinfo, "cg_vehicle", "-1" );
+	Info::setValueForKey( userinfo, "cg_nextVehicle", "-1" );
 	SV_SetUserinfo( clientNum, userinfo );
 
 	// get and distribute relevent paramters
@@ -230,7 +230,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 	SV_GetUserinfo( clientNum, userinfo, sizeof(userinfo) );
 
 	// vehicle index for next spawning
-	int vehIndex = atoi( Info_ValueForKey( userinfo, "cg_nextVehicle" ) );
+	int vehIndex = atoi( Info::valueForKey( userinfo, "cg_nextVehicle" ) );
 
 	GameEntity* ent;
 	switch( vehIndex >= 0 ? availableVehicles[vehIndex].cat : 0 )
@@ -439,7 +439,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 		// distribute the weapons
 		MF_getDefaultLoadoutForVehicle( vehIndex, &ent->loadout_, &ent->client_->ps_ );
 
-		Info_SetValueForKey( userinfo, "cg_vehicle", va( "%d", vehIndex ) );
+		Info::setValueForKey( userinfo, "cg_vehicle", va( "%d", vehIndex ) );
 		SV_SetUserinfo( clientNum, userinfo );
 		ClientUserinfoChanged( clientNum );
 
@@ -522,7 +522,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 		VectorCopy (availableVehicles[vehIndex].maxs, ent->r.maxs);
 
 		// set health
-		handicap = atoi( Info_ValueForKey( userinfo, "handicap" ) );
+		handicap = atoi( Info::valueForKey( userinfo, "handicap" ) );
 		if ( handicap < 1 || handicap > 100 ) 
 			handicap = 100;
 

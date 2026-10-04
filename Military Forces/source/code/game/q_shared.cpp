@@ -1080,14 +1080,14 @@ void Com_TruncateLongString( char *buffer, const char *s )
 
 /*
 ===============
-Info_ValueForKey
+Info::valueForKey
 
 Searches the string for the given
 key and returns the associated value, or an empty string.
 FIXME: overflow check?
 ===============
 */
-char *Info_ValueForKey( const char *s, const char *key ) {
+char *Info::valueForKey( const char *s, const char *key ) {
 	char	pkey[BIG_INFO_KEY];
 	static	char value[2][BIG_INFO_VALUE];	// use two buffers so compares
 											// work without stomping on each other
@@ -1099,7 +1099,7 @@ char *Info_ValueForKey( const char *s, const char *key ) {
 	}
 
 	if ( strlen( s ) >= BIG_INFO_STRING ) {
-		Com_Error( ERR_DROP, "Info_ValueForKey: oversize infostring" );
+		Com_Error( ERR_DROP, "Info::valueForKey: oversize infostring" );
 	}
 
 	valueindex ^= 1;
@@ -1139,12 +1139,12 @@ char *Info_ValueForKey( const char *s, const char *key ) {
 
 /*
 ===================
-Info_NextPair
+Info::nextPair
 
 Used to itterate through all the key/value pairs in an info string
 ===================
 */
-void Info_NextPair( const char **head, char *key, char *value ) {
+void Info::nextPair( const char **head, char *key, char *value ) {
 	char	*o;
 	const char	*s;
 
@@ -1180,17 +1180,17 @@ void Info_NextPair( const char **head, char *key, char *value ) {
 
 /*
 ===================
-Info_RemoveKey
+Info::removeKey
 ===================
 */
-void Info_RemoveKey( char *s, const char *key ) {
+void Info::removeKey( char *s, const char *key ) {
 	char	*start;
 	char	pkey[MAX_INFO_KEY];
 	char	value[MAX_INFO_VALUE];
 	char	*o;
 
 	if ( strlen( s ) >= MAX_INFO_STRING ) {
-		Com_Error( ERR_DROP, "Info_RemoveKey: oversize infostring" );
+		Com_Error( ERR_DROP, "Info::removeKey: oversize infostring" );
 	}
 
 	if (strchr (key, '\\')) {
@@ -1236,17 +1236,17 @@ void Info_RemoveKey( char *s, const char *key ) {
 
 /*
 ===================
-Info_RemoveKey_Big
+Info::removeKey_Big
 ===================
 */
-void Info_RemoveKey_Big( char *s, const char *key ) {
+void Info::removeKey_Big( char *s, const char *key ) {
 	char	*start;
 	char	pkey[BIG_INFO_KEY];
 	char	value[BIG_INFO_VALUE];
 	char	*o;
 
 	if ( strlen( s ) >= BIG_INFO_STRING ) {
-		Com_Error( ERR_DROP, "Info_RemoveKey_Big: oversize infostring" );
+		Com_Error( ERR_DROP, "Info::removeKey_Big: oversize infostring" );
 	}
 
 	if (strchr (key, '\\')) {
@@ -1294,13 +1294,13 @@ void Info_RemoveKey_Big( char *s, const char *key ) {
 
 /*
 ==================
-Info_Validate
+Info::validate
 
 Some characters are illegal in info strings because they
 can mess up the server's parsing
 ==================
 */
-bool Info_Validate( const char *s ) {
+bool Info::validate( const char *s ) {
 	const char* ch = s;
 
 	while ( *ch != '\0' )
@@ -1322,17 +1322,17 @@ bool Info_Validate( const char *s ) {
 
 /*
 ==================
-Info_SetValueForKey
+Info::setValueForKey
 
 Changes or adds a key/value pair
 ==================
 */
-void Info_SetValueForKey( char *s, const char *key, const char *value ) {
+void Info::setValueForKey( char *s, const char *key, const char *value ) {
 	char	newi[MAX_INFO_STRING];
 	const char* blacklist = "\\;\"";
 
 	if ( strlen( s ) >= MAX_INFO_STRING ) {
-		Com_Error( ERR_DROP, "Info_SetValueForKey: oversize infostring" );
+		Com_Error( ERR_DROP, "Info::setValueForKey: oversize infostring" );
 	}
 
 	for(; *blacklist; ++blacklist)
@@ -1344,7 +1344,7 @@ void Info_SetValueForKey( char *s, const char *key, const char *value ) {
 		}
 	}
 	
-	Info_RemoveKey (s, key);
+	Info::removeKey (s, key);
 	if (!value || !strlen(value))
 		return;
 
@@ -1362,18 +1362,18 @@ void Info_SetValueForKey( char *s, const char *key, const char *value ) {
 
 /*
 ==================
-Info_SetValueForKey_Big
+Info::setValueForKey_Big
 
 Changes or adds a key/value pair
 Includes and retains zero-length values
 ==================
 */
-void Info_SetValueForKey_Big( char *s, const char *key, const char *value ) {
+void Info::setValueForKey_Big( char *s, const char *key, const char *value ) {
 	char	newi[BIG_INFO_STRING];
 	const char* blacklist = "\\;\"";
 
 	if ( strlen( s ) >= BIG_INFO_STRING ) {
-		Com_Error( ERR_DROP, "Info_SetValueForKey: oversize infostring" );
+		Com_Error( ERR_DROP, "Info::setValueForKey: oversize infostring" );
 	}
 
 	for(; *blacklist; ++blacklist)
@@ -1385,7 +1385,7 @@ void Info_SetValueForKey_Big( char *s, const char *key, const char *value ) {
 		}
 	}
 
-	Info_RemoveKey_Big (s, key);
+	Info::removeKey_Big (s, key);
 	if (!value)
 		return;
 

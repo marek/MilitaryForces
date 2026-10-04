@@ -102,7 +102,7 @@ void G_InitSessionData( GameClient* client, char *userinfo )
 	} 
 	else 
 	{
-		value = Info_ValueForKey( userinfo, "team" );
+		value = Info::valueForKey( userinfo, "team" );
 		if ( value[0] == 's' ) 
 		{
 			// a willing spectator, not a waiting-in-line

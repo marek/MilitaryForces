@@ -925,13 +925,17 @@ void Com_TruncateLongString( char *buffer, const char *s );
 //
 // key / value info strings
 //
-char *Info_ValueForKey( const char *s, const char *key );
-void Info_RemoveKey( char *s, const char *key );
-void Info_RemoveKey_Big( char *s, const char *key );
-void Info_SetValueForKey( char *s, const char *key, const char *value );
-void Info_SetValueForKey_Big( char *s, const char *key, const char *value );
-bool Info_Validate( const char *s );
-void Info_NextPair( const char **s, char *key, char *value );
+class Info
+{
+public:
+	static char *valueForKey( const char *s, const char *key );
+	static void removeKey( char *s, const char *key );
+	static void removeKey_Big( char *s, const char *key );
+	static void setValueForKey( char *s, const char *key, const char *value );
+	static void setValueForKey_Big( char *s, const char *key, const char *value );
+	static bool validate( const char *s );
+	static void nextPair( const char **s, char *key, char *value );
+};
 
 // this is only here so the functions in q_shared.c and bg_*.c can link
 void	QDECL Com_Error( int level, const char *error, ... ) Q_NO_RETURN Q_PRINTF_FUNC(2, 3);

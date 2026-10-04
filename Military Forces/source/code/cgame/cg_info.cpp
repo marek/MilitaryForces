@@ -115,7 +115,7 @@ void CG_DrawInformation( ) {
 	sysInfo = CG_ConfigString( CS_SYSTEMINFO );
 
 	// get the map name
-	s = Info_ValueForKey( info, "mapname" );
+	s = Info::valueForKey( info, "mapname" );
 
 	// try to load the loading shot for this map
 	// NOTE: changed from 'levelshots', because only use now use the levelshots for small map previews (MM)
@@ -137,7 +137,7 @@ void CG_DrawInformation( ) {
 	if( !loadingshot )
 	{
 		// if no loading shot, display the correct gameset artwork
-		pGameset = Info_ValueForKey( info, "mf_gameset" );
+		pGameset = Info::valueForKey( info, "mf_gameset" );
 		if( pGameset[0] )
 		{
 			loadingshot = refExport.RegisterShaderNoMip( va( "ui\\assets\\mid-%s", pGameset ) );
@@ -198,21 +198,21 @@ void CG_DrawInformation( ) {
 	if( !atoi( buf ) )
 	{		
 		// pure?
-		s = Info_ValueForKey( sysInfo, "sv_pure" );
+		s = Info::valueForKey( sysInfo, "sv_pure" );
 		if ( s[0] == '1' )
 		{
 			strcat( flagBuf, "+Pure " );
 		}
 
 		// cheats?
-		s = Info_ValueForKey( sysInfo, "sv_cheats" );
+		s = Info::valueForKey( sysInfo, "sv_cheats" );
 		if ( s[0] == '1' )
 		{
 			strcat( flagBuf, "+Cheats " );
 		}
 
 		// server hostname
-		Q_strncpyz(buf, Info_ValueForKey( info, "sv_hostname" ), 1024);
+		Q_strncpyz(buf, Info::valueForKey( info, "sv_hostname" ), 1024);
 		Q_CleanStr(buf);
 		UI_DrawProportionalString( x, y, va( "server: %s %s", buf, flagBuf ), UI_LEFT|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 		y += PROP_HEIGHT;
@@ -257,7 +257,7 @@ void CG_DrawInformation( ) {
 	y += PROP_HEIGHT;
 
 	// timelimit (OPTIONAL)
-	value = atoi( Info_ValueForKey( info, "timelimit" ) );
+	value = atoi( Info::valueForKey( info, "timelimit" ) );
 	if ( value )
 	{
 		UI_DrawProportionalString( x, y, va( "timelimit: %i", value ), UI_LEFT|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
@@ -267,7 +267,7 @@ void CG_DrawInformation( ) {
 	// fraglimit OR ...
 	if (cgs.gametype < GT_CTF ) 
 	{
-		value = atoi( Info_ValueForKey( info, "fraglimit" ) );
+		value = atoi( Info::valueForKey( info, "fraglimit" ) );
 		if ( value ) {
 			UI_DrawProportionalString( x, y, va( "fraglimit: %i", value ), UI_LEFT|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 			y += PROP_HEIGHT;
@@ -276,7 +276,7 @@ void CG_DrawInformation( ) {
 	// ... capturelimit
 	if (cgs.gametype >= GT_CTF)
 	{
-		value = atoi( Info_ValueForKey( info, "capturelimit" ) );
+		value = atoi( Info::valueForKey( info, "capturelimit" ) );
 		if ( value ) {
 			UI_DrawProportionalString( x, y, va( "capturelimit: %i", value ), UI_LEFT|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 			y += PROP_HEIGHT;

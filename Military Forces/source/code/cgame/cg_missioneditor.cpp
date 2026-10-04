@@ -865,7 +865,7 @@ void ME_ExportToScript( const char* scriptname )
 
 	// set up mission filename
 	info = CG_ConfigString( CS_SERVERINFO );
-	mapname = Info_ValueForKey( info, "mapname" );
+	mapname = Info::valueForKey( info, "mapname" );
 	Com_sprintf(scriptfile, 255, "missions/%s/%s.mis", mapname, scriptname);
 
 	if( FileSystem::fOpenFileByMode(scriptfile, &f, FS_WRITE) < 0 ) {
@@ -1082,7 +1082,7 @@ void ME_ImportScript( const char* scriptname )
 
 	// set up mission filename
 	info = CG_ConfigString( CS_SERVERINFO );
-	mapname = Info_ValueForKey( info, "mapname" );
+	mapname = Info::valueForKey( info, "mapname" );
 	Com_sprintf(filename, 255, "missions/%s/%s.mis", mapname, scriptname);
 
 	if( !ME_LoadOverviewAndEntities(filename, &overview, vehicles, installations) )
@@ -1106,7 +1106,7 @@ void ME_Init_MissionEditor()
 	const char	*scriptname;
 
 	info = CG_ConfigString( CS_SERVERINFO );
-	scriptname = Info_ValueForKey( info, "mf_mission" );
+	scriptname = Info::valueForKey( info, "mf_mission" );
 
 	ME_ImportScript(scriptname);
 }

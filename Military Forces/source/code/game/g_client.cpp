@@ -592,16 +592,16 @@ void ClientUserinfoChanged( int clientNum )
 	SV_GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
 
 	// check for malformed or illegal info strings
-	if( !Info_Validate(userinfo) ) 
+	if( !Info::validate(userinfo) ) 
 		strcpy (userinfo, "\\name\\badinfo");
 
 	// check for local client
-	char* s = Info_ValueForKey( userinfo, "ip" );
+	char* s = Info::valueForKey( userinfo, "ip" );
 	if( !strcmp( s, "localhost" ) ) 
 		client->pers_.localClient_ = true;
 
 	// check the item prediction
-	s = Info_ValueForKey( userinfo, "cg_predictItems" );
+	s = Info::valueForKey( userinfo, "cg_predictItems" );
 	if( !atoi( s ) ) 
 		client->pers_.predictItemPickup_ = false;
 	else 
@@ -610,7 +610,7 @@ void ClientUserinfoChanged( int clientNum )
 	// set name
 	char	oldname[MAX_STRING_CHARS];
 	Q_strncpyz ( oldname, client->pers_.netname_, sizeof( oldname ) );
-	s = Info_ValueForKey( userinfo, "name" );
+	s = Info::valueForKey( userinfo, "name" );
 	ClientCleanName( s, client->pers_.netname_, sizeof(client->pers_.netname_) );
 
 	if( client->sess_.sessionTeam_ == ClientBase::TEAM_SPECTATOR ) 
@@ -633,7 +633,7 @@ void ClientUserinfoChanged( int clientNum )
 	// For changing vehicle
 	if( (client->ps_.pm_flags & PMF_RECHARGING) && (client->ps_.objectives != OB_REDFLAG) && (client->ps_.objectives != OB_BLUEFLAG)) 
 	{
-		nextVehicle = atoi( Info_ValueForKey( userinfo, "cg_nextVehicle" ) );	
+		nextVehicle = atoi( Info::valueForKey( userinfo, "cg_nextVehicle" ) );	
 		if( nextVehicle != client->nextVehicle_ ) 
 		{
 			client->ps_.pm_flags &= ~PMF_VEHICLESELECT;
@@ -645,7 +645,7 @@ void ClientUserinfoChanged( int clientNum )
 	//if( !(ent->r.svFlags & SVF_BOT) )
 	//{
 		// get the next-vehicle value
-		nextVehicle = atoi( Info_ValueForKey( userinfo, "cg_nextVehicle" ) );	
+		nextVehicle = atoi( Info::valueForKey( userinfo, "cg_nextVehicle" ) );	
 		client->nextVehicle_ = nextVehicle;
 		
 		// if next-vehicle is invalid, set the current vehicle to invalid also
@@ -658,7 +658,7 @@ void ClientUserinfoChanged( int clientNum )
 		else
 		{
 			// get current vehicle value
-			vehicle = atoi( Info_ValueForKey( userinfo, "cg_vehicle" ) );
+			vehicle = atoi( Info::valueForKey( userinfo, "cg_vehicle" ) );
 			client->vehicle_ = vehicle;
 		}
 
@@ -674,10 +674,10 @@ void ClientUserinfoChanged( int clientNum )
 	//	client->vehicle_ = client->nextVehicle_ = vehicle = nextVehicle = -1;
 	//}
 
-	client->advancedControls_ = atoi( Info_ValueForKey( userinfo, "cg_advanced" ) );
+	client->advancedControls_ = atoi( Info::valueForKey( userinfo, "cg_advanced" ) );
 
 	// set max health
-	int health = atoi( Info_ValueForKey( userinfo, "handicap" ) );
+	int health = atoi( Info::valueForKey( userinfo, "handicap" ) );
 	//if( (ent->r.svFlags & SVF_BOT) || vehicle < 0 ) 
 	//{
 	//	client->pers_.maxHealth_ = health;
@@ -697,7 +697,7 @@ void ClientUserinfoChanged( int clientNum )
 	if( g_gametype.integer >= GT_TEAM && 
 		(theLevel.getEntity(clientNum)->r.svFlags & SVF_BOT) )
 	{
-		s = Info_ValueForKey( userinfo, "team" );
+		s = Info::valueForKey( userinfo, "team" );
 		if( !Q_stricmp( s, "red" ) || !Q_stricmp( s, "r" ) ) 
 			team = ClientBase::TEAM_RED;
 		else if ( !Q_stricmp( s, "blue" ) || !Q_stricmp( s, "b" ) ) 
@@ -712,14 +712,14 @@ void ClientUserinfoChanged( int clientNum )
 		team = client->sess_.sessionTeam_;
 
 	// teamInfo
-	s = Info_ValueForKey( userinfo, "teamoverlay" );
+	s = Info::valueForKey( userinfo, "teamoverlay" );
 	if( ! *s || atoi( s ) != 0 ) 
 		client->pers_.teamInfo_ = true;
 	else 
 		client->pers_.teamInfo_ = false;
 
 	// team task (0 = none, 1 = offence, 2 = defence)
-	int teamTask = atoi(Info_ValueForKey(userinfo, "teamtask"));
+	int teamTask = atoi(Info::valueForKey(userinfo, "teamtask"));
 	// team Leader (1 = leader, 0 is normal player)
 	int teamLeader = client->sess_.teamLeader_;
 
@@ -727,9 +727,9 @@ void ClientUserinfoChanged( int clientNum )
 	char	c1[MAX_INFO_STRING];
 	char	redTeam[MAX_INFO_STRING];
 	char	blueTeam[MAX_INFO_STRING];
-	strcpy(c1, Info_ValueForKey( userinfo, "color" ));
-	strcpy(redTeam, Info_ValueForKey( userinfo, "g_redteam" ));
-	strcpy(blueTeam, Info_ValueForKey( userinfo, "g_blueteam" ));
+	strcpy(c1, Info::valueForKey( userinfo, "color" ));
+	strcpy(redTeam, Info::valueForKey( userinfo, "g_redteam" ));
+	strcpy(blueTeam, Info::valueForKey( userinfo, "g_blueteam" ));
 
 	// send over a subset of the userinfo keys so other clients can
 	// print scoreboards, display models, and play custom sounds
@@ -738,7 +738,7 @@ void ClientUserinfoChanged( int clientNum )
 	//	s = va("n\\%s\\t\\%i\\c1\\%s\\hc\\%i\\w\\%i\\l\\%i\\skill\\%s\\tt\\%d\\tl\\%d\\v\\%d\\x\\%d\\ac\\%d",
 	//		client->pers_.netname_, client->sess_.sessionTeam_, c1,
 	//		client->pers_.maxHealth_, client->sess_.wins_, client->sess_.losses_,
-	//		Info_ValueForKey( userinfo, "skill" ), teamTask, teamLeader,
+	//		Info::valueForKey( userinfo, "skill" ), teamTask, teamLeader,
 	//		-1, -1, 0 );	// MFQ3: for now no vehicle and simple controls
 	//} 
 	//else 

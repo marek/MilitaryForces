@@ -26,7 +26,7 @@ unsigned int MF_UI_GetTeam( )
 	GetConfigString( CS_PLAYERS + cs.clientNum, info, MAX_INFO_STRING );
 
 	// find out the team index
-	teamIdx = atoi( Info_ValueForKey( info, "t" ) );
+	teamIdx = atoi( Info::valueForKey( info, "t" ) );
 
 	// find return
 	switch( teamIdx )
@@ -60,7 +60,7 @@ unsigned long MF_UI_GetGameset( bool asEnum )
 
 	// get info
 	GetConfigString( CS_SERVERINFO, info, sizeof(info) );
-	pGameSet = Info_ValueForKey( info, "mf_gameset" );
+	pGameSet = Info::valueForKey( info, "mf_gameset" );
 
 	// compare & return result
 	return MF_UI_Gameset_StringToValue( pGameSet, asEnum );

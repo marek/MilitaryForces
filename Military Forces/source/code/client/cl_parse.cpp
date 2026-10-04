@@ -374,7 +374,7 @@ void CL_SystemInfoChanged( ) {
 	// when the serverId changes, any further messages we send to the server will use this new serverId
 	// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=475
 	// in some cases, outdated cp commands might get sent with this news serverId
-	cl.serverId = atoi( Info_ValueForKey( systemInfo, "sv_serverid" ) );
+	cl.serverId = atoi( Info::valueForKey( systemInfo, "sv_serverid" ) );
 
 #ifdef USE_VOIP
 #ifdef LEGACY_PROTOCOL
@@ -383,7 +383,7 @@ void CL_SystemInfoChanged( ) {
 	else
 #endif
 	{
-		s = Info_ValueForKey( systemInfo, "sv_voipProtocol" );
+		s = Info::valueForKey( systemInfo, "sv_voipProtocol" );
 		clc.voipEnabled = !Q_stricmp(s, "opus");
 	}
 #endif
@@ -393,19 +393,19 @@ void CL_SystemInfoChanged( ) {
 		return;
 	}
 
-	s = Info_ValueForKey( systemInfo, "sv_cheats" );
+	s = Info::valueForKey( systemInfo, "sv_cheats" );
 	cl_connectedToCheatServer = atoi( s );
 	if ( !cl_connectedToCheatServer ) {
 		CvarSystem::setCheatState();
 	}
 
 	// check pure server string
-	s = Info_ValueForKey( systemInfo, "sv_paks" );
-	t = Info_ValueForKey( systemInfo, "sv_pakNames" );
+	s = Info::valueForKey( systemInfo, "sv_paks" );
+	t = Info::valueForKey( systemInfo, "sv_pakNames" );
 	FileSystem::pureServerSetLoadedPaks( s, t );
 
-	s = Info_ValueForKey( systemInfo, "sv_referencedPaks" );
-	t = Info_ValueForKey( systemInfo, "sv_referencedPakNames" );
+	s = Info::valueForKey( systemInfo, "sv_referencedPaks" );
+	t = Info::valueForKey( systemInfo, "sv_referencedPakNames" );
 	FileSystem::pureServerSetReferencedPaks( s, t );
 
 	gameSet = false;
@@ -414,7 +414,7 @@ void CL_SystemInfoChanged( ) {
 	while ( s ) {
 		int cvar_flags;
 		
-		Info_NextPair( &s, key, value );
+		Info::nextPair( &s, key, value );
 		if ( !key[0] ) {
 			break;
 		}
@@ -470,10 +470,10 @@ static void CL_ParseServerInfo()
 	serverInfo = cl.gameState.stringData
 		+ cl.gameState.stringOffsets[ CS_SERVERINFO ];
 
-	clc.sv_allowDownload = atoi(Info_ValueForKey(serverInfo,
+	clc.sv_allowDownload = atoi(Info::valueForKey(serverInfo,
 		"sv_allowDownload"));
 	Q_strncpyz(clc.sv_dlURL,
-		Info_ValueForKey(serverInfo, "sv_dlURL"),
+		Info::valueForKey(serverInfo, "sv_dlURL"),
 		sizeof(clc.sv_dlURL));
 }
 

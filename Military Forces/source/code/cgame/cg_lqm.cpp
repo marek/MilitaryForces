@@ -219,8 +219,8 @@ void CG_LQMObituary( entityState_t *ent, clientInfo_t *ci )
 	    return;
     }
 #pragma message("remove the problem checking here!")
-	if( Info_ValueForKey( targetInfo, "n" ) != nullptr ) {
-		Q_strncpyz( targetName, Info_ValueForKey( targetInfo, "n" ), sizeof(targetName) - 2);
+	if( Info::valueForKey( targetInfo, "n" ) != nullptr ) {
+		Q_strncpyz( targetName, Info::valueForKey( targetInfo, "n" ), sizeof(targetName) - 2);
 	}
 	else {
 		Com_Error( ERR_DROP, "MFQ3 Error (3): Invalid targetinfo\n" );
@@ -298,8 +298,8 @@ void CG_LQMObituary( entityState_t *ent, clientInfo_t *ci )
 	    attacker = ENTITYNUM_WORLD;
 	    strcpy( attackerName, "noname" );
     } else {
-		if( Info_ValueForKey( attackerInfo, "n" ) != nullptr ) {
-			Q_strncpyz( attackerName, Info_ValueForKey( attackerInfo, "n" ), sizeof(attackerName) - 2);
+		if( Info::valueForKey( attackerInfo, "n" ) != nullptr ) {
+			Q_strncpyz( attackerName, Info::valueForKey( attackerInfo, "n" ), sizeof(attackerName) - 2);
 		}
 		else {
 			Com_Error( ERR_DROP, "MFQ3 Error (1): Bad attackerInfo!\n" );

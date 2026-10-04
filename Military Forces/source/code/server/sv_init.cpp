@@ -199,7 +199,7 @@ void SV_SetUserinfo( int index, const char *val )
 	SV_Client* cl = theSVS.svClients_.at(index);
 
 	Q_strncpyz( cl->userinfo_, val, sizeof( cl->userinfo_ ) );
-	Q_strncpyz( cl->name_, Info_ValueForKey( val, "name" ), sizeof(cl->name_) );
+	Q_strncpyz( cl->name_, Info::valueForKey( val, "name" ), sizeof(cl->name_) );
 }
 
 

@@ -1546,9 +1546,9 @@ void CL_RequestMotd( ) {
 
 	Com_sprintf( cls.updateChallenge, sizeof( cls.updateChallenge ), "%i", (int)((((unsigned int)rand() << 16) ^ (unsigned int)rand()) ^ Com_Milliseconds()));
 
-	Info_SetValueForKey( info, "challenge", cls.updateChallenge );
-	Info_SetValueForKey( info, "renderer", cls.glconfig.renderer_string );
-	Info_SetValueForKey( info, "version", com_version->string );
+	Info::setValueForKey( info, "challenge", cls.updateChallenge );
+	Info::setValueForKey( info, "renderer", cls.glconfig.renderer_string );
+	Info::setValueForKey( info, "version", com_version->string );
 
 	Network::outOfBandPrint( NS_CLIENT, cls.updateServer, "getmotd \"%s\"\n", info );
 #endif
@@ -1822,7 +1822,7 @@ static void CL_CompletePlayerName( char *args, int argNum )
 
 		//configstring
 		info = cl.gameState.stringData + cl.gameState.stringOffsets[CS_SERVERINFO];
-		clientCount = atoi( Info_ValueForKey( info, "sv_maxclients" ) );
+		clientCount = atoi( Info::valueForKey( info, "sv_maxclients" ) );
 
 		nameCount = 0;
 
@@ -1832,7 +1832,7 @@ static void CL_CompletePlayerName( char *args, int argNum )
 
 			info = cl.gameState.stringData + cl.gameState.stringOffsets[CS_PLAYERS+i];
 
-			name = Info_ValueForKey( info, "n" );
+			name = Info::valueForKey( info, "n" );
 			if( name[0] == '\0' )
 				continue;
 			Q_strncpyz( names[nameCount], name, sizeof(names[nameCount]) );
@@ -2425,12 +2425,12 @@ void CL_CheckForResend( ) {
 			clc.compat = true;
 
 		if(clc.compat)
-			Info_SetValueForKey(info, "protocol", va("%i", com_legacyprotocol->integer));
+			Info::setValueForKey(info, "protocol", va("%i", com_legacyprotocol->integer));
 		else
 #endif
-			Info_SetValueForKey(info, "protocol", va("%i", com_protocol->integer));
-		Info_SetValueForKey( info, "qport", va("%i", port ) );
-		Info_SetValueForKey( info, "challenge", va("%i", clc.challenge ) );
+			Info::setValueForKey(info, "protocol", va("%i", com_protocol->integer));
+		Info::setValueForKey( info, "qport", va("%i", port ) );
+		Info::setValueForKey( info, "challenge", va("%i", clc.challenge ) );
 		
 		Com_sprintf( data, sizeof(data), "connect \"%s\"", info );
 		Network::outOfBandData( NS_CLIENT, clc.serverAddress, reinterpret_cast<byte *>(data), strlen ( data ) );
@@ -2464,12 +2464,12 @@ void CL_MotdPacket( netadr_t from ) {
 	info = CommandSystem::argv(1);
 
 	// check challenge
-	challenge = Info_ValueForKey( info, "challenge" );
+	challenge = Info::valueForKey( info, "challenge" );
 	if ( strcmp( challenge, cls.updateChallenge ) ) {
 		return;
 	}
 
-	challenge = Info_ValueForKey( info, "motd" );
+	challenge = Info::valueForKey( info, "motd" );
 
 	Q_strncpyz( cls.updateInfoString, info, sizeof( cls.updateInfoString ) );
 	CvarSystem::set( "cl_motdString", challenge );
@@ -3509,13 +3509,13 @@ void CL_Sayto_f( ) {
 	Com_FieldStringToPlayerName( name, MAX_NAME_LENGTH, rawname );
 
 	info = cl.gameState.stringData + cl.gameState.stringOffsets[CS_SERVERINFO];
-	count = atoi( Info_ValueForKey( info, "sv_maxclients" ) );
+	count = atoi( Info::valueForKey( info, "sv_maxclients" ) );
 
 	clientNum = -1;
 	for( i = 0; i < count; i++ ) {
 
 		info = cl.gameState.stringData + cl.gameState.stringOffsets[CS_PLAYERS+i];
-		Q_strncpyz( cleanName, Info_ValueForKey( info, "n" ), sizeof(cleanName) );
+		Q_strncpyz( cleanName, Info::valueForKey( info, "n" ), sizeof(cleanName) );
 		Q_CleanStr( cleanName );
 
 		if ( !Q_stricmp( cleanName, name ) ) {
@@ -3838,18 +3838,18 @@ void CL_Shutdown(const char *finalmsg, bool disconnect, bool quit)
 static void CL_SetServerInfo(serverInfo_t *server, const char *info, int ping) {
 	if (server) {
 		if (info) {
-			server->clients = atoi(Info_ValueForKey(info, "clients"));
-			Q_strncpyz(server->hostName,Info_ValueForKey(info, "hostname"), MAX_HOSTNAME_LENGTH);
-			Q_strncpyz(server->mapName, Info_ValueForKey(info, "mapname"), MAX_NAME_LENGTH);
-			server->maxClients = atoi(Info_ValueForKey(info, "sv_maxclients"));
-			Q_strncpyz(server->game,Info_ValueForKey(info, "game"), MAX_NAME_LENGTH);
-			server->gameType = atoi(Info_ValueForKey(info, "gametype"));
-			server->netType = atoi(Info_ValueForKey(info, "nettype"));
-			server->minPing = atoi(Info_ValueForKey(info, "minping"));
-			server->maxPing = atoi(Info_ValueForKey(info, "maxping"));
-			server->punkbuster = atoi(Info_ValueForKey(info, "punkbuster"));
-			server->g_humanplayers = atoi(Info_ValueForKey(info, "g_humanplayers"));
-			server->g_needpass = atoi(Info_ValueForKey(info, "g_needpass"));
+			server->clients = atoi(Info::valueForKey(info, "clients"));
+			Q_strncpyz(server->hostName,Info::valueForKey(info, "hostname"), MAX_HOSTNAME_LENGTH);
+			Q_strncpyz(server->mapName, Info::valueForKey(info, "mapname"), MAX_NAME_LENGTH);
+			server->maxClients = atoi(Info::valueForKey(info, "sv_maxclients"));
+			Q_strncpyz(server->game,Info::valueForKey(info, "game"), MAX_NAME_LENGTH);
+			server->gameType = atoi(Info::valueForKey(info, "gametype"));
+			server->netType = atoi(Info::valueForKey(info, "nettype"));
+			server->minPing = atoi(Info::valueForKey(info, "minping"));
+			server->maxPing = atoi(Info::valueForKey(info, "maxping"));
+			server->punkbuster = atoi(Info::valueForKey(info, "punkbuster"));
+			server->g_humanplayers = atoi(Info::valueForKey(info, "g_humanplayers"));
+			server->g_needpass = atoi(Info::valueForKey(info, "g_needpass"));
 		}
 		server->ping = ping;
 	}
@@ -3894,7 +3894,7 @@ void CL_ServerInfoPacket( netadr_t from, Message *msg ) {
 	infoString = msg->readString();
 
 	// if this isn't the correct gamename, ignore it
-	gamename = Info_ValueForKey( infoString, "gamename" );
+	gamename = Info::valueForKey( infoString, "gamename" );
 
 #ifdef LEGACY_PROTOCOL
 	// gamename is optional for legacy protocol
@@ -3911,7 +3911,7 @@ void CL_ServerInfoPacket( netadr_t from, Message *msg ) {
 	}
 
 	// if this isn't the correct protocol version, ignore it
-	prot = atoi( Info_ValueForKey( infoString, "protocol" ) );
+	prot = atoi( Info::valueForKey( infoString, "protocol" ) );
 
 	if(prot != com_protocol->integer
 #ifdef LEGACY_PROTOCOL
@@ -3950,7 +3950,7 @@ void CL_ServerInfoPacket( netadr_t from, Message *msg ) {
 					type = 0;
 					break;
 			}
-			Info_SetValueForKey( cl_pinglist[i].info, "nettype", va("%d", type) );
+			Info::setValueForKey( cl_pinglist[i].info, "nettype", va("%d", type) );
 			CL_SetServerInfoByAddress(from, infoString, cl_pinglist[i].time);
 
 			return;

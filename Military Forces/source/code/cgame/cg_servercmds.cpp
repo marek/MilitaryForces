@@ -120,23 +120,23 @@ void CG_ParseServerinfo( ) {
 	unsigned int newset = cgs.gameset;
 
 	info = CG_ConfigString( CS_SERVERINFO );
-	cgs.gametype = static_cast<gametype_t>(atoi( Info_ValueForKey( info, "g_gametype" ) ));
+	cgs.gametype = static_cast<gametype_t>(atoi( Info::valueForKey( info, "g_gametype" ) ));
 	CvarSystem::set("g_gametype", va("%i", cgs.gametype));
-	cgs.dmflags = atoi( Info_ValueForKey( info, "dmflags" ) );
-	cgs.teamflags = atoi( Info_ValueForKey( info, "teamflags" ) );
-	cgs.fraglimit = atoi( Info_ValueForKey( info, "fraglimit" ) );
-	cgs.capturelimit = atoi( Info_ValueForKey( info, "capturelimit" ) );
-	cgs.timelimit = atoi( Info_ValueForKey( info, "timelimit" ) );
-	cgs.maxclients = atoi( Info_ValueForKey( info, "sv_maxclients" ) );
-	mapname = Info_ValueForKey( info, "mapname" );
+	cgs.dmflags = atoi( Info::valueForKey( info, "dmflags" ) );
+	cgs.teamflags = atoi( Info::valueForKey( info, "teamflags" ) );
+	cgs.fraglimit = atoi( Info::valueForKey( info, "fraglimit" ) );
+	cgs.capturelimit = atoi( Info::valueForKey( info, "capturelimit" ) );
+	cgs.timelimit = atoi( Info::valueForKey( info, "timelimit" ) );
+	cgs.maxclients = atoi( Info::valueForKey( info, "sv_maxclients" ) );
+	mapname = Info::valueForKey( info, "mapname" );
 	Com_sprintf( cgs.mapname, sizeof( cgs.mapname ), "maps/%s.bsp", mapname );
-	Q_strncpyz( cgs.redTeam, Info_ValueForKey( info, "g_redTeam" ), sizeof(cgs.redTeam) );
+	Q_strncpyz( cgs.redTeam, Info::valueForKey( info, "g_redTeam" ), sizeof(cgs.redTeam) );
 	CvarSystem::set("g_redTeam", cgs.redTeam);
-	Q_strncpyz( cgs.blueTeam, Info_ValueForKey( info, "g_blueTeam" ), sizeof(cgs.blueTeam) );
+	Q_strncpyz( cgs.blueTeam, Info::valueForKey( info, "g_blueTeam" ), sizeof(cgs.blueTeam) );
 	CvarSystem::set("g_blueTeam", cgs.blueTeam);
 	
 	// mfq3
-	Q_strncpyz( gs, Info_ValueForKey( info, "mf_gameset" ), sizeof(gs) );
+	Q_strncpyz( gs, Info::valueForKey( info, "mf_gameset" ), sizeof(gs) );
 	if( strcmp( gs, "modern" ) == 0 ) newset = MF_GAMESET_MODERN;
 	else if( strcmp( gs, "ww2" ) == 0 ) newset = MF_GAMESET_WW2;
 	else if( strcmp( gs, "ww1" ) == 0 ) newset = MF_GAMESET_WW1;
