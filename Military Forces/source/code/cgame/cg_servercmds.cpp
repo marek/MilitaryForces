@@ -121,6 +121,7 @@ void CGame::parseServerinfo( ) {
 
 	info = CGame::configString( CS_SERVERINFO );
 	cgs.gametype = static_cast<gametype_t>(atoi( Info::valueForKey( info, "g_gametype" ) ));
+	VehicleData::testVehicles_ = atoi( Info::valueForKey( info, "g_testVehicles" ) ) != 0;
 	CvarSystem::set("g_gametype", va("%i", cgs.gametype));
 	cgs.dmflags = atoi( Info::valueForKey( info, "dmflags" ) );
 	cgs.teamflags = atoi( Info::valueForKey( info, "teamflags" ) );

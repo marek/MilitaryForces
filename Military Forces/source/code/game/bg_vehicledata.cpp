@@ -10,13 +10,6 @@
 completeLoadout_t availableLoadouts[MAX_LOADOUTS];
 
 // just contains data of all the available vehicles
-// test entries are offered for selection in debug builds only
-#ifdef _DEBUG
-#define MF_TEST_VEHICLE 0
-#else
-#define MF_TEST_VEHICLE VF_NOTSELECTABLE
-#endif
-
 completeVehicleData_t availableVehicles[] = 
 {
 	// ---------------------------------------------
@@ -1316,7 +1309,7 @@ completeVehicleData_t availableVehicles[] =
 		.maxthrottle = 10,
 		.engines = 2,
 		.accel = 260,
-		.maxhealth = 300,
+		.maxhealth = 450,
 		.gunoffset = {16.65f, -3.391f, 0.378f},
 		.maxfuel = 60,
 		.weapons = { 0, WI_MK83, 0, 0, 0, 0, 0, WI_CFLARE },
@@ -1340,7 +1333,7 @@ completeVehicleData_t availableVehicles[] =
 		.team = MF_TEAM_ANY,
 		.cat = CAT_PLANE,
 		.cls = CLASS_PLANE_BOMBER,
-		.flags = VF_STEALTH,
+		.flags = VF_STEALTH|VF_TESTONLY,
 		.caps = HC_GEAR|HC_SPEEDBRAKE| HC_VAPOR|HC_WEAPONBAY,
 		.turnspeed = {50, 30, 150},
 		.cam_dist = {0, 120, 100},
@@ -1350,7 +1343,7 @@ completeVehicleData_t availableVehicles[] =
 		.maxthrottle = 10,
 		.engines = 2,
 		.accel = 260,
-		.maxhealth = 300,
+		.maxhealth = 450,
 		.gunoffset = {16.65f, -3.391f, 0.378f},
 		.maxfuel = 60,
 		.weapons = { 0, WI_NB10MT, 0, 0, 0, 0, 0, WI_CFLARE },
@@ -1374,7 +1367,7 @@ completeVehicleData_t availableVehicles[] =
 		.team = MF_TEAM_ANY,
 		.cat = CAT_PLANE,
 		.cls = CLASS_PLANE_BOMBER,
-		.flags = VF_STEALTH,
+		.flags = VF_STEALTH|VF_TESTONLY,
 		.caps = HC_GEAR|HC_SPEEDBRAKE| HC_VAPOR|HC_WEAPONBAY,
 		.turnspeed = {50, 30, 150},
 		.cam_dist = {0, 120, 100},
@@ -1384,7 +1377,7 @@ completeVehicleData_t availableVehicles[] =
 		.maxthrottle = 10,
 		.engines = 2,
 		.accel = 260,
-		.maxhealth = 300,
+		.maxhealth = 450,
 		.gunoffset = {16.65f, -3.391f, 0.378f},
 		.maxfuel = 60,
 		.weapons = { 0, WI_NB5MT, 0, 0, 0, 0, 0, WI_CFLARE },
@@ -1408,7 +1401,7 @@ completeVehicleData_t availableVehicles[] =
 		.team = MF_TEAM_ANY,
 		.cat = CAT_PLANE,
 		.cls = CLASS_PLANE_BOMBER,
-		.flags = VF_STEALTH,
+		.flags = VF_STEALTH|VF_TESTONLY,
 		.caps = HC_GEAR|HC_SPEEDBRAKE| HC_VAPOR|HC_WEAPONBAY,
 		.turnspeed = {50, 30, 150},
 		.cam_dist = {0, 120, 100},
@@ -1418,7 +1411,7 @@ completeVehicleData_t availableVehicles[] =
 		.maxthrottle = 10,
 		.engines = 2,
 		.accel = 260,
-		.maxhealth = 300,
+		.maxhealth = 450,
 		.gunoffset = {16.65f, -3.391f, 0.378f},
 		.maxfuel = 60,
 		.weapons = { 0, WI_NB1MT, 0, 0, 0, 0, 0, WI_CFLARE },
@@ -1442,7 +1435,7 @@ completeVehicleData_t availableVehicles[] =
 		.team = MF_TEAM_ANY,
 		.cat = CAT_PLANE,
 		.cls = CLASS_PLANE_BOMBER,
-		.flags = VF_STEALTH,
+		.flags = VF_STEALTH|VF_TESTONLY,
 		.caps = HC_GEAR|HC_SPEEDBRAKE| HC_VAPOR|HC_WEAPONBAY,
 		.turnspeed = {50, 30, 150},
 		.cam_dist = {0, 120, 100},
@@ -1452,7 +1445,7 @@ completeVehicleData_t availableVehicles[] =
 		.maxthrottle = 10,
 		.engines = 2,
 		.accel = 260,
-		.maxhealth = 300,
+		.maxhealth = 450,
 		.gunoffset = {16.65f, -3.391f, 0.378f},
 		.maxfuel = 60,
 		.weapons = { 0, WI_NM5MT, 0, 0, 0, 0, 0, WI_CFLARE },
@@ -1476,7 +1469,7 @@ completeVehicleData_t availableVehicles[] =
 		.team = MF_TEAM_ANY,
 		.cat = CAT_PLANE,
 		.cls = CLASS_PLANE_BOMBER,
-		.flags = VF_STEALTH,
+		.flags = VF_STEALTH|VF_TESTONLY,
 		.caps = HC_GEAR|HC_SPEEDBRAKE| HC_VAPOR|HC_WEAPONBAY,
 		.turnspeed = {50, 30, 150},
 		.cam_dist = {0, 120, 100},
@@ -1486,7 +1479,7 @@ completeVehicleData_t availableVehicles[] =
 		.maxthrottle = 10,
 		.engines = 2,
 		.accel = 260,
-		.maxhealth = 300,
+		.maxhealth = 450,
 		.gunoffset = {16.65f, -3.391f, 0.378f},
 		.maxfuel = 60,
 		.weapons = { 0, WI_NM1MT, 0, 0, 0, 0, 0, WI_CFLARE },
@@ -2109,7 +2102,7 @@ completeVehicleData_t availableVehicles[] =
 		.descriptiveName = "helo",
 		.tinyName = "helo",
 		.modelName = "helo",
-		.flags = MF_TEST_VEHICLE,
+		.flags = VF_TESTONLY,
 		.shadowShader = SHADOW_DEFAULT,
 		.gameset = MF_GAMESET_MODERN,
 		.team = MF_TEAM_ANY,

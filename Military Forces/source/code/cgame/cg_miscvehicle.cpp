@@ -65,6 +65,9 @@ void ClientEntity::misc_Plane()
 				this->gearAnimFrame = geardown;
 				this->gearAnim = GEAR_ANIM_STOP;
 			}
+		} else if( this->gearAnimStartTime == 0 ) {
+			// nothing animating: draw what the state says, in case the gear event never arrived
+			this->gearAnimFrame = (ONOFF & OO_GEAR) ? geardown : GEAR_UP;
 		}
 		drawInfo.gearFrame = this->gearAnimFrame;
 	}

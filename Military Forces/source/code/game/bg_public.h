@@ -669,6 +669,7 @@ extern const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1];
 inline constexpr int VF_NOTSELECTABLE = 1; // cannot be selected (turrets, etc)
 inline constexpr int VF_STEALTH = 2;
 inline constexpr int VF_COOKOFF = 4;
+inline constexpr int VF_TESTONLY = 16;	// offered only when the server sets g_testVehicles
 inline constexpr int VF_DOORGUNS = 8;	// one gun in each door, sharing one weapon: each covers its own side
 
 // door guns stop short of the fuselage line; both fire only when the aim is this close to straight ahead or behind
@@ -1141,6 +1142,8 @@ struct mission_vehicle_t {
 class VehicleData
 {
 public:
+	static inline bool testVehicles_ = false;
+	static bool selectable( int vehicle );
 	static bool stealthHidden( int vehicle, int revealTime, int time, float dist, float radarRange );
 	static bool vehicleHasTurret( int vehicle );
 	static void parseMissionScripts( char *buf, mission_overview_t* overview, mission_vehicle_t* vehs, mission_groundInstallation_t* gis);

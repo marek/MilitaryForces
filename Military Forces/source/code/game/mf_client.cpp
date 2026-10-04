@@ -260,6 +260,12 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 	// set client
 	GameClient* client = theLevel.getClient(clientNum);
 
+	if( vehIndex >= 0 && !VehicleData::selectable( vehIndex ) )
+	{
+		client->ps_.pm_flags &= ~PMF_VEHICLESPAWN;
+		return;
+	}
+
 	// If nukes are banned, disallow loadouts with any nukebombs or nukemissiles
 	if(mf_allowNukes.integer == 0 && vehIndex >= 0)
 	{

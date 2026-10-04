@@ -93,7 +93,7 @@ void FireWeapon( GameEntity *ent )
 	ent->client_->accuracy_shots_++;
 
 	if( availableVehicles[ent->client_->vehicle_].flags & VF_STEALTH ) 
-		ent->client_->ps_.timers[TIMER_REVEAL] = theLevel.time_ + g_stealthPenalty.integer * 1000;
+		ent->client_->ps_.timers[TIMER_REVEAL] = std::max( ent->client_->ps_.timers[TIMER_REVEAL], theLevel.time_ + stealthPenalty( ent->client_->vehicle_ ) );
 
 	// fire the specific weapon
 	switch( availableWeapons[ent->s.weaponIndex].type ) 

@@ -34,6 +34,7 @@ vmCvar_t	g_dedicated;
 vmCvar_t	g_speed;
 vmCvar_t	g_gravity;
 vmCvar_t	g_stealthPenalty;
+vmCvar_t	g_testVehicles;
 vmCvar_t	g_botMinPlayers;
 vmCvar_t	g_botSkill;
 vmCvar_t	g_ruseReset;
@@ -135,6 +136,7 @@ cvarTable_t		gameCvarTable[] = {
 	{ &g_speed, "g_speed", "320", 0, 0, true  },
 	{ &g_gravity, "g_gravity", "800", 0, 0, true  },
 	{ &g_stealthPenalty, "g_stealthPenalty", "30", 0, 0, true  },
+	{ &g_testVehicles, "g_testVehicles", "0", CVAR_SERVERINFO | CVAR_LATCH, 0, false  },
 	{ &g_botMinPlayers, "g_botMinPlayers", "0", CVAR_ARCHIVE, 0, false  },
 	{ &g_botSkill, "g_botSkill", "3", CVAR_ARCHIVE, 0, false  },
 	{ &g_ruseReset, "g_ruseReset", "30", 0, 0, true  },
@@ -268,6 +270,8 @@ void G_RegisterCvars()
 
 	if (remapped) 
 		G_RemapTeamShaders();
+
+	VehicleData::testVehicles_ = g_testVehicles.integer != 0;
 
 	// check some things
 	if ( g_gametype.integer < 0 || g_gametype.integer >= GT_MAX_GAME_TYPE ) 

@@ -3525,6 +3525,7 @@ static void UI_RefreshVehicleSelect( int change_vehicle )
 
 	// Nukes
 	allowNukes = (atoi( Info::valueForKey( info, "mf_allowNukes" ) )!=0);
+	VehicleData::testVehicles_ = atoi( Info::valueForKey( info, "g_testVehicles" ) ) != 0;
 
 	// ----------> GAMESET & TEAM <-----------
 

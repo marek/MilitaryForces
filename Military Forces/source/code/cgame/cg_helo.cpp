@@ -161,6 +161,9 @@ void ClientEntity::helo( clientInfo_t *ci )
 				this->gearAnimFrame = geardown;
 				this->gearAnim = GEAR_ANIM_STOP;
 			}
+		} else if( this->gearAnimStartTime == 0 ) {
+			// nothing animating: draw what the state says, in case the gear event never arrived
+			this->gearAnimFrame = (this->currentState.ONOFF & OO_GEAR) ? geardown : GEAR_UP;
 		}
 		drawInfo.gearFrame = this->gearAnimFrame;
 	}

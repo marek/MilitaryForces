@@ -142,7 +142,7 @@ int VehicleData::getIndexOfVehicle( int start,			// where to start in list
 		if( !(availableVehicles[i].team & team) ) continue;					// wrong team
 		if( !(availableVehicles[i].cat & cat) ) continue;					// wrong category
 		if( !(availableVehicles[i].cls & cls) ) continue;					// wrong class
-		if( availableVehicles[i].flags & VF_NOTSELECTABLE ) continue;		// not offered for selection
+		if( !VehicleData::selectable( i ) ) continue;						// not offered for selection
 		
 		if(!allowNukes)
 		{
@@ -1191,6 +1191,14 @@ void VehicleData::findDeck( const char *name, completeVehicleData_t *veh )
 	veh->hasDeck = true;
 }
 
+bool VehicleData::selectable( int vehicle )
+{
+	if( vehicle < 0 || vehicle >= bg_numberOfVehicles ) 
+		return false;
+	const unsigned int flags = availableVehicles[vehicle].flags;
+	return !(flags & VF_NOTSELECTABLE) && (testVehicles_ || !(flags & VF_TESTONLY));
+}
+
 bool VehicleData::stealthHidden( int vehicle, int revealTime, int time, float dist, float radarRange )
 {
 	if( vehicle < 0 || vehicle >= bg_numberOfVehicles ) 
@@ -1199,7 +1207,9 @@ bool VehicleData::stealthHidden( int vehicle, int revealTime, int time, float di
 		return false;
 	if( time < revealTime ) 
 		return false;
-	return dist > radarRange * STEALTH_RANGE_FACTOR;
+	// a stealth bomber is revealed only by its open bay, and shut it is the hardest target of all
+	const float factor = availableVehicles[vehicle].cls == CLASS_PLANE_BOMBER ? STEALTH_RANGE_FACTOR * 0.5f : STEALTH_RANGE_FACTOR;
+	return dist > radarRange * factor;
 }
 
 bool VehicleData::vehicleHasTurret( int vehicle )

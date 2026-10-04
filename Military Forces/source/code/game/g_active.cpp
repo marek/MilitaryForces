@@ -848,8 +848,8 @@ void ClientThink_real( GameEntity *ent )
 
 	// first the general functionality, then the cat-specific one
 	if( client->vehicle_ >= 0 && (availableVehicles[client->vehicle_].flags & VF_STEALTH) && (client->ps_.ONOFF & OO_WEAPONBAY) &&
-		client->ps_.timers[TIMER_REVEAL] < theLevel.time_ + g_stealthPenalty.integer * 1000 ) 
-		client->ps_.timers[TIMER_REVEAL] = theLevel.time_ + g_stealthPenalty.integer * 1000;
+		client->ps_.timers[TIMER_REVEAL] < theLevel.time_ + stealthPenalty( client->vehicle_ ) ) 
+		client->ps_.timers[TIMER_REVEAL] = theLevel.time_ + stealthPenalty( client->vehicle_ );
 	if( client->ps_.weaponNum != ucmd->weapon ) 
 	{
 		unlock(ent);

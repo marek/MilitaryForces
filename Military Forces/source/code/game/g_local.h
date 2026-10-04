@@ -937,6 +937,14 @@ extern	vmCvar_t	g_password;
 extern	vmCvar_t	g_needpass;
 extern	vmCvar_t	g_gravity;
 extern	vmCvar_t	g_stealthPenalty;
+extern	vmCvar_t	g_testVehicles;
+
+// how long a stealth vehicle stays visible after firing or opening its bay: a bomber fades again soon after the doors shut
+inline int stealthPenalty( int vehicle )
+{
+	constexpr int bomberPenalty = 5000;
+	return availableVehicles[vehicle].cls == CLASS_PLANE_BOMBER ? std::min( bomberPenalty, g_stealthPenalty.integer * 1000 ) : g_stealthPenalty.integer * 1000;
+}
 extern	vmCvar_t	g_botMinPlayers;
 extern	vmCvar_t	g_botSkill;
 extern	vmCvar_t	g_ruseReset;
