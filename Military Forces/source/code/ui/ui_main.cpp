@@ -170,7 +170,7 @@ void AssetCache()
 		uiInfo.uiUtils.dc_->assets_.crosshairShader[n] = refExport.RegisterShaderNoMip( va("gfx/2d/crosshair%c", 'a' + n ) );
 	}
 
-	uiInfo.newHighScoreSound = S_RegisterSound("sound/feedback/voc_newhighscore.wav", false);
+	uiInfo.newHighScoreSound = SoundSystem::registerSound("sound/feedback/voc_newhighscore.wav", false);
 }
 
 void _UI_DrawSides(float x, float y, float w, float h, float size) 
@@ -808,7 +808,7 @@ bool Asset_Parse(int handle)
 			if (!uiInfo.uiUtils.pc_String_Parse(handle, &tempStr)) {
 				return false;
 			}
-			uiInfo.uiUtils.dc_->assets_.menuEnterSound = S_RegisterSound( tempStr, false );
+			uiInfo.uiUtils.dc_->assets_.menuEnterSound = SoundSystem::registerSound( tempStr, false );
 			continue;
 		}
 
@@ -817,7 +817,7 @@ bool Asset_Parse(int handle)
 			if (!uiInfo.uiUtils.pc_String_Parse(handle, &tempStr)) {
 				return false;
 			}
-			uiInfo.uiUtils.dc_->assets_.menuExitSound = S_RegisterSound( tempStr, false );
+			uiInfo.uiUtils.dc_->assets_.menuExitSound = SoundSystem::registerSound( tempStr, false );
 			continue;
 		}
 
@@ -826,7 +826,7 @@ bool Asset_Parse(int handle)
 			if (!uiInfo.uiUtils.pc_String_Parse(handle, &tempStr)) {
 				return false;
 			}
-			uiInfo.uiUtils.dc_->assets_.itemFocusSound = S_RegisterSound( tempStr, false );
+			uiInfo.uiUtils.dc_->assets_.itemFocusSound = SoundSystem::registerSound( tempStr, false );
 			continue;
 		}
 
@@ -835,7 +835,7 @@ bool Asset_Parse(int handle)
 			if (!uiInfo.uiUtils.pc_String_Parse(handle, &tempStr)) {
 				return false;
 			}
-			uiInfo.uiUtils.dc_->assets_.menuBuzzSound = S_RegisterSound( tempStr, false );
+			uiInfo.uiUtils.dc_->assets_.menuBuzzSound = SoundSystem::registerSound( tempStr, false );
 			continue;
 		}
 
@@ -2459,7 +2459,7 @@ bool UI_OwnerDrawVisible(int flags)
 				if (uiInfo.soundHighScore) {
 					if (CvarSystem::variableValue("sv_killserver") == 0) {
 						// wait on server to go down before playing sound
-						S_StartLocalSound(uiInfo.newHighScoreSound, CHAN_ANNOUNCER);
+						SoundSystem::startLocalSound(uiInfo.newHighScoreSound, CHAN_ANNOUNCER);
 						uiInfo.soundHighScore = false;
 					}
 				}
@@ -6007,7 +6007,7 @@ void _UI_KeyEvent( int key, bool down )
 /*
 	if ((s > 0) && (s != menu_null_sound))
 	{
-		S_StartLocalSound( s, CHAN_LOCAL_SOUND );
+		SoundSystem::startLocalSound( s, CHAN_LOCAL_SOUND );
 	}
 */
 }
@@ -6068,8 +6068,8 @@ void _UI_SetActiveMenu( UserInterface::MenuCommand menu ) {
 	  case UserInterface::MenuCommand::UIMENU_MAIN:
 			//CvarSystem::set( "sv_killserver", "1" );
 			Key_SetCatcher( ( KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
-			//S_StartLocalSound( S_RegisterSound("sound/misc/menu_background.wav", false) , CHAN_LOCAL_SOUND );
-			//S_StartBackgroundTrack("sound/misc/menu_background.wav", NULL);
+			//SoundSystem::startLocalSound( SoundSystem::registerSound("sound/misc/menu_background.wav", false) , CHAN_LOCAL_SOUND );
+			//SoundSystem::startBackgroundTrack("sound/misc/menu_background.wav", NULL);
 			if (uiInfo.inGameLoad) {
 				UI_LoadNonIngame();
 			}

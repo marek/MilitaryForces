@@ -503,7 +503,7 @@ void SCR_DrawScreenField( stereoFrame_t stereoFrame ) {
 			break;
 		case CA_DISCONNECTED:
 			// force menu up
-			S_StopAllSounds();
+			SoundSystem::stopAllSounds();
 			theUI.setActiveMenu( UserInterface::MenuCommand::UIMENU_MAIN );
 			break;
 		case CA_CONNECTING:

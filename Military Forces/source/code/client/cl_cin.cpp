@@ -1154,17 +1154,17 @@ redump:
 		case	ZA_SOUND_MONO:
 			if (!cinTable[currentHandle].silent) {
 				ssize = RllDecodeMonoToStereo( framedata, sbuf, cinTable[currentHandle].RoQFrameSize, 0, static_cast<unsigned short>(cinTable[currentHandle].roq_flags));
-                                S_RawSamples(0, ssize, 22050, 2, 1, reinterpret_cast<byte *>(sbuf), 1.0f, -1);
+                                SoundSystem::rawSamples(0, ssize, 22050, 2, 1, reinterpret_cast<byte *>(sbuf), 1.0f, -1);
 			}
 			break;
 		case	ZA_SOUND_STEREO:
 			if (!cinTable[currentHandle].silent) {
 				if (cinTable[currentHandle].numQuads == -1) {
-					S_Update();
+					SoundSystem::update();
 					s_rawend[0] = s_soundtime;
 				}
 				ssize = RllDecodeStereoToStereo( framedata, sbuf, cinTable[currentHandle].RoQFrameSize, 0, static_cast<unsigned short>(cinTable[currentHandle].roq_flags));
-                                S_RawSamples(0, ssize, 22050, 2, 2, reinterpret_cast<byte *>(sbuf), 1.0f, -1);
+                                SoundSystem::rawSamples(0, ssize, 22050, 2, 2, reinterpret_cast<byte *>(sbuf), 1.0f, -1);
 			}
 			break;
 		case	ROQ_QUAD_INFO:
@@ -1629,7 +1629,7 @@ void CL_PlayCinematic_f() {
 		bits |= CIN_loop;
 	}
 
-	S_StopAllSounds ();
+	SoundSystem::stopAllSounds ();
 
 	CL_handle = CIN_PlayCinematic( arg, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, bits );
 	if (CL_handle >= 0) {
@@ -1656,7 +1656,7 @@ void SCR_RunCinematic ()
 void SCR_StopCinematic() {
 	if (CL_handle >= 0 && CL_handle < MAX_VIDEO_HANDLES) {
 		CIN_StopCinematic(CL_handle);
-		S_StopAllSounds ();
+		SoundSystem::stopAllSounds ();
 		CL_handle = -1;
 	}
 }

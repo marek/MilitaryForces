@@ -1641,4 +1641,6 @@ int ahextoi( const char* string );
 
 #include "../qcommon/keys_system.h"
 
+#include "../qcommon/sound_system.h"
+
 #endif	// __Q_SHARED_H

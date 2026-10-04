@@ -92,9 +92,9 @@ void ClientEntity::setEntitySoundPosition() {
 
 		v = cgs.inlineModelMidpoints[ this->currentState.modelindex ];
 		VectorAdd( this->lerpOrigin, v, origin );
-		S_UpdateEntityPosition( this->currentState.number, origin );
+		SoundSystem::updateEntityPosition( this->currentState.number, origin );
 	} else {
-		S_UpdateEntityPosition( this->currentState.number, this->lerpOrigin );
+		SoundSystem::updateEntityPosition( this->currentState.number, this->lerpOrigin );
 	}
 }
 
@@ -113,10 +113,10 @@ void ClientEntity::entityEffects() {
 	// add loop sound
 	if ( this->currentState.loopSound ) {
 		if (this->currentState.eType != ET_SPEAKER) {
-			S_AddLoopingSound( this->currentState.number, this->lerpOrigin, vec3_origin, 
+			SoundSystem::addLoopingSound( this->currentState.number, this->lerpOrigin, vec3_origin, 
 				cgs.gameSounds[ this->currentState.loopSound ] );
 		} else {
-			S_AddRealLoopingSound( this->currentState.number, this->lerpOrigin, vec3_origin, 
+			SoundSystem::addRealLoopingSound( this->currentState.number, this->lerpOrigin, vec3_origin, 
 				cgs.gameSounds[ this->currentState.loopSound ] );
 		}
 	}
@@ -195,7 +195,7 @@ void ClientEntity::speaker() {
 		return;
 	}
 
-	S_StartSound (nullptr, this->currentState.number, CHAN_ITEM, cgs.gameSounds[this->currentState.eventParm] );
+	SoundSystem::startSound (nullptr, this->currentState.number, CHAN_ITEM, cgs.gameSounds[this->currentState.eventParm] );
 
 	//	ent->s.frame = ent->wait * 10;
 	//	ent->s.clientNum = ent->random * 10;
@@ -351,7 +351,7 @@ void ClientEntity::missile() {
 
 		BG_EvaluateTrajectoryDelta( &this->currentState.pos, cg.time, velocity );
 
-		S_AddLoopingSound( this->currentState.number, this->lerpOrigin, velocity, weapon->missileSound );
+		SoundSystem::addLoopingSound( this->currentState.number, this->lerpOrigin, velocity, weapon->missileSound );
 	}
 
 	// create the render entity

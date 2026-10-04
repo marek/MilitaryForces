@@ -331,9 +331,9 @@ void SoundEffect::loadDefault() {
 
 /*
 ===================
-S_DisableSounds
+SoundSystem::disableSounds
 
-Disables sounds until the next S_BeginRegistration.
+Disables sounds until the next SoundSystem::beginRegistration.
 This is called when the hunk is cleared and the sounds
 are no longer valid.
 ===================
@@ -345,7 +345,7 @@ void S_Base_DisableSounds( ) {
 
 /*
 ==================
-S_RegisterSound
+SoundSystem::registerSound
 
 Creates a default buzz sound if the file can't be loaded
 ==================
@@ -386,7 +386,7 @@ sfxHandle_t	S_Base_RegisterSound( const char *name, bool compressed ) {
 
 /*
 =====================
-S_BeginRegistration
+SoundSystem::beginRegistration
 
 =====================
 */
@@ -536,11 +536,11 @@ static void S_Base_StartSoundEx( vec3_t origin, int entityNum, int entchannel, s
 	}
 
 	if ( !origin && ( entityNum < 0 || entityNum >= MAX_GENTITIES ) ) {
-		Com_Error( ERR_DROP, "S_StartSound: bad entitynum %i", entityNum );
+		Com_Error( ERR_DROP, "SoundSystem::startSound: bad entitynum %i", entityNum );
 	}
 
 	if ( sfxHandle < 0 || sfxHandle >= s_numSfx ) {
-		Com_Printf( S_COLOR_YELLOW "S_StartSound: handle %i out of range\n", sfxHandle );
+		Com_Printf( S_COLOR_YELLOW "SoundSystem::startSound: handle %i out of range\n", sfxHandle );
 		return;
 	}
 
@@ -649,7 +649,7 @@ static void S_Base_StartSoundEx( vec3_t origin, int entityNum, int entchannel, s
 
 /*
 ====================
-S_StartSound
+SoundSystem::startSound
 
 if origin is NULL, the sound will be dynamically sourced from the entity
 ====================
@@ -660,7 +660,7 @@ void S_Base_StartSound( vec3_t origin, int entityNum, int entchannel, sfxHandle_
 
 /*
 ==================
-S_StartLocalSound
+SoundSystem::startLocalSound
 ==================
 */
 void S_Base_StartLocalSound( sfxHandle_t sfxHandle, int channelNum ) {
@@ -669,7 +669,7 @@ void S_Base_StartLocalSound( sfxHandle_t sfxHandle, int channelNum ) {
 	}
 
 	if ( sfxHandle < 0 || sfxHandle >= s_numSfx ) {
-		Com_Printf( S_COLOR_YELLOW "S_StartLocalSound: handle %i out of range\n", sfxHandle );
+		Com_Printf( S_COLOR_YELLOW "SoundSystem::startLocalSound: handle %i out of range\n", sfxHandle );
 		return;
 	}
 
@@ -679,7 +679,7 @@ void S_Base_StartLocalSound( sfxHandle_t sfxHandle, int channelNum ) {
 
 /*
 ==================
-S_ClearSoundBuffer
+SoundSystem::clearSoundBuffer
 
 If we are about to perform file access, clear the buffer
 so sound doesn't stutter.
@@ -713,7 +713,7 @@ void S_Base_ClearSoundBuffer( ) {
 
 /*
 ==================
-S_StopAllSounds
+SoundSystem::stopAllSounds
 ==================
 */
 void S_Base_StopAllSounds() {
@@ -743,7 +743,7 @@ void S_Base_StopLoopingSound(int entityNum) {
 
 /*
 ==================
-S_ClearLoopingSounds
+SoundSystem::clearLoopingSounds
 
 ==================
 */
@@ -759,7 +759,7 @@ void S_Base_ClearLoopingSounds( bool killall ) {
 
 /*
 ==================
-S_AddLoopingSound
+SoundSystem::addLoopingSound
 
 Called during entity generation for a frame
 Include velocity in case I get around to doing doppler...
@@ -773,7 +773,7 @@ void S_Base_AddLoopingSound( int entityNum, const vec3_t origin, const vec3_t ve
 	}
 
 	if ( sfxHandle < 0 || sfxHandle >= s_numSfx ) {
-		Com_Printf( S_COLOR_YELLOW "S_AddLoopingSound: handle %i out of range\n", sfxHandle );
+		Com_Printf( S_COLOR_YELLOW "SoundSystem::addLoopingSound: handle %i out of range\n", sfxHandle );
 		return;
 	}
 
@@ -822,7 +822,7 @@ void S_Base_AddLoopingSound( int entityNum, const vec3_t origin, const vec3_t ve
 
 /*
 ==================
-S_AddLoopingSound
+SoundSystem::addLoopingSound
 
 Called during entity generation for a frame
 Include velocity in case I get around to doing doppler...
@@ -836,7 +836,7 @@ void S_Base_AddRealLoopingSound( int entityNum, const vec3_t origin, const vec3_
 	}
 
 	if ( sfxHandle < 0 || sfxHandle >= s_numSfx ) {
-		Com_Printf( S_COLOR_YELLOW "S_AddRealLoopingSound: handle %i out of range\n", sfxHandle );
+		Com_Printf( S_COLOR_YELLOW "SoundSystem::addRealLoopingSound: handle %i out of range\n", sfxHandle );
 		return;
 	}
 
@@ -1099,14 +1099,14 @@ void S_Base_RawSamples( int stream, int samples, int rate, int width, int numCha
 
 /*
 =====================
-S_UpdateEntityPosition
+SoundSystem::updateEntityPosition
 
 let the sound system know where an entity currently is
 ======================
 */
 void S_Base_UpdateEntityPosition( int entityNum, const vec3_t origin ) {
 	if ( entityNum < 0 || entityNum >= MAX_GENTITIES ) {
-		Com_Error( ERR_DROP, "S_UpdateEntityPosition: bad entitynum %i", entityNum );
+		Com_Error( ERR_DROP, "SoundSystem::updateEntityPosition: bad entitynum %i", entityNum );
 	}
 	VectorCopy( origin, loopSounds[entityNum].origin );
 }
@@ -1114,7 +1114,7 @@ void S_Base_UpdateEntityPosition( int entityNum, const vec3_t origin ) {
 
 /*
 ============
-S_Respatialize
+SoundSystem::respatialize
 
 Change the volumes of all the playing sounds for changes in their positions
 ============
@@ -1199,7 +1199,7 @@ bool S_ScanChannelStarts( ) {
 
 /*
 ============
-S_Update
+SoundSystem::update
 
 Called once each time through the main loop
 ============
@@ -1256,7 +1256,7 @@ void S_GetSoundtime()
 	}
 
 	// it is possible to miscount buffers if it has wrapped twice between
-	// calls to S_Update.  Oh well.
+	// calls to SoundSystem::update.  Oh well.
 	samplepos = SNDDMA_GetDMAPos();
 	if (samplepos < oldsamplepos)
 	{
@@ -1361,7 +1361,7 @@ background music functions
 
 /*
 ======================
-S_StopBackgroundTrack
+SoundSystem::stopBackgroundTrack
 ======================
 */
 void S_Base_StopBackgroundTrack( ) {
@@ -1400,7 +1400,7 @@ static void S_OpenBackgroundStream( const char *filename ) {
 
 /*
 ======================
-S_StartBackgroundTrack
+SoundSystem::startBackgroundTrack
 ======================
 */
 void S_Base_StartBackgroundTrack( const char *intro, const char *loop ){
@@ -1410,7 +1410,7 @@ void S_Base_StartBackgroundTrack( const char *intro, const char *loop ){
 	if ( !loop || !loop[0] ) {
 		loop = intro;
 	}
-	Com_DPrintf( "S_StartBackgroundTrack( %s, %s )\n", intro, loop );
+	Com_DPrintf( "SoundSystem::startBackgroundTrack( %s, %s )\n", intro, loop );
 
 	if(!*intro)
 	{
@@ -1554,7 +1554,7 @@ void S_Base_Shutdown( ) {
 
 /*
 ================
-S_Init
+SoundSystem::init
 ================
 */
 bool S_Base_Init( soundInterface_t *si ) {

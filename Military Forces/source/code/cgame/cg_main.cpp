@@ -494,7 +494,7 @@ static void CG_RegisterItemSounds( int itemNum ) {
 	item = &bg_itemlist[ itemNum ];
 
 	if( item->pickup_sound ) {
-		S_RegisterSound( item->pickup_sound, false );
+		SoundSystem::registerSound( item->pickup_sound, false );
 	}
 
 	// parse the space seperated precache string for other media
@@ -521,7 +521,7 @@ static void CG_RegisterItemSounds( int itemNum ) {
 		}
 
 		if ( !strcmp(data+len-3, "wav" )) {
-			S_RegisterSound( data, false );
+			SoundSystem::registerSound( data, false );
 		}
 	}
 }
@@ -538,70 +538,70 @@ static void CG_RegisterSounds( ) {
 	char	items[MAX_ITEMS+1];
 	const char	*soundName;
 
-	cgs.media.oneMinuteSound = S_RegisterSound( "sound/feedback/1_minute.wav", false );
-	cgs.media.fiveMinuteSound = S_RegisterSound( "sound/feedback/5_minute.wav", false );
-	cgs.media.suddenDeathSound = S_RegisterSound( "sound/feedback/sudden_death.wav", false );
-	cgs.media.oneFragSound = S_RegisterSound( "sound/feedback/1_frag.wav", false );
-	cgs.media.twoFragSound = S_RegisterSound( "sound/feedback/2_frags.wav", false );
-	cgs.media.threeFragSound = S_RegisterSound( "sound/feedback/3_frags.wav", false );
-	cgs.media.count3Sound = S_RegisterSound( "sound/feedback/three.wav", false );
-	cgs.media.count2Sound = S_RegisterSound( "sound/feedback/two.wav", false );
-	cgs.media.count1Sound = S_RegisterSound( "sound/feedback/one.wav", false );
-	cgs.media.countFightSound = S_RegisterSound( "sound/feedback/fight.wav", false );
-	cgs.media.countPrepareSound = S_RegisterSound( "sound/feedback/prepare.wav", false );
+	cgs.media.oneMinuteSound = SoundSystem::registerSound( "sound/feedback/1_minute.wav", false );
+	cgs.media.fiveMinuteSound = SoundSystem::registerSound( "sound/feedback/5_minute.wav", false );
+	cgs.media.suddenDeathSound = SoundSystem::registerSound( "sound/feedback/sudden_death.wav", false );
+	cgs.media.oneFragSound = SoundSystem::registerSound( "sound/feedback/1_frag.wav", false );
+	cgs.media.twoFragSound = SoundSystem::registerSound( "sound/feedback/2_frags.wav", false );
+	cgs.media.threeFragSound = SoundSystem::registerSound( "sound/feedback/3_frags.wav", false );
+	cgs.media.count3Sound = SoundSystem::registerSound( "sound/feedback/three.wav", false );
+	cgs.media.count2Sound = SoundSystem::registerSound( "sound/feedback/two.wav", false );
+	cgs.media.count1Sound = SoundSystem::registerSound( "sound/feedback/one.wav", false );
+	cgs.media.countFightSound = SoundSystem::registerSound( "sound/feedback/fight.wav", false );
+	cgs.media.countPrepareSound = SoundSystem::registerSound( "sound/feedback/prepare.wav", false );
 
 	if ( cgs.gametype >= GT_TEAM || cg_buildScript.integer ) {
 
-		cgs.media.captureAwardSound = S_RegisterSound( "sound/teamplay/flagcapture_yourteam.wav", false );
-		cgs.media.redLeadsSound = S_RegisterSound( "sound/feedback/redleads.wav", false );
-		cgs.media.blueLeadsSound = S_RegisterSound( "sound/feedback/blueleads.wav", false );
-		cgs.media.teamsTiedSound = S_RegisterSound( "sound/feedback/teamstied.wav", false );
-		cgs.media.hitTeamSound = S_RegisterSound( "sound/feedback/hit_teammate.wav", false );
+		cgs.media.captureAwardSound = SoundSystem::registerSound( "sound/teamplay/flagcapture_yourteam.wav", false );
+		cgs.media.redLeadsSound = SoundSystem::registerSound( "sound/feedback/redleads.wav", false );
+		cgs.media.blueLeadsSound = SoundSystem::registerSound( "sound/feedback/blueleads.wav", false );
+		cgs.media.teamsTiedSound = SoundSystem::registerSound( "sound/feedback/teamstied.wav", false );
+		cgs.media.hitTeamSound = SoundSystem::registerSound( "sound/feedback/hit_teammate.wav", false );
 
-		cgs.media.redScoredSound = S_RegisterSound( "sound/teamplay/voc_red_scores.wav", false );
-		cgs.media.blueScoredSound = S_RegisterSound( "sound/teamplay/voc_blue_scores.wav", false );
+		cgs.media.redScoredSound = SoundSystem::registerSound( "sound/teamplay/voc_red_scores.wav", false );
+		cgs.media.blueScoredSound = SoundSystem::registerSound( "sound/teamplay/voc_blue_scores.wav", false );
 
-		cgs.media.captureYourTeamSound = S_RegisterSound( "sound/teamplay/flagcapture_yourteam.wav", false );
-		cgs.media.captureOpponentSound = S_RegisterSound( "sound/teamplay/flagcapture_opponent.wav", false );
+		cgs.media.captureYourTeamSound = SoundSystem::registerSound( "sound/teamplay/flagcapture_yourteam.wav", false );
+		cgs.media.captureOpponentSound = SoundSystem::registerSound( "sound/teamplay/flagcapture_opponent.wav", false );
 
-		cgs.media.returnYourTeamSound = S_RegisterSound( "sound/teamplay/flagreturn_yourteam.wav", false );
-		cgs.media.returnOpponentSound = S_RegisterSound( "sound/teamplay/flagreturn_opponent.wav", false );
+		cgs.media.returnYourTeamSound = SoundSystem::registerSound( "sound/teamplay/flagreturn_yourteam.wav", false );
+		cgs.media.returnOpponentSound = SoundSystem::registerSound( "sound/teamplay/flagreturn_opponent.wav", false );
 
-		cgs.media.takenYourTeamSound = S_RegisterSound( "sound/teamplay/flagtaken_yourteam.wav", false );
-		cgs.media.takenOpponentSound = S_RegisterSound( "sound/teamplay/flagtaken_opponent.wav", false );
+		cgs.media.takenYourTeamSound = SoundSystem::registerSound( "sound/teamplay/flagtaken_yourteam.wav", false );
+		cgs.media.takenOpponentSound = SoundSystem::registerSound( "sound/teamplay/flagtaken_opponent.wav", false );
 
 		if ( cgs.gametype == GT_CTF || cg_buildScript.integer ) {
-			cgs.media.redFlagReturnedSound = S_RegisterSound( "sound/teamplay/voc_red_returned.wav", false );
-			cgs.media.blueFlagReturnedSound = S_RegisterSound( "sound/teamplay/voc_blue_returned.wav", false );
-			cgs.media.enemyTookYourFlagSound = S_RegisterSound( "sound/teamplay/voc_enemy_flag.wav", false );
-			cgs.media.yourTeamTookEnemyFlagSound = S_RegisterSound( "sound/teamplay/voc_team_flag.wav", false );
+			cgs.media.redFlagReturnedSound = SoundSystem::registerSound( "sound/teamplay/voc_red_returned.wav", false );
+			cgs.media.blueFlagReturnedSound = SoundSystem::registerSound( "sound/teamplay/voc_blue_returned.wav", false );
+			cgs.media.enemyTookYourFlagSound = SoundSystem::registerSound( "sound/teamplay/voc_enemy_flag.wav", false );
+			cgs.media.yourTeamTookEnemyFlagSound = SoundSystem::registerSound( "sound/teamplay/voc_team_flag.wav", false );
 		}
 
-		cgs.media.youHaveFlagSound = S_RegisterSound( "sound/teamplay/voc_you_flag.wav", false );
-		cgs.media.holyShitSound = S_RegisterSound( "sound/feedback/voc_holyshit.wav", false);
-		cgs.media.yourTeamTookTheFlagSound = S_RegisterSound( "sound/teamplay/voc_team_1flag.wav", false );
-		cgs.media.enemyTookTheFlagSound = S_RegisterSound( "sound/teamplay/voc_enemy_1flag.wav", false );
+		cgs.media.youHaveFlagSound = SoundSystem::registerSound( "sound/teamplay/voc_you_flag.wav", false );
+		cgs.media.holyShitSound = SoundSystem::registerSound( "sound/feedback/voc_holyshit.wav", false);
+		cgs.media.yourTeamTookTheFlagSound = SoundSystem::registerSound( "sound/teamplay/voc_team_1flag.wav", false );
+		cgs.media.enemyTookTheFlagSound = SoundSystem::registerSound( "sound/teamplay/voc_enemy_1flag.wav", false );
 	}
 
-	cgs.media.respawnSound = S_RegisterSound( "sound/items/respawn1.wav", false );
+	cgs.media.respawnSound = SoundSystem::registerSound( "sound/items/respawn1.wav", false );
 
-	cgs.media.talkSound = S_RegisterSound( "sound/player/talk.wav", false );
+	cgs.media.talkSound = SoundSystem::registerSound( "sound/player/talk.wav", false );
 
-	cgs.media.hitSound = S_RegisterSound( "sound/feedback/hit.wav", false );
+	cgs.media.hitSound = SoundSystem::registerSound( "sound/feedback/hit.wav", false );
 
-	cgs.media.impressiveSound = S_RegisterSound( "sound/feedback/impressive.wav", false );
-	cgs.media.excellentSound = S_RegisterSound( "sound/feedback/excellent.wav", false );
-	cgs.media.deniedSound = S_RegisterSound( "sound/feedback/denied.wav", false );
-	cgs.media.assistSound = S_RegisterSound( "sound/feedback/assist.wav", false );
-	cgs.media.defendSound = S_RegisterSound( "sound/feedback/defense.wav", false );
+	cgs.media.impressiveSound = SoundSystem::registerSound( "sound/feedback/impressive.wav", false );
+	cgs.media.excellentSound = SoundSystem::registerSound( "sound/feedback/excellent.wav", false );
+	cgs.media.deniedSound = SoundSystem::registerSound( "sound/feedback/denied.wav", false );
+	cgs.media.assistSound = SoundSystem::registerSound( "sound/feedback/assist.wav", false );
+	cgs.media.defendSound = SoundSystem::registerSound( "sound/feedback/defense.wav", false );
 
-	cgs.media.takenLeadSound = S_RegisterSound( "sound/feedback/takenlead.wav", false);
-	cgs.media.tiedLeadSound = S_RegisterSound( "sound/feedback/tiedlead.wav", false);
-	cgs.media.lostLeadSound = S_RegisterSound( "sound/feedback/lostlead.wav", false);
+	cgs.media.takenLeadSound = SoundSystem::registerSound( "sound/feedback/takenlead.wav", false);
+	cgs.media.tiedLeadSound = SoundSystem::registerSound( "sound/feedback/tiedlead.wav", false);
+	cgs.media.lostLeadSound = SoundSystem::registerSound( "sound/feedback/lostlead.wav", false);
 
-	cgs.media.watrInSound = S_RegisterSound( "sound/player/watr_in.wav", false);
-	cgs.media.watrOutSound = S_RegisterSound( "sound/player/watr_out.wav", false);
-	cgs.media.watrUnSound = S_RegisterSound( "sound/player/watr_un.wav", false);
+	cgs.media.watrInSound = SoundSystem::registerSound( "sound/player/watr_in.wav", false);
+	cgs.media.watrOutSound = SoundSystem::registerSound( "sound/player/watr_out.wav", false);
+	cgs.media.watrUnSound = SoundSystem::registerSound( "sound/player/watr_un.wav", false);
 
 	// only register the items that the server says we need
 	Q_strncpyz(items, CG_ConfigString(CS_ITEMS), sizeof(items));
@@ -620,56 +620,56 @@ static void CG_RegisterSounds( ) {
 		if ( soundName[0] == '*' ) {
 			continue;	// custom sound
 		}
-		cgs.gameSounds[i] = S_RegisterSound( soundName, false );
+		cgs.gameSounds[i] = SoundSystem::registerSound( soundName, false );
 		CG_LoadingStep( i, MAX_SOUNDS );
 	}
 
 	// FIXME: only needed with item
-	cgs.media.sfx_ric1 = S_RegisterSound( "sound/weapons/machinegun/ric1.wav", false);
-	cgs.media.sfx_ric2 = S_RegisterSound( "sound/weapons/machinegun/ric2.wav", false);
-	cgs.media.sfx_ric3 = S_RegisterSound( "sound/weapons/machinegun/ric3.wav", false);
-	cgs.media.sfx_rockexp = S_RegisterSound( "sound/weapons/rocket/rocklx1a.wav", false);
+	cgs.media.sfx_ric1 = SoundSystem::registerSound( "sound/weapons/machinegun/ric1.wav", false);
+	cgs.media.sfx_ric2 = SoundSystem::registerSound( "sound/weapons/machinegun/ric2.wav", false);
+	cgs.media.sfx_ric3 = SoundSystem::registerSound( "sound/weapons/machinegun/ric3.wav", false);
+	cgs.media.sfx_rockexp = SoundSystem::registerSound( "sound/weapons/rocket/rocklx1a.wav", false);
 
-	cgs.media.n_healthSound = S_RegisterSound( "sound/items/n_health.wav", false );
+	cgs.media.n_healthSound = SoundSystem::registerSound( "sound/items/n_health.wav", false );
 
 	// MFQ3
-	cgs.media.engineJet = S_RegisterSound( "sound/engines/jet.wav", false );
-	cgs.media.engineProp = S_RegisterSound( "sound/engines/prop.wav", false );
-	cgs.media.engineJetAB = S_RegisterSound( "sound/engines/afterburner.wav", false );
-	cgs.media.engineHelo = S_RegisterSound( "sound/engines/helo.wav", false );
+	cgs.media.engineJet = SoundSystem::registerSound( "sound/engines/jet.wav", false );
+	cgs.media.engineProp = SoundSystem::registerSound( "sound/engines/prop.wav", false );
+	cgs.media.engineJetAB = SoundSystem::registerSound( "sound/engines/afterburner.wav", false );
+	cgs.media.engineHelo = SoundSystem::registerSound( "sound/engines/helo.wav", false );
 
 	// Nuclear Bomb
-	cgs.media.nukeExplodeSound = S_RegisterSound( "sound/items/kam_explode.wav", false );
-	cgs.media.nukeImplodeSound = S_RegisterSound( "sound/items/kam_implode.wav", false );
-	cgs.media.nukeFarSound = S_RegisterSound( "sound/items/nuke_far.wav", false );
+	cgs.media.nukeExplodeSound = SoundSystem::registerSound( "sound/items/kam_explode.wav", false );
+	cgs.media.nukeImplodeSound = SoundSystem::registerSound( "sound/items/kam_implode.wav", false );
+	cgs.media.nukeFarSound = SoundSystem::registerSound( "sound/items/nuke_far.wav", false );
 	cgs.media.nukeEffectModel = refExport.RegisterModel( "models/weaphits/nukeblast.md3" );
 	cgs.media.nukeShockWave = refExport.RegisterModel( "models/weaphits/nukeshockwave.md3" );
 	cgs.media.nukeCloudModel = refExport.RegisterModel( "models/weaphits/nukecloud.md3" );
 
 	// MFQ3: New sounds
-	cgs.media.planeDeath[0] = S_RegisterSound( "sound/explosions/explode1.wav", false );	
-	cgs.media.planeDeath[1] = S_RegisterSound( "sound/explosions/explode2.wav", false );	
-	cgs.media.planeDeath[2] = S_RegisterSound( "sound/explosions/explode3.wav", false );	
-	cgs.media.planeDeath[3] = S_RegisterSound( "sound/explosions/explode4.wav", false );	
+	cgs.media.planeDeath[0] = SoundSystem::registerSound( "sound/explosions/explode1.wav", false );	
+	cgs.media.planeDeath[1] = SoundSystem::registerSound( "sound/explosions/explode2.wav", false );	
+	cgs.media.planeDeath[2] = SoundSystem::registerSound( "sound/explosions/explode3.wav", false );	
+	cgs.media.planeDeath[3] = SoundSystem::registerSound( "sound/explosions/explode4.wav", false );	
 	if( !cgs.media.planeDeath[0] )
 	{
 		// MFQ3: old quake3 sound (backup)
-		cgs.media.planeDeath[0] = S_RegisterSound( "sound/death/planedeath.wav", false );	
+		cgs.media.planeDeath[0] = SoundSystem::registerSound( "sound/death/planedeath.wav", false );	
 		cgs.media.planeDeath[1] = cgs.media.planeDeath[0];
 		cgs.media.planeDeath[2] = cgs.media.planeDeath[0];
 		cgs.media.planeDeath[3] = cgs.media.planeDeath[0];
 	}
 
 	// added mg
-	cgs.media.engineTank[0] = S_RegisterSound( "sound/engines/tank0.wav", false );
-	cgs.media.engineTank[1] = S_RegisterSound( "sound/engines/tank1.wav", false );
-	cgs.media.engineTank[2] = S_RegisterSound( "sound/engines/tank2.wav", false );
-	cgs.media.engineTank[3] = S_RegisterSound( "sound/engines/tank3.wav", false );
-	cgs.media.engineTank[4] = S_RegisterSound( "sound/engines/tank4.wav", false );
-	cgs.media.engineTank[5] = S_RegisterSound( "sound/engines/tank5.wav", false );
-	cgs.media.engineTank[6] = S_RegisterSound( "sound/engines/tank6.wav", false );
-	cgs.media.engineTank[7] = S_RegisterSound( "sound/engines/tank7.wav", false );
-	cgs.media.engineTank[8] = S_RegisterSound( "sound/engines/tank8.wav", false );
+	cgs.media.engineTank[0] = SoundSystem::registerSound( "sound/engines/tank0.wav", false );
+	cgs.media.engineTank[1] = SoundSystem::registerSound( "sound/engines/tank1.wav", false );
+	cgs.media.engineTank[2] = SoundSystem::registerSound( "sound/engines/tank2.wav", false );
+	cgs.media.engineTank[3] = SoundSystem::registerSound( "sound/engines/tank3.wav", false );
+	cgs.media.engineTank[4] = SoundSystem::registerSound( "sound/engines/tank4.wav", false );
+	cgs.media.engineTank[5] = SoundSystem::registerSound( "sound/engines/tank5.wav", false );
+	cgs.media.engineTank[6] = SoundSystem::registerSound( "sound/engines/tank6.wav", false );
+	cgs.media.engineTank[7] = SoundSystem::registerSound( "sound/engines/tank7.wav", false );
+	cgs.media.engineTank[8] = SoundSystem::registerSound( "sound/engines/tank8.wav", false );
 
 }
 
@@ -1218,7 +1218,7 @@ bool CG_Asset_Parse(int handle) {
 			if (!cgUtils.pc_String_Parse(handle, &tempStr)) {
 				return false;
 			}
-			cgUtils.dc_->assets_.menuEnterSound = S_RegisterSound( tempStr, false );
+			cgUtils.dc_->assets_.menuEnterSound = SoundSystem::registerSound( tempStr, false );
 			continue;
 		}
 
@@ -1227,7 +1227,7 @@ bool CG_Asset_Parse(int handle) {
 			if (!cgUtils.pc_String_Parse(handle, &tempStr)) {
 				return false;
 			}
-			cgUtils.dc_->assets_.menuExitSound = S_RegisterSound( tempStr, false );
+			cgUtils.dc_->assets_.menuExitSound = SoundSystem::registerSound( tempStr, false );
 			continue;
 		}
 
@@ -1236,7 +1236,7 @@ bool CG_Asset_Parse(int handle) {
 			if (!cgUtils.pc_String_Parse(handle, &tempStr)) {
 				return false;
 			}
-			cgUtils.dc_->assets_.itemFocusSound = S_RegisterSound( tempStr, false );
+			cgUtils.dc_->assets_.itemFocusSound = SoundSystem::registerSound( tempStr, false );
 			continue;
 		}
 
@@ -1245,7 +1245,7 @@ bool CG_Asset_Parse(int handle) {
 			if (!cgUtils.pc_String_Parse(handle, &tempStr)) {
 				return false;
 			}
-			cgUtils.dc_->assets_.menuBuzzSound = S_RegisterSound( tempStr, false );
+			cgUtils.dc_->assets_.menuBuzzSound = SoundSystem::registerSound( tempStr, false );
 			continue;
 		}
 
@@ -1830,7 +1830,7 @@ void CG_StartMusic( ) {
 	Q_strncpyz( parm1, COM_Parse( &s ), sizeof( parm1 ) );
 	Q_strncpyz( parm2, COM_Parse( &s ), sizeof( parm2 ) );
 
-	S_StartBackgroundTrack( parm1, parm2 );
+	SoundSystem::startBackgroundTrack( parm1, parm2 );
 }
 
 // NOTE: functions copied from v1.29h code to enable New scoreboard method
@@ -2067,7 +2067,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 
 	CG_ShaderStateChanged();
 
-	S_ClearLoopingSounds( true );
+	SoundSystem::clearLoopingSounds( true );
 
 	// MFQ3 vehicles
 	MF_LoadAllVehicleData();

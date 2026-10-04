@@ -35,7 +35,7 @@ sfxHandle_t	CG_CustomSound( int clientNum, const char *soundName ) {
 	int			i;
 
 	if ( soundName[0] != '*' ) {
-		return S_RegisterSound( soundName, false );
+		return SoundSystem::registerSound( soundName, false );
 	}
 
 	if ( clientNum < 0 || clientNum >= MAX_CLIENTS ) {

@@ -481,14 +481,14 @@ void CL_CaptureVoip()
 	// try to get more audio data from the sound card...
 
 	if (initialFrame) {
-		S_MasterGain(Com_Clamp(0.0f, 1.0f, cl_voipGainDuringCapture->value));
-		S_StartCapture();
+		SoundSystem::masterGain(Com_Clamp(0.0f, 1.0f, cl_voipGainDuringCapture->value));
+		SoundSystem::startCapture();
 		CL_VoipNewGeneration();
 		CL_VoipParseTargets();
 	}
 
 	if ((cl_voipSend->integer) || (finalFrame)) { // user wants to capture audio?
-		int samples = S_AvailableCaptureSamples();
+		int samples = SoundSystem::availableCaptureSamples();
 		const int packetSamples = (finalFrame) ? VOIP_MAX_FRAME_SAMPLES : VOIP_MAX_PACKET_SAMPLES;
 
 		// enough data buffered in audio hardware to process yet?
@@ -512,7 +512,7 @@ void CL_CaptureVoip()
 			}
 			voipFrames = samples / VOIP_MAX_FRAME_SAMPLES;
 
-			S_Capture(samples, reinterpret_cast<byte *>(sampbuffer));  // grab from audio card.
+			SoundSystem::capture(samples, reinterpret_cast<byte *>(sampbuffer));  // grab from audio card.
 
 			// check the "power" of this packet...
 			for (i = 0; i < samples; i++) {
@@ -558,8 +558,8 @@ void CL_CaptureVoip()
 	// User requested we stop recording, and we've now processed the last of
 	//  any previously-buffered data. Pause the capture device, etc.
 	if (finalFrame) {
-		S_StopCapture();
-		S_MasterGain(1.0f);
+		SoundSystem::stopCapture();
+		SoundSystem::masterGain(1.0f);
 		clc.voipPower = 0.0f;  // force this value so it doesn't linger.
 	}
 }
@@ -1219,7 +1219,7 @@ void CL_ShutdownAll(bool shutdownRef)
 		CL_StopRecord_f();
 
 	// clear sounds
-	S_DisableSounds();
+	SoundSystem::disableSounds();
 	// shutdown CGame
 	CL_ShutdownCGame();
 	// shutdown UI
@@ -1333,7 +1333,7 @@ Called before parsing a gamestate
 */
 void CL_ClearState () {
 
-//	S_StopAllSounds();
+//	SoundSystem::stopAllSounds();
 
 	Com_Memset( &cl, 0, sizeof( cl ) );
 }
@@ -1438,7 +1438,7 @@ void CL_Disconnect( bool showMainMenu ) {
 	}
 
 	SCR_StopCinematic ();
-	S_ClearSoundBuffer();
+	SoundSystem::clearSoundBuffer();
 
 	// send a disconnect message to the server
 	// send it a few times in case one is dropped
@@ -1943,7 +1943,7 @@ void CL_Vid_Restart_f( ) {
 		CL_StopRecord_f();
 
 	// don't let them loop during the restart
-	S_StopAllSounds();
+	SoundSystem::stopAllSounds();
 
 	if(!FileSystem::conditionalRestart(clc.checksumFeed, true))
 	{
@@ -2005,7 +2005,7 @@ Restart the sound subsystem
 */
 void CL_Snd_Shutdown()
 {
-	S_Shutdown();
+	SoundSystem::shutdown();
 	cls.soundStarted = false;
 }
 
@@ -2996,7 +2996,7 @@ void CL_Frame ( int msec ) {
 			cls.frametime = msec;
 			cls.realtime += cls.frametime;
 			SCR_UpdateScreen();
-			S_Update();
+			SoundSystem::update();
 			Console::runConsole();
 			cls.framecount++;
 			return;
@@ -3011,7 +3011,7 @@ void CL_Frame ( int msec ) {
 	} else	if ( clc.state == CA_DISCONNECTED && !( Key_GetCatcher( ) & KEYCATCH_UI )
 		&& !com_sv_running->integer && theUI.isInitialized() ) {
 		// if disconnected, bring up the menu
-		S_StopAllSounds();
+		SoundSystem::stopAllSounds();
 		theUI.setActiveMenu( UserInterface::MenuCommand::UIMENU_MAIN );
 	}
 
@@ -3099,7 +3099,7 @@ void CL_Frame ( int msec ) {
 	SCR_UpdateScreen();
 
 	// update audio
-	S_Update();
+	SoundSystem::update();
 
 #ifdef USE_VOIP
 	CL_CaptureVoip();
@@ -3213,12 +3213,12 @@ void CL_StartHunkUsers( bool rendererOnly ) {
 
 	if ( !cls.soundStarted ) {
 		cls.soundStarted = true;
-		S_Init();
+		SoundSystem::init();
 	}
 
 	if ( !cls.soundRegistered ) {
 		cls.soundRegistered = true;
-		S_BeginRegistration();
+		SoundSystem::beginRegistration();
 	}
 
 	if( com_dedicated->integer ) {

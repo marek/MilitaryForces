@@ -292,11 +292,11 @@ void CG_RegisterWeapons() {
 			weaponInfo->missileModel = refExport.RegisterModel( availableWeapons[i].modelName );
 			
 			// MFQ3: New sound
-			weaponInfo->missileSound = S_RegisterSound( "sound/weapons/rocket/rocketFly1.wav", false );
+			weaponInfo->missileSound = SoundSystem::registerSound( "sound/weapons/rocket/rocketFly1.wav", false );
 			if( !weaponInfo->missileSound )
 			{
 				// MFQ3: old quake3 sound (backup)
-				weaponInfo->missileSound = S_RegisterSound( "sound/weapons/rocket/rockfly.wav", false );
+				weaponInfo->missileSound = SoundSystem::registerSound( "sound/weapons/rocket/rockfly.wav", false );
 			}
 
 			// FFAR trail with no dynamic lighting
@@ -308,7 +308,7 @@ void CG_RegisterWeapons() {
 			//MAKERGB( weaponInfo->flashDlightColor, 1, 0.75f, 0 );
 
 			// MFQ3: New sound
-			weaponInfo->flashSound[0] = S_RegisterSound( "sound/weapons/rocket/rocketFire1.wav", false );
+			weaponInfo->flashSound[0] = SoundSystem::registerSound( "sound/weapons/rocket/rocketFire1.wav", false );
 
 			break;
 		case WT_ANTIAIRMISSILE:
@@ -318,7 +318,7 @@ void CG_RegisterWeapons() {
 			weaponInfo->missileModel = refExport.RegisterModel( availableWeapons[i].modelName );
 			
 			// MFQ3: New sound
-			weaponInfo->missileSound = S_RegisterSound( "sound/weapons/rocket/rocketFly1.wav", false );
+			weaponInfo->missileSound = SoundSystem::registerSound( "sound/weapons/rocket/rocketFly1.wav", false );
 
 
 			// FFAR trail with no dynamic lighting
@@ -329,7 +329,7 @@ void CG_RegisterWeapons() {
 			//MAKERGB( weaponInfo->flashDlightColor, 1, 0.75f, 0 );
 
 			// MFQ3: New sound
-			weaponInfo->flashSound[0] = S_RegisterSound( "sound/weapons/rocket/rocketFire1.wav", false );
+			weaponInfo->flashSound[0] = SoundSystem::registerSound( "sound/weapons/rocket/rocketFire1.wav", false );
 
 			break;
 
@@ -337,8 +337,8 @@ void CG_RegisterWeapons() {
 		case WT_GUIDEDBOMB:
 			// find out which model to use
 			weaponInfo->missileModel = refExport.RegisterModel( availableWeapons[i].modelName );
-			weaponInfo->missileSound = S_RegisterSound( "sound/weapons/rocket/rockfly.wav", false );
-			weaponInfo->flashSound[0] = S_RegisterSound( "sound/weapons/rocket/rocklf1a.wav", false );
+			weaponInfo->missileSound = SoundSystem::registerSound( "sound/weapons/rocket/rockfly.wav", false );
+			weaponInfo->flashSound[0] = SoundSystem::registerSound( "sound/weapons/rocket/rocklf1a.wav", false );
 			break;
 
 		case WT_MACHINEGUN:
@@ -352,24 +352,24 @@ void CG_RegisterWeapons() {
 			case WI_MG_8XCAL50:
 			case WI_MG_6XCAL50:
 				// olden sound
-				weaponInfo->flashSound[0] = S_RegisterSound( "sound/weapons/machinegun/machineGun2.wav", false );
+				weaponInfo->flashSound[0] = SoundSystem::registerSound( "sound/weapons/machinegun/machineGun2.wav", false );
 				break;
 
 			case WI_MG_12_7MM:
 			case WI_MG_14_5MM:
 				// modern sound (noisey)
-				weaponInfo->flashSound[0] = S_RegisterSound( "sound/weapons/machinegun/machineGun3.wav", false );
+				weaponInfo->flashSound[0] = SoundSystem::registerSound( "sound/weapons/machinegun/machineGun3.wav", false );
 				break;
 
 			case WI_MGT_7_62MM:
-				weaponInfo->flashSound[0] = S_RegisterSound( "sound/weapons/machinegun/minigun.wav", false );
+				weaponInfo->flashSound[0] = SoundSystem::registerSound( "sound/weapons/machinegun/minigun.wav", false );
 				break;
 			
 			case WI_MG_20MM:
 			case WI_MG_M4A1:
 			default:
 				// modern sound (silenced)
-				weaponInfo->flashSound[0] = S_RegisterSound( "sound/weapons/machinegun/machineGun1.wav", false );
+				weaponInfo->flashSound[0] = SoundSystem::registerSound( "sound/weapons/machinegun/machineGun1.wav", false );
 				break;
 			}
 
@@ -385,14 +385,14 @@ void CG_RegisterWeapons() {
 
 		case WT_BALLISTICGUN:
 			weaponInfo->missileModel = refExport.RegisterModel( availableWeapons[i].modelName );
-			weaponInfo->missileSound = S_RegisterSound( "sound/weapons/rocket/rockfly.wav", false );
+			weaponInfo->missileSound = SoundSystem::registerSound( "sound/weapons/rocket/rockfly.wav", false );
 
 			// no dynamic lighting
 			weaponInfo->missileDlight = 0;
 			
 			MAKERGB( weaponInfo->missileDlightColor, 1, 0.75f, 0 );
 
-			weaponInfo->flashSound[0] = S_RegisterSound( "sound/weapons/rocket/rocklf1a.wav", false );
+			weaponInfo->flashSound[0] = SoundSystem::registerSound( "sound/weapons/rocket/rocklf1a.wav", false );
 			break;
 
 		case WT_FLARE:
@@ -403,7 +403,7 @@ void CG_RegisterWeapons() {
 					weaponInfo->missileTrailFunc = CG_FlareTrail;
 					break;
 				case WI_BURNINGMAN:
-					weaponInfo->missileSound = S_RegisterSound( "sound/misc/scream.wav", false );
+					weaponInfo->missileSound = SoundSystem::registerSound( "sound/misc/scream.wav", false );
 					break;
 				default:
 				break;
@@ -428,8 +428,8 @@ void CG_RegisterWeapons() {
 		case WT_NUKEBOMB:
 			// find out which model to use
 			weaponInfo->missileModel = refExport.RegisterModel( availableWeapons[i].modelName );
-			weaponInfo->missileSound = S_RegisterSound( "sound/weapons/rocket/rockfly.wav", false );
-			weaponInfo->flashSound[0] = S_RegisterSound( "sound/weapons/rocket/rocklf1a.wav", false );
+			weaponInfo->missileSound = SoundSystem::registerSound( "sound/weapons/rocket/rockfly.wav", false );
+			weaponInfo->flashSound[0] = SoundSystem::registerSound( "sound/weapons/rocket/rocklf1a.wav", false );
 			break;
 		case WT_NUKEMISSILE:
 			//switch(i)
@@ -439,8 +439,8 @@ void CG_RegisterWeapons() {
 
 						// find out which model to use
 						weaponInfo->missileModel = refExport.RegisterModel( availableWeapons[i].modelName );
-						weaponInfo->missileSound = S_RegisterSound( "sound/weapons/rocket/rockfly.wav", false );
-						weaponInfo->flashSound[0] = S_RegisterSound( "sound/weapons/rocket/rocklf1a.wav", false );
+						weaponInfo->missileSound = SoundSystem::registerSound( "sound/weapons/rocket/rockfly.wav", false );
+						weaponInfo->flashSound[0] = SoundSystem::registerSound( "sound/weapons/rocket/rocklf1a.wav", false );
 						weaponInfo->missileTrailFunc = CG_MissileTrail;
 			//		}
 			//		break;
@@ -453,12 +453,12 @@ void CG_RegisterWeapons() {
 		case WT_AMMOCRATE:
 		case WT_HEALTHCRATE:
 			weaponInfo->missileModel = refExport.RegisterModel( availableWeapons[i].modelName );
-			weaponInfo->flashSound[0] = S_RegisterSound( "sound/weapons/rocket/rocklf1a.wav", false );
+			weaponInfo->flashSound[0] = SoundSystem::registerSound( "sound/weapons/rocket/rocklf1a.wav", false );
 			break;
 
 		default:
 			//MAKERGB( weaponInfo->flashDlightColor, 1, 1, 1 );
-			weaponInfo->flashSound[0] = S_RegisterSound( "sound/weapons/rocket/rocklf1a.wav", false );
+			weaponInfo->flashSound[0] = SoundSystem::registerSound( "sound/weapons/rocket/rocklf1a.wav", false );
 			break;
 		}
 	}
@@ -649,7 +649,7 @@ void ClientEntity::fireMachinegun( bool main )
 		if ( weap->flashSound[c] )
 		{
 			// play
-			S_StartSound( nullptr, ent->number, CHAN_WEAPON, weap->flashSound[c] );
+			SoundSystem::startSound( nullptr, ent->number, CHAN_WEAPON, weap->flashSound[c] );
 		}
 	}
 }
@@ -695,7 +695,7 @@ void ClientEntity::fireWeapon() {
 		c = rand() % c;
 		if ( weap->flashSound[c] )
 		{
-			S_StartSound( nullptr, ent->number, CHAN_WEAPON, weap->flashSound[c] );
+			SoundSystem::startSound( nullptr, ent->number, CHAN_WEAPON, weap->flashSound[c] );
 		}
 	}
 	if( loadout )
@@ -863,7 +863,7 @@ void CG_MissileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_t di
 	//
 	if( sfx )
 	{
-		S_StartSound( origin, ENTITYNUM_WORLD, CHAN_AUTO, sfx );
+		SoundSystem::startSound( origin, ENTITYNUM_WORLD, CHAN_AUTO, sfx );
 	}
 
 	// MFQ3: disable dynamic lighting? (it makes MF looks much too quakey)
@@ -1014,7 +1014,7 @@ void CG_GenericExplosion( vec3_t origin, int type )
 
 	// play 1 of the x explosion sounds
 	soundIdx = rand() % NUM_EXPLOSION_SOUNDS;
-	S_StartSound( origin, ENTITYNUM_WORLD, CHAN_AUTO, cgs.media.planeDeath[ soundIdx ] );
+	SoundSystem::startSound( origin, ENTITYNUM_WORLD, CHAN_AUTO, cgs.media.planeDeath[ soundIdx ] );
 
 	// if building, play more sound
 	if( type == 2 )
@@ -1031,7 +1031,7 @@ void CG_GenericExplosion( vec3_t origin, int type )
 		}
 
 		// play additional sound
-		S_StartSound( adjust, ENTITYNUM_WORLD, CHAN_AUTO, cgs.media.planeDeath[ soundIdx ] );
+		SoundSystem::startSound( adjust, ENTITYNUM_WORLD, CHAN_AUTO, cgs.media.planeDeath[ soundIdx ] );
 	}
 
 }

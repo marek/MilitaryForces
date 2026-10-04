@@ -1298,7 +1298,7 @@ void CL_KeyDownEvent( int key, unsigned time )
 			}
 			else if ( clc.state != CA_DISCONNECTED ) {
 				CL_Disconnect_f();
-				S_StopAllSounds();
+				SoundSystem::stopAllSounds();
 				theUI.setActiveMenu( UserInterface::MenuCommand::UIMENU_MAIN );
 			}
 			return;

@@ -610,7 +610,7 @@ CG_PlayBufferedSounds
 static void CG_PlayBufferedSounds( ) {
 	if ( cg.soundTime < cg.time ) {
 		if (cg.soundBufferOut != cg.soundBufferIn && cg.soundBuffer[cg.soundBufferOut]) {
-			S_StartLocalSound(cg.soundBuffer[cg.soundBufferOut], CHAN_ANNOUNCER);
+			SoundSystem::startLocalSound(cg.soundBuffer[cg.soundBufferOut], CHAN_ANNOUNCER);
 			cg.soundBuffer[cg.soundBufferOut] = 0;
 			cg.soundBufferOut = (cg.soundBufferOut + 1) % MAX_SOUNDBUFFER;
 			cg.soundTime = cg.time + 750;
@@ -646,7 +646,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, bool demoPlay
 
 	// any looped sounds will be respecified as entities
 	// are added to the render list
-	S_ClearLoopingSounds(false);
+	SoundSystem::clearLoopingSounds(false);
 
 	// clear all the render lists
 	refExport.ClearScene();
@@ -711,7 +711,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, bool demoPlay
 	memcpy( cg.refdef.areamask, cg.snap->areamask, sizeof( cg.refdef.areamask ) );
 
 	// update audio positions
-	S_Respatialize( cg.snap->ps.clientNum, cg.refdef.vieworg, cg.refdef.viewaxis, inwater );
+	SoundSystem::respatialize( cg.snap->ps.clientNum, cg.refdef.vieworg, cg.refdef.viewaxis, inwater );
 
 	// make sure the lagometerSample and frame timing isn't done twice when in stereo
 	if ( stereoView != STEREO_RIGHT ) {

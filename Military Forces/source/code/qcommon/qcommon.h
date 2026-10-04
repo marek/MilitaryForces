@@ -847,7 +847,6 @@ void Key_KeynameCompletion( void(*callback)(const char *s) );
 
 // for writing the config files
 
-void S_ClearSoundBuffer( );
 // call before filesystem access
 
 void SCR_DebugGraph (float value);	// FIXME: move logging to common?

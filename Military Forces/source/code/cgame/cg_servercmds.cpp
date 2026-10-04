@@ -170,7 +170,7 @@ static void CG_ParseWarmup( ) {
 
 	} else if ( warmup > 0 && cg.warmup <= 0 && cgs.gametype != GT_MISSION_EDITOR ) {
 		{
-			S_StartLocalSound( cgs.media.countPrepareSound, CHAN_ANNOUNCER );
+			SoundSystem::startLocalSound( cgs.media.countPrepareSound, CHAN_ANNOUNCER );
 		}
 	}
 
@@ -308,7 +308,7 @@ static void CG_ConfigStringModified( ) {
 		cgs.gameModels[ num-CS_MODELS ] = refExport.RegisterModel( str );
 	} else if ( num >= CS_SOUNDS && num < CS_SOUNDS+MAX_SOUNDS ) {
 		if ( str[0] != '*' ) {	// player specific sounds don't register here
-			cgs.gameSounds[ num-CS_SOUNDS] = S_RegisterSound( str, false );
+			cgs.gameSounds[ num-CS_SOUNDS] = SoundSystem::registerSound( str, false );
 		}
 	} else if ( num >= CS_PLAYERS && num < CS_PLAYERS+MAX_CLIENTS ) {
 		CG_NewClientInfo( num - CS_PLAYERS );
@@ -437,7 +437,7 @@ static void CG_MapRestart( ) {
 
 	CG_StartMusic();
 
-	S_ClearLoopingSounds(true);
+	SoundSystem::clearLoopingSounds(true);
 
 	// MFQ3 vehicle needs to be reset
 	if( cg_vehicle.integer != -1 ) {
@@ -451,7 +451,7 @@ static void CG_MapRestart( ) {
 
 	// play the "fight" sound if this is a restart without warmup
 	if ( cg.warmup == 0 && cgs.gametype != GT_MISSION_EDITOR /* && cgs.gametype == GT_TOURNAMENT */) {
-		S_StartLocalSound( cgs.media.countFightSound, CHAN_ANNOUNCER );
+		SoundSystem::startLocalSound( cgs.media.countFightSound, CHAN_ANNOUNCER );
 		CG_CenterPrint( "FIGHT!", 120, GIANTCHAR_WIDTH*2 );
 	} else if ( cgs.gametype == GT_MISSION_EDITOR ) {
 		CG_CenterPrint( "EDIT!", 120, GIANTCHAR_WIDTH*2 );
@@ -535,7 +535,7 @@ static void CG_ServerCommand( ) {
 
 	if ( !strcmp( cmd, "chat" ) ) {
 		if ( !cg_teamChatsOnly.integer ) {
-			S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
+			SoundSystem::startLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
 			Q_strncpyz( text, CG_Argv(1), MAX_SAY_TEXT );
 			CG_RemoveChatEscapeChar( text );
 			CG_Printf( "%s\n", text );
@@ -544,7 +544,7 @@ static void CG_ServerCommand( ) {
 	}
 
 	if ( !strcmp( cmd, "tchat" ) ) {
-		S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
+		SoundSystem::startLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
 		Q_strncpyz( text, CG_Argv(1), MAX_SAY_TEXT );
 		CG_RemoveChatEscapeChar( text );
 		CG_AddToTeamChat( text );

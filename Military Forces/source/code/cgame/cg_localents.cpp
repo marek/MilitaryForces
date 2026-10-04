@@ -445,8 +445,8 @@ void LocalEntity::addNuke() {
 	if (t > NUKE_SHOCKWAVE_STARTTIME && t < NUKE_SHOCKWAVE_ENDTIME) {
 
 		if (!(this->leFlags & LEF_SOUND1)) {
-//			S_StartSound (re->origin, ENTITYNUM_WORLD, CHAN_AUTO, cgs.media.nukeExplodeSound );
-			S_StartLocalSound(cgs.media.nukeExplodeSound, CHAN_AUTO);
+//			SoundSystem::startSound (re->origin, ENTITYNUM_WORLD, CHAN_AUTO, cgs.media.nukeExplodeSound );
+			SoundSystem::startLocalSound(cgs.media.nukeExplodeSound, CHAN_AUTO);
 			this->leFlags |= LEF_SOUND1;
 		}
 		// 1st nuke shockwave
@@ -491,8 +491,8 @@ void LocalEntity::addNuke() {
 		}
 		else {
 			if (!(this->leFlags & LEF_SOUND2)) {
-//				S_StartSound (re->origin, ENTITYNUM_WORLD, CHAN_AUTO, cgs.media.nukeImplodeSound );
-				S_StartLocalSound(cgs.media.nukeImplodeSound, CHAN_AUTO);
+//				SoundSystem::startSound (re->origin, ENTITYNUM_WORLD, CHAN_AUTO, cgs.media.nukeImplodeSound );
+				SoundSystem::startLocalSound(cgs.media.nukeImplodeSound, CHAN_AUTO);
 				this->leFlags |= LEF_SOUND2;
 			}
 			c = static_cast<float>(NUKE_IMPLODE_ENDTIME - t) / static_cast<float>(NUKE_IMPLODE_ENDTIME - NUKE_IMPLODE_STARTTIME);

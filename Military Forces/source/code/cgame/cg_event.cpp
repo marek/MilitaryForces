@@ -90,7 +90,7 @@ void ClientEntity::painEvent( int health ) {
 	} else {
 		snd = "*pain100_1.wav";
 	}
-	S_StartSound( nullptr, this->currentState.number, CHAN_VOICE, 
+	SoundSystem::startSound( nullptr, this->currentState.number, CHAN_VOICE, 
 		CG_CustomSound( this->currentState.number, snd ) );
 
 	// save pain time for programitic twitch animation
@@ -145,19 +145,19 @@ void ClientEntity::entityEvent( vec3_t position )
 
 	case EV_WATER_TOUCH:
 		DEBUGNAME("EV_WATER_TOUCH");
-		S_StartSound (nullptr, es->number, CHAN_AUTO, cgs.media.watrInSound );
+		SoundSystem::startSound (nullptr, es->number, CHAN_AUTO, cgs.media.watrInSound );
 		break;
 	case EV_WATER_LEAVE:
 		DEBUGNAME("EV_WATER_LEAVE");
-		S_StartSound (nullptr, es->number, CHAN_AUTO, cgs.media.watrOutSound );
+		SoundSystem::startSound (nullptr, es->number, CHAN_AUTO, cgs.media.watrOutSound );
 		break;
 	case EV_WATER_UNDER:
 		DEBUGNAME("EV_WATER_UNDER");
-		S_StartSound (nullptr, es->number, CHAN_AUTO, cgs.media.watrUnSound );
+		SoundSystem::startSound (nullptr, es->number, CHAN_AUTO, cgs.media.watrUnSound );
 		break;
 	case EV_WATER_CLEAR:
 		DEBUGNAME("EV_WATER_CLEAR");
-		S_StartSound (nullptr, es->number, CHAN_AUTO, CG_CustomSound( es->number, "*gasp.wav" ) );
+		SoundSystem::startSound (nullptr, es->number, CHAN_AUTO, CG_CustomSound( es->number, "*gasp.wav" ) );
 		break;
 
 	case EV_ITEM_PICKUP:
@@ -176,9 +176,9 @@ void ClientEntity::entityEvent( vec3_t position )
 			// powerups and team items will have a separate global sound, this one
 			// will be played at prediction time
 			if ( item->giType == IT_TEAM) {
-				S_StartSound (nullptr, es->number, CHAN_AUTO,	cgs.media.n_healthSound );
+				SoundSystem::startSound (nullptr, es->number, CHAN_AUTO,	cgs.media.n_healthSound );
 			} else {
-				S_StartSound (nullptr, es->number, CHAN_AUTO,	S_RegisterSound( item->pickup_sound, false ) );
+				SoundSystem::startSound (nullptr, es->number, CHAN_AUTO,	SoundSystem::registerSound( item->pickup_sound, false ) );
 			}
 
 			// show icon and name on status bar
@@ -202,7 +202,7 @@ void ClientEntity::entityEvent( vec3_t position )
 			item = &bg_itemlist[ index ];
 			// powerup pickups are global
 			if( item->pickup_sound ) {
-				S_StartSound (nullptr, cg.snap->ps.clientNum, CHAN_AUTO, S_RegisterSound( item->pickup_sound, false ) );
+				SoundSystem::startSound (nullptr, cg.snap->ps.clientNum, CHAN_AUTO, SoundSystem::registerSound( item->pickup_sound, false ) );
 			}
 
 			// show icon and name on status bar
@@ -247,12 +247,12 @@ void ClientEntity::entityEvent( vec3_t position )
 	//
 	case EV_ITEM_POP:
 		DEBUGNAME("EV_ITEM_POP");
-		S_StartSound (nullptr, es->number, CHAN_AUTO, cgs.media.respawnSound );
+		SoundSystem::startSound (nullptr, es->number, CHAN_AUTO, cgs.media.respawnSound );
 		break;
 	case EV_ITEM_RESPAWN:
 		DEBUGNAME("EV_ITEM_RESPAWN");
 		this->miscTime = cg.time;	// scale up from this
-		S_StartSound (nullptr, es->number, CHAN_AUTO, cgs.media.respawnSound );
+		SoundSystem::startSound (nullptr, es->number, CHAN_AUTO, cgs.media.respawnSound );
 		break;
 
 	//
@@ -393,20 +393,20 @@ void ClientEntity::entityEvent( vec3_t position )
 	case EV_GENERAL_SOUND:
 		DEBUGNAME("EV_GENERAL_SOUND");
 		if ( cgs.gameSounds[ es->eventParm ] ) {
-			S_StartSound (nullptr, es->number, CHAN_VOICE, cgs.gameSounds[ es->eventParm ] );
+			SoundSystem::startSound (nullptr, es->number, CHAN_VOICE, cgs.gameSounds[ es->eventParm ] );
 		} else {
 			s = CG_ConfigString( CS_SOUNDS + es->eventParm );
-			S_StartSound (nullptr, es->number, CHAN_VOICE, CG_CustomSound( es->number, s ) );
+			SoundSystem::startSound (nullptr, es->number, CHAN_VOICE, CG_CustomSound( es->number, s ) );
 		}
 		break;
 
 	case EV_GLOBAL_SOUND:	// play from the player's head so it never diminishes
 		DEBUGNAME("EV_GLOBAL_SOUND");
 		if ( cgs.gameSounds[ es->eventParm ] ) {
-			S_StartSound (nullptr, cg.snap->ps.clientNum, CHAN_AUTO, cgs.gameSounds[ es->eventParm ] );
+			SoundSystem::startSound (nullptr, cg.snap->ps.clientNum, CHAN_AUTO, cgs.gameSounds[ es->eventParm ] );
 		} else {
 			s = CG_ConfigString( CS_SOUNDS + es->eventParm );
-			S_StartSound (nullptr, cg.snap->ps.clientNum, CHAN_AUTO, CG_CustomSound( es->number, s ) );
+			SoundSystem::startSound (nullptr, cg.snap->ps.clientNum, CHAN_AUTO, CG_CustomSound( es->number, s ) );
 		}
 		break;
 
@@ -488,7 +488,7 @@ void ClientEntity::entityEvent( vec3_t position )
 
 				// MFQ3
 				case GTS_NUKE:
-					S_StartLocalSound(cgs.media.nukeFarSound, CHAN_ANNOUNCER);
+					SoundSystem::startLocalSound(cgs.media.nukeFarSound, CHAN_ANNOUNCER);
 					break;
 				default:
 					break;
@@ -509,7 +509,7 @@ void ClientEntity::entityEvent( vec3_t position )
 	case EV_DEATH2:
 	case EV_DEATH3:
 		DEBUGNAME("EV_DEATHx");
-		S_StartSound( nullptr, es->number, CHAN_VOICE, 
+		SoundSystem::startSound( nullptr, es->number, CHAN_VOICE, 
 				CG_CustomSound( es->number, va("*death%i.wav", event - EV_DEATH1 + 1) ) );
 		break;
 

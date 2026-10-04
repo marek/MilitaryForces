@@ -298,18 +298,18 @@ void CG_DrawPlane(DrawInfo_Plane_t* drawInfo)
 	if( drawInfo->basicInfo.entityNum >= 0 ) 
 	{
 		if ( veh->caps & HC_PROP ) {
-			S_AddLoopingSound( drawInfo->basicInfo.entityNum, drawInfo->basicInfo.origin, vec3_origin, 
+			SoundSystem::addLoopingSound( drawInfo->basicInfo.entityNum, drawInfo->basicInfo.origin, vec3_origin, 
 									cgs.media.engineProp );
 		}
 		else {
 			if( drawInfo->basicInfo.throttle > 10 ) 
 			{
-				S_AddLoopingSound( drawInfo->basicInfo.entityNum, drawInfo->basicInfo.origin, vec3_origin, 
+				SoundSystem::addLoopingSound( drawInfo->basicInfo.entityNum, drawInfo->basicInfo.origin, vec3_origin, 
 										cgs.media.engineJetAB );
 			}
 			else 
 			{
-				S_AddLoopingSound( drawInfo->basicInfo.entityNum, drawInfo->basicInfo.origin, vec3_origin,
+				SoundSystem::addLoopingSound( drawInfo->basicInfo.entityNum, drawInfo->basicInfo.origin, vec3_origin,
 										cgs.media.engineJet );
 			}
 		}
@@ -438,7 +438,7 @@ void CG_DrawGV(DrawInfo_GV_t* drawInfo)
 	if( drawInfo->basicInfo.entityNum >= 0 ) {
 		tanksound = drawInfo->basicInfo.speed * NUM_TANKSOUNDS / veh->maxspeed;
 		if( tanksound >= NUM_TANKSOUNDS ) tanksound = NUM_TANKSOUNDS - 1;
-		S_AddLoopingSound( drawInfo->basicInfo.entityNum, 
+		SoundSystem::addLoopingSound( drawInfo->basicInfo.entityNum, 
 								drawInfo->basicInfo.origin, 
 								vec3_origin, 
 								cgs.media.engineTank[tanksound] );
@@ -524,7 +524,7 @@ void CG_DrawBoat(DrawInfo_Boat_t* drawInfo)
 	if( drawInfo->basicInfo.entityNum >= 0 ) {
 		tanksound = drawInfo->basicInfo.speed * NUM_TANKSOUNDS / veh->maxspeed;
 		if( tanksound >= NUM_TANKSOUNDS ) tanksound = NUM_TANKSOUNDS - 1;
-		S_AddLoopingSound( drawInfo->basicInfo.entityNum, 
+		SoundSystem::addLoopingSound( drawInfo->basicInfo.entityNum, 
 								drawInfo->basicInfo.origin, 
 								vec3_origin, 
 								cgs.media.engineTank[tanksound] );
@@ -659,7 +659,7 @@ refEntity_t	    part[BP_HELO_MAX_PARTS];
 
 	// sound
 	if( drawInfo->basicInfo.entityNum >= 0 ) {
-			S_AddLoopingSound( drawInfo->basicInfo.entityNum, drawInfo->basicInfo.origin, vec3_origin, 
+			SoundSystem::addLoopingSound( drawInfo->basicInfo.entityNum, drawInfo->basicInfo.origin, vec3_origin, 
 									cgs.media.engineHelo );
 	}
 

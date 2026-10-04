@@ -765,7 +765,7 @@ long FileSystem::baseDir_FOpenFileRead(const char *filename, fileHandle_t *fp)
 	Q_strncpyz( fsh[f].name, filename, sizeof( fsh[f].name ) );
 
 	// don't let sound stutter
-	S_ClearSoundBuffer();
+	SoundSystem::clearSoundBuffer();
 
 	for(int i = 0; i < ARRAY_LEN( fs_pathVars ) && !fsh[f].handleFiles.file.o; i++) {
 		const cvar_t *pathVar = fs_pathVars[i];
@@ -813,7 +813,7 @@ void FileSystem::baseDir_Rename_HomeData( const char *from, const char *to, bool
 	}
 
 	// don't let sound stutter
-	S_ClearSoundBuffer();
+	SoundSystem::clearSoundBuffer();
 
 	from_ospath = FileSystem::baseDir_BuildOSPath( fs_homedatapath->string, from );
 	to_ospath = FileSystem::baseDir_BuildOSPath( fs_homedatapath->string, to );
@@ -910,7 +910,7 @@ fileHandle_t FileSystem::fOpenFileAppend_HomeData( const char *filename ) {
 	Q_strncpyz( fsh[f].name, filename, sizeof( fsh[f].name ) );
 
 	// don't let sound stutter
-	S_ClearSoundBuffer();
+	SoundSystem::clearSoundBuffer();
 
 	ospath = FileSystem::buildOSPath( fs_homedatapath->string, fs_gamedir, filename );
 
@@ -953,7 +953,7 @@ fileHandle_t FileSystem::fCreateOpenPipeFile( const char *filename ) {
 	Q_strncpyz( fsh[f].name, filename, sizeof( fsh[f].name ) );
 
 	// don't let sound stutter
-	S_ClearSoundBuffer();
+	SoundSystem::clearSoundBuffer();
 
 	ospath = FileSystem::buildOSPath( fs_homedatapath->string, fs_gamedir, filename );
 

@@ -920,10 +920,6 @@ void UI_SPSkillMenu_Cache( );
 // system calls
 int Sys_Milliseconds ();
 void SCR_UpdateScreen();
-void S_StartLocalSound( sfxHandle_t sfxHandle, int channelNum );
-sfxHandle_t	S_RegisterSound( const char *name, bool compressed );
-void S_StopBackgroundTrack();
-void S_StartBackgroundTrack( const char *intro, const char *loop );
 void Key_KeynumToStringBuf( int keynum, char *buf, int buflen );
 void Key_GetBindingBuf( int keynum, char *buf, int buflen );
 int Key_GetCatcher();

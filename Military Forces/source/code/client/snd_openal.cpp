@@ -1177,7 +1177,7 @@ void S_AL_UpdateEntityPosition( int entityNum, const vec3_t origin )
 	VectorCopy( origin, sanOrigin );
 	S_AL_SanitiseVector( sanOrigin );
 	if ( entityNum < 0 || entityNum >= MAX_GENTITIES )
-		Com_Error( ERR_DROP, "S_UpdateEntityPosition: bad entitynum %i", entityNum );
+		Com_Error( ERR_DROP, "SoundSystem::updateEntityPosition: bad entitynum %i", entityNum );
 	VectorCopy( sanOrigin, entityList[entityNum].origin );
 }
 
@@ -1713,7 +1713,7 @@ static void S_AL_AllocateStreamChannel(int stream, int entityNum)
         	// Lock the streamSource so nobody else can use it, and get the raw streamSource
         	S_AL_SrcLock(cursrc);
         
-        	// make sure that after unmuting the S_AL_Gain in S_Update() does not turn
+        	// make sure that after unmuting the S_AL_Gain in SoundSystem::update() does not turn
         	// volume up prematurely for this source
         	srcList[cursrc].scaleGain = 0.0f;
 
@@ -1942,7 +1942,7 @@ static void S_AL_MusicSourceGet( )
 	S_AL_SrcLock(musicSourceHandle);
 	musicSource = S_AL_SrcGet(musicSourceHandle);
 
-	// make sure that after unmuting the S_AL_Gain in S_Update() does not turn
+	// make sure that after unmuting the S_AL_Gain in SoundSystem::update() does not turn
 	// volume up prematurely for this source
 	srcList[musicSourceHandle].scaleGain = 0.0f;
 

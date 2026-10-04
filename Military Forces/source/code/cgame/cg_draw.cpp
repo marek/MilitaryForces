@@ -1431,7 +1431,7 @@ CG_DrawReward
 //			cg.rewardTime = cg.time;
 //			cg.rewardStack--;
 //			color = CG_FadeColor( cg.rewardTime, REWARD_TIME );
-//			S_StartLocalSound(cg.rewardSound[0], CHAN_ANNOUNCER);
+//			SoundSystem::startLocalSound(cg.rewardSound[0], CHAN_ANNOUNCER);
 //		} else {
 //			return;
 //		}
@@ -1820,7 +1820,7 @@ static void CG_DrawVote() {
 	// play a talk beep whenever it is modified
 	if ( cgs.voteModified ) {
 		cgs.voteModified = false;
-		S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
+		SoundSystem::startLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
 	}
 
 	sec = ( VOTE_TIME - ( cg.time - cgs.voteTime ) ) / 1000;
@@ -1854,7 +1854,7 @@ static void CG_DrawTeamVote() {
 	// play a talk beep whenever it is modified
 	if ( cgs.teamVoteModified[cs_offset] ) {
 		cgs.teamVoteModified[cs_offset] = false;
-		S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
+		SoundSystem::startLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
 	}
 
 	sec = ( VOTE_TIME - ( cg.time - cgs.teamVoteTime[cs_offset] ) ) / 1000;
@@ -2114,13 +2114,13 @@ static void CG_DrawWarmup( ) {
 		if( cgs.gametype != GT_MISSION_EDITOR ) {
 			switch ( sec ) {
 			case 0:
-				S_StartLocalSound( cgs.media.count1Sound, CHAN_ANNOUNCER );
+				SoundSystem::startLocalSound( cgs.media.count1Sound, CHAN_ANNOUNCER );
 				break;
 			case 1:
-				S_StartLocalSound( cgs.media.count2Sound, CHAN_ANNOUNCER );
+				SoundSystem::startLocalSound( cgs.media.count2Sound, CHAN_ANNOUNCER );
 				break;
 			case 2:
-				S_StartLocalSound( cgs.media.count3Sound, CHAN_ANNOUNCER );
+				SoundSystem::startLocalSound( cgs.media.count3Sound, CHAN_ANNOUNCER );
 				break;
 			default:
 				break;

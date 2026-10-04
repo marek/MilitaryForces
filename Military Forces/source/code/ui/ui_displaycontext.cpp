@@ -79,7 +79,7 @@ UI_DisplayContext::setCVar( const char *cvar, const char *value )
 void
 UI_DisplayContext::startLocalSound( sfxHandle_t sfx, int channelNum )
 {
-	S_StartLocalSound( sfx, channelNum );
+	SoundSystem::startLocalSound( sfx, channelNum );
 }
 
 //void
@@ -91,19 +91,19 @@ UI_DisplayContext::startLocalSound( sfxHandle_t sfx, int channelNum )
 sfxHandle_t
 UI_DisplayContext::registerSound( const char *name, bool compressed )
 {
-	return S_RegisterSound( name, compressed );
+	return SoundSystem::registerSound( name, compressed );
 }
 
 void
 UI_DisplayContext::startBackgroundTrack( const char *intro, const char *loop )
 {
-	S_StartBackgroundTrack( intro, loop );
+	SoundSystem::startBackgroundTrack( intro, loop );
 }
 
 void
 UI_DisplayContext::stopBackgroundTrack()
 {
-	S_StopBackgroundTrack();
+	SoundSystem::stopBackgroundTrack();
 }
 
 

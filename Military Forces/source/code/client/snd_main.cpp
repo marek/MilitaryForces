@@ -77,10 +77,10 @@ static bool S_ValidSoundInterface( soundInterface_t *pSi )
 
 /*
 =================
-S_StartSound
+SoundSystem::startSound
 =================
 */
-void S_StartSound( vec3_t origin, int entnum, int entchannel, sfxHandle_t sfx )
+void SoundSystem::startSound( vec3_t origin, int entnum, int entchannel, sfxHandle_t sfx )
 {
 	if( si.StartSound ) {
 		si.StartSound( origin, entnum, entchannel, sfx );
@@ -89,10 +89,10 @@ void S_StartSound( vec3_t origin, int entnum, int entchannel, sfxHandle_t sfx )
 
 /*
 =================
-S_StartLocalSound
+SoundSystem::startLocalSound
 =================
 */
-void S_StartLocalSound( sfxHandle_t sfx, int channelNum )
+void SoundSystem::startLocalSound( sfxHandle_t sfx, int channelNum )
 {
 	if( si.StartLocalSound ) {
 		si.StartLocalSound( sfx, channelNum );
@@ -101,10 +101,10 @@ void S_StartLocalSound( sfxHandle_t sfx, int channelNum )
 
 /*
 =================
-S_StartBackgroundTrack
+SoundSystem::startBackgroundTrack
 =================
 */
-void S_StartBackgroundTrack( const char *intro, const char *loop )
+void SoundSystem::startBackgroundTrack( const char *intro, const char *loop )
 {
 	if( si.StartBackgroundTrack ) {
 		si.StartBackgroundTrack( intro, loop );
@@ -113,10 +113,10 @@ void S_StartBackgroundTrack( const char *intro, const char *loop )
 
 /*
 =================
-S_StopBackgroundTrack
+SoundSystem::stopBackgroundTrack
 =================
 */
-void S_StopBackgroundTrack( )
+void SoundSystem::stopBackgroundTrack( )
 {
 	if( si.StopBackgroundTrack ) {
 		si.StopBackgroundTrack( );
@@ -125,10 +125,10 @@ void S_StopBackgroundTrack( )
 
 /*
 =================
-S_RawSamples
+SoundSystem::rawSamples
 =================
 */
-void S_RawSamples (int stream, int samples, int rate, int width, int channels,
+void SoundSystem::rawSamples (int stream, int samples, int rate, int width, int channels,
 		   const byte *data, float volume, int entityNum)
 {
 	if(si.RawSamples)
@@ -137,10 +137,10 @@ void S_RawSamples (int stream, int samples, int rate, int width, int channels,
 
 /*
 =================
-S_StopAllSounds
+SoundSystem::stopAllSounds
 =================
 */
-void S_StopAllSounds( )
+void SoundSystem::stopAllSounds( )
 {
 	if( si.StopAllSounds ) {
 		si.StopAllSounds( );
@@ -149,10 +149,10 @@ void S_StopAllSounds( )
 
 /*
 =================
-S_ClearLoopingSounds
+SoundSystem::clearLoopingSounds
 =================
 */
-void S_ClearLoopingSounds( bool killall )
+void SoundSystem::clearLoopingSounds( bool killall )
 {
 	if( si.ClearLoopingSounds ) {
 		si.ClearLoopingSounds( killall );
@@ -161,10 +161,10 @@ void S_ClearLoopingSounds( bool killall )
 
 /*
 =================
-S_AddLoopingSound
+SoundSystem::addLoopingSound
 =================
 */
-void S_AddLoopingSound( int entityNum, const vec3_t origin,
+void SoundSystem::addLoopingSound( int entityNum, const vec3_t origin,
 		const vec3_t velocity, sfxHandle_t sfx )
 {
 	if( si.AddLoopingSound ) {
@@ -174,10 +174,10 @@ void S_AddLoopingSound( int entityNum, const vec3_t origin,
 
 /*
 =================
-S_AddRealLoopingSound
+SoundSystem::addRealLoopingSound
 =================
 */
-void S_AddRealLoopingSound( int entityNum, const vec3_t origin,
+void SoundSystem::addRealLoopingSound( int entityNum, const vec3_t origin,
 		const vec3_t velocity, sfxHandle_t sfx )
 {
 	if( si.AddRealLoopingSound ) {
@@ -187,10 +187,10 @@ void S_AddRealLoopingSound( int entityNum, const vec3_t origin,
 
 /*
 =================
-S_StopLoopingSound
+SoundSystem::stopLoopingSound
 =================
 */
-void S_StopLoopingSound( int entityNum )
+void SoundSystem::stopLoopingSound( int entityNum )
 {
 	if( si.StopLoopingSound ) {
 		si.StopLoopingSound( entityNum );
@@ -199,10 +199,10 @@ void S_StopLoopingSound( int entityNum )
 
 /*
 =================
-S_Respatialize
+SoundSystem::respatialize
 =================
 */
-void S_Respatialize( int entityNum, const vec3_t origin,
+void SoundSystem::respatialize( int entityNum, const vec3_t origin,
 		vec3_t axis[3], int inwater )
 {
 	if( si.Respatialize ) {
@@ -212,10 +212,10 @@ void S_Respatialize( int entityNum, const vec3_t origin,
 
 /*
 =================
-S_UpdateEntityPosition
+SoundSystem::updateEntityPosition
 =================
 */
-void S_UpdateEntityPosition( int entityNum, const vec3_t origin )
+void SoundSystem::updateEntityPosition( int entityNum, const vec3_t origin )
 {
 	if( si.UpdateEntityPosition ) {
 		si.UpdateEntityPosition( entityNum, origin );
@@ -224,10 +224,10 @@ void S_UpdateEntityPosition( int entityNum, const vec3_t origin )
 
 /*
 =================
-S_Update
+SoundSystem::update
 =================
 */
-void S_Update( )
+void SoundSystem::update( )
 {
 	if(s_muted->integer)
 	{
@@ -255,10 +255,10 @@ void S_Update( )
 
 /*
 =================
-S_DisableSounds
+SoundSystem::disableSounds
 =================
 */
-void S_DisableSounds( )
+void SoundSystem::disableSounds( )
 {
 	if( si.DisableSounds ) {
 		si.DisableSounds( );
@@ -267,10 +267,10 @@ void S_DisableSounds( )
 
 /*
 =================
-S_BeginRegistration
+SoundSystem::beginRegistration
 =================
 */
-void S_BeginRegistration( )
+void SoundSystem::beginRegistration( )
 {
 	if( si.BeginRegistration ) {
 		si.BeginRegistration( );
@@ -279,10 +279,10 @@ void S_BeginRegistration( )
 
 /*
 =================
-S_RegisterSound
+SoundSystem::registerSound
 =================
 */
-sfxHandle_t	S_RegisterSound( const char *sample, bool compressed )
+sfxHandle_t	SoundSystem::registerSound( const char *sample, bool compressed )
 {
 	if( si.RegisterSound ) {
 		return si.RegisterSound( sample, compressed );
@@ -293,10 +293,10 @@ sfxHandle_t	S_RegisterSound( const char *sample, bool compressed )
 
 /*
 =================
-S_ClearSoundBuffer
+SoundSystem::clearSoundBuffer
 =================
 */
-void S_ClearSoundBuffer( )
+void SoundSystem::clearSoundBuffer( )
 {
 	if( si.ClearSoundBuffer ) {
 		si.ClearSoundBuffer( );
@@ -331,10 +331,10 @@ void S_SoundList( )
 #ifdef USE_VOIP
 /*
 =================
-S_StartCapture
+SoundSystem::startCapture
 =================
 */
-void S_StartCapture( )
+void SoundSystem::startCapture( )
 {
 	if( si.StartCapture ) {
 		si.StartCapture( );
@@ -343,10 +343,10 @@ void S_StartCapture( )
 
 /*
 =================
-S_AvailableCaptureSamples
+SoundSystem::availableCaptureSamples
 =================
 */
-int S_AvailableCaptureSamples( )
+int SoundSystem::availableCaptureSamples( )
 {
 	if( si.AvailableCaptureSamples ) {
 		return si.AvailableCaptureSamples( );
@@ -356,10 +356,10 @@ int S_AvailableCaptureSamples( )
 
 /*
 =================
-S_Capture
+SoundSystem::capture
 =================
 */
-void S_Capture( int samples, byte *data )
+void SoundSystem::capture( int samples, byte *data )
 {
 	if( si.Capture ) {
 		si.Capture( samples, data );
@@ -368,10 +368,10 @@ void S_Capture( int samples, byte *data )
 
 /*
 =================
-S_StopCapture
+SoundSystem::stopCapture
 =================
 */
-void S_StopCapture( )
+void SoundSystem::stopCapture( )
 {
 	if( si.StopCapture ) {
 		si.StopCapture( );
@@ -380,10 +380,10 @@ void S_StopCapture( )
 
 /*
 =================
-S_MasterGain
+SoundSystem::masterGain
 =================
 */
-void S_MasterGain( float gain )
+void SoundSystem::masterGain( float gain )
 {
 	if( si.MasterGain ) {
 		si.MasterGain( gain );
@@ -466,10 +466,10 @@ void S_StopMusic_f( )
 
 /*
 =================
-S_Init
+SoundSystem::init
 =================
 */
-void S_Init( )
+void SoundSystem::init( )
 {
 	cvar_t		*cv;
 	bool	started = false;
@@ -495,7 +495,7 @@ void S_Init( )
 		CommandSystem::addCommand( "music", S_Music_f );
 		CommandSystem::addCommand( "stopmusic", S_StopMusic_f );
 		CommandSystem::addCommand( "s_list", S_SoundList );
-		CommandSystem::addCommand( "s_stop", S_StopAllSounds );
+		CommandSystem::addCommand( "s_stop", SoundSystem::stopAllSounds );
 		CommandSystem::addCommand( "s_info", S_SoundInfo );
 
 		cv = CvarSystem::get( "s_useOpenAL", "1", CVAR_ARCHIVE | CVAR_LATCH );
@@ -527,10 +527,10 @@ void S_Init( )
 
 /*
 =================
-S_Shutdown
+SoundSystem::shutdown
 =================
 */
-void S_Shutdown( )
+void SoundSystem::shutdown( )
 {
 	if( si.Shutdown ) {
 		si.Shutdown( );
