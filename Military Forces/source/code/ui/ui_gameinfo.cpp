@@ -21,10 +21,10 @@ static char		*ui_arenaInfos[MAX_ARENAS];
 
 /*
 ===============
-UI_ParseInfos
+Menus::parseInfos
 ===============
 */
-int UI_ParseInfos( char *buf, int max, char *infos[] ) 
+int Menus::parseInfos( char *buf, int max, char *infos[] ) 
 {
 	char	*token;
 	int		count;
@@ -108,17 +108,17 @@ static void UI_LoadArenasFromFile( char *filename ) {
 	buf[len] = 0;
 	FileSystem::fCloseFile( f );
 
-	ui_numArenas += UI_ParseInfos( buf, MAX_ARENAS - ui_numArenas, &ui_arenaInfos[ui_numArenas] );
+	ui_numArenas += Menus::parseInfos( buf, MAX_ARENAS - ui_numArenas, &ui_arenaInfos[ui_numArenas] );
 }
 
 /*
 ===============
-UI_AlphabeticMapNameQsortCompare
+Menus::alphabeticMapNameQsortCompare
 
 Used to sort the maps into alphabetic order
 ===============
 */
-int UI_AlphabeticMapNameQsortCompare( const void * arg1, const void * arg2 )
+int Menus::alphabeticMapNameQsortCompare( const void * arg1, const void * arg2 )
 {
    /* Compare all of both strings: */
    return Q_stricmp( ((mapInfo *) arg1)->mapName, ((mapInfo *) arg2)->mapName );
@@ -126,10 +126,10 @@ int UI_AlphabeticMapNameQsortCompare( const void * arg1, const void * arg2 )
 
 /*
 ===============
-UI_LoadArenas
+Menus::loadArenas
 ===============
 */
-void UI_LoadArenas( ) {
+void Menus::loadArenas( ) {
 	int			numdirs;
 	vmCvar_t	arenasFile;
 	char		filename[128];
@@ -214,7 +214,7 @@ void UI_LoadArenas( ) {
 	}
 
 	// perform an alphabetic sort on the map names
-	SortArray( &uiInfo.mapList[0], uiInfo.mapCount, UI_AlphabeticMapNameQsortCompare );
+	SortArray( &uiInfo.mapList[0], uiInfo.mapCount, Menus::alphabeticMapNameQsortCompare );
 }
 
 

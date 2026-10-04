@@ -16,10 +16,10 @@ bool newUI = false;
 
 /*
 =================
-UI_ClampCvar
+Menus::clampCvar
 =================
 */
-float UI_ClampCvar( float min, float max, float value )
+float Menus::clampCvar( float min, float max, float value )
 {
 	if ( value < min ) return min;
 	if ( value > max ) return max;
@@ -28,14 +28,14 @@ float UI_ClampCvar( float min, float max, float value )
 
 /*
 =================
-UI_StartDemoLoop
+Menus::startDemoLoop
 =================
 */
-void UI_StartDemoLoop( ) {
+void Menus::startDemoLoop( ) {
 	CommandBuffer::executeText( EXEC_APPEND, "d1\n" );
 }
 
-char *UI_Argv( int arg ) {
+char *Menus::argv( int arg ) {
 	static char	buffer[MAX_STRING_CHARS];
 
 	CommandSystem::argvBuffer( arg, buffer, sizeof( buffer ) );
@@ -44,7 +44,7 @@ char *UI_Argv( int arg ) {
 }
 
 
-char *UI_Cvar_VariableString( const char *var_name ) {
+char *Menus::cvar_VariableString( const char *var_name ) {
 	static char	buffer[MAX_STRING_CHARS];
 
 	CvarSystem::variableStringBuffer( var_name, buffer, sizeof( buffer ) );
@@ -54,7 +54,7 @@ char *UI_Cvar_VariableString( const char *var_name ) {
 
 
 
-void UI_SetBestScores(postGameInfo_t *newInfo, bool postGame) {
+void Menus::setBestScores(postGameInfo_t *newInfo, bool postGame) {
 	CvarSystem::set("ui_scoreAccuracy",     va("%i%%", newInfo->accuracy));
 	CvarSystem::set("ui_scoreImpressives",	va("%i", newInfo->impressives));
 	CvarSystem::set("ui_scoreExcellents", 	va("%i", newInfo->excellents));
@@ -89,7 +89,7 @@ void UI_SetBestScores(postGameInfo_t *newInfo, bool postGame) {
 	}
 }
 
-void UI_LoadBestScores(const char *map, int game) {
+void Menus::loadBestScores(const char *map, int game) {
 	char		fileName[MAX_QPATH];
 	fileHandle_t f;
 	postGameInfo_t newInfo;
@@ -103,7 +103,7 @@ void UI_LoadBestScores(const char *map, int game) {
 		}
 		FileSystem::fCloseFile(f);
 	}
-	UI_SetBestScores(&newInfo, false);
+	Menus::setBestScores(&newInfo, false);
 
 	Com_sprintf(fileName, MAX_QPATH, "demos/%s_%d.dm_%d", map, game, static_cast<int>(CvarSystem::variableValue("protocol")));
 	uiInfo.demoAvailable = false;
@@ -115,10 +115,10 @@ void UI_LoadBestScores(const char *map, int game) {
 
 /*
 ===============
-UI_ClearScores
+Menus::clearScores
 ===============
 */
-void UI_ClearScores() {
+void Menus::clearScores() {
 	char	gameList[4096];
 	char *gameFile;
 	int		i, len, count, size;
@@ -143,7 +143,7 @@ void UI_ClearScores() {
 		}
 	}
 	
-	UI_SetBestScores(&newInfo, false);
+	Menus::setBestScores(&newInfo, false);
 
 }
 
@@ -187,18 +187,18 @@ static void UI_CalcPostGameStats() {
 		FileSystem::fCloseFile(f);
 	}					 
 
-	newInfo.accuracy = atoi(UI_Argv(3));
-	newInfo.impressives = atoi(UI_Argv(4));
-	newInfo.excellents = atoi(UI_Argv(5));
-	newInfo.defends = atoi(UI_Argv(6));
-	newInfo.assists = atoi(UI_Argv(7));
-	newInfo.gauntlets = atoi(UI_Argv(8));
-	newInfo.baseScore = atoi(UI_Argv(9));
-	newInfo.perfects = atoi(UI_Argv(10));
-	newInfo.redScore = atoi(UI_Argv(11));
-	newInfo.blueScore = atoi(UI_Argv(12));
-	time = atoi(UI_Argv(13));
-	newInfo.captures = atoi(UI_Argv(14));
+	newInfo.accuracy = atoi(Menus::argv(3));
+	newInfo.impressives = atoi(Menus::argv(4));
+	newInfo.excellents = atoi(Menus::argv(5));
+	newInfo.defends = atoi(Menus::argv(6));
+	newInfo.assists = atoi(Menus::argv(7));
+	newInfo.gauntlets = atoi(Menus::argv(8));
+	newInfo.baseScore = atoi(Menus::argv(9));
+	newInfo.perfects = atoi(Menus::argv(10));
+	newInfo.redScore = atoi(Menus::argv(11));
+	newInfo.blueScore = atoi(Menus::argv(12));
+	time = atoi(Menus::argv(13));
+	newInfo.captures = atoi(Menus::argv(14));
 
 	newInfo.time = (time - CvarSystem::variableValue("ui_matchStartTime")) / 1000;
 	adjustedTime = uiInfo.mapList[ui_currentMap.integer].timeToBeat[game];
@@ -240,16 +240,16 @@ static void UI_CalcPostGameStats() {
 	}
  
 	// put back all the ui overrides
-	CvarSystem::set("capturelimit", UI_Cvar_VariableString("ui_saveCaptureLimit"));
-	CvarSystem::set("fraglimit", UI_Cvar_VariableString("ui_saveFragLimit"));
-	CvarSystem::set("cg_drawTimer", UI_Cvar_VariableString("ui_drawTimer"));
-	CvarSystem::set("g_doWarmup", UI_Cvar_VariableString("ui_doWarmup"));
-	CvarSystem::set("g_Warmup", UI_Cvar_VariableString("ui_Warmup"));
-	CvarSystem::set("sv_pure", UI_Cvar_VariableString("ui_pure"));
-	CvarSystem::set("g_friendlyFire", UI_Cvar_VariableString("ui_friendlyFire"));
+	CvarSystem::set("capturelimit", Menus::cvar_VariableString("ui_saveCaptureLimit"));
+	CvarSystem::set("fraglimit", Menus::cvar_VariableString("ui_saveFragLimit"));
+	CvarSystem::set("cg_drawTimer", Menus::cvar_VariableString("ui_drawTimer"));
+	CvarSystem::set("g_doWarmup", Menus::cvar_VariableString("ui_doWarmup"));
+	CvarSystem::set("g_Warmup", Menus::cvar_VariableString("ui_Warmup"));
+	CvarSystem::set("sv_pure", Menus::cvar_VariableString("ui_pure"));
+	CvarSystem::set("g_friendlyFire", Menus::cvar_VariableString("ui_friendlyFire"));
 
-	UI_SetBestScores(&newInfo, true);
-	UI_ShowPostGame(newHigh);
+	Menus::setBestScores(&newInfo, true);
+	Menus::showPostGame(newHigh);
 
 
 }
@@ -271,31 +271,31 @@ static void UI_Chat( int mode )
 }
 /*
 =================
-UI_ConsoleCommand
+Menus::consoleCommand
 =================
 */
-bool UI_ConsoleCommand( int realTime ) {
+bool Menus::consoleCommand( int realTime ) {
 	char	*cmd;
 
 	uiInfo.uiUtils.dc_->frameTime_ = realTime - uiInfo.uiUtils.dc_->realTime_;
 	uiInfo.uiUtils.dc_->realTime_ = realTime;
 
-	cmd = UI_Argv( 0 );
+	cmd = Menus::argv( 0 );
 
 	// ensure minimum menu data is available
 	//Menu_Cache();
 
 	if ( Q_stricmp (cmd, "ui_test") == 0 ) {
-		UI_ShowPostGame(true);
+		Menus::showPostGame(true);
 	}
 
 	if ( Q_stricmp (cmd, "ui_report") == 0 ) {
-		UI_Report();
+		Menus::report();
 		return true;
 	}
 	
 	if ( Q_stricmp (cmd, "ui_load") == 0 ) {
-		UI_Load();
+		Menus::load();
 		return true;
 	}
 
@@ -303,9 +303,9 @@ bool UI_ConsoleCommand( int realTime ) {
 		if (CommandSystem::argc() == 4) {
 			char shader1[MAX_QPATH];
 			char shader2[MAX_QPATH];
-			Q_strncpyz(shader1, UI_Argv(1), sizeof(shader1));
-			Q_strncpyz(shader2, UI_Argv(2), sizeof(shader2));
-			refExport.RemapShader(shader1, shader2, UI_Argv(3));
+			Q_strncpyz(shader1, Menus::argv(1), sizeof(shader1));
+			Q_strncpyz(shader2, Menus::argv(2), sizeof(shader2));
+			refExport.RemapShader(shader1, shader2, Menus::argv(3));
 			return true;
 		}
 	}
@@ -391,32 +391,32 @@ bool UI_ConsoleCommand( int realTime ) {
 
 /*
 =================
-UI_Shutdown
+Menus::shutdown
 =================
 */
-void UI_Shutdown( ) {
+void Menus::shutdown( ) {
 }
 
 /*
 ================
-UI_AdjustFrom640
+Menus::adjustFrom640
 
 Adjusted for resolution and screen aspect ratio
 ================
 */
-void UI_AdjustFrom640( float *x, float *y, float *w, float *h ) {
+void Menus::adjustFrom640( float *x, float *y, float *w, float *h ) {
 	uiInfo.uiUtils.adjustFrom640( x, y, w, h );
 }
 
-void UI_DrawNamedPic( float x, float y, float width, float height, const char *picname ) {
+void Menus::drawNamedPic( float x, float y, float width, float height, const char *picname ) {
 	qhandle_t	hShader;
 
 	hShader = refExport.RegisterShaderNoMip( picname );
-	UI_AdjustFrom640( &x, &y, &width, &height );
+	Menus::adjustFrom640( &x, &y, &width, &height );
 	refExport.DrawStretchPic( x, y, width, height, 0, 0, 1, 1, hShader );
 }
 
-void UI_DrawHandlePic( float x, float y, float w, float h, qhandle_t hShader ) {
+void Menus::drawHandlePic( float x, float y, float w, float h, qhandle_t hShader ) {
 	float	s0;
 	float	s1;
 	float	t0;
@@ -457,74 +457,74 @@ void UI_DrawHandlePic( float x, float y, float w, float h, qhandle_t hShader ) {
 		return;
 	}
 
-	UI_AdjustFrom640( &x, &y, &w, &h );
+	Menus::adjustFrom640( &x, &y, &w, &h );
 	refExport.DrawStretchPic( x, y, w, h, s0, t0, s1, t1, hShader );
 }
 
 /*
 ================
-UI_FillRect
+Menus::fillRect
 
 Coordinates are 640*480 virtual values
 =================
 */
-void UI_FillRect( float x, float y, float width, float height, const float *color ) 
+void Menus::fillRect( float x, float y, float width, float height, const float *color ) 
 {
 	refExport.SetColor( color );
 
-	UI_AdjustFrom640( &x, &y, &width, &height );
+	Menus::adjustFrom640( &x, &y, &width, &height );
 	refExport.DrawStretchPic( x, y, width, height, 0, 0, 0, 0, uiInfo.uiUtils.dc_->whiteShader_ );
 
 	refExport.SetColor( nullptr );
 }
 
-void UI_DrawSides(float x, float y, float w, float h) 
+void Menus::drawSides(float x, float y, float w, float h) 
 {
-	UI_AdjustFrom640( &x, &y, &w, &h );
+	Menus::adjustFrom640( &x, &y, &w, &h );
 	refExport.DrawStretchPic( x, y, 1, h, 0, 0, 0, 0, uiInfo.uiUtils.dc_->whiteShader_ );
 	refExport.DrawStretchPic( x + w - 1, y, 1, h, 0, 0, 0, 0, uiInfo.uiUtils.dc_->whiteShader_ );
 }
 
-void UI_DrawTopBottom(float x, float y, float w, float h) 
+void Menus::drawTopBottom(float x, float y, float w, float h) 
 {
-	UI_AdjustFrom640( &x, &y, &w, &h );
+	Menus::adjustFrom640( &x, &y, &w, &h );
 	refExport.DrawStretchPic( x, y, w, 1, 0, 0, 0, 0, uiInfo.uiUtils.dc_->whiteShader_ );
 	refExport.DrawStretchPic( x, y + h - 1, w, 1, 0, 0, 0, 0, uiInfo.uiUtils.dc_->whiteShader_ );
 }
 /*
 ================
-UI_DrawRect
+Menus::drawRect
 
 Coordinates are 640*480 virtual values
 =================
 */
-void UI_DrawRect( float x, float y, float width, float height, const float *color ) {
+void Menus::drawRect( float x, float y, float width, float height, const float *color ) {
 	refExport.SetColor( color );
 
-  UI_DrawTopBottom(x, y, width, height);
-  UI_DrawSides(x, y, width, height);
+  Menus::drawTopBottom(x, y, width, height);
+  Menus::drawSides(x, y, width, height);
 
 	refExport.SetColor( nullptr );
 }
 
-void UI_SetColor( const float *rgba ) 
+void Menus::setColor( const float *rgba ) 
 {
 	refExport.SetColor( rgba );
 }
 
-void UI_UpdateScreen( ) 
+void Menus::updateScreen( ) 
 {
 	Screen::updateScreen();
 }
 
 
-void UI_DrawTextBox (int x, int y, int width, int lines)
+void Menus::drawTextBox (int x, int y, int width, int lines)
 {
-	UI_FillRect( x + BIGCHAR_WIDTH/2, y + BIGCHAR_HEIGHT/2, ( width + 1 ) * BIGCHAR_WIDTH, ( lines + 1 ) * BIGCHAR_HEIGHT, colorBlack );
-	UI_DrawRect( x + BIGCHAR_WIDTH/2, y + BIGCHAR_HEIGHT/2, ( width + 1 ) * BIGCHAR_WIDTH, ( lines + 1 ) * BIGCHAR_HEIGHT, colorWhite );
+	Menus::fillRect( x + BIGCHAR_WIDTH/2, y + BIGCHAR_HEIGHT/2, ( width + 1 ) * BIGCHAR_WIDTH, ( lines + 1 ) * BIGCHAR_HEIGHT, colorBlack );
+	Menus::drawRect( x + BIGCHAR_WIDTH/2, y + BIGCHAR_HEIGHT/2, ( width + 1 ) * BIGCHAR_WIDTH, ( lines + 1 ) * BIGCHAR_HEIGHT, colorWhite );
 }
 
-bool UI_CursorInRect (int x, int y, int width, int height)
+bool Menus::cursorInRect (int x, int y, int width, int height)
 {
 	if (uiInfo.uiUtils.dc_->cursorX_ < x ||
 		uiInfo.uiUtils.dc_->cursorY_ < y ||

@@ -348,22 +348,14 @@ extern sfxHandle_t	MenuField_Key( menufield_s* m, int* key );
 //
 // ui_main.c
 //
-void UI_Report();
-void UI_Load();
-void UI_LoadMenus(const char *menuFile, bool reset);
 void _UI_SetActiveMenu( UserInterface::MenuCommand menu );
 int UI_AdjustTimeByGame(int time);
-void UI_ShowPostGame(bool newHigh);
-void UI_ClearScores();
-void UI_LoadArenas();
 
 //
 // ui_menu.c
 //
 extern void MainMenu_Cache( );
 extern void UI_MainMenu();
-extern void UI_RegisterCvars( );
-extern void UI_UpdateCvars( );
 
 //
 // ui_credits.c
@@ -397,7 +389,6 @@ extern void TeamMain_Cache( );
 //
 // ui_connect.c
 //
-extern void UI_DrawConnectScreen( bool overlay );
 
 //
 // ui_controls2.c
@@ -855,20 +846,9 @@ extern uiInfo_t uiInfo;
 
 
 extern void			UI_Init( );
-extern void			UI_Shutdown( );
 extern void			UI_KeyEvent( int key );
 extern void			UI_MouseEvent( int dx, int dy );
 extern void			UI_Refresh( int realtime );
-extern bool		UI_ConsoleCommand( int realTime );
-extern float		UI_ClampCvar( float min, float max, float value );
-extern void			UI_DrawNamedPic( float x, float y, float width, float height, const char *picname );
-extern void			UI_DrawHandlePic( float x, float y, float w, float h, qhandle_t hShader ); 
-extern void			UI_FillRect( float x, float y, float width, float height, const float *color );
-extern void			UI_DrawRect( float x, float y, float width, float height, const float *color );
-extern void     UI_DrawTopBottom(float x, float y, float w, float h);
-extern void     UI_DrawSides(float x, float y, float w, float h);
-extern void			UI_UpdateScreen( );
-extern void			UI_SetColor( const float *rgba );
 extern void			UI_LerpColor(vec4_t a, vec4_t b, vec4_t c, float t);
 extern void			UI_DrawBannerString( int x, int y, const char* str, int style, vec4_t color );
 extern float		UI_ProportionalSizeScale( int style );
@@ -876,21 +856,14 @@ extern void			UI_DrawProportionalString( int x, int y, const char* str, int styl
 extern int			UI_ProportionalStringWidth( const char* str );
 extern void			UI_DrawString( int x, int y, const char* str, int style, vec4_t color );
 extern void			UI_DrawChar( int x, int y, int ch, int style, vec4_t color );
-extern bool 	UI_CursorInRect (int x, int y, int width, int height);
-extern void			UI_AdjustFrom640( float *x, float *y, float *w, float *h );
-extern void			UI_DrawTextBox (int x, int y, int width, int lines);
 extern bool		UI_IsFullscreen( );
 extern void			UI_SetActiveMenu( UserInterface::MenuCommand menu );
 extern void			UI_PushMenu ( menuframework_s *menu );
 extern void			UI_PopMenu ();
 extern void			UI_ForceMenuOff ();
-extern char			*UI_Argv( int arg );
-extern char			*UI_Cvar_VariableString( const char *var_name );
 extern void			UI_Refresh( int time );
 extern void			UI_KeyEvent( int key );
-extern void			UI_StartDemoLoop( );
 extern bool		m_entersound;
-void UI_LoadBestScores(const char *map, int game);
 extern uiStatic_t	uis;
 
 //
@@ -1086,6 +1059,8 @@ using postGameInfo_t = postGameInfo_s;
 unsigned int MF_UI_GetTeam( );
 unsigned long MF_UI_GetGameset( bool asEnum );
 unsigned long MF_UI_Gameset_StringToValue( char * pString, bool asEnum );
+
+#include "ui_menus.h"
 
 #endif	// __UI_LOCAL_H__
 

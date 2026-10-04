@@ -140,7 +140,7 @@ enum uiExport_t {
 //	void	UI_Init( void );
 
 //	UI_SHUTDOWN,
-//	void	UI_Shutdown( void );
+//	void	Menus::shutdown( void );
 
 //	UI_KEY_EVENT,
 //	void	UI_KeyEvent( int key );
@@ -158,10 +158,10 @@ enum uiExport_t {
 //	void	UI_SetActiveMenu( uiMenuCommand_t menu );
 
 //	UI_CONSOLE_COMMAND,
-//	bool UI_ConsoleCommand( int realTime );
+//	bool Menus::consoleCommand( int realTime );
 
 //	UI_DRAW_CONNECT_SCREEN,
-//	void	UI_DrawConnectScreen( bool overlay );
+//	void	Menus::drawConnectScreen( bool overlay );
 //	UI_HASUNIQUECDKEY
 // if !overlay, the background will be drawn, otherwise it will be
 // overlayed over whatever the cgame has drawn.

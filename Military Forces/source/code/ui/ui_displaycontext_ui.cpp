@@ -8,29 +8,12 @@ int Text_Height(const char *text, float scale, int limit);
 void _UI_DrawRect( float x, float y, float width, float height, float size, const float *color );
 void _UI_DrawSides(float x, float y, float w, float h, float size);
 void _UI_DrawTopBottom(float x, float y, float w, float h, float size);
-void UI_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, int ownerDrawFlags, 
-				  int align, float special, float scale, const vec4_t color, qhandle_t shader, 
-				  int textStyle, itemDef_t * item);
-float UI_GetValue(int ownerDraw);
-bool UI_OwnerDrawVisible(int flags);
-void UI_RunMenuScript(char **args);
 void Text_PaintWithCursor(float x, float y, float scale, vec4_t color, const char *text, int cursorPos, 
 						  char cursor, int limit, int style);
-bool UI_OwnerDrawHandleKey(int ownerDraw, int flags, float *special, int key);
-int UI_FeederCount(float feederID);
-const char *UI_FeederItemText(float feederID, int index, int column, qhandle_t *handle);
 void Text_PaintWithCursor(float x, float y, float scale, vec4_t color, const char *text, int cursorPos, char cursor, 
 						  int limit, int style);
-qhandle_t UI_FeederItemImage(float feederID, int index);
-void UI_FeederSelection(float feederID, int index);
 void Text_PaintWithCursor(float x, float y, float scale, const vec4_t color, const char *text, int cursorPos, 
 						  char cursor, int limit, int style); 
-void UI_Pause(bool b);
-int UI_OwnerDrawWidth(int ownerDraw, float scale);
-int UI_PlayCinematic(const char *name, float x, float y, float w, float h);
-void UI_StopCinematic(int handle);
-void UI_DrawCinematic(int handle, float x, float y, float w, float h);
-void UI_RunCinematicFrame(int handle);
 
 
 
@@ -40,7 +23,7 @@ void UI_RunCinematicFrame(int handle);
 void
 UI_DisplayContextUI::drawHandlePic( float x, float y, float w, float h, qhandle_t asset )
 {
-	UI_DrawHandlePic( x, y, w, h, asset );
+	Menus::drawHandlePic( x, y, w, h, asset );
 }
 
 void
@@ -65,7 +48,7 @@ UI_DisplayContextUI::textHeight( const char *text, float scale, int limit )
 void
 UI_DisplayContextUI::fillRect( float x, float y, float w, float h, const vec4_t color ) 
 {
-	UI_FillRect( x, y, w, h, color );
+	Menus::fillRect( x, y, w, h, color );
 }
 
 void
@@ -91,32 +74,32 @@ UI_DisplayContextUI::ownerDrawItem( float x, float y, float w, float h, float te
 					 			    int ownerDraw, int ownerDrawFlags, int align, float special, float scale, 
 									const vec4_t color, qhandle_t shader, int textStyle, itemDef_t* item )
 {
-	UI_OwnerDraw( x, y, w, h, text_x, text_y, ownerDraw, ownerDrawFlags, 
+	Menus::ownerDraw( x, y, w, h, text_x, text_y, ownerDraw, ownerDrawFlags, 
 				  align, special, scale, color, shader, textStyle, item );
 }
 
 //float
 //UI_DisplayContextUI::getValue( int ownerDraw )
 //{
-//	return UI_GetValue( ownerDraw );
+//	return Menus::getValue( ownerDraw );
 //}
 
 bool
 UI_DisplayContextUI::ownerDrawVisible( int flags )
 {
-	return UI_OwnerDrawVisible( flags );
+	return Menus::ownerDrawVisible( flags );
 }
 
 void
 UI_DisplayContextUI::runScript( char **p )
 {
-	UI_RunMenuScript( p );
+	Menus::runMenuScript( p );
 }
 
 //void
 //UI_DisplayContextUI::getTeamColor( vec4_t *color )
 //{
-//	UI_GetTeamColor( color );
+//	Menus::getTeamColor( color );
 //}
 
 float
@@ -147,31 +130,31 @@ UI_DisplayContextUI::getOverstrikeMode()
 bool
 UI_DisplayContextUI::ownerDrawHandleKey( int ownerDraw, int flags, float *special, int key )
 {
-	return UI_OwnerDrawHandleKey( ownerDraw, flags, special, key );
+	return Menus::ownerDrawHandleKey( ownerDraw, flags, special, key );
 }
 
 int
 UI_DisplayContextUI::feederCount( float feederID )
 {
-	return UI_FeederCount( feederID );
+	return Menus::feederCount( feederID );
 }
 
 const char*
 UI_DisplayContextUI::feederItemText( float feederID, int index, int column, qhandle_t *handle )
 {
-	return UI_FeederItemText( feederID, index, column, handle );
+	return Menus::feederItemText( feederID, index, column, handle );
 }
 
 qhandle_t
 UI_DisplayContextUI::feederItemImage( float feederID, int index )
 {
-	return UI_FeederItemImage( feederID, index );
+	return Menus::feederItemImage( feederID, index );
 }
 
 void
 UI_DisplayContextUI::feederSelection( float feederID, int index )
 {
-	UI_FeederSelection( feederID, index );
+	Menus::feederSelection( feederID, index );
 }
 
 void
@@ -201,37 +184,37 @@ UI_DisplayContextUI::executeText( int exec_when, const char *text )
 void
 UI_DisplayContextUI::pause( bool b )
 {
-	UI_Pause( b );
+	Menus::pause( b );
 }
 
 int
 UI_DisplayContextUI::ownerDrawWidth( int ownerDraw, float scale )
 {
-	return UI_OwnerDrawWidth( ownerDraw, scale );
+	return Menus::ownerDrawWidth( ownerDraw, scale );
 }
 
 int
 UI_DisplayContextUI::playCinematic( const char *name, float x, float y, float w, float h )
 {
-	return UI_PlayCinematic( name, x, y, w, h );
+	return Menus::playCinematic( name, x, y, w, h );
 }
 
 void
 UI_DisplayContextUI::stopCinematic( int handle )
 {
-	UI_StopCinematic( handle );
+	Menus::stopCinematic( handle );
 }
 
 void
 UI_DisplayContextUI::drawCinematic( int handle, float x, float y, float w, float h )
 {
-	UI_DrawCinematic( handle, x, y, w, h );
+	Menus::drawCinematic( handle, x, y, w, h );
 }
 
 void
 UI_DisplayContextUI::runCinematicFrame( int handle )
 {
-	UI_RunCinematicFrame( handle );
+	Menus::runCinematicFrame( handle );
 }
 
 

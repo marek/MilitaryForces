@@ -129,7 +129,7 @@ void CGame::drawTopBottom(float x, float y, float w, float h, float size) {
 }
 /*
 ================
-UI_DrawRect
+Menus::drawRect
 
 Coordinates are 640*480 virtual values
 =================

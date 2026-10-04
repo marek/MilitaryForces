@@ -3358,7 +3358,7 @@ UI_Utils::menu_Paint( menuDef_t *menu, bool forcePaint )
 	else if (menu->window.background) 
 	{
 		// this allows a background shader without being full screen
-		//UI_DrawHandlePic(menu->window.rect.x, menu->window.rect.y, menu->window.rect.w, menu->window.rect.h, menu->backgroundShader);
+		//Menus::drawHandlePic(menu->window.rect.x, menu->window.rect.y, menu->window.rect.w, menu->window.rect.h, menu->backgroundShader);
 	}
 
 	// paint the background and or border

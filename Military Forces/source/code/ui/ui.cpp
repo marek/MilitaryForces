@@ -1,4 +1,5 @@
 #include "ui.h"
+#include "ui_local.h"
 
 
 
@@ -10,8 +11,6 @@ void _UI_MouseEvent( int, int );
 void _UI_Refresh( int );
 bool _UI_IsFullscreen();
 void _UI_SetActiveMenu( UserInterface::MenuCommand );
-bool UI_ConsoleCommand( int );
-void UI_DrawConnectScreen( bool overlay );
 
 
 
@@ -79,13 +78,13 @@ UserInterface::setActiveMenu( MenuCommand menu ) const
 bool
 UserInterface::consoleCommand( int realTime ) const
 {
-	return UI_ConsoleCommand( realTime );
+	return Menus::consoleCommand( realTime );
 }
 
 void
 UserInterface::drawConnectScreen( bool overlay ) const
 {
-	UI_DrawConnectScreen( overlay );
+	Menus::drawConnectScreen( overlay );
 }
 
 //bool
