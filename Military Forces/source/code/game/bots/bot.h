@@ -88,6 +88,8 @@ public:
 		int		goalsReached = 0;
 		int		goalsExpired = 0;
 		int		leader = -1;
+		int		leaderTime = 0;
+		bool	teamPlayer = false;
 		vec3_t	trail[6] = {};
 		int		trailTime = 0;
 		int		logTime = 0;
@@ -192,6 +194,9 @@ private:
 	static void thinkRider( GameEntity* ent, State& bot, usercmd_t& cmd, vec3_t view );
 
 	static GameEntity* findEnemy( GameEntity* ent, State& bot, Role role );
+	static void chooseLeader( GameEntity* ent, State& bot );
+	static GameEntity* leaderOf( const State& bot );
+	static int targetOf( GameEntity* leader );
 	static Role roleOf( int vehicle );
 	static Goal chooseGoal( GameEntity* ent, State& bot, const Sense& sense );
 	static const Character& character( const State& bot );

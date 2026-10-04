@@ -19,6 +19,61 @@ Bots::Role Bots::roleOf( int vehicle )
 	return Role::Infantry;
 }
 
+GameEntity* Bots::leaderOf( const State& bot )
+{
+	GameEntity* leader = bot.leader >= 0 ? theLevel.getEntity( bot.leader ) : nullptr;
+	return alive( leader ) ? leader : nullptr;
+}
+
+// who a leader is fighting: a bot's chosen enemy, a real player's locked target
+int Bots::targetOf( GameEntity* leader )
+{
+	if( isBot( leader->s.number ) )
+		return states_[leader->s.number].enemy;
+	return leader->tracktarget_ && leader->tracktarget_->client_ ? leader->tracktarget_->s.number : -1;
+}
+
+// A team player picks someone to fight alongside: a real player first, otherwise a bot of the same kind that is
+// not following anyone itself. The lower client number leads, so two bots never follow each other.
+void Bots::chooseLeader( GameEntity* ent, State& bot )
+{
+	constexpr float humanRange = 9000.0f;
+	constexpr float botRange = 6000.0f;
+	constexpr float humanPreference = 0.3f;
+	bot.leaderTime = theLevel.time_ + 2000;
+	bot.leader = -1;
+	if( !bot.teamPlayer || g_gametype.integer < GT_TEAM )
+		return;
+	const unsigned int ownCat = availableVehicles[ent->client_->vehicle_].cat;
+	const bool flyer = (ownCat & (CAT_PLANE|CAT_HELO)) != 0;
+	float best = 0;
+	for( int i = 1; i <= theLevel.maxclients_; i++ )
+	{
+		GameEntity* other = theLevel.getEntity( i );
+		if( other == ent || !alive( other ) || !OnSameTeam( ent, other ) || other->client_->sess_.ridingClient_ >= 0 )
+			continue;
+		const unsigned int cat = availableVehicles[other->client_->vehicle_].cat;
+		if( cat & CAT_LQM )
+			continue;
+		const bool human = !isBot( i );
+		const float dist = Distance( ent->r.currentOrigin, other->r.currentOrigin );
+		if( human )
+		{
+			// keep up with a real player in the same element: air with air, surface with surface
+			if( flyer != ((cat & (CAT_PLANE|CAT_HELO)) != 0) || dist > humanRange )
+				continue;
+		}
+		else if( !(cat & ownCat) || i > ent->s.number || states_[i].leader >= 0 || dist > botRange )
+			continue;
+		const float weighted = human ? dist * humanPreference : dist;
+		if( bot.leader < 0 || weighted < best )
+		{
+			bot.leader = i;
+			best = weighted;
+		}
+	}
+}
+
 GameEntity* Bots::findEnemy( GameEntity* ent, State& bot, Role role )
 {
 	GameClient* client = ent->client_;
@@ -27,6 +82,9 @@ GameEntity* Bots::findEnemy( GameEntity* ent, State& bot, Role role )
 	const float maxRange = flyer ? planeEnemyRange : surfaceEnemyRange;
 	const float radarRange = veh.radarRange > 0 ? static_cast<float>( veh.radarRange ) : 8000.0f;
 	const bool antiAir = hasWeaponType( client->vehicle_, client->ps_, WT_ANTIAIRMISSILE );
+
+	GameEntity* leader = leaderOf( bot );
+	const int leaderTarget = leader ? targetOf( leader ) : -1;
 
 	GameEntity* best = nullptr;
 	float bestScore = 0;
@@ -104,6 +162,9 @@ GameEntity* Bots::findEnemy( GameEntity* ent, State& bot, Role role )
 		}
 		if( i == bot.enemy )
 			score *= 0.7f;
+		// fight what the leader is fighting
+		if( leaderTarget == i )
+			score *= 0.35f;
 		if( g_gametype.integer == GT_CTF && (oc->ps_.objectives & (client->sess_.sessionTeam_ == ClientBase::TEAM_RED ? OB_REDFLAG : OB_BLUEFLAG)) )
 			score *= 0.15f;
 		if( !best || score < bestScore )

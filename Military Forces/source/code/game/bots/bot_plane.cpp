@@ -100,7 +100,7 @@ struct PlaneTasks
 	}
 	static bool wantsWingman( Mind& c )
 	{
-		return g_gametype.integer >= GT_TEAM && c.sense.role == Role::Fighter && !c.sense.enemy && c.who().teamwork > 0.25f;
+		return c.bot.leader >= 0 && !c.sense.enemy;
 	}
 	static constexpr float rotateSpeed = 1.12f;
 
@@ -424,34 +424,14 @@ struct PlaneTasks
 
 	static Status wingman( Mind& c )
 	{
-		// a real player is the preferred leader; another bot leads only for team-minded characters, the lower number leading
-		constexpr float humanPreference = 0.3f;
-		const bool followsBots = c.who().teamwork > 0.5f;
-		GameEntity* leader = nullptr;
-		float leaderDist = 0;
-		for( int i = 1; i <= theLevel.maxclients_; i++ )
-		{
-			GameEntity* other = theLevel.getEntity( i );
-			if( other == c.ent || !alive( other ) || !OnSameTeam( c.ent, other ) || !(availableVehicles[other->client_->vehicle_].cat & CAT_PLANE) || (other->client_->ps_.ONOFF & OO_LANDED) )
-				continue;
-			const bool human = !Bots::isBot( i );
-			if( !human && (!followsBots || i > c.ent->s.number || Bots::roleOf( other->client_->vehicle_ ) != Role::Fighter) )
-				continue;
-			const float dist = Distance( c.ent->r.currentOrigin, other->r.currentOrigin );
-			const float weighted = human ? dist * humanPreference : dist;
-			if( dist < 9000 && (!leader || weighted < leaderDist) )
-			{
-				leader = other;
-				leaderDist = weighted;
-			}
-		}
-		c.bot.leader = leader ? leader->s.number : -1;
+		GameEntity* leader = Bots::leaderOf( c.bot );
 		if( !leader )
 			return Status::Failure;
+		// off the leader's wing, on the side given by the client number so two wingmen take different sides
 		vec3_t forward, right;
 		AngleVectors( leader->client_->ps_.vehicleAngles, forward, right, nullptr );
 		VectorMA( leader->r.currentOrigin, 600.0f, forward, c.bot.goal );
-		VectorMA( c.bot.goal, 300.0f, right, c.bot.goal );
+		VectorMA( c.bot.goal, (c.ent->s.number & 1) ? 300.0f : -300.0f, right, c.bot.goal );
 		c.bot.goalTime = theLevel.time_ + 2000;
 		c.headFor( c.bot.goal );
 		c.holdAltitude();
@@ -945,7 +925,7 @@ struct PlaneTasks
 			t.when( "engaging", engaging, attack ),
 			t.when( "wants height", climbing, t.action( "gain height", gainHeight ) ),
 			t.when( "bomber with payload", canBombStructure, t.action( "bomb structure", bombStructure ) ),
-			t.when( "team fighter without target", wantsWingman, t.action( "wingman", wingman ) ),
+			t.when( "has a leader and no target", wantsWingman, t.action( "wingman", wingman ) ),
 			t.action( "patrol", patrol ) } );
 
 		const auto* safety = t.always( "avoid", t.action( "plan manoeuvre", probeTerrain ), {

@@ -48,6 +48,7 @@ struct HeloTasks
 	static bool seesEnemy( Mind& c ) { return c.sense.enemyVisible; }
 	static bool hasEnemy( Mind& c ) { return c.sense.enemy != nullptr; }
 	static bool airborne( Mind& c ) { return !c.landed(); }
+	static bool hasLeader( Mind& c ) { return c.bot.leader >= 0; }
 
 	static void faceEnemy( Mind& c )
 	{
@@ -191,6 +192,22 @@ struct HeloTasks
 		faceEnemy( c );
 		const Vec3 enemy = c.enemyPosition();
 		c.travelTo( Vec3( enemy.x(), enemy.y(), c.ent->r.currentOrigin[2] ) );
+		return Status::Running;
+	}
+
+	// stay beside the leader, on the side given by the client number
+	static Status escort( Mind& c )
+	{
+		GameEntity* leader = Bots::leaderOf( c.bot );
+		if( !leader )
+			return Status::Failure;
+		vec3_t flat = { 0, leader->client_->ps_.vehicleAngles[YAW], 0 }, right, spot;
+		AngleVectors( flat, nullptr, right, nullptr );
+		VectorMA( leader->r.currentOrigin, (c.ent->s.number & 1) ? 350.0f : -350.0f, right, spot );
+		flyTo( c, spot );
+		c.standoff = -200.0f;
+		if( c.dist < 150 )
+			c.mode = Hover;
 		return Status::Running;
 	}
 
@@ -434,6 +451,7 @@ struct HeloTasks
 			t.when( "capturing", capturing, t.action( "go to flag", goToFlag ) ),
 			t.when( "fighting", fighting, popAndCover ),
 			t.when( "has an enemy", hasEnemy, t.action( "close on enemy", closeOnEnemy ) ),
+			t.when( "has a leader", hasLeader, t.action( "escort", escort ) ),
 			t.action( "patrol", patrol ) } );
 
 		t.setRoot( t.always( "pilot", act, {

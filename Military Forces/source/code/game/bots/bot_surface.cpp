@@ -19,6 +19,7 @@ struct SurfaceTasks
 	static bool engaging( Mind& c ) { return groundEnemy( c ) && c.bot.desire != Goal::Capture; }
 	static bool reversing( Mind& c ) { return theLevel.time_ < c.bot.reverseTime; }
 	static bool hasEnemy( Mind& c ) { return c.sense.enemy != nullptr; }
+	static bool hasLeader( Mind& c ) { return c.bot.leader >= 0 && c.bot.desire != Goal::Capture; }
 
 	static bool waterAt( const Mind& c, const vec3_t forward, float reach, bool& drop )
 	{
@@ -107,6 +108,18 @@ struct SurfaceTasks
 		VectorCopy( c.sense.enemyDir, c.course );
 		c.travelTo( c.enemyPosition() );
 		c.hold = c.sense.enemyDist < 1500;
+		return Status::Running;
+	}
+
+	// drive with the leader, stopping a little short
+	static Status convoy( Mind& c )
+	{
+		GameEntity* leader = Bots::leaderOf( c.bot );
+		if( !leader )
+			return Status::Failure;
+		c.bot.hasHide = false;
+		c.courseTo( leader->r.currentOrigin );
+		holdNear( c, 350 );
 		return Status::Running;
 	}
 
@@ -239,6 +252,7 @@ struct SurfaceTasks
 			t.when( "wants to rearm", rearming, t.action( "drive to pad", driveToPad ) ),
 			t.when( "evading", evading, t.action( "withdraw", withdraw ) ),
 			t.when( "ground enemy", engaging, t.action( "engage", engage ) ),
+			t.when( "has a leader", hasLeader, t.action( "convoy", convoy ) ),
 			t.action( "drive to goal", driveToGoal ) } );
 
 		const auto* drive = t.selector( "controls", {

@@ -360,6 +360,18 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 		bot.desire = Goal::Roam;
 		bot.commitTime = 0;
 		bot.tree = behavior::Memory{};
+		// about one life in five is flown as a team player, more for team-minded characters
+		// (and more readily when a real player is on the team)
+		bool humanOnTeam = false;
+		for( int i = 1; i <= theLevel.maxclients_ && g_gametype.integer >= GT_TEAM; i++ )
+		{
+			GameEntity* other = theLevel.getEntity( i );
+			if( other != ent && other && other->inuse_ && other->client_ && !isBot( i ) && OnSameTeam( ent, other ) )
+				humanOnTeam = true;
+		}
+		bot.teamPlayer = random() < (0.4f + (humanOnTeam ? 0.3f : 0.0f)) * character( bot ).teamwork;
+		bot.leader = -1;
+		bot.leaderTime = 0;
 		bot.groundTime = 0;
 		bot.probeBlocked = false;
 		bot.brakeTime = 0;
@@ -427,6 +439,8 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 	}
 	else
 	{
+		if( theLevel.time_ >= bot.leaderTime )
+			chooseLeader( ent, bot );
 		Sense s;
 		sense( ent, bot, s );
 		const unsigned int cat = availableVehicles[client->vehicle_].cat;
