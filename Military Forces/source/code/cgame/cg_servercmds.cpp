@@ -17,14 +17,14 @@ struct orderTask_t {
 
 /*
 =================
-CG_ParseScores
+ClientGame::parseScores
 
 =================
 */
 
 constexpr int SCORE_BLOCK = 15; // this value must be exactly how many parameters we expect per client score
 
-static void CG_ParseScores( )
+void ClientGame::parseScores( )
 {
 	int	i, objectives;
 
@@ -71,11 +71,11 @@ static void CG_ParseScores( )
 
 /*
 =================
-CG_ParseTeamInfo
+ClientGame::parseTeamInfo
 
 =================
 */
-static void CG_ParseTeamInfo( ) {
+void ClientGame::parseTeamInfo( ) {
 	int		i;
 	int		client;
 
@@ -154,10 +154,10 @@ void ClientGame::parseServerinfo( ) {
 
 /*
 ==================
-CG_ParseWarmup
+ClientGame::parseWarmup
 ==================
 */
-static void CG_ParseWarmup( ) {
+void ClientGame::parseWarmup( ) {
 	const char	*info;
 	int			warmup;
 
@@ -250,11 +250,11 @@ void ClientGame::shaderStateChanged() {
 
 /*
 ================
-CG_ConfigStringModified
+ClientGame::configStringModified
 
 ================
 */
-static void CG_ConfigStringModified( ) {
+void ClientGame::configStringModified( ) {
 	const char	*str;
 	int		num;
 
@@ -273,7 +273,7 @@ static void CG_ConfigStringModified( ) {
 	} else if ( num == CS_SERVERINFO ) {
 		ClientGame::parseServerinfo();
 	} else if ( num == CS_WARMUP ) {
-		CG_ParseWarmup();
+		ClientGame::parseWarmup();
 	} else if ( num == CS_SCORES1 ) {
 		cgs.scores1 = atoi( str );
 	} else if ( num == CS_SCORES2 ) {
@@ -329,11 +329,11 @@ static void CG_ConfigStringModified( ) {
 
 /*
 =======================
-CG_AddToTeamChat
+ClientGame::addToTeamChat
 
 =======================
 */
-static void CG_AddToTeamChat( const char *str ) {
+void ClientGame::addToTeamChat( const char *str ) {
 	int len;
 	char *p, *ls;
 	int lastcolor;
@@ -404,7 +404,7 @@ static void CG_AddToTeamChat( const char *str ) {
 
 /*
 ===============
-CG_MapRestart
+ClientGame::mapRestart
 
 The server has issued a map_restart, so the next snapshot
 is completely New and should not be interpolated to.
@@ -413,7 +413,7 @@ A tournement restart will clear everything, but doesn't
 require a reload of all the media
 ===============
 */
-static void CG_MapRestart( ) {
+void ClientGame::mapRestart( ) {
 
 	if ( cg_showmiss.integer ) {
 		ClientGame::printf( "CG_MapRestart\n" );
@@ -460,10 +460,10 @@ static void CG_MapRestart( ) {
 
 /*
 =================
-CG_RemoveChatEscapeChar
+ClientGame::removeChatEscapeChar
 =================
 */
-static void CG_RemoveChatEscapeChar( char *text ) {
+void ClientGame::removeChatEscapeChar( char *text ) {
 	int i, l;
 
 	l = 0;
@@ -477,10 +477,10 @@ static void CG_RemoveChatEscapeChar( char *text ) {
 
 /*
 =================
-CG_PrintExtractExtra
+ClientGame::printExtractExtra
 =================
 */
-static void CG_PrintExtractExtra( )
+void ClientGame::printExtractExtra( )
 {
 	const char	*extraCmd = ClientGame::argv(2);
 
@@ -500,13 +500,13 @@ static void CG_PrintExtractExtra( )
 
 /*
 =================
-CG_ServerCommand
+ClientGame::serverCommand
 
 The string has been tokenized and can be retrieved with
 CommandSystem::argc() / CommandSystem::argv()
 =================
 */
-static void CG_ServerCommand( ) {
+void ClientGame::serverCommand( ) {
 	const char	*cmd;
 	char		text[MAX_SAY_TEXT];
 
@@ -523,12 +523,12 @@ static void CG_ServerCommand( ) {
 	}
 
 	if ( !strcmp( cmd, "cs" ) ) {
-		CG_ConfigStringModified();
+		ClientGame::configStringModified();
 		return;
 	}
 
 	if ( !strcmp( cmd, "print" ) ) {
-		CG_PrintExtractExtra( );
+		ClientGame::printExtractExtra( );
 		ClientGame::printf( "%s", ClientGame::argv(1) );
 		return;
 	}
@@ -537,7 +537,7 @@ static void CG_ServerCommand( ) {
 		if ( !cg_teamChatsOnly.integer ) {
 			SoundSystem::startLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
 			Q_strncpyz( text, ClientGame::argv(1), MAX_SAY_TEXT );
-			CG_RemoveChatEscapeChar( text );
+			ClientGame::removeChatEscapeChar( text );
 			ClientGame::printf( "%s\n", text );
 		}
 		return;
@@ -546,24 +546,24 @@ static void CG_ServerCommand( ) {
 	if ( !strcmp( cmd, "tchat" ) ) {
 		SoundSystem::startLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
 		Q_strncpyz( text, ClientGame::argv(1), MAX_SAY_TEXT );
-		CG_RemoveChatEscapeChar( text );
-		CG_AddToTeamChat( text );
+		ClientGame::removeChatEscapeChar( text );
+		ClientGame::addToTeamChat( text );
 		ClientGame::printf( "%s\n", text );
 		return;
 	}
 
 	if ( !strcmp( cmd, "scores" ) ) {
-		CG_ParseScores();
+		ClientGame::parseScores();
 		return;
 	}
 
 	if ( !strcmp( cmd, "tinfo" ) ) {
-		CG_ParseTeamInfo();
+		ClientGame::parseTeamInfo();
 		return;
 	}
 
 	if ( !strcmp( cmd, "map_restart" ) ) {
-		CG_MapRestart();
+		ClientGame::mapRestart();
 		return;
 	}
 
@@ -613,6 +613,6 @@ void ClientGame::executeNewServerCommands( int latestSequence )
 	while ( cgs.serverCommandSequence < latestSequence ) 
 	{
 		if ( CL_GetServerCommand( ++cgs.serverCommandSequence ) ) 
-			CG_ServerCommand();
+			ClientGame::serverCommand();
 	}
 }

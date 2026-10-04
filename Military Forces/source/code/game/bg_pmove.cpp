@@ -98,12 +98,12 @@ void PlayerMove::clipVelocity( vec3_t in, vec3_t normal, vec3_t out, float overb
 
 /*
 ==================
-PM_Friction
+PlayerMove::friction
 
 Handles both ground friction and water friction
 ==================
 */
-static void PM_Friction( ) {
+void PlayerMove::friction( ) {
 	vec3_t	vec;
 	float	*vel;
 	float	speed, newspeed, control;
@@ -161,12 +161,12 @@ static void PM_Friction( ) {
 
 /*
 ==============
-PM_Accelerate
+PlayerMove::accelerate
 
 Handles user intended acceleration
 ==============
 */
-static void PM_Accelerate( vec3_t wishdir, float wishspeed, float accel ) {
+void PlayerMove::accelerate( vec3_t wishdir, float wishspeed, float accel ) {
 #if 1
 	// q2 style
 	int			i;
@@ -209,14 +209,14 @@ static void PM_Accelerate( vec3_t wishdir, float wishspeed, float accel ) {
 
 /*
 ============
-PM_CmdScale
+PlayerMove::cmdScale
 
 Returns the scale factor to apply to cmd movements
 This allows the clients to use axial -127 to 127 values for all directions
 without getting a sqrt(2) distortion in speed.
 ============
 */
-static float PM_CmdScale( usercmd_t *cmd ) {
+float PlayerMove::cmdScale( usercmd_t *cmd ) {
 	int		max;
 	float	total;
 	float	scale;
@@ -241,12 +241,12 @@ static float PM_CmdScale( usercmd_t *cmd ) {
 
 /*
 ===================
-PM_FlyMove
+PlayerMove::flyMove
 
 Only with the flight powerup
 ===================
 */
-static void PM_FlyMove( ) {
+void PlayerMove::flyMove( ) {
 	int		i;
 	vec3_t	wishvel;
 	float	wishspeed;
@@ -258,9 +258,9 @@ static void PM_FlyMove( ) {
 	VectorSet( pm->mins, -8, -8, -8 );
 
 	// normal slowdown
-	PM_Friction ();
+	PlayerMove::friction ();
 
-	scale = PM_CmdScale( &pm->cmd );
+	scale = PlayerMove::cmdScale( &pm->cmd );
 
 	// MFQ3: maps are much bigger and open than normal (e.g. Q3) maps, so increase the speed that
 	// the spectator camera can travel at
@@ -287,17 +287,17 @@ static void PM_FlyMove( ) {
 	VectorCopy (wishvel, wishdir);
 	wishspeed = VectorNormalize(wishdir);
 
-	PM_Accelerate (wishdir, wishspeed, pm_flyaccelerate);
+	PlayerMove::accelerate (wishdir, wishspeed, pm_flyaccelerate);
 
 	PlayerMove::slideMove( false );
 }
 
 /*
 ===============
-PM_NoclipMove
+PlayerMove::noclipMove
 ===============
 */
-static void PM_NoclipMove( ) {
+void PlayerMove::noclipMove( ) {
 	float	speed, drop, friction, control, newspeed;
 	int			i;
 	vec3_t		wishvel;
@@ -333,7 +333,7 @@ static void PM_NoclipMove( ) {
 	}
 
 	// accelerate
-	scale = PM_CmdScale( &pm->cmd );
+	scale = PlayerMove::cmdScale( &pm->cmd );
 
 	fmove = pm->cmd.forwardmove;
 	smove = pm->cmd.rightmove;
@@ -346,7 +346,7 @@ static void PM_NoclipMove( ) {
 	wishspeed = VectorNormalize(wishdir);
 	wishspeed *= scale;
 
-	PM_Accelerate( wishdir, wishspeed, pm_accelerate );
+	PlayerMove::accelerate( wishdir, wishspeed, pm_accelerate );
 
 	// move
 	VectorMA (pm->ps->origin, pml.frametime, pm->ps->velocity, pm->ps->origin);
@@ -356,10 +356,10 @@ static void PM_NoclipMove( ) {
 
 /*
 =============
-PM_SetWaterLevel	FIXME: avoid this twice?  certainly if not moving
+PlayerMove::setWaterLevel	FIXME: avoid this twice?  certainly if not moving
 =============
 */
-static void PM_SetWaterLevel( ) {
+void PlayerMove::setWaterLevel( ) {
 	vec3_t		point, start, end;
 	int			cont;
 //	int			sample1;
@@ -456,12 +456,12 @@ static void PM_SetWaterLevel( ) {
 
 /*
 ==============
-PM_WaterEvents
+PlayerMove::waterEvents
 
 Generate sound events for entering and leaving water
 ==============
 */
-static void PM_WaterEvents( ) {		// FIXME?
+void PlayerMove::waterEvents( ) {		// FIXME?
 
 //    if( pm->ps->pm_type == PM_VEHICLE ) {
 //		return;
@@ -499,12 +499,12 @@ static void PM_WaterEvents( ) {		// FIXME?
 
 /*
 ==============
-PM_Flare
+PlayerMove::flare
 
 Generates flare events and modifes the flare counter
 ==============
 */
-static void PM_Flare( ) {
+void PlayerMove::flare( ) {
 
 	if( pm->ps->pm_flags & PMF_RESPAWNED ) {
 		return;
@@ -543,12 +543,12 @@ static void PM_Flare( ) {
 
 /*
 ==============
-PM_Weapon
+PlayerMove::weapon
 
 Generates weapon events and modifes the weapon counter
 ==============
 */
-static void PM_Weapon( ) {
+void PlayerMove::weapon( ) {
 	bool	canShoot = true,
 				canShootMG = true;
 
@@ -670,10 +670,10 @@ static void PM_Weapon( ) {
 
 /*
 ================
-PM_DropTimers
+PlayerMove::dropTimers
 ================
 */
-static void PM_DropTimers( ) {
+void PlayerMove::dropTimers( ) {
 	// drop misc timing counter
 	if ( pm->ps->pm_time ) {
 		if ( pml.msec >= pm->ps->pm_time ) {
@@ -734,12 +734,12 @@ void PM_UpdateViewAngles( playerState_t *ps, const usercmd_t *cmd ) {
 
 /*
 ==============
-PM_VehicleBoundingBox
+PlayerMove::vehicleBoundingBox
 
 Sets mins, maxs, and pm->ps->viewheight
 ==============
 */
-static void PM_VehicleBoundingBox ()
+void PlayerMove::vehicleBoundingBox()
 {
 /*    vec3_t	mins, maxs;
 	float	diff1, diff2;
@@ -837,11 +837,11 @@ void PM_Throttle_Down()
 
 /*
 ===================
-PM_VehicleMove
+PlayerMove::vehicleMove
 
 ===================
 */
-static void PM_VehicleMove( ) 
+void PlayerMove::vehicleMove( ) 
 {
 	if( availableVehicles[pm->vehicle].cat & CAT_PLANE ) 
 	{
@@ -945,14 +945,14 @@ void PmoveSingle (pmove_t *pmove) {
 	}
 
 	if ( pm->ps->pm_type == PM_SPECTATOR ) {
-		PM_FlyMove ();
-		PM_DropTimers ();
+		PlayerMove::flyMove ();
+		PlayerMove::dropTimers ();
 		return;
 	}
 
 	if ( pm->ps->pm_type == PM_NOCLIP ) {
-		PM_NoclipMove ();
-		PM_DropTimers ();
+		PlayerMove::noclipMove ();
+		PlayerMove::dropTimers ();
 		return;
 	}
 
@@ -972,28 +972,28 @@ void PmoveSingle (pmove_t *pmove) {
 	}
 
 	// set watertype, and waterlevel
-	PM_SetWaterLevel();
+	PlayerMove::setWaterLevel();
 	pml.previous_waterlevel = pmove->waterlevel;
 
 	// set mins, maxs, and viewheight
-    PM_VehicleBoundingBox();
+    PlayerMove::vehicleBoundingBox();
 
-	PM_DropTimers();
+	PlayerMove::dropTimers();
 
 	// vehicle
-	PM_VehicleMove();
+	PlayerMove::vehicleMove();
 
 	// set watertype, and waterlevel
-	PM_SetWaterLevel();
+	PlayerMove::setWaterLevel();
 
 	// weapons
-	PM_Weapon();
+	PlayerMove::weapon();
 
 	// flares
-	PM_Flare();
+	PlayerMove::flare();
 
 	// entering / leaving water splashes
-	PM_WaterEvents();
+	PlayerMove::waterEvents();
 
 	// snap some parts of playerstate to save network bandwidth
 	Q_SnapVector( pm->ps->velocity );

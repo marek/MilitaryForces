@@ -14,12 +14,12 @@ extern pml_t		pml;
 
 /*
 ===================
-PM_Boat_FuelFlow
+PlayerMove::boat_FuelFlow
 
 ===================
 */
 
-static void PM_Boat_FuelFlow( int throttle )
+void PlayerMove::boat_FuelFlow( int throttle )
 {
 	int fuelflow = (20 - throttle) * 1000;
 
@@ -38,11 +38,11 @@ static void PM_Boat_FuelFlow( int throttle )
 
 /*
 ===================
-PM_BoatAccelerate
+PlayerMove::boatAccelerate
 
 ===================
 */
-static void PM_BoatAccelerate()
+void PlayerMove::boatAccelerate()
 {
     float	topspeed = availableVehicles[pm->vehicle].maxspeed;
     float	currspeed = static_cast<float>(pm->ps->speed)/10;
@@ -99,7 +99,7 @@ static void PM_BoatAccelerate()
 		throttle *= -1;
 	}
 
-	PM_Boat_FuelFlow( throttle );
+	PlayerMove::boat_FuelFlow( throttle );
 }
 
 
@@ -130,7 +130,7 @@ void PlayerMove::boatMove( )
 	float		lean = 0;
 
 	// set speed
-	PM_BoatAccelerate();
+	PlayerMove::boatAccelerate();
 
 	// speed
 	speed = static_cast<float>(pm->ps->speed)/10;
@@ -274,10 +274,10 @@ void PlayerMove::boatMove( )
 
 /*
 ===============
-PM_AddTouchEnt_Boat
+PlayerMove::addTouchEnt_Boat
 ===============
 */
-static void PM_AddTouchEnt_Boat( int entityNum ) {
+void PlayerMove::addTouchEnt_Boat( int entityNum ) {
 	int		i;
 
 	if ( entityNum == ENTITYNUM_WORLD ) {
@@ -382,7 +382,7 @@ bool PM_SlideMove_Boat() {
 		(trace.entityNum == ENTITYNUM_WORLD &&
 //				!(trace.surfaceFlags & SURF_NOIMPACT) &&
 		!(trace.surfaceFlags & SURF_SKY)) ) {
-		PM_AddTouchEnt_Boat( trace.entityNum );
+		PlayerMove::addTouchEnt_Boat( trace.entityNum );
 	}
 
 	// angle
@@ -479,7 +479,7 @@ bool	PM_SlideMove_Boat() {
 			(trace.entityNum == ENTITYNUM_WORLD &&
 //				!(trace.surfaceFlags & SURF_NOIMPACT) &&
 			!(trace.surfaceFlags & SURF_SKY)) ) {
-			PM_AddTouchEnt_Boat( trace.entityNum );
+			PlayerMove::addTouchEnt_Boat( trace.entityNum );
 		}
 
 		time_left -= time_left * trace.fraction;

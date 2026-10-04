@@ -19,6 +19,10 @@ public:
 	static void drawCinematic ();
 	static void runCinematic ();
 	static void stopCinematic ();
+
+public:
+	static void drawChar( int x, int y, float size, int ch );
+	static int strlen( const char *str );
 };
 
 #endif

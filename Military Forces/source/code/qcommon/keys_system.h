@@ -12,6 +12,11 @@ public:
 	static void setOverstrikeMode( bool state );
 	static void clearStates( );
 	static int getKey(const char *binding);
+
+public:
+	static void completeUnbind( char *args, int argNum );
+	static void completeBind( char *args, int argNum );
+	static bool cL_BindUICommand( const char *cmd );
 };
 
 #endif

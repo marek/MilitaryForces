@@ -1099,10 +1099,10 @@ void Key_KeynameCompletion( void(*callback)(const char *s) ) {
 
 /*
 ====================
-Key_CompleteUnbind
+Keys::completeUnbind
 ====================
 */
-static void Key_CompleteUnbind( char *args, int argNum )
+void Keys::completeUnbind( char *args, int argNum )
 {
 	if( argNum == 2 )
 	{
@@ -1116,10 +1116,10 @@ static void Key_CompleteUnbind( char *args, int argNum )
 
 /*
 ====================
-Key_CompleteBind
+Keys::completeBind
 ====================
 */
-static void Key_CompleteBind( char *args, int argNum )
+void Keys::completeBind( char *args, int argNum )
 {
 	char *p;
 
@@ -1149,21 +1149,21 @@ CL_InitKeyCommands
 void CL_InitKeyCommands( ) {
 	// register our functions
 	CommandSystem::addCommand ("bind",Key_Bind_f);
-	CommandSystem::setCommandCompletionFunc( "bind", Key_CompleteBind );
+	CommandSystem::setCommandCompletionFunc( "bind", Keys::completeBind );
 	CommandSystem::addCommand ("unbind",Key_Unbind_f);
-	CommandSystem::setCommandCompletionFunc( "unbind", Key_CompleteUnbind );
+	CommandSystem::setCommandCompletionFunc( "unbind", Keys::completeUnbind );
 	CommandSystem::addCommand ("unbindall",Key_Unbindall_f);
 	CommandSystem::addCommand ("bindlist",Key_Bindlist_f);
 }
 
 /*
 ===================
-CL_BindUICommand
+Keys::cL_BindUICommand
 
 Returns true if bind command should be executed while user interface is shown
 ===================
 */
-static bool CL_BindUICommand( const char *cmd ) {
+bool Keys::cL_BindUICommand( const char *cmd ) {
 	if ( Key_GetCatcher( ) & KEYCATCH_CONSOLE )
 		return false;
 
@@ -1221,7 +1221,7 @@ void CL_ParseBinding( int key, bool down, unsigned time )
 		else if( down )
 		{
 			// normal commands only execute on key press
-			if ( allCommands || CL_BindUICommand( p ) ) {
+			if ( allCommands || Keys::cL_BindUICommand( p ) ) {
 				CommandBuffer::addText( p );
 				CommandBuffer::addText( "\n" );
 			}

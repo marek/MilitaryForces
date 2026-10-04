@@ -78,10 +78,10 @@ static int  bufIndex;
 
 /*
 ===============
-SafeFS_Write
+Client::safeFS_Write
 ===============
 */
-static ID_INLINE void SafeFS_Write( const void *buf, int len, fileHandle_t f )
+ID_INLINE void Client::safeFS_Write( const void *buf, int len, fileHandle_t f )
 {
   if( FileSystem::write( buf, len, f ) < len )
     Common::error( ERR_DROP, "Failed to write avi file" );
@@ -89,10 +89,10 @@ static ID_INLINE void SafeFS_Write( const void *buf, int len, fileHandle_t f )
 
 /*
 ===============
-WRITE_STRING
+Client::wRITE_STRING
 ===============
 */
-static ID_INLINE void WRITE_STRING( const char *s )
+ID_INLINE void Client::wRITE_STRING( const char *s )
 {
   Com_Memcpy( &buffer[ bufIndex ], s, strlen( s ) );
   bufIndex += strlen( s );
@@ -100,10 +100,10 @@ static ID_INLINE void WRITE_STRING( const char *s )
 
 /*
 ===============
-WRITE_4BYTES
+Client::wRITE_4BYTES
 ===============
 */
-static ID_INLINE void WRITE_4BYTES( int x )
+ID_INLINE void Client::wRITE_4BYTES( int x )
 {
   buffer[ bufIndex + 0 ] = static_cast<byte>( ( x >>  0 ) & 0xFF );
   buffer[ bufIndex + 1 ] = static_cast<byte>( ( x >>  8 ) & 0xFF );
@@ -114,10 +114,10 @@ static ID_INLINE void WRITE_4BYTES( int x )
 
 /*
 ===============
-WRITE_2BYTES
+Client::wRITE_2BYTES
 ===============
 */
-static ID_INLINE void WRITE_2BYTES( int x )
+ID_INLINE void Client::wRITE_2BYTES( int x )
 {
   buffer[ bufIndex + 0 ] = static_cast<byte>( ( x >>  0 ) & 0xFF );
   buffer[ bufIndex + 1 ] = static_cast<byte>( ( x >>  8 ) & 0xFF );
@@ -126,10 +126,10 @@ static ID_INLINE void WRITE_2BYTES( int x )
 
 /*
 ===============
-START_CHUNK
+Client::sTART_CHUNK
 ===============
 */
-static ID_INLINE void START_CHUNK( const char *s )
+ID_INLINE void Client::sTART_CHUNK( const char *s )
 {
   if( afd.chunkStackTop == MAX_RIFF_CHUNKS )
   {
@@ -138,16 +138,16 @@ static ID_INLINE void START_CHUNK( const char *s )
 
   afd.chunkStack[ afd.chunkStackTop ] = bufIndex;
   afd.chunkStackTop++;
-  WRITE_STRING( s );
-  WRITE_4BYTES( 0 );
+  Client::wRITE_STRING( s );
+  Client::wRITE_4BYTES( 0 );
 }
 
 /*
 ===============
-END_CHUNK
+Client::eND_CHUNK
 ===============
 */
-static ID_INLINE void END_CHUNK( )
+ID_INLINE void Client::eND_CHUNK( )
 {
   int endIndex = bufIndex;
 
@@ -159,7 +159,7 @@ static ID_INLINE void END_CHUNK( )
   afd.chunkStackTop--;
   bufIndex = afd.chunkStack[ afd.chunkStackTop ];
   bufIndex += 4;
-  WRITE_4BYTES( endIndex - bufIndex - 4 );
+  Client::wRITE_4BYTES( endIndex - bufIndex - 4 );
   bufIndex = endIndex;
   bufIndex = PAD( bufIndex, 2 );
 }
@@ -174,142 +174,142 @@ void CL_WriteAVIHeader( )
   bufIndex = 0;
   afd.chunkStackTop = 0;
 
-  START_CHUNK( "RIFF" );
+  Client::sTART_CHUNK( "RIFF" );
   {
-    WRITE_STRING( "AVI " );
+    Client::wRITE_STRING( "AVI " );
     {
-      START_CHUNK( "LIST" );
+      Client::sTART_CHUNK( "LIST" );
       {
-        WRITE_STRING( "hdrl" );
-        WRITE_STRING( "avih" );
-        WRITE_4BYTES( 56 );                     //"avih" "chunk" size
-        WRITE_4BYTES( afd.framePeriod );        //dwMicroSecPerFrame
-        WRITE_4BYTES( afd.maxRecordSize *
+        Client::wRITE_STRING( "hdrl" );
+        Client::wRITE_STRING( "avih" );
+        Client::wRITE_4BYTES( 56 );                     //"avih" "chunk" size
+        Client::wRITE_4BYTES( afd.framePeriod );        //dwMicroSecPerFrame
+        Client::wRITE_4BYTES( afd.maxRecordSize *
             afd.frameRate );                    //dwMaxBytesPerSec
-        WRITE_4BYTES( 0 );                      //dwReserved1
-        WRITE_4BYTES( 0x110 );                  //dwFlags bits HAS_INDEX and IS_INTERLEAVED
-        WRITE_4BYTES( afd.numVideoFrames );     //dwTotalFrames
-        WRITE_4BYTES( 0 );                      //dwInitialFrame
+        Client::wRITE_4BYTES( 0 );                      //dwReserved1
+        Client::wRITE_4BYTES( 0x110 );                  //dwFlags bits HAS_INDEX and IS_INTERLEAVED
+        Client::wRITE_4BYTES( afd.numVideoFrames );     //dwTotalFrames
+        Client::wRITE_4BYTES( 0 );                      //dwInitialFrame
 
         if( afd.audio )                         //dwStreams
-          WRITE_4BYTES( 2 );
+          Client::wRITE_4BYTES( 2 );
         else
-          WRITE_4BYTES( 1 );
+          Client::wRITE_4BYTES( 1 );
 
-        WRITE_4BYTES( afd.maxRecordSize );      //dwSuggestedBufferSize
-        WRITE_4BYTES( afd.width );              //dwWidth
-        WRITE_4BYTES( afd.height );             //dwHeight
-        WRITE_4BYTES( 0 );                      //dwReserved[ 0 ]
-        WRITE_4BYTES( 0 );                      //dwReserved[ 1 ]
-        WRITE_4BYTES( 0 );                      //dwReserved[ 2 ]
-        WRITE_4BYTES( 0 );                      //dwReserved[ 3 ]
+        Client::wRITE_4BYTES( afd.maxRecordSize );      //dwSuggestedBufferSize
+        Client::wRITE_4BYTES( afd.width );              //dwWidth
+        Client::wRITE_4BYTES( afd.height );             //dwHeight
+        Client::wRITE_4BYTES( 0 );                      //dwReserved[ 0 ]
+        Client::wRITE_4BYTES( 0 );                      //dwReserved[ 1 ]
+        Client::wRITE_4BYTES( 0 );                      //dwReserved[ 2 ]
+        Client::wRITE_4BYTES( 0 );                      //dwReserved[ 3 ]
 
-        START_CHUNK( "LIST" );
+        Client::sTART_CHUNK( "LIST" );
         {
-          WRITE_STRING( "strl" );
-          WRITE_STRING( "strh" );
-          WRITE_4BYTES( 56 );                   //"strh" "chunk" size
-          WRITE_STRING( "vids" );
+          Client::wRITE_STRING( "strl" );
+          Client::wRITE_STRING( "strh" );
+          Client::wRITE_4BYTES( 56 );                   //"strh" "chunk" size
+          Client::wRITE_STRING( "vids" );
 
           if( afd.motionJpeg )
-            WRITE_STRING( "MJPG" );
+            Client::wRITE_STRING( "MJPG" );
           else
-            WRITE_4BYTES( 0 );                  // BI_RGB
+            Client::wRITE_4BYTES( 0 );                  // BI_RGB
 
-          WRITE_4BYTES( 0 );                    //dwFlags
-          WRITE_4BYTES( 0 );                    //dwPriority
-          WRITE_4BYTES( 0 );                    //dwInitialFrame
+          Client::wRITE_4BYTES( 0 );                    //dwFlags
+          Client::wRITE_4BYTES( 0 );                    //dwPriority
+          Client::wRITE_4BYTES( 0 );                    //dwInitialFrame
 
-          WRITE_4BYTES( 1 );                    //dwTimescale
-          WRITE_4BYTES( afd.frameRate );        //dwDataRate
-          WRITE_4BYTES( 0 );                    //dwStartTime
-          WRITE_4BYTES( afd.numVideoFrames );   //dwDataLength
+          Client::wRITE_4BYTES( 1 );                    //dwTimescale
+          Client::wRITE_4BYTES( afd.frameRate );        //dwDataRate
+          Client::wRITE_4BYTES( 0 );                    //dwStartTime
+          Client::wRITE_4BYTES( afd.numVideoFrames );   //dwDataLength
 
-          WRITE_4BYTES( afd.maxRecordSize );    //dwSuggestedBufferSize
-          WRITE_4BYTES( -1 );                   //dwQuality
-          WRITE_4BYTES( 0 );                    //dwSampleSize
-          WRITE_2BYTES( 0 );                    //rcFrame
-          WRITE_2BYTES( 0 );                    //rcFrame
-          WRITE_2BYTES( afd.width );            //rcFrame
-          WRITE_2BYTES( afd.height );           //rcFrame
+          Client::wRITE_4BYTES( afd.maxRecordSize );    //dwSuggestedBufferSize
+          Client::wRITE_4BYTES( -1 );                   //dwQuality
+          Client::wRITE_4BYTES( 0 );                    //dwSampleSize
+          Client::wRITE_2BYTES( 0 );                    //rcFrame
+          Client::wRITE_2BYTES( 0 );                    //rcFrame
+          Client::wRITE_2BYTES( afd.width );            //rcFrame
+          Client::wRITE_2BYTES( afd.height );           //rcFrame
 
-          WRITE_STRING( "strf" );
-          WRITE_4BYTES( 40 );                   //"strf" "chunk" size
-          WRITE_4BYTES( 40 );                   //biSize
-          WRITE_4BYTES( afd.width );            //biWidth
-          WRITE_4BYTES( afd.height );           //biHeight
-          WRITE_2BYTES( 1 );                    //biPlanes
-          WRITE_2BYTES( 24 );                   //biBitCount
+          Client::wRITE_STRING( "strf" );
+          Client::wRITE_4BYTES( 40 );                   //"strf" "chunk" size
+          Client::wRITE_4BYTES( 40 );                   //biSize
+          Client::wRITE_4BYTES( afd.width );            //biWidth
+          Client::wRITE_4BYTES( afd.height );           //biHeight
+          Client::wRITE_2BYTES( 1 );                    //biPlanes
+          Client::wRITE_2BYTES( 24 );                   //biBitCount
 
           if( afd.motionJpeg )                  //biCompression
           {
-            WRITE_STRING( "MJPG" );
-            WRITE_4BYTES( afd.width *
+            Client::wRITE_STRING( "MJPG" );
+            Client::wRITE_4BYTES( afd.width *
                 afd.height );                   //biSizeImage
           }
           else
           {
-            WRITE_4BYTES( 0 );                  // BI_RGB
-            WRITE_4BYTES( afd.width *
+            Client::wRITE_4BYTES( 0 );                  // BI_RGB
+            Client::wRITE_4BYTES( afd.width *
                 afd.height * 3 );               //biSizeImage
           }
 
-          WRITE_4BYTES( 0 );                    //biXPelsPetMeter
-          WRITE_4BYTES( 0 );                    //biYPelsPetMeter
-          WRITE_4BYTES( 0 );                    //biClrUsed
-          WRITE_4BYTES( 0 );                    //biClrImportant
+          Client::wRITE_4BYTES( 0 );                    //biXPelsPetMeter
+          Client::wRITE_4BYTES( 0 );                    //biYPelsPetMeter
+          Client::wRITE_4BYTES( 0 );                    //biClrUsed
+          Client::wRITE_4BYTES( 0 );                    //biClrImportant
         }
-        END_CHUNK( );
+        Client::eND_CHUNK( );
 
         if( afd.audio )
         {
-          START_CHUNK( "LIST" );
+          Client::sTART_CHUNK( "LIST" );
           {
-            WRITE_STRING( "strl" );
-            WRITE_STRING( "strh" );
-            WRITE_4BYTES( 56 );                 //"strh" "chunk" size
-            WRITE_STRING( "auds" );
-            WRITE_4BYTES( 0 );                  //FCC
-            WRITE_4BYTES( 0 );                  //dwFlags
-            WRITE_4BYTES( 0 );                  //dwPriority
-            WRITE_4BYTES( 0 );                  //dwInitialFrame
+            Client::wRITE_STRING( "strl" );
+            Client::wRITE_STRING( "strh" );
+            Client::wRITE_4BYTES( 56 );                 //"strh" "chunk" size
+            Client::wRITE_STRING( "auds" );
+            Client::wRITE_4BYTES( 0 );                  //FCC
+            Client::wRITE_4BYTES( 0 );                  //dwFlags
+            Client::wRITE_4BYTES( 0 );                  //dwPriority
+            Client::wRITE_4BYTES( 0 );                  //dwInitialFrame
 
-            WRITE_4BYTES( afd.a.sampleSize );   //dwTimescale
-            WRITE_4BYTES( afd.a.sampleSize *
+            Client::wRITE_4BYTES( afd.a.sampleSize );   //dwTimescale
+            Client::wRITE_4BYTES( afd.a.sampleSize *
                 afd.a.rate );                   //dwDataRate
-            WRITE_4BYTES( 0 );                  //dwStartTime
-            WRITE_4BYTES( afd.a.totalBytes /
+            Client::wRITE_4BYTES( 0 );                  //dwStartTime
+            Client::wRITE_4BYTES( afd.a.totalBytes /
                 afd.a.sampleSize );             //dwDataLength
 
-            WRITE_4BYTES( 0 );                  //dwSuggestedBufferSize
-            WRITE_4BYTES( -1 );                 //dwQuality
-            WRITE_4BYTES( afd.a.sampleSize );   //dwSampleSize
-            WRITE_2BYTES( 0 );                  //rcFrame
-            WRITE_2BYTES( 0 );                  //rcFrame
-            WRITE_2BYTES( 0 );                  //rcFrame
-            WRITE_2BYTES( 0 );                  //rcFrame
+            Client::wRITE_4BYTES( 0 );                  //dwSuggestedBufferSize
+            Client::wRITE_4BYTES( -1 );                 //dwQuality
+            Client::wRITE_4BYTES( afd.a.sampleSize );   //dwSampleSize
+            Client::wRITE_2BYTES( 0 );                  //rcFrame
+            Client::wRITE_2BYTES( 0 );                  //rcFrame
+            Client::wRITE_2BYTES( 0 );                  //rcFrame
+            Client::wRITE_2BYTES( 0 );                  //rcFrame
 
-            WRITE_STRING( "strf" );
-            WRITE_4BYTES( 18 );                 //"strf" "chunk" size
-            WRITE_2BYTES( afd.a.format );       //wFormatTag
-            WRITE_2BYTES( afd.a.channels );     //nChannels
-            WRITE_4BYTES( afd.a.rate );         //nSamplesPerSec
-            WRITE_4BYTES( afd.a.sampleSize *
+            Client::wRITE_STRING( "strf" );
+            Client::wRITE_4BYTES( 18 );                 //"strf" "chunk" size
+            Client::wRITE_2BYTES( afd.a.format );       //wFormatTag
+            Client::wRITE_2BYTES( afd.a.channels );     //nChannels
+            Client::wRITE_4BYTES( afd.a.rate );         //nSamplesPerSec
+            Client::wRITE_4BYTES( afd.a.sampleSize *
                 afd.a.rate );                   //nAvgBytesPerSec
-            WRITE_2BYTES( afd.a.sampleSize );   //nBlockAlign
-            WRITE_2BYTES( afd.a.bits );         //wBitsPerSample
-            WRITE_2BYTES( 0 );                  //cbSize
+            Client::wRITE_2BYTES( afd.a.sampleSize );   //nBlockAlign
+            Client::wRITE_2BYTES( afd.a.bits );         //wBitsPerSample
+            Client::wRITE_2BYTES( 0 );                  //cbSize
           }
-          END_CHUNK( );
+          Client::eND_CHUNK( );
         }
       }
-      END_CHUNK( );
+      Client::eND_CHUNK( );
 
       afd.moviOffset = bufIndex;
 
-      START_CHUNK( "LIST" );
+      Client::sTART_CHUNK( "LIST" );
       {
-        WRITE_STRING( "movi" );
+        Client::wRITE_STRING( "movi" );
       }
     }
   }
@@ -414,12 +414,12 @@ bool Client::openAVIForWriting( const char *fileName )
   // correct amount of space at the beginning of the file
   CL_WriteAVIHeader( );
 
-  SafeFS_Write( buffer, bufIndex, afd.f );
+  Client::safeFS_Write( buffer, bufIndex, afd.f );
   afd.fileSize = bufIndex;
 
   bufIndex = 0;
-  START_CHUNK( "idx1" );
-  SafeFS_Write( buffer, bufIndex, afd.idxF );
+  Client::sTART_CHUNK( "idx1" );
+  Client::safeFS_Write( buffer, bufIndex, afd.idxF );
 
   afd.moviSize = 4; // For the "movi"
   afd.fileOpen = true;
@@ -429,10 +429,10 @@ bool Client::openAVIForWriting( const char *fileName )
 
 /*
 ===============
-CL_CheckFileSize
+Client::checkFileSize
 ===============
 */
-static bool CL_CheckFileSize( int bytesToAdd )
+bool Client::checkFileSize( int bytesToAdd )
 {
   unsigned int newFileSize;
 
@@ -474,16 +474,16 @@ void CL_WriteAVIVideoFrame( const byte *imageBuffer, int size )
     return;
 
   // Chunk header + contents + padding
-  if( CL_CheckFileSize( 8 + size + 2 ) )
+  if( Client::checkFileSize( 8 + size + 2 ) )
     return;
 
   bufIndex = 0;
-  WRITE_STRING( "00dc" );
-  WRITE_4BYTES( size );
+  Client::wRITE_STRING( "00dc" );
+  Client::wRITE_4BYTES( size );
 
-  SafeFS_Write( buffer, 8, afd.f );
-  SafeFS_Write( imageBuffer, size, afd.f );
-  SafeFS_Write( padding, paddingSize, afd.f );
+  Client::safeFS_Write( buffer, 8, afd.f );
+  Client::safeFS_Write( imageBuffer, size, afd.f );
+  Client::safeFS_Write( padding, paddingSize, afd.f );
   afd.fileSize += ( chunkSize + paddingSize );
 
   afd.numVideoFrames++;
@@ -494,11 +494,11 @@ void CL_WriteAVIVideoFrame( const byte *imageBuffer, int size )
 
   // Index
   bufIndex = 0;
-  WRITE_STRING( "00dc" );           //dwIdentifier
-  WRITE_4BYTES( 0x00000010 );       //dwFlags (all frames are KeyFrames)
-  WRITE_4BYTES( chunkOffset );      //dwOffset
-  WRITE_4BYTES( size );             //dwLength
-  SafeFS_Write( buffer, 16, afd.idxF );
+  Client::wRITE_STRING( "00dc" );           //dwIdentifier
+  Client::wRITE_4BYTES( 0x00000010 );       //dwFlags (all frames are KeyFrames)
+  Client::wRITE_4BYTES( chunkOffset );      //dwOffset
+  Client::wRITE_4BYTES( size );             //dwLength
+  Client::safeFS_Write( buffer, 16, afd.idxF );
 
   afd.numIndices++;
 }
@@ -522,7 +522,7 @@ void Client::writeAVIAudioFrame( const byte *pcmBuffer, int size )
     return;
 
   // Chunk header + contents + padding
-  if( CL_CheckFileSize( 8 + bytesInBuffer + size + 2 ) )
+  if( Client::checkFileSize( 8 + bytesInBuffer + size + 2 ) )
     return;
 
   if( bytesInBuffer + size > PCM_BUFFER_SIZE )
@@ -545,12 +545,12 @@ void Client::writeAVIAudioFrame( const byte *pcmBuffer, int size )
     byte  padding[ 4 ] = { 0 };
 
     bufIndex = 0;
-    WRITE_STRING( "01wb" );
-    WRITE_4BYTES( bytesInBuffer );
+    Client::wRITE_STRING( "01wb" );
+    Client::wRITE_4BYTES( bytesInBuffer );
 
-    SafeFS_Write( buffer, 8, afd.f );
-    SafeFS_Write( pcmCaptureBuffer, bytesInBuffer, afd.f );
-    SafeFS_Write( padding, paddingSize, afd.f );
+    Client::safeFS_Write( buffer, 8, afd.f );
+    Client::safeFS_Write( pcmCaptureBuffer, bytesInBuffer, afd.f );
+    Client::safeFS_Write( padding, paddingSize, afd.f );
     afd.fileSize += ( chunkSize + paddingSize );
 
     afd.numAudioFrames++;
@@ -559,11 +559,11 @@ void Client::writeAVIAudioFrame( const byte *pcmBuffer, int size )
 
     // Index
     bufIndex = 0;
-    WRITE_STRING( "01wb" );           //dwIdentifier
-    WRITE_4BYTES( 0 );                //dwFlags
-    WRITE_4BYTES( chunkOffset );      //dwOffset
-    WRITE_4BYTES( bytesInBuffer );    //dwLength
-    SafeFS_Write( buffer, 16, afd.idxF );
+    Client::wRITE_STRING( "01wb" );           //dwIdentifier
+    Client::wRITE_4BYTES( 0 );                //dwFlags
+    Client::wRITE_4BYTES( chunkOffset );      //dwOffset
+    Client::wRITE_4BYTES( bytesInBuffer );    //dwLength
+    Client::safeFS_Write( buffer, 16, afd.idxF );
 
     afd.numIndices++;
 
@@ -607,8 +607,8 @@ bool Client::closeAVI( )
 
   FileSystem::seek( afd.idxF, 4, FS_SEEK_SET );
   bufIndex = 0;
-  WRITE_4BYTES( indexSize );
-  SafeFS_Write( buffer, bufIndex, afd.idxF );
+  Client::wRITE_4BYTES( indexSize );
+  Client::safeFS_Write( buffer, bufIndex, afd.idxF );
   FileSystem::fCloseFile( afd.idxF );
 
   // Write index
@@ -627,12 +627,12 @@ bool Client::closeAVI( )
   while( indexRemainder > MAX_AVI_BUFFER )
   {
     FileSystem::read( buffer, MAX_AVI_BUFFER, afd.idxF );
-    SafeFS_Write( buffer, MAX_AVI_BUFFER, afd.f );
+    Client::safeFS_Write( buffer, MAX_AVI_BUFFER, afd.f );
     afd.fileSize += MAX_AVI_BUFFER;
     indexRemainder -= MAX_AVI_BUFFER;
   }
   FileSystem::read( buffer, indexRemainder, afd.idxF );
-  SafeFS_Write( buffer, indexRemainder, afd.f );
+  Client::safeFS_Write( buffer, indexRemainder, afd.f );
   afd.fileSize += indexRemainder;
   FileSystem::fCloseFile( afd.idxF );
 
@@ -644,12 +644,12 @@ bool Client::closeAVI( )
   CL_WriteAVIHeader( );
 
   bufIndex = 4;
-  WRITE_4BYTES( afd.fileSize - 8 ); // "RIFF" size
+  Client::wRITE_4BYTES( afd.fileSize - 8 ); // "RIFF" size
 
   bufIndex = afd.moviOffset + 4;    // Skip "LIST"
-  WRITE_4BYTES( afd.moviSize );
+  Client::wRITE_4BYTES( afd.moviSize );
 
-  SafeFS_Write( buffer, bufIndex, afd.f );
+  Client::safeFS_Write( buffer, bufIndex, afd.f );
 
   Z_Free( afd.cBuffer );
   Z_Free( afd.eBuffer );

@@ -610,13 +610,13 @@ void SendPendingPredictableEvents( playerState_t *ps )
 	}
 }
 
-static void RiderAngles( GameClient *rider, GameClient *pilot, vec3_t out )
+void Game::riderAngles( GameClient *rider, GameClient *pilot, vec3_t out )
 {
 	for( int i = 0; i < 3; i++ ) 
 		out[i] = SHORT2ANGLE( (short)( rider->pers_.cmd_.angles[i] + pilot->ps_.delta_angles[i] ) );
 }
 
-static bool RiderVehicleValid( GameClient *pilot, GameEntity *veh )
+bool Game::riderVehicleValid( GameClient *pilot, GameEntity *veh )
 {
 	if( !pilot || !veh || pilot->pers_.connected_ != GameClient::ClientPersistant::CON_CONNECTED ) 
 		return false;
@@ -629,23 +629,23 @@ static bool RiderVehicleValid( GameClient *pilot, GameEntity *veh )
 	return true;
 }
 
-static void RiderThink( GameEntity *ent )
+void Game::riderThink( GameEntity *ent )
 {
 	GameClient* client = ent->client_;
 	int pilotNum = client->sess_.ridingClient_;
 
 	client->ps_.commandTime = client->pers_.cmd_.serverTime;
-	if( !RiderVehicleValid( theLevel.getClient( pilotNum ), theLevel.getEntity( pilotNum ) ) ) 
+	if( !Game::riderVehicleValid( theLevel.getClient( pilotNum ), theLevel.getEntity( pilotNum ) ) ) 
 		Rider_Leave( ent, true );
 }
 
-static void RiderEndFrame( GameEntity *ent )
+void Game::riderEndFrame( GameEntity *ent )
 {
 	GameClient* client = ent->client_;
 	int pilotNum = client->sess_.ridingClient_;
 	GameClient* pilot = theLevel.getClient( pilotNum );
 
-	if( !RiderVehicleValid( pilot, theLevel.getEntity( pilotNum ) ) ) 
+	if( !Game::riderVehicleValid( pilot, theLevel.getEntity( pilotNum ) ) ) 
 		return;
 
 	int flags = (pilot->ps_.eFlags & ~(EF_VOTED | EF_TEAMVOTED)) | (client->ps_.eFlags & (EF_VOTED | EF_TEAMVOTED));
@@ -655,7 +655,7 @@ static void RiderEndFrame( GameEntity *ent )
 	client->ps_.eFlags = flags;
 	client->ps_.commandTime = commandTime;
 	if( client->sess_.seat_ == 1 && VehicleData::vehicleHasTurret( pilot->vehicle_ ) ) 
-		RiderAngles( client, pilot, client->ps_.viewangles );
+		Game::riderAngles( client, pilot, client->ps_.viewangles );
 
 	ent->s.eType = ET_INVISIBLE;
 	ent->s.vehicleEnt = pilotNum;
@@ -705,7 +705,7 @@ void ClientThink_real( GameEntity *ent )
 
 	if( client->sess_.ridingClient_ >= 0 ) 
 	{
-		RiderThink( ent );
+		Game::riderThink( ent );
 		return;
 	}
 
@@ -885,7 +885,7 @@ void ClientThink_real( GameEntity *ent )
 			if( !rider || rider->pers_.connected_ != GameClient::ClientPersistant::CON_CONNECTED ||
 				rider->sess_.ridingClient_ != ent->s.number || rider->sess_.seat_ != 1 ) 
 				continue;
-			RiderAngles( rider, client, gunnerAngles );
+			Game::riderAngles( rider, client, gunnerAngles );
 			pm.gunnerAngles = gunnerAngles;
 			if( availableWeapons[client->ps_.weaponIndex].turret ) 
 			{
@@ -1113,7 +1113,7 @@ void ClientEndFrame( GameEntity *ent )
 
 	if( ent->client_->sess_.ridingClient_ >= 0 ) 
 	{
-		RiderEndFrame( ent );
+		Game::riderEndFrame( ent );
 		return;
 	}
 

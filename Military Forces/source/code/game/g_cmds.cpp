@@ -916,7 +916,7 @@ G_Say
 ==================
 */
 
-static void G_SayTo( GameEntity *ent, GameEntity *other, int mode, int color, const char *name, const char *message )
+void Game::sayTo( GameEntity *ent, GameEntity *other, int mode, int color, const char *name, const char *message )
 {
 	if( !other ) 
 		return;
@@ -987,7 +987,7 @@ void G_Say( GameEntity *ent, GameEntity *target, int mode, const char *chatText 
 
 	if( target ) 
 	{
-		G_SayTo( ent, target, mode, color, name, text );
+		Game::sayTo( ent, target, mode, color, name, text );
 		return;
 	}
 
@@ -1001,17 +1001,17 @@ void G_Say( GameEntity *ent, GameEntity *target, int mode, const char *chatText 
 		GameEntity* other = theLevel.getEntity(j);
 		if( !other )
 			continue;
-		G_SayTo( ent, other, mode, color, name, text );
+		Game::sayTo( ent, other, mode, color, name, text );
 	}
 }
 
 
 /*
 ==================
-Cmd_Say_f
+Game::cmd_Say_f
 ==================
 */
-static void Cmd_Say_f( GameEntity *ent, int mode, bool arg0 ) 
+void Game::cmd_Say_f( GameEntity *ent, int mode, bool arg0 ) 
 {
 	char		*p;
 
@@ -1028,10 +1028,10 @@ static void Cmd_Say_f( GameEntity *ent, int mode, bool arg0 )
 
 /*
 ==================
-Cmd_Tell_f
+Game::cmd_Tell_f
 ==================
 */
-static void Cmd_Tell_f( GameEntity* ent ) 
+void Game::cmd_Tell_f( GameEntity* ent ) 
 {
 	if( CommandSystem::argc () < 2 ) 
 		return;
@@ -1531,7 +1531,7 @@ void Cmd_TeamVote_f( GameEntity *ent )
 }
 
 
-static void Rider_SetVehicle( int clientNum, int vehicle )
+void Game::rider_SetVehicle( int clientNum, int vehicle )
 {
 	char userinfo[MAX_INFO_STRING];
 	SV_GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
@@ -1584,7 +1584,7 @@ void Rider_Leave( GameEntity *ent, bool forced )
 	client->sess_.seat_ = 0;
 	if( pilot && pilot->pers_.connected_ == GameClient::ClientPersistant::CON_CONNECTED ) 
 		SV_GameSendServerCommand( pilotNum, va( "print \"%s^7 left your vehicle\n\"", client->pers_.netname_ ) );
-	Rider_SetVehicle( ent->s.number, client->vehicle_ );
+	Game::rider_SetVehicle( ent->s.number, client->vehicle_ );
 	switch_vehicle( ent );
 }
 
@@ -1604,7 +1604,7 @@ void Rider_KillAll( GameEntity *vehicle, GameEntity *attacker )
 		VectorCopy( vehicle->r.currentOrigin, rider->ps_.origin );
 		rider->sess_.ridingClient_ = -1;
 		rider->sess_.seat_ = 0;
-		Rider_SetVehicle( i, rider->vehicle_ );
+		Game::rider_SetVehicle( i, rider->vehicle_ );
 		switch_vehicle( theLevel.getEntity( i ) );
 		GameEntity* body = theLevel.getEntity( i );
 		if( body && body->health_ > 0 ) 
@@ -1614,10 +1614,10 @@ void Rider_KillAll( GameEntity *vehicle, GameEntity *attacker )
 
 /*
 =================
-Rider_Board
+Game::rider_Board
 =================
 */
-static bool Rider_Board( GameEntity *ent )
+bool Game::rider_Board( GameEntity *ent )
 {
 	GameClient* client = ent->client_;
 
@@ -1667,10 +1667,10 @@ static bool Rider_Board( GameEntity *ent )
 
 /*
 =================
-Cmd_Enter
+Game::cmd_Enter
 =================
 */
-static void Cmd_Enter( GameEntity *ent )
+void Game::cmd_Enter( GameEntity *ent )
 {
 	GameClient* client = ent->client_;
 	int touch[MAX_GENTITIES];
@@ -1704,7 +1704,7 @@ static void Cmd_Enter( GameEntity *ent )
 	}
 	if( !best ) 
 	{
-		Rider_Board( ent );
+		Game::rider_Board( ent );
 		return;
 	}
 
@@ -1769,7 +1769,7 @@ void Cmd_Eject_f( GameEntity *ent )
 	int vehicle = client->vehicle_;
 	if( availableVehicles[vehicle].cat & CAT_LQM ) 
 	{
-		Cmd_Enter( ent );
+		Game::cmd_Enter( ent );
 		return;
 	}
 	bool onGround = (availableVehicles[vehicle].cat & (CAT_GROUND|CAT_BOAT)) != 0;
@@ -1869,17 +1869,17 @@ void ClientCommand( int clientNum )
 
 	if( Q_stricmp( cmd, "say") == 0 ) 
 	{
-		Cmd_Say_f( ent, SAY_ALL, false );
+		Game::cmd_Say_f( ent, SAY_ALL, false );
 		return;
 	}
 	if( Q_stricmp( cmd, "say_team" ) == 0 ) 
 	{
-		Cmd_Say_f( ent, SAY_TEAM, false );
+		Game::cmd_Say_f( ent, SAY_TEAM, false );
 		return;
 	}
 	if( Q_stricmp( cmd, "tell" ) == 0 )
 	{
-		Cmd_Tell_f( ent );
+		Game::cmd_Tell_f( ent );
 		return;
 	}
 	if( Q_stricmp( cmd, "score" ) == 0 )
@@ -1891,7 +1891,7 @@ void ClientCommand( int clientNum )
 	// ignore all other commands when at intermission
 	if( theLevel.intermissiontime_ )
 	{
-		Cmd_Say_f (ent, false, true);
+		Game::cmd_Say_f (ent, false, true);
 		return;
 	}
 

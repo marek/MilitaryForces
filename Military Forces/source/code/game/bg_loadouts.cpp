@@ -16,7 +16,7 @@ VehicleData::distributeWeaponsOnPylons
 weapon mount info
 =================
 */
-static int QDECL MF_posCompare( const void* a, const void* b )
+int QDECL VehicleData::posCompare( const void* a, const void* b )
 {
 	int p1 = ((mountInfo_t*)a)->pos;
 	int p2 = ((mountInfo_t*)b)->pos;
@@ -71,7 +71,7 @@ bool VehicleData::distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout
 	}
 
 	// sort
-	qsort(&loadout->mounts[0], num, sizeof(loadout->mounts[0]), MF_posCompare );
+	qsort(&loadout->mounts[0], num, sizeof(loadout->mounts[0]), VehicleData::posCompare );
 
 	// fill
 	for( i = WP_WEAPON1; i < WP_FLARE; ++i ) {

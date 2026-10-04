@@ -460,10 +460,10 @@ void Client::systemInfoChanged( ) {
 
 /*
 ==================
-CL_ParseServerInfo
+Client::parseServerInfo
 ==================
 */
-static void CL_ParseServerInfo()
+void Client::parseServerInfo()
 {
 	const char *serverInfo;
 
@@ -549,7 +549,7 @@ void CL_ParseGamestate( Message *msg ) {
 	CvarSystem::variableStringBuffer("fs_game", oldGame, sizeof(oldGame));
 
 	// parse useful values out of CS_SERVERINFO
-	CL_ParseServerInfo();
+	Client::parseServerInfo();
 
 	// parse serverId and other cvars
 	Client::systemInfoChanged();
@@ -675,8 +675,7 @@ void CL_ParseDownload ( Message *msg ) {
 }
 
 #ifdef USE_VOIP
-static
-bool CL_ShouldIgnoreVoipSender(int sender)
+bool Client::shouldIgnoreVoipSender(int sender)
 {
 	if (!cl_voip->integer)
 		return true;  // VoIP is disabled.
@@ -694,13 +693,13 @@ bool CL_ShouldIgnoreVoipSender(int sender)
 
 /*
 =====================
-CL_PlayVoip
+Client::playVoip
 
 Play raw data
 =====================
 */
 
-static void CL_PlayVoip(int sender, int samplecnt, const byte *data, int flags)
+void Client::playVoip(int sender, int samplecnt, const byte *data, int flags)
 {
 	if(flags & VOIP_DIRECT)
 	{
@@ -717,13 +716,12 @@ static void CL_PlayVoip(int sender, int samplecnt, const byte *data, int flags)
 
 /*
 =====================
-CL_ParseVoip
+Client::parseVoip
 
 A VoIP message has been received from the server
 =====================
 */
-static
-void CL_ParseVoip ( Message *msg, bool ignoreData ) {
+void Client::parseVoip( Message *msg, bool ignoreData ) {
 	static short decoded[VOIP_MAX_PACKET_SAMPLES*4]; // !!! FIXME: don't hard code
 
 	const int sender = msg->readShort();
@@ -771,7 +769,7 @@ void CL_ParseVoip ( Message *msg, bool ignoreData ) {
 		return;   // can't handle VoIP without libopus!
 	} else if (sender >= MAX_CLIENTS) {
 		return;   // bogus sender.
-	} else if (CL_ShouldIgnoreVoipSender(sender)) {
+	} else if (Client::shouldIgnoreVoipSender(sender)) {
 		return;   // Channel is muted, bail.
 	}
 
@@ -839,7 +837,7 @@ void CL_ParseVoip ( Message *msg, bool ignoreData ) {
 	            written * 2, written, frames);
 
 	if(written > 0)
-		CL_PlayVoip(sender, written, reinterpret_cast<const byte *>(decoded), flags);
+		Client::playVoip(sender, written, reinterpret_cast<const byte *>(decoded), flags);
 
 	clc.voipIncomingSequence[sender] = sequence + frames;
 }
@@ -941,12 +939,12 @@ void Client::parseServerMessage( Message *msg ) {
 			break;
 		case svc_voipSpeex:
 #ifdef USE_VOIP
-			CL_ParseVoip( msg, true );
+			Client::parseVoip( msg, true );
 #endif
 			break;
 		case svc_voipOpus:
 #ifdef USE_VOIP
-			CL_ParseVoip( msg, !clc.voipEnabled );
+			Client::parseVoip( msg, !clc.voipEnabled );
 #endif
 			break;
 		}

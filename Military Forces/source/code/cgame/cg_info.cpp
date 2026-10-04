@@ -41,7 +41,7 @@ ClientGame::loadingString
 
 ======================
 */
-static void CG_LoadingRefresh( bool force ) {
+void ClientGame::loadingRefresh( bool force ) {
 	int hz = cgs.glconfig.displayFrequency > 0 ? cgs.glconfig.displayFrequency : 60;
 	int now = System::milliseconds();
 
@@ -56,7 +56,7 @@ static void CG_LoadingRefresh( bool force ) {
 void ClientGame::loadingString( const char *s ) {
 	Q_strncpyz( cg.infoScreenText, s, sizeof( cg.infoScreenText ) );
 
-	CG_LoadingRefresh( false );
+	ClientGame::loadingRefresh( false );
 }
 
 void ClientGame::loadingStage( const char *s, float start, float end ) {
@@ -65,7 +65,7 @@ void ClientGame::loadingStage( const char *s, float start, float end ) {
 	cg.infoLoadEnd = end;
 	cg.infoLoadFraction = start;
 
-	CG_LoadingRefresh( true );
+	ClientGame::loadingRefresh( true );
 }
 
 void ClientGame::loadingStep( int done, int total ) {
@@ -73,7 +73,7 @@ void ClientGame::loadingStep( int done, int total ) {
 		cg.infoLoadFraction = cg.infoLoadStart + ( cg.infoLoadEnd - cg.infoLoadStart ) * done / total;
 	}
 
-	CG_LoadingRefresh( false );
+	ClientGame::loadingRefresh( false );
 }
 
 

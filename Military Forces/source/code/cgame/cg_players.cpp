@@ -57,10 +57,10 @@ sfxHandle_t	ClientGame::customSound( int clientNum, const char *soundName ) {
 
 /*
 ====================
-CG_ColorFromString
+ClientGame::colorFromString
 ====================
 */
-static void CG_ColorFromString( const char *v, vec3_t color ) {
+void ClientGame::colorFromString( const char *v, vec3_t color ) {
 	int val;
 
 	VectorClear( color );
@@ -112,7 +112,7 @@ void ClientGame::newClientInfo( int clientNum ) {
 
 	// colors
 	v = Info::valueForKey( configstring, "c1" );
-	CG_ColorFromString( v, newInfo.color );
+	ClientGame::colorFromString( v, newInfo.color );
 
 	// bot skill
 	v = Info::valueForKey( configstring, "skill" );

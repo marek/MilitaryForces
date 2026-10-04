@@ -365,7 +365,6 @@ Get the catagory/class enum from the vehicle index (use CAT_ANY & CLASS_ANY to d
 =================
 */
 
-static void MF_findDeck( const char *name, completeVehicleData_t *veh );
 
 void VehicleData::loadAllVehicleData()
 {
@@ -395,7 +394,7 @@ void VehicleData::loadAllVehicleData()
 			VehicleData::getDimensions( name, 0, &availableVehicles[i].maxs, &availableVehicles[i].mins );
 		availableVehicles[i].mins[2] += 1;// to look better ?
 		if( availableVehicles[i].cat & CAT_BOAT ) 
-			MF_findDeck( name, &availableVehicles[i] );
+			VehicleData::findDeck( name, &availableVehicles[i] );
 		if( availableVehicles[i].cat & (CAT_HELO|CAT_BOAT) ) 
 			availableVehicles[i].seats = 4;
 		else if( availableVehicles[i].cat & CAT_GROUND ) 
@@ -592,7 +591,7 @@ Mission script parsing
 */
 
 
-static void MF_ParseOverview( char **buf, mission_overview_t* overview ) 
+void VehicleData::parseOverview( char **buf, mission_overview_t* overview ) 
 {
 	char	*token;
 	char	info[MAX_INFO_STRING];
@@ -678,7 +677,7 @@ static void MF_ParseOverview( char **buf, mission_overview_t* overview )
 }
 
 
-static void MF_ParseWaypoints( char **buf, mission_vehicle_t* veh ) 
+void VehicleData::parseWaypoints( char **buf, mission_vehicle_t* veh ) 
 {
 	char	*token;
 	int		num = 0;
@@ -728,7 +727,7 @@ static void MF_ParseWaypoints( char **buf, mission_vehicle_t* veh )
 	}
 }
 
-static void MF_ParseVehicle( char **buf, mission_vehicle_t* veh ) 
+void VehicleData::parseVehicle( char **buf, mission_vehicle_t* veh ) 
 {
 	char	*token;
 
@@ -830,13 +829,13 @@ static void MF_ParseVehicle( char **buf, mission_vehicle_t* veh )
 		}
 		else if( !strcmp( token, "Waypoints" ) )
 		{
-			MF_ParseWaypoints(buf, veh);
+			VehicleData::parseWaypoints(buf, veh);
 		}
 	}
 	veh->used = true;
 }
 
-static void MF_ParseGroundInstallation( char **buf, mission_groundInstallation_t* gi ) 
+void VehicleData::parseGroundInstallation( char **buf, mission_groundInstallation_t* gi ) 
 {
 	char	*token;
 
@@ -931,7 +930,7 @@ static void MF_ParseGroundInstallation( char **buf, mission_groundInstallation_t
 	gi->used = true;
 }
 
-static void MF_ResolveMissionVehicle( mission_vehicle_t* veh )
+void VehicleData::resolveMissionVehicle( mission_vehicle_t* veh )
 {
 	int i, best = -1;
 
@@ -967,7 +966,7 @@ static void MF_ResolveMissionVehicle( mission_vehicle_t* veh )
 	}
 }
 
-static void MF_ResolveMissionGroundInstallation( mission_groundInstallation_t* gi )
+void VehicleData::resolveMissionGroundInstallation( mission_groundInstallation_t* gi )
 {
 	int i;
 	const char *name = gi->descriptivename[0] ? gi->descriptivename : gi->objectname;
@@ -986,7 +985,7 @@ static void MF_ResolveMissionGroundInstallation( mission_groundInstallation_t* g
 	Common::printf( S_COLOR_YELLOW "Mission ground installation '%s' not found, using index %d\n", name, gi->index );
 }
 
-static void MF_ParseEntities( char **buf, 
+void VehicleData::parseEntities( char **buf, 
 						  mission_vehicle_t* vehs, 
 						  mission_groundInstallation_t* gis ) 
 {
@@ -1021,11 +1020,11 @@ static void MF_ParseEntities( char **buf,
 			{
 				mission_vehicle_t skipped;
 				Common::printf( "Too many vehicles in mission, ignoring the rest\n" );
-				MF_ParseVehicle(buf, &skipped);
+				VehicleData::parseVehicle(buf, &skipped);
 				continue;
 			}
-			MF_ParseVehicle(buf, &vehs[numVeh]);
-			MF_ResolveMissionVehicle(&vehs[numVeh]);
+			VehicleData::parseVehicle(buf, &vehs[numVeh]);
+			VehicleData::resolveMissionVehicle(&vehs[numVeh]);
 			++numVeh;
 			continue;
 		}
@@ -1035,11 +1034,11 @@ static void MF_ParseEntities( char **buf,
 			{
 				mission_groundInstallation_t skipped;
 				Common::printf( "Too many ground installations in mission, ignoring the rest\n" );
-				MF_ParseGroundInstallation(buf, &skipped);
+				VehicleData::parseGroundInstallation(buf, &skipped);
 				continue;
 			}
-			MF_ParseGroundInstallation(buf, &gis[numGI]);
-			MF_ResolveMissionGroundInstallation(&gis[numGI]);
+			VehicleData::parseGroundInstallation(buf, &gis[numGI]);
+			VehicleData::resolveMissionGroundInstallation(&gis[numGI]);
 			++numGI;
 			continue;
 		}
@@ -1076,12 +1075,12 @@ void VehicleData::parseMissionScripts( char *buf,
 		}
 		else if( !strcmp(token, "Overview" ) )
 		{
-			MF_ParseOverview(&buf, overview);
+			VehicleData::parseOverview(&buf, overview);
 			continue;
 		}
 		else if( !strcmp(token, "Entities" ) )
 		{
-			MF_ParseEntities(&buf, vehs, gis);
+			VehicleData::parseEntities(&buf, vehs, gis);
 			continue;
 		}
 		else
@@ -1095,7 +1094,7 @@ void VehicleData::parseMissionScripts( char *buf,
 
 constexpr int DECK_GRID = 12;
 
-static void MF_findDeck( const char *name, completeVehicleData_t *veh )
+void VehicleData::findDeck( const char *name, completeVehicleData_t *veh )
 {
 	void	*buf;
 	float	cell[DECK_GRID][DECK_GRID];

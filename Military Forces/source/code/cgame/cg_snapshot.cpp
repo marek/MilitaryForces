@@ -53,7 +53,7 @@ void ClientEntity::transitionEntity() {
 		this->resetEntity();
 	}
 
-	// clear the next state.  if will be set by the next CG_SetNextSnap
+	// clear the next state.  if will be set by the next ClientGame::setNextSnap
 	this->interpolate = false;
 
 	// check for events
@@ -67,7 +67,7 @@ CG_SetInitialSnapshot
 
 This will only happen on the very first snapshot, or
 on tourney restarts.  All other times will use 
-CG_TransitionSnapshot instead.
+ClientGame::transitionSnapshot instead.
 
 FIXME: Also called by map_restart?
 ==================
@@ -109,12 +109,12 @@ void CG_SetInitialSnapshot( snapshot_t *snap ) {
 
 /*
 ===================
-CG_TransitionSnapshot
+ClientGame::transitionSnapshot
 
 The transition point from snap to nextSnap has passed
 ===================
 */
-static void CG_TransitionSnapshot( ) {
+void ClientGame::transitionSnapshot( ) {
 	ClientEntity			*cent;
 	snapshot_t			*oldFrame;
 	int					i;
@@ -180,12 +180,12 @@ static void CG_TransitionSnapshot( ) {
 
 /*
 ===================
-CG_SetNextSnap
+ClientGame::setNextSnap
 
 A New snapshot has just been read in from the client system.
 ===================
 */
-static void CG_SetNextSnap( snapshot_t *snap ) {
+void ClientGame::setNextSnap( snapshot_t *snap ) {
 	int					num;
 	entityState_t		*es;
 	ClientEntity			*cent;
@@ -251,7 +251,7 @@ static void CG_SetNextSnap( snapshot_t *snap ) {
 
 /*
 ========================
-CG_ReadNextSnapshot
+ClientGame::readNextSnapshot
 
 This is the only place New snapshots are requested
 This may increment cgs.processedSnapshotNum multiple
@@ -259,7 +259,7 @@ times if the client system fails to return a
 valid snapshot.
 ========================
 */
-static snapshot_t *CG_ReadNextSnapshot( ) {
+snapshot_t * ClientGame::readNextSnapshot( ) {
 	int	r;
 	snapshot_t	*dest;
 
@@ -345,7 +345,7 @@ void ClientGame::processSnapshots( ) {
 	// Once we have gotten the first snapshot, cg.snap will
 	// always have valid data for the rest of the game
 	while ( !cg.snap ) {
-		snap = CG_ReadNextSnapshot();
+		snap = ClientGame::readNextSnapshot();
 		if ( !snap ) {
 			// we can't continue until we get a snapshot
 			return;
@@ -364,7 +364,7 @@ void ClientGame::processSnapshots( ) {
 	do {
 		// if we don't have a nextframe, try and read a New one in
 		if ( !cg.nextSnap ) {
-			snap = CG_ReadNextSnapshot();
+			snap = ClientGame::readNextSnapshot();
 
 			// if we still don't have a nextframe, we will just have to
 			// extrapolate
@@ -372,7 +372,7 @@ void ClientGame::processSnapshots( ) {
 				break;
 			}
 
-			CG_SetNextSnap( snap );
+			ClientGame::setNextSnap( snap );
 
 
 			// if time went backwards, we have a level restart
@@ -387,7 +387,7 @@ void ClientGame::processSnapshots( ) {
 		}
 
 		// we have passed the transition from nextFrame to frame
-		CG_TransitionSnapshot();
+		ClientGame::transitionSnapshot();
 	} while ( true );
 
 	// assert our valid conditions upon exiting

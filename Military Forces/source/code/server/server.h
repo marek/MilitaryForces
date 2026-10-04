@@ -489,6 +489,48 @@ public:
 	static clipHandle_t clipHandleForEntity( EntityBase* gameEnt );
 	static void sectorList_f();
 	static void clipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int entityNum, int contentmask, bool capsule );
+
+public:
+	static SV_Client * getPlayerByHandle();
+	static SV_Client * getPlayerByNum();
+	static void map_f();
+	static void mapRestart_f();
+	static void kick_f();
+	static void kickBots_f();
+	static void kickAll_f();
+	static void kickNum_f();
+	static void ban_f( void );
+	static void banNum_f( void );
+	static void rehashBans_f();
+	static void writeBans();
+	static bool delBanEntryFromList( int index );
+	static bool parseCIDRNotation( netadr_t *dest, int *mask, char *adrstr );
+	static void addBanToList( bool isexception );
+	static void delBanFromList( bool isexception );
+	static void listBans_f();
+	static void flushBans_f();
+	static void banAddr_f();
+	static void exceptAddr_f();
+	static void banDel_f();
+	static void exceptDel_f();
+	static int strlen( const char *str );
+	static void status_f();
+	static void conSay_f();
+	static void conTell_f();
+	static void conSayto_f();
+	static void serverinfo_f();
+	static void systeminfo_f();
+	static void dumpUser_f();
+	static void killServer_f();
+	static void completeMapName( char *args, int argNum );
+	static void completePlayerName( char *args, int argNum );
+	static bool isBanned( netadr_t *from, bool isexception );
+	static long sVC_HashForAddress( netadr_t address );
+	static leakyBucket_t * sVC_BucketForAddress( netadr_t address, int burst, int period );
+	static int entityUpdateBits( entityState_t *from, entityState_t *to, bool create, uint64_t forced );
+	static int QDECL qsortSnapshotCandidates( const void *a, const void *b );
+	static float snapshotEntityWeight( const playerState_t *ps, const vec3_t forward, entityState_t *state, entityState_t *known );
+	static int QDECL qsortEntityNumbers( const void *a, const void *b );
 };
 // clip to a specific entity
 

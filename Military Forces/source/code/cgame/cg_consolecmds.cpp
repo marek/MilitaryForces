@@ -45,7 +45,7 @@ void CG_TargetCommand_f( ) {
 MFQ3 GPS
 ==================
 */
-static void CG_ToggleGps_f( ) {
+void ClientGame::toggleGps_f( ) {
 
 	if( cg.time < cg.GPSTime ) {
 		return;
@@ -54,7 +54,7 @@ static void CG_ToggleGps_f( ) {
 	cg.GPSTime = cg.time + 500;
 }
 
-static void CG_ToggleRadarRange_f( ) {
+void ClientGame::toggleRadarRange_f( ) {
 
 	if( cg.time < cg.RADARTime ) {
 		return;
@@ -70,7 +70,7 @@ static void CG_ToggleRadarRange_f( ) {
 MFQ3 MFD Mode cycling
 ==================
 */
-static void CG_Set_MFD_Mode( int num ) {
+void ClientGame::set_MFD_Mode( int num ) {
 	bool found = false;
 	char buffer[33], value;
 	int start = cg.Mode_MFD[num] - 1;
@@ -92,20 +92,20 @@ static void CG_Set_MFD_Mode( int num ) {
 		CvarSystem::set( "mfd2_defaultpage", va("%d", cg.Mode_MFD[num]) );
 }
 
-static void CG_Set_MFD1_Mode_f( ) {
+void ClientGame::set_MFD1_Mode_f( ) {
 	if( cg.time < cg.MFDTime ) {
 		return;
 	}
-	CG_Set_MFD_Mode(MFD_1);
+	ClientGame::set_MFD_Mode(MFD_1);
 
 	cg.MFDTime = cg.time + 100;
 }
 
-static void CG_Set_MFD2_Mode_f( ) {
+void ClientGame::set_MFD2_Mode_f( ) {
 	if( cg.time < cg.MFDTime ) {
 		return;
 	}
-	CG_Set_MFD_Mode(MFD_2);
+	ClientGame::set_MFD_Mode(MFD_2);
 
 	cg.MFDTime = cg.time + 100;
 }
@@ -117,7 +117,7 @@ MFQ3 MFD Mode setting
 ==================
 */
 
-static void CG_Set_MFD_Page( int num ) {
+void ClientGame::set_MFD_Page( int num ) {
 	int page;
 
 	if( CommandSystem::argc() < 2 ) {
@@ -138,20 +138,20 @@ static void CG_Set_MFD_Page( int num ) {
 
 }
 
-static void CG_Set_MFD1_Page_f( ) {
+void ClientGame::set_MFD1_Page_f( ) {
 	if( cg.time < cg.MFDTime ) {
 		return;
 	}
-	CG_Set_MFD_Page(MFD_1);
+	ClientGame::set_MFD_Page(MFD_1);
 
 	cg.MFDTime = cg.time + 100;
 }
 
-static void CG_Set_MFD2_Page_f( ) {
+void ClientGame::set_MFD2_Page_f( ) {
 	if( cg.time < cg.MFDTime ) {
 		return;
 	}
-	CG_Set_MFD_Page(MFD_2);
+	ClientGame::set_MFD_Page(MFD_2);
 
 	cg.MFDTime = cg.time + 100;
 }
@@ -162,7 +162,7 @@ MFQ3 HUD Color setting
 ==================
 */
 
-static void CG_Update_HUD_Color_f( )
+void ClientGame::update_HUD_Color_f( )
 {
 	// update 
 	cg.HUDColor = ClientGame::cvar_Get( "hud_color" );
@@ -174,7 +174,7 @@ MFQ3 HUD Color cycling
 ==================
 */
 
-static void CG_Cycle_HUD_Color_f( ) {
+void ClientGame::cycle_HUD_Color_f( ) {
 	if( cg.time < cg.HUDColorTime ) {
 		return;
 	}
@@ -194,7 +194,7 @@ MFQ3 MFD color setting
 ==================
 */
 
-static void CG_Update_MFD_Color_f( )
+void ClientGame::update_MFD_Color_f( )
 {
 	// update 
 	cg.MFDColor = ClientGame::cvar_Get( "mfd_color" );
@@ -206,7 +206,7 @@ MFQ3 MFD toggling
 ==================
 */
 
-static void CG_Toggle_MFD1_f( ) {
+void ClientGame::toggle_MFD1_f( ) {
 	int mfd1 = hud_mfd.integer;
 
 	mfd1 = mfd1 ? 0 : 1;
@@ -214,7 +214,7 @@ static void CG_Toggle_MFD1_f( ) {
 	
 }
 
-static void CG_Toggle_MFD2_f( ) {
+void ClientGame::toggle_MFD2_f( ) {
 	int mfd2 = hud_mfd2.integer;
 
 	mfd2 = mfd2 ? 0 : 1;
@@ -229,7 +229,7 @@ MFQ3 MFD color cycling
 ==================
 */
 
-static void CG_Cycle_MFD_Color_f( ) {
+void ClientGame::cycle_MFD_Color_f( ) {
 	if( cg.time < cg.MFDColorTime ) {
 		return;
 	}
@@ -249,7 +249,7 @@ MFQ3 MFD Camera mode cycling
 ==================
 */
 
-static void CG_Cycle_Camera_Mode_f( ) {
+void ClientGame::cycle_Camera_Mode_f( ) {
 	if( cg.time < cg.CameraModeTime ) {
 		return;
 	}
@@ -267,7 +267,7 @@ MFQ3 MFD Camera Mode setting
 ==================
 */
 
-static void CG_Set_Camera_Mode_f( ) {
+void ClientGame::set_Camera_Mode_f( ) {
 
 	if( cg.time < cg.CameraModeTime ) {
 		return;
@@ -291,22 +291,22 @@ MFQ3 MFD camera mode quick action keys
 ==================
 */
 
-static void CG_CamBack_f( )
+void ClientGame::camBack_f( )
 {
 	cg.CameraMode = CAMERA_BACK;
 }
 
-static void CG_CamDown_f( )
+void ClientGame::camDown_f( )
 {
 	cg.CameraMode = CAMERA_DOWN;
 }
 
-static void CG_CamBomb_f( )
+void ClientGame::camBomb_f( )
 {
 	cg.CameraMode = CAMERA_BOMB;
 }
 
-static void CG_CamOld_f( )
+void ClientGame::camOld_f( )
 {
 	cg.CameraMode = CAMERA_TARGET;
 }
@@ -316,7 +316,7 @@ static void CG_CamOld_f( )
 MFQ3 INFO
 ==================
 */
-static void CG_ToggleInfo_f( ) {
+void ClientGame::toggleInfo_f( ) {
 
 	if( cg.time < cg.INFOTime ) {
 		return;
@@ -330,7 +330,7 @@ static void CG_ToggleInfo_f( ) {
 MFQ3 toggle view between external and cockpit view
 ==================
 */
-static void CG_ToggleView_f( ) {
+void ClientGame::toggleView_f( ) {
 
 	if( cg.time < cg.toggleViewTime ) {
 		return;
@@ -350,7 +350,7 @@ MFQ3 camera
 ==================
 */
 
-static void CG_AdjustReset_f( ) {
+void ClientGame::adjustReset_f( ) {
 	cg.cameraAdjustEnum = CAMADJ_NONE;
 	cg.cameraAdjustAmount = 0;
 }
@@ -362,12 +362,12 @@ constexpr float MOVE_BASIC = 0.4f;
 MFQ3 camera zoom in/out
 ==================
 */
-static void CG_ZoomIn_f( ) {
+void ClientGame::zoomIn_f( ) {
 	cg.cameraAdjustEnum = CAMADJ_INOUT;
 	cg.cameraAdjustAmount = +MOVE_BASIC;
 }
 
-static void CG_ZoomOut_f( ) {
+void ClientGame::zoomOut_f( ) {
 	cg.cameraAdjustEnum = CAMADJ_INOUT;
 	cg.cameraAdjustAmount = -MOVE_BASIC;
 }
@@ -377,12 +377,12 @@ static void CG_ZoomOut_f( ) {
 MFQ3 camera up/down
 ==================
 */
-static void CG_CameraUp_f( ) {
+void ClientGame::cameraUp_f( ) {
 	cg.cameraAdjustEnum = CAMADJ_UPDOWN;
 	cg.cameraAdjustAmount = +MOVE_BASIC;
 }
 
-static void CG_CameraDown_f( ) {
+void ClientGame::cameraDown_f( ) {
 	cg.cameraAdjustEnum = CAMADJ_UPDOWN;
 	cg.cameraAdjustAmount = -MOVE_BASIC;
 }
@@ -390,43 +390,43 @@ static void CG_CameraDown_f( ) {
 
 /*
 =================
-CG_SizeUp_f
+ClientGame::sizeUp_f
 
 Keybinding command
 =================
 */
-static void CG_SizeUp_f () {
+void ClientGame::sizeUp_f() {
 	CvarSystem::set("cg_viewsize", va("%i",(cg_viewsize.integer+10)));
 }
 
 
 /*
 =================
-CG_SizeDown_f
+ClientGame::sizeDown_f
 
 Keybinding command
 =================
 */
-static void CG_SizeDown_f () {
+void ClientGame::sizeDown_f() {
 	CvarSystem::set("cg_viewsize", va("%i",(cg_viewsize.integer-10)));
 }
 
 
 /*
 =============
-CG_Viewpos_f
+ClientGame::viewpos_f
 
 Debugging command to print the current position
 =============
 */
-static void CG_Viewpos_f () {
+void ClientGame::viewpos_f() {
 	ClientGame::printf ("(%i %i %i) : %i\n", static_cast<int>(cg.refdef.vieworg[0]),
 		static_cast<int>(cg.refdef.vieworg[1]), static_cast<int>(cg.refdef.vieworg[2]), 
 		static_cast<int>(cg.refdefViewAngles[YAW]));
 }
 
 
-static void CG_ScoresDown_f( ) {
+void ClientGame::scoresDown_f( ) {
 
 	if ( cg.scoresRequestTime + 2000 < cg.time ) {
 		// the scores are more than two seconds out of data,
@@ -447,14 +447,14 @@ static void CG_ScoresDown_f( ) {
 	}
 }
 
-static void CG_ScoresUp_f( ) {
+void ClientGame::scoresUp_f( ) {
 	if ( cg.showScores ) {
 		cg.showScores = false;
 		cg.scoreFadeTime = cg.time;
 	}
 }
 
-static void CG_TellTarget_f( ) {
+void ClientGame::tellTarget_f( ) {
 	int		clientNum;
 	char	command[128];
 	char	message[128];
@@ -469,7 +469,7 @@ static void CG_TellTarget_f( ) {
 	CL_AddReliableCommand( command );
 }
 
-static void CG_TellAttacker_f( ) {
+void ClientGame::tellAttacker_f( ) {
 	int		clientNum;
 	char	command[128];
 	char	message[128];
@@ -484,15 +484,15 @@ static void CG_TellAttacker_f( ) {
 	CL_AddReliableCommand( command );
 }
 
-static void CG_TestPlane_f( ) {
+void ClientGame::testPlane_f( ) {
 	ClientGame::testVehicle(CAT_PLANE);
 }
 
-static void CG_TestGV_f( ) {
+void ClientGame::testGV_f( ) {
 	ClientGame::testVehicle(CAT_GROUND);
 }
 
-static void CG_Spawn_GI_f( ) {
+void ClientGame::spawn_GI_f( ) {
 	int idx;
 
 	if( CommandSystem::argc() < 2 ) return;
@@ -508,7 +508,7 @@ static void CG_Spawn_GI_f( ) {
 
 }
 
-static void CG_ExportToScript_f( ) {
+void ClientGame::exportToScript_f( ) {
 	if( CommandSystem::argc() < 2 ) 
 	{
 		ClientGame::printf("Scriptname not specified!");
@@ -519,11 +519,11 @@ static void CG_ExportToScript_f( ) {
 
 }
 
-static void CG_SetSide_f( ) {
+void ClientGame::setSide_f( ) {
 	ME_SetSide( ClientGame::argv(1) );
 }
 
-static void CG_ImportScript_f( ) {
+void ClientGame::importScript_f( ) {
 	if( CommandSystem::argc() < 2 )
 	{
 		ClientGame::printf("Scriptname not specified!");
@@ -618,57 +618,57 @@ static consoleCommand_t	commands[] = {
 	{ "prevframe", ClientGame::testModelPrevFrame_f },
 	{ "nextskin", ClientGame::testModelNextSkin_f },
 	{ "prevskin", ClientGame::testModelPrevSkin_f },
-	{ "testPlane", CG_TestPlane_f },
-	{ "testGV", CG_TestGV_f },
+	{ "testPlane", ClientGame::testPlane_f },
+	{ "testGV", ClientGame::testGV_f },
 	{ "testPlaneCmd", ClientGame::testPlaneCmd_f },
 	{ "testGVCmd", ClientGame::testGVCmd_f },
-	{ "viewpos", CG_Viewpos_f },
-	{ "+scores", CG_ScoresDown_f },
-	{ "-scores", CG_ScoresUp_f },
+	{ "viewpos", ClientGame::viewpos_f },
+	{ "+scores", ClientGame::scoresDown_f },
+	{ "-scores", ClientGame::scoresUp_f },
 	{ "+zoom", ClientGame::zoomDown_f },
 	{ "-zoom", ClientGame::zoomUp_f },
-	{ "sizeup", CG_SizeUp_f },
-	{ "sizedown", CG_SizeDown_f },
+	{ "sizeup", ClientGame::sizeUp_f },
+	{ "sizedown", ClientGame::sizeDown_f },
 	{ "weapnext", ClientGame::nextWeapon_f },
 	{ "weapprev", ClientGame::prevWeapon_f },
 	{ "weapon", ClientGame::weapon_f },
-	{ "tell_target", CG_TellTarget_f },
-	{ "tell_attacker", CG_TellAttacker_f },
+	{ "tell_target", ClientGame::tellTarget_f },
+	{ "tell_attacker", ClientGame::tellAttacker_f },
 	{ "tcmd", CG_TargetCommand_f },
-	{ "gps", CG_ToggleGps_f },
-	{ "extinfo", CG_ToggleInfo_f },
-	{ "toggleview", CG_ToggleView_f },
-	{ "+zoomin", CG_ZoomIn_f },
-	{ "-zoomin", CG_AdjustReset_f },
-	{ "+zoomout", CG_ZoomOut_f },
-	{ "-zoomout", CG_AdjustReset_f },
-	{ "+cameraup", CG_CameraUp_f },
-	{ "-cameraup", CG_AdjustReset_f },
-	{ "+cameradown", CG_CameraDown_f },
-	{ "-cameradown", CG_AdjustReset_f },
-	{ "radarrange", CG_ToggleRadarRange_f },
-	{ "mfd1_mode", CG_Set_MFD1_Mode_f },
-	{ "mfd2_mode", CG_Set_MFD2_Mode_f },
-	{ "mfd1_page", CG_Set_MFD1_Page_f },
-	{ "mfd2_page", CG_Set_MFD2_Page_f },
-	{ "cycle_hud_color", CG_Cycle_HUD_Color_f },
-	{ "cycle_mfd_color", CG_Cycle_MFD_Color_f },
-	{ "cycle_camera_mode", CG_Cycle_Camera_Mode_f },
-	{ "set_camera_mode", CG_Set_Camera_Mode_f },
-	{ "+backcam", CG_CamBack_f },
-	{ "-backcam", CG_CamOld_f },
-	{ "+downcam", CG_CamDown_f },
-	{ "-downcam", CG_CamOld_f },
-	{ "+bombcam", CG_CamBomb_f },
-	{ "-bombcam", CG_CamOld_f },
-	{ "toggle_mfd1", CG_Toggle_MFD1_f },
-	{ "toggle_mfd2", CG_Toggle_MFD2_f },
-	{ "update_hud_color", CG_Update_HUD_Color_f },
-	{ "update_mfd_color", CG_Update_MFD_Color_f },
-	{ "me_spawn_gi", CG_Spawn_GI_f },
-	{ "me_export_to_script", CG_ExportToScript_f },
-	{ "me_import_script", CG_ImportScript_f },
-	{ "me_side", CG_SetSide_f },
+	{ "gps", ClientGame::toggleGps_f },
+	{ "extinfo", ClientGame::toggleInfo_f },
+	{ "toggleview", ClientGame::toggleView_f },
+	{ "+zoomin", ClientGame::zoomIn_f },
+	{ "-zoomin", ClientGame::adjustReset_f },
+	{ "+zoomout", ClientGame::zoomOut_f },
+	{ "-zoomout", ClientGame::adjustReset_f },
+	{ "+cameraup", ClientGame::cameraUp_f },
+	{ "-cameraup", ClientGame::adjustReset_f },
+	{ "+cameradown", ClientGame::cameraDown_f },
+	{ "-cameradown", ClientGame::adjustReset_f },
+	{ "radarrange", ClientGame::toggleRadarRange_f },
+	{ "mfd1_mode", ClientGame::set_MFD1_Mode_f },
+	{ "mfd2_mode", ClientGame::set_MFD2_Mode_f },
+	{ "mfd1_page", ClientGame::set_MFD1_Page_f },
+	{ "mfd2_page", ClientGame::set_MFD2_Page_f },
+	{ "cycle_hud_color", ClientGame::cycle_HUD_Color_f },
+	{ "cycle_mfd_color", ClientGame::cycle_MFD_Color_f },
+	{ "cycle_camera_mode", ClientGame::cycle_Camera_Mode_f },
+	{ "set_camera_mode", ClientGame::set_Camera_Mode_f },
+	{ "+backcam", ClientGame::camBack_f },
+	{ "-backcam", ClientGame::camOld_f },
+	{ "+downcam", ClientGame::camDown_f },
+	{ "-downcam", ClientGame::camOld_f },
+	{ "+bombcam", ClientGame::camBomb_f },
+	{ "-bombcam", ClientGame::camOld_f },
+	{ "toggle_mfd1", ClientGame::toggle_MFD1_f },
+	{ "toggle_mfd2", ClientGame::toggle_MFD2_f },
+	{ "update_hud_color", ClientGame::update_HUD_Color_f },
+	{ "update_mfd_color", ClientGame::update_MFD_Color_f },
+	{ "me_spawn_gi", ClientGame::spawn_GI_f },
+	{ "me_export_to_script", ClientGame::exportToScript_f },
+	{ "me_import_script", ClientGame::importScript_f },
+	{ "me_side", ClientGame::setSide_f },
 };
 
 /*

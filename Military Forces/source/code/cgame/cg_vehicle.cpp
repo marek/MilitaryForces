@@ -16,13 +16,13 @@ LQMAnimations_t availableLQMAnimations;
 
 /*
 ======================
-CG_ParseLQMAnimationFile
+ClientGame::parseLQMAnimationFile
 
 Read a configuration file containing animation coutns and rates
 models/players/visor/animation.cfg, etc
 ======================
 */
-static animation_t * CG_ParseLQMAnimationFile( const char *filename ) {
+animation_t * ClientGame::parseLQMAnimationFile( const char *filename ) {
 	char		*text_p, *prev;
 	int			len;
 	int			i;
@@ -185,7 +185,7 @@ static animation_t * CG_ParseLQMAnimationFile( const char *filename ) {
 constexpr int MAX_TEAM_SKIN_MODELS = 2048;
 static qhandle_t cg_teamSkins[2][MAX_TEAM_SKIN_MODELS];
 
-static qhandle_t CG_RegisterVehiclePart( const char *name, bool expected )
+qhandle_t ClientGame::registerVehiclePart( const char *name, bool expected )
 {
 	fileHandle_t f;
 
@@ -220,7 +220,7 @@ qhandle_t ClientGame::teamSkin( qhandle_t model, int team )
 	return cg_teamSkins[team - 1][model];
 }
 
-static void CG_CachePlane(int index)
+void ClientGame::cachePlane(int index)
 {
 	char name[128];
 	char basename[128];
@@ -266,7 +266,7 @@ static void CG_CachePlane(int index)
 			break;
 		}
 
-		availableVehicles[index].handle[i] = CG_RegisterVehiclePart( name, 
+		availableVehicles[index].handle[i] = ClientGame::registerVehiclePart( name, 
 			( i == BP_PLANE_GEAR && ( caps & HC_GEAR ) ) ||
 			( i == BP_PLANE_BRAKES && ( caps & HC_SPEEDBRAKE ) ) ||
 			( i == BP_PLANE_BAY && ( caps & HC_WEAPONBAY ) ) ||
@@ -286,13 +286,13 @@ static void CG_CachePlane(int index)
 
 /*
 ===============
-CG_CacheGroundVehicle
+ClientGame::cacheGroundVehicle
 
 On startup cache it
 ===============
 */
 
-static void CG_CacheGroundVehicle(int index)
+void ClientGame::cacheGroundVehicle(int index)
 {
 	char name[128];
 	char basename[128];
@@ -331,7 +331,7 @@ static void CG_CacheGroundVehicle(int index)
 			Com_sprintf( name, sizeof(name), "%s_w6.md3", basename );
 			break;
 		}
-		availableVehicles[index].handle[i] = CG_RegisterVehiclePart( name, 
+		availableVehicles[index].handle[i] = ClientGame::registerVehiclePart( name, 
 			i >= BP_GV_WHEEL && ( availableVehicles[index].caps & HC_WHEELS ) && i - BP_GV_WHEEL < availableVehicles[index].wheels );
 //		if( !availableVehicles[index].handle[i] ) {
 //			ClientGame::printf( "MFQ3 Warning: Unable to load model '%s'\n", name );
@@ -347,13 +347,13 @@ static void CG_CacheGroundVehicle(int index)
 
 /*
 ===============
-CG_CacheGroundVehicle
+ClientGame::cacheGroundVehicle
 
 On startup cache it
 ===============
 */
 
-static void CG_CacheHelo(int index)
+void ClientGame::cacheHelo(int index)
 {
 	char name[128];
 	char basename[128];
@@ -395,7 +395,7 @@ static void CG_CacheHelo(int index)
 			Com_sprintf( name, sizeof(name), "%s_parts.md3", basename );
 			break;
 		}
-		availableVehicles[index].handle[i] = CG_RegisterVehiclePart( name, false );
+		availableVehicles[index].handle[i] = ClientGame::registerVehiclePart( name, false );
 	}
 
 	// only thing that always has to be there is body
@@ -407,13 +407,13 @@ static void CG_CacheHelo(int index)
 
 /*
 ===============
-CG_CacheGroundVehicle
+ClientGame::cacheGroundVehicle
 
 On startup cache it
 ===============
 */
 
-static void CG_CacheLQM(int index)
+void ClientGame::cacheLQM(int index)
 {
 	char name[128];
 	char basename[128];
@@ -434,7 +434,7 @@ static void CG_CacheLQM(int index)
 			Com_sprintf( name, sizeof(name), "%s_head.md3", basename );
 			break;
 		}
-		availableVehicles[index].handle[i] = CG_RegisterVehiclePart( name, true );
+		availableVehicles[index].handle[i] = ClientGame::registerVehiclePart( name, true );
 	}
 
 	// only thing that always has to be there is body
@@ -445,7 +445,7 @@ static void CG_CacheLQM(int index)
 
 	// Parse LQM Animations
 	Com_sprintf( name, sizeof(name), "models/vehicles/lqms/%s/animation.cfg",  availableVehicles[index].modelName );
-	availableVehicles[index].animations = CG_ParseLQMAnimationFile(name);
+	availableVehicles[index].animations = ClientGame::parseLQMAnimationFile(name);
 	if(!availableVehicles[index].animations) 
 		Common::printf( S_COLOR_YELLOW "WARNING: MFQ3: cannot parse %s: animation.cfg\n", basename );
 }
@@ -453,13 +453,13 @@ static void CG_CacheLQM(int index)
 
 /*
 ===============
-CG_CacheBoat
+ClientGame::cacheBoat
 
 On startup cache it
 ===============
 */
 
-static void CG_CacheBoat(int index)
+void ClientGame::cacheBoat(int index)
 {
 	char name[128];
 	char basename[128];
@@ -516,10 +516,10 @@ static void CG_CacheBoat(int index)
 			md3Tag_t tag;
 
 			Com_sprintf( body, sizeof(body), "%s.md3", basename );
-			availableVehicles[index].handle[i] = CG_RegisterVehiclePart( name, 
+			availableVehicles[index].handle[i] = ClientGame::registerVehiclePart( name, 
 				availableVehicles[index].handle[BP_BOAT_BODY] && VehicleData::findTag( body, turretTags[i/2], &tag ) );
 		} else {
-			availableVehicles[index].handle[i] = CG_RegisterVehiclePart( name, availableVehicles[index].handle[i-1] != 0 );
+			availableVehicles[index].handle[i] = ClientGame::registerVehiclePart( name, availableVehicles[index].handle[i-1] != 0 );
 		}
 	}
 
@@ -530,13 +530,13 @@ static void CG_CacheBoat(int index)
 
 /*
 ===============
-CG_CacheGroundInstallation
+ClientGame::cacheGroundInstallation
 
 On startup cache it
 ===============
 */
 
-static void CG_CacheGroundInstallation(int index)
+void ClientGame::cacheGroundInstallation(int index)
 {
 	char name[128];
 	char basename[128];
@@ -563,7 +563,7 @@ static void CG_CacheGroundInstallation(int index)
 			Com_sprintf( name, sizeof(name), "%s_upg.md3", basename );
 			break;
 		}
-		availableGroundInstallations[index].handle[i] = CG_RegisterVehiclePart( name, false );
+		availableGroundInstallations[index].handle[i] = ClientGame::registerVehiclePart( name, false );
 //		if( !availableVehicles[index].handle[i] ) {
 //			ClientGame::printf( "MFQ3 Warning: Unable to load model '%s'\n", name );
 //		}
@@ -653,19 +653,19 @@ void ClientGame::cacheVehicles()
 		if( availableVehicles[i].gameset & cgs.gameset ) {
 			ClientGame::loadingString(availableVehicles[i].descriptiveName);
 			if( availableVehicles[i].cat & CAT_PLANE ) {
-					CG_CachePlane(i);
+					ClientGame::cachePlane(i);
 			}
 			else if( availableVehicles[i].cat & CAT_GROUND ) {
-					CG_CacheGroundVehicle(i);
+					ClientGame::cacheGroundVehicle(i);
 			}
 			else if( availableVehicles[i].cat & CAT_HELO ) {
-					CG_CacheHelo(i);
+					ClientGame::cacheHelo(i);
 			}
 			else if( availableVehicles[i].cat & CAT_LQM ) {
-					CG_CacheLQM(i);
+					ClientGame::cacheLQM(i);
 			}
 			else if( availableVehicles[i].cat & CAT_BOAT ) {
-					CG_CacheBoat(i);
+					ClientGame::cacheBoat(i);
 			}
 			else {
 				Common::error( ERR_DROP, "Invalid Vehicle type in CG_CacheVehicles (%d,%d)", 
@@ -677,7 +677,7 @@ void ClientGame::cacheVehicles()
 		ClientGame::loadingStep( bg_numberOfVehicles + i, total );
 		if( availableGroundInstallations[i].gameset & cgs.gameset ) {
 			ClientGame::loadingString(availableGroundInstallations[i].descriptiveName);
-			CG_CacheGroundInstallation(i);
+			ClientGame::cacheGroundInstallation(i);
 		}
 	}
 

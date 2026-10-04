@@ -15,7 +15,7 @@
 //
 //------------------------------------------------------------------
 
-static int MiscVehicle_TeamScore( GameEntity *self, GameEntity *attacker )
+int Game::miscVehicle_TeamScore( GameEntity *self, GameEntity *attacker )
 {
 	if( g_gametype.integer >= GT_TEAM && self->s.generic1 == attacker->client_->ps_.persistant[PERS_TEAM] )
 		return -self->score_;
@@ -28,7 +28,7 @@ void MiscVehicle_Die::execute( GameEntity *inflictor, GameEntity *attacker, int 
 		vec3_t	pos;
 		VectorAdd( self_->r.absmin, self_->r.absmax, pos );
 		VectorScale( pos, 0.5f, pos );
-		AddScore( attacker, pos, MiscVehicle_TeamScore( self_, attacker ) );
+		AddScore( attacker, pos, Game::miscVehicle_TeamScore( self_, attacker ) );
 	}
 
 	ExplodeVehicle(self_);
@@ -39,7 +39,7 @@ void MiscVehicle_Die::execute( GameEntity *inflictor, GameEntity *attacker, int 
 	SV_LinkEntity( self_ );
 }
 
-static void MiscVehicle_DropToGround( GameEntity *ent, float above, float below )
+void Game::miscVehicle_DropToGround( GameEntity *ent, float above, float below )
 {
 	trace_t	trace;
 	vec3_t	startpos, endpos;
@@ -55,7 +55,7 @@ static void MiscVehicle_DropToGround( GameEntity *ent, float above, float below 
 	}
 }
 
-static void SP_misc_plane( GameEntity *ent )
+void Game::sP_misc_plane( GameEntity *ent )
 {
 	unsigned int vehIndex = ent->s.modelindex;
 	trace_t	trace;
@@ -108,9 +108,9 @@ static void SP_misc_plane( GameEntity *ent )
 	SV_LinkEntity (ent);
 }
 
-static void SP_misc_gv( GameEntity *ent )
+void Game::sP_misc_gv( GameEntity *ent )
 {
-	MiscVehicle_DropToGround( ent, 64, 512 );
+	Game::miscVehicle_DropToGround( ent, 64, 512 );
 
 	// set flags
 	ent->s.ONOFF = OO_LANDED;
@@ -124,11 +124,11 @@ static void SP_misc_gv( GameEntity *ent )
 	SV_LinkEntity (ent);
 }
 
-static void SP_misc_helo( GameEntity *ent )
+void Game::sP_misc_helo( GameEntity *ent )
 {
 	unsigned int vehIndex = ent->s.modelindex;
 
-	MiscVehicle_DropToGround( ent, 64, 512 );
+	Game::miscVehicle_DropToGround( ent, 64, 512 );
 
 	// set flags
 	ent->s.ONOFF = OO_LANDED;
@@ -149,9 +149,9 @@ static void SP_misc_helo( GameEntity *ent )
 	SV_LinkEntity (ent);
 }
 
-static void SP_misc_boat( GameEntity *ent )
+void Game::sP_misc_boat( GameEntity *ent )
 {
-	MiscVehicle_DropToGround( ent, 64, 512 );
+	Game::miscVehicle_DropToGround( ent, 64, 512 );
 
 	// set flags
 	ent->s.ONOFF = OO_LANDED;
@@ -561,19 +561,19 @@ void DroneInit()
 		unsigned long cat = availableVehicles[ent->s.modelindex].cat;
 		if( (ent->s.eFlags & EF_PILOT_ONBOARD) && ((cat & CAT_PLANE) || (cat & CAT_HELO)) ) continue;
 		if( cat & CAT_PLANE ) {
-			SP_misc_plane( ent );
+			Game::sP_misc_plane( ent );
 		} else if( cat & CAT_HELO ) {
-			SP_misc_helo( ent );
+			Game::sP_misc_helo( ent );
 		} else if( cat & CAT_BOAT ) {
-			SP_misc_boat( ent );
+			Game::sP_misc_boat( ent );
 		} else {
-			SP_misc_gv( ent );
+			Game::sP_misc_gv( ent );
 		}
 	}
 }
 
 
-static void MiscVehicle_SetTeam( GameEntity *ent )
+void Game::miscVehicle_SetTeam( GameEntity *ent )
 {
 	if( ent->team_ && g_gametype.integer >= GT_TEAM ) {
 		if ( Q_stricmp( ent->team_, "red" ) == 0 ) {
@@ -609,7 +609,7 @@ GameEntity* SP_misc_vehicle( GameEntity *sp_ent )
 	ent->s.eType = ET_MISC_VEHICLE;
 	ent->s.modelindex = i;
 
-	MiscVehicle_SetTeam( ent );
+	Game::miscVehicle_SetTeam( ent );
 
 	VectorCopy(availableVehicles[i].mins, ent->r.mins);
 	VectorCopy(availableVehicles[i].maxs, ent->r.maxs);
@@ -664,7 +664,7 @@ void SP_misc_groundinstallation( GameEntity *sp_ent )
 	ent->s.modelindex = 255;
 	ent->s.modelindex2 = i;
 
-	MiscVehicle_SetTeam( ent );
+	Game::miscVehicle_SetTeam( ent );
 
 	VectorCopy(availableGroundInstallations[i].mins, ent->r.mins);
 	VectorCopy(availableGroundInstallations[i].maxs, ent->r.maxs);

@@ -226,13 +226,13 @@ void ServerMain::getChallenge(netadr_t from)
 
 /*
 ==================
-SV_IsBanned
+ServerMain::isBanned
 
 Check whether a certain address is banned
 ==================
 */
 
-static bool SV_IsBanned(netadr_t *from, bool isexception)
+bool ServerMain::isBanned(netadr_t *from, bool isexception)
 {
 	int index;
 	serverBan_t *curban;
@@ -240,7 +240,7 @@ static bool SV_IsBanned(netadr_t *from, bool isexception)
 	if(!isexception)
 	{
 		// If this is a query for a ban, first check whether the client is excepted
-		if(SV_IsBanned(from, true))
+		if(ServerMain::isBanned(from, true))
 			return false;
 	}
 	
@@ -271,7 +271,7 @@ void ServerMain::directConnect( netadr_t from )
 	Common::dPrintf ("SVC_DirectConnect ()\n");
 
 	// Check whether this client is banned.
-	if(SV_IsBanned(&from, false))
+	if(ServerMain::isBanned(&from, false))
 	{
 		Network::outOfBandPrint(NS_SERVER, from, "print\nYou are banned from this server.\n");
 		return;

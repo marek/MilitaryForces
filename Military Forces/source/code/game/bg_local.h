@@ -62,6 +62,34 @@ public:
 	static void lQMMove( );
 	static void boatMove( );
 	static bool slideMove( bool gravity );
+
+public:
+	static void boat_FuelFlow( int throttle );
+	static void boatAccelerate();
+	static void addTouchEnt_Boat( int entityNum );
+	static void groundVehicle_FuelFlow( int throttle );
+	static void groundVehicleAccelerate();
+	static void adjustToTerrain();
+	static void addTouchEnt_GV( int entityNum );
+	static void helo_FuelFlow( int throttle );
+	static void heloAccelerate();
+	static void addTouchEnt_Helo( int entityNum );
+	static void addTouchEnt_LQM( int entityNum );
+	static void plane_FuelFlow( int throttle );
+	static void planeAccelerate();
+	static void addTouchEnt_Plane( int entityNum );
+	static void friction();
+	static void accelerate( vec3_t wishdir, float wishspeed, float accel );
+	static float cmdScale( usercmd_t *cmd );
+	static void flyMove();
+	static void noclipMove();
+	static void setWaterLevel();
+	static void waterEvents();
+	static void flare();
+	static void weapon();
+	static void dropTimers();
+	static void vehicleBoundingBox();
+	static void vehicleMove();
 };
 
 // MFQ3

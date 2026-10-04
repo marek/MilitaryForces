@@ -206,10 +206,10 @@ CG_TeamScoreboard
 
 /*
 ================
-CG_CenterGiantLine
+ClientGame::centerGiantLine
 ================
 */
-static void CG_CenterGiantLine( float y, const char *string ) {
+void ClientGame::centerGiantLine( float y, const char *string ) {
 	float		x;
 	vec4_t		color;
 
@@ -261,7 +261,7 @@ void ClientGame::drawOldTourneyScoreboard( ) {
 	}
 
 	// print optional title
-	CG_CenterGiantLine( 8, s );
+	ClientGame::centerGiantLine( 8, s );
 
 	// print server time
 	ones = cg.time / 1000;
@@ -271,7 +271,7 @@ void ClientGame::drawOldTourneyScoreboard( ) {
 	ones %= 10;
 	s = va("%i:%i%i", min, tens, ones );
 
-	CG_CenterGiantLine( 64, s );
+	ClientGame::centerGiantLine( 64, s );
 
 
 	// print the two scores

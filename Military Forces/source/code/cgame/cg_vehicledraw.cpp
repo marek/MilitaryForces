@@ -89,19 +89,19 @@ char *lqm_tags[BP_LQM_MAX_PARTS] =
 
 /*
 =============
-CG_PlanePilot
+ClientGame::planePilot
 =============
 */
 static int cg_drawTeam;
 
-static void CG_AddVehiclePart( refEntity_t *re )
+void ClientGame::addVehiclePart( refEntity_t *re )
 {
 	if( cg_drawTeam && !re->customSkin && !re->customShader ) 
 		re->customSkin = ClientGame::teamSkin( re->hModel, cg_drawTeam );
 	refExport.AddRefEntityToScene( re );
 }
 
-static void CG_PlanePilot( const refEntity_t *parent, qhandle_t parentModel, int idx ) {
+void ClientGame::planePilot( const refEntity_t *parent, qhandle_t parentModel, int idx ) {
 
 	refEntity_t		pilot[MAX_PILOTS*3];	// three parts per pilot
 	unsigned int	i,j,k;
@@ -122,7 +122,7 @@ static void CG_PlanePilot( const refEntity_t *parent, qhandle_t parentModel, int
 			AxisCopy( axisDefault, pilot[k].axis );
 			Com_sprintf( tag, 12, "tag_pilot%d", i+1 );
 			ClientGame::positionRotatedEntityOnTag( &pilot[k], parent, parentModel, tag);
-			CG_AddVehiclePart( &pilot[k] );
+			ClientGame::addVehiclePart( &pilot[k] );
 		}
 	}
 }
@@ -183,7 +183,7 @@ void ClientGame::drawPlane(DrawInfo_Plane_t* drawInfo)
     part[BP_PLANE_BODY].renderfx = renderfx;
     VectorCopy (part[BP_PLANE_BODY].origin, part[BP_PLANE_BODY].oldorigin);
 	part[BP_PLANE_BODY].frame = drawInfo->bodyFrame;
-	CG_AddVehiclePart( &part[BP_PLANE_BODY] );
+	ClientGame::addVehiclePart( &part[BP_PLANE_BODY] );
 	
 	// if the model failed, allow the default nullmodel to be displayed, but nothing else
 	if (!part[BP_PLANE_BODY].hModel) 
@@ -208,7 +208,7 @@ void ClientGame::drawPlane(DrawInfo_Plane_t* drawInfo)
 				ClientGame::positionRotatedEntityOnTag( &engine, &part[BP_PLANE_BODY], veh->handle[BP_PLANE_BODY], engine_tags[ii-1] );
 				engine.shadowPlane = shadowPlane;
 				engine.renderfx = renderfx;
-				CG_AddVehiclePart( &engine );
+				ClientGame::addVehiclePart( &engine );
 			}
 		}
 		if( (veh->caps & HC_SWINGWING) && 
@@ -223,10 +223,10 @@ void ClientGame::drawPlane(DrawInfo_Plane_t* drawInfo)
 		ClientGame::positionRotatedEntityOnTag( &part[i], &part[BP_PLANE_BODY], veh->handle[BP_PLANE_BODY], plane_tags[i] );
 		part[i].shadowPlane = shadowPlane;
 		part[i].renderfx = renderfx;
-		CG_AddVehiclePart( &part[i] );
+		ClientGame::addVehiclePart( &part[i] );
 	}
 	// pilot
-	CG_PlanePilot( &part[BP_PLANE_BODY], veh->handle[BP_PLANE_BODY], drawInfo->basicInfo.vehicleIndex );
+	ClientGame::planePilot( &part[BP_PLANE_BODY], veh->handle[BP_PLANE_BODY], drawInfo->basicInfo.vehicleIndex );
 	
 	// vwep
 	if( (veh->renderFlags & MFR_VWEP) && drawInfo->basicInfo.usedLoadout ) 
@@ -247,7 +247,7 @@ void ClientGame::drawPlane(DrawInfo_Plane_t* drawInfo)
 						drawInfo->basicInfo.usedLoadout->mounts[i].tag.name );
 				vwep.shadowPlane = shadowPlane;
 				vwep.renderfx = renderfx;
-				CG_AddVehiclePart( &vwep );
+				ClientGame::addVehiclePart( &vwep );
 			}
 		}
 	}
@@ -267,7 +267,7 @@ void ClientGame::drawPlane(DrawInfo_Plane_t* drawInfo)
 		ClientGame::positionEntityOnTag( &vapor, &part[BP_PLANE_BODY], veh->handle[BP_PLANE_BODY], "tag_vapor1" );
 		vapor.shadowPlane = shadowPlane;
 		vapor.renderfx = renderfx;
-		CG_AddVehiclePart( &vapor );
+		ClientGame::addVehiclePart( &vapor );
 	}
 	
 	// throttle/afterburner
@@ -280,7 +280,7 @@ void ClientGame::drawPlane(DrawInfo_Plane_t* drawInfo)
 		burner.shadowPlane = shadowPlane;
 		burner.renderfx = renderfx;
 		burner.frame = drawInfo->bodyFrame;
-		CG_AddVehiclePart( &burner );
+		ClientGame::addVehiclePart( &burner );
 		if( veh->engines > 1 ) 
 		{
 			burner2.hModel = cgs.media.afterburner[veh->effectModel];
@@ -290,7 +290,7 @@ void ClientGame::drawPlane(DrawInfo_Plane_t* drawInfo)
 			burner2.shadowPlane = shadowPlane;
 			burner2.renderfx = renderfx;
 			burner2.frame = drawInfo->bodyFrame;
-			CG_AddVehiclePart( &burner2 );
+			ClientGame::addVehiclePart( &burner2 );
 		}
 	}
 
@@ -362,7 +362,7 @@ void ClientGame::drawGV(DrawInfo_GV_t* drawInfo)
     part[BP_GV_BODY].shadowPlane = shadowPlane;
     part[BP_GV_BODY].renderfx = renderfx;
     VectorCopy (part[BP_GV_BODY].origin, part[BP_GV_BODY].oldorigin);
-    CG_AddVehiclePart( &part[BP_GV_BODY] );
+    ClientGame::addVehiclePart( &part[BP_GV_BODY] );
 
     //
     // turret
@@ -375,7 +375,7 @@ void ClientGame::drawGV(DrawInfo_GV_t* drawInfo)
 	part[BP_GV_TURRET].shadowPlane = shadowPlane;
     part[BP_GV_TURRET].renderfx = renderfx;
     VectorCopy (part[BP_GV_TURRET].origin, part[BP_GV_TURRET].oldorigin);
-    CG_AddVehiclePart( &part[BP_GV_TURRET] );
+    ClientGame::addVehiclePart( &part[BP_GV_TURRET] );
 
     //
     // gun
@@ -388,7 +388,7 @@ void ClientGame::drawGV(DrawInfo_GV_t* drawInfo)
 	part[BP_GV_GUNBARREL].shadowPlane = shadowPlane;
     part[BP_GV_GUNBARREL].renderfx = renderfx;
     VectorCopy (part[BP_GV_GUNBARREL].origin, part[BP_GV_GUNBARREL].oldorigin);
-    CG_AddVehiclePart( &part[BP_GV_GUNBARREL] );
+    ClientGame::addVehiclePart( &part[BP_GV_GUNBARREL] );
 
 	//
 	// wheels
@@ -430,7 +430,7 @@ void ClientGame::drawGV(DrawInfo_GV_t* drawInfo)
 			
 			ClientGame::positionRotatedEntityOnTag( &part[BP_GV_WHEEL+ii], &part[BP_GV_BODY], veh->handle[BP_GV_BODY], gv_tags[BP_GV_WHEEL+ii] );
 			
-			CG_AddVehiclePart( &part[BP_GV_WHEEL+ii] );
+			ClientGame::addVehiclePart( &part[BP_GV_WHEEL+ii] );
 		}
 	}
 
@@ -489,7 +489,7 @@ void ClientGame::drawBoat(DrawInfo_Boat_t* drawInfo)
     part[BP_BOAT_BODY].shadowPlane = shadowPlane;
     part[BP_BOAT_BODY].renderfx = renderfx;
     VectorCopy (part[BP_BOAT_BODY].origin, part[BP_BOAT_BODY].oldorigin);
-    CG_AddVehiclePart( &part[BP_BOAT_BODY] );
+    ClientGame::addVehiclePart( &part[BP_BOAT_BODY] );
 
     //
     // turrets
@@ -506,7 +506,7 @@ void ClientGame::drawBoat(DrawInfo_Boat_t* drawInfo)
 		part[BP_BOAT_TURRET+j].shadowPlane = shadowPlane;
 		part[BP_BOAT_TURRET+j].renderfx = renderfx;
 		VectorCopy (part[BP_BOAT_TURRET+j].origin, part[BP_BOAT_TURRET+j].oldorigin);
-		CG_AddVehiclePart( &part[BP_BOAT_TURRET+j] );
+		ClientGame::addVehiclePart( &part[BP_BOAT_TURRET+j] );
 		// gun
 		part[BP_BOAT_GUNBARREL+j].hModel = veh->handle[BP_BOAT_GUNBARREL+j];
 		VectorCopy( drawInfo->basicInfo.origin, part[BP_BOAT_GUNBARREL+j].lightingOrigin );
@@ -516,7 +516,7 @@ void ClientGame::drawBoat(DrawInfo_Boat_t* drawInfo)
 		part[BP_BOAT_GUNBARREL+j].shadowPlane = shadowPlane;
 		part[BP_BOAT_GUNBARREL+j].renderfx = renderfx;
 		VectorCopy (part[BP_BOAT_GUNBARREL+j].origin, part[BP_BOAT_GUNBARREL+j].oldorigin);
-		CG_AddVehiclePart( &part[BP_BOAT_GUNBARREL+j] );
+		ClientGame::addVehiclePart( &part[BP_BOAT_GUNBARREL+j] );
 
 	}
 
@@ -564,7 +564,7 @@ refEntity_t	    part[BP_HELO_MAX_PARTS];
     part[BP_HELO_BODY].shadowPlane = shadowPlane;
     part[BP_HELO_BODY].renderfx = renderfx;
     VectorCopy (part[BP_HELO_BODY].origin, part[BP_HELO_BODY].oldorigin);
-    CG_AddVehiclePart( &part[BP_HELO_BODY] );
+    ClientGame::addVehiclePart( &part[BP_HELO_BODY] );
 
 
 
@@ -584,7 +584,7 @@ refEntity_t	    part[BP_HELO_MAX_PARTS];
 		ClientGame::positionRotatedEntityOnTag( &part[i], &part[BP_HELO_BODY], veh->handle[BP_HELO_BODY], helo_tags[i] );
 		part[i].shadowPlane = shadowPlane;
 		part[i].renderfx = renderfx;
-		CG_AddVehiclePart( &part[i] );
+		ClientGame::addVehiclePart( &part[i] );
 	}
 
 
@@ -601,7 +601,7 @@ refEntity_t	    part[BP_HELO_MAX_PARTS];
 		ClientGame::positionEntityOnTag( &part[i], &part[BP_HELO_BODY], veh->handle[BP_HELO_BODY], helo_tags[i] );
 		part[i].shadowPlane = shadowPlane;
 		part[i].renderfx = renderfx;
-		CG_AddVehiclePart( &part[i] );
+		ClientGame::addVehiclePart( &part[i] );
 	}
 
 	// vwep
@@ -623,7 +623,7 @@ refEntity_t	    part[BP_HELO_MAX_PARTS];
 						drawInfo->basicInfo.usedLoadout->mounts[i].tag.name );
 				vwep.shadowPlane = shadowPlane;
 				vwep.renderfx = renderfx;
-				CG_AddVehiclePart( &vwep );
+				ClientGame::addVehiclePart( &vwep );
 			}
 		}
 	}
@@ -643,7 +643,7 @@ refEntity_t	    part[BP_HELO_MAX_PARTS];
 		part[BP_HELO_TURRET+j].shadowPlane = shadowPlane;
 		part[BP_HELO_TURRET+j].renderfx = renderfx;
 		VectorCopy (part[BP_HELO_TURRET+j].origin, part[BP_HELO_TURRET+j].oldorigin);
-		CG_AddVehiclePart( &part[BP_HELO_TURRET+j] );
+		ClientGame::addVehiclePart( &part[BP_HELO_TURRET+j] );
 		// gun
 		part[BP_HELO_GUNBARREL+j].hModel = veh->handle[BP_HELO_GUNBARREL+j];
 		VectorCopy( drawInfo->basicInfo.origin, part[BP_HELO_GUNBARREL+j].lightingOrigin );
@@ -653,7 +653,7 @@ refEntity_t	    part[BP_HELO_MAX_PARTS];
 		part[BP_HELO_GUNBARREL+j].shadowPlane = shadowPlane;
 		part[BP_HELO_GUNBARREL+j].renderfx = renderfx;
 		VectorCopy (part[BP_HELO_GUNBARREL+j].origin, part[BP_HELO_GUNBARREL+j].oldorigin);
-		CG_AddVehiclePart( &part[BP_HELO_GUNBARREL+j] );
+		ClientGame::addVehiclePart( &part[BP_HELO_GUNBARREL+j] );
 
 	}
 
@@ -948,7 +948,7 @@ void ClientGame::drawLQM(DrawInfo_LQM_t* drawInfo)
     part[BP_LQM_LEGS].shadowPlane = shadowPlane;
     part[BP_LQM_LEGS].renderfx = renderfx;
     VectorCopy (part[BP_LQM_LEGS].origin, part[BP_LQM_LEGS].oldorigin);
-    CG_AddVehiclePart( &part[BP_LQM_LEGS] );
+    ClientGame::addVehiclePart( &part[BP_LQM_LEGS] );
 
 	//
 	// Add Torso
@@ -977,7 +977,7 @@ void ClientGame::drawLQM(DrawInfo_LQM_t* drawInfo)
 	ClientGame::positionRotatedEntityOnTag( &part[BP_LQM_TORSO], &part[BP_LQM_LEGS], veh->handle[BP_LQM_LEGS], lqm_tags[BP_LQM_TORSO] );
 	part[BP_LQM_TORSO].shadowPlane = shadowPlane;
 	part[BP_LQM_TORSO].renderfx = renderfx;
-	CG_AddVehiclePart( &part[BP_LQM_TORSO] );
+	ClientGame::addVehiclePart( &part[BP_LQM_TORSO] );
 
 	// Add Head
 	part[BP_LQM_HEAD].hModel = veh->handle[BP_LQM_HEAD];
@@ -991,7 +991,7 @@ void ClientGame::drawLQM(DrawInfo_LQM_t* drawInfo)
 	ClientGame::positionRotatedEntityOnTag( &part[BP_LQM_HEAD], &part[BP_LQM_TORSO], veh->handle[BP_LQM_TORSO], lqm_tags[BP_LQM_HEAD] );
 	part[BP_LQM_HEAD].shadowPlane = shadowPlane;
 	part[BP_LQM_HEAD].renderfx = renderfx;
-	CG_AddVehiclePart( &part[BP_LQM_HEAD] );
+	ClientGame::addVehiclePart( &part[BP_LQM_HEAD] );
 
 	// Add Weapon
 	part[BP_LQM_MAX_PARTS].hModel = availableWeapons[drawInfo->weaponIndex].modelHandle;
@@ -1000,7 +1000,7 @@ void ClientGame::drawLQM(DrawInfo_LQM_t* drawInfo)
 	ClientGame::positionRotatedEntityOnTag( &part[BP_LQM_MAX_PARTS], &part[BP_LQM_TORSO], veh->handle[BP_LQM_TORSO], "tag_weap" );
 	part[BP_LQM_MAX_PARTS].shadowPlane = shadowPlane;
 	part[BP_LQM_MAX_PARTS].renderfx = renderfx;
-	CG_AddVehiclePart( &part[BP_LQM_MAX_PARTS] );
+	ClientGame::addVehiclePart( &part[BP_LQM_MAX_PARTS] );
 
 	// muzzleflash
 	if( drawInfo->basicInfo.drawMuzzleFlash ) {
@@ -1026,7 +1026,7 @@ void ClientGame::drawGI(DrawInfo_GI_t* drawInfo)
 	VectorCopy( drawInfo->basicInfo.origin, part[BP_GI_BODY].origin );	
 	VectorCopy( drawInfo->basicInfo.origin, part[BP_GI_BODY].oldorigin);
 	AxisCopy( drawInfo->basicInfo.axis, part[BP_GI_BODY].axis );
-	CG_AddVehiclePart( &part[BP_GI_BODY] );
+	ClientGame::addVehiclePart( &part[BP_GI_BODY] );
 
 	// other parts
 	for( i = 1; i < BP_GI_MAX_PARTS; i++ ) 
@@ -1068,6 +1068,6 @@ void ClientGame::drawGI(DrawInfo_GI_t* drawInfo)
 			ClientGame::positionRotatedEntityOnTag( &part[i], &part[BP_GI_BODY], 
 				veh->handle[BP_GI_BODY], gi_tags[i] );
 		}
-		CG_AddVehiclePart( &part[i] );
+		ClientGame::addVehiclePart( &part[i] );
 	}
 }

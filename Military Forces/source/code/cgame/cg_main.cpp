@@ -369,10 +369,10 @@ void CG_RegisterCvars( ) {
 
 /*																																			
 ===================
-CG_ForceModelChange
+ClientGame::forceModelChange
 ===================
 */
-static void CG_ForceModelChange( ) {
+void ClientGame::forceModelChange( ) {
 	int		i;
 
 	for (i=0 ; i<MAX_CLIENTS ; i++) {
@@ -424,7 +424,7 @@ void ClientGame::updateCvars( )
 	if ( forceModelModificationCount != cg_forceModel.modificationCount ) 
 	{
 		forceModelModificationCount = cg_forceModel.modificationCount;
-		CG_ForceModelChange();
+		ClientGame::forceModelChange();
 	}
 	cg.tracernum = (cg_tracer.integer > 0) ? cg_tracer.integer : 3;
 }
@@ -480,12 +480,12 @@ const char *ClientGame::argv( int arg )
 
 /*
 =================
-CG_RegisterItemSounds
+ClientGame::registerItemSounds
 
 The server says this item is used on this level
 =================
 */
-static void CG_RegisterItemSounds( int itemNum ) {
+void ClientGame::registerItemSounds( int itemNum ) {
 	gitem_t			*item;
 	char			data[MAX_QPATH];
 	char			*s, *start;
@@ -528,12 +528,12 @@ static void CG_RegisterItemSounds( int itemNum ) {
 
 /*
 =================
-CG_RegisterSounds
+ClientGame::registerSounds
 
 called during a precache command
 =================
 */
-static void CG_RegisterSounds( ) {
+void ClientGame::registerSounds( ) {
 	int		i;
 	char	items[MAX_ITEMS+1];
 	const char	*soundName;
@@ -608,7 +608,7 @@ static void CG_RegisterSounds( ) {
 
 	for ( i = 1 ; i < bg_numItems ; i++ ) {
 //		if ( items[ i ] == '1' || cg_buildScript.integer ) {
-			CG_RegisterItemSounds( i );
+			ClientGame::registerItemSounds( i );
 //		}
 	}
 
@@ -680,12 +680,12 @@ static void CG_RegisterSounds( ) {
 
 /*
 =================
-CG_PrecacheVehiclePreview
+ClientGame::precacheVehiclePreview
 
 Simply does a refExport.RegisterShaderNoMip() for all our icons
 =================
 */
-static void CG_PrecacheVehiclePreview( )
+void ClientGame::precacheVehiclePreview( )
 {
 	char * pIconString = nullptr;
 	int i = 0;
@@ -707,12 +707,12 @@ static void CG_PrecacheVehiclePreview( )
 
 /*
 =================
-CG_RegisterGraphics
+ClientGame::registerGraphics
 
 This function may execute for a couple of minutes with a slow disk.
 =================
 */
-static void CG_RegisterGraphics( ) {
+void ClientGame::registerGraphics( ) {
 	int			i;
 	char		items[MAX_ITEMS+1];
 	static char		*sb_nums[11] = {
@@ -1035,7 +1035,7 @@ static void CG_RegisterGraphics( ) {
 
 	// MFQ3: precache the vehicle icons here (they are used by the UI, but registered models
 	// are engine-global)
-	CG_PrecacheVehiclePreview();
+	ClientGame::precacheVehiclePreview();
 
 	cgs.media.bulletFlashModel = refExport.RegisterModel( "models/weaphits/bullet.md3");
 	cgs.media.dishFlashModel = refExport.RegisterModel( "models/weaphits/boom01.md3");
@@ -1122,10 +1122,10 @@ void ClientGame::buildSpectatorString() {
 
 /*																																			
 ===================
-CG_RegisterClients
+ClientGame::registerClients
 ===================
 */
-static void CG_RegisterClients( ) {
+void ClientGame::registerClients( ) {
 	int		i;
 
 	ClientGame::newClientInfo(cg.clientNum);
@@ -1565,10 +1565,10 @@ void ClientGame::setScoreSelection(void *p) {
 
 /*
 =================
-CG_InfoFromScoreIndex
+ClientGame::infoFromScoreIndex
 =================
 */
-static clientInfo_t * CG_InfoFromScoreIndex(int index, int team, int *scoreIndex) {
+clientInfo_t * ClientGame::infoFromScoreIndex(int index, int team, int *scoreIndex) {
 	int i, count;
 	if ( cgs.gametype >= GT_TEAM ) {
 		count = 0;
@@ -1613,7 +1613,7 @@ const char *CG_FeederItemText(float feederID, int index, int column, qhandle_t *
 		team = ClientBase::TEAM_SPECTATOR;
 	}
 
-	info = CG_InfoFromScoreIndex(index, team, &scoreIndex);
+	info = ClientGame::infoFromScoreIndex(index, team, &scoreIndex);
 	sp = &cg.scores[scoreIndex];
 
 	// spectator?
@@ -2034,17 +2034,17 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	cgUtils.string_Init();
 
 	ClientGame::loadingStage( "sounds", 0.1f, 0.2f );
-	CG_RegisterSounds();
+	ClientGame::registerSounds();
 
 	ClientGame::loadingStage( "graphics", 0.2f, 0.35f );
-	CG_RegisterGraphics();
+	ClientGame::registerGraphics();
 
 	ClientGame::loadingStage( "weapons", 0.85f, 0.95f );
 	ClientGame::registerWeapons();
 
 	ClientGame::loadingStage( "clients", 0.95f, 1.0f );
 
-	CG_RegisterClients();
+	ClientGame::registerClients();
 
 	CG_AssetCache();       // cache UI gfx
 	CG_LoadHudMenu();      // load New hud stuff

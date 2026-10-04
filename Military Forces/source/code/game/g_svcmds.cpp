@@ -103,10 +103,10 @@ static bool StringToFilter (char *s, ipFilter_t *f)
 
 /*
 =================
-UpdateIPBans
+Game::updateIPBans
 =================
 */
-static void UpdateIPBans ()
+void Game::updateIPBans()
 {
 	byte	b[4];
 	int		i;
@@ -162,10 +162,10 @@ bool Game::filterPacket (char *from)
 
 /*
 =================
-AddIP
+Game::addIP
 =================
 */
-static void AddIP( char *str )
+void Game::addIP( char *str )
 {
 	int		i;
 
@@ -185,7 +185,7 @@ static void AddIP( char *str )
 	if (!StringToFilter (str, &ipFilters[i]))
 		ipFilters[i].compare = 0xffffffffu;
 
-	UpdateIPBans();
+	Game::updateIPBans();
 }
 
 /*
@@ -207,7 +207,7 @@ void Game::processIPBans()
 		while (*s == ' ')
 			*s++ = 0;
 		if (*t)
-			AddIP( t );
+			Game::addIP( t );
 		t = s;
 	}
 }
@@ -229,7 +229,7 @@ void Svcmd_AddIP_f ()
 
 	CommandSystem::argvBuffer( 1, str, sizeof( str ) );
 
-	AddIP( str );
+	Game::addIP( str );
 
 }
 
@@ -260,7 +260,7 @@ void Svcmd_RemoveIP_f ()
 			ipFilters[i].compare = 0xffffffffu;
 			Common::printf ("Removed.\n");
 
-			UpdateIPBans();
+			Game::updateIPBans();
 			return;
 		}
 	}

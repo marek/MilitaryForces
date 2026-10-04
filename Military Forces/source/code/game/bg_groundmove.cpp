@@ -50,12 +50,12 @@ void PM_GroundVehicle_Brakes()
 
 /*
 ===================
-PM_GroundVehicle_FuelFlow
+PlayerMove::groundVehicle_FuelFlow
 
 ===================
 */
 
-static void PM_GroundVehicle_FuelFlow( int throttle )
+void PlayerMove::groundVehicle_FuelFlow( int throttle )
 {
 	int fuelflow = (20 - throttle) * 1000;
 
@@ -74,10 +74,10 @@ static void PM_GroundVehicle_FuelFlow( int throttle )
 
 /*
 ===================
-PM_GroundVehicleAccelerate
+PlayerMove::groundVehicleAccelerate
 ===================
 */
-static void PM_GroundVehicleAccelerate()
+void PlayerMove::groundVehicleAccelerate()
 {
     float	topspeed = availableVehicles[pm->vehicle].maxspeed;
     float	currspeed = static_cast<float>(pm->ps->speed)/10;
@@ -152,16 +152,16 @@ static void PM_GroundVehicleAccelerate()
 		throttle *= -1;
 	}
 
-	PM_GroundVehicle_FuelFlow( throttle );
+	PlayerMove::groundVehicle_FuelFlow( throttle );
 }
 
 /*
 ===================
-PM_AdjustToTerrain
+PlayerMove::adjustToTerrain
 
 ===================
 */
-static void PM_AdjustToTerrain( ) 
+void PlayerMove::adjustToTerrain( ) 
 {
 	trace_t		tr;
 	vec3_t		dir, forward, right;
@@ -348,7 +348,7 @@ void PlayerMove::groundVehicleMove( )
 	}
 
 	// set speed
-	PM_GroundVehicleAccelerate();
+	PlayerMove::groundVehicleAccelerate();
 
 	// speed
 	speed = static_cast<float>(pm->ps->speed)/10;
@@ -365,7 +365,7 @@ void PlayerMove::groundVehicleMove( )
 	PM_SlideMove_GV();
 
 	// put the vehicle into the landscape with proper angles
-	PM_AdjustToTerrain();
+	PlayerMove::adjustToTerrain();
 
 	// get the actual turret angles
 	AngleVectors( pm->ps->vehicleAngles, forward, nullptr, up );
@@ -472,10 +472,10 @@ void PlayerMove::groundVehicleMove( )
 
 /*
 ===============
-PM_AddTouchEnt_GV
+PlayerMove::addTouchEnt_GV
 ===============
 */
-static void PM_AddTouchEnt_GV( int entityNum ) {
+void PlayerMove::addTouchEnt_GV( int entityNum ) {
 	int		i;
 
 	if ( entityNum == ENTITYNUM_WORLD ) {
@@ -592,7 +592,7 @@ bool	PM_SlideMove_GV() {
 			pm->ps->stats[STAT_HEALTH] <= 0 ||
 			(trace.entityNum == ENTITYNUM_WORLD &&
 			!(trace.surfaceFlags & SURF_SKY)) ) {
-			PM_AddTouchEnt_GV( trace.entityNum );
+			PlayerMove::addTouchEnt_GV( trace.entityNum );
 		}
 
 		time_left -= time_left * trace.fraction;

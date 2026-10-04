@@ -383,10 +383,10 @@ leakyBucket_t outboundLeakyBucket;
 
 /*
 ================
-SVC_HashForAddress
+ServerMain::sVC_HashForAddress
 ================
 */
-static long SVC_HashForAddress( netadr_t address ) {
+long ServerMain::sVC_HashForAddress( netadr_t address ) {
 	byte 		*ip = nullptr;
 	size_t	size = 0;
 	int			i;
@@ -410,15 +410,15 @@ static long SVC_HashForAddress( netadr_t address ) {
 
 /*
 ================
-SVC_BucketForAddress
+ServerMain::sVC_BucketForAddress
 
 Find or allocate a bucket for an address
 ================
 */
-static leakyBucket_t *SVC_BucketForAddress( netadr_t address, int burst, int period ) {
+leakyBucket_t * ServerMain::sVC_BucketForAddress( netadr_t address, int burst, int period ) {
 	leakyBucket_t	*bucket = nullptr;
 	int						i;
-	long					hash = SVC_HashForAddress( address );
+	long					hash = ServerMain::sVC_HashForAddress( address );
 	int						now = System::milliseconds();
 
 	for ( bucket = bucketHashes[ hash ]; bucket; bucket = bucket->next ) {
@@ -529,7 +529,7 @@ Rate limit for a particular address
 ================
 */
 bool SVC_RateLimitAddress( netadr_t from, int burst, int period ) {
-	leakyBucket_t *bucket = SVC_BucketForAddress( from, burst, period );
+	leakyBucket_t *bucket = ServerMain::sVC_BucketForAddress( from, burst, period );
 
 	return SVC_RateLimit( bucket, burst, period );
 }

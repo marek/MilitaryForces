@@ -216,10 +216,10 @@ void PlayerMove::lQMMove( )
 
 /*
 ===============
-PM_AddTouchEnt_LQM
+PlayerMove::addTouchEnt_LQM
 ===============
 */
-static void PM_AddTouchEnt_LQM( int entityNum ) {
+void PlayerMove::addTouchEnt_LQM( int entityNum ) {
 	int		i;
 
 	if ( entityNum == ENTITYNUM_WORLD ) {
@@ -333,7 +333,7 @@ bool	PM_SlideMove_LQM() {
 			(trace.entityNum == ENTITYNUM_WORLD &&
 //				!(trace.surfaceFlags & SURF_NOIMPACT) &&
 			!(trace.surfaceFlags & SURF_SKY)) ) {
-			PM_AddTouchEnt_LQM( trace.entityNum );
+			PlayerMove::addTouchEnt_LQM( trace.entityNum );
 		}
 
 		time_left -= time_left * trace.fraction;

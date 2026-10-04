@@ -53,7 +53,7 @@ struct snapshotCandidate_t {
 	float	priority;
 };
 
-static int SV_EntityUpdateBits( entityState_t *from, entityState_t *to, bool create, uint64_t forced ) 
+int ServerMain::entityUpdateBits( entityState_t *from, entityState_t *to, bool create, uint64_t forced ) 
 {
 	byte	buf[1024];
 	Message	msg;
@@ -65,7 +65,7 @@ static int SV_EntityUpdateBits( entityState_t *from, entityState_t *to, bool cre
 	return msg.bit;
 }
 
-static int QDECL SV_QsortSnapshotCandidates( const void *a, const void *b ) 
+int QDECL ServerMain::qsortSnapshotCandidates( const void *a, const void *b ) 
 {
 	const snapshotCandidate_t	*ca = static_cast<const snapshotCandidate_t *>(a);
 	const snapshotCandidate_t	*cb = static_cast<const snapshotCandidate_t *>(b);
@@ -79,7 +79,7 @@ static int QDECL SV_QsortSnapshotCandidates( const void *a, const void *b )
 	return ca->number - cb->number;
 }
 
-static float SV_SnapshotEntityWeight( const playerState_t *ps, const vec3_t forward, 
+float ServerMain::snapshotEntityWeight( const playerState_t *ps, const vec3_t forward, 
 									  entityState_t *state, entityState_t *known ) 
 {
 	EntityBase	*ent;
@@ -291,9 +291,9 @@ void SV_Client::emitPacketEntities( SV_Client::ClientSnapshot *frame, Message *m
 
 		if ( !( table->flags[num] & ENTITY_KNOWN ) ) {
 			action[num] = 1 + SENT_CREATE;
-			bits = SV_EntityUpdateBits( &theSV.serverEntities_[num].baseline_, state, true, 0 );
+			bits = ServerMain::entityUpdateBits( &theSV.serverEntities_[num].baseline_, state, true, 0 );
 		} else {
-			bits = SV_EntityUpdateBits( &table->sent[num], state, false, table->forced[num] );
+			bits = ServerMain::entityUpdateBits( &table->sent[num], state, false, table->forced[num] );
 			if ( !bits ) {
 				table->priority[num] = 0;
 				continue;
@@ -305,7 +305,7 @@ void SV_Client::emitPacketEntities( SV_Client::ClientSnapshot *frame, Message *m
 			continue;
 		}
 
-		table->priority[num] += SV_SnapshotEntityWeight( &frame->ps_, forward, state, 
+		table->priority[num] += ServerMain::snapshotEntityWeight( &frame->ps_, forward, state, 
 			( table->flags[num] & ENTITY_KNOWN ) ? &table->sent[num] : nullptr );
 		candidates[numCandidates].number = num;
 		candidates[numCandidates].bits = bits;
@@ -324,7 +324,7 @@ void SV_Client::emitPacketEntities( SV_Client::ClientSnapshot *frame, Message *m
 		remaining = 200 * 8;
 	}
 
-	qsort( candidates, numCandidates, sizeof( candidates[0] ), SV_QsortSnapshotCandidates );
+	qsort( candidates, numCandidates, sizeof( candidates[0] ), ServerMain::qsortSnapshotCandidates );
 
 	for ( i = 0 ; i < numCandidates ; i++ ) {
 		if ( candidates[i].bits <= remaining ) {
@@ -526,10 +526,10 @@ struct snapshotEntityNumbers_t {
 
 /*
 =======================
-SV_QsortEntityNumbers
+ServerMain::qsortEntityNumbers
 =======================
 */
-static int QDECL SV_QsortEntityNumbers( const void *a, const void *b ) {
+int QDECL ServerMain::qsortEntityNumbers( const void *a, const void *b ) {
 	int	*ea, *eb;
 
 	ea = (int *)a;
@@ -790,7 +790,7 @@ void SV_Client::buildClientSnapshot()
 	// to work correctly.  This also catches the error condition
 	// of an entity being included twice.
 	qsort( entityNumbers.snapshotEntities, entityNumbers.numSnapshotEntities, 
-		sizeof( entityNumbers.snapshotEntities[0] ), SV_QsortEntityNumbers );
+		sizeof( entityNumbers.snapshotEntities[0] ), ServerMain::qsortEntityNumbers );
 
 	// now that all viewpoint's areabits have been OR'd together, invert
 	// all of them to make it a mask vector, which is what the renderer wants

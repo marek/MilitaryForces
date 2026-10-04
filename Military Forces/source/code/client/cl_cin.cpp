@@ -149,7 +149,7 @@ void CIN_CloseAllVideos() {
 }
 
 
-static int CIN_HandleForVideo() {
+int Client::cIN_HandleForVideo() {
 	int		i;
 
 	for ( i = 0 ; i < MAX_VIDEO_HANDLES ; i++ ) {
@@ -165,7 +165,7 @@ static int CIN_HandleForVideo() {
 extern int CL_ScaledMilliseconds();
 
 //-----------------------------------------------------------------------------
-// RllSetupTable
+// Client::rllSetupTable
 //
 // Allocates and initializes the square table.
 //
@@ -173,7 +173,7 @@ extern int CL_ScaledMilliseconds();
 //
 // Returns:		Nothing
 //-----------------------------------------------------------------------------
-static void RllSetupTable( )
+void Client::rllSetupTable( )
 {
 	int z;
 
@@ -1055,7 +1055,7 @@ static void initRoQ( )
 	cinTable[currentHandle].VQBuffer = reinterpret_cast<void (*)(byte *, void *)>(blitVQQuad32fs);
 	cinTable[currentHandle].samplesPerPixel = 4;
 	ROQ_GenYUVTables();
-	RllSetupTable();
+	Client::rllSetupTable();
 }
 
 /******************************************************************************
@@ -1431,7 +1431,7 @@ int CIN_PlayCinematic( const char *arg, int x, int y, int w, int h, int systemBi
 	Common::dPrintf("CIN_PlayCinematic( %s )\n", arg);
 
 	Com_Memset(&cin, 0, sizeof(cinematics_t) );
-	currentHandle = CIN_HandleForVideo();
+	currentHandle = Client::cIN_HandleForVideo();
 
 	cin.currentHandle = currentHandle;
 

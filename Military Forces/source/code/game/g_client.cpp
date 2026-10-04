@@ -494,7 +494,7 @@ ClientBase::eTeam PickTeam( int ignoreClientNum )
 ClientCheckName
 ============
 */
-static void ClientCleanName( const char *in, char *out, int outSize ) {
+void Game::clientCleanName( const char *in, char *out, int outSize ) {
 	int		len, colorlessLen;
 	char	ch;
 	char	*p;
@@ -611,7 +611,7 @@ void ClientUserinfoChanged( int clientNum )
 	char	oldname[MAX_STRING_CHARS];
 	Q_strncpyz ( oldname, client->pers_.netname_, sizeof( oldname ) );
 	s = Info::valueForKey( userinfo, "name" );
-	ClientCleanName( s, client->pers_.netname_, sizeof(client->pers_.netname_) );
+	Game::clientCleanName( s, client->pers_.netname_, sizeof(client->pers_.netname_) );
 
 	if( client->sess_.sessionTeam_ == ClientBase::TEAM_SPECTATOR ) 
 	{

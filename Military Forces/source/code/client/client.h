@@ -639,6 +639,38 @@ public:
 	static bool closeAVI( );
 	static bool videoRecording( );
 	static void writeDemoMessage ( Message *msg, int headerBytes );
+
+public:
+	static ID_INLINE void safeFS_Write( const void *buf, int len, fileHandle_t f );
+	static ID_INLINE void wRITE_STRING( const char *s );
+	static ID_INLINE void wRITE_4BYTES( int x );
+	static ID_INLINE void wRITE_2BYTES( int x );
+	static ID_INLINE void sTART_CHUNK( const char *s );
+	static ID_INLINE void eND_CHUNK();
+	static bool checkFileSize( int bytesToAdd );
+	static int cIN_HandleForVideo();
+	static void rllSetupTable();
+	static void updateMumble();
+	static void updateVoipIgnore( const char *idstr, bool ignore );
+	static void updateVoipGain( const char *idstr, float gain );
+	static void voipNewGeneration();
+	static void captureVoip();
+	static float demoFrameDurationSDev();
+	static int walkDemoExt( char *arg, char *name, int *demofile );
+	static void completeDemoName( char *args, int argNum );
+	static void updateGUID( const char *prefix, int prefix_len );
+	static void oldGame();
+	static void completeRcon( char *args, int argNum );
+	static void completePlayerName( char *args, int argNum );
+	static void initDownload( const char *localName );
+	static void beginDownload( const char *remoteName );
+	static void beginHttpDownload( const char *remoteURL );
+	static void netchan_Encode( Message *msg );
+	static void netchan_Decode( Message *msg );
+	static void parseServerInfo();
+	static bool shouldIgnoreVoipSender( int sender );
+	static void playVoip( int sender, int samplecnt, const byte *data, int flags );
+	static void parseVoip( Message *msg, bool ignoreData );
 };
 
 #endif // __CLIENT_H__

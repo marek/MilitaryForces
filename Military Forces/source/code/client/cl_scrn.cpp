@@ -118,10 +118,10 @@ void Screen::drawPic( float x, float y, float width, float height, qhandle_t hSh
 
 
 /*
-** SCR_DrawChar
+** Screen::drawChar
 ** chars are drawn at 640*480 virtual screen size
 */
-static void SCR_DrawChar( int x, int y, float size, int ch ) {
+void Screen::drawChar( int x, int y, float size, int ch ) {
 	int row, col;
 	float frow, fcol;
 	float	ax, ay, aw, ah;
@@ -215,7 +215,7 @@ void SCR_DrawStringExt( int x, int y, float size, const char *string, float *set
 			s += 2;
 			continue;
 		}
-		SCR_DrawChar( xx+2, y+2, size, *s );
+		Screen::drawChar( xx+2, y+2, size, *s );
 		xx += size;
 		s++;
 	}
@@ -237,7 +237,7 @@ void SCR_DrawStringExt( int x, int y, float size, const char *string, float *set
 				continue;
 			}
 		}
-		SCR_DrawChar( xx, y, size, *s );
+		Screen::drawChar( xx, y, size, *s );
 		xx += size;
 		s++;
 	}
@@ -298,9 +298,9 @@ void Screen::drawSmallStringExt( int x, int y, const char *string, float *setCol
 
 
 /*
-** SCR_Strlen -- skips color escape codes
+** Screen::strlen -- skips color escape codes
 */
-static int SCR_Strlen( const char *str ) {
+int Screen::strlen( const char *str ) {
 	const char *s = str;
 	int count = 0;
 
@@ -320,7 +320,7 @@ static int SCR_Strlen( const char *str ) {
 ** Screen::getBigStringWidth
 */ 
 int	Screen::getBigStringWidth( const char *str ) {
-	return SCR_Strlen( str ) * BIGCHAR_WIDTH;
+	return Screen::strlen( str ) * BIGCHAR_WIDTH;
 }
 
 

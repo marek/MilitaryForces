@@ -9,7 +9,7 @@
 #include "g_miscvehicle.h"
 
 
-static void G_SpawnMissionVehicles(mission_vehicle_t* vehs)
+void Game::spawnMissionVehicles(mission_vehicle_t* vehs)
 {
 	for( int i = 0; i < IGME_MAX_VEHICLES; ++i )
 	{
@@ -28,7 +28,7 @@ static void G_SpawnMissionVehicles(mission_vehicle_t* vehs)
 	}
 }
 
-static void G_SpawnMissionGroundInstallations(mission_groundInstallation_t* gis)
+void Game::spawnMissionGroundInstallations(mission_groundInstallation_t* gis)
 {
 	for( int i = 0; i < IGME_MAX_VEHICLES; ++i )
 	{
@@ -47,7 +47,7 @@ static void G_SpawnMissionGroundInstallations(mission_groundInstallation_t* gis)
 }
 
 
-static bool G_LoadOverviewAndEntities( char *filename,
+bool Game::loadOverviewAndEntities( char *filename,
 										mission_overview_t* overview,
 										mission_vehicle_t* vehs,
 										mission_groundInstallation_t* gis)
@@ -110,10 +110,10 @@ void G_LoadMissionScripts()
 	CvarSystem::variableStringBuffer("mapname", buffer, 32);
 	Com_sprintf( filename, MAX_FILEPATH, "missions/%s/%s.mis", buffer, missionname );
 
-	if( !G_LoadOverviewAndEntities(filename, &overview, vehicles, installations) )
+	if( !Game::loadOverviewAndEntities(filename, &overview, vehicles, installations) )
 		return;
 
-	G_SpawnMissionVehicles(vehicles);
+	Game::spawnMissionVehicles(vehicles);
 
-	G_SpawnMissionGroundInstallations(installations);
+	Game::spawnMissionGroundInstallations(installations);
 }

@@ -12,10 +12,10 @@
 
 /*
 ==========================
-CG_FFARTrail
+ClientGame::fFARTrail
 ==========================
 */
-static void CG_FFARTrail( ClientEntity * cent, const weaponInfo_t *wi )
+void ClientGame::fFARTrail( ClientEntity * cent, const weaponInfo_t *wi )
 {
 	LocalEntity	* smoke;
 	vec3_t			up, pos, smoke_pos, velocity;
@@ -55,10 +55,10 @@ static void CG_FFARTrail( ClientEntity * cent, const weaponInfo_t *wi )
 
 /*
 ==========================
-CG_MissileTrail
+ClientGame::missileTrail
 ==========================
 */
-static void CG_MissileTrail( ClientEntity * cent, const weaponInfo_t *wi )
+void ClientGame::missileTrail( ClientEntity * cent, const weaponInfo_t *wi )
 {
 	LocalEntity	* smoke;
 	vec3_t			up, pos, smoke_pos, velocity;
@@ -112,10 +112,10 @@ static void CG_MissileTrail( ClientEntity * cent, const weaponInfo_t *wi )
 
 /*
 ==========================
-CG_FlareTrail
+ClientGame::flareTrail
 ==========================
 */
-static void CG_FlareTrail( ClientEntity * cent, const weaponInfo_t *wi )
+void ClientGame::flareTrail( ClientEntity * cent, const weaponInfo_t *wi )
 {
 	LocalEntity	* smoke;
 	vec3_t			up, pos, smoke_pos, velocity;
@@ -152,7 +152,7 @@ static void CG_FlareTrail( ClientEntity * cent, const weaponInfo_t *wi )
 }
 
 
-static void CG_MissileTrail2( ClientEntity * cent, const weaponInfo_t *wi ) {
+void ClientGame::missileTrail2( ClientEntity * cent, const weaponInfo_t *wi ) {
 	vec3_t  start, end;
 	LocalEntity *le;
 	refEntity_t   *re;
@@ -300,8 +300,8 @@ void ClientGame::registerWeapons() {
 			}
 
 			// FFAR trail with no dynamic lighting
-			weaponInfo->missileTrailFunc = CG_FFARTrail;
-			//weaponInfo->missileTrailFunc = CG_MissileTrail2;
+			weaponInfo->missileTrailFunc = ClientGame::fFARTrail;
+			//weaponInfo->missileTrailFunc = ClientGame::missileTrail2;
 			weaponInfo->missileDlight = 0;
 			
 			MAKERGB( weaponInfo->missileDlightColor, 1, 0.75f, 0 );
@@ -322,7 +322,7 @@ void ClientGame::registerWeapons() {
 
 
 			// FFAR trail with no dynamic lighting
-			weaponInfo->missileTrailFunc = CG_MissileTrail2;
+			weaponInfo->missileTrailFunc = ClientGame::missileTrail2;
 			weaponInfo->missileDlight = 0;
 			
 			MAKERGB( weaponInfo->missileDlightColor, 1, 0.75f, 0 );
@@ -400,7 +400,7 @@ void ClientGame::registerWeapons() {
 				case WI_CFLARE:
 				case WI_FLARE:
 				
-					weaponInfo->missileTrailFunc = CG_FlareTrail;
+					weaponInfo->missileTrailFunc = ClientGame::flareTrail;
 					break;
 				case WI_BURNINGMAN:
 					weaponInfo->missileSound = SoundSystem::registerSound( "sound/misc/scream.wav", false );
@@ -441,7 +441,7 @@ void ClientGame::registerWeapons() {
 						weaponInfo->missileModel = refExport.RegisterModel( availableWeapons[i].modelName );
 						weaponInfo->missileSound = SoundSystem::registerSound( "sound/weapons/rocket/rockfly.wav", false );
 						weaponInfo->flashSound[0] = SoundSystem::registerSound( "sound/weapons/rocket/rocklf1a.wav", false );
-						weaponInfo->missileTrailFunc = CG_MissileTrail;
+						weaponInfo->missileTrailFunc = ClientGame::missileTrail;
 			//		}
 			//		break;
 			//}

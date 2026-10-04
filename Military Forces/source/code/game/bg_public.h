@@ -1136,6 +1136,17 @@ public:
 	static bool getDimensions(const char* fileName, int frame, vec3_t* maxs, vec3_t* mins);
 	static void loadAllVehicleData();
 	static int findWeaponsOfType( int weaponIndex, completeLoadout_t* loadout );
+
+private:
+	static void parseOverview( char **buf, mission_overview_t* overview );
+	static void parseWaypoints( char **buf, mission_vehicle_t* veh );
+	static void parseVehicle( char **buf, mission_vehicle_t* veh );
+	static void parseGroundInstallation( char **buf, mission_groundInstallation_t* gi );
+	static void resolveMissionVehicle( mission_vehicle_t* veh );
+	static void resolveMissionGroundInstallation( mission_groundInstallation_t* gi );
+	static void parseEntities( char **buf, mission_vehicle_t* vehs, mission_groundInstallation_t* gis );
+	static void findDeck( const char *name, completeVehicleData_t *veh );
+	static int QDECL posCompare( const void* a, const void* b );
 };
 
 inline constexpr int MF_THROTTLE_REVERSE = -5;

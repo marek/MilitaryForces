@@ -626,7 +626,7 @@ void ME_SpawnWaypoint()
 	}
 }
 
-static IGME_vehicle_t* ME_SpawnVehicleAt( int vehidx, vec3_t pos, vec3_t angles ) 
+IGME_vehicle_t* ClientGame::mE_SpawnVehicleAt( int vehidx, vec3_t pos, vec3_t angles ) 
 {
 	IGME_vehicle_t*	 veh = nullptr;
 	int i;
@@ -667,12 +667,12 @@ static IGME_vehicle_t* ME_SpawnVehicleAt( int vehidx, vec3_t pos, vec3_t angles 
 IGME_vehicle_t* ME_SpawnVehicle( int vehidx ) 
 {
 	// spawns at current player location
-	return ME_SpawnVehicleAt( vehidx, 
+	return ClientGame::mE_SpawnVehicleAt( vehidx, 
 							  cg.predictedPlayerState.origin,
 							  cg.predictedPlayerState.viewangles );
 }
 
-static IGME_vehicle_t* ME_SpawnGroundInstallationAt( int idx, vec3_t pos, vec3_t angles )
+IGME_vehicle_t* ClientGame::mE_SpawnGroundInstallationAt( int idx, vec3_t pos, vec3_t angles )
 {
 	IGME_vehicle_t*	 veh = nullptr;
 	int i;
@@ -714,7 +714,7 @@ static IGME_vehicle_t* ME_SpawnGroundInstallationAt( int idx, vec3_t pos, vec3_t
 void ME_SpawnGroundInstallation( int idx )
 {
 	// spawn at player loc
-	ME_SpawnGroundInstallationAt( idx, 
+	ClientGame::mE_SpawnGroundInstallationAt( idx, 
 								  cg.predictedPlayerState.origin, 
 								  cg.predictedPlayerState.viewangles );
 }
@@ -988,14 +988,14 @@ void ME_ExportToScript( const char* scriptname )
 }
 
 
-static void ME_SpawnMissionGroundInstallations(mission_groundInstallation_t* gis)
+void ClientGame::mE_SpawnMissionGroundInstallations(mission_groundInstallation_t* gis)
 {
 	int	i;
 
 	for( i = 0; i < IGME_MAX_VEHICLES; ++i )
 	{
 		if( !gis[i].used ) break;
-		IGME_vehicle_t* veh = ME_SpawnGroundInstallationAt(gis[i].index,
+		IGME_vehicle_t* veh = ClientGame::mE_SpawnGroundInstallationAt(gis[i].index,
 									 gis[i].origin,
 									 gis[i].angles);
 		if( veh && (!Q_stricmp( gis[i].teamname, "red" ) || !Q_stricmp( gis[i].teamname, "blue" )) )
@@ -1004,7 +1004,7 @@ static void ME_SpawnMissionGroundInstallations(mission_groundInstallation_t* gis
 }
 
 
-static void ME_SpawnMissionVehicles(mission_vehicle_t* vehs)
+void ClientGame::mE_SpawnMissionVehicles(mission_vehicle_t* vehs)
 {
 	int	i, j, k;
 	IGME_vehicle_t* veh;
@@ -1012,7 +1012,7 @@ static void ME_SpawnMissionVehicles(mission_vehicle_t* vehs)
 	for( i = 0; i < IGME_MAX_VEHICLES; ++i )
 	{
 		if( !vehs[i].used ) break;
-		veh = ME_SpawnVehicleAt(vehs[i].index,
+		veh = ClientGame::mE_SpawnVehicleAt(vehs[i].index,
 					 		    vehs[i].origin,
 								vehs[i].angles);
 		if( !veh ) continue;
@@ -1034,7 +1034,7 @@ static void ME_SpawnMissionVehicles(mission_vehicle_t* vehs)
 }
 
 
-static bool ME_LoadOverviewAndEntities( char *filename,
+bool ClientGame::mE_LoadOverviewAndEntities( char *filename,
 										mission_overview_t* overview,
 										mission_vehicle_t* vehs, 
 										mission_groundInstallation_t* gis)
@@ -1085,7 +1085,7 @@ void ME_ImportScript( const char* scriptname )
 	mapname = Info::valueForKey( info, "mapname" );
 	Com_sprintf(filename, 255, "missions/%s/%s.mis", mapname, scriptname);
 
-	if( !ME_LoadOverviewAndEntities(filename, &overview, vehicles, installations) )
+	if( !ClientGame::mE_LoadOverviewAndEntities(filename, &overview, vehicles, installations) )
 	{
 		Common::printf( "Unable to load script\n" );
 		return;
@@ -1095,8 +1095,8 @@ void ME_ImportScript( const char* scriptname )
 	memset( &cgs.IGME, 0, sizeof(cgs.IGME) );
 
 	// spawn New stuff
-	ME_SpawnMissionVehicles(vehicles);
-	ME_SpawnMissionGroundInstallations(installations);
+	ClientGame::mE_SpawnMissionVehicles(vehicles);
+	ClientGame::mE_SpawnMissionGroundInstallations(installations);
 }
 
 // loads up initial mission (specified in mf_mission)

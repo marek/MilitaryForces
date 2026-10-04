@@ -26,12 +26,12 @@ constexpr int MAX_HELO_TARGROLL = 20;
 
 /*
 ===================
-PM_Helo_FuelFlow
+PlayerMove::helo_FuelFlow
 
 ===================
 */
 
-static void PM_Helo_FuelFlow( int throttle )
+void PlayerMove::helo_FuelFlow( int throttle )
 {
 	int fuelflow = (20 - throttle) * 1000;
 
@@ -241,11 +241,11 @@ void PM_Helo_Brakes()
 
 /*
 ===================
-PM_HeloAccelerate
+PlayerMove::heloAccelerate
 
 ===================
 */
-static void PM_HeloAccelerate()
+void PlayerMove::heloAccelerate()
 {
     float	throttle = pm->ps->fixed_throttle;
     int		maxthrottle = availableVehicles[pm->vehicle].maxthrottle;
@@ -291,7 +291,7 @@ static void PM_HeloAccelerate()
 	pm->ps->throttle = throttle;
 
 	// fuel flow
-	PM_Helo_FuelFlow( totalthrottle );
+	PlayerMove::helo_FuelFlow( totalthrottle );
 
 }
 
@@ -466,7 +466,7 @@ void PlayerMove::heloMove( )
 	turretdir[PITCH] = AngleMod( turretdir[PITCH] );
 
 	// Check acceleration
-	PM_HeloAccelerate();
+	PlayerMove::heloAccelerate();
 
     if( dead ) {
 		pm->ps->vehicleAngles[PITCH] = 30*sin(pm->ps->origin[2]/25);
@@ -641,7 +641,7 @@ void PlayerMove::heloMove( )
 PM_AddTouchEnt_Plane
 ===============
 */
-static void PM_AddTouchEnt_Helo( int entityNum ) {
+void PlayerMove::addTouchEnt_Helo( int entityNum ) {
 	int		i;
 
 	if ( entityNum == ENTITYNUM_WORLD ) {
@@ -753,7 +753,7 @@ bool	PM_SlideMove_Helo() {
 			(trace.entityNum == ENTITYNUM_WORLD &&
 //				!(trace.surfaceFlags & SURF_NOIMPACT) &&
 			!(trace.surfaceFlags & SURF_SKY)) ) {
-			PM_AddTouchEnt_Helo( trace.entityNum );
+			PlayerMove::addTouchEnt_Helo( trace.entityNum );
 		}
 
 		time_left -= time_left * trace.fraction;

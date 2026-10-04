@@ -14,12 +14,12 @@
 
 /*
 =================
-CG_CalcVrect
+ClientGame::calcVrect
 
 Sets the coordinates of the rendered window
 =================
 */
-static void CG_CalcVrect () {
+void ClientGame::calcVrect() {
 	int		size;
 
 	// the intermission should allways be full screen
@@ -52,7 +52,7 @@ static void CG_CalcVrect () {
 
 /*
 ===============
-CG_OffsetVehicleView
+ClientGame::offsetVehicleView
 
 ===============
 */
@@ -60,7 +60,7 @@ constexpr int FOCUS_DISTANCE = 512;
 //#define	_VIEW_SETTING_DISPLAY
 
 // MFQ3
-static void CG_OffsetVehicleView( bool spectator ) 
+void ClientGame::offsetVehicleView( bool spectator ) 
 {
     vec3_t	    forward, right, up;
     vec3_t	    focusAngles;
@@ -153,7 +153,7 @@ static void CG_OffsetVehicleView( bool spectator )
 
 
 // MFQ3
-static void CG_OffsetVehicleViewCFV( bool spectator ) 
+void ClientGame::offsetVehicleViewCFV( bool spectator ) 
 {
     vec3_t	    forward, right, up;
     vec3_t	    focusAngles;
@@ -253,11 +253,11 @@ static void CG_OffsetVehicleViewCFV( bool spectator )
 
 /*
 ===============
-CG_OffsetCockpitView
+ClientGame::offsetCockpitView
 MFQ3
 ===============
 */
-static void CG_OffsetCockpitView( ) 
+void ClientGame::offsetCockpitView( ) 
 {
     vec3_t	    forward, right, up;
     vec3_t	    view;
@@ -276,7 +276,7 @@ static void CG_OffsetCockpitView( )
 
 
 /*
-static void CG_OffsetCockpitView( void ) {
+static void ClientGame::offsetCockpitView( void ) {
 	float			*origin;
 	float			*angles;
 	float			ratio;
@@ -367,7 +367,7 @@ void ClientGame::zoomUp_f( )
 
 /*
 ====================
-CG_CalcFov
+ClientGame::calcFov
 
 Fixed fov at intermissions, otherwise account for fov variable and zooms.
 ====================
@@ -375,7 +375,7 @@ Fixed fov at intermissions, otherwise account for fov variable and zooms.
 constexpr int WAVE_AMPLITUDE = 1;
 constexpr double WAVE_FREQUENCY = 0.4;
 
-static int CG_CalcFov( ) {
+int ClientGame::calcFov( ) {
 	float	x;
 	float	phase;
 	float	v;
@@ -461,11 +461,11 @@ static int CG_CalcFov( ) {
 
 /*
 ===============
-CG_CalcViewValues
+ClientGame::calcViewValues
 ===============
 */
 
-static void CG_CalcMiscViewValues( )
+void ClientGame::calcMiscViewValues( )
 {
 	bool noAdjust = false;
 
@@ -511,24 +511,24 @@ static void CG_CalcMiscViewValues( )
 
 /*
 ===============
-CG_CalcViewValues
+ClientGame::calcViewValues
 
 Sets cg.refdef view values
 ===============
 */
-static int CG_CalcViewValues( ) {
+int ClientGame::calcViewValues( ) {
 	playerState_t	*ps;
 
 	memset( &cg.refdef, 0, sizeof( cg.refdef ) );
 
-	CG_CalcMiscViewValues();
+	ClientGame::calcMiscViewValues();
 
 	// strings for in game rendering
 	// Q_strncpyz( cg.refdef.text[0], "Park Ranger", sizeof(cg.refdef.text[0]) );
 	// Q_strncpyz( cg.refdef.text[1], "19", sizeof(cg.refdef.text[1]) );
 
 	// calculate size of 3D view
-	CG_CalcVrect();
+	ClientGame::calcVrect();
 
 	ps = &cg.predictedPlayerState;
 
@@ -537,7 +537,7 @@ static int CG_CalcViewValues( ) {
 		VectorCopy( ps->origin, cg.refdef.vieworg );
 		VectorCopy( ps->viewangles, cg.refdefViewAngles );
 		AnglesToAxis( cg.refdefViewAngles, cg.refdef.viewaxis );
-		return CG_CalcFov();
+		return ClientGame::calcFov();
 	}
 
 	VectorCopy( ps->origin, cg.refdef.vieworg );
@@ -565,14 +565,14 @@ static int CG_CalcViewValues( ) {
 	}
 
 	if( ps->pm_type == PM_SPECTATOR ) {
-	    CG_OffsetVehicleView(true);
+	    ClientGame::offsetVehicleView(true);
 	} else if ( cg.renderingThirdPerson ) {
 		if( cg_advanced.integer )
-			CG_OffsetVehicleViewCFV(false);
+			ClientGame::offsetVehicleViewCFV(false);
 		else
-			CG_OffsetVehicleView(false);
+			ClientGame::offsetVehicleView(false);
 	} else {
-		CG_OffsetCockpitView();
+		ClientGame::offsetCockpitView();
 	}
 
 	// position eye reletive to origin
@@ -583,7 +583,7 @@ static int CG_CalcViewValues( ) {
 	}
 
 	// field of view
-	return CG_CalcFov();
+	return ClientGame::calcFov();
 }
 
 
@@ -604,10 +604,10 @@ void ClientGame::addBufferedSound( sfxHandle_t sfx ) {
 
 /*
 =====================
-CG_PlayBufferedSounds
+ClientGame::playBufferedSounds
 =====================
 */
-static void CG_PlayBufferedSounds( ) {
+void ClientGame::playBufferedSounds( ) {
 	if ( cg.soundTime < cg.time ) {
 		if (cg.soundBufferOut != cg.soundBufferIn && cg.soundBuffer[cg.soundBufferOut]) {
 			SoundSystem::startLocalSound(cg.soundBuffer[cg.soundBufferOut], CHAN_ANNOUNCER);
@@ -674,7 +674,7 @@ void ClientGame::drawActiveFrame( int serverTime, stereoFrame_t stereoView, bool
 	cg.renderingThirdPerson = cg_thirdPerson.integer || (cg.snap->ps.stats[STAT_HEALTH] <= 0);
 
 	// build cg.refdef
-	inwater = CG_CalcViewValues();
+	inwater = ClientGame::calcViewValues();
 
 	// build the render lists
 	if ( !cg.hyperspace ) {
@@ -694,7 +694,7 @@ void ClientGame::drawActiveFrame( int serverTime, stereoFrame_t stereoView, bool
 	}
 
 	// add buffered sounds
-	CG_PlayBufferedSounds();
+	ClientGame::playBufferedSounds();
 
 	// finish up the rest of the refdef
 	if( cg.testModelEntity.hModel ) {

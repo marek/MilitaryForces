@@ -8,7 +8,7 @@
 #include "g_miscvehicle.h"
 
 
-static void loselock( GameEntity* ent )
+void Game::loselock( GameEntity* ent )
 {
 	// update target
 	if( ent->tracktarget_ && ent->tracktarget_->client_ ) {
@@ -24,7 +24,7 @@ static void loselock( GameEntity* ent )
 
 void GroundInstallation_Die::execute( GameEntity *inflictor, GameEntity *attacker, int damage, int meansOfDeath )
 {
-	loselock(self_);
+	Game::loselock(self_);
 
 	if( self_->score_ && attacker && attacker->client_ ) {
 		vec3_t	pos;
@@ -48,7 +48,7 @@ void GroundInstallation_Die::execute( GameEntity *inflictor, GameEntity *attacke
 	SV_LinkEntity( self_ );
 }
 
-static void Update_GI_Targets( GameEntity* ent )
+void Game::update_GI_Targets( GameEntity* ent )
 {
 	vec3_t			mins, maxs, rangevec, dir;
 	float			range = availableGroundInstallations[ent->s.modelindex2].radarRange;
@@ -133,34 +133,34 @@ static void Update_GI_Targets( GameEntity* ent )
 			if( !ent->tracktarget_->inuse_ ||
 				ent->tracktarget_->health_ <= 0 )
 			{
-				loselock(ent);
+				Game::loselock(ent);
 				return;
 			}
 			// armed ?
 			if( ent->count_ <= 0 )
 			{
-				loselock(ent);
+				Game::loselock(ent);
 				return;
 			}
 			// check distance
 			VectorSubtract(ent->tracktarget_->r.currentOrigin, ent->r.currentOrigin, dir);
 			if( VectorLength(dir) > range )
 			{
-				loselock(ent);
+				Game::loselock(ent);
 				return;
 			}
 			// check LOS
 			SV_Trace( &tr, ent->r.currentOrigin, nullptr, nullptr, ent->tracktarget_->r.currentOrigin, ent->s.number, MASK_PLAYERSOLID, false );
 			if( tr.fraction < 1 && tr.entityNum != ent->tracktarget_->s.number )
 			{
-				loselock(ent);
+				Game::loselock(ent);
 				return;
 			}
 		}
 	}
 	else if( ent->tracktarget_ )
 	{
-		loselock(ent);
+		Game::loselock(ent);
 	}
 }
 
@@ -172,7 +172,7 @@ void GroundInstallation_Think::execute()
 	vec3_t	targdir, targangles;
 	int		locktime;
 
-	Update_GI_Targets(ent);
+	Game::update_GI_Targets(ent);
 
 	if( ent->tracktarget_ )
 	{

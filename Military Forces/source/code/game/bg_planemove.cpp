@@ -111,12 +111,12 @@ void PlayerMove::toggle_Bay()
 
 /*
 ===================
-PM_Plane_FuelFlow
+PlayerMove::plane_FuelFlow
 
 ===================
 */
 
-static void PM_Plane_FuelFlow( int throttle )
+void PlayerMove::plane_FuelFlow( int throttle )
 {
 	int fuelflow = (20 - throttle) * 1000;
 
@@ -138,11 +138,11 @@ static void PM_Plane_FuelFlow( int throttle )
 
 /*
 ===================
-PM_PlaneAccelerate
+PlayerMove::planeAccelerate
 
 ===================
 */
-static void PM_PlaneAccelerate()
+void PlayerMove::planeAccelerate()
 {
     float	throttle = pm->ps->fixed_throttle;
     float	topspeed = availableVehicles[pm->vehicle].maxspeed;
@@ -207,7 +207,7 @@ static void PM_PlaneAccelerate()
     pm->ps->speed = currspeed*10;
 
 	// fuel flow
-	PM_Plane_FuelFlow( throttle );
+	PlayerMove::plane_FuelFlow( throttle );
 
 }
 
@@ -318,7 +318,7 @@ void PlayerMove::planeMove( )
 	viewdir[YAW] = AngleMod( viewdir[YAW] );
 	vehdir[YAW] = AngleMod( vehdir[YAW] );
 
-	PM_PlaneAccelerate();
+	PlayerMove::planeAccelerate();
 
 	// swing wings
 	if( availableVehicles[pm->vehicle].caps & HC_SWINGWING && !dead ) {
@@ -598,7 +598,7 @@ void PlayerMove::planeMoveAdvanced( )
 	viewdir[YAW] = AngleMod( viewdir[YAW] );
 	vehdir[YAW] = AngleMod( vehdir[YAW] );
 
-	PM_PlaneAccelerate();
+	PlayerMove::planeAccelerate();
 
 	// swing wings
 	if( availableVehicles[pm->vehicle].caps & HC_SWINGWING && !dead ) {
@@ -773,10 +773,10 @@ void PlayerMove::planeMoveAdvanced( )
 
 /*
 ===============
-PM_AddTouchEnt_Plane
+PlayerMove::addTouchEnt_Plane
 ===============
 */
-static void PM_AddTouchEnt_Plane( int entityNum ) {
+void PlayerMove::addTouchEnt_Plane( int entityNum ) {
 	int		i;
 
 	if ( entityNum == ENTITYNUM_WORLD ) {
@@ -890,7 +890,7 @@ bool	PM_SlideMove_Plane() {
 			(trace.entityNum == ENTITYNUM_WORLD &&
 //				!(trace.surfaceFlags & SURF_NOIMPACT) &&
 			!(trace.surfaceFlags & SURF_SKY)) ) {
-			PM_AddTouchEnt_Plane( trace.entityNum );
+			PlayerMove::addTouchEnt_Plane( trace.entityNum );
 		}
 
 		time_left -= time_left * trace.fraction;

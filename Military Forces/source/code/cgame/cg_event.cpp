@@ -54,12 +54,12 @@ const char	*ClientGame::placeString( int rank ) {
 
 /*
 ================
-CG_ItemPickup
+ClientGame::itemPickup
 
 A New item was picked up this frame
 ================
 */
-static void CG_ItemPickup( int itemNum ) {
+void ClientGame::itemPickup( int itemNum ) {
 	cg.itemPickup = itemNum;
 	cg.itemPickupTime = cg.time;
 	cg.itemPickupBlendTime = cg.time;
@@ -183,7 +183,7 @@ void ClientEntity::entityEvent( vec3_t position )
 
 			// show icon and name on status bar
 			if ( es->number == cg.snap->ps.clientNum ) {
-				CG_ItemPickup( index );
+				ClientGame::itemPickup( index );
 			}
 		}
 		break;
@@ -207,7 +207,7 @@ void ClientEntity::entityEvent( vec3_t position )
 
 			// show icon and name on status bar
 			if ( es->number == cg.snap->ps.clientNum ) {
-				CG_ItemPickup( index );
+				ClientGame::itemPickup( index );
 			}
 		}
 		break;

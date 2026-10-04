@@ -27,7 +27,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #ifdef LEGACY_PROTOCOL
 /*
 ==============
-CL_Netchan_Encode
+Client::netchan_Encode
 
 	// first 12 bytes of the data are always:
 	long serverId;
@@ -36,7 +36,7 @@ CL_Netchan_Encode
 
 ==============
 */
-static void CL_Netchan_Encode( Message *msg ) {
+void Client::netchan_Encode( Message *msg ) {
 	int serverId, messageAcknowledge, reliableAcknowledge;
 	int i, index, srdc, sbit, soob;
 	byte key, *string;
@@ -83,14 +83,14 @@ static void CL_Netchan_Encode( Message *msg ) {
 
 /*
 ==============
-CL_Netchan_Decode
+Client::netchan_Decode
 
 	// first four bytes of the data are always:
 	long reliableAcknowledge;
 
 ==============
 */
-static void CL_Netchan_Decode( Message *msg ) {
+void Client::netchan_Decode( Message *msg ) {
 	long reliableAcknowledge, i, index;
 	byte key, *string;
         int	srdc, sbit, soob;
@@ -154,7 +154,7 @@ void Client::netchan_Transmit( NetChannel *chan, Message* msg ) {
 
 #ifdef LEGACY_PROTOCOL
 	if(chan->compat)
-		CL_Netchan_Encode(msg);
+		Client::netchan_Encode(msg);
 #endif
 
 	chan->transmit( msg->cursize, msg->data );
@@ -180,7 +180,7 @@ bool Client::netchan_Process( NetChannel *chan, Message *msg ) {
 
 #ifdef LEGACY_PROTOCOL
 	if(chan->compat)
-		CL_Netchan_Decode(msg);
+		Client::netchan_Decode(msg);
 #endif
 
 	return true;

@@ -62,11 +62,11 @@ void ClientGame::buildSolidList( ) {
 
 /*
 ====================
-CG_ClipMoveToEntities
+ClientGame::clipMoveToEntities
 
 ====================
 */
-static void CG_ClipMoveToEntities ( const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end,
+void ClientGame::clipMoveToEntities( const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end,
 							int skipNumber, int mask, trace_t *tr ) {
 	int			i, x, zd, zu;
 	trace_t		trace;
@@ -145,7 +145,7 @@ void	ClientGame::trace( trace_t *result, const vec3_t start, const vec3_t mins, 
 	CollisionModel::boxTrace ( &t, start, end, const_cast<float *>(mins), const_cast<float *>(maxs), 0, mask, capsule);
 	t.entityNum = t.fraction != 1.0 ? ENTITYNUM_WORLD : ENTITYNUM_NONE;
 	// check all other solid models
-	CG_ClipMoveToEntities (start, mins, maxs, end, skipNumber, mask, &t);
+	ClientGame::clipMoveToEntities (start, mins, maxs, end, skipNumber, mask, &t);
 
 	*result = t;
 }
@@ -191,13 +191,13 @@ int		ClientGame::pointContents( const vec3_t point, int passEntityNum ) {
 
 /*
 ========================
-CG_InterpolatePlayerState
+ClientGame::interpolatePlayerState
 
 Generates cg.predictedPlayerState by interpolating between
 cg.snap->player_state and cg.nextFrame->player_state
 ========================
 */
-static void CG_InterpolatePlayerState( bool grabAngles ) {
+void ClientGame::interpolatePlayerState( bool grabAngles ) {
 	float			f;
 	int				i;
 	playerState_t	*out;
@@ -309,12 +309,12 @@ void ClientEntity::touchItem() {
 
 /*
 =========================
-CG_TouchTriggerPrediction
+ClientGame::touchTriggerPrediction
 
 Predict push triggers and items
 =========================
 */
-static void CG_TouchTriggerPrediction( ) {
+void ClientGame::touchTriggerPrediction( ) {
 	int			i;
 	trace_t		trace;
 	entityState_t	*ent;
@@ -412,13 +412,13 @@ void ClientGame::predictPlayerState( ) {
 
 	// demo playback just copies the moves
 	if ( cg.demoPlayback || (cg.snap->ps.pm_flags & PMF_FOLLOW) ) {
-		CG_InterpolatePlayerState( false );
+		ClientGame::interpolatePlayerState( false );
 		return;
 	}
 
 	// non-predicting local movement will grab the latest angles
 	if ( cg_nopredict.integer || cg_synchronousClients.integer ) {
-		CG_InterpolatePlayerState( true );
+		ClientGame::interpolatePlayerState( true );
 		return;
 	}
 
@@ -574,7 +574,7 @@ void ClientGame::predictPlayerState( ) {
 		moved = true;
 
 		// add push trigger movement effects
-		CG_TouchTriggerPrediction();
+		ClientGame::touchTriggerPrediction();
 
 		// check for predictable events that changed from previous predictions
 		//ClientGame::checkChangedPredictableEvents(&cg.predictedPlayerState);

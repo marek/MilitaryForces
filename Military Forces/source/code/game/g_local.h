@@ -584,6 +584,38 @@ public:
 	static void initSessionData( GameClient *client, char *userinfo );
 	static void initWorldSession();
 	static void writeSessionData();
+
+public:
+	static void riderAngles( GameClient *rider, GameClient *pilot, vec3_t out );
+	static bool riderVehicleValid( GameClient *pilot, GameEntity *veh );
+	static void riderThink( GameEntity *ent );
+	static void riderEndFrame( GameEntity *ent );
+	static void clientCleanName( const char *in, char *out, int outSize );
+	static void sayTo( GameEntity *ent, GameEntity *other, int mode, int color, const char *name, const char *message );
+	static void cmd_Say_f( GameEntity *ent, int mode, bool arg0 );
+	static void cmd_Tell_f( GameEntity* ent );
+	static void rider_SetVehicle( int clientNum, int vehicle );
+	static bool rider_Board( GameEntity *ent );
+	static void cmd_Enter( GameEntity *ent );
+	static void loselock( GameEntity* ent );
+	static void update_GI_Targets( GameEntity* ent );
+	static int miscVehicle_TeamScore( GameEntity *self, GameEntity *attacker );
+	static void miscVehicle_DropToGround( GameEntity *ent, float above, float below );
+	static void sP_misc_plane( GameEntity *ent );
+	static void sP_misc_gv( GameEntity *ent );
+	static void sP_misc_helo( GameEntity *ent );
+	static void sP_misc_boat( GameEntity *ent );
+	static void miscVehicle_SetTeam( GameEntity *ent );
+	static void nukeRadiusDamage( vec3_t origin, GameEntity *attacker, float damage, float radius );
+	static void nukeShockWave( vec3_t origin, GameEntity *attacker, float damage, float push, float radius );
+	static void burningManExplode( GameEntity *ent );
+	static void on_target_lost( GameEntity *missile );
+	static void spawnMissionVehicles( mission_vehicle_t* vehs );
+	static void spawnMissionGroundInstallations( mission_groundInstallation_t* gis );
+	static bool loadOverviewAndEntities( char *filename, mission_overview_t* overview, mission_vehicle_t* vehs, mission_groundInstallation_t* gis );
+	static void updateIPBans();
+	static void addIP( char *str );
+	static int QDECL sortClients( const void *a, const void *b );
 };
 // spawn string returns a temporary reference, you must CopyString() if you want to keep it
 

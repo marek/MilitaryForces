@@ -37,12 +37,12 @@ These commands can only be entered from stdin or by a remote operator datagram
 
 /*
 ==================
-SV_GetPlayerByHandle
+ServerMain::getPlayerByHandle
 
 Returns the player with player id or name from CommandSystem::argv(1)
 ==================
 */
-static SV_Client *SV_GetPlayerByHandle( ) {
+SV_Client * ServerMain::getPlayerByHandle( ) {
 	SV_Client	*cl;
 	int			i;
 	char		*s;
@@ -103,12 +103,12 @@ static SV_Client *SV_GetPlayerByHandle( ) {
 
 /*
 ==================
-SV_GetPlayerByNum
+ServerMain::getPlayerByNum
 
 Returns the player with idnum from CommandSystem::argv(1)
 ==================
 */
-static SV_Client *SV_GetPlayerByNum( ) {
+SV_Client * ServerMain::getPlayerByNum( ) {
 	SV_Client	*cl;
 	int			i;
 	int			idnum;
@@ -151,12 +151,12 @@ static SV_Client *SV_GetPlayerByNum( ) {
 
 /*
 ==================
-SV_Map_f
+ServerMain::map_f
 
 Restart the server on a different map
 ==================
 */
-static void SV_Map_f() 
+void ServerMain::map_f() 
 {
 	char		*cmd;
 	char		*map;
@@ -230,13 +230,13 @@ static void SV_Map_f()
 
 /*
 ================
-SV_MapRestart_f
+ServerMain::mapRestart_f
 
 Completely restarts a level, but doesn't send a new gamestate to the clients.
 This allows fair starts with variable load times.
 ================
 */
-static void SV_MapRestart_f() 
+void ServerMain::mapRestart_f() 
 {
 	// make sure we aren't restarting twice in the same frame
 	if( com_frameTime == theSV.serverId_ ) 
@@ -371,12 +371,12 @@ static void SV_MapRestart_f()
 
 /*
 ==================
-SV_Kick_f
+ServerMain::kick_f
 
 Kick a user off of the server
 ==================
 */
-static void SV_Kick_f( ) {
+void ServerMain::kick_f( ) {
 	SV_Client	*cl;
 	int			i;
 
@@ -391,7 +391,7 @@ static void SV_Kick_f( ) {
 		return;
 	}
 
-	cl = SV_GetPlayerByHandle();
+	cl = ServerMain::getPlayerByHandle();
 	if ( !cl ) {
 		if ( !Q_stricmp(CommandSystem::argv(1), "all") ) {
 			for ( i=1 ; i <= sv_maxclients->integer ; i++ ) {
@@ -436,12 +436,12 @@ static void SV_Kick_f( ) {
 
 /*
 ==================
-SV_KickBots_f
+ServerMain::kickBots_f
 
 Kick all bots off of the server
 ==================
 */
-static void SV_KickBots_f( ) {
+void ServerMain::kickBots_f( ) {
 	SV_Client	*cl;
 	int			i;
 
@@ -469,12 +469,12 @@ static void SV_KickBots_f( ) {
 }
 /*
 ==================
-SV_KickAll_f
+ServerMain::kickAll_f
 
 Kick all users off of the server
 ==================
 */
-static void SV_KickAll_f( ) {
+void ServerMain::kickAll_f( ) {
 	SV_Client *cl;
 	int i;
 
@@ -503,12 +503,12 @@ static void SV_KickAll_f( ) {
 
 /*
 ==================
-SV_KickNum_f
+ServerMain::kickNum_f
 
 Kick a user off of the server
 ==================
 */
-static void SV_KickNum_f( ) {
+void ServerMain::kickNum_f( ) {
 	SV_Client	*cl;
 
 	// make sure server is running
@@ -522,7 +522,7 @@ static void SV_KickNum_f( ) {
 		return;
 	}
 
-	cl = SV_GetPlayerByNum();
+	cl = ServerMain::getPlayerByNum();
 	if ( !cl ) {
 		return;
 	}
@@ -540,13 +540,13 @@ static void SV_KickNum_f( ) {
 
 /*
 ==================
-SV_Ban_f
+ServerMain::ban_f
 
 Ban a user from being able to play on this server through the auth
 server
 ==================
 */
-static void SV_Ban_f( void ) {
+void ServerMain::ban_f( void ) {
 	SV_Client	*cl;
 
 	// make sure server is running
@@ -560,7 +560,7 @@ static void SV_Ban_f( void ) {
 		return;
 	}
 
-	cl = SV_GetPlayerByHandle();
+	cl = ServerMain::getPlayerByHandle();
 
 	if (!cl) {
 		return;
@@ -596,13 +596,13 @@ static void SV_Ban_f( void ) {
 
 /*
 ==================
-SV_BanNum_f
+ServerMain::banNum_f
 
 Ban a user from being able to play on this server through the auth
 server
 ==================
 */
-static void SV_BanNum_f( void ) {
+void ServerMain::banNum_f( void ) {
 	SV_Client	*cl;
 
 	// make sure server is running
@@ -616,7 +616,7 @@ static void SV_BanNum_f( void ) {
 		return;
 	}
 
-	cl = SV_GetPlayerByNum();
+	cl = ServerMain::getPlayerByNum();
 	if ( !cl ) {
 		return;
 	}
@@ -651,12 +651,12 @@ static void SV_BanNum_f( void ) {
 
 /*
 ==================
-SV_RehashBans_f
+ServerMain::rehashBans_f
 
 Load saved bans from file.
 ==================
 */
-static void SV_RehashBans_f()
+void ServerMain::rehashBans_f()
 {
 	int index, filelen;
 	fileHandle_t readfrom;
@@ -733,12 +733,12 @@ static void SV_RehashBans_f()
 
 /*
 ==================
-SV_WriteBans
+ServerMain::writeBans
 
 Save bans to file.
 ==================
 */
-static void SV_WriteBans()
+void ServerMain::writeBans()
 {
 	int index;
 	fileHandle_t writeto;
@@ -769,13 +769,13 @@ static void SV_WriteBans()
 
 /*
 ==================
-SV_DelBanEntryFromList
+ServerMain::delBanEntryFromList
 
 Remove a ban or an exception from the list.
 ==================
 */
 
-static bool SV_DelBanEntryFromList(int index)
+bool ServerMain::delBanEntryFromList(int index)
 {
 	if(index == serverBansCount - 1)
 		serverBansCount--;
@@ -792,13 +792,13 @@ static bool SV_DelBanEntryFromList(int index)
 
 /*
 ==================
-SV_ParseCIDRNotation
+ServerMain::parseCIDRNotation
 
 Parse a CIDR notation type string and return a netadr_t and suffix by reference
 ==================
 */
 
-static bool SV_ParseCIDRNotation(netadr_t *dest, int *mask, char *adrstr)
+bool ServerMain::parseCIDRNotation(netadr_t *dest, int *mask, char *adrstr)
 {
 	char *suffix;
 	
@@ -837,13 +837,13 @@ static bool SV_ParseCIDRNotation(netadr_t *dest, int *mask, char *adrstr)
 
 /*
 ==================
-SV_AddBanToList
+ServerMain::addBanToList
 
 Ban a user from being able to play on this server based on his ip address.
 ==================
 */
 
-static void SV_AddBanToList(bool isexception)
+void ServerMain::addBanToList(bool isexception)
 {
 	char *banstring;
 	char addy2[NET_ADDRSTRMAXLEN];
@@ -877,7 +877,7 @@ static void SV_AddBanToList(bool isexception)
 	{
 		// This is an ip address, not a client num.
 		
-		if(SV_ParseCIDRNotation(&ip, &mask, banstring))
+		if(ServerMain::parseCIDRNotation(&ip, &mask, banstring))
 		{
 			Common::printf("Error: Invalid address %s\n", banstring);
 			return;
@@ -889,7 +889,7 @@ static void SV_AddBanToList(bool isexception)
 		
 		// client num.
 		
-		cl = SV_GetPlayerByNum();
+		cl = ServerMain::getPlayerByNum();
 
 		if(!cl)
 		{
@@ -962,7 +962,7 @@ static void SV_AddBanToList(bool isexception)
 		curban = &serverBans[index];
 		
 		if(curban->subnet > mask && (!curban->isexception || isexception) && Network::compareBaseAdrMask(curban->ip, ip, mask))
-			SV_DelBanEntryFromList(index);
+			ServerMain::delBanEntryFromList(index);
 		else
 			index++;
 	}
@@ -973,7 +973,7 @@ static void SV_AddBanToList(bool isexception)
 	
 	serverBansCount++;
 	
-	SV_WriteBans();
+	ServerMain::writeBans();
 
 	Common::printf("Added %s: %s/%d\n", isexception ? "ban exception" : "ban",
 		   Network::adrToString(ip), mask);
@@ -981,13 +981,13 @@ static void SV_AddBanToList(bool isexception)
 
 /*
 ==================
-SV_DelBanFromList
+ServerMain::delBanFromList
 
 Remove a ban or an exception from the list.
 ==================
 */
 
-static void SV_DelBanFromList(bool isexception)
+void ServerMain::delBanFromList(bool isexception)
 {
 	int index, count = 0, todel, mask;
 	netadr_t ip;
@@ -1011,7 +1011,7 @@ static void SV_DelBanFromList(bool isexception)
 	{
 		serverBan_t *curban;
 		
-		if(SV_ParseCIDRNotation(&ip, &mask, banstring))
+		if(ServerMain::parseCIDRNotation(&ip, &mask, banstring))
 		{
 			Common::printf("Error: Invalid address %s\n", banstring);
 			return;
@@ -1031,7 +1031,7 @@ static void SV_DelBanFromList(bool isexception)
 					   isexception ? "exception" : "ban",
 					   Network::adrToString(curban->ip), curban->subnet);
 					   
-				SV_DelBanEntryFromList(index);
+				ServerMain::delBanEntryFromList(index);
 			}
 			else
 				index++;
@@ -1059,7 +1059,7 @@ static void SV_DelBanFromList(bool isexception)
 					   isexception ? "exception" : "ban",
 					   Network::adrToString(serverBans[index].ip), serverBans[index].subnet);
 
-					SV_DelBanEntryFromList(index);
+					ServerMain::delBanEntryFromList(index);
 
 					break;
 				}
@@ -1067,19 +1067,19 @@ static void SV_DelBanFromList(bool isexception)
 		}
 	}
 	
-	SV_WriteBans();
+	ServerMain::writeBans();
 }
 
 
 /*
 ==================
-SV_ListBans_f
+ServerMain::listBans_f
 
 List all bans and exceptions on console
 ==================
 */
 
-static void SV_ListBans_f()
+void ServerMain::listBans_f()
 {
 	int index, count;
 	serverBan_t *ban;
@@ -1118,13 +1118,13 @@ static void SV_ListBans_f()
 
 /*
 ==================
-SV_FlushBans_f
+ServerMain::flushBans_f
 
 Delete all bans and exceptions.
 ==================
 */
 
-static void SV_FlushBans_f()
+void ServerMain::flushBans_f()
 {
 	// make sure server is running
 	if ( !com_sv_running->integer ) {
@@ -1135,35 +1135,35 @@ static void SV_FlushBans_f()
 	serverBansCount = 0;
 	
 	// empty the ban file.
-	SV_WriteBans();
+	ServerMain::writeBans();
 	
 	Common::printf("All bans and exceptions have been deleted.\n");
 }
 
-static void SV_BanAddr_f()
+void ServerMain::banAddr_f()
 {
-	SV_AddBanToList(false);
+	ServerMain::addBanToList(false);
 }
 
-static void SV_ExceptAddr_f()
+void ServerMain::exceptAddr_f()
 {
-	SV_AddBanToList(true);
+	ServerMain::addBanToList(true);
 }
 
-static void SV_BanDel_f()
+void ServerMain::banDel_f()
 {
-	SV_DelBanFromList(false);
+	ServerMain::delBanFromList(false);
 }
 
-static void SV_ExceptDel_f()
+void ServerMain::exceptDel_f()
 {
-	SV_DelBanFromList(true);
+	ServerMain::delBanFromList(true);
 }
 
 /*
-** SV_Strlen -- skips color escape codes
+** ServerMain::strlen -- skips color escape codes
 */
-static int SV_Strlen( const char *str ) {
+int ServerMain::strlen( const char *str ) {
 	const char *s = str;
 	int count = 0;
 
@@ -1181,10 +1181,10 @@ static int SV_Strlen( const char *str ) {
 
 /*
 ================
-SV_Status_f
+ServerMain::status_f
 ================
 */
-static void SV_Status_f( ) {
+void ServerMain::status_f( ) {
 	int			i, j, l;
 	SV_Client	*cl;
 	playerState_t	*ps;
@@ -1222,7 +1222,7 @@ static void SV_Status_f( ) {
 
 		Common::printf ("%s", cl->name_);
 		
-		l = 16 - SV_Strlen(cl->name_);
+		l = 16 - ServerMain::strlen(cl->name_);
 		j = 0;
 		
 		do
@@ -1253,10 +1253,10 @@ static void SV_Status_f( ) {
 
 /*
 ==================
-SV_ConSay_f
+ServerMain::conSay_f
 ==================
 */
-static void SV_ConSay_f() {
+void ServerMain::conSay_f() {
 	char	*p;
 	char	text[1024];
 
@@ -1286,10 +1286,10 @@ static void SV_ConSay_f() {
 
 /*
 ==================
-SV_ConTell_f
+ServerMain::conTell_f
 ==================
 */
-static void SV_ConTell_f() {
+void ServerMain::conTell_f() {
 	char	*p;
 	char	text[1024];
 	SV_Client	*cl;
@@ -1305,7 +1305,7 @@ static void SV_ConTell_f() {
 		return;
 	}
 
-	cl = SV_GetPlayerByNum();
+	cl = ServerMain::getPlayerByNum();
 	if ( !cl ) {
 		return;
 	}
@@ -1327,10 +1327,10 @@ static void SV_ConTell_f() {
 
 /*
 ==================
-SV_ConSayto_f
+ServerMain::conSayto_f
 ==================
 */
-static void SV_ConSayto_f() {
+void ServerMain::conSayto_f() {
 	char		*p;
 	char		text[1024];
 	SV_Client	*cl;
@@ -1408,12 +1408,12 @@ void ServerMain::heartbeat_f( ) {
 
 /*
 ===========
-SV_Serverinfo_f
+ServerMain::serverinfo_f
 
 Examine the serverinfo string
 ===========
 */
-static void SV_Serverinfo_f( ) {
+void ServerMain::serverinfo_f( ) {
 	// make sure server is running
 	if ( !com_sv_running->integer ) {
 		Common::printf( "Server is not running.\n" );
@@ -1427,12 +1427,12 @@ static void SV_Serverinfo_f( ) {
 
 /*
 ===========
-SV_Systeminfo_f
+ServerMain::systeminfo_f
 
 Examine the systeminfo string
 ===========
 */
-static void SV_Systeminfo_f( ) {
+void ServerMain::systeminfo_f( ) {
 	// make sure server is running
 	if ( !com_sv_running->integer ) {
 		Common::printf( "Server is not running.\n" );
@@ -1446,12 +1446,12 @@ static void SV_Systeminfo_f( ) {
 
 /*
 ===========
-SV_DumpUser_f
+ServerMain::dumpUser_f
 
 Examine all a users info strings
 ===========
 */
-static void SV_DumpUser_f( ) {
+void ServerMain::dumpUser_f( ) {
 	SV_Client	*cl;
 
 	// make sure server is running
@@ -1465,7 +1465,7 @@ static void SV_DumpUser_f( ) {
 		return;
 	}
 
-	cl = SV_GetPlayerByHandle();
+	cl = ServerMain::getPlayerByHandle();
 	if ( !cl ) {
 		return;
 	}
@@ -1481,7 +1481,7 @@ static void SV_DumpUser_f( ) {
 SV_KillServer
 =================
 */
-static void SV_KillServer_f( ) {
+void ServerMain::killServer_f( ) {
 	SV_Shutdown( "killserver" );
 }
 
@@ -1489,10 +1489,10 @@ static void SV_KillServer_f( ) {
 
 /*
 ==================
-SV_CompleteMapName
+ServerMain::completeMapName
 ==================
 */
-static void SV_CompleteMapName( char *args, int argNum ) {
+void ServerMain::completeMapName( char *args, int argNum ) {
 	if( argNum == 2 ) {
 		Field_CompleteFilename( "maps", "bsp", nullptr, true, false );
 	}
@@ -1500,10 +1500,10 @@ static void SV_CompleteMapName( char *args, int argNum ) {
 
 /*
 ==================
-SV_CompletePlayerName
+ServerMain::completePlayerName
 ==================
 */
-static void SV_CompletePlayerName( char *args, int argNum ) {
+void ServerMain::completePlayerName( char *args, int argNum ) {
 	if( argNum == 2 ) {
 		char		names[MAX_CLIENTS][MAX_NAME_LENGTH];
 		const char	*namesPtr[MAX_CLIENTS];
@@ -1552,49 +1552,49 @@ void ServerMain::addOperatorCommands( ) {
 	initialized = true;
 
 	CommandSystem::addCommand ("heartbeat", ServerMain::heartbeat_f);
-	CommandSystem::addCommand ("kick", SV_Kick_f);
+	CommandSystem::addCommand ("kick", ServerMain::kick_f);
 #ifndef STANDALONE
 	if(!com_standalone->integer)
 	{
-		CommandSystem::addCommand ("banUser", SV_Ban_f);
-		CommandSystem::addCommand ("banClient", SV_BanNum_f);
+		CommandSystem::addCommand ("banUser", ServerMain::ban_f);
+		CommandSystem::addCommand ("banClient", ServerMain::banNum_f);
 	}
 #endif
-	CommandSystem::addCommand ("kickbots", SV_KickBots_f);
-	CommandSystem::addCommand ("kickall", SV_KickAll_f);
-	CommandSystem::addCommand ("kicknum", SV_KickNum_f);
-	CommandSystem::addCommand ("clientkick", SV_KickNum_f); // Legacy command
-	CommandSystem::addCommand ("status", SV_Status_f);
-	CommandSystem::addCommand ("serverinfo", SV_Serverinfo_f);
-	CommandSystem::addCommand ("systeminfo", SV_Systeminfo_f);
-	CommandSystem::addCommand ("dumpuser", SV_DumpUser_f);
-	CommandSystem::addCommand ("map_restart", SV_MapRestart_f);
+	CommandSystem::addCommand ("kickbots", ServerMain::kickBots_f);
+	CommandSystem::addCommand ("kickall", ServerMain::kickAll_f);
+	CommandSystem::addCommand ("kicknum", ServerMain::kickNum_f);
+	CommandSystem::addCommand ("clientkick", ServerMain::kickNum_f); // Legacy command
+	CommandSystem::addCommand ("status", ServerMain::status_f);
+	CommandSystem::addCommand ("serverinfo", ServerMain::serverinfo_f);
+	CommandSystem::addCommand ("systeminfo", ServerMain::systeminfo_f);
+	CommandSystem::addCommand ("dumpuser", ServerMain::dumpUser_f);
+	CommandSystem::addCommand ("map_restart", ServerMain::mapRestart_f);
 	CommandSystem::addCommand ("sectorlist", ServerMain::sectorList_f);
-	CommandSystem::addCommand ("map", SV_Map_f);
-	CommandSystem::setCommandCompletionFunc( "map", SV_CompleteMapName );
+	CommandSystem::addCommand ("map", ServerMain::map_f);
+	CommandSystem::setCommandCompletionFunc( "map", ServerMain::completeMapName );
 #ifndef PRE_RELEASE_DEMO
-	CommandSystem::addCommand ("devmap", SV_Map_f);
-	CommandSystem::setCommandCompletionFunc( "devmap", SV_CompleteMapName );
-	CommandSystem::addCommand ("spmap", SV_Map_f);
-	CommandSystem::setCommandCompletionFunc( "spmap", SV_CompleteMapName );
-	CommandSystem::addCommand ("spdevmap", SV_Map_f);
-	CommandSystem::setCommandCompletionFunc( "spdevmap", SV_CompleteMapName );
+	CommandSystem::addCommand ("devmap", ServerMain::map_f);
+	CommandSystem::setCommandCompletionFunc( "devmap", ServerMain::completeMapName );
+	CommandSystem::addCommand ("spmap", ServerMain::map_f);
+	CommandSystem::setCommandCompletionFunc( "spmap", ServerMain::completeMapName );
+	CommandSystem::addCommand ("spdevmap", ServerMain::map_f);
+	CommandSystem::setCommandCompletionFunc( "spdevmap", ServerMain::completeMapName );
 #endif
-	CommandSystem::addCommand ("killserver", SV_KillServer_f);
+	CommandSystem::addCommand ("killserver", ServerMain::killServer_f);
 	if( com_dedicated->integer ) {
-		CommandSystem::addCommand ("say", SV_ConSay_f);
-		CommandSystem::addCommand ("tell", SV_ConTell_f);
-		CommandSystem::addCommand ("sayto", SV_ConSayto_f);
-		CommandSystem::setCommandCompletionFunc( "sayto", SV_CompletePlayerName );
+		CommandSystem::addCommand ("say", ServerMain::conSay_f);
+		CommandSystem::addCommand ("tell", ServerMain::conTell_f);
+		CommandSystem::addCommand ("sayto", ServerMain::conSayto_f);
+		CommandSystem::setCommandCompletionFunc( "sayto", ServerMain::completePlayerName );
 	}
 	
-	CommandSystem::addCommand("rehashbans", SV_RehashBans_f);
-	CommandSystem::addCommand("listbans", SV_ListBans_f);
-	CommandSystem::addCommand("banaddr", SV_BanAddr_f);
-	CommandSystem::addCommand("exceptaddr", SV_ExceptAddr_f);
-	CommandSystem::addCommand("bandel", SV_BanDel_f);
-	CommandSystem::addCommand("exceptdel", SV_ExceptDel_f);
-	CommandSystem::addCommand("flushbans", SV_FlushBans_f);
+	CommandSystem::addCommand("rehashbans", ServerMain::rehashBans_f);
+	CommandSystem::addCommand("listbans", ServerMain::listBans_f);
+	CommandSystem::addCommand("banaddr", ServerMain::banAddr_f);
+	CommandSystem::addCommand("exceptaddr", ServerMain::exceptAddr_f);
+	CommandSystem::addCommand("bandel", ServerMain::banDel_f);
+	CommandSystem::addCommand("exceptdel", ServerMain::exceptDel_f);
+	CommandSystem::addCommand("flushbans", ServerMain::flushBans_f);
 }
 
 /*

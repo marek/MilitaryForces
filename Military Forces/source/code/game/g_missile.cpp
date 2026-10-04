@@ -191,10 +191,10 @@ struct Think_ExplodeCFlare : public GameEntity::EntityFunc_Think
 
 /*
 ===============
-NukeRadiusDamage
+Game::nukeRadiusDamage
 ===============
 */
-static void NukeRadiusDamage( vec3_t origin, GameEntity *attacker, float damage, float radius ) 
+void Game::nukeRadiusDamage( vec3_t origin, GameEntity *attacker, float damage, float radius ) 
 {
 	float		dist;
 	GameEntity	*ent;
@@ -277,10 +277,10 @@ static void NukeRadiusDamage( vec3_t origin, GameEntity *attacker, float damage,
 
 /*
 ===============
-NukeShockWave
+Game::nukeShockWave
 ===============
 */
-static void NukeShockWave( vec3_t origin, GameEntity *attacker, float damage, float push, float radius ) 
+void Game::nukeShockWave( vec3_t origin, GameEntity *attacker, float damage, float push, float radius ) 
 {
 	float		dist;
 	GameEntity	*ent;
@@ -364,14 +364,14 @@ struct Think_NukeDamage : public GameEntity::EntityFunc_Think
 		{
 			// shockwave push back
 			t = self_->count_ - NUKE_SHOCKWAVE_STARTTIME;
-			NukeShockWave(self_->s.pos.trBase, self_->activator_, 25, 50,	static_cast<int>(t) * self_->splashRadius_ / (NUKE_SHOCKWAVE_ENDTIME - NUKE_SHOCKWAVE_STARTTIME) );
+			Game::nukeShockWave(self_->s.pos.trBase, self_->activator_, 25, 50,	static_cast<int>(t) * self_->splashRadius_ / (NUKE_SHOCKWAVE_ENDTIME - NUKE_SHOCKWAVE_STARTTIME) );
 		}
 		//
 		if( self_->count_ >= NUKE_EXPLODE_STARTTIME ) 
 		{
 			// do our damage
 			t = self_->count_ - NUKE_EXPLODE_STARTTIME;
-			NukeRadiusDamage( self_->s.pos.trBase, self_->activator_, 700,	static_cast<int>(t) * self_->splashRadius_ / (NUKE_IMPLODE_STARTTIME - NUKE_EXPLODE_STARTTIME) );
+			Game::nukeRadiusDamage( self_->s.pos.trBase, self_->activator_, 700,	static_cast<int>(t) * self_->splashRadius_ / (NUKE_IMPLODE_STARTTIME - NUKE_EXPLODE_STARTTIME) );
 		}
 
 		// either cycle or kill self
@@ -489,10 +489,10 @@ void G_CrateDropItems(GameEntity *ent)
 
 /*
 ================
-G_burningManExplode
+Game::burningManExplode
 ================
 */
-static void G_burningManExplode( GameEntity *ent )
+void Game::burningManExplode( GameEntity *ent )
 {
 	vec3_t		start, dir;
 	static int	seed = 0x92;
@@ -568,7 +568,7 @@ struct Think_ExplodeNuke : public GameEntity::EntityFunc_Think
 
 		static int seed = 0x92;
 		if( static_cast<int>(35 * Q_random(&seed)) + 1 == 2 )
-			G_burningManExplode( self_ );
+			Game::burningManExplode( self_ );
 
 		// play global sound at all clients
 		te = Game::tempEntity(snapped, EV_GLOBAL_TEAM_SOUND );
@@ -821,7 +821,7 @@ struct Think_No_Fuel_Flight : public GameEntity::EntityFunc_Think
 	}
 };
 
-static void on_target_lost( GameEntity *missile ) 
+void Game::on_target_lost( GameEntity *missile ) 
 {
 	// update target
 	if( missile->tracktarget_ && missile->tracktarget_->client_ ) 
@@ -852,19 +852,19 @@ struct Think_FollowTarget : public GameEntity::EntityFunc_Think
 		// target invalid
 		if( !self->tracktarget_ ) 
 		{
-			on_target_lost(self);
+			Game::on_target_lost(self);
 			return;
 		} 
 		else if( !self->tracktarget_->inuse_ ) 
 		{
-			on_target_lost(self);
+			Game::on_target_lost(self);
 			return;
 		}
 
 		// out of fuel
 		if( theLevel.time_ >= self->wait_ ) 
 		{
-			on_target_lost(self);
+			Game::on_target_lost(self);
 			return;
 		}
 
@@ -883,7 +883,7 @@ struct Think_FollowTarget : public GameEntity::EntityFunc_Think
 		// out of range (if ever possible)
 		if( dist > self->range_ ) 
 		{
-			on_target_lost(self);
+			Game::on_target_lost(self);
 			return;
 		}
 
@@ -934,7 +934,7 @@ struct Think_FollowTarget : public GameEntity::EntityFunc_Think
 		if( dot < self->followcone_ ) 
 		{ 
 			// roughly 5 degrees
-			on_target_lost(self);
+			Game::on_target_lost(self);
 			return;
 		}
 
@@ -942,7 +942,7 @@ struct Think_FollowTarget : public GameEntity::EntityFunc_Think
 		SV_Trace( &tr, self->r.currentOrigin, nullptr, nullptr, mid, self->tracktarget_->s.number, MASK_SOLID, false );
 		if( tr.fraction < 1.0f ) 
 		{
-			on_target_lost(self);
+			Game::on_target_lost(self);
 			return;
 		}
 

@@ -179,8 +179,7 @@ void CL_CDDialog( ) {
 }
 
 #ifdef USE_MUMBLE
-static
-void CL_UpdateMumble()
+void Client::updateMumble()
 {
 	vec3_t pos, forward, up;
 	float scale = cl_mumbleScale->value;
@@ -217,8 +216,7 @@ void CL_UpdateMumble()
 
 
 #ifdef USE_VOIP
-static
-void CL_UpdateVoipIgnore(const char *idstr, bool ignore)
+void Client::updateVoipIgnore(const char *idstr, bool ignore)
 {
 	if ((*idstr >= '0') && (*idstr <= '9')) {
 		const int id = atoi(idstr);
@@ -234,8 +232,7 @@ void CL_UpdateVoipIgnore(const char *idstr, bool ignore)
 	Common::printf("VoIP: invalid player ID#\n");
 }
 
-static
-void CL_UpdateVoipGain(const char *idstr, float gain)
+void Client::updateVoipGain(const char *idstr, float gain)
 {
 	if ((*idstr >= '0') && (*idstr <= '9')) {
 		const int id = atoi(idstr);
@@ -268,12 +265,12 @@ void Client::voip_f( )
 	}
 
 	if (strcmp(cmd, "ignore") == 0) {
-		CL_UpdateVoipIgnore(CommandSystem::argv(2), true);
+		Client::updateVoipIgnore(CommandSystem::argv(2), true);
 	} else if (strcmp(cmd, "unignore") == 0) {
-		CL_UpdateVoipIgnore(CommandSystem::argv(2), false);
+		Client::updateVoipIgnore(CommandSystem::argv(2), false);
 	} else if (strcmp(cmd, "gain") == 0) {
 		if (CommandSystem::argc() > 3) {
-			CL_UpdateVoipGain(CommandSystem::argv(2), atof(CommandSystem::argv(3)));
+			Client::updateVoipGain(CommandSystem::argv(2), atof(CommandSystem::argv(3)));
 		} else if (Q_isanumber(CommandSystem::argv(2))) {
 			int id = atoi(CommandSystem::argv(2));
 			if (id >= 0 && id < MAX_CLIENTS) {
@@ -301,8 +298,7 @@ void Client::voip_f( )
 }
 
 
-static
-void CL_VoipNewGeneration()
+void Client::voipNewGeneration()
 {
 	// don't have a zero generation so new clients won't match, and don't
 	//  wrap to negative so MSG_ReadLong() doesn't "fail."
@@ -399,14 +395,13 @@ void CL_VoipParseTargets()
 
 /*
 ===============
-CL_CaptureVoip
+Client::captureVoip
 
 Record more audio from the hardware if required and encode it into Opus
  data for later transmission.
 ===============
 */
-static
-void CL_CaptureVoip()
+void Client::captureVoip()
 {
 	const float audioMult = cl_voipCaptureMult->value;
 	const bool useVad = (cl_voipUseVAD->integer != 0);
@@ -483,7 +478,7 @@ void CL_CaptureVoip()
 	if (initialFrame) {
 		SoundSystem::masterGain(Com_Clamp(0.0f, 1.0f, cl_voipGainDuringCapture->value));
 		SoundSystem::startCapture();
-		CL_VoipNewGeneration();
+		Client::voipNewGeneration();
 		CL_VoipParseTargets();
 	}
 
@@ -535,7 +530,7 @@ void CL_CaptureVoip()
 			                 (static_cast<float>(samples)))) * 100.0f;
 
 			if ((useVad) && (clc.voipPower < cl_voipVADThreshold->value)) {
-				CL_VoipNewGeneration();  // no "talk" for at least 1/4 second.
+				Client::voipNewGeneration();  // no "talk" for at least 1/4 second.
 			} else {
 				clc.voipOutgoingDataSize = bytes;
 				clc.voipOutgoingDataFrames = voipFrames;
@@ -840,10 +835,10 @@ CLIENT SIDE DEMO PLAYBACK
 
 /*
 =================
-CL_DemoFrameDurationSDev
+Client::demoFrameDurationSDev
 =================
 */
-static float CL_DemoFrameDurationSDev( )
+float Client::demoFrameDurationSDev( )
 {
 	int i;
 	int numFrames;
@@ -896,7 +891,7 @@ void CL_DemoCompleted( )
 					clc.timeDemoMinDuration,
 					time / static_cast<float>(clc.timeDemoFrames),
 					clc.timeDemoMaxDuration,
-					CL_DemoFrameDurationSDev( ) );
+					Client::demoFrameDurationSDev( ) );
 			Common::printf( "%s", buffer );
 
 			// Write a log of all the frame durations
@@ -990,10 +985,10 @@ void Client::readDemoMessage( ) {
 
 /*
 ====================
-CL_WalkDemoExt
+Client::walkDemoExt
 ====================
 */
-static int CL_WalkDemoExt(char *arg, char *name, int *demofile)
+int Client::walkDemoExt(char *arg, char *name, int *demofile)
 {
 	int i = 0;
 	*demofile = 0;
@@ -1053,10 +1048,10 @@ static int CL_WalkDemoExt(char *arg, char *name, int *demofile)
 
 /*
 ====================
-CL_CompleteDemoName
+Client::completeDemoName
 ====================
 */
-static void CL_CompleteDemoName( char *args, int argNum )
+void Client::completeDemoName( char *args, int argNum )
 {
 	if( argNum == 2 )
 	{
@@ -1130,11 +1125,11 @@ void CL_PlayDemo_f( ) {
 
 			Q_strncpyz(retry, arg, len + 1);
 			retry[len] = '\0';
-			protocol = CL_WalkDemoExt(retry, name, &clc.demofile);
+			protocol = Client::walkDemoExt(retry, name, &clc.demofile);
 		}
 	}
 	else
-		protocol = CL_WalkDemoExt(arg, name, &clc.demofile);
+		protocol = Client::walkDemoExt(arg, name, &clc.demofile);
 	
 	if (!clc.demofile) {
 		Common::error( ERR_DROP, "couldn't open %s", name);
@@ -1340,12 +1335,12 @@ void Client::clearState () {
 
 /*
 ====================
-CL_UpdateGUID
+Client::updateGUID
 
 update cl_guid using QKEY_FILE and optional prefix
 ====================
 */
-static void CL_UpdateGUID( const char *prefix, int prefix_len )
+void Client::updateGUID( const char *prefix, int prefix_len )
 {
 	fileHandle_t f;
 	int len;
@@ -1360,7 +1355,7 @@ static void CL_UpdateGUID( const char *prefix, int prefix_len )
 			prefix, prefix_len ) );
 }
 
-static void CL_OldGame()
+void Client::oldGame()
 {
 	if(cl_oldGameSet)
 	{
@@ -1413,7 +1408,7 @@ void CL_Disconnect( bool showMainMenu ) {
 		cl_voipUseVAD->integer = 0;  // disable this for a moment.
 		clc.voipOutgoingDataSize = 0;  // dump any pending VoIP transmission.
 		CvarSystem::set("cl_voipSend", "0");
-		CL_CaptureVoip();  // clean up any state...
+		Client::captureVoip();  // clean up any state...
 		cl_voipUseVAD->integer = tmp;
 	}
 
@@ -1478,10 +1473,10 @@ void CL_Disconnect( bool showMainMenu ) {
 		Client::closeAVI( );
 	}
 
-	CL_UpdateGUID( nullptr, 0 );
+	Client::updateGUID( nullptr, 0 );
 
 	if(!noGameRestart)
-		CL_OldGame();
+		Client::oldGame();
 	else
 		noGameRestart = false;
 }
@@ -1760,9 +1755,9 @@ void CL_Connect_f( ) {
 	Common::printf( "%s resolved to %s\n", clc.servername, serverString);
 
 	if( cl_guidServerUniq->integer )
-		CL_UpdateGUID( serverString, strlen( serverString ) );
+		Client::updateGUID( serverString, strlen( serverString ) );
 	else
-		CL_UpdateGUID( nullptr, 0 );
+		Client::updateGUID( nullptr, 0 );
 
 	// if we aren't playing on a lan, we need to authenticate
 	// with the cd key
@@ -1788,10 +1783,10 @@ constexpr int MAX_RCON_MESSAGE = 1024;
 
 /*
 ==================
-CL_CompleteRcon
+Client::completeRcon
 ==================
 */
-static void CL_CompleteRcon( char *args, int argNum )
+void Client::completeRcon( char *args, int argNum )
 {
 	if( argNum == 2 )
 	{
@@ -1805,10 +1800,10 @@ static void CL_CompleteRcon( char *args, int argNum )
 
 /*
 ==================
-CL_CompletePlayerName
+Client::completePlayerName
 ==================
 */
-static void CL_CompletePlayerName( char *args, int argNum )
+void Client::completePlayerName( char *args, int argNum )
 {
 	if( argNum == 2 )
 	{
@@ -2158,10 +2153,10 @@ void CL_DownloadsComplete( ) {
 
 /*
 =================
-CL_InitDownload
+Client::initDownload
 =================
 */
-static void CL_InitDownload( const char *localName ) {
+void Client::initDownload( const char *localName ) {
 	Q_strncpyz ( clc.downloadName, localName, sizeof(clc.downloadName) );
 	Com_sprintf( clc.downloadTempName, sizeof(clc.downloadTempName), "%s.tmp", localName );
 
@@ -2177,23 +2172,23 @@ static void CL_InitDownload( const char *localName ) {
 
 /*
 =================
-CL_BeginDownload
+Client::beginDownload
 
 Requests a file to download from the server.  Stores it in the current
 game directory.
 =================
 */
-static void CL_BeginDownload( const char *remoteName ) {
+void Client::beginDownload( const char *remoteName ) {
 	CL_AddReliableCommand(va("download %s", remoteName), false);
 }
 
 #ifdef USE_HTTP
 /*
 =================
-CL_BeginHttpDownload
+Client::beginHttpDownload
 =================
 */
-static void CL_BeginHttpDownload( const char *remoteURL ) {
+void Client::beginHttpDownload( const char *remoteURL ) {
 	if(Q_strncmp(remoteURL, "http://", strlen("http://")) != 0 &&
 		Q_strncmp(remoteURL, "https://", strlen("https://")) != 0) {
 		Common::error(ERR_DROP, "Download Error: %s is a malformed/"
@@ -2286,8 +2281,8 @@ void Client::nextDownload()
 					"have sv_dlURL set\n");
 			}
 			else if(CL_HTTP_Available()) {
-				CL_InitDownload(localName);
-				CL_BeginHttpDownload(va("%s/%s",
+				Client::initDownload(localName);
+				Client::beginHttpDownload(va("%s/%s",
 					clc.sv_dlURL, remoteName));
 
 				usedHTTP = true;
@@ -2309,8 +2304,8 @@ void Client::nextDownload()
 				return;	
 			}
 			else {
-				CL_InitDownload( localName );
-				CL_BeginDownload( remoteName );
+				Client::initDownload( localName );
+				Client::beginDownload( remoteName );
 			}
 		}
 		clc.downloadRestart = true;
@@ -3102,11 +3097,11 @@ void CL_Frame ( int msec ) {
 	SoundSystem::update();
 
 #ifdef USE_VOIP
-	CL_CaptureVoip();
+	Client::captureVoip();
 #endif
 
 #ifdef USE_MUMBLE
-	CL_UpdateMumble();
+	Client::updateMumble();
 #endif
 
 	// advance local effects for next frame
@@ -3726,7 +3721,7 @@ void CL_Init( ) {
 	CommandSystem::addCommand ("disconnect", Client::disconnect_f);
 	CommandSystem::addCommand ("record", CL_Record_f);
 	CommandSystem::addCommand ("demo", CL_PlayDemo_f);
-	CommandSystem::setCommandCompletionFunc( "demo", CL_CompleteDemoName );
+	CommandSystem::setCommandCompletionFunc( "demo", Client::completeDemoName );
 	CommandSystem::addCommand ("cinematic", Client::playCinematic_f);
 	CommandSystem::addCommand ("stoprecord", Client::stopRecord_f);
 	CommandSystem::addCommand ("connect", CL_Connect_f);
@@ -3734,7 +3729,7 @@ void CL_Init( ) {
 	CommandSystem::addCommand ("localservers", Client::localServers_f);
 	CommandSystem::addCommand ("globalservers", Client::globalServers_f);
 	CommandSystem::addCommand ("rcon", CL_Rcon_f);
-	CommandSystem::setCommandCompletionFunc( "rcon", CL_CompleteRcon );
+	CommandSystem::setCommandCompletionFunc( "rcon", Client::completeRcon );
 	CommandSystem::addCommand ("ping", Client::ping_f );
 	CommandSystem::addCommand ("serverstatus", CL_ServerStatus_f );
 	CommandSystem::addCommand ("showip", CL_ShowIP_f );
@@ -3745,7 +3740,7 @@ void CL_Init( ) {
 	CommandSystem::addCommand ("stopvideo", CL_StopVideo_f );
 	if( !com_dedicated->integer ) {
 		CommandSystem::addCommand ("sayto", CL_Sayto_f );
-		CommandSystem::setCommandCompletionFunc( "sayto", CL_CompletePlayerName );
+		CommandSystem::setCommandCompletionFunc( "sayto", Client::completePlayerName );
 	}
 	CL_InitRef();
 
@@ -3757,7 +3752,7 @@ void CL_Init( ) {
 
 	CL_GenerateQKey();
 	CvarSystem::get( "cl_guid", "", CVAR_USERINFO | CVAR_ROM );
-	CL_UpdateGUID( nullptr, 0 );
+	Client::updateGUID( nullptr, 0 );
 
 	Common::printf( "----- Client Initialization Complete -----\n" );
 }

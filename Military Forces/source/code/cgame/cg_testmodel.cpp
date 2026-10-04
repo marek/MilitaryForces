@@ -153,7 +153,7 @@ void ClientGame::addTestModel () {
 	refExport.AddRefEntityToScene( &cg.testModelEntity );
 }
 
-static void registerTestVehicle()
+void ClientGame::registerTestVehicle()
 {
 	int			i;
 	char		basename[128];
@@ -249,7 +249,7 @@ void ClientGame::addTestVehicle () {
 	int		i;
 
 	// re-register the model, because the level may have changed
-	registerTestVehicle();
+	ClientGame::registerTestVehicle();
 
 	if ( !cg.testVehicleParts[0].hModel ) {
 		ClientGame::printf ("Can't register model\n");
@@ -332,7 +332,7 @@ void ClientGame::testVehicle (long cat) {
 
 	Q_strncpyz (cg.testVehicleName, ClientGame::argv( 1 ), MAX_QPATH );
 
-	registerTestVehicle();
+	ClientGame::registerTestVehicle();
 
 /*	if ( CommandSystem::argc() == 3 ) {
 		cg.testModelEntity.backlerp = atof( ClientGame::argv( 2 ) );
