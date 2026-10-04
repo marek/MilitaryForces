@@ -582,10 +582,19 @@ struct PlaneTasks
 					return false;
 				}
 			}
-			if( trafficAt( c, to, start.seconds + (travelled + length) / airspeed ) )
+			// look for traffic at points along the leg, not only at its end
+			constexpr float trafficStep = 150.0f;
+			const int steps = std::max( 1, static_cast<int>( ceil( length / trafficStep ) ) );
+			for( int step = 1; step <= steps; step++ )
 			{
-				travelled += length * 0.5f;
-				return false;
+				const float along = length * step / steps;
+				vec3_t point;
+				VectorMA( from, along, dir, point );
+				if( trafficAt( c, point, start.seconds + (travelled + along) / airspeed ) )
+				{
+					travelled += along - length / steps;
+					return false;
+				}
 			}
 			travelled += length;
 			VectorCopy( to, from );
@@ -634,17 +643,20 @@ struct PlaneTasks
 	{
 		if( sweepFrom( c, end, brakedRadius, 0.0f, 0.0f, horizon, 60.0f ) >= horizon )
 			return true;
-		if( sweepFrom( c, end, brakedRadius, 0.0f, 0.35f, horizon, 60.0f ) >= horizon )
+		if( sweepFrom( c, end, brakedRadius, 0.0f, 0.17f, horizon, 60.0f ) >= horizon )
 			return true;
-		const float around = brakedRadius * static_cast<float>( M_PI ) + 200.0f;
-		for( float turn : { 180.0f, -180.0f, 90.0f, -90.0f } )
+		// follow a bend, turn off, or turn back
+		for( float turn : { 45.0f, -45.0f, 90.0f, -90.0f, 180.0f, -180.0f } )
 		{
-			if( sweepFrom( c, end, brakedRadius, turn, 0.0f, around, 60.0f ) >= around )
+			const float length = brakedRadius * fabs( turn ) * static_cast<float>( M_PI ) / 180.0f + (fabs( turn ) < 100.0f ? horizon * 0.6f : 200.0f);
+			if( sweepFrom( c, end, brakedRadius, turn, 0.0f, length, 60.0f ) >= length )
 				return true;
 		}
 		return false;
 	}
 
+	// Plans the next second or two of flight. The heading the pilot wants is flown ahead as an arc at the aircraft's turn
+	// radius followed by a straight; if that does not fit, other manoeuvres are tried in order of preference.
 	static Status probeTerrain( Mind& c )
 	{
 		State& bot = c.bot;
@@ -664,18 +676,22 @@ struct PlaneTasks
 			const float rightClear = tr.fraction * 1200.0f;
 			bot.confined = leftClear + rightClear < 1500 || c.room < 900;
 
-			const bool steering = theLevel.time_ < bot.avoidTime;
+			constexpr float margin = 60.0f;
 			const float wantYaw = c.view[YAW];
 			const float wantTurn = AngleSubtract( wantYaw, yaw );
-			const float wantSlope = std::clamp( -static_cast<float>( tan( c.view[PITCH] * M_PI / 180.0 ) ), -0.4f, 0.5f );
+			// near the stall the nose can only come up a little, so plan the climb that can actually be flown
+			const bool slow = c.speed < c.veh.stallspeed * 1.7f;
+			const float flyablePitch = slow ? std::max( c.view[PITCH], -10.0f ) : c.view[PITCH];
+			const float wantSlope = std::clamp( -static_cast<float>( tan( flyablePitch * M_PI / 180.0 ) ), -0.4f, 0.5f );
 			const float horizon = std::clamp( c.airspeed * 3.0f, 900.0f, 2500.0f );
 			const bool wasBlocked = bot.probeBlocked;
 			const float radius = c.turnRadius();
 			const float turnRate = std::max( 10.0f, c.veh.turnspeed[YAW] ) * static_cast<float>( M_PI ) / 180.0f;
 			const float brakedRadius = (c.airspeed + std::min( c.airspeed, c.veh.stallspeed * 1.2f )) * 0.5f / turnRate;
 			const bool canBrake = brakedRadius < radius * 0.85f;
+
 			Pose wantEnd;
-			bot.probeWant = sweep( c, radius, wantTurn, wantSlope, horizon, 60.0f, &wantEnd );
+			bot.probeWant = sweep( c, radius, wantTurn, wantSlope, horizon, margin, &wantEnd );
 			if( bot.probeWant >= horizon && !wayOut( c, wantEnd, brakedRadius, horizon ) )
 				bot.probeWant = horizon * 0.9f;
 			bot.probeBest = bot.probeWant;
@@ -688,49 +704,51 @@ struct PlaneTasks
 			if( bot.probeBlocked )
 			{
 				constexpr std::array<float, 11> turns = { 0.0f, 30.0f, -30.0f, 60.0f, -60.0f, 90.0f, -90.0f, 135.0f, -135.0f, 180.0f, -180.0f };
-				struct Climb { float slope; float pitch; bool keep; };
-				const std::array<Climb, 3> climbs = { { { wantSlope, c.view[PITCH], true }, { 0.35f, -19.0f, false }, { -0.25f, 14.0f, false } } };
+				struct Climb { float slope; float pitch; };
+				const std::array<Climb, 3> climbs = { { { wantSlope, c.view[PITCH] }, { slow ? 0.17f : 0.35f, slow ? -10.0f : -19.0f }, { -0.25f, 14.0f } } };
 				const bool canDive = c.sense.height > c.minHeight + 300.0f;
-				const float previousYaw = bot.avoidYaw;
-				const float previousPitch = bot.avoidPitch;
 
 				// candidates in order of preference, so the search can stop at the first one that is clear
-				struct Candidate { float turn; const Climb* climb; float command; float penalty; };
-				std::array<Candidate, turns.size() * climbs.size()> candidates;
+				struct Candidate { float turn; float slope; float pitch; float penalty; };
+				std::array<Candidate, turns.size() * climbs.size() + 1> candidates;
 				size_t count = 0;
+				// the wanted heading itself comes first: it may still be the best of a bad set
+				candidates[count++] = { wantTurn, wantSlope, c.view[PITCH], -500.0f };
 				for( float turn : turns )
 				{
-					for( const Climb& climb : climbs )
+					for( size_t k = 0; k < climbs.size(); k++ )
 					{
-						if( climb.slope < 0 && !climb.keep && !canDive )
+						if( k == 2 && !canDive )
 							continue;
-						const float command = yaw + std::clamp( turn, -100.0f, 100.0f );
-						float penalty = fabs( AngleSubtract( yaw + turn, wantYaw ) ) * 2.0f + fabs( turn ) + (climb.keep ? 0.0f : 60.0f);
-						// stay with the manoeuvre already begun
-						if( steering )
-							penalty += fabs( AngleSubtract( command, previousYaw ) ) * 1.5f + (climb.pitch * previousPitch < 0 ? 150.0f : 0.0f);
-						candidates[count++] = { turn, &climb, command, penalty };
+						float penalty = fabs( AngleSubtract( yaw + turn, wantYaw ) ) * 2.0f + fabs( turn ) + (k ? 60.0f : 0.0f);
+						// keep right: when both sides are open, pass traffic on the right
+						if( turn > 0 )
+							penalty += 15.0f;
+						candidates[count++] = { turn, climbs[k].slope, climbs[k].pitch, penalty };
 					}
 				}
 				std::sort( candidates.begin(), candidates.begin() + count, []( const Candidate& a, const Candidate& b ) { return a.penalty < b.penalty; } );
 
-				for( float width : { 60.0f, 0.0f } )
+				// with clearance first; if nothing fits, the longest bare line
+				for( float width : { margin, 0.0f } )
 				{
 					float best = -99999.0f, bestFree = 0;
 					bool bestBraked = false;
+					const Candidate* chosen = nullptr;
 					for( size_t i = 0; i < count; i++ )
 					{
 						const Candidate& candidate = candidates[i];
 						Pose end;
-						float free = sweep( c, radius, candidate.turn, candidate.climb->slope, horizon, width, &end );
+						float free = sweep( c, radius, candidate.turn, candidate.slope, horizon, width, &end );
 						bool braked = false;
-						if( free < horizon && candidate.turn != 0.0f && canBrake )
+						// the same turn with the air brake out, at the radius the lower speed gives
+						if( free < horizon && fabs( candidate.turn ) > 10.0f && canBrake )
 						{
 							Pose slowEnd;
-							const float slow = sweep( c, brakedRadius, candidate.turn, candidate.climb->slope, horizon, width, &slowEnd );
-							if( slow > free )
+							const float slowFree = sweep( c, brakedRadius, candidate.turn, candidate.slope, horizon, width, &slowEnd );
+							if( slowFree > free )
 							{
-								free = slow;
+								free = slowFree;
 								braked = true;
 								end = slowEnd;
 							}
@@ -738,17 +756,21 @@ struct PlaneTasks
 						// leads into a dead end: better than a wall, worse than any open path
 						if( free >= horizon && width > 0 && !wayOut( c, end, brakedRadius, horizon ) )
 							free = horizon * 0.9f;
-						const float score = (free < horizon ? free * 2.0f - horizon * 2.0f : horizon) - candidate.penalty - (braked ? 40.0f : 0.0f);
+						const float score = (free < horizon ? free * 2.0f - horizon * 2.0f : horizon) - std::max( candidate.penalty, 0.0f ) - (braked ? 40.0f : 0.0f);
 						if( score > best )
 						{
 							best = score;
 							bestFree = free;
 							bestBraked = braked;
-							bot.avoidYaw = candidate.command;
-							bot.avoidPitch = candidate.climb->pitch;
+							chosen = &candidate;
 						}
 						if( free >= horizon )
 							break;
+					}
+					if( chosen )
+					{
+						bot.avoidYaw = yaw + std::clamp( chosen->turn, -100.0f, 100.0f );
+						bot.avoidPitch = chosen->pitch;
 					}
 					bot.probeBest = bestFree;
 					if( bestBraked )
@@ -781,53 +803,6 @@ struct PlaneTasks
 		}
 		else if( braking && c.bot.desire != Goal::Rearm && canBrake )
 			c.cmd.buttons |= BUTTON_BRAKE;
-		return Status::Success;
-	}
-
-	static Status avoidTraffic( Mind& c )
-	{
-		State& bot = c.bot;
-		for( int i = 1; i <= theLevel.maxclients_; i++ )
-		{
-			GameEntity* other = theLevel.getEntity( i );
-			if( other == c.ent || !alive( other ) || other->client_->sess_.ridingClient_ >= 0 )
-				continue;
-			if( !(availableVehicles[other->client_->vehicle_].cat & (CAT_PLANE|CAT_HELO)) || (other->client_->ps_.ONOFF & OO_LANDED) )
-				continue;
-			vec3_t rel, relVel, miss;
-			VectorSubtract( other->r.currentOrigin, c.ent->r.currentOrigin, rel );
-			if( VectorLength( rel ) > 3000 )
-				continue;
-			VectorSubtract( other->client_->ps_.velocity, c.ps.velocity, relVel );
-			const float closing = DotProduct( relVel, relVel );
-			if( closing < 1.0f )
-				continue;
-			const float when = -DotProduct( rel, relVel ) / closing;
-			if( when <= 0 || when > (bot.confined ? 3.0f : 2.0f) )
-				continue;
-			VectorMA( rel, when, relVel, miss );
-			if( VectorLength( miss ) > 260 )
-				continue;
-			vec3_t right;
-			AngleVectors( c.ps.vehicleAngles, nullptr, right, nullptr );
-			const float side = DotProduct( rel, right ) + DotProduct( miss, right );
-			const float dodgePitch = (rel[2] + miss[2] >= 0 && c.sense.height > c.minHeight + 250) ? 22.0f : -28.0f;
-			bot.egressTime = std::max( bot.egressTime, theLevel.time_ + 1500 );
-			if( bot.confined )
-			{
-				c.view[PITCH] = std::clamp( dodgePitch, -14.0f, 12.0f );
-				// keep right to pass head-on traffic
-				vec3_t ahead;
-				AngleVectors( c.ps.vehicleAngles, ahead, nullptr, nullptr );
-				if( DotProduct( rel, ahead ) > 0 )
-					c.view[YAW] = c.ps.vehicleAngles[YAW] - 25.0f;
-				break;
-			}
-			// turn away from the other aircraft; the terrain check after this node vets the result
-			c.view[YAW] = c.ps.vehicleAngles[YAW] + (side > 0 ? 45.0f : -45.0f);
-			c.view[PITCH] = dodgePitch;
-			break;
-		}
 		return Status::Success;
 	}
 
@@ -910,8 +885,7 @@ struct PlaneTasks
 
 		const auto* safety = t.selector( "terrain", {
 			t.when( "just airborne", climbingOut, t.action( "climb out", climbOut ) ),
-			t.always( "avoid", t.action( "avoid traffic", avoidTraffic ), {
-				t.action( "probe terrain", probeTerrain ),
+			t.always( "avoid", t.action( "plan manoeuvre", probeTerrain ), {
 				t.action( "corner speed", cornerSpeed ),
 				t.action( "floor and ceiling", floorAndCeiling ) } ) } );
 

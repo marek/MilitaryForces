@@ -361,6 +361,7 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 		bot.commitTime = 0;
 		bot.tree = behavior::Memory{};
 		bot.groundTime = 0;
+		bot.probeBlocked = false;
 		bot.brakeTime = 0;
 		bot.path.clear();
 		bot.pathTime = 0;
