@@ -1610,7 +1610,7 @@ void CIN_DrawCinematic (int handle) {
 	cinTable[handle].dirty = false;
 }
 
-void CL_PlayCinematic_f() {
+void Client::playCinematic_f() {
 	char	*arg, *s;
 	int bits = CIN_system;
 

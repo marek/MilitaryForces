@@ -30,7 +30,7 @@ void CG_TargetCommand_f( ) {
 	int		targetNum;
 	char	test[4];
 
-	targetNum = CG_CrosshairPlayer();
+	targetNum = ClientGame::crosshairPlayer();
 	if ( targetNum == -1 ) {
 		return;
 	}
@@ -124,7 +124,7 @@ static void CG_Set_MFD_Page( int num ) {
 		return;
 	}
 
-	page = atoi( CG_Argv(1) );
+	page = atoi( ClientGame::argv(1) );
 
 	if( page < 0 ) page = 0;
 	else if( page >= MFD_MAX ) page = MFD_MAX - 1;
@@ -165,7 +165,7 @@ MFQ3 HUD Color setting
 static void CG_Update_HUD_Color_f( )
 {
 	// update 
-	cg.HUDColor = CG_Cvar_Get( "hud_color" );
+	cg.HUDColor = ClientGame::cvar_Get( "hud_color" );
 }
 
 /*
@@ -197,7 +197,7 @@ MFQ3 MFD color setting
 static void CG_Update_MFD_Color_f( )
 {
 	// update 
-	cg.MFDColor = CG_Cvar_Get( "mfd_color" );
+	cg.MFDColor = ClientGame::cvar_Get( "mfd_color" );
 }
 
 /*
@@ -277,7 +277,7 @@ static void CG_Set_Camera_Mode_f( ) {
 		return;
 	}
 
-	cg.CameraMode = atoi( CG_Argv(1) );
+	cg.CameraMode = atoi( ClientGame::argv(1) );
 	if( cg.CameraMode >= CAMERA_MAX || cg.CameraMode < 0 ) {
 		cg.CameraMode = 0;
 	}
@@ -420,7 +420,7 @@ Debugging command to print the current position
 =============
 */
 static void CG_Viewpos_f () {
-	CG_Printf ("(%i %i %i) : %i\n", static_cast<int>(cg.refdef.vieworg[0]),
+	ClientGame::printf ("(%i %i %i) : %i\n", static_cast<int>(cg.refdef.vieworg[0]),
 		static_cast<int>(cg.refdef.vieworg[1]), static_cast<int>(cg.refdef.vieworg[2]), 
 		static_cast<int>(cg.refdefViewAngles[YAW]));
 }
@@ -459,7 +459,7 @@ static void CG_TellTarget_f( ) {
 	char	command[128];
 	char	message[128];
 
-	clientNum = CG_CrosshairPlayer();
+	clientNum = ClientGame::crosshairPlayer();
 	if ( clientNum == -1 ) {
 		return;
 	}
@@ -474,7 +474,7 @@ static void CG_TellAttacker_f( ) {
 	char	command[128];
 	char	message[128];
 
-	clientNum = CG_LastAttacker();
+	clientNum = ClientGame::lastAttacker();
 	if ( clientNum == -1 ) {
 		return;
 	}
@@ -485,11 +485,11 @@ static void CG_TellAttacker_f( ) {
 }
 
 static void CG_TestPlane_f( ) {
-	CG_TestVehicle(CAT_PLANE);
+	ClientGame::testVehicle(CAT_PLANE);
 }
 
 static void CG_TestGV_f( ) {
-	CG_TestVehicle(CAT_GROUND);
+	ClientGame::testVehicle(CAT_GROUND);
 }
 
 static void CG_Spawn_GI_f( ) {
@@ -497,10 +497,10 @@ static void CG_Spawn_GI_f( ) {
 
 	if( CommandSystem::argc() < 2 ) return;
 
-	idx = atoi( CG_Argv(1) );
+	idx = atoi( ClientGame::argv(1) );
 
 	if( idx < 0 || idx >= bg_numberOfGroundInstallations ) {
-		CG_Printf("GroundInstallation number out of range (0-%d)\n", bg_numberOfGroundInstallations-1 );
+		ClientGame::printf("GroundInstallation number out of range (0-%d)\n", bg_numberOfGroundInstallations-1 );
 		return;
 	}
 
@@ -511,25 +511,25 @@ static void CG_Spawn_GI_f( ) {
 static void CG_ExportToScript_f( ) {
 	if( CommandSystem::argc() < 2 ) 
 	{
-		CG_Printf("Scriptname not specified!");
+		ClientGame::printf("Scriptname not specified!");
 		return;
 	}
 
-	ME_ExportToScript( CG_Argv(1) );
+	ME_ExportToScript( ClientGame::argv(1) );
 
 }
 
 static void CG_SetSide_f( ) {
-	ME_SetSide( CG_Argv(1) );
+	ME_SetSide( ClientGame::argv(1) );
 }
 
 static void CG_ImportScript_f( ) {
 	if( CommandSystem::argc() < 2 )
 	{
-		CG_Printf("Scriptname not specified!");
+		ClientGame::printf("Scriptname not specified!");
 		return;
 	}
-	ME_ImportScript( CG_Argv(1) );
+	ME_ImportScript( ClientGame::argv(1) );
 }
 
 /*
@@ -558,46 +558,46 @@ bool CG_ExtractDeveloper( )
 	}
 
 	// convert 2nd param into a value
-	value = atof( CG_Argv(1) );
+	value = atof( ClientGame::argv(1) );
 
 	// check 2nd param against known variables
 
-	if( !Q_stricmp( CG_Argv(0), "ox" ) )
+	if( !Q_stricmp( ClientGame::argv(0), "ox" ) )
 	{
 		availableVehicles[ ci->vehicle ].shadowCoords[ SHC_XOFFSET ] = value;
 		return true;
 	}
-	else if( !Q_stricmp( CG_Argv(0), "oy" ) )
+	else if( !Q_stricmp( ClientGame::argv(0), "oy" ) )
 	{
 		availableVehicles[ ci->vehicle ].shadowCoords[ SHC_YOFFSET ] = value;
 		return true;
 	}
-	else if( !Q_stricmp( CG_Argv(0), "ax" ) )
+	else if( !Q_stricmp( ClientGame::argv(0), "ax" ) )
 	{
 		availableVehicles[ ci->vehicle ].shadowCoords[ SHC_XADJUST ] = value;
 		return true;
 	}
-	else if( !Q_stricmp( CG_Argv(0), "ay" ) )
+	else if( !Q_stricmp( ClientGame::argv(0), "ay" ) )
 	{
 		availableVehicles[ ci->vehicle ].shadowCoords[ SHC_YADJUST ] = value;
 		return true;
 	}
-	else if( !Q_stricmp( CG_Argv(0), "pmax" ) )
+	else if( !Q_stricmp( ClientGame::argv(0), "pmax" ) )
 	{
 		availableVehicles[ ci->vehicle ].shadowAdjusts[ SHO_PITCHMAX ] = value;
 		return true;
 	}
-	else if( !Q_stricmp( CG_Argv(0), "rmax" ) )
+	else if( !Q_stricmp( ClientGame::argv(0), "rmax" ) )
 	{
 		availableVehicles[ ci->vehicle ].shadowAdjusts[ SHO_ROLLMAX ] = value;
 		return true;
 	}
-	else if( !Q_stricmp( CG_Argv(0), "pmod" ) )
+	else if( !Q_stricmp( ClientGame::argv(0), "pmod" ) )
 	{
 		availableVehicles[ ci->vehicle ].shadowAdjusts[ SHO_PITCHMOD ] = value;
 		return true;
 	}
-	else if( !Q_stricmp( CG_Argv(0), "rmod" ) )
+	else if( !Q_stricmp( ClientGame::argv(0), "rmod" ) )
 	{
 		availableVehicles[ ci->vehicle ].shadowAdjusts[ SHO_ROLLMOD ] = value;
 		return true;
@@ -612,26 +612,26 @@ struct consoleCommand_t {
 };
 
 static consoleCommand_t	commands[] = {
-	{ "testgun", CG_TestGun_f },
-	{ "testmodel", CG_TestModel_f },
-	{ "nextframe", CG_TestModelNextFrame_f },
-	{ "prevframe", CG_TestModelPrevFrame_f },
-	{ "nextskin", CG_TestModelNextSkin_f },
-	{ "prevskin", CG_TestModelPrevSkin_f },
+	{ "testgun", ClientGame::testGun_f },
+	{ "testmodel", ClientGame::testModel_f },
+	{ "nextframe", ClientGame::testModelNextFrame_f },
+	{ "prevframe", ClientGame::testModelPrevFrame_f },
+	{ "nextskin", ClientGame::testModelNextSkin_f },
+	{ "prevskin", ClientGame::testModelPrevSkin_f },
 	{ "testPlane", CG_TestPlane_f },
 	{ "testGV", CG_TestGV_f },
-	{ "testPlaneCmd", CG_TestPlaneCmd_f },
-	{ "testGVCmd", CG_TestGVCmd_f },
+	{ "testPlaneCmd", ClientGame::testPlaneCmd_f },
+	{ "testGVCmd", ClientGame::testGVCmd_f },
 	{ "viewpos", CG_Viewpos_f },
 	{ "+scores", CG_ScoresDown_f },
 	{ "-scores", CG_ScoresUp_f },
-	{ "+zoom", CG_ZoomDown_f },
-	{ "-zoom", CG_ZoomUp_f },
+	{ "+zoom", ClientGame::zoomDown_f },
+	{ "-zoom", ClientGame::zoomUp_f },
 	{ "sizeup", CG_SizeUp_f },
 	{ "sizedown", CG_SizeDown_f },
-	{ "weapnext", CG_NextWeapon_f },
-	{ "weapprev", CG_PrevWeapon_f },
-	{ "weapon", CG_Weapon_f },
+	{ "weapnext", ClientGame::nextWeapon_f },
+	{ "weapprev", ClientGame::prevWeapon_f },
+	{ "weapon", ClientGame::weapon_f },
 	{ "tell_target", CG_TellTarget_f },
 	{ "tell_attacker", CG_TellAttacker_f },
 	{ "tcmd", CG_TargetCommand_f },
@@ -673,17 +673,17 @@ static consoleCommand_t	commands[] = {
 
 /*
 =================
-CG_ConsoleCommand
+ClientGame::consoleCommand
 
 The string has been tokenized and can be retrieved with
 CommandSystem::argc() / CommandSystem::argv()
 =================
 */
-bool CG_ConsoleCommand( ) {
+bool ClientGame::consoleCommand( ) {
 	const char	*cmd;
 	int		i;
 
-	cmd = CG_Argv(0);
+	cmd = ClientGame::argv(0);
 
 	// developer variable modification
 	if( CG_ExtractDeveloper() )
@@ -710,13 +710,13 @@ bool CG_ConsoleCommand( ) {
 
 /*
 =================
-CG_InitConsoleCommands
+ClientGame::initConsoleCommands
 
 Let the client system know about all of our commands
 so it can perform tab completion
 =================
 */
-void CG_InitConsoleCommands( ) {
+void ClientGame::initConsoleCommands( ) {
 	int		i;
 
 	for ( i = 0 ; i < sizeof( commands ) / sizeof( commands[0] ) ; i++ ) {

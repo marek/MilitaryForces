@@ -39,10 +39,10 @@ void ME_CopySelection()
 	int				i;
 
 	if( cgs.IGME.numSelections > 1 ) {
-		CG_Printf( "Can only copy a SINGLE vehicle!\n" );
+		ClientGame::printf( "Can only copy a SINGLE vehicle!\n" );
 		return;
 	} else if( cgs.IGME.numSelections < 1 ) {
-		CG_Printf( "Select object to copy!\n" );
+		ClientGame::printf( "Select object to copy!\n" );
 		return;
 	}
 
@@ -76,7 +76,7 @@ void ME_CopySelection()
 		}
 		cgs.IGME.copyBufferVehicleUsed = true;
 	}
-	CG_Printf( "Copied to clipboard\n" );
+	ClientGame::printf( "Copied to clipboard\n" );
 }
 
 void ME_PasteSelection()
@@ -86,7 +86,7 @@ void ME_PasteSelection()
 
 	if( cgs.IGME.waypointmode ) {
 		if( !cgs.IGME.copyBufferRouteUsed ) {
-			CG_Printf( "Clipboard empty, copy something first!" );
+			ClientGame::printf( "Clipboard empty, copy something first!" );
 			return;
 		}
 		veh = ME_GetSelectedVehicle();
@@ -98,7 +98,7 @@ void ME_PasteSelection()
 		}	
 	} else {
 		if( !cgs.IGME.copyBufferVehicleUsed ) {
-			CG_Printf( "Clipboard empty, copy something first!" );
+			ClientGame::printf( "Clipboard empty, copy something first!" );
 			return;
 		}
 		for( i = 0; i < IGME_MAX_VEHICLES; ++i ) {
@@ -108,7 +108,7 @@ void ME_PasteSelection()
 			}
 		}
 		if( !veh ) {
-			CG_Printf( "No more space for vehicles left! Delete some first!\n" );
+			ClientGame::printf( "No more space for vehicles left! Delete some first!\n" );
 			return;
 		}
 		veh->active = cgs.IGME.copyBufferVehicle.active;
@@ -123,7 +123,7 @@ void ME_PasteSelection()
 			VectorCopy( cgs.IGME.copyBufferVehicle.waypoints[i].origin, veh->waypoints[i].origin );
 		}
 	}
-	CG_Printf( "Pasted\n" );
+	ClientGame::printf( "Pasted\n" );
 }
 
 void ME_ToggleWaypointMode()
@@ -131,32 +131,32 @@ void ME_ToggleWaypointMode()
 	IGME_vehicle_t* veh = nullptr;
 
 	if( cgs.IGME.numSelections != 1 ) {
-		CG_Printf( "You have to select a single vehicle to enter WAYPOINTMODE\n" );
+		ClientGame::printf( "You have to select a single vehicle to enter WAYPOINTMODE\n" );
 		return;
 	}
 
 	veh = ME_GetSelectedVehicle();
 	if( !veh ) return;
 	if( veh->groundInstallation ) {
-		CG_Printf( "Static units dont really need waypoints, do they ?\n" );
+		ClientGame::printf( "Static units dont really need waypoints, do they ?\n" );
 		return;
 	}
 
 	cgs.IGME.waypointmode = cgs.IGME.waypointmode ? false : true;
 
-	if( cgs.IGME.waypointmode ) CG_Printf( "Waypoint mode is ON\n" );
-	else CG_Printf( "Waypoint mode is OFF\n" );
+	if( cgs.IGME.waypointmode ) ClientGame::printf( "Waypoint mode is ON\n" );
+	else ClientGame::printf( "Waypoint mode is OFF\n" );
 }
 
 void ME_ToggleWaypointDisplay()
 {
 	cgs.IGME.showAllWaypoints = cgs.IGME.showAllWaypoints ? false : true;
 
-	if( cgs.IGME.showAllWaypoints ) CG_Printf( "ALL Waypoints are displayed\n" );
-	else CG_Printf( "Only Waypoints of SELECTED vehicle are displayed\n" );
+	if( cgs.IGME.showAllWaypoints ) ClientGame::printf( "ALL Waypoints are displayed\n" );
+	else ClientGame::printf( "Only Waypoints of SELECTED vehicle are displayed\n" );
 }
 
-void CG_Draw_IGME()
+void ClientGame::draw_IGME()
 {
 	int				i;
 	usercmd_t		cmd;
@@ -568,7 +568,7 @@ void ME_DragSelection( int x, int y )
 			if( !wpt->selected ) continue;
 			VectorCopy( wpt->origin, start );
 			VectorAdd( wpt->origin, forward, end );
-			CG_Trace( &tr, start, vec3_origin, vec3_origin, end, cg.snap->ps.clientNum, MASK_ALL );
+			ClientGame::trace( &tr, start, vec3_origin, vec3_origin, end, cg.snap->ps.clientNum, MASK_ALL );
 			VectorCopy( tr.endpos, wpt->origin );
 		}
 	} else {
@@ -580,7 +580,7 @@ void ME_DragSelection( int x, int y )
 			if( !veh->selected ) continue;
 			VectorCopy( veh->origin, start );
 			VectorAdd( veh->origin, forward, end );
-			CG_Trace( &tr, start, vec3_origin, vec3_origin, end, cg.snap->ps.clientNum, MASK_ALL );
+			ClientGame::trace( &tr, start, vec3_origin, vec3_origin, end, cg.snap->ps.clientNum, MASK_ALL );
 			VectorCopy( tr.endpos, veh->origin );
 		}
 	}
@@ -599,12 +599,12 @@ void ME_SpawnWaypoint()
 	// waypoints
 	} else {
 		if( selveh->waypoints[IGME_MAX_WAYPOINTS-1].active ) {
-			CG_Printf( "Too many waypoints!\n" );
+			ClientGame::printf( "Too many waypoints!\n" );
 			return;
 		}
 		if( insert ) {
 			if( cgs.IGME.numWptSelections != 1 ) {
-				CG_Printf( "Select ONE single waypoint after which to insert!\n" );
+				ClientGame::printf( "Select ONE single waypoint after which to insert!\n" );
 				return;
 			}
 			if( insert ) {
@@ -632,7 +632,7 @@ static IGME_vehicle_t* ME_SpawnVehicleAt( int vehidx, vec3_t pos, vec3_t angles 
 	int i;
 
 	if( cgs.IGME.waypointmode ) {
-		CG_Printf( "You are in waypoint mode, spawning vehicles not allowed now!\n" );
+		ClientGame::printf( "You are in waypoint mode, spawning vehicles not allowed now!\n" );
 		return nullptr;
 	}
 
@@ -643,7 +643,7 @@ static IGME_vehicle_t* ME_SpawnVehicleAt( int vehidx, vec3_t pos, vec3_t angles 
 		}
 	}
 	if( !veh ) {
-		CG_Printf( "Too many vehicles spawned! Please delete one first!\n" );
+		ClientGame::printf( "Too many vehicles spawned! Please delete one first!\n" );
 		return nullptr;
 	}
 
@@ -678,7 +678,7 @@ static IGME_vehicle_t* ME_SpawnGroundInstallationAt( int idx, vec3_t pos, vec3_t
 	int i;
 
 	if( cgs.IGME.waypointmode ) {
-		CG_Printf( "You are in waypoint mode, spawning ground installations not allowed now!\n" );
+		ClientGame::printf( "You are in waypoint mode, spawning ground installations not allowed now!\n" );
 		return nullptr;
 	}
 
@@ -689,7 +689,7 @@ static IGME_vehicle_t* ME_SpawnGroundInstallationAt( int idx, vec3_t pos, vec3_t
 		}
 	}
 	if( !veh ) {
-		CG_Printf( "Too many vehicles spawned! Please delete one first!\n" );
+		ClientGame::printf( "Too many vehicles spawned! Please delete one first!\n" );
 		return nullptr;
 	}
 
@@ -734,7 +734,7 @@ void ME_DrawVehicle( IGME_vehicle_t* veh )
 		drawInfo.turretAngle = 0;
 		drawInfo.gunAngle = 10;
 		drawInfo.upgrades = availableGroundInstallations[veh->vehidx].upgrades;
-		CG_DrawGI(&drawInfo);
+		ClientGame::drawGI(&drawInfo);
 	} else {
 		switch( availableVehicles[veh->vehidx].cat ) {
 		case CAT_PLANE:
@@ -747,7 +747,7 @@ void ME_DrawVehicle( IGME_vehicle_t* veh )
 				drawInfo.basicInfo.vehicleIndex = veh->vehidx;
 				drawInfo.basicInfo.entityNum = -1;
 				drawInfo.basicInfo.usedLoadout = &availableLoadouts[veh->vehidx];
-				CG_DrawPlane(&drawInfo);	
+				ClientGame::drawPlane(&drawInfo);	
 			}
 			break;
 		case CAT_GROUND:
@@ -760,7 +760,7 @@ void ME_DrawVehicle( IGME_vehicle_t* veh )
 				drawInfo.basicInfo.vehicleIndex = veh->vehidx;
 				drawInfo.basicInfo.entityNum = -1;
 				drawInfo.basicInfo.usedLoadout = &availableLoadouts[veh->vehidx];
-				CG_DrawGV(&drawInfo);	
+				ClientGame::drawGV(&drawInfo);	
 			}
 			break;
 		case CAT_BOAT:
@@ -773,7 +773,7 @@ void ME_DrawVehicle( IGME_vehicle_t* veh )
 				drawInfo.basicInfo.vehicleIndex = veh->vehidx;
 				drawInfo.basicInfo.entityNum = -1;
 				drawInfo.basicInfo.usedLoadout = &availableLoadouts[veh->vehidx];
-				CG_DrawBoat(&drawInfo);
+				ClientGame::drawBoat(&drawInfo);
 			}
 			break;
 		case CAT_HELO:
@@ -859,21 +859,21 @@ void ME_ExportToScript( const char* scriptname )
 
 	if( !scriptname )
 	{
-		CG_Printf("Invalid scriptname!\n");
+		ClientGame::printf("Invalid scriptname!\n");
 		return;
 	}
 
 	// set up mission filename
-	info = CG_ConfigString( CS_SERVERINFO );
+	info = ClientGame::configString( CS_SERVERINFO );
 	mapname = Info::valueForKey( info, "mapname" );
 	Com_sprintf(scriptfile, 255, "missions/%s/%s.mis", mapname, scriptname);
 
 	if( FileSystem::fOpenFileByMode(scriptfile, &f, FS_WRITE) < 0 ) {
-		CG_Printf("Unable to write to file %s. Exporting to script cancelled.", scriptfile);
+		ClientGame::printf("Unable to write to file %s. Exporting to script cancelled.", scriptfile);
 		return;
 	}
 	
-	CG_Printf("Saving to script: %s\n", scriptfile);
+	ClientGame::printf("Saving to script: %s\n", scriptfile);
 
 	// first line comment
 	Com_sprintf( outstring, sizeof(outstring), "//Missionscript for map %s\n\n",mapname );
@@ -978,7 +978,7 @@ void ME_ExportToScript( const char* scriptname )
 
 
 
-	CG_Printf("Successfully saved to script\n");
+	ClientGame::printf("Successfully saved to script\n");
 
 	FileSystem::fCloseFile(f);
 
@@ -1081,7 +1081,7 @@ void ME_ImportScript( const char* scriptname )
 	memset(&installations[0], 0, sizeof(installations));
 
 	// set up mission filename
-	info = CG_ConfigString( CS_SERVERINFO );
+	info = ClientGame::configString( CS_SERVERINFO );
 	mapname = Info::valueForKey( info, "mapname" );
 	Com_sprintf(filename, 255, "missions/%s/%s.mis", mapname, scriptname);
 
@@ -1105,7 +1105,7 @@ void ME_Init_MissionEditor()
 	const char	*info;
 	const char	*scriptname;
 
-	info = CG_ConfigString( CS_SERVERINFO );
+	info = ClientGame::configString( CS_SERVERINFO );
 	scriptname = Info::valueForKey( info, "mf_mission" );
 
 	ME_ImportScript(scriptname);
@@ -1119,7 +1119,7 @@ void ME_SetSide( const char* side )
 	int i, count = 0;
 
 	if( Q_stricmp( side, "red" ) && Q_stricmp( side, "blue" ) && Q_stricmp( side, "none" ) ) {
-		CG_Printf( "usage: me_side <red|blue|none>\n" );
+		ClientGame::printf( "usage: me_side <red|blue|none>\n" );
 		return;
 	}
 	for( i = 0; i < IGME_MAX_VEHICLES; ++i ) {
@@ -1131,5 +1131,5 @@ void ME_SetSide( const char* side )
 			Q_strncpyz( veh->side, side, sizeof(veh->side) );
 		count++;
 	}
-	CG_Printf( "%d object(s) set to side %s\n", count, side );
+	ClientGame::printf( "%d object(s) set to side %s\n", count, side );
 }

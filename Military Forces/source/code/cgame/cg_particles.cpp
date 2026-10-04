@@ -43,11 +43,11 @@ void CG_EjectParticle(particleWorld_t * w, particleEmitter_t * e)
 	}
 	w->particles[i].lastthink = w->particles[i].lastAttractionThink = w->particles[i].birthtime = cg.time;
 	w->particles[i].dead = false;
-	CG_ParticleThink(w, &w->particles[i]);
+	ClientGame::particleThink(w, &w->particles[i]);
 	w->numParticles++;
 }
 
-int CG_AddParticleSystem(particleWorld_t * w, particleSystem_t * s)
+int ClientGame::addParticleSystem(particleWorld_t * w, particleSystem_t * s)
 {
 	int i;
 	for(i = 0; i < sizeof(w->systems)/sizeof(w->systems[0]); i++)
@@ -71,7 +71,7 @@ void CG_KillParticleSystem(particleWorld_t * w, int index)
 	w->systems[index].dead = true;
 }
 
-int CG_AddParticleEmitter(particleWorld_t * w, particleEmitter_t * e)
+int ClientGame::addParticleEmitter(particleWorld_t * w, particleEmitter_t * e)
 {
 	int i;
 	for(i = 0; i < sizeof(w->emitters)/sizeof(w->emitters[0]); i++)
@@ -224,7 +224,7 @@ void CG_ParticleSystemThink(particleWorld_t * w, particleSystem_t * s)
 	}	
 }
 
-void CG_ParticleThink(particleWorld_t * w, particle_t * p)
+void ClientGame::particleThink(particleWorld_t * w, particle_t * p)
 {
 	trace_t		trace;
 	vec3_t		mins, maxs, result, temp;
@@ -333,7 +333,7 @@ void CG_ParticleThink(particleWorld_t * w, particle_t * p)
 	VectorSet( mins, -p->radius, -p->radius, -p->radius );
 	VectorSet( maxs, p->radius, p->radius, p->radius );
 	
-	CG_Trace( &trace, p->trBase, mins, maxs, result, ENTITYNUM_NONE, MASK_SOLID );
+	ClientGame::trace( &trace, p->trBase, mins, maxs, result, ENTITYNUM_NONE, MASK_SOLID );
 	
 	// bounce/die if hit
 	if( trace.fraction == 1.0f)
@@ -440,7 +440,7 @@ void CG_RenderParticle(particle_t * p)
 }
 
 
-void CG_ParticleWorldThink(particleWorld_t * w)
+void ClientGame::particleWorldThink(particleWorld_t * w)
 {
 	int i;
 
@@ -449,7 +449,7 @@ void CG_ParticleWorldThink(particleWorld_t * w)
 	{
 		if(!w->particles[i].dead)
 		{
-			CG_ParticleThink(w, &w->particles[i]);
+			ClientGame::particleThink(w, &w->particles[i]);
 		}
 	}
 
@@ -472,7 +472,7 @@ void CG_ParticleWorldThink(particleWorld_t * w)
 		}
 	}
 }
-void CG_ParticleWorldRender(particleWorld_t * w)
+void ClientGame::particleWorldRender(particleWorld_t * w)
 {
 	int i, j;
 
@@ -487,7 +487,7 @@ void CG_ParticleWorldRender(particleWorld_t * w)
 	}
 }
 
-void CG_ParticleWorldInit(particleWorld_t * w)
+void ClientGame::particleWorldInit(particleWorld_t * w)
 {
 int i;
 

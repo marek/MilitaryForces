@@ -1243,7 +1243,7 @@ void S_GetSoundtime()
 	static	int		buffers;
 	static	int		oldsamplepos;
 
-	if( CL_VideoRecording( ) )
+	if( Client::videoRecording( ) )
 	{
 		float fps = MIN(cl_aviFrameRate->value, 1000.0f);
 		float frameDuration = MAX(dma.speed / fps, 1.0f) + clc.aviSoundFrameRemainder;

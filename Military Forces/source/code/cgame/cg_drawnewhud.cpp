@@ -77,7 +77,7 @@ Coordinates are 640*480 virtual values
 */
 static void CG_DrawHUDPic( float x, float y, float width, float height, qhandle_t hShader, vec4_t color ) {
 	refExport.SetColor( color );
-	CG_AdjustFrom640( &x, &y, &width, &height );
+	ClientGame::adjustFrom640( &x, &y, &width, &height );
 	refExport.DrawStretchPic( x, y, width, height, 0, 0, 1, 1, hShader );
 	refExport.SetColor( nullptr );
 }
@@ -180,7 +180,7 @@ static int CG_DrawChar_MFQ3( int x, int y, int ch, bool right ) {
 		ax -= aw;
 	}
 
-	CG_AdjustFrom640( &ax, &ay, &aw, &ah );
+	ClientGame::adjustFrom640( &ax, &ay, &aw, &ah );
 
 	if( num ) {
 		refExport.DrawStretchPic( ax, ay, aw, ah,
@@ -268,7 +268,7 @@ static int CG_DrawString_MFQ3_R( int x, int y, const char *string, const float *
 	int			i = 0;
 
 	if( len >= 127 ) {
-		CG_Printf( "String too long! Not printed!" );
+		ClientGame::printf( "String too long! Not printed!" );
 		return 0;
 	}
 	while( len >= 0 ) {
@@ -377,14 +377,14 @@ static void CG_MFQ3HUD_Numbers (int x, int y, int width, int value, bool percent
 		else
 			frame = *ptr -'0';
 
-		CG_DrawPic( x,y, HUDNUM_WIDTH, HUDNUM_HEIGHT, cgs.media.HUDnumbers[frame] );
+		ClientGame::drawPic( x,y, HUDNUM_WIDTH, HUDNUM_HEIGHT, cgs.media.HUDnumbers[frame] );
 		if( right ) x -= HUDNUM_WIDTH-1;
 		else x += HUDNUM_WIDTH-1;
 		ptr++;
 		l--;
 	}
 	if( percent ) {
-		CG_DrawPic( x,y, 2*HUDNUM_WIDTH, HUDNUM_HEIGHT, cgs.media.HUDnumbers[STAT_PERCENT] );
+		ClientGame::drawPic( x,y, 2*HUDNUM_WIDTH, HUDNUM_HEIGHT, cgs.media.HUDnumbers[STAT_PERCENT] );
 	}
 
 	refExport.SetColor( NULL );
@@ -520,7 +520,7 @@ static void CG_DrawRadarSymbols_AIR_new( int vehicle, float range, int x, int y 
 
 		// check LOS and/or RADAR on
 		if( !(cg.radarEnts[i]->currentState.ONOFF & OO_RADAR) ) {
-			CG_Trace( &res, pos, nullptr, nullptr, otherpos, cg.snap->ps.clientNum, MASK_SOLID );
+			ClientGame::trace( &res, pos, nullptr, nullptr, otherpos, cg.snap->ps.clientNum, MASK_SOLID );
 			if( res.fraction < 1.0f ) 
 				continue;
 		}
@@ -544,7 +544,7 @@ static void CG_DrawRadarSymbols_AIR_new( int vehicle, float range, int x, int y 
 		}
 
 		// draw
-		CG_DrawPic( x + dir[0], y - dir[1], 8, 8, cgs.media.radarIcons[icon] );
+		ClientGame::drawPic( x + dir[0], y - dir[1], 8, 8, cgs.media.radarIcons[icon] );
 		// check if we should draw any more targets
 		drawnTargets++;
 		if( drawnTargets >= cg_radarTargets.integer ) break;
@@ -657,7 +657,7 @@ static void CG_DrawRadarSymbols_GROUND_new( int vehicle, float range, int x, int
 			// check LOS and/or RADAR on
 			if( !(cg.radarEnts[i]->currentState.ONOFF & OO_RADAR) ) 
 			{
-				CG_Trace( &res, pos, nullptr, nullptr, otherpos, cg.snap->ps.clientNum, MASK_SOLID );
+				ClientGame::trace( &res, pos, nullptr, nullptr, otherpos, cg.snap->ps.clientNum, MASK_SOLID );
 				if( res.fraction < 1.0f ) 
 					continue;
 			}
@@ -732,14 +732,14 @@ static void CG_DrawRadarSymbols_GROUND_new( int vehicle, float range, int x, int
 				}
 			}
 			// check LOS
-			CG_Trace( &res, pos, nullptr, nullptr, otherpos, cg.snap->ps.clientNum, MASK_SOLID );
+			ClientGame::trace( &res, pos, nullptr, nullptr, otherpos, cg.snap->ps.clientNum, MASK_SOLID );
 //			if( res.fraction < 1.0f ) continue;
 			if( res.entityNum != cg.radarEnts[i]->currentState.number ) 
 				continue;
 		}
 
 		// draw
-		CG_DrawPic( x + dir[0], y - dir[1], 8, 8, cgs.media.radarIcons[icon] );
+		ClientGame::drawPic( x + dir[0], y - dir[1], 8, 8, cgs.media.radarIcons[icon] );
 		// check if we should draw any more targets
 		drawnTargets++;
 		if( drawnTargets >= cg_radarTargets.integer ) 
@@ -839,7 +839,7 @@ static void CG_DrawRadarSymbols_GROUND_new( int vehicle, float range, int x, int
 //			// check LOS and/or RADAR on
 //			if( !(cg.radarEnts[i]->currentState.ONOFF & OO_RADAR) ) 
 //			{
-//				CG_Trace( &res, pos, NULL, NULL, otherpos, cg.snap->ps.clientNum, MASK_SOLID );
+//				ClientGame::trace( &res, pos, NULL, NULL, otherpos, cg.snap->ps.clientNum, MASK_SOLID );
 //				if( res.fraction < 1.0f ) continue;
 //			}
 //			// which icon (if at all, dont show lqms)
@@ -908,13 +908,13 @@ static void CG_DrawRadarSymbols_GROUND_new( int vehicle, float range, int x, int
 //				}
 //			}
 //			// check LOS
-//			CG_Trace( &res, pos, NULL, NULL, otherpos, cg.snap->ps.clientNum, MASK_SOLID );
+//			ClientGame::trace( &res, pos, NULL, NULL, otherpos, cg.snap->ps.clientNum, MASK_SOLID );
 ////			if( res.fraction < 1.0f ) continue;
 //			if( res.entityNum != cg.radarEnts[i]->currentState.number ) continue;
 //		}
 //
 //		// draw
-//		CG_DrawPic( x + dir[0], y - dir[1], 8, 8, cgs.media.radarIcons[icon] );
+//		ClientGame::drawPic( x + dir[0], y - dir[1], 8, 8, cgs.media.radarIcons[icon] );
 //		// check if we should draw any more targets
 //		drawnTargets++;
 //		if( drawnTargets >= cg_radarTargets.integer ) break;
@@ -953,7 +953,7 @@ static void CG_Draw_Redundant(int vehicle, int health, int throttle, int ammo[16
 
 		// draw health
 	if( hud_health.integer ) {
-		CG_SetScreenPlacement( PLACE_RIGHT );
+		ClientGame::setScreenPlacement( PLACE_RIGHT );
 		CG_DrawHUDPic( 516, 318, 32, 8, cgs.media.HUDhealthtext, HUDColors[cg.HUDColor] ); 
 		Com_sprintf(buffer, 5, "%d%%", health);
 		CG_DrawString_MFQ3( 560, 318, buffer, HUDColors[cg.HUDColor], 0 );
@@ -961,7 +961,7 @@ static void CG_Draw_Redundant(int vehicle, int health, int throttle, int ammo[16
 
 		// draw throttle
 	if( hud_throttle.integer ) {
-		CG_SetScreenPlacement( PLACE_RIGHT );
+		ClientGame::setScreenPlacement( PLACE_RIGHT );
 		CG_DrawHUDPic( 516, 330, 32, 8, cgs.media.HUDthrottletext, HUDColors[cg.HUDColor] ); 
 
 		if( availableVehicles[vehicle].engines > 1 ) {
@@ -992,7 +992,7 @@ static void CG_Draw_Redundant(int vehicle, int health, int throttle, int ammo[16
 				actualstring = availableWeapons[availableVehicles[vehicle].weapons[0]].shortName;
 			}
 			Com_sprintf( ammostring, 32, "%s: %d", actualstring, ammo[0] );
-			CG_SetScreenPlacement( PLACE_LEFT );
+			ClientGame::setScreenPlacement( PLACE_LEFT );
 			CG_DrawString_MFQ3( 4, 318, ammostring, HUDColors[cg.HUDColor], 0);
 		}
 
@@ -1005,12 +1005,12 @@ static void CG_Draw_Redundant(int vehicle, int health, int throttle, int ammo[16
 				actualstring = availableWeapons[availableVehicles[vehicle].weapons[selweap]].shortName;
 			}
 			Com_sprintf( ammostring, 32, "%s: %d", actualstring, ammo[selweap] );
-			CG_SetScreenPlacement( PLACE_LEFT );
+			ClientGame::setScreenPlacement( PLACE_LEFT );
 			CG_DrawString_MFQ3( 4, 330, ammostring, HUDColors[cg.HUDColor], 0);
 		}
 	}
 
-	CG_SetScreenPlacement( PLACE_CENTER );
+	ClientGame::setScreenPlacement( PLACE_CENTER );
 }
 
 
@@ -1031,7 +1031,7 @@ static void CG_Draw_Center(int vehicle, int health, int throttle) {
 	height = 32;
 
 		// background
-	CG_DrawPic( x, y, width, height, cgs.media.HUDsolid ); 
+	ClientGame::drawPic( x, y, width, height, cgs.media.HUDsolid ); 
 
 		// health
 	if( healthpic >= 0 ) {
@@ -1039,30 +1039,30 @@ static void CG_Draw_Center(int vehicle, int health, int throttle) {
 		y = 448;
 		width = 128;
 		height = 32;
-		CG_DrawPic( x, y, width, height, cgs.media.HUDhealth[healthpic] ); 
+		ClientGame::drawPic( x, y, width, height, cgs.media.HUDhealth[healthpic] ); 
 	}
 
 		// throttle
 	if( throttlepic >= 0 ) {
 		if( availableVehicles[vehicle].engines > 1 ) {
 			if( availableVehicles[vehicle].maxthrottle > MF_THROTTLE_MILITARY ) {
-				CG_DrawPic( 320, 448, 128, 16, cgs.media.HUDthrottle_2_1_ab[throttlepic] ); 
-				CG_DrawPic( 320, 464, 128, 16, cgs.media.HUDthrottle_2_2_ab[throttlepic] ); 
+				ClientGame::drawPic( 320, 448, 128, 16, cgs.media.HUDthrottle_2_1_ab[throttlepic] ); 
+				ClientGame::drawPic( 320, 464, 128, 16, cgs.media.HUDthrottle_2_2_ab[throttlepic] ); 
 			} else {
-				CG_DrawPic( 320, 448, 128, 16, cgs.media.HUDthrottle_2_1[throttlepic] ); 
-				CG_DrawPic( 320, 464, 128, 16, cgs.media.HUDthrottle_2_2[throttlepic] ); 
+				ClientGame::drawPic( 320, 448, 128, 16, cgs.media.HUDthrottle_2_1[throttlepic] ); 
+				ClientGame::drawPic( 320, 464, 128, 16, cgs.media.HUDthrottle_2_2[throttlepic] ); 
 			}
 		} else {
 			if( availableVehicles[vehicle].maxthrottle > MF_THROTTLE_MILITARY ) {
-				CG_DrawPic( 320, 448, 128, height, cgs.media.HUDthrottle_1_ab[throttlepic] ); 
+				ClientGame::drawPic( 320, 448, 128, height, cgs.media.HUDthrottle_1_ab[throttlepic] ); 
 			} else {
 				if( ( (availableVehicles[vehicle].cat & CAT_GROUND) ||
 					(availableVehicles[vehicle].cat & CAT_BOAT) ||
 					(availableVehicles[vehicle].cat & CAT_HELO) ) &&
 					throttlepic >= MF_THROTTLE_MILITARY ) {
-					CG_DrawPic( 320, 448, 128, 32, cgs.media.HUDthrottle_rev[throttlepic-10] ); 
+					ClientGame::drawPic( 320, 448, 128, 32, cgs.media.HUDthrottle_rev[throttlepic-10] ); 
 				} else {
-					CG_DrawPic( 320, 448, 128, 32, cgs.media.HUDthrottle_1[throttlepic] ); 
+					ClientGame::drawPic( 320, 448, 128, 32, cgs.media.HUDthrottle_1[throttlepic] ); 
 				}
 			}
 		}
@@ -1108,7 +1108,7 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 	vx = x;
 	vy = y;
 	vh = h;
-	CG_AdjustFrom640( &x, &y, &w, &h );
+	ClientGame::adjustFrom640( &x, &y, &w, &h );
 	cg.HUDCamera.x = x;
 	cg.HUDCamera.y = y;
 	cg.HUDCamera.width = w;
@@ -1183,7 +1183,7 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 			VectorAdd( tempH, tempV, v );
 			VectorAdd( cent->currentState.pos.trBase, v, end );
 			VectorNormalize( v );
-			CG_Trace( &tr, cent->currentState.pos.trBase, nullptr, nullptr, end, cent->currentState.number, MASK_ALL );
+			ClientGame::trace( &tr, cent->currentState.pos.trBase, nullptr, nullptr, end, cent->currentState.number, MASK_ALL );
 			if( tr.fraction < 1 ) break;
 		}
 		vectoangles( v, end );
@@ -1233,9 +1233,9 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 	cg.drawingMFD = true;
 
 	// ummm shall I really do this ???
-	CG_AddPacketEntities();
-	CG_AddMarks();
-	CG_AddLocalEntities();
+	ClientGame::addPacketEntities();
+	ClientGame::addMarks();
+	ClientGame::addLocalEntities();
 
 	// render
 	refExport.RenderScene( &cg.HUDCamera );
@@ -1269,7 +1269,7 @@ void ClientEntity::draw_MFD( int mfdnum, int vehicle, int targetrange, int targe
 	}
 	y = 352;
 	width = height = 128;
-	CG_DrawPic( x, y, width, height, cgs.media.HUDmfd );
+	ClientGame::drawPic( x, y, width, height, cgs.media.HUDmfd );
 
 		// draw contents of mfd only if it is not off
 	if( !mode ) return;
@@ -1299,7 +1299,7 @@ void ClientEntity::draw_MFD( int mfdnum, int vehicle, int targetrange, int targe
 
 		// draw background
 		refExport.SetColor( HUDColors[cg.MFDColor] );
-		CG_DrawPic( x, y, width, height, cgs.media.HUDrwr );
+		ClientGame::drawPic( x, y, width, height, cgs.media.HUDrwr );
 		refExport.SetColor( nullptr );
 		// draw contents
 		if( radarmode & OO_RADAR_AIR ) {
@@ -1465,7 +1465,7 @@ static void CG_Draw_AltTape( int value ) {
 	width = 16;
 	height = 256;
 	refExport.SetColor( HUDColors[cg.HUDColor] );
-	CG_AdjustFrom640( &x, &y, &width, &height );
+	ClientGame::adjustFrom640( &x, &y, &width, &height );
 	refExport.DrawStretchPic( x, y, width, height, 0, 0.125f+offset, 1, 0.625f+offset, cgs.media.HUDalt );
 	refExport.SetColor( nullptr );
 		// alt indicater
@@ -1548,7 +1548,7 @@ static void CG_Draw_SpeedTape( int value, int stallspeed, int gearspeed, int sca
 	width = 16;
 	height = 256;
 	refExport.SetColor( HUDColors[cg.HUDColor] );
-	CG_AdjustFrom640( &x, &y, &width, &height );
+	ClientGame::adjustFrom640( &x, &y, &width, &height );
 	refExport.DrawStretchPic( x, y, width, height, 0, 0.125f+offset, 1, 0.625f+offset, cgs.media.HUDspeed );
 	refExport.SetColor( nullptr );
 		// speed indicater
@@ -1620,7 +1620,7 @@ static void CG_Draw_SpeedTape( int value, int stallspeed, int gearspeed, int sca
 			x = 55;
 			y = 171+(value2*64/scale);
 			width = height = 8;
-			CG_AdjustFrom640( &x, &y, &width, &height );
+			ClientGame::adjustFrom640( &x, &y, &width, &height );
 			refExport.DrawStretchPic( x, y, width, height, 0, 0, 1, 1, cgs.media.HUDcaret_v_r_l );
 		}
 	}
@@ -1652,7 +1652,7 @@ static void CG_Draw_HeadingTape( int value, int targetheading ) {
 	width = 448;
 	height = 16;
 	refExport.SetColor( HUDColors[cg.HUDColor] );
-	CG_AdjustFrom640( &x, &y, &width, &height );
+	ClientGame::adjustFrom640( &x, &y, &width, &height );
 	refExport.DrawStretchPic( x, y, width, height, 0.125f-offset, 0, 1-offset, 1, cgs.media.HUDheading );
 	refExport.SetColor( nullptr );
 		// draw heading value box
@@ -1731,7 +1731,7 @@ CG_DrawStatusBar_MFQ3
 
 ================
 */
-void CG_DrawStatusBar_MFQ3_new( ) {
+void ClientGame::drawStatusBar_MFQ3_new( ) {
 	ClientEntity	*cent;
 	playerState_t	*ps;
 	int			value, value2;
@@ -1753,7 +1753,7 @@ void CG_DrawStatusBar_MFQ3_new( ) {
 	}
 
 	// aiming/targetting reticles
-	CG_Draw_Reticles();
+	ClientGame::draw_Reticles();
 
 	cent = &cg_entities[cg.snap->ps.clientNum];
 	ps = &cg.snap->ps;
@@ -1792,10 +1792,10 @@ void CG_DrawStatusBar_MFQ3_new( ) {
 			if( (availableVehicles[vehicle].cat & CAT_GROUND) || 
 				(availableVehicles[vehicle].cat & CAT_BOAT) ) value = 10;
 			else value = 50;
-			CG_SetScreenPlacement( PLACE_LEFT );
+			ClientGame::setScreenPlacement( PLACE_LEFT );
 			CG_Draw_SpeedTape( ps->speed/10, availableVehicles[vehicle].stallspeed,
 					availableVehicles[vehicle].stallspeed * SPEED_GREEN_ARC, value );
-			CG_SetScreenPlacement( PLACE_CENTER );
+			ClientGame::setScreenPlacement( PLACE_CENTER );
 		}
 
 		// altitude (not for ground-vehicles)
@@ -1808,11 +1808,11 @@ void CG_DrawStatusBar_MFQ3_new( ) {
 			start[2] += availableVehicles[vehicle].mins[2];
 			VectorCopy( start, end );
 			end[2] -= 20000;
-			CG_Trace( &tr, start, vec3_origin, vec3_origin, end, cg.snap->ps.clientNum, MASK_SOLID|MASK_WATER );
+			ClientGame::trace( &tr, start, vec3_origin, vec3_origin, end, cg.snap->ps.clientNum, MASK_SOLID|MASK_WATER );
 			altitude = static_cast<int>(tr.fraction * 20000);
-			CG_SetScreenPlacement( PLACE_RIGHT );
+			ClientGame::setScreenPlacement( PLACE_RIGHT );
 			CG_Draw_AltTape(altitude);
-			CG_SetScreenPlacement( PLACE_CENTER );
+			ClientGame::setScreenPlacement( PLACE_CENTER );
 		}
 
 		// stall related
@@ -1822,16 +1822,16 @@ void CG_DrawStatusBar_MFQ3_new( ) {
 
 		// mfd 1
 		if( hud_mfd.integer ) {
-			CG_SetScreenPlacement( PLACE_LEFT );
+			ClientGame::setScreenPlacement( PLACE_LEFT );
 			cent->draw_MFD( MFD_1, vehicle, targetrange, targetheading, altitude, ps, stallcolor );
-			CG_SetScreenPlacement( PLACE_CENTER );
+			ClientGame::setScreenPlacement( PLACE_CENTER );
 		}
 
 		// mfd 2
 		if( hud_mfd2.integer ) {
-			CG_SetScreenPlacement( PLACE_RIGHT );
+			ClientGame::setScreenPlacement( PLACE_RIGHT );
 			cent->draw_MFD( MFD_2, vehicle, targetrange, targetheading, altitude, ps, stallcolor );
-			CG_SetScreenPlacement( PLACE_CENTER );
+			ClientGame::setScreenPlacement( PLACE_CENTER );
 		}
 
 		// solid middle section

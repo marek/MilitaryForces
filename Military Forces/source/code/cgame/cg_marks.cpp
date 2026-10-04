@@ -24,12 +24,12 @@ static		int	markTotal;
 
 /*
 ===================
-CG_InitMarkPolys
+ClientGame::initMarkPolys
 
 This is called at startup and for tournement restarts
 ===================
 */
-void	CG_InitMarkPolys( ) {
+void	ClientGame::initMarkPolys( ) {
 	int		i;
 
 	memset( cg_markPolys, 0, sizeof(cg_markPolys) );
@@ -98,22 +98,22 @@ markPoly_t	*CG_AllocMark( ) {
 
 /*
 =================
-CG_ImpactMark
+ClientGame::impactMark
 =================
 */
 
-void CG_ImpactMark( qhandle_t markShader, const vec3_t origin, const vec3_t dir, 
+void ClientGame::impactMark( qhandle_t markShader, const vec3_t origin, const vec3_t dir, 
 					  float orientation, float red, float green, float blue, float alpha,
 					  bool alphaFade, float radius, bool temporary )
 {
 	// link to extended version
-	CG_ImpactMarkEx( markShader, origin, dir, orientation, red, green, blue, alpha,
+	ClientGame::impactMarkEx( markShader, origin, dir, orientation, red, green, blue, alpha,
 					 alphaFade, radius, radius, temporary );
 }
 
 /*
 =================
-CG_ImpactMarkEx
+ClientGame::impactMarkEx
 
 origin should be a point within a unit of the plane
 dir should be the plane normal
@@ -125,7 +125,7 @@ passed to the renderer.
 constexpr int MAX_MARK_FRAGMENTS = 128;
 constexpr int MAX_MARK_POINTS = 384;
 
-void CG_ImpactMarkEx( qhandle_t markShader, const vec3_t origin, const vec3_t dir, 
+void ClientGame::impactMarkEx( qhandle_t markShader, const vec3_t origin, const vec3_t dir, 
 					  float orientation, float red, float green, float blue, float alpha,
 					  bool alphaFade, float xRadius, float yRadius, bool temporary )
 {
@@ -249,13 +249,13 @@ return;
 
 /*
 ===============
-CG_AddMarks
+ClientGame::addMarks
 ===============
 */
 constexpr int MARK_TOTAL_TIME = 10000;
 constexpr int MARK_FADE_TIME = 1000;
 
-void CG_AddMarks( ) {
+void ClientGame::addMarks( ) {
 	int			j;
 	markPoly_t	*mp, *next;
 	int			t;

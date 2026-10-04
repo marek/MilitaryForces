@@ -216,7 +216,7 @@ static void SV_Map_f()
 	Q_strncpyz(mapname, map, sizeof(mapname));
 
 	// start up the map
-	SV_SpawnServer( mapname, killBots );
+	ServerMain::spawnServer( mapname, killBots );
 
 	// set the cheat value
 	// if the level was started with "map <levelname>", then
@@ -275,7 +275,7 @@ static void SV_MapRestart_f()
 		// restart the map the slow way
 		Q_strncpyz( mapname, CvarSystem::variableString( "mapname" ), sizeof( mapname ) );
 
-		SV_SpawnServer( mapname, false );
+		ServerMain::spawnServer( mapname, false );
 		return;
 	}
 
@@ -304,7 +304,7 @@ static void SV_MapRestart_f()
 	theSV.state_ = Server::SS_LOADING;
 	theSV.restarting_ = true;
 
-	SV_RestartGameProgs();
+	ServerMain::restartGameProgs();
 
 	// run a few frames to allow everything to settle
 	for( int i = 0 ;i < 3 ; i++ ) 
@@ -1281,7 +1281,7 @@ static void SV_ConSay_f() {
 	strcat(text, p);
 
 	Common::printf("%s\n", text);
-	SV_SendServerCommand(nullptr, "chat \"%s\"", text);
+	ServerMain::sendServerCommand(nullptr, "chat \"%s\"", text);
 }
 
 /*
@@ -1321,7 +1321,7 @@ static void SV_ConTell_f() {
 	strcat(text, p);
 
 	Common::printf("%s\n", text);
-	SV_SendServerCommand(cl, "chat \"%s\"", text);
+	ServerMain::sendServerCommand(cl, "chat \"%s\"", text);
 }
 
 
@@ -1390,18 +1390,18 @@ static void SV_ConSayto_f() {
 	strcat(text, p);
 
 	Common::printf("%s\n", text);
-	SV_SendServerCommand(saytocl, "chat \"%s\"", text);
+	ServerMain::sendServerCommand(saytocl, "chat \"%s\"", text);
 }
 
 
 /*
 ==================
-SV_Heartbeat_f
+ServerMain::heartbeat_f
 
-Also called by SV_DropClient, SV_DirectConnect, and SV_SpawnServer
+Also called by SV_DropClient, ServerMain::directConnect, and ServerMain::spawnServer
 ==================
 */
-void SV_Heartbeat_f( ) {
+void ServerMain::heartbeat_f( ) {
 	theSVS.nextHeartbeatTime_ = -9999999;
 }
 
@@ -1540,10 +1540,10 @@ static void SV_CompletePlayerName( char *args, int argNum ) {
 
 /*
 ==================
-SV_AddOperatorCommands
+ServerMain::addOperatorCommands
 ==================
 */
-void SV_AddOperatorCommands( ) {
+void ServerMain::addOperatorCommands( ) {
 	static bool	initialized;
 
 	if ( initialized ) {
@@ -1551,7 +1551,7 @@ void SV_AddOperatorCommands( ) {
 	}
 	initialized = true;
 
-	CommandSystem::addCommand ("heartbeat", SV_Heartbeat_f);
+	CommandSystem::addCommand ("heartbeat", ServerMain::heartbeat_f);
 	CommandSystem::addCommand ("kick", SV_Kick_f);
 #ifndef STANDALONE
 	if(!com_standalone->integer)
@@ -1569,7 +1569,7 @@ void SV_AddOperatorCommands( ) {
 	CommandSystem::addCommand ("systeminfo", SV_Systeminfo_f);
 	CommandSystem::addCommand ("dumpuser", SV_DumpUser_f);
 	CommandSystem::addCommand ("map_restart", SV_MapRestart_f);
-	CommandSystem::addCommand ("sectorlist", SV_SectorList_f);
+	CommandSystem::addCommand ("sectorlist", ServerMain::sectorList_f);
 	CommandSystem::addCommand ("map", SV_Map_f);
 	CommandSystem::setCommandCompletionFunc( "map", SV_CompleteMapName );
 #ifndef PRE_RELEASE_DEMO
@@ -1599,10 +1599,10 @@ void SV_AddOperatorCommands( ) {
 
 /*
 ==================
-SV_RemoveOperatorCommands
+ServerMain::removeOperatorCommands
 ==================
 */
-void SV_RemoveOperatorCommands( ) {
+void ServerMain::removeOperatorCommands( ) {
 #if 0
 	// removing these won't let the server start again
 	CommandSystem::removeCommand ("heartbeat");

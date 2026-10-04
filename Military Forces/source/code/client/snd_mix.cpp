@@ -133,8 +133,8 @@ void S_TransferStereo16 (unsigned long *pbuf, int endtime)
 		snd_p += snd_linear_count;
 		ls_paintedtime += (snd_linear_count>>1); // snd_linear_count / dma.channels
 
-		if( CL_VideoRecording( ) )
-			CL_WriteAVIAudioFrame( reinterpret_cast<byte *>(snd_out), snd_linear_count << 1 ); // snd_linear_count * (dma.samplebits/8)
+		if( Client::videoRecording( ) )
+			Client::writeAVIAudioFrame( reinterpret_cast<byte *>(snd_out), snd_linear_count << 1 ); // snd_linear_count * (dma.samplebits/8)
 	}
 }
 

@@ -33,7 +33,7 @@ static void SV_CloseDownload( SV_Client *cl );
 
 /*
 =================
-SV_GetChallenge
+ServerMain::getChallenge
 
 A "getchallenge" OOB command has been received
 Returns a challenge number that can be used
@@ -49,7 +49,7 @@ When an authorizeip is returned, a challenge response will be
 sent to that ip.
 =================
 */
-void SV_GetChallenge(netadr_t from)
+void ServerMain::getChallenge(netadr_t from)
 {
 	int		i;
 	int		oldest;
@@ -260,13 +260,13 @@ static bool SV_IsBanned(netadr_t *from, bool isexception)
 
 /*
 ==================
-SV_DirectConnect
+ServerMain::directConnect
 
 A "connect" OOB command has been received
 ==================
 */
 
-void SV_DirectConnect( netadr_t from ) 
+void ServerMain::directConnect( netadr_t from ) 
 {
 	Common::dPrintf ("SVC_DirectConnect ()\n");
 
@@ -559,7 +559,7 @@ gotnewcl:
 			count++;
 	}
 	if( count == 1 || count == sv_maxclients->integer )
-		SV_Heartbeat_f();
+		ServerMain::heartbeat_f();
 }
 
 
@@ -595,7 +595,7 @@ SV_DropClient
 
 Called when the player is totally leaving the server, either willingly
 or unwillingly.  This is NOT called if the entire server is quiting
-or crashing -- SV_FinalMessage() will handle that
+or crashing -- ServerMain::finalMessage() will handle that
 =====================
 */
 void SV_Client::drop( const char *reason ) 
@@ -636,7 +636,7 @@ void SV_Client::drop( const char *reason )
 	this->gamestateMessageNum_ = -1;
 
 	// tell everyone why they got dropped
-	SV_SendServerCommand( nullptr, "print \"%s" S_COLOR_WHITE " %s\n\"", this->name_, reason );
+	ServerMain::sendServerCommand( nullptr, "print \"%s" S_COLOR_WHITE " %s\n\"", this->name_, reason );
 
 	// call the prog function for removing a client
 	// this will remove the body, among other things
@@ -644,7 +644,7 @@ void SV_Client::drop( const char *reason )
 	theSG.clientDisconnect( this->clientNum_ );
 
 	// add the disconnect command
-	SV_SendServerCommand( this, "disconnect \"%s\"", reason);
+	ServerMain::sendServerCommand( this, "disconnect \"%s\"", reason);
 
 	if ( isBot ) {
 		// bots shouldn't go zombie, as there's no real net connection.
@@ -670,7 +670,7 @@ void SV_Client::drop( const char *reason )
 			break;
 	}
 	if( i > sv_maxclients->integer ) 
-		SV_Heartbeat_f();
+		ServerMain::heartbeat_f();
 }
 
 /*
@@ -1118,14 +1118,14 @@ int SV_Client::writeDownloadToClient( Message *msg )
 
 /*
 ==================
-SV_SendQueuedMessages
+ServerMain::sendQueuedMessages
 
 Send one round of fragments, or queued messages to all clients that have data pending.
 Return the shortest time interval for sending next packet to client
 ==================
 */
 
-int SV_SendQueuedMessages()
+int ServerMain::sendQueuedMessages()
 {
 	int i, retval = -1, nextFragT;
 	SV_Client *cl;
@@ -1152,13 +1152,13 @@ int SV_SendQueuedMessages()
 
 /*
 ==================
-SV_SendDownloadMessages
+ServerMain::sendDownloadMessages
 
 Send one round of download messages to all clients
 ==================
 */
 
-int SV_SendDownloadMessages()
+int ServerMain::sendDownloadMessages()
 {
 	int i, numDLs = 0, retval;
 	SV_Client *cl;

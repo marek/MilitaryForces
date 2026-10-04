@@ -317,13 +317,13 @@ void CL_WriteAVIHeader( )
 
 /*
 ===============
-CL_OpenAVIForWriting
+Client::openAVIForWriting
 
 Creates an AVI file and gets it into a state where
 writing the actual data can begin
 ===============
 */
-bool CL_OpenAVIForWriting( const char *fileName )
+bool Client::openAVIForWriting( const char *fileName )
 {
   if( afd.fileOpen )
     return false;
@@ -371,7 +371,7 @@ bool CL_OpenAVIForWriting( const char *fileName )
   afd.a.rate = dma.speed;
   afd.a.format = WAV_FORMAT_PCM;
   afd.a.channels = dma.channels;
-  /* !!! FIXME: if CL_WriteAVIAudioFrame() is ever called from somewhere other
+  /* !!! FIXME: if Client::writeAVIAudioFrame() is ever called from somewhere other
      !!! FIXME:  than S_TransferStereo16(), we will need to handle/convert
      !!! FIXME:  float32 samples for AVI writing. */
   afd.a.bits = dma.samplebits;
@@ -447,10 +447,10 @@ static bool CL_CheckFileSize( int bytesToAdd )
   if( newFileSize > INT_MAX )
   {
     // Close the current file...
-    CL_CloseAVI( );
+    Client::closeAVI( );
 
     // ...And open a new one
-    CL_OpenAVIForWriting( va( "%s_", afd.fileName ) );
+    Client::openAVIForWriting( va( "%s_", afd.fileName ) );
 
     return true;
   }
@@ -507,10 +507,10 @@ constexpr int PCM_BUFFER_SIZE = 44100;
 
 /*
 ===============
-CL_WriteAVIAudioFrame
+Client::writeAVIAudioFrame
 ===============
 */
-void CL_WriteAVIAudioFrame( const byte *pcmBuffer, int size )
+void Client::writeAVIAudioFrame( const byte *pcmBuffer, int size )
 {
   static byte pcmCaptureBuffer[ PCM_BUFFER_SIZE ] = { 0 };
   static int  bytesInBuffer = 0;
@@ -573,10 +573,10 @@ void CL_WriteAVIAudioFrame( const byte *pcmBuffer, int size )
 
 /*
 ===============
-CL_TakeVideoFrame
+Client::takeVideoFrame
 ===============
 */
-void CL_TakeVideoFrame( )
+void Client::takeVideoFrame( )
 {
   // AVI file isn't open
   if( !afd.fileOpen )
@@ -588,12 +588,12 @@ void CL_TakeVideoFrame( )
 
 /*
 ===============
-CL_CloseAVI
+Client::closeAVI
 
 Closes the AVI file and writes an index chunk
 ===============
 */
-bool CL_CloseAVI( )
+bool Client::closeAVI( )
 {
   int indexRemainder;
   int indexSize = afd.numIndices * 16;
@@ -662,10 +662,10 @@ bool CL_CloseAVI( )
 
 /*
 ===============
-CL_VideoRecording
+Client::videoRecording
 ===============
 */
-bool CL_VideoRecording( )
+bool Client::videoRecording( )
 {
   return afd.fileOpen;
 }

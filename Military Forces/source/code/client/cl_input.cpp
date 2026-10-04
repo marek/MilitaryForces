@@ -155,12 +155,12 @@ void IN_KeyUp( kbutton_t *b ) {
 
 /*
 ===============
-CL_KeyState
+Client::keyState
 
 Returns the fraction of the frame that the key was down
 ===============
 */
-float CL_KeyState( kbutton_t *key ) {
+float Client::keyState( kbutton_t *key ) {
 	float		val;
 	int			msec;
 
@@ -301,12 +301,12 @@ void CL_AdjustAngles( ) {
 	}
 
 	if ( !in_strafe.active ) {
-		cl.viewangles[YAW] -= speed*cl_yawspeed->value*CL_KeyState (&in_right);
-		cl.viewangles[YAW] += speed*cl_yawspeed->value*CL_KeyState (&in_left);
+		cl.viewangles[YAW] -= speed*cl_yawspeed->value*Client::keyState (&in_right);
+		cl.viewangles[YAW] += speed*cl_yawspeed->value*Client::keyState (&in_left);
 	}
 
-	cl.viewangles[PITCH] -= speed*cl_pitchspeed->value * CL_KeyState (&in_lookup);
-	cl.viewangles[PITCH] += speed*cl_pitchspeed->value * CL_KeyState (&in_lookdown);
+	cl.viewangles[PITCH] -= speed*cl_pitchspeed->value * Client::keyState (&in_lookup);
+	cl.viewangles[PITCH] += speed*cl_pitchspeed->value * Client::keyState (&in_lookdown);
 }
 
 /*
@@ -337,19 +337,19 @@ void CL_KeyMove( usercmd_t *cmd ) {
 	side = 0;
 	up = 0;
 	if ( in_strafe.active ) {
-		side += movespeed * CL_KeyState (&in_right);
-		side -= movespeed * CL_KeyState (&in_left);
+		side += movespeed * Client::keyState (&in_right);
+		side -= movespeed * Client::keyState (&in_left);
 	}
 
-	side += movespeed * CL_KeyState (&in_moveright);
-	side -= movespeed * CL_KeyState (&in_moveleft);
+	side += movespeed * Client::keyState (&in_moveright);
+	side -= movespeed * Client::keyState (&in_moveleft);
 
 
-	up += movespeed * CL_KeyState (&in_up);
-	up -= movespeed * CL_KeyState (&in_down);
+	up += movespeed * Client::keyState (&in_up);
+	up -= movespeed * Client::keyState (&in_down);
 
-	forward += movespeed * CL_KeyState (&in_forward);
-	forward -= movespeed * CL_KeyState (&in_back);
+	forward += movespeed * Client::keyState (&in_forward);
+	forward -= movespeed * Client::keyState (&in_back);
 
 	cmd->forwardmove = ClampChar( forward );
 	cmd->rightmove = ClampChar( side );
@@ -723,7 +723,7 @@ bool CL_ReadyToSendPacket( ) {
 
 /*
 ===================
-CL_WritePacket
+Client::writePacket
 
 Create and send the command packet to the server
 Including both the reliable commands and the usercmds
@@ -742,7 +742,7 @@ During normal gameplay, a client packet will contain something like:
 
 ===================
 */
-void CL_WritePacket( ) {
+void Client::writePacket( ) {
 	Message		buf;
 	byte		data[MAX_MSGLEN];
 	int			i, j;
@@ -835,7 +835,7 @@ void CL_WritePacket( ) {
 				fakemsg.writeBits( clc.voipFlags, VOIP_FLAGCNT);
 				fakemsg.writeData( clc.voipOutgoingData, voipSize);
 				fakemsg.writeByte( svc_EOF);
-				CL_WriteDemoMessage (&fakemsg, 0);
+				Client::writeDemoMessage (&fakemsg, 0);
 			}
 
 			clc.voipOutgoingSequence += clc.voipOutgoingDataFrames;
@@ -896,17 +896,17 @@ void CL_WritePacket( ) {
 		Common::printf( "%i ", buf.cursize );
 	}
 
-	CL_Netchan_Transmit (&clc.netchan, &buf);	
+	Client::netchan_Transmit (&clc.netchan, &buf);	
 }
 
 /*
 =================
-CL_SendCmd
+Client::sendCmd
 
 Called every frame to builds and sends a command packet to the server.
 =================
 */
-void CL_SendCmd( ) {
+void Client::sendCmd( ) {
 	// don't send any message if not connected
 	if ( clc.state < CA_CONNECTED ) {
 		return;
@@ -928,15 +928,15 @@ void CL_SendCmd( ) {
 		return;
 	}
 
-	CL_WritePacket();
+	Client::writePacket();
 }
 
 /*
 ============
-CL_InitInput
+Client::initInput
 ============
 */
-void CL_InitInput( ) {
+void Client::initInput( ) {
 	CommandSystem::addCommand ("centerview",IN_CenterView);
 
 	CommandSystem::addCommand ("+moveup",IN_UpDown);
@@ -1009,10 +1009,10 @@ void CL_InitInput( ) {
 
 /*
 ============
-CL_ShutdownInput
+Client::shutdownInput
 ============
 */
-void CL_ShutdownInput()
+void Client::shutdownInput()
 {
 	CommandSystem::removeCommand("centerview");
 

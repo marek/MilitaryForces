@@ -41,7 +41,7 @@ static animation_t * CG_ParseLQMAnimationFile( const char *filename ) {
 		return nullptr;
 	}
 	if ( len >= sizeof( text ) - 1 ) {
-		CG_Printf( "File %s too long\n", filename );
+		ClientGame::printf( "File %s too long\n", filename );
 		FileSystem::fCloseFile( f );
 		return nullptr;
 	}
@@ -146,7 +146,7 @@ static animation_t * CG_ParseLQMAnimationFile( const char *filename ) {
 	}
 
 	if ( i != MAX_ANIMATIONS ) {
-		CG_Printf( "Error parsing animation file: %s", filename );
+		ClientGame::printf( "Error parsing animation file: %s", filename );
 		return nullptr;
 	}
 
@@ -191,7 +191,7 @@ static qhandle_t CG_RegisterVehiclePart( const char *name, bool expected )
 
 	if( FileSystem::fOpenFileByMode( name, &f, FS_READ ) < 0 ) {
 		if( expected )
-			CG_Printf( "MFQ3 Warning: Unable to load model '%s'\n", name );
+			ClientGame::printf( "MFQ3 Warning: Unable to load model '%s'\n", name );
 		return 0;
 	}
 	FileSystem::fCloseFile( f );
@@ -213,7 +213,7 @@ static qhandle_t CG_RegisterVehiclePart( const char *name, bool expected )
 	return model;
 }
 
-qhandle_t CG_TeamSkin( qhandle_t model, int team )
+qhandle_t ClientGame::teamSkin( qhandle_t model, int team )
 {
 	if( team < 1 || team > 2 || model <= 0 || model >= MAX_TEAM_SKIN_MODELS ) 
 		return 0;
@@ -274,7 +274,7 @@ static void CG_CachePlane(int index)
 			( i == BP_PLANE_PROP && ( caps & HC_PROP ) ) );
 
 //		if( !availableVehicles[index].handle[i] ) {
-//			CG_Printf( "MFQ3 Warning: Unable to load model '%s'\n", name );
+//			ClientGame::printf( "MFQ3 Warning: Unable to load model '%s'\n", name );
 //		}
 	}
 
@@ -334,7 +334,7 @@ static void CG_CacheGroundVehicle(int index)
 		availableVehicles[index].handle[i] = CG_RegisterVehiclePart( name, 
 			i >= BP_GV_WHEEL && ( availableVehicles[index].caps & HC_WHEELS ) && i - BP_GV_WHEEL < availableVehicles[index].wheels );
 //		if( !availableVehicles[index].handle[i] ) {
-//			CG_Printf( "MFQ3 Warning: Unable to load model '%s'\n", name );
+//			ClientGame::printf( "MFQ3 Warning: Unable to load model '%s'\n", name );
 //		}
 	}
 
@@ -477,7 +477,7 @@ static void CG_CacheBoat(int index)
 //			{
 //				md3Tag_t tag;
 //				if( VehicleData::findTag(name, "tag_turret", &tag) ) {
-//					CG_Printf( "found tag_turret in %s: %.1f %.1f %.1f\n", name,
+//					ClientGame::printf( "found tag_turret in %s: %.1f %.1f %.1f\n", name,
 //						tag.origin[0], tag.origin[1], tag.origin[2] );
 //				}
 //			}
@@ -565,7 +565,7 @@ static void CG_CacheGroundInstallation(int index)
 		}
 		availableGroundInstallations[index].handle[i] = CG_RegisterVehiclePart( name, false );
 //		if( !availableVehicles[index].handle[i] ) {
-//			CG_Printf( "MFQ3 Warning: Unable to load model '%s'\n", name );
+//			ClientGame::printf( "MFQ3 Warning: Unable to load model '%s'\n", name );
 //		}
 	}
 
@@ -576,13 +576,13 @@ static void CG_CacheGroundInstallation(int index)
 
 /*
 ===============
-CG_InitShadows
+ClientGame::initShadows
 
 Initialise all the shadow parameters for each vehicle
 ===============
 */
 
-void CG_InitShadows( )
+void ClientGame::initShadows( )
 {
 	qhandle_t customShadowShader = -1;
 	float xRad = 0, yRad = 0;
@@ -638,20 +638,20 @@ void CG_InitShadows( )
 
 /*
 ===============
-CG_CacheVehicles
+ClientGame::cacheVehicles
 ===============
 */
 
-void CG_CacheVehicles()
+void ClientGame::cacheVehicles()
 {
 	int i;
 	int total = bg_numberOfVehicles + bg_numberOfGroundInstallations;
 	
 	for( i = 0; i < bg_numberOfVehicles; i++ )
 	{
-		CG_LoadingStep( i, total );
+		ClientGame::loadingStep( i, total );
 		if( availableVehicles[i].gameset & cgs.gameset ) {
-			CG_LoadingString(availableVehicles[i].descriptiveName);
+			ClientGame::loadingString(availableVehicles[i].descriptiveName);
 			if( availableVehicles[i].cat & CAT_PLANE ) {
 					CG_CachePlane(i);
 			}
@@ -674,9 +674,9 @@ void CG_CacheVehicles()
 		}
 	}
 	for( i = 0; i < bg_numberOfGroundInstallations; i++ ) {
-		CG_LoadingStep( bg_numberOfVehicles + i, total );
+		ClientGame::loadingStep( bg_numberOfVehicles + i, total );
 		if( availableGroundInstallations[i].gameset & cgs.gameset ) {
-			CG_LoadingString(availableGroundInstallations[i].descriptiveName);
+			ClientGame::loadingString(availableGroundInstallations[i].descriptiveName);
 			CG_CacheGroundInstallation(i);
 		}
 	}
@@ -685,28 +685,28 @@ void CG_CacheVehicles()
 
 /*
 ===============
-CG_RegisterVehicle
+ClientGame::registerVehicle
 
 load the vehicle
 ===============
 */
-void CG_RegisterVehicle( clientInfo_t *ci )
+void ClientGame::registerVehicle( clientInfo_t *ci )
 {
 //	Common::printf( "RegVehicle = %i\n" ,ci->vehicle);    
 	if( availableVehicles[ci->vehicle].cat & CAT_PLANE ) {
-		CG_RegisterPlane(ci);
+		ClientGame::registerPlane(ci);
 	}
 	else if( availableVehicles[ci->vehicle].cat & CAT_GROUND ) {
-		CG_RegisterGroundVehicle(ci);
+		ClientGame::registerGroundVehicle(ci);
 	}
 	else if( availableVehicles[ci->vehicle].cat & CAT_HELO ) {
-		CG_RegisterHelo(ci);
+		ClientGame::registerHelo(ci);
 	}
 	else if( availableVehicles[ci->vehicle].cat & CAT_LQM ) {
-		CG_RegisterLQM(ci);
+		ClientGame::registerLQM(ci);
 	}
 	else if( availableVehicles[ci->vehicle].cat & CAT_BOAT ) {
-		CG_RegisterBoat(ci);
+		ClientGame::registerBoat(ci);
 	}
 	else
 		Common::error( ERR_DROP, "Invalid vehicle type in register vehicle" );
@@ -835,10 +835,10 @@ void ClientEntity::vehicle()
 
 /*
 =============
-CG_VehicleObituary
+ClientGame::vehicleObituary
 =============
 */
-void CG_VehicleObituary( entityState_t *ent ) 
+void ClientGame::vehicleObituary( entityState_t *ent ) 
 {
     clientInfo_t	*ci;
     int		        clientNum = ent->otherEntityNum;
@@ -849,38 +849,38 @@ void CG_VehicleObituary( entityState_t *ent )
     ci = &cgs.clientinfo[clientNum];
 
     if ( !ci->infoValid ) {
-		CG_Printf( "No obituary available!\n" );
+		ClientGame::printf( "No obituary available!\n" );
 		return;
     }
 
 	if( availableVehicles[ci->vehicle].cat & CAT_PLANE ) {
-		CG_PlaneObituary( ent, ci );
+		ClientGame::planeObituary( ent, ci );
 	}
 	else if( availableVehicles[ci->vehicle].cat & CAT_GROUND ) {
-		CG_GroundVehicleObituary( ent, ci );
+		ClientGame::groundVehicleObituary( ent, ci );
 	}
 	else if( availableVehicles[ci->vehicle].cat & CAT_HELO ) {
-		CG_HeloObituary( ent, ci );
+		ClientGame::heloObituary( ent, ci );
 	}
 	else if( availableVehicles[ci->vehicle].cat & CAT_LQM ) {
-		CG_LQMObituary( ent, ci );
+		ClientGame::lQMObituary( ent, ci );
 	}
 	else if( availableVehicles[ci->vehicle].cat & CAT_BOAT ) {
-		CG_BoatObituary( ent, ci );
+		ClientGame::boatObituary( ent, ci );
 	}
 	else {
-		CG_PlaneObituary( ent, ci );
+		ClientGame::planeObituary( ent, ci );
 	}
 
 }
 
 /*
 =============
-CG_VehicleMuzzleFlash
+ClientGame::vehicleMuzzleFlash
 
 =============
 */
-void CG_VehicleMuzzleFlash( int weaponIdx, const refEntity_t *parent, qhandle_t parentModel, int idx ) {
+void ClientGame::vehicleMuzzleFlash( int weaponIdx, const refEntity_t *parent, qhandle_t parentModel, int idx ) {
 
 	refEntity_t		flash[MAX_MUZZLEFLASHES];
 	vec3_t			angles;
@@ -913,7 +913,7 @@ void CG_VehicleMuzzleFlash( int weaponIdx, const refEntity_t *parent, qhandle_t 
 		} else {
 			strcpy( tag, "tag_gun" );
 		}
-		CG_PositionRotatedEntityOnTag( &flash[i], parent, parentModel, tag);
+		ClientGame::positionRotatedEntityOnTag( &flash[i], parent, parentModel, tag);
 		refExport.AddRefEntityToScene( &flash[i] );
 	}
 }

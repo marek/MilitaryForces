@@ -146,10 +146,10 @@ bool CL_Netchan_TransmitNextFragment(NetChannel *chan)
 
 /*
 ===============
-CL_Netchan_Transmit
+Client::netchan_Transmit
 ================
 */
-void CL_Netchan_Transmit( NetChannel *chan, Message* msg ) {
+void Client::netchan_Transmit( NetChannel *chan, Message* msg ) {
 	msg->writeByte( clc_EOF );
 
 #ifdef LEGACY_PROTOCOL
@@ -168,10 +168,10 @@ void CL_Netchan_Transmit( NetChannel *chan, Message* msg ) {
 
 /*
 =================
-CL_Netchan_Process
+Client::netchan_Process
 =================
 */
-bool CL_Netchan_Process( NetChannel *chan, Message *msg ) {
+bool Client::netchan_Process( NetChannel *chan, Message *msg ) {
 	int ret;
 
 	ret = chan->process( msg );

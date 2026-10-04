@@ -100,7 +100,7 @@ static void CG_OffsetVehicleView( bool spectator )
 
 #ifdef _VIEW_SETTING_DISPLAY
 	sprintf( test,"d=%f h=%f", dist, height );
-	CG_CenterPrint( test, 100, 10 );
+	ClientGame::centerPrint( test, 100, 10 );
 #endif
 
 	// update vars
@@ -134,7 +134,7 @@ static void CG_OffsetVehicleView( bool spectator )
 		view[2] += /*(availableVehicles[cg_vehicle.integer].cam_height[ CAMERA_V_DEFAULT ]*/ + height /*)*/;
 	}
 
-    CG_Trace( &trace, start, mins, maxs, view, cg.predictedPlayerState.clientNum, MASK_SOLID );
+    ClientGame::trace( &trace, start, mins, maxs, view, cg.predictedPlayerState.clientNum, MASK_SOLID );
 
     if ( trace.fraction < 1.0 ) 
     {
@@ -143,7 +143,7 @@ static void CG_OffsetVehicleView( bool spectator )
 		// try another trace to this position, because a tunnel may have the ceiling
 		// close enogh that this is poking out
 
-		CG_Trace( &trace, start, mins, maxs, view, cg.predictedPlayerState.clientNum, MASK_SOLID );
+		ClientGame::trace( &trace, start, mins, maxs, view, cg.predictedPlayerState.clientNum, MASK_SOLID );
 		VectorCopy( trace.endpos, view );
     }
 
@@ -193,7 +193,7 @@ static void CG_OffsetVehicleViewCFV( bool spectator )
 
 #ifdef _VIEW_SETTING_DISPLAY
 	sprintf( test,"d=%f h=%f", dist, height );
-	CG_CenterPrint( test, 100, 10 );
+	ClientGame::centerPrint( test, 100, 10 );
 #endif
 
 	// update vars
@@ -234,7 +234,7 @@ static void CG_OffsetVehicleViewCFV( bool spectator )
 			view[2] += /*(availableVehicles[cg_vehicle.integer].cam_height[ CAMERA_V_DEFAULT ]*/ + height /*)*/;
 	}
 
-    CG_Trace( &trace, start, mins, maxs, view, cg.predictedPlayerState.clientNum, MASK_SOLID );
+    ClientGame::trace( &trace, start, mins, maxs, view, cg.predictedPlayerState.clientNum, MASK_SOLID );
 
     if ( trace.fraction < 1.0 ) 
     {
@@ -243,7 +243,7 @@ static void CG_OffsetVehicleViewCFV( bool spectator )
 		// try another trace to this position, because a tunnel may have the ceiling
 		// close enogh that this is poking out
 
-		CG_Trace( &trace, start, mins, maxs, view, cg.predictedPlayerState.clientNum, MASK_SOLID );
+		ClientGame::trace( &trace, start, mins, maxs, view, cg.predictedPlayerState.clientNum, MASK_SOLID );
 		VectorCopy( trace.endpos, view );
     }
 
@@ -331,7 +331,7 @@ static void CG_OffsetCockpitView( void ) {
 
 //======================================================================
 
-void CG_ZoomDown_f( )
+void ClientGame::zoomDown_f( )
 { 
 	// locked-out?
 	if( cg.zoomLockOut )
@@ -359,7 +359,7 @@ void CG_ZoomDown_f( )
 	cg.zoomLockOut = false;
 }
 
-void CG_ZoomUp_f( )
+void ClientGame::zoomUp_f( )
 { 
 	// reset lock-out
 	cg.zoomLockOut = false;
@@ -433,7 +433,7 @@ static int CG_CalcFov( ) {
 	fov_x = atan( tan( fov_y / 360 * M_PI ) * cg.refdef.width / cg.refdef.height ) * 360 / M_PI;
 
 	// warp if underwater
-	contents = CG_PointContents( cg.refdef.vieworg, -1 );
+	contents = ClientGame::pointContents( cg.refdef.vieworg, -1 );
 	if ( contents & ( CONTENTS_WATER | CONTENTS_SLIME | CONTENTS_LAVA ) ){
 		phase = cg.time / 1000.0 * WAVE_FREQUENCY * M_PI * 2;
 		v = WAVE_AMPLITUDE * sin( phase );
@@ -589,10 +589,10 @@ static int CG_CalcViewValues( ) {
 
 /*
 =====================
-CG_AddBufferedSound
+ClientGame::addBufferedSound
 =====================
 */
-void CG_AddBufferedSound( sfxHandle_t sfx ) {
+void ClientGame::addBufferedSound( sfxHandle_t sfx ) {
 	if ( !sfx )
 		return;
 	cg.soundBuffer[cg.soundBufferIn] = sfx;
@@ -622,25 +622,25 @@ static void CG_PlayBufferedSounds( ) {
 
 /*
 =================
-CG_DrawActiveFrame
+ClientGame::drawActiveFrame
 
 Generates and draws a game scene and status information at the given time.
 =================
 */
-void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, bool demoPlayback ) {
+void ClientGame::drawActiveFrame( int serverTime, stereoFrame_t stereoView, bool demoPlayback ) {
 	int		inwater;
 
 	cg.time = serverTime;
 	cg.demoPlayback = demoPlayback;
 
 	// update cvars
-	CG_UpdateCvars();
+	ClientGame::updateCvars();
 
 	// if we are only updating the screen as a loading
 	// pacifier, don't even try to read snapshots
 	if ( cg.infoScreenText[0] != 0 )
 	{
-		CG_DrawInformation();
+		ClientGame::drawInformation();
 		return;
 	}
 
@@ -652,12 +652,12 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, bool demoPlay
 	refExport.ClearScene();
 
 	// set up cg.snap and possibly cg.nextSnap
-	CG_ProcessSnapshots();
+	ClientGame::processSnapshots();
 
 	// if we haven't received any snapshots yet, all
 	// we can draw is the information screen
 	if ( !cg.snap || ( cg.snap->snapFlags & SNAPFLAG_NOT_ACTIVE ) ) {
-		CG_DrawInformation();
+		ClientGame::drawInformation();
 		return;
 	}
 
@@ -668,7 +668,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, bool demoPlay
 	cg.clientFrame++;
 
 	// update cg.predictedPlayerState
-	CG_PredictPlayerState();
+	ClientGame::predictPlayerState();
 
 	// decide on third person view
 	cg.renderingThirdPerson = cg_thirdPerson.integer || (cg.snap->ps.stats[STAT_HEALTH] <= 0);
@@ -678,9 +678,9 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, bool demoPlay
 
 	// build the render lists
 	if ( !cg.hyperspace ) {
-		CG_AddPacketEntities();			// adter calcViewValues, so predicted player state is correct
-		CG_AddMarks();
-		CG_AddLocalEntities();
+		ClientGame::addPacketEntities();			// adter calcViewValues, so predicted player state is correct
+		ClientGame::addMarks();
+		ClientGame::addLocalEntities();
 
 
 		pw.systems[0].pos[0] = sin(static_cast<float>(cg.time)/100)*10;
@@ -688,8 +688,8 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, bool demoPlay
 
 		// Add Particles
 		/*
-		CG_ParticleWorldThink(&pw);
-		CG_ParticleWorldRender(&pw);
+		ClientGame::particleWorldThink(&pw);
+		ClientGame::particleWorldRender(&pw);
 		*/
 	}
 
@@ -698,13 +698,13 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, bool demoPlay
 
 	// finish up the rest of the refdef
 	if( cg.testModelEntity.hModel ) {
-		CG_AddTestModel();
+		ClientGame::addTestModel();
 	}
 	if( cg.testVehicleParts[0].hModel ) {
-		CG_AddTestVehicle();
+		ClientGame::addTestVehicle();
 	}
 	if( cgs.gametype == GT_MISSION_EDITOR ) {
-		CG_Draw_IGME();
+		ClientGame::draw_IGME();
 	}
 
 	cg.refdef.time = cg.time;
@@ -720,7 +720,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, bool demoPlay
 			cg.frametime = 0;
 		}
 		cg.oldTime = cg.time;
-		CG_AddLagometerFrameInfo();
+		ClientGame::addLagometerFrameInfo();
 	}
 	if (cg_timescale.value != cg_timescaleFadeEnd.value) {
 		if (cg_timescale.value < cg_timescaleFadeEnd.value) {
@@ -739,10 +739,10 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, bool demoPlay
 	}
 
 	// actually issue the rendering calls
-	CG_DrawActive( stereoView );
+	ClientGame::drawActive( stereoView );
 
 	if ( cg_stats.integer ) {
-		CG_Printf( "cg.clientFrame:%i\n", cg.clientFrame );
+		ClientGame::printf( "cg.clientFrame:%i\n", cg.clientFrame );
 	}
 }
 
@@ -750,12 +750,12 @@ constexpr double DTOR = 0.01745329252;
 
 /*
 =================
-CG_WorldToScreenCoords
+ClientGame::worldToScreenCoords
 
 Converts a world vector point into screen coords
 =================
 */
-bool CG_WorldToScreenCoords( vec3_t worldPoint, int * pX, int * pY, bool virtualXY )
+bool ClientGame::worldToScreenCoords( vec3_t worldPoint, int * pX, int * pY, bool virtualXY )
 {
 	vec3_t v, dp, n, p;
 	float tanthetah, tanthetav;
@@ -807,7 +807,7 @@ bool CG_WorldToScreenCoords( vec3_t worldPoint, int * pX, int * pY, bool virtual
 	   {
 		   p[0] += cg.refdef.x;
 		   p[1] += cg.refdef.y;
-		   CG_VirtualFromScreen( &p[0], &p[1] );
+		   ClientGame::virtualFromScreen( &p[0], &p[1] );
 	   }
 
 	   // convert 

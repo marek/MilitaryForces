@@ -468,7 +468,7 @@ void Text_PaintWithCursor(float x, float y, float scale, const vec4_t color, con
 													glyph->t2,
 													glyph->glyph);
 
-				// CG_DrawPic(x, y - yadj, scale * uiDC.Assets.textFont.glyphs[text[i]].imageWidth, scale * uiDC.Assets.textFont.glyphs[text[i]].imageHeight, uiDC.Assets.textFont.glyphs[text[i]].glyph);
+				// ClientGame::drawPic(x, y - yadj, scale * uiDC.Assets.textFont.glyphs[text[i]].imageWidth, scale * uiDC.Assets.textFont.glyphs[text[i]].imageHeight, uiDC.Assets.textFont.glyphs[text[i]].glyph);
 			yadj = useScale * glyph2->top;
 		    if (count == cursorPos && !((uiInfo.uiUtils.dc_->realTime_/BLINK_DIVISOR) & 1)) 
 			{

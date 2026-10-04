@@ -208,7 +208,7 @@ struct worldSector_t;
 //
 //	int			time;						// will be strictly increasing across level changes
 //
-//	int			snapFlagServerBit;			// ^= SNAPFLAG_SERVERCOUNT every SV_SpawnServer()
+//	int			snapFlagServerBit;			// ^= SNAPFLAG_SERVERCOUNT every ServerMain::spawnServer()
 //
 //	client_t	*clients;					// [sv_maxclients->integer];
 //	int			numSnapshotEntities;		// sv_maxclients->integer*PACKET_BACKUP*MAX_PACKET_ENTITIES
@@ -298,7 +298,6 @@ extern	cvar_t	*sv_voipProtocol;
 //
 // sv_main.c
 //
-void SV_FinalMessage (const char *message);
 typedef struct leakyBucket_s leakyBucket_t;
 struct leakyBucket_s {
 	netadrtype_t	type;
@@ -323,16 +322,12 @@ bool SVC_RateLimitAddress( netadr_t from, int burst, int period );
 
 int SV_RateMsec(SV_Client *client);
 
-//void QDECL SV_SendServerCommand( client_t *cl, const char *fmt, ...);
-void QDECL SV_SendServerCommand( SV_Client *cl, const char *fmt, ...) Q_PRINTF_FUNC(2, 3);
+//void QDECL ServerMain::sendServerCommand( client_t *cl, const char *fmt, ...);
 
 
-void SV_AddOperatorCommands ();
-void SV_RemoveOperatorCommands ();
 
 
 //void SV_MasterHeartbeat (void);
-void SV_MasterShutdown ();
 
 bool SV_GetEntityToken( char *buffer, int bufferSize );
 
@@ -348,17 +343,13 @@ void SV_GetConfigstring( int index, char *buffer, int bufferSize );
 void SV_SetUserinfo( int index, const char *val );
 void SV_GetUserinfo( int index, char *buffer, int bufferSize );
 
-void SV_ChangeMaxClients( );
-void SV_SpawnServer( char *server, bool killBots );
 
 
 
 //
 // sv_client.c
 //
-void SV_GetChallenge( netadr_t from );
 
-void SV_DirectConnect( netadr_t from );
 
 //void SV_AuthorizeIpPacket( netadr_t from );
 
@@ -383,13 +374,10 @@ void SV_ExecuteClientCommand( SV_Client *cl, const char *s, bool clientOK );
 void SV_ClientThink (SV_Client *cl, usercmd_t *cmd);
 
 int SV_WriteDownloadToClient(SV_Client *cl, Message *msg);
-int SV_SendQueuedMessages();
-int SV_SendDownloadMessages();
 
 //
 // sv_ccmds.c
 //
-void SV_Heartbeat_f( );
 
 //
 // sv_snapshot.c
@@ -398,14 +386,13 @@ void SV_Heartbeat_f( );
 //void (client_t *client)->updateServerCommandsToClient( Message *msg );
 //void SV_WriteFrameToClient (client_t *client, Message *msg);
 //void (client_t *client)->sendMessageToClient( Message *msg );
-//void SV_SendClientMessages( void );
+//void ServerMain::sendClientMessages( void );
 //void (client_t *client)->sendClientSnapshot();
 
 void SV_AddServerCommand( SV_Client *client, const char *cmd );
 void SV_UpdateServerCommandsToClient( SV_Client *client, Message *msg );
 void SV_WriteFrameToClient (SV_Client *client, Message *msg);
 void SV_SendMessageToClient( Message *msg, SV_Client *client );
-void SV_SendClientMessages( );
 void SV_SendClientSnapshot( SV_Client *client );
 
 //
@@ -417,11 +404,9 @@ void SV_SendClientSnapshot( SV_Client *client );
 //svEntity_t	*SV_SvEntityForGentity( const entityState_t* s, const entityShared_t* r);
 //sharedEntity_t *SV_GEntityForSvEntity( svEntity_t *svEnt );
 void SV_ShutdownGameProgs ( );
-void SV_RestartGameProgs( );
 bool SV_inPVS (const vec3_t p1, const vec3_t p2);
 void SV_GetUsercmd( int clientNum, usercmd_t *cmd );
 bool SV_EntityContact( const vec3_t mins, const vec3_t maxs, EntityBase* gameEnt, bool capsule );
-bool SV_inPVSIgnorePortals( const vec3_t p1, const vec3_t p2);
 void SV_GetServerinfo( char *buffer, int bufferSize );
 void SV_GameSendServerCommand( int clientNum, const char *text );
 void SV_GameDropClient( int clientNum, const char *reason );
@@ -437,7 +422,6 @@ void SV_LocateGameData( std::vector<EntityBase*>* gameEntities,
 // high level object sorting to reduce interaction tests
 //
 
-void SV_ClearWorld ();
 // called after the world model has been loaded, before linking any entities
 
 //void SV_UnlinkEntity( entityState_t* s, entityShared_t* r );
@@ -454,10 +438,8 @@ void SV_LinkEntity( EntityBase* gameEnt );
 // is not solid
 
 
-clipHandle_t SV_ClipHandleForEntity( EntityBase* gameEnt );
 
 
-void SV_SectorList_f();
 
 
 int SV_AreaEntities( const vec3_t mins, const vec3_t maxs, int *entityList, int maxcount );
@@ -485,8 +467,29 @@ void SV_Trace( trace_t *results, const vec3_t start, const vec3_t mins, const ve
 // passEntityNum is explicitly excluded from clipping checks (normally ENTITYNUM_NONE)
 
 
-void SV_ClipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, const vec3_t maxs, 
-					  const vec3_t end, int entityNum, int contentmask, bool capsule );
+class ServerMain
+{
+public:
+	static void finalMessage (const char *message);
+	static void QDECL sendServerCommand( SV_Client *cl, const char *fmt, ...) Q_PRINTF_FUNC(2, 3);
+	static void addOperatorCommands ();
+	static void removeOperatorCommands ();
+	static void masterShutdown ();
+	static void changeMaxClients( );
+	static void spawnServer( char *server, bool killBots );
+	static void getChallenge( netadr_t from );
+	static void directConnect( netadr_t from );
+	static int sendQueuedMessages();
+	static int sendDownloadMessages();
+	static void heartbeat_f( );
+	static void sendClientMessages( );
+	static void restartGameProgs( );
+	static bool inPVSIgnorePortals( const vec3_t p1, const vec3_t p2);
+	static void clearWorld ();
+	static clipHandle_t clipHandleForEntity( EntityBase* gameEnt );
+	static void sectorList_f();
+	static void clipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int entityNum, int contentmask, bool capsule );
+};
 // clip to a specific entity
 
 //

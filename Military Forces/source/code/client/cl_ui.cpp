@@ -454,7 +454,7 @@ LAN_GetPingQueueCount
 ====================
 */
 int LAN_GetPingQueueCount( ) {
-	return (CL_GetPingQueueCount());
+	return (Client::getPingQueueCount());
 }
 
 /*
@@ -463,7 +463,7 @@ LAN_ClearPing
 ====================
 */
 void LAN_ClearPing( int n ) {
-	CL_ClearPing( n );
+	Client::clearPing( n );
 }
 
 /*
@@ -472,7 +472,7 @@ LAN_GetPing
 ====================
 */
 void LAN_GetPing( int n, char *buf, int buflen, int *pingtime ) {
-	CL_GetPing( n, buf, buflen, pingtime );
+	Client::getPing( n, buf, buflen, pingtime );
 }
 
 /*
@@ -481,7 +481,7 @@ LAN_GetPingInfo
 ====================
 */
 void LAN_GetPingInfo( int n, char *buf, int buflen ) {
-	CL_GetPingInfo( n, buf, buflen );
+	Client::getPingInfo( n, buf, buflen );
 }
 
 /*
@@ -568,7 +568,7 @@ LAN_UpdateVisiblePings
 =======================
 */
 bool LAN_UpdateVisiblePings(int source ) {
-	return CL_UpdateVisiblePings_f(source);
+	return Client::updateVisiblePings_f(source);
 }
 
 /*
@@ -577,7 +577,7 @@ LAN_GetServerStatus
 ====================
 */
 int LAN_GetServerStatus( const char *serverAddress, char *serverStatus, int maxLen ) {
-	return CL_ServerStatus( serverAddress, serverStatus, maxLen );
+	return Client::serverStatus( serverAddress, serverStatus, maxLen );
 }
 
 /*
@@ -720,10 +720,10 @@ void CL_ShutdownUI( ) {
 
 /*
 ====================
-CL_InitUI
+Client::initUI
 ====================
 */
-void CL_InitUI( ) {
+void Client::initUI( ) {
 	// init for this gamestate
 	theUI.init( (clc.state >= CA_AUTHORIZING && clc.state < CA_ACTIVE) );
 }

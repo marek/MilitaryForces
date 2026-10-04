@@ -43,7 +43,7 @@ static void CG_FFARTrail( ClientEntity * cent, const weaponInfo_t *wi )
 	smoke_pos[2] += + Q_random( &seed ) * 2;
 	smoke_rad = 1 + Q_random( &seed ) * 3;
 
-	smoke = CG_SmokePuff( smoke_pos, up, 
+	smoke = ClientGame::smokePuff( smoke_pos, up, 
 						  smoke_rad, 
 						  1.0f, 1.0f, 1.0f, 1.0f,
 						  10500, 
@@ -81,7 +81,7 @@ static void CG_MissileTrail( ClientEntity * cent, const weaponInfo_t *wi )
 	VectorAdd( pos, velocity, pos );
 
 	// draw trail
-/*	smoke = CG_SmokePuff( pos, up, 
+/*	smoke = ClientGame::smokePuff( pos, up, 
 						  4, 
 						  0.8f, 0.8f, 0.8f, 0.33f,
 						  400, 
@@ -101,7 +101,7 @@ static void CG_MissileTrail( ClientEntity * cent, const weaponInfo_t *wi )
 	smoke_rot += 1;
 	smoke_rad = 4 + Q_random( &seed ) * 5;
 
-	smoke = CG_SmokePuff( smoke_pos, up, 
+	smoke = ClientGame::smokePuff( smoke_pos, up, 
 						  smoke_rad, 
 						  1.0f, 1.0f, 1.0f, 1.0f,
 						  10500, 
@@ -142,7 +142,7 @@ static void CG_FlareTrail( ClientEntity * cent, const weaponInfo_t *wi )
 	smoke_pos[1] += Q_random( &seed ) * 5;
 	smoke_pos[2] += Q_random( &seed ) * 5;
 	smoke_rad = 1 + Q_random( &seed ) * 5;
-	smoke = CG_SmokePuff( smoke_pos, up, 
+	smoke = ClientGame::smokePuff( smoke_pos, up, 
 						  smoke_rad, 
 						  0.8f, 0.8f, 0.8f, 0.33f,
 						  4000, 
@@ -175,7 +175,7 @@ static void CG_MissileTrail2( ClientEntity * cent, const weaponInfo_t *wi ) {
 			return;
 		}
 	
-		le = CG_AllocLocalEntity();
+		le = ClientGame::allocLocalEntity();
 		le->leFlags = LEF_PUFF_DONT_SCALE;
 		re = &le->refEntity;
 
@@ -238,7 +238,7 @@ CG_NukeTrail
 //
 //		// draw trail
 //
-//		smoke = CG_SmokePuff( pos, up, 
+//		smoke = ClientGame::smokePuff( pos, up, 
 //							20, 
 //							0.0f, 0.0f, 0.0f, 0.8f,
 //							8000, 
@@ -257,7 +257,7 @@ CG_RegisterWeapon
 The server says this item is used on this level
 =================
 */
-void CG_RegisterWeapons() {
+void ClientGame::registerWeapons() {
 	weaponInfo_t	*weaponInfo;
 	gitem_t			*ammo;
 	int				i;
@@ -270,7 +270,7 @@ void CG_RegisterWeapons() {
 	// for all weapon indexes in cg_weapons[]
 	for( i = 0; i < WI_MAX; i++ )
 	{
-		CG_LoadingStep( i, WI_MAX );
+		ClientGame::loadingStep( i, WI_MAX );
 		weaponInfo = &cg_weapons[i];
 		memset( weaponInfo, 0, sizeof( *weaponInfo ) );
 		weaponInfo->registered = true;
@@ -466,12 +466,12 @@ void CG_RegisterWeapons() {
 
 /*
 =================
-CG_RegisterItemVisuals
+ClientGame::registerItemVisuals
 
 The server says this item is used on this level
 =================
 */
-void CG_RegisterItemVisuals( int itemNum ) {
+void ClientGame::registerItemVisuals( int itemNum ) {
 	itemInfo_t		*itemInfo;
 	gitem_t			*item;
 
@@ -509,10 +509,10 @@ WEAPON SELECTION
 
 /*
 ===============
-CG_NextWeapon_f
+ClientGame::nextWeapon_f
 ===============
 */
-void CG_NextWeapon_f( ) {
+void ClientGame::nextWeapon_f( ) {
 	int start = cg.weaponSelect;
 	if ( !cg.snap ) {
 		return;
@@ -531,10 +531,10 @@ void CG_NextWeapon_f( ) {
 
 /*
 ===============
-CG_PrevWeapon_f
+ClientGame::prevWeapon_f
 ===============
 */
-void CG_PrevWeapon_f( ) {
+void ClientGame::prevWeapon_f( ) {
 	int start = cg.weaponSelect;
 	if ( !cg.snap ) {
 		return;
@@ -553,10 +553,10 @@ void CG_PrevWeapon_f( ) {
 
 /*
 ===============
-CG_Weapon_f
+ClientGame::weapon_f
 ===============
 */
-void CG_Weapon_f( ) {
+void ClientGame::weapon_f( ) {
 	int		num;
 
 	if ( !cg.snap ) {
@@ -566,7 +566,7 @@ void CG_Weapon_f( ) {
 		return;
 	}
 
-	num = atoi( CG_Argv( 1 ) );
+	num = atoi( ClientGame::argv( 1 ) );
 
 	if ( num < WP_MACHINEGUN || num > WP_WEAPON6 ) {
 		return;
@@ -705,12 +705,12 @@ void ClientEntity::fireWeapon() {
 
 /*
 =================
-CG_MissileHitWall
+ClientGame::missileHitWall
 
 Caused by an EV_MISSILE_MISS event, or directly by local bullet tracing
 =================
 */
-void CG_MissileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType ) {
+void ClientGame::missileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType ) {
 	qhandle_t		mod;
 	qhandle_t		mark;
 	qhandle_t		shader;
@@ -874,7 +874,7 @@ void CG_MissileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_t di
 	//
 	if( mod )
 	{
-		le = CG_MakeExplosion( origin, dir, 
+		le = ClientGame::makeExplosion( origin, dir, 
 							   mod,
 							   shader,
 							   0, duration,
@@ -891,15 +891,15 @@ void CG_MissileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_t di
 	//
 	// impact mark
 	//
-	CG_ImpactMark( mark, origin, dir, random()*360, 1,1,1,1, false, radius, false );
+	ClientGame::impactMark( mark, origin, dir, random()*360, 1,1,1,1, false, radius, false );
 }
 
 /*
 =================
-CG_GenericExplosion
+ClientGame::genericExplosion
 =================
 */
-void CG_GenericExplosion( vec3_t origin, int type )
+void ClientGame::genericExplosion( vec3_t origin, int type )
 {
 	LocalEntity	* le = nullptr;
 	vec3_t			up = {0, 0, 1};
@@ -955,7 +955,7 @@ void CG_GenericExplosion( vec3_t origin, int type )
 		}
 
 		// make explosion
-		le = CG_MakeExplosion( adjust, up, 
+		le = ClientGame::makeExplosion( adjust, up, 
 							   cgs.media.dishFlashModel,	
 							   cgs.media.rocketExplosionShader[ rand() & 0x01 ],
 							   offset, 900, 
@@ -1004,7 +1004,7 @@ void CG_GenericExplosion( vec3_t origin, int type )
 			}
 
 			// make smoke
-			smoke = CG_SmokePuff( adjust, up, 75 * m, 0.8f, 0.8f, 0.8f, 1.00f, (i * 2000), cg.time,
+			smoke = ClientGame::smokePuff( adjust, up, 75 * m, 0.8f, 0.8f, 0.8f, 1.00f, (i * 2000), cg.time,
 								  0, 0, 
 								  cgs.media.smokePuffShader );
 		}
@@ -1038,16 +1038,16 @@ void CG_GenericExplosion( vec3_t origin, int type )
 
 /*
 =================
-CG_VehicleHit
+ClientGame::vehicleHit
 =================
 */
-void CG_VehicleHit( vec3_t origin, int damage )
+void ClientGame::vehicleHit( vec3_t origin, int damage )
 {
 	vec3_t			up = {0, 0, 1};
 	LocalEntity	*smoke = nullptr;
 
 	// make smoke
-	smoke = CG_SmokePuff( origin, up, 
+	smoke = ClientGame::smokePuff( origin, up, 
 				  damage, 
 				  0.8f, 0.8f, 0.8f, 1.00f,
 				  1000, 

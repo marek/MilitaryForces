@@ -248,7 +248,7 @@ void CL_UpdateVoipGain(const char *idstr, float gain)
 	}
 }
 
-void CL_Voip_f( )
+void Client::voip_f( )
 {
 	const char *cmd = CommandSystem::argv(1);
 	const char *reason = nullptr;
@@ -612,13 +612,13 @@ CLIENT SIDE DEMO RECORDING
 
 /*
 ====================
-CL_WriteDemoMessage
+Client::writeDemoMessage
 
 Dumps the current net message, prefixed by the length
 ====================
 */
 
-void CL_WriteDemoMessage ( Message *msg, int headerBytes ) {
+void Client::writeDemoMessage ( Message *msg, int headerBytes ) {
 	int		len, swlen;
 
 	// write the packet sequence
@@ -640,7 +640,7 @@ CL_StopRecording_f
 stop recording a demo
 ====================
 */
-void CL_StopRecord_f( ) {
+void Client::stopRecord_f( ) {
 	int		len;
 
 	if ( !clc.demorecording ) {
@@ -932,15 +932,15 @@ void CL_DemoCompleted( )
 	}
 
 	CL_Disconnect( true );
-	CL_NextDemo();
+	Client::nextDemo();
 }
 
 /*
 =================
-CL_ReadDemoMessage
+Client::readDemoMessage
 =================
 */
-void CL_ReadDemoMessage( ) {
+void Client::readDemoMessage( ) {
 	int			r;
 	Message		buf;
 	byte		bufData[ MAX_MSGLEN ];
@@ -985,7 +985,7 @@ void CL_ReadDemoMessage( ) {
 
 	clc.lastPacketTime = cls.realtime;
 	buf.readcount = 0;
-	CL_ParseServerMessage( &buf );
+	Client::parseServerMessage( &buf );
 }
 
 /*
@@ -1157,7 +1157,7 @@ void CL_PlayDemo_f( ) {
 
 	// read demo messages until connected
 	while ( clc.state >= CA_CONNECTED && clc.state < CA_PRIMED ) {
-		CL_ReadDemoMessage();
+		Client::readDemoMessage();
 	}
 	// don't get the first snapshot this frame, to prevent the long
 	// time from the gamestate load from messing causing a time skip
@@ -1167,12 +1167,12 @@ void CL_PlayDemo_f( ) {
 
 /*
 ====================
-CL_StartDemoLoop
+Client::startDemoLoop
 
 Closing the main menu will restart the demo loop
 ====================
 */
-void CL_StartDemoLoop( ) {
+void Client::startDemoLoop( ) {
 	// start the demo loop again
 	CommandBuffer::addText ("d1\n");
 	Key_SetCatcher( 0 );
@@ -1180,13 +1180,13 @@ void CL_StartDemoLoop( ) {
 
 /*
 ==================
-CL_NextDemo
+Client::nextDemo
 
 Called when a demo or cinematic finishes
 If the "nextdemo" cvar is set, that command will be issued
 ==================
 */
-void CL_NextDemo( ) {
+void Client::nextDemo( ) {
 	char	v[MAX_STRING_CHARS];
 
 	Q_strncpyz( v, CvarSystem::variableString ("nextdemo"), sizeof(v) );
@@ -1212,11 +1212,11 @@ CL_ShutdownAll
 */
 void CL_ShutdownAll(bool shutdownRef)
 {
-	if(CL_VideoRecording())
-		CL_CloseAVI();
+	if(Client::videoRecording())
+		Client::closeAVI();
 
 	if(clc.demorecording)
-		CL_StopRecord_f();
+		Client::stopRecord_f();
 
 	// clear sounds
 	SoundSystem::disableSounds();
@@ -1227,7 +1227,7 @@ void CL_ShutdownAll(bool shutdownRef)
 
 	// shutdown the renderer
 	if(shutdownRef)
-		CL_ShutdownRef();
+		Client::shutdownRef();
 	else if(refExport.Shutdown)
 		refExport.Shutdown(false);		// don't destroy window or context
 
@@ -1326,12 +1326,12 @@ void CL_MapLoading( ) {
 
 /*
 =====================
-CL_ClearState
+Client::clearState
 
 Called before parsing a gamestate
 =====================
 */
-void CL_ClearState () {
+void Client::clearState () {
 
 //	SoundSystem::stopAllSounds();
 
@@ -1390,7 +1390,7 @@ void CL_Disconnect( bool showMainMenu ) {
 	CvarSystem::set("r_uiFullScreen", "1");
 
 	if ( clc.demorecording ) {
-		CL_StopRecord_f ();
+		Client::stopRecord_f ();
 	}
 
 	if (clc.download) {
@@ -1444,16 +1444,16 @@ void CL_Disconnect( bool showMainMenu ) {
 	// send it a few times in case one is dropped
 	if ( clc.state >= CA_CONNECTED ) {
 		CL_AddReliableCommand("disconnect", true);
-		CL_WritePacket();
-		CL_WritePacket();
-		CL_WritePacket();
+		Client::writePacket();
+		Client::writePacket();
+		Client::writePacket();
 	}
 	
 	// Remove pure paks
 	FileSystem::pureServerSetLoadedPaks("", "");
 	FileSystem::pureServerSetReferencedPaks( "", "" );
 	
-	CL_ClearState ();
+	Client::clearState ();
 
 	// wipe the client connection
 	Com_Memset( &clc, 0, sizeof( clc ) );
@@ -1472,10 +1472,10 @@ void CL_Disconnect( bool showMainMenu ) {
 #endif
 
 	// Stop recording any video
-	if( CL_VideoRecording( ) ) {
+	if( Client::videoRecording( ) ) {
 		// Finish rendering current frame
 		Screen::updateScreen( );
-		CL_CloseAVI( );
+		Client::closeAVI( );
 	}
 
 	CL_UpdateGUID( nullptr, 0 );
@@ -1664,10 +1664,10 @@ void CL_ForwardToServer_f( ) {
 
 /*
 ==================
-CL_Disconnect_f
+Client::disconnect_f
 ==================
 */
-void CL_Disconnect_f( ) {
+void Client::disconnect_f( ) {
 	Screen::stopCinematic();
 	CvarSystem::set("ui_singlePlayerActive", "0");
 	if ( clc.state != CA_DISCONNECTED && clc.state != CA_CINEMATIC ) {
@@ -1924,7 +1924,7 @@ void CL_ResetPureClientAtServer( ) {
 
 /*
 =================
-CL_Vid_Restart_f
+Client::vid_Restart_f
 
 Restart the video subsystem
 
@@ -1932,15 +1932,15 @@ we also have to reload the UI and CGame because the renderer
 doesn't know what graphics to reload
 =================
 */
-void CL_Vid_Restart_f( ) {
+void Client::vid_Restart_f( ) {
 
 	// Settings may have changed so stop recording now
-	if( CL_VideoRecording( ) ) {
-		CL_CloseAVI( );
+	if( Client::videoRecording( ) ) {
+		Client::closeAVI( );
 	}
 
 	if(clc.demorecording)
-		CL_StopRecord_f();
+		Client::stopRecord_f();
 
 	// don't let them loop during the restart
 	SoundSystem::stopAllSounds();
@@ -1964,7 +1964,7 @@ void CL_Vid_Restart_f( ) {
 		// shutdown the CGame
 		CL_ShutdownCGame();
 		// shutdown the renderer and clear the renderer interface
-		CL_ShutdownRef();
+		Client::shutdownRef();
 		// client is no longer pure until new checksums are sent
 		CL_ResetPureClientAtServer();
 		// clear pak references
@@ -1989,7 +1989,7 @@ void CL_Vid_Restart_f( ) {
 		if(clc.state > CA_CONNECTED && clc.state != CA_CINEMATIC)
 		{
 			cls.cgameStarted = true;
-			CL_InitCGame();
+			Client::initCGame();
 			// send pure checksums
 			CL_SendPureChecksums();
 		}
@@ -2011,18 +2011,18 @@ void CL_Snd_Shutdown()
 
 /*
 =================
-CL_Snd_Restart_f
+Client::snd_Restart_f
 
 Restart the sound subsystem
 The cgame and game must also be forced to restart because
 handles will be invalid
 =================
 */
-void CL_Snd_Restart_f()
+void Client::snd_Restart_f()
 {
 	CL_Snd_Shutdown();
 	// sound will be reinitialized by vid_restart
-	CL_Vid_Restart_f();
+	Client::vid_Restart_f();
 }
 
 
@@ -2146,14 +2146,14 @@ void CL_DownloadsComplete( ) {
 
 	// initialize the CGame
 	cls.cgameStarted = true;
-	CL_InitCGame();
+	Client::initCGame();
 
 	// set pure checksums
 	CL_SendPureChecksums();
 
-	CL_WritePacket();
-	CL_WritePacket();
-	CL_WritePacket();
+	Client::writePacket();
+	Client::writePacket();
+	Client::writePacket();
 }
 
 /*
@@ -2215,9 +2215,9 @@ static void CL_BeginHttpDownload( const char *remoteURL ) {
 		!clc.disconnectedForHttpDownload) {
 
 		CL_AddReliableCommand("disconnect", true);
-		CL_WritePacket();
-		CL_WritePacket();
-		CL_WritePacket();
+		Client::writePacket();
+		Client::writePacket();
+		Client::writePacket();
 		clc.disconnectedForHttpDownload = true;
 	}
 
@@ -2227,12 +2227,12 @@ static void CL_BeginHttpDownload( const char *remoteURL ) {
 
 /*
 =================
-CL_NextDownload
+Client::nextDownload
 
 A download completed or failed
 =================
 */
-void CL_NextDownload()
+void Client::nextDownload()
 {
 	char *s;
 	char *remoteName, *localName;
@@ -2326,13 +2326,13 @@ void CL_NextDownload()
 
 /*
 =================
-CL_InitDownloads
+Client::initDownloads
 
 After receiving a valid game state, we valid the cgame and local zip files here
 and determine if we need to download them
 =================
 */
-void CL_InitDownloads() {
+void Client::initDownloads() {
   char missingfiles[1024];
 
   if ( !(cl_allowDownload->integer & DLF_ENABLE) )
@@ -2359,7 +2359,7 @@ void CL_InitDownloads() {
 			*clc.downloadTempName = *clc.downloadName = 0;
 			CvarSystem::set( "cl_downloadName", "" );
 
-			CL_NextDownload();
+			Client::nextDownload();
 			return;
 		}
 
@@ -2777,7 +2777,7 @@ void CL_ConnectionlessPacket( netadr_t from, Message *msg ) {
 
 	// server responding to an info broadcast
 	if ( !Q_stricmp(c, "infoResponse") ) {
-		CL_ServerInfoPacket( from, msg );
+		Client::serverInfoPacket( from, msg );
 		return;
 	}
 
@@ -2872,7 +2872,7 @@ void CL_PacketEvent( netadr_t from, Message *msg ) {
 		return;
 	}
 
-	if (!CL_Netchan_Process( &clc.netchan, msg) ) {
+	if (!Client::netchan_Process( &clc.netchan, msg) ) {
 		return;		// out of order, duplicated, etc
 	}
 
@@ -2885,14 +2885,14 @@ void CL_PacketEvent( netadr_t from, Message *msg ) {
 	clc.serverMessageSequence = LittleLong( *reinterpret_cast<int *>(msg->data) );
 
 	clc.lastPacketTime = cls.realtime;
-	CL_ParseServerMessage( msg );
+	Client::parseServerMessage( msg );
 
 	//
 	// we don't know if it is ok to save a demo message until
 	// after we have parsed the frame
 	//
 	if ( clc.demorecording && !clc.demowaiting ) {
-		CL_WriteDemoMessage( msg, headerBytes );
+		Client::writeDemoMessage( msg, headerBytes );
 	}
 }
 
@@ -2906,7 +2906,7 @@ void CL_CheckTimeout( ) {
 	//
 	// check timeout
 	//
-	if ( ( !CL_CheckPaused() || !sv_paused->integer ) 
+	if ( ( !Client::checkPaused() || !sv_paused->integer ) 
 		&& clc.state >= CA_CONNECTED && clc.state != CA_CINEMATIC
 	    && cls.realtime - clc.lastPacketTime > cl_timeout->value*1000) {
 		if (++cl.timeoutcount > 5) {	// timeoutcount saves debugger
@@ -2921,11 +2921,11 @@ void CL_CheckTimeout( ) {
 
 /*
 ==================
-CL_CheckPaused
+Client::checkPaused
 Check whether client has been paused.
 ==================
 */
-bool CL_CheckPaused()
+bool Client::checkPaused()
 {
 	// if cl_paused->modified is set, the cvar has only been changed in
 	// this frame. Keep paused in this frame to ensure the server doesn't
@@ -2950,7 +2950,7 @@ void CL_CheckUserinfo( ) {
 		return;
 
 	// don't overflow the reliable command buffer when paused
-	if(CL_CheckPaused())
+	if(Client::checkPaused())
 		return;
 
 	// send a reliable userinfo update if needed
@@ -2985,7 +2985,7 @@ void CL_Frame ( int msec ) {
 
 			FileSystem::baseDir_Rename_HomeData(clc.downloadTempName, clc.downloadName, false);
 			clc.downloadRestart = true;
-			CL_NextDownload();
+			Client::nextDownload();
 		}
 
 		// we can't process frames normally when in disconnected
@@ -3016,13 +3016,13 @@ void CL_Frame ( int msec ) {
 	}
 
 	// if recording an avi, lock to a fixed fps
-	if ( CL_VideoRecording( ) && cl_aviFrameRate->integer && msec) {
+	if ( Client::videoRecording( ) && cl_aviFrameRate->integer && msec) {
 		// save the current screen
 		if ( clc.state == CA_ACTIVE || cl_forceavidemo->integer) {
 			float fps = MIN(cl_aviFrameRate->value * com_timescale->value, 1000.0f);
 			float frameDuration = MAX(1000.0f / fps, 1.0f) + clc.aviVideoFrameRemainder;
 
-			CL_TakeVideoFrame( );
+			Client::takeVideoFrame( );
 
 			msec = static_cast<int>(frameDuration);
 			clc.aviVideoFrameRemainder = frameDuration - msec;
@@ -3063,7 +3063,7 @@ void CL_Frame ( int msec ) {
 		}
 		else if( clc.state != CA_ACTIVE && clc.demorecording ) {
 			// Recording, but not CA_ACTIVE, so stop recording
-			CL_StopRecord_f( );
+			Client::stopRecord_f( );
 		}
 	}
 
@@ -3087,13 +3087,13 @@ void CL_Frame ( int msec ) {
 	CL_CheckTimeout();
 
 	// send intentions now
-	CL_SendCmd();
+	Client::sendCmd();
 
 	// resend a connection request if necessary
 	CL_CheckForResend();
 
 	// decide on the serverTime to render
-	CL_SetCGameTime();
+	Client::setCGameTime();
 
 	// update the screen
 	Screen::updateScreen();
@@ -3150,10 +3150,10 @@ static Q_PRINTF_FUNC(2, 3) void QDECL CL_RefPrintf( int print_level, const char 
 
 /*
 ============
-CL_ShutdownRef
+Client::shutdownRef
 ============
 */
-void CL_ShutdownRef( ) {
+void Client::shutdownRef( ) {
 	if ( refExport.Shutdown ) {
 		refExport.Shutdown( true );
 	}
@@ -3227,7 +3227,7 @@ void CL_StartHunkUsers( bool rendererOnly ) {
 
 	if ( !cls.uiStarted ) {
 		cls.uiStarted = true;
-		CL_InitUI();
+		Client::initUI();
 	}
 }
 
@@ -3435,7 +3435,7 @@ void CL_Video_f( )
     }
   }
 
-  CL_OpenAVIForWriting( filename );
+  Client::openAVIForWriting( filename );
 }
 
 /*
@@ -3445,7 +3445,7 @@ CL_StopVideo_f
 */
 void CL_StopVideo_f( )
 {
-  CL_CloseAVI( );
+  Client::closeAVI( );
 }
 
 /*
@@ -3551,14 +3551,14 @@ void CL_Init( ) {
 
 	if(!com_fullyInitialized)
 	{
-		CL_ClearState();
+		Client::clearState();
 		clc.state = CA_DISCONNECTED;	// no longer CA_UNINITIALIZED
 		cl_oldGameSet = false;
 	}
 
 	cls.realtime = 0;
 
-	CL_InitInput ();
+	Client::initInput ();
 
 	//
 	// register our variables
@@ -3721,21 +3721,21 @@ void CL_Init( ) {
 	CommandSystem::addCommand ("cmd", CL_ForwardToServer_f);
 	CommandSystem::addCommand ("configstrings", CL_Configstrings_f);
 	CommandSystem::addCommand ("clientinfo", CL_Clientinfo_f);
-	CommandSystem::addCommand ("snd_restart", CL_Snd_Restart_f);
-	CommandSystem::addCommand ("vid_restart", CL_Vid_Restart_f);
-	CommandSystem::addCommand ("disconnect", CL_Disconnect_f);
+	CommandSystem::addCommand ("snd_restart", Client::snd_Restart_f);
+	CommandSystem::addCommand ("vid_restart", Client::vid_Restart_f);
+	CommandSystem::addCommand ("disconnect", Client::disconnect_f);
 	CommandSystem::addCommand ("record", CL_Record_f);
 	CommandSystem::addCommand ("demo", CL_PlayDemo_f);
 	CommandSystem::setCommandCompletionFunc( "demo", CL_CompleteDemoName );
-	CommandSystem::addCommand ("cinematic", CL_PlayCinematic_f);
-	CommandSystem::addCommand ("stoprecord", CL_StopRecord_f);
+	CommandSystem::addCommand ("cinematic", Client::playCinematic_f);
+	CommandSystem::addCommand ("stoprecord", Client::stopRecord_f);
 	CommandSystem::addCommand ("connect", CL_Connect_f);
 	CommandSystem::addCommand ("reconnect", CL_Reconnect_f);
-	CommandSystem::addCommand ("localservers", CL_LocalServers_f);
-	CommandSystem::addCommand ("globalservers", CL_GlobalServers_f);
+	CommandSystem::addCommand ("localservers", Client::localServers_f);
+	CommandSystem::addCommand ("globalservers", Client::globalServers_f);
 	CommandSystem::addCommand ("rcon", CL_Rcon_f);
 	CommandSystem::setCommandCompletionFunc( "rcon", CL_CompleteRcon );
-	CommandSystem::addCommand ("ping", CL_Ping_f );
+	CommandSystem::addCommand ("ping", Client::ping_f );
 	CommandSystem::addCommand ("serverstatus", CL_ServerStatus_f );
 	CommandSystem::addCommand ("showip", CL_ShowIP_f );
 	CommandSystem::addCommand ("fs_openedList", CL_OpenedPK3List_f );
@@ -3821,7 +3821,7 @@ void CL_Shutdown(const char *finalmsg, bool disconnect, bool quit)
 	CommandSystem::removeCommand ("video");
 	CommandSystem::removeCommand ("stopvideo");
 
-	CL_ShutdownInput();
+	Client::shutdownInput();
 	Console::shutdown();
 
 	CvarSystem::set( "cl_running", "0" );
@@ -3880,10 +3880,10 @@ static void CL_SetServerInfoByAddress(netadr_t from, const char *info, int ping)
 
 /*
 ===================
-CL_ServerInfoPacket
+Client::serverInfoPacket
 ===================
 */
-void CL_ServerInfoPacket( netadr_t from, Message *msg ) {
+void Client::serverInfoPacket( netadr_t from, Message *msg ) {
 	int		i, type;
 	char	info[MAX_INFO_STRING];
 	char	*infoString;
@@ -4023,10 +4023,10 @@ serverStatus_t *CL_GetServerStatus( netadr_t from ) {
 
 /*
 ===================
-CL_ServerStatus
+Client::serverStatus
 ===================
 */
-int CL_ServerStatus( const char *serverAddress, char *serverStatusString, int maxLen ) {
+int Client::serverStatus( const char *serverAddress, char *serverStatusString, int maxLen ) {
 	int i;
 	netadr_t	to;
 	serverStatus_t *serverStatus;
@@ -4179,10 +4179,10 @@ void CL_ServerStatusResponse( netadr_t from, Message *msg ) {
 
 /*
 ==================
-CL_LocalServers_f
+Client::localServers_f
 ==================
 */
-void CL_LocalServers_f( ) {
+void Client::localServers_f( ) {
 	char		*message;
 	int			i, j;
 	netadr_t	to;
@@ -4223,14 +4223,14 @@ void CL_LocalServers_f( ) {
 
 /*
 ==================
-CL_GlobalServers_f
+Client::globalServers_f
 
 Originally master 0 was Internet and master 1 was MPlayer.
 ioquake3 2008; added support for requesting five separate master servers using 0-4.
 ioquake3 2017; made master 0 fetch all master servers and 1-5 request a single master server.
 ==================
 */
-void CL_GlobalServers_f( ) {
+void Client::globalServers_f( ) {
 	netadr_t	to;
 	int			count, i, masterNum;
 	char		command[1024], *masteraddress;
@@ -4326,10 +4326,10 @@ void CL_GlobalServers_f( ) {
 
 /*
 ==================
-CL_GetPing
+Client::getPing
 ==================
 */
-void CL_GetPing( int n, char *buf, int buflen, int *pingtime )
+void Client::getPing( int n, char *buf, int buflen, int *pingtime )
 {
 	const char	*str;
 	int		time;
@@ -4369,10 +4369,10 @@ void CL_GetPing( int n, char *buf, int buflen, int *pingtime )
 
 /*
 ==================
-CL_GetPingInfo
+Client::getPingInfo
 ==================
 */
-void CL_GetPingInfo( int n, char *buf, int buflen )
+void Client::getPingInfo( int n, char *buf, int buflen )
 {
 	if (n < 0 || n >= MAX_PINGREQUESTS || !cl_pinglist[n].adr.port)
 	{
@@ -4387,10 +4387,10 @@ void CL_GetPingInfo( int n, char *buf, int buflen )
 
 /*
 ==================
-CL_ClearPing
+Client::clearPing
 ==================
 */
-void CL_ClearPing( int n )
+void Client::clearPing( int n )
 {
 	if (n < 0 || n >= MAX_PINGREQUESTS)
 		return;
@@ -4400,10 +4400,10 @@ void CL_ClearPing( int n )
 
 /*
 ==================
-CL_GetPingQueueCount
+Client::getPingQueueCount
 ==================
 */
-int CL_GetPingQueueCount( )
+int Client::getPingQueueCount( )
 {
 	int		i;
 	int		count;
@@ -4480,10 +4480,10 @@ ping_t* CL_GetFreePing( )
 
 /*
 ==================
-CL_Ping_f
+Client::ping_f
 ==================
 */
-void CL_Ping_f( ) {
+void Client::ping_f( ) {
 	netadr_t	to;
 	ping_t*		pingptr;
 	char*		server;
@@ -4530,10 +4530,10 @@ void CL_Ping_f( ) {
 
 /*
 ==================
-CL_UpdateVisiblePings_f
+Client::updateVisiblePings_f
 ==================
 */
-bool CL_UpdateVisiblePings_f(int source) {
+bool Client::updateVisiblePings_f(int source) {
 	int			slots, i;
 	char		buff[MAX_STRING_CHARS];
 	int			pingTime;
@@ -4546,7 +4546,7 @@ bool CL_UpdateVisiblePings_f(int source) {
 
 	cls.pingUpdateSource = source;
 
-	slots = CL_GetPingQueueCount();
+	slots = Client::getPingQueueCount();
 	if (slots < MAX_PINGREQUESTS) {
 		serverInfo_t *server = nullptr;
 
@@ -4622,9 +4622,9 @@ bool CL_UpdateVisiblePings_f(int source) {
 		if (!cl_pinglist[i].adr.port) {
 			continue;
 		}
-		CL_GetPing( i, buff, MAX_STRING_CHARS, &pingTime );
+		Client::getPing( i, buff, MAX_STRING_CHARS, &pingTime );
 		if (pingTime != 0) {
-			CL_ClearPing(i);
+			Client::clearPing(i);
 			status = true;
 		}
 	}

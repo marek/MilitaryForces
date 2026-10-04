@@ -79,17 +79,17 @@ CG_DrawScoreboard
 //	// draw the handicap or bot skill marker (unless player has flag)
 //	if ( ci->objectives & OB_REDFLAG ) {
 //		if( largeFormat ) {
-//			CG_DrawFlagModel( iconx, y - ( 32 - BIGCHAR_HEIGHT ) / 2, 32, 32, ClientBase::TEAM_RED, false );
+//			ClientGame::drawFlagModel( iconx, y - ( 32 - BIGCHAR_HEIGHT ) / 2, 32, 32, ClientBase::TEAM_RED, false );
 //		}
 //		else {
-//			CG_DrawFlagModel( iconx, y, 16, 16, ClientBase::TEAM_RED, false );
+//			ClientGame::drawFlagModel( iconx, y, 16, 16, ClientBase::TEAM_RED, false );
 //		}
 //	} else if ( ci->objectives & OB_BLUEFLAG ) {
 //		if( largeFormat ) {
-//			CG_DrawFlagModel( iconx, y - ( 32 - BIGCHAR_HEIGHT ) / 2, 32, 32, ClientBase::TEAM_BLUE, false );
+//			ClientGame::drawFlagModel( iconx, y - ( 32 - BIGCHAR_HEIGHT ) / 2, 32, 32, ClientBase::TEAM_BLUE, false );
 //		}
 //		else {
-//			CG_DrawFlagModel( iconx, y, 16, 16, ClientBase::TEAM_BLUE, false );
+//			ClientGame::drawFlagModel( iconx, y, 16, 16, ClientBase::TEAM_BLUE, false );
 //		}
 //	} else {
 ////		if ( ci->botSkill > 0 && ci->botSkill <= 5 ) {
@@ -97,19 +97,19 @@ CG_DrawScoreboard
 //		if ( ci->handicap < 100 ) {
 //			Com_sprintf( string, sizeof( string ), "%i", ci->handicap );
 //			if ( cgs.gametype == GT_TOURNAMENT )
-//				CG_DrawSmallStringColor( iconx, y - SMALLCHAR_HEIGHT/2, string, color );
+//				ClientGame::drawSmallStringColor( iconx, y - SMALLCHAR_HEIGHT/2, string, color );
 //			else
-//				CG_DrawSmallStringColor( iconx, y, string, color );
+//				ClientGame::drawSmallStringColor( iconx, y, string, color );
 //		}
 //
 //		// draw the wins / losses
 //		if ( cgs.gametype == GT_TOURNAMENT ) {
 //			Com_sprintf( string, sizeof( string ), "%i/%i", ci->wins, ci->losses );
 //			if( ci->handicap < 100 && !ci->botSkill ) {
-//				CG_DrawSmallStringColor( iconx, y + SMALLCHAR_HEIGHT/2, string, color );
+//				ClientGame::drawSmallStringColor( iconx, y + SMALLCHAR_HEIGHT/2, string, color );
 //			}
 //			else {
-//				CG_DrawSmallStringColor( iconx, y, string, color );
+//				ClientGame::drawSmallStringColor( iconx, y, string, color );
 //			}
 //		}
 //	}
@@ -158,15 +158,15 @@ CG_DrawScoreboard
 //		}
 //
 //		hcolor[3] = fade * 0.7;
-//		CG_FillRect( SB_SCORELINE_X + BIGCHAR_WIDTH + (SB_RATING_WIDTH / 2), y, 
+//		ClientGame::fillRect( SB_SCORELINE_X + BIGCHAR_WIDTH + (SB_RATING_WIDTH / 2), y, 
 //			640 - SB_SCORELINE_X - BIGCHAR_WIDTH, BIGCHAR_HEIGHT+1, hcolor );
 //	}
 //
-//	CG_DrawBigString( SB_SCORELINE_X + (SB_RATING_WIDTH / 2), y, string, fade );
+//	ClientGame::drawBigString( SB_SCORELINE_X + (SB_RATING_WIDTH / 2), y, string, fade );
 //
 //	// add the "ready" marker for intermission exiting
 //	if ( cg.snap->ps.stats[ STAT_CLIENTS_READY ] & ( 1 << score->client ) ) {
-//		CG_DrawBigStringColor( iconx, y, "READY", color );
+//		ClientGame::drawBigStringColor( iconx, y, "READY", color );
 //	}
 //}
 
@@ -218,9 +218,9 @@ static void CG_CenterGiantLine( float y, const char *string ) {
 	color[2] = 1;
 	color[3] = 1;
 
-	x = 0.5 * ( 640 - GIANT_WIDTH * CG_DrawStrlen( string ) );
+	x = 0.5 * ( 640 - GIANT_WIDTH * ClientGame::drawStrlen( string ) );
 
-	CG_DrawStringExt( x, y, string, color, true, true, GIANT_WIDTH, GIANT_HEIGHT, 0 );
+	ClientGame::drawStringExt( x, y, string, color, true, true, GIANT_WIDTH, GIANT_HEIGHT, 0 );
 }
 
 /*
@@ -230,7 +230,7 @@ CG_DrawTourneyScoreboard
 Draw the oversize scoreboard for tournements
 =================
 */
-void CG_DrawOldTourneyScoreboard( ) {
+void ClientGame::drawOldTourneyScoreboard( ) {
 	const char		*s;
 	vec4_t			color;
 	int				min, tens, ones;
@@ -252,10 +252,10 @@ void CG_DrawOldTourneyScoreboard( ) {
 	// draw the dialog background
 	color[0] = color[1] = color[2] = 0;
 	color[3] = 1;
-	CG_FillRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, color );
+	ClientGame::fillRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, color );
 
 	// print the mesage of the day
-	s = CG_ConfigString( CS_MOTD );
+	s = ClientGame::configString( CS_MOTD );
 	if ( !s[0] ) {
 		s = "Scoreboard";
 	}
@@ -281,15 +281,15 @@ void CG_DrawOldTourneyScoreboard( ) {
 		//
 		// teamplay scoreboard
 		//
-		CG_DrawStringExt( 8, y, "Red Team", color, true, true, GIANT_WIDTH, GIANT_HEIGHT, 0 );
+		ClientGame::drawStringExt( 8, y, "Red Team", color, true, true, GIANT_WIDTH, GIANT_HEIGHT, 0 );
 		s = va("%i", cg.teamScores[0] );
-		CG_DrawStringExt( 632 - GIANT_WIDTH * strlen(s), y, s, color, true, true, GIANT_WIDTH, GIANT_HEIGHT, 0 );
+		ClientGame::drawStringExt( 632 - GIANT_WIDTH * strlen(s), y, s, color, true, true, GIANT_WIDTH, GIANT_HEIGHT, 0 );
 		
 		y += 64;
 
-		CG_DrawStringExt( 8, y, "Blue Team", color, true, true, GIANT_WIDTH, GIANT_HEIGHT, 0 );
+		ClientGame::drawStringExt( 8, y, "Blue Team", color, true, true, GIANT_WIDTH, GIANT_HEIGHT, 0 );
 		s = va("%i", cg.teamScores[1] );
-		CG_DrawStringExt( 632 - GIANT_WIDTH * strlen(s), y, s, color, true, true, GIANT_WIDTH, GIANT_HEIGHT, 0 );
+		ClientGame::drawStringExt( 632 - GIANT_WIDTH * strlen(s), y, s, color, true, true, GIANT_WIDTH, GIANT_HEIGHT, 0 );
 	} else {
 		//
 		// free for all scoreboard
@@ -303,9 +303,9 @@ void CG_DrawOldTourneyScoreboard( ) {
 				continue;
 			}
 
-			CG_DrawStringExt( 8, y, ci->name, color, true, true, GIANT_WIDTH, GIANT_HEIGHT, 0 );
+			ClientGame::drawStringExt( 8, y, ci->name, color, true, true, GIANT_WIDTH, GIANT_HEIGHT, 0 );
 			s = va("%i", ci->score );
-			CG_DrawStringExt( 632 - GIANT_WIDTH * strlen(s), y, s, color, true, true, GIANT_WIDTH, GIANT_HEIGHT, 0 );
+			ClientGame::drawStringExt( 632 - GIANT_WIDTH * strlen(s), y, s, color, true, true, GIANT_WIDTH, GIANT_HEIGHT, 0 );
 			y += 64;
 		}
 	}

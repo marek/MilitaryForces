@@ -31,7 +31,7 @@ bool VehicleData::findTag(const char* fileName, const char* tagname, md3Tag_t* t
 		md3Frame_t	frame;
 		int			i;	
 		FileSystem::read(&head, sizeof(head), f);
-//		CG_Printf("%s has %i tags\n", fileName, head.numTags );
+//		ClientGame::printf("%s has %i tags\n", fileName, head.numTags );
 		for( i = 0; i < head.numFrames; ++i ) {
 			FileSystem::read(&frame, sizeof(frame), f);
 		}
@@ -41,8 +41,8 @@ bool VehicleData::findTag(const char* fileName, const char* tagname, md3Tag_t* t
 				found = true;
 				break;
 			}
-//			CG_Printf("tag %i: %s\n", i, tag.name );
-//			CG_Printf("tag %i: %.1f %.1f %.1f\n", i, tag.origin[0], tag.origin[1], tag.origin[2] );
+//			ClientGame::printf("tag %i: %s\n", i, tag.name );
+//			ClientGame::printf("tag %i: %.1f %.1f %.1f\n", i, tag.origin[0], tag.origin[1], tag.origin[2] );
 		}
 		FileSystem::fCloseFile(f);
 	} else {

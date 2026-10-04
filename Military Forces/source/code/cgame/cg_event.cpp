@@ -8,12 +8,12 @@
 
 /*
 ===================
-CG_PlaceString
+ClientGame::placeString
 
 Also called by scoreboard drawing
 ===================
 */
-const char	*CG_PlaceString( int rank ) {
+const char	*ClientGame::placeString( int rank ) {
 	static char	str[64];
 	char	*s, *t;
 
@@ -91,7 +91,7 @@ void ClientEntity::painEvent( int health ) {
 		snd = "*pain100_1.wav";
 	}
 	SoundSystem::startSound( nullptr, this->currentState.number, CHAN_VOICE, 
-		CG_CustomSound( this->currentState.number, snd ) );
+		ClientGame::customSound( this->currentState.number, snd ) );
 
 	// save pain time for programitic twitch animation
 	this->pe.painTime = cg.time;
@@ -109,7 +109,7 @@ also called by CG_CheckPlayerstateEvents
 ==============
 */
 
-#define	DEBUGNAME(x) if(cg_debugEvents.integer){CG_Printf(x"\n");}
+#define	DEBUGNAME(x) if(cg_debugEvents.integer){ClientGame::printf(x"\n");}
 
 void ClientEntity::entityEvent( vec3_t position )
 {
@@ -124,7 +124,7 @@ void ClientEntity::entityEvent( vec3_t position )
 	event = es->event & ~EV_EVENT_BITS;
 
 	if ( cg_debugEvents.integer ) {
-		CG_Printf( "ent:%3i  event:%3i ", es->number, event );
+		ClientGame::printf( "ent:%3i  event:%3i ", es->number, event );
 	}
 
 	if ( !event ) {
@@ -157,7 +157,7 @@ void ClientEntity::entityEvent( vec3_t position )
 		break;
 	case EV_WATER_CLEAR:
 		DEBUGNAME("EV_WATER_CLEAR");
-		SoundSystem::startSound (nullptr, es->number, CHAN_AUTO, CG_CustomSound( es->number, "*gasp.wav" ) );
+		SoundSystem::startSound (nullptr, es->number, CHAN_AUTO, ClientGame::customSound( es->number, "*gasp.wav" ) );
 		break;
 
 	case EV_ITEM_PICKUP:
@@ -261,44 +261,44 @@ void ClientEntity::entityEvent( vec3_t position )
 	case EV_MISSILE_HIT:
 		DEBUGNAME("EV_MISSILE_HIT");
 		ByteToDir( es->eventParm, dir );
-		CG_MissileHitWall( es->weaponIndex, 0, position, dir, IMPACTSOUND_DEFAULT );
+		ClientGame::missileHitWall( es->weaponIndex, 0, position, dir, IMPACTSOUND_DEFAULT );
 		break;
 
 	case EV_MISSILE_MISS:
 		DEBUGNAME("EV_MISSILE_MISS");
 		ByteToDir( es->eventParm, dir );
-		CG_MissileHitWall( es->weaponIndex, 0, position, dir, IMPACTSOUND_DEFAULT );
+		ClientGame::missileHitWall( es->weaponIndex, 0, position, dir, IMPACTSOUND_DEFAULT );
 		break;
 
 	case EV_MISSILE_MISS_METAL:
 		DEBUGNAME("EV_MISSILE_MISS_METAL");
 		ByteToDir( es->eventParm, dir );
-		CG_MissileHitWall( es->weaponIndex, 0, position, dir, IMPACTSOUND_METAL );
+		ClientGame::missileHitWall( es->weaponIndex, 0, position, dir, IMPACTSOUND_METAL );
 		break;
 
 	// MFQ3 events
 
 	case EV_VEHICLE_HIT:
 		DEBUGNAME("EV_VEHICLE_HIT");
-		CG_VehicleHit( position, es->eventParm );
+		ClientGame::vehicleHit( position, es->eventParm );
 		break;
 
 	case EV_VEHICLE_DIE:
 		DEBUGNAME("EV_VEHICLE_DIE");
-		CG_GenericExplosion( position, EXPLODE_VEHICLE_DIE );
+		ClientGame::genericExplosion( position, EXPLODE_VEHICLE_DIE );
 		break;
 
 	case EV_VEHICLE_GIB:
 		DEBUGNAME("EV_VEHICLE_GIB");
 		if(availableVehicles[cgs.clientinfo[ this->currentState.clientNum ].vehicle].cat & CAT_LQM)
-			CG_GibPlayer(position);
+			ClientGame::gibPlayer(position);
 		else
-			CG_GenericExplosion( position, EXPLODE_VEHICLE_GIB );
+			ClientGame::genericExplosion( position, EXPLODE_VEHICLE_GIB );
 		break;
 
 	case EV_BUILDING_EXPLODE:
 		DEBUGNAME("EV_BUILDING_EXPLODE");
-		CG_GenericExplosion( position, EXPLODE_BUILDING );
+		ClientGame::genericExplosion( position, EXPLODE_BUILDING );
 		break;
 
 	case EV_GEAR_UP_FULL:
@@ -395,8 +395,8 @@ void ClientEntity::entityEvent( vec3_t position )
 		if ( cgs.gameSounds[ es->eventParm ] ) {
 			SoundSystem::startSound (nullptr, es->number, CHAN_VOICE, cgs.gameSounds[ es->eventParm ] );
 		} else {
-			s = CG_ConfigString( CS_SOUNDS + es->eventParm );
-			SoundSystem::startSound (nullptr, es->number, CHAN_VOICE, CG_CustomSound( es->number, s ) );
+			s = ClientGame::configString( CS_SOUNDS + es->eventParm );
+			SoundSystem::startSound (nullptr, es->number, CHAN_VOICE, ClientGame::customSound( es->number, s ) );
 		}
 		break;
 
@@ -405,8 +405,8 @@ void ClientEntity::entityEvent( vec3_t position )
 		if ( cgs.gameSounds[ es->eventParm ] ) {
 			SoundSystem::startSound (nullptr, cg.snap->ps.clientNum, CHAN_AUTO, cgs.gameSounds[ es->eventParm ] );
 		} else {
-			s = CG_ConfigString( CS_SOUNDS + es->eventParm );
-			SoundSystem::startSound (nullptr, cg.snap->ps.clientNum, CHAN_AUTO, CG_CustomSound( es->number, s ) );
+			s = ClientGame::configString( CS_SOUNDS + es->eventParm );
+			SoundSystem::startSound (nullptr, cg.snap->ps.clientNum, CHAN_AUTO, ClientGame::customSound( es->number, s ) );
 		}
 		break;
 
@@ -416,31 +416,31 @@ void ClientEntity::entityEvent( vec3_t position )
 			switch( es->eventParm ) {
 				case GTS_RED_CAPTURE: // CTF: red team captured the blue flag, 1FCTF: red team captured the neutral flag
 					if ( cgs.clientinfo[cg.clientNum].team == ClientBase::TEAM_RED )
-						CG_AddBufferedSound( cgs.media.captureYourTeamSound );
+						ClientGame::addBufferedSound( cgs.media.captureYourTeamSound );
 					else
-						CG_AddBufferedSound( cgs.media.captureOpponentSound );
+						ClientGame::addBufferedSound( cgs.media.captureOpponentSound );
 					break;
 				case GTS_BLUE_CAPTURE: // CTF: blue team captured the red flag, 1FCTF: blue team captured the neutral flag
 					if ( cgs.clientinfo[cg.clientNum].team == ClientBase::TEAM_BLUE )
-						CG_AddBufferedSound( cgs.media.captureYourTeamSound );
+						ClientGame::addBufferedSound( cgs.media.captureYourTeamSound );
 					else
-						CG_AddBufferedSound( cgs.media.captureOpponentSound );
+						ClientGame::addBufferedSound( cgs.media.captureOpponentSound );
 					break;
 				case GTS_RED_RETURN: // CTF: blue flag returned, 1FCTF: never used
 					if ( cgs.clientinfo[cg.clientNum].team == ClientBase::TEAM_RED )
-						CG_AddBufferedSound( cgs.media.returnYourTeamSound );
+						ClientGame::addBufferedSound( cgs.media.returnYourTeamSound );
 					else
-						CG_AddBufferedSound( cgs.media.returnOpponentSound );
+						ClientGame::addBufferedSound( cgs.media.returnOpponentSound );
 					//
-					CG_AddBufferedSound( cgs.media.blueFlagReturnedSound );
+					ClientGame::addBufferedSound( cgs.media.blueFlagReturnedSound );
 					break;
 				case GTS_BLUE_RETURN: // CTF red flag returned, 1FCTF: neutral flag returned
 					if ( cgs.clientinfo[cg.clientNum].team == ClientBase::TEAM_BLUE )
-						CG_AddBufferedSound( cgs.media.returnYourTeamSound );
+						ClientGame::addBufferedSound( cgs.media.returnYourTeamSound );
 					else
-						CG_AddBufferedSound( cgs.media.returnOpponentSound );
+						ClientGame::addBufferedSound( cgs.media.returnOpponentSound );
 					//
-					CG_AddBufferedSound( cgs.media.redFlagReturnedSound );
+					ClientGame::addBufferedSound( cgs.media.redFlagReturnedSound );
 					break;
 
 				case GTS_RED_TAKEN: // CTF: red team took blue flag, 1FCTF: blue team took the neutral flag
@@ -449,10 +449,10 @@ void ClientEntity::entityEvent( vec3_t position )
 					}
 					else {
 					if (cgs.clientinfo[cg.clientNum].team == ClientBase::TEAM_BLUE) {
-						 	CG_AddBufferedSound( cgs.media.enemyTookYourFlagSound );
+						 	ClientGame::addBufferedSound( cgs.media.enemyTookYourFlagSound );
 						}
 						else if (cgs.clientinfo[cg.clientNum].team == ClientBase::TEAM_RED) {
- 							CG_AddBufferedSound( cgs.media.yourTeamTookEnemyFlagSound );
+ 							ClientGame::addBufferedSound( cgs.media.yourTeamTookEnemyFlagSound );
 						}
 					}
 					break;
@@ -462,28 +462,28 @@ void ClientEntity::entityEvent( vec3_t position )
 					}
 					else {
 						if (cgs.clientinfo[cg.clientNum].team == ClientBase::TEAM_RED) {
-							CG_AddBufferedSound( cgs.media.enemyTookYourFlagSound );
+							ClientGame::addBufferedSound( cgs.media.enemyTookYourFlagSound );
 						}
 						else if (cgs.clientinfo[cg.clientNum].team == ClientBase::TEAM_BLUE) {
-							CG_AddBufferedSound( cgs.media.yourTeamTookEnemyFlagSound );
+							ClientGame::addBufferedSound( cgs.media.yourTeamTookEnemyFlagSound );
 						}
 					}
 					break;
 
 				case GTS_REDTEAM_SCORED:
-					CG_AddBufferedSound(cgs.media.redScoredSound);
+					ClientGame::addBufferedSound(cgs.media.redScoredSound);
 					break;
 				case GTS_BLUETEAM_SCORED:
-					CG_AddBufferedSound(cgs.media.blueScoredSound);
+					ClientGame::addBufferedSound(cgs.media.blueScoredSound);
 					break;
 				case GTS_REDTEAM_TOOK_LEAD:
-					CG_AddBufferedSound(cgs.media.redLeadsSound);
+					ClientGame::addBufferedSound(cgs.media.redLeadsSound);
 					break;
 				case GTS_BLUETEAM_TOOK_LEAD:
-					CG_AddBufferedSound(cgs.media.blueLeadsSound);
+					ClientGame::addBufferedSound(cgs.media.blueLeadsSound);
 					break;
 				case GTS_TEAMS_ARE_TIED:
-					CG_AddBufferedSound( cgs.media.teamsTiedSound );
+					ClientGame::addBufferedSound( cgs.media.teamsTiedSound );
 					break;
 
 				// MFQ3
@@ -510,13 +510,13 @@ void ClientEntity::entityEvent( vec3_t position )
 	case EV_DEATH3:
 		DEBUGNAME("EV_DEATHx");
 		SoundSystem::startSound( nullptr, es->number, CHAN_VOICE, 
-				CG_CustomSound( es->number, va("*death%i.wav", event - EV_DEATH1 + 1) ) );
+				ClientGame::customSound( es->number, va("*death%i.wav", event - EV_DEATH1 + 1) ) );
 		break;
 
 
 	case EV_OBITUARY:
 		DEBUGNAME("EV_OBITUARY");
-	    CG_VehicleObituary( es );
+	    ClientGame::vehicleObituary( es );
 		break;
 
 	case EV_DEBUG_LINE:

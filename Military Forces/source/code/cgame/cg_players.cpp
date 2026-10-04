@@ -26,11 +26,11 @@ char	*cg_customSoundNames[MAX_CUSTOM_SOUNDS] = {
 
 /*
 ================
-CG_CustomSound
+ClientGame::customSound
 
 ================
 */
-sfxHandle_t	CG_CustomSound( int clientNum, const char *soundName ) {
+sfxHandle_t	ClientGame::customSound( int clientNum, const char *soundName ) {
 	clientInfo_t *ci;
 	int			i;
 
@@ -85,10 +85,10 @@ static void CG_ColorFromString( const char *v, vec3_t color ) {
 
 /*
 ======================
-CG_NewClientInfo
+ClientGame::newClientInfo
 ======================
 */
-void CG_NewClientInfo( int clientNum ) {
+void ClientGame::newClientInfo( int clientNum ) {
 	clientInfo_t *ci;
 	clientInfo_t newInfo;
 	const char	*configstring;
@@ -96,7 +96,7 @@ void CG_NewClientInfo( int clientNum ) {
 
 	ci = &cgs.clientinfo[clientNum];
 
-	configstring = CG_ConfigString( clientNum + CS_PLAYERS );
+	configstring = ClientGame::configString( clientNum + CS_PLAYERS );
 	if ( !configstring[0] ) {
 		memset( ci, 0, sizeof( *ci ) );
 		return;		// player just left
@@ -174,7 +174,7 @@ void CG_NewClientInfo( int clientNum ) {
 		CvarSystem::set( "cg_vehicle", va( "%d", newInfo.vehicle ) );
 		// only set "cg_nextvehicle" to the same as "cg_vehicle" when we currently don't have
 		// a vehicle index in it.
-		if( CG_Cvar_Get( "cg_nextVehicle" ) == -1 )
+		if( ClientGame::cvar_Get( "cg_nextVehicle" ) == -1 )
 		{
 			CvarSystem::set( "cg_nextVehicle", va( "%d", newInfo.vehicle ) );
 		}
@@ -183,7 +183,7 @@ void CG_NewClientInfo( int clientNum ) {
 	// makes sure vehicle is registered
 	if( newInfo.vehicle >= 0 )
 	{
-	    CG_RegisterVehicle(&newInfo);
+	    ClientGame::registerVehicle(&newInfo);
 	    newInfo.infoValid = true;
 	    *ci = newInfo;
 

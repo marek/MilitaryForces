@@ -469,28 +469,12 @@ void CL_AddReliableCommand(const char *cmd, bool isDisconnectCmd = false);
 
 void CL_StartHunkUsers( bool rendererOnly );
 
-void CL_Disconnect_f ();
 void CL_GetChallengePacket ();
-void CL_Vid_Restart_f( );
-void CL_Snd_Restart_f ();
-void CL_StartDemoLoop( );
-void CL_NextDemo( );
-void CL_ReadDemoMessage( );
-void CL_StopRecord_f();
 
-void CL_InitDownloads();
-void CL_NextDownload();
 
-void CL_GetPing( int n, char *buf, int buflen, int *pingtime );
-void CL_GetPingInfo( int n, char *buf, int buflen );
-void CL_ClearPing( int n );
-int CL_GetPingQueueCount( );
 
-void CL_ShutdownRef( );
 void CL_InitRef( );
-int CL_ServerStatus( const char *serverAddress, char *serverStatusString, int maxLen );
 
-bool CL_CheckPaused();
 
 //
 // cl_input
@@ -503,18 +487,12 @@ struct kbutton_t {
 	bool	wasPressed;		// set when down, not cleared when up
 };
 
-void CL_InitInput();
-void CL_ShutdownInput();
-void CL_SendCmd ();
-void CL_ClearState ();
 void CL_ReadPackets ();
 
-void CL_WritePacket( );
 void IN_CenterView ();
 
 void CL_VerifyCode( );
 
-float CL_KeyState (kbutton_t *key);
 int Key_StringToKeynum( char *str );
 char *Key_KeynumToString (int keynum);
 
@@ -525,20 +503,12 @@ extern int cl_connectedToPureServer;
 extern int cl_connectedToCheatServer;
 
 #ifdef USE_VOIP
-void CL_Voip_f( );
 #endif
 
-void CL_SystemInfoChanged( );
-void CL_ParseServerMessage( Message *msg );
 
 //====================================================================
 
-void	CL_ServerInfoPacket( netadr_t from, Message *msg );
-void	CL_LocalServers_f( );
-void	CL_GlobalServers_f( );
 void	CL_FavoriteServers_f( );
-void	CL_Ping_f( );
-bool CL_UpdateVisiblePings_f( int source );
 
 
 //
@@ -568,8 +538,6 @@ public:
 	static void close( );
 };
 
-void CL_LoadConsoleHistory( );
-void CL_SaveConsoleHistory( );
 
 //
 // cl_scrn.c
@@ -584,7 +552,6 @@ void CL_SaveConsoleHistory( );
 // cl_cin.c
 //
 
-void CL_PlayCinematic_f( );
 int CIN_PlayCinematic( const char *arg0, int xpos, int ypos, int width, int height, int bits);
 e_status CIN_StopCinematic(int handle);
 e_status CIN_RunCinematic (int handle);
@@ -597,18 +564,13 @@ void CIN_CloseAllVideos();
 //
 // cl_cgame.c
 //
-void CL_InitCGame( );
 void CL_ShutdownCGame( );
 bool CL_GameCommand( );
-void CL_CGameRendering( stereoFrame_t stereo );
-void CL_SetCGameTime( );
-void CL_FirstSnapshot( );
 void CL_ShaderStateChanged();
 
 //
 // cl_ui.c
 //
-void CL_InitUI( );
 void CL_ShutdownUI( );
 int Key_GetCatcher( );
 void Key_SetCatcher( int catcher );
@@ -619,22 +581,64 @@ void LAN_SaveServersToCache( );
 //
 // cl_net_chan.c
 //
-void CL_Netchan_Transmit( NetChannel *chan, Message* msg);	//int length, const byte *data );
-bool CL_Netchan_Process( NetChannel *chan, Message *msg );
 
 //
 // cl_avi.c
 //
-bool CL_OpenAVIForWriting( const char *filename );
-void CL_TakeVideoFrame( );
 void CL_WriteAVIVideoFrame( const byte *imageBuffer, int size );
-void CL_WriteAVIAudioFrame( const byte *pcmBuffer, int size );
-bool CL_CloseAVI( );
-bool CL_VideoRecording( );
 
 //
 // cl_main.c
 //
-void CL_WriteDemoMessage ( Message *msg, int headerBytes );
+class Client
+{
+public:
+	static void disconnect_f ();
+	static void vid_Restart_f( );
+	static void snd_Restart_f ();
+	static void startDemoLoop( );
+	static void nextDemo( );
+	static void readDemoMessage( );
+	static void stopRecord_f();
+	static void initDownloads();
+	static void nextDownload();
+	static void getPing( int n, char *buf, int buflen, int *pingtime );
+	static void getPingInfo( int n, char *buf, int buflen );
+	static void clearPing( int n );
+	static int getPingQueueCount( );
+	static void shutdownRef( );
+	static int serverStatus( const char *serverAddress, char *serverStatusString, int maxLen );
+	static bool checkPaused();
+	static void initInput();
+	static void shutdownInput();
+	static void sendCmd ();
+	static void clearState ();
+	static void writePacket( );
+	static float keyState (kbutton_t *key);
+	static void voip_f( );
+	static void systemInfoChanged( );
+	static void parseServerMessage( Message *msg );
+	static void serverInfoPacket( netadr_t from, Message *msg );
+	static void localServers_f( );
+	static void globalServers_f( );
+	static void ping_f( );
+	static bool updateVisiblePings_f( int source );
+	static void loadConsoleHistory( );
+	static void saveConsoleHistory( );
+	static void playCinematic_f( );
+	static void initCGame( );
+	static void cGameRendering( stereoFrame_t stereo );
+	static void setCGameTime( );
+	static void firstSnapshot( );
+	static void initUI( );
+	static void netchan_Transmit( NetChannel *chan, Message* msg);
+	static bool netchan_Process( NetChannel *chan, Message *msg );
+	static bool openAVIForWriting( const char *filename );
+	static void takeVideoFrame( );
+	static void writeAVIAudioFrame( const byte *pcmBuffer, int size );
+	static bool closeAVI( );
+	static bool videoRecording( );
+	static void writeDemoMessage ( Message *msg, int headerBytes );
+};
 
 #endif // __CLIENT_H__

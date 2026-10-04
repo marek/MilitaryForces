@@ -43,22 +43,22 @@ This must be the very first function compiled into the .q3vm file
 //		CG_Shutdown();
 //		return 0;
 //	case CG_CONSOLE_COMMAND:
-//		return CG_ConsoleCommand();
+//		return ClientGame::consoleCommand();
 //	case CG_DRAW_ACTIVE_FRAME:
-//		CG_DrawActiveFrame( arg0, static_cast<stereoFrame_t>(arg1), arg2 );
+//		ClientGame::drawActiveFrame( arg0, static_cast<stereoFrame_t>(arg1), arg2 );
 //		return 0;
 //	case CG_CROSSHAIR_PLAYER:
-//		return CG_CrosshairPlayer();
+//		return ClientGame::crosshairPlayer();
 	//case CG_LAST_ATTACKER:
-	//	return CG_LastAttacker();
+	//	return ClientGame::lastAttacker();
 //	case CG_KEY_EVENT:
-//		CG_KeyEvent(arg0, arg1);
+//		ClientGame::keyEvent(arg0, arg1);
 //		return 0;
 //	case CG_MOUSE_EVENT:
-//		CG_MouseEvent(arg0, arg1);
+//		ClientGame::mouseEvent(arg0, arg1);
 //		return 0;
 //	case CG_EVENT_HANDLING:
-//		CG_EventHandling(arg0);
+//		ClientGame::eventHandling(arg0);
 //		return 0;
 //	default:
 //		CG_Error( "vmMain: unknown command %i", command );
@@ -378,20 +378,20 @@ static void CG_ForceModelChange( ) {
 	for (i=0 ; i<MAX_CLIENTS ; i++) {
 		const char *clientInfo;
 
-		clientInfo = CG_ConfigString( CS_PLAYERS+i );
+		clientInfo = ClientGame::configString( CS_PLAYERS+i );
 		if ( !clientInfo[0] ) {
 			continue;
 		}
-		CG_NewClientInfo( i );
+		ClientGame::newClientInfo( i );
 	}
 }
 
 /*
 =================
-CG_UpdateCvars
+ClientGame::updateCvars
 =================
 */
-void CG_UpdateCvars( ) 
+void ClientGame::updateCvars( ) 
 {
 	int			i;
 	cvarTable_t	*cv;
@@ -429,7 +429,7 @@ void CG_UpdateCvars( )
 	cg.tracernum = (cg_tracer.integer > 0) ? cg_tracer.integer : 3;
 }
 
-int CG_CrosshairPlayer( ) 
+int ClientGame::crosshairPlayer( ) 
 {
 	if ( cg.time > ( cg.crosshairClientTime + 1000 ) )
 		return -1;
@@ -437,7 +437,7 @@ int CG_CrosshairPlayer( )
 	return cg.crosshairClientNum;
 }
 
-int CG_LastAttacker( ) 
+int ClientGame::lastAttacker( ) 
 {
 	if ( !cg.attackerTime ) 
 		return -1;
@@ -445,7 +445,7 @@ int CG_LastAttacker( )
 	return cg.snap->ps.persistant[PERS_ATTACKER];
 }
 
-void QDECL CG_Printf( const char *msg, ... ) 
+void QDECL ClientGame::printf( const char *msg, ... ) 
 {
 	va_list		argptr;
 	char		text[1024];
@@ -455,7 +455,7 @@ void QDECL CG_Printf( const char *msg, ... )
 	va_end (argptr);
 
 	// add the text into the custom consol
-	CG_Add_Console_Line( text );
+	ClientGame::add_Console_Line( text );
 
 	// write the text into the console (only displayed if the cVar 'con_notifytime' is not -1)
 	Common::printf( "%s", text );
@@ -463,10 +463,10 @@ void QDECL CG_Printf( const char *msg, ... )
 
 /*
 ================
-CG_Argv
+ClientGame::argv
 ================
 */
-const char *CG_Argv( int arg ) 
+const char *ClientGame::argv( int arg ) 
 {
 	static char	buffer[MAX_STRING_CHARS];
 
@@ -604,7 +604,7 @@ static void CG_RegisterSounds( ) {
 	cgs.media.watrUnSound = SoundSystem::registerSound( "sound/player/watr_un.wav", false);
 
 	// only register the items that the server says we need
-	Q_strncpyz(items, CG_ConfigString(CS_ITEMS), sizeof(items));
+	Q_strncpyz(items, ClientGame::configString(CS_ITEMS), sizeof(items));
 
 	for ( i = 1 ; i < bg_numItems ; i++ ) {
 //		if ( items[ i ] == '1' || cg_buildScript.integer ) {
@@ -613,7 +613,7 @@ static void CG_RegisterSounds( ) {
 	}
 
 	for ( i = 1 ; i < MAX_SOUNDS ; i++ ) {
-		soundName = CG_ConfigString( CS_SOUNDS+i );
+		soundName = ClientGame::configString( CS_SOUNDS+i );
 		if ( !soundName[0] ) {
 			break;
 		}
@@ -621,7 +621,7 @@ static void CG_RegisterSounds( ) {
 			continue;	// custom sound
 		}
 		cgs.gameSounds[i] = SoundSystem::registerSound( soundName, false );
-		CG_LoadingStep( i, MAX_SOUNDS );
+		ClientGame::loadingStep( i, MAX_SOUNDS );
 	}
 
 	// FIXME: only needed with item
@@ -692,7 +692,7 @@ static void CG_PrecacheVehiclePreview( )
 	qhandle_t h;
 
 	// update loading display
-	CG_LoadingString( "precache icons" );
+	ClientGame::loadingString( "precache icons" );
 
 	// for all icons
 	for( i = 0; i < bg_numberOfVehicles; i++ )
@@ -869,12 +869,12 @@ static void CG_RegisterGraphics( ) {
 	memset( &cg.refdef, 0, sizeof( cg.refdef ) );
 	refExport.ClearScene();
 
-	CG_LoadingString( cgs.mapname );
+	ClientGame::loadingString( cgs.mapname );
 
 	refExport.LoadWorld( cgs.mapname );
 
 	// precache status bar pics
-	CG_LoadingString( "game media" );
+	ClientGame::loadingString( "game media" );
 
 	for ( i=0 ; i<11 ; i++) {
 		cgs.media.numberShaders[i] = refExport.RegisterShader( sb_nums[i] );
@@ -1044,12 +1044,12 @@ static void CG_RegisterGraphics( ) {
 	memset( cg_weapons, 0, sizeof( cg_weapons ) );
 
 	// only register the items that the server says we need
-	Q_strncpyz(items, CG_ConfigString(CS_ITEMS), sizeof(items));
+	Q_strncpyz(items, ClientGame::configString(CS_ITEMS), sizeof(items));
 
 	for ( i = 1 ; i < bg_numItems ; i++ ) {
 		if ( items[ i ] == '1' || cg_buildScript.integer ) {
 //			CG_LoadingItem( i );
-			CG_RegisterItemVisuals( i );
+			ClientGame::registerItemVisuals( i );
 		}
 	}
 
@@ -1082,17 +1082,17 @@ static void CG_RegisterGraphics( ) {
 	for (i=1 ; i<MAX_MODELS ; i++) {
 		const char		*modelName;
 
-		modelName = CG_ConfigString( CS_MODELS+i );
+		modelName = ClientGame::configString( CS_MODELS+i );
 		if ( !modelName[0] ) {
 			break;
 		}
 		cgs.gameModels[i] = refExport.RegisterModel( modelName);
-		CG_LoadingStep( i, MAX_MODELS );
+		ClientGame::loadingStep( i, MAX_MODELS );
 	}
 
 	// MFQ3 register all the vehicles
-	CG_LoadingStage( "MFQ3 vehicles", 0.35f, 0.85f );
-	CG_CacheVehicles();
+	ClientGame::loadingStage( "MFQ3 vehicles", 0.35f, 0.85f );
+	ClientGame::cacheVehicles();
 
 }
 
@@ -1100,11 +1100,11 @@ static void CG_RegisterGraphics( ) {
 
 /*																																			
 =======================
-CG_BuildSpectatorString
+ClientGame::buildSpectatorString
 
 =======================
 */
-void CG_BuildSpectatorString() {
+void ClientGame::buildSpectatorString() {
 	int i;
 	cg.spectatorList[0] = 0;
 	for (i = 0; i < MAX_CLIENTS; i++) {
@@ -1128,7 +1128,7 @@ CG_RegisterClients
 static void CG_RegisterClients( ) {
 	int		i;
 
-	CG_NewClientInfo(cg.clientNum);
+	ClientGame::newClientInfo(cg.clientNum);
 
 	for (i=0 ; i<MAX_CLIENTS ; i++) {
 		const char		*clientInfo;
@@ -1137,13 +1137,13 @@ static void CG_RegisterClients( ) {
 			continue;
 		}
 
-		clientInfo = CG_ConfigString( CS_PLAYERS+i );
+		clientInfo = ClientGame::configString( CS_PLAYERS+i );
 		if ( !clientInfo[0]) {
 			continue;
 		}
-		CG_NewClientInfo( i );
+		ClientGame::newClientInfo( i );
 	}
-	CG_BuildSpectatorString();
+	ClientGame::buildSpectatorString();
 }
 
 	// NOTE: functions copied from v1.29h code to enable New scoreboard method
@@ -1394,10 +1394,10 @@ bool CG_Load_Menu(char **p) {
 
 /*
 =================
-CG_LoadMenus
+ClientGame::loadMenus
 =================
 */
-void CG_LoadMenus(const char *menuFile) {
+void ClientGame::loadMenus(const char *menuFile) {
 	char	*token;
 	char *p;
 	int	len, start;
@@ -1464,10 +1464,10 @@ void CG_LoadMenus(const char *menuFile) {
 
 /*
 =================
-CG_FeederCount
+ClientGame::feederCount
 =================
 */
-int CG_FeederCount(float feederID) {
+int ClientGame::feederCount(float feederID) {
 	int i, count;
 	count = 0;
 
@@ -1525,11 +1525,11 @@ int CG_FeederCount(float feederID) {
 
 /*
 =================
-CG_SetScoreSelection
+ClientGame::setScoreSelection
 =================
 */
 
-void CG_SetScoreSelection(void *p) {
+void ClientGame::setScoreSelection(void *p) {
 	menuDef_t *menu = static_cast<menuDef_t*>(p);
 	playerState_t *ps = &cg.snap->ps;
 	int i, red, blue;
@@ -1803,10 +1803,10 @@ void CG_FeederSelection(float feederID, int index)
 
 /*
 =================
-CG_ConfigString
+ClientGame::configString
 =================
 */
-const char *CG_ConfigString( int index ) {
+const char *ClientGame::configString( int index ) {
 	if ( index < 0 || index >= MAX_CONFIGSTRINGS ) {
 		Common::error( ERR_DROP, "CG_ConfigString: bad index: %i", index );
 	}
@@ -1817,16 +1817,16 @@ const char *CG_ConfigString( int index ) {
 
 /*
 ======================
-CG_StartMusic
+ClientGame::startMusic
 
 ======================
 */
-void CG_StartMusic( ) {
+void ClientGame::startMusic( ) {
 	char	*s;
 	char	parm1[MAX_QPATH], parm2[MAX_QPATH];
 
 	// start the background music
-	s = const_cast<char *>(CG_ConfigString( CS_MUSIC ));
+	s = const_cast<char *>(ClientGame::configString( CS_MUSIC ));
 	Q_strncpyz( parm1, COM_Parse( &s ), sizeof( parm1 ) );
 	Q_strncpyz( parm2, COM_Parse( &s ), sizeof( parm2 ) );
 
@@ -1845,19 +1845,19 @@ int CG_OwnerDrawWidth(int ownerDraw, float scale)
 	switch (ownerDraw)
 	{
 	  case CG_GAME_TYPE:
-			return CG_Text_Width(CG_GameTypeString(), scale, 0);
+			return ClientGame::text_Width(ClientGame::gameTypeString(), scale, 0);
 
 	  case CG_GAME_STATUS:
-			return CG_Text_Width(CG_GetGameStatusText(), scale, 0);
+			return ClientGame::text_Width(ClientGame::getGameStatusText(), scale, 0);
 /*
 	  case CG_KILLER:
-			return CG_Text_Width(CG_GetKillerText(), scale, 0);
+			return ClientGame::text_Width(CG_GetKillerText(), scale, 0);
 			break;
 	  case CG_RED_NAME:
-			return CG_Text_Width(cg_redTeamName.string, scale, 0);
+			return ClientGame::text_Width(cg_redTeamName.string, scale, 0);
 			break;
 	  case CG_BLUE_NAME:
-			return CG_Text_Width(cg_blueTeamName.string, scale, 0);
+			return ClientGame::text_Width(cg_blueTeamName.string, scale, 0);
 			break;
 */
 	}
@@ -1881,7 +1881,7 @@ void CG_LoadHudMenu() {
 		hudSet = "ui/hud.txt";
 	}
 
-	CG_LoadMenus(hudSet);
+	ClientGame::loadMenus(hudSet);
 }
 
 /*
@@ -1954,7 +1954,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 
 	CG_RegisterCvars();
 
-	CG_InitConsoleCommands();
+	ClientGame::initConsoleCommands();
 
 	// this has the effect of stopping the usual Q3 console text being displayed (because
 	// we want to custom handle this textual display - but still retain the history that
@@ -1982,12 +1982,12 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	CL_GetGameState( &cgs.gameState );
 
 	// check version
-	s = CG_ConfigString( CS_GAME_VERSION );
+	s = ClientGame::configString( CS_GAME_VERSION );
 	if ( strcmp( s, MF_VERSION ) ) {
 		Common::error( ERR_DROP, "Client/Server game mismatch: %s/%s", MF_VERSION, s );
 	}
 
-	s = CG_ConfigString( CS_LEVEL_START_TIME );
+	s = ClientGame::configString( CS_LEVEL_START_TIME );
 	cgs.levelStartTime = atoi( s );
 
 	// MFQ3: vehicle needs to be reset
@@ -2024,34 +2024,34 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 		CvarSystem::set( "mfd2_defaultpage", va("%d", cg.Mode_MFD[MFD_2]) );
 	}
 
-	CG_ParseServerinfo();
+	ClientGame::parseServerinfo();
 
 	// load the New map
-	CG_LoadingStage( "collision map", 0.0f, 0.1f );
+	ClientGame::loadingStage( "collision map", 0.0f, 0.1f );
 
 	CL_CM_LoadMap( cgs.mapname );
 
 	cgUtils.string_Init();
 
-	CG_LoadingStage( "sounds", 0.1f, 0.2f );
+	ClientGame::loadingStage( "sounds", 0.1f, 0.2f );
 	CG_RegisterSounds();
 
-	CG_LoadingStage( "graphics", 0.2f, 0.35f );
+	ClientGame::loadingStage( "graphics", 0.2f, 0.35f );
 	CG_RegisterGraphics();
 
-	CG_LoadingStage( "weapons", 0.85f, 0.95f );
-	CG_RegisterWeapons();
+	ClientGame::loadingStage( "weapons", 0.85f, 0.95f );
+	ClientGame::registerWeapons();
 
-	CG_LoadingStage( "clients", 0.95f, 1.0f );
+	ClientGame::loadingStage( "clients", 0.95f, 1.0f );
 
 	CG_RegisterClients();
 
 	CG_AssetCache();       // cache UI gfx
 	CG_LoadHudMenu();      // load New hud stuff
 
-	CG_InitLocalEntities();
+	ClientGame::initLocalEntities();
 
-	CG_InitMarkPolys();
+	ClientGame::initMarkPolys();
 
 
 	// remove the last loading update
@@ -2059,13 +2059,13 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	cg.infoLoadFraction = 0;
 
 	// Make sure we have update values (scores)
-	CG_SetConfigValues();
+	ClientGame::setConfigValues();
 
-	CG_StartMusic();
+	ClientGame::startMusic();
 
-	CG_LoadingString( "" );
+	ClientGame::loadingString( "" );
 
-	CG_ShaderStateChanged();
+	ClientGame::shaderStateChanged();
 
 	SoundSystem::clearLoopingSounds( true );
 
@@ -2073,7 +2073,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	VehicleData::loadAllVehicleData();
 
 	// init all the vehicle's shadow system
-	CG_InitShadows();
+	ClientGame::initShadows();
 
 	// mission editor
 	if( cgs.gametype == GT_MISSION_EDITOR )
@@ -2093,13 +2093,13 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 		memset(&p, 0, sizeof(p));
 		
 		
-		CG_ParticleWorldInit(&pw);
+		ClientGame::particleWorldInit(&pw);
 
 		ps.cent = NULL;
 		ps.dead = false;
 		ps.lifetime = 0;
 		VectorSet(ps.pos, 0, 0, 3000);
-		i = CG_AddParticleSystem(&pw, &ps);
+		i = ClientGame::addParticleSystem(&pw, &ps);
 		if(i >= 0)
 		{
 			p.lifetime = 20000;
@@ -2129,7 +2129,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 			pe.parentSytem = i;
 			pe.numEjectPerInterval = 5;
 			pe.particleTemplate = p;
-			i = CG_AddParticleEmitter(&pw, &pe);
+			i = ClientGame::addParticleEmitter(&pw, &pe);
 			pw.emitters[i].particleTemplate.parentEmitter = i;
 		}
 	}*/
@@ -2153,23 +2153,23 @@ void CG_Shutdown( ) {
 
 /*
 ==================
-CG_EventHandling
+ClientGame::eventHandling
 ==================
  type 0 - no event handling
       1 - team menu
       2 - hud editor
 
 */
-void CG_EventHandling(int type)
+void ClientGame::eventHandling(int type)
 {
 }
 
 /*
 =================
-CG_KeyEvent
+ClientGame::keyEvent
 =================
 */
-void CG_KeyEvent(int key, bool down)
+void ClientGame::keyEvent(int key, bool down)
 {
 	if( cgs.gametype == GT_MISSION_EDITOR ) {
 		ME_KeyEvent(key, down);
@@ -2178,10 +2178,10 @@ void CG_KeyEvent(int key, bool down)
 
 /*
 =================
-CG_MouseEvent
+ClientGame::mouseEvent
 =================
 */
-void CG_MouseEvent(int x, int y)
+void ClientGame::mouseEvent(int x, int y)
 {
 	if( cgs.gametype == GT_MISSION_EDITOR ) {
 		ME_MouseEvent(x, y);

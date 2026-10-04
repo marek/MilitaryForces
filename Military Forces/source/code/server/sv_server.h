@@ -100,7 +100,7 @@ struct ServerStatic
 
 	int				time_;						// will be strictly increasing across level changes
 
-	int				snapFlagServerBit_;			// ^= SNAPFLAG_SERVERCOUNT every SV_SpawnServer()
+	int				snapFlagServerBit_;			// ^= SNAPFLAG_SERVERCOUNT every ServerMain::spawnServer()
 
 //	SV_Client*		clients_;					// [sv_maxclients->integer];
 	SVClientList	svClients_;					// replaces former clients_ member

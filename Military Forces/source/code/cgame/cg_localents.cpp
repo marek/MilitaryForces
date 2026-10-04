@@ -18,12 +18,12 @@ LocalEntity	*cg_freeLocalEntities;		// single linked list
 
 /*
 ===================
-CG_InitLocalEntities
+ClientGame::initLocalEntities
 
 This is called at startup and for tournement restarts
 ===================
 */
-void	CG_InitLocalEntities( ) {
+void	ClientGame::initLocalEntities( ) {
 	int		i;
 
 	memset( cg_localEntities, 0, sizeof( cg_localEntities ) );
@@ -60,12 +60,12 @@ void LocalEntity::freeLocalEntity() {
 
 /*
 ===================
-CG_AllocLocalEntity
+ClientGame::allocLocalEntity
 
 Will allways succeed, even if it requires freeing an old active entity
 ===================
 */
-LocalEntity	*CG_AllocLocalEntity( ) {
+LocalEntity	*ClientGame::allocLocalEntity( ) {
 	LocalEntity	*le;
 
 	if ( !cg_freeLocalEntities ) {
@@ -110,7 +110,7 @@ void LocalEntity::fragmentBounceMark( trace_t *trace ) {
 	int			radius;
 
 	radius = 8 + (rand()&15);
-	CG_ImpactMark( cgs.media.burnMarkShader, trace->endpos, trace->plane.normal, random()*360,
+	ClientGame::impactMark( cgs.media.burnMarkShader, trace->endpos, trace->plane.normal, random()*360,
 			1,1,1,1, true, radius, false );
 
 	// don't allow a fragment to make multiple marks, or they
@@ -186,7 +186,7 @@ void LocalEntity::addFragment() {
 	GameShared::evaluateTrajectory( &this->pos, cg.time, newOrigin );
 
 	// trace a line from previous position to New position
-	CG_Trace( &trace, this->refEntity.origin, nullptr, nullptr, newOrigin, -1, CONTENTS_SOLID );
+	ClientGame::trace( &trace, this->refEntity.origin, nullptr, nullptr, newOrigin, -1, CONTENTS_SOLID );
 	if ( trace.fraction == 1.0 ) {
 		// still in free fall
 		VectorCopy( newOrigin, this->refEntity.origin );
@@ -587,11 +587,11 @@ void LocalEntity::addNuke() {
 
 /*
 ===================
-CG_AddLocalEntities
+ClientGame::addLocalEntities
 
 ===================
 */
-void CG_AddLocalEntities( ) {
+void ClientGame::addLocalEntities( ) {
 	LocalEntity	*le, *next;
 
 	// walk the list backwards, so any New local entities generated

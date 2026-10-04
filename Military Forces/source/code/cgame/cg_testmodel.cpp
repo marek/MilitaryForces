@@ -48,13 +48,13 @@ console doesn't pause the game.
 
 /*
 =================
-CG_TestModel_f
+ClientGame::testModel_f
 
 Creates an entity in front of the current position, which
 can then be moved around
 =================
 */
-void CG_TestModel_f () {
+void ClientGame::testModel_f () {
 	vec3_t		angles;
 
 	memset( &cg.testModelEntity, 0, sizeof(cg.testModelEntity) );
@@ -62,16 +62,16 @@ void CG_TestModel_f () {
 		return;
 	}
 
-	Q_strncpyz (cg.testModelName, CG_Argv( 1 ), MAX_QPATH );
+	Q_strncpyz (cg.testModelName, ClientGame::argv( 1 ), MAX_QPATH );
 	cg.testModelEntity.hModel = refExport.RegisterModel( cg.testModelName );
 
 	if ( CommandSystem::argc() == 3 ) {
-		cg.testModelEntity.backlerp = atof( CG_Argv( 2 ) );
+		cg.testModelEntity.backlerp = atof( ClientGame::argv( 2 ) );
 		cg.testModelEntity.frame = 1;
 		cg.testModelEntity.oldframe = 0;
 	}
 	if (! cg.testModelEntity.hModel ) {
-		CG_Printf( "Can't register model\n" );
+		ClientGame::printf( "Can't register model\n" );
 		return;
 	}
 
@@ -87,51 +87,51 @@ void CG_TestModel_f () {
 
 /*
 =================
-CG_TestGun_f
+ClientGame::testGun_f
 
 Replaces the current view weapon with the given model
 =================
 */
-void CG_TestGun_f () {
-	CG_TestModel_f();
+void ClientGame::testGun_f () {
+	ClientGame::testModel_f();
 	cg.testGun = true;
 	cg.testModelEntity.renderfx = RF_MINLIGHT | RF_DEPTHHACK | RF_FIRST_PERSON;
 }
 
 
-void CG_TestModelNextFrame_f () {
+void ClientGame::testModelNextFrame_f () {
 	cg.testModelEntity.frame++;
-	CG_Printf( "frame %i\n", cg.testModelEntity.frame );
+	ClientGame::printf( "frame %i\n", cg.testModelEntity.frame );
 }
 
-void CG_TestModelPrevFrame_f () {
+void ClientGame::testModelPrevFrame_f () {
 	cg.testModelEntity.frame--;
 	if ( cg.testModelEntity.frame < 0 ) {
 		cg.testModelEntity.frame = 0;
 	}
-	CG_Printf( "frame %i\n", cg.testModelEntity.frame );
+	ClientGame::printf( "frame %i\n", cg.testModelEntity.frame );
 }
 
-void CG_TestModelNextSkin_f () {
+void ClientGame::testModelNextSkin_f () {
 	cg.testModelEntity.skinNum++;
-	CG_Printf( "skin %i\n", cg.testModelEntity.skinNum );
+	ClientGame::printf( "skin %i\n", cg.testModelEntity.skinNum );
 }
 
-void CG_TestModelPrevSkin_f () {
+void ClientGame::testModelPrevSkin_f () {
 	cg.testModelEntity.skinNum--;
 	if ( cg.testModelEntity.skinNum < 0 ) {
 		cg.testModelEntity.skinNum = 0;
 	}
-	CG_Printf( "skin %i\n", cg.testModelEntity.skinNum );
+	ClientGame::printf( "skin %i\n", cg.testModelEntity.skinNum );
 }
 
-void CG_AddTestModel () {
+void ClientGame::addTestModel () {
 	int		i;
 
 	// re-register the model, because the level may have changed
 	cg.testModelEntity.hModel = refExport.RegisterModel( cg.testModelName );
 	if (! cg.testModelEntity.hModel ) {
-		CG_Printf ("Can't register model\n");
+		ClientGame::printf ("Can't register model\n");
 		return;
 	}
 
@@ -245,14 +245,14 @@ static void registerTestVehicle()
 	}
 }
 
-void CG_AddTestVehicle () {
+void ClientGame::addTestVehicle () {
 	int		i;
 
 	// re-register the model, because the level may have changed
 	registerTestVehicle();
 
 	if ( !cg.testVehicleParts[0].hModel ) {
-		CG_Printf ("Can't register model\n");
+		ClientGame::printf ("Can't register model\n");
 		return;
 	}
 
@@ -264,7 +264,7 @@ void CG_AddTestVehicle () {
 
 				for( i = 1; i < BP_PLANE_MAX_PARTS; ++i ) {
 					if( ! cg.testVehicleParts[i].hModel ) continue;
-					CG_PositionEntityOnTag( &cg.testVehicleParts[i], &cg.testVehicleParts[0], 
+					ClientGame::positionEntityOnTag( &cg.testVehicleParts[i], &cg.testVehicleParts[0], 
 						cg.testVehicleParts[0].hModel, plane_tags[i] );
 					if( i == BP_PLANE_CONTROLS ) {
 						if( !cg.testVehicleParts[BP_PLANE_GEAR].frame &&
@@ -277,11 +277,11 @@ void CG_AddTestVehicle () {
 					}
 					refExport.AddRefEntityToScene( &cg.testVehicleParts[i] );
 					if( cg.testVehicleParts[BP_PLANE_BODY].frame ) {
-						CG_PositionEntityOnTag( &cg.testBurner, &cg.testVehicleParts[0], 
+						ClientGame::positionEntityOnTag( &cg.testBurner, &cg.testVehicleParts[0], 
 												cg.testVehicleParts[0].hModel, "tag_ab1" );
 						refExport.AddRefEntityToScene( &cg.testBurner );
 						if( cg.testNumBurners ) {
-							CG_PositionEntityOnTag( &cg.testBurner2, &cg.testVehicleParts[0], 
+							ClientGame::positionEntityOnTag( &cg.testBurner2, &cg.testVehicleParts[0], 
 													cg.testVehicleParts[0].hModel, "tag_ab2" );
 							refExport.AddRefEntityToScene( &cg.testBurner2 );
 						}
@@ -289,7 +289,7 @@ void CG_AddTestVehicle () {
 					}
 					if( cg.testVaporFrame ) {
 						cg.testVapor.frame = cg.testVaporFrame-1;
-						CG_PositionEntityOnTag( &cg.testVapor, &cg.testVehicleParts[0], 
+						ClientGame::positionEntityOnTag( &cg.testVapor, &cg.testVehicleParts[0], 
 												cg.testVehicleParts[0].hModel, "tag_vapor1" );
 						refExport.AddRefEntityToScene( &cg.testVapor );
 					}
@@ -300,10 +300,10 @@ void CG_AddTestVehicle () {
 			{
 				for( i = 1; i < BP_GV_MAX_PARTS; ++i ) {
 					if( ! cg.testVehicleParts[i].hModel ) continue;
-					CG_PositionEntityOnTag( &cg.testVehicleParts[1], &cg.testVehicleParts[0], 
+					ClientGame::positionEntityOnTag( &cg.testVehicleParts[1], &cg.testVehicleParts[0], 
 						cg.testVehicleParts[0].hModel, gv_tags[1] );
 					refExport.AddRefEntityToScene( &cg.testVehicleParts[1] );
-					CG_PositionEntityOnTag( &cg.testVehicleParts[2], &cg.testVehicleParts[1], 
+					ClientGame::positionEntityOnTag( &cg.testVehicleParts[2], &cg.testVehicleParts[1], 
 						cg.testVehicleParts[1].hModel, gv_tags[2] );
 					refExport.AddRefEntityToScene( &cg.testVehicleParts[2] );
 				}
@@ -313,7 +313,7 @@ void CG_AddTestVehicle () {
 
 }
 
-void CG_TestVehicle (long cat) {
+void ClientGame::testVehicle (long cat) {
 	vec3_t		angles;
 	int			i;
 
@@ -330,17 +330,17 @@ void CG_TestVehicle (long cat) {
 		return;
 	}
 
-	Q_strncpyz (cg.testVehicleName, CG_Argv( 1 ), MAX_QPATH );
+	Q_strncpyz (cg.testVehicleName, ClientGame::argv( 1 ), MAX_QPATH );
 
 	registerTestVehicle();
 
 /*	if ( CommandSystem::argc() == 3 ) {
-		cg.testModelEntity.backlerp = atof( CG_Argv( 2 ) );
+		cg.testModelEntity.backlerp = atof( ClientGame::argv( 2 ) );
 		cg.testModelEntity.frame = 1;
 		cg.testModelEntity.oldframe = 0;
 	}*/
 	if (! cg.testVehicleParts[0].hModel ) {
-		CG_Printf( "Can't register model\n" );
+		ClientGame::printf( "Can't register model\n" );
 		return;
 	}
 
@@ -358,7 +358,7 @@ void CG_TestVehicle (long cat) {
 
 
 
-void CG_TestPlaneCmd_f () {
+void ClientGame::testPlaneCmd_f () {
 	char		cmd[128];
 	
 	if( cg.testVehicleCat != CAT_PLANE ) {
@@ -369,7 +369,7 @@ void CG_TestPlaneCmd_f () {
 		return;
 	}
 
-	Q_strncpyz (cmd, CG_Argv( 1 ), MAX_QPATH );
+	Q_strncpyz (cmd, ClientGame::argv( 1 ), MAX_QPATH );
 	
 	if (Q_stricmp (cmd, "cockpit") == 0) {
 		cg.testVehicleParts[BP_PLANE_COCKPIT].frame = cg.testVehicleParts[BP_PLANE_COCKPIT].frame ? 0 : 1;
@@ -391,7 +391,7 @@ void CG_TestPlaneCmd_f () {
 		} else if( cg.testVehicleParts[BP_PLANE_CONTROLS].frame < min ) {
 			cg.testVehicleParts[BP_PLANE_CONTROLS].frame += 9;
 		}
-		CG_Printf( "Control frame = %d\n", cg.testVehicleParts[BP_PLANE_CONTROLS].frame );
+		ClientGame::printf( "Control frame = %d\n", cg.testVehicleParts[BP_PLANE_CONTROLS].frame );
 	} else if (Q_stricmp (cmd, "throttle") == 0) {
 		cg.testVehicleParts[BP_PLANE_BODY].frame++;
 		if( cg.testVehicleParts[BP_PLANE_BODY].frame > 2 ) {
@@ -407,21 +407,21 @@ void CG_TestPlaneCmd_f () {
 	} else if (Q_stricmp (cmd, "burnermodel") == 0) {
 		cg.testBurnerNum++;
 		if( cg.testBurnerNum >= AB_MAX ) cg.testBurnerNum = 0;
-		CG_Printf( "Using burner model %d\n", cg.testBurnerNum );
+		ClientGame::printf( "Using burner model %d\n", cg.testBurnerNum );
 	} else if (Q_stricmp (cmd, "burnernum") == 0) {
 		cg.testNumBurners = cg.testNumBurners ? 0 : 1;
-		CG_Printf( "Using %d burners\n", cg.testNumBurners+1 );
+		ClientGame::printf( "Using %d burners\n", cg.testNumBurners+1 );
 	} else if (Q_stricmp (cmd, "vapor") == 0) {
 		cg.testVaporFrame++;
 		if( cg.testVaporFrame > 2 ) cg.testVaporFrame = 0;
 	} else if (Q_stricmp (cmd, "vapormodel") == 0) {
 		cg.testVaporNum = cg.testVaporNum ? 0 : 1;
-		CG_Printf( "Using vapor model %d\n", cg.testVaporNum );
+		ClientGame::printf( "Using vapor model %d\n", cg.testVaporNum );
 	}
 
 }
 
-void CG_TestGVCmd_f () {
+void ClientGame::testGVCmd_f () {
 	char		cmd[128];
 
 	return; // if there is anything to do finish this func
@@ -434,7 +434,7 @@ void CG_TestGVCmd_f () {
 		return;
 	}
 
-	Q_strncpyz (cmd, CG_Argv( 1 ), MAX_QPATH );
+	Q_strncpyz (cmd, ClientGame::argv( 1 ), MAX_QPATH );
 	
 	if (Q_stricmp (cmd, "blah") == 0) {
 

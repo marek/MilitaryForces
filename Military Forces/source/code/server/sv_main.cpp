@@ -186,14 +186,14 @@ void SV_Client::addServerCommand( const char *cmd ) {
 
 /*
 =================
-SV_SendServerCommand
+ServerMain::sendServerCommand
 
 Sends a reliable command string to be interpreted by 
 the client game module: "cp", "print", "chat", etc
 A NULL client will broadcast to all clients
 =================
 */
-void QDECL SV_SendServerCommand( SV_Client *cl, const char *fmt, ... ) 
+void QDECL ServerMain::sendServerCommand( SV_Client *cl, const char *fmt, ... ) 
 {
 	va_list		argptr;
 	byte		message[MAX_MSGLEN];
@@ -346,12 +346,12 @@ void SV_MasterHeartbeat(const char *message)
 
 /*
 =================
-SV_MasterShutdown
+ServerMain::masterShutdown
 
 Informs all masters that this server is going down
 =================
 */
-void SV_MasterShutdown( ) {
+void ServerMain::masterShutdown( ) {
 	// send a heartbeat right now
 	theSVS.nextHeartbeatTime_ = -9999;
 	SV_MasterHeartbeat(HEARTBEAT_FOR_MASTER);
@@ -817,9 +817,9 @@ void SV_ConnectionlessPacket( netadr_t from, Message *msg ) {
   } else if (!Q_stricmp(c, "getinfo")) {
 		SVC_Info( from );
 	} else if (!Q_stricmp(c, "getchallenge")) {
-		SV_GetChallenge( from );
+		ServerMain::getChallenge( from );
 	} else if (!Q_stricmp(c, "connect")) {
-		SV_DirectConnect( from );
+		ServerMain::directConnect( from );
 	//} else if (!Q_stricmp(c, "ipAuthorize")) {
 	//	SV_AuthorizeIpPacket( from );
 	} else if (!Q_stricmp(c, "rcon")) {
@@ -1187,7 +1187,7 @@ void SV_Frame( int msec )
 	SV_CheckTimeouts();
 
 	// send messages back to the clients
-	SV_SendClientMessages();
+	ServerMain::sendClientMessages();
 
 	// send a heartbeat to the master if needed
 	SV_MasterHeartbeat(HEARTBEAT_FOR_MASTER);
@@ -1261,7 +1261,7 @@ int SV_SendQueuedPackets()
 	int timeVal = INT_MAX;
 
 	// Send out fragmented packets now that we're idle
-	delayT = SV_SendQueuedMessages();
+	delayT = ServerMain::sendQueuedMessages();
 	if(delayT >= 0)
 		timeVal = delayT;
 
@@ -1279,7 +1279,7 @@ int SV_SendQueuedPackets()
 		}
 		else
 		{
-			numBlocks = SV_SendDownloadMessages();
+			numBlocks = ServerMain::sendDownloadMessages();
 
 			if(numBlocks)
 			{
@@ -1316,7 +1316,7 @@ int SV_SendQueuedPackets()
 	}
 	else
 	{
-		if(SV_SendDownloadMessages())
+		if(ServerMain::sendDownloadMessages())
 			timeVal = 0;
 	}
 

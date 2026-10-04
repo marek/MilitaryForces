@@ -556,7 +556,7 @@ struct cg_t {
 	bool	hyperspace;				// true if prediction has hit a trigger_teleport
 	playerState_t	predictedPlayerState;
 	ClientEntity		predictedPlayerEntity;
-	bool	validPPS;				// clear until the first call to CG_PredictPlayerState
+	bool	validPPS;				// clear until the first call to ClientGame::predictPlayerState
 	int			predictedErrorTime;
 	vec3_t		predictedError;
 
@@ -1306,66 +1306,34 @@ extern	vmCvar_t		cg_shadowDebug;
 //
 // cg_main.c
 //
-const char *CG_ConfigString( int index );
-const char *CG_Argv( int arg );
 
-void QDECL CG_Printf( const char *msg, ... ) Q_PRINTF_FUNC(1, 2);
 //void QDECL CG_Error( const char *msg, ... );
 
-void CG_StartMusic( );
 
-void CG_UpdateCvars( );
 
-int CG_CrosshairPlayer( );
-int CG_LastAttacker( );
-void CG_LoadMenus(const char *menuFile);
-void CG_KeyEvent(int key, bool down);
-void CG_MouseEvent(int x, int y);
-void CG_EventHandling(int type);
 void CG_RankRunFrame( );
-void CG_SetScoreSelection(void *menu);
 score_t *CG_GetSelectedScore();
-void CG_BuildSpectatorString();
-int CG_FeederCount(float feederID);
 
 void CG_AddRegisterMessage(const char * s);
 
 //
 // cg_util.c
 //
-float CG_Cvar_Get( const char * cvar );
 unsigned long MF_CG_GetGameset( bool asEnum );
 
 //
 // cg_testmodel.c
 //
-void CG_TestPlaneCmd_f();
-void CG_TestGVCmd_f();
-void CG_TestVehicle(long cat);
-void CG_AddTestVehicle ();
-void CG_AddTestModel ();
-void CG_TestModel_f ();
-void CG_TestGun_f ();
-void CG_TestModelNextFrame_f ();
-void CG_TestModelPrevFrame_f ();
-void CG_TestModelNextSkin_f ();
-void CG_TestModelPrevSkin_f ();
 
 
 //
 // cg_view.c
 //
 
-void CG_ZoomDown_f( );
-void CG_ZoomUp_f( );
-void CG_AddBufferedSound( sfxHandle_t sfx);
-void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, bool demoPlayback );
-bool CG_WorldToScreenCoords( vec3_t worldPoint, int * pX, int * pY, bool virtualXY );
 
 //
 // cg_drawtools.c
 //
-void CG_DrawProgressBar( rectDef_t *rect, vec4_t color, vec4_t textcolor, float scale, int textStyle, float progress );
 enum screenPlacement_e {
 	PLACE_CENTER,
 	PLACE_LEFT,
@@ -1373,39 +1341,16 @@ enum screenPlacement_e {
 	PLACE_STRETCH
 };
 
-void CG_SetScreenPlacement( screenPlacement_e placement );
-screenPlacement_e CG_GetScreenPlacement( );
-void CG_AdjustFrom640( float *x, float *y, float *w, float *h );
-void CG_VirtualFromScreen( float *x, float *y );
-void CG_FillRect( float x, float y, float width, float height, const float *color );
-void CG_DrawPic( float x, float y, float width, float height, qhandle_t hShader );
 void CG_DrawString( float x, float y, const char *string, 
 				   float charWidth, float charHeight, const float *modulate );
 
 
-void CG_DrawStringExt( int x, int y, const char *string, const float *setColor, 
-		bool forceColor, bool shadow, int charWidth, int charHeight, int maxChars );
-void CG_DrawBigString( int x, int y, const char *s, float alpha );
-void CG_DrawBigStringColor( int x, int y, const char *s, vec4_t color );
-void CG_DrawSmallString( int x, int y, const char *s, float alpha );
-void CG_DrawSmallStringColor( int x, int y, const char *s, vec4_t color );
 
-int CG_DrawStrlen( const char *str );
 
-float	*CG_FadeColor( int startMsec, int totalMsec );
-float *CG_TeamColor( int team );
-void CG_TileClear( );
 
 void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t color );
-void CG_DrawRect( float x, float y, float width, float height, float size, const float *color );
-void CG_DrawSides(float x, float y, float w, float h, float size);
-void CG_DrawTopBottom(float x, float y, float w, float h, float size);
 
-bool CG_GenericShadow( BasicDrawInfo_t *drawInfo, float *shadowPlane );
 
-void CG_ResetReticles( );
-void CG_AddReticleEntityToScene( refEntity_t * pReticle, ClientEntity * pTarget );
-void CG_Draw_Reticles();
 //void CG_Draw_HUD_Label( int x, int y, char * pText, float alpha );
 
 //
@@ -1418,18 +1363,6 @@ extern  char systemChat[256];
 extern  char teamChat1[256];
 extern  char teamChat2[256];
 
-void CG_AddLagometerFrameInfo( );
-void CG_AddLagometerSnapshotInfo( snapshot_t *snap );
-void CG_CenterPrint( const char *str, int y, int charWidth );
-void CG_DrawActive( stereoFrame_t stereoView );
-void CG_DrawFlagModel( float x, float y, float w, float h, int team, bool force2D );
-void CG_DrawTeamBackground( int x, int y, int w, int h, float alpha, int team );
-void CG_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, int ownerDrawFlags, 
-				  int align, float special, float scale, const vec4_t color, qhandle_t shader, int textStyle, 
-				  itemDef_t * item );
-void CG_Text_Paint(float x, float y, float scale, const vec4_t color, const char *text, float adjust, int limit, int style);
-int CG_Text_Width(const char *text, float scale, int limit);
-int CG_Text_Height(const char *text, float scale, int limit);
 void CG_SelectPrevPlayer();
 void CG_SelectNextPlayer();
 float CG_GetValue(int ownerDraw);
@@ -1439,208 +1372,115 @@ void CG_ShowResponseHead();
 void CG_SetPrintString(int type, const char *p);
 void CG_InitTeamChat();
 void CG_GetTeamColor(vec4_t *color);
-const char *CG_GetGameStatusText();
 const char *CG_GetKillerText();
-void CG_Draw3DModel( float x, float y, float w, float h, qhandle_t model, qhandle_t skin, vec3_t origin, vec3_t angles );
-void CG_Text_PaintChar(float x, float y, float width, float height, float scale, float s, float t, float s2, float t2, qhandle_t hShader);
 void CG_CheckOrderPending();
-const char *CG_GameTypeString();
 bool CG_YourTeamHasFlag();
 bool CG_OtherTeamHasFlag();
 qhandle_t CG_StatusHandle(int task);
 
-void CG_DrawStatusBar_MFQ3_new();
 
-void CG_Add_Console_Line( char * pText );
-bool CG_NewHUDActive( );
 
 //
 // cg_player.c
 //
-void CG_NewClientInfo( int clientNum );
-sfxHandle_t	CG_CustomSound( int clientNum, const char *soundName );
 void CG_TrailItem( ClientEntity *cent, qhandle_t hModel );	// ditto
 
 //
 // cg_vehicle.c
 //
-void CG_CacheVehicles();
-void CG_RegisterVehicle( clientInfo_t *ci );
-void CG_VehicleObituary( entityState_t *ent );
-void CG_VehicleMuzzleFlash( int weaponIdx, const refEntity_t *parent, qhandle_t parentModel, int idx );
-void CG_InitShadows( );
-qhandle_t CG_TeamSkin( qhandle_t model, int team );
 
 
 //
 // cg_vehicledraw.c
 //
-void CG_DrawPlane(DrawInfo_Plane_t* drawInfo);
-void CG_DrawGV(DrawInfo_GV_t* drawInfo);
-void CG_DrawBoat(DrawInfo_Boat_t* drawInfo);
-void CG_DrawHelo(DrawInfo_Helo_t* drawInfo);
-void CG_DrawLQM(DrawInfo_LQM_t* drawInfo);
-void CG_DrawGI(DrawInfo_GI_t* drawInfo);
 
 //
 // cg_plane.c
 //
-void CG_RegisterPlane( clientInfo_t *ci );
-void CG_PlaneObituary( entityState_t *ent, clientInfo_t *ci );
 
 //
 // cg_groundvehicle.c
 //
-void CG_RegisterGroundVehicle( clientInfo_t *ci );
-void CG_GroundVehicleObituary( entityState_t *ent, clientInfo_t *ci );
 
 
 //
 // cg_helo.c
 //
-void CG_RegisterHelo( clientInfo_t *ci );
-void CG_HeloObituary( entityState_t *ent, clientInfo_t *ci );
 
 
 //
 // cg_lqm.c
 //
-void CG_RegisterLQM( clientInfo_t *ci );
-void CG_LQMObituary( entityState_t *ent, clientInfo_t *ci );
 
 
 //
 // cg_boat.c
 //
-void CG_RegisterBoat( clientInfo_t *ci );
-void CG_BoatObituary( entityState_t *ent, clientInfo_t *ci );
 
 
 //
 // cg_predict.c
 //
-void CG_BuildSolidList( );
-int	CG_PointContents( const vec3_t point, int passEntityNum );
-void CG_Trace( trace_t *result, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, 
-					 int skipNumber, int mask, bool capsule = true );
-void CG_PredictPlayerState( );
 
 
 //
 // cg_events.c
 //
-const char	*CG_PlaceString( int rank );
 
 
 //
 // cg_ents.c
 //
-void CG_AddPacketEntities( );
-void CG_AdjustPositionForMover( const vec3_t in, int moverNum, int fromTime, int toTime, vec3_t out );
 
-void CG_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent, 
-							qhandle_t parentModel, char *tagName );
-void CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *parent, 
-							qhandle_t parentModel, char *tagName );
 
 
 
 //
 // cg_weapons.c
 //
-void CG_NextWeapon_f( );
-void CG_PrevWeapon_f( );
-void CG_Weapon_f( );
 
-void CG_RegisterWeapons();
-void CG_RegisterItemVisuals( int itemNum );
 
-void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType );
-void CG_GenericExplosion( vec3_t origin, int type );
-void CG_VehicleHit( vec3_t origin, int damage );
 void CG_Bullet( vec3_t origin, int sourceEntityNum, vec3_t normal, int fleshEntityNum );
 
 //
 // cg_marks.c
 //
-void	CG_InitMarkPolys( );
-void	CG_AddMarks( );
 
-void	CG_ImpactMark( qhandle_t markShader, 
-				    const vec3_t origin, const vec3_t dir, 
-					float orientation, 
-				    float r, float g, float b, float a, 
-					bool alphaFade, 
-					float radius, bool temporary );
 
-void	CG_ImpactMarkEx( qhandle_t markShader, const vec3_t origin, const vec3_t dir, 
-						 float orientation, float red, float green, float blue, float alpha,
-						 bool alphaFade, float xRadius, float yRadius, bool temporary );
 
 //
 // cg_localents.c
 //
-void	CG_InitLocalEntities( );
-LocalEntity	*CG_AllocLocalEntity( );
-void	CG_AddLocalEntities( );
 
 //
 // cg_effects.c
 //
-LocalEntity *CG_SmokePuff( const vec3_t p, 
-				   const vec3_t vel, 
-				   float radius,
-				   float r, float g, float b, float a,
-				   float duration,
-				   int startTime,
-				   int fadeInTime,
-				   int leFlags,
-				   qhandle_t hShader );
 
-LocalEntity *CG_MakeExplosion( vec3_t origin, vec3_t dir,
-								qhandle_t hModel, qhandle_t shader, int offset, int duration,
-								bool isSprite );
 
-void CG_GibPlayer( vec3_t playerOrigin );
 
 //
 // cg_snapshot.c
 //
-void CG_ProcessSnapshots( );
 
 //
 // cg_info.c
 //
-void CG_LoadingString( const char *s );
-void CG_LoadingStage( const char *s, float start, float end );
-void CG_LoadingStep( int done, int total );
-void CG_DrawInformation( );
 
 //
 // cg_scoreboard.c
 //
-void CG_DrawOldTourneyScoreboard( );
 
 //
 // cg_consolecmds.c
 //
-bool CG_ConsoleCommand( );
-void CG_InitConsoleCommands( );
 
 //
 // cg_servercmds.c
 //
-void CG_ExecuteNewServerCommands( int latestSequence );
-void CG_ParseServerinfo( );
-void CG_SetConfigValues( );
-void CG_ShaderStateChanged();
 
 //
 // cg_playerstate.c
 //
-void CG_Respawn( );
-void CG_TransitionPlayerState( playerState_t *ps, playerState_t *ops );
-void CG_CheckChangedPredictableEvents( playerState_t *ps );
 
 //
 // cg_missioneditor.c
@@ -1650,7 +1490,6 @@ void ME_SpawnGroundInstallation( int idx );
 void ME_ExportToScript( const char* scriptname );
 void ME_ImportScript( const char* scriptname );
 void ME_SetSide( const char* side );
-void CG_Draw_IGME();
 void ME_KeyEvent(int key, bool down);
 void ME_MouseEvent(int x, int y);
 void ME_Init_MissionEditor();
@@ -1806,12 +1645,154 @@ struct particleWorld_s
 };
 using particleWorld_t = particleWorld_s;
 
-void CG_ParticleWorldRender(particleWorld_t * w);
-void CG_ParticleWorldThink(particleWorld_t * w);
-int CG_AddParticleEmitter(particleWorld_t * w, particleEmitter_t * e);
-int CG_AddParticleSystem(particleWorld_t * w, particleSystem_t * s);
-void CG_ParticleWorldInit(particleWorld_t * w);
-void CG_ParticleThink(particleWorld_t * w, particle_t * p);
+class ClientGame
+{
+public:
+	static const char *configString( int index );
+	static const char *argv( int arg );
+	static void QDECL printf( const char *msg, ... ) Q_PRINTF_FUNC(1, 2);
+	static void startMusic( );
+	static void updateCvars( );
+	static int crosshairPlayer( );
+	static int lastAttacker( );
+	static void loadMenus(const char *menuFile);
+	static void keyEvent(int key, bool down);
+	static void mouseEvent(int x, int y);
+	static void eventHandling(int type);
+	static void setScoreSelection(void *menu);
+	static void buildSpectatorString();
+	static int feederCount(float feederID);
+	static float cvar_Get( const char * cvar );
+	static void testPlaneCmd_f();
+	static void testGVCmd_f();
+	static void testVehicle(long cat);
+	static void addTestVehicle ();
+	static void addTestModel ();
+	static void testModel_f ();
+	static void testGun_f ();
+	static void testModelNextFrame_f ();
+	static void testModelPrevFrame_f ();
+	static void testModelNextSkin_f ();
+	static void testModelPrevSkin_f ();
+	static void zoomDown_f( );
+	static void zoomUp_f( );
+	static void addBufferedSound( sfxHandle_t sfx);
+	static void drawActiveFrame( int serverTime, stereoFrame_t stereoView, bool demoPlayback );
+	static bool worldToScreenCoords( vec3_t worldPoint, int * pX, int * pY, bool virtualXY );
+	static void drawProgressBar( rectDef_t *rect, vec4_t color, vec4_t textcolor, float scale, int textStyle, float progress );
+	static void setScreenPlacement( screenPlacement_e placement );
+	static screenPlacement_e getScreenPlacement( );
+	static void adjustFrom640( float *x, float *y, float *w, float *h );
+	static void virtualFromScreen( float *x, float *y );
+	static void fillRect( float x, float y, float width, float height, const float *color );
+	static void drawPic( float x, float y, float width, float height, qhandle_t hShader );
+	static void drawStringExt( int x, int y, const char *string, const float *setColor, bool forceColor, bool shadow, int charWidth, int charHeight, int maxChars );
+	static void drawBigString( int x, int y, const char *s, float alpha );
+	static void drawBigStringColor( int x, int y, const char *s, vec4_t color );
+	static void drawSmallString( int x, int y, const char *s, float alpha );
+	static void drawSmallStringColor( int x, int y, const char *s, vec4_t color );
+	static int drawStrlen( const char *str );
+	static float *fadeColor( int startMsec, int totalMsec );
+	static float *teamColor( int team );
+	static void tileClear( );
+	static void drawRect( float x, float y, float width, float height, float size, const float *color );
+	static void drawSides(float x, float y, float w, float h, float size);
+	static void drawTopBottom(float x, float y, float w, float h, float size);
+	static bool genericShadow( BasicDrawInfo_t *drawInfo, float *shadowPlane );
+	static void resetReticles( );
+	static void addReticleEntityToScene( refEntity_t * pReticle, ClientEntity * pTarget );
+	static void draw_Reticles();
+	static void addLagometerFrameInfo( );
+	static void addLagometerSnapshotInfo( snapshot_t *snap );
+	static void centerPrint( const char *str, int y, int charWidth );
+	static void drawActive( stereoFrame_t stereoView );
+	static void drawFlagModel( float x, float y, float w, float h, int team, bool force2D );
+	static void drawTeamBackground( int x, int y, int w, int h, float alpha, int team );
+	static void ownerDraw(float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, int ownerDrawFlags, int align, float special, float scale, const vec4_t color, qhandle_t shader, int textStyle, itemDef_t * item );
+	static void text_Paint(float x, float y, float scale, const vec4_t color, const char *text, float adjust, int limit, int style);
+	static int text_Width(const char *text, float scale, int limit);
+	static int text_Height(const char *text, float scale, int limit);
+	static const char *getGameStatusText();
+	static void draw3DModel( float x, float y, float w, float h, qhandle_t model, qhandle_t skin, vec3_t origin, vec3_t angles );
+	static void text_PaintChar(float x, float y, float width, float height, float scale, float s, float t, float s2, float t2, qhandle_t hShader);
+	static const char *gameTypeString();
+	static void drawStatusBar_MFQ3_new();
+	static void add_Console_Line( char * pText );
+	static bool newHUDActive( );
+	static void newClientInfo( int clientNum );
+	static sfxHandle_t customSound( int clientNum, const char *soundName );
+	static void cacheVehicles();
+	static void registerVehicle( clientInfo_t *ci );
+	static void vehicleObituary( entityState_t *ent );
+	static void vehicleMuzzleFlash( int weaponIdx, const refEntity_t *parent, qhandle_t parentModel, int idx );
+	static void initShadows( );
+	static qhandle_t teamSkin( qhandle_t model, int team );
+	static void drawPlane(DrawInfo_Plane_t* drawInfo);
+	static void drawGV(DrawInfo_GV_t* drawInfo);
+	static void drawBoat(DrawInfo_Boat_t* drawInfo);
+	static void drawHelo(DrawInfo_Helo_t* drawInfo);
+	static void drawLQM(DrawInfo_LQM_t* drawInfo);
+	static void drawGI(DrawInfo_GI_t* drawInfo);
+	static void registerPlane( clientInfo_t *ci );
+	static void planeObituary( entityState_t *ent, clientInfo_t *ci );
+	static void registerGroundVehicle( clientInfo_t *ci );
+	static void groundVehicleObituary( entityState_t *ent, clientInfo_t *ci );
+	static void registerHelo( clientInfo_t *ci );
+	static void heloObituary( entityState_t *ent, clientInfo_t *ci );
+	static void registerLQM( clientInfo_t *ci );
+	static void lQMObituary( entityState_t *ent, clientInfo_t *ci );
+	static void registerBoat( clientInfo_t *ci );
+	static void boatObituary( entityState_t *ent, clientInfo_t *ci );
+	static void buildSolidList( );
+	static int pointContents( const vec3_t point, int passEntityNum );
+	static void trace( trace_t *result, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int skipNumber, int mask, bool capsule = true );
+	static void predictPlayerState( );
+	static const char *placeString( int rank );
+	static void addPacketEntities( );
+	static void adjustPositionForMover( const vec3_t in, int moverNum, int fromTime, int toTime, vec3_t out );
+	static void positionEntityOnTag( refEntity_t *entity, const refEntity_t *parent, qhandle_t parentModel, char *tagName );
+	static void positionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *parent, qhandle_t parentModel, char *tagName );
+	static void nextWeapon_f( );
+	static void prevWeapon_f( );
+	static void weapon_f( );
+	static void registerWeapons();
+	static void registerItemVisuals( int itemNum );
+	static void missileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType );
+	static void genericExplosion( vec3_t origin, int type );
+	static void vehicleHit( vec3_t origin, int damage );
+	static void initMarkPolys( );
+	static void addMarks( );
+	static void impactMark( qhandle_t markShader, const vec3_t origin, const vec3_t dir, float orientation, float r, float g, float b, float a, bool alphaFade, float radius, bool temporary );
+	static void impactMarkEx( qhandle_t markShader, const vec3_t origin, const vec3_t dir, float orientation, float red, float green, float blue, float alpha, bool alphaFade, float xRadius, float yRadius, bool temporary );
+	static void initLocalEntities( );
+	static LocalEntity *allocLocalEntity( );
+	static void addLocalEntities( );
+	static LocalEntity *smokePuff( const vec3_t p, const vec3_t vel, float radius, float r, float g, float b, float a, float duration, int startTime, int fadeInTime, int leFlags, qhandle_t hShader );
+	static LocalEntity *makeExplosion( vec3_t origin, vec3_t dir, qhandle_t hModel, qhandle_t shader, int offset, int duration, bool isSprite );
+	static void gibPlayer( vec3_t playerOrigin );
+	static void processSnapshots( );
+	static void loadingString( const char *s );
+	static void loadingStage( const char *s, float start, float end );
+	static void loadingStep( int done, int total );
+	static void drawInformation( );
+	static void drawOldTourneyScoreboard( );
+	static bool consoleCommand( );
+	static void initConsoleCommands( );
+	static void executeNewServerCommands( int latestSequence );
+	static void parseServerinfo( );
+	static void setConfigValues( );
+	static void shaderStateChanged();
+	static void respawn( );
+	static void transitionPlayerState( playerState_t *ps, playerState_t *ops );
+	static void checkChangedPredictableEvents( playerState_t *ps );
+	static void draw_IGME();
+	static void particleWorldRender(particleWorld_t * w);
+	static void particleWorldThink(particleWorld_t * w);
+	static int addParticleEmitter(particleWorld_t * w, particleEmitter_t * e);
+	static int addParticleSystem(particleWorld_t * w, particleSystem_t * s);
+	static void particleWorldInit(particleWorld_t * w);
+	static void particleThink(particleWorld_t * w, particle_t * p);
+};
 extern particleWorld_t pw;
 extern refexport_t	refExport;
 

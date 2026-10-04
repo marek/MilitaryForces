@@ -260,7 +260,7 @@ void CL_ConfigstringModified( ) {
 
 	if ( index == CS_SYSTEMINFO ) {
 		// parse serverId and other cvars
-		CL_SystemInfoChanged();
+		Client::systemInfoChanged();
 	}
 
 }
@@ -412,12 +412,12 @@ void CL_ShutdownCGame( ) {
 
 /*
 ====================
-CL_InitCGame
+Client::initCGame
 
 Should only be called by CL_StartHunkUsers
 ====================
 */
-void CL_InitCGame()
+void Client::initCGame()
 {
 	const char			*info;
 	const char			*mapname;
@@ -487,10 +487,10 @@ bool CL_GameCommand( )
 
 /*
 =====================
-CL_CGameRendering
+Client::cGameRendering
 =====================
 */
-void CL_CGameRendering( stereoFrame_t stereo ) 
+void Client::cGameRendering( stereoFrame_t stereo ) 
 {
 	theCG.drawActiveFrame( cl.serverTime, stereo, clc.demoplaying );
 }
@@ -570,10 +570,10 @@ void CL_AdjustTimeDelta( ) {
 
 /*
 ==================
-CL_FirstSnapshot
+Client::firstSnapshot
 ==================
 */
-void CL_FirstSnapshot( ) {
+void Client::firstSnapshot( ) {
 	// ignore snapshots that don't have entities
 	if ( cl.snap.snapFlags & SNAPFLAG_NOT_ACTIVE ) {
 		return;
@@ -625,7 +625,7 @@ void CL_FirstSnapshot( ) {
 		}
 		clc.voipCodecInitialized = true;
 		clc.voipMuteAll = false;
-		CommandSystem::addCommand ("voip", CL_Voip_f);
+		CommandSystem::addCommand ("voip", Client::voip_f);
 		CvarSystem::set("cl_voipSendTarget", "spatial");
 		Com_Memset(clc.voipTargets, ~0, sizeof(clc.voipTargets));
 	}
@@ -634,10 +634,10 @@ void CL_FirstSnapshot( ) {
 
 /*
 ==================
-CL_SetCGameTime
+Client::setCGameTime
 ==================
 */
-void CL_SetCGameTime( ) {
+void Client::setCGameTime( ) {
 	// getting a valid frame message ends the connection process
 	if ( clc.state != CA_ACTIVE ) {
 		if ( clc.state != CA_PRIMED ) {
@@ -650,11 +650,11 @@ void CL_SetCGameTime( ) {
 				clc.firstDemoFrameSkipped = true;
 				return;
 			}
-			CL_ReadDemoMessage();
+			Client::readDemoMessage();
 		}
 		if ( cl.newSnapshots ) {
 			cl.newSnapshots = false;
-			CL_FirstSnapshot();
+			Client::firstSnapshot();
 		}
 		if ( clc.state != CA_ACTIVE ) {
 			return;
@@ -667,7 +667,7 @@ void CL_SetCGameTime( ) {
 	}
 
 	// allow pause in single player
-	if ( sv_paused->integer && CL_CheckPaused() && com_sv_running->integer ) {
+	if ( sv_paused->integer && Client::checkPaused() && com_sv_running->integer ) {
 		// paused
 		return;
 	}
@@ -768,7 +768,7 @@ void CL_SetCGameTime( ) {
 	while ( cl.serverTime >= cl.snap.serverTime ) {
 		// feed another messag, which should change
 		// the contents of cl.snap
-		CL_ReadDemoMessage();
+		Client::readDemoMessage();
 		if ( clc.state != CA_ACTIVE ) {
 			return;		// end of demo
 		}

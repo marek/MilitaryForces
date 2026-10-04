@@ -61,7 +61,7 @@ void SV_Client::sendConfigstring( int index )
 			Q_strncpyz( buf, &theSV.configstrings_[index][sent],
 				maxChunkSize );
 
-			SV_SendServerCommand( this, "%s %i \"%s\"\n", cmd,
+			ServerMain::sendServerCommand( this, "%s %i \"%s\"\n", cmd,
 				index, buf );
 
 			sent += (maxChunkSize - 1);
@@ -69,7 +69,7 @@ void SV_Client::sendConfigstring( int index )
 		}
 	} else {
 		// standard cs, just send it
-		SV_SendServerCommand( this, "cs %i \"%s\"\n", index,
+		ServerMain::sendServerCommand( this, "cs %i \"%s\"\n", index,
 			theSV.configstrings_[index] );
 	}
 }
@@ -314,10 +314,10 @@ void SV_Startup()
 
 /*
 ==================
-SV_ChangeMaxClients
+ServerMain::changeMaxClients
 ==================
 */
-void SV_ChangeMaxClients() 
+void ServerMain::changeMaxClients() 
 {
 	// get the highest client number in use
 	int count = 0;
@@ -386,14 +386,14 @@ void SV_ClearServer()
 
 /*
 ================
-SV_SpawnServer
+ServerMain::spawnServer
 
 Change the server to a New map, taking all connected
 clients along with it.
 This is NOT called for map_restart
 ================
 */
-void SV_SpawnServer( char *server, bool killBots ) 
+void ServerMain::spawnServer( char *server, bool killBots ) 
 {
 	int			i;
 	int			checksum;
@@ -426,7 +426,7 @@ void SV_SpawnServer( char *server, bool killBots )
 	} else {
 		// check for maxclients change
 		if ( sv_maxclients->modified ) {
-			SV_ChangeMaxClients();
+			ServerMain::changeMaxClients();
 		}
 	}
 
@@ -482,7 +482,7 @@ void SV_SpawnServer( char *server, bool killBots )
 	CvarSystem::set( "sv_serverid", va("%i", theSV.serverId_ ) );
 
 	// clear physics interaction links
-	SV_ClearWorld ();
+	ServerMain::clearWorld ();
 	
 	// media configstring setting should be done during
 	// the loading stage, so connected clients don't have
@@ -620,7 +620,7 @@ void SV_SpawnServer( char *server, bool killBots )
 	theSV.state_ = Server::SS_GAME;
 
 	// send a heartbeat now so the master will get up to date info
-	SV_Heartbeat_f();
+	ServerMain::heartbeat_f();
 
 	Hunk_SetMark();
 
@@ -644,7 +644,7 @@ Only called at main exe startup, not for each game
 */
 
 void SV_Init () {
-	SV_AddOperatorCommands ();
+	ServerMain::addOperatorCommands ();
 
 	// serverinfo vars
 	CvarSystem::get ("dmflags", "0", CVAR_SERVERINFO);
@@ -709,7 +709,7 @@ void SV_Init () {
 
 /*
 ==================
-SV_FinalMessage
+ServerMain::finalMessage
 
 Used by SV_Shutdown to send a final message to all
 connected clients before the server goes down.  The messages are sent immediately,
@@ -717,7 +717,7 @@ not just stuck on the outgoing message list, because the server is going
 to totally exit after returning from this function.
 ==================
 */
-void SV_FinalMessage( const char *message ) 
+void ServerMain::finalMessage( const char *message ) 
 {
 
 	// send it twice, ignoring rate
@@ -735,8 +735,8 @@ void SV_FinalMessage( const char *message )
 				// don't send a disconnect to a local client
 				if( cl->netchan_.remoteAddress.type != NA_LOOPBACK ) 
 				{
-					SV_SendServerCommand( cl, "print \"%s\n\"\n", message );
-					SV_SendServerCommand( cl, "disconnect \"%s\"", message );
+					ServerMain::sendServerCommand( cl, "print \"%s\n\"\n", message );
+					ServerMain::sendServerCommand( cl, "disconnect \"%s\"", message );
 				}
 				// force a snapshot to be sent
 				cl->lastSnapshotTime_ = 0;
@@ -765,11 +765,11 @@ void SV_Shutdown( const char *finalmsg )
 	Network::leaveMulticast6();
 
 	if( theSVS.svClients_.size() && !com_errorEntered ) {
-		SV_FinalMessage( finalmsg );
+		ServerMain::finalMessage( finalmsg );
 	}
 
-	SV_RemoveOperatorCommands();
-	SV_MasterShutdown();
+	ServerMain::removeOperatorCommands();
+	ServerMain::masterShutdown();
 	SV_ShutdownGameProgs();
 
 	// free current level

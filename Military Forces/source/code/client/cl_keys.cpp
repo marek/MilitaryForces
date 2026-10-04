@@ -661,7 +661,7 @@ void Console_Key (int key) {
 
 		g_consoleField.widthInChars = g_console_field_width;
 
-		CL_SaveConsoleHistory( );
+		Client::saveConsoleHistory( );
 
 		if ( clc.state == CA_DISCONNECTED ) {
 			Screen::updateScreen ();	// force an update, because the command
@@ -1297,7 +1297,7 @@ void CL_KeyDownEvent( int key, unsigned time )
 				theUI.setActiveMenu( UserInterface::MenuCommand::UIMENU_INGAME );
 			}
 			else if ( clc.state != CA_DISCONNECTED ) {
-				CL_Disconnect_f();
+				Client::disconnect_f();
 				SoundSystem::stopAllSounds();
 				theUI.setActiveMenu( UserInterface::MenuCommand::UIMENU_MAIN );
 			}
@@ -1466,12 +1466,12 @@ static int	consoleSaveBufferSize = 0;
 
 /*
 ================
-CL_LoadConsoleHistory
+Client::loadConsoleHistory
 
 Load the console history from CONSOLE_HISTORY_FILE
 ================
 */
-void CL_LoadConsoleHistory( )
+void Client::loadConsoleHistory( )
 {
 	char					*token, *text_p;
 	int						i, numChars, numLines = 0;
@@ -1535,13 +1535,13 @@ void CL_LoadConsoleHistory( )
 
 /*
 ================
-CL_SaveConsoleHistory
+Client::saveConsoleHistory
 
 Save the console history into CONSOLE_HISTORY_FILE
 so that it persists across invocations of q3
 ================
 */
-void CL_SaveConsoleHistory( )
+void Client::saveConsoleHistory( )
 {
 	int						i;
 	int						lineLength, saveBufferLength, additionalLength;

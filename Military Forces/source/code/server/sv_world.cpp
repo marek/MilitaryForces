@@ -28,14 +28,14 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /*
 ================
-SV_ClipHandleForEntity
+ServerMain::clipHandleForEntity
 
 Returns a headnode that can be used for testing or clipping to a
 given entity.  If the entity is a bsp model, the headnode will
 be returned, otherwise a custom box tree will be constructed.
 ================
 */
-clipHandle_t SV_ClipHandleForEntity( EntityBase* gameEnt )
+clipHandle_t ServerMain::clipHandleForEntity( EntityBase* gameEnt )
 {
 	if ( gameEnt->r.bmodel ) 
 	{
@@ -87,10 +87,10 @@ int			sv_numworldSectors;
 
 /*
 ===============
-SV_SectorList_f
+ServerMain::sectorList_f
 ===============
 */
-void SV_SectorList_f() 
+void ServerMain::sectorList_f() 
 {
 	int				i, c;
 	worldSector_t	*sec;
@@ -152,11 +152,11 @@ worldSector_t *SV_CreateworldSector( int depth, vec3_t mins, vec3_t maxs ) {
 
 /*
 ===============
-SV_ClearWorld
+ServerMain::clearWorld
 
 ===============
 */
-void SV_ClearWorld( ) {
+void ServerMain::clearWorld( ) {
 	clipHandle_t	h;
 	vec3_t			mins, maxs;
 
@@ -500,11 +500,11 @@ struct moveclip_t {
 
 /*
 ====================
-SV_ClipToEntity
+ServerMain::clipToEntity
 
 ====================
 */
-void SV_ClipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, const vec3_t maxs,
+void ServerMain::clipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, const vec3_t maxs,
 					  const vec3_t end, int entityNum, int contentmask, bool capsule ) 
 {
 	EntityBase*		touch;
@@ -523,7 +523,7 @@ void SV_ClipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, con
 	}
 
 	// might intersect, so do an exact clip
-	clipHandle = SV_ClipHandleForEntity (touch);
+	clipHandle = ServerMain::clipHandleForEntity (touch);
 
 	origin = touch->r.currentOrigin;
 	angles = touch->r.currentAngles;
@@ -595,7 +595,7 @@ void SV_ClipMoveToEntities( moveclip_t *clip )
 		}
 
 		// might intersect, so do an exact clip
-		clipHandle = SV_ClipHandleForEntity (touch);
+		clipHandle = ServerMain::clipHandleForEntity (touch);
 
 		origin = touch->r.currentOrigin;
 		angles = touch->r.currentAngles;
@@ -718,7 +718,7 @@ int SV_PointContents( const vec3_t p, int passEntityNum )
 		}
 		hit = theSV.getEntityByNum( touch[i] );
 		// might intersect, so do an exact clip
-		clipHandle = SV_ClipHandleForEntity( hit );
+		clipHandle = ServerMain::clipHandleForEntity( hit );
 		angles = hit->r.currentAngles;
 		if ( !hit->r.bmodel ) {
 			angles = vec3_origin;	// boxes don't rotate

@@ -381,7 +381,7 @@ void Console::init () {
 		historyEditLines[i].clear();
 		historyEditLines[i].widthInChars = g_console_field_width;
 	}
-	CL_LoadConsoleHistory( );
+	Client::loadConsoleHistory( );
 
 	CommandSystem::addCommand ("toggleconsole", Console::toggleConsole_f);
 	CommandSystem::addCommand ("togglemenu", Con_ToggleMenu_f);

@@ -11,13 +11,13 @@
 
 /*
 ======================
-CG_PositionEntityOnTag
+ClientGame::positionEntityOnTag
 
 Modifies the entities position and axis by the given
 tag location
 ======================
 */
-void CG_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent, 
+void ClientGame::positionEntityOnTag( refEntity_t *entity, const refEntity_t *parent, 
 							qhandle_t parentModel, char *tagName ) {
 	int				i;
 	orientation_t	lerped;
@@ -40,13 +40,13 @@ void CG_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent,
 
 /*
 ======================
-CG_PositionRotatedEntityOnTag
+ClientGame::positionRotatedEntityOnTag
 
 Modifies the entities position and axis by the given
 tag location
 ======================
 */
-void CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *parent, 
+void ClientGame::positionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *parent, 
 							qhandle_t parentModel, char *tagName ) {
 	int				i;
 	orientation_t	lerped;
@@ -616,12 +616,12 @@ void CG_RotatePoint(vec3_t point, vec3_t matrix[3]) {
 
 /*
 =========================
-CG_AdjustPositionForMover
+ClientGame::adjustPositionForMover
 
 Also called by client movement prediction code
 =========================
 */
-void CG_AdjustPositionForMover( const vec3_t in, int moverNum, int fromTime, int toTime, vec3_t out ) {
+void ClientGame::adjustPositionForMover( const vec3_t in, int moverNum, int fromTime, int toTime, vec3_t out ) {
 	ClientEntity	*cent;
 	vec3_t	oldOrigin, origin, deltaOrigin;
 	vec3_t	oldAngles, angles, deltaAngles;
@@ -786,7 +786,7 @@ void ClientEntity::calcEntityLerpPositions() {
 	// adjust for riding a mover if it wasn't rolled into the predicted
 	// player state
 	if ( this != &cg.predictedPlayerEntity ) {
-		CG_AdjustPositionForMover( this->lerpOrigin, this->currentState.groundEntityNum, 
+		ClientGame::adjustPositionForMover( this->lerpOrigin, this->currentState.groundEntityNum, 
 		cg.snap->serverTime, cg.time, this->lerpOrigin );
 	}
 }
@@ -887,11 +887,11 @@ void ClientEntity::addCEntity() {
 
 /*
 ===============
-CG_AddPacketEntities
+ClientGame::addPacketEntities
 
 ===============
 */
-void CG_AddPacketEntities( ) {
+void ClientGame::addPacketEntities( ) {
 	int					num;
 	ClientEntity			*cent;
 	playerState_t		*ps;

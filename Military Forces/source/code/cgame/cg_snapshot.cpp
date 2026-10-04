@@ -82,13 +82,13 @@ void CG_SetInitialSnapshot( snapshot_t *snap ) {
 	GameShared::playerStateToEntityState( &snap->ps, &cg_entities[ snap->ps.clientNum ].currentState, false );
 
 	// sort out solid entities
-	CG_BuildSolidList();
+	ClientGame::buildSolidList();
 
-	CG_ExecuteNewServerCommands( snap->serverCommandSequence );
+	ClientGame::executeNewServerCommands( snap->serverCommandSequence );
 
 	// set our local weapon selection pointer to
 	// what the server has indicated the current weapon is
-	CG_Respawn();
+	ClientGame::respawn();
 
 	for ( i = 0 ; i < cg.snap->numEntities ; i++ ) {
 		state = &cg.snap->entities[ i ];
@@ -127,7 +127,7 @@ static void CG_TransitionSnapshot( ) {
 	}
 
 	// execute any server string commands before transitioning entities
-	CG_ExecuteNewServerCommands( cg.nextSnap->serverCommandSequence );
+	ClientGame::executeNewServerCommands( cg.nextSnap->serverCommandSequence );
 
 	// if we had a map_restart, set everthing with initial
 	if ( !cg.snap ) {
@@ -171,7 +171,7 @@ static void CG_TransitionSnapshot( ) {
 		// reason, then the client events and view changes will be issued now
 		if ( cg.demoPlayback || (cg.snap->ps.pm_flags & PMF_FOLLOW)
 			|| cg_nopredict.integer || cg_synchronousClients.integer ) {
-			CG_TransitionPlayerState( ps, ops );
+			ClientGame::transitionPlayerState( ps, ops );
 		}
 	}
 
@@ -245,7 +245,7 @@ static void CG_SetNextSnap( snapshot_t *snap ) {
 	}
 
 	// sort out solid entities
-	CG_BuildSolidList();
+	ClientGame::buildSolidList();
 }
 
 
@@ -264,7 +264,7 @@ static snapshot_t *CG_ReadNextSnapshot( ) {
 	snapshot_t	*dest;
 
 	if ( cg.latestSnapshotNum > cgs.processedSnapshotNum + 1000 ) {
-		CG_Printf( "WARNING: CG_ReadNextSnapshot: way out of range, %i > %i", 
+		ClientGame::printf( "WARNING: CG_ReadNextSnapshot: way out of range, %i > %i", 
 			cg.latestSnapshotNum, cgs.processedSnapshotNum );
 	}
 
@@ -287,7 +287,7 @@ static snapshot_t *CG_ReadNextSnapshot( ) {
 
 		// if it succeeded, return
 		if ( r ) {
-			CG_AddLagometerSnapshotInfo( dest );
+			ClientGame::addLagometerSnapshotInfo( dest );
 			return dest;
 		}
 
@@ -297,7 +297,7 @@ static snapshot_t *CG_ReadNextSnapshot( ) {
 		// buffer in the client system.
 
 		// record as a dropped packet
-		CG_AddLagometerSnapshotInfo( nullptr );
+		ClientGame::addLagometerSnapshotInfo( nullptr );
 
 		// If there are additional snapshots, continue trying to
 		// read them.
@@ -310,7 +310,7 @@ static snapshot_t *CG_ReadNextSnapshot( ) {
 
 /*
 ============
-CG_ProcessSnapshots
+ClientGame::processSnapshots
 
 We are trying to set up a renderable view, so determine
 what the simulated time is, and try to get snapshots
@@ -327,7 +327,7 @@ of an interpolating one)
 
 ============
 */
-void CG_ProcessSnapshots( ) {
+void ClientGame::processSnapshots( ) {
 	snapshot_t		*snap;
 	int				n;
 

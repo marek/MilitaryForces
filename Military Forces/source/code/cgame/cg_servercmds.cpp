@@ -28,34 +28,34 @@ static void CG_ParseScores( )
 {
 	int	i, objectives;
 
-	cg.numScores = atoi( CG_Argv( 1 ) );
+	cg.numScores = atoi( ClientGame::argv( 1 ) );
 	if ( cg.numScores > MAX_CLIENTS )
 	{
 		cg.numScores = MAX_CLIENTS;
 	}
 
-	cg.teamScores[0] = atoi( CG_Argv( 2 ) );
-	cg.teamScores[1] = atoi( CG_Argv( 3 ) );
+	cg.teamScores[0] = atoi( ClientGame::argv( 2 ) );
+	cg.teamScores[1] = atoi( ClientGame::argv( 3 ) );
 
 	memset( cg.scores, 0, sizeof( cg.scores ) );
 	for ( i = 0 ; i < cg.numScores ; i++ )
 	{
 		//
-		cg.scores[i].client = atoi( CG_Argv( i * SCORE_BLOCK + 4 ) );
-		cg.scores[i].score = atoi( CG_Argv( i * SCORE_BLOCK + 5 ) );
-		cg.scores[i].ping = atoi( CG_Argv( i * SCORE_BLOCK + 6 ) );
-		cg.scores[i].time = atoi( CG_Argv( i * SCORE_BLOCK + 7 ) );
-		cg.scores[i].scoreFlags = atoi( CG_Argv( i * SCORE_BLOCK + 8 ) );
-		objectives = atoi( CG_Argv( i * SCORE_BLOCK + 9 ) );
-		cg.scores[i].accuracy = atoi(CG_Argv( i * SCORE_BLOCK + 10));
-		cg.scores[i].impressiveCount = atoi(CG_Argv( i * SCORE_BLOCK + 11));
-		cg.scores[i].excellentCount = atoi(CG_Argv (i * SCORE_BLOCK + 12));
-		cg.scores[i].guantletCount = atoi(CG_Argv( i * SCORE_BLOCK + 13));
-		cg.scores[i].defendCount = atoi(CG_Argv( i * SCORE_BLOCK + 14));
-		cg.scores[i].assistCount = atoi(CG_Argv( i * 14 + 15));
-		cg.scores[i].perfect = atoi(CG_Argv( i * SCORE_BLOCK + 16));
-		cg.scores[i].captures = atoi(CG_Argv(i * SCORE_BLOCK + 17));
-		cg.scores[i].deaths = atoi( CG_Argv( i * SCORE_BLOCK + 18 ) );
+		cg.scores[i].client = atoi( ClientGame::argv( i * SCORE_BLOCK + 4 ) );
+		cg.scores[i].score = atoi( ClientGame::argv( i * SCORE_BLOCK + 5 ) );
+		cg.scores[i].ping = atoi( ClientGame::argv( i * SCORE_BLOCK + 6 ) );
+		cg.scores[i].time = atoi( ClientGame::argv( i * SCORE_BLOCK + 7 ) );
+		cg.scores[i].scoreFlags = atoi( ClientGame::argv( i * SCORE_BLOCK + 8 ) );
+		objectives = atoi( ClientGame::argv( i * SCORE_BLOCK + 9 ) );
+		cg.scores[i].accuracy = atoi(ClientGame::argv( i * SCORE_BLOCK + 10));
+		cg.scores[i].impressiveCount = atoi(ClientGame::argv( i * SCORE_BLOCK + 11));
+		cg.scores[i].excellentCount = atoi(ClientGame::argv (i * SCORE_BLOCK + 12));
+		cg.scores[i].guantletCount = atoi(ClientGame::argv( i * SCORE_BLOCK + 13));
+		cg.scores[i].defendCount = atoi(ClientGame::argv( i * SCORE_BLOCK + 14));
+		cg.scores[i].assistCount = atoi(ClientGame::argv( i * 14 + 15));
+		cg.scores[i].perfect = atoi(ClientGame::argv( i * SCORE_BLOCK + 16));
+		cg.scores[i].captures = atoi(ClientGame::argv(i * SCORE_BLOCK + 17));
+		cg.scores[i].deaths = atoi( ClientGame::argv( i * SCORE_BLOCK + 18 ) );
 
 		if ( cg.scores[i].client < 0 || cg.scores[i].client >= MAX_CLIENTS )
 		{
@@ -79,7 +79,7 @@ static void CG_ParseTeamInfo( ) {
 	int		i;
 	int		client;
 
-	numSortedTeamPlayers = atoi( CG_Argv( 1 ) );
+	numSortedTeamPlayers = atoi( ClientGame::argv( 1 ) );
 	if( numSortedTeamPlayers < 0 || numSortedTeamPlayers > TEAM_MAXOVERLAY )
 	{
 		Common::error( ERR_DROP, "CG_ParseTeamInfo: numSortedTeamPlayers out of range (%d)",
@@ -88,7 +88,7 @@ static void CG_ParseTeamInfo( ) {
 	}
 
 	for ( i = 0 ; i < numSortedTeamPlayers ; i++ ) {
-		client = atoi( CG_Argv( i * 6 + 2 ) );
+		client = atoi( ClientGame::argv( i * 6 + 2 ) );
 		if( client < 0 || client >= MAX_CLIENTS )
 		{
 		  Common::error( ERR_DROP, "CG_ParseTeamInfo: bad client number: %d", client );
@@ -97,29 +97,29 @@ static void CG_ParseTeamInfo( ) {
 
 		sortedTeamPlayers[i] = client;
 
-		cgs.clientinfo[ client ].location = atoi( CG_Argv( i * 6 + 3 ) );
-		cgs.clientinfo[ client ].health = atoi( CG_Argv( i * 6 + 4 ) );
-		cgs.clientinfo[ client ].curWeapon = atoi( CG_Argv( i * 6 + 5 ) );
-		cgs.clientinfo[ client ].objectives = atoi( CG_Argv( i * 6 + 6 ) );
+		cgs.clientinfo[ client ].location = atoi( ClientGame::argv( i * 6 + 3 ) );
+		cgs.clientinfo[ client ].health = atoi( ClientGame::argv( i * 6 + 4 ) );
+		cgs.clientinfo[ client ].curWeapon = atoi( ClientGame::argv( i * 6 + 5 ) );
+		cgs.clientinfo[ client ].objectives = atoi( ClientGame::argv( i * 6 + 6 ) );
 	}
 }
 
 
 /*
 ================
-CG_ParseServerinfo
+ClientGame::parseServerinfo
 
 This is called explicitly when the gamestate is first received,
 and whenever the server updates any serverinfo flagged cvars
 ================
 */
-void CG_ParseServerinfo( ) {
+void ClientGame::parseServerinfo( ) {
 	const char	*info;
 	char	*mapname;
 	char	gs[32];
 	unsigned int newset = cgs.gameset;
 
-	info = CG_ConfigString( CS_SERVERINFO );
+	info = ClientGame::configString( CS_SERVERINFO );
 	cgs.gametype = static_cast<gametype_t>(atoi( Info::valueForKey( info, "g_gametype" ) ));
 	CvarSystem::set("g_gametype", va("%i", cgs.gametype));
 	cgs.dmflags = atoi( Info::valueForKey( info, "dmflags" ) );
@@ -161,7 +161,7 @@ static void CG_ParseWarmup( ) {
 	const char	*info;
 	int			warmup;
 
-	info = CG_ConfigString( CS_WARMUP );
+	info = ClientGame::configString( CS_WARMUP );
 
 	warmup = atoi( info );
 	cg.warmupCount = -1;
@@ -179,31 +179,31 @@ static void CG_ParseWarmup( ) {
 
 /*
 ================
-CG_SetConfigValues
+ClientGame::setConfigValues
 
 Called on load to set the initial values from configure strings
 ================
 */
-void CG_SetConfigValues( ) {
+void ClientGame::setConfigValues( ) {
 	const char *s;
 
-	cgs.scores1 = atoi( CG_ConfigString( CS_SCORES1 ) );
-	cgs.scores2 = atoi( CG_ConfigString( CS_SCORES2 ) );
-	cgs.levelStartTime = atoi( CG_ConfigString( CS_LEVEL_START_TIME ) );
+	cgs.scores1 = atoi( ClientGame::configString( CS_SCORES1 ) );
+	cgs.scores2 = atoi( ClientGame::configString( CS_SCORES2 ) );
+	cgs.levelStartTime = atoi( ClientGame::configString( CS_LEVEL_START_TIME ) );
 	if( cgs.gametype == GT_CTF ) {
-		s = CG_ConfigString( CS_FLAGSTATUS );
+		s = ClientGame::configString( CS_FLAGSTATUS );
 		cgs.redflag = s[0] - '0';
 		cgs.blueflag = s[1] - '0';
 	}
-	cg.warmup = atoi( CG_ConfigString( CS_WARMUP ) );
+	cg.warmup = atoi( ClientGame::configString( CS_WARMUP ) );
 }
 
 /*
 =====================
-CG_ShaderStateChanged
+ClientGame::shaderStateChanged
 =====================
 */
-void CG_ShaderStateChanged() {
+void ClientGame::shaderStateChanged() {
 	char originalShader[MAX_QPATH];
 	char newShader[MAX_QPATH];
 	char timeOffset[16];
@@ -211,7 +211,7 @@ void CG_ShaderStateChanged() {
 	char *n,*t;
 	int length;
 
-	o = CG_ConfigString( CS_SHADERSTATE );
+	o = ClientGame::configString( CS_SHADERSTATE );
 	while (o && *o) {
 		n = const_cast<char *>(strstr(o, "="));
 		if (n && *n) {
@@ -258,20 +258,20 @@ static void CG_ConfigStringModified( ) {
 	const char	*str;
 	int		num;
 
-	num = atoi( CG_Argv( 1 ) );
+	num = atoi( ClientGame::argv( 1 ) );
 
 	// get the gamestate from the client system, which will have the
 	// New configstring already integrated
 	CL_GetGameState( &cgs.gameState );
 
 	// look up the individual string that was modified
-	str = CG_ConfigString( num );
+	str = ClientGame::configString( num );
 
 	// do something with it if necessary
 	if ( num == CS_MUSIC ) {
-		CG_StartMusic();
+		ClientGame::startMusic();
 	} else if ( num == CS_SERVERINFO ) {
-		CG_ParseServerinfo();
+		ClientGame::parseServerinfo();
 	} else if ( num == CS_WARMUP ) {
 		CG_ParseWarmup();
 	} else if ( num == CS_SCORES1 ) {
@@ -311,8 +311,8 @@ static void CG_ConfigStringModified( ) {
 			cgs.gameSounds[ num-CS_SOUNDS] = SoundSystem::registerSound( str, false );
 		}
 	} else if ( num >= CS_PLAYERS && num < CS_PLAYERS+MAX_CLIENTS ) {
-		CG_NewClientInfo( num - CS_PLAYERS );
-		CG_BuildSpectatorString();
+		ClientGame::newClientInfo( num - CS_PLAYERS );
+		ClientGame::buildSpectatorString();
 	} else if ( num == CS_FLAGSTATUS ) {
 		if( cgs.gametype == GT_CTF ) {
 			// format is rb where its red/blue, 0 is at base, 1 is taken, 2 is dropped
@@ -321,7 +321,7 @@ static void CG_ConfigStringModified( ) {
 		}
 	}
 	else if ( num == CS_SHADERSTATE ) {
-		CG_ShaderStateChanged();
+		ClientGame::shaderStateChanged();
 	}
 		
 }
@@ -416,11 +416,11 @@ require a reload of all the media
 static void CG_MapRestart( ) {
 
 	if ( cg_showmiss.integer ) {
-		CG_Printf( "CG_MapRestart\n" );
+		ClientGame::printf( "CG_MapRestart\n" );
 	}
 
-	CG_InitLocalEntities();
-	CG_InitMarkPolys();
+	ClientGame::initLocalEntities();
+	ClientGame::initMarkPolys();
 
 	// make sure the "3 frags left" warnings play again
 	cg.fraglimitWarnings = 0;
@@ -435,7 +435,7 @@ static void CG_MapRestart( ) {
 
 	cg.mapRestart = true;
 
-	CG_StartMusic();
+	ClientGame::startMusic();
 
 	SoundSystem::clearLoopingSounds(true);
 
@@ -452,9 +452,9 @@ static void CG_MapRestart( ) {
 	// play the "fight" sound if this is a restart without warmup
 	if ( cg.warmup == 0 && cgs.gametype != GT_MISSION_EDITOR /* && cgs.gametype == GT_TOURNAMENT */) {
 		SoundSystem::startLocalSound( cgs.media.countFightSound, CHAN_ANNOUNCER );
-		CG_CenterPrint( "FIGHT!", 120, GIANTCHAR_WIDTH*2 );
+		ClientGame::centerPrint( "FIGHT!", 120, GIANTCHAR_WIDTH*2 );
 	} else if ( cgs.gametype == GT_MISSION_EDITOR ) {
-		CG_CenterPrint( "EDIT!", 120, GIANTCHAR_WIDTH*2 );
+		ClientGame::centerPrint( "EDIT!", 120, GIANTCHAR_WIDTH*2 );
 	}
 }
 
@@ -482,7 +482,7 @@ CG_PrintExtractExtra
 */
 static void CG_PrintExtractExtra( )
 {
-	const char	*extraCmd = CG_Argv(2);
+	const char	*extraCmd = ClientGame::argv(2);
 
 	// intercepts 'print' commands and forwards the text onto other parts if need be
 
@@ -493,7 +493,7 @@ static void CG_PrintExtractExtra( )
 		if( strcmp( extraCmd, "<scoreboard>" ) == 0 )
 		{
 			// copy the first parameter into the information chars
-			strcpy( cg.scoreboardMisc, CG_Argv(1) );
+			strcpy( cg.scoreboardMisc, ClientGame::argv(1) );
 		}
 	}
 }
@@ -510,7 +510,7 @@ static void CG_ServerCommand( ) {
 	const char	*cmd;
 	char		text[MAX_SAY_TEXT];
 
-	cmd = CG_Argv(0);
+	cmd = ClientGame::argv(0);
 
 	if ( !cmd[0] ) {
 		// server claimed the command
@@ -518,7 +518,7 @@ static void CG_ServerCommand( ) {
 	}
 
 	if ( !strcmp( cmd, "cp" ) ) {
-		CG_CenterPrint( CG_Argv(1), SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
+		ClientGame::centerPrint( ClientGame::argv(1), SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
 		return;
 	}
 
@@ -529,26 +529,26 @@ static void CG_ServerCommand( ) {
 
 	if ( !strcmp( cmd, "print" ) ) {
 		CG_PrintExtractExtra( );
-		CG_Printf( "%s", CG_Argv(1) );
+		ClientGame::printf( "%s", ClientGame::argv(1) );
 		return;
 	}
 
 	if ( !strcmp( cmd, "chat" ) ) {
 		if ( !cg_teamChatsOnly.integer ) {
 			SoundSystem::startLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
-			Q_strncpyz( text, CG_Argv(1), MAX_SAY_TEXT );
+			Q_strncpyz( text, ClientGame::argv(1), MAX_SAY_TEXT );
 			CG_RemoveChatEscapeChar( text );
-			CG_Printf( "%s\n", text );
+			ClientGame::printf( "%s\n", text );
 		}
 		return;
 	}
 
 	if ( !strcmp( cmd, "tchat" ) ) {
 		SoundSystem::startLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
-		Q_strncpyz( text, CG_Argv(1), MAX_SAY_TEXT );
+		Q_strncpyz( text, ClientGame::argv(1), MAX_SAY_TEXT );
 		CG_RemoveChatEscapeChar( text );
 		CG_AddToTeamChat( text );
-		CG_Printf( "%s\n", text );
+		ClientGame::printf( "%s\n", text );
 		return;
 	}
 
@@ -569,7 +569,7 @@ static void CG_ServerCommand( ) {
 
   if ( Q_stricmp (cmd, "remapShader") == 0 ) {
 		if (CommandSystem::argc() == 4) {
-			refExport.RemapShader(CG_Argv(1), CG_Argv(2), CG_Argv(3));
+			refExport.RemapShader(ClientGame::argv(1), ClientGame::argv(2), ClientGame::argv(3));
 		}
 	}
 
@@ -582,7 +582,7 @@ static void CG_ServerCommand( ) {
 
 	if( !strcmp( cmd, "me_spawnvehicle" ) ) {
 		if( CommandSystem::argc() == 2 ) {
-			int idx = atoi(CG_Argv(1));
+			int idx = atoi(ClientGame::argv(1));
 			ME_SpawnVehicle(idx);
 		}
 		return;
@@ -590,25 +590,25 @@ static void CG_ServerCommand( ) {
 
 	if( !strcmp( cmd, "me_spawnvehiclegi" ) ) {
 		if( CommandSystem::argc() == 2 ) {
-			int idx = atoi(CG_Argv(1));
+			int idx = atoi(ClientGame::argv(1));
 			ME_SpawnGroundInstallation(idx);
 		}
 		return;
 	}
 
-	CG_Printf( "Unknown client game command: %s\n", cmd );
+	ClientGame::printf( "Unknown client game command: %s\n", cmd );
 }
 
 
 /*
 ====================
-CG_ExecuteNewServerCommands
+ClientGame::executeNewServerCommands
 
 Execute all of the server commands that were received along
 with this this snapshot.
 ====================
 */
-void CG_ExecuteNewServerCommands( int latestSequence ) 
+void ClientGame::executeNewServerCommands( int latestSequence ) 
 {
 	while ( cgs.serverCommandSequence < latestSequence ) 
 	{

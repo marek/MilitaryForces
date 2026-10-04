@@ -98,14 +98,14 @@ void SV_GameSendServerCommand( int clientNum, const char *text )
 {
 	if ( clientNum == -1 ) 
 	{
-		SV_SendServerCommand( nullptr, "%s", text );
+		ServerMain::sendServerCommand( nullptr, "%s", text );
 	} 
 	else 
 	{
 		if ( clientNum < 1 || clientNum > sv_maxclients->integer || !theSVS.svClients_.at(clientNum) ) 
 			return;
 
-		SV_SendServerCommand( theSVS.svClients_.at(clientNum), "%s", text );	
+		ServerMain::sendServerCommand( theSVS.svClients_.at(clientNum), "%s", text );	
 	}
 }
 
@@ -191,12 +191,12 @@ bool SV_inPVS (const vec3_t p1, const vec3_t p2)
 
 /*
 =================
-SV_inPVSIgnorePortals
+ServerMain::inPVSIgnorePortals
 
 Does NOT check portalareas
 =================
 */
-bool SV_inPVSIgnorePortals( const vec3_t p1, const vec3_t p2)
+bool ServerMain::inPVSIgnorePortals( const vec3_t p1, const vec3_t p2)
 {
 	int		leafnum;
 	int		cluster;
@@ -251,7 +251,7 @@ bool SV_EntityContact( const vec3_t mins, const vec3_t maxs, EntityBase* gameEnt
 	origin = gameEnt->r.currentOrigin;
 	angles = gameEnt->r.currentAngles;
 
-	ch = SV_ClipHandleForEntity( gameEnt );
+	ch = ServerMain::clipHandleForEntity( gameEnt );
 	CollisionModel::transformedBoxTrace ( &trace, vec3_origin, vec3_origin, const_cast<float *>(mins), const_cast<float *>(maxs),
 		ch, -1, origin, angles, capsule );
 
@@ -351,12 +351,12 @@ void SV_InitGame()
 
 /*
 ===================
-SV_RestartGameProgs
+ServerMain::restartGameProgs
 
 Called on a map_restart, but not on a normal map change
 ===================
 */
-void SV_RestartGameProgs( ) 
+void ServerMain::restartGameProgs( ) 
 {
 	if( !theSG.isInitialized() )
 		return;

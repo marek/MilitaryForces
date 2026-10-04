@@ -355,14 +355,14 @@ int cl_connectedToCheatServer;
 
 /*
 ==================
-CL_SystemInfoChanged
+Client::systemInfoChanged
 
 The systeminfo configstring has been changed, so parse
 new information out of it.  This will happen at every
 gamestate, and possibly during gameplay.
 ==================
 */
-void CL_SystemInfoChanged( ) {
+void Client::systemInfoChanged( ) {
 	char			*systemInfo;
 	const char		*s, *t;
 	char			key[BIG_INFO_KEY];
@@ -496,7 +496,7 @@ void CL_ParseGamestate( Message *msg ) {
 	clc.connectPacketCount = 0;
 
 	// wipe local client state
-	CL_ClearState();
+	Client::clearState();
 
 	// a gamestate always marks a server command sequence
 	clc.serverCommandSequence = msg->readLong();
@@ -552,11 +552,11 @@ void CL_ParseGamestate( Message *msg ) {
 	CL_ParseServerInfo();
 
 	// parse serverId and other cvars
-	CL_SystemInfoChanged();
+	Client::systemInfoChanged();
 
 	// stop recording now so the demo won't have an unnecessary level load at the end.
 	if(cl_autoRecordDemo->integer && clc.demorecording)
-		CL_StopRecord_f();
+		Client::stopRecord_f();
 	
 	// reinitialize the filesystem if the game directory has changed
 	if(!cl_oldGameSet && (CvarSystem::flags("fs_game") & CVAR_MODIFIED))
@@ -569,7 +569,7 @@ void CL_ParseGamestate( Message *msg ) {
 
 	// This used to call CL_StartHunkUsers, but now we enter the download state before loading the
 	// cgame
-	CL_InitDownloads();
+	Client::initDownloads();
 
 	// make sure the game starts
 	CvarSystem::set( "cl_paused", "0" );
@@ -636,7 +636,7 @@ void CL_ParseDownload ( Message *msg ) {
 		if (!clc.download) {
 			Common::printf( "Could not create %s\n", clc.downloadTempName );
 			CL_AddReliableCommand("stopdl", false);
-			CL_NextDownload();
+			Client::nextDownload();
 			return;
 		}
 	}
@@ -666,11 +666,11 @@ void CL_ParseDownload ( Message *msg ) {
 		// loading right away.  If we take a while to load, the server is happily trying
 		// to send us that last block over and over.
 		// Write it twice to help make sure we acknowledge the download
-		CL_WritePacket();
-		CL_WritePacket();
+		Client::writePacket();
+		Client::writePacket();
 
 		// get another file if needed
-		CL_NextDownload ();
+		Client::nextDownload ();
 	}
 }
 
@@ -875,10 +875,10 @@ void CL_ParseCommandString( Message *msg ) {
 
 /*
 =====================
-CL_ParseServerMessage
+Client::parseServerMessage
 =====================
 */
-void CL_ParseServerMessage( Message *msg ) {
+void Client::parseServerMessage( Message *msg ) {
 	int			cmd;
 
 	if ( cl_shownet->integer == 1 ) {

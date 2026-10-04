@@ -886,7 +886,7 @@ void SV_Client::sendMessageToClient( Message *msg )
 =======================
 SV_SendClientSnapshot
 
-Also called by SV_FinalMessage
+Also called by ServerMain::finalMessage
 
 =======================
 */
@@ -935,10 +935,10 @@ void SV_Client::sendClientSnapshot()
 
 /*
 =======================
-SV_SendClientMessages
+ServerMain::sendClientMessages
 =======================
 */
-void SV_SendClientMessages()
+void ServerMain::sendClientMessages()
 {
 	// send a message to each connected client
 	for( int i = 1; i <= sv_maxclients->integer; i++ ) 
