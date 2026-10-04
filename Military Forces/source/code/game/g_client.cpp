@@ -126,6 +126,30 @@ bool SpotWouldTelefrag( GameEntity *spot, int vehicle )
 		if ( hit && (hit->client_ || hit->s.eType == ET_MISC_VEHICLE) ) 
 			return true;
 	}
+
+	if( !(availableVehicles[vehicle].cat & (CAT_PLANE|CAT_HELO)) )
+		return false;
+	constexpr float approachSeconds = 3.0f;
+	constexpr float approachRadius = 350.0f;
+	for( int i = 1; i <= theLevel.maxclients_; i++ )
+	{
+		GameEntity* other = theLevel.getEntity( i );
+		if( !other || !other->inuse_ || !other->client_ || other->health_ <= 0 || other->client_->vehicle_ < 0 )
+			continue;
+		if( !(availableVehicles[other->client_->vehicle_].cat & (CAT_PLANE|CAT_HELO)) )
+			continue;
+		vec3_t rel;
+		VectorSubtract( spot->s.origin, other->r.currentOrigin, rel );
+		const float* velocity = other->client_->ps_.velocity;
+		const float speedSquared = DotProduct( velocity, velocity );
+		if( speedSquared < 1.0f )
+			continue;
+		const float when = std::clamp( DotProduct( rel, velocity ) / speedSquared, 0.0f, approachSeconds );
+		vec3_t miss;
+		VectorMA( rel, -when, velocity, miss );
+		if( VectorLength( miss ) < approachRadius )
+			return true;
+	}
 	return false;
 }
 

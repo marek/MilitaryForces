@@ -940,7 +940,12 @@ extern	vmCvar_t	g_stealthPenalty;
 extern	vmCvar_t	g_botMinPlayers;
 extern	vmCvar_t	g_botSkill;
 extern	vmCvar_t	g_ruseReset;
+#if defined(_DEBUG) && !defined(MF_BOT_DEBUG)
+#define MF_BOT_DEBUG
+#endif
+#ifdef MF_BOT_DEBUG
 extern	vmCvar_t	g_botDebug;
+#endif
 extern	vmCvar_t	g_botLanding;
 extern	vmCvar_t	g_botVehicles;
 extern	vmCvar_t	g_abandonTime;

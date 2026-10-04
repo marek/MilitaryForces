@@ -1,193 +1,274 @@
-#include "../g_local.h"
-#include "../g_level.h"
-#include "bot.h"
-#include "bot_local.h"
-#include <algorithm>
-#include <cmath>
+#include "bot_mind.h"
 
-void Bots::thinkSurface( GameEntity* ent, State& bot, const Sense& sense, usercmd_t& cmd, vec3_t view )
+using behavior::Status;
+
+struct SurfaceTasks
 {
-	GameClient* client = ent->client_;
-	const playerState_t& ps = client->ps_;
-	const completeVehicleData_t& veh = availableVehicles[client->vehicle_];
-	const bool boat = (veh.cat & CAT_BOAT) != 0;
+	using Mind = Bots::Mind;
+	using Goal = Bots::Goal;
 
-	if( bot.desire != Goal::Capture && (theLevel.time_ > bot.goalTime || Distance( ent->r.currentOrigin, bot.goal ) < 400 ) )
-		pickGoal( ent, bot, boat ? 6000 : 4000 );
+	static bool groundEnemy( const Mind& c ) { return c.sense.enemy && !c.sense.enemyAir; }
 
-	vec3_t dir, angles;
-	bool hold = false;
-	if( sense.enemy && !sense.enemyAir && bot.desire != Goal::Capture )
+	static bool hidingFromAircraft( Mind& c ) { return c.bot.desire == Goal::Hide && c.sense.airThreat; }
+	static bool wantsHullDown( Mind& c )
 	{
-		VectorCopy( sense.enemyDir, dir );
-		hold = sense.enemyDist < 1500;
+		return c.bot.desire == Goal::Attack && groundEnemy( c ) && !c.boat && c.sense.enemyDist > 900 && c.sense.enemyDist < 4500 && c.who().caution > 0.5f;
 	}
-	else
-		VectorSubtract( bot.goal, ent->r.currentOrigin, dir );
+	static bool rearming( Mind& c ) { return c.bot.desire == Goal::Rearm && c.bot.pad >= 0; }
+	static bool evading( Mind& c ) { return c.bot.desire == Goal::Evade && c.sense.enemy; }
+	static bool engaging( Mind& c ) { return groundEnemy( c ) && c.bot.desire != Goal::Capture; }
+	static bool reversing( Mind& c ) { return theLevel.time_ < c.bot.reverseTime; }
+	static bool hasEnemy( Mind& c ) { return c.sense.enemy != nullptr; }
 
-	flares( ent, bot, sense, cmd );
-	if( bot.desire == Goal::Hide && sense.airThreat )
+	static bool waterAt( const Mind& c, const vec3_t forward, float reach, bool& drop )
 	{
-		if( !bot.hasHide || theLevel.time_ > bot.hideTime )
-		{
-			bot.hasHide = findHidePoint( ent, bot, sense.airThreat );
-			bot.hideTime = theLevel.time_ + 4000;
-		}
-		if( bot.hasHide )
-		{
-			VectorSubtract( bot.hidePoint, ent->r.currentOrigin, dir );
-			hold = fabs( dir[0] ) + fabs( dir[1] ) < 90;
-		}
-		else
-		{
-			VectorSubtract( ent->r.currentOrigin, sense.airThreat->r.currentOrigin, dir );
-			hold = false;
-		}
-	}
-	else if( bot.desire == Goal::Attack && sense.enemy && !sense.enemyAir && !boat && sense.enemyDist > 900 && sense.enemyDist < 4500 &&
-		character( bot ).caution > 0.5f )
-	{
-		if( theLevel.time_ > bot.hideTime )
-		{
-			bot.hasHide = findHidePoint( ent, bot, sense.enemy, true );
-			bot.hideTime = theLevel.time_ + 5000;
-		}
-		if( bot.hasHide )
-		{
-			VectorSubtract( bot.hidePoint, ent->r.currentOrigin, dir );
-			hold = fabs( dir[0] ) + fabs( dir[1] ) < 90;
-		}
-	}
-	else if( bot.desire == Goal::Rearm && bot.pad >= 0 )
-	{
-		VectorSubtract( pads_[bot.pad].spot, ent->r.currentOrigin, dir );
-		hold = fabs( dir[0] ) + fabs( dir[1] ) < 80;
-		if( hold && replenished( ent ) )
-			finishRearm( ent, bot );
-	}
-	else
-	{
-		bot.hasHide = false;
-		if( bot.desire == Goal::Evade && sense.enemy )
-		{
-			VectorNegate( sense.enemyDir, dir );
-			hold = false;
-		}
-	}
-	dir[2] = 0;
-	vectoangles( dir, angles );
-
-	float wantYaw = angles[YAW];
-	vec3_t forward, flat;
-	trace_t tr;
-	VectorSet( flat, 0, ps.vehicleAngles[YAW], 0 );
-	AngleVectors( flat, forward, nullptr, nullptr );
-
-	bool blocked = false;
-	vec3_t start;
-	VectorCopy( ent->r.currentOrigin, start );
-	start[2] += veh.maxs[2] * 0.5f + 8;
-	if( pathBlocked( start, forward, 260, ent->s.number, tr ) && tr.plane.normal[2] < 0.6f )
-		blocked = true;
-	if( !boat && !blocked )
-	{
-		for( float reach : { 160.0f, 380.0f } )
-		{
-			vec3_t ahead, below;
-			trace_t water;
-			VectorMA( ent->r.currentOrigin, reach, forward, ahead );
-			ahead[2] += 120;
-			VectorCopy( ahead, below );
-			below[2] -= 500;
-			SV_Trace( &water, ahead, nullptr, nullptr, below, ent->s.number, MASK_SOLID|MASK_WATER, false );
-			if( water.fraction < 1.0f && (water.contents & MASK_WATER) )
-				blocked = true;
-			if( water.fraction >= 1.0f || ent->r.currentOrigin[2] - water.endpos[2] > reach * 0.65f )
-				blocked = true;
-		}
-	}
-	if( boat && !blocked )
-	{
-		vec3_t ahead;
-		VectorMA( ent->r.currentOrigin, 500, forward, ahead );
-		ahead[2] = ent->r.currentOrigin[2] - 6;
-		if( !(SV_PointContents( ahead, ent->s.number ) & MASK_WATER) )
-			blocked = true;
-	}
-
-	if( theLevel.time_ > bot.stuckCheckTime )
-	{
-		if( !hold && theLevel.time_ > bot.spawnTime + 4000 && theLevel.time_ > bot.reverseTime + 2000 &&
-			Distance( ent->r.currentOrigin, bot.lastOrigin ) < 40 )
-			blocked = true;
-		VectorCopy( ent->r.currentOrigin, bot.lastOrigin );
-		bot.stuckCheckTime = theLevel.time_ + 2500;
-	}
-	if( blocked && theLevel.time_ > bot.reverseTime )
-	{
-		bot.reverseTime = theLevel.time_ + 1800;
-		bot.reverseTurn = (rand() & 1) ? moveFull : -moveFull;
-		pickGoal( ent, bot, boat ? 6000 : 4000 );
-	}
-
-	bool waterBehind = false;
-	if( !boat && theLevel.time_ < bot.reverseTime )
-	{
-		vec3_t behind, below;
+		vec3_t ahead, below;
 		trace_t water;
-		VectorMA( ent->r.currentOrigin, -200.0f, forward, behind );
-		behind[2] += 120;
-		VectorCopy( behind, below );
+		VectorMA( c.ent->r.currentOrigin, reach, forward, ahead );
+		ahead[2] += 120;
+		VectorCopy( ahead, below );
 		below[2] -= 500;
-		SV_Trace( &water, behind, nullptr, nullptr, below, ent->s.number, MASK_SOLID|MASK_WATER, false );
-		waterBehind = water.fraction < 1.0f && (water.contents & MASK_WATER);
-	}
-	if( theLevel.time_ < bot.reverseTime && !waterBehind )
-	{
-		cmd.forwardmove = -moveFull;
-		cmd.rightmove = bot.reverseTurn;
-	}
-	else if( waterBehind )
-	{
-		cmd.forwardmove = blocked ? moveNone : moveFull;
-		cmd.rightmove = bot.reverseTurn;
-	}
-	else
-	{
-		const float yawError = AngleSubtract( wantYaw, ps.vehicleAngles[YAW] );
-		if( yawError < -6 )
-			cmd.rightmove = moveFull;
-		else if( yawError > 6 )
-			cmd.rightmove = -moveFull;
-		if( !hold )
-			cmd.forwardmove = moveFull;
+		SV_Trace( &water, ahead, nullptr, nullptr, below, c.ent->s.number, MASK_SOLID|MASK_WATER, false );
+		drop = water.fraction >= 1.0f || c.ent->r.currentOrigin[2] - water.endpos[2] > fabs( reach ) * 0.65f;
+		return water.fraction < 1.0f && (water.contents & MASK_WATER);
 	}
 
-	if( sense.enemy )
+	static bool waterBehind( Mind& c )
 	{
-		view[YAW] = sense.enemyAngles[YAW];
-		view[PITCH] = std::clamp( AngleSubtract( sense.enemyAngles[PITCH], 0 ), -60.0f, 20.0f );
-		const int selected = veh.weapons[ps.weaponNum];
+		if( c.boat || !reversing( c ) )
+			return false;
+		vec3_t forward, flat = { 0, c.ps.vehicleAngles[YAW], 0 };
+		bool drop;
+		AngleVectors( flat, forward, nullptr, nullptr );
+		return waterAt( c, forward, -200.0f, drop );
+	}
+
+	static void holdNear( Mind& c, float radius )
+	{
+		c.hold = fabs( c.course[0] ) + fabs( c.course[1] ) < radius;
+	}
+
+	static Status driveToCover( Mind& c )
+	{
+		if( !c.bot.hasHide || theLevel.time_ > c.bot.hideTime )
+		{
+			c.bot.hasHide = Bots::findHidePoint( c.ent, c.bot, c.sense.airThreat );
+			c.bot.hideTime = theLevel.time_ + 4000;
+		}
+		if( !c.bot.hasHide )
+			return Status::Failure;
+		c.courseTo( c.bot.hidePoint );
+		holdNear( c, 90 );
+		return Status::Running;
+	}
+
+	static Status runFromAircraft( Mind& c )
+	{
+		VectorSubtract( c.ent->r.currentOrigin, c.sense.airThreat->r.currentOrigin, c.course );
+		return Status::Running;
+	}
+
+	static Status hullDown( Mind& c )
+	{
+		if( theLevel.time_ > c.bot.hideTime )
+		{
+			c.bot.hasHide = Bots::findHidePoint( c.ent, c.bot, c.sense.enemy, true );
+			c.bot.hideTime = theLevel.time_ + 5000;
+		}
+		if( !c.bot.hasHide )
+			return Status::Failure;
+		c.courseTo( c.bot.hidePoint );
+		holdNear( c, 90 );
+		return Status::Running;
+	}
+
+	static Status driveToPad( Mind& c )
+	{
+		c.courseTo( Bots::pads_[c.bot.pad].spot );
+		holdNear( c, 80 );
+		if( c.hold && Bots::replenished( c.ent ) )
+		{
+			Bots::finishRearm( c.ent, c.bot );
+			return Status::Success;
+		}
+		return Status::Running;
+	}
+
+	static Status withdraw( Mind& c )
+	{
+		c.bot.hasHide = false;
+		VectorNegate( c.sense.enemyDir, c.course );
+		return Status::Running;
+	}
+
+	static Status engage( Mind& c )
+	{
+		c.bot.hasHide = false;
+		VectorCopy( c.sense.enemyDir, c.course );
+		c.travelTo( c.enemyPosition() );
+		c.hold = c.sense.enemyDist < 1500;
+		return Status::Running;
+	}
+
+	static Status driveToGoal( Mind& c )
+	{
+		c.bot.hasHide = false;
+		c.courseTo( c.bot.goal );
+		return Status::Running;
+	}
+
+	static Status countermeasures( Mind& c )
+	{
+		Bots::flares( c.ent, c.bot, c.sense, c.cmd );
+		return Status::Success;
+	}
+
+	static Status navigate( Mind& c )
+	{
+		c.followGround( c.boat, 220.0f );
+		return Status::Success;
+	}
+
+	static Status watchAhead( Mind& c )
+	{
+		Bots::State& bot = c.bot;
+		vec3_t forward, flat = { 0, c.ps.vehicleAngles[YAW], 0 }, start;
+		trace_t tr;
+		AngleVectors( flat, forward, nullptr, nullptr );
+		VectorCopy( c.ent->r.currentOrigin, start );
+		start[2] += c.veh.maxs[2] * 0.5f + 8;
+		c.blocked = Bots::pathBlocked( start, forward, 260, c.ent->s.number, tr ) && tr.plane.normal[2] < 0.6f;
+		if( !c.boat && !c.blocked )
+		{
+			for( float reach : { 160.0f, 380.0f } )
+			{
+				bool drop;
+				if( waterAt( c, forward, reach, drop ) || drop )
+					c.blocked = true;
+			}
+		}
+		if( c.boat && !c.blocked )
+		{
+			vec3_t ahead;
+			VectorMA( c.ent->r.currentOrigin, 500, forward, ahead );
+			ahead[2] = c.ent->r.currentOrigin[2] - 6;
+			if( !(SV_PointContents( ahead, c.ent->s.number ) & MASK_WATER) )
+				c.blocked = true;
+		}
+		if( theLevel.time_ > bot.stuckCheckTime )
+		{
+			if( !c.hold && theLevel.time_ > bot.spawnTime + 4000 && theLevel.time_ > bot.reverseTime + 2000 &&
+				Distance( c.ent->r.currentOrigin, bot.lastOrigin ) < 40 )
+				c.blocked = true;
+			VectorCopy( c.ent->r.currentOrigin, bot.lastOrigin );
+			bot.stuckCheckTime = theLevel.time_ + 2500;
+		}
+		if( c.blocked && theLevel.time_ > bot.reverseTime )
+		{
+			bot.reverseTime = theLevel.time_ + 1800;
+			bot.reverseTurn = (rand() & 1) ? moveFull : -moveFull;
+			bot.pathTime = 0;
+			if( !bot.following )
+				Bots::pickGoal( c.ent, bot, c.boat ? 6000 : 4000 );
+		}
+		return Status::Success;
+	}
+
+	static Status creepForward( Mind& c )
+	{
+		c.cmd.forwardmove = c.blocked ? moveNone : moveFull;
+		c.cmd.rightmove = static_cast<signed char>( c.bot.reverseTurn );
+		return Status::Running;
+	}
+
+	static Status reverse( Mind& c )
+	{
+		c.cmd.forwardmove = -moveFull;
+		c.cmd.rightmove = static_cast<signed char>( c.bot.reverseTurn );
+		return Status::Running;
+	}
+
+	static Status steer( Mind& c )
+	{
+		vec3_t angles;
+		c.course[2] = 0;
+		vectoangles( c.course, angles );
+		const float yawError = AngleSubtract( angles[YAW], c.ps.vehicleAngles[YAW] );
+		if( yawError < -6 )
+			c.cmd.rightmove = moveFull;
+		else if( yawError > 6 )
+			c.cmd.rightmove = -moveFull;
+		if( !c.hold )
+			c.cmd.forwardmove = moveFull;
+		return Status::Running;
+	}
+
+	static Status gunnery( Mind& c )
+	{
+		c.view[YAW] = c.sense.enemyAngles[YAW];
+		c.view[PITCH] = std::clamp( AngleSubtract( c.sense.enemyAngles[PITCH], 0 ), -60.0f, 20.0f );
+		const int selected = c.veh.weapons[c.ps.weaponNum];
 		if( selected && availableWeapons[selected].type == WT_BALLISTICGUN && availableWeapons[selected].muzzleVelocity > 0 )
 		{
 			const float shell = static_cast<float>( availableWeapons[selected].muzzleVelocity );
-			const float flight = sense.enemyDist / shell;
-			vec3_t aim, dirAim, aimAngles;
-			VectorMA( sense.enemyVisible ? sense.enemy->r.currentOrigin : bot.seen[sense.enemy->s.number].position, flight, sense.enemy->client_->ps_.velocity, aim );
-			VectorSubtract( aim, ent->r.currentOrigin, dirAim );
+			const float flight = c.sense.enemyDist / shell;
+			vec3_t aim, dirAim, aimAngles, known;
+			c.enemyPosition().copyTo( known );
+			VectorMA( known, flight, c.sense.enemy->client_->ps_.velocity, aim );
+			VectorSubtract( aim, c.ent->r.currentOrigin, dirAim );
 			const float range = VectorLength( dirAim );
 			vectoangles( dirAim, aimAngles );
 			const float arc = 0.5f * asin( std::clamp( DEFAULT_GRAVITY * range / (shell * shell), 0.0f, 1.0f ) ) * 180.0f / static_cast<float>( M_PI );
-			view[YAW] = aimAngles[YAW];
-			view[PITCH] = std::clamp( AngleSubtract( aimAngles[PITCH], 0 ) - arc, -60.0f, 20.0f );
+			c.view[YAW] = aimAngles[YAW];
+			c.view[PITCH] = std::clamp( AngleSubtract( aimAngles[PITCH], 0 ) - arc, -60.0f, 20.0f );
 		}
-		const float turretYaw = ps.vehicleAngles[YAW] + ps.turretAngle;
-		const float aimError = fabs( AngleSubtract( view[YAW], turretYaw ) );
-		fireWeapons( ent, bot, sense, cmd, aimError );
+		const float turretYaw = c.ps.vehicleAngles[YAW] + c.ps.turretAngle;
+		Bots::fireWeapons( c.ent, c.bot, c.sense, c.cmd, fabs( AngleSubtract( c.view[YAW], turretYaw ) ) );
+		return Status::Success;
 	}
-	else
+
+	static behavior::Tree<Mind> build()
 	{
-		view[YAW] = ps.vehicleAngles[YAW];
-		view[PITCH] = 0;
+		behavior::Tree<Mind> t;
+
+		const auto* act = t.selector( "driver", {
+			t.when( "aircraft overhead", hidingFromAircraft, t.selector( "hide", {
+				t.action( "drive to cover", driveToCover ),
+				t.action( "run from aircraft", runFromAircraft ) } ) ),
+			t.when( "cautious gunner", wantsHullDown, t.action( "hull down", hullDown ) ),
+			t.when( "wants to rearm", rearming, t.action( "drive to pad", driveToPad ) ),
+			t.when( "evading", evading, t.action( "withdraw", withdraw ) ),
+			t.when( "ground enemy", engaging, t.action( "engage", engage ) ),
+			t.action( "drive to goal", driveToGoal ) } );
+
+		const auto* drive = t.selector( "controls", {
+			t.when( "water behind", waterBehind, t.action( "creep forward", creepForward ) ),
+			t.when( "backing out", reversing, t.action( "reverse", reverse ) ),
+			t.action( "steer", steer ) } );
+
+		t.setRoot( t.always( "crew", act, {
+			t.action( "countermeasures", countermeasures ),
+			t.action( "navigate", navigate ),
+			t.action( "watch ahead", watchAhead ),
+			drive,
+			t.when( "has a target", hasEnemy, t.action( "gunnery", gunnery ) ) } ) );
+		return t;
 	}
+};
+
+void Bots::thinkSurface( GameEntity* ent, State& bot, const Sense& sense, usercmd_t& cmd, vec3_t view )
+{
+	static const behavior::Tree<Mind> tree = SurfaceTasks::build();
+
+	GameClient* client = ent->client_;
+	const playerState_t& ps = client->ps_;
+	Mind mind{ ent, client, bot, sense, cmd, view, ps, availableVehicles[client->vehicle_], static_cast<float>( ps.speed ) / 10.0f };
+	mind.boat = (mind.veh.cat & CAT_BOAT) != 0;
+
+	if( bot.desire != Goal::Capture && (theLevel.time_ > bot.goalTime || Distance( ent->r.currentOrigin, bot.goal ) < 400 ) )
+		pickGoal( ent, bot, mind.boat ? 6000 : 4000 );
+	view[YAW] = ps.vehicleAngles[YAW];
+	view[PITCH] = 0;
+
+	runTree( tree, mind, "surface" );
 }

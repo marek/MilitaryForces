@@ -4,6 +4,7 @@
 #include "../q_shared.h"
 #include <array>
 #include <vector>
+#include "bot_behavior.h"
 
 struct GameEntity;
 struct GameClient;
@@ -43,7 +44,6 @@ public:
 		float		reaction;
 	};
 
-private:
 	struct Seen
 	{
 		vec3_t	position = { 0, 0, 0 };
@@ -83,6 +83,8 @@ private:
 		int		structureTime = 0;
 		int		lifeScore = 0;
 		int		badLives = 0;
+		std::array<int, 5> ownLives = {};
+		std::array<int, 5> ownFailures = {};
 		int		goalsReached = 0;
 		int		goalsExpired = 0;
 		int		leader = -1;
@@ -113,6 +115,8 @@ private:
 		size_t	pathIndex = 0;
 		int		pathTime = 0;
 		bool	following = false;
+		bool	cornerAhead = false;
+		behavior::Memory tree;
 		float	chaseTurn = 0;
 		float	chasePitch = 0;
 		int		badPadTime = 0;
@@ -123,6 +127,10 @@ private:
 		int		landGiveUp = 0;
 		int		probeTime = 0;
 		bool	probeBlocked = false;
+		int		brakeTime = 0;
+		int		groundTime = 0;
+		float	probeWant = 0;
+		float	probeBest = 0;
 		bool	confined = false;
 		float	takeoffYaw = 0;
 		int		takeoffTime = 0;
@@ -166,6 +174,15 @@ private:
 		bool		duel = false;
 	};
 
+	struct Mind;
+	friend struct LandingSteps;
+	friend struct PlaneTasks;
+	friend struct HeloTasks;
+	friend struct SurfaceTasks;
+	friend struct InfantryTasks;
+	friend struct GoalScoring;
+
+private:
 	static void think( GameEntity* ent, State& bot, usercmd_t& cmd );
 	static void thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_t& cmd, vec3_t view );
 	static void thinkHelo( GameEntity* ent, State& bot, const Sense& sense, usercmd_t& cmd, vec3_t view );
@@ -199,9 +216,9 @@ private:
 	static void finishRearm( GameEntity* ent, State& bot );
 	static bool runwayBusy( int padIndex, GameEntity* self );
 	static bool turnClear( GameEntity* ent, float radius, float degrees, float climb = 0 );
-	static bool defendMissile( GameEntity* ent, State& bot, const Sense& sense, usercmd_t& cmd, vec3_t view );
-	static bool landPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_t& cmd, vec3_t view );
 	static void sense( GameEntity* ent, State& bot, Sense& out );
+	static void logDeath( GameEntity* self, GameEntity* attacker, int meansOfDeath );
+	static void logState( GameEntity* ent, State& bot, const usercmd_t& cmd, const vec3_t view );
 	static void pickGoal( GameEntity* ent, State& bot, float radius );
 	static void fireWeapons( GameEntity* ent, State& bot, const Sense& sense, usercmd_t& cmd, float aimError );
 	static int findWeaponSlot( int vehicle, const playerState_t& ps, bool air, float dist, bool& guided );
@@ -209,7 +226,9 @@ private:
 	static void setRadar( GameEntity* ent, State& bot, bool air );
 	static float heightAboveGround( const vec3_t origin, int passEntity );
 	static bool pathBlocked( const vec3_t origin, const vec3_t dir, float dist, int passEntity, trace_t& tr, float halfWidth = 0 );
-	static int pickVehicle( int teamFlag, bool allowInfantry = true, const Character* who = nullptr );
+	static int pickVehicle( int teamFlag, bool allowInfantry = true, const Character* who = nullptr, const State* memory = nullptr );
+	static float failureSensitivity( const Character& who );
+	static float switchDesire( const State& bot, int kind );
 	static unsigned int spawnCategories();
 	static void fill();
 	static void select( GameEntity* ent, State& bot );

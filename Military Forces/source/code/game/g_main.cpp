@@ -37,7 +37,9 @@ vmCvar_t	g_stealthPenalty;
 vmCvar_t	g_botMinPlayers;
 vmCvar_t	g_botSkill;
 vmCvar_t	g_ruseReset;
+#ifdef MF_BOT_DEBUG
 vmCvar_t	g_botDebug;
+#endif
 vmCvar_t	g_botLanding;
 vmCvar_t	g_botVehicles;
 vmCvar_t	g_abandonTime;
@@ -135,7 +137,9 @@ cvarTable_t		gameCvarTable[] = {
 	{ &g_botMinPlayers, "g_botMinPlayers", "0", CVAR_ARCHIVE, 0, false  },
 	{ &g_botSkill, "g_botSkill", "3", CVAR_ARCHIVE, 0, false  },
 	{ &g_ruseReset, "g_ruseReset", "30", 0, 0, true  },
+#ifdef MF_BOT_DEBUG
 	{ &g_botDebug, "g_botDebug", "0", 0, 0, false  },
+#endif
 	{ &g_botLanding, "g_botLanding", "1", 0, 0, false  },
 	{ &g_botVehicles, "g_botVehicles", "", 0, 0, false  },
 	{ &g_abandonTime, "g_abandonTime", "300", 0, 0, true  },

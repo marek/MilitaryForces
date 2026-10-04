@@ -3,6 +3,7 @@
 #include "bot.h"
 #include "bot_local.h"
 #include "bot_airnav.h"
+#include "bot_groundnav.h"
 #include <algorithm>
 #include <cmath>
 
@@ -26,6 +27,7 @@ void Bots::reset()
 	kindLives_.fill( 0 );
 	kindCrashes_.fill( 0 );
 	AirNav::reset();
+	GroundNav::reset();
 }
 
 bool Bots::isBot( int clientNum )
@@ -58,49 +60,10 @@ void Bots::onDeath( GameEntity* self, GameEntity* attacker, int meansOfDeath )
 	kindLives_[kind]++;
 	if( (meansOfDeath == MOD_CRASH || meansOfDeath == MOD_WATER) && theLevel.time_ - bot.spawnTime < 20000 )
 		kindCrashes_[kind]++;
-	if( !g_botDebug.integer )
-		return;
-
-	const playerState_t& ps = self->client_->ps_;
-	vec3_t forward, start;
-	trace_t ahead;
-	AngleVectors( ps.vehicleAngles, forward, nullptr, nullptr );
-	VectorMA( self->r.currentOrigin, -100.0f, forward, start );
-	pathBlocked( start, forward, 600, self->s.number, ahead );
-	GameEntity* hit = ahead.fraction < 1.0f && ahead.entityNum > ENTITYNUM_WORLD ? theLevel.getEntity( ahead.entityNum ) : nullptr;
-	GameEntity* enemy = bot.enemy >= 0 ? theLevel.getEntity( bot.enemy ) : nullptr;
-	float nearest = -1;
-	int nearestNum = -1;
-	for( int i = 1; i <= theLevel.maxclients_; i++ )
-	{
-		GameEntity* other = theLevel.getEntity( i );
-		if( other == self || !other || !other->inuse_ || !other->client_ || other->client_->vehicle_ < 0 )
-			continue;
-		const float dist = Distance( self->r.currentOrigin, other->r.currentOrigin );
-		if( nearest < 0 || dist < nearest )
-		{
-			nearest = dist;
-			nearestNum = i;
-		}
-	}
-	vec3_t below;
-	VectorCopy( self->r.currentOrigin, below );
-	below[2] -= heightAboveGround( self->r.currentOrigin, self->s.number ) + 4;
-
-	Common::printf( "BOTDEATH t %d bot %d mod %d by %d veh %d role %d goal %d age %d health %d org %.0f %.0f %.0f vel %.0f %.0f %.0f speed %d pitch %.0f roll %.0f yaw %.0f "
-		"height %.0f ceiling %.0f water %d onoff %x throttle %d fuel %d enemy %d edist %.0f avoid %d egress %d land %d pad %d ahead %.0f aheadent %d aheadclass %s normalz %.2f "
-		"nearest %d ndist %.0f trail",
-		theLevel.time_, self->s.number, meansOfDeath, attacker ? attacker->s.number : -1, self->client_->vehicle_, static_cast<int>( roleOf( self->client_->vehicle_ ) ),
-		static_cast<int>( bot.desire ), theLevel.time_ - bot.spawnTime, self->health_, self->r.currentOrigin[0], self->r.currentOrigin[1], self->r.currentOrigin[2],
-		ps.velocity[0], ps.velocity[1], ps.velocity[2], ps.speed, ps.vehicleAngles[PITCH], ps.vehicleAngles[ROLL], ps.vehicleAngles[YAW],
-		heightAboveGround( self->r.currentOrigin, self->s.number ), ceilingAbove( self->r.currentOrigin, self->s.number ),
-		(SV_PointContents( below, self->s.number ) & MASK_WATER) != 0, ps.ONOFF, ps.fixed_throttle, ps.stats[STAT_FUEL],
-		bot.enemy, enemy ? Distance( enemy->r.currentOrigin, self->r.currentOrigin ) : -1.0f, theLevel.time_ < bot.avoidTime, theLevel.time_ < bot.egressTime,
-		bot.landPhase, bot.pad, ahead.fraction * 600.0f - 100.0f, ahead.fraction < 1.0f ? ahead.entityNum : -1, hit && hit->classname_ ? hit->classname_ : "-",
-		ahead.plane.normal[2], nearestNum, nearest );
-	for( int i = 0; i < 6; i++ )
-		Common::printf( " %.0f,%.0f,%.0f", bot.trail[i][0], bot.trail[i][1], bot.trail[i][2] );
-	Common::printf( "\n" );
+#ifdef MF_BOT_DEBUG
+	if( g_botDebug.integer )
+		logDeath( self, attacker, meansOfDeath );
+#endif
 }
 
 void Bots::onConnect( int clientNum )
@@ -136,7 +99,20 @@ unsigned int Bots::spawnCategories()
 	return cats ? cats : CAT_ANY;
 }
 
-int Bots::pickVehicle( int teamFlag, bool allowInfantry, const Character* who )
+float Bots::failureSensitivity( const Character& who )
+{
+	return std::clamp( 0.3f + who.caution - 0.5f * who.patience, 0.1f, 1.2f );
+}
+
+float Bots::switchDesire( const State& bot, int kind )
+{
+	if( bot.ownLives[kind] < 2 )
+		return 0.0f;
+	const float failureRate = static_cast<float>( bot.ownFailures[kind] ) / bot.ownLives[kind];
+	return std::clamp( failureRate * failureSensitivity( character( bot ) ) * (0.4f + 0.2f * bot.badLives), 0.0f, 0.9f );
+}
+
+int Bots::pickVehicle( int teamFlag, bool allowInfantry, const Character* who, const State* memory )
 {
 	unsigned int cats = spawnCategories();
 	if( g_botVehicles.string[0] )
@@ -182,6 +158,11 @@ int Bots::pickVehicle( int teamFlag, bool allowInfantry, const Character* who )
 			weight = weight * 12 / 100;
 		if( kindLives_[kind] >= 12 && kindCrashes_[kind] * 10 > kindLives_[kind] * 5 )
 			weight = std::max( 1, weight / 3 );
+		if( memory && who && memory->ownLives[kind] > 0 )
+		{
+			const float failureRate = static_cast<float>( memory->ownFailures[kind] ) / memory->ownLives[kind];
+			weight = std::max( 1, static_cast<int>( weight / (1.0f + failureRate * memory->ownLives[kind] * failureSensitivity( *who )) ) );
+		}
 
 		if( weight <= 0 )
 			continue;
@@ -298,7 +279,7 @@ void Bots::select( GameEntity* ent, State& bot )
 		teamFlag = client->sess_.sessionTeam_ == ClientBase::TEAM_RED ? MF_TEAM_1 : MF_TEAM_2;
 
 	if( bot.vehicle < 0 || bot.vehicle >= bg_numberOfVehicles || !(availableVehicles[bot.vehicle].team & teamFlag) )
-		bot.vehicle = pickVehicle( teamFlag, true, &character( bot ) );
+		bot.vehicle = pickVehicle( teamFlag, true, &character( bot ), &bot );
 	if( bot.vehicle < 0 )
 		return;
 
@@ -331,13 +312,18 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 		if( bot.wasAlive )
 		{
 			const int score = ps.persistant[PERS_SCORE];
-			bot.badLives = score > bot.lifeScore ? 0 : bot.badLives + 1;
-			if( bot.badLives >= 2 && random() < 0.4f + 0.4f * (1.0f - character( bot ).patience) )
+			const int kind = kindOf( client->vehicle_ );
+			const bool failed = score <= bot.lifeScore;
+			bot.badLives = failed ? bot.badLives + 1 : 0;
+			bot.ownLives[kind]++;
+			if( failed )
+				bot.ownFailures[kind]++;
+			if( random() < switchDesire( bot, kind ) )
 			{
 				int teamFlag = MF_TEAM_ANY;
 				if( g_gametype.integer >= GT_TEAM )
 					teamFlag = client->sess_.sessionTeam_ == ClientBase::TEAM_RED ? MF_TEAM_1 : MF_TEAM_2;
-				const int vehicle = pickVehicle( teamFlag, false, &character( bot ) );
+				const int vehicle = pickVehicle( teamFlag, false, &character( bot ), &bot );
 				if( vehicle >= 0 )
 				{
 					bot.vehicle = vehicle;
@@ -373,6 +359,13 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 		bot.landPhase = 0;
 		bot.desire = Goal::Roam;
 		bot.commitTime = 0;
+		bot.tree = behavior::Memory{};
+		bot.groundTime = 0;
+		bot.brakeTime = 0;
+		bot.path.clear();
+		bot.pathTime = 0;
+		bot.following = false;
+		bot.cornerAhead = false;
 		bot.takeoffTime = 0;
 		bot.hitTime = 0;
 		bot.lastHealth = ent->health_;
@@ -454,29 +447,10 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 	for( int i = 0; i < 3; i++ )
 		cmd.angles[i] = ANGLE2SHORT( view[i] ) - ps.delta_angles[i];
 
+#ifdef MF_BOT_DEBUG
 	if( g_botDebug.integer >= 3 && theLevel.time_ >= bot.logTime )
-	{
-		bot.logTime = theLevel.time_ + 500;
-		vec3_t flat = { 0, ps.vehicleAngles[YAW], 0 }, forward, right, up = { 0, 0, 1 }, back, left, down = { 0, 0, -1 }, nose;
-		AngleVectors( flat, forward, right, nullptr );
-		AngleVectors( ps.vehicleAngles, nose, nullptr, nullptr );
-		VectorNegate( forward, back );
-		VectorNegate( right, left );
-		const float* dirs[7] = { nose, forward, back, left, right, up, down };
-		float reach[7];
-		for( int i = 0; i < 7; i++ )
-		{
-			trace_t tr;
-			pathBlocked( ent->r.currentOrigin, dirs[i], 4000, ent->s.number, tr );
-			reach[i] = tr.fraction * 4000.0f;
-		}
-		Common::printf( "BOTSTATE t %d bot %d veh %d goal %d org %.0f %.0f %.0f vel %.0f %.0f %.0f speed %d ang %.0f %.0f %.0f view %.0f %.0f move %d %d buttons %x "
-			"onoff %x throttle %d health %d enemy %d clear nose %.0f fwd %.0f back %.0f left %.0f right %.0f up %.0f down %.0f avoid %d egress %d land %d\n",
-			theLevel.time_, ent->s.number, client->vehicle_, static_cast<int>( bot.desire ), ent->r.currentOrigin[0], ent->r.currentOrigin[1], ent->r.currentOrigin[2],
-			ps.velocity[0], ps.velocity[1], ps.velocity[2], ps.speed, ps.vehicleAngles[PITCH], ps.vehicleAngles[YAW], ps.vehicleAngles[ROLL], view[PITCH], view[YAW],
-			cmd.forwardmove, cmd.rightmove, cmd.buttons, ps.ONOFF, ps.fixed_throttle, ent->health_, bot.enemy,
-			reach[0], reach[1], reach[2], reach[3], reach[4], reach[5], reach[6], theLevel.time_ < bot.avoidTime, theLevel.time_ < bot.egressTime, bot.landPhase );
-	}
+		logState( ent, bot, cmd, view );
+#endif
 }
 
 void Bots::runFrame()
@@ -546,30 +520,4 @@ void Bots::addCommand()
 void Bots::kickCommand()
 {
 	removeAll();
-}
-
-void Bots::listCommand()
-{
-	Common::printf( "BOTTIME %d\n", theLevel.time_ );
-	Common::printf( "AIRNAV cells %d free %d\n", AirNav::cellCount(), AirNav::freeCount() );
-	if( !padsBuilt_ )
-		buildPads();
-	for( const Pad& pad : pads_ )
-		Common::printf( "PAD spot %.0f %.0f %.0f centre %.0f %.0f axis %.2f %.2f half %.0f runway %d cat %x team %d\n", pad.spot[0], pad.spot[1], pad.spot[2],
-			pad.center[0], pad.center[1], pad.axis[0], pad.axis[1], pad.halfLength, pad.runway, pad.category, pad.team );
-	for( int i = 1; i <= theLevel.maxclients_ && i <= MAX_CLIENTS; i++ )
-	{
-		if( !states_[i].active )
-			continue;
-		GameEntity* ent = theLevel.getEntity( i );
-		if( !ent || !ent->client_ )
-			continue;
-		GameClient* cl = ent->client_;
-		Common::printf( "BOT %d %s vehicle %d health %d org %.0f %.0f %.0f speed %d enemy %d riding %d score %d height %.0f onoff %x angles %.0f %.0f fuel %d goal %d role %d ammo %d %d %d %d goals %d %d\n", i, cl->pers_.netname_,
-			cl->vehicle_, ent->health_, ent->r.currentOrigin[0], ent->r.currentOrigin[1], ent->r.currentOrigin[2], cl->ps_.speed,
-			states_[i].enemy, cl->sess_.ridingClient_, cl->ps_.persistant[PERS_SCORE], heightAboveGround( ent->r.currentOrigin, i ),
-			cl->ps_.ONOFF, cl->ps_.vehicleAngles[PITCH], cl->ps_.vehicleAngles[YAW], cl->ps_.stats[STAT_FUEL],
-			static_cast<int>( states_[i].desire ), cl->vehicle_ >= 0 ? static_cast<int>( roleOf( cl->vehicle_ ) ) : -1,
-			cl->ps_.ammo[1], cl->ps_.ammo[2], cl->ps_.ammo[3], cl->ps_.ammo[4], states_[i].goalsReached, states_[i].goalsExpired );
-	}
 }

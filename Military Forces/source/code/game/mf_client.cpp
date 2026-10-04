@@ -13,6 +13,11 @@
 #include "g_lqm.h"
 #include "g_groundvehicle.h"
 
+namespace
+{
+	constexpr int spawnHoldLimit = 3000;
+}
+
 
 /*
 ===========
@@ -324,6 +329,8 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 					client->ps_.pm_flags &= ~PMF_VEHICLESPAWN;
 					if( occupied ) 
 					{
+						if( !client->spawnHoldTime_ )
+							client->spawnHoldTime_ = theLevel.time_;
 						client->ps_.pm_flags |= PMF_VEHICLESELECT;
 						client->respawnTime_ = theLevel.time_ + 1000;
 					}
@@ -344,12 +351,15 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 				if( !(spawnPoint->ent_category_ & availableVehicles[vehIndex].cat) ) 
 					continue;
 
-				if( SpotWouldTelefrag( spawnPoint, vehIndex ) ) 
+				// hold an occupied spawn only for a moment, so campers cannot block it
+				const bool heldLongEnough = client->spawnHoldTime_ && theLevel.time_ > client->spawnHoldTime_ + spawnHoldLimit;
+				if( !heldLongEnough && SpotWouldTelefrag( spawnPoint, vehIndex ) ) 
 				{
 					occupied = true;
 					continue;
 				}
 				
+				client->spawnHoldTime_ = 0;
 				break;
 
 			} while ( true );

@@ -450,11 +450,13 @@ bool ConsoleCommand()
 		return true;
 	}
 
+#ifdef MF_BOT_DEBUG
 	if( Q_stricmp( cmd, "botlist" ) == 0 ) 
 	{
 		Bots::listCommand();
 		return true;
 	}
+#endif
 
 	if (Q_stricmp (cmd, "addip") == 0) 
 	{

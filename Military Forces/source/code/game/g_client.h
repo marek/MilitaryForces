@@ -141,6 +141,7 @@ struct GameClient : public ClientBase
 	int					lasthurt_mod_;		// type of damage the client did
 
 	// timers
+	int					spawnHoldTime_ = 0;	// when this client started waiting for an occupied spawn point
 	int					respawnTime_;		// can respawn when time > this, force after g_forcerespwan
 	int					inactivityTime_;	// kick players when time > this
 	bool				inactivityWarning_;	// true if the five seoond warning has been given

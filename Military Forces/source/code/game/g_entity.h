@@ -209,6 +209,9 @@ struct GameEntity::EntityFunc_Base
 {
 	virtual ~EntityFunc_Base() {}
 
+	static void*	operator new( std::size_t size );
+	static void		operator delete( void* block, std::size_t size );
+
 	GameEntity*	self_ = nullptr;
 };
 

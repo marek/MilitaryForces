@@ -209,6 +209,42 @@ GameEntity::cleanAll()
 	retireAll();
 }
 
+namespace
+{
+	constexpr std::size_t funcBlockSize = 96;
+	constexpr std::size_t funcSlabBlocks = 256;
+	std::vector<void*> funcFree;
+
+	void* takeFuncBlock()
+	{
+		if( funcFree.empty() )
+		{
+			char* slab = static_cast<char*>( ::operator new( funcBlockSize * funcSlabBlocks ) );
+			funcFree.reserve( funcFree.capacity() + funcSlabBlocks );
+			for( std::size_t i = 0; i < funcSlabBlocks; i++ )
+				funcFree.push_back( slab + i * funcBlockSize );
+		}
+		void* block = funcFree.back();
+		funcFree.pop_back();
+		return block;
+	}
+}
+
+void* GameEntity::EntityFunc_Base::operator new( std::size_t size )
+{
+	return size <= funcBlockSize ? takeFuncBlock() : ::operator new( size );
+}
+
+void GameEntity::EntityFunc_Base::operator delete( void* block, std::size_t size )
+{
+	if( !block )
+		return;
+	if( size <= funcBlockSize )
+		funcFree.push_back( block );
+	else
+		::operator delete( block );
+}
+
 static std::vector<std::unique_ptr<GameEntity::EntityFunc_Base>> retiredFuncs;
 
 template<class T>
