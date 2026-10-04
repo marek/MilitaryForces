@@ -628,7 +628,7 @@ void Key_GetBindingBuf( int keynum, char *buf, int buflen )
 {
 	char	*value;
 
-	value = Key_GetBinding( keynum );
+	value = Keys::getBinding( keynum );
 	if ( value ) {
 		Q_strncpyz( buf, value, buflen );
 	}

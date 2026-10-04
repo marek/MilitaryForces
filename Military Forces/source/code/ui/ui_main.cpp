@@ -4043,7 +4043,7 @@ void UI_RunMenuScript(char **args)
 		else if (Q_stricmp(name, "closeingame") == 0) 
 		{
 			Key_SetCatcher( ( Key_GetCatcher() & ~KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
-			Key_ClearStates();
+			Keys::clearStates();
 			CvarSystem::set( "cl_paused", "0" );
 			uiInfo.uiUtils.menu_CloseAll();
 		} 
@@ -4184,7 +4184,7 @@ void UI_RunMenuScript(char **args)
 					}
 				}
 				Key_SetCatcher( ( Key_GetCatcher() & ~KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
-				Key_ClearStates();
+				Keys::clearStates();
 				CvarSystem::set( "cl_paused", "0" );
 				uiInfo.uiUtils.menu_CloseAll();
 			}
@@ -4200,7 +4200,7 @@ void UI_RunMenuScript(char **args)
 					CommandBuffer::executeText( EXEC_APPEND, "\n" );
 				}
 				Key_SetCatcher( ( Key_GetCatcher() & ~KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
-				Key_ClearStates();
+				Keys::clearStates();
 				CvarSystem::set( "cl_paused", "0" );
 				uiInfo.uiUtils.menu_CloseAll();
 			}
@@ -4218,7 +4218,7 @@ void UI_RunMenuScript(char **args)
 					CommandBuffer::executeText( EXEC_APPEND, "\n" );
 				}
 				Key_SetCatcher( ( Key_GetCatcher() & ~KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
-				Key_ClearStates();
+				Keys::clearStates();
 				CvarSystem::set( "cl_paused", "0" );
 				uiInfo.uiUtils.menu_CloseAll();
 			}
@@ -5802,7 +5802,7 @@ void UI_Pause(bool b)
 	} else {
 		// unpause the game and clear the ui keycatcher
 		Key_SetCatcher( ( Key_GetCatcher() & ~KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
-		Key_ClearStates();
+		Keys::clearStates();
 		CvarSystem::set( "cl_paused", "0" );
 	}
 }
@@ -6000,7 +6000,7 @@ void _UI_KeyEvent( int key, bool down )
 		else
 		{
 			Key_SetCatcher( ( Key_GetCatcher() & ~KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
-			Key_ClearStates();
+			Keys::clearStates();
 			CvarSystem::set( "cl_paused", "0" );
 		}
 	}
@@ -6060,7 +6060,7 @@ void _UI_SetActiveMenu( UserInterface::MenuCommand menu ) {
 	  switch ( menu ) {
 	  case UserInterface::MenuCommand::UIMENU_NONE:
 			Key_SetCatcher( ( Key_GetCatcher() & ~KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
-			Key_ClearStates();
+			Keys::clearStates();
 			CvarSystem::set( "cl_paused", "0" );
 			uiInfo.uiUtils.menu_CloseAll();
 

@@ -45,11 +45,3 @@ extern	int				anykeydown;
 extern	bool	chat_team;
 extern	int			chat_playerNum;
 
-void Key_WriteBindings( fileHandle_t f );
-void Key_SetBinding( int keynum, const char *binding );
-char *Key_GetBinding( int keynum );
-bool Key_IsDown( int keynum );
-bool Key_GetOverstrikeMode( );
-void Key_SetOverstrikeMode( bool state );
-void Key_ClearStates( );
-int Key_GetKey(const char *binding);

@@ -845,7 +845,6 @@ void CL_Snd_Shutdown();
 void Key_KeynameCompletion( void(*callback)(const char *s) );
 // for keyname autocompletion
 
-void Key_WriteBindings( fileHandle_t f );
 // for writing the config files
 
 void S_ClearSoundBuffer( );

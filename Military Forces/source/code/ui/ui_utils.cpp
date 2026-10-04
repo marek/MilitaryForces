@@ -2205,7 +2205,7 @@ UI_Utils::item_TextField_HandleKey( itemDef_t *item, int key )
 
 			if ( key == K_HOME || key == K_KP_HOME) 
 			{	
-				// || ( tolower(key) == 'a' && Key_IsDown( K_CTRL ) ) ) {
+				// || ( tolower(key) == 'a' && Keys::isDown( K_CTRL ) ) ) {
 				item->cursorPos = 0;
 				editPtr->paintOffset = 0;
 				return true;
@@ -2213,7 +2213,7 @@ UI_Utils::item_TextField_HandleKey( itemDef_t *item, int key )
 
 			if ( key == K_END || key == K_KP_END)  
 			{
-				// ( tolower(key) == 'e' && Key_IsDown( K_CTRL ) ) ) {
+				// ( tolower(key) == 'e' && Keys::isDown( K_CTRL ) ) ) {
 				item->cursorPos = len;
 				if(item->cursorPos > editPtr->maxPaintChars) 
 					editPtr->paintOffset = len - editPtr->maxPaintChars;

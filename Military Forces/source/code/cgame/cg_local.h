@@ -1672,7 +1672,6 @@ void S_AddRealLoopingSound( int entityNum, const vec3_t origin, const vec3_t vel
 void S_StartBackgroundTrack( const char *intro, const char *loop );
 void S_UpdateEntityPosition( int entityNum, const vec3_t origin );
 void S_Respatialize( int entityNum, const vec3_t head, vec3_t axis[3], int inwater );
-bool Key_IsDown( int keynum );
 int Key_GetCatcher();
 void Key_SetCatcher( int catcher );
 void CL_GetGlconfig( glconfig_t *glconfig );

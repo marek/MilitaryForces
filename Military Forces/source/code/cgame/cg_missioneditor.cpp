@@ -166,17 +166,17 @@ void CG_Draw_IGME()
 	// check for selections
 	cmdNum = CL_GetCurrentCmdNumber();
 	CL_GetUserCmd( cmdNum, &cmd );
-	if( Key_IsDown(K_MOUSE1) && !Key_GetCatcher() ) {
+	if( Keys::isDown(K_MOUSE1) && !Key_GetCatcher() ) {
 		if( (cgs.IGME.waypointmode && cgs.IGME.numWptSelections) ||
 			(!cgs.IGME.waypointmode && cgs.IGME.numSelections) ) {
 			Key_SetCatcher( ( KEYCATCH_CGAME ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
 			cgs.IGME.dragmode = true;
 		}
-	} else if( (Key_IsDown(K_MOUSE3) || Key_IsDown(K_SPACE)) &&
+	} else if( (Keys::isDown(K_MOUSE3) || Keys::isDown(K_SPACE)) &&
 				cg.time >= cgs.IGME.selectionTime ) {
 		ME_CheckForSelection();
 		cgs.IGME.selectionTime = cg.time + 250;
-	} else if( Key_IsDown(K_BACKSPACE) && !Key_GetCatcher() && cg.time >= cgs.IGME.selectionTime ) {
+	} else if( Keys::isDown(K_BACKSPACE) && !Key_GetCatcher() && cg.time >= cgs.IGME.selectionTime ) {
 		ME_DeleteSelection();
 		cgs.IGME.selectionTime = cg.time + 250;
 	} else if( (cmd.buttons & BUTTON_GEAR) && cg.time >= cgs.IGME.selectionTime ) {
@@ -190,11 +190,11 @@ void CG_Draw_IGME()
 				cg.time >= cgs.IGME.selectionTime ) {
 		ME_ToggleWaypointDisplay();
 		cgs.IGME.selectionTime = cg.time + 250;
-	} else if( !cgs.IGME.dragmode && Key_IsDown(K_CTRL) && Key_IsDown('c') && 
+	} else if( !cgs.IGME.dragmode && Keys::isDown(K_CTRL) && Keys::isDown('c') && 
 				cg.time >= cgs.IGME.selectionTime ) {
 		ME_CopySelection();
 		cgs.IGME.selectionTime = cg.time + 500;
-	} else if( !cgs.IGME.dragmode && Key_IsDown(K_CTRL) && Key_IsDown('v') &&
+	} else if( !cgs.IGME.dragmode && Keys::isDown(K_CTRL) && Keys::isDown('v') &&
 				cg.time >= cgs.IGME.selectionTime ) {
 		ME_PasteSelection();
 		cgs.IGME.selectionTime = cg.time + 500;
@@ -307,7 +307,7 @@ void ME_DeselectAll()
 
 void ME_SelectVehicle( IGME_vehicle_t* veh )
 {
-	int multisel = Key_IsDown(K_CTRL);
+	int multisel = Keys::isDown(K_CTRL);
 
 	if( !veh ) {
 		if( !multisel ) ME_DeselectAll();
@@ -345,7 +345,7 @@ void ME_DeselectAllWaypoints()
 
 void ME_SelectWaypoint( IGME_waypoint_t* wpt )
 {
-	int multisel = Key_IsDown(K_CTRL);
+	int multisel = Keys::isDown(K_CTRL);
 
 	if( !wpt ) {
 		if( !multisel ) ME_DeselectAllWaypoints();
@@ -538,8 +538,8 @@ void ME_DragSelection( int x, int y )
 {
 	vec3_t			angles, forward, right;
 	int				i;
-	int			vertical = Key_IsDown(K_CTRL);
-	int			rotate = Key_IsDown(K_SHIFT);
+	int			vertical = Keys::isDown(K_CTRL);
+	int			rotate = Keys::isDown(K_SHIFT);
 
 	if( vertical ) {
 		// move vertically
@@ -591,7 +591,7 @@ void ME_SpawnWaypoint()
 	IGME_vehicle_t* veh = ME_GetVehicleUnderCrosshair();
 	IGME_vehicle_t* selveh = ME_GetSelectedVehicle();
 	int				i;
-	int			insert = Key_IsDown(K_CTRL);
+	int			insert = Keys::isDown(K_CTRL);
 		
 	// vehicle following
 	if( veh && !veh->selected ) {

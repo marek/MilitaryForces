@@ -167,7 +167,7 @@ UI_UtilsUI::customChatEnd( bool sendText )
 
 	// re-enable normal keyboard operation
 	Key_SetCatcher( ( Key_GetCatcher() & ~KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
-	Key_ClearStates();
+	Keys::clearStates();
 }
 
 void 

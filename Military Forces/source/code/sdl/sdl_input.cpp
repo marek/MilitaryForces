@@ -585,7 +585,7 @@ static bool KeyToAxisAndSign(int keynum, int *outAxis, int *outSign)
 	if (!keynum)
 		return false;
 
-	bind = Key_GetBinding(keynum);
+	bind = Keys::getBinding(keynum);
 
 	if (!bind || *bind != '+')
 		return false;

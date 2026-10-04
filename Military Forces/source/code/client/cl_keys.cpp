@@ -795,22 +795,22 @@ void Message_Key( int key ) {
 //============================================================================
 
 
-bool Key_GetOverstrikeMode( ) {
+bool Keys::getOverstrikeMode( ) {
 	return key_overstrikeMode;
 }
 
 
-void Key_SetOverstrikeMode( bool state ) {
+void Keys::setOverstrikeMode( bool state ) {
 	key_overstrikeMode = state;
 }
 
 
 /*
 ===================
-Key_IsDown
+Keys::isDown
 ===================
 */
-bool Key_IsDown( int keynum ) {
+bool Keys::isDown( int keynum ) {
 	if ( keynum < 0 || keynum >= MAX_KEYS ) {
 		return false;
 	}
@@ -908,10 +908,10 @@ char *Key_KeynumToString( int keynum ) {
 
 /*
 ===================
-Key_SetBinding
+Keys::setBinding
 ===================
 */
-void Key_SetBinding( int keynum, const char *binding ) {
+void Keys::setBinding( int keynum, const char *binding ) {
 	if ( keynum < 0 || keynum >= MAX_KEYS ) {
 		return;
 	}
@@ -932,10 +932,10 @@ void Key_SetBinding( int keynum, const char *binding ) {
 
 /*
 ===================
-Key_GetBinding
+Keys::getBinding
 ===================
 */
-char *Key_GetBinding( int keynum ) {
+char *Keys::getBinding( int keynum ) {
 	if ( keynum < 0 || keynum >= MAX_KEYS ) {
 		return "";
 	}
@@ -945,11 +945,11 @@ char *Key_GetBinding( int keynum ) {
 
 /* 
 ===================
-Key_GetKey
+Keys::getKey
 ===================
 */
 
-int Key_GetKey(const char *binding) {
+int Keys::getKey(const char *binding) {
   int i;
 
   if (binding) {
@@ -984,7 +984,7 @@ void Key_Unbind_f ()
 		return;
 	}
 
-	Key_SetBinding (b, "");
+	Keys::setBinding (b, "");
 }
 
 /*
@@ -998,7 +998,7 @@ void Key_Unbindall_f ()
 	
 	for (i=0 ; i < MAX_KEYS; i++)
 		if (keys[i].binding)
-			Key_SetBinding (i, "");
+			Keys::setBinding (i, "");
 }
 
 
@@ -1044,17 +1044,17 @@ void Key_Bind_f ()
 			strcat (cmd, " ");
 	}
 
-	Key_SetBinding (b, cmd);
+	Keys::setBinding (b, cmd);
 }
 
 /*
 ============
-Key_WriteBindings
+Keys::writeBindings
 
 Writes lines containing "bind key value"
 ============
 */
-void Key_WriteBindings( fileHandle_t f ) {
+void Keys::writeBindings( fileHandle_t f ) {
 	int		i;
 
 	FileSystem::printf (f, "unbindall\n" );
@@ -1262,7 +1262,7 @@ void CL_KeyDownEvent( int key, unsigned time )
 	if( key == K_CONSOLE || ( keys[K_SHIFT].down && key == K_ESCAPE ) )
 	{
 		Console::toggleConsole_f ();
-		Key_ClearStates ();
+		Keys::clearStates ();
 		return;
 	}
 
@@ -1415,10 +1415,10 @@ void CL_CharEvent( int key ) {
 
 /*
 ===================
-Key_ClearStates
+Keys::clearStates
 ===================
 */
-void Key_ClearStates ()
+void Keys::clearStates ()
 {
 	int		i;
 
@@ -1453,7 +1453,7 @@ Key_SetCatcher
 void Key_SetCatcher( int catcher ) {
 	// If the catcher state is changing, clear all key states
 	if( catcher != keyCatchers )
-		Key_ClearStates( );
+		Keys::clearStates( );
 
 	keyCatchers = catcher;
 }

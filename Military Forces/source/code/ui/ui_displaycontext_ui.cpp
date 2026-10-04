@@ -135,13 +135,13 @@ UI_DisplayContextUI::drawTextWithCursor( float x, float y, float scale, vec4_t c
 void
 UI_DisplayContextUI::setOverstrikeMode( bool b )
 {
-	Key_SetOverstrikeMode( b );
+	Keys::setOverstrikeMode( b );
 }
 
 bool
 UI_DisplayContextUI::getOverstrikeMode()
 {
-	return Key_GetOverstrikeMode();
+	return Keys::getOverstrikeMode();
 }
 
 bool
@@ -189,7 +189,7 @@ UI_DisplayContextUI::getBindingBuf( int keynum, char *buf, int buflen )
 void
 UI_DisplayContextUI::setBinding( int keynum, const char *binding )
 {
-	Key_SetBinding( keynum, binding );
+	Keys::setBinding( keynum, binding );
 }
 
 void
