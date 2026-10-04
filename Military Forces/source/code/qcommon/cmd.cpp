@@ -347,10 +347,10 @@ struct cmd_function_s
 using cmd_function_t = cmd_function_s;
 
 
-static	int			cmd_argc;
-static	char		*cmd_argv[MAX_STRING_TOKENS];		// points into cmd_tokenized
-static	char		cmd_tokenized[BIG_INFO_STRING+MAX_STRING_TOKENS];	// will have 0 bytes inserted
-static	char		cmd_cmd[BIG_INFO_STRING]; // the original command we received (no token processing)
+int CommandSystem::cmd_argc;
+char *CommandSystem::cmd_argv[MAX_STRING_TOKENS];		// points into cmd_tokenized
+char CommandSystem::cmd_tokenized[BIG_INFO_STRING+MAX_STRING_TOKENS];	// will have 0 bytes inserted
+char CommandSystem::cmd_cmd[BIG_INFO_STRING]; // the original command we received (no token processing)
 
 static	cmd_function_t	*cmd_functions;		// possible commands to execute
 

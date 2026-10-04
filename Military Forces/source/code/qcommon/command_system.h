@@ -38,6 +38,12 @@ public:
 
 private:
 	static void tokenizeString2( const char *text_in, bool ignoreQuotes );
+
+private:
+	static char cmd_cmd[BIG_INFO_STRING];
+	static char cmd_tokenized[BIG_INFO_STRING+MAX_STRING_TOKENS];
+	static char *cmd_argv[MAX_STRING_TOKENS];
+	static int cmd_argc;
 };
 
 #endif
