@@ -186,10 +186,24 @@ void PlayerMove::lQMMove( )
 		else
 			anim &= ~A_LQM_CROUCH;*/
 
+		// a long fall opens the parachute, unless the ground is already too close
+		if( !(anim & A_LQM_CHUTE) && liftvel[2] < -LQM_CHUTE_OPEN_SPEED ) {
+			vec3_t below;
+			trace_t ground;
+			VectorCopy( pm->ps->origin, below );
+			below[2] -= LQM_CHUTE_MIN_HEIGHT;
+			pm->trace( &ground, pm->ps->origin, pm->mins, pm->maxs, below, pm->ps->clientNum, pm->tracemask, false );
+			if( ground.fraction == 1.0f )
+				anim |= A_LQM_CHUTE;
+		}
+
 		VectorAdd(forwardvel, rightvel, deltavel);
 		VectorAdd(liftvel, deltavel, deltavel);
 		// Gravity
 		deltavel[2] = std::max(deltavel[2]-DEFAULT_GRAVITY*pml.frametime ,-DEFAULT_GRAVITY);
+		// under the canopy the fall is braked to a steady sink
+		if( (anim & A_LQM_CHUTE) && deltavel[2] < -LQM_CHUTE_DESCENT )
+			deltavel[2] = std::min( -LQM_CHUTE_DESCENT, deltavel[2] + DEFAULT_GRAVITY * 3.0f * pml.frametime );
     }
 	// return angles
 	VectorCopy( viewdir, pm->ps->vehicleAngles );
@@ -208,6 +222,7 @@ void PlayerMove::lQMMove( )
 	if(pml.walking) {
 		pm->ps->velocity[2] = 0;
 		pm->ps->ONOFF &= ~OO_STALLED;	// Done landing
+		pm->ps->vehicleAnim &= ~A_LQM_CHUTE;
 		if((anim & A_LQM_CROUCH) && (anim & A_LQM_EJECT)) 
 			pm->ps->vehicleAnim &= ~A_LQM_JUMP;
 	}

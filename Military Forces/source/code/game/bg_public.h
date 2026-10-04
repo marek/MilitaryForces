@@ -1188,6 +1188,13 @@ inline constexpr int A_LQM_RIGHT = 16;
 inline constexpr int A_LQM_EJECT = 32;
 inline constexpr int A_LQM_FLY = 64;
 inline constexpr int A_LQM_DIE = 128;
+inline constexpr int A_LQM_CHUTE = 256;			// parachute open
+
+// soldier parachute: opens by itself in a long fall
+inline constexpr float LQM_CHUTE_OPEN_SPEED = 260.0f;	// falling faster than this opens it
+inline constexpr float LQM_CHUTE_MIN_HEIGHT = 140.0f;	// no time to open below this
+inline constexpr float LQM_CHUTE_DESCENT = 110.0f;		// sink rate under the canopy
+inline constexpr float LQM_SAFE_LANDING = 320.0f;		// landing faster than this hurts
 #define A_LQM_JUMP				(A_LQM_CROUCH|A_LQM_EJECT)
 
 // this is for the PW_ONOFF_FLAGS

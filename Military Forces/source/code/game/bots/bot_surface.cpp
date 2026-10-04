@@ -114,7 +114,9 @@ struct SurfaceTasks
 	static bool walkerWaiting( Mind& c )
 	{
 		constexpr float pickupRange = 1500.0f;
-		c.target = c.veh.seats > 0 && !c.sense.enemyVisible ? Bots::walkerNear( c.ent, c.bot, pickupRange ) : nullptr;
+		// boats and wheeled vehicles stop for a team mate on foot; tanks do not
+		const bool givesLifts = c.veh.seats > 1 && (c.boat || (c.veh.caps & HC_WHEELS));
+		c.target = givesLifts && !c.sense.enemyVisible ? Bots::walkerNear( c.ent, c.bot, pickupRange ) : nullptr;
 		return c.target != nullptr;
 	}
 

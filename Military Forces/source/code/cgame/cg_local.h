@@ -796,6 +796,7 @@ struct cgMedia_t {
 	qhandle_t	pilotWW2;
 	qhandle_t	pilotHeadWW2;
 	qhandle_t	pilotSeatWW2;
+	qhandle_t	parachute;
 	qhandle_t	missilePuffShader;
 	qhandle_t	flarePuffShader;
 	qhandle_t   railCoreShader;

@@ -957,6 +957,7 @@ void CGame::registerGraphics( ) {
 	cgs.media.pilotWW2 = refExport.RegisterModel( "models/effects/pilot_body_ww2.md3" );
 	cgs.media.pilotHeadWW2 = refExport.RegisterModel( "models/effects/pilot_head_ww2.md3" );
 	cgs.media.pilotSeatWW2 = refExport.RegisterModel( "models/effects/pilot_seat_ww2.md3" );
+	cgs.media.parachute = refExport.RegisterModel( "models/effects/parachute.md3" );
 	cgs.media.reticle[CH_GUNMODE] = refExport.RegisterModel( "models/effects/ch_gunmode.md3" );
 	cgs.media.reticle[CH_BOMBMODE] = refExport.RegisterModel( "models/effects/ch_agmode.md3" );
 	cgs.media.reticle[CH_ROCKETMODE] = refExport.RegisterModel( "models/effects/ch_rocketmode.md3" );

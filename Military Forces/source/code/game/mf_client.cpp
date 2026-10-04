@@ -591,7 +591,9 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 	}
 
 	// health will count down towards max_health
-	ent->health_ = client->ps_.stats[STAT_HEALTH] = client->ps_.stats[STAT_MAX_HEALTH] + 25;
+	// vehicles start with a little extra that counts down; a soldier starts at a soldier's maximum
+	const bool soldier = vehIndex >= 0 && (availableVehicles[vehIndex].cat & CAT_LQM) != 0;
+	ent->health_ = client->ps_.stats[STAT_HEALTH] = client->ps_.stats[STAT_MAX_HEALTH] + (soldier ? 0 : 25);
 
 	Game::setOrigin( ent, spawn_origin );
 	VectorCopy( spawn_origin, client->ps_.origin );

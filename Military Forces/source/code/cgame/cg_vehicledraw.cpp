@@ -996,6 +996,27 @@ void CGame::drawLQM(DrawInfo_LQM_t* drawInfo)
 	part[BP_LQM_HEAD].renderfx = renderfx;
 	CGame::addVehiclePart( &part[BP_LQM_HEAD] );
 
+	// Parachute: the canopy and ropes of the supply crate, swaying gently above the soldier
+	if( (anim & A_LQM_CHUTE) && cgs.media.parachute )
+	{
+		constexpr float canopyScale = 0.45f;
+		constexpr float sway = 7.0f;
+		refEntity_t chute;
+		memset( &chute, 0, sizeof( chute ) );
+		chute.hModel = cgs.media.parachute;
+		VectorCopy( drawInfo->basicInfo.origin, chute.origin );
+		chute.origin[2] += 1.0f;
+		VectorCopy( chute.origin, chute.lightingOrigin );
+		VectorCopy( chute.origin, chute.oldorigin );
+		vec3_t canopyAngles = { sway * static_cast<float>( sin( cg.time * 0.0021 ) ), drawInfo->basicInfo.angles[1], sway * static_cast<float>( cos( cg.time * 0.0017 ) ) };
+		AnglesToAxis( canopyAngles, chute.axis );
+		for( int k = 0; k < 3; k++ )
+			VectorScale( chute.axis[k], canopyScale, chute.axis[k] );
+		chute.nonNormalizedAxes = true;
+		chute.renderfx = renderfx | RF_NOSHADOW;
+		CGame::addVehiclePart( &chute );
+	}
+
 	// Add Weapon
 	part[BP_LQM_MAX_PARTS].hModel = availableWeapons[drawInfo->weaponIndex].modelHandle;
 	VectorCopy( drawInfo->basicInfo.origin, part[BP_LQM_MAX_PARTS].lightingOrigin );

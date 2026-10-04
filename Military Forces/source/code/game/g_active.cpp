@@ -895,6 +895,7 @@ void ClientThink_real( GameEntity *ent )
 	// setup vehicle for pmove
 	pm.advancedControls = client->advancedControls_;
 	pm.vehicle = client->vehicle_;
+	const float sinkBefore = -client->ps_.velocity[2];
 	pm.updateGear = ent->updateGear_;
 	pm.updateBay = ent->updateBay_;
 
@@ -936,6 +937,11 @@ void ClientThink_real( GameEntity *ent )
 		pm.ps->pm_flags &= ~PMF_RECHARGING;
 
 	Pmove (&pm);
+
+	// a soldier who comes down too fast is hurt by the landing; under a parachute the sink rate is well below this
+	constexpr float landingDamagePerSpeed = 0.45f;
+	if( (availableVehicles[client->vehicle_].cat & CAT_LQM) && sinkBefore > LQM_SAFE_LANDING && client->ps_.velocity[2] > -1.0f && ent->health_ > 0 )
+		Game::damage( ent, nullptr, ent, nullptr, nullptr, static_cast<int>( (sinkBefore - LQM_SAFE_LANDING) * landingDamagePerSpeed ), DAMAGE_NO_PROTECTION, MOD_FALLING, CAT_ANY );
 
 	if( client->devHold_ )
 	{

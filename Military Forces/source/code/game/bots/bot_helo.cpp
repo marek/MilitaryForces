@@ -23,10 +23,13 @@ struct HeloTasks
 	static bool parked( Mind& c ) { return c.landed() && overPad( c ); }
 	static bool abovePad( Mind& c ) { return overPad( c ); }
 	static bool missileInbound( Mind& c ) { return c.sense.missile && c.sense.missileTime < 6.0f && !c.landed(); }
+	// only transport helicopters take passengers; attack helicopters leave soldiers to them
+	static bool transport( const Mind& c ) { return c.veh.seats > 1 && !(c.veh.cls & CLASS_HELO_ATTACK); }
+
 	static bool walkerWaiting( Mind& c )
 	{
 		constexpr float pickupRange = 1800.0f;
-		c.target = c.veh.seats > 0 && !c.sense.enemyVisible ? Bots::walkerNear( c.ent, c.bot, pickupRange ) : nullptr;
+		c.target = transport( c ) && !c.sense.enemyVisible ? Bots::walkerNear( c.ent, c.bot, pickupRange ) : nullptr;
 		return c.target != nullptr;
 	}
 
@@ -54,7 +57,7 @@ struct HeloTasks
 
 	static bool passengersNear( Mind& c )
 	{
-		if( g_gametype.integer < GT_TEAM || !c.landed() || theLevel.time_ >= c.bot.spawnTime + 12000 )
+		if( g_gametype.integer < GT_TEAM || !c.landed() || theLevel.time_ >= c.bot.spawnTime + 12000 || !transport( c ) )
 			return false;
 		for( int i = 1; i <= theLevel.maxclients_; i++ )
 		{
