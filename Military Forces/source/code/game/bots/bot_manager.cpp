@@ -2,6 +2,7 @@
 #include "../g_level.h"
 #include "bot.h"
 #include "bot_local.h"
+#include "bot_airnav.h"
 #include <algorithm>
 #include <cmath>
 
@@ -24,6 +25,7 @@ void Bots::reset()
 	characters_.clear();
 	kindLives_.fill( 0 );
 	kindCrashes_.fill( 0 );
+	AirNav::reset();
 }
 
 bool Bots::isBot( int clientNum )
@@ -549,6 +551,7 @@ void Bots::kickCommand()
 void Bots::listCommand()
 {
 	Common::printf( "BOTTIME %d\n", theLevel.time_ );
+	Common::printf( "AIRNAV cells %d free %d\n", AirNav::cellCount(), AirNav::freeCount() );
 	if( !padsBuilt_ )
 		buildPads();
 	for( const Pad& pad : pads_ )

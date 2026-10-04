@@ -2,6 +2,7 @@
 #include "../g_level.h"
 #include "bot.h"
 #include "bot_local.h"
+#include "bot_airnav.h"
 #include <algorithm>
 #include <cmath>
 
@@ -525,6 +526,50 @@ void Bots::thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_
 			view[PITCH] = std::clamp( (sense.height - cruise) / 30.0f, -30.0f, 20.0f );
 		}
 	}
+	if( !bombing && !(bot.desire == Goal::Rearm && bot.landPhase == 2) )
+	{
+		const Vec3 here( ent->r.currentOrigin );
+		Vec3 dest;
+		if( sense.enemy && bot.desire == Goal::Attack && theLevel.time_ > bot.egressTime )
+			dest = sense.enemyVisible ? Vec3( sense.enemy->r.currentOrigin ) : Vec3( bot.seen[sense.enemy->s.number].position );
+		else
+			dest = Vec3( bot.goal[0], bot.goal[1], bot.desire == Goal::Rearm ? bot.approachHeight : here.z() );
+		const Vec3 toDest = dest - here;
+		const float range = toDest.length();
+		const Vec3 probeEnd = range > 2500.0f ? here + toDest * (2500.0f / range) : dest;
+		if( range > 300.0f && !AirNav::clearLine( here, probeEnd, 70.0f ) )
+		{
+			if( theLevel.time_ >= bot.pathTime || bot.path.empty() )
+			{
+				AirNav::findPath( here, dest, bot.path );
+				bot.pathIndex = 0;
+				bot.pathTime = theLevel.time_ + 1500;
+			}
+			const float turnRadius = std::max( VectorLength( ps.velocity ), 1.0f ) / (std::max( 10.0f, veh.turnspeed[YAW] ) * static_cast<float>( M_PI ) / 180.0f);
+			while( bot.pathIndex + 1 < bot.path.size() &&
+				((bot.path[bot.pathIndex] - here).length() < turnRadius * 1.3f || AirNav::clearLine( here, bot.path[bot.pathIndex + 1], 70.0f )) )
+				bot.pathIndex++;
+			if( bot.pathIndex < bot.path.size() )
+			{
+				const Vec3 leg = bot.path[bot.pathIndex] - here;
+				vec3_t legDir, legAngles;
+				leg.copyTo( legDir );
+				vectoangles( legDir, legAngles );
+				const float aimAt = sense.enemy ? fabs( AngleSubtract( sense.enemyAngles[YAW], ps.vehicleAngles[YAW] ) ) : 180.0f;
+				snapShot = attacking && aimAt < 6.0f;
+				attacking = false;
+				view[YAW] = legAngles[YAW];
+				view[PITCH] = std::clamp( AngleSubtract( legAngles[PITCH], 0 ), -20.0f, 20.0f );
+				bot.following = true;
+			}
+		}
+		else
+		{
+			bot.path.clear();
+			bot.following = false;
+		}
+	}
+
 	const bool defending = defendMissile( ent, bot, sense, cmd, view );
 	if( defending )
 		attacking = false;

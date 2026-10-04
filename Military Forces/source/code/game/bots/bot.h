@@ -109,6 +109,10 @@ private:
 		int		reactEnemy = -1;
 		float	breakSide = 1;
 		int		chaseTime = 0;
+		std::vector<Vec3> path;
+		size_t	pathIndex = 0;
+		int		pathTime = 0;
+		bool	following = false;
 		float	chaseTurn = 0;
 		float	chasePitch = 0;
 		int		badPadTime = 0;
