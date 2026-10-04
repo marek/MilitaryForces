@@ -15,14 +15,30 @@ int Bots::fillTime_ = 0;
 
 namespace
 {
-	constexpr std::array<const char*, 16> botNames = {
-		"Alpha", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot", "Golf", "Hotel",
-		"India", "Juliet", "Kilo", "Lima", "Mike", "November", "Oscar", "Papa"
-	};
+	constexpr std::array<Bots::Character, 16> characters = { {
+		{ "Alpha", 0.9f, 0.3f, 0.4f, 0.5f, 0.9f },
+		{ "Bravo", 0.6f, 0.6f, 0.7f, 0.8f, 0.7f },
+		{ "Charlie", 0.4f, 0.9f, 0.9f, 0.6f, 0.8f },
+		{ "Delta", 1.0f, 0.2f, 0.2f, 0.3f, 0.6f },
+		{ "Echo", 0.7f, 0.5f, 0.6f, 0.9f, 0.85f },
+		{ "Foxtrot", 0.5f, 0.7f, 0.5f, 0.4f, 0.5f },
+		{ "Golf", 0.8f, 0.4f, 0.8f, 0.7f, 0.95f },
+		{ "Hotel", 0.3f, 0.8f, 0.6f, 0.9f, 0.6f },
+		{ "India", 0.9f, 0.5f, 0.3f, 0.2f, 0.75f },
+		{ "Juliet", 0.6f, 0.4f, 0.9f, 0.6f, 0.9f },
+		{ "Kilo", 0.75f, 0.75f, 0.5f, 0.5f, 0.65f },
+		{ "Lima", 0.5f, 0.3f, 0.3f, 0.8f, 0.55f },
+		{ "Mike", 0.85f, 0.6f, 0.7f, 0.4f, 0.8f },
+		{ "November", 0.4f, 0.6f, 0.8f, 0.7f, 0.7f },
+		{ "Oscar", 0.95f, 0.35f, 0.5f, 0.6f, 1.0f },
+		{ "Papa", 0.65f, 0.85f, 0.4f, 0.5f, 0.6f }
+	} };
 
 	constexpr float planeCruiseHeight = 1400.0f;
 	constexpr float planeMinHeight = 450.0f;
 	constexpr float heloCruiseHeight = 500.0f;
+	constexpr float heloLowHeight = 180.0f;
+	constexpr float bomberMinHeight = 2200.0f;
 	constexpr float planeEnemyRange = 14000.0f;
 	constexpr float surfaceEnemyRange = 7000.0f;
 
@@ -63,6 +79,7 @@ void Bots::onConnect( int clientNum )
 		return;
 	states_[clientNum] = State{};
 	states_[clientNum].active = true;
+	states_[clientNum].character = clientNum % static_cast<int>( characters.size() );
 }
 
 void Bots::onDisconnect( int clientNum )
@@ -144,7 +161,7 @@ int Bots::add( int vehicle, const char* team, const char* name )
 	}
 
 	char userinfo[MAX_INFO_STRING] = "";
-	Info::setValueForKey( userinfo, "name", name && name[0] ? name : va( "%s %d", botNames[clientNum % botNames.size()], clientNum ) );
+	Info::setValueForKey( userinfo, "name", name && name[0] ? name : characters[clientNum % characters.size()].name );
 	Info::setValueForKey( userinfo, "rate", "25000" );
 	Info::setValueForKey( userinfo, "snaps", "20" );
 	Info::setValueForKey( userinfo, "handicap", "100" );
@@ -254,13 +271,66 @@ bool Bots::pathBlocked( const vec3_t origin, const vec3_t dir, float dist, int p
 	return tr.fraction < 1.0f;
 }
 
-GameEntity* Bots::findEnemy( GameEntity* ent, State& bot )
+const Bots::Character& Bots::character( const State& bot )
+{
+	return characters[bot.character % characters.size()];
+}
+
+float Bots::skill( const State& bot )
+{
+	return std::clamp( g_botSkill.value, 1.0f, 5.0f ) / 5.0f * (0.5f + 0.5f * character( bot ).aim);
+}
+
+Bots::Role Bots::roleOf( int vehicle )
+{
+	const completeVehicleData_t& veh = availableVehicles[vehicle];
+	if( veh.cat & CAT_PLANE )
+		return (veh.cls & CLASS_PLANE_BOMBER) ? Role::Bomber : Role::Fighter;
+	if( veh.cat & CAT_HELO )
+		return (veh.cls & CLASS_HELO_TRANSPORT) ? Role::TransportHelo : Role::AttackHelo;
+	if( veh.cat & CAT_GROUND )
+		return (veh.cls & CLASS_GROUND_SAM) ? Role::AirDefence : Role::Tank;
+	if( veh.cat & CAT_BOAT )
+		return Role::Boat;
+	return Role::Infantry;
+}
+
+bool Bots::hasWeaponType( int vehicle, const playerState_t& ps, int type )
+{
+	for( int slot = WP_WEAPON1; slot < WP_FLARE; slot++ )
+	{
+		const int weapon = availableVehicles[vehicle].weapons[slot];
+		if( weapon && ps.ammo[slot] > 0 && availableWeapons[weapon].type == type )
+			return true;
+	}
+	return false;
+}
+
+bool Bots::visible( GameEntity* ent, const vec3_t from, GameEntity* target )
+{
+	trace_t tr;
+	SV_Trace( &tr, from, nullptr, nullptr, target->r.currentOrigin, ent->s.number, MASK_SOLID, false );
+	return tr.fraction >= 1.0f || tr.entityNum == target->s.number;
+}
+
+float Bots::ceilingAbove( const vec3_t origin, int passEntity )
+{
+	trace_t tr;
+	vec3_t end;
+	VectorCopy( origin, end );
+	end[2] += 8000;
+	SV_Trace( &tr, origin, nullptr, nullptr, end, passEntity, MASK_PLAYERSOLID|CONTENTS_BOTCLIP, false );
+	return tr.fraction * 8000.0f;
+}
+
+GameEntity* Bots::findEnemy( GameEntity* ent, State& bot, Role role )
 {
 	GameClient* client = ent->client_;
 	const completeVehicleData_t& veh = availableVehicles[client->vehicle_];
 	const bool flyer = (veh.cat & (CAT_PLANE|CAT_HELO)) != 0;
 	const float maxRange = flyer ? planeEnemyRange : surfaceEnemyRange;
 	const float radarRange = veh.radarRange > 0 ? static_cast<float>( veh.radarRange ) : 8000.0f;
+	const bool antiAir = hasWeaponType( client->vehicle_, client->ps_, WT_ANTIAIRMISSILE );
 
 	GameEntity* best = nullptr;
 	float bestScore = 0;
@@ -281,12 +351,43 @@ GameEntity* Bots::findEnemy( GameEntity* ent, State& bot )
 		if( VehicleData::stealthHidden( oc->vehicle_, oc->ps_.timers[TIMER_REVEAL], theLevel.time_, dist, radarRange ) )
 			continue;
 
-		const bool air = (availableVehicles[oc->vehicle_].cat & (CAT_PLANE|CAT_HELO)) != 0 && !(oc->ps_.ONOFF & OO_LANDED);
+		const completeVehicleData_t& ov = availableVehicles[oc->vehicle_];
+		const bool air = (ov.cat & (CAT_PLANE|CAT_HELO)) != 0 && !(oc->ps_.ONOFF & OO_LANDED);
 		float score = dist;
-		if( air != flyer )
-			score *= flyer ? 1.3f : 2.5f;
-		if( (veh.cat & CAT_LQM) && dist > 1500 )
-			continue;
+		switch( role )
+		{
+		case Role::Fighter:
+			if( !air )
+				score *= 1.6f;
+			else if( (ov.cat & CAT_HELO) || (ov.cls & CLASS_PLANE_BOMBER) )
+				score *= 0.6f;
+			break;
+		case Role::Bomber:
+			if( air || (ov.cat & CAT_LQM) )
+				continue;
+			break;
+		case Role::AttackHelo:
+		case Role::TransportHelo:
+			if( air )
+				score *= (ov.cat & CAT_HELO) ? 1.2f : 3.0f;
+			break;
+		case Role::Tank:
+			if( air && !antiAir )
+				continue;
+			if( air )
+				score *= 1.5f;
+			break;
+		case Role::AirDefence:
+			if( !air )
+				score *= 2.0f;
+			break;
+		case Role::Boat:
+			break;
+		case Role::Infantry:
+			if( dist > 1500 || air )
+				continue;
+			break;
+		}
 		if( i == bot.enemy )
 			score *= 0.7f;
 		if( !best || score < bestScore )
@@ -298,11 +399,57 @@ GameEntity* Bots::findEnemy( GameEntity* ent, State& bot )
 	return best;
 }
 
+Bots::Goal Bots::chooseGoal( GameEntity* ent, State& bot, const Sense& sense )
+{
+	const Character& who = character( bot );
+	const playerState_t& ps = ent->client_->ps_;
+	const bool airborne = sense.role == Role::Fighter || sense.role == Role::Bomber;
+
+	float attack = sense.enemy ? who.aggression * (0.4f + 0.6f * sense.health) : 0.0f;
+	float evade = who.caution * ((1.0f - sense.health) * 1.2f + (sense.launched ? 0.5f : sense.locked ? 0.15f : 0.0f));
+	float climb = 0;
+	float hide = 0;
+
+	if( sense.role == Role::Bomber )
+	{
+		const float want = std::max( bomberMinHeight, sense.height + ceilingAbove( ent->r.currentOrigin, ent->s.number ) - 700.0f );
+		climb = 1.2f * who.patience * std::clamp( 1.0f - sense.height / std::min( want, 3500.0f ), 0.0f, 1.0f ) + (sense.height < bomberMinHeight * 0.8f ? 0.6f : 0.0f);
+		if( sense.airThreat && sense.airThreatDist < 3000 )
+			evade += who.caution * 0.8f;
+		if( !hasWeaponType( ent->client_->vehicle_, ps, WT_IRONBOMB ) && !hasWeaponType( ent->client_->vehicle_, ps, WT_GUIDEDBOMB ) &&
+			!hasWeaponType( ent->client_->vehicle_, ps, WT_ANTIGROUNDMISSILE ) && !hasWeaponType( ent->client_->vehicle_, ps, WT_ROCKET ) )
+			attack *= 0.5f;
+	}
+	else if( sense.role == Role::Fighter )
+	{
+		if( sense.enemy && sense.enemyAir && sense.enemyDist > 3000 )
+			climb = 0.5f * who.patience * std::clamp( (sense.enemy->r.currentOrigin[2] + 400 - ent->r.currentOrigin[2]) / 800.0f, 0.0f, 1.0f );
+	}
+	else if( sense.role == Role::Tank )
+	{
+		if( sense.airThreat && !hasWeaponType( ent->client_->vehicle_, ps, WT_ANTIAIRMISSILE ) )
+			hide = who.caution * 1.6f * std::clamp( 1.3f - sense.airThreatDist / 5000.0f, 0.0f, 1.0f );
+	}
+
+	if( sense.stealth && sense.revealed && airborne )
+		evade += who.caution * 0.6f;
+	if( sense.stealth && !sense.revealed && sense.enemy && sense.enemyDist > 2500 )
+		climb += 0.3f * who.patience;
+
+	Goal goal = Goal::Roam;
+	float best = 0.2f;
+	if( attack > best ) { best = attack; goal = Goal::Attack; }
+	if( evade > best ) { best = evade; goal = Goal::Evade; }
+	if( climb > best ) { best = climb; goal = Goal::Climb; }
+	if( hide > best ) { best = hide; goal = Goal::Hide; }
+	return goal;
+}
+
 void Bots::sense( GameEntity* ent, State& bot, Sense& out )
 {
 	if( theLevel.time_ >= bot.enemyTime )
 	{
-		GameEntity* enemy = findEnemy( ent, bot );
+		GameEntity* enemy = findEnemy( ent, bot, roleOf( ent->client_->vehicle_ ) );
 		bot.enemy = enemy ? enemy->s.number : -1;
 		bot.enemyTime = theLevel.time_ + 700 + (rand() % 300);
 	}
@@ -330,6 +477,135 @@ void Bots::sense( GameEntity* ent, State& bot, Sense& out )
 			!(out.enemy->client_->ps_.ONOFF & OO_LANDED);
 	}
 	out.height = heightAboveGround( ent->r.currentOrigin, ent->s.number );
+
+	GameClient* client = ent->client_;
+	const playerState_t& ps = client->ps_;
+	out.role = roleOf( client->vehicle_ );
+	out.health = std::clamp( static_cast<float>( ent->health_ ) / std::max( 1, client->pers_.maxHealth_ ), 0.0f, 1.0f );
+	out.locked = (ps.stats[STAT_LOCKINFO] & (LI_BEING_LOCKED|LI_BEING_LAUNCHED)) != 0;
+	out.launched = (ps.stats[STAT_LOCKINFO] & LI_BEING_LAUNCHED) != 0;
+	out.stealth = (availableVehicles[client->vehicle_].flags & VF_STEALTH) != 0;
+	out.revealed = ps.timers[TIMER_REVEAL] > theLevel.time_;
+	if( out.enemy )
+		out.enemyVisible = visible( ent, ent->r.currentOrigin, out.enemy );
+
+	for( int i = 1; i <= theLevel.maxclients_; i++ )
+	{
+		GameEntity* other = theLevel.getEntity( i );
+		if( other == ent || !alive( other ) || other->client_->sess_.ridingClient_ >= 0 )
+			continue;
+		if( g_gametype.integer >= GT_TEAM && OnSameTeam( ent, other ) )
+			continue;
+		if( !(availableVehicles[other->client_->vehicle_].cat & (CAT_PLANE|CAT_HELO)) || (other->client_->ps_.ONOFF & OO_LANDED) )
+			continue;
+		const float dist = Distance( ent->r.currentOrigin, other->r.currentOrigin );
+		if( dist < 6000 && (!out.airThreat || dist < out.airThreatDist) )
+		{
+			out.airThreat = other;
+			out.airThreatDist = dist;
+		}
+	}
+
+	if( theLevel.time_ >= bot.goalEvalTime )
+	{
+		bot.desire = chooseGoal( ent, bot, out );
+		bot.goalEvalTime = theLevel.time_ + 1000;
+	}
+}
+
+void Bots::flares( GameEntity* ent, State& bot, const Sense& sense, usercmd_t& cmd )
+{
+	if( !sense.launched || ent->client_->ps_.ammo[WP_FLARE] <= 0 || theLevel.time_ < bot.flareTime )
+		return;
+	if( random() > skill( bot ) )
+	{
+		bot.flareTime = theLevel.time_ + 400;
+		return;
+	}
+	cmd.buttons |= BUTTON_FLARE;
+	bot.flareTime = theLevel.time_ + 700;
+}
+
+bool Bots::findHidePoint( GameEntity* ent, State& bot, GameEntity* threat )
+{
+	float bestDist = 0;
+	bool found = false;
+	for( int ring = 0; ring < 3; ring++ )
+	{
+		const float radius = 350.0f + ring * 450.0f;
+		for( int step = 0; step < 12; step++ )
+		{
+			const float angle = step * (2.0f * M_PI / 12.0f);
+			vec3_t point, down;
+			VectorCopy( ent->r.currentOrigin, point );
+			point[0] += cos( angle ) * radius;
+			point[1] += sin( angle ) * radius;
+			point[2] += 300;
+			VectorCopy( point, down );
+			down[2] -= 2000;
+			trace_t tr;
+			SV_Trace( &tr, point, nullptr, nullptr, down, ent->s.number, MASK_SOLID|MASK_WATER, false );
+			if( tr.startsolid || tr.fraction >= 1.0f || (tr.contents & MASK_WATER) )
+				continue;
+			VectorCopy( tr.endpos, point );
+			point[2] += 20;
+			if( fabs( point[2] - ent->r.currentOrigin[2] ) > radius * 0.5f )
+				continue;
+			if( visible( ent, point, threat ) )
+				continue;
+			const float dist = Distance( ent->r.currentOrigin, point );
+			if( !found || dist < bestDist )
+			{
+				VectorCopy( point, bot.hidePoint );
+				bestDist = dist;
+				found = true;
+			}
+		}
+		if( found )
+			break;
+	}
+	return found;
+}
+
+void Bots::bomb( GameEntity* ent, State& bot, const Sense& sense, usercmd_t& cmd, vec3_t view )
+{
+	GameClient* client = ent->client_;
+	const playerState_t& ps = client->ps_;
+	const completeVehicleData_t& veh = availableVehicles[client->vehicle_];
+
+	int slot = -1;
+	for( int i = WP_WEAPON1; i < WP_FLARE && slot < 0; i++ )
+	{
+		const int weapon = veh.weapons[i];
+		if( weapon && ps.ammo[i] > 0 && (availableWeapons[weapon].type == WT_IRONBOMB || availableWeapons[weapon].type == WT_GUIDEDBOMB) )
+			slot = i;
+	}
+	if( slot < 0 )
+		return;
+	cmd.weapon = slot;
+
+	vec3_t flat;
+	VectorSubtract( sense.enemy->r.currentOrigin, ent->r.currentOrigin, flat );
+	const float drop = -flat[2];
+	flat[2] = 0;
+	const float dist = VectorLength( flat );
+	vec3_t angles;
+	vectoangles( flat, angles );
+	view[YAW] = angles[YAW];
+
+	if( drop <= 0 || ps.weaponNum != slot )
+		return;
+	const float fall = sqrt( 2.0f * drop / DEFAULT_GRAVITY );
+	const float speed = sqrt( ps.velocity[0] * ps.velocity[0] + ps.velocity[1] * ps.velocity[1] );
+	const float lead = speed * fall;
+	const float yawError = fabs( AngleSubtract( angles[YAW], ps.vehicleAngles[YAW] ) );
+	if( yawError < 8 && fabs( dist - lead ) < 250.0f + 400.0f * (1.0f - skill( bot )) )
+	{
+		cmd.buttons |= BUTTON_ATTACK_MAIN;
+		bot.bombTime = theLevel.time_;
+	}
+	if( dist < lead - 400 && theLevel.time_ > bot.bombTime + 500 )
+		bot.egressTime = theLevel.time_ + 8000;
 }
 
 void Bots::pickGoal( GameEntity* ent, State& bot, float radius )
@@ -453,34 +729,54 @@ void Bots::thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_
 	if( theLevel.time_ > bot.goalTime || Distance( ent->r.currentOrigin, bot.goal ) < 2000 )
 		pickGoal( ent, bot, 9000 );
 
+	flares( ent, bot, sense, cmd );
+
+	const bool bomber = sense.role == Role::Bomber;
+	float cruise = planeCruiseHeight;
+	if( bomber )
+		cruise = std::clamp( sense.height + ceilingAbove( ent->r.currentOrigin, ent->s.number ) - 700.0f, bomberMinHeight, 3500.0f );
+	else if( bot.desire == Goal::Climb )
+		cruise = sense.height + 500.0f;
+
 	vec3_t dir, angles;
 	bool attacking = false;
-	if( sense.enemy && theLevel.time_ > bot.egressTime )
+	bool bombing = false;
+	VectorSubtract( bot.goal, ent->r.currentOrigin, dir );
+	dir[2] = 0;
+	vectoangles( dir, angles );
+	angles[PITCH] = 0;
+
+	if( sense.enemy && bot.desire == Goal::Evade )
+		angles[YAW] = sense.enemyAngles[YAW] + 180.0f;
+	else if( sense.enemy && bot.desire == Goal::Attack && theLevel.time_ > bot.egressTime )
 	{
-		VectorCopy( sense.enemyAngles, angles );
-		attacking = true;
-		if( !sense.enemyAir && sense.enemyDist < 900 )
-			bot.egressTime = theLevel.time_ + 5000;
-		if( sense.enemyAir && sense.enemyDist < 500 )
+		const bool hasBombs = hasWeaponType( client->vehicle_, ps, WT_IRONBOMB ) || hasWeaponType( client->vehicle_, ps, WT_GUIDEDBOMB );
+		if( bomber && hasBombs && !sense.enemyAir )
+			bombing = true;
+		else if( sense.stealth && !sense.revealed && sense.enemyDist > 2500 )
+			angles[YAW] = sense.enemyAngles[YAW];
+		else
 		{
-			bot.avoidYaw = ps.vehicleAngles[YAW] + 70.0f;
-			bot.avoidTime = theLevel.time_ + 1500;
-			bot.egressTime = theLevel.time_ + 2500;
+			VectorCopy( sense.enemyAngles, angles );
+			attacking = true;
+			if( !sense.enemyAir && sense.enemyDist < 900 )
+				bot.egressTime = theLevel.time_ + 5000;
+			if( sense.enemyAir && sense.enemyDist < 500 )
+			{
+				bot.avoidYaw = ps.vehicleAngles[YAW] + 70.0f;
+				bot.avoidTime = theLevel.time_ + 1500;
+				bot.egressTime = theLevel.time_ + 2500;
+			}
 		}
-	}
-	else
-	{
-		VectorSubtract( bot.goal, ent->r.currentOrigin, dir );
-		dir[2] = 0;
-		vectoangles( dir, angles );
-		angles[PITCH] = 0;
 	}
 
 	view[YAW] = angles[YAW];
 	if( attacking && (sense.enemyAir || sense.height > planeMinHeight * 1.5f) )
 		view[PITCH] = std::clamp( angles[PITCH], -50.0f, 35.0f );
 	else
-		view[PITCH] = std::clamp( (sense.height - planeCruiseHeight) / 30.0f, -30.0f, 20.0f );
+		view[PITCH] = std::clamp( (sense.height - cruise) / 30.0f, -30.0f, 20.0f );
+	if( bombing )
+		bomb( ent, bot, sense, cmd, view );
 
 	vec3_t forward;
 	const float travel = std::max( 1200.0f, VectorLength( ps.velocity ) * 3.0f );
@@ -517,7 +813,7 @@ void Bots::thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_
 	{
 		view[YAW] = bot.avoidYaw;
 		if( attacking )
-			view[PITCH] = std::clamp( (sense.height - planeCruiseHeight) / 30.0f, -30.0f, 20.0f );
+			view[PITCH] = std::clamp( (sense.height - cruise) / 30.0f, -30.0f, 20.0f );
 	}
 	if( sense.height < planeMinHeight )
 		view[PITCH] = -40.0f;
@@ -579,19 +875,51 @@ void Bots::thinkHelo( GameEntity* ent, State& bot, const Sense& sense, usercmd_t
 		vectoangles( dir, angles );
 		angles[PITCH] = 0;
 	}
-	view[YAW] = angles[YAW];
+	const bool evading = sense.enemy && bot.desire == Goal::Evade;
+	view[YAW] = evading ? angles[YAW] + 180.0f : angles[YAW];
 	view[PITCH] = sense.enemy ? std::clamp( AngleSubtract( angles[PITCH], 0 ), -30.0f, 45.0f ) : 0.0f;
+	flares( ent, bot, sense, cmd );
 
-	const float yawError = fabs( AngleSubtract( angles[YAW], ps.vehicleAngles[YAW] ) );
+	const float yawError = fabs( AngleSubtract( view[YAW], ps.vehicleAngles[YAW] ) );
 
-	float wantHeight = heloCruiseHeight;
+	float wantHeight = sense.role == Role::AttackHelo ? heloLowHeight : heloCruiseHeight * 0.6f;
+	bool cover = false;
+	if( sense.enemy && bot.desire == Goal::Attack && dist < 3000 )
+	{
+		if( theLevel.time_ < bot.hideTime )
+		{
+			cover = true;
+			wantHeight = 110.0f;
+		}
+		else if( !bot.exposed )
+		{
+			if( sense.enemyVisible )
+			{
+				bot.exposed = true;
+				bot.popTime = theLevel.time_ + 3000 + static_cast<int>( 4000 * character( bot ).patience );
+			}
+			else
+				wantHeight = std::min( sense.height + 300.0f, 900.0f );
+		}
+		if( bot.exposed )
+		{
+			wantHeight = std::max( sense.height, heloLowHeight );
+			if( theLevel.time_ > bot.popTime )
+			{
+				bot.exposed = false;
+				bot.hideTime = theLevel.time_ + 2000 + static_cast<int>( 3000 * character( bot ).caution );
+			}
+		}
+	}
+	else
+		bot.exposed = false;
 	vec3_t forward, flat;
 	trace_t tr;
 	VectorSet( flat, 0, ps.vehicleAngles[YAW], 0 );
 	AngleVectors( flat, forward, nullptr, nullptr );
-	const bool blocked = pathBlocked( ent->r.currentOrigin, forward, 900, ent->s.number, tr );
+	const bool blocked = pathBlocked( ent->r.currentOrigin, forward, 900, ent->s.number, tr ) && (tr.entityNum == ENTITYNUM_WORLD || tr.fraction < 0.35f);
 	if( blocked )
-		wantHeight = sense.height + 400;
+		wantHeight = std::min( sense.height + 400.0f, 1500.0f );
 
 	const float throttle = signedThrottle( ps, client->vehicle_ );
 	float wantThrottle = std::clamp( (wantHeight - sense.height) / 60.0f, -3.0f, static_cast<float>( veh.maxthrottle ) );
@@ -605,11 +933,15 @@ void Bots::thinkHelo( GameEntity* ent, State& bot, const Sense& sense, usercmd_t
 		cmd.buttons |= BUTTON_DECREASE;
 
 	float wantPitch = 0;
-	if( !(ps.ONOFF & OO_LANDED) && !blocked && sense.height > 150 )
+	if( !(ps.ONOFF & OO_LANDED) && !blocked && sense.height > 90 )
 	{
 		const float standoff = sense.enemy ? (sense.enemyAir ? 500.0f : 1200.0f) : 0.0f;
-		if( yawError < 50 && dist > standoff + 300 )
-			wantPitch = sense.height > 300 ? 14.0f : 7.0f;
+		if( evading )
+			wantPitch = yawError < 60 ? 14.0f : 0.0f;
+		else if( cover )
+			wantPitch = -5.0f;
+		else if( yawError < 50 && dist > standoff + 300 )
+			wantPitch = sense.height > 300 ? 14.0f : 9.0f;
 		else if( sense.enemy && dist < standoff )
 			wantPitch = -6.0f;
 	}
@@ -626,7 +958,7 @@ void Bots::thinkHelo( GameEntity* ent, State& bot, const Sense& sense, usercmd_t
 			cmd.rightmove = 127;
 	}
 
-	if( sense.enemy && !(ps.ONOFF & OO_LANDED) )
+	if( sense.enemy && !(ps.ONOFF & OO_LANDED) && !cover && !evading )
 		fireWeapons( ent, bot, sense, cmd, yawError );
 }
 
@@ -649,6 +981,35 @@ void Bots::thinkSurface( GameEntity* ent, State& bot, const Sense& sense, usercm
 	}
 	else
 		VectorSubtract( bot.goal, ent->r.currentOrigin, dir );
+
+	flares( ent, bot, sense, cmd );
+	if( bot.desire == Goal::Hide && sense.airThreat )
+	{
+		if( !bot.hasHide || theLevel.time_ > bot.hideTime )
+		{
+			bot.hasHide = findHidePoint( ent, bot, sense.airThreat );
+			bot.hideTime = theLevel.time_ + 4000;
+		}
+		if( bot.hasHide )
+		{
+			VectorSubtract( bot.hidePoint, ent->r.currentOrigin, dir );
+			hold = fabs( dir[0] ) + fabs( dir[1] ) < 90;
+		}
+		else
+		{
+			VectorSubtract( ent->r.currentOrigin, sense.airThreat->r.currentOrigin, dir );
+			hold = false;
+		}
+	}
+	else
+	{
+		bot.hasHide = false;
+		if( bot.desire == Goal::Evade && sense.enemy )
+		{
+			VectorNegate( sense.enemyDir, dir );
+			hold = false;
+		}
+	}
 	dir[2] = 0;
 	vectoangles( dir, angles );
 
@@ -908,10 +1269,10 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 			thinkInfantry( ent, bot, s, cmd, view );
 	}
 
-	const float skill = std::clamp( g_botSkill.value, 1.0f, 5.0f );
+	const float wobble = (1.0f - skill( bot )) * 3.0f;
 	bot.aimPhase += 0.11f;
-	view[YAW] += sin( bot.aimPhase ) * (5.0f - skill) * 0.6f;
-	view[PITCH] += cos( bot.aimPhase * 0.7f ) * (5.0f - skill) * 0.4f;
+	view[YAW] += sin( bot.aimPhase ) * wobble;
+	view[PITCH] += cos( bot.aimPhase * 0.7f ) * wobble * 0.6f;
 
 	for( int i = 0; i < 3; i++ )
 		cmd.angles[i] = ANGLE2SHORT( view[i] ) - ps.delta_angles[i];
@@ -996,9 +1357,10 @@ void Bots::listCommand()
 		if( !ent || !ent->client_ )
 			continue;
 		GameClient* cl = ent->client_;
-		Common::printf( "BOT %d %s vehicle %d health %d org %.0f %.0f %.0f speed %d enemy %d riding %d score %d height %.0f onoff %x angles %.0f %.0f fuel %d\n", i, cl->pers_.netname_,
+		Common::printf( "BOT %d %s vehicle %d health %d org %.0f %.0f %.0f speed %d enemy %d riding %d score %d height %.0f onoff %x angles %.0f %.0f fuel %d goal %d role %d\n", i, cl->pers_.netname_,
 			cl->vehicle_, ent->health_, ent->r.currentOrigin[0], ent->r.currentOrigin[1], ent->r.currentOrigin[2], cl->ps_.speed,
 			states_[i].enemy, cl->sess_.ridingClient_, cl->ps_.persistant[PERS_SCORE], heightAboveGround( ent->r.currentOrigin, i ),
-			cl->ps_.ONOFF, cl->ps_.vehicleAngles[PITCH], cl->ps_.vehicleAngles[YAW], cl->ps_.stats[STAT_FUEL] );
+			cl->ps_.ONOFF, cl->ps_.vehicleAngles[PITCH], cl->ps_.vehicleAngles[YAW], cl->ps_.stats[STAT_FUEL],
+			static_cast<int>( states_[i].desire ), cl->vehicle_ >= 0 ? static_cast<int>( roleOf( cl->vehicle_ ) ) : -1 );
 	}
 }

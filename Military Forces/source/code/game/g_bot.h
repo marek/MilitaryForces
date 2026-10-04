@@ -24,6 +24,19 @@ public:
 	static void kickCommand();
 	static void listCommand();
 
+	enum class Role { Fighter, Bomber, AttackHelo, TransportHelo, Tank, AirDefence, Boat, Infantry };
+	enum class Goal { Roam, Attack, Evade, Climb, Hide };
+
+	struct Character
+	{
+		const char*	name;
+		float		aggression;
+		float		caution;
+		float		patience;
+		float		teamwork;
+		float		aim;
+	};
+
 private:
 	struct State
 	{
@@ -46,6 +59,16 @@ private:
 		float	avoidYaw = 0;
 		float	aimPhase = 0;
 		bool	wasAlive = false;
+		int		character = 0;
+		Goal	desire = Goal::Roam;
+		int		goalEvalTime = 0;
+		vec3_t	hidePoint = { 0, 0, 0 };
+		int		hideTime = 0;
+		bool	hasHide = false;
+		int		popTime = 0;
+		bool	exposed = false;
+		int		flareTime = 0;
+		int		bombTime = 0;
 	};
 
 	struct Sense
@@ -56,6 +79,15 @@ private:
 		vec3_t		enemyAngles = { 0, 0, 0 };
 		bool		enemyAir = false;
 		float		height = 0;
+		bool		enemyVisible = false;
+		bool		locked = false;
+		bool		launched = false;
+		float		health = 1;
+		GameEntity*	airThreat = nullptr;
+		float		airThreatDist = 0;
+		Role		role = Role::Fighter;
+		bool		stealth = false;
+		bool		revealed = false;
 	};
 
 	static void think( GameEntity* ent, State& bot, usercmd_t& cmd );
@@ -65,7 +97,17 @@ private:
 	static void thinkInfantry( GameEntity* ent, State& bot, const Sense& sense, usercmd_t& cmd, vec3_t view );
 	static void thinkRider( GameEntity* ent, State& bot, usercmd_t& cmd, vec3_t view );
 
-	static GameEntity* findEnemy( GameEntity* ent, State& bot );
+	static GameEntity* findEnemy( GameEntity* ent, State& bot, Role role );
+	static Role roleOf( int vehicle );
+	static Goal chooseGoal( GameEntity* ent, State& bot, const Sense& sense );
+	static const Character& character( const State& bot );
+	static float skill( const State& bot );
+	static bool visible( GameEntity* ent, const vec3_t from, GameEntity* target );
+	static bool hasWeaponType( int vehicle, const playerState_t& ps, int type );
+	static bool findHidePoint( GameEntity* ent, State& bot, GameEntity* threat );
+	static void bomb( GameEntity* ent, State& bot, const Sense& sense, usercmd_t& cmd, vec3_t view );
+	static void flares( GameEntity* ent, State& bot, const Sense& sense, usercmd_t& cmd );
+	static float ceilingAbove( const vec3_t origin, int passEntity );
 	static void sense( GameEntity* ent, State& bot, Sense& out );
 	static void pickGoal( GameEntity* ent, State& bot, float radius );
 	static void fireWeapons( GameEntity* ent, State& bot, const Sense& sense, usercmd_t& cmd, float aimError );
