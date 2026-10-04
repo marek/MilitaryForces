@@ -272,9 +272,6 @@ void	Game::touchTriggers( GameEntity *ent )
 
 		if( hit->touchFunc_ ) 
 			hit->touchFunc_->execute( ent, &trace );
-
-		if( ( ent->r.svFlags & SVF_BOT ) && ( ent->touchFunc_ ) ) 
-			ent->touchFunc_->execute( hit, &trace );
 	}
 
 }

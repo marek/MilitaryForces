@@ -446,7 +446,7 @@ void Bots::thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_
 	if( ps.ONOFF & OO_LANDED )
 	{
 		view[YAW] = ps.vehicleAngles[YAW];
-		view[PITCH] = speed > veh.stallspeed * 1.2f ? -15.0f : 0.0f;
+		view[PITCH] = speed > veh.stallspeed * 1.4f ? -10.0f : 0.0f;
 		return;
 	}
 
@@ -461,6 +461,12 @@ void Bots::thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_
 		attacking = true;
 		if( !sense.enemyAir && sense.enemyDist < 900 )
 			bot.egressTime = theLevel.time_ + 5000;
+		if( sense.enemyAir && sense.enemyDist < 500 )
+		{
+			bot.avoidYaw = ps.vehicleAngles[YAW] + 70.0f;
+			bot.avoidTime = theLevel.time_ + 1500;
+			bot.egressTime = theLevel.time_ + 2500;
+		}
 	}
 	else
 	{
@@ -522,6 +528,8 @@ void Bots::thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_
 
 	if( speed < veh.stallspeed * 1.3f && sense.height > planeMinHeight * 2 )
 		view[PITCH] = std::max( view[PITCH], 5.0f );
+	else if( speed < veh.stallspeed * 1.7f )
+		view[PITCH] = std::max( view[PITCH], -10.0f );
 
 	if( attacking )
 	{
@@ -596,13 +604,26 @@ void Bots::thinkHelo( GameEntity* ent, State& bot, const Sense& sense, usercmd_t
 	else if( throttle > ceil( wantThrottle ) )
 		cmd.buttons |= BUTTON_DECREASE;
 
+	float wantPitch = 0;
 	if( !(ps.ONOFF & OO_LANDED) && !blocked && sense.height > 150 )
 	{
 		const float standoff = sense.enemy ? (sense.enemyAir ? 500.0f : 1200.0f) : 0.0f;
 		if( yawError < 50 && dist > standoff + 300 )
-			cmd.forwardmove = 127;
+			wantPitch = sense.height > 300 ? 14.0f : 7.0f;
 		else if( sense.enemy && dist < standoff )
+			wantPitch = -6.0f;
+	}
+	if( !(ps.ONOFF & OO_LANDED) )
+	{
+		const float pitchError = wantPitch - ps.vehicleAngles[PITCH];
+		if( pitchError > 2 )
+			cmd.forwardmove = 127;
+		else if( pitchError < -2 )
 			cmd.forwardmove = -127;
+		if( ps.vehicleAngles[ROLL] > 2 )
+			cmd.rightmove = -127;
+		else if( ps.vehicleAngles[ROLL] < -2 )
+			cmd.rightmove = 127;
 	}
 
 	if( sense.enemy && !(ps.ONOFF & OO_LANDED) )
