@@ -116,6 +116,11 @@ void CGame::offsetVehicleView( bool spectator )
 	}
 
     VectorCopy( cg.refdefViewAngles, focusAngles );
+	// swing the camera around the vehicle, for looking at it from the side or the front
+	if( cg_thirdPersonAngle.value != 0.0f && !spectator ) {
+		focusAngles[YAW] += cg_thirdPersonAngle.value;
+		cg.refdefViewAngles[YAW] = focusAngles[YAW];
+	}
 
 //    if ( cg.predictedPlayerState.stats[STAT_HEALTH] <= GIB_HEALTH ) 
 //    {
@@ -146,6 +151,13 @@ void CGame::offsetVehicleView( bool spectator )
 		CGame::trace( &trace, start, mins, maxs, view, cg.predictedPlayerState.clientNum, MASK_SOLID );
 		VectorCopy( trace.endpos, view );
     }
+
+	if( cg_thirdPersonAngle.value != 0.0f && !spectator ) {
+		// keep the vehicle in the middle of the picture
+		vec3_t toVehicle;
+		VectorSubtract( cg.refdef.vieworg, view, toVehicle );
+		vectoangles( toVehicle, cg.refdefViewAngles );
+	}
 
     VectorCopy( view, cg.refdef.vieworg );
 }

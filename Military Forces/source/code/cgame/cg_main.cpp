@@ -80,7 +80,7 @@ particleWorld_t		pw;
 // (unused cVars)
 //vmCvar_t	cg_drawCrosshair;
 //vmCvar_t	cg_pmove_fixed;
-//vmCvar_t	cg_thirdPersonAngle;
+vmCvar_t	cg_thirdPersonAngle;
 
 vmCvar_t	cg_railTrailTime;
 vmCvar_t	cg_centertime;
@@ -205,7 +205,7 @@ struct cvarTable_t {
 
 cvarTable_t		cvarTable[] = {
 //	{ &cg_pmove_fixed, "cg_pmove_fixed", "1", CVAR_USERINFO | CVAR_ARCHIVE },
-//	{ &cg_thirdPersonAngle, "cg_thirdPersonAngle", "0", 0 },
+	{ &cg_thirdPersonAngle, "cg_thirdPersonAngle", "0", CVAR_CHEAT },
 //	{ &cg_drawCrosshair, "cg_drawCrosshair", "4", CVAR_ARCHIVE },
 
 	{ &cg_ignore, "cg_ignore", "0", 0 },	// used for debugging
