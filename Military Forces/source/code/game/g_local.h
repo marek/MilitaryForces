@@ -807,7 +807,7 @@ void ClientSpawn( GameEntity *ent );
 void AddScore( GameEntity *ent, vec3_t origin, int score );
 void CalculateRanks( );
 bool SpotWouldTelefrag( GameEntity *spot );
-bool SpotWouldTelefrag( GameEntity *spot, int vehicle );
+bool SpotWouldTelefrag( GameEntity *spot, int vehicle, bool *freshOccupant = nullptr );
 
 // mfq3
 // mf_client.c

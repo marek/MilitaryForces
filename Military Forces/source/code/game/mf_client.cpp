@@ -352,14 +352,17 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 					continue;
 
 				// hold an occupied spawn only for a moment, so campers cannot block it
+				// (someone who only just spawned there is leaving, so keep waiting for them)
 				const bool heldLongEnough = client->spawnHoldTime_ && theLevel.time_ > client->spawnHoldTime_ + spawnHoldLimit;
-				if( !heldLongEnough && SpotWouldTelefrag( spawnPoint, vehIndex ) ) 
+				bool freshOccupant = false;
+				if( SpotWouldTelefrag( spawnPoint, vehIndex, &freshOccupant ) && (!heldLongEnough || freshOccupant) ) 
 				{
 					occupied = true;
 					continue;
 				}
 				
 				client->spawnHoldTime_ = 0;
+				client->spawnedTime_ = theLevel.time_;
 				break;
 
 			} while ( true );

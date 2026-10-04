@@ -101,8 +101,10 @@ bool SpotWouldTelefrag( GameEntity *spot )
 	return false;
 }
 
-bool SpotWouldTelefrag( GameEntity *spot, int vehicle )
+bool SpotWouldTelefrag( GameEntity *spot, int vehicle, bool *freshOccupant )
 {
+	// someone who spawned moments ago is on the way out, not camping
+	constexpr int freshTime = 10000;
 	int			touch[MAX_GENTITIES];
 	vec3_t		mins, maxs;
 
@@ -124,7 +126,11 @@ bool SpotWouldTelefrag( GameEntity *spot, int vehicle )
 	{
 		GameEntity* hit = theLevel.getEntity(touch[i]);
 		if ( hit && (hit->client_ || hit->s.eType == ET_MISC_VEHICLE) ) 
+		{
+			if( freshOccupant && hit->client_ && theLevel.time_ - hit->client_->spawnedTime_ < freshTime )
+				*freshOccupant = true;
 			return true;
+		}
 	}
 
 	if( !(availableVehicles[vehicle].cat & (CAT_PLANE|CAT_HELO)) )

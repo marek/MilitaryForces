@@ -242,19 +242,15 @@ struct HeloTasks
 		return Status::Success;
 	}
 
-	static Status terrainAhead( Mind& c )
-	{
-		vec3_t forward, flat = { 0, c.ps.vehicleAngles[YAW], 0 };
-		trace_t tr;
-		AngleVectors( flat, forward, nullptr, nullptr );
-		c.blocked = Bots::pathBlocked( c.ent->r.currentOrigin, forward, 900, c.ent->s.number, tr ) && (tr.entityNum == ENTITYNUM_WORLD || tr.fraction < 0.35f);
-		if( c.blocked )
-			c.wantHeight = std::min( c.sense.height + 400.0f, 1500.0f );
-		return Status::Success;
-	}
-
 	static Status collective( Mind& c )
 	{
+		// never climb into the roof, whatever asked for the height
+		constexpr float headroom = 150.0f;
+		if( !c.landed() )
+		{
+			const float highest = c.sense.height + Bots::ceilingAbove( c.ent->r.currentOrigin, c.ent->s.number ) - headroom;
+			c.wantHeight = std::min( c.wantHeight, std::max( highest, 40.0f ) );
+		}
 		const float throttle = signedThrottle( c.ps, c.client->vehicle_ );
 		float wantThrottle = std::clamp( (c.wantHeight - c.sense.height) / 60.0f, -3.0f, static_cast<float>( c.veh.maxthrottle ) );
 		if( c.wait )
@@ -270,45 +266,139 @@ struct HeloTasks
 		return Status::Success;
 	}
 
-	static Status attitude( Mind& c )
+	// free distance for the whole airframe along a direction, up to reach
+	static float clearAlong( const Mind& c, const vec3_t dir, float reach )
 	{
+		constexpr float margin = 24.0f;
+		vec3_t mins, maxs, end;
+		for( int k = 0; k < 3; k++ )
+		{
+			mins[k] = c.veh.mins[k] - margin;
+			maxs[k] = c.veh.maxs[k] + margin;
+		}
+		VectorMA( c.ent->r.currentOrigin, reach, dir, end );
+		trace_t tr;
+		SV_Trace( &tr, c.ent->r.currentOrigin, mins, maxs, end, c.ent->s.number, MASK_PLAYERSOLID|CONTENTS_BOTCLIP, false );
+		if( tr.startsolid )
+			SV_Trace( &tr, c.ent->r.currentOrigin, c.veh.mins, c.veh.maxs, end, c.ent->s.number, MASK_PLAYERSOLID|CONTENTS_BOTCLIP, false );
+		return tr.startsolid ? 0.0f : tr.fraction * reach;
+	}
+
+	// A helicopter goes where it tilts, in any direction, and stops when it levels. The pilot keeps the nose on what it
+	// is looking at and tilts toward the clear direction nearest to where it wants to go.
+	static Status steer( Mind& c )
+	{
+		constexpr float maxPitch = 30.0f;
+		constexpr float maxRoll = 40.0f;
+		constexpr float levelling = 0.75f;
 		c.yawError = fabs( AngleSubtract( c.view[YAW], c.ps.vehicleAngles[YAW] ) );
-		float wantPitch = 0;
-		if( !c.blocked && c.sense.height > 90 )
+
+		// how hard to push in the wanted direction, as forward tilt in degrees (negative backs away)
+		float push = 0;
+		if( c.sense.height > 60 )
 		{
 			switch( c.mode )
 			{
 			case Run:
-				wantPitch = c.yawError < 60 ? 14.0f : 0.0f;
+				push = 14.0f;
 				break;
 			case ToPad:
-				wantPitch = c.yawError < 40 ? std::clamp( c.dist / 60.0f, 3.0f, 14.0f ) : 0.0f;
+				push = std::clamp( c.dist / 60.0f, 3.0f, 14.0f );
 				break;
 			case MoveToCover:
-				wantPitch = c.dist > 150 && c.yawError < 50 ? 12.0f : 0.0f;
+				push = c.dist > 150 ? 12.0f : 0.0f;
 				break;
 			case BackOff:
-				wantPitch = -5.0f;
+				push = -5.0f;
 				break;
 			case Hover:
 				break;
 			default:
-				if( c.yawError < 50 && c.dist > c.standoff + 300 )
-					wantPitch = c.sense.height > 300 ? 14.0f : 9.0f;
+				if( c.dist > c.standoff + 300 )
+					push = c.sense.height > 300 ? 14.0f : 9.0f;
 				else if( c.sense.enemy && c.dist < c.standoff )
-					wantPitch = -6.0f;
+					push = -6.0f;
 				break;
 			}
 		}
+
+		const float maxSpeed = static_cast<float>( c.veh.maxspeed );
+		const float sideSpeed = std::max( 1.0f, c.veh.turnspeed[YAW] * 2.5f );
+		float travelYaw = c.view[YAW] + (push < 0 ? 180.0f : 0.0f);
+		float speed = fabs( push ) / maxPitch * maxSpeed;
+		c.blocked = false;
+		if( speed > 1.0f )
+		{
+			// the wanted direction first, then either side of it, then back the way it came; hover if nothing is open
+			const float reach = 200.0f + speed * 2.0f;
+			bool found = false;
+			for( float offset : { 0.0f, 45.0f, -45.0f, 90.0f, -90.0f, 135.0f, -135.0f, 180.0f } )
+			{
+				vec3_t angles = { 0, travelYaw + offset, 0 }, dir;
+				AngleVectors( angles, dir, nullptr, nullptr );
+				if( clearAlong( c, dir, reach ) < reach )
+				{
+					if( offset == 0.0f )
+						c.blocked = true;
+					continue;
+				}
+				travelYaw += offset;
+				if( offset != 0.0f )
+					speed *= 0.7f;
+				found = true;
+				break;
+			}
+			if( !found )
+				speed = 0;
+			// something in the way of the direct line: go over it if there is room above
+			if( c.blocked )
+				c.wantHeight = std::max( c.wantHeight, std::min( c.sense.height + 300.0f, 1500.0f ) );
+		}
+
+		// the tilt is coarse, so the real motion can differ from the wanted one: stop if it leads into something
+		vec3_t moving = { c.ps.velocity[0], c.ps.velocity[1], 0 };
+		const float drift = VectorNormalize( moving );
+		if( drift > 15.0f && clearAlong( c, moving, 120.0f + drift * 1.5f ) < 120.0f + drift * 1.5f )
+			speed = 0;
+
+		// slow or hovering next to something: ease away from it
+		if( speed < 20.0f )
+		{
+			constexpr float nearby = 140.0f;
+			vec3_t away = { 0, 0, 0 };
+			for( float around = 0.0f; around < 360.0f; around += 45.0f )
+			{
+				vec3_t angles = { 0, around, 0 }, dir;
+				AngleVectors( angles, dir, nullptr, nullptr );
+				const float free = clearAlong( c, dir, nearby );
+				if( free < nearby )
+					VectorMA( away, -(nearby - free) / nearby, dir, away );
+			}
+			if( VectorNormalize( away ) > 0.05f )
+			{
+				vec3_t angles;
+				vectoangles( away, angles );
+				travelYaw = angles[YAW];
+				speed = maxSpeed * 0.12f;
+			}
+		}
+
+		vec3_t travel = { 0, travelYaw, 0 }, body = { 0, c.ps.vehicleAngles[YAW], 0 }, dir, forward, right;
+		AngleVectors( travel, dir, nullptr, nullptr );
+		AngleVectors( body, forward, right, nullptr );
+		const float wantPitch = std::clamp( DotProduct( dir, forward ) * speed / maxSpeed * maxPitch, -maxPitch, maxPitch );
+		const float wantRoll = std::clamp( DotProduct( dir, right ) * speed / sideSpeed * maxRoll, -maxRoll * 0.8f, maxRoll * 0.8f );
 		const float pitchError = wantPitch - c.ps.vehicleAngles[PITCH];
-		if( pitchError > 2 )
+		// level precisely: a couple of degrees left over is a steady drift
+		if( pitchError > levelling )
 			c.cmd.forwardmove = moveFull;
-		else if( pitchError < -2 )
+		else if( pitchError < -levelling )
 			c.cmd.forwardmove = -moveFull;
-		if( c.ps.vehicleAngles[ROLL] > 2 )
-			c.cmd.rightmove = -moveFull;
-		else if( c.ps.vehicleAngles[ROLL] < -2 )
+		const float rollError = wantRoll - c.ps.vehicleAngles[ROLL];
+		if( rollError > levelling )
 			c.cmd.rightmove = moveFull;
+		else if( rollError < -levelling )
+			c.cmd.rightmove = -moveFull;
 		return Status::Success;
 	}
 
@@ -349,9 +439,8 @@ struct HeloTasks
 		t.setRoot( t.always( "pilot", act, {
 			t.action( "countermeasures", countermeasures ),
 			t.action( "navigate", navigate ),
-			t.action( "terrain ahead", terrainAhead ),
-			t.action( "collective", collective ),
-			t.when( "airborne", airborne, t.always( "fly", t.action( "attitude", attitude ), { t.action( "fire", fire ) } ) ) } ) );
+			t.when( "airborne", airborne, t.always( "fly", t.action( "steer", steer ), { t.action( "fire", fire ) } ) ),
+			t.action( "collective", collective ) } ) );
 		return t;
 	}
 };
