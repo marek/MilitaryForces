@@ -298,6 +298,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 		} 
 		else 
 		{
+			bool occupied = false;
 			do 
 			{
 				i++;
@@ -318,8 +319,14 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 	
 				if( i > 25) 
 				{
-					Common::printf(S_COLOR_YELLOW "WARNING: Couldn't find a spawn point after over 25 tries (Check mf_lvcat?) \n");
+					if( !occupied ) 
+						Common::printf(S_COLOR_YELLOW "WARNING: Couldn't find a spawn point after over 25 tries (Check mf_lvcat?) \n");
 					client->ps_.pm_flags &= ~PMF_VEHICLESPAWN;
+					if( occupied ) 
+					{
+						client->ps_.pm_flags |= PMF_VEHICLESELECT;
+						client->respawnTime_ = theLevel.time_ + 1000;
+					}
 					return;
 					break;
 				}
@@ -336,6 +343,12 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 				// check for category on this spawn point
 				if( !(spawnPoint->ent_category_ & availableVehicles[vehIndex].cat) ) 
 					continue;
+
+				if( SpotWouldTelefrag( spawnPoint, vehIndex ) ) 
+				{
+					occupied = true;
+					continue;
+				}
 				
 				break;
 

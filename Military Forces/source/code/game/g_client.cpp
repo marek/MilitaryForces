@@ -101,6 +101,33 @@ bool SpotWouldTelefrag( GameEntity *spot )
 	return false;
 }
 
+bool SpotWouldTelefrag( GameEntity *spot, int vehicle )
+{
+	int			touch[MAX_GENTITIES];
+	vec3_t		mins, maxs;
+
+	if( vehicle < 0 || vehicle >= bg_numberOfVehicles ) 
+		return SpotWouldTelefrag( spot );
+
+	VectorAdd( spot->s.origin, availableVehicles[vehicle].mins, mins );
+	VectorAdd( spot->s.origin, availableVehicles[vehicle].maxs, maxs );
+	for( int i = 0; i < 3; i++ )
+	{
+		mins[i] -= 24;
+		maxs[i] += 24;
+	}
+	maxs[2] += 60;
+	int num = SV_AreaEntities( mins, maxs, touch, MAX_GENTITIES );
+
+	for( int i=0 ; i<num ; i++ )
+	{
+		GameEntity* hit = theLevel.getEntity(touch[i]);
+		if ( hit && (hit->client_ || hit->s.eType == ET_MISC_VEHICLE) ) 
+			return true;
+	}
+	return false;
+}
+
 /*
 ================
 SelectNearestDeathmatchSpawnPoint

@@ -56,7 +56,7 @@ int Bots::findWeaponSlot( int vehicle, const playerState_t& ps, bool air, float 
 		case WT_BALLISTICGUN:
 			if( air )
 				continue;
-			score = 7000.0f;
+			score = dist < 5000 ? 9500.0f : 7000.0f;
 			break;
 		case WT_MACHINEGUN:
 			if( !data.turret && !(data.fitsPylon & PF_GUNPOD) )

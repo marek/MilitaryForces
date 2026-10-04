@@ -148,8 +148,22 @@ void Bots::thinkSurface( GameEntity* ent, State& bot, const Sense& sense, usercm
 	{
 		view[YAW] = sense.enemyAngles[YAW];
 		view[PITCH] = std::clamp( AngleSubtract( sense.enemyAngles[PITCH], 0 ), -60.0f, 20.0f );
+		const int selected = veh.weapons[ps.weaponNum];
+		if( selected && availableWeapons[selected].type == WT_BALLISTICGUN && availableWeapons[selected].muzzleVelocity > 0 )
+		{
+			const float shell = static_cast<float>( availableWeapons[selected].muzzleVelocity );
+			const float flight = sense.enemyDist / shell;
+			vec3_t aim, dirAim, aimAngles;
+			VectorMA( sense.enemyVisible ? sense.enemy->r.currentOrigin : bot.seen[sense.enemy->s.number].position, flight, sense.enemy->client_->ps_.velocity, aim );
+			VectorSubtract( aim, ent->r.currentOrigin, dirAim );
+			const float range = VectorLength( dirAim );
+			vectoangles( dirAim, aimAngles );
+			const float arc = 0.5f * asin( std::clamp( DEFAULT_GRAVITY * range / (shell * shell), 0.0f, 1.0f ) ) * 180.0f / static_cast<float>( M_PI );
+			view[YAW] = aimAngles[YAW];
+			view[PITCH] = std::clamp( AngleSubtract( aimAngles[PITCH], 0 ) - arc, -60.0f, 20.0f );
+		}
 		const float turretYaw = ps.vehicleAngles[YAW] + ps.turretAngle;
-		const float aimError = fabs( AngleSubtract( sense.enemyAngles[YAW], turretYaw ) );
+		const float aimError = fabs( AngleSubtract( view[YAW], turretYaw ) );
 		fireWeapons( ent, bot, sense, cmd, aimError );
 	}
 	else

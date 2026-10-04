@@ -19,6 +19,8 @@ Bots::Goal Bots::chooseGoal( GameEntity* ent, State& bot, const Sense& sense )
 		evade += who.caution * (sense.blindsided ? 1.4f : 0.3f);
 	if( sense.blindsided && sense.role == Role::Tank )
 		hide += who.caution * 1.2f;
+	if( (sense.role == Role::Tank || sense.role == Role::AirDefence) && sense.health > 0.3f )
+		evade *= 0.4f;
 
 	if( sense.role == Role::Bomber )
 	{
