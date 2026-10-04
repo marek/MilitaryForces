@@ -752,12 +752,12 @@ void RE_UploadCinematic (int w, int h, int cols, int rows, const byte *data, int
 		tr.scratchImage[client]->height = tr.scratchImage[client]->uploadHeight = rows;
 
 		if ( qglesMajorVersion >= 1 ) {
-			buffer = static_cast<byte *>(ri.Hunk_AllocateTempMemory( 3 * cols * rows ));
+			buffer = static_cast<byte *>(ri.hunkAllocateTempMemory( 3 * cols * rows ));
 
 			R_ConvertTextureFormat( data, cols, rows, GL_RGB, GL_UNSIGNED_BYTE, buffer );
 			qglTextureImage2DEXT(texture, GL_TEXTURE_2D, 0, GL_RGB, cols, rows, 0, GL_RGB, GL_UNSIGNED_BYTE, buffer);
 
-			ri.Hunk_FreeTempMemory( buffer );
+			ri.hunkFreeTempMemory( buffer );
 		} else {
 			qglTextureImage2DEXT(texture, GL_TEXTURE_2D, 0, GL_RGB8, cols, rows, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 		}
@@ -771,12 +771,12 @@ void RE_UploadCinematic (int w, int h, int cols, int rows, const byte *data, int
 			// otherwise, just subimage upload it so that drivers can tell we are going to be changing
 			// it and don't try and do a texture compression
 			if ( qglesMajorVersion >= 1 ) {
-				buffer = static_cast<byte *>(ri.Hunk_AllocateTempMemory( 3 * cols * rows ));
+				buffer = static_cast<byte *>(ri.hunkAllocateTempMemory( 3 * cols * rows ));
 
 				R_ConvertTextureFormat( data, cols, rows, GL_RGB, GL_UNSIGNED_BYTE, buffer );
 				qglTextureSubImage2DEXT(texture, GL_TEXTURE_2D, 0, 0, 0, cols, rows, GL_RGB, GL_UNSIGNED_BYTE, buffer);
 
-				ri.Hunk_FreeTempMemory( buffer );
+				ri.hunkFreeTempMemory( buffer );
 			} else {
 				qglTextureSubImage2DEXT(texture, GL_TEXTURE_2D, 0, 0, 0, cols, rows, GL_RGBA, GL_UNSIGNED_BYTE, data);
 			}
@@ -1467,7 +1467,7 @@ const void	*RB_SwapBuffers( const void *data ) {
 		long sum = 0;
 		unsigned char *stencilReadback;
 
-		stencilReadback = static_cast<unsigned char *>(ri.Hunk_AllocateTempMemory( glConfig.vidWidth * glConfig.vidHeight ));
+		stencilReadback = static_cast<unsigned char *>(ri.hunkAllocateTempMemory( glConfig.vidWidth * glConfig.vidHeight ));
 		qglReadPixels( 0, 0, glConfig.vidWidth, glConfig.vidHeight, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, stencilReadback );
 
 		for ( i = 0; i < glConfig.vidWidth * glConfig.vidHeight; i++ ) {
@@ -1475,7 +1475,7 @@ const void	*RB_SwapBuffers( const void *data ) {
 		}
 
 		backEnd.pc.c_overDraw += sum;
-		ri.Hunk_FreeTempMemory( stencilReadback );
+		ri.hunkFreeTempMemory( stencilReadback );
 	}
 
 	RB_PresentToScreen();

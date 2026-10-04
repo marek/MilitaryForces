@@ -229,7 +229,7 @@ model_t *R_AllocModel( ) {
 		return nullptr;
 	}
 
-	mod = static_cast<model_t *>(ri.Hunk_Alloc( sizeof( *tr.models[tr.numModels] ), h_low ));
+	mod = static_cast<model_t *>(ri.hunkAlloc( sizeof( *tr.models[tr.numModels] ), h_low ));
 	mod->index = tr.numModels;
 	tr.models[tr.numModels] = mod;
 	tr.numModels++;
@@ -394,7 +394,7 @@ static bool R_LoadMD3 (model_t *mod, int lod, void *buffer, const char *mod_name
 	mod->type = MOD_MESH;
 	size = LittleLong(pinmodel->ofsEnd);
 	mod->dataSize += size;
-	mod->md3[lod] = static_cast<md3Header_t *>(ri.Hunk_Alloc( size, h_low ));
+	mod->md3[lod] = static_cast<md3Header_t *>(ri.hunkAlloc( size, h_low ));
 
 	Com_Memcpy (mod->md3[lod], buffer, LittleLong(pinmodel->ofsEnd) );
 
@@ -587,7 +587,7 @@ static bool R_LoadMDR( model_t *mod, void *buffer, int filesize, const char *mod
 	}
 
 	mod->dataSize += size;
-	mod->modelData = mdr = static_cast<mdrHeader_t *>(ri.Hunk_Alloc( size, h_low ));
+	mod->modelData = mdr = static_cast<mdrHeader_t *>(ri.hunkAlloc( size, h_low ));
 
 	// Copy all the values over from the file and fix endian issues in the process, if necessary.
 	

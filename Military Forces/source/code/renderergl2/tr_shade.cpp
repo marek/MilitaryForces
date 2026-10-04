@@ -185,7 +185,7 @@ static void DrawNormals (shaderCommands_t *input) {
 	const GLsizeiptr maxFloatCount = floatsPerVertex * static_cast<GLsizeiptr>(vertexCount);
 	const GLsizeiptr maxByteCount = static_cast<GLsizeiptr>(sizeof(float)) * maxFloatCount;
 
-	float* lineVertices = static_cast<float*>(ri.Hunk_AllocateTempMemory(static_cast<int>(maxByteCount)));
+	float* lineVertices = static_cast<float*>(ri.hunkAllocateTempMemory(static_cast<int>(maxByteCount)));
 	float* writePtr = lineVertices;
 
 	// Build the line list
@@ -220,7 +220,7 @@ static void DrawNormals (shaderCommands_t *input) {
 
 	const GLsizei numVerts = static_cast<GLsizei>((writePtr - lineVertices) / 3);
 	if (numVerts == 0) {
-		ri.Hunk_FreeTempMemory(lineVertices);
+		ri.hunkFreeTempMemory(lineVertices);
 		return;
 	}
 
@@ -274,7 +274,7 @@ static void DrawNormals (shaderCommands_t *input) {
 	if (prevProg) qglUseProgram(static_cast<GLuint>(prevProg));
 	else          qglUseProgram(0);
 
-	ri.Hunk_FreeTempMemory(lineVertices);
+	ri.hunkFreeTempMemory(lineVertices);
 }
 
 /*

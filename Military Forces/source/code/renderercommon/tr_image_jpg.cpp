@@ -467,10 +467,10 @@ void RE_SaveJPG(char * filename, int quality, int image_width, int image_height,
   size_t bufSize;
 
   bufSize = image_width * image_height * 3;
-  out = static_cast<byte *>(ri.Hunk_AllocateTempMemory(bufSize));
+  out = static_cast<byte *>(ri.hunkAllocateTempMemory(bufSize));
 
   bufSize = RE_SaveJPGToBuffer(out, bufSize, quality, image_width, image_height, image_buffer, padding);
   ri.FS_WriteFile(filename, out, bufSize);
 
-  ri.Hunk_FreeTempMemory(out);
+  ri.hunkFreeTempMemory(out);
 }

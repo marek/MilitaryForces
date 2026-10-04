@@ -471,7 +471,7 @@ alignment of packAlign to ensure efficient copying.
 
 Stores the length of padding after a line of pixels to address padlen
 
-Return value must be freed with ri.Hunk_FreeTempMemory()
+Return value must be freed with ri.hunkFreeTempMemory()
 ================== 
 */  
 
@@ -497,7 +497,7 @@ byte *RB_ReadPixels(int x, int y, int width, int height, size_t *offset, int *pa
 	padwidth = PAD(linelen, packAlign);
 
 	// Allocate a few more bytes so that we can choose an alignment we like
-	buffer = static_cast<byte *>(ri.Hunk_AllocateTempMemory(padwidth * height + *offset + packAlign - 1));
+	buffer = static_cast<byte *>(ri.hunkAllocateTempMemory(padwidth * height + *offset + packAlign - 1));
 
 	bufstart = static_cast<byte *>PADP((intptr_t) buffer + *offset, packAlign);
 	qglReadPixels(x, y, width, height, format, GL_UNSIGNED_BYTE, bufstart);
@@ -579,7 +579,7 @@ void RB_TakeScreenshot(int x, int y, int width, int height, char *fileName)
 
 	ri.FS_WriteFile(fileName, buffer, memcount + 18);
 
-	ri.Hunk_FreeTempMemory(allbuf);
+	ri.hunkFreeTempMemory(allbuf);
 }
 
 /* 
@@ -602,7 +602,7 @@ void RB_TakeScreenshotJPEG(int x, int y, int width, int height, char *fileName)
 		R_GammaCorrect(buffer + offset, memcount);
 
 	RE_SaveJPG(fileName, r_screenshotJpegQuality->integer, width, height, buffer + offset, padlen);
-	ri.Hunk_FreeTempMemory(buffer);
+	ri.hunkFreeTempMemory(buffer);
 }
 
 /*
@@ -726,7 +726,7 @@ void R_LevelShot( ) {
 	allsource = RB_ReadPixels(0, 0, glConfig.vidWidth, glConfig.vidHeight, &offset, &padlen);
 	source = allsource + offset;
 
-	buffer = static_cast<byte *>(ri.Hunk_AllocateTempMemory(128 * 128*3 + 18));
+	buffer = static_cast<byte *>(ri.hunkAllocateTempMemory(128 * 128*3 + 18));
 	Com_Memset (buffer, 0, 18);
 	buffer[2] = 2;		// uncompressed type
 	buffer[12] = 128;
@@ -762,8 +762,8 @@ void R_LevelShot( ) {
 
 	ri.FS_WriteFile( checkname, buffer, 128 * 128*3 + 18 );
 
-	ri.Hunk_FreeTempMemory(buffer);
-	ri.Hunk_FreeTempMemory(allsource);
+	ri.hunkFreeTempMemory(buffer);
+	ri.hunkFreeTempMemory(allsource);
 
 	ri.Printf( PRINT_ALL, "Wrote %s\n", checkname );
 }
@@ -1559,7 +1559,7 @@ void R_Init( ) {
 	if (max_polyverts < MAX_POLYVERTS)
 		max_polyverts = MAX_POLYVERTS;
 
-	ptr = static_cast<byte *>(ri.Hunk_Alloc( sizeof( *backEndData ) + sizeof(srfPoly_t) * max_polys + sizeof(polyVert_t) * max_polyverts, h_low));
+	ptr = static_cast<byte *>(ri.hunkAlloc( sizeof( *backEndData ) + sizeof(srfPoly_t) * max_polys + sizeof(polyVert_t) * max_polyverts, h_low));
 	backEndData = reinterpret_cast<backEndData_t *>(ptr);
 	backEndData->polys = reinterpret_cast<srfPoly_t *>(reinterpret_cast<char *>(ptr) + sizeof( *backEndData ));
 	backEndData->polyVerts = reinterpret_cast<polyVert_t *>(reinterpret_cast<char *>(ptr) + sizeof( *backEndData ) + sizeof(srfPoly_t) * max_polys);

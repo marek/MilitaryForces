@@ -612,7 +612,7 @@ bool R_LoadIQM( model_t *mod, void *buffer, int filesize, const char *mod_name )
 	}
 
 	mod->type = MOD_IQM;
-	iqmData = static_cast<iqmData_t *>(ri.Hunk_Alloc( size, h_low ));
+	iqmData = static_cast<iqmData_t *>(ri.hunkAlloc( size, h_low ));
 	mod->modelData = iqmData;
 
 	// fill header

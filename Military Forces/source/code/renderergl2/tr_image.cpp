@@ -1629,7 +1629,7 @@ static bool RawImage_ScaleToPower2( byte **data, int *inout_width, int *inout_he
 			finalheight >>= 1;
 		}
 
-		*resampledBuffer = static_cast<byte *>(ri.Hunk_AllocateTempMemory( finalwidth * finalheight * 4 ));
+		*resampledBuffer = static_cast<byte *>(ri.hunkAllocateTempMemory( finalwidth * finalheight * 4 ));
 
 		if (scaled_width != width || scaled_height != height)
 			ResampleTexture (*data, width, height, *resampledBuffer, scaled_width, scaled_height);
@@ -1662,7 +1662,7 @@ static bool RawImage_ScaleToPower2( byte **data, int *inout_width, int *inout_he
 	{
 		if (data && resampledBuffer)
 		{
-			*resampledBuffer = static_cast<byte *>(ri.Hunk_AllocateTempMemory( scaled_width * scaled_height * 4 ));
+			*resampledBuffer = static_cast<byte *>(ri.hunkAllocateTempMemory( scaled_width * scaled_height * 4 ));
 			ResampleTexture (*data, width, height, *resampledBuffer, scaled_width, scaled_height);
 			*data = *resampledBuffer;
 		}
@@ -1926,7 +1926,7 @@ static void RawImage_UploadToRgtc2Texture(GLuint texture, int miplevel, int x, i
 	hBlocks = (height + 3) / 4;
 	size = wBlocks * hBlocks * 16;
 
-	p = compressedData = static_cast<byte *>(ri.Hunk_AllocateTempMemory(size));
+	p = compressedData = static_cast<byte *>(ri.hunkAllocateTempMemory(size));
 	for (iy = 0; iy < height; iy += 4)
 	{
 		int oh = std::min(4, height - iy);
@@ -1960,7 +1960,7 @@ static void RawImage_UploadToRgtc2Texture(GLuint texture, int miplevel, int x, i
 	// FIXME: Won't work for x/y that aren't multiples of 4.
 	qglCompressedTextureSubImage2DEXT(texture, GL_TEXTURE_2D, miplevel, x, y, width, height, GL_COMPRESSED_RG_RGTC2, size, compressedData);
 
-	ri.Hunk_FreeTempMemory(compressedData);
+	ri.hunkFreeTempMemory(compressedData);
 }
 
 static int CalculateMipSize(int width, int height, GLenum picFormat)
@@ -2033,7 +2033,7 @@ static void RawImage_UploadTexture(GLuint texture, byte *data, int x, int y, int
 
 	if (qglesMajorVersion && rgba8 && (dataFormat != GL_RGBA || dataType != GL_UNSIGNED_BYTE))
 	{
-		formatBuffer = static_cast<byte *>(ri.Hunk_AllocateTempMemory(4 * width * height));
+		formatBuffer = static_cast<byte *>(ri.hunkAllocateTempMemory(4 * width * height));
 	}
 
 	miplevel = 0;
@@ -2093,7 +2093,7 @@ static void RawImage_UploadTexture(GLuint texture, byte *data, int x, int y, int
 	while (!lastMip);
 
 	if (formatBuffer != nullptr)
-		ri.Hunk_FreeTempMemory(formatBuffer);
+		ri.hunkFreeTempMemory(formatBuffer);
 }
 
 
@@ -2186,7 +2186,7 @@ image_t *R_CreateImage2( const char *name, byte *pic, int width, int height, GLe
 		ri.Error( ERR_DROP, "R_CreateImage: MAX_DRAWIMAGES hit");
 	}
 
-	image = tr.images[tr.numImages] = static_cast<image_t *>(ri.Hunk_Alloc( sizeof( image_t ), h_low ));
+	image = tr.images[tr.numImages] = static_cast<image_t *>(ri.hunkAlloc( sizeof( image_t ), h_low ));
 	qglGenTextures(1, &image->texnum);
 	tr.numImages++;
 
@@ -2305,7 +2305,7 @@ image_t *R_CreateImage2( const char *name, byte *pic, int width, int height, GLe
 		Upload32(pic, 0, 0, width, height, picFormat, dataFormat, dataType, numMips, image, scaled);
 
 	if (resampledBuffer != nullptr)
-		ri.Hunk_FreeTempMemory(resampledBuffer);
+		ri.hunkFreeTempMemory(resampledBuffer);
 
 	// Set all necessary texture parameters.
 	qglTextureParameterfEXT(image->texnum, textureTarget, GL_TEXTURE_WRAP_S, glWrapClampMode);
@@ -2776,7 +2776,7 @@ static void R_CreateFogImage( ) {
 	byte	*data;
 	float	d;
 
-	data = static_cast<byte *>(ri.Hunk_AllocateTempMemory( FOG_S * FOG_T * 4 ));
+	data = static_cast<byte *>(ri.hunkAllocateTempMemory( FOG_S * FOG_T * 4 ));
 
 	// S is distance, T is depth
 	for (x=0 ; x<FOG_S ; x++) {
@@ -2790,7 +2790,7 @@ static void R_CreateFogImage( ) {
 		}
 	}
 	tr.fogImage = R_CreateImage("*fog", data, FOG_S, FOG_T, IMGTYPE_COLORALPHA, IMGFLAG_CLAMPTOEDGE, 0 );
-	ri.Hunk_FreeTempMemory( data );
+	ri.hunkFreeTempMemory( data );
 }
 
 /*
@@ -3221,7 +3221,7 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 		return 0;
 	}
 	tr.numSkins++;
-	skin = static_cast<skin_t *>(ri.Hunk_Alloc( sizeof( skin_t ), h_low ));
+	skin = static_cast<skin_t *>(ri.hunkAlloc( sizeof( skin_t ), h_low ));
 	tr.skins[hSkin] = skin;
 	Q_strncpyz( skin->name, name, sizeof( skin->name ) );
 	skin->numSurfaces = 0;
@@ -3231,7 +3231,7 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 	// If not a .skin file, load as a single shader
 	if ( strcmp( name + strlen( name ) - 5, ".skin" ) ) {
 		skin->numSurfaces = 1;
-		skin->surfaces = static_cast<skinSurface_t *>(ri.Hunk_Alloc( sizeof( skinSurface_t ), h_low ));
+		skin->surfaces = static_cast<skinSurface_t *>(ri.hunkAlloc( sizeof( skinSurface_t ), h_low ));
 		skin->surfaces[0].shader = R_FindShader( name, LIGHTMAP_NONE, true );
 		return hSkin;
 	}
@@ -3289,7 +3289,7 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 	}
 
 	// copy surfaces to skin
-	skin->surfaces = static_cast<skinSurface_t *>(ri.Hunk_Alloc( skin->numSurfaces * sizeof( skinSurface_t ), h_low ));
+	skin->surfaces = static_cast<skinSurface_t *>(ri.hunkAlloc( skin->numSurfaces * sizeof( skinSurface_t ), h_low ));
 	memcpy( skin->surfaces, parseSurfaces, skin->numSurfaces * sizeof( skinSurface_t ) );
 
 	return hSkin;
@@ -3307,10 +3307,10 @@ void	R_InitSkins( ) {
 	tr.numSkins = 1;
 
 	// make the default skin have all default shaders
-	skin = tr.skins[0] = static_cast<skin_t *>(ri.Hunk_Alloc( sizeof( skin_t ), h_low ));
+	skin = tr.skins[0] = static_cast<skin_t *>(ri.hunkAlloc( sizeof( skin_t ), h_low ));
 	Q_strncpyz( skin->name, "<default skin>", sizeof( skin->name )  );
 	skin->numSurfaces = 1;
-	skin->surfaces = static_cast<skinSurface_t *>(ri.Hunk_Alloc( sizeof( skinSurface_t ), h_low ));
+	skin->surfaces = static_cast<skinSurface_t *>(ri.hunkAlloc( sizeof( skinSurface_t ), h_low ));
 	skin->surfaces[0].shader = tr.defaultShader;
 }
 

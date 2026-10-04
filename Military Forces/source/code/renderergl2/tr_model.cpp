@@ -230,7 +230,7 @@ model_t *R_AllocModel( ) {
 		return nullptr;
 	}
 
-	mod = static_cast<model_t *>(ri.Hunk_Alloc( sizeof( *tr.models[tr.numModels] ), h_low ));
+	mod = static_cast<model_t *>(ri.hunkAlloc( sizeof( *tr.models[tr.numModels] ), h_low ));
 	mod->index = tr.numModels;
 	tr.models[tr.numModels] = mod;
 	tr.numModels++;
@@ -408,7 +408,7 @@ static bool R_LoadMD3(model_t * mod, int lod, void *buffer, int bufferSize, cons
 	mod->type = MOD_MESH;
 	size = LittleLong(md3Model->ofsEnd);
 	mod->dataSize += size;
-	mdvModel = mod->mdv[lod] = static_cast<mdvModel_t *>(ri.Hunk_Alloc(sizeof(mdvModel_t), h_low));
+	mdvModel = mod->mdv[lod] = static_cast<mdvModel_t *>(ri.hunkAlloc(sizeof(mdvModel_t), h_low));
 
 //  Com_Memcpy(mod->md3[lod], buffer, LittleLong(md3Model->ofsEnd));
 
@@ -430,7 +430,7 @@ static bool R_LoadMD3(model_t * mod, int lod, void *buffer, int bufferSize, cons
 
 	// swap all the frames
 	mdvModel->numFrames = md3Model->numFrames;
-	mdvModel->frames = frame = static_cast<mdvFrame_t *>(ri.Hunk_Alloc(sizeof(*frame) * md3Model->numFrames, h_low));
+	mdvModel->frames = frame = static_cast<mdvFrame_t *>(ri.hunkAlloc(sizeof(*frame) * md3Model->numFrames, h_low));
 
 	md3Frame = reinterpret_cast<md3Frame_t *>(reinterpret_cast<byte *>(md3Model) + md3Model->ofsFrames);
 	for(i = 0; i < md3Model->numFrames; i++, frame++, md3Frame++)
@@ -446,7 +446,7 @@ static bool R_LoadMD3(model_t * mod, int lod, void *buffer, int bufferSize, cons
 
 	// swap all the tags
 	mdvModel->numTags = md3Model->numTags;
-	mdvModel->tags = tag = static_cast<mdvTag_t *>(ri.Hunk_Alloc(sizeof(*tag) * (md3Model->numTags * md3Model->numFrames), h_low));
+	mdvModel->tags = tag = static_cast<mdvTag_t *>(ri.hunkAlloc(sizeof(*tag) * (md3Model->numTags * md3Model->numFrames), h_low));
 
 	md3Tag = reinterpret_cast<md3Tag_t *>(reinterpret_cast<byte *>(md3Model) + md3Model->ofsTags);
 	for(i = 0; i < md3Model->numTags * md3Model->numFrames; i++, tag++, md3Tag++)
@@ -461,7 +461,7 @@ static bool R_LoadMD3(model_t * mod, int lod, void *buffer, int bufferSize, cons
 	}
 
 
-	mdvModel->tagNames = tagName = static_cast<mdvTagName_t *>(ri.Hunk_Alloc(sizeof(*tagName) * (md3Model->numTags), h_low));
+	mdvModel->tagNames = tagName = static_cast<mdvTagName_t *>(ri.hunkAlloc(sizeof(*tagName) * (md3Model->numTags), h_low));
 
 	md3Tag = reinterpret_cast<md3Tag_t *>(reinterpret_cast<byte *>(md3Model) + md3Model->ofsTags);
 	for(i = 0; i < md3Model->numTags; i++, tagName++, md3Tag++)
@@ -471,7 +471,7 @@ static bool R_LoadMD3(model_t * mod, int lod, void *buffer, int bufferSize, cons
 
 	// swap all the surfaces
 	mdvModel->numSurfaces = md3Model->numSurfaces;
-	mdvModel->surfaces = surf = static_cast<mdvSurface_t *>(ri.Hunk_Alloc(sizeof(*surf) * md3Model->numSurfaces, h_low));
+	mdvModel->surfaces = surf = static_cast<mdvSurface_t *>(ri.hunkAlloc(sizeof(*surf) * md3Model->numSurfaces, h_low));
 
 	md3Surf = reinterpret_cast<md3Surface_t *>(reinterpret_cast<byte *>(md3Model) + md3Model->ofsSurfaces);
 	for(i = 0; i < md3Model->numSurfaces; i++)
@@ -525,7 +525,7 @@ static bool R_LoadMD3(model_t * mod, int lod, void *buffer, int bufferSize, cons
 
 		// register the shaders
 		surf->numShaderIndexes = md3Surf->numShaders;
-		surf->shaderIndexes = shaderIndex = static_cast<int *>(ri.Hunk_Alloc(sizeof(*shaderIndex) * md3Surf->numShaders, h_low));
+		surf->shaderIndexes = shaderIndex = static_cast<int *>(ri.hunkAlloc(sizeof(*shaderIndex) * md3Surf->numShaders, h_low));
 
 		md3Shader = reinterpret_cast<md3Shader_t *>(reinterpret_cast<byte *>(md3Surf) + md3Surf->ofsShaders);
 		for(j = 0; j < md3Surf->numShaders; j++, shaderIndex++, md3Shader++)
@@ -545,7 +545,7 @@ static bool R_LoadMD3(model_t * mod, int lod, void *buffer, int bufferSize, cons
 
 		// swap all the triangles
 		surf->numIndexes = md3Surf->numTriangles * 3;
-		surf->indexes = tri = static_cast<glIndex_t *>(ri.Hunk_Alloc(sizeof(*tri) * 3 * md3Surf->numTriangles, h_low));
+		surf->indexes = tri = static_cast<glIndex_t *>(ri.hunkAlloc(sizeof(*tri) * 3 * md3Surf->numTriangles, h_low));
 
 		md3Tri = reinterpret_cast<md3Triangle_t *>(reinterpret_cast<byte *>(md3Surf) + md3Surf->ofsTriangles);
 		for(j = 0; j < md3Surf->numTriangles; j++, tri += 3, md3Tri++)
@@ -557,7 +557,7 @@ static bool R_LoadMD3(model_t * mod, int lod, void *buffer, int bufferSize, cons
 
 		// swap all the XyzNormals
 		surf->numVerts = md3Surf->numVerts;
-		surf->verts = v = static_cast<mdvVertex_t *>(ri.Hunk_Alloc(sizeof(*v) * (md3Surf->numVerts * md3Surf->numFrames), h_low));
+		surf->verts = v = static_cast<mdvVertex_t *>(ri.hunkAlloc(sizeof(*v) * (md3Surf->numVerts * md3Surf->numFrames), h_low));
 
 		md3xyz = reinterpret_cast<md3XyzNormal_t *>(reinterpret_cast<byte *>(md3Surf) + md3Surf->ofsXyzNormals);
 		for(j = 0; j < md3Surf->numVerts * md3Surf->numFrames; j++, md3xyz++, v++)
@@ -589,7 +589,7 @@ static bool R_LoadMD3(model_t * mod, int lod, void *buffer, int bufferSize, cons
 		}
 
 		// swap all the ST
-		surf->st = st = static_cast<mdvSt_t *>(ri.Hunk_Alloc(sizeof(*st) * md3Surf->numVerts, h_low));
+		surf->st = st = static_cast<mdvSt_t *>(ri.hunkAlloc(sizeof(*st) * md3Surf->numVerts, h_low));
 
 		md3st = reinterpret_cast<md3St_t *>(reinterpret_cast<byte *>(md3Surf) + md3Surf->ofsSt);
 		for(j = 0; j < md3Surf->numVerts; j++, md3st++, st++)
@@ -674,7 +674,7 @@ static bool R_LoadMD3(model_t * mod, int lod, void *buffer, int bufferSize, cons
 		srfVaoMdvMesh_t *vaoSurf;
 
 		mdvModel->numVaoSurfaces = mdvModel->numSurfaces;
-		mdvModel->vaoSurfaces = static_cast<srfVaoMdvMesh_t *>(ri.Hunk_Alloc(sizeof(*mdvModel->vaoSurfaces) * mdvModel->numSurfaces, h_low));
+		mdvModel->vaoSurfaces = static_cast<srfVaoMdvMesh_t *>(ri.hunkAlloc(sizeof(*mdvModel->vaoSurfaces) * mdvModel->numSurfaces, h_low));
 
 		vaoSurf = mdvModel->vaoSurfaces;
 		surf = mdvModel->surfaces;
@@ -883,7 +883,7 @@ static bool R_LoadMDR( model_t *mod, void *buffer, int filesize, const char *mod
 	}
 
 	mod->dataSize += size;
-	mod->modelData = mdr = static_cast<mdrHeader_t *>(ri.Hunk_Alloc( size, h_low ));
+	mod->modelData = mdr = static_cast<mdrHeader_t *>(ri.hunkAlloc( size, h_low ));
 
 	// Copy all the values over from the file and fix endian issues in the process, if necessary.
 	

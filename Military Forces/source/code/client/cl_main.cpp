@@ -3292,9 +3292,9 @@ void CL_InitRef( ) {
 	ri.Milliseconds = CL_ScaledMilliseconds;
 	ri.Malloc = CL_RefMalloc;
 	ri.Free = Zone::free;
-	ri.Hunk_AllocAt = Hunk_Alloc;
-	ri.Hunk_AllocateTempMemory = Hunk_AllocateTempMemory;
-	ri.Hunk_FreeTempMemory = Hunk_FreeTempMemory;
+	ri.hunkAllocAt = Hunk_Alloc;
+	ri.hunkAllocateTempMemory = Hunk_AllocateTempMemory;
+	ri.hunkFreeTempMemory = Hunk_FreeTempMemory;
 
 	ri.CM_ClusterPVS = CollisionModel::clusterPVS;
 	ri.CM_DrawDebugSurface = CollisionModel::drawDebugSurface;

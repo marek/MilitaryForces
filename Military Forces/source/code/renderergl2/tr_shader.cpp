@@ -2776,7 +2776,7 @@ static shader_t *GeneratePermanentShader( ) {
 		return tr.defaultShader;
 	}
 
-	newShader = static_cast<shader_t *>(ri.Hunk_Alloc( sizeof( shader_t ), h_low ));
+	newShader = static_cast<shader_t *>(ri.hunkAlloc( sizeof( shader_t ), h_low ));
 
 	*newShader = shader;
 
@@ -2798,12 +2798,12 @@ static shader_t *GeneratePermanentShader( ) {
 		if ( !stages[i].active ) {
 			break;
 		}
-		newShader->stages[i] = static_cast<shaderStage_t *>(ri.Hunk_Alloc( sizeof( stages[i] ), h_low ));
+		newShader->stages[i] = static_cast<shaderStage_t *>(ri.hunkAlloc( sizeof( stages[i] ), h_low ));
 		*newShader->stages[i] = stages[i];
 
 		for ( b = 0 ; b < NUM_TEXTURE_BUNDLES ; b++ ) {
 			size = newShader->stages[i]->bundle[b].numTexMods * sizeof( texModInfo_t );
-			newShader->stages[i]->bundle[b].texMods = static_cast<texModInfo_t *>(ri.Hunk_Alloc( size, h_low ));
+			newShader->stages[i]->bundle[b].texMods = static_cast<texModInfo_t *>(ri.hunkAlloc( size, h_low ));
 			Com_Memcpy( newShader->stages[i]->bundle[b].texMods, stages[i].bundle[b].texMods, size );
 		}
 	}
@@ -3879,7 +3879,7 @@ static void ScanAndLoadShaderFiles( )
 	}
 
 	// build single large buffer
-	s_shaderText = static_cast<char *>(ri.Hunk_Alloc( sum + numShaderFiles*2, h_low ));
+	s_shaderText = static_cast<char *>(ri.hunkAlloc( sum + numShaderFiles*2, h_low ));
 	s_shaderText[ 0 ] = '\0';
 	textEnd = s_shaderText;
  
@@ -3919,7 +3919,7 @@ static void ScanAndLoadShaderFiles( )
 
 	size += MAX_SHADERTEXT_HASH;
 
-	hashMem = static_cast<char *>(ri.Hunk_Alloc( size * sizeof(char *), h_low ));
+	hashMem = static_cast<char *>(ri.hunkAlloc( size * sizeof(char *), h_low ));
 
 	for (i = 0; i < MAX_SHADERTEXT_HASH; i++) {
 		shaderTextHashTable[i] = reinterpret_cast<char **>(hashMem);

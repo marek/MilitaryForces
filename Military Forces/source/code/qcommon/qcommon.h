@@ -735,15 +735,7 @@ temp file loading
 // debug builds record who asked for each block (the calling function, file and line); release builds ignore it
 void *S_Malloc( int size, const std::source_location& at = std::source_location::current() );			// NOT 0 filled memory only for small allocations
 
-void Hunk_Clear( );
-void Hunk_ClearToMark( );
-void Hunk_SetMark( );
-bool Hunk_CheckMark( );
-void Hunk_ClearTempMemory( );
-void *Hunk_AllocateTempMemory( int size );
-void Hunk_FreeTempMemory( void *buf );
-int	Hunk_MemoryRemaining( );
-void Hunk_Log( );
+
 
 
 // commandLine should not include the executable name (argv[0])
