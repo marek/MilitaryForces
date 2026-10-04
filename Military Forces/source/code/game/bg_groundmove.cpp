@@ -312,6 +312,63 @@ PlayerMove::groundVehicleMove
 */
 bool	PM_SlideMove_GV();
 
+/*
+===================
+PM_StepSlideMove_GV
+
+A ground vehicle that is stopped by an edge in the terrain tries again from a little higher up, so it
+climbs onto ground it could drive on instead of sliding along the edge. The step is only taken when it
+ends on ground that is not too steep and gets the vehicle further than sliding did.
+===================
+*/
+static void PM_StepSlideMove_GV()
+{
+	constexpr float drivableNormal = 0.6f;
+	vec3_t	startOrigin, startVelocity, slideOrigin, slideVelocity, up, down, mins;
+	trace_t	trace;
+
+	VectorCopy( pm->ps->origin, startOrigin );
+	VectorCopy( pm->ps->velocity, startVelocity );
+	if( !PM_SlideMove_GV() )
+		return;		// nothing in the way
+
+	VectorCopy( pm->ps->origin, slideOrigin );
+	VectorCopy( pm->ps->velocity, slideVelocity );
+
+	// how high a vehicle can step: a good part of its own height
+	const float stepSize = std::max( 6.0f, ( availableVehicles[pm->vehicle].maxs[2] - availableVehicles[pm->vehicle].mins[2] ) * 0.6f );
+	VectorCopy( availableVehicles[pm->vehicle].mins, mins );
+	mins[2] += 4;
+
+	// room above to lift the vehicle
+	VectorCopy( startOrigin, up );
+	up[2] += stepSize;
+	pm->trace( &trace, startOrigin, mins, pm->maxs, up, pm->ps->clientNum, pm->tracemask, false );
+	if( trace.allsolid )
+		return;
+
+	// the same move from up there
+	VectorCopy( trace.endpos, pm->ps->origin );
+	VectorCopy( startVelocity, pm->ps->velocity );
+	PM_SlideMove_GV();
+
+	// and back down onto whatever is underneath
+	VectorCopy( pm->ps->origin, down );
+	down[2] -= stepSize;
+	pm->trace( &trace, pm->ps->origin, mins, pm->maxs, down, pm->ps->clientNum, pm->tracemask, false );
+	if( !trace.allsolid )
+		VectorCopy( trace.endpos, pm->ps->origin );
+
+	const float slideDistance = ( slideOrigin[0] - startOrigin[0] ) * ( slideOrigin[0] - startOrigin[0] ) + ( slideOrigin[1] - startOrigin[1] ) * ( slideOrigin[1] - startOrigin[1] );
+	const float stepDistance = ( pm->ps->origin[0] - startOrigin[0] ) * ( pm->ps->origin[0] - startOrigin[0] ) + ( pm->ps->origin[1] - startOrigin[1] ) * ( pm->ps->origin[1] - startOrigin[1] );
+	const bool drivable = trace.fraction < 1.0f && trace.plane.normal[2] >= drivableNormal;
+	if( !drivable || stepDistance <= slideDistance )
+	{
+		VectorCopy( slideOrigin, pm->ps->origin );
+		VectorCopy( slideVelocity, pm->ps->velocity );
+	}
+}
+
 void PlayerMove::groundVehicleMove( ) 
 {
 	// like in the q3tank mod and airq2 the left/right keys turn the hull of the tank
@@ -362,7 +419,7 @@ void PlayerMove::groundVehicleMove( )
 	VectorAdd( forward, pm->ps->velocity, forward );
 	VectorScale( forward, speed, pm->ps->velocity );
 
-	PM_SlideMove_GV();
+	PM_StepSlideMove_GV();
 
 	// put the vehicle into the landscape with proper angles
 	PlayerMove::adjustToTerrain();
