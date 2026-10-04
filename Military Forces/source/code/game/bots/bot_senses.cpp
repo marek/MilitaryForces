@@ -131,6 +131,30 @@ void Bots::chooseLeader( GameEntity* ent, State& bot )
 	}
 }
 
+// How much being shot by someone favours them as the next target: 0.4 turns on them readily, 1 ignores them.
+// Breaking off costs the work already put into the current target, so that is weighed against how badly the bot is hurt.
+float Bots::turnOnAttacker( GameEntity* ent, const State& bot, int attacker )
+{
+	constexpr float eager = 0.4f, closeFight = 1500.0f, nearlyDead = 0.4f;
+	GameEntity* current = bot.enemy >= 1 && bot.enemy <= theLevel.maxclients_ && bot.enemy != attacker ? theLevel.getEntity( bot.enemy ) : nullptr;
+	if( !current || !current->client_ || current->health_ <= 0 )
+		return eager;
+	const Character& who = character( bot );
+	const float mine = std::clamp( static_cast<float>( ent->health_ ) / std::max( 1, ent->client_->pers_.maxHealth_ ), 0.0f, 1.0f );
+	const float theirs = std::clamp( static_cast<float>( current->health_ ) / std::max( 1, current->client_->pers_.maxHealth_ ), 0.0f, 1.0f );
+	float invested = 0.0f;
+	if( theirs < nearlyDead )
+		invested += 0.45f;
+	if( Distance( ent->r.currentOrigin, current->r.currentOrigin ) < closeFight )
+		invested += 0.25f;
+	if( bot.desire == Goal::Capture || (g_gametype.integer == GT_CTF && current->client_->ps_.objectives) )
+		invested += 0.3f;
+	invested += (who.patience - 0.5f) * 0.3f;
+	// the more hurt, the less it can afford to leave the attacker alone
+	const float danger = (1.0f - mine) * (0.6f + 0.6f * who.caution);
+	return eager + (1.0f - eager) * std::clamp( invested - danger, 0.0f, 1.0f );
+}
+
 GameEntity* Bots::findEnemy( GameEntity* ent, State& bot, Role role )
 {
 	GameClient* client = ent->client_;
@@ -230,9 +254,9 @@ GameEntity* Bots::findEnemy( GameEntity* ent, State& bot, Role role )
 		}
 		if( i == bot.enemy )
 			score *= 0.7f;
-		// whoever is shooting at it comes first
+		// whoever is shooting at it pulls hard, unless that means giving up a fight that is nearly won
 		if( attackedBy )
-			score *= 0.4f;
+			score *= turnOnAttacker( ent, bot, i );
 		// fight what the leader is fighting
 		if( leaderTarget == i )
 			score *= 0.35f;

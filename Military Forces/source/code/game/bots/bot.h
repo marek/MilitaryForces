@@ -206,6 +206,7 @@ private:
 	static Role roleOf( int vehicle );
 	static Goal chooseGoal( GameEntity* ent, State& bot, const Sense& sense );
 	static const Character& character( const State& bot );
+	static float turnOnAttacker( GameEntity* ent, const State& bot, int attacker );
 	static float skill( const State& bot );
 	static int memoryTime( const State& bot );
 	static bool visible( GameEntity* ent, const vec3_t from, GameEntity* target );
