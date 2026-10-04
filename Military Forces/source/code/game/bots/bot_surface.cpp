@@ -332,7 +332,7 @@ struct SurfaceTasks
 			VectorSubtract( aim, c.ent->r.currentOrigin, dirAim );
 			const float range = VectorLength( dirAim );
 			vectoangles( dirAim, aimAngles );
-			const float arc = 0.5f * asin( std::clamp( DEFAULT_GRAVITY * range / (shell * shell), 0.0f, 1.0f ) ) * 180.0f / static_cast<float>( M_PI );
+			const float arc = 0.5f * asin( std::clamp( DEFAULT_GRAVITY * range / (shell * shell), 0.0f, 1.0f ) ) * 180.0f / std::numbers::pi_v<float>;
 			c.view[YAW] = aimAngles[YAW];
 			c.view[PITCH] = std::clamp( AngleSubtract( aimAngles[PITCH], 0 ) - arc, -60.0f, 20.0f );
 		}

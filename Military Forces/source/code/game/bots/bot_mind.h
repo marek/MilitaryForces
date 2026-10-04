@@ -101,7 +101,7 @@ struct Bots::Mind
 
 	float turnRadius() const
 	{
-		return std::max( VectorLength( ps.velocity ), 1.0f ) / (std::max( 10.0f, veh.turnspeed[YAW] ) * static_cast<float>( M_PI ) / 180.0f);
+		return std::max( VectorLength( ps.velocity ), 1.0f ) / (std::max( 10.0f, veh.turnspeed[YAW] ) * std::numbers::pi_v<float> / 180.0f);
 	}
 	void holdAltitude()
 	{

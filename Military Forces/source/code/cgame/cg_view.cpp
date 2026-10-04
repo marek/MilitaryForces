@@ -427,15 +427,15 @@ int CGame::calcFov( ) {
 		}*/
 //	}
 
-	x = 640 / tan( fov_x / 360 * M_PI );
+	x = 640 / tan( fov_x / 360 * std::numbers::pi_v<float> );
 	fov_y = atan2( 480, x );
-	fov_y = fov_y * 360 / M_PI;
-	fov_x = atan( tan( fov_y / 360 * M_PI ) * cg.refdef.width / cg.refdef.height ) * 360 / M_PI;
+	fov_y = fov_y * 360 / std::numbers::pi_v<float>;
+	fov_x = atan( tan( fov_y / 360 * std::numbers::pi_v<float> ) * cg.refdef.width / cg.refdef.height ) * 360 / std::numbers::pi_v<float>;
 
 	// warp if underwater
 	contents = CGame::pointContents( cg.refdef.vieworg, -1 );
 	if ( contents & ( CONTENTS_WATER | CONTENTS_SLIME | CONTENTS_LAVA ) ){
-		phase = cg.time / 1000.0 * WAVE_FREQUENCY * M_PI * 2;
+		phase = cg.time / 1000.0 * WAVE_FREQUENCY * std::numbers::pi_v<float> * 2;
 		v = WAVE_AMPLITUDE * sin( phase );
 		fov_x += v;
 		fov_y -= v;

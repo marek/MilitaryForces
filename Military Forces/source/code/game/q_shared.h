@@ -172,6 +172,7 @@ typedef int intptr_t;
 #include <ctype.h>
 #include <limits.h>
 #include <algorithm>
+#include <numbers>
 #include <stdint.h>
 
 #ifdef _WIN32
@@ -413,8 +414,7 @@ typedef	int	fixed4_t;
 typedef	int	fixed8_t;
 typedef	int	fixed16_t;
 
-#ifndef M_PI
-#define M_PI		3.14159265358979323846f	// matches value in gcc v2 math.h
+#ifndef std::numbers::pi_v<float>
 #endif
 
 inline constexpr int NUMVERTEXNORMALS = 162;
@@ -477,8 +477,8 @@ extern vec4_t	g_color_table[8];
 #define	MAKERGB( v, r, g, b ) v[0]=r;v[1]=g;v[2]=b
 #define	MAKERGBA( v, r, g, b, a ) v[0]=r;v[1]=g;v[2]=b;v[3]=a
 
-#define DEG2RAD( a ) ( ( (a) * M_PI ) / 180.0F )
-#define RAD2DEG( a ) ( ( (a) * 180.0f ) / M_PI )
+#define DEG2RAD( a ) ( ( (a) * std::numbers::pi_v<float> ) / 180.0F )
+#define RAD2DEG( a ) ( ( (a) * 180.0f ) / std::numbers::pi_v<float> )
 
 struct cplane_s;
 

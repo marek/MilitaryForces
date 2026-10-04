@@ -743,7 +743,7 @@ void PlayerMove::vehicleBoundingBox()
 {
 /*    vec3_t	mins, maxs;
 	float	diff1, diff2;
-	float	corr = sin(fabs(pm->ps->vehicleAngles[2])*M_PI/180);
+	float	corr = sin(fabs(pm->ps->vehicleAngles[2])*std::numbers::pi_v<float>/180);
 
     VectorCopy( availableVehicles[pm->vehicle].mins, mins );
     VectorCopy( availableVehicles[pm->vehicle].maxs, maxs );

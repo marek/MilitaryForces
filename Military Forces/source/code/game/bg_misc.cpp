@@ -420,7 +420,7 @@ void GameShared::evaluateTrajectory( const trajectory_t *tr, int atTime, vec3_t 
 		break;
 	case TR_SINE:
 		deltaTime = ( atTime - tr->trTime ) / static_cast<float>(tr->trDuration);
-		phase = sin( deltaTime * M_PI * 2 );
+		phase = sin( deltaTime * std::numbers::pi_v<float> * 2 );
 		VectorMA( tr->trBase, phase, tr->trDelta, result );
 		break;
 	case TR_LINEAR_STOP:
@@ -482,7 +482,7 @@ void GameShared::evaluateTrajectoryDelta( const trajectory_t *tr, int atTime, ve
 		break;
 	case TR_SINE:
 		deltaTime = ( atTime - tr->trTime ) / static_cast<float>(tr->trDuration);
-		phase = cos( deltaTime * M_PI * 2 );	// derivative of sin = cos
+		phase = cos( deltaTime * std::numbers::pi_v<float> * 2 );	// derivative of sin = cos
 		phase *= 0.5;
 		VectorScale( tr->trDelta, phase, result );
 		break;

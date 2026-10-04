@@ -608,7 +608,7 @@ UI_Utils::item_Paint(itemDef_t *item)
 			h = item->window.rectClient.h / 2;
 			rx = item->window.rectClient.x + w - item->window.rectEffects.x;
 			ry = item->window.rectClient.y + h - item->window.rectEffects.y;
-			a = 3 * M_PI / 180;
+			a = 3 * std::numbers::pi_v<float> / 180;
   			c = cos(a);
 			s = sin(a);
 			item->window.rectClient.x = (rx * c - ry * s) + item->window.rectEffects.x - w;
@@ -1317,9 +1317,9 @@ UI_Utils::item_Model_Paint( itemDef_t *item )
 	refdef.fov_y = (modelPtr->fov_y) ? modelPtr->fov_y : h;
 
 	//refdef.fov_x = (int)((float)refdef.width / 640.0f * 90.0f);
-	//xx = refdef.width / tan( refdef.fov_x / 360 * M_PI );
+	//xx = refdef.width / tan( refdef.fov_x / 360 * std::numbers::pi_v<float> );
 	//refdef.fov_y = atan2( refdef.height, xx );
-	//refdef.fov_y *= ( 360 / M_PI );
+	//refdef.fov_y *= ( 360 / std::numbers::pi_v<float> );
 
 	dc_->clearScene();
 

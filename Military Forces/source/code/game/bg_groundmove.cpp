@@ -10,15 +10,15 @@
 extern pmove_t		*pm;
 extern pml_t		pml;
 
-#define	PFRONT		0
-#define PBACK		1
-#define PLEFT		2
-#define PRIGHT		3
-#define	PFRONTC		4
-#define PBACKC		5
-#define PLEFTC		6
-#define PRIGHTC		7
-#define PMAX		8
+constexpr int PFRONT = 0;
+constexpr int PBACK = 1;
+constexpr int PLEFT = 2;
+constexpr int PRIGHT = 3;
+constexpr int PFRONTC = 4;
+constexpr int PBACKC = 5;
+constexpr int PLEFTC = 6;
+constexpr int PRIGHTC = 7;
+constexpr int PMAX = 8;
 
 
 
@@ -563,7 +563,7 @@ PM_SlideMove_GV
 Returns true if the velocity was clipped in some way
 ==================
 */
-#define	MAX_CLIP_PLANES	5
+constexpr int MAX_CLIP_PLANES = 5;
 bool	PM_SlideMove_GV() {
 	int			bumpcount, numbumps;
 	vec3_t		dir;

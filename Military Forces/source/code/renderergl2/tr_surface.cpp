@@ -254,7 +254,7 @@ static void RB_SurfaceSprite( ) {
 		float	s, c;
 		float	ang;
 		
-		ang = M_PI * ent->e.rotation / 180;
+		ang = std::numbers::pi_v<float> * ent->e.rotation / 180;
 		s = sin( ang );
 		c = cos( ang );
 

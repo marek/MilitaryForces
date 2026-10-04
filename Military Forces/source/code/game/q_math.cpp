@@ -388,7 +388,7 @@ void vectoangles( const vec3_t value1, vec3_t angles ) {
 	}
 	else {
 		if ( value1[0] ) {
-			yaw = ( atan2 ( value1[1], value1[0] ) * 180 / M_PI );
+			yaw = ( atan2 ( value1[1], value1[0] ) * 180 / std::numbers::pi_v<float> );
 		}
 		else if ( value1[1] > 0 ) {
 			yaw = 90;
@@ -401,7 +401,7 @@ void vectoangles( const vec3_t value1, vec3_t angles ) {
 		}
 
 		forward = sqrt ( value1[0]*value1[0] + value1[1]*value1[1] );
-		pitch = ( atan2(value1[2], forward) * 180 / M_PI );
+		pitch = ( atan2(value1[2], forward) * 180 / std::numbers::pi_v<float> );
 		if ( pitch < 0 ) {
 			pitch += 360;
 		}
@@ -1055,13 +1055,13 @@ void AngleVectors( const vec3_t angles, vec3_t forward, vec3_t right, vec3_t up)
 	static float		sr, sp, sy, cr, cp, cy;
 	// static to help MS compiler fp bugs
 
-	angle = angles[YAW] * (M_PI*2 / 360);
+	angle = angles[YAW] * (std::numbers::pi_v<float>*2 / 360);
 	sy = sin(angle);
 	cy = cos(angle);
-	angle = angles[PITCH] * (M_PI*2 / 360);
+	angle = angles[PITCH] * (std::numbers::pi_v<float>*2 / 360);
 	sp = sin(angle);
 	cp = cos(angle);
-	angle = angles[ROLL] * (M_PI*2 / 360);
+	angle = angles[ROLL] * (std::numbers::pi_v<float>*2 / 360);
 	sr = sin(angle);
 	cr = cos(angle);
 
@@ -1157,11 +1157,11 @@ float Q_acos(float c) {
 
 	angle = acos(c);
 
-	if (angle > M_PI) {
-		return static_cast<float>(M_PI);
+	if (angle > std::numbers::pi_v<float>) {
+		return std::numbers::pi_v<float>;
 	}
-	if (angle < -M_PI) {
-		return static_cast<float>(M_PI);
+	if (angle < -std::numbers::pi_v<float>) {
+		return std::numbers::pi_v<float>;
 	}
 	return angle;
 }

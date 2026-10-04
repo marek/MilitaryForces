@@ -394,7 +394,7 @@ bool PM_SlideMove_Boat() {
 }
 
 /*
-#define	MAX_CLIP_PLANES	5
+constexpr int MAX_CLIP_PLANES = 5;
 bool	PM_SlideMove_Boat() {
 	int			bumpcount, numbumps;
 	vec3_t		dir;

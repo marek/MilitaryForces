@@ -530,10 +530,10 @@ void R_SetupProjection(viewParms_t *dest, float zProj, bool computeFrustum)
 			stereoSep = 0;
 	}
 
-	ymax = zProj * tan(dest->fovY * M_PI / 360.0f);
+	ymax = zProj * tan(dest->fovY * std::numbers::pi_v<float> / 360.0f);
 	ymin = -ymax;
 
-	xmax = zProj * tan(dest->fovX * M_PI / 360.0f);
+	xmax = zProj * tan(dest->fovX * std::numbers::pi_v<float> / 360.0f);
 	xmin = -xmax;
 
 	width = xmax - xmin;

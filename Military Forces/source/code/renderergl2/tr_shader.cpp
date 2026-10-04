@@ -1826,11 +1826,11 @@ static bool ParseShader( char **text )
 
 			token = COM_ParseExt( text, false );
 			a = atof( token );
-			a = a / 180 * M_PI;
+			a = a / 180 * std::numbers::pi_v<float>;
 
 			token = COM_ParseExt( text, false );
 			b = atof( token );
-			b = b / 180 * M_PI;
+			b = b / 180 * std::numbers::pi_v<float>;
 
 			tr.sunDirection[0] = cos( a ) * cos( b );
 			tr.sunDirection[1] = sin( a ) * cos( b );

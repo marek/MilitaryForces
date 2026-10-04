@@ -281,7 +281,7 @@ PM_SlideMove_Plane
 Returns true if the velocity was clipped in some way
 ==================
 */
-#define	MAX_CLIP_PLANES	5
+constexpr int MAX_CLIP_PLANES = 5;
 bool	PM_SlideMove_LQM() {
 	int			bumpcount, numbumps;
 	vec3_t		dir;

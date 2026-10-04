@@ -770,10 +770,10 @@ void R_SetupProjection(viewParms_t *dest, float zProj, float zFar, bool computeF
 			stereoSep = 0;
 	}
 
-	ymax = zProj * tan(dest->fovY * M_PI / 360.0f);
+	ymax = zProj * tan(dest->fovY * std::numbers::pi_v<float> / 360.0f);
 	ymin = -ymax;
 
-	xmax = zProj * tan(dest->fovX * M_PI / 360.0f);
+	xmax = zProj * tan(dest->fovX * std::numbers::pi_v<float> / 360.0f);
 	xmin = -xmax;
 
 	width = xmax - xmin;
@@ -2218,10 +2218,10 @@ void R_RenderSunShadowMaps(const refdef_t *fd, int level)
 	if (r_forceSun->integer == 2)
 	{
 		int scale = 32768;
-		float angle = (fd->time % scale) / static_cast<float>(scale) * M_PI;
+		float angle = (fd->time % scale) / static_cast<float>(scale) * std::numbers::pi_v<float>;
 		lightDir[0] = cos(angle);
-		lightDir[1] = sin(35.0f * M_PI / 180.0f);
-		lightDir[2] = sin(angle) * cos(35.0f * M_PI / 180.0f);
+		lightDir[1] = sin(35.0f * std::numbers::pi_v<float> / 180.0f);
+		lightDir[2] = sin(angle) * cos(35.0f * std::numbers::pi_v<float> / 180.0f);
 		lightDir[3] = 0.0f;
 
 		if (true) //((fd->time % (scale * 2)) < scale)
@@ -2343,8 +2343,8 @@ void R_RenderSunShadowMaps(const refdef_t *fd, int level)
 		if (level != 3)
 		{
 			// add view near plane
-			lx = splitZNear * tan(fd->fov_x * M_PI / 360.0f);
-			ly = splitZNear * tan(fd->fov_y * M_PI / 360.0f);
+			lx = splitZNear * tan(fd->fov_x * std::numbers::pi_v<float> / 360.0f);
+			ly = splitZNear * tan(fd->fov_y * std::numbers::pi_v<float> / 360.0f);
 			VectorMA(fd->vieworg, splitZNear, fd->viewaxis[0], base);
 
 			VectorMA(base,   lx, fd->viewaxis[1], point);
@@ -2369,8 +2369,8 @@ void R_RenderSunShadowMaps(const refdef_t *fd, int level)
 			
 
 			// add view far plane
-			lx = splitZFar * tan(fd->fov_x * M_PI / 360.0f);
-			ly = splitZFar * tan(fd->fov_y * M_PI / 360.0f);
+			lx = splitZFar * tan(fd->fov_x * std::numbers::pi_v<float> / 360.0f);
+			ly = splitZFar * tan(fd->fov_y * std::numbers::pi_v<float> / 360.0f);
 			VectorMA(fd->vieworg, splitZFar, fd->viewaxis[0], base);
 
 			VectorMA(base,   lx, fd->viewaxis[1], point);

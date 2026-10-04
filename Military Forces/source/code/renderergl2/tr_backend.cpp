@@ -1020,8 +1020,8 @@ const void	*RB_DrawSurfs( const void *data ) {
 					vec3_t viewVector;
 
 					float zmax = backEnd.viewParms.zFar;
-					float ymax = zmax * tan(backEnd.viewParms.fovY * M_PI / 360.0f);
-					float xmax = zmax * tan(backEnd.viewParms.fovX * M_PI / 360.0f);
+					float ymax = zmax * tan(backEnd.viewParms.fovY * std::numbers::pi_v<float> / 360.0f);
+					float xmax = zmax * tan(backEnd.viewParms.fovX * std::numbers::pi_v<float> / 360.0f);
 
 					VectorScale(backEnd.refdef.viewaxis[0], zmax, viewVector);
 					tr.shadowmaskShader.setUniformVec3( UNIFORM_VIEWFORWARD, viewVector );
@@ -1069,8 +1069,8 @@ const void	*RB_DrawSurfs( const void *data ) {
 				vec4_t quadVerts[4];
 				vec2_t texCoords[4];
 
-				viewInfo[2] = 1.0f / (static_cast<float>(tr.quarterImage[0]->width)  * tan(backEnd.viewParms.fovX * M_PI / 360.0f) * 2.0f);
-				viewInfo[3] = 1.0f / (static_cast<float>(tr.quarterImage[0]->height) * tan(backEnd.viewParms.fovY * M_PI / 360.0f) * 2.0f);
+				viewInfo[2] = 1.0f / (static_cast<float>(tr.quarterImage[0]->width)  * tan(backEnd.viewParms.fovX * std::numbers::pi_v<float> / 360.0f) * 2.0f);
+				viewInfo[3] = 1.0f / (static_cast<float>(tr.quarterImage[0]->height) * tan(backEnd.viewParms.fovY * std::numbers::pi_v<float> / 360.0f) * 2.0f);
 				viewInfo[3] *= static_cast<float>(backEnd.viewParms.viewportHeight) / static_cast<float>(backEnd.viewParms.viewportWidth);
 
 				FBO_Bind(tr.quarterFbo[0]);

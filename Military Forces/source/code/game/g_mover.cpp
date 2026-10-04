@@ -1553,7 +1553,7 @@ void SP_func_pendulum(GameEntity *ent)
 	if ( length < 8 ) 
 		length = 8;
 
-	float freq = 1 / ( M_PI * 2 ) * sqrt( g_gravity.value / ( 3 * length ) );
+	float freq = 1 / ( std::numbers::pi_v<float> * 2 ) * sqrt( g_gravity.value / ( 3 * length ) );
 
 	ent->s.pos.trDuration = ( 1000 / freq );
 

@@ -272,7 +272,7 @@ bool Bots::findHidePoint( GameEntity* ent, State& bot, GameEntity* threat, bool 
 		const float radius = 350.0f + ring * 450.0f;
 		for( int step = 0; step < 12; step++ )
 		{
-			const float angle = step * (2.0f * M_PI / 12.0f);
+			const float angle = step * (2.0f * std::numbers::pi_v<float> / 12.0f);
 			vec3_t point, down;
 			VectorCopy( ent->r.currentOrigin, point );
 			point[0] += cos( angle ) * radius;
@@ -429,7 +429,7 @@ void Bots::pickGoal( GameEntity* ent, State& bot, float radius )
 	}
 	else
 	{
-		const float angle = random() * 2.0f * M_PI;
+		const float angle = random() * 2.0f * std::numbers::pi_v<float>;
 		const float dist = radius * (0.3f + 0.7f * random());
 		bot.goal[0] = bot.home[0] + cos( angle ) * dist;
 		bot.goal[1] = bot.home[1] + sin( angle ) * dist;
@@ -443,7 +443,7 @@ void Bots::pickGoal( GameEntity* ent, State& bot, float radius )
 				probe[2] = ent->r.currentOrigin[2] - 6;
 				if( SV_PointContents( probe, ent->s.number ) & MASK_WATER )
 					break;
-				const float a = random() * 2.0f * M_PI;
+				const float a = random() * 2.0f * std::numbers::pi_v<float>;
 				const float d = radius * (0.2f + 0.8f * random());
 				bot.goal[0] = ent->r.currentOrigin[0] + cos( a ) * d;
 				bot.goal[1] = ent->r.currentOrigin[1] + sin( a ) * d;

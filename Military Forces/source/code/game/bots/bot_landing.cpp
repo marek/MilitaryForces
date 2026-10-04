@@ -164,7 +164,7 @@ Status LandingSteps::approach( Bots::Mind& c )
 		return Status::Failure;
 	}
 
-	const float turnRate = std::max( 10.0f, c.veh.turnspeed[YAW] ) * static_cast<float>( M_PI ) / 180.0f;
+	const float turnRate = std::max( 10.0f, c.veh.turnspeed[YAW] ) * std::numbers::pi_v<float> / 180.0f;
 	const float radius = std::max( c.speed, g.stall * 1.7f ) / turnRate;
 	const float wantRun = std::clamp( radius * 5.0f + 1200.0f, 1800.0f, c.bot.landRun );
 	c.bot.approachHeight = g.pad.z + std::min( std::clamp( wantRun * c.bot.landSlope * 0.75f, 300.0f, 800.0f ), std::max( 150.0f, c.bot.landCeiling - 250.0f ) );
@@ -182,7 +182,7 @@ Status LandingSteps::approach( Bots::Mind& c )
 		c.bot.landOutbound = true;
 
 	const float heading = c.bot.landOutbound ? g.axisYaw + 180.0f + (g.lateral >= 0 ? -20.0f : 20.0f) :
-		g.axisYaw - std::clamp( static_cast<float>( atan2( g.lateral, radius * 2.5f ) * 180.0 / M_PI ), -60.0f, 60.0f );
+		g.axisYaw - std::clamp( static_cast<float>( atan2( g.lateral, radius * 2.5f ) * 180.0 / std::numbers::pi_v<float> ), -60.0f, 60.0f );
 	vec3_t wish = { 0, heading, 0 }, dir;
 	AngleVectors( wish, dir, nullptr, nullptr );
 	VectorMA( c.ent->r.currentOrigin, 2500.0f, dir, c.bot.goal );

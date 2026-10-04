@@ -68,7 +68,7 @@ inline constexpr double PULSE_SCALE = 1.5; // amount to scale up the icons when 
 
 inline constexpr int MAX_STEP_CHANGE = 32;
 
-#define	MAX_VERTS_ON_POLY	10
+inline constexpr int MAX_VERTS_ON_POLY = 10;
 inline constexpr int MAX_MARK_POLYS = 1024;
 
 inline constexpr int STAT_MINUS = 10; // num frame for '-' stats digit
@@ -147,7 +147,7 @@ enum Camera_Modes {
 	CAMERA_MAX		
 };
 
-#define MAX_CONSOLE_LINES 8
+inline constexpr int MAX_CONSOLE_LINES = 8;
 
 // custom console
 struct strConsoleLine {

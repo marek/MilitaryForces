@@ -13,7 +13,7 @@ bool Bots::turnClear( GameEntity* ent, float radius, float degrees, float climb 
 	VectorCopy( ent->r.currentOrigin, from );
 	for( float swept = 30.0f; swept <= total + 29.0f; swept += 30.0f )
 	{
-		const float angle = std::min( swept, total ) * static_cast<float>( M_PI ) / 180.0f;
+		const float angle = std::min( swept, total ) * std::numbers::pi_v<float> / 180.0f;
 		vec3_t point, dir;
 		VectorMA( ent->r.currentOrigin, radius * sin( angle ), forward, point );
 		VectorMA( point, side * radius * (1.0f - cos( angle )), right, point );
@@ -171,7 +171,7 @@ struct PlaneTasks
 		}
 		const float stall = static_cast<float>( c.veh.stallspeed );
 		const float groundRun = stall * rotateSpeed * stall * rotateSpeed / (2.0f * groundAcceleration) * 1.15f;
-		const float turnRate = std::max( 10.0f, c.veh.turnspeed[YAW] ) * static_cast<float>( M_PI ) / 180.0f;
+		const float turnRate = std::max( 10.0f, c.veh.turnspeed[YAW] ) * std::numbers::pi_v<float> / 180.0f;
 		const float radius = stall * 1.15f / turnRate;
 		float best = 0, bestRun = 0, longest = 0;
 		for( int step = 0; step < 24; step++ )
@@ -520,7 +520,7 @@ struct PlaneTasks
 	{
 		// in a corridor, traffic one way flies above the middle and traffic the other way below it
 		constexpr float laneOffset = 0.17f;
-		const float lane = cos( c.ps.vehicleAngles[YAW] * static_cast<float>( M_PI ) / 180.0f ) >= 0.0f ? 0.5f + laneOffset : 0.5f - laneOffset;
+		const float lane = cos( c.ps.vehicleAngles[YAW] * std::numbers::pi_v<float> / 180.0f ) >= 0.0f ? 0.5f + laneOffset : 0.5f - laneOffset;
 		if( c.room < c.cruise * 2.0f && !(c.attacking && c.sense.enemyAir) && !onApproach( c ) )
 			c.view[PITCH] = std::clamp( (c.sense.height - c.room * lane) / 20.0f, -25.0f, 20.0f );
 		return Status::Success;
@@ -531,7 +531,7 @@ struct PlaneTasks
 	{
 		const playerState_t& ps = other->client_->ps_;
 		const float roll = ps.vehicleAngles[ROLL];
-		const float rate = std::max( 10.0f, availableVehicles[other->client_->vehicle_].turnspeed[YAW] ) * static_cast<float>( M_PI ) / 180.0f;
+		const float rate = std::max( 10.0f, availableVehicles[other->client_->vehicle_].turnspeed[YAW] ) * std::numbers::pi_v<float> / 180.0f;
 		const float speed = sqrtf( ps.velocity[0] * ps.velocity[0] + ps.velocity[1] * ps.velocity[1] );
 		if( !(availableVehicles[other->client_->vehicle_].cat & CAT_PLANE) || fabs( roll ) < 45.0f || speed < 1.0f )
 		{
@@ -643,7 +643,7 @@ struct PlaneTasks
 		};
 		for( float swept = std::min( 30.0f, total ); swept > 0 && travelled < horizon; swept += 30.0f )
 		{
-			const float angle = std::min( swept, total ) * static_cast<float>( M_PI ) / 180.0f;
+			const float angle = std::min( swept, total ) * std::numbers::pi_v<float> / 180.0f;
 			vec3_t point;
 			VectorMA( start.origin, radius * sin( angle ), forward, point );
 			VectorMA( point, side * radius * (1.0f - cos( angle )), right, point );
@@ -689,7 +689,7 @@ struct PlaneTasks
 		// follow a bend, turn off, or turn back
 		for( float turn : { 45.0f, -45.0f, 90.0f, -90.0f, 180.0f, -180.0f } )
 		{
-			const float length = brakedRadius * fabs( turn ) * static_cast<float>( M_PI ) / 180.0f + (fabs( turn ) < 100.0f ? horizon * 0.6f : 200.0f);
+			const float length = brakedRadius * fabs( turn ) * std::numbers::pi_v<float> / 180.0f + (fabs( turn ) < 100.0f ? horizon * 0.6f : 200.0f);
 			if( sweepFrom( c, end, brakedRadius, turn, 0.0f, length, 60.0f ) >= length )
 				return true;
 		}
@@ -726,11 +726,11 @@ struct PlaneTasks
 			// near the stall the nose can only come up a little, so plan the climb that can actually be flown
 			const bool slow = c.speed < c.veh.stallspeed * 1.7f;
 			const float flyablePitch = slow ? std::max( c.view[PITCH], -10.0f ) : c.view[PITCH];
-			const float wantSlope = std::clamp( -static_cast<float>( tan( flyablePitch * M_PI / 180.0 ) ), -0.4f, 0.5f );
+			const float wantSlope = std::clamp( -static_cast<float>( tan( flyablePitch * std::numbers::pi_v<float> / 180.0 ) ), -0.4f, 0.5f );
 			const float horizon = std::clamp( c.airspeed * 3.0f, 900.0f, 2500.0f );
 			const bool wasBlocked = bot.probeBlocked;
 			const float radius = c.turnRadius();
-			const float turnRate = std::max( 10.0f, c.veh.turnspeed[YAW] ) * static_cast<float>( M_PI ) / 180.0f;
+			const float turnRate = std::max( 10.0f, c.veh.turnspeed[YAW] ) * std::numbers::pi_v<float> / 180.0f;
 			const float brakedRadius = (c.airspeed + std::min( c.airspeed, c.veh.stallspeed * 1.2f )) * 0.5f / turnRate;
 			const bool canBrake = brakedRadius < radius * 0.85f;
 
@@ -876,7 +876,7 @@ struct PlaneTasks
 			return Status::Success;
 		vec3_t fwd;
 		AngleVectors( c.ps.vehicleAngles, fwd, nullptr, nullptr );
-		const float aimError = acos( std::clamp( DotProduct( fwd, c.sense.enemyDir ), -1.0f, 1.0f ) ) * 180.0f / M_PI;
+		const float aimError = acos( std::clamp( DotProduct( fwd, c.sense.enemyDir ), -1.0f, 1.0f ) ) * 180.0f / std::numbers::pi_v<float>;
 		Bots::fireWeapons( c.ent, c.bot, c.sense, c.cmd, aimError );
 		if( c.forcedWeapon >= 0 )
 			c.cmd.weapon = c.forcedWeapon;

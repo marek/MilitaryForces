@@ -135,7 +135,7 @@ extern vmCvar_t ui_serverStatusTimeOut;
 #define LCOLUMN_OFFSET			(-BIGCHAR_WIDTH )
 
 inline constexpr int SLIDER_RANGE = 10;
-#define	MAX_EDIT_LINE			256
+inline constexpr int MAX_EDIT_LINE = 256;
 
 inline constexpr int MAX_MENUDEPTH = 8;
 #define MAX_MENUITEMS			96

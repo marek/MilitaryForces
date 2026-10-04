@@ -169,7 +169,7 @@ SelectNearestDeathmatchSpawnPoint
 Find the spot that we DON'T want to use
 ================
 */
-#define	MAX_SPAWN_POINTS	128
+constexpr int MAX_SPAWN_POINTS = 128;
 GameEntity *SelectNearestDeathmatchSpawnPoint( vec3_t from ) 
 {
 	GameEntity	*spot;
@@ -202,7 +202,6 @@ SelectRandomDeathmatchSpawnPoint
 go to a random point that doesn't telefrag
 ================
 */
-#define	MAX_SPAWN_POINTS	128
 GameEntity *SelectRandomDeathmatchSpawnPoint()
 {
 	GameEntity	*spot;
