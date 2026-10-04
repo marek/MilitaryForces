@@ -149,7 +149,7 @@ int Bots::pickVehicle( int teamFlag, bool allowInfantry, const Character* who, c
 	for( int i = 0; i < bg_numberOfVehicles && num < 256; i++ )
 	{
 		const completeVehicleData_t& veh = availableVehicles[i];
-		if( !(veh.gameset & gameset) || !(veh.team & teamFlag) || !(veh.cat & cats) )
+		if( !(veh.gameset & gameset) || !(veh.team & teamFlag) || !(veh.cat & cats) || (veh.flags & VF_NOTSELECTABLE) )
 			continue;
 		bool nuke = false;
 		for( unsigned int weapon : veh.weapons )

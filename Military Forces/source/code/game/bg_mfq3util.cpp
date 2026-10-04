@@ -142,6 +142,7 @@ int VehicleData::getIndexOfVehicle( int start,			// where to start in list
 		if( !(availableVehicles[i].team & team) ) continue;					// wrong team
 		if( !(availableVehicles[i].cat & cat) ) continue;					// wrong category
 		if( !(availableVehicles[i].cls & cls) ) continue;					// wrong class
+		if( availableVehicles[i].flags & VF_NOTSELECTABLE ) continue;		// not offered for selection
 		
 		if(!allowNukes)
 		{

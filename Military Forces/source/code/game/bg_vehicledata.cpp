@@ -10,6 +10,13 @@
 completeLoadout_t availableLoadouts[MAX_LOADOUTS];
 
 // just contains data of all the available vehicles
+// test entries are offered for selection in debug builds only
+#ifdef _DEBUG
+#define MF_TEST_VEHICLE 0
+#else
+#define MF_TEST_VEHICLE VF_NOTSELECTABLE
+#endif
+
 completeVehicleData_t availableVehicles[] = 
 {
 	// ---------------------------------------------
@@ -2102,6 +2109,7 @@ completeVehicleData_t availableVehicles[] =
 		.descriptiveName = "helo",
 		.tinyName = "helo",
 		.modelName = "helo",
+		.flags = MF_TEST_VEHICLE,
 		.shadowShader = SHADOW_DEFAULT,
 		.gameset = MF_GAMESET_MODERN,
 		.team = MF_TEAM_ANY,
