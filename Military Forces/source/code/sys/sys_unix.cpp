@@ -135,7 +135,15 @@ static char *Sys_DefaultHomePath()
 			if( com_homepath && com_homepath->string[0] )
 				Q_strcat(homePath, sizeof(homePath), com_homepath->string);
 			else
-				Q_strcat(homePath, sizeof(homePath), HOMEPATH_NAME);
+			{
+				// settings from before the folder was renamed keep working where they are
+				char legacy[ MAX_OSPATH ];
+				struct stat st;
+				Com_sprintf( legacy, sizeof(legacy), "%s%s", homePath, HOMEPATH_NAME );
+				Q_strcat(homePath, sizeof(homePath), HOMEPATH_NAME_MACOS);
+				if( stat( homePath, &st ) != 0 && stat( legacy, &st ) == 0 )
+					Q_strncpyz( homePath, legacy, sizeof(homePath) );
+			}
 		}
 	}
 

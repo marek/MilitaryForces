@@ -2435,6 +2435,39 @@ completeVehicleData_t availableVehicles[] =
 		.trackCone = -1,
 		.gearTime = 1400,
 		.bayTime = 1000,
+	},
+
+	// the Huey without supplies: twice the door gun ammunition, for games without team mates to supply.
+	// Added at the end so the indices of the vehicles above stay as they were
+    {
+		.descriptiveName = "UH-1 \"Huey\" (Gunship)",
+		.tinyName = "UH-1G",
+		.modelName = "UH-1",
+		.shadowShader = SHADOW_DEFAULT,
+		.gameset = MF_GAMESET_MODERN,
+		.team = MF_TEAM_ANY,
+		.cat = CAT_HELO,
+		.cls = CLASS_HELO_RECON,
+		.turnspeed = {50, 125, 70},
+		.cam_dist = {0, 100, 46.8},
+		.cam_height = {0, 100, 14.6},
+		.maxspeed = 300,
+		.minthrottle = -5,
+		.maxthrottle = 10,
+		.engines = 1,
+		.accel = 33,
+		.maxhealth = 170,
+		.gunoffset = {1.8, 0.6, 3.5},
+		.maxfuel = 160,
+		.gearheight = 285,
+		.tailangle = 5,
+		.weapons = { 0, WI_MGT_7_62MM, 0, 0, 0, 0, 0, WI_FLARE },
+		.ammo = { 0, 3000, 0, 0, 0, 0, 0, 40 },
+		.turret = { 1, 0, 0, 0, 0, 0, 0, 0 },
+		.cockpitview = {0, 0, 5.8},
+		.radarRange = 8000,
+		.radarRange2 = 5000,
+		.trackCone = -1,
 	}
 };
 

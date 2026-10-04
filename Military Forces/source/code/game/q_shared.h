@@ -33,6 +33,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
   #define CLIENT_WINDOW_MIN_TITLE	"MF"
   #define HOMEPATH_NAME_UNIX_LEGACY	".militaryforces"
   #define HOMEPATH_NAME				"MilitaryForces"
+  // where settings live for a player: Documents\My Games on Windows, Application Support on macOS
+  #define HOMEPATH_NAME_WINDOWS		"My Games\\Military Forces"
+  #define HOMEPATH_NAME_MACOS		"Military Forces"
   #define GAMENAME_FOR_MASTER		"MilitaryForces"	// must NOT contain whitespace
   #define CONFIG_PREFIX			"mfconfig"
   #define MASTER_SERVER_NAME		"dpmaster.deathmask.net"

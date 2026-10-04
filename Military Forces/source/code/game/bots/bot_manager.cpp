@@ -168,6 +168,9 @@ int Bots::pickVehicle( int teamFlag, bool allowInfantry, const Character* who, c
 		else if( (veh.cat & CAT_LQM) && allowInfantry ) { weight = 8; kind = 4; }
 		if( who )
 			weight = static_cast<int>( weight * 10 * std::max( 0.0f, who->prefer[kind] ) );
+		// supplies are for team mates: nobody flies the supply helicopter in a free-for-all
+		if( g_gametype.integer < GT_TEAM && carriesSupplies( i ) )
+			continue;
 		if( who && !teamHasSupplier && carriesSupplies( i ) )
 			weight = static_cast<int>( weight * (2.0f + 8.0f * who->teamwork) );
 		if( !groundTargets && (veh.cat & CAT_PLANE) && (veh.cls & CLASS_PLANE_BOMBER) )

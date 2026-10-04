@@ -95,6 +95,7 @@ static char *Sys_DefaultHomePath( void )
 	if(!*homePath && com_homepath)
 	{
 		TCHAR szPath[MAX_PATH];
+		TCHAR szDocuments[MAX_PATH];
 
 		if( !SUCCEEDED( SHGetFolderPathA( NULL, CSIDL_APPDATA,
 						NULL, 0, szPath ) ) )
@@ -102,13 +103,25 @@ static char *Sys_DefaultHomePath( void )
 			Common::printf("Unable to detect CSIDL_APPDATA\n");
 			return NULL;
 		}
-		
-		Com_sprintf(homePath, sizeof(homePath), "%s%c", szPath, PATH_SEP);
 
 		if(com_homepath->string[0])
-			Q_strcat(homePath, sizeof(homePath), com_homepath->string);
+		{
+			Com_sprintf(homePath, sizeof(homePath), "%s%c%s", szPath, PATH_SEP, com_homepath->string);
+			return homePath;
+		}
+
+		// settings live in Documents\My Games; an existing folder in AppData from before keeps being used,
+		// and AppData is the fallback when there is no Documents folder
+		char legacy[ MAX_OSPATH ];
+		Com_sprintf(legacy, sizeof(legacy), "%s%c%s", szPath, PATH_SEP, HOMEPATH_NAME);
+		if( SUCCEEDED( SHGetFolderPathA( NULL, CSIDL_PERSONAL, NULL, 0, szDocuments ) ) )
+		{
+			Com_sprintf(homePath, sizeof(homePath), "%s%c%s", szDocuments, PATH_SEP, HOMEPATH_NAME_WINDOWS);
+			if( GetFileAttributesA( homePath ) == INVALID_FILE_ATTRIBUTES && GetFileAttributesA( legacy ) != INVALID_FILE_ATTRIBUTES )
+				Q_strncpyz( homePath, legacy, sizeof(homePath) );
+		}
 		else
-			Q_strcat(homePath, sizeof(homePath), HOMEPATH_NAME);
+			Q_strncpyz( homePath, legacy, sizeof(homePath) );
 	}
 
 	return homePath;
