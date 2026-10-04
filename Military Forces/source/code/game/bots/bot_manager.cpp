@@ -115,7 +115,19 @@ unsigned int Bots::spawnCategories()
 
 int Bots::pickVehicle( int teamFlag, bool allowInfantry, const Character* who )
 {
-	const unsigned int cats = spawnCategories();
+	unsigned int cats = spawnCategories();
+	if( g_botVehicles.string[0] )
+	{
+		unsigned int wanted = 0;
+		if( strstr( g_botVehicles.string, "plane" ) ) wanted |= CAT_PLANE;
+		if( strstr( g_botVehicles.string, "helo" ) ) wanted |= CAT_HELO;
+		if( strstr( g_botVehicles.string, "ground" ) ) wanted |= CAT_GROUND;
+		if( strstr( g_botVehicles.string, "boat" ) ) wanted |= CAT_BOAT;
+		if( strstr( g_botVehicles.string, "infantry" ) ) wanted |= CAT_LQM;
+		if( cats & wanted )
+			cats &= wanted;
+	}
+	const bool groundTargets = (cats & (CAT_GROUND|CAT_BOAT)) != 0;
 	const unsigned long gameset = Game::getGameset();
 	std::array<int, 256> candidates;
 	std::array<int, 256> weights;
@@ -143,6 +155,8 @@ int Bots::pickVehicle( int teamFlag, bool allowInfantry, const Character* who )
 		else if( (veh.cat & CAT_LQM) && allowInfantry ) { weight = 8; kind = 4; }
 		if( who )
 			weight = static_cast<int>( weight * 10 * std::max( 0.0f, who->prefer[kind] ) );
+		if( !groundTargets && (veh.cat & CAT_PLANE) && (veh.cls & CLASS_PLANE_BOMBER) )
+			weight = weight * 12 / 100;
 		if( weight <= 0 )
 			continue;
 		if( !weight )

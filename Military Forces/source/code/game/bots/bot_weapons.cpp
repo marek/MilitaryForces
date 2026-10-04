@@ -152,6 +152,8 @@ void Bots::flares( GameEntity* ent, State& bot, const Sense& sense, usercmd_t& c
 {
 	if( !sense.launched || ent->client_->ps_.ammo[WP_FLARE] <= 0 || theLevel.time_ < bot.flareTime )
 		return;
+	if( sense.missile && sense.missileDist > 1800 && sense.missileTime > 2.0f )
+		return;
 	if( random() > skill( bot ) )
 	{
 		bot.flareTime = theLevel.time_ + 400;

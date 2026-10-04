@@ -34,6 +34,51 @@ void Bots::runwayHeading( GameEntity* ent, State& bot )
 		bot.takeoffTime = theLevel.time_ + 30000;
 }
 
+bool Bots::defendMissile( GameEntity* ent, State& bot, const Sense& sense, usercmd_t& cmd, vec3_t view )
+{
+	if( !sense.missile || sense.missileTime > 6.0f )
+		return false;
+
+	const playerState_t& ps = ent->client_->ps_;
+	const float toLeft = fabs( AngleSubtract( sense.missileYaw + 90.0f, ps.vehicleAngles[YAW] ) );
+	const float toRight = fabs( AngleSubtract( sense.missileYaw - 90.0f, ps.vehicleAngles[YAW] ) );
+	if( sense.missileTime > 1.5f )
+		bot.breakSide = toLeft < toRight ? 1.0f : -1.0f;
+
+	if( sense.missileTime > 1.2f * (0.5f + skill( bot )) )
+	{
+		view[YAW] = sense.missileYaw + 90.0f * bot.breakSide;
+		view[PITCH] = sense.height > planeMinHeight * 2.0f ? 8.0f : -5.0f;
+	}
+	else
+	{
+		view[YAW] = sense.missileYaw - 100.0f * bot.breakSide;
+		view[PITCH] = -28.0f;
+	}
+	cmd.forwardmove = moveFull;
+	return true;
+}
+
+bool Bots::runwayBusy( int padIndex, GameEntity* self )
+{
+	const Pad& pad = pads_[padIndex];
+	for( int i = 1; i <= theLevel.maxclients_; i++ )
+	{
+		GameEntity* other = theLevel.getEntity( i );
+		if( other == self || !alive( other ) || other->client_->sess_.ridingClient_ >= 0 )
+			continue;
+		vec3_t rel;
+		VectorSubtract( other->r.currentOrigin, pad.center, rel );
+		const float along = rel[0] * pad.axis[0] + rel[1] * pad.axis[1];
+		const float side = rel[1] * pad.axis[0] - rel[0] * pad.axis[1];
+		if( fabs( along ) < pad.halfLength + 150 && fabs( side ) < 220 && fabs( rel[2] ) < 160 )
+			return true;
+		if( isBot( i ) && i < self->s.number && states_[i].landPhase == 2 && states_[i].pad >= 0 && Distance( pads_[states_[i].pad].center, pad.center ) < 400 )
+			return true;
+	}
+	return false;
+}
+
 bool Bots::landPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_t& cmd, vec3_t view )
 {
 	const Pad& pad = pads_[bot.pad];
@@ -197,13 +242,13 @@ bool Bots::landPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_t
 		VectorMA( ent->r.currentOrigin, 2500.0f, dir, bot.goal );
 		bot.goal[2] = bot.approachHeight;
 		bot.goalTime = theLevel.time_ + 3000;
-		if( !bot.landOutbound && before > wantRun * 0.3f && fabs( lateral ) < std::max( 150.0f, radius * 0.3f ) && headingError < 15 && fabs( ent->r.currentOrigin[2] - bot.approachHeight ) < 300 )
+		if( !bot.landOutbound && !runwayBusy( bot.pad, ent ) && before > wantRun * 0.3f && fabs( lateral ) < std::max( 150.0f, radius * 0.3f ) && headingError < 15 && fabs( ent->r.currentOrigin[2] - bot.approachHeight ) < 300 )
 			bot.landPhase = 2;
 		else
 			return false;
 	}
 
-	if( before < -pad.halfLength || (before < -200 && above > 150) || fabs( side ) > 900 )
+	if( before < -pad.halfLength || (before < -200 && above > 150) || fabs( side ) > 900 || (before > 300 && runwayBusy( bot.pad, ent )) )
 	{
 		bot.landPhase = 1;
 		return true;
@@ -393,6 +438,9 @@ void Bots::thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_
 		view[PITCH] = std::clamp( angles[PITCH], -50.0f, 35.0f );
 	else
 		view[PITCH] = std::clamp( (sense.height - cruise) / 30.0f, -30.0f, 20.0f );
+	const bool defending = defendMissile( ent, bot, sense, cmd, view );
+	if( defending )
+		attacking = false;
 	if( bot.desire == Goal::Rearm && bot.landPhase == 1 )
 	{
 		view[PITCH] = std::clamp( (ent->r.currentOrigin[2] - bot.approachHeight) / 30.0f, -25.0f, 20.0f );

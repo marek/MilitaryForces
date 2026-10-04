@@ -104,6 +104,7 @@ private:
 		bool	landOutbound = false;
 		float	landCeiling = 800;
 		int		badPad = -1;
+		float	breakSide = 1;
 		int		badPadTime = 0;
 		float	landOffset = 45;
 		float	approachHeight = 0;
@@ -148,6 +149,10 @@ private:
 		bool		revealed = false;
 		bool		underFire = false;
 		bool		blindsided = false;
+		GameEntity*	missile = nullptr;
+		float		missileDist = 0;
+		float		missileTime = 0;
+		float		missileYaw = 0;
 		bool		duel = false;
 	};
 
@@ -182,6 +187,8 @@ private:
 	static int findPad( GameEntity* ent, int skip = -1 );
 	static bool replenished( GameEntity* ent );
 	static void finishRearm( GameEntity* ent, State& bot );
+	static bool runwayBusy( int padIndex, GameEntity* self );
+	static bool defendMissile( GameEntity* ent, State& bot, const Sense& sense, usercmd_t& cmd, vec3_t view );
 	static bool landPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_t& cmd, vec3_t view );
 	static void sense( GameEntity* ent, State& bot, Sense& out );
 	static void pickGoal( GameEntity* ent, State& bot, float radius );

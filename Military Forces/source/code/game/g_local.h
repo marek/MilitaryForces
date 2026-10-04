@@ -941,6 +941,7 @@ extern	vmCvar_t	g_botSkill;
 extern	vmCvar_t	g_ruseReset;
 extern	vmCvar_t	g_botDebug;
 extern	vmCvar_t	g_botLanding;
+extern	vmCvar_t	g_botVehicles;
 extern	vmCvar_t	g_abandonTime;
 extern	vmCvar_t	g_enterRange;
 extern	vmCvar_t	g_speed;

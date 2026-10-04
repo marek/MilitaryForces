@@ -66,6 +66,9 @@ void Bots::thinkHelo( GameEntity* ent, State& bot, const Sense& sense, usercmd_t
 	view[PITCH] = sense.enemy ? std::clamp( AngleSubtract( angles[PITCH], 0 ), -30.0f, 45.0f ) : 0.0f;
 	flares( ent, bot, sense, cmd );
 
+	const bool dodging = sense.missile && sense.missileTime < 6.0f;
+	if( dodging )
+		view[YAW] = sense.missileYaw + 90.0f;
 	const float yawError = fabs( AngleSubtract( view[YAW], ps.vehicleAngles[YAW] ) );
 
 	float wantHeight = sense.role == Role::AttackHelo ? heloLowHeight : heloCruiseHeight * 0.6f;
@@ -102,6 +105,11 @@ void Bots::thinkHelo( GameEntity* ent, State& bot, const Sense& sense, usercmd_t
 		bot.exposed = false;
 	if( bot.desire == Goal::Capture && dist < 500 )
 		wantHeight = 25.0f;
+	if( dodging )
+	{
+		cover = true;
+		wantHeight = 60.0f;
+	}
 	if( rearming )
 	{
 		cover = true;
@@ -134,7 +142,9 @@ void Bots::thinkHelo( GameEntity* ent, State& bot, const Sense& sense, usercmd_t
 	if( !(ps.ONOFF & OO_LANDED) && !blocked && sense.height > 90 )
 	{
 		const float standoff = sense.enemy ? (sense.enemyAir ? 500.0f : 1200.0f) : 0.0f;
-		if( rearming )
+		if( dodging )
+			wantPitch = yawError < 60 ? 14.0f : 0.0f;
+		else if( rearming )
 			wantPitch = overPad ? 0.0f : (yawError < 40 ? std::clamp( dist / 60.0f, 3.0f, 14.0f ) : 0.0f);
 		else if( evading )
 			wantPitch = yawError < 60 ? 14.0f : 0.0f;

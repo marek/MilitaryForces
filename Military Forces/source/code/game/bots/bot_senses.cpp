@@ -212,6 +212,29 @@ void Bots::sense( GameEntity* ent, State& bot, Sense& out )
 		out.blindsided = !seen;
 	}
 
+	if( out.launched )
+	{
+		for( int i = MAX_CLIENTS + 1; i < theLevel.num_entities_; i++ )
+		{
+			GameEntity* other = theLevel.getEntity( i );
+			if( !other || !other->inuse_ || other->s.eType != ET_MISSILE || other->tracktarget_ != ent )
+				continue;
+			vec3_t rel;
+			VectorSubtract( other->r.currentOrigin, ent->r.currentOrigin, rel );
+			const float dist = VectorLength( rel );
+			if( out.missile && dist > out.missileDist )
+				continue;
+			vec3_t relVel, angles;
+			VectorSubtract( other->s.pos.trDelta, ps.velocity, relVel );
+			const float closing = -DotProduct( rel, relVel ) / std::max( dist, 1.0f );
+			vectoangles( rel, angles );
+			out.missile = other;
+			out.missileDist = dist;
+			out.missileTime = closing > 1 ? dist / closing : 99.0f;
+			out.missileYaw = angles[YAW];
+		}
+	}
+
 	for( int i = 1; i <= theLevel.maxclients_; i++ )
 	{
 		GameEntity* other = theLevel.getEntity( i );
