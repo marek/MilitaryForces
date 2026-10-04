@@ -915,6 +915,13 @@ void ClientThink_real( GameEntity *ent )
 
 	Pmove (&pm);
 
+	if( client->devHold_ )
+	{
+		VectorCopy( client->devHoldOrigin_, client->ps_.origin );
+		VectorCopy( client->devHoldAngles_, client->ps_.vehicleAngles );
+		VectorClear( client->ps_.velocity );
+	}
+
 	// save pmove results for vehicle
 	VectorCopy( pm.ps->vehicleAngles, ent->s.angles );
 	client->ps_.speed = pm.ps->speed;

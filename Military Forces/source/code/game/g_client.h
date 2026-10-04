@@ -105,6 +105,9 @@ struct GameClient : public ClientBase
 	bool				readyToExit_;		// wishes to leave the intermission
 
 	bool				noclip_;
+	bool				devHold_;
+	vec3_t				devHoldOrigin_;
+	vec3_t				devHoldAngles_;
 
 	int					lastCmdTime_;		// level.time of last usercmd_t, for EF_CONNECTION
 											// we can't just use pers.lastCommand.time, because

@@ -312,6 +312,31 @@ void Cmd_LevelShot_f( GameEntity *ent )
 }
 
 
+void Cmd_DevPlace_f( GameEntity *ent ) 
+{
+	char	arg[MAX_TOKEN_CHARS];
+
+	if( !CheatsOk( ent ) )
+		return;
+
+	if( CommandSystem::argc() < 5 )
+	{
+		ent->client_->devHold_ = false;
+		return;
+	}
+	for( int i = 0; i < 3; ++i )
+	{
+		CommandSystem::argvBuffer( i + 1, arg, sizeof( arg ) );
+		ent->client_->devHoldOrigin_[i] = atof( arg );
+	}
+	CommandSystem::argvBuffer( 4, arg, sizeof( arg ) );
+	VectorSet( ent->client_->devHoldAngles_, 0, atof( arg ), 0 );
+	ent->client_->devHold_ = true;
+	VectorCopy( ent->client_->devHoldOrigin_, ent->client_->ps_.origin );
+	VectorClear( ent->client_->ps_.velocity );
+	SetClientViewAngle( ent, ent->client_->devHoldAngles_ );
+}
+
 /*
 ==================
 Cmd_LevelShot_f
@@ -1935,6 +1960,8 @@ void ClientCommand( int clientNum )
 		Cmd_ME_SpawnGI_f( ent );
 	else if( Q_stricmp (cmd, "eject") == 0 )
 		Cmd_Eject_f( ent );
+	else if( Q_stricmp (cmd, "dev_place") == 0 )
+		Cmd_DevPlace_f( ent );
 
 	else
 		SV_GameSendServerCommand( clientNum, va("print \"unknown cmd %s\n\"", cmd ) );

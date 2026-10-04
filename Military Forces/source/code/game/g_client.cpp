@@ -868,6 +868,7 @@ GameClient::ClientSession::ClientSession() :
 GameClient::GameClient() :
 	readyToExit_(false),
 	noclip_(false),
+	devHold_(false),
 	lastCmdTime_(0),
 	buttons_(0),
 	oldbuttons_(0),
@@ -904,6 +905,7 @@ GameClient::clear()
 	memset(&sess_, 0, sizeof(sess_));
 	readyToExit_ = false;
 	noclip_ = false;
+	devHold_ = false;
 	lastCmdTime_ = 0;
 	buttons_ = 0;
 	oldbuttons_ = 0;

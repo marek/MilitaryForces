@@ -623,10 +623,11 @@ static void CG_DevStatus_f( ) {
 	if( !cg.snap || !CvarSystem::variableIntegerValue( "sv_cheats" ) ) 
 		return;
 	const playerState_t *ps = &cg.snap->ps;
-	Common::printf( "DEVSTATUS veh %d health %d fuel %d ammo %d %d %d %d %d %d %d %d onoff %x reveal %d time %d org %.1f %.1f %.1f ground %d weapon %d %d\n",
+	Common::printf( "DEVSTATUS veh %d health %d fuel %d ammo %d %d %d %d %d %d %d %d onoff %x reveal %d time %d org %.1f %.1f %.1f ground %d weapon %d %d lock %d target %d\n",
 		cgs.clientinfo[ps->clientNum].vehicle, ps->stats[STAT_HEALTH], ps->stats[STAT_FUEL],
 		ps->ammo[0], ps->ammo[1], ps->ammo[2], ps->ammo[3], ps->ammo[4], ps->ammo[5], ps->ammo[6], ps->ammo[7],
-		ps->ONOFF, ps->timers[TIMER_REVEAL], cg.snap->serverTime, ps->origin[0], ps->origin[1], ps->origin[2], ps->groundEntityNum, ps->weaponNum, ps->weaponIndex );
+		ps->ONOFF, ps->timers[TIMER_REVEAL], cg.snap->serverTime, ps->origin[0], ps->origin[1], ps->origin[2], ps->groundEntityNum, ps->weaponNum, ps->weaponIndex,
+		ps->stats[STAT_LOCKINFO], ps->tracktarget );
 }
 
 static consoleCommand_t	commands[] = {
@@ -773,6 +774,7 @@ void CGame::initConsoleCommands( ) {
 	CL_AddCgameCommand ("loaddefered");	// spelled wrong, but not changing for demo
 	CL_AddCgameCommand ("contact_tower");
 	CL_AddCgameCommand ("radar");
+	CL_AddCgameCommand ("dev_place");
 	CL_AddCgameCommand ("unlock");
 
 }

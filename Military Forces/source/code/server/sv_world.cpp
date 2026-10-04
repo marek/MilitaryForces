@@ -562,11 +562,8 @@ void SV_ClipMoveToEntities( moveclip_t *clip )
 
 	if ( clip->passEntityNum != ENTITYNUM_NONE ) {
 		passOwnerNum = ( theSV.getEntityByNum( clip->passEntityNum ) )->r.ownerNum;
-		if ( passOwnerNum == ENTITYNUM_NONE ) {
-			passOwnerNum = -1;
-		}
 	} else {
-		passOwnerNum = -1;
+		passOwnerNum = ENTITYNUM_NONE;
 	}
 
 	for ( i=0 ; i<num ; i++ ) {
@@ -580,10 +577,10 @@ void SV_ClipMoveToEntities( moveclip_t *clip )
 			if ( touchlist[i] == clip->passEntityNum ) {
 				continue;	// don't clip against the pass entity
 			}
-			if ( touch->r.ownerNum == clip->passEntityNum ) {
+			if ( clip->passEntityNum > ENTITYNUM_WORLD && touch->r.ownerNum == clip->passEntityNum ) {
 				continue;	// don't clip against own missiles
 			}
-			if ( touch->r.ownerNum == passOwnerNum && !(touch->r.svFlags & SVF_DECK) ) {
+			if ( passOwnerNum > ENTITYNUM_WORLD && touch->r.ownerNum == passOwnerNum && !(touch->r.svFlags & SVF_DECK) ) {
 				continue;	// don't clip against other missiles from our owner
 			}
 		}
