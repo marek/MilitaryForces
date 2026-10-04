@@ -1293,7 +1293,7 @@ static void RoQShutdown( ) {
 		// the time it was referenced
 		s = CvarSystem::variableString( "nextmap" );
 		if ( s[0] ) {
-			Cbuf_ExecuteText( EXEC_APPEND, va("%s\n", s) );
+			CommandBuffer::executeText( EXEC_APPEND, va("%s\n", s) );
 			CvarSystem::set( "nextmap", "" );
 		}
 		CL_handle = -1;

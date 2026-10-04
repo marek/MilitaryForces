@@ -516,8 +516,8 @@ bool Com_AddStartupCommands( ) {
 		}
 
 		added = true;
-		Cbuf_AddText( com_consoleLines[i] );
-		Cbuf_AddText( "\n" );
+		CommandBuffer::addText( com_consoleLines[i] );
+		CommandBuffer::addText( "\n" );
 	}
 
 	return added;
@@ -2222,8 +2222,8 @@ int Com_EventLoop( ) {
 				CL_JoystickEvent( ev.evValue, ev.evValue2, ev.evTime );
 			break;
 			case SE_CONSOLE:
-				Cbuf_AddText( static_cast<char *>(ev.evPtr) );
-				Cbuf_AddText( "\n" );
+				CommandBuffer::addText( static_cast<char *>(ev.evPtr) );
+				CommandBuffer::addText( "\n" );
 			break;
 			default:
 				Com_Error( ERR_FATAL, "Com_EventLoop: bad event type %i", ev.evType );
@@ -2358,16 +2358,16 @@ For controlling environment variables
 
 void Com_ExecuteCfg()
 {
-	Cbuf_ExecuteText(EXEC_NOW, "exec default.cfg\n");
-	Cbuf_Execute(); // Always execute after exec to prevent text buffer overflowing
+	CommandBuffer::executeText(EXEC_NOW, "exec default.cfg\n");
+	CommandBuffer::execute(); // Always execute after exec to prevent text buffer overflowing
 
 	if(!Com_SafeMode())
 	{
 		// skip the q3config.cfg and autoexec.cfg if "safe" is on the command line
-		Cbuf_ExecuteText(EXEC_NOW, "exec " Q3CONFIG_CFG "\n");
-		Cbuf_Execute();
-		Cbuf_ExecuteText(EXEC_NOW, "exec autoexec.cfg\n");
-		Cbuf_Execute();
+		CommandBuffer::executeText(EXEC_NOW, "exec " Q3CONFIG_CFG "\n");
+		CommandBuffer::execute();
+		CommandBuffer::executeText(EXEC_NOW, "exec autoexec.cfg\n");
+		CommandBuffer::execute();
 	}
 }
 
@@ -2676,7 +2676,7 @@ void Com_Init( char *commandLine ) {
 	Com_ParseCommandLine( commandLine );
 
 //	Swap_Init ();
-	Cbuf_Init ();
+	CommandBuffer::init ();
 
 	Com_DetectSSE();
 
@@ -2821,7 +2821,7 @@ void Com_Init( char *commandLine ) {
 		// if the user didn't give any commands, run default action
 		if ( !com_dedicated->integer ) {
 #ifdef CINEMATICS_LOGO
-			Cbuf_AddText ("cinematic " CINEMATICS_LOGO "\n");
+			CommandBuffer::addText ("cinematic " CINEMATICS_LOGO "\n");
 #endif
 #ifdef CINEMATICS_INTRO
 			if( !com_introPlayed->integer ) {
@@ -2893,7 +2893,7 @@ void Com_ReadFromPipe( )
 		{
 			char tmp = *brk;
 			*brk = '\0';
-			Cbuf_ExecuteText( EXEC_APPEND, buf );
+			CommandBuffer::executeText( EXEC_APPEND, buf );
 			*brk = tmp;
 
 			accu -= brk - buf;
@@ -2901,7 +2901,7 @@ void Com_ReadFromPipe( )
 		}
 		else if( accu >= sizeof( buf ) - 1 ) // full
 		{
-			Cbuf_ExecuteText( EXEC_APPEND, buf );
+			CommandBuffer::executeText( EXEC_APPEND, buf );
 			accu = 0;
 		}
 	}
@@ -3157,7 +3157,7 @@ void Com_Frame( ) {
 	
 	msec = com_frameTime - lastTime;
 
-	Cbuf_Execute ();
+	CommandBuffer::execute ();
 
 	if (com_altivec->modified)
 	{
@@ -3203,7 +3203,7 @@ void Com_Frame( ) {
 		timeBeforeEvents = Sys_Milliseconds ();
 	}
 	Com_EventLoop();
-	Cbuf_Execute ();
+	CommandBuffer::execute ();
 
 
 	//

@@ -1126,21 +1126,21 @@ void SV_Frame( int msec )
 	if ( theSVS.time_ > 0x70000000 )
 	{
 		SV_Shutdown( "Restarting server due to time wrapping" );
-		Cbuf_AddText( va( "map %s\n", CvarSystem::variableString( "mapname" ) ) );
+		CommandBuffer::addText( va( "map %s\n", CvarSystem::variableString( "mapname" ) ) );
 		return;
 	}
 	// this can happen considerably earlier when lots of clients play and the map doesn't change
 	if ( theSVS.nextSnapshotEntities_ >= 0x7FFFFFFE - theSVS.numSnapshotEntities_ )
 	{
 		SV_Shutdown( "Restarting server due to numSnapshotEntities wrapping" );
-		Cbuf_AddText( va( "map %s\n", CvarSystem::variableString( "mapname" ) ) );
+		CommandBuffer::addText( va( "map %s\n", CvarSystem::variableString( "mapname" ) ) );
 		return;
 	}
 
 	if( theSV.restartTime_ && theSV.time_ >= theSV.restartTime_ ) 
 	{
 		theSV.restartTime_ = 0;
-		Cbuf_AddText( "map_restart 0\n" );
+		CommandBuffer::addText( "map_restart 0\n" );
 		return;
 	}
 

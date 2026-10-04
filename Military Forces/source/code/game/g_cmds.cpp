@@ -1196,7 +1196,7 @@ void Cmd_CallVote_f( GameEntity *ent )
 	if( theLevel.voteExecuteTime_ ) 
 	{
 		theLevel.voteExecuteTime_ = 0;
-		Cbuf_ExecuteText( EXEC_APPEND, va("%s\n", theLevel.voteString_ ) );
+		CommandBuffer::executeText( EXEC_APPEND, va("%s\n", theLevel.voteString_ ) );
 	}
 
 	int i = 0;

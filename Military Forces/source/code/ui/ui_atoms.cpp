@@ -32,7 +32,7 @@ UI_StartDemoLoop
 =================
 */
 void UI_StartDemoLoop( ) {
-	Cbuf_ExecuteText( EXEC_APPEND, "d1\n" );
+	CommandBuffer::executeText( EXEC_APPEND, "d1\n" );
 }
 
 char *UI_Argv( int arg ) {

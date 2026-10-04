@@ -703,7 +703,7 @@ void SV_Init () {
 	sv_banFile = CvarSystem::get("sv_banFile", "serverbans.dat", CVAR_ARCHIVE);
 
 	// Load saved bans
-	Cbuf_AddText("rehashbans\n");
+	CommandBuffer::addText("rehashbans\n");
 }
 
 

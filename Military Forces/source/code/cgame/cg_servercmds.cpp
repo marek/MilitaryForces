@@ -146,7 +146,7 @@ void CG_ParseServerinfo( ) {
 	// gameset changed>
 	if( cgs.gameset && newset != cgs.gameset )
 	{	
-		Cbuf_AddText(";vid_restart\n" );  // Leading ' ; ' Previous command getting stuck?
+		CommandBuffer::addText(";vid_restart\n" );  // Leading ' ; ' Previous command getting stuck?
 		Com_Printf("The gameset has changed to %s\n", gs );
 	}
 	cgs.gameset = newset;

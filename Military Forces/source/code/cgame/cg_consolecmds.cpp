@@ -36,7 +36,7 @@ void CG_TargetCommand_f( ) {
 	}
 
 	Cmd_ArgvBuffer( 1, test, 4 );
-	Cbuf_AddText( va( "gc %i %i", targetNum, atoi( test ) ) );
+	CommandBuffer::addText( va( "gc %i %i", targetNum, atoi( test ) ) );
 }
 
 

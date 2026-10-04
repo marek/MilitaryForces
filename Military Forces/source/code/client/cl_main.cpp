@@ -1174,7 +1174,7 @@ Closing the main menu will restart the demo loop
 */
 void CL_StartDemoLoop( ) {
 	// start the demo loop again
-	Cbuf_AddText ("d1\n");
+	CommandBuffer::addText ("d1\n");
 	Key_SetCatcher( 0 );
 }
 
@@ -1197,9 +1197,9 @@ void CL_NextDemo( ) {
 	}
 
 	CvarSystem::set ("nextdemo","");
-	Cbuf_AddText (v);
-	Cbuf_AddText ("\n");
-	Cbuf_Execute();
+	CommandBuffer::addText (v);
+	CommandBuffer::addText ("\n");
+	CommandBuffer::execute();
 }
 
 
@@ -1686,7 +1686,7 @@ void CL_Reconnect_f( ) {
 	if ( !strlen( cl_reconnectArgs ) )
 		return;
 	CvarSystem::set("ui_singlePlayerActive", "0");
-	Cbuf_AddText( va("connect %s\n", cl_reconnectArgs ) );
+	CommandBuffer::addText( va("connect %s\n", cl_reconnectArgs ) );
 }
 
 /*
@@ -3058,7 +3058,7 @@ void CL_Frame ( int msec ) {
 			Q_strncpyz( mapName, COM_SkipPath( cl.mapname ), sizeof( cl.mapname ) );
 			COM_StripExtension(mapName, mapName, sizeof(mapName));
 
-			Cbuf_ExecuteText( EXEC_NOW,
+			CommandBuffer::executeText( EXEC_NOW,
 					va( "record %s-%s-%s", nowString, serverName, mapName ) );
 		}
 		else if( clc.state != CA_ACTIVE && clc.demorecording ) {
@@ -3290,7 +3290,7 @@ void CL_InitRef( ) {
 	ri.Cmd_RemoveCommand = Cmd_RemoveCommand;
 	ri.Cmd_Argc = Cmd_Argc;
 	ri.Cmd_Argv = Cmd_Argv;
-	ri.Cmd_ExecuteText = Cbuf_ExecuteText;
+	ri.Cmd_ExecuteText = CommandBuffer::executeText;
 	ri.Printf = CL_RefPrintf;
 	ri.Error = Com_Error;
 	ri.Milliseconds = CL_ScaledMilliseconds;
@@ -3751,7 +3751,7 @@ void CL_Init( ) {
 
 	SCR_Init ();
 
-//	Cbuf_Execute ();
+//	CommandBuffer::execute ();
 
 	CvarSystem::set( "cl_running", "1" );
 
@@ -4255,7 +4255,7 @@ void CL_GlobalServers_f( ) {
 			numAddress++;
 
 			Com_sprintf(command, sizeof(command), "globalservers %d %s %s\n", i, Cmd_Argv(2), Cmd_ArgsFrom(3));
-			Cbuf_AddText(command);
+			CommandBuffer::addText(command);
 		}
 
 		if ( !numAddress ) {

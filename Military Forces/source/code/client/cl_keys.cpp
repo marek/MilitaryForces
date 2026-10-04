@@ -614,7 +614,7 @@ Handles history and console scrollback
 void Console_Key (int key) {
 	// ctrl-L clears screen
 	if ( key == 'l' && keys[K_CTRL].down ) {
-		Cbuf_AddText ("clear\n");
+		CommandBuffer::addText ("clear\n");
 		return;
 	}
 
@@ -636,19 +636,19 @@ void Console_Key (int key) {
 
 		// leading slash is an explicit command
 		if ( g_consoleField.buffer[0] == '\\' || g_consoleField.buffer[0] == '/' ) {
-			Cbuf_AddText( g_consoleField.buffer+1 );	// valid command
-			Cbuf_AddText ("\n");
+			CommandBuffer::addText( g_consoleField.buffer+1 );	// valid command
+			CommandBuffer::addText ("\n");
 		} else {
 			// other text will be chat messages
 			if ( !g_consoleField.buffer[0] ) {
 				return;	// empty lines just scroll the console without adding to history
 			} else {
 				if ( con_autochat->integer ) {
-					Cbuf_AddText ("cmd say ");
+					CommandBuffer::addText ("cmd say ");
 				}
 
-				Cbuf_AddText( g_consoleField.buffer );
-				Cbuf_AddText ("\n");
+				CommandBuffer::addText( g_consoleField.buffer );
+				CommandBuffer::addText ("\n");
 			}
 		}
 
@@ -1215,15 +1215,15 @@ void CL_ParseBinding( int key, bool down, unsigned time )
 				char cmd[1024];
 				Com_sprintf( cmd, sizeof( cmd ), "%c%s %d %d\n",
 					( down ) ? '+' : '-', p + 1, key, time );
-				Cbuf_AddText( cmd );
+				CommandBuffer::addText( cmd );
 			}
 		}
 		else if( down )
 		{
 			// normal commands only execute on key press
 			if ( allCommands || CL_BindUICommand( p ) ) {
-				Cbuf_AddText( p );
-				Cbuf_AddText( "\n" );
+				CommandBuffer::addText( p );
+				CommandBuffer::addText( "\n" );
 			}
 		}
 		if( !end )

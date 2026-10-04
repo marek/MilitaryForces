@@ -195,7 +195,7 @@ UI_DisplayContextUI::setBinding( int keynum, const char *binding )
 void
 UI_DisplayContextUI::executeText( int exec_when, const char *text )
 {
-	Cbuf_ExecuteText( exec_when, text );
+	CommandBuffer::executeText( exec_when, text );
 }
 
 void

@@ -462,7 +462,7 @@ bool ConsoleCommand()
 
 	if (Q_stricmp (cmd, "listip") == 0) 
 	{
-		Cbuf_ExecuteText( EXEC_INSERT, "g_banIPs\n" );
+		CommandBuffer::executeText( EXEC_INSERT, "g_banIPs\n" );
 		return true;
 	}
 

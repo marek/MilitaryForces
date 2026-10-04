@@ -1631,4 +1631,6 @@ int RandomInt( int min, int max );
 float RandomFloat( float min, float max );
 int ahextoi( const char* string );
 
+#include "../qcommon/command_buffer.h"
+
 #endif	// __Q_SHARED_H

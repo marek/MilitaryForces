@@ -1164,7 +1164,7 @@ static void IN_ProcessEvents( )
 				break;
 
 			case SDL_QUIT:
-				Cbuf_ExecuteText(EXEC_NOW, "quit Closed window\n");
+				CommandBuffer::executeText(EXEC_NOW, "quit Closed window\n");
 				break;
 
 			case SDL_WINDOWEVENT:
@@ -1228,7 +1228,7 @@ static void IN_ProcessEvents( )
 
 						if( protocolCommand )
 						{
-							Cbuf_ExecuteText( EXEC_APPEND, va( "%s\n", protocolCommand ) );
+							CommandBuffer::executeText( EXEC_APPEND, va( "%s\n", protocolCommand ) );
 							free( protocolCommand );
 						}
 					}
@@ -1288,7 +1288,7 @@ void IN_Frame( )
 	if( ( vidRestartTime != 0 ) && ( vidRestartTime < Sys_Milliseconds( ) ) )
 	{
 		vidRestartTime = 0;
-		Cbuf_AddText( "vid_restart\n" );
+		CommandBuffer::addText( "vid_restart\n" );
 	}
 }
 

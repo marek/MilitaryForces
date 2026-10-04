@@ -3065,7 +3065,7 @@ static void UI_StartSinglePlayer() {
 
  	CvarSystem::setValue( "singleplayer", 1 );
  	CvarSystem::setValue( "g_gametype", Com_Clamp( 0, 7, tierList[i].gameTypes[j] ) );
-	Cbuf_ExecuteText( EXEC_APPEND, va( "wait ; wait ; map %s\n", tierList[i].maps[j] ) );
+	CommandBuffer::executeText( EXEC_APPEND, va( "wait ; wait ; map %s\n", tierList[i].maps[j] ) );
 	skill = CvarSystem::variableValue( "g_spSkill" );
 
 	if (j == MAPS_PER_TIER-1) {
@@ -3075,15 +3075,15 @@ static void UI_StartSinglePlayer() {
 		k = UI_TeamIndexFromName(UI_Cvar_VariableString("ui_opponentName"));
 		for (i = 0; i < PLAYERS_PER_TEAM; i++) {
 			Com_sprintf( buff, sizeof(buff), "wait ; addbot %s %i %s 250 %s\n", UI_AIFromName(teamList[k].teamMembers[i]), skill, "Blue", teamList[k].teamMembers[i]);
-			Cbuf_ExecuteText( EXEC_APPEND, buff );
+			CommandBuffer::executeText( EXEC_APPEND, buff );
 		}
 
 		k = UI_TeamIndexFromName(UI_Cvar_VariableString("ui_teamName"));
 		for (i = 1; i < PLAYERS_PER_TEAM; i++) {
 			Com_sprintf( buff, sizeof(buff), "wait ; addbot %s %i %s 250 %s\n", UI_AIFromName(teamList[k].teamMembers[i]), skill, "Red", teamList[k].teamMembers[i]);
-			Cbuf_ExecuteText( EXEC_APPEND, buff );
+			CommandBuffer::executeText( EXEC_APPEND, buff );
 		}
-		Cbuf_ExecuteText( EXEC_APPEND, "wait 5; team Red\n" );
+		CommandBuffer::executeText( EXEC_APPEND, "wait 5; team Red\n" );
 	}
 	
 
@@ -3256,7 +3256,7 @@ static void UI_StartSkirmish(bool next)
 
 	g = uiInfo.gameTypes[ui_gameType.integer].gtEnum;
 	CvarSystem::setValue( "g_gametype", g );
-	Cbuf_ExecuteText( EXEC_APPEND, va( "wait ; wait ; map %s\n", uiInfo.mapList[ui_currentMap.integer].mapLoadName) );
+	CommandBuffer::executeText( EXEC_APPEND, va( "wait ; wait ; map %s\n", uiInfo.mapList[ui_currentMap.integer].mapLoadName) );
 	skill = CvarSystem::variableValue( "g_spSkill" );
 	CvarSystem::set("ui_scoreMap", uiInfo.mapList[ui_currentMap.integer].mapName);
 
@@ -3305,24 +3305,24 @@ static void UI_StartSkirmish(bool next)
 	if (g == GT_TOURNAMENT) {
 		CvarSystem::set("sv_maxClients", "2");
 		Com_sprintf( buff, sizeof(buff), "wait ; addbot %s %f "", %i \n", uiInfo.mapList[ui_currentMap.integer].opponentName, skill, delay);
-		Cbuf_ExecuteText( EXEC_APPEND, buff );
+		CommandBuffer::executeText( EXEC_APPEND, buff );
 	} else {
 		temp = uiInfo.mapList[ui_currentMap.integer].teamMembers * 2;
 		CvarSystem::set("sv_maxClients", va("%d", temp));
 		for (i =0; i < uiInfo.mapList[ui_currentMap.integer].teamMembers; i++) {
 			Com_sprintf( buff, sizeof(buff), "addbot %s %f %s %i %s\n", UI_AIFromName(uiInfo.teamList[k].teamMembers[i]), skill, (g == GT_FFA) ? "" : "Blue", delay, uiInfo.teamList[k].teamMembers[i]);
-			Cbuf_ExecuteText( EXEC_APPEND, buff );
+			CommandBuffer::executeText( EXEC_APPEND, buff );
 			delay += 500;
 		}
 		k = UI_TeamIndexFromName(UI_Cvar_VariableString("ui_teamName"));
 		for (i =0; i < uiInfo.mapList[ui_currentMap.integer].teamMembers-1; i++) {
 			Com_sprintf( buff, sizeof(buff), "addbot %s %f %s %i %s\n", UI_AIFromName(uiInfo.teamList[k].teamMembers[i]), skill, (g == GT_FFA) ? "" : "Red", delay, uiInfo.teamList[k].teamMembers[i]);
-			Cbuf_ExecuteText( EXEC_APPEND, buff );
+			CommandBuffer::executeText( EXEC_APPEND, buff );
 			delay += 500;
 		}
 	}
 	if (g >= GT_TEAM ) {
-		Cbuf_ExecuteText( EXEC_APPEND, "wait 5; team Red\n" );
+		CommandBuffer::executeText( EXEC_APPEND, "wait 5; team Red\n" );
 	}
 }
 
@@ -3746,9 +3746,9 @@ static void UI_SelectVehicle( )
 
 	if( CvarSystem::variableValue("g_gametype") == GT_MISSION_EDITOR ) {
 		if(UI_CAT_GI == vehicleCat)
-			Cbuf_ExecuteText( EXEC_APPEND, va( "me_spawngi %d\n", idx ) );
+			CommandBuffer::executeText( EXEC_APPEND, va( "me_spawngi %d\n", idx ) );
 		else
-			Cbuf_ExecuteText( EXEC_APPEND, va( "me_spawn %d\n", idx ) );
+			CommandBuffer::executeText( EXEC_APPEND, va( "me_spawn %d\n", idx ) );
 	} else {
 		// set into the trigger index
 		CvarSystem::set( "cg_nextVehicle", va( "%d", idx ));	
@@ -3778,7 +3778,7 @@ void UI_RunMenuScript(char **args)
 			CvarSystem::setValue( "g_gametype", Com_Clamp( 0, 8, uiInfo.gameTypes[ui_netGameType.integer].gtEnum ) );
 			CvarSystem::set("g_redTeam", UI_Cvar_VariableString("ui_teamName"));
 			CvarSystem::set("g_blueTeam", UI_Cvar_VariableString("ui_opponentName"));
-			Cbuf_ExecuteText( EXEC_APPEND, va( "wait ; wait ; map %s\n", uiInfo.mapList[ui_currentNetMap.integer].mapLoadName ) );
+			CommandBuffer::executeText( EXEC_APPEND, va( "wait ; wait ; map %s\n", uiInfo.mapList[ui_currentNetMap.integer].mapLoadName ) );
 			skill = CvarSystem::variableValue( "g_spSkill" );
 			// set max clients based on spots
 			oldclients = CvarSystem::variableValue( "sv_maxClients" );
@@ -3820,11 +3820,11 @@ void UI_RunMenuScript(char **args)
 		} 
 		else if (Q_stricmp(name, "resetDefaults") == 0) 
 		{
-			Cbuf_ExecuteText( EXEC_APPEND, "exec default.cfg\n");
-			Cbuf_ExecuteText( EXEC_APPEND, "cvar_restart\n");
+			CommandBuffer::executeText( EXEC_APPEND, "exec default.cfg\n");
+			CommandBuffer::executeText( EXEC_APPEND, "cvar_restart\n");
 			uiInfo.uiUtils.getControlUtils()->setDefaults();
 			CvarSystem::set("com_introPlayed", "1" );
-			Cbuf_ExecuteText( EXEC_APPEND, "vid_restart\n" );
+			CommandBuffer::executeText( EXEC_APPEND, "vid_restart\n" );
 		} 
 		else if (Q_stricmp(name, "getCDKey") == 0) 
 		{
@@ -3905,7 +3905,7 @@ void UI_RunMenuScript(char **args)
 		{
 			if (uiInfo.demoAvailable) 
 			{
-			  Cbuf_ExecuteText( EXEC_APPEND, va("demo %s_%i\n", uiInfo.mapList[ui_currentMap.integer].mapLoadName, uiInfo.gameTypes[ui_gameType.integer].gtEnum));
+			  CommandBuffer::executeText( EXEC_APPEND, va("demo %s_%i\n", uiInfo.mapList[ui_currentMap.integer].mapLoadName, uiInfo.gameTypes[ui_gameType.integer].gtEnum));
 			}
 		}
 		else if (Q_stricmp(name, "LoadDemos") == 0) 
@@ -3926,11 +3926,11 @@ void UI_RunMenuScript(char **args)
 			{
 			  CIN_StopCinematic(uiInfo.previewMovie);
 			}
-			Cbuf_ExecuteText( EXEC_APPEND, va("cinematic %s.roq 2\n", uiInfo.movieList[uiInfo.movieIndex]));
+			CommandBuffer::executeText( EXEC_APPEND, va("cinematic %s.roq 2\n", uiInfo.movieList[uiInfo.movieIndex]));
 		} 
 		else if (Q_stricmp(name, "RunDemo") == 0) 
 		{
-			Cbuf_ExecuteText( EXEC_APPEND, va("demo %s\n", uiInfo.demoList[uiInfo.demoIndex]));
+			CommandBuffer::executeText( EXEC_APPEND, va("demo %s\n", uiInfo.demoList[uiInfo.demoIndex]));
 		} 
 		else if (Q_stricmp(name, "closeJoin") == 0) 
 		{
@@ -3989,20 +3989,20 @@ void UI_RunMenuScript(char **args)
 			CvarSystem::set("ui_singlePlayerActive", "0");
 			if (uiInfo.serverStatus.currentServer >= 0 && uiInfo.serverStatus.currentServer < uiInfo.serverStatus.numDisplayServers) {
 				LAN_GetServerAddressString(ui_netSource.integer, uiInfo.serverStatus.displayServers[uiInfo.serverStatus.currentServer], buff, 1024);
-				Cbuf_ExecuteText( EXEC_APPEND, va( "connect %s\n", buff ) );
+				CommandBuffer::executeText( EXEC_APPEND, va( "connect %s\n", buff ) );
 			}
 		} 
 		else if (Q_stricmp(name, "FoundPlayerJoinServer") == 0)
 		{
 			CvarSystem::set("ui_singlePlayerActive", "0");
 			if (uiInfo.currentFoundPlayerServer >= 0 && uiInfo.currentFoundPlayerServer < uiInfo.numFoundPlayerServers) {
-				Cbuf_ExecuteText( EXEC_APPEND, va( "connect %s\n", uiInfo.foundPlayerServerAddresses[uiInfo.currentFoundPlayerServer] ) );
+				CommandBuffer::executeText( EXEC_APPEND, va( "connect %s\n", uiInfo.foundPlayerServerAddresses[uiInfo.currentFoundPlayerServer] ) );
 			}
 		} 
 		else if (Q_stricmp(name, "Quit") == 0) 
 		{
 			CvarSystem::set("ui_singlePlayerActive", "0");
-			Cbuf_ExecuteText( EXEC_INSERT, "quit");
+			CommandBuffer::executeText( EXEC_INSERT, "quit");
 		}
 		else if (Q_stricmp(name, "Controls") == 0)
 		{
@@ -4013,7 +4013,7 @@ void UI_RunMenuScript(char **args)
 		} 
 		else if (Q_stricmp(name, "Leave") == 0) 
 		{
-			Cbuf_ExecuteText( EXEC_APPEND, "disconnect\n" );
+			CommandBuffer::executeText( EXEC_APPEND, "disconnect\n" );
 			Key_SetCatcher( ( KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
 			uiInfo.uiUtils.menu_CloseAll();
 			uiInfo.uiUtils.menu_ActivateByName("main");
@@ -4051,31 +4051,31 @@ void UI_RunMenuScript(char **args)
 		{
 			if (ui_currentNetMap.integer >=0 && ui_currentNetMap.integer < uiInfo.mapCount) 
 			{
-				Cbuf_ExecuteText( EXEC_APPEND, va("callvote map %s\n",uiInfo.mapList[ui_currentNetMap.integer].mapLoadName) );
+				CommandBuffer::executeText( EXEC_APPEND, va("callvote map %s\n",uiInfo.mapList[ui_currentNetMap.integer].mapLoadName) );
 			}
 		}
 		else if (Q_stricmp(name, "voteKick") == 0) 
 		{
 			if (uiInfo.playerIndex >= 0 && uiInfo.playerIndex < uiInfo.playerCount) 
 			{
-				Cbuf_ExecuteText( EXEC_APPEND, va("callvote kick %s\n",uiInfo.playerNames[uiInfo.playerIndex]) );
+				CommandBuffer::executeText( EXEC_APPEND, va("callvote kick %s\n",uiInfo.playerNames[uiInfo.playerIndex]) );
 			}
 		} 
 		else if (Q_stricmp(name, "voteGame") == 0) 
 		{
 			if (ui_netGameType.integer >= 0 && ui_netGameType.integer < uiInfo.numGameTypes)
 			{
-				Cbuf_ExecuteText( EXEC_APPEND, va("callvote g_gametype %i\n",uiInfo.gameTypes[ui_netGameType.integer].gtEnum) );
+				CommandBuffer::executeText( EXEC_APPEND, va("callvote g_gametype %i\n",uiInfo.gameTypes[ui_netGameType.integer].gtEnum) );
 			}
 		//} else if (Q_stricmp(name, "voteSet") == 0) {	// TEMP DISABLED FOR NOW
 //			if (ui_netGameset.integer >= 0 && ui_netGameset.integer < numGamesets) 
-				//Cbuf_ExecuteText( EXEC_APPEND, va("callvote mf_gameset %s\n",gameset_codes[ui_netGameset.integer]) );
+				//CommandBuffer::executeText( EXEC_APPEND, va("callvote mf_gameset %s\n",gameset_codes[ui_netGameset.integer]) );
 		} 
 		else if (Q_stricmp(name, "voteLeader") == 0) 
 		{
 			if (uiInfo.teamIndex >= 0 && uiInfo.teamIndex < uiInfo.myTeamCount)
 			{
-				Cbuf_ExecuteText( EXEC_APPEND, va("callteamvote leader %s\n",uiInfo.teamNames[uiInfo.teamIndex]) );
+				CommandBuffer::executeText( EXEC_APPEND, va("callteamvote leader %s\n",uiInfo.teamNames[uiInfo.teamIndex]) );
 			}
 		} 
 		else if (Q_stricmp(name, "addFavorite") == 0) 
@@ -4166,8 +4166,8 @@ void UI_RunMenuScript(char **args)
 				if (selectedPlayer < uiInfo.myTeamCount) 
 				{
 					Com_sprintf( buff, sizeof( buff ), orders, uiInfo.teamClientNums[selectedPlayer] );
-					Cbuf_ExecuteText( EXEC_APPEND, buff );
-					Cbuf_ExecuteText( EXEC_APPEND, "\n" );
+					CommandBuffer::executeText( EXEC_APPEND, buff );
+					CommandBuffer::executeText( EXEC_APPEND, "\n" );
 				} 
 				else 
 				{
@@ -4179,8 +4179,8 @@ void UI_RunMenuScript(char **args)
 							continue;
 						}
 						Com_sprintf( buff, sizeof( buff ), orders, uiInfo.teamNames[i] );
-						Cbuf_ExecuteText( EXEC_APPEND, buff );
-						Cbuf_ExecuteText( EXEC_APPEND, "\n" );
+						CommandBuffer::executeText( EXEC_APPEND, buff );
+						CommandBuffer::executeText( EXEC_APPEND, "\n" );
 					}
 				}
 				Key_SetCatcher( ( Key_GetCatcher() & ~KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
@@ -4196,8 +4196,8 @@ void UI_RunMenuScript(char **args)
 			{
 				int selectedPlayer = CvarSystem::variableValue("cg_selectedPlayer");
 				if (selectedPlayer == uiInfo.myTeamCount) {
-					Cbuf_ExecuteText( EXEC_APPEND, orders );
-					Cbuf_ExecuteText( EXEC_APPEND, "\n" );
+					CommandBuffer::executeText( EXEC_APPEND, orders );
+					CommandBuffer::executeText( EXEC_APPEND, "\n" );
 				}
 				Key_SetCatcher( ( Key_GetCatcher() & ~KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
 				Key_ClearStates();
@@ -4214,8 +4214,8 @@ void UI_RunMenuScript(char **args)
 				if (selectedPlayer < uiInfo.myTeamCount)
 				{
 					Com_sprintf( buff, sizeof( buff ), orders, uiInfo.teamClientNums[selectedPlayer] );
-					Cbuf_ExecuteText( EXEC_APPEND, buff );
-					Cbuf_ExecuteText( EXEC_APPEND, "\n" );
+					CommandBuffer::executeText( EXEC_APPEND, buff );
+					CommandBuffer::executeText( EXEC_APPEND, "\n" );
 				}
 				Key_SetCatcher( ( Key_GetCatcher() & ~KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
 				Key_ClearStates();
@@ -6850,7 +6850,7 @@ static void UI_StartServerRefresh(bool full)
 	LAN_ResetPings(ui_netSource.integer);
 	//
 	if( ui_netSource.integer == AS_LOCAL ) {
-		Cbuf_ExecuteText( EXEC_NOW, "localservers\n" );
+		CommandBuffer::executeText( EXEC_NOW, "localservers\n" );
 		uiInfo.serverStatus.refreshtime = uiInfo.uiUtils.dc_->realTime_ + 1000;
 		return;
 	}
@@ -6859,10 +6859,10 @@ static void UI_StartServerRefresh(bool full)
 	if( ui_netSource.integer == AS_GLOBAL ) {
 		const char *ptr = UI_Cvar_VariableString("debug_protocol");
 		if (strlen(ptr)) {
-			Cbuf_ExecuteText( EXEC_NOW, va( "globalservers 0 %s full empty\n", ptr ) );
+			CommandBuffer::executeText( EXEC_NOW, va( "globalservers 0 %s full empty\n", ptr ) );
 		}
 		else {
-			Cbuf_ExecuteText( EXEC_NOW, va( "globalservers 0 %d full empty\n", static_cast<int>(CvarSystem::variableValue( "protocol" )) ) );
+			CommandBuffer::executeText( EXEC_NOW, va( "globalservers 0 %d full empty\n", static_cast<int>(CvarSystem::variableValue( "protocol" )) ) );
 		}
 	}
 }

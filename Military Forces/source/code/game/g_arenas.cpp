@@ -75,7 +75,7 @@ void UpdateTournamentInfo()
 
 		strcat( msg, buf );
 	}
-	Cbuf_ExecuteText( EXEC_APPEND, msg );
+	CommandBuffer::executeText( EXEC_APPEND, msg );
 }
 
 

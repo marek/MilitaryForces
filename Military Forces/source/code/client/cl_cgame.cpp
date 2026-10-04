@@ -370,7 +370,7 @@ rescan:
 		// close the console
 		Con_Close();
 		// take a special screenshot next frame
-		Cbuf_AddText( "wait ; wait ; wait ; wait ; screenshot levelshot\n" );
+		CommandBuffer::addText( "wait ; wait ; wait ; wait ; screenshot levelshot\n" );
 		return true;
 	}
 
@@ -591,7 +591,7 @@ void CL_FirstSnapshot( ) {
 	// this is to allow scripting a timedemo to start right
 	// after loading
 	if ( cl_activeAction->string[0] ) {
-		Cbuf_AddText( cl_activeAction->string );
+		CommandBuffer::addText( cl_activeAction->string );
 		CvarSystem::set( "activeAction", "" );
 	}
 

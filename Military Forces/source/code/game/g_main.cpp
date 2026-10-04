@@ -914,7 +914,7 @@ void ExitLevel()
 		if ( !theLevel.restarted_ ) 
 		{
 			RemoveTournamentLoser();
-			Cbuf_ExecuteText( EXEC_APPEND, "map_restart 0\n" );
+			CommandBuffer::executeText( EXEC_APPEND, "map_restart 0\n" );
 			theLevel.restarted_ = true;
 			theLevel.changemap_ = nullptr;
 			theLevel.intermissiontime_ = 0;
@@ -922,7 +922,7 @@ void ExitLevel()
 		return;	
 	}
 
-	Cbuf_ExecuteText( EXEC_APPEND, "vstr nextmap\n" );
+	CommandBuffer::executeText( EXEC_APPEND, "vstr nextmap\n" );
 	theLevel.changemap_ = nullptr;
 	theLevel.intermissiontime_ = 0;
 
@@ -1336,7 +1336,7 @@ void CheckTournament()
 		{
 			theLevel.warmupTime_ += 10000;
 			CvarSystem::set( "g_restarted", "1" );
-			Cbuf_ExecuteText( EXEC_APPEND, "map_restart 0\n" );
+			CommandBuffer::executeText( EXEC_APPEND, "map_restart 0\n" );
 			theLevel.restarted_ = true;
 			return;
 		}
@@ -1398,7 +1398,7 @@ void CheckTournament()
 		{
 			theLevel.warmupTime_ += 10000;
 			CvarSystem::set( "g_restarted", "1" );
-			Cbuf_ExecuteText( EXEC_APPEND, "map_restart 0\n" );
+			CommandBuffer::executeText( EXEC_APPEND, "map_restart 0\n" );
 			theLevel.restarted_ = true;
 			return;
 		}
@@ -1418,7 +1418,7 @@ void CheckVote()
 	if( theLevel.voteExecuteTime_ && theLevel.voteExecuteTime_ < theLevel.time_ ) 
 	{
 		theLevel.voteExecuteTime_ = 0;
-		Cbuf_ExecuteText( EXEC_APPEND, va("%s\n", theLevel.voteString_ ) );
+		CommandBuffer::executeText( EXEC_APPEND, va("%s\n", theLevel.voteString_ ) );
 	}
 	if( !theLevel.voteTime_ ) 
 		return;
@@ -1578,7 +1578,7 @@ void CheckTeamVote( int team )
 				SetLeader(team, atoi(theLevel.teamVoteString_[cs_offset] + 7));
 			}
 			else
-				Cbuf_ExecuteText( EXEC_APPEND, va("%s\n", theLevel.teamVoteString_[cs_offset] ) );
+				CommandBuffer::executeText( EXEC_APPEND, va("%s\n", theLevel.teamVoteString_[cs_offset] ) );
 		}
 		else if( theLevel.teamVoteNo_[cs_offset] >= theLevel.numteamVotingClients_[cs_offset]/2 ) 
 		{

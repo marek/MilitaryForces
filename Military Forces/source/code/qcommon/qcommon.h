@@ -334,16 +334,12 @@ files can be execed.
 
 */
 
-void Cbuf_Init ();
 // allocates an initial text buffer that will grow as needed
 
-void Cbuf_AddText( const char *text );
 // Adds command text at the end of the buffer, does NOT add a final \n
 
-void Cbuf_ExecuteText( int exec_when, const char *text );
-// this can be used in place of either Cbuf_AddText or Cbuf_InsertText
+// this can be used in place of either CommandBuffer::addText or CommandBuffer::insertText
 
-void Cbuf_Execute ();
 // Pulls off \n terminated lines of text from the command buffer and sends
 // them through Cmd_ExecuteString.  Stops when the buffer is empty.
 // Normally called once per frame, but may be explicitly invoked.

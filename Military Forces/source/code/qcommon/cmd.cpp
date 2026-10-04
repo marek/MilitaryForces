@@ -70,10 +70,10 @@ void Cmd_Wait_f( ) {
 
 /*
 ============
-Cbuf_Init
+CommandBuffer::init
 ============
 */
-void Cbuf_Init ()
+void CommandBuffer::init ()
 {
 	cmd_text.data = cmd_text_buf;
 	cmd_text.maxsize = MAX_CMD_BUFFER;
@@ -82,19 +82,19 @@ void Cbuf_Init ()
 
 /*
 ============
-Cbuf_AddText
+CommandBuffer::addText
 
 Adds command text at the end of the buffer, does NOT add a final \n
 ============
 */
-void Cbuf_AddText( const char *text ) {
+void CommandBuffer::addText( const char *text ) {
 	int		l;
 	
 	l = strlen (text);
 
 	if (cmd_text.cursize + l >= cmd_text.maxsize)
 	{
-		Com_Printf ("Cbuf_AddText: overflow\n");
+		Com_Printf ("CommandBuffer::addText: overflow\n");
 		return;
 	}
 	Com_Memcpy(&cmd_text.data[cmd_text.cursize], text, l);
@@ -104,19 +104,19 @@ void Cbuf_AddText( const char *text ) {
 
 /*
 ============
-Cbuf_InsertText
+CommandBuffer::insertText
 
 Adds command text immediately after the current command
 Adds a \n to the text
 ============
 */
-void Cbuf_InsertText( const char *text ) {
+void CommandBuffer::insertText( const char *text ) {
 	int		len;
 	int		i;
 
 	len = strlen( text ) + 1;
 	if ( len + cmd_text.cursize > cmd_text.maxsize ) {
-		Com_Printf( "Cbuf_InsertText overflowed\n" );
+		Com_Printf( "CommandBuffer::insertText overflowed\n" );
 		return;
 	}
 
@@ -137,10 +137,10 @@ void Cbuf_InsertText( const char *text ) {
 
 /*
 ============
-Cbuf_ExecuteText
+CommandBuffer::executeText
 ============
 */
-void Cbuf_ExecuteText (int exec_when, const char *text)
+void CommandBuffer::executeText (int exec_when, const char *text)
 {
 	switch (exec_when)
 	{
@@ -149,27 +149,27 @@ void Cbuf_ExecuteText (int exec_when, const char *text)
 			Com_DPrintf(S_COLOR_YELLOW "EXEC_NOW %s\n", text);
 			Cmd_ExecuteString (text);
 		} else {
-			Cbuf_Execute();
+			CommandBuffer::execute();
 			Com_DPrintf(S_COLOR_YELLOW "EXEC_NOW %s\n", cmd_text.data);
 		}
 		break;
 	case EXEC_INSERT:
-		Cbuf_InsertText (text);
+		CommandBuffer::insertText (text);
 		break;
 	case EXEC_APPEND:
-		Cbuf_AddText (text);
+		CommandBuffer::addText (text);
 		break;
 	default:
-		Com_Error (ERR_FATAL, "Cbuf_ExecuteText: bad exec_when");
+		Com_Error (ERR_FATAL, "CommandBuffer::executeText: bad exec_when");
 	}
 }
 
 /*
 ============
-Cbuf_Execute
+CommandBuffer::execute
 ============
 */
-void Cbuf_Execute ()
+void CommandBuffer::execute ()
 {
 	int		i;
 	char	*text;
@@ -290,7 +290,7 @@ void Cmd_Exec_f( ) {
 	if (!quiet)
 		Com_Printf ("execing %s\n", filename);
 	
-	Cbuf_InsertText (f.c);
+	CommandBuffer::insertText (f.c);
 
 	FS_FreeFile (f.v);
 }
@@ -312,7 +312,7 @@ void Cmd_Vstr_f( ) {
 	}
 
 	v = CvarSystem::variableString( Cmd_Argv( 1 ) );
-	Cbuf_InsertText( va("%s\n", v ) );
+	CommandBuffer::insertText( va("%s\n", v ) );
 }
 
 

@@ -159,7 +159,7 @@ UI_UtilsUI::customChatEnd( bool sendText )
 	// send the text?
 	if( sendText && pMode )
 	{
-		Cbuf_ExecuteText( EXEC_APPEND, va( "%s %s", pMode, uiInfo.customChat.text ) );
+		CommandBuffer::executeText( EXEC_APPEND, va( "%s %s", pMode, uiInfo.customChat.text ) );
 	}
 
 	// disable chat

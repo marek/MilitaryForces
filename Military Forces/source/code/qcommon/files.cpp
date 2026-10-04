@@ -4099,7 +4099,7 @@ void FS_Restart( int checksumFeed ) {
 
 		// skip the q3config.cfg if "safe" is on the command line
 		if ( !Com_SafeMode() ) {
-			Cbuf_AddText ("exec " Q3CONFIG_CFG "\n");
+			CommandBuffer::addText ("exec " Q3CONFIG_CFG "\n");
 		}
 	}
 
