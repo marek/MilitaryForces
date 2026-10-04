@@ -184,20 +184,20 @@
 //	char			buf[MAX_BOTS_TEXT];
 //	unsigned int	stidx = level.scriptList.usedSTs;
 //
-//	len = FS_FOpenFileByMode( filename, &f, FS_READ );
+//	len = FileSystem::fOpenFileByMode( filename, &f, FS_READ );
 //	if ( !f ) {
 //		Com_Printf( S_COLOR_RED "file not found: %s\n", filename );
 //		return 0;
 //	}
 //	if ( len >= MAX_BOTS_TEXT ) {
 //		Com_Printf( S_COLOR_RED "file too large: %s is %i, max allowed is %i", filename, len, MAX_BOTS_TEXT );
-//		FS_FCloseFile( f );
+//		FileSystem::fCloseFile( f );
 //		return 0;
 //	}
 //
-//	FS_Read( buf, len, f );
+//	FileSystem::read( buf, len, f );
 //	buf[len] = 0;
-//	FS_FCloseFile( f );
+//	FileSystem::fCloseFile( f );
 //
 //	if( ParseScripts( ent, buf ) < 0 ) {
 //		ent->idxScriptBegin = ent->idxScriptEnd = -1;

@@ -55,18 +55,18 @@ void LAN_LoadCachedServers( ) {
 	fileHandle_t fileIn;
 	cls.numglobalservers = cls.numfavoriteservers = 0;
 	cls.numGlobalServerAddresses = 0;
-	if (FS_BaseDir_FOpenFileRead("servercache.dat", &fileIn)) {
-		FS_Read(&cls.numglobalservers, sizeof(int), fileIn);
-		FS_Read(&cls.numfavoriteservers, sizeof(int), fileIn);
-		FS_Read(&size, sizeof(int), fileIn);
+	if (FileSystem::baseDir_FOpenFileRead("servercache.dat", &fileIn)) {
+		FileSystem::read(&cls.numglobalservers, sizeof(int), fileIn);
+		FileSystem::read(&cls.numfavoriteservers, sizeof(int), fileIn);
+		FileSystem::read(&size, sizeof(int), fileIn);
 		if (size == sizeof(cls.globalServers) + sizeof(cls.favoriteServers)) {
-			FS_Read(&cls.globalServers, sizeof(cls.globalServers), fileIn);
-			FS_Read(&cls.favoriteServers, sizeof(cls.favoriteServers), fileIn);
+			FileSystem::read(&cls.globalServers, sizeof(cls.globalServers), fileIn);
+			FileSystem::read(&cls.favoriteServers, sizeof(cls.favoriteServers), fileIn);
 		} else {
 			cls.numglobalservers = cls.numfavoriteservers = 0;
 			cls.numGlobalServerAddresses = 0;
 		}
-		FS_FCloseFile(fileIn);
+		FileSystem::fCloseFile(fileIn);
 	}
 }
 
@@ -77,14 +77,14 @@ LAN_SaveServersToCache
 */
 void LAN_SaveServersToCache( ) {
 	int size;
-	fileHandle_t fileOut = FS_BaseDir_FOpenFileWrite_HomeState("servercache.dat");
-	FS_Write(&cls.numglobalservers, sizeof(int), fileOut);
-	FS_Write(&cls.numfavoriteservers, sizeof(int), fileOut);
+	fileHandle_t fileOut = FileSystem::baseDir_FOpenFileWrite_HomeState("servercache.dat");
+	FileSystem::write(&cls.numglobalservers, sizeof(int), fileOut);
+	FileSystem::write(&cls.numfavoriteservers, sizeof(int), fileOut);
 	size = sizeof(cls.globalServers) + sizeof(cls.favoriteServers);
-	FS_Write(&size, sizeof(int), fileOut);
-	FS_Write(&cls.globalServers, sizeof(cls.globalServers), fileOut);
-	FS_Write(&cls.favoriteServers, sizeof(cls.favoriteServers), fileOut);
-	FS_FCloseFile(fileOut);
+	FileSystem::write(&size, sizeof(int), fileOut);
+	FileSystem::write(&cls.globalServers, sizeof(cls.globalServers), fileOut);
+	FileSystem::write(&cls.favoriteServers, sizeof(cls.favoriteServers), fileOut);
+	FileSystem::fCloseFile(fileOut);
 }
 
 

@@ -662,7 +662,7 @@ FILE *Sys_Mkfifo( const char *ospath )
 
 	// if file already exists AND is a pipefile, remove it
 	if( !stat( ospath, &buf ) && S_ISFIFO( buf.st_mode ) )
-		FS_Remove( ospath );
+		FileSystem::remove( ospath );
 
 	result = mkfifo( ospath, 0600 );
 	if( result != 0 )
@@ -970,7 +970,7 @@ void Sys_ErrorDialog( const char *error )
 	const char *homedatapath = CvarSystem::variableString( "fs_homedatapath" );
 	const char *gamedir = CvarSystem::variableString( "fs_game" );
 	const char *fileName = "crashlog.txt";
-	char *ospath = FS_BuildOSPath( homedatapath, gamedir, fileName );
+	char *ospath = FileSystem::buildOSPath( homedatapath, gamedir, fileName );
 
 	Sys_Print( va( "%s\n", error ) );
 
@@ -979,7 +979,7 @@ void Sys_ErrorDialog( const char *error )
 #endif
 
 	// Make sure the write path for the crashlog exists...
-	if( FS_CreatePath( homedatapath ) )
+	if( FileSystem::createPath( homedatapath ) )
 	{
 		Com_Printf("ERROR: couldn't create path '%s' for crash log.\n", ospath);
 		return;

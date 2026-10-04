@@ -95,21 +95,21 @@ void UI_LoadBestScores(const char *map, int game) {
 	postGameInfo_t newInfo;
 	memset(&newInfo, 0, sizeof(postGameInfo_t));
 	Com_sprintf(fileName, MAX_QPATH, "games/%s_%i.game", map, game);
-	if (FS_FOpenFileByMode(fileName, &f, FS_READ) >= 0) {
+	if (FileSystem::fOpenFileByMode(fileName, &f, FS_READ) >= 0) {
 		int size = 0;
-		FS_Read(&size, sizeof(int), f);
+		FileSystem::read(&size, sizeof(int), f);
 		if (size == sizeof(postGameInfo_t)) {
-			FS_Read(&newInfo, sizeof(postGameInfo_t), f);
+			FileSystem::read(&newInfo, sizeof(postGameInfo_t), f);
 		}
-		FS_FCloseFile(f);
+		FileSystem::fCloseFile(f);
 	}
 	UI_SetBestScores(&newInfo, false);
 
 	Com_sprintf(fileName, MAX_QPATH, "demos/%s_%d.dm_%d", map, game, static_cast<int>(CvarSystem::variableValue("protocol")));
 	uiInfo.demoAvailable = false;
-	if (FS_FOpenFileByMode(fileName, &f, FS_READ) >= 0) {
+	if (FileSystem::fOpenFileByMode(fileName, &f, FS_READ) >= 0) {
 		uiInfo.demoAvailable = true;
-		FS_FCloseFile(f);
+		FileSystem::fCloseFile(f);
 	} 
 }
 
@@ -125,7 +125,7 @@ void UI_ClearScores() {
 	fileHandle_t f;
 	postGameInfo_t newInfo;
 
-	count = FS_GetFileList( "games", "game", gameList, sizeof(gameList) );
+	count = FileSystem::getFileList( "games", "game", gameList, sizeof(gameList) );
 
 	size = sizeof(postGameInfo_t);
 	memset(&newInfo, 0, size);
@@ -134,10 +134,10 @@ void UI_ClearScores() {
 		gameFile = gameList;
 		for ( i = 0; i < count; i++ ) {
 			len = strlen(gameFile);
-			if (FS_FOpenFileByMode(va("games/%s",gameFile), &f, FS_WRITE) >= 0) {
-				FS_Write(&size, sizeof(int), f);
-				FS_Write(&newInfo, size, f);
-				FS_FCloseFile(f);
+			if (FileSystem::fOpenFileByMode(va("games/%s",gameFile), &f, FS_WRITE) >= 0) {
+				FileSystem::write(&size, sizeof(int), f);
+				FileSystem::write(&newInfo, size, f);
+				FileSystem::fCloseFile(f);
 			}
 			gameFile += len + 1;
 		}
@@ -177,14 +177,14 @@ static void UI_CalcPostGameStats() {
 	Com_sprintf(fileName, MAX_QPATH, "games/%s_%i.game", map, game);
 	// see if we have one already
 	memset(&oldInfo, 0, sizeof(postGameInfo_t));
-	if (FS_FOpenFileByMode(fileName, &f, FS_READ) >= 0) {
+	if (FileSystem::fOpenFileByMode(fileName, &f, FS_READ) >= 0) {
 	// if so load it
 		size = 0;
-		FS_Read(&size, sizeof(int), f);
+		FileSystem::read(&size, sizeof(int), f);
 		if (size == sizeof(postGameInfo_t)) {
-			FS_Read(&oldInfo, sizeof(postGameInfo_t), f);
+			FileSystem::read(&oldInfo, sizeof(postGameInfo_t), f);
 		}
-		FS_FCloseFile(f);
+		FileSystem::fCloseFile(f);
 	}					 
 
 	newInfo.accuracy = atoi(UI_Argv(3));
@@ -227,11 +227,11 @@ static void UI_CalcPostGameStats() {
 	if  (newHigh) {
 		// if so write out the New one
 		uiInfo.newHighScoreTime = uiInfo.uiUtils.dc_->realTime_ + 20000;
-		if (FS_FOpenFileByMode(fileName, &f, FS_WRITE) >= 0) {
+		if (FileSystem::fOpenFileByMode(fileName, &f, FS_WRITE) >= 0) {
 			size = sizeof(postGameInfo_t);
-			FS_Write(&size, sizeof(int), f);
-			FS_Write(&newInfo, sizeof(postGameInfo_t), f);
-			FS_FCloseFile(f);
+			FileSystem::write(&size, sizeof(int), f);
+			FileSystem::write(&newInfo, sizeof(postGameInfo_t), f);
+			FileSystem::fCloseFile(f);
 		}
 	}
 

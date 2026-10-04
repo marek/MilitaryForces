@@ -336,9 +336,9 @@ void G_InitGame( int levelTime, int randomSeed )
 			g_log.string[0] ) 
 	{
 		if ( g_logSync.integer ) 
-			FS_FOpenFileByMode( g_log.string, &theLevel.logFile_, FS_APPEND_SYNC );
+			FileSystem::fOpenFileByMode( g_log.string, &theLevel.logFile_, FS_APPEND_SYNC );
 		else
-			FS_FOpenFileByMode( g_log.string, &theLevel.logFile_, FS_APPEND );
+			FileSystem::fOpenFileByMode( g_log.string, &theLevel.logFile_, FS_APPEND );
 
 		if ( !theLevel.logFile_ )
 			Com_Printf( "WARNING: Couldn't open logfile: %s\n", g_log.string );
@@ -439,7 +439,7 @@ void G_ShutdownGame()
 	{
 		G_LogPrintf("ShutdownGame:\n" );
 		G_LogPrintf("------------------------------------------------------------\n" );
-		FS_FCloseFile( theLevel.logFile_ );
+		FileSystem::fCloseFile( theLevel.logFile_ );
 	}
 
 	// write all the client session data so we can get it back
@@ -983,7 +983,7 @@ void QDECL G_LogPrintf( const char *fmt, ... )
 	if ( !theLevel.logFile_ ) 
 		return;
 
-	FS_Write( string, strlen( string ), theLevel.logFile_ );
+	FileSystem::write( string, strlen( string ), theLevel.logFile_ );
 }
 
 /*

@@ -1057,11 +1057,11 @@ Writes lines containing "bind key value"
 void Key_WriteBindings( fileHandle_t f ) {
 	int		i;
 
-	FS_Printf (f, "unbindall\n" );
+	FileSystem::printf (f, "unbindall\n" );
 
 	for (i=0 ; i<MAX_KEYS ; i++) {
 		if (keys[i].binding && keys[i].binding[0] ) {
-			FS_Printf (f, "bind %s \"%s\"\n", Key_KeynumToString(i), keys[i].binding);
+			FileSystem::printf (f, "bind %s \"%s\"\n", Key_KeynumToString(i), keys[i].binding);
 
 		}
 
@@ -1477,7 +1477,7 @@ void CL_LoadConsoleHistory( )
 	int						i, numChars, numLines = 0;
 	fileHandle_t	f;
 
-	consoleSaveBufferSize = FS_FOpenFileRead( CONSOLE_HISTORY_FILE, &f, false );
+	consoleSaveBufferSize = FileSystem::fOpenFileRead( CONSOLE_HISTORY_FILE, &f, false );
 	if( !f )
 	{
 		Com_Printf( "Couldn't read %s.\n", CONSOLE_HISTORY_FILE );
@@ -1485,7 +1485,7 @@ void CL_LoadConsoleHistory( )
 	}
 
 	if( consoleSaveBufferSize < MAX_CONSOLE_SAVE_BUFFER &&
-			FS_Read( consoleSaveBuffer, consoleSaveBufferSize, f ) == consoleSaveBufferSize )
+			FileSystem::read( consoleSaveBuffer, consoleSaveBufferSize, f ) == consoleSaveBufferSize )
 	{
 		consoleSaveBuffer[consoleSaveBufferSize] = '\0';
 		text_p = consoleSaveBuffer;
@@ -1530,7 +1530,7 @@ void CL_LoadConsoleHistory( )
 	else
 		Com_Printf( "Couldn't read %s.\n", CONSOLE_HISTORY_FILE );
 
-	FS_FCloseFile( f );
+	FileSystem::fCloseFile( f );
 }
 
 /*
@@ -1578,15 +1578,15 @@ void CL_SaveConsoleHistory( )
 
 	consoleSaveBufferSize = strlen( consoleSaveBuffer );
 
-	f = FS_FOpenFileWrite_HomeState( CONSOLE_HISTORY_FILE );
+	f = FileSystem::fOpenFileWrite_HomeState( CONSOLE_HISTORY_FILE );
 	if( !f )
 	{
 		Com_Printf( "Couldn't write %s.\n", CONSOLE_HISTORY_FILE );
 		return;
 	}
 
-	if( FS_Write( consoleSaveBuffer, consoleSaveBufferSize, f ) < consoleSaveBufferSize )
+	if( FileSystem::write( consoleSaveBuffer, consoleSaveBufferSize, f ) < consoleSaveBufferSize )
 		Com_Printf( "Couldn't write %s.\n", CONSOLE_HISTORY_FILE );
 
-	FS_FCloseFile( f );
+	FileSystem::fCloseFile( f );
 }

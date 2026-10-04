@@ -4,9 +4,6 @@
 
 
 
-int	FS_FOpenFileByMode( const char *qpath, fileHandle_t *f, fsMode_t mode );
-int FS_Read( void *buffer, int len, fileHandle_t f );
-void FS_FCloseFile( fileHandle_t f );
 
 
 UI_PrecompilerTools::Punctuation UI_PrecompilerTools::default_punctuations[] =
@@ -276,7 +273,7 @@ UI_PrecompilerTools::loadScriptFile( const char *filename )
 		Com_sprintf(pathname, sizeof(pathname), "%s/%s", basefolder_.c_str(), filename);
 	else
 		Com_sprintf(pathname, sizeof(pathname), "%s", filename);
-	length = FS_FOpenFileByMode( pathname, &fp, FS_READ );
+	length = FileSystem::fOpenFileByMode( pathname, &fp, FS_READ );
 	if (!fp) return nullptr;
 
 	buffer = UI_Memtools::getClearedMemory(sizeof(Script) + length + 1);
@@ -300,8 +297,8 @@ UI_PrecompilerTools::loadScriptFile( const char *filename )
 	//
 	setScriptPunctuations(script, nullptr);
 	//
-	FS_Read(script->buffer_, length, fp);
-	FS_FCloseFile(fp);
+	FileSystem::read(script->buffer_, length, fp);
+	FileSystem::fCloseFile(fp);
 	//
 	script->length_ = COM_Compress(script->buffer_);
 

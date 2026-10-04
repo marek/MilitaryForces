@@ -193,7 +193,7 @@ void QDECL Com_Printf( const char *fmt, ... ) {
 	if ( com_logfile && com_logfile->integer ) {
     // TTimo: only open the qconsole.log if the filesystem is in an initialized state
     //   also, avoid recursing in the qconsole.log opening (i.e. if fs_debug is on)
-		if ( !logfile && FS_Initialized() && !opening_qconsole) {
+		if ( !logfile && FileSystem::initialized() && !opening_qconsole) {
 			struct tm *newtime;
 			time_t aclock;
 
@@ -202,7 +202,7 @@ void QDECL Com_Printf( const char *fmt, ... ) {
 			time( &aclock );
 			newtime = localtime( &aclock );
 
-			logfile = FS_FOpenFileWrite_HomeData( "qconsole.log" );
+			logfile = FileSystem::fOpenFileWrite_HomeData( "qconsole.log" );
 			
 			if(logfile)
 			{
@@ -212,7 +212,7 @@ void QDECL Com_Printf( const char *fmt, ... ) {
 				{
 					// force it to not buffer so we get valid
 					// data even if we are crashing
-					FS_ForceFlush(logfile);
+					FileSystem::forceFlush(logfile);
 				}
 			}
 			else
@@ -223,8 +223,8 @@ void QDECL Com_Printf( const char *fmt, ... ) {
 
       opening_qconsole = false;
 		}
-		if ( logfile && FS_Initialized()) {
-			FS_Write(msg, strlen(msg), logfile);
+		if ( logfile && FileSystem::initialized()) {
+			FileSystem::write(msg, strlen(msg), logfile);
 		}
 	}
 }
@@ -311,7 +311,7 @@ void QDECL Com_Error( int code, const char *fmt, ... ) {
 		CL_Disconnect( true );
 		CL_FlushMemory( );
 		// make sure we can get at our local stuff
-		FS_PureServerSetLoadedPaks("", "");
+		FileSystem::pureServerSetLoadedPaks("", "");
 		com_errorEntered = false;
 		longjmp (abortframe, -1);
 	} else if (code == ERR_DROP) {
@@ -322,7 +322,7 @@ void QDECL Com_Error( int code, const char *fmt, ... ) {
 		}
 		CL_Disconnect( true );
 		CL_FlushMemory( );
-		FS_PureServerSetLoadedPaks("", "");
+		FileSystem::pureServerSetLoadedPaks("", "");
 		com_errorEntered = false;
 		longjmp (abortframe, -1);
 	} else if ( code == ERR_NEED_CD ) {
@@ -338,7 +338,7 @@ void QDECL Com_Error( int code, const char *fmt, ... ) {
 			Com_Printf("Server didn't have CD\n" );
 		}
 
-		FS_PureServerSetLoadedPaks("", "");
+		FileSystem::pureServerSetLoadedPaks("", "");
 
 		com_errorEntered = false;
 		longjmp (abortframe, -1);
@@ -372,7 +372,7 @@ void Com_Quit_f( ) {
 		SV_Shutdown(p[0] ? p : "Server quit");
 		CL_Shutdown(p[0] ? p : "Client quit", true, true);
 		Com_Shutdown ();
-		FS_Shutdown(true);
+		FileSystem::shutdown(true);
 	}
 	Sys_Quit ();
 }
@@ -1096,14 +1096,14 @@ void Z_LogZoneHeap( memzone_t *zone, char *name ) {
 	char		buf[4096];
 	int size, allocSize, numBlocks;
 
-	if (!logfile || !FS_Initialized())
+	if (!logfile || !FileSystem::initialized())
 		return;
 	size = numBlocks = 0;
 #ifdef ZONE_DEBUG
 	allocSize = 0;
 #endif
 	Com_sprintf(buf, sizeof(buf), "\r\n================\r\n%s log\r\n================\r\n", name);
-	FS_Write(buf, strlen(buf), logfile);
+	FileSystem::write(buf, strlen(buf), logfile);
 	for (block = zone->blocklist.next ; block->next != &zone->blocklist; block = block->next) {
 		if (block->tag) {
 #ifdef ZONE_DEBUG
@@ -1119,7 +1119,7 @@ void Z_LogZoneHeap( memzone_t *zone, char *name ) {
 			}
 			dump[j] = '\0';
 			Com_sprintf(buf, sizeof(buf), "size = %8d: %s, line: %d (%s) [%s]\r\n", block->d.allocSize, block->d.file, block->d.line, block->d.label, dump);
-			FS_Write(buf, strlen(buf), logfile);
+			FileSystem::write(buf, strlen(buf), logfile);
 			allocSize += block->d.allocSize;
 #endif
 			size += block->size;
@@ -1133,9 +1133,9 @@ void Z_LogZoneHeap( memzone_t *zone, char *name ) {
 	allocSize = numBlocks * sizeof(memblock_t); // + 32 bit alignment
 #endif
 	Com_sprintf(buf, sizeof(buf), "%d %s memory in %d blocks\r\n", size, name, numBlocks);
-	FS_Write(buf, strlen(buf), logfile);
+	FileSystem::write(buf, strlen(buf), logfile);
 	Com_sprintf(buf, sizeof(buf), "%d %s memory overhead\r\n", size - allocSize, name);
-	FS_Write(buf, strlen(buf), logfile);
+	FileSystem::write(buf, strlen(buf), logfile);
 }
 
 /*
@@ -1457,25 +1457,25 @@ void Hunk_Log( ) {
 	char		buf[4096];
 	int size, numBlocks;
 
-	if (!logfile || !FS_Initialized())
+	if (!logfile || !FileSystem::initialized())
 		return;
 	size = 0;
 	numBlocks = 0;
 	Com_sprintf(buf, sizeof(buf), "\r\n================\r\nHunk log\r\n================\r\n");
-	FS_Write(buf, strlen(buf), logfile);
+	FileSystem::write(buf, strlen(buf), logfile);
 	for (block = hunkblocks ; block; block = block->next) {
 #ifdef HUNK_DEBUG
 		Com_sprintf(buf, sizeof(buf), "size = %8d: %s, line: %d (%s)\r\n", block->size, block->file, block->line, block->label);
-		FS_Write(buf, strlen(buf), logfile);
+		FileSystem::write(buf, strlen(buf), logfile);
 #endif
 		size += block->size;
 		numBlocks++;
 	}
 	Com_sprintf(buf, sizeof(buf), "%d Hunk memory\r\n", size);
-	FS_Write(buf, strlen(buf), logfile);
+	FileSystem::write(buf, strlen(buf), logfile);
 	Com_sprintf(buf, sizeof(buf), "%d hunk blocks\r\n", numBlocks);
-	FS_Write(buf, strlen(buf), logfile);
-	FS_Flush(logfile);
+	FileSystem::write(buf, strlen(buf), logfile);
+	FileSystem::flush(logfile);
 }
 
 /*
@@ -1488,7 +1488,7 @@ void Hunk_SmallLog( ) {
 	char		buf[4096];
 	int size, locsize, numBlocks;
 
-	if (!logfile || !FS_Initialized())
+	if (!logfile || !FileSystem::initialized())
 		return;
 	for (block = hunkblocks ; block; block = block->next) {
 		block->printed = false;
@@ -1496,7 +1496,7 @@ void Hunk_SmallLog( ) {
 	size = 0;
 	numBlocks = 0;
 	Com_sprintf(buf, sizeof(buf), "\r\n================\r\nHunk Small log\r\n================\r\n");
-	FS_Write(buf, strlen(buf), logfile);
+	FileSystem::write(buf, strlen(buf), logfile);
 	for (block = hunkblocks; block; block = block->next) {
 		if (block->printed) {
 			continue;
@@ -1515,7 +1515,7 @@ void Hunk_SmallLog( ) {
 		}
 #ifdef HUNK_DEBUG
 		Com_sprintf(buf, sizeof(buf), "size = %8d: %s, line: %d (%s)\r\n", locsize, block->file, block->line, block->label);
-		FS_Write(buf, strlen(buf), logfile);
+		FileSystem::write(buf, strlen(buf), logfile);
 #else
 		(void)locsize; // Suppress warning
 #endif
@@ -1523,10 +1523,10 @@ void Hunk_SmallLog( ) {
 		numBlocks++;
 	}
 	Com_sprintf(buf, sizeof(buf), "%d Hunk memory\r\n", size);
-	FS_Write(buf, strlen(buf), logfile);
+	FileSystem::write(buf, strlen(buf), logfile);
 	Com_sprintf(buf, sizeof(buf), "%d hunk blocks\r\n", numBlocks);
-	FS_Write(buf, strlen(buf), logfile);
-	FS_Flush(logfile);
+	FileSystem::write(buf, strlen(buf), logfile);
+	FileSystem::flush(logfile);
 }
 
 /*
@@ -1543,7 +1543,7 @@ void Com_InitHunkMemory( ) {
 	// this allows the config and product id files ( journal files too ) to be loaded
 	// by the file system without redunant routines in the file system utilizing different 
 	// memory systems
-	if (FS_LoadStack() != 0) {
+	if (FileSystem::loadStack() != 0) {
 		Com_Error( ERR_FATAL, "Hunk initialization failed. File system load stack not zero");
 	}
 
@@ -1912,12 +1912,12 @@ void Com_InitJournaling( ) {
 
 	if ( com_journal->integer == 1 ) {
 		Com_Printf( "Journaling events\n");
-		com_journalFile = FS_FOpenFileWrite_HomeState( "journal.dat" );
-		com_journalDataFile = FS_FOpenFileWrite_HomeState( "journaldata.dat" );
+		com_journalFile = FileSystem::fOpenFileWrite_HomeState( "journal.dat" );
+		com_journalDataFile = FileSystem::fOpenFileWrite_HomeState( "journaldata.dat" );
 	} else if ( com_journal->integer == 2 ) {
 		Com_Printf( "Replaying journaled events\n");
-		FS_FOpenFileRead( "journal.dat", &com_journalFile, true );
-		FS_FOpenFileRead( "journaldata.dat", &com_journalDataFile, true );
+		FileSystem::fOpenFileRead( "journal.dat", &com_journalFile, true );
+		FileSystem::fOpenFileRead( "journaldata.dat", &com_journalDataFile, true );
 	}
 
 	if ( !com_journalFile || !com_journalDataFile ) {
@@ -2053,13 +2053,13 @@ sysEvent_t	Com_GetRealEvent( ) {
 
 	// either get an event from the system or the journal file
 	if ( com_journal->integer == 2 ) {
-		r = FS_Read( &ev, sizeof(ev), com_journalFile );
+		r = FileSystem::read( &ev, sizeof(ev), com_journalFile );
 		if ( r != sizeof(ev) ) {
 			Com_Error( ERR_FATAL, "Error reading from journal file" );
 		}
 		if ( ev.evPtrLength ) {
 			ev.evPtr = Z_Malloc( ev.evPtrLength );
-			r = FS_Read( ev.evPtr, ev.evPtrLength, com_journalFile );
+			r = FileSystem::read( ev.evPtr, ev.evPtrLength, com_journalFile );
 			if ( r != ev.evPtrLength ) {
 				Com_Error( ERR_FATAL, "Error reading from journal file" );
 			}
@@ -2069,12 +2069,12 @@ sysEvent_t	Com_GetRealEvent( ) {
 
 		// write the journal value out if needed
 		if ( com_journal->integer == 1 ) {
-			r = FS_Write( &ev, sizeof(ev), com_journalFile );
+			r = FileSystem::write( &ev, sizeof(ev), com_journalFile );
 			if ( r != sizeof(ev) ) {
 				Com_Error( ERR_FATAL, "Error writing to journal file" );
 			}
 			if ( ev.evPtrLength ) {
-				r = FS_Write( ev.evPtr, ev.evPtrLength, com_journalFile );
+				r = FileSystem::write( ev.evPtr, ev.evPtrLength, com_journalFile );
 				if ( r != ev.evPtrLength ) {
 					Com_Error( ERR_FATAL, "Error writing to journal file" );
 				}
@@ -2399,7 +2399,7 @@ void Com_GameRestart(int checksumFeed, bool disconnect)
 			CL_Shutdown("Game directory changed", disconnect, false);
 		}
 
-		FS_Restart(checksumFeed);
+		FileSystem::restart(checksumFeed);
 	
 		// Clean out any user and VM created cvars
 		CvarSystem::restart(true);
@@ -2463,7 +2463,7 @@ void Com_ReadCDKey( const char *filename ) {
 
 	Com_sprintf(fbuffer, sizeof(fbuffer), "%s/q3key", filename);
 
-	FS_BaseDir_FOpenFileRead( fbuffer, &f );
+	FileSystem::baseDir_FOpenFileRead( fbuffer, &f );
 	if ( !f ) {
 		Com_Memset( cl_cdkey, '\0', 17 );
 		return;
@@ -2471,8 +2471,8 @@ void Com_ReadCDKey( const char *filename ) {
 
 	Com_Memset( buffer, 0, sizeof(buffer) );
 
-	FS_Read( buffer, 16, f );
-	FS_FCloseFile( f );
+	FileSystem::read( buffer, 16, f );
+	FileSystem::fCloseFile( f );
 
 	Q_strlwr(buffer);
 
@@ -2495,7 +2495,7 @@ void Com_AppendCDKey( const char *filename ) {
 
 	Com_sprintf(fbuffer, sizeof(fbuffer), "%s/q3key", filename);
 
-	FS_BaseDir_FOpenFileRead( fbuffer, &f );
+	FileSystem::baseDir_FOpenFileRead( fbuffer, &f );
 	if (!f) {
 		Com_Memset( &cl_cdkey[16], '\0', 17 );
 		return;
@@ -2503,8 +2503,8 @@ void Com_AppendCDKey( const char *filename ) {
 
 	Com_Memset( buffer, 0, sizeof(buffer) );
 
-	FS_Read( buffer, 16, f );
-	FS_FCloseFile( f );
+	FileSystem::read( buffer, 16, f );
+	FileSystem::fCloseFile( f );
 
 	if (CL_CDKeyValidate(buffer, NULL)) {
 		strcat( &cl_cdkey[16], buffer );
@@ -2540,7 +2540,7 @@ static void Com_WriteCDKey( const char *filename, const char *ikey ) {
 #ifndef _WIN32
 	savedumask = umask(0077);
 #endif
-	f = FS_BaseDir_FOpenFileWrite_HomeState( fbuffer );
+	f = FileSystem::baseDir_FOpenFileWrite_HomeState( fbuffer );
 	if ( !f ) {
 		Com_Printf ("Couldn't write CD key to %s.\n", fbuffer );
 		goto out;
@@ -2548,13 +2548,13 @@ static void Com_WriteCDKey( const char *filename, const char *ikey ) {
 
 	Q_strlwr(key);
 
-	FS_Write( key, 16, f );
+	FileSystem::write( key, 16, f );
 
-	FS_Printf( f, "\n// generated by " PRODUCT_NAME ", do not modify\r\n" );
-	FS_Printf( f, "// Do not give this file to ANYONE.\r\n" );
-	FS_Printf( f, "// id Software and Activision will NOT ask you to send this file to them.\r\n");
+	FileSystem::printf( f, "\n// generated by " PRODUCT_NAME ", do not modify\r\n" );
+	FileSystem::printf( f, "// Do not give this file to ANYONE.\r\n" );
+	FileSystem::printf( f, "// id Software and Activision will NOT ask you to send this file to them.\r\n");
 
-	FS_FCloseFile( f );
+	FileSystem::fCloseFile( f );
 out:
 #ifndef _WIN32
 	umask(savedumask);
@@ -2696,7 +2696,7 @@ void Com_Init( char *commandLine ) {
 	com_basegame = CvarSystem::get("com_basegame", BASEGAME, CVAR_INIT);
 	com_homepath = CvarSystem::get("com_homepath", "", CVAR_INIT|CVAR_PROTECTED);
 
-	FS_InitFilesystem ();
+	FileSystem::initFilesystem ();
 
 	Com_InitJournaling();
 
@@ -2798,7 +2798,7 @@ void Com_Init( char *commandLine ) {
 
 	Sys_Init();
 
-	Sys_InitPIDFile( FS_GetCurrentGameDir() );
+	Sys_InitPIDFile( FileSystem::getCurrentGameDir() );
 
 	// Pick a random port value
 	Com_RandomBytes( reinterpret_cast<byte*>(&qport), sizeof(int) );
@@ -2851,7 +2851,7 @@ void Com_Init( char *commandLine ) {
 	com_pipefile = CvarSystem::get( "com_pipefile", "", CVAR_ARCHIVE|CVAR_LATCH );
 	if( com_pipefile->string[0] )
 	{
-		pipefile = FS_FCreateOpenPipeFile( com_pipefile->string );
+		pipefile = FileSystem::fCreateOpenPipeFile( com_pipefile->string );
 	}
 
 	Com_Printf ("--- Common Initialization Complete ---\n");
@@ -2873,7 +2873,7 @@ void Com_ReadFromPipe( )
 	if( !pipefile )
 		return;
 
-	while( ( read = FS_Read( buf + accu, sizeof( buf ) - accu - 1, pipefile ) ) > 0 )
+	while( ( read = FileSystem::read( buf + accu, sizeof( buf ) - accu - 1, pipefile ) ) > 0 )
 	{
 		char *brk = nullptr;
 		int i;
@@ -2913,16 +2913,16 @@ void Com_ReadFromPipe( )
 void Com_WriteConfigToFile( const char *filename ) {
 	fileHandle_t	f;
 
-	f = FS_FOpenFileWrite_HomeConfig( filename );
+	f = FileSystem::fOpenFileWrite_HomeConfig( filename );
 	if ( !f ) {
 		Com_Printf ("Couldn't write %s.\n", filename );
 		return;
 	}
 
-	FS_Printf (f, "// generated by " PRODUCT_NAME ", do not modify\n");
+	FileSystem::printf (f, "// generated by " PRODUCT_NAME ", do not modify\n");
 	Key_WriteBindings (f);
 	CvarSystem::writeVariables (f);
-	FS_FCloseFile( f );
+	FileSystem::fCloseFile( f );
 }
 
 
@@ -3274,18 +3274,18 @@ Com_Shutdown
 */
 void Com_Shutdown () {
 	if (logfile) {
-		FS_FCloseFile (logfile);
+		FileSystem::fCloseFile (logfile);
 		logfile = 0;
 	}
 
 	if ( com_journalFile ) {
-		FS_FCloseFile( com_journalFile );
+		FileSystem::fCloseFile( com_journalFile );
 		com_journalFile = 0;
 	}
 
 	if( pipefile ) {
-		FS_FCloseFile( pipefile );
-		FS_Remove_HomeData( com_pipefile->string );
+		FileSystem::fCloseFile( pipefile );
+		FileSystem::remove_HomeData( com_pipefile->string );
 	}
 
 }
@@ -3450,10 +3450,10 @@ void Field_CompleteFilename( const char *dir, const char *ext,
 	matchCount = 0;
 	shortestMatch[ 0 ] = 0;
 
-	FS_FilenameCompletion( dir, ext, filter, stripExt, FindMatches, allowNonPureFilesOnDisk );
+	FileSystem::filenameCompletion( dir, ext, filter, stripExt, FindMatches, allowNonPureFilesOnDisk );
 
 	if( !Field_Complete( ) )
-		FS_FilenameCompletion( dir, ext, filter, stripExt, PrintMatches, allowNonPureFilesOnDisk );
+		FileSystem::filenameCompletion( dir, ext, filter, stripExt, PrintMatches, allowNonPureFilesOnDisk );
 }
 
 /*

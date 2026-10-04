@@ -3,12 +3,8 @@
 #include "../qcommon/qfiles.h"
 #include "../game/bg_public.h"
 #include "bg_md3utils.h"
-int FS_Read( void *buffer, int len, fileHandle_t f );
 
 // decls
-int FS_FOpenFileByMode( const char *qpath, fileHandle_t *f, fsMode_t mode );
-void FS_FCloseFile( fileHandle_t f );
-int FS_Seek( fileHandle_t f, long offset, int origin );
 
 
 bool
@@ -20,12 +16,12 @@ Md3Utils::getModelDimensions( std::string const& filename,
 	bool success = false;
 	fileHandle_t file;
 
-	if( FS_FOpenFileByMode(filename.c_str(), &file, FS_READ) >= 0 ) 
+	if( FileSystem::fOpenFileByMode(filename.c_str(), &file, FS_READ) >= 0 ) 
 		 success = getModelDimensions( file, mins, maxs, checkFrame );
 	else
 		Com_Error(ERR_FATAL, "Unable to open file %s\n", filename.c_str() );
 
-	FS_FCloseFile(file);
+	FileSystem::fCloseFile(file);
 
 	return success;
 }
@@ -43,7 +39,7 @@ Md3Utils::getModelDimensions( fileHandle_t const& file,
 	}
 
 	// put it back to beginning of file (just in case)
-	if( FS_Seek( file, 0, FS_SEEK_SET ) != 0 )
+	if( FileSystem::seek( file, 0, FS_SEEK_SET ) != 0 )
 	{
 		Com_Error(ERR_FATAL, "Unable to set file pointer in file!\n" );
 		return false;
@@ -55,7 +51,7 @@ Md3Utils::getModelDimensions( fileHandle_t const& file,
 	md3Header_t header;
 	md3Frame_t currentFrame;
 
-	FS_Read(&header, sizeof(header), file);
+	FileSystem::read(&header, sizeof(header), file);
 	int number = header.numFrames;
 
 	if( checkFrame >= number )
@@ -73,7 +69,7 @@ Md3Utils::getModelDimensions( fileHandle_t const& file,
 
 	for( int i = 0; i < number; ++i ) 
 	{
-		FS_Read(&currentFrame, sizeof(currentFrame), file);
+		FileSystem::read(&currentFrame, sizeof(currentFrame), file);
 
 		if( checkFrame >= 0 && i == checkFrame )
 		{
@@ -117,12 +113,12 @@ Md3Utils::getTagsContaining( std::string const& filename,
 	int found = 0;
 	fileHandle_t file;
 
-	if( FS_FOpenFileByMode(filename.c_str(), &file, FS_READ) >= 0 ) 
+	if( FileSystem::fOpenFileByMode(filename.c_str(), &file, FS_READ) >= 0 ) 
 		 found = getTagsContaining( file, str, tagList );
 	else
 		Com_Error(ERR_FATAL, "Unable to open file %s\n", filename.c_str() );
 
-	FS_FCloseFile(file);
+	FileSystem::fCloseFile(file);
 
 	return found;
 }
@@ -142,7 +138,7 @@ Md3Utils::getTagsContaining( fileHandle_t const& file,
 	}
 
 	// put it back to beginning of file (just in case)
-	if( FS_Seek( file, 0, FS_SEEK_SET ) != 0 )
+	if( FileSystem::seek( file, 0, FS_SEEK_SET ) != 0 )
 	{
 		Com_Error(ERR_FATAL, "Unable to set file pointer in file!\n" );
 		return false;
@@ -151,17 +147,17 @@ Md3Utils::getTagsContaining( fileHandle_t const& file,
 	tagList.clear();
 
 	md3Header_t head;
-	FS_Read(&head, sizeof(head), file);
+	FileSystem::read(&head, sizeof(head), file);
 
 	md3Frame_t	frame;
 	for( int i = 0; i < head.numFrames; ++i ) 
-		FS_Read(&frame, sizeof(frame), file);
+		FileSystem::read(&frame, sizeof(frame), file);
 
 	int total = head.numTags;
 	md3Tag_t	tag;
 	for( int i = 0; i < total; ++ i ) 
 	{
-		FS_Read(&tag, sizeof(tag), file);
+		FileSystem::read(&tag, sizeof(tag), file);
 		std::string tagName(tag.name);
 		// if it contains the string at the first position, then add it
 		if( tagName.find(str) == 0 )
@@ -179,12 +175,12 @@ Md3Utils::getTagInfo( std::string const& filename,
 	bool success = false;
 	fileHandle_t file;
 
-	if( FS_FOpenFileByMode(filename.c_str(), &file, FS_READ) >= 0 ) 
+	if( FileSystem::fOpenFileByMode(filename.c_str(), &file, FS_READ) >= 0 ) 
 		 success = getTagInfo( file, tagname, tag );
 	else
 		Com_Error(ERR_FATAL, "Unable to open file %s\n", filename.c_str() );
 
-	FS_FCloseFile(file);
+	FileSystem::fCloseFile(file);
 
 	return success;
 }
@@ -201,7 +197,7 @@ Md3Utils::getTagInfo( fileHandle_t const& file,
 	}
 
 	// put it back to beginning of file (just in case)
-	if( FS_Seek( file, 0, FS_SEEK_SET ) != 0 )
+	if( FileSystem::seek( file, 0, FS_SEEK_SET ) != 0 )
 	{
 		Com_Error(ERR_FATAL, "Unable to set file pointer in file!\n" );
 		return false;
@@ -212,13 +208,13 @@ Md3Utils::getTagInfo( fileHandle_t const& file,
 	md3Header_t head;
 	md3Frame_t	frame;
 
-	FS_Read(&head, sizeof(head), file);
+	FileSystem::read(&head, sizeof(head), file);
 	for( int i = 0; i < head.numFrames; ++i ) 
-		FS_Read(&frame, sizeof(frame), file);
+		FileSystem::read(&frame, sizeof(frame), file);
 
 	for( int i = 0; i < head.numTags; ++i ) 
 	{
-		FS_Read(&tag, sizeof(md3Tag_t), file);
+		FileSystem::read(&tag, sizeof(md3Tag_t), file);
 		if( strcmp( tag.name, tagname.c_str() ) == 0 ) 
 		{
 			found = true;
@@ -234,10 +230,10 @@ Md3Utils::getNumberOfFrames( std::string const& fileName )
 {
 	fileHandle_t file;
 	
-	if( FS_FOpenFileByMode( fileName.c_str(), &file, FS_READ ) >= 0 ) 
+	if( FileSystem::fOpenFileByMode( fileName.c_str(), &file, FS_READ ) >= 0 ) 
 	{
 		int frames = getNumberOfFrames( file );
-		FS_FCloseFile( file );
+		FileSystem::fCloseFile( file );
 		return frames;
 	}
 
@@ -256,14 +252,14 @@ Md3Utils::getNumberOfFrames( fileHandle_t const& file )
 	}
 
 	// put it back to beginning of file (just in case)
-	if( FS_Seek( file, 0, FS_SEEK_SET ) != 0 )
+	if( FileSystem::seek( file, 0, FS_SEEK_SET ) != 0 )
 	{
 		Com_Error(ERR_FATAL, "Unable to set file pointer in file!\n" );
 		return false;
 	}
 
 	md3Header_t head;
-	FS_Read( &head, sizeof(head), file );
+	FileSystem::read( &head, sizeof(head), file );
 	return head.numFrames;
 }
 

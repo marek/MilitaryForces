@@ -83,7 +83,7 @@ SafeFS_Write
 */
 static ID_INLINE void SafeFS_Write( const void *buf, int len, fileHandle_t f )
 {
-  if( FS_Write( buf, len, f ) < len )
+  if( FileSystem::write( buf, len, f ) < len )
     Com_Error( ERR_DROP, "Failed to write avi file" );
 }
 
@@ -337,13 +337,13 @@ bool CL_OpenAVIForWriting( const char *fileName )
     return false;
   }
 
-  if( ( afd.f = FS_FOpenFileWrite_HomeData( fileName ) ) <= 0 )
+  if( ( afd.f = FileSystem::fOpenFileWrite_HomeData( fileName ) ) <= 0 )
     return false;
 
-  if( ( afd.idxF = FS_FOpenFileWrite_HomeData(
+  if( ( afd.idxF = FileSystem::fOpenFileWrite_HomeData(
           va( "%s" INDEX_FILE_EXTENSION, fileName ) ) ) <= 0 )
   {
-    FS_FCloseFile( afd.f );
+    FileSystem::fCloseFile( afd.f );
     return false;
   }
 
@@ -605,19 +605,19 @@ bool CL_CloseAVI( )
 
   afd.fileOpen = false;
 
-  FS_Seek( afd.idxF, 4, FS_SEEK_SET );
+  FileSystem::seek( afd.idxF, 4, FS_SEEK_SET );
   bufIndex = 0;
   WRITE_4BYTES( indexSize );
   SafeFS_Write( buffer, bufIndex, afd.idxF );
-  FS_FCloseFile( afd.idxF );
+  FileSystem::fCloseFile( afd.idxF );
 
   // Write index
 
   // Open the temp index file
-  if( ( indexSize = FS_FOpenFileRead( idxFileName,
+  if( ( indexSize = FileSystem::fOpenFileRead( idxFileName,
           &afd.idxF, true ) ) <= 0 )
   {
-    FS_FCloseFile( afd.f );
+    FileSystem::fCloseFile( afd.f );
     return false;
   }
 
@@ -626,21 +626,21 @@ bool CL_CloseAVI( )
   // Append index to end of avi file
   while( indexRemainder > MAX_AVI_BUFFER )
   {
-    FS_Read( buffer, MAX_AVI_BUFFER, afd.idxF );
+    FileSystem::read( buffer, MAX_AVI_BUFFER, afd.idxF );
     SafeFS_Write( buffer, MAX_AVI_BUFFER, afd.f );
     afd.fileSize += MAX_AVI_BUFFER;
     indexRemainder -= MAX_AVI_BUFFER;
   }
-  FS_Read( buffer, indexRemainder, afd.idxF );
+  FileSystem::read( buffer, indexRemainder, afd.idxF );
   SafeFS_Write( buffer, indexRemainder, afd.f );
   afd.fileSize += indexRemainder;
-  FS_FCloseFile( afd.idxF );
+  FileSystem::fCloseFile( afd.idxF );
 
   // Remove temp index file
-  FS_Remove_HomeData( idxFileName );
+  FileSystem::remove_HomeData( idxFileName );
 
   // Write the real header
-  FS_Seek( afd.f, 0, FS_SEEK_SET );
+  FileSystem::seek( afd.f, 0, FS_SEEK_SET );
   CL_WriteAVIHeader( );
 
   bufIndex = 4;
@@ -653,7 +653,7 @@ bool CL_CloseAVI( )
 
   Z_Free( afd.cBuffer );
   Z_Free( afd.eBuffer );
-  FS_FCloseFile( afd.f );
+  FileSystem::fCloseFile( afd.f );
 
   Com_Printf( "Wrote %d:%d frames to %s\n", afd.numVideoFrames, afd.numAudioFrames, afd.fileName );
 

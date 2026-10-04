@@ -282,7 +282,7 @@ void CommandSystem::exec_f( ) {
 
 	Q_strncpyz( filename, CommandSystem::argv(1), sizeof( filename ) );
 	COM_DefaultExtension( filename, sizeof( filename ), ".cfg" );
-	FS_ReadFile( filename, &f.v);
+	FileSystem::readFile( filename, &f.v);
 	if (!f.c) {
 		Com_Printf ("couldn't exec %s\n", filename);
 		return;
@@ -292,7 +292,7 @@ void CommandSystem::exec_f( ) {
 	
 	CommandBuffer::insertText (f.c);
 
-	FS_FreeFile (f.v);
+	FileSystem::freeFile (f.v);
 }
 
 

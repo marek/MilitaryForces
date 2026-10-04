@@ -940,7 +940,7 @@ void CvarSystem::writeVariables(fileHandle_t f)
 				}
 				Com_sprintf (buffer, sizeof(buffer), "seta %s \"%s\"\n", var->name, var->string);
 			}
-			FS_Write( buffer, strlen( buffer ), f );
+			FileSystem::write( buffer, strlen( buffer ), f );
 		}
 	}
 }

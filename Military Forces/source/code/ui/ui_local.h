@@ -919,11 +919,6 @@ void UI_SPSkillMenu_Cache( );
 
 // system calls
 int Sys_Milliseconds ();
-int FS_FOpenFileByMode( const char *qpath, fileHandle_t *f, fsMode_t mode );
-void FS_FCloseFile( fileHandle_t f );
-int FS_Read( void *buffer, int len, fileHandle_t f );
-int FS_Write( const void *buffer, int len, fileHandle_t h );
-int	FS_GetFileList(  const char *path, const char *extension, char *listbuf, int bufsize );
 void SCR_UpdateScreen();
 void S_StartLocalSound( sfxHandle_t sfxHandle, int channelNum );
 sfxHandle_t	S_RegisterSound( const char *name, bool compressed );

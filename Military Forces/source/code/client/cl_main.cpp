@@ -624,12 +624,12 @@ void CL_WriteDemoMessage ( Message *msg, int headerBytes ) {
 	// write the packet sequence
 	len = clc.serverMessageSequence;
 	swlen = LittleLong( len );
-	FS_Write (&swlen, 4, clc.demofile);
+	FileSystem::write (&swlen, 4, clc.demofile);
 	// skip the packet sequencing information
 	len = msg->cursize - headerBytes;
 	swlen = LittleLong(len);
-	FS_Write (&swlen, 4, clc.demofile);
-	FS_Write ( msg->data + headerBytes, len, clc.demofile );
+	FileSystem::write (&swlen, 4, clc.demofile);
+	FileSystem::write ( msg->data + headerBytes, len, clc.demofile );
 }
 
 
@@ -650,9 +650,9 @@ void CL_StopRecord_f( ) {
 
 	// finish up
 	len = -1;
-	FS_Write (&len, 4, clc.demofile);
-	FS_Write (&len, 4, clc.demofile);
-	FS_FCloseFile (clc.demofile);
+	FileSystem::write (&len, 4, clc.demofile);
+	FileSystem::write (&len, 4, clc.demofile);
+	FileSystem::fCloseFile (clc.demofile);
 	clc.demofile = 0;
 	clc.demorecording = false;
 	clc.spDemoRecording = false;
@@ -750,7 +750,7 @@ void CL_Record_f( ) {
 #endif
 				Com_sprintf(name, sizeof(name), "demos/%s.%s%d", demoName, DEMOEXT, com_protocol->integer);
 
-			if (!FS_FileExists_HomeData(name))
+			if (!FileSystem::fileExists_HomeData(name))
 				break;	// file doesn't exist
 		}
 	}
@@ -758,7 +758,7 @@ void CL_Record_f( ) {
 	// open the demo file
 
 	Com_Printf ("recording to %s.\n", name);
-	clc.demofile = FS_FOpenFileWrite_HomeData( name );
+	clc.demofile = FileSystem::fOpenFileWrite_HomeData( name );
 	if ( !clc.demofile ) {
 		Com_Printf ("ERROR: couldn't open.\n");
 		return;
@@ -821,11 +821,11 @@ void CL_Record_f( ) {
 
 	// write it to the demo file
 	len = LittleLong( clc.serverMessageSequence - 1 );
-	FS_Write (&len, 4, clc.demofile);
+	FileSystem::write (&len, 4, clc.demofile);
 
 	len = LittleLong (buf.cursize);
-	FS_Write (&len, 4, clc.demofile);
-	FS_Write (buf.data, buf.cursize, clc.demofile);
+	FileSystem::write (&len, 4, clc.demofile);
+	FileSystem::write (buf.data, buf.cursize, clc.demofile);
 
 	// the rest of the demo file will be copied from net messages
 }
@@ -911,15 +911,15 @@ void CL_DemoCompleted( )
 				else
 					numFrames = clc.timeDemoFrames - 1;
 
-				f = FS_FOpenFileWrite_HomeData( cl_timedemoLog->string );
+				f = FileSystem::fOpenFileWrite_HomeData( cl_timedemoLog->string );
 				if( f )
 				{
-					FS_Printf( f, "# %s", buffer );
+					FileSystem::printf( f, "# %s", buffer );
 
 					for( i = 0; i < numFrames; i++ )
-						FS_Printf( f, "%d\n", clc.timeDemoDurations[ i ] );
+						FileSystem::printf( f, "%d\n", clc.timeDemoDurations[ i ] );
 
-					FS_FCloseFile( f );
+					FileSystem::fCloseFile( f );
 					Com_Printf( "%s written\n", cl_timedemoLog->string );
 				}
 				else
@@ -952,7 +952,7 @@ void CL_ReadDemoMessage( ) {
 	}
 
 	// get the sequence number
-	r = FS_Read( &s, 4, clc.demofile);
+	r = FileSystem::read( &s, 4, clc.demofile);
 	if ( r != 4 ) {
 		CL_DemoCompleted ();
 		return;
@@ -963,7 +963,7 @@ void CL_ReadDemoMessage( ) {
 	buf.init( bufData, sizeof( bufData ) );
 
 	// get the length
-	r = FS_Read (&buf.cursize, 4, clc.demofile);
+	r = FileSystem::read (&buf.cursize, 4, clc.demofile);
 	if ( r != 4 ) {
 		CL_DemoCompleted ();
 		return;
@@ -976,7 +976,7 @@ void CL_ReadDemoMessage( ) {
 	if ( buf.cursize > buf.maxsize ) {
 		Com_Error (ERR_DROP, "CL_ReadDemoMessage: demoMsglen > MAX_MSGLEN");
 	}
-	r = FS_Read( buf.data, buf.cursize, clc.demofile );
+	r = FileSystem::read( buf.data, buf.cursize, clc.demofile );
 	if ( r != buf.cursize ) {
 		Com_Printf( "Demo file was truncated.\n");
 		CL_DemoCompleted ();
@@ -1002,7 +1002,7 @@ static int CL_WalkDemoExt(char *arg, char *name, int *demofile)
 	if(com_legacyprotocol->integer > 0)
 	{
 		Com_sprintf(name, MAX_OSPATH, "demos/%s.%s%d", arg, DEMOEXT, com_legacyprotocol->integer);
-		FS_FOpenFileRead(name, demofile, true);
+		FileSystem::fOpenFileRead(name, demofile, true);
 		
 		if (*demofile)
 		{
@@ -1015,7 +1015,7 @@ static int CL_WalkDemoExt(char *arg, char *name, int *demofile)
 #endif
 	{
 		Com_sprintf(name, MAX_OSPATH, "demos/%s.%s%d", arg, DEMOEXT, com_protocol->integer);
-		FS_FOpenFileRead(name, demofile, true);
+		FileSystem::fOpenFileRead(name, demofile, true);
 
 		if (*demofile)
 		{
@@ -1036,7 +1036,7 @@ static int CL_WalkDemoExt(char *arg, char *name, int *demofile)
 			continue;
 	
 		Com_sprintf (name, MAX_OSPATH, "demos/%s.%s%d", arg, DEMOEXT, demo_protocols[i]);
-		FS_FOpenFileRead( name, demofile, true );
+		FileSystem::fOpenFileRead( name, demofile, true );
 		if (*demofile)
 		{
 			Com_Printf("Demo file: %s\n", name);
@@ -1116,7 +1116,7 @@ void CL_PlayDemo_f( ) {
 		  )
 		{
 			Com_sprintf(name, sizeof(name), "demos/%s", arg);
-			FS_FOpenFileRead(name, &clc.demofile, true);
+			FileSystem::fOpenFileRead(name, &clc.demofile, true);
 		}
 		else
 		{
@@ -1350,8 +1350,8 @@ static void CL_UpdateGUID( const char *prefix, int prefix_len )
 	fileHandle_t f;
 	int len;
 
-	len = FS_BaseDir_FOpenFileRead( QKEY_FILE, &f );
-	FS_FCloseFile( f );
+	len = FileSystem::baseDir_FOpenFileRead( QKEY_FILE, &f );
+	FileSystem::fCloseFile( f );
 
 	if( len != QKEY_SIZE ) 
 		CvarSystem::set( "cl_guid", "" );
@@ -1367,7 +1367,7 @@ static void CL_OldGame()
 		// change back to previous fs_game
 		cl_oldGameSet = false;
 		CvarSystem::set2("fs_game", cl_oldGame, true);
-		FS_ConditionalRestart(clc.checksumFeed, false);
+		FileSystem::conditionalRestart(clc.checksumFeed, false);
 	}
 }
 
@@ -1394,7 +1394,7 @@ void CL_Disconnect( bool showMainMenu ) {
 	}
 
 	if (clc.download) {
-		FS_FCloseFile( clc.download );
+		FileSystem::fCloseFile( clc.download );
 		clc.download = 0;
 	}
 	*clc.downloadTempName = *clc.downloadName = 0;
@@ -1429,7 +1429,7 @@ void CL_Disconnect( bool showMainMenu ) {
 #endif
 
 	if ( clc.demofile ) {
-		FS_FCloseFile( clc.demofile );
+		FileSystem::fCloseFile( clc.demofile );
 		clc.demofile = 0;
 	}
 
@@ -1450,8 +1450,8 @@ void CL_Disconnect( bool showMainMenu ) {
 	}
 	
 	// Remove pure paks
-	FS_PureServerSetLoadedPaks("", "");
-	FS_PureServerSetReferencedPaks( "", "" );
+	FileSystem::pureServerSetLoadedPaks("", "");
+	FileSystem::pureServerSetReferencedPaks( "", "" );
 	
 	CL_ClearState ();
 
@@ -1908,7 +1908,7 @@ void CL_SendPureChecksums( ) {
 	char cMsg[MAX_INFO_VALUE];
 
 	// if we are pure we need to send back a command with our referenced pk3 checksums
-	Com_sprintf(cMsg, sizeof(cMsg), "cp %d %s", cl.serverId, FS_ReferencedPakPureChecksums());
+	Com_sprintf(cMsg, sizeof(cMsg), "cp %d %s", cl.serverId, FileSystem::referencedPakPureChecksums());
 
 	CL_AddReliableCommand(cMsg, false);
 }
@@ -1945,7 +1945,7 @@ void CL_Vid_Restart_f( ) {
 	// don't let them loop during the restart
 	S_StopAllSounds();
 
-	if(!FS_ConditionalRestart(clc.checksumFeed, true))
+	if(!FileSystem::conditionalRestart(clc.checksumFeed, true))
 	{
 		// if not running a server clear the whole hunk
 		if(com_sv_running->integer)
@@ -1968,7 +1968,7 @@ void CL_Vid_Restart_f( ) {
 		// client is no longer pure until new checksums are sent
 		CL_ResetPureClientAtServer();
 		// clear pak references
-		FS_ClearPakReferences( FS_UI_REF | FS_CGAME_REF );
+		FileSystem::clearPakReferences( FS_UI_REF | FS_CGAME_REF );
 		// reinitialize the filesystem if the game directory or checksum has changed
 
 		cls.rendererStarted = false;
@@ -2032,7 +2032,7 @@ CL_PK3List_f
 ==================
 */
 void CL_OpenedPK3List_f( ) {
-	Com_Printf("Opened PK3 Names: %s\n", FS_LoadedPakNames());
+	Com_Printf("Opened PK3 Names: %s\n", FileSystem::loadedPakNames());
 }
 
 /*
@@ -2041,7 +2041,7 @@ CL_PureList_f
 ==================
 */
 void CL_ReferencedPK3List_f( ) {
-	Com_Printf("Referenced PK3 Names: %s\n", FS_ReferencedPakNames());
+	Com_Printf("Referenced PK3 Names: %s\n", FileSystem::referencedPakNames());
 }
 
 /*
@@ -2099,7 +2099,7 @@ void CL_DownloadsComplete( ) {
 		clc.httpUsed = false;
 		if( clc.disconnectedForHttpDownload ) {
 			if(clc.downloadRestart) {
-				FS_Restart(clc.checksumFeed);
+				FileSystem::restart(clc.checksumFeed);
 				clc.downloadRestart = false;
 			}
 			clc.disconnectedForHttpDownload = false;
@@ -2113,7 +2113,7 @@ void CL_DownloadsComplete( ) {
 	if (clc.downloadRestart) {
 		clc.downloadRestart = false;
 
-		FS_Restart(clc.checksumFeed); // We possibly downloaded a pak, restart the file system to load it
+		FileSystem::restart(clc.checksumFeed); // We possibly downloaded a pak, restart the file system to load it
 
 		// inform the server so we get new gamestate info
 		CL_AddReliableCommand("donedl", false);
@@ -2205,7 +2205,7 @@ static void CL_BeginHttpDownload( const char *remoteURL ) {
 	CL_HTTP_BeginDownload(remoteURL);
 	Q_strncpyz(clc.downloadURL, remoteURL, sizeof(clc.downloadURL));
 
-	clc.download = FS_BaseDir_FOpenFileWrite_HomeData(clc.downloadTempName);
+	clc.download = FileSystem::baseDir_FOpenFileWrite_HomeData(clc.downloadTempName);
 	if(!clc.download) {
 		Com_Error(ERR_DROP, "CL_BeginHTTPDownload: failed to open "
 			"%s for writing", clc.downloadTempName);
@@ -2241,9 +2241,9 @@ void CL_NextDownload()
 	// A download has finished, check whether this matches a referenced checksum
 	if(*clc.downloadName)
 	{
-		char *zippath = FS_BaseDir_BuildOSPath(CvarSystem::variableString("fs_homedatapath"), clc.downloadName);
+		char *zippath = FileSystem::baseDir_BuildOSPath(CvarSystem::variableString("fs_homedatapath"), clc.downloadName);
 
-		if(!FS_CompareZipChecksum(zippath))
+		if(!FileSystem::compareZipChecksum(zippath))
 			Com_Error(ERR_DROP, "Incorrect checksum for file: %s", clc.downloadName);
 	}
 
@@ -2339,7 +2339,7 @@ void CL_InitDownloads() {
   {
     // autodownload is disabled on the client
     // but it's possible that some referenced files on the server are missing
-    if (FS_ComparePaks( missingfiles, sizeof( missingfiles ), false ) )
+    if (FileSystem::comparePaks( missingfiles, sizeof( missingfiles ), false ) )
     {      
       // NOTE TTimo I would rather have that printed as a modal message box
       //   but at this point while joining the game we don't know wether we will successfully join or not
@@ -2348,7 +2348,7 @@ void CL_InitDownloads() {
                   "Go to the setting menu to turn on autodownload, or get the file elsewhere\n\n", missingfiles );
     }
   }
-  else if ( FS_ComparePaks( clc.downloadList, sizeof( clc.downloadList ) , true ) ) {
+  else if ( FileSystem::comparePaks( clc.downloadList, sizeof( clc.downloadList ) , true ) ) {
 
     Com_Printf("Need paks: %s\n", clc.downloadList );
 
@@ -2979,11 +2979,11 @@ void CL_Frame ( int msec ) {
 
 		if(finished) {
 			if(clc.download) {
-				FS_FCloseFile(clc.download);
+				FileSystem::fCloseFile(clc.download);
 				clc.download = 0;
 			}
 
-			FS_BaseDir_Rename_HomeData(clc.downloadTempName, clc.downloadName, false);
+			FileSystem::baseDir_Rename_HomeData(clc.downloadTempName, clc.downloadName, false);
 			clc.downloadRestart = true;
 			CL_NextDownload();
 		}
@@ -3307,13 +3307,13 @@ void CL_InitRef( ) {
 	ri.CM_ClusterPVS = CM_ClusterPVS;
 	ri.CM_DrawDebugSurface = CM_DrawDebugSurface;
 
-	ri.FS_ReadFile = FS_ReadFile;
-	ri.FS_FreeFile = FS_FreeFile;
-	ri.FS_WriteFile = FS_WriteFile;
-	ri.FS_FreeFileList = FS_FreeFileList;
-	ri.FS_ListFiles = FS_ListFiles;
-	ri.FS_FileIsInPAK = FS_FileIsInPAK;
-	ri.FS_FileExists = FS_FileExists_HomeData;
+	ri.FS_ReadFile = FileSystem::readFile;
+	ri.FS_FreeFile = FileSystem::freeFile;
+	ri.FS_WriteFile = FileSystem::writeFile;
+	ri.FS_FreeFileList = FileSystem::freeFileList;
+	ri.FS_ListFiles = FileSystem::listFiles;
+	ri.FS_FileIsInPAK = FileSystem::fileIsInPAK;
+	ri.FS_FileExists = FileSystem::fileExists_HomeData;
 	ri.Cvar_Get = CvarSystem::get;
 	ri.Cvar_Set = CvarSystem::set;
 	ri.Cvar_SetValue = CvarSystem::setValue;
@@ -3424,7 +3424,7 @@ void CL_Video_f( )
       Com_sprintf( filename, MAX_OSPATH, "videos/video%d%d%d%d.avi",
           a, b, c, d );
 
-      if( !FS_FileExists_HomeData( filename ) )
+      if( !FileSystem::fileExists_HomeData( filename ) )
         break; // file doesn't exist
     }
 
@@ -3462,8 +3462,8 @@ static void CL_GenerateQKey()
 	unsigned char buff[ QKEY_SIZE ];
 	fileHandle_t f;
 
-	len = FS_BaseDir_FOpenFileRead( QKEY_FILE, &f );
-	FS_FCloseFile( f );
+	len = FileSystem::baseDir_FOpenFileRead( QKEY_FILE, &f );
+	FileSystem::fCloseFile( f );
 	if( len == QKEY_SIZE ) {
 		Com_Printf( "QKEY found.\n" );
 		return;
@@ -3477,14 +3477,14 @@ static void CL_GenerateQKey()
 		Com_Printf( "QKEY building random string\n" );
 		Com_RandomBytes( buff, sizeof(buff) );
 
-		f = FS_BaseDir_FOpenFileWrite_HomeState( QKEY_FILE );
+		f = FileSystem::baseDir_FOpenFileWrite_HomeState( QKEY_FILE );
 		if( !f ) {
 			Com_Printf( "QKEY could not open %s for write\n",
 				QKEY_FILE );
 			return;
 		}
-		FS_Write( buff, sizeof(buff), f );
-		FS_FCloseFile( f );
+		FileSystem::write( buff, sizeof(buff), f );
+		FileSystem::fCloseFile( f );
 		Com_Printf( "QKEY generated\n" );
 	}
 } 

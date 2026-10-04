@@ -1406,10 +1406,10 @@ void CG_LoadMenus(const char *menuFile) {
 
 	start = Sys_Milliseconds();
 
-	len = FS_FOpenFileByMode( menuFile, &f, FS_READ );
+	len = FileSystem::fOpenFileByMode( menuFile, &f, FS_READ );
 	if ( !f ) {
 		Com_Error( ERR_DROP, S_COLOR_YELLOW "menu file not found: %s, using default\n", menuFile );
-		len = FS_FOpenFileByMode( "ui/hud.txt", &f, FS_READ );
+		len = FileSystem::fOpenFileByMode( "ui/hud.txt", &f, FS_READ );
 		if (!f) {
 			Com_Error( ERR_DROP, S_COLOR_RED "default menu file not found: ui/hud.txt, unable to continue!\n", menuFile );
 		}
@@ -1417,13 +1417,13 @@ void CG_LoadMenus(const char *menuFile) {
 
 	if ( len >= MAX_MENUDEFFILE ) {
 		Com_Error( ERR_DROP, S_COLOR_RED "menu file too large: %s is %i, max allowed is %i", menuFile, len, MAX_MENUDEFFILE );
-		FS_FCloseFile( f );
+		FileSystem::fCloseFile( f );
 		return;
 	}
 
-	FS_Read( buf, len, f );
+	FileSystem::read( buf, len, f );
 	buf[len] = 0;
-	FS_FCloseFile( f );
+	FileSystem::fCloseFile( f );
 	
 	COM_Compress(buf);
 

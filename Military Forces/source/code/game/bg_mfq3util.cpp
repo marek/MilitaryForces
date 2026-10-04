@@ -5,12 +5,9 @@
 #include "q_shared.h"
 #include "../qcommon/qfiles.h"
 #include "bg_public.h"
-int FS_Read( void *buffer, int len, fileHandle_t f );
 
 // externals
 
-int FS_FOpenFileByMode( const char *qpath, fileHandle_t *f, fsMode_t mode );
-void FS_FCloseFile( fileHandle_t f );
 
 /*
 =================
@@ -419,13 +416,13 @@ void MF_LoadAllVehicleData()
 			// gear
 			Com_sprintf( name, sizeof(name), "%s_gear.md3", modelbasename );
 
-			FS_FOpenFileByMode(name, &f, FS_READ);
+			FileSystem::fOpenFileByMode(name, &f, FS_READ);
 
 			if(f &&  MF_getNumberOfFrames( name, &num ) ) 
 			{
 				vec3_t min1, min2;
 
-				FS_FCloseFile(f);
+				FileSystem::fCloseFile(f);
 				availableVehicles[i].maxGearFrame = num - 1;
 				
 				if(!availableVehicles[i].gearheight)
@@ -453,11 +450,11 @@ void MF_LoadAllVehicleData()
 			// bay
 			Com_sprintf( name, sizeof(name), "%s_bay.md3", modelbasename );
 
-			FS_FOpenFileByMode(name, &f, FS_READ);
+			FileSystem::fOpenFileByMode(name, &f, FS_READ);
 
 			if(f && MF_getNumberOfFrames( name, &num ) ) 
 			{
-				FS_FCloseFile(f);
+				FileSystem::fCloseFile(f);
 				availableVehicles[i].maxBayFrame = num - 1;
 			}
 			else 
@@ -481,12 +478,12 @@ void MF_LoadAllVehicleData()
 			// gear
 			Com_sprintf( name, sizeof(name), "%s_gear.md3", modelbasename );
 
-			FS_FOpenFileByMode(name, &f, FS_READ);
+			FileSystem::fOpenFileByMode(name, &f, FS_READ);
 
 			if(f &&  MF_getNumberOfFrames( name, &num ) ) {
 				vec3_t min1, min2;
 
-				FS_FCloseFile(f);
+				FileSystem::fCloseFile(f);
 				availableVehicles[i].maxGearFrame = num - 1;
 
 				
@@ -506,11 +503,11 @@ void MF_LoadAllVehicleData()
 			// bay
 			Com_sprintf( name, sizeof(name), "%s_bay.md3", modelbasename );
 
-			FS_FOpenFileByMode(name, &f, FS_READ);
+			FileSystem::fOpenFileByMode(name, &f, FS_READ);
 
 			if(f && MF_getNumberOfFrames( name, &num ) ) 
 			{
-				FS_FCloseFile(f);
+				FileSystem::fCloseFile(f);
 				availableVehicles[i].maxBayFrame = num - 1;
 			}
 			else 
@@ -544,10 +541,10 @@ void MF_LoadAllVehicleData()
 			if(availableVehicles[i].wheels)
 			{
 				Com_sprintf( name, sizeof(name), "%s_w1.md3", modelbasename );
-				FS_FOpenFileByMode(name, &f, FS_READ);
+				FileSystem::fOpenFileByMode(name, &f, FS_READ);
 				if(f)
 				{
-					FS_FCloseFile(f);
+					FileSystem::fCloseFile(f);
 		
 					MF_findTag(name, "tag_wheel", &tag);
 					MF_getDimensions( name, 0, &max, &min );
@@ -1095,8 +1092,6 @@ void MF_ParseMissionScripts( char *buf,
 	}
 }
 
-long	FS_ReadFile( const char *qpath, void **buffer );
-void	FS_FreeFile( void *buffer );
 
 constexpr int DECK_GRID = 12;
 
@@ -1109,14 +1104,14 @@ static void MF_findDeck( const char *name, completeVehicleData_t *veh )
 	int		num = 0;
 
 	veh->hasDeck = false;
-	if( FS_ReadFile( name, &buf ) <= 0 || !buf ) 
+	if( FileSystem::readFile( name, &buf ) <= 0 || !buf ) 
 		return;
 
 	md3Header_t *header = static_cast<md3Header_t*>(buf);
 	float sx = veh->maxs[0] - veh->mins[0];
 	float sy = veh->maxs[1] - veh->mins[1];
 	if( header->ident != MD3_IDENT || sx <= 0 || sy <= 0 ) {
-		FS_FreeFile( buf );
+		FileSystem::freeFile( buf );
 		return;
 	}
 	memset( used, 0, sizeof(used) );
@@ -1156,7 +1151,7 @@ static void MF_findDeck( const char *name, completeVehicleData_t *veh )
 		}
 		surf = reinterpret_cast<md3Surface_t*>(reinterpret_cast<byte*>(surf) + surf->ofsEnd);
 	}
-	FS_FreeFile( buf );
+	FileSystem::freeFile( buf );
 
 	for( int cx = 1; cx < DECK_GRID - 1; cx++ ) {
 		for( int cy = 2; cy < DECK_GRID - 2; cy++ ) {

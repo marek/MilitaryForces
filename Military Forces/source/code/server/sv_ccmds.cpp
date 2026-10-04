@@ -171,7 +171,7 @@ static void SV_Map_f()
 	// make sure the level exists before trying to change, so that
 	// a typo at the server console won't end the game
 	Com_sprintf (expanded, sizeof(expanded), "maps/%s.bsp", map);
-	if ( FS_ReadFile (expanded, nullptr) == -1 ) 
+	if ( FileSystem::readFile (expanded, nullptr) == -1 ) 
 	{
 		Com_Printf ("Can't find map %s\n", expanded);
 		return;
@@ -668,21 +668,21 @@ static void SV_RehashBans_f()
 	if(!sv_banFile->string || !*sv_banFile->string)
 		return;
 
-	Com_sprintf(filepath, sizeof(filepath), "%s/%s", FS_GetCurrentGameDir(), sv_banFile->string);
+	Com_sprintf(filepath, sizeof(filepath), "%s/%s", FileSystem::getCurrentGameDir(), sv_banFile->string);
 
-	if((filelen = FS_BaseDir_FOpenFileRead(filepath, &readfrom)) >= 0)
+	if((filelen = FileSystem::baseDir_FOpenFileRead(filepath, &readfrom)) >= 0)
 	{
 		if(filelen < 2)
 		{
 			// Don't bother if file is too short.
-			FS_FCloseFile(readfrom);
+			FileSystem::fCloseFile(readfrom);
 			return;
 		}
 
 		curpos = textbuf = static_cast<char *>(Z_Malloc(filelen));
 		
-		filelen = FS_Read(textbuf, filelen, readfrom);
-		FS_FCloseFile(readfrom);
+		filelen = FileSystem::read(textbuf, filelen, readfrom);
+		FileSystem::fCloseFile(readfrom);
 		
 		endpos = textbuf + filelen;
 		
@@ -747,9 +747,9 @@ static void SV_WriteBans()
 	if(!sv_banFile->string || !*sv_banFile->string)
 		return;
 	
-	Com_sprintf(filepath, sizeof(filepath), "%s/%s", FS_GetCurrentGameDir(), sv_banFile->string);
+	Com_sprintf(filepath, sizeof(filepath), "%s/%s", FileSystem::getCurrentGameDir(), sv_banFile->string);
 
-	if((writeto = FS_BaseDir_FOpenFileWrite_HomeState(filepath)))
+	if((writeto = FileSystem::baseDir_FOpenFileWrite_HomeState(filepath)))
 	{
 		char writebuf[128];
 		serverBan_t *curban;
@@ -760,10 +760,10 @@ static void SV_WriteBans()
 			
 			Com_sprintf(writebuf, sizeof(writebuf), "%d %s %d\n",
 				    curban->isexception, Network::adrToString(curban->ip), curban->subnet);
-			FS_Write(writebuf, strlen(writebuf), writeto);
+			FileSystem::write(writebuf, strlen(writebuf), writeto);
 		}
 
-		FS_FCloseFile(writeto);
+		FileSystem::fCloseFile(writeto);
 	}
 }
 

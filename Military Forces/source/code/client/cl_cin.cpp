@@ -1085,10 +1085,10 @@ static void RoQReset( ) {
 	
 	if (currentHandle < 0) return;
 
-	FS_FCloseFile( cinTable[currentHandle].iFile );
-	FS_FOpenFileRead (cinTable[currentHandle].fileName, &cinTable[currentHandle].iFile, true);
+	FileSystem::fCloseFile( cinTable[currentHandle].iFile );
+	FileSystem::fOpenFileRead (cinTable[currentHandle].fileName, &cinTable[currentHandle].iFile, true);
 	// let the background thread start reading ahead
-	FS_Read (cin.file, 16, cinTable[currentHandle].iFile);
+	FileSystem::read (cin.file, 16, cinTable[currentHandle].iFile);
 	RoQ_init();
 	cinTable[currentHandle].status = FMV_LOOPED;
 }
@@ -1109,7 +1109,7 @@ static void RoQInterrupt()
         
 	if (currentHandle < 0) return;
 
-	FS_Read( cin.file, cinTable[currentHandle].RoQFrameSize+8, cinTable[currentHandle].iFile );
+	FileSystem::read( cin.file, cinTable[currentHandle].RoQFrameSize+8, cinTable[currentHandle].iFile );
 	if ( cinTable[currentHandle].RoQPlayed >= cinTable[currentHandle].ROQSize ) { 
 		if (cinTable[currentHandle].holdAtEnd==false) {
 			if (cinTable[currentHandle].looping) {
@@ -1224,7 +1224,7 @@ redump:
 // one more frame hits the dust
 //
 //	assert(cinTable[currentHandle].RoQFrameSize <= 65536);
-//	r = FS_Read( cin.file, cinTable[currentHandle].RoQFrameSize+8, cinTable[currentHandle].iFile );
+//	r = FileSystem::read( cin.file, cinTable[currentHandle].RoQFrameSize+8, cinTable[currentHandle].iFile );
 	cinTable[currentHandle].RoQPlayed	+= cinTable[currentHandle].RoQFrameSize+8;
 }
 
@@ -1281,7 +1281,7 @@ static void RoQShutdown( ) {
 	cinTable[currentHandle].status = FMV_IDLE;
 
 	if (cinTable[currentHandle].iFile) {
-		FS_FCloseFile( cinTable[currentHandle].iFile );
+		FileSystem::fCloseFile( cinTable[currentHandle].iFile );
 		cinTable[currentHandle].iFile = 0;
 	}
 
@@ -1438,7 +1438,7 @@ int CIN_PlayCinematic( const char *arg, int x, int y, int w, int h, int systemBi
 	strcpy(cinTable[currentHandle].fileName, name);
 
 	cinTable[currentHandle].ROQSize = 0;
-	cinTable[currentHandle].ROQSize = FS_FOpenFileRead (cinTable[currentHandle].fileName, &cinTable[currentHandle].iFile, true);
+	cinTable[currentHandle].ROQSize = FileSystem::fOpenFileRead (cinTable[currentHandle].fileName, &cinTable[currentHandle].iFile, true);
 
 	if (cinTable[currentHandle].ROQSize<=0) {
 		Com_DPrintf("play(%s), ROQSize<=0\n", arg);
@@ -1468,13 +1468,13 @@ int CIN_PlayCinematic( const char *arg, int x, int y, int w, int h, int systemBi
 
 	initRoQ();
 					
-	FS_Read (cin.file, 16, cinTable[currentHandle].iFile);
+	FileSystem::read (cin.file, 16, cinTable[currentHandle].iFile);
 
 	RoQID = static_cast<unsigned short>(cin.file[0]) + static_cast<unsigned short>(cin.file[1])*256;
 	if (RoQID == 0x1084)
 	{
 		RoQ_init();
-//		FS_Read (cin.file, cinTable[currentHandle].RoQFrameSize+8, cinTable[currentHandle].iFile);
+//		FileSystem::read (cin.file, cinTable[currentHandle].RoQFrameSize+8, cinTable[currentHandle].iFile);
 
 		cinTable[currentHandle].status = FMV_PLAY;
 		Com_DPrintf("trFMV::play(), playing %s\n", arg);

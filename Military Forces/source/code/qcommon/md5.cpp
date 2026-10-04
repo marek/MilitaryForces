@@ -272,13 +272,13 @@ char *Com_MD5File( const char *fn, int length, const char *prefix, int prefix_le
 
 	Q_strncpyz( final, "", sizeof( final ) );
 
-	filelen = FS_BaseDir_FOpenFileRead( fn, &f );
+	filelen = FileSystem::baseDir_FOpenFileRead( fn, &f );
 
 	if( !f ) {
 		return final;
 	}
 	if( filelen < 1 ) {
-		FS_FCloseFile( f );
+		FileSystem::fCloseFile( f );
 		return final;
 	}
 	if(filelen < length || !length) {
@@ -291,7 +291,7 @@ char *Com_MD5File( const char *fn, int length, const char *prefix, int prefix_le
 		MD5Update(&md5 , (unsigned char *)prefix, prefix_len);
 
 	for(;;) {
-		r = FS_Read(buffer, sizeof(buffer), f);
+		r = FileSystem::read(buffer, sizeof(buffer), f);
 		if(r < 1)
 			break;
 		if(r + total > length)
@@ -301,7 +301,7 @@ char *Com_MD5File( const char *fn, int length, const char *prefix, int prefix_le
 		if(r < sizeof(buffer) || total >= length)
 			break;
 	}
-	FS_FCloseFile(f);
+	FileSystem::fCloseFile(f);
 	MD5Final(&md5, digest);
 	final[0] = '\0';
 	for(i = 0; i < 16; i++) {

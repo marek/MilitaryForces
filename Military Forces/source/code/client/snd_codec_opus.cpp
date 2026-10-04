@@ -86,8 +86,8 @@ int S_OggOpus_Callback_read(void *datasource, unsigned char *ptr, int size )
 	// we use a SoundStream in the generic pointer to pass around
 	stream = static_cast<SoundStream *>(datasource);
 
-	// read it with the Q3 function FS_Read()
-	bytesRead = FS_Read(ptr, size, stream->file);
+	// read it with the Q3 function FileSystem::read()
+	bytesRead = FileSystem::read(ptr, size, stream->file);
 
 	// update the file position
 	stream->pos += bytesRead;
@@ -117,7 +117,7 @@ int S_OggOpus_Callback_seek(void *datasource, opus_int64 offset, int whence)
 		case SEEK_SET :
 		{
 			// set the file position in the actual file with the Q3 function
-			retVal = FS_Seek(stream->file, static_cast<long>(offset), FS_SEEK_SET);
+			retVal = FileSystem::seek(stream->file, static_cast<long>(offset), FS_SEEK_SET);
 
 			// something has gone wrong, so we return here
 			if(retVal < 0)
@@ -133,7 +133,7 @@ int S_OggOpus_Callback_seek(void *datasource, opus_int64 offset, int whence)
 		case SEEK_CUR :
 		{
 			// set the file position in the actual file with the Q3 function
-			retVal = FS_Seek(stream->file, static_cast<long>(offset), FS_SEEK_CUR);
+			retVal = FileSystem::seek(stream->file, static_cast<long>(offset), FS_SEEK_CUR);
 
 			// something has gone wrong, so we return here
 			if(retVal < 0)
@@ -149,7 +149,7 @@ int S_OggOpus_Callback_seek(void *datasource, opus_int64 offset, int whence)
 		case SEEK_END :
 		{
 			// set the file position in the actual file with the Q3 function
-			retVal = FS_Seek(stream->file, static_cast<long>(offset), FS_SEEK_END);
+			retVal = FileSystem::seek(stream->file, static_cast<long>(offset), FS_SEEK_END);
 
 			// something has gone wrong, so we return here
 			if(retVal < 0)
@@ -199,7 +199,7 @@ opus_int64 S_OggOpus_Callback_tell(void *datasource)
 	// SoundStream in the generic pointer
 	stream = static_cast<SoundStream *>(datasource);
 
-	return static_cast<opus_int64>(FS_FTell(stream->file));
+	return static_cast<opus_int64>(FileSystem::fTell(stream->file));
 }
 
 // the callback structure

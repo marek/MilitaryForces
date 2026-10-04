@@ -402,11 +402,11 @@ void CL_SystemInfoChanged( ) {
 	// check pure server string
 	s = Info_ValueForKey( systemInfo, "sv_paks" );
 	t = Info_ValueForKey( systemInfo, "sv_pakNames" );
-	FS_PureServerSetLoadedPaks( s, t );
+	FileSystem::pureServerSetLoadedPaks( s, t );
 
 	s = Info_ValueForKey( systemInfo, "sv_referencedPaks" );
 	t = Info_ValueForKey( systemInfo, "sv_referencedPakNames" );
-	FS_PureServerSetReferencedPaks( s, t );
+	FileSystem::pureServerSetReferencedPaks( s, t );
 
 	gameSet = false;
 	// scan through all the variables in the systeminfo and locally set cvars to match
@@ -422,7 +422,7 @@ void CL_SystemInfoChanged( ) {
 		// ehw!
 		if (!Q_stricmp(key, "fs_game"))
 		{
-			if(FS_InvalidGameDir(value))
+			if(FileSystem::invalidGameDir(value))
 			{
 				Com_Printf(S_COLOR_YELLOW "WARNING: Server sent invalid fs_game value %s\n", value);
 				continue;
@@ -565,7 +565,7 @@ void CL_ParseGamestate( Message *msg ) {
 		Q_strncpyz(cl_oldGame, oldGame, sizeof(cl_oldGame));
 	}
 
-	FS_ConditionalRestart(clc.checksumFeed, false);
+	FileSystem::conditionalRestart(clc.checksumFeed, false);
 
 	// This used to call CL_StartHunkUsers, but now we enter the download state before loading the
 	// cgame
@@ -631,7 +631,7 @@ void CL_ParseDownload ( Message *msg ) {
 	// open the file if not opened yet
 	if (!clc.download)
 	{
-		clc.download = FS_BaseDir_FOpenFileWrite_HomeData( clc.downloadTempName );
+		clc.download = FileSystem::baseDir_FOpenFileWrite_HomeData( clc.downloadTempName );
 
 		if (!clc.download) {
 			Com_Printf( "Could not create %s\n", clc.downloadTempName );
@@ -642,7 +642,7 @@ void CL_ParseDownload ( Message *msg ) {
 	}
 
 	if (size)
-		FS_Write( data, size, clc.download );
+		FileSystem::write( data, size, clc.download );
 
 	CL_AddReliableCommand(va("nextdl %d", clc.downloadBlock), false);
 	clc.downloadBlock++;
@@ -654,11 +654,11 @@ void CL_ParseDownload ( Message *msg ) {
 
 	if (!size) { // A zero length block means EOF
 		if (clc.download) {
-			FS_FCloseFile( clc.download );
+			FileSystem::fCloseFile( clc.download );
 			clc.download = 0;
 
 			// rename the file
-			FS_BaseDir_Rename_HomeData ( clc.downloadTempName, clc.downloadName, false );
+			FileSystem::baseDir_Rename_HomeData ( clc.downloadTempName, clc.downloadName, false );
 		}
 
 		// send intentions now

@@ -93,20 +93,20 @@ static void UI_LoadArenasFromFile( char *filename ) {
 	fileHandle_t	f;
 	char			buf[MAX_ARENAS_TEXT];
 
-	len = FS_FOpenFileByMode( filename, &f, FS_READ );
+	len = FileSystem::fOpenFileByMode( filename, &f, FS_READ );
 	if ( !f ) {
 		Com_Printf( S_COLOR_RED "file not found: %s\n", filename );
 		return;
 	}
 	if ( len >= MAX_ARENAS_TEXT ) {
 		Com_Printf( S_COLOR_RED "file too large: %s is %i, max allowed is %i", filename, len, MAX_ARENAS_TEXT );
-		FS_FCloseFile( f );
+		FileSystem::fCloseFile( f );
 		return;
 	}
 
-	FS_Read( buf, len, f );
+	FileSystem::read( buf, len, f );
 	buf[len] = 0;
-	FS_FCloseFile( f );
+	FileSystem::fCloseFile( f );
 
 	ui_numArenas += UI_ParseInfos( buf, MAX_ARENAS - ui_numArenas, &ui_arenaInfos[ui_numArenas] );
 }
@@ -151,7 +151,7 @@ void UI_LoadArenas( ) {
 	}
 
 	// get all arenas from .arena files
-	numdirs = FS_GetFileList("scripts", ".arena", dirlist, 1024 );
+	numdirs = FileSystem::getFileList("scripts", ".arena", dirlist, 1024 );
 	dirptr  = dirlist;
 	for (i = 0; i < numdirs; i++, dirptr += dirlen+1) {
 		dirlen = strlen(dirptr);

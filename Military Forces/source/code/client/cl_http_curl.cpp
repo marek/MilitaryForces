@@ -234,7 +234,7 @@ static int CL_cURL_CallbackProgress(void *clientp, curl_off_t dltotal, curl_off_
 static size_t CL_cURL_CallbackWrite(void *buffer, size_t size, size_t nmemb,
 	void *stream)
 {
-	FS_Write( buffer, size*nmemb, (static_cast<fileHandle_t*>(stream))[0] );
+	FileSystem::write( buffer, size*nmemb, (static_cast<fileHandle_t*>(stream))[0] );
 	return size*nmemb;
 }
 

@@ -202,7 +202,7 @@ SoundStream *S_CodecUtilOpen(const char *filename, snd_codec_t *codec)
 	int length;
 
 	// Try to open the file
-	length = FS_FOpenFileRead(filename, &hnd, true);
+	length = FileSystem::fOpenFileRead(filename, &hnd, true);
 	if(!hnd)
 	{
 		Com_DPrintf("Can't read sound file %s\n", filename);
@@ -213,7 +213,7 @@ SoundStream *S_CodecUtilOpen(const char *filename, snd_codec_t *codec)
 	stream = static_cast<SoundStream *>(Z_Malloc(sizeof(SoundStream)));
 	if(!stream)
 	{
-		FS_FCloseFile(hnd);
+		FileSystem::fCloseFile(hnd);
 		return nullptr;
 	}
 
@@ -231,7 +231,7 @@ S_CodecUtilClose
 */
 void S_CodecUtilClose(SoundStream **stream)
 {
-	FS_FCloseFile((*stream)->file);
+	FileSystem::fCloseFile((*stream)->file);
 	Z_Free(*stream);
 	*stream = nullptr;
 }

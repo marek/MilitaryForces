@@ -464,71 +464,38 @@ inline constexpr int MAX_FILE_HANDLES = 64;
 #	define Q3CONFIG_CFG CONFIG_PREFIX ".cfg"
 #endif
 
-bool FS_Initialized( );
 
-void	FS_InitFilesystem ( );
-void	FS_Shutdown( bool closemfp );
 
-bool FS_ConditionalRestart(int checksumFeed, bool disconnect);
-void	FS_Restart( int checksumFeed );
 // shutdown and restart the filesystem so changes to fs_gamedir can take effect
 
-char	**FS_ListFiles( const char *directory, const char *extension, int *numfiles );
 // directory should not have either a leading or trailing /
 // if extension is "/", only subdirectories will be returned
 // the returned files will not include any directories or /
 
-void	FS_FreeFileList( char **list );
 
-bool FS_FileExists_HomeData( const char *file );
 
-bool FS_CreatePath (const char *OSPath);
 
 int FS_FindVM(void **startSearch, char *found, int foundlen, const char *name, int enableDll);
 
-char	*FS_BaseDir_BuildOSPath( const char *base, const char *qpath );
-char	*FS_BuildOSPath( const char *base, const char *game, const char *qpath );
-bool FS_CompareZipChecksum(const char *zipfile);
 
-int		FS_LoadStack( );
 
-int		FS_GetFileList(  const char *path, const char *extension, char *listbuf, int bufsize );
-int		FS_GetModList(  char *listbuf, int bufsize );
 
-void	FS_GetModDescription( const char *modDir, char *description, int descriptionLen );
 
-fileHandle_t	FS_FOpenFileWrite_HomeConfig( const char *filename );
-fileHandle_t	FS_FOpenFileWrite_HomeData( const char *filename );
-fileHandle_t	FS_FOpenFileWrite_HomeState( const char *filename );
-fileHandle_t	FS_FOpenFileAppend_HomeData( const char *filename );
-fileHandle_t	FS_FCreateOpenPipeFile( const char *filename );
 // will properly create any needed paths and deal with seperater character issues
 
-fileHandle_t FS_BaseDir_FOpenFileWrite_HomeConfig( const char *filename );
-fileHandle_t FS_BaseDir_FOpenFileWrite_HomeData( const char *filename );
-fileHandle_t FS_BaseDir_FOpenFileWrite_HomeState( const char *filename );
-long		FS_BaseDir_FOpenFileRead( const char *filename, fileHandle_t *fp );
-void	FS_BaseDir_Rename_HomeData( const char *from, const char *to, bool safe );
-long		FS_FOpenFileRead( const char *qpath, fileHandle_t *file, bool uniqueFILE );
 // if uniqueFILE is true, then a new FILE will be fopened even if the file
 // is found in an already open pak file.  If uniqueFILE is false, you must call
-// FS_FCloseFile instead of fclose, otherwise the pak FILE would be improperly closed
+// FileSystem::fCloseFile instead of fclose, otherwise the pak FILE would be improperly closed
 // It is generally safe to always set uniqueFILE to true, because the majority of
-// file IO goes through FS_ReadFile, which Does The Right Thing already.
+// file IO goes through FileSystem::readFile, which Does The Right Thing already.
 
-int		FS_FileIsInPAK(const char *filename, int *pChecksum );
 // returns 1 if a file is in the PAK file, otherwise -1
 
-int		FS_Write( const void *buffer, int len, fileHandle_t f );
 
-int		FS_Read( void *buffer, int len, fileHandle_t f );
 // properly handles partial reads and reads from other dlls
 
-void	FS_FCloseFile( fileHandle_t f );
 // note: you can't just fclose from another DLL, due to MS libc issues
 
-long	FS_ReadFileDir(const char *qpath, void *searchPath, bool unpure, void **buffer);
-long	FS_ReadFile(const char *qpath, void **buffer);
 // returns the length of the file
 // a null buffer will just return the file length without loading
 // as a quick check for existence. -1 length == not present
@@ -536,70 +503,41 @@ long	FS_ReadFile(const char *qpath, void **buffer);
 // the buffer should be considered read-only, because it may be cached
 // for other uses.
 
-void	FS_ForceFlush( fileHandle_t f );
 // forces flush on files we're writing to.
 
-void	FS_FreeFile( void *buffer );
-// frees the memory returned by FS_ReadFile
+// frees the memory returned by FileSystem::readFile
 
-void	FS_WriteFile( const char *qpath, const void *buffer, int size );
 // writes a complete file, creating any subdirectories needed
 
-long FS_filelength(fileHandle_t f);
 // doesn't work for files that are opened from a pack file
 
-int		FS_FTell( fileHandle_t f );
 // where are we?
 
-void	FS_Flush( fileHandle_t f );
 
-void 	QDECL FS_Printf( fileHandle_t f, const char *fmt, ... ) Q_PRINTF_FUNC(2, 3);
 // like fprintf
 
-int		FS_FOpenFileByMode( const char *qpath, fileHandle_t *f, fsMode_t mode );
 // opens a file for reading, writing, or appending depending on the value of mode
 
-int		FS_Seek( fileHandle_t f, long offset, int origin );
 // seek on a file
 
-bool FS_FilenameCompare( const char *s1, const char *s2 );
 
-const char *FS_LoadedPakNames( );
-const char *FS_LoadedPakChecksums( );
-const char *FS_LoadedPakPureChecksums( );
 // Returns a space separated string containing the checksums of all loaded pk3 files.
 // Servers with sv_pure set will get this string and pass it to clients.
 
-const char *FS_ReferencedPakNames( );
-const char *FS_ReferencedPakChecksums( );
-const char *FS_ReferencedPakPureChecksums( );
 // Returns a space separated string containing the checksums of all loaded 
 // AND referenced pk3 files. Servers with sv_pure set will get this string 
 // back from clients for pure validation 
 
-void FS_ClearPakReferences( int flags );
 // clears referenced booleans on loaded pk3s
 
-void FS_PureServerSetReferencedPaks( const char *pakSums, const char *pakNames );
-void FS_PureServerSetLoadedPaks( const char *pakSums, const char *pakNames );
 // If the string is empty, all data sources will be allowed.
 // If not empty, only pk3 files that match one of the space
 // separated checksums will be checked for files, with the
 // sole exception of .cfg files.
 
-bool FS_CheckDirTraversal(const char *checkdir);
-bool FS_InvalidGameDir(const char *gamedir);
-bool FS_idPak(char *pak, char *base, int numPaks);
-bool FS_ComparePaks( char *neededpaks, int len, bool dlstring );
 
-void FS_Remove( const char *osPath );
-void FS_Remove_HomeData( const char *homePath );
 
-void	FS_FilenameCompletion( const char *dir, const char *ext, char *filter,
-		bool stripExt, void(*callback)(const char *s), bool allowNonPureFilesOnDisk );
 
-const char *FS_GetCurrentGameDir();
-bool FS_Which(const char *filename, void *searchPath);
 
 /*
 ==============================================================

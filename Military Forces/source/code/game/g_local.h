@@ -941,10 +941,6 @@ extern	vmCvar_t	mf_allowNukes;
 
 // system calls
 int Sys_Milliseconds ();
-int FS_FOpenFileByMode( const char *qpath, fileHandle_t *f, fsMode_t mode );
-void FS_FCloseFile( fileHandle_t f );
-int FS_Read( void *buffer, int len, fileHandle_t f );
-int FS_Write( const void *buffer, int len, fileHandle_t h );
 void SV_GetUsercmd( int clientNum, usercmd_t *cmd );
 bool SV_GetEntityToken( char *buffer, int bufferSize );
 bool SV_EntityContact( const vec3_t mins, const vec3_t maxs, EntityBase* gameEnt, bool capsule );

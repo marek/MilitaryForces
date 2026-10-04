@@ -1860,7 +1860,7 @@ void MSG_HuffStats_f( ) {
 	for ( i = 0 ; i < 256 ; i++ ) {
 		Q_strcat( out, sizeof( out ), va( "%d,\t\t\t// %d\n", msg_huffCounts[i], i ) );
 	}
-	FS_WriteFile( "huffstats.txt", out, strlen( out ) );
+	FileSystem::writeFile( "huffstats.txt", out, strlen( out ) );
 	Com_Printf( "wrote huffstats.txt\n" );
 }
 

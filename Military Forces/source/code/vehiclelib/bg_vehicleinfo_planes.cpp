@@ -4,11 +4,8 @@
 #include "../game/q_shared.h"
 #include "../qcommon/qfiles.h"
 #include "../game/bg_public.h"
-int FS_Read( void *buffer, int len, fileHandle_t f );
 
 // decls
-int FS_FOpenFileByMode( const char *qpath, fileHandle_t *f, fsMode_t mode );
-void FS_FCloseFile( fileHandle_t f );
 
 
 
@@ -38,7 +35,7 @@ GameObjectInfo_Aircraft::setupBoundingBox()
 
 	fileHandle_t fileVehicle;
 
-	if( FS_FOpenFileByMode((modelBaseName + ".md3").c_str(), &fileVehicle, FS_READ) < 0 ) 
+	if( FileSystem::fOpenFileByMode((modelBaseName + ".md3").c_str(), &fileVehicle, FS_READ) < 0 ) 
 	{
 		Com_Error(ERR_FATAL, "Unable to open model file %s\n", modelBaseName.c_str() );
 		return false;
@@ -55,7 +52,7 @@ GameObjectInfo_Aircraft::setupBoundingBox()
 		{
 			// gear
 			fileHandle_t fileGear;
-			if( FS_FOpenFileByMode((modelBaseName + "_gear.md3").c_str(), &fileGear, FS_READ) >= 0 ) 
+			if( FileSystem::fOpenFileByMode((modelBaseName + "_gear.md3").c_str(), &fileGear, FS_READ) >= 0 ) 
 			{
 				// gear animations
 				int frames = Md3Utils::getNumberOfFrames( fileGear );
@@ -83,7 +80,7 @@ GameObjectInfo_Aircraft::setupBoundingBox()
 						success = false;
 				}
 
-				FS_FCloseFile(fileGear);
+				FileSystem::fCloseFile(fileGear);
 			}
 			else
 			{
@@ -94,13 +91,13 @@ GameObjectInfo_Aircraft::setupBoundingBox()
 		else
 			success = false;
 	}
-	FS_FCloseFile(fileVehicle);
+	FileSystem::fCloseFile(fileVehicle);
 
 	if( success && bayAnim_ )
 	{
 		// gear
 		fileHandle_t fileBay;
-		if( FS_FOpenFileByMode((modelBaseName + "_bay.md3").c_str(), &fileBay, FS_READ) >= 0 ) 
+		if( FileSystem::fOpenFileByMode((modelBaseName + "_bay.md3").c_str(), &fileBay, FS_READ) >= 0 ) 
 		{
 			// gear animations
 			int frames = Md3Utils::getNumberOfFrames( fileBay );
@@ -109,7 +106,7 @@ GameObjectInfo_Aircraft::setupBoundingBox()
 			else
 				bayAnim_->maxFrame_ = frames - 1;
 
-			FS_FCloseFile(fileBay);
+			FileSystem::fCloseFile(fileBay);
 		}
 		else
 			success = false;

@@ -378,9 +378,9 @@ void SV_ClearServer()
 //	char filename[MAX_QPATH];
 //
 //	Com_sprintf( filename, sizeof(filename), "vm/%s.qvm", "cgame" );
-//	FS_FOpenFileRead( filename, &f, false );
+//	FileSystem::fOpenFileRead( filename, &f, false );
 //	if ( f ) {
-//		FS_FCloseFile( f );
+//		FileSystem::fCloseFile( f );
 //	}
 //}
 
@@ -431,7 +431,7 @@ void SV_SpawnServer( char *server, bool killBots )
 	}
 
 	// clear pak references
-	FS_ClearPakReferences(0);
+	FileSystem::clearPakReferences(0);
 
 	// allocate the snapshot entities on the hunk
 	theSVS.snapshotEntities_ = reinterpret_cast<entityState_t*>(
@@ -466,7 +466,7 @@ void SV_SpawnServer( char *server, bool killBots )
 
 	// get a New checksum feed and restart the file system
 	theSV.checksumFeed_ = ( (static_cast<unsigned int>(rand()) << 16) ^ static_cast<unsigned int>(rand()) ) ^ Com_Milliseconds();
-	FS_Restart( theSV.checksumFeed_ );
+	FileSystem::restart( theSV.checksumFeed_ );
 
 	CM_LoadMap( va("maps/%s.bsp", server), false, &checksum );
 
@@ -580,12 +580,12 @@ void SV_SpawnServer( char *server, bool killBots )
 	{
 		// the server sends these to the clients so they will only
 		// load pk3s also loaded at the server
-		p = FS_LoadedPakChecksums();
+		p = FileSystem::loadedPakChecksums();
 		CvarSystem::set( "sv_paks", p );
 		if (strlen(p) == 0) 
 			Com_Printf( "WARNING: sv_pure set but no PK3 files loaded\n" );
 
-		p = FS_LoadedPakNames();
+		p = FileSystem::loadedPakNames();
 		CvarSystem::set( "sv_pakNames", p );
 
 		// if a dedicated pure server we need to touch the cgame because it could be in a
@@ -601,9 +601,9 @@ void SV_SpawnServer( char *server, bool killBots )
 	}
 	// the server sends these to the clients so they can figure
 	// out which pk3s should be auto-downloaded
-	p = FS_ReferencedPakChecksums();
+	p = FileSystem::referencedPakChecksums();
 	CvarSystem::set( "sv_referencedPaks", p );
-	p = FS_ReferencedPakNames();
+	p = FileSystem::referencedPakNames();
 	CvarSystem::set( "sv_referencedPakNames", p );
 
 	// save systeminfo and serverinfo strings

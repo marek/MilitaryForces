@@ -8,12 +8,9 @@
 #include "bg_md3utils.h"
 
 #include <algorithm>
-int FS_Read( void *buffer, int len, fileHandle_t f );
 
 
 // decls
-int FS_FOpenFileByMode( const char *qpath, fileHandle_t *f, fsMode_t mode );
-void FS_FCloseFile( fileHandle_t f );
 
 
 

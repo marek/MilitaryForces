@@ -215,7 +215,7 @@ struct clientConnection_t {
 	int			downloadCount;	// how many bytes we got
 	int			downloadSize;	// how many bytes we got
 	char		downloadList[MAX_INFO_STRING]; // list of paks we need to download
-	bool	downloadRestart;	// if true, we need to do another FS_Restart because we downloaded a pak
+	bool	downloadRestart;	// if true, we need to do another FileSystem::restart because we downloaded a pak
 
 	// demo information
 	char		demoName[MAX_QPATH];

@@ -868,7 +868,7 @@ void ME_ExportToScript( const char* scriptname )
 	mapname = Info_ValueForKey( info, "mapname" );
 	Com_sprintf(scriptfile, 255, "missions/%s/%s.mis", mapname, scriptname);
 
-	if( FS_FOpenFileByMode(scriptfile, &f, FS_WRITE) < 0 ) {
+	if( FileSystem::fOpenFileByMode(scriptfile, &f, FS_WRITE) < 0 ) {
 		CG_Printf("Unable to write to file %s. Exporting to script cancelled.", scriptfile);
 		return;
 	}
@@ -877,110 +877,110 @@ void ME_ExportToScript( const char* scriptname )
 
 	// first line comment
 	Com_sprintf( outstring, sizeof(outstring), "//Missionscript for map %s\n\n",mapname );
-	FS_Write( outstring, strlen(outstring), f );
+	FileSystem::write( outstring, strlen(outstring), f );
 
 	// header
 	Com_sprintf( outstring, sizeof(outstring), "Overview\n{\n\tmap\t%s\n", mapname );
-	FS_Write( outstring, strlen(outstring), f );
+	FileSystem::write( outstring, strlen(outstring), f );
 
 	Com_sprintf( outstring, sizeof(outstring), "\tgameset\t%d\n", static_cast<int>(cgs.gameset) );
-	FS_Write( outstring, strlen(outstring), f );
+	FileSystem::write( outstring, strlen(outstring), f );
 
 	Com_sprintf( outstring, sizeof(outstring), "\tgametype\t%d\n", cgs.gametype );
-	FS_Write( outstring, strlen(outstring), f );
+	FileSystem::write( outstring, strlen(outstring), f );
 
 	Com_sprintf( outstring, sizeof(outstring), "\tmission\t%s\n", scriptname );
-	FS_Write( outstring, strlen(outstring), f );
+	FileSystem::write( outstring, strlen(outstring), f );
 
 	Com_sprintf( outstring, sizeof(outstring), "\tgoal\tSearchAndDestroy\n}\n\n" );
-	FS_Write( outstring, strlen(outstring), f );
+	FileSystem::write( outstring, strlen(outstring), f );
 
 	// entities and groundinstallations
 	Com_sprintf( outstring, sizeof(outstring), "Entities\n{\n", mapname );
-	FS_Write( outstring, strlen(outstring), f );
+	FileSystem::write( outstring, strlen(outstring), f );
 	for( i = 0; i < IGME_MAX_VEHICLES; ++i ) {
 		veh = &cgs.IGME.vehicles[i]; 
 		if( !veh->active ) continue;
 		if( veh->groundInstallation	)
 		{
 			Com_sprintf( outstring, sizeof(outstring), "\tGroundInstallation\n\t{\n", mapname );
-			FS_Write( outstring, strlen(outstring), f );
+			FileSystem::write( outstring, strlen(outstring), f );
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\tIndex\t%d\n", veh->vehidx );
-			FS_Write( outstring, strlen(outstring), f );
+			FileSystem::write( outstring, strlen(outstring), f );
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\tName\t\"%s\"\n", availableGroundInstallations[veh->vehidx].descriptiveName );
-			FS_Write( outstring, strlen(outstring), f );
+			FileSystem::write( outstring, strlen(outstring), f );
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\tTeam\t%s\n", veh->side[0] ? veh->side : "?" );
-			FS_Write( outstring, strlen(outstring), f );
+			FileSystem::write( outstring, strlen(outstring), f );
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\tOrigin\t%f;%f;%f\n", veh->origin[0],
 				veh->origin[1], veh->origin[2]);
-			FS_Write( outstring, strlen(outstring), f );
+			FileSystem::write( outstring, strlen(outstring), f );
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\tAngles\t%f;%f;%f\n", veh->angles[0],
 				veh->angles[1], veh->angles[2]);
-			FS_Write( outstring, strlen(outstring), f );
+			FileSystem::write( outstring, strlen(outstring), f );
 
 			Com_sprintf( outstring, sizeof(outstring), "\t}\n\n", mapname );
-			FS_Write( outstring, strlen(outstring), f );
+			FileSystem::write( outstring, strlen(outstring), f );
 		}
 		else
 		{
 			Com_sprintf( outstring, sizeof(outstring), "\tVehicle\n\t{\n", mapname );
-			FS_Write( outstring, strlen(outstring), f );
+			FileSystem::write( outstring, strlen(outstring), f );
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\tIndex\t%d\n", veh->vehidx );
-			FS_Write( outstring, strlen(outstring), f );
+			FileSystem::write( outstring, strlen(outstring), f );
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\tName\t\"%s\"\n", availableVehicles[veh->vehidx].modelName );
-			FS_Write( outstring, strlen(outstring), f );
+			FileSystem::write( outstring, strlen(outstring), f );
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\tDescriptive\t\"%s\"\n", availableVehicles[veh->vehidx].descriptiveName );
-			FS_Write( outstring, strlen(outstring), f );
+			FileSystem::write( outstring, strlen(outstring), f );
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\tTeam\t%d\n", availableVehicles[veh->vehidx].team ); 
-			FS_Write( outstring, strlen(outstring), f );
+			FileSystem::write( outstring, strlen(outstring), f );
 
 			if( veh->side[0] )
 			{
 				Com_sprintf( outstring, sizeof(outstring), "\t\tSide\t%s\n", veh->side ); 
-				FS_Write( outstring, strlen(outstring), f );
+				FileSystem::write( outstring, strlen(outstring), f );
 			}
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\tOrigin\t%f;%f;%f\n", veh->origin[0],
 				veh->origin[1], veh->origin[2]);
-			FS_Write( outstring, strlen(outstring), f );
+			FileSystem::write( outstring, strlen(outstring), f );
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\tAngles\t%f;%f;%f\n", veh->angles[0],
 				veh->angles[1], veh->angles[2]);
-			FS_Write( outstring, strlen(outstring), f );
+			FileSystem::write( outstring, strlen(outstring), f );
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\tWaypoints\n\t\t{\n" );
-			FS_Write( outstring, strlen(outstring), f );
+			FileSystem::write( outstring, strlen(outstring), f );
 
 			for( j = 0; j < IGME_MAX_WAYPOINTS; ++j ) 
 			{
 				if( !veh->waypoints[j].active ) break;//as they are in a row
 				Com_sprintf( outstring, sizeof(outstring), "\t\t\tOrigin\t%f;%f;%f\n", veh->waypoints[j].origin[0],
 					veh->waypoints[j].origin[1], veh->waypoints[j].origin[2]);
-				FS_Write( outstring, strlen(outstring), f );
+				FileSystem::write( outstring, strlen(outstring), f );
 
 			}
 
 			Com_sprintf( outstring, sizeof(outstring), "\t\t}\n\t}\n\n", mapname );
-			FS_Write( outstring, strlen(outstring), f );
+			FileSystem::write( outstring, strlen(outstring), f );
 		}
 	}
 	Com_sprintf( outstring, sizeof(outstring), "}\n", mapname );
-	FS_Write( outstring, strlen(outstring), f );
+	FileSystem::write( outstring, strlen(outstring), f );
 
 
 
 	CG_Printf("Successfully saved to script\n");
 
-	FS_FCloseFile(f);
+	FileSystem::fCloseFile(f);
 
 
 
@@ -1044,7 +1044,7 @@ static bool ME_LoadOverviewAndEntities( char *filename,
 	char				inbuffer[MAX_MISSION_TEXT];
 
 	// open the file, fill it into buffer and close it, afterwards parse it
-	len = FS_FOpenFileByMode( filename, &f, FS_READ );
+	len = FileSystem::fOpenFileByMode( filename, &f, FS_READ );
 	if ( !f ) 
 	{
 		Com_Printf( S_COLOR_RED "file not found: %s\n", filename );
@@ -1053,13 +1053,13 @@ static bool ME_LoadOverviewAndEntities( char *filename,
 	if ( len >= MAX_MISSION_TEXT ) 
 	{
 		Com_Printf( S_COLOR_RED "file too large: %s is %i, max allowed is %i", filename, len, MAX_MISSION_TEXT );
-		FS_FCloseFile( f );
+		FileSystem::fCloseFile( f );
 		return false;
 	}
 
-	FS_Read( inbuffer, len, f );
+	FileSystem::read( inbuffer, len, f );
 	inbuffer[len] = 0;
-	FS_FCloseFile( f );
+	FileSystem::fCloseFile( f );
 
 	Com_Printf( S_COLOR_GREEN "Successfully opened mission script: %s\n", filename );
 

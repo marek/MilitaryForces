@@ -1635,4 +1635,6 @@ int ahextoi( const char* string );
 
 #include "../qcommon/command_system.h"
 
+#include "../qcommon/file_system.h"
+
 #endif	// __Q_SHARED_H

@@ -84,11 +84,11 @@ size_t S_OGG_Callback_read(void *ptr, size_t size, size_t nmemb, void *datasourc
 	// we use a SoundStream in the generic pointer to pass around
 	stream = static_cast<SoundStream *>(datasource);
 
-	// FS_Read does not support multi-byte elements
+	// FileSystem::read does not support multi-byte elements
 	byteSize = nmemb * size;
 
-	// read it with the Q3 function FS_Read()
-	bytesRead = FS_Read(ptr, byteSize, stream->file);
+	// read it with the Q3 function FileSystem::read()
+	bytesRead = FileSystem::read(ptr, byteSize, stream->file);
 
 	// update the file position
 	stream->pos += bytesRead;
@@ -128,7 +128,7 @@ int S_OGG_Callback_seek(void *datasource, ogg_int64_t offset, int whence)
 		case SEEK_SET :
 		{
 			// set the file position in the actual file with the Q3 function
-			retVal = FS_Seek(stream->file, static_cast<long>(offset), FS_SEEK_SET);
+			retVal = FileSystem::seek(stream->file, static_cast<long>(offset), FS_SEEK_SET);
 
 			// something has gone wrong, so we return here
 			if(retVal < 0)
@@ -144,7 +144,7 @@ int S_OGG_Callback_seek(void *datasource, ogg_int64_t offset, int whence)
 		case SEEK_CUR :
 		{
 			// set the file position in the actual file with the Q3 function
-			retVal = FS_Seek(stream->file, static_cast<long>(offset), FS_SEEK_CUR);
+			retVal = FileSystem::seek(stream->file, static_cast<long>(offset), FS_SEEK_CUR);
 
 			// something has gone wrong, so we return here
 			if(retVal < 0)
@@ -160,7 +160,7 @@ int S_OGG_Callback_seek(void *datasource, ogg_int64_t offset, int whence)
 		case SEEK_END :
 		{
 			// set the file position in the actual file with the Q3 function
-			retVal = FS_Seek(stream->file, static_cast<long>(offset), FS_SEEK_END);
+			retVal = FileSystem::seek(stream->file, static_cast<long>(offset), FS_SEEK_END);
 
 			// something has gone wrong, so we return here
 			if(retVal < 0)
@@ -210,7 +210,7 @@ long S_OGG_Callback_tell(void *datasource)
 	// SoundStream in the generic pointer
 	stream = static_cast<SoundStream *>(datasource);
 
-	return static_cast<long>(FS_FTell(stream->file));
+	return static_cast<long>(FileSystem::fTell(stream->file));
 }
 
 // the callback structure

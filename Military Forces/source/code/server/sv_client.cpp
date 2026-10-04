@@ -811,7 +811,7 @@ void SV_Client::closeDownload()
 
 	// EOF
 	if (this->download_) 
-		FS_FCloseFile( this->download_ );
+		FileSystem::fCloseFile( this->download_ );
 
 	this->download_ = 0;
 	*this->downloadName_ = 0;
@@ -947,7 +947,7 @@ int SV_Client::writeDownloadToClient( Message *msg )
 			// Check for pk3 filename extension
 			if(!Q_stricmp(pakptr + 1, "pk3"))
 			{
-				const char *referencedPaks = FS_ReferencedPakNames();
+				const char *referencedPaks = FileSystem::referencedPakNames();
 
 				// Check whether the file appears in the list of referenced
 				// paks to prevent downloading of arbitrary files.
@@ -956,17 +956,17 @@ int SV_Client::writeDownloadToClient( Message *msg )
 
 				for(curindex = 0; curindex < numRefPaks; curindex++)
 				{
-					if(!FS_FilenameCompare(CommandSystem::argv(curindex), pakbuf))
+					if(!FileSystem::filenameCompare(CommandSystem::argv(curindex), pakbuf))
 					{
 						unreferenced = 0;
 
 						// now that we know the file is referenced,
 						// check whether it's legal to download it.
 #ifndef STANDALONE
-						missionPack = FS_idPak(pakbuf, BASETA, NUM_TA_PAKS);
+						missionPack = FileSystem::idPak(pakbuf, BASETA, NUM_TA_PAKS);
 						idPack = missionPack;
 #endif
-						idPack = idPack || FS_idPak(pakbuf, (char *)BASEGAME, NUM_ID_PAKS);
+						idPack = idPack || FileSystem::idPak(pakbuf, (char *)BASEGAME, NUM_ID_PAKS);
 
 						break;
 					}
@@ -980,7 +980,7 @@ int SV_Client::writeDownloadToClient( Message *msg )
 		if ( !(sv_allowDownload->integer & DLF_ENABLE) ||
 			(sv_allowDownload->integer & DLF_NO_UDP) ||
 			idPack || unreferenced ||
-			( this->downloadSize_ = FS_BaseDir_FOpenFileRead( this->downloadName_, &this->download_ ) ) < 0 ) {
+			( this->downloadSize_ = FileSystem::baseDir_FOpenFileRead( this->downloadName_, &this->download_ ) ) < 0 ) {
 			// cannot auto-download file
 			if(unreferenced)
 			{
@@ -1029,7 +1029,7 @@ int SV_Client::writeDownloadToClient( Message *msg )
 			*this->downloadName_ = 0;
 			
 			if(this->download_)
-				FS_FCloseFile(this->download_);
+				FileSystem::fCloseFile(this->download_);
 			
 			return 1;
 		}
@@ -1051,7 +1051,7 @@ int SV_Client::writeDownloadToClient( Message *msg )
 		if (!this->downloadBlocks_[curindex])
 			this->downloadBlocks_[curindex] = static_cast<unsigned char *>(Z_Malloc(MAX_DOWNLOAD_BLKSIZE));
 
-		this->downloadBlockSize_[curindex] = FS_Read( this->downloadBlocks_[curindex], MAX_DOWNLOAD_BLKSIZE, this->download_ );
+		this->downloadBlockSize_[curindex] = FileSystem::read( this->downloadBlocks_[curindex], MAX_DOWNLOAD_BLKSIZE, this->download_ );
 
 		if (this->downloadBlockSize_[curindex] < 0) {
 			// EOF right now
@@ -1232,9 +1232,9 @@ static void SV_VerifyPaks_f( SV_Client *cl )
 		bGood = true;
 		nChkSum1 = nChkSum2 = 0;
 		// we run the game, so determine which cgame and ui the client "should" be running
-		//bGood = (FS_FileIsInPAK("vm/cgame.qvm", &nChkSum1) == 1);
+		//bGood = (FileSystem::fileIsInPAK("vm/cgame.qvm", &nChkSum1) == 1);
 		//if (bGood)
-		//	bGood = (FS_FileIsInPAK("vm/ui.qvm", &nChkSum2) == 1);
+		//	bGood = (FileSystem::fileIsInPAK("vm/ui.qvm", &nChkSum2) == 1);
 
 		nClientPaks = CommandSystem::argc();
 
@@ -1319,7 +1319,7 @@ static void SV_VerifyPaks_f( SV_Client *cl )
 				break;
 
 			// get the pure checksums of the pk3 files loaded by the server
-			pPaks = FS_LoadedPakPureChecksums();
+			pPaks = FileSystem::loadedPakPureChecksums();
 			CommandSystem::tokenizeString( pPaks );
 			nServerPaks = CommandSystem::argc();
 			if (nServerPaks > 1024)

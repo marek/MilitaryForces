@@ -609,7 +609,7 @@ void CM_LoadMap( const char *name, bool clientload, int *checksum ) {
 	// load the file
 	//
 #ifndef BSPC
-	length = FS_ReadFile( name, &buf.v );
+	length = FileSystem::readFile( name, &buf.v );
 #else
 	length = LoadQuakeFile((quakefile_t *) name, &buf.v);
 #endif
@@ -648,7 +648,7 @@ void CM_LoadMap( const char *name, bool clientload, int *checksum ) {
 	CMod_LoadPatches( &header.lumps[LUMP_SURFACES], &header.lumps[LUMP_DRAWVERTS] );
 
 	// we are NOT freeing the file, because it is cached for the ref
-	FS_FreeFile (buf.v);
+	FileSystem::freeFile (buf.v);
 
 	CM_InitBoxHull ();
 

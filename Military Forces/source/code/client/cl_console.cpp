@@ -206,7 +206,7 @@ void Con_Dump_f ()
 		return;
 	}
 
-	f = FS_FOpenFileWrite_HomeData( filename );
+	f = FileSystem::fOpenFileWrite_HomeData( filename );
 	if (!f)
 	{
 		Com_Printf ("ERROR: couldn't open %s.\n", filename);
@@ -253,11 +253,11 @@ void Con_Dump_f ()
 #else
 		Q_strcat(buffer, bufferlen, "\n");
 #endif
-		FS_Write(buffer, strlen(buffer), f);
+		FileSystem::write(buffer, strlen(buffer), f);
 	}
 
 	Hunk_FreeTempMemory( buffer );
-	FS_FCloseFile( f );
+	FileSystem::fCloseFile( f );
 }
 
 						

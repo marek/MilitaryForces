@@ -149,7 +149,7 @@ bool CL_HTTP_PerformDownload(void)
         clc.downloadCount += bytesRead;
         CvarSystem::setValue("cl_downloadCount", clc.downloadCount);
 
-        DWORD bytesWritten = (DWORD)FS_Write(readBuffer, bytesRead, clc.download);
+        DWORD bytesWritten = (DWORD)FileSystem::write(readBuffer, bytesRead, clc.download);
         DropIf(bytesWritten != bytesRead, "bytesWritten != bytesRead");
 
         return false;

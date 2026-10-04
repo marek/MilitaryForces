@@ -57,7 +57,7 @@ static bool G_LoadOverviewAndEntities( char *filename,
 	static char			inbuffer[MAX_MISSION_TEXT];
 
 	// open the file, fill it into buffer and close it, afterwards parse it
-	len = FS_FOpenFileByMode( filename, &f, FS_READ );
+	len = FileSystem::fOpenFileByMode( filename, &f, FS_READ );
 	if ( !f )
 	{
 		Com_Printf( S_COLOR_RED "file not found: %s\n", filename );
@@ -66,13 +66,13 @@ static bool G_LoadOverviewAndEntities( char *filename,
 	if ( len >= MAX_MISSION_TEXT )
 	{
 		Com_Printf( S_COLOR_RED "file too large: %s is %i, max allowed is %i\n", filename, len, MAX_MISSION_TEXT );
-		FS_FCloseFile( f );
+		FileSystem::fCloseFile( f );
 		return false;
 	}
 
-	FS_Read( inbuffer, len, f );
+	FileSystem::read( inbuffer, len, f );
 	inbuffer[len] = 0;
-	FS_FCloseFile( f );
+	FileSystem::fCloseFile( f );
 
 	Com_Printf( S_COLOR_GREEN "Successfully opened mission script: %s\n", filename );
 

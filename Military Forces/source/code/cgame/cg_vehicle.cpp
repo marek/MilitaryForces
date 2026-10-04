@@ -36,18 +36,18 @@ static animation_t * CG_ParseLQMAnimationFile( const char *filename ) {
 	animations = reinterpret_cast<animation_t *>(&availableLQMAnimations.anim[availableLQMAnimations.numAnimations]);
 
 	// load the file
-	len = FS_FOpenFileByMode( filename, &f, FS_READ );
+	len = FileSystem::fOpenFileByMode( filename, &f, FS_READ );
 	if ( len <= 0 ) {
 		return nullptr;
 	}
 	if ( len >= sizeof( text ) - 1 ) {
 		CG_Printf( "File %s too long\n", filename );
-		FS_FCloseFile( f );
+		FileSystem::fCloseFile( f );
 		return nullptr;
 	}
-	FS_Read( text, len, f );
+	FileSystem::read( text, len, f );
 	text[len] = 0;
-	FS_FCloseFile( f );
+	FileSystem::fCloseFile( f );
 
 	// parse the text
 	text_p = text;
@@ -189,12 +189,12 @@ static qhandle_t CG_RegisterVehiclePart( const char *name, bool expected )
 {
 	fileHandle_t f;
 
-	if( FS_FOpenFileByMode( name, &f, FS_READ ) < 0 ) {
+	if( FileSystem::fOpenFileByMode( name, &f, FS_READ ) < 0 ) {
 		if( expected )
 			CG_Printf( "MFQ3 Warning: Unable to load model '%s'\n", name );
 		return 0;
 	}
-	FS_FCloseFile( f );
+	FileSystem::fCloseFile( f );
 	qhandle_t model = refExport.RegisterModel( name );
 	if( model > 0 && model < MAX_TEAM_SKIN_MODELS ) {
 		char skin[128];
@@ -204,8 +204,8 @@ static qhandle_t CG_RegisterVehiclePart( const char *name, bool expected )
 		for( int t = 0; t < 2; ++t ) {
 			Com_sprintf( skin, sizeof(skin), "%s_team%d.skin", base, t + 1 );
 			cg_teamSkins[t][model] = 0;
-			if( FS_FOpenFileByMode( skin, &f, FS_READ ) >= 0 ) {
-				FS_FCloseFile( f );
+			if( FileSystem::fOpenFileByMode( skin, &f, FS_READ ) >= 0 ) {
+				FileSystem::fCloseFile( f );
 				cg_teamSkins[t][model] = refExport.RegisterSkin( skin );
 			}
 		}

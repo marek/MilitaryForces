@@ -723,20 +723,20 @@ char *GetMenuBuffer(const char *filename) {
 	fileHandle_t	f;
 	static char buf[MAX_MENUFILE];
 
-	len = FS_FOpenFileByMode( filename, &f, FS_READ );
+	len = FileSystem::fOpenFileByMode( filename, &f, FS_READ );
 	if ( !f ) {
 		Com_Printf( S_COLOR_RED "menu file not found: %s, using default\n", filename );
 		return defaultMenu;
 	}
 	if ( len >= MAX_MENUFILE ) {
 		Com_Printf( S_COLOR_RED "menu file too large: %s is %i, max allowed is %i", filename, len, MAX_MENUFILE );
-		FS_FCloseFile( f );
+		FileSystem::fCloseFile( f );
 		return defaultMenu;
 	}
 
-	FS_Read( buf, len, f );
+	FileSystem::read( buf, len, f );
 	buf[len] = 0;
-	FS_FCloseFile( f );
+	FileSystem::fCloseFile( f );
 	//COM_Compress(buf);
   return buf;
 
@@ -3105,7 +3105,7 @@ static void UI_LoadMods()
 	int		dirlen;
 
 	uiInfo.modCount = 0;
-	numdirs = FS_GetFileList( "$modlist", "", dirlist, sizeof(dirlist) );
+	numdirs = FileSystem::getFileList( "$modlist", "", dirlist, sizeof(dirlist) );
 	dirptr  = dirlist;
 	for( i = 0; i < numdirs; i++ ) 
 	{
@@ -3131,7 +3131,7 @@ static void UI_LoadTeams() {
 	char	*teamName;
 	int		i, len, count;
 
-	count = FS_GetFileList( "", "team", teamList, 4096 );
+	count = FileSystem::getFileList( "", "team", teamList, 4096 );
 
 	if (count) {
 		teamName = teamList;
@@ -3156,7 +3156,7 @@ static void UI_LoadMovies()
 	char	*moviename;
 	int		i, len;
 
-	uiInfo.movieCount = FS_GetFileList( "video", "roq", movielist, 4096 );
+	uiInfo.movieCount = FileSystem::getFileList( "video", "roq", movielist, 4096 );
 
 	if (uiInfo.movieCount) 
 	{
@@ -3193,7 +3193,7 @@ static void UI_LoadDemos() {
 
 	Com_sprintf(demoExt, sizeof(demoExt), "mfq3_dm_%d", static_cast<int>(CvarSystem::variableValue("protocol")));
 
-	uiInfo.demoCount = FS_GetFileList( "demos", demoExt, demolist, 4096 );
+	uiInfo.demoCount = FileSystem::getFileList( "demos", demoExt, demolist, 4096 );
 
 	Com_sprintf(demoExt, sizeof(demoExt), ".mfq3_dm_%d", static_cast<int>(CvarSystem::variableValue("protocol")));
 
@@ -3460,7 +3460,7 @@ static void UI_InitialiseUI( )
 	uiInfo.pCreditsData = nullptr;
 
 	// open file
-	fileSize = FS_FOpenFileByMode( "ui\\credits.txt", &creditsFile, FS_READ );	
+	fileSize = FileSystem::fOpenFileByMode( "ui\\credits.txt", &creditsFile, FS_READ );	
 	if( fileSize )
 	{
 //		int index = 0;
@@ -3470,7 +3470,7 @@ static void UI_InitialiseUI( )
 		// read in the entire credits file
 		uiInfo.pCreditsData = uiInfo.uiUtils.alloc( fileSize );
 		pCredits = static_cast<char *>(uiInfo.pCreditsData);
-		FS_Read( pCredits, fileSize, creditsFile );
+		FileSystem::read( pCredits, fileSize, creditsFile );
 	
 		// assign line pointers
 		do
@@ -3492,7 +3492,7 @@ static void UI_InitialiseUI( )
 		while( pLineEnd && pCredits < (static_cast<char *>(uiInfo.pCreditsData)+fileSize) );
 
 		// close file
-		FS_FCloseFile( creditsFile );
+		FileSystem::fCloseFile( creditsFile );
 	}
 
 
@@ -4311,12 +4311,12 @@ bool UI_hasSkinForBase(const char *base, const char *team) {
 	
 	Com_sprintf( test, sizeof( test ), "models/players/%s/%s/lower_default.skin", base, team );
 
-	if (FS_FOpenFileByMode(test, nullptr, FS_READ)) {
+	if (FileSystem::fOpenFileByMode(test, nullptr, FS_READ)) {
 		return true;
 	}
 	Com_sprintf( test, sizeof( test ), "models/players/characters/%s/%s/lower_default.skin", base, team );
 
-	if (FS_FOpenFileByMode(test, nullptr, FS_READ)) {
+	if (FileSystem::fOpenFileByMode(test, nullptr, FS_READ)) {
 		return true;
 	}
 	return false;
