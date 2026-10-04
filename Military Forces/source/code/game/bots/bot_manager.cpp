@@ -179,7 +179,8 @@ int Bots::pickVehicle( int teamFlag, bool allowInfantry, const Character* who )
 		if( !groundTargets && (veh.cat & CAT_PLANE) && (veh.cls & CLASS_PLANE_BOMBER) )
 			weight = weight * 12 / 100;
 		if( kindLives_[kind] >= 12 && kindCrashes_[kind] * 10 > kindLives_[kind] * 5 )
-			weight = std::max( 1, weight / 12 );
+			weight = std::max( 1, weight / 3 );
+
 		if( weight <= 0 )
 			continue;
 		if( !weight )

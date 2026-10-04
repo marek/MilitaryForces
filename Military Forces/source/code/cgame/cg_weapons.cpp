@@ -926,11 +926,12 @@ void CGame::cookOff( vec3_t origin, int vehicle )
 	refEntity_t* re = &le->refEntity;
 	le->leType = LE_FRAGMENT;
 	le->startTime = cg.time;
-	le->endTime = le->startTime + 9000;
+	le->endTime = le->startTime + std::max( 9, cg_debrisTime.integer ) * 1000;
 	VectorCopy( origin, re->origin );
 	re->origin[2] += 6;
 	AxisCopy( axisDefault, re->axis );
 	re->hModel = turret;
+	re->customShader = cgs.media.charredShader;
 	le->pos.trType = TR_GRAVITY;
 	VectorCopy( re->origin, le->pos.trBase );
 	VectorSet( le->pos.trDelta, crandom() * 70.0f, crandom() * 70.0f, 520.0f + random() * 180.0f );

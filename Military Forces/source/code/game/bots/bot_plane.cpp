@@ -59,6 +59,31 @@ bool Bots::defendMissile( GameEntity* ent, State& bot, const Sense& sense, userc
 	return true;
 }
 
+bool Bots::turnClear( GameEntity* ent, float radius, float degrees, float climb )
+{
+	const playerState_t& ps = ent->client_->ps_;
+	vec3_t flat = { 0, ps.vehicleAngles[YAW], 0 }, forward, right, from;
+	AngleVectors( flat, forward, right, nullptr );
+	const float side = degrees > 0 ? -1.0f : 1.0f;
+	const float total = std::min( static_cast<float>( fabs( degrees ) ), 210.0f );
+	VectorCopy( ent->r.currentOrigin, from );
+	for( float swept = 30.0f; swept <= total + 29.0f; swept += 30.0f )
+	{
+		const float angle = std::min( swept, total ) * static_cast<float>( M_PI ) / 180.0f;
+		vec3_t point, dir;
+		VectorMA( ent->r.currentOrigin, radius * sin( angle ), forward, point );
+		VectorMA( point, side * radius * (1.0f - cos( angle )), right, point );
+		point[2] += climb * radius * angle;
+		VectorSubtract( point, from, dir );
+		const float length = VectorNormalize( dir );
+		trace_t tr;
+		if( length > 1 && pathBlocked( from, dir, length, ent->s.number, tr, 50.0f ) && tr.entityNum == ENTITYNUM_WORLD && !tr.startsolid )
+			return false;
+		VectorCopy( point, from );
+	}
+	return true;
+}
+
 bool Bots::runwayBusy( int padIndex, GameEntity* self )
 {
 	const Pad& pad = pads_[padIndex];
@@ -439,6 +464,67 @@ void Bots::thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_
 		view[PITCH] = std::clamp( angles[PITCH], -50.0f, 35.0f );
 	else
 		view[PITCH] = std::clamp( (sense.height - cruise) / 30.0f, -30.0f, 20.0f );
+	bool snapShot = false;
+	if( attacking )
+	{
+		const float turn = AngleSubtract( sense.enemyAngles[YAW], ps.vehicleAngles[YAW] );
+		const float turnRadius = std::max( VectorLength( ps.velocity ), 1.0f ) / (std::max( 10.0f, veh.turnspeed[YAW] ) * static_cast<float>( M_PI ) / 180.0f);
+		bool safe = fabs( turn ) < 20.0f;
+		if( !safe && theLevel.time_ < bot.chaseTime )
+		{
+			safe = true;
+			view[YAW] = ps.vehicleAngles[YAW] + bot.chaseTurn;
+			if( bot.chasePitch != 0.0f )
+				view[PITCH] = bot.chasePitch;
+		}
+		else if( !safe )
+		{
+			const float longWay = turn > 0 ? turn - 360.0f : turn + 360.0f;
+			const bool canDive = sense.height > planeMinHeight + 300.0f;
+			struct Option { float degrees; float climb; };
+			const std::array<Option, 6> options = { {
+				{ turn, 0.0f }, { turn, 0.25f }, { turn, -0.25f }, { longWay, 0.0f }, { longWay, 0.25f }, { longWay, -0.25f }
+			} };
+			for( const Option& option : options )
+			{
+				if( option.climb < 0 && !canDive )
+					continue;
+				if( !turnClear( ent, turnRadius, option.degrees, option.climb ) )
+					continue;
+				safe = true;
+				bot.chaseTime = theLevel.time_ + 900;
+				bot.chaseTurn = option.degrees > 0 ? 80.0f : -80.0f;
+				bot.chasePitch = option.climb > 0 ? -14.0f : option.climb < 0 ? 14.0f : 0.0f;
+				if( option.degrees != turn || option.climb != 0.0f )
+				{
+					view[YAW] = ps.vehicleAngles[YAW] + bot.chaseTurn;
+					if( bot.chasePitch != 0.0f )
+						view[PITCH] = bot.chasePitch;
+				}
+				else
+					bot.chaseTime = 0;
+				break;
+			}
+		}
+		if( safe && bot.confined && theLevel.time_ >= bot.chaseTime )
+		{
+			trace_t line;
+			vec3_t toEnemy;
+			VectorCopy( sense.enemyDir, toEnemy );
+			if( fabs( turn ) < 20.0f && pathBlocked( ent->r.currentOrigin, toEnemy, std::min( sense.enemyDist, 1500.0f ), ent->s.number, line, 60.0f ) &&
+				line.entityNum == ENTITYNUM_WORLD && !line.startsolid )
+				safe = false;
+		}
+		if( bot.confined )
+			view[PITCH] = std::clamp( view[PITCH], -14.0f, 14.0f );
+		if( !safe )
+		{
+			attacking = false;
+			snapShot = fabs( turn ) < 6.0f;
+			view[YAW] = ps.vehicleAngles[YAW];
+			view[PITCH] = std::clamp( (sense.height - cruise) / 30.0f, -30.0f, 20.0f );
+		}
+	}
 	const bool defending = defendMissile( ent, bot, sense, cmd, view );
 	if( defending )
 		attacking = false;
@@ -581,7 +667,7 @@ void Bots::thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_
 			vec3_t right;
 			AngleVectors( ps.vehicleAngles, nullptr, right, nullptr );
 			const float side = DotProduct( rel, right ) + DotProduct( miss, right );
-			bot.avoidYaw = ps.vehicleAngles[YAW] + (side > 0 ? 45.0f : -45.0f);
+			bot.avoidYaw = ps.vehicleAngles[YAW] + (bot.confined ? 0.0f : side > 0 ? 45.0f : -45.0f);
 			bot.avoidPitch = (rel[2] + miss[2] >= 0 && sense.height > minHeight + 250) ? 22.0f : -28.0f;
 			bot.avoidTime = theLevel.time_ + 700;
 			bot.egressTime = std::max( bot.egressTime, theLevel.time_ + 1500 );
@@ -604,7 +690,7 @@ void Bots::thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_
 	if( ps.ONOFF & OO_STALLED )
 		view[PITCH] = speed > veh.stallspeed ? ps.vehicleAngles[PITCH] + 1.0f : std::max( view[PITCH], ps.vehicleAngles[PITCH] + 1.0f );
 
-	if( attacking )
+	if( attacking || snapShot )
 	{
 		vec3_t fwd;
 		AngleVectors( ps.vehicleAngles, fwd, nullptr, nullptr );

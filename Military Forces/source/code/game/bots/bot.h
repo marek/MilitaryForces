@@ -108,6 +108,9 @@ private:
 		int		reactTime = 0;
 		int		reactEnemy = -1;
 		float	breakSide = 1;
+		int		chaseTime = 0;
+		float	chaseTurn = 0;
+		float	chasePitch = 0;
 		int		badPadTime = 0;
 		float	landOffset = 45;
 		float	approachHeight = 0;
@@ -191,6 +194,7 @@ private:
 	static bool replenished( GameEntity* ent );
 	static void finishRearm( GameEntity* ent, State& bot );
 	static bool runwayBusy( int padIndex, GameEntity* self );
+	static bool turnClear( GameEntity* ent, float radius, float degrees, float climb = 0 );
 	static bool defendMissile( GameEntity* ent, State& bot, const Sense& sense, usercmd_t& cmd, vec3_t view );
 	static bool landPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_t& cmd, vec3_t view );
 	static void sense( GameEntity* ent, State& bot, Sense& out );

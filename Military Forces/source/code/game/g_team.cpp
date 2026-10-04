@@ -587,6 +587,9 @@ int Pickup_Team( GameEntity *ent, GameEntity *other )
 	int team;
 	GameClient *cl = other->client_;
 
+	if( cl->vehicle_ >= 0 && (availableVehicles[cl->vehicle_].cat & CAT_PLANE) ) 
+		return 0;
+
 	// figure out what team this flag is
 	if( strcmp(ent->classname_, "team_CTF_redflag") == 0 ) 
 		team = ClientBase::TEAM_RED;

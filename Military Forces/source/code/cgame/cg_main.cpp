@@ -190,6 +190,7 @@ vmCvar_t	m2cp_page4;
 vmCvar_t	m2cp_page5;
 
 vmCvar_t	cg_fxQuality;
+vmCvar_t	cg_debrisTime;
 vmCvar_t	cg_consoleTextStyle;
 
 // MFQ3: development cVars
@@ -312,6 +313,7 @@ cvarTable_t		cvarTable[] = {
 	{ &m2cp_page4, "m2cp_page4", "1", CVAR_ARCHIVE },
 	{ &m2cp_page5, "m2cp_page5", "1", CVAR_ARCHIVE },
 
+	{ &cg_debrisTime, "cg_debrisTime", "120", CVAR_ARCHIVE },
 	{ &cg_fxQuality, "cg_fxQuality", "2", CVAR_ARCHIVE },	// enum: quality_t in cg_local.h
 	{ &cg_consoleTextStyle, "cg_consoleTextStyle", "3", CVAR_ARCHIVE },
 
@@ -1056,6 +1058,7 @@ void CGame::registerGraphics( ) {
 	// wall marks
 	cgs.media.bulletMarkShader = refExport.RegisterShader( "gfx/damage/bullet_mrk" );
 	cgs.media.burnMarkShader = refExport.RegisterShader( "gfx/damage/burn_med_mrk" );
+	cgs.media.charredShader = refExport.RegisterShader( "models/effects/charred" );
 
 	// default shadows (one per class of vehicle - remember that vehicles can specify their own shadows if perferred)
 	for( i = 0; i < MF_MAX_CATEGORIES; i ++ )

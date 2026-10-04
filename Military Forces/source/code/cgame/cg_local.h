@@ -782,6 +782,7 @@ struct cgMedia_t {
 	// wall mark shaders
 	qhandle_t	bulletMarkShader;
 	qhandle_t	burnMarkShader;
+	qhandle_t	charredShader;
 
 	// MFQ3 effect models
 	qhandle_t	vapor;
@@ -1300,6 +1301,7 @@ extern	vmCvar_t		m2cp_page4;
 extern	vmCvar_t		m2cp_page5;
 
 extern	vmCvar_t		cg_fxQuality;
+extern	vmCvar_t		cg_debrisTime;
 extern	vmCvar_t		cg_consoleTextStyle;
 
 extern	vmCvar_t		cg_shadowDebug;
