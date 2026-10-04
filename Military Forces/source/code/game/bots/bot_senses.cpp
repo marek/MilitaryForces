@@ -222,6 +222,9 @@ GameEntity* Bots::findEnemy( GameEntity* ent, State& bot, Role role )
 		}
 		if( i == bot.enemy )
 			score *= 0.7f;
+		// people came to play: a real player is a more interesting opponent than another bot
+		if( !isBot( i ) )
+			score *= 0.6f;
 		// fight what the leader is fighting
 		if( leaderTarget == i )
 			score *= 0.35f;

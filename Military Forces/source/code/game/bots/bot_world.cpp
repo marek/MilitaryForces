@@ -384,7 +384,43 @@ void Bots::pickGoal( GameEntity* ent, State& bot, float radius )
 	if( roamPoints_.empty() )
 		buildRoamPoints();
 	const unsigned int cat = ent->client_->vehicle_ >= 0 ? availableVehicles[ent->client_->vehicle_].cat : 0;
-	if( (cat & (CAT_PLANE|CAT_HELO)) && !roamPoints_.empty() && radius > 3500 )
+
+	// Everyone has a rough idea where the enemy is. Part of the time a bot goes looking for a real player on the
+	// other side, the aggressive ones more often, so the fight comes to the people playing.
+	GameEntity* quarry = nullptr;
+	if( !(cat & CAT_LQM) && random() < 0.3f + 0.4f * character( bot ).aggression )
+	{
+		float nearest = 0;
+		for( int i = 1; i <= theLevel.maxclients_; i++ )
+		{
+			GameEntity* other = theLevel.getEntity( i );
+			if( other == ent || isBot( i ) || !alive( other ) || other->client_->sess_.ridingClient_ >= 0 )
+				continue;
+			if( g_gametype.integer >= GT_TEAM && OnSameTeam( ent, other ) )
+				continue;
+			// a boat cannot go after someone inland, nor a ground vehicle after someone at sea or in the air
+			const unsigned int otherCat = availableVehicles[other->client_->vehicle_].cat;
+			const bool otherFlying = (otherCat & (CAT_PLANE|CAT_HELO)) && !(other->client_->ps_.ONOFF & OO_LANDED);
+			if( (cat & (CAT_GROUND|CAT_BOAT)) && (otherFlying || ((cat & CAT_BOAT) != 0) != ((otherCat & CAT_BOAT) != 0)) )
+				continue;
+			const float dist = Distance( ent->r.currentOrigin, other->r.currentOrigin );
+			if( !quarry || dist < nearest )
+			{
+				quarry = other;
+				nearest = dist;
+			}
+		}
+	}
+	if( quarry )
+	{
+		constexpr float vagueness = 900.0f;
+		VectorCopy( quarry->r.currentOrigin, bot.goal );
+		bot.goal[0] += crandom() * vagueness;
+		bot.goal[1] += crandom() * vagueness;
+		if( !(cat & (CAT_PLANE|CAT_HELO)) )
+			bot.goal[2] = ent->r.currentOrigin[2];
+	}
+	else if( (cat & (CAT_PLANE|CAT_HELO)) && !roamPoints_.empty() && radius > 3500 )
 	{
 		const Vec3& point = roamPoints_[rand() % roamPoints_.size()];
 		point.copyTo( bot.goal );
