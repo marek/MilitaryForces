@@ -630,7 +630,15 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 	} 
 	else 
 	{
-		if(!(cs_flags & CS_NOKILL))
+		// someone still choosing a vehicle is not in the world yet: nothing can hit them, they block
+		// nothing and they do not telefrag whoever stands on the spawn point
+		const bool choosing = (client->ps_.pm_flags & PMF_VEHICLESELECT) != 0;
+		if( choosing )
+		{
+			ent->r.contents = 0;
+			ent->takedamage_ = false;
+		}
+		else if(!(cs_flags & CS_NOKILL))
 			Game::killBox( ent );
 		SV_LinkEntity (ent);
 	}

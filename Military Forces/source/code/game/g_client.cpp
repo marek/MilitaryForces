@@ -125,6 +125,9 @@ bool SpotWouldTelefrag( GameEntity *spot, int vehicle, bool *freshOccupant )
 	for( int i=0 ; i<num ; i++ )
 	{
 		GameEntity* hit = theLevel.getEntity(touch[i]);
+		// a player still choosing a vehicle does not occupy the spot
+		if ( hit && hit->client_ && (hit->client_->ps_.pm_flags & PMF_VEHICLESELECT) )
+			continue;
 		if ( hit && (hit->client_ || hit->s.eType == ET_MISC_VEHICLE) ) 
 		{
 			if( freshOccupant && hit->client_ && theLevel.time_ - hit->client_->spawnedTime_ < freshTime )
