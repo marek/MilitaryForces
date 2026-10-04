@@ -37,7 +37,7 @@ void SV_Client::netchanFreeQueue()
 	for(netbuf = this->netchan_start_queue_; netbuf; netbuf = next)
 	{
 		next = netbuf->next_;
-		Z_Free(netbuf);
+		Zone::free(netbuf);
 	}
 	
 	this->netchan_start_queue_ = nullptr;
@@ -68,7 +68,7 @@ void SV_Client::netchanTransmitNextInQueue()
 	else
 		Common::dPrintf("#462 Netchan_TransmitNextFragment: remaining queued message\n");
 
-	Z_Free(netbuf);
+	Zone::free(netbuf);
 }
 
 /*
@@ -116,7 +116,7 @@ void SV_Client::netchanTransmit( Message *msg )
 	{
 		SV_Client::Netchan_Buffer *netbuf;
 		Common::dPrintf("#462 SV_Netchan_Transmit: unsent fragments, stacked\n");
-		netbuf = static_cast<SV_Client::Netchan_Buffer *>(Z_Malloc(sizeof(SV_Client::Netchan_Buffer)));
+		netbuf = static_cast<SV_Client::Netchan_Buffer *>(Zone::malloc(sizeof(SV_Client::Netchan_Buffer)));
 		// store the msg, we can't store it encoded, as the encoding depends on stuff we still have to finish sending
 		netbuf->msg_.copy( netbuf->msgBuffer_, sizeof( netbuf->msgBuffer_ ), msg);
 		netbuf->next_ = nullptr;

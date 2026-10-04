@@ -591,7 +591,7 @@ char **System::listFiles( const char *directory, const char *extension, char *fi
 		if (!nfiles)
 			return NULL;
 
-		listCopy = Z_Malloc( ( nfiles + 1 ) * sizeof( *listCopy ) );
+		listCopy = Zone::malloc( ( nfiles + 1 ) * sizeof( *listCopy ) );
 		for ( i = 0 ; i < nfiles ; i++ ) {
 			listCopy[i] = list[i];
 		}
@@ -659,7 +659,7 @@ char **System::listFiles( const char *directory, const char *extension, char *fi
 		return NULL;
 	}
 
-	listCopy = Z_Malloc( ( nfiles + 1 ) * sizeof( *listCopy ) );
+	listCopy = Zone::malloc( ( nfiles + 1 ) * sizeof( *listCopy ) );
 	for ( i = 0 ; i < nfiles ; i++ ) {
 		listCopy[i] = list[i];
 	}
@@ -694,10 +694,10 @@ void System::freeFileList( char **list )
 	}
 
 	for ( i = 0 ; list[i] ; i++ ) {
-		Z_Free( list[i] );
+		Zone::free( list[i] );
 	}
 
-	Z_Free( list );
+	Zone::free( list );
 }
 
 

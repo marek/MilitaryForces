@@ -56,7 +56,7 @@ Winding	* Winding::alloc( int points ) {
 		c_peak_windings = c_active_windings;
 
 	s = sizeof(vec_t)*3*points + sizeof(int);
-	w = static_cast<Winding *>(Z_Malloc (s));
+	w = static_cast<Winding *>(Zone::malloc (s));
 	Com_Memset (w, 0, s); 
 	return w;
 }
@@ -67,7 +67,7 @@ void Winding::free(  ) {
 	*reinterpret_cast<unsigned *>(this) = 0xdeaddead;
 
 	c_active_windings--;
-	Z_Free (this);
+	Zone::free (this);
 }
 
 /*

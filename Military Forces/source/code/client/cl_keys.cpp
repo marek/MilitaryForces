@@ -448,7 +448,7 @@ void EditField::paste() {
 		this->charEvent( cbd[i] );
 	}
 
-	Z_Free( cbd );
+	Zone::free( cbd );
 }
 
 /*
@@ -918,7 +918,7 @@ void Keys::setBinding( int keynum, const char *binding ) {
 
 	// free old bindings
 	if ( keys[ keynum ].binding ) {
-		Z_Free( keys[ keynum ].binding );
+		Zone::free( keys[ keynum ].binding );
 	}
 		
 	// allocate memory for new binding

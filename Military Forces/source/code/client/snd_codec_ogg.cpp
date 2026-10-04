@@ -252,7 +252,7 @@ SoundStream *S_OGG_CodecOpenStream(const char *filename)
 	}
 
 	// alloctate the OggVorbis_File
-	vf = static_cast<OggVorbis_File *>(Z_Malloc(sizeof(OggVorbis_File)));
+	vf = static_cast<OggVorbis_File *>(Zone::malloc(sizeof(OggVorbis_File)));
 	if(!vf)
 	{
 		S_CodecUtilClose(&stream);
@@ -263,7 +263,7 @@ SoundStream *S_OGG_CodecOpenStream(const char *filename)
 	// open the codec with our callbacks and stream as the generic pointer
 	if(ov_open_callbacks(stream, vf, nullptr, 0, S_OGG_Callbacks) != 0)
 	{
-		Z_Free(vf);
+		Zone::free(vf);
 
 		S_CodecUtilClose(&stream);
 
@@ -275,7 +275,7 @@ SoundStream *S_OGG_CodecOpenStream(const char *filename)
 	{
 		ov_clear(vf);
 
-		Z_Free(vf);
+		Zone::free(vf);
 
 		S_CodecUtilClose(&stream);
 
@@ -287,7 +287,7 @@ SoundStream *S_OGG_CodecOpenStream(const char *filename)
 	{
 		ov_clear(vf);
 
-		Z_Free(vf);
+		Zone::free(vf);
 
 		S_CodecUtilClose(&stream);
 
@@ -300,7 +300,7 @@ SoundStream *S_OGG_CodecOpenStream(const char *filename)
 	{
 		ov_clear(vf);
 
-		Z_Free(vf);
+		Zone::free(vf);
 
 		S_CodecUtilClose(&stream);
 
@@ -344,7 +344,7 @@ void S_OGG_CodecCloseStream(SoundStream *stream)
 	ov_clear(static_cast<OggVorbis_File *>(stream->ptr));
 
 	// free the OGG codec control struct
-	Z_Free(stream->ptr);
+	Zone::free(stream->ptr);
 
 	// close the stream
 	S_CodecUtilClose(&stream);

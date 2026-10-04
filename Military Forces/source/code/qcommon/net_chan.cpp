@@ -531,8 +531,8 @@ void Network::flushPacketQueue()
 			packetQueue->to);
 		last = packetQueue;
 		packetQueue = packetQueue->next;
-		Z_Free(last->data);
-		Z_Free(last);
+		Zone::free(last->data);
+		Zone::free(last);
 	}
 }
 

@@ -121,7 +121,7 @@ void SV_SetConfigstring( int index, const char *val )
 		return;
 
 	// change the string in sv
-	Z_Free( theSV.configstrings_[index] );
+	Zone::free( theSV.configstrings_[index] );
 	theSV.configstrings_[index] = CopyString( val );
 
 	// send it to all the clients if we aren't
@@ -295,7 +295,7 @@ void SV_Startup()
 
 	SV_BoundMaxClients( 1 );
 
-	//theSVS.clients_ = reinterpret_cast<SV_Client*>(Z_Malloc (sizeof(SV_Client) * sv_maxclients->integer ));
+	//theSVS.clients_ = reinterpret_cast<SV_Client*>(Zone::malloc (sizeof(SV_Client) * sv_maxclients->integer ));
 	theSVS.initClients(sv_maxclients->integer);	// initializes clients to 0 (will be allocated once they join)
 	theSVS.numSnapshotEntities_ = sv_maxclients->integer * 2 * MAX_SNAPSHOT_ENTITIES;
 	theSVS.initialized_ = true;
@@ -360,7 +360,7 @@ void SV_ClearServer()
 	{
 		if ( theSV.configstrings_[i] )
 		{
-			Z_Free( theSV.configstrings_[i] );
+			Zone::free( theSV.configstrings_[i] );
 		}
 	}
 	theSV.clear();
@@ -777,7 +777,7 @@ void SV_Shutdown( const char *finalmsg )
 
 	// free server static data
 //	if( theSVS.clients_ ) 
-//		Z_Free( theSVS.clients_ );
+//		Zone::free( theSVS.clients_ );
 //	theSVS.clearClients();// done in theSVS.clear()
 
 ///	Com_Memset( &svs, 0, sizeof( svs ) );

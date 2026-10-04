@@ -43,7 +43,7 @@ void *BotImport_GetMemory(int size)
 {
 	void *ptr;
 
-	ptr = Z_TagMalloc( size, TAG_BOTLIB );
+	ptr = Zone::tagMalloc( size, TAG_BOTLIB );
 	return ptr;
 }
 
@@ -54,7 +54,7 @@ BotImport_FreeMemory
 */
 void BotImport_FreeMemory(void *ptr) 
 {
-	Z_Free(ptr);
+	Zone::free(ptr);
 }
 
 /*

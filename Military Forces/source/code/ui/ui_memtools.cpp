@@ -1,4 +1,5 @@
 #include "ui_memtools.h"
+#include "../game/q_shared.h"
 #include <memory>
 #include <cstring>
 
@@ -12,7 +13,6 @@
 void *BotImport_GetMemory(int size);
 void *BotImport_HunkAlloc( int size );
 void BotImport_FreeMemory(void *ptr);
-int Z_AvailableMemory( );
 
 
 
@@ -75,6 +75,6 @@ UI_Memtools::freeMemory( void *ptr )
 int 
 UI_Memtools::availableMemory()
 {
-	return Z_AvailableMemory();
+	return Zone::availableMemory();
 }
 

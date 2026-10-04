@@ -732,7 +732,7 @@ void ServerMain::rehashBans_f()
 			return;
 		}
 
-		curpos = textbuf = static_cast<char *>(Z_Malloc(filelen));
+		curpos = textbuf = static_cast<char *>(Zone::malloc(filelen));
 		
 		filelen = FileSystem::read(textbuf, filelen, readfrom);
 		FileSystem::fCloseFile(readfrom);
@@ -780,7 +780,7 @@ void ServerMain::rehashBans_f()
 			
 		serverBansCount = index;
 		
-		Z_Free(textbuf);
+		Zone::free(textbuf);
 	}
 }
 

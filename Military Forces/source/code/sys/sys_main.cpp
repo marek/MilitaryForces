@@ -156,7 +156,7 @@ char *System::getClipboardData()
 		if ( cliptext[0] != '\0' ) {
 			size_t bufsize = strlen( cliptext ) + 1;
 
-			data = static_cast<char *>(Z_Malloc( bufsize ));
+			data = static_cast<char *>(Zone::malloc( bufsize ));
 			Q_strncpyz( data, cliptext, bufsize );
 
 			// find first listed char and set to '\0'

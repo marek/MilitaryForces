@@ -1650,4 +1650,6 @@ int ahextoi( const char* string );
 
 #include "../qcommon/common.h"
 
+#include "../qcommon/zone.h"
+
 #endif	// __Q_SHARED_H

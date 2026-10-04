@@ -733,13 +733,7 @@ temp file loading
 #endif
 
 // debug builds record who asked for each block (the calling function, file and line); release builds ignore it
-void *Z_TagMalloc( int size, int tag, const std::source_location& at = std::source_location::current() );	// NOT 0 filled memory
-void *Z_Malloc( int size, const std::source_location& at = std::source_location::current() );			// returns 0 filled memory
 void *S_Malloc( int size, const std::source_location& at = std::source_location::current() );			// NOT 0 filled memory only for small allocations
-void Z_Free( void *ptr );
-void Z_FreeTags( int tag );
-int Z_AvailableMemory( );
-void Z_LogHeap( );
 
 void Hunk_Clear( );
 void Hunk_ClearToMark( );

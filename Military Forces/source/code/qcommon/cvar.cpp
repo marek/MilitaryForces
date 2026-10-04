@@ -349,7 +349,7 @@ cvar_t *CvarSystem::get( const char *var_name, const char *var_value, int flags 
 		if(var->flags & CVAR_USER_CREATED)
 		{
 			var->flags &= ~CVAR_USER_CREATED;
-			Z_Free( var->resetString );
+			Zone::free( var->resetString );
 			var->resetString = CopyString( var_value );
 
 			if(flags & CVAR_ROM)
@@ -358,7 +358,7 @@ cvar_t *CvarSystem::get( const char *var_name, const char *var_value, int flags 
 				// so force it to value given by the engine.
 
 				if(var->latchedString)
-					Z_Free(var->latchedString);
+					Zone::free(var->latchedString);
 				
 				var->latchedString = CopyString(var_value);
 			}
@@ -381,7 +381,7 @@ cvar_t *CvarSystem::get( const char *var_name, const char *var_value, int flags 
 		// only allow one non-empty reset string without a warning
 		if ( !var->resetString[0] ) {
 			// we don't have a reset string yet
-			Z_Free( var->resetString );
+			Zone::free( var->resetString );
 			var->resetString = CopyString( var_value );
 		} else if ( var_value[0] && strcmp( var->resetString, var_value ) ) {
 			Common::dPrintf( "Warning: cvar \"%s\" given initial values: \"%s\" and \"%s\"\n",
@@ -394,7 +394,7 @@ cvar_t *CvarSystem::get( const char *var_name, const char *var_value, int flags 
 			s = var->latchedString;
 			var->latchedString = nullptr;	// otherwise cvar_set2 would free it
 			CvarSystem::set2( var_name, s, true );
-			Z_Free( s );
+			Zone::free( s );
 		}
 
 		// ZOID--needs to be set so that cvars the game sets as 
@@ -539,7 +539,7 @@ cvar_t *CvarSystem::set2( const char *var_name, const char *value, bool force ) 
 	{
 		if(!strcmp(value, var->string))
 		{
-			Z_Free(var->latchedString);
+			Zone::free(var->latchedString);
 			var->latchedString = nullptr;
 			return var;
 		}
@@ -579,7 +579,7 @@ cvar_t *CvarSystem::set2( const char *var_name, const char *value, bool force ) 
 			{
 				if (strcmp(value, var->latchedString) == 0)
 					return var;
-				Z_Free (var->latchedString);
+				Zone::free (var->latchedString);
 			}
 			else
 			{
@@ -598,7 +598,7 @@ cvar_t *CvarSystem::set2( const char *var_name, const char *value, bool force ) 
 	{
 		if (var->latchedString)
 		{
-			Z_Free (var->latchedString);
+			Zone::free (var->latchedString);
 			var->latchedString = nullptr;
 		}
 	}
@@ -609,7 +609,7 @@ cvar_t *CvarSystem::set2( const char *var_name, const char *value, bool force ) 
 	var->modified = true;
 	var->modificationCount++;
 	
-	Z_Free (var->string);	// free the old value string
+	Zone::free (var->string);	// free the old value string
 	
 	var->string = CopyString(value);
 	var->value = atof (var->string);
@@ -729,7 +729,7 @@ void CvarSystem::setCheatState()
 			// because of a different var->latchedString
 			if (var->latchedString)
 			{
-				Z_Free(var->latchedString);
+				Zone::free(var->latchedString);
 				var->latchedString = nullptr;
 			}
 			if (strcmp(var->resetString,var->string))
@@ -1118,15 +1118,15 @@ cvar_t *CvarSystem::unset(cvar_t *cv)
 	modifiedFlags |= cv->flags;
 
 	if(cv->name)
-		Z_Free(cv->name);
+		Zone::free(cv->name);
 	if(cv->string)
-		Z_Free(cv->string);
+		Zone::free(cv->string);
 	if(cv->latchedString)
-		Z_Free(cv->latchedString);
+		Zone::free(cv->latchedString);
 	if(cv->resetString)
-		Z_Free(cv->resetString);
+		Zone::free(cv->resetString);
 	if(cv->description)
-		Z_Free(cv->description);
+		Zone::free(cv->description);
 
 	if(cv->prev)
 		cv->prev->next = cv->next;
@@ -1307,7 +1307,7 @@ void CvarSystem::setDescription( cvar_t *var, const char *var_description )
 	{
 		if( var->description != nullptr )
 		{
-			Z_Free( var->description );
+			Zone::free( var->description );
 		}
 		var->description = CopyString( var_description );
 	}

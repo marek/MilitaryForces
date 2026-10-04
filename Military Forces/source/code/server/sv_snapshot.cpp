@@ -852,7 +852,7 @@ void SV_Client::writeVoipToClient( Message *msg )
 	        		msg->writeData( packet->data, packet->len);
                         }
 
-			Z_Free(packet);
+			Zone::free(packet);
 		}
 
 		this->queuedVoipPackets_ -= i;

@@ -3233,7 +3233,7 @@ CL_RefMalloc
 ============
 */
 void *CL_RefMalloc( int size ) {
-	return Z_TagMalloc( size, TAG_RENDERER );
+	return Zone::tagMalloc( size, TAG_RENDERER );
 }
 
 int CL_ScaledMilliseconds() {
@@ -3291,7 +3291,7 @@ void CL_InitRef( ) {
 	ri.Error = Common::error;
 	ri.Milliseconds = CL_ScaledMilliseconds;
 	ri.Malloc = CL_RefMalloc;
-	ri.Free = Z_Free;
+	ri.Free = Zone::free;
 	ri.Hunk_AllocAt = Hunk_Alloc;
 	ri.Hunk_AllocateTempMemory = Hunk_AllocateTempMemory;
 	ri.Hunk_FreeTempMemory = Hunk_FreeTempMemory;

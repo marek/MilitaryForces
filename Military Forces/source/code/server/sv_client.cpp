@@ -579,7 +579,7 @@ void SV_Client::free()
 	{
 		index %= ARRAY_LEN(this->voipPacket_);
 		
-		Z_Free(this->voipPacket_[index]);
+		Zone::free(this->voipPacket_[index]);
 	}
 	
 	this->queuedVoipPackets_ = 0;
@@ -821,7 +821,7 @@ void SV_Client::closeDownload()
 	{
 		if (this->downloadBlocks_[i]) 
 		{
-			Z_Free( this->downloadBlocks_[i] );
+			Zone::free( this->downloadBlocks_[i] );
 			this->downloadBlocks_[i] = nullptr;
 		}
 	}
@@ -1049,7 +1049,7 @@ int SV_Client::writeDownloadToClient( Message *msg )
 		curindex = (this->downloadCurrentBlock_ % MAX_DOWNLOAD_WINDOW);
 
 		if (!this->downloadBlocks_[curindex])
-			this->downloadBlocks_[curindex] = static_cast<unsigned char *>(Z_Malloc(MAX_DOWNLOAD_BLKSIZE));
+			this->downloadBlocks_[curindex] = static_cast<unsigned char *>(Zone::malloc(MAX_DOWNLOAD_BLKSIZE));
 
 		this->downloadBlockSize_[curindex] = FileSystem::read( this->downloadBlocks_[curindex], MAX_DOWNLOAD_BLKSIZE, this->download_ );
 
@@ -1903,7 +1903,7 @@ void SV_Client::userVoip( Message *msg, bool ignoreData )
 			continue;  // no room for another packet right now.
 		}
 
-		packet = static_cast<voipServerPacket_t *>(Z_Malloc(sizeof(*packet)));
+		packet = static_cast<voipServerPacket_t *>(Zone::malloc(sizeof(*packet)));
 		packet->sender = sender;
 		packet->frames = frames;
 		packet->len = packetsize;

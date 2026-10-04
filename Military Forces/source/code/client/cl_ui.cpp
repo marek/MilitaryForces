@@ -606,7 +606,7 @@ void GetClipboardData( char *buf, int buflen ) {
 
 	Q_strncpyz( buf, cbd, buflen );
 
-	Z_Free( cbd );
+	Zone::free( cbd );
 }
 
 /*

@@ -690,8 +690,8 @@ void	CommandSystem::removeCommand( const char *cmd_name ) {
 		}
 		if ( !strcmp( cmd_name, cmd->name ) ) {
 			*back = cmd->next;
-			Z_Free (cmd->name);
-			Z_Free (cmd);
+			Zone::free (cmd->name);
+			Zone::free (cmd);
 			return;
 		}
 		back = &cmd->next;

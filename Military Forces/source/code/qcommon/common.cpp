@@ -825,19 +825,19 @@ static int Z_AvailableZoneMemory( memzone_t *zone ) {
 
 /*
 ========================
-Z_AvailableMemory
+Zone::availableMemory
 ========================
 */
-int Z_AvailableMemory( ) {
+int Zone::availableMemory( ) {
 	return Z_AvailableZoneMemory( mainzone );
 }
 
 /*
 ========================
-Z_Free
+Zone::free
 ========================
 */
-void Z_Free( void *ptr ) {
+void Zone::free( void *ptr ) {
 	memblock_t	*block, *other;
 	memzone_t *zone;
 	
@@ -902,10 +902,10 @@ void Z_Free( void *ptr ) {
 
 /*
 ================
-Z_FreeTags
+Zone::freeTags
 ================
 */
-void Z_FreeTags( int tag ) {
+void Zone::freeTags( int tag ) {
 	memzone_t	*zone;
 
 	if ( tag == TAG_SMALL ) {
@@ -915,11 +915,11 @@ void Z_FreeTags( int tag ) {
 		zone = mainzone;
 	}
 	// use the rover as our pointer, because
-	// Z_Free automatically adjusts it
+	// Zone::free automatically adjusts it
 	zone->rover = zone->blocklist.next;
 	do {
 		if ( zone->rover->tag == tag ) {
-			Z_Free( reinterpret_cast<void *>(zone->rover + 1) );
+			Zone::free( reinterpret_cast<void *>(zone->rover + 1) );
 			continue;
 		}
 		zone->rover = zone->rover->next;
@@ -929,10 +929,10 @@ void Z_FreeTags( int tag ) {
 
 /*
 ================
-Z_TagMalloc
+Zone::tagMalloc
 ================
 */
-void *Z_TagMalloc( int size, int tag, const std::source_location& at ) {
+void *Zone::tagMalloc( int size, int tag, const std::source_location& at ) {
 #ifdef ZONE_DEBUG
 	// debug builds record who asked for each block: the calling function, file and line
 	const char *label = at.function_name();
@@ -973,7 +973,7 @@ void *Z_TagMalloc( int size, int tag, const std::source_location& at ) {
 		if (rover == start)	{
 			// scaned all the way around the list
 #ifdef ZONE_DEBUG
-			Z_LogHeap();
+			Zone::logHeap();
 
 			Common::error(ERR_FATAL, "Z_Malloc: failed on allocation of %i bytes from the %s zone: %s, line: %d (%s)",
 								size, zone == smallzone ? "small" : "main", file, line, label);
@@ -1029,22 +1029,22 @@ void *Z_TagMalloc( int size, int tag, const std::source_location& at ) {
 
 /*
 ========================
-Z_Malloc
+Zone::malloc
 ========================
 */
-void *Z_Malloc( int size, const std::source_location& at ) {
+void *Zone::malloc( int size, const std::source_location& at ) {
 	void	*buf;
 	
   //Z_CheckHeap ();	// DEBUG
 
-	buf = Z_TagMalloc( size, TAG_GENERAL, at );
+	buf = Zone::tagMalloc( size, TAG_GENERAL, at );
 	Com_Memset( buf, 0, size );
 
 	return buf;
 }
 
 void *S_Malloc( int size, const std::source_location& at ) {
-	return Z_TagMalloc( size, TAG_SMALL, at );
+	return Zone::tagMalloc( size, TAG_SMALL, at );
 }
 
 /*
@@ -1128,10 +1128,10 @@ void Z_LogZoneHeap( memzone_t *zone, char *name ) {
 
 /*
 ========================
-Z_LogHeap
+Zone::logHeap
 ========================
 */
-void Z_LogHeap( ) {
+void Zone::logHeap( ) {
 	Z_LogZoneHeap( mainzone, "MAIN" );
 	Z_LogZoneHeap( smallzone, "SMALL" );
 }
@@ -1566,7 +1566,7 @@ void Com_InitHunkMemory( ) {
 
 	CommandSystem::addCommand( "meminfo", Com_Meminfo_f );
 #ifdef ZONE_DEBUG
-	CommandSystem::addCommand( "zonelog", Z_LogHeap );
+	CommandSystem::addCommand( "zonelog", Zone::logHeap );
 #endif
 #ifdef HUNK_DEBUG
 	CommandSystem::addCommand( "hunklog", Hunk_Log );
@@ -1773,13 +1773,13 @@ void *Hunk_AllocateTempMemory( int size ) {
 	void		*buf;
 	hunkHeader_t	*hdr;
 
-	// return a Z_Malloc'd block if the hunk has not been initialized
+	// return a Zone::malloc'd block if the hunk has not been initialized
 	// this allows the config and product id files ( journal files too ) to be loaded
 	// by the file system without redunant routines in the file system utilizing different 
 	// memory systems
 	if ( s_hunkData == nullptr )
 	{
-		return Z_Malloc(size);
+		return Zone::malloc(size);
 	}
 
 	Hunk_SwapBanks();
@@ -1821,13 +1821,13 @@ Hunk_FreeTempMemory
 void Hunk_FreeTempMemory( void *buf ) {
 	hunkHeader_t	*hdr;
 
-	  // free with Z_Free if the hunk has not been initialized
+	  // free with Zone::free if the hunk has not been initialized
 	  // this allows the config and product id files ( journal files too ) to be loaded
 	  // by the file system without redunant routines in the file system utilizing different 
 	  // memory systems
 	if ( s_hunkData == nullptr )
 	{
-		Z_Free(buf);
+		Zone::free(buf);
 		return;
 	}
 
@@ -1966,7 +1966,7 @@ void Common::queueEvent( int time, sysEventType_t type, int value, int value2, i
 		// we are discarding an event, but don't leak memory
 		if ( ev->evPtr )
 		{
-			Z_Free( ev->evPtr );
+			Zone::free( ev->evPtr );
 		}
 		eventTail++;
 	}
@@ -2012,7 +2012,7 @@ sysEvent_t Common::getSystemEvent( )
 		int   len;
 
 		len = strlen( s ) + 1;
-		b = static_cast<char *>(Z_Malloc( len ));
+		b = static_cast<char *>(Zone::malloc( len ));
 		strcpy( b, s );
 		Common::queueEvent( 0, SE_CONSOLE, 0, 0, len, b );
 	}
@@ -2047,7 +2047,7 @@ sysEvent_t	Com_GetRealEvent( ) {
 			Common::error( ERR_FATAL, "Error reading from journal file" );
 		}
 		if ( ev.evPtrLength ) {
-			ev.evPtr = Z_Malloc( ev.evPtrLength );
+			ev.evPtr = Zone::malloc( ev.evPtrLength );
 			r = FileSystem::read( ev.evPtr, ev.evPtrLength, com_journalFile );
 			if ( r != ev.evPtrLength ) {
 				Common::error( ERR_FATAL, "Error reading from journal file" );
@@ -2111,7 +2111,7 @@ void Com_PushEvent( sysEvent_t *event ) {
 		}
 
 		if ( ev->evPtr ) {
-			Z_Free( ev->evPtr );
+			Zone::free( ev->evPtr );
 		}
 		com_pushedEventsTail++;
 	} else {
@@ -2221,7 +2221,7 @@ int Common::eventLoop( ) {
 
 		// free any block data
 		if ( ev.evPtr ) {
-			Z_Free( ev.evPtr );
+			Zone::free( ev.evPtr );
 		}
 	}
 
