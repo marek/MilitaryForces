@@ -191,7 +191,7 @@ CL_AddCgameCommand
 */
 void CL_AddCgameCommand( const char *cmdName ) 
 {
-	Cmd_AddCommand( cmdName, nullptr );
+	CommandSystem::addCommand( cmdName, nullptr );
 }
 
 /*
@@ -216,12 +216,12 @@ void CL_ConfigstringModified( ) {
 	gameState_t	oldGs;
 	int			len;
 
-	index = atoi( Cmd_Argv(1) );
+	index = atoi( CommandSystem::argv(1) );
 	if ( index < 0 || index >= MAX_CONFIGSTRINGS ) {
 		Com_Error( ERR_DROP, "CL_ConfigstringModified: bad index %i", index );
 	}
 	// get everything after "cs <num>"
-	s = Cmd_ArgsFrom(2);
+	s = CommandSystem::argsFrom(2);
 
 	old = cl.gameState.stringData + cl.gameState.stringOffsets[ index ];
 	if ( !strcmp( old, s ) ) {
@@ -300,26 +300,26 @@ bool CL_GetServerCommand( int serverCommandNumber ) {
 	Com_DPrintf( "serverCommand: %i : %s\n", serverCommandNumber, s );
 
 rescan:
-	Cmd_TokenizeString( s );
-	cmd = Cmd_Argv(0);
-	argc = Cmd_Argc();
+	CommandSystem::tokenizeString( s );
+	cmd = CommandSystem::argv(0);
+	argc = CommandSystem::argc();
 
 	if ( !strcmp( cmd, "disconnect" ) ) {
 		// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=552
 		// allow server to indicate why they were disconnected
 		if ( argc >= 2 )
-			Com_Error( ERR_SERVERDISCONNECT, "Server disconnected - %s", Cmd_Argv( 1 ) );
+			Com_Error( ERR_SERVERDISCONNECT, "Server disconnected - %s", CommandSystem::argv( 1 ) );
 		else
 			Com_Error( ERR_SERVERDISCONNECT, "Server disconnected" );
 	}
 
 	if ( !strcmp( cmd, "bcs0" ) ) {
-		Com_sprintf( bigConfigString, BIG_INFO_STRING, "cs %s \"%s", Cmd_Argv(1), Cmd_Argv(2) );
+		Com_sprintf( bigConfigString, BIG_INFO_STRING, "cs %s \"%s", CommandSystem::argv(1), CommandSystem::argv(2) );
 		return false;
 	}
 
 	if ( !strcmp( cmd, "bcs1" ) ) {
-		s = Cmd_Argv(2);
+		s = CommandSystem::argv(2);
 		if( strlen(bigConfigString) + strlen(s) >= BIG_INFO_STRING ) {
 			Com_Error( ERR_DROP, "bcs exceeded BIG_INFO_STRING" );
 		}
@@ -328,7 +328,7 @@ rescan:
 	}
 
 	if ( !strcmp( cmd, "bcs2" ) ) {
-		s = Cmd_Argv(2);
+		s = CommandSystem::argv(2);
 		if( strlen(bigConfigString) + strlen(s) + 1 >= BIG_INFO_STRING ) {
 			Com_Error( ERR_DROP, "bcs exceeded BIG_INFO_STRING" );
 		}
@@ -340,8 +340,8 @@ rescan:
 
 	if ( !strcmp( cmd, "cs" ) ) {
 		CL_ConfigstringModified();
-		// reparse the string, because CL_ConfigstringModified may have done another Cmd_TokenizeString()
-		Cmd_TokenizeString( s );
+		// reparse the string, because CL_ConfigstringModified may have done another CommandSystem::tokenizeString()
+		CommandSystem::tokenizeString( s );
 		return true;
 	}
 
@@ -349,8 +349,8 @@ rescan:
 		// clear notify lines and outgoing commands before passing
 		// the restart to the cgame
 		Con_ClearNotify();
-		// reparse the string, because Con_ClearNotify() may have done another Cmd_TokenizeString()
-		Cmd_TokenizeString( s );
+		// reparse the string, because Con_ClearNotify() may have done another CommandSystem::tokenizeString()
+		CommandSystem::tokenizeString( s );
 		Com_Memset( cl.cmds, 0, sizeof( cl.cmds ) );
 		return true;
 	}
@@ -625,7 +625,7 @@ void CL_FirstSnapshot( ) {
 		}
 		clc.voipCodecInitialized = true;
 		clc.voipMuteAll = false;
-		Cmd_AddCommand ("voip", CL_Voip_f);
+		CommandSystem::addCommand ("voip", CL_Voip_f);
 		CvarSystem::set("cl_voipSendTarget", "spatial");
 		Com_Memset(clc.voipTargets, ~0, sizeof(clc.voipTargets));
 	}

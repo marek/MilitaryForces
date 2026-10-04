@@ -363,7 +363,7 @@ do the appropriate things.
 */
 void Com_Quit_f( ) {
 	// don't try to shutdown if we are in a recursive error
-	char *p = Cmd_Args( );
+	char *p = CommandSystem::args( );
 	if ( !com_errorEntered ) {
 		// Some VMs might execute "quit" command directly,
 		// which would trigger an unload of active VM error.
@@ -443,9 +443,9 @@ bool Com_SafeMode( ) {
 	int		i;
 
 	for ( i = 0 ; i < com_numConsoleLines ; i++ ) {
-		Cmd_TokenizeString( com_consoleLines[i] );
-		if ( !Q_stricmp( Cmd_Argv(0), "safe" )
-			|| !Q_stricmp( Cmd_Argv(0), "cvar_restart" ) ) {
+		CommandSystem::tokenizeString( com_consoleLines[i] );
+		if ( !Q_stricmp( CommandSystem::argv(0), "safe" )
+			|| !Q_stricmp( CommandSystem::argv(0), "cvar_restart" ) ) {
 			com_consoleLines[i][0] = 0;
 			return true;
 		}
@@ -470,19 +470,19 @@ void Com_StartupVariable( const char *match ) {
 	char	*s;
 
 	for (i=0 ; i < com_numConsoleLines ; i++) {
-		Cmd_TokenizeString( com_consoleLines[i] );
-		if ( strcmp( Cmd_Argv(0), "set" ) ) {
+		CommandSystem::tokenizeString( com_consoleLines[i] );
+		if ( strcmp( CommandSystem::argv(0), "set" ) ) {
 			continue;
 		}
 
-		s = Cmd_Argv(1);
+		s = CommandSystem::argv(1);
 		
 		if(!match || !strcmp(s, match))
 		{
 			if(CvarSystem::flags(s) == CVAR_NONEXISTENT)
-				CvarSystem::get(s, Cmd_ArgsFrom(2), CVAR_USER_CREATED);
+				CvarSystem::get(s, CommandSystem::argsFrom(2), CVAR_USER_CREATED);
 			else
-				CvarSystem::set2(s, Cmd_ArgsFrom(2), false);
+				CvarSystem::set2(s, CommandSystem::argsFrom(2), false);
 		}
 	}
 }
@@ -1283,7 +1283,7 @@ void Com_Meminfo_f( ) {
 	rendererBytes = 0;
 	zoneBlocks = 0;
 	for (block = mainzone->blocklist.next ; ; block = block->next) {
-		if ( Cmd_Argc() != 1 ) {
+		if ( CommandSystem::argc() != 1 ) {
 			Com_Printf ("block:%p    size:%7i    tag:%3i\n",
 				reinterpret_cast<void *>(block), block->size, block->tag);
 		}
@@ -1576,13 +1576,13 @@ void Com_InitHunkMemory( ) {
 	s_hunkData = (byte *) ( ( (intptr_t)s_hunkData + 31 ) & ~31 );
 	Hunk_Clear();
 
-	Cmd_AddCommand( "meminfo", Com_Meminfo_f );
+	CommandSystem::addCommand( "meminfo", Com_Meminfo_f );
 #ifdef ZONE_DEBUG
-	Cmd_AddCommand( "zonelog", Z_LogHeap );
+	CommandSystem::addCommand( "zonelog", Z_LogHeap );
 #endif
 #ifdef HUNK_DEBUG
-	Cmd_AddCommand( "hunklog", Hunk_Log );
-	Cmd_AddCommand( "hunksmalllog", Hunk_SmallLog );
+	CommandSystem::addCommand( "hunklog", Hunk_Log );
+	CommandSystem::addCommand( "hunksmalllog", Hunk_SmallLog );
 #endif
 }
 
@@ -2272,7 +2272,7 @@ test error shutdown procedures
 =============
 */
 static void Q_NO_RETURN Com_Error_f () {
-	if ( Cmd_Argc() > 1 ) {
+	if ( CommandSystem::argc() > 1 ) {
 		Com_Error( ERR_DROP, "Testing drop error" );
 	} else {
 		Com_Error( ERR_FATAL, "Testing fatal error" );
@@ -2292,11 +2292,11 @@ static void Com_Freeze_f () {
 	float	s;
 	int		start, now;
 
-	if ( Cmd_Argc() != 2 ) {
+	if ( CommandSystem::argc() != 2 ) {
 		Com_Printf( "freeze <seconds>\n" );
 		return;
 	}
-	s = atof( Cmd_Argv(1) );
+	s = atof( CommandSystem::argv(1) );
 
 	start = Com_Milliseconds();
 
@@ -2328,12 +2328,12 @@ For controlling environment variables
 */
 void Com_Setenv_f()
 {
-	int argc = Cmd_Argc();
-	char *arg1 = Cmd_Argv(1);
+	int argc = CommandSystem::argc();
+	char *arg1 = CommandSystem::argv(1);
 
 	if(argc > 2)
 	{
-		char *arg2 = Cmd_ArgsFrom(2);
+		char *arg2 = CommandSystem::argsFrom(2);
 		
 		Sys_SetEnv(arg1, arg2);
 	}
@@ -2434,7 +2434,7 @@ Expose possibility to change current running mod to the user
 
 void Com_GameRestart_f()
 {
-	CvarSystem::set("fs_game", Cmd_Argv(1));
+	CvarSystem::set("fs_game", CommandSystem::argv(1));
 
 	Com_GameRestart(0, true);
 }
@@ -2684,7 +2684,7 @@ void Com_Init( char *commandLine ) {
 	Com_StartupVariable( nullptr );
 
 	Com_InitZoneMemory();
-	Cmd_Init ();
+	CommandSystem::init ();
 
 	// get the developer cvar set as early as possible
 	com_developer = CvarSystem::get("developer", "0", CVAR_TEMP);
@@ -2701,18 +2701,18 @@ void Com_Init( char *commandLine ) {
 	Com_InitJournaling();
 
 	// Add some commands here already so users can use them from config files
-	Cmd_AddCommand ("setenv", Com_Setenv_f);
+	CommandSystem::addCommand ("setenv", Com_Setenv_f);
 	if (com_developer && com_developer->integer)
 	{
-		Cmd_AddCommand ("error", Com_Error_f);
-		Cmd_AddCommand ("crash", Com_Crash_f);
-		Cmd_AddCommand ("freeze", Com_Freeze_f);
+		CommandSystem::addCommand ("error", Com_Error_f);
+		CommandSystem::addCommand ("crash", Com_Crash_f);
+		CommandSystem::addCommand ("freeze", Com_Freeze_f);
 	}
-	Cmd_AddCommand ("quit", Com_Quit_f);
-	Cmd_AddCommand ("changeVectors", MSG_ReportChangeVectors_f );
-	Cmd_AddCommand ("writeconfig", Com_WriteConfig_f );
-	Cmd_SetCommandCompletionFunc( "writeconfig", Cmd_CompleteCfgName );
-	Cmd_AddCommand("game_restart", Com_GameRestart_f);
+	CommandSystem::addCommand ("quit", Com_Quit_f);
+	CommandSystem::addCommand ("changeVectors", MSG_ReportChangeVectors_f );
+	CommandSystem::addCommand ("writeconfig", Com_WriteConfig_f );
+	CommandSystem::setCommandCompletionFunc( "writeconfig", CommandSystem::completeCfgName );
+	CommandSystem::addCommand("game_restart", Com_GameRestart_f);
 
 	Com_ExecuteCfg();
 
@@ -2973,12 +2973,12 @@ Write the config file to a specific name
 void Com_WriteConfig_f( ) {
 	char	filename[MAX_QPATH];
 
-	if ( Cmd_Argc() != 2 ) {
+	if ( CommandSystem::argc() != 2 ) {
 		Com_Printf( "Usage: writeconfig <filename>\n" );
 		return;
 	}
 
-	Q_strncpyz( filename, Cmd_Argv(1), sizeof( filename ) );
+	Q_strncpyz( filename, CommandSystem::argv(1), sizeof( filename ) );
 	COM_DefaultExtension( filename, sizeof( filename ), ".cfg" );
 
 	if (!COM_CompareExtension(filename, ".cfg"))
@@ -3469,8 +3469,8 @@ void Field_CompleteCommand( char *cmd,
 	// Skip leading whitespace and quotes
 	cmd = Com_SkipCharset( cmd, " \"" );
 
-	Cmd_TokenizeStringIgnoreQuotes( cmd );
-	completionArgument = Cmd_Argc( );
+	CommandSystem::tokenizeStringIgnoreQuotes( cmd );
+	completionArgument = CommandSystem::argc( );
 
 	// If there is trailing whitespace on the cmd
 	if( *( cmd + strlen( cmd ) - 1 ) == ' ' )
@@ -3479,7 +3479,7 @@ void Field_CompleteCommand( char *cmd,
 		completionArgument++;
 	}
 	else
-		completionString = Cmd_Argv( completionArgument - 1 );
+		completionString = CommandSystem::argv( completionArgument - 1 );
 
 #ifndef DEDICATED
 	// add a '\' to the start of the buffer if it might be sent as chat otherwise
@@ -3505,7 +3505,7 @@ void Field_CompleteCommand( char *cmd,
 
 	if( completionArgument > 1 )
 	{
-		const char *baseCmd = Cmd_Argv( 0 );
+		const char *baseCmd = CommandSystem::argv( 0 );
 		char *p;
 
 #ifndef DEDICATED
@@ -3517,7 +3517,7 @@ void Field_CompleteCommand( char *cmd,
 		if( ( p = Field_FindFirstSeparator( cmd ) ) )
 			Field_CompleteCommand( p + 1, true, true ); // Compound command
 		else
-			Cmd_CompleteArgument( baseCmd, cmd, completionArgument ); 
+			CommandSystem::completeArgument( baseCmd, cmd, completionArgument ); 
 	}
 	else
 	{
@@ -3531,7 +3531,7 @@ void Field_CompleteCommand( char *cmd,
 			return;
 
 		if( doCommands )
-			Cmd_CommandCompletion( FindMatches );
+			CommandSystem::commandCompletion( FindMatches );
 
 		if( doCvars )
 			CvarSystem::commandCompletion( FindMatches );
@@ -3540,7 +3540,7 @@ void Field_CompleteCommand( char *cmd,
 		{
 			// run through again, printing matches
 			if( doCommands )
-				Cmd_CommandCompletion( PrintMatches );
+				CommandSystem::commandCompletion( PrintMatches );
 
 			if( doCvars )
 				CvarSystem::commandCompletion( PrintCvarMatches );

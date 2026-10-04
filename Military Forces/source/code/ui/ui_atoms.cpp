@@ -38,7 +38,7 @@ void UI_StartDemoLoop( ) {
 char *UI_Argv( int arg ) {
 	static char	buffer[MAX_STRING_CHARS];
 
-	Cmd_ArgvBuffer( arg, buffer, sizeof( buffer ) );
+	CommandSystem::argvBuffer( arg, buffer, sizeof( buffer ) );
 
 	return buffer;
 }
@@ -300,7 +300,7 @@ bool UI_ConsoleCommand( int realTime ) {
 	}
 
 	if ( Q_stricmp (cmd, "remapShader") == 0 ) {
-		if (Cmd_Argc() == 4) {
+		if (CommandSystem::argc() == 4) {
 			char shader1[MAX_QPATH];
 			char shader2[MAX_QPATH];
 			Q_strncpyz(shader1, UI_Argv(1), sizeof(shader1));

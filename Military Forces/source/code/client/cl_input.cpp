@@ -79,7 +79,7 @@ void IN_KeyDown( kbutton_t *b ) {
 	int		k;
 	char	*c;
 	
-	c = Cmd_Argv(1);
+	c = CommandSystem::argv(1);
 	if ( c[0] ) {
 		k = atoi(c);
 	} else {
@@ -104,7 +104,7 @@ void IN_KeyDown( kbutton_t *b ) {
 	}
 
 	// save timestamp for partial frame summing
-	c = Cmd_Argv(2);
+	c = CommandSystem::argv(2);
 	b->downtime = atoi(c);
 
 	b->active = true;
@@ -116,7 +116,7 @@ void IN_KeyUp( kbutton_t *b ) {
 	char	*c;
 	unsigned	uptime;
 
-	c = Cmd_Argv(1);
+	c = CommandSystem::argv(1);
 	if ( c[0] ) {
 		k = atoi(c);
 	} else {
@@ -140,7 +140,7 @@ void IN_KeyUp( kbutton_t *b ) {
 	b->active = false;
 
 	// save timestamp for partial frame summing
-	c = Cmd_Argv(2);
+	c = CommandSystem::argv(2);
 	uptime = atoi(c);
 	if ( uptime ) {
 		b->msec += uptime - b->downtime;
@@ -937,70 +937,70 @@ CL_InitInput
 ============
 */
 void CL_InitInput( ) {
-	Cmd_AddCommand ("centerview",IN_CenterView);
+	CommandSystem::addCommand ("centerview",IN_CenterView);
 
-	Cmd_AddCommand ("+moveup",IN_UpDown);
-	Cmd_AddCommand ("-moveup",IN_UpUp);
-	Cmd_AddCommand ("+movedown",IN_DownDown);
-	Cmd_AddCommand ("-movedown",IN_DownUp);
-	Cmd_AddCommand ("+left",IN_LeftDown);
-	Cmd_AddCommand ("-left",IN_LeftUp);
-	Cmd_AddCommand ("+right",IN_RightDown);
-	Cmd_AddCommand ("-right",IN_RightUp);
-	Cmd_AddCommand ("+forward",IN_ForwardDown);
-	Cmd_AddCommand ("-forward",IN_ForwardUp);
-	Cmd_AddCommand ("+back",IN_BackDown);
-	Cmd_AddCommand ("-back",IN_BackUp);
-	Cmd_AddCommand ("+lookup", IN_LookupDown);
-	Cmd_AddCommand ("-lookup", IN_LookupUp);
-	Cmd_AddCommand ("+lookdown", IN_LookdownDown);
-	Cmd_AddCommand ("-lookdown", IN_LookdownUp);
-	Cmd_AddCommand ("+strafe", IN_StrafeDown);
-	Cmd_AddCommand ("-strafe", IN_StrafeUp);
-	Cmd_AddCommand ("+moveleft", IN_MoveleftDown);
-	Cmd_AddCommand ("-moveleft", IN_MoveleftUp);
-	Cmd_AddCommand ("+moveright", IN_MoverightDown);
-	Cmd_AddCommand ("-moveright", IN_MoverightUp);
-	Cmd_AddCommand ("+speed", IN_SpeedDown);
-	Cmd_AddCommand ("-speed", IN_SpeedUp);
-	Cmd_AddCommand ("+attack", IN_Button0Down);
-	Cmd_AddCommand ("-attack", IN_Button0Up);
-	Cmd_AddCommand ("+button0", IN_Button0Down);
-	Cmd_AddCommand ("-button0", IN_Button0Up);
-	Cmd_AddCommand ("+button1", IN_Button1Down);
-	Cmd_AddCommand ("-button1", IN_Button1Up);
-	Cmd_AddCommand ("+button2", IN_Button2Down);
-	Cmd_AddCommand ("-button2", IN_Button2Up);
-	Cmd_AddCommand ("+button3", IN_Button3Down);
-	Cmd_AddCommand ("-button3", IN_Button3Up);
-	Cmd_AddCommand ("+button4", IN_Button4Down);
-	Cmd_AddCommand ("-button4", IN_Button4Up);
-	Cmd_AddCommand ("+button5", IN_Button5Down);
-	Cmd_AddCommand ("-button5", IN_Button5Up);
-	Cmd_AddCommand ("+button6", IN_Button6Down);
-	Cmd_AddCommand ("-button6", IN_Button6Up);
-	Cmd_AddCommand ("+button7", IN_Button7Down);
-	Cmd_AddCommand ("-button7", IN_Button7Up);
-	Cmd_AddCommand ("+button8", IN_Button8Down);
-	Cmd_AddCommand ("-button8", IN_Button8Up);
-	Cmd_AddCommand ("+button9", IN_Button9Down);
-	Cmd_AddCommand ("-button9", IN_Button9Up);
-	Cmd_AddCommand ("+button10", IN_Button10Down);
-	Cmd_AddCommand ("-button10", IN_Button10Up);
-	Cmd_AddCommand ("+button11", IN_Button11Down);
-	Cmd_AddCommand ("-button11", IN_Button11Up);
-	Cmd_AddCommand ("+button12", IN_Button12Down);
-	Cmd_AddCommand ("-button12", IN_Button12Up);
-	Cmd_AddCommand ("+button13", IN_Button13Down);
-	Cmd_AddCommand ("-button13", IN_Button13Up);
-	Cmd_AddCommand ("+button14", IN_Button14Down);
-	Cmd_AddCommand ("-button14", IN_Button14Up);
-	Cmd_AddCommand ("+mlook", IN_MLookDown);
-	Cmd_AddCommand ("-mlook", IN_MLookUp);
+	CommandSystem::addCommand ("+moveup",IN_UpDown);
+	CommandSystem::addCommand ("-moveup",IN_UpUp);
+	CommandSystem::addCommand ("+movedown",IN_DownDown);
+	CommandSystem::addCommand ("-movedown",IN_DownUp);
+	CommandSystem::addCommand ("+left",IN_LeftDown);
+	CommandSystem::addCommand ("-left",IN_LeftUp);
+	CommandSystem::addCommand ("+right",IN_RightDown);
+	CommandSystem::addCommand ("-right",IN_RightUp);
+	CommandSystem::addCommand ("+forward",IN_ForwardDown);
+	CommandSystem::addCommand ("-forward",IN_ForwardUp);
+	CommandSystem::addCommand ("+back",IN_BackDown);
+	CommandSystem::addCommand ("-back",IN_BackUp);
+	CommandSystem::addCommand ("+lookup", IN_LookupDown);
+	CommandSystem::addCommand ("-lookup", IN_LookupUp);
+	CommandSystem::addCommand ("+lookdown", IN_LookdownDown);
+	CommandSystem::addCommand ("-lookdown", IN_LookdownUp);
+	CommandSystem::addCommand ("+strafe", IN_StrafeDown);
+	CommandSystem::addCommand ("-strafe", IN_StrafeUp);
+	CommandSystem::addCommand ("+moveleft", IN_MoveleftDown);
+	CommandSystem::addCommand ("-moveleft", IN_MoveleftUp);
+	CommandSystem::addCommand ("+moveright", IN_MoverightDown);
+	CommandSystem::addCommand ("-moveright", IN_MoverightUp);
+	CommandSystem::addCommand ("+speed", IN_SpeedDown);
+	CommandSystem::addCommand ("-speed", IN_SpeedUp);
+	CommandSystem::addCommand ("+attack", IN_Button0Down);
+	CommandSystem::addCommand ("-attack", IN_Button0Up);
+	CommandSystem::addCommand ("+button0", IN_Button0Down);
+	CommandSystem::addCommand ("-button0", IN_Button0Up);
+	CommandSystem::addCommand ("+button1", IN_Button1Down);
+	CommandSystem::addCommand ("-button1", IN_Button1Up);
+	CommandSystem::addCommand ("+button2", IN_Button2Down);
+	CommandSystem::addCommand ("-button2", IN_Button2Up);
+	CommandSystem::addCommand ("+button3", IN_Button3Down);
+	CommandSystem::addCommand ("-button3", IN_Button3Up);
+	CommandSystem::addCommand ("+button4", IN_Button4Down);
+	CommandSystem::addCommand ("-button4", IN_Button4Up);
+	CommandSystem::addCommand ("+button5", IN_Button5Down);
+	CommandSystem::addCommand ("-button5", IN_Button5Up);
+	CommandSystem::addCommand ("+button6", IN_Button6Down);
+	CommandSystem::addCommand ("-button6", IN_Button6Up);
+	CommandSystem::addCommand ("+button7", IN_Button7Down);
+	CommandSystem::addCommand ("-button7", IN_Button7Up);
+	CommandSystem::addCommand ("+button8", IN_Button8Down);
+	CommandSystem::addCommand ("-button8", IN_Button8Up);
+	CommandSystem::addCommand ("+button9", IN_Button9Down);
+	CommandSystem::addCommand ("-button9", IN_Button9Up);
+	CommandSystem::addCommand ("+button10", IN_Button10Down);
+	CommandSystem::addCommand ("-button10", IN_Button10Up);
+	CommandSystem::addCommand ("+button11", IN_Button11Down);
+	CommandSystem::addCommand ("-button11", IN_Button11Up);
+	CommandSystem::addCommand ("+button12", IN_Button12Down);
+	CommandSystem::addCommand ("-button12", IN_Button12Up);
+	CommandSystem::addCommand ("+button13", IN_Button13Down);
+	CommandSystem::addCommand ("-button13", IN_Button13Up);
+	CommandSystem::addCommand ("+button14", IN_Button14Down);
+	CommandSystem::addCommand ("-button14", IN_Button14Up);
+	CommandSystem::addCommand ("+mlook", IN_MLookDown);
+	CommandSystem::addCommand ("-mlook", IN_MLookUp);
 
 #ifdef USE_VOIP
-	Cmd_AddCommand ("+voiprecord", IN_VoipRecordDown);
-	Cmd_AddCommand ("-voiprecord", IN_VoipRecordUp);
+	CommandSystem::addCommand ("+voiprecord", IN_VoipRecordDown);
+	CommandSystem::addCommand ("-voiprecord", IN_VoipRecordUp);
 #endif
 
 	cl_nodelta = CvarSystem::get ("cl_nodelta", "0", 0);
@@ -1014,69 +1014,69 @@ CL_ShutdownInput
 */
 void CL_ShutdownInput()
 {
-	Cmd_RemoveCommand("centerview");
+	CommandSystem::removeCommand("centerview");
 
-	Cmd_RemoveCommand("+moveup");
-	Cmd_RemoveCommand("-moveup");
-	Cmd_RemoveCommand("+movedown");
-	Cmd_RemoveCommand("-movedown");
-	Cmd_RemoveCommand("+left");
-	Cmd_RemoveCommand("-left");
-	Cmd_RemoveCommand("+right");
-	Cmd_RemoveCommand("-right");
-	Cmd_RemoveCommand("+forward");
-	Cmd_RemoveCommand("-forward");
-	Cmd_RemoveCommand("+back");
-	Cmd_RemoveCommand("-back");
-	Cmd_RemoveCommand("+lookup");
-	Cmd_RemoveCommand("-lookup");
-	Cmd_RemoveCommand("+lookdown");
-	Cmd_RemoveCommand("-lookdown");
-	Cmd_RemoveCommand("+strafe");
-	Cmd_RemoveCommand("-strafe");
-	Cmd_RemoveCommand("+moveleft");
-	Cmd_RemoveCommand("-moveleft");
-	Cmd_RemoveCommand("+moveright");
-	Cmd_RemoveCommand("-moveright");
-	Cmd_RemoveCommand("+speed");
-	Cmd_RemoveCommand("-speed");
-	Cmd_RemoveCommand("+attack");
-	Cmd_RemoveCommand("-attack");
-	Cmd_RemoveCommand("+button0");
-	Cmd_RemoveCommand("-button0");
-	Cmd_RemoveCommand("+button1");
-	Cmd_RemoveCommand("-button1");
-	Cmd_RemoveCommand("+button2");
-	Cmd_RemoveCommand("-button2");
-	Cmd_RemoveCommand("+button3");
-	Cmd_RemoveCommand("-button3");
-	Cmd_RemoveCommand("+button4");
-	Cmd_RemoveCommand("-button4");
-	Cmd_RemoveCommand("+button5");
-	Cmd_RemoveCommand("-button5");
-	Cmd_RemoveCommand("+button6");
-	Cmd_RemoveCommand("-button6");
-	Cmd_RemoveCommand("+button7");
-	Cmd_RemoveCommand("-button7");
-	Cmd_RemoveCommand("+button8");
-	Cmd_RemoveCommand("-button8");
-	Cmd_RemoveCommand("+button9");
-	Cmd_RemoveCommand("-button9");
-	Cmd_RemoveCommand("+button10");
-	Cmd_RemoveCommand("-button10");
-	Cmd_RemoveCommand("+button11");
-	Cmd_RemoveCommand("-button11");
-	Cmd_RemoveCommand("+button12");
-	Cmd_RemoveCommand("-button12");
-	Cmd_RemoveCommand("+button13");
-	Cmd_RemoveCommand("-button13");
-	Cmd_RemoveCommand("+button14");
-	Cmd_RemoveCommand("-button14");
-	Cmd_RemoveCommand("+mlook");
-	Cmd_RemoveCommand("-mlook");
+	CommandSystem::removeCommand("+moveup");
+	CommandSystem::removeCommand("-moveup");
+	CommandSystem::removeCommand("+movedown");
+	CommandSystem::removeCommand("-movedown");
+	CommandSystem::removeCommand("+left");
+	CommandSystem::removeCommand("-left");
+	CommandSystem::removeCommand("+right");
+	CommandSystem::removeCommand("-right");
+	CommandSystem::removeCommand("+forward");
+	CommandSystem::removeCommand("-forward");
+	CommandSystem::removeCommand("+back");
+	CommandSystem::removeCommand("-back");
+	CommandSystem::removeCommand("+lookup");
+	CommandSystem::removeCommand("-lookup");
+	CommandSystem::removeCommand("+lookdown");
+	CommandSystem::removeCommand("-lookdown");
+	CommandSystem::removeCommand("+strafe");
+	CommandSystem::removeCommand("-strafe");
+	CommandSystem::removeCommand("+moveleft");
+	CommandSystem::removeCommand("-moveleft");
+	CommandSystem::removeCommand("+moveright");
+	CommandSystem::removeCommand("-moveright");
+	CommandSystem::removeCommand("+speed");
+	CommandSystem::removeCommand("-speed");
+	CommandSystem::removeCommand("+attack");
+	CommandSystem::removeCommand("-attack");
+	CommandSystem::removeCommand("+button0");
+	CommandSystem::removeCommand("-button0");
+	CommandSystem::removeCommand("+button1");
+	CommandSystem::removeCommand("-button1");
+	CommandSystem::removeCommand("+button2");
+	CommandSystem::removeCommand("-button2");
+	CommandSystem::removeCommand("+button3");
+	CommandSystem::removeCommand("-button3");
+	CommandSystem::removeCommand("+button4");
+	CommandSystem::removeCommand("-button4");
+	CommandSystem::removeCommand("+button5");
+	CommandSystem::removeCommand("-button5");
+	CommandSystem::removeCommand("+button6");
+	CommandSystem::removeCommand("-button6");
+	CommandSystem::removeCommand("+button7");
+	CommandSystem::removeCommand("-button7");
+	CommandSystem::removeCommand("+button8");
+	CommandSystem::removeCommand("-button8");
+	CommandSystem::removeCommand("+button9");
+	CommandSystem::removeCommand("-button9");
+	CommandSystem::removeCommand("+button10");
+	CommandSystem::removeCommand("-button10");
+	CommandSystem::removeCommand("+button11");
+	CommandSystem::removeCommand("-button11");
+	CommandSystem::removeCommand("+button12");
+	CommandSystem::removeCommand("-button12");
+	CommandSystem::removeCommand("+button13");
+	CommandSystem::removeCommand("-button13");
+	CommandSystem::removeCommand("+button14");
+	CommandSystem::removeCommand("-button14");
+	CommandSystem::removeCommand("+mlook");
+	CommandSystem::removeCommand("-mlook");
 
 #ifdef USE_VOIP
-	Cmd_RemoveCommand("+voiprecord");
-	Cmd_RemoveCommand("-voiprecord");
+	CommandSystem::removeCommand("+voiprecord");
+	CommandSystem::removeCommand("-voiprecord");
 #endif
 }

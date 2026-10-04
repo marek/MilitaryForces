@@ -35,7 +35,7 @@ void CG_TargetCommand_f( ) {
 		return;
 	}
 
-	Cmd_ArgvBuffer( 1, test, 4 );
+	CommandSystem::argvBuffer( 1, test, 4 );
 	CommandBuffer::addText( va( "gc %i %i", targetNum, atoi( test ) ) );
 }
 
@@ -120,7 +120,7 @@ MFQ3 MFD Mode setting
 static void CG_Set_MFD_Page( int num ) {
 	int page;
 
-	if( Cmd_Argc() < 2 ) {
+	if( CommandSystem::argc() < 2 ) {
 		return;
 	}
 
@@ -273,7 +273,7 @@ static void CG_Set_Camera_Mode_f( ) {
 		return;
 	}
 
-	if( Cmd_Argc() < 2 ) {
+	if( CommandSystem::argc() < 2 ) {
 		return;
 	}
 
@@ -464,7 +464,7 @@ static void CG_TellTarget_f( ) {
 		return;
 	}
 
-	Cmd_ArgsBuffer( message, 128 );
+	CommandSystem::argsBuffer( message, 128 );
 	Com_sprintf( command, 128, "tell %i %s", clientNum, message );
 	CL_AddReliableCommand( command );
 }
@@ -479,7 +479,7 @@ static void CG_TellAttacker_f( ) {
 		return;
 	}
 
-	Cmd_ArgsBuffer( message, 128 );
+	CommandSystem::argsBuffer( message, 128 );
 	Com_sprintf( command, 128, "tell %i %s", clientNum, message );
 	CL_AddReliableCommand( command );
 }
@@ -495,7 +495,7 @@ static void CG_TestGV_f( ) {
 static void CG_Spawn_GI_f( ) {
 	int idx;
 
-	if( Cmd_Argc() < 2 ) return;
+	if( CommandSystem::argc() < 2 ) return;
 
 	idx = atoi( CG_Argv(1) );
 
@@ -509,7 +509,7 @@ static void CG_Spawn_GI_f( ) {
 }
 
 static void CG_ExportToScript_f( ) {
-	if( Cmd_Argc() < 2 ) 
+	if( CommandSystem::argc() < 2 ) 
 	{
 		CG_Printf("Scriptname not specified!");
 		return;
@@ -524,7 +524,7 @@ static void CG_SetSide_f( ) {
 }
 
 static void CG_ImportScript_f( ) {
-	if( Cmd_Argc() < 2 )
+	if( CommandSystem::argc() < 2 )
 	{
 		CG_Printf("Scriptname not specified!");
 		return;
@@ -676,7 +676,7 @@ static consoleCommand_t	commands[] = {
 CG_ConsoleCommand
 
 The string has been tokenized and can be retrieved with
-Cmd_Argc() / Cmd_Argv()
+CommandSystem::argc() / CommandSystem::argv()
 =================
 */
 bool CG_ConsoleCommand( ) {

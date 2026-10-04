@@ -971,16 +971,16 @@ void Key_Unbind_f ()
 {
 	int		b;
 
-	if (Cmd_Argc() != 2)
+	if (CommandSystem::argc() != 2)
 	{
 		Com_Printf ("unbind <key> : remove commands from a key\n");
 		return;
 	}
 	
-	b = Key_StringToKeynum (Cmd_Argv(1));
+	b = Key_StringToKeynum (CommandSystem::argv(1));
 	if (b==-1)
 	{
-		Com_Printf ("\"%s\" isn't a valid key\n", Cmd_Argv(1));
+		Com_Printf ("\"%s\" isn't a valid key\n", CommandSystem::argv(1));
 		return;
 	}
 
@@ -1012,17 +1012,17 @@ void Key_Bind_f ()
 	int			i, c, b;
 	char		cmd[1024];
 	
-	c = Cmd_Argc();
+	c = CommandSystem::argc();
 
 	if (c < 2)
 	{
 		Com_Printf ("bind <key> [command] : attach a command to a key\n");
 		return;
 	}
-	b = Key_StringToKeynum (Cmd_Argv(1));
+	b = Key_StringToKeynum (CommandSystem::argv(1));
 	if (b==-1)
 	{
-		Com_Printf ("\"%s\" isn't a valid key\n", Cmd_Argv(1));
+		Com_Printf ("\"%s\" isn't a valid key\n", CommandSystem::argv(1));
 		return;
 	}
 
@@ -1039,7 +1039,7 @@ void Key_Bind_f ()
 	cmd[0] = 0;		// start out with a null string
 	for (i=2 ; i< c ; i++)
 	{
-		strcat (cmd, Cmd_Argv(i));
+		strcat (cmd, CommandSystem::argv(i));
 		if (i != (c-1))
 			strcat (cmd, " ");
 	}
@@ -1148,12 +1148,12 @@ CL_InitKeyCommands
 */
 void CL_InitKeyCommands( ) {
 	// register our functions
-	Cmd_AddCommand ("bind",Key_Bind_f);
-	Cmd_SetCommandCompletionFunc( "bind", Key_CompleteBind );
-	Cmd_AddCommand ("unbind",Key_Unbind_f);
-	Cmd_SetCommandCompletionFunc( "unbind", Key_CompleteUnbind );
-	Cmd_AddCommand ("unbindall",Key_Unbindall_f);
-	Cmd_AddCommand ("bindlist",Key_Bindlist_f);
+	CommandSystem::addCommand ("bind",Key_Bind_f);
+	CommandSystem::setCommandCompletionFunc( "bind", Key_CompleteBind );
+	CommandSystem::addCommand ("unbind",Key_Unbind_f);
+	CommandSystem::setCommandCompletionFunc( "unbind", Key_CompleteUnbind );
+	CommandSystem::addCommand ("unbindall",Key_Unbindall_f);
+	CommandSystem::addCommand ("bindlist",Key_Bindlist_f);
 }
 
 /*

@@ -1593,7 +1593,7 @@ void NET_Init( ) {
 
 	NET_Config( true );
 	
-	Cmd_AddCommand ("net_restart", NET_Restart_f);
+	CommandSystem::addCommand ("net_restart", NET_Restart_f);
 }
 
 

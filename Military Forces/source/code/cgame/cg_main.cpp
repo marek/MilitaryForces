@@ -470,7 +470,7 @@ const char *CG_Argv( int arg )
 {
 	static char	buffer[MAX_STRING_CHARS];
 
-	Cmd_ArgvBuffer( arg, buffer, sizeof( buffer ) );
+	CommandSystem::argvBuffer( arg, buffer, sizeof( buffer ) );
 
 	return buffer;
 }

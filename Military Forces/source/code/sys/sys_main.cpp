@@ -359,7 +359,7 @@ Sys_Init
 */
 void Sys_Init()
 {
-	Cmd_AddCommand( "in_restart", Sys_In_Restart_f );
+	CommandSystem::addCommand( "in_restart", Sys_In_Restart_f );
 	CvarSystem::set( "arch", OS_STRING " " ARCH_STRING );
 	CvarSystem::set( "username", Sys_GetCurrentUser( ) );
 }

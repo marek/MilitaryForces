@@ -42,16 +42,16 @@ byte		cmd_text_buf[MAX_CMD_BUFFER];
 
 /*
 ============
-Cmd_Wait_f
+CommandSystem::wait_f
 
 Causes execution of the remainder of the command buffer to be delayed until
 next frame.  This allows commands like:
 bind g "cmd use rocket ; +attack ; wait ; -attack ; cmd use blaster"
 ============
 */
-void Cmd_Wait_f( ) {
-	if ( Cmd_Argc() == 2 ) {
-		cmd_wait = atoi( Cmd_Argv( 1 ) );
+void CommandSystem::wait_f( ) {
+	if ( CommandSystem::argc() == 2 ) {
+		cmd_wait = atoi( CommandSystem::argv( 1 ) );
 		if ( cmd_wait < 0 )
 			cmd_wait = 1; // ignore the argument
 	} else {
@@ -147,7 +147,7 @@ void CommandBuffer::executeText (int exec_when, const char *text)
 	case EXEC_NOW:
 		if (text && strlen(text) > 0) {
 			Com_DPrintf(S_COLOR_YELLOW "EXEC_NOW %s\n", text);
-			Cmd_ExecuteString (text);
+			CommandSystem::executeString (text);
 		} else {
 			CommandBuffer::execute();
 			Com_DPrintf(S_COLOR_YELLOW "EXEC_NOW %s\n", cmd_text.data);
@@ -245,7 +245,7 @@ void CommandBuffer::execute ()
 
 // execute the command line
 
-		Cmd_ExecuteString (line);		
+		CommandSystem::executeString (line);		
 	}
 }
 
@@ -261,10 +261,10 @@ void CommandBuffer::execute ()
 
 /*
 ===============
-Cmd_Exec_f
+CommandSystem::exec_f
 ===============
 */
-void Cmd_Exec_f( ) {
+void CommandSystem::exec_f( ) {
 	bool quiet;
 	union {
 		char	*c;
@@ -272,15 +272,15 @@ void Cmd_Exec_f( ) {
 	} f;
 	char	filename[MAX_QPATH];
 
-	quiet = !Q_stricmp(Cmd_Argv(0), "execq");
+	quiet = !Q_stricmp(CommandSystem::argv(0), "execq");
 
-	if (Cmd_Argc () != 2) {
+	if (CommandSystem::argc () != 2) {
 		Com_Printf ("exec%s <filename> : execute a script file%s\n",
 		            quiet ? "q" : "", quiet ? " without notification" : "");
 		return;
 	}
 
-	Q_strncpyz( filename, Cmd_Argv(1), sizeof( filename ) );
+	Q_strncpyz( filename, CommandSystem::argv(1), sizeof( filename ) );
 	COM_DefaultExtension( filename, sizeof( filename ), ".cfg" );
 	FS_ReadFile( filename, &f.v);
 	if (!f.c) {
@@ -298,34 +298,34 @@ void Cmd_Exec_f( ) {
 
 /*
 ===============
-Cmd_Vstr_f
+CommandSystem::vstr_f
 
 Inserts the current value of a variable as command text
 ===============
 */
-void Cmd_Vstr_f( ) {
+void CommandSystem::vstr_f( ) {
 	char	*v;
 
-	if (Cmd_Argc () != 2) {
+	if (CommandSystem::argc () != 2) {
 		Com_Printf ("vstr <variablename> : execute a variable command\n");
 		return;
 	}
 
-	v = CvarSystem::variableString( Cmd_Argv( 1 ) );
+	v = CvarSystem::variableString( CommandSystem::argv( 1 ) );
 	CommandBuffer::insertText( va("%s\n", v ) );
 }
 
 
 /*
 ===============
-Cmd_Echo_f
+CommandSystem::echo_f
 
 Just prints the rest of the line to the console
 ===============
 */
-void Cmd_Echo_f ()
+void CommandSystem::echo_f ()
 {
-	Com_Printf ("%s\n", Cmd_Args());
+	Com_Printf ("%s\n", CommandSystem::args());
 }
 
 
@@ -356,19 +356,19 @@ static	cmd_function_t	*cmd_functions;		// possible commands to execute
 
 /*
 ============
-Cmd_Argc
+CommandSystem::argc
 ============
 */
-int		Cmd_Argc( ) {
+int		CommandSystem::argc( ) {
 	return cmd_argc;
 }
 
 /*
 ============
-Cmd_Argv
+CommandSystem::argv
 ============
 */
-char	*Cmd_Argv( int arg ) {
+char	*CommandSystem::argv( int arg ) {
 	if ( static_cast<unsigned>(arg) >= cmd_argc ) {
 		return "";
 	}
@@ -377,25 +377,25 @@ char	*Cmd_Argv( int arg ) {
 
 /*
 ============
-Cmd_ArgvBuffer
+CommandSystem::argvBuffer
 
 The interpreted versions use this because
 they can't have pointers returned to them
 ============
 */
-void	Cmd_ArgvBuffer( int arg, char *buffer, int bufferLength ) {
-	Q_strncpyz( buffer, Cmd_Argv( arg ), bufferLength );
+void	CommandSystem::argvBuffer( int arg, char *buffer, int bufferLength ) {
+	Q_strncpyz( buffer, CommandSystem::argv( arg ), bufferLength );
 }
 
 
 /*
 ============
-Cmd_Args
+CommandSystem::args
 
 Returns a single string containing argv(1) to argv(argc()-1)
 ============
 */
-char	*Cmd_Args( ) {
+char	*CommandSystem::args( ) {
 	static	char		cmd_args[MAX_STRING_CHARS];
 	int		i;
 
@@ -412,12 +412,12 @@ char	*Cmd_Args( ) {
 
 /*
 ============
-Cmd_Args
+CommandSystem::args
 
 Returns a single string containing argv(arg) to argv(argc()-1)
 ============
 */
-char *Cmd_ArgsFrom( int arg ) {
+char *CommandSystem::argsFrom( int arg ) {
 	static	char		cmd_args[BIG_INFO_STRING];
 	int		i;
 
@@ -436,26 +436,26 @@ char *Cmd_ArgsFrom( int arg ) {
 
 /*
 ============
-Cmd_ArgsBuffer
+CommandSystem::argsBuffer
 
 The interpreted versions use this because
 they can't have pointers returned to them
 ============
 */
-void	Cmd_ArgsBuffer( char *buffer, int bufferLength ) {
-	Q_strncpyz( buffer, Cmd_Args(), bufferLength );
+void	CommandSystem::argsBuffer( char *buffer, int bufferLength ) {
+	Q_strncpyz( buffer, CommandSystem::args(), bufferLength );
 }
 
 /*
 ============
-Cmd_Cmd
+CommandSystem::cmd
 
 Retrieve the unmodified command string
 For rcon use when you want to transmit without altering quoting
 https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=543
 ============
 */
-char *Cmd_Cmd()
+char *CommandSystem::cmd()
 {
 	return cmd_cmd;
 }
@@ -467,7 +467,7 @@ char *Cmd_Cmd()
    https://bugzilla.icculus.org/show_bug.cgi?id=4769
 */
 
-void Cmd_Args_Sanitize()
+void CommandSystem::args_Sanitize()
 {
 	int i;
 
@@ -487,7 +487,7 @@ void Cmd_Args_Sanitize()
 
 /*
 ============
-Cmd_TokenizeString
+CommandSystem::tokenizeString
 
 Parses the given string into command line tokens.
 The text is copied to a separate buffer and 0 characters
@@ -503,7 +503,7 @@ static void Cmd_TokenizeString2( const char *text_in, bool ignoreQuotes ) {
 
 #ifdef TKN_DBG
   // FIXME TTimo blunt hook to try to find the tokenization of userinfo
-  Com_DPrintf("Cmd_TokenizeString: %s\n", text_in);
+  Com_DPrintf("CommandSystem::tokenizeString: %s\n", text_in);
 #endif
 
 	// clear previous args
@@ -601,28 +601,28 @@ static void Cmd_TokenizeString2( const char *text_in, bool ignoreQuotes ) {
 
 /*
 ============
-Cmd_TokenizeString
+CommandSystem::tokenizeString
 ============
 */
-void Cmd_TokenizeString( const char *text_in ) {
+void CommandSystem::tokenizeString( const char *text_in ) {
 	Cmd_TokenizeString2( text_in, false );
 }
 
 /*
 ============
-Cmd_TokenizeStringIgnoreQuotes
+CommandSystem::tokenizeStringIgnoreQuotes
 ============
 */
-void Cmd_TokenizeStringIgnoreQuotes( const char *text_in ) {
+void CommandSystem::tokenizeStringIgnoreQuotes( const char *text_in ) {
 	Cmd_TokenizeString2( text_in, true );
 }
 
 /*
 ============
-Cmd_FindCommand
+CommandSystem::findCommand
 ============
 */
-cmd_function_t *Cmd_FindCommand( const char *cmd_name )
+cmd_function_t *CommandSystem::findCommand( const char *cmd_name )
 {
 	cmd_function_t *cmd;
 	for( cmd = cmd_functions; cmd; cmd = cmd->next )
@@ -633,18 +633,18 @@ cmd_function_t *Cmd_FindCommand( const char *cmd_name )
 
 /*
 ============
-Cmd_AddCommand
+CommandSystem::addCommand
 ============
 */
-void	Cmd_AddCommand( const char *cmd_name, xcommand_t function ) {
+void	CommandSystem::addCommand( const char *cmd_name, xcommand_t function ) {
 	cmd_function_t	*cmd;
 	
 	// fail if the command already exists
-	if( Cmd_FindCommand( cmd_name ) )
+	if( CommandSystem::findCommand( cmd_name ) )
 	{
 		// allow completion-only commands to be silently doubled
 		if( function != nullptr )
-			Com_Printf( "Cmd_AddCommand: %s already defined\n", cmd_name );
+			Com_Printf( "CommandSystem::addCommand: %s already defined\n", cmd_name );
 		return;
 	}
 
@@ -659,10 +659,10 @@ void	Cmd_AddCommand( const char *cmd_name, xcommand_t function ) {
 
 /*
 ============
-Cmd_SetCommandCompletionFunc
+CommandSystem::setCommandCompletionFunc
 ============
 */
-void Cmd_SetCommandCompletionFunc( const char *command, completionFunc_t complete ) {
+void CommandSystem::setCommandCompletionFunc( const char *command, completionFunc_t complete ) {
 	cmd_function_t	*cmd;
 
 	for( cmd = cmd_functions; cmd; cmd = cmd->next ) {
@@ -675,10 +675,10 @@ void Cmd_SetCommandCompletionFunc( const char *command, completionFunc_t complet
 
 /*
 ============
-Cmd_RemoveCommand
+CommandSystem::removeCommand
 ============
 */
-void	Cmd_RemoveCommand( const char *cmd_name ) {
+void	CommandSystem::removeCommand( const char *cmd_name ) {
 	cmd_function_t	*cmd, **back;
 
 	back = &cmd_functions;
@@ -700,14 +700,14 @@ void	Cmd_RemoveCommand( const char *cmd_name ) {
 
 /*
 ============
-Cmd_RemoveCommandSafe
+CommandSystem::removeCommandSafe
 
 Only remove commands with no associated function
 ============
 */
-void Cmd_RemoveCommandSafe( const char *cmd_name )
+void CommandSystem::removeCommandSafe( const char *cmd_name )
 {
-	cmd_function_t *cmd = Cmd_FindCommand( cmd_name );
+	cmd_function_t *cmd = CommandSystem::findCommand( cmd_name );
 
 	if( !cmd )
 		return;
@@ -718,15 +718,15 @@ void Cmd_RemoveCommandSafe( const char *cmd_name )
 		return;
 	}
 
-	Cmd_RemoveCommand( cmd_name );
+	CommandSystem::removeCommand( cmd_name );
 }
 
 /*
 ============
-Cmd_CommandCompletion
+CommandSystem::commandCompletion
 ============
 */
-void	Cmd_CommandCompletion( void(*callback)(const char *s) ) {
+void	CommandSystem::commandCompletion( void(*callback)(const char *s) ) {
 	cmd_function_t	*cmd;
 	
 	for (cmd=cmd_functions ; cmd ; cmd=cmd->next) {
@@ -736,10 +736,10 @@ void	Cmd_CommandCompletion( void(*callback)(const char *s) ) {
 
 /*
 ============
-Cmd_CompleteArgument
+CommandSystem::completeArgument
 ============
 */
-void Cmd_CompleteArgument( const char *command, char *args, int argNum ) {
+void CommandSystem::completeArgument( const char *command, char *args, int argNum ) {
 	cmd_function_t	*cmd;
 
 	for( cmd = cmd_functions; cmd; cmd = cmd->next ) {
@@ -755,17 +755,17 @@ void Cmd_CompleteArgument( const char *command, char *args, int argNum ) {
 
 /*
 ============
-Cmd_ExecuteString
+CommandSystem::executeString
 
 A complete command line has been parsed, so try to execute it
 ============
 */
-void	Cmd_ExecuteString( const char *text ) {	
+void	CommandSystem::executeString( const char *text ) {	
 	cmd_function_t	*cmd, **prev;
 
 	// execute the command line
-	Cmd_TokenizeString( text );		
-	if ( !Cmd_Argc() ) {
+	CommandSystem::tokenizeString( text );		
+	if ( !CommandSystem::argc() ) {
 		return;		// no tokens
 	}
 
@@ -817,17 +817,17 @@ void	Cmd_ExecuteString( const char *text ) {
 
 /*
 ============
-Cmd_List_f
+CommandSystem::list_f
 ============
 */
-void Cmd_List_f ()
+void CommandSystem::list_f ()
 {
 	cmd_function_t	*cmd;
 	int				i;
 	char			*match;
 
-	if ( Cmd_Argc() > 1 ) {
-		match = Cmd_Argv( 1 );
+	if ( CommandSystem::argc() > 1 ) {
+		match = CommandSystem::argv( 1 );
 	} else {
 		match = nullptr;
 	}
@@ -844,10 +844,10 @@ void Cmd_List_f ()
 
 /*
 ==================
-Cmd_CompleteCfgName
+CommandSystem::completeCfgName
 ==================
 */
-void Cmd_CompleteCfgName( char *args, int argNum ) {
+void CommandSystem::completeCfgName( char *args, int argNum ) {
 	if( argNum == 2 ) {
 		Field_CompleteFilename( "", "cfg", nullptr, false, true );
 	}
@@ -855,18 +855,18 @@ void Cmd_CompleteCfgName( char *args, int argNum ) {
 
 /*
 ============
-Cmd_Init
+CommandSystem::init
 ============
 */
-void Cmd_Init () {
-	Cmd_AddCommand ("cmdlist",Cmd_List_f);
-	Cmd_AddCommand ("exec",Cmd_Exec_f);
-	Cmd_AddCommand ("execq",Cmd_Exec_f);
-	Cmd_SetCommandCompletionFunc( "exec", Cmd_CompleteCfgName );
-	Cmd_SetCommandCompletionFunc( "execq", Cmd_CompleteCfgName );
-	Cmd_AddCommand ("vstr",Cmd_Vstr_f);
-	Cmd_SetCommandCompletionFunc( "vstr", CvarSystem::completeCvarName );
-	Cmd_AddCommand ("echo",Cmd_Echo_f);
-	Cmd_AddCommand ("wait", Cmd_Wait_f);
+void CommandSystem::init () {
+	CommandSystem::addCommand ("cmdlist",CommandSystem::list_f);
+	CommandSystem::addCommand ("exec",CommandSystem::exec_f);
+	CommandSystem::addCommand ("execq",CommandSystem::exec_f);
+	CommandSystem::setCommandCompletionFunc( "exec", CommandSystem::completeCfgName );
+	CommandSystem::setCommandCompletionFunc( "execq", CommandSystem::completeCfgName );
+	CommandSystem::addCommand ("vstr",CommandSystem::vstr_f);
+	CommandSystem::setCommandCompletionFunc( "vstr", CvarSystem::completeCvarName );
+	CommandSystem::addCommand ("echo",CommandSystem::echo_f);
+	CommandSystem::addCommand ("wait", CommandSystem::wait_f);
 }
 

@@ -191,13 +191,13 @@ void Con_Dump_f ()
 	char	*buffer;
 	char	filename[MAX_QPATH];
 
-	if (Cmd_Argc() != 2)
+	if (CommandSystem::argc() != 2)
 	{
 		Com_Printf ("usage: condump <filename>\n");
 		return;
 	}
 
-	Q_strncpyz( filename, Cmd_Argv( 1 ), sizeof( filename ) );
+	Q_strncpyz( filename, CommandSystem::argv( 1 ), sizeof( filename ) );
 	COM_DefaultExtension( filename, sizeof( filename ), ".txt" );
 
 	if (!COM_CompareExtension(filename, ".txt"))
@@ -383,15 +383,15 @@ void Con_Init () {
 	}
 	CL_LoadConsoleHistory( );
 
-	Cmd_AddCommand ("toggleconsole", Con_ToggleConsole_f);
-	Cmd_AddCommand ("togglemenu", Con_ToggleMenu_f);
-	Cmd_AddCommand ("messagemode", Con_MessageMode_f);
-	Cmd_AddCommand ("messagemode2", Con_MessageMode2_f);
-	Cmd_AddCommand ("messagemode3", Con_MessageMode3_f);
-	Cmd_AddCommand ("messagemode4", Con_MessageMode4_f);
-	Cmd_AddCommand ("clear", Con_Clear_f);
-	Cmd_AddCommand ("condump", Con_Dump_f);
-	Cmd_SetCommandCompletionFunc( "condump", Cmd_CompleteTxtName );
+	CommandSystem::addCommand ("toggleconsole", Con_ToggleConsole_f);
+	CommandSystem::addCommand ("togglemenu", Con_ToggleMenu_f);
+	CommandSystem::addCommand ("messagemode", Con_MessageMode_f);
+	CommandSystem::addCommand ("messagemode2", Con_MessageMode2_f);
+	CommandSystem::addCommand ("messagemode3", Con_MessageMode3_f);
+	CommandSystem::addCommand ("messagemode4", Con_MessageMode4_f);
+	CommandSystem::addCommand ("clear", Con_Clear_f);
+	CommandSystem::addCommand ("condump", Con_Dump_f);
+	CommandSystem::setCommandCompletionFunc( "condump", Cmd_CompleteTxtName );
 }
 
 /*
@@ -401,14 +401,14 @@ Con_Shutdown
 */
 void Con_Shutdown()
 {
-	Cmd_RemoveCommand("toggleconsole");
-	Cmd_RemoveCommand("togglemenu");
-	Cmd_RemoveCommand("messagemode");
-	Cmd_RemoveCommand("messagemode2");
-	Cmd_RemoveCommand("messagemode3");
-	Cmd_RemoveCommand("messagemode4");
-	Cmd_RemoveCommand("clear");
-	Cmd_RemoveCommand("condump");
+	CommandSystem::removeCommand("toggleconsole");
+	CommandSystem::removeCommand("togglemenu");
+	CommandSystem::removeCommand("messagemode");
+	CommandSystem::removeCommand("messagemode2");
+	CommandSystem::removeCommand("messagemode3");
+	CommandSystem::removeCommand("messagemode4");
+	CommandSystem::removeCommand("clear");
+	CommandSystem::removeCommand("condump");
 }
 
 /*

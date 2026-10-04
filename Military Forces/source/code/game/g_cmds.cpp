@@ -141,10 +141,10 @@ char	*ConcatArgs( int start )
 	char	arg[MAX_STRING_CHARS];
 
 	len = 0;
-	c = Cmd_Argc();
+	c = CommandSystem::argc();
 	for ( i = start ; i < c ; i++ ) 
 	{
-		Cmd_ArgvBuffer( i, arg, sizeof( arg ) );
+		CommandSystem::argvBuffer( i, arg, sizeof( arg ) );
 		tlen = strlen( arg );
 		if ( len + tlen >= MAX_STRING_CHARS - 1 ) 
 			break;
@@ -329,10 +329,10 @@ void Cmd_TeamTask_f( GameEntity *ent )
 	int task;
 	int client = ent->s.number;// ok ? before: ent->client_ - theLevel.clients_;
 
-	if ( Cmd_Argc() != 2 ) 
+	if ( CommandSystem::argc() != 2 ) 
 		return;
 
-	Cmd_ArgvBuffer( 1, arg, sizeof( arg ) );
+	CommandSystem::argvBuffer( 1, arg, sizeof( arg ) );
 	task = atoi( arg );
 
 	SV_GetUserinfo(client, userinfo, sizeof(userinfo));
@@ -769,7 +769,7 @@ void Cmd_Team_f( GameEntity *ent )
 	ClientBase::eTeam oldTeam;
 	char		s[MAX_TOKEN_CHARS];
 
-	if ( Cmd_Argc() != 2 )
+	if ( CommandSystem::argc() != 2 )
 	{
 		oldTeam = ent->client_->sess_.sessionTeam_;
 		switch ( oldTeam )
@@ -805,7 +805,7 @@ void Cmd_Team_f( GameEntity *ent )
 		ent->client_->sess_.losses_++;
 	}
 
-	Cmd_ArgvBuffer( 1, s, sizeof( s ) );
+	CommandSystem::argvBuffer( 1, s, sizeof( s ) );
 
 	// set team
 	SetTeam( ent, s );
@@ -825,14 +825,14 @@ void Cmd_Follow_f( GameEntity *ent )
 	int		i;
 	char	arg[MAX_TOKEN_CHARS];
 
-	if( Cmd_Argc() != 2 ) 
+	if( CommandSystem::argc() != 2 ) 
 	{
 		if( ent->client_->sess_.spectatorState_ == GameClient::ClientSession::SPECTATOR_FOLLOW ) 
 			StopFollowing( ent );
 		return;
 	}
 
-	Cmd_ArgvBuffer( 1, arg, sizeof( arg ) );
+	CommandSystem::argvBuffer( 1, arg, sizeof( arg ) );
 	i = ClientNumberFromString( ent, arg );
 	if( i == -1 ) 
 		return;
@@ -1015,7 +1015,7 @@ static void Cmd_Say_f( GameEntity *ent, int mode, bool arg0 )
 {
 	char		*p;
 
-	if( Cmd_Argc () < 2 && !arg0 ) 
+	if( CommandSystem::argc () < 2 && !arg0 ) 
 		return;
 
 	if( arg0 )
@@ -1033,12 +1033,12 @@ Cmd_Tell_f
 */
 static void Cmd_Tell_f( GameEntity* ent ) 
 {
-	if( Cmd_Argc () < 2 ) 
+	if( CommandSystem::argc () < 2 ) 
 		return;
 
 	char arg[MAX_TOKEN_CHARS];
 
-	Cmd_ArgvBuffer( 1, arg, sizeof( arg ) );
+	CommandSystem::argvBuffer( 1, arg, sizeof( arg ) );
 	int targetNum = atoi( arg );
 	if( targetNum < 1 || targetNum > theLevel.maxclients_ ) 
 		return;
@@ -1072,9 +1072,9 @@ void Cmd_GameCommand_f( GameEntity *ent )
 {
 	char	str[MAX_TOKEN_CHARS];
 
-	Cmd_ArgvBuffer( 1, str, sizeof( str ) );
+	CommandSystem::argvBuffer( 1, str, sizeof( str ) );
 	int player = atoi( str );
-	Cmd_ArgvBuffer( 2, str, sizeof( str ) );
+	CommandSystem::argvBuffer( 2, str, sizeof( str ) );
 	int order = atoi( str );
 
 	if( player < 1 || player > MAX_CLIENTS ) 
@@ -1140,8 +1140,8 @@ void Cmd_CallVote_f( GameEntity *ent )
 	char	arg2[MAX_STRING_TOKENS];
 
 	// make sure it is a valid command to vote on
-	Cmd_ArgvBuffer( 1, arg1, sizeof( arg1 ) );
-	Cmd_ArgvBuffer( 2, arg2, sizeof( arg2 ) );
+	CommandSystem::argvBuffer( 1, arg1, sizeof( arg1 ) );
+	CommandSystem::argvBuffer( 2, arg2, sizeof( arg2 ) );
 
 	// check for command separators in arg2
 	for( char *c = arg2; *c; ++c) {
@@ -1302,7 +1302,7 @@ void Cmd_Vote_f( GameEntity *ent )
 
 	ent->client_->ps_.eFlags |= EF_VOTED;
 
-	Cmd_ArgvBuffer( 1, msg, sizeof( msg ) );
+	CommandSystem::argvBuffer( 1, msg, sizeof( msg ) );
 
 	if( tolower( msg[0] ) == 'y' || msg[0] == '1' )
 	{
@@ -1362,14 +1362,14 @@ void Cmd_CallTeamVote_f( GameEntity *ent )
 	char	arg2[MAX_STRING_TOKENS];
 
 	// make sure it is a valid command to vote on
-	Cmd_ArgvBuffer( 1, arg1, sizeof( arg1 ) );
+	CommandSystem::argvBuffer( 1, arg1, sizeof( arg1 ) );
 	arg2[0] = '\0';
 	int i;
-	for( i = 2; i < Cmd_Argc(); i++ ) 
+	for( i = 2; i < CommandSystem::argc(); i++ ) 
 	{
 		if( i > 2 )
 			strcat(arg2, " ");
-		Cmd_ArgvBuffer( i, &arg2[strlen(arg2)], sizeof( arg2 ) - strlen(arg2) );
+		CommandSystem::argvBuffer( i, &arg2[strlen(arg2)], sizeof( arg2 ) - strlen(arg2) );
 	}
 
 	// check for command separators in arg2
@@ -1513,7 +1513,7 @@ void Cmd_TeamVote_f( GameEntity *ent )
 
 	ent->client_->ps_.eFlags |= EF_TEAMVOTED;
 
-	Cmd_ArgvBuffer( 1, msg, sizeof( msg ) );
+	CommandSystem::argvBuffer( 1, msg, sizeof( msg ) );
 
 	if( tolower( msg[0] ) == 'y' || msg[0] == '1' ) 
 	{
@@ -1822,7 +1822,7 @@ void Cmd_ME_Spawn_f( GameEntity *ent )
 	int		idx;
 	char	arg1[MAX_STRING_TOKENS];
 
-	Cmd_ArgvBuffer( 1, arg1, sizeof( arg1 ) );
+	CommandSystem::argvBuffer( 1, arg1, sizeof( arg1 ) );
 
 	idx = atoi(arg1);
 	if( idx < 0 || idx >= bg_numberOfVehicles ) 
@@ -1842,7 +1842,7 @@ void Cmd_ME_SpawnGI_f( GameEntity *ent )
 	int		idx;
 	char	arg1[MAX_STRING_TOKENS];
 
-	Cmd_ArgvBuffer( 1, arg1, sizeof( arg1 ) );
+	CommandSystem::argvBuffer( 1, arg1, sizeof( arg1 ) );
 
 	idx = atoi(arg1);
 	if( idx < 0 || idx >= bg_numberOfGroundInstallations ) 
@@ -1865,7 +1865,7 @@ void ClientCommand( int clientNum )
 	if( !ent || !ent->client_ ) 
 		return;		// not fully in game yet
 
-	Cmd_ArgvBuffer( 0, cmd, sizeof( cmd ) );
+	CommandSystem::argvBuffer( 0, cmd, sizeof( cmd ) );
 
 	if( Q_stricmp( cmd, "say") == 0 ) 
 	{

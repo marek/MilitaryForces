@@ -503,7 +503,7 @@ static void CG_PrintExtractExtra( )
 CG_ServerCommand
 
 The string has been tokenized and can be retrieved with
-Cmd_Argc() / Cmd_Argv()
+CommandSystem::argc() / CommandSystem::argv()
 =================
 */
 static void CG_ServerCommand( ) {
@@ -568,7 +568,7 @@ static void CG_ServerCommand( ) {
 	}
 
   if ( Q_stricmp (cmd, "remapShader") == 0 ) {
-		if (Cmd_Argc() == 4) {
+		if (CommandSystem::argc() == 4) {
 			refExport.RemapShader(CG_Argv(1), CG_Argv(2), CG_Argv(3));
 		}
 	}
@@ -581,7 +581,7 @@ static void CG_ServerCommand( ) {
 	}
 
 	if( !strcmp( cmd, "me_spawnvehicle" ) ) {
-		if( Cmd_Argc() == 2 ) {
+		if( CommandSystem::argc() == 2 ) {
 			int idx = atoi(CG_Argv(1));
 			ME_SpawnVehicle(idx);
 		}
@@ -589,7 +589,7 @@ static void CG_ServerCommand( ) {
 	}
 
 	if( !strcmp( cmd, "me_spawnvehiclegi" ) ) {
-		if( Cmd_Argc() == 2 ) {
+		if( CommandSystem::argc() == 2 ) {
 			int idx = atoi(CG_Argv(1));
 			ME_SpawnGroundInstallation(idx);
 		}

@@ -58,14 +58,14 @@ void CG_TestModel_f () {
 	vec3_t		angles;
 
 	memset( &cg.testModelEntity, 0, sizeof(cg.testModelEntity) );
-	if ( Cmd_Argc() < 2 ) {
+	if ( CommandSystem::argc() < 2 ) {
 		return;
 	}
 
 	Q_strncpyz (cg.testModelName, CG_Argv( 1 ), MAX_QPATH );
 	cg.testModelEntity.hModel = refExport.RegisterModel( cg.testModelName );
 
-	if ( Cmd_Argc() == 3 ) {
+	if ( CommandSystem::argc() == 3 ) {
 		cg.testModelEntity.backlerp = atof( CG_Argv( 2 ) );
 		cg.testModelEntity.frame = 1;
 		cg.testModelEntity.oldframe = 0;
@@ -326,7 +326,7 @@ void CG_TestVehicle (long cat) {
 		memset( &cg.testVehicleParts[i], 0, sizeof(cg.testVehicleParts[i]) );
 	}
 
-	if ( Cmd_Argc() < 2 ) {
+	if ( CommandSystem::argc() < 2 ) {
 		return;
 	}
 
@@ -334,7 +334,7 @@ void CG_TestVehicle (long cat) {
 
 	registerTestVehicle();
 
-/*	if ( Cmd_Argc() == 3 ) {
+/*	if ( CommandSystem::argc() == 3 ) {
 		cg.testModelEntity.backlerp = atof( CG_Argv( 2 ) );
 		cg.testModelEntity.frame = 1;
 		cg.testModelEntity.oldframe = 0;
@@ -365,7 +365,7 @@ void CG_TestPlaneCmd_f () {
 		return;
 	}
 
-	if ( Cmd_Argc() < 2 ) {
+	if ( CommandSystem::argc() < 2 ) {
 		return;
 	}
 
@@ -430,7 +430,7 @@ void CG_TestGVCmd_f () {
 		return;
 	}
 
-	if ( Cmd_Argc() < 2 ) {
+	if ( CommandSystem::argc() < 2 ) {
 		return;
 	}
 

@@ -222,12 +222,12 @@ void Svcmd_AddIP_f ()
 {
 	char		str[MAX_TOKEN_CHARS];
 
-	if ( Cmd_Argc() < 2 ) {
+	if ( CommandSystem::argc() < 2 ) {
 		Com_Printf("Usage:  addip <ip-mask>\n");
 		return;
 	}
 
-	Cmd_ArgvBuffer( 1, str, sizeof( str ) );
+	CommandSystem::argvBuffer( 1, str, sizeof( str ) );
 
 	AddIP( str );
 
@@ -244,12 +244,12 @@ void Svcmd_RemoveIP_f ()
 	int			i;
 	char		str[MAX_TOKEN_CHARS];
 
-	if ( Cmd_Argc() < 2 ) {
+	if ( CommandSystem::argc() < 2 ) {
 		Com_Printf("Usage:  sv removeip <ip-mask>\n");
 		return;
 	}
 
-	Cmd_ArgvBuffer( 1, str, sizeof( str ) );
+	CommandSystem::argvBuffer( 1, str, sizeof( str ) );
 
 	if (!StringToFilter (str, &f))
 		return;
@@ -396,13 +396,13 @@ void Svcmd_ForceTeam_f()
 	char		str[MAX_TOKEN_CHARS];
 
 	// find the player
-	Cmd_ArgvBuffer( 1, str, sizeof( str ) );
+	CommandSystem::argvBuffer( 1, str, sizeof( str ) );
 	cl = ClientForString( str );
 	if ( !cl ) 
 		return;
 
 	// set the team
-	Cmd_ArgvBuffer( 2, str, sizeof( str ) );
+	CommandSystem::argvBuffer( 2, str, sizeof( str ) );
 	SetTeam( theLevel.getEntity(cl->ps_.clientNum), str );// &g_entities[cl - level.clients], str );
 }
 
@@ -418,7 +418,7 @@ bool ConsoleCommand()
 {
 	char	cmd[MAX_TOKEN_CHARS];
 
-	Cmd_ArgvBuffer( 0, cmd, sizeof( cmd ) );
+	CommandSystem::argvBuffer( 0, cmd, sizeof( cmd ) );
 
 	if ( Q_stricmp (cmd, "entitylist") == 0 ) 
 	{

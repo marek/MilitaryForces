@@ -250,7 +250,7 @@ void CL_UpdateVoipGain(const char *idstr, float gain)
 
 void CL_Voip_f( )
 {
-	const char *cmd = Cmd_Argv(1);
+	const char *cmd = CommandSystem::argv(1);
 	const char *reason = nullptr;
 
 	if (clc.state != CA_ACTIVE)
@@ -268,14 +268,14 @@ void CL_Voip_f( )
 	}
 
 	if (strcmp(cmd, "ignore") == 0) {
-		CL_UpdateVoipIgnore(Cmd_Argv(2), true);
+		CL_UpdateVoipIgnore(CommandSystem::argv(2), true);
 	} else if (strcmp(cmd, "unignore") == 0) {
-		CL_UpdateVoipIgnore(Cmd_Argv(2), false);
+		CL_UpdateVoipIgnore(CommandSystem::argv(2), false);
 	} else if (strcmp(cmd, "gain") == 0) {
-		if (Cmd_Argc() > 3) {
-			CL_UpdateVoipGain(Cmd_Argv(2), atof(Cmd_Argv(3)));
-		} else if (Q_isanumber(Cmd_Argv(2))) {
-			int id = atoi(Cmd_Argv(2));
+		if (CommandSystem::argc() > 3) {
+			CL_UpdateVoipGain(CommandSystem::argv(2), atof(CommandSystem::argv(3)));
+		} else if (Q_isanumber(CommandSystem::argv(2))) {
+			int id = atoi(CommandSystem::argv(2));
 			if (id >= 0 && id < MAX_CLIENTS) {
 				Com_Printf("VoIP: current gain for player #%d "
 					"is %f\n", id, clc.voipGain[id]);
@@ -702,7 +702,7 @@ void CL_Record_f( ) {
 	entityState_t	nullstate;
 	char		*s;
 
-	if ( Cmd_Argc() > 2 ) {
+	if ( CommandSystem::argc() > 2 ) {
 		Com_Printf ("record <demoname>\n");
 		return;
 	}
@@ -728,8 +728,8 @@ void CL_Record_f( ) {
 		Com_Printf (S_COLOR_YELLOW "WARNING: You should set 'g_synchronousClients 1' for smoother demo recording\n");
 	}
 
-	if ( Cmd_Argc() == 2 ) {
-		s = Cmd_Argv(1);
+	if ( CommandSystem::argc() == 2 ) {
+		s = CommandSystem::argv(1);
 		Q_strncpyz( demoName, s, sizeof( demoName ) );
 #ifdef LEGACY_PROTOCOL
 		if(clc.compat)
@@ -1082,7 +1082,7 @@ void CL_PlayDemo_f( ) {
 	int			protocol, i;
 	char		retry[MAX_OSPATH];
 
-	if (Cmd_Argc() != 2) {
+	if (CommandSystem::argc() != 2) {
 		Com_Printf ("demo <demoname>\n");
 		return;
 	}
@@ -1092,7 +1092,7 @@ void CL_PlayDemo_f( ) {
 	CvarSystem::set( "sv_killserver", "2" );
 
 	// open the demo file
-	Q_strncpyz( arg, Cmd_Argv(1), sizeof( arg ) );
+	Q_strncpyz( arg, CommandSystem::argv(1), sizeof( arg ) );
 	
 	CL_Disconnect( true );
 
@@ -1425,7 +1425,7 @@ void CL_Disconnect( bool showMainMenu ) {
 		}
 		clc.voipCodecInitialized = false;
 	}
-	Cmd_RemoveCommand ("voip");
+	CommandSystem::removeCommand ("voip");
 #endif
 
 	if ( clc.demofile ) {
@@ -1499,7 +1499,7 @@ so when they are typed in at the console, they will need to be forwarded.
 void CL_ForwardCommandToServer( const char *string ) {
 	char	*cmd;
 
-	cmd = Cmd_Argv(0);
+	cmd = CommandSystem::argv(0);
 
 	// ignore key up commands
 	if ( cmd[0] == '-' ) {
@@ -1511,7 +1511,7 @@ void CL_ForwardCommandToServer( const char *string ) {
 		return;
 	}
 
-	if ( Cmd_Argc() > 1 ) {
+	if ( CommandSystem::argc() > 1 ) {
 		CL_AddReliableCommand(string, false);
 	} else {
 		CL_AddReliableCommand(cmd, false);
@@ -1657,8 +1657,8 @@ void CL_ForwardToServer_f( ) {
 	}
 	
 	// don't forward the first argument
-	if ( Cmd_Argc() > 1 ) {
-		CL_AddReliableCommand(Cmd_Args(), false);
+	if ( CommandSystem::argc() > 1 ) {
+		CL_AddReliableCommand(CommandSystem::args(), false);
 	}
 }
 
@@ -1698,7 +1698,7 @@ CL_Connect_f
 void CL_Connect_f( ) {
 	char	server[MAX_OSPATH];
 	const char	*serverString;
-	int argc = Cmd_Argc();
+	int argc = CommandSystem::argc();
 	netadrtype_t family = NA_UNSPEC;
 
 	if ( argc != 2 && argc != 3 ) {
@@ -1707,21 +1707,21 @@ void CL_Connect_f( ) {
 	}
 	
 	if(argc == 2)
-		Q_strncpyz( server, Cmd_Argv(1), sizeof( server ) );
+		Q_strncpyz( server, CommandSystem::argv(1), sizeof( server ) );
 	else
 	{
-		if(!strcmp(Cmd_Argv(1), "-4"))
+		if(!strcmp(CommandSystem::argv(1), "-4"))
 			family = NA_IP;
-		else if(!strcmp(Cmd_Argv(1), "-6"))
+		else if(!strcmp(CommandSystem::argv(1), "-6"))
 			family = NA_IP6;
 		else
 			Com_Printf( "warning: only -4 or -6 as address type understood.\n");
 		
-		Q_strncpyz( server, Cmd_Argv(2), sizeof( server ) );
+		Q_strncpyz( server, CommandSystem::argv(2), sizeof( server ) );
 	}
 
 	// save arguments for reconnect
-	Q_strncpyz( cl_reconnectArgs, Cmd_Args(), sizeof( cl_reconnectArgs ) );
+	Q_strncpyz( cl_reconnectArgs, CommandSystem::args(), sizeof( cl_reconnectArgs ) );
 
 	CvarSystem::set("ui_singlePlayerActive", "0");
 
@@ -1877,7 +1877,7 @@ void CL_Rcon_f( ) {
 	Q_strcat (message, MAX_RCON_MESSAGE, " ");
 
 	// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=543
-	Q_strcat (message, MAX_RCON_MESSAGE, Cmd_Cmd()+5);
+	Q_strcat (message, MAX_RCON_MESSAGE, CommandSystem::cmd()+5);
 
 	if ( clc.state >= CA_CONNECTED ) {
 		to = clc.netchan.remoteAddress;
@@ -2461,7 +2461,7 @@ void CL_MotdPacket( netadr_t from ) {
 		return;
 	}
 
-	info = Cmd_Argv(1);
+	info = CommandSystem::argv(1);
 
 	// check challenge
 	challenge = Info_ValueForKey( info, "challenge" );
@@ -2638,9 +2638,9 @@ void CL_ConnectionlessPacket( netadr_t from, Message *msg ) {
 
 	s = msg->readStringLine();
 
-	Cmd_TokenizeString( s );
+	CommandSystem::tokenizeString( s );
 
-	c = Cmd_Argv(0);
+	c = CommandSystem::argv(0);
 
 	Com_DPrintf ("CL packet %s: %s\n", NET_AdrToStringwPort(from), c);
 
@@ -2656,11 +2656,11 @@ void CL_ConnectionlessPacket( netadr_t from, Message *msg ) {
 			return;
 		}
 		
-		c = Cmd_Argv(2);
+		c = CommandSystem::argv(2);
 		if(*c)
 			challenge = atoi(c);
 
-		strver = Cmd_Argv(3);
+		strver = CommandSystem::argv(3);
 		if(*strver)
 		{
 			ver = atoi(strver);
@@ -2716,7 +2716,7 @@ void CL_ConnectionlessPacket( netadr_t from, Message *msg ) {
 		}
 
 		// start sending challenge response instead of challenge request packets
-		clc.challenge = atoi(Cmd_Argv(1));
+		clc.challenge = atoi(CommandSystem::argv(1));
 		clc.state = CA_CHALLENGING;
 		clc.connectPacketCount = 0;
 		clc.connectTime = -99999;
@@ -2747,7 +2747,7 @@ void CL_ConnectionlessPacket( netadr_t from, Message *msg ) {
 		if(!clc.compat)
 #endif
 		{
-			c = Cmd_Argv(1);
+			c = CommandSystem::argv(1);
 
 			if(*c)
 				challenge = atoi(c);
@@ -2791,7 +2791,7 @@ void CL_ConnectionlessPacket( netadr_t from, Message *msg ) {
 	if ( !Q_stricmp(c, "echo") ) {
 		// NOTE: we may have to add exceptions for auth and update servers
 		if ( NET_CompareAdr( from, clc.serverAddress ) || NET_CompareAdr( from, cls.rconAddress ) ) {
-			NET_OutOfBandPrint( NS_CLIENT, from, "%s", Cmd_Argv(1) );
+			NET_OutOfBandPrint( NS_CLIENT, from, "%s", CommandSystem::argv(1) );
 		}
 		return;
 	}
@@ -3286,10 +3286,10 @@ void CL_InitRef( ) {
 	}
 #endif
 
-	ri.Cmd_AddCommand = Cmd_AddCommand;
-	ri.Cmd_RemoveCommand = Cmd_RemoveCommand;
-	ri.Cmd_Argc = Cmd_Argc;
-	ri.Cmd_Argv = Cmd_Argv;
+	ri.Cmd_AddCommand = CommandSystem::addCommand;
+	ri.Cmd_RemoveCommand = CommandSystem::removeCommand;
+	ri.Cmd_Argc = CommandSystem::argc;
+	ri.Cmd_Argv = CommandSystem::argv;
 	ri.Cmd_ExecuteText = CommandBuffer::executeText;
 	ri.Printf = CL_RefPrintf;
 	ri.Error = Com_Error;
@@ -3366,7 +3366,7 @@ void CL_SetModel_f( ) {
 	char	*arg;
 	char	name[256];
 
-	arg = Cmd_Argv( 1 );
+	arg = CommandSystem::argv( 1 );
 	if (arg[0]) {
 		CvarSystem::set( "model", arg );
 		CvarSystem::set( "headmodel", arg );
@@ -3399,10 +3399,10 @@ void CL_Video_f( )
     return;
   }
 
-  if( Cmd_Argc( ) == 2 )
+  if( CommandSystem::argc( ) == 2 )
   {
     // explicit filename
-    Com_sprintf( filename, MAX_OSPATH, "videos/%s.avi", Cmd_Argv( 1 ) );
+    Com_sprintf( filename, MAX_OSPATH, "videos/%s.avi", CommandSystem::argv( 1 ) );
   }
   else
   {
@@ -3499,12 +3499,12 @@ void CL_Sayto_f( ) {
 	int			clientNum;
 	char		*p;
 
-	if ( Cmd_Argc() < 3 ) {
+	if ( CommandSystem::argc() < 3 ) {
 		Com_Printf ("sayto <player name> <text>\n");
 		return;
 	}
 
-	rawname = Cmd_Argv(1);
+	rawname = CommandSystem::argv(1);
 
 	Com_FieldStringToPlayerName( name, MAX_NAME_LENGTH, rawname );
 
@@ -3529,7 +3529,7 @@ void CL_Sayto_f( ) {
 		return;
 	}
 
-	p = Cmd_ArgsFrom(2);
+	p = CommandSystem::argsFrom(2);
 
 	if ( *p == '"' ) {
 		p++;
@@ -3718,34 +3718,34 @@ void CL_Init( ) {
 	//
 	// register our commands
 	//
-	Cmd_AddCommand ("cmd", CL_ForwardToServer_f);
-	Cmd_AddCommand ("configstrings", CL_Configstrings_f);
-	Cmd_AddCommand ("clientinfo", CL_Clientinfo_f);
-	Cmd_AddCommand ("snd_restart", CL_Snd_Restart_f);
-	Cmd_AddCommand ("vid_restart", CL_Vid_Restart_f);
-	Cmd_AddCommand ("disconnect", CL_Disconnect_f);
-	Cmd_AddCommand ("record", CL_Record_f);
-	Cmd_AddCommand ("demo", CL_PlayDemo_f);
-	Cmd_SetCommandCompletionFunc( "demo", CL_CompleteDemoName );
-	Cmd_AddCommand ("cinematic", CL_PlayCinematic_f);
-	Cmd_AddCommand ("stoprecord", CL_StopRecord_f);
-	Cmd_AddCommand ("connect", CL_Connect_f);
-	Cmd_AddCommand ("reconnect", CL_Reconnect_f);
-	Cmd_AddCommand ("localservers", CL_LocalServers_f);
-	Cmd_AddCommand ("globalservers", CL_GlobalServers_f);
-	Cmd_AddCommand ("rcon", CL_Rcon_f);
-	Cmd_SetCommandCompletionFunc( "rcon", CL_CompleteRcon );
-	Cmd_AddCommand ("ping", CL_Ping_f );
-	Cmd_AddCommand ("serverstatus", CL_ServerStatus_f );
-	Cmd_AddCommand ("showip", CL_ShowIP_f );
-	Cmd_AddCommand ("fs_openedList", CL_OpenedPK3List_f );
-	Cmd_AddCommand ("fs_referencedList", CL_ReferencedPK3List_f );
-	Cmd_AddCommand ("model", CL_SetModel_f );
-	Cmd_AddCommand ("video", CL_Video_f );
-	Cmd_AddCommand ("stopvideo", CL_StopVideo_f );
+	CommandSystem::addCommand ("cmd", CL_ForwardToServer_f);
+	CommandSystem::addCommand ("configstrings", CL_Configstrings_f);
+	CommandSystem::addCommand ("clientinfo", CL_Clientinfo_f);
+	CommandSystem::addCommand ("snd_restart", CL_Snd_Restart_f);
+	CommandSystem::addCommand ("vid_restart", CL_Vid_Restart_f);
+	CommandSystem::addCommand ("disconnect", CL_Disconnect_f);
+	CommandSystem::addCommand ("record", CL_Record_f);
+	CommandSystem::addCommand ("demo", CL_PlayDemo_f);
+	CommandSystem::setCommandCompletionFunc( "demo", CL_CompleteDemoName );
+	CommandSystem::addCommand ("cinematic", CL_PlayCinematic_f);
+	CommandSystem::addCommand ("stoprecord", CL_StopRecord_f);
+	CommandSystem::addCommand ("connect", CL_Connect_f);
+	CommandSystem::addCommand ("reconnect", CL_Reconnect_f);
+	CommandSystem::addCommand ("localservers", CL_LocalServers_f);
+	CommandSystem::addCommand ("globalservers", CL_GlobalServers_f);
+	CommandSystem::addCommand ("rcon", CL_Rcon_f);
+	CommandSystem::setCommandCompletionFunc( "rcon", CL_CompleteRcon );
+	CommandSystem::addCommand ("ping", CL_Ping_f );
+	CommandSystem::addCommand ("serverstatus", CL_ServerStatus_f );
+	CommandSystem::addCommand ("showip", CL_ShowIP_f );
+	CommandSystem::addCommand ("fs_openedList", CL_OpenedPK3List_f );
+	CommandSystem::addCommand ("fs_referencedList", CL_ReferencedPK3List_f );
+	CommandSystem::addCommand ("model", CL_SetModel_f );
+	CommandSystem::addCommand ("video", CL_Video_f );
+	CommandSystem::addCommand ("stopvideo", CL_StopVideo_f );
 	if( !com_dedicated->integer ) {
-		Cmd_AddCommand ("sayto", CL_Sayto_f );
-		Cmd_SetCommandCompletionFunc( "sayto", CL_CompletePlayerName );
+		CommandSystem::addCommand ("sayto", CL_Sayto_f );
+		CommandSystem::setCommandCompletionFunc( "sayto", CL_CompletePlayerName );
 	}
 	CL_InitRef();
 
@@ -3797,29 +3797,29 @@ void CL_Shutdown(const char *finalmsg, bool disconnect, bool quit)
 	CL_HTTP_Shutdown();
 #endif
 
-	Cmd_RemoveCommand ("cmd");
-	Cmd_RemoveCommand ("configstrings");
-	Cmd_RemoveCommand ("clientinfo");
-	Cmd_RemoveCommand ("snd_restart");
-	Cmd_RemoveCommand ("vid_restart");
-	Cmd_RemoveCommand ("disconnect");
-	Cmd_RemoveCommand ("record");
-	Cmd_RemoveCommand ("demo");
-	Cmd_RemoveCommand ("cinematic");
-	Cmd_RemoveCommand ("stoprecord");
-	Cmd_RemoveCommand ("connect");
-	Cmd_RemoveCommand ("reconnect");
-	Cmd_RemoveCommand ("localservers");
-	Cmd_RemoveCommand ("globalservers");
-	Cmd_RemoveCommand ("rcon");
-	Cmd_RemoveCommand ("ping");
-	Cmd_RemoveCommand ("serverstatus");
-	Cmd_RemoveCommand ("showip");
-	Cmd_RemoveCommand ("fs_openedList");
-	Cmd_RemoveCommand ("fs_referencedList");
-	Cmd_RemoveCommand ("model");
-	Cmd_RemoveCommand ("video");
-	Cmd_RemoveCommand ("stopvideo");
+	CommandSystem::removeCommand ("cmd");
+	CommandSystem::removeCommand ("configstrings");
+	CommandSystem::removeCommand ("clientinfo");
+	CommandSystem::removeCommand ("snd_restart");
+	CommandSystem::removeCommand ("vid_restart");
+	CommandSystem::removeCommand ("disconnect");
+	CommandSystem::removeCommand ("record");
+	CommandSystem::removeCommand ("demo");
+	CommandSystem::removeCommand ("cinematic");
+	CommandSystem::removeCommand ("stoprecord");
+	CommandSystem::removeCommand ("connect");
+	CommandSystem::removeCommand ("reconnect");
+	CommandSystem::removeCommand ("localservers");
+	CommandSystem::removeCommand ("globalservers");
+	CommandSystem::removeCommand ("rcon");
+	CommandSystem::removeCommand ("ping");
+	CommandSystem::removeCommand ("serverstatus");
+	CommandSystem::removeCommand ("showip");
+	CommandSystem::removeCommand ("fs_openedList");
+	CommandSystem::removeCommand ("fs_referencedList");
+	CommandSystem::removeCommand ("model");
+	CommandSystem::removeCommand ("video");
+	CommandSystem::removeCommand ("stopvideo");
 
 	CL_ShutdownInput();
 	Con_Shutdown();
@@ -4235,7 +4235,7 @@ void CL_GlobalServers_f( ) {
 	int			count, i, masterNum;
 	char		command[1024], *masteraddress;
 	
-	if ((count = Cmd_Argc()) < 3 || (masterNum = atoi(Cmd_Argv(1))) < 0 || masterNum > MAX_MASTER_SERVERS)
+	if ((count = CommandSystem::argc()) < 3 || (masterNum = atoi(CommandSystem::argv(1))) < 0 || masterNum > MAX_MASTER_SERVERS)
 	{
 		Com_Printf("usage: globalservers <master# 0-%d> <protocol> [keywords]\n", MAX_MASTER_SERVERS);
 		return;	
@@ -4254,7 +4254,7 @@ void CL_GlobalServers_f( ) {
 
 			numAddress++;
 
-			Com_sprintf(command, sizeof(command), "globalservers %d %s %s\n", i, Cmd_Argv(2), Cmd_ArgsFrom(3));
+			Com_sprintf(command, sizeof(command), "globalservers %d %s %s\n", i, CommandSystem::argv(2), CommandSystem::argsFrom(3));
 			CommandBuffer::addText(command);
 		}
 
@@ -4299,25 +4299,25 @@ void CL_GlobalServers_f( ) {
 		if(v4enabled)
 		{
 			Com_sprintf(command, sizeof(command), "getserversExt %s %s",
-				com_gamename->string, Cmd_Argv(2));
+				com_gamename->string, CommandSystem::argv(2));
 		}
 		else
 		{
 			Com_sprintf(command, sizeof(command), "getserversExt %s %s ipv6",
-				com_gamename->string, Cmd_Argv(2));
+				com_gamename->string, CommandSystem::argv(2));
 		}
 	}
 	else if ( !Q_stricmp( com_gamename->string, LEGACY_MASTER_GAMENAME ) )
 		Com_sprintf(command, sizeof(command), "getservers %s",
-			Cmd_Argv(2));
+			CommandSystem::argv(2));
 	else
 		Com_sprintf(command, sizeof(command), "getservers %s %s",
-			com_gamename->string, Cmd_Argv(2));
+			com_gamename->string, CommandSystem::argv(2));
 
 	for (i=3; i < count; i++)
 	{
 		Q_strcat(command, sizeof(command), " ");
-		Q_strcat(command, sizeof(command), Cmd_Argv(i));
+		Q_strcat(command, sizeof(command), CommandSystem::argv(i));
 	}
 
 	NET_OutOfBandPrint( NS_SERVER, to, "%s", command );
@@ -4490,7 +4490,7 @@ void CL_Ping_f( ) {
 	int			argc;
 	netadrtype_t	family = NA_UNSPEC;
 
-	argc = Cmd_Argc();
+	argc = CommandSystem::argc();
 
 	if ( argc != 2 && argc != 3 ) {
 		Com_Printf( "usage: ping [-4|-6] server\n");
@@ -4498,17 +4498,17 @@ void CL_Ping_f( ) {
 	}
 	
 	if(argc == 2)
-		server = Cmd_Argv(1);
+		server = CommandSystem::argv(1);
 	else
 	{
-		if(!strcmp(Cmd_Argv(1), "-4"))
+		if(!strcmp(CommandSystem::argv(1), "-4"))
 			family = NA_IP;
-		else if(!strcmp(Cmd_Argv(1), "-6"))
+		else if(!strcmp(CommandSystem::argv(1), "-6"))
 			family = NA_IP6;
 		else
 			Com_Printf( "warning: only -4 or -6 as address type understood.\n");
 		
-		server = Cmd_Argv(2);
+		server = CommandSystem::argv(2);
 	}
 
 	Com_Memset( &to, 0, sizeof(netadr_t) );
@@ -4644,7 +4644,7 @@ void CL_ServerStatus_f() {
 	int			argc;
 	netadrtype_t	family = NA_UNSPEC;
 
-	argc = Cmd_Argc();
+	argc = CommandSystem::argc();
 
 	if ( argc != 2 && argc != 3 )
 	{
@@ -4663,17 +4663,17 @@ void CL_ServerStatus_f() {
 		Com_Memset( &to, 0, sizeof(netadr_t) );
 	
 		if(argc == 2)
-			server = Cmd_Argv(1);
+			server = CommandSystem::argv(1);
 		else
 		{
-			if(!strcmp(Cmd_Argv(1), "-4"))
+			if(!strcmp(CommandSystem::argv(1), "-4"))
 				family = NA_IP;
-			else if(!strcmp(Cmd_Argv(1), "-6"))
+			else if(!strcmp(CommandSystem::argv(1), "-6"))
 				family = NA_IP6;
 			else
 				Com_Printf( "warning: only -4 or -6 as address type understood.\n");
 		
-			server = Cmd_Argv(2);
+			server = CommandSystem::argv(2);
 		}
 
 		toptr = &to;

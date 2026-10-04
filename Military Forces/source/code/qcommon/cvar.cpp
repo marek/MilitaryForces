@@ -751,19 +751,19 @@ bool CvarSystem::command( ) {
 	cvar_t	*v;
 
 	// check variables
-	v = Cvar_FindVar (Cmd_Argv(0));
+	v = Cvar_FindVar (CommandSystem::argv(0));
 	if (!v) {
 		return false;
 	}
 
 	// perform a variable print or set
-	if ( Cmd_Argc() == 1 ) {
+	if ( CommandSystem::argc() == 1 ) {
 		CvarSystem::print( v );
 		return true;
 	}
 
 	// set the value if forcing isn't required
-	CvarSystem::set2 (v->name, Cmd_Args(), false);
+	CvarSystem::set2 (v->name, CommandSystem::args(), false);
 	return true;
 }
 
@@ -781,13 +781,13 @@ void CvarSystem::print_f()
 	char *name;
 	cvar_t *cv;
 	
-	if(Cmd_Argc() != 2)
+	if(CommandSystem::argc() != 2)
 	{
 		Com_Printf ("usage: print <variable>\n");
 		return;
 	}
 
-	name = Cmd_Argv(1);
+	name = CommandSystem::argv(1);
 
 	cv = Cvar_FindVar(name);
 	
@@ -806,7 +806,7 @@ given values
 ============
 */
 void CvarSystem::toggle_f( ) {
-	int		i, c = Cmd_Argc();
+	int		i, c = CommandSystem::argc();
 	char		*curval;
 
 	if(c < 2) {
@@ -815,8 +815,8 @@ void CvarSystem::toggle_f( ) {
 	}
 
 	if(c == 2) {
-		CvarSystem::set2(Cmd_Argv(1), va("%d", 
-			!CvarSystem::variableValue(Cmd_Argv(1))), 
+		CvarSystem::set2(CommandSystem::argv(1), va("%d", 
+			!CvarSystem::variableValue(CommandSystem::argv(1))), 
 			false);
 		return;
 	}
@@ -826,19 +826,19 @@ void CvarSystem::toggle_f( ) {
 		return;
 	}
 
-	curval = CvarSystem::variableString(Cmd_Argv(1));
+	curval = CvarSystem::variableString(CommandSystem::argv(1));
 
 	// don't bother checking the last arg for a match since the desired
 	// behaviour is the same as no match (set to the first argument)
 	for(i = 2; i + 1 < c; i++) {
-		if(strcmp(curval, Cmd_Argv(i)) == 0) {
-			CvarSystem::set2(Cmd_Argv(1), Cmd_Argv(i + 1), false);
+		if(strcmp(curval, CommandSystem::argv(i)) == 0) {
+			CvarSystem::set2(CommandSystem::argv(1), CommandSystem::argv(i + 1), false);
 			return;
 		}
 	}
 
 	// fallback
-	CvarSystem::set2(Cmd_Argv(1), Cmd_Argv(2), false);
+	CvarSystem::set2(CommandSystem::argv(1), CommandSystem::argv(2), false);
 }
 
 /*
@@ -854,8 +854,8 @@ void CvarSystem::set_f( ) {
 	char	*cmd;
 	cvar_t	*v;
 
-	c = Cmd_Argc();
-	cmd = Cmd_Argv(0);
+	c = CommandSystem::argc();
+	cmd = CommandSystem::argv(0);
 
 	if ( c < 2 ) {
 		Com_Printf ("usage: %s <variable> <value>\n", cmd);
@@ -866,7 +866,7 @@ void CvarSystem::set_f( ) {
 		return;
 	}
 
-	v = CvarSystem::set2 (Cmd_Argv(1), Cmd_ArgsFrom(2), false);
+	v = CvarSystem::set2 (CommandSystem::argv(1), CommandSystem::argsFrom(2), false);
 	if( !v ) {
 		return;
 	}
@@ -898,11 +898,11 @@ CvarSystem::reset_f
 ============
 */
 void CvarSystem::reset_f( ) {
-	if ( Cmd_Argc() != 2 ) {
+	if ( CommandSystem::argc() != 2 ) {
 		Com_Printf ("usage: reset <variable>\n");
 		return;
 	}
-	CvarSystem::reset( Cmd_Argv( 1 ) );
+	CvarSystem::reset( CommandSystem::argv( 1 ) );
 }
 
 /*
@@ -955,8 +955,8 @@ void CvarSystem::list_f( ) {
 	int		i;
 	char	*match;
 
-	if ( Cmd_Argc() > 1 ) {
-		match = Cmd_Argv( 1 );
+	if ( CommandSystem::argc() > 1 ) {
+		match = CommandSystem::argv( 1 );
 	} else {
 		match = nullptr;
 	}
@@ -1031,8 +1031,8 @@ void CvarSystem::listModified_f( ) {
 	char	*value;
 	char	*match;
 
-	if ( Cmd_Argc() > 1 ) {
-		match = Cmd_Argv( 1 );
+	if ( CommandSystem::argc() > 1 ) {
+		match = CommandSystem::argv( 1 );
 	} else {
 		match = nullptr;
 	}
@@ -1161,13 +1161,13 @@ void CvarSystem::unset_f()
 {
 	cvar_t *cv;
 	
-	if(Cmd_Argc() != 2)
+	if(CommandSystem::argc() != 2)
 	{
-		Com_Printf("Usage: %s <varname>\n", Cmd_Argv(0));
+		Com_Printf("Usage: %s <varname>\n", CommandSystem::argv(0));
 		return;
 	}
 	
-	cv = Cvar_FindVar(Cmd_Argv(1));
+	cv = Cvar_FindVar(CommandSystem::argv(1));
 
 	if(!cv)
 		return;
@@ -1175,7 +1175,7 @@ void CvarSystem::unset_f()
 	if(cv->flags & CVAR_USER_CREATED)
 		CvarSystem::unset(cv);
 	else
-		Com_Printf("Error: %s: Variable %s is not user created.\n", Cmd_Argv(0), cv->name);
+		Com_Printf("Error: %s: Variable %s is not user created.\n", CommandSystem::argv(0), cv->name);
 }
 
 
@@ -1442,23 +1442,23 @@ void CvarSystem::init ()
 
 	cvar_cheats = CvarSystem::get("sv_cheats", "1", CVAR_ROM | CVAR_SYSTEMINFO );
 
-	Cmd_AddCommand ("print", CvarSystem::print_f);
-	Cmd_AddCommand ("toggle", CvarSystem::toggle_f);
-	Cmd_SetCommandCompletionFunc( "toggle", CvarSystem::completeCvarName );
-	Cmd_AddCommand ("set", CvarSystem::set_f);
-	Cmd_SetCommandCompletionFunc( "set", CvarSystem::completeCvarName );
-	Cmd_AddCommand ("sets", CvarSystem::set_f);
-	Cmd_SetCommandCompletionFunc( "sets", CvarSystem::completeCvarName );
-	Cmd_AddCommand ("setu", CvarSystem::set_f);
-	Cmd_SetCommandCompletionFunc( "setu", CvarSystem::completeCvarName );
-	Cmd_AddCommand ("seta", CvarSystem::set_f);
-	Cmd_SetCommandCompletionFunc( "seta", CvarSystem::completeCvarName );
-	Cmd_AddCommand ("reset", CvarSystem::reset_f);
-	Cmd_SetCommandCompletionFunc( "reset", CvarSystem::completeCvarName );
-	Cmd_AddCommand ("unset", CvarSystem::unset_f);
-	Cmd_SetCommandCompletionFunc("unset", CvarSystem::completeCvarName);
+	CommandSystem::addCommand ("print", CvarSystem::print_f);
+	CommandSystem::addCommand ("toggle", CvarSystem::toggle_f);
+	CommandSystem::setCommandCompletionFunc( "toggle", CvarSystem::completeCvarName );
+	CommandSystem::addCommand ("set", CvarSystem::set_f);
+	CommandSystem::setCommandCompletionFunc( "set", CvarSystem::completeCvarName );
+	CommandSystem::addCommand ("sets", CvarSystem::set_f);
+	CommandSystem::setCommandCompletionFunc( "sets", CvarSystem::completeCvarName );
+	CommandSystem::addCommand ("setu", CvarSystem::set_f);
+	CommandSystem::setCommandCompletionFunc( "setu", CvarSystem::completeCvarName );
+	CommandSystem::addCommand ("seta", CvarSystem::set_f);
+	CommandSystem::setCommandCompletionFunc( "seta", CvarSystem::completeCvarName );
+	CommandSystem::addCommand ("reset", CvarSystem::reset_f);
+	CommandSystem::setCommandCompletionFunc( "reset", CvarSystem::completeCvarName );
+	CommandSystem::addCommand ("unset", CvarSystem::unset_f);
+	CommandSystem::setCommandCompletionFunc("unset", CvarSystem::completeCvarName);
 
-	Cmd_AddCommand ("cvarlist", CvarSystem::list_f);
-	Cmd_AddCommand ("cvar_modified", CvarSystem::listModified_f);
-	Cmd_AddCommand ("cvar_restart", CvarSystem::restart_f);
+	CommandSystem::addCommand ("cvarlist", CvarSystem::list_f);
+	CommandSystem::addCommand ("cvar_modified", CvarSystem::listModified_f);
+	CommandSystem::addCommand ("cvar_restart", CvarSystem::restart_f);
 }

@@ -1866,7 +1866,7 @@ void MSG_HuffStats_f( ) {
 
 void MSG_InitHuffStats( ) {
 	msg_huffstats = CvarSystem::get( "msg_huffstats", "0", CVAR_TEMP );
-	Cmd_AddCommand( "huffstats", MSG_HuffStats_f );
+	CommandSystem::addCommand( "huffstats", MSG_HuffStats_f );
 }
 
 //===========================================================================

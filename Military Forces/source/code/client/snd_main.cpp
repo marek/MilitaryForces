@@ -407,7 +407,7 @@ void S_Play_f( ) {
 		return;
 	}
 
-	c = Cmd_Argc();
+	c = CommandSystem::argc();
 
 	if( c < 2 ) {
 		Com_Printf ("Usage: play <sound filename> [sound filename] [sound filename] ...\n");
@@ -415,7 +415,7 @@ void S_Play_f( ) {
 	}
 
 	for( i = 1; i < c; i++ ) {
-		h = si.RegisterSound( Cmd_Argv(i), false );
+		h = si.RegisterSound( CommandSystem::argv(i), false );
 
 		if( h ) {
 			si.StartLocalSound( h, CHAN_LOCAL_SOUND );
@@ -435,12 +435,12 @@ void S_Music_f( ) {
 		return;
 	}
 
-	c = Cmd_Argc();
+	c = CommandSystem::argc();
 
 	if ( c == 2 ) {
-		si.StartBackgroundTrack( Cmd_Argv(1), nullptr );
+		si.StartBackgroundTrack( CommandSystem::argv(1), nullptr );
 	} else if ( c == 3 ) {
-		si.StartBackgroundTrack( Cmd_Argv(1), Cmd_Argv(2) );
+		si.StartBackgroundTrack( CommandSystem::argv(1), CommandSystem::argv(2) );
 	} else {
 		Com_Printf ("Usage: music <musicfile> [loopfile]\n");
 		return;
@@ -491,12 +491,12 @@ void S_Init( )
 
 		S_CodecInit( );
 
-		Cmd_AddCommand( "play", S_Play_f );
-		Cmd_AddCommand( "music", S_Music_f );
-		Cmd_AddCommand( "stopmusic", S_StopMusic_f );
-		Cmd_AddCommand( "s_list", S_SoundList );
-		Cmd_AddCommand( "s_stop", S_StopAllSounds );
-		Cmd_AddCommand( "s_info", S_SoundInfo );
+		CommandSystem::addCommand( "play", S_Play_f );
+		CommandSystem::addCommand( "music", S_Music_f );
+		CommandSystem::addCommand( "stopmusic", S_StopMusic_f );
+		CommandSystem::addCommand( "s_list", S_SoundList );
+		CommandSystem::addCommand( "s_stop", S_StopAllSounds );
+		CommandSystem::addCommand( "s_info", S_SoundInfo );
 
 		cv = CvarSystem::get( "s_useOpenAL", "1", CVAR_ARCHIVE | CVAR_LATCH );
 		if( cv->integer ) {
@@ -538,12 +538,12 @@ void S_Shutdown( )
 
 	Com_Memset( &si, 0, sizeof( soundInterface_t ) );
 
-	Cmd_RemoveCommand( "play" );
-	Cmd_RemoveCommand( "music");
-	Cmd_RemoveCommand( "stopmusic");
-	Cmd_RemoveCommand( "s_list" );
-	Cmd_RemoveCommand( "s_stop" );
-	Cmd_RemoveCommand( "s_info" );
+	CommandSystem::removeCommand( "play" );
+	CommandSystem::removeCommand( "music");
+	CommandSystem::removeCommand( "stopmusic");
+	CommandSystem::removeCommand( "s_list" );
+	CommandSystem::removeCommand( "s_stop" );
+	CommandSystem::removeCommand( "s_info" );
 
 	S_CodecShutdown( );
 }

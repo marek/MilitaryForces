@@ -2508,17 +2508,17 @@ void FS_Dir_f( ) {
 	int		ndirs;
 	int		i;
 
-	if ( Cmd_Argc() < 2 || Cmd_Argc() > 3 ) {
+	if ( CommandSystem::argc() < 2 || CommandSystem::argc() > 3 ) {
 		Com_Printf( "usage: dir <directory> [extension]\n" );
 		return;
 	}
 
-	if ( Cmd_Argc() == 2 ) {
-		path = Cmd_Argv( 1 );
+	if ( CommandSystem::argc() == 2 ) {
+		path = CommandSystem::argv( 1 );
 		extension = "";
 	} else {
-		path = Cmd_Argv( 1 );
-		extension = Cmd_Argv( 2 );
+		path = CommandSystem::argv( 1 );
+		extension = CommandSystem::argv( 2 );
 	}
 
 	Com_Printf( "Directory of %s %s\n", path, extension );
@@ -2624,13 +2624,13 @@ void FS_NewDir_f( ) {
 	int		ndirs;
 	int		i;
 
-	if ( Cmd_Argc() < 2 ) {
+	if ( CommandSystem::argc() < 2 ) {
 		Com_Printf( "usage: fdir <filter>\n" );
 		Com_Printf( "example: fdir *q3dm*.bsp\n");
 		return;
 	}
 
-	filter = Cmd_Argv( 1 );
+	filter = CommandSystem::argv( 1 );
 
 	Com_Printf( "---------------\n" );
 
@@ -2689,12 +2689,12 @@ FS_TouchFile_f
 void FS_TouchFile_f( ) {
 	fileHandle_t	f;
 
-	if ( Cmd_Argc() != 2 ) {
+	if ( CommandSystem::argc() != 2 ) {
 		Com_Printf( "Usage: touchFile <file>\n" );
 		return;
 	}
 
-	FS_FOpenFileRead( Cmd_Argv( 1 ), &f, false );
+	FS_FOpenFileRead( CommandSystem::argv( 1 ), &f, false );
 	if ( f ) {
 		FS_FCloseFile( f );
 	}
@@ -2736,7 +2736,7 @@ void FS_Which_f( ) {
 	searchpath_t	*search;
 	char		*filename;
 
-	filename = Cmd_Argv(1);
+	filename = CommandSystem::argv(1);
 
 	if ( !filename[0] ) {
 		Com_Printf( "Usage: which <file>\n" );
@@ -3148,11 +3148,11 @@ void FS_Shutdown( bool closemfp ) {
 	// any FS_ calls will now be an error until reinitialized
 	fs_searchpaths = nullptr;
 
-	Cmd_RemoveCommand( "path" );
-	Cmd_RemoveCommand( "dir" );
-	Cmd_RemoveCommand( "fdir" );
-	Cmd_RemoveCommand( "touchFile" );
-	Cmd_RemoveCommand( "which" );
+	CommandSystem::removeCommand( "path" );
+	CommandSystem::removeCommand( "dir" );
+	CommandSystem::removeCommand( "fdir" );
+	CommandSystem::removeCommand( "touchFile" );
+	CommandSystem::removeCommand( "which" );
 
 #ifdef FS_MISSING
 	if (closemfp) {
@@ -3340,11 +3340,11 @@ static void FS_Startup( const char *gameName )
 #endif
 
 	// add our commands
-	Cmd_AddCommand ("path", FS_Path_f);
-	Cmd_AddCommand ("dir", FS_Dir_f );
-	Cmd_AddCommand ("fdir", FS_NewDir_f );
-	Cmd_AddCommand ("touchFile", FS_TouchFile_f );
-	Cmd_AddCommand ("which", FS_Which_f );
+	CommandSystem::addCommand ("path", FS_Path_f);
+	CommandSystem::addCommand ("dir", FS_Dir_f );
+	CommandSystem::addCommand ("fdir", FS_NewDir_f );
+	CommandSystem::addCommand ("touchFile", FS_TouchFile_f );
+	CommandSystem::addCommand ("which", FS_Which_f );
 
 	// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=506
 	// reorder the pure pk3 files according to server order
@@ -3901,9 +3901,9 @@ exception of .cfg and .dat files.
 void FS_PureServerSetLoadedPaks( const char *pakSums, const char *pakNames ) {
 	int		i, c, d;
 
-	Cmd_TokenizeString( pakSums );
+	CommandSystem::tokenizeString( pakSums );
 
-	c = Cmd_Argc();
+	c = CommandSystem::argc();
 	if ( c > MAX_SEARCH_PATHS ) {
 		c = MAX_SEARCH_PATHS;
 	}
@@ -3911,7 +3911,7 @@ void FS_PureServerSetLoadedPaks( const char *pakSums, const char *pakNames ) {
 	fs_numServerPaks = c;
 
 	for ( i = 0 ; i < c ; i++ ) {
-		fs_serverPaks[i] = atoi( Cmd_Argv( i ) );
+		fs_serverPaks[i] = atoi( CommandSystem::argv( i ) );
 	}
 
 	if (fs_numServerPaks) {
@@ -3936,15 +3936,15 @@ void FS_PureServerSetLoadedPaks( const char *pakSums, const char *pakNames ) {
 		fs_serverPakNames[i] = nullptr;
 	}
 	if ( pakNames && *pakNames ) {
-		Cmd_TokenizeString( pakNames );
+		CommandSystem::tokenizeString( pakNames );
 
-		d = Cmd_Argc();
+		d = CommandSystem::argc();
 		if ( d > MAX_SEARCH_PATHS ) {
 			d = MAX_SEARCH_PATHS;
 		}
 
 		for ( i = 0 ; i < d ; i++ ) {
-			fs_serverPakNames[i] = CopyString( Cmd_Argv( i ) );
+			fs_serverPakNames[i] = CopyString( CommandSystem::argv( i ) );
 		}
 	}
 }
@@ -3961,15 +3961,15 @@ checksums to see if any pk3 files need to be auto-downloaded.
 void FS_PureServerSetReferencedPaks( const char *pakSums, const char *pakNames ) {
 	int		i, c, d = 0;
 
-	Cmd_TokenizeString( pakSums );
+	CommandSystem::tokenizeString( pakSums );
 
-	c = Cmd_Argc();
+	c = CommandSystem::argc();
 	if ( c > MAX_SEARCH_PATHS ) {
 		c = MAX_SEARCH_PATHS;
 	}
 
 	for ( i = 0 ; i < c ; i++ ) {
-		fs_serverReferencedPaks[i] = atoi( Cmd_Argv( i ) );
+		fs_serverReferencedPaks[i] = atoi( CommandSystem::argv( i ) );
 	}
 
 	for (i = 0 ; i < ARRAY_LEN(fs_serverReferencedPakNames); i++)
@@ -3981,15 +3981,15 @@ void FS_PureServerSetReferencedPaks( const char *pakSums, const char *pakNames )
 	}
 
 	if ( pakNames && *pakNames ) {
-		Cmd_TokenizeString( pakNames );
+		CommandSystem::tokenizeString( pakNames );
 
-		d = Cmd_Argc();
+		d = CommandSystem::argc();
 
 		if(d > c)
 			d = c;
 
 		for ( i = 0 ; i < d ; i++ ) {
-			fs_serverReferencedPakNames[i] = CopyString( Cmd_Argv( i ) );
+			fs_serverReferencedPakNames[i] = CopyString( CommandSystem::argv( i ) );
 		}
 	}
 

@@ -225,8 +225,8 @@ inline constexpr int MAX_QINT = 0x7fffffff;
 
 // the game guarantees that no string from the network will ever
 // exceed MAX_STRING_CHARS
-inline constexpr int MAX_STRING_CHARS = 1024; // max length of a string passed to Cmd_TokenizeString
-inline constexpr int MAX_STRING_TOKENS = 1024; // max tokens resulting from Cmd_TokenizeString
+inline constexpr int MAX_STRING_CHARS = 1024; // max length of a string passed to CommandSystem::tokenizeString
+inline constexpr int MAX_STRING_TOKENS = 1024; // max tokens resulting from CommandSystem::tokenizeString
 inline constexpr int MAX_TOKEN_CHARS = 1024; // max length of an individual token
 
 inline constexpr int MAX_INFO_STRING = 1024;
@@ -1632,5 +1632,7 @@ float RandomFloat( float min, float max );
 int ahextoi( const char* string );
 
 #include "../qcommon/command_buffer.h"
+
+#include "../qcommon/command_system.h"
 
 #endif	// __Q_SHARED_H

@@ -1549,7 +1549,7 @@ void S_Base_Shutdown( ) {
 	s_soundStarted = 0;
 	s_numSfx = 0;
 
-	Cmd_RemoveCommand("s_info");
+	CommandSystem::removeCommand("s_info");
 }
 
 /*

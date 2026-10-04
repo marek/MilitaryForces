@@ -39,7 +39,7 @@ These commands can only be entered from stdin or by a remote operator datagram
 ==================
 SV_GetPlayerByHandle
 
-Returns the player with player id or name from Cmd_Argv(1)
+Returns the player with player id or name from CommandSystem::argv(1)
 ==================
 */
 static SV_Client *SV_GetPlayerByHandle( ) {
@@ -53,12 +53,12 @@ static SV_Client *SV_GetPlayerByHandle( ) {
 		return nullptr;
 	}
 
-	if ( Cmd_Argc() < 2 ) {
+	if ( CommandSystem::argc() < 2 ) {
 		Com_Printf( "No player specified.\n" );
 		return nullptr;
 	}
 
-	s = Cmd_Argv(1);
+	s = CommandSystem::argv(1);
 
 	// Check whether this is a numeric player handle
 	for(i = 0; s[i] >= '0' && s[i] <= '9'; i++);
@@ -105,7 +105,7 @@ static SV_Client *SV_GetPlayerByHandle( ) {
 ==================
 SV_GetPlayerByNum
 
-Returns the player with idnum from Cmd_Argv(1)
+Returns the player with idnum from CommandSystem::argv(1)
 ==================
 */
 static SV_Client *SV_GetPlayerByNum( ) {
@@ -119,12 +119,12 @@ static SV_Client *SV_GetPlayerByNum( ) {
 		return nullptr;
 	}
 
-	if ( Cmd_Argc() < 2 ) {
+	if ( CommandSystem::argc() < 2 ) {
 		Com_Printf( "No player specified.\n" );
 		return nullptr;
 	}
 
-	s = Cmd_Argv(1);
+	s = CommandSystem::argv(1);
 
 	for (i = 0; s[i]; i++) {
 		if (s[i] < '0' || s[i] > '9') {
@@ -164,7 +164,7 @@ static void SV_Map_f()
 	char		expanded[MAX_QPATH];
 	char		mapname[MAX_QPATH];
 
-	map = Cmd_Argv(1);
+	map = CommandSystem::argv(1);
 	if ( !map ) 
 		return;
 
@@ -180,7 +180,7 @@ static void SV_Map_f()
 	// force latched values to get set
 	CvarSystem::get ("g_gametype", "0", CVAR_SERVERINFO | CVAR_USERINFO | CVAR_LATCH );
 
-	cmd = Cmd_Argv(0);
+	cmd = CommandSystem::argv(0);
 	if( Q_stricmpn( cmd, "sp", 2 ) == 0 ) 
 	{
 		CvarSystem::setValue( "g_gametype", GT_SINGLE_PLAYER );
@@ -253,8 +253,8 @@ static void SV_MapRestart_f()
 		return;
 
 	int	delay;
-	if (Cmd_Argc() > 1 ) 
-		delay = atoi( Cmd_Argv(1) );
+	if (CommandSystem::argc() > 1 ) 
+		delay = atoi( CommandSystem::argv(1) );
 	else 
 		delay = 5;
 
@@ -386,14 +386,14 @@ static void SV_Kick_f( ) {
 		return;
 	}
 
-	if ( Cmd_Argc() != 2 ) {
+	if ( CommandSystem::argc() != 2 ) {
 		Com_Printf ("Usage: kick <player name>\nkick all = kick everyone\nkick allbots = kick all bots\n");
 		return;
 	}
 
 	cl = SV_GetPlayerByHandle();
 	if ( !cl ) {
-		if ( !Q_stricmp(Cmd_Argv(1), "all") ) {
+		if ( !Q_stricmp(CommandSystem::argv(1), "all") ) {
 			for ( i=1 ; i <= sv_maxclients->integer ; i++ ) {
 				cl = theSVS.svClients_.at(i);
 				if ( !cl )
@@ -408,7 +408,7 @@ static void SV_Kick_f( ) {
 				cl->lastPacketTime_ = theSVS.time_;	// in case there is a funny zombie
 			}
 		}
-		else if ( !Q_stricmp(Cmd_Argv(1), "allbots") ) {
+		else if ( !Q_stricmp(CommandSystem::argv(1), "allbots") ) {
 			for ( i=1 ; i <= sv_maxclients->integer ; i++ ) {
 				cl = theSVS.svClients_.at(i);
 				if ( !cl )
@@ -517,8 +517,8 @@ static void SV_KickNum_f( ) {
 		return;
 	}
 
-	if ( Cmd_Argc() != 2 ) {
-		Com_Printf ("Usage: %s <client number>\n", Cmd_Argv(0));
+	if ( CommandSystem::argc() != 2 ) {
+		Com_Printf ("Usage: %s <client number>\n", CommandSystem::argv(0));
 		return;
 	}
 
@@ -555,7 +555,7 @@ static void SV_Ban_f( void ) {
 		return;
 	}
 
-	if ( Cmd_Argc() != 2 ) {
+	if ( CommandSystem::argc() != 2 ) {
 		Com_Printf ("Usage: banUser <player name>\n");
 		return;
 	}
@@ -611,7 +611,7 @@ static void SV_BanNum_f( void ) {
 		return;
 	}
 
-	if ( Cmd_Argc() != 2 ) {
+	if ( CommandSystem::argc() != 2 ) {
 		Com_Printf ("Usage: banClient <client number>\n");
 		return;
 	}
@@ -857,11 +857,11 @@ static void SV_AddBanToList(bool isexception)
 		return;
 	}
 
-	argc = Cmd_Argc();
+	argc = CommandSystem::argc();
 	
 	if(argc < 2 || argc > 3)
 	{
-		Com_Printf ("Usage: %s (ip[/subnet] | clientnum [subnet])\n", Cmd_Argv(0));
+		Com_Printf ("Usage: %s (ip[/subnet] | clientnum [subnet])\n", CommandSystem::argv(0));
 		return;
 	}
 
@@ -871,7 +871,7 @@ static void SV_AddBanToList(bool isexception)
 		return;
 	}
 
-	banstring = Cmd_Argv(1);
+	banstring = CommandSystem::argv(1);
 	
 	if(strchr(banstring, '.') || strchr(banstring, ':'))
 	{
@@ -893,7 +893,7 @@ static void SV_AddBanToList(bool isexception)
 
 		if(!cl)
 		{
-			Com_Printf("Error: Playernum %s does not exist.\n", Cmd_Argv(1));
+			Com_Printf("Error: Playernum %s does not exist.\n", CommandSystem::argv(1));
 			return;
 		}
 		
@@ -901,7 +901,7 @@ static void SV_AddBanToList(bool isexception)
 		
 		if(argc == 3)
 		{
-			mask = atoi(Cmd_Argv(2));
+			mask = atoi(CommandSystem::argv(2));
 			
 			if(ip.type == NA_IP)
 			{
@@ -999,13 +999,13 @@ static void SV_DelBanFromList(bool isexception)
 		return;
 	}
 	
-	if(Cmd_Argc() != 2)
+	if(CommandSystem::argc() != 2)
 	{
-		Com_Printf ("Usage: %s (ip[/subnet] | num)\n", Cmd_Argv(0));
+		Com_Printf ("Usage: %s (ip[/subnet] | num)\n", CommandSystem::argv(0));
 		return;
 	}
 
-	banstring = Cmd_Argv(1);
+	banstring = CommandSystem::argv(1);
 	
 	if(strchr(banstring, '.') || strchr(banstring, ':'))
 	{
@@ -1039,7 +1039,7 @@ static void SV_DelBanFromList(bool isexception)
 	}
 	else
 	{
-		todel = atoi(Cmd_Argv(1));
+		todel = atoi(CommandSystem::argv(1));
 
 		if(todel < 1 || todel > serverBansCount)
 		{
@@ -1266,12 +1266,12 @@ static void SV_ConSay_f() {
 		return;
 	}
 
-	if ( Cmd_Argc () < 2 ) {
+	if ( CommandSystem::argc () < 2 ) {
 		return;
 	}
 
 	strcpy (text, "console: ");
-	p = Cmd_Args();
+	p = CommandSystem::args();
 
 	if ( *p == '"' ) {
 		p++;
@@ -1300,7 +1300,7 @@ static void SV_ConTell_f() {
 		return;
 	}
 
-	if ( Cmd_Argc() < 3 ) {
+	if ( CommandSystem::argc() < 3 ) {
 		Com_Printf ("Usage: tell <client number> <text>\n");
 		return;
 	}
@@ -1311,7 +1311,7 @@ static void SV_ConTell_f() {
 	}
 
 	strcpy (text, "console_tell: ");
-	p = Cmd_ArgsFrom(2);
+	p = CommandSystem::argsFrom(2);
 
 	if ( *p == '"' ) {
 		p++;
@@ -1346,12 +1346,12 @@ static void SV_ConSayto_f() {
 		return;
 	}
 
-	if ( Cmd_Argc() < 3 ) {
+	if ( CommandSystem::argc() < 3 ) {
 		Com_Printf ("Usage: sayto <player name> <text>\n");
 		return;
 	}
 
-	rawname = Cmd_Argv(1);
+	rawname = CommandSystem::argv(1);
 	
 	//allowing special characters in the console 
 	//with hex strings for player names
@@ -1380,7 +1380,7 @@ static void SV_ConSayto_f() {
 	}
 
 	strcpy (text, "console_sayto: ");
-	p = Cmd_ArgsFrom(2);
+	p = CommandSystem::argsFrom(2);
 
 	if ( *p == '"' ) {
 		p++;
@@ -1460,7 +1460,7 @@ static void SV_DumpUser_f( ) {
 		return;
 	}
 
-	if ( Cmd_Argc() != 2 ) {
+	if ( CommandSystem::argc() != 2 ) {
 		Com_Printf ("Usage: dumpuser <userid>\n");
 		return;
 	}
@@ -1551,50 +1551,50 @@ void SV_AddOperatorCommands( ) {
 	}
 	initialized = true;
 
-	Cmd_AddCommand ("heartbeat", SV_Heartbeat_f);
-	Cmd_AddCommand ("kick", SV_Kick_f);
+	CommandSystem::addCommand ("heartbeat", SV_Heartbeat_f);
+	CommandSystem::addCommand ("kick", SV_Kick_f);
 #ifndef STANDALONE
 	if(!com_standalone->integer)
 	{
-		Cmd_AddCommand ("banUser", SV_Ban_f);
-		Cmd_AddCommand ("banClient", SV_BanNum_f);
+		CommandSystem::addCommand ("banUser", SV_Ban_f);
+		CommandSystem::addCommand ("banClient", SV_BanNum_f);
 	}
 #endif
-	Cmd_AddCommand ("kickbots", SV_KickBots_f);
-	Cmd_AddCommand ("kickall", SV_KickAll_f);
-	Cmd_AddCommand ("kicknum", SV_KickNum_f);
-	Cmd_AddCommand ("clientkick", SV_KickNum_f); // Legacy command
-	Cmd_AddCommand ("status", SV_Status_f);
-	Cmd_AddCommand ("serverinfo", SV_Serverinfo_f);
-	Cmd_AddCommand ("systeminfo", SV_Systeminfo_f);
-	Cmd_AddCommand ("dumpuser", SV_DumpUser_f);
-	Cmd_AddCommand ("map_restart", SV_MapRestart_f);
-	Cmd_AddCommand ("sectorlist", SV_SectorList_f);
-	Cmd_AddCommand ("map", SV_Map_f);
-	Cmd_SetCommandCompletionFunc( "map", SV_CompleteMapName );
+	CommandSystem::addCommand ("kickbots", SV_KickBots_f);
+	CommandSystem::addCommand ("kickall", SV_KickAll_f);
+	CommandSystem::addCommand ("kicknum", SV_KickNum_f);
+	CommandSystem::addCommand ("clientkick", SV_KickNum_f); // Legacy command
+	CommandSystem::addCommand ("status", SV_Status_f);
+	CommandSystem::addCommand ("serverinfo", SV_Serverinfo_f);
+	CommandSystem::addCommand ("systeminfo", SV_Systeminfo_f);
+	CommandSystem::addCommand ("dumpuser", SV_DumpUser_f);
+	CommandSystem::addCommand ("map_restart", SV_MapRestart_f);
+	CommandSystem::addCommand ("sectorlist", SV_SectorList_f);
+	CommandSystem::addCommand ("map", SV_Map_f);
+	CommandSystem::setCommandCompletionFunc( "map", SV_CompleteMapName );
 #ifndef PRE_RELEASE_DEMO
-	Cmd_AddCommand ("devmap", SV_Map_f);
-	Cmd_SetCommandCompletionFunc( "devmap", SV_CompleteMapName );
-	Cmd_AddCommand ("spmap", SV_Map_f);
-	Cmd_SetCommandCompletionFunc( "spmap", SV_CompleteMapName );
-	Cmd_AddCommand ("spdevmap", SV_Map_f);
-	Cmd_SetCommandCompletionFunc( "spdevmap", SV_CompleteMapName );
+	CommandSystem::addCommand ("devmap", SV_Map_f);
+	CommandSystem::setCommandCompletionFunc( "devmap", SV_CompleteMapName );
+	CommandSystem::addCommand ("spmap", SV_Map_f);
+	CommandSystem::setCommandCompletionFunc( "spmap", SV_CompleteMapName );
+	CommandSystem::addCommand ("spdevmap", SV_Map_f);
+	CommandSystem::setCommandCompletionFunc( "spdevmap", SV_CompleteMapName );
 #endif
-	Cmd_AddCommand ("killserver", SV_KillServer_f);
+	CommandSystem::addCommand ("killserver", SV_KillServer_f);
 	if( com_dedicated->integer ) {
-		Cmd_AddCommand ("say", SV_ConSay_f);
-		Cmd_AddCommand ("tell", SV_ConTell_f);
-		Cmd_AddCommand ("sayto", SV_ConSayto_f);
-		Cmd_SetCommandCompletionFunc( "sayto", SV_CompletePlayerName );
+		CommandSystem::addCommand ("say", SV_ConSay_f);
+		CommandSystem::addCommand ("tell", SV_ConTell_f);
+		CommandSystem::addCommand ("sayto", SV_ConSayto_f);
+		CommandSystem::setCommandCompletionFunc( "sayto", SV_CompletePlayerName );
 	}
 	
-	Cmd_AddCommand("rehashbans", SV_RehashBans_f);
-	Cmd_AddCommand("listbans", SV_ListBans_f);
-	Cmd_AddCommand("banaddr", SV_BanAddr_f);
-	Cmd_AddCommand("exceptaddr", SV_ExceptAddr_f);
-	Cmd_AddCommand("bandel", SV_BanDel_f);
-	Cmd_AddCommand("exceptdel", SV_ExceptDel_f);
-	Cmd_AddCommand("flushbans", SV_FlushBans_f);
+	CommandSystem::addCommand("rehashbans", SV_RehashBans_f);
+	CommandSystem::addCommand("listbans", SV_ListBans_f);
+	CommandSystem::addCommand("banaddr", SV_BanAddr_f);
+	CommandSystem::addCommand("exceptaddr", SV_ExceptAddr_f);
+	CommandSystem::addCommand("bandel", SV_BanDel_f);
+	CommandSystem::addCommand("exceptdel", SV_ExceptDel_f);
+	CommandSystem::addCommand("flushbans", SV_FlushBans_f);
 }
 
 /*
@@ -1605,21 +1605,21 @@ SV_RemoveOperatorCommands
 void SV_RemoveOperatorCommands( ) {
 #if 0
 	// removing these won't let the server start again
-	Cmd_RemoveCommand ("heartbeat");
-	Cmd_RemoveCommand ("kick");
-	Cmd_RemoveCommand ("kicknum");
-	Cmd_RemoveCommand ("clientkick");
-	Cmd_RemoveCommand ("kickall");
-	Cmd_RemoveCommand ("kickbots");
-	Cmd_RemoveCommand ("banUser");
-	Cmd_RemoveCommand ("banClient");
-	Cmd_RemoveCommand ("status");
-	Cmd_RemoveCommand ("serverinfo");
-	Cmd_RemoveCommand ("systeminfo");
-	Cmd_RemoveCommand ("dumpuser");
-	Cmd_RemoveCommand ("map_restart");
-	Cmd_RemoveCommand ("sectorlist");
-	Cmd_RemoveCommand ("say");
+	CommandSystem::removeCommand ("heartbeat");
+	CommandSystem::removeCommand ("kick");
+	CommandSystem::removeCommand ("kicknum");
+	CommandSystem::removeCommand ("clientkick");
+	CommandSystem::removeCommand ("kickall");
+	CommandSystem::removeCommand ("kickbots");
+	CommandSystem::removeCommand ("banUser");
+	CommandSystem::removeCommand ("banClient");
+	CommandSystem::removeCommand ("status");
+	CommandSystem::removeCommand ("serverinfo");
+	CommandSystem::removeCommand ("systeminfo");
+	CommandSystem::removeCommand ("dumpuser");
+	CommandSystem::removeCommand ("map_restart");
+	CommandSystem::removeCommand ("sectorlist");
+	CommandSystem::removeCommand ("say");
 #endif
 }
 

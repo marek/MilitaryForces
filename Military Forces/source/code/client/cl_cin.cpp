@@ -1619,8 +1619,8 @@ void CL_PlayCinematic_f() {
 		SCR_StopCinematic();
 	}
 
-	arg = Cmd_Argv( 1 );
-	s = Cmd_Argv(2);
+	arg = CommandSystem::argv( 1 );
+	s = CommandSystem::argv(2);
 
 	if ((s && s[0] == '1') || Q_stricmp(arg,"demoend.roq")==0 || Q_stricmp(arg,"end.roq")==0) {
 		bits |= CIN_hold;
