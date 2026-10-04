@@ -10,6 +10,8 @@ void MF_ClientBegin( int clientNum );
 
 namespace bots
 {
+	constexpr signed char moveFull = 127;
+	constexpr signed char moveNone = 0;
 	constexpr float planeCruiseHeight = 1400.0f;
 	constexpr float planeMinHeight = 450.0f;
 	constexpr float heloCruiseHeight = 500.0f;

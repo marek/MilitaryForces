@@ -97,14 +97,14 @@ void Bots::thinkInfantry( GameEntity* ent, State& bot, const Sense& sense, userc
 	vectoangles( dir, angles );
 	view[YAW] = angles[YAW];
 	view[PITCH] = 0;
-	cmd.forwardmove = 127;
+	cmd.forwardmove = moveFull;
 
 	if( theLevel.time_ > bot.stuckCheckTime )
 	{
 		if( Distance( ent->r.currentOrigin, bot.lastOrigin ) < 8 && theLevel.time_ > bot.spawnTime + 3000 )
 		{
 			bot.reverseTime = theLevel.time_ + 1200;
-			bot.reverseTurn = (rand() & 1) ? 127 : -127;
+			bot.reverseTurn = (rand() & 1) ? moveFull : -moveFull;
 		}
 		VectorCopy( ent->r.currentOrigin, bot.lastOrigin );
 		bot.stuckCheckTime = theLevel.time_ + 2000;
@@ -116,7 +116,7 @@ void Bots::thinkInfantry( GameEntity* ent, State& bot, const Sense& sense, userc
 	{
 		view[YAW] = sense.enemyAngles[YAW];
 		view[PITCH] = std::clamp( AngleSubtract( sense.enemyAngles[PITCH], 0 ), -60.0f, 60.0f );
-		cmd.forwardmove = 0;
+		cmd.forwardmove = moveNone;
 		if( client->ps_.ammo[WP_MACHINEGUN] > 0 )
 			cmd.buttons |= BUTTON_ATTACK;
 	}

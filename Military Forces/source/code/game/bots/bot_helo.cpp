@@ -158,13 +158,13 @@ void Bots::thinkHelo( GameEntity* ent, State& bot, const Sense& sense, usercmd_t
 	{
 		const float pitchError = wantPitch - ps.vehicleAngles[PITCH];
 		if( pitchError > 2 )
-			cmd.forwardmove = 127;
+			cmd.forwardmove = moveFull;
 		else if( pitchError < -2 )
-			cmd.forwardmove = -127;
+			cmd.forwardmove = -moveFull;
 		if( ps.vehicleAngles[ROLL] > 2 )
-			cmd.rightmove = -127;
+			cmd.rightmove = -moveFull;
 		else if( ps.vehicleAngles[ROLL] < -2 )
-			cmd.rightmove = 127;
+			cmd.rightmove = moveFull;
 	}
 
 	if( sense.enemy && !(ps.ONOFF & OO_LANDED) && !cover && !evading )

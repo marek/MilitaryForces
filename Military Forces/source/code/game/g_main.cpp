@@ -135,7 +135,7 @@ cvarTable_t		gameCvarTable[] = {
 	{ &g_botSkill, "g_botSkill", "3", CVAR_ARCHIVE, 0, false  },
 	{ &g_ruseReset, "g_ruseReset", "30", 0, 0, true  },
 	{ &g_botDebug, "g_botDebug", "0", 0, 0, false  },
-	{ &g_botLanding, "g_botLanding", "0", 0, 0, false  },
+	{ &g_botLanding, "g_botLanding", "1", 0, 0, false  },
 	{ &g_abandonTime, "g_abandonTime", "300", 0, 0, true  },
 	{ &g_enterRange, "g_enterRange", "45", 0, 0, true  },
 	{ &g_knockback, "g_knockback", "1000", 0, 0, true  },

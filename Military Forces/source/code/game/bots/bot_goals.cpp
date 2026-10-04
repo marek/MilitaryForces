@@ -62,7 +62,7 @@ Bots::Goal Bots::chooseGoal( GameEntity* ent, State& bot, const Sense& sense )
 	}
 	if( bot.pad >= 0 )
 		rearm = std::max( rearm, 0.9f );
-	if( rearm > 0 && sense.role != Role::Infantry && findPad( ent ) < 0 )
+	if( rearm > 0 && sense.role != Role::Infantry && findPad( ent, theLevel.time_ < bot.badPadTime ? bot.badPad : -1 ) < 0 )
 		rearm = 0;
 	if( sense.role == Role::Infantry || ((sense.role == Role::Fighter || sense.role == Role::Bomber) && (!g_botLanding.integer || theLevel.time_ < bot.landGiveUp)) )
 		rearm = 0;
@@ -98,7 +98,7 @@ Bots::Goal Bots::chooseGoal( GameEntity* ent, State& bot, const Sense& sense )
 	{
 		if( bot.pad < 0 )
 		{
-			bot.pad = findPad( ent );
+			bot.pad = findPad( ent, theLevel.time_ < bot.badPadTime ? bot.badPad : -1 );
 			bot.landPhase = 0;
 		}
 	}

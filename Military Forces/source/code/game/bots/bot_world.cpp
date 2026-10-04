@@ -216,7 +216,7 @@ void Bots::buildPads()
 					}
 				}
 				pad.halfLength = best * 0.5f;
-				pad.runway = best >= 1200.0f;
+				pad.runway = best >= 1000.0f;
 				pad.center[2] = pad.z;
 			}
 		}
@@ -224,7 +224,7 @@ void Bots::buildPads()
 	}
 }
 
-int Bots::findPad( GameEntity* ent )
+int Bots::findPad( GameEntity* ent, int skip )
 {
 	if( !padsBuilt_ )
 		buildPads();
@@ -236,7 +236,7 @@ int Bots::findPad( GameEntity* ent )
 	for( size_t i = 0; i < pads_.size(); i++ )
 	{
 		const Pad& pad = pads_[i];
-		if( !(pad.category & cat) || ((cat & CAT_PLANE) && !pad.runway) )
+		if( !(pad.category & cat) || ((cat & CAT_PLANE) && !pad.runway) || static_cast<int>( i ) == skip )
 			continue;
 		if( g_gametype.integer >= GT_TEAM && pad.team != ClientBase::TEAM_FREE && pad.team != client->sess_.sessionTeam_ )
 			continue;

@@ -124,24 +124,24 @@ void Bots::thinkSurface( GameEntity* ent, State& bot, const Sense& sense, usercm
 	if( blocked && theLevel.time_ > bot.reverseTime )
 	{
 		bot.reverseTime = theLevel.time_ + 1800;
-		bot.reverseTurn = (rand() & 1) ? 127 : -127;
+		bot.reverseTurn = (rand() & 1) ? moveFull : -moveFull;
 		pickGoal( ent, bot, boat ? 6000 : 4000 );
 	}
 
 	if( theLevel.time_ < bot.reverseTime )
 	{
-		cmd.forwardmove = -127;
+		cmd.forwardmove = -moveFull;
 		cmd.rightmove = bot.reverseTurn;
 	}
 	else
 	{
 		const float yawError = AngleSubtract( wantYaw, ps.vehicleAngles[YAW] );
 		if( yawError < -6 )
-			cmd.rightmove = 127;
+			cmd.rightmove = moveFull;
 		else if( yawError > 6 )
-			cmd.rightmove = -127;
+			cmd.rightmove = -moveFull;
 		if( !hold )
-			cmd.forwardmove = 127;
+			cmd.forwardmove = moveFull;
 	}
 
 	if( sense.enemy )

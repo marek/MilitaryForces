@@ -406,7 +406,7 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 			thinkInfantry( ent, bot, s, cmd, view );
 	}
 
-	const float wobble = (1.0f - skill( bot )) * 3.0f;
+	const float wobble = bot.desire == Goal::Rearm ? 0.0f : (1.0f - skill( bot )) * 3.0f;
 	bot.aimPhase += 0.11f;
 	view[YAW] += sin( bot.aimPhase ) * wobble;
 	view[PITCH] += cos( bot.aimPhase * 0.7f ) * wobble * 0.6f;

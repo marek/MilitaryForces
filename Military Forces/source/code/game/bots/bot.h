@@ -100,12 +100,19 @@ private:
 		int		landPhase = 0;
 		float	landDir = 1;
 		float	landRun = 3500;
+		float	landSlope = 0.15f;
+		bool	landOutbound = false;
+		float	landCeiling = 800;
+		int		badPad = -1;
+		int		badPadTime = 0;
+		float	landOffset = 45;
 		float	approachHeight = 0;
 		int		gearTime = 0;
 		int		landStart = 0;
 		int		landGiveUp = 0;
 		int		probeTime = 0;
 		bool	probeBlocked = false;
+		bool	confined = false;
 		float	takeoffYaw = 0;
 		int		takeoffTime = 0;
 	};
@@ -172,7 +179,7 @@ private:
 	static bool runwayAt( const vec3_t point );
 	static float runwayRun( const vec3_t origin, float yaw, float maxDist );
 	static void runwayHeading( GameEntity* ent, State& bot );
-	static int findPad( GameEntity* ent );
+	static int findPad( GameEntity* ent, int skip = -1 );
 	static bool replenished( GameEntity* ent );
 	static void finishRearm( GameEntity* ent, State& bot );
 	static bool landPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_t& cmd, vec3_t view );
