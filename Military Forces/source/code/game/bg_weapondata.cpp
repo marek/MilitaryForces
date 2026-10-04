@@ -11,2573 +11,1693 @@
 completeWeaponData_t availableWeapons[] = 
 {
 	// empty entry
-	{ 
-		static_cast<weaponType_t>(0),		// type
-		0,									// gameset
-		"",									// descriptiveName
-		"",									// shortName
-		"",									// shortName2 (GVs)
-		"",									// modelName
-		0,									// handle
-		"",									// vwepName
-		0,									// vwephandle
-		"",									// iconName
-		0,									// iconHandle
-		0,									// cat
-		0,									// non cat mod
-		0,									// muzzleVelocity
-		0,									// range
-		0,									// fuelrange
-		0,									// fire interval
-		0,									// damage
-		0,									// damageRadius
-		0,									// spread
-		0,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		0,									// crosshair
-		0,									// crosshair track
-		0,									// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		0,									// number per package
-		0,									// fits on category
-		PF_NA,								// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = static_cast<weaponType_t>(0),
+		.descriptiveName = "",
+		.shortName = "",
+		.shortName2 = "",
+		.modelName = "",
+		.vwepName = "",
+		.iconName = "",
+		.fitsPylon = PF_NA,
 	},
 
 	// machinegun: WW1, cal .303, 2 barrels
-	{ 
-		WT_MACHINEGUN,						// type
-		MF_GAMESET_WW1,						// gameset
-		"2x cal.303 MG",					// descriptiveName
-		"MG",								// shortName
-		"MG",								// shortName2 (GVs)
-		"",									// modelName
-		0,									// handle
-		"",									// vwepName
-		0,									// vwephandle
-		"hud/iconw_mg.tga",					// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		2000,								// muzzleVelocity
-		0,									// range
-		0,									// fuelrange
-		150,								// fire interval
-		10,									// damage
-		0,									// damageRadius
-		8,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
-		8,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_GUNMODE,							// crosshair
-		CH_GUNMODE,							// crosshair track
-		CH_GUNMODE,							// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_ANY,							// fits on category
-		PF_NA,								// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_MACHINEGUN,
+		.gameset = MF_GAMESET_WW1,
+		.descriptiveName = "2x cal.303 MG",
+		.shortName = "MG",
+		.shortName2 = "MG",
+		.modelName = "",
+		.vwepName = "",
+		.iconName = "hud/iconw_mg.tga",
+		.category = CAT_ANY,
+		.muzzleVelocity = 2000,
+		.fireInterval = 150,
+		.damage = 10,
+		.spread = 8,
+		.barrels = 8,
+		.crosshair = CH_GUNMODE,
+		.crosshairtrack = CH_GUNMODE,
+		.crosshairlock = CH_GUNMODE,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_ANY,
+		.fitsPylon = PF_NA,
 	},
 
 	// machinegun: WW1, cal .312, 2 barrels
-	{ 
-		WT_MACHINEGUN,						// type
-		MF_GAMESET_WW1,						// gameset
-		"2x cal.312 MG",					// descriptiveName
-		"MG",								// shortName
-		"MG",								// shortName2 (GVs)
-		"",									// modelName
-		0,									// handle
-		"",									// vwepName
-		0,									// vwephandle
-		"hud/iconw_mg.tga",					// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		2000,								// muzzleVelocity
-		0,									// range
-		0,									// fuelrange
-		150,								// fire interval
-		10,									// damage
-		0,									// damageRadius
-		8,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
-		8,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_GUNMODE,							// crosshair
-		CH_GUNMODE,							// crosshair track
-		CH_GUNMODE,							// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_ANY,							// fits on category
-		PF_NA,								// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_MACHINEGUN,
+		.gameset = MF_GAMESET_WW1,
+		.descriptiveName = "2x cal.312 MG",
+		.shortName = "MG",
+		.shortName2 = "MG",
+		.modelName = "",
+		.vwepName = "",
+		.iconName = "hud/iconw_mg.tga",
+		.category = CAT_ANY,
+		.muzzleVelocity = 2000,
+		.fireInterval = 150,
+		.damage = 10,
+		.spread = 8,
+		.barrels = 8,
+		.crosshair = CH_GUNMODE,
+		.crosshairtrack = CH_GUNMODE,
+		.crosshairlock = CH_GUNMODE,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_ANY,
+		.fitsPylon = PF_NA,
 	},
 
 	// machinegun: WW2, cal 50, 8 barrels
-	{ 
-		WT_MACHINEGUN,						// type
-		MF_GAMESET_WW2,						// gameset
-		"8x cal.50 MG",						// descriptiveName
-		"MG",								// shortName
-		"MG",								// shortName2 (GVs)
-		"",									// modelName
-		0,									// handle
-		"",									// vwepName
-		0,									// vwephandle
-		"hud/iconw_mg.tga",					// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		3000,								// muzzleVelocity
-		0,									// range
-		0,									// fuelrange
-		150,								// fire interval
-		15,									// damage
-		0,									// damageRadius
-		8,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
-		8,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_GUNMODE,							// crosshair
-		CH_GUNMODE,							// crosshair track
-		CH_GUNMODE,							// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_ANY,							// fits on category
-		PF_NA,								// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_MACHINEGUN,
+		.gameset = MF_GAMESET_WW2,
+		.descriptiveName = "8x cal.50 MG",
+		.shortName = "MG",
+		.shortName2 = "MG",
+		.modelName = "",
+		.vwepName = "",
+		.iconName = "hud/iconw_mg.tga",
+		.category = CAT_ANY,
+		.muzzleVelocity = 3000,
+		.fireInterval = 150,
+		.damage = 15,
+		.spread = 8,
+		.barrels = 8,
+		.crosshair = CH_GUNMODE,
+		.crosshairtrack = CH_GUNMODE,
+		.crosshairlock = CH_GUNMODE,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_ANY,
+		.fitsPylon = PF_NA,
 	},
 
 	// machinegun: WW2, cal 50, 6 barrels
-	{ 
-		WT_MACHINEGUN,						// type
-		MF_GAMESET_WW2,						// gameset
-		"6x cal.50 MG",						// descriptiveName
-		"MG",								// shortName
-		"MG",								// shortName2 (GVs)
-		"",									// modelName
-		0,									// handle
-		"",									// vwepName
-		0,									// vwephandle
-		"hud/iconw_mg.tga",					// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		3000,								// muzzleVelocity
-		0,									// range
-		0,									// fuelrange
-		150,								// fire interval
-		15,									// damage
-		0,									// damageRadius
-		8,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
-		6,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_GUNMODE,							// crosshair
-		CH_GUNMODE,							// crosshair track
-		CH_GUNMODE,							// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_ANY,							// fits on category
-		PF_NA,								// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_MACHINEGUN,
+		.gameset = MF_GAMESET_WW2,
+		.descriptiveName = "6x cal.50 MG",
+		.shortName = "MG",
+		.shortName2 = "MG",
+		.modelName = "",
+		.vwepName = "",
+		.iconName = "hud/iconw_mg.tga",
+		.category = CAT_ANY,
+		.muzzleVelocity = 3000,
+		.fireInterval = 150,
+		.damage = 15,
+		.spread = 8,
+		.barrels = 6,
+		.crosshair = CH_GUNMODE,
+		.crosshairtrack = CH_GUNMODE,
+		.crosshairlock = CH_GUNMODE,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_ANY,
+		.fitsPylon = PF_NA,
 	},
 
 	// machinegun: any set, 12.7mm, 1 barrel
-	{ 
-		WT_MACHINEGUN,						// type
-		MF_GAMESET_ANY,						// gameset
-		"12.7mm MG",						// descriptiveName
-		"MG",								// shortName
-		"MG",								// shortName2 (GVs)
-		"",									// modelName
-		0,									// handle
-		"",									// vwepName
-		0,									// vwephandle
-		"hud/iconw_mg.tga",					// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		3000,								// muzzleVelocity
-		0,									// range
-		0,									// fuelrange
-		100,								// fire interval
-		6,									// damage
-		0,									// damageRadius
-		14,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
-		1,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_GUNMODE,							// crosshair
-		CH_GUNMODE,							// crosshair track
-		CH_GUNMODE,							// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_ANY,							// fits on category
-		PF_NA,								// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_MACHINEGUN,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "12.7mm MG",
+		.shortName = "MG",
+		.shortName2 = "MG",
+		.modelName = "",
+		.vwepName = "",
+		.iconName = "hud/iconw_mg.tga",
+		.category = CAT_ANY,
+		.muzzleVelocity = 3000,
+		.fireInterval = 100,
+		.damage = 6,
+		.spread = 14,
+		.barrels = 1,
+		.crosshair = CH_GUNMODE,
+		.crosshairtrack = CH_GUNMODE,
+		.crosshairlock = CH_GUNMODE,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_ANY,
+		.fitsPylon = PF_NA,
 	},
 
 	// machinegun: any set, 14.5mm, 1 barrel
-	{ 
-		WT_MACHINEGUN,						// type
-		MF_GAMESET_ANY,						// gameset
-		"Dual 14.5mm MG",					// descriptiveName
-		"MG",								// shortName
-		"MG",								// shortName2 (GVs)
-		"",									// modelName
-		0,									// handle
-		"",									// vwepName
-		0,									// vwephandle
-		"hud/iconw_mg.tga",					// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		3000,								// muzzleVelocity
-		0,									// range
-		0,									// fuelrange
-		120,								// fire interval
-		7,									// damage
-		0,									// damageRadius
-		14,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
-		2,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_GUNMODE,							// crosshair
-		CH_GUNMODE,							// crosshair track
-		CH_GUNMODE,							// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_ANY,							// fits on category
-		PF_NA,								// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_MACHINEGUN,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "Dual 14.5mm MG",
+		.shortName = "MG",
+		.shortName2 = "MG",
+		.modelName = "",
+		.vwepName = "",
+		.iconName = "hud/iconw_mg.tga",
+		.category = CAT_ANY,
+		.muzzleVelocity = 3000,
+		.fireInterval = 120,
+		.damage = 7,
+		.spread = 14,
+		.barrels = 2,
+		.crosshair = CH_GUNMODE,
+		.crosshairtrack = CH_GUNMODE,
+		.crosshairlock = CH_GUNMODE,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_ANY,
+		.fitsPylon = PF_NA,
 	},
 
 	// machinegun: any set,  4x14.5mm, 1 barrel
-	{ 
-		WT_MACHINEGUN,						// type
-		MF_GAMESET_ANY,						// gameset
-		"Quad 14.5mm MG",					// descriptiveName
-		"MG",								// shortName
-		"MG",								// shortName2 (GVs)
-		"",									// modelName
-		0,									// handle
-		"",									// vwepName
-		0,									// vwephandle
-		"hud/iconw_mg.tga",					// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		3000,								// muzzleVelocity
-		0,									// range
-		0,									// fuelrange
-		100,								// fire interval
-		7,									// damage
-		0,									// damageRadius
-		14,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
-		4,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_GUNMODE,							// crosshair
-		CH_GUNMODE,							// crosshair track
-		CH_GUNMODE,							// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_ANY,							// fits on category
-		PF_NA,								// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_MACHINEGUN,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "Quad 14.5mm MG",
+		.shortName = "MG",
+		.shortName2 = "MG",
+		.modelName = "",
+		.vwepName = "",
+		.iconName = "hud/iconw_mg.tga",
+		.category = CAT_ANY,
+		.muzzleVelocity = 3000,
+		.fireInterval = 100,
+		.damage = 7,
+		.spread = 14,
+		.barrels = 4,
+		.crosshair = CH_GUNMODE,
+		.crosshairtrack = CH_GUNMODE,
+		.crosshairlock = CH_GUNMODE,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_ANY,
+		.fitsPylon = PF_NA,
 	},
 
 	// machinegun: modern, 20mm, 1 barrel
-	{ 
-		WT_MACHINEGUN,						// type
-		MF_GAMESET_MODERN,					// gameset
-		"20mm MG",							// descriptiveName
-		"GUN",								// shortName
-		"MG",								// shortName2 (GVs)
-		"",									// modelName
-		0,									// handle
-		"",									// vwepName
-		0,									// vwephandle
-		"hud/iconw_mg.tga",					// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		3000,								// muzzleVelocity
-		6500,								// range (for AAA-GI guns)
-		0,									// fuelrange
-		100,								// fire interval
-		12,									// damage
-		0,									// damageRadius
-		14,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
-		1,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_GUNMODE,							// crosshair
-		CH_GUNMODE,							// crosshair track
-		CH_GUNMODE,							// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_ANY,							// fits on category
-		PF_NA,								// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_MACHINEGUN,
+		.gameset = MF_GAMESET_MODERN,
+		.descriptiveName = "20mm MG",
+		.shortName = "GUN",
+		.shortName2 = "MG",
+		.modelName = "",
+		.vwepName = "",
+		.iconName = "hud/iconw_mg.tga",
+		.category = CAT_ANY,
+		.muzzleVelocity = 3000,
+		.range = 6500,
+		.fireInterval = 100,
+		.damage = 12,
+		.spread = 14,
+		.barrels = 1,
+		.crosshair = CH_GUNMODE,
+		.crosshairtrack = CH_GUNMODE,
+		.crosshairlock = CH_GUNMODE,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_ANY,
+		.fitsPylon = PF_NA,
 	},
 
 
 	// machinegun: modern, 30mm, 1 barrel
-	{ 
-		WT_MACHINEGUN,						// type
-		MF_GAMESET_MODERN,					// gameset
-		"30mm MG",							// descriptiveName
-		"GUN",								// shortName
-		"MG",								// shortName2 (GVs)
-		"",									// modelName
-		0,									// handle
-		"",									// vwepName
-		0,									// vwephandle
-		"hud/iconw_mg.tga",					// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		2500,								// muzzleVelocity
-		0,									// range
-		0,									// fuelrange
-		100,								// fire interval
-		35,									// damage
-		30,									// damageRadius
-		16,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
-		1,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_GUNMODE,							// crosshair
-		CH_GUNMODE,							// crosshair track
-		CH_GUNMODE,							// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_ANY,							// fits on category
-		PF_NA,								// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_MACHINEGUN,
+		.gameset = MF_GAMESET_MODERN,
+		.descriptiveName = "30mm MG",
+		.shortName = "GUN",
+		.shortName2 = "MG",
+		.modelName = "",
+		.vwepName = "",
+		.iconName = "hud/iconw_mg.tga",
+		.category = CAT_ANY,
+		.muzzleVelocity = 2500,
+		.fireInterval = 100,
+		.damage = 35,
+		.damageRadius = 30,
+		.spread = 16,
+		.barrels = 1,
+		.crosshair = CH_GUNMODE,
+		.crosshairtrack = CH_GUNMODE,
+		.crosshairlock = CH_GUNMODE,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_ANY,
+		.fitsPylon = PF_NA,
 	},
 
 
 
 	// machinegun: modern, 20mm, 2 barrel
-	{ 
-		WT_MACHINEGUN,						// type
-		MF_GAMESET_MODERN,					// gameset
-		"Dual 20mm MG",						// descriptiveName
-		"GUN",								// shortName
-		"MG",								// shortName2 (GVs)
-		"",									// modelName
-		0,									// handle
-		"",									// vwepName
-		0,									// vwephandle
-		"hud/iconw_mg.tga",					// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		3000,								// muzzleVelocity 
-		0,									// range
-		0,									// fuelrange
-		100,								// fire interval
-		17,									// damage
-		0,									// damageRadius
-		10,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
-		2,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_GUNMODE,							// crosshair
-		CH_GUNMODE,							// crosshair track
-		CH_GUNMODE,							// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_ANY,							// fits on category
-		PF_NA,								// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_MACHINEGUN,
+		.gameset = MF_GAMESET_MODERN,
+		.descriptiveName = "Dual 20mm MG",
+		.shortName = "GUN",
+		.shortName2 = "MG",
+		.modelName = "",
+		.vwepName = "",
+		.iconName = "hud/iconw_mg.tga",
+		.category = CAT_ANY,
+		.muzzleVelocity = 3000,
+		.fireInterval = 100,
+		.damage = 17,
+		.spread = 10,
+		.barrels = 2,
+		.crosshair = CH_GUNMODE,
+		.crosshairtrack = CH_GUNMODE,
+		.crosshairlock = CH_GUNMODE,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_ANY,
+		.fitsPylon = PF_NA,
 	},
 
 	// machinegun: M4A1
-	{ 
-		WT_MACHINEGUN,						// type
-		MF_GAMESET_MODERN,					// gameset
-		"M4A1",								// descriptiveName
-		"GUN",								// shortName
-		"MG",								// shortName2 (GVs)
-		"models/weapons/m4a1.md3",			// modelName
-		0,									// handle
-		"models/weapons/m4a1.md3",			// vwepName
-		0,									// vwephandle
-		"hud/iconw_mg.tga",					// iconName
-		0,									// iconHandle
-		CAT_LQM,							// cat
-		0,									// non cat mod
-		2500,								// muzzleVelocity
-		0,									// range
-		0,									// fuelrange
-		150,								// fire interval
-		2,									// damage
-		30,									// damageRadius
-		16,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
-		1,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_GUNMODE,							// crosshair
-		CH_GUNMODE,							// crosshair track
-		CH_GUNMODE,							// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		30,									// number per package
-		CAT_ANY,							// fits on category
-		PF_NA,								// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_MACHINEGUN,
+		.gameset = MF_GAMESET_MODERN,
+		.descriptiveName = "M4A1",
+		.shortName = "GUN",
+		.shortName2 = "MG",
+		.modelName = "models/weapons/m4a1.md3",
+		.vwepName = "models/weapons/m4a1.md3",
+		.iconName = "hud/iconw_mg.tga",
+		.category = CAT_LQM,
+		.muzzleVelocity = 2500,
+		.fireInterval = 150,
+		.damage = 2,
+		.damageRadius = 30,
+		.spread = 16,
+		.barrels = 1,
+		.crosshair = CH_GUNMODE,
+		.crosshairtrack = CH_GUNMODE,
+		.crosshairlock = CH_GUNMODE,
+		.numberPerPackage = 30,
+		.fitsCategory = CAT_ANY,
+		.fitsPylon = PF_NA,
 	},
 
 	// machinegun: modern, 30mm, 2 barrel
-	{ 
-		WT_MACHINEGUN,						// type
-		MF_GAMESET_MODERN,					// gameset
-		"Dual 30mm MG",						// descriptiveName
-		"GUN",								// shortName
-		"MG",								// shortName2 (GVs)
-		"",									// modelName
-		0,									// handle
-		"",									// vwepName
-		0,									// vwephandle
-		"hud/iconw_mg.tga",					// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		2800,								// muzzleVelocity
-		0,									// range
-		0,									// fuelrange
-		140,								// fire interval
-		20,									// damage
-		0,									// damageRadius
-		10,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
-		2,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_GUNMODE,							// crosshair
-		CH_GUNMODE,							// crosshair track
-		CH_GUNMODE,							// crosshair lock
-		1,									// turret
-		{5,120,0},							// max turret angles
-		{-75,-120,0},							// min turret angles
-		1,									// number per package
-		CAT_ANY,							// fits on category
-		PF_NA,								// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_MACHINEGUN,
+		.gameset = MF_GAMESET_MODERN,
+		.descriptiveName = "Dual 30mm MG",
+		.shortName = "GUN",
+		.shortName2 = "MG",
+		.modelName = "",
+		.vwepName = "",
+		.iconName = "hud/iconw_mg.tga",
+		.category = CAT_ANY,
+		.muzzleVelocity = 2800,
+		.fireInterval = 140,
+		.damage = 20,
+		.spread = 10,
+		.barrels = 2,
+		.crosshair = CH_GUNMODE,
+		.crosshairtrack = CH_GUNMODE,
+		.crosshairlock = CH_GUNMODE,
+		.turret = 1,
+		.maxturns = {5,120,0},
+		.minturns = {-75,-120,0},
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_ANY,
+		.fitsPylon = PF_NA,
 	},
 
 	// machinegun: modern, 7.62mm minigun turret
-	{ 
-		WT_MACHINEGUN,						// type
-		MF_GAMESET_MODERN,					// gameset
-		"7.62mm Minigun",						// descriptiveName
-		"GUN",								// shortName
-		"MG",								// shortName2 (GVs)
-		"",									// modelName
-		0,									// handle
-		"",									// vwepName
-		0,									// vwephandle
-		"hud/iconw_mg.tga",					// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		3500,								// muzzleVelocity
-		0,									// range
-		0,									// fuelrange
-		100,								// fire interval
-		10,									// damage
-		0,									// damageRadius
-		5,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
-		1,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_GUNMODE,							// crosshair
-		CH_GUNMODE,							// crosshair track
-		CH_GUNMODE,							// crosshair lock
-		1,									// turret
-		{45,-2,0},							// max turret angles
-		{-10,-178,0},							// min turret angles
-		1,									// number per package
-		CAT_ANY,							// fits on category
-		PF_NA,								// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_MACHINEGUN,
+		.gameset = MF_GAMESET_MODERN,
+		.descriptiveName = "7.62mm Minigun",
+		.shortName = "GUN",
+		.shortName2 = "MG",
+		.modelName = "",
+		.vwepName = "",
+		.iconName = "hud/iconw_mg.tga",
+		.category = CAT_ANY,
+		.muzzleVelocity = 3500,
+		.fireInterval = 100,
+		.damage = 10,
+		.spread = 5,
+		.barrels = 1,
+		.crosshair = CH_GUNMODE,
+		.crosshairtrack = CH_GUNMODE,
+		.crosshairlock = CH_GUNMODE,
+		.turret = 1,
+		.maxturns = {45,-2,0},
+		.minturns = {-10,-178,0},
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_ANY,
+		.fitsPylon = PF_NA,
 	},
 
 	// machinegun: modern, 12.7mm turret
-	{ 
-		WT_MACHINEGUN,						// type
-		MF_GAMESET_MODERN,					// gameset
-		"12.7mm MG",						// descriptiveName
-		"GUN",								// shortName
-		"MG",								// shortName2 (GVs)
-		"",									// modelName
-		0,									// handle
-		"",									// vwepName
-		0,									// vwephandle
-		"hud/iconw_mg.tga",					// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		2900,								// muzzleVelocity
-		0,									// range
-		0,									// fuelrange
-		100,								// fire interval
-		6,									// damage
-		0,									// damageRadius
-		10,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
-		1,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_GUNMODE,							// crosshair
-		CH_GUNMODE,							// crosshair track
-		CH_GUNMODE,							// crosshair lock
-		1,									// turret
-		{45,45,0},							// max turret angles
-		{-45,135,0},							// min turret angles
-		1,									// number per package
-		CAT_ANY,							// fits on category
-		PF_NA,								// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_MACHINEGUN,
+		.gameset = MF_GAMESET_MODERN,
+		.descriptiveName = "12.7mm MG",
+		.shortName = "GUN",
+		.shortName2 = "MG",
+		.modelName = "",
+		.vwepName = "",
+		.iconName = "hud/iconw_mg.tga",
+		.category = CAT_ANY,
+		.muzzleVelocity = 2900,
+		.fireInterval = 100,
+		.damage = 6,
+		.spread = 10,
+		.barrels = 1,
+		.crosshair = CH_GUNMODE,
+		.crosshairtrack = CH_GUNMODE,
+		.crosshairlock = CH_GUNMODE,
+		.turret = 1,
+		.maxturns = {45,45,0},
+		.minturns = {-45,135,0},
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_ANY,
+		.fitsPylon = PF_NA,
 	},
 
 	// FFAR
-	{ 
-		WT_ROCKET,							// type
-		MF_GAMESET_ANY,						// gameset
-		"FFAR (19)",						// descriptiveName
-		"FFAR",								// shortName
-		"FFAR",								// shortName2 (GVs)
-		"models/weapons/vwep_rocket.md3",	// modelName
-		0,									// handle
-		"models/weapons/vwep_ffar.md3",		// vwepName
-		0,									// vwephandle
-		"hud/iconw_rkt.tga",				// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		1500,								// muzzleVelocity
-		0,									// range
-		5000,								// fuelrange
-		180,								// fire interval
-		40,									// damage
-		50,									// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_ROCKETMODE,						// crosshair
-		CH_ROCKETMODE,						// crosshair track
-		CH_ROCKETMODE,						// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		19,									// number per package
-		CAT_PLANE|CAT_HELO,					// fits on category
-		PF_FFAR,							// fits on pylon
-		0,									// basicECMVulnerability
-		WF_HAS_FIRE_FRAME,					// flags
+	{
+		.type = WT_ROCKET,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "FFAR (19)",
+		.shortName = "FFAR",
+		.shortName2 = "FFAR",
+		.modelName = "models/weapons/vwep_rocket.md3",
+		.vwepName = "models/weapons/vwep_ffar.md3",
+		.iconName = "hud/iconw_rkt.tga",
+		.category = CAT_ANY,
+		.muzzleVelocity = 1500,
+		.fuelrange = 5000,
+		.fireInterval = 180,
+		.damage = 40,
+		.damageRadius = 50,
+		.spread = 1,
+		.barrels = 2,
+		.crosshair = CH_ROCKETMODE,
+		.crosshairtrack = CH_ROCKETMODE,
+		.crosshairlock = CH_ROCKETMODE,
+		.numberPerPackage = 19,
+		.fitsCategory = CAT_PLANE|CAT_HELO,
+		.fitsPylon = PF_FFAR,
+		.flags = WF_HAS_FIRE_FRAME,
 	},
 
 	// FFAR
-	{ 
-		WT_ROCKET,							// type
-		MF_GAMESET_ANY,						// gameset
-		"FFAR (7)",							// descriptiveName
-		"FFAR",								// shortName
-		"FFAR",								// shortName2 (GVs)
-		"models/weapons/vwep_rocket.md3",	// modelName
-		0,									// handle
-		"models/weapons/vwep_ffar_lt.md3",	// vwepName
-		0,									// vwephandle
-		"hud/iconw_rkt.tga",				// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		1500,								// muzzleVelocity
-		0,									// range
-		5000,								// fuelrange
-		180,								// fire interval
-		40,									// damage
-		50,									// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_ROCKETMODE,						// crosshair
-		CH_ROCKETMODE,						// crosshair track
-		CH_ROCKETMODE,						// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		7,									// number per package
-		CAT_PLANE|CAT_HELO,					// fits on category
-		PF_FFAR,							// fits on pylon
-		0,									// basicECMVulnerability
-		WF_HAS_FIRE_FRAME,					// flags
+	{
+		.type = WT_ROCKET,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "FFAR (7)",
+		.shortName = "FFAR",
+		.shortName2 = "FFAR",
+		.modelName = "models/weapons/vwep_rocket.md3",
+		.vwepName = "models/weapons/vwep_ffar_lt.md3",
+		.iconName = "hud/iconw_rkt.tga",
+		.category = CAT_ANY,
+		.muzzleVelocity = 1500,
+		.fuelrange = 5000,
+		.fireInterval = 180,
+		.damage = 40,
+		.damageRadius = 50,
+		.spread = 1,
+		.barrels = 2,
+		.crosshair = CH_ROCKETMODE,
+		.crosshairtrack = CH_ROCKETMODE,
+		.crosshairlock = CH_ROCKETMODE,
+		.numberPerPackage = 7,
+		.fitsCategory = CAT_PLANE|CAT_HELO,
+		.fitsPylon = PF_FFAR,
+		.flags = WF_HAS_FIRE_FRAME,
 	},
 
 
 	// FFAR
-	{ 
-		WT_ROCKET,							// type
-		MF_GAMESET_ANY,						// gameset
-		"FFAR+ (6)",						// descriptiveName
-		"FFAR+",							// shortName
-		"FFAR+",							// shortName2 (GVs)
-		"models/weapons/vwep_rocket_hv.md3",// modelName
-		0,									// handle
-		"models/weapons/vwep_ffar_hv.md3",	// vwepName
-		0,									// vwephandle
-		"hud/iconw_rkt.tga",				// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		1500,								// muzzleVelocity
-		0,									// range
-		5000,								// fuelrange
-		200,								// fire interval
-		80, 								// damage
-		80,									// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_ROCKETMODE,						// crosshair
-		CH_ROCKETMODE,						// crosshair track
-		CH_ROCKETMODE,						// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		6,									// number per package
-		CAT_PLANE|CAT_HELO,					// fits on category
-		PF_FFAR,							// fits on pylon  !! PF_FFAR&PF_AG_HVY !!
-		0,									// basicECMVulnerability
-		WF_HAS_FIRE_FRAME,					// flags
+	{
+		.type = WT_ROCKET,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "FFAR+ (6)",
+		.shortName = "FFAR+",
+		.shortName2 = "FFAR+",
+		.modelName = "models/weapons/vwep_rocket_hv.md3",
+		.vwepName = "models/weapons/vwep_ffar_hv.md3",
+		.iconName = "hud/iconw_rkt.tga",
+		.category = CAT_ANY,
+		.muzzleVelocity = 1500,
+		.fuelrange = 5000,
+		.fireInterval = 200,
+		.damage = 80,
+		.damageRadius = 80,
+		.spread = 1,
+		.barrels = 2,
+		.crosshair = CH_ROCKETMODE,
+		.crosshairtrack = CH_ROCKETMODE,
+		.crosshairlock = CH_ROCKETMODE,
+		.numberPerPackage = 6,
+		.fitsCategory = CAT_PLANE|CAT_HELO,
+		.fitsPylon = PF_FFAR,
+		.flags = WF_HAS_FIRE_FRAME,
 	},
 
 
 	// tank gun
-	{ 
-		WT_BALLISTICGUN,					// type
-		MF_GAMESET_ANY,						// gameset
-		"100mm Gun",						// descriptiveName
-		"GUN",								// shortName
-		"GUN",								// shortName2 (GVs)
-		"models/weapons/ffar.md3",			// modelName
-		0,									// handle
-		"",									// vwepName
-		0,									// vwephandle
-		"hud/iconw_rkt.tga",				// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		2000,								// muzzleVelocity
-		0,									// range
-		0,									// fuelrange
-		1500,								// fire interval
-		110,								// damage
-		60,									// damageRadius
-		1,									// spread
-		1,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_ROCKETMODE,						// crosshair
-		CH_ROCKETMODE,						// crosshair track
-		CH_ROCKETMODE,						// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_GROUND,							// fits on category
-		PF_NA,								// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_BALLISTICGUN,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "100mm Gun",
+		.shortName = "GUN",
+		.shortName2 = "GUN",
+		.modelName = "models/weapons/ffar.md3",
+		.vwepName = "",
+		.iconName = "hud/iconw_rkt.tga",
+		.category = CAT_ANY,
+		.muzzleVelocity = 2000,
+		.fireInterval = 1500,
+		.damage = 110,
+		.damageRadius = 60,
+		.spread = 1,
+		.barrels = 1,
+		.crosshair = CH_ROCKETMODE,
+		.crosshairtrack = CH_ROCKETMODE,
+		.crosshairlock = CH_ROCKETMODE,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_GROUND,
+		.fitsPylon = PF_NA,
 	},
 
 	// tank gun
-	{ 
-		WT_BALLISTICGUN,					// type
-		MF_GAMESET_ANY,						// gameset
-		"125mm Gun",						// descriptiveName
-		"GUN",								// shortName
-		"GUN",								// shortName2 (GVs)
-		"models/weapons/ffar.md3",			// modelName
-		0,									// handle
-		"",									// vwepName
-		0,									// vwephandle
-		"hud/iconw_rkt.tga",				// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		2500,								// muzzleVelocity
-		0,									// range
-		0,									// fuelrange
-		1500,								// fire interval
-		150,								// damage
-		80,									// damageRadius
-		1,									// spread
-		1,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_ROCKETMODE,						// crosshair
-		CH_ROCKETMODE,						// crosshair track
-		CH_ROCKETMODE,						// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_GROUND,							// fits on category
-		PF_NA,								// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_BALLISTICGUN,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "125mm Gun",
+		.shortName = "GUN",
+		.shortName2 = "GUN",
+		.modelName = "models/weapons/ffar.md3",
+		.vwepName = "",
+		.iconName = "hud/iconw_rkt.tga",
+		.category = CAT_ANY,
+		.muzzleVelocity = 2500,
+		.fireInterval = 1500,
+		.damage = 150,
+		.damageRadius = 80,
+		.spread = 1,
+		.barrels = 1,
+		.crosshair = CH_ROCKETMODE,
+		.crosshairtrack = CH_ROCKETMODE,
+		.crosshairlock = CH_ROCKETMODE,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_GROUND,
+		.fitsPylon = PF_NA,
 	},
 
 	// iron bombs
-	{ 
-		WT_IRONBOMB,						// type
-		MF_GAMESET_ANY,						// gameset
-		"Mk82",								// descriptiveName
-		"MK-82",							// shortName
-		"BAD SHIT",							// shortName2 (GVs)
-		"models/weapons/vwep_500.md3",		// modelName
-		0,									// handle
-		"models/weapons/vwep_500.md3",		// vwepName
-		0,									// vwephandle
-		"hud/iconw_bmb.tga",				// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		0,									// muzzleVelocity
-		0,									// range
-		0,									// fuelrange
-		100,								// fire interval
-		50,								// damage
-		150,								// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_BOMBMODE,						// crosshair
-		CH_BOMBMODE,						// crosshair track
-		CH_BOMBMODE,						// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_PLANE,							// fits on category
-		PF_AG_LT,							// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_IRONBOMB,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "Mk82",
+		.shortName = "MK-82",
+		.shortName2 = "BAD SHIT",
+		.modelName = "models/weapons/vwep_500.md3",
+		.vwepName = "models/weapons/vwep_500.md3",
+		.iconName = "hud/iconw_bmb.tga",
+		.category = CAT_ANY,
+		.fireInterval = 100,
+		.damage = 50,
+		.damageRadius = 150,
+		.spread = 1,
+		.barrels = 2,
+		.crosshair = CH_BOMBMODE,
+		.crosshairtrack = CH_BOMBMODE,
+		.crosshairlock = CH_BOMBMODE,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_PLANE,
+		.fitsPylon = PF_AG_LT,
 	},
 
 
 	// iron bombs
-	{ 
-		WT_IRONBOMB,						// type
-		MF_GAMESET_ANY,						// gameset
-		"Mk82 R",							// descriptiveName
-		"MK-82 R",							// shortName
-		"BAD SHIT R",						// shortName2 (GVs)
-		"models/weapons/vwep_500.md3",		// modelName
-		0,									// handle
-		"models/weapons/vwep_500.md3",		// vwepName
-		0,									// vwephandle
-		"hud/iconw_bmb.tga",				// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		0,									// muzzleVelocity
-		0,									// range
-		0,									// fuelrange
-		100,								// fire interval
-		50,									// damage
-		150,								// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_BOMBMODE,						// crosshair
-		CH_BOMBMODE,						// crosshair track
-		CH_BOMBMODE,						// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_PLANE,							// fits on category
-		PF_AG_LT,							// fits on pylon
-		0,									// basicECMVulnerability
-		WF_HAS_FIRE_FRAME,					// flags
+	{
+		.type = WT_IRONBOMB,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "Mk82 R",
+		.shortName = "MK-82 R",
+		.shortName2 = "BAD SHIT R",
+		.modelName = "models/weapons/vwep_500.md3",
+		.vwepName = "models/weapons/vwep_500.md3",
+		.iconName = "hud/iconw_bmb.tga",
+		.category = CAT_ANY,
+		.fireInterval = 100,
+		.damage = 50,
+		.damageRadius = 150,
+		.spread = 1,
+		.barrels = 2,
+		.crosshair = CH_BOMBMODE,
+		.crosshairtrack = CH_BOMBMODE,
+		.crosshairlock = CH_BOMBMODE,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_PLANE,
+		.fitsPylon = PF_AG_LT,
+		.flags = WF_HAS_FIRE_FRAME,
 	},
 
 
 	// iron bombs
-	{ 
-		WT_IRONBOMB,						// type
-		MF_GAMESET_ANY,						// gameset
-		"Mk83",								// descriptiveName
-		"MK-83",							// shortName
-		"BAD SHIT",							// shortName2 (GVs)
-		"models/weapons/vwep_1000.md3",		// modelName
-		0,									// handle
-		"models/weapons/vwep_1000.md3",		// vwepName
-		0,									// vwephandle
-		"hud/iconw_bmb.tga",				// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		0,									// muzzleVelocity
-		0,									// range
-		0,									// fuelrange
-		200,								// fire interval
-		120,								// damage
-		230,								// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_BOMBMODE,						// crosshair
-		CH_BOMBMODE,						// crosshair track
-		CH_BOMBMODE,						// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_PLANE,							// fits on category
-		PF_AG_MED,							// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_IRONBOMB,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "Mk83",
+		.shortName = "MK-83",
+		.shortName2 = "BAD SHIT",
+		.modelName = "models/weapons/vwep_1000.md3",
+		.vwepName = "models/weapons/vwep_1000.md3",
+		.iconName = "hud/iconw_bmb.tga",
+		.category = CAT_ANY,
+		.fireInterval = 200,
+		.damage = 120,
+		.damageRadius = 230,
+		.spread = 1,
+		.barrels = 2,
+		.crosshair = CH_BOMBMODE,
+		.crosshairtrack = CH_BOMBMODE,
+		.crosshairlock = CH_BOMBMODE,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_PLANE,
+		.fitsPylon = PF_AG_MED,
 	},
 
 
 	// iron bombs
-	{ 
-		WT_IRONBOMB,						// type
-		MF_GAMESET_ANY,						// gameset
-		"Mk83 R",								// descriptiveName
-		"MK-83 R",							// shortName
-		"BAD SHIT",							// shortName2 (GVs)
-		"models/weapons/vwep_1000.md3",		// modelName
-		0,									// handle
-		"models/weapons/vwep_1000.md3",		// vwepName
-		0,									// vwephandle
-		"hud/iconw_bmb.tga",				// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		0,									// muzzleVelocity
-		0,									// range
-		0,									// fuelrange
-		200,								// fire interval
-		120,								// damage
-		230,								// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_BOMBMODE,						// crosshair
-		CH_BOMBMODE,						// crosshair track
-		CH_BOMBMODE,						// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_PLANE,							// fits on category
-		PF_AG_MED,							// fits on pylon
-		0,									// basicECMVulnerability
-		WF_HAS_FIRE_FRAME,					// flags
+	{
+		.type = WT_IRONBOMB,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "Mk83 R",
+		.shortName = "MK-83 R",
+		.shortName2 = "BAD SHIT",
+		.modelName = "models/weapons/vwep_1000.md3",
+		.vwepName = "models/weapons/vwep_1000.md3",
+		.iconName = "hud/iconw_bmb.tga",
+		.category = CAT_ANY,
+		.fireInterval = 200,
+		.damage = 120,
+		.damageRadius = 230,
+		.spread = 1,
+		.barrels = 2,
+		.crosshair = CH_BOMBMODE,
+		.crosshairtrack = CH_BOMBMODE,
+		.crosshairlock = CH_BOMBMODE,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_PLANE,
+		.fitsPylon = PF_AG_MED,
+		.flags = WF_HAS_FIRE_FRAME,
 	},
 
 
 
 	// iron bombs
-	{ 
-		WT_IRONBOMB,						// type
-		MF_GAMESET_ANY,						// gameset
-		"Mk84",								// descriptiveName
-		"MK-84",							// shortName
-		"BAD SHIT",							// shortName2 (GVs)
-		"models/weapons/vwep_2000.md3",		// modelName
-		0,									// handle
-		"models/weapons/vwep_2000.md3",		// vwepName
-		0,									// vwephandle
-		"hud/iconw_bmb.tga",				// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		0,									// muzzleVelocity
-		0,									// range
-		0,									// fuelrange
-		300,								// fire interval
-		260,								// damage
-		330,								// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_BOMBMODE,						// crosshair
-		CH_BOMBMODE,						// crosshair track
-		CH_BOMBMODE,						// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_PLANE,							// fits on category
-		PF_AG_HVY,							// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_IRONBOMB,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "Mk84",
+		.shortName = "MK-84",
+		.shortName2 = "BAD SHIT",
+		.modelName = "models/weapons/vwep_2000.md3",
+		.vwepName = "models/weapons/vwep_2000.md3",
+		.iconName = "hud/iconw_bmb.tga",
+		.category = CAT_ANY,
+		.fireInterval = 300,
+		.damage = 260,
+		.damageRadius = 330,
+		.spread = 1,
+		.barrels = 2,
+		.crosshair = CH_BOMBMODE,
+		.crosshairtrack = CH_BOMBMODE,
+		.crosshairlock = CH_BOMBMODE,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_PLANE,
+		.fitsPylon = PF_AG_HVY,
 	},
 
 	// gbu15
-	{ 
-		WT_GUIDEDBOMB,						// type
-		MF_GAMESET_ANY,						// gameset
-		"GBU-15",							// descriptiveName
-		"GBU-15",							// shortName
-		"BAD SHIT",							// shortName2 (GVs)
-		"models/weapons/vwep_gbu15.md3",	// modelName
-		0,									// handle
-		"models/weapons/vwep_gbu15.md3",	// vwepName
-		0,									// vwephandle
-		"hud/iconw_rkt.tga",				// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		0,									// muzzleVelocity
-		0,									// range
-		0,									// fuelrange
-		3000,								// fire interval
-		300,								// damage
-		50,									// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0.985f,								// lockcone (dot)
-		0.996f,								// followcone (dot)
-		1500,								// locktime
-		CH_MISSILEMODE,						// crosshair
-		CH_MISSILEMODETRACK,				// crosshair track
-		CH_MISSILEMODELOCK,					// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_PLANE,							// fits on category
-		PF_AG_HVY,							// fits on pylon  !! PF_AG_HVY&PF_AG_GDA !!
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_GUIDEDBOMB,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "GBU-15",
+		.shortName = "GBU-15",
+		.shortName2 = "BAD SHIT",
+		.modelName = "models/weapons/vwep_gbu15.md3",
+		.vwepName = "models/weapons/vwep_gbu15.md3",
+		.iconName = "hud/iconw_rkt.tga",
+		.category = CAT_ANY,
+		.fireInterval = 3000,
+		.damage = 300,
+		.damageRadius = 50,
+		.spread = 1,
+		.barrels = 2,
+		.lockcone = 0.985f,
+		.followcone = 0.996f,
+		.lockdelay = 1500,
+		.crosshair = CH_MISSILEMODE,
+		.crosshairtrack = CH_MISSILEMODETRACK,
+		.crosshairlock = CH_MISSILEMODELOCK,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_PLANE,
+		.fitsPylon = PF_AG_HVY,
 	},
 
 		// durandal
-	{ 
-		WT_IRONBOMB,						// type
-		MF_GAMESET_ANY,						// gameset
-		"Durandal",							// descriptiveName
-		"Durandal",							// shortName
-		"BAD SHIT",							// shortName2 (GVs)
-		"models/weapons/vwep_durandal.md3",	// modelName
-		0,									// handle
-		"models/weapons/vwep_durandal.md3",	// vwepName
-		0,									// vwephandle
-		"hud/iconw_rkt.tga",				// iconName
-		0,									// iconHandle
-		CAT_GROUND,							// cat
-		0.3f,								// non cat mod
-		1000,								// muzzleVelocity
-		8000,								// range
-		5000,								// fuelrange
-		300,								// fire interval
-		600,								// damage
-		30,									// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_MISSILEMODE,						// crosshair
-		CH_MISSILEMODETRACK,				// crosshair track
-		CH_MISSILEMODELOCK,					// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_PLANE,							// fits on category
-		PF_AG_MED,							// fits on pylon
-		0,									// basicECMVulnerability
-		WF_HAS_FIRE_FRAME,					// flags
+	{
+		.type = WT_IRONBOMB,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "Durandal",
+		.shortName = "Durandal",
+		.shortName2 = "BAD SHIT",
+		.modelName = "models/weapons/vwep_durandal.md3",
+		.vwepName = "models/weapons/vwep_durandal.md3",
+		.iconName = "hud/iconw_rkt.tga",
+		.category = CAT_GROUND,
+		.noncatmod = 0.3f,
+		.muzzleVelocity = 1000,
+		.range = 8000,
+		.fuelrange = 5000,
+		.fireInterval = 300,
+		.damage = 600,
+		.damageRadius = 30,
+		.spread = 1,
+		.barrels = 2,
+		.crosshair = CH_MISSILEMODE,
+		.crosshairtrack = CH_MISSILEMODETRACK,
+		.crosshairlock = CH_MISSILEMODELOCK,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_PLANE,
+		.fitsPylon = PF_AG_MED,
+		.flags = WF_HAS_FIRE_FRAME,
 	},
 
 	// Sidewinder
-	{ 
-		WT_ANTIAIRMISSILE,					// type
-		MF_GAMESET_ANY,						// gameset
-		"AIM-9 Sidewinder",					// descriptiveName
-		"AIM-9",							// shortName
-		"SR-SAM",							// shortName2 (GVs)
-		"models/weapons/vwep_sidewinder.md3",// modelName
-		0,									// handle
-		"models/weapons/vwep_sidewinder.md3",// vwepName
-		0,									// vwephandle
-		"hud/iconw_rkt.tga",				// iconName
-		0,									// iconHandle
-		CAT_PLANE|CAT_HELO,					// cat
-		0.3f,								// non cat mod
-		1000,								// muzzleVelocity
-		1800,								// range
-		2500,								// fuelrange
-		400,								// fire interval
-		70,									// damage
-		40,									// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0.5f,								// lockcone (dot)
-		0.5f,								// followcone (dot) (0.996)
-		1000,								// locktime
-		CH_MISSILEMODE,						// crosshair
-		CH_MISSILEMODETRACK,				// crosshair track
-		CH_MISSILEMODELOCK,					// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_PLANE|CAT_HELO,					// fits on category
-		PF_AA_LT,							// fits on pylon
-		30,									// basicECMVulnerability
-		WF_HAS_FIRE_FRAME,					// flags
+	{
+		.type = WT_ANTIAIRMISSILE,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "AIM-9 Sidewinder",
+		.shortName = "AIM-9",
+		.shortName2 = "SR-SAM",
+		.modelName = "models/weapons/vwep_sidewinder.md3",
+		.vwepName = "models/weapons/vwep_sidewinder.md3",
+		.iconName = "hud/iconw_rkt.tga",
+		.category = CAT_PLANE|CAT_HELO,
+		.noncatmod = 0.3f,
+		.muzzleVelocity = 1000,
+		.range = 1800,
+		.fuelrange = 2500,
+		.fireInterval = 400,
+		.damage = 70,
+		.damageRadius = 40,
+		.spread = 1,
+		.barrels = 2,
+		.lockcone = 0.5f,
+		.followcone = 0.5f,
+		.lockdelay = 1000,
+		.crosshair = CH_MISSILEMODE,
+		.crosshairtrack = CH_MISSILEMODETRACK,
+		.crosshairlock = CH_MISSILEMODELOCK,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_PLANE|CAT_HELO,
+		.fitsPylon = PF_AA_LT,
+		.basicECMVulnerability = 30,
+		.flags = WF_HAS_FIRE_FRAME,
 	},
 
 	// AMRAAM
-	{ 
-		WT_ANTIAIRMISSILE,					// type
-		MF_GAMESET_ANY,						// gameset
-		"AIM-120 AMRAMM",					// descriptiveName
-		"AIM-120",							// shortName
-		"MR-SAM",							// shortName2 (GVs)
-		"models/weapons/vwep_amraam.md3",	// modelName
-		0,									// handle
-		"models/weapons/vwep_amraam.md3",	// vwepName
-		0,									// vwephandle
-		"hud/iconw_rkt.tga",				// iconName
-		0,									// iconHandle
-		CAT_PLANE|CAT_HELO,					// cat
-		0.3f,								// non cat mod
-		1500,								// muzzleVelocity
-		4500,								// range
-		6500,								// fuelrange
-		600,								// fire interval
-		90,									// damage
-		60,									// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0.7f,								// lockcone (dot)
-		0.7f,								// followcone (dot)
-		1500,								// locktime
-		CH_MISSILEMODE,						// crosshair
-		CH_MISSILEMODETRACK,				// crosshair track
-		CH_MISSILEMODELOCK,					// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_PLANE,							// fits on category
-		PF_AA_MED,							// fits on pylon
-		25,									// basicECMVulnerability
-		WF_HAS_FIRE_FRAME,					// flags
+	{
+		.type = WT_ANTIAIRMISSILE,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "AIM-120 AMRAMM",
+		.shortName = "AIM-120",
+		.shortName2 = "MR-SAM",
+		.modelName = "models/weapons/vwep_amraam.md3",
+		.vwepName = "models/weapons/vwep_amraam.md3",
+		.iconName = "hud/iconw_rkt.tga",
+		.category = CAT_PLANE|CAT_HELO,
+		.noncatmod = 0.3f,
+		.muzzleVelocity = 1500,
+		.range = 4500,
+		.fuelrange = 6500,
+		.fireInterval = 600,
+		.damage = 90,
+		.damageRadius = 60,
+		.spread = 1,
+		.barrels = 2,
+		.lockcone = 0.7f,
+		.followcone = 0.7f,
+		.lockdelay = 1500,
+		.crosshair = CH_MISSILEMODE,
+		.crosshairtrack = CH_MISSILEMODETRACK,
+		.crosshairlock = CH_MISSILEMODELOCK,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_PLANE,
+		.fitsPylon = PF_AA_MED,
+		.basicECMVulnerability = 25,
+		.flags = WF_HAS_FIRE_FRAME,
 	},
 
 	// Sparrow
-	{ 
-		WT_ANTIAIRMISSILE,					// type
-		MF_GAMESET_ANY,						// gameset
-		"AIM-7 Sparrow",					// descriptiveName
-		"AIM-7",							// shortName
-		"MR_SAM",							// shortName2 (GVs)
-		"models/weapons/vwep_sparrow.md3",	// modelName
-		0,									// handle
-		"models/weapons/vwep_sparrow.md3",	// vwepName
-		0,									// vwephandle
-		"hud/iconw_rkt.tga",				// iconName
-		0,									// iconHandle
-		CAT_PLANE|CAT_HELO,					// cat
-		0.3f,								// non cat mod
-		2200,								// muzzleVelocity
-		8000,								// range
-		11000,								// fuelrange
-		900,								// fire interval
-		120,								// damage
-		90,									// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0.9f,								// lockcone (dot)
-		0.9f,								// followcone (dot)
-		1500,								// locktime
-		CH_MISSILEMODE,						// crosshair
-		CH_MISSILEMODETRACK,				// crosshair track
-		CH_MISSILEMODELOCK,					// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_PLANE,							// fits on category
-		PF_AA_HVY,							// fits on pylon
-		20,									// basicECMVulnerability
-		WF_HAS_FIRE_FRAME,					// flags
+	{
+		.type = WT_ANTIAIRMISSILE,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "AIM-7 Sparrow",
+		.shortName = "AIM-7",
+		.shortName2 = "MR_SAM",
+		.modelName = "models/weapons/vwep_sparrow.md3",
+		.vwepName = "models/weapons/vwep_sparrow.md3",
+		.iconName = "hud/iconw_rkt.tga",
+		.category = CAT_PLANE|CAT_HELO,
+		.noncatmod = 0.3f,
+		.muzzleVelocity = 2200,
+		.range = 8000,
+		.fuelrange = 11000,
+		.fireInterval = 900,
+		.damage = 120,
+		.damageRadius = 90,
+		.spread = 1,
+		.barrels = 2,
+		.lockcone = 0.9f,
+		.followcone = 0.9f,
+		.lockdelay = 1500,
+		.crosshair = CH_MISSILEMODE,
+		.crosshairtrack = CH_MISSILEMODETRACK,
+		.crosshairlock = CH_MISSILEMODELOCK,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_PLANE,
+		.fitsPylon = PF_AA_HVY,
+		.basicECMVulnerability = 20,
+		.flags = WF_HAS_FIRE_FRAME,
 	},
 
 	// Phoenix
-	{ 
-		WT_ANTIAIRMISSILE,					// type
-		MF_GAMESET_ANY,						// gameset
-		"AIM-54 Phoenix",					// descriptiveName
-		"AIM-54",							// shortName
-		"LR_SAM",							// shortName2 (GVs)
-		"models/weapons/vwep_phoenix.md3",	// modelName
-		0,									// handle
-		"models/weapons/vwep_phoenix.md3",	// vwepName
-		0,									// vwephandle
-		"hud/iconw_rkt.tga",				// iconName
-		0,									// iconHandle
-		CAT_PLANE|CAT_HELO,					// cat
-		0.3f,								// non cat mod
-		3500,								// muzzleVelocity
-		18000,								// range
-		20000,								// fuelrange
-		1200,								// fire interval
-		300,								// damage
-		120,								// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0.985f,								// lockcone (dot)
-		0.996f,								// followcone (dot)
-		3000,								// locktime
-		CH_MISSILEMODE,						// crosshair
-		CH_MISSILEMODETRACK,				// crosshair track
-		CH_MISSILEMODELOCK,					// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_PLANE,							// fits on category
-		PF_AA_PHX,							// fits on pylon
-		15,									// basicECMVulnerability
-		WF_HAS_FIRE_FRAME,					// flags
+	{
+		.type = WT_ANTIAIRMISSILE,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "AIM-54 Phoenix",
+		.shortName = "AIM-54",
+		.shortName2 = "LR_SAM",
+		.modelName = "models/weapons/vwep_phoenix.md3",
+		.vwepName = "models/weapons/vwep_phoenix.md3",
+		.iconName = "hud/iconw_rkt.tga",
+		.category = CAT_PLANE|CAT_HELO,
+		.noncatmod = 0.3f,
+		.muzzleVelocity = 3500,
+		.range = 18000,
+		.fuelrange = 20000,
+		.fireInterval = 1200,
+		.damage = 300,
+		.damageRadius = 120,
+		.spread = 1,
+		.barrels = 2,
+		.lockcone = 0.985f,
+		.followcone = 0.996f,
+		.lockdelay = 3000,
+		.crosshair = CH_MISSILEMODE,
+		.crosshairtrack = CH_MISSILEMODETRACK,
+		.crosshairlock = CH_MISSILEMODELOCK,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_PLANE,
+		.fitsPylon = PF_AA_PHX,
+		.basicECMVulnerability = 15,
+		.flags = WF_HAS_FIRE_FRAME,
 	},
 
 	// Stinger
-	{ 
-		WT_ANTIAIRMISSILE,					// type
-		MF_GAMESET_ANY,						// gameset
-		"Stinger",							// descriptiveName
-		"SR-AAM",							// shortName
-		"SR-SAM",							// shortName2 (GVs)
-		"models/weapons/vwep_stinger.md3",// modelName
-		0,									// handle
-		"models/weapons/vwep_stinger.md3",// vwepName
-		0,									// vwephandle
-		"hud/iconw_rkt.tga",				// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0.3f,								// non cat mod
-		1100,								// muzzleVelocity
-		4500,								// range
-		9000,								// fuelrange
-		500,								// fire interval
-		60,									// damage
-		40,									// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0.7f,								// lockcone (dot)
-		0.7f,								// followcone (dot)
-		1500,								// locktime
-		CH_MISSILEMODE,						// crosshair
-		CH_MISSILEMODETRACK,				// crosshair track
-		CH_MISSILEMODELOCK,					// crosshair lock
-		0,									// turret
-		{5,180,0},							// max turret angles
-		{-85,-180,0},						// min turret angles
-		1,									// number per package
-		CAT_ANY,							// fits on category
-		PF_AA_LT,							// fits on pylon
-		25,									// basicECMVulnerability
-		WF_HAS_FIRE_FRAME,					// flags
+	{
+		.type = WT_ANTIAIRMISSILE,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "Stinger",
+		.shortName = "SR-AAM",
+		.shortName2 = "SR-SAM",
+		.modelName = "models/weapons/vwep_stinger.md3",
+		.vwepName = "models/weapons/vwep_stinger.md3",
+		.iconName = "hud/iconw_rkt.tga",
+		.category = CAT_ANY,
+		.noncatmod = 0.3f,
+		.muzzleVelocity = 1100,
+		.range = 4500,
+		.fuelrange = 9000,
+		.fireInterval = 500,
+		.damage = 60,
+		.damageRadius = 40,
+		.spread = 1,
+		.barrels = 2,
+		.lockcone = 0.7f,
+		.followcone = 0.7f,
+		.lockdelay = 1500,
+		.crosshair = CH_MISSILEMODE,
+		.crosshairtrack = CH_MISSILEMODETRACK,
+		.crosshairlock = CH_MISSILEMODELOCK,
+		.maxturns = {5,180,0},
+		.minturns = {-85,-180,0},
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_ANY,
+		.fitsPylon = PF_AA_LT,
+		.basicECMVulnerability = 25,
+		.flags = WF_HAS_FIRE_FRAME,
 	},
 
 	// Atoll
-	{ 
-		WT_ANTIAIRMISSILE,					// type
-		MF_GAMESET_ANY,						// gameset
-		"AA-2 Atoll",						// descriptiveName
-		"SR-AAM",							// shortName
-		"SR_SAM",							// shortName2 (GVs)
-		"models/weapons/vwep_sidewinder.md3",// modelName
-		0,									// handle
-		"models/weapons/vwep_sidewinder.md3",// vwepName
-		0,									// vwephandle
-		"hud/iconw_rkt.tga",				// iconName
-		0,									// iconHandle
-		CAT_PLANE|CAT_HELO,					// cat
-		0.3f,								// non cat mod
-		1300,								// muzzleVelocity
-		5000,								// range
-		8000,								// fuelrange
-		500,								// fire interval
-		100,								// damage
-		50,									// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0.985f,								// lockcone (dot)
-		0.985f,								// followcone (dot)
-		1500,								// locktime
-		CH_MISSILEMODE,						// crosshair
-		CH_MISSILEMODETRACK,				// crosshair track
-		CH_MISSILEMODELOCK,					// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_PLANE,							// fits on category
-		PF_AA_LT,							// fits on pylon
-		25,									// basicECMVulnerability
-		WF_HAS_FIRE_FRAME,					// flags
+	{
+		.type = WT_ANTIAIRMISSILE,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "AA-2 Atoll",
+		.shortName = "SR-AAM",
+		.shortName2 = "SR_SAM",
+		.modelName = "models/weapons/vwep_sidewinder.md3",
+		.vwepName = "models/weapons/vwep_sidewinder.md3",
+		.iconName = "hud/iconw_rkt.tga",
+		.category = CAT_PLANE|CAT_HELO,
+		.noncatmod = 0.3f,
+		.muzzleVelocity = 1300,
+		.range = 5000,
+		.fuelrange = 8000,
+		.fireInterval = 500,
+		.damage = 100,
+		.damageRadius = 50,
+		.spread = 1,
+		.barrels = 2,
+		.lockcone = 0.985f,
+		.followcone = 0.985f,
+		.lockdelay = 1500,
+		.crosshair = CH_MISSILEMODE,
+		.crosshairtrack = CH_MISSILEMODETRACK,
+		.crosshairlock = CH_MISSILEMODELOCK,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_PLANE,
+		.fitsPylon = PF_AA_LT,
+		.basicECMVulnerability = 25,
+		.flags = WF_HAS_FIRE_FRAME,
 	},
 
 	// Archer
-	{ 
-		WT_ANTIAIRMISSILE,					// type
-		MF_GAMESET_ANY,						// gameset
-		"AA-11 Archer",						// descriptiveName
-		"MR-AAM",							// shortName
-		"MR_SAM",							// shortName2 (GVs)
-		"models/weapons/vwep_amraam.md3",	// modelName
-		0,									// handle
-		"models/weapons/vwep_amraam.md3",	// vwepName
-		0,									// vwephandle
-		"hud/iconw_rkt.tga",				// iconName
-		0,									// iconHandle
-		CAT_PLANE|CAT_HELO,					// cat
-		0.3f,								// non cat mod
-		1800,								// muzzleVelocity
-		8000,								// range
-		8000,								// fuelrange
-		500,								// fire interval
-		100,								// damage
-		50,									// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0.985f,								// lockcone (dot)
-		0.996f,								// followcone (dot)
-		1500,								// locktime
-		CH_MISSILEMODE,						// crosshair
-		CH_MISSILEMODETRACK,				// crosshair track
-		CH_MISSILEMODELOCK,					// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_PLANE|CAT_HELO,					// fits on category
-		PF_AA_MED,							// fits on pylon
-		25,									// basicECMVulnerability
-		WF_HAS_FIRE_FRAME,					// flags
+	{
+		.type = WT_ANTIAIRMISSILE,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "AA-11 Archer",
+		.shortName = "MR-AAM",
+		.shortName2 = "MR_SAM",
+		.modelName = "models/weapons/vwep_amraam.md3",
+		.vwepName = "models/weapons/vwep_amraam.md3",
+		.iconName = "hud/iconw_rkt.tga",
+		.category = CAT_PLANE|CAT_HELO,
+		.noncatmod = 0.3f,
+		.muzzleVelocity = 1800,
+		.range = 8000,
+		.fuelrange = 8000,
+		.fireInterval = 500,
+		.damage = 100,
+		.damageRadius = 50,
+		.spread = 1,
+		.barrels = 2,
+		.lockcone = 0.985f,
+		.followcone = 0.996f,
+		.lockdelay = 1500,
+		.crosshair = CH_MISSILEMODE,
+		.crosshairtrack = CH_MISSILEMODETRACK,
+		.crosshairlock = CH_MISSILEMODELOCK,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_PLANE|CAT_HELO,
+		.fitsPylon = PF_AA_MED,
+		.basicECMVulnerability = 25,
+		.flags = WF_HAS_FIRE_FRAME,
 	},
 
 	// Alamo
-	{ 
-		WT_ANTIAIRMISSILE,					// type
-		MF_GAMESET_ANY,						// gameset
-		"AA-10 Alamo",						// descriptiveName
-		"MR-AAM",							// shortName
-		"MR-SAM",							// shortName2 (GVs)
-		"models/weapons/vwep_sparrow.md3",	// modelName
-		0,									// handle
-		"models/weapons/vwep_sparrow.md3",	// vwepName
-		0,									// vwephandle
-		"hud/iconw_rkt.tga",				// iconName
-		0,									// iconHandle
-		CAT_PLANE|CAT_HELO,					// cat
-		0.3f,								// non cat mod
-		2500,								// muzzleVelocity
-		10000,								// range
-		8000,								// fuelrange
-		500,								// fire interval
-		100,								// damage
-		50,									// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0.985f,								// lockcone (dot)
-		0.996f,								// followcone (dot)
-		1500,								// locktime
-		CH_MISSILEMODE,						// crosshair
-		CH_MISSILEMODETRACK,				// crosshair track
-		CH_MISSILEMODELOCK,					// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_PLANE,							// fits on category
-		PF_AA_HVY,							// fits on pylon
-		25,									// basicECMVulnerability
-		WF_HAS_FIRE_FRAME,					// flags
+	{
+		.type = WT_ANTIAIRMISSILE,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "AA-10 Alamo",
+		.shortName = "MR-AAM",
+		.shortName2 = "MR-SAM",
+		.modelName = "models/weapons/vwep_sparrow.md3",
+		.vwepName = "models/weapons/vwep_sparrow.md3",
+		.iconName = "hud/iconw_rkt.tga",
+		.category = CAT_PLANE|CAT_HELO,
+		.noncatmod = 0.3f,
+		.muzzleVelocity = 2500,
+		.range = 10000,
+		.fuelrange = 8000,
+		.fireInterval = 500,
+		.damage = 100,
+		.damageRadius = 50,
+		.spread = 1,
+		.barrels = 2,
+		.lockcone = 0.985f,
+		.followcone = 0.996f,
+		.lockdelay = 1500,
+		.crosshair = CH_MISSILEMODE,
+		.crosshairtrack = CH_MISSILEMODETRACK,
+		.crosshairlock = CH_MISSILEMODELOCK,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_PLANE,
+		.fitsPylon = PF_AA_HVY,
+		.basicECMVulnerability = 25,
+		.flags = WF_HAS_FIRE_FRAME,
 	},
 
 	// Hellfire
-	{ 
-		WT_ANTIGROUNDMISSILE,				// type
-		MF_GAMESET_ANY,						// gameset
-		"Hellfire",							// descriptiveName
-		"AGM",								// shortName
-		"SSM",								// shortName2 (GVs)
-		"models/weapons/vwep_hellfire.md3",// modelName
-		0,									// handle
-		"models/weapons/vwep_hellfire.md3",// vwepName
-		0,									// vwephandle
-		"hud/iconw_rkt.tga",				// iconName
-		0,									// iconHandle
-		CAT_GROUND,							// cat
-		0.3f,								// non cat mod
-		1000,								// muzzleVelocity
-		4500,								// range
-		6500,								// fuelrange
-		500,								// fire interval
-		110,								// damage
-		40,									// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0.985f,								// lockcone (dot)
-		0.996f,								// followcone (dot)
-		2000,								// locktime
-		CH_MISSILEMODE,						// crosshair
-		CH_MISSILEMODETRACK,				// crosshair track
-		CH_MISSILEMODELOCK,					// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-//		{5,180,0},							// max turret angles
-//		{-40,-180,0},						// min turret angles
-		1,									// number per package
-		CAT_HELO|CAT_GROUND|CAT_BOAT,		// fits on category
-		PF_AG_MED,							// fits on pylon
-		25,									// basicECMVulnerability
-		WF_HAS_FIRE_FRAME,					// flags
+	{
+		.type = WT_ANTIGROUNDMISSILE,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "Hellfire",
+		.shortName = "AGM",
+		.shortName2 = "SSM",
+		.modelName = "models/weapons/vwep_hellfire.md3",
+		.vwepName = "models/weapons/vwep_hellfire.md3",
+		.iconName = "hud/iconw_rkt.tga",
+		.category = CAT_GROUND,
+		.noncatmod = 0.3f,
+		.muzzleVelocity = 1000,
+		.range = 4500,
+		.fuelrange = 6500,
+		.fireInterval = 500,
+		.damage = 110,
+		.damageRadius = 40,
+		.spread = 1,
+		.barrels = 2,
+		.lockcone = 0.985f,
+		.followcone = 0.996f,
+		.lockdelay = 2000,
+		.crosshair = CH_MISSILEMODE,
+		.crosshairtrack = CH_MISSILEMODETRACK,
+		.crosshairlock = CH_MISSILEMODELOCK,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_HELO|CAT_GROUND|CAT_BOAT,
+		.fitsPylon = PF_AG_MED,
+		.basicECMVulnerability = 25,
+		.flags = WF_HAS_FIRE_FRAME,
 	},
 
 	// Maverick
-	{ 
-		WT_ANTIGROUNDMISSILE,				// type
-		MF_GAMESET_ANY,						// gameset
-		"Maverick",							// descriptiveName
-		"AGM 65",							// shortName
-		"SSM",								// shortName2 (GVs)
-		"models/weapons/vwep_maverick.md3",	// modelName
-		0,									// handle
-		"models/weapons/vwep_maverick.md3",	// vwepName
-		0,									// vwephandle
-		"hud/iconw_rkt.tga",				// iconName
-		0,									// iconHandle
-		CAT_GROUND,							// cat
-		0.3f,								// non cat mod
-		1000,								// muzzleVelocity
-		4500,								// range
-		6500,								// fuelrange
-		2000,								// fire interval
-		150,								// damage
-		50,									// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0.5f,								// lockcone (dot)
-		0.5f,								// followcone (dot)
-		2500,								// locktime
-		CH_MISSILEMODE,						// crosshair
-		CH_MISSILEMODETRACK,				// crosshair track
-		CH_MISSILEMODELOCK,					// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_PLANE,							// fits on category
-		PF_AG_MED,							// fits on pylon  !! PF_AG_MED&PF_AG_GDA !!
-		25,									// basicECMVulnerability
-		WF_HAS_FIRE_FRAME,					// flags
+	{
+		.type = WT_ANTIGROUNDMISSILE,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "Maverick",
+		.shortName = "AGM 65",
+		.shortName2 = "SSM",
+		.modelName = "models/weapons/vwep_maverick.md3",
+		.vwepName = "models/weapons/vwep_maverick.md3",
+		.iconName = "hud/iconw_rkt.tga",
+		.category = CAT_GROUND,
+		.noncatmod = 0.3f,
+		.muzzleVelocity = 1000,
+		.range = 4500,
+		.fuelrange = 6500,
+		.fireInterval = 2000,
+		.damage = 150,
+		.damageRadius = 50,
+		.spread = 1,
+		.barrels = 2,
+		.lockcone = 0.5f,
+		.followcone = 0.5f,
+		.lockdelay = 2500,
+		.crosshair = CH_MISSILEMODE,
+		.crosshairtrack = CH_MISSILEMODETRACK,
+		.crosshairlock = CH_MISSILEMODELOCK,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_PLANE,
+		.fitsPylon = PF_AG_MED,
+		.basicECMVulnerability = 25,
+		.flags = WF_HAS_FIRE_FRAME,
 	},
 
 	// HARM
-	{ 
-		WT_ANTIGROUNDMISSILE,				// type
-		MF_GAMESET_ANY,						// gameset
-		"HARM",								// descriptiveName
-		"HARM",								// shortName
-		"DOH",								// shortName2 (GVs)
-		"models/weapons/vwep_harm.md3",		// modelName
-		0,									// handle
-		"models/weapons/vwep_harm.md3",		// vwepName
-		0,									// vwephandle
-		"hud/iconw_rkt.tga",				// iconName
-		0,									// iconHandle
-		CAT_GROUND,							// cat
-		0.3f,								// non cat mod
-		3000,								// muzzleVelocity
-		5000,								// range
-		6000,								// fuelrange
-		500,								// fire interval
-		500,								// damage
-		70,									// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0.985f,								// lockcone (dot)
-		0.996f,								// followcone (dot)
-		1700,								// locktime
-		CH_MISSILEMODE,						// crosshair
-		CH_MISSILEMODETRACK,				// crosshair track
-		CH_MISSILEMODELOCK,					// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_PLANE,							// fits on category
-		PF_HARM,							// fits on pylon
-		25,									// basicECMVulnerability
-		WF_HAS_FIRE_FRAME,					// flags
+	{
+		.type = WT_ANTIGROUNDMISSILE,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "HARM",
+		.shortName = "HARM",
+		.shortName2 = "DOH",
+		.modelName = "models/weapons/vwep_harm.md3",
+		.vwepName = "models/weapons/vwep_harm.md3",
+		.iconName = "hud/iconw_rkt.tga",
+		.category = CAT_GROUND,
+		.noncatmod = 0.3f,
+		.muzzleVelocity = 3000,
+		.range = 5000,
+		.fuelrange = 6000,
+		.fireInterval = 500,
+		.damage = 500,
+		.damageRadius = 70,
+		.spread = 1,
+		.barrels = 2,
+		.lockcone = 0.985f,
+		.followcone = 0.996f,
+		.lockdelay = 1700,
+		.crosshair = CH_MISSILEMODE,
+		.crosshairtrack = CH_MISSILEMODETRACK,
+		.crosshairlock = CH_MISSILEMODELOCK,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_PLANE,
+		.fitsPylon = PF_HARM,
+		.basicECMVulnerability = 25,
+		.flags = WF_HAS_FIRE_FRAME,
 	},
 
 
 
 	// AA SAM
-	{ 
-		WT_ANTIAIRMISSILE,					// type
-		MF_GAMESET_ANY,						// gameset
-		"SAM",								// descriptiveName
-		"SAM",								// shortName
-		"THE-SAM",							// shortName2 (GVs)
-		"models/weapons/missile_sam.md3",	// modelName
-		0,									// handle
-		"models/weapons/missile_sam.md3",	// vwepName
-		0,									// vwephandle
-		"hud/iconw_rkt.tga",				// iconName
-		0,									// iconHandle
-		CAT_PLANE|CAT_HELO,					// cat
-		0.3f,								// non cat mod
-		1000,								// muzzleVelocity
-		4500,								// range
-		13000,								// fuelrange
-		3200,								// fire interval
-		100,								// damage
-		100,								// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0.7f,								// lockcone (dot)
-		0.7f,								// followcone (dot)
-		1500,								// locktime
-		CH_MISSILEMODE,						// crosshair
-		CH_MISSILEMODETRACK,				// crosshair track
-		CH_MISSILEMODELOCK,					// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_PLANE,							// fits on category
-		PF_AA_MED,							// fits on pylon
-		40,									// basicECMVulnerability
-		WF_HAS_FIRE_FRAME,					// flags
+	{
+		.type = WT_ANTIAIRMISSILE,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "SAM",
+		.shortName = "SAM",
+		.shortName2 = "THE-SAM",
+		.modelName = "models/weapons/missile_sam.md3",
+		.vwepName = "models/weapons/missile_sam.md3",
+		.iconName = "hud/iconw_rkt.tga",
+		.category = CAT_PLANE|CAT_HELO,
+		.noncatmod = 0.3f,
+		.muzzleVelocity = 1000,
+		.range = 4500,
+		.fuelrange = 13000,
+		.fireInterval = 3200,
+		.damage = 100,
+		.damageRadius = 100,
+		.spread = 1,
+		.barrels = 2,
+		.lockcone = 0.7f,
+		.followcone = 0.7f,
+		.lockdelay = 1500,
+		.crosshair = CH_MISSILEMODE,
+		.crosshairtrack = CH_MISSILEMODETRACK,
+		.crosshairlock = CH_MISSILEMODELOCK,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_PLANE,
+		.fitsPylon = PF_AA_MED,
+		.basicECMVulnerability = 40,
+		.flags = WF_HAS_FIRE_FRAME,
 	},
 
 
 
 	// ECM
-	{ 
-		WT_IRONBOMB,						// type
-		MF_GAMESET_ANY,						// gameset
-		"ECM",								// descriptiveName
-		"ECM",								// shortName
-		"BAD SHIT",							// shortName2 (GVs)
-		"models/weapons/vwep_ecm.md3",		// modelName
-		0,									// handle
-		"models/weapons/vwep_ecm.md3",		// vwepName
-		0,									// vwephandle
-		"hud/iconw_bmb.tga",				// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		0,									// muzzleVelocity
-		0,									// range
-		0,									// fuelrange
-		200,								// fire interval
-		10,									// damage
-		10,									// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_BOMBMODE,						// crosshair
-		CH_BOMBMODE,						// crosshair track
-		CH_BOMBMODE,						// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		20,								// number per package
-		CAT_PLANE,							// fits on category
-		PF_JAMMER,							// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_IRONBOMB,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "ECM",
+		.shortName = "ECM",
+		.shortName2 = "BAD SHIT",
+		.modelName = "models/weapons/vwep_ecm.md3",
+		.vwepName = "models/weapons/vwep_ecm.md3",
+		.iconName = "hud/iconw_bmb.tga",
+		.category = CAT_ANY,
+		.fireInterval = 200,
+		.damage = 10,
+		.damageRadius = 10,
+		.spread = 1,
+		.barrels = 2,
+		.crosshair = CH_BOMBMODE,
+		.crosshairtrack = CH_BOMBMODE,
+		.crosshairlock = CH_BOMBMODE,
+		.numberPerPackage = 20,
+		.fitsCategory = CAT_PLANE,
+		.fitsPylon = PF_JAMMER,
 	},
 
 
 	// LASE
-	{ 
-		WT_IRONBOMB,						// type
-		MF_GAMESET_ANY,						// gameset
-		"LASER DESIGNATOR",								// descriptiveName
-		"LASE",								// shortName
-		"BAD SHIT",							// shortName2 (GVs)
-		"models/weapons/vwep_ir.md3",		// modelName
-		0,									// handle
-		"models/weapons/vwep_ir.md3",		// vwepName
-		0,									// vwephandle
-		"hud/iconw_bmb.tga",				// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		0,									// muzzleVelocity
-		0,									// range
-		0,									// fuelrange
-		200,								// fire interval
-		10,									// damage
-		10,									// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_BOMBMODE,						// crosshair
-		CH_BOMBMODE,						// crosshair track
-		CH_BOMBMODE,						// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		20,								// number per package
-		CAT_PLANE,							// fits on category
-		PF_JAMMER,							// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_IRONBOMB,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "LASER DESIGNATOR",
+		.shortName = "LASE",
+		.shortName2 = "BAD SHIT",
+		.modelName = "models/weapons/vwep_ir.md3",
+		.vwepName = "models/weapons/vwep_ir.md3",
+		.iconName = "hud/iconw_bmb.tga",
+		.category = CAT_ANY,
+		.fireInterval = 200,
+		.damage = 10,
+		.damageRadius = 10,
+		.spread = 1,
+		.barrels = 2,
+		.crosshair = CH_BOMBMODE,
+		.crosshairtrack = CH_BOMBMODE,
+		.crosshairlock = CH_BOMBMODE,
+		.numberPerPackage = 20,
+		.fitsCategory = CAT_PLANE,
+		.fitsPylon = PF_JAMMER,
 	},
 
 
 	// FLARECHAFF
-	{ 
-		WT_IRONBOMB,						// type
-		MF_GAMESET_ANY,						// gameset
-		"COUNTERMEASURE POD",				// descriptiveName
-		"CM POD",							// shortName
-		"BAD SHIT",							// shortName2 (GVs)
-		"models/weapons/vwep_flarechaff.md3",			// modelName
-		0,									// handle
-		"models/weapons/vwep_flarechaff.md3",			// vwepName
-		0,									// vwephandle
-		"hud/iconw_bmb.tga",				// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		0,									// muzzleVelocity
-		0,									// range
-		0,									// fuelrange
-		200,								// fire interval
-		10,									// damage
-		10,									// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_BOMBMODE,						// crosshair
-		CH_BOMBMODE,						// crosshair track
-		CH_BOMBMODE,						// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		20,								// number per package
-		CAT_PLANE,							// fits on category
-		PF_FLAREPOD,							// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_IRONBOMB,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "COUNTERMEASURE POD",
+		.shortName = "CM POD",
+		.shortName2 = "BAD SHIT",
+		.modelName = "models/weapons/vwep_flarechaff.md3",
+		.vwepName = "models/weapons/vwep_flarechaff.md3",
+		.iconName = "hud/iconw_bmb.tga",
+		.category = CAT_ANY,
+		.fireInterval = 200,
+		.damage = 10,
+		.damageRadius = 10,
+		.spread = 1,
+		.barrels = 2,
+		.crosshair = CH_BOMBMODE,
+		.crosshairtrack = CH_BOMBMODE,
+		.crosshairlock = CH_BOMBMODE,
+		.numberPerPackage = 20,
+		.fitsCategory = CAT_PLANE,
+		.fitsPylon = PF_FLAREPOD,
 	},
 
 
 	// droptank
-	{ 
-		WT_FUELTANK,						// type
-		MF_GAMESET_ANY,						// gameset
-		"Droptank",							// descriptiveName
-		"Droptank",							// shortName
-		"BAD SHIT",							// shortName2 (GVs)
-		"models/weapons/vwep_droptank.md3",	// modelName
-		0,									// handle
-		"models/weapons/vwep_droptank.md3",// vwepName
-		0,									// vwephandle
-		"hud/iconw_bmb.tga",				// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		0,									// muzzleVelocity
-		0,									// range
-		0,									// fuelrange
-		200,								// fire interval
-		30,									// damage
-		15,									// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_GUNMODE,							// crosshair
-		CH_GUNMODE,							// crosshair track
-		CH_GUNMODE,							// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		30,									// number per package
-		CAT_PLANE,							// fits on category
-		PF_TANK_HVY,						// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_FUELTANK,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "Droptank",
+		.shortName = "Droptank",
+		.shortName2 = "BAD SHIT",
+		.modelName = "models/weapons/vwep_droptank.md3",
+		.vwepName = "models/weapons/vwep_droptank.md3",
+		.iconName = "hud/iconw_bmb.tga",
+		.category = CAT_ANY,
+		.fireInterval = 200,
+		.damage = 30,
+		.damageRadius = 15,
+		.spread = 1,
+		.barrels = 2,
+		.crosshair = CH_GUNMODE,
+		.crosshairtrack = CH_GUNMODE,
+		.crosshairlock = CH_GUNMODE,
+		.numberPerPackage = 30,
+		.fitsCategory = CAT_PLANE,
+		.fitsPylon = PF_TANK_HVY,
 	},
 
 	// droptank pair
-	{ 
-		WT_FUELTANK,						// type
-		MF_GAMESET_ANY,						// gameset
-		"Droptank",							// descriptiveName
-		"Droptank",							// shortName
-		"BAD SHIT",							// shortName2 (GVs)
-		"models/weapons/vwep_droptank.md3",	// modelName
-		0,									// handle
-		"models/weapons/vwep_droptank.md3",// vwepName
-		0,									// vwephandle
-		"hud/iconw_bmb.tga",				// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		0,									// muzzleVelocity
-		0,									// range
-		0,									// fuelrange
-		200,								// fire interval
-		30,									// damage
-		15,									// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_GUNMODE,							// crosshair
-		CH_GUNMODE,							// crosshair track
-		CH_GUNMODE,							// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		30,									// number per package
-		CAT_PLANE,							// fits on category
-		PF_TANK_HVY,						// fits on pylon
-		0,									// basicECMVulnerability
-		WF_FIRE_IN_PAIRS,					// flags
+	{
+		.type = WT_FUELTANK,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "Droptank",
+		.shortName = "Droptank",
+		.shortName2 = "BAD SHIT",
+		.modelName = "models/weapons/vwep_droptank.md3",
+		.vwepName = "models/weapons/vwep_droptank.md3",
+		.iconName = "hud/iconw_bmb.tga",
+		.category = CAT_ANY,
+		.fireInterval = 200,
+		.damage = 30,
+		.damageRadius = 15,
+		.spread = 1,
+		.barrels = 2,
+		.crosshair = CH_GUNMODE,
+		.crosshairtrack = CH_GUNMODE,
+		.crosshairlock = CH_GUNMODE,
+		.numberPerPackage = 30,
+		.fitsCategory = CAT_PLANE,
+		.fitsPylon = PF_TANK_HVY,
+		.flags = WF_FIRE_IN_PAIRS,
 	},
 
 	// droptank lt
-	{ 
-		WT_FUELTANK,						// type
-		MF_GAMESET_ANY,						// gameset
-		"Droptank small",					// descriptiveName
-		"Droptank",							// shortName
-		"BAD SHIT",							// shortName2 (GVs)
-		"models/weapons/vwep_droptank_lt.md3",// modelName
-		0,									// handle
-		"models/weapons/vwep_droptank_lt.md3",// vwepName
-		0,									// vwephandle
-		"hud/iconw_bmb.tga",				// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		0,									// muzzleVelocity
-		0,									// range
-		0,									// fuelrange
-		200,								// fire interval
-		20,									// damage
-		10,									// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_GUNMODE,							// crosshair
-		CH_GUNMODE,							// crosshair track
-		CH_GUNMODE,							// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		20,									// number per package
-		CAT_PLANE,							// fits on category
-		PF_TANK_LT,							// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_FUELTANK,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "Droptank small",
+		.shortName = "Droptank",
+		.shortName2 = "BAD SHIT",
+		.modelName = "models/weapons/vwep_droptank_lt.md3",
+		.vwepName = "models/weapons/vwep_droptank_lt.md3",
+		.iconName = "hud/iconw_bmb.tga",
+		.category = CAT_ANY,
+		.fireInterval = 200,
+		.damage = 20,
+		.damageRadius = 10,
+		.spread = 1,
+		.barrels = 2,
+		.crosshair = CH_GUNMODE,
+		.crosshairtrack = CH_GUNMODE,
+		.crosshairlock = CH_GUNMODE,
+		.numberPerPackage = 20,
+		.fitsCategory = CAT_PLANE,
+		.fitsPylon = PF_TANK_LT,
 	},
 
 	// droptank lt pair
-	{ 
-		WT_FUELTANK,						// type
-		MF_GAMESET_ANY,						// gameset
-		"Droptank small",					// descriptiveName
-		"Droptank",							// shortName
-		"BAD SHIT",							// shortName2 (GVs)
-		"models/weapons/vwep_droptank_lt.md3",// modelName
-		0,									// handle
-		"models/weapons/vwep_droptank_lt.md3",// vwepName
-		0,									// vwephandle
-		"hud/iconw_bmb.tga",				// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		0,									// muzzleVelocity
-		0,									// range
-		0,									// fuelrange
-		200,								// fire interval
-		20,									// damage
-		10,									// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_GUNMODE,							// crosshair
-		CH_GUNMODE,							// crosshair track
-		CH_GUNMODE,							// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		20,									// number per package
-		CAT_PLANE,							// fits on category
-		PF_TANK_LT,							// fits on pylon
-		0,									// basicECMVulnerability
-		WF_FIRE_IN_PAIRS,					// flags
+	{
+		.type = WT_FUELTANK,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "Droptank small",
+		.shortName = "Droptank",
+		.shortName2 = "BAD SHIT",
+		.modelName = "models/weapons/vwep_droptank_lt.md3",
+		.vwepName = "models/weapons/vwep_droptank_lt.md3",
+		.iconName = "hud/iconw_bmb.tga",
+		.category = CAT_ANY,
+		.fireInterval = 200,
+		.damage = 20,
+		.damageRadius = 10,
+		.spread = 1,
+		.barrels = 2,
+		.crosshair = CH_GUNMODE,
+		.crosshairtrack = CH_GUNMODE,
+		.crosshairlock = CH_GUNMODE,
+		.numberPerPackage = 20,
+		.fitsCategory = CAT_PLANE,
+		.fitsPylon = PF_TANK_LT,
+		.flags = WF_FIRE_IN_PAIRS,
 	},
 
 	// droptank lt pair
-	{ 
-		WT_FUELCRATE,						// type
-		MF_GAMESET_ANY,						// gameset
-		"Fuel Crate",						// descriptiveName
-		"Fuel Crate",							// shortName
-		"Fuel Crate",							// shortName2 (GVs)
-		"models/weapons/crate.md3",// modelName
-		0,									// handle
-		"models/weapons/crate.md3",// vwepName
-		0,									// vwephandle
-		"hud/iconw_bmb.tga",				// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		45,									// muzzleVelocity
-		0,									// range
-		0,									// fuelrange
-		200,								// fire interval
-		20,									// damage
-		10,									// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_GUNMODE,							// crosshair
-		CH_GUNMODE,							// crosshair track
-		CH_GUNMODE,							// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_HELO,							// fits on category
-		0,									// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_FUELCRATE,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "Fuel Crate",
+		.shortName = "Fuel Crate",
+		.shortName2 = "Fuel Crate",
+		.modelName = "models/weapons/crate.md3",
+		.vwepName = "models/weapons/crate.md3",
+		.iconName = "hud/iconw_bmb.tga",
+		.category = CAT_ANY,
+		.muzzleVelocity = 45,
+		.fireInterval = 200,
+		.damage = 20,
+		.damageRadius = 10,
+		.spread = 1,
+		.barrels = 2,
+		.crosshair = CH_GUNMODE,
+		.crosshairtrack = CH_GUNMODE,
+		.crosshairlock = CH_GUNMODE,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_HELO,
 	},
 
 	// Health Crate
-	{ 
-		WT_HEALTHCRATE,						// type
-		MF_GAMESET_ANY,						// gameset
-		"Health Crate",						// descriptiveName
-		"Health Crate",							// shortName
-		"Health Crate",							// shortName2 (GVs)
-		"models/weapons/crate.md3",// modelName
-		0,									// handle
-		"models/weapons/crate.md3",// vwepName
-		0,									// vwephandle
-		"hud/iconw_bmb.tga",				// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		45,									// muzzleVelocity
-		0,									// range
-		0,									// fuelrange
-		200,								// fire interval
-		15,									// damage
-		10,									// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_GUNMODE,							// crosshair
-		CH_GUNMODE,							// crosshair track
-		CH_GUNMODE,							// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_HELO,							// fits on category
-		0,									// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_HEALTHCRATE,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "Health Crate",
+		.shortName = "Health Crate",
+		.shortName2 = "Health Crate",
+		.modelName = "models/weapons/crate.md3",
+		.vwepName = "models/weapons/crate.md3",
+		.iconName = "hud/iconw_bmb.tga",
+		.category = CAT_ANY,
+		.muzzleVelocity = 45,
+		.fireInterval = 200,
+		.damage = 15,
+		.damageRadius = 10,
+		.spread = 1,
+		.barrels = 2,
+		.crosshair = CH_GUNMODE,
+		.crosshairtrack = CH_GUNMODE,
+		.crosshairlock = CH_GUNMODE,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_HELO,
 	},
 
 	// Ammo Crate
-	{ 
-		WT_AMMOCRATE,						// type
-		MF_GAMESET_ANY,						// gameset
-		"Ammo Crate",						// descriptiveName
-		"Ammo Crate",							// shortName
-		"Ammo Crate",							// shortName2 (GVs)
-		"models/weapons/crate.md3",// modelName
-		0,									// handle
-		"models/weapons/crate.md3",// vwepName
-		0,									// vwephandle
-		"hud/iconw_bmb.tga",				// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		45,									// muzzleVelocity
-		0,									// range
-		0,									// fuelrange
-		200,								// fire interval
-		15,									// damage
-		10,									// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_GUNMODE,							// crosshair
-		CH_GUNMODE,							// crosshair track
-		CH_GUNMODE,							// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_HELO,							// fits on category
-		0,									// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_AMMOCRATE,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "Ammo Crate",
+		.shortName = "Ammo Crate",
+		.shortName2 = "Ammo Crate",
+		.modelName = "models/weapons/crate.md3",
+		.vwepName = "models/weapons/crate.md3",
+		.iconName = "hud/iconw_bmb.tga",
+		.category = CAT_ANY,
+		.muzzleVelocity = 45,
+		.fireInterval = 200,
+		.damage = 15,
+		.damageRadius = 10,
+		.spread = 1,
+		.barrels = 2,
+		.crosshair = CH_GUNMODE,
+		.crosshairtrack = CH_GUNMODE,
+		.crosshairlock = CH_GUNMODE,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_HELO,
 	},
 
 	// flares
-	{ 
-		WT_FLARE,							// type
-		MF_GAMESET_ANY,						// gameset
-		"Flares",							// descriptiveName
-		"Flares",							// shortName
-		"Flares",							// shortName2 (GVs)
-		"models/effects/flare.md3",			// modelName
-		0,									// handle
-		"",									// vwepName
-		0,									// vwephandle
-		"",									// iconName
-		0,									// iconHandle
-		0,									// cat
-		0,									// non cat mod
-		0,									// muzzleVelocity
-		0,									// range
-		2000,								// fuelrange
-		200,								// fire interval
-		0,									// damage
-		0,									// damageRadius
-		1,									// spread
-		0,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone (dot)
-		0,									// followcone (dot)
-		0,									// locktime
-		0,									// crosshair
-		0,									// crosshair track
-		0,									// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_ANY,							// fits on category
-		PF_FLAREPOD,						// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_FLARE,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "Flares",
+		.shortName = "Flares",
+		.shortName2 = "Flares",
+		.modelName = "models/effects/flare.md3",
+		.vwepName = "",
+		.iconName = "",
+		.fuelrange = 2000,
+		.fireInterval = 200,
+		.spread = 1,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_ANY,
+		.fitsPylon = PF_FLAREPOD,
 	},
 
 	// Cflares
-	{ 
-		WT_FLARE,							// type
-		MF_GAMESET_ANY,						// gameset
-		"CFlares",							// descriptiveName
-		"CFlares",							// shortName
-		"CFlares",							// shortName2 (GVs)
-		"models/weapons/vwep_flarechaff.md3",			// modelName
-		0,									// handle
-		"",									// vwepName
-		0,									// vwephandle
-		"",									// iconName
-		0,									// iconHandle
-		0,									// cat
-		0,									// non cat mod
-		0,									// muzzleVelocity
-		0,									// range
-		2000,								// fuelrange
-		200,								// fire interval
-		0,									// damage
-		0,									// damageRadius
-		1,									// spread
-		0,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone (dot)
-		0,									// followcone (dot)
-		0,									// locktime
-		0,									// crosshair
-		0,									// crosshair track
-		0,									// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_ANY,							// fits on category
-		PF_FLAREPOD,						// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_FLARE,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "CFlares",
+		.shortName = "CFlares",
+		.shortName2 = "CFlares",
+		.modelName = "models/weapons/vwep_flarechaff.md3",
+		.vwepName = "",
+		.iconName = "",
+		.fuelrange = 2000,
+		.fireInterval = 200,
+		.spread = 1,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_ANY,
+		.fitsPylon = PF_FLAREPOD,
 	},
 
 	// Burning people, can be used as flares
-	{ 
-		WT_FLARE,							// type
-		MF_GAMESET_ANY,						// gameset
-		"BurningMan",						// descriptiveName
-		"BurningMan",						// shortName
-		"BurningMan",						// shortName2 (GVs)
-		"models/effects/burningman.md3",	// modelName
-		0,									// handle
-		"",									// vwepName
-		0,									// vwephandle
-		"",									// iconName
-		0,									// iconHandle
-		0,									// cat
-		0,									// non cat mod
-		0,									// muzzleVelocity
-		0,									// range
-		2000,								// fuelrange
-		200,								// fire interval
-		0,									// damage
-		0,									// damageRadius
-		1,									// spread
-		0,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone (dot)
-		0,									// followcone (dot)
-		0,									// locktime
-		0,									// crosshair
-		0,									// crosshair track
-		0,									// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_ANY,							// fits on category
-		PF_FLAREPOD,						// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_FLARE,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "BurningMan",
+		.shortName = "BurningMan",
+		.shortName2 = "BurningMan",
+		.modelName = "models/effects/burningman.md3",
+		.vwepName = "",
+		.iconName = "",
+		.fuelrange = 2000,
+		.fireInterval = 200,
+		.spread = 1,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_ANY,
+		.fitsPylon = PF_FLAREPOD,
 	},
 	
 	// Nuke
-	{ 
-		WT_NUKEBOMB,						// type
-		MF_GAMESET_ANY,						// gameset
-		"WW2 relic pos bomb that shouldn't even work anymore",								// descriptiveName
-		"NB10MT",							// shortName
-		"NB10MT",							// shortName2 (GVs)
-		"models/weapons/vwep_nuke.md3",		// modelName
-		0,									// handle
-		"models/weapons/vwep_nuke.md3",		// vwepName
-		0,									// vwephandle
-		"hud/iconw_bmb.tga",				// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		0,									// muzzleVelocity
-		0,									// range
-		0,									// fuelrange
-		5000,								// fire interval
-		1000,								// damage
-		2000,								// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_BOMBMODE,						// crosshair
-		CH_BOMBMODE,						// crosshair track
-		CH_BOMBMODE,						// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_PLANE,							// fits on category
-		PF_AG_LT,							// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_NUKEBOMB,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "WW2 relic pos bomb that shouldn't even work anymore",
+		.shortName = "NB10MT",
+		.shortName2 = "NB10MT",
+		.modelName = "models/weapons/vwep_nuke.md3",
+		.vwepName = "models/weapons/vwep_nuke.md3",
+		.iconName = "hud/iconw_bmb.tga",
+		.category = CAT_ANY,
+		.fireInterval = 5000,
+		.damage = 1000,
+		.damageRadius = 2000,
+		.spread = 1,
+		.barrels = 2,
+		.crosshair = CH_BOMBMODE,
+		.crosshairtrack = CH_BOMBMODE,
+		.crosshairlock = CH_BOMBMODE,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_PLANE,
+		.fitsPylon = PF_AG_LT,
 	},
 
 	// Nuke
-	{ 
-		WT_NUKEBOMB,						// type
-		MF_GAMESET_ANY,						// gameset
-		"WW2 relic pos bomb that shouldn't even work anymore",								// descriptiveName
-		"NB5MT",							// shortName
-		"NB5MT",							// shortName2 (GVs)
-		"models/weapons/vwep_nuke.md3",		// modelName
-		0,									// handle
-		"models/weapons/vwep_nuke.md3",		// vwepName
-		0,									// vwephandle
-		"hud/iconw_bmb.tga",				// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		0,									// muzzleVelocity
-		0,									// range
-		0,									// fuelrange
-		5000,								// fire interval
-		1000,								// damage
-		800,								// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_BOMBMODE,						// crosshair
-		CH_BOMBMODE,						// crosshair track
-		CH_BOMBMODE,						// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_PLANE,							// fits on category
-		PF_AG_LT,							// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_NUKEBOMB,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "WW2 relic pos bomb that shouldn't even work anymore",
+		.shortName = "NB5MT",
+		.shortName2 = "NB5MT",
+		.modelName = "models/weapons/vwep_nuke.md3",
+		.vwepName = "models/weapons/vwep_nuke.md3",
+		.iconName = "hud/iconw_bmb.tga",
+		.category = CAT_ANY,
+		.fireInterval = 5000,
+		.damage = 1000,
+		.damageRadius = 800,
+		.spread = 1,
+		.barrels = 2,
+		.crosshair = CH_BOMBMODE,
+		.crosshairtrack = CH_BOMBMODE,
+		.crosshairlock = CH_BOMBMODE,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_PLANE,
+		.fitsPylon = PF_AG_LT,
 	},
 
 	// Nuke
-	{ 
-		WT_NUKEBOMB,						// type
-		MF_GAMESET_ANY,						// gameset
-		"WW2 relic pos bomb that shouldn't even work anymore",								// descriptiveName
-		"NB1MT",							// shortName
-		"NB1MT",							// shortName2 (GVs)
-		"models/weapons/vwep_nuke.md3",		// modelName
-		0,									// handle
-		"models/weapons/vwep_nuke.md3",		// vwepName
-		0,									// vwephandle
-		"hud/iconw_bmb.tga",				// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		0,									// muzzleVelocity
-		0,									// range
-		0,									// fuelrange
-		5000,								// fire interval
-		1000,								// damage
-		300,								// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_BOMBMODE,						// crosshair
-		CH_BOMBMODE,						// crosshair track
-		CH_BOMBMODE,						// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_PLANE,							// fits on category
-		PF_AG_LT,							// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_NUKEBOMB,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "WW2 relic pos bomb that shouldn't even work anymore",
+		.shortName = "NB1MT",
+		.shortName2 = "NB1MT",
+		.modelName = "models/weapons/vwep_nuke.md3",
+		.vwepName = "models/weapons/vwep_nuke.md3",
+		.iconName = "hud/iconw_bmb.tga",
+		.category = CAT_ANY,
+		.fireInterval = 5000,
+		.damage = 1000,
+		.damageRadius = 300,
+		.spread = 1,
+		.barrels = 2,
+		.crosshair = CH_BOMBMODE,
+		.crosshairtrack = CH_BOMBMODE,
+		.crosshairlock = CH_BOMBMODE,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_PLANE,
+		.fitsPylon = PF_AG_LT,
 	},
 
 	// Nuke
-	{ 
-		WT_NUKEMISSILE,						// type
-		MF_GAMESET_ANY,						// gameset
-		"MinkiCorp brand Nuclear device",								// descriptiveName
-		"NM10MT",							// shortName
-		"NM10MT",							// shortName2 (GVs)
-		"models/weapons/vwep_nuke.md3",		// modelName
-		0,									// handle
-		"models/weapons/vwep_nuke.md3",		// vwepName
-		0,									// vwephandle
-		"hud/iconw_bmb.tga",				// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		800,								// muzzleVelocity
-		75000,								// range
-		75000,								// fuelrange
-		5000,								// fire interval
-		1000,								// damage
-		2000,								// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_BOMBMODE,						// crosshair
-		CH_BOMBMODE,						// crosshair track
-		CH_BOMBMODE,						// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_PLANE,							// fits on category
-		PF_AG_LT,							// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_NUKEMISSILE,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "MinkiCorp brand Nuclear device",
+		.shortName = "NM10MT",
+		.shortName2 = "NM10MT",
+		.modelName = "models/weapons/vwep_nuke.md3",
+		.vwepName = "models/weapons/vwep_nuke.md3",
+		.iconName = "hud/iconw_bmb.tga",
+		.category = CAT_ANY,
+		.muzzleVelocity = 800,
+		.range = 75000,
+		.fuelrange = 75000,
+		.fireInterval = 5000,
+		.damage = 1000,
+		.damageRadius = 2000,
+		.spread = 1,
+		.barrels = 2,
+		.crosshair = CH_BOMBMODE,
+		.crosshairtrack = CH_BOMBMODE,
+		.crosshairlock = CH_BOMBMODE,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_PLANE,
+		.fitsPylon = PF_AG_LT,
 	},
 
 	// Nuke
-	{ 
-		WT_NUKEMISSILE,						// type
-		MF_GAMESET_ANY,						// gameset
-		"MinkiCorp brand Nuclear device",								// descriptiveName
-		"NM5MT",							// shortName
-		"NM5MT",							// shortName2 (GVs)
-		"models/weapons/vwep_nukemissile.md3",		// modelName
-		0,									// handle
-		"models/weapons/vwep_nukemissile.md3",		// vwepName
-		0,									// vwephandle
-		"hud/iconw_bmb.tga",				// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		800,									// muzzleVelocity
-		75000,								// range
-		75000,								// fuelrange
-		5000,								// fire interval
-		1000,								// damage
-		800,								// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_BOMBMODE,						// crosshair
-		CH_BOMBMODE,						// crosshair track
-		CH_BOMBMODE,						// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_PLANE,							// fits on category
-		PF_AG_LT,							// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_NUKEMISSILE,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "MinkiCorp brand Nuclear device",
+		.shortName = "NM5MT",
+		.shortName2 = "NM5MT",
+		.modelName = "models/weapons/vwep_nukemissile.md3",
+		.vwepName = "models/weapons/vwep_nukemissile.md3",
+		.iconName = "hud/iconw_bmb.tga",
+		.category = CAT_ANY,
+		.muzzleVelocity = 800,
+		.range = 75000,
+		.fuelrange = 75000,
+		.fireInterval = 5000,
+		.damage = 1000,
+		.damageRadius = 800,
+		.spread = 1,
+		.barrels = 2,
+		.crosshair = CH_BOMBMODE,
+		.crosshairtrack = CH_BOMBMODE,
+		.crosshairlock = CH_BOMBMODE,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_PLANE,
+		.fitsPylon = PF_AG_LT,
 	},
 
 	// Nuke
-	{ 
-		WT_NUKEMISSILE,						// type
-		MF_GAMESET_ANY,						// gameset
-		"MinkiCorp brand Nuclear device",								// descriptiveName
-		"NM1MT",							// shortName
-		"NM1MT",							// shortName2 (GVs)
-		"models/weapons/vwep_nukemissile.md3",		// modelName
-		0,									// handle
-		"models/weapons/vwep_nukemissile.md3",		// vwepName
-		0,									// vwephandle
-		"hud/iconw_bmb.tga",				// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		800,									// muzzleVelocity
-		75000,								// range
-		75000,								// fuelrange
-		5000,								// fire interval
-		1000,								// damage
-		300,								// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_BOMBMODE,						// crosshair
-		CH_BOMBMODE,						// crosshair track
-		CH_BOMBMODE,						// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_PLANE,							// fits on category
-		PF_AG_LT,							// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_NUKEMISSILE,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "MinkiCorp brand Nuclear device",
+		.shortName = "NM1MT",
+		.shortName2 = "NM1MT",
+		.modelName = "models/weapons/vwep_nukemissile.md3",
+		.vwepName = "models/weapons/vwep_nukemissile.md3",
+		.iconName = "hud/iconw_bmb.tga",
+		.category = CAT_ANY,
+		.muzzleVelocity = 800,
+		.range = 75000,
+		.fuelrange = 75000,
+		.fireInterval = 5000,
+		.damage = 1000,
+		.damageRadius = 300,
+		.spread = 1,
+		.barrels = 2,
+		.crosshair = CH_BOMBMODE,
+		.crosshairtrack = CH_BOMBMODE,
+		.crosshairlock = CH_BOMBMODE,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_PLANE,
+		.fitsPylon = PF_AG_LT,
 	},
 	// Flak
-	{ 
-		WT_FLAK,							// type
-		MF_GAMESET_ANY,						// gameset
-		"Flak",								// descriptiveName
-		"Flak",								// shortName
-		"Flak",								// shortName2 (GVs)
-		"",		// modelName
-		0,									// handle
-		"",		// vwepName
-		0,									// vwephandle
-		"hud/iconw_bmb.tga",				// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		3000,								// muzzleVelocity
-		75000,								// range
-		75000,								// fuelrange
-		5000,								// fire interval
-		35,									// damage
-		300,								// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_MISSILEMODE,						// crosshair
-		CH_MISSILEMODE,						// crosshair track
-		CH_MISSILEMODE,						// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		1,									// number per package
-		CAT_GROUND,							// fits on category
-		PF_NA,								// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_FLAK,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "Flak",
+		.shortName = "Flak",
+		.shortName2 = "Flak",
+		.modelName = "",
+		.vwepName = "",
+		.iconName = "hud/iconw_bmb.tga",
+		.category = CAT_ANY,
+		.muzzleVelocity = 3000,
+		.range = 75000,
+		.fuelrange = 75000,
+		.fireInterval = 5000,
+		.damage = 35,
+		.damageRadius = 300,
+		.spread = 1,
+		.barrels = 2,
+		.crosshair = CH_MISSILEMODE,
+		.crosshairtrack = CH_MISSILEMODE,
+		.crosshairlock = CH_MISSILEMODE,
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_GROUND,
+		.fitsPylon = PF_NA,
 	},
-	{ 
-		WT_ROCKET,							// type
-		MF_GAMESET_ANY,						// gameset
-		"S-8 (20)",				// descriptiveName
-		"S-8",				// shortName
-		"FFAR",								// shortName2 (GVs)
-		"models/weapons/vwep_rocket.md3",	// modelName
-		0,									// handle
-		"models/weapons/vwep_s8.md3",				// vwepName
-		0,									// vwephandle
-		"hud/iconw_rkt.tga",				// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		1500,								// muzzleVelocity
-		0,									// range
-		5000,								// fuelrange
-		180,								// fire interval
-		45,				// damage
-		55,				// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_ROCKETMODE,						// crosshair
-		CH_ROCKETMODE,						// crosshair track
-		CH_ROCKETMODE,						// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		20,				// number per package
-		CAT_HELO,				// fits on category
-		PF_FFAR,							// fits on pylon
-		0,									// basicECMVulnerability
-		WF_HAS_FIRE_FRAME,					// flags
+	{
+		.type = WT_ROCKET,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "S-8 (20)",
+		.shortName = "S-8",
+		.shortName2 = "FFAR",
+		.modelName = "models/weapons/vwep_rocket.md3",
+		.vwepName = "models/weapons/vwep_s8.md3",
+		.iconName = "hud/iconw_rkt.tga",
+		.category = CAT_ANY,
+		.muzzleVelocity = 1500,
+		.fuelrange = 5000,
+		.fireInterval = 180,
+		.damage = 45,
+		.damageRadius = 55,
+		.spread = 1,
+		.barrels = 2,
+		.crosshair = CH_ROCKETMODE,
+		.crosshairtrack = CH_ROCKETMODE,
+		.crosshairlock = CH_ROCKETMODE,
+		.numberPerPackage = 20,
+		.fitsCategory = CAT_HELO,
+		.fitsPylon = PF_FFAR,
+		.flags = WF_HAS_FIRE_FRAME,
 	},
-	{ 
-		WT_ROCKET,							// type
-		MF_GAMESET_ANY,						// gameset
-		"S-5 (32)",				// descriptiveName
-		"S-5",				// shortName
-		"FFAR",								// shortName2 (GVs)
-		"models/weapons/vwep_rocket.md3",	// modelName
-		0,									// handle
-		"models/weapons/vwep_s5.md3",				// vwepName
-		0,									// vwephandle
-		"hud/iconw_rkt.tga",				// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		1500,								// muzzleVelocity
-		0,									// range
-		5000,								// fuelrange
-		120,				// fire interval
-		25,				// damage
-		35,				// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_ROCKETMODE,						// crosshair
-		CH_ROCKETMODE,						// crosshair track
-		CH_ROCKETMODE,						// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-		32,				// number per package
-		CAT_HELO,				// fits on category
-		PF_FFAR,							// fits on pylon
-		0,									// basicECMVulnerability
-		WF_HAS_FIRE_FRAME,					// flags
+	{
+		.type = WT_ROCKET,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "S-5 (32)",
+		.shortName = "S-5",
+		.shortName2 = "FFAR",
+		.modelName = "models/weapons/vwep_rocket.md3",
+		.vwepName = "models/weapons/vwep_s5.md3",
+		.iconName = "hud/iconw_rkt.tga",
+		.category = CAT_ANY,
+		.muzzleVelocity = 1500,
+		.fuelrange = 5000,
+		.fireInterval = 120,
+		.damage = 25,
+		.damageRadius = 35,
+		.spread = 1,
+		.barrels = 2,
+		.crosshair = CH_ROCKETMODE,
+		.crosshairtrack = CH_ROCKETMODE,
+		.crosshairlock = CH_ROCKETMODE,
+		.numberPerPackage = 32,
+		.fitsCategory = CAT_HELO,
+		.fitsPylon = PF_FFAR,
+		.flags = WF_HAS_FIRE_FRAME,
 	},
-	{ 
-		WT_ANTIGROUNDMISSILE,				// type
-		MF_GAMESET_ANY,						// gameset
-		"AT-6 Spiral",				// descriptiveName
-		"AT-6",				// shortName
-		"SSM",								// shortName2 (GVs)
-		"models/weapons/vwep_hellfire.md3",// modelName
-		0,									// handle
-		"models/weapons/vwep_at6.md3",				// vwepName
-		0,									// vwephandle
-		"hud/iconw_rkt.tga",				// iconName
-		0,									// iconHandle
-		CAT_GROUND,							// cat
-		0.3f,								// non cat mod
-		1000,								// muzzleVelocity
-		4500,								// range
-		6500,								// fuelrange
-		500,								// fire interval
-		110,								// damage
-		40,									// damageRadius
-		1,									// spread
-		2,									// barrels
-		0,									// barrelDistance
-		0.985f,								// lockcone (dot)
-		0.996f,								// followcone (dot)
-		2000,								// locktime
-		CH_MISSILEMODE,						// crosshair
-		CH_MISSILEMODETRACK,				// crosshair track
-		CH_MISSILEMODELOCK,					// crosshair lock
-		0,									// turret
-		{0,0,0},							// max turret angles
-		{0,0,0},							// min turret angles
-//		{5,180,0},							// max turret angles
-//		{-40,-180,0},						// min turret angles
-		2,				// number per package
-		CAT_HELO,				// fits on category
-		PF_AG_MED|PF_GUNPOD,				// fits on pylon
-		25,									// basicECMVulnerability
-		WF_HAS_FIRE_FRAME,					// flags
+	{
+		.type = WT_ANTIGROUNDMISSILE,
+		.gameset = MF_GAMESET_ANY,
+		.descriptiveName = "AT-6 Spiral",
+		.shortName = "AT-6",
+		.shortName2 = "SSM",
+		.modelName = "models/weapons/vwep_hellfire.md3",
+		.vwepName = "models/weapons/vwep_at6.md3",
+		.iconName = "hud/iconw_rkt.tga",
+		.category = CAT_GROUND,
+		.noncatmod = 0.3f,
+		.muzzleVelocity = 1000,
+		.range = 4500,
+		.fuelrange = 6500,
+		.fireInterval = 500,
+		.damage = 110,
+		.damageRadius = 40,
+		.spread = 1,
+		.barrels = 2,
+		.lockcone = 0.985f,
+		.followcone = 0.996f,
+		.lockdelay = 2000,
+		.crosshair = CH_MISSILEMODE,
+		.crosshairtrack = CH_MISSILEMODETRACK,
+		.crosshairlock = CH_MISSILEMODELOCK,
+		.numberPerPackage = 2,
+		.fitsCategory = CAT_HELO,
+		.fitsPylon = PF_AG_MED|PF_GUNPOD,
+		.basicECMVulnerability = 25,
+		.flags = WF_HAS_FIRE_FRAME,
 	},
-	{ 
-		WT_MACHINEGUN,						// type
-		MF_GAMESET_MODERN,					// gameset
-		"20mm Cannon",				// descriptiveName
-		"GUN",								// shortName
-		"MG",								// shortName2 (GVs)
-		"",									// modelName
-		0,									// handle
-		"",									// vwepName
-		0,									// vwephandle
-		"hud/iconw_mg.tga",					// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		2900,								// muzzleVelocity
-		0,									// range
-		0,									// fuelrange
-		80,				// fire interval
-		12,				// damage
-		0,									// damageRadius
-		10,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
-		1,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_GUNMODE,							// crosshair
-		CH_GUNMODE,							// crosshair track
-		CH_GUNMODE,							// crosshair lock
-		1,									// turret
-		{60,120,0},				// max turret angles
-		{-15,-120,0},				// min turret angles
-		1,									// number per package
-		CAT_ANY,							// fits on category
-		PF_NA,								// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_MACHINEGUN,
+		.gameset = MF_GAMESET_MODERN,
+		.descriptiveName = "20mm Cannon",
+		.shortName = "GUN",
+		.shortName2 = "MG",
+		.modelName = "",
+		.vwepName = "",
+		.iconName = "hud/iconw_mg.tga",
+		.category = CAT_ANY,
+		.muzzleVelocity = 2900,
+		.fireInterval = 80,
+		.damage = 12,
+		.spread = 10,
+		.barrels = 1,
+		.crosshair = CH_GUNMODE,
+		.crosshairtrack = CH_GUNMODE,
+		.crosshairlock = CH_GUNMODE,
+		.turret = 1,
+		.maxturns = {60,120,0},
+		.minturns = {-15,-120,0},
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_ANY,
+		.fitsPylon = PF_NA,
 	},
-	{ 
-		WT_MACHINEGUN,						// type
-		MF_GAMESET_MODERN,					// gameset
-		"12.7mm Yak-B",				// descriptiveName
-		"GUN",								// shortName
-		"MG",								// shortName2 (GVs)
-		"",									// modelName
-		0,									// handle
-		"",									// vwepName
-		0,									// vwephandle
-		"hud/iconw_mg.tga",					// iconName
-		0,									// iconHandle
-		CAT_ANY,							// cat
-		0,									// non cat mod
-		2900,								// muzzleVelocity
-		0,									// range
-		0,									// fuelrange
-		40,				// fire interval
-		7,				// damage
-		0,									// damageRadius
-		10,									// spread (in 0.1 deg; ie 60 means +- 3 degrees)
-		1,									// barrels
-		0,									// barrelDistance
-		0,									// lockcone
-		0,									// followcone
-		0,									// locktime
-		CH_GUNMODE,							// crosshair
-		CH_GUNMODE,							// crosshair track
-		CH_GUNMODE,							// crosshair lock
-		1,									// turret
-		{60,60,0},				// max turret angles
-		{-20,-60,0},				// min turret angles
-		1,									// number per package
-		CAT_ANY,							// fits on category
-		PF_NA,								// fits on pylon
-		0,									// basicECMVulnerability
-		0,									// flags
+	{
+		.type = WT_MACHINEGUN,
+		.gameset = MF_GAMESET_MODERN,
+		.descriptiveName = "12.7mm Yak-B",
+		.shortName = "GUN",
+		.shortName2 = "MG",
+		.modelName = "",
+		.vwepName = "",
+		.iconName = "hud/iconw_mg.tga",
+		.category = CAT_ANY,
+		.muzzleVelocity = 2900,
+		.fireInterval = 40,
+		.damage = 7,
+		.spread = 10,
+		.barrels = 1,
+		.crosshair = CH_GUNMODE,
+		.crosshairtrack = CH_GUNMODE,
+		.crosshairlock = CH_GUNMODE,
+		.turret = 1,
+		.maxturns = {60,60,0},
+		.minturns = {-20,-60,0},
+		.numberPerPackage = 1,
+		.fitsCategory = CAT_ANY,
+		.fitsPylon = PF_NA,
 	},
 	// ****************************************************************************** 
 
