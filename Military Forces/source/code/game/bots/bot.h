@@ -133,6 +133,7 @@ public:
 		float	probeBest = 0;
 		bool	confined = false;
 		float	takeoffYaw = 0;
+		float	departYaw = 0;
 		int		takeoffTime = 0;
 	};
 
@@ -208,9 +209,8 @@ private:
 	static void loadCharacters();
 	static void buildRoamPoints();
 	static bool steerAround( GameEntity* ent, float wantYaw, float travel, float& yaw );
-	static bool runwayAt( const vec3_t point );
+	static bool runwayAt( const vec3_t point, float* surface = nullptr );
 	static float runwayRun( const vec3_t origin, float yaw, float maxDist );
-	static void runwayHeading( GameEntity* ent, State& bot );
 	static int findPad( GameEntity* ent, int skip = -1 );
 	static bool replenished( GameEntity* ent );
 	static void finishRearm( GameEntity* ent, State& bot );

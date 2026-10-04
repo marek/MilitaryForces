@@ -126,7 +126,7 @@ bool Bots::steerAround( GameEntity* ent, float wantYaw, float travel, float& yaw
 	return false;
 }
 
-bool Bots::runwayAt( const vec3_t point )
+bool Bots::runwayAt( const vec3_t point, float* surface )
 {
 	vec3_t start, end;
 	VectorCopy( point, start );
@@ -138,6 +138,8 @@ bool Bots::runwayAt( const vec3_t point )
 	if( tr.fraction >= 1.0f || tr.entityNum <= ENTITYNUM_WORLD )
 		return false;
 	GameEntity* ground = theLevel.getEntity( tr.entityNum );
+	if( surface )
+		*surface = tr.endpos[2];
 	return ground && ground->classname_ && strcmp( ground->classname_, "func_runway" ) == 0;
 }
 
@@ -145,12 +147,17 @@ float Bots::runwayRun( const vec3_t origin, float yaw, float maxDist )
 {
 	vec3_t angles = { 0, yaw, 0 }, dir, point;
 	AngleVectors( angles, dir, nullptr, nullptr );
-	float run = 0;
-	for( float dist = 50.0f; dist <= maxDist; dist += 50.0f )
+	// wheels cannot cross a step between runway pieces, so the run ends where the surface height changes
+	constexpr float maxStep = 1.5f;
+	float run = 0, previous = 0, surface = 0;
+	if( !runwayAt( origin, &previous ) )
+		return 0;
+	for( float dist = 25.0f; dist <= maxDist; dist += 25.0f )
 	{
 		VectorMA( origin, dist, dir, point );
-		if( !runwayAt( point ) )
+		if( !runwayAt( point, &surface ) || fabs( surface - previous ) > maxStep )
 			break;
+		previous = surface;
 		run = dist;
 	}
 	return run;

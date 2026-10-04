@@ -3,35 +3,6 @@
 #include <algorithm>
 #include <cmath>
 
-void Bots::runwayHeading( GameEntity* ent, State& bot )
-{
-	vec3_t origin;
-	VectorCopy( ent->r.currentOrigin, origin );
-	origin[2] -= heightAboveGround( ent->r.currentOrigin, ent->s.number );
-	if( !runwayAt( origin ) )
-		return;
-	float best = 0;
-	for( int step = 0; step < 24; step++ )
-	{
-		const float yaw = step * 15.0f;
-		const float run = runwayRun( origin, yaw, 4000 );
-		vec3_t angles = { -6.0f, yaw, 0 }, dir, start;
-		AngleVectors( angles, dir, nullptr, nullptr );
-		VectorCopy( origin, start );
-		start[2] += 40;
-		trace_t tr;
-		pathBlocked( start, dir, 2500, ent->s.number, tr );
-		const float score = std::min( run, 500.0f ) * 4.0f + tr.fraction * 2500.0f;
-		if( run >= 150 && score > best )
-		{
-			best = score;
-			bot.takeoffYaw = yaw;
-		}
-	}
-	if( best > 0 )
-		bot.takeoffTime = theLevel.time_ + 30000;
-}
-
 bool Bots::turnClear( GameEntity* ent, float radius, float degrees, float climb )
 {
 	const playerState_t& ps = ent->client_->ps_;
@@ -131,11 +102,12 @@ struct PlaneTasks
 	{
 		return g_gametype.integer >= GT_TEAM && c.sense.role == Role::Fighter && !c.sense.enemy && c.who().teamwork > 0.5f;
 	}
-	// only in the first seconds after leaving the runway; low and slow elsewhere is handled by the terrain check
-	static bool climbingOut( Mind& c )
+	static constexpr float rotateSpeed = 1.12f;
+
+	static bool departing( Mind& c )
 	{
-		constexpr int climbOutTime = 6000;
-		return theLevel.time_ < c.bot.groundTime + climbOutTime && c.sense.height < 150 && c.speed < c.veh.stallspeed * 1.6f;
+		constexpr int departTime = 4000;
+		return !c.landed() && theLevel.time_ < c.bot.groundTime + departTime;
 	}
 
 	static void roam( Mind& c )
@@ -179,14 +151,90 @@ struct PlaneTasks
 			c.view[PITCH] = std::clamp( c.view[PITCH], -14.0f, 14.0f );
 	}
 
+	// Chooses the take-off heading: enough runway to reach flying speed, nothing standing on it, and from the lift-off
+	// point a climb, straight or turning, that fits the terrain and leads somewhere.
+	static void planDeparture( Mind& c )
+	{
+		constexpr float groundAcceleration = 85.0f;
+		constexpr float climbSlope = 0.14f;
+		constexpr float departure = 900.0f;
+		vec3_t origin;
+		VectorCopy( c.ent->r.currentOrigin, origin );
+		origin[2] -= c.sense.height;
+		if( !Bots::runwayAt( origin ) )
+		{
+#ifdef MF_BOT_DEBUG
+			if( g_botDebug.integer >= 2 )
+				Common::printf( "BOTTAKEOFF t %d bot %d not on a runway at %.0f %.0f %.0f height %.0f\n", theLevel.time_, c.ent->s.number, origin[0], origin[1], origin[2], c.sense.height );
+#endif
+			return;
+		}
+		const float stall = static_cast<float>( c.veh.stallspeed );
+		const float groundRun = stall * rotateSpeed * stall * rotateSpeed / (2.0f * groundAcceleration) * 1.15f;
+		const float turnRate = std::max( 10.0f, c.veh.turnspeed[YAW] ) * static_cast<float>( M_PI ) / 180.0f;
+		const float radius = stall * 1.15f / turnRate;
+		float best = 0, bestRun = 0, longest = 0;
+		for( int step = 0; step < 24; step++ )
+		{
+			const float yaw = step * 15.0f;
+			const float run = Bots::runwayRun( origin, yaw, 4000 );
+			longest = std::max( longest, run );
+			if( run < 150 )
+				continue;
+			vec3_t level = { 0, yaw, 0 }, dir, start;
+			trace_t ground;
+			AngleVectors( level, dir, nullptr, nullptr );
+			VectorCopy( origin, start );
+			start[2] += 14;
+			const float roll = std::min( run, groundRun + 100.0f );
+			Bots::pathBlocked( start, dir, roll, c.ent->s.number, ground, 30.0f );
+			const bool rollClear = ground.startsolid || ground.fraction >= 1.0f;
+
+			Pose liftOff;
+			VectorMA( origin, std::min( run, groundRun ), dir, liftOff.origin );
+			liftOff.origin[2] += 30;
+			liftOff.yaw = yaw;
+			liftOff.seconds = 3.0f;
+			float departTurn = 0;
+			bool departClear = false;
+			for( float turn : { 0.0f, 30.0f, -30.0f, 60.0f, -60.0f, 90.0f, -90.0f } )
+			{
+				Pose end;
+				if( sweepFrom( c, liftOff, radius, turn, climbSlope, departure, 60.0f, &end ) >= departure && wayOut( c, end, radius, departure ) )
+				{
+					departTurn = turn;
+					departClear = true;
+					break;
+				}
+			}
+			const float score = (run >= groundRun ? 5000.0f : 0.0f) + (rollClear ? 3000.0f : 0.0f) + (departClear ? 4000.0f - fabs( departTurn ) * 5.0f : 0.0f) +
+				std::min( run, groundRun * 2.0f ) * 2.0f;
+			if( score > best )
+			{
+				best = score;
+				bestRun = run;
+				c.bot.takeoffYaw = yaw;
+				c.bot.departYaw = yaw + departTurn;
+			}
+		}
+#ifdef MF_BOT_DEBUG
+		if( g_botDebug.integer >= 2 )
+			Common::printf( "BOTTAKEOFF t %d bot %d veh %d at %.0f %.0f %.0f facing %.0f chose %.0f then %.0f run %.0f need %.0f longest %.0f score %.0f\n", theLevel.time_, c.ent->s.number,
+				c.client->vehicle_, origin[0], origin[1], origin[2], c.ps.vehicleAngles[YAW], c.bot.takeoffYaw, c.bot.departYaw, bestRun, groundRun, longest, best );
+#endif
+		if( best > 0 )
+			c.bot.takeoffTime = theLevel.time_ + 30000;
+	}
+
 	static Status takeOff( Mind& c )
 	{
 		c.direct = true;
 		c.bot.groundTime = theLevel.time_;
 		if( theLevel.time_ >= c.bot.takeoffTime && c.speed < 20 )
-			Bots::runwayHeading( c.ent, c.bot );
+			planDeparture( c );
 		c.view[YAW] = theLevel.time_ < c.bot.takeoffTime ? c.bot.takeoffYaw : c.ps.vehicleAngles[YAW];
-		c.view[PITCH] = c.speed > c.veh.stallspeed * 0.97f ? -8.0f : 0.0f;
+		// leave the ground with speed in hand: lifting off right at the stall drops the aircraft back
+		c.view[PITCH] = c.speed > c.veh.stallspeed * rotateSpeed ? -8.0f : 0.0f;
 		if( fabs( AngleSubtract( c.view[YAW], c.ps.vehicleAngles[YAW] ) ) > 6 )
 			c.cmd.forwardmove = c.speed < 12 ? moveFull : -moveFull;
 		if( c.speed < c.veh.stallspeed * 0.5f )
@@ -208,6 +256,14 @@ struct PlaneTasks
 				}
 			}
 		}
+		return Status::Running;
+	}
+
+	// follow the departure that was planned on the ground; the manoeuvre check still vets it
+	static Status depart( Mind& c )
+	{
+		c.view[YAW] = c.bot.departYaw;
+		c.view[PITCH] = -8.0f;
 		return Status::Running;
 	}
 
@@ -478,13 +534,6 @@ struct PlaneTasks
 		return Status::Success;
 	}
 
-	static Status climbOut( Mind& c )
-	{
-		c.view[YAW] = c.ps.vehicleAngles[YAW];
-		c.view[PITCH] = -8.0f;
-		return Status::Success;
-	}
-
 	// where another aircraft will be: straight on, or round its turn when it is banked hard
 	static void predictAircraft( GameEntity* other, float seconds, vec3_t out )
 	{
@@ -662,6 +711,9 @@ struct PlaneTasks
 		State& bot = c.bot;
 		GameEntity* ent = c.ent;
 		const float yaw = c.ps.vehicleAngles[YAW];
+		// the first moments of a departure were planned on the ground; too low to manoeuvre yet
+		if( departing( c ) && c.sense.height < 60.0f )
+			return Status::Success;
 		if( theLevel.time_ >= bot.probeTime )
 		{
 			// look more often when something is in the way
@@ -874,6 +926,7 @@ struct PlaneTasks
 			t.when( "missile inbound", missileInbound, t.action( "defend missile", defendMissile ) ),
 			t.when( "wants to rearm", landing, land ),
 			t.when( "on the ground", onGround, t.action( "take off", takeOff ) ),
+			t.when( "just airborne", departing, t.action( "depart", depart ) ),
 			t.when( "evading", evading, t.selector( "evade", {
 				t.when( "blindsided", blindsided, t.action( "break away", breakAway ) ),
 				t.action( "flee", flee ) } ) ),
@@ -883,11 +936,9 @@ struct PlaneTasks
 			t.when( "team fighter without target", wantsWingman, t.action( "wingman", wingman ) ),
 			t.action( "patrol", patrol ) } );
 
-		const auto* safety = t.selector( "terrain", {
-			t.when( "just airborne", climbingOut, t.action( "climb out", climbOut ) ),
-			t.always( "avoid", t.action( "plan manoeuvre", probeTerrain ), {
-				t.action( "corner speed", cornerSpeed ),
-				t.action( "floor and ceiling", floorAndCeiling ) } ) } );
+		const auto* safety = t.always( "avoid", t.action( "plan manoeuvre", probeTerrain ), {
+			t.action( "corner speed", cornerSpeed ),
+			t.action( "floor and ceiling", floorAndCeiling ) } );
 
 		const auto* flight = t.when( "in free flight", flying, t.always( "fly", t.action( "countermeasures", countermeasures ), {
 			t.action( "navigate", navigate ),

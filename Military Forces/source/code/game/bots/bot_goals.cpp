@@ -209,7 +209,7 @@ bool Bots::replenished( GameEntity* ent )
 
 void Bots::finishRearm( GameEntity* ent, State& bot )
 {
-	runwayHeading( ent, bot );
+	bot.takeoffTime = 0;
 	bot.pad = -1;
 	bot.landPhase = 0;
 	bot.goalEvalTime = 0;
