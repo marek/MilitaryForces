@@ -611,7 +611,16 @@ struct consoleCommand_t {
 	void	(*function)();
 };
 
+static void CG_DevVehicle_f( ) {
+	if( !CvarSystem::variableIntegerValue( "sv_cheats" ) ) {
+		Common::printf( "dev_vehicle needs cheats (devmap)\n" );
+		return;
+	}
+	CvarSystem::set( "cg_nextVehicle", CGame::argv( 1 ) );
+}
+
 static consoleCommand_t	commands[] = {
+	{ "dev_vehicle", CG_DevVehicle_f },
 	{ "testgun", CGame::testGun_f },
 	{ "testmodel", CGame::testModel_f },
 	{ "nextframe", CGame::testModelNextFrame_f },
