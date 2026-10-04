@@ -172,19 +172,19 @@ void *S_CodecLoad(const char *filename, snd_info_t *info)
 S_CodecOpenStream
 =================
 */
-snd_stream_t *S_CodecOpenStream(const char *filename)
+SoundStream *S_CodecOpenStream(const char *filename)
 {
-	return static_cast<snd_stream_t *>(S_CodecGetSound(filename, nullptr));
+	return static_cast<SoundStream *>(S_CodecGetSound(filename, nullptr));
 }
 
-void S_CodecCloseStream(snd_stream_t *stream)
+void SoundStream::closeStream()
 {
-	stream->codec->close(stream);
+	this->codec->close(this);
 }
 
-int S_CodecReadStream(snd_stream_t *stream, int bytes, void *buffer)
+int SoundStream::readStream( int bytes, void *buffer )
 {
-	return stream->codec->read(stream, bytes, buffer);
+	return this->codec->read(this, bytes, buffer);
 }
 
 //=======================================================================
@@ -195,9 +195,9 @@ int S_CodecReadStream(snd_stream_t *stream, int bytes, void *buffer)
 S_CodecUtilOpen
 =================
 */
-snd_stream_t *S_CodecUtilOpen(const char *filename, snd_codec_t *codec)
+SoundStream *S_CodecUtilOpen(const char *filename, snd_codec_t *codec)
 {
-	snd_stream_t *stream;
+	SoundStream *stream;
 	fileHandle_t hnd;
 	int length;
 
@@ -210,7 +210,7 @@ snd_stream_t *S_CodecUtilOpen(const char *filename, snd_codec_t *codec)
 	}
 
 	// Allocate a stream
-	stream = static_cast<snd_stream_t *>(Z_Malloc(sizeof(snd_stream_t)));
+	stream = static_cast<SoundStream *>(Z_Malloc(sizeof(SoundStream)));
 	if(!stream)
 	{
 		FS_FCloseFile(hnd);
@@ -229,7 +229,7 @@ snd_stream_t *S_CodecUtilOpen(const char *filename, snd_codec_t *codec)
 S_CodecUtilClose
 =================
 */
-void S_CodecUtilClose(snd_stream_t **stream)
+void S_CodecUtilClose(SoundStream **stream)
 {
 	FS_FCloseFile((*stream)->file);
 	Z_Free(*stream);

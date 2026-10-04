@@ -684,15 +684,27 @@ Edit fields and command line history/completion
 */
 
 #define	MAX_EDIT_LINE	256
-struct field_t {
+class EditField
+{
+public:
+	void clear();
+	void autoComplete();
+	void draw( int x, int y, int width, bool showCursor, bool noColorEscape );
+	void bigDraw( int x, int y, int width, bool showCursor, bool noColorEscape );
+	void paste();
+	void keyDownEvent( int key );
+	void charEvent( int ch );
+	void hist_Add();
+
 	int		cursor;
 	int		scroll;
 	int		widthInChars;
 	char	buffer[MAX_EDIT_LINE];
+
+private:
+	void variableSizeDraw( int x, int y, int width, int size, bool drawSmall, bool showCursor, bool noColorEscape );
 };
 
-void Field_Clear( field_t *edit );
-void Field_AutoComplete( field_t *edit );
 void Field_CompleteKeyname( );
 void Field_CompleteFilename( const char *dir, const char *ext,
 		char *filter, bool stripExt,

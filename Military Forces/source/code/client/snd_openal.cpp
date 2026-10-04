@@ -1920,8 +1920,8 @@ static srcHandle_t musicSourceHandle = -1;
 static ALuint musicSource;
 static ALuint musicBuffers[NUM_MUSIC_BUFFERS];
 
-static snd_stream_t *mus_stream;
-static snd_stream_t *intro_stream;
+static SoundStream *mus_stream;
+static SoundStream *intro_stream;
 static char s_backgroundLoop[MAX_QPATH];
 
 static byte decode_buffer[MUSIC_BUFFER_SIZE];
@@ -1977,13 +1977,13 @@ static void S_AL_CloseMusicFiles()
 {
 	if(intro_stream)
 	{
-		S_CodecCloseStream(intro_stream);
+		intro_stream->closeStream();
 		intro_stream = nullptr;
 	}
 	
 	if(mus_stream)
 	{
-		S_CodecCloseStream(mus_stream);
+		mus_stream->closeStream();
 		mus_stream = nullptr;
 	}
 }
@@ -2028,7 +2028,7 @@ void S_AL_MusicProcess(ALuint b)
 	ALenum error;
 	int l;
 	ALuint format;
-	snd_stream_t *curstream;
+	SoundStream *curstream;
 
 	S_AL_ClearError( false );
 
@@ -2040,12 +2040,12 @@ void S_AL_MusicProcess(ALuint b)
 	if(!curstream)
 		return;
 
-	l = S_CodecReadStream(curstream, MUSIC_BUFFER_SIZE, decode_buffer);
+	l = curstream->readStream( MUSIC_BUFFER_SIZE, decode_buffer );
 
 	// Run out data to read, start at the beginning again
 	if(l == 0)
 	{
-		S_CodecCloseStream(curstream);
+		curstream->closeStream();
 
 		// the intro stream just finished playing so we don't need to reopen
 		// the music stream.
@@ -2062,7 +2062,7 @@ void S_AL_MusicProcess(ALuint b)
 			return;
 		}
 
-		l = S_CodecReadStream(curstream, MUSIC_BUFFER_SIZE, decode_buffer);
+		l = curstream->readStream( MUSIC_BUFFER_SIZE, decode_buffer );
 	}
 
 	format = S_AL_Format(curstream->info.width, curstream->info.channels);

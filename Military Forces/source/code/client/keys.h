@@ -30,17 +30,17 @@ struct qkey_t {
 extern	bool	key_overstrikeMode;
 extern	qkey_t		keys[MAX_KEYS];
 
-// NOTE TTimo the declaration of field_t and Field_Clear is now in qcommon/qcommon.h
-void Field_KeyDownEvent( field_t *edit, int key );
-void Field_CharEvent( field_t *edit, int ch );
-void Field_Draw( field_t *edit, int x, int y, int width, bool showCursor, bool noColorEscape );
-void Field_BigDraw( field_t *edit, int x, int y, int width, bool showCursor, bool noColorEscape );
+// NOTE TTimo the declaration of EditField and Field_Clear is now in qcommon/qcommon.h
+void Field_KeyDownEvent( EditField *edit, int key );
+void Field_CharEvent( EditField *edit, int ch );
+void Field_Draw( EditField *edit, int x, int y, int width, bool showCursor, bool noColorEscape );
+void Field_BigDraw( EditField *edit, int x, int y, int width, bool showCursor, bool noColorEscape );
 
 inline constexpr int COMMAND_HISTORY = 32;
-extern	field_t	historyEditLines[COMMAND_HISTORY];
+extern	EditField	historyEditLines[COMMAND_HISTORY];
 
-extern	field_t	g_consoleField;
-extern	field_t	chatField;
+extern	EditField	g_consoleField;
+extern	EditField	chatField;
 extern	int				anykeydown;
 extern	bool	chat_team;
 extern	int			chat_playerNum;

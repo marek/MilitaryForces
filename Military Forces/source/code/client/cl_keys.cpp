@@ -29,14 +29,14 @@ key up events are sent even if in console mode
 
 */
 
-field_t	historyEditLines[COMMAND_HISTORY];
+EditField	historyEditLines[COMMAND_HISTORY];
 
 int			nextHistoryLine;		// the last line in the history buffer, not masked
 int			historyLine;	// the line being displayed from history buffer
 							// will be <= nextHistoryLine
 
-field_t		g_consoleField;
-field_t		chatField;
+EditField		g_consoleField;
+EditField		chatField;
 bool	chat_team;
 
 int			chat_playerNum;
@@ -345,8 +345,7 @@ Handles horizontal scrolling and cursor blinking
 x, y, and width are in pixels
 ===================
 */
-static void Field_VariableSizeDraw( field_t *edit, int x, int y, int width, int size,
-	bool drawSmall, bool showCursor, bool noColorEscape ) {
+void EditField::variableSizeDraw( int x, int y, int width, int size, bool drawSmall, bool showCursor, bool noColorEscape ) {
 	int		len;
 	int		drawLen;
 	int		prestep;
@@ -354,20 +353,20 @@ static void Field_VariableSizeDraw( field_t *edit, int x, int y, int width, int 
 	char	str[MAX_STRING_CHARS];
 	int		i;
 
-	drawLen = edit->widthInChars - 1; // - 1 so there is always a space for the cursor
-	len = strlen( edit->buffer );
+	drawLen = this->widthInChars - 1; // - 1 so there is always a space for the cursor
+	len = strlen( this->buffer );
 
 	// guarantee that cursor will be visible
 	if ( len <= drawLen ) {
 		prestep = 0;
 	} else {
-		if ( edit->scroll + drawLen > len ) {
-			edit->scroll = len - drawLen;
-			if ( edit->scroll < 0 ) {
-				edit->scroll = 0;
+		if ( this->scroll + drawLen > len ) {
+			this->scroll = len - drawLen;
+			if ( this->scroll < 0 ) {
+				this->scroll = 0;
 			}
 		}
-		prestep = edit->scroll;
+		prestep = this->scroll;
 	}
 
 	if ( prestep + drawLen > len ) {
@@ -379,7 +378,7 @@ static void Field_VariableSizeDraw( field_t *edit, int x, int y, int width, int 
 		Com_Error( ERR_DROP, "drawLen >= MAX_STRING_CHARS" );
 	}
 
-	Com_Memcpy( str, edit->buffer + prestep, drawLen );
+	Com_Memcpy( str, this->buffer + prestep, drawLen );
 	str[ drawLen ] = 0;
 
 	// draw it
@@ -408,24 +407,24 @@ static void Field_VariableSizeDraw( field_t *edit, int x, int y, int width, int 
 		i = drawLen - strlen( str );
 
 		if ( drawSmall ) {
-			SCR_DrawSmallChar( x + ( edit->cursor - prestep - i ) * size, y, cursorChar );
+			SCR_DrawSmallChar( x + ( this->cursor - prestep - i ) * size, y, cursorChar );
 		} else {
 			str[0] = cursorChar;
 			str[1] = 0;
-			SCR_DrawBigString( x + ( edit->cursor - prestep - i ) * size, y, str, 1.0, false );
+			SCR_DrawBigString( x + ( this->cursor - prestep - i ) * size, y, str, 1.0, false );
 
 		}
 	}
 }
 
-void Field_Draw( field_t *edit, int x, int y, int width, bool showCursor, bool noColorEscape ) 
+void EditField::draw( int x, int y, int width, bool showCursor, bool noColorEscape ) 
 {
-	Field_VariableSizeDraw( edit, x, y, width, g_smallchar_width, true, showCursor, noColorEscape );
+	this->variableSizeDraw( x, y, width, g_smallchar_width, true, showCursor, noColorEscape );
 }
 
-void Field_BigDraw( field_t *edit, int x, int y, int width, bool showCursor, bool noColorEscape ) 
+void EditField::bigDraw( int x, int y, int width, bool showCursor, bool noColorEscape ) 
 {
-	Field_VariableSizeDraw( edit, x, y, width, BIGCHAR_WIDTH, false, showCursor, noColorEscape );
+	this->variableSizeDraw( x, y, width, BIGCHAR_WIDTH, false, showCursor, noColorEscape );
 }
 
 /*
@@ -433,7 +432,7 @@ void Field_BigDraw( field_t *edit, int x, int y, int width, bool showCursor, boo
 Field_Paste
 ================
 */
-void Field_Paste( field_t *edit ) {
+void EditField::paste() {
 	char	*cbd;
 	int		pasteLen, i;
 
@@ -446,7 +445,7 @@ void Field_Paste( field_t *edit ) {
 	// send as if typed, so insert / overstrike works properly
 	pasteLen = strlen( cbd );
 	for ( i = 0 ; i < pasteLen ; i++ ) {
-		Field_CharEvent( edit, cbd[i] );
+		this->charEvent( cbd[i] );
 	}
 
 	Z_Free( cbd );
@@ -462,44 +461,44 @@ in-game talk, and menu fields
 Key events are used for non-printable characters, others are gotten from char events.
 =================
 */
-void Field_KeyDownEvent( field_t *edit, int key ) {
+void EditField::keyDownEvent( int key ) {
 	int		len;
 
 	// shift-insert is paste
 	if ( ( ( key == K_INS ) || ( key == K_KP_INS ) ) && keys[K_SHIFT].down ) {
-		Field_Paste( edit );
+		this->paste();
 		return;
 	}
 
 	key = tolower( key );
-	len = strlen( edit->buffer );
+	len = strlen( this->buffer );
 
 	switch ( key ) {
 		case K_DEL:
-			if ( edit->cursor < len ) {
-				memmove( edit->buffer + edit->cursor, 
-					edit->buffer + edit->cursor + 1, len - edit->cursor );
+			if ( this->cursor < len ) {
+				memmove( this->buffer + this->cursor, 
+					this->buffer + this->cursor + 1, len - this->cursor );
 			}
 			break;
 
 		case K_RIGHTARROW:
-			if ( edit->cursor < len ) {
-				edit->cursor++;
+			if ( this->cursor < len ) {
+				this->cursor++;
 			}
 			break;
 
 		case K_LEFTARROW:
-			if ( edit->cursor > 0 ) {
-				edit->cursor--;
+			if ( this->cursor > 0 ) {
+				this->cursor--;
 			}
 			break;
 
 		case K_HOME:
-			edit->cursor = 0;
+			this->cursor = 0;
 			break;
 
 		case K_END:
-			edit->cursor = len;
+			this->cursor = len;
 			break;
 
 		case K_INS:
@@ -511,10 +510,10 @@ void Field_KeyDownEvent( field_t *edit, int key ) {
 	}
 
 	// Change scroll if cursor is no longer visible
-	if ( edit->cursor < edit->scroll ) {
-		edit->scroll = edit->cursor;
-	} else if ( edit->cursor >= edit->scroll + edit->widthInChars && edit->cursor <= len ) {
-		edit->scroll = edit->cursor - edit->widthInChars + 1;
+	if ( this->cursor < this->scroll ) {
+		this->scroll = this->cursor;
+	} else if ( this->cursor >= this->scroll + this->widthInChars && this->cursor <= len ) {
+		this->scroll = this->cursor - this->widthInChars + 1;
 	}
 }
 
@@ -523,43 +522,43 @@ void Field_KeyDownEvent( field_t *edit, int key ) {
 Field_CharEvent
 ==================
 */
-void Field_CharEvent( field_t *edit, int ch ) {
+void EditField::charEvent( int ch ) {
 	int		len;
 
 	if ( ch == 'v' - 'a' + 1 ) {	// ctrl-v is paste
-		Field_Paste( edit );
+		this->paste();
 		return;
 	}
 
 	if ( ch == 'c' - 'a' + 1 ) {	// ctrl-c clears the field
-		Field_Clear( edit );
+		this->clear();
 		return;
 	}
 
-	len = strlen( edit->buffer );
+	len = strlen( this->buffer );
 
 	if ( ch == 'h' - 'a' + 1 )	{	// ctrl-h is backspace
-		if ( edit->cursor > 0 ) {
-			memmove( edit->buffer + edit->cursor - 1, 
-				edit->buffer + edit->cursor, len + 1 - edit->cursor );
-			edit->cursor--;
-			if ( edit->cursor < edit->scroll )
+		if ( this->cursor > 0 ) {
+			memmove( this->buffer + this->cursor - 1, 
+				this->buffer + this->cursor, len + 1 - this->cursor );
+			this->cursor--;
+			if ( this->cursor < this->scroll )
 			{
-				edit->scroll--;
+				this->scroll--;
 			}
 		}
 		return;
 	}
 
 	if ( ch == 'a' - 'a' + 1 ) {	// ctrl-a is home
-		edit->cursor = 0;
-		edit->scroll = 0;
+		this->cursor = 0;
+		this->scroll = 0;
 		return;
 	}
 
 	if ( ch == 'e' - 'a' + 1 ) {	// ctrl-e is end
-		edit->cursor = len;
-		edit->scroll = edit->cursor - edit->widthInChars;
+		this->cursor = len;
+		this->scroll = this->cursor - this->widthInChars;
 		return;
 	}
 
@@ -572,28 +571,28 @@ void Field_CharEvent( field_t *edit, int ch ) {
 
 	if ( key_overstrikeMode ) {	
 		// - 2 to leave room for the leading slash and trailing \0
-		if ( edit->cursor == MAX_EDIT_LINE - 2 )
+		if ( this->cursor == MAX_EDIT_LINE - 2 )
 			return;
-		edit->buffer[edit->cursor] = ch;
-		edit->cursor++;
+		this->buffer[this->cursor] = ch;
+		this->cursor++;
 	} else {	// insert mode
 		// - 2 to leave room for the leading slash and trailing \0
 		if ( len == MAX_EDIT_LINE - 2 ) {
 			return; // all full
 		}
-		memmove( edit->buffer + edit->cursor + 1, 
-			edit->buffer + edit->cursor, len + 1 - edit->cursor );
-		edit->buffer[edit->cursor] = ch;
-		edit->cursor++;
+		memmove( this->buffer + this->cursor + 1, 
+			this->buffer + this->cursor, len + 1 - this->cursor );
+		this->buffer[this->cursor] = ch;
+		this->cursor++;
 	}
 
 
-	if ( edit->cursor >= edit->widthInChars ) {
-		edit->scroll++;
+	if ( this->cursor >= this->widthInChars ) {
+		this->scroll++;
 	}
 
-	if ( edit->cursor == len + 1) {
-		edit->buffer[edit->cursor] = 0;
+	if ( this->cursor == len + 1) {
+		this->buffer[this->cursor] = 0;
 	}
 }
 
@@ -658,7 +657,7 @@ void Console_Key (int key) {
 		nextHistoryLine++;
 		historyLine = nextHistoryLine;
 
-		Field_Clear( &g_consoleField );
+		g_consoleField.clear();
 
 		g_consoleField.widthInChars = g_console_field_width;
 
@@ -673,7 +672,7 @@ void Console_Key (int key) {
 	// command completion
 
 	if (key == K_TAB) {
-		Field_AutoComplete(&g_consoleField);
+		g_consoleField.autoComplete();
 		return;
 	}
 
@@ -694,7 +693,7 @@ void Console_Key (int key) {
 		historyLine++;
 		if (historyLine >= nextHistoryLine) {
 			historyLine = nextHistoryLine;
-			Field_Clear( &g_consoleField );
+			g_consoleField.clear();
 			g_consoleField.widthInChars = g_console_field_width;
 			return;
 		}
@@ -744,7 +743,7 @@ void Console_Key (int key) {
 	}
 
 	// pass to the normal editline routine
-	Field_KeyDownEvent( &g_consoleField, key );
+	g_consoleField.keyDownEvent( key );
 }
 
 //============================================================================
@@ -764,7 +763,7 @@ void Message_Key( int key ) {
 
 	if (key == K_ESCAPE) {
 		Key_SetCatcher( Key_GetCatcher( ) & ~KEYCATCH_MESSAGE );
-		Field_Clear( &chatField );
+		chatField.clear();
 		return;
 	}
 
@@ -786,11 +785,11 @@ void Message_Key( int key ) {
 			CL_AddReliableCommand(buffer, false);
 		}
 		Key_SetCatcher( Key_GetCatcher( ) & ~KEYCATCH_MESSAGE );
-		Field_Clear( &chatField );
+		chatField.clear();
 		return;
 	}
 
-	Field_KeyDownEvent( &chatField, key );
+	chatField.keyDownEvent( key );
 }
 
 //============================================================================
@@ -1397,7 +1396,7 @@ void CL_CharEvent( int key ) {
 	// distribute the key down event to the appropriate handler
 	if ( Key_GetCatcher( ) & KEYCATCH_CONSOLE )
 	{
-		Field_CharEvent( &g_consoleField, key );
+		g_consoleField.charEvent( key );
 	}
 	else if ( Key_GetCatcher( ) & KEYCATCH_UI )
 	{
@@ -1405,11 +1404,11 @@ void CL_CharEvent( int key ) {
 	}
 	else if ( Key_GetCatcher( ) & KEYCATCH_MESSAGE ) 
 	{
-		Field_CharEvent( &chatField, key );
+		chatField.charEvent( key );
 	}
 	else if ( clc.state == CA_DISCONNECTED )
 	{
-		Field_CharEvent( &g_consoleField, key );
+		g_consoleField.charEvent( key );
 	}
 }
 
@@ -1522,9 +1521,9 @@ void CL_LoadConsoleHistory( )
 		}
 
 		memmove( &historyEditLines[ 0 ], &historyEditLines[ i + 1 ],
-				numLines * sizeof( field_t ) );
+				numLines * sizeof( EditField ) );
 		for( i = numLines; i < COMMAND_HISTORY; i++ )
-			Field_Clear( &historyEditLines[ i ] );
+			(&historyEditLines[ i ])->clear();
 
 		historyLine = nextHistoryLine = numLines;
 	}

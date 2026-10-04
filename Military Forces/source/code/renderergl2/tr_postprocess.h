@@ -25,9 +25,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "tr_fbo.h"
 
-void RB_ToneMap(FBO_t *hdrFbo, ivec4_t hdrBox, FBO_t *ldrFbo, ivec4_t ldrBox, int autoExposure);
-void RB_BokehBlur(FBO_t *src, ivec4_t srcBox, FBO_t *dst, ivec4_t dstBox, float blur);
-void RB_SunRays(FBO_t *srcFbo, ivec4_t srcBox, FBO_t *dstFbo, ivec4_t dstBox);
-void RB_GaussianBlur(FBO_t *srcFbo, FBO_t *dstFbo, float blur);
+void RB_ToneMap(Framebuffer *hdrFbo, ivec4_t hdrBox, Framebuffer *ldrFbo, ivec4_t ldrBox, int autoExposure);
+void RB_BokehBlur(Framebuffer *src, ivec4_t srcBox, Framebuffer *dst, ivec4_t dstBox, float blur);
+void RB_SunRays(Framebuffer *srcFbo, ivec4_t srcBox, Framebuffer *dstFbo, ivec4_t dstBox);
+void RB_GaussianBlur(Framebuffer *srcFbo, Framebuffer *dstFbo, float blur);
 
 #endif

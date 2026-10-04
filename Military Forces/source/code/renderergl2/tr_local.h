@@ -849,7 +849,7 @@ struct viewParms_t {
 	int			frameCount;			// copied from tr.frameCount
 	cplane_t	portalPlane;		// clip anything behind this if mirroring
 	int			viewportX, viewportY, viewportWidth, viewportHeight;
-	FBO_t		*targetFbo;
+	Framebuffer		*targetFbo;
 	int         targetFboLayer;
 	int         targetFboCubemapIndex;
 	float		fovX, fovY;
@@ -1411,7 +1411,7 @@ struct glstate_t {
 	int             boneAnimation; // number of bones
 	mat4_t          boneMatrix[IQM_MAX_JOINTS];
 	uint32_t        vertexAttribsEnabled;  // global if no VAOs, tess only otherwise
-	FBO_t          *currentFBO;
+	Framebuffer          *currentFBO;
 	vao_t          *currentVao;
 	mat4_t        modelview;
 	mat4_t        projection;
@@ -1525,7 +1525,7 @@ struct backEndState_t {
 	bool	vertexes2D;		// shader needs to be finished
 	trRefEntity_t	entity2D;	// currentEntity will point at this when doing 2D rendering
 
-	FBO_t *last2DFBO;
+	Framebuffer *last2DFBO;
 	bool    colorMask[4];
 	bool    depthFill;
 	float       greyscale;
@@ -1590,21 +1590,21 @@ struct trGlobals_t {
 	
 	image_t					*textureDepthImage;
 
-	FBO_t					*renderFbo;
-	FBO_t					*msaaResolveFbo;
-	FBO_t					*sunRaysFbo;
-	FBO_t					*depthFbo;
-	FBO_t					*pshadowFbos[MAX_DRAWN_PSHADOWS];
-	FBO_t					*screenScratchFbo;
-	FBO_t					*textureScratchFbo[2];
-	FBO_t                   *quarterFbo[2];
-	FBO_t					*calcLevelsFbo;
-	FBO_t					*targetLevelsFbo;
-	FBO_t					*sunShadowFbo[4];
-	FBO_t					*screenShadowFbo;
-	FBO_t					*screenSsaoFbo;
-	FBO_t					*hdrDepthFbo;
-	FBO_t                   *renderCubeFbo;
+	Framebuffer					*renderFbo;
+	Framebuffer					*msaaResolveFbo;
+	Framebuffer					*sunRaysFbo;
+	Framebuffer					*depthFbo;
+	Framebuffer					*pshadowFbos[MAX_DRAWN_PSHADOWS];
+	Framebuffer					*screenScratchFbo;
+	Framebuffer					*textureScratchFbo[2];
+	Framebuffer                   *quarterFbo[2];
+	Framebuffer					*calcLevelsFbo;
+	Framebuffer					*targetLevelsFbo;
+	Framebuffer					*sunShadowFbo[4];
+	Framebuffer					*screenShadowFbo;
+	Framebuffer					*screenSsaoFbo;
+	Framebuffer					*hdrDepthFbo;
+	Framebuffer                   *renderCubeFbo;
 
 	shader_t				*defaultShader;
 	shader_t				*shadowShader;
@@ -1688,7 +1688,7 @@ struct trGlobals_t {
 	image_t					*images[MAX_DRAWIMAGES];
 
 	int						numFBOs;
-	FBO_t					*fbos[MAX_FBOS];
+	Framebuffer					*fbos[MAX_FBOS];
 
 	int						numVaos;
 	vao_t					*vaos[MAX_VAOS];

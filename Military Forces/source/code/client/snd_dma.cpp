@@ -37,7 +37,7 @@ void S_Update_( );
 void S_Base_StopAllSounds();
 void S_Base_StopBackgroundTrack( );
 
-snd_stream_t	*s_backgroundStream = nullptr;
+SoundStream	*s_backgroundStream = nullptr;
 static char		s_backgroundLoop[MAX_QPATH];
 //static char		s_backgroundMusic[MAX_QPATH]; //TTimo: unused
 
@@ -1367,7 +1367,7 @@ S_StopBackgroundTrack
 void S_Base_StopBackgroundTrack( ) {
 	if(!s_backgroundStream)
 		return;
-	S_CodecCloseStream(s_backgroundStream);
+	s_backgroundStream->closeStream();
 	s_backgroundStream = nullptr;
 	s_rawend[0] = 0;
 }
@@ -1382,7 +1382,7 @@ static void S_OpenBackgroundStream( const char *filename ) {
 	// if restarting the same back ground track
 	if(s_backgroundStream)
 	{
-		S_CodecCloseStream(s_backgroundStream);
+		s_backgroundStream->closeStream();
 		s_backgroundStream = nullptr;
 	}
 
@@ -1466,7 +1466,7 @@ void S_UpdateBackgroundTrack( ) {
 		}
 
 		// Read
-		r = S_CodecReadStream(s_backgroundStream, fileBytes, raw);
+		r = s_backgroundStream->readStream( fileBytes, raw );
 		if(r < fileBytes)
 		{
 			fileSamples = r / (s_backgroundStream->info.width * s_backgroundStream->info.channels);

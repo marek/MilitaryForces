@@ -3301,17 +3301,17 @@ command line completion
 Field_Clear
 ==================
 */
-void Field_Clear( field_t *edit ) {
-  memset(edit->buffer, 0, MAX_EDIT_LINE);
-	edit->cursor = 0;
-	edit->scroll = 0;
+void EditField::clear() {
+  memset(this->buffer, 0, MAX_EDIT_LINE);
+	this->cursor = 0;
+	this->scroll = 0;
 }
 
 static const char *completionString;
 static char shortestMatch[MAX_TOKEN_CHARS];
 static int	matchCount;
-// field we are working on, passed to Field_AutoComplete(&g_consoleCommand for instance)
-static field_t *completionField;
+// field we are working on, passed to (&g_consoleCommand for instance)->autoComplete()
+static EditField *completionField;
 
 /*
 ===============
@@ -3555,9 +3555,9 @@ Field_AutoComplete
 Perform Tab expansion
 ===============
 */
-void Field_AutoComplete( field_t *field )
+void EditField::autoComplete()
 {
-	completionField = field;
+	completionField = this;
 
 	Field_CompleteCommand( completionField->buffer, true, true );
 }

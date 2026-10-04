@@ -240,9 +240,9 @@ void *S_WAV_CodecLoad(const char *filename, snd_info_t *info)
 S_WAV_CodecOpenStream
 =================
 */
-snd_stream_t *S_WAV_CodecOpenStream(const char *filename)
+SoundStream *S_WAV_CodecOpenStream(const char *filename)
 {
-	snd_stream_t *rv;
+	SoundStream *rv;
 
 	// Open
 	rv = S_CodecUtilOpen(filename, &wav_codec);
@@ -264,7 +264,7 @@ snd_stream_t *S_WAV_CodecOpenStream(const char *filename)
 S_WAV_CodecCloseStream
 =================
 */
-void S_WAV_CodecCloseStream(snd_stream_t *stream)
+void S_WAV_CodecCloseStream(SoundStream *stream)
 {
 	S_CodecUtilClose(&stream);
 }
@@ -274,7 +274,7 @@ void S_WAV_CodecCloseStream(snd_stream_t *stream)
 S_WAV_CodecReadStream
 =================
 */
-int S_WAV_CodecReadStream(snd_stream_t *stream, int bytes, void *buffer)
+int S_WAV_CodecReadStream(SoundStream *stream, int bytes, void *buffer)
 {
 	int remaining = stream->info.size - stream->pos;
 	int samples;

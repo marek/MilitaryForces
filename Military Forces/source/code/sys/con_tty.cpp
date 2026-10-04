@@ -57,12 +57,12 @@ static int TTY_eof;
 
 static struct termios TTY_tc;
 
-static field_t TTY_con;
+static EditField TTY_con;
 
 // This is somewhat of aduplicate of the graphical console history
 // but it's safer more modular to have our own here
 constexpr int CON_HISTORY = 32;
-static field_t ttyEditLines[ CON_HISTORY ];
+static EditField ttyEditLines[ CON_HISTORY ];
 static int hist_current = -1, hist_count = 0;
 
 #ifndef DEDICATED
@@ -185,12 +185,12 @@ void CON_Shutdown( )
 Hist_Add
 ==================
 */
-void Hist_Add(field_t *field)
+void EditField::hist_Add()
 {
 	int i;
 
 	// Don't save blank lines in history.
-	if (!field->cursor)
+	if (!this->cursor)
 		return;
 
 	assert(hist_count <= CON_HISTORY);
@@ -202,7 +202,7 @@ void Hist_Add(field_t *field)
 	{
 		ttyEditLines[i] = ttyEditLines[i-1];
 	}
-	ttyEditLines[0] = *field;
+	ttyEditLines[0] = *this;
 	if (hist_count<CON_HISTORY)
 	{
 		hist_count++;
@@ -215,7 +215,7 @@ void Hist_Add(field_t *field)
 Hist_Prev
 ==================
 */
-field_t *Hist_Prev( )
+EditField *Hist_Prev( )
 {
 	int hist_prev;
 	assert(hist_count <= CON_HISTORY);
@@ -236,7 +236,7 @@ field_t *Hist_Prev( )
 Hist_Next
 ==================
 */
-field_t *Hist_Next( )
+EditField *Hist_Next( )
 {
 	assert(hist_count <= CON_HISTORY);
 	assert(hist_count >= 0);
@@ -296,7 +296,7 @@ void CON_Init( )
 		return;
 	}
 
-	Field_Clear(&TTY_con);
+	TTY_con.clear();
 	tcgetattr (STDIN_FILENO, &TTY_tc);
 	TTY_erase = TTY_tc.c_cc[VERASE];
 	TTY_eof = TTY_tc.c_cc[VEOF];
@@ -336,7 +336,7 @@ char *CON_Input( )
 	static char text[MAX_EDIT_LINE];
 	int avail;
 	char key;
-	field_t *history;
+	EditField *history;
 	size_t Q_UNUSED_VAR size;
 
 	if(ttycon_on)
@@ -385,16 +385,16 @@ char *CON_Input( )
 					}
 
 					// push it in history
-					Hist_Add(&TTY_con);
+					TTY_con.hist_Add();
 					CON_Hide();
 					Com_Printf("%s%s\n", TTY_CONSOLE_PROMPT, TTY_con.buffer);
-					Field_Clear(&TTY_con);
+					TTY_con.clear();
 					CON_Show();
 #else
 					// push it in history
-					Hist_Add(&TTY_con);
+					TTY_con.hist_Add();
 					Q_strncpyz(text, TTY_con.buffer, sizeof(text));
-					Field_Clear(&TTY_con);
+					TTY_con.clear();
 					key = '\n';
 					size = write(STDOUT_FILENO, &key, 1);
 					size = write(STDOUT_FILENO, TTY_CONSOLE_PROMPT, strlen(TTY_CONSOLE_PROMPT));
@@ -404,7 +404,7 @@ char *CON_Input( )
 				if (key == '\t')
 				{
 					CON_Hide();
-					Field_AutoComplete( &TTY_con );
+					TTY_con.autoComplete();
 					CON_Show();
 					return nullptr;
 				}
@@ -438,7 +438,7 @@ char *CON_Input( )
 										TTY_con = *history;
 									} else
 									{
-										Field_Clear(&TTY_con);
+										TTY_con.clear();
 									}
 									CON_Show();
 									tcflush(STDIN_FILENO, TCIFLUSH);

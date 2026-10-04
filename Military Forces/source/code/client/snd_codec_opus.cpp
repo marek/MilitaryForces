@@ -54,7 +54,7 @@ snd_codec_t opus_codec =
 // fread() replacement
 int S_OggOpus_Callback_read(void *datasource, unsigned char *ptr, int size )
 {
-	snd_stream_t *stream;
+	SoundStream *stream;
 	int bytesRead = 0;
 
 	// check if input is valid
@@ -83,8 +83,8 @@ int S_OggOpus_Callback_read(void *datasource, unsigned char *ptr, int size )
 		return -1;
 	}
 	
-	// we use a snd_stream_t in the generic pointer to pass around
-	stream = static_cast<snd_stream_t *>(datasource);
+	// we use a SoundStream in the generic pointer to pass around
+	stream = static_cast<SoundStream *>(datasource);
 
 	// read it with the Q3 function FS_Read()
 	bytesRead = FS_Read(ptr, size, stream->file);
@@ -98,7 +98,7 @@ int S_OggOpus_Callback_read(void *datasource, unsigned char *ptr, int size )
 // fseek() replacement
 int S_OggOpus_Callback_seek(void *datasource, opus_int64 offset, int whence)
 {
-	snd_stream_t *stream;
+	SoundStream *stream;
 	int retVal = 0;
 
 	// check if input is valid
@@ -108,8 +108,8 @@ int S_OggOpus_Callback_seek(void *datasource, opus_int64 offset, int whence)
 		return -1;
 	}
 
-	// snd_stream_t in the generic pointer
-	stream = static_cast<snd_stream_t *>(datasource);
+	// SoundStream in the generic pointer
+	stream = static_cast<SoundStream *>(datasource);
 
 	// we must map the whence to its Q3 counterpart
 	switch(whence)
@@ -187,7 +187,7 @@ int S_OggOpus_Callback_close(void *datasource)
 // ftell() replacement
 opus_int64 S_OggOpus_Callback_tell(void *datasource)
 {
-	snd_stream_t   *stream;
+	SoundStream   *stream;
 
 	// check if input is valid
 	if(!datasource)
@@ -196,8 +196,8 @@ opus_int64 S_OggOpus_Callback_tell(void *datasource)
 		return -1;
 	}
 
-	// snd_stream_t in the generic pointer
-	stream = static_cast<snd_stream_t *>(datasource);
+	// SoundStream in the generic pointer
+	stream = static_cast<SoundStream *>(datasource);
 
 	return static_cast<opus_int64>(FS_FTell(stream->file));
 }
@@ -216,9 +216,9 @@ const OpusFileCallbacks S_OggOpus_Callbacks =
 S_OggOpus_CodecOpenStream
 =================
 */
-snd_stream_t *S_OggOpus_CodecOpenStream(const char *filename)
+SoundStream *S_OggOpus_CodecOpenStream(const char *filename)
 {
-	snd_stream_t *stream;
+	SoundStream *stream;
 
 	// Opus codec control structure
 	OggOpusFile *of;
@@ -315,7 +315,7 @@ snd_stream_t *S_OggOpus_CodecOpenStream(const char *filename)
 S_OggOpus_CodecCloseStream
 =================
 */
-void S_OggOpus_CodecCloseStream(snd_stream_t *stream)
+void S_OggOpus_CodecCloseStream(SoundStream *stream)
 {
 	// check if input is valid
 	if(!stream)
@@ -335,7 +335,7 @@ void S_OggOpus_CodecCloseStream(snd_stream_t *stream)
 S_OggOpus_CodecReadStream
 =================
 */
-int S_OggOpus_CodecReadStream(snd_stream_t *stream, int bytes, void *buffer)
+int S_OggOpus_CodecReadStream(SoundStream *stream, int bytes, void *buffer)
 {
 	// buffer handling
 	int samplesRead, samplesLeft, c;
@@ -396,7 +396,7 @@ where we read the whole stream at once.
 */
 void *S_OggOpus_CodecLoad(const char *filename, snd_info_t *info)
 {
-	snd_stream_t *stream;
+	SoundStream *stream;
 	byte *buffer;
 	int bytesRead;
 	

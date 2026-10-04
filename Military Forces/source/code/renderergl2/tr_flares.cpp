@@ -279,7 +279,7 @@ void RB_TestFlare( flare_t *f ) {
 	float			fade;
 	float			flareDepth;
 
-	FBO_t           *oldFbo;
+	Framebuffer           *oldFbo;
 
 	backEnd.pc.c_flareTests++;
 

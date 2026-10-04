@@ -79,7 +79,7 @@ void Con_ToggleConsole_f () {
 	}
 
 	if ( con_autoclear->integer ) {
-		Field_Clear( &g_consoleField );
+		g_consoleField.clear();
 	}
 
 	g_consoleField.widthInChars = g_console_field_width;
@@ -106,7 +106,7 @@ Con_MessageMode_f
 void Con_MessageMode_f () {
 	chat_playerNum = -1;
 	chat_team = false;
-	Field_Clear( &chatField );
+	chatField.clear();
 	chatField.widthInChars = 30;
 
 	Key_SetCatcher( Key_GetCatcher( ) ^ KEYCATCH_MESSAGE );
@@ -120,7 +120,7 @@ Con_MessageMode2_f
 void Con_MessageMode2_f () {
 	chat_playerNum = -1;
 	chat_team = true;
-	Field_Clear( &chatField );
+	chatField.clear();
 	chatField.widthInChars = 25;
 	Key_SetCatcher( Key_GetCatcher( ) ^ KEYCATCH_MESSAGE );
 }
@@ -137,7 +137,7 @@ void Con_MessageMode3_f () {
 		return;
 	}
 	chat_team = false;
-	Field_Clear( &chatField );
+	chatField.clear();
 	chatField.widthInChars = 30;
 	Key_SetCatcher( Key_GetCatcher( ) ^ KEYCATCH_MESSAGE );
 }
@@ -154,7 +154,7 @@ void Con_MessageMode4_f () {
 		return;
 	}
 	chat_team = false;
-	Field_Clear( &chatField );
+	chatField.clear();
 	chatField.widthInChars = 30;
 	Key_SetCatcher( Key_GetCatcher( ) ^ KEYCATCH_MESSAGE );
 }
@@ -375,10 +375,10 @@ void Con_Init () {
 	con_scale = Cvar_Get("con_scale", "1", CVAR_ARCHIVE);
 	Cvar_CheckRange(con_scale, 1.0f, 4.0f, false);
 
-	Field_Clear( &g_consoleField );
+	g_consoleField.clear();
 	g_consoleField.widthInChars = g_console_field_width;
 	for ( i = 0 ; i < COMMAND_HISTORY ; i++ ) {
-		Field_Clear( &historyEditLines[i] );
+		historyEditLines[i].clear();
 		historyEditLines[i].widthInChars = g_console_field_width;
 	}
 	CL_LoadConsoleHistory( );
@@ -564,8 +564,7 @@ void Con_DrawInput () {
 
 	SCR_DrawSmallChar( con.xadjust + 1 * g_smallchar_width, y, ']' );
 
-	Field_Draw( &g_consoleField, con.xadjust + 2 * g_smallchar_width, y,
-		SCREEN_WIDTH - 3 * g_smallchar_width, true, true );
+	g_consoleField.draw( con.xadjust + 2 * g_smallchar_width, y, SCREEN_WIDTH - 3 * g_smallchar_width, true, true );
 }
 
 
@@ -648,8 +647,7 @@ void Con_DrawNotify ()
 			skip = 5;
 		}
 
-		Field_BigDraw( &chatField, skip * BIGCHAR_WIDTH, v,
-			SCREEN_WIDTH - ( skip + 1 ) * BIGCHAR_WIDTH, true, true );
+		chatField.bigDraw( skip * BIGCHAR_WIDTH, v, SCREEN_WIDTH - ( skip + 1 ) * BIGCHAR_WIDTH, true, true );
 	}
 
 }
@@ -859,7 +857,7 @@ void Con_Close( ) {
 	if ( !com_cl_running->integer ) {
 		return;
 	}
-	Field_Clear( &g_consoleField );
+	g_consoleField.clear();
 	Con_ClearNotify ();
 	Key_SetCatcher( Key_GetCatcher( ) & ~KEYCATCH_CONSOLE );
 	con.finalFrac = 0;				// none visible
