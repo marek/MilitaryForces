@@ -41,6 +41,7 @@ endif()
 
 function(add_mf_renderer NAME)
     add_library(${NAME} MODULE ${ARGN} ${RENDERER_COMMON_SOURCES} ${SDL_RENDERER_SOURCES} ${DYNAMIC_RENDERER_SOURCES})
+    mf_keep_symbols(${NAME})
     set_target_properties(${NAME} PROPERTIES PREFIX "" SUFFIX ${CMAKE_SHARED_LIBRARY_SUFFIX})
     target_compile_definitions(${NAME} PRIVATE ${CLIENT_DEFINITIONS} USE_RENDERER_DLOPEN
         $<$<CONFIG:Debug>:_DEBUG> $<$<NOT:$<CONFIG:Debug>>:NDEBUG>)
@@ -53,6 +54,7 @@ if(USE_RENDERER_DLOPEN)
     add_mf_renderer(renderer_opengl2 ${RENDERER_GL2_SOURCES} ${RENDERER_GL2_SHADER_C_SOURCES})
     list(APPEND CLIENT_DEFINITIONS USE_RENDERER_DLOPEN)
     add_library(renderer_null MODULE ${SOURCE_DIR}/renderernull/tr_null.cpp ${DYNAMIC_RENDERER_SOURCES})
+    mf_keep_symbols(renderer_null)
     set_target_properties(renderer_null PROPERTIES PREFIX "" SUFFIX ${CMAKE_SHARED_LIBRARY_SUFFIX})
     target_compile_definitions(renderer_null PRIVATE ${CLIENT_DEFINITIONS} USE_RENDERER_DLOPEN
         $<$<CONFIG:Debug>:_DEBUG> $<$<NOT:$<CONFIG:Debug>>:NDEBUG>)

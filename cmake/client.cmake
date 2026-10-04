@@ -41,6 +41,8 @@ if(APPLE AND BUILD_MACOS_APP)
     finish_macos_app()
 endif()
 
+mf_keep_symbols(${CLIENT_NAME})
+
 if(WIN32 AND TARGET SDL2::SDL2)
     add_custom_command(TARGET ${CLIENT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:SDL2::SDL2> $<TARGET_FILE_DIR:${CLIENT_NAME}>)

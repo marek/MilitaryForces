@@ -1,0 +1,18 @@
+# Moves the debug information of one built file into a separate symbol file and strips the file itself.
+# Run as: cmake -DFILE=<binary> -DOUT=<symbol dir> -DCONFIG=<config> -P split_symbols.cmake
+if(NOT CONFIG STREQUAL "Release" AND NOT CONFIG STREQUAL "RelWithDebInfo")
+    return()
+endif()
+file(MAKE_DIRECTORY ${OUT})
+get_filename_component(NAME ${FILE} NAME)
+if(APPLE OR CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
+    execute_process(COMMAND dsymutil ${FILE} -o ${OUT}/${NAME}.dSYM RESULT_VARIABLE FAILED)
+    if(NOT FAILED)
+        execute_process(COMMAND strip -S ${FILE})
+    endif()
+else()
+    execute_process(COMMAND objcopy --only-keep-debug ${FILE} ${OUT}/${NAME}.debug RESULT_VARIABLE FAILED)
+    if(NOT FAILED)
+        execute_process(COMMAND objcopy --strip-debug --add-gnu-debuglink=${OUT}/${NAME}.debug ${FILE})
+    endif()
+endif()

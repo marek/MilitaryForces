@@ -904,9 +904,10 @@ void Cmd_FollowCycle_f( GameEntity *ent, int dir )
 	if( dir != 1 && dir != -1 ) 
 		Common::error( ERR_DROP, "Cmd_FollowCycle_f: bad dir %i", dir );
 
+	// one pass over the client slots at most: the starting value is not a slot when nobody is being
+	// followed yet, so waiting to come back round to it never ended when there was no one to follow
 	int clientnum = ent->client_->sess_.spectatorClient_;
-	int original = clientnum;
-	do {
+	for( int tried = 0; tried < theLevel.maxclients_; tried++ ) {
 		clientnum += dir;
 		if( clientnum > theLevel.maxclients_ ) 
 			clientnum = 1;
@@ -928,7 +929,7 @@ void Cmd_FollowCycle_f( GameEntity *ent, int dir )
 		ent->client_->sess_.spectatorClient_ = clientnum;
 		ent->client_->sess_.spectatorState_ = GameClient::ClientSession::SPECTATOR_FOLLOW;
 		return;
-	} while( clientnum != original );
+	}
 
 	// leave it where it was
 }
