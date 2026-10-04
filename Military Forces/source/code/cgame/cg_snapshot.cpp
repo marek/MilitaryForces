@@ -16,24 +16,24 @@
 CG_ResetEntity
 ==================
 */
-static void CG_ResetEntity( centity_t *cent )
+void ClientEntity::resetEntity()
 {
 	// if the previous snapshot this entity was updated in is at least
 	// an event window back in time then we can reset the previous event
-	if ( cent->snapShotTime < cg.time - EVENT_VALID_MSEC )
+	if ( this->snapShotTime < cg.time - EVENT_VALID_MSEC )
 	{
-		cent->previousEvent = 0;
+		this->previousEvent = 0;
 	}
 
-	cent->trailTime = cg.snap->serverTime;
-	cent->errorTime = 0;
+	this->trailTime = cg.snap->serverTime;
+	this->errorTime = 0;
 
-	VectorCopy (cent->currentState.origin, cent->lerpOrigin);
-	VectorCopy (cent->currentState.angles, cent->lerpAngles);
+	VectorCopy (this->currentState.origin, this->lerpOrigin);
+	VectorCopy (this->currentState.angles, this->lerpAngles);
 
-	if ( cent->currentState.eType == ET_PLAYER )
+	if ( this->currentState.eType == ET_PLAYER )
 	{
-		// 	CG_ResetPlayerEntity( cent );
+		// 	CG_ResetPlayerEntity( this );
 	}
 }
 
@@ -44,20 +44,20 @@ CG_TransitionEntity
 cent->nextState is moved to cent->currentState and events are fired
 ===============
 */
-static void CG_TransitionEntity( centity_t *cent ) {
-	cent->currentState = cent->nextState;
-	cent->currentValid = true;
+void ClientEntity::transitionEntity() {
+	this->currentState = this->nextState;
+	this->currentValid = true;
 
 	// reset if the entity wasn't in the last frame or was teleported
-	if ( !cent->interpolate ) {
-		CG_ResetEntity( cent );
+	if ( !this->interpolate ) {
+		this->resetEntity();
 	}
 
 	// clear the next state.  if will be set by the next CG_SetNextSnap
-	cent->interpolate = false;
+	this->interpolate = false;
 
 	// check for events
-	CG_CheckEvents( cent );
+	this->checkEvents();
 }
 
 
@@ -74,7 +74,7 @@ FIXME: Also called by map_restart?
 */
 void CG_SetInitialSnapshot( snapshot_t *snap ) {
 	int				i;
-	centity_t		*cent;
+	ClientEntity		*cent;
 	entityState_t	*state;
 
 	cg.snap = snap;
@@ -99,10 +99,10 @@ void CG_SetInitialSnapshot( snapshot_t *snap ) {
 		cent->interpolate = false;
 		cent->currentValid = true;
 
-		CG_ResetEntity( cent );
+		cent->resetEntity();
 
 		// check for events
-		CG_CheckEvents( cent );
+		cent->checkEvents();
 	}
 }
 
@@ -115,7 +115,7 @@ The transition point from snap to nextSnap has passed
 ===================
 */
 static void CG_TransitionSnapshot( ) {
-	centity_t			*cent;
+	ClientEntity			*cent;
 	snapshot_t			*oldFrame;
 	int					i;
 
@@ -148,7 +148,7 @@ static void CG_TransitionSnapshot( ) {
 
 	for ( i = 0 ; i < cg.snap->numEntities ; i++ ) {
 		cent = &cg_entities[ cg.snap->entities[ i ].number ];
-		CG_TransitionEntity( cent );
+		cent->transitionEntity();
 
 		// remember time of snapshot this entity was last updated in
 		cent->snapShotTime = cg.snap->serverTime;
@@ -188,7 +188,7 @@ A New snapshot has just been read in from the client system.
 static void CG_SetNextSnap( snapshot_t *snap ) {
 	int					num;
 	entityState_t		*es;
-	centity_t			*cent;
+	ClientEntity			*cent;
 
 	cg.nextSnap = snap;
 
@@ -212,7 +212,7 @@ static void CG_SetNextSnap( snapshot_t *snap ) {
 
 			if ( cg.snap && es->pos.trType == TR_LINEAR_STOP &&
 				es->pos.trTime - cent->currentState.pos.trTime > 3 * ( snap->serverTime - cg.snap->serverTime ) / 2 ) {
-				float	f = CG_EntityAngleErrorFraction( cent );
+				float	f = cent->entityAngleErrorFraction();
 				int		i;
 
 				for ( i = 0 ; i < 3 ; i++ ) {

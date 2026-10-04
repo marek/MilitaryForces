@@ -14,9 +14,9 @@
 static	pmove_t		cg_pmove;
 
 static	int			cg_numSolidEntities;
-static	centity_t	*cg_solidEntities[MAX_ENTITIES_IN_SNAPSHOT];
+static	ClientEntity	*cg_solidEntities[MAX_ENTITIES_IN_SNAPSHOT];
 static	int			cg_numTriggerEntities;
-static	centity_t	*cg_triggerEntities[MAX_ENTITIES_IN_SNAPSHOT];
+static	ClientEntity	*cg_triggerEntities[MAX_ENTITIES_IN_SNAPSHOT];
 
 /*
 ====================
@@ -29,7 +29,7 @@ efficient collision detection
 */
 void CG_BuildSolidList( ) {
 	int			i;
-	centity_t	*cent;
+	ClientEntity	*cent;
 	snapshot_t	*snap;
 	entityState_t	*ent;
 
@@ -74,7 +74,7 @@ static void CG_ClipMoveToEntities ( const vec3_t start, const vec3_t mins, const
 	clipHandle_t 	cmodel;
 	vec3_t		bmins, bmaxs;
 	vec3_t		origin, angles;
-	centity_t	*cent;
+	ClientEntity	*cent;
 
 	for ( i = 0 ; i < cg_numSolidEntities ; i++ ) {
 		cent = cg_solidEntities[ i ];
@@ -158,7 +158,7 @@ CG_PointContents
 int		CG_PointContents( const vec3_t point, int passEntityNum ) {
 	int			i;
 	entityState_t	*ent;
-	centity_t	*cent;
+	ClientEntity	*cent;
 	clipHandle_t cmodel;
 	int			contents;
 
@@ -261,29 +261,29 @@ static void CG_InterpolatePlayerState( bool grabAngles ) {
 CG_TouchItem
 ===================
 */
-static void CG_TouchItem( centity_t *cent ) {
+void ClientEntity::touchItem() {
 	gitem_t		*item;
 	clientInfo_t *ci;
 
 	if ( !cg_predictItems.integer ) {
 		return;
 	}
-	if ( !BG_PlayerTouchesItem( &cg.predictedPlayerState, &cent->currentState, cg.time ) ) {
+	if ( !BG_PlayerTouchesItem( &cg.predictedPlayerState, &this->currentState, cg.time ) ) {
 		return;
 	}
 
 	// never pick an item up twice in a prediction
-	if ( cent->miscTime == cg.time ) {
+	if ( this->miscTime == cg.time ) {
 		return;
 	}
 
 	ci = &cgs.clientinfo[cg.predictedPlayerState.clientNum];
 
-	if ( !BG_CanItemBeGrabbed( cgs.gametype, &cent->currentState, &cg.predictedPlayerState, ci->vehicle ) ) {
+	if ( !BG_CanItemBeGrabbed( cgs.gametype, &this->currentState, &cg.predictedPlayerState, ci->vehicle ) ) {
 		return;		// can't hold it
 	}
 
-	item = &bg_itemlist[ cent->currentState.modelindex ];
+	item = &bg_itemlist[ this->currentState.modelindex ];
 
 	// Special case for flags.  
 	// We don't predict touching our own flag
@@ -297,13 +297,13 @@ static void CG_TouchItem( centity_t *cent ) {
 	}
 
 	// grab it
-	BG_AddPredictableEventToPlayerstate( EV_ITEM_PICKUP, cent->currentState.modelindex , &cg.predictedPlayerState);
+	BG_AddPredictableEventToPlayerstate( EV_ITEM_PICKUP, this->currentState.modelindex , &cg.predictedPlayerState);
 
 	// remove it from the frame so it won't be drawn
-	cent->currentState.eFlags |= EF_NODRAW;
+	this->currentState.eFlags |= EF_NODRAW;
 
 	// don't touch it again this prediction
-	cent->miscTime = cg.time;
+	this->miscTime = cg.time;
 }
 
 
@@ -319,7 +319,7 @@ static void CG_TouchTriggerPrediction( ) {
 	trace_t		trace;
 	entityState_t	*ent;
 	clipHandle_t cmodel;
-	centity_t	*cent;
+	ClientEntity	*cent;
 	bool	spectator;
 
 	// dead clients don't activate triggers
@@ -338,7 +338,7 @@ static void CG_TouchTriggerPrediction( ) {
 		ent = &cent->currentState;
 
 		if ( ent->eType == ET_ITEM && !spectator ) {
-			CG_TouchItem( cent );
+			cent->touchItem();
 			continue;
 		}
 

@@ -15,7 +15,7 @@
 CG_FFARTrail
 ==========================
 */
-static void CG_FFARTrail( centity_t * cent, const weaponInfo_t *wi )
+static void CG_FFARTrail( ClientEntity * cent, const weaponInfo_t *wi )
 {
 	LocalEntity	* smoke;
 	vec3_t			up, pos, smoke_pos, velocity;
@@ -58,7 +58,7 @@ static void CG_FFARTrail( centity_t * cent, const weaponInfo_t *wi )
 CG_MissileTrail
 ==========================
 */
-static void CG_MissileTrail( centity_t * cent, const weaponInfo_t *wi )
+static void CG_MissileTrail( ClientEntity * cent, const weaponInfo_t *wi )
 {
 	LocalEntity	* smoke;
 	vec3_t			up, pos, smoke_pos, velocity;
@@ -115,7 +115,7 @@ static void CG_MissileTrail( centity_t * cent, const weaponInfo_t *wi )
 CG_FlareTrail
 ==========================
 */
-static void CG_FlareTrail( centity_t * cent, const weaponInfo_t *wi )
+static void CG_FlareTrail( ClientEntity * cent, const weaponInfo_t *wi )
 {
 	LocalEntity	* smoke;
 	vec3_t			up, pos, smoke_pos, velocity;
@@ -152,7 +152,7 @@ static void CG_FlareTrail( centity_t * cent, const weaponInfo_t *wi )
 }
 
 
-static void CG_MissileTrail2( centity_t * cent, const weaponInfo_t *wi ) {
+static void CG_MissileTrail2( ClientEntity * cent, const weaponInfo_t *wi ) {
 	vec3_t  start, end;
 	LocalEntity *le;
 	refEntity_t   *re;
@@ -219,7 +219,7 @@ static void CG_MissileTrail2( centity_t * cent, const weaponInfo_t *wi ) {
 CG_NukeTrail
 ==========================
 */
-//static void CG_NukeTrail( centity_t * cent, const weaponInfo_t *wi )
+//static void CG_NukeTrail( ClientEntity * cent, const weaponInfo_t *wi )
 //{
 //	if(cent->TimeSinceLastTrail <= cg.time - 200)
 //	{
@@ -597,35 +597,35 @@ CG_FireWeapon
 Caused by an EV_FIRE_MG event
 ================
 */
-void CG_FireMachinegun( centity_t *cent, bool main )
+void ClientEntity::fireMachinegun( bool main )
 {
 	entityState_t * ent;
 	weaponInfo_t * weap;
 	int c = -1;
 
 	// get the current entity state and weapon info
-	ent = &cent->currentState;
+	ent = &this->currentState;
 
 	if( main ) {
 		weap = &cg_weapons[ ent->weaponIndex ];
-		cent->muzzleFlashWeapon = ent->weaponIndex;
+		this->muzzleFlashWeapon = ent->weaponIndex;
 	} else {
 		int	clientNum;
-	    clientNum = cent->currentState.clientNum;
+	    clientNum = this->currentState.clientNum;
 		if ( clientNum < 0 || clientNum >= MAX_CLIENTS ) {
 			weap = &cg_weapons[ WI_MG_20MM ];// hacky
-			cent->muzzleFlashWeapon = WI_MG_20MM;// very hacky
+			this->muzzleFlashWeapon = WI_MG_20MM;// very hacky
 		} else {
 			clientInfo_t * ci;
 			ci = &cgs.clientinfo[ clientNum ];
 			weap = &cg_weapons[availableVehicles[ci->vehicle].weapons[0]];
-			cent->muzzleFlashWeapon = availableVehicles[ci->vehicle].weapons[0];
+			this->muzzleFlashWeapon = availableVehicles[ci->vehicle].weapons[0];
 		}
 	}
 
 	// mark the entity as muzzle flashing, so when it is added it will
 	// append the flash to the weapon model
-	cent->muzzleFlashTime = cg.time;
+	this->muzzleFlashTime = cg.time;
 
 	// play a sound
 
@@ -661,17 +661,17 @@ CG_FireWeapon
 Caused by an EV_FIRE_WEAPON event
 ================
 */
-void CG_FireWeapon( centity_t *cent ) {
+void ClientEntity::fireWeapon() {
 	entityState_t *ent;
 	int				c;
 	weaponInfo_t	*weap;
 
-	ent = &cent->currentState;
+	ent = &this->currentState;
 	if ( ent->weaponIndex == WI_NONE ) {
 		return;
 	}
 
-	completeLoadout_t* loadout = CG_EntityLoadout( cent );
+	completeLoadout_t* loadout = this->entityLoadout();
 	if( loadout && availableWeapons[ent->weaponIndex].type == WT_FUELTANK ) {
 		while( MF_findWeaponsOfType( ent->weaponIndex, loadout ) )
 			MF_removeWeaponFromLoadout( ent->weaponIndex, loadout, nullptr, nullptr, nullptr, 0 );
@@ -679,7 +679,7 @@ void CG_FireWeapon( centity_t *cent ) {
 	}
 
 	if( availableWeapons[ent->weaponIndex].type == WT_MACHINEGUN ) {
-		CG_FireMachinegun(cent, true);
+		this->fireMachinegun( true );
 		return;	
 	}
 	weap = &cg_weapons[ent->weaponIndex];

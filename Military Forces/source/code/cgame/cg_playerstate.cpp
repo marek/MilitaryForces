@@ -136,13 +136,13 @@ CG_CheckPlayerstateEvents
 void CG_CheckPlayerstateEvents( playerState_t *ps, playerState_t *ops ) {
 	int			i;
 	int			event;
-	centity_t	*cent;
+	ClientEntity	*cent;
 
 	if ( ps->externalEvent && ps->externalEvent != ops->externalEvent ) {
 		cent = &cg_entities[ ps->clientNum ];
 		cent->currentState.event = ps->externalEvent;
 		cent->currentState.eventParm = ps->externalEventParm;
-		CG_EntityEvent( cent, cent->lerpOrigin );
+		cent->entityEvent( cent->lerpOrigin );
 	}
 
 	cent = &cg.predictedPlayerEntity; // cg_entities[ ps->clientNum ];
@@ -157,7 +157,7 @@ void CG_CheckPlayerstateEvents( playerState_t *ps, playerState_t *ops ) {
 			event = ps->events[ i & (MAX_PS_EVENTS-1) ];
 			cent->currentState.event = event;
 			cent->currentState.eventParm = ps->eventParms[ i & (MAX_PS_EVENTS-1) ];
-			CG_EntityEvent( cent, cent->lerpOrigin );
+			cent->entityEvent( cent->lerpOrigin );
 
 			cg.predictableEvents[ i & (MAX_PREDICTED_EVENTS-1) ] = event;
 
@@ -174,7 +174,7 @@ CG_CheckChangedPredictableEvents
 void CG_CheckChangedPredictableEvents( playerState_t *ps ) {
 	int i;
 	int event;
-	centity_t	*cent;
+	ClientEntity	*cent;
 
 	cent = &cg.predictedPlayerEntity;
 	for ( i = ps->eventSequence - MAX_PS_EVENTS ; i < ps->eventSequence ; i++ ) {
@@ -190,7 +190,7 @@ void CG_CheckChangedPredictableEvents( playerState_t *ps ) {
 				event = ps->events[ i & (MAX_PS_EVENTS-1) ];
 				cent->currentState.event = event;
 				cent->currentState.eventParm = ps->eventParms[ i & (MAX_PS_EVENTS-1) ];
-				CG_EntityEvent( cent, cent->lerpOrigin );
+				cent->entityEvent( cent->lerpOrigin );
 
 				cg.predictableEvents[ i & (MAX_PREDICTED_EVENTS-1) ] = event;
 
@@ -226,7 +226,7 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 	// health changes of more than -1 should make pain sounds
 	if ( ps->stats[STAT_HEALTH] < ops->stats[STAT_HEALTH] - 1 ) {
 		if ( ps->stats[STAT_HEALTH] > 0 ) {
-			CG_PainEvent( &cg.predictedPlayerEntity, ps->stats[STAT_HEALTH] );
+			cg.predictedPlayerEntity.painEvent( ps->stats[STAT_HEALTH] );
 		}
 	}
 

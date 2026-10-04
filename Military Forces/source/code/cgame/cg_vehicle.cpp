@@ -712,28 +712,28 @@ void CG_RegisterVehicle( clientInfo_t *ci )
 		Com_Error( ERR_DROP, "Invalid vehicle type in register vehicle" );
 }
 
-static int CG_LoadoutVehicle( centity_t* cent )
+int ClientEntity::loadoutVehicle()
 {
-	if( cent->currentState.eType == ET_VEHICLE ) 
+	if( this->currentState.eType == ET_VEHICLE ) 
 	{
-		int clientNum = cent->currentState.clientNum;
+		int clientNum = this->currentState.clientNum;
 		if( clientNum < 0 || clientNum >= MAX_CLIENTS ) 
 			return -1;
 		return cgs.clientinfo[clientNum].vehicle;
 	}
-	if( cent->currentState.eType == ET_MISC_VEHICLE && cent->currentState.modelindex < 255 ) 
-		return cent->currentState.modelindex;
+	if( this->currentState.eType == ET_MISC_VEHICLE && this->currentState.modelindex < 255 ) 
+		return this->currentState.modelindex;
 	return -1;
 }
 
-completeLoadout_t* CG_EntityLoadout( centity_t* cent )
+completeLoadout_t* ClientEntity::entityLoadout()
 {
-	int idx = CG_LoadoutVehicle( cent );
+	int idx = this->loadoutVehicle();
 	if( idx < 0 || idx >= bg_numberOfVehicles ) 
 		return nullptr;
 
-	int n = cent->currentState.number;
-	int key = ((idx + 1) << 1) | ((cent->currentState.eFlags & EF_TELEPORT_BIT) ? 1 : 0);
+	int n = this->currentState.number;
+	int key = ((idx + 1) << 1) | ((this->currentState.eFlags & EF_TELEPORT_BIT) ? 1 : 0);
 	if( cg_loadoutKeys[n] != key ) 
 	{
 		MF_getDefaultLoadoutForVehicle( idx, &cg_loadouts[n], nullptr );
@@ -742,16 +742,16 @@ completeLoadout_t* CG_EntityLoadout( centity_t* cent )
 	return &cg_loadouts[n];
 }
 
-void CG_SetDrawLoadout( centity_t* cent, BasicDrawInfo_t* info )
+void ClientEntity::setDrawLoadout( BasicDrawInfo_t* info )
 {
-	info->usedLoadout = CG_EntityLoadout( cent );
+	info->usedLoadout = this->entityLoadout();
 	if( !info->usedLoadout ) 
 		return;
 
-	bool local = cent->currentState.eType == ET_VEHICLE && cent->currentState.clientNum == cg.snap->ps.clientNum;
+	bool local = this->currentState.eType == ET_VEHICLE && this->currentState.clientNum == cg.snap->ps.clientNum;
 	for( int i = 0; i < info->usedLoadout->usedMounts; ++i ) 
 		info->numWeaponsOnMount[i] = local ? cg.snap->ps.numWeaponsOnMount[i] :
-			( (cent->currentState.mountMask & (1 << i)) ? info->usedLoadout->mounts[i].num : 0 );
+			( (this->currentState.mountMask & (1 << i)) ? info->usedLoadout->mounts[i].num : 0 );
 }
 
 /*
@@ -759,13 +759,13 @@ void CG_SetDrawLoadout( centity_t* cent, BasicDrawInfo_t* info )
 CG_Vehicle
 ===============
 */
-void CG_Vehicle( centity_t *cent ) 
+void ClientEntity::vehicle() 
 {
     clientInfo_t * ci;
     int	clientNum;
 
     // get client num and info
-    clientNum = cent->currentState.clientNum;
+    clientNum = this->currentState.clientNum;
     if ( clientNum < 0 || clientNum >= MAX_CLIENTS )
 	{
 		Com_Error( ERR_DROP, "Bad clientNum on player entity");
@@ -780,7 +780,7 @@ void CG_Vehicle( centity_t *cent )
     }
 
 	// don't draw ourselves, if we are rendering the MFDs
-	if( cent == &cg.predictedPlayerEntity && cg.drawingMFD )
+	if( this == &cg.predictedPlayerEntity && cg.drawingMFD )
 	{
 		return;
 	}
@@ -790,41 +790,41 @@ void CG_Vehicle( centity_t *cent )
 	{
 		if( cg.radarTargets < MAX_RADAR_TARGETS && (cg.predictedPlayerEntity.currentState.ONOFF & OO_RADAR_AIR))
 		{
-			cg.radarEnts[cg.radarTargets++] = cent;
+			cg.radarEnts[cg.radarTargets++] = this;
 		}
-		CG_Plane( cent, ci );
+		this->plane( ci );
 	}
 	// ground vehicle?
 	else if( availableVehicles[ci->vehicle].cat & CAT_GROUND )
 	{
 		if( cg.radarTargets < MAX_RADAR_TARGETS && (cg.predictedPlayerEntity.currentState.ONOFF & OO_RADAR_GROUND))
 		{
-			cg.radarEnts[cg.radarTargets++] = cent;
+			cg.radarEnts[cg.radarTargets++] = this;
 		}
-		CG_GroundVehicle( cent, ci );
+		this->groundVehicle( ci );
 	}
 	// helo?
 	else if( availableVehicles[ci->vehicle].cat & CAT_HELO )
 	{
 		if( cg.radarTargets < MAX_RADAR_TARGETS && (cg.predictedPlayerEntity.currentState.ONOFF & OO_RADAR_AIR))
 		{
-			cg.radarEnts[cg.radarTargets++] = cent;
+			cg.radarEnts[cg.radarTargets++] = this;
 		}
-		CG_Helo( cent, ci );
+		this->helo( ci );
 	}
 	// lqm?
 	else if( availableVehicles[ci->vehicle].cat & CAT_LQM)
 	{
-			CG_LQM( cent, ci );
+			this->lQM( ci );
 	}
 	// boat ?
 	else if( availableVehicles[ci->vehicle].cat & CAT_BOAT )
 	{
 		if( cg.radarTargets < MAX_RADAR_TARGETS && (cg.predictedPlayerEntity.currentState.ONOFF & OO_RADAR_GROUND))
 		{
-			cg.radarEnts[cg.radarTargets++] = cent;
+			cg.radarEnts[cg.radarTargets++] = this;
 		}
-		CG_Boat( cent, ci );
+		this->boat( ci );
 	}
 	else
 	{

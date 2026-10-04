@@ -73,11 +73,11 @@ CG_PainEvent
 Also called by playerstate transition
 ================
 */
-void CG_PainEvent( centity_t *cent, int health ) {
+void ClientEntity::painEvent( int health ) {
 	char	*snd;
 
 	// don't do more than two pain sounds a second
-	if ( cg.time - cent->pe.painTime < 500 ) {
+	if ( cg.time - this->pe.painTime < 500 ) {
 		return;
 	}
 
@@ -90,12 +90,12 @@ void CG_PainEvent( centity_t *cent, int health ) {
 	} else {
 		snd = "*pain100_1.wav";
 	}
-	S_StartSound( nullptr, cent->currentState.number, CHAN_VOICE, 
-		CG_CustomSound( cent->currentState.number, snd ) );
+	S_StartSound( nullptr, this->currentState.number, CHAN_VOICE, 
+		CG_CustomSound( this->currentState.number, snd ) );
 
 	// save pain time for programitic twitch animation
-	cent->pe.painTime = cg.time;
-	cent->pe.painDirection ^= 1;
+	this->pe.painTime = cg.time;
+	this->pe.painDirection ^= 1;
 }
 
 
@@ -111,7 +111,7 @@ also called by CG_CheckPlayerstateEvents
 
 #define	DEBUGNAME(x) if(cg_debugEvents.integer){CG_Printf(x"\n");}
 
-void CG_EntityEvent( centity_t *cent, vec3_t position )
+void ClientEntity::entityEvent( vec3_t position )
 {
 	entityState_t	*es;
 	int				event;
@@ -120,7 +120,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position )
 	int				clientNum;
 	clientInfo_t	*ci;
 
-	es = &cent->currentState;
+	es = &this->currentState;
 	event = es->event & ~EV_EVENT_BITS;
 
 	if ( cg_debugEvents.integer ) {
@@ -218,12 +218,12 @@ void CG_EntityEvent( centity_t *cent, vec3_t position )
 
 	case EV_FIRE_MG:
 		DEBUGNAME("EV_FIRE_WEAPON");
-		CG_FireMachinegun( cent, false );
+		this->fireMachinegun( false );
 		break;
 
 	case EV_FIRE_WEAPON:
 		DEBUGNAME("EV_FIRE_WEAPON");
-		CG_FireWeapon( cent );
+		this->fireWeapon();
 		break;
 
 	case EV_FIRE_FLARE:
@@ -232,12 +232,12 @@ void CG_EntityEvent( centity_t *cent, vec3_t position )
 	
 	case EV_NUKE:
 		DEBUGNAME("EV_NUKE");
-		CG_NukeEffect( cent, es );
+		this->nukeEffect( es );
 		break;
 
 	case EV_FLAK:
 		DEBUGNAME("EV_FLAK");
-		CG_FlakEffect( cent, es );
+		this->flakEffect( es );
 		break;
 
 	//=================================================================
@@ -251,7 +251,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position )
 		break;
 	case EV_ITEM_RESPAWN:
 		DEBUGNAME("EV_ITEM_RESPAWN");
-		cent->miscTime = cg.time;	// scale up from this
+		this->miscTime = cg.time;	// scale up from this
 		S_StartSound (nullptr, es->number, CHAN_AUTO, cgs.media.respawnSound );
 		break;
 
@@ -290,7 +290,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position )
 
 	case EV_VEHICLE_GIB:
 		DEBUGNAME("EV_VEHICLE_GIB");
-		if(availableVehicles[cgs.clientinfo[ cent->currentState.clientNum ].vehicle].cat & CAT_LQM)
+		if(availableVehicles[cgs.clientinfo[ this->currentState.clientNum ].vehicle].cat & CAT_LQM)
 			CG_GibPlayer(position);
 		else
 			CG_GenericExplosion( position, EXPLODE_VEHICLE_GIB );
@@ -303,91 +303,91 @@ void CG_EntityEvent( centity_t *cent, vec3_t position )
 
 	case EV_GEAR_UP_FULL:
 		DEBUGNAME("EV_GEAR_UP_FULL");
-		cent->gearAnimStartTime = 0;
-		cent->gearAnim = GEAR_ANIM_STOP;
-		cent->gearAnimFrame = GEAR_UP;
+		this->gearAnimStartTime = 0;
+		this->gearAnim = GEAR_ANIM_STOP;
+		this->gearAnimFrame = GEAR_UP;
 		break;
 
 	case EV_GEAR_UP:
 		DEBUGNAME("EV_GEAR_UP");
-		cent->gearAnimStartTime = cg.time;
-		cent->gearAnim = GEAR_ANIM_UP;
+		this->gearAnimStartTime = cg.time;
+		this->gearAnim = GEAR_ANIM_UP;
 		break;
 
 	case EV_GEAR_STOP:
 		DEBUGNAME("EV_GEAR_STOP");
-		cent->gearAnimStartTime = 0;
-		cent->gearAnim = GEAR_ANIM_STOP;
+		this->gearAnimStartTime = 0;
+		this->gearAnim = GEAR_ANIM_STOP;
 		break;
 
 	case EV_GEAR_DOWN:
 		DEBUGNAME("EV_GEAR_DOWN");
-		cent->gearAnimStartTime = cg.time;
-		cent->gearAnim = GEAR_ANIM_DOWN;
+		this->gearAnimStartTime = cg.time;
+		this->gearAnim = GEAR_ANIM_DOWN;
 		break;
 
 	case EV_GEAR_DOWN_FULL:
 		DEBUGNAME("EV_GEAR_DOWN_FULL");
-		cent->gearAnimStartTime = 0;
-		cent->gearAnim = GEAR_ANIM_STOP;
+		this->gearAnimStartTime = 0;
+		this->gearAnim = GEAR_ANIM_STOP;
 		{
 			// old version
 			/*
-			if( cent->currentState.eType == ET_VEHICLE ) {
+			if( this->currentState.eType == ET_VEHICLE ) {
 			    clientInfo_t	*ci;
 				int				clientNum;
-			    clientNum = cent->currentState.clientNum;
+			    clientNum = this->currentState.clientNum;
 				if ( clientNum < 0 || clientNum >= MAX_CLIENTS ) {
 					Com_Error( ERR_DROP, "Bad clientNum on player entity (EV_GEAR_DOWN_FULL)");
 				}
 				ci = &cgs.clientinfo[ clientNum ];
-				cent->gearAnimFrame = availableVehicles[ci->vehicle].maxGearFrame;
-			} else if( cent->currentState.eType == ET_MISC_VEHICLE ) {
-				cent->gearAnimFrame = availableVehicles[cent->currentState.modelindex].maxGearFrame;
+				this->gearAnimFrame = availableVehicles[ci->vehicle].maxGearFrame;
+			} else if( this->currentState.eType == ET_MISC_VEHICLE ) {
+				this->gearAnimFrame = availableVehicles[this->currentState.modelindex].maxGearFrame;
 			}
 			*/
 			// New version
 			clientInfo_t	*ci;
 			int				clientNum;
-			clientNum = cent->currentState.clientNum;
+			clientNum = this->currentState.clientNum;
 			if( clientNum < 0 || clientNum >= MAX_CLIENTS ) {
-				cent->gearAnimFrame = availableVehicles[cent->currentState.modelindex].maxGearFrame;
+				this->gearAnimFrame = availableVehicles[this->currentState.modelindex].maxGearFrame;
 			} else {
 				ci = &cgs.clientinfo[ clientNum ];
-				cent->gearAnimFrame = availableVehicles[ci->vehicle].maxGearFrame;
+				this->gearAnimFrame = availableVehicles[ci->vehicle].maxGearFrame;
 			}
 		}
 		break;
 	
 	case EV_BAY_UP_FULL:
 		DEBUGNAME("EV_BAY_UP_FULL");
-		cent->bayAnimStartTime = 0;
-		cent->bayAnim = BAY_ANIM_STOP;
-		cent->bayAnimFrame = BAY_UP;
+		this->bayAnimStartTime = 0;
+		this->bayAnim = BAY_ANIM_STOP;
+		this->bayAnimFrame = BAY_UP;
 		break;
 
 	case EV_BAY_UP:
 		DEBUGNAME("EV_BAY_UP");
-		cent->bayAnimStartTime = cg.time;
-		cent->bayAnim = BAY_ANIM_UP;
+		this->bayAnimStartTime = cg.time;
+		this->bayAnim = BAY_ANIM_UP;
 		break;
 
 	case EV_BAY_STOP:
 		DEBUGNAME("EV_BAY_STOP");
-		cent->bayAnimStartTime = 0;
-		cent->bayAnim = BAY_ANIM_STOP;
+		this->bayAnimStartTime = 0;
+		this->bayAnim = BAY_ANIM_STOP;
 		break;
 
 	case EV_BAY_DOWN:
 		DEBUGNAME("EV_BAY_DOWN");
-		cent->bayAnimStartTime = cg.time;
-		cent->bayAnim = BAY_ANIM_DOWN;
+		this->bayAnimStartTime = cg.time;
+		this->bayAnim = BAY_ANIM_DOWN;
 		break;
 
 	case EV_BAY_DOWN_FULL:
 		DEBUGNAME("EV_BAY_DOWN_FULL");
-		cent->bayAnimStartTime = 0;
-		cent->bayAnim = BAY_ANIM_STOP;
+		this->bayAnimStartTime = 0;
+		this->bayAnim = BAY_ANIM_STOP;
 		break;
 
 	case EV_GENERAL_SOUND:
@@ -500,8 +500,8 @@ void CG_EntityEvent( centity_t *cent, vec3_t position )
 		// local player sounds are triggered in CG_CheckLocalSounds,
 		// so ignore events on the player
 		DEBUGNAME("EV_PAIN");
-		if ( cent->currentState.number != cg.snap->ps.clientNum ) {
-			CG_PainEvent( cent, es->eventParm );
+		if ( this->currentState.number != cg.snap->ps.clientNum ) {
+			this->painEvent( es->eventParm );
 		}
 		break;
 
@@ -521,7 +521,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position )
 
 	case EV_DEBUG_LINE:
 		DEBUGNAME("EV_DEBUG_LINE");
-		CG_Beam( cent );
+		this->beam();
 		break;
 
 	default:
@@ -539,43 +539,43 @@ CG_CheckEvents
 
 ==============
 */
-void CG_CheckEvents( centity_t *cent )
+void ClientEntity::checkEvents()
 {
 	// check for event-only entities
-	if ( cent->currentState.eType > ET_EVENTS )
+	if ( this->currentState.eType > ET_EVENTS )
 	{
-		if ( cent->previousEvent )
+		if ( this->previousEvent )
 		{
 			return;	// already fired
 		}
-		cent->previousEvent = 1;
+		this->previousEvent = 1;
 
 		// if this is a player event set the entity number of the client entity number
-		if ( cent->currentState.eFlags & EF_PLAYER_EVENT )
+		if ( this->currentState.eFlags & EF_PLAYER_EVENT )
 		{
-			cent->currentState.number = cent->currentState.otherEntityNum;
+			this->currentState.number = this->currentState.otherEntityNum;
 		}
 
-		cent->currentState.event = cent->currentState.eType - ET_EVENTS;
+		this->currentState.event = this->currentState.eType - ET_EVENTS;
 	} 
 	else 
 	{
 		// check for events riding with another entity
-		if ( cent->currentState.event == cent->previousEvent )
+		if ( this->currentState.event == this->previousEvent )
 		{
 			return;
 		}
-		cent->previousEvent = cent->currentState.event;
-		if ( ( cent->currentState.event & ~EV_EVENT_BITS ) == 0 )
+		this->previousEvent = this->currentState.event;
+		if ( ( this->currentState.event & ~EV_EVENT_BITS ) == 0 )
 		{
 			return;
 		}
 	}
 
 	// calculate the position at exactly the frame time
-	BG_EvaluateTrajectory( &cent->currentState.pos, cg.snap->serverTime, cent->lerpOrigin );
-	CG_SetEntitySoundPosition( cent );
+	BG_EvaluateTrajectory( &this->currentState.pos, cg.snap->serverTime, this->lerpOrigin );
+	this->setEntitySoundPosition();
 
-	CG_EntityEvent( cent, cent->lerpOrigin );
+	this->entityEvent( this->lerpOrigin );
 }
 

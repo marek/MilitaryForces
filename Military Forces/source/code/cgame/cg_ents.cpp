@@ -85,16 +85,16 @@ CG_SetEntitySoundPosition
 Also called by event processing code
 ======================
 */
-void CG_SetEntitySoundPosition( centity_t *cent ) {
-	if ( cent->currentState.solid == SOLID_BMODEL ) {
+void ClientEntity::setEntitySoundPosition() {
+	if ( this->currentState.solid == SOLID_BMODEL ) {
 		vec3_t	origin;
 		float	*v;
 
-		v = cgs.inlineModelMidpoints[ cent->currentState.modelindex ];
-		VectorAdd( cent->lerpOrigin, v, origin );
-		S_UpdateEntityPosition( cent->currentState.number, origin );
+		v = cgs.inlineModelMidpoints[ this->currentState.modelindex ];
+		VectorAdd( this->lerpOrigin, v, origin );
+		S_UpdateEntityPosition( this->currentState.number, origin );
 	} else {
-		S_UpdateEntityPosition( cent->currentState.number, cent->lerpOrigin );
+		S_UpdateEntityPosition( this->currentState.number, this->lerpOrigin );
 	}
 }
 
@@ -105,34 +105,34 @@ CG_EntityEffects
 Add continuous entity effects, like local entity emission and lighting
 ==================
 */
-static void CG_EntityEffects( centity_t *cent ) {
+void ClientEntity::entityEffects() {
 
 	// update sound origins
-	CG_SetEntitySoundPosition( cent );
+	this->setEntitySoundPosition();
 
 	// add loop sound
-	if ( cent->currentState.loopSound ) {
-		if (cent->currentState.eType != ET_SPEAKER) {
-			S_AddLoopingSound( cent->currentState.number, cent->lerpOrigin, vec3_origin, 
-				cgs.gameSounds[ cent->currentState.loopSound ] );
+	if ( this->currentState.loopSound ) {
+		if (this->currentState.eType != ET_SPEAKER) {
+			S_AddLoopingSound( this->currentState.number, this->lerpOrigin, vec3_origin, 
+				cgs.gameSounds[ this->currentState.loopSound ] );
 		} else {
-			S_AddRealLoopingSound( cent->currentState.number, cent->lerpOrigin, vec3_origin, 
-				cgs.gameSounds[ cent->currentState.loopSound ] );
+			S_AddRealLoopingSound( this->currentState.number, this->lerpOrigin, vec3_origin, 
+				cgs.gameSounds[ this->currentState.loopSound ] );
 		}
 	}
 
 
 	// constant light glow
-/*	if ( cent->currentState.constantLight ) {
+/*	if ( this->currentState.constantLight ) {
 		int		cl;
 		int		i, r, g, b;
 
-		cl = cent->currentState.constantLight;
+		cl = this->currentState.constantLight;
 		r = cl & 255;
 		g = ( cl >> 8 ) & 255;
 		b = ( cl >> 16 ) & 255;
 		i = ( ( cl >> 24 ) & 255 ) * 4;
-		refExport.AddLightToScene( cent->lerpOrigin, i, r, g, b );
+		refExport.AddLightToScene( this->lerpOrigin, i, r, g, b );
 	}*/
 
 }
@@ -143,11 +143,11 @@ static void CG_EntityEffects( centity_t *cent ) {
 CG_General
 ==================
 */
-static void CG_General( centity_t *cent ) {
+void ClientEntity::general() {
 	refEntity_t			ent;
 	entityState_t		*s1;
 
-	s1 = &cent->currentState;
+	s1 = &this->currentState;
 
 	// if set to invisible, skip
 	if (!s1->modelindex) {
@@ -162,8 +162,8 @@ static void CG_General( centity_t *cent ) {
 	ent.oldframe = ent.frame;
 	ent.backlerp = 0;
 
-	VectorCopy( cent->lerpOrigin, ent.origin);
-	VectorCopy( cent->lerpOrigin, ent.oldorigin);
+	VectorCopy( this->lerpOrigin, ent.origin);
+	VectorCopy( this->lerpOrigin, ent.oldorigin);
 
 	ent.hModel = cgs.gameModels[s1->modelindex];
 
@@ -173,7 +173,7 @@ static void CG_General( centity_t *cent ) {
 	}
 
 	// convert angles to axis
-	AnglesToAxis( cent->lerpAngles, ent.axis );
+	AnglesToAxis( this->lerpAngles, ent.axis );
 
 	// add to refresh list
 	refExport.AddRefEntityToScene (&ent);
@@ -186,20 +186,20 @@ CG_Speaker
 Speaker entities can automatically play sounds
 ==================
 */
-static void CG_Speaker( centity_t *cent ) {
-	if ( ! cent->currentState.clientNum ) {	// FIXME: use something other than clientNum...
+void ClientEntity::speaker() {
+	if ( ! this->currentState.clientNum ) {	// FIXME: use something other than clientNum...
 		return;		// not auto triggering
 	}
 
-	if ( cg.time < cent->miscTime ) {
+	if ( cg.time < this->miscTime ) {
 		return;
 	}
 
-	S_StartSound (nullptr, cent->currentState.number, CHAN_ITEM, cgs.gameSounds[cent->currentState.eventParm] );
+	S_StartSound (nullptr, this->currentState.number, CHAN_ITEM, cgs.gameSounds[this->currentState.eventParm] );
 
 	//	ent->s.frame = ent->wait * 10;
 	//	ent->s.clientNum = ent->random * 10;
-	cent->miscTime = cg.time + cent->currentState.frame * 100 + cent->currentState.clientNum * 100 * crandom();
+	this->miscTime = cg.time + this->currentState.frame * 100 + this->currentState.clientNum * 100 * crandom();
 }
 
 /*
@@ -207,7 +207,7 @@ static void CG_Speaker( centity_t *cent ) {
 CG_Item
 ==================
 */
-static void CG_Item( centity_t *cent ) {
+void ClientEntity::item() {
 	refEntity_t		ent;
 	entityState_t	*es;
 	gitem_t			*item;
@@ -215,7 +215,7 @@ static void CG_Item( centity_t *cent ) {
 	float			frac;
 	float			scale;
 
-	es = &cent->currentState;
+	es = &this->currentState;
 	if ( es->modelindex >= bg_numItems ) {
 		Com_Error( ERR_DROP, "Bad item index %i on entity", es->modelindex );
 	}
@@ -229,7 +229,7 @@ static void CG_Item( centity_t *cent ) {
 	if ( cg_simpleItems.integer && item->giType != IT_TEAM ) {
 		memset( &ent, 0, sizeof( ent ) );
 		ent.reType = RT_SPRITE;
-		VectorCopy( cent->lerpOrigin, ent.origin );
+		VectorCopy( this->lerpOrigin, ent.origin );
 		ent.radius = 14;
 		ent.customShader = cg_items[es->modelindex].icon;
 		ent.shaderRGBA[0] = 255;
@@ -241,29 +241,29 @@ static void CG_Item( centity_t *cent ) {
 	}
 
 	// items bob up and down continuously
-	scale = 0.005 + cent->currentState.number * 0.00001;
-	cent->lerpOrigin[2] += 4 + cos( ( cg.time + 1000 ) *  scale ) * 4;
+	scale = 0.005 + this->currentState.number * 0.00001;
+	this->lerpOrigin[2] += 4 + cos( ( cg.time + 1000 ) *  scale ) * 4;
 
 	memset (&ent, 0, sizeof(ent));
 
 	// autorotate at one of two speeds
 	if ( item->giType == IT_HEALTH ) {
-		VectorCopy( cg.autoAnglesFast, cent->lerpAngles );
+		VectorCopy( cg.autoAnglesFast, this->lerpAngles );
 		AxisCopy( cg.autoAxisFast, ent.axis );
 	} else {
-		VectorCopy( cg.autoAngles, cent->lerpAngles );
+		VectorCopy( cg.autoAngles, this->lerpAngles );
 		AxisCopy( cg.autoAxis, ent.axis );
 	}
 
 	ent.hModel = cg_items[es->modelindex].models[0];
 
-	VectorCopy( cent->lerpOrigin, ent.origin);
-	VectorCopy( cent->lerpOrigin, ent.oldorigin);
+	VectorCopy( this->lerpOrigin, ent.origin);
+	VectorCopy( this->lerpOrigin, ent.oldorigin);
 
 	ent.nonNormalizedAxes = false;
 
 	// if just respawned, slowly scale up
-	msec = cg.time - cent->miscTime;
+	msec = cg.time - this->miscTime;
 	if ( msec >= 0 && msec < ITEM_SCALEUP_TIME ) {
 		frac = static_cast<float>(msec) / ITEM_SCALEUP_TIME;
 		VectorScale( ent.axis[0], frac, ent.axis[0] );
@@ -310,38 +310,38 @@ static void CG_Item( centity_t *cent ) {
 CG_Missile
 ===============
 */
-static void CG_Missile( centity_t *cent ) {
+void ClientEntity::missile() {
 	refEntity_t			ent;
 	entityState_t		*s1;
 	const weaponInfo_t		*weapon;
 
-	s1 = &cent->currentState;
+	s1 = &this->currentState;
 	if ( s1->weaponNum > WP_WEAPON6 ) {
 		s1->weaponNum = 0;
 	}
 	weapon = &cg_weapons[s1->weaponIndex];
 
 	// calculate the axis
-	VectorCopy( s1->angles, cent->lerpAngles);
+	VectorCopy( s1->angles, this->lerpAngles);
 
 	// add trails
 	if ( weapon->missileTrailFunc ) 
 	{
 		// only ever call the missile-trail function once per NEW-frame
-		// NOTE: this assumes that we don't use the ->miscTime variable of centity_t (missiles) for anything else
-		if( cent->miscTime != cg.time )
+		// NOTE: this assumes that we don't use the ->miscTime variable of ClientEntity (missiles) for anything else
+		if( this->miscTime != cg.time )
 		{
 			// call the trail func
-			weapon->missileTrailFunc( cent, weapon );
+			weapon->missileTrailFunc( this, weapon );
 
 			// lock-out the frame
-			cent->miscTime = cg.time;
+			this->miscTime = cg.time;
 		}
 	}
 
 	// add dynamic light
 	if ( weapon->missileDlight ) {
-		refExport.AddLightToScene(cent->lerpOrigin, weapon->missileDlight, 
+		refExport.AddLightToScene(this->lerpOrigin, weapon->missileDlight, 
 			weapon->missileDlightColor[0], weapon->missileDlightColor[1], weapon->missileDlightColor[2] );
 	}
 
@@ -349,15 +349,15 @@ static void CG_Missile( centity_t *cent ) {
 	if ( weapon->missileSound ) {
 		vec3_t	velocity;
 
-		BG_EvaluateTrajectoryDelta( &cent->currentState.pos, cg.time, velocity );
+		BG_EvaluateTrajectoryDelta( &this->currentState.pos, cg.time, velocity );
 
-		S_AddLoopingSound( cent->currentState.number, cent->lerpOrigin, velocity, weapon->missileSound );
+		S_AddLoopingSound( this->currentState.number, this->lerpOrigin, velocity, weapon->missileSound );
 	}
 
 	// create the render entity
 	memset (&ent, 0, sizeof(ent));
-	VectorCopy( cent->lerpOrigin, ent.origin);
-	VectorCopy( cent->lerpOrigin, ent.oldorigin);
+	VectorCopy( this->lerpOrigin, ent.origin);
+	VectorCopy( this->lerpOrigin, ent.oldorigin);
 
 	// flicker between two skins
 	ent.skinNum = cg.clientFrame & 1;
@@ -370,20 +370,20 @@ static void CG_Missile( centity_t *cent ) {
 	}
 
 	// flame frame
-	if( availableWeapons[cent->currentState.weaponIndex].flags & WF_HAS_FIRE_FRAME ) {
+	if( availableWeapons[this->currentState.weaponIndex].flags & WF_HAS_FIRE_FRAME ) {
 		ent.frame = 1;
 	}
 
 	// spin as it moves
-	if ( availableWeapons[cent->currentState.weaponIndex].type == WT_AMMOCRATE || 
-		availableWeapons[cent->currentState.weaponIndex].type == WT_HEALTHCRATE ||  
-		availableWeapons[cent->currentState.weaponIndex].type == WT_FUELCRATE) {
+	if ( availableWeapons[this->currentState.weaponIndex].type == WT_AMMOCRATE || 
+		availableWeapons[this->currentState.weaponIndex].type == WT_HEALTHCRATE ||  
+		availableWeapons[this->currentState.weaponIndex].type == WT_FUELCRATE) {
 		RotateAroundDirection( ent.axis, 0 );
 	} else if ( s1->pos.trType != TR_STATIONARY && 
-		availableWeapons[cent->currentState.weaponIndex].type != WT_IRONBOMB &&
-		availableWeapons[cent->currentState.weaponIndex].type != WT_GUIDEDBOMB &&
-		availableWeapons[cent->currentState.weaponIndex].type != WT_NUKEBOMB && 
-		availableWeapons[cent->currentState.weaponIndex].type != WT_NUKEMISSILE ) {
+		availableWeapons[this->currentState.weaponIndex].type != WT_IRONBOMB &&
+		availableWeapons[this->currentState.weaponIndex].type != WT_GUIDEDBOMB &&
+		availableWeapons[this->currentState.weaponIndex].type != WT_NUKEBOMB && 
+		availableWeapons[this->currentState.weaponIndex].type != WT_NUKEMISSILE ) {
 	
 		RotateAroundDirection( ent.axis, cg.time / 4 );
 	} else {
@@ -401,24 +401,24 @@ static void CG_Missile( centity_t *cent ) {
 CG_Bullet_Tracer
 ===============
 */
-static void CG_Bullet_Tracer( centity_t *cent ) {
+void ClientEntity::bullet_Tracer() {
 	refEntity_t			ent;
 	entityState_t		*s1;
 	const weaponInfo_t		*weapon;
 
-	s1 = &cent->currentState;
+	s1 = &this->currentState;
 	if ( s1->weaponNum > WP_WEAPON6 ) {
 		s1->weaponNum = 0;
 	}
 	weapon = &cg_weapons[s1->weaponIndex];
 
 	// calculate the axis
-	VectorCopy( s1->angles, cent->lerpAngles);
+	VectorCopy( s1->angles, this->lerpAngles);
 
 	// create the render entity
 	memset (&ent, 0, sizeof(ent));
-	VectorCopy( cent->lerpOrigin, ent.origin);
-	VectorCopy( cent->lerpOrigin, ent.oldorigin);
+	VectorCopy( this->lerpOrigin, ent.origin);
+	VectorCopy( this->lerpOrigin, ent.oldorigin);
 
 	ent.hModel = cgs.media.bulletTracer;
 	ent.frame = 2;
@@ -438,17 +438,17 @@ static void CG_Bullet_Tracer( centity_t *cent ) {
 CG_Mover
 ===============
 */
-static void CG_Mover( centity_t *cent ) {
+void ClientEntity::mover() {
 	refEntity_t			ent;
 	entityState_t		*s1;
 
-	s1 = &cent->currentState;
+	s1 = &this->currentState;
 
 	// create the render entity
 	memset (&ent, 0, sizeof(ent));
-	VectorCopy( cent->lerpOrigin, ent.origin);
-	VectorCopy( cent->lerpOrigin, ent.oldorigin);
-	AnglesToAxis( cent->lerpAngles, ent.axis );
+	VectorCopy( this->lerpOrigin, ent.origin);
+	VectorCopy( this->lerpOrigin, ent.oldorigin);
+	AnglesToAxis( this->lerpAngles, ent.axis );
 
 	ent.renderfx = RF_NOSHADOW;
 
@@ -479,24 +479,24 @@ static void CG_Mover( centity_t *cent ) {
 CG_Explosive
 ===============
 */
-static void CG_Explosive( centity_t *cent ) {
+void ClientEntity::explosive() {
 	refEntity_t			ent;
 	entityState_t		*s1;
 
-	s1 = &cent->currentState;
+	s1 = &this->currentState;
 
 	// radar
 	if( cg.radarTargets < MAX_RADAR_TARGETS && (cg.predictedPlayerEntity.currentState.ONOFF & OO_RADAR_GROUND) 
-		&& (cent->currentState.ONOFF & OO_RADAR) ) {
-		cent->destroyableStructure = true;
-		cg.radarEnts[cg.radarTargets++] = cent;
+		&& (this->currentState.ONOFF & OO_RADAR) ) {
+		this->destroyableStructure = true;
+		cg.radarEnts[cg.radarTargets++] = this;
 	}
 
 	// create the render entity
 	memset (&ent, 0, sizeof(ent));
-	VectorCopy( cent->lerpOrigin, ent.origin);
-	VectorCopy( cent->lerpOrigin, ent.oldorigin);
-	AnglesToAxis( cent->lerpAngles, ent.axis );
+	VectorCopy( this->lerpOrigin, ent.origin);
+	VectorCopy( this->lerpOrigin, ent.oldorigin);
+	AnglesToAxis( this->lerpAngles, ent.axis );
 
 //	ent.renderfx = RF_NOSHADOW;
 
@@ -523,11 +523,11 @@ CG_Beam
 Also called as an event
 ===============
 */
-void CG_Beam( centity_t *cent ) {
+void ClientEntity::beam() {
 	refEntity_t			ent;
 	entityState_t		*s1;
 
-	s1 = &cent->currentState;
+	s1 = &this->currentState;
 
 	// create the render entity
 	memset (&ent, 0, sizeof(ent));
@@ -548,15 +548,15 @@ void CG_Beam( centity_t *cent ) {
 CG_Portal
 ===============
 */
-static void CG_Portal( centity_t *cent ) {
+void ClientEntity::portal() {
 	refEntity_t			ent;
 	entityState_t		*s1;
 
-	s1 = &cent->currentState;
+	s1 = &this->currentState;
 
 	// create the render entity
 	memset (&ent, 0, sizeof(ent));
-	VectorCopy( cent->lerpOrigin, ent.origin );
+	VectorCopy( this->lerpOrigin, ent.origin );
 	VectorCopy( s1->origin2, ent.oldorigin );
 	ByteToDir( s1->eventParm, ent.axis[0] );
 	PerpendicularVector( ent.axis[1], ent.axis[0] );
@@ -622,7 +622,7 @@ Also called by client movement prediction code
 =========================
 */
 void CG_AdjustPositionForMover( const vec3_t in, int moverNum, int fromTime, int toTime, vec3_t out ) {
-	centity_t	*cent;
+	ClientEntity	*cent;
 	vec3_t	oldOrigin, origin, deltaOrigin;
 	vec3_t	oldAngles, angles, deltaAngles;
 	vec3_t	matrix[3], transpose[3];
@@ -666,20 +666,20 @@ void CG_AdjustPositionForMover( const vec3_t in, int moverNum, int fromTime, int
 CG_InterpolateEntityPosition
 =============================
 */
-float CG_EntityAngleErrorFraction( const centity_t *cent ) {
+float ClientEntity::entityAngleErrorFraction() const {
 	float	f;
 
-	if ( !cent->errorTime ) {
+	if ( !this->errorTime ) {
 		return 0;
 	}
-	f = 1.0f - ( cg.time - cent->errorTime ) / static_cast<float>(ANGLE_ERROR_DECAY);
+	f = 1.0f - ( cg.time - this->errorTime ) / static_cast<float>(ANGLE_ERROR_DECAY);
 	if ( f > 1.0f ) {
 		f = 1.0f;
 	}
 	return f;
 }
 
-static void CG_InterpolateEntityPosition( centity_t *cent ) {
+void ClientEntity::interpolateEntityPosition() {
 	vec3_t		current, next;
 	float		f;
 
@@ -693,19 +693,19 @@ static void CG_InterpolateEntityPosition( centity_t *cent ) {
 
 	// this will linearize a sine or parabolic curve, but it is important
 	// to not extrapolate player positions if more recent data is available
-	BG_EvaluateTrajectory( &cent->currentState.pos, cg.snap->serverTime, current );
-	BG_EvaluateTrajectory( &cent->nextState.pos, cg.nextSnap->serverTime, next );
+	BG_EvaluateTrajectory( &this->currentState.pos, cg.snap->serverTime, current );
+	BG_EvaluateTrajectory( &this->nextState.pos, cg.nextSnap->serverTime, next );
 
-	cent->lerpOrigin[0] = current[0] + f * ( next[0] - current[0] );
-	cent->lerpOrigin[1] = current[1] + f * ( next[1] - current[1] );
-	cent->lerpOrigin[2] = current[2] + f * ( next[2] - current[2] );
+	this->lerpOrigin[0] = current[0] + f * ( next[0] - current[0] );
+	this->lerpOrigin[1] = current[1] + f * ( next[1] - current[1] );
+	this->lerpOrigin[2] = current[2] + f * ( next[2] - current[2] );
 
-	BG_EvaluateTrajectory( &cent->currentState.apos, cg.snap->serverTime, current );
-	BG_EvaluateTrajectory( &cent->nextState.apos, cg.nextSnap->serverTime, next );
+	BG_EvaluateTrajectory( &this->currentState.apos, cg.snap->serverTime, current );
+	BG_EvaluateTrajectory( &this->nextState.apos, cg.nextSnap->serverTime, next );
 
-	cent->lerpAngles[0] = LerpAngle( current[0], next[0], f );
-	cent->lerpAngles[1] = LerpAngle( current[1], next[1], f );
-	cent->lerpAngles[2] = LerpAngle( current[2], next[2], f );
+	this->lerpAngles[0] = LerpAngle( current[0], next[0], f );
+	this->lerpAngles[1] = LerpAngle( current[1], next[1], f );
+	this->lerpAngles[2] = LerpAngle( current[2], next[2], f );
 
 }
 
@@ -715,38 +715,38 @@ CG_VehicleLerpAngles
 
 =============================
 */
-void CG_VehicleLerpAngles( centity_t *cent ) {
+void ClientEntity::vehicleLerpAngles() {
 	quat_t	current, next, out;
 	float	f;
 
-	if ( cent == &cg.predictedPlayerEntity || !cent->interpolate || !cg.nextSnap ) {
-		VectorCopy( cent->currentState.angles, cent->lerpAngles );
-		VectorCopy( cent->currentState.angles2, cent->lerpAngles2 );
+	if ( this == &cg.predictedPlayerEntity || !this->interpolate || !cg.nextSnap ) {
+		VectorCopy( this->currentState.angles, this->lerpAngles );
+		VectorCopy( this->currentState.angles2, this->lerpAngles2 );
 		return;
 	}
 
-	AnglesToQuat( cent->nextState.angles, next );
+	AnglesToQuat( this->nextState.angles, next );
 
-	if ( cent->errorSnapTime == cg.nextSnap->serverTime ) {
+	if ( this->errorSnapTime == cg.nextSnap->serverTime ) {
 		QuatCopy( next, out );
-		VectorCopy( cent->nextState.angles2, cent->lerpAngles2 );
+		VectorCopy( this->nextState.angles2, this->lerpAngles2 );
 	} else {
 		f = cg.frameInterpolation;
-		AnglesToQuat( cent->currentState.angles, current );
+		AnglesToQuat( this->currentState.angles, current );
 		QuatInterpolate( current, next, f, out );
-		cent->lerpAngles2[0] = LerpAngle( cent->currentState.angles2[0], cent->nextState.angles2[0], f );
-		cent->lerpAngles2[1] = LerpAngle( cent->currentState.angles2[1], cent->nextState.angles2[1], f );
-		cent->lerpAngles2[2] = LerpAngle( cent->currentState.angles2[2], cent->nextState.angles2[2], f );
+		this->lerpAngles2[0] = LerpAngle( this->currentState.angles2[0], this->nextState.angles2[0], f );
+		this->lerpAngles2[1] = LerpAngle( this->currentState.angles2[1], this->nextState.angles2[1], f );
+		this->lerpAngles2[2] = LerpAngle( this->currentState.angles2[2], this->nextState.angles2[2], f );
 	}
 
-	f = CG_EntityAngleErrorFraction( cent );
+	f = this->entityAngleErrorFraction();
 	if ( f > 0 ) {
-		AnglesToQuat( cent->errorAngles, current );
+		AnglesToQuat( this->errorAngles, current );
 		QuatInterpolate( out, current, f, out );
-		VectorMA( cent->lerpAngles2, f, cent->errorAngles2, cent->lerpAngles2 );
+		VectorMA( this->lerpAngles2, f, this->errorAngles2, this->lerpAngles2 );
 	}
 
-	QuatToAngles( out, cent->lerpAngles );
+	QuatToAngles( out, this->lerpAngles );
 }
 
 /*
@@ -755,49 +755,49 @@ CG_CalcEntityLerpPositions
 
 ===============
 */
-static void CG_CalcEntityLerpPositions( centity_t *cent ) {
+void ClientEntity::calcEntityLerpPositions() {
 
 	// if this player does not want to see extrapolated players
 	if ( !cg_smoothClients.integer ) {
 		// make sure the clients use TR_INTERPOLATE
-		if ( cent->currentState.number <= MAX_CLIENTS ) {
-			cent->currentState.pos.trType = TR_INTERPOLATE;
-			cent->nextState.pos.trType = TR_INTERPOLATE;
+		if ( this->currentState.number <= MAX_CLIENTS ) {
+			this->currentState.pos.trType = TR_INTERPOLATE;
+			this->nextState.pos.trType = TR_INTERPOLATE;
 		}
 	}
 
-	if ( cent->interpolate && cent->currentState.pos.trType == TR_INTERPOLATE ) {
-		CG_InterpolateEntityPosition( cent );
+	if ( this->interpolate && this->currentState.pos.trType == TR_INTERPOLATE ) {
+		this->interpolateEntityPosition();
 		return;
 	}
 
 	// first see if we can interpolate between two snaps for
 	// linear extrapolated clients
-	if ( cent->interpolate && cent->currentState.pos.trType == TR_LINEAR_STOP &&
-											cent->currentState.number <= MAX_CLIENTS) {
-		CG_InterpolateEntityPosition( cent );
+	if ( this->interpolate && this->currentState.pos.trType == TR_LINEAR_STOP &&
+											this->currentState.number <= MAX_CLIENTS) {
+		this->interpolateEntityPosition();
 		return;
 	}
 
 	// just use the current frame and evaluate as best we can
-	BG_EvaluateTrajectory( &cent->currentState.pos, cg.time, cent->lerpOrigin );
-	BG_EvaluateTrajectory( &cent->currentState.apos, cg.time, cent->lerpAngles );
+	BG_EvaluateTrajectory( &this->currentState.pos, cg.time, this->lerpOrigin );
+	BG_EvaluateTrajectory( &this->currentState.apos, cg.time, this->lerpAngles );
 
 	// adjust for riding a mover if it wasn't rolled into the predicted
 	// player state
-	if ( cent != &cg.predictedPlayerEntity ) {
-		CG_AdjustPositionForMover( cent->lerpOrigin, cent->currentState.groundEntityNum, 
-		cg.snap->serverTime, cg.time, cent->lerpOrigin );
+	if ( this != &cg.predictedPlayerEntity ) {
+		CG_AdjustPositionForMover( this->lerpOrigin, this->currentState.groundEntityNum, 
+		cg.snap->serverTime, cg.time, this->lerpOrigin );
 	}
 }
 
-static void CG_EmptyVehicleIcon( centity_t *cent )
+void ClientEntity::emptyVehicleIcon()
 {
 	static qhandle_t	icon;
 	refEntity_t			ent;
-	int					vehicle = cent->currentState.modelindex;
+	int					vehicle = this->currentState.modelindex;
 	static const byte	colors[3][3] = { { 255, 255, 255 }, { 255, 70, 60 }, { 70, 130, 255 } };
-	int					team = cent->currentState.generic1;
+	int					team = this->currentState.generic1;
 
 	if( vehicle < 0 || vehicle >= bg_numberOfVehicles ) 
 		return;
@@ -807,7 +807,7 @@ static void CG_EmptyVehicleIcon( centity_t *cent )
 		team = 0;
 
 	memset( &ent, 0, sizeof(ent) );
-	VectorCopy( cent->lerpOrigin, ent.origin );
+	VectorCopy( this->lerpOrigin, ent.origin );
 	ent.origin[2] += availableVehicles[vehicle].maxs[2] + 10;
 	ent.reType = RT_SPRITE;
 	ent.customShader = icon;
@@ -826,61 +826,61 @@ CG_AddCEntity
 
 ===============
 */
-static void CG_AddCEntity( centity_t *cent ) {
+void ClientEntity::addCEntity() {
 	// event-only entities will have been dealt with already
-	if ( cent->currentState.eType >= ET_EVENTS ) {
+	if ( this->currentState.eType >= ET_EVENTS ) {
 		return;
 	}
 
 	// calculate the current origin
-	CG_CalcEntityLerpPositions( cent );
+	this->calcEntityLerpPositions();
 
 	// add automatic effects
-	CG_EntityEffects( cent );
+	this->entityEffects();
 
-	switch ( cent->currentState.eType ) {
+	switch ( this->currentState.eType ) {
 	default:
-		Com_Error( ERR_DROP, "Bad entity type: %i\n", cent->currentState.eType );
+		Com_Error( ERR_DROP, "Bad entity type: %i\n", this->currentState.eType );
 		break;
 	case ET_INVISIBLE:
 	case ET_TELEPORT_TRIGGER:
 		break;
 	case ET_GENERAL:
-		CG_General( cent );
+		this->general();
 		break;
 	case ET_ITEM:
-		CG_Item( cent );
+		this->item();
 		break;
 	case ET_MISSILE:
-		CG_Missile( cent );
+		this->missile();
 		break;
 	case ET_BULLET:
-		if( !(cent->currentState.generic1 % cg.tracernum) ) {
-			CG_Bullet_Tracer( cent );
+		if( !(this->currentState.generic1 % cg.tracernum) ) {
+			this->bullet_Tracer();
 		}
 		break;
 	case ET_MOVER:
-		CG_Mover( cent );
+		this->mover();
 		break;
 	case ET_EXPLOSIVE:
-		CG_Explosive( cent );
+		this->explosive();
 		break;
 	case ET_BEAM:
-		CG_Beam( cent );
+		this->beam();
 		break;
 	case ET_PORTAL:
-		CG_Portal( cent );
+		this->portal();
 		break;
 	case ET_SPEAKER:
-		CG_Speaker( cent );
+		this->speaker();
 		break;
 	case ET_VEHICLE:
-		CG_Vehicle( cent );
+		this->vehicle();
 		break;
 	case ET_MISC_VEHICLE:
-		CG_Misc_Vehicle( cent );
-		if( (cent->currentState.seatMask & SEATMASK_ENTERABLE) && !(cent->currentState.seatMask & SEATMASK_PILOT) ) 
-			CG_EmptyVehicleIcon( cent );
+		this->misc_Vehicle();
+		if( (this->currentState.seatMask & SEATMASK_ENTERABLE) && !(this->currentState.seatMask & SEATMASK_PILOT) ) 
+			this->emptyVehicleIcon();
 		break;
 	}
 }
@@ -893,7 +893,7 @@ CG_AddPacketEntities
 */
 void CG_AddPacketEntities( ) {
 	int					num;
-	centity_t			*cent;
+	ClientEntity			*cent;
 	playerState_t		*ps;
 
 	// set cg.frameInterpolation
@@ -927,16 +927,16 @@ void CG_AddPacketEntities( ) {
 	ps = &cg.predictedPlayerState;
 	BG_PlayerStateToEntityState( ps, &cg.predictedPlayerEntity.currentState, false );
 	if( !(cg.predictedPlayerState.pm_flags & PMF_VEHICLESELECT) ) {
-		CG_AddCEntity( &cg.predictedPlayerEntity );
+		cg.predictedPlayerEntity.addCEntity();
 	}
 
 	// lerp the non-predicted value for lightning gun origins
-	CG_CalcEntityLerpPositions( &cg_entities[ cg.snap->ps.clientNum ] );
+	(&cg_entities[ cg.snap->ps.clientNum ])->calcEntityLerpPositions();
 
 	// add each entity sent over by the server
 	for ( num = 0 ; num < cg.snap->numEntities ; num++ ) {
 		cent = &cg_entities[ cg.snap->entities[ num ].number ];
-		CG_AddCEntity( cent );
+		cent->addCEntity();
 	}
 }
 

@@ -201,18 +201,18 @@ void CG_NewClientInfo( int clientNum ) {
 CG_TrailItem
 ===============
 */
-void CG_TrailItem( centity_t *cent, qhandle_t hModel ) {
+void ClientEntity::trailItem( qhandle_t hModel ) {
 	refEntity_t		ent;
 	vec3_t			angles;
 	vec3_t			axis[3];
 
-	VectorCopy( cent->lerpAngles, angles );
+	VectorCopy( this->lerpAngles, angles );
 	angles[PITCH] = 0;
 	angles[ROLL] = 0;
 	AnglesToAxis( angles, axis );
 
 	memset( &ent, 0, sizeof( ent ) );
-	VectorMA( cent->lerpOrigin, -16, axis[0], ent.origin );
+	VectorMA( this->lerpOrigin, -16, axis[0], ent.origin );
 	ent.origin[2] += 16;
 	angles[YAW] += 90;
 	AnglesToAxis( angles, ent.axis );

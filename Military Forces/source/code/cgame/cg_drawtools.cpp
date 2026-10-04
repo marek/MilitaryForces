@@ -1119,7 +1119,7 @@ Adds a reticle, either as a 2D sprite or as pending HUD gfx
 
 #pragma message ("CG_AddReticleEntityToScene() FRIEND tracking/lock NOT implemented")
 
-void CG_AddReticleEntityToScene( refEntity_t * pReticle, centity_t * pTarget )
+void CG_AddReticleEntityToScene( refEntity_t * pReticle, ClientEntity * pTarget )
 {
 	float offsetx, offsety, scaling = 1.0f;
 
@@ -1347,27 +1347,27 @@ CG_Generic_Smoke
 Draws generic smoke puffs (vehicles on fire)
 ================
 */
-LocalEntity * CG_Generic_Smoke( centity_t * cent, vec3_t smokePosition, int density )
+LocalEntity * ClientEntity::generic_Smoke( vec3_t smokePosition, int density )
 {
 	LocalEntity * smoke = nullptr;
 
 	// valid state to add a smoke puff local entity?
-	if( cg_smoke.integer && cent->miscTime < cg.time )
+	if( cg_smoke.integer && this->miscTime < cg.time )
 	{
 		vec3_t			up = {0, 0, 20};					// direction of smoke
 		float			lifeTime = RandomInt( 50, 150 );	// general life-frames of smoke
 
 		// create puff entity
 		smoke = CG_SmokePuff( smokePosition, up, 
-							  cent->currentState.generic1,				// radius 
+							  this->currentState.generic1,				// radius 
 							  0.5, 0.5, 0.5, 0.33f,						// colour & alpha
-							  lifeTime * cent->currentState.generic1,	// actual duration
+							  lifeTime * this->currentState.generic1,	// actual duration
 							  cg.time, 0,
 							  LEF_NO_RADIUS_KILL, 
 							  cgs.media.smokePuffShader );	
 
 		// lock-out x frames
-		cent->miscTime = cg.time + density;
+		this->miscTime = cg.time + density;
 	}
 
 	return smoke;

@@ -88,7 +88,7 @@ LocalEntity *CG_SmokePuff( const vec3_t p, const vec3_t vel,
 CG_NukeCloud
 ==========================
 */
-//static void CG_NukeCloud( centity_t * cent, entityState_t * es )
+//static void CG_NukeCloud( ClientEntity * cent, entityState_t * es )
 //{
 //	LocalEntity	* smoke;
 //	vec3_t			pos, velocity;
@@ -177,7 +177,7 @@ CG_NukeCloud
 CG_NukeEffect
 ==================
 */
-void CG_NukeEffect(  centity_t * cent, entityState_t * es ) {
+void ClientEntity::nukeEffect( entityState_t * es ) {
 	LocalEntity	*le;
 	refEntity_t		*re;
 
@@ -200,9 +200,9 @@ void CG_NukeEffect(  centity_t * cent, entityState_t * es ) {
 
 	re->hModel = cgs.media.nukeEffectModel;
 
-	VectorCopy( cent->lerpOrigin, re->origin );
+	VectorCopy( this->lerpOrigin, re->origin );
 
-	//CG_NukeCloud(cent, es);
+	//CG_NukeCloud(this, es);
 
 }
 
@@ -212,7 +212,7 @@ void CG_NukeEffect(  centity_t * cent, entityState_t * es ) {
 CG_FlakEffect
 ==========================
 */
-void CG_FlakEffect( centity_t * cent, entityState_t * es )
+void ClientEntity::flakEffect( entityState_t * es )
 {
 	LocalEntity	* smoke;
 	vec3_t			pos, velocity;
@@ -220,13 +220,13 @@ void CG_FlakEffect( centity_t * cent, entityState_t * es )
 	static int	seed = 0x92;
 	puff_size = availableWeapons[es->weaponIndex].damageRadius / 10;
 
-	VectorCopy( cent->lerpOrigin, pos );
+	VectorCopy( this->lerpOrigin, pos );
 
 	// draw base
 	temp = availableWeapons[es->weaponIndex].damageRadius * 0.5;
 	for(i = 0; i <= 30; i++)
 	{
-			VectorCopy(cent->lerpOrigin, pos);
+			VectorCopy(this->lerpOrigin, pos);
 			pos[0] += (temp - (temp * -1) + 1) * Q_random( &seed ) + (temp * -1);
 			pos[1] += (temp - (temp * -1) + 1) * Q_random( &seed ) + (temp * -1);
 			pos[2] += (temp - (temp * -1) + 1) * Q_random( &seed ) + (temp * -1);

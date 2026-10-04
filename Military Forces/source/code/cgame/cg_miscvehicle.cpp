@@ -14,83 +14,83 @@ CG_Misc_Plane
 ===============
 */
 
-static void CG_Misc_Plane( centity_t *cent ) 
+void ClientEntity::misc_Plane() 
 {
 	vec3_t			velocity;	
 	vec3_t			smokePosition, forward;
 	DrawInfo_Plane_t drawInfo;
-	int				ONOFF = cent->currentState.ONOFF;
+	int				ONOFF = this->currentState.ONOFF;
 
 	memset( &drawInfo, 0, sizeof(drawInfo) );
-	drawInfo.basicInfo.vehicleIndex = cent->currentState.modelindex;
+	drawInfo.basicInfo.vehicleIndex = this->currentState.modelindex;
 	drawInfo.basicInfo.ONOFF = ONOFF;
 		
 	// get speed
-	VectorCopy( cent->currentState.pos.trDelta, velocity );
+	VectorCopy( this->currentState.pos.trDelta, velocity );
 	drawInfo.basicInfo.speed = VectorLength( velocity );
 	
 	// entitynum
-	drawInfo.basicInfo.entityNum = cent->currentState.number;
+	drawInfo.basicInfo.entityNum = this->currentState.number;
 
     // get the rotation information
-    CG_VehicleLerpAngles( cent );
-    AnglesToAxis( cent->lerpAngles, drawInfo.basicInfo.axis );
+    this->vehicleLerpAngles();
+    AnglesToAxis( this->lerpAngles, drawInfo.basicInfo.axis );
 
 	// position and orientation
-	VectorCopy( cent->lerpOrigin, drawInfo.basicInfo.origin );
-	VectorCopy( cent->lerpAngles, drawInfo.basicInfo.angles );
+	VectorCopy( this->lerpOrigin, drawInfo.basicInfo.origin );
+	VectorCopy( this->lerpAngles, drawInfo.basicInfo.angles );
 
 	// throttle
-	drawInfo.basicInfo.throttle = cent->currentState.frame;
+	drawInfo.basicInfo.throttle = this->currentState.frame;
     
 	// control surfaces
-	drawInfo.controlFrame = cent->currentState.vehicleAnim;
+	drawInfo.controlFrame = this->currentState.vehicleAnim;
 	
 	// gear
-	if( availableVehicles[cent->currentState.modelindex].caps & HC_GEAR ) {
-		int timediff = cg.time - cent->gearAnimStartTime;
-		int geardown = availableVehicles[cent->currentState.modelindex].maxGearFrame;
+	if( availableVehicles[this->currentState.modelindex].caps & HC_GEAR ) {
+		int timediff = cg.time - this->gearAnimStartTime;
+		int geardown = availableVehicles[this->currentState.modelindex].maxGearFrame;
 		if( ONOFF & OO_GEAR ) {
 			drawInfo.controlFrame += 9;
 		}
-		if( cent->gearAnim == GEAR_ANIM_UP ) {
-			cent->gearAnimFrame = geardown - timediff/25;
-			if( cent->gearAnimFrame < GEAR_UP ) {
-				cent->gearAnimFrame = GEAR_UP;
-				cent->gearAnim = GEAR_ANIM_STOP;
+		if( this->gearAnim == GEAR_ANIM_UP ) {
+			this->gearAnimFrame = geardown - timediff/25;
+			if( this->gearAnimFrame < GEAR_UP ) {
+				this->gearAnimFrame = GEAR_UP;
+				this->gearAnim = GEAR_ANIM_STOP;
 			}
-		} else if( cent->gearAnim == GEAR_ANIM_DOWN ) {
-			cent->gearAnimFrame = GEAR_UP + timediff/25;
-			if( cent->gearAnimFrame > geardown ) {
-				cent->gearAnimFrame = geardown;
-				cent->gearAnim = GEAR_ANIM_STOP;
+		} else if( this->gearAnim == GEAR_ANIM_DOWN ) {
+			this->gearAnimFrame = GEAR_UP + timediff/25;
+			if( this->gearAnimFrame > geardown ) {
+				this->gearAnimFrame = geardown;
+				this->gearAnim = GEAR_ANIM_STOP;
 			}
 		}
-		drawInfo.gearFrame = cent->gearAnimFrame;
+		drawInfo.gearFrame = this->gearAnimFrame;
 	}
 	
 	// bay
-	if( availableVehicles[cent->currentState.modelindex].caps & HC_WEAPONBAY ) {
-		int timediff = cg.time - cent->bayAnimStartTime;
-		int baydown = availableVehicles[cent->currentState.modelindex].maxBayFrame;
-		if( cent->bayAnim == BAY_ANIM_UP ) {
-			cent->bayAnimFrame = baydown - timediff/25;
-			if( cent->bayAnimFrame < BAY_UP ) {
-				cent->bayAnimFrame = BAY_UP;
-				cent->bayAnim = BAY_ANIM_STOP;
+	if( availableVehicles[this->currentState.modelindex].caps & HC_WEAPONBAY ) {
+		int timediff = cg.time - this->bayAnimStartTime;
+		int baydown = availableVehicles[this->currentState.modelindex].maxBayFrame;
+		if( this->bayAnim == BAY_ANIM_UP ) {
+			this->bayAnimFrame = baydown - timediff/25;
+			if( this->bayAnimFrame < BAY_UP ) {
+				this->bayAnimFrame = BAY_UP;
+				this->bayAnim = BAY_ANIM_STOP;
 			}
-		} else if( cent->bayAnim == BAY_ANIM_DOWN ) {
-			cent->bayAnimFrame = BAY_UP + timediff/25;
-			if( cent->bayAnimFrame > baydown ) {
-				cent->bayAnimFrame = baydown;
-				cent->bayAnim = BAY_ANIM_STOP;
+		} else if( this->bayAnim == BAY_ANIM_DOWN ) {
+			this->bayAnimFrame = BAY_UP + timediff/25;
+			if( this->bayAnimFrame > baydown ) {
+				this->bayAnimFrame = baydown;
+				this->bayAnim = BAY_ANIM_STOP;
 			}
 		}
-		drawInfo.bayFrame = cent->bayAnimFrame;
+		drawInfo.bayFrame = this->bayAnimFrame;
 	}
 
 	// speedbrakes
-	if( availableVehicles[cent->currentState.modelindex].caps & HC_SPEEDBRAKE ) {
+	if( availableVehicles[this->currentState.modelindex].caps & HC_SPEEDBRAKE ) {
 		if( ONOFF & OO_SPEEDBRAKE ) {
 			drawInfo.brakeFrame = 1;
 		}
@@ -105,62 +105,62 @@ static void CG_Misc_Plane( centity_t *cent )
 	} 
 
 	// body
-	if( cent->currentState.frame <= 10 ) {
+	if( this->currentState.frame <= 10 ) {
 		drawInfo.bodyFrame = 0;
 	} else {
-		drawInfo.bodyFrame = ( cent->currentState.frame > 12 ? 2 : 1 );
+		drawInfo.bodyFrame = ( this->currentState.frame > 12 ? 2 : 1 );
 	}
 
 	// swingwings
-	if( availableVehicles[cent->currentState.modelindex].caps & HC_SWINGWING ) {
-		drawInfo.swingAngle = cent->lerpAngles2[PITCH];
+	if( availableVehicles[this->currentState.modelindex].caps & HC_SWINGWING ) {
+		drawInfo.swingAngle = this->lerpAngles2[PITCH];
 	}
 
 	// loadout
-	CG_SetDrawLoadout( cent, &drawInfo.basicInfo );
+	this->setDrawLoadout( &drawInfo.basicInfo );
 
 	// smoke
-	if( cent->currentState.generic1 ) {
-		AngleVectors( cent->lerpAngles, forward, nullptr, nullptr );
-		VectorMA( cent->lerpOrigin, availableVehicles[cent->currentState.modelindex].mins[0], forward, smokePosition );
-		CG_Generic_Smoke( cent, smokePosition, 10 );
+	if( this->currentState.generic1 ) {
+		AngleVectors( this->lerpAngles, forward, nullptr, nullptr );
+		VectorMA( this->lerpOrigin, availableVehicles[this->currentState.modelindex].mins[0], forward, smokePosition );
+		this->generic_Smoke( smokePosition, 10 );
 	}
 
 	// muzzleflash
-	if( cg.time - cent->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {
+	if( cg.time - this->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {
 		drawInfo.basicInfo.drawMuzzleFlash = true;
-		drawInfo.basicInfo.flashWeaponIndex = cent->muzzleFlashWeapon;
+		drawInfo.basicInfo.flashWeaponIndex = this->muzzleFlashWeapon;
 	}
 	// muzzleflash
-	if( cg.time - cent->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {
+	if( cg.time - this->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {
 		drawInfo.basicInfo.drawMuzzleFlash = true;
-		drawInfo.basicInfo.flashWeaponIndex = cent->muzzleFlashWeapon;
+		drawInfo.basicInfo.flashWeaponIndex = this->muzzleFlashWeapon;
 	}
 
 	// draw plane
 	CG_DrawPlane(&drawInfo);
 	
 	// flags
-//	CG_PlaneFlags( cent );
+//	CG_PlaneFlags( this );
 
 	// smoke
-/*	if( cent->currentState.generic1 && cent->miscTime > cg.time ) {
+/*	if( this->currentState.generic1 && this->miscTime > cg.time ) {
 		LocalEntity	*smoke;
 		vec3_t			up = {0, 0, 1};
 		vec3_t			pos;
 		vec3_t			forward;
 
-		AngleVectors( cent->lerpAngles, forward, NULL, NULL );
-		VectorMA( cent->lerpOrigin, availableVehicles[cent->currentState.modelindex].mins[0], forward, pos );
+		AngleVectors( this->lerpAngles, forward, NULL, NULL );
+		VectorMA( this->lerpOrigin, availableVehicles[this->currentState.modelindex].mins[0], forward, pos );
 
 		smoke = CG_SmokePuff( pos, up, 
-					  cent->currentState.generic1, 
+					  this->currentState.generic1, 
 					  0.5, 0.5, 0.5, 0.66f,
-					  100*cent->currentState.generic1, 
+					  100*this->currentState.generic1, 
 					  cg.time, 0,
 					  LEF_PUFF_DONT_SCALE, 
 					  cgs.media.smokePuffShader );	
-		cent->miscTime = cg.time + 10;
+		this->miscTime = cg.time + 10;
 	}*/
 }
 
@@ -171,84 +171,84 @@ CG_Misc_GV
 ===============
 */
 
-static void CG_Misc_GV( centity_t *cent ) 
+void ClientEntity::misc_GV() 
 {
 	vec3_t			velocity;
 	DrawInfo_GV_t	drawInfo;
 
 	memset( &drawInfo, 0, sizeof(drawInfo) );
-	drawInfo.basicInfo.vehicleIndex = cent->currentState.modelindex;
-	drawInfo.basicInfo.ONOFF = cent->currentState.ONOFF;
+	drawInfo.basicInfo.vehicleIndex = this->currentState.modelindex;
+	drawInfo.basicInfo.ONOFF = this->currentState.ONOFF;
 
 	// get velocity
-	VectorCopy( cent->currentState.pos.trDelta, velocity );
+	VectorCopy( this->currentState.pos.trDelta, velocity );
 	drawInfo.basicInfo.speed = VectorLength( velocity );
 
 	// entitynum
-	drawInfo.basicInfo.entityNum = cent->currentState.number;
+	drawInfo.basicInfo.entityNum = this->currentState.number;
 
     // get the rotation information
-    CG_VehicleLerpAngles( cent );
-    AnglesToAxis( cent->lerpAngles, drawInfo.basicInfo.axis );
+    this->vehicleLerpAngles();
+    AnglesToAxis( this->lerpAngles, drawInfo.basicInfo.axis );
 
 	// position and orientation
-	VectorCopy( cent->lerpOrigin, drawInfo.basicInfo.origin );
-	VectorCopy( cent->lerpAngles, drawInfo.basicInfo.angles );
+	VectorCopy( this->lerpOrigin, drawInfo.basicInfo.origin );
+	VectorCopy( this->lerpAngles, drawInfo.basicInfo.angles );
 
 	// loadout
-	CG_SetDrawLoadout( cent, &drawInfo.basicInfo );
+	this->setDrawLoadout( &drawInfo.basicInfo );
 
 	// turret/gun angle
-	drawInfo.gunAngle = cent->lerpAngles2[PITCH];
-	drawInfo.turretAngle = cent->lerpAngles2[ROLL];
+	drawInfo.gunAngle = this->lerpAngles2[PITCH];
+	drawInfo.turretAngle = this->lerpAngles2[ROLL];
 
 	// wheels
-	if( (availableVehicles[cent->currentState.modelindex].caps & HC_WHEELS) ) {
-		int timediff = cg.time - cent->gearAnimStartTime;
+	if( (availableVehicles[this->currentState.modelindex].caps & HC_WHEELS) ) {
+		int timediff = cg.time - this->gearAnimStartTime;
 		float dist = drawInfo.basicInfo.speed * timediff / 1000;
 		vec3_t v1, v2;
 		float dot;
-		AngleVectors( cent->currentState.angles, v1, nullptr, nullptr );
-		VectorCopy( cent->currentState.pos.trDelta, v2 );
+		AngleVectors( this->currentState.angles, v1, nullptr, nullptr );
+		VectorCopy( this->currentState.pos.trDelta, v2 );
 		VectorNormalize( v2 );
 		dot = DotProduct( v1, v2 );
-		dist = ( (dist / availableVehicles[cent->currentState.modelindex].wheelCF)*360);
-		cent->gearAnim += (dot > 0 ? dist : -dist);
-		cent->gearAnim = AngleMod( cent->gearAnim );
-		cent->gearAnimStartTime = cg.time;
-		drawInfo.wheelAngle = static_cast<float>(cent->gearAnim);
+		dist = ( (dist / availableVehicles[this->currentState.modelindex].wheelCF)*360);
+		this->gearAnim += (dot > 0 ? dist : -dist);
+		this->gearAnim = AngleMod( this->gearAnim );
+		this->gearAnimStartTime = cg.time;
+		drawInfo.wheelAngle = static_cast<float>(this->gearAnim);
 	}
 
 	// muzzleflash
-	if( cg.time - cent->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {
+	if( cg.time - this->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {
 		drawInfo.basicInfo.drawMuzzleFlash = true;
-		drawInfo.basicInfo.flashWeaponIndex = cent->muzzleFlashWeapon;
+		drawInfo.basicInfo.flashWeaponIndex = this->muzzleFlashWeapon;
 	}
 
 
 	// smoke
-//	if( cent->currentState.generic1 ) {
-//		CG_Generic_Smoke( cent, cent->lerpOrigin, 100 );
+//	if( this->currentState.generic1 ) {
+//		this->generic_Smoke( this->lerpOrigin, 100 );
 //	}
 	
 	// draw plane
 	CG_DrawGV(&drawInfo);
 
 	// smoke 
-	if( cent->currentState.generic1 ) {
+	if( this->currentState.generic1 ) {
 		LocalEntity	*smoke;
 		vec3_t			up = {0, 0, 20};
 		vec3_t			pos;
 		vec3_t			forward;
 
-		AngleVectors( cent->lerpAngles, forward, nullptr, nullptr );
-		VectorCopy( cent->lerpOrigin, pos );
+		AngleVectors( this->lerpAngles, forward, nullptr, nullptr );
+		VectorCopy( this->lerpOrigin, pos );
 		pos[2] += 12;
 
 		smoke = CG_SmokePuff( pos, up, 
-					  cent->currentState.generic1, 
+					  this->currentState.generic1, 
 					  0.5, 0.5, 0.5, 0.66f,
-					  200*cent->currentState.generic1, 
+					  200*this->currentState.generic1, 
 					  cg.time, 0,
 					  LEF_PUFF_DONT_SCALE, 
 					  cgs.media.smokePuffShader );	
@@ -261,45 +261,45 @@ CG_Misc_Helo
 ===============
 */
 
-static void CG_Misc_Helo( centity_t *cent ) 
+void ClientEntity::misc_Helo() 
 {
 	vec3_t			velocity;
 	DrawInfo_Helo_t	drawInfo;
 	int i;
 
 	memset( &drawInfo, 0, sizeof(drawInfo) );
-	drawInfo.basicInfo.vehicleIndex = cent->currentState.modelindex;
-	drawInfo.basicInfo.ONOFF = cent->currentState.ONOFF;
+	drawInfo.basicInfo.vehicleIndex = this->currentState.modelindex;
+	drawInfo.basicInfo.ONOFF = this->currentState.ONOFF;
 
 	// get velocity
-	VectorCopy( cent->currentState.pos.trDelta, velocity );
+	VectorCopy( this->currentState.pos.trDelta, velocity );
 	drawInfo.basicInfo.speed = VectorLength( velocity );
 
 	// entitynum
-	drawInfo.basicInfo.entityNum = cent->currentState.number;
+	drawInfo.basicInfo.entityNum = this->currentState.number;
 
     // get the rotation information
-    CG_VehicleLerpAngles( cent );
-    AnglesToAxis( cent->lerpAngles, drawInfo.basicInfo.axis );
+    this->vehicleLerpAngles();
+    AnglesToAxis( this->lerpAngles, drawInfo.basicInfo.axis );
 
 	// position and orientation
-	VectorCopy( cent->lerpOrigin, drawInfo.basicInfo.origin );
-	VectorCopy( cent->lerpAngles, drawInfo.basicInfo.angles );
+	VectorCopy( this->lerpOrigin, drawInfo.basicInfo.origin );
+	VectorCopy( this->lerpAngles, drawInfo.basicInfo.angles );
    
 	// loadout
-	CG_SetDrawLoadout( cent, &drawInfo.basicInfo );
+	this->setDrawLoadout( &drawInfo.basicInfo );
 
 	// turret/gun angle
 	for(i = 0; i < 4; i++)
 	{
-		drawInfo.gunAngle[i] = cent->lerpAngles2[PITCH];
-		drawInfo.turretAngle[i] = cent->lerpAngles2[ROLL];
+		drawInfo.gunAngle[i] = this->lerpAngles2[PITCH];
+		drawInfo.turretAngle[i] = this->lerpAngles2[ROLL];
 	}
 
 	// muzzleflash
-	if( cg.time - cent->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {
+	if( cg.time - this->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {
 		drawInfo.basicInfo.drawMuzzleFlash = true;
-		drawInfo.basicInfo.flashWeaponIndex = cent->muzzleFlashWeapon;
+		drawInfo.basicInfo.flashWeaponIndex = this->muzzleFlashWeapon;
 	}
 
 	
@@ -307,20 +307,20 @@ static void CG_Misc_Helo( centity_t *cent )
 	CG_DrawHelo(&drawInfo);
 
 	// smoke 
-	if( cent->currentState.generic1 ) {
+	if( this->currentState.generic1 ) {
 		LocalEntity	*smoke;
 		vec3_t			up = {0, 0, 20};
 		vec3_t			pos;
 		vec3_t			forward;
 
-		AngleVectors( cent->lerpAngles, forward, nullptr, nullptr );
-		VectorCopy( cent->lerpOrigin, pos );
+		AngleVectors( this->lerpAngles, forward, nullptr, nullptr );
+		VectorCopy( this->lerpOrigin, pos );
 		pos[2] += 12;
 
 		smoke = CG_SmokePuff( pos, up, 
-					  cent->currentState.generic1, 
+					  this->currentState.generic1, 
 					  0.5, 0.5, 0.5, 0.66f,
-					  200*cent->currentState.generic1, 
+					  200*this->currentState.generic1, 
 					  cg.time, 0,
 					  LEF_PUFF_DONT_SCALE, 
 					  cgs.media.smokePuffShader );	
@@ -333,7 +333,7 @@ CG_Misc_LQM
 ===============
 */
 
-static void CG_Misc_LQM( centity_t *cent ) 
+void ClientEntity::misc_LQM() 
 {
 
 }
@@ -344,65 +344,65 @@ CG_Misc_Boat
 ===============
 */
 
-static void CG_Misc_Boat( centity_t *cent ) 
+void ClientEntity::misc_Boat() 
 {
 	vec3_t			velocity;
 	DrawInfo_Boat_t	drawInfo;
 	int i;
 
 	memset( &drawInfo, 0, sizeof(drawInfo) );
-	drawInfo.basicInfo.vehicleIndex = cent->currentState.modelindex;
-	drawInfo.basicInfo.ONOFF = cent->currentState.ONOFF;
+	drawInfo.basicInfo.vehicleIndex = this->currentState.modelindex;
+	drawInfo.basicInfo.ONOFF = this->currentState.ONOFF;
 
 	// get velocity
-	VectorCopy( cent->currentState.pos.trDelta, velocity );
+	VectorCopy( this->currentState.pos.trDelta, velocity );
 	drawInfo.basicInfo.speed = VectorLength( velocity );
 
 	// entitynum
-	drawInfo.basicInfo.entityNum = cent->currentState.number;
+	drawInfo.basicInfo.entityNum = this->currentState.number;
 
     // get the rotation information
-    CG_VehicleLerpAngles( cent );
-    AnglesToAxis( cent->lerpAngles, drawInfo.basicInfo.axis );
+    this->vehicleLerpAngles();
+    AnglesToAxis( this->lerpAngles, drawInfo.basicInfo.axis );
 
 	// position and orientation
-	VectorCopy( cent->lerpOrigin, drawInfo.basicInfo.origin );
-	VectorCopy( cent->lerpAngles, drawInfo.basicInfo.angles );
+	VectorCopy( this->lerpOrigin, drawInfo.basicInfo.origin );
+	VectorCopy( this->lerpAngles, drawInfo.basicInfo.angles );
    
 	// loadout
-	CG_SetDrawLoadout( cent, &drawInfo.basicInfo );
+	this->setDrawLoadout( &drawInfo.basicInfo );
 
 	// turret/gun angle
 	for(i = 0; i < 4; i++)
 	{
-		drawInfo.gunAngle[i] = cent->lerpAngles2[PITCH];
-		drawInfo.turretAngle[i] = cent->lerpAngles2[ROLL];
+		drawInfo.gunAngle[i] = this->lerpAngles2[PITCH];
+		drawInfo.turretAngle[i] = this->lerpAngles2[ROLL];
 	}
 
 	// muzzleflash
-	if( cg.time - cent->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {
+	if( cg.time - this->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {
 		drawInfo.basicInfo.drawMuzzleFlash = true;
-		drawInfo.basicInfo.flashWeaponIndex = cent->muzzleFlashWeapon;
+		drawInfo.basicInfo.flashWeaponIndex = this->muzzleFlashWeapon;
 	}
 
 	// draw boat
 	CG_DrawBoat(&drawInfo);
 
 	// smoke 
-	if( cent->currentState.generic1 ) {
+	if( this->currentState.generic1 ) {
 		LocalEntity	*smoke;
 		vec3_t			up = {0, 0, 20};
 		vec3_t			pos;
 		vec3_t			forward;
 
-		AngleVectors( cent->lerpAngles, forward, nullptr, nullptr );
-		VectorCopy( cent->lerpOrigin, pos );
+		AngleVectors( this->lerpAngles, forward, nullptr, nullptr );
+		VectorCopy( this->lerpOrigin, pos );
 		pos[2] += 12;
 
 		smoke = CG_SmokePuff( pos, up, 
-					  cent->currentState.generic1, 
+					  this->currentState.generic1, 
 					  0.5, 0.5, 0.5, 0.66f,
-					  200*cent->currentState.generic1, 
+					  200*this->currentState.generic1, 
 					  cg.time, 0,
 					  LEF_PUFF_DONT_SCALE, 
 					  cgs.media.smokePuffShader );	
@@ -417,28 +417,28 @@ CG_Misc_GI
 ===============
 */
 
-static void CG_Misc_GI( centity_t *cent ) 
+void ClientEntity::misc_GI() 
 {
 	DrawInfo_GI_t	drawInfo;
 
 	memset( &drawInfo, 0, sizeof(drawInfo) );
-	drawInfo.basicInfo.vehicleIndex = cent->currentState.modelindex2;
-	drawInfo.basicInfo.ONOFF = cent->currentState.ONOFF;
+	drawInfo.basicInfo.vehicleIndex = this->currentState.modelindex2;
+	drawInfo.basicInfo.ONOFF = this->currentState.ONOFF;
 
 	// entitynum
-	drawInfo.basicInfo.entityNum = cent->currentState.number;
+	drawInfo.basicInfo.entityNum = this->currentState.number;
 
     // get the rotation information
-    CG_VehicleLerpAngles( cent );
-    AnglesToAxis( cent->lerpAngles, drawInfo.basicInfo.axis );
+    this->vehicleLerpAngles();
+    AnglesToAxis( this->lerpAngles, drawInfo.basicInfo.axis );
 
 	// position and orientation
-	VectorCopy( cent->lerpOrigin, drawInfo.basicInfo.origin );
-	VectorCopy( cent->lerpAngles, drawInfo.basicInfo.angles );
+	VectorCopy( this->lerpOrigin, drawInfo.basicInfo.origin );
+	VectorCopy( this->lerpAngles, drawInfo.basicInfo.angles );
 
 	// turret/gun angle
-	drawInfo.gunAngle = cent->lerpAngles2[PITCH];
-	drawInfo.turretAngle = cent->lerpAngles2[ROLL];
+	drawInfo.gunAngle = this->lerpAngles2[PITCH];
+	drawInfo.turretAngle = this->lerpAngles2[ROLL];
 
 	// upgrades
 	drawInfo.upgrades = availableGroundInstallations[drawInfo.basicInfo.vehicleIndex].upgrades;
@@ -447,20 +447,20 @@ static void CG_Misc_GI( centity_t *cent )
 	CG_DrawGI(&drawInfo);
 
 	// smoke 
-	if( cent->currentState.generic1 ) {
+	if( this->currentState.generic1 ) {
 		LocalEntity	*smoke;
 		vec3_t			up = {0, 0, 20};
 		vec3_t			pos;
 		vec3_t			forward;
 
-		AngleVectors( cent->lerpAngles, forward, nullptr, nullptr );
-		VectorCopy( cent->lerpOrigin, pos );
+		AngleVectors( this->lerpAngles, forward, nullptr, nullptr );
+		VectorCopy( this->lerpOrigin, pos );
 		pos[2] += 12;
 
 		smoke = CG_SmokePuff( pos, up, 
-					  cent->currentState.generic1, 
+					  this->currentState.generic1, 
 					  0.5, 0.5, 0.5, 0.66f,
-					  200*cent->currentState.generic1, 
+					  200*this->currentState.generic1, 
 					  cg.time, 0,
 					  LEF_PUFF_DONT_SCALE, 
 					  cgs.media.smokePuffShader );	
@@ -472,45 +472,45 @@ static void CG_Misc_GI( centity_t *cent )
 
 
 
-void CG_Misc_Vehicle( centity_t *cent ) 
+void ClientEntity::misc_Vehicle() 
 {
 	// check for ground installation
-	if( cent->currentState.modelindex == 255 &&
-		cent->currentState.modelindex2 >= 0 &&
-		cent->currentState.modelindex2 < bg_numberOfGroundInstallations )
+	if( this->currentState.modelindex == 255 &&
+		this->currentState.modelindex2 >= 0 &&
+		this->currentState.modelindex2 < bg_numberOfGroundInstallations )
 	{
 		if( cg.radarTargets < MAX_RADAR_TARGETS && (cg.predictedPlayerEntity.currentState.ONOFF & OO_RADAR_GROUND)) {
-			cg.radarEnts[cg.radarTargets++] = cent;
+			cg.radarEnts[cg.radarTargets++] = this;
 		}
-		CG_Misc_GI( cent );
+		this->misc_GI();
 	}
 	// otherwise normal vehicle
-	else if( availableVehicles[cent->currentState.modelindex].cat & CAT_PLANE ) {
+	else if( availableVehicles[this->currentState.modelindex].cat & CAT_PLANE ) {
 		if( cg.radarTargets < MAX_RADAR_TARGETS && (cg.predictedPlayerEntity.currentState.ONOFF & OO_RADAR_AIR)) {
-			cg.radarEnts[cg.radarTargets++] = cent;
+			cg.radarEnts[cg.radarTargets++] = this;
 		}
-		CG_Misc_Plane( cent );
+		this->misc_Plane();
 	}
-	else if( availableVehicles[cent->currentState.modelindex].cat & CAT_GROUND ) {
+	else if( availableVehicles[this->currentState.modelindex].cat & CAT_GROUND ) {
 		if( cg.radarTargets < MAX_RADAR_TARGETS && (cg.predictedPlayerEntity.currentState.ONOFF & OO_RADAR_GROUND)) {
-			cg.radarEnts[cg.radarTargets++] = cent;
+			cg.radarEnts[cg.radarTargets++] = this;
 		}
-		CG_Misc_GV( cent );
+		this->misc_GV();
 	}
-	else if( availableVehicles[cent->currentState.modelindex].cat & CAT_HELO ) {
+	else if( availableVehicles[this->currentState.modelindex].cat & CAT_HELO ) {
 		if( cg.radarTargets < MAX_RADAR_TARGETS && (cg.predictedPlayerEntity.currentState.ONOFF & OO_RADAR_AIR)) {
-			cg.radarEnts[cg.radarTargets++] = cent;
+			cg.radarEnts[cg.radarTargets++] = this;
 		}
-		CG_Misc_Helo( cent );
+		this->misc_Helo();
 	}
-	else if( availableVehicles[cent->currentState.modelindex].cat & CAT_LQM ) {
-		CG_Misc_LQM( cent );
+	else if( availableVehicles[this->currentState.modelindex].cat & CAT_LQM ) {
+		this->misc_LQM();
 	}
-	else if( availableVehicles[cent->currentState.modelindex].cat & CAT_BOAT ) {
+	else if( availableVehicles[this->currentState.modelindex].cat & CAT_BOAT ) {
 		if( cg.radarTargets < MAX_RADAR_TARGETS && (cg.predictedPlayerEntity.currentState.ONOFF & OO_RADAR_GROUND)) {
-			cg.radarEnts[cg.radarTargets++] = cent;
+			cg.radarEnts[cg.radarTargets++] = this;
 		}
-		CG_Misc_Boat( cent );
+		this->misc_Boat();
 	}
 	else {
 		Com_Error( ERR_DROP, "Error: CG_Misc_Vehicle got wrong CAT!\n" );

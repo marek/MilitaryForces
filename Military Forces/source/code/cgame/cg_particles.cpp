@@ -117,25 +117,25 @@ void CG_AttractParticles(particle_t * a, particle_t * b)
 	VectorAdd(vtemp,a->trAttraction,a->trAttraction);
 }
 
-void CG_RemoveParticleSystemFromLocalEntity(centity_t * b)
+void ClientEntity::removeParticleSystemFromLocalEntity()
 {
 
 }
 
-void CG_RemoveParticleSystemFromCEntity(centity_t * b)
+void ClientEntity::removeParticleSystemFromCEntity()
 {
 
 }
 
 //attract particle a to entity b
-void CG_AttractParticleToEntity(particle_t * a, centity_t * b)
+void ClientEntity::attractParticleToEntity( particle_t * a )
 {
 	vec3_t vtemp;
 	float distance;
 	float ftemp;
 	float dtime = (cg.time - a->lastthink)*0.001;
 	
-	VectorSubtract(b->currentState.pos.trBase, a->trBase, vtemp);
+	VectorSubtract(this->currentState.pos.trBase, a->trBase, vtemp);
 	distance = VectorNormalize(vtemp);
 	if(distance <= 0)
 		return;
@@ -153,9 +153,9 @@ void CG_AttractParticleToEntity(particle_t * a, centity_t * b)
 	// If close enough, inherhit speed
 	if(distance <= 100 && distance > 0)
 	{
-		VectorCopy(b->currentState.pos.trBase, vtemp);
+		VectorCopy(this->currentState.pos.trBase, vtemp);
 		VectorNormalize(vtemp);
-		VectorScale(vtemp, dtime*VectorLength(b->currentState.pos.trBase)*(1/distance),vtemp);
+		VectorScale(vtemp, dtime*VectorLength(this->currentState.pos.trBase)*(1/distance),vtemp);
 		VectorAdd(vtemp, a->trDelta, a->trDelta);
 	}
 }
@@ -303,12 +303,12 @@ void CG_ParticleThink(particleWorld_t * w, particle_t * p)
 	}
 	if(p->attractionEntity != 0)
 	{
-		CG_AttractParticleToEntity(p, &cg_entities[0]);
+		cg_entities[0].attractParticleToEntity( p );
 		/*
 		for(int i = 0; i < MAX_GENTITIES; i++)
 		{
 			if(cg_entities[i].currentValid)
-				CG_AttractParticleToEntity(p, &cg_entities[i]);
+				cg_entities[i].attractParticleToEntity( p );
 		}*/
 	}
 

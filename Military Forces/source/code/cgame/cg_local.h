@@ -174,11 +174,74 @@ struct playerEntity_t {
 
 
 
-// centity_t have a direct corespondence with gentity_t in the game, but
+// ClientEntity have a direct corespondence with gentity_t in the game, but
 // only the entityState_t is directly communicated to the cgame
 inline constexpr int ANGLE_ERROR_DECAY = 150;
 
-struct centity_s {
+struct clientInfo_t;
+class LocalEntity;
+struct particle_s;
+using particle_t = particle_s;
+struct BasicDrawInfo_t;
+
+class ClientEntity
+{
+public:
+	void boat( clientInfo_t *ci );
+	void draw_MFD( int mfdnum, int vehicle, int targetrange, int targetheading, int altitude, playerState_t *ps, int stallcolor );
+	LocalEntity * generic_Smoke( vec3_t smokePosition, int density );
+	void nukeEffect( entityState_t * es );
+	void flakEffect( entityState_t * es );
+	void setEntitySoundPosition();
+	void entityEffects();
+	void general();
+	void speaker();
+	void item();
+	void missile();
+	void bullet_Tracer();
+	void mover();
+	void explosive();
+	void beam();
+	void portal();
+	float entityAngleErrorFraction() const;
+	void interpolateEntityPosition();
+	void vehicleLerpAngles();
+	void calcEntityLerpPositions();
+	void emptyVehicleIcon();
+	void addCEntity();
+	void painEvent( int health );
+	void entityEvent( vec3_t position );
+	void checkEvents();
+	void groundVehicleFlags();
+	void groundVehicle( clientInfo_t *ci );
+	void heloPilot( const refEntity_t *parent, qhandle_t parentModel, int idx );
+	void heloFlags();
+	void helo( clientInfo_t *ci );
+	void lQMFlags();
+	void lQM( clientInfo_t *ci );
+	void misc_Plane();
+	void misc_GV();
+	void misc_Helo();
+	void misc_LQM();
+	void misc_Boat();
+	void misc_GI();
+	void misc_Vehicle();
+	void removeParticleSystemFromLocalEntity();
+	void removeParticleSystemFromCEntity();
+	void attractParticleToEntity( particle_t * a );
+	void planeFlags();
+	void plane( clientInfo_t *ci );
+	void trailItem( qhandle_t hModel );
+	void touchItem();
+	void resetEntity();
+	void transitionEntity();
+	int loadoutVehicle();
+	completeLoadout_t* entityLoadout();
+	void setDrawLoadout( BasicDrawInfo_t* info );
+	void vehicle();
+	void fireMachinegun( bool main );
+	void fireWeapon();
+
 	entityState_t	currentState;	// from cg.frame
 	entityState_t	nextState;		// from cg.nextFrame, if available
 	bool		interpolate;	// true if next is valid to interpolate to
@@ -227,7 +290,6 @@ struct centity_s {
 
 	int				muzzleFlashWeapon;
 };
-using centity_t = centity_s;
 
 
 //======================================================================
@@ -403,7 +465,7 @@ struct weaponInfo_s {
 
 	qhandle_t		missileModel;
 	sfxHandle_t		missileSound;
-	void			(*missileTrailFunc)( centity_t *, const struct weaponInfo_s *wi );
+	void			(*missileTrailFunc)( ClientEntity *, const struct weaponInfo_s *wi );
 	float			missileDlight;
 	vec3_t			missileDlightColor;
 	int				missileRenderfx;
@@ -440,7 +502,7 @@ struct reticle_t {
 	int w;	// width & height
 	int h;
 	qhandle_t shader;		// shader index (gfx)
-	centity_t * pTarget;	// target entity pointer (can be NULL)
+	ClientEntity * pTarget;	// target entity pointer (can be NULL)
 };
 
 inline constexpr int MAX_REWARDSTACK = 10;
@@ -493,7 +555,7 @@ struct cg_t {
 	// prediction state
 	bool	hyperspace;				// true if prediction has hit a trigger_teleport
 	playerState_t	predictedPlayerState;
-	centity_t		predictedPlayerEntity;
+	ClientEntity		predictedPlayerEntity;
 	bool	validPPS;				// clear until the first call to CG_PredictPlayerState
 	int			predictedErrorTime;
 	vec3_t		predictedError;
@@ -626,7 +688,7 @@ struct cg_t {
 	int				MFDTime;
 	int				Mode_MFD[NUM_MFDS_IN_COCKPIT];
 	int				toggleViewTime;
-	centity_t		*radarEnts[MAX_RADAR_TARGETS];
+	ClientEntity		*radarEnts[MAX_RADAR_TARGETS];
 	unsigned int	radarTargets;
 	int				tracernum;
 	int				HUDColor;
@@ -1118,7 +1180,7 @@ struct cgs_t {
 
 extern	cgs_t			cgs;
 extern	cg_t			cg;
-extern	centity_t		cg_entities[MAX_GENTITIES];
+extern	ClientEntity		cg_entities[MAX_GENTITIES];
 extern	weaponInfo_t	cg_weapons[WI_MAX];
 extern	itemInfo_t		cg_items[MAX_ITEMS];
 extern	markPoly_t		cg_markPolys[MAX_MARK_POLYS];
@@ -1342,10 +1404,9 @@ void CG_DrawTopBottom(float x, float y, float w, float h, float size);
 bool CG_GenericShadow( BasicDrawInfo_t *drawInfo, float *shadowPlane );
 
 void CG_ResetReticles( );
-void CG_AddReticleEntityToScene( refEntity_t * pReticle, centity_t * pTarget );
+void CG_AddReticleEntityToScene( refEntity_t * pReticle, ClientEntity * pTarget );
 void CG_Draw_Reticles();
 //void CG_Draw_HUD_Label( int x, int y, char * pText, float alpha );
-LocalEntity * CG_Generic_Smoke( centity_t * cent, vec3_t smokePosition, int density );
 
 //
 // cg_draw.c, cg_newDraw.c
@@ -1398,19 +1459,15 @@ bool CG_NewHUDActive( );
 //
 void CG_NewClientInfo( int clientNum );
 sfxHandle_t	CG_CustomSound( int clientNum, const char *soundName );
-void CG_TrailItem( centity_t *cent, qhandle_t hModel );	// ditto
+void CG_TrailItem( ClientEntity *cent, qhandle_t hModel );	// ditto
 
 //
 // cg_vehicle.c
 //
 void CG_CacheVehicles();
-void CG_Vehicle( centity_t *cent );
 void CG_RegisterVehicle( clientInfo_t *ci );
 void CG_VehicleObituary( entityState_t *ent );
 void CG_VehicleMuzzleFlash( int weaponIdx, const refEntity_t *parent, qhandle_t parentModel, int idx );
-void CG_Misc_Vehicle( centity_t *cent );
-completeLoadout_t* CG_EntityLoadout( centity_t* cent );
-void CG_SetDrawLoadout( centity_t* cent, BasicDrawInfo_t* info );
 void CG_InitShadows( );
 qhandle_t CG_TeamSkin( qhandle_t model, int team );
 
@@ -1428,14 +1485,12 @@ void CG_DrawGI(DrawInfo_GI_t* drawInfo);
 //
 // cg_plane.c
 //
-void CG_Plane( centity_t *cent, clientInfo_t *ci );
 void CG_RegisterPlane( clientInfo_t *ci );
 void CG_PlaneObituary( entityState_t *ent, clientInfo_t *ci );
 
 //
 // cg_groundvehicle.c
 //
-void CG_GroundVehicle( centity_t *cent, clientInfo_t *ci );
 void CG_RegisterGroundVehicle( clientInfo_t *ci );
 void CG_GroundVehicleObituary( entityState_t *ent, clientInfo_t *ci );
 
@@ -1443,7 +1498,6 @@ void CG_GroundVehicleObituary( entityState_t *ent, clientInfo_t *ci );
 //
 // cg_helo.c
 //
-void CG_Helo( centity_t *cent, clientInfo_t *ci );
 void CG_RegisterHelo( clientInfo_t *ci );
 void CG_HeloObituary( entityState_t *ent, clientInfo_t *ci );
 
@@ -1451,7 +1505,6 @@ void CG_HeloObituary( entityState_t *ent, clientInfo_t *ci );
 //
 // cg_lqm.c
 //
-void CG_LQM( centity_t *cent, clientInfo_t *ci );
 void CG_RegisterLQM( clientInfo_t *ci );
 void CG_LQMObituary( entityState_t *ent, clientInfo_t *ci );
 
@@ -1459,7 +1512,6 @@ void CG_LQMObituary( entityState_t *ent, clientInfo_t *ci );
 //
 // cg_boat.c
 //
-void CG_Boat( centity_t *cent, clientInfo_t *ci );
 void CG_RegisterBoat( clientInfo_t *ci );
 void CG_BoatObituary( entityState_t *ent, clientInfo_t *ci );
 
@@ -1477,20 +1529,13 @@ void CG_PredictPlayerState( );
 //
 // cg_events.c
 //
-void CG_CheckEvents( centity_t *cent );
 const char	*CG_PlaceString( int rank );
-void CG_EntityEvent( centity_t *cent, vec3_t position );
-void CG_PainEvent( centity_t *cent, int health );
 
 
 //
 // cg_ents.c
 //
-void CG_SetEntitySoundPosition( centity_t *cent );
 void CG_AddPacketEntities( );
-float CG_EntityAngleErrorFraction( const centity_t *cent );
-void CG_VehicleLerpAngles( centity_t *cent );
-void CG_Beam( centity_t *cent );
 void CG_AdjustPositionForMover( const vec3_t in, int moverNum, int fromTime, int toTime, vec3_t out );
 
 void CG_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent, 
@@ -1510,8 +1555,6 @@ void CG_Weapon_f( );
 void CG_RegisterWeapons();
 void CG_RegisterItemVisuals( int itemNum );
 
-void CG_FireWeapon( centity_t *cent );
-void CG_FireMachinegun( centity_t *cent, bool main );
 void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType );
 void CG_GenericExplosion( vec3_t origin, int type );
 void CG_VehicleHit( vec3_t origin, int damage );
@@ -1558,8 +1601,6 @@ LocalEntity *CG_MakeExplosion( vec3_t origin, vec3_t dir,
 								qhandle_t hModel, qhandle_t shader, int offset, int duration,
 								bool isSprite );
 
-void CG_NukeEffect(  centity_t * cent, entityState_t * es );
-void CG_FlakEffect(  centity_t * cent, entityState_t * es );
 void CG_GibPlayer( vec3_t playerOrigin );
 
 //
@@ -1698,7 +1739,7 @@ inline constexpr int MAX_PARTICLE_SHADERS = 100;
 // Particle systems are nothing more than a collection of emitters
 struct particleSystem_s
 {
-	centity_t	* cent;
+	ClientEntity	* cent;
 
 	vec3_t		pos;		// position of system  if cent != null
 	// age properties

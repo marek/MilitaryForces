@@ -49,7 +49,7 @@ void CG_RegisterHelo( clientInfo_t *ci )
 CG_PlanePilot
 =============
 */
-void CG_HeloPilot( centity_t *cent, const refEntity_t *parent, qhandle_t parentModel, int idx ) {
+void ClientEntity::heloPilot( const refEntity_t *parent, qhandle_t parentModel, int idx ) {
 /*
 	refEntity_t		pilot[MAX_PILOTS*3];	// three parts per pilot
 	unsigned int	i,j,k;
@@ -81,27 +81,27 @@ void CG_HeloPilot( centity_t *cent, const refEntity_t *parent, qhandle_t parentM
 CG_PlaneFlags
 ===============
 */
-static void CG_HeloFlags( centity_t *cent ) {
+void ClientEntity::heloFlags() {
 	/*int		powerups;
 	clientInfo_t	*ci;
 
-	powerups = cent->currentState.objectives;
+	powerups = this->currentState.objectives;
 	if ( !powerups ) {
 		return;
 	}
 
-	ci = &cgs.clientinfo[ cent->currentState.clientNum ];
+	ci = &cgs.clientinfo[ this->currentState.clientNum ];
 
 	// redflag
 	if ( powerups & OB_REDFLAG ) {
-		CG_TrailItem( cent, cgs.media.redFlagModel );
-//		refExport.AddLightToScene( cent->lerpOrigin, 200 + (rand()&31), 1.0, 0.2f, 0.2f );
+		this->trailItem( cgs.media.redFlagModel );
+//		refExport.AddLightToScene( this->lerpOrigin, 200 + (rand()&31), 1.0, 0.2f, 0.2f );
 	}
 
 	// blueflag
 	if ( powerups & OB_BLUEFLAG ) {
-		CG_TrailItem( cent, cgs.media.blueFlagModel );
-//		refExport.AddLightToScene( cent->lerpOrigin, 200 + (rand()&31), 0.2f, 0.2f, 1.0 );
+		this->trailItem( cgs.media.blueFlagModel );
+//		refExport.AddLightToScene( this->lerpOrigin, 200 + (rand()&31), 0.2f, 0.2f, 1.0 );
 	}*/
 }
 
@@ -111,12 +111,12 @@ static void CG_HeloFlags( centity_t *cent ) {
 CG_Plane
 ===============
 */
-void CG_Helo( centity_t *cent, clientInfo_t *ci ) 
+void ClientEntity::helo( clientInfo_t *ci ) 
 {
 	vec3_t			velocity;	
 	vec3_t			smokePosition, forward;//, right, up, temp, start;
 	DrawInfo_Helo_t drawInfo;
-	int				ONOFF = cent->currentState.ONOFF;
+	int				ONOFF = this->currentState.ONOFF;
 	int				i;
 
 	memset( &drawInfo, 0, sizeof(drawInfo) );
@@ -125,70 +125,70 @@ void CG_Helo( centity_t *cent, clientInfo_t *ci )
 	drawInfo.basicInfo.ONOFF = ONOFF;
 		
 	// get speed
-	VectorCopy( cent->currentState.pos.trDelta, velocity );
+	VectorCopy( this->currentState.pos.trDelta, velocity );
 	drawInfo.basicInfo.speed = VectorLength( velocity );
 	
 	// entitynum
-	drawInfo.basicInfo.entityNum = cent->currentState.number;
+	drawInfo.basicInfo.entityNum = this->currentState.number;
 
     // get the rotation information
-    CG_VehicleLerpAngles( cent );
-    AnglesToAxis( cent->lerpAngles, drawInfo.basicInfo.axis );
+    this->vehicleLerpAngles();
+    AnglesToAxis( this->lerpAngles, drawInfo.basicInfo.axis );
 
 	// position and orientation
-	VectorCopy( cent->lerpOrigin, drawInfo.basicInfo.origin );
-	VectorCopy( cent->lerpAngles, drawInfo.basicInfo.angles );
+	VectorCopy( this->lerpOrigin, drawInfo.basicInfo.origin );
+	VectorCopy( this->lerpAngles, drawInfo.basicInfo.angles );
 
 	// throttle
-	drawInfo.basicInfo.throttle = cent->currentState.frame;
+	drawInfo.basicInfo.throttle = this->currentState.frame;
 
 	// loadout
-	CG_SetDrawLoadout( cent, &drawInfo.basicInfo );
+	this->setDrawLoadout( &drawInfo.basicInfo );
 
 	// gear
 	if( availableVehicles[ci->vehicle].caps & HC_GEAR ) {
-		int timediff = cg.time - cent->gearAnimStartTime;
+		int timediff = cg.time - this->gearAnimStartTime;
 		int geardown = availableVehicles[ci->vehicle].maxGearFrame;
-		if( cent->gearAnim == GEAR_ANIM_UP ) {
-			cent->gearAnimFrame = geardown - timediff/25;
-			if( cent->gearAnimFrame < GEAR_UP ) {
-				cent->gearAnimFrame = GEAR_UP;
-				cent->gearAnim = GEAR_ANIM_STOP;
+		if( this->gearAnim == GEAR_ANIM_UP ) {
+			this->gearAnimFrame = geardown - timediff/25;
+			if( this->gearAnimFrame < GEAR_UP ) {
+				this->gearAnimFrame = GEAR_UP;
+				this->gearAnim = GEAR_ANIM_STOP;
 			}
-		} else if( cent->gearAnim == GEAR_ANIM_DOWN ) {
-			cent->gearAnimFrame = GEAR_UP + timediff/25;
-			if( cent->gearAnimFrame > geardown ) {
-				cent->gearAnimFrame = geardown;
-				cent->gearAnim = GEAR_ANIM_STOP;
+		} else if( this->gearAnim == GEAR_ANIM_DOWN ) {
+			this->gearAnimFrame = GEAR_UP + timediff/25;
+			if( this->gearAnimFrame > geardown ) {
+				this->gearAnimFrame = geardown;
+				this->gearAnim = GEAR_ANIM_STOP;
 			}
 		}
-		drawInfo.gearFrame = cent->gearAnimFrame;
+		drawInfo.gearFrame = this->gearAnimFrame;
 	}
 
 	// bay
 	if( availableVehicles[ci->vehicle].caps & HC_WEAPONBAY ) {
-		int timediff = cg.time - cent->bayAnimStartTime;
+		int timediff = cg.time - this->bayAnimStartTime;
 		int baydown = availableVehicles[ci->vehicle].maxBayFrame;
-		if( cent->bayAnim == BAY_ANIM_UP ) {
-			cent->bayAnimFrame = baydown - timediff/25;
-			if( cent->bayAnimFrame < BAY_UP ) {
-				cent->bayAnimFrame = BAY_UP;
-				cent->bayAnim = BAY_ANIM_STOP;
+		if( this->bayAnim == BAY_ANIM_UP ) {
+			this->bayAnimFrame = baydown - timediff/25;
+			if( this->bayAnimFrame < BAY_UP ) {
+				this->bayAnimFrame = BAY_UP;
+				this->bayAnim = BAY_ANIM_STOP;
 			}
-		} else if( cent->bayAnim == BAY_ANIM_DOWN ) {
-			cent->bayAnimFrame = BAY_UP + timediff/25;
-			if( cent->bayAnimFrame > baydown ) {
-				cent->bayAnimFrame = baydown;
-				cent->bayAnim = BAY_ANIM_STOP;
+		} else if( this->bayAnim == BAY_ANIM_DOWN ) {
+			this->bayAnimFrame = BAY_UP + timediff/25;
+			if( this->bayAnimFrame > baydown ) {
+				this->bayAnimFrame = baydown;
+				this->bayAnim = BAY_ANIM_STOP;
 			}
 		}
-		drawInfo.bayFrame = cent->bayAnimFrame;
+		drawInfo.bayFrame = this->bayAnimFrame;
 	}
 
     // turrets
 	for( i = 0; i < 4; ++i ) {
-		float yaw = cent->lerpAngles2[ROLL];
-		float pitch = cent->lerpAngles2[PITCH];
+		float yaw = this->lerpAngles2[ROLL];
+		float pitch = this->lerpAngles2[PITCH];
 		float max, min;
 		if( yaw > 180 ) yaw -= 360;
 		max = availableWeapons[availableVehicles[ci->vehicle].weapons[i+1]].maxturns[1];
@@ -211,16 +211,16 @@ void CG_Helo( centity_t *cent, clientInfo_t *ci )
 
 
 	// smoke
-	if( cent->currentState.generic1 ) {
-		AngleVectors( cent->lerpAngles, forward, nullptr, nullptr );
-		VectorMA( cent->lerpOrigin, availableVehicles[ci->vehicle].mins[0], forward, smokePosition );
-		CG_Generic_Smoke( cent, smokePosition, 10 );
+	if( this->currentState.generic1 ) {
+		AngleVectors( this->lerpAngles, forward, nullptr, nullptr );
+		VectorMA( this->lerpOrigin, availableVehicles[ci->vehicle].mins[0], forward, smokePosition );
+		this->generic_Smoke( smokePosition, 10 );
 	}
 
 	// muzzleflash
-	if( cg.time - cent->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {
+	if( cg.time - this->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {
 		drawInfo.basicInfo.drawMuzzleFlash = true;
-		drawInfo.basicInfo.flashWeaponIndex = cent->muzzleFlashWeapon;
+		drawInfo.basicInfo.flashWeaponIndex = this->muzzleFlashWeapon;
 	}
 
 	
@@ -228,10 +228,10 @@ void CG_Helo( centity_t *cent, clientInfo_t *ci )
 	CG_DrawHelo(&drawInfo);
 
 	// flags
-	CG_HeloFlags( cent );
+	this->heloFlags();
 
 	// reticles
-	if( cent == &cg.predictedPlayerEntity )
+	if( this == &cg.predictedPlayerEntity )
 	{
 		refEntity_t	reticle;
 		vec3_t	forward, right, up, ang, start, end, temp;
@@ -249,30 +249,30 @@ void CG_Helo( centity_t *cent, clientInfo_t *ci )
 		{
 			refEntity_t reticlelock;
 			bool building = false;
-			centity_t* target = &cg_entities[cent->currentState.tracktarget];
+			ClientEntity* target = &cg_entities[this->currentState.tracktarget];
 			
 			if( target->currentState.eType == ET_EXPLOSIVE )
 			{
 				building = true;
 			}
 
-			reticle.customShader = availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshairtrack;
-			reticle.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshairtrack];
+			reticle.customShader = availableWeapons[availableVehicles[ci->vehicle].weapons[this->currentState.weaponNum]].crosshairtrack;
+			reticle.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[this->currentState.weaponNum]].crosshairtrack];
 
 			if( building )
 			{
-				VectorSubtract( cgs.inlineModelMidpoints[target->currentState.modelindex], cent->lerpOrigin, forward );
+				VectorSubtract( cgs.inlineModelMidpoints[target->currentState.modelindex], this->lerpOrigin, forward );
 			}
 			else
 			{
-				VectorSubtract( target->lerpOrigin, cent->lerpOrigin, forward );
+				VectorSubtract( target->lerpOrigin, this->lerpOrigin, forward );
 			}
 
 			len = VectorNormalize( forward );
 			vectoangles( forward, ang );
 			AnglesToAxis( ang, reticle.axis );
-			VectorMA( cent->lerpOrigin, 2000, forward, end );
-			CG_Trace( &tr, cent->lerpOrigin, nullptr, nullptr, end, cg.snap->ps.clientNum, MASK_SOLID ); 
+			VectorMA( this->lerpOrigin, 2000, forward, end );
+			CG_Trace( &tr, this->lerpOrigin, nullptr, nullptr, end, cg.snap->ps.clientNum, MASK_SOLID ); 
 			
 			if( tr.entityNum > ENTITYNUM_WORLD && tr.entityNum < MAX_CLIENTS )
 			{
@@ -305,22 +305,22 @@ void CG_Helo( centity_t *cent, clientInfo_t *ci )
 				// copy the reticle entity as our reticle-lock entity
 				memcpy( &reticlelock, &reticle, sizeof(reticle) );
 				
-				reticlelock.customShader = availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshairlock;
-				reticlelock.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshairlock];
+				reticlelock.customShader = availableWeapons[availableVehicles[ci->vehicle].weapons[this->currentState.weaponNum]].crosshairlock;
+				reticlelock.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[this->currentState.weaponNum]].crosshairlock];
 				reticlelock.frame = 1;
 			}
 			else
 			{
 				memset( &reticlelock, 0, sizeof(reticlelock) );	
 				
-				reticlelock.customShader = availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshairtrack;
-				reticlelock.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshairtrack];
+				reticlelock.customShader = availableWeapons[availableVehicles[ci->vehicle].weapons[this->currentState.weaponNum]].crosshairtrack;
+				reticlelock.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[this->currentState.weaponNum]].crosshairtrack];
 				
-				AngleVectors( cent->currentState.angles, forward, right, up );
-				RotatePointAroundVector( temp, up, forward, cent->lerpAngles2[ROLL] );
+				AngleVectors( this->currentState.angles, forward, right, up );
+				RotatePointAroundVector( temp, up, forward, this->lerpAngles2[ROLL] );
 				CrossProduct( up, temp, right );
-				RotatePointAroundVector( forward, right, temp, cent->lerpAngles2[PITCH] );
-				VectorMA( cent->lerpOrigin, availableVehicles[ci->vehicle].gunoffset[0], forward, start );
+				RotatePointAroundVector( forward, right, temp, this->lerpAngles2[PITCH] );
+				VectorMA( this->lerpOrigin, availableVehicles[ci->vehicle].gunoffset[0], forward, start );
 				VectorMA( start, availableVehicles[ci->vehicle].gunoffset[1], right, start );
 				VectorMA( start, availableVehicles[ci->vehicle].gunoffset[2], up, start );
 				VectorMA( start, 2000, forward, end );
@@ -352,16 +352,16 @@ void CG_Helo( centity_t *cent, clientInfo_t *ci )
 
 			CG_AddReticleEntityToScene( &reticlelock, nullptr );
 		}
-		else if(!(ps->stats[STAT_LOCKINFO] & LI_TRACKING) || (availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].type == WT_MACHINEGUN))
+		else if(!(ps->stats[STAT_LOCKINFO] & LI_TRACKING) || (availableWeapons[availableVehicles[ci->vehicle].weapons[this->currentState.weaponNum]].type == WT_MACHINEGUN))
 		{
-			reticle.customShader = availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshair;
-			reticle.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshair];
+			reticle.customShader = availableWeapons[availableVehicles[ci->vehicle].weapons[this->currentState.weaponNum]].crosshair;
+			reticle.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[this->currentState.weaponNum]].crosshair];
 
-			AngleVectors( cent->currentState.angles, forward, right, up );
-			RotatePointAroundVector( temp, up, forward, cent->lerpAngles2[ROLL] );
+			AngleVectors( this->currentState.angles, forward, right, up );
+			RotatePointAroundVector( temp, up, forward, this->lerpAngles2[ROLL] );
 			CrossProduct( up, temp, right );
-			RotatePointAroundVector( forward, right, temp, cent->lerpAngles2[PITCH] );
-			VectorMA( cent->lerpOrigin, availableVehicles[ci->vehicle].gunoffset[0], forward, start );
+			RotatePointAroundVector( forward, right, temp, this->lerpAngles2[PITCH] );
+			VectorMA( this->lerpOrigin, availableVehicles[ci->vehicle].gunoffset[0], forward, start );
 			VectorMA( start, availableVehicles[ci->vehicle].gunoffset[1], right, start );
 			VectorMA( start, availableVehicles[ci->vehicle].gunoffset[2], up, start );
 			VectorMA( start, 2000, forward, end );

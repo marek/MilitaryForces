@@ -436,7 +436,7 @@ CG_DrawRadarSymbols
 */
 static void CG_DrawRadarSymbols_AIR_new( int vehicle, float range, int x, int y ) {
 	unsigned int i;
-	centity_t	*self = &cg.predictedPlayerEntity;
+	ClientEntity	*self = &cg.predictedPlayerEntity;
 	vec3_t		pos, pos1, pos2;
 	vec3_t		dir;
 	float		dist;
@@ -554,7 +554,7 @@ static void CG_DrawRadarSymbols_AIR_new( int vehicle, float range, int x, int y 
 static void CG_DrawRadarSymbols_GROUND_new( int vehicle, float range, int x, int y ) 
 {
 	unsigned int i;
-	centity_t	*self = &cg.predictedPlayerEntity;
+	ClientEntity	*self = &cg.predictedPlayerEntity;
 	vec3_t		pos, pos1, pos2;
 	vec3_t		dir;
 	float		dist;
@@ -750,7 +750,7 @@ static void CG_DrawRadarSymbols_GROUND_new( int vehicle, float range, int x, int
 
 //static void CG_DrawGroundSupportRadar( int vehicle, float range, int x, int y ) {
 //	unsigned int i;
-//	centity_t	*self = &cg.predictedPlayerEntity;
+//	ClientEntity	*self = &cg.predictedPlayerEntity;
 //	vec3_t		pos, pos1, pos2;
 //	vec3_t		dir;
 //	float		dist;
@@ -1080,7 +1080,7 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 	// this is probably very dirty and ugly
 	// but so far I haven't found another way to do it...
 	// any ideas anyone?
-	centity_t *cent = &cg.predictedPlayerEntity;
+	ClientEntity *cent = &cg.predictedPlayerEntity;
 	playerState_t *ps = &cg.predictedPlayerState;
 	vec3_t	v;
 	float	x, y, w, h, vx, vy, vh;
@@ -1195,7 +1195,7 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 		// angles
 		if( ps->stats[STAT_LOCKINFO] & LI_TRACKING ) {
 			vec3_t a;
-			centity_t* target = &cg_entities[cent->currentState.tracktarget];
+			ClientEntity* target = &cg_entities[cent->currentState.tracktarget];
 			bool building = false;
 
 			if( target->currentState.eType == ET_EXPLOSIVE ) building = true;
@@ -1254,12 +1254,11 @@ CG_Draw_MFD
 
 ================
 */
-static void CG_Draw_MFD(int mfdnum, int vehicle, centity_t * cent, int targetrange, 
-						int targetheading, int altitude, playerState_t *ps, int stallcolor) {
+void ClientEntity::draw_MFD( int mfdnum, int vehicle, int targetrange, int targetheading, int altitude, playerState_t *ps, int stallcolor ) {
 	float		x, y, width, height;
 	int			mode = cg.Mode_MFD[mfdnum];
-	int			onoff = cent->currentState.ONOFF;
-	int			selweap = cent->currentState.weaponNum;
+	int			onoff = this->currentState.ONOFF;
+	int			selweap = this->currentState.weaponNum;
 	char		buffer[16];
 
 		// draw mfd screen
@@ -1733,7 +1732,7 @@ CG_DrawStatusBar_MFQ3
 ================
 */
 void CG_DrawStatusBar_MFQ3_new( ) {
-	centity_t	*cent;
+	ClientEntity	*cent;
 	playerState_t	*ps;
 	int			value, value2;
 	int			vehicle = cgs.clientinfo[cg.predictedPlayerState.clientNum].vehicle;
@@ -1762,7 +1761,7 @@ void CG_DrawStatusBar_MFQ3_new( ) {
 
 	// calc target range and heading
 	if( ps->stats[STAT_LOCKINFO] & LI_TRACKING ) {
-		centity_t* target = &cg_entities[cent->currentState.tracktarget];
+		ClientEntity* target = &cg_entities[cent->currentState.tracktarget];
 		vec3_t dir, angles;
 		if( target->currentState.eType == ET_EXPLOSIVE ) {
 			VectorSubtract( cgs.inlineModelMidpoints[target->currentState.modelindex], cent->lerpOrigin, dir );
@@ -1824,14 +1823,14 @@ void CG_DrawStatusBar_MFQ3_new( ) {
 		// mfd 1
 		if( hud_mfd.integer ) {
 			CG_SetScreenPlacement( PLACE_LEFT );
-			CG_Draw_MFD(MFD_1, vehicle, cent, targetrange, targetheading, altitude, ps, stallcolor);
+			cent->draw_MFD( MFD_1, vehicle, targetrange, targetheading, altitude, ps, stallcolor );
 			CG_SetScreenPlacement( PLACE_CENTER );
 		}
 
 		// mfd 2
 		if( hud_mfd2.integer ) {
 			CG_SetScreenPlacement( PLACE_RIGHT );
-			CG_Draw_MFD(MFD_2, vehicle, cent, targetrange, targetheading, altitude, ps, stallcolor);
+			cent->draw_MFD( MFD_2, vehicle, targetrange, targetheading, altitude, ps, stallcolor );
 			CG_SetScreenPlacement( PLACE_CENTER );
 		}
 

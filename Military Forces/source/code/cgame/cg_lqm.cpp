@@ -26,27 +26,27 @@ void CG_RegisterLQM( clientInfo_t *ci )
 CG_GroundVehicleFlags
 ===============
 */
-static void CG_LQMFlags( centity_t *cent ) {
+void ClientEntity::lQMFlags() {
 	int		powerups;
 	clientInfo_t	*ci;
 
-	powerups = cent->currentState.objectives;
+	powerups = this->currentState.objectives;
 	if ( !powerups ) {
 		return;
 	}
 
-	ci = &cgs.clientinfo[ cent->currentState.clientNum ];
+	ci = &cgs.clientinfo[ this->currentState.clientNum ];
 
 	// redflag
 	if ( powerups & OB_REDFLAG ) {
-		CG_TrailItem( cent, cgs.media.redFlagModel );
-//		refExport.AddLightToScene( cent->lerpOrigin, 200 + (rand()&31), 1.0, 0.2f, 0.2f );
+		this->trailItem( cgs.media.redFlagModel );
+//		refExport.AddLightToScene( this->lerpOrigin, 200 + (rand()&31), 1.0, 0.2f, 0.2f );
 	}
 
 	// blueflag
 	if ( powerups & OB_BLUEFLAG ) {
-		CG_TrailItem( cent, cgs.media.blueFlagModel );
-//		refExport.AddLightToScene( cent->lerpOrigin, 200 + (rand()&31), 0.2f, 0.2f, 1.0 );
+		this->trailItem( cgs.media.blueFlagModel );
+//		refExport.AddLightToScene( this->lerpOrigin, 200 + (rand()&31), 0.2f, 0.2f, 1.0 );
 	}
 }
 
@@ -55,12 +55,12 @@ static void CG_LQMFlags( centity_t *cent ) {
 CG_GroundVehicle
 ===============
 */
-void CG_LQM( centity_t *cent, clientInfo_t *ci ) 
+void ClientEntity::lQM( clientInfo_t *ci ) 
 {
 	vec3_t			velocity;	
 	vec3_t		    right, up, temp, start;
 	DrawInfo_LQM_t drawInfo;
-	int				ONOFF = cent->currentState.ONOFF;
+	int				ONOFF = this->currentState.ONOFF;
 
 
 	memset( &drawInfo, 0, sizeof(drawInfo) );
@@ -69,64 +69,64 @@ void CG_LQM( centity_t *cent, clientInfo_t *ci )
 	drawInfo.basicInfo.ONOFF = ONOFF;
 
 	// Copy Weapon Index
-	drawInfo.weaponIndex = cent->currentState.weaponIndex;
+	drawInfo.weaponIndex = this->currentState.weaponIndex;
 
 	// Copy animation state
-	drawInfo.anim = cent->currentState.vehicleAnim;
+	drawInfo.anim = this->currentState.vehicleAnim;
 
 	// Copy animation frames
-	drawInfo.lastTorsoAngle = cent->bayAnim;
-	drawInfo.lastLegsAngle = cent->gearAnim;
-	drawInfo.torsoFrame = cent->bayAnimFrame;
-	drawInfo.legsFrame = cent->gearAnimFrame;
-	drawInfo.torsoTime = cent->bayAnimStartTime;
-	drawInfo.legsTime = cent->gearAnimStartTime;
+	drawInfo.lastTorsoAngle = this->bayAnim;
+	drawInfo.lastLegsAngle = this->gearAnim;
+	drawInfo.torsoFrame = this->bayAnimFrame;
+	drawInfo.legsFrame = this->gearAnimFrame;
+	drawInfo.torsoTime = this->bayAnimStartTime;
+	drawInfo.legsTime = this->gearAnimStartTime;
 
 	// get speed
-	VectorCopy( cent->currentState.pos.trDelta, velocity );
+	VectorCopy( this->currentState.pos.trDelta, velocity );
 	drawInfo.basicInfo.speed = VectorLength( velocity );
 	
 	// entitynum
-	drawInfo.basicInfo.entityNum = cent->currentState.number;
+	drawInfo.basicInfo.entityNum = this->currentState.number;
 
     // get the rotation information
-    CG_VehicleLerpAngles( cent );
-    AnglesToAxis( cent->lerpAngles, drawInfo.basicInfo.axis );
+    this->vehicleLerpAngles();
+    AnglesToAxis( this->lerpAngles, drawInfo.basicInfo.axis );
 
 	// position and orientation
-	VectorCopy( cent->lerpOrigin, drawInfo.basicInfo.origin );
-	VectorCopy( cent->lerpAngles, drawInfo.basicInfo.angles );
+	VectorCopy( this->lerpOrigin, drawInfo.basicInfo.origin );
+	VectorCopy( this->lerpAngles, drawInfo.basicInfo.angles );
 
 	// throttle
-	drawInfo.basicInfo.throttle = cent->currentState.frame;
+	drawInfo.basicInfo.throttle = this->currentState.frame;
 
 	// loadout
-	drawInfo.basicInfo.usedLoadout = nullptr;//&cg_loadouts[cent->currentState.number];
+	drawInfo.basicInfo.usedLoadout = nullptr;//&cg_loadouts[this->currentState.number];
 
 	// muzzleflash
-	if( cg.time - cent->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {
+	if( cg.time - this->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {
 		drawInfo.basicInfo.drawMuzzleFlash = true;
-		drawInfo.basicInfo.flashWeaponIndex = cent->muzzleFlashWeapon;
+		drawInfo.basicInfo.flashWeaponIndex = this->muzzleFlashWeapon;
 	}
 
 	// draw lqm
 	CG_DrawLQM(&drawInfo);
 
 	// return frames
-	cent->bayAnim = drawInfo.lastTorsoAngle;
-	cent->gearAnim = drawInfo.lastLegsAngle;
-	cent->bayAnimFrame = drawInfo.torsoFrame;
-	cent->bayAnimStartTime = drawInfo.torsoTime;
-	cent->gearAnimFrame = drawInfo.legsFrame;
-	cent->gearAnimStartTime = drawInfo.legsTime;
+	this->bayAnim = drawInfo.lastTorsoAngle;
+	this->gearAnim = drawInfo.lastLegsAngle;
+	this->bayAnimFrame = drawInfo.torsoFrame;
+	this->bayAnimStartTime = drawInfo.torsoTime;
+	this->gearAnimFrame = drawInfo.legsFrame;
+	this->gearAnimStartTime = drawInfo.legsTime;
 	
 
 	// flags
-	CG_LQMFlags( cent );
+	this->lQMFlags();
 
 
 	// reticles
-	if( cent == &cg.predictedPlayerEntity )
+	if( this == &cg.predictedPlayerEntity )
 	{
 		refEntity_t		reticle;
 		vec3_t	forward, ang, end;
@@ -139,14 +139,14 @@ void CG_LQM( centity_t *cent, clientInfo_t *ci )
 
 		CG_ResetReticles();
 
-		reticle.customShader = availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshair;
-		reticle.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[cent->currentState.weaponNum]].crosshair];
+		reticle.customShader = availableWeapons[availableVehicles[ci->vehicle].weapons[this->currentState.weaponNum]].crosshair;
+		reticle.hModel = cgs.media.reticle[availableWeapons[availableVehicles[ci->vehicle].weapons[this->currentState.weaponNum]].crosshair];
 
-		AngleVectors( cent->currentState.angles, forward, right, up );
-		RotatePointAroundVector( temp, up, forward, cent->lerpAngles2[ROLL] );
+		AngleVectors( this->currentState.angles, forward, right, up );
+		RotatePointAroundVector( temp, up, forward, this->lerpAngles2[ROLL] );
 		CrossProduct( up, temp, right );
-		RotatePointAroundVector( forward, right, temp, cent->lerpAngles2[PITCH] );
-		VectorMA( cent->lerpOrigin, availableVehicles[ci->vehicle].gunoffset[0], forward, start );
+		RotatePointAroundVector( forward, right, temp, this->lerpAngles2[PITCH] );
+		VectorMA( this->lerpOrigin, availableVehicles[ci->vehicle].gunoffset[0], forward, start );
 		VectorMA( start, availableVehicles[ci->vehicle].gunoffset[1], right, start );
 		VectorMA( start, availableVehicles[ci->vehicle].gunoffset[2], up, start );
 		VectorMA( start, 2000, forward, end );

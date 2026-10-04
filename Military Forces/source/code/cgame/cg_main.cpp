@@ -70,7 +70,7 @@ This must be the very first function compiled into the .q3vm file
 
 cg_t				cg;
 cgs_t				cgs;
-centity_t			cg_entities[MAX_GENTITIES];
+ClientEntity			cg_entities[MAX_GENTITIES];
 completeLoadout_t	cg_loadouts[MAX_GENTITIES];
 int					cg_loadoutKeys[MAX_GENTITIES];
 weaponInfo_t		cg_weapons[WI_MAX];
@@ -1601,7 +1601,7 @@ const char *CG_FeederItemText(float feederID, int index, int column, qhandle_t *
 	bool spectator = false;
 	bool dontShowVehicle = false;
 	score_t *sp = nullptr;
-	centity_t *self = &cg.predictedPlayerEntity;
+	ClientEntity *self = &cg.predictedPlayerEntity;
 
 	*handle = -1;
 
