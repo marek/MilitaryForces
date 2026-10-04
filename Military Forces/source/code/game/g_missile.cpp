@@ -477,7 +477,10 @@ void G_CrateDropItems(GameEntity *ent)
 		if(found) 
 		{
 			ent->s.pos.trBase[2] += 25;
-			Drop_Item( ent, item, 180*sin(crandom()));
+			// remember who dropped it, so a team mate picking it up scores for them
+			GameEntity* dropped = Drop_Item( ent, item, 180*sin(crandom()));
+			if( dropped )
+				dropped->parent_ = ent->parent_;
 			ent->s.pos.trBase[2] -= 25;
 
 		}

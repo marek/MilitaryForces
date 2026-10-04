@@ -90,6 +90,8 @@ public:
 		int		leader = -1;
 		int		leaderTime = 0;
 		bool	teamPlayer = false;
+		int		liftTime = 0;
+		int		liftGiveUp = 0;
 		vec3_t	trail[6] = {};
 		int		trailTime = 0;
 		int		logTime = 0;
@@ -221,6 +223,10 @@ private:
 	static void finishRearm( GameEntity* ent, State& bot );
 	static bool runwayBusy( int padIndex, GameEntity* self );
 	static bool friendlyNear( GameEntity* ent, const vec3_t point, float radius );
+	static int supplyNeed( GameEntity* who, bool urgentOnly = false );
+	static GameEntity* walkerNear( GameEntity* ent, State& bot, float range );
+	static int ridersOf( GameEntity* ent );
+	static bool carriesSupplies( int vehicle );
 	static bool turnClear( GameEntity* ent, float radius, float degrees, float climb = 0 );
 	static void sense( GameEntity* ent, State& bot, Sense& out );
 	static void logDeath( GameEntity* self, GameEntity* attacker, int meansOfDeath );

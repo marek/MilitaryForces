@@ -111,6 +111,84 @@ struct SurfaceTasks
 		return Status::Running;
 	}
 
+	static bool walkerWaiting( Mind& c )
+	{
+		constexpr float pickupRange = 1500.0f;
+		c.target = c.veh.seats > 0 && !c.sense.enemyVisible ? Bots::walkerNear( c.ent, c.bot, pickupRange ) : nullptr;
+		return c.target != nullptr;
+	}
+
+	// pull up beside a team mate on foot and wait so they can climb aboard
+	static Status pickUpWalker( Mind& c )
+	{
+		c.bot.hasHide = false;
+		c.courseTo( c.target->r.currentOrigin );
+		holdNear( c, 60.0f + c.veh.maxs[1] );
+		return Status::Running;
+	}
+
+	// an unarmed transport with someone aboard is a taxi
+	static bool carryingPassenger( Mind& c )
+	{
+		return !c.boat && (c.veh.caps & HC_WHEELS) && !VehicleData::vehicleHasTurret( c.client->vehicle_ ) && Bots::ridersOf( c.ent ) > 0;
+	}
+
+	// take the passenger to the nearest free vehicle we know of, otherwise home to base, and stop there
+	static Status deliverPassenger( Mind& c )
+	{
+		constexpr float knownRange = 6000.0f;
+		const float* destination = c.bot.hasHome ? c.bot.home : nullptr;
+		float best = knownRange;
+		for( int i = MAX_CLIENTS + 1; i < theLevel.num_entities_; i++ )
+		{
+			GameEntity* other = theLevel.getEntity( i );
+			if( !other || !other->inuse_ || other->health_ <= 0 || other->s.eType != ET_MISC_VEHICLE || !(other->s.seatMask & SEATMASK_ENTERABLE) )
+				continue;
+			const float dist = Distance( c.ent->r.currentOrigin, other->r.currentOrigin );
+			if( dist < best )
+			{
+				best = dist;
+				destination = other->r.currentOrigin;
+			}
+		}
+		if( !destination )
+			return Status::Failure;
+		c.bot.hasHide = false;
+		c.courseTo( destination );
+		holdNear( c, 150 );
+		return Status::Running;
+	}
+
+	// short of fuel, health or ammunition and a pickup that helps is lying nearby: go and get it
+	static Status driveToSupplies( Mind& c )
+	{
+		// a real shortage is worth a detour; topping up only when the supplies are close by
+		const int urgent = Bots::supplyNeed( c.ent, true );
+		const int need = urgent ? urgent : Bots::supplyNeed( c.ent );
+		if( !need )
+			return Status::Failure;
+		const float range = urgent ? 3000.0f : 1200.0f;
+		const int wanted = need == WT_FUELCRATE ? IT_FUEL : need == WT_HEALTHCRATE ? IT_HEALTH : IT_AMMO;
+		GameEntity* nearest = nullptr;
+		float best = range;
+		for( int i = MAX_CLIENTS + 1; i < theLevel.num_entities_; i++ )
+		{
+			GameEntity* item = theLevel.getEntity( i );
+			if( !item || !item->inuse_ || item->s.eType != ET_ITEM || !item->item_ || item->item_->giType != wanted || (item->s.eFlags & EF_NODRAW) )
+				continue;
+			const float dist = Distance( c.ent->r.currentOrigin, item->r.currentOrigin );
+			if( dist < best )
+			{
+				nearest = item;
+				best = dist;
+			}
+		}
+		if( !nearest )
+			return Status::Failure;
+		c.courseTo( nearest->r.currentOrigin );
+		return Status::Running;
+	}
+
 	// drive with the leader, stopping a little short
 	static Status convoy( Mind& c )
 	{
@@ -249,6 +327,9 @@ struct SurfaceTasks
 				t.action( "drive to cover", driveToCover ),
 				t.action( "run from aircraft", runFromAircraft ) } ) ),
 			t.when( "cautious gunner", wantsHullDown, t.action( "hull down", hullDown ) ),
+			t.when( "has a passenger", carryingPassenger, t.action( "deliver passenger", deliverPassenger ) ),
+			t.when( "team mate on foot nearby", walkerWaiting, t.action( "pick up walker", pickUpWalker ) ),
+			t.action( "drive to supplies", driveToSupplies ),
 			t.when( "wants to rearm", rearming, t.action( "drive to pad", driveToPad ) ),
 			t.when( "evading", evading, t.action( "withdraw", withdraw ) ),
 			t.when( "ground enemy", engaging, t.action( "engage", engage ) ),

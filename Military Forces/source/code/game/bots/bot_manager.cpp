@@ -128,6 +128,16 @@ int Bots::pickVehicle( int teamFlag, bool allowInfantry, const Character* who, c
 	}
 	const bool groundTargets = (cats & (CAT_GROUND|CAT_BOAT)) != 0;
 	const unsigned long gameset = Game::getGameset();
+	// a team with nobody flying supplies: team-minded characters consider taking the supply helicopter
+	bool teamHasSupplier = g_gametype.integer < GT_TEAM;
+	const int ownTeam = teamFlag == MF_TEAM_1 ? ClientBase::TEAM_RED : ClientBase::TEAM_BLUE;
+	for( int i = 1; i <= theLevel.maxclients_ && !teamHasSupplier; i++ )
+	{
+		GameEntity* other = theLevel.getEntity( i );
+		if( other && other->inuse_ && other->client_ && other->client_->sess_.sessionTeam_ == ownTeam && other->client_->vehicle_ >= 0 &&
+			carriesSupplies( other->client_->vehicle_ ) )
+			teamHasSupplier = true;
+	}
 	std::array<int, 256> candidates;
 	std::array<int, 256> weights;
 	int num = 0, total = 0;
@@ -154,6 +164,8 @@ int Bots::pickVehicle( int teamFlag, bool allowInfantry, const Character* who, c
 		else if( (veh.cat & CAT_LQM) && allowInfantry ) { weight = 8; kind = 4; }
 		if( who )
 			weight = static_cast<int>( weight * 10 * std::max( 0.0f, who->prefer[kind] ) );
+		if( who && !teamHasSupplier && carriesSupplies( i ) )
+			weight = static_cast<int>( weight * (2.0f + 8.0f * who->teamwork) );
 		if( !groundTargets && (veh.cat & CAT_PLANE) && (veh.cls & CLASS_PLANE_BOMBER) )
 			weight = weight * 12 / 100;
 		if( kindLives_[kind] >= 12 && kindCrashes_[kind] * 10 > kindLives_[kind] * 5 )
@@ -360,7 +372,7 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 		bot.desire = Goal::Roam;
 		bot.commitTime = 0;
 		bot.tree = behavior::Memory{};
-		// about one life in five is flown as a team player, more for team-minded characters
+		// some lives are played as a team player, more often by team-minded characters
 		// (and more readily when a real player is on the team)
 		bool humanOnTeam = false;
 		for( int i = 1; i <= theLevel.maxclients_ && g_gametype.integer >= GT_TEAM; i++ )
@@ -369,7 +381,11 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 			if( other != ent && other && other->inuse_ && other->client_ && !isBot( i ) && OnSameTeam( ent, other ) )
 				humanOnTeam = true;
 		}
-		bot.teamPlayer = random() < (0.4f + (humanOnTeam ? 0.3f : 0.0f)) * character( bot ).teamwork;
+		// tanks and helicopters hunt in packs for safety: about two lives in five; planes about one in five
+		const Role role = roleOf( client->vehicle_ );
+		const bool packHunter = role == Role::Tank || role == Role::AirDefence || role == Role::AttackHelo || role == Role::TransportHelo;
+		const float keenness = (packHunter ? 0.68f : 0.35f) + (humanOnTeam ? 0.3f : 0.0f);
+		bot.teamPlayer = random() < keenness * character( bot ).teamwork;
 		bot.leader = -1;
 		bot.leaderTime = 0;
 		bot.groundTime = 0;

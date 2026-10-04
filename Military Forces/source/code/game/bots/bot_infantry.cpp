@@ -200,6 +200,23 @@ void Bots::thinkRider( GameEntity* ent, State& bot, usercmd_t& cmd, vec3_t view 
 	VectorCopy( pilot->client_->ps_.vehicleAngles, view );
 	view[ROLL] = 0;
 	const bool gunner = client->sess_.seat_ == 1 && VehicleData::vehicleHasTurret( pilot->client_->vehicle_ );
+	// a passenger in a wheeled transport gets out once it has stopped for them
+	constexpr int rideTime = 6000;
+	const completeVehicleData_t& ride = availableVehicles[pilot->client_->vehicle_];
+	if( !gunner && (ride.cat & CAT_GROUND) && (ride.caps & HC_WHEELS) && VectorLength( pilot->client_->ps_.velocity ) < 15 )
+	{
+		if( !bot.liftTime )
+			bot.liftTime = theLevel.time_;
+		else if( theLevel.time_ > bot.liftTime + rideTime && theLevel.time_ > bot.commandTime )
+		{
+			bot.liftTime = 0;
+			bot.commandTime = theLevel.time_ + 2000;
+			Cmd_Eject_f( ent );
+			return;
+		}
+	}
+	else
+		bot.liftTime = 0;
 	if( !gunner && !(availableVehicles[pilot->client_->vehicle_].cat & (CAT_HELO|CAT_BOAT)) )
 		return;
 	const float reach = gunner ? 3500.0f : 1500.0f;

@@ -19,6 +19,63 @@ Bots::Role Bots::roleOf( int vehicle )
 	return Role::Infantry;
 }
 
+int Bots::ridersOf( GameEntity* ent )
+{
+	int riders = 0;
+	for( int i = 1; i <= theLevel.maxclients_; i++ )
+	{
+		GameEntity* other = theLevel.getEntity( i );
+		if( other && other->inuse_ && other->client_ && other->client_->pers_.connected_ == GameClient::ClientPersistant::CON_CONNECTED &&
+			other->client_->sess_.ridingClient_ == ent->s.number )
+			riders++;
+	}
+	return riders;
+}
+
+// A team mate on foot that this vehicle could take aboard, a real player first. The offer is held for a while and
+// then dropped for a time, so a vehicle does not sit waiting for someone who is not interested.
+GameEntity* Bots::walkerNear( GameEntity* ent, State& bot, float range )
+{
+	constexpr int offerTime = 15000;
+	constexpr int restTime = 25000;
+	constexpr float humanPreference = 0.3f;
+	if( g_gametype.integer < GT_TEAM || theLevel.time_ < bot.liftGiveUp )
+		return nullptr;
+	if( ridersOf( ent ) >= availableVehicles[ent->client_->vehicle_].seats )
+		return nullptr;
+	GameEntity* walker = nullptr;
+	float best = 0;
+	for( int i = 1; i <= theLevel.maxclients_; i++ )
+	{
+		GameEntity* other = theLevel.getEntity( i );
+		if( other == ent || !alive( other ) || !OnSameTeam( ent, other ) || other->client_->sess_.ridingClient_ >= 0 )
+			continue;
+		if( !(availableVehicles[other->client_->vehicle_].cat & CAT_LQM) )
+			continue;
+		const float dist = Distance( ent->r.currentOrigin, other->r.currentOrigin );
+		const float weighted = isBot( i ) ? dist : dist * humanPreference;
+		if( dist < range && (!walker || weighted < best) )
+		{
+			walker = other;
+			best = weighted;
+		}
+	}
+	if( !walker )
+	{
+		bot.liftTime = 0;
+		return nullptr;
+	}
+	if( !bot.liftTime )
+		bot.liftTime = theLevel.time_;
+	if( theLevel.time_ > bot.liftTime + offerTime )
+	{
+		bot.liftTime = 0;
+		bot.liftGiveUp = theLevel.time_ + restTime;
+		return nullptr;
+	}
+	return walker;
+}
+
 GameEntity* Bots::leaderOf( const State& bot )
 {
 	GameEntity* leader = bot.leader >= 0 ? theLevel.getEntity( bot.leader ) : nullptr;
@@ -38,7 +95,7 @@ int Bots::targetOf( GameEntity* leader )
 void Bots::chooseLeader( GameEntity* ent, State& bot )
 {
 	constexpr float humanRange = 9000.0f;
-	constexpr float botRange = 6000.0f;
+	constexpr float botRange = 9000.0f;
 	constexpr float humanPreference = 0.3f;
 	bot.leaderTime = theLevel.time_ + 2000;
 	bot.leader = -1;

@@ -175,6 +175,37 @@ void Bots::flares( GameEntity* ent, State& bot, const Sense& sense, usercmd_t& c
 	bot.flareTime = theLevel.time_ + 700;
 }
 
+// what a vehicle is short of, as the crate type that would help, or 0
+int Bots::supplyNeed( GameEntity* who, bool urgentOnly )
+{
+	const playerState_t& ps = who->client_->ps_;
+	const completeVehicleData_t& veh = availableVehicles[who->client_->vehicle_];
+	if( ps.stats[STAT_FUEL] < ps.stats[STAT_MAX_FUEL] * (urgentOnly ? 0.4f : 0.55f) )
+		return WT_FUELCRATE;
+	if( who->health_ < who->client_->pers_.maxHealth_ * (urgentOnly ? 0.5f : 0.7f) )
+		return WT_HEALTHCRATE;
+	if( urgentOnly )
+		return outOfAmmo( who->client_->vehicle_, ps ) ? WT_AMMOCRATE : 0;
+	// a fight uses ammunition: any weapon under two fifths is worth a crate
+	for( int slot = WP_MACHINEGUN; slot < WP_FLARE; slot++ )
+	{
+		if( veh.weapons[slot] && veh.ammo[slot] > 0 && ps.ammo[slot] * 5 < ps.ammo[slot + 8] * 2 )
+			return WT_AMMOCRATE;
+	}
+	return 0;
+}
+
+bool Bots::carriesSupplies( int vehicle )
+{
+	for( unsigned int weapon : availableVehicles[vehicle].weapons )
+	{
+		const int type = availableWeapons[weapon].type;
+		if( weapon && (type == WT_FUELCRATE || type == WT_AMMOCRATE || type == WT_HEALTHCRATE) )
+			return true;
+	}
+	return false;
+}
+
 // a team mate's vehicle inside the given distance of a point
 bool Bots::friendlyNear( GameEntity* ent, const vec3_t point, float radius )
 {

@@ -10,6 +10,11 @@
 #include "g_level.h"
 #include "g_item.h"
 
+namespace
+{
+	constexpr int resupplyScore = 1;
+}
+
 /*
 
   Items are any object that a player can touch to gain some effect.
@@ -207,6 +212,14 @@ struct Touch_ItemTouch : public GameEntity::EntityFunc_Touch
 
 		if ( !respawn ) 
 			return;
+
+		// supplies dropped by a team mate and actually used: a point for whoever brought them
+		GameEntity* supplier = self->parent_;
+		if( supplier && supplier != other && supplier->inuse_ && supplier->client_ && g_gametype.integer >= GT_TEAM && OnSameTeam( supplier, other ) )
+		{
+			AddScore( supplier, self->r.currentOrigin, resupplyScore );
+			Game::logPrintf( "Resupply: %i %i %s\n", supplier->s.number, other->s.number, self->item_->classname );
+		}
 
 		// play the normal pickup sound
 		if( predict ) 
