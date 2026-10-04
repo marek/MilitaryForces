@@ -887,6 +887,14 @@ struct Think_FollowTarget : public GameEntity::EntityFunc_Think
 			return;
 		}
 
+		if( (availableWeapons[self->s.weaponIndex].flags & WF_RADAR_GUIDED) && self->tracktarget_->client_ &&
+			VehicleData::stealthHidden( self->tracktarget_->client_->vehicle_, self->tracktarget_->client_->ps_.timers[TIMER_REVEAL],
+				theLevel.time_, dist, availableWeapons[self->s.weaponIndex].range ) )
+		{
+			Game::on_target_lost(self);
+			return;
+		}
+
 		// check for flares
 		VectorSubtract( self->r.currentOrigin, range, mins );
 		VectorAdd( self->r.currentOrigin, range, maxs );

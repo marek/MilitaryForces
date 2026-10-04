@@ -902,6 +902,7 @@ enum weaponType_t {
 inline constexpr int WF_NONE = 0;
 inline constexpr int WF_HAS_FIRE_FRAME = 1; // for missiles
 inline constexpr int WF_FIRE_IN_PAIRS = 2; // for bombs, tanks etc
+inline constexpr int WF_RADAR_GUIDED = 4;
 
 
 // list of ground installations

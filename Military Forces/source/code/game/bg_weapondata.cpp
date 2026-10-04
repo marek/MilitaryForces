@@ -752,7 +752,7 @@ completeWeaponData_t availableWeapons[] =
 		.fitsCategory = CAT_PLANE,
 		.fitsPylon = PF_AA_MED,
 		.basicECMVulnerability = 25,
-		.flags = WF_HAS_FIRE_FRAME,
+		.flags = WF_HAS_FIRE_FRAME|WF_RADAR_GUIDED,
 	},
 
 	// Sparrow
@@ -785,7 +785,7 @@ completeWeaponData_t availableWeapons[] =
 		.fitsCategory = CAT_PLANE,
 		.fitsPylon = PF_AA_HVY,
 		.basicECMVulnerability = 20,
-		.flags = WF_HAS_FIRE_FRAME,
+		.flags = WF_HAS_FIRE_FRAME|WF_RADAR_GUIDED,
 	},
 
 	// Phoenix
@@ -818,7 +818,7 @@ completeWeaponData_t availableWeapons[] =
 		.fitsCategory = CAT_PLANE,
 		.fitsPylon = PF_AA_PHX,
 		.basicECMVulnerability = 15,
-		.flags = WF_HAS_FIRE_FRAME,
+		.flags = WF_HAS_FIRE_FRAME|WF_RADAR_GUIDED,
 	},
 
 	// Stinger
@@ -952,7 +952,7 @@ completeWeaponData_t availableWeapons[] =
 		.fitsCategory = CAT_PLANE,
 		.fitsPylon = PF_AA_HVY,
 		.basicECMVulnerability = 25,
-		.flags = WF_HAS_FIRE_FRAME,
+		.flags = WF_HAS_FIRE_FRAME|WF_RADAR_GUIDED,
 	},
 
 	// Hellfire
@@ -1086,7 +1086,7 @@ completeWeaponData_t availableWeapons[] =
 		.fitsCategory = CAT_PLANE,
 		.fitsPylon = PF_AA_MED,
 		.basicECMVulnerability = 40,
-		.flags = WF_HAS_FIRE_FRAME,
+		.flags = WF_HAS_FIRE_FRAME|WF_RADAR_GUIDED,
 	},
 
 
