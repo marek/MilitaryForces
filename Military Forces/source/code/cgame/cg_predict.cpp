@@ -11,23 +11,23 @@
 
 #include "cg_local.h"
 
-pmove_t ClientGame::cg_pmove;
+pmove_t CGame::cg_pmove;
 
-int ClientGame::cg_numSolidEntities;
-ClientEntity *ClientGame::cg_solidEntities[MAX_ENTITIES_IN_SNAPSHOT];
-int ClientGame::cg_numTriggerEntities;
-ClientEntity *ClientGame::cg_triggerEntities[MAX_ENTITIES_IN_SNAPSHOT];
+int CGame::cg_numSolidEntities;
+ClientEntity *CGame::cg_solidEntities[MAX_ENTITIES_IN_SNAPSHOT];
+int CGame::cg_numTriggerEntities;
+ClientEntity *CGame::cg_triggerEntities[MAX_ENTITIES_IN_SNAPSHOT];
 
 /*
 ====================
-ClientGame::buildSolidList
+CGame::buildSolidList
 
 When a New cg.snap has been set, this function builds a sublist
 of the entities that are actually solid, to make for more
 efficient collision detection
 ====================
 */
-void ClientGame::buildSolidList( ) {
+void CGame::buildSolidList( ) {
 	int			i;
 	ClientEntity	*cent;
 	snapshot_t	*snap;
@@ -62,11 +62,11 @@ void ClientGame::buildSolidList( ) {
 
 /*
 ====================
-ClientGame::clipMoveToEntities
+CGame::clipMoveToEntities
 
 ====================
 */
-void ClientGame::clipMoveToEntities( const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end,
+void CGame::clipMoveToEntities( const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end,
 							int skipNumber, int mask, trace_t *tr ) {
 	int			i, x, zd, zu;
 	trace_t		trace;
@@ -134,10 +134,10 @@ void ClientGame::clipMoveToEntities( const vec3_t start, const vec3_t mins, cons
 
 /*
 ================
-ClientGame::trace
+CGame::trace
 ================
 */
-void	ClientGame::trace( trace_t *result, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, 
+void	CGame::trace( trace_t *result, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, 
 					 int skipNumber, int mask, bool capsule ) 
 {
 	trace_t	t;
@@ -145,17 +145,17 @@ void	ClientGame::trace( trace_t *result, const vec3_t start, const vec3_t mins, 
 	CollisionModel::boxTrace ( &t, start, end, const_cast<float *>(mins), const_cast<float *>(maxs), 0, mask, capsule);
 	t.entityNum = t.fraction != 1.0 ? ENTITYNUM_WORLD : ENTITYNUM_NONE;
 	// check all other solid models
-	ClientGame::clipMoveToEntities (start, mins, maxs, end, skipNumber, mask, &t);
+	CGame::clipMoveToEntities (start, mins, maxs, end, skipNumber, mask, &t);
 
 	*result = t;
 }
 
 /*
 ================
-ClientGame::pointContents
+CGame::pointContents
 ================
 */
-int		ClientGame::pointContents( const vec3_t point, int passEntityNum ) {
+int		CGame::pointContents( const vec3_t point, int passEntityNum ) {
 	int			i;
 	entityState_t	*ent;
 	ClientEntity	*cent;
@@ -191,13 +191,13 @@ int		ClientGame::pointContents( const vec3_t point, int passEntityNum ) {
 
 /*
 ========================
-ClientGame::interpolatePlayerState
+CGame::interpolatePlayerState
 
 Generates cg.predictedPlayerState by interpolating between
 cg.snap->player_state and cg.nextFrame->player_state
 ========================
 */
-void ClientGame::interpolatePlayerState( bool grabAngles ) {
+void CGame::interpolatePlayerState( bool grabAngles ) {
 	float			f;
 	int				i;
 	playerState_t	*out;
@@ -309,12 +309,12 @@ void ClientEntity::touchItem() {
 
 /*
 =========================
-ClientGame::touchTriggerPrediction
+CGame::touchTriggerPrediction
 
 Predict push triggers and items
 =========================
 */
-void ClientGame::touchTriggerPrediction( ) {
+void CGame::touchTriggerPrediction( ) {
 	int			i;
 	trace_t		trace;
 	entityState_t	*ent;
@@ -368,7 +368,7 @@ void ClientGame::touchTriggerPrediction( ) {
 
 /*
 =================
-ClientGame::predictPlayerState
+CGame::predictPlayerState
 
 Generates cg.predictedPlayerState for the current cg.time
 cg.predictedPlayerState is guaranteed to be valid after exiting.
@@ -392,7 +392,7 @@ We detect prediction errors and allow them to be decayed off over several frames
 to ease the jerk.
 =================
 */
-void ClientGame::predictPlayerState( ) {
+void CGame::predictPlayerState( ) {
 	int			cmdNum, current;
 	playerState_t	oldPlayerState;
 	bool	moved;
@@ -412,20 +412,20 @@ void ClientGame::predictPlayerState( ) {
 
 	// demo playback just copies the moves
 	if ( cg.demoPlayback || (cg.snap->ps.pm_flags & PMF_FOLLOW) ) {
-		ClientGame::interpolatePlayerState( false );
+		CGame::interpolatePlayerState( false );
 		return;
 	}
 
 	// non-predicting local movement will grab the latest angles
 	if ( cg_nopredict.integer || cg_synchronousClients.integer ) {
-		ClientGame::interpolatePlayerState( true );
+		CGame::interpolatePlayerState( true );
 		return;
 	}
 
 	// prepare for pmove
 	cg_pmove.ps = &cg.predictedPlayerState;
-	cg_pmove.trace = ClientGame::trace;
-	cg_pmove.pointcontents = ClientGame::pointContents;
+	cg_pmove.trace = CGame::trace;
+	cg_pmove.pointcontents = CGame::pointContents;
 	if ( cg_pmove.ps->pm_type == PM_DEAD ) {
 		cg_pmove.tracemask = MASK_PLAYERSOLID & ~CONTENTS_BODY;
 	}
@@ -449,7 +449,7 @@ void ClientGame::predictPlayerState( ) {
 	if ( oldestCmd.serverTime > cg.snap->ps.commandTime 
 		&& oldestCmd.serverTime < cg.time ) {	// special check for map_restart
 		if ( cg_showmiss.integer ) {
-			ClientGame::printf ("exceeded PACKET_BACKUP on commands\n");
+			CGame::printf ("exceeded PACKET_BACKUP on commands\n");
 		}
 		return;
 	}
@@ -514,24 +514,24 @@ void ClientGame::predictPlayerState( ) {
 				// a teleport will not cause an error decay
 				VectorClear( cg.predictedError );
 				if ( cg_showmiss.integer ) {
-					ClientGame::printf( "PredictionTeleport\n" );
+					CGame::printf( "PredictionTeleport\n" );
 				}
 				cg.thisFrameTeleport = false;
 			} else {
 				vec3_t	adjusted;
-				ClientGame::adjustPositionForMover( cg.predictedPlayerState.origin, 
+				CGame::adjustPositionForMover( cg.predictedPlayerState.origin, 
 					cg.predictedPlayerState.groundEntityNum, cg.physicsTime, cg.oldTime, adjusted );
 
 				if ( cg_showmiss.integer ) {
 					if (!VectorCompare( oldPlayerState.origin, adjusted )) {
-						ClientGame::printf("prediction error\n");
+						CGame::printf("prediction error\n");
 					}
 				}
 				VectorSubtract( oldPlayerState.origin, adjusted, delta );
 				len = VectorLength( delta );
 				if ( len > 0.1 ) {
 					if ( cg_showmiss.integer ) {
-						ClientGame::printf("Prediction miss: %f\n", len);
+						CGame::printf("Prediction miss: %f\n", len);
 					}
 					if ( cg_errorDecay.integer ) {
 						int		t;
@@ -543,7 +543,7 @@ void ClientGame::predictPlayerState( ) {
 							f = 0;
 						}
 						if ( f > 0 && cg_showmiss.integer ) {
-							ClientGame::printf("Double prediction decay: %f\n", f);
+							CGame::printf("Double prediction decay: %f\n", f);
 						}
 						VectorScale( cg.predictedError, f, cg.predictedError );
 					} else {
@@ -574,40 +574,40 @@ void ClientGame::predictPlayerState( ) {
 		moved = true;
 
 		// add push trigger movement effects
-		ClientGame::touchTriggerPrediction();
+		CGame::touchTriggerPrediction();
 
 		// check for predictable events that changed from previous predictions
-		//ClientGame::checkChangedPredictableEvents(&cg.predictedPlayerState);
+		//CGame::checkChangedPredictableEvents(&cg.predictedPlayerState);
 	}
 
 	if ( cg_showmiss.integer > 1 ) {
-		ClientGame::printf( "[%i : %i] ", cg_pmove.cmd.serverTime, cg.time );
+		CGame::printf( "[%i : %i] ", cg_pmove.cmd.serverTime, cg.time );
 	}
 
 	if ( !moved ) {
 		if ( cg_showmiss.integer ) {
-			ClientGame::printf( "not moved\n" );
+			CGame::printf( "not moved\n" );
 		}
 		return;
 	}
 
 	// adjust for the movement of the groundentity
-	ClientGame::adjustPositionForMover( cg.predictedPlayerState.origin, 
+	CGame::adjustPositionForMover( cg.predictedPlayerState.origin, 
 		cg.predictedPlayerState.groundEntityNum, 
 		cg.physicsTime, cg.time, cg.predictedPlayerState.origin );
 
 	if ( cg_showmiss.integer ) {
 		if (cg.predictedPlayerState.eventSequence > oldPlayerState.eventSequence + MAX_PS_EVENTS) {
-			ClientGame::printf("WARNING: dropped event\n");
+			CGame::printf("WARNING: dropped event\n");
 		}
 	}
 
 	// fire events and other transition triggered things
-	ClientGame::transitionPlayerState( &cg.predictedPlayerState, &oldPlayerState );
+	CGame::transitionPlayerState( &cg.predictedPlayerState, &oldPlayerState );
 
 	if ( cg_showmiss.integer ) {
 		if (cg.eventSequence > cg.predictedPlayerState.eventSequence) {
-			ClientGame::printf("WARNING: double event\n");
+			CGame::printf("WARNING: double event\n");
 			cg.eventSequence = cg.predictedPlayerState.eventSequence;
 		}
 	}

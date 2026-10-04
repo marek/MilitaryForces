@@ -11,12 +11,12 @@
 
 /*
 =====================
-ClientGame::smokePuff
+CGame::smokePuff
 
 Adds a smoke puff localEntity.
 =====================
 */
-LocalEntity *ClientGame::smokePuff( const vec3_t p, const vec3_t vel, 
+LocalEntity *CGame::smokePuff( const vec3_t p, const vec3_t vel, 
 				   float radius,
 				   float r, float g, float b, float a,
 				   float duration,
@@ -29,7 +29,7 @@ LocalEntity *ClientGame::smokePuff( const vec3_t p, const vec3_t vel,
 	refEntity_t		*re;
 //	int fadeInTime = startTime + duration / 2;
 
-	le = ClientGame::allocLocalEntity();
+	le = CGame::allocLocalEntity();
 	le->leFlags = leFlags;
 	le->radius = radius;
 	
@@ -117,7 +117,7 @@ CG_NukeCloud
 //			pos[2] += Q_random( &seed ) * 50;
 //			velocity[0] = (5 - (-5) + 1) * Q_random(&seed) + -5;
 //			velocity[1] = (5 - (-5) + 1) * Q_random(&seed) + -5;
-//			smoke = ClientGame::smokePuff( pos, velocity, 
+//			smoke = CGame::smokePuff( pos, velocity, 
 //						  puff_size, 
 //						  0.1f, 0.1f, 0.1f, 0.7f,
 //						  10000, 
@@ -138,7 +138,7 @@ CG_NukeCloud
 //			velocity[1] = (1 - (-1) + 1) * Q_random(&seed) + -1;
 //			velocity[2] = ((temp * 10) / 6.5) * Q_random(&seed);
 //
-//			smoke = ClientGame::smokePuff( pos, velocity, 
+//			smoke = CGame::smokePuff( pos, velocity, 
 //						  puff_size, 
 //						  0.1f, 0.1f, 0.1f, 0.7f,
 //						  10000, 
@@ -160,7 +160,7 @@ CG_NukeCloud
 //			velocity[1] = (3 - (-3) + 1) * Q_random(&seed) + -3;
 //			velocity[2] = ((temp * 2) / 6.5) * Q_random(&seed);
 //
-//			smoke = ClientGame::smokePuff( pos, velocity, 
+//			smoke = CGame::smokePuff( pos, velocity, 
 //						  puff_size, 
 //						  0.1f, 0.1f, 0.1f, 0.7f,
 //						  10000, 
@@ -181,7 +181,7 @@ void ClientEntity::nukeEffect( entityState_t * es ) {
 	LocalEntity	*le;
 	refEntity_t		*re;
 
-	le = ClientGame::allocLocalEntity();
+	le = CGame::allocLocalEntity();
 	le->leFlags = 0;
 	le->leType = LE_NUKE;
 	le->startTime = cg.time;
@@ -232,7 +232,7 @@ void ClientEntity::flakEffect( entityState_t * es )
 			pos[2] += (temp - (temp * -1) + 1) * Q_random( &seed ) + (temp * -1);
 			velocity[0] = (5 - (-5) + 1) * Q_random(&seed) + -5;
 			velocity[1] = (5 - (-5) + 1) * Q_random(&seed) + -5;
-			smoke = ClientGame::smokePuff( pos, velocity, 
+			smoke = CGame::smokePuff( pos, velocity, 
 						  puff_size, 
 						  0.0f, 0.0f, 0.0f, 0.7f,
 						  10000, 
@@ -246,10 +246,10 @@ void ClientEntity::flakEffect( entityState_t * es )
 
 /*
 ====================
-ClientGame::makeExplosion
+CGame::makeExplosion
 ====================
 */
-LocalEntity *ClientGame::makeExplosion( vec3_t origin, vec3_t dir, 
+LocalEntity *CGame::makeExplosion( vec3_t origin, vec3_t dir, 
 								 qhandle_t hModel, qhandle_t shader,
 								 int offset, int duration, bool isSprite )
 {
@@ -264,7 +264,7 @@ LocalEntity *ClientGame::makeExplosion( vec3_t origin, vec3_t dir,
 	// skew the time a bit so they aren't all in sync
 	offset += rand() & 63;
 
-	ex = ClientGame::allocLocalEntity();
+	ex = CGame::allocLocalEntity();
 	if ( isSprite )
 	{
 		ex->leType = LE_SPRITE_EXPLOSION;
@@ -320,7 +320,7 @@ void CG_LaunchExplode( vec3_t origin, vec3_t velocity, qhandle_t hModel ) {
 	LocalEntity	*le;
 	refEntity_t		*re;
 
-	le = ClientGame::allocLocalEntity();
+	le = CGame::allocLocalEntity();
 	re = &le->refEntity;
 
 	le->leType = LE_FRAGMENT;
@@ -353,7 +353,7 @@ void CG_LaunchGib( vec3_t origin, vec3_t velocity, qhandle_t hModel ) {
 	refEntity_t		*re;
 	int				i;
 
-	le = ClientGame::allocLocalEntity();
+	le = CGame::allocLocalEntity();
 	re = &le->refEntity;
 
 	le->leType = LE_FRAGMENT;
@@ -379,14 +379,14 @@ void CG_LaunchGib( vec3_t origin, vec3_t velocity, qhandle_t hModel ) {
 
 /*
 ===================
-ClientGame::gibPlayer
+CGame::gibPlayer
 
 Generated a bunch of gibs launching out from the bodies location
 ===================
 */
 #define	GIB_VELOCITY	250*LQM_SCALE
 constexpr int GIB_JUMP = 250;
-void ClientGame::gibPlayer( vec3_t playerOrigin ) {
+void CGame::gibPlayer( vec3_t playerOrigin ) {
 	vec3_t	origin, velocity;
 
 	/*

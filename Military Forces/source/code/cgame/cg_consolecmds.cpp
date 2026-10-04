@@ -30,7 +30,7 @@ void CG_TargetCommand_f( ) {
 	int		targetNum;
 	char	test[4];
 
-	targetNum = ClientGame::crosshairPlayer();
+	targetNum = CGame::crosshairPlayer();
 	if ( targetNum == -1 ) {
 		return;
 	}
@@ -45,7 +45,7 @@ void CG_TargetCommand_f( ) {
 MFQ3 GPS
 ==================
 */
-void ClientGame::toggleGps_f( ) {
+void CGame::toggleGps_f( ) {
 
 	if( cg.time < cg.GPSTime ) {
 		return;
@@ -54,7 +54,7 @@ void ClientGame::toggleGps_f( ) {
 	cg.GPSTime = cg.time + 500;
 }
 
-void ClientGame::toggleRadarRange_f( ) {
+void CGame::toggleRadarRange_f( ) {
 
 	if( cg.time < cg.RADARTime ) {
 		return;
@@ -70,7 +70,7 @@ void ClientGame::toggleRadarRange_f( ) {
 MFQ3 MFD Mode cycling
 ==================
 */
-void ClientGame::set_MFD_Mode( int num ) {
+void CGame::set_MFD_Mode( int num ) {
 	bool found = false;
 	char buffer[33], value;
 	int start = cg.Mode_MFD[num] - 1;
@@ -92,20 +92,20 @@ void ClientGame::set_MFD_Mode( int num ) {
 		CvarSystem::set( "mfd2_defaultpage", va("%d", cg.Mode_MFD[num]) );
 }
 
-void ClientGame::set_MFD1_Mode_f( ) {
+void CGame::set_MFD1_Mode_f( ) {
 	if( cg.time < cg.MFDTime ) {
 		return;
 	}
-	ClientGame::set_MFD_Mode(MFD_1);
+	CGame::set_MFD_Mode(MFD_1);
 
 	cg.MFDTime = cg.time + 100;
 }
 
-void ClientGame::set_MFD2_Mode_f( ) {
+void CGame::set_MFD2_Mode_f( ) {
 	if( cg.time < cg.MFDTime ) {
 		return;
 	}
-	ClientGame::set_MFD_Mode(MFD_2);
+	CGame::set_MFD_Mode(MFD_2);
 
 	cg.MFDTime = cg.time + 100;
 }
@@ -117,14 +117,14 @@ MFQ3 MFD Mode setting
 ==================
 */
 
-void ClientGame::set_MFD_Page( int num ) {
+void CGame::set_MFD_Page( int num ) {
 	int page;
 
 	if( CommandSystem::argc() < 2 ) {
 		return;
 	}
 
-	page = atoi( ClientGame::argv(1) );
+	page = atoi( CGame::argv(1) );
 
 	if( page < 0 ) page = 0;
 	else if( page >= MFD_MAX ) page = MFD_MAX - 1;
@@ -138,20 +138,20 @@ void ClientGame::set_MFD_Page( int num ) {
 
 }
 
-void ClientGame::set_MFD1_Page_f( ) {
+void CGame::set_MFD1_Page_f( ) {
 	if( cg.time < cg.MFDTime ) {
 		return;
 	}
-	ClientGame::set_MFD_Page(MFD_1);
+	CGame::set_MFD_Page(MFD_1);
 
 	cg.MFDTime = cg.time + 100;
 }
 
-void ClientGame::set_MFD2_Page_f( ) {
+void CGame::set_MFD2_Page_f( ) {
 	if( cg.time < cg.MFDTime ) {
 		return;
 	}
-	ClientGame::set_MFD_Page(MFD_2);
+	CGame::set_MFD_Page(MFD_2);
 
 	cg.MFDTime = cg.time + 100;
 }
@@ -162,10 +162,10 @@ MFQ3 HUD Color setting
 ==================
 */
 
-void ClientGame::update_HUD_Color_f( )
+void CGame::update_HUD_Color_f( )
 {
 	// update 
-	cg.HUDColor = ClientGame::cvar_Get( "hud_color" );
+	cg.HUDColor = CGame::cvar_Get( "hud_color" );
 }
 
 /*
@@ -174,7 +174,7 @@ MFQ3 HUD Color cycling
 ==================
 */
 
-void ClientGame::cycle_HUD_Color_f( ) {
+void CGame::cycle_HUD_Color_f( ) {
 	if( cg.time < cg.HUDColorTime ) {
 		return;
 	}
@@ -194,10 +194,10 @@ MFQ3 MFD color setting
 ==================
 */
 
-void ClientGame::update_MFD_Color_f( )
+void CGame::update_MFD_Color_f( )
 {
 	// update 
-	cg.MFDColor = ClientGame::cvar_Get( "mfd_color" );
+	cg.MFDColor = CGame::cvar_Get( "mfd_color" );
 }
 
 /*
@@ -206,7 +206,7 @@ MFQ3 MFD toggling
 ==================
 */
 
-void ClientGame::toggle_MFD1_f( ) {
+void CGame::toggle_MFD1_f( ) {
 	int mfd1 = hud_mfd.integer;
 
 	mfd1 = mfd1 ? 0 : 1;
@@ -214,7 +214,7 @@ void ClientGame::toggle_MFD1_f( ) {
 	
 }
 
-void ClientGame::toggle_MFD2_f( ) {
+void CGame::toggle_MFD2_f( ) {
 	int mfd2 = hud_mfd2.integer;
 
 	mfd2 = mfd2 ? 0 : 1;
@@ -229,7 +229,7 @@ MFQ3 MFD color cycling
 ==================
 */
 
-void ClientGame::cycle_MFD_Color_f( ) {
+void CGame::cycle_MFD_Color_f( ) {
 	if( cg.time < cg.MFDColorTime ) {
 		return;
 	}
@@ -249,7 +249,7 @@ MFQ3 MFD Camera mode cycling
 ==================
 */
 
-void ClientGame::cycle_Camera_Mode_f( ) {
+void CGame::cycle_Camera_Mode_f( ) {
 	if( cg.time < cg.CameraModeTime ) {
 		return;
 	}
@@ -267,7 +267,7 @@ MFQ3 MFD Camera Mode setting
 ==================
 */
 
-void ClientGame::set_Camera_Mode_f( ) {
+void CGame::set_Camera_Mode_f( ) {
 
 	if( cg.time < cg.CameraModeTime ) {
 		return;
@@ -277,7 +277,7 @@ void ClientGame::set_Camera_Mode_f( ) {
 		return;
 	}
 
-	cg.CameraMode = atoi( ClientGame::argv(1) );
+	cg.CameraMode = atoi( CGame::argv(1) );
 	if( cg.CameraMode >= CAMERA_MAX || cg.CameraMode < 0 ) {
 		cg.CameraMode = 0;
 	}
@@ -291,22 +291,22 @@ MFQ3 MFD camera mode quick action keys
 ==================
 */
 
-void ClientGame::camBack_f( )
+void CGame::camBack_f( )
 {
 	cg.CameraMode = CAMERA_BACK;
 }
 
-void ClientGame::camDown_f( )
+void CGame::camDown_f( )
 {
 	cg.CameraMode = CAMERA_DOWN;
 }
 
-void ClientGame::camBomb_f( )
+void CGame::camBomb_f( )
 {
 	cg.CameraMode = CAMERA_BOMB;
 }
 
-void ClientGame::camOld_f( )
+void CGame::camOld_f( )
 {
 	cg.CameraMode = CAMERA_TARGET;
 }
@@ -316,7 +316,7 @@ void ClientGame::camOld_f( )
 MFQ3 INFO
 ==================
 */
-void ClientGame::toggleInfo_f( ) {
+void CGame::toggleInfo_f( ) {
 
 	if( cg.time < cg.INFOTime ) {
 		return;
@@ -330,7 +330,7 @@ void ClientGame::toggleInfo_f( ) {
 MFQ3 toggle view between external and cockpit view
 ==================
 */
-void ClientGame::toggleView_f( ) {
+void CGame::toggleView_f( ) {
 
 	if( cg.time < cg.toggleViewTime ) {
 		return;
@@ -350,7 +350,7 @@ MFQ3 camera
 ==================
 */
 
-void ClientGame::adjustReset_f( ) {
+void CGame::adjustReset_f( ) {
 	cg.cameraAdjustEnum = CAMADJ_NONE;
 	cg.cameraAdjustAmount = 0;
 }
@@ -362,12 +362,12 @@ constexpr float MOVE_BASIC = 0.4f;
 MFQ3 camera zoom in/out
 ==================
 */
-void ClientGame::zoomIn_f( ) {
+void CGame::zoomIn_f( ) {
 	cg.cameraAdjustEnum = CAMADJ_INOUT;
 	cg.cameraAdjustAmount = +MOVE_BASIC;
 }
 
-void ClientGame::zoomOut_f( ) {
+void CGame::zoomOut_f( ) {
 	cg.cameraAdjustEnum = CAMADJ_INOUT;
 	cg.cameraAdjustAmount = -MOVE_BASIC;
 }
@@ -377,12 +377,12 @@ void ClientGame::zoomOut_f( ) {
 MFQ3 camera up/down
 ==================
 */
-void ClientGame::cameraUp_f( ) {
+void CGame::cameraUp_f( ) {
 	cg.cameraAdjustEnum = CAMADJ_UPDOWN;
 	cg.cameraAdjustAmount = +MOVE_BASIC;
 }
 
-void ClientGame::cameraDown_f( ) {
+void CGame::cameraDown_f( ) {
 	cg.cameraAdjustEnum = CAMADJ_UPDOWN;
 	cg.cameraAdjustAmount = -MOVE_BASIC;
 }
@@ -390,43 +390,43 @@ void ClientGame::cameraDown_f( ) {
 
 /*
 =================
-ClientGame::sizeUp_f
+CGame::sizeUp_f
 
 Keybinding command
 =================
 */
-void ClientGame::sizeUp_f() {
+void CGame::sizeUp_f() {
 	CvarSystem::set("cg_viewsize", va("%i",(cg_viewsize.integer+10)));
 }
 
 
 /*
 =================
-ClientGame::sizeDown_f
+CGame::sizeDown_f
 
 Keybinding command
 =================
 */
-void ClientGame::sizeDown_f() {
+void CGame::sizeDown_f() {
 	CvarSystem::set("cg_viewsize", va("%i",(cg_viewsize.integer-10)));
 }
 
 
 /*
 =============
-ClientGame::viewpos_f
+CGame::viewpos_f
 
 Debugging command to print the current position
 =============
 */
-void ClientGame::viewpos_f() {
-	ClientGame::printf ("(%i %i %i) : %i\n", static_cast<int>(cg.refdef.vieworg[0]),
+void CGame::viewpos_f() {
+	CGame::printf ("(%i %i %i) : %i\n", static_cast<int>(cg.refdef.vieworg[0]),
 		static_cast<int>(cg.refdef.vieworg[1]), static_cast<int>(cg.refdef.vieworg[2]), 
 		static_cast<int>(cg.refdefViewAngles[YAW]));
 }
 
 
-void ClientGame::scoresDown_f( ) {
+void CGame::scoresDown_f( ) {
 
 	if ( cg.scoresRequestTime + 2000 < cg.time ) {
 		// the scores are more than two seconds out of data,
@@ -447,19 +447,19 @@ void ClientGame::scoresDown_f( ) {
 	}
 }
 
-void ClientGame::scoresUp_f( ) {
+void CGame::scoresUp_f( ) {
 	if ( cg.showScores ) {
 		cg.showScores = false;
 		cg.scoreFadeTime = cg.time;
 	}
 }
 
-void ClientGame::tellTarget_f( ) {
+void CGame::tellTarget_f( ) {
 	int		clientNum;
 	char	command[128];
 	char	message[128];
 
-	clientNum = ClientGame::crosshairPlayer();
+	clientNum = CGame::crosshairPlayer();
 	if ( clientNum == -1 ) {
 		return;
 	}
@@ -469,12 +469,12 @@ void ClientGame::tellTarget_f( ) {
 	CL_AddReliableCommand( command );
 }
 
-void ClientGame::tellAttacker_f( ) {
+void CGame::tellAttacker_f( ) {
 	int		clientNum;
 	char	command[128];
 	char	message[128];
 
-	clientNum = ClientGame::lastAttacker();
+	clientNum = CGame::lastAttacker();
 	if ( clientNum == -1 ) {
 		return;
 	}
@@ -484,23 +484,23 @@ void ClientGame::tellAttacker_f( ) {
 	CL_AddReliableCommand( command );
 }
 
-void ClientGame::testPlane_f( ) {
-	ClientGame::testVehicle(CAT_PLANE);
+void CGame::testPlane_f( ) {
+	CGame::testVehicle(CAT_PLANE);
 }
 
-void ClientGame::testGV_f( ) {
-	ClientGame::testVehicle(CAT_GROUND);
+void CGame::testGV_f( ) {
+	CGame::testVehicle(CAT_GROUND);
 }
 
-void ClientGame::spawn_GI_f( ) {
+void CGame::spawn_GI_f( ) {
 	int idx;
 
 	if( CommandSystem::argc() < 2 ) return;
 
-	idx = atoi( ClientGame::argv(1) );
+	idx = atoi( CGame::argv(1) );
 
 	if( idx < 0 || idx >= bg_numberOfGroundInstallations ) {
-		ClientGame::printf("GroundInstallation number out of range (0-%d)\n", bg_numberOfGroundInstallations-1 );
+		CGame::printf("GroundInstallation number out of range (0-%d)\n", bg_numberOfGroundInstallations-1 );
 		return;
 	}
 
@@ -508,28 +508,28 @@ void ClientGame::spawn_GI_f( ) {
 
 }
 
-void ClientGame::exportToScript_f( ) {
+void CGame::exportToScript_f( ) {
 	if( CommandSystem::argc() < 2 ) 
 	{
-		ClientGame::printf("Scriptname not specified!");
+		CGame::printf("Scriptname not specified!");
 		return;
 	}
 
-	ME_ExportToScript( ClientGame::argv(1) );
+	ME_ExportToScript( CGame::argv(1) );
 
 }
 
-void ClientGame::setSide_f( ) {
-	ME_SetSide( ClientGame::argv(1) );
+void CGame::setSide_f( ) {
+	ME_SetSide( CGame::argv(1) );
 }
 
-void ClientGame::importScript_f( ) {
+void CGame::importScript_f( ) {
 	if( CommandSystem::argc() < 2 )
 	{
-		ClientGame::printf("Scriptname not specified!");
+		CGame::printf("Scriptname not specified!");
 		return;
 	}
-	ME_ImportScript( ClientGame::argv(1) );
+	ME_ImportScript( CGame::argv(1) );
 }
 
 /*
@@ -558,46 +558,46 @@ bool CG_ExtractDeveloper( )
 	}
 
 	// convert 2nd param into a value
-	value = atof( ClientGame::argv(1) );
+	value = atof( CGame::argv(1) );
 
 	// check 2nd param against known variables
 
-	if( !Q_stricmp( ClientGame::argv(0), "ox" ) )
+	if( !Q_stricmp( CGame::argv(0), "ox" ) )
 	{
 		availableVehicles[ ci->vehicle ].shadowCoords[ SHC_XOFFSET ] = value;
 		return true;
 	}
-	else if( !Q_stricmp( ClientGame::argv(0), "oy" ) )
+	else if( !Q_stricmp( CGame::argv(0), "oy" ) )
 	{
 		availableVehicles[ ci->vehicle ].shadowCoords[ SHC_YOFFSET ] = value;
 		return true;
 	}
-	else if( !Q_stricmp( ClientGame::argv(0), "ax" ) )
+	else if( !Q_stricmp( CGame::argv(0), "ax" ) )
 	{
 		availableVehicles[ ci->vehicle ].shadowCoords[ SHC_XADJUST ] = value;
 		return true;
 	}
-	else if( !Q_stricmp( ClientGame::argv(0), "ay" ) )
+	else if( !Q_stricmp( CGame::argv(0), "ay" ) )
 	{
 		availableVehicles[ ci->vehicle ].shadowCoords[ SHC_YADJUST ] = value;
 		return true;
 	}
-	else if( !Q_stricmp( ClientGame::argv(0), "pmax" ) )
+	else if( !Q_stricmp( CGame::argv(0), "pmax" ) )
 	{
 		availableVehicles[ ci->vehicle ].shadowAdjusts[ SHO_PITCHMAX ] = value;
 		return true;
 	}
-	else if( !Q_stricmp( ClientGame::argv(0), "rmax" ) )
+	else if( !Q_stricmp( CGame::argv(0), "rmax" ) )
 	{
 		availableVehicles[ ci->vehicle ].shadowAdjusts[ SHO_ROLLMAX ] = value;
 		return true;
 	}
-	else if( !Q_stricmp( ClientGame::argv(0), "pmod" ) )
+	else if( !Q_stricmp( CGame::argv(0), "pmod" ) )
 	{
 		availableVehicles[ ci->vehicle ].shadowAdjusts[ SHO_PITCHMOD ] = value;
 		return true;
 	}
-	else if( !Q_stricmp( ClientGame::argv(0), "rmod" ) )
+	else if( !Q_stricmp( CGame::argv(0), "rmod" ) )
 	{
 		availableVehicles[ ci->vehicle ].shadowAdjusts[ SHO_ROLLMOD ] = value;
 		return true;
@@ -612,78 +612,78 @@ struct consoleCommand_t {
 };
 
 static consoleCommand_t	commands[] = {
-	{ "testgun", ClientGame::testGun_f },
-	{ "testmodel", ClientGame::testModel_f },
-	{ "nextframe", ClientGame::testModelNextFrame_f },
-	{ "prevframe", ClientGame::testModelPrevFrame_f },
-	{ "nextskin", ClientGame::testModelNextSkin_f },
-	{ "prevskin", ClientGame::testModelPrevSkin_f },
-	{ "testPlane", ClientGame::testPlane_f },
-	{ "testGV", ClientGame::testGV_f },
-	{ "testPlaneCmd", ClientGame::testPlaneCmd_f },
-	{ "testGVCmd", ClientGame::testGVCmd_f },
-	{ "viewpos", ClientGame::viewpos_f },
-	{ "+scores", ClientGame::scoresDown_f },
-	{ "-scores", ClientGame::scoresUp_f },
-	{ "+zoom", ClientGame::zoomDown_f },
-	{ "-zoom", ClientGame::zoomUp_f },
-	{ "sizeup", ClientGame::sizeUp_f },
-	{ "sizedown", ClientGame::sizeDown_f },
-	{ "weapnext", ClientGame::nextWeapon_f },
-	{ "weapprev", ClientGame::prevWeapon_f },
-	{ "weapon", ClientGame::weapon_f },
-	{ "tell_target", ClientGame::tellTarget_f },
-	{ "tell_attacker", ClientGame::tellAttacker_f },
+	{ "testgun", CGame::testGun_f },
+	{ "testmodel", CGame::testModel_f },
+	{ "nextframe", CGame::testModelNextFrame_f },
+	{ "prevframe", CGame::testModelPrevFrame_f },
+	{ "nextskin", CGame::testModelNextSkin_f },
+	{ "prevskin", CGame::testModelPrevSkin_f },
+	{ "testPlane", CGame::testPlane_f },
+	{ "testGV", CGame::testGV_f },
+	{ "testPlaneCmd", CGame::testPlaneCmd_f },
+	{ "testGVCmd", CGame::testGVCmd_f },
+	{ "viewpos", CGame::viewpos_f },
+	{ "+scores", CGame::scoresDown_f },
+	{ "-scores", CGame::scoresUp_f },
+	{ "+zoom", CGame::zoomDown_f },
+	{ "-zoom", CGame::zoomUp_f },
+	{ "sizeup", CGame::sizeUp_f },
+	{ "sizedown", CGame::sizeDown_f },
+	{ "weapnext", CGame::nextWeapon_f },
+	{ "weapprev", CGame::prevWeapon_f },
+	{ "weapon", CGame::weapon_f },
+	{ "tell_target", CGame::tellTarget_f },
+	{ "tell_attacker", CGame::tellAttacker_f },
 	{ "tcmd", CG_TargetCommand_f },
-	{ "gps", ClientGame::toggleGps_f },
-	{ "extinfo", ClientGame::toggleInfo_f },
-	{ "toggleview", ClientGame::toggleView_f },
-	{ "+zoomin", ClientGame::zoomIn_f },
-	{ "-zoomin", ClientGame::adjustReset_f },
-	{ "+zoomout", ClientGame::zoomOut_f },
-	{ "-zoomout", ClientGame::adjustReset_f },
-	{ "+cameraup", ClientGame::cameraUp_f },
-	{ "-cameraup", ClientGame::adjustReset_f },
-	{ "+cameradown", ClientGame::cameraDown_f },
-	{ "-cameradown", ClientGame::adjustReset_f },
-	{ "radarrange", ClientGame::toggleRadarRange_f },
-	{ "mfd1_mode", ClientGame::set_MFD1_Mode_f },
-	{ "mfd2_mode", ClientGame::set_MFD2_Mode_f },
-	{ "mfd1_page", ClientGame::set_MFD1_Page_f },
-	{ "mfd2_page", ClientGame::set_MFD2_Page_f },
-	{ "cycle_hud_color", ClientGame::cycle_HUD_Color_f },
-	{ "cycle_mfd_color", ClientGame::cycle_MFD_Color_f },
-	{ "cycle_camera_mode", ClientGame::cycle_Camera_Mode_f },
-	{ "set_camera_mode", ClientGame::set_Camera_Mode_f },
-	{ "+backcam", ClientGame::camBack_f },
-	{ "-backcam", ClientGame::camOld_f },
-	{ "+downcam", ClientGame::camDown_f },
-	{ "-downcam", ClientGame::camOld_f },
-	{ "+bombcam", ClientGame::camBomb_f },
-	{ "-bombcam", ClientGame::camOld_f },
-	{ "toggle_mfd1", ClientGame::toggle_MFD1_f },
-	{ "toggle_mfd2", ClientGame::toggle_MFD2_f },
-	{ "update_hud_color", ClientGame::update_HUD_Color_f },
-	{ "update_mfd_color", ClientGame::update_MFD_Color_f },
-	{ "me_spawn_gi", ClientGame::spawn_GI_f },
-	{ "me_export_to_script", ClientGame::exportToScript_f },
-	{ "me_import_script", ClientGame::importScript_f },
-	{ "me_side", ClientGame::setSide_f },
+	{ "gps", CGame::toggleGps_f },
+	{ "extinfo", CGame::toggleInfo_f },
+	{ "toggleview", CGame::toggleView_f },
+	{ "+zoomin", CGame::zoomIn_f },
+	{ "-zoomin", CGame::adjustReset_f },
+	{ "+zoomout", CGame::zoomOut_f },
+	{ "-zoomout", CGame::adjustReset_f },
+	{ "+cameraup", CGame::cameraUp_f },
+	{ "-cameraup", CGame::adjustReset_f },
+	{ "+cameradown", CGame::cameraDown_f },
+	{ "-cameradown", CGame::adjustReset_f },
+	{ "radarrange", CGame::toggleRadarRange_f },
+	{ "mfd1_mode", CGame::set_MFD1_Mode_f },
+	{ "mfd2_mode", CGame::set_MFD2_Mode_f },
+	{ "mfd1_page", CGame::set_MFD1_Page_f },
+	{ "mfd2_page", CGame::set_MFD2_Page_f },
+	{ "cycle_hud_color", CGame::cycle_HUD_Color_f },
+	{ "cycle_mfd_color", CGame::cycle_MFD_Color_f },
+	{ "cycle_camera_mode", CGame::cycle_Camera_Mode_f },
+	{ "set_camera_mode", CGame::set_Camera_Mode_f },
+	{ "+backcam", CGame::camBack_f },
+	{ "-backcam", CGame::camOld_f },
+	{ "+downcam", CGame::camDown_f },
+	{ "-downcam", CGame::camOld_f },
+	{ "+bombcam", CGame::camBomb_f },
+	{ "-bombcam", CGame::camOld_f },
+	{ "toggle_mfd1", CGame::toggle_MFD1_f },
+	{ "toggle_mfd2", CGame::toggle_MFD2_f },
+	{ "update_hud_color", CGame::update_HUD_Color_f },
+	{ "update_mfd_color", CGame::update_MFD_Color_f },
+	{ "me_spawn_gi", CGame::spawn_GI_f },
+	{ "me_export_to_script", CGame::exportToScript_f },
+	{ "me_import_script", CGame::importScript_f },
+	{ "me_side", CGame::setSide_f },
 };
 
 /*
 =================
-ClientGame::consoleCommand
+CGame::consoleCommand
 
 The string has been tokenized and can be retrieved with
 CommandSystem::argc() / CommandSystem::argv()
 =================
 */
-bool ClientGame::consoleCommand( ) {
+bool CGame::consoleCommand( ) {
 	const char	*cmd;
 	int		i;
 
-	cmd = ClientGame::argv(0);
+	cmd = CGame::argv(0);
 
 	// developer variable modification
 	if( CG_ExtractDeveloper() )
@@ -710,13 +710,13 @@ bool ClientGame::consoleCommand( ) {
 
 /*
 =================
-ClientGame::initConsoleCommands
+CGame::initConsoleCommands
 
 Let the client system know about all of our commands
 so it can perform tab completion
 =================
 */
-void ClientGame::initConsoleCommands( ) {
+void CGame::initConsoleCommands( ) {
 	int		i;
 
 	for ( i = 0 ; i < sizeof( commands ) / sizeof( commands[0] ) ; i++ ) {

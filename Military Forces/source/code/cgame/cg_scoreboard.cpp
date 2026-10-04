@@ -54,7 +54,7 @@ constexpr int SB_SCORELINE_X = 112;
 //  
 //  wins/losses are drawn on bot icon now
 
-bool ClientGame::localClient; // true if local client has been displayed
+bool CGame::localClient; // true if local client has been displayed
 
 
 							 /*
@@ -79,17 +79,17 @@ CG_DrawScoreboard
 //	// draw the handicap or bot skill marker (unless player has flag)
 //	if ( ci->objectives & OB_REDFLAG ) {
 //		if( largeFormat ) {
-//			ClientGame::drawFlagModel( iconx, y - ( 32 - BIGCHAR_HEIGHT ) / 2, 32, 32, ClientBase::TEAM_RED, false );
+//			CGame::drawFlagModel( iconx, y - ( 32 - BIGCHAR_HEIGHT ) / 2, 32, 32, ClientBase::TEAM_RED, false );
 //		}
 //		else {
-//			ClientGame::drawFlagModel( iconx, y, 16, 16, ClientBase::TEAM_RED, false );
+//			CGame::drawFlagModel( iconx, y, 16, 16, ClientBase::TEAM_RED, false );
 //		}
 //	} else if ( ci->objectives & OB_BLUEFLAG ) {
 //		if( largeFormat ) {
-//			ClientGame::drawFlagModel( iconx, y - ( 32 - BIGCHAR_HEIGHT ) / 2, 32, 32, ClientBase::TEAM_BLUE, false );
+//			CGame::drawFlagModel( iconx, y - ( 32 - BIGCHAR_HEIGHT ) / 2, 32, 32, ClientBase::TEAM_BLUE, false );
 //		}
 //		else {
-//			ClientGame::drawFlagModel( iconx, y, 16, 16, ClientBase::TEAM_BLUE, false );
+//			CGame::drawFlagModel( iconx, y, 16, 16, ClientBase::TEAM_BLUE, false );
 //		}
 //	} else {
 ////		if ( ci->botSkill > 0 && ci->botSkill <= 5 ) {
@@ -97,19 +97,19 @@ CG_DrawScoreboard
 //		if ( ci->handicap < 100 ) {
 //			Com_sprintf( string, sizeof( string ), "%i", ci->handicap );
 //			if ( cgs.gametype == GT_TOURNAMENT )
-//				ClientGame::drawSmallStringColor( iconx, y - SMALLCHAR_HEIGHT/2, string, color );
+//				CGame::drawSmallStringColor( iconx, y - SMALLCHAR_HEIGHT/2, string, color );
 //			else
-//				ClientGame::drawSmallStringColor( iconx, y, string, color );
+//				CGame::drawSmallStringColor( iconx, y, string, color );
 //		}
 //
 //		// draw the wins / losses
 //		if ( cgs.gametype == GT_TOURNAMENT ) {
 //			Com_sprintf( string, sizeof( string ), "%i/%i", ci->wins, ci->losses );
 //			if( ci->handicap < 100 && !ci->botSkill ) {
-//				ClientGame::drawSmallStringColor( iconx, y + SMALLCHAR_HEIGHT/2, string, color );
+//				CGame::drawSmallStringColor( iconx, y + SMALLCHAR_HEIGHT/2, string, color );
 //			}
 //			else {
-//				ClientGame::drawSmallStringColor( iconx, y, string, color );
+//				CGame::drawSmallStringColor( iconx, y, string, color );
 //			}
 //		}
 //	}
@@ -158,15 +158,15 @@ CG_DrawScoreboard
 //		}
 //
 //		hcolor[3] = fade * 0.7;
-//		ClientGame::fillRect( SB_SCORELINE_X + BIGCHAR_WIDTH + (SB_RATING_WIDTH / 2), y, 
+//		CGame::fillRect( SB_SCORELINE_X + BIGCHAR_WIDTH + (SB_RATING_WIDTH / 2), y, 
 //			640 - SB_SCORELINE_X - BIGCHAR_WIDTH, BIGCHAR_HEIGHT+1, hcolor );
 //	}
 //
-//	ClientGame::drawBigString( SB_SCORELINE_X + (SB_RATING_WIDTH / 2), y, string, fade );
+//	CGame::drawBigString( SB_SCORELINE_X + (SB_RATING_WIDTH / 2), y, string, fade );
 //
 //	// add the "ready" marker for intermission exiting
 //	if ( cg.snap->ps.stats[ STAT_CLIENTS_READY ] & ( 1 << score->client ) ) {
-//		ClientGame::drawBigStringColor( iconx, y, "READY", color );
+//		CGame::drawBigStringColor( iconx, y, "READY", color );
 //	}
 //}
 
@@ -206,10 +206,10 @@ CG_TeamScoreboard
 
 /*
 ================
-ClientGame::centerGiantLine
+CGame::centerGiantLine
 ================
 */
-void ClientGame::centerGiantLine( float y, const char *string ) {
+void CGame::centerGiantLine( float y, const char *string ) {
 	float		x;
 	vec4_t		color;
 
@@ -218,9 +218,9 @@ void ClientGame::centerGiantLine( float y, const char *string ) {
 	color[2] = 1;
 	color[3] = 1;
 
-	x = 0.5 * ( 640 - GIANT_WIDTH * ClientGame::drawStrlen( string ) );
+	x = 0.5 * ( 640 - GIANT_WIDTH * CGame::drawStrlen( string ) );
 
-	ClientGame::drawStringExt( x, y, string, color, true, true, GIANT_WIDTH, GIANT_HEIGHT, 0 );
+	CGame::drawStringExt( x, y, string, color, true, true, GIANT_WIDTH, GIANT_HEIGHT, 0 );
 }
 
 /*
@@ -230,7 +230,7 @@ CG_DrawTourneyScoreboard
 Draw the oversize scoreboard for tournements
 =================
 */
-void ClientGame::drawOldTourneyScoreboard( ) {
+void CGame::drawOldTourneyScoreboard( ) {
 	const char		*s;
 	vec4_t			color;
 	int				min, tens, ones;
@@ -252,16 +252,16 @@ void ClientGame::drawOldTourneyScoreboard( ) {
 	// draw the dialog background
 	color[0] = color[1] = color[2] = 0;
 	color[3] = 1;
-	ClientGame::fillRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, color );
+	CGame::fillRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, color );
 
 	// print the mesage of the day
-	s = ClientGame::configString( CS_MOTD );
+	s = CGame::configString( CS_MOTD );
 	if ( !s[0] ) {
 		s = "Scoreboard";
 	}
 
 	// print optional title
-	ClientGame::centerGiantLine( 8, s );
+	CGame::centerGiantLine( 8, s );
 
 	// print server time
 	ones = cg.time / 1000;
@@ -271,7 +271,7 @@ void ClientGame::drawOldTourneyScoreboard( ) {
 	ones %= 10;
 	s = va("%i:%i%i", min, tens, ones );
 
-	ClientGame::centerGiantLine( 64, s );
+	CGame::centerGiantLine( 64, s );
 
 
 	// print the two scores
@@ -281,15 +281,15 @@ void ClientGame::drawOldTourneyScoreboard( ) {
 		//
 		// teamplay scoreboard
 		//
-		ClientGame::drawStringExt( 8, y, "Red Team", color, true, true, GIANT_WIDTH, GIANT_HEIGHT, 0 );
+		CGame::drawStringExt( 8, y, "Red Team", color, true, true, GIANT_WIDTH, GIANT_HEIGHT, 0 );
 		s = va("%i", cg.teamScores[0] );
-		ClientGame::drawStringExt( 632 - GIANT_WIDTH * strlen(s), y, s, color, true, true, GIANT_WIDTH, GIANT_HEIGHT, 0 );
+		CGame::drawStringExt( 632 - GIANT_WIDTH * strlen(s), y, s, color, true, true, GIANT_WIDTH, GIANT_HEIGHT, 0 );
 		
 		y += 64;
 
-		ClientGame::drawStringExt( 8, y, "Blue Team", color, true, true, GIANT_WIDTH, GIANT_HEIGHT, 0 );
+		CGame::drawStringExt( 8, y, "Blue Team", color, true, true, GIANT_WIDTH, GIANT_HEIGHT, 0 );
 		s = va("%i", cg.teamScores[1] );
-		ClientGame::drawStringExt( 632 - GIANT_WIDTH * strlen(s), y, s, color, true, true, GIANT_WIDTH, GIANT_HEIGHT, 0 );
+		CGame::drawStringExt( 632 - GIANT_WIDTH * strlen(s), y, s, color, true, true, GIANT_WIDTH, GIANT_HEIGHT, 0 );
 	} else {
 		//
 		// free for all scoreboard
@@ -303,9 +303,9 @@ void ClientGame::drawOldTourneyScoreboard( ) {
 				continue;
 			}
 
-			ClientGame::drawStringExt( 8, y, ci->name, color, true, true, GIANT_WIDTH, GIANT_HEIGHT, 0 );
+			CGame::drawStringExt( 8, y, ci->name, color, true, true, GIANT_WIDTH, GIANT_HEIGHT, 0 );
 			s = va("%i", ci->score );
-			ClientGame::drawStringExt( 632 - GIANT_WIDTH * strlen(s), y, s, color, true, true, GIANT_WIDTH, GIANT_HEIGHT, 0 );
+			CGame::drawStringExt( 632 - GIANT_WIDTH * strlen(s), y, s, color, true, true, GIANT_WIDTH, GIANT_HEIGHT, 0 );
 			y += 64;
 		}
 	}

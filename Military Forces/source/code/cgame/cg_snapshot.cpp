@@ -53,7 +53,7 @@ void ClientEntity::transitionEntity() {
 		this->resetEntity();
 	}
 
-	// clear the next state.  if will be set by the next ClientGame::setNextSnap
+	// clear the next state.  if will be set by the next CGame::setNextSnap
 	this->interpolate = false;
 
 	// check for events
@@ -67,7 +67,7 @@ CG_SetInitialSnapshot
 
 This will only happen on the very first snapshot, or
 on tourney restarts.  All other times will use 
-ClientGame::transitionSnapshot instead.
+CGame::transitionSnapshot instead.
 
 FIXME: Also called by map_restart?
 ==================
@@ -82,13 +82,13 @@ void CG_SetInitialSnapshot( snapshot_t *snap ) {
 	GameShared::playerStateToEntityState( &snap->ps, &cg_entities[ snap->ps.clientNum ].currentState, false );
 
 	// sort out solid entities
-	ClientGame::buildSolidList();
+	CGame::buildSolidList();
 
-	ClientGame::executeNewServerCommands( snap->serverCommandSequence );
+	CGame::executeNewServerCommands( snap->serverCommandSequence );
 
 	// set our local weapon selection pointer to
 	// what the server has indicated the current weapon is
-	ClientGame::respawn();
+	CGame::respawn();
 
 	for ( i = 0 ; i < cg.snap->numEntities ; i++ ) {
 		state = &cg.snap->entities[ i ];
@@ -109,12 +109,12 @@ void CG_SetInitialSnapshot( snapshot_t *snap ) {
 
 /*
 ===================
-ClientGame::transitionSnapshot
+CGame::transitionSnapshot
 
 The transition point from snap to nextSnap has passed
 ===================
 */
-void ClientGame::transitionSnapshot( ) {
+void CGame::transitionSnapshot( ) {
 	ClientEntity			*cent;
 	snapshot_t			*oldFrame;
 	int					i;
@@ -127,7 +127,7 @@ void ClientGame::transitionSnapshot( ) {
 	}
 
 	// execute any server string commands before transitioning entities
-	ClientGame::executeNewServerCommands( cg.nextSnap->serverCommandSequence );
+	CGame::executeNewServerCommands( cg.nextSnap->serverCommandSequence );
 
 	// if we had a map_restart, set everthing with initial
 	if ( !cg.snap ) {
@@ -171,7 +171,7 @@ void ClientGame::transitionSnapshot( ) {
 		// reason, then the client events and view changes will be issued now
 		if ( cg.demoPlayback || (cg.snap->ps.pm_flags & PMF_FOLLOW)
 			|| cg_nopredict.integer || cg_synchronousClients.integer ) {
-			ClientGame::transitionPlayerState( ps, ops );
+			CGame::transitionPlayerState( ps, ops );
 		}
 	}
 
@@ -180,12 +180,12 @@ void ClientGame::transitionSnapshot( ) {
 
 /*
 ===================
-ClientGame::setNextSnap
+CGame::setNextSnap
 
 A New snapshot has just been read in from the client system.
 ===================
 */
-void ClientGame::setNextSnap( snapshot_t *snap ) {
+void CGame::setNextSnap( snapshot_t *snap ) {
 	int					num;
 	entityState_t		*es;
 	ClientEntity			*cent;
@@ -245,13 +245,13 @@ void ClientGame::setNextSnap( snapshot_t *snap ) {
 	}
 
 	// sort out solid entities
-	ClientGame::buildSolidList();
+	CGame::buildSolidList();
 }
 
 
 /*
 ========================
-ClientGame::readNextSnapshot
+CGame::readNextSnapshot
 
 This is the only place New snapshots are requested
 This may increment cgs.processedSnapshotNum multiple
@@ -259,12 +259,12 @@ times if the client system fails to return a
 valid snapshot.
 ========================
 */
-snapshot_t * ClientGame::readNextSnapshot( ) {
+snapshot_t * CGame::readNextSnapshot( ) {
 	int	r;
 	snapshot_t	*dest;
 
 	if ( cg.latestSnapshotNum > cgs.processedSnapshotNum + 1000 ) {
-		ClientGame::printf( "WARNING: CG_ReadNextSnapshot: way out of range, %i > %i", 
+		CGame::printf( "WARNING: CG_ReadNextSnapshot: way out of range, %i > %i", 
 			cg.latestSnapshotNum, cgs.processedSnapshotNum );
 	}
 
@@ -287,7 +287,7 @@ snapshot_t * ClientGame::readNextSnapshot( ) {
 
 		// if it succeeded, return
 		if ( r ) {
-			ClientGame::addLagometerSnapshotInfo( dest );
+			CGame::addLagometerSnapshotInfo( dest );
 			return dest;
 		}
 
@@ -297,7 +297,7 @@ snapshot_t * ClientGame::readNextSnapshot( ) {
 		// buffer in the client system.
 
 		// record as a dropped packet
-		ClientGame::addLagometerSnapshotInfo( nullptr );
+		CGame::addLagometerSnapshotInfo( nullptr );
 
 		// If there are additional snapshots, continue trying to
 		// read them.
@@ -310,7 +310,7 @@ snapshot_t * ClientGame::readNextSnapshot( ) {
 
 /*
 ============
-ClientGame::processSnapshots
+CGame::processSnapshots
 
 We are trying to set up a renderable view, so determine
 what the simulated time is, and try to get snapshots
@@ -327,7 +327,7 @@ of an interpolating one)
 
 ============
 */
-void ClientGame::processSnapshots( ) {
+void CGame::processSnapshots( ) {
 	snapshot_t		*snap;
 	int				n;
 
@@ -345,7 +345,7 @@ void ClientGame::processSnapshots( ) {
 	// Once we have gotten the first snapshot, cg.snap will
 	// always have valid data for the rest of the game
 	while ( !cg.snap ) {
-		snap = ClientGame::readNextSnapshot();
+		snap = CGame::readNextSnapshot();
 		if ( !snap ) {
 			// we can't continue until we get a snapshot
 			return;
@@ -364,7 +364,7 @@ void ClientGame::processSnapshots( ) {
 	do {
 		// if we don't have a nextframe, try and read a New one in
 		if ( !cg.nextSnap ) {
-			snap = ClientGame::readNextSnapshot();
+			snap = CGame::readNextSnapshot();
 
 			// if we still don't have a nextframe, we will just have to
 			// extrapolate
@@ -372,7 +372,7 @@ void ClientGame::processSnapshots( ) {
 				break;
 			}
 
-			ClientGame::setNextSnap( snap );
+			CGame::setNextSnap( snap );
 
 
 			// if time went backwards, we have a level restart
@@ -387,7 +387,7 @@ void ClientGame::processSnapshots( ) {
 		}
 
 		// we have passed the transition from nextFrame to frame
-		ClientGame::transitionSnapshot();
+		CGame::transitionSnapshot();
 	} while ( true );
 
 	// assert our valid conditions upon exiting

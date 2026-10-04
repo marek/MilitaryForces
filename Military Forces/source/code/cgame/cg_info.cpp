@@ -30,18 +30,18 @@ static void CG_DrawLoadingIcons( void ) {
 			y += 40;
 		}
 		x = 16 + n % 13 * 48;
-		ClientGame::drawPic( x, y, 32, 32, loadingItemIcons[n] );
+		CGame::drawPic( x, y, 32, 32, loadingItemIcons[n] );
 	}
 }
 */
 
 /*
 ======================
-ClientGame::loadingString
+CGame::loadingString
 
 ======================
 */
-void ClientGame::loadingRefresh( bool force ) {
+void CGame::loadingRefresh( bool force ) {
 	int hz = cgs.glconfig.displayFrequency > 0 ? cgs.glconfig.displayFrequency : 60;
 	int now = System::milliseconds();
 
@@ -53,27 +53,27 @@ void ClientGame::loadingRefresh( bool force ) {
 	Screen::updateScreen();
 }
 
-void ClientGame::loadingString( const char *s ) {
+void CGame::loadingString( const char *s ) {
 	Q_strncpyz( cg.infoScreenText, s, sizeof( cg.infoScreenText ) );
 
-	ClientGame::loadingRefresh( false );
+	CGame::loadingRefresh( false );
 }
 
-void ClientGame::loadingStage( const char *s, float start, float end ) {
+void CGame::loadingStage( const char *s, float start, float end ) {
 	Q_strncpyz( cg.infoScreenText, s, sizeof( cg.infoScreenText ) );
 	cg.infoLoadStart = start;
 	cg.infoLoadEnd = end;
 	cg.infoLoadFraction = start;
 
-	ClientGame::loadingRefresh( true );
+	CGame::loadingRefresh( true );
 }
 
-void ClientGame::loadingStep( int done, int total ) {
+void CGame::loadingStep( int done, int total ) {
 	if ( total > 0 ) {
 		cg.infoLoadFraction = cg.infoLoadStart + ( cg.infoLoadEnd - cg.infoLoadStart ) * done / total;
 	}
 
-	ClientGame::loadingRefresh( false );
+	CGame::loadingRefresh( false );
 }
 
 
@@ -91,17 +91,17 @@ void CG_LoadingItem( int itemNum ) {
 		loadingItemIcons[loadingItemIconCount++] = refExport.RegisterShaderNoMip( item->icon );
 	}
 
-	ClientGame::loadingString( item->pickup_name );
+	CGame::loadingString( item->pickup_name );
 }
 */
 /*
 ====================
-ClientGame::drawInformation
+CGame::drawInformation
 
 Draw all the status / pacifier stuff during level loading
 ====================
 */
-void ClientGame::drawInformation( ) {
+void CGame::drawInformation( ) {
 	const char	* s = nullptr, * pGameset = nullptr;
 	const char	* info = nullptr;
 	const char	* sysInfo = nullptr;
@@ -111,8 +111,8 @@ void ClientGame::drawInformation( ) {
 	char		buf[1024] = { 0 } ;
 	char		flagBuf[64] = { 0 };
 
-	info = ClientGame::configString( CS_SERVERINFO );
-	sysInfo = ClientGame::configString( CS_SYSTEMINFO );
+	info = CGame::configString( CS_SERVERINFO );
+	sysInfo = CGame::configString( CS_SYSTEMINFO );
 
 	// get the map name
 	s = Info::valueForKey( info, "mapname" );
@@ -131,7 +131,7 @@ void ClientGame::drawInformation( ) {
 
 	// full screen render
 	refExport.SetColor( nullptr );
-	ClientGame::drawPic( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, background );
+	CGame::drawPic( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, background );
 
 	// alpha blend the 1024x256 loading shot (or gameset artwork) over the picture frame
 	if( !loadingshot )
@@ -147,14 +147,14 @@ void ClientGame::drawInformation( ) {
 	// something to display?
 	if( loadingshot )
 	{
-		ClientGame::drawPic( 0, 160, 640, 160, loadingshot );
+		CGame::drawPic( 0, 160, 640, 160, loadingshot );
 	}
 /*
 	// draw the icons of things as they are loaded
 	CG_DrawLoadingIcons();
 */
 	// map-specific message (long map name)
-	s = ClientGame::configString( CS_MESSAGE );
+	s = CGame::configString( CS_MESSAGE );
 	if ( s[0] )
 	{
 		UI_DrawProportionalString( 632, 300, s, UI_RIGHT|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
@@ -175,19 +175,19 @@ void ClientGame::drawInformation( ) {
 			p.y = 323;
 			p.h = 15;
 			p.w = 640;
-			ClientGame::drawProgressBar( &p, colorDkGrey, colorWhite, 12.0f, UI_SMALLFONT|UI_INVERSE|UI_CENTER, cg.infoLoadFraction );
+			CGame::drawProgressBar( &p, colorDkGrey, colorWhite, 12.0f, UI_SMALLFONT|UI_INVERSE|UI_CENTER, cg.infoLoadFraction );
 		}
 	}
 	else
 	{
 		UI_DrawProportionalString( 320, 170, "Awaiting snapshot...", UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 	}
-	//ClientGame::drawStringExt(0, 150, cg.infoCurrentLoadItemText, colorLtGrey, true, false, 6,6, strlen(cg.infoCurrentLoadItemText));
+	//CGame::drawStringExt(0, 150, cg.infoCurrentLoadItemText, colorLtGrey, true, false, 6,6, strlen(cg.infoCurrentLoadItemText));
 	//p.x = 0;
 	//p.y = 323;
 	//p.h = 15;
 	//p.w = 640;
-	//ClientGame::drawProgressBar(&p, colorDkGrey, colorWhite, 12.0f, UI_SMALLFONT|UI_INVERSE|UI_CENTER, cg.infoLoadFraction);
+	//CGame::drawProgressBar(&p, colorDkGrey, colorWhite, 12.0f, UI_SMALLFONT|UI_INVERSE|UI_CENTER, cg.infoLoadFraction);
 
 	// draw info string information
 	x = 32;
@@ -218,7 +218,7 @@ void ClientGame::drawInformation( ) {
 		y += PROP_HEIGHT;
 
 		// server-specific message of the day
-		s = ClientGame::configString( CS_MOTD );
+		s = CGame::configString( CS_MOTD );
 		if ( s[0] )
 		{
 			UI_DrawProportionalString( x, y, s, UI_LEFT|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );

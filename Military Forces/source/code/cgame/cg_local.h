@@ -556,7 +556,7 @@ struct cg_t {
 	bool	hyperspace;				// true if prediction has hit a trigger_teleport
 	playerState_t	predictedPlayerState;
 	ClientEntity		predictedPlayerEntity;
-	bool	validPPS;				// clear until the first call to ClientGame::predictPlayerState
+	bool	validPPS;				// clear until the first call to CGame::predictPlayerState
 	int			predictedErrorTime;
 	vec3_t		predictedError;
 
@@ -1645,7 +1645,7 @@ struct particleWorld_s
 };
 using particleWorld_t = particleWorld_s;
 
-class ClientGame
+class CGame
 {
 public:
 	static const char *configString( int index );

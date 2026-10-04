@@ -1,4 +1,5 @@
 #include "cg.h"
+#include "cg_local.h"
 
 #pragma message( "+++TODO+++ decls (remove when finished porting to C++!)" )
 void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum );
@@ -43,7 +44,7 @@ ClientGame::shutdown()
 bool
 ClientGame::consoleCommand() const
 {
-	return ClientGame::consoleCommand();
+	return CGame::consoleCommand();
 }
 
 void
@@ -51,37 +52,37 @@ ClientGame::drawActiveFrame( int serverTime,
 							 stereoFrame_t stereoView, 
 							 bool demoPlayback ) const
 {
-	ClientGame::drawActiveFrame( serverTime, stereoView, demoPlayback );
+	CGame::drawActiveFrame( serverTime, stereoView, demoPlayback );
 }
 
 int 
 ClientGame::crosshairPlayer() const
 {
-	return ClientGame::crosshairPlayer();
+	return CGame::crosshairPlayer();
 }
 
 int
 ClientGame::lastAttacker() const
 {
-	return ClientGame::lastAttacker();
+	return CGame::lastAttacker();
 }
 
 void
 ClientGame::keyEvent( int key, bool down ) const
 {
-	ClientGame::keyEvent( key, down );
+	CGame::keyEvent( key, down );
 }
 
 void
 ClientGame::mouseEvent( int dx, int dy ) const
 {
-	ClientGame::mouseEvent( dx, dy );
+	CGame::mouseEvent( dx, dy );
 }
 
 void
 ClientGame::eventHandling( int type ) const
 {
-	ClientGame::eventHandling( type );
+	CGame::eventHandling( type );
 }
 
 bool

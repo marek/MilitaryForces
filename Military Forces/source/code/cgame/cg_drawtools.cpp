@@ -12,7 +12,7 @@
 extern UI_UtilsCG cgUtils;
 
 
-void ClientGame::drawProgressBar( rectDef_t *rect, vec4_t color, vec4_t textcolor, float scale, int textStyle, float progress )
+void CGame::drawProgressBar( rectDef_t *rect, vec4_t color, vec4_t textcolor, float scale, int textStyle, float progress )
 {
 	float   rimWidth = rect->h / 20.0f;
 	float   doneWidth, leftWidth;
@@ -28,10 +28,10 @@ void ClientGame::drawProgressBar( rectDef_t *rect, vec4_t color, vec4_t textcolo
 	leftWidth = ( rect->w - 2 * rimWidth ) - doneWidth;
   
 	refExport.SetColor( color );
-	ClientGame::drawPic( rect->x, rect->y, rimWidth + doneWidth, rect->h, cgs.media.whiteShader );
-	ClientGame::drawPic( rimWidth + rect->x + doneWidth, rect->y, leftWidth, rimWidth, cgs.media.whiteShader );
-	ClientGame::drawPic( rimWidth + rect->x + doneWidth, rect->y + rect->h - rimWidth, leftWidth, rimWidth, cgs.media.whiteShader );
-	ClientGame::drawPic( rect->x + rect->w - rimWidth, rect->y, rimWidth, rect->h, cgs.media.whiteShader );
+	CGame::drawPic( rect->x, rect->y, rimWidth + doneWidth, rect->h, cgs.media.whiteShader );
+	CGame::drawPic( rimWidth + rect->x + doneWidth, rect->y, leftWidth, rimWidth, cgs.media.whiteShader );
+	CGame::drawPic( rimWidth + rect->x + doneWidth, rect->y + rect->h - rimWidth, leftWidth, rimWidth, cgs.media.whiteShader );
+	CGame::drawPic( rect->x + rect->w - rimWidth, rect->y, rimWidth, rect->h, cgs.media.whiteShader );
 	refExport.SetColor( nullptr );
   
 	//draw text
@@ -41,28 +41,28 @@ void ClientGame::drawProgressBar( rectDef_t *rect, vec4_t color, vec4_t textcolo
 		twa = scale * strlen(textBuffer);
 		tx = rect->x + ( rect->w / 2.0f ) - ( twa / 2.0f );
 		ty = rect->y + ( rect->h / 2.0f ) - ( scale / 2.0f );
-		ClientGame::drawStringExt(tx, ty, textBuffer, textcolor, true, false, scale,scale, strlen(textBuffer));
+		CGame::drawStringExt(tx, ty, textBuffer, textcolor, true, false, scale,scale, strlen(textBuffer));
 	}
 }
 
 /*
 ================
-ClientGame::adjustFrom640
+CGame::adjustFrom640
 
 Adjusted for resolution and screen aspect ratio
 ================
 */
-screenPlacement_e ClientGame::cg_screenPlacement = PLACE_CENTER;
+screenPlacement_e CGame::cg_screenPlacement = PLACE_CENTER;
 
-void ClientGame::setScreenPlacement( screenPlacement_e placement ) {
+void CGame::setScreenPlacement( screenPlacement_e placement ) {
 	cg_screenPlacement = placement;
 }
 
-screenPlacement_e ClientGame::getScreenPlacement( ) {
+screenPlacement_e CGame::getScreenPlacement( ) {
 	return cg_screenPlacement;
 }
 
-void ClientGame::adjustFrom640( float *x, float *y, float *w, float *h ) {
+void CGame::adjustFrom640( float *x, float *y, float *w, float *h ) {
 	if ( cg_screenPlacement == PLACE_STRETCH || ( *x <= 0 && *x + *w >= 640 ) ) {
 		*x *= cgs.screenXScale;
 		*w *= cgs.screenXScale;
@@ -86,22 +86,22 @@ void ClientGame::adjustFrom640( float *x, float *y, float *w, float *h ) {
 	}
 }
 
-void ClientGame::virtualFromScreen( float *x, float *y ) {
+void CGame::virtualFromScreen( float *x, float *y ) {
 	*x = ( *x - cgs.screenXOffset ) / cgs.screenScale;
 	*y = ( *y - cgs.screenYOffset ) / cgs.screenScale;
 }
 
 /*
 ================
-ClientGame::fillRect
+CGame::fillRect
 
 Coordinates are 640*480 virtual values
 =================
 */
-void ClientGame::fillRect( float x, float y, float width, float height, const float *color ) {
+void CGame::fillRect( float x, float y, float width, float height, const float *color ) {
 	refExport.SetColor( color );
 
-	ClientGame::adjustFrom640( &x, &y, &width, &height );
+	CGame::adjustFrom640( &x, &y, &width, &height );
 	refExport.DrawStretchPic( x, y, width, height, 0, 0, 0, 0, cgs.media.whiteShader );
 
 	refExport.SetColor( nullptr );
@@ -109,20 +109,20 @@ void ClientGame::fillRect( float x, float y, float width, float height, const fl
 
 /*
 ================
-ClientGame::drawSides
+CGame::drawSides
 
 Coords are virtual 640x480
 ================
 */
-void ClientGame::drawSides(float x, float y, float w, float h, float size) {
-	ClientGame::adjustFrom640( &x, &y, &w, &h );
+void CGame::drawSides(float x, float y, float w, float h, float size) {
+	CGame::adjustFrom640( &x, &y, &w, &h );
 	size *= cgs.screenScale;
 	refExport.DrawStretchPic( x, y, size, h, 0, 0, 0, 0, cgs.media.whiteShader );
 	refExport.DrawStretchPic( x + w - size, y, size, h, 0, 0, 0, 0, cgs.media.whiteShader );
 }
 
-void ClientGame::drawTopBottom(float x, float y, float w, float h, float size) {
-	ClientGame::adjustFrom640( &x, &y, &w, &h );
+void CGame::drawTopBottom(float x, float y, float w, float h, float size) {
+	CGame::adjustFrom640( &x, &y, &w, &h );
 	size *= cgs.screenScale;
 	refExport.DrawStretchPic( x, y, w, size, 0, 0, 0, 0, cgs.media.whiteShader );
 	refExport.DrawStretchPic( x, y + h - size, w, size, 0, 0, 0, 0, cgs.media.whiteShader );
@@ -134,11 +134,11 @@ UI_DrawRect
 Coordinates are 640*480 virtual values
 =================
 */
-void ClientGame::drawRect( float x, float y, float width, float height, float size, const float *color ) {
+void CGame::drawRect( float x, float y, float width, float height, float size, const float *color ) {
 	refExport.SetColor( color );
 
-  ClientGame::drawTopBottom(x, y, width, height, size);
-  ClientGame::drawSides(x, y + size, width, height - size * 2, size);
+  CGame::drawTopBottom(x, y, width, height, size);
+  CGame::drawSides(x, y + size, width, height - size * 2, size);
 
 	refExport.SetColor( nullptr );
 }
@@ -147,13 +147,13 @@ void ClientGame::drawRect( float x, float y, float width, float height, float si
 
 /*
 ================
-ClientGame::drawPic
+CGame::drawPic
 
 Coordinates are 640*480 virtual values
 =================
 */
-void ClientGame::drawPic( float x, float y, float width, float height, qhandle_t hShader ) {
-	ClientGame::adjustFrom640( &x, &y, &width, &height );
+void CGame::drawPic( float x, float y, float width, float height, qhandle_t hShader ) {
+	CGame::adjustFrom640( &x, &y, &width, &height );
 	refExport.DrawStretchPic( x, y, width, height, 0, 0, 1, 1, hShader );
 }
 
@@ -182,7 +182,7 @@ void CG_DrawChar( int x, int y, int width, int height, int ch ) {
 	ay = y;
 	aw = width;
 	ah = height;
-	ClientGame::adjustFrom640( &ax, &ay, &aw, &ah );
+	CGame::adjustFrom640( &ax, &ay, &aw, &ah );
 
 	row = ch>>4;
 	col = ch&15;
@@ -200,7 +200,7 @@ void CG_DrawChar( int x, int y, int width, int height, int ch ) {
 
 /*
 ==================
-ClientGame::drawStringExt
+CGame::drawStringExt
 
 Draws a multi-colored string with a drop shadow, optionally forcing
 to a fixed color.
@@ -208,7 +208,7 @@ to a fixed color.
 Coordinates are at 640 by 480 virtual resolution
 ==================
 */
-void ClientGame::drawStringExt( int x, int y, const char *string, const float *setColor, 
+void CGame::drawStringExt( int x, int y, const char *string, const float *setColor, 
 		bool forceColor, bool shadow, int charWidth, int charHeight, int maxChars ) {
 	vec4_t		color;
 	const char	*s;
@@ -261,38 +261,38 @@ void ClientGame::drawStringExt( int x, int y, const char *string, const float *s
 	refExport.SetColor( nullptr );
 }
 
-void ClientGame::drawBigString( int x, int y, const char *s, float alpha ) {
+void CGame::drawBigString( int x, int y, const char *s, float alpha ) {
 	float	color[4];
 
 	color[0] = color[1] = color[2] = 1.0;
 	color[3] = alpha;
-	ClientGame::drawStringExt( x, y, s, color, false, true, BIGCHAR_WIDTH, BIGCHAR_HEIGHT, 0 );
+	CGame::drawStringExt( x, y, s, color, false, true, BIGCHAR_WIDTH, BIGCHAR_HEIGHT, 0 );
 }
 
-void ClientGame::drawBigStringColor( int x, int y, const char *s, vec4_t color ) {
-	ClientGame::drawStringExt( x, y, s, color, true, true, BIGCHAR_WIDTH, BIGCHAR_HEIGHT, 0 );
+void CGame::drawBigStringColor( int x, int y, const char *s, vec4_t color ) {
+	CGame::drawStringExt( x, y, s, color, true, true, BIGCHAR_WIDTH, BIGCHAR_HEIGHT, 0 );
 }
 
-void ClientGame::drawSmallString( int x, int y, const char *s, float alpha ) {
+void CGame::drawSmallString( int x, int y, const char *s, float alpha ) {
 	float	color[4];
 
 	color[0] = color[1] = color[2] = 1.0;
 	color[3] = alpha;
-	ClientGame::drawStringExt( x, y, s, color, false, false, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, 0 );
+	CGame::drawStringExt( x, y, s, color, false, false, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, 0 );
 }
 
-void ClientGame::drawSmallStringColor( int x, int y, const char *s, vec4_t color ) {
-	ClientGame::drawStringExt( x, y, s, color, true, false, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, 0 );
+void CGame::drawSmallStringColor( int x, int y, const char *s, vec4_t color ) {
+	CGame::drawStringExt( x, y, s, color, true, false, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, 0 );
 }
 
 /*
 =================
-ClientGame::drawStrlen
+CGame::drawStrlen
 
 Returns character count, skiping color escape codes
 =================
 */
-int ClientGame::drawStrlen( const char *str ) {
+int CGame::drawStrlen( const char *str ) {
 	const char *s = str;
 	int count = 0;
 
@@ -310,13 +310,13 @@ int ClientGame::drawStrlen( const char *str ) {
 
 /*
 =============
-ClientGame::tileClearBox
+CGame::tileClearBox
 
 This repeats a 64*64 tile graphic to fill the screen around a sized down
 refresh window.
 =============
 */
-void ClientGame::tileClearBox( int x, int y, int w, int h, qhandle_t hShader ) {
+void CGame::tileClearBox( int x, int y, int w, int h, qhandle_t hShader ) {
 	float	s1, t1, s2, t2;
 
 	s1 = x/64.0;
@@ -330,12 +330,12 @@ void ClientGame::tileClearBox( int x, int y, int w, int h, qhandle_t hShader ) {
 
 /*
 ==============
-ClientGame::tileClear
+CGame::tileClear
 
 Clear around a sized down screen
 ==============
 */
-void ClientGame::tileClear( ) {
+void CGame::tileClear( ) {
 	int		top, bottom, left, right;
 	int		w, h;
 
@@ -353,26 +353,26 @@ void ClientGame::tileClear( ) {
 	right = left + cg.refdef.width-1;
 
 	// clear above view screen
-	ClientGame::tileClearBox( 0, 0, w, top, cgs.media.backTileShader );
+	CGame::tileClearBox( 0, 0, w, top, cgs.media.backTileShader );
 
 	// clear below view screen
-	ClientGame::tileClearBox( 0, bottom, w, h - bottom, cgs.media.backTileShader );
+	CGame::tileClearBox( 0, bottom, w, h - bottom, cgs.media.backTileShader );
 
 	// clear left of view screen
-	ClientGame::tileClearBox( 0, top, left, bottom - top + 1, cgs.media.backTileShader );
+	CGame::tileClearBox( 0, top, left, bottom - top + 1, cgs.media.backTileShader );
 
 	// clear right of view screen
-	ClientGame::tileClearBox( right, top, w - right, bottom - top + 1, cgs.media.backTileShader );
+	CGame::tileClearBox( right, top, w - right, bottom - top + 1, cgs.media.backTileShader );
 }
 
 
 
 /*
 ================
-ClientGame::fadeColor
+CGame::fadeColor
 ================
 */
-float *ClientGame::fadeColor( int startMsec, int totalMsec ) {
+float *CGame::fadeColor( int startMsec, int totalMsec ) {
 	static vec4_t		color;
 	int			t;
 
@@ -400,10 +400,10 @@ float *ClientGame::fadeColor( int startMsec, int totalMsec ) {
 
 /*
 ================
-ClientGame::teamColor
+CGame::teamColor
 ================
 */
-float *ClientGame::teamColor( int team ) {
+float *CGame::teamColor( int team ) {
 	static vec4_t	red = {1, 0.2f, 0.2f, 1};
 	static vec4_t	blue = {0.2f, 0.2f, 1, 1};
 	static vec4_t	other = {1, 1, 1, 1};
@@ -423,7 +423,7 @@ float *ClientGame::teamColor( int team ) {
 
 /*
 =================
-ClientGame::uI_DrawProportionalString2
+CGame::uI_DrawProportionalString2
 =================
 */
 static int	propMap[128][3] = {
@@ -577,7 +577,7 @@ constexpr int PROPB_HEIGHT = 36;
 UI_DrawBannerString
 =================
 */
-void ClientGame::uI_DrawBannerString2( int x, int y, const char* str, vec4_t color )
+void CGame::uI_DrawBannerString2( int x, int y, const char* str, vec4_t color )
 {
 	const char* s;
 	char	ch;
@@ -596,7 +596,7 @@ void ClientGame::uI_DrawBannerString2( int x, int y, const char* str, vec4_t col
 	ax = x;
 	ay = y;
 	aw = ah = 0;
-	ClientGame::adjustFrom640( &ax, &ay, &aw, &ah );
+	CGame::adjustFrom640( &ax, &ay, &aw, &ah );
 
 	s = str;
 	while ( *s )
@@ -660,10 +660,10 @@ void UI_DrawBannerString( int x, int y, const char* str, int style, vec4_t color
 	if ( style & UI_DROPSHADOW ) {
 		drawcolor[0] = drawcolor[1] = drawcolor[2] = 0;
 		drawcolor[3] = color[3];
-		ClientGame::uI_DrawBannerString2( x+2, y+2, str, drawcolor );
+		CGame::uI_DrawBannerString2( x+2, y+2, str, drawcolor );
 	}
 
-	ClientGame::uI_DrawBannerString2( x, y, str, color );
+	CGame::uI_DrawBannerString2( x, y, str, color );
 }
 
 
@@ -689,7 +689,7 @@ int UI_ProportionalStringWidth( const char* str ) {
 	return width;
 }
 
-void ClientGame::uI_DrawProportionalString2( int x, int y, const char* str, vec4_t color, float sizeScale, qhandle_t charset )
+void CGame::uI_DrawProportionalString2( int x, int y, const char* str, vec4_t color, float sizeScale, qhandle_t charset )
 {
 	const char* s;
 	char	ch;
@@ -708,7 +708,7 @@ void ClientGame::uI_DrawProportionalString2( int x, int y, const char* str, vec4
 	ax = x;
 	ay = y;
 	aw = ah = 0;
-	ClientGame::adjustFrom640( &ax, &ay, &aw, &ah );
+	CGame::adjustFrom640( &ax, &ay, &aw, &ah );
 
 	s = str;
 	while ( *s )
@@ -780,7 +780,7 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 	if ( style & UI_DROPSHADOW ) {
 		drawcolor[0] = drawcolor[1] = drawcolor[2] = 0;
 		drawcolor[3] = color[3];
-		ClientGame::uI_DrawProportionalString2( x+2, y+2, str, drawcolor, sizeScale, cgs.media.charsetProp );
+		CGame::uI_DrawProportionalString2( x+2, y+2, str, drawcolor, sizeScale, cgs.media.charsetProp );
 	}
 
 	if ( style & UI_INVERSE ) {
@@ -788,7 +788,7 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 		drawcolor[1] = color[1] * 0.8;
 		drawcolor[2] = color[2] * 0.8;
 		drawcolor[3] = color[3];
-		ClientGame::uI_DrawProportionalString2( x, y, str, drawcolor, sizeScale, cgs.media.charsetProp );
+		CGame::uI_DrawProportionalString2( x, y, str, drawcolor, sizeScale, cgs.media.charsetProp );
 		return;
 	}
 
@@ -797,22 +797,22 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 		drawcolor[1] = color[1] * 0.8;
 		drawcolor[2] = color[2] * 0.8;
 		drawcolor[3] = color[3];
-		ClientGame::uI_DrawProportionalString2( x, y, str, color, sizeScale, cgs.media.charsetProp );
+		CGame::uI_DrawProportionalString2( x, y, str, color, sizeScale, cgs.media.charsetProp );
 
 		drawcolor[0] = color[0];
 		drawcolor[1] = color[1];
 		drawcolor[2] = color[2];
 		drawcolor[3] = 0.5f + 0.5f * sinf( cg.time / PULSE_DIVISOR );
-		ClientGame::uI_DrawProportionalString2( x, y, str, drawcolor, sizeScale, cgs.media.charsetPropGlow );
+		CGame::uI_DrawProportionalString2( x, y, str, drawcolor, sizeScale, cgs.media.charsetPropGlow );
 		return;
 	}
 
-	ClientGame::uI_DrawProportionalString2( x, y, str, color, sizeScale, cgs.media.charsetProp );
+	CGame::uI_DrawProportionalString2( x, y, str, color, sizeScale, cgs.media.charsetProp );
 }
 
 /*
 ===============
-ClientGame::genericShadow
+CGame::genericShadow
 
 Uses polygons to alpha blend a shadow texture onto the terrain
 ===============
@@ -850,13 +850,13 @@ int CG_GetVehicleShadowShader( int vehicle )
 
 /*
 ===============
-ClientGame::polyMeshGeneratedShadow
+CGame::polyMeshGeneratedShadow
 
 Uses a X/Y axis of a polygon-mesh to draw shadows
 ===============
 */
 
-bool ClientGame::polyMeshGeneratedShadow( BasicDrawInfo_t *drawInfo, float *shadowPlane )
+bool CGame::polyMeshGeneratedShadow( BasicDrawInfo_t *drawInfo, float *shadowPlane )
 {
 	int x = 0, y = 0, iMod = 0;
 	float xRad = 0, yRad = 0;
@@ -981,7 +981,7 @@ bool ClientGame::polyMeshGeneratedShadow( BasicDrawInfo_t *drawInfo, float *shad
 			verts[y][x].st[ 1 ] = u;
 
 			// is the start point in the water?
-			if( ClientGame::pointContents( verts[y][x].xyz, -1 ) & CONTENTS_WATER )
+			if( CGame::pointContents( verts[y][x].xyz, -1 ) & CONTENTS_WATER )
 			{ 
 				// don't collide rays with water (cause we have at least one vert already in the water)
 				traceMask = MASK_SOLID;
@@ -998,7 +998,7 @@ bool ClientGame::polyMeshGeneratedShadow( BasicDrawInfo_t *drawInfo, float *shad
 			VectorCopy( verts[y][x].xyz, start );
 			VectorCopy( verts[y][x].xyz, end );
 			end[2] -= 1024;
-			ClientGame::trace( &trace, start, mins, maxs, end, 0, traceMask );
+			CGame::trace( &trace, start, mins, maxs, end, 0, traceMask );
 			
 			// if we didn't starting our trace in the ground, set z
 			if( !trace.startsolid )
@@ -1009,7 +1009,7 @@ bool ClientGame::polyMeshGeneratedShadow( BasicDrawInfo_t *drawInfo, float *shad
 
 			// in the water?
 			vertInWater = false;
-			if( ClientGame::pointContents( verts[y][x].xyz, -1 ) & CONTENTS_WATER )
+			if( CGame::pointContents( verts[y][x].xyz, -1 ) & CONTENTS_WATER )
 			{
 				vertInWater = true;
 			}
@@ -1073,7 +1073,7 @@ bool ClientGame::polyMeshGeneratedShadow( BasicDrawInfo_t *drawInfo, float *shad
 
 /*
 ===============
-ClientGame::genericShadow
+CGame::genericShadow
 
 Uses polygons to alpha blend a shadow texture onto the terrain
 ===============
@@ -1081,24 +1081,24 @@ Uses polygons to alpha blend a shadow texture onto the terrain
 
 #define _POLYMESH_SHADOW
 
-bool ClientGame::genericShadow( BasicDrawInfo_t *drawInfo, float *shadowPlane )
+bool CGame::genericShadow( BasicDrawInfo_t *drawInfo, float *shadowPlane )
 {
 //#ifndef _POLYMESH_SHADOW
 //	return CG_MarkGeneratedShadow( drawInfo, shadowPlane );
 //#else
-	return ClientGame::polyMeshGeneratedShadow( drawInfo, shadowPlane );
+	return CGame::polyMeshGeneratedShadow( drawInfo, shadowPlane );
 //#endif
 }
 
 /*
 ===============
-ClientGame::resetReticles
+CGame::resetReticles
 
 Calls to reset reticle handling
 ===============
 */
 
-void ClientGame::resetReticles( )
+void CGame::resetReticles( )
 {
 	// reset when starting main scene
 	if( !cg.drawingMFD )
@@ -1109,7 +1109,7 @@ void ClientGame::resetReticles( )
 
 /*
 ===============
-ClientGame::addReticleEntityToScene
+CGame::addReticleEntityToScene
 
 Adds a reticle, either as a 2D sprite or as pending HUD gfx
 ===============
@@ -1119,7 +1119,7 @@ Adds a reticle, either as a 2D sprite or as pending HUD gfx
 
 #pragma message ("CG_AddReticleEntityToScene() FRIEND tracking/lock NOT implemented")
 
-void ClientGame::addReticleEntityToScene( refEntity_t * pReticle, ClientEntity * pTarget )
+void CGame::addReticleEntityToScene( refEntity_t * pReticle, ClientEntity * pTarget )
 {
 	float offsetx, offsety, scaling = 1.0f;
 
@@ -1227,7 +1227,7 @@ void ClientGame::addReticleEntityToScene( refEntity_t * pReticle, ClientEntity *
 		refExport.AddRefEntityToScene( pRecticle );
 #else
 		// if HUD image
-		if( ClientGame::worldToScreenCoords( pReticle->origin, &cg.HUDReticle[cg.reticleIdx].x, &cg.HUDReticle[cg.reticleIdx].y, true ) )
+		if( CGame::worldToScreenCoords( pReticle->origin, &cg.HUDReticle[cg.reticleIdx].x, &cg.HUDReticle[cg.reticleIdx].y, true ) )
 		{
 			// set origin
 			cg.HUDReticle[cg.reticleIdx].ox = cg.HUDReticle[cg.reticleIdx].x;
@@ -1311,12 +1311,12 @@ void CG_Parse_Reticle_Target( reticle_t * pR )
 
 /*
 ================
-ClientGame::draw_Reticles
+CGame::draw_Reticles
 
 Draws all pending 2D reticles
 ================
 */
-void ClientGame::draw_Reticles( )
+void CGame::draw_Reticles( )
 {
 	int i = 0;
 
@@ -1330,7 +1330,7 @@ void ClientGame::draw_Reticles( )
 		if( pR[i].shader )
 		{
 			// draw gfx
-			ClientGame::drawPic( pR[i].x, pR[i].y, pR[i].w, pR[i].h, pR[i].shader );
+			CGame::drawPic( pR[i].x, pR[i].y, pR[i].w, pR[i].h, pR[i].shader );
 
 			// draw associated label (if any)
 			CG_Parse_Reticle_Target( &pR[i] );
@@ -1358,7 +1358,7 @@ LocalEntity * ClientEntity::generic_Smoke( vec3_t smokePosition, int density )
 		float			lifeTime = RandomInt( 50, 150 );	// general life-frames of smoke
 
 		// create puff entity
-		smoke = ClientGame::smokePuff( smokePosition, up, 
+		smoke = CGame::smokePuff( smokePosition, up, 
 							  this->currentState.generic1,				// radius 
 							  0.5, 0.5, 0.5, 0.33f,						// colour & alpha
 							  lifeTime * this->currentState.generic1,	// actual duration

@@ -113,12 +113,12 @@ void CG_DamageFeedback( int yawByte, int pitchByte, int damage ) {
 
 /*
 ================
-ClientGame::respawn
+CGame::respawn
 
 A respawn happened this snapshot
 ================
 */
-void ClientGame::respawn( ) {
+void CGame::respawn( ) {
 	// no error decay on player movement
 	cg.thisFrameTeleport = true;
 
@@ -168,10 +168,10 @@ void CG_CheckPlayerstateEvents( playerState_t *ps, playerState_t *ops ) {
 
 /*
 ==================
-ClientGame::checkChangedPredictableEvents
+CGame::checkChangedPredictableEvents
 ==================
 */
-void ClientGame::checkChangedPredictableEvents( playerState_t *ps ) {
+void CGame::checkChangedPredictableEvents( playerState_t *ps ) {
 	int i;
 	int event;
 	ClientEntity	*cent;
@@ -195,7 +195,7 @@ void ClientGame::checkChangedPredictableEvents( playerState_t *ps ) {
 				cg.predictableEvents[ i & (MAX_PREDICTED_EVENTS-1) ] = event;
 
 				if ( cg_showmiss.integer ) {
-					ClientGame::printf("WARNING: changed predicted event\n");
+					CGame::printf("WARNING: changed predicted event\n");
 				}
 			}
 		}
@@ -252,11 +252,11 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 		if ( ps->persistant[PERS_RANK] != ops->persistant[PERS_RANK] ) {
 			if ( cgs.gametype < GT_TEAM) {
 				if (  ps->persistant[PERS_RANK] == 0 ) {
-					ClientGame::addBufferedSound(cgs.media.takenLeadSound);
+					CGame::addBufferedSound(cgs.media.takenLeadSound);
 				} else if ( ps->persistant[PERS_RANK] == RANK_TIED_FLAG ) {
-					ClientGame::addBufferedSound(cgs.media.tiedLeadSound);
+					CGame::addBufferedSound(cgs.media.tiedLeadSound);
 				} else if ( ( ops->persistant[PERS_RANK] & ~RANK_TIED_FLAG ) == 0 ) {
-					ClientGame::addBufferedSound(cgs.media.lostLeadSound);
+					CGame::addBufferedSound(cgs.media.lostLeadSound);
 				}
 			}
 		}
@@ -286,26 +286,26 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 		highScore = cgs.scores1;
 		if ( !( cg.fraglimitWarnings & 4 ) && highScore == (cgs.fraglimit - 1) ) {
 			cg.fraglimitWarnings |= 1 | 2 | 4;
-			ClientGame::addBufferedSound(cgs.media.oneFragSound);
+			CGame::addBufferedSound(cgs.media.oneFragSound);
 		}
 		else if ( cgs.fraglimit > 2 && !( cg.fraglimitWarnings & 2 ) && highScore == (cgs.fraglimit - 2) ) {
 			cg.fraglimitWarnings |= 1 | 2;
-			ClientGame::addBufferedSound(cgs.media.twoFragSound);
+			CGame::addBufferedSound(cgs.media.twoFragSound);
 		}
 		else if ( cgs.fraglimit > 3 && !( cg.fraglimitWarnings & 1 ) && highScore == (cgs.fraglimit - 3) ) {
 			cg.fraglimitWarnings |= 1;
-			ClientGame::addBufferedSound(cgs.media.threeFragSound);
+			CGame::addBufferedSound(cgs.media.threeFragSound);
 		}
 	}
 }
 
 /*
 ===============
-ClientGame::transitionPlayerState
+CGame::transitionPlayerState
 
 ===============
 */
-void ClientGame::transitionPlayerState( playerState_t *ps, playerState_t *ops ) {
+void CGame::transitionPlayerState( playerState_t *ps, playerState_t *ops ) {
 
 	// check for changing follow mode
 	if ( ps->clientNum != ops->clientNum ) {
@@ -321,11 +321,11 @@ void ClientGame::transitionPlayerState( playerState_t *ps, playerState_t *ops ) 
 
 	// respawning
 	if ( ps->persistant[PERS_SPAWN_COUNT] != ops->persistant[PERS_SPAWN_COUNT] ) {
-		ClientGame::respawn();
+		CGame::respawn();
 	}
 
 	if ( cg.mapRestart ) {
-		ClientGame::respawn();
+		CGame::respawn();
 		cg.mapRestart = false;
 	}
 

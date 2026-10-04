@@ -83,7 +83,7 @@ enum fieldtype_t
 	F_IGNORE
 };
 
-struct EditField
+struct SpawnField
 {
 	char	*name;
 	int		ofs;
@@ -91,7 +91,7 @@ struct EditField
 	int		flags;
 };
 
-//EditField fields[] = {
+//SpawnField fields[] = {
 //	{"classname", FOFS(classname_), F_LSTRING},
 //	{"origin", FOFS(s.origin), F_VECTOR},
 //	{"model", FOFS(model_), F_LSTRING},
@@ -119,7 +119,7 @@ struct EditField
 //};
 
 
-EditField fields[] = {
+SpawnField fields[] = {
 	{"classname", FOFS2(classname_), F_LSTRING},
 	{"origin", FOFS2(origin_), F_VECTOR},
 	{"model", FOFS2(model_), F_LSTRING},
@@ -392,7 +392,7 @@ in a gentity
 //void G_ParseField( const char *key, const char *value, GameEntity *ent ) 
 void G_ParseField( const char *key, const char *value, SpawnFieldHolder *ent ) 
 {
-	EditField	*f;
+	SpawnField	*f;
 	byte	*b;
 	float	v;
 	vec3_t	vec;

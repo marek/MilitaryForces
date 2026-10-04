@@ -39,10 +39,10 @@ void ME_CopySelection()
 	int				i;
 
 	if( cgs.IGME.numSelections > 1 ) {
-		ClientGame::printf( "Can only copy a SINGLE vehicle!\n" );
+		CGame::printf( "Can only copy a SINGLE vehicle!\n" );
 		return;
 	} else if( cgs.IGME.numSelections < 1 ) {
-		ClientGame::printf( "Select object to copy!\n" );
+		CGame::printf( "Select object to copy!\n" );
 		return;
 	}
 
@@ -76,7 +76,7 @@ void ME_CopySelection()
 		}
 		cgs.IGME.copyBufferVehicleUsed = true;
 	}
-	ClientGame::printf( "Copied to clipboard\n" );
+	CGame::printf( "Copied to clipboard\n" );
 }
 
 void ME_PasteSelection()
@@ -86,7 +86,7 @@ void ME_PasteSelection()
 
 	if( cgs.IGME.waypointmode ) {
 		if( !cgs.IGME.copyBufferRouteUsed ) {
-			ClientGame::printf( "Clipboard empty, copy something first!" );
+			CGame::printf( "Clipboard empty, copy something first!" );
 			return;
 		}
 		veh = ME_GetSelectedVehicle();
@@ -98,7 +98,7 @@ void ME_PasteSelection()
 		}	
 	} else {
 		if( !cgs.IGME.copyBufferVehicleUsed ) {
-			ClientGame::printf( "Clipboard empty, copy something first!" );
+			CGame::printf( "Clipboard empty, copy something first!" );
 			return;
 		}
 		for( i = 0; i < IGME_MAX_VEHICLES; ++i ) {
@@ -108,7 +108,7 @@ void ME_PasteSelection()
 			}
 		}
 		if( !veh ) {
-			ClientGame::printf( "No more space for vehicles left! Delete some first!\n" );
+			CGame::printf( "No more space for vehicles left! Delete some first!\n" );
 			return;
 		}
 		veh->active = cgs.IGME.copyBufferVehicle.active;
@@ -123,7 +123,7 @@ void ME_PasteSelection()
 			VectorCopy( cgs.IGME.copyBufferVehicle.waypoints[i].origin, veh->waypoints[i].origin );
 		}
 	}
-	ClientGame::printf( "Pasted\n" );
+	CGame::printf( "Pasted\n" );
 }
 
 void ME_ToggleWaypointMode()
@@ -131,32 +131,32 @@ void ME_ToggleWaypointMode()
 	IGME_vehicle_t* veh = nullptr;
 
 	if( cgs.IGME.numSelections != 1 ) {
-		ClientGame::printf( "You have to select a single vehicle to enter WAYPOINTMODE\n" );
+		CGame::printf( "You have to select a single vehicle to enter WAYPOINTMODE\n" );
 		return;
 	}
 
 	veh = ME_GetSelectedVehicle();
 	if( !veh ) return;
 	if( veh->groundInstallation ) {
-		ClientGame::printf( "Static units dont really need waypoints, do they ?\n" );
+		CGame::printf( "Static units dont really need waypoints, do they ?\n" );
 		return;
 	}
 
 	cgs.IGME.waypointmode = cgs.IGME.waypointmode ? false : true;
 
-	if( cgs.IGME.waypointmode ) ClientGame::printf( "Waypoint mode is ON\n" );
-	else ClientGame::printf( "Waypoint mode is OFF\n" );
+	if( cgs.IGME.waypointmode ) CGame::printf( "Waypoint mode is ON\n" );
+	else CGame::printf( "Waypoint mode is OFF\n" );
 }
 
 void ME_ToggleWaypointDisplay()
 {
 	cgs.IGME.showAllWaypoints = cgs.IGME.showAllWaypoints ? false : true;
 
-	if( cgs.IGME.showAllWaypoints ) ClientGame::printf( "ALL Waypoints are displayed\n" );
-	else ClientGame::printf( "Only Waypoints of SELECTED vehicle are displayed\n" );
+	if( cgs.IGME.showAllWaypoints ) CGame::printf( "ALL Waypoints are displayed\n" );
+	else CGame::printf( "Only Waypoints of SELECTED vehicle are displayed\n" );
 }
 
-void ClientGame::draw_IGME()
+void CGame::draw_IGME()
 {
 	int				i;
 	usercmd_t		cmd;
@@ -568,7 +568,7 @@ void ME_DragSelection( int x, int y )
 			if( !wpt->selected ) continue;
 			VectorCopy( wpt->origin, start );
 			VectorAdd( wpt->origin, forward, end );
-			ClientGame::trace( &tr, start, vec3_origin, vec3_origin, end, cg.snap->ps.clientNum, MASK_ALL );
+			CGame::trace( &tr, start, vec3_origin, vec3_origin, end, cg.snap->ps.clientNum, MASK_ALL );
 			VectorCopy( tr.endpos, wpt->origin );
 		}
 	} else {
@@ -580,7 +580,7 @@ void ME_DragSelection( int x, int y )
 			if( !veh->selected ) continue;
 			VectorCopy( veh->origin, start );
 			VectorAdd( veh->origin, forward, end );
-			ClientGame::trace( &tr, start, vec3_origin, vec3_origin, end, cg.snap->ps.clientNum, MASK_ALL );
+			CGame::trace( &tr, start, vec3_origin, vec3_origin, end, cg.snap->ps.clientNum, MASK_ALL );
 			VectorCopy( tr.endpos, veh->origin );
 		}
 	}
@@ -599,12 +599,12 @@ void ME_SpawnWaypoint()
 	// waypoints
 	} else {
 		if( selveh->waypoints[IGME_MAX_WAYPOINTS-1].active ) {
-			ClientGame::printf( "Too many waypoints!\n" );
+			CGame::printf( "Too many waypoints!\n" );
 			return;
 		}
 		if( insert ) {
 			if( cgs.IGME.numWptSelections != 1 ) {
-				ClientGame::printf( "Select ONE single waypoint after which to insert!\n" );
+				CGame::printf( "Select ONE single waypoint after which to insert!\n" );
 				return;
 			}
 			if( insert ) {
@@ -626,13 +626,13 @@ void ME_SpawnWaypoint()
 	}
 }
 
-IGME_vehicle_t* ClientGame::mE_SpawnVehicleAt( int vehidx, vec3_t pos, vec3_t angles ) 
+IGME_vehicle_t* CGame::mE_SpawnVehicleAt( int vehidx, vec3_t pos, vec3_t angles ) 
 {
 	IGME_vehicle_t*	 veh = nullptr;
 	int i;
 
 	if( cgs.IGME.waypointmode ) {
-		ClientGame::printf( "You are in waypoint mode, spawning vehicles not allowed now!\n" );
+		CGame::printf( "You are in waypoint mode, spawning vehicles not allowed now!\n" );
 		return nullptr;
 	}
 
@@ -643,7 +643,7 @@ IGME_vehicle_t* ClientGame::mE_SpawnVehicleAt( int vehidx, vec3_t pos, vec3_t an
 		}
 	}
 	if( !veh ) {
-		ClientGame::printf( "Too many vehicles spawned! Please delete one first!\n" );
+		CGame::printf( "Too many vehicles spawned! Please delete one first!\n" );
 		return nullptr;
 	}
 
@@ -667,18 +667,18 @@ IGME_vehicle_t* ClientGame::mE_SpawnVehicleAt( int vehidx, vec3_t pos, vec3_t an
 IGME_vehicle_t* ME_SpawnVehicle( int vehidx ) 
 {
 	// spawns at current player location
-	return ClientGame::mE_SpawnVehicleAt( vehidx, 
+	return CGame::mE_SpawnVehicleAt( vehidx, 
 							  cg.predictedPlayerState.origin,
 							  cg.predictedPlayerState.viewangles );
 }
 
-IGME_vehicle_t* ClientGame::mE_SpawnGroundInstallationAt( int idx, vec3_t pos, vec3_t angles )
+IGME_vehicle_t* CGame::mE_SpawnGroundInstallationAt( int idx, vec3_t pos, vec3_t angles )
 {
 	IGME_vehicle_t*	 veh = nullptr;
 	int i;
 
 	if( cgs.IGME.waypointmode ) {
-		ClientGame::printf( "You are in waypoint mode, spawning ground installations not allowed now!\n" );
+		CGame::printf( "You are in waypoint mode, spawning ground installations not allowed now!\n" );
 		return nullptr;
 	}
 
@@ -689,7 +689,7 @@ IGME_vehicle_t* ClientGame::mE_SpawnGroundInstallationAt( int idx, vec3_t pos, v
 		}
 	}
 	if( !veh ) {
-		ClientGame::printf( "Too many vehicles spawned! Please delete one first!\n" );
+		CGame::printf( "Too many vehicles spawned! Please delete one first!\n" );
 		return nullptr;
 	}
 
@@ -714,7 +714,7 @@ IGME_vehicle_t* ClientGame::mE_SpawnGroundInstallationAt( int idx, vec3_t pos, v
 void ME_SpawnGroundInstallation( int idx )
 {
 	// spawn at player loc
-	ClientGame::mE_SpawnGroundInstallationAt( idx, 
+	CGame::mE_SpawnGroundInstallationAt( idx, 
 								  cg.predictedPlayerState.origin, 
 								  cg.predictedPlayerState.viewangles );
 }
@@ -734,7 +734,7 @@ void ME_DrawVehicle( IGME_vehicle_t* veh )
 		drawInfo.turretAngle = 0;
 		drawInfo.gunAngle = 10;
 		drawInfo.upgrades = availableGroundInstallations[veh->vehidx].upgrades;
-		ClientGame::drawGI(&drawInfo);
+		CGame::drawGI(&drawInfo);
 	} else {
 		switch( availableVehicles[veh->vehidx].cat ) {
 		case CAT_PLANE:
@@ -747,7 +747,7 @@ void ME_DrawVehicle( IGME_vehicle_t* veh )
 				drawInfo.basicInfo.vehicleIndex = veh->vehidx;
 				drawInfo.basicInfo.entityNum = -1;
 				drawInfo.basicInfo.usedLoadout = &availableLoadouts[veh->vehidx];
-				ClientGame::drawPlane(&drawInfo);	
+				CGame::drawPlane(&drawInfo);	
 			}
 			break;
 		case CAT_GROUND:
@@ -760,7 +760,7 @@ void ME_DrawVehicle( IGME_vehicle_t* veh )
 				drawInfo.basicInfo.vehicleIndex = veh->vehidx;
 				drawInfo.basicInfo.entityNum = -1;
 				drawInfo.basicInfo.usedLoadout = &availableLoadouts[veh->vehidx];
-				ClientGame::drawGV(&drawInfo);	
+				CGame::drawGV(&drawInfo);	
 			}
 			break;
 		case CAT_BOAT:
@@ -773,7 +773,7 @@ void ME_DrawVehicle( IGME_vehicle_t* veh )
 				drawInfo.basicInfo.vehicleIndex = veh->vehidx;
 				drawInfo.basicInfo.entityNum = -1;
 				drawInfo.basicInfo.usedLoadout = &availableLoadouts[veh->vehidx];
-				ClientGame::drawBoat(&drawInfo);
+				CGame::drawBoat(&drawInfo);
 			}
 			break;
 		case CAT_HELO:
@@ -859,21 +859,21 @@ void ME_ExportToScript( const char* scriptname )
 
 	if( !scriptname )
 	{
-		ClientGame::printf("Invalid scriptname!\n");
+		CGame::printf("Invalid scriptname!\n");
 		return;
 	}
 
 	// set up mission filename
-	info = ClientGame::configString( CS_SERVERINFO );
+	info = CGame::configString( CS_SERVERINFO );
 	mapname = Info::valueForKey( info, "mapname" );
 	Com_sprintf(scriptfile, 255, "missions/%s/%s.mis", mapname, scriptname);
 
 	if( FileSystem::fOpenFileByMode(scriptfile, &f, FS_WRITE) < 0 ) {
-		ClientGame::printf("Unable to write to file %s. Exporting to script cancelled.", scriptfile);
+		CGame::printf("Unable to write to file %s. Exporting to script cancelled.", scriptfile);
 		return;
 	}
 	
-	ClientGame::printf("Saving to script: %s\n", scriptfile);
+	CGame::printf("Saving to script: %s\n", scriptfile);
 
 	// first line comment
 	Com_sprintf( outstring, sizeof(outstring), "//Missionscript for map %s\n\n",mapname );
@@ -978,7 +978,7 @@ void ME_ExportToScript( const char* scriptname )
 
 
 
-	ClientGame::printf("Successfully saved to script\n");
+	CGame::printf("Successfully saved to script\n");
 
 	FileSystem::fCloseFile(f);
 
@@ -988,14 +988,14 @@ void ME_ExportToScript( const char* scriptname )
 }
 
 
-void ClientGame::mE_SpawnMissionGroundInstallations(mission_groundInstallation_t* gis)
+void CGame::mE_SpawnMissionGroundInstallations(mission_groundInstallation_t* gis)
 {
 	int	i;
 
 	for( i = 0; i < IGME_MAX_VEHICLES; ++i )
 	{
 		if( !gis[i].used ) break;
-		IGME_vehicle_t* veh = ClientGame::mE_SpawnGroundInstallationAt(gis[i].index,
+		IGME_vehicle_t* veh = CGame::mE_SpawnGroundInstallationAt(gis[i].index,
 									 gis[i].origin,
 									 gis[i].angles);
 		if( veh && (!Q_stricmp( gis[i].teamname, "red" ) || !Q_stricmp( gis[i].teamname, "blue" )) )
@@ -1004,7 +1004,7 @@ void ClientGame::mE_SpawnMissionGroundInstallations(mission_groundInstallation_t
 }
 
 
-void ClientGame::mE_SpawnMissionVehicles(mission_vehicle_t* vehs)
+void CGame::mE_SpawnMissionVehicles(mission_vehicle_t* vehs)
 {
 	int	i, j, k;
 	IGME_vehicle_t* veh;
@@ -1012,7 +1012,7 @@ void ClientGame::mE_SpawnMissionVehicles(mission_vehicle_t* vehs)
 	for( i = 0; i < IGME_MAX_VEHICLES; ++i )
 	{
 		if( !vehs[i].used ) break;
-		veh = ClientGame::mE_SpawnVehicleAt(vehs[i].index,
+		veh = CGame::mE_SpawnVehicleAt(vehs[i].index,
 					 		    vehs[i].origin,
 								vehs[i].angles);
 		if( !veh ) continue;
@@ -1034,7 +1034,7 @@ void ClientGame::mE_SpawnMissionVehicles(mission_vehicle_t* vehs)
 }
 
 
-bool ClientGame::mE_LoadOverviewAndEntities( char *filename,
+bool CGame::mE_LoadOverviewAndEntities( char *filename,
 										mission_overview_t* overview,
 										mission_vehicle_t* vehs, 
 										mission_groundInstallation_t* gis)
@@ -1081,11 +1081,11 @@ void ME_ImportScript( const char* scriptname )
 	memset(&installations[0], 0, sizeof(installations));
 
 	// set up mission filename
-	info = ClientGame::configString( CS_SERVERINFO );
+	info = CGame::configString( CS_SERVERINFO );
 	mapname = Info::valueForKey( info, "mapname" );
 	Com_sprintf(filename, 255, "missions/%s/%s.mis", mapname, scriptname);
 
-	if( !ClientGame::mE_LoadOverviewAndEntities(filename, &overview, vehicles, installations) )
+	if( !CGame::mE_LoadOverviewAndEntities(filename, &overview, vehicles, installations) )
 	{
 		Common::printf( "Unable to load script\n" );
 		return;
@@ -1095,8 +1095,8 @@ void ME_ImportScript( const char* scriptname )
 	memset( &cgs.IGME, 0, sizeof(cgs.IGME) );
 
 	// spawn New stuff
-	ClientGame::mE_SpawnMissionVehicles(vehicles);
-	ClientGame::mE_SpawnMissionGroundInstallations(installations);
+	CGame::mE_SpawnMissionVehicles(vehicles);
+	CGame::mE_SpawnMissionGroundInstallations(installations);
 }
 
 // loads up initial mission (specified in mf_mission)
@@ -1105,7 +1105,7 @@ void ME_Init_MissionEditor()
 	const char	*info;
 	const char	*scriptname;
 
-	info = ClientGame::configString( CS_SERVERINFO );
+	info = CGame::configString( CS_SERVERINFO );
 	scriptname = Info::valueForKey( info, "mf_mission" );
 
 	ME_ImportScript(scriptname);
@@ -1119,7 +1119,7 @@ void ME_SetSide( const char* side )
 	int i, count = 0;
 
 	if( Q_stricmp( side, "red" ) && Q_stricmp( side, "blue" ) && Q_stricmp( side, "none" ) ) {
-		ClientGame::printf( "usage: me_side <red|blue|none>\n" );
+		CGame::printf( "usage: me_side <red|blue|none>\n" );
 		return;
 	}
 	for( i = 0; i < IGME_MAX_VEHICLES; ++i ) {
@@ -1131,5 +1131,5 @@ void ME_SetSide( const char* side )
 			Q_strncpyz( veh->side, side, sizeof(veh->side) );
 		count++;
 	}
-	ClientGame::printf( "%d object(s) set to side %s\n", count, side );
+	CGame::printf( "%d object(s) set to side %s\n", count, side );
 }

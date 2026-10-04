@@ -67,11 +67,11 @@ lagometer_t		lagometer;
 
 /*
 ==============
-ClientGame::add_Console_Line
+CGame::add_Console_Line
 ==============
 */
 
-void ClientGame::add_Console_Line( char * pText )
+void CGame::add_Console_Line( char * pText )
 {
 	// copy the text in
 	strcpy( consoleLine[ consoleIdx ].text, pText );
@@ -90,10 +90,10 @@ void ClientGame::add_Console_Line( char * pText )
 
 /*
 ==============
-ClientGame::text_Width
+CGame::text_Width
 ==============
 */
-int ClientGame::text_Width(const char *text, float scale, int limit) {
+int CGame::text_Width(const char *text, float scale, int limit) {
   int count,len;
 	float out;
 	glyphInfo_t *glyph;
@@ -132,10 +132,10 @@ int ClientGame::text_Width(const char *text, float scale, int limit) {
 
 /*
 ==============
-ClientGame::text_Height
+CGame::text_Height
 ==============
 */
-int ClientGame::text_Height(const char *text, float scale, int limit) {
+int CGame::text_Height(const char *text, float scale, int limit) {
   int len, count;
 	float max;
 	glyphInfo_t *glyph;
@@ -176,23 +176,23 @@ int ClientGame::text_Height(const char *text, float scale, int limit) {
 
 /*
 ==============
-ClientGame::text_PaintChar
+CGame::text_PaintChar
 ==============
 */
-void ClientGame::text_PaintChar(float x, float y, float width, float height, float scale, float s, float t, float s2, float t2, qhandle_t hShader) {
+void CGame::text_PaintChar(float x, float y, float width, float height, float scale, float s, float t, float s2, float t2, qhandle_t hShader) {
   float w, h;
   w = width * scale;
   h = height * scale;
-  ClientGame::adjustFrom640( &x, &y, &w, &h );
+  CGame::adjustFrom640( &x, &y, &w, &h );
   refExport.DrawStretchPic( x, y, w, h, s, t, s2, t2, hShader );
 }
 
 /*
 ==============
-ClientGame::text_Paint
+CGame::text_Paint
 ==============
 */
-void ClientGame::text_Paint(float x, float y, float scale, const vec4_t color, const char *text, float adjust, int limit, int style)
+void CGame::text_Paint(float x, float y, float scale, const vec4_t color, const char *text, float adjust, int limit, int style)
 {
 	int ix = 0, iy = 0;
 	int len, count;
@@ -244,7 +244,7 @@ void ClientGame::text_Paint(float x, float y, float scale, const vec4_t color, c
 					int ofs = style == ITEM_TEXTSTYLE_SHADOWED ? 1 : 2;
 					colorBlack[3] = newColor[3];
 					refExport.SetColor( colorBlack );
-					ClientGame::text_PaintChar(x + ofs, y - yadj + ofs, 
+					CGame::text_PaintChar(x + ofs, y - yadj + ofs, 
 									glyph->imageWidth,
 									glyph->imageHeight,
 									useScale, 
@@ -273,7 +273,7 @@ void ClientGame::text_Paint(float x, float y, float scale, const vec4_t color, c
 							// don't bother for the middle, we'll do that later
 							if( ix && iy )
 							{
-								ClientGame::text_PaintChar(x - ix, y - yadj - iy, 
+								CGame::text_PaintChar(x - ix, y - yadj - iy, 
 												glyph->imageWidth,
 												glyph->imageHeight,
 												useScale, 
@@ -291,7 +291,7 @@ void ClientGame::text_Paint(float x, float y, float scale, const vec4_t color, c
 				}
 
 				// print the actual text
-				ClientGame::text_PaintChar(x, y - yadj, 
+				CGame::text_PaintChar(x, y - yadj, 
 								glyph->imageWidth,
 								glyph->imageHeight,
 								useScale, 
@@ -301,7 +301,7 @@ void ClientGame::text_Paint(float x, float y, float scale, const vec4_t color, c
 								glyph->t2,
 								glyph->glyph);
 
-				// ClientGame::drawPic(x, y - yadj, scale * cgDC.Assets.textFont.glyphs[text[i]].imageWidth, scale * cgDC.Assets.textFont.glyphs[text[i]].imageHeight, cgDC.Assets.textFont.glyphs[text[i]].glyph);
+				// CGame::drawPic(x, y - yadj, scale * cgDC.Assets.textFont.glyphs[text[i]].imageWidth, scale * cgDC.Assets.textFont.glyphs[text[i]].imageHeight, cgDC.Assets.textFont.glyphs[text[i]].glyph);
 				x += (glyph->xSkip * useScale) + adjust;
 				s++;
 				count++;
@@ -366,7 +366,7 @@ Draws large numbers
 //		else
 //			frame = *ptr -'0';
 //
-//		ClientGame::drawPic( x,y, CHAR_WIDTH, CHAR_HEIGHT, cgs.media.numberShaders[frame] );
+//		CGame::drawPic( x,y, CHAR_WIDTH, CHAR_HEIGHT, cgs.media.numberShaders[frame] );
 //		x += CHAR_WIDTH;
 //		ptr++;
 //		l--;
@@ -376,11 +376,11 @@ Draws large numbers
 
 /*
 ================
-ClientGame::draw3DModel
+CGame::draw3DModel
 
 ================
 */
-void ClientGame::draw3DModel( float x, float y, float w, float h, qhandle_t model, qhandle_t skin, vec3_t origin, vec3_t angles ) {
+void CGame::draw3DModel( float x, float y, float w, float h, qhandle_t model, qhandle_t skin, vec3_t origin, vec3_t angles ) {
 	refdef_t		refdef;
 	refEntity_t		ent;
 
@@ -388,7 +388,7 @@ void ClientGame::draw3DModel( float x, float y, float w, float h, qhandle_t mode
 		return;
 	}
 
-	ClientGame::adjustFrom640( &x, &y, &w, &h );
+	CGame::adjustFrom640( &x, &y, &w, &h );
 
 	memset( &refdef, 0, sizeof( refdef ) );
 
@@ -420,12 +420,12 @@ void ClientGame::draw3DModel( float x, float y, float w, float h, qhandle_t mode
 
 /*
 ================
-ClientGame::drawFlagModel
+CGame::drawFlagModel
 
 Used for both the status bar and the scoreboard
 ================
 */
-void ClientGame::drawFlagModel( float x, float y, float w, float h, int team, bool force2D ) {
+void CGame::drawFlagModel( float x, float y, float w, float h, int team, bool force2D ) {
 	qhandle_t		cm;
 	float			len;
 	vec3_t			origin, angles;
@@ -458,7 +458,7 @@ void ClientGame::drawFlagModel( float x, float y, float w, float h, int team, bo
 		} else {
 			return;
 		}
-		ClientGame::draw3DModel( x, y, w, h, handle, 0, origin, angles );
+		CGame::draw3DModel( x, y, w, h, handle, 0, origin, angles );
 	} else if ( cg_drawIcons.integer ) {
 		gitem_t *item;
 
@@ -470,18 +470,18 @@ void ClientGame::drawFlagModel( float x, float y, float w, float h, int team, bo
 			return;
 		}
 		if (item) {
-		  ClientGame::drawPic( x, y, w, h, cg_items[ ITEM_INDEX(item) ].icon );
+		  CGame::drawPic( x, y, w, h, cg_items[ ITEM_INDEX(item) ].icon );
 		}
 	}
 }
 
 /*
 ================
-ClientGame::drawTeamBackground
+CGame::drawTeamBackground
 
 ================
 */
-void ClientGame::drawTeamBackground( int x, int y, int w, int h, float alpha, int team )
+void CGame::drawTeamBackground( int x, int y, int w, int h, float alpha, int team )
 {
 	vec4_t		hcolor;
 
@@ -498,7 +498,7 @@ void ClientGame::drawTeamBackground( int x, int y, int w, int h, float alpha, in
 		return;
 	}
 	refExport.SetColor( hcolor );
-	ClientGame::drawPic( x, y, w, h, cgs.media.teamStatusBar );
+	CGame::drawPic( x, y, w, h, cgs.media.teamStatusBar );
 	refExport.SetColor( nullptr );
 }
 
@@ -514,16 +514,16 @@ void ClientGame::drawTeamBackground( int x, int y, int w, int h, float alpha, in
 
 /*
 ==================
-ClientGame::drawSnapshot
+CGame::drawSnapshot
 ==================
 */
-float ClientGame::drawSnapshot( float y ) {
+float CGame::drawSnapshot( float y ) {
 	char		*s;
 	int			w;
 
 	s = va( "time:%i snap:%i cmd:%i", cg.snap->serverTime, 
 		cg.latestSnapshotNum, cgs.serverCommandSequence );
-	w = ClientGame::drawStrlen( s ) * BIGCHAR_WIDTH;
+	w = CGame::drawStrlen( s ) * BIGCHAR_WIDTH;
 
 	cgUtils.drawStringNew( 320, 430, 0.35f, colorWhite, s, 0, 0, ITEM_TEXTSTYLE_SHADOWED, CENTRE_JUSTIFY );
 
@@ -532,14 +532,14 @@ float ClientGame::drawSnapshot( float y ) {
 
 /*
 ==================
-ClientGame::drawFPS
+CGame::drawFPS
 ==================
 */
 
 constexpr int FPS_FRAMES = 4;
 constexpr int FPS_STROBE = 50; // only show every x computes because we can't read the damn this otherwise
 
-float ClientGame::drawFPS( float y ) {
+float CGame::drawFPS( float y ) {
 	char		*s;
 	int			w;
 	static int	previousTimes[FPS_FRAMES];
@@ -583,7 +583,7 @@ float ClientGame::drawFPS( float y ) {
 		if( strobe >= FPS_STROBE ) strobe = 0;
 
 		s = va( "%ifps", fps );
-		w = ClientGame::drawStrlen( s ) * BIGCHAR_WIDTH;
+		w = CGame::drawStrlen( s ) * BIGCHAR_WIDTH;
 
 
 		cgUtils.drawStringNew( 635, y + 2, 0.5f, *cgUtils.createColourVector(1,1,1,1,nullptr), s, 0, 0, 3, RIGHT_JUSTIFY );
@@ -593,12 +593,12 @@ float ClientGame::drawFPS( float y ) {
 	return y + BIGCHAR_HEIGHT + 4;
 }
 
-float ClientGame::drawParticleStats( float y ) {
+float CGame::drawParticleStats( float y ) {
 	char		*s;
 	int			w;
 	
 	s = va( "# Particles: %i", pw.numParticles );
-	w = ClientGame::drawStrlen( s ) * BIGCHAR_WIDTH;
+	w = CGame::drawStrlen( s ) * BIGCHAR_WIDTH;
 
 	cgUtils.drawStringNew( 635, y + 2, 0.5f, *cgUtils.createColourVector(1,1,1,1,nullptr), s, 0, 0, 3, RIGHT_JUSTIFY );
 	
@@ -641,7 +641,7 @@ CG_DrawTeamOverlay
 //		ci = cgs.clientinfo + sortedTeamPlayers[i];
 //		if ( ci->infoValid && ci->team == cg.snap->ps.persistant[PERS_TEAM]) {
 //			plyrs++;
-//			len = ClientGame::drawStrlen(ci->name);
+//			len = CGame::drawStrlen(ci->name);
 //			if (len > pwidth)
 //				pwidth = len;
 //		}
@@ -656,9 +656,9 @@ CG_DrawTeamOverlay
 //	// max location name width
 //	lwidth = 0;
 //	for (i = 1; i < MAX_LOCATIONS; i++) {
-//		p = ClientGame::configString(CS_LOCATIONS + i);
+//		p = CGame::configString(CS_LOCATIONS + i);
 //		if (p && *p) {
-//			len = ClientGame::drawStrlen(p);
+//			len = CGame::drawStrlen(p);
 //			if (len > lwidth)
 //				lwidth = len;
 //		}
@@ -695,7 +695,7 @@ CG_DrawTeamOverlay
 //		hcolor[3] = 0.33f;
 //	}
 //	refExport.SetColor( hcolor );
-//	ClientGame::drawPic( x, y, w, h, cgs.media.teamStatusBar );
+//	CGame::drawPic( x, y, w, h, cgs.media.teamStatusBar );
 //	refExport.SetColor( NULL );
 //
 //	for (i = 0; i < count; i++) {
@@ -706,22 +706,22 @@ CG_DrawTeamOverlay
 //
 //			xx = x + TINYCHAR_WIDTH;
 //
-//			ClientGame::drawStringExt( xx, y,
+//			CGame::drawStringExt( xx, y,
 //				ci->name, hcolor, false, false,
 //				TINYCHAR_WIDTH, TINYCHAR_HEIGHT, TEAM_OVERLAY_MAXNAME_WIDTH);
 //
 //			if (lwidth) {
-//				p = ClientGame::configString(CS_LOCATIONS + ci->location);
+//				p = CGame::configString(CS_LOCATIONS + ci->location);
 //				if (!p || !*p)
 //					p = "unknown";
-//				len = ClientGame::drawStrlen(p);
+//				len = CGame::drawStrlen(p);
 //				if (len > lwidth)
 //					len = lwidth;
 //
 ////				xx = x + TINYCHAR_WIDTH * 2 + TINYCHAR_WIDTH * pwidth + 
 ////					((lwidth/2 - len/2) * TINYCHAR_WIDTH);
 //				xx = x + TINYCHAR_WIDTH * 2 + TINYCHAR_WIDTH * pwidth;
-//				ClientGame::drawStringExt( xx, y,
+//				CGame::drawStringExt( xx, y,
 //					p, hcolor, false, false, TINYCHAR_WIDTH, TINYCHAR_HEIGHT,
 //					TEAM_OVERLAY_MAXLOCATION_WIDTH);
 //			}
@@ -731,7 +731,7 @@ CG_DrawTeamOverlay
 //			xx = x + TINYCHAR_WIDTH * 3 + 
 //				TINYCHAR_WIDTH * pwidth + TINYCHAR_WIDTH * lwidth;
 //
-//			ClientGame::drawStringExt( xx, y,
+//			CGame::drawStringExt( xx, y,
 //				st, hcolor, false, false,
 //				TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 0 );
 //
@@ -747,7 +747,7 @@ CG_DrawTeamOverlay
 //					item = GameShared::findItemForPowerup( static_cast<objective_t>(j) );
 //
 //					if (item) {
-//						ClientGame::drawPic( xx, y, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 
+//						CGame::drawPic( xx, y, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 
 //						refExport.RegisterShader( item->icon ) );
 //						if (right) {
 //							xx -= TINYCHAR_WIDTH;
@@ -768,12 +768,12 @@ CG_DrawTeamOverlay
 
 /*
 ==============
-ClientGame::drawDisconnect
+CGame::drawDisconnect
 
 Should we draw something differnet for long lag vs no packets?
 ==============
 */
-void ClientGame::drawDisconnect( ) {
+void CGame::drawDisconnect( ) {
 	float		x, y;
 	int			cmdNum;
 	usercmd_t	cmd;
@@ -790,7 +790,7 @@ void ClientGame::drawDisconnect( ) {
 
 	// also add text in center of screen
 	s = "Connection Interrupted";
-	w = ClientGame::drawStrlen( s ) * BIGCHAR_WIDTH;
+	w = CGame::drawStrlen( s ) * BIGCHAR_WIDTH;
 
 	cgUtils.drawStringNewAlpha( 320, 100, s, 1.0f, CENTRE_JUSTIFY );
 
@@ -802,7 +802,7 @@ void ClientGame::drawDisconnect( ) {
 	x = 640 - 48;
 	y = 480 - 48;
 
-	ClientGame::drawPic( x, y, 48, 48, refExport.RegisterShader("gfx/2d/net.tga" ) );
+	CGame::drawPic( x, y, 48, 48, refExport.RegisterShader("gfx/2d/net.tga" ) );
 }
 
 constexpr int MAX_LAGOMETER_PING = 900;
@@ -810,10 +810,10 @@ constexpr int MAX_LAGOMETER_RANGE = 300;
 
 /*
 ==============
-ClientGame::drawLagometer
+CGame::drawLagometer
 ==============
 */
-void ClientGame::drawLagometer( float y )
+void CGame::drawLagometer( float y )
 {
 	int		a, x, i;
 	float	v;
@@ -824,7 +824,7 @@ void ClientGame::drawLagometer( float y )
 	// just draw the disconnect?
 	if ( !cg_lagometer.integer || cgs.localServer )
 	{
-		ClientGame::drawDisconnect();
+		CGame::drawDisconnect();
 		return;
 	}
 
@@ -833,7 +833,7 @@ void ClientGame::drawLagometer( float y )
 	//
 	
 	// is the New HUD active?
-	if( ClientGame::newHUDActive() ) {
+	if( CGame::newHUDActive() ) {
 		x = 80;
 		y = 250;
 	}
@@ -845,13 +845,13 @@ void ClientGame::drawLagometer( float y )
 	}
 
 	refExport.SetColor( nullptr );
-	ClientGame::drawPic( x, y, 48, 48, cgs.media.lagometerShader );
+	CGame::drawPic( x, y, 48, 48, cgs.media.lagometerShader );
 
 	ax = x;
 	ay = y;
 	aw = 48;
 	ah = 48;
-	ClientGame::adjustFrom640( &ax, &ay, &aw, &ah );
+	CGame::adjustFrom640( &ax, &ay, &aw, &ah );
 
 	color = -1;
 	range = ah / 3;
@@ -922,23 +922,23 @@ void ClientGame::drawLagometer( float y )
 	refExport.SetColor( nullptr );
 
 	if ( cg_nopredict.integer || cg_synchronousClients.integer ) {
-		ClientGame::drawBigString( ax, ay, "snc", 1.0 );
+		CGame::drawBigString( ax, ay, "snc", 1.0 );
 	}
 
-	ClientGame::drawDisconnect();
+	CGame::drawDisconnect();
 }
 
 
 
 /*
 =====================
-ClientGame::newHUDActive
+CGame::newHUDActive
 
 Is the New HUD actually being draw?
 =====================
 */
 
-bool ClientGame::newHUDActive( )
+bool CGame::newHUDActive( )
 {
 	// definatley not active?
 	if ( cg.snap->ps.pm_type == PM_DEAD ||
@@ -955,14 +955,14 @@ bool ClientGame::newHUDActive( )
 
 /*
 =====================
-ClientGame::drawCustomConsole
+CGame::drawCustomConsole
 
 =====================
 */
 
 constexpr int LINE_HEIGHT = 14;
 
-void ClientGame::drawCustomConsole( )
+void CGame::drawCustomConsole( )
 {
 	float alpha = 0.0f;
 	int drawIdx = 0;
@@ -972,7 +972,7 @@ void ClientGame::drawCustomConsole( )
 	int coy = 4;
 	
 	// alter draw TL position?
-	if( ClientGame::newHUDActive() )
+	if( CGame::newHUDActive() )
 	{
 		cox = 64;
 		coy = 32;
@@ -1037,12 +1037,12 @@ void ClientGame::drawCustomConsole( )
 
 /*
 =====================
-ClientGame::drawUpperLeft
+CGame::drawUpperLeft
 
 =====================
 */
 
-void ClientGame::drawUpperLeft( )
+void CGame::drawUpperLeft( )
 {
 	rectDef_t fillRect;
 	
@@ -1058,23 +1058,23 @@ void ClientGame::drawUpperLeft( )
 */
 
 	// draw our custom console
-	ClientGame::setScreenPlacement( PLACE_LEFT );
-	ClientGame::drawCustomConsole();
-	ClientGame::setScreenPlacement( PLACE_CENTER );
+	CGame::setScreenPlacement( PLACE_LEFT );
+	CGame::drawCustomConsole();
+	CGame::setScreenPlacement( PLACE_CENTER );
 }
 
 
 /*
 =====================
-ClientGame::drawUpperRight
+CGame::drawUpperRight
 
 =====================
 */
-void ClientGame::drawUpperRight( bool scoreboard )
+void CGame::drawUpperRight( bool scoreboard )
 {
 	float y = 2;
 
-	ClientGame::setScreenPlacement( PLACE_RIGHT );
+	CGame::setScreenPlacement( PLACE_RIGHT );
 
 // MFQ3: no room for this because of our extensive HUD!
 //	if ( cgs.gametype >= GT_TEAM && cg_drawTeamOverlay.integer == 1 ) {
@@ -1086,17 +1086,17 @@ void ClientGame::drawUpperRight( bool scoreboard )
 	{
 		// snapshot
 		if ( cg_drawSnapshot.integer ) {
-			y = ClientGame::drawSnapshot( y );
+			y = CGame::drawSnapshot( y );
 		}
 
 		// framerate
 		if ( cg_drawFPS.integer ) {
-			y = ClientGame::drawFPS( y );
+			y = CGame::drawFPS( y );
 		}
 
 		// Particle stats
 		if ( cg_drawParticleStats.integer ) {
-			y = ClientGame::drawParticleStats( y );
+			y = CGame::drawParticleStats( y );
 		}
 	}
 
@@ -1113,9 +1113,9 @@ void ClientGame::drawUpperRight( bool scoreboard )
 	}
 
 	// the lagometer
-	ClientGame::drawLagometer( y );
+	CGame::drawLagometer( y );
 
-	ClientGame::setScreenPlacement( PLACE_CENTER );
+	CGame::setScreenPlacement( PLACE_CENTER );
 }
 
 /*
@@ -1158,13 +1158,13 @@ Draw the small two score display
 //		color[2] = 1;
 //		color[3] = 0.33f;
 //		s = va( "%2i", s2 );
-//		w = ClientGame::drawStrlen( s ) * BIGCHAR_WIDTH + 8;
+//		w = CGame::drawStrlen( s ) * BIGCHAR_WIDTH + 8;
 //		x -= w;
-//		ClientGame::fillRect( x, y-4,  w, BIGCHAR_HEIGHT+8, color );
+//		CGame::fillRect( x, y-4,  w, BIGCHAR_HEIGHT+8, color );
 //		if ( cg.snap->ps.persistant[PERS_TEAM] == ClientBase::TEAM_BLUE ) {
-//			ClientGame::drawPic( x, y-4, w, BIGCHAR_HEIGHT+8, cgs.media.selectShader );
+//			CGame::drawPic( x, y-4, w, BIGCHAR_HEIGHT+8, cgs.media.selectShader );
 //		}
-//		ClientGame::drawBigString( x + 4, y, s, 1.0F);
+//		CGame::drawBigString( x + 4, y, s, 1.0F);
 //
 //		if ( cgs.gametype == GT_CTF ) {
 //			// Display flag status
@@ -1173,7 +1173,7 @@ Draw the small two score display
 //			if (item) {
 //				y1 = y - BIGCHAR_HEIGHT - 8;
 //				if( cgs.blueflag >= 0 && cgs.blueflag <= 2 ) {
-//					ClientGame::drawPic( x, y1-4, w, BIGCHAR_HEIGHT+8, cgs.media.blueFlagShader[cgs.blueflag] );
+//					CGame::drawPic( x, y1-4, w, BIGCHAR_HEIGHT+8, cgs.media.blueFlagShader[cgs.blueflag] );
 //				}
 //			}
 //		}
@@ -1183,13 +1183,13 @@ Draw the small two score display
 //		color[2] = 0;
 //		color[3] = 0.33f;
 //		s = va( "%2i", s1 );
-//		w = ClientGame::drawStrlen( s ) * BIGCHAR_WIDTH + 8;
+//		w = CGame::drawStrlen( s ) * BIGCHAR_WIDTH + 8;
 //		x -= w;
-//		ClientGame::fillRect( x, y-4,  w, BIGCHAR_HEIGHT+8, color );
+//		CGame::fillRect( x, y-4,  w, BIGCHAR_HEIGHT+8, color );
 //		if ( cg.snap->ps.persistant[PERS_TEAM] == ClientBase::TEAM_RED ) {
-//			ClientGame::drawPic( x, y-4, w, BIGCHAR_HEIGHT+8, cgs.media.selectShader );
+//			CGame::drawPic( x, y-4, w, BIGCHAR_HEIGHT+8, cgs.media.selectShader );
 //		}
-//		ClientGame::drawBigString( x + 4, y, s, 1.0F);
+//		CGame::drawBigString( x + 4, y, s, 1.0F);
 //
 //		if ( cgs.gametype == GT_CTF ) {
 //			// Display flag status
@@ -1198,7 +1198,7 @@ Draw the small two score display
 //			if (item) {
 //				y1 = y - BIGCHAR_HEIGHT - 8;
 //				if( cgs.redflag >= 0 && cgs.redflag <= 2 ) {
-//					ClientGame::drawPic( x, y1-4, w, BIGCHAR_HEIGHT+8, cgs.media.redFlagShader[cgs.redflag] );
+//					CGame::drawPic( x, y1-4, w, BIGCHAR_HEIGHT+8, cgs.media.redFlagShader[cgs.redflag] );
 //				}
 //			}
 //		}
@@ -1210,9 +1210,9 @@ Draw the small two score display
 //		}
 //		if ( v ) {
 //			s = va( "%2i", v );
-//			w = ClientGame::drawStrlen( s ) * BIGCHAR_WIDTH + 8;
+//			w = CGame::drawStrlen( s ) * BIGCHAR_WIDTH + 8;
 //			x -= w;
-//			ClientGame::drawBigString( x + 4, y, s, 1.0F);
+//			CGame::drawBigString( x + 4, y, s, 1.0F);
 //		}
 //
 //	} else {
@@ -1228,52 +1228,52 @@ Draw the small two score display
 //		}
 //		if ( s2 != SCORE_NOT_PRESENT ) {
 //			s = va( "%2i", s2 );
-//			w = ClientGame::drawStrlen( s ) * BIGCHAR_WIDTH + 8;
+//			w = CGame::drawStrlen( s ) * BIGCHAR_WIDTH + 8;
 //			x -= w;
 //			if ( !spectator && score == s2 && score != s1 ) {
 //				color[0] = 1;
 //				color[1] = 0;
 //				color[2] = 0;
 //				color[3] = 0.33f;
-//				ClientGame::fillRect( x, y-4,  w, BIGCHAR_HEIGHT+8, color );
-//				ClientGame::drawPic( x, y-4, w, BIGCHAR_HEIGHT+8, cgs.media.selectShader );
+//				CGame::fillRect( x, y-4,  w, BIGCHAR_HEIGHT+8, color );
+//				CGame::drawPic( x, y-4, w, BIGCHAR_HEIGHT+8, cgs.media.selectShader );
 //			} else {
 //				color[0] = 0.5f;
 //				color[1] = 0.5f;
 //				color[2] = 0.5f;
 //				color[3] = 0.33f;
-//				ClientGame::fillRect( x, y-4,  w, BIGCHAR_HEIGHT+8, color );
+//				CGame::fillRect( x, y-4,  w, BIGCHAR_HEIGHT+8, color );
 //			}	
-//			ClientGame::drawBigString( x + 4, y, s, 1.0F);
+//			CGame::drawBigString( x + 4, y, s, 1.0F);
 //		}
 //
 //		// first place
 //		if ( s1 != SCORE_NOT_PRESENT ) {
 //			s = va( "%2i", s1 );
-//			w = ClientGame::drawStrlen( s ) * BIGCHAR_WIDTH + 8;
+//			w = CGame::drawStrlen( s ) * BIGCHAR_WIDTH + 8;
 //			x -= w;
 //			if ( !spectator && score == s1 ) {
 //				color[0] = 0;
 //				color[1] = 0;
 //				color[2] = 1;
 //				color[3] = 0.33f;
-//				ClientGame::fillRect( x, y-4,  w, BIGCHAR_HEIGHT+8, color );
-//				ClientGame::drawPic( x, y-4, w, BIGCHAR_HEIGHT+8, cgs.media.selectShader );
+//				CGame::fillRect( x, y-4,  w, BIGCHAR_HEIGHT+8, color );
+//				CGame::drawPic( x, y-4, w, BIGCHAR_HEIGHT+8, cgs.media.selectShader );
 //			} else {
 //				color[0] = 0.5f;
 //				color[1] = 0.5f;
 //				color[2] = 0.5f;
 //				color[3] = 0.33f;
-//				ClientGame::fillRect( x, y-4,  w, BIGCHAR_HEIGHT+8, color );
+//				CGame::fillRect( x, y-4,  w, BIGCHAR_HEIGHT+8, color );
 //			}	
-//			ClientGame::drawBigString( x + 4, y, s, 1.0F);
+//			CGame::drawBigString( x + 4, y, s, 1.0F);
 //		}
 //
 //		if ( cgs.fraglimit ) {
 //			s = va( "%2i", cgs.fraglimit );
-//			w = ClientGame::drawStrlen( s ) * BIGCHAR_WIDTH + 8;
+//			w = CGame::drawStrlen( s ) * BIGCHAR_WIDTH + 8;
 //			x -= w;
-//			ClientGame::drawBigString( x + 4, y, s, 1.0F);
+//			CGame::drawBigString( x + 4, y, s, 1.0F);
 //		}
 //
 //	}
@@ -1298,12 +1298,12 @@ CG_DrawPickupItem
 //
 //	value = cg.itemPickup;
 //	if ( value ) {
-//		fadeColor = ClientGame::fadeColor( cg.itemPickupTime, 3000 );
+//		fadeColor = CGame::fadeColor( cg.itemPickupTime, 3000 );
 //		if ( fadeColor ) {
-//			ClientGame::registerItemVisuals( value );
+//			CGame::registerItemVisuals( value );
 //			refExport.SetColor( fadeColor );
-//			ClientGame::drawPic( 8, y, ICON_SIZE, ICON_SIZE, cg_items[ value ].icon );
-//			ClientGame::drawBigString( ICON_SIZE + 16, y + (ICON_SIZE/2 - BIGCHAR_HEIGHT/2), bg_itemlist[ value ].pickup_name, fadeColor[0] );
+//			CGame::drawPic( 8, y, ICON_SIZE, ICON_SIZE, cg_items[ value ].icon );
+//			CGame::drawBigString( ICON_SIZE + 16, y + (ICON_SIZE/2 - BIGCHAR_HEIGHT/2), bg_itemlist[ value ].pickup_name, fadeColor[0] );
 //			refExport.SetColor( NULL );
 //		}
 //	}
@@ -1364,7 +1364,7 @@ CG_DrawTeamInfo
 //		w = 0;
 //
 //		for (i = cgs.teamLastChatPos; i < cgs.teamChatPos; i++) {
-//			len = ClientGame::drawStrlen(cgs.teamChatMsgs[i % chatHeight]);
+//			len = CGame::drawStrlen(cgs.teamChatMsgs[i % chatHeight]);
 //			if (len > w)
 //				w = len;
 //		}
@@ -1389,14 +1389,14 @@ CG_DrawTeamInfo
 //		}
 //
 //		refExport.SetColor( hcolor );
-//		ClientGame::drawPic( CHATLOC_X, CHATLOC_Y - h, 640, h, cgs.media.teamStatusBar );
+//		CGame::drawPic( CHATLOC_X, CHATLOC_Y - h, 640, h, cgs.media.teamStatusBar );
 //		refExport.SetColor( NULL );
 //
 //		hcolor[0] = hcolor[1] = hcolor[2] = 1.0;
 //		hcolor[3] = 1.0;
 //
 //		for (i = cgs.teamChatPos - 1; i >= cgs.teamLastChatPos; i--) {
-//			ClientGame::drawStringExt( CHATLOC_X + TINYCHAR_WIDTH, 
+//			CGame::drawStringExt( CHATLOC_X + TINYCHAR_WIDTH, 
 //				CHATLOC_Y - (cgs.teamChatPos - i)*TINYCHAR_HEIGHT, 
 //				cgs.teamChatMsgs[i % chatHeight], hcolor, false, false,
 //				TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 0 );
@@ -1420,7 +1420,7 @@ CG_DrawReward
 //		return;
 //	}
 //
-//	color = ClientGame::fadeColor( cg.rewardTime, REWARD_TIME );
+//	color = CGame::fadeColor( cg.rewardTime, REWARD_TIME );
 //	if ( !color ) {
 //		if (cg.rewardStack > 0) {
 //			for(i = 0; i < cg.rewardStack; i++) {
@@ -1430,7 +1430,7 @@ CG_DrawReward
 //			}
 //			cg.rewardTime = cg.time;
 //			cg.rewardStack--;
-//			color = ClientGame::fadeColor( cg.rewardTime, REWARD_TIME );
+//			color = CGame::fadeColor( cg.rewardTime, REWARD_TIME );
 //			SoundSystem::startLocalSound(cg.rewardSound[0], CHAN_ANNOUNCER);
 //		} else {
 //			return;
@@ -1442,10 +1442,10 @@ CG_DrawReward
 //	if ( cg.rewardCount[0] >= 10 ) {
 //		y = 56;
 //		x = 320 - ICON_SIZE/2;
-//		ClientGame::drawPic( x, y, ICON_SIZE-4, ICON_SIZE-4, cg.rewardShader[0] );
+//		CGame::drawPic( x, y, ICON_SIZE-4, ICON_SIZE-4, cg.rewardShader[0] );
 //		Com_sprintf(buf, sizeof(buf), "%d", cg.rewardCount[0]);
-//		x = ( SCREEN_WIDTH - SMALLCHAR_WIDTH * ClientGame::drawStrlen( buf ) ) / 2;
-//		ClientGame::drawStringExt( x, y+ICON_SIZE, buf, color, false, true,
+//		x = ( SCREEN_WIDTH - SMALLCHAR_WIDTH * CGame::drawStrlen( buf ) ) / 2;
+//		CGame::drawStringExt( x, y+ICON_SIZE, buf, color, false, true,
 //								SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, 0 );
 //	}
 //	else {
@@ -1455,7 +1455,7 @@ CG_DrawReward
 //		y = 56;
 //		x = 320 - count * ICON_SIZE/2;
 //		for ( i = 0 ; i < count ; i++ ) {
-//			ClientGame::drawPic( x, y, ICON_SIZE-4, ICON_SIZE-4, cg.rewardShader[0] );
+//			CGame::drawPic( x, y, ICON_SIZE-4, ICON_SIZE-4, cg.rewardShader[0] );
 //			x += ICON_SIZE;
 //		}
 //	}
@@ -1464,12 +1464,12 @@ CG_DrawReward
 
 /*
 ==============
-ClientGame::addLagometerFrameInfo
+CGame::addLagometerFrameInfo
 
 Adds the current interpolate / extrapolate bar for this frame
 ==============
 */
-void ClientGame::addLagometerFrameInfo( ) {
+void CGame::addLagometerFrameInfo( ) {
 	int			offset;
 
 	offset = cg.time - cg.latestSnapshotTime;
@@ -1479,7 +1479,7 @@ void ClientGame::addLagometerFrameInfo( ) {
 
 /*
 ==============
-ClientGame::addLagometerSnapshotInfo
+CGame::addLagometerSnapshotInfo
 
 Each time a snapshot is received, log its ping time and
 the number of snapshots that were dropped before it.
@@ -1487,7 +1487,7 @@ the number of snapshots that were dropped before it.
 Pass NULL for a dropped packet.
 ==============
 */
-void ClientGame::addLagometerSnapshotInfo( snapshot_t *snap ) {
+void CGame::addLagometerSnapshotInfo( snapshot_t *snap ) {
 	// dropped packet
 	if ( !snap ) {
 		lagometer.snapshotSamples[ lagometer.snapshotCount & ( LAG_SAMPLES - 1) ] = -1;
@@ -1512,13 +1512,13 @@ CENTER PRINTING
 
 /*
 ==============
-ClientGame::centerPrint
+CGame::centerPrint
 
 Called for important messages that should stay in the center of the screen
 for a few moments
 ==============
 */
-void ClientGame::centerPrint( const char *str, int y, int charWidth ) {
+void CGame::centerPrint( const char *str, int y, int charWidth ) {
 	char	*s;
 
 	Q_strncpyz( cg.centerPrint, str, sizeof(cg.centerPrint) );
@@ -1540,10 +1540,10 @@ void ClientGame::centerPrint( const char *str, int y, int charWidth ) {
 
 /*
 ===================
-ClientGame::drawCenterString
+CGame::drawCenterString
 ===================
 */
-void ClientGame::drawCenterString( ) {
+void CGame::drawCenterString( ) {
 	char	*start;
 	int		l;
 	int		x, y, w;//, h;
@@ -1553,7 +1553,7 @@ void ClientGame::drawCenterString( ) {
 		return;
 	}
 
-	color = ClientGame::fadeColor( cg.centerPrintTime, 1000 * cg_centertime.value );
+	color = CGame::fadeColor( cg.centerPrintTime, 1000 * cg_centertime.value );
 	if ( !color ) {
 		return;
 	}
@@ -1575,7 +1575,7 @@ void ClientGame::drawCenterString( ) {
 		}
 		linebuffer[l] = 0;
 
-		w = cg.centerPrintCharWidth * ClientGame::drawStrlen( linebuffer );
+		w = cg.centerPrintCharWidth * CGame::drawStrlen( linebuffer );
 
 		x = ( SCREEN_WIDTH - w ) / 2;
 
@@ -1645,7 +1645,7 @@ static void CG_DrawCrosshair(void) {
 
 	x = cg_crosshairX.integer;
 	y = cg_crosshairY.integer;
-	ClientGame::adjustFrom640( &x, &y, &w, &h );
+	CGame::adjustFrom640( &x, &y, &w, &h );
 
 	ca = cg_drawCrosshair.integer;
 	if (ca < 0) {
@@ -1675,7 +1675,7 @@ static void CG_ScanForCrosshairEntity( void ) {
 	VectorCopy( cg.refdef.vieworg, start );
 	VectorMA( start, 131072, cg.refdef.viewaxis[0], end );
 
-	ClientGame::trace( &trace, start, vec3_origin, vec3_origin, end, 
+	CGame::trace( &trace, start, vec3_origin, vec3_origin, end, 
 		cg.snap->ps.clientNum, CONTENTS_SOLID|CONTENTS_BODY );
 	if ( trace.entityNum >= MAX_CLIENTS ) {
 		return;
@@ -1695,10 +1695,10 @@ static void CG_ScanForCrosshairEntity( void ) {
 
 /*
 =====================
-ClientGame::drawCrosshairNames
+CGame::drawCrosshairNames
 =====================
 */
-void ClientGame::drawCrosshairNames( ) {
+void CGame::drawCrosshairNames( ) {
 	float		*color;
 	char		*name;
 	float		w;
@@ -1717,7 +1717,7 @@ void ClientGame::drawCrosshairNames( ) {
 	CG_ScanForCrosshairEntity();
 */
 	// draw the name of the player being looked at
-	color = ClientGame::fadeColor( cg.crosshairClientTime, 1000 );
+	color = CGame::fadeColor( cg.crosshairClientTime, 1000 );
 	if ( !color )
 	{
 		refExport.SetColor( nullptr );
@@ -1726,7 +1726,7 @@ void ClientGame::drawCrosshairNames( ) {
 
 	// if we get here then we have a name to draw
 	name = cgs.clientinfo[ cg.crosshairClientNum ].name;
-	w = ClientGame::drawStrlen( name ) * BIGCHAR_WIDTH;
+	w = CGame::drawStrlen( name ) * BIGCHAR_WIDTH;
 
 	cgUtils.drawStringNew( 320, 170, 0.5f, color, name, 0, 0, ITEM_TEXTSTYLE_OUTLINED, CENTRE_JUSTIFY );
 
@@ -1738,10 +1738,10 @@ void ClientGame::drawCrosshairNames( ) {
 
 /*
 =================
-ClientGame::drawSpectator
+CGame::drawSpectator
 =================
 */
-void ClientGame::drawSpectator() {
+void CGame::drawSpectator() {
 
 	// this is where we load the spectator menu script
 	if( menuSpectator == nullptr)
@@ -1794,7 +1794,7 @@ void ClientGame::drawSpectator() {
 		x = cg_crosshairX.integer;
 		y = cg_crosshairY.integer;
 
-		ClientGame::adjustFrom640( &x, &y, &w, &h );
+		CGame::adjustFrom640( &x, &y, &w, &h );
 
 		hShader = cgs.media.crosshairShader[0];
 
@@ -1806,10 +1806,10 @@ void ClientGame::drawSpectator() {
 
 /*
 =================
-ClientGame::drawVote
+CGame::drawVote
 =================
 */
-void ClientGame::drawVote() {
+void CGame::drawVote() {
 	char	*s;
 	int		sec;
 
@@ -1828,15 +1828,15 @@ void ClientGame::drawVote() {
 		sec = 0;
 	}
 	s = va("VOTE(%i):%s yes:%i no:%i", sec, cgs.voteString, cgs.voteYes, cgs.voteNo );
-	ClientGame::drawSmallString( 0, 58, s, 1.0F );
+	CGame::drawSmallString( 0, 58, s, 1.0F );
 }
 
 /*
 =================
-ClientGame::drawTeamVote
+CGame::drawTeamVote
 =================
 */
-void ClientGame::drawTeamVote() {
+void CGame::drawTeamVote() {
 	char	*s;
 	int		sec, cs_offset;
 
@@ -1863,15 +1863,15 @@ void ClientGame::drawTeamVote() {
 	}
 	s = va("TEAMVOTE(%i):%s yes:%i no:%i", sec, cgs.teamVoteString[cs_offset],
 							cgs.teamVoteYes[cs_offset], cgs.teamVoteNo[cs_offset] );
-	ClientGame::drawSmallString( 0, 90, s, 1.0F );
+	CGame::drawSmallString( 0, 90, s, 1.0F );
 }
 
 /*
 =================
-ClientGame::drawScoreboard
+CGame::drawScoreboard
 =================
 */
-bool ClientGame::drawScoreboard()
+bool CGame::drawScoreboard()
 {
 	static bool firstTime = true;
 	float fade, *fadeColor;
@@ -1916,7 +1916,7 @@ bool ClientGame::drawScoreboard()
 	}
 	else
 	{
-		fadeColor = ClientGame::fadeColor( cg.scoreFadeTime, FADE_TIME );
+		fadeColor = CGame::fadeColor( cg.scoreFadeTime, FADE_TIME );
 		if( !fadeColor )
 		{
 			// next time scoreboard comes up, don't print killer
@@ -1946,7 +1946,7 @@ bool ClientGame::drawScoreboard()
 	{
 		if( firstTime )
 		{
-			ClientGame::setScoreSelection( menuScoreboard );
+			CGame::setScoreSelection( menuScoreboard );
 			firstTime = false;
 		}
 
@@ -1965,27 +1965,27 @@ bool ClientGame::drawScoreboard()
 
 /*
 =================
-ClientGame::drawIntermission
+CGame::drawIntermission
 =================
 */
-void ClientGame::drawIntermission( )
+void CGame::drawIntermission( )
 {
 	if( cgs.gametype == GT_SINGLE_PLAYER )
 	{
-		ClientGame::drawCenterString();
+		CGame::drawCenterString();
 		return;
 	}
 
 	cg.scoreFadeTime = cg.time;
-	cg.scoreBoardShowing = ClientGame::drawScoreboard();
+	cg.scoreBoardShowing = CGame::drawScoreboard();
 }
 
 /*
 =================
-ClientGame::drawFollow
+CGame::drawFollow
 =================
 */
-bool ClientGame::drawFollow( )
+bool CGame::drawFollow( )
 {
 //	float		x = 0;
 	vec4_t		*pColor = nullptr;
@@ -2027,10 +2027,10 @@ bool ClientGame::drawFollow( )
 
 /*
 =================
-ClientGame::drawWarmup
+CGame::drawWarmup
 =================
 */
-void ClientGame::drawWarmup( ) {
+void CGame::drawWarmup( ) {
 	int			w;
 	int			sec;
 	int			i;
@@ -2046,7 +2046,7 @@ void ClientGame::drawWarmup( ) {
 
 	if ( sec < 0 ) {
 		s = "Waiting for players";		
-		w = ClientGame::drawStrlen( s ) * BIGCHAR_WIDTH;
+		w = CGame::drawStrlen( s ) * BIGCHAR_WIDTH;
 		cg.warmupCount = 0;
 
 		cgUtils.drawStringNew( 320, 64, 0.5f, *cgUtils.createColourVector(1,1,1,1,nullptr), s, 0, 0, 3, CENTRE_JUSTIFY );
@@ -2071,13 +2071,13 @@ void ClientGame::drawWarmup( ) {
 		if ( ci1 && ci2 ) {
 			s = va( "%s vs %s", ci1->name, ci2->name );
 
-			w = ClientGame::drawStrlen( s );
+			w = CGame::drawStrlen( s );
 			if ( w > 640 / GIANT_WIDTH ) {
 				cw = 640 / w;
 			} else {
 				cw = GIANT_WIDTH;
 			}
-			ClientGame::drawStringExt( 320 - w * cw/2, 20,s, colorWhite, 
+			CGame::drawStringExt( 320 - w * cw/2, 20,s, colorWhite, 
 					false, true, cw, static_cast<int>(cw * 1.5f), 0 );
 		}
 	} else {
@@ -2093,13 +2093,13 @@ void ClientGame::drawWarmup( ) {
 			s = "";
 		}
 
-		w = ClientGame::drawStrlen( s );
+		w = CGame::drawStrlen( s );
 		if ( w > 640 / GIANT_WIDTH ) {
 			cw = 640 / w;
 		} else {
 			cw = GIANT_WIDTH;
 		}
-		ClientGame::drawStringExt( 320 - w * cw/2, 25,s, colorWhite, 
+		CGame::drawStringExt( 320 - w * cw/2, 25,s, colorWhite, 
 				false, true, cw, static_cast<int>(cw * 1.1), 0 );
 	}
 
@@ -2147,26 +2147,26 @@ void ClientGame::drawWarmup( ) {
 		break;
 	}
 
-	w = ClientGame::drawStrlen( s );
-	ClientGame::drawStringExt( 320 - w * cw/2, 70, s, colorWhite, 
+	w = CGame::drawStrlen( s );
+	CGame::drawStringExt( 320 - w * cw/2, 70, s, colorWhite, 
 			false, true, cw, static_cast<int>(cw * 1.5), 0 );
 }
 
 //==================================================================================
 
-void ClientGame::drawTourneyScoreboard() {
-	ClientGame::drawOldTourneyScoreboard();
+void CGame::drawTourneyScoreboard() {
+	CGame::drawOldTourneyScoreboard();
 }
 
 /*
 =================
-ClientGame::draw2D_MFQ3
+CGame::draw2D_MFQ3
 MFQ3 version, not using the other version in order
 to keep it in case we have to look something up later
 - old version shall be deleted later though!
 =================
 */
-void ClientGame::draw2D_MFQ3( ) {
+void CGame::draw2D_MFQ3( ) {
 
 	// if we are taking a levelshot for the menu, don't draw anything
 	if ( cg.levelShot )
@@ -2183,16 +2183,16 @@ void ClientGame::draw2D_MFQ3( ) {
 	// only draw intermission stuff?
 	if ( cg.snap->ps.pm_type == PM_INTERMISSION )
 	{
-		ClientGame::drawIntermission();
+		CGame::drawIntermission();
 		return;
 	}
 
 	// don't draw any HUD if scoreboard is up
-	cg.scoreBoardShowing = ClientGame::drawScoreboard();
+	cg.scoreBoardShowing = CGame::drawScoreboard();
 	if( cg.scoreBoardShowing )
 	{
 		// draw the timers
-		ClientGame::drawUpperRight( true );
+		CGame::drawUpperRight( true );
 
 		return;
 	}
@@ -2200,9 +2200,9 @@ void ClientGame::draw2D_MFQ3( ) {
 	// are we in spectator mode, or awaiting vehicle selection?
 	if( cg.snap->ps.persistant[PERS_TEAM] == ClientBase::TEAM_SPECTATOR || cg_vehicle.integer == -1 )
 	{
-		ClientGame::drawSpectator();
+		CGame::drawSpectator();
 //		CG_DrawCrosshair();
-//		ClientGame::drawCrosshairNames();
+//		CGame::drawCrosshairNames();
 	}
 	else
 	{
@@ -2211,51 +2211,51 @@ void ClientGame::draw2D_MFQ3( ) {
 			 cg.snap->ps.stats[STAT_HEALTH] > 0 &&
 			 !(cg.snap->ps.pm_flags & PMF_VEHICLESELECT) )
 		{
-			ClientGame::drawStatusBar_MFQ3_new();
+			CGame::drawStatusBar_MFQ3_new();
 
 //			CG_DrawCrosshair();
-			ClientGame::drawCrosshairNames();
+			CGame::drawCrosshairNames();
 //			CG_DrawReward();
 		}
     
 	}
 
-	ClientGame::drawVote();
-	ClientGame::drawTeamVote();
+	CGame::drawVote();
+	CGame::drawTeamVote();
 
-	ClientGame::drawUpperLeft();
+	CGame::drawUpperLeft();
 
-	ClientGame::drawUpperRight( false );
+	CGame::drawUpperRight( false );
 
-	if( !ClientGame::drawFollow() )
+	if( !CGame::drawFollow() )
 	{
-		ClientGame::drawWarmup();
+		CGame::drawWarmup();
 	}
-	ClientGame::drawCenterString();
+	CGame::drawCenterString();
 }
 
 
 /*
 =====================
-ClientGame::drawActive
+CGame::drawActive
 
 Perform all drawing needed to completely fill the screen
 =====================
 */
-void ClientGame::drawActive( stereoFrame_t stereoView ) {
+void CGame::drawActive( stereoFrame_t stereoView ) {
 	float		separation;
 	vec3_t		baseOrg;
 
 	// optionally draw the info screen instead
 	if( !cg.snap ) {
-		ClientGame::drawInformation();
+		CGame::drawInformation();
 		return;
 	}
 
 	// optionally draw the tournement scoreboard instead
 	if ( cg.snap->ps.persistant[PERS_TEAM] == ClientBase::TEAM_SPECTATOR &&
 		( cg.snap->ps.pm_flags & PMF_SCOREBOARD ) ) {
-		ClientGame::drawTourneyScoreboard();
+		CGame::drawTourneyScoreboard();
 		return;
 	}
 
@@ -2276,7 +2276,7 @@ void ClientGame::drawActive( stereoFrame_t stereoView ) {
 
 
 	// clear around the rendered view if sized down
-	ClientGame::tileClear();
+	CGame::tileClear();
 
 	// offset vieworg appropriately if we're doing stereo separation
 	VectorCopy( cg.refdef.vieworg, baseOrg );
@@ -2294,16 +2294,16 @@ void ClientGame::drawActive( stereoFrame_t stereoView ) {
 
 	// draw status bar and other floating elements
 // 	CG_Draw2D();
-	ClientGame::draw2D_MFQ3();
+	CGame::draw2D_MFQ3();
 }
 
 
 /*
 =====================
-ClientGame::getGameStatusText
+CGame::getGameStatusText
 =====================
 */
-const char *ClientGame::getGameStatusText()
+const char *CGame::getGameStatusText()
 {
 	const char * s = "";
 	char * pFormatStringDraw = nullptr;
@@ -2316,7 +2316,7 @@ const char *ClientGame::getGameStatusText()
 		// Deathmatch
 		if (cg.snap->ps.persistant[PERS_TEAM] != ClientBase::TEAM_SPECTATOR )
 		{
-			s = va("%s place with %i",ClientGame::placeString( cg.snap->ps.persistant[PERS_RANK] + 1 ),cg.snap->ps.persistant[PERS_SCORE] );
+			s = va("%s place with %i",CGame::placeString( cg.snap->ps.persistant[PERS_RANK] + 1 ),cg.snap->ps.persistant[PERS_SCORE] );
 		}
 	}
 	else if ( cgs.gametype == GT_TEAM || cgs.gametype == GT_CTF )
@@ -2373,10 +2373,10 @@ const char *CG_GameMiscString() {
 
 /*
 =====================
-ClientGame::gameTypeString
+CGame::gameTypeString
 =====================
 */
-const char *ClientGame::gameTypeString()
+const char *CGame::gameTypeString()
 {
 	const char * pGameType = nullptr;
 	const char * pGameSet = nullptr;
@@ -2405,20 +2405,20 @@ const char *ClientGame::gameTypeString()
 
 /*
 =====================
-ClientGame::drawGameType
+CGame::drawGameType
 =====================
 */
-void ClientGame::drawGameType(rectDef_t *rect, float scale, const vec4_t color, qhandle_t shader, int textStyle )
+void CGame::drawGameType(rectDef_t *rect, float scale, const vec4_t color, qhandle_t shader, int textStyle )
 {
-	ClientGame::text_Paint(rect->x, rect->y + rect->h, scale, color, ClientGame::gameTypeString(), 0, 0, textStyle);
+	CGame::text_Paint(rect->x, rect->y + rect->h, scale, color, CGame::gameTypeString(), 0, 0, textStyle);
 }
 
 /*
 =====================
-ClientGame::drawGameMisc
+CGame::drawGameMisc
 =====================
 */
-void ClientGame::drawGameMisc( itemDef_t * item )
+void CGame::drawGameMisc( itemDef_t * item )
 {
 	// setup text
 	item->text = CG_GameMiscString();
@@ -2429,10 +2429,10 @@ void ClientGame::drawGameMisc( itemDef_t * item )
 
 /*
 =====================
-ClientGame::drawTeamScore
+CGame::drawTeamScore
 =====================
 */
-void ClientGame::drawTeamScore( itemDef_t * item, int team )
+void CGame::drawTeamScore( itemDef_t * item, int team )
 {
 	// NOTE: the score strings are  copied to these statics because just using the pointer returned 
 	// by va() appears to cause memory problems
@@ -2463,10 +2463,10 @@ void ClientGame::drawTeamScore( itemDef_t * item, int team )
 
 /*
 =====================
-ClientGame::drawTeamCount
+CGame::drawTeamCount
 =====================
 */
-void ClientGame::drawTeamCount( itemDef_t * item, int team )
+void CGame::drawTeamCount( itemDef_t * item, int team )
 {
 	// NOTE: the count strings are  copied to these statics because just using the pointer returned 
 	// by va() appears to cause memory problems
@@ -2480,7 +2480,7 @@ void ClientGame::drawTeamCount( itemDef_t * item, int team )
 	switch( team )
 	{
 	case CG_GAME_REDCOUNT:
-		count = ClientGame::feederCount( FEEDER_REDTEAM_LIST );
+		count = CGame::feederCount( FEEDER_REDTEAM_LIST );
 		if( count == 1 )
 			strcpy( redCount, va( "Red (%d player)", count ));
 		else
@@ -2490,7 +2490,7 @@ void ClientGame::drawTeamCount( itemDef_t * item, int team )
 		break;
 
 	case CG_GAME_BLUECOUNT:
-		count = ClientGame::feederCount( FEEDER_BLUETEAM_LIST );
+		count = CGame::feederCount( FEEDER_BLUETEAM_LIST );
 		if( count == 1 )
 			strcpy( blueCount, va( "Blue (%d player)", count ));
 		else
@@ -2499,7 +2499,7 @@ void ClientGame::drawTeamCount( itemDef_t * item, int team )
 		break;
 
 	case CG_GAME_SPECTATORCOUNT:
-		count = ClientGame::feederCount( FEEDER_SPECTATOR_LIST );
+		count = CGame::feederCount( FEEDER_SPECTATOR_LIST );
 		if( count == 1 )
 			strcpy( spectatorCount, va( "Spectator (%d client)", count ));
 		else
@@ -2508,7 +2508,7 @@ void ClientGame::drawTeamCount( itemDef_t * item, int team )
 		break;
 
 	case CG_GAME_PLAYERSCOUNT:
-		count = ClientGame::feederCount( FEEDER_SCOREBOARD );
+		count = CGame::feederCount( FEEDER_SCOREBOARD );
 		if( count == 1 )
 			strcpy( playerCount, va( "Players (%d player)", count ));
 		else
@@ -2527,20 +2527,20 @@ void ClientGame::drawTeamCount( itemDef_t * item, int team )
 
 /*
 =====================
-ClientGame::drawGameStatus
+CGame::drawGameStatus
 =====================
 */
-void ClientGame::drawGameStatus(rectDef_t *rect, float scale, const vec4_t color, qhandle_t shader, int textStyle )
+void CGame::drawGameStatus(rectDef_t *rect, float scale, const vec4_t color, qhandle_t shader, int textStyle )
 {
-	ClientGame::text_Paint(rect->x, rect->y + rect->h, scale, color, ClientGame::getGameStatusText(), 0, 0, textStyle);
+	CGame::text_Paint(rect->x, rect->y + rect->h, scale, color, CGame::getGameStatusText(), 0, 0, textStyle);
 }
 
 /*
 =====================
-ClientGame::ownerDraw
+CGame::ownerDraw
 =====================
 */
-void ClientGame::ownerDraw( float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, int ownerDrawFlags, 
+void CGame::ownerDraw( float x, float y, float w, float h, float text_x, float text_y, int ownerDraw, int ownerDrawFlags, 
 				  int align, float special, float scale, const vec4_t color, qhandle_t shader, int textStyle, 
 				  itemDef_t * item )
 {
@@ -2691,44 +2691,44 @@ void ClientGame::ownerDraw( float x, float y, float w, float h, float text_x, fl
     CG_DrawAreaTeamChat(&rect, scale, color, shader);
     break;
   case CG_AREA_CHAT:
-	ClientGame::drawTeamScore( item, -1 );
+	CGame::drawTeamScore( item, -1 );
     CG_DrawAreaChat(&rect, scale, color, shader);
     break;
 */
   case CG_GAME_MISC:
-    ClientGame::drawGameMisc( item );
+    CGame::drawGameMisc( item );
 	break;
 
   case CG_GAME_REDCOUNT:
-    ClientGame::drawTeamCount( item, CG_GAME_REDCOUNT );
+    CGame::drawTeamCount( item, CG_GAME_REDCOUNT );
 	break;
 
   case CG_GAME_BLUECOUNT:
-    ClientGame::drawTeamCount( item, CG_GAME_BLUECOUNT );
+    CGame::drawTeamCount( item, CG_GAME_BLUECOUNT );
     break;
 
   case CG_GAME_SPECTATORCOUNT:
-    ClientGame::drawTeamCount( item, CG_GAME_SPECTATORCOUNT );
+    CGame::drawTeamCount( item, CG_GAME_SPECTATORCOUNT );
     break;
 
   case CG_GAME_PLAYERSCOUNT:
-    ClientGame::drawTeamCount( item, CG_GAME_PLAYERSCOUNT );
+    CGame::drawTeamCount( item, CG_GAME_PLAYERSCOUNT );
     break;
 
   case CG_GAME_REDSCORE:
-    ClientGame::drawTeamScore( item, CG_GAME_REDSCORE );
+    CGame::drawTeamScore( item, CG_GAME_REDSCORE );
 	break;
 
   case CG_GAME_BLUESCORE:
-    ClientGame::drawTeamScore( item, CG_GAME_BLUESCORE );
+    CGame::drawTeamScore( item, CG_GAME_BLUESCORE );
     break;
 
   case CG_GAME_TYPE:
-    ClientGame::drawGameType( &rect, scale, color, shader, textStyle );
+    CGame::drawGameType( &rect, scale, color, shader, textStyle );
     break;
 
   case CG_GAME_STATUS:
-    ClientGame::drawGameStatus( &rect, scale, color, shader, textStyle );
+    CGame::drawGameStatus( &rect, scale, color, shader, textStyle );
 	break;
 /*
   case CG_KILLER:

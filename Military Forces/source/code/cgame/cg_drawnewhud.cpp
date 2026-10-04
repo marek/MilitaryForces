@@ -11,7 +11,7 @@ extern UI_UtilsCG cgUtils;
 // there are a couple of duplicate functions here
 // this should be cleaned up and factorized when there is some time left..
 
-int ClientGame::alphabet_spaces[33] =
+int CGame::alphabet_spaces[33] =
 {
 	8,	// A=8
 	7,	// B=7
@@ -48,7 +48,7 @@ int ClientGame::alphabet_spaces[33] =
 	7	// ==7	
 };
 
-int ClientGame::number_spaces[16] =
+int CGame::number_spaces[16] =
 {
 	8,	// 0=8
 	8,	// 1=8
@@ -70,14 +70,14 @@ int ClientGame::number_spaces[16] =
 
 /*
 ================
-ClientGame::drawHUDPic
+CGame::drawHUDPic
 
 Coordinates are 640*480 virtual values
 =================
 */
-void ClientGame::drawHUDPic( float x, float y, float width, float height, qhandle_t hShader, vec4_t color ) {
+void CGame::drawHUDPic( float x, float y, float width, float height, qhandle_t hShader, vec4_t color ) {
 	refExport.SetColor( color );
-	ClientGame::adjustFrom640( &x, &y, &width, &height );
+	CGame::adjustFrom640( &x, &y, &width, &height );
 	refExport.DrawStretchPic( x, y, width, height, 0, 0, 1, 1, hShader );
 	refExport.SetColor( nullptr );
 }
@@ -89,7 +89,7 @@ CG_DrawChar
 Coordinates and size in 640*480 virtual screen size
 ===============
 */
-int ClientGame::getStartPos( int col ) {
+int CGame::getStartPos( int col ) {
 	int i, ret = 0;
 
 	for( i = 0; i < col; ++i ) {
@@ -98,7 +98,7 @@ int ClientGame::getStartPos( int col ) {
 	return ret;
 }
 
-int ClientGame::getStartPosNum( int col ) {
+int CGame::getStartPosNum( int col ) {
 	int i, ret = 0;
 
 	for( i = 0; i < col; ++i ) {
@@ -108,7 +108,7 @@ int ClientGame::getStartPosNum( int col ) {
 }
 
 
-int ClientGame::drawChar_MFQ3( int x, int y, int ch, bool right ) {
+int CGame::drawChar_MFQ3( int x, int y, int ch, bool right ) {
 	int		col;
 	float	fcol;
 	float	size;
@@ -165,11 +165,11 @@ int ClientGame::drawChar_MFQ3( int x, int y, int ch, bool right ) {
 	if( num ) {
 		aw = number_spaces[col];
 		size = 0.0078125f;// size of one pixel on a 128 width bitmap
-		fcol = ClientGame::getStartPosNum(col)*size;
+		fcol = CGame::getStartPosNum(col)*size;
 	} else {
 		aw = alphabet_spaces[col];
 		size = 0.00390625f;// size of one pixel on a 256 width bitmap
-		fcol = ClientGame::getStartPos(col)*size;
+		fcol = CGame::getStartPos(col)*size;
 	}
 
 	ah = HUDNUM_HEIGHT;
@@ -180,7 +180,7 @@ int ClientGame::drawChar_MFQ3( int x, int y, int ch, bool right ) {
 		ax -= aw;
 	}
 
-	ClientGame::adjustFrom640( &ax, &ay, &aw, &ah );
+	CGame::adjustFrom640( &ax, &ay, &aw, &ah );
 
 	if( num ) {
 		refExport.DrawStretchPic( ax, ay, aw, ah,
@@ -201,7 +201,7 @@ int ClientGame::drawChar_MFQ3( int x, int y, int ch, bool right ) {
 
 /*
 ==================
-ClientGame::drawString_MFQ3
+CGame::drawString_MFQ3
 
 Draws a multi-colored string with a drop shadow, optionally forcing
 to a fixed color.
@@ -209,7 +209,7 @@ to a fixed color.
 Coordinates are at 640 by 480 virtual resolution
 ==================
 */
-int ClientGame::drawString_MFQ3( int x, int y, const char *string, const float *setColor, int maxChars ) {
+int CGame::drawString_MFQ3( int x, int y, const char *string, const float *setColor, int maxChars ) {
 	const char	*s = nullptr;
 	char		*lowerstring = nullptr;
 	int			xx = x;
@@ -235,7 +235,7 @@ int ClientGame::drawString_MFQ3( int x, int y, const char *string, const float *
 	cnt = 0;
 	refExport.SetColor( setColor );
 	while ( *s && cnt < maxChars) {
-		charWidth = ClientGame::drawChar_MFQ3( xx, y, *s, false );
+		charWidth = CGame::drawChar_MFQ3( xx, y, *s, false );
 		xx += charWidth;
 		cnt++;
 		s++;
@@ -249,7 +249,7 @@ int ClientGame::drawString_MFQ3( int x, int y, const char *string, const float *
 
 /*
 ==================
-ClientGame::drawString_MFQ3 - right aligned (ie x = right end of string)
+CGame::drawString_MFQ3 - right aligned (ie x = right end of string)
 
 Draws a multi-colored string with a drop shadow, optionally forcing
 to a fixed color.
@@ -257,7 +257,7 @@ to a fixed color.
 Coordinates are at 640 by 480 virtual resolution
 ==================
 */
-int ClientGame::drawString_MFQ3_R( int x, int y, const char *string, const float *setColor, int maxChars )
+int CGame::drawString_MFQ3_R( int x, int y, const char *string, const float *setColor, int maxChars )
 {
 	const char	*s;
 	int			xx;
@@ -268,7 +268,7 @@ int ClientGame::drawString_MFQ3_R( int x, int y, const char *string, const float
 	int			i = 0;
 
 	if( len >= 127 ) {
-		ClientGame::printf( "String too long! Not printed!" );
+		CGame::printf( "String too long! Not printed!" );
 		return 0;
 	}
 	while( len >= 0 ) {
@@ -292,7 +292,7 @@ int ClientGame::drawString_MFQ3_R( int x, int y, const char *string, const float
 	cnt = 0;
 	refExport.SetColor( setColor );
 	while ( *s && cnt < maxChars) {
-		charWidth = ClientGame::drawChar_MFQ3( xx, y, *s, true );
+		charWidth = CGame::drawChar_MFQ3( xx, y, *s, true );
 		xx -= charWidth;
 		cnt++;
 		s++;
@@ -377,14 +377,14 @@ static void CG_MFQ3HUD_Numbers (int x, int y, int width, int value, bool percent
 		else
 			frame = *ptr -'0';
 
-		ClientGame::drawPic( x,y, HUDNUM_WIDTH, HUDNUM_HEIGHT, cgs.media.HUDnumbers[frame] );
+		CGame::drawPic( x,y, HUDNUM_WIDTH, HUDNUM_HEIGHT, cgs.media.HUDnumbers[frame] );
 		if( right ) x -= HUDNUM_WIDTH-1;
 		else x += HUDNUM_WIDTH-1;
 		ptr++;
 		l--;
 	}
 	if( percent ) {
-		ClientGame::drawPic( x,y, 2*HUDNUM_WIDTH, HUDNUM_HEIGHT, cgs.media.HUDnumbers[STAT_PERCENT] );
+		CGame::drawPic( x,y, 2*HUDNUM_WIDTH, HUDNUM_HEIGHT, cgs.media.HUDnumbers[STAT_PERCENT] );
 	}
 
 	refExport.SetColor( NULL );
@@ -418,7 +418,7 @@ static void CG_MFQ3HUD_DecNumbers (int x, int y, int width, int decimals, int in
 	CG_MFQ3HUD_Numbers( x, y, prewid, pre, false, HUDColors[cg.HUDColor], true );
 //	x += (HUDNUM_WIDTH-1)*prewid;
 
-	ClientGame::drawHUDPic( x-1,y+2, HUDNUM_WIDTH, HUDNUM_HEIGHT, cgs.media.HUDnumbers[STAT_POINT], HUDColors[cg.HUDColor] );
+	CGame::drawHUDPic( x-1,y+2, HUDNUM_WIDTH, HUDNUM_HEIGHT, cgs.media.HUDnumbers[STAT_POINT], HUDColors[cg.HUDColor] );
 //	x += HUDNUM_WIDTH-1;
 
 	CG_MFQ3HUD_Numbers( x+4, y, postwid, post, false, HUDColors[cg.HUDColor], false );
@@ -434,7 +434,7 @@ CG_DrawRadarSymbols
 
 ================
 */
-void ClientGame::drawRadarSymbols_AIR_new( int vehicle, float range, int x, int y ) {
+void CGame::drawRadarSymbols_AIR_new( int vehicle, float range, int x, int y ) {
 	unsigned int i;
 	ClientEntity	*self = &cg.predictedPlayerEntity;
 	vec3_t		pos, pos1, pos2;
@@ -520,7 +520,7 @@ void ClientGame::drawRadarSymbols_AIR_new( int vehicle, float range, int x, int 
 
 		// check LOS and/or RADAR on
 		if( !(cg.radarEnts[i]->currentState.ONOFF & OO_RADAR) ) {
-			ClientGame::trace( &res, pos, nullptr, nullptr, otherpos, cg.snap->ps.clientNum, MASK_SOLID );
+			CGame::trace( &res, pos, nullptr, nullptr, otherpos, cg.snap->ps.clientNum, MASK_SOLID );
 			if( res.fraction < 1.0f ) 
 				continue;
 		}
@@ -544,14 +544,14 @@ void ClientGame::drawRadarSymbols_AIR_new( int vehicle, float range, int x, int 
 		}
 
 		// draw
-		ClientGame::drawPic( x + dir[0], y - dir[1], 8, 8, cgs.media.radarIcons[icon] );
+		CGame::drawPic( x + dir[0], y - dir[1], 8, 8, cgs.media.radarIcons[icon] );
 		// check if we should draw any more targets
 		drawnTargets++;
 		if( drawnTargets >= cg_radarTargets.integer ) break;
 	}
 }
 
-void ClientGame::drawRadarSymbols_GROUND_new( int vehicle, float range, int x, int y ) 
+void CGame::drawRadarSymbols_GROUND_new( int vehicle, float range, int x, int y ) 
 {
 	unsigned int i;
 	ClientEntity	*self = &cg.predictedPlayerEntity;
@@ -657,7 +657,7 @@ void ClientGame::drawRadarSymbols_GROUND_new( int vehicle, float range, int x, i
 			// check LOS and/or RADAR on
 			if( !(cg.radarEnts[i]->currentState.ONOFF & OO_RADAR) ) 
 			{
-				ClientGame::trace( &res, pos, nullptr, nullptr, otherpos, cg.snap->ps.clientNum, MASK_SOLID );
+				CGame::trace( &res, pos, nullptr, nullptr, otherpos, cg.snap->ps.clientNum, MASK_SOLID );
 				if( res.fraction < 1.0f ) 
 					continue;
 			}
@@ -732,14 +732,14 @@ void ClientGame::drawRadarSymbols_GROUND_new( int vehicle, float range, int x, i
 				}
 			}
 			// check LOS
-			ClientGame::trace( &res, pos, nullptr, nullptr, otherpos, cg.snap->ps.clientNum, MASK_SOLID );
+			CGame::trace( &res, pos, nullptr, nullptr, otherpos, cg.snap->ps.clientNum, MASK_SOLID );
 //			if( res.fraction < 1.0f ) continue;
 			if( res.entityNum != cg.radarEnts[i]->currentState.number ) 
 				continue;
 		}
 
 		// draw
-		ClientGame::drawPic( x + dir[0], y - dir[1], 8, 8, cgs.media.radarIcons[icon] );
+		CGame::drawPic( x + dir[0], y - dir[1], 8, 8, cgs.media.radarIcons[icon] );
 		// check if we should draw any more targets
 		drawnTargets++;
 		if( drawnTargets >= cg_radarTargets.integer ) 
@@ -839,7 +839,7 @@ void ClientGame::drawRadarSymbols_GROUND_new( int vehicle, float range, int x, i
 //			// check LOS and/or RADAR on
 //			if( !(cg.radarEnts[i]->currentState.ONOFF & OO_RADAR) ) 
 //			{
-//				ClientGame::trace( &res, pos, NULL, NULL, otherpos, cg.snap->ps.clientNum, MASK_SOLID );
+//				CGame::trace( &res, pos, NULL, NULL, otherpos, cg.snap->ps.clientNum, MASK_SOLID );
 //				if( res.fraction < 1.0f ) continue;
 //			}
 //			// which icon (if at all, dont show lqms)
@@ -908,13 +908,13 @@ void ClientGame::drawRadarSymbols_GROUND_new( int vehicle, float range, int x, i
 //				}
 //			}
 //			// check LOS
-//			ClientGame::trace( &res, pos, NULL, NULL, otherpos, cg.snap->ps.clientNum, MASK_SOLID );
+//			CGame::trace( &res, pos, NULL, NULL, otherpos, cg.snap->ps.clientNum, MASK_SOLID );
 ////			if( res.fraction < 1.0f ) continue;
 //			if( res.entityNum != cg.radarEnts[i]->currentState.number ) continue;
 //		}
 //
 //		// draw
-//		ClientGame::drawPic( x + dir[0], y - dir[1], 8, 8, cgs.media.radarIcons[icon] );
+//		CGame::drawPic( x + dir[0], y - dir[1], 8, 8, cgs.media.radarIcons[icon] );
 //		// check if we should draw any more targets
 //		drawnTargets++;
 //		if( drawnTargets >= cg_radarTargets.integer ) break;
@@ -925,26 +925,26 @@ void ClientGame::drawRadarSymbols_GROUND_new( int vehicle, float range, int x, i
 
 /*
 ================
-ClientGame::draw_Redundant
+CGame::draw_Redundant
 
 ================
 */
-void ClientGame::draw_Coords(int xcoord, int ycoord) {
+void CGame::draw_Coords(int xcoord, int ycoord) {
 		// draw coords
 	char buffer[8];
 	Com_sprintf(buffer, 7, "%d", xcoord);
-	ClientGame::drawString_MFQ3_R( 290, 32, buffer, HUDColors[cg.HUDColor], 0 );
+	CGame::drawString_MFQ3_R( 290, 32, buffer, HUDColors[cg.HUDColor], 0 );
 	Com_sprintf(buffer, 7, "%d", ycoord);
-	ClientGame::drawString_MFQ3( 350, 32, buffer, HUDColors[cg.HUDColor], 0 );
+	CGame::drawString_MFQ3( 350, 32, buffer, HUDColors[cg.HUDColor], 0 );
 }
 
 /*
 ================
-ClientGame::draw_Redundant
+CGame::draw_Redundant
 
 ================
 */
-void ClientGame::draw_Redundant(int vehicle, int health, int throttle, int ammo[16], int selweap) {
+void CGame::draw_Redundant(int vehicle, int health, int throttle, int ammo[16], int selweap) {
 	char		buffer[12];
 		
 	// if vehicle is invalid break
@@ -953,28 +953,28 @@ void ClientGame::draw_Redundant(int vehicle, int health, int throttle, int ammo[
 
 		// draw health
 	if( hud_health.integer ) {
-		ClientGame::setScreenPlacement( PLACE_RIGHT );
-		ClientGame::drawHUDPic( 516, 318, 32, 8, cgs.media.HUDhealthtext, HUDColors[cg.HUDColor] ); 
+		CGame::setScreenPlacement( PLACE_RIGHT );
+		CGame::drawHUDPic( 516, 318, 32, 8, cgs.media.HUDhealthtext, HUDColors[cg.HUDColor] ); 
 		Com_sprintf(buffer, 5, "%d%%", health);
-		ClientGame::drawString_MFQ3( 560, 318, buffer, HUDColors[cg.HUDColor], 0 );
+		CGame::drawString_MFQ3( 560, 318, buffer, HUDColors[cg.HUDColor], 0 );
 	}
 
 		// draw throttle
 	if( hud_throttle.integer ) {
-		ClientGame::setScreenPlacement( PLACE_RIGHT );
-		ClientGame::drawHUDPic( 516, 330, 32, 8, cgs.media.HUDthrottletext, HUDColors[cg.HUDColor] ); 
+		CGame::setScreenPlacement( PLACE_RIGHT );
+		CGame::drawHUDPic( 516, 330, 32, 8, cgs.media.HUDthrottletext, HUDColors[cg.HUDColor] ); 
 
 		if( availableVehicles[vehicle].engines > 1 ) {
 			Com_sprintf(buffer, 10, "%d%%/%d%%", throttle*10, throttle*10);
-			ClientGame::drawString_MFQ3( 560, 330, buffer, HUDColors[cg.HUDColor], 0 );
+			CGame::drawString_MFQ3( 560, 330, buffer, HUDColors[cg.HUDColor], 0 );
 		} else {
 			if( (availableVehicles[vehicle].cat & CAT_GROUND) &&
 				throttle > MF_THROTTLE_MILITARY ) {
 				Com_sprintf(buffer, 5, "%d%%", (10-throttle)*10);
-				ClientGame::drawString_MFQ3( 560, 330, buffer, HUDColors[cg.HUDColor], 0 );
+				CGame::drawString_MFQ3( 560, 330, buffer, HUDColors[cg.HUDColor], 0 );
 			} else {
 				Com_sprintf(buffer, 5, "%d%%", throttle*10);
-				ClientGame::drawString_MFQ3( 560, 330, buffer, HUDColors[cg.HUDColor], 0 );
+				CGame::drawString_MFQ3( 560, 330, buffer, HUDColors[cg.HUDColor], 0 );
 			}
 		}
 	}
@@ -992,8 +992,8 @@ void ClientGame::draw_Redundant(int vehicle, int health, int throttle, int ammo[
 				actualstring = availableWeapons[availableVehicles[vehicle].weapons[0]].shortName;
 			}
 			Com_sprintf( ammostring, 32, "%s: %d", actualstring, ammo[0] );
-			ClientGame::setScreenPlacement( PLACE_LEFT );
-			ClientGame::drawString_MFQ3( 4, 318, ammostring, HUDColors[cg.HUDColor], 0);
+			CGame::setScreenPlacement( PLACE_LEFT );
+			CGame::drawString_MFQ3( 4, 318, ammostring, HUDColors[cg.HUDColor], 0);
 		}
 
 			// selected weapon
@@ -1005,22 +1005,22 @@ void ClientGame::draw_Redundant(int vehicle, int health, int throttle, int ammo[
 				actualstring = availableWeapons[availableVehicles[vehicle].weapons[selweap]].shortName;
 			}
 			Com_sprintf( ammostring, 32, "%s: %d", actualstring, ammo[selweap] );
-			ClientGame::setScreenPlacement( PLACE_LEFT );
-			ClientGame::drawString_MFQ3( 4, 330, ammostring, HUDColors[cg.HUDColor], 0);
+			CGame::setScreenPlacement( PLACE_LEFT );
+			CGame::drawString_MFQ3( 4, 330, ammostring, HUDColors[cg.HUDColor], 0);
 		}
 	}
 
-	ClientGame::setScreenPlacement( PLACE_CENTER );
+	CGame::setScreenPlacement( PLACE_CENTER );
 }
 
 
 /*
 ================
-ClientGame::draw_Center
+CGame::draw_Center
 
 ================
 */
-void ClientGame::draw_Center(int vehicle, int health, int throttle) {
+void CGame::draw_Center(int vehicle, int health, int throttle) {
 	float		x, y, width, height;
 	int			healthpic = (health/10)-1;
 	int			throttlepic = throttle - 1;
@@ -1031,7 +1031,7 @@ void ClientGame::draw_Center(int vehicle, int health, int throttle) {
 	height = 32;
 
 		// background
-	ClientGame::drawPic( x, y, width, height, cgs.media.HUDsolid ); 
+	CGame::drawPic( x, y, width, height, cgs.media.HUDsolid ); 
 
 		// health
 	if( healthpic >= 0 ) {
@@ -1039,30 +1039,30 @@ void ClientGame::draw_Center(int vehicle, int health, int throttle) {
 		y = 448;
 		width = 128;
 		height = 32;
-		ClientGame::drawPic( x, y, width, height, cgs.media.HUDhealth[healthpic] ); 
+		CGame::drawPic( x, y, width, height, cgs.media.HUDhealth[healthpic] ); 
 	}
 
 		// throttle
 	if( throttlepic >= 0 ) {
 		if( availableVehicles[vehicle].engines > 1 ) {
 			if( availableVehicles[vehicle].maxthrottle > MF_THROTTLE_MILITARY ) {
-				ClientGame::drawPic( 320, 448, 128, 16, cgs.media.HUDthrottle_2_1_ab[throttlepic] ); 
-				ClientGame::drawPic( 320, 464, 128, 16, cgs.media.HUDthrottle_2_2_ab[throttlepic] ); 
+				CGame::drawPic( 320, 448, 128, 16, cgs.media.HUDthrottle_2_1_ab[throttlepic] ); 
+				CGame::drawPic( 320, 464, 128, 16, cgs.media.HUDthrottle_2_2_ab[throttlepic] ); 
 			} else {
-				ClientGame::drawPic( 320, 448, 128, 16, cgs.media.HUDthrottle_2_1[throttlepic] ); 
-				ClientGame::drawPic( 320, 464, 128, 16, cgs.media.HUDthrottle_2_2[throttlepic] ); 
+				CGame::drawPic( 320, 448, 128, 16, cgs.media.HUDthrottle_2_1[throttlepic] ); 
+				CGame::drawPic( 320, 464, 128, 16, cgs.media.HUDthrottle_2_2[throttlepic] ); 
 			}
 		} else {
 			if( availableVehicles[vehicle].maxthrottle > MF_THROTTLE_MILITARY ) {
-				ClientGame::drawPic( 320, 448, 128, height, cgs.media.HUDthrottle_1_ab[throttlepic] ); 
+				CGame::drawPic( 320, 448, 128, height, cgs.media.HUDthrottle_1_ab[throttlepic] ); 
 			} else {
 				if( ( (availableVehicles[vehicle].cat & CAT_GROUND) ||
 					(availableVehicles[vehicle].cat & CAT_BOAT) ||
 					(availableVehicles[vehicle].cat & CAT_HELO) ) &&
 					throttlepic >= MF_THROTTLE_MILITARY ) {
-					ClientGame::drawPic( 320, 448, 128, 32, cgs.media.HUDthrottle_rev[throttlepic-10] ); 
+					CGame::drawPic( 320, 448, 128, 32, cgs.media.HUDthrottle_rev[throttlepic-10] ); 
 				} else {
-					ClientGame::drawPic( 320, 448, 128, 32, cgs.media.HUDthrottle_1[throttlepic] ); 
+					CGame::drawPic( 320, 448, 128, 32, cgs.media.HUDthrottle_1[throttlepic] ); 
 				}
 			}
 		}
@@ -1071,11 +1071,11 @@ void ClientGame::draw_Center(int vehicle, int health, int throttle) {
 
 /*
 ================
-ClientGame::hUD_Camera
+CGame::hUD_Camera
 
 ================
 */
-void ClientGame::hUD_Camera(int mfdnum, int vehicle) {
+void CGame::hUD_Camera(int mfdnum, int vehicle) {
 
 	// this is probably very dirty and ugly
 	// but so far I haven't found another way to do it...
@@ -1108,7 +1108,7 @@ void ClientGame::hUD_Camera(int mfdnum, int vehicle) {
 	vx = x;
 	vy = y;
 	vh = h;
-	ClientGame::adjustFrom640( &x, &y, &w, &h );
+	CGame::adjustFrom640( &x, &y, &w, &h );
 	cg.HUDCamera.x = x;
 	cg.HUDCamera.y = y;
 	cg.HUDCamera.width = w;
@@ -1183,7 +1183,7 @@ void ClientGame::hUD_Camera(int mfdnum, int vehicle) {
 			VectorAdd( tempH, tempV, v );
 			VectorAdd( cent->currentState.pos.trBase, v, end );
 			VectorNormalize( v );
-			ClientGame::trace( &tr, cent->currentState.pos.trBase, nullptr, nullptr, end, cent->currentState.number, MASK_ALL );
+			CGame::trace( &tr, cent->currentState.pos.trBase, nullptr, nullptr, end, cent->currentState.number, MASK_ALL );
 			if( tr.fraction < 1 ) break;
 		}
 		vectoangles( v, end );
@@ -1233,16 +1233,16 @@ void ClientGame::hUD_Camera(int mfdnum, int vehicle) {
 	cg.drawingMFD = true;
 
 	// ummm shall I really do this ???
-	ClientGame::addPacketEntities();
-	ClientGame::addMarks();
-	ClientGame::addLocalEntities();
+	CGame::addPacketEntities();
+	CGame::addMarks();
+	CGame::addLocalEntities();
 
 	// render
 	refExport.RenderScene( &cg.HUDCamera );
 
 	// draw zoom amount
 	Com_sprintf(buffer, 11, "ZOOM: X%d", cg.zoomAmount);
-	ClientGame::drawString_MFQ3( vx+2, vy+vh-12, buffer, HUDColors[cg.MFDColor], 0);
+	CGame::drawString_MFQ3( vx+2, vy+vh-12, buffer, HUDColors[cg.MFDColor], 0);
 
 	// reset to normal rendering
 	cg.drawingMFD = false;
@@ -1269,7 +1269,7 @@ void ClientEntity::draw_MFD( int mfdnum, int vehicle, int targetrange, int targe
 	}
 	y = 352;
 	width = height = 128;
-	ClientGame::drawPic( x, y, width, height, cgs.media.HUDmfd );
+	CGame::drawPic( x, y, width, height, cgs.media.HUDmfd );
 
 		// draw contents of mfd only if it is not off
 	if( !mode ) return;
@@ -1299,28 +1299,28 @@ void ClientEntity::draw_MFD( int mfdnum, int vehicle, int targetrange, int targe
 
 		// draw background
 		refExport.SetColor( HUDColors[cg.MFDColor] );
-		ClientGame::drawPic( x, y, width, height, cgs.media.HUDrwr );
+		CGame::drawPic( x, y, width, height, cgs.media.HUDrwr );
 		refExport.SetColor( nullptr );
 		// draw contents
 		if( radarmode & OO_RADAR_AIR ) {
-			ClientGame::drawRadarSymbols_AIR_new(vehicle, range, x+60, y+60);
+			CGame::drawRadarSymbols_AIR_new(vehicle, range, x+60, y+60);
 			Com_sprintf(buffer, 15, "%d", range);
-			ClientGame::drawString_MFQ3_R( x+122, y+14, buffer, HUDColors[cg.MFDColor], 0);
+			CGame::drawString_MFQ3_R( x+122, y+14, buffer, HUDColors[cg.MFDColor], 0);
 			strcpy( mode, "AIR" );
 		} else if( radarmode & OO_RADAR_GROUND ) {
-			ClientGame::drawRadarSymbols_GROUND_new(vehicle, range, x+60, y+60);
+			CGame::drawRadarSymbols_GROUND_new(vehicle, range, x+60, y+60);
 			Com_sprintf(buffer, 15, "%d", range);
-			ClientGame::drawString_MFQ3_R( x+122, y+14, buffer, HUDColors[cg.MFDColor], 0);
+			CGame::drawString_MFQ3_R( x+122, y+14, buffer, HUDColors[cg.MFDColor], 0);
 			strcpy( mode, "GND" );
 		} else if( availableVehicles[vehicle].radarRange || 
 				   availableVehicles[vehicle].radarRange2 ) {
 			strcpy( mode, "OFF" );
 		}
-		ClientGame::drawString_MFQ3( x+4, y+14, mode, HUDColors[cg.MFDColor], 0);
+		CGame::drawString_MFQ3( x+4, y+14, mode, HUDColors[cg.MFDColor], 0);
 		// draw flares
 		if( flares >= 0 ) {
 			Com_sprintf(buffer, 6, "%d", flares);
-			ClientGame::drawString_MFQ3_R( x+122, y+114, buffer, HUDColors[cg.MFDColor], 0);
+			CGame::drawString_MFQ3_R( x+122, y+114, buffer, HUDColors[cg.MFDColor], 0);
 		}
 	} else if( mode == MFD_STATUS ) {
 		int		fuel;
@@ -1331,34 +1331,34 @@ void ClientEntity::draw_MFD( int mfdnum, int vehicle, int targetrange, int targe
 			(availableVehicles[vehicle].cat & CAT_BOAT) ) {
 			fuel *= 100;
 		}
-		ClientGame::drawString_MFQ3( x+4, y+14, "STATUS:", HUDColors[cg.MFDColor], 0);
-		ClientGame::drawString_MFQ3( x+4, y+20, "------", HUDColors[cg.MFDColor], 0);
-		ClientGame::drawString_MFQ3( x+4, y+30, "GEAR:", HUDColors[cg.MFDColor], 0);
-		ClientGame::drawString_MFQ3_R( x+122, y+30, (onoff & OO_GEAR ? "DOWN" : "UP"), HUDColors[cg.MFDColor], 0);
-		ClientGame::drawString_MFQ3( x+4, y+40, "BRAKES:", HUDColors[cg.MFDColor], 0);
-		ClientGame::drawString_MFQ3_R( x+122, y+40, (onoff & OO_SPEEDBRAKE ? "ON" : "OFF"), HUDColors[cg.MFDColor], 0);
-		ClientGame::drawString_MFQ3( x+4, y+50, "WPNBAYS:", HUDColors[cg.MFDColor], 0);
-		ClientGame::drawString_MFQ3_R( x+122, y+50, (onoff & OO_WEAPONBAY ? "OPEN" : "CLSD"), HUDColors[cg.MFDColor], 0);
-		ClientGame::drawString_MFQ3( x+4, y+60, "AUTOPILOT:", HUDColors[cg.MFDColor], 0);
-		ClientGame::drawString_MFQ3_R( x+122, y+60, "O/S", HUDColors[cg.MFDColor], 0);
-		ClientGame::drawString_MFQ3( x+4, y+80, "FUEL:", HUDColors[cg.MFDColor], 0);
+		CGame::drawString_MFQ3( x+4, y+14, "STATUS:", HUDColors[cg.MFDColor], 0);
+		CGame::drawString_MFQ3( x+4, y+20, "------", HUDColors[cg.MFDColor], 0);
+		CGame::drawString_MFQ3( x+4, y+30, "GEAR:", HUDColors[cg.MFDColor], 0);
+		CGame::drawString_MFQ3_R( x+122, y+30, (onoff & OO_GEAR ? "DOWN" : "UP"), HUDColors[cg.MFDColor], 0);
+		CGame::drawString_MFQ3( x+4, y+40, "BRAKES:", HUDColors[cg.MFDColor], 0);
+		CGame::drawString_MFQ3_R( x+122, y+40, (onoff & OO_SPEEDBRAKE ? "ON" : "OFF"), HUDColors[cg.MFDColor], 0);
+		CGame::drawString_MFQ3( x+4, y+50, "WPNBAYS:", HUDColors[cg.MFDColor], 0);
+		CGame::drawString_MFQ3_R( x+122, y+50, (onoff & OO_WEAPONBAY ? "OPEN" : "CLSD"), HUDColors[cg.MFDColor], 0);
+		CGame::drawString_MFQ3( x+4, y+60, "AUTOPILOT:", HUDColors[cg.MFDColor], 0);
+		CGame::drawString_MFQ3_R( x+122, y+60, "O/S", HUDColors[cg.MFDColor], 0);
+		CGame::drawString_MFQ3( x+4, y+80, "FUEL:", HUDColors[cg.MFDColor], 0);
 		Com_sprintf(buffer, 6, "%d", fuel);
-		ClientGame::drawString_MFQ3_R( x+122, y+80, buffer, HUDColors[cg.MFDColor], 0);
+		CGame::drawString_MFQ3_R( x+122, y+80, buffer, HUDColors[cg.MFDColor], 0);
 		if( availableVehicles[vehicle].flags & VF_STEALTH ) {
 			int left = ( ps->timers[TIMER_REVEAL] - cg.snap->serverTime + 999 ) / 1000;
-			ClientGame::drawString_MFQ3( x+4, y+90, "STEALTH:", HUDColors[cg.MFDColor], 0);
+			CGame::drawString_MFQ3( x+4, y+90, "STEALTH:", HUDColors[cg.MFDColor], 0);
 			if( left > 0 ) {
 				Com_sprintf(buffer, 6, "%dS", left);
-				ClientGame::drawString_MFQ3_R( x+122, y+90, buffer, HUDColors[cg.MFDColor], 0);
+				CGame::drawString_MFQ3_R( x+122, y+90, buffer, HUDColors[cg.MFDColor], 0);
 			} else {
-				ClientGame::drawString_MFQ3_R( x+122, y+90, "ON", HUDColors[cg.MFDColor], 0);
+				CGame::drawString_MFQ3_R( x+122, y+90, "ON", HUDColors[cg.MFDColor], 0);
 			}
 		}
 	} else if( mode == MFD_INVENTORY ) {
 		char	invline[33];
 		int		i;
-		ClientGame::drawString_MFQ3( x+4, y+14, "INVENTORY:", HUDColors[cg.MFDColor], 0);
-		ClientGame::drawString_MFQ3( x+4, y+20, "_________", HUDColors[cg.MFDColor], 0);
+		CGame::drawString_MFQ3( x+4, y+14, "INVENTORY:", HUDColors[cg.MFDColor], 0);
+		CGame::drawString_MFQ3( x+4, y+20, "_________", HUDColors[cg.MFDColor], 0);
 
 		y = 382;
 
@@ -1373,9 +1373,9 @@ void ClientEntity::draw_MFD( int mfdnum, int vehicle, int targetrange, int targe
 					actualstring = availableWeapons[availableVehicles[vehicle].weapons[i]].shortName;
 				}
 				Com_sprintf( buffer, 5, "%d", ps->ammo[i] );
-				ClientGame::drawString_MFQ3_R( x+36, y, buffer, HUDColors[cg.MFDColor], 0);
+				CGame::drawString_MFQ3_R( x+36, y, buffer, HUDColors[cg.MFDColor], 0);
 				Com_sprintf( invline, 32, "%c    %s", (i == selweap ? '*' : ' '), actualstring );
-				ClientGame::drawString_MFQ3( x+4, y, invline, HUDColors[cg.MFDColor], 0);
+				CGame::drawString_MFQ3( x+4, y, invline, HUDColors[cg.MFDColor], 0);
 				y += 10;
 			}
 			if( i == 0 || i == 6 ) y+=4; 
@@ -1383,56 +1383,56 @@ void ClientEntity::draw_MFD( int mfdnum, int vehicle, int targetrange, int targe
 	}
 	else if( mode == MFD_CAMERA )
 	{
-		ClientGame::hUD_Camera(mfdnum, vehicle);
+		CGame::hUD_Camera(mfdnum, vehicle);
 		if( targetrange >= 0 )
 		{
 			Com_sprintf(buffer, 15, "RANGE: %d", targetrange);
-			ClientGame::drawString_MFQ3( x+6, y+16, buffer, HUDColors[cg.MFDColor], 0);
-			ClientGame::drawHUDPic( x+48, y+48, 32, 32, cgs.media.HUDreticles[HR_TARGET_ENEMY], HUDColors[HUD_GREEN] );
+			CGame::drawString_MFQ3( x+6, y+16, buffer, HUDColors[cg.MFDColor], 0);
+			CGame::drawHUDPic( x+48, y+48, 32, 32, cgs.media.HUDreticles[HR_TARGET_ENEMY], HUDColors[HUD_GREEN] );
 		}
 		else
 		{
-			ClientGame::drawHUDPic( x+48, y+48, 32, 32, cgs.media.HUDreticles[HR_GUIDED_WHITE], HUDColors[HUD_WHITE] );
+			CGame::drawHUDPic( x+48, y+48, 32, 32, cgs.media.HUDreticles[HR_GUIDED_WHITE], HUDColors[HUD_WHITE] );
 		}
 	}
 	else if( mode == MFD_INFO )
 	{
 		int	value;
-		ClientGame::drawString_MFQ3( x+4, y+14, "FLIGHTDATA:", HUDColors[cg.MFDColor], 0);
-		ClientGame::drawString_MFQ3( x+4, y+20, "----------", HUDColors[cg.MFDColor], 0);
-		ClientGame::drawString_MFQ3( x+4, y+30, "HEADING:", HUDColors[cg.MFDColor], 0);
-		ClientGame::drawString_MFQ3( x+4, y+40, "TGT HDG:", HUDColors[cg.MFDColor], 0);
-		ClientGame::drawString_MFQ3( x+4, y+54, "SPEED:", HUDColors[cg.MFDColor], 0);
-		ClientGame::drawString_MFQ3( x+4, y+64, "ALTITUDE:", HUDColors[cg.MFDColor], 0);
-		ClientGame::drawString_MFQ3( x+4, y+78, "POS X:", HUDColors[cg.MFDColor], 0);
-		ClientGame::drawString_MFQ3( x+4, y+88, "POS Y:", HUDColors[cg.MFDColor], 0);
-		ClientGame::drawString_MFQ3( x+4, y+102, "THROTTLE:", HUDColors[cg.MFDColor], 0);
-		ClientGame::drawString_MFQ3( x+4, y+112, "HEALTH:", HUDColors[cg.MFDColor], 0);
+		CGame::drawString_MFQ3( x+4, y+14, "FLIGHTDATA:", HUDColors[cg.MFDColor], 0);
+		CGame::drawString_MFQ3( x+4, y+20, "----------", HUDColors[cg.MFDColor], 0);
+		CGame::drawString_MFQ3( x+4, y+30, "HEADING:", HUDColors[cg.MFDColor], 0);
+		CGame::drawString_MFQ3( x+4, y+40, "TGT HDG:", HUDColors[cg.MFDColor], 0);
+		CGame::drawString_MFQ3( x+4, y+54, "SPEED:", HUDColors[cg.MFDColor], 0);
+		CGame::drawString_MFQ3( x+4, y+64, "ALTITUDE:", HUDColors[cg.MFDColor], 0);
+		CGame::drawString_MFQ3( x+4, y+78, "POS X:", HUDColors[cg.MFDColor], 0);
+		CGame::drawString_MFQ3( x+4, y+88, "POS Y:", HUDColors[cg.MFDColor], 0);
+		CGame::drawString_MFQ3( x+4, y+102, "THROTTLE:", HUDColors[cg.MFDColor], 0);
+		CGame::drawString_MFQ3( x+4, y+112, "HEALTH:", HUDColors[cg.MFDColor], 0);
 		value = 360 - static_cast<int>(ps->vehicleAngles[1]);
 		if( value <= 0 ) value += 360;
 			Com_sprintf(buffer, 5, "%d", value);
-			ClientGame::drawString_MFQ3_R( x+122, y+30, buffer, HUDColors[cg.MFDColor], 0);
+			CGame::drawString_MFQ3_R( x+122, y+30, buffer, HUDColors[cg.MFDColor], 0);
 		if( targetheading >= 0 ) {
 			Com_sprintf(buffer, 5, "%d", targetheading);
-			ClientGame::drawString_MFQ3_R( x+122, y+40, buffer, HUDColors[cg.MFDColor], 0);
+			CGame::drawString_MFQ3_R( x+122, y+40, buffer, HUDColors[cg.MFDColor], 0);
 		} else {
-			ClientGame::drawString_MFQ3_R( x+122, y+40, "---", HUDColors[cg.MFDColor], 0);
+			CGame::drawString_MFQ3_R( x+122, y+40, "---", HUDColors[cg.MFDColor], 0);
 		}
 		value = ps->speed/10;
 		Com_sprintf(buffer, 7, "%d", value);
-		ClientGame::drawString_MFQ3_R( x+122, y+54, buffer, HUDColors[stallcolor], 0);
+		CGame::drawString_MFQ3_R( x+122, y+54, buffer, HUDColors[stallcolor], 0);
 		Com_sprintf(buffer, 7, "%d", altitude);
-		ClientGame::drawString_MFQ3_R( x+122, y+64, buffer, HUDColors[cg.MFDColor], 0);
+		CGame::drawString_MFQ3_R( x+122, y+64, buffer, HUDColors[cg.MFDColor], 0);
 		Com_sprintf(buffer, 7, "%d", static_cast<int>(ps->origin[0]));
-		ClientGame::drawString_MFQ3_R( x+122, y+78, buffer, HUDColors[cg.MFDColor], 0);
+		CGame::drawString_MFQ3_R( x+122, y+78, buffer, HUDColors[cg.MFDColor], 0);
 		Com_sprintf(buffer, 7, "%d", static_cast<int>(ps->origin[1]));
-		ClientGame::drawString_MFQ3_R( x+122, y+88, buffer, HUDColors[cg.MFDColor], 0);
+		CGame::drawString_MFQ3_R( x+122, y+88, buffer, HUDColors[cg.MFDColor], 0);
 		value = (100*ps->stats[STAT_HEALTH]/ps->stats[STAT_MAX_HEALTH]);
 		if( value > 100 ) value = 100;	
 		Com_sprintf(buffer, 7, "%d", ps->throttle*10);
-		ClientGame::drawString_MFQ3_R( x+122, y+102, buffer, HUDColors[cg.MFDColor], 0);
+		CGame::drawString_MFQ3_R( x+122, y+102, buffer, HUDColors[cg.MFDColor], 0);
 		Com_sprintf(buffer, 7, "%d", value);
-		ClientGame::drawString_MFQ3_R( x+122, y+112, buffer, HUDColors[cg.MFDColor], 0);
+		CGame::drawString_MFQ3_R( x+122, y+112, buffer, HUDColors[cg.MFDColor], 0);
 	}
 }
 
@@ -1441,11 +1441,11 @@ void ClientEntity::draw_MFD( int mfdnum, int vehicle, int targetrange, int targe
 
 /*
 ================
-ClientGame::draw_AltTape
+CGame::draw_AltTape
 
 ================
 */
-void ClientGame::draw_AltTape( int value ) {
+void CGame::draw_AltTape( int value ) {
 	int			scale = 500;
 	int			value2, visible1, visible2, visible3, visible4, visible5;
 	float		offset;
@@ -1465,23 +1465,23 @@ void ClientGame::draw_AltTape( int value ) {
 	width = 16;
 	height = 256;
 	refExport.SetColor( HUDColors[cg.HUDColor] );
-	ClientGame::adjustFrom640( &x, &y, &width, &height );
+	CGame::adjustFrom640( &x, &y, &width, &height );
 	refExport.DrawStretchPic( x, y, width, height, 0, 0.125f+offset, 1, 0.625f+offset, cgs.media.HUDalt );
 	refExport.SetColor( nullptr );
 		// alt indicater
 	x = 578;
 	y = 171;
 	width = height = 8;
-	ClientGame::drawHUDPic( x, y, width, height, cgs.media.HUDind_v_r, HUDColors[cg.HUDColor] );
+	CGame::drawHUDPic( x, y, width, height, cgs.media.HUDind_v_r, HUDColors[cg.HUDColor] );
 		// draw alt value box
 	x = 585;
 	y = 28;
 	width = 52;
 	height = 16;
-	ClientGame::drawHUDPic( x, y, width, height, cgs.media.HUDvaluebox2, HUDColors[cg.HUDColor] );
+	CGame::drawHUDPic( x, y, width, height, cgs.media.HUDvaluebox2, HUDColors[cg.HUDColor] );
 		// draw alt
 	Com_sprintf(buffer, 7, "%d", value);
-	ClientGame::drawString_MFQ3_R( 626, 32, buffer, HUDColors[cg.HUDColor], 0);
+	CGame::drawString_MFQ3_R( 626, 32, buffer, HUDColors[cg.HUDColor], 0);
 	
 		// find visible alt numbers
 	visible3 = ((value+(scale/2))/scale);
@@ -1502,34 +1502,34 @@ void ClientGame::draw_AltTape( int value ) {
 	}
 		// draw visible alt numbers
 	Com_sprintf(buffer, 11, "%.1f", static_cast<float>(visible3)/100 );
-	ClientGame::drawString_MFQ3( 596, 171+(value2*64/scale), buffer, HUDColors[cg.HUDColor], 0);
+	CGame::drawString_MFQ3( 596, 171+(value2*64/scale), buffer, HUDColors[cg.HUDColor], 0);
 	if( visible2 >= 0 ) {
 		value2 = value - visible2;
 		Com_sprintf(buffer, 11, "%.1f", static_cast<float>(visible2)/100 );
-		ClientGame::drawString_MFQ3( 596, 171+(value2*64/scale), buffer, HUDColors[cg.HUDColor], 0);
+		CGame::drawString_MFQ3( 596, 171+(value2*64/scale), buffer, HUDColors[cg.HUDColor], 0);
 		if( bottom && visible1 >= 0 ) {
 			value2 = value - visible1;
 			Com_sprintf(buffer, 11, "%.1f", static_cast<float>(visible1)/100 );
-			ClientGame::drawString_MFQ3( 596, 171+(value2*64/scale), buffer, HUDColors[cg.HUDColor], 0);
+			CGame::drawString_MFQ3( 596, 171+(value2*64/scale), buffer, HUDColors[cg.HUDColor], 0);
 		}
 	}
 	value2 = value - visible4;
 	Com_sprintf(buffer, 11, "%.1f", static_cast<float>(visible4)/100 );
-	ClientGame::drawString_MFQ3( 596, 171+(value2*64/scale), buffer, HUDColors[cg.HUDColor], 0);
+	CGame::drawString_MFQ3( 596, 171+(value2*64/scale), buffer, HUDColors[cg.HUDColor], 0);
 	if( top ) {
 		value2 = value - visible5;
 		Com_sprintf(buffer, 11, "%.1f", static_cast<float>(visible5)/100 );
-		ClientGame::drawString_MFQ3( 596, 171+(value2*64/scale), buffer, HUDColors[cg.HUDColor], 0);
+		CGame::drawString_MFQ3( 596, 171+(value2*64/scale), buffer, HUDColors[cg.HUDColor], 0);
 	}
 }
 
 /*
 ================
-ClientGame::draw_SpeedTape
+CGame::draw_SpeedTape
 
 ================
 */
-void ClientGame::draw_SpeedTape( int value, int stallspeed, int gearspeed, int scale ) {
+void CGame::draw_SpeedTape( int value, int stallspeed, int gearspeed, int scale ) {
 	int			value2, visible1, visible2, visible3, visible4, visible5;
 	float		offset;
 	float		x, y, width, height;
@@ -1548,23 +1548,23 @@ void ClientGame::draw_SpeedTape( int value, int stallspeed, int gearspeed, int s
 	width = 16;
 	height = 256;
 	refExport.SetColor( HUDColors[cg.HUDColor] );
-	ClientGame::adjustFrom640( &x, &y, &width, &height );
+	CGame::adjustFrom640( &x, &y, &width, &height );
 	refExport.DrawStretchPic( x, y, width, height, 0, 0.125f+offset, 1, 0.625f+offset, cgs.media.HUDspeed );
 	refExport.SetColor( nullptr );
 		// speed indicater
 	x = 55;
 	y = 171;
 	width = height = 8;
-	ClientGame::drawHUDPic( x, y, width, height, cgs.media.HUDind_v, HUDColors[cg.HUDColor] );
+	CGame::drawHUDPic( x, y, width, height, cgs.media.HUDind_v, HUDColors[cg.HUDColor] );
 		// draw speed value box
 	x = 3;
 	y = 28;
 	width = 52;
 	height = 16;
-	ClientGame::drawHUDPic( x, y, width, height, cgs.media.HUDvaluebox2, HUDColors[cg.HUDColor] );
+	CGame::drawHUDPic( x, y, width, height, cgs.media.HUDvaluebox2, HUDColors[cg.HUDColor] );
 		// draw speed
 	Com_sprintf(buffer, 7, "%d", value);
-	ClientGame::drawString_MFQ3_R( 45, 32, buffer, HUDColors[cg.HUDColor], 0);
+	CGame::drawString_MFQ3_R( 45, 32, buffer, HUDColors[cg.HUDColor], 0);
 		// find visible speed numbers
 	visible3 = ((value+(scale/2))/scale);
 	visible3 *= scale;
@@ -1584,24 +1584,24 @@ void ClientGame::draw_SpeedTape( int value, int stallspeed, int gearspeed, int s
 	}
 		// draw visible speed numbers
 	Com_sprintf(buffer, 7, "%d", visible3);
-	ClientGame::drawString_MFQ3_R( 46, 171+(value2*64/scale), buffer, HUDColors[cg.HUDColor], 0);
+	CGame::drawString_MFQ3_R( 46, 171+(value2*64/scale), buffer, HUDColors[cg.HUDColor], 0);
 	if( visible2 >= 0 ) {
 		value2 = value - visible2;
 		Com_sprintf(buffer, 7, "%d", visible2);
-		ClientGame::drawString_MFQ3_R( 46, 171+(value2*64/scale), buffer, HUDColors[cg.HUDColor], 0);
+		CGame::drawString_MFQ3_R( 46, 171+(value2*64/scale), buffer, HUDColors[cg.HUDColor], 0);
 		if( bottom && visible1 >= 0 ) {
 			value2 = value - visible1;
 			Com_sprintf(buffer, 7, "%d", visible1);
-			ClientGame::drawString_MFQ3_R( 46, 171+(value2*64/scale), buffer, HUDColors[cg.HUDColor], 0);
+			CGame::drawString_MFQ3_R( 46, 171+(value2*64/scale), buffer, HUDColors[cg.HUDColor], 0);
 		}
 	}
 	value2 = value - visible4;
 	Com_sprintf(buffer, 7, "%d", visible4);
-	ClientGame::drawString_MFQ3_R( 46, 171+(value2*64/scale), buffer, HUDColors[cg.HUDColor], 0);
+	CGame::drawString_MFQ3_R( 46, 171+(value2*64/scale), buffer, HUDColors[cg.HUDColor], 0);
 	if( top ) {
 		value2 = value - visible5;
 		Com_sprintf(buffer, 7, "%d", visible5);
-		ClientGame::drawString_MFQ3_R( 46, 171+(value2*64/scale), buffer, HUDColors[cg.HUDColor], 0);
+		CGame::drawString_MFQ3_R( 46, 171+(value2*64/scale), buffer, HUDColors[cg.HUDColor], 0);
 	}
 		// gearspeed
 	if( gearspeed > 0 ) {
@@ -1610,7 +1610,7 @@ void ClientGame::draw_SpeedTape( int value, int stallspeed, int gearspeed, int s
 			x = 55;
 			y = 171+(value2*64/scale);
 			width = height = 8;
-			ClientGame::drawHUDPic( x, y, width, height, cgs.media.HUDcaret_v_g_l, HUDColors[cg.HUDColor] );
+			CGame::drawHUDPic( x, y, width, height, cgs.media.HUDcaret_v_g_l, HUDColors[cg.HUDColor] );
 		}
 	}
 		// stallspeed
@@ -1620,7 +1620,7 @@ void ClientGame::draw_SpeedTape( int value, int stallspeed, int gearspeed, int s
 			x = 55;
 			y = 171+(value2*64/scale);
 			width = height = 8;
-			ClientGame::adjustFrom640( &x, &y, &width, &height );
+			CGame::adjustFrom640( &x, &y, &width, &height );
 			refExport.DrawStretchPic( x, y, width, height, 0, 0, 1, 1, cgs.media.HUDcaret_v_r_l );
 		}
 	}
@@ -1629,11 +1629,11 @@ void ClientGame::draw_SpeedTape( int value, int stallspeed, int gearspeed, int s
 
 /*
 ================
-ClientGame::draw_HeadingTape
+CGame::draw_HeadingTape
 
 ================
 */
-void ClientGame::draw_HeadingTape( int value, int targetheading ) {
+void CGame::draw_HeadingTape( int value, int targetheading ) {
 
 	float		x, y, width, height;
 	float		offset;
@@ -1652,7 +1652,7 @@ void ClientGame::draw_HeadingTape( int value, int targetheading ) {
 	width = 448;
 	height = 16;
 	refExport.SetColor( HUDColors[cg.HUDColor] );
-	ClientGame::adjustFrom640( &x, &y, &width, &height );
+	CGame::adjustFrom640( &x, &y, &width, &height );
 	refExport.DrawStretchPic( x, y, width, height, 0.125f-offset, 0, 1-offset, 1, cgs.media.HUDheading );
 	refExport.SetColor( nullptr );
 		// draw heading value box
@@ -1660,10 +1660,10 @@ void ClientGame::draw_HeadingTape( int value, int targetheading ) {
 	y = 28;
 	width = 32;
 	height = 16;
-	ClientGame::drawHUDPic( x, y, width, height, cgs.media.HUDvaluebox, HUDColors[cg.HUDColor] );
+	CGame::drawHUDPic( x, y, width, height, cgs.media.HUDvaluebox, HUDColors[cg.HUDColor] );
 		// draw heading
 	Com_sprintf(buffer, 7, "%d", value);
-	ClientGame::drawString_MFQ3_R( 332, 32, buffer, HUDColors[cg.HUDColor], 0);
+	CGame::drawString_MFQ3_R( 332, 32, buffer, HUDColors[cg.HUDColor], 0);
 		// find visible heading numbers
 	visible2 = (((value+15)/10));
 	if( (visible2%3) ) {
@@ -1691,25 +1691,25 @@ void ClientGame::draw_HeadingTape( int value, int targetheading ) {
 	}
 		// draw visible heading numbers
 	Com_sprintf(buffer, 7, "%d", visible2);
-	ClientGame::drawString_MFQ3_R( 330-(value2*64/10), 6, buffer, HUDColors[cg.HUDColor], 0);
+	CGame::drawString_MFQ3_R( 330-(value2*64/10), 6, buffer, HUDColors[cg.HUDColor], 0);
 	if( left ) {
 		value2 = value - visible1;
 		if( value2 < 0 ) value2 += 360;
 		Com_sprintf(buffer, 7, "%d", visible1);
-		ClientGame::drawString_MFQ3_R( 330-(value2*64/10), 6, buffer, HUDColors[cg.HUDColor], 0);
+		CGame::drawString_MFQ3_R( 330-(value2*64/10), 6, buffer, HUDColors[cg.HUDColor], 0);
 	}
 	if( right ) {
 		value2 = value - visible3;
 		if( value2 > 0 ) value2 -= 360;
 		Com_sprintf(buffer, 7, "%d", visible3);
-		ClientGame::drawString_MFQ3_R( 330-(value2*64/10), 6, buffer, HUDColors[cg.HUDColor], 0);
+		CGame::drawString_MFQ3_R( 330-(value2*64/10), 6, buffer, HUDColors[cg.HUDColor], 0);
 	}
 
 		// heading indicater
 	x = 316;
 	y = 24;
 	width = height = 8;
-	ClientGame::drawHUDPic( x, y, width, height, cgs.media.HUDind_h, HUDColors[cg.HUDColor] );
+	CGame::drawHUDPic( x, y, width, height, cgs.media.HUDind_h, HUDColors[cg.HUDColor] );
 
 		// heading caret
 	if( targetheading > 0 && targetheading <= 360 ) {
@@ -1721,7 +1721,7 @@ void ClientGame::draw_HeadingTape( int value, int targetheading ) {
 		x = 316-(value2*64/10);
 		y = 24;
 		width = height = 8;
-		ClientGame::drawHUDPic( x, y, width, height, cgs.media.HUDcaret_h, HUDColors[cg.HUDColor] );
+		CGame::drawHUDPic( x, y, width, height, cgs.media.HUDcaret_h, HUDColors[cg.HUDColor] );
 	}
 }
 
@@ -1731,7 +1731,7 @@ CG_DrawStatusBar_MFQ3
 
 ================
 */
-void ClientGame::drawStatusBar_MFQ3_new( ) {
+void CGame::drawStatusBar_MFQ3_new( ) {
 	ClientEntity	*cent;
 	playerState_t	*ps;
 	int			value, value2;
@@ -1753,7 +1753,7 @@ void ClientGame::drawStatusBar_MFQ3_new( ) {
 	}
 
 	// aiming/targetting reticles
-	ClientGame::draw_Reticles();
+	CGame::draw_Reticles();
 
 	cent = &cg_entities[cg.snap->ps.clientNum];
 	ps = &cg.snap->ps;
@@ -1781,7 +1781,7 @@ void ClientGame::drawStatusBar_MFQ3_new( ) {
 	if( hud_heading.integer ) {
 		value = 360 - static_cast<int>(ps->vehicleAngles[1]);
 		if( value <= 0 ) value += 360;
-		ClientGame::draw_HeadingTape( value, targetheading );
+		CGame::draw_HeadingTape( value, targetheading );
 	}
 
 	// Not for LQM's
@@ -1792,10 +1792,10 @@ void ClientGame::drawStatusBar_MFQ3_new( ) {
 			if( (availableVehicles[vehicle].cat & CAT_GROUND) || 
 				(availableVehicles[vehicle].cat & CAT_BOAT) ) value = 10;
 			else value = 50;
-			ClientGame::setScreenPlacement( PLACE_LEFT );
-			ClientGame::draw_SpeedTape( ps->speed/10, availableVehicles[vehicle].stallspeed,
+			CGame::setScreenPlacement( PLACE_LEFT );
+			CGame::draw_SpeedTape( ps->speed/10, availableVehicles[vehicle].stallspeed,
 					availableVehicles[vehicle].stallspeed * SPEED_GREEN_ARC, value );
-			ClientGame::setScreenPlacement( PLACE_CENTER );
+			CGame::setScreenPlacement( PLACE_CENTER );
 		}
 
 		// altitude (not for ground-vehicles)
@@ -1808,11 +1808,11 @@ void ClientGame::drawStatusBar_MFQ3_new( ) {
 			start[2] += availableVehicles[vehicle].mins[2];
 			VectorCopy( start, end );
 			end[2] -= 20000;
-			ClientGame::trace( &tr, start, vec3_origin, vec3_origin, end, cg.snap->ps.clientNum, MASK_SOLID|MASK_WATER );
+			CGame::trace( &tr, start, vec3_origin, vec3_origin, end, cg.snap->ps.clientNum, MASK_SOLID|MASK_WATER );
 			altitude = static_cast<int>(tr.fraction * 20000);
-			ClientGame::setScreenPlacement( PLACE_RIGHT );
-			ClientGame::draw_AltTape(altitude);
-			ClientGame::setScreenPlacement( PLACE_CENTER );
+			CGame::setScreenPlacement( PLACE_RIGHT );
+			CGame::draw_AltTape(altitude);
+			CGame::setScreenPlacement( PLACE_CENTER );
 		}
 
 		// stall related
@@ -1822,16 +1822,16 @@ void ClientGame::drawStatusBar_MFQ3_new( ) {
 
 		// mfd 1
 		if( hud_mfd.integer ) {
-			ClientGame::setScreenPlacement( PLACE_LEFT );
+			CGame::setScreenPlacement( PLACE_LEFT );
 			cent->draw_MFD( MFD_1, vehicle, targetrange, targetheading, altitude, ps, stallcolor );
-			ClientGame::setScreenPlacement( PLACE_CENTER );
+			CGame::setScreenPlacement( PLACE_CENTER );
 		}
 
 		// mfd 2
 		if( hud_mfd2.integer ) {
-			ClientGame::setScreenPlacement( PLACE_RIGHT );
+			CGame::setScreenPlacement( PLACE_RIGHT );
 			cent->draw_MFD( MFD_2, vehicle, targetrange, targetheading, altitude, ps, stallcolor );
-			ClientGame::setScreenPlacement( PLACE_CENTER );
+			CGame::setScreenPlacement( PLACE_CENTER );
 		}
 
 		// solid middle section
@@ -1840,17 +1840,17 @@ void ClientGame::drawStatusBar_MFQ3_new( ) {
 		} else value = 0;
 		if( value > 100 ) value = 100;
 		if( hud_center.integer ) {
-			ClientGame::draw_Center(vehicle, value, ps->throttle);
+			CGame::draw_Center(vehicle, value, ps->throttle);
 		}
 
 		// additional HUD info: health and throttle (redundant)
-		ClientGame::draw_Redundant(vehicle, value, ps->throttle, ps->ammo, cent->currentState.weaponNum );
+		CGame::draw_Redundant(vehicle, value, ps->throttle, ps->ammo, cent->currentState.weaponNum );
 
 		// GPS
 		if( cg.GPS ) {
 			value = static_cast<int>(ps->origin[0]);
 			value2 = static_cast<int>(ps->origin[1]);
-			ClientGame::draw_Coords( value, value2 );
+			CGame::draw_Coords( value, value2 );
 		}
 		
 		// stallwarning

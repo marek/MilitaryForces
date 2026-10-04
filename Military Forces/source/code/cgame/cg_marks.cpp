@@ -20,16 +20,16 @@ MARK POLYS
 markPoly_t	cg_activeMarkPolys;			// double linked list
 markPoly_t	*cg_freeMarkPolys;			// single linked list
 markPoly_t	cg_markPolys[MAX_MARK_POLYS];
-int ClientGame::markTotal;
+int CGame::markTotal;
 
 /*
 ===================
-ClientGame::initMarkPolys
+CGame::initMarkPolys
 
 This is called at startup and for tournement restarts
 ===================
 */
-void	ClientGame::initMarkPolys( ) {
+void	CGame::initMarkPolys( ) {
 	int		i;
 
 	memset( cg_markPolys, 0, sizeof(cg_markPolys) );
@@ -98,22 +98,22 @@ markPoly_t	*CG_AllocMark( ) {
 
 /*
 =================
-ClientGame::impactMark
+CGame::impactMark
 =================
 */
 
-void ClientGame::impactMark( qhandle_t markShader, const vec3_t origin, const vec3_t dir, 
+void CGame::impactMark( qhandle_t markShader, const vec3_t origin, const vec3_t dir, 
 					  float orientation, float red, float green, float blue, float alpha,
 					  bool alphaFade, float radius, bool temporary )
 {
 	// link to extended version
-	ClientGame::impactMarkEx( markShader, origin, dir, orientation, red, green, blue, alpha,
+	CGame::impactMarkEx( markShader, origin, dir, orientation, red, green, blue, alpha,
 					 alphaFade, radius, radius, temporary );
 }
 
 /*
 =================
-ClientGame::impactMarkEx
+CGame::impactMarkEx
 
 origin should be a point within a unit of the plane
 dir should be the plane normal
@@ -125,7 +125,7 @@ passed to the renderer.
 constexpr int MAX_MARK_FRAGMENTS = 128;
 constexpr int MAX_MARK_POINTS = 384;
 
-void ClientGame::impactMarkEx( qhandle_t markShader, const vec3_t origin, const vec3_t dir, 
+void CGame::impactMarkEx( qhandle_t markShader, const vec3_t origin, const vec3_t dir, 
 					  float orientation, float red, float green, float blue, float alpha,
 					  bool alphaFade, float xRadius, float yRadius, bool temporary )
 {
@@ -249,13 +249,13 @@ return;
 
 /*
 ===============
-ClientGame::addMarks
+CGame::addMarks
 ===============
 */
 constexpr int MARK_TOTAL_TIME = 10000;
 constexpr int MARK_FADE_TIME = 1000;
 
-void ClientGame::addMarks( ) {
+void CGame::addMarks( ) {
 	int			j;
 	markPoly_t	*mp, *next;
 	int			t;

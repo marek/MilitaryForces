@@ -14,12 +14,12 @@
 
 /*
 =================
-ClientGame::calcVrect
+CGame::calcVrect
 
 Sets the coordinates of the rendered window
 =================
 */
-void ClientGame::calcVrect() {
+void CGame::calcVrect() {
 	int		size;
 
 	// the intermission should allways be full screen
@@ -52,7 +52,7 @@ void ClientGame::calcVrect() {
 
 /*
 ===============
-ClientGame::offsetVehicleView
+CGame::offsetVehicleView
 
 ===============
 */
@@ -60,7 +60,7 @@ constexpr int FOCUS_DISTANCE = 512;
 //#define	_VIEW_SETTING_DISPLAY
 
 // MFQ3
-void ClientGame::offsetVehicleView( bool spectator ) 
+void CGame::offsetVehicleView( bool spectator ) 
 {
     vec3_t	    forward, right, up;
     vec3_t	    focusAngles;
@@ -100,7 +100,7 @@ void ClientGame::offsetVehicleView( bool spectator )
 
 #ifdef _VIEW_SETTING_DISPLAY
 	sprintf( test,"d=%f h=%f", dist, height );
-	ClientGame::centerPrint( test, 100, 10 );
+	CGame::centerPrint( test, 100, 10 );
 #endif
 
 	// update vars
@@ -134,7 +134,7 @@ void ClientGame::offsetVehicleView( bool spectator )
 		view[2] += /*(availableVehicles[cg_vehicle.integer].cam_height[ CAMERA_V_DEFAULT ]*/ + height /*)*/;
 	}
 
-    ClientGame::trace( &trace, start, mins, maxs, view, cg.predictedPlayerState.clientNum, MASK_SOLID );
+    CGame::trace( &trace, start, mins, maxs, view, cg.predictedPlayerState.clientNum, MASK_SOLID );
 
     if ( trace.fraction < 1.0 ) 
     {
@@ -143,7 +143,7 @@ void ClientGame::offsetVehicleView( bool spectator )
 		// try another trace to this position, because a tunnel may have the ceiling
 		// close enogh that this is poking out
 
-		ClientGame::trace( &trace, start, mins, maxs, view, cg.predictedPlayerState.clientNum, MASK_SOLID );
+		CGame::trace( &trace, start, mins, maxs, view, cg.predictedPlayerState.clientNum, MASK_SOLID );
 		VectorCopy( trace.endpos, view );
     }
 
@@ -153,7 +153,7 @@ void ClientGame::offsetVehicleView( bool spectator )
 
 
 // MFQ3
-void ClientGame::offsetVehicleViewCFV( bool spectator ) 
+void CGame::offsetVehicleViewCFV( bool spectator ) 
 {
     vec3_t	    forward, right, up;
     vec3_t	    focusAngles;
@@ -193,7 +193,7 @@ void ClientGame::offsetVehicleViewCFV( bool spectator )
 
 #ifdef _VIEW_SETTING_DISPLAY
 	sprintf( test,"d=%f h=%f", dist, height );
-	ClientGame::centerPrint( test, 100, 10 );
+	CGame::centerPrint( test, 100, 10 );
 #endif
 
 	// update vars
@@ -234,7 +234,7 @@ void ClientGame::offsetVehicleViewCFV( bool spectator )
 			view[2] += /*(availableVehicles[cg_vehicle.integer].cam_height[ CAMERA_V_DEFAULT ]*/ + height /*)*/;
 	}
 
-    ClientGame::trace( &trace, start, mins, maxs, view, cg.predictedPlayerState.clientNum, MASK_SOLID );
+    CGame::trace( &trace, start, mins, maxs, view, cg.predictedPlayerState.clientNum, MASK_SOLID );
 
     if ( trace.fraction < 1.0 ) 
     {
@@ -243,7 +243,7 @@ void ClientGame::offsetVehicleViewCFV( bool spectator )
 		// try another trace to this position, because a tunnel may have the ceiling
 		// close enogh that this is poking out
 
-		ClientGame::trace( &trace, start, mins, maxs, view, cg.predictedPlayerState.clientNum, MASK_SOLID );
+		CGame::trace( &trace, start, mins, maxs, view, cg.predictedPlayerState.clientNum, MASK_SOLID );
 		VectorCopy( trace.endpos, view );
     }
 
@@ -253,11 +253,11 @@ void ClientGame::offsetVehicleViewCFV( bool spectator )
 
 /*
 ===============
-ClientGame::offsetCockpitView
+CGame::offsetCockpitView
 MFQ3
 ===============
 */
-void ClientGame::offsetCockpitView( ) 
+void CGame::offsetCockpitView( ) 
 {
     vec3_t	    forward, right, up;
     vec3_t	    view;
@@ -276,7 +276,7 @@ void ClientGame::offsetCockpitView( )
 
 
 /*
-static void ClientGame::offsetCockpitView( void ) {
+static void CGame::offsetCockpitView( void ) {
 	float			*origin;
 	float			*angles;
 	float			ratio;
@@ -331,7 +331,7 @@ static void ClientGame::offsetCockpitView( void ) {
 
 //======================================================================
 
-void ClientGame::zoomDown_f( )
+void CGame::zoomDown_f( )
 { 
 	// locked-out?
 	if( cg.zoomLockOut )
@@ -359,7 +359,7 @@ void ClientGame::zoomDown_f( )
 	cg.zoomLockOut = false;
 }
 
-void ClientGame::zoomUp_f( )
+void CGame::zoomUp_f( )
 { 
 	// reset lock-out
 	cg.zoomLockOut = false;
@@ -367,7 +367,7 @@ void ClientGame::zoomUp_f( )
 
 /*
 ====================
-ClientGame::calcFov
+CGame::calcFov
 
 Fixed fov at intermissions, otherwise account for fov variable and zooms.
 ====================
@@ -375,7 +375,7 @@ Fixed fov at intermissions, otherwise account for fov variable and zooms.
 constexpr int WAVE_AMPLITUDE = 1;
 constexpr double WAVE_FREQUENCY = 0.4;
 
-int ClientGame::calcFov( ) {
+int CGame::calcFov( ) {
 	float	x;
 	float	phase;
 	float	v;
@@ -433,7 +433,7 @@ int ClientGame::calcFov( ) {
 	fov_x = atan( tan( fov_y / 360 * M_PI ) * cg.refdef.width / cg.refdef.height ) * 360 / M_PI;
 
 	// warp if underwater
-	contents = ClientGame::pointContents( cg.refdef.vieworg, -1 );
+	contents = CGame::pointContents( cg.refdef.vieworg, -1 );
 	if ( contents & ( CONTENTS_WATER | CONTENTS_SLIME | CONTENTS_LAVA ) ){
 		phase = cg.time / 1000.0 * WAVE_FREQUENCY * M_PI * 2;
 		v = WAVE_AMPLITUDE * sin( phase );
@@ -461,11 +461,11 @@ int ClientGame::calcFov( ) {
 
 /*
 ===============
-ClientGame::calcViewValues
+CGame::calcViewValues
 ===============
 */
 
-void ClientGame::calcMiscViewValues( )
+void CGame::calcMiscViewValues( )
 {
 	bool noAdjust = false;
 
@@ -511,24 +511,24 @@ void ClientGame::calcMiscViewValues( )
 
 /*
 ===============
-ClientGame::calcViewValues
+CGame::calcViewValues
 
 Sets cg.refdef view values
 ===============
 */
-int ClientGame::calcViewValues( ) {
+int CGame::calcViewValues( ) {
 	playerState_t	*ps;
 
 	memset( &cg.refdef, 0, sizeof( cg.refdef ) );
 
-	ClientGame::calcMiscViewValues();
+	CGame::calcMiscViewValues();
 
 	// strings for in game rendering
 	// Q_strncpyz( cg.refdef.text[0], "Park Ranger", sizeof(cg.refdef.text[0]) );
 	// Q_strncpyz( cg.refdef.text[1], "19", sizeof(cg.refdef.text[1]) );
 
 	// calculate size of 3D view
-	ClientGame::calcVrect();
+	CGame::calcVrect();
 
 	ps = &cg.predictedPlayerState;
 
@@ -537,7 +537,7 @@ int ClientGame::calcViewValues( ) {
 		VectorCopy( ps->origin, cg.refdef.vieworg );
 		VectorCopy( ps->viewangles, cg.refdefViewAngles );
 		AnglesToAxis( cg.refdefViewAngles, cg.refdef.viewaxis );
-		return ClientGame::calcFov();
+		return CGame::calcFov();
 	}
 
 	VectorCopy( ps->origin, cg.refdef.vieworg );
@@ -565,14 +565,14 @@ int ClientGame::calcViewValues( ) {
 	}
 
 	if( ps->pm_type == PM_SPECTATOR ) {
-	    ClientGame::offsetVehicleView(true);
+	    CGame::offsetVehicleView(true);
 	} else if ( cg.renderingThirdPerson ) {
 		if( cg_advanced.integer )
-			ClientGame::offsetVehicleViewCFV(false);
+			CGame::offsetVehicleViewCFV(false);
 		else
-			ClientGame::offsetVehicleView(false);
+			CGame::offsetVehicleView(false);
 	} else {
-		ClientGame::offsetCockpitView();
+		CGame::offsetCockpitView();
 	}
 
 	// position eye reletive to origin
@@ -583,16 +583,16 @@ int ClientGame::calcViewValues( ) {
 	}
 
 	// field of view
-	return ClientGame::calcFov();
+	return CGame::calcFov();
 }
 
 
 /*
 =====================
-ClientGame::addBufferedSound
+CGame::addBufferedSound
 =====================
 */
-void ClientGame::addBufferedSound( sfxHandle_t sfx ) {
+void CGame::addBufferedSound( sfxHandle_t sfx ) {
 	if ( !sfx )
 		return;
 	cg.soundBuffer[cg.soundBufferIn] = sfx;
@@ -604,10 +604,10 @@ void ClientGame::addBufferedSound( sfxHandle_t sfx ) {
 
 /*
 =====================
-ClientGame::playBufferedSounds
+CGame::playBufferedSounds
 =====================
 */
-void ClientGame::playBufferedSounds( ) {
+void CGame::playBufferedSounds( ) {
 	if ( cg.soundTime < cg.time ) {
 		if (cg.soundBufferOut != cg.soundBufferIn && cg.soundBuffer[cg.soundBufferOut]) {
 			SoundSystem::startLocalSound(cg.soundBuffer[cg.soundBufferOut], CHAN_ANNOUNCER);
@@ -622,25 +622,25 @@ void ClientGame::playBufferedSounds( ) {
 
 /*
 =================
-ClientGame::drawActiveFrame
+CGame::drawActiveFrame
 
 Generates and draws a game scene and status information at the given time.
 =================
 */
-void ClientGame::drawActiveFrame( int serverTime, stereoFrame_t stereoView, bool demoPlayback ) {
+void CGame::drawActiveFrame( int serverTime, stereoFrame_t stereoView, bool demoPlayback ) {
 	int		inwater;
 
 	cg.time = serverTime;
 	cg.demoPlayback = demoPlayback;
 
 	// update cvars
-	ClientGame::updateCvars();
+	CGame::updateCvars();
 
 	// if we are only updating the screen as a loading
 	// pacifier, don't even try to read snapshots
 	if ( cg.infoScreenText[0] != 0 )
 	{
-		ClientGame::drawInformation();
+		CGame::drawInformation();
 		return;
 	}
 
@@ -652,12 +652,12 @@ void ClientGame::drawActiveFrame( int serverTime, stereoFrame_t stereoView, bool
 	refExport.ClearScene();
 
 	// set up cg.snap and possibly cg.nextSnap
-	ClientGame::processSnapshots();
+	CGame::processSnapshots();
 
 	// if we haven't received any snapshots yet, all
 	// we can draw is the information screen
 	if ( !cg.snap || ( cg.snap->snapFlags & SNAPFLAG_NOT_ACTIVE ) ) {
-		ClientGame::drawInformation();
+		CGame::drawInformation();
 		return;
 	}
 
@@ -668,19 +668,19 @@ void ClientGame::drawActiveFrame( int serverTime, stereoFrame_t stereoView, bool
 	cg.clientFrame++;
 
 	// update cg.predictedPlayerState
-	ClientGame::predictPlayerState();
+	CGame::predictPlayerState();
 
 	// decide on third person view
 	cg.renderingThirdPerson = cg_thirdPerson.integer || (cg.snap->ps.stats[STAT_HEALTH] <= 0);
 
 	// build cg.refdef
-	inwater = ClientGame::calcViewValues();
+	inwater = CGame::calcViewValues();
 
 	// build the render lists
 	if ( !cg.hyperspace ) {
-		ClientGame::addPacketEntities();			// adter calcViewValues, so predicted player state is correct
-		ClientGame::addMarks();
-		ClientGame::addLocalEntities();
+		CGame::addPacketEntities();			// adter calcViewValues, so predicted player state is correct
+		CGame::addMarks();
+		CGame::addLocalEntities();
 
 
 		pw.systems[0].pos[0] = sin(static_cast<float>(cg.time)/100)*10;
@@ -688,23 +688,23 @@ void ClientGame::drawActiveFrame( int serverTime, stereoFrame_t stereoView, bool
 
 		// Add Particles
 		/*
-		ClientGame::particleWorldThink(&pw);
-		ClientGame::particleWorldRender(&pw);
+		CGame::particleWorldThink(&pw);
+		CGame::particleWorldRender(&pw);
 		*/
 	}
 
 	// add buffered sounds
-	ClientGame::playBufferedSounds();
+	CGame::playBufferedSounds();
 
 	// finish up the rest of the refdef
 	if( cg.testModelEntity.hModel ) {
-		ClientGame::addTestModel();
+		CGame::addTestModel();
 	}
 	if( cg.testVehicleParts[0].hModel ) {
-		ClientGame::addTestVehicle();
+		CGame::addTestVehicle();
 	}
 	if( cgs.gametype == GT_MISSION_EDITOR ) {
-		ClientGame::draw_IGME();
+		CGame::draw_IGME();
 	}
 
 	cg.refdef.time = cg.time;
@@ -720,7 +720,7 @@ void ClientGame::drawActiveFrame( int serverTime, stereoFrame_t stereoView, bool
 			cg.frametime = 0;
 		}
 		cg.oldTime = cg.time;
-		ClientGame::addLagometerFrameInfo();
+		CGame::addLagometerFrameInfo();
 	}
 	if (cg_timescale.value != cg_timescaleFadeEnd.value) {
 		if (cg_timescale.value < cg_timescaleFadeEnd.value) {
@@ -739,10 +739,10 @@ void ClientGame::drawActiveFrame( int serverTime, stereoFrame_t stereoView, bool
 	}
 
 	// actually issue the rendering calls
-	ClientGame::drawActive( stereoView );
+	CGame::drawActive( stereoView );
 
 	if ( cg_stats.integer ) {
-		ClientGame::printf( "cg.clientFrame:%i\n", cg.clientFrame );
+		CGame::printf( "cg.clientFrame:%i\n", cg.clientFrame );
 	}
 }
 
@@ -750,12 +750,12 @@ constexpr double DTOR = 0.01745329252;
 
 /*
 =================
-ClientGame::worldToScreenCoords
+CGame::worldToScreenCoords
 
 Converts a world vector point into screen coords
 =================
 */
-bool ClientGame::worldToScreenCoords( vec3_t worldPoint, int * pX, int * pY, bool virtualXY )
+bool CGame::worldToScreenCoords( vec3_t worldPoint, int * pX, int * pY, bool virtualXY )
 {
 	vec3_t v, dp, n, p;
 	float tanthetah, tanthetav;
@@ -807,7 +807,7 @@ bool ClientGame::worldToScreenCoords( vec3_t worldPoint, int * pX, int * pY, boo
 	   {
 		   p[0] += cg.refdef.x;
 		   p[1] += cg.refdef.y;
-		   ClientGame::virtualFromScreen( &p[0], &p[1] );
+		   CGame::virtualFromScreen( &p[0], &p[1] );
 	   }
 
 	   // convert 

@@ -138,7 +138,7 @@ void ClientEntity::misc_Plane()
 	}
 
 	// draw plane
-	ClientGame::drawPlane(&drawInfo);
+	CGame::drawPlane(&drawInfo);
 	
 	// flags
 //	CG_PlaneFlags( this );
@@ -153,7 +153,7 @@ void ClientEntity::misc_Plane()
 		AngleVectors( this->lerpAngles, forward, NULL, NULL );
 		VectorMA( this->lerpOrigin, availableVehicles[this->currentState.modelindex].mins[0], forward, pos );
 
-		smoke = ClientGame::smokePuff( pos, up, 
+		smoke = CGame::smokePuff( pos, up, 
 					  this->currentState.generic1, 
 					  0.5, 0.5, 0.5, 0.66f,
 					  100*this->currentState.generic1, 
@@ -232,7 +232,7 @@ void ClientEntity::misc_GV()
 //	}
 	
 	// draw plane
-	ClientGame::drawGV(&drawInfo);
+	CGame::drawGV(&drawInfo);
 
 	// smoke 
 	if( this->currentState.generic1 ) {
@@ -245,7 +245,7 @@ void ClientEntity::misc_GV()
 		VectorCopy( this->lerpOrigin, pos );
 		pos[2] += 12;
 
-		smoke = ClientGame::smokePuff( pos, up, 
+		smoke = CGame::smokePuff( pos, up, 
 					  this->currentState.generic1, 
 					  0.5, 0.5, 0.5, 0.66f,
 					  200*this->currentState.generic1, 
@@ -304,7 +304,7 @@ void ClientEntity::misc_Helo()
 
 	
 	// draw helo
-	ClientGame::drawHelo(&drawInfo);
+	CGame::drawHelo(&drawInfo);
 
 	// smoke 
 	if( this->currentState.generic1 ) {
@@ -317,7 +317,7 @@ void ClientEntity::misc_Helo()
 		VectorCopy( this->lerpOrigin, pos );
 		pos[2] += 12;
 
-		smoke = ClientGame::smokePuff( pos, up, 
+		smoke = CGame::smokePuff( pos, up, 
 					  this->currentState.generic1, 
 					  0.5, 0.5, 0.5, 0.66f,
 					  200*this->currentState.generic1, 
@@ -386,7 +386,7 @@ void ClientEntity::misc_Boat()
 	}
 
 	// draw boat
-	ClientGame::drawBoat(&drawInfo);
+	CGame::drawBoat(&drawInfo);
 
 	// smoke 
 	if( this->currentState.generic1 ) {
@@ -399,7 +399,7 @@ void ClientEntity::misc_Boat()
 		VectorCopy( this->lerpOrigin, pos );
 		pos[2] += 12;
 
-		smoke = ClientGame::smokePuff( pos, up, 
+		smoke = CGame::smokePuff( pos, up, 
 					  this->currentState.generic1, 
 					  0.5, 0.5, 0.5, 0.66f,
 					  200*this->currentState.generic1, 
@@ -444,7 +444,7 @@ void ClientEntity::misc_GI()
 	drawInfo.upgrades = availableGroundInstallations[drawInfo.basicInfo.vehicleIndex].upgrades;
 
 	// draw plane
-	ClientGame::drawGI(&drawInfo);
+	CGame::drawGI(&drawInfo);
 
 	// smoke 
 	if( this->currentState.generic1 ) {
@@ -457,7 +457,7 @@ void ClientEntity::misc_GI()
 		VectorCopy( this->lerpOrigin, pos );
 		pos[2] += 12;
 
-		smoke = ClientGame::smokePuff( pos, up, 
+		smoke = CGame::smokePuff( pos, up, 
 					  this->currentState.generic1, 
 					  0.5, 0.5, 0.5, 0.66f,
 					  200*this->currentState.generic1, 

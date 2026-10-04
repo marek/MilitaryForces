@@ -6,12 +6,12 @@
 
 /*
 =================
-ClientGame::cvar_Get
+CGame::cvar_Get
 
 Generic get value from Cvar
 =================
 */
-float ClientGame::cvar_Get( const char * cvar )
+float CGame::cvar_Get( const char * cvar )
 {
 	// allocate temp string buffer
 	char buff[128];
@@ -38,7 +38,7 @@ unsigned long MF_CG_GetGameset( bool asEnum )
 	unsigned long returnValue = MF_GAMESET_MODERN;
 
 	// get info
-	pInfo = ClientGame::configString( CS_SERVERINFO );
+	pInfo = CGame::configString( CS_SERVERINFO );
 	pGameSet = Info::valueForKey( pInfo, "mf_gameset" );
 
 	// compare

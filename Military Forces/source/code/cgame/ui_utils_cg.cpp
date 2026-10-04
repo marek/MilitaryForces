@@ -41,14 +41,14 @@ UI_UtilsCG::drawTimer( float y )
 	seconds -= tens * 10;
 
 	s = va( "%i:%i%i", mins, tens, seconds );
-	w = ClientGame::drawStrlen( s ) * BIGCHAR_WIDTH;
+	w = CGame::drawStrlen( s ) * BIGCHAR_WIDTH;
 
-	screenPlacement_e placement = ClientGame::getScreenPlacement();
+	screenPlacement_e placement = CGame::getScreenPlacement();
 
 	// alter the draw position?
-	if( ClientGame::newHUDActive() )
+	if( CGame::newHUDActive() )
 	{
-		ClientGame::setScreenPlacement( PLACE_CENTER );
+		CGame::setScreenPlacement( PLACE_CENTER );
 		// fit around the New HUD (draw bottom middle-right)
 		dx = 480;
 		dy = 460;
@@ -67,7 +67,7 @@ UI_UtilsCG::drawTimer( float y )
 	// draw timer string
 	drawStringNew( dx, dy, 0.35f, colorWhite, s, 0, 0, ITEM_TEXTSTYLE_SHADOWED, CENTRE_JUSTIFY );
 
-	ClientGame::setScreenPlacement( placement );
+	CGame::setScreenPlacement( placement );
 
 	return y + k_TIMER_HEIGHT + 4;	
 }
@@ -107,14 +107,14 @@ UI_UtilsCG::drawCountdownTimer( float y )
 	}
 
 	s = va( "%i:%i%i", mins, tens, seconds );
-	w = ClientGame::drawStrlen( s ) * BIGCHAR_WIDTH;
+	w = CGame::drawStrlen( s ) * BIGCHAR_WIDTH;
 
-	screenPlacement_e placement = ClientGame::getScreenPlacement();
+	screenPlacement_e placement = CGame::getScreenPlacement();
 
 	// alter the draw position?
-	if( ClientGame::newHUDActive() )
+	if( CGame::newHUDActive() )
 	{
-		ClientGame::setScreenPlacement( PLACE_CENTER );
+		CGame::setScreenPlacement( PLACE_CENTER );
 		// fit around the New HUD (draw bottom middle-left)
 		dx = 160;
 		dy = 460;
@@ -136,7 +136,7 @@ UI_UtilsCG::drawCountdownTimer( float y )
 		drawStringNew( dx, dy, 0.35f, colorWhite, s, 0, 0, ITEM_TEXTSTYLE_SHADOWED, CENTRE_JUSTIFY );
 	}
 
-	ClientGame::setScreenPlacement( placement );
+	CGame::setScreenPlacement( placement );
 
 	return y + k_TIMER_HEIGHT + 4;
 }

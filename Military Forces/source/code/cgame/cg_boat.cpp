@@ -8,10 +8,10 @@
 
 /*
 ==========================
-ClientGame::registerBoat
+CGame::registerBoat
 ==========================
 */
-void ClientGame::registerBoat( clientInfo_t *ci ) 
+void CGame::registerBoat( clientInfo_t *ci ) 
 {
 	int i;
 
@@ -93,7 +93,7 @@ void ClientEntity::boat( clientInfo_t *ci )
 		drawInfo.basicInfo.flashWeaponIndex = this->muzzleFlashWeapon;
 	}
 
-	ClientGame::drawBoat(&drawInfo);
+	CGame::drawBoat(&drawInfo);
 
 	// reticles
 	if( this == &cg.predictedPlayerEntity )
@@ -107,7 +107,7 @@ void ClientEntity::boat( clientInfo_t *ci )
 
 		memset( &reticle, 0, sizeof(reticle) );
 
-		ClientGame::resetReticles();
+		CGame::resetReticles();
 
 		// are we tracking a target?
 		if( ps->stats[STAT_LOCKINFO] & LI_TRACKING )
@@ -137,7 +137,7 @@ void ClientEntity::boat( clientInfo_t *ci )
 			vectoangles( forward, ang );
 			AnglesToAxis( ang, reticle.axis );
 			VectorMA( this->lerpOrigin, 2000, forward, end );
-			ClientGame::trace( &tr, this->lerpOrigin, nullptr, nullptr, end, cg.snap->ps.clientNum, MASK_SOLID ); 
+			CGame::trace( &tr, this->lerpOrigin, nullptr, nullptr, end, cg.snap->ps.clientNum, MASK_SOLID ); 
 			
 			if( tr.entityNum > ENTITYNUM_WORLD && tr.entityNum < MAX_CLIENTS )
 			{
@@ -146,7 +146,7 @@ void ClientEntity::boat( clientInfo_t *ci )
 			}
 
 			VectorCopy( tr.endpos, end );
-			ClientGame::trace( &tr, cg.refdef.vieworg, nullptr, nullptr, end, cg.snap->ps.clientNum, MASK_SOLID ); 
+			CGame::trace( &tr, cg.refdef.vieworg, nullptr, nullptr, end, cg.snap->ps.clientNum, MASK_SOLID ); 
 			VectorSubtract( tr.endpos, cg.refdef.vieworg, forward );
 			len = VectorNormalize(forward);
 			
@@ -162,7 +162,7 @@ void ClientEntity::boat( clientInfo_t *ci )
 			VectorCopy( reticle.origin, reticle.lightingOrigin );
 			reticle.renderfx = RF_LIGHTING_ORIGIN|RF_SHADOW_PLANE;
 
-			ClientGame::addReticleEntityToScene( &reticle, target );
+			CGame::addReticleEntityToScene( &reticle, target );
 
 			// are we locked onto this target?
 			if( ps->stats[STAT_LOCKINFO] & LI_LOCKING )
@@ -196,9 +196,9 @@ void ClientEntity::boat( clientInfo_t *ci )
 				VectorScale( reticlelock.axis[1], 10.0f, reticlelock.axis[1] );
 				VectorScale( reticlelock.axis[2], 10.0f, reticlelock.axis[2] );
 				reticlelock.nonNormalizedAxes = true;
-				ClientGame::trace( &tr, start, nullptr, nullptr, end, cg.snap->ps.clientNum, MASK_SOLID ); 
+				CGame::trace( &tr, start, nullptr, nullptr, end, cg.snap->ps.clientNum, MASK_SOLID ); 
 				VectorCopy( tr.endpos, end );
-				ClientGame::trace( &tr, cg.refdef.vieworg, nullptr, nullptr, end, cg.snap->ps.clientNum, MASK_SOLID ); 
+				CGame::trace( &tr, cg.refdef.vieworg, nullptr, nullptr, end, cg.snap->ps.clientNum, MASK_SOLID ); 
 				VectorSubtract( tr.endpos, cg.refdef.vieworg, forward );
 				len = VectorNormalize(forward);
 
@@ -215,7 +215,7 @@ void ClientEntity::boat( clientInfo_t *ci )
 				reticlelock.renderfx = RF_LIGHTING_ORIGIN|RF_SHADOW_PLANE;
 			}
 
-			ClientGame::addReticleEntityToScene( &reticlelock, nullptr );
+			CGame::addReticleEntityToScene( &reticlelock, nullptr );
 		}
 		else
 		{
@@ -233,7 +233,7 @@ void ClientEntity::boat( clientInfo_t *ci )
 			vectoangles( forward, ang );
 			ang[2] = 0;
 			AnglesToAxis( ang, reticle.axis );
-			ClientGame::trace( &tr, start, nullptr, nullptr, end, cg.snap->ps.clientNum, MASK_SOLID ); 
+			CGame::trace( &tr, start, nullptr, nullptr, end, cg.snap->ps.clientNum, MASK_SOLID ); 
 
 			if( tr.entityNum > ENTITYNUM_WORLD && tr.entityNum < MAX_CLIENTS )
 			{
@@ -242,7 +242,7 @@ void ClientEntity::boat( clientInfo_t *ci )
 			}
 
 			VectorCopy( tr.endpos, end );
-			ClientGame::trace( &tr, cg.refdef.vieworg, nullptr, nullptr, end, cg.snap->ps.clientNum, MASK_SOLID ); 
+			CGame::trace( &tr, cg.refdef.vieworg, nullptr, nullptr, end, cg.snap->ps.clientNum, MASK_SOLID ); 
 			VectorSubtract( tr.endpos, cg.refdef.vieworg, forward );
 			len = VectorNormalize(forward);
 			
@@ -258,19 +258,19 @@ void ClientEntity::boat( clientInfo_t *ci )
 			VectorCopy( reticle.origin, reticle.lightingOrigin );
 			reticle.renderfx = RF_LIGHTING_ORIGIN|RF_SHADOW_PLANE;
 			
-			ClientGame::addReticleEntityToScene( &reticle, nullptr );
+			CGame::addReticleEntityToScene( &reticle, nullptr );
 		}
 	}
 }
 
 /*
 =============
-ClientGame::groundVehicleObituary
+CGame::groundVehicleObituary
 
 General ugly function, needs to be made prettier some day...
 =============
 */
-void ClientGame::boatObituary( entityState_t *ent, clientInfo_t *ci ) 
+void CGame::boatObituary( entityState_t *ent, clientInfo_t *ci ) 
 {
 	// add some cool stuff here :-)
 
@@ -292,10 +292,10 @@ void ClientGame::boatObituary( entityState_t *ent, clientInfo_t *ci )
 	    attacker = ENTITYNUM_WORLD;
 	    attackerInfo = nullptr;
     } else {
-	    attackerInfo = ClientGame::configString( CS_PLAYERS + attacker );
+	    attackerInfo = CGame::configString( CS_PLAYERS + attacker );
     }
 
-    targetInfo = ClientGame::configString( CS_PLAYERS + target );
+    targetInfo = CGame::configString( CS_PLAYERS + target );
     if ( !targetInfo ) {
 	    return;
     }
@@ -354,7 +354,7 @@ void ClientGame::boatObituary( entityState_t *ent, clientInfo_t *ci )
     }
 
     if (message) {
-	    ClientGame::printf( "%s %s.\n", targetName, message);
+	    CGame::printf( "%s %s.\n", targetName, message);
 	    return;
     }
 
@@ -364,12 +364,12 @@ void ClientGame::boatObituary( entityState_t *ent, clientInfo_t *ci )
 
 	if ( cgs.gametype < GT_TEAM ) {
 		s = va("You fragged %s\n%s place with %i", targetName, 
-			ClientGame::placeString( cg.snap->ps.persistant[PERS_RANK] + 1 ),
+			CGame::placeString( cg.snap->ps.persistant[PERS_RANK] + 1 ),
 			cg.snap->ps.persistant[PERS_SCORE] );
 	} else {
 		s = va("You fragged %s", targetName );
 	}
-	ClientGame::centerPrint( s, SCREEN_HEIGHT * 0.25, BIGCHAR_WIDTH );
+	CGame::centerPrint( s, SCREEN_HEIGHT * 0.25, BIGCHAR_WIDTH );
 
 	// print the text message as well
     }
@@ -439,12 +439,12 @@ void ClientGame::boatObituary( entityState_t *ent, clientInfo_t *ci )
 
 		if( message )
 		{
-			ClientGame::printf( "%s %s %s%s\n", targetName, message, attackerName, message2);
+			CGame::printf( "%s %s %s%s\n", targetName, message, attackerName, message2);
 			return;
 		}
     }
 
     // we don't know what it was
-    ClientGame::printf( "%s died.\n", targetName );
+    CGame::printf( "%s died.\n", targetName );
 }
 
