@@ -405,11 +405,11 @@ void PM_PlaneMove( )
 				//viewdir[YAW] > vehdir[YAW] - 10 ) {
 				pm->ps->ONOFF &= ~OO_STALLED;
 			}
-//			Com_Printf( "Stalled\n" );    
+//			Common::printf( "Stalled\n" );    
 	    }
 	    // normal flight
 	    else {
-//			Com_Printf( "Normal\n" );
+//			Common::printf( "Normal\n" );
 			// yaw/pitch
 			for( i = PITCH; i <= YAW; i++ ) {
 				diff[i] = viewdir[i] - vehdir[i];
@@ -466,11 +466,11 @@ void PM_PlaneMove( )
 			}
 			pm->ps->vehicleAnim = anim;
 
-		//	Com_Printf( va("anim is %d\n", anim) );
-		//	Com_Printf( va( "diff %.1f %.1f %.1f\n", diff[0], diff[1], diff[2] ) ); 
-	      //  Com_Printf( va("hdg: %.1f diff: %.1f\n", viewdir[YAW], diff[YAW]) );
-	    //   Com_Printf( va("view: %.1f %.1f %.1f\n", viewdir[PITCH], viewdir[YAW], viewdir[ROLL]) );
-	        //Com_Printf( va("move: %.1f %.1f %.1f\n", vehdir[PITCH], vehdir[YAW], vehdir[ROLL]) );
+		//	Common::printf( va("anim is %d\n", anim) );
+		//	Common::printf( va( "diff %.1f %.1f %.1f\n", diff[0], diff[1], diff[2] ) ); 
+	      //  Common::printf( va("hdg: %.1f diff: %.1f\n", viewdir[YAW], diff[YAW]) );
+	    //   Common::printf( va("view: %.1f %.1f %.1f\n", viewdir[PITCH], viewdir[YAW], viewdir[ROLL]) );
+	        //Common::printf( va("move: %.1f %.1f %.1f\n", vehdir[PITCH], vehdir[YAW], vehdir[ROLL]) );
 			//}
 		}
 		if( (availableVehicles[pm->vehicle].caps & HC_GEAR) && (pm->ps->ONOFF & OO_GEAR) &&
@@ -685,12 +685,12 @@ void PM_PlaneMoveAdvanced( )
 				//viewdir[YAW] > vehdir[YAW] - 10 ) {
 				pm->ps->ONOFF &= ~OO_STALLED;
 			}
-//			Com_Printf( "Stalled\n" );    
+//			Common::printf( "Stalled\n" );    
 	    }
 	    // normal flight
 	    else 
 		{
-//			Com_Printf("moves: %d %d %d\n", pm->cmd.forwardmove, pm->cmd.rightmove, pm->cmd.upmove );
+//			Common::printf("moves: %d %d %d\n", pm->cmd.forwardmove, pm->cmd.rightmove, pm->cmd.upmove );
 
 			ratepitch = static_cast<float>(pm->cmd.forwardmove)/127;
 			rateyaw = static_cast<float>(pm->cmd.upmove)/127;

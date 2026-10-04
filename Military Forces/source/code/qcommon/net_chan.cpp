@@ -147,7 +147,7 @@ void NetChannel::transmitNextFragment() {
 	this->lastSentSize = send.cursize;
 
 	if ( showpackets->integer ) {
-		Com_Printf ("%s send %4i : s=%i fragment=%i,%i\n"
+		Common::printf ("%s send %4i : s=%i fragment=%i,%i\n"
 			, netsrcString[ this->sock ]
 			, send.cursize
 			, this->outgoingSequence
@@ -180,7 +180,7 @@ void NetChannel::transmit( int length, const byte *data ) {
 	byte		send_buf[MAX_PACKETLEN];
 
 	if ( length > MAX_MSGLEN ) {
-		Com_Error( ERR_DROP, "Netchan_Transmit: length = %i", length );
+		Common::error( ERR_DROP, "Netchan_Transmit: length = %i", length );
 	}
 	this->unsentFragmentStart = 0;
 
@@ -222,7 +222,7 @@ void NetChannel::transmit( int length, const byte *data ) {
 	this->lastSentSize = send.cursize;
 
 	if ( showpackets->integer ) {
-		Com_Printf( "%s send %4i : s=%i ack=%i\n"
+		Common::printf( "%s send %4i : s=%i ack=%i\n"
 			, netsrcString[ this->sock ]
 			, send.cursize
 			, this->outgoingSequence - 1
@@ -289,13 +289,13 @@ bool NetChannel::process( Message *msg ) {
 
 	if ( showpackets->integer ) {
 		if ( fragmented ) {
-			Com_Printf( "%s recv %4i : s=%i fragment=%i,%i\n"
+			Common::printf( "%s recv %4i : s=%i fragment=%i,%i\n"
 				, netsrcString[ this->sock ]
 				, msg->cursize
 				, sequence
 				, fragmentStart, fragmentLength );
 		} else {
-			Com_Printf( "%s recv %4i : s=%i\n"
+			Common::printf( "%s recv %4i : s=%i\n"
 				, netsrcString[ this->sock ]
 				, msg->cursize
 				, sequence );
@@ -307,7 +307,7 @@ bool NetChannel::process( Message *msg ) {
 	//
 	if ( sequence <= this->incomingSequence ) {
 		if ( showdrop->integer || showpackets->integer ) {
-			Com_Printf( "%s:Out of order packet %i at %i\n"
+			Common::printf( "%s:Out of order packet %i at %i\n"
 				, Network::adrToString( this->remoteAddress )
 				,  sequence
 				, this->incomingSequence );
@@ -321,7 +321,7 @@ bool NetChannel::process( Message *msg ) {
 	this->dropped = sequence - (this->incomingSequence+1);
 	if ( this->dropped > 0 ) {
 		if ( showdrop->integer || showpackets->integer ) {
-			Com_Printf( "%s:Dropped %i packets at %i\n"
+			Common::printf( "%s:Dropped %i packets at %i\n"
 			, Network::adrToString( this->remoteAddress )
 			, this->dropped
 			, sequence );
@@ -347,7 +347,7 @@ bool NetChannel::process( Message *msg ) {
 		// if we missed a fragment, dump the message
 		if ( fragmentStart != this->fragmentLength ) {
 			if ( showdrop->integer || showpackets->integer ) {
-				Com_Printf( "%s:Dropped a message fragment\n"
+				Common::printf( "%s:Dropped a message fragment\n"
 				, Network::adrToString( this->remoteAddress ));
 			}
 			// we can still keep the part that we have so far,
@@ -359,7 +359,7 @@ bool NetChannel::process( Message *msg ) {
 		if ( fragmentLength < 0 || msg->readcount + fragmentLength > msg->cursize ||
 			this->fragmentLength + fragmentLength > sizeof( this->fragmentBuffer ) ) {
 			if ( showdrop->integer || showpackets->integer ) {
-				Com_Printf ("%s:illegal fragment length\n"
+				Common::printf ("%s:illegal fragment length\n"
 				, Network::adrToString (this->remoteAddress ) );
 			}
 			return false;
@@ -376,7 +376,7 @@ bool NetChannel::process( Message *msg ) {
 		}
 
 		if ( this->fragmentLength > msg->maxsize ) {
-			Com_Printf( "%s:fragmentLength %i > msg->maxsize\n"
+			Common::printf( "%s:fragmentLength %i > msg->maxsize\n"
 				, Network::adrToString (this->remoteAddress ),
 				this->fragmentLength );
 			return false;
@@ -540,7 +540,7 @@ void Network::sendPacket( netsrc_t sock, int length, const void *data, netadr_t 
 
 	// sequenced packets are shown in netchan, so just show oob
 	if ( showpackets->integer && *(int *)data == -1 )	{
-		Com_Printf ("send packet %4i\n", length);
+		Common::printf ("send packet %4i\n", length);
 	}
 
 	if ( to.type == NA_LOOPBACK ) {

@@ -592,7 +592,7 @@ GameEntity* SP_misc_vehicle( GameEntity *sp_ent )
 
 	if( i < 0 || i >= bg_numberOfVehicles )
 	{
-		Com_Printf ("%s (%s) cannot be spawned - index out of range\n", sp_ent->classname_, sp_ent->model_);
+		Common::printf ("%s (%s) cannot be spawned - index out of range\n", sp_ent->classname_, sp_ent->model_);
 		sp_ent->freeUp();
 		return nullptr;
 	}
@@ -646,7 +646,7 @@ void SP_misc_groundinstallation( GameEntity *sp_ent )
 
 	if( i < 0 || i >= bg_numberOfGroundInstallations )
 	{
-		Com_Printf ("%s (%s) cannot be spawned - index out of range\n", sp_ent->classname_, sp_ent->model_);
+		Common::printf ("%s (%s) cannot be spawned - index out of range\n", sp_ent->classname_, sp_ent->model_);
 		sp_ent->freeUp();
 		return;
 	}

@@ -375,7 +375,7 @@ void EditField::variableSizeDraw( int x, int y, int width, int size, bool drawSm
 
 	// extract <drawLen> characters from the field at <prestep>
 	if ( drawLen >= MAX_STRING_CHARS ) {
-		Com_Error( ERR_DROP, "drawLen >= MAX_STRING_CHARS" );
+		Common::error( ERR_DROP, "drawLen >= MAX_STRING_CHARS" );
 	}
 
 	Com_Memcpy( str, this->buffer + prestep, drawLen );
@@ -632,7 +632,7 @@ void Console_Key (int key) {
 			g_consoleField.cursor++;
 		}
 
-		Com_Printf ( "]%s\n", g_consoleField.buffer );
+		Common::printf ( "]%s\n", g_consoleField.buffer );
 
 		// leading slash is an explicit command
 		if ( g_consoleField.buffer[0] == '\\' || g_consoleField.buffer[0] == '/' ) {
@@ -973,14 +973,14 @@ void Key_Unbind_f ()
 
 	if (CommandSystem::argc() != 2)
 	{
-		Com_Printf ("unbind <key> : remove commands from a key\n");
+		Common::printf ("unbind <key> : remove commands from a key\n");
 		return;
 	}
 	
 	b = Key_StringToKeynum (CommandSystem::argv(1));
 	if (b==-1)
 	{
-		Com_Printf ("\"%s\" isn't a valid key\n", CommandSystem::argv(1));
+		Common::printf ("\"%s\" isn't a valid key\n", CommandSystem::argv(1));
 		return;
 	}
 
@@ -1016,22 +1016,22 @@ void Key_Bind_f ()
 
 	if (c < 2)
 	{
-		Com_Printf ("bind <key> [command] : attach a command to a key\n");
+		Common::printf ("bind <key> [command] : attach a command to a key\n");
 		return;
 	}
 	b = Key_StringToKeynum (CommandSystem::argv(1));
 	if (b==-1)
 	{
-		Com_Printf ("\"%s\" isn't a valid key\n", CommandSystem::argv(1));
+		Common::printf ("\"%s\" isn't a valid key\n", CommandSystem::argv(1));
 		return;
 	}
 
 	if (c == 2)
 	{
 		if (keys[b].binding && keys[b].binding[0])
-			Com_Printf ("\"%s\" = \"%s\"\n", Key_KeynumToString(b), keys[b].binding );
+			Common::printf ("\"%s\" = \"%s\"\n", Key_KeynumToString(b), keys[b].binding );
 		else
-			Com_Printf ("\"%s\" is not bound\n", Key_KeynumToString(b) );
+			Common::printf ("\"%s\" is not bound\n", Key_KeynumToString(b) );
 		return;
 	}
 	
@@ -1080,7 +1080,7 @@ void Key_Bindlist_f( ) {
 
 	for ( i = 0 ; i < MAX_KEYS ; i++ ) {
 		if ( keys[i].binding && keys[i].binding[0] ) {
-			Com_Printf( "%s \"%s\"\n", Key_KeynumToString(i), keys[i].binding );
+			Common::printf( "%s \"%s\"\n", Key_KeynumToString(i), keys[i].binding );
 		}
 	}
 }
@@ -1480,7 +1480,7 @@ void CL_LoadConsoleHistory( )
 	consoleSaveBufferSize = FileSystem::fOpenFileRead( CONSOLE_HISTORY_FILE, &f, false );
 	if( !f )
 	{
-		Com_Printf( "Couldn't read %s.\n", CONSOLE_HISTORY_FILE );
+		Common::printf( "Couldn't read %s.\n", CONSOLE_HISTORY_FILE );
 		return;
 	}
 
@@ -1509,7 +1509,7 @@ void CL_LoadConsoleHistory( )
 			text_p++;
 			if( numChars > ( strlen( consoleSaveBuffer ) -	( text_p - consoleSaveBuffer ) ) )
 			{
-				Com_DPrintf( S_COLOR_YELLOW "WARNING: probable corrupt history\n" );
+				Common::dPrintf( S_COLOR_YELLOW "WARNING: probable corrupt history\n" );
 				break;
 			}
 			Com_Memcpy( historyEditLines[ i ].buffer,
@@ -1528,7 +1528,7 @@ void CL_LoadConsoleHistory( )
 		historyLine = nextHistoryLine = numLines;
 	}
 	else
-		Com_Printf( "Couldn't read %s.\n", CONSOLE_HISTORY_FILE );
+		Common::printf( "Couldn't read %s.\n", CONSOLE_HISTORY_FILE );
 
 	FileSystem::fCloseFile( f );
 }
@@ -1581,12 +1581,12 @@ void CL_SaveConsoleHistory( )
 	f = FileSystem::fOpenFileWrite_HomeState( CONSOLE_HISTORY_FILE );
 	if( !f )
 	{
-		Com_Printf( "Couldn't write %s.\n", CONSOLE_HISTORY_FILE );
+		Common::printf( "Couldn't write %s.\n", CONSOLE_HISTORY_FILE );
 		return;
 	}
 
 	if( FileSystem::write( consoleSaveBuffer, consoleSaveBufferSize, f ) < consoleSaveBufferSize )
-		Com_Printf( "Couldn't write %s.\n", CONSOLE_HISTORY_FILE );
+		Common::printf( "Couldn't write %s.\n", CONSOLE_HISTORY_FILE );
 
 	FileSystem::fCloseFile( f );
 }

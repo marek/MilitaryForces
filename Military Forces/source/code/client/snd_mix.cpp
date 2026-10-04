@@ -522,7 +522,7 @@ void S_PaintChannels( int endtime ) {
 	else
 		snd_vol = s_volume->value*255;
 
-//Com_Printf ("%i to %i\n", s_paintedtime, endtime);
+//Common::printf ("%i to %i\n", s_paintedtime, endtime);
 	while ( s_paintedtime < endtime ) {
 		// if paintbuffer is smaller than DMA buffer
 		// we may need to fill it multiple times

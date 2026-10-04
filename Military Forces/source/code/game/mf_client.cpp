@@ -251,7 +251,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 		ent = new Entity_Infantry;
 		break;
 	default:
-		//Com_Error( ERR_DROP, "Invalid vehicle type in MF_ClientSpawn" );
+		//Common::error( ERR_DROP, "Invalid vehicle type in MF_ClientSpawn" );
 #pragma message("-->make GameEntity_Spectator!!")
 		ent = new GameEntity;	// not chosen yet.. just spectator 
 		break;
@@ -324,7 +324,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 	
 				if( i > 25) 
 				{
-					Com_Printf(S_COLOR_YELLOW "WARNING: Couldn't find a spawn point after over 25 tries (Check mf_lvcat?) \n");
+					Common::printf(S_COLOR_YELLOW "WARNING: Couldn't find a spawn point after over 25 tries (Check mf_lvcat?) \n");
 					client->ps_.pm_flags &= ~PMF_VEHICLESPAWN;
 					return;
 					break;

@@ -2729,7 +2729,7 @@ UI_Utils::item_Slider_HandleKey( itemDef_t *item, int key, int down )
 			}
 		}
 	}
-	Com_Printf("slider handle key exit\n");
+	Common::printf("slider handle key exit\n");
 	return false;
 }
 
@@ -3982,7 +3982,7 @@ UI_Utils::pc_SourceError(int handle, char *format, ...)
 	line = 0;
 	precomp_.sourceFileAndLine(handle, filename, &line);
 
-	Com_Printf(S_COLOR_RED "ERROR: %s, line %d: %s\n", filename, line, string);
+	Common::printf(S_COLOR_RED "ERROR: %s, line %d: %s\n", filename, line, string);
 }
 
 bool 
@@ -4424,7 +4424,7 @@ UI_Utils::alloc( int size )
 	if ( allocPoint_ + size > MEM_POOL_SIZE ) 
 	{
 		outOfMemory_ = true;
-		Com_Printf("UI_Alloc: Failure. Out of memory!\n");
+		Common::printf("UI_Alloc: Failure. Out of memory!\n");
 		return nullptr;
 	}
 
@@ -4526,16 +4526,16 @@ void
 UI_Utils::string_Report() 
 {
 	float f;
-	Com_Printf("Memory/String Pool Info\n");
-	Com_Printf("----------------\n");
+	Common::printf("Memory/String Pool Info\n");
+	Common::printf("----------------\n");
 	f = strPoolIndex_;
 	f /= STRING_POOL_SIZE;
 	f *= 100;
-	Com_Printf("String Pool is %.1f%% full, %i bytes out of %i used.\n", f, strPoolIndex_, STRING_POOL_SIZE);
+	Common::printf("String Pool is %.1f%% full, %i bytes out of %i used.\n", f, strPoolIndex_, STRING_POOL_SIZE);
 	f = allocPoint_;
 	f /= MEM_POOL_SIZE;
 	f *= 100;
-	Com_Printf("Memory Pool is %.1f%% full, %i bytes out of %i used.\n", f, allocPoint_, MEM_POOL_SIZE);
+	Common::printf("Memory Pool is %.1f%% full, %i bytes out of %i used.\n", f, allocPoint_, MEM_POOL_SIZE);
 }
 
 long 

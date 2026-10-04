@@ -415,7 +415,7 @@ void SV_Client::writeSnapshotToClient( Message *msg )
 		>= (PACKET_BACKUP - 3) ) 
 	{
 		// this hasn't gotten a good message through in a long time
-		Com_DPrintf ("%s: Delta request from out of date packet.\n", this->name_);
+		Common::dPrintf ("%s: Delta request from out of date packet.\n", this->name_);
 		oldframe = nullptr;
 		lastframe = 0;
 	} 
@@ -536,7 +536,7 @@ static int QDECL SV_QsortEntityNumbers( const void *a, const void *b ) {
 	eb = (int *)b;
 
 	if ( *ea == *eb ) {
-		Com_Error( ERR_DROP, "SV_QsortEntityStates: duplicated entity" );
+		Common::error( ERR_DROP, "SV_QsortEntityStates: duplicated entity" );
 	}
 
 	if ( *ea < *eb ) {
@@ -617,7 +617,7 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin,
 
 		if (ent->s.number != e) 
 		{
-			Com_DPrintf ("FIXING ENT->S.NUMBER!!!\n");
+			Common::dPrintf ("FIXING ENT->S.NUMBER!!!\n");
 			ent->s.number = e;
 		}
 
@@ -641,7 +641,7 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin,
 		if ( ent->r.svFlags & SVF_CLIENTMASK ) 
 		{
 			if (frame->ps_.clientNum >= 32)
-				Com_Error( ERR_DROP, "SVF_CLIENTMASK: cientNum > 32\n" );
+				Common::error( ERR_DROP, "SVF_CLIENTMASK: cientNum > 32\n" );
 			if (~ent->r.singleClient & (1 << frame->ps_.clientNum))
 				continue;
 		}
@@ -771,7 +771,7 @@ void SV_Client::buildClientSnapshot()
 	clientNum = frame->ps_.clientNum;
 	if ( clientNum < 1 || clientNum >= MAX_GENTITIES ) 
 	{
-		Com_Error( ERR_DROP, "SV_BuildClientSnapshot: bad this" );
+		Common::error( ERR_DROP, "SV_BuildClientSnapshot: bad this" );
 	}
 	svEnt = &theSV.serverEntities_[ clientNum ];
 
@@ -810,7 +810,7 @@ void SV_Client::buildClientSnapshot()
 		theSVS.nextSnapshotEntities_++;
 		// this should never hit, map should always be restarted first in SV_Frame
 		if ( theSVS.nextSnapshotEntities_ >= 0x7FFFFFFE ) 
-			Com_Error(ERR_FATAL, "svs.nextSnapshotEntities wrapped");
+			Common::error(ERR_FATAL, "svs.nextSnapshotEntities wrapped");
 		frame->num_entities_++;
 	}
 }
@@ -925,7 +925,7 @@ void SV_Client::sendClientSnapshot()
 	// check for overflow
 	if ( msg.overflowed ) 
 	{
-		Com_Printf ("WARNING: msg overflowed for %s\n", this->name_);
+		Common::printf ("WARNING: msg overflowed for %s\n", this->name_);
 		msg.clear();
 	}
 

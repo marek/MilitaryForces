@@ -171,7 +171,7 @@ void CL_ServerStatusResponse( netadr_t from, Message *msg );
 ===============
 CL_CDDialog
 
-Called by Com_Error when a cd is needed
+Called by Common::error when a cd is needed
 ===============
 */
 void CL_CDDialog( ) {
@@ -226,12 +226,12 @@ void CL_UpdateVoipIgnore(const char *idstr, bool ignore)
 			clc.voipIgnore[id] = ignore;
 			CL_AddReliableCommand(va("voip %s %d",
 			                         ignore ? "ignore" : "unignore", id), false);
-			Com_Printf("VoIP: %s ignoring player #%d\n",
+			Common::printf("VoIP: %s ignoring player #%d\n",
 			            ignore ? "Now" : "No longer", id);
 			return;
 		}
 	}
-	Com_Printf("VoIP: invalid player ID#\n");
+	Common::printf("VoIP: invalid player ID#\n");
 }
 
 static
@@ -243,7 +243,7 @@ void CL_UpdateVoipGain(const char *idstr, float gain)
 			gain = 0.0f;
 		if ((id >= 0) && (id < MAX_CLIENTS)) {
 			clc.voipGain[id] = gain;
-			Com_Printf("VoIP: player #%d gain now set to %f\n", id, gain);
+			Common::printf("VoIP: player #%d gain now set to %f\n", id, gain);
 		}
 	}
 }
@@ -263,7 +263,7 @@ void CL_Voip_f( )
 		reason = "running in single-player mode";
 
 	if (reason != nullptr) {
-		Com_Printf("VoIP: command ignored: %s\n", reason);
+		Common::printf("VoIP: command ignored: %s\n", reason);
 		return;
 	}
 
@@ -277,24 +277,24 @@ void CL_Voip_f( )
 		} else if (Q_isanumber(CommandSystem::argv(2))) {
 			int id = atoi(CommandSystem::argv(2));
 			if (id >= 0 && id < MAX_CLIENTS) {
-				Com_Printf("VoIP: current gain for player #%d "
+				Common::printf("VoIP: current gain for player #%d "
 					"is %f\n", id, clc.voipGain[id]);
 			} else {
-				Com_Printf("VoIP: invalid player ID#\n");
+				Common::printf("VoIP: invalid player ID#\n");
 			}
 		} else {
-			Com_Printf("usage: voip gain <playerID#> [value]\n");
+			Common::printf("usage: voip gain <playerID#> [value]\n");
 		}
 	} else if (strcmp(cmd, "muteall") == 0) {
-		Com_Printf("VoIP: muting incoming voice\n");
+		Common::printf("VoIP: muting incoming voice\n");
 		CL_AddReliableCommand("voip muteall", false);
 		clc.voipMuteAll = true;
 	} else if (strcmp(cmd, "unmuteall") == 0) {
-		Com_Printf("VoIP: unmuting incoming voice\n");
+		Common::printf("VoIP: unmuting incoming voice\n");
 		CL_AddReliableCommand("voip unmuteall", false);
 		clc.voipMuteAll = false;
 	} else {
-		Com_Printf("usage: voip [un]ignore <playerID#>\n"
+		Common::printf("usage: voip [un]ignore <playerID#>\n"
 		           "       voip [un]muteall\n"
 		           "       voip gain <playerID#> [value]\n");
 	}
@@ -386,7 +386,7 @@ void CL_VoipParseTargets()
 
 		if(val < 0 || val >= MAX_CLIENTS)
 		{
-			Com_Printf(S_COLOR_YELLOW "WARNING: VoIP "
+			Common::printf(S_COLOR_YELLOW "WARNING: VoIP "
 				   "target %d is not a valid client "
 				   "number\n", val);
 
@@ -426,9 +426,9 @@ void CL_CaptureVoip()
 	//  you don't, you don't need VoIP.  :)
 	if (cl_voip->modified || cl_rate->modified) {
 		if ((cl_voip->integer) && (cl_rate->integer < 25000)) {
-			Com_Printf(S_COLOR_YELLOW "Your network rate is too slow for VoIP.\n");
-			Com_Printf("Set 'Data Rate' to 'LAN/Cable/xDSL' in 'Setup/System/Network'.\n");
-			Com_Printf("Until then, VoIP is disabled.\n");
+			Common::printf(S_COLOR_YELLOW "Your network rate is too slow for VoIP.\n");
+			Common::printf("Set 'Data Rate' to 'LAN/Cable/xDSL' in 'Setup/System/Network'.\n");
+			Common::printf("Until then, VoIP is disabled.\n");
 			CvarSystem::set("cl_voip", "0");
 		}
 		CvarSystem::set("cl_voipProtocol", cl_voip->integer ? "opus" : "");
@@ -507,7 +507,7 @@ void CL_CaptureVoip()
 
 			samples -= samples % VOIP_MAX_FRAME_SAMPLES;
 			if (samples != 120 && samples != 240 && samples != 480 && samples != 960 && samples != 1920 && samples != 2880 ) {
-				Com_Printf("Voip: bad number of samples %d\n", samples);
+				Common::printf("Voip: bad number of samples %d\n", samples);
 				return;
 			}
 			voipFrames = samples / VOIP_MAX_FRAME_SAMPLES;
@@ -527,7 +527,7 @@ void CL_CaptureVoip()
 									(unsigned char *) clc.voipOutgoingData,
 									sizeof (clc.voipOutgoingData));
 			if ( bytes <= 0 ) {
-				Com_DPrintf("VoIP: Error encoding %d samples\n", samples);
+				Common::dPrintf("VoIP: Error encoding %d samples\n", samples);
 				bytes = 0;
 			}
 
@@ -540,7 +540,7 @@ void CL_CaptureVoip()
 				clc.voipOutgoingDataSize = bytes;
 				clc.voipOutgoingDataFrames = voipFrames;
 
-				Com_DPrintf("VoIP: Send %d frames, %d bytes, %f power\n",
+				Common::dPrintf("VoIP: Send %d frames, %d bytes, %f power\n",
 				            voipFrames, bytes, clc.voipPower);
 
 				#if 0
@@ -595,7 +595,7 @@ void CL_AddReliableCommand(const char *cmd, bool isDisconnectCmd)
 		if(com_errorEntered)
 			return;
 		else
-			Com_Error(ERR_DROP, "Client command overflow");
+			Common::error(ERR_DROP, "Client command overflow");
 	}
 
 	Q_strncpyz(clc.reliableCommands[++clc.reliableSequence & (MAX_RELIABLE_COMMANDS - 1)],
@@ -644,7 +644,7 @@ void CL_StopRecord_f( ) {
 	int		len;
 
 	if ( !clc.demorecording ) {
-		Com_Printf ("Not recording a demo.\n");
+		Common::printf ("Not recording a demo.\n");
 		return;
 	}
 
@@ -656,7 +656,7 @@ void CL_StopRecord_f( ) {
 	clc.demofile = 0;
 	clc.demorecording = false;
 	clc.spDemoRecording = false;
-	Com_Printf ("Stopped demo.\n");
+	Common::printf ("Stopped demo.\n");
 }
 
 /* 
@@ -703,19 +703,19 @@ void CL_Record_f( ) {
 	char		*s;
 
 	if ( CommandSystem::argc() > 2 ) {
-		Com_Printf ("record <demoname>\n");
+		Common::printf ("record <demoname>\n");
 		return;
 	}
 
 	if ( clc.demorecording ) {
 		if (!clc.spDemoRecording) {
-			Com_Printf ("Already recording.\n");
+			Common::printf ("Already recording.\n");
 		}
 		return;
 	}
 
 	if ( clc.state != CA_ACTIVE ) {
-		Com_Printf ("You must be in a level to record.\n");
+		Common::printf ("You must be in a level to record.\n");
 		return;
 	}
 
@@ -725,7 +725,7 @@ void CL_Record_f( ) {
 		// Don't nag if we're simply recording everything automatically.
 		!cl_autoRecordDemo->integer )
 	{
-		Com_Printf (S_COLOR_YELLOW "WARNING: You should set 'g_synchronousClients 1' for smoother demo recording\n");
+		Common::printf (S_COLOR_YELLOW "WARNING: You should set 'g_synchronousClients 1' for smoother demo recording\n");
 	}
 
 	if ( CommandSystem::argc() == 2 ) {
@@ -757,10 +757,10 @@ void CL_Record_f( ) {
 
 	// open the demo file
 
-	Com_Printf ("recording to %s.\n", name);
+	Common::printf ("recording to %s.\n", name);
 	clc.demofile = FileSystem::fOpenFileWrite_HomeData( name );
 	if ( !clc.demofile ) {
-		Com_Printf ("ERROR: couldn't open.\n");
+		Common::printf ("ERROR: couldn't open.\n");
 		return;
 	}
 	clc.demorecording = true;
@@ -897,7 +897,7 @@ void CL_DemoCompleted( )
 					time / static_cast<float>(clc.timeDemoFrames),
 					clc.timeDemoMaxDuration,
 					CL_DemoFrameDurationSDev( ) );
-			Com_Printf( "%s", buffer );
+			Common::printf( "%s", buffer );
 
 			// Write a log of all the frame durations
 			if( cl_timedemoLog && strlen( cl_timedemoLog->string ) > 0 )
@@ -920,11 +920,11 @@ void CL_DemoCompleted( )
 						FileSystem::printf( f, "%d\n", clc.timeDemoDurations[ i ] );
 
 					FileSystem::fCloseFile( f );
-					Com_Printf( "%s written\n", cl_timedemoLog->string );
+					Common::printf( "%s written\n", cl_timedemoLog->string );
 				}
 				else
 				{
-					Com_Printf( "Couldn't open %s for writing\n",
+					Common::printf( "Couldn't open %s for writing\n",
 							cl_timedemoLog->string );
 				}
 			}
@@ -974,11 +974,11 @@ void CL_ReadDemoMessage( ) {
 		return;
 	}
 	if ( buf.cursize > buf.maxsize ) {
-		Com_Error (ERR_DROP, "CL_ReadDemoMessage: demoMsglen > MAX_MSGLEN");
+		Common::error (ERR_DROP, "CL_ReadDemoMessage: demoMsglen > MAX_MSGLEN");
 	}
 	r = FileSystem::read( buf.data, buf.cursize, clc.demofile );
 	if ( r != buf.cursize ) {
-		Com_Printf( "Demo file was truncated.\n");
+		Common::printf( "Demo file was truncated.\n");
 		CL_DemoCompleted ();
 		return;
 	}
@@ -1006,7 +1006,7 @@ static int CL_WalkDemoExt(char *arg, char *name, int *demofile)
 		
 		if (*demofile)
 		{
-			Com_Printf("Demo file: %s\n", name);
+			Common::printf("Demo file: %s\n", name);
 			return com_legacyprotocol->integer;
 		}
 	}
@@ -1019,12 +1019,12 @@ static int CL_WalkDemoExt(char *arg, char *name, int *demofile)
 
 		if (*demofile)
 		{
-			Com_Printf("Demo file: %s\n", name);
+			Common::printf("Demo file: %s\n", name);
 			return com_protocol->integer;
 		}
 	}
 
-	Com_Printf("Not found: %s\n", name);
+	Common::printf("Not found: %s\n", name);
 
 	while(demo_protocols[i])
 	{
@@ -1039,12 +1039,12 @@ static int CL_WalkDemoExt(char *arg, char *name, int *demofile)
 		FileSystem::fOpenFileRead( name, demofile, true );
 		if (*demofile)
 		{
-			Com_Printf("Demo file: %s\n", name);
+			Common::printf("Demo file: %s\n", name);
 
 			return demo_protocols[i];
 		}
 		else
-			Com_Printf("Not found: %s\n", name);
+			Common::printf("Not found: %s\n", name);
 		i++;
 	}
 	
@@ -1083,7 +1083,7 @@ void CL_PlayDemo_f( ) {
 	char		retry[MAX_OSPATH];
 
 	if (CommandSystem::argc() != 2) {
-		Com_Printf ("demo <demoname>\n");
+		Common::printf ("demo <demoname>\n");
 		return;
 	}
 
@@ -1122,7 +1122,7 @@ void CL_PlayDemo_f( ) {
 		{
 			int len;
 
-			Com_Printf("Protocol %d not supported for demos\n", protocol);
+			Common::printf("Protocol %d not supported for demos\n", protocol);
 			len = ext_test - arg;
 
 			if(len >= ARRAY_LEN(retry))
@@ -1137,7 +1137,7 @@ void CL_PlayDemo_f( ) {
 		protocol = CL_WalkDemoExt(arg, name, &clc.demofile);
 	
 	if (!clc.demofile) {
-		Com_Error( ERR_DROP, "couldn't open %s", name);
+		Common::error( ERR_DROP, "couldn't open %s", name);
 		return;
 	}
 	Q_strncpyz( clc.demoName, arg, sizeof( clc.demoName ) );
@@ -1191,7 +1191,7 @@ void CL_NextDemo( ) {
 
 	Q_strncpyz( v, CvarSystem::variableString ("nextdemo"), sizeof(v) );
 	v[MAX_STRING_CHARS-1] = 0;
-	Com_DPrintf("CL_NextDemo: %s\n", v );
+	Common::dPrintf("CL_NextDemo: %s\n", v );
 	if (!v[0]) {
 		return;
 	}
@@ -1241,7 +1241,7 @@ void CL_ShutdownAll(bool shutdownRef)
 =================
 CL_ClearMemory
 
-Called by Com_GameRestart
+Called by Common::gameRestart
 =================
 */
 void CL_ClearMemory(bool shutdownRef)
@@ -1268,7 +1268,7 @@ CL_FlushMemory
 
 Called by CL_MapLoading, CL_Connect_f, CL_PlayDemo_f, and CL_ParseGamestate the only
 ways a client gets into a game
-Also called by Com_Error
+Also called by Common::error
 =================
 */
 void CL_FlushMemory()
@@ -1378,7 +1378,7 @@ CL_Disconnect
 Called when a connection, demo, or cinematic is being terminated.
 Goes from a connected state to either a menu state or a console state
 Sends a disconnect message to the server
-This is also called on Com_Error and Com_Quit, so it shouldn't cause any errors
+This is also called on Common::error and Com_Quit, so it shouldn't cause any errors
 =====================
 */
 void CL_Disconnect( bool showMainMenu ) {
@@ -1402,7 +1402,7 @@ void CL_Disconnect( bool showMainMenu ) {
 
 #ifdef USE_MUMBLE
 	if (cl_useMumble->integer && mumble_islinked()) {
-		Com_Printf("Mumble: Unlinking from Mumble application\n");
+		Common::printf("Mumble: Unlinking from Mumble application\n");
 		mumble_unlink();
 	}
 #endif
@@ -1507,7 +1507,7 @@ void CL_ForwardCommandToServer( const char *string ) {
 	}
 
 	if ( clc.demoplaying || clc.state < CA_CONNECTED || cmd[0] == '+' ) {
-		Com_Printf ("Unknown command \"%s" S_COLOR_WHITE "\"\n", cmd);
+		Common::printf ("Unknown command \"%s" S_COLOR_WHITE "\"\n", cmd);
 		return;
 	}
 
@@ -1531,20 +1531,20 @@ void CL_RequestMotd( ) {
 	if ( !cl_motd->integer ) {
 		return;
 	}
-	Com_Printf( "Resolving %s\n", UPDATE_SERVER_NAME );
+	Common::printf( "Resolving %s\n", UPDATE_SERVER_NAME );
 	if ( !Network::stringToAdr( UPDATE_SERVER_NAME, &cls.updateServer, NA_IP ) ) {
-		Com_Printf( "Couldn't resolve address\n" );
+		Common::printf( "Couldn't resolve address\n" );
 		return;
 	}
 	cls.updateServer.port = BigShort( PORT_UPDATE );
-	Com_Printf( "%s resolved to %i.%i.%i.%i:%i\n", UPDATE_SERVER_NAME,
+	Common::printf( "%s resolved to %i.%i.%i.%i:%i\n", UPDATE_SERVER_NAME,
 		cls.updateServer.ip[0], cls.updateServer.ip[1],
 		cls.updateServer.ip[2], cls.updateServer.ip[3],
 		BigShort( cls.updateServer.port ) );
 	
 	info[0] = 0;
 
-	Com_sprintf( cls.updateChallenge, sizeof( cls.updateChallenge ), "%i", (int)((((unsigned int)rand() << 16) ^ (unsigned int)rand()) ^ Com_Milliseconds()));
+	Com_sprintf( cls.updateChallenge, sizeof( cls.updateChallenge ), "%i", (int)((((unsigned int)rand() << 16) ^ (unsigned int)rand()) ^ Common::milliseconds()));
 
 	Info::setValueForKey( info, "challenge", cls.updateChallenge );
 	Info::setValueForKey( info, "renderer", cls.glconfig.renderer_string );
@@ -1599,14 +1599,14 @@ void CL_RequestAuthorization( void ) {
 	cvar_t	*fs;
 
 	if ( !cls.authorizeServer.port ) {
-		Com_Printf( "Resolving %s\n", AUTHORIZE_SERVER_NAME );
+		Common::printf( "Resolving %s\n", AUTHORIZE_SERVER_NAME );
 		if ( !Network::stringToAdr( AUTHORIZE_SERVER_NAME, &cls.authorizeServer, NA_IP ) ) {
-			Com_Printf( "Couldn't resolve address\n" );
+			Common::printf( "Couldn't resolve address\n" );
 			return;
 		}
 
 		cls.authorizeServer.port = BigShort( PORT_AUTHORIZE );
-		Com_Printf( "%s resolved to %i.%i.%i.%i:%i\n", AUTHORIZE_SERVER_NAME,
+		Common::printf( "%s resolved to %i.%i.%i.%i:%i\n", AUTHORIZE_SERVER_NAME,
 			cls.authorizeServer.ip[0], cls.authorizeServer.ip[1],
 			cls.authorizeServer.ip[2], cls.authorizeServer.ip[3],
 			BigShort( cls.authorizeServer.port ) );
@@ -1652,7 +1652,7 @@ CL_ForwardToServer_f
 */
 void CL_ForwardToServer_f( ) {
 	if ( clc.state != CA_ACTIVE || clc.demoplaying ) {
-		Com_Printf ("Not connected to a server.\n");
+		Common::printf ("Not connected to a server.\n");
 		return;
 	}
 	
@@ -1671,7 +1671,7 @@ void CL_Disconnect_f( ) {
 	Screen::stopCinematic();
 	CvarSystem::set("ui_singlePlayerActive", "0");
 	if ( clc.state != CA_DISCONNECTED && clc.state != CA_CINEMATIC ) {
-		Com_Error (ERR_DISCONNECT, "Disconnected from server");
+		Common::error (ERR_DISCONNECT, "Disconnected from server");
 	}
 }
 
@@ -1702,7 +1702,7 @@ void CL_Connect_f( ) {
 	netadrtype_t family = NA_UNSPEC;
 
 	if ( argc != 2 && argc != 3 ) {
-		Com_Printf( "usage: connect [-4|-6] server\n");
+		Common::printf( "usage: connect [-4|-6] server\n");
 		return;	
 	}
 	
@@ -1715,7 +1715,7 @@ void CL_Connect_f( ) {
 		else if(!strcmp(CommandSystem::argv(1), "-6"))
 			family = NA_IP6;
 		else
-			Com_Printf( "warning: only -4 or -6 as address type understood.\n");
+			Common::printf( "warning: only -4 or -6 as address type understood.\n");
 		
 		Q_strncpyz( server, CommandSystem::argv(2), sizeof( server ) );
 	}
@@ -1747,7 +1747,7 @@ void CL_Connect_f( ) {
 	Q_strncpyz( clc.servername, server, sizeof(clc.servername) );
 
 	if (!Network::stringToAdr(clc.servername, &clc.serverAddress, family) ) {
-		Com_Printf ("Bad server address\n");
+		Common::printf ("Bad server address\n");
 		clc.state = CA_DISCONNECTED;
 		return;
 	}
@@ -1757,7 +1757,7 @@ void CL_Connect_f( ) {
 
 	serverString = Network::adrToStringwPort(clc.serverAddress);
 
-	Com_Printf( "%s resolved to %s\n", clc.servername, serverString);
+	Common::printf( "%s resolved to %s\n", clc.servername, serverString);
 
 	if( cl_guidServerUniq->integer )
 		CL_UpdateGUID( serverString, strlen( serverString ) );
@@ -1773,7 +1773,7 @@ void CL_Connect_f( ) {
 		clc.state = CA_CONNECTING;
 		
 		// Set a client challenge number that ideally is mirrored back by the server.
-		clc.challenge = ((static_cast<unsigned int>(rand()) << 16) ^ static_cast<unsigned int>(rand())) ^ Com_Milliseconds();
+		clc.challenge = ((static_cast<unsigned int>(rand()) << 16) ^ static_cast<unsigned int>(rand())) ^ Common::milliseconds();
 	}
 
 	Key_SetCatcher( 0 );
@@ -1841,7 +1841,7 @@ static void CL_CompletePlayerName( char *args, int argNum )
 			namesPtr[nameCount] = names[nameCount];
 			nameCount++;
 		}
-		qsort( (void*)namesPtr, nameCount, sizeof( namesPtr[0] ), Com_strCompare );
+		qsort( (void*)namesPtr, nameCount, sizeof( namesPtr[0] ), Common::strCompare );
 
 		Field_CompletePlayerName( namesPtr, nameCount );
 	}
@@ -1860,7 +1860,7 @@ void CL_Rcon_f( ) {
 	netadr_t	to;
 
 	if ( !rcon_client_password->string[0] ) {
-		Com_Printf ("You must set 'rconpassword' before\n"
+		Common::printf ("You must set 'rconpassword' before\n"
 					"issuing an rcon command.\n");
 		return;
 	}
@@ -1883,7 +1883,7 @@ void CL_Rcon_f( ) {
 		to = clc.netchan.remoteAddress;
 	} else {
 		if (!strlen(rconAddress->string)) {
-			Com_Printf ("You must either be connected,\n"
+			Common::printf ("You must either be connected,\n"
 						"or set the 'rconAddress' cvar\n"
 						"to issue rcon commands\n");
 
@@ -2032,7 +2032,7 @@ CL_PK3List_f
 ==================
 */
 void CL_OpenedPK3List_f( ) {
-	Com_Printf("Opened PK3 Names: %s\n", FileSystem::loadedPakNames());
+	Common::printf("Opened PK3 Names: %s\n", FileSystem::loadedPakNames());
 }
 
 /*
@@ -2041,7 +2041,7 @@ CL_PureList_f
 ==================
 */
 void CL_ReferencedPK3List_f( ) {
-	Com_Printf("Referenced PK3 Names: %s\n", FileSystem::referencedPakNames());
+	Common::printf("Referenced PK3 Names: %s\n", FileSystem::referencedPakNames());
 }
 
 /*
@@ -2054,7 +2054,7 @@ void CL_Configstrings_f( ) {
 	int		ofs;
 
 	if ( clc.state != CA_ACTIVE ) {
-		Com_Printf( "Not connected to a server.\n");
+		Common::printf( "Not connected to a server.\n");
 		return;
 	}
 
@@ -2063,7 +2063,7 @@ void CL_Configstrings_f( ) {
 		if ( !ofs ) {
 			continue;
 		}
-		Com_Printf( "%4i: %s\n", i, cl.gameState.stringData + ofs );
+		Common::printf( "%4i: %s\n", i, cl.gameState.stringData + ofs );
 	}
 }
 
@@ -2073,12 +2073,12 @@ CL_Clientinfo_f
 ==============
 */
 void CL_Clientinfo_f( ) {
-	Com_Printf( "--------- Client Information ---------\n" );
-	Com_Printf( "state: %i\n", clc.state );
-	Com_Printf( "Server: %s\n", clc.servername );
-	Com_Printf ("User info settings:\n");
+	Common::printf( "--------- Client Information ---------\n" );
+	Common::printf( "state: %i\n", clc.state );
+	Common::printf( "Server: %s\n", clc.servername );
+	Common::printf ("User info settings:\n");
 	Info_Print( CvarSystem::infoString( CVAR_USERINFO ) );
-	Com_Printf( "--------------------------------------\n" );
+	Common::printf( "--------------------------------------\n" );
 }
 
 
@@ -2127,9 +2127,9 @@ void CL_DownloadsComplete( ) {
 	clc.state = CA_LOADING;
 
 	// Pump the loop, this may change gamestate!
-	Com_EventLoop();
+	Common::eventLoop();
 
-	// if the gamestate was changed by calling Com_EventLoop
+	// if the gamestate was changed by calling Common::eventLoop
 	// then we loaded everything already and we don't want to do it again.
 	if ( clc.state != CA_LOADING ) {
 		return;
@@ -2196,18 +2196,18 @@ CL_BeginHttpDownload
 static void CL_BeginHttpDownload( const char *remoteURL ) {
 	if(Q_strncmp(remoteURL, "http://", strlen("http://")) != 0 &&
 		Q_strncmp(remoteURL, "https://", strlen("https://")) != 0) {
-		Com_Error(ERR_DROP, "Download Error: %s is a malformed/"
+		Common::error(ERR_DROP, "Download Error: %s is a malformed/"
 			"unsupported URL", remoteURL);
 	}
 
-	Com_Printf("URL: %s\n", remoteURL);
+	Common::printf("URL: %s\n", remoteURL);
 
 	CL_HTTP_BeginDownload(remoteURL);
 	Q_strncpyz(clc.downloadURL, remoteURL, sizeof(clc.downloadURL));
 
 	clc.download = FileSystem::baseDir_FOpenFileWrite_HomeData(clc.downloadTempName);
 	if(!clc.download) {
-		Com_Error(ERR_DROP, "CL_BeginHTTPDownload: failed to open "
+		Common::error(ERR_DROP, "CL_BeginHTTPDownload: failed to open "
 			"%s for writing", clc.downloadTempName);
 	}
 
@@ -2244,7 +2244,7 @@ void CL_NextDownload()
 		char *zippath = FileSystem::baseDir_BuildOSPath(CvarSystem::variableString("fs_homedatapath"), clc.downloadName);
 
 		if(!FileSystem::compareZipChecksum(zippath))
-			Com_Error(ERR_DROP, "Incorrect checksum for file: %s", clc.downloadName);
+			Common::error(ERR_DROP, "Incorrect checksum for file: %s", clc.downloadName);
 	}
 
 	*clc.downloadTempName = *clc.downloadName = 0;
@@ -2275,13 +2275,13 @@ void CL_NextDownload()
 #ifdef USE_HTTP
 		if(!(cl_allowDownload->integer & DLF_NO_REDIRECT)) {
 			if(clc.sv_allowDownload & DLF_NO_REDIRECT) {
-				Com_Printf("WARNING: server does not "
+				Common::printf("WARNING: server does not "
 					"allow download redirection "
 					"(sv_allowDownload is %d)\n",
 					clc.sv_allowDownload);
 			}
 			else if(!*clc.sv_dlURL) {
-				Com_Printf("WARNING: server allows "
+				Common::printf("WARNING: server allows "
 					"download redirection, but does not "
 					"have sv_dlURL set\n");
 			}
@@ -2294,7 +2294,7 @@ void CL_NextDownload()
 			}
 		}
 		else if(!(clc.sv_allowDownload & DLF_NO_REDIRECT)) {
-			Com_Printf("WARNING: server allows download "
+			Common::printf("WARNING: server allows download "
 				"redirection, but it disabled by client "
 				"configuration (cl_allowDownload is %d)\n",
 				cl_allowDownload->integer);
@@ -2302,7 +2302,7 @@ void CL_NextDownload()
 #endif /* USE_HTTP */
 		if(!usedHTTP) {
 			if((cl_allowDownload->integer & DLF_NO_UDP)) {
-				Com_Error(ERR_DROP, "UDP Downloads are "
+				Common::error(ERR_DROP, "UDP Downloads are "
 					"disabled on your client. "
 					"(cl_allowDownload is %d)",
 					cl_allowDownload->integer);
@@ -2343,14 +2343,14 @@ void CL_InitDownloads() {
     {      
       // NOTE TTimo I would rather have that printed as a modal message box
       //   but at this point while joining the game we don't know wether we will successfully join or not
-      Com_Printf( "\nWARNING: You are missing some files referenced by the server:\n%s"
+      Common::printf( "\nWARNING: You are missing some files referenced by the server:\n%s"
                   "You might not be able to join the game\n"
                   "Go to the setting menu to turn on autodownload, or get the file elsewhere\n\n", missingfiles );
     }
   }
   else if ( FileSystem::comparePaks( clc.downloadList, sizeof( clc.downloadList ) , true ) ) {
 
-    Com_Printf("Need paks: %s\n", clc.downloadList );
+    Common::printf("Need paks: %s\n", clc.downloadList );
 
 		if ( *clc.downloadList ) {
 			// if autodownloading is not enabled on the server
@@ -2440,7 +2440,7 @@ void CL_CheckForResend( ) {
 		break;
 
 	default:
-		Com_Error( ERR_FATAL, "CL_CheckForResend: bad clc.state" );
+		Common::error( ERR_FATAL, "CL_CheckForResend: bad clc.state" );
 	}
 }
 
@@ -2512,7 +2512,7 @@ void CL_ServersResponsePacket( const netadr_t* from, Message *msg, bool extended
 	byte*			buffptr;
 	byte*			buffend;
 	
-	Com_Printf("CL_ServersResponsePacket from %s\n", Network::adrToStringwPort(*from));
+	Common::printf("CL_ServersResponsePacket from %s\n", Network::adrToStringwPort(*from));
 
 	if (cls.numglobalservers == -1) {
 		// state to detect lack of servers or lack of response
@@ -2618,7 +2618,7 @@ void CL_ServersResponsePacket( const netadr_t* from, Message *msg, bool extended
 	cls.numglobalservers = count;
 	total = count + cls.numGlobalServerAddresses;
 
-	Com_Printf("%d servers parsed (total %d)\n", numservers, total);
+	Common::printf("%d servers parsed (total %d)\n", numservers, total);
 }
 
 /*
@@ -2642,7 +2642,7 @@ void CL_ConnectionlessPacket( netadr_t from, Message *msg ) {
 
 	c = CommandSystem::argv(0);
 
-	Com_DPrintf ("CL packet %s: %s\n", Network::adrToStringwPort(from), c);
+	Common::dPrintf ("CL packet %s: %s\n", Network::adrToStringwPort(from), c);
 
 	// challenge from the server we are connecting to
 	if (!Q_stricmp(c, "challengeResponse"))
@@ -2652,7 +2652,7 @@ void CL_ConnectionlessPacket( netadr_t from, Message *msg ) {
 	
 		if (clc.state != CA_CONNECTING)
 		{
-			Com_DPrintf("Unwanted challenge response received. Ignored.\n");
+			Common::dPrintf("Unwanted challenge response received. Ignored.\n");
 			return;
 		}
 		
@@ -2674,14 +2674,14 @@ void CL_ConnectionlessPacket( netadr_t from, Message *msg ) {
 					// Fall back to idq3 protocol.
 					clc.compat = true;
 
-					Com_Printf(S_COLOR_YELLOW "Warning: Server reports protocol version %d, "
+					Common::printf(S_COLOR_YELLOW "Warning: Server reports protocol version %d, "
 						   "we have %d. Trying legacy protocol %d.\n",
 						   ver, com_protocol->integer, com_legacyprotocol->integer);
 				}
 				else
 #endif
 				{
-					Com_Printf(S_COLOR_YELLOW "Warning: Server reports protocol version %d, we have %d. "
+					Common::printf(S_COLOR_YELLOW "Warning: Server reports protocol version %d, we have %d. "
 						   "Trying anyways.\n", ver, com_protocol->integer);
 				}
 			}
@@ -2700,7 +2700,7 @@ void CL_ConnectionlessPacket( netadr_t from, Message *msg ) {
 			
 				if(!*c || challenge != clc.challenge)
 				{
-					Com_DPrintf("Challenge response received from unexpected source. Ignored.\n");
+					Common::dPrintf("Challenge response received from unexpected source. Ignored.\n");
 					return;
 				}
 			}
@@ -2710,7 +2710,7 @@ void CL_ConnectionlessPacket( netadr_t from, Message *msg ) {
 		{
 			if(!*c || challenge != clc.challenge)
 			{
-				Com_Printf("Bad challenge for challengeResponse. Ignored.\n");
+				Common::printf("Bad challenge for challengeResponse. Ignored.\n");
 				return;
 			}
 		}
@@ -2724,22 +2724,22 @@ void CL_ConnectionlessPacket( netadr_t from, Message *msg ) {
 		// take this address as the new server address.  This allows
 		// a server proxy to hand off connections to multiple servers
 		clc.serverAddress = from;
-		Com_DPrintf ("challengeResponse: %d\n", clc.challenge);
+		Common::dPrintf ("challengeResponse: %d\n", clc.challenge);
 		return;
 	}
 
 	// server connection
 	if ( !Q_stricmp(c, "connectResponse") ) {
 		if ( clc.state >= CA_CONNECTED ) {
-			Com_Printf ("Dup connect received. Ignored.\n");
+			Common::printf ("Dup connect received. Ignored.\n");
 			return;
 		}
 		if ( clc.state != CA_CHALLENGING ) {
-			Com_Printf ("connectResponse packet while not connecting. Ignored.\n");
+			Common::printf ("connectResponse packet while not connecting. Ignored.\n");
 			return;
 		}
 		if ( !Network::compareAdr( from, clc.serverAddress ) ) {
-			Com_Printf( "connectResponse from wrong address. Ignored.\n" );
+			Common::printf( "connectResponse from wrong address. Ignored.\n" );
 			return;
 		}
 
@@ -2753,13 +2753,13 @@ void CL_ConnectionlessPacket( netadr_t from, Message *msg ) {
 				challenge = atoi(c);
 			else
 			{
-				Com_Printf("Bad connectResponse received. Ignored.\n");
+				Common::printf("Bad connectResponse received. Ignored.\n");
 				return;
 			}
 			
 			if(challenge != clc.challenge)
 			{
-				Com_Printf("ConnectResponse with bad challenge received. Ignored.\n");
+				Common::printf("ConnectResponse with bad challenge received. Ignored.\n");
 				return;
 			}
 		}
@@ -2815,7 +2815,7 @@ void CL_ConnectionlessPacket( netadr_t from, Message *msg ) {
 			s = msg->readString();
 
 			Q_strncpyz( clc.serverMessage, s, sizeof( clc.serverMessage ) );
-			Com_Printf( "%s", s );
+			Common::printf( "%s", s );
 		}
 		return;
 	}
@@ -2832,7 +2832,7 @@ void CL_ConnectionlessPacket( netadr_t from, Message *msg ) {
 		return;
 	}
 
-	Com_DPrintf ("Unknown connectionless packet command.\n");
+	Common::dPrintf ("Unknown connectionless packet command.\n");
 }
 
 
@@ -2858,7 +2858,7 @@ void CL_PacketEvent( netadr_t from, Message *msg ) {
 	}
 
 	if ( msg->cursize < 4 ) {
-		Com_Printf ("%s: Runt packet\n", Network::adrToStringwPort( from ));
+		Common::printf ("%s: Runt packet\n", Network::adrToStringwPort( from ));
 		return;
 	}
 
@@ -2866,7 +2866,7 @@ void CL_PacketEvent( netadr_t from, Message *msg ) {
 	// packet from server
 	//
 	if ( !Network::compareAdr( from, clc.netchan.remoteAddress ) ) {
-		Com_DPrintf ("%s:sequenced packet without connection\n"
+		Common::dPrintf ("%s:sequenced packet without connection\n"
 			, Network::adrToStringwPort( from ) );
 		// FIXME: send a client disconnect?
 		return;
@@ -2910,7 +2910,7 @@ void CL_CheckTimeout( ) {
 		&& clc.state >= CA_CONNECTED && clc.state != CA_CINEMATIC
 	    && cls.realtime - clc.lastPacketTime > cl_timeout->value*1000) {
 		if (++cl.timeoutcount > 5) {	// timeoutcount saves debugger
-			Com_Printf ("\nServer connection timed out.\n");
+			Common::printf ("\nServer connection timed out.\n");
 			CL_Disconnect( true );
 			return;
 		}
@@ -3038,7 +3038,7 @@ void CL_Frame ( int msec ) {
 			char		mapName[ MAX_QPATH ];
 			char		serverName[ MAX_OSPATH ];
 
-			Com_RealTime( &now );
+			Common::realTime( &now );
 			nowString = va( "%04d%02d%02d%02d%02d%02d",
 					1900 + now.tm_year,
 					1 + now.tm_mon,
@@ -3136,13 +3136,13 @@ static Q_PRINTF_FUNC(2, 3) void QDECL CL_RefPrintf( int print_level, const char 
 	va_end (argptr);
 
 	if ( print_level == PRINT_ALL ) {
-		Com_Printf ("%s", msg);
+		Common::printf ("%s", msg);
 	} else if ( print_level == PRINT_WARNING ) {
-		Com_Printf (S_COLOR_YELLOW "%s", msg);		// yellow
+		Common::printf (S_COLOR_YELLOW "%s", msg);		// yellow
 	} else if ( print_level == PRINT_ERROR ) {
-		Com_Printf (S_COLOR_RED "%s", msg);			// red
+		Common::printf (S_COLOR_RED "%s", msg);			// red
 	} else if ( print_level == PRINT_DEVELOPER ) {
-		Com_DPrintf (S_COLOR_RED "%s", msg);		// red - developer only
+		Common::dPrintf (S_COLOR_RED "%s", msg);		// red - developer only
 	}
 }
 
@@ -3257,7 +3257,7 @@ void CL_InitRef( ) {
 	char			dllName[MAX_OSPATH];
 #endif
 
-	Com_Printf( "----- Initializing Renderer ----\n" );
+	Common::printf( "----- Initializing Renderer ----\n" );
 
 #ifdef USE_RENDERER_DLOPEN
 	cl_renderer = CvarSystem::get("cl_renderer", "opengl2", CVAR_ARCHIVE | CVAR_LATCH);
@@ -3266,7 +3266,7 @@ void CL_InitRef( ) {
 
 	if(!(rendererLib = Sys_LoadDll(dllName, false)) && strcmp(cl_renderer->string, cl_renderer->resetString))
 	{
-		Com_Printf("failed:\n\"%s\"\n", Sys_LibraryError());
+		Common::printf("failed:\n\"%s\"\n", Sys_LibraryError());
 		CvarSystem::forceReset("cl_renderer");
 
 		Com_sprintf(dllName, sizeof(dllName), "renderer_%s" DLL_EXT, cl_renderer->resetString);
@@ -3275,14 +3275,14 @@ void CL_InitRef( ) {
 
 	if(!rendererLib)
 	{
-		Com_Printf("failed:\n\"%s\"\n", Sys_LibraryError());
-		Com_Error(ERR_FATAL, "Failed to load renderer");
+		Common::printf("failed:\n\"%s\"\n", Sys_LibraryError());
+		Common::error(ERR_FATAL, "Failed to load renderer");
 	}
 
 	GetRefAPI = reinterpret_cast<GetRefAPI_t>(Sys_LoadFunction(rendererLib, "GetRefAPI"));
 	if(!GetRefAPI)
 	{
-		Com_Error(ERR_FATAL, "Can't load symbol GetRefAPI: '%s'",  Sys_LibraryError());
+		Common::error(ERR_FATAL, "Can't load symbol GetRefAPI: '%s'",  Sys_LibraryError());
 	}
 #endif
 
@@ -3292,7 +3292,7 @@ void CL_InitRef( ) {
 	ri.Cmd_Argv = CommandSystem::argv;
 	ri.Cmd_ExecuteText = CommandBuffer::executeText;
 	ri.Printf = CL_RefPrintf;
-	ri.Error = Com_Error;
+	ri.Error = Common::error;
 	ri.Milliseconds = CL_ScaledMilliseconds;
 	ri.Malloc = CL_RefMalloc;
 	ri.Free = Z_Free;
@@ -3346,10 +3346,10 @@ void CL_InitRef( ) {
 	hA3Dg_ExportRenderGeom (ret);
 #endif
 
-	Com_Printf( "-------------------------------\n");
+	Common::printf( "-------------------------------\n");
 
 	if ( !ret ) {
-		Com_Error (ERR_FATAL, "Couldn't initialize refresh" );
+		Common::error (ERR_FATAL, "Couldn't initialize refresh" );
 	}
 
 	refExport = *ret;
@@ -3372,7 +3372,7 @@ void CL_SetModel_f( ) {
 		CvarSystem::set( "headmodel", arg );
 	} else {
 		CvarSystem::variableStringBuffer( "model", name, sizeof(name) );
-		Com_Printf("model is set to %s\n", name);
+		Common::printf("model is set to %s\n", name);
 	}
 }
 
@@ -3395,7 +3395,7 @@ void CL_Video_f( )
 
   if( !clc.demoplaying )
   {
-    Com_Printf( "The video command can only be used when playing back demos\n" );
+    Common::printf( "The video command can only be used when playing back demos\n" );
     return;
   }
 
@@ -3430,7 +3430,7 @@ void CL_Video_f( )
 
     if( i > 9999 )
     {
-      Com_Printf( S_COLOR_RED "ERROR: no free file names to create video\n" );
+      Common::printf( S_COLOR_RED "ERROR: no free file names to create video\n" );
       return;
     }
   }
@@ -3465,27 +3465,27 @@ static void CL_GenerateQKey()
 	len = FileSystem::baseDir_FOpenFileRead( QKEY_FILE, &f );
 	FileSystem::fCloseFile( f );
 	if( len == QKEY_SIZE ) {
-		Com_Printf( "QKEY found.\n" );
+		Common::printf( "QKEY found.\n" );
 		return;
 	}
 	else {
 		if( len > 0 ) {
-			Com_Printf( "QKEY file size != %d, regenerating\n",
+			Common::printf( "QKEY file size != %d, regenerating\n",
 				QKEY_SIZE );
 		}
 
-		Com_Printf( "QKEY building random string\n" );
+		Common::printf( "QKEY building random string\n" );
 		Com_RandomBytes( buff, sizeof(buff) );
 
 		f = FileSystem::baseDir_FOpenFileWrite_HomeState( QKEY_FILE );
 		if( !f ) {
-			Com_Printf( "QKEY could not open %s for write\n",
+			Common::printf( "QKEY could not open %s for write\n",
 				QKEY_FILE );
 			return;
 		}
 		FileSystem::write( buff, sizeof(buff), f );
 		FileSystem::fCloseFile( f );
-		Com_Printf( "QKEY generated\n" );
+		Common::printf( "QKEY generated\n" );
 	}
 } 
 
@@ -3500,13 +3500,13 @@ void CL_Sayto_f( ) {
 	char		*p;
 
 	if ( CommandSystem::argc() < 3 ) {
-		Com_Printf ("sayto <player name> <text>\n");
+		Common::printf ("sayto <player name> <text>\n");
 		return;
 	}
 
 	rawname = CommandSystem::argv(1);
 
-	Com_FieldStringToPlayerName( name, MAX_NAME_LENGTH, rawname );
+	Common::fieldStringToPlayerName( name, MAX_NAME_LENGTH, rawname );
 
 	info = cl.gameState.stringData + cl.gameState.stringOffsets[CS_SERVERINFO];
 	count = atoi( Info::valueForKey( info, "sv_maxclients" ) );
@@ -3525,7 +3525,7 @@ void CL_Sayto_f( ) {
 	}
 	if( clientNum <= -1 )
 	{
-		Com_Printf ("No such player name: %s.\n", name);
+		Common::printf ("No such player name: %s.\n", name);
 		return;
 	}
 
@@ -3545,7 +3545,7 @@ CL_Init
 ====================
 */
 void CL_Init( ) {
-	Com_Printf( "----- Client Initialization -----\n" );
+	Common::printf( "----- Client Initialization -----\n" );
 
 	Console::init ();
 
@@ -3706,7 +3706,7 @@ void CL_Init( ) {
 
 #ifdef USE_HTTP
 	if(!CL_HTTP_Init()) {
-		Com_Printf("WARNING: couldn't initialize HTTP download support\n");
+		Common::printf("WARNING: couldn't initialize HTTP download support\n");
 	}
 #endif
 
@@ -3759,7 +3759,7 @@ void CL_Init( ) {
 	CvarSystem::get( "cl_guid", "", CVAR_USERINFO | CVAR_ROM );
 	CL_UpdateGUID( nullptr, 0 );
 
-	Com_Printf( "----- Client Initialization Complete -----\n" );
+	Common::printf( "----- Client Initialization Complete -----\n" );
 }
 
 
@@ -3777,10 +3777,10 @@ void CL_Shutdown(const char *finalmsg, bool disconnect, bool quit)
 	if(!(com_cl_running && com_cl_running->integer))
 		return;
 	
-	Com_Printf( "----- Client Shutdown (%s) -----\n", finalmsg );
+	Common::printf( "----- Client Shutdown (%s) -----\n", finalmsg );
 
 	if ( recursive ) {
-		Com_Printf( "WARNING: Recursive shutdown\n" );
+		Common::printf( "WARNING: Recursive shutdown\n" );
 		return;
 	}
 	recursive = true;
@@ -3831,7 +3831,7 @@ void CL_Shutdown(const char *finalmsg, bool disconnect, bool quit)
 	Com_Memset( &cls, 0, sizeof( cls ) );
 	Key_SetCatcher( 0 );
 
-	Com_Printf( "-----------------------\n" );
+	Common::printf( "-----------------------\n" );
 
 }
 
@@ -3906,7 +3906,7 @@ void CL_ServerInfoPacket( netadr_t from, Message *msg ) {
 
 	if (gameMismatch)
 	{
-		Com_DPrintf( "Game mismatch in info packet: %s\n", infoString );
+		Common::dPrintf( "Game mismatch in info packet: %s\n", infoString );
 		return;
 	}
 
@@ -3919,7 +3919,7 @@ void CL_ServerInfoPacket( netadr_t from, Message *msg ) {
 #endif
 	  )
 	{
-		Com_DPrintf( "Different protocol info packet: %s\n", infoString );
+		Common::dPrintf( "Different protocol info packet: %s\n", infoString );
 		return;
 	}
 
@@ -3930,7 +3930,7 @@ void CL_ServerInfoPacket( netadr_t from, Message *msg ) {
 		{
 			// calc ping time
 			cl_pinglist[i].time = System::milliseconds() - cl_pinglist[i].start;
-			Com_DPrintf( "ping time %dms from %s\n", cl_pinglist[i].time, Network::adrToString( from ) );
+			Common::dPrintf( "ping time %dms from %s\n", cl_pinglist[i].time, Network::adrToString( from ) );
 
 			// save of info
 			Q_strncpyz( cl_pinglist[i].info, infoString, sizeof( cl_pinglist[i].info ) );
@@ -3975,7 +3975,7 @@ void CL_ServerInfoPacket( netadr_t from, Message *msg ) {
 	}
 
 	if ( i == MAX_OTHER_SERVERS ) {
-		Com_DPrintf( "MAX_OTHER_SERVERS hit, dropping infoResponse\n" );
+		Common::dPrintf( "MAX_OTHER_SERVERS hit, dropping infoResponse\n" );
 		return;
 	}
 
@@ -3988,7 +3988,7 @@ void CL_ServerInfoPacket( netadr_t from, Message *msg ) {
 		if (info[strlen(info)-1] != '\n') {
 			Q_strcat(info, sizeof(info), "\n");
 		}
-		Com_Printf( "%s: %s", Network::adrToStringwPort( from ), info );
+		Common::printf( "%s: %s", Network::adrToStringwPort( from ), info );
 	}
 }
 
@@ -4060,12 +4060,12 @@ int CL_ServerStatus( const char *serverAddress, char *serverStatusString, int ma
 			return true;
 		}
 		// resend the request regularly
-		else if ( serverStatus->startTime < Com_Milliseconds() - cl_serverStatusResendTime->integer ) {
+		else if ( serverStatus->startTime < Common::milliseconds() - cl_serverStatusResendTime->integer ) {
 			serverStatus->print = false;
 			serverStatus->pending = true;
 			serverStatus->retrieved = false;
 			serverStatus->time = 0;
-			serverStatus->startTime = Com_Milliseconds();
+			serverStatus->startTime = Common::milliseconds();
 			Network::outOfBandPrint( NS_CLIENT, to, "getstatus" );
 			return false;
 		}
@@ -4076,7 +4076,7 @@ int CL_ServerStatus( const char *serverAddress, char *serverStatusString, int ma
 		serverStatus->print = false;
 		serverStatus->pending = true;
 		serverStatus->retrieved = false;
-		serverStatus->startTime = Com_Milliseconds();
+		serverStatus->startTime = Common::milliseconds();
 		serverStatus->time = 0;
 		Network::outOfBandPrint( NS_CLIENT, to, "getstatus" );
 		return false;
@@ -4114,7 +4114,7 @@ void CL_ServerStatusResponse( netadr_t from, Message *msg ) {
 	Com_sprintf(&serverStatus->string[len], sizeof(serverStatus->string)-len, "%s", s);
 
 	if (serverStatus->print) {
-		Com_Printf("Server settings:\n");
+		Common::printf("Server settings:\n");
 		// print cvars
 		while (*s) {
 			for (i = 0; i < 2 && *s; i++) {
@@ -4132,10 +4132,10 @@ void CL_ServerStatusResponse( netadr_t from, Message *msg ) {
 				}
 				info[l] = '\0';
 				if (i) {
-					Com_Printf("%s\n", info);
+					Common::printf("%s\n", info);
 				}
 				else {
-					Com_Printf("%-24s", info);
+					Common::printf("%-24s", info);
 				}
 			}
 		}
@@ -4145,8 +4145,8 @@ void CL_ServerStatusResponse( netadr_t from, Message *msg ) {
 	Com_sprintf(&serverStatus->string[len], sizeof(serverStatus->string)-len, "\\");
 
 	if (serverStatus->print) {
-		Com_Printf("\nPlayers:\n");
-		Com_Printf("num: score: ping: name:\n");
+		Common::printf("\nPlayers:\n");
+		Common::printf("num: score: ping: name:\n");
 	}
 	for (i = 0, s = msg->readStringLine(); *s; s = msg->readStringLine(), i++) {
 
@@ -4163,13 +4163,13 @@ void CL_ServerStatusResponse( netadr_t from, Message *msg ) {
 				s++;
 			else
 				s = "unknown";
-			Com_Printf("%-2d   %-3d    %-3d   %s\n", i, score, ping, s );
+			Common::printf("%-2d   %-3d    %-3d   %s\n", i, score, ping, s );
 		}
 	}
 	len = strlen(serverStatus->string);
 	Com_sprintf(&serverStatus->string[len], sizeof(serverStatus->string)-len, "\\");
 
-	serverStatus->time = Com_Milliseconds();
+	serverStatus->time = Common::milliseconds();
 	serverStatus->address = from;
 	serverStatus->pending = false;
 	if (serverStatus->print) {
@@ -4187,7 +4187,7 @@ void CL_LocalServers_f( ) {
 	int			i, j;
 	netadr_t	to;
 
-	Com_Printf( "Scanning for servers on the local network...\n");
+	Common::printf( "Scanning for servers on the local network...\n");
 
 	// reset the list, waiting for response
 	cls.numlocalservers = 0;
@@ -4237,7 +4237,7 @@ void CL_GlobalServers_f( ) {
 	
 	if ((count = CommandSystem::argc()) < 3 || (masterNum = atoi(CommandSystem::argv(1))) < 0 || masterNum > MAX_MASTER_SERVERS)
 	{
-		Com_Printf("usage: globalservers <master# 0-%d> <protocol> [keywords]\n", MAX_MASTER_SERVERS);
+		Common::printf("usage: globalservers <master# 0-%d> <protocol> [keywords]\n", MAX_MASTER_SERVERS);
 		return;	
 	}
 
@@ -4259,7 +4259,7 @@ void CL_GlobalServers_f( ) {
 		}
 
 		if ( !numAddress ) {
-			Com_Printf( "CL_GlobalServers_f: Error: No master server addresses.\n");
+			Common::printf( "CL_GlobalServers_f: Error: No master server addresses.\n");
 		}
 		return;
 	}
@@ -4269,7 +4269,7 @@ void CL_GlobalServers_f( ) {
 	
 	if(!*masteraddress)
 	{
-		Com_Printf( "CL_GlobalServers_f: Error: No master server address given.\n");
+		Common::printf( "CL_GlobalServers_f: Error: No master server address given.\n");
 		return;	
 	}
 
@@ -4280,13 +4280,13 @@ void CL_GlobalServers_f( ) {
 	
 	if(!i)
 	{
-		Com_Printf( "CL_GlobalServers_f: Error: could not resolve address of master %s\n", masteraddress);
+		Common::printf( "CL_GlobalServers_f: Error: could not resolve address of master %s\n", masteraddress);
 		return;	
 	}
 	else if(i == 2)
 		to.port = BigShort(PORT_MASTER);
 
-	Com_Printf("Requesting servers from %s (%s)...\n", masteraddress, Network::adrToStringwPort(to));
+	Common::printf("Requesting servers from %s (%s)...\n", masteraddress, Network::adrToStringwPort(to));
 
 	cls.numglobalservers = -1;
 	cls.pingUpdateSource = AS_GLOBAL;
@@ -4493,7 +4493,7 @@ void CL_Ping_f( ) {
 	argc = CommandSystem::argc();
 
 	if ( argc != 2 && argc != 3 ) {
-		Com_Printf( "usage: ping [-4|-6] server\n");
+		Common::printf( "usage: ping [-4|-6] server\n");
 		return;	
 	}
 	
@@ -4506,7 +4506,7 @@ void CL_Ping_f( ) {
 		else if(!strcmp(CommandSystem::argv(1), "-6"))
 			family = NA_IP6;
 		else
-			Com_Printf( "warning: only -4 or -6 as address type understood.\n");
+			Common::printf( "warning: only -4 or -6 as address type understood.\n");
 		
 		server = CommandSystem::argv(2);
 	}
@@ -4650,8 +4650,8 @@ void CL_ServerStatus_f() {
 	{
 		if (clc.state != CA_ACTIVE || clc.demoplaying)
 		{
-			Com_Printf ("Not connected to a server.\n");
-			Com_Printf( "usage: serverstatus [-4|-6] server\n");
+			Common::printf ("Not connected to a server.\n");
+			Common::printf( "usage: serverstatus [-4|-6] server\n");
 			return;
 		}
 
@@ -4671,7 +4671,7 @@ void CL_ServerStatus_f() {
 			else if(!strcmp(CommandSystem::argv(1), "-6"))
 				family = NA_IP6;
 			else
-				Com_Printf( "warning: only -4 or -6 as address type understood.\n");
+				Common::printf( "warning: only -4 or -6 as address type understood.\n");
 		
 			server = CommandSystem::argv(2);
 		}

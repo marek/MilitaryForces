@@ -90,7 +90,7 @@ void Message::beginReadingOOB() {
 void Message::copy( byte *data, int length, Message *src )
 {
 	if (length<src->cursize) {
-		Com_Error( ERR_DROP, "MSG_Copy: can't copy into a smaller Message buffer");
+		Common::error( ERR_DROP, "MSG_Copy: can't copy into a smaller Message buffer");
 	}
 	Com_Memcpy(this, src, sizeof(Message));
 	this->data = data;
@@ -118,7 +118,7 @@ void Message::writeBits( int value, int bits ) {
 	}
 
 	if ( bits == 0 || bits < -31 || bits > 32 ) {
-		Com_Error( ERR_DROP, "MSG_WriteBits: bad bits %i", bits );
+		Common::error( ERR_DROP, "MSG_WriteBits: bad bits %i", bits );
 	}
 
 	if ( bits < 0 ) {
@@ -146,7 +146,7 @@ void Message::writeBits( int value, int bits ) {
 			this->cursize += 4;
 			this->bit += 32;
 		} else {
-			Com_Error( ERR_DROP, "can't write %d bits", bits );
+			Common::error( ERR_DROP, "can't write %d bits", bits );
 		}
 	} else {
 		value &= (0xffffffff >> (32 - bits));
@@ -231,7 +231,7 @@ int Message::readBits( int bits ) {
 			this->bit += 32;
 		}
 		else
-			Com_Error(ERR_DROP, "can't read %d bits", bits);
+			Common::error(ERR_DROP, "can't read %d bits", bits);
 	} else {
 		nbits = 0;
 		if (bits&7) {
@@ -281,7 +281,7 @@ int Message::readBits( int bits ) {
 void Message::writeChar( int c ) {
 #ifdef PARANOID
 	if (c < -128 || c > 127)
-		Com_Error (ERR_FATAL, "MSG_WriteChar: range error");
+		Common::error (ERR_FATAL, "MSG_WriteChar: range error");
 #endif
 
 	this->writeBits( c, 8 );
@@ -290,7 +290,7 @@ void Message::writeChar( int c ) {
 void Message::writeByte( int c ) {
 #ifdef PARANOID
 	if (c < 0 || c > 255)
-		Com_Error (ERR_FATAL, "MSG_WriteByte: range error");
+		Common::error (ERR_FATAL, "MSG_WriteByte: range error");
 #endif
 
 	this->writeBits( c, 8 );
@@ -306,7 +306,7 @@ void Message::writeData( const void *data, int length ) {
 void Message::writeShort( int c ) {
 #ifdef PARANOID
 	if (c < ((short)0x8000) || c > (short)0x7fff)
-		Com_Error (ERR_FATAL, "MSG_WriteShort: range error");
+		Common::error (ERR_FATAL, "MSG_WriteShort: range error");
 #endif
 
 	this->writeBits( c, 16 );
@@ -331,7 +331,7 @@ void Message::writeString( const char *s ) {
 
 		l = strlen( s );
 		if ( l >= MAX_STRING_CHARS ) {
-			Com_Printf( "MSG_WriteString: MAX_STRING_CHARS" );
+			Common::printf( "MSG_WriteString: MAX_STRING_CHARS" );
 			this->writeData( "", 1);
 			return;
 		}
@@ -357,7 +357,7 @@ void Message::writeBigString( const char *s ) {
 
 		l = strlen( s );
 		if ( l >= BIG_INFO_STRING ) {
-			Com_Printf( "MSG_WriteString: BIG_INFO_STRING" );
+			Common::printf( "MSG_WriteString: BIG_INFO_STRING" );
 			this->writeData( "", 1);
 			return;
 		}
@@ -584,7 +584,7 @@ delta functions
 
 extern cvar_t *cl_shownet;
 
-#define	LOG(x) if( cl_shownet && cl_shownet->integer == 4 ) { Com_Printf("%s ", x ); };
+#define	LOG(x) if( cl_shownet && cl_shownet->integer == 4 ) { Common::printf("%s ", x ); };
 
 /*
 =============================================================================
@@ -747,7 +747,7 @@ void MSG_ReportChangeVectors_f( ) {
 	int i;
 	for(i=0;i<256;i++) {
 		if (pcount[i]) {
-			Com_Printf("%d used %d\n", i, pcount[i]);
+			Common::printf("%d used %d\n", i, pcount[i]);
 		}
 	}
 }
@@ -913,7 +913,7 @@ bool Message::writeEntity( struct entityState_s *from, struct entityState_s *to,
 	}
 
 	if ( to->number < 0 || to->number >= MAX_GENTITIES ) {
-		Com_Error (ERR_FATAL, "MSG_WriteDeltaEntity: Bad entity number: %i", to->number );
+		Common::error (ERR_FATAL, "MSG_WriteDeltaEntity: Bad entity number: %i", to->number );
 	}
 
 	lc = 0;
@@ -1057,7 +1057,7 @@ void Message::readDeltaEntity( entityState_t *from, entityState_t *to, int numbe
 	int			startBit, endBit;
 
 	if ( number < 0 || number >= MAX_GENTITIES) {
-		Com_Error( ERR_DROP, "Bad delta entity number: %i", number );
+		Common::error( ERR_DROP, "Bad delta entity number: %i", number );
 	}
 
 	if ( this->bit == 0 ) {
@@ -1071,7 +1071,7 @@ void Message::readDeltaEntity( entityState_t *from, entityState_t *to, int numbe
 		Com_Memset( to, 0, sizeof( *to ) );	
 		to->number = ENTITYNUM_WIRE_END;
 		if ( cl_shownet && ( cl_shownet->integer >= 2 || cl_shownet->integer == -1 ) ) {
-			Com_Printf( "%3i: #%-3i remove\n", this->readcount, number );
+			Common::printf( "%3i: #%-3i remove\n", this->readcount, number );
 		}
 		return;
 	}
@@ -1087,14 +1087,14 @@ void Message::readDeltaEntity( entityState_t *from, entityState_t *to, int numbe
 	lc = this->readByte();
 
 	if ( lc > numFields || lc < 0 ) {
-		Com_Error( ERR_DROP, "invalid entityState field count" );
+		Common::error( ERR_DROP, "invalid entityState field count" );
 	}
 
 	// shownet 2/3 will interleave with other printed info, -1 will
 	// just print the delta records`
 	if ( cl_shownet && ( cl_shownet->integer >= 2 || cl_shownet->integer == -1 ) ) {
 		print = 1;
-		Com_Printf( "%3i: #%-3i ", this->readcount, to->number );
+		Common::printf( "%3i: #%-3i ", this->readcount, to->number );
 	} else {
 		print = 0;
 	}
@@ -1122,7 +1122,7 @@ void Message::readDeltaEntity( entityState_t *from, entityState_t *to, int numbe
 								*reinterpret_cast<float *>(toF) = this->readBits( -NETF_ANG_BITS ) / 64.0f;
 							}
 							if ( print ) {
-								Com_Printf( "%s:%f ", field->name, *reinterpret_cast<float *>(toF) );
+								Common::printf( "%s:%f ", field->name, *reinterpret_cast<float *>(toF) );
 							}
 						} else {
 							// integral float
@@ -1131,14 +1131,14 @@ void Message::readDeltaEntity( entityState_t *from, entityState_t *to, int numbe
 							trunc -= FLOAT_INT_BIAS;
 							*reinterpret_cast<float *>(toF) = trunc; 
 							if ( print ) {
-								Com_Printf( "%s:%i ", field->name, trunc );
+								Common::printf( "%s:%i ", field->name, trunc );
 							}
 						}
 					} else {
 						// full floating point value
 						*toF = this->readBits( 32 );
 						if ( print ) {
-							Com_Printf( "%s:%f ", field->name, *reinterpret_cast<float *>(toF) );
+							Common::printf( "%s:%f ", field->name, *reinterpret_cast<float *>(toF) );
 						}
 					}
 				}
@@ -1149,7 +1149,7 @@ void Message::readDeltaEntity( entityState_t *from, entityState_t *to, int numbe
 					// integer
 					*toF = this->readBits( field->bits );
 					if ( print ) {
-						Com_Printf( "%s:%i ", field->name, *toF );
+						Common::printf( "%s:%i ", field->name, *toF );
 					}
 				}
 			}
@@ -1170,7 +1170,7 @@ void Message::readDeltaEntity( entityState_t *from, entityState_t *to, int numbe
 		} else {
 			endBit = ( this->readcount - 1 ) * 8 + this->bit - GENTITYNUM_BITS;
 		}
-		Com_Printf( " (%i bits)\n", endBit - startBit  );
+		Common::printf( " (%i bits)\n", endBit - startBit  );
 	}
 }
 
@@ -1449,7 +1449,7 @@ void Message::readDeltaPlayerstate( playerState_t *from, playerState_t *to ) {
 	// just print the delta records
 	if ( cl_shownet && ( cl_shownet->integer >= 2 || cl_shownet->integer == -2 ) ) {
 		print = 1;
-		Com_Printf( "%3i: playerstate ", this->readcount );
+		Common::printf( "%3i: playerstate ", this->readcount );
 	} else {
 		print = 0;
 	}
@@ -1458,7 +1458,7 @@ void Message::readDeltaPlayerstate( playerState_t *from, playerState_t *to ) {
 	lc = this->readByte();
 
 	if ( lc > numFields || lc < 0 ) {
-		Com_Error( ERR_DROP, "invalid playerState field count" );
+		Common::error( ERR_DROP, "invalid playerState field count" );
 	}
 
 	for ( i = 0, field = playerStateFields ; i < lc ; i++, field++ ) {
@@ -1478,20 +1478,20 @@ void Message::readDeltaPlayerstate( playerState_t *from, playerState_t *to ) {
 					trunc -= FLOAT_INT_BIAS;
 					*reinterpret_cast<float *>(toF) = trunc; 
 					if ( print ) {
-						Com_Printf( "%s:%i ", field->name, trunc );
+						Common::printf( "%s:%i ", field->name, trunc );
 					}
 				} else {
 					// full floating point value
 					*toF = this->readBits( 32 );
 					if ( print ) {
-						Com_Printf( "%s:%f ", field->name, *reinterpret_cast<float *>(toF) );
+						Common::printf( "%s:%f ", field->name, *reinterpret_cast<float *>(toF) );
 					}
 				}
 			} else {
 				// integer
 				*toF = this->readBits( field->bits );
 				if ( print ) {
-					Com_Printf( "%s:%i ", field->name, *toF );
+					Common::printf( "%s:%i ", field->name, *toF );
 				}
 			}
 		}
@@ -1569,7 +1569,7 @@ void Message::readDeltaPlayerstate( playerState_t *from, playerState_t *to ) {
 		} else {
 			endBit = ( this->readcount - 1 ) * 8 + this->bit - GENTITYNUM_BITS;
 		}
-		Com_Printf( " (%i bits)\n", endBit - startBit  );
+		Common::printf( " (%i bits)\n", endBit - startBit  );
 	}
 }
 
@@ -1861,7 +1861,7 @@ void MSG_HuffStats_f( ) {
 		Q_strcat( out, sizeof( out ), va( "%d,\t\t\t// %d\n", msg_huffCounts[i], i ) );
 	}
 	FileSystem::writeFile( "huffstats.txt", out, strlen( out ) );
-	Com_Printf( "wrote huffstats.txt\n" );
+	Common::printf( "wrote huffstats.txt\n" );
 }
 
 void MSG_InitHuffStats( ) {

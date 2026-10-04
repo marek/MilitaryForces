@@ -878,7 +878,7 @@ void Cmd_FollowCycle_f( GameEntity *ent, int dir )
 		SetTeam( ent, "spectator" );
 
 	if( dir != 1 && dir != -1 ) 
-		Com_Error( ERR_DROP, "Cmd_FollowCycle_f: bad dir %i", dir );
+		Common::error( ERR_DROP, "Cmd_FollowCycle_f: bad dir %i", dir );
 
 	int clientnum = ent->client_->sess_.spectatorClient_;
 	int original = clientnum;
@@ -993,7 +993,7 @@ void G_Say( GameEntity *ent, GameEntity *target, int mode, const char *chatText 
 
 	// echo the text to the console
 	if( g_dedicated.integer ) 
-		Com_Printf( "%s%s\n", name, text);
+		Common::printf( "%s%s\n", name, text);
 
 	// send it to all the apropriate clients
 	for( int j = 1; j <= theLevel.maxclients_; j++ ) 

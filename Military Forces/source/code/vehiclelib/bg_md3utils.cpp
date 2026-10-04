@@ -19,7 +19,7 @@ Md3Utils::getModelDimensions( std::string const& filename,
 	if( FileSystem::fOpenFileByMode(filename.c_str(), &file, FS_READ) >= 0 ) 
 		 success = getModelDimensions( file, mins, maxs, checkFrame );
 	else
-		Com_Error(ERR_FATAL, "Unable to open file %s\n", filename.c_str() );
+		Common::error(ERR_FATAL, "Unable to open file %s\n", filename.c_str() );
 
 	FileSystem::fCloseFile(file);
 
@@ -34,14 +34,14 @@ Md3Utils::getModelDimensions( fileHandle_t const& file,
 {
 	if( !file )
 	{
-		Com_Error(ERR_FATAL, "Invalid filehandle passed to Md3Utils::getModelDimensions\n" );
+		Common::error(ERR_FATAL, "Invalid filehandle passed to Md3Utils::getModelDimensions\n" );
 		return false;
 	}
 
 	// put it back to beginning of file (just in case)
 	if( FileSystem::seek( file, 0, FS_SEEK_SET ) != 0 )
 	{
-		Com_Error(ERR_FATAL, "Unable to set file pointer in file!\n" );
+		Common::error(ERR_FATAL, "Unable to set file pointer in file!\n" );
 		return false;
 	}
 
@@ -56,7 +56,7 @@ Md3Utils::getModelDimensions( fileHandle_t const& file,
 
 	if( checkFrame >= number )
 	{
-		Com_Error(ERR_FATAL, "File only has %d frames, therefore unable to check frame %d\n", 
+		Common::error(ERR_FATAL, "File only has %d frames, therefore unable to check frame %d\n", 
 					number, checkFrame );
 		return false;
 	}
@@ -116,7 +116,7 @@ Md3Utils::getTagsContaining( std::string const& filename,
 	if( FileSystem::fOpenFileByMode(filename.c_str(), &file, FS_READ) >= 0 ) 
 		 found = getTagsContaining( file, str, tagList );
 	else
-		Com_Error(ERR_FATAL, "Unable to open file %s\n", filename.c_str() );
+		Common::error(ERR_FATAL, "Unable to open file %s\n", filename.c_str() );
 
 	FileSystem::fCloseFile(file);
 
@@ -133,14 +133,14 @@ Md3Utils::getTagsContaining( fileHandle_t const& file,
 
 	if( !file )
 	{
-		Com_Error(ERR_FATAL, "Invalid filehandle passed to Md3Utils::getTagsContaining\n" );
+		Common::error(ERR_FATAL, "Invalid filehandle passed to Md3Utils::getTagsContaining\n" );
 		return 0;
 	}
 
 	// put it back to beginning of file (just in case)
 	if( FileSystem::seek( file, 0, FS_SEEK_SET ) != 0 )
 	{
-		Com_Error(ERR_FATAL, "Unable to set file pointer in file!\n" );
+		Common::error(ERR_FATAL, "Unable to set file pointer in file!\n" );
 		return false;
 	}
 
@@ -178,7 +178,7 @@ Md3Utils::getTagInfo( std::string const& filename,
 	if( FileSystem::fOpenFileByMode(filename.c_str(), &file, FS_READ) >= 0 ) 
 		 success = getTagInfo( file, tagname, tag );
 	else
-		Com_Error(ERR_FATAL, "Unable to open file %s\n", filename.c_str() );
+		Common::error(ERR_FATAL, "Unable to open file %s\n", filename.c_str() );
 
 	FileSystem::fCloseFile(file);
 
@@ -192,14 +192,14 @@ Md3Utils::getTagInfo( fileHandle_t const& file,
 {
 	if( !file )
 	{
-		Com_Error(ERR_FATAL, "Invalid filehandle passed to Md3Utils::getTagInfo\n" );
+		Common::error(ERR_FATAL, "Invalid filehandle passed to Md3Utils::getTagInfo\n" );
 		return false;
 	}
 
 	// put it back to beginning of file (just in case)
 	if( FileSystem::seek( file, 0, FS_SEEK_SET ) != 0 )
 	{
-		Com_Error(ERR_FATAL, "Unable to set file pointer in file!\n" );
+		Common::error(ERR_FATAL, "Unable to set file pointer in file!\n" );
 		return false;
 	}
 
@@ -237,7 +237,7 @@ Md3Utils::getNumberOfFrames( std::string const& fileName )
 		return frames;
 	}
 
-	Com_Printf( "Unable to open file %s\n", fileName.c_str() );
+	Common::printf( "Unable to open file %s\n", fileName.c_str() );
 
 	return 0;
 }
@@ -247,14 +247,14 @@ Md3Utils::getNumberOfFrames( fileHandle_t const& file )
 {
 	if( !file )
 	{
-		Com_Error(ERR_FATAL, "Invalid filehandle passed to Md3Utils::getNumberOfFrames\n" );
+		Common::error(ERR_FATAL, "Invalid filehandle passed to Md3Utils::getNumberOfFrames\n" );
 		return false;
 	}
 
 	// put it back to beginning of file (just in case)
 	if( FileSystem::seek( file, 0, FS_SEEK_SET ) != 0 )
 	{
-		Com_Error(ERR_FATAL, "Unable to set file pointer in file!\n" );
+		Common::error(ERR_FATAL, "Unable to set file pointer in file!\n" );
 		return false;
 	}
 

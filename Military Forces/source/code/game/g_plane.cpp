@@ -32,7 +32,7 @@ Entity_Plane::checkForTakeoffOrLanding()
 		{
 			vec3_t angles;
 			vectoangles( trace.plane.normal, angles );
-//			Com_Printf( "maxs = %.1f, trace = %.1f\n", g_entities[trace.entityNum].r.maxs[2], trace.endpos[2]); 
+//			Common::printf( "maxs = %.1f, trace = %.1f\n", g_entities[trace.entityNum].r.maxs[2], trace.endpos[2]); 
 //			self->client->ps.origin[2] = g_entities[trace.entityNum].r.maxs[2] + 
 //				fabs(self->r.mins[2]) + ( (self->client->ps.powerups[PW_ONOFF]&OO_GEAR) ?
 //				self->gearheight : 0 );

@@ -341,7 +341,7 @@ void CM_FloodArea_r( int areaNum, int floodnum) {
 	if ( area->floodvalid == cm.floodvalid ) {
 		if (area->floodnum == floodnum)
 			return;
-		Com_Error (ERR_DROP, "FloodArea_r: reflooded");
+		Common::error (ERR_DROP, "FloodArea_r: reflooded");
 	}
 
 	area->floodnum = floodnum;
@@ -392,7 +392,7 @@ void	CollisionModel::adjustAreaPortalState( int area1, int area2, bool open ) {
 	}
 
 	if ( area1 >= cm.numAreas || area2 >= cm.numAreas ) {
-		Com_Error (ERR_DROP, "CM_ChangeAreaPortalState: bad area number");
+		Common::error (ERR_DROP, "CM_ChangeAreaPortalState: bad area number");
 	}
 
 	if ( open ) {
@@ -402,7 +402,7 @@ void	CollisionModel::adjustAreaPortalState( int area1, int area2, bool open ) {
 		cm.areaPortals[ area1 * cm.numAreas + area2 ]--;
 		cm.areaPortals[ area2 * cm.numAreas + area1 ]--;
 		if ( cm.areaPortals[ area2 * cm.numAreas + area1 ] < 0 ) {
-			Com_Error (ERR_DROP, "CollisionModel::adjustAreaPortalState: negative reference count");
+			Common::error (ERR_DROP, "CollisionModel::adjustAreaPortalState: negative reference count");
 		}
 	}
 
@@ -427,7 +427,7 @@ bool	CollisionModel::areasConnected( int area1, int area2 ) {
 	}
 
 	if (area1 >= cm.numAreas || area2 >= cm.numAreas) {
-		Com_Error (ERR_DROP, "area >= cm.numAreas");
+		Common::error (ERR_DROP, "area >= cm.numAreas");
 	}
 
 	if (cm.areas[area1].floodnum == cm.areas[area2].floodnum) {

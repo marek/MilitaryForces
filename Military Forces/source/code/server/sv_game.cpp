@@ -33,12 +33,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 //void SV_GameError( const char *string ) 
 //{
-//	Com_Error( ERR_DROP, "%s", string );
+//	Common::error( ERR_DROP, "%s", string );
 //}
 
 //void SV_GamePrint( const char *string ) 
 //{
-//	Com_Printf( "%s", string );
+//	Common::printf( "%s", string );
 //}
 
  //these functions must be used instead of pointer arithmetic, because
@@ -74,7 +74,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //{
 //	if ( !s || !r || s->number < 0 || s->number >= MAX_GENTITIES ) 
 //	{
-//		Com_Error( ERR_DROP, "SV_SvEntityForGentity: bad gEnt" );
+//		Common::error( ERR_DROP, "SV_SvEntityForGentity: bad gEnt" );
 //	}
 //	return &sv.svEntities[ s->number ];
 //}
@@ -139,10 +139,10 @@ void SV_SetBrushModel( EntityBase* gameEnt, const char *name )
 	vec3_t			mins, maxs;
 
 	if (!name) 
-		Com_Error( ERR_DROP, "SV_SetBrushModel: NULL" );
+		Common::error( ERR_DROP, "SV_SetBrushModel: NULL" );
 
 	if (name[0] != '*') 
-		Com_Error( ERR_DROP, "SV_SetBrushModel: %s isn't a brush model", name );
+		Common::error( ERR_DROP, "SV_SetBrushModel: %s isn't a brush model", name );
 
 	gameEnt->s.modelindex = atoi( name + 1 );
 
@@ -268,7 +268,7 @@ SV_GetServerinfo
 void SV_GetServerinfo( char *buffer, int bufferSize ) 
 {
 	if ( bufferSize < 1 ) {
-		Com_Error( ERR_DROP, "SV_GetServerinfo: bufferSize == %i", bufferSize );
+		Common::error( ERR_DROP, "SV_GetServerinfo: bufferSize == %i", bufferSize );
 	}
 	Q_strncpyz( buffer, CvarSystem::infoString( CVAR_SERVERINFO ), bufferSize );
 }
@@ -300,7 +300,7 @@ void SV_GetUsercmd( int clientNum, usercmd_t *cmd )
 {
 	if ( clientNum < 1 || clientNum > sv_maxclients->integer || !theSVS.svClients_.at(clientNum) ) 
 	{
-		Com_Error( ERR_DROP, "SV_GetUsercmd: bad clientNum:%i", clientNum );
+		Common::error( ERR_DROP, "SV_GetUsercmd: bad clientNum:%i", clientNum );
 	}
 	*cmd = theSVS.svClients_.at(clientNum)->lastUsercmd_;
 }
@@ -343,8 +343,8 @@ void SV_InitGame()
 	
 	// use the current msec count for a random seed
 	// init for this gamestate
-	//VM_Call( gvm, GAME_INIT, svs.time, Com_Milliseconds(), restart );
-	theSG.init( theSV.time_, Com_Milliseconds() );
+	//VM_Call( gvm, GAME_INIT, svs.time, Common::milliseconds(), restart );
+	theSG.init( theSV.time_, Common::milliseconds() );
 }
 
 

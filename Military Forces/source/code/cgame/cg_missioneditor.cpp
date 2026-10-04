@@ -1047,12 +1047,12 @@ static bool ME_LoadOverviewAndEntities( char *filename,
 	len = FileSystem::fOpenFileByMode( filename, &f, FS_READ );
 	if ( !f ) 
 	{
-		Com_Printf( S_COLOR_RED "file not found: %s\n", filename );
+		Common::printf( S_COLOR_RED "file not found: %s\n", filename );
 		return false;
 	}
 	if ( len >= MAX_MISSION_TEXT ) 
 	{
-		Com_Printf( S_COLOR_RED "file too large: %s is %i, max allowed is %i", filename, len, MAX_MISSION_TEXT );
+		Common::printf( S_COLOR_RED "file too large: %s is %i, max allowed is %i", filename, len, MAX_MISSION_TEXT );
 		FileSystem::fCloseFile( f );
 		return false;
 	}
@@ -1061,7 +1061,7 @@ static bool ME_LoadOverviewAndEntities( char *filename,
 	inbuffer[len] = 0;
 	FileSystem::fCloseFile( f );
 
-	Com_Printf( S_COLOR_GREEN "Successfully opened mission script: %s\n", filename );
+	Common::printf( S_COLOR_GREEN "Successfully opened mission script: %s\n", filename );
 
 	MF_ParseMissionScripts(inbuffer, overview, vehs, gis);
 
@@ -1087,7 +1087,7 @@ void ME_ImportScript( const char* scriptname )
 
 	if( !ME_LoadOverviewAndEntities(filename, &overview, vehicles, installations) )
 	{
-		Com_Printf( "Unable to load script\n" );
+		Common::printf( "Unable to load script\n" );
 		return;
 	}
 

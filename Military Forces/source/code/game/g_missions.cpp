@@ -60,12 +60,12 @@ static bool G_LoadOverviewAndEntities( char *filename,
 	len = FileSystem::fOpenFileByMode( filename, &f, FS_READ );
 	if ( !f )
 	{
-		Com_Printf( S_COLOR_RED "file not found: %s\n", filename );
+		Common::printf( S_COLOR_RED "file not found: %s\n", filename );
 		return false;
 	}
 	if ( len >= MAX_MISSION_TEXT )
 	{
-		Com_Printf( S_COLOR_RED "file too large: %s is %i, max allowed is %i\n", filename, len, MAX_MISSION_TEXT );
+		Common::printf( S_COLOR_RED "file too large: %s is %i, max allowed is %i\n", filename, len, MAX_MISSION_TEXT );
 		FileSystem::fCloseFile( f );
 		return false;
 	}
@@ -74,7 +74,7 @@ static bool G_LoadOverviewAndEntities( char *filename,
 	inbuffer[len] = 0;
 	FileSystem::fCloseFile( f );
 
-	Com_Printf( S_COLOR_GREEN "Successfully opened mission script: %s\n", filename );
+	Common::printf( S_COLOR_GREEN "Successfully opened mission script: %s\n", filename );
 
 	MF_ParseMissionScripts(inbuffer, overview, vehs, gis);
 
@@ -96,14 +96,14 @@ void G_LoadMissionScripts()
 
 	if( strlen(mf_mission.string) > 31 )
 	{
-		Com_Printf(S_COLOR_RED "Missionname in mf_mission too long -> no mission loaded\n");
+		Common::printf(S_COLOR_RED "Missionname in mf_mission too long -> no mission loaded\n");
 		return;
 	}
 	Q_strncpyz(missionname, mf_mission.string, 32);
 	if( !Q_stricmp(missionname, "") ||
 		!Q_stricmp(missionname, "none") )
 	{
-		Com_Printf("Not loading mission, as requested.\n");
+		Common::printf("Not loading mission, as requested.\n");
 		return;
 	}
 

@@ -276,7 +276,7 @@ SoundStream *S_OggOpus_CodecOpenStream(const char *filename)
 
 		S_CodecUtilClose(&stream);
 
-		Com_Printf("Only Ogg Opus files with one stream are support\n");
+		Common::printf("Only Ogg Opus files with one stream are support\n");
 		return nullptr;
 	}
 
@@ -286,7 +286,7 @@ SoundStream *S_OggOpus_CodecOpenStream(const char *filename)
 
 		S_CodecUtilClose(&stream);
 
-		Com_Printf("Only mono and stereo Ogg Opus files are supported\n");
+		Common::printf("Only mono and stereo Ogg Opus files are supported\n");
 		return nullptr;
 	}
 

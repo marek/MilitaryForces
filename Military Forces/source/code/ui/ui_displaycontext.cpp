@@ -85,7 +85,7 @@ UI_DisplayContext::startLocalSound( sfxHandle_t sfx, int channelNum )
 //void
 //UI_DisplayContext::Error( int level, const char *error, ... )
 //{
-//	Com_Error( level
+//	Common::error( level
 //}
 
 sfxHandle_t

@@ -222,7 +222,7 @@ GameEntity *SelectRandomFurthestSpawnPoint( vec3_t avoidPoint, vec3_t origin, ve
 	{
 		spot = G_Find( nullptr, FOFS(classname_), "info_player_deathmatch");
 		if( !spot )
-			Com_Error( ERR_DROP, "Couldn't find a spawn point" );
+			Common::error( ERR_DROP, "Couldn't find a spawn point" );
 		VectorCopy( spot->s.origin, origin );
 		origin[2] += 9;
 		VectorCopy( spot->s.angles, angles );

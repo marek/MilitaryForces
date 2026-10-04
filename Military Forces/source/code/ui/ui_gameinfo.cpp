@@ -41,13 +41,13 @@ int UI_ParseInfos( char *buf, int max, char *infos[] )
 		
 		if ( strcmp( token, "{" ) ) 
 		{
-			Com_Printf( "Missing { in info file\n" );
+			Common::printf( "Missing { in info file\n" );
 			break;
 		}
 
 		if ( count == max ) 
 		{
-			Com_Printf( "Max infos exceeded\n" );
+			Common::printf( "Max infos exceeded\n" );
 			break;
 		}
 
@@ -57,7 +57,7 @@ int UI_ParseInfos( char *buf, int max, char *infos[] )
 			token = COM_ParseExt( &buf, true );
 			if ( !token[0] ) 
 			{
-				Com_Printf( "Unexpected end of info file\n" );
+				Common::printf( "Unexpected end of info file\n" );
 				break;
 			}
 			if ( !strcmp( token, "}" ) ) 
@@ -95,11 +95,11 @@ static void UI_LoadArenasFromFile( char *filename ) {
 
 	len = FileSystem::fOpenFileByMode( filename, &f, FS_READ );
 	if ( !f ) {
-		Com_Printf( S_COLOR_RED "file not found: %s\n", filename );
+		Common::printf( S_COLOR_RED "file not found: %s\n", filename );
 		return;
 	}
 	if ( len >= MAX_ARENAS_TEXT ) {
-		Com_Printf( S_COLOR_RED "file too large: %s is %i, max allowed is %i", filename, len, MAX_ARENAS_TEXT );
+		Common::printf( S_COLOR_RED "file too large: %s is %i, max allowed is %i", filename, len, MAX_ARENAS_TEXT );
 		FileSystem::fCloseFile( f );
 		return;
 	}
@@ -159,9 +159,9 @@ void UI_LoadArenas( ) {
 		strcat(filename, dirptr);
 		UI_LoadArenasFromFile(filename);
 	}
-	Com_Printf( "%i arenas parsed\n", ui_numArenas );
+	Common::printf( "%i arenas parsed\n", ui_numArenas );
 	if (uiInfo.uiUtils.outOfMemory()) {
-		Com_Printf(S_COLOR_YELLOW"WARNING: not anough memory in pool to load all arenas\n");
+		Common::printf(S_COLOR_YELLOW"WARNING: not anough memory in pool to load all arenas\n");
 	}
 
 	for( n = 0; n < ui_numArenas; n++ )

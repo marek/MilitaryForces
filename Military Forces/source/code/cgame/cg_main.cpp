@@ -458,7 +458,7 @@ void QDECL CG_Printf( const char *msg, ... )
 	CG_Add_Console_Line( text );
 
 	// write the text into the console (only displayed if the cVar 'con_notifytime' is not -1)
-	Com_Printf( "%s", text );
+	Common::printf( "%s", text );
 }
 
 /*
@@ -510,7 +510,7 @@ static void CG_RegisterItemSounds( int itemNum ) {
 
 		len = s-start;
 		if (len >= MAX_QPATH || len < 5) {
-			Com_Error( ERR_DROP, "PrecacheItem: %s has bad precache string", 
+			Common::error( ERR_DROP, "PrecacheItem: %s has bad precache string", 
 				item->classname);
 			return;
 		}
@@ -1332,12 +1332,12 @@ void CG_ParseMenu(const char *menuFile) {
 		}
 
 		//if ( Q_stricmp( token, "{" ) ) {
-		//	Com_Printf( "Missing { in menu file\n" );
+		//	Common::printf( "Missing { in menu file\n" );
 		//	break;
 		//}
 
 		//if ( menuCount == MAX_MENUS ) {
-		//	Com_Printf( "Too many menus!\n" );
+		//	Common::printf( "Too many menus!\n" );
 		//	break;
 		//}
 
@@ -1408,15 +1408,15 @@ void CG_LoadMenus(const char *menuFile) {
 
 	len = FileSystem::fOpenFileByMode( menuFile, &f, FS_READ );
 	if ( !f ) {
-		Com_Error( ERR_DROP, S_COLOR_YELLOW "menu file not found: %s, using default\n", menuFile );
+		Common::error( ERR_DROP, S_COLOR_YELLOW "menu file not found: %s, using default\n", menuFile );
 		len = FileSystem::fOpenFileByMode( "ui/hud.txt", &f, FS_READ );
 		if (!f) {
-			Com_Error( ERR_DROP, S_COLOR_RED "default menu file not found: ui/hud.txt, unable to continue!\n", menuFile );
+			Common::error( ERR_DROP, S_COLOR_RED "default menu file not found: ui/hud.txt, unable to continue!\n", menuFile );
 		}
 	}
 
 	if ( len >= MAX_MENUDEFFILE ) {
-		Com_Error( ERR_DROP, S_COLOR_RED "menu file too large: %s is %i, max allowed is %i", menuFile, len, MAX_MENUDEFFILE );
+		Common::error( ERR_DROP, S_COLOR_RED "menu file too large: %s is %i, max allowed is %i", menuFile, len, MAX_MENUDEFFILE );
 		FileSystem::fCloseFile( f );
 		return;
 	}
@@ -1438,12 +1438,12 @@ void CG_LoadMenus(const char *menuFile) {
 		}
 
 		//if ( Q_stricmp( token, "{" ) ) {
-		//	Com_Printf( "Missing { in menu file\n" );
+		//	Common::printf( "Missing { in menu file\n" );
 		//	break;
 		//}
 
 		//if ( menuCount == MAX_MENUS ) {
-		//	Com_Printf( "Too many menus!\n" );
+		//	Common::printf( "Too many menus!\n" );
 		//	break;
 		//}
 
@@ -1808,7 +1808,7 @@ CG_ConfigString
 */
 const char *CG_ConfigString( int index ) {
 	if ( index < 0 || index >= MAX_CONFIGSTRINGS ) {
-		Com_Error( ERR_DROP, "CG_ConfigString: bad index: %i", index );
+		Common::error( ERR_DROP, "CG_ConfigString: bad index: %i", index );
 	}
 	return cgs.gameState.stringData + cgs.gameState.stringOffsets[ index ];
 }
@@ -1984,7 +1984,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	// check version
 	s = CG_ConfigString( CS_GAME_VERSION );
 	if ( strcmp( s, MF_VERSION ) ) {
-		Com_Error( ERR_DROP, "Client/Server game mismatch: %s/%s", MF_VERSION, s );
+		Common::error( ERR_DROP, "Client/Server game mismatch: %s/%s", MF_VERSION, s );
 	}
 
 	s = CG_ConfigString( CS_LEVEL_START_TIME );

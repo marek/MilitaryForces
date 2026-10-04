@@ -496,7 +496,7 @@ void SCR_DrawScreenField( stereoFrame_t stereoFrame ) {
 	if ( theUI.isInitialized() && !uiFullscreen ) {
 		switch( clc.state ) {
 		default:
-			Com_Error( ERR_FATAL, "SCR_DrawScreenField: bad clc.state" );
+			Common::error( ERR_FATAL, "SCR_DrawScreenField: bad clc.state" );
 			break;
 		case CA_CINEMATIC:
 			Screen::drawCinematic();
@@ -566,7 +566,7 @@ void Screen::updateScreen( ) {
 	}
 
 	if ( ++recursive > 2 ) {
-		Com_Error( ERR_FATAL, "Screen::updateScreen: recursively called" );
+		Common::error( ERR_FATAL, "Screen::updateScreen: recursively called" );
 	}
 	recursive = 1;
 

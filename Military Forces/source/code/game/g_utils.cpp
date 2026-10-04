@@ -89,7 +89,7 @@ int G_FindConfigstringIndex( char *name, int start, int max, bool create )
 		return 0;
 
 	if ( i == max ) 
-		Com_Error( ERR_DROP, "G_FindConfigstringIndex: overflow" );
+		Common::error( ERR_DROP, "G_FindConfigstringIndex: overflow" );
 
 	SV_SetConfigstring( start + i, name );
 
@@ -200,7 +200,7 @@ GameEntity* G_PickTarget( char *targetname )
 
 	if (!targetname)
 	{
-		Com_Printf("G_PickTarget called with NULL targetname\n");
+		Common::printf("G_PickTarget called with NULL targetname\n");
 		return nullptr;
 	}
 
@@ -216,7 +216,7 @@ GameEntity* G_PickTarget( char *targetname )
 
 	if (!num_choices)
 	{
-		Com_Printf("G_PickTarget: target %s not found\n", targetname);
+		Common::printf("G_PickTarget: target %s not found\n", targetname);
 		return nullptr;
 	}
 
@@ -257,7 +257,7 @@ void G_UseTargets( GameEntity *ent, GameEntity *activator )
 	{
 		if ( t == ent )
 		{
-			Com_Printf ("WARNING: Entity used itself.\n");
+			Common::printf ("WARNING: Entity used itself.\n");
 		} 
 		else
 		{
@@ -266,7 +266,7 @@ void G_UseTargets( GameEntity *ent, GameEntity *activator )
 		}
 		if ( !ent->inuse_ ) 
 		{
-			Com_Printf("entity was removed while using targets\n");
+			Common::printf("entity was removed while using targets\n");
 			return;
 		}
 	}
@@ -430,9 +430,9 @@ float vectoyaw( const vec3_t vec )
 //		for( i = 0; i < MAX_GENTITIES; i++ ) 
 //		{
 //			GameEntity* currEnt = theLevel.getEntity(i);
-//			Com_Printf("%4i: %s\n", i, currEnt->classname_);// g_entities[i].classname);
+//			Common::printf("%4i: %s\n", i, currEnt->classname_);// g_entities[i].classname);
 //		}
-//		Com_Error( ERR_DROP, "G_Spawn: no free entities" );
+//		Common::error( ERR_DROP, "G_Spawn: no free entities" );
 //	}
 //	
 //	// open up a New slot
@@ -608,7 +608,7 @@ void G_AddEventToQueue( GameEntity* ent, int event, int eventParm )
 
 	if( ent->eventQueue_[i].used_ ) 
 	{
-		Com_Printf( "Event queue full! Event lost!\n" );
+		Common::printf( "Event queue full! Event lost!\n" );
 		return;
 	}
 	ent->eventQueue_[i].event_ = event;
@@ -634,7 +634,7 @@ void G_AddEvent( GameEntity *ent, int event, int eventParm, bool addToQueue )
 
 	if( !event ) 
 	{
-		Com_Printf( "G_AddEvent: zero event added for entity %i\n", ent->s.number );
+		Common::printf( "G_AddEvent: zero event added for entity %i\n", ent->s.number );
 		return;
 	}
 
@@ -724,7 +724,7 @@ unsigned long G_GetGameset()
 	else 
 	{	
 		// default gameset
-		Com_Printf( "mf_gameset is not valid, defaulting 'modern'\n" );
+		Common::printf( "mf_gameset is not valid, defaulting 'modern'\n" );
 		CvarSystem::set("mf_gameset", "modern");
 		return MF_GAMESET_MODERN;
 	}

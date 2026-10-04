@@ -123,13 +123,13 @@ static void *GPA(char *str)
 	rv = Sys_LoadFunction(OpenALLib, str);
 	if(!rv)
 	{
-		Com_Printf( " Can't load symbol %s\n", str);
+		Common::printf( " Can't load symbol %s\n", str);
 		alinit_fail = true;
 		return nullptr;
 	}
 	else
 	{
-		Com_DPrintf( " Loaded symbol %s (%p)\n", str, rv);
+		Common::dPrintf( " Loaded symbol %s (%p)\n", str, rv);
         return rv;
 	}
 }
@@ -228,7 +228,7 @@ bool QAL_Init(const char *libname)
 	if(alinit_fail)
 	{
 		QAL_Shutdown();
-		Com_Printf( " One or more symbols not found\n");
+		Common::printf( " One or more symbols not found\n");
 		return false;
 	}
 

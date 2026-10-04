@@ -940,7 +940,6 @@ int LAN_CompareServers( int source, int sortKey, int sortDir, int s1, int s2 );
 int LAN_GetServerStatus( const char *serverAddress, char *serverStatus, int maxLen );
 //void CLUI_GetCDKey( char *buf, int buflen );
 //void CLUI_SetCDKey( char *buf );
-int Com_RealTime(qtime_t *qtime);
 int CIN_PlayCinematic( const char *arg, int x, int y, int w, int h, int systemBits );
 e_status CIN_StopCinematic(int handle);
 e_status CIN_RunCinematic (int handle);

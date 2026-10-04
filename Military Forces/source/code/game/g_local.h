@@ -825,7 +825,6 @@ void CheckTeamLeader( int team );
 void G_RunThink (GameEntity *ent);
 void QDECL G_LogPrintf( const char *fmt, ... );
 void SendScoreboardMessageToAllClients( );
-void QDECL Com_Printf( const char *fmt, ... );
 //void QDECL G_Error( const char *fmt, ... );
 
 //

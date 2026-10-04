@@ -312,7 +312,7 @@ bool G_CallSpawn( SpawnFieldHolder *sfh )
 
 	if ( !sfh->classname_ )
 	{
-		Com_Printf ("G_CallSpawn: NULL classname\n");
+		Common::printf ("G_CallSpawn: NULL classname\n");
 		return false;
 	}
 
@@ -338,7 +338,7 @@ bool G_CallSpawn( SpawnFieldHolder *sfh )
 			return true;
 		}
 	}
-	Com_Printf ("%s doesn't have a spawn function\n", sfh->classname_);
+	Common::printf ("%s doesn't have a spawn function\n", sfh->classname_);
 	return false;
 }
 
@@ -543,7 +543,7 @@ char *G_AddSpawnVarToken( const char *string )
 
 	l = strlen( string );
 	if ( theLevel.numSpawnVarChars_ + l + 1 > LevelLocals::k_MAX_SPAWN_VARS_CHARS ) 
-		Com_Error( ERR_DROP, "G_AddSpawnVarToken: MAX_SPAWN_VARS" );
+		Common::error( ERR_DROP, "G_AddSpawnVarToken: MAX_SPAWN_VARS" );
 
 	dest = theLevel.spawnVarChars_ + theLevel.numSpawnVarChars_;
 	memcpy( dest, string, l+1 );
@@ -578,26 +578,26 @@ bool G_ParseSpawnVars()
 		return false;
 	}
 	if ( com_token[0] != '{' ) 
-		Com_Error( ERR_DROP, "G_ParseSpawnVars: found %s when expecting {",com_token );
+		Common::error( ERR_DROP, "G_ParseSpawnVars: found %s when expecting {",com_token );
 
 	// go through all the key / value pairs
 	while ( true )
 	{	
 		// parse key
 		if ( !SV_GetEntityToken( keyname, sizeof( keyname ) ) ) 
-			Com_Error( ERR_DROP, "G_ParseSpawnVars: EOF without closing brace" );
+			Common::error( ERR_DROP, "G_ParseSpawnVars: EOF without closing brace" );
 
 		if ( keyname[0] == '}' ) 
 			break;
 		
 		// parse value	
 		if ( !SV_GetEntityToken( com_token, sizeof( com_token ) ) ) 
-			Com_Error( ERR_DROP, "G_ParseSpawnVars: EOF without closing brace" );
+			Common::error( ERR_DROP, "G_ParseSpawnVars: EOF without closing brace" );
 
 		if ( com_token[0] == '}' ) 
-			Com_Error( ERR_DROP, "G_ParseSpawnVars: closing brace without data" );
+			Common::error( ERR_DROP, "G_ParseSpawnVars: closing brace without data" );
 		if ( theLevel.numSpawnVars_ == LevelLocals::k_MAX_SPAWN_VARS ) 
-			Com_Error( ERR_DROP, "G_ParseSpawnVars: MAX_SPAWN_VARS" );
+			Common::error( ERR_DROP, "G_ParseSpawnVars: MAX_SPAWN_VARS" );
 
 		theLevel.spawnVars_[ theLevel.numSpawnVars_ ][0] = G_AddSpawnVarToken( keyname );
 		theLevel.spawnVars_[ theLevel.numSpawnVars_ ][1] = G_AddSpawnVarToken( com_token );
@@ -622,7 +622,7 @@ void SP_worldspawn()
 
 	G_SpawnString( "classname", "", &s );
 	if ( Q_stricmp( s, "worldspawn" ) ) 
-		Com_Error( ERR_DROP, "SP_worldspawn: The first entity isn't 'worldspawn'" );
+		Common::error( ERR_DROP, "SP_worldspawn: The first entity isn't 'worldspawn'" );
 
 	// make some data visible to connecting client
 	SV_SetConfigstring( CS_GAME_VERSION, MF_VERSION );
@@ -689,7 +689,7 @@ void G_SpawnEntitiesFromString()
 	// has a "spawn" function to perform any global setup
 	// needed by a level (setting configstrings or cvars, etc)
 	if ( !G_ParseSpawnVars() ) 
-		Com_Error( ERR_DROP, "SpawnEntities: no entities" );
+		Common::error( ERR_DROP, "SpawnEntities: no entities" );
 
 	SP_worldspawn();
 

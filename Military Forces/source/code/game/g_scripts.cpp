@@ -12,11 +12,11 @@
 //	} else {	// only to be performed on startup
 //		if( strcmp( token, "landed" ) == 0 ) {
 //			ent->s.ONOFF |= OO_LANDED;
-//			Com_Printf( "Set %s's state to landed\n", ent->targetname );
+//			Common::printf( "Set %s's state to landed\n", ent->targetname );
 //			return 1;
 //		} else if( strcmp( token, "airborne" ) == 0 ) {
 //			ent->s.ONOFF &= ~OO_LANDED;
-//			Com_Printf( "Set %s's state to airborne\n", ent->targetname );
+//			Common::printf( "Set %s's state to airborne\n", ent->targetname );
 //			return 1;
 //		}
 //	}
@@ -32,7 +32,7 @@
 //		i = findWaypoint(token);
 //		if( i >= 0 ) {
 //			ent->nextWaypoint = &level.waypointList.waypoints[i];
-//			Com_Printf( "Set %s's next waypoint to %s\n", ent->targetname, ent->nextWaypoint->name );
+//			Common::printf( "Set %s's next waypoint to %s\n", ent->targetname, ent->nextWaypoint->name );
 //			return 1;
 //		}
 //		break;
@@ -54,7 +54,7 @@
 //		i = findWaypoint(token);
 //		if( i >= 0 ) {
 //			st->nextWp = &level.waypointList.waypoints[i];
-//			Com_Printf( "Added 'next_Waypoint' task (with wp %s) to current task\n", st->nextWp->name );
+//			Common::printf( "Added 'next_Waypoint' task (with wp %s) to current task\n", st->nextWp->name );
 //			return 1;
 //		}
 //		break;
@@ -71,11 +71,11 @@
 //	scripttask_t*  st = &level.scriptList.scripts[level.scriptList.usedSTs];
 //	int idx;
 //
-//	Com_Printf( "Found waypoint event: %s\n", wp );
+//	Common::printf( "Found waypoint event: %s\n", wp );
 //
 //	idx = findWaypoint( wp );
 //	if( idx < 0 ) {
-//		Com_Printf( "Unable to find waypoint %s - no scripts for this drone\n", wp );
+//		Common::printf( "Unable to find waypoint %s - no scripts for this drone\n", wp );
 //		return 0;
 //	}
 //
@@ -110,7 +110,7 @@
 //			break;
 //		}
 //		if( strcmp( token, "{" ) ) {
-//			Com_Printf( "Missing { in info file\n" );
+//			Common::printf( "Missing { in info file\n" );
 //			break;
 //		} else {
 //			openbraces++;
@@ -120,7 +120,7 @@
 //		while( 1 ) {
 //			token = COM_ParseExt( &buf, true );
 //			if( !token[0] ) {
-////				Com_Printf( "Unexpected end of info file\n" );
+////				Common::printf( "Unexpected end of info file\n" );
 //				break;
 //			}
 //			if( !strcmp( token, "{" ) ) {
@@ -134,7 +134,7 @@
 //				continue;
 //			}
 //			if( level.scriptList.usedSTs >= MAX_SCRIPT_TASKS ) {
-//				Com_Printf( "Exceeding maximum number of scripts - parsing cancelled\n" );
+//				Common::printf( "Exceeding maximum number of scripts - parsing cancelled\n" );
 //				return -1;
 //			}
 //			Q_strncpyz( key, token, sizeof( key ) );
@@ -157,7 +157,7 @@
 //			if( strcmp( key, "next_Waypoint" ) == 0 ) {
 //				if( !addToTask( currentTask, AT_NEXT_WAYPOINT, token ) ) {
 //					if( !addToGeneralBehaviour(ent, AT_NEXT_WAYPOINT, token) ) {
-//						Com_Printf( "Error in script %s %s\n", key, token );
+//						Common::printf( "Error in script %s %s\n", key, token );
 //						return -1;
 //					}
 //				}
@@ -167,7 +167,7 @@
 //			if( strcmp( key, "set_State" ) == 0 ) {
 //				if( !addToTask( currentTask, AT_SET_STATE, token ) ) {
 //					if( !addToGeneralBehaviour(ent, AT_SET_STATE, token) ) {
-//						Com_Printf( "Error in script %s %s\n", key, token );
+//						Common::printf( "Error in script %s %s\n", key, token );
 //						return -1;
 //					}
 //
@@ -186,11 +186,11 @@
 //
 //	len = FileSystem::fOpenFileByMode( filename, &f, FS_READ );
 //	if ( !f ) {
-//		Com_Printf( S_COLOR_RED "file not found: %s\n", filename );
+//		Common::printf( S_COLOR_RED "file not found: %s\n", filename );
 //		return 0;
 //	}
 //	if ( len >= MAX_BOTS_TEXT ) {
-//		Com_Printf( S_COLOR_RED "file too large: %s is %i, max allowed is %i", filename, len, MAX_BOTS_TEXT );
+//		Common::printf( S_COLOR_RED "file too large: %s is %i, max allowed is %i", filename, len, MAX_BOTS_TEXT );
 //		FileSystem::fCloseFile( f );
 //		return 0;
 //	}

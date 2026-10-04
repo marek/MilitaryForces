@@ -156,7 +156,7 @@ void SP_target_speaker( GameEntity *ent )
 	G_SpawnFloat( "random", "0", &ent->random_ );
 
 	if ( !G_SpawnString( "noise", "NOSOUND", &s ) ) 
-		Com_Error( ERR_DROP, "target_speaker without a noise key at %s", vtos( ent->s.origin ) );
+		Common::error( ERR_DROP, "target_speaker without a noise key at %s", vtos( ent->s.origin ) );
 
 	// force all client reletive sounds to be "activator" speakers that
 	// play on the entity that activates it

@@ -307,7 +307,7 @@ void G_Damage( GameEntity *targ, GameEntity *inflictor, GameEntity* attacker,
 
 	if ( g_debugDamage.integer ) 
 	{
-		Com_Printf( "%i: client:%i health:%i damage:%i\n", theLevel.time_, targ->s.number,
+		Common::printf( "%i: client:%i health:%i damage:%i\n", theLevel.time_, targ->s.number,
 			targ->health_, take );
 	}
 

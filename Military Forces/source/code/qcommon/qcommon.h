@@ -83,7 +83,7 @@ public:
 
 	static int hashKey( const char *string, int maxlen );
 
-	bool	allowoverflow;	// if false, do a Com_Error
+	bool	allowoverflow;	// if false, do a Common::error
 	bool	overflowed;		// set to true if the buffer size failed (with allowoverflow set)
 	bool	oob;			// set to true if the buffer size failed (with allowoverflow set)
 	byte	*data;
@@ -591,19 +591,10 @@ extern char cl_cdkey[34];
 
 // returned by System::getProcessorFeatures
 
-// centralized and cleaned, that's the max string you can send to a Com_Printf / Com_DPrintf (above gets truncated)
+// centralized and cleaned, that's the max string you can send to a Common::printf / Common::dPrintf (above gets truncated)
 inline constexpr int MAXPRINTMSG = 4096;
 
 
-enum sysEventType_t {
-	// SE_NONE must be zero
-	SE_NONE = 0,		// evTime is still valid
-	SE_KEY,			// evValue is a key code, evValue2 is the down flag
-	SE_CHAR,		// evValue is an ascii char
-	SE_MOUSE,		// evValue and evValue2 are relative signed x / y moves
-	SE_JOYSTICK_AXIS,	// evValue is an axis number and evValue2 is the current state (-127 to 127)
-	SE_CONSOLE		// evPtr is a char*
-};
 
 struct sysEvent_t {
 	int				evTime;
@@ -613,40 +604,19 @@ struct sysEvent_t {
 	void			*evPtr;			// this must be manually freed if not NULL
 };
 
-void		Com_QueueEvent( int time, sysEventType_t type, int value, int value2, int ptrLength, void *ptr );
-int			Com_EventLoop( );
-sysEvent_t	Com_GetSystemEvent( );
 
 char		*CopyString( const char *in );
 void		Info_Print( const char *s );
 
-void		Com_BeginRedirect (char *buffer, int buffersize, void (*flush)(char *));
-void		Com_EndRedirect( );
-void 		QDECL Com_Printf( const char *fmt, ... ) Q_PRINTF_FUNC(1, 2);
-void 		QDECL Com_DPrintf( const char *fmt, ... ) Q_PRINTF_FUNC(1, 2);
-void 		QDECL Com_Error( int code, const char *fmt, ... ) Q_NO_RETURN Q_PRINTF_FUNC(2, 3);
-void 		Com_Quit_f( ) Q_NO_RETURN;
-void		Com_GameRestart(int checksumFeed, bool disconnect);
 
-int			Com_Milliseconds( );	// will be journaled properly
 unsigned	Com_BlockChecksum( const void *buffer, int length );
 char		*Com_MD5File(const char *filename, int length, const char *prefix, int prefix_len);
-int			Com_Filter(char *filter, char *name, int casesensitive);
-int			Com_FilterPath(char *filter, char *name, int casesensitive);
-int			Com_RealTime(qtime_t *qtime);
-bool	Com_SafeMode( );
-void		Com_RunAndTimeServerPacket(netadr_t *evFrom, Message *buf);
 
-bool	Com_IsVoipTarget(uint8_t *voipTargets, int voipTargetsSize, int clientNum);
 
-void		Com_StartupVariable( const char *match );
 // checks for and removes command line "+set var arg" constructs
 // if match is NULL, all set commands will be executed, otherwise
 // only a set with the exact name.  Only used during startup.
 
-bool		Com_PlayerNameToFieldString( char *str, int length, const char *name );
-bool		Com_FieldStringToPlayerName( char *name, int length, const char *rawname );
-int QDECL	Com_strCompare( const void *a, const void *b );
 
 
 extern	cvar_t	*com_developer;
@@ -758,12 +728,8 @@ void Hunk_FreeTempMemory( void *buf );
 int	Hunk_MemoryRemaining( );
 void Hunk_Log( );
 
-void Com_TouchMemory( );
 
 // commandLine should not include the executable name (argv[0])
-void Com_Init( char *commandLine );
-void Com_Frame( );
-void Com_Shutdown( );
 
 
 /*

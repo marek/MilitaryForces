@@ -217,7 +217,7 @@ void G_FindTeams()
 		}
 	}
 
-	Com_Printf ("%i teams with %i entities\n", c, c2);
+	Common::printf ("%i teams with %i entities\n", c, c2);
 }
 
 void G_RemapTeamShaders() 
@@ -253,7 +253,7 @@ void G_RegisterCvars()
 	// check some things
 	if ( g_gametype.integer < 0 || g_gametype.integer >= GT_MAX_GAME_TYPE ) 
 	{
-		Com_Printf( "g_gametype %i is out of range, defaulting to 0\n", g_gametype.integer );
+		Common::printf( "g_gametype %i is out of range, defaulting to 0\n", g_gametype.integer );
 		CvarSystem::set( "g_gametype", "0" );
 	}
 	theLevel.warmupModificationCount_ = g_warmup.modificationCount;
@@ -303,10 +303,10 @@ G_InitGame
 */
 void G_InitGame( int levelTime, int randomSeed ) 
 {
-	Com_Printf ("------- Game Initialization -------\n");
-	Com_Printf ("gamename: %s\n", GAME_IDENTIFIER);
-	Com_Printf ("gamedate: %s\n",  __DATE__ );
-	Com_Printf ("mf version: %s\n", MF_VERSION );
+	Common::printf ("------- Game Initialization -------\n");
+	Common::printf ("gamename: %s\n", GAME_IDENTIFIER);
+	Common::printf ("gamedate: %s\n",  __DATE__ );
+	Common::printf ("mf version: %s\n", MF_VERSION );
 
 	srand( randomSeed );
 
@@ -341,7 +341,7 @@ void G_InitGame( int levelTime, int randomSeed )
 			FileSystem::fOpenFileByMode( g_log.string, &theLevel.logFile_, FS_APPEND );
 
 		if ( !theLevel.logFile_ )
-			Com_Printf( "WARNING: Couldn't open logfile: %s\n", g_log.string );
+			Common::printf( "WARNING: Couldn't open logfile: %s\n", g_log.string );
 		else 
 		{
 			char serverinfo[MAX_INFO_STRING];
@@ -353,7 +353,7 @@ void G_InitGame( int levelTime, int randomSeed )
 		}
 	} 
 	else
-		Com_Printf( "Not logging to disk.\n" );
+		Common::printf( "Not logging to disk.\n" );
 
 	G_InitWorldSession();
 
@@ -402,7 +402,7 @@ void G_InitGame( int levelTime, int randomSeed )
 
 	SaveRegisteredItems();
 
-	Com_Printf ("-----------------------------------\n");
+	Common::printf ("-----------------------------------\n");
 
 	if( g_gametype.integer == GT_SINGLE_PLAYER || CvarSystem::variableIntegerValue( "com_buildScript" ) ) 
 	{
@@ -433,7 +433,7 @@ G_ShutdownGame
 */
 void G_ShutdownGame() 
 {
-	Com_Printf ("==== ShutdownGame ====\n");
+	Common::printf ("==== ShutdownGame ====\n");
 
 	if ( theLevel.logFile_ ) 
 	{
@@ -978,7 +978,7 @@ void QDECL G_LogPrintf( const char *fmt, ... )
 	va_end( argptr );
 
 	if ( g_dedicated.integer )
-		Com_Printf( "%s", string + 7 );
+		Common::printf( "%s", string + 7 );
 
 	if ( !theLevel.logFile_ ) 
 		return;
@@ -1177,7 +1177,7 @@ void CheckExitRules()
 	}
 
 	if ( g_timelimit.integer < 0 || g_timelimit.integer > INT_MAX / 60000 ) {
-		Com_Printf( "timelimit %i is out of range, defaulting to 0\n", g_timelimit.integer );
+		Common::printf( "timelimit %i is out of range, defaulting to 0\n", g_timelimit.integer );
 		CvarSystem::set( "timelimit", "0" );
 		CvarSystem::update( &g_timelimit );
 	}
@@ -1196,7 +1196,7 @@ void CheckExitRules()
 		return;
 
 	if ( g_fraglimit.integer < 0 ) {
-		Com_Printf( "fraglimit %i is out of range, defaulting to 0\n", g_fraglimit.integer );
+		Common::printf( "fraglimit %i is out of range, defaulting to 0\n", g_fraglimit.integer );
 		CvarSystem::set( "fraglimit", "0" );
 		CvarSystem::update( &g_fraglimit );
 	}
@@ -1237,7 +1237,7 @@ void CheckExitRules()
 	}
 
 	if ( g_capturelimit.integer < 0 ) {
-		Com_Printf( "capturelimit %i is out of range, defaulting to 0\n", g_capturelimit.integer );
+		Common::printf( "capturelimit %i is out of range, defaulting to 0\n", g_capturelimit.integer );
 		CvarSystem::set( "capturelimit", "0" );
 		CvarSystem::update( &g_capturelimit );
 	}
@@ -1634,7 +1634,7 @@ void G_RunThink( GameEntity *ent )
 	
 	ent->nextthink_ = 0;
 	if( !ent->thinkFunc_ ) 
-		Com_Error( ERR_DROP, "NULL ent->think");
+		Common::error( ERR_DROP, "NULL ent->think");
 
 	ent->thinkFunc_->execute();
 }
@@ -1765,7 +1765,7 @@ void G_RunFrame( int levelTime )
 		{
 			ent = theLevel.getEntity(i);
 			if( ent )
-				Com_Printf("%4i: %s\n", i, ent->classname_);
+				Common::printf("%4i: %s\n", i, ent->classname_);
 		}
 		CvarSystem::set("g_listEntity", "0");
 	}

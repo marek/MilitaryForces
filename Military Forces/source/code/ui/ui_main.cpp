@@ -725,11 +725,11 @@ char *GetMenuBuffer(const char *filename) {
 
 	len = FileSystem::fOpenFileByMode( filename, &f, FS_READ );
 	if ( !f ) {
-		Com_Printf( S_COLOR_RED "menu file not found: %s, using default\n", filename );
+		Common::printf( S_COLOR_RED "menu file not found: %s, using default\n", filename );
 		return defaultMenu;
 	}
 	if ( len >= MAX_MENUFILE ) {
-		Com_Printf( S_COLOR_RED "menu file too large: %s is %i, max allowed is %i", filename, len, MAX_MENUFILE );
+		Common::printf( S_COLOR_RED "menu file too large: %s is %i, max allowed is %i", filename, len, MAX_MENUFILE );
 		FileSystem::fCloseFile( f );
 		return defaultMenu;
 	}
@@ -905,11 +905,11 @@ bool Asset_Parse(int handle)
 void Font_Report() 
 {
 	int i;
-	Com_Printf("Font Info\n");
-	Com_Printf("=========\n");
+	Common::printf("Font Info\n");
+	Common::printf("=========\n");
 	for ( i = 32; i < 96; i++) 
 	{
-		Com_Printf("Glyph handle %i: %i\n", i, uiInfo.uiUtils.dc_->assets_.textFont.glyphs[i].glyph);
+		Common::printf("Glyph handle %i: %i\n", i, uiInfo.uiUtils.dc_->assets_.textFont.glyphs[i].glyph);
 	}
 }
 
@@ -925,7 +925,7 @@ void UI_ParseMenu(const char *menuFile)
 	int handle;
 	UI_PrecompilerTools::PC_Token  token;
 
-	Com_Printf("Parsing menu file:%s\n", menuFile);
+	Common::printf("Parsing menu file:%s\n", menuFile);
 
 	handle = uiInfo.uiUtils.getPrecompilerTools()->loadSourceHandle(menuFile);
 	if (!handle) {
@@ -939,12 +939,12 @@ void UI_ParseMenu(const char *menuFile)
 		}
 
 		//if ( Q_stricmp( token, "{" ) ) {
-		//	Com_Printf( "Missing { in menu file\n" );
+		//	Common::printf( "Missing { in menu file\n" );
 		//	break;
 		//}
 
 		//if ( menuCount == MAX_MENUS ) {
-		//	Com_Printf( "Too many menus!\n" );
+		//	Common::printf( "Too many menus!\n" );
 		//	break;
 		//}
 
@@ -1006,10 +1006,10 @@ void UI_LoadMenus(const char *menuFile, bool reset)
 
 	handle = uiInfo.uiUtils.getPrecompilerTools()->loadSourceHandle( menuFile );
 	if (!handle) {
-		Com_Printf( S_COLOR_YELLOW "menu file not found: %s, using default\n", menuFile );
+		Common::printf( S_COLOR_YELLOW "menu file not found: %s, using default\n", menuFile );
 		handle = uiInfo.uiUtils.getPrecompilerTools()->loadSourceHandle( "ui/menus.txt" );
 		if (!handle) {
-			Com_Error( ERR_DROP, S_COLOR_RED "default menu file not found: ui/menus.txt, unable to continue!\n", menuFile );
+			Common::error( ERR_DROP, S_COLOR_RED "default menu file not found: ui/menus.txt, unable to continue!\n", menuFile );
 		}
 	}
 
@@ -1039,7 +1039,7 @@ void UI_LoadMenus(const char *menuFile, bool reset)
 		}
 	}
 
-	//Com_Printf("UI menu load time = %d milli seconds\n", ServerUIApi::milliseconds() - start);
+	//Common::printf("UI menu load time = %d milli seconds\n", ServerUIApi::milliseconds() - start);
 
 	uiInfo.uiUtils.getPrecompilerTools()->freeSourceHandle( handle );
 }
@@ -4096,17 +4096,17 @@ void UI_RunMenuScript(char **args)
 					if (res == 0)
 					{
 						// server already in the list
-						Com_Printf("Favorite already in list\n");
+						Common::printf("Favorite already in list\n");
 					}
 					else if (res == -1) 
 					{
 						// list full
-						Com_Printf("Favorite list full\n");
+						Common::printf("Favorite list full\n");
 					}
 					else 
 					{
 						// successfully added
-						Com_Printf("Added favorite server %s\n", addr);
+						Common::printf("Added favorite server %s\n", addr);
 					}
 				}
 			}
@@ -4142,17 +4142,17 @@ void UI_RunMenuScript(char **args)
 					if (res == 0)
 					{
 						// server already in the list
-						Com_Printf("Favorite already in list\n");
+						Common::printf("Favorite already in list\n");
 					}
 					else if (res == -1)
 					{
 						// list full
-						Com_Printf("Favorite list full\n");
+						Common::printf("Favorite list full\n");
 					}
 					else 
 					{
 						// successfully added
-						Com_Printf("Added favorite server %s\n", addr);
+						Common::printf("Added favorite server %s\n", addr);
 					}
 				}
 			}
@@ -4266,7 +4266,7 @@ void UI_RunMenuScript(char **args)
 		}
 		else
 		{
-			Com_Printf("unknown UI script %s\n", name);
+			Common::printf("unknown UI script %s\n", name);
 		}
 	}
 }
@@ -5420,7 +5420,7 @@ static bool Team_Parse(char **p) {
     if (token[0] == '{') {
       if (uiInfo.teamCount == MAX_TEAMS) {
         uiInfo.teamCount--;
-        Com_Printf("Too many teams, last team replaced!\n");
+        Common::printf("Too many teams, last team replaced!\n");
       }
 
       // seven tokens per line, team name and icon, and 5 team member names
@@ -5444,7 +5444,7 @@ static bool Team_Parse(char **p) {
 				}
 			}
 
-      Com_Printf("Loaded team %s with team icon %s.\n", uiInfo.teamList[uiInfo.teamCount].teamName, tempStr);
+      Common::printf("Loaded team %s with team icon %s.\n", uiInfo.teamList[uiInfo.teamCount].teamName, tempStr);
       uiInfo.teamCount++;
 
       token = COM_ParseExt(p, true);
@@ -5482,7 +5482,7 @@ static bool Character_Parse(char **p) {
     if (token[0] == '{') {
       if (uiInfo.characterCount == MAX_HEADS) {
         uiInfo.characterCount--;
-        Com_Printf("Too many characters, last character replaced!\n");
+        Common::printf("Too many characters, last character replaced!\n");
       }
 
       // two tokens per line, character name and sex
@@ -5504,7 +5504,7 @@ static bool Character_Parse(char **p) {
         uiInfo.characterList[uiInfo.characterCount].base = uiInfo.uiUtils.string_Alloc(va("%s",tempStr));
 	  }
 
-      Com_Printf("Loaded %s character %s.\n", uiInfo.characterList[uiInfo.characterCount].base, uiInfo.characterList[uiInfo.characterCount].name);
+      Common::printf("Loaded %s character %s.\n", uiInfo.characterList[uiInfo.characterCount].base, uiInfo.characterList[uiInfo.characterCount].name);
       uiInfo.characterCount++;
      
       token = COM_ParseExt(p, true);
@@ -5541,7 +5541,7 @@ static bool Alias_Parse(char **p) {
     if (token[0] == '{') {
       if (uiInfo.aliasCount == MAX_ALIASES) {
         uiInfo.aliasCount--;
-        Com_Printf("Too many aliases, last alias replaced!\n");
+        Common::printf("Too many aliases, last alias replaced!\n");
       }
 
       // three tokens per line, character name, bot alias, and preferred action a - all purpose, d - defense, o - offense
@@ -5551,7 +5551,7 @@ static bool Alias_Parse(char **p) {
         return false;
       }
     
-      Com_Printf("Loaded character alias %s using character ai %s.\n", uiInfo.aliasList[uiInfo.aliasCount].name, 
+      Common::printf("Loaded character alias %s using character ai %s.\n", uiInfo.aliasList[uiInfo.aliasCount].name, 
 		  uiInfo.aliasList[uiInfo.aliasCount].ai);
       uiInfo.aliasCount++;
      
@@ -5660,13 +5660,13 @@ static bool GameType_Parse(char **p, bool join) {
 				if (uiInfo.numJoinGameTypes < MAX_GAMETYPES) {
 					uiInfo.numJoinGameTypes++;
 				} else {
-					Com_Printf("Too many net game types, last one replace!\n");
+					Common::printf("Too many net game types, last one replace!\n");
 				}		
 			} else {
 				if (uiInfo.numGameTypes < MAX_GAMETYPES) {
 					uiInfo.numGameTypes++;
 				} else {
-					Com_Printf("Too many game types, last one replace!\n");
+					Common::printf("Too many game types, last one replace!\n");
 				}		
 			}
      
@@ -5737,7 +5737,7 @@ static bool MapList_Parse(char **p) {
 			if (uiInfo.mapCount < MAX_MAPS) {
 				uiInfo.mapCount++;
 			} else {
-				Com_Printf("Too many maps, last one replaced!\n");
+				Common::printf("Too many maps, last one replaced!\n");
 			}
 		}
 	}
@@ -6764,12 +6764,12 @@ static void UI_StopServerRefresh( )
 		return;
 	}
 	uiInfo.serverStatus.refreshActive = false;
-	Com_Printf("%d servers listed in browser with %d players.\n",
+	Common::printf("%d servers listed in browser with %d players.\n",
 					uiInfo.serverStatus.numDisplayServers,
 					uiInfo.serverStatus.numPlayersOnServers);
 	count = LAN_GetServerCount(ui_netSource.integer);
 	if (count - uiInfo.serverStatus.numDisplayServers > 0) {
-		Com_Printf("%d servers not listed due to packet loss or pings higher than %d\n",
+		Common::printf("%d servers not listed due to packet loss or pings higher than %d\n",
 						count - uiInfo.serverStatus.numDisplayServers,
 						static_cast<int>(CvarSystem::variableValue("cl_maxPing")));
 	}
@@ -6831,7 +6831,7 @@ static void UI_StartServerRefresh(bool full)
 	//char	*ptr;
 
 	qtime_t q;
-	Com_RealTime(&q);
+	Common::realTime(&q);
  	CvarSystem::set( va("ui_lastServerRefresh_%i", ui_netSource.integer), va("%s-%i, %i at %i:%i", MonthAbbrev[q.tm_mon],q.tm_mday, 1900+q.tm_year,q.tm_hour,q.tm_min));
 
 	if (!full) {

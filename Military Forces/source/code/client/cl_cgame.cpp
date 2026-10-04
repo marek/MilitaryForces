@@ -67,7 +67,7 @@ bool CL_GetUserCmd( int cmdNumber, usercmd_t *ucmd )
 
 	// can't return anything that we haven't created yet
 	if ( cmdNumber > cl.cmdNumber ) {
-		Com_Error( ERR_DROP, "CL_GetUserCmd: %i >= %i", cmdNumber, cl.cmdNumber );
+		Common::error( ERR_DROP, "CL_GetUserCmd: %i >= %i", cmdNumber, cl.cmdNumber );
 	}
 
 	// the usercmd has been overwritten in the wrapping
@@ -95,7 +95,7 @@ CL_GetParseEntityState
 bool	CL_GetParseEntityState( int parseEntityNumber, entityState_t *state ) {
 	// can't return anything that hasn't been parsed yet
 	if ( parseEntityNumber >= cl.parseEntitiesNum ) {
-		Com_Error( ERR_DROP, "CL_GetParseEntityState: %i >= %i",
+		Common::error( ERR_DROP, "CL_GetParseEntityState: %i >= %i",
 			parseEntityNumber, cl.parseEntitiesNum );
 	}
 
@@ -130,7 +130,7 @@ bool	CL_GetSnapshot( int snapshotNumber, snapshot_t *snapshot )
 	int				i, count;
 
 	if ( snapshotNumber > cl.snap.messageNum ) {
-		Com_Error( ERR_DROP, "CL_GetSnapshot: snapshotNumber > cl.snapshot.messageNum" );
+		Common::error( ERR_DROP, "CL_GetSnapshot: snapshotNumber > cl.snapshot.messageNum" );
 	}
 
 	// if the frame has fallen out of the circular buffer, we can't return it
@@ -159,7 +159,7 @@ bool	CL_GetSnapshot( int snapshotNumber, snapshot_t *snapshot )
 	snapshot->ps = clSnap->ps;
 	count = clSnap->numEntities;
 	if ( count > MAX_ENTITIES_IN_SNAPSHOT ) {
-		Com_DPrintf( "CL_GetSnapshot: truncated %i entities to %i\n", count, MAX_ENTITIES_IN_SNAPSHOT );
+		Common::dPrintf( "CL_GetSnapshot: truncated %i entities to %i\n", count, MAX_ENTITIES_IN_SNAPSHOT );
 		count = MAX_ENTITIES_IN_SNAPSHOT;
 	}
 	snapshot->numEntities = count;
@@ -200,7 +200,7 @@ CL_CgameError
 =====================
 */
 void CL_CgameError( const char *string ) {
-	Com_Error( ERR_DROP, "%s", string );
+	Common::error( ERR_DROP, "%s", string );
 }
 
 
@@ -218,7 +218,7 @@ void CL_ConfigstringModified( ) {
 
 	index = atoi( CommandSystem::argv(1) );
 	if ( index < 0 || index >= MAX_CONFIGSTRINGS ) {
-		Com_Error( ERR_DROP, "CL_ConfigstringModified: bad index %i", index );
+		Common::error( ERR_DROP, "CL_ConfigstringModified: bad index %i", index );
 	}
 	// get everything after "cs <num>"
 	s = CommandSystem::argsFrom(2);
@@ -249,7 +249,7 @@ void CL_ConfigstringModified( ) {
 		len = strlen( dup );
 
 		if ( len + 1 + cl.gameState.dataCount > MAX_GAMESTATE_CHARS ) {
-			Com_Error( ERR_DROP, "MAX_GAMESTATE_CHARS exceeded" );
+			Common::error( ERR_DROP, "MAX_GAMESTATE_CHARS exceeded" );
 		}
 
 		// append it to the gameState string buffer
@@ -285,19 +285,19 @@ bool CL_GetServerCommand( int serverCommandNumber ) {
 		// reliable commands then the client never got those first reliable commands
 		if ( clc.demoplaying )
 			return false;
-		Com_Error( ERR_DROP, "CL_GetServerCommand: a reliable command was cycled out" );
+		Common::error( ERR_DROP, "CL_GetServerCommand: a reliable command was cycled out" );
 		return false;
 	}
 
 	if ( serverCommandNumber > clc.serverCommandSequence ) {
-		Com_Error( ERR_DROP, "CL_GetServerCommand: requested a command not received" );
+		Common::error( ERR_DROP, "CL_GetServerCommand: requested a command not received" );
 		return false;
 	}
 
 	s = clc.serverCommands[ serverCommandNumber & ( MAX_RELIABLE_COMMANDS - 1 ) ];
 	clc.lastExecutedServerCommand = serverCommandNumber;
 
-	Com_DPrintf( "serverCommand: %i : %s\n", serverCommandNumber, s );
+	Common::dPrintf( "serverCommand: %i : %s\n", serverCommandNumber, s );
 
 rescan:
 	CommandSystem::tokenizeString( s );
@@ -308,9 +308,9 @@ rescan:
 		// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=552
 		// allow server to indicate why they were disconnected
 		if ( argc >= 2 )
-			Com_Error( ERR_SERVERDISCONNECT, "Server disconnected - %s", CommandSystem::argv( 1 ) );
+			Common::error( ERR_SERVERDISCONNECT, "Server disconnected - %s", CommandSystem::argv( 1 ) );
 		else
-			Com_Error( ERR_SERVERDISCONNECT, "Server disconnected" );
+			Common::error( ERR_SERVERDISCONNECT, "Server disconnected" );
 	}
 
 	if ( !strcmp( cmd, "bcs0" ) ) {
@@ -321,7 +321,7 @@ rescan:
 	if ( !strcmp( cmd, "bcs1" ) ) {
 		s = CommandSystem::argv(2);
 		if( strlen(bigConfigString) + strlen(s) >= BIG_INFO_STRING ) {
-			Com_Error( ERR_DROP, "bcs exceeded BIG_INFO_STRING" );
+			Common::error( ERR_DROP, "bcs exceeded BIG_INFO_STRING" );
 		}
 		strcat( bigConfigString, s );
 		return false;
@@ -330,7 +330,7 @@ rescan:
 	if ( !strcmp( cmd, "bcs2" ) ) {
 		s = CommandSystem::argv(2);
 		if( strlen(bigConfigString) + strlen(s) + 1 >= BIG_INFO_STRING ) {
-			Com_Error( ERR_DROP, "bcs exceeded BIG_INFO_STRING" );
+			Common::error( ERR_DROP, "bcs exceeded BIG_INFO_STRING" );
 		}
 		strcat( bigConfigString, s );
 		strcat( bigConfigString, "\"" );
@@ -451,7 +451,7 @@ void CL_InitCGame()
 
 	t2 = System::milliseconds();
 
-	Com_Printf( "CL_InitCGame: %5.2f seconds\n", (t2-t1)/1000.0 );
+	Common::printf( "CL_InitCGame: %5.2f seconds\n", (t2-t1)/1000.0 );
 
 	// have the renderer touch all its images, so they are present
 	// on the card even if the driver does deferred loading
@@ -459,7 +459,7 @@ void CL_InitCGame()
 
 	// make sure everything is paged in
 	if (!System::lowPhysicalMemory()) {
-		Com_TouchMemory();
+		Common::touchMemory();
 	}
 
 	// clear anything that got printed
@@ -537,12 +537,12 @@ void CL_AdjustTimeDelta( ) {
 		cl.oldServerTime = cl.snap.serverTime;	// FIXME: is this a problem for cgame?
 		cl.serverTime = cl.snap.serverTime;
 		if ( cl_showTimeDelta->integer ) {
-			Com_Printf( "<RESET> " );
+			Common::printf( "<RESET> " );
 		}
 	} else if ( deltaDelta > 100 ) {
 		// fast adjust, cut the difference in half
 		if ( cl_showTimeDelta->integer ) {
-			Com_Printf( "<FAST> " );
+			Common::printf( "<FAST> " );
 		}
 		cl.serverTimeDelta = ( cl.serverTimeDelta + newDelta ) >> 1;
 	} else {
@@ -563,7 +563,7 @@ void CL_AdjustTimeDelta( ) {
 	}
 
 	if ( cl_showTimeDelta->integer ) {
-		Com_Printf( "%i ", cl.serverTimeDelta );
+		Common::printf( "%i ", cl.serverTimeDelta );
 	}
 }
 
@@ -598,7 +598,7 @@ void CL_FirstSnapshot( ) {
 #ifdef USE_MUMBLE
 	if ((cl_useMumble->integer) && !mumble_islinked()) {
 		int ret = mumble_link(CLIENT_WINDOW_TITLE);
-		Com_Printf("Mumble: Linking to Mumble application %s\n", ret==0?"ok":"failed");
+		Common::printf("Mumble: Linking to Mumble application %s\n", ret==0?"ok":"failed");
 	}
 #endif
 
@@ -610,14 +610,14 @@ void CL_FirstSnapshot( ) {
 		clc.opusEncoder = opus_encoder_create(48000, 1, OPUS_APPLICATION_VOIP, &error);
 
 		if ( error ) {
-			Com_DPrintf("VoIP: Error opus_encoder_create %d\n", error);
+			Common::dPrintf("VoIP: Error opus_encoder_create %d\n", error);
 			return;
 		}
 
 		for (i = 0; i < MAX_CLIENTS; i++) {
 			clc.opusDecoder[i] = opus_decoder_create(48000, 1, &error);
 			if ( error ) {
-				Com_DPrintf("VoIP: Error opus_decoder_create(%d) %d\n", i, error);
+				Common::dPrintf("VoIP: Error opus_decoder_create(%d) %d\n", i, error);
 				return;
 			}
 			clc.voipIgnore[i] = false;
@@ -663,7 +663,7 @@ void CL_SetCGameTime( ) {
 
 	// if we have gotten to this point, cl.snap is guaranteed to be valid
 	if ( !cl.snap.valid ) {
-		Com_Error( ERR_DROP, "CL_SetCGameTime: !cl.snap.valid" );
+		Common::error( ERR_DROP, "CL_SetCGameTime: !cl.snap.valid" );
 	}
 
 	// allow pause in single player
@@ -673,7 +673,7 @@ void CL_SetCGameTime( ) {
 	}
 
 	if ( cl.snap.serverTime < cl.oldFrameServerTime ) {
-		Com_Error( ERR_DROP, "cl.snap.serverTime < cl.oldFrameServerTime" );
+		Common::error( ERR_DROP, "cl.snap.serverTime < cl.oldFrameServerTime" );
 	}
 	cl.oldFrameServerTime = cl.snap.serverTime;
 

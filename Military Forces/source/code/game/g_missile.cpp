@@ -666,7 +666,7 @@ void G_MissileImpact( GameEntity *ent, trace_t *trace )
 	if( availableWeapons[ent->s.weaponIndex].type == WT_NUKEBOMB || availableWeapons[ent->s.weaponIndex].type == WT_NUKEMISSILE )
 	{
 		if( !ent->thinkFunc_ )
-			Com_Error( ERR_DROP, "NULL ent->think");
+			Common::error( ERR_DROP, "NULL ent->think");
 		else
 			ent->thinkFunc_->execute();
 	}
@@ -908,7 +908,7 @@ struct Think_FollowTarget : public GameEntity::EntityFunc_Think
 			hit->ONOFF_ = 0; // disable the flare
 			prob = rand() % 100;
 			vulner = self->basicECMVulnerability_ - self->tracktarget_->s.frame;
-			//Com_Printf("TT: %d, vulner: %d, prob: %d\n", missile->tracktarget->s.frame, vulner, prob);
+			//Common::printf("TT: %d, vulner: %d, prob: %d\n", missile->tracktarget->s.frame, vulner, prob);
 			if( prob < vulner ) 
 			{
 				if( self->tracktarget_->client_ )
@@ -1322,7 +1322,7 @@ void fire_autocannon( GameEntity *self, bool main )
 	spreadY = ((rand() % static_cast<unsigned int>(spreadY)) - spreadY/2)/10;
 	spreadangle[0] += spreadX;
 	spreadangle[1] += spreadY;
-//	Com_Printf( "spread %.1f %.1f\n", spreadX, spreadY );
+//	Common::printf( "spread %.1f %.1f\n", spreadX, spreadY );
 
 	VectorCopy( availableVehicles[self->client_->vehicle_].gunoffset, offset );
 	VectorCopy( self->s.pos.trBase, start );
@@ -1885,7 +1885,7 @@ void LaunchMissile_GI( GameEntity* ent )
 	vec3_t		dir, start;
 
 	ent->count_--;
-//	Com_Printf("Launching GI missile....%d left\n", ent->count);
+//	Common::printf("Launching GI missile....%d left\n", ent->count);
 
 	VectorCopy( ent->s.pos.trBase, start );
 	start[2] += 10;

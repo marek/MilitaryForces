@@ -193,7 +193,7 @@ void Con_Dump_f ()
 
 	if (CommandSystem::argc() != 2)
 	{
-		Com_Printf ("usage: condump <filename>\n");
+		Common::printf ("usage: condump <filename>\n");
 		return;
 	}
 
@@ -202,18 +202,18 @@ void Con_Dump_f ()
 
 	if (!COM_CompareExtension(filename, ".txt"))
 	{
-		Com_Printf("Con_Dump_f: Only the \".txt\" extension is supported by this command!\n");
+		Common::printf("Con_Dump_f: Only the \".txt\" extension is supported by this command!\n");
 		return;
 	}
 
 	f = FileSystem::fOpenFileWrite_HomeData( filename );
 	if (!f)
 	{
-		Com_Printf ("ERROR: couldn't open %s.\n", filename);
+		Common::printf ("ERROR: couldn't open %s.\n", filename);
 		return;
 	}
 
-	Com_Printf ("Dumped console text to %s.\n", filename );
+	Common::printf ("Dumped console text to %s.\n", filename );
 
 	// skip empty lines
 	for (l = con.current - con.totallines + 1 ; l <= con.current ; l++)

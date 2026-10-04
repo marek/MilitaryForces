@@ -128,7 +128,7 @@ int SV_Client::replacePendingServerCommands( const char *cmd ) {
 				Q_strncpyz( this->reliableCommands_[ index ], cmd, sizeof( this->reliableCommands_[ index ] ) );
 				/*
 				if ( this->netchan_.remoteAddress.type != NA_BOT ) {
-					Com_Printf( "WARNING: this %i removed double pending config string %i: %s\n", this->clientNum_, csnum1, cmd );
+					Common::printf( "WARNING: this %i removed double pending config string %i: %s\n", this->clientNum_, csnum1, cmd );
 				}
 				*/
 				return true;
@@ -171,11 +171,11 @@ void SV_Client::addServerCommand( const char *cmd ) {
 			return;
 		}
 
-		Com_Printf( "===== pending server commands =====\n" );
+		Common::printf( "===== pending server commands =====\n" );
 		for ( i = this->reliableAcknowledge_ + 1 ; i <= this->reliableSequence_ ; i++ ) {
-			Com_Printf( "cmd %5d: %s\n", i, this->reliableCommands_[ i & (MAX_RELIABLE_COMMANDS-1) ] );
+			Common::printf( "cmd %5d: %s\n", i, this->reliableCommands_[ i & (MAX_RELIABLE_COMMANDS-1) ] );
 		}
-		Com_Printf( "cmd %5d: %s\n", i, cmd );
+		Common::printf( "cmd %5d: %s\n", i, cmd );
 		this->drop( "Server command overflow" );
 		return;
 	}
@@ -219,7 +219,7 @@ void QDECL SV_SendServerCommand( SV_Client *cl, const char *fmt, ... )
 	// hack to echo broadcast prints to console
 	if( com_dedicated->integer && !strncmp( reinterpret_cast<char *>(message), "print", 5) ) 
 	{
-		Com_Printf ("broadcast: %s\n", SV_ExpandNewlines(reinterpret_cast<char *>(message)) );
+		Common::printf ("broadcast: %s\n", SV_ExpandNewlines(reinterpret_cast<char *>(message)) );
 	}
 
 	// send the data to all relevent clients
@@ -293,7 +293,7 @@ void SV_MasterHeartbeat(const char *message)
 			
 			if(netenabled & NET_ENABLEV4)
 			{
-				Com_Printf("Resolving %s (IPv4)\n", sv_master[i]->string);
+				Common::printf("Resolving %s (IPv4)\n", sv_master[i]->string);
 				res = Network::stringToAdr(sv_master[i]->string, &adr[i][0], NA_IP);
 
 				if(res == 2)
@@ -303,14 +303,14 @@ void SV_MasterHeartbeat(const char *message)
 				}
 				
 				if(res)
-					Com_Printf( "%s resolved to %s\n", sv_master[i]->string, Network::adrToStringwPort(adr[i][0]));
+					Common::printf( "%s resolved to %s\n", sv_master[i]->string, Network::adrToStringwPort(adr[i][0]));
 				else
-					Com_Printf( "%s has no IPv4 address.\n", sv_master[i]->string);
+					Common::printf( "%s has no IPv4 address.\n", sv_master[i]->string);
 			}
 			
 			if(netenabled & NET_ENABLEV6)
 			{
-				Com_Printf("Resolving %s (IPv6)\n", sv_master[i]->string);
+				Common::printf("Resolving %s (IPv6)\n", sv_master[i]->string);
 				res = Network::stringToAdr(sv_master[i]->string, &adr[i][1], NA_IP6);
 
 				if(res == 2)
@@ -320,9 +320,9 @@ void SV_MasterHeartbeat(const char *message)
 				}
 				
 				if(res)
-					Com_Printf( "%s resolved to %s\n", sv_master[i]->string, Network::adrToStringwPort(adr[i][1]));
+					Common::printf( "%s resolved to %s\n", sv_master[i]->string, Network::adrToStringwPort(adr[i][1]));
 				else
-					Com_Printf( "%s has no IPv6 address.\n", sv_master[i]->string);
+					Common::printf( "%s has no IPv6 address.\n", sv_master[i]->string);
 			}
 		}
 
@@ -332,7 +332,7 @@ void SV_MasterHeartbeat(const char *message)
 		}
 
 
-		Com_Printf ("Sending heartbeat to %s\n", sv_master[i]->string );
+		Common::printf ("Sending heartbeat to %s\n", sv_master[i]->string );
 
 		// this command should be changed if the server info / status format
 		// ever incompatably changes
@@ -551,7 +551,7 @@ void SVC_Status( netadr_t from )
 
 	// Prevent using getstatus as an amplifier
 	if ( SVC_RateLimitAddress( from, 10, 1000 ) ) {
-		Com_DPrintf( "SVC_Status: rate limit from %s exceeded, dropping request\n",
+		Common::dPrintf( "SVC_Status: rate limit from %s exceeded, dropping request\n",
 			Network::adrToString( from ) );
 		return;
 	}
@@ -559,7 +559,7 @@ void SVC_Status( netadr_t from )
 	// Allow getstatus to be DoSed relatively easily, but prevent
 	// excess outbound bandwidth usage when being flooded inbound
 	if ( SVC_RateLimit( &outboundLeakyBucket, 10, 100 ) ) {
-		Com_DPrintf( "SVC_Status: rate limit exceeded, dropping request\n" );
+		Common::dPrintf( "SVC_Status: rate limit exceeded, dropping request\n" );
 		return;
 	}
 
@@ -626,7 +626,7 @@ void SVC_Info( netadr_t from )
 
 	// Prevent using getinfo as an amplifier
 	if ( SVC_RateLimitAddress( from, 10, 1000 ) ) {
-		Com_DPrintf( "SVC_Info: rate limit from %s exceeded, dropping request\n",
+		Common::dPrintf( "SVC_Info: rate limit from %s exceeded, dropping request\n",
 			Network::adrToString( from ) );
 		return;
 	}
@@ -634,7 +634,7 @@ void SVC_Info( netadr_t from )
 	// Allow getinfo to be DoSed relatively easily, but prevent
 	// excess outbound bandwidth usage when being flooded inbound
 	if ( SVC_RateLimit( &outboundLeakyBucket, 10, 100 ) ) {
-		Com_DPrintf( "SVC_Info: rate limit exceeded, dropping request\n" );
+		Common::dPrintf( "SVC_Info: rate limit exceeded, dropping request\n" );
 		return;
 	}
 
@@ -726,7 +726,7 @@ void SVC_RemoteCommand( netadr_t from, Message *msg )
 
 	// Prevent using rcon as an amplifier and make dictionary attacks impractical
 	if ( SVC_RateLimitAddress( from, 10, 1000 ) ) {
-		Com_DPrintf( "SVC_RemoteCommand: rate limit from %s exceeded, dropping request\n",
+		Common::dPrintf( "SVC_RemoteCommand: rate limit from %s exceeded, dropping request\n",
 			Network::adrToString( from ) );
 		return;
 	}
@@ -737,28 +737,28 @@ void SVC_RemoteCommand( netadr_t from, Message *msg )
 
 		// Make DoS via rcon impractical
 		if ( SVC_RateLimit( &bucket, 10, 1000 ) ) {
-			Com_DPrintf( "SVC_RemoteCommand: rate limit exceeded, dropping request\n" );
+			Common::dPrintf( "SVC_RemoteCommand: rate limit exceeded, dropping request\n" );
 			return;
 		}
 
 		valid = false;
-		Com_Printf ("Bad rcon from %s: %s\n", Network::adrToString (from), CommandSystem::argsFrom(2) );
+		Common::printf ("Bad rcon from %s: %s\n", Network::adrToString (from), CommandSystem::argsFrom(2) );
 	} else {
 		valid = true;
-		Com_Printf ("Rcon from %s: %s\n", Network::adrToString (from), CommandSystem::argsFrom(2) );
+		Common::printf ("Rcon from %s: %s\n", Network::adrToString (from), CommandSystem::argsFrom(2) );
 	}
 
 	// start redirecting all print outputs to the packet
 	theSVS.redirectAddress_ = from;
-	Com_BeginRedirect (sv_outputbuf, SV_OUTPUTBUF_LENGTH, SV_FlushRedirect);
+	Common::beginRedirect (sv_outputbuf, SV_OUTPUTBUF_LENGTH, SV_FlushRedirect);
 
 	if ( !strlen( sv_rconPassword->string ) ) 
 	{
-		Com_Printf ("No rconpassword set on the server.\n");
+		Common::printf ("No rconpassword set on the server.\n");
 	} 
 	else if ( !valid ) 
 	{
-		Com_Printf ("Bad rconpassword.\n");
+		Common::printf ("Bad rconpassword.\n");
 	} 
 	else 
 	{
@@ -782,7 +782,7 @@ void SVC_RemoteCommand( netadr_t from, Message *msg )
 
 	}
 
-	Com_EndRedirect ();
+	Common::endRedirect ();
 }
 
 /*
@@ -810,7 +810,7 @@ void SV_ConnectionlessPacket( netadr_t from, Message *msg ) {
 	CommandSystem::tokenizeString( s );
 
 	c = CommandSystem::argv(0);
-	Com_DPrintf ("SV packet %s : %s\n", Network::adrToString(from), c);
+	Common::dPrintf ("SV packet %s : %s\n", Network::adrToString(from), c);
 
 	if (!Q_stricmp(c, "getstatus")) {
 		SVC_Status( from  );
@@ -829,7 +829,7 @@ void SV_ConnectionlessPacket( netadr_t from, Message *msg ) {
 		// server disconnect messages when their New server sees our final
 		// sequenced messages to the old client
 	} else {
-		Com_DPrintf ("bad connectionless packet from %s:\n%s\n"
+		Common::dPrintf ("bad connectionless packet from %s:\n%s\n"
 		, Network::adrToString (from), s);
 	}
 }
@@ -878,7 +878,7 @@ void SV_PacketEvent( netadr_t from, Message *msg )
 		// port assignments
 		if( cl->netchan_.remoteAddress.port != from.port )
 		{
-			Com_Printf( "SV_PacketEvent: fixing up a translated port\n" );
+			Common::printf( "SV_PacketEvent: fixing up a translated port\n" );
 			cl->netchan_.remoteAddress.port = from.port;
 		}
 
@@ -997,7 +997,7 @@ void SV_CheckTimeouts()
 			&& cl->lastPacketTime_ < zombiepoint ) 
 		{
 			// using the client id cause the cl->name is empty at this point
-			Com_DPrintf( "Going from CS_ZOMBIE to CS_FREE for client %d\n", i );
+			Common::dPrintf( "Going from CS_ZOMBIE to CS_FREE for client %d\n", i );
 			cl->state_ = SV_Client::CS_FREE;	// can now be reused
 			continue;
 		}

@@ -124,7 +124,7 @@ void RespawnItem( GameEntity *ent )
 		int choice;
 
 		if( !ent->teammaster_ ) 
-			Com_Error( ERR_DROP, "RespawnItem: bad teammaster");
+			Common::error( ERR_DROP, "RespawnItem: bad teammaster");
 
 		master = ent->teammaster_;
 
@@ -432,7 +432,7 @@ void GameItem::Think_FinishSpawningItem::execute()
 		SV_Trace( &tr, self_->s.origin, self_->r.mins, self_->r.maxs, dest, self_->s.number, MASK_SOLID, false );
 		if( tr.startsolid ) 
 		{
-			Com_Printf ("FinishSpawningItem: %s startsolid at %s\n", self_->classname_, vtos(self_->s.origin));
+			Common::printf ("FinishSpawningItem: %s startsolid at %s\n", self_->classname_, vtos(self_->s.origin));
 			//theLevel.removeEntity(self_);
 			self_->freeUp();
 			return;
@@ -474,11 +474,11 @@ void G_CheckTeamItems()
 		// check for the two flags
 		item = BG_FindItem( "Red Flag" );
 		if ( !item || !itemRegistered[ item - bg_itemlist ] ) {
-			Com_Printf( S_COLOR_YELLOW "WARNING: No team_CTF_redflag in map" );
+			Common::printf( S_COLOR_YELLOW "WARNING: No team_CTF_redflag in map" );
 		}
 		item = BG_FindItem( "Blue Flag" );
 		if ( !item || !itemRegistered[ item - bg_itemlist ] ) {
-			Com_Printf( S_COLOR_YELLOW "WARNING: No team_CTF_blueflag in map" );
+			Common::printf( S_COLOR_YELLOW "WARNING: No team_CTF_blueflag in map" );
 		}
 	}
 }
@@ -514,7 +514,7 @@ The item will be added to the precache list
 void RegisterItem( gitem_t *item )
 {
 	if ( !item ) {
-		Com_Error( ERR_DROP, "RegisterItem: NULL" );
+		Common::error( ERR_DROP, "RegisterItem: NULL" );
 	}
 	itemRegistered[ item - bg_itemlist ] = true;
 }
@@ -549,7 +549,7 @@ void SaveRegisteredItems()
 	}
 	string[ bg_numItems ] = 0;
 
-	Com_Printf( "%i items registered\n", count );
+	Common::printf( "%i items registered\n", count );
 	SV_SetConfigstring(CS_ITEMS, string);
 }
 

@@ -345,7 +345,7 @@ void COM_ParseError( char *format, ... )
 	Q_vsnprintf (string, sizeof(string), format, argptr);
 	va_end (argptr);
 
-	Com_Printf("ERROR: %s, line %d: %s\n", com_parsename, COM_GetCurrentParseLine(), string);
+	Common::printf("ERROR: %s, line %d: %s\n", com_parsename, COM_GetCurrentParseLine(), string);
 }
 
 void COM_ParseWarning( char *format, ... )
@@ -357,7 +357,7 @@ void COM_ParseWarning( char *format, ... )
 	Q_vsnprintf (string, sizeof(string), format, argptr);
 	va_end (argptr);
 
-	Com_Printf("WARNING: %s, line %d: %s\n", com_parsename, COM_GetCurrentParseLine(), string);
+	Common::printf("WARNING: %s, line %d: %s\n", com_parsename, COM_GetCurrentParseLine(), string);
 }
 
 /*
@@ -580,7 +580,7 @@ void COM_MatchToken( char **buf_p, char *match ) {
 
 	token = COM_Parse( buf_p );
 	if ( strcmp( token, match ) ) {
-		Com_Error( ERR_DROP, "MatchToken: %s != %s", token, match );
+		Common::error( ERR_DROP, "MatchToken: %s != %s", token, match );
 	}
 }
 
@@ -811,13 +811,13 @@ Safe strncpy that ensures a trailing zero
 */
 void Q_strncpyz( char *dest, const char *src, int destsize ) {
   if ( !dest ) {
-    Com_Error( ERR_FATAL, "Q_strncpyz: NULL dest" );
+    Common::error( ERR_FATAL, "Q_strncpyz: NULL dest" );
   }
 	if ( !src ) {
-		Com_Error( ERR_FATAL, "Q_strncpyz: NULL src" );
+		Common::error( ERR_FATAL, "Q_strncpyz: NULL src" );
 	}
 	if ( destsize < 1 ) {
-		Com_Error(ERR_FATAL,"Q_strncpyz: destsize < 1" ); 
+		Common::error(ERR_FATAL,"Q_strncpyz: destsize < 1" ); 
 	}
 
 	strncpy( dest, src, destsize-1 );
@@ -915,7 +915,7 @@ void Q_strcat( char *dest, int size, const char *src ) {
 
 	l1 = strlen( dest );
 	if ( l1 >= size ) {
-		Com_Error( ERR_FATAL, "Q_strcat: already overflowed" );
+		Common::error( ERR_FATAL, "Q_strcat: already overflowed" );
 	}
 	Q_strncpyz( dest + l1, src, size - l1 );
 }
@@ -1020,7 +1020,7 @@ int QDECL Com_sprintf(char *dest, int size, const char *fmt, ...)
 	va_end (argptr);
 
 	if(len >= size)
-		Com_Printf("Com_sprintf: Output length %d too short, require %d bytes.\n", size, len + 1);
+		Common::printf("Com_sprintf: Output length %d too short, require %d bytes.\n", size, len + 1);
 	
 	return len;
 }
@@ -1099,7 +1099,7 @@ char *Info::valueForKey( const char *s, const char *key ) {
 	}
 
 	if ( strlen( s ) >= BIG_INFO_STRING ) {
-		Com_Error( ERR_DROP, "Info::valueForKey: oversize infostring" );
+		Common::error( ERR_DROP, "Info::valueForKey: oversize infostring" );
 	}
 
 	valueindex ^= 1;
@@ -1190,7 +1190,7 @@ void Info::removeKey( char *s, const char *key ) {
 	char	*o;
 
 	if ( strlen( s ) >= MAX_INFO_STRING ) {
-		Com_Error( ERR_DROP, "Info::removeKey: oversize infostring" );
+		Common::error( ERR_DROP, "Info::removeKey: oversize infostring" );
 	}
 
 	if (strchr (key, '\\')) {
@@ -1246,7 +1246,7 @@ void Info::removeKey_Big( char *s, const char *key ) {
 	char	*o;
 
 	if ( strlen( s ) >= BIG_INFO_STRING ) {
-		Com_Error( ERR_DROP, "Info::removeKey_Big: oversize infostring" );
+		Common::error( ERR_DROP, "Info::removeKey_Big: oversize infostring" );
 	}
 
 	if (strchr (key, '\\')) {
@@ -1332,14 +1332,14 @@ void Info::setValueForKey( char *s, const char *key, const char *value ) {
 	const char* blacklist = "\\;\"";
 
 	if ( strlen( s ) >= MAX_INFO_STRING ) {
-		Com_Error( ERR_DROP, "Info::setValueForKey: oversize infostring" );
+		Common::error( ERR_DROP, "Info::setValueForKey: oversize infostring" );
 	}
 
 	for(; *blacklist; ++blacklist)
 	{
 		if (strchr (key, *blacklist) || strchr (value, *blacklist))
 		{
-			Com_Printf (S_COLOR_YELLOW "Can't use keys or values with a '%c': %s = %s\n", *blacklist, key, value);
+			Common::printf (S_COLOR_YELLOW "Can't use keys or values with a '%c': %s = %s\n", *blacklist, key, value);
 			return;
 		}
 	}
@@ -1352,7 +1352,7 @@ void Info::setValueForKey( char *s, const char *key, const char *value ) {
 
 	if (strlen(newi) + strlen(s) >= MAX_INFO_STRING)
 	{
-		Com_Printf ("Info string length exceeded\n");
+		Common::printf ("Info string length exceeded\n");
 		return;
 	}
 
@@ -1373,14 +1373,14 @@ void Info::setValueForKey_Big( char *s, const char *key, const char *value ) {
 	const char* blacklist = "\\;\"";
 
 	if ( strlen( s ) >= BIG_INFO_STRING ) {
-		Com_Error( ERR_DROP, "Info::setValueForKey: oversize infostring" );
+		Common::error( ERR_DROP, "Info::setValueForKey: oversize infostring" );
 	}
 
 	for(; *blacklist; ++blacklist)
 	{
 		if (strchr (key, *blacklist) || strchr (value, *blacklist))
 		{
-			Com_Printf (S_COLOR_YELLOW "Can't use keys or values with a '%c': %s = %s\n", *blacklist, key, value);
+			Common::printf (S_COLOR_YELLOW "Can't use keys or values with a '%c': %s = %s\n", *blacklist, key, value);
 			return;
 		}
 	}
@@ -1393,7 +1393,7 @@ void Info::setValueForKey_Big( char *s, const char *key, const char *value ) {
 
 	if (strlen(newi) + strlen(s) >= BIG_INFO_STRING)
 	{
-		Com_Printf ("BIG Info string length exceeded\n");
+		Common::printf ("BIG Info string length exceeded\n");
 		return;
 	}
 

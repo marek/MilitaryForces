@@ -119,7 +119,7 @@ static void S_AL_ClearError( bool quiet )
 		return;
 	if(error != AL_NO_ERROR)
 	{
-		Com_Printf(S_COLOR_YELLOW "WARNING: unhandled AL error: %s\n",
+		Common::printf(S_COLOR_YELLOW "WARNING: unhandled AL error: %s\n",
 			S_AL_ErrorMsg(error));
 	}
 }
@@ -178,7 +178,7 @@ static sfxHandle_t S_AL_BufferFindFree( )
 	}
 
 	// Shit...
-	Com_Error(ERR_FATAL, "S_AL_BufferFindFree: No free sound handles");
+	Common::error(ERR_FATAL, "S_AL_BufferFindFree: No free sound handles");
 	return -1;
 }
 
@@ -196,21 +196,21 @@ static sfxHandle_t S_AL_BufferFind(const char *filename)
 	int i;
 
 	if ( !filename ) {
-		Com_Error( ERR_FATAL, "Sound name is NULL" );
+		Common::error( ERR_FATAL, "Sound name is NULL" );
 	}
 
 	if ( !filename[0] ) {
-		Com_Printf( S_COLOR_YELLOW "WARNING: Sound name is empty\n" );
+		Common::printf( S_COLOR_YELLOW "WARNING: Sound name is empty\n" );
 		return 0;
 	}
 
 	if ( strlen( filename ) >= MAX_QPATH ) {
-		Com_Printf( S_COLOR_YELLOW "WARNING: Sound name is too long: %s\n", filename );
+		Common::printf( S_COLOR_YELLOW "WARNING: Sound name is too long: %s\n", filename );
 		return 0;
 	}
 
 	if ( filename[0] == '*' ) {
-		Com_Printf( S_COLOR_YELLOW "WARNING: Tried to load player sound directly: %s\n", filename );
+		Common::printf( S_COLOR_YELLOW "WARNING: Tried to load player sound directly: %s\n", filename );
 		return 0;
 	}
 
@@ -249,9 +249,9 @@ S_AL_BufferUseDefault
 static void S_AL_BufferUseDefault(sfxHandle_t sfx)
 {
 	if(sfx == default_sfx)
-		Com_Error(ERR_FATAL, "Can't load default sound effect %s", knownSfx[sfx].filename);
+		Common::error(ERR_FATAL, "Can't load default sound effect %s", knownSfx[sfx].filename);
 
-	Com_Printf( S_COLOR_YELLOW "WARNING: Using default sound for %s\n", knownSfx[sfx].filename);
+	Common::printf( S_COLOR_YELLOW "WARNING: Using default sound for %s\n", knownSfx[sfx].filename);
 	knownSfx[sfx].isDefault = true;
 	knownSfx[sfx].buffer = knownSfx[default_sfx].buffer;
 }
@@ -273,7 +273,7 @@ static void S_AL_BufferUnload(sfxHandle_t sfx)
 	S_AL_ClearError( false );
 	qalDeleteBuffers(1, &knownSfx[sfx].buffer);
 	if(qalGetError() != AL_NO_ERROR)
-		Com_Printf( S_COLOR_RED "ERROR: Can't delete sound buffer for %s\n",
+		Common::printf( S_COLOR_RED "ERROR: Can't delete sound buffer for %s\n",
 				knownSfx[sfx].filename);
 
 	knownSfx[sfx].inMemory = false;
@@ -331,7 +331,7 @@ static bool S_AL_GenBuffers(ALsizei numBuffers, ALuint *buffers, const char *nam
 	{
 		if( !S_AL_BufferEvict( ) )
 		{
-			Com_Printf( S_COLOR_RED "ERROR: Out of audio buffers\n");
+			Common::printf( S_COLOR_RED "ERROR: Out of audio buffers\n");
 			return false;
 		}
 
@@ -343,7 +343,7 @@ static bool S_AL_GenBuffers(ALsizei numBuffers, ALuint *buffers, const char *nam
 
 	if( error != AL_NO_ERROR )
 	{
-		Com_Printf( S_COLOR_RED "ERROR: Can't create a sound buffer for %s - %s\n",
+		Common::printf( S_COLOR_RED "ERROR: Can't create a sound buffer for %s - %s\n",
 				    name, S_AL_ErrorMsg(error));
 		return false;
 	}
@@ -421,7 +421,7 @@ static void S_AL_BufferLoad(sfxHandle_t sfx, bool cache)
 			qalDeleteBuffers(1, &curSfx->buffer);
 			S_AL_BufferUseDefault(sfx);
 			Hunk_FreeTempMemory(data);
-			Com_Printf( S_COLOR_RED "ERROR: Out of memory loading %s\n", curSfx->filename);
+			Common::printf( S_COLOR_RED "ERROR: Out of memory loading %s\n", curSfx->filename);
 			return;
 		}
 
@@ -436,7 +436,7 @@ static void S_AL_BufferLoad(sfxHandle_t sfx, bool cache)
 		qalDeleteBuffers(1, &curSfx->buffer);
 		S_AL_BufferUseDefault(sfx);
 		Hunk_FreeTempMemory(data);
-		Com_Printf( S_COLOR_RED "ERROR: Can't fill sound buffer for %s - %s\n",
+		Common::printf( S_COLOR_RED "ERROR: Can't fill sound buffer for %s - %s\n",
 				curSfx->filename, S_AL_ErrorMsg(error));
 		return;
 	}
@@ -530,7 +530,7 @@ sfxHandle_t S_AL_RegisterSound( const char *sample, bool compressed )
 
 	if((!knownSfx[sfx].inMemory) && (!knownSfx[sfx].isDefault))
 		S_AL_BufferLoad(sfx, s_alPrecache->integer);
-	knownSfx[sfx].lastUsedTime = Com_Milliseconds();
+	knownSfx[sfx].lastUsedTime = Common::milliseconds();
 
 	if (knownSfx[sfx].isDefault) {
 		return 0;
@@ -622,7 +622,7 @@ static void _S_AL_SanitiseVector( vec3_t v, int line )
 {
 	if( Q_isnan( v[ 0 ] ) || Q_isnan( v[ 1 ] ) || Q_isnan( v[ 2 ] ) )
 	{
-		Com_DPrintf( S_COLOR_YELLOW "WARNING: vector with one or more NaN components "
+		Common::dPrintf( S_COLOR_YELLOW "WARNING: vector with one or more NaN components "
 				"being passed to OpenAL at %s:%d -- zeroing\n", __FILE__, line );
 		VectorClear( v );
 	}
@@ -749,7 +749,7 @@ bool S_AL_SrcInit( )
 	}
 
 	// All done. Print this for informational purposes
-	Com_Printf( "Allocated %d sources.\n", srcCount);
+	Common::printf( "Allocated %d sources.\n", srcCount);
 	alSourcesInitialised = true;
 	return true;
 }
@@ -774,7 +774,7 @@ void S_AL_SrcShutdown( )
 		curSource = &srcList[i];
 		
 		if(curSource->isLocked)
-			Com_DPrintf( S_COLOR_YELLOW "WARNING: Source %d is locked\n", i);
+			Common::dPrintf( S_COLOR_YELLOW "WARNING: Source %d is locked\n", i);
 
 		if(curSource->entity > 0)
 			entityList[curSource->entity].srcAllocated = false;
@@ -862,7 +862,7 @@ static void S_AL_SaveLoopPos(src_t *dest, ALuint alSource)
 
 		if(error != AL_INVALID_ENUM)
 		{
-			Com_Printf(S_COLOR_YELLOW "WARNING: Could not get time offset for alSource %d: %s\n",
+			Common::printf(S_COLOR_YELLOW "WARNING: Could not get time offset for alSource %d: %s\n",
 				   alSource, S_AL_ErrorMsg(error));
 		}
 		
@@ -1177,7 +1177,7 @@ void S_AL_UpdateEntityPosition( int entityNum, const vec3_t origin )
 	VectorCopy( origin, sanOrigin );
 	S_AL_SanitiseVector( sanOrigin );
 	if ( entityNum < 0 || entityNum >= MAX_GENTITIES )
-		Com_Error( ERR_DROP, "SoundSystem::updateEntityPosition: bad entitynum %i", entityNum );
+		Common::error( ERR_DROP, "SoundSystem::updateEntityPosition: bad entitynum %i", entityNum );
 	VectorCopy( sanOrigin, entityList[entityNum].origin );
 }
 
@@ -1191,11 +1191,11 @@ Necessary for i.g. Western Quake3 mod which is buggy.
 static bool S_AL_CheckInput(int entityNum, sfxHandle_t sfx)
 {
 	if (entityNum < 0 || entityNum >= MAX_GENTITIES)
-		Com_Error(ERR_DROP, "ERROR: S_AL_CheckInput: bad entitynum %i", entityNum);
+		Common::error(ERR_DROP, "ERROR: S_AL_CheckInput: bad entitynum %i", entityNum);
 
 	if (sfx < 0 || sfx >= numSfx)
 	{
-		Com_Printf(S_COLOR_RED "ERROR: S_AL_CheckInput: handle %i out of range\n", sfx);
+		Common::printf(S_COLOR_RED "ERROR: S_AL_CheckInput: handle %i out of range\n", sfx);
 		return true;
 	}
 
@@ -1334,7 +1334,7 @@ static void S_AL_SrcLoop( alSrcPriority_t priority, sfxHandle_t sfx,
 		src = S_AL_SrcAlloc( priority, entityNum, -1 );
 		if( src == -1 )
 		{
-			Com_DPrintf( S_COLOR_YELLOW "WARNING: Failed to allocate source "
+			Common::dPrintf( S_COLOR_YELLOW "WARNING: Failed to allocate source "
 					"for loop sfx %d on entity %d\n", sfx, entityNum );
 			return;
 		}
@@ -1541,7 +1541,7 @@ void S_AL_SrcUpdate( )
 							{
 								if(error != AL_INVALID_ENUM)
 								{
-									Com_Printf(S_COLOR_YELLOW "WARNING: Cannot get sample offset from source %d: "
+									Common::printf(S_COLOR_YELLOW "WARNING: Cannot get sample offset from source %d: "
 										   "%s\n", i, S_AL_ErrorMsg(error));
 								}
 							}
@@ -1785,7 +1785,7 @@ void S_AL_RawSamples(int stream, int samples, int rate, int width, int channels,
 		// Failed?
 		if(streamSourceHandles[stream] == -1)
 		{
-			Com_Printf( S_COLOR_RED "ERROR: Can't allocate streaming streamSource\n");
+			Common::printf( S_COLOR_RED "ERROR: Can't allocate streaming streamSource\n");
 			return;
 		}
 	}
@@ -1794,7 +1794,7 @@ void S_AL_RawSamples(int stream, int samples, int rate, int width, int channels,
 
 	if (numBuffers == MAX_STREAM_BUFFERS)
 	{
-		Com_DPrintf(S_COLOR_RED"WARNING: Steam dropping raw samples, reached MAX_STREAM_BUFFERS\n");
+		Common::dPrintf(S_COLOR_RED"WARNING: Steam dropping raw samples, reached MAX_STREAM_BUFFERS\n");
 		return;
 	}
 
@@ -2080,7 +2080,7 @@ void S_AL_MusicProcess(ALuint b)
 	if( ( error = qalGetError( ) ) != AL_NO_ERROR )
 	{
 		S_AL_StopBackgroundTrack( );
-		Com_Printf( S_COLOR_RED "ERROR: while buffering data for music stream - %s\n",
+		Common::printf( S_COLOR_RED "ERROR: while buffering data for music stream - %s\n",
 				S_AL_ErrorMsg( error ) );
 		return;
 	}
@@ -2189,7 +2189,7 @@ void S_AL_MusicUpdate( )
 	qalGetSourcei( musicSource, AL_BUFFERS_QUEUED, &numBuffers );
 	if( state == AL_STOPPED && numBuffers )
 	{
-		Com_DPrintf( S_COLOR_YELLOW "Restarted OpenAL music\n" );
+		Common::dPrintf( S_COLOR_YELLOW "Restarted OpenAL music\n" );
 		qalSourcePlay(musicSource);
 	}
 
@@ -2376,10 +2376,10 @@ void S_AL_SoundList( )
 	for (sfx=knownSfx, i=0 ; i<numSfx ; i++, sfx++) {
 		size = sfx->info.samples;
 		total += size;
-		Com_Printf("%6i : %s[%s]\n", size,
+		Common::printf("%6i : %s[%s]\n", size,
 				sfx->filename, sfx->inMemory ? "resident " : "paged out");
 	}
-	Com_Printf ("Total resident: %i\n", total);
+	Common::printf ("Total resident: %i\n", total);
 }
 
 #ifdef USE_VOIP
@@ -2430,26 +2430,26 @@ S_AL_SoundInfo
 */
 static void S_AL_SoundInfo()
 {
-	Com_Printf( "OpenAL info:\n" );
-	Com_Printf( "  Vendor:         %s\n", qalGetString( AL_VENDOR ) );
-	Com_Printf( "  Version:        %s\n", qalGetString( AL_VERSION ) );
-	Com_Printf( "  Renderer:       %s\n", qalGetString( AL_RENDERER ) );
-	Com_Printf( "  AL Extensions:  %s\n", qalGetString( AL_EXTENSIONS ) );
-	Com_Printf( "  ALC Extensions: %s\n", qalcGetString( alDevice, ALC_EXTENSIONS ) );
+	Common::printf( "OpenAL info:\n" );
+	Common::printf( "  Vendor:         %s\n", qalGetString( AL_VENDOR ) );
+	Common::printf( "  Version:        %s\n", qalGetString( AL_VERSION ) );
+	Common::printf( "  Renderer:       %s\n", qalGetString( AL_RENDERER ) );
+	Common::printf( "  AL Extensions:  %s\n", qalGetString( AL_EXTENSIONS ) );
+	Common::printf( "  ALC Extensions: %s\n", qalcGetString( alDevice, ALC_EXTENSIONS ) );
 
 	if(enumeration_all_ext)
-		Com_Printf("  Device:         %s\n", qalcGetString(alDevice, ALC_ALL_DEVICES_SPECIFIER));
+		Common::printf("  Device:         %s\n", qalcGetString(alDevice, ALC_ALL_DEVICES_SPECIFIER));
 	else if(enumeration_ext)
-		Com_Printf("  Device:         %s\n", qalcGetString(alDevice, ALC_DEVICE_SPECIFIER));
+		Common::printf("  Device:         %s\n", qalcGetString(alDevice, ALC_DEVICE_SPECIFIER));
 
 	if(enumeration_all_ext || enumeration_ext)
-		Com_Printf("  Available Devices:\n%s", s_alAvailableDevices->string);
+		Common::printf("  Available Devices:\n%s", s_alAvailableDevices->string);
 
 #ifdef USE_VOIP
 	if(capture_ext)
 	{
-		Com_Printf("  Input Device:   %s\n", qalcGetString(alCaptureDevice, ALC_CAPTURE_DEVICE_SPECIFIER));
-		Com_Printf("  Available Input Devices:\n%s", s_alAvailableInputDevices->string);
+		Common::printf("  Input Device:   %s\n", qalcGetString(alCaptureDevice, ALC_CAPTURE_DEVICE_SPECIFIER));
+		Common::printf("  Available Input Devices:\n%s", s_alAvailableInputDevices->string);
 	}
 #endif
 }
@@ -2480,7 +2480,7 @@ void S_AL_Shutdown( )
 		qalcCaptureStop(alCaptureDevice);
 		qalcCaptureCloseDevice(alCaptureDevice);
 		alCaptureDevice = nullptr;
-		Com_Printf( "OpenAL capture device closed.\n" );
+		Common::printf( "OpenAL capture device closed.\n" );
 	}
 #endif
 
@@ -2538,7 +2538,7 @@ bool S_AL_Init( soundInterface_t *si )
 	// Load QAL
 	if( !QAL_Init( s_alDriver->string ) )
 	{
-		Com_Printf( "Failed to load library: \"%s\".\n", s_alDriver->string );
+		Common::printf( "Failed to load library: \"%s\".\n", s_alDriver->string );
 		if( !Q_stricmp( s_alDriver->string, ALDRIVER_DEFAULT ) || !QAL_Init( ALDRIVER_DEFAULT ) ) {
 			return false;
 		}
@@ -2612,14 +2612,14 @@ bool S_AL_Init( soundInterface_t *si )
 	alDevice = qalcOpenDevice(device);
 	if( !alDevice && device )
 	{
-		Com_Printf( "Failed to open OpenAL device '%s', trying default.\n", device );
+		Common::printf( "Failed to open OpenAL device '%s', trying default.\n", device );
 		alDevice = qalcOpenDevice(nullptr);
 	}
 
 	if( !alDevice )
 	{
 		QAL_Shutdown( );
-		Com_Printf( "Failed to open OpenAL device.\n" );
+		Common::printf( "Failed to open OpenAL device.\n" );
 		return false;
 	}
 
@@ -2629,7 +2629,7 @@ bool S_AL_Init( soundInterface_t *si )
 	{
 		QAL_Shutdown( );
 		qalcCloseDevice( alDevice );
-		Com_Printf( "Failed to create OpenAL context.\n" );
+		Common::printf( "Failed to create OpenAL context.\n" );
 		return false;
 	}
 	qalcMakeContextCurrent( alContext );
@@ -2650,12 +2650,12 @@ bool S_AL_Init( soundInterface_t *si )
 	s_alCapture = CvarSystem::get( "s_alCapture", "1", CVAR_ARCHIVE | CVAR_LATCH );
 	if (!s_alCapture->integer)
 	{
-		Com_Printf("OpenAL capture support disabled by user ('+set s_alCapture 1' to enable)\n");
+		Common::printf("OpenAL capture support disabled by user ('+set s_alCapture 1' to enable)\n");
 	}
 #if USE_MUMBLE
 	else if (cl_useMumble->integer)
 	{
-		Com_Printf("OpenAL capture support disabled for Mumble support\n");
+		Common::printf("OpenAL capture support disabled for Mumble support\n");
 	}
 #endif
 	else
@@ -2671,7 +2671,7 @@ bool S_AL_Init( soundInterface_t *si )
 		if (!qalcIsExtensionPresent(NULL, "ALC_EXT_capture"))
 #endif
 		{
-			Com_Printf("No ALC_EXT_capture support, can't record audio.\n");
+			Common::printf("No ALC_EXT_capture support, can't record audio.\n");
 		}
 		else
 		{
@@ -2699,14 +2699,14 @@ bool S_AL_Init( soundInterface_t *si )
 
 			s_alAvailableInputDevices = CvarSystem::get("s_alAvailableInputDevices", inputdevicenames, CVAR_ROM | CVAR_NORESTART);
 
-			Com_Printf("OpenAL default capture device is '%s'\n", defaultinputdevice ? defaultinputdevice : "none");
+			Common::printf("OpenAL default capture device is '%s'\n", defaultinputdevice ? defaultinputdevice : "none");
 			alCaptureDevice = qalcCaptureOpenDevice(inputdevice, 48000, AL_FORMAT_MONO16, VOIP_MAX_PACKET_SAMPLES*4);
 			if( !alCaptureDevice && inputdevice )
 			{
-				Com_Printf( "Failed to open OpenAL Input device '%s', trying default.\n", inputdevice );
+				Common::printf( "Failed to open OpenAL Input device '%s', trying default.\n", inputdevice );
 				alCaptureDevice = qalcCaptureOpenDevice(nullptr, 48000, AL_FORMAT_MONO16, VOIP_MAX_PACKET_SAMPLES*4);
 			}
-			Com_Printf( "OpenAL capture device %s.\n",
+			Common::printf( "OpenAL capture device %s.\n",
 				    (alCaptureDevice == nullptr) ? "failed to open" : "opened");
 		}
 	}

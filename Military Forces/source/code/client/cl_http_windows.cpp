@@ -42,7 +42,7 @@ static Q_PRINTF_FUNC(2, 3) void DropIf(bool condition, const char *fmt, ...)
     Q_vsnprintf(buffer, sizeof(buffer), fmt, argptr);
     va_end(argptr);
 
-    Com_Error(ERR_DROP, "Download Error: %s URL: %s", buffer, clc.downloadURL);
+    Common::error(ERR_DROP, "Download Error: %s URL: %s", buffer, clc.downloadURL);
 }
 
 /*

@@ -50,7 +50,7 @@ CG_FreeMarkPoly
 */
 void CG_FreeMarkPoly( markPoly_t *le ) {
 	if ( !le->prevMark ) {
-		Com_Error( ERR_DROP, "CG_FreeLocalEntity: not active" );
+		Common::error( ERR_DROP, "CG_FreeLocalEntity: not active" );
 	}
 
 	// remove from the doubly linked active list
@@ -154,7 +154,7 @@ return;
 	// rubbish radius?
 	if ( xRadius <= 0 || yRadius <= 0 )
 	{
-		Com_Error( ERR_DROP, "CG_ImpactMarkEx called with xradius AND/OR yradius <= 0" );
+		Common::error( ERR_DROP, "CG_ImpactMarkEx called with xradius AND/OR yradius <= 0" );
 	}
 
 	// create the texture axis

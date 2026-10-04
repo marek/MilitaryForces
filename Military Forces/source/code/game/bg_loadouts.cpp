@@ -38,7 +38,7 @@ bool MF_distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout )
 	modelname = MF_CreateModelPathname( idx, "models/vehicles/%s/%s/%s.md3" );
 
 //#ifdef _DEBUG
-//	Com_Printf( "Calculating weapon stations for %s\n", availableVehicles[idx].tinyName );
+//	Common::printf( "Calculating weapon stations for %s\n", availableVehicles[idx].tinyName );
 //#endif
 
 	loadout->mountsOnBay = false;
@@ -55,7 +55,7 @@ bool MF_distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout )
 	}
 
 //#ifdef _DEBUG
-//	Com_Printf( "%s has %d mounts\n", modelname, num );
+//	Common::printf( "%s has %d mounts\n", modelname, num );
 //#endif
 
 	loadout->usedMounts = num;
@@ -91,7 +91,7 @@ bool MF_distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout )
 	}
 //#ifdef _DEBUG
 //	for( i = 0; i < num; ++i ) {
-//		Com_Printf( "Mount %d: %d %x %c %d x %s\n", i, loadout->mounts[i].pos, loadout->mounts[i].flags,
+//		Common::printf( "Mount %d: %d %x %c %d x %s\n", i, loadout->mounts[i].pos, loadout->mounts[i].flags,
 //			(loadout->mounts[i].left ? 'L' : 'R'), loadout->mounts[i].num, 
 //			availableWeapons[loadout->mounts[i].weapon].descriptiveName );
 //	}
@@ -137,7 +137,7 @@ void MF_getDefaultLoadoutForVehicle( int idx, completeLoadout_t* loadout, player
 	if( idx < 0 ) 
 		return;
 
-//	Com_Printf("Getting default loadout for %s (%s)\n", availableVehicles[idx].descriptiveName, where );
+//	Common::printf("Getting default loadout for %s (%s)\n", availableVehicles[idx].descriptiveName, where );
 	memcpy( loadout, &availableLoadouts[idx], sizeof(completeLoadout_t) );
 	if( ps )
 		for( i = 0; i < 32; ++i )

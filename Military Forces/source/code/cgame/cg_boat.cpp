@@ -304,7 +304,7 @@ void CG_BoatObituary( entityState_t *ent, clientInfo_t *ci )
 		Q_strncpyz( targetName, Info::valueForKey( targetInfo, "n" ), sizeof(targetName) - 2);
 	}
 	else {
-		Com_Error( ERR_DROP, "MFQ3 Error (3): Invalid targetinfo\n" );
+		Common::error( ERR_DROP, "MFQ3 Error (3): Invalid targetinfo\n" );
 	}	
     strcat( targetName, S_COLOR_WHITE );
 
@@ -383,7 +383,7 @@ void CG_BoatObituary( entityState_t *ent, clientInfo_t *ci )
 			Q_strncpyz( attackerName, Info::valueForKey( attackerInfo, "n" ), sizeof(attackerName) - 2);
 		}
 		else {
-			Com_Error( ERR_DROP, "MFQ3 Error (1): Bad attackerInfo!\n" );
+			Common::error( ERR_DROP, "MFQ3 Error (1): Bad attackerInfo!\n" );
 		}
 	    strcat( attackerName, S_COLOR_WHITE );
 	    // check for kill messages about the current clientNum
@@ -392,7 +392,7 @@ void CG_BoatObituary( entityState_t *ent, clientInfo_t *ci )
 				Q_strncpyz( cg.killerName, attackerName, sizeof( cg.killerName ) );
 			}
 			else {
-				Com_Error( ERR_DROP, "MFQ3 Error (2): No attackerName!\n" );
+				Common::error( ERR_DROP, "MFQ3 Error (2): No attackerName!\n" );
 			}
 	    }
     }

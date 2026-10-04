@@ -169,7 +169,7 @@ void G_InitWorldSession()
 	if ( g_gametype.integer != gt) 
 	{
 		theLevel.newSession_ = true;
-		Com_Printf( "Gametype changed, clearing session data.\n" );
+		Common::printf( "Gametype changed, clearing session data.\n" );
 	} 
 }
 

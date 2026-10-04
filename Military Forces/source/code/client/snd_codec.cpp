@@ -102,7 +102,7 @@ static void *S_CodecGetSound(const char *filename, snd_info_t *info)
 		{
 			if( orgNameFailed )
 			{
-				Com_DPrintf(S_COLOR_YELLOW "WARNING: %s not present, using %s instead\n",
+				Common::dPrintf(S_COLOR_YELLOW "WARNING: %s not present, using %s instead\n",
 						filename, altName );
 			}
 
@@ -110,7 +110,7 @@ static void *S_CodecGetSound(const char *filename, snd_info_t *info)
 		}
 	}
 
-	Com_Printf(S_COLOR_YELLOW "WARNING: Failed to %s sound %s!\n", info ? "load" : "open", filename);
+	Common::printf(S_COLOR_YELLOW "WARNING: Failed to %s sound %s!\n", info ? "load" : "open", filename);
 
 	return nullptr;
 }
@@ -205,7 +205,7 @@ SoundStream *S_CodecUtilOpen(const char *filename, snd_codec_t *codec)
 	length = FileSystem::fOpenFileRead(filename, &hnd, true);
 	if(!hnd)
 	{
-		Com_DPrintf("Can't read sound file %s\n", filename);
+		Common::dPrintf("Can't read sound file %s\n", filename);
 		return nullptr;
 	}
 

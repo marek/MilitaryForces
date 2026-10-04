@@ -513,7 +513,7 @@ void ClientEntity::misc_Vehicle()
 		this->misc_Boat();
 	}
 	else {
-		Com_Error( ERR_DROP, "Error: CG_Misc_Vehicle got wrong CAT!\n" );
+		Common::error( ERR_DROP, "Error: CG_Misc_Vehicle got wrong CAT!\n" );
 	}
 }
 

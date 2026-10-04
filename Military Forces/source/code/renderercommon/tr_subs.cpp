@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "tr_common.h"
 
-void QDECL Com_Printf( const char *msg, ... )
+void QDECL Common::printf( const char *msg, ... )
 {
 	va_list         argptr;
 	char            text[1024];
@@ -35,7 +35,7 @@ void QDECL Com_Printf( const char *msg, ... )
 	ri.Printf(PRINT_ALL, "%s", text);
 }
 
-void QDECL Com_Error( int level, const char *error, ... )
+void QDECL Common::error( int level, const char *error, ... )
 {
 	va_list         argptr;
 	char            text[1024];

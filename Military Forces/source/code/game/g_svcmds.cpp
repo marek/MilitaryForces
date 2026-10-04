@@ -76,7 +76,7 @@ static bool StringToFilter (char *s, ipFilter_t *f)
 	{
 		if (*s < '0' || *s > '9')
 		{
-			Com_Printf( "Bad filter address: %s\n", s );
+			Common::printf( "Bad filter address: %s\n", s );
 			return false;
 		}
 		
@@ -176,7 +176,7 @@ static void AddIP( char *str )
 	{
 		if (numIPFilters == MAX_IPFILTERS)
 		{
-			Com_Printf ("IP filter list is full\n");
+			Common::printf ("IP filter list is full\n");
 			return;
 		}
 		numIPFilters++;
@@ -223,7 +223,7 @@ void Svcmd_AddIP_f ()
 	char		str[MAX_TOKEN_CHARS];
 
 	if ( CommandSystem::argc() < 2 ) {
-		Com_Printf("Usage:  addip <ip-mask>\n");
+		Common::printf("Usage:  addip <ip-mask>\n");
 		return;
 	}
 
@@ -245,7 +245,7 @@ void Svcmd_RemoveIP_f ()
 	char		str[MAX_TOKEN_CHARS];
 
 	if ( CommandSystem::argc() < 2 ) {
-		Com_Printf("Usage:  sv removeip <ip-mask>\n");
+		Common::printf("Usage:  sv removeip <ip-mask>\n");
 		return;
 	}
 
@@ -258,14 +258,14 @@ void Svcmd_RemoveIP_f ()
 		if (ipFilters[i].mask == f.mask	&&
 			ipFilters[i].compare == f.compare) {
 			ipFilters[i].compare = 0xffffffffu;
-			Com_Printf ("Removed.\n");
+			Common::printf ("Removed.\n");
 
 			UpdateIPBans();
 			return;
 		}
 	}
 
-	Com_Printf ( "Didn't find %s.\n", str );
+	Common::printf ( "Didn't find %s.\n", str );
 }
 
 /*
@@ -282,63 +282,63 @@ void Svcmd_EntityList_f()
 		if ( !check || !check->inuse_ ) 
 			continue;
 
-		Com_Printf("%3i:", e);
+		Common::printf("%3i:", e);
 		switch ( check->s.eType ) 
 		{
 		case ET_GENERAL:
-			Com_Printf("ET_GENERAL          ");
+			Common::printf("ET_GENERAL          ");
 			break;
 		case ET_PLAYER:
-			Com_Printf("ET_PLAYER           ");
+			Common::printf("ET_PLAYER           ");
 			break;
 		case ET_ITEM:
-			Com_Printf("ET_ITEM             ");
+			Common::printf("ET_ITEM             ");
 			break;
 		case ET_MISSILE:
-			Com_Printf("ET_MISSILE          ");
+			Common::printf("ET_MISSILE          ");
 			break;
 		case ET_BULLET:
-			Com_Printf("ET_BULLET           ");
+			Common::printf("ET_BULLET           ");
 			break;
 		case ET_MOVER:
-			Com_Printf("ET_MOVER            ");
+			Common::printf("ET_MOVER            ");
 			break;
 		case ET_BEAM:
-			Com_Printf("ET_BEAM             ");
+			Common::printf("ET_BEAM             ");
 			break;
 		case ET_PORTAL:
-			Com_Printf("ET_PORTAL           ");
+			Common::printf("ET_PORTAL           ");
 			break;
 		case ET_SPEAKER:
-			Com_Printf("ET_SPEAKER          ");
+			Common::printf("ET_SPEAKER          ");
 			break;
 		case ET_TELEPORT_TRIGGER:
-			Com_Printf("ET_TELEPORT_TRIGGER ");
+			Common::printf("ET_TELEPORT_TRIGGER ");
 			break;
 		case ET_INVISIBLE:
-			Com_Printf("ET_INVISIBLE        ");
+			Common::printf("ET_INVISIBLE        ");
 			break;
 //		case ET_GRAPPLE:
-//			Com_Printf("ET_GRAPPLE          ");
+//			Common::printf("ET_GRAPPLE          ");
 //			break;
 		case ET_VEHICLE:
-			Com_Printf("ET_VEHICLE          ");
+			Common::printf("ET_VEHICLE          ");
 			break;
 		case ET_MISC_VEHICLE:
-			Com_Printf("ET_MISC_VEHICLE          ");
+			Common::printf("ET_MISC_VEHICLE          ");
 			break;
 		case ET_EXPLOSIVE:
-			Com_Printf("ET_EXPLOSIVE        ");
+			Common::printf("ET_EXPLOSIVE        ");
 			break;
 		default:
-			Com_Printf("%3i                 ", check->s.eType);
+			Common::printf("%3i                 ", check->s.eType);
 			break;
 		}
 
 		if ( check->classname_ ) 
-			Com_Printf("%s", check->classname_);
+			Common::printf("%s", check->classname_);
 
-		Com_Printf("\n");
+		Common::printf("\n");
 	}
 }
 
@@ -354,14 +354,14 @@ GameClient* ClientForString( const char *s )
 		idnum = atoi( s );
 		if ( idnum < 1 || idnum > theLevel.maxclients_ ) 
 		{
-			Com_Printf( "Bad client slot: %i\n", idnum );
+			Common::printf( "Bad client slot: %i\n", idnum );
 			return nullptr;
 		}
 
 		cl = theLevel.getClient(idnum);// &level.clients[idnum];
 		if( cl && cl->pers_.connected_ == GameClient::ClientPersistant::CON_DISCONNECTED ) 
 		{
-			Com_Printf( "Client %i is not connected\n", idnum );
+			Common::printf( "Client %i is not connected\n", idnum );
 			return nullptr;
 		}
 		return cl;
@@ -378,7 +378,7 @@ GameClient* ClientForString( const char *s )
 			return cl;
 	}
 
-	Com_Printf( "User %s is not on the server\n", s );
+	Common::printf( "User %s is not on the server\n", s );
 
 	return nullptr;
 }

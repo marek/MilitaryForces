@@ -94,7 +94,7 @@ void CommandBuffer::addText( const char *text ) {
 
 	if (cmd_text.cursize + l >= cmd_text.maxsize)
 	{
-		Com_Printf ("CommandBuffer::addText: overflow\n");
+		Common::printf ("CommandBuffer::addText: overflow\n");
 		return;
 	}
 	Com_Memcpy(&cmd_text.data[cmd_text.cursize], text, l);
@@ -116,7 +116,7 @@ void CommandBuffer::insertText( const char *text ) {
 
 	len = strlen( text ) + 1;
 	if ( len + cmd_text.cursize > cmd_text.maxsize ) {
-		Com_Printf( "CommandBuffer::insertText overflowed\n" );
+		Common::printf( "CommandBuffer::insertText overflowed\n" );
 		return;
 	}
 
@@ -146,11 +146,11 @@ void CommandBuffer::executeText (int exec_when, const char *text)
 	{
 	case EXEC_NOW:
 		if (text && strlen(text) > 0) {
-			Com_DPrintf(S_COLOR_YELLOW "EXEC_NOW %s\n", text);
+			Common::dPrintf(S_COLOR_YELLOW "EXEC_NOW %s\n", text);
 			CommandSystem::executeString (text);
 		} else {
 			CommandBuffer::execute();
-			Com_DPrintf(S_COLOR_YELLOW "EXEC_NOW %s\n", cmd_text.data);
+			Common::dPrintf(S_COLOR_YELLOW "EXEC_NOW %s\n", cmd_text.data);
 		}
 		break;
 	case EXEC_INSERT:
@@ -160,7 +160,7 @@ void CommandBuffer::executeText (int exec_when, const char *text)
 		CommandBuffer::addText (text);
 		break;
 	default:
-		Com_Error (ERR_FATAL, "CommandBuffer::executeText: bad exec_when");
+		Common::error (ERR_FATAL, "CommandBuffer::executeText: bad exec_when");
 	}
 }
 
@@ -275,7 +275,7 @@ void CommandSystem::exec_f( ) {
 	quiet = !Q_stricmp(CommandSystem::argv(0), "execq");
 
 	if (CommandSystem::argc () != 2) {
-		Com_Printf ("exec%s <filename> : execute a script file%s\n",
+		Common::printf ("exec%s <filename> : execute a script file%s\n",
 		            quiet ? "q" : "", quiet ? " without notification" : "");
 		return;
 	}
@@ -284,11 +284,11 @@ void CommandSystem::exec_f( ) {
 	COM_DefaultExtension( filename, sizeof( filename ), ".cfg" );
 	FileSystem::readFile( filename, &f.v);
 	if (!f.c) {
-		Com_Printf ("couldn't exec %s\n", filename);
+		Common::printf ("couldn't exec %s\n", filename);
 		return;
 	}
 	if (!quiet)
-		Com_Printf ("execing %s\n", filename);
+		Common::printf ("execing %s\n", filename);
 	
 	CommandBuffer::insertText (f.c);
 
@@ -307,7 +307,7 @@ void CommandSystem::vstr_f( ) {
 	char	*v;
 
 	if (CommandSystem::argc () != 2) {
-		Com_Printf ("vstr <variablename> : execute a variable command\n");
+		Common::printf ("vstr <variablename> : execute a variable command\n");
 		return;
 	}
 
@@ -325,7 +325,7 @@ Just prints the rest of the line to the console
 */
 void CommandSystem::echo_f ()
 {
-	Com_Printf ("%s\n", CommandSystem::args());
+	Common::printf ("%s\n", CommandSystem::args());
 }
 
 
@@ -503,7 +503,7 @@ static void Cmd_TokenizeString2( const char *text_in, bool ignoreQuotes ) {
 
 #ifdef TKN_DBG
   // FIXME TTimo blunt hook to try to find the tokenization of userinfo
-  Com_DPrintf("CommandSystem::tokenizeString: %s\n", text_in);
+  Common::dPrintf("CommandSystem::tokenizeString: %s\n", text_in);
 #endif
 
 	// clear previous args
@@ -644,7 +644,7 @@ void	CommandSystem::addCommand( const char *cmd_name, xcommand_t function ) {
 	{
 		// allow completion-only commands to be silently doubled
 		if( function != nullptr )
-			Com_Printf( "CommandSystem::addCommand: %s already defined\n", cmd_name );
+			Common::printf( "CommandSystem::addCommand: %s already defined\n", cmd_name );
 		return;
 	}
 
@@ -713,7 +713,7 @@ void CommandSystem::removeCommandSafe( const char *cmd_name )
 		return;
 	if( cmd->function )
 	{
-		Com_Error( ERR_DROP, "Restricted source tried to remove "
+		Common::error( ERR_DROP, "Restricted source tried to remove "
 			"system command \"%s\"", cmd_name );
 		return;
 	}
@@ -834,12 +834,12 @@ void CommandSystem::list_f ()
 
 	i = 0;
 	for (cmd=cmd_functions ; cmd ; cmd=cmd->next) {
-		if (match && !Com_Filter(match, cmd->name, false)) continue;
+		if (match && !Common::filter(match, cmd->name, false)) continue;
 
-		Com_Printf ("%s\n", cmd->name);
+		Common::printf ("%s\n", cmd->name);
 		i++;
 	}
-	Com_Printf ("%i commands\n", i);
+	Common::printf ("%i commands\n", i);
 }
 
 /*

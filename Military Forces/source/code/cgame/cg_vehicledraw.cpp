@@ -214,7 +214,7 @@ void CG_DrawPlane(DrawInfo_Plane_t* drawInfo)
 		if( (veh->caps & HC_SWINGWING) && 
 			(i == BP_PLANE_WINGLEFT || i == BP_PLANE_WINGRIGHT)  ) 
 		{
-			//Com_Printf( "Swingwing: %f\n", drawInfo->swingAngle );
+			//Common::printf( "Swingwing: %f\n", drawInfo->swingAngle );
 			if( i == BP_PLANE_WINGLEFT ) 
 				RotateAroundYaw( part[BP_PLANE_WINGLEFT].axis, drawInfo->swingAngle );
 			else if( i == BP_PLANE_WINGRIGHT )

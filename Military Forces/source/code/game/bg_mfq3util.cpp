@@ -602,11 +602,11 @@ static void MF_ParseOverview( char **buf, mission_overview_t* overview )
 	{
 		return;
 	}
-//	Com_Printf(va("O-Token: '%s' - VALID\n", token));
+//	Common::printf(va("O-Token: '%s' - VALID\n", token));
 
 	if( strcmp( token, "{" ) ) 
 	{
-		Com_Printf( "Missing { in overview\n" );
+		Common::printf( "Missing { in overview\n" );
 		return;
 	} 
 
@@ -616,12 +616,12 @@ static void MF_ParseOverview( char **buf, mission_overview_t* overview )
 		token = COM_ParseExt( buf, true );
 		if( !token[0] ) 
 		{
-//				Com_Printf( "Unexpected end of info file\n" );
+//				Common::printf( "Unexpected end of info file\n" );
 			break;
 		}
 		if( !strcmp( token, "{" ) ) 
 		{
-//				Com_Printf( "Unexpected { found\n" );
+//				Common::printf( "Unexpected { found\n" );
 			break;
 		}
 		if( !strcmp( token, "}" ) ) 
@@ -688,11 +688,11 @@ static void MF_ParseWaypoints( char **buf, mission_vehicle_t* veh )
 	{
 		return;
 	}
-//	Com_Printf(va("W-Token: '%s' - VALID\n", token));
+//	Common::printf(va("W-Token: '%s' - VALID\n", token));
 
 	if( strcmp( token, "{" ) ) 
 	{
-		Com_Printf( "Missing { in vehicle\n" );
+		Common::printf( "Missing { in vehicle\n" );
 		return;
 	} 
 
@@ -701,12 +701,12 @@ static void MF_ParseWaypoints( char **buf, mission_vehicle_t* veh )
 		token = COM_ParseExt( buf, true );
 		if( !token[0] ) 
 		{
-//				Com_Printf( "Unexpected end of info file\n" );
+//				Common::printf( "Unexpected end of info file\n" );
 			break;
 		}
 		if( !strcmp( token, "{" ) ) 
 		{
-//				Com_Printf( "Unexpected { found\n" );
+//				Common::printf( "Unexpected { found\n" );
 			break;
 		}
 		if( !strcmp( token, "}" ) ) 
@@ -737,11 +737,11 @@ static void MF_ParseVehicle( char **buf, mission_vehicle_t* veh )
 	{
 		return;
 	}
-//	Com_Printf(va("V-Token: '%s' - VALID\n", token));
+//	Common::printf(va("V-Token: '%s' - VALID\n", token));
 
 	if( strcmp( token, "{" ) ) 
 	{
-		Com_Printf( "Missing { in vehicle\n" );
+		Common::printf( "Missing { in vehicle\n" );
 		return;
 	} 
 
@@ -750,12 +750,12 @@ static void MF_ParseVehicle( char **buf, mission_vehicle_t* veh )
 		token = COM_ParseExt( buf, true );
 		if( !token[0] ) 
 		{
-//				Com_Printf( "Unexpected end of info file\n" );
+//				Common::printf( "Unexpected end of info file\n" );
 			break;
 		}
 		if( !strcmp( token, "{" ) ) 
 		{
-//				Com_Printf( "Unexpected { found\n" );
+//				Common::printf( "Unexpected { found\n" );
 			break;
 		}
 		if( !strcmp( token, "}" ) ) 
@@ -845,11 +845,11 @@ static void MF_ParseGroundInstallation( char **buf, mission_groundInstallation_t
 	{
 		return;
 	}
-//	Com_Printf(va("GV-Token: '%s' - VALID\n", token));
+//	Common::printf(va("GV-Token: '%s' - VALID\n", token));
 
 	if( strcmp( token, "{" ) ) 
 	{
-		Com_Printf( "Missing { in groundinstallation\n" );
+		Common::printf( "Missing { in groundinstallation\n" );
 		return;
 	} 
 
@@ -858,12 +858,12 @@ static void MF_ParseGroundInstallation( char **buf, mission_groundInstallation_t
 		token = COM_ParseExt( buf, true );
 		if( !token[0] ) 
 		{
-//				Com_Printf( "Unexpected end of info file\n" );
+//				Common::printf( "Unexpected end of info file\n" );
 			break;
 		}
 		if( !strcmp( token, "{" ) ) 
 		{
-//				Com_Printf( "Unexpected { found\n" );
+//				Common::printf( "Unexpected { found\n" );
 			break;
 		}
 		if( !strcmp( token, "}" ) ) 
@@ -963,7 +963,7 @@ static void MF_ResolveMissionVehicle( mission_vehicle_t* veh )
 			veh->index = best;
 			return;
 		}
-		Com_Printf( S_COLOR_YELLOW "Mission vehicle '%s' not found, using index %d\n", veh->objectname, veh->index );
+		Common::printf( S_COLOR_YELLOW "Mission vehicle '%s' not found, using index %d\n", veh->objectname, veh->index );
 	}
 }
 
@@ -983,7 +983,7 @@ static void MF_ResolveMissionGroundInstallation( mission_groundInstallation_t* g
 			return;
 		}
 	}
-	Com_Printf( S_COLOR_YELLOW "Mission ground installation '%s' not found, using index %d\n", name, gi->index );
+	Common::printf( S_COLOR_YELLOW "Mission ground installation '%s' not found, using index %d\n", name, gi->index );
 }
 
 static void MF_ParseEntities( char **buf, 
@@ -999,11 +999,11 @@ static void MF_ParseEntities( char **buf,
 	{
 		return;
 	};
-//	Com_Printf(va("E-Token: '%s' - VALID\n", token));
+//	Common::printf(va("E-Token: '%s' - VALID\n", token));
 
 	if( strcmp( token, "{" ) ) 
 	{
-		Com_Printf( "Missing { in entities\n" );
+		Common::printf( "Missing { in entities\n" );
 		return;
 	} 
 
@@ -1012,7 +1012,7 @@ static void MF_ParseEntities( char **buf,
 		token = COM_Parse( buf );
 		if( !token[0] ) 
 		{
-			Com_Printf("Token: '%s' - END\n", token);
+			Common::printf("Token: '%s' - END\n", token);
 			break;
 		}
 		else if( !strcmp(token, "Vehicle" ) )
@@ -1020,7 +1020,7 @@ static void MF_ParseEntities( char **buf,
 			if( numVeh >= IGME_MAX_VEHICLES )
 			{
 				mission_vehicle_t skipped;
-				Com_Printf( "Too many vehicles in mission, ignoring the rest\n" );
+				Common::printf( "Too many vehicles in mission, ignoring the rest\n" );
 				MF_ParseVehicle(buf, &skipped);
 				continue;
 			}
@@ -1034,7 +1034,7 @@ static void MF_ParseEntities( char **buf,
 			if( numGI >= IGME_MAX_VEHICLES )
 			{
 				mission_groundInstallation_t skipped;
-				Com_Printf( "Too many ground installations in mission, ignoring the rest\n" );
+				Common::printf( "Too many ground installations in mission, ignoring the rest\n" );
 				MF_ParseGroundInstallation(buf, &skipped);
 				continue;
 			}
@@ -1045,12 +1045,12 @@ static void MF_ParseEntities( char **buf,
 		}
 		else if( !strcmp( token, "}" ) ) 
 		{
-			Com_Printf("End of Entities\n");
+			Common::printf("End of Entities\n");
 			break;
 		}
 		else
 		{
-			Com_Printf(S_COLOR_RED "Invalid Token '%s' - parsing cancelled\n", token);
+			Common::printf(S_COLOR_RED "Invalid Token '%s' - parsing cancelled\n", token);
 			break;
 		}
 	}
@@ -1071,7 +1071,7 @@ void MF_ParseMissionScripts( char *buf,
 		token = COM_Parse( &buf );
 		if( !token[0] ) 
 		{
-			//Com_Printf("Token: '%s' - END\n", token);
+			//Common::printf("Token: '%s' - END\n", token);
 			break;
 		}
 		else if( !strcmp(token, "Overview" ) )
@@ -1086,7 +1086,7 @@ void MF_ParseMissionScripts( char *buf,
 		}
 		else
 		{
-			Com_Printf(S_COLOR_RED "Invalid Token '%s' - parsing cancelled\n", token);
+			Common::printf(S_COLOR_RED "Invalid Token '%s' - parsing cancelled\n", token);
 			break;
 		}
 	}

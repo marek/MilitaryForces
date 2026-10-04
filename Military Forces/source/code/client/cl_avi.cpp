@@ -84,7 +84,7 @@ SafeFS_Write
 static ID_INLINE void SafeFS_Write( const void *buf, int len, fileHandle_t f )
 {
   if( FileSystem::write( buf, len, f ) < len )
-    Com_Error( ERR_DROP, "Failed to write avi file" );
+    Common::error( ERR_DROP, "Failed to write avi file" );
 }
 
 /*
@@ -133,7 +133,7 @@ static ID_INLINE void START_CHUNK( const char *s )
 {
   if( afd.chunkStackTop == MAX_RIFF_CHUNKS )
   {
-    Com_Error( ERR_DROP, "ERROR: Top of chunkstack breached" );
+    Common::error( ERR_DROP, "ERROR: Top of chunkstack breached" );
   }
 
   afd.chunkStack[ afd.chunkStackTop ] = bufIndex;
@@ -153,7 +153,7 @@ static ID_INLINE void END_CHUNK( )
 
   if( afd.chunkStackTop <= 0 )
   {
-    Com_Error( ERR_DROP, "ERROR: Bottom of chunkstack breached" );
+    Common::error( ERR_DROP, "ERROR: Bottom of chunkstack breached" );
   }
 
   afd.chunkStackTop--;
@@ -333,7 +333,7 @@ bool CL_OpenAVIForWriting( const char *fileName )
   // Don't start if a framerate has not been chosen
   if( cl_aviFrameRate->integer <= 0 )
   {
-    Com_Printf( S_COLOR_RED "cl_aviFrameRate must be >= 1\n" );
+    Common::printf( S_COLOR_RED "cl_aviFrameRate must be >= 1\n" );
     return false;
   }
 
@@ -384,7 +384,7 @@ bool CL_OpenAVIForWriting( const char *fileName )
     while( ( afd.a.rate % suggestRate ) && suggestRate >= 1 )
       suggestRate--;
 
-    Com_Printf( S_COLOR_YELLOW "WARNING: cl_aviFrameRate is not a divisor "
+    Common::printf( S_COLOR_YELLOW "WARNING: cl_aviFrameRate is not a divisor "
         "of the audio rate, suggest %d\n", suggestRate );
   }
 
@@ -396,7 +396,7 @@ bool CL_OpenAVIForWriting( const char *fileName )
   {
     if( afd.a.bits != 16 || afd.a.channels != 2 )
     {
-      Com_Printf( S_COLOR_YELLOW "WARNING: Audio format of %d bit/%d channels not supported",
+      Common::printf( S_COLOR_YELLOW "WARNING: Audio format of %d bit/%d channels not supported",
           afd.a.bits, afd.a.channels );
       afd.audio = false;
     }
@@ -406,7 +406,7 @@ bool CL_OpenAVIForWriting( const char *fileName )
   else
   {
     afd.audio = false;
-    Com_Printf( S_COLOR_YELLOW "WARNING: Audio capture is not supported "
+    Common::printf( S_COLOR_YELLOW "WARNING: Audio capture is not supported "
         "with OpenAL. Set s_useOpenAL to 0 for audio capture\n" );
   }
 
@@ -527,7 +527,7 @@ void CL_WriteAVIAudioFrame( const byte *pcmBuffer, int size )
 
   if( bytesInBuffer + size > PCM_BUFFER_SIZE )
   {
-    Com_Printf( S_COLOR_YELLOW
+    Common::printf( S_COLOR_YELLOW
         "WARNING: Audio capture buffer overflow -- truncating\n" );
     size = PCM_BUFFER_SIZE - bytesInBuffer;
   }
@@ -655,7 +655,7 @@ bool CL_CloseAVI( )
   Z_Free( afd.eBuffer );
   FileSystem::fCloseFile( afd.f );
 
-  Com_Printf( "Wrote %d:%d frames to %s\n", afd.numVideoFrames, afd.numAudioFrames, afd.fileName );
+  Common::printf( "Wrote %d:%d frames to %s\n", afd.numVideoFrames, afd.numAudioFrames, afd.fileName );
 
   return true;
 }

@@ -104,7 +104,7 @@ void SV_SectorList_f()
 		for ( ent = sec->entities ; ent ; ent = ent->nextEntityInWorldSector_ ) 
 			c++;
 
-		Com_Printf( "sector %i: %i entities\n", i, c );
+		Common::printf( "sector %i: %i entities\n", i, c );
 	}
 }
 
@@ -207,7 +207,7 @@ void SV_UnlinkEntity( EntityBase* gameEnt )
 		}
 	}
 
-	Com_Printf( "WARNING: SV_UnlinkEntity: not found in worldSector\n" );
+	Common::printf( "WARNING: SV_UnlinkEntity: not found in worldSector\n" );
 }
 
 
@@ -334,7 +334,7 @@ void SV_LinkEntity( EntityBase* gameEnt )
 			{
 				if (ent->areanum2_ != -1 && ent->areanum2_ != area && theSV.state_ == Server::SS_LOADING) 
 				{
-					Com_DPrintf ("Object %i touching 3 areas at %f %f %f\n",
+					Common::dPrintf ("Object %i touching 3 areas at %f %f %f\n",
 					gameEnt->s.number,
 					gameEnt->r.absmin[0], gameEnt->r.absmin[1], gameEnt->r.absmin[2]);
 				}
@@ -438,7 +438,7 @@ void SV_AreaEntities_r( worldSector_t *node, areaParms_t *ap )
 
 		if ( ap->count == ap->maxcount ) 
 		{
-			Com_Printf ("SV_AreaEntities: MAXCOUNT\n");
+			Common::printf ("SV_AreaEntities: MAXCOUNT\n");
 			return;
 		}
 

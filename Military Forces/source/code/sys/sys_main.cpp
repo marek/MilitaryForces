@@ -119,7 +119,7 @@ void Sys_In_Restart_f( )
 #ifndef DEDICATED
 	if( !SDL_WasInit( SDL_INIT_VIDEO ) )
 	{
-		Com_Printf( "in_restart: Cannot restart input while video is shutdown\n" );
+		Common::printf( "in_restart: Cannot restart input while video is shutdown\n" );
 		return;
 	}
 #endif
@@ -247,7 +247,7 @@ static bool Sys_WritePIDFile( const char *gamedir )
 		fclose( f );
 	}
 	else
-		Com_Printf( S_COLOR_YELLOW "Couldn't write %s.\n", pidFile );
+		Common::printf( S_COLOR_YELLOW "Couldn't write %s.\n", pidFile );
 
 	return stale;
 }
@@ -515,13 +515,13 @@ void *Sys_LoadDll(const char *name, bool useSystemLib)
 
 	if(!System::dllExtension(name))
 	{
-		Com_Printf("Refusing to attempt to load library \"%s\": Extension not allowed.\n", name);
+		Common::printf("Refusing to attempt to load library \"%s\": Extension not allowed.\n", name);
 		return nullptr;
 	}
 
 	if(useSystemLib)
 	{
-		Com_Printf("Trying to load \"%s\"...\n", name);
+		Common::printf("Trying to load \"%s\"...\n", name);
 		dllhandle = Sys_LoadLibrary(name);
 	}
 	
@@ -539,12 +539,12 @@ void *Sys_LoadDll(const char *name, bool useSystemLib)
 		len = Com_sprintf(libPath, sizeof(libPath), "%s%c%s", topDir, PATH_SEP, name);
 		if(len < sizeof(libPath))
 		{
-			Com_Printf("Trying to load \"%s\" from \"%s\"...\n", name, topDir);
+			Common::printf("Trying to load \"%s\" from \"%s\"...\n", name, topDir);
 			dllhandle = Sys_LoadLibrary(libPath);
 		}
 		else
 		{
-			Com_Printf("Skipping trying to load \"%s\" from \"%s\", file name is too long.\n", name, topDir);
+			Common::printf("Skipping trying to load \"%s\" from \"%s\", file name is too long.\n", name, topDir);
 		}
 
 		if(!dllhandle)
@@ -559,17 +559,17 @@ void *Sys_LoadDll(const char *name, bool useSystemLib)
 				len = Com_sprintf(libPath, sizeof(libPath), "%s%c%s", basePath, PATH_SEP, name);
 				if(len < sizeof(libPath))
 				{
-					Com_Printf("Trying to load \"%s\" from \"%s\"...\n", name, basePath);
+					Common::printf("Trying to load \"%s\" from \"%s\"...\n", name, basePath);
 					dllhandle = Sys_LoadLibrary(libPath);
 				}
 				else
 				{
-					Com_Printf("Skipping trying to load \"%s\" from \"%s\", file name is too long.\n", name, basePath);
+					Common::printf("Skipping trying to load \"%s\" from \"%s\", file name is too long.\n", name, basePath);
 				}
 			}
 			
 			if(!dllhandle)
-				Com_Printf("Loading \"%s\" failed\n", name);
+				Common::printf("Loading \"%s\" failed\n", name);
 		}
 	}
 	
@@ -616,7 +616,7 @@ char *Sys_ParseProtocolUri( const char *uri )
 	// Both "quake3://" and "quake3:" can be used
 	if ( Q_strncmp( uri, PROTOCOL_HANDLER ":", strlen( PROTOCOL_HANDLER ":" ) ) )
 	{
-		Com_Printf( "Sys_ParseProtocolUri: unsupported protocol.\n" );
+		Common::printf( "Sys_ParseProtocolUri: unsupported protocol.\n" );
 		return NULL;
 	}
 	uri += strlen( PROTOCOL_HANDLER ":" );
@@ -624,7 +624,7 @@ char *Sys_ParseProtocolUri( const char *uri )
 	{
 		uri += strlen( "//" );
 	}
-	Com_Printf( "Sys_ParseProtocolUri: %s\n", uri );
+	Common::printf( "Sys_ParseProtocolUri: %s\n", uri );
 
 	// At the moment, only "connect/hostname:port" is supported
 	if ( !Q_strncmp( uri, "connect/", strlen( "connect/" ) ) )
@@ -635,7 +635,7 @@ char *Sys_ParseProtocolUri( const char *uri )
 		uri += strlen( "connect/" );
 		if ( *uri == '\0' || *uri == '?' )
 		{
-			Com_Printf( "Sys_ParseProtocolUri: missing argument.\n" );
+			Common::printf( "Sys_ParseProtocolUri: missing argument.\n" );
 			return NULL;
 		}
 
@@ -655,7 +655,7 @@ char *Sys_ParseProtocolUri( const char *uri )
 				&& uri[i] != '.' && uri[i] != ':' && uri[i] != '-'
 				&& uri[i] != '[' && uri[i] != ']' )
 			{
-				Com_Printf( "Sys_ParseProtocolUri: hostname contains unsupported character.\n" );
+				Common::printf( "Sys_ParseProtocolUri: hostname contains unsupported character.\n" );
 				return NULL;
 			}
 		}
@@ -668,7 +668,7 @@ char *Sys_ParseProtocolUri( const char *uri )
 	}
 	else
 	{
-		Com_Printf( "Sys_ParseProtocolUri: unsupported command.\n" );
+		Common::printf( "Sys_ParseProtocolUri: unsupported command.\n" );
 		return NULL;
 	}
 }
@@ -774,7 +774,7 @@ int main( int argc, char **argv )
 	Sys_SetBinaryPath( System::dirName( argv[ 0 ] ) );
 	System::setDefaultInstallPath( DEFAULT_BASEDIR );
 
-	// Concatenate the command line for passing to Com_Init
+	// Concatenate the command line for passing to Common::init
 	for( i = 1; i < argc; i++ )
 	{
 		bool containsSpaces;
@@ -814,7 +814,7 @@ int main( int argc, char **argv )
 #endif
 
 	CON_Init( );
-	Com_Init( commandLine );
+	Common::init( commandLine );
 	Network::init( );
 
 	signal( SIGILL, Sys_SigHandler );
@@ -824,11 +824,11 @@ int main( int argc, char **argv )
 	signal( SIGINT, Sys_SigHandler );
 
 #ifdef __EMSCRIPTEN__
-	emscripten_set_main_loop( Com_Frame, 0, 1 );
+	emscripten_set_main_loop( Common::frame, 0, 1 );
 #else
 	while( true )
 	{
-		Com_Frame( );
+		Common::frame( );
 	}
 #endif
 

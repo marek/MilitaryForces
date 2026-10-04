@@ -87,13 +87,13 @@ static void *GPA(char *str)
 	rv = Sys_LoadFunction(cURLLib, str);
 	if(!rv)
 	{
-		Com_Printf("Can't load symbol %s\n", str);
+		Common::printf("Can't load symbol %s\n", str);
 		cURLSymbolLoadFailed = true;
 		return nullptr;
 	}
 	else
 	{
-		Com_DPrintf("Loaded symbol %s (0x%p)\n", str, rv);
+		Common::dPrintf("Loaded symbol %s (0x%p)\n", str, rv);
         return rv;
 	}
 }
@@ -110,7 +110,7 @@ bool CL_HTTP_Init()
 
 	cl_cURLLib = CvarSystem::get("cl_cURLLib", DEFAULT_CURL_LIB, CVAR_ARCHIVE | CVAR_PROTECTED);
 
-	Com_Printf("Loading \"%s\"...", cl_cURLLib->string);
+	Common::printf("Loading \"%s\"...", cl_cURLLib->string);
 	if(!(cURLLib = Sys_LoadDll(cl_cURLLib->string, true)))
 	{
 #ifdef ALTERNATE_CURL_LIB
@@ -145,10 +145,10 @@ bool CL_HTTP_Init()
 	if(cURLSymbolLoadFailed)
 	{
 		CL_HTTP_Shutdown();
-		Com_Printf("FAIL One or more symbols not found\n");
+		Common::printf("FAIL One or more symbols not found\n");
 		return false;
 	}
-	Com_Printf("OK\n");
+	Common::printf("OK\n");
 
 	return true;
 }
@@ -172,13 +172,13 @@ static void CL_cURL_Cleanup()
 			result = qcurl_multi_remove_handle(downloadCURLM,
 				downloadCURL);
 			if(result != CURLM_OK) {
-				Com_DPrintf("qcurl_multi_remove_handle failed: %s\n", qcurl_multi_strerror(result));
+				Common::dPrintf("qcurl_multi_remove_handle failed: %s\n", qcurl_multi_strerror(result));
 			}
 			qcurl_easy_cleanup(downloadCURL);
 		}
 		result = qcurl_multi_cleanup(downloadCURLM);
 		if(result != CURLM_OK) {
-			Com_DPrintf("CL_cURL_Cleanup: qcurl_multi_cleanup failed: %s\n", qcurl_multi_strerror(result));
+			Common::dPrintf("CL_cURL_Cleanup: qcurl_multi_cleanup failed: %s\n", qcurl_multi_strerror(result));
 		}
 		downloadCURLM = nullptr;
 		downloadCURL = nullptr;
@@ -257,7 +257,7 @@ CURLcode qcurl_easy_setopt_warn(CURL *curl, CURLoption option, ...)
 	}
 
 	if(result != CURLE_OK) {
-		Com_DPrintf("qcurl_easy_setopt failed: %s\n", qcurl_easy_strerror(result));
+		Common::dPrintf("qcurl_easy_setopt failed: %s\n", qcurl_easy_strerror(result));
 	}
 	va_end(argp);
 
@@ -272,7 +272,7 @@ void CL_HTTP_BeginDownload( const char *remoteURL )
 
 	downloadCURL = qcurl_easy_init();
 	if(!downloadCURL) {
-		Com_Error(ERR_DROP, "CL_HTTP_BeginDownload: qcurl_easy_init() "
+		Common::error(ERR_DROP, "CL_HTTP_BeginDownload: qcurl_easy_init() "
 			"failed");
 		return;
 	}
@@ -305,7 +305,7 @@ void CL_HTTP_BeginDownload( const char *remoteURL )
 	if(!downloadCURLM) {
 		qcurl_easy_cleanup(downloadCURL);
 		downloadCURL = nullptr;
-		Com_Error(ERR_DROP, "CL_HTTP_BeginDownload: qcurl_multi_init() "
+		Common::error(ERR_DROP, "CL_HTTP_BeginDownload: qcurl_multi_init() "
 			"failed");
 		return;
 	}
@@ -313,7 +313,7 @@ void CL_HTTP_BeginDownload( const char *remoteURL )
 	if(result != CURLM_OK) {
 		qcurl_easy_cleanup(downloadCURL);
 		downloadCURL = nullptr;
-		Com_Error(ERR_DROP,"CL_HTTP_BeginDownload: qcurl_multi_add_handle() failed: %s", qcurl_multi_strerror(result));
+		Common::error(ERR_DROP,"CL_HTTP_BeginDownload: qcurl_multi_add_handle() failed: %s", qcurl_multi_strerror(result));
 		return;
 	}
 }
@@ -341,7 +341,7 @@ bool CL_HTTP_PerformDownload()
 
 		qcurl_easy_getinfo(msg->easy_handle, CURLINFO_RESPONSE_CODE,
 			&code);	
-		Com_Error(ERR_DROP, "Download Error: %s Code: %ld URL: %s",
+		Common::error(ERR_DROP, "Download Error: %s Code: %ld URL: %s",
 			qcurl_easy_strerror(msg->data.result),
 			code, clc.downloadURL);
 	}

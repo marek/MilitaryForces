@@ -938,8 +938,6 @@ public:
 };
 
 // this is only here so the functions in q_shared.c and bg_*.c can link
-void	QDECL Com_Error( int level, const char *error, ... ) Q_NO_RETURN Q_PRINTF_FUNC(2, 3);
-void	QDECL Com_Printf( const char *msg, ... ) Q_PRINTF_FUNC(1, 2);
 
 
 /*
@@ -1650,5 +1648,7 @@ int ahextoi( const char* string );
 #include "../qcommon/screen.h"
 
 #include "../qcommon/system.h"
+
+#include "../qcommon/common.h"
 
 #endif	// __Q_SHARED_H

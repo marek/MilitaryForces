@@ -82,7 +82,7 @@ static void CG_ParseTeamInfo( ) {
 	numSortedTeamPlayers = atoi( CG_Argv( 1 ) );
 	if( numSortedTeamPlayers < 0 || numSortedTeamPlayers > TEAM_MAXOVERLAY )
 	{
-		Com_Error( ERR_DROP, "CG_ParseTeamInfo: numSortedTeamPlayers out of range (%d)",
+		Common::error( ERR_DROP, "CG_ParseTeamInfo: numSortedTeamPlayers out of range (%d)",
 				numSortedTeamPlayers );
 		return;
 	}
@@ -91,7 +91,7 @@ static void CG_ParseTeamInfo( ) {
 		client = atoi( CG_Argv( i * 6 + 2 ) );
 		if( client < 0 || client >= MAX_CLIENTS )
 		{
-		  Com_Error( ERR_DROP, "CG_ParseTeamInfo: bad client number: %d", client );
+		  Common::error( ERR_DROP, "CG_ParseTeamInfo: bad client number: %d", client );
 		  return;
 		}
 
@@ -141,13 +141,13 @@ void CG_ParseServerinfo( ) {
 	else if( strcmp( gs, "ww2" ) == 0 ) newset = MF_GAMESET_WW2;
 	else if( strcmp( gs, "ww1" ) == 0 ) newset = MF_GAMESET_WW1;
 	else newset = MF_GAMESET_MODERN;
-	Com_Printf("The gameset is '%s'\n", gs);
+	Common::printf("The gameset is '%s'\n", gs);
 
 	// gameset changed>
 	if( cgs.gameset && newset != cgs.gameset )
 	{	
 		CommandBuffer::addText(";vid_restart\n" );  // Leading ' ; ' Previous command getting stuck?
-		Com_Printf("The gameset has changed to %s\n", gs );
+		Common::printf("The gameset has changed to %s\n", gs );
 	}
 	cgs.gameset = newset;
 }

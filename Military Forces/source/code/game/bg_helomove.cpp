@@ -182,7 +182,7 @@ PM_AdjustToTerrain
 //			if( pm->ps->vehicleAngles[0] < 89 || pm->ps->vehicleAngles[0] > 270 )
 //				pm->ps->vehicleAngles[0] += availableVehicles[pm->vehicle].turnspeed[0] * pml.frametime;
 //		}
-////		Com_Printf( "%.1f\n", pm->ps->vehicleAngles[2] );
+////		Common::printf( "%.1f\n", pm->ps->vehicleAngles[2] );
 //	}
 //}
 

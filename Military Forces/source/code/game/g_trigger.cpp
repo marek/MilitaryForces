@@ -102,7 +102,7 @@ void SP_trigger_multiple( GameEntity *ent )
 	if( ent->random_ >= ent->wait_ && ent->wait_ >= 0 ) 
 	{
 		ent->random_ = ent->wait_ - FRAMETIME;
-		Com_Printf( "trigger_multiple has random >= wait\n" );
+		Common::printf( "trigger_multiple has random >= wait\n" );
 	}
 
 	ent->setTouch( std::make_unique<Touch_MultiTouch>());
@@ -203,7 +203,7 @@ void SP_func_timer( GameEntity *self )
 	if( self->random_ >= self->wait_ ) 
 	{
 		self->random_ = self->wait_ - FRAMETIME;
-		Com_Printf( "func_timer at %s has random >= wait\n", vtos( self->s.origin ) );
+		Common::printf( "func_timer at %s has random >= wait\n", vtos( self->s.origin ) );
 	}
 
 	if( self->spawnflags_ & 1 )

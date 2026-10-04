@@ -86,7 +86,7 @@ Server::SVEntityForGameEntity( EntityBase* gameEnt )
 {
 	if ( !gameEnt || gameEnt->s.number < 0 || gameEnt->s.number >= MAX_GENTITIES ) 
 	{
-		Com_Error( ERR_DROP, "Server::getServerEntity: bad gameEnt" );
+		Common::error( ERR_DROP, "Server::getServerEntity: bad gameEnt" );
 	}
 	return &serverEntities_[gameEnt->s.number];
 }

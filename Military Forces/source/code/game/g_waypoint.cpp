@@ -23,7 +23,7 @@
 //	Q_strncpyz( w->name, wp->targetname, MAX_NAME_LENGTH );
 //	VectorCopy( wp->s.origin, w->pos );
 //	
-//	Com_Printf( "Found waypoint %s (%d)\n", w->name, idx );
+//	Common::printf( "Found waypoint %s (%d)\n", w->name, idx );
 //
 //	// increment
 //	level.waypointList.usedWPs++;

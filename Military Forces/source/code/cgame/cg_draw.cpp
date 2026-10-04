@@ -2271,7 +2271,7 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 		break;
 	default:
 		separation = 0;
-		Com_Error( ERR_DROP, "CG_DrawActive: Undefined stereoView" );
+		Common::error( ERR_DROP, "CG_DrawActive: Undefined stereoView" );
 	}
 
 

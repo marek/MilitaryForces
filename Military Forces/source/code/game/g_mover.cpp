@@ -118,7 +118,7 @@ bool G_TryPushingEntity( GameEntity *check, GameEntity *pusher, vec3_t move, vec
 
 	// save off the old position
 	if( pushed_p > &pushed[MAX_GENTITIES] ) 
-		Com_Error( ERR_DROP, "pushed_p > &pushed[MAX_GENTITIES]" );
+		Common::error( ERR_DROP, "pushed_p > &pushed[MAX_GENTITIES]" );
 
 	pushed_p->ent = check;
 	VectorCopy (check->s.pos.trBase, pushed_p->origin);
@@ -545,7 +545,7 @@ struct Reached_BinaryMover : public GameEntity::EntityFunc_Reached
 
 		} 
 		else 
-			Com_Error( ERR_DROP, "Reached_BinaryMover: bad moverState" );
+			Common::error( ERR_DROP, "Reached_BinaryMover: bad moverState" );
 	}
 };
 
@@ -1267,7 +1267,7 @@ struct Think_SetupTrainTargets : public GameEntity::EntityFunc_Think
 		self_->nextTrain_ = G_Find( nullptr, FOFS(targetname_), self_->target_ );
 		if( !self_->nextTrain_ ) 
 		{
-			Com_Printf( "func_train at %s with an unfound target\n",
+			Common::printf( "func_train at %s with an unfound target\n",
 				vtos(self_->r.absmin) );
 			return;
 		}
@@ -1280,7 +1280,7 @@ struct Think_SetupTrainTargets : public GameEntity::EntityFunc_Think
 
 			if( !path->target_ ) 
 			{
-				Com_Printf( "Train corner at %s without a target\n",
+				Common::printf( "Train corner at %s without a target\n",
 					vtos(path->s.origin) );
 				return;
 			}
@@ -1293,7 +1293,7 @@ struct Think_SetupTrainTargets : public GameEntity::EntityFunc_Think
 				next = G_Find( next, FOFS(targetname_), path->target_ );
 				if( !next ) 
 				{
-					Com_Printf( "Train corner at %s without a target path_corner\n",
+					Common::printf( "Train corner at %s without a target path_corner\n",
 						vtos(path->s.origin) );
 					return;
 				}
@@ -1325,7 +1325,7 @@ void SP_path_corner( GameEntity *self )
 {
 	if ( !self->targetname_ ) 
 	{
-		Com_Printf ("path_corner with no targetname at %s\n", vtos(self->s.origin));
+		Common::printf ("path_corner with no targetname at %s\n", vtos(self->s.origin));
 		self->freeUp();
 		return;
 	}
@@ -1365,7 +1365,7 @@ void SP_func_train (GameEntity *self)
 
 	if( !self->target_ ) 
 	{
-		Com_Printf ("func_train without a target at %s\n", vtos(self->r.absmin));
+		Common::printf ("func_train without a target at %s\n", vtos(self->r.absmin));
 		self->freeUp();
 		return;
 	}

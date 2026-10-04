@@ -53,7 +53,7 @@ void SV_Client::netchanTransmitNextInQueue()
 {
 	SV_Client::Netchan_Buffer *netbuf;
 		
-	Com_DPrintf("#462 Netchan_TransmitNextFragment: popping a queued message for transmit\n");
+	Common::dPrintf("#462 Netchan_TransmitNextFragment: popping a queued message for transmit\n");
 	netbuf = this->netchan_start_queue_;
 
 	this->netchan_.transmit( netbuf->msg_.cursize, netbuf->msg_.data );
@@ -62,11 +62,11 @@ void SV_Client::netchanTransmitNextInQueue()
 	this->netchan_start_queue_ = netbuf->next_;
 	if(!this->netchan_start_queue_)
 	{
-		Com_DPrintf("#462 Netchan_TransmitNextFragment: emptied queue\n");
+		Common::dPrintf("#462 Netchan_TransmitNextFragment: emptied queue\n");
 		this->netchan_end_queue_ = &this->netchan_start_queue_;
 	}
 	else
-		Com_DPrintf("#462 Netchan_TransmitNextFragment: remaining queued message\n");
+		Common::dPrintf("#462 Netchan_TransmitNextFragment: remaining queued message\n");
 
 	Z_Free(netbuf);
 }
@@ -115,7 +115,7 @@ void SV_Client::netchanTransmit( Message *msg )
 	if(this->netchan_.unsentFragments || this->netchan_start_queue_)
 	{
 		SV_Client::Netchan_Buffer *netbuf;
-		Com_DPrintf("#462 SV_Netchan_Transmit: unsent fragments, stacked\n");
+		Common::dPrintf("#462 SV_Netchan_Transmit: unsent fragments, stacked\n");
 		netbuf = static_cast<SV_Client::Netchan_Buffer *>(Z_Malloc(sizeof(SV_Client::Netchan_Buffer)));
 		// store the msg, we can't store it encoded, as the encoding depends on stuff we still have to finish sending
 		netbuf->msg_.copy( netbuf->msgBuffer_, sizeof( netbuf->msgBuffer_ ), msg);

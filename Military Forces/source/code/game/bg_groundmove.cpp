@@ -300,7 +300,7 @@ static void PM_AdjustToTerrain( )
 			if( pm->ps->vehicleAngles[0] < 89 || pm->ps->vehicleAngles[0] > 270 )
 				pm->ps->vehicleAngles[0] += availableVehicles[pm->vehicle].turnspeed[0] * pml.frametime;
 		}
-//		Com_Printf( "%.1f\n", pm->ps->vehicleAngles[2] );
+//		Common::printf( "%.1f\n", pm->ps->vehicleAngles[2] );
 	}
 }
 
@@ -373,11 +373,11 @@ void PM_GroundVehicleMove( )
 	vectoangles( temp, turretdir );
 	turretdir[PITCH] += gun_pitch;
 
-//	Com_Printf( "vehd = %.1f %.1f %.1f (%.1f %.1f)\n", pm->ps->vehicleAngles[0], pm->ps->vehicleAngles[1],
+//	Common::printf( "vehd = %.1f %.1f %.1f (%.1f %.1f)\n", pm->ps->vehicleAngles[0], pm->ps->vehicleAngles[1],
 //			pm->ps->vehicleAngles[2], turret_yaw, gun_pitch );
-//	Com_Printf( "view = %.1f %.1f %.1f\n", pm->ps->viewangles[0], pm->ps->viewangles[1],
+//	Common::printf( "view = %.1f %.1f %.1f\n", pm->ps->viewangles[0], pm->ps->viewangles[1],
 //			pm->ps->viewangles[2] );
-//	Com_Printf( "turr = %.1f %.1f %.1f\n", turretdir[0], turretdir[1], turretdir[2] );
+//	Common::printf( "turr = %.1f %.1f %.1f\n", turretdir[0], turretdir[1], turretdir[2] );
 
 	// local vectors
     VectorCopy( pm->ps->vehicleAngles, vehdir );
@@ -459,7 +459,7 @@ void PM_GroundVehicleMove( )
 		} else if ( gun_pitch > 90 && gun_pitch < availableVehicles[pm->vehicle].gearheight ) {
 			gun_pitch = availableVehicles[pm->vehicle].gearheight;
 		}
-//		Com_Printf( "gun %.1f (d %.1f)\n", gun_pitch, diff[PITCH] );
+//		Common::printf( "gun %.1f (d %.1f)\n", gun_pitch, diff[PITCH] );
 	}
 
 	// return angles

@@ -49,7 +49,7 @@ sfxHandle_t	CG_CustomSound( int clientNum, const char *soundName ) {
 		}
 	}
 
-	Com_Error( ERR_DROP, "Unknown custom sound: %s", soundName );
+	Common::error( ERR_DROP, "Unknown custom sound: %s", soundName );
 	return 0;
 }
 
@@ -187,7 +187,7 @@ void CG_NewClientInfo( int clientNum ) {
 	    newInfo.infoValid = true;
 	    *ci = newInfo;
 
-//		Com_Printf( "New info received, it is a vehicle (%s)\n", newInfo.name );
+//		Common::printf( "New info received, it is a vehicle (%s)\n", newInfo.name );
 	    return;
 	}
 

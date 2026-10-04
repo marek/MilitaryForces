@@ -64,7 +64,7 @@ void updateTargetTracking( GameEntity *ent )
 	GameEntity		*test;
 	float			cone = 0.0f;
 	
-//	Com_Printf( "updateTargetTracking for %s\n", ent->client->pers.netname );
+//	Common::printf( "updateTargetTracking for %s\n", ent->client->pers.netname );
 
 	// what can we lock on ?
 	if(	ent->client_->ps_.ONOFF & OO_RADAR_AIR )

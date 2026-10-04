@@ -99,7 +99,7 @@ static char *Sys_DefaultHomePath( void )
 		if( !SUCCEEDED( SHGetFolderPathA( NULL, CSIDL_APPDATA,
 						NULL, 0, szPath ) ) )
 		{
-			Com_Printf("Unable to detect CSIDL_APPDATA\n");
+			Common::printf("Unable to detect CSIDL_APPDATA\n");
 			return NULL;
 		}
 		
@@ -236,7 +236,7 @@ char* System::microsoftStorePath(void)
 		if( !SUCCEEDED( SHGetFolderPathA( NULL, CSIDL_PROGRAM_FILES,
 						NULL, 0, szPath ) ) )
 		{
-			Com_Printf("Unable to detect CSIDL_PROGRAM_FILES\n");
+			Common::printf("Unable to detect CSIDL_PROGRAM_FILES\n");
 			return microsoftStorePath;
 		}
 
@@ -514,7 +514,7 @@ void Sys_ListFilteredFiles( const char *basedir, char *subdirs, char *filter, ch
 			break;
 		}
 		Com_sprintf( filename, sizeof(filename), "%s\\%s", subdirs, findinfo.name );
-		if (!Com_FilterPath( filter, filename, false ))
+		if (!Common::filterPath( filter, filename, false ))
 			continue;
 		list[ *numfiles ] = CopyString( filename );
 		(*numfiles)++;
@@ -832,7 +832,7 @@ void Sys_PlatformInit( void )
 
 		if(timerResolution > 1)
 		{
-			Com_Printf("Warning: Minimum supported timer resolution is %ums "
+			Common::printf("Warning: Minimum supported timer resolution is %ums "
 				"on this system, recommended resolution 1ms\n", timerResolution);
 		}
 		

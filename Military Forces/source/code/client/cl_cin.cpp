@@ -157,7 +157,7 @@ static int CIN_HandleForVideo() {
 			return i;
 		}
 	}
-	Com_Error( ERR_DROP, "CIN_HandleForVideo: none free" );
+	Common::error( ERR_DROP, "CIN_HandleForVideo: none free" );
 	return -1;
 }
 
@@ -1010,7 +1010,7 @@ static void readQuadInfo( byte *qData )
                         cinTable[currentHandle].drawY = 256;
                 }
 		if (cinTable[currentHandle].CIN_WIDTH != 256 || cinTable[currentHandle].CIN_HEIGHT != 256) {
-			Com_Printf("HACK: approxmimating cinematic for Rage Pro or Voodoo\n");
+			Common::printf("HACK: approxmimating cinematic for Rage Pro or Voodoo\n");
 		}
 	}
 }
@@ -1212,7 +1212,7 @@ redump:
 	cinTable[currentHandle].roqF1		 = static_cast<signed char>(framedata[6]);
 
 	if (cinTable[currentHandle].RoQFrameSize>65536||cinTable[currentHandle].roq_id==0x1084) {
-		Com_DPrintf("roq_size>65536||roq_id==0x1084\n");
+		Common::dPrintf("roq_size>65536||roq_id==0x1084\n");
 		cinTable[currentHandle].status = FMV_EOF;
 		if (cinTable[currentHandle].looping) {
 			RoQReset();
@@ -1277,7 +1277,7 @@ static void RoQShutdown( ) {
 	if ( cinTable[currentHandle].status == FMV_IDLE ) {
 		return;
 	}
-	Com_DPrintf("finished cinematic\n");
+	Common::dPrintf("finished cinematic\n");
 	cinTable[currentHandle].status = FMV_IDLE;
 
 	if (cinTable[currentHandle].iFile) {
@@ -1312,7 +1312,7 @@ e_status CIN_StopCinematic(int handle) {
 	if (handle < 0 || handle>= MAX_VIDEO_HANDLES || cinTable[handle].status == FMV_EOF) return FMV_EOF;
 	currentHandle = handle;
 
-	Com_DPrintf("trFMV::stop(), closing %s\n", cinTable[currentHandle].fileName);
+	Common::dPrintf("trFMV::stop(), closing %s\n", cinTable[currentHandle].fileName);
 
 	if (!cinTable[currentHandle].buf) {
 		return FMV_EOF;
@@ -1428,7 +1428,7 @@ int CIN_PlayCinematic( const char *arg, int x, int y, int w, int h, int systemBi
 		}
 	}
 
-	Com_DPrintf("CIN_PlayCinematic( %s )\n", arg);
+	Common::dPrintf("CIN_PlayCinematic( %s )\n", arg);
 
 	Com_Memset(&cin, 0, sizeof(cinematics_t) );
 	currentHandle = CIN_HandleForVideo();
@@ -1441,7 +1441,7 @@ int CIN_PlayCinematic( const char *arg, int x, int y, int w, int h, int systemBi
 	cinTable[currentHandle].ROQSize = FileSystem::fOpenFileRead (cinTable[currentHandle].fileName, &cinTable[currentHandle].iFile, true);
 
 	if (cinTable[currentHandle].ROQSize<=0) {
-		Com_DPrintf("play(%s), ROQSize<=0\n", arg);
+		Common::dPrintf("play(%s), ROQSize<=0\n", arg);
 		cinTable[currentHandle].fileName[0] = 0;
 		return -1;
 	}
@@ -1477,7 +1477,7 @@ int CIN_PlayCinematic( const char *arg, int x, int y, int w, int h, int systemBi
 //		FileSystem::read (cin.file, cinTable[currentHandle].RoQFrameSize+8, cinTable[currentHandle].iFile);
 
 		cinTable[currentHandle].status = FMV_PLAY;
-		Com_DPrintf("trFMV::play(), playing %s\n", arg);
+		Common::dPrintf("trFMV::play(), playing %s\n", arg);
 
 		if (cinTable[currentHandle].alterGameState) {
 			clc.state = CA_CINEMATIC;
@@ -1491,7 +1491,7 @@ int CIN_PlayCinematic( const char *arg, int x, int y, int w, int h, int systemBi
 
 		return currentHandle;
 	}
-	Com_DPrintf("trFMV::play(), invalid RoQ ID\n");
+	Common::dPrintf("trFMV::play(), invalid RoQ ID\n");
 
 	RoQShutdown();
 	return -1;
@@ -1614,7 +1614,7 @@ void CL_PlayCinematic_f() {
 	char	*arg, *s;
 	int bits = CIN_system;
 
-	Com_DPrintf("CL_PlayCinematic_f\n");
+	Common::dPrintf("CL_PlayCinematic_f\n");
 	if (clc.state == CA_CINEMATIC) {
 		Screen::stopCinematic();
 	}

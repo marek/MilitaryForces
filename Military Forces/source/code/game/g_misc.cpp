@@ -80,7 +80,7 @@ struct Think_LocateCamera : public GameEntity::EntityFunc_Think
 		owner = G_PickTarget( self_->target_ );
 		if ( !owner ) 
 		{
-			Com_Printf( "Couldn't find target for misc_partal_surface\n" );
+			Common::printf( "Couldn't find target for misc_partal_surface\n" );
 			self_->freeUp();
 			return;
 		}

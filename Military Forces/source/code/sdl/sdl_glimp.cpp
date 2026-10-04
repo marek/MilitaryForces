@@ -291,13 +291,13 @@ static bool GLimp_GetProcAddresses( bool fixedFunction ) {
 	GLE(const GLubyte *, GetString, GLenum name)
 
 	if ( !qglGetString ) {
-		Com_Error( ERR_FATAL, "glGetString is NULL" );
+		Common::error( ERR_FATAL, "glGetString is NULL" );
 	}
 
 	version = reinterpret_cast<const char *>(qglGetString( GL_VERSION ));
 
 	if ( !version ) {
-		Com_Error( ERR_FATAL, "GL_VERSION is NULL" );
+		Common::error( ERR_FATAL, "GL_VERSION is NULL" );
 	}
 
 	if ( Q_stricmpn( "OpenGL ES", version, 9 ) == 0 ) {
@@ -325,9 +325,9 @@ static bool GLimp_GetProcAddresses( bool fixedFunction ) {
 			QGL_ES_1_1_PROCS;
 			QGL_ES_1_1_FIXED_FUNCTION_PROCS;
 			// error so this doesn't segfault due to NULL desktop GL functions being used
-			Com_Error( ERR_FATAL, "Unsupported OpenGL Version: %s", version );
+			Common::error( ERR_FATAL, "Unsupported OpenGL Version: %s", version );
 		} else {
-			Com_Error( ERR_FATAL, "Unsupported OpenGL Version (%s), OpenGL 1.1 is required", version );
+			Common::error( ERR_FATAL, "Unsupported OpenGL Version (%s), OpenGL 1.1 is required", version );
 		}
 	} else {
 		if ( QGL_VERSION_ATLEAST( 2, 0 ) ) {
@@ -348,7 +348,7 @@ static bool GLimp_GetProcAddresses( bool fixedFunction ) {
 			qglDrawBuffer = GLimp_GLES_DrawBuffer;
 			qglPolygonMode = GLimp_GLES_PolygonMode;
 		} else {
-			Com_Error( ERR_FATAL, "Unsupported OpenGL Version (%s), OpenGL 2.0 is required", version );
+			Common::error( ERR_FATAL, "Unsupported OpenGL Version (%s), OpenGL 2.0 is required", version );
 		}
 	}
 

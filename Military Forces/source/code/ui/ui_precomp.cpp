@@ -328,7 +328,7 @@ UI_PrecompilerTools::pushScript( SourceFile* source, Script* script )
 	{
 		if (!Q_stricmp(s->filename_, script->filename_))
 		{
-			Com_Printf(S_COLOR_RED "ERROR: %s recursively included", script->filename_);
+			Common::printf(S_COLOR_RED "ERROR: %s recursively included", script->filename_);
 			return;
 		} //end if
 	} //end for
@@ -578,14 +578,14 @@ UI_PrecompilerTools::expandDefine( SourceFile* source, Token* deftoken, Define* 
 					//stringize the define parameter tokens
 					if (!stringizeTokens(parms[parmnum], &token))
 					{
-						Com_Printf(S_COLOR_RED "ERROR: can't stringize tokens");
+						Common::printf(S_COLOR_RED "ERROR: can't stringize tokens");
 						return false;
 					} //end if
 					t = copyToken(&token);
 				} //end if
 				else
 				{
-					Com_Printf(S_COLOR_YELLOW "stringizing operator without define parameter");
+					Common::printf(S_COLOR_YELLOW "stringizing operator without define parameter");
 					continue;
 				} //end if
 			} //end if
@@ -616,7 +616,7 @@ UI_PrecompilerTools::expandDefine( SourceFile* source, Token* deftoken, Define* 
 				{
 					if (!mergeTokens(t1, t2))
 					{
-						Com_Printf(S_COLOR_RED "ERROR: can't merge %s with %s", t1->string_, t2->string_);
+						Common::printf(S_COLOR_RED "ERROR: can't merge %s with %s", t1->string_, t2->string_);
 						return false;
 					} //end if
 					freeToken(t1->next_);
@@ -725,13 +725,13 @@ UI_PrecompilerTools::readDefineParms( SourceFile* source, Define* define, Token*
 
 	if (!readSourceToken(source, &token))
 	{
-		Com_Printf(S_COLOR_RED "ERROR: define %s missing parms", define->name_);
+		Common::printf(S_COLOR_RED "ERROR: define %s missing parms", define->name_);
 		return false;
 	} //end if
 	//
 	if (define->numparms_ > maxparms)
 	{
-		Com_Printf(S_COLOR_RED "ERROR: define with more than %d parameters", maxparms);
+		Common::printf(S_COLOR_RED "ERROR: define with more than %d parameters", maxparms);
 		return false;
 	} //end if
 	//
@@ -740,7 +740,7 @@ UI_PrecompilerTools::readDefineParms( SourceFile* source, Define* define, Token*
 	if (strcmp(token.string_, "("))
 	{
 		unreadSourceToken(source, &token);
-		Com_Printf(S_COLOR_RED "ERROR: define %s missing parms", define->name_);
+		Common::printf(S_COLOR_RED "ERROR: define %s missing parms", define->name_);
 		return false;
 	} //end if
 	//read the define parameters
@@ -748,12 +748,12 @@ UI_PrecompilerTools::readDefineParms( SourceFile* source, Define* define, Token*
 	{
 		if (numparms >= maxparms)
 		{
-			Com_Printf(S_COLOR_RED "ERROR: define %s with too many parms", define->name_);
+			Common::printf(S_COLOR_RED "ERROR: define %s with too many parms", define->name_);
 			return false;
 		} //end if
 		if (numparms >= define->numparms_)
 		{
-			Com_Printf(S_COLOR_YELLOW "WARNING: define %s has too many parms", define->name_);
+			Common::printf(S_COLOR_YELLOW "WARNING: define %s has too many parms", define->name_);
 			return false;
 		} //end if
 		parms[numparms] = nullptr;
@@ -764,7 +764,7 @@ UI_PrecompilerTools::readDefineParms( SourceFile* source, Define* define, Token*
 			//
 			if (!readSourceToken(source, &token))
 			{
-				Com_Printf(S_COLOR_RED "ERROR: define %s incomplete", define->name_);
+				Common::printf(S_COLOR_RED "ERROR: define %s incomplete", define->name_);
 				return false;
 			} //end if
 			//
@@ -773,7 +773,7 @@ UI_PrecompilerTools::readDefineParms( SourceFile* source, Define* define, Token*
 				if (indent <= 0)
 				{
 					if (lastcomma) 
-						Com_Printf(S_COLOR_YELLOW "WARNING: too many comma's");
+						Common::printf(S_COLOR_YELLOW "WARNING: too many comma's");
 					lastcomma = 1;
 					break;
 				} //end if
@@ -791,7 +791,7 @@ UI_PrecompilerTools::readDefineParms( SourceFile* source, Define* define, Token*
 				{
 					if (!parms[define->numparms_-1])
 					{
-						Com_Printf(S_COLOR_YELLOW "WARNING: too few define parms");
+						Common::printf(S_COLOR_YELLOW "WARNING: too few define parms");
 					} //end if
 					done = 1;
 					break;
@@ -919,7 +919,7 @@ UI_PrecompilerTools::scriptReadToken( Script* script, Token* token )
 	//check for punctuations
 	else if (!scriptReadPunctuation(script, token))
 	{
-		Com_Printf(S_COLOR_RED "ERROR: can't read token");
+		Common::printf(S_COLOR_RED "ERROR: can't read token");
 		return 0;
 	} //end if
 	//copy the token into the script structure
@@ -1009,7 +1009,7 @@ UI_PrecompilerTools::scriptReadString( Script* script, Token* token, int quote )
 		//minus 2 because trailing double quote and zero have to be appended
 		if (len >= k_MAX_TOKEN - 2)
 		{
-			Com_Printf(S_COLOR_RED "ERROR: string longer than MAX_TOKEN = %d", k_MAX_TOKEN);
+			Common::printf(S_COLOR_RED "ERROR: string longer than MAX_TOKEN = %d", k_MAX_TOKEN);
 			return 0;
 		} //end if
 		//if there is an escape character and
@@ -1056,13 +1056,13 @@ UI_PrecompilerTools::scriptReadString( Script* script, Token* token, int quote )
 			if (*script->script_p_ == '\0')
 			{
 				token->string_[len] = 0;
-				Com_Printf(S_COLOR_RED "ERROR: missing trailing quote");
+				Common::printf(S_COLOR_RED "ERROR: missing trailing quote");
 				return 0;
 			} //end if
 	      if (*script->script_p_ == '\n')
 			{
 				token->string_[len] = 0;
-				Com_Printf(S_COLOR_RED "ERROR: newline inside string %s", token->string_);
+				Common::printf(S_COLOR_RED "ERROR: newline inside string %s", token->string_);
 				return 0;
 			} //end if
 			token->string_[len++] = *script->script_p_++;
@@ -1103,7 +1103,7 @@ UI_PrecompilerTools::scriptReadNumber( Script* script, Token* token )
 			token->string_[len++] = *script->script_p_++;
 			if (len >= k_MAX_TOKEN)
 			{
-				Com_Printf(S_COLOR_RED "ERROR: hexadecimal number longer than MAX_TOKEN = %d", k_MAX_TOKEN);
+				Common::printf(S_COLOR_RED "ERROR: hexadecimal number longer than MAX_TOKEN = %d", k_MAX_TOKEN);
 				return 0;
 			} //end if
 			c = *script->script_p_;
@@ -1124,7 +1124,7 @@ UI_PrecompilerTools::scriptReadNumber( Script* script, Token* token )
 			token->string_[len++] = *script->script_p_++;
 			if (len >= k_MAX_TOKEN)
 			{
-				Com_Printf(S_COLOR_RED "ERROR: binary number longer than MAX_TOKEN = %d", k_MAX_TOKEN);
+				Common::printf(S_COLOR_RED "ERROR: binary number longer than MAX_TOKEN = %d", k_MAX_TOKEN);
 				return 0;
 			} //end if
 			c = *script->script_p_;
@@ -1148,7 +1148,7 @@ UI_PrecompilerTools::scriptReadNumber( Script* script, Token* token )
 			token->string_[len++] = *script->script_p_++;
 			if (len >= k_MAX_TOKEN - 1)
 			{
-				Com_Printf(S_COLOR_RED "ERROR: number longer than MAX_TOKEN = %d", k_MAX_TOKEN);
+				Common::printf(S_COLOR_RED "ERROR: number longer than MAX_TOKEN = %d", k_MAX_TOKEN);
 				return 0;
 			} //end if
 		} //end while
@@ -1194,7 +1194,7 @@ UI_PrecompilerTools::scriptReadPrimitive( Script* script, Token* token )
 	{
 		if (len >= k_MAX_TOKEN)
 		{
-			Com_Printf(S_COLOR_RED "ERROR: primitive token longer than MAX_TOKEN = %d", k_MAX_TOKEN);
+			Common::printf(S_COLOR_RED "ERROR: primitive token longer than MAX_TOKEN = %d", k_MAX_TOKEN);
 			return 0;
 		} //end if
 		token->string_[len++] = *script->script_p_++;
@@ -1218,7 +1218,7 @@ UI_PrecompilerTools::scriptReadName( Script* script, Token* token )
 		token->string_[len++] = *script->script_p_++;
 		if (len >= k_MAX_TOKEN)
 		{
-			Com_Printf(S_COLOR_RED "ERROR: name longer than MAX_TOKEN = %d", k_MAX_TOKEN);
+			Common::printf(S_COLOR_RED "ERROR: name longer than MAX_TOKEN = %d", k_MAX_TOKEN);
 			return 0;
 		} //end if
 		c = *script->script_p_;
@@ -1313,7 +1313,7 @@ UI_PrecompilerTools::scriptReadEscapeCharacter( Script* script, char *ch )
 			script->script_p_--;
 			if (val > 0xFF)
 			{
-				Com_Printf(S_COLOR_YELLOW "WARNING: too large value in escape character");
+				Common::printf(S_COLOR_YELLOW "WARNING: too large value in escape character");
 				val = 0xFF;
 			} //end if
 			c = val;
@@ -1322,7 +1322,7 @@ UI_PrecompilerTools::scriptReadEscapeCharacter( Script* script, char *ch )
 		default: //NOTE: decimal ASCII code, NOT octal
 		{
 			if (*script->script_p_ < '0' || *script->script_p_ > '9') 
-				Com_Printf(S_COLOR_RED "ERROR: unknown escape char");
+				Common::printf(S_COLOR_RED "ERROR: unknown escape char");
 
 			for (i = 0, val = 0; ; i++, script->script_p_++)
 			{
@@ -1334,7 +1334,7 @@ UI_PrecompilerTools::scriptReadEscapeCharacter( Script* script, char *ch )
 			script->script_p_--;
 			if (val > 0xFF)
 			{
-				Com_Printf(S_COLOR_YELLOW "WARNING: too large value in escape character");
+				Common::printf(S_COLOR_YELLOW "WARNING: too large value in escape character");
 				val = 0xFF;
 			} //end if
 			c = val;
@@ -1370,7 +1370,7 @@ UI_PrecompilerTools::readSourceToken( SourceFile* source, Token* token )
 			while(source->indentstack_ &&
 					source->indentstack_->script_ == source->scriptstack_)
 			{
-				Com_Printf(S_COLOR_YELLOW "WARNING: missing #endif");
+				Common::printf(S_COLOR_YELLOW "WARNING: missing #endif");
 				popIndent(source, &type, &skip);
 			} //end if
 		} //end if
@@ -1410,14 +1410,14 @@ UI_PrecompilerTools::readDirective( SourceFile* source )
 	//read the directive name
 	if (!readSourceToken(source, &token))
 	{
-		Com_Printf(S_COLOR_RED "ERROR: found # without name");
+		Common::printf(S_COLOR_RED "ERROR: found # without name");
 		return false;
 	}
 	//directive name must be on the same line
 	if (token.linescrossed_ > 0)
 	{
 		unreadSourceToken(source, &token);
-		Com_Printf(S_COLOR_RED "ERROR: found # at end of line");
+		Common::printf(S_COLOR_RED "ERROR: found # at end of line");
 		return false;
 	}
 	//if if is a name
@@ -1432,7 +1432,7 @@ UI_PrecompilerTools::readDirective( SourceFile* source )
 			}
 		}
 	}
-	Com_Printf(S_COLOR_RED "ERROR: unknown precompiler directive %s", token.string_);
+	Common::printf(S_COLOR_RED "ERROR: unknown precompiler directive %s", token.string_);
 	return false;
 } 
 
@@ -1445,14 +1445,14 @@ UI_PrecompilerTools::readDollarDirective( SourceFile* source )
 	//read the directive name
 	if (!readSourceToken(source, &token))
 	{
-		Com_Printf(S_COLOR_RED "ERROR: found $ without name");
+		Common::printf(S_COLOR_RED "ERROR: found $ without name");
 		return false;
 	} //end if
 	//directive name must be on the same line
 	if (token.linescrossed_ > 0)
 	{
 		unreadSourceToken(source, &token);
-		Com_Printf(S_COLOR_RED "ERROR: found $ at end of line");
+		Common::printf(S_COLOR_RED "ERROR: found $ at end of line");
 		return false;
 	} //end if
 	//if if is a name
@@ -1468,7 +1468,7 @@ UI_PrecompilerTools::readDollarDirective( SourceFile* source )
 		} //end for
 	} //end if
 	unreadSourceToken(source, &token);
-	Com_Printf(S_COLOR_RED "ERROR: unknown precompiler directive %s", token.string_);
+	Common::printf(S_COLOR_RED "ERROR: unknown precompiler directive %s", token.string_);
 	return false;
 }
 
@@ -1511,7 +1511,7 @@ UI_PrecompilerTools::readToken( SourceFile* source, Token* token )
 					token->string_[strlen(token->string_)-1] = '\0';
 					if (strlen(token->string_) + strlen(newtoken.string_+1) + 1 >= k_MAX_TOKEN)
 					{
-						Com_Printf(S_COLOR_RED "ERROR: string longer than MAX_TOKEN = %d", k_MAX_TOKEN);
+						Common::printf(S_COLOR_RED "ERROR: string longer than MAX_TOKEN = %d", k_MAX_TOKEN);
 						return false;
 					}
 					strcat(token->string_, newtoken.string_+1);
@@ -1553,7 +1553,7 @@ UI_PrecompilerTools::copyToken( Token* token )
 	t = reinterpret_cast<Token*>(UI_Memtools::getMemory(sizeof(Token)));
 	if (!t)
 	{
-		Com_Error(ERR_FATAL, "out of token space\n");
+		Common::error(ERR_FATAL, "out of token space\n");
 		return nullptr;
 	}
 	Com_Memcpy(t, token, sizeof(Token));
@@ -1662,7 +1662,7 @@ UI_PrecompilerTools::evaluate( SourceFile *source, signed long int *intvalue,
 	//
 	if (!readLine(source, &token))
 	{
-		Com_Printf(S_COLOR_RED "ERROR: no value after #if/#elif");
+		Common::printf(S_COLOR_RED "ERROR: no value after #if/#elif");
 		return false;
 	} //end if
 	firsttoken = nullptr;
@@ -1701,7 +1701,7 @@ UI_PrecompilerTools::evaluate( SourceFile *source, signed long int *intvalue,
 
 				if (!define)
 				{
-					Com_Printf(S_COLOR_RED "ERROR: can't evaluate %s, not defined", token.string_);
+					Common::printf(S_COLOR_RED "ERROR: can't evaluate %s, not defined", token.string_);
 					return false;
 				} //end if
 				if (!expandDefineIntoSource(source, &token, define)) return false;
@@ -1720,7 +1720,7 @@ UI_PrecompilerTools::evaluate( SourceFile *source, signed long int *intvalue,
 		} //end else
 		else //can't evaluate the token
 		{
-			Com_Printf(S_COLOR_RED "ERROR: can't evaluate %s", token.string_);
+			Common::printf(S_COLOR_RED "ERROR: can't evaluate %s", token.string_);
 			return false;
 		} //end else
 	} while(readLine(source, &token));
@@ -1773,13 +1773,13 @@ UI_PrecompilerTools::evaluateTokens( SourceFile* source, Token* tokens, signed l
 			{
 				if (lastwasvalue || negativevalue)
 				{
-					Com_Printf(S_COLOR_RED "ERROR: syntax error in #if/#elif");
+					Common::printf(S_COLOR_RED "ERROR: syntax error in #if/#elif");
 					error = 1;
 					break;
 				} //end if
 				if (strcmp(t->string_, "defined"))
 				{
-					Com_Printf(S_COLOR_RED "ERROR: undefined name %s in #if/#elif", t->string_);
+					Common::printf(S_COLOR_RED "ERROR: undefined name %s in #if/#elif", t->string_);
 					error = 1;
 					break;
 				} //end if
@@ -1791,7 +1791,7 @@ UI_PrecompilerTools::evaluateTokens( SourceFile* source, Token* tokens, signed l
 				} //end if
 				if (!t || t->type_ != TT_NAME)
 				{
-					Com_Printf(S_COLOR_RED "ERROR: defined without name in #if/#elif");
+					Common::printf(S_COLOR_RED "ERROR: defined without name in #if/#elif");
 					error = 1;
 					break;
 				} //end if
@@ -1799,7 +1799,7 @@ UI_PrecompilerTools::evaluateTokens( SourceFile* source, Token* tokens, signed l
 				// alloc value
 				if (numvalues >= k_MAX_VALUES) 
 				{
-					Com_Printf(S_COLOR_RED "ERROR:out of value space\n");		
+					Common::printf(S_COLOR_RED "ERROR:out of value space\n");		
 					error = 1;										
 					break;											
 				}													
@@ -1829,7 +1829,7 @@ UI_PrecompilerTools::evaluateTokens( SourceFile* source, Token* tokens, signed l
 					t = t->next_;
 					if (!t || strcmp(t->string_, ")"))
 					{
-						Com_Printf(S_COLOR_RED "ERROR: defined without ) in #if/#elif");
+						Common::printf(S_COLOR_RED "ERROR: defined without ) in #if/#elif");
 						error = 1;
 						break;
 					} //end if
@@ -1843,7 +1843,7 @@ UI_PrecompilerTools::evaluateTokens( SourceFile* source, Token* tokens, signed l
 			{
 				if (lastwasvalue)
 				{
-					Com_Printf(S_COLOR_RED "ERROR: syntax error in #if/#elif");
+					Common::printf(S_COLOR_RED "ERROR: syntax error in #if/#elif");
 					error = 1;
 					break;
 				} //end if
@@ -1851,7 +1851,7 @@ UI_PrecompilerTools::evaluateTokens( SourceFile* source, Token* tokens, signed l
 				// alloc value
 				if (numvalues >= k_MAX_VALUES) 
 				{
-					Com_Printf(S_COLOR_RED "ERROR:out of value space\n");		
+					Common::printf(S_COLOR_RED "ERROR:out of value space\n");		
 					error = 1;										
 					break;											
 				}													
@@ -1886,7 +1886,7 @@ UI_PrecompilerTools::evaluateTokens( SourceFile* source, Token* tokens, signed l
 			{
 				if (negativevalue)
 				{
-					Com_Printf(S_COLOR_RED "ERROR: misplaced minus sign in #if/#elif");
+					Common::printf(S_COLOR_RED "ERROR: misplaced minus sign in #if/#elif");
 					error = 1;
 					break;
 				} //end if
@@ -1900,7 +1900,7 @@ UI_PrecompilerTools::evaluateTokens( SourceFile* source, Token* tokens, signed l
 					parentheses--;
 					if (parentheses < 0)
 					{
-						Com_Printf(S_COLOR_RED "ERROR: too many ) in #if/#elsif");
+						Common::printf(S_COLOR_RED "ERROR: too many ) in #if/#elsif");
 						error = 1;
 					} //end if
 					break;
@@ -1913,7 +1913,7 @@ UI_PrecompilerTools::evaluateTokens( SourceFile* source, Token* tokens, signed l
 						t->subtype_ == P_BIN_AND || t->subtype_ == P_BIN_OR ||
 						t->subtype_ == P_BIN_XOR)
 					{
-						Com_Printf(S_COLOR_RED "ERROR: illigal operator %s on floating point operands\n", t->string_);
+						Common::printf(S_COLOR_RED "ERROR: illigal operator %s on floating point operands\n", t->string_);
 						error = 1;
 						break;
 					} //end if
@@ -1925,7 +1925,7 @@ UI_PrecompilerTools::evaluateTokens( SourceFile* source, Token* tokens, signed l
 					{
 						if (lastwasvalue)
 						{
-							Com_Printf(S_COLOR_RED "ERROR: ! or ~ after value in #if/#elif");
+							Common::printf(S_COLOR_RED "ERROR: ! or ~ after value in #if/#elif");
 							error = 1;
 							break;
 						} //end if
@@ -1934,7 +1934,7 @@ UI_PrecompilerTools::evaluateTokens( SourceFile* source, Token* tokens, signed l
 					case P_INC:
 					case P_DEC:
 					{
-						Com_Printf(S_COLOR_RED "ERROR: ++ or -- used in #if/#elif");
+						Common::printf(S_COLOR_RED "ERROR: ++ or -- used in #if/#elif");
 						break;
 					} //end case
 					case P_SUB:
@@ -1973,7 +1973,7 @@ UI_PrecompilerTools::evaluateTokens( SourceFile* source, Token* tokens, signed l
 					{
 						if (!lastwasvalue)
 						{
-							Com_Printf(S_COLOR_RED "ERROR: operator %s after operator in #if/#elif", t->string_);
+							Common::printf(S_COLOR_RED "ERROR: operator %s after operator in #if/#elif", t->string_);
 							error = 1;
 							break;
 						} //end if
@@ -1981,7 +1981,7 @@ UI_PrecompilerTools::evaluateTokens( SourceFile* source, Token* tokens, signed l
 					} //end case
 					default:
 					{
-						Com_Printf(S_COLOR_RED "ERROR: invalid operator %s in #if/#elif", t->string_);
+						Common::printf(S_COLOR_RED "ERROR: invalid operator %s in #if/#elif", t->string_);
 						error = 1;
 						break;
 					} //end default
@@ -1993,7 +1993,7 @@ UI_PrecompilerTools::evaluateTokens( SourceFile* source, Token* tokens, signed l
 					// alloc operator
 					if (numoperators >= k_MAX_OPERATORS) 
 					{
-						Com_Printf(S_COLOR_RED "ERROR:out of operator space\n");	
+						Common::printf(S_COLOR_RED "ERROR:out of operator space\n");	
 						error = 1;										
 						break;											
 					}													
@@ -2016,7 +2016,7 @@ UI_PrecompilerTools::evaluateTokens( SourceFile* source, Token* tokens, signed l
 			} //end case
 			default:
 			{
-				Com_Printf(S_COLOR_RED "ERROR: unknown %s in #if/#elif", t->string_);
+				Common::printf(S_COLOR_RED "ERROR: unknown %s in #if/#elif", t->string_);
 				error = 1;
 				break;
 			} //end default
@@ -2027,12 +2027,12 @@ UI_PrecompilerTools::evaluateTokens( SourceFile* source, Token* tokens, signed l
 	{
 		if (!lastwasvalue)
 		{
-			Com_Printf(S_COLOR_RED "ERROR: trailing operator in #if/#elif");
+			Common::printf(S_COLOR_RED "ERROR: trailing operator in #if/#elif");
 			error = 1;
 		} //end if
 		else if (parentheses)
 		{
-			Com_Printf(S_COLOR_RED "ERROR: too many ( in #if/#elif");
+			Common::printf(S_COLOR_RED "ERROR: too many ( in #if/#elif");
 			error = 1;
 		} //end else if
 	} //end if
@@ -2062,7 +2062,7 @@ UI_PrecompilerTools::evaluateTokens( SourceFile* source, Token* tokens, signed l
 			//if there's no value or no next value
 			if (!v)
 			{
-				Com_Printf(S_COLOR_RED "ERROR: mising values in #if/#elif");
+				Common::printf(S_COLOR_RED "ERROR: mising values in #if/#elif");
 				error = 1;
 				break;
 			} //end if
@@ -2084,7 +2084,7 @@ UI_PrecompilerTools::evaluateTokens( SourceFile* source, Token* tokens, signed l
 									break;
 			case P_DIV:				if (!v2->intvalue_ || !v2->floatvalue_)
 									{
-										Com_Printf(S_COLOR_RED "ERROR: divide by zero in #if/#elif\n");
+										Common::printf(S_COLOR_RED "ERROR: divide by zero in #if/#elif\n");
 										error = 1;
 										break;
 									}
@@ -2092,7 +2092,7 @@ UI_PrecompilerTools::evaluateTokens( SourceFile* source, Token* tokens, signed l
 									v1->floatvalue_ /= v2->floatvalue_; break;
 			case P_MOD:				if (!v2->intvalue_)
 									{
-										Com_Printf(S_COLOR_RED "ERROR: divide by zero in #if/#elif\n");
+										Common::printf(S_COLOR_RED "ERROR: divide by zero in #if/#elif\n");
 										error = 1;
 										break;
 									}
@@ -2142,7 +2142,7 @@ UI_PrecompilerTools::evaluateTokens( SourceFile* source, Token* tokens, signed l
 			{
 				if (!gotquestmarkvalue)
 				{
-					Com_Printf(S_COLOR_RED "ERROR: : without ? in #if/#elif");
+					Common::printf(S_COLOR_RED "ERROR: : without ? in #if/#elif");
 					error = 1;
 					break;
 				} //end if
@@ -2163,7 +2163,7 @@ UI_PrecompilerTools::evaluateTokens( SourceFile* source, Token* tokens, signed l
 			{
 				if (gotquestmarkvalue)
 				{
-					Com_Printf(S_COLOR_RED "ERROR: ? after ? in #if/#elif");
+					Common::printf(S_COLOR_RED "ERROR: ? after ? in #if/#elif");
 					error = 1;
 					break;
 				} //end if
@@ -2432,12 +2432,12 @@ UI_PrecompilerTools::dollarEvaluate( SourceFile* source, signed long int *intval
 	//
 	if (!readSourceToken(source, &token))
 	{
-		Com_Printf(S_COLOR_RED "ERROR: no leading ( after $evalint/$evalfloat");
+		Common::printf(S_COLOR_RED "ERROR: no leading ( after $evalint/$evalfloat");
 		return false;
 	} //end if
 	if (!readSourceToken(source, &token))
 	{
-		Com_Printf(S_COLOR_RED "ERROR: nothing to evaluate");
+		Common::printf(S_COLOR_RED "ERROR: nothing to evaluate");
 		return false;
 	} //end if
 	indent = 1;
@@ -2477,7 +2477,7 @@ UI_PrecompilerTools::dollarEvaluate( SourceFile* source, signed long int *intval
 
 				if (!define)
 				{
-					Com_Printf(S_COLOR_RED "ERROR: can't evaluate %s, not defined", token.string_);
+					Common::printf(S_COLOR_RED "ERROR: can't evaluate %s, not defined", token.string_);
 					return false;
 				} //end if
 				if (!expandDefineIntoSource(source, &token, define)) return false;
@@ -2502,7 +2502,7 @@ UI_PrecompilerTools::dollarEvaluate( SourceFile* source, signed long int *intval
 		} //end else
 		else //can't evaluate the token
 		{
-			Com_Printf(S_COLOR_RED "ERROR: can't evaluate %s", token.string_);
+			Common::printf(S_COLOR_RED "ERROR: can't evaluate %s", token.string_);
 			return false;
 		} //end else
 	} while(readSourceToken(source, &token));
@@ -2531,13 +2531,13 @@ UI_PrecompilerTools::directive_undef( SourceFile* source )
 	//
 	if (!readLine(source, &token))
 	{
-		Com_Printf(S_COLOR_RED "ERROR: undef without name");
+		Common::printf(S_COLOR_RED "ERROR: undef without name");
 		return false;
 	} //end if
 	if (token.type_ != TT_NAME)
 	{
 		unreadSourceToken(source, &token);
-		Com_Printf(S_COLOR_RED "ERROR: expected name, found %s", token.string_);
+		Common::printf(S_COLOR_RED "ERROR: expected name, found %s", token.string_);
 		return false;
 	} //end if
 
@@ -2548,7 +2548,7 @@ UI_PrecompilerTools::directive_undef( SourceFile* source )
 		{
 			if (define->flags_ & k_DEFINE_FIXED)
 			{
-				Com_Printf(S_COLOR_YELLOW "WARNING: can't undef %s", token.string_);
+				Common::printf(S_COLOR_YELLOW "WARNING: can't undef %s", token.string_);
 			} //end if
 			else
 			{
@@ -2617,13 +2617,13 @@ UI_PrecompilerTools::Directive::if_def( SourceFile* source, int type )
 
 	if (!tools_->readLine(source, &token))
 	{
-		Com_Printf(S_COLOR_RED "ERROR: #ifdef without name");
+		Common::printf(S_COLOR_RED "ERROR: #ifdef without name");
 		return false;
 	} //end if
 	if (token.type_ != TT_NAME)
 	{
 		tools_->unreadSourceToken(source, &token);
-		Com_Printf(S_COLOR_RED "ERROR: expected name after #ifdef, found %s", token.string_);
+		Common::printf(S_COLOR_RED "ERROR: expected name after #ifdef, found %s", token.string_);
 		return false;
 	} //end if
 	d = tools_->findHashedDefine(source->definehash_, token.string_);
@@ -2667,7 +2667,7 @@ UI_PrecompilerTools::Directive_elif::func( SourceFile* source )
 	tools_->popIndent(source, &type, &skip);
 	if (!type || type == INDENT_ELSE)
 	{
-		Com_Printf(S_COLOR_RED "ERROR: misplaced #elif");
+		Common::printf(S_COLOR_RED "ERROR: misplaced #elif");
 		return false;
 	} //end if
 	if (!tools_->evaluate(source, &value, nullptr, true)) 
@@ -2685,12 +2685,12 @@ UI_PrecompilerTools::Directive_else::func( SourceFile* source )
 	tools_->popIndent(source, &type, &skip);
 	if (!type)
 	{
-		Com_Printf(S_COLOR_RED "ERROR: misplaced #else");
+		Common::printf(S_COLOR_RED "ERROR: misplaced #else");
 		return false;
 	} //end if
 	if (type == INDENT_ELSE)
 	{
-		Com_Printf(S_COLOR_RED "ERROR: #else after #else");
+		Common::printf(S_COLOR_RED "ERROR: #else after #else");
 		return false;
 	} //end if
 	tools_->pushIndent(source, INDENT_ELSE, !skip);
@@ -2705,7 +2705,7 @@ UI_PrecompilerTools::Directive_endif::func( SourceFile* source )
 	tools_->popIndent(source, &type, &skip);
 	if (!type)
 	{
-		Com_Printf(S_COLOR_RED "ERROR: misplaced #endif");
+		Common::printf(S_COLOR_RED "ERROR: misplaced #endif");
 		return false;
 	} //end if
 	return true;
@@ -2722,12 +2722,12 @@ UI_PrecompilerTools::Directive_include::func( SourceFile* source )
 	//
 	if (!tools_->readSourceToken(source, &token))
 	{
-		Com_Printf(S_COLOR_RED "ERROR: #include without file name");
+		Common::printf(S_COLOR_RED "ERROR: #include without file name");
 		return false;
 	} //end if
 	if (token.linescrossed_ > 0)
 	{
-		Com_Printf(S_COLOR_RED "ERROR: #include without file name");
+		Common::printf(S_COLOR_RED "ERROR: #include without file name");
 		return false;
 	} //end if
 	if (token.type_ == TT_STRING)
@@ -2757,11 +2757,11 @@ UI_PrecompilerTools::Directive_include::func( SourceFile* source )
 		} //end while
 		if (*token.string_ != '>')
 		{
-			Com_Printf(S_COLOR_YELLOW "WARNING: #include missing trailing >");
+			Common::printf(S_COLOR_YELLOW "WARNING: #include missing trailing >");
 		} //end if
 		if (!strlen(path))
 		{
-			Com_Printf(S_COLOR_RED "ERROR: #include without file name between < >");
+			Common::printf(S_COLOR_RED "ERROR: #include without file name between < >");
 			return false;
 		} //end if
 		tools_->convertPath(path);
@@ -2769,12 +2769,12 @@ UI_PrecompilerTools::Directive_include::func( SourceFile* source )
 	} //end if
 	else
 	{
-		Com_Printf(S_COLOR_RED "ERROR: #include without file name");
+		Common::printf(S_COLOR_RED "ERROR: #include without file name");
 		return false;
 	} //end else
 	if (!script)
 	{
-		Com_Printf(S_COLOR_RED "ERROR: file %s not found", path);
+		Common::printf(S_COLOR_RED "ERROR: file %s not found", path);
 		return false;
 	} //end if
 	tools_->pushScript(source, script);
@@ -2793,13 +2793,13 @@ UI_PrecompilerTools::Directive_define::func( SourceFile* source )
 	//
 	if (!tools_->readLine(source, &token))
 	{
-		Com_Printf(S_COLOR_RED "ERROR: #define without name");
+		Common::printf(S_COLOR_RED "ERROR: #define without name");
 		return false;
 	} //end if
 	if (token.type_ != TT_NAME)
 	{
 		tools_->unreadSourceToken(source, &token);
-		Com_Printf(S_COLOR_RED "ERROR: expected name after #define, found %s", token.string_);
+		Common::printf(S_COLOR_RED "ERROR: expected name after #define, found %s", token.string_);
 		return false;
 	} //end if
 	//check if the define already exists
@@ -2809,10 +2809,10 @@ UI_PrecompilerTools::Directive_define::func( SourceFile* source )
 	{
 		if (define->flags_ & k_DEFINE_FIXED)
 		{
-			Com_Printf(S_COLOR_RED "ERROR: can't redefine %s", token.string_);
+			Common::printf(S_COLOR_RED "ERROR: can't redefine %s", token.string_);
 			return false;
 		} //end if
-		Com_Printf(S_COLOR_YELLOW "WARNING: redefinition of %s", token.string_);
+		Common::printf(S_COLOR_YELLOW "WARNING: redefinition of %s", token.string_);
 		//unread the define name before executing the #undef directive
 		tools_->unreadSourceToken(source, &token);
 		if (!tools_->directive_undef(source)) return false;
@@ -2842,19 +2842,19 @@ UI_PrecompilerTools::Directive_define::func( SourceFile* source )
 			{
 				if (!tools_->readLine(source, &token))
 				{
-					Com_Printf(S_COLOR_RED "ERROR: expected define parameter");
+					Common::printf(S_COLOR_RED "ERROR: expected define parameter");
 					return false;
 				} //end if
 				//if it isn't a name
 				if (token.type_ != TT_NAME)
 				{
-					Com_Printf(S_COLOR_RED "ERROR: invalid define parameter");
+					Common::printf(S_COLOR_RED "ERROR: invalid define parameter");
 					return false;
 				} //end if
 				//
 				if (tools_->findDefineParm(define, token.string_) >= 0)
 				{
-					Com_Printf(S_COLOR_RED "ERROR: two the same define parameters");
+					Common::printf(S_COLOR_RED "ERROR: two the same define parameters");
 					return false;
 				} //end if
 				//add the define parm
@@ -2868,7 +2868,7 @@ UI_PrecompilerTools::Directive_define::func( SourceFile* source )
 				//read next token
 				if (!tools_->readLine(source, &token))
 				{
-					Com_Printf(S_COLOR_RED "ERROR: define parameters not terminated");
+					Common::printf(S_COLOR_RED "ERROR: define parameters not terminated");
 					return false;
 				} //end if
 				//
@@ -2877,7 +2877,7 @@ UI_PrecompilerTools::Directive_define::func( SourceFile* source )
 				//then it must be a comma
 				if (strcmp(token.string_, ","))
 				{
-					Com_Printf(S_COLOR_RED "ERROR: define not terminated");
+					Common::printf(S_COLOR_RED "ERROR: define not terminated");
 					return false;
 				} //end if
 			} //end while
@@ -2891,7 +2891,7 @@ UI_PrecompilerTools::Directive_define::func( SourceFile* source )
 		t = tools_->copyToken(&token);
 		if (t->type_ == TT_NAME && !strcmp(t->string_, define->name_))
 		{
-			Com_Printf(S_COLOR_RED "ERROR: recursive define (removed recursion)");
+			Common::printf(S_COLOR_RED "ERROR: recursive define (removed recursion)");
 			continue;
 		} //end if
 		tools_->clearTokenWhiteSpace(t);
@@ -2909,7 +2909,7 @@ UI_PrecompilerTools::Directive_define::func( SourceFile* source )
 		if (!strcmp(define->tokens_->string_, "##") ||
 				!strcmp(last->string_, "##"))
 		{
-			Com_Printf(S_COLOR_RED "ERROR: define with misplaced ##");
+			Common::printf(S_COLOR_RED "ERROR: define with misplaced ##");
 			return false;
 		} //end if
 	} //end if
@@ -2928,13 +2928,13 @@ UI_PrecompilerTools::Directive_undef::func( SourceFile* source )
 	//
 	if (!tools_->readLine(source, &token))
 	{
-		Com_Printf(S_COLOR_RED "ERROR: undef without name");
+		Common::printf(S_COLOR_RED "ERROR: undef without name");
 		return false;
 	} //end if
 	if (token.type_ != TT_NAME)
 	{
 		tools_->unreadSourceToken(source, &token);
-		Com_Printf(S_COLOR_RED "ERROR: expected name, found %s", token.string_);
+		Common::printf(S_COLOR_RED "ERROR: expected name, found %s", token.string_);
 		return false;
 	} //end if
 
@@ -2945,7 +2945,7 @@ UI_PrecompilerTools::Directive_undef::func( SourceFile* source )
 		{
 			if (define->flags_ & k_DEFINE_FIXED)
 			{
-				Com_Printf(S_COLOR_YELLOW "WARNING: can't undef %s", token.string_);
+				Common::printf(S_COLOR_YELLOW "WARNING: can't undef %s", token.string_);
 			} //end if
 			else
 			{
@@ -2965,7 +2965,7 @@ UI_PrecompilerTools::Directive_undef::func( SourceFile* source )
 int
 UI_PrecompilerTools::Directive_line::func( SourceFile* source )
 {
-	Com_Printf(S_COLOR_RED "ERROR: #line directive not supported");
+	Common::printf(S_COLOR_RED "ERROR: #line directive not supported");
 	return false;
 }
 
@@ -2976,7 +2976,7 @@ UI_PrecompilerTools::Directive_error::func( SourceFile* source )
 
 	strcpy(token.string_, "");
 	tools_->readSourceToken(source, &token);
-	Com_Printf(S_COLOR_RED "ERROR: #error directive: %s", token.string_);
+	Common::printf(S_COLOR_RED "ERROR: #error directive: %s", token.string_);
 	return false;
 }
 
@@ -2985,7 +2985,7 @@ UI_PrecompilerTools::Directive_pragma::func( SourceFile* source )
 {
 	Token token;
 
-	Com_Printf(S_COLOR_YELLOW "WARNING: #pragma directive not supported");
+	Common::printf(S_COLOR_YELLOW "WARNING: #pragma directive not supported");
 	while(tools_->readLine(source, &token)) ;
 
 	return true;

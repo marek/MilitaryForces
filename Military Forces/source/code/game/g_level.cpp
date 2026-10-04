@@ -320,9 +320,9 @@ LevelLocals::spawnEntity()
 		{
 			GameEntity* currEnt = getEntity(i);
 			if( currEnt )
-				Com_Printf("%4i: %s\n", static_cast<int>(i), currEnt->classname_);
+				Common::printf("%4i: %s\n", static_cast<int>(i), currEnt->classname_);
 		}
-		Com_Error( ERR_DROP, "LevelLocals::spawnEntity: no free entities" );
+		Common::error( ERR_DROP, "LevelLocals::spawnEntity: no free entities" );
 	}
 	// we reached the end but there is still space in the vector until we hit max_gentities
 	else

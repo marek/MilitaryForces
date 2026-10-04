@@ -222,7 +222,7 @@ static const char *Cvar_Validate( cvar_t *var,
 			if( !Q_isintegral( valuef ) )
 			{
 				if( warn )
-					Com_Printf( "WARNING: cvar '%s' must be integral", var->name );
+					Common::printf( "WARNING: cvar '%s' must be integral", var->name );
 
 				valuef = static_cast<int>(valuef);
 				changed = true;
@@ -232,7 +232,7 @@ static const char *Cvar_Validate( cvar_t *var,
 	else
 	{
 		if( warn )
-			Com_Printf( "WARNING: cvar '%s' must be numeric", var->name );
+			Common::printf( "WARNING: cvar '%s' must be numeric", var->name );
 
 		valuef = atof( var->resetString );
 		changed = true;
@@ -243,14 +243,14 @@ static const char *Cvar_Validate( cvar_t *var,
 		if( warn )
 		{
 			if( changed )
-				Com_Printf( " and is" );
+				Common::printf( " and is" );
 			else
-				Com_Printf( "WARNING: cvar '%s'", var->name );
+				Common::printf( "WARNING: cvar '%s'", var->name );
 
 			if( Q_isintegral( var->min ) )
-				Com_Printf( " out of range (min %d)", static_cast<int>(var->min) );
+				Common::printf( " out of range (min %d)", static_cast<int>(var->min) );
 			else
-				Com_Printf( " out of range (min %f)", var->min );
+				Common::printf( " out of range (min %f)", var->min );
 		}
 
 		valuef = var->min;
@@ -261,14 +261,14 @@ static const char *Cvar_Validate( cvar_t *var,
 		if( warn )
 		{
 			if( changed )
-				Com_Printf( " and is" );
+				Common::printf( " and is" );
 			else
-				Com_Printf( "WARNING: cvar '%s'", var->name );
+				Common::printf( "WARNING: cvar '%s'", var->name );
 
 			if( Q_isintegral( var->max ) )
-				Com_Printf( " out of range (max %d)", static_cast<int>(var->max) );
+				Common::printf( " out of range (max %d)", static_cast<int>(var->max) );
 			else
-				Com_Printf( " out of range (max %f)", var->max );
+				Common::printf( " out of range (max %f)", var->max );
 		}
 
 		valuef = var->max;
@@ -282,14 +282,14 @@ static const char *Cvar_Validate( cvar_t *var,
 			Com_sprintf( s, sizeof( s ), "%d", static_cast<int>(valuef) );
 
 			if( warn )
-				Com_Printf( ", setting to %d\n", static_cast<int>(valuef) );
+				Common::printf( ", setting to %d\n", static_cast<int>(valuef) );
 		}
 		else
 		{
 			Com_sprintf( s, sizeof( s ), "%f", valuef );
 
 			if( warn )
-				Com_Printf( ", setting to %f\n", valuef );
+				Common::printf( ", setting to %f\n", valuef );
 		}
 
 		return s;
@@ -313,17 +313,17 @@ cvar_t *CvarSystem::get( const char *var_name, const char *var_value, int flags 
 	int	index;
 
 	if ( !var_name || ! var_value ) {
-		Com_Error( ERR_FATAL, "CvarSystem::get: NULL parameter" );
+		Common::error( ERR_FATAL, "CvarSystem::get: NULL parameter" );
 	}
 
 	if ( !Cvar_ValidateString( var_name ) ) {
-		Com_Printf("invalid cvar name string: %s\n", var_name );
+		Common::printf("invalid cvar name string: %s\n", var_name );
 		var_name = "BADNAME";
 	}
 
 #if 0		// FIXME: values with backslash happen
 	if ( !Cvar_ValidateString( var_value ) ) {
-		Com_Printf("invalid cvar value string: %s\n", var_value );
+		Common::printf("invalid cvar value string: %s\n", var_value );
 		var_value = "BADVALUE";
 	}
 #endif
@@ -386,7 +386,7 @@ cvar_t *CvarSystem::get( const char *var_name, const char *var_value, int flags 
 			Z_Free( var->resetString );
 			var->resetString = CopyString( var_value );
 		} else if ( var_value[0] && strcmp( var->resetString, var_value ) ) {
-			Com_DPrintf( "Warning: cvar \"%s\" given initial values: \"%s\" and \"%s\"\n",
+			Common::dPrintf( "Warning: cvar \"%s\" given initial values: \"%s\" and \"%s\"\n",
 				var_name, var->resetString, var_value );
 		}
 		// if we have a latched string, take that value now
@@ -420,7 +420,7 @@ cvar_t *CvarSystem::get( const char *var_name, const char *var_value, int flags 
 	if(index >= MAX_CVARS)
 	{
 		if(!com_errorEntered)
-			Com_Error(ERR_FATAL, "Error: Too many cvars, cannot create a new one!");
+			Common::error(ERR_FATAL, "Error: Too many cvars, cannot create a new one!");
 
 		return nullptr;
 	}
@@ -473,26 +473,26 @@ Prints the value, default, and latched string of the given variable
 ============
 */
 void CvarSystem::print( cvar_t *v ) {
-	Com_Printf ("\"%s\" is:\"%s" S_COLOR_WHITE "\"",
+	Common::printf ("\"%s\" is:\"%s" S_COLOR_WHITE "\"",
 			v->name, v->string );
 
 	if ( !( v->flags & CVAR_ROM ) ) {
 		if ( !Q_stricmp( v->string, v->resetString ) ) {
-			Com_Printf (", the default" );
+			Common::printf (", the default" );
 		} else {
-			Com_Printf (" default:\"%s" S_COLOR_WHITE "\"",
+			Common::printf (" default:\"%s" S_COLOR_WHITE "\"",
 					v->resetString );
 		}
 	}
 
-	Com_Printf ("\n");
+	Common::printf ("\n");
 
 	if ( v->latchedString ) {
-		Com_Printf( "latched: \"%s\"\n", v->latchedString );
+		Common::printf( "latched: \"%s\"\n", v->latchedString );
 	}
 
 	if ( v->description ) {
-		Com_Printf( "%s\n", v->description );
+		Common::printf( "%s\n", v->description );
 	}
 }
 
@@ -504,16 +504,16 @@ CvarSystem::set2
 cvar_t *CvarSystem::set2( const char *var_name, const char *value, bool force ) {
 	cvar_t	*var;
 
-//	Com_DPrintf( "CvarSystem::set2: %s %s\n", var_name, value );
+//	Common::dPrintf( "CvarSystem::set2: %s %s\n", var_name, value );
 
 	if ( !Cvar_ValidateString( var_name ) ) {
-		Com_Printf("invalid cvar name string: %s\n", var_name );
+		Common::printf("invalid cvar name string: %s\n", var_name );
 		var_name = "BADNAME";
 	}
 
 #if 0	// FIXME
 	if ( value && !Cvar_ValidateString( value ) ) {
-		Com_Printf("invalid cvar value string: %s\n", value );
+		Common::printf("invalid cvar value string: %s\n", value );
 		var_value = "BADVALUE";
 	}
 #endif
@@ -559,19 +559,19 @@ cvar_t *CvarSystem::set2( const char *var_name, const char *value, bool force ) 
 	{
 		if (var->flags & CVAR_ROM)
 		{
-			Com_Printf ("%s is read only.\n", var_name);
+			Common::printf ("%s is read only.\n", var_name);
 			return var;
 		}
 
 		if (var->flags & CVAR_INIT)
 		{
-			Com_Printf ("%s is write protected.\n", var_name);
+			Common::printf ("%s is write protected.\n", var_name);
 			return var;
 		}
 
 		if ((var->flags & CVAR_CHEAT) && !cvar_cheats->integer)
 		{
-			Com_Printf ("%s is cheat protected.\n", var_name);
+			Common::printf ("%s is cheat protected.\n", var_name);
 			return var;
 		}
 		
@@ -589,7 +589,7 @@ cvar_t *CvarSystem::set2( const char *var_name, const char *value, bool force ) 
 					return var;
 			}
 
-			Com_Printf ("%s will be changed upon restarting.\n", var_name);
+			Common::printf ("%s will be changed upon restarting.\n", var_name);
 			var->latchedString = CopyString(value);
 			var->modified = true;
 			var->modificationCount++;
@@ -641,10 +641,10 @@ void CvarSystem::setSafe( const char *var_name, const char *value )
 	if((flags != CVAR_NONEXISTENT) && (flags & CVAR_PROTECTED))
 	{
 		if( value )
-			Com_Error( ERR_DROP, "Restricted source tried to set "
+			Common::error( ERR_DROP, "Restricted source tried to set "
 				"\"%s\" to \"%s\"", var_name, value );
 		else
-			Com_Error( ERR_DROP, "Restricted source tried to "
+			Common::error( ERR_DROP, "Restricted source tried to "
 				"modify \"%s\"", var_name );
 		return;
 	}
@@ -783,7 +783,7 @@ void CvarSystem::print_f()
 	
 	if(CommandSystem::argc() != 2)
 	{
-		Com_Printf ("usage: print <variable>\n");
+		Common::printf ("usage: print <variable>\n");
 		return;
 	}
 
@@ -794,7 +794,7 @@ void CvarSystem::print_f()
 	if(cv)
 		CvarSystem::print(cv);
 	else
-		Com_Printf ("Cvar %s does not exist.\n", name);
+		Common::printf ("Cvar %s does not exist.\n", name);
 }
 
 /*
@@ -810,7 +810,7 @@ void CvarSystem::toggle_f( ) {
 	char		*curval;
 
 	if(c < 2) {
-		Com_Printf("usage: toggle <variable> [value1, value2, ...]\n");
+		Common::printf("usage: toggle <variable> [value1, value2, ...]\n");
 		return;
 	}
 
@@ -822,7 +822,7 @@ void CvarSystem::toggle_f( ) {
 	}
 
 	if(c == 3) {
-		Com_Printf("toggle: nothing to toggle to\n");
+		Common::printf("toggle: nothing to toggle to\n");
 		return;
 	}
 
@@ -858,7 +858,7 @@ void CvarSystem::set_f( ) {
 	cmd = CommandSystem::argv(0);
 
 	if ( c < 2 ) {
-		Com_Printf ("usage: %s <variable> <value>\n", cmd);
+		Common::printf ("usage: %s <variable> <value>\n", cmd);
 		return;
 	}
 	if ( c == 2 ) {
@@ -899,7 +899,7 @@ CvarSystem::reset_f
 */
 void CvarSystem::reset_f( ) {
 	if ( CommandSystem::argc() != 2 ) {
-		Com_Printf ("usage: reset <variable>\n");
+		Common::printf ("usage: reset <variable>\n");
 		return;
 	}
 	CvarSystem::reset( CommandSystem::argv( 1 ) );
@@ -927,14 +927,14 @@ void CvarSystem::writeVariables(fileHandle_t f)
 			// write the latched value, even if it hasn't taken effect yet
 			if ( var->latchedString ) {
 				if( strlen( var->name ) + strlen( var->latchedString ) + 10 > sizeof( buffer ) ) {
-					Com_Printf( S_COLOR_YELLOW "WARNING: value of variable "
+					Common::printf( S_COLOR_YELLOW "WARNING: value of variable "
 							"\"%s\" too long to write to file\n", var->name );
 					continue;
 				}
 				Com_sprintf (buffer, sizeof(buffer), "seta %s \"%s\"\n", var->name, var->latchedString);
 			} else {
 				if( strlen( var->name ) + strlen( var->string ) + 10 > sizeof( buffer ) ) {
-					Com_Printf( S_COLOR_YELLOW "WARNING: value of variable "
+					Common::printf( S_COLOR_YELLOW "WARNING: value of variable "
 							"\"%s\" too long to write to file\n", var->name );
 					continue;
 				}
@@ -964,60 +964,60 @@ void CvarSystem::list_f( ) {
 	i = 0;
 	for (var = cvar_vars ; var ; var = var->next, i++)
 	{
-		if(!var->name || (match && !Com_Filter(match, var->name, false)))
+		if(!var->name || (match && !Common::filter(match, var->name, false)))
 			continue;
 
 		if (var->flags & CVAR_SERVERINFO) {
-			Com_Printf("S");
+			Common::printf("S");
 		} else {
-			Com_Printf(" ");
+			Common::printf(" ");
 		}
 		if (var->flags & CVAR_SYSTEMINFO) {
-			Com_Printf("s");
+			Common::printf("s");
 		} else {
-			Com_Printf(" ");
+			Common::printf(" ");
 		}
 		if (var->flags & CVAR_USERINFO) {
-			Com_Printf("U");
+			Common::printf("U");
 		} else {
-			Com_Printf(" ");
+			Common::printf(" ");
 		}
 		if (var->flags & CVAR_ROM) {
-			Com_Printf("R");
+			Common::printf("R");
 		} else {
-			Com_Printf(" ");
+			Common::printf(" ");
 		}
 		if (var->flags & CVAR_INIT) {
-			Com_Printf("I");
+			Common::printf("I");
 		} else {
-			Com_Printf(" ");
+			Common::printf(" ");
 		}
 		if (var->flags & CVAR_ARCHIVE) {
-			Com_Printf("A");
+			Common::printf("A");
 		} else {
-			Com_Printf(" ");
+			Common::printf(" ");
 		}
 		if (var->flags & CVAR_LATCH) {
-			Com_Printf("L");
+			Common::printf("L");
 		} else {
-			Com_Printf(" ");
+			Common::printf(" ");
 		}
 		if (var->flags & CVAR_CHEAT) {
-			Com_Printf("C");
+			Common::printf("C");
 		} else {
-			Com_Printf(" ");
+			Common::printf(" ");
 		}
 		if (var->flags & CVAR_USER_CREATED) {
-			Com_Printf("?");
+			Common::printf("?");
 		} else {
-			Com_Printf(" ");
+			Common::printf(" ");
 		}
 
-		Com_Printf (" %s \"%s\"\n", var->name, var->string);
+		Common::printf (" %s \"%s\"\n", var->name, var->string);
 	}
 
-	Com_Printf ("\n%i total cvars\n", i);
-	Com_Printf ("%i cvar indexes\n", cvar_numIndexes);
+	Common::printf ("\n%i total cvars\n", i);
+	Common::printf ("%i cvar indexes\n", cvar_numIndexes);
 }
 
 /*
@@ -1049,59 +1049,59 @@ void CvarSystem::listModified_f( ) {
 
 		totalModified++;
 
-		if (match && !Com_Filter(match, var->name, false))
+		if (match && !Common::filter(match, var->name, false))
 			continue;
 
 		if (var->flags & CVAR_SERVERINFO) {
-			Com_Printf("S");
+			Common::printf("S");
 		} else {
-			Com_Printf(" ");
+			Common::printf(" ");
 		}
 		if (var->flags & CVAR_SYSTEMINFO) {
-			Com_Printf("s");
+			Common::printf("s");
 		} else {
-			Com_Printf(" ");
+			Common::printf(" ");
 		}
 		if (var->flags & CVAR_USERINFO) {
-			Com_Printf("U");
+			Common::printf("U");
 		} else {
-			Com_Printf(" ");
+			Common::printf(" ");
 		}
 		if (var->flags & CVAR_ROM) {
-			Com_Printf("R");
+			Common::printf("R");
 		} else {
-			Com_Printf(" ");
+			Common::printf(" ");
 		}
 		if (var->flags & CVAR_INIT) {
-			Com_Printf("I");
+			Common::printf("I");
 		} else {
-			Com_Printf(" ");
+			Common::printf(" ");
 		}
 		if (var->flags & CVAR_ARCHIVE) {
-			Com_Printf("A");
+			Common::printf("A");
 		} else {
-			Com_Printf(" ");
+			Common::printf(" ");
 		}
 		if (var->flags & CVAR_LATCH) {
-			Com_Printf("L");
+			Common::printf("L");
 		} else {
-			Com_Printf(" ");
+			Common::printf(" ");
 		}
 		if (var->flags & CVAR_CHEAT) {
-			Com_Printf("C");
+			Common::printf("C");
 		} else {
-			Com_Printf(" ");
+			Common::printf(" ");
 		}
 		if (var->flags & CVAR_USER_CREATED) {
-			Com_Printf("?");
+			Common::printf("?");
 		} else {
-			Com_Printf(" ");
+			Common::printf(" ");
 		}
 
-		Com_Printf (" %s \"%s\", default \"%s\"\n", var->name, value, var->resetString);
+		Common::printf (" %s \"%s\", default \"%s\"\n", var->name, value, var->resetString);
 	}
 
-	Com_Printf ("\n%i total modified cvars\n", totalModified);
+	Common::printf ("\n%i total modified cvars\n", totalModified);
 }
 
 /*
@@ -1163,7 +1163,7 @@ void CvarSystem::unset_f()
 	
 	if(CommandSystem::argc() != 2)
 	{
-		Com_Printf("Usage: %s <varname>\n", CommandSystem::argv(0));
+		Common::printf("Usage: %s <varname>\n", CommandSystem::argv(0));
 		return;
 	}
 	
@@ -1175,7 +1175,7 @@ void CvarSystem::unset_f()
 	if(cv->flags & CVAR_USER_CREATED)
 		CvarSystem::unset(cv);
 	else
-		Com_Printf("Error: %s: Variable %s is not user created.\n", CommandSystem::argv(0), cv->name);
+		Common::printf("Error: %s: Variable %s is not user created.\n", CommandSystem::argv(0), cv->name);
 }
 
 
@@ -1331,30 +1331,30 @@ void CvarSystem::register_(vmCvar_t *vmCvar, const char *varName, const char *de
 	// flags. Unfortunately some historical game code (including single player
 	// baseq3) sets both flags. We unset CVAR_ROM for such cvars.
 	if ((flags & (CVAR_ARCHIVE | CVAR_ROM)) == (CVAR_ARCHIVE | CVAR_ROM)) {
-		Com_DPrintf( S_COLOR_YELLOW "WARNING: Unsetting CVAR_ROM from cvar '%s', "
+		Common::dPrintf( S_COLOR_YELLOW "WARNING: Unsetting CVAR_ROM from cvar '%s', "
 			"since it is also CVAR_ARCHIVE\n", varName );
 		flags &= ~CVAR_ROM;
 	}
 
 	// Don't allow VM to specific a different creator or other internal flags.
 	if ( flags & CVAR_USER_CREATED ) {
-		Com_DPrintf( S_COLOR_YELLOW "WARNING: VM tried to set CVAR_USER_CREATED on cvar '%s'\n", varName );
+		Common::dPrintf( S_COLOR_YELLOW "WARNING: VM tried to set CVAR_USER_CREATED on cvar '%s'\n", varName );
 		flags &= ~CVAR_USER_CREATED;
 	}
 	if ( flags & CVAR_SERVER_CREATED ) {
-		Com_DPrintf( S_COLOR_YELLOW "WARNING: VM tried to set CVAR_SERVER_CREATED on cvar '%s'\n", varName );
+		Common::dPrintf( S_COLOR_YELLOW "WARNING: VM tried to set CVAR_SERVER_CREATED on cvar '%s'\n", varName );
 		flags &= ~CVAR_SERVER_CREATED;
 	}
 	if ( flags & CVAR_PROTECTED ) {
-		Com_DPrintf( S_COLOR_YELLOW "WARNING: VM tried to set CVAR_PROTECTED on cvar '%s'\n", varName );
+		Common::dPrintf( S_COLOR_YELLOW "WARNING: VM tried to set CVAR_PROTECTED on cvar '%s'\n", varName );
 		flags &= ~CVAR_PROTECTED;
 	}
 	if ( flags & CVAR_MODIFIED ) {
-		Com_DPrintf( S_COLOR_YELLOW "WARNING: VM tried to set CVAR_MODIFIED on cvar '%s'\n", varName );
+		Common::dPrintf( S_COLOR_YELLOW "WARNING: VM tried to set CVAR_MODIFIED on cvar '%s'\n", varName );
 		flags &= ~CVAR_MODIFIED;
 	}
 	if ( flags & CVAR_NONEXISTENT ) {
-		Com_DPrintf( S_COLOR_YELLOW "WARNING: VM tried to set CVAR_NONEXISTENT on cvar '%s'\n", varName );
+		Common::dPrintf( S_COLOR_YELLOW "WARNING: VM tried to set CVAR_NONEXISTENT on cvar '%s'\n", varName );
 		flags &= ~CVAR_NONEXISTENT;
 	}
 
@@ -1362,7 +1362,7 @@ void CvarSystem::register_(vmCvar_t *vmCvar, const char *varName, const char *de
 
 	// Don't modify cvar if it's protected.
 	if ( cv && ( cv->flags & CVAR_PROTECTED ) ) {
-		Com_DPrintf( S_COLOR_YELLOW "WARNING: VM tried to register protected cvar '%s' with value '%s'%s\n",
+		Common::dPrintf( S_COLOR_YELLOW "WARNING: VM tried to register protected cvar '%s' with value '%s'%s\n",
 			varName, defaultValue, ( flags & ~cv->flags ) != 0 ? " and new flags" : "" );
 	} else {
 		cv = CvarSystem::get(varName, defaultValue, flags | CVAR_VM_CREATED);
@@ -1389,7 +1389,7 @@ void	CvarSystem::update( vmCvar_t *vmCvar ) {
 	assert(vmCvar);
 
 	if ( static_cast<unsigned>(vmCvar->handle) >= cvar_numIndexes ) {
-		Com_Error( ERR_DROP, "CvarSystem::update: handle out of range" );
+		Common::error( ERR_DROP, "CvarSystem::update: handle out of range" );
 	}
 
 	cv = cvar_indexes + vmCvar->handle;
@@ -1402,7 +1402,7 @@ void	CvarSystem::update( vmCvar_t *vmCvar ) {
 	}
 	vmCvar->modificationCount = cv->modificationCount;
 	if ( strlen(cv->string)+1 > MAX_CVAR_VALUE_STRING ) 
-	  Com_Error( ERR_DROP, "CvarSystem::update: src %s length %u exceeds MAX_CVAR_VALUE_STRING",
+	  Common::error( ERR_DROP, "CvarSystem::update: src %s length %u exceeds MAX_CVAR_VALUE_STRING",
 		     cv->string, 
 		     static_cast<unsigned int>(strlen(cv->string)));
 	Q_strncpyz( vmCvar->string, cv->string,  MAX_CVAR_VALUE_STRING ); 

@@ -84,7 +84,7 @@ static animation_t * CG_ParseLQMAnimationFile( const char *filename ) {
 			text_p = prev;	// unget the token
 			break;
 		}
-		Com_Printf( "unknown token '%s' is %s\n", token, filename );
+		Common::printf( "unknown token '%s' is %s\n", token, filename );
 	}
 
 	// read information for each frame
@@ -280,7 +280,7 @@ static void CG_CachePlane(int index)
 
 	// only thing that always has to be there is body
 	if( !availableVehicles[index].handle[BP_PLANE_BODY] ) {
-		Com_Printf( S_COLOR_YELLOW "WARNING: MFQ3: missing body %s.md3, model not loaded\n", basename );
+		Common::printf( S_COLOR_YELLOW "WARNING: MFQ3: missing body %s.md3, model not loaded\n", basename );
 	}
 }
 
@@ -340,7 +340,7 @@ static void CG_CacheGroundVehicle(int index)
 
 	// only thing that always has to be there is body
 	if( !availableVehicles[index].handle[BP_GV_BODY] ) {
-		Com_Printf( S_COLOR_YELLOW "WARNING: MFQ3: missing body %s.md3, model not loaded\n", basename );
+		Common::printf( S_COLOR_YELLOW "WARNING: MFQ3: missing body %s.md3, model not loaded\n", basename );
 	}
 }
 
@@ -400,7 +400,7 @@ static void CG_CacheHelo(int index)
 
 	// only thing that always has to be there is body
 	if( !availableVehicles[index].handle[BP_HELO_BODY] ) {
-		Com_Printf( S_COLOR_YELLOW "WARNING: MFQ3: missing body %s.md3, model not loaded\n", basename );
+		Common::printf( S_COLOR_YELLOW "WARNING: MFQ3: missing body %s.md3, model not loaded\n", basename );
 	}
 }
 
@@ -439,7 +439,7 @@ static void CG_CacheLQM(int index)
 
 	// only thing that always has to be there is body
 	if( !availableVehicles[index].handle[BP_LQM_TORSO] ) {
-		Com_Printf( S_COLOR_YELLOW "WARNING: MFQ3: missing body %s_torso.md3, model not loaded\n", basename );
+		Common::printf( S_COLOR_YELLOW "WARNING: MFQ3: missing body %s_torso.md3, model not loaded\n", basename );
 		return;
 	}
 
@@ -447,7 +447,7 @@ static void CG_CacheLQM(int index)
 	Com_sprintf( name, sizeof(name), "models/vehicles/lqms/%s/animation.cfg",  availableVehicles[index].modelName );
 	availableVehicles[index].animations = CG_ParseLQMAnimationFile(name);
 	if(!availableVehicles[index].animations) 
-		Com_Printf( S_COLOR_YELLOW "WARNING: MFQ3: cannot parse %s: animation.cfg\n", basename );
+		Common::printf( S_COLOR_YELLOW "WARNING: MFQ3: cannot parse %s: animation.cfg\n", basename );
 }
 
 
@@ -668,7 +668,7 @@ void CG_CacheVehicles()
 					CG_CacheBoat(i);
 			}
 			else {
-				Com_Error( ERR_DROP, "Invalid Vehicle type in CG_CacheVehicles (%d,%d)", 
+				Common::error( ERR_DROP, "Invalid Vehicle type in CG_CacheVehicles (%d,%d)", 
 					i, availableVehicles[i].cat );
 			}
 		}
@@ -692,7 +692,7 @@ load the vehicle
 */
 void CG_RegisterVehicle( clientInfo_t *ci )
 {
-//	Com_Printf( "RegVehicle = %i\n" ,ci->vehicle);    
+//	Common::printf( "RegVehicle = %i\n" ,ci->vehicle);    
 	if( availableVehicles[ci->vehicle].cat & CAT_PLANE ) {
 		CG_RegisterPlane(ci);
 	}
@@ -709,7 +709,7 @@ void CG_RegisterVehicle( clientInfo_t *ci )
 		CG_RegisterBoat(ci);
 	}
 	else
-		Com_Error( ERR_DROP, "Invalid vehicle type in register vehicle" );
+		Common::error( ERR_DROP, "Invalid vehicle type in register vehicle" );
 }
 
 int ClientEntity::loadoutVehicle()
@@ -768,10 +768,10 @@ void ClientEntity::vehicle()
     clientNum = this->currentState.clientNum;
     if ( clientNum < 0 || clientNum >= MAX_CLIENTS )
 	{
-		Com_Error( ERR_DROP, "Bad clientNum on player entity");
+		Common::error( ERR_DROP, "Bad clientNum on player entity");
     }
     ci = &cgs.clientinfo[ clientNum ];
-	//Com_Printf( "Vehicle = %i\n" ,ci->vehicle);    
+	//Common::printf( "Vehicle = %i\n" ,ci->vehicle);    
 
 	// don't continue if client info is invalid
     if ( !ci->infoValid )
@@ -828,7 +828,7 @@ void ClientEntity::vehicle()
 	}
 	else
 	{
-		Com_Error( ERR_DROP, "Error: CG_Vehicle got wrong CAT!\n" );
+		Common::error( ERR_DROP, "Error: CG_Vehicle got wrong CAT!\n" );
 	}
 }
 
@@ -844,7 +844,7 @@ void CG_VehicleObituary( entityState_t *ent )
     int		        clientNum = ent->otherEntityNum;
 
     if ( clientNum < 0 || clientNum >= MAX_CLIENTS ) {
-		Com_Error( ERR_DROP, "CG_VehicleObituary: target out of range" );
+		Common::error( ERR_DROP, "CG_VehicleObituary: target out of range" );
     }
     ci = &cgs.clientinfo[clientNum];
 

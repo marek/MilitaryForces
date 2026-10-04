@@ -338,7 +338,7 @@ void ClientEntity::entityEvent( vec3_t position )
 				int				clientNum;
 			    clientNum = this->currentState.clientNum;
 				if ( clientNum < 0 || clientNum >= MAX_CLIENTS ) {
-					Com_Error( ERR_DROP, "Bad clientNum on player entity (EV_GEAR_DOWN_FULL)");
+					Common::error( ERR_DROP, "Bad clientNum on player entity (EV_GEAR_DOWN_FULL)");
 				}
 				ci = &cgs.clientinfo[ clientNum ];
 				this->gearAnimFrame = availableVehicles[ci->vehicle].maxGearFrame;
@@ -526,7 +526,7 @@ void ClientEntity::entityEvent( vec3_t position )
 
 	default:
 		DEBUGNAME("UNKNOWN");
-		Com_Error( ERR_DROP, "Unknown event: %i", event );
+		Common::error( ERR_DROP, "Unknown event: %i", event );
 		break;
 	}
 

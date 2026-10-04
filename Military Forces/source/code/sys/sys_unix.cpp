@@ -341,7 +341,7 @@ bool Sys_MigrateToXDG(void)
 
 	if( len < 0 || len >= (int)sizeof( scriptBuffer ) )
 	{
-		Com_Printf( "XDG migration error: substitution failed.\n" );
+		Common::printf( "XDG migration error: substitution failed.\n" );
 		return false;
 	}
 
@@ -349,7 +349,7 @@ bool Sys_MigrateToXDG(void)
 	int fd = mkstemp( scriptPath );
 	if( fd == -1 )
 	{
-		Com_Printf( "XDG migration error: script creation failed.\n" );
+		Common::printf( "XDG migration error: script creation failed.\n" );
 		return false;
 	}
 
@@ -357,7 +357,7 @@ bool Sys_MigrateToXDG(void)
 	{
 		close( fd );
 		unlink( scriptPath );
-		Com_Printf( "XDG migration error: script write failed.\n" );
+		Common::printf( "XDG migration error: script write failed.\n" );
 		return false;
 	}
 	close( fd );
@@ -365,7 +365,7 @@ bool Sys_MigrateToXDG(void)
 	if( chmod( scriptPath, 0700 ) == -1 )
 	{
 		unlink( scriptPath );
-		Com_Printf( "XDG migration error: script chmod failed.\n" );
+		Common::printf( "XDG migration error: script chmod failed.\n" );
 		return false;
 	}
 
@@ -776,7 +776,7 @@ void Sys_ListFilteredFiles( const char *basedir, char *subdirs, char *filter, ch
 			break;
 		}
 		Com_sprintf( filename, sizeof(filename), "%s/%s", subdirs, d->d_name );
-		if (!Com_FilterPath( filter, filename, false ))
+		if (!Common::filterPath( filter, filename, false ))
 			continue;
 		list[ *numfiles ] = CopyString( filename );
 		(*numfiles)++;
@@ -981,7 +981,7 @@ void Sys_ErrorDialog( const char *error )
 	// Make sure the write path for the crashlog exists...
 	if( FileSystem::createPath( homedatapath ) )
 	{
-		Com_Printf("ERROR: couldn't create path '%s' for crash log.\n", ospath);
+		Common::printf("ERROR: couldn't create path '%s' for crash log.\n", ospath);
 		return;
 	}
 
@@ -991,14 +991,14 @@ void Sys_ErrorDialog( const char *error )
 	f = open( ospath, O_CREAT | O_TRUNC | O_WRONLY, 0640 );
 	if( f == -1 )
 	{
-		Com_Printf( "ERROR: couldn't open %s\n", fileName );
+		Common::printf( "ERROR: couldn't open %s\n", fileName );
 		return;
 	}
 
 	// We're crashing, so we don't care much if write() or close() fails.
 	while( ( size = CON_LogRead( buffer, sizeof( buffer ) ) ) > 0 ) {
 		if( write( f, buffer, size ) != size ) {
-			Com_Printf( "ERROR: couldn't fully write to %s\n", fileName );
+			Common::printf( "ERROR: couldn't fully write to %s\n", fileName );
 			break;
 		}
 	}
@@ -1154,7 +1154,7 @@ dialogResult_t System::dialog( dialogType_t type, const char *message, const cha
 		}
 	}
 
-	Com_DPrintf( S_COLOR_YELLOW "WARNING: failed to show a dialog\n" );
+	Common::dPrintf( S_COLOR_YELLOW "WARNING: failed to show a dialog\n" );
 	return DR_OK;
 }
 #endif
@@ -1346,7 +1346,7 @@ bool Sys_SetMaxFileLimit( )
 		if( setrlimit( RLIMIT_NOFILE, &limit ) == 0 )
 			return true;
 		else
-			Com_DPrintf( S_COLOR_YELLOW "WARNING: setrlimit (rlim_max) failed\n" );
+			Common::dPrintf( S_COLOR_YELLOW "WARNING: setrlimit (rlim_max) failed\n" );
 
 #ifdef OPEN_MAX
 		// On older macOS versions an error can happen trying to set a file limit above
@@ -1355,11 +1355,11 @@ bool Sys_SetMaxFileLimit( )
 		if( setrlimit( RLIMIT_NOFILE, &limit ) == 0 )
 			return true;
 		else
-			Com_DPrintf( S_COLOR_YELLOW "WARNING: setrlimit (OPEN_MAX) failed\n" );
+			Common::dPrintf( S_COLOR_YELLOW "WARNING: setrlimit (OPEN_MAX) failed\n" );
 #endif
 	}
 	else
-		Com_DPrintf( S_COLOR_YELLOW "WARNING: getrlimit failed\n" );
+		Common::dPrintf( S_COLOR_YELLOW "WARNING: getrlimit failed\n" );
 
 #endif // RLIMIT_NOFILE
 

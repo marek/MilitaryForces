@@ -53,7 +53,7 @@ WeaponInfo::createWeapon()
 
 	if( !newWeapon )
 	{
-		Com_Error(ERR_FATAL, "Unable to allocate memory for WeaponInfo!");
+		Common::error(ERR_FATAL, "Unable to allocate memory for WeaponInfo!");
 		return nullptr;
 	}
 	return newWeapon;

@@ -331,7 +331,7 @@ bool BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const playerSt
 	int		i;
 
 	if ( ent->modelindex < 1 || ent->modelindex >= bg_numItems ) {
-		Com_Error( ERR_DROP, "BG_CanItemBeGrabbed: index out of range" );
+		Common::error( ERR_DROP, "BG_CanItemBeGrabbed: index out of range" );
 	}
 
 	item = &bg_itemlist[ent->modelindex];
@@ -390,7 +390,7 @@ bool BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const playerSt
 		return false;
 
     case IT_BAD:
-            Com_Error( ERR_DROP, "BG_CanItemBeGrabbed: IT_BAD" );
+            Common::error( ERR_DROP, "BG_CanItemBeGrabbed: IT_BAD" );
 	}
 
 	return false;
@@ -455,7 +455,7 @@ void BG_EvaluateTrajectory( const trajectory_t *tr, int atTime, vec3_t result ) 
 			VectorMA( tr->trBase, deltaTime, tr->trDelta, result );
 		break;
 	default:
-		Com_Error( ERR_DROP, "BG_EvaluateTrajectory: unknown trType: %i", tr->trType );
+		Common::error( ERR_DROP, "BG_EvaluateTrajectory: unknown trType: %i", tr->trType );
 		break;
 	}
 }
@@ -516,7 +516,7 @@ void BG_EvaluateTrajectoryDelta( const trajectory_t *tr, int atTime, vec3_t resu
 		break;
 
 	default:
-		Com_Error( ERR_DROP, "BG_EvaluateTrajectoryDelta: unknown trType: %i", tr->trType );
+		Common::error( ERR_DROP, "BG_EvaluateTrajectoryDelta: unknown trType: %i", tr->trType );
 		break;
 	}
 }
@@ -683,7 +683,7 @@ void BG_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, bool snap
 	}
 
 	s->weaponIndex = ps->weaponIndex;
-//	Com_Printf("weaponIndex: %d\n", ps->weaponIndex);
+//	Common::printf("weaponIndex: %d\n", ps->weaponIndex);
 	s->weaponNum = ps->weaponNum;
 	s->groundEntityNum = ps->groundEntityNum;
 	s->objectives = ps->objectives;
@@ -775,7 +775,7 @@ void BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s
 	}
 
 	s->weaponIndex = ps->weaponIndex;
-//	Com_Printf("weaponIndex: %d\n", ps->weaponIndex);
+//	Common::printf("weaponIndex: %d\n", ps->weaponIndex);
 	s->weaponNum = ps->weaponNum;
 	s->groundEntityNum = ps->groundEntityNum;
 	s->objectives = ps->objectives;

@@ -64,13 +64,13 @@ GameObjectInfo::createVehicle(unsigned int category)
 		newVehicle = new GameObjectInfo_Infantry();
 		break;
 	default:
-		Com_Error(ERR_FATAL, "Invalid vehicle class in createVehicle!");
+		Common::error(ERR_FATAL, "Invalid vehicle class in createVehicle!");
 		return nullptr;
 	}
 
 	if( !newVehicle )
 	{
-		Com_Error(ERR_FATAL, "Unable to allocate memory for GameObjectInfo!");
+		Common::error(ERR_FATAL, "Unable to allocate memory for GameObjectInfo!");
 		return nullptr;
 	}
 	return newVehicle;
@@ -114,7 +114,7 @@ GameObjectInfo::createModelPath()
 		modelPath_ += "lqms/";
 		break;
 	default:
-		Com_Error(ERR_FATAL, "Wrong category in vehicle in 'getModelPath'");
+		Common::error(ERR_FATAL, "Wrong category in vehicle in 'getModelPath'");
 		return false;
 	}
 	modelPath_ += modelName_ + "/" + modelName_;
@@ -147,7 +147,7 @@ GameObjectInfo::addWeaponToLoadout( Loadout& loadout,
 	int idx = DataManager::getInstance().findWeaponByName(lookupName);
 	if( idx < 0 )
 	{
-		Com_Printf("Unable to add weapon with name '%s' to loadout, didnt find it.", lookupName.c_str());
+		Common::printf("Unable to add weapon with name '%s' to loadout, didnt find it.", lookupName.c_str());
 		return false;
 	}
 	Armament arm;

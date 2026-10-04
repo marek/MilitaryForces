@@ -86,7 +86,7 @@ GameObjectInfo_Vehicle::createWeaponMounts()
 		mounts_[i].tag_ = tagList[i];
 
 //#ifdef _DEBUG
-//	Com_Printf( "%s has %d mounts\n", descriptiveName_.c_str(), tagList.size() );
+//	Common::printf( "%s has %d mounts\n", descriptiveName_.c_str(), tagList.size() );
 //#endif
 
 	// set up
@@ -167,7 +167,7 @@ GameObjectInfo_Vehicle::correctArmament(Loadout& loadout, std::string const& loa
 			continue;
 		if( workCopy[i].maxAmmo_ > 0 )
 		{
-			Com_Printf("WARNING: %s loadout '%s' can't fit all the weapons, loadout modified: %d %ss removed\n",
+			Common::printf("WARNING: %s loadout '%s' can't fit all the weapons, loadout modified: %d %ss removed\n",
 				descriptiveName_.c_str(), loadoutName.c_str(), workCopy[i].maxAmmo_, 
 				allWeapons[workCopy[i].weaponIndex_]->descriptiveName_.c_str() );
 			loadout[i].maxAmmo_ -= workCopy[i].maxAmmo_;
@@ -175,6 +175,6 @@ GameObjectInfo_Vehicle::correctArmament(Loadout& loadout, std::string const& loa
 		}
 	}
 	if( !numProblems )
-		Com_Printf("INFO: %s loadout '%s' verified OK.\n", descriptiveName_.c_str(), loadoutName.c_str() );
+		Common::printf("INFO: %s loadout '%s' verified OK.\n", descriptiveName_.c_str(), loadoutName.c_str() );
 }
 

@@ -159,7 +159,7 @@ static void SNDDMA_PrintAudiospec(const char *str, const SDL_AudioSpec *spec)
 	int		i;
 	char	*fmt = nullptr;
 
-	Com_Printf("%s:\n", str);
+	Common::printf("%s:\n", str);
 
 	for( i = 0; i < formatToStringTableSize; i++ ) {
 		if( spec->format == formatToStringTable[ i ].enumFormat ) {
@@ -168,14 +168,14 @@ static void SNDDMA_PrintAudiospec(const char *str, const SDL_AudioSpec *spec)
 	}
 
 	if( fmt ) {
-		Com_Printf( "  Format:   %s\n", fmt );
+		Common::printf( "  Format:   %s\n", fmt );
 	} else {
-		Com_Printf( "  Format:   " S_COLOR_RED "UNKNOWN\n");
+		Common::printf( "  Format:   " S_COLOR_RED "UNKNOWN\n");
 	}
 
-	Com_Printf( "  Freq:     %d\n", spec->freq );
-	Com_Printf( "  Samples:  %d\n", static_cast<int>(spec->samples) );
-	Com_Printf( "  Channels: %d\n", static_cast<int>(spec->channels) );
+	Common::printf( "  Freq:     %d\n", spec->freq );
+	Common::printf( "  Samples:  %d\n", static_cast<int>(spec->samples) );
+	Common::printf( "  Channels: %d\n", static_cast<int>(spec->channels) );
 }
 
 /*
@@ -200,17 +200,17 @@ bool SNDDMA_Init()
 		s_sdlMixSamps = CvarSystem::get("s_sdlMixSamps", "0", CVAR_ARCHIVE);
 	}
 
-	Com_Printf( "SDL_Init( SDL_INIT_AUDIO )... " );
+	Common::printf( "SDL_Init( SDL_INIT_AUDIO )... " );
 
 	if (SDL_Init(SDL_INIT_AUDIO) != 0)
 	{
-		Com_Printf( "FAILED (%s)\n", SDL_GetError( ) );
+		Common::printf( "FAILED (%s)\n", SDL_GetError( ) );
 		return false;
 	}
 
-	Com_Printf( "OK\n" );
+	Common::printf( "OK\n" );
 
-	Com_Printf( "SDL audio driver is \"%s\".\n", SDL_GetCurrentAudioDriver( ) );
+	Common::printf( "SDL audio driver is \"%s\".\n", SDL_GetCurrentAudioDriver( ) );
 
 	memset(&desired, '\0', sizeof (desired));
 	memset(&obtained, '\0', sizeof (obtained));
@@ -246,7 +246,7 @@ bool SNDDMA_Init()
 	sdlPlaybackDevice = SDL_OpenAudioDevice(nullptr, SDL_FALSE, &desired, &obtained, SDL_AUDIO_ALLOW_ANY_CHANGE);
 	if (sdlPlaybackDevice == 0)
 	{
-		Com_Printf("SDL_OpenAudioDevice() failed: %s\n", SDL_GetError());
+		Common::printf("SDL_OpenAudioDevice() failed: %s\n", SDL_GetError());
 		SDL_QuitSubSystem(SDL_INIT_AUDIO);
 		return false;
 	}
@@ -283,12 +283,12 @@ bool SNDDMA_Init()
 	s_sdlCapture = CvarSystem::get( "s_sdlCapture", "1", CVAR_ARCHIVE | CVAR_LATCH );
 	if (!s_sdlCapture->integer)
 	{
-		Com_Printf("SDL audio capture support disabled by user ('+set s_sdlCapture 1' to enable)\n");
+		Common::printf("SDL audio capture support disabled by user ('+set s_sdlCapture 1' to enable)\n");
 	}
 #if USE_MUMBLE
 	else if (cl_useMumble->integer)
 	{
-		Com_Printf("SDL audio capture support disabled for Mumble support\n");
+		Common::printf("SDL audio capture support disabled for Mumble support\n");
 	}
 #endif
 	else
@@ -301,18 +301,18 @@ bool SNDDMA_Init()
 		spec.channels = 1;
 		spec.samples = VOIP_MAX_PACKET_SAMPLES * 4;
 		sdlCaptureDevice = SDL_OpenAudioDevice(nullptr, SDL_TRUE, &spec, nullptr, 0);
-		Com_Printf( "SDL capture device %s.\n",
+		Common::printf( "SDL capture device %s.\n",
 				    (sdlCaptureDevice == 0) ? "failed to open" : "opened");
 	}
 
 	sdlMasterGain = 1.0f;
 #endif
 
-	Com_Printf("Starting SDL audio callback...\n");
+	Common::printf("Starting SDL audio callback...\n");
 	SDL_PauseAudioDevice(sdlPlaybackDevice, 0);  // start callback.
 	// don't unpause the capture device; we'll do that in StartCapture.
 
-	Com_Printf("SDL audio initialized.\n");
+	Common::printf("SDL audio initialized.\n");
 	snd_inited = true;
 	return true;
 }
@@ -336,18 +336,18 @@ void SNDDMA_Shutdown()
 {
 	if (sdlPlaybackDevice != 0)
 	{
-		Com_Printf("Closing SDL audio playback device...\n");
+		Common::printf("Closing SDL audio playback device...\n");
 		SDL_CloseAudioDevice(sdlPlaybackDevice);
-		Com_Printf("SDL audio playback device closed.\n");
+		Common::printf("SDL audio playback device closed.\n");
 		sdlPlaybackDevice = 0;
 	}
 
 #ifdef USE_SDL_AUDIO_CAPTURE
 	if (sdlCaptureDevice)
 	{
-		Com_Printf("Closing SDL audio capture device...\n");
+		Common::printf("Closing SDL audio capture device...\n");
 		SDL_CloseAudioDevice(sdlCaptureDevice);
-		Com_Printf("SDL audio capture device closed.\n");
+		Common::printf("SDL audio capture device closed.\n");
 		sdlCaptureDevice = 0;
 	}
 #endif
@@ -357,7 +357,7 @@ void SNDDMA_Shutdown()
 	dma.buffer = nullptr;
 	dmapos = dmasize = 0;
 	snd_inited = false;
-	Com_Printf("SDL audio shut down.\n");
+	Common::printf("SDL audio shut down.\n");
 }
 
 /*

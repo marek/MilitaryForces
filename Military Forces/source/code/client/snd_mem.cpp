@@ -97,7 +97,7 @@ void SND_setup() {
 	*reinterpret_cast<sndBuffer **>(q) = nullptr;
 	freelist = p + scs - 1;
 
-	Com_Printf("Sound memory manager started\n");
+	Common::printf("Sound memory manager started\n");
 }
 
 void SND_shutdown()
@@ -225,16 +225,16 @@ bool SoundEffect::loadSound()
 		return false;
 
 	if ( info.width == 1 ) {
-		Com_DPrintf(S_COLOR_YELLOW "WARNING: %s is a 8 bit audio file\n", this->soundName);
+		Common::dPrintf(S_COLOR_YELLOW "WARNING: %s is a 8 bit audio file\n", this->soundName);
 	}
 
 	if ( info.rate != 22050 ) {
-		Com_DPrintf(S_COLOR_YELLOW "WARNING: %s is not a 22kHz audio file\n", this->soundName);
+		Common::dPrintf(S_COLOR_YELLOW "WARNING: %s is not a 22kHz audio file\n", this->soundName);
 	}
 
 	samples = static_cast<short *>(Hunk_AllocateTempMemory(info.channels * info.samples * sizeof(short) * 2));
 
-	this->lastTimeUsed = Com_Milliseconds()+1;
+	this->lastTimeUsed = Common::milliseconds()+1;
 
 	// each of these compression schemes works just fine
 	// but the 16bit quality is much nicer and with a local
@@ -274,5 +274,5 @@ bool SoundEffect::loadSound()
 }
 
 void S_DisplayFreeMemory() {
-	Com_Printf("%d bytes free sound buffer memory, %d total used\n", inUse, totalInUse);
+	Common::printf("%d bytes free sound buffer memory, %d total used\n", inUse, totalInUse);
 }

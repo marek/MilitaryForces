@@ -37,7 +37,7 @@ GameObjectInfo_Aircraft::setupBoundingBox()
 
 	if( FileSystem::fOpenFileByMode((modelBaseName + ".md3").c_str(), &fileVehicle, FS_READ) < 0 ) 
 	{
-		Com_Error(ERR_FATAL, "Unable to open model file %s\n", modelBaseName.c_str() );
+		Common::error(ERR_FATAL, "Unable to open model file %s\n", modelBaseName.c_str() );
 		return false;
 	}
 

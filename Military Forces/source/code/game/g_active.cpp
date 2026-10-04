@@ -695,12 +695,12 @@ void ClientThink_real( GameEntity *ent )
 	if( ucmd->serverTime > theLevel.time_ + 200 ) 
 	{
 		ucmd->serverTime = theLevel.time_ + 200;
-//		Com_Printf("serverTime <<<<<\n" );
+//		Common::printf("serverTime <<<<<\n" );
 	}
 	if( ucmd->serverTime < theLevel.time_ - 1000 ) 
 	{
 		ucmd->serverTime = theLevel.time_ - 1000;
-//		Com_Printf("serverTime >>>>>\n" );
+//		Common::printf("serverTime >>>>>\n" );
 	} 
 
 	if( client->sess_.ridingClient_ >= 0 ) 

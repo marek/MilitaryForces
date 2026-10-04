@@ -94,7 +94,7 @@ void QDECL PrintMsg( GameEntity *ent, const char *fmt, ... )
 	
 	va_start (argptr,fmt);
 	if (Q_vsnprintf (msg, sizeof(msg), fmt, argptr) >= sizeof(msg)) 
-		Com_Error( ERR_DROP, "PrintMsg overrun" );
+		Common::error( ERR_DROP, "PrintMsg overrun" );
 
 	va_end (argptr);
 
@@ -388,7 +388,7 @@ void Team_ReturnFlagSound( GameEntity *ent, int team )
 
 	if (ent == nullptr)
 	{
-		Com_Printf ("Warning:  NULL passed to Team_ReturnFlagSound\n");
+		Common::printf ("Warning:  NULL passed to Team_ReturnFlagSound\n");
 		return;
 	}
 
@@ -407,7 +407,7 @@ void Team_TakeFlagSound( GameEntity *ent, int team )
 
 	if (ent == nullptr) 
 	{
-		Com_Printf ("Warning:  NULL passed to Team_TakeFlagSound\n");
+		Common::printf ("Warning:  NULL passed to Team_TakeFlagSound\n");
 		return;
 	}
 
@@ -449,7 +449,7 @@ void Team_CaptureFlagSound( GameEntity *ent, int team )
 
 	if (ent == nullptr) 
 	{
-		Com_Printf ("Warning:  NULL passed to Team_CaptureFlagSound\n");
+		Common::printf ("Warning:  NULL passed to Team_CaptureFlagSound\n");
 		return;
 	}
 

@@ -217,7 +217,7 @@ void ClientEntity::item() {
 
 	es = &this->currentState;
 	if ( es->modelindex >= bg_numItems ) {
-		Com_Error( ERR_DROP, "Bad item index %i on entity", es->modelindex );
+		Common::error( ERR_DROP, "Bad item index %i on entity", es->modelindex );
 	}
 
 	// if set to invisible, skip
@@ -686,7 +686,7 @@ void ClientEntity::interpolateEntityPosition() {
 	// it would be an internal error to find an entity that interpolates without
 	// a snapshot ahead of the current one
 	if ( cg.nextSnap == nullptr ) {
-		Com_Error( ERR_DROP, "CG_InterpoateEntityPosition: cg.nextSnap == NULL" );
+		Common::error( ERR_DROP, "CG_InterpoateEntityPosition: cg.nextSnap == NULL" );
 	}
 
 	f = cg.frameInterpolation;
@@ -840,7 +840,7 @@ void ClientEntity::addCEntity() {
 
 	switch ( this->currentState.eType ) {
 	default:
-		Com_Error( ERR_DROP, "Bad entity type: %i\n", this->currentState.eType );
+		Common::error( ERR_DROP, "Bad entity type: %i\n", this->currentState.eType );
 		break;
 	case ET_INVISIBLE:
 	case ET_TELEPORT_TRIGGER:

@@ -770,7 +770,7 @@ static void PM_VehicleBoundingBox ()
     VectorCopy( mins, pm->mins );
     VectorCopy( maxs, pm->maxs );
 */
-//    Com_Printf( "a: %.1f (%.1f*%.1f*%.1f) b: %.1f %.1f / %.1f %.1f\n", pm->ps->vehicleAngles[2], corr, diff1, diff2, 
+//    Common::printf( "a: %.1f (%.1f*%.1f*%.1f) b: %.1f %.1f / %.1f %.1f\n", pm->ps->vehicleAngles[2], corr, diff1, diff2, 
 //	    maxs[1], mins[1], maxs[2], mins[2] );
 
 	// for now static bounding box
@@ -868,7 +868,7 @@ static void PM_VehicleMove( )
 	}
 	else 
 	{
-		Com_Error( ERR_DROP, "ERROR: Invalid vehicle type in PM_VehicleMove" );
+		Common::error( ERR_DROP, "ERROR: Invalid vehicle type in PM_VehicleMove" );
 	}
 }
 

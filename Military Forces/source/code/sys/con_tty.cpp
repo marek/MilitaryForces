@@ -290,7 +290,7 @@ void CON_Init( )
 
 	if (!stdinIsATTY)
 	{
-		Com_Printf("tty console mode disabled\n");
+		Common::printf("tty console mode disabled\n");
 		ttycon_on = false;
 		stdin_active = true;
 		return;
@@ -387,7 +387,7 @@ char *CON_Input( )
 					// push it in history
 					TTY_con.hist_Add();
 					CON_Hide();
-					Com_Printf("%s%s\n", TTY_CONSOLE_PROMPT, TTY_con.buffer);
+					Common::printf("%s%s\n", TTY_CONSOLE_PROMPT, TTY_con.buffer);
 					TTY_con.clear();
 					CON_Show();
 #else
@@ -452,7 +452,7 @@ char *CON_Input( )
 						}
 					}
 				}
-				Com_DPrintf("droping ISCTL sequence: %d, TTY_erase: %d\n", key, TTY_erase);
+				Common::dPrintf("droping ISCTL sequence: %d, TTY_erase: %d\n", key, TTY_erase);
 				tcflush(STDIN_FILENO, TCIFLUSH);
 				return nullptr;
 			}

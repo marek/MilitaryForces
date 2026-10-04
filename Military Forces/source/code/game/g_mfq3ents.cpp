@@ -54,7 +54,7 @@ void Die_ExplosiveDie::execute( GameEntity *inflictor, GameEntity *attacker, int
 		{
 			if ( t == ent ) 
 			{
-				Com_Printf ("WARNING: Entity used itself.\n");
+				Common::printf ("WARNING: Entity used itself.\n");
 			} 
 			else 
 			{
@@ -63,7 +63,7 @@ void Die_ExplosiveDie::execute( GameEntity *inflictor, GameEntity *attacker, int
 			}
 			if( !ent->inuse_ ) 
 			{
-				Com_Printf("entity was removed while using targets\n");
+				Common::printf("entity was removed while using targets\n");
 				break;
 			}
 		}
@@ -102,7 +102,7 @@ void SP_func_runway( GameEntity *ent )
 		else if ( Q_stricmp( ent->team_, "blue" ) == 0 ) 
 			ent->s.generic1 = ClientBase::TEAM_BLUE;	
 	}
-//	Com_Printf( "runway: %d, %.1f %.1f %.1f - %.1f %.1f %.1f\n", ent->health, ent->r.mins[0],
+//	Common::printf( "runway: %d, %.1f %.1f %.1f - %.1f %.1f %.1f\n", ent->health, ent->r.mins[0],
 //		ent->r.mins[1], ent->r.mins[2], ent->r.maxs[0], ent->r.maxs[1], ent->r.maxs[2] );
 
 	SV_LinkEntity( ent );

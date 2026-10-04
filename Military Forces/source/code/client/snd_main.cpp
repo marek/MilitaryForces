@@ -410,7 +410,7 @@ void S_Play_f( ) {
 	c = CommandSystem::argc();
 
 	if( c < 2 ) {
-		Com_Printf ("Usage: play <sound filename> [sound filename] [sound filename] ...\n");
+		Common::printf ("Usage: play <sound filename> [sound filename] [sound filename] ...\n");
 		return;
 	}
 
@@ -442,7 +442,7 @@ void S_Music_f( ) {
 	} else if ( c == 3 ) {
 		si.StartBackgroundTrack( CommandSystem::argv(1), CommandSystem::argv(2) );
 	} else {
-		Com_Printf ("Usage: music <musicfile> [loopfile]\n");
+		Common::printf ("Usage: music <musicfile> [loopfile]\n");
 		return;
 	}
 
@@ -474,7 +474,7 @@ void SoundSystem::init( )
 	cvar_t		*cv;
 	bool	started = false;
 
-	Com_Printf( "------ Initializing Sound ------\n" );
+	Common::printf( "------ Initializing Sound ------\n" );
 
 	s_volume = CvarSystem::get( "s_volume", "0.8", CVAR_ARCHIVE );
 	s_musicVolume = CvarSystem::get( "s_musicvolume", "0.25", CVAR_ARCHIVE );
@@ -486,7 +486,7 @@ void SoundSystem::init( )
 
 	cv = CvarSystem::get( "s_initsound", "1", 0 );
 	if( !cv->integer ) {
-		Com_Printf( "Sound disabled.\n" );
+		Common::printf( "Sound disabled.\n" );
 	} else {
 
 		S_CodecInit( );
@@ -512,17 +512,17 @@ void SoundSystem::init( )
 
 		if( started ) {
 			if( !S_ValidSoundInterface( &si ) ) {
-				Com_Error( ERR_FATAL, "Sound interface invalid" );
+				Common::error( ERR_FATAL, "Sound interface invalid" );
 			}
 
 			S_SoundInfo( );
-			Com_Printf( "Sound initialization successful.\n" );
+			Common::printf( "Sound initialization successful.\n" );
 		} else {
-			Com_Printf( "Sound initialization failed.\n" );
+			Common::printf( "Sound initialization failed.\n" );
 		}
 	}
 
-	Com_Printf( "--------------------------------\n");
+	Common::printf( "--------------------------------\n");
 }
 
 /*

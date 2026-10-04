@@ -46,7 +46,7 @@ bool MF_findTag(const char* fileName, const char* tagname, md3Tag_t* tag)
 		}
 		FileSystem::fCloseFile(f);
 	} else {
-		Com_Printf( "Unable to read tag from %s\n", fileName );
+		Common::printf( "Unable to read tag from %s\n", fileName );
 	}
 	return found;
 }
@@ -73,7 +73,7 @@ bool MF_getNumberOfTags(const char* fileName, int* number)
 		found = true;
 		FileSystem::fCloseFile(f);
 	} else {
-		Com_Printf( "Unable to open file %s\n", fileName );
+		Common::printf( "Unable to open file %s\n", fileName );
 	}
 	return found;
 
@@ -117,7 +117,7 @@ int MF_getTagsContaining(const char* fileName, const char* str, md3Tag_t* tags, 
 		}
 		FileSystem::fCloseFile(f);
 	} else {
-		Com_Printf( "Unable to open file %s\n", fileName );
+		Common::printf( "Unable to open file %s\n", fileName );
 	}
 	return number;
 
@@ -146,7 +146,7 @@ bool MF_getNumberOfFrames(const char* fileName, int* number)
 		found = true;
 		FileSystem::fCloseFile(f);
 	} else {
-		Com_Printf( "Unable to open file %s\n", fileName );
+		Common::printf( "Unable to open file %s\n", fileName );
 	}
 	return found;
 
@@ -184,7 +184,7 @@ bool MF_getDimensions(const char* fileName, int frame, vec3_t* maxs, vec3_t* min
 		}
 		FileSystem::fCloseFile(f);
 	} else {
-		Com_Printf( "Unable to open file %s\n", fileName );
+		Common::printf( "Unable to open file %s\n", fileName );
 	}
 	return found;
 

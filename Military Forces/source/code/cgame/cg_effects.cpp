@@ -258,7 +258,7 @@ LocalEntity *CG_MakeExplosion( vec3_t origin, vec3_t dir,
 	vec3_t			tmpVec, newOrigin;
 
 	if ( duration <= 0 ) {
-		Com_Error( ERR_DROP, "CG_MakeExplosion: duration = %i", duration );
+		Common::error( ERR_DROP, "CG_MakeExplosion: duration = %i", duration );
 	}
 
 	// skew the time a bit so they aren't all in sync

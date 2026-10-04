@@ -184,11 +184,11 @@ void PM_BoatMove( )
 	vectoangles( temp, turretdir );
 	turretdir[PITCH] += gun_pitch;
 
-//	Com_Printf( "vehd = %.1f %.1f %.1f (%.1f %.1f)\n", pm->ps->vehicleAngles[0], pm->ps->vehicleAngles[1],
+//	Common::printf( "vehd = %.1f %.1f %.1f (%.1f %.1f)\n", pm->ps->vehicleAngles[0], pm->ps->vehicleAngles[1],
 //			pm->ps->vehicleAngles[2], turret_yaw, gun_pitch );
-//	Com_Printf( "view = %.1f %.1f %.1f\n", pm->ps->viewangles[0], pm->ps->viewangles[1],
+//	Common::printf( "view = %.1f %.1f %.1f\n", pm->ps->viewangles[0], pm->ps->viewangles[1],
 //			pm->ps->viewangles[2] );
-//	Com_Printf( "turr = %.1f %.1f %.1f\n", turretdir[0], turretdir[1], turretdir[2] );
+//	Common::printf( "turr = %.1f %.1f %.1f\n", turretdir[0], turretdir[1], turretdir[2] );
 
 	// local vectors
     VectorCopy( pm->ps->vehicleAngles, vehdir );
@@ -261,7 +261,7 @@ void PM_BoatMove( )
 		if( gun_pitch < 0 ) gun_pitch += 360;// clamp it back to pos
 		else if( gun_pitch > 360 ) gun_pitch -= 360;
 
-//		Com_Printf( "gun %.1f (d %.1f)\n", gun_pitch, diff[PITCH] );
+//		Common::printf( "gun %.1f (d %.1f)\n", gun_pitch, diff[PITCH] );
 	}
 
 	// return angles

@@ -68,7 +68,7 @@ CG_DrawScoreboard
 //	int iconx;
 //
 //	if ( score->client < 0 || score->client >= cgs.maxclients ) {
-//		Com_Printf( "Bad score->client: %i\n", score->client );
+//		Common::printf( "Bad score->client: %i\n", score->client );
 //		return;
 //	}
 //	
