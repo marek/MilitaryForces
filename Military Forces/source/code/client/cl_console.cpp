@@ -69,10 +69,10 @@ cvar_t		*con_scale;
 
 /*
 ================
-Con_ToggleConsole_f
+Console::toggleConsole_f
 ================
 */
-void Con_ToggleConsole_f () {
+void Console::toggleConsole_f () {
 	// Can't toggle the console when it's the only thing available
 	if ( clc.state == CA_DISCONNECTED && Key_GetCatcher( ) == KEYCATCH_CONSOLE ) {
 		return;
@@ -84,7 +84,7 @@ void Con_ToggleConsole_f () {
 
 	g_consoleField.widthInChars = g_console_field_width;
 
-	Con_ClearNotify ();
+	Console::clearNotify ();
 	Key_SetCatcher( Key_GetCatcher( ) ^ KEYCATCH_CONSOLE );
 }
 
@@ -161,17 +161,17 @@ void Con_MessageMode4_f () {
 
 /*
 ================
-Con_Clear_f
+Console::clear_f
 ================
 */
-void Con_Clear_f () {
+void Console::clear_f () {
 	int		i;
 
 	for ( i = 0 ; i < CON_TEXTSIZE ; i++ ) {
 		con.text[i] = (ColorIndex(COLOR_WHITE)<<8) | ' ';
 	}
 
-	Con_Bottom();		// go to end
+	Console::bottom();		// go to end
 }
 
 						
@@ -263,10 +263,10 @@ void Con_Dump_f ()
 						
 /*
 ================
-Con_ClearNotify
+Console::clearNotify
 ================
 */
-void Con_ClearNotify( ) {
+void Console::clearNotify( ) {
 	int		i;
 	
 	for ( i = 0 ; i < NUM_CON_TIMES ; i++ ) {
@@ -278,12 +278,12 @@ void Con_ClearNotify( ) {
 
 /*
 ================
-Con_CheckResize
+Console::checkResize
 
 If the line width has changed, reformat the buffer.
 ================
 */
-void Con_CheckResize ()
+void Console::checkResize ()
 {
 	int		i, j, width, oldwidth, oldtotallines, numlines, numchars;
 	short	tbuf[CON_TEXTSIZE];
@@ -340,7 +340,7 @@ void Con_CheckResize ()
 			}
 		}
 
-		Con_ClearNotify ();
+		Console::clearNotify ();
 	}
 
 	con.current = con.totallines - 1;
@@ -361,10 +361,10 @@ void Cmd_CompleteTxtName( char *args, int argNum ) {
 
 /*
 ================
-Con_Init
+Console::init
 ================
 */
-void Con_Init () {
+void Console::init () {
 	int		i;
 
 	con_notifytime = CvarSystem::get ("con_notifytime", "3", CVAR_ARCHIVE);
@@ -383,23 +383,23 @@ void Con_Init () {
 	}
 	CL_LoadConsoleHistory( );
 
-	CommandSystem::addCommand ("toggleconsole", Con_ToggleConsole_f);
+	CommandSystem::addCommand ("toggleconsole", Console::toggleConsole_f);
 	CommandSystem::addCommand ("togglemenu", Con_ToggleMenu_f);
 	CommandSystem::addCommand ("messagemode", Con_MessageMode_f);
 	CommandSystem::addCommand ("messagemode2", Con_MessageMode2_f);
 	CommandSystem::addCommand ("messagemode3", Con_MessageMode3_f);
 	CommandSystem::addCommand ("messagemode4", Con_MessageMode4_f);
-	CommandSystem::addCommand ("clear", Con_Clear_f);
+	CommandSystem::addCommand ("clear", Console::clear_f);
 	CommandSystem::addCommand ("condump", Con_Dump_f);
 	CommandSystem::setCommandCompletionFunc( "condump", Cmd_CompleteTxtName );
 }
 
 /*
 ================
-Con_Shutdown
+Console::shutdown
 ================
 */
-void Con_Shutdown()
+void Console::shutdown()
 {
 	CommandSystem::removeCommand("toggleconsole");
 	CommandSystem::removeCommand("togglemenu");
@@ -471,7 +471,7 @@ void CL_ConsolePrint( char *txt ) {
 		con.color[2] =
 		con.color[3] = 1.0f;
 		con.linewidth = -1;
-		Con_CheckResize ();
+		Console::checkResize ();
 		con.initialized = true;
 	}
 
@@ -570,12 +570,12 @@ void Con_DrawInput () {
 
 /*
 ================
-Con_DrawNotify
+Console::drawNotify
 
 Draws the last few lines of output transparently over the game top
 ================
 */
-void Con_DrawNotify ()
+void Console::drawNotify ()
 {
 	int		x, v;
 	short	*text;
@@ -768,12 +768,12 @@ void Con_DrawSolidConsole( float frac ) {
 
 /*
 ==================
-Con_DrawConsole
+Console::drawConsole
 ==================
 */
-void Con_DrawConsole( ) {
+void Console::drawConsole( ) {
 	// check for console width changes from a vid mode change
-	Con_CheckResize ();
+	Console::checkResize ();
 
 	// if disconnected, render console full screen
 	if ( clc.state == CA_DISCONNECTED ) {
@@ -788,7 +788,7 @@ void Con_DrawConsole( ) {
 	} else {
 		// draw notify lines
 		if ( clc.state == CA_ACTIVE ) {
-			Con_DrawNotify ();
+			Console::drawNotify ();
 		}
 	}
 }
@@ -797,12 +797,12 @@ void Con_DrawConsole( ) {
 
 /*
 ==================
-Con_RunConsole
+Console::runConsole
 
 Scroll it up or down
 ==================
 */
-void Con_RunConsole () {
+void Console::runConsole () {
 	// decide on the destination height of the console
 	if ( Key_GetCatcher( ) & KEYCATCH_CONSOLE )
 		con.finalFrac = 0.5;		// half screen
@@ -827,38 +827,38 @@ void Con_RunConsole () {
 }
 
 
-void Con_PageUp( ) {
+void Console::pageUp( ) {
 	con.display -= 2;
 	if ( con.current - con.display >= con.totallines ) {
 		con.display = con.current - con.totallines + 1;
 	}
 }
 
-void Con_PageDown( ) {
+void Console::pageDown( ) {
 	con.display += 2;
 	if (con.display > con.current) {
 		con.display = con.current;
 	}
 }
 
-void Con_Top( ) {
+void Console::top( ) {
 	con.display = con.totallines;
 	if ( con.current - con.display >= con.totallines ) {
 		con.display = con.current - con.totallines + 1;
 	}
 }
 
-void Con_Bottom( ) {
+void Console::bottom( ) {
 	con.display = con.current;
 }
 
 
-void Con_Close( ) {
+void Console::close( ) {
 	if ( !com_cl_running->integer ) {
 		return;
 	}
 	g_consoleField.clear();
-	Con_ClearNotify ();
+	Console::clearNotify ();
 	Key_SetCatcher( Key_GetCatcher( ) & ~KEYCATCH_CONSOLE );
 	con.finalFrac = 0;				// none visible
 	con.displayFrac = 0;

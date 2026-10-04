@@ -1142,7 +1142,7 @@ void CL_PlayDemo_f( ) {
 	}
 	Q_strncpyz( clc.demoName, arg, sizeof( clc.demoName ) );
 
-	Con_Close();
+	Console::close();
 
 	clc.state = CA_CONNECTED;
 	clc.demoplaying = true;
@@ -1297,7 +1297,7 @@ void CL_MapLoading( ) {
 		return;
 	}
 
-	Con_Close();
+	Console::close();
 	Key_SetCatcher( 0 );
 
 	// if we are already connected to the local host, stay connected
@@ -1742,7 +1742,7 @@ void CL_Connect_f( ) {
 
 	noGameRestart = true;
 	CL_Disconnect( true );
-	Con_Close();
+	Console::close();
 
 	Q_strncpyz( clc.servername, server, sizeof(clc.servername) );
 
@@ -2997,7 +2997,7 @@ void CL_Frame ( int msec ) {
 			cls.realtime += cls.frametime;
 			SCR_UpdateScreen();
 			S_Update();
-			Con_RunConsole();
+			Console::runConsole();
 			cls.framecount++;
 			return;
 		}
@@ -3112,7 +3112,7 @@ void CL_Frame ( int msec ) {
 	// advance local effects for next frame
 	SCR_RunCinematic();
 
-	Con_RunConsole();
+	Console::runConsole();
 
 	cls.framecount++;
 }
@@ -3547,7 +3547,7 @@ CL_Init
 void CL_Init( ) {
 	Com_Printf( "----- Client Initialization -----\n" );
 
-	Con_Init ();
+	Console::init ();
 
 	if(!com_fullyInitialized)
 	{
@@ -3822,7 +3822,7 @@ void CL_Shutdown(const char *finalmsg, bool disconnect, bool quit)
 	CommandSystem::removeCommand ("stopvideo");
 
 	CL_ShutdownInput();
-	Con_Shutdown();
+	Console::shutdown();
 
 	CvarSystem::set( "cl_running", "0" );
 

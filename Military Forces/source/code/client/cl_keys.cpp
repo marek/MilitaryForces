@@ -703,42 +703,42 @@ void Console_Key (int key) {
 
 	// console scrolling
 	if ( key == K_PGUP ) {
-		Con_PageUp();
+		Console::pageUp();
 		return;
 	}
 
 	if ( key == K_PGDN) {
-		Con_PageDown();
+		Console::pageDown();
 		return;
 	}
 
 	if ( key == K_MWHEELUP) {	//----(SA)	added some mousewheel functionality to the console
-		Con_PageUp();
+		Console::pageUp();
 		if(keys[K_CTRL].down) {	// hold <ctrl> to accelerate scrolling
-			Con_PageUp();
-			Con_PageUp();
+			Console::pageUp();
+			Console::pageUp();
 		}
 		return;
 	}
 
 	if ( key == K_MWHEELDOWN) {	//----(SA)	added some mousewheel functionality to the console
-		Con_PageDown();
+		Console::pageDown();
 		if(keys[K_CTRL].down) {	// hold <ctrl> to accelerate scrolling
-			Con_PageDown();
-			Con_PageDown();
+			Console::pageDown();
+			Console::pageDown();
 		}
 		return;
 	}
 
 	// ctrl-home = top of console
 	if ( key == K_HOME && keys[K_CTRL].down ) {
-		Con_Top();
+		Console::top();
 		return;
 	}
 
 	// ctrl-end = bottom of console
 	if ( key == K_END && keys[K_CTRL].down ) {
-		Con_Bottom();
+		Console::bottom();
 		return;
 	}
 
@@ -1261,7 +1261,7 @@ void CL_KeyDownEvent( int key, unsigned time )
 	// console key is hardcoded, so the user can never unbind it
 	if( key == K_CONSOLE || ( keys[K_SHIFT].down && key == K_ESCAPE ) )
 	{
-		Con_ToggleConsole_f ();
+		Console::toggleConsole_f ();
 		Key_ClearStates ();
 		return;
 	}

@@ -549,20 +549,24 @@ extern int g_smallchar_height;
 
 void Con_DrawCharacter (int cx, int line, int num);
 
-void Con_CheckResize ();
-void Con_Init();
-void Con_Shutdown();
-void Con_Clear_f ();
-void Con_ToggleConsole_f ();
-void Con_DrawNotify ();
-void Con_ClearNotify ();
-void Con_RunConsole ();
-void Con_DrawConsole ();
-void Con_PageUp( );
-void Con_PageDown( );
-void Con_Top( );
-void Con_Bottom( );
-void Con_Close( );
+class Console
+{
+public:
+	static void checkResize ();
+	static void init();
+	static void shutdown();
+	static void clear_f ();
+	static void toggleConsole_f ();
+	static void drawNotify ();
+	static void clearNotify ();
+	static void runConsole ();
+	static void drawConsole ();
+	static void pageUp( );
+	static void pageDown( );
+	static void top( );
+	static void bottom( );
+	static void close( );
+};
 
 void CL_LoadConsoleHistory( );
 void CL_SaveConsoleHistory( );

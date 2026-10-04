@@ -348,8 +348,8 @@ rescan:
 	if ( !strcmp( cmd, "map_restart" ) ) {
 		// clear notify lines and outgoing commands before passing
 		// the restart to the cgame
-		Con_ClearNotify();
-		// reparse the string, because Con_ClearNotify() may have done another CommandSystem::tokenizeString()
+		Console::clearNotify();
+		// reparse the string, because Console::clearNotify() may have done another CommandSystem::tokenizeString()
 		CommandSystem::tokenizeString( s );
 		Com_Memset( cl.cmds, 0, sizeof( cl.cmds ) );
 		return true;
@@ -368,7 +368,7 @@ rescan:
 			return false;
 		}
 		// close the console
-		Con_Close();
+		Console::close();
 		// take a special screenshot next frame
 		CommandBuffer::addText( "wait ; wait ; wait ; wait ; screenshot levelshot\n" );
 		return true;
@@ -427,7 +427,7 @@ void CL_InitCGame()
 	t1 = Sys_Milliseconds();
 
 	// put away the console
-	Con_Close();
+	Console::close();
 
 	// find the current mapname
 	info = cl.gameState.stringData + cl.gameState.stringOffsets[ CS_SERVERINFO ];
@@ -463,7 +463,7 @@ void CL_InitCGame()
 	}
 
 	// clear anything that got printed
-	Con_ClearNotify ();
+	Console::clearNotify ();
 }
 
 

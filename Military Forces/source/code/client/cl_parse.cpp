@@ -491,7 +491,7 @@ void CL_ParseGamestate( Message *msg ) {
 	char			*s;
 	char oldGame[MAX_QPATH];
 
-	Con_Close();
+	Console::close();
 
 	clc.connectPacketCount = 0;
 
