@@ -387,11 +387,12 @@ void CGame::cacheHelo(int index)
 		case BP_HELO_GUNBARREL:
 			Com_sprintf( name, sizeof(name), "%s_gun.md3", basename );
 			break;
+		// door guns are one gun model on two mounts
 		case BP_HELO_TURRET2:
-			Com_sprintf( name, sizeof(name), "%s_tur2.md3", basename );
+			Com_sprintf( name, sizeof(name), (availableVehicles[index].flags & VF_DOORGUNS) ? "%s_tur.md3" : "%s_tur2.md3", basename );
 			break;
 		case BP_HELO_GUNBARREL2:
-			Com_sprintf( name, sizeof(name), "%s_gun2.md3", basename );
+			Com_sprintf( name, sizeof(name), (availableVehicles[index].flags & VF_DOORGUNS) ? "%s_gun.md3" : "%s_gun2.md3", basename );
 			break;
 		case BP_HELO_GEAR:
 			Com_sprintf( name, sizeof(name), "%s_gear.md3", basename );

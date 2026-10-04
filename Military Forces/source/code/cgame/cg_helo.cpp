@@ -205,6 +205,15 @@ void ClientEntity::helo( clientInfo_t *ci )
 		min = availableWeapons[availableVehicles[ci->vehicle].weapons[i+1]].minturns[0];
 		if( pitch > max ) pitch = max;
 		else if( pitch < min ) pitch = min;
+		// two door guns share the first turret weapon: the right gun is drawn first, the left second
+		if( (availableVehicles[ci->vehicle].flags & VF_DOORGUNS) && i < 2 ) {
+			yaw = this->lerpAngles2[ROLL];
+			if( yaw > 180 ) yaw -= 360;
+			yaw = doorGunYaw( i == 1, yaw );
+			pitch = this->lerpAngles2[PITCH];
+			if( pitch > 180 ) pitch -= 360;
+			pitch = std::clamp( pitch, availableWeapons[availableVehicles[ci->vehicle].weapons[1]].minturns[0], availableWeapons[availableVehicles[ci->vehicle].weapons[1]].maxturns[0] );
+		}
 		drawInfo.turretAngle[i] = yaw;
 		drawInfo.gunAngle[i] = pitch;
 	}

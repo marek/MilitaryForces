@@ -669,6 +669,30 @@ extern const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1];
 inline constexpr int VF_NOTSELECTABLE = 1; // cannot be selected (turrets, etc)
 inline constexpr int VF_STEALTH = 2;
 inline constexpr int VF_COOKOFF = 4;
+inline constexpr int VF_DOORGUNS = 8;	// one gun in each door, sharing one weapon: each covers its own side
+
+// door guns stop short of the fuselage line; both fire only when the aim is this close to straight ahead or behind
+inline constexpr float DOORGUN_STOP = 2.0f;
+inline constexpr float DOORGUN_BOTH = 4.0f;
+
+// the yaw a door gun takes for a wanted aim yaw (-180..180, positive left): its own side, held at the nearer stop otherwise
+inline float doorGunYaw( bool leftGun, float aim )
+{
+	const float side = leftGun ? aim : -aim;
+	if( side >= DOORGUN_STOP && side <= 180.0f - DOORGUN_STOP )
+		return aim;
+	const float stop = (side > 90.0f || side < -90.0f) ? 180.0f - DOORGUN_STOP : DOORGUN_STOP;
+	return leftGun ? stop : -stop;
+}
+
+// whether that gun bears on the aim closely enough to fire
+inline bool doorGunBears( bool leftGun, float aim )
+{
+	float off = doorGunYaw( leftGun, aim ) - aim;
+	if( off > 180.0f ) off -= 360.0f;
+	else if( off < -180.0f ) off += 360.0f;
+	return off <= DOORGUN_BOTH + DOORGUN_STOP && off >= -(DOORGUN_BOTH + DOORGUN_STOP);
+}
 
 inline constexpr int SEATMASK_PILOT = 0x0001;
 inline constexpr int SEATMASK_ENTERABLE = 0x8000;

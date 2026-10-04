@@ -1312,6 +1312,14 @@ void fire_ironbomb( GameEntity *self )
 }
 
 
+namespace
+{
+	// where the Huey's door mounts are, from the model's turret tags
+	constexpr float doorGunForward = 4.1f;
+	constexpr float doorGunSide = 6.6f;
+	constexpr float doorGunUp = -1.7f;
+}
+
 /*
 =================
 fire_autocannon MFQ3
@@ -1348,7 +1356,28 @@ void fire_autocannon( GameEntity *self, bool main )
 //		start[2] += availableVehicles[self->client->vehicle].maxs[2];
 		// otherwise use this
 		AngleVectors( spreadangle, forward, right, up );
-		RotatePointAroundVector( temp, up, forward, self->client_->ps_.turretAngle );
+		float turretYaw = self->client_->ps_.turretAngle;
+		if( main && (availableVehicles[self->client_->vehicle_].flags & VF_DOORGUNS) )
+		{
+			// the gun on the side being aimed at fires, from its own door; both only when aiming along the fuselage
+			float aim = turretYaw > 180 ? turretYaw - 360 : turretYaw;
+			const bool rightBears = doorGunBears( false, aim ), leftBears = doorGunBears( true, aim );
+			bool leftGun = leftBears;
+			if( leftBears && rightBears )
+			{
+				self->bulletpos_ = ( self->bulletpos_ == 0 ? 1 : 0 );
+				leftGun = self->bulletpos_ != 0;
+			}
+			turretYaw = doorGunYaw( leftGun, aim );
+			// the door mounts sit either side of the cabin; offset[1] is applied along the turned right vector below
+			vec3_t flatForward, flatRight, flatUp;
+			AngleVectors( self->client_->ps_.vehicleAngles, flatForward, flatRight, flatUp );
+			VectorMA( start, doorGunForward, flatForward, start );
+			VectorMA( start, leftGun ? -doorGunSide : doorGunSide, flatRight, start );
+			VectorMA( start, doorGunUp, flatUp, start );
+			VectorClear( offset );
+		}
+		RotatePointAroundVector( temp, up, forward, turretYaw );
 		CrossProduct( up, temp, right );
 		RotatePointAroundVector( dir, right, temp, self->client_->ps_.gunAngle );
 
