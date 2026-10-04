@@ -38,7 +38,7 @@ struct snd_info_s
 };
 using snd_info_t = snd_info_s;
 
-typedef struct snd_codec_s snd_codec_t;
+using snd_codec_t = struct snd_codec_s;
 
 class SoundStream
 {

@@ -176,7 +176,7 @@ void Pmove (pmove_t *pmove);
 
 // 3rd person camera vector interpretations
 
-typedef enum {
+enum {
 	CAMERA_V_MIN,
 	CAMERA_V_MAX,
 	CAMERA_V_DEFAULT

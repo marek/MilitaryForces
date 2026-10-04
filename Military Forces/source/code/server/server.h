@@ -298,7 +298,7 @@ extern	cvar_t	*sv_voipProtocol;
 //
 // sv_main.c
 //
-typedef struct leakyBucket_s leakyBucket_t;
+using leakyBucket_t = struct leakyBucket_s;
 struct leakyBucket_s {
 	netadrtype_t	type;
 

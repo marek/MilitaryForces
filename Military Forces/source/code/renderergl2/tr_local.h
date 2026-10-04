@@ -835,7 +835,7 @@ struct fog_t {
 	float		surface[4];
 };
 
-typedef enum : int {
+enum viewParmFlags_t : int {
 	VPF_NONE            = 0x00,
 	VPF_NOVIEWMODEL     = 0x01,
 	VPF_SHADOWMAP       = 0x02,
@@ -845,7 +845,7 @@ typedef enum : int {
 	VPF_USESUNLIGHT     = 0x20,
 	VPF_FARPLANEFRUSTUM = 0x40,
 	VPF_NOCUBEMAPS      = 0x80
-} viewParmFlags_t;
+};
 
 inline viewParmFlags_t operator|( viewParmFlags_t a, viewParmFlags_t b ) { return (viewParmFlags_t)( (int)a | (int)b ); }
 inline viewParmFlags_t operator&( viewParmFlags_t a, viewParmFlags_t b ) { return (viewParmFlags_t)( (int)a & (int)b ); }
@@ -1439,11 +1439,11 @@ enum memInfo_t {
 	MI_ATI
 };
 
-typedef enum : int {
+enum textureCompressionRef_t : int {
 	TCR_NONE = 0x0000,
 	TCR_RGTC = 0x0001,
 	TCR_BPTC = 0x0002,
-} textureCompressionRef_t;
+};
 
 inline textureCompressionRef_t operator|( textureCompressionRef_t a, textureCompressionRef_t b ) { return (textureCompressionRef_t)( (int)a | (int)b ); }
 inline textureCompressionRef_t operator&( textureCompressionRef_t a, textureCompressionRef_t b ) { return (textureCompressionRef_t)( (int)a & (int)b ); }

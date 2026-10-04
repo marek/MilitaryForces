@@ -34,7 +34,7 @@ enum imgType_t
 	IMGTYPE_DELUXE, // normals are swizzled, deluxe are not
 };
 
-typedef enum : int
+enum imgFlags_t : int
 {
 	IMGFLAG_NONE           = 0x0000,
 	IMGFLAG_MIPMAP         = 0x0001,
@@ -44,7 +44,7 @@ typedef enum : int
 	IMGFLAG_NOLIGHTSCALE   = 0x0020,
 	IMGFLAG_CLAMPTOEDGE    = 0x0040,
 	IMGFLAG_GENNORMALMAP   = 0x0080,
-} imgFlags_t;
+};
 
 inline imgFlags_t operator|( imgFlags_t a, imgFlags_t b ) { return (imgFlags_t)( (int)a | (int)b ); }
 inline imgFlags_t operator&( imgFlags_t a, imgFlags_t b ) { return (imgFlags_t)( (int)a & (int)b ); }

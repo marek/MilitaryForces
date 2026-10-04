@@ -1526,7 +1526,7 @@ void		testPrintInt( char *string, int i );
 void		testPrintFloat( char *string, float f );
 
 
-typedef enum {
+enum {
   SYSTEM_PRINT,
   CHAT_PRINT,
   TEAMCHAT_PRINT

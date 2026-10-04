@@ -841,11 +841,12 @@ extern int ZEXPORT unzLocateFile (unzFile file, const char *szFileName, int iCas
 */
 
 /*
-typedef struct unz_file_pos_s
+struct unz_file_pos
 {
     uLong pos_in_zip_directory;   // offset in file
     uLong num_of_file;            // # of file
-} unz_file_pos;
+};
+using unz_file_pos_s = unz_file_pos;
 */
 
 extern int ZEXPORT unzGetFilePos(unzFile file, unz_file_pos* file_pos)

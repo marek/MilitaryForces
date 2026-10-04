@@ -981,7 +981,7 @@ inline constexpr int CVAR_MODIFIED = 0x40000000; // Cvar was modified
 inline constexpr unsigned int CVAR_NONEXISTENT = 0x80000000; // Cvar doesn't exist.
 
 // nothing outside the Cvar_*() functions should modify these fields!
-typedef struct cvar_s cvar_t;
+using cvar_t = struct cvar_s;
 
 struct cvar_s {
 	char			*name;
