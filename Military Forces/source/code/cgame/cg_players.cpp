@@ -167,6 +167,11 @@ void CGame::newClientInfo( int clientNum ) {
 //		CvarSystem::set( "cl_freelook", "1" );
 
 	// MFQ3: vehicle
+	v = Info::valueForKey( configstring, "pt" );
+	newInfo.paintTeam = atoi( v );
+	v = Info::valueForKey( configstring, "pb" );
+	newInfo.paintBlown = atoi( v ) != 0;
+
 	v = Info::valueForKey( configstring, "v" );
 	newInfo.vehicle = atoi( v );
 	if( newInfo.vehicle >= 0 && clientNum == cg.predictedPlayerEntity.currentState.clientNum )

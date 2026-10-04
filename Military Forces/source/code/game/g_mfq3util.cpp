@@ -51,6 +51,8 @@ void track( GameEntity* ent, GameEntity* target )
 	ent->s.tracktarget = ent->tracktarget_->s.number;
 	ent->client_->ps_.stats[STAT_LOCKINFO] |= LI_TRACKING;
 	ent->client_->ps_.tracktarget = ent->tracktarget_->s.number;
+	if( target->client_ && target->client_->ruseBlown_ ) 
+		target->client_->ruseSeenTime_ = theLevel.time_;
 }
 
 void updateTargetTracking( GameEntity *ent )
@@ -183,6 +185,9 @@ void updateTargetTracking( GameEntity *ent )
 			return;
 		}
 			
+		if( ent->tracktarget_->client_ && ent->tracktarget_->client_->ruseBlown_ ) 
+			ent->tracktarget_->client_->ruseSeenTime_ = theLevel.time_;
+
 		// check within range
 		dist = VectorNormalize( diff );
 		if( dist > radarrange )

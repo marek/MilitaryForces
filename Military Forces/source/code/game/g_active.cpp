@@ -1134,6 +1134,12 @@ while a slow client may have multiple ClientEndFrame between ClientThink.
 */
 void ClientEndFrame( GameEntity *ent ) 
 {
+	if( ent->client_->ruseBlown_ && (!ent->client_->sess_.paintTeam_ || theLevel.time_ > ent->client_->ruseSeenTime_ + g_ruseReset.integer * 1000) ) 
+	{
+		ent->client_->ruseBlown_ = false;
+		ClientUserinfoChanged( ent->s.number );
+	}
+
 	if( ent->client_->sess_.sessionTeam_ == ClientBase::TEAM_SPECTATOR ) 
 	{
 		SpectatorClientEndFrame( ent );

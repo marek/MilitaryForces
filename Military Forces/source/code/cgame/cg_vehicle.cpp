@@ -213,6 +213,14 @@ qhandle_t CGame::registerVehiclePart( const char *name, bool expected )
 	return model;
 }
 
+int CGame::apparentTeam( int clientNum, int viewerTeam )
+{
+	const clientInfo_t& ci = cgs.clientinfo[clientNum];
+	if( static_cast<int>( ci.team ) == viewerTeam )
+		return viewerTeam;
+	return ci.paintTeam && !ci.paintBlown ? ci.paintTeam : static_cast<int>( ci.team );
+}
+
 qhandle_t CGame::teamSkin( qhandle_t model, int team )
 {
 	if( team < 1 || team > 2 || model <= 0 || model >= MAX_TEAM_SKIN_MODELS ) 
@@ -781,6 +789,11 @@ void ClientEntity::vehicle()
 
 	// don't draw ourselves, if we are rendering the MFDs
 	if( this == &cg.predictedPlayerEntity && cg.drawingMFD )
+	{
+		return;
+	}
+
+	if( ci->vehicle < 0 || ci->vehicle >= bg_numberOfVehicles )
 	{
 		return;
 	}

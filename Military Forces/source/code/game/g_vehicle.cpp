@@ -64,6 +64,7 @@ VehicleDeathImpl( GameEntity* self, GameEntity* inflictor, GameEntity* attacker,
 	else 
 		obit = modNames[ meansOfDeath ];
 
+	self->client_->sess_.paintTeam_ = 0;
 	if( self->r.contents != CONTENTS_CORPSE )
 	{
 		Game::logPrintf( "Kill: %i %i %i: %s killed %s by %s\n", killer, self->s.number, meansOfDeath, killerName, 

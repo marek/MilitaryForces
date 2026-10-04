@@ -26,9 +26,11 @@ void Bots::thinkInfantry( GameEntity* ent, State& bot, const Sense& sense, userc
 			candidate = true;
 		if( !candidate )
 			continue;
-		const float dist = Distance( ent->r.currentOrigin, other->r.currentOrigin );
+		float dist = Distance( ent->r.currentOrigin, other->r.currentOrigin );
 		if( dist > 4000 )
 			continue;
+		if( other->client_ && VehicleData::vehicleHasTurret( other->client_->vehicle_ ) && !(other->s.seatMask & (1 << 1)) )
+			dist *= 0.4f;
 		if( !ride || dist < rideDist )
 		{
 			ride = other;
@@ -40,7 +42,7 @@ void Bots::thinkInfantry( GameEntity* ent, State& bot, const Sense& sense, userc
 	if( ride )
 	{
 		VectorSubtract( ride->r.currentOrigin, ent->r.currentOrigin, dir );
-		if( rideDist < g_enterRange.value * 0.9f && theLevel.time_ > bot.commandTime )
+		if( Distance( ent->r.currentOrigin, ride->r.currentOrigin ) < g_enterRange.value * 0.9f && theLevel.time_ > bot.commandTime )
 		{
 			bot.commandTime = theLevel.time_ + 1500;
 			Cmd_Eject_f( ent );

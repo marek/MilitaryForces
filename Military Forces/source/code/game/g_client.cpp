@@ -749,10 +749,10 @@ void ClientUserinfoChanged( int clientNum )
 	//} 
 	//else 
 	//{
-		s = va("n\\%s\\t\\%i\\g_redteam\\%s\\g_blueteam\\%s\\c1\\%s\\hc\\%i\\w\\%i\\l\\%i\\tt\\%d\\tl\\%d\\v\\%d\\x\\%d\\ac\\%d",
+		s = va("n\\%s\\t\\%i\\g_redteam\\%s\\g_blueteam\\%s\\c1\\%s\\hc\\%i\\w\\%i\\l\\%i\\tt\\%d\\tl\\%d\\v\\%d\\x\\%d\\ac\\%d\\pt\\%d\\pb\\%d",
 			client->pers_.netname_, client->sess_.sessionTeam_, redTeam, blueTeam, c1,
 			client->pers_.maxHealth_, client->sess_.wins_, client->sess_.losses_, teamTask, teamLeader,
-			vehicle, nextVehicle, client->advancedControls_ ); // MFQ3: send current/next vehicle indexes
+			vehicle, nextVehicle, client->advancedControls_ , client->sess_.paintTeam_, client->ruseBlown_ ? 1 : 0 ); // MFQ3: send current/next vehicle indexes
 	//}
 
 	SV_SetConfigstring( CS_PLAYERS+clientNum, s );
@@ -877,6 +877,8 @@ GameClient::GameClient() :
 	readyToExit_(false),
 	noclip_(false),
 	devHold_(false),
+	ruseBlown_(false),
+	ruseSeenTime_(0),
 	riderAmmo_(0),
 	riderFireTime_(0),
 	lastCmdTime_(0),
@@ -916,6 +918,8 @@ GameClient::clear()
 	readyToExit_ = false;
 	noclip_ = false;
 	devHold_ = false;
+	ruseBlown_ = false;
+	ruseSeenTime_ = 0;
 	riderAmmo_ = 0;
 	riderFireTime_ = 0;
 	lastCmdTime_ = 0;

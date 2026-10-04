@@ -416,6 +416,8 @@ struct clientInfo_t {
 
 	char			name[MAX_QPATH];
 	ClientBase::eTeam team;
+	int				paintTeam;
+	bool			paintBlown;
 
 	int				botSkill;		// 0 = not bot, 1-5 = bot
 
@@ -1759,6 +1761,7 @@ public:
 	static void registerWeapons();
 	static void registerItemVisuals( int itemNum );
 	static void missileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType );
+	static int apparentTeam( int clientNum, int viewerTeam );
 	static void genericExplosion( vec3_t origin, int type );
 	static void cookOff( vec3_t origin, int vehicle );
 	static void vehicleHit( vec3_t origin, int damage );

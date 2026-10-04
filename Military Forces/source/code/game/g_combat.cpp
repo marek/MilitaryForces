@@ -341,6 +341,16 @@ void Game::damage( GameEntity *targ, GameEntity *inflictor, GameEntity* attacker
 		// set the last client who damaged the target
 		targ->client_->lasthurt_client_ = attacker->s.number;
 		targ->client_->lasthurt_mod_ = mod;
+		if( attacker->client_ && attacker != targ && attacker->client_->sess_.paintTeam_ && 
+			attacker->client_->sess_.paintTeam_ == targ->client_->sess_.sessionTeam_ ) 
+		{
+			attacker->client_->ruseSeenTime_ = theLevel.time_;
+			if( !attacker->client_->ruseBlown_ ) 
+			{
+				attacker->client_->ruseBlown_ = true;
+				ClientUserinfoChanged( attacker->s.number );
+			}
+		}
 	}
 
 	// do the damage

@@ -538,7 +538,7 @@ void CGame::drawRadarSymbols_AIR_new( int vehicle, float range, int x, int y ) {
 		}
 		// friend or foe
 		if( cgs.gametype >= GT_TEAM ) {
-			if( cgs.clientinfo[cg.radarEnts[i]->currentState.clientNum].team ==
+			if( CGame::apparentTeam( cg.radarEnts[i]->currentState.clientNum, cgs.clientinfo[self->currentState.clientNum].team ) ==
 				cgs.clientinfo[self->currentState.clientNum].team ) 
 				icon++;
 		}
@@ -678,7 +678,7 @@ void CGame::drawRadarSymbols_GROUND_new( int vehicle, float range, int x, int y 
 			// friend or foe
 			if( cgs.gametype >= GT_TEAM ) 
 			{
-				if( cgs.clientinfo[cg.radarEnts[i]->currentState.clientNum].team ==
+				if( CGame::apparentTeam( cg.radarEnts[i]->currentState.clientNum, cgs.clientinfo[self->currentState.clientNum].team ) ==
 					cgs.clientinfo[self->currentState.clientNum].team ) 
 					icon++;
 			}

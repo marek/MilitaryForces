@@ -88,7 +88,7 @@ void CGame::parseTeamInfo( ) {
 	}
 
 	for ( i = 0 ; i < numSortedTeamPlayers ; i++ ) {
-		client = atoi( CGame::argv( i * 6 + 2 ) );
+		client = atoi( CGame::argv( i * 5 + 2 ) );
 		if( client < 0 || client >= MAX_CLIENTS )
 		{
 		  Common::error( ERR_DROP, "CG_ParseTeamInfo: bad client number: %d", client );
@@ -97,10 +97,10 @@ void CGame::parseTeamInfo( ) {
 
 		sortedTeamPlayers[i] = client;
 
-		cgs.clientinfo[ client ].location = atoi( CGame::argv( i * 6 + 3 ) );
-		cgs.clientinfo[ client ].health = atoi( CGame::argv( i * 6 + 4 ) );
-		cgs.clientinfo[ client ].curWeapon = atoi( CGame::argv( i * 6 + 5 ) );
-		cgs.clientinfo[ client ].objectives = atoi( CGame::argv( i * 6 + 6 ) );
+		cgs.clientinfo[ client ].location = atoi( CGame::argv( i * 5 + 3 ) );
+		cgs.clientinfo[ client ].health = atoi( CGame::argv( i * 5 + 4 ) );
+		cgs.clientinfo[ client ].curWeapon = atoi( CGame::argv( i * 5 + 5 ) );
+		cgs.clientinfo[ client ].objectives = atoi( CGame::argv( i * 5 + 6 ) );
 	}
 }
 

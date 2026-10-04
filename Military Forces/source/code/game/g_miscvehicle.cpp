@@ -400,7 +400,8 @@ void MiscVehicle_Abandon( GameEntity *ent )
 	{
 		think->enterable_ = true;
 		think->fuel_ = client->ps_.stats[STAT_FUEL];
-		think->ownerTeam_ = client->sess_.sessionTeam_;
+		think->ownerTeam_ = client->sess_.paintTeam_ ? client->sess_.paintTeam_ : client->sess_.sessionTeam_;
+		veh->s.generic1 = think->ownerTeam_;
 		memcpy( think->ammo_, client->ps_.ammo, sizeof(think->ammo_) );
 		memcpy( think->mounts_, client->ps_.numWeaponsOnMount, sizeof(think->mounts_) );
 		veh->r.contents = availableVehicles[vehicle].hasDeck ? CONTENTS_CORPSE : CONTENTS_BODY;
@@ -408,9 +409,9 @@ void MiscVehicle_Abandon( GameEntity *ent )
 		veh->health_ = ent->health_;
 		veh->s.seatMask = SEATMASK_ENTERABLE;
 		veh->s.mountMask = ent->s.mountMask;
-		veh->s.generic1 = client->sess_.sessionTeam_;
 	}
 	veh->setThink( std::move( think ) );
+	client->sess_.paintTeam_ = 0;
 	veh->nextthink_ = theLevel.time_ + 50;
 
 	SV_LinkEntity( veh );

@@ -1658,7 +1658,7 @@ bool Game::rider_Board( GameEntity *ent )
 		int seats = availableVehicles[pilot->vehicle_].seats;
 		if( seats <= 0 || (availableVehicles[pilot->vehicle_].cat & CAT_LQM) ) 
 			continue;
-		if( g_gametype.integer >= GT_TEAM && pilot->sess_.sessionTeam_ != client->sess_.sessionTeam_ ) 
+		if( g_gametype.integer < GT_TEAM || pilot->sess_.sessionTeam_ != client->sess_.sessionTeam_ ) 
 			continue;
 		if( !(pilot->ps_.ONOFF & OO_LANDED) && VectorLength( pilot->ps_.velocity ) > 60 ) 
 			continue;
@@ -1735,6 +1735,7 @@ void Game::cmd_Enter( GameEntity *ent )
 	}
 
 	int vehicle = best->s.modelindex;
+	int paint = bestThink->ownerTeam_;
 	int health = best->health_;
 	int fuel = bestThink->fuel_;
 	int ammo[MAX_WEAPONS_PER_VEHICLE*2];
@@ -1763,6 +1764,9 @@ void Game::cmd_Enter( GameEntity *ent )
 		return;
 	veh->health_ = cl->ps_.stats[STAT_HEALTH] = health;
 	cl->ps_.stats[STAT_FUEL] = fuel;
+	cl->sess_.paintTeam_ = g_gametype.integer >= GT_TEAM && paint != cl->sess_.sessionTeam_ ? paint : 0;
+	if( cl->sess_.paintTeam_ ) 
+		ClientUserinfoChanged( clientNum );
 	memcpy( cl->ps_.ammo, ammo, sizeof(ammo) );
 	for( int i = 0; i < 32; i++ ) 
 	{

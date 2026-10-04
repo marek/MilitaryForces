@@ -92,6 +92,7 @@ struct GameClient : public ClientBase
 		int					teamLeader_;		// true when this client is a team leader
 		int					ridingClient_;		// client whose vehicle this player rides in, -1 = none
 		int					seat_;
+		int					paintTeam_;
 	};
 
 						GameClient();
@@ -106,6 +107,8 @@ struct GameClient : public ClientBase
 
 	bool				noclip_;
 	bool				devHold_;
+	bool				ruseBlown_;
+	int					ruseSeenTime_;
 	int					riderAmmo_;
 	int					riderFireTime_;
 	vec3_t				devHoldOrigin_;

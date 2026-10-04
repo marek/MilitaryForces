@@ -40,6 +40,8 @@ GameEntity* Bots::findEnemy( GameEntity* ent, State& bot, Role role )
 			continue;
 		if( g_gametype.integer >= GT_TEAM && OnSameTeam( ent, other ) )
 			continue;
+		if( g_gametype.integer >= GT_TEAM && oc->sess_.paintTeam_ == client->sess_.sessionTeam_ && !oc->ruseBlown_ )
+			continue;
 
 		float dist = Distance( ent->r.currentOrigin, other->r.currentOrigin );
 		Seen& seen = bot.seen[i];

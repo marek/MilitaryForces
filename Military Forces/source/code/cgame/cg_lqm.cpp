@@ -65,7 +65,7 @@ void ClientEntity::lQM( clientInfo_t *ci )
 
 	memset( &drawInfo, 0, sizeof(drawInfo) );
 	drawInfo.basicInfo.vehicleIndex = ci->vehicle;
-	drawInfo.basicInfo.team = cgs.gametype >= GT_TEAM ? ci->team : 0;
+	drawInfo.basicInfo.team = cgs.gametype >= GT_TEAM ? (ci->paintTeam ? ci->paintTeam : ci->team) : 0;
 	drawInfo.basicInfo.ONOFF = ONOFF;
 
 	// Copy Weapon Index
