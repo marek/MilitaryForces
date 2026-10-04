@@ -756,8 +756,8 @@ all big things are allocated on the hunk.
 #define MINFRAGMENT	64
 
 struct zonedebug_s {
-	char *label;
-	char *file;
+	const char *label;
+	const char *file;
 	int line;
 	int allocSize;
 };
@@ -933,7 +933,7 @@ Z_TagMalloc
 ================
 */
 #ifdef ZONE_DEBUG
-void *Z_TagMallocDebug( int size, int tag, char *label, char *file, int line ) {
+void *Z_TagMallocDebug( int size, int tag, const char *label, const char *file, int line ) {
 	int		allocSize;
 #else
 void *Z_TagMalloc( int size, int tag ) {
@@ -1031,7 +1031,7 @@ Z_Malloc
 ========================
 */
 #ifdef ZONE_DEBUG
-void *Z_MallocDebug( int size, char *label, char *file, int line ) {
+void *Z_MallocDebug( int size, const char *label, const char *file, int line ) {
 #else
 void *Z_Malloc( int size ) {
 #endif
@@ -1050,7 +1050,7 @@ void *Z_Malloc( int size ) {
 }
 
 #ifdef ZONE_DEBUG
-void *S_MallocDebug( int size, char *label, char *file, int line ) {
+void *S_MallocDebug( int size, const char *label, const char *file, int line ) {
 	return Z_TagMallocDebug( size, TAG_SMALL, label, file, line );
 }
 #else
@@ -1248,8 +1248,8 @@ struct hunkblock_s {
 	int size;
 	byte printed;
 	struct hunkblock_s *next;
-	char *label;
-	char *file;
+	const char *label;
+	const char *file;
 	int line;
 };
 using hunkblock_t = hunkblock_s;
@@ -1702,7 +1702,7 @@ Allocate permanent (until the hunk is cleared) memory
 =================
 */
 #ifdef HUNK_DEBUG
-void *Hunk_AllocDebug( int size, ha_pref preference, char *label, char *file, int line ) {
+void *Hunk_AllocDebug( int size, ha_pref preference, const char *label, const char *file, int line ) {
 #else
 void *Hunk_Alloc( int size, ha_pref preference ) {
 #endif

@@ -172,6 +172,7 @@ typedef int intptr_t;
 #include <ctype.h>
 #include <limits.h>
 #include <algorithm>
+#include <source_location>
 #include <numbers>
 #include <stdint.h>
 
@@ -326,8 +327,11 @@ enum ha_pref {
 };
 
 #ifdef HUNK_DEBUG
-#define Hunk_Alloc( size, preference )				Hunk_AllocDebug(size, preference, #size, __FILE__, __LINE__)
-void *Hunk_AllocDebug( int size, ha_pref preference, char *label, char *file, int line );
+void *Hunk_AllocDebug( int size, ha_pref preference, const char *label, const char *file, int line );
+// debug builds record who asked for each block: the calling function, file and line
+inline void *Hunk_Alloc( int size, ha_pref preference, const std::source_location& at = std::source_location::current() ) {
+	return Hunk_AllocDebug( size, preference, at.function_name(), at.file_name(), static_cast<int>( at.line() ) );
+}
 #else
 void *Hunk_Alloc( int size, ha_pref preference );
 #endif

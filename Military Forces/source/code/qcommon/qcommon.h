@@ -733,12 +733,19 @@ temp file loading
 #endif
 
 #ifdef ZONE_DEBUG
-#define Z_TagMalloc(size, tag)			Z_TagMallocDebug(size, tag, #size, __FILE__, __LINE__)
-#define Z_Malloc(size)					Z_MallocDebug(size, #size, __FILE__, __LINE__)
-#define S_Malloc(size)					S_MallocDebug(size, #size, __FILE__, __LINE__)
-void *Z_TagMallocDebug( int size, int tag, char *label, char *file, int line );	// NOT 0 filled memory
-void *Z_MallocDebug( int size, char *label, char *file, int line );			// returns 0 filled memory
-void *S_MallocDebug( int size, char *label, char *file, int line );			// returns 0 filled memory
+void *Z_TagMallocDebug( int size, int tag, const char *label, const char *file, int line );	// NOT 0 filled memory
+void *Z_MallocDebug( int size, const char *label, const char *file, int line );			// returns 0 filled memory
+void *S_MallocDebug( int size, const char *label, const char *file, int line );			// returns 0 filled memory
+// debug builds record who asked for each block: the calling function, file and line
+inline void *Z_TagMalloc( int size, int tag, const std::source_location& at = std::source_location::current() ) {
+	return Z_TagMallocDebug( size, tag, at.function_name(), at.file_name(), static_cast<int>( at.line() ) );
+}
+inline void *Z_Malloc( int size, const std::source_location& at = std::source_location::current() ) {
+	return Z_MallocDebug( size, at.function_name(), at.file_name(), static_cast<int>( at.line() ) );
+}
+inline void *S_Malloc( int size, const std::source_location& at = std::source_location::current() ) {
+	return S_MallocDebug( size, at.function_name(), at.file_name(), static_cast<int>( at.line() ) );
+}
 #else
 void *Z_TagMalloc( int size, int tag );	// NOT 0 filled memory
 void *Z_Malloc( int size );			// returns 0 filled memory
