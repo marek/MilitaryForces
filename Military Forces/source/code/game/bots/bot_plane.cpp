@@ -576,6 +576,9 @@ void Bots::thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_
 			AngleVectors( flat, nullptr, right, nullptr );
 			VectorNegate( right, left );
 			const bool blocked = pathBlocked( ent->r.currentOrigin, nose, look, ent->s.number, tr ) && tr.entityNum == ENTITYNUM_WORLD;
+			const float noseClear = tr.fraction * look;
+			const float radiusNow = std::max( airspeed, 1.0f ) / (std::max( 10.0f, veh.turnspeed[YAW] ) * static_cast<float>( M_PI ) / 180.0f);
+			const bool imminent = blocked && noseClear < radiusNow * 2.2f;
 			pathBlocked( ent->r.currentOrigin, left, 1200, ent->s.number, tr );
 			const float leftClear = tr.fraction * 1200.0f;
 			pathBlocked( ent->r.currentOrigin, right, 1200, ent->s.number, tr );
@@ -600,8 +603,8 @@ void Bots::thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_
 						if( pt.startsolid )
 							pathBlocked( ent->r.currentOrigin, dir, reach, ent->s.number, pt );
 						const float turn = fabs( AngleSubtract( probe[YAW], ps.vehicleAngles[YAW] ) );
-						float score = pt.fraction * reach - turn * 6.0f - fabs( AngleSubtract( probe[YAW], view[YAW] ) ) * (bot.confined ? 1.0f : 3.0f) - fabs( pitch ) * 4.0f;
-						if( turn > 30.0f )
+						float score = pt.fraction * reach - turn * (imminent ? 2.0f : 6.0f) - fabs( AngleSubtract( probe[YAW], view[YAW] ) ) * (bot.confined ? 1.0f : 3.0f) - fabs( pitch ) * 4.0f;
+						if( turn > 30.0f && !imminent )
 						{
 							const float turnRadius = std::max( airspeed, 1.0f ) / (std::max( 10.0f, veh.turnspeed[YAW] ) * static_cast<float>( M_PI ) / 180.0f);
 							vec3_t mid = { pitch, ps.vehicleAngles[YAW] + AngleSubtract( probe[YAW], ps.vehicleAngles[YAW] ) * 0.5f, 0 }, midDir;
@@ -667,10 +670,16 @@ void Bots::thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_
 			vec3_t right;
 			AngleVectors( ps.vehicleAngles, nullptr, right, nullptr );
 			const float side = DotProduct( rel, right ) + DotProduct( miss, right );
-			bot.avoidYaw = ps.vehicleAngles[YAW] + (bot.confined ? 0.0f : side > 0 ? 45.0f : -45.0f);
-			bot.avoidPitch = (rel[2] + miss[2] >= 0 && sense.height > minHeight + 250) ? 22.0f : -28.0f;
-			bot.avoidTime = theLevel.time_ + 700;
+			const float dodgePitch = (rel[2] + miss[2] >= 0 && sense.height > minHeight + 250) ? 22.0f : -28.0f;
 			bot.egressTime = std::max( bot.egressTime, theLevel.time_ + 1500 );
+			if( bot.confined )
+			{
+				view[PITCH] = std::clamp( dodgePitch, -14.0f, 12.0f );
+				break;
+			}
+			bot.avoidYaw = ps.vehicleAngles[YAW] + (side > 0 ? 45.0f : -45.0f);
+			bot.avoidPitch = dodgePitch;
+			bot.avoidTime = theLevel.time_ + 700;
 			view[YAW] = bot.avoidYaw;
 			view[PITCH] = bot.avoidPitch;
 			break;
