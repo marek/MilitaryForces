@@ -48,6 +48,11 @@ bool VehicleData::distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout
 		num = VehicleData::getTagsContaining(modelname, "tag_P", tags, MAX_MOUNTS_PER_VEHICLE );
 		loadout->mountsOnBay = num > 0;
 	}
+	bool wideFlags = false;
+	if( !num && (availableVehicles[idx].cat & CAT_PLANE) ) {
+		num = VehicleData::getTagsContaining(modelname, "PY", tags, MAX_MOUNTS_PER_VEHICLE );
+		wideFlags = num > 0;
+	}
 	if( !num ) return false;
 
 	for( i = 0; i < num; ++i ) {
@@ -61,7 +66,18 @@ bool VehicleData::distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout
 	loadout->usedMounts = num;
 
 	// set up
-	for( i = 0; i < num; ++i ) {
+	for( i = 0; wideFlags && i < num; ++i ) {
+		if( strlen( tags[i].name ) < 11 || tags[i].name[0] != 'P' || tags[i].name[1] != 'Y' ) return false;
+		int flags = ahextoi( va("0x%c%c%c%c%c%c", tags[i].name[4], tags[i].name[5], tags[i].name[6],
+				tags[i].name[7], tags[i].name[8], tags[i].name[9]) );
+		loadout->mounts[i].pos = ahextoi( va("0x%c", tags[i].name[2]) );
+		loadout->mounts[i].group = ahextoi( va("0x%c", tags[i].name[3]) );
+		loadout->mounts[i].flags = flags & 0xBFFF;
+		if( flags & PF_AA_MED ) loadout->mounts[i].flags |= PF_AA_LT;
+		if( flags & 0x100000 ) loadout->mounts[i].flags |= PF_DONT_DROP;
+		loadout->mounts[i].left = tags[i].name[10] == 'L' ? true : false;
+	}
+	for( i = 0; !wideFlags && i < num; ++i ) {
 		if( strlen( tags[i].name ) < 12 ) return false;
 		loadout->mounts[i].pos = ahextoi( va("0x%c", tags[i].name[5]) );
 		loadout->mounts[i].group = ahextoi( va("0x%c", tags[i].name[6]) );
