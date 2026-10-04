@@ -157,13 +157,13 @@ void CGame::drawInformation( ) {
 	s = CGame::configString( CS_MESSAGE );
 	if ( s[0] )
 	{
-		UI_DrawProportionalString( 632, 300, s, UI_RIGHT|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
+		ProportionalFont::drawString( 632, 300, s, UI_RIGHT|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 	}
 
 	// draw loading progress text
 	if ( cg.infoScreenText[0] )
 	{
-		UI_DrawProportionalString( 320, 170, va("Loading... %s", cg.infoScreenText), UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
+		ProportionalFont::drawString( 320, 170, va("Loading... %s", cg.infoScreenText), UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 		if ( cg.infoLoadFraction > 0 )
 		{
 			rectDef_t p;
@@ -180,7 +180,7 @@ void CGame::drawInformation( ) {
 	}
 	else
 	{
-		UI_DrawProportionalString( 320, 170, "Awaiting snapshot...", UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
+		ProportionalFont::drawString( 320, 170, "Awaiting snapshot...", UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 	}
 	//CGame::drawStringExt(0, 150, cg.infoCurrentLoadItemText, colorLtGrey, true, false, 6,6, strlen(cg.infoCurrentLoadItemText));
 	//p.x = 0;
@@ -214,14 +214,14 @@ void CGame::drawInformation( ) {
 		// server hostname
 		Q_strncpyz(buf, Info::valueForKey( info, "sv_hostname" ), 1024);
 		Q_CleanStr(buf);
-		UI_DrawProportionalString( x, y, va( "server: %s %s", buf, flagBuf ), UI_LEFT|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
+		ProportionalFont::drawString( x, y, va( "server: %s %s", buf, flagBuf ), UI_LEFT|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 		y += PROP_HEIGHT;
 
 		// server-specific message of the day
 		s = CGame::configString( CS_MOTD );
 		if ( s[0] )
 		{
-			UI_DrawProportionalString( x, y, s, UI_LEFT|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
+			ProportionalFont::drawString( x, y, s, UI_LEFT|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 			y += PROP_HEIGHT;
 		}
 
@@ -253,14 +253,14 @@ void CGame::drawInformation( ) {
 		s = "Unknown Gametype";
 		break;
 	}
-	UI_DrawProportionalString( x, y, s, UI_LEFT|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
+	ProportionalFont::drawString( x, y, s, UI_LEFT|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 	y += PROP_HEIGHT;
 
 	// timelimit (OPTIONAL)
 	value = atoi( Info::valueForKey( info, "timelimit" ) );
 	if ( value )
 	{
-		UI_DrawProportionalString( x, y, va( "timelimit: %i", value ), UI_LEFT|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
+		ProportionalFont::drawString( x, y, va( "timelimit: %i", value ), UI_LEFT|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 		y += PROP_HEIGHT;
 	}
 
@@ -269,7 +269,7 @@ void CGame::drawInformation( ) {
 	{
 		value = atoi( Info::valueForKey( info, "fraglimit" ) );
 		if ( value ) {
-			UI_DrawProportionalString( x, y, va( "fraglimit: %i", value ), UI_LEFT|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
+			ProportionalFont::drawString( x, y, va( "fraglimit: %i", value ), UI_LEFT|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 			y += PROP_HEIGHT;
 		}
 	}
@@ -278,7 +278,7 @@ void CGame::drawInformation( ) {
 	{
 		value = atoi( Info::valueForKey( info, "capturelimit" ) );
 		if ( value ) {
-			UI_DrawProportionalString( x, y, va( "capturelimit: %i", value ), UI_LEFT|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
+			ProportionalFont::drawString( x, y, va( "capturelimit: %i", value ), UI_LEFT|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 			y += PROP_HEIGHT;
 		}
 	}

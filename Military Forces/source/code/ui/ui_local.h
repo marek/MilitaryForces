@@ -8,6 +8,7 @@
 #include "../game/q_shared.h"
 #include "../cgame/tr_types.h"
 #include "ui_public.h"
+#include "../qcommon/proportional_font.h"
 #include "../qcommon/client_host.h"
 #include "keycodes.h"
 #include "../qcommon/qfiles.h"
@@ -850,10 +851,6 @@ extern void			UI_KeyEvent( int key );
 extern void			UI_MouseEvent( int dx, int dy );
 extern void			UI_Refresh( int realtime );
 extern void			UI_LerpColor(vec4_t a, vec4_t b, vec4_t c, float t);
-extern void			UI_DrawBannerString( int x, int y, const char* str, int style, vec4_t color );
-extern float		UI_ProportionalSizeScale( int style );
-extern void			UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t color );
-extern int			UI_ProportionalStringWidth( const char* str );
 extern void			UI_DrawString( int x, int y, const char* str, int style, vec4_t color );
 extern void			UI_DrawChar( int x, int y, int ch, int style, vec4_t color );
 extern bool		UI_IsFullscreen( );

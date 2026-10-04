@@ -574,7 +574,7 @@ constexpr int PROPB_HEIGHT = 36;
 
 /*
 =================
-UI_DrawBannerString
+ProportionalFont::drawBanner
 =================
 */
 void CGame::uI_DrawBannerString2( int x, int y, const char* str, vec4_t color )
@@ -622,7 +622,7 @@ void CGame::uI_DrawBannerString2( int x, int y, const char* str, vec4_t color )
 	refExport.SetColor( nullptr );
 }
 
-void UI_DrawBannerString( int x, int y, const char* str, int style, vec4_t color ) {
+void ProportionalFont::drawBanner( int x, int y, const char* str, int style, vec4_t color ) {
 	const char *	s;
 	int				ch;
 	int				width;
@@ -667,7 +667,7 @@ void UI_DrawBannerString( int x, int y, const char* str, int style, vec4_t color
 }
 
 
-int UI_ProportionalStringWidth( const char* str ) {
+int ProportionalFont::stringWidth( const char* str ) {
 	const char *	s;
 	int				ch;
 	int				charWidth;
@@ -737,10 +737,10 @@ void CGame::uI_DrawProportionalString2( int x, int y, const char* str, vec4_t co
 
 /*
 =================
-UI_ProportionalSizeScale
+ProportionalFont::sizeScale
 =================
 */
-float UI_ProportionalSizeScale( int style ) {
+float ProportionalFont::sizeScale( int style ) {
 	if(  style & UI_SMALLFONT ) {
 		return 0.75;
 	}
@@ -751,24 +751,24 @@ float UI_ProportionalSizeScale( int style ) {
 
 /*
 =================
-UI_DrawProportionalString
+ProportionalFont::drawString
 =================
 */
-void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t color ) {
+void ProportionalFont::drawString( int x, int y, const char* str, int style, vec4_t color ) {
 	vec4_t	drawcolor;
 	int		width;
 	float	sizeScale;
 
-	sizeScale = UI_ProportionalSizeScale( style );
+	sizeScale = ProportionalFont::sizeScale( style );
 
 	switch( style & UI_FORMATMASK ) {
 		case UI_CENTER:
-			width = UI_ProportionalStringWidth( str ) * sizeScale;
+			width = ProportionalFont::stringWidth( str ) * sizeScale;
 			x -= width / 2;
 			break;
 
 		case UI_RIGHT:
-			width = UI_ProportionalStringWidth( str ) * sizeScale;
+			width = ProportionalFont::stringWidth( str ) * sizeScale;
 			x -= width;
 			break;
 

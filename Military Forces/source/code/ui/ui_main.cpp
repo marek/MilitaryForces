@@ -6361,7 +6361,7 @@ void Menus::drawConnectScreen( bool overlay )
 		Text_PaintCenter( centerPoint, yStart + 48, scale, colorWhite,text , ITEM_TEXTSTYLE_SHADOWEDMORE );
 	}
 /*
-	UI_DrawProportionalString( 320, 96, "Press Esc to abort", UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, menu_text_color );
+	ProportionalFont::drawString( 320, 96, "Press Esc to abort", UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, menu_text_color );
 
 	// display global MOTD at bottom
 	Text_PaintCenter( centerPoint, 600, scale, colorWhite, Info::valueForKey( cstate.updateInfoString, "motd" ), 0 );

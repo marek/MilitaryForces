@@ -12,6 +12,7 @@
 #include "tr_types.h"
 #include "../game/bg_public.h"
 #include "cg_public.h"
+#include "../qcommon/proportional_font.h"
 #include "../qcommon/client_host.h"
 #include "../ui/ui_shared.h"
 #include "../renderercommon/tr_public.h"
@@ -1356,7 +1357,6 @@ void CG_DrawString( float x, float y, const char *string,
 
 
 
-void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t color );
 
 
 //void CG_Draw_HUD_Label( int x, int y, char * pText, float alpha );
