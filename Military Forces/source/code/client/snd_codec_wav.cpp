@@ -217,7 +217,7 @@ void *S_WAV_CodecLoad(const char *filename, snd_info_t *info)
 	}
 
 	// Allocate some memory
-	buffer = Hunk_AllocateTempMemory(info->size);
+	buffer = Hunk::allocateTempMemory(info->size);
 	if(!buffer)
 	{
 		FileSystem::fCloseFile(file);

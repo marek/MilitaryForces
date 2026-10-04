@@ -1437,10 +1437,10 @@ void Com_InitZoneMemory( ) {
 
 /*
 =================
-Hunk_Log
+Hunk::log
 =================
 */
-void Hunk_Log( ) {
+void Hunk::log( ) {
 	hunkblock_t	*block;
 	char		buf[4096];
 	int size, numBlocks;
@@ -1468,10 +1468,10 @@ void Hunk_Log( ) {
 
 /*
 =================
-Hunk_SmallLog
+Hunk::smallLog
 =================
 */
-void Hunk_SmallLog( ) {
+void Hunk::smallLog( ) {
 	hunkblock_t	*block, *block2;
 	char		buf[4096];
 	int size, locsize, numBlocks;
@@ -1562,24 +1562,24 @@ void Com_InitHunkMemory( ) {
 	}
 	// cacheline align
 	s_hunkData = (byte *) ( ( (intptr_t)s_hunkData + 31 ) & ~31 );
-	Hunk_Clear();
+	Hunk::clear();
 
 	CommandSystem::addCommand( "meminfo", Com_Meminfo_f );
 #ifdef ZONE_DEBUG
 	CommandSystem::addCommand( "zonelog", Zone::logHeap );
 #endif
 #ifdef HUNK_DEBUG
-	CommandSystem::addCommand( "hunklog", Hunk_Log );
-	CommandSystem::addCommand( "hunksmalllog", Hunk_SmallLog );
+	CommandSystem::addCommand( "hunklog", Hunk::log );
+	CommandSystem::addCommand( "hunksmalllog", Hunk::smallLog );
 #endif
 }
 
 /*
 ====================
-Hunk_MemoryRemaining
+Hunk::memoryRemaining
 ====================
 */
-int	Hunk_MemoryRemaining( ) {
+int	Hunk::memoryRemaining( ) {
 	int		low, high;
 
 	low = hunk_low.permanent > hunk_low.temp ? hunk_low.permanent : hunk_low.temp;
@@ -1590,34 +1590,34 @@ int	Hunk_MemoryRemaining( ) {
 
 /*
 ===================
-Hunk_SetMark
+Hunk::setMark
 
 The server calls this after the level and game VM have been loaded
 ===================
 */
-void Hunk_SetMark( ) {
+void Hunk::setMark( ) {
 	hunk_low.mark = hunk_low.permanent;
 	hunk_high.mark = hunk_high.permanent;
 }
 
 /*
 =================
-Hunk_ClearToMark
+Hunk::clearToMark
 
 The client calls this before starting a vid_restart or snd_restart
 =================
 */
-void Hunk_ClearToMark( ) {
+void Hunk::clearToMark( ) {
 	hunk_low.permanent = hunk_low.temp = hunk_low.mark;
 	hunk_high.permanent = hunk_high.temp = hunk_high.mark;
 }
 
 /*
 =================
-Hunk_CheckMark
+Hunk::checkMark
 =================
 */
-bool Hunk_CheckMark( ) {
+bool Hunk::checkMark( ) {
 	if( hunk_low.mark || hunk_high.mark ) {
 		return true;
 	}
@@ -1630,12 +1630,12 @@ void SV_ShutdownGameProgs( );
 
 /*
 =================
-Hunk_Clear
+Hunk::clear
 
 The server calls this before shutting down or loading a new map
 =================
 */
-void Hunk_Clear( ) {
+void Hunk::clear( ) {
 
 #ifndef DEDICATED
 	CL_ShutdownCGame();
@@ -1684,12 +1684,12 @@ static void Hunk_SwapBanks( ) {
 
 /*
 =================
-Hunk_Alloc
+Hunk::alloc
 
 Allocate permanent (until the hunk is cleared) memory
 =================
 */
-void *Hunk_Alloc( int size, ha_pref preference, const std::source_location& at ) {
+void *Hunk::alloc( int size, ha_pref preference, const std::source_location& at ) {
 #ifdef HUNK_DEBUG
 	const char *label = at.function_name();
 	const char *file = at.file_name();
@@ -1722,8 +1722,8 @@ void *Hunk_Alloc( int size, ha_pref preference, const std::source_location& at )
 
 	if ( hunk_low.temp + hunk_high.temp + size > s_hunkTotal ) {
 #ifdef HUNK_DEBUG
-		Hunk_Log();
-		Hunk_SmallLog();
+		Hunk::log();
+		Hunk::smallLog();
 
 		Common::error(ERR_DROP, "Hunk_Alloc failed on %i: %s, line: %d (%s)", size, file, line, label);
 #else
@@ -1762,14 +1762,14 @@ void *Hunk_Alloc( int size, ha_pref preference, const std::source_location& at )
 
 /*
 =================
-Hunk_AllocateTempMemory
+Hunk::allocateTempMemory
 
 This is used by the file loading system.
 Multiple files can be loaded in temporary memory.
 When the files-in-use count reaches zero, all temp memory will be deleted
 =================
 */
-void *Hunk_AllocateTempMemory( int size ) {
+void *Hunk::allocateTempMemory( int size ) {
 	void		*buf;
 	hunkHeader_t	*hdr;
 
@@ -1815,10 +1815,10 @@ void *Hunk_AllocateTempMemory( int size ) {
 
 /*
 ==================
-Hunk_FreeTempMemory
+Hunk::freeTempMemory
 ==================
 */
-void Hunk_FreeTempMemory( void *buf ) {
+void Hunk::freeTempMemory( void *buf ) {
 	hunkHeader_t	*hdr;
 
 	  // free with Zone::free if the hunk has not been initialized
@@ -1840,7 +1840,7 @@ void Hunk_FreeTempMemory( void *buf ) {
 	hdr->magic = HUNK_FREE_MAGIC;
 
 	// this only works if the files are freed in stack order,
-	// otherwise the memory will stay around until Hunk_ClearTempMemory
+	// otherwise the memory will stay around until Hunk::clearTempMemory
 	if ( hunk_temp == &hunk_low ) {
 		if ( hdr == reinterpret_cast<void *>(s_hunkData + hunk_temp->temp - hdr->size ) ) {
 			hunk_temp->temp -= hdr->size;
@@ -1859,14 +1859,14 @@ void Hunk_FreeTempMemory( void *buf ) {
 
 /*
 =================
-Hunk_ClearTempMemory
+Hunk::clearTempMemory
 
 The temp space is no longer needed.  If we have left more
 touched but unused memory on this side, have future
 permanent allocs use this side.
 =================
 */
-void Hunk_ClearTempMemory( ) {
+void Hunk::clearTempMemory( ) {
 	if ( s_hunkData != nullptr ) {
 		hunk_temp->temp = hunk_temp->permanent;
 	}

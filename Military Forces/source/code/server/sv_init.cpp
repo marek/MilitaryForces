@@ -415,7 +415,7 @@ void ServerMain::spawnServer( char *server, bool killBots )
 	CL_ShutdownAll(false);
 
 	// clear the whole hunk because we're (re)loading the server
-	Hunk_Clear();
+	Hunk::clear();
 
 	// clear collision map data
 	CollisionModel::clearMap();
@@ -435,7 +435,7 @@ void ServerMain::spawnServer( char *server, bool killBots )
 
 	// allocate the snapshot entities on the hunk
 	theSVS.snapshotEntities_ = reinterpret_cast<entityState_t*>(
-					Hunk_Alloc( sizeof(entityState_t)*theSVS.numSnapshotEntities_, h_high ));
+					Hunk::alloc( sizeof(entityState_t)*theSVS.numSnapshotEntities_, h_high ));
 	theSVS.nextSnapshotEntities_ = 0;
 
 	// toggle the server bit so clients can detect that a
@@ -622,7 +622,7 @@ void ServerMain::spawnServer( char *server, bool killBots )
 	// send a heartbeat now so the master will get up to date info
 	ServerMain::heartbeat_f();
 
-	Hunk_SetMark();
+	Hunk::setMark();
 
 #ifndef DEDICATED
 	if ( com_dedicated->integer ) {

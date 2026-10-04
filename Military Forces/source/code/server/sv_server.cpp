@@ -198,7 +198,7 @@ ServerStatic::changeMaxNumClients( int newNumClients, int newClientsBeginAt )
 		svClients_.at(i) = nullptr;
 	}
 
-	//SV_Client* oldClients = reinterpret_cast<SV_Client*>(Hunk_AllocateTempMemory( count * sizeof(SV_Client) ));
+	//SV_Client* oldClients = reinterpret_cast<SV_Client*>(Hunk::allocateTempMemory( count * sizeof(SV_Client) ));
 	//// copy the clients to hunk memory
 	//for ( i = 0 ; i < count ; i++ ) 
 	//{
@@ -223,7 +223,7 @@ ServerStatic::changeMaxNumClients( int newNumClients, int newClientsBeginAt )
 	//}
 
 	//// free the old clients on the hunk
-	//Hunk_FreeTempMemory( oldClients );
+	//Hunk::freeTempMemory( oldClients );
 }
 
 

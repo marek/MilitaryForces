@@ -326,16 +326,6 @@ enum ha_pref {
 	h_dontcare
 };
 
-void *Hunk_Alloc( int size, ha_pref preference, const std::source_location& at = std::source_location::current() );
-void Hunk_Clear( );
-void Hunk_ClearToMark( );
-void Hunk_SetMark( );
-bool Hunk_CheckMark( );
-void Hunk_ClearTempMemory( );
-void *Hunk_AllocateTempMemory( int size );
-void Hunk_FreeTempMemory( void *buf );
-int	Hunk_MemoryRemaining( );
-void Hunk_Log( );
 
 #define Com_Memset memset
 #define Com_Memcpy memcpy
@@ -1660,5 +1650,7 @@ int ahextoi( const char* string );
 #include "../qcommon/common.h"
 
 #include "../qcommon/zone.h"
+
+#include "../qcommon/hunk.h"
 
 #endif	// __Q_SHARED_H

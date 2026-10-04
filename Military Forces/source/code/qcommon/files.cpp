@@ -1717,7 +1717,7 @@ long FileSystem::readFileDir(const char *qpath, void *searchPath, bool unpure, v
 				return len;
 			}
 
-			buf = static_cast<byte *>(Hunk_AllocateTempMemory(len+1));
+			buf = static_cast<byte *>(Hunk::allocateTempMemory(len+1));
 			*buffer = buf;
 
 			r = FileSystem::read( buf, len, com_journalDataFile );
@@ -1777,7 +1777,7 @@ long FileSystem::readFileDir(const char *qpath, void *searchPath, bool unpure, v
 	fs_loadCount++;
 	fs_loadStack++;
 
-	buf = static_cast<byte *>(Hunk_AllocateTempMemory(len+1));
+	buf = static_cast<byte *>(Hunk::allocateTempMemory(len+1));
 	*buffer = buf;
 
 	FileSystem::read (buf, len, h);
@@ -1823,11 +1823,11 @@ void FileSystem::freeFile( void *buffer ) {
 	}
 	fs_loadStack--;
 
-	Hunk_FreeTempMemory( buffer );
+	Hunk::freeTempMemory( buffer );
 
 	// if all of our temp files are free, clear all of our space
 	if ( fs_loadStack == 0 ) {
-		Hunk_ClearTempMemory();
+		Hunk::clearTempMemory();
 	}
 }
 

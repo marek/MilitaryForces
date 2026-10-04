@@ -85,7 +85,7 @@ void SND_setup() {
 
 	buffer = static_cast<sndBuffer *>(malloc(scs*sizeof(sndBuffer) ));
 	// allocate the stack based hunk allocator
-	sfxScratchBuffer = static_cast<short *>(malloc(SND_CHUNK_SIZE * sizeof(short) * 4));	//Hunk_Alloc(SND_CHUNK_SIZE * sizeof(short) * 4);
+	sfxScratchBuffer = static_cast<short *>(malloc(SND_CHUNK_SIZE * sizeof(short) * 4));	//Hunk::alloc(SND_CHUNK_SIZE * sizeof(short) * 4);
 	sfxScratchPointer = nullptr;
 
 	inUse = scs*sizeof(sndBuffer);
@@ -232,7 +232,7 @@ bool SoundEffect::loadSound()
 		Common::dPrintf(S_COLOR_YELLOW "WARNING: %s is not a 22kHz audio file\n", this->soundName);
 	}
 
-	samples = static_cast<short *>(Hunk_AllocateTempMemory(info.channels * info.samples * sizeof(short) * 2));
+	samples = static_cast<short *>(Hunk::allocateTempMemory(info.channels * info.samples * sizeof(short) * 2));
 
 	this->lastTimeUsed = Common::milliseconds()+1;
 
@@ -267,8 +267,8 @@ bool SoundEffect::loadSound()
 
 	this->soundChannels = info.channels;
 	
-	Hunk_FreeTempMemory(samples);
-	Hunk_FreeTempMemory(data);
+	Hunk::freeTempMemory(samples);
+	Hunk::freeTempMemory(data);
 
 	return true;
 }

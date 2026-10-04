@@ -1596,13 +1596,13 @@ void CIN_DrawCinematic (int handle) {
 	if (cinTable[handle].dirty && (cinTable[handle].CIN_WIDTH != cinTable[handle].drawX || cinTable[handle].CIN_HEIGHT != cinTable[handle].drawY)) {
 		int *buf2;
 
-		buf2 = static_cast<int *>(Hunk_AllocateTempMemory( 256*256*4 ));
+		buf2 = static_cast<int *>(Hunk::allocateTempMemory( 256*256*4 ));
 
 		CIN_ResampleCinematic(handle, buf2);
 
 		refExport.DrawStretchRaw( x, y, w, h, 256, 256, reinterpret_cast<byte *>(buf2), handle, true);
 		cinTable[handle].dirty = false;
-		Hunk_FreeTempMemory(buf2);
+		Hunk::freeTempMemory(buf2);
 		return;
 	}
 
@@ -1682,13 +1682,13 @@ void CIN_UploadCinematic(int handle) {
 		if (cinTable[handle].dirty && (cinTable[handle].CIN_WIDTH != cinTable[handle].drawX || cinTable[handle].CIN_HEIGHT != cinTable[handle].drawY))  {
 			int *buf2;
 
-			buf2 = static_cast<int *>(Hunk_AllocateTempMemory( 256*256*4 ));
+			buf2 = static_cast<int *>(Hunk::allocateTempMemory( 256*256*4 ));
 
 			CIN_ResampleCinematic(handle, buf2);
 
 			refExport.UploadCinematic( cinTable[handle].CIN_WIDTH, cinTable[handle].CIN_HEIGHT, 256, 256, reinterpret_cast<byte *>(buf2), handle, true);
 			cinTable[handle].dirty = false;
-			Hunk_FreeTempMemory(buf2);
+			Hunk::freeTempMemory(buf2);
 		} else {
 			// Upload video at normal resolution
 			refExport.UploadCinematic( cinTable[handle].CIN_WIDTH, cinTable[handle].CIN_HEIGHT, cinTable[handle].drawX, cinTable[handle].drawY,

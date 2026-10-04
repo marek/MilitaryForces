@@ -386,7 +386,7 @@ static void S_AL_BufferLoad(sfxHandle_t sfx, bool cache)
 	if (!cache)
 	{
 		// Don't create AL cache
-		Hunk_FreeTempMemory(data);
+		Hunk::freeTempMemory(data);
 		return;
 	}
 
@@ -396,7 +396,7 @@ static void S_AL_BufferLoad(sfxHandle_t sfx, bool cache)
 	if (!S_AL_GenBuffers(1, &curSfx->buffer, curSfx->filename))
 	{
 		S_AL_BufferUseDefault(sfx);
-		Hunk_FreeTempMemory(data);
+		Hunk::freeTempMemory(data);
 		return;
 	}
 
@@ -420,7 +420,7 @@ static void S_AL_BufferLoad(sfxHandle_t sfx, bool cache)
 		{
 			qalDeleteBuffers(1, &curSfx->buffer);
 			S_AL_BufferUseDefault(sfx);
-			Hunk_FreeTempMemory(data);
+			Hunk::freeTempMemory(data);
 			Common::printf( S_COLOR_RED "ERROR: Out of memory loading %s\n", curSfx->filename);
 			return;
 		}
@@ -435,7 +435,7 @@ static void S_AL_BufferLoad(sfxHandle_t sfx, bool cache)
 	{
 		qalDeleteBuffers(1, &curSfx->buffer);
 		S_AL_BufferUseDefault(sfx);
-		Hunk_FreeTempMemory(data);
+		Hunk::freeTempMemory(data);
 		Common::printf( S_COLOR_RED "ERROR: Can't fill sound buffer for %s - %s\n",
 				curSfx->filename, S_AL_ErrorMsg(error));
 		return;
@@ -444,7 +444,7 @@ static void S_AL_BufferLoad(sfxHandle_t sfx, bool cache)
 	curSfx->info = info;
 	
 	// Free the memory
-	Hunk_FreeTempMemory(data);
+	Hunk::freeTempMemory(data);
 
 	// Woo!
 	curSfx->inMemory = true;

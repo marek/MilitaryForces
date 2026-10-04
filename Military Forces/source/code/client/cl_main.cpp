@@ -1248,13 +1248,13 @@ void CL_ClearMemory(bool shutdownRef)
 	// if not running a server clear the whole hunk
 	if ( !com_sv_running || !com_sv_running->integer ) {
 		// clear the whole hunk
-		Hunk_Clear();
+		Hunk::clear();
 		// clear collision map data
 		CollisionModel::clearMap();
 	}
 	else {
 		// clear all the client data on the hunk
-		Hunk_ClearToMark();
+		Hunk::clearToMark();
 	}
 }
 
@@ -1947,12 +1947,12 @@ void Client::vid_Restart_f( ) {
 		if(com_sv_running->integer)
 		{
 			// clear all the client data on the hunk
-			Hunk_ClearToMark();
+			Hunk::clearToMark();
 		}
 		else
 		{
 			// clear the whole hunk
-			Hunk_Clear();
+			Hunk::clear();
 		}
 	
 		// shutdown the UI
@@ -3292,9 +3292,9 @@ void CL_InitRef( ) {
 	ri.Milliseconds = CL_ScaledMilliseconds;
 	ri.Malloc = CL_RefMalloc;
 	ri.Free = Zone::free;
-	ri.hunkAllocAt = Hunk_Alloc;
-	ri.hunkAllocateTempMemory = Hunk_AllocateTempMemory;
-	ri.hunkFreeTempMemory = Hunk_FreeTempMemory;
+	ri.hunkAllocAt = Hunk::alloc;
+	ri.hunkAllocateTempMemory = Hunk::allocateTempMemory;
+	ri.hunkFreeTempMemory = Hunk::freeTempMemory;
 
 	ri.CM_ClusterPVS = CollisionModel::clusterPVS;
 	ri.CM_DrawDebugSurface = CollisionModel::drawDebugSurface;

@@ -64,10 +64,10 @@ BotImport_HunkAlloc
 */
 void *BotImport_HunkAlloc( int size ) 
 {
-	if( Hunk_CheckMark() ) {
+	if( Hunk::checkMark() ) {
 		Common::error( ERR_DROP, "SV_Bot_HunkAlloc: Alloc with marks already set\n" );
 	}
-	return Hunk_Alloc( size, h_high );
+	return Hunk::alloc( size, h_high );
 }
 
 

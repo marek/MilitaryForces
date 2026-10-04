@@ -102,7 +102,7 @@ void CMod_LoadShaders( lump_t *l ) {
 	if (count < 1) {
 		Common::error (ERR_DROP, "Map with no shaders");
 	}
-	cm.shaders = static_cast<dshader_t *>(Hunk_Alloc( count * sizeof( *cm.shaders ), h_high ));
+	cm.shaders = static_cast<dshader_t *>(Hunk::alloc( count * sizeof( *cm.shaders ), h_high ));
 	cm.numShaders = count;
 
 	Com_Memcpy( cm.shaders, in, count * sizeof( *cm.shaders ) );
@@ -133,7 +133,7 @@ void CMod_LoadSubmodels( lump_t *l ) {
 
 	if (count < 1)
 		Common::error (ERR_DROP, "Map with no models");
-	cm.cmodels = static_cast<cmodel_t *>(Hunk_Alloc( count * sizeof( *cm.cmodels ), h_high ));
+	cm.cmodels = static_cast<cmodel_t *>(Hunk::alloc( count * sizeof( *cm.cmodels ), h_high ));
 	cm.numSubModels = count;
 
 	if ( count > MAX_SUBMODELS ) {
@@ -156,14 +156,14 @@ void CMod_LoadSubmodels( lump_t *l ) {
 
 		// make a "leaf" just to hold the model's brushes and surfaces
 		out->leaf.numLeafBrushes = LittleLong( in->numBrushes );
-		indexes = static_cast<int *>(Hunk_Alloc( out->leaf.numLeafBrushes * 4, h_high ));
+		indexes = static_cast<int *>(Hunk::alloc( out->leaf.numLeafBrushes * 4, h_high ));
 		out->leaf.firstLeafBrush = indexes - cm.leafbrushes;
 		for ( j = 0 ; j < out->leaf.numLeafBrushes ; j++ ) {
 			indexes[j] = LittleLong( in->firstBrush ) + j;
 		}
 
 		out->leaf.numLeafSurfaces = LittleLong( in->numSurfaces );
-		indexes = static_cast<int *>(Hunk_Alloc( out->leaf.numLeafSurfaces * 4, h_high ));
+		indexes = static_cast<int *>(Hunk::alloc( out->leaf.numLeafSurfaces * 4, h_high ));
 		out->leaf.firstLeafSurface = indexes - cm.leafsurfaces;
 		for ( j = 0 ; j < out->leaf.numLeafSurfaces ; j++ ) {
 			indexes[j] = LittleLong( in->firstSurface ) + j;
@@ -191,7 +191,7 @@ void CMod_LoadNodes( lump_t *l ) {
 
 	if (count < 1)
 		Common::error (ERR_DROP, "Map has no nodes");
-	cm.nodes = static_cast<cNode_t *>(Hunk_Alloc( count * sizeof( *cm.nodes ), h_high ));
+	cm.nodes = static_cast<cNode_t *>(Hunk::alloc( count * sizeof( *cm.nodes ), h_high ));
 	cm.numNodes = count;
 
 	out = cm.nodes;
@@ -243,7 +243,7 @@ void CMod_LoadBrushes( lump_t *l ) {
 	}
 	count = l->filelen / sizeof(*in);
 
-	cm.brushes = static_cast<cbrush_t *>(Hunk_Alloc( ( BOX_BRUSHES + count ) * sizeof( *cm.brushes ), h_high ));
+	cm.brushes = static_cast<cbrush_t *>(Hunk::alloc( ( BOX_BRUSHES + count ) * sizeof( *cm.brushes ), h_high ));
 	cm.numBrushes = count;
 
 	out = cm.brushes;
@@ -262,7 +262,7 @@ void CMod_LoadBrushes( lump_t *l ) {
 
 		// pack the side planes four to a block; unused slots hold a plane nothing can cross
 		const int blocks = ( out->numsides + 3 ) / 4;
-		out->planeBlocks = blocks ? static_cast<float *>(Hunk_Alloc( blocks * cmPlaneBlockFloats * sizeof( float ), h_high )) : nullptr;
+		out->planeBlocks = blocks ? static_cast<float *>(Hunk::alloc( blocks * cmPlaneBlockFloats * sizeof( float ), h_high )) : nullptr;
 		for ( int side = 0 ; side < blocks * 4 ; side++ ) {
 			float *block = out->planeBlocks + ( side / 4 ) * cmPlaneBlockFloats;
 			const int lane = side & 3;
@@ -301,7 +301,7 @@ void CMod_LoadLeafs (lump_t *l)
 	if (count < 1)
 		Common::error (ERR_DROP, "Map with no leafs");
 
-	cm.leafs = static_cast<cLeaf_t *>(Hunk_Alloc( ( BOX_LEAFS + count ) * sizeof( *cm.leafs ), h_high ));
+	cm.leafs = static_cast<cLeaf_t *>(Hunk::alloc( ( BOX_LEAFS + count ) * sizeof( *cm.leafs ), h_high ));
 	cm.numLeafs = count;
 
 	out = cm.leafs;	
@@ -320,8 +320,8 @@ void CMod_LoadLeafs (lump_t *l)
 			cm.numAreas = out->area + 1;
 	}
 
-	cm.areas = static_cast<cArea_t *>(Hunk_Alloc( cm.numAreas * sizeof( *cm.areas ), h_high ));
-	cm.areaPortals = static_cast<int *>(Hunk_Alloc( cm.numAreas * cm.numAreas * sizeof( *cm.areaPortals ), h_high ));
+	cm.areas = static_cast<cArea_t *>(Hunk::alloc( cm.numAreas * sizeof( *cm.areas ), h_high ));
+	cm.areaPortals = static_cast<int *>(Hunk::alloc( cm.numAreas * cm.numAreas * sizeof( *cm.areaPortals ), h_high ));
 }
 
 /*
@@ -344,7 +344,7 @@ void CMod_LoadPlanes (lump_t *l)
 
 	if (count < 1)
 		Common::error (ERR_DROP, "Map with no planes");
-	cm.planes = static_cast<cplane_t *>(Hunk_Alloc( ( BOX_PLANES + count ) * sizeof( *cm.planes ), h_high ));
+	cm.planes = static_cast<cplane_t *>(Hunk::alloc( ( BOX_PLANES + count ) * sizeof( *cm.planes ), h_high ));
 	cm.numPlanes = count;
 
 	out = cm.planes;	
@@ -382,7 +382,7 @@ void CMod_LoadLeafBrushes (lump_t *l)
 		Common::error (ERR_DROP, "MOD_LoadBmodel: funny lump size");
 	count = l->filelen / sizeof(*in);
 
-	cm.leafbrushes = static_cast<int *>(Hunk_Alloc( (count + BOX_BRUSHES) * sizeof( *cm.leafbrushes ), h_high ));
+	cm.leafbrushes = static_cast<int *>(Hunk::alloc( (count + BOX_BRUSHES) * sizeof( *cm.leafbrushes ), h_high ));
 	cm.numLeafBrushes = count;
 
 	out = cm.leafbrushes;
@@ -409,7 +409,7 @@ void CMod_LoadLeafSurfaces( lump_t *l )
 		Common::error (ERR_DROP, "MOD_LoadBmodel: funny lump size");
 	count = l->filelen / sizeof(*in);
 
-	cm.leafsurfaces = static_cast<int *>(Hunk_Alloc( count * sizeof( *cm.leafsurfaces ), h_high ));
+	cm.leafsurfaces = static_cast<int *>(Hunk::alloc( count * sizeof( *cm.leafsurfaces ), h_high ));
 	cm.numLeafSurfaces = count;
 
 	out = cm.leafsurfaces;
@@ -438,7 +438,7 @@ void CMod_LoadBrushSides (lump_t *l)
 	}
 	count = l->filelen / sizeof(*in);
 
-	cm.brushsides = static_cast<cbrushside_t *>(Hunk_Alloc( ( BOX_SIDES + count ) * sizeof( *cm.brushsides ), h_high ));
+	cm.brushsides = static_cast<cbrushside_t *>(Hunk::alloc( ( BOX_SIDES + count ) * sizeof( *cm.brushsides ), h_high ));
 	cm.numBrushSides = count;
 
 	out = cm.brushsides;	
@@ -461,7 +461,7 @@ CMod_LoadEntityString
 =================
 */
 void CMod_LoadEntityString( lump_t *l ) {
-	cm.entityString = static_cast<char *>(Hunk_Alloc( l->filelen, h_high ));
+	cm.entityString = static_cast<char *>(Hunk::alloc( l->filelen, h_high ));
 	cm.numEntityChars = l->filelen;
 	Com_Memcpy (cm.entityString, cmod_base + l->fileofs, l->filelen);
 }
@@ -479,14 +479,14 @@ void CMod_LoadVisibility( lump_t *l ) {
     len = l->filelen;
 	if ( !len ) {
 		cm.clusterBytes = ( cm.numClusters + 31 ) & ~31;
-		cm.visibility = static_cast<byte *>(Hunk_Alloc( cm.clusterBytes, h_high ));
+		cm.visibility = static_cast<byte *>(Hunk::alloc( cm.clusterBytes, h_high ));
 		Com_Memset( cm.visibility, 255, cm.clusterBytes );
 		return;
 	}
 	buf = cmod_base + l->fileofs;
 
 	cm.vised = true;
-	cm.visibility = static_cast<byte *>(Hunk_Alloc( len, h_high ));
+	cm.visibility = static_cast<byte *>(Hunk::alloc( len, h_high ));
 	cm.numClusters = LittleLong( (reinterpret_cast<int *>(buf))[0] );
 	cm.clusterBytes = LittleLong( (reinterpret_cast<int *>(buf))[1] );
 	Com_Memcpy (cm.visibility, buf + VIS_HEADER, len - VIS_HEADER );
@@ -516,7 +516,7 @@ void CMod_LoadPatches( lump_t *surfs, lump_t *verts ) {
 	if (surfs->filelen % sizeof(*in))
 		Common::error (ERR_DROP, "MOD_LoadBmodel: funny lump size");
 	cm.numSurfaces = count = surfs->filelen / sizeof(*in);
-	cm.surfaces = static_cast<cPatch_t **>(Hunk_Alloc( cm.numSurfaces * sizeof( cm.surfaces[0] ), h_high ));
+	cm.surfaces = static_cast<cPatch_t **>(Hunk::alloc( cm.numSurfaces * sizeof( cm.surfaces[0] ), h_high ));
 
 	dv = static_cast<drawVert_t *>(reinterpret_cast<void *>(cmod_base + verts->fileofs));
 	if (verts->filelen % sizeof(*dv))
@@ -530,7 +530,7 @@ void CMod_LoadPatches( lump_t *surfs, lump_t *verts ) {
 		}
 		// FIXME: check for non-colliding patches
 
-		cm.surfaces[ i ] = patch = static_cast<cPatch_t *>(Hunk_Alloc( sizeof( *patch ), h_high ));
+		cm.surfaces[ i ] = patch = static_cast<cPatch_t *>(Hunk::alloc( sizeof( *patch ), h_high ));
 
 		// load the full drawverts onto the stack
 		width = LittleLong( in->patchWidth );
@@ -621,7 +621,7 @@ void CollisionModel::loadMap( const char *name, bool clientload, int *checksum )
 		cm.numLeafs = 1;
 		cm.numClusters = 1;
 		cm.numAreas = 1;
-		cm.cmodels = static_cast<cmodel_t *>(Hunk_Alloc( sizeof( *cm.cmodels ), h_high ));
+		cm.cmodels = static_cast<cmodel_t *>(Hunk::alloc( sizeof( *cm.cmodels ), h_high ));
 		*checksum = 0;
 		return;
 	}
