@@ -43,7 +43,7 @@ bool VehicleData::distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout
 
 	loadout->mountsOnBay = false;
 	num = VehicleData::getTagsContaining(modelname, "tag_P", tags, MAX_MOUNTS_PER_VEHICLE );
-	if( !num && (availableVehicles[idx].cat & CAT_HELO) ) {
+	if( !num && (availableVehicles[idx].cat & CAT_HELO) && (availableVehicles[idx].caps & HC_WEAPONBAY) ) {
 		modelname = VehicleData::createModelPathname( idx, "models/vehicles/%s/%s/%s_bay.md3" );
 		num = VehicleData::getTagsContaining(modelname, "tag_P", tags, MAX_MOUNTS_PER_VEHICLE );
 		loadout->mountsOnBay = num > 0;
