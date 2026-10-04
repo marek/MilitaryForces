@@ -733,7 +733,6 @@ temp file loading
 #endif
 
 // debug builds record who asked for each block (the calling function, file and line); release builds ignore it
-void *S_Malloc( int size, const std::source_location& at = std::source_location::current() );			// NOT 0 filled memory only for small allocations
 
 
 

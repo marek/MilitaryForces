@@ -1043,7 +1043,7 @@ void *Zone::malloc( int size, const std::source_location& at ) {
 	return buf;
 }
 
-void *S_Malloc( int size, const std::source_location& at ) {
+void *Zone::smallMalloc( int size, const std::source_location& at ) {
 	return Zone::tagMalloc( size, TAG_SMALL, at );
 }
 
@@ -1177,7 +1177,7 @@ char *CopyString( const char *in ) {
 			return (reinterpret_cast<char *>(&numberstring[in[0]-'0'])) + sizeof(memblock_t);
 		}
 	}
-	out = static_cast<char *>(S_Malloc (strlen(in)+1));
+	out = static_cast<char *>(Zone::smallMalloc(strlen(in)+1));
 	strcpy (out, in);
 	return out;
 }
