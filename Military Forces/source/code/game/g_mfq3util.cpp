@@ -38,7 +38,7 @@ void untrack( GameEntity* ent )
 		ent->tracktarget_->client_->ps_.stats[STAT_LOCKINFO] &= ~LI_BEING_LOCKED;
 
 	ent->locktime_ = theLevel.time_;
-	ent->tracktarget_ = 0;
+	ent->tracktarget_ = nullptr;
 	ent->s.tracktarget = ENTITYNUM_NONE;
 	ent->client_->ps_.stats[STAT_LOCKINFO] &= ~(LI_TRACKING|LI_LOCKING);
 	ent->client_->ps_.tracktarget = ENTITYNUM_NONE;
@@ -103,7 +103,7 @@ void updateTargetTracking( GameEntity *ent )
 	else
 	{
 		VectorCopy( ent->s.angles, dir );
-		AngleVectors( dir, forward, 0, 0 );
+		AngleVectors( dir, forward, nullptr, nullptr );
 	}
 
 	// no target yet
@@ -214,7 +214,7 @@ void updateTargetTracking( GameEntity *ent )
 			
 		// check LOS
 		VectorMA( ent->r.currentOrigin, dist, diff, endpos );
-		SV_Trace( &tr, ent->r.currentOrigin, 0, 0, endpos, ent->s.number, MASK_PLAYERSOLID, false );
+		SV_Trace( &tr, ent->r.currentOrigin, nullptr, nullptr, endpos, ent->s.number, MASK_PLAYERSOLID, false );
 		if( tr.fraction < 1 && tr.entityNum != ent->s.tracktarget ) 
 		{
 			untrack(ent);

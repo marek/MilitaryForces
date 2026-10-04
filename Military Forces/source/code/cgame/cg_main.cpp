@@ -22,7 +22,7 @@ UI_UtilsCG cgUtils;
 int forceModelModificationCount = -1;
 
 void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum );
-void CG_Shutdown( void );
+void CG_Shutdown( );
 
 
 /*
@@ -349,7 +349,7 @@ vec4_t HUDColors[HUD_MAX] = {
 CG_RegisterCvars
 =================
 */
-void CG_RegisterCvars( void ) {
+void CG_RegisterCvars( ) {
 	int			i;
 	cvarTable_t	*cv;
 	char		var[MAX_TOKEN_CHARS];
@@ -372,7 +372,7 @@ void CG_RegisterCvars( void ) {
 CG_ForceModelChange
 ===================
 */
-static void CG_ForceModelChange( void ) {
+static void CG_ForceModelChange( ) {
 	int		i;
 
 	for (i=0 ; i<MAX_CLIENTS ; i++) {
@@ -391,7 +391,7 @@ static void CG_ForceModelChange( void ) {
 CG_UpdateCvars
 =================
 */
-void CG_UpdateCvars( void ) 
+void CG_UpdateCvars( ) 
 {
 	int			i;
 	cvarTable_t	*cv;
@@ -429,7 +429,7 @@ void CG_UpdateCvars( void )
 	cg.tracernum = (cg_tracer.integer > 0) ? cg_tracer.integer : 3;
 }
 
-int CG_CrosshairPlayer( void ) 
+int CG_CrosshairPlayer( ) 
 {
 	if ( cg.time > ( cg.crosshairClientTime + 1000 ) )
 		return -1;
@@ -437,7 +437,7 @@ int CG_CrosshairPlayer( void )
 	return cg.crosshairClientNum;
 }
 
-int CG_LastAttacker( void ) 
+int CG_LastAttacker( ) 
 {
 	if ( !cg.attackerTime ) 
 		return -1;
@@ -533,7 +533,7 @@ CG_RegisterSounds
 called during a precache command
 =================
 */
-static void CG_RegisterSounds( void ) {
+static void CG_RegisterSounds( ) {
 	int		i;
 	char	items[MAX_ITEMS+1];
 	const char	*soundName;
@@ -685,9 +685,9 @@ CG_PrecacheVehiclePreview
 Simply does a refExport.RegisterShaderNoMip() for all our icons
 =================
 */
-static void CG_PrecacheVehiclePreview( void )
+static void CG_PrecacheVehiclePreview( )
 {
-	char * pIconString = NULL;
+	char * pIconString = nullptr;
 	int i = 0;
 	qhandle_t h;
 
@@ -712,7 +712,7 @@ CG_RegisterGraphics
 This function may execute for a couple of minutes with a slow disk.
 =================
 */
-static void CG_RegisterGraphics( void ) {
+static void CG_RegisterGraphics( ) {
 	int			i;
 	char		items[MAX_ITEMS+1];
 	static char		*sb_nums[11] = {
@@ -1125,7 +1125,7 @@ void CG_BuildSpectatorString() {
 CG_RegisterClients
 ===================
 */
-static void CG_RegisterClients( void ) {
+static void CG_RegisterClients( ) {
 	int		i;
 
 	CG_NewClientInfo(cg.clientNum);
@@ -1163,7 +1163,7 @@ bool CG_Asset_Parse(int handle) {
 		return false;
 	}
     
-	while ( 1 ) {
+	while ( true ) {
 		if (!cgUtils.getPrecompilerTools()->readTokenHandle(handle, &token))
 			return false;
 
@@ -1326,7 +1326,7 @@ void CG_ParseMenu(const char *menuFile) {
 	if (!handle)
 		return;
 
-	while ( 1 ) {
+	while ( true ) {
 		if (!cgUtils.getPrecompilerTools()->readTokenHandle( handle, &token )) {
 			break;
 		}
@@ -1375,7 +1375,7 @@ bool CG_Load_Menu(char **p) {
 		return false;
 	}
 
-	while ( 1 ) {
+	while ( true ) {
 
 		token = COM_ParseExt(p, true);
     
@@ -1431,7 +1431,7 @@ void CG_LoadMenus(const char *menuFile) {
 
 	p = buf;
 
-	while ( 1 ) {
+	while ( true ) {
 		token = COM_ParseExt( &p, true );
 		if( !token || token[0] == 0 || token[0] == '}') {
 			break;
@@ -1545,7 +1545,7 @@ void CG_SetScoreSelection(void *p) {
 		}
 	}
 
-	if (menu == NULL) {
+	if (menu == nullptr) {
 		// just interested in setting the selected score
 		return;
 	}
@@ -1557,9 +1557,9 @@ void CG_SetScoreSelection(void *p) {
 			feeder = FEEDER_BLUETEAM_LIST;
 			i = blue;
 		}
-		cgUtils.menu_SetFeederSelection(menu, feeder, i, NULL);
+		cgUtils.menu_SetFeederSelection(menu, feeder, i, nullptr);
 	} else {
-		cgUtils.menu_SetFeederSelection(menu, FEEDER_SCOREBOARD, cg.selectedScore, NULL);
+		cgUtils.menu_SetFeederSelection(menu, FEEDER_SCOREBOARD, cg.selectedScore, nullptr);
 	}
 }
 
@@ -1594,13 +1594,13 @@ CG_FeederItemText
 const char *CG_FeederItemText(float feederID, int index, int column, qhandle_t *handle) 
 {
 	//gitem_t *item;
-	clientInfo_t *info = NULL;
+	clientInfo_t *info = nullptr;
 	int scoreIndex = 0;
 	int team = -1;
 	int vehicleIndex = -1;
 	bool spectator = false;
 	bool dontShowVehicle = false;
-	score_t *sp = NULL;
+	score_t *sp = nullptr;
 	centity_t *self = &cg.predictedPlayerEntity;
 
 	*handle = -1;
@@ -1821,7 +1821,7 @@ CG_StartMusic
 
 ======================
 */
-void CG_StartMusic( void ) {
+void CG_StartMusic( ) {
 	char	*s;
 	char	parm1[MAX_QPATH], parm2[MAX_QPATH];
 
@@ -2143,7 +2143,7 @@ CG_Shutdown
 Called before every level change or subsystem restart
 =================
 */
-void CG_Shutdown( void ) {
+void CG_Shutdown( ) {
 	// some mods may need to do cleanup work here,
 	// like closing files or archiving session data
 

@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../game/q_shared.h"
 #include "qcommon.h"
 
-cvar_t		*cvar_vars = NULL;
+cvar_t		*cvar_vars = nullptr;
 cvar_t		*cvar_cheats;
 int			cvar_modifiedFlags;
 
@@ -94,7 +94,7 @@ static cvar_t *Cvar_FindVar( const char *var_name ) {
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -394,7 +394,7 @@ cvar_t *Cvar_Get( const char *var_name, const char *var_value, int flags ) {
 			char *s;
 
 			s = var->latchedString;
-			var->latchedString = NULL;	// otherwise cvar_set2 would free it
+			var->latchedString = nullptr;	// otherwise cvar_set2 would free it
 			Cvar_Set2( var_name, s, true );
 			Z_Free( s );
 		}
@@ -422,7 +422,7 @@ cvar_t *Cvar_Get( const char *var_name, const char *var_value, int flags ) {
 		if(!com_errorEntered)
 			Com_Error(ERR_FATAL, "Error: Too many cvars, cannot create a new one!");
 
-		return NULL;
+		return nullptr;
 	}
 	
 	var = &cvar_indexes[index];
@@ -438,14 +438,14 @@ cvar_t *Cvar_Get( const char *var_name, const char *var_value, int flags ) {
 	var->integer = atoi(var->string);
 	var->resetString = CopyString( var_value );
 	var->validate = false;
-	var->description = NULL;
+	var->description = nullptr;
 
 	// link the variable in
 	var->next = cvar_vars;
 	if(cvar_vars)
 		cvar_vars->prev = var;
 
-	var->prev = NULL;
+	var->prev = nullptr;
 	cvar_vars = var;
 
 	var->flags = flags;
@@ -459,7 +459,7 @@ cvar_t *Cvar_Get( const char *var_name, const char *var_value, int flags ) {
 	if(hashTable[hash])
 		hashTable[hash]->hashPrev = var;
 
-	var->hashPrev = NULL;
+	var->hashPrev = nullptr;
 	hashTable[hash] = var;
 
 	return var;
@@ -521,7 +521,7 @@ cvar_t *Cvar_Set2( const char *var_name, const char *value, bool force ) {
 	var = Cvar_FindVar (var_name);
 	if (!var) {
 		if ( !value ) {
-			return NULL;
+			return nullptr;
 		}
 		// create it
 		if ( !force ) {
@@ -542,7 +542,7 @@ cvar_t *Cvar_Set2( const char *var_name, const char *value, bool force ) {
 		if(!strcmp(value, var->string))
 		{
 			Z_Free(var->latchedString);
-			var->latchedString = NULL;
+			var->latchedString = nullptr;
 			return var;
 		}
 
@@ -601,7 +601,7 @@ cvar_t *Cvar_Set2( const char *var_name, const char *value, bool force ) {
 		if (var->latchedString)
 		{
 			Z_Free (var->latchedString);
-			var->latchedString = NULL;
+			var->latchedString = nullptr;
 		}
 	}
 
@@ -698,7 +698,7 @@ Cvar_Reset
 ============
 */
 void Cvar_Reset( const char *var_name ) {
-	Cvar_Set2( var_name, NULL, false );
+	Cvar_Set2( var_name, nullptr, false );
 }
 
 /*
@@ -708,7 +708,7 @@ Cvar_ForceReset
 */
 void Cvar_ForceReset(const char *var_name)
 {
-	Cvar_Set2(var_name, NULL, true);
+	Cvar_Set2(var_name, nullptr, true);
 }
 
 /*
@@ -718,7 +718,7 @@ Cvar_SetCheatState
 Any testing variables will be reset to the safe values
 ============
 */
-void Cvar_SetCheatState(void)
+void Cvar_SetCheatState()
 {
 	cvar_t	*var;
 
@@ -732,7 +732,7 @@ void Cvar_SetCheatState(void)
 			if (var->latchedString)
 			{
 				Z_Free(var->latchedString);
-				var->latchedString = NULL;
+				var->latchedString = nullptr;
 			}
 			if (strcmp(var->resetString,var->string))
 				Cvar_Set(var->name, var->resetString);
@@ -747,7 +747,7 @@ Cvar_Command
 Handles variable inspection and changing from the console
 ============
 */
-bool Cvar_Command( void ) {
+bool Cvar_Command( ) {
 	cvar_t	*v;
 
 	// check variables
@@ -776,7 +776,7 @@ Prints the contents of a cvar
 (preferred over Cvar_Command where cvar names and commands conflict)
 ============
 */
-void Cvar_Print_f(void)
+void Cvar_Print_f()
 {
 	char *name;
 	cvar_t *cv;
@@ -805,7 +805,7 @@ Toggles a cvar for easy single key binding, optionally through a list of
 given values
 ============
 */
-void Cvar_Toggle_f( void ) {
+void Cvar_Toggle_f( ) {
 	int		i, c = Cmd_Argc();
 	char		*curval;
 
@@ -849,7 +849,7 @@ Allows setting and defining of arbitrary cvars from console, even if they
 weren't declared in C code.
 ============
 */
-void Cvar_Set_f( void ) {
+void Cvar_Set_f( ) {
 	int		c;
 	char	*cmd;
 	cvar_t	*v;
@@ -897,7 +897,7 @@ void Cvar_Set_f( void ) {
 Cvar_Reset_f
 ============
 */
-void Cvar_Reset_f( void ) {
+void Cvar_Reset_f( ) {
 	if ( Cmd_Argc() != 2 ) {
 		Com_Printf ("usage: reset <variable>\n");
 		return;
@@ -950,7 +950,7 @@ void Cvar_WriteVariables(fileHandle_t f)
 Cvar_List_f
 ============
 */
-void Cvar_List_f( void ) {
+void Cvar_List_f( ) {
 	cvar_t	*var;
 	int		i;
 	char	*match;
@@ -958,7 +958,7 @@ void Cvar_List_f( void ) {
 	if ( Cmd_Argc() > 1 ) {
 		match = Cmd_Argv( 1 );
 	} else {
-		match = NULL;
+		match = nullptr;
 	}
 
 	i = 0;
@@ -1025,7 +1025,7 @@ void Cvar_List_f( void ) {
 Cvar_ListModified_f
 ============
 */
-void Cvar_ListModified_f( void ) {
+void Cvar_ListModified_f( ) {
 	cvar_t	*var;
 	int		totalModified;
 	char	*value;
@@ -1034,7 +1034,7 @@ void Cvar_ListModified_f( void ) {
 	if ( Cmd_Argc() > 1 ) {
 		match = Cmd_Argv( 1 );
 	} else {
-		match = NULL;
+		match = nullptr;
 	}
 
 	totalModified = 0;
@@ -1157,7 +1157,7 @@ Unsets a userdefined cvar
 ============
 */
 
-void Cvar_Unset_f(void)
+void Cvar_Unset_f()
 {
 	cvar_t *cv;
 	
@@ -1223,7 +1223,7 @@ Cvar_Restart_f
 Resets all cvars to their hardcoded values
 ============
 */
-void Cvar_Restart_f(void)
+void Cvar_Restart_f()
 {
 	Cvar_Restart(false);
 }
@@ -1307,7 +1307,7 @@ void Cvar_SetDescription( cvar_t *var, const char *var_description )
 {
 	if( var_description && var_description[0] != '\0' )
 	{
-		if( var->description != NULL )
+		if( var->description != nullptr )
 		{
 			Z_Free( var->description );
 		}
@@ -1385,7 +1385,7 @@ updates an interpreted modules' version of a cvar
 =====================
 */
 void	Cvar_Update( vmCvar_t *vmCvar ) {
-	cvar_t	*cv = NULL;
+	cvar_t	*cv = nullptr;
 	assert(vmCvar);
 
 	if ( (unsigned)vmCvar->handle >= cvar_numIndexes ) {
@@ -1435,7 +1435,7 @@ Cvar_Init
 Reads in all archived cvars
 ============
 */
-void Cvar_Init (void)
+void Cvar_Init ()
 {
 	Com_Memset(cvar_indexes, '\0', sizeof(cvar_indexes));
 	Com_Memset(hashTable, '\0', sizeof(hashTable));

@@ -61,8 +61,8 @@ UI_UtilsCG::drawTimer( float y )
 	}
 
 	// draw the timer background (TODO: possibly replace this with HUD when near/in the HUD)
-	dc_->fillRect( dx-(k_TIMER_WIDTH/2), dy-4, k_TIMER_WIDTH, k_TIMER_HEIGHT, *createColourVector( 0,0.5f,0,0.75f,NULL ) );
-	dc_->drawRect( dx-(k_TIMER_WIDTH/2), dy-4, k_TIMER_WIDTH, k_TIMER_HEIGHT, 1, *createColourVector( 0,0,0,1.0f,NULL ) );
+	dc_->fillRect( dx-(k_TIMER_WIDTH/2), dy-4, k_TIMER_WIDTH, k_TIMER_HEIGHT, *createColourVector( 0,0.5f,0,0.75f,nullptr ) );
+	dc_->drawRect( dx-(k_TIMER_WIDTH/2), dy-4, k_TIMER_WIDTH, k_TIMER_HEIGHT, 1, *createColourVector( 0,0,0,1.0f,nullptr ) );
 
 	// draw timer string
 	drawStringNew( dx, dy, 0.35f, colorWhite, s, 0, 0, ITEM_TEXTSTYLE_SHADOWED, CENTRE_JUSTIFY );
@@ -127,8 +127,8 @@ UI_UtilsCG::drawCountdownTimer( float y )
 	}
 
 	// draw the timer background (TODO: possibly replace this with HUD when near/in the HUD)
-	dc_->fillRect( dx-(k_TIMER_WIDTH/2), dy-4, k_TIMER_WIDTH, k_TIMER_HEIGHT, *createColourVector( 0.7f,0,0,0.75f,NULL ) );
-	dc_->drawRect( dx-(k_TIMER_WIDTH/2), dy-4, k_TIMER_WIDTH, k_TIMER_HEIGHT, 1, *createColourVector( 0,0,0,1.0f,NULL ) );
+	dc_->fillRect( dx-(k_TIMER_WIDTH/2), dy-4, k_TIMER_WIDTH, k_TIMER_HEIGHT, *createColourVector( 0.7f,0,0,0.75f,nullptr ) );
+	dc_->drawRect( dx-(k_TIMER_WIDTH/2), dy-4, k_TIMER_WIDTH, k_TIMER_HEIGHT, 1, *createColourVector( 0,0,0,1.0f,nullptr ) );
 
 	// draw timer string
 	if( !flash )
@@ -155,14 +155,14 @@ UI_UtilsCG::draw_HUD_Label( int x, int y, char * pText, float alpha )
 	// draw background
 	dc_->fillRect( x-(labelWidth/2)-k_HUD_LABEL_TL, y-k_HUD_LABEL_TL,
 		labelWidth+k_HUD_LABEL_BR, labelHeight+k_HUD_LABEL_BR,
-		*createColourVector( 0,0,0,(0.5f * alpha),NULL ) );
+		*createColourVector( 0,0,0,(0.5f * alpha),nullptr ) );
 
 	dc_->drawRect( x-(labelWidth/2)-k_HUD_LABEL_TL, y-k_HUD_LABEL_TL,
 		labelWidth+k_HUD_LABEL_BR, labelHeight+k_HUD_LABEL_BR,
-		1, *createColourVector( 0,0,0,(0.75f * alpha),NULL ) );
+		1, *createColourVector( 0,0,0,(0.75f * alpha),nullptr ) );
 
 	// draw timer string
-	drawStringNew( x, (y+1), k_HUD_LABEL_SCALE, *createColourVector( 0,0,0,(1.0f * alpha),NULL ), pText, 0, 0, ITEM_TEXTSTYLE_NORMAL, CENTRE_JUSTIFY );
+	drawStringNew( x, (y+1), k_HUD_LABEL_SCALE, *createColourVector( 0,0,0,(1.0f * alpha),nullptr ), pText, 0, 0, ITEM_TEXTSTYLE_NORMAL, CENTRE_JUSTIFY );
 }
 
 

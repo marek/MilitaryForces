@@ -10,7 +10,7 @@
 void						
 WeaponInfo::createAllMissiles(WeaponList& weapons)
 {
-	WeaponInfo* wep = 0;
+	WeaponInfo* wep = nullptr;
 
 	// Sidewinder
 	wep = createWeapon();

@@ -127,7 +127,7 @@ void P_WorldEffects( GameEntity *ent )
 				// don't play a normal pain sound
 //				ent->pain_debounce_time = level.time + 200;
 
-				G_Damage (ent, NULL, NULL, NULL, NULL, 
+				G_Damage (ent, nullptr, nullptr, nullptr, nullptr, 
 					ent->damage_, DAMAGE_NO_PROTECTION, MOD_WATER, CAT_ANY);
 			}
 		}
@@ -149,12 +149,12 @@ void P_WorldEffects( GameEntity *ent )
 		{
 			if( ent->watertype_ & CONTENTS_LAVA) 
 			{
-				G_Damage (ent, NULL, NULL, NULL, NULL, 
+				G_Damage (ent, nullptr, nullptr, nullptr, nullptr, 
 					30*waterlevel, 0, MOD_LAVA, CAT_ANY);
 			}
 			if( ent->watertype_ & CONTENTS_SLIME) 
 			{
-				G_Damage (ent, NULL, NULL, NULL, NULL, 
+				G_Damage (ent, nullptr, nullptr, nullptr, nullptr, 
 					10*waterlevel, 0, MOD_SLIME, CAT_ANY);
 			}
 		}
@@ -482,7 +482,7 @@ void ClientIntermissionThink( GameClient *client )
 	if( client->buttons_ & ( BUTTON_ATTACK|BUTTON_ATTACK_MAIN ) & ( client->oldbuttons_ ^ client->buttons_ ) )
 	{ 
 		// this used to be an ^1 but once a player says ready, it should stick
-		client->readyToExit_ = 1;
+		client->readyToExit_ = true;
 	}
 }
 
@@ -931,7 +931,7 @@ void ClientThink_real( GameEntity *ent )
 			client->ps_.ONOFF &= ~OO_VAPOR;
 			float impact = -client->ps_.velocity[2] - 100;
 			if( impact > 0 )
-				G_Damage( ent, 0, ent, 0, 0, impact/2, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
+				G_Damage( ent, nullptr, ent, nullptr, nullptr, impact/2, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 		}
 	}
 
@@ -959,7 +959,7 @@ void ClientThink_real( GameEntity *ent )
 		!(availableVehicles[client->vehicle_].cat & CAT_GROUND) &&
 		!(availableVehicles[client->vehicle_].cat & CAT_BOAT) )
 	{
-	    G_Damage( ent, NULL, ent, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
+	    G_Damage( ent, nullptr, ent, nullptr, nullptr, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 	}
 
 	// execute client events
@@ -1160,7 +1160,7 @@ void ClientEndFrame( GameEntity *ent )
 	SendPendingPredictableEvents( &ent->client_->ps_ );
 
 	// MFQ3 reset radio targets
-	ent->radio_target_ = 0;
+	ent->radio_target_ = nullptr;
 }
 
 

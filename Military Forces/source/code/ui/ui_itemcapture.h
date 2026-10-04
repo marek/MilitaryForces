@@ -26,21 +26,21 @@ struct UI_Capture_ListBoxAuto : public UI_CaptureBase
 {
 	explicit			UI_Capture_ListBoxAuto( UI_ScrollInfo* si );
 
-	virtual void		capture();
+	void		capture() override;
 };
 
 struct UI_Capture_ListBoxThumb : public UI_CaptureBase
 {
 	explicit			UI_Capture_ListBoxThumb( UI_ScrollInfo* si );
 
-	virtual void		capture();
+	void		capture() override;
 };
 
 struct UI_Capture_SliderThumb : public UI_CaptureBase
 {
 	explicit			UI_Capture_SliderThumb( UI_ScrollInfo* si );
 
-	virtual void		capture();
+	void		capture() override;
 };
 
 

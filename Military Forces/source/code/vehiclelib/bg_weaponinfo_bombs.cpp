@@ -10,7 +10,7 @@
 void						
 WeaponInfo::createAllBombs(WeaponList& weapons)
 {
-	WeaponInfo* wep = 0;
+	WeaponInfo* wep = nullptr;
 
 	// Mk82
 	wep = createWeapon();

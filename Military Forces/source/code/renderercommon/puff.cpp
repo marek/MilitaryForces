@@ -168,7 +168,7 @@ local int32_t stored(struct state *s)
 
     /* copy len bytes from in to out */
     if (s->incnt + len > s->inlen) return 2;    /* not enough input */
-    if (s->out != NULL) {
+    if (s->out != nullptr) {
         if (s->outcnt + len > s->outlen)
             return 1;                           /* not enough output space */
         while (len--)
@@ -234,7 +234,7 @@ local int32_t decode(struct state *s, struct huffman *h)
     code = first = index = 0;
     len = 1;
     next = h->count + 1;
-    while (1) {
+    while (true) {
         while (left--) {
             code |= bitbuf & 1;
             bitbuf >>= 1;
@@ -414,7 +414,7 @@ local int32_t codes(struct state *s,
         if (symbol < 0) return symbol;  /* invalid symbol */
         if (symbol < 256) {             /* literal: symbol is the byte */
             /* write out the literal */
-            if (s->out != NULL) {
+            if (s->out != nullptr) {
                 if (s->outcnt == s->outlen) return 1;
                 s->out[s->outcnt] = symbol;
             }
@@ -434,7 +434,7 @@ local int32_t codes(struct state *s,
                 return -10;     /* distance too far back */
 
             /* copy length bytes from distance bytes back */
-            if (s->out != NULL) {
+            if (s->out != nullptr) {
                 if (s->outcnt + len > s->outlen) return 1;
                 while (len--) {
                     s->out[s->outcnt] = s->out[s->outcnt - dist];

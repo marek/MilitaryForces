@@ -143,7 +143,7 @@ field_t fields[] = {
 	{"category", FOFS2(ent_category_), F_INT},
 	{"score", FOFS2(score_), F_INT},
 
-	{NULL}
+	{nullptr}
 };
 
 
@@ -278,7 +278,7 @@ spawn_t	spawns[] = {
 
 	{"item_botroam", SP_item_botroam},
 
-	{0, 0}
+	{nullptr, nullptr}
 };
 
 // MFQ3 moved this here from g_items.c 
@@ -504,7 +504,7 @@ void G_SpawnGEntityFromSpawnVars()
 		}
 	}
 
-	if( G_SpawnString( "gametype", NULL, &value ) ) 
+	if( G_SpawnString( "gametype", nullptr, &value ) ) 
 	{
 		if( g_gametype.integer >= GT_FFA && g_gametype.integer < GT_MAX_GAME_TYPE ) 
 		{
@@ -581,7 +581,7 @@ bool G_ParseSpawnVars()
 		Com_Error( ERR_DROP, "G_ParseSpawnVars: found %s when expecting {",com_token );
 
 	// go through all the key / value pairs
-	while ( 1 )
+	while ( true )
 	{	
 		// parse key
 		if ( !SV_GetEntityToken( keyname, sizeof( keyname ) ) ) 

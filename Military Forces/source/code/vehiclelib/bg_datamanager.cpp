@@ -24,7 +24,7 @@ DataManager::~DataManager()
 	for( size_t i = 0; i < allGameObjects_.size(); ++i )
 	{
 		delete allGameObjects_[i];
-		allGameObjects_[i] = 0;
+		allGameObjects_[i] = nullptr;
 	}
 	allGameObjects_.clear();
 
@@ -32,7 +32,7 @@ DataManager::~DataManager()
 	for( size_t i = 0; i < allWeapons_.size(); ++i )
 	{
 		delete allWeapons_[i];
-		allWeapons_[i] = 0;
+		allWeapons_[i] = nullptr;
 	}
 	allWeapons_.clear();
 

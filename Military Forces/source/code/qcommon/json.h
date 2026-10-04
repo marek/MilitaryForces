@@ -170,21 +170,21 @@ static unsigned int JSON_NoParse(const char *json, const char *jsonEnd)
 const char *JSON_ArrayGetFirstValue(const char *json, const char *jsonEnd)
 {
 	if (!json || json >= jsonEnd || !IS_STRUCT_OPEN(*json))
-		return NULL;
+		return nullptr;
 
 	json = JSON_SkipSeparators(json + 1, jsonEnd);
 
-	return (json >= jsonEnd || IS_STRUCT_CLOSE(*json)) ? NULL : json;
+	return (json >= jsonEnd || IS_STRUCT_CLOSE(*json)) ? nullptr : json;
 }
 
 const char *JSON_ArrayGetNextValue(const char *json, const char *jsonEnd)
 {
 	if (!json || json >= jsonEnd || IS_STRUCT_CLOSE(*json))
-		return NULL;
+		return nullptr;
 
 	json = JSON_SkipValueAndSeparators(json, jsonEnd);
 
-	return (json >= jsonEnd || IS_STRUCT_CLOSE(*json)) ? NULL : json;
+	return (json >= jsonEnd || IS_STRUCT_CLOSE(*json)) ? nullptr : json;
 }
 
 unsigned int JSON_ArrayGetIndex(const char *json, const char *jsonEnd, const char **indexes, unsigned int numIndexes)
@@ -237,7 +237,7 @@ const char *JSON_ObjectGetNamedValue(const char *json, const char *jsonEnd, cons
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 // --------------------------------------------------------------------------

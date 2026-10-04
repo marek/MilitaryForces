@@ -210,7 +210,7 @@ void QDECL SV_SendServerCommand( SV_Client *cl, const char *fmt, ... )
 		return;
 	}
 
-	if( cl != NULL ) 
+	if( cl != nullptr ) 
 	{
 		SV_AddServerCommand( cl, (char *)message );
 		return;
@@ -351,7 +351,7 @@ SV_MasterShutdown
 Informs all masters that this server is going down
 =================
 */
-void SV_MasterShutdown( void ) {
+void SV_MasterShutdown( ) {
 	// send a heartbeat right now
 	theSVS.nextHeartbeatTime_ = -9999;
 	SV_MasterHeartbeat(HEARTBEAT_FOR_MASTER);
@@ -387,7 +387,7 @@ SVC_HashForAddress
 ================
 */
 static long SVC_HashForAddress( netadr_t address ) {
-	byte 		*ip = NULL;
+	byte 		*ip = nullptr;
 	size_t	size = 0;
 	int			i;
 	long		hash = 0;
@@ -416,7 +416,7 @@ Find or allocate a bucket for an address
 ================
 */
 static leakyBucket_t *SVC_BucketForAddress( netadr_t address, int burst, int period ) {
-	leakyBucket_t	*bucket = NULL;
+	leakyBucket_t	*bucket = nullptr;
 	int						i;
 	long					hash = SVC_HashForAddress( address );
 	int						now = Sys_Milliseconds();
@@ -449,13 +449,13 @@ static leakyBucket_t *SVC_BucketForAddress( netadr_t address, int burst, int per
 		// Reclaim expired buckets
 		if ( bucket->lastTime > 0 && ( interval > ( burst * period ) ||
 					interval < 0 ) ) {
-			if ( bucket->prev != NULL ) {
+			if ( bucket->prev != nullptr ) {
 				bucket->prev->next = bucket->next;
 			} else {
 				bucketHashes[ bucket->hash ] = bucket->next;
 			}
 			
-			if ( bucket->next != NULL ) {
+			if ( bucket->next != nullptr ) {
 				bucket->next->prev = bucket->prev;
 			}
 
@@ -476,11 +476,11 @@ static leakyBucket_t *SVC_BucketForAddress( netadr_t address, int burst, int per
 
 			// Add to the head of the relevant hash chain
 			bucket->next = bucketHashes[ hash ];
-			if ( bucketHashes[ hash ] != NULL ) {
+			if ( bucketHashes[ hash ] != nullptr ) {
 				bucketHashes[ hash ]->prev = bucket;
 			}
 
-			bucket->prev = NULL;
+			bucket->prev = nullptr;
 			bucketHashes[ hash ] = bucket;
 
 			return bucket;
@@ -488,7 +488,7 @@ static leakyBucket_t *SVC_BucketForAddress( netadr_t address, int burst, int per
 	}
 
 	// Couldn't allocate a bucket for this address
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -497,7 +497,7 @@ SVC_RateLimit
 ================
 */
 bool SVC_RateLimit( leakyBucket_t *bucket, int burst, int period ) {
-	if ( bucket != NULL ) {
+	if ( bucket != nullptr ) {
 		int now = Sys_Milliseconds();
 		int interval = now - bucket->lastTime;
 		int expired = interval / period;
@@ -1060,7 +1060,7 @@ SV_FrameMsec
 Return time in millseconds until processing of the next server frame.
 ==================
 */
-int SV_FrameMsec(void)
+int SV_FrameMsec()
 {
 	if(sv_fps)
 	{
@@ -1253,7 +1253,7 @@ Return the time in msec until we expect to be called next
 ====================
 */
 
-int SV_SendQueuedPackets(void)
+int SV_SendQueuedPackets()
 {
 	int numBlocks;
 	int dlStart, deltaT, delayT;

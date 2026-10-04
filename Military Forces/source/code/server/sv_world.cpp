@@ -125,7 +125,7 @@ worldSector_t *SV_CreateworldSector( int depth, vec3_t mins, vec3_t maxs ) {
 
 	if (depth == AREA_DEPTH) {
 		anode->axis = -1;
-		anode->children[0] = anode->children[1] = NULL;
+		anode->children[0] = anode->children[1] = nullptr;
 		return anode;
 	}
 	
@@ -156,7 +156,7 @@ SV_ClearWorld
 
 ===============
 */
-void SV_ClearWorld( void ) {
+void SV_ClearWorld( ) {
 	clipHandle_t	h;
 	vec3_t			mins, maxs;
 
@@ -193,7 +193,7 @@ void SV_UnlinkEntity( EntityBase* gameEnt )
 	if ( !ws ) {
 		return;		// not linked in anywhere
 	}
-	ent->worldSector_ = NULL;
+	ent->worldSector_ = nullptr;
 
 	if ( ws->entities == ent ) {
 		ws->entities = ent->nextEntityInWorldSector_;
@@ -368,7 +368,7 @@ void SV_LinkEntity( EntityBase* gameEnt )
 
 	// find the first world sector node that the ent's box crosses
 	node = sv_worldSectors;
-	while (1)
+	while (true)
 	{
 		if (node->axis == -1)
 			break;

@@ -23,7 +23,7 @@ Entity_Helicopter::checkForTakeoffOrLanding()
 
 	VectorCopy( startpos, endpos );
 	endpos[2] -= height;
-	SV_Trace (&trace, startpos, NULL, NULL, endpos, s.number, MASK_PLAYERSOLID, false );
+	SV_Trace (&trace, startpos, nullptr, nullptr, endpos, s.number, MASK_PLAYERSOLID, false );
 
 	// check for takeoff
 	if((client_->ps_.ONOFF & OO_LANDEDTERRAIN) && throttle) 
@@ -64,12 +64,12 @@ Entity_Helicopter::checkForTakeoffOrLanding()
 				}
 				else 
 				{
-					G_Damage( this, NULL, this, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
+					G_Damage( this, nullptr, this, nullptr, nullptr, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 				}
 			} 
 			else
 			{
-				G_Damage( this, NULL, this, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
+				G_Damage( this, nullptr, this, nullptr, nullptr, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 			}
 		}
 	}
@@ -79,7 +79,7 @@ Entity_Helicopter::checkForTakeoffOrLanding()
 void
 Entity_Helicopter::Entity_Helicopter_Touch::execute( GameEntity* other, trace_t *trace )
 {
-	G_Damage( self_, NULL, self_, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
+	G_Damage( self_, nullptr, self_, nullptr, nullptr, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 }
 
 void

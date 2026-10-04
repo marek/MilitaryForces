@@ -15,17 +15,17 @@ Server::Server() :
 	snapshotCounter_(0),
 	timeResidual_(0),
 	nextFrameTime_(0),
-	entityParsePoint_(0),
-	gameEntities_(0),
-	gameClients_(0),
+	entityParsePoint_(nullptr),
+	gameEntities_(nullptr),
+	gameClients_(nullptr),
 	restartTime_(0),
 	time_(0)
 {
 	for( int i = 0; i < MAX_MODELS; ++i )
-		models_[i] = 0;
+		models_[i] = nullptr;
 
 	for( int i = 0; i < MAX_CONFIGSTRINGS; ++i )
-		configstrings_[i] = 0;
+		configstrings_[i] = nullptr;
 
 }
 
@@ -45,9 +45,9 @@ Server::clear()
 	snapshotCounter_ = 0;
 	timeResidual_ = 0;
 	nextFrameTime_ = 0;
-	entityParsePoint_ = 0;
-	gameEntities_ = 0;
-	gameClients_ = 0;
+	entityParsePoint_ = nullptr;
+	gameEntities_ = nullptr;
+	gameClients_ = nullptr;
 	restartTime_ = 0;
 	time_ = 0;
 
@@ -124,7 +124,7 @@ ServerStatic::ServerStatic() :
 	//clients_(0),
 	numSnapshotEntities_(0),
 	nextSnapshotEntities_(0),
-	snapshotEntities_(0),
+	snapshotEntities_(nullptr),
 	nextHeartbeatTime_(0)
 {
 }
@@ -151,7 +151,7 @@ ServerStatic::clear()
 
 	numSnapshotEntities_ = 0;
 	nextSnapshotEntities_ = 0;
-	snapshotEntities_ = 0;
+	snapshotEntities_ = nullptr;
 	nextHeartbeatTime_ = 0;
 	memset( masterResolveTime_, 0, sizeof(masterResolveTime_) );
 
@@ -168,7 +168,7 @@ ServerStatic::clearClients()
 		if( svClients_.at(i) )
 			SV_FreeClient( svClients_.at(i) );
 		delete svClients_.at(i);
-		svClients_.at(i) = 0;
+		svClients_.at(i) = nullptr;
 	}
 	svClients_.clear();
 }
@@ -182,7 +182,7 @@ ServerStatic::initClients( int numClients )
 	svClients_.resize( numClients + 1 );
 	for( size_t i = 0; i < svClients_.size(); ++i )
 	{
-		svClients_.at(i) = 0;
+		svClients_.at(i) = nullptr;
 	}
 }
 
@@ -197,7 +197,7 @@ ServerStatic::changeMaxNumClients( int newNumClients, int newClientsBeginAt )
 	svClients_.resize( newNumClients + 1 );
 	for( size_t i = newClientsBeginAt; i < svClients_.size(); ++i )
 	{
-		svClients_.at(i) = 0;
+		svClients_.at(i) = nullptr;
 	}
 
 	//SV_Client* oldClients = reinterpret_cast<SV_Client*>(Hunk_AllocateTempMemory( count * sizeof(SV_Client) ));

@@ -18,8 +18,8 @@ void FS_FCloseFile( fileHandle_t f );
 
 
 GameObjectInfo_Vehicle::GameObjectInfo_Vehicle() :
-	airRadar_(0),
-	groundRadar_(0),
+	airRadar_(nullptr),
+	groundRadar_(nullptr),
 	minThrottle_(0),
 	maxThrottle_(0),
 	acceleration_(0),
@@ -33,9 +33,9 @@ GameObjectInfo_Vehicle::GameObjectInfo_Vehicle() :
 GameObjectInfo_Vehicle::~GameObjectInfo_Vehicle()
 {
 	delete airRadar_;
-	airRadar_ = 0;
+	airRadar_ = nullptr;
 	delete groundRadar_;
-	groundRadar_ = 0;
+	groundRadar_ = nullptr;
 }
 
 bool

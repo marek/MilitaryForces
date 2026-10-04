@@ -246,6 +246,6 @@ extern LPALCCAPTURESAMPLES qalcCaptureSamples;
 #endif
 
 bool QAL_Init(const char *libname);
-void QAL_Shutdown( void );
+void QAL_Shutdown( );
 
 #endif	// __QAL_H__

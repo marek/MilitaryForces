@@ -79,7 +79,7 @@ static void CG_DrawHUDPic( float x, float y, float width, float height, qhandle_
 	refExport.SetColor( color );
 	CG_AdjustFrom640( &x, &y, &width, &height );
 	refExport.DrawStretchPic( x, y, width, height, 0, 0, 1, 1, hShader );
-	refExport.SetColor( NULL );
+	refExport.SetColor( nullptr );
 }
 
 /*
@@ -210,8 +210,8 @@ Coordinates are at 640 by 480 virtual resolution
 ==================
 */
 static int CG_DrawString_MFQ3( int x, int y, const char *string, const float *setColor, int maxChars ) {
-	const char	*s = 0;
-	char		*lowerstring = 0;
+	const char	*s = nullptr;
+	char		*lowerstring = nullptr;
 	int			xx = x;
 	int			cnt;
 	int			charWidth, charHeight;
@@ -240,7 +240,7 @@ static int CG_DrawString_MFQ3( int x, int y, const char *string, const float *se
 		cnt++;
 		s++;
 	}
-	refExport.SetColor( NULL );
+	refExport.SetColor( nullptr );
 
 	delete [] lowerstring;
 	return (xx-x);
@@ -297,7 +297,7 @@ static int CG_DrawString_MFQ3_R( int x, int y, const char *string, const float *
 		cnt++;
 		s++;
 	}
-	refExport.SetColor( NULL );
+	refExport.SetColor( nullptr );
 	return (xx-x);
 }
 
@@ -515,12 +515,12 @@ static void CG_DrawRadarSymbols_AIR_new( int vehicle, float range, int x, int y 
 		if( angles[1] > 360 ) angles[1] -= 360;
 		else if( angles[1] < 0 ) angles[1] += 360;
 		angles[0] = angles[2] = 0;
-		AngleVectors( angles, dir, 0, 0 );
+		AngleVectors( angles, dir, nullptr, nullptr );
 		VectorScale( dir, dist, dir );
 
 		// check LOS and/or RADAR on
 		if( !(cg.radarEnts[i]->currentState.ONOFF & OO_RADAR) ) {
-			CG_Trace( &res, pos, NULL, NULL, otherpos, cg.snap->ps.clientNum, MASK_SOLID );
+			CG_Trace( &res, pos, nullptr, nullptr, otherpos, cg.snap->ps.clientNum, MASK_SOLID );
 			if( res.fraction < 1.0f ) 
 				continue;
 		}
@@ -567,7 +567,7 @@ static void CG_DrawRadarSymbols_GROUND_new( int vehicle, float range, int x, int
 	int			icon;
 	int			drawnTargets = 0;
 	trace_t		res;
-	bool	groundinstallation = 0;
+	bool	groundinstallation = false;
 	float		fullRange = range;
 
 	if( cg.RADARRangeSetting ) {
@@ -601,14 +601,14 @@ static void CG_DrawRadarSymbols_GROUND_new( int vehicle, float range, int x, int
 			continue;
 
 		// vehicles
-		groundinstallation = 0;
+		groundinstallation = false;
 		if( !cg.radarEnts[i]->destroyableStructure ) {
 			// get other vehicle
 			if( cg.radarEnts[i]->currentState.eType == ET_MISC_VEHICLE ) {
 				if( cg.radarEnts[i]->currentState.modelindex == 255 )	// ground installation
 				{
 					otherveh = cg.radarEnts[i]->currentState.modelindex2;	
-					groundinstallation = 1;
+					groundinstallation = true;
 				}
 				else													// other misc veh
 					otherveh = cg.radarEnts[i]->currentState.modelindex;
@@ -651,13 +651,13 @@ static void CG_DrawRadarSymbols_GROUND_new( int vehicle, float range, int x, int
 			else if( angles[1] < 0 ) 
 				angles[1] += 360;
 			angles[0] = angles[2] = 0;
-			AngleVectors( angles, dir, 0, 0 );
+			AngleVectors( angles, dir, nullptr, nullptr );
 			VectorScale( dir, dist, dir );
 
 			// check LOS and/or RADAR on
 			if( !(cg.radarEnts[i]->currentState.ONOFF & OO_RADAR) ) 
 			{
-				CG_Trace( &res, pos, NULL, NULL, otherpos, cg.snap->ps.clientNum, MASK_SOLID );
+				CG_Trace( &res, pos, nullptr, nullptr, otherpos, cg.snap->ps.clientNum, MASK_SOLID );
 				if( res.fraction < 1.0f ) 
 					continue;
 			}
@@ -717,7 +717,7 @@ static void CG_DrawRadarSymbols_GROUND_new( int vehicle, float range, int x, int
 			else if( angles[1] < 0 ) 
 				angles[1] += 360;
 			angles[0] = angles[2] = 0;
-			AngleVectors( angles, dir, 0, 0 );
+			AngleVectors( angles, dir, nullptr, nullptr );
 			VectorScale( dir, dist, dir );
 
 			icon = RD_BUILDING_ENEMY;
@@ -732,7 +732,7 @@ static void CG_DrawRadarSymbols_GROUND_new( int vehicle, float range, int x, int
 				}
 			}
 			// check LOS
-			CG_Trace( &res, pos, NULL, NULL, otherpos, cg.snap->ps.clientNum, MASK_SOLID );
+			CG_Trace( &res, pos, nullptr, nullptr, otherpos, cg.snap->ps.clientNum, MASK_SOLID );
 //			if( res.fraction < 1.0f ) continue;
 			if( res.entityNum != cg.radarEnts[i]->currentState.number ) 
 				continue;
@@ -1132,7 +1132,7 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 
 	if( cammode == CAMERA_DOWN ) {
 		vec3_t a;
-		AngleVectors( cent->currentState.angles, 0, 0, v );
+		AngleVectors( cent->currentState.angles, nullptr, nullptr, v );
 		VectorSet( a, 90, cent->currentState.angles[1], 0 );
 		AnglesToAxis( a, cg.HUDCamera.viewaxis );
 			// position
@@ -1152,7 +1152,7 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 			AnglesToAxis( temp, cg.HUDCamera.viewaxis );
 		} else {
 			vec3_t a, b;
-			AngleVectors( cent->currentState.angles, v, 0, 0 );
+			AngleVectors( cent->currentState.angles, v, nullptr, nullptr );
 			VectorCopy( v, b );
 			VectorInverse( b );
 			vectoangles( b, a );
@@ -1168,7 +1168,7 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 		float hD, vD, alpha;
 		int t;
 		trace_t tr;
-		AngleVectors( cent->currentState.angles, v, 0, 0 );
+		AngleVectors( cent->currentState.angles, v, nullptr, nullptr );
 		VectorSet( horz, v[0], v[1], 0 );
 		VectorNormalize( horz );
 		VectorSet( vert, 0, 0, 1 );
@@ -1183,7 +1183,7 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 			VectorAdd( tempH, tempV, v );
 			VectorAdd( cent->currentState.pos.trBase, v, end );
 			VectorNormalize( v );
-			CG_Trace( &tr, cent->currentState.pos.trBase, 0, 0, end, cent->currentState.number, MASK_ALL );
+			CG_Trace( &tr, cent->currentState.pos.trBase, nullptr, nullptr, end, cent->currentState.number, MASK_ALL );
 			if( tr.fraction < 1 ) break;
 		}
 		vectoangles( v, end );
@@ -1220,7 +1220,7 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 				AnglesToAxis( temp, cg.HUDCamera.viewaxis );
 			} else {
 				AnglesToAxis( cent->currentState.angles, cg.HUDCamera.viewaxis );
-				AngleVectors( cent->currentState.angles, v, 0, 0 );
+				AngleVectors( cent->currentState.angles, v, nullptr, nullptr );
 			}
 		}
 			// position
@@ -1301,7 +1301,7 @@ static void CG_Draw_MFD(int mfdnum, int vehicle, centity_t * cent, int targetran
 		// draw background
 		refExport.SetColor( HUDColors[cg.MFDColor] );
 		CG_DrawPic( x, y, width, height, cgs.media.HUDrwr );
-		refExport.SetColor( NULL );
+		refExport.SetColor( nullptr );
 		// draw contents
 		if( radarmode & OO_RADAR_AIR ) {
 			CG_DrawRadarSymbols_AIR_new(vehicle, range, x+60, y+60);
@@ -1468,7 +1468,7 @@ static void CG_Draw_AltTape( int value ) {
 	refExport.SetColor( HUDColors[cg.HUDColor] );
 	CG_AdjustFrom640( &x, &y, &width, &height );
 	refExport.DrawStretchPic( x, y, width, height, 0, 0.125f+offset, 1, 0.625f+offset, cgs.media.HUDalt );
-	refExport.SetColor( NULL );
+	refExport.SetColor( nullptr );
 		// alt indicater
 	x = 578;
 	y = 171;
@@ -1551,7 +1551,7 @@ static void CG_Draw_SpeedTape( int value, int stallspeed, int gearspeed, int sca
 	refExport.SetColor( HUDColors[cg.HUDColor] );
 	CG_AdjustFrom640( &x, &y, &width, &height );
 	refExport.DrawStretchPic( x, y, width, height, 0, 0.125f+offset, 1, 0.625f+offset, cgs.media.HUDspeed );
-	refExport.SetColor( NULL );
+	refExport.SetColor( nullptr );
 		// speed indicater
 	x = 55;
 	y = 171;
@@ -1655,7 +1655,7 @@ static void CG_Draw_HeadingTape( int value, int targetheading ) {
 	refExport.SetColor( HUDColors[cg.HUDColor] );
 	CG_AdjustFrom640( &x, &y, &width, &height );
 	refExport.DrawStretchPic( x, y, width, height, 0.125f-offset, 0, 1-offset, 1, cgs.media.HUDheading );
-	refExport.SetColor( NULL );
+	refExport.SetColor( nullptr );
 		// draw heading value box
 	x = 304;
 	y = 28;
@@ -1732,7 +1732,7 @@ CG_DrawStatusBar_MFQ3
 
 ================
 */
-void CG_DrawStatusBar_MFQ3_new( void ) {
+void CG_DrawStatusBar_MFQ3_new( ) {
 	centity_t	*cent;
 	playerState_t	*ps;
 	int			value, value2;

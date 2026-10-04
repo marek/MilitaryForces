@@ -563,7 +563,7 @@ R_RotateForViewer
 Sets up the modelview matrix for a given viewParm
 =================
 */
-void R_RotateForViewer (void) 
+void R_RotateForViewer () 
 {
 	float	viewerMatrix[16];
 	vec3_t	origin;
@@ -608,7 +608,7 @@ void R_RotateForViewer (void)
 /*
 ** SetFarClip
 */
-static void R_SetFarClip( void )
+static void R_SetFarClip( )
 {
 	float	farthestCornerDistance = 0;
 	int		i;
@@ -1408,8 +1408,8 @@ static ID_INLINE void R_Radix( int offset, int size, drawSurf_t *source, drawSur
   int           count[ 256 ] = { 0 };
   int           index[ 256 ];
   int           i;
-  unsigned char *sortKey = NULL;
-  unsigned char *end = NULL;
+  unsigned char *sortKey = nullptr;
+  unsigned char *end = nullptr;
 
   sortKey = ( (unsigned char *)&source[ 0 ].sort ) + offset;
   end = sortKey + ( size * sizeof( drawSurf_t ) );
@@ -1635,7 +1635,7 @@ static void R_AddEntitySurface (int entityNum)
 R_AddEntitySurfaces
 =============
 */
-void R_AddEntitySurfaces (void) {
+void R_AddEntitySurfaces () {
 	int i;
 
 	if ( !r_drawentities->integer ) {
@@ -1652,7 +1652,7 @@ void R_AddEntitySurfaces (void) {
 R_GenerateDrawSurfs
 ====================
 */
-void R_GenerateDrawSurfs( void ) {
+void R_GenerateDrawSurfs( ) {
 	R_AddWorldSurfaces ();
 
 	R_AddPolygonSurfaces();
@@ -1716,7 +1716,7 @@ R_DebugGraphics
 Visualization aid for movement clipping debugging
 ====================
 */
-void R_DebugGraphics( void ) {
+void R_DebugGraphics( ) {
 	if ( tr.refdef.rdflags & RDF_NOWORLDMODEL ) {
 		return;
 	}
@@ -1906,7 +1906,7 @@ void R_RenderPshadowMaps(const refdef_t *fd)
 				{
 					// FIXME: never actually tested this
 					mdrHeader_t *header = (mdrHeader_t *)model->modelData;
-					int frameSize = (size_t)( &((mdrFrame_t *)0)->bones[ header->numBones ] );
+					int frameSize = (size_t)( &((mdrFrame_t *)nullptr)->bones[ header->numBones ] );
 					mdrFrame_t *frame = ( mdrFrame_t * ) ( ( byte * ) header + header->ofsFrames + frameSize * ent->e.frame);
 
 					radius = frame->radius;
@@ -2224,7 +2224,7 @@ void R_RenderSunShadowMaps(const refdef_t *fd, int level)
 		lightDir[2] = sin(angle) * cos(35.0f * M_PI / 180.0f);
 		lightDir[3] = 0.0f;
 
-		if (1) //((fd->time % (scale * 2)) < scale)
+		if (true) //((fd->time % (scale * 2)) < scale)
 		{
 			lightCol[0] = 
 			lightCol[1] = 
@@ -2615,7 +2615,7 @@ void R_RenderCubemapSide( int cubemapIndex, int cubemapSide, bool subscene )
 
 		// FIXME: sun shadows aren't rendered correctly in cubemaps
 		// fix involves changing r_FBufScale to fit smaller cubemap image size, or rendering cubemap to framebuffer first
-		if(0) //(glRefConfig.framebufferObject && r_sunlightMode->integer && (r_forceSun->integer || tr.sunShadows))
+		if(false) //(glRefConfig.framebufferObject && r_sunlightMode->integer && (r_forceSun->integer || tr.sunShadows))
 		{
 			R_RenderSunShadowMaps(&refdef, 0);
 			R_RenderSunShadowMaps(&refdef, 1);
@@ -2660,7 +2660,7 @@ void R_RenderCubemapSide( int cubemapIndex, int cubemapSide, bool subscene )
 
 	// FIXME: sun shadows aren't rendered correctly in cubemaps
 	// fix involves changing r_FBufScale to fit smaller cubemap image size, or rendering cubemap to framebuffer first
-	if (0) //(r_depthPrepass->value && ((r_forceSun->integer) || tr.sunShadows))
+	if (false) //(r_depthPrepass->value && ((r_forceSun->integer) || tr.sunShadows))
 	{
 		parms.flags = VPF_USESUNLIGHT;
 	}

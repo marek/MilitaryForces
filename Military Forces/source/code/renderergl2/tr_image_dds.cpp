@@ -220,8 +220,8 @@ void R_LoadDDS ( const char *filename, byte **pic, int *width, int *height, GLen
 		void *v;
 	} buffer;
 	int len;
-	ddsHeader_t *ddsHeader = NULL;
-	ddsHeaderDxt10_t *ddsHeaderDxt10 = NULL;
+	ddsHeader_t *ddsHeader = nullptr;
+	ddsHeaderDxt10_t *ddsHeaderDxt10 = nullptr;
 	byte *data;
 
 	if (!picFormat)
@@ -239,7 +239,7 @@ void R_LoadDDS ( const char *filename, byte **pic, int *width, int *height, GLen
 	if (numMips)
 		*numMips = 1;
 
-	*pic = NULL;
+	*pic = nullptr;
 
 	//
 	// load the file

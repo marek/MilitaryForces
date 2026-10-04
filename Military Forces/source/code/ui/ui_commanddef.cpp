@@ -4,7 +4,7 @@
 
 
 
-UI_Utils* UI_Utils::Command::utils_ = 0;
+UI_Utils* UI_Utils::Command::utils_ = nullptr;
 
 void
 UI_Utils::Command::setUtils( UI_Utils* utils )
@@ -78,7 +78,7 @@ UI_Utils::Command_SetColor::handler( itemDef_t *item, char** args )
 	vec4_t *out;
 	// expecting type of color to set and 4 args for the color
 	if (utils_->string_Parse(args, &name)) {
-		out = NULL;
+		out = nullptr;
 		if (Q_stricmp(name, "backcolor") == 0) 
 		{
 			out = &item->window.backColor;
@@ -173,9 +173,9 @@ UI_Utils::Command_SetItemColor::handler( itemDef_t *item, char** args )
 		for (j = 0; j < count; j++) 
 		{
 			item2 = utils_->menu_GetMatchingItemByNumber(reinterpret_cast<menuDef_t*>(item->parent), j, itemname);
-			if (item2 != NULL) 
+			if (item2 != nullptr) 
 			{
-				out = NULL;
+				out = nullptr;
 				if (Q_stricmp(name, "backcolor") == 0) 
 				{
 					out = &item2->window.backColor;

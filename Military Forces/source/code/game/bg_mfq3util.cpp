@@ -232,7 +232,7 @@ MF_getNumberOfItems
 int MF_getNumberOfItems(const char **itemlist)
 {
 	int i;
-	for( i = 0; itemlist[i] != 0; i++ );
+	for( i = 0; itemlist[i] != nullptr; i++ );
 	return i;
 }
 
@@ -260,7 +260,7 @@ MF_CreateModelPathname
 // creates a model pathname (e.g. pFormatString = "models/vehicles/%s/%s/%s_icon")
 char * MF_CreateModelPathname( int vehicle, char * pFormatString )
 {
-	char * pReturnString = NULL;
+	char * pReturnString = nullptr;
 	char catDir[ 32 ];
 	unsigned int cat = 0;
 
@@ -295,7 +295,7 @@ char * MF_CreateModelPathname( int vehicle, char * pFormatString )
 // same for groundinstallations
 char * MF_CreateGIPathname( int vehicle, char * pFormatString )
 {
-	char * pReturnString = NULL;
+	char * pReturnString = nullptr;
 	char catDir[ 32 ];
 //	unsigned int cat = 0;
 
@@ -373,7 +373,7 @@ static void MF_findDeck( const char *name, completeVehicleData_t *veh );
 void MF_LoadAllVehicleData()
 {
 	int i, j, num;
-	char* modelbasename = 0;
+	char* modelbasename = nullptr;
 	char name[128];
 	fileHandle_t	f;
 	md3Tag_t tag;
@@ -430,8 +430,8 @@ void MF_LoadAllVehicleData()
 				
 				if(!availableVehicles[i].gearheight)
 				{
-					if( MF_getDimensions( name, 0, 0, &min1 ) &&
-						MF_getDimensions( name, num-1, 0, &min2 ) ) 
+					if( MF_getDimensions( name, 0, nullptr, &min1 ) &&
+						MF_getDimensions( name, num-1, nullptr, &min2 ) ) 
 					{
 						availableVehicles[i].gearheight = min1[2] - min2[2] - 1.5;// for coll. detection
 						if( availableVehicles[i].gearheight < 0 ) 
@@ -492,8 +492,8 @@ void MF_LoadAllVehicleData()
 				
 				if(!availableVehicles[i].gearheight){
 
-					if( MF_getDimensions( name, 0, 0, &min1 ) &&
-						MF_getDimensions( name, num-1, 0, &min2 ) ) {
+					if( MF_getDimensions( name, 0, nullptr, &min1 ) &&
+						MF_getDimensions( name, num-1, nullptr, &min2 ) ) {
 						availableVehicles[i].gearheight = min1[2] - min2[2] - 1.5;// for coll. detection
 						if( availableVehicles[i].gearheight < 0 ) availableVehicles[i].gearheight = 0;
 					}
@@ -614,7 +614,7 @@ static void MF_ParseOverview( char **buf, mission_overview_t* overview )
 	} 
 
 	info[0] = '\0';
-	while( 1 ) 
+	while( true ) 
 	{
 		token = COM_ParseExt( buf, true );
 		if( !token[0] ) 
@@ -699,7 +699,7 @@ static void MF_ParseWaypoints( char **buf, mission_vehicle_t* veh )
 		return;
 	} 
 
-	while( 1 ) 
+	while( true ) 
 	{
 		token = COM_ParseExt( buf, true );
 		if( !token[0] ) 
@@ -748,7 +748,7 @@ static void MF_ParseVehicle( char **buf, mission_vehicle_t* veh )
 		return;
 	} 
 
-	while( 1 ) 
+	while( true ) 
 	{
 		token = COM_ParseExt( buf, true );
 		if( !token[0] ) 
@@ -856,7 +856,7 @@ static void MF_ParseGroundInstallation( char **buf, mission_groundInstallation_t
 		return;
 	} 
 
-	while( 1 ) 
+	while( true ) 
 	{
 		token = COM_ParseExt( buf, true );
 		if( !token[0] ) 
@@ -1010,7 +1010,7 @@ static void MF_ParseEntities( char **buf,
 		return;
 	} 
 
-	while( 1 )
+	while( true )
 	{
 		token = COM_Parse( buf );
 		if( !token[0] ) 
@@ -1069,7 +1069,7 @@ void MF_ParseMissionScripts( char *buf,
 
 	MF_SetMissionScriptOverviewDefaults(overview);
 
-	while( 1 )
+	while( true )
 	{
 		token = COM_Parse( &buf );
 		if( !token[0] ) 

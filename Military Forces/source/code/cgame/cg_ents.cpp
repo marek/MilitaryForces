@@ -195,7 +195,7 @@ static void CG_Speaker( centity_t *cent ) {
 		return;
 	}
 
-	S_StartSound (NULL, cent->currentState.number, CHAN_ITEM, cgs.gameSounds[cent->currentState.eventParm] );
+	S_StartSound (nullptr, cent->currentState.number, CHAN_ITEM, cgs.gameSounds[cent->currentState.eventParm] );
 
 	//	ent->s.frame = ent->wait * 10;
 	//	ent->s.clientNum = ent->random * 10;
@@ -685,7 +685,7 @@ static void CG_InterpolateEntityPosition( centity_t *cent ) {
 
 	// it would be an internal error to find an entity that interpolates without
 	// a snapshot ahead of the current one
-	if ( cg.nextSnap == NULL ) {
+	if ( cg.nextSnap == nullptr ) {
 		Com_Error( ERR_DROP, "CG_InterpoateEntityPosition: cg.nextSnap == NULL" );
 	}
 
@@ -891,7 +891,7 @@ CG_AddPacketEntities
 
 ===============
 */
-void CG_AddPacketEntities( void ) {
+void CG_AddPacketEntities( ) {
 	int					num;
 	centity_t			*cent;
 	playerState_t		*ps;

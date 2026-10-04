@@ -49,8 +49,8 @@ typedef enum
 	RSERR_UNKNOWN
 } rserr_t;
 
-SDL_Window *SDL_window = NULL;
-static SDL_GLContext SDL_glContext = NULL;
+SDL_Window *SDL_window = nullptr;
+static SDL_GLContext SDL_glContext = nullptr;
 
 cvar_t *r_allowSoftwareGL; // Don't abort out if a hardware visual can't be obtained
 cvar_t *r_allowResize; // make window resizable
@@ -76,7 +76,7 @@ void (APIENTRYP qglClientActiveTextureARB) (GLenum texture);
 void (APIENTRYP qglMultiTexCoord2fARB) (GLenum target, GLfloat s, GLfloat t);
 
 void (APIENTRYP qglLockArraysEXT) (GLint first, GLsizei count);
-void (APIENTRYP qglUnlockArraysEXT) (void);
+void (APIENTRYP qglUnlockArraysEXT) ();
 
 #define GLE(ret, name, ...) name##proc * qgl##name = NULL;
 QGL_1_1_PROCS;
@@ -100,7 +100,7 @@ QGL_EXT_direct_state_access_PROCS;
 GLimp_Shutdown
 ===============
 */
-void GLimp_Shutdown( void )
+void GLimp_Shutdown( )
 {
 	ri.IN_Shutdown();
 
@@ -114,7 +114,7 @@ GLimp_Minimize
 Minimize the game so that user is back at the desktop
 ===============
 */
-void GLimp_Minimize( void )
+void GLimp_Minimize( )
 {
 	SDL_MinimizeWindow( SDL_window );
 }
@@ -161,7 +161,7 @@ static int GLimp_CompareModes( const void *a, const void *b )
 GLimp_DetectAvailableModes
 ===============
 */
-static void GLimp_DetectAvailableModes(void)
+static void GLimp_DetectAvailableModes()
 {
 	int i, j;
 	char buf[ MAX_STRING_CHARS ] = { 0 };
@@ -368,7 +368,7 @@ GLimp_ClearProcAddresses
 Clear addresses for OpenGL functions.
 ===============
 */
-static void GLimp_ClearProcAddresses( void ) {
+static void GLimp_ClearProcAddresses( ) {
 #define GLE( ret, name, ... ) qgl##name = NULL;
 
 	qglMajorVersion = 0;
@@ -391,12 +391,12 @@ static void GLimp_ClearProcAddresses( void ) {
 	QGL_ARB_vertex_array_object_PROCS;
 	QGL_EXT_direct_state_access_PROCS;
 
-	qglActiveTextureARB = NULL;
-	qglClientActiveTextureARB = NULL;
-	qglMultiTexCoord2fARB = NULL;
+	qglActiveTextureARB = nullptr;
+	qglClientActiveTextureARB = nullptr;
+	qglMultiTexCoord2fARB = nullptr;
 
-	qglLockArraysEXT = NULL;
-	qglUnlockArraysEXT = NULL;
+	qglLockArraysEXT = nullptr;
+	qglUnlockArraysEXT = nullptr;
 
 #undef GLE
 }
@@ -419,7 +419,7 @@ static int GLimp_SetMode(int mode, bool fullscreen, bool noborder, bool fixedFun
 	int colorBits, depthBits, stencilBits;
 	int samples;
 	int i = 0;
-	SDL_Surface *icon = NULL;
+	SDL_Surface *icon = nullptr;
 	Uint32 flags = SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI;
 	SDL_DisplayMode desktopMode;
 	int display = 0;
@@ -446,7 +446,7 @@ static int GLimp_SetMode(int mode, bool fullscreen, bool noborder, bool fixedFun
 #endif
 
 	// If a window exists, note its display index
-	if( SDL_window != NULL )
+	if( SDL_window != nullptr )
 	{
 		display = SDL_GetWindowDisplayIndex( SDL_window );
 		if( display < 0 )
@@ -505,19 +505,19 @@ static int GLimp_SetMode(int mode, bool fullscreen, bool noborder, bool fixedFun
 	}
 
 	// Destroy existing state if it exists
-	if( SDL_glContext != NULL )
+	if( SDL_glContext != nullptr )
 	{
 		GLimp_ClearProcAddresses();
 		SDL_GL_DeleteContext( SDL_glContext );
-		SDL_glContext = NULL;
+		SDL_glContext = nullptr;
 	}
 
-	if( SDL_window != NULL )
+	if( SDL_window != nullptr )
 	{
 		SDL_GetWindowPosition( SDL_window, &x, &y );
 		ri.Printf( PRINT_DEVELOPER, "Existing window at %dx%d before being destroyed\n", x, y );
 		SDL_DestroyWindow( SDL_window );
-		SDL_window = NULL;
+		SDL_window = nullptr;
 	}
 
 	if( fullscreen )
@@ -726,7 +726,7 @@ static int GLimp_SetMode(int mode, bool fullscreen, bool noborder, bool fixedFun
 			SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, contexts[type].minorVersion );
 
 			if( ( SDL_window = SDL_CreateWindow( CLIENT_WINDOW_TITLE, x, y,
-					glConfig.vidWidth, glConfig.vidHeight, flags ) ) == NULL )
+					glConfig.vidWidth, glConfig.vidHeight, flags ) ) == nullptr )
 			{
 				ri.Printf( PRINT_DEVELOPER, "SDL_CreateWindow failed: %s\n", SDL_GetError( ) );
 				break;
@@ -739,7 +739,7 @@ static int GLimp_SetMode(int mode, bool fullscreen, bool noborder, bool fixedFun
 			if ( !SDL_glContext )
 			{
 				SDL_DestroyWindow( SDL_window );
-				SDL_window = NULL;
+				SDL_window = nullptr;
 				ri.Printf( PRINT_ALL, "SDL_GL_CreateContext() for %s context failed: %s\n", contextName, SDL_GetError() );
 				continue;
 			}
@@ -749,9 +749,9 @@ static int GLimp_SetMode(int mode, bool fullscreen, bool noborder, bool fixedFun
 				ri.Printf( PRINT_ALL, "GLimp_GetProcAddresses() for %s context failed\n", contextName );
 				GLimp_ClearProcAddresses();
 				SDL_GL_DeleteContext( SDL_glContext );
-				SDL_glContext = NULL;
+				SDL_glContext = nullptr;
 				SDL_DestroyWindow( SDL_window );
-				SDL_window = NULL;
+				SDL_window = nullptr;
 				continue;
 			}
 
@@ -766,9 +766,9 @@ static int GLimp_SetMode(int mode, bool fullscreen, bool noborder, bool fixedFun
 
 					GLimp_ClearProcAddresses();
 					SDL_GL_DeleteContext( SDL_glContext );
-					SDL_glContext = NULL;
+					SDL_glContext = nullptr;
 					SDL_DestroyWindow( SDL_window );
-					SDL_window = NULL;
+					SDL_window = nullptr;
 					continue;
 				}
 			}
@@ -782,7 +782,7 @@ static int GLimp_SetMode(int mode, bool fullscreen, bool noborder, bool fixedFun
 
 		if ( !SDL_glContext ) {
 			SDL_DestroyWindow( SDL_window );
-			SDL_window = NULL;
+			SDL_window = nullptr;
 			continue;
 		}
 
@@ -800,7 +800,7 @@ static int GLimp_SetMode(int mode, bool fullscreen, bool noborder, bool fixedFun
 			desiredMode.w = glConfig.vidWidth;
 			desiredMode.h = glConfig.vidHeight;
 			desiredMode.refresh_rate = glConfig.displayFrequency = ri.Cvar_VariableIntegerValue( "r_displayRefresh" );
-			desiredMode.driverdata = NULL;
+			desiredMode.driverdata = nullptr;
 
 			if( SDL_SetWindowDisplayMode( SDL_window, &desiredMode ) < 0 )
 			{
@@ -933,9 +933,9 @@ static void APIENTRY GLimp_DebugCallback( GLenum source, GLenum type, GLuint id,
 	ri.Printf( severity == GLIMP_DEBUG_SEVERITY_HIGH ? PRINT_WARNING : PRINT_ALL, "GL debug (%s, 0x%x): %s\n", level, id, message );
 }
 
-static void GLimp_InitDebugOutput( void )
+static void GLimp_InitDebugOutput( )
 {
-	void *proc = NULL;
+	void *proc = nullptr;
 	bool khr = false;
 
 	if( !r_glDebug->integer )
@@ -944,7 +944,7 @@ static void GLimp_InitDebugOutput( void )
 	if( SDL_GL_ExtensionSupported( "GL_KHR_debug" ) )
 	{
 		proc = SDL_GL_GetProcAddress( "glDebugMessageCallback" );
-		khr = proc != NULL;
+		khr = proc != nullptr;
 	}
 	if( !proc && SDL_GL_ExtensionSupported( "GL_ARB_debug_output" ) )
 		proc = SDL_GL_GetProcAddress( "glDebugMessageCallbackARB" );
@@ -955,7 +955,7 @@ static void GLimp_InitDebugOutput( void )
 		return;
 	}
 
-	( ( GLimp_DebugMessageCallbackProc )proc )( GLimp_DebugCallback, NULL );
+	( ( GLimp_DebugMessageCallbackProc )proc )( GLimp_DebugCallback, nullptr );
 	qglEnable( GLIMP_DEBUG_OUTPUT_SYNCHRONOUS );
 	if( khr )
 		qglEnable( GLIMP_DEBUG_OUTPUT );
@@ -1039,9 +1039,9 @@ static void GLimp_InitExtensions( bool fixedFunction )
 		}
 
 		// GL_ARB_multitexture
-		qglMultiTexCoord2fARB = NULL;
-		qglActiveTextureARB = NULL;
-		qglClientActiveTextureARB = NULL;
+		qglMultiTexCoord2fARB = nullptr;
+		qglActiveTextureARB = nullptr;
+		qglClientActiveTextureARB = nullptr;
 		if ( SDL_GL_ExtensionSupported( "GL_ARB_multitexture" ) )
 		{
 			if ( r_ext_multitexture->value )
@@ -1061,9 +1061,9 @@ static void GLimp_InitExtensions( bool fixedFunction )
 					}
 					else
 					{
-						qglMultiTexCoord2fARB = NULL;
-						qglActiveTextureARB = NULL;
-						qglClientActiveTextureARB = NULL;
+						qglMultiTexCoord2fARB = nullptr;
+						qglActiveTextureARB = nullptr;
+						qglClientActiveTextureARB = nullptr;
 						ri.Printf( PRINT_ALL, "...not using GL_ARB_multitexture, < 2 texture units\n" );
 					}
 				}
@@ -1085,7 +1085,7 @@ static void GLimp_InitExtensions( bool fixedFunction )
 			{
 				ri.Printf( PRINT_ALL, "...using GL_EXT_compiled_vertex_array\n" );
 				qglLockArraysEXT = ( void ( APIENTRY * )( GLint, GLint ) ) SDL_GL_GetProcAddress( "glLockArraysEXT" );
-				qglUnlockArraysEXT = ( void ( APIENTRY * )( void ) ) SDL_GL_GetProcAddress( "glUnlockArraysEXT" );
+				qglUnlockArraysEXT = ( void ( APIENTRY * )( ) ) SDL_GL_GetProcAddress( "glUnlockArraysEXT" );
 				if (!qglLockArraysEXT || !qglUnlockArraysEXT)
 				{
 					ri.Error (ERR_FATAL, "bad getprocaddress");
@@ -1259,7 +1259,7 @@ Responsible for doing a swapbuffers
 ===============
 */
 #ifdef __APPLE__
-static bool GLimp_DisplaysAsleep( void )
+static bool GLimp_DisplaysAsleep( )
 {
 	CGDirectDisplayID displays[ 16 ];
 	uint32_t count = 0;
@@ -1277,7 +1277,7 @@ static bool GLimp_DisplaysAsleep( void )
 	return count > 0;
 }
 
-static void GLimp_CheckDisplaySleep( void )
+static void GLimp_CheckDisplaySleep( )
 {
 	static bool vsyncSuspended = false;
 	static int nextCheck = 0;
@@ -1301,7 +1301,7 @@ static void GLimp_CheckDisplaySleep( void )
 }
 #endif
 
-void GLimp_EndFrame( void )
+void GLimp_EndFrame( )
 {
 #ifdef __APPLE__
 	GLimp_CheckDisplaySleep( );

@@ -19,7 +19,7 @@ CG_CalcVrect
 Sets the coordinates of the rendered window
 =================
 */
-static void CG_CalcVrect (void) {
+static void CG_CalcVrect () {
 	int		size;
 
 	// the intermission should allways be full screen
@@ -257,7 +257,7 @@ CG_OffsetCockpitView
 MFQ3
 ===============
 */
-static void CG_OffsetCockpitView( void ) 
+static void CG_OffsetCockpitView( ) 
 {
     vec3_t	    forward, right, up;
     vec3_t	    view;
@@ -331,7 +331,7 @@ static void CG_OffsetCockpitView( void ) {
 
 //======================================================================
 
-void CG_ZoomDown_f( void )
+void CG_ZoomDown_f( )
 { 
 	// locked-out?
 	if( cg.zoomLockOut )
@@ -359,7 +359,7 @@ void CG_ZoomDown_f( void )
 	cg.zoomLockOut = false;
 }
 
-void CG_ZoomUp_f( void )
+void CG_ZoomUp_f( )
 { 
 	// reset lock-out
 	cg.zoomLockOut = false;
@@ -375,7 +375,7 @@ Fixed fov at intermissions, otherwise account for fov variable and zooms.
 #define	WAVE_AMPLITUDE	1
 #define	WAVE_FREQUENCY	0.4
 
-static int CG_CalcFov( void ) {
+static int CG_CalcFov( ) {
 	float	x;
 	float	phase;
 	float	v;
@@ -465,7 +465,7 @@ CG_CalcViewValues
 ===============
 */
 
-static void CG_CalcMiscViewValues( void )
+static void CG_CalcMiscViewValues( )
 {
 	bool noAdjust = false;
 
@@ -516,7 +516,7 @@ CG_CalcViewValues
 Sets cg.refdef view values
 ===============
 */
-static int CG_CalcViewValues( void ) {
+static int CG_CalcViewValues( ) {
 	playerState_t	*ps;
 
 	memset( &cg.refdef, 0, sizeof( cg.refdef ) );
@@ -607,7 +607,7 @@ void CG_AddBufferedSound( sfxHandle_t sfx ) {
 CG_PlayBufferedSounds
 =====================
 */
-static void CG_PlayBufferedSounds( void ) {
+static void CG_PlayBufferedSounds( ) {
 	if ( cg.soundTime < cg.time ) {
 		if (cg.soundBufferOut != cg.soundBufferIn && cg.soundBuffer[cg.soundBufferOut]) {
 			S_StartLocalSound(cg.soundBuffer[cg.soundBufferOut], CHAN_ANNOUNCER);

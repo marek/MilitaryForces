@@ -380,7 +380,7 @@ RB_Hyperspace
 A player has predicted a teleport, but hasn't arrived yet
 ================
 */
-static void RB_Hyperspace( void ) {
+static void RB_Hyperspace( ) {
 	float		c;
 
 	if ( !backEnd.isHyperspace ) {
@@ -395,7 +395,7 @@ static void RB_Hyperspace( void ) {
 }
 
 
-static void SetViewportAndScissor( void ) {
+static void SetViewportAndScissor( ) {
 	qglMatrixMode(GL_PROJECTION);
 	qglLoadMatrixf( backEnd.viewParms.projectionMatrix );
 	qglMatrixMode(GL_MODELVIEW);
@@ -415,7 +415,7 @@ Any mirrored or portaled views have already been drawn, so prepare
 to actually render the visible surfaces for this view
 =================
 */
-void RB_BeginDrawingView (void) {
+void RB_BeginDrawingView () {
 	int clearBits = 0;
 
 	// sync with gl if needed
@@ -520,7 +520,7 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	// draw everything
 	oldEntityNum = -1;
 	backEnd.currentEntity = &tr.worldEntity;
-	oldShader = NULL;
+	oldShader = nullptr;
 	oldFogNum = -1;
 	oldDepthRange = false;
 	wasCrosshair = false;
@@ -543,9 +543,9 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 		// change the tess parameters if needed
 		// a "entityMergable" shader is a shader that can have surfaces from separate
 		// entities merged into a single batch, like smoke and blood puff sprites
-		if ( shader != NULL && ( shader != oldShader || fogNum != oldFogNum || dlighted != oldDlighted 
+		if ( shader != nullptr && ( shader != oldShader || fogNum != oldFogNum || dlighted != oldDlighted 
 			|| ( entityNum != oldEntityNum && !shader->entityMergable ) ) ) {
-			if (oldShader != NULL) {
+			if (oldShader != nullptr) {
 				RB_EndSurface();
 			}
 			RB_BeginSurface( shader, fogNum );
@@ -659,7 +659,7 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	backEnd.refdef.floatTime = originalTime;
 
 	// draw the contents of the last shader batch
-	if (oldShader != NULL) {
+	if (oldShader != nullptr) {
 		RB_EndSurface();
 	}
 
@@ -695,7 +695,7 @@ RB_SetGL2D
 
 ================
 */
-void	RB_SetGL2D (void) {
+void	RB_SetGL2D () {
 	backEnd.projection2D = true;
 
 	// set 2D virtual screen size
@@ -958,7 +958,7 @@ was there.  This is used to test for texture thrashing.
 Also called by RE_EndRegistration
 ===============
 */
-void RB_ShowImages( void ) {
+void RB_ShowImages( ) {
 	int		i;
 	image_t	*image;
 	float	x, y, w, h;
@@ -1108,7 +1108,7 @@ void RB_ExecuteRenderCommands( const void *data ) {
 
 	t1 = ri.Milliseconds ();
 
-	while ( 1 ) {
+	while ( true ) {
 		data = PADP(data, sizeof(void *));
 
 		switch ( *(const int *)data ) {

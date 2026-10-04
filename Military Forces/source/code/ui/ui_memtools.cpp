@@ -12,7 +12,7 @@
 void *BotImport_GetMemory(int size);
 void *BotImport_HunkAlloc( int size );
 void BotImport_FreeMemory(void *ptr);
-int Z_AvailableMemory( void );
+int Z_AvailableMemory( );
 
 
 
@@ -24,7 +24,7 @@ UI_Memtools::getMemory( unsigned long size )
 
 	ptr = BotImport_GetMemory(size + sizeof(intptr_t));
 	if (!ptr) 
-		return 0;
+		return nullptr;
 	memid = (intptr_t *) ptr;
 	*memid = MEM_ID;
 	return (intptr_t *) ((char *) ptr + sizeof(intptr_t));
@@ -46,7 +46,7 @@ UI_Memtools::getHunkMemory( unsigned long size )
 	intptr_t *memid;
 
 	ptr = BotImport_HunkAlloc(size + sizeof(intptr_t));
-	if (!ptr) return NULL;
+	if (!ptr) return nullptr;
 	memid = (intptr_t *) ptr;
 	*memid = HUNK_ID;
 	return (intptr_t *) ((char *) ptr + sizeof(intptr_t));

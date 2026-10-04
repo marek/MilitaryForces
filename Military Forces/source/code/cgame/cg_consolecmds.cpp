@@ -26,7 +26,7 @@ static char* cycleCvars[] =
 };
 
 
-void CG_TargetCommand_f( void ) {
+void CG_TargetCommand_f( ) {
 	int		targetNum;
 	char	test[4];
 
@@ -45,7 +45,7 @@ void CG_TargetCommand_f( void ) {
 MFQ3 GPS
 ==================
 */
-static void CG_ToggleGps_f( void ) {
+static void CG_ToggleGps_f( ) {
 
 	if( cg.time < cg.GPSTime ) {
 		return;
@@ -54,7 +54,7 @@ static void CG_ToggleGps_f( void ) {
 	cg.GPSTime = cg.time + 500;
 }
 
-static void CG_ToggleRadarRange_f( void ) {
+static void CG_ToggleRadarRange_f( ) {
 
 	if( cg.time < cg.RADARTime ) {
 		return;
@@ -92,7 +92,7 @@ static void CG_Set_MFD_Mode( int num ) {
 		Cvar_Set( "mfd2_defaultpage", va("%d", cg.Mode_MFD[num]) );
 }
 
-static void CG_Set_MFD1_Mode_f( void ) {
+static void CG_Set_MFD1_Mode_f( ) {
 	if( cg.time < cg.MFDTime ) {
 		return;
 	}
@@ -101,7 +101,7 @@ static void CG_Set_MFD1_Mode_f( void ) {
 	cg.MFDTime = cg.time + 100;
 }
 
-static void CG_Set_MFD2_Mode_f( void ) {
+static void CG_Set_MFD2_Mode_f( ) {
 	if( cg.time < cg.MFDTime ) {
 		return;
 	}
@@ -138,7 +138,7 @@ static void CG_Set_MFD_Page( int num ) {
 
 }
 
-static void CG_Set_MFD1_Page_f( void ) {
+static void CG_Set_MFD1_Page_f( ) {
 	if( cg.time < cg.MFDTime ) {
 		return;
 	}
@@ -147,7 +147,7 @@ static void CG_Set_MFD1_Page_f( void ) {
 	cg.MFDTime = cg.time + 100;
 }
 
-static void CG_Set_MFD2_Page_f( void ) {
+static void CG_Set_MFD2_Page_f( ) {
 	if( cg.time < cg.MFDTime ) {
 		return;
 	}
@@ -162,7 +162,7 @@ MFQ3 HUD Color setting
 ==================
 */
 
-static void CG_Update_HUD_Color_f( void )
+static void CG_Update_HUD_Color_f( )
 {
 	// update 
 	cg.HUDColor = CG_Cvar_Get( "hud_color" );
@@ -174,7 +174,7 @@ MFQ3 HUD Color cycling
 ==================
 */
 
-static void CG_Cycle_HUD_Color_f( void ) {
+static void CG_Cycle_HUD_Color_f( ) {
 	if( cg.time < cg.HUDColorTime ) {
 		return;
 	}
@@ -194,7 +194,7 @@ MFQ3 MFD color setting
 ==================
 */
 
-static void CG_Update_MFD_Color_f( void )
+static void CG_Update_MFD_Color_f( )
 {
 	// update 
 	cg.MFDColor = CG_Cvar_Get( "mfd_color" );
@@ -206,7 +206,7 @@ MFQ3 MFD toggling
 ==================
 */
 
-static void CG_Toggle_MFD1_f( void ) {
+static void CG_Toggle_MFD1_f( ) {
 	int mfd1 = hud_mfd.integer;
 
 	mfd1 = mfd1 ? 0 : 1;
@@ -214,7 +214,7 @@ static void CG_Toggle_MFD1_f( void ) {
 	
 }
 
-static void CG_Toggle_MFD2_f( void ) {
+static void CG_Toggle_MFD2_f( ) {
 	int mfd2 = hud_mfd2.integer;
 
 	mfd2 = mfd2 ? 0 : 1;
@@ -229,7 +229,7 @@ MFQ3 MFD color cycling
 ==================
 */
 
-static void CG_Cycle_MFD_Color_f( void ) {
+static void CG_Cycle_MFD_Color_f( ) {
 	if( cg.time < cg.MFDColorTime ) {
 		return;
 	}
@@ -249,7 +249,7 @@ MFQ3 MFD Camera mode cycling
 ==================
 */
 
-static void CG_Cycle_Camera_Mode_f( void ) {
+static void CG_Cycle_Camera_Mode_f( ) {
 	if( cg.time < cg.CameraModeTime ) {
 		return;
 	}
@@ -267,7 +267,7 @@ MFQ3 MFD Camera Mode setting
 ==================
 */
 
-static void CG_Set_Camera_Mode_f( void ) {
+static void CG_Set_Camera_Mode_f( ) {
 
 	if( cg.time < cg.CameraModeTime ) {
 		return;
@@ -291,22 +291,22 @@ MFQ3 MFD camera mode quick action keys
 ==================
 */
 
-static void CG_CamBack_f( void )
+static void CG_CamBack_f( )
 {
 	cg.CameraMode = CAMERA_BACK;
 }
 
-static void CG_CamDown_f( void )
+static void CG_CamDown_f( )
 {
 	cg.CameraMode = CAMERA_DOWN;
 }
 
-static void CG_CamBomb_f( void )
+static void CG_CamBomb_f( )
 {
 	cg.CameraMode = CAMERA_BOMB;
 }
 
-static void CG_CamOld_f( void )
+static void CG_CamOld_f( )
 {
 	cg.CameraMode = CAMERA_TARGET;
 }
@@ -316,7 +316,7 @@ static void CG_CamOld_f( void )
 MFQ3 INFO
 ==================
 */
-static void CG_ToggleInfo_f( void ) {
+static void CG_ToggleInfo_f( ) {
 
 	if( cg.time < cg.INFOTime ) {
 		return;
@@ -330,7 +330,7 @@ static void CG_ToggleInfo_f( void ) {
 MFQ3 toggle view between external and cockpit view
 ==================
 */
-static void CG_ToggleView_f( void ) {
+static void CG_ToggleView_f( ) {
 
 	if( cg.time < cg.toggleViewTime ) {
 		return;
@@ -350,7 +350,7 @@ MFQ3 camera
 ==================
 */
 
-static void CG_AdjustReset_f( void ) {
+static void CG_AdjustReset_f( ) {
 	cg.cameraAdjustEnum = CAMADJ_NONE;
 	cg.cameraAdjustAmount = 0;
 }
@@ -362,12 +362,12 @@ static void CG_AdjustReset_f( void ) {
 MFQ3 camera zoom in/out
 ==================
 */
-static void CG_ZoomIn_f( void ) {
+static void CG_ZoomIn_f( ) {
 	cg.cameraAdjustEnum = CAMADJ_INOUT;
 	cg.cameraAdjustAmount = +MOVE_BASIC;
 }
 
-static void CG_ZoomOut_f( void ) {
+static void CG_ZoomOut_f( ) {
 	cg.cameraAdjustEnum = CAMADJ_INOUT;
 	cg.cameraAdjustAmount = -MOVE_BASIC;
 }
@@ -377,12 +377,12 @@ static void CG_ZoomOut_f( void ) {
 MFQ3 camera up/down
 ==================
 */
-static void CG_CameraUp_f( void ) {
+static void CG_CameraUp_f( ) {
 	cg.cameraAdjustEnum = CAMADJ_UPDOWN;
 	cg.cameraAdjustAmount = +MOVE_BASIC;
 }
 
-static void CG_CameraDown_f( void ) {
+static void CG_CameraDown_f( ) {
 	cg.cameraAdjustEnum = CAMADJ_UPDOWN;
 	cg.cameraAdjustAmount = -MOVE_BASIC;
 }
@@ -395,7 +395,7 @@ CG_SizeUp_f
 Keybinding command
 =================
 */
-static void CG_SizeUp_f (void) {
+static void CG_SizeUp_f () {
 	Cvar_Set("cg_viewsize", va("%i",(int)(cg_viewsize.integer+10)));
 }
 
@@ -407,7 +407,7 @@ CG_SizeDown_f
 Keybinding command
 =================
 */
-static void CG_SizeDown_f (void) {
+static void CG_SizeDown_f () {
 	Cvar_Set("cg_viewsize", va("%i",(int)(cg_viewsize.integer-10)));
 }
 
@@ -419,14 +419,14 @@ CG_Viewpos_f
 Debugging command to print the current position
 =============
 */
-static void CG_Viewpos_f (void) {
+static void CG_Viewpos_f () {
 	CG_Printf ("(%i %i %i) : %i\n", (int)cg.refdef.vieworg[0],
 		(int)cg.refdef.vieworg[1], (int)cg.refdef.vieworg[2], 
 		(int)cg.refdefViewAngles[YAW]);
 }
 
 
-static void CG_ScoresDown_f( void ) {
+static void CG_ScoresDown_f( ) {
 
 	if ( cg.scoresRequestTime + 2000 < cg.time ) {
 		// the scores are more than two seconds out of data,
@@ -447,14 +447,14 @@ static void CG_ScoresDown_f( void ) {
 	}
 }
 
-static void CG_ScoresUp_f( void ) {
+static void CG_ScoresUp_f( ) {
 	if ( cg.showScores ) {
 		cg.showScores = false;
 		cg.scoreFadeTime = cg.time;
 	}
 }
 
-static void CG_TellTarget_f( void ) {
+static void CG_TellTarget_f( ) {
 	int		clientNum;
 	char	command[128];
 	char	message[128];
@@ -469,7 +469,7 @@ static void CG_TellTarget_f( void ) {
 	CL_AddReliableCommand( command );
 }
 
-static void CG_TellAttacker_f( void ) {
+static void CG_TellAttacker_f( ) {
 	int		clientNum;
 	char	command[128];
 	char	message[128];
@@ -484,15 +484,15 @@ static void CG_TellAttacker_f( void ) {
 	CL_AddReliableCommand( command );
 }
 
-static void CG_TestPlane_f( void ) {
+static void CG_TestPlane_f( ) {
 	CG_TestVehicle(CAT_PLANE);
 }
 
-static void CG_TestGV_f( void ) {
+static void CG_TestGV_f( ) {
 	CG_TestVehicle(CAT_GROUND);
 }
 
-static void CG_Spawn_GI_f( void ) {
+static void CG_Spawn_GI_f( ) {
 	int idx;
 
 	if( Cmd_Argc() < 2 ) return;
@@ -508,7 +508,7 @@ static void CG_Spawn_GI_f( void ) {
 
 }
 
-static void CG_ExportToScript_f( void ) {
+static void CG_ExportToScript_f( ) {
 	if( Cmd_Argc() < 2 ) 
 	{
 		CG_Printf("Scriptname not specified!");
@@ -519,11 +519,11 @@ static void CG_ExportToScript_f( void ) {
 
 }
 
-static void CG_SetSide_f( void ) {
+static void CG_SetSide_f( ) {
 	ME_SetSide( CG_Argv(1) );
 }
 
-static void CG_ImportScript_f( void ) {
+static void CG_ImportScript_f( ) {
 	if( Cmd_Argc() < 2 )
 	{
 		CG_Printf("Scriptname not specified!");
@@ -540,9 +540,9 @@ Intercepts 'say <var> <values>' commands for development purposes
 =================
 */
 
-bool CG_ExtractDeveloper( void )
+bool CG_ExtractDeveloper( )
 {
-	clientInfo_t * ci = NULL;
+	clientInfo_t * ci = nullptr;
 
 	float value = 0;
 
@@ -608,7 +608,7 @@ bool CG_ExtractDeveloper( void )
 
 typedef struct {
 	char	*cmd;
-	void	(*function)(void);
+	void	(*function)();
 } consoleCommand_t;
 
 static consoleCommand_t	commands[] = {
@@ -679,7 +679,7 @@ The string has been tokenized and can be retrieved with
 Cmd_Argc() / Cmd_Argv()
 =================
 */
-bool CG_ConsoleCommand( void ) {
+bool CG_ConsoleCommand( ) {
 	const char	*cmd;
 	int		i;
 
@@ -716,7 +716,7 @@ Let the client system know about all of our commands
 so it can perform tab completion
 =================
 */
-void CG_InitConsoleCommands( void ) {
+void CG_InitConsoleCommands( ) {
 	int		i;
 
 	for ( i = 0 ; i < sizeof( commands ) / sizeof( commands[0] ) ; i++ ) {

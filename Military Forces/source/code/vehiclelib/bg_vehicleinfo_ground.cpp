@@ -54,7 +54,7 @@ GameObjectInfo_GroundVehicle::setupBoundingBox()
 void
 GameObjectInfo_GroundVehicle::createAllGroundVehicles( GameObjectList& gameObjects )
 {
-	GameObjectInfo_GroundVehicle* veh = 0;
+	GameObjectInfo_GroundVehicle* veh = nullptr;
 
 
 	// --- MODERN --- 
@@ -319,8 +319,8 @@ GameObjectInfo_GroundVehicle::createAllGroundVehicles( GameObjectList& gameObjec
 	Vector4Set( veh->shadowAdjusts_, 0, 0, 0, 0 );	
 	VectorSet( veh->gunoffset_, 5, 0, 8 );		
 	VectorSet( veh->cockpitview_, 0, 0, 14 );	
-	veh->airRadar_ = 0;		
-	veh->groundRadar_ = 0;			
+	veh->airRadar_ = nullptr;		
+	veh->groundRadar_ = nullptr;			
 	veh->minThrottle_ = -5;
 	veh->maxThrottle_ = 10;
 	veh->acceleration_ = 20;
@@ -352,8 +352,8 @@ GameObjectInfo_GroundVehicle::createAllGroundVehicles( GameObjectList& gameObjec
 	Vector4Set( veh->shadowAdjusts_, 0, 0, 0, 0 );	
 	VectorSet( veh->gunoffset_, 5, 0, 8 );		
 	VectorSet( veh->cockpitview_, 0, 0, 14 );	
-	veh->airRadar_ = 0;		
-	veh->groundRadar_ = 0;			
+	veh->airRadar_ = nullptr;		
+	veh->groundRadar_ = nullptr;			
 	veh->minThrottle_ = -5;
 	veh->maxThrottle_ = 10;
 	veh->acceleration_ = 20;
@@ -386,7 +386,7 @@ GameObjectInfo_GroundVehicle::createAllGroundVehicles( GameObjectList& gameObjec
 	VectorSet( veh->gunoffset_, 3, 1, 6 );		
 	VectorSet( veh->cockpitview_, 0, 0, 10 );	
 	veh->airRadar_ = new VehicleRadarInfo(-1, 5000, CAT_PLANE|CAT_HELO);		
-	veh->groundRadar_ = 0;			
+	veh->groundRadar_ = nullptr;			
 	veh->minThrottle_ = 0;
 	veh->maxThrottle_ = 0;
 	veh->acceleration_ = 0;
@@ -419,7 +419,7 @@ GameObjectInfo_GroundVehicle::createAllGroundVehicles( GameObjectList& gameObjec
 	VectorSet( veh->gunoffset_, 3, 1, 6 );		
 	VectorSet( veh->cockpitview_, 0, 0, 10 );	
 	veh->airRadar_ = new VehicleRadarInfo(-1, 5000, CAT_PLANE|CAT_HELO);		
-	veh->groundRadar_ = 0;			
+	veh->groundRadar_ = nullptr;			
 	veh->minThrottle_ = 0;
 	veh->maxThrottle_ = 0;
 	veh->acceleration_ = 0;

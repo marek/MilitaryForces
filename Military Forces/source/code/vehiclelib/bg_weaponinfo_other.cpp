@@ -10,7 +10,7 @@
 void						
 WeaponInfo::createAllOther(WeaponList& weapons)
 {
-	WeaponInfo* wep = 0;
+	WeaponInfo* wep = nullptr;
 
 	// FFAR (19)
 	wep = WeaponInfo::createWeapon();

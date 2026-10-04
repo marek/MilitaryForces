@@ -117,7 +117,7 @@ UI_HashUtils::~UI_HashUtils()
 	menuKeywords_.clear();
 }
 
-UI_Utils* UI_HashUtils::utils_ = 0;
+UI_Utils* UI_HashUtils::utils_ = nullptr;
 
 void
 UI_HashUtils::setUtils( UI_Utils* utils )
@@ -132,7 +132,7 @@ UI_HashUtils::findKeyword( KeywordMap& map, const char* keyword )
 	int key = getKey( keyword );
 	KeywordMapIter it = map.find( key );
 	if( it == map.end() )
-		return 0;
+		return nullptr;
 	return it->second;
 }
 

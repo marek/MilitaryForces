@@ -126,7 +126,7 @@ void GL_TextureMode( const char *string ) {
 R_SumOfUsedImages
 ===============
 */
-int R_SumOfUsedImages( void ) {
+int R_SumOfUsedImages( ) {
 	int	total;
 	int i;
 
@@ -145,7 +145,7 @@ int R_SumOfUsedImages( void ) {
 R_ImageList_f
 ===============
 */
-void R_ImageList_f( void ) {
+void R_ImageList_f( ) {
 	int i;
 	int estTotalSize = 0;
 
@@ -560,8 +560,8 @@ static void Upload32( unsigned *data,
 						  int *pUploadWidth, int *pUploadHeight )
 {
 	int			samples;
-	unsigned	*scaledBuffer = NULL;
-	unsigned	*resampledBuffer = NULL;
+	unsigned	*scaledBuffer = nullptr;
+	unsigned	*resampledBuffer = nullptr;
 	int			scaled_width, scaled_height;
 	int			i, c;
 	byte		*scan;
@@ -822,9 +822,9 @@ done:
 
 	GL_CheckErrors();
 
-	if ( scaledBuffer != 0 )
+	if ( scaledBuffer != nullptr )
 		ri.Hunk_FreeTempMemory( scaledBuffer );
-	if ( resampledBuffer != 0 )
+	if ( resampledBuffer != nullptr )
 		ri.Hunk_FreeTempMemory( resampledBuffer );
 }
 
@@ -949,7 +949,7 @@ void R_LoadImage( const char *name, byte **pic, int *width, int *height )
 	const char *ext;
 	char *altName;
 
-	*pic = NULL;
+	*pic = nullptr;
 	*width = 0;
 	*height = 0;
 
@@ -973,7 +973,7 @@ void R_LoadImage( const char *name, byte **pic, int *width, int *height )
 		// A loader was found
 		if( i < numImageLoaders )
 		{
-			if( *pic == NULL )
+			if( *pic == nullptr )
 			{
 				// Loader failed, most likely because the file isn't there;
 				// try again without the extension
@@ -1031,7 +1031,7 @@ image_t	*R_FindImageFile( const char *name, imgType_t type, imgFlags_t flags )
 	long	hash;
 
 	if (!name) {
-		return NULL;
+		return nullptr;
 	}
 
 	hash = generateHashValue(name);
@@ -1055,8 +1055,8 @@ image_t	*R_FindImageFile( const char *name, imgType_t type, imgFlags_t flags )
 	// load the pic from disk
 	//
 	R_LoadImage( name, &pic, &width, &height );
-	if ( pic == NULL ) {
-		return NULL;
+	if ( pic == nullptr ) {
+		return nullptr;
 	}
 
 	image = R_CreateImage( ( char * ) name, pic, width, height, type, flags, 0 );
@@ -1071,7 +1071,7 @@ R_CreateDlightImage
 ================
 */
 #define	DLIGHT_SIZE	16
-static void R_CreateDlightImage( void ) {
+static void R_CreateDlightImage( ) {
 	int		x,y;
 	byte	data[DLIGHT_SIZE][DLIGHT_SIZE][4];
 	int		b;
@@ -1104,7 +1104,7 @@ static void R_CreateDlightImage( void ) {
 R_InitFogTable
 =================
 */
-void R_InitFogTable( void ) {
+void R_InitFogTable( ) {
 	int		i;
 	float	d;
 	float	exp;
@@ -1160,7 +1160,7 @@ R_CreateFogImage
 */
 #define	FOG_S	256
 #define	FOG_T	32
-static void R_CreateFogImage( void ) {
+static void R_CreateFogImage( ) {
 	int		x,y;
 	byte	*data;
 	float	d;
@@ -1188,7 +1188,7 @@ R_CreateDefaultImage
 ==================
 */
 #define	DEFAULT_SIZE	16
-static void R_CreateDefaultImage( void ) {
+static void R_CreateDefaultImage( ) {
 	int		x;
 	byte	data[DEFAULT_SIZE][DEFAULT_SIZE][4];
 
@@ -1223,7 +1223,7 @@ static void R_CreateDefaultImage( void ) {
 R_CreateBuiltinImages
 ==================
 */
-void R_CreateBuiltinImages( void ) {
+void R_CreateBuiltinImages( ) {
 	int		x,y;
 	byte	data[DEFAULT_SIZE][DEFAULT_SIZE][4];
 
@@ -1262,7 +1262,7 @@ void R_CreateBuiltinImages( void ) {
 R_SetColorMappings
 ===============
 */
-void R_SetColorMappings( void ) {
+void R_SetColorMappings( ) {
 	int		i, j;
 	float	g;
 	int		inf;
@@ -1347,7 +1347,7 @@ void R_SetColorMappings( void ) {
 R_InitImages
 ===============
 */
-void	R_InitImages( void ) {
+void	R_InitImages( ) {
 	Com_Memset(hashTable, 0, sizeof(hashTable));
 	// build brightness translation tables
 	R_SetColorMappings();
@@ -1361,7 +1361,7 @@ void	R_InitImages( void ) {
 R_DeleteTextures
 ===============
 */
-void R_DeleteTextures( void ) {
+void R_DeleteTextures( ) {
 	int		i;
 
 	for ( i=0; i<tr.numImages ; i++ ) {
@@ -1409,11 +1409,11 @@ static char *CommaParse( char **data_p ) {
 
 	// make sure incoming data is valid
 	if ( !data ) {
-		*data_p = NULL;
+		*data_p = nullptr;
 		return com_token;
 	}
 
-	while ( 1 ) {
+	while ( true ) {
 		// skip whitespace
 		while( (c = *data) <= ' ') {
 			if( !c ) {
@@ -1460,7 +1460,7 @@ static char *CommaParse( char **data_p ) {
 	if (c == '\"')
 	{
 		data++;
-		while (1)
+		while (true)
 		{
 			c = *data++;
 			if (c=='\"' || !c)
@@ -1624,7 +1624,7 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 R_InitSkins
 ===============
 */
-void	R_InitSkins( void ) {
+void	R_InitSkins( ) {
 	skin_t		*skin;
 
 	tr.numSkins = 1;
@@ -1654,7 +1654,7 @@ skin_t	*R_GetSkinByHandle( qhandle_t hSkin ) {
 R_SkinList_f
 ===============
 */
-void	R_SkinList_f( void ) {
+void	R_SkinList_f( ) {
 	int			i, j;
 	skin_t		*skin;
 

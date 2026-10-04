@@ -72,8 +72,8 @@ protected:
 													unsigned int selectionType,
 													int turret = -1,
 													bool limitedAngles = false,
-													vec3_t minAngles = 0,
-													vec3_t maxAngles = 0 );
+													vec3_t minAngles = nullptr,
+													vec3_t maxAngles = nullptr );
 
 private:
     // disable
@@ -87,7 +87,7 @@ private:
 struct GameObjectInfo_Vehicle : public GameObjectInfo
 {
 	// setup object
-	virtual bool			setupGameObject();
+	bool			setupGameObject() override;
 
 	// general vehicle (non infantry)
 	vec3_t					gunoffset_;				// guntag
@@ -104,10 +104,10 @@ struct GameObjectInfo_Vehicle : public GameObjectInfo
 protected:
 	// dont allow construction of this
 							GameObjectInfo_Vehicle();
-	virtual					~GameObjectInfo_Vehicle();
+	~GameObjectInfo_Vehicle() override;
 
 	// bounding box
-	virtual bool			setupBoundingBox();
+	bool			setupBoundingBox() override;
 
 	// go through loadouts to make sure they are ok
 	virtual bool			verifyLoadouts();
@@ -125,7 +125,7 @@ private:
 struct GameObjectInfo_GroundVehicle : public GameObjectInfo_Vehicle
 {
 									GameObjectInfo_GroundVehicle();
-	virtual							~GameObjectInfo_GroundVehicle();
+	~GameObjectInfo_GroundVehicle() override;
 
 	// helper to create all of this type
 	static void						createAllGroundVehicles( GameObjectList& gameObjects );
@@ -136,7 +136,7 @@ struct GameObjectInfo_GroundVehicle : public GameObjectInfo_Vehicle
 
 protected:
 	// bounding box
-	virtual bool					setupBoundingBox();
+	bool					setupBoundingBox() override;
 
 private:
     // disable
@@ -156,11 +156,11 @@ struct GameObjectInfo_Aircraft : public GameObjectInfo_Vehicle
 
 protected:
 	// bounding box
-	virtual bool			setupBoundingBox();
+	bool			setupBoundingBox() override;
 
 	// dont allow construction of this
 							GameObjectInfo_Aircraft();
-	virtual					~GameObjectInfo_Aircraft();
+	~GameObjectInfo_Aircraft() override;
 
 private:
     // disable
@@ -172,7 +172,7 @@ private:
 struct GameObjectInfo_Plane : public GameObjectInfo_Aircraft
 {
 							GameObjectInfo_Plane();
-	virtual					~GameObjectInfo_Plane();
+	~GameObjectInfo_Plane() override;
 
 	// helper to create all of this type
 	static void				createAllPlanes( GameObjectList& gameObjects );
@@ -185,7 +185,7 @@ struct GameObjectInfo_Plane : public GameObjectInfo_Aircraft
 
 protected:
 	// bounding box
-	virtual bool			setupBoundingBox();
+	bool			setupBoundingBox() override;
 
 private:
     // disable
@@ -197,14 +197,14 @@ private:
 struct GameObjectInfo_Helicopter : public GameObjectInfo_Aircraft
 {
 							GameObjectInfo_Helicopter();
-	virtual					~GameObjectInfo_Helicopter();
+	~GameObjectInfo_Helicopter() override;
 
 	// helper to create all of this type
 	static void				createAllHelicopters( GameObjectList& gameObjects );
 
 protected:
 	// bounding box
-	virtual bool			setupBoundingBox();
+	bool			setupBoundingBox() override;
 
 private:
     // disable
@@ -216,7 +216,7 @@ private:
 struct GameObjectInfo_Boat : public GameObjectInfo_Vehicle
 {
 							GameObjectInfo_Boat();
-	virtual					~GameObjectInfo_Boat();
+	~GameObjectInfo_Boat() override;
 
 	// helper to create all of this type
 	static void				createAllBoats( GameObjectList& gameObjects );
@@ -234,20 +234,20 @@ private:
 struct GameObjectInfo_Infantry : public GameObjectInfo
 {
 							GameObjectInfo_Infantry();
-	virtual					~GameObjectInfo_Infantry();
+	~GameObjectInfo_Infantry() override;
 
 	// helper to create all of this type
 	static void				createAllInfantry( GameObjectList& gameObjects );
 
 	// setup object
-	virtual bool			setupGameObject();
+	bool			setupGameObject() override;
 
 	// infantry
 	AnimationInfo*			animations_;			// Animation pointer
 
 protected:
 	// bounding box
-	virtual bool			setupBoundingBox();
+	bool			setupBoundingBox() override;
 
 private:
     // disable

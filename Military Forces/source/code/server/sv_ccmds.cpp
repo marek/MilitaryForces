@@ -42,7 +42,7 @@ SV_GetPlayerByHandle
 Returns the player with player id or name from Cmd_Argv(1)
 ==================
 */
-static SV_Client *SV_GetPlayerByHandle( void ) {
+static SV_Client *SV_GetPlayerByHandle( ) {
 	SV_Client	*cl;
 	int			i;
 	char		*s;
@@ -50,12 +50,12 @@ static SV_Client *SV_GetPlayerByHandle( void ) {
 
 	// make sure server is running
 	if ( !com_sv_running->integer ) {
-		return NULL;
+		return nullptr;
 	}
 
 	if ( Cmd_Argc() < 2 ) {
 		Com_Printf( "No player specified.\n" );
-		return NULL;
+		return nullptr;
 	}
 
 	s = Cmd_Argv(1);
@@ -98,7 +98,7 @@ static SV_Client *SV_GetPlayerByHandle( void ) {
 
 	Com_Printf( "Player %s is not on the server\n", s );
 
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -108,7 +108,7 @@ SV_GetPlayerByNum
 Returns the player with idnum from Cmd_Argv(1)
 ==================
 */
-static SV_Client *SV_GetPlayerByNum( void ) {
+static SV_Client *SV_GetPlayerByNum( ) {
 	SV_Client	*cl;
 	int			i;
 	int			idnum;
@@ -116,12 +116,12 @@ static SV_Client *SV_GetPlayerByNum( void ) {
 
 	// make sure server is running
 	if ( !com_sv_running->integer ) {
-		return NULL;
+		return nullptr;
 	}
 
 	if ( Cmd_Argc() < 2 ) {
 		Com_Printf( "No player specified.\n" );
-		return NULL;
+		return nullptr;
 	}
 
 	s = Cmd_Argv(1);
@@ -129,19 +129,19 @@ static SV_Client *SV_GetPlayerByNum( void ) {
 	for (i = 0; s[i]; i++) {
 		if (s[i] < '0' || s[i] > '9') {
 			Com_Printf( "Bad slot number: %s\n", s);
-			return NULL;
+			return nullptr;
 		}
 	}
 	idnum = atoi( s );
 	if ( idnum < 1 || idnum > sv_maxclients->integer ) {
 		Com_Printf( "Bad client slot: %i\n", idnum );
-		return NULL;
+		return nullptr;
 	}
 
 	cl = theSVS.svClients_.at(idnum);
 	if ( !cl || !cl->state_ ) {
 		Com_Printf( "Client %i is not active\n", idnum );
-		return NULL;
+		return nullptr;
 	}
 	return cl;
 }
@@ -171,7 +171,7 @@ static void SV_Map_f()
 	// make sure the level exists before trying to change, so that
 	// a typo at the server console won't end the game
 	Com_sprintf (expanded, sizeof(expanded), "maps/%s.bsp", map);
-	if ( FS_ReadFile (expanded, NULL) == -1 ) 
+	if ( FS_ReadFile (expanded, nullptr) == -1 ) 
 	{
 		Com_Printf ("Can't find map %s\n", expanded);
 		return;
@@ -356,7 +356,7 @@ static void SV_MapRestart_f()
 			// If we don't reset client->lastUsercmd and are restarting during map load,
 			// the client will hang because we'll use the last Usercmd from the previous map,
 			// which is wrong obviously.
-			SV_ClientEnterWorld(client, NULL);
+			SV_ClientEnterWorld(client, nullptr);
 		}
 	}	
 
@@ -376,7 +376,7 @@ SV_Kick_f
 Kick a user off of the server
 ==================
 */
-static void SV_Kick_f( void ) {
+static void SV_Kick_f( ) {
 	SV_Client	*cl;
 	int			i;
 
@@ -441,7 +441,7 @@ SV_KickBots_f
 Kick all bots off of the server
 ==================
 */
-static void SV_KickBots_f( void ) {
+static void SV_KickBots_f( ) {
 	SV_Client	*cl;
 	int			i;
 
@@ -474,7 +474,7 @@ SV_KickAll_f
 Kick all users off of the server
 ==================
 */
-static void SV_KickAll_f( void ) {
+static void SV_KickAll_f( ) {
 	SV_Client *cl;
 	int i;
 
@@ -508,7 +508,7 @@ SV_KickNum_f
 Kick a user off of the server
 ==================
 */
-static void SV_KickNum_f( void ) {
+static void SV_KickNum_f( ) {
 	SV_Client	*cl;
 
 	// make sure server is running
@@ -656,7 +656,7 @@ SV_RehashBans_f
 Load saved bans from file.
 ==================
 */
-static void SV_RehashBans_f(void)
+static void SV_RehashBans_f()
 {
 	int index, filelen;
 	fileHandle_t readfrom;
@@ -738,7 +738,7 @@ SV_WriteBans
 Save bans to file.
 ==================
 */
-static void SV_WriteBans(void)
+static void SV_WriteBans()
 {
 	int index;
 	fileHandle_t writeto;
@@ -1079,7 +1079,7 @@ List all bans and exceptions on console
 ==================
 */
 
-static void SV_ListBans_f(void)
+static void SV_ListBans_f()
 {
 	int index, count;
 	serverBan_t *ban;
@@ -1124,7 +1124,7 @@ Delete all bans and exceptions.
 ==================
 */
 
-static void SV_FlushBans_f(void)
+static void SV_FlushBans_f()
 {
 	// make sure server is running
 	if ( !com_sv_running->integer ) {
@@ -1140,22 +1140,22 @@ static void SV_FlushBans_f(void)
 	Com_Printf("All bans and exceptions have been deleted.\n");
 }
 
-static void SV_BanAddr_f(void)
+static void SV_BanAddr_f()
 {
 	SV_AddBanToList(false);
 }
 
-static void SV_ExceptAddr_f(void)
+static void SV_ExceptAddr_f()
 {
 	SV_AddBanToList(true);
 }
 
-static void SV_BanDel_f(void)
+static void SV_BanDel_f()
 {
 	SV_DelBanFromList(false);
 }
 
-static void SV_ExceptDel_f(void)
+static void SV_ExceptDel_f()
 {
 	SV_DelBanFromList(true);
 }
@@ -1184,7 +1184,7 @@ static int SV_Strlen( const char *str ) {
 SV_Status_f
 ================
 */
-static void SV_Status_f( void ) {
+static void SV_Status_f( ) {
 	int			i, j, l;
 	SV_Client	*cl;
 	playerState_t	*ps;
@@ -1256,7 +1256,7 @@ static void SV_Status_f( void ) {
 SV_ConSay_f
 ==================
 */
-static void SV_ConSay_f(void) {
+static void SV_ConSay_f() {
 	char	*p;
 	char	text[1024];
 
@@ -1281,7 +1281,7 @@ static void SV_ConSay_f(void) {
 	strcat(text, p);
 
 	Com_Printf("%s\n", text);
-	SV_SendServerCommand(NULL, "chat \"%s\"", text);
+	SV_SendServerCommand(nullptr, "chat \"%s\"", text);
 }
 
 /*
@@ -1289,7 +1289,7 @@ static void SV_ConSay_f(void) {
 SV_ConTell_f
 ==================
 */
-static void SV_ConTell_f(void) {
+static void SV_ConTell_f() {
 	char	*p;
 	char	text[1024];
 	SV_Client	*cl;
@@ -1330,7 +1330,7 @@ static void SV_ConTell_f(void) {
 SV_ConSayto_f
 ==================
 */
-static void SV_ConSayto_f(void) {
+static void SV_ConSayto_f() {
 	char		*p;
 	char		text[1024];
 	SV_Client	*cl;
@@ -1357,7 +1357,7 @@ static void SV_ConSayto_f(void) {
 	//with hex strings for player names
 	Com_FieldStringToPlayerName( name, MAX_NAME_LENGTH, rawname );
 
-	saytocl = NULL;
+	saytocl = nullptr;
 	for ( i=1 ; i <= sv_maxclients->integer ; i++ ) {
 		cl = theSVS.svClients_.at(i);
 		if ( !cl )
@@ -1401,7 +1401,7 @@ SV_Heartbeat_f
 Also called by SV_DropClient, SV_DirectConnect, and SV_SpawnServer
 ==================
 */
-void SV_Heartbeat_f( void ) {
+void SV_Heartbeat_f( ) {
 	theSVS.nextHeartbeatTime_ = -9999999;
 }
 
@@ -1413,7 +1413,7 @@ SV_Serverinfo_f
 Examine the serverinfo string
 ===========
 */
-static void SV_Serverinfo_f( void ) {
+static void SV_Serverinfo_f( ) {
 	// make sure server is running
 	if ( !com_sv_running->integer ) {
 		Com_Printf( "Server is not running.\n" );
@@ -1432,7 +1432,7 @@ SV_Systeminfo_f
 Examine the systeminfo string
 ===========
 */
-static void SV_Systeminfo_f( void ) {
+static void SV_Systeminfo_f( ) {
 	// make sure server is running
 	if ( !com_sv_running->integer ) {
 		Com_Printf( "Server is not running.\n" );
@@ -1451,7 +1451,7 @@ SV_DumpUser_f
 Examine all a users info strings
 ===========
 */
-static void SV_DumpUser_f( void ) {
+static void SV_DumpUser_f( ) {
 	SV_Client	*cl;
 
 	// make sure server is running
@@ -1481,7 +1481,7 @@ static void SV_DumpUser_f( void ) {
 SV_KillServer
 =================
 */
-static void SV_KillServer_f( void ) {
+static void SV_KillServer_f( ) {
 	SV_Shutdown( "killserver" );
 }
 
@@ -1494,7 +1494,7 @@ SV_CompleteMapName
 */
 static void SV_CompleteMapName( char *args, int argNum ) {
 	if( argNum == 2 ) {
-		Field_CompleteFilename( "maps", "bsp", NULL, true, false );
+		Field_CompleteFilename( "maps", "bsp", nullptr, true, false );
 	}
 }
 
@@ -1543,7 +1543,7 @@ static void SV_CompletePlayerName( char *args, int argNum ) {
 SV_AddOperatorCommands
 ==================
 */
-void SV_AddOperatorCommands( void ) {
+void SV_AddOperatorCommands( ) {
 	static bool	initialized;
 
 	if ( initialized ) {
@@ -1602,7 +1602,7 @@ void SV_AddOperatorCommands( void ) {
 SV_RemoveOperatorCommands
 ==================
 */
-void SV_RemoveOperatorCommands( void ) {
+void SV_RemoveOperatorCommands( ) {
 #if 0
 	// removing these won't let the server start again
 	Cmd_RemoveCommand ("heartbeat");

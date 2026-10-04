@@ -64,15 +64,15 @@ typedef struct
 	wchar_t description[2048];
 } LinkedMem;
 
-static LinkedMem *lm = NULL;
+static LinkedMem *lm = nullptr;
 
 #ifdef WIN32
 static HANDLE hMapObject = NULL;
 #else
-static int32_t GetTickCount(void)
+static int32_t GetTickCount()
 {
 	struct timeval tv;
-	gettimeofday(&tv,NULL);
+	gettimeofday(&tv,nullptr);
 
 	return tv.tv_usec / 1000 + tv.tv_sec * 1000;
 }
@@ -106,9 +106,9 @@ int mumble_link(const char* name)
 		return -1;
 	}
 
-	lm = (LinkedMem *) (mmap(NULL, sizeof(LinkedMem), PROT_READ | PROT_WRITE, MAP_SHARED, shmfd,0));
+	lm = (LinkedMem *) (mmap(nullptr, sizeof(LinkedMem), PROT_READ | PROT_WRITE, MAP_SHARED, shmfd,0));
 	if (lm == (void *) (-1)) {
-		lm = NULL;
+		lm = nullptr;
 		close(shmfd);
 		return -1;
 	}
@@ -168,7 +168,7 @@ void mumble_set_description(const char* description)
 	mbstowcs(lm->description, description, len);
 }
 
-void mumble_unlink(void)
+void mumble_unlink()
 {
 	if(!lm)
 		return;
@@ -179,10 +179,10 @@ void mumble_unlink(void)
 #else
 	munmap(lm, sizeof(LinkedMem));
 #endif
-	lm = NULL;
+	lm = nullptr;
 }
 
-int mumble_islinked(void)
+int mumble_islinked()
 {
-	return lm != NULL;
+	return lm != nullptr;
 }

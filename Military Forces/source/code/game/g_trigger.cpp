@@ -22,7 +22,7 @@ void InitTrigger( GameEntity *self )
 // the wait time has passed, so set back up for another activation
 struct Think_MultiWait : public GameEntity::EntityFunc_Think
 {
-	virtual void execute() 
+	void execute() override 
 	{
 		self_->nextthink_ = 0;
 	}
@@ -62,7 +62,7 @@ void multi_trigger( GameEntity *ent, GameEntity *activator )
 	{
 		// we can't just remove (self) here, because this is a touch function
 		// called while looping through area links...
-		ent->setTouch(0);
+		ent->setTouch(nullptr);
 		ent->nextthink_ = theLevel.time_ + FRAMETIME;
 		ent->setThink(new GameEntity::EntityFunc_Free);
 	}
@@ -70,7 +70,7 @@ void multi_trigger( GameEntity *ent, GameEntity *activator )
 
 struct Use_MultiUse : public GameEntity::EntityFunc_Use
 {
-	virtual void execute( GameEntity *other, GameEntity *activator ) 
+	void execute( GameEntity *other, GameEntity *activator ) override 
 	{
 		multi_trigger( self_, activator );
 	}
@@ -78,7 +78,7 @@ struct Use_MultiUse : public GameEntity::EntityFunc_Use
 
 struct Touch_MultiTouch : public GameEntity::EntityFunc_Touch
 {
-	virtual void execute( GameEntity *other, trace_t *trace ) 
+	void execute( GameEntity *other, trace_t *trace ) override 
 	{
 		if( !other->client_ ) 
 			return;
@@ -124,7 +124,7 @@ trigger_always
 
 struct Think_TriggerAlwaysThink : public GameEntity::EntityFunc_Think
 {
-	virtual void execute() 
+	void execute() override 
 	{
 		G_UseTargets(self_, self_);
 		self_->freeUp();
@@ -164,7 +164,7 @@ so, the basic time between firing is a random time between
 */
 struct Think_FuncTimer : public GameEntity::EntityFunc_Think
 {
-	virtual void execute()
+	void execute() override
 	{
 		G_UseTargets (self_, self_->activator_);
 		// set time before next firing
@@ -174,7 +174,7 @@ struct Think_FuncTimer : public GameEntity::EntityFunc_Think
 
 struct Use_FuncTimer : public GameEntity::EntityFunc_Use
 {
-	virtual void execute( GameEntity *other, GameEntity *activator ) 
+	void execute( GameEntity *other, GameEntity *activator ) override 
 	{
 		self_->activator_ = activator;
 

@@ -53,13 +53,13 @@ void PM_AddTouchEnt( int entityNum );
 void PM_AddEvent( int newEvent );
 
 // MFQ3
-void PM_PlaneMove( void );
-void PM_PlaneMoveAdvanced( void );
+void PM_PlaneMove( );
+void PM_PlaneMoveAdvanced( );
 void PM_Toggle_Bay();
-void PM_GroundVehicleMove( void );
-void PM_HeloMove( void );
-void PM_LQMMove( void );
-void PM_BoatMove( void );
+void PM_GroundVehicleMove( );
+void PM_HeloMove( );
+void PM_LQMMove( );
+void PM_BoatMove( );
 
 bool	PM_SlideMove( bool gravity );
 void		PM_StepSlideMove( bool gravity );

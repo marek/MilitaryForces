@@ -33,7 +33,7 @@ short*   snd_out;
 
 #if defined(__GNUC__) || !id386
 
-void S_WriteLinearBlastStereo16 (void)
+void S_WriteLinearBlastStereo16 ()
 {
 	int		i;
 	int		val;
@@ -478,7 +478,7 @@ void S_PaintChannelFromMuLaw( channel_t *ch, sfx_t *sc, int count, int sampleOff
 			samp[i].left += (data * leftvol)>>8;
 			samp[i].right += (data * rightvol)>>8;
 			samples++;
-			if (chunk != NULL && samples == (byte *)chunk->sndChunk+(SND_CHUNK_SIZE*2)) {
+			if (chunk != nullptr && samples == (byte *)chunk->sndChunk+(SND_CHUNK_SIZE*2)) {
 				chunk = chunk->next;
 				samples = (byte *)chunk->sndChunk;
 			}
@@ -556,7 +556,7 @@ void S_PaintChannels( int endtime ) {
 			ltime = s_paintedtime;
 			sc = ch->thesfx;
 
-			if (sc->soundData==NULL || sc->soundLength==0) {
+			if (sc->soundData==nullptr || sc->soundLength==0) {
 				continue;
 			}
 
@@ -589,7 +589,7 @@ void S_PaintChannels( int endtime ) {
 			ltime = s_paintedtime;
 			sc = ch->thesfx;
 
-			if (sc->soundData==NULL || sc->soundLength==0) {
+			if (sc->soundData==nullptr || sc->soundLength==0) {
 				continue;
 			}
 			// we might have to make two passes if it

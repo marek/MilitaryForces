@@ -3654,12 +3654,12 @@ const char *gameset_items[MF_MAX_GAMESETS+1] =
 	"Modern",
 	"World War II",
 	"World War I",
-	0,
-	0,
-	0,
-	0,
-	0,
-	0
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr
 };
 
 const char *gameset_codes[MF_MAX_GAMESETS+1] =
@@ -3667,12 +3667,12 @@ const char *gameset_codes[MF_MAX_GAMESETS+1] =
 	"modern",
 	"ww2",
 	"ww1",
-	0,
-	0,
-	0,
-	0,
-	0,
-	0
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr
 };
 
 const char *team_items[MF_MAX_GAMESETS][MF_MAX_TEAMS+1] =
@@ -3681,104 +3681,104 @@ const char *team_items[MF_MAX_GAMESETS][MF_MAX_TEAMS+1] =
 	{
 		"NATO",
 		"Rebels",
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr
 	},
 
 	// world war 2
 	{
 		"U.S.Air Force",
 		"Royal Air Force",
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr
 	},
 
 	// world war 1
 	{
 		"Germany",
 		"England",
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr
 	},
 
 	// free
 	{
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr
 	},
 
 	// free
 	{
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr
 	},
 
 	// free
 	{
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr
 	},
 
 	// free
 	{
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr
 	},
 
 	// free
 	{
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr
 	}
 };
 
@@ -3790,10 +3790,10 @@ const char *cat_fileRef[MF_MAX_CATEGORIES+1] =
 	"Helicopter",	// ok that way, Mark ?
 	"Infantry",
 	"Boat",
-	0,
-	0,
-	0,
-	0
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr
 };
 
 const char *cat_items[MF_MAX_CATEGORIES+1] =
@@ -3805,9 +3805,9 @@ const char *cat_items[MF_MAX_CATEGORIES+1] =
 	"Infantry",
 	"Boats",
 	"Ground Installations",
-	0,
-	0,
-	0
+	nullptr,
+	nullptr,
+	nullptr
 };
 
 const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1] =
@@ -3816,13 +3816,13 @@ const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1] =
 	{
 		"Fighter",
 		"Bomber",
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr
 	},
 
 	// ground vehicles
@@ -3834,8 +3834,8 @@ const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1] =
 		"AAG",
 		"Transport",
 		"Light",
-		0,
-		0
+		nullptr,
+		nullptr
 	},
 
 	// helicopters
@@ -3843,77 +3843,77 @@ const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1] =
 		"Attack",
 		"Recon",
 		"Transport",
-		0,
-		0,
-		0,
-		0,
-		0,
-		0
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr
 	},
 
 	// infantry
 	{
 		"Special Unit",
 		"Infantry",
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr
 	},
 
 	// boats
 	{
 		"Patrol Boat",
 		"Transport Boat",
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr
 	},
 
 	// free
 	{
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr
 	},
 
 	// free
 	{
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr
 	},
 
 	// free
 	{
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr
 	}
 };
 

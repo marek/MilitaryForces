@@ -45,7 +45,7 @@ GameObjectInfo::~GameObjectInfo()
 GameObjectInfo*
 GameObjectInfo::createVehicle(unsigned int category)
 {
-	GameObjectInfo* newVehicle = 0;
+	GameObjectInfo* newVehicle = nullptr;
 
 	switch( category )
 	{
@@ -66,13 +66,13 @@ GameObjectInfo::createVehicle(unsigned int category)
 		break;
 	default:
 		Com_Error(ERR_FATAL, "Invalid vehicle class in createVehicle!");
-		return 0;
+		return nullptr;
 	}
 
 	if( !newVehicle )
 	{
 		Com_Error(ERR_FATAL, "Unable to allocate memory for GameObjectInfo!");
-		return 0;
+		return nullptr;
 	}
 	return newVehicle;
 }

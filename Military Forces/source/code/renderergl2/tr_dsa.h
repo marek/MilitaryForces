@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "../renderercommon/qgl.h"
 
-void GL_BindNullTextures(void);
+void GL_BindNullTextures();
 int GL_BindMultiTexture(GLenum texunit, GLenum target, GLuint texture);
 
 GLvoid APIENTRY GLDSA_BindMultiTextureEXT(GLenum texunit, GLenum target, GLuint texture);
@@ -43,7 +43,7 @@ GLvoid APIENTRY GLDSA_CompressedTextureSubImage2DEXT(GLuint texture, GLenum targ
 
 GLvoid APIENTRY GLDSA_GenerateTextureMipmapEXT(GLuint texture, GLenum target);
 
-void GL_BindNullProgram(void);
+void GL_BindNullProgram();
 int GL_UseProgram(GLuint program);
 
 GLvoid APIENTRY GLDSA_ProgramUniform1iEXT(GLuint program, GLint location, GLint v0);
@@ -60,7 +60,7 @@ GLvoid APIENTRY GLDSA_ProgramUniformMatrix4fvEXT(GLuint program, GLint location,
 	GLsizei count, GLboolean transpose,
 	const GLfloat *value);
 
-void GL_BindNullFramebuffers(void);
+void GL_BindNullFramebuffers();
 void GL_BindFramebuffer(GLenum target, GLuint framebuffer);
 void GL_BindRenderbuffer(GLuint renderbuffer);
 

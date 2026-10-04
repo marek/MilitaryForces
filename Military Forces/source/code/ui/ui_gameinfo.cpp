@@ -33,7 +33,7 @@ int UI_ParseInfos( char *buf, int max, char *infos[] )
 
 	count = 0;
 
-	while ( 1 ) 
+	while ( true ) 
 	{
 		token = COM_Parse( &buf );
 		if ( !token[0] ) 
@@ -52,7 +52,7 @@ int UI_ParseInfos( char *buf, int max, char *infos[] )
 		}
 
 		info[0] = '\0';
-		while ( 1 ) 
+		while ( true ) 
 		{
 			token = COM_ParseExt( &buf, true );
 			if ( !token[0] ) 
@@ -129,7 +129,7 @@ int UI_AlphabeticMapNameQsortCompare( const void * arg1, const void * arg2 )
 UI_LoadArenas
 ===============
 */
-void UI_LoadArenas( void ) {
+void UI_LoadArenas( ) {
 	int			numdirs;
 	vmCvar_t	arenasFile;
 	char		filename[128];

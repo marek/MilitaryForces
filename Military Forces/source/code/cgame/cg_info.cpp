@@ -101,10 +101,10 @@ CG_DrawInformation
 Draw all the status / pacifier stuff during level loading
 ====================
 */
-void CG_DrawInformation( void ) {
-	const char	* s = NULL, * pGameset = NULL;
-	const char	* info = NULL;
-	const char	* sysInfo = NULL;
+void CG_DrawInformation( ) {
+	const char	* s = nullptr, * pGameset = nullptr;
+	const char	* info = nullptr;
+	const char	* sysInfo = nullptr;
 	int			x, y;
 	int			value;
 	qhandle_t	background = 0, loadingshot = 0;
@@ -130,7 +130,7 @@ void CG_DrawInformation( void ) {
 	}
 
 	// full screen render
-	refExport.SetColor( NULL );
+	refExport.SetColor( nullptr );
 	CG_DrawPic( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, background );
 
 	// alpha blend the 1024x256 loading shot (or gameset artwork) over the picture frame

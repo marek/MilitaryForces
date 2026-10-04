@@ -41,36 +41,36 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #endif
 
 // Console
-void CON_Shutdown( void );
-void CON_Init( void );
-char *CON_Input( void );
+void CON_Shutdown( );
+void CON_Init( );
+char *CON_Input( );
 void CON_Print( const char *message );
 
-unsigned int CON_LogSize( void );
+unsigned int CON_LogSize( );
 unsigned int CON_LogWrite( const char *in );
 unsigned int CON_LogRead( char *out, unsigned int outSize );
 
-char *Sys_BinaryPath( void );
+char *Sys_BinaryPath( );
 char *Sys_BinaryPathRelative( const char *relative );
 
 #ifdef __APPLE__
 char *Sys_StripAppBundle( char *pwd );
 #endif
 
-void Sys_GLimpSafeInit( void );
-void Sys_GLimpInit( void );
-void Sys_PlatformInit( void );
-void Sys_PlatformExit( void );
+void Sys_GLimpSafeInit( );
+void Sys_GLimpInit( );
+void Sys_PlatformInit( );
+void Sys_PlatformExit( );
 void Sys_SigHandler( int signal ) Q_NO_RETURN;
 void Sys_ErrorDialog( const char *error );
 void Sys_AnsiColorPrint( const char *msg );
 
-int Sys_PID( void );
+int Sys_PID( );
 bool Sys_PIDIsRunning( int pid );
 
 bool Sys_OpenFolderInPlatformFileManager( const char *path );
 
-bool Sys_SetMaxFileLimit( void );
+bool Sys_SetMaxFileLimit( );
 
 #ifdef PROTOCOL_HANDLER
 char *Sys_ParseProtocolUri( const char *uri );

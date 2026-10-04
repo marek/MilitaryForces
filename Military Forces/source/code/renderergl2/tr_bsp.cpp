@@ -292,10 +292,10 @@ static	void R_LoadLightmaps( lump_t *l, lump_t *surfs ) {
 
 		for (i = 0; i < tr.numLightmaps; i++)
 		{
-			tr.lightmaps[i] = R_CreateImage(va("_fatlightmap%d", i), NULL, width, height, IMGTYPE_COLORALPHA, imgFlags, textureInternalFormat);
+			tr.lightmaps[i] = R_CreateImage(va("_fatlightmap%d", i), nullptr, width, height, IMGTYPE_COLORALPHA, imgFlags, textureInternalFormat);
 
 			if (tr.worldDeluxeMapping)
-				tr.deluxemaps[i] = R_CreateImage(va("_fatdeluxemap%d", i), NULL, width, height, IMGTYPE_DELUXE, imgFlags, 0);
+				tr.deluxemaps[i] = R_CreateImage(va("_fatdeluxemap%d", i), nullptr, width, height, IMGTYPE_DELUXE, imgFlags, 0);
 		}
 	}
 
@@ -317,7 +317,7 @@ static	void R_LoadLightmaps( lump_t *l, lump_t *surfs ) {
 		// if (tr.worldLightmapping)
 		{
 			char filename[MAX_QPATH];
-			byte *hdrLightmap = NULL;
+			byte *hdrLightmap = nullptr;
 			int size = 0;
 
 			// look for hdr lightmaps
@@ -732,7 +732,7 @@ static void ParseFace( dsurface_t *ds, drawVert_t *verts, float *hdrVertColors, 
 	ClearBounds(surf->cullinfo.bounds[0], surf->cullinfo.bounds[1]);
 	verts += LittleLong(ds->firstVert);
 	for(i = 0; i < numVerts; i++)
-		LoadDrawVertToSrfVert(&cv->verts[i], &verts[i], realLightmapNum, hdrVertColors ? hdrVertColors + (ds->firstVert + i) * 3 : NULL, surf->cullinfo.bounds);
+		LoadDrawVertToSrfVert(&cv->verts[i], &verts[i], realLightmapNum, hdrVertColors ? hdrVertColors + (ds->firstVert + i) * 3 : nullptr, surf->cullinfo.bounds);
 
 	// copy triangles
 	badTriangles = 0;
@@ -831,7 +831,7 @@ static void ParseMesh ( dsurface_t *ds, drawVert_t *verts, float *hdrVertColors,
 	verts += LittleLong( ds->firstVert );
 	numPoints = width * height;
 	for(i = 0; i < numPoints; i++)
-		LoadDrawVertToSrfVert(&points[i], &verts[i], realLightmapNum, hdrVertColors ? hdrVertColors + (ds->firstVert + i) * 3 : NULL, NULL);
+		LoadDrawVertToSrfVert(&points[i], &verts[i], realLightmapNum, hdrVertColors ? hdrVertColors + (ds->firstVert + i) * 3 : nullptr, nullptr);
 
 	// pre-tesseleate
 	R_SubdividePatchToGrid( grid, width, height, points );
@@ -895,7 +895,7 @@ static void ParseTriSurf( dsurface_t *ds, drawVert_t *verts, float *hdrVertColor
 	ClearBounds(surf->cullinfo.bounds[0], surf->cullinfo.bounds[1]);
 	verts += LittleLong(ds->firstVert);
 	for(i = 0; i < numVerts; i++)
-		LoadDrawVertToSrfVert(&cv->verts[i], &verts[i], -1, hdrVertColors ? hdrVertColors + (ds->firstVert + i) * 3 : NULL, surf->cullinfo.bounds);
+		LoadDrawVertToSrfVert(&cv->verts[i], &verts[i], -1, hdrVertColors ? hdrVertColors + (ds->firstVert + i) * 3 : nullptr, surf->cullinfo.bounds);
 
 	// copy triangles
 	badTriangles = 0;
@@ -1137,7 +1137,7 @@ This function assumes that all patches in one group are nicely stitched together
 If this is not the case this function will still do its job but won't fix the highest LoD cracks.
 =================
 */
-void R_FixSharedVertexLodError( void ) {
+void R_FixSharedVertexLodError( ) {
 	int i;
 	srfBspSurface_t *grid1;
 
@@ -1609,7 +1609,7 @@ int R_TryStitchingPatch( int grid1num ) {
 R_StitchAllPatches
 ===============
 */
-void R_StitchAllPatches( void ) {
+void R_StitchAllPatches( ) {
 	int i, stitched, numstitches;
 	srfBspSurface_t *grid1;
 
@@ -1642,7 +1642,7 @@ void R_StitchAllPatches( void ) {
 R_MovePatchSurfacesToHunk
 ===============
 */
-void R_MovePatchSurfacesToHunk(void) {
+void R_MovePatchSurfacesToHunk() {
 	int i;
 	srfBspSurface_t *grid;
 
@@ -1691,7 +1691,7 @@ static	void R_LoadSurfaces( lump_t *surfs, lump_t *verts, lump_t *indexLump ) {
 	int			count;
 	int			numFaces, numMeshes, numTriSurfs, numFlares;
 	int			i;
-	float *hdrVertColors = NULL;
+	float *hdrVertColors = nullptr;
 
 	numFaces = 0;
 	numMeshes = 0;
@@ -1831,8 +1831,8 @@ static	void R_LoadSubmodels( lump_t *l ) {
 
 		model = R_AllocModel();
 
-		assert( model != NULL );			// this should never happen
-		if ( model == NULL ) {
+		assert( model != nullptr );			// this should never happen
+		if ( model == nullptr ) {
 			ri.Error(ERR_DROP, "R_LoadSubmodels: R_AllocModel() failed");
 		}
 
@@ -1946,7 +1946,7 @@ static	void R_LoadNodesAndLeafs (lump_t *nodeLump, lump_t *leafLump) {
 	}	
 
 	// chain descendants
-	R_SetParent (s_worldData.nodes, NULL);
+	R_SetParent (s_worldData.nodes, nullptr);
 }
 
 //=============================================================================
@@ -2189,7 +2189,7 @@ void R_LoadLightGrid( lump_t *l ) {
 
 	if ( l->filelen != numGridPoints * 8 ) {
 		ri.Printf( PRINT_WARNING, "WARNING: light grid mismatch\n" );
-		w->lightGridData = NULL;
+		w->lightGridData = nullptr;
 		return;
 	}
 
@@ -2244,7 +2244,7 @@ void R_LoadLightGrid( lump_t *l ) {
 				ColorToRGB16(c, &w->lightGrid16[i * 6 + 3]);
 			}
 		}
-		else if (0)
+		else if (false)
 		{
 			// promote 8-bit lightgrid to 16-bit
 			w->lightGrid16 = (uint16_t *)ri.Hunk_Alloc(sizeof(w->lightGrid16) * 6 * numGridPoints, h_low);
@@ -2294,7 +2294,7 @@ void R_LoadEntities( lump_t *l ) {
 	}
 
 	// only parse the world spawn
-	while ( 1 ) {	
+	while ( true ) {	
 		// parse key
 		token = COM_ParseExt( &p, true );
 
@@ -2393,7 +2393,7 @@ bool R_ParseSpawnVars( char *spawnVarChars, int maxSpawnVarChars, int *numSpawnV
 	}
 
 	// go through all the key / value pairs
-	while ( 1 ) {	
+	while ( true ) {	
 		int keyLength, tokenLength;
 
 		// parse key
@@ -2487,7 +2487,7 @@ void R_LoadEnvironmentJson(const char *baseName)
 		return;
 	}
 
-	tr.numCubemaps = JSON_ArrayGetIndex(cubemapArrayJson, bufferEnd, NULL, 0);
+	tr.numCubemaps = JSON_ArrayGetIndex(cubemapArrayJson, bufferEnd, nullptr, 0);
 	tr.cubemaps = (cubemap_t *)ri.Hunk_Alloc(tr.numCubemaps * sizeof(*tr.cubemaps), h_low);
 	memset(tr.cubemaps, 0, tr.numCubemaps * sizeof(*tr.cubemaps));
 
@@ -2585,7 +2585,7 @@ void R_LoadCubemapEntities(char *cubemapEntityName)
 	}
 }
 
-void R_AssignCubemapsToWorldSurfaces(void)
+void R_AssignCubemapsToWorldSurfaces()
 {
 	world_t	*w;
 	int i;
@@ -2619,7 +2619,7 @@ void R_AssignCubemapsToWorldSurfaces(void)
 }
 
 
-void R_LoadCubemaps(void)
+void R_LoadCubemaps()
 {
 	int i;
 	imgFlags_t flags = IMGFLAG_CLAMPTOEDGE | IMGFLAG_MIPMAP | IMGFLAG_NOLIGHTSCALE | IMGFLAG_CUBEMAP;
@@ -2636,7 +2636,7 @@ void R_LoadCubemaps(void)
 }
 
 
-void R_RenderMissingCubemaps(void)
+void R_RenderMissingCubemaps()
 {
 	int i, j;
 	imgFlags_t flags = IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE | IMGFLAG_MIPMAP | IMGFLAG_NOLIGHTSCALE | IMGFLAG_CUBEMAP;
@@ -2645,7 +2645,7 @@ void R_RenderMissingCubemaps(void)
 	{
 		if (!tr.cubemaps[i].image)
 		{
-			tr.cubemaps[i].image = R_CreateImage(va("*cubeMap%d", i), NULL, r_cubemapSize->integer, r_cubemapSize->integer, IMGTYPE_COLORALPHA, flags, GL_RGBA8);
+			tr.cubemaps[i].image = R_CreateImage(va("*cubeMap%d", i), nullptr, r_cubemapSize->integer, r_cubemapSize->integer, IMGTYPE_COLORALPHA, flags, GL_RGBA8);
 
 			for (j = 0; j < 6; j++)
 			{
@@ -2659,7 +2659,7 @@ void R_RenderMissingCubemaps(void)
 }
 
 
-void R_CalcVertexLightDirs( void )
+void R_CalcVertexLightDirs( )
 {
 	int i, k;
 	msurface_t *surface;
@@ -2745,7 +2745,7 @@ void RE_LoadWorldMap( const char *name ) {
 
 	// clear tr.world so if the level fails to load, the next
 	// try will not look at the partially loaded version
-	tr.world = NULL;
+	tr.world = nullptr;
 
 	Com_Memset( &s_worldData, 0, sizeof( s_worldData ) );
 	Q_strncpyz( s_worldData.name, name, sizeof( s_worldData.name ) );
@@ -2787,7 +2787,7 @@ void RE_LoadWorldMap( const char *name ) {
 	R_CalcVertexLightDirs();
 
 	// determine which parts of the map are in sunlight
-	if (0)
+	if (false)
 	{
 		world_t	*w;
 		uint8_t *primaryLightGrid, *data;
@@ -2840,7 +2840,7 @@ void RE_LoadWorldMap( const char *name ) {
 			}
 		}
 
-		if (0)
+		if (false)
 		{
 			int k;
 			byte *buf = (byte *)ri.Malloc(w->lightGridBounds[0] * w->lightGridBounds[1] * 3 + 18);

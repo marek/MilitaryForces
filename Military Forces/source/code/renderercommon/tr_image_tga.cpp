@@ -53,7 +53,7 @@ void R_LoadTGA ( const char *name, byte **pic, int *width, int *height)
 	byte		*targa_rgba;
 	int length;
 
-	*pic = NULL;
+	*pic = nullptr;
 
 	if(width)
 		*width = 0;

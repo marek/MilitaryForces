@@ -11,7 +11,7 @@ struct Entity_GroundVehicle : public VehicleBase
 {
 	struct Entity_GroundVehicle_Pain : public EntityFunc_Pain
 	{
-		virtual void	execute( GameEntity* attacker, int damage );
+		void	execute( GameEntity* attacker, int damage ) override;
 	};
 };
 

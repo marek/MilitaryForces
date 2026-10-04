@@ -448,7 +448,7 @@ static void R_RecursiveWorldNode( mnode_t *node, unsigned int planeBits, uint64_
 		// tail recurse
 		node = node->children[1];
 		dlightBits = newDlights[1];
-	} while ( 1 );
+	} while ( true );
 
 	{
 		// leaf node, so add mark surfaces
@@ -508,7 +508,7 @@ static mnode_t *R_PointInLeaf( const vec3_t p ) {
 	}
 
 	node = tr.world->nodes;
-	while( 1 ) {
+	while( true ) {
 		if (node->contents != -1) {
 			break;
 		}
@@ -564,7 +564,7 @@ Mark the leaves and nodes that are in the PVS for the current
 cluster
 ===============
 */
-static void R_MarkLeaves (void) {
+static void R_MarkLeaves () {
 	const byte	*vis;
 	mnode_t	*leaf, *parent;
 	int		i;
@@ -642,7 +642,7 @@ static void R_MarkLeaves (void) {
 R_AddWorldSurfaces
 =============
 */
-void R_AddWorldSurfaces (void) {
+void R_AddWorldSurfaces () {
 	if ( !r_drawworld->integer ) {
 		return;
 	}

@@ -449,8 +449,8 @@ static int GLSL_LoadGPUShaderText(const char *name, const char *fallback,
 	GLenum shaderType, char *dest, int destSize)
 {
 	char            filename[MAX_QPATH];
-	GLchar      *buffer = NULL;
-	const GLchar *shaderText = NULL;
+	GLchar      *buffer = nullptr;
+	const GLchar *shaderText = nullptr;
 	int             size;
 	int             result;
 
@@ -467,7 +467,7 @@ static int GLSL_LoadGPUShaderText(const char *name, const char *fallback,
 		size = ri.FS_ReadFile(filename, (void **)&buffer);
 	} else {
 		size = 0;
-		buffer = NULL;
+		buffer = nullptr;
 	}
 
 	if(!buffer)
@@ -534,7 +534,7 @@ static void GLSL_ShowProgramUniforms(GLuint program)
 	// Loop over each of the active uniforms, and set their value
 	for(i = 0; i < count; i++)
 	{
-		qglGetActiveUniform(program, i, sizeof(uniformName), NULL, &size, &type, uniformName);
+		qglGetActiveUniform(program, i, sizeof(uniformName), nullptr, &size, &type, uniformName);
 
 		ri.Printf(PRINT_DEVELOPER, "active uniform: '%s'\n", uniformName);
 	}
@@ -668,7 +668,7 @@ static int GLSL_InitGPUShader(shaderProgram_t * program, const char *name,
 		}
 	}
 
-	result = GLSL_InitGPUShader2(program, name, attribs, vpCode, fragmentShader ? fpCode : NULL);
+	result = GLSL_InitGPUShader2(program, name, attribs, vpCode, fragmentShader ? fpCode : nullptr);
 
 	return result;
 }
@@ -957,7 +957,7 @@ void GLSL_DeleteGPUShader(shaderProgram_t *program)
 	}
 }
 
-void GLSL_InitGPUShaders(void)
+void GLSL_InitGPUShaders()
 {
 	int             startTime, endTime;
 	int i;
@@ -1553,7 +1553,7 @@ void GLSL_InitGPUShaders(void)
 		numEtcShaders, (endTime - startTime) / 1000.0);
 }
 
-void GLSL_ShutdownGPUShaders(void)
+void GLSL_ShutdownGPUShaders()
 {
 	int i;
 

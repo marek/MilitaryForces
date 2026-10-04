@@ -102,8 +102,8 @@ void MSG_WriteDeltaPlayerstate( msg_t *msg, struct playerState_s *from, struct p
 void MSG_ReadDeltaPlayerstate( msg_t *msg, struct playerState_s *from, struct playerState_s *to );
 
 
-void MSG_ReportChangeVectors_f( void );
-void MSG_InitHuffStats( void );
+void MSG_ReportChangeVectors_f( );
+void MSG_InitHuffStats( );
 extern int msg_huffstatsHold;
 
 //============================================================================
@@ -163,11 +163,11 @@ typedef struct {
 	unsigned long	scope_id;	// Needed for IPv6 link-local addresses
 } netadr_t;
 
-void		NET_Init( void );
-void		NET_Shutdown( void );
-void		NET_Restart_f( void );
+void		NET_Init( );
+void		NET_Shutdown( );
+void		NET_Restart_f( );
 void		NET_Config( bool enableNetworking );
-void		NET_FlushPacketQueue(void);
+void		NET_FlushPacketQueue();
 void		NET_SendPacket (netsrc_t sock, int length, const void *data, netadr_t to);
 void		QDECL NET_OutOfBandPrint( netsrc_t net_socket, netadr_t adr, const char *format, ...) Q_PRINTF_FUNC(3, 4);
 void		QDECL NET_OutOfBandData( netsrc_t sock, netadr_t adr, byte *format, int len );
@@ -180,8 +180,8 @@ const char	*NET_AdrToString (netadr_t a);
 const char	*NET_AdrToStringwPort (netadr_t a);
 int		NET_StringToAdr ( const char *s, netadr_t *a, netadrtype_t family);
 bool	NET_GetLoopPacket (netsrc_t sock, netadr_t *net_from, msg_t *net_message);
-void		NET_JoinMulticast6(void);
-void		NET_LeaveMulticast6(void);
+void		NET_JoinMulticast6();
+void		NET_LeaveMulticast6();
 void		NET_Sleep(int msec);
 
 
@@ -335,7 +335,7 @@ files can be execed.
 
 */
 
-void Cbuf_Init (void);
+void Cbuf_Init ();
 // allocates an initial text buffer that will grow as needed
 
 void Cbuf_AddText( const char *text );
@@ -344,7 +344,7 @@ void Cbuf_AddText( const char *text );
 void Cbuf_ExecuteText( int exec_when, const char *text );
 // this can be used in place of either Cbuf_AddText or Cbuf_InsertText
 
-void Cbuf_Execute (void);
+void Cbuf_Execute ();
 // Pulls off \n terminated lines of text from the command buffer and sends
 // them through Cmd_ExecuteString.  Stops when the buffer is empty.
 // Normally called once per frame, but may be explicitly invoked.
@@ -359,9 +359,9 @@ then searches for a command or variable that matches the first token.
 
 */
 
-typedef void (*xcommand_t) (void);
+typedef void (*xcommand_t) ();
 
-void	Cmd_Init (void);
+void	Cmd_Init ();
 
 void	Cmd_AddCommand( const char *cmd_name, xcommand_t function );
 // called by the init functions of other parts of the program to
@@ -384,14 +384,14 @@ void Cmd_SetCommandCompletionFunc( const char *command,
 void Cmd_CompleteArgument( const char *command, char *args, int argNum );
 void Cmd_CompleteCfgName( char *args, int argNum );
 
-int		Cmd_Argc (void);
+int		Cmd_Argc ();
 char	*Cmd_Argv (int arg);
 void	Cmd_ArgvBuffer( int arg, char *buffer, int bufferLength );
-char	*Cmd_Args (void);
+char	*Cmd_Args ();
 char	*Cmd_ArgsFrom( int arg );
 void	Cmd_ArgsBuffer( char *buffer, int bufferLength );
-char	*Cmd_Cmd (void);
-void	Cmd_Args_Sanitize( void );
+char	*Cmd_Cmd ();
+void	Cmd_Args_Sanitize( );
 // The functions that execute commands get their parameters with these
 // functions. Cmd_Argv () will return an empty string, not a NULL
 // if arg > argc, so string operations are allways safe.
@@ -478,10 +478,10 @@ void	Cvar_CommandCompletion( void(*callback)(const char *s) );
 void 	Cvar_Reset( const char *var_name );
 void 	Cvar_ForceReset(const char *var_name);
 
-void	Cvar_SetCheatState( void );
+void	Cvar_SetCheatState( );
 // reset all testing vars to a safe value
 
-bool Cvar_Command( void );
+bool Cvar_Command( );
 // called by Cmd_ExecuteString when Cmd_Argv(0) doesn't match a known
 // command.  Returns true if the command was a variable reference that
 // was handled. (print or change)
@@ -490,7 +490,7 @@ void 	Cvar_WriteVariables( fileHandle_t f );
 // writes lines containing "set variable value" for all variables
 // with the archive flag set to true.
 
-void	Cvar_Init( void );
+void	Cvar_Init( );
 
 char	*Cvar_InfoString( int bit );
 char	*Cvar_InfoString_Big( int bit );
@@ -501,7 +501,7 @@ void Cvar_CheckRange( cvar_t *cv, float minVal, float maxVal, bool shouldBeInteg
 void Cvar_SetDescription( cvar_t *var, const char *var_description );
 
 void	Cvar_Restart(bool unsetVM);
-void	Cvar_Restart_f( void );
+void	Cvar_Restart_f( );
 
 void Cvar_CompleteCvarName( char *args, int argNum );
 
@@ -539,9 +539,9 @@ issues.
 #	define Q3CONFIG_CFG CONFIG_PREFIX ".cfg"
 #endif
 
-bool FS_Initialized( void );
+bool FS_Initialized( );
 
-void	FS_InitFilesystem ( void );
+void	FS_InitFilesystem ( );
 void	FS_Shutdown( bool closemfp );
 
 bool FS_ConditionalRestart(int checksumFeed, bool disconnect);
@@ -565,7 +565,7 @@ char	*FS_BaseDir_BuildOSPath( const char *base, const char *qpath );
 char	*FS_BuildOSPath( const char *base, const char *game, const char *qpath );
 bool FS_CompareZipChecksum(const char *zipfile);
 
-int		FS_LoadStack( void );
+int		FS_LoadStack( );
 
 int		FS_GetFileList(  const char *path, const char *extension, char *listbuf, int bufsize );
 int		FS_GetModList(  char *listbuf, int bufsize );
@@ -639,15 +639,15 @@ int		FS_Seek( fileHandle_t f, long offset, int origin );
 
 bool FS_FilenameCompare( const char *s1, const char *s2 );
 
-const char *FS_LoadedPakNames( void );
-const char *FS_LoadedPakChecksums( void );
-const char *FS_LoadedPakPureChecksums( void );
+const char *FS_LoadedPakNames( );
+const char *FS_LoadedPakChecksums( );
+const char *FS_LoadedPakPureChecksums( );
 // Returns a space separated string containing the checksums of all loaded pk3 files.
 // Servers with sv_pure set will get this string and pass it to clients.
 
-const char *FS_ReferencedPakNames( void );
-const char *FS_ReferencedPakChecksums( void );
-const char *FS_ReferencedPakPureChecksums( void );
+const char *FS_ReferencedPakNames( );
+const char *FS_ReferencedPakChecksums( );
+const char *FS_ReferencedPakPureChecksums( );
 // Returns a space separated string containing the checksums of all loaded 
 // AND referenced pk3 files. Servers with sv_pure set will get this string 
 // back from clients for pure validation 
@@ -673,7 +673,7 @@ void FS_Remove_HomeData( const char *homePath );
 void	FS_FilenameCompletion( const char *dir, const char *ext, char *filter,
 		bool stripExt, void(*callback)(const char *s), bool allowNonPureFilesOnDisk );
 
-const char *FS_GetCurrentGameDir(void);
+const char *FS_GetCurrentGameDir();
 bool FS_Which(const char *filename, void *searchPath);
 
 /*
@@ -694,7 +694,7 @@ typedef struct {
 
 void Field_Clear( field_t *edit );
 void Field_AutoComplete( field_t *edit );
-void Field_CompleteKeyname( void );
+void Field_CompleteKeyname( );
 void Field_CompleteFilename( const char *dir, const char *ext,
 		char *filter, bool stripExt,
 		bool allowNonPureFilesOnDisk );
@@ -753,27 +753,27 @@ typedef struct {
 } sysEvent_t;
 
 void		Com_QueueEvent( int time, sysEventType_t type, int value, int value2, int ptrLength, void *ptr );
-int			Com_EventLoop( void );
-sysEvent_t	Com_GetSystemEvent( void );
+int			Com_EventLoop( );
+sysEvent_t	Com_GetSystemEvent( );
 
 char		*CopyString( const char *in );
 void		Info_Print( const char *s );
 
 void		Com_BeginRedirect (char *buffer, int buffersize, void (*flush)(char *));
-void		Com_EndRedirect( void );
+void		Com_EndRedirect( );
 void 		QDECL Com_Printf( const char *fmt, ... ) Q_PRINTF_FUNC(1, 2);
 void 		QDECL Com_DPrintf( const char *fmt, ... ) Q_PRINTF_FUNC(1, 2);
 void 		QDECL Com_Error( int code, const char *fmt, ... ) Q_NO_RETURN Q_PRINTF_FUNC(2, 3);
-void 		Com_Quit_f( void ) Q_NO_RETURN;
+void 		Com_Quit_f( ) Q_NO_RETURN;
 void		Com_GameRestart(int checksumFeed, bool disconnect);
 
-int			Com_Milliseconds( void );	// will be journaled properly
+int			Com_Milliseconds( );	// will be journaled properly
 unsigned	Com_BlockChecksum( const void *buffer, int length );
 char		*Com_MD5File(const char *filename, int length, const char *prefix, int prefix_len);
 int			Com_Filter(char *filter, char *name, int casesensitive);
 int			Com_FilterPath(char *filter, char *name, int casesensitive);
 int			Com_RealTime(qtime_t *qtime);
-bool	Com_SafeMode( void );
+bool	Com_SafeMode( );
 void		Com_RunAndTimeServerPacket(netadr_t *evFrom, msg_t *buf);
 
 bool	Com_IsVoipTarget(uint8_t *voipTargets, int voipTargetsSize, int clientNum);
@@ -884,25 +884,25 @@ void *S_Malloc( int size );			// NOT 0 filled memory only for small allocations
 #endif
 void Z_Free( void *ptr );
 void Z_FreeTags( int tag );
-int Z_AvailableMemory( void );
-void Z_LogHeap( void );
+int Z_AvailableMemory( );
+void Z_LogHeap( );
 
-void Hunk_Clear( void );
-void Hunk_ClearToMark( void );
-void Hunk_SetMark( void );
-bool Hunk_CheckMark( void );
-void Hunk_ClearTempMemory( void );
+void Hunk_Clear( );
+void Hunk_ClearToMark( );
+void Hunk_SetMark( );
+bool Hunk_CheckMark( );
+void Hunk_ClearTempMemory( );
 void *Hunk_AllocateTempMemory( int size );
 void Hunk_FreeTempMemory( void *buf );
-int	Hunk_MemoryRemaining( void );
-void Hunk_Log( void);
+int	Hunk_MemoryRemaining( );
+void Hunk_Log( );
 
-void Com_TouchMemory( void );
+void Com_TouchMemory( );
 
 // commandLine should not include the executable name (argv[0])
 void Com_Init( char *commandLine );
-void Com_Frame( void );
-void Com_Shutdown( void );
+void Com_Frame( );
+void Com_Shutdown( );
 
 
 /*
@@ -916,15 +916,15 @@ CLIENT / SERVER SYSTEMS
 //
 // client interface
 //
-void CL_InitKeyCommands( void );
+void CL_InitKeyCommands( );
 // the keyboard binding interface must be setup before execing
 // config files, but the rest of client startup will happen later
 
-void CL_Init( void );
+void CL_Init( );
 void CL_Disconnect( bool showMainMenu );
 void CL_Shutdown(const char *finalmsg, bool disconnect, bool quit);
 void CL_Frame( int msec );
-bool CL_GameCommand( void );
+bool CL_GameCommand( );
 void CL_KeyEvent (int key, bool down, unsigned time);
 
 void CL_CharEvent( int key );
@@ -938,7 +938,7 @@ void CL_PacketEvent( netadr_t from, msg_t *msg );
 
 void CL_ConsolePrint( char *text );
 
-void CL_MapLoading( void );
+void CL_MapLoading( );
 // do a screen update before starting to load a map
 // when the server is going to load a new map, the entire hunk
 // will be cleared, so the client must shutdown cgame, ui, and
@@ -949,22 +949,22 @@ void	CL_ForwardCommandToServer( const char *string );
 // things like godmode, noclip, etc, are commands directed to the server,
 // so when they are typed in at the console, they will need to be forwarded.
 
-void CL_CDDialog( void );
+void CL_CDDialog( );
 // bring up the "need a cd to play" dialog
 
-void CL_FlushMemory( void );
+void CL_FlushMemory( );
 // dump all memory on an error
 
 void CL_ShutdownAll(bool shutdownRef);
 // shutdown client
 
-void CL_InitRef(void);
+void CL_InitRef();
 // initialize renderer interface
 
 void CL_StartHunkUsers( bool rendererOnly );
 // start all the client stuff using the hunk
 
-void CL_Snd_Shutdown(void);
+void CL_Snd_Shutdown();
 // Restart sound subsystem
 
 void Key_KeynameCompletion( void(*callback)(const char *s) );
@@ -973,7 +973,7 @@ void Key_KeynameCompletion( void(*callback)(const char *s) );
 void Key_WriteBindings( fileHandle_t f );
 // for writing the config files
 
-void S_ClearSoundBuffer( void );
+void S_ClearSoundBuffer( );
 // call before filesystem access
 
 void SCR_DebugGraph (float value);	// FIXME: move logging to common?
@@ -984,27 +984,27 @@ void SCR_DebugGraph (float value);	// FIXME: move logging to common?
 //
 // server interface
 //
-void SV_Init( void );
+void SV_Init( );
 void SV_Shutdown( const char *finalmsg );
 void SV_Frame( int msec );
 void SV_PacketEvent( netadr_t from, msg_t *msg );
-int SV_FrameMsec(void);
-bool SV_GameCommand( void );
-int SV_SendQueuedPackets(void);
+int SV_FrameMsec();
+bool SV_GameCommand( );
+int SV_SendQueuedPackets();
 
 //
 // UI interface
 //
-bool UI_GameCommand( void );
-bool UI_usesUniqueCDKey(void);
+bool UI_GameCommand( );
+bool UI_usesUniqueCDKey();
 
 //
 // input interface
 //
 void IN_Init( void *windowData );
-void IN_Frame( void );
-void IN_Shutdown( void );
-void IN_Restart( void );
+void IN_Frame( );
+void IN_Shutdown( );
+void IN_Restart( );
 
 /*
 ==============================================================
@@ -1016,28 +1016,28 @@ NON-PORTABLE SYSTEM SERVICES
 
 #define MAX_JOYSTICK_AXIS 16
 
-void	Sys_Init (void);
+void	Sys_Init ();
 
 bool Sys_DllExtension( const char *name );
 
-char	*Sys_GetCurrentUser( void );
+char	*Sys_GetCurrentUser( );
 
 void	QDECL Sys_Error( const char *error, ...) Q_NO_RETURN Q_PRINTF_FUNC(1, 2);
-void	Sys_Quit (void) Q_NO_RETURN;
-char	*Sys_GetClipboardData( void );	// note that this isn't journaled...
+void	Sys_Quit () Q_NO_RETURN;
+char	*Sys_GetClipboardData( );	// note that this isn't journaled...
 
 void	Sys_Print( const char *msg );
 
 // Sys_Milliseconds should only be used for profiling purposes,
 // any game related timing information should come from event timestamps
-int		Sys_Milliseconds (void);
+int		Sys_Milliseconds ();
 
 bool Sys_RandomBytes( byte *string, int len );
 
 // the system console is shown when a dedicated server is running
 void	Sys_DisplaySystemConsole( bool show );
 
-cpuFeatures_t Sys_GetProcessorFeatures( void );
+cpuFeatures_t Sys_GetProcessorFeatures( );
 
 void	Sys_SetErrorText( const char *text );
 
@@ -1047,34 +1047,34 @@ bool	Sys_StringToAdr( const char *s, netadr_t *a, netadrtype_t family );
 //Does NOT parse port numbers, only base addresses.
 
 bool	Sys_IsLANAddress (netadr_t adr);
-void		Sys_ShowIP(void);
+void		Sys_ShowIP();
 
 FILE	*Sys_FOpen( const char *ospath, const char *mode );
 bool Sys_Mkdir( const char *path );
 FILE	*Sys_Mkfifo( const char *ospath );
-char	*Sys_Cwd( void );
+char	*Sys_Cwd( );
 void	Sys_SetDefaultInstallPath(const char *path);
-char	*Sys_DefaultInstallPath(void);
-char	*Sys_SteamPath(void);
-char	*Sys_GogPath(void);
-char	*Sys_MicrosoftStorePath(void);
+char	*Sys_DefaultInstallPath();
+char	*Sys_SteamPath();
+char	*Sys_GogPath();
+char	*Sys_MicrosoftStorePath();
 
 #ifdef __APPLE__
-char    *Sys_DefaultAppPath(void);
+char    *Sys_DefaultAppPath();
 #endif
 
-char	*Sys_DefaultHomeConfigPath(void);
-char	*Sys_DefaultHomeDataPath(void);
-char	*Sys_DefaultHomeStatePath(void);
+char	*Sys_DefaultHomeConfigPath();
+char	*Sys_DefaultHomeDataPath();
+char	*Sys_DefaultHomeStatePath();
 const char *Sys_Dirname( char *path );
 const char *Sys_Basename( char *path );
-char *Sys_ConsoleInput(void);
+char *Sys_ConsoleInput();
 
 char **Sys_ListFiles( const char *directory, const char *extension, char *filter, int *numfiles, bool wantsubs );
 void	Sys_FreeFileList( char **list );
 void	Sys_Sleep(int msec);
 
-bool Sys_LowPhysicalMemory( void );
+bool Sys_LowPhysicalMemory( );
 
 void Sys_SetEnv(const char *name, const char *value);
 
@@ -1149,7 +1149,7 @@ void	Huff_putBit( int bit, byte *fout, int *offset);
 int		Huff_getBit( byte *fout, int *offset);
 
 // don't use if you don't know what you're doing.
-int		Huff_getBloc(void);
+int		Huff_getBloc();
 void	Huff_setBloc(int _bloc);
 
 

@@ -157,7 +157,7 @@ SNDDMA_PrintAudiospec
 static void SNDDMA_PrintAudiospec(const char *str, const SDL_AudioSpec *spec)
 {
 	int		i;
-	char	*fmt = NULL;
+	char	*fmt = nullptr;
 
 	Com_Printf("%s:\n", str);
 
@@ -183,7 +183,7 @@ static void SNDDMA_PrintAudiospec(const char *str, const SDL_AudioSpec *spec)
 SNDDMA_Init
 ===============
 */
-bool SNDDMA_Init(void)
+bool SNDDMA_Init()
 {
 	SDL_AudioSpec desired;
 	SDL_AudioSpec obtained;
@@ -243,7 +243,7 @@ bool SNDDMA_Init(void)
 	desired.channels = (int) s_sdlChannels->value;
 	desired.callback = SNDDMA_AudioCallback;
 
-	sdlPlaybackDevice = SDL_OpenAudioDevice(NULL, SDL_FALSE, &desired, &obtained, SDL_AUDIO_ALLOW_ANY_CHANGE);
+	sdlPlaybackDevice = SDL_OpenAudioDevice(nullptr, SDL_FALSE, &desired, &obtained, SDL_AUDIO_ALLOW_ANY_CHANGE);
 	if (sdlPlaybackDevice == 0)
 	{
 		Com_Printf("SDL_OpenAudioDevice() failed: %s\n", SDL_GetError());
@@ -300,7 +300,7 @@ bool SNDDMA_Init(void)
 		spec.format = AUDIO_S16SYS;
 		spec.channels = 1;
 		spec.samples = VOIP_MAX_PACKET_SAMPLES * 4;
-		sdlCaptureDevice = SDL_OpenAudioDevice(NULL, SDL_TRUE, &spec, NULL, 0);
+		sdlCaptureDevice = SDL_OpenAudioDevice(nullptr, SDL_TRUE, &spec, nullptr, 0);
 		Com_Printf( "SDL capture device %s.\n",
 				    (sdlCaptureDevice == 0) ? "failed to open" : "opened");
 	}
@@ -322,7 +322,7 @@ bool SNDDMA_Init(void)
 SNDDMA_GetDMAPos
 ===============
 */
-int SNDDMA_GetDMAPos(void)
+int SNDDMA_GetDMAPos()
 {
 	return dmapos;
 }
@@ -332,7 +332,7 @@ int SNDDMA_GetDMAPos(void)
 SNDDMA_Shutdown
 ===============
 */
-void SNDDMA_Shutdown(void)
+void SNDDMA_Shutdown()
 {
 	if (sdlPlaybackDevice != 0)
 	{
@@ -354,7 +354,7 @@ void SNDDMA_Shutdown(void)
 
 	SDL_QuitSubSystem(SDL_INIT_AUDIO);
 	free(dma.buffer);
-	dma.buffer = NULL;
+	dma.buffer = nullptr;
 	dmapos = dmasize = 0;
 	snd_inited = false;
 	Com_Printf("SDL audio shut down.\n");
@@ -367,7 +367,7 @@ SNDDMA_Submit
 Send sound to device if buffer isn't really the dma buffer
 ===============
 */
-void SNDDMA_Submit(void)
+void SNDDMA_Submit()
 {
 	SDL_UnlockAudioDevice(sdlPlaybackDevice);
 }
@@ -377,14 +377,14 @@ void SNDDMA_Submit(void)
 SNDDMA_BeginPainting
 ===============
 */
-void SNDDMA_BeginPainting (void)
+void SNDDMA_BeginPainting ()
 {
 	SDL_LockAudioDevice(sdlPlaybackDevice);
 }
 
 
 #ifdef USE_VOIP
-void SNDDMA_StartCapture(void)
+void SNDDMA_StartCapture()
 {
 #ifdef USE_SDL_AUDIO_CAPTURE
 	if (sdlCaptureDevice)
@@ -395,7 +395,7 @@ void SNDDMA_StartCapture(void)
 #endif
 }
 
-int SNDDMA_AvailableCaptureSamples(void)
+int SNDDMA_AvailableCaptureSamples()
 {
 #ifdef USE_SDL_AUDIO_CAPTURE
 	// divided by 2 to convert from bytes to (mono16) samples.
@@ -420,7 +420,7 @@ void SNDDMA_Capture(int samples, byte *data)
 	}
 }
 
-void SNDDMA_StopCapture(void)
+void SNDDMA_StopCapture()
 {
 #ifdef USE_SDL_AUDIO_CAPTURE
 	if (sdlCaptureDevice)

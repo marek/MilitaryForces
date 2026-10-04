@@ -11,12 +11,12 @@ struct Entity_Infantry : public VehicleBase
 {
 	struct Entity_Infantry_Touch : public EntityFunc_Touch
 	{
-		virtual void	execute( GameEntity* other, trace_t *trace );
+		void	execute( GameEntity* other, trace_t *trace ) override;
 	};
 
 	struct Entity_Infantry_Pain : public EntityFunc_Pain
 	{
-		virtual void	execute( GameEntity* attacker, int damage );
+		void	execute( GameEntity* attacker, int damage ) override;
 	};
 };
 

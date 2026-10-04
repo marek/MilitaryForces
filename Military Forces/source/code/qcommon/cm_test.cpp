@@ -142,7 +142,7 @@ void CM_BoxLeafnums_r( leafList_t *ll, int nodenum ) {
 	cNode_t		*node;
 	int			s;
 
-	while (1) {
+	while (true) {
 		if (nodenum < 0) {
 			ll->storeLeafs( ll, nodenum );
 			return;
@@ -360,7 +360,7 @@ CM_FloodAreaConnections
 
 ====================
 */
-void	CM_FloodAreaConnections( void ) {
+void	CM_FloodAreaConnections( ) {
 	int		i;
 	cArea_t	*area;
 	int		floodnum;

@@ -3,7 +3,7 @@
 #include "ui_utils.h"
 
 
-UI_Utils* ControlUtils::utils_ = 0;
+UI_Utils* ControlUtils::utils_ = nullptr;
 
 
 ControlUtils::ControlUtils()
@@ -137,7 +137,7 @@ ControlUtils::~ControlUtils()
 	for( size_t i = 0; i < bindings_.size(); ++i )
 	{	
 		delete bindings_[i];
-		bindings_[i] = 0;
+		bindings_[i] = nullptr;
 	}
 	bindings_.clear();
 }

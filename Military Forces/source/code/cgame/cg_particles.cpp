@@ -14,7 +14,7 @@ void CG_EjectParticle(particleWorld_t * w, particleEmitter_t * e)
 
 	memcpy(&w->particles[i], &e->particleTemplate, sizeof(particle_t));
 	
-	if(w->systems[e->parentSytem].cent != NULL)
+	if(w->systems[e->parentSytem].cent != nullptr)
 	{
 		if(e->inheritVelocity == -1)
 		{
@@ -412,7 +412,7 @@ void CG_RenderParticle(particle_t * p)
 													
 	vectoangles( cg.refdef.viewaxis[0], rotate_ang );
 	rotate_ang[ROLL] += p->rotation;
-	AngleVectors ( rotate_ang, NULL, rr, ru);
+	AngleVectors ( rotate_ang, nullptr, rr, ru);
 
 	VectorMA (origin, -p->radius*2, ru, point);	
 	VectorMA (point, -p->radius*2, rr, point);	

@@ -116,7 +116,7 @@ void S_StartBackgroundTrack( const char *intro, const char *loop )
 S_StopBackgroundTrack
 =================
 */
-void S_StopBackgroundTrack( void )
+void S_StopBackgroundTrack( )
 {
 	if( si.StopBackgroundTrack ) {
 		si.StopBackgroundTrack( );
@@ -140,7 +140,7 @@ void S_RawSamples (int stream, int samples, int rate, int width, int channels,
 S_StopAllSounds
 =================
 */
-void S_StopAllSounds( void )
+void S_StopAllSounds( )
 {
 	if( si.StopAllSounds ) {
 		si.StopAllSounds( );
@@ -227,7 +227,7 @@ void S_UpdateEntityPosition( int entityNum, const vec3_t origin )
 S_Update
 =================
 */
-void S_Update( void )
+void S_Update( )
 {
 	if(s_muted->integer)
 	{
@@ -258,7 +258,7 @@ void S_Update( void )
 S_DisableSounds
 =================
 */
-void S_DisableSounds( void )
+void S_DisableSounds( )
 {
 	if( si.DisableSounds ) {
 		si.DisableSounds( );
@@ -270,7 +270,7 @@ void S_DisableSounds( void )
 S_BeginRegistration
 =================
 */
-void S_BeginRegistration( void )
+void S_BeginRegistration( )
 {
 	if( si.BeginRegistration ) {
 		si.BeginRegistration( );
@@ -296,7 +296,7 @@ sfxHandle_t	S_RegisterSound( const char *sample, bool compressed )
 S_ClearSoundBuffer
 =================
 */
-void S_ClearSoundBuffer( void )
+void S_ClearSoundBuffer( )
 {
 	if( si.ClearSoundBuffer ) {
 		si.ClearSoundBuffer( );
@@ -308,7 +308,7 @@ void S_ClearSoundBuffer( void )
 S_SoundInfo
 =================
 */
-void S_SoundInfo( void )
+void S_SoundInfo( )
 {
 	if( si.SoundInfo ) {
 		si.SoundInfo( );
@@ -320,7 +320,7 @@ void S_SoundInfo( void )
 S_SoundList
 =================
 */
-void S_SoundList( void )
+void S_SoundList( )
 {
 	if( si.SoundList ) {
 		si.SoundList( );
@@ -334,7 +334,7 @@ void S_SoundList( void )
 S_StartCapture
 =================
 */
-void S_StartCapture( void )
+void S_StartCapture( )
 {
 	if( si.StartCapture ) {
 		si.StartCapture( );
@@ -346,7 +346,7 @@ void S_StartCapture( void )
 S_AvailableCaptureSamples
 =================
 */
-int S_AvailableCaptureSamples( void )
+int S_AvailableCaptureSamples( )
 {
 	if( si.AvailableCaptureSamples ) {
 		return si.AvailableCaptureSamples( );
@@ -371,7 +371,7 @@ void S_Capture( int samples, byte *data )
 S_StopCapture
 =================
 */
-void S_StopCapture( void )
+void S_StopCapture( )
 {
 	if( si.StopCapture ) {
 		si.StopCapture( );
@@ -398,7 +398,7 @@ void S_MasterGain( float gain )
 S_Play_f
 =================
 */
-void S_Play_f( void ) {
+void S_Play_f( ) {
 	int 		i;
 	int			c;
 	sfxHandle_t	h;
@@ -428,7 +428,7 @@ void S_Play_f( void ) {
 S_Music_f
 =================
 */
-void S_Music_f( void ) {
+void S_Music_f( ) {
 	int		c;
 
 	if( !si.StartBackgroundTrack ) {
@@ -438,7 +438,7 @@ void S_Music_f( void ) {
 	c = Cmd_Argc();
 
 	if ( c == 2 ) {
-		si.StartBackgroundTrack( Cmd_Argv(1), NULL );
+		si.StartBackgroundTrack( Cmd_Argv(1), nullptr );
 	} else if ( c == 3 ) {
 		si.StartBackgroundTrack( Cmd_Argv(1), Cmd_Argv(2) );
 	} else {
@@ -453,7 +453,7 @@ void S_Music_f( void ) {
 S_Music_f
 =================
 */
-void S_StopMusic_f( void )
+void S_StopMusic_f( )
 {
 	if(!si.StopBackgroundTrack)
 		return;
@@ -469,7 +469,7 @@ void S_StopMusic_f( void )
 S_Init
 =================
 */
-void S_Init( void )
+void S_Init( )
 {
 	cvar_t		*cv;
 	bool	started = false;
@@ -530,7 +530,7 @@ void S_Init( void )
 S_Shutdown
 =================
 */
-void S_Shutdown( void )
+void S_Shutdown( )
 {
 	if( si.Shutdown ) {
 		si.Shutdown( );

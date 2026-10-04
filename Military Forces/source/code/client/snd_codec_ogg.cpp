@@ -48,7 +48,7 @@ snd_codec_t ogg_codec =
 	S_OGG_CodecOpenStream,
 	S_OGG_CodecReadStream,
 	S_OGG_CodecCloseStream,
-	NULL
+	nullptr
 };
 
 // callbacks for vobisfile
@@ -241,14 +241,14 @@ snd_stream_t *S_OGG_CodecOpenStream(const char *filename)
 	// check if input is valid
 	if(!filename)
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	// Open the stream
 	stream = S_CodecUtilOpen(filename, &ogg_codec);
 	if(!stream)
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	// alloctate the OggVorbis_File
@@ -257,17 +257,17 @@ snd_stream_t *S_OGG_CodecOpenStream(const char *filename)
 	{
 		S_CodecUtilClose(&stream);
 
-		return NULL;
+		return nullptr;
 	}
 
 	// open the codec with our callbacks and stream as the generic pointer
-	if(ov_open_callbacks(stream, vf, NULL, 0, S_OGG_Callbacks) != 0)
+	if(ov_open_callbacks(stream, vf, nullptr, 0, S_OGG_Callbacks) != 0)
 	{
 		Z_Free(vf);
 
 		S_CodecUtilClose(&stream);
 
-		return NULL;
+		return nullptr;
 	}
 
 	// the stream must be seekable
@@ -279,7 +279,7 @@ snd_stream_t *S_OGG_CodecOpenStream(const char *filename)
 
 		S_CodecUtilClose(&stream);
 
-		return NULL;
+		return nullptr;
 	}
  
 	// we only support OGGs with one substream
@@ -291,7 +291,7 @@ snd_stream_t *S_OGG_CodecOpenStream(const char *filename)
 
 		S_CodecUtilClose(&stream);
 
-		return NULL;  
+		return nullptr;  
 	}
 
 	// get the info about channels and rate
@@ -304,7 +304,7 @@ snd_stream_t *S_OGG_CodecOpenStream(const char *filename)
 
 		S_CodecUtilClose(&stream);
 
-		return NULL;  
+		return nullptr;  
 	}
 
 	// get the number of sample-frames in the OGG
@@ -429,14 +429,14 @@ void *S_OGG_CodecLoad(const char *filename, snd_info_t *info)
 	// check if input is valid
 	if(!(filename && info))
 	{
-		return NULL;
+		return nullptr;
 	}
 	
 	// open the file as a stream
 	stream = S_OGG_CodecOpenStream(filename);
 	if(!stream)
 	{
-		return NULL;
+		return nullptr;
 	}
 	
 	// copy over the info
@@ -454,7 +454,7 @@ void *S_OGG_CodecLoad(const char *filename, snd_info_t *info)
 	{
 		S_OGG_CodecCloseStream(stream);
 	
-		return NULL;	
+		return nullptr;	
 	}
 
 	// fill the buffer
@@ -466,7 +466,7 @@ void *S_OGG_CodecLoad(const char *filename, snd_info_t *info)
 		Hunk_FreeTempMemory(buffer);
 		S_OGG_CodecCloseStream(stream);
 
-		return NULL;	
+		return nullptr;	
 	}
 
 	S_OGG_CodecCloseStream(stream);

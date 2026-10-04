@@ -64,11 +64,11 @@ kbutton_t	in_buttons[16];
 bool	in_mlooking;
 
 
-void IN_MLookDown( void ) {
+void IN_MLookDown( ) {
 	in_mlooking = true;
 }
 
-void IN_MLookUp( void ) {
+void IN_MLookUp( ) {
 	in_mlooking = false;
 	if ( !cl_freelook->integer ) {
 		IN_CenterView ();
@@ -196,80 +196,80 @@ float CL_KeyState( kbutton_t *key ) {
 
 
 
-void IN_UpDown(void) {IN_KeyDown(&in_up);}
-void IN_UpUp(void) {IN_KeyUp(&in_up);}
-void IN_DownDown(void) {IN_KeyDown(&in_down);}
-void IN_DownUp(void) {IN_KeyUp(&in_down);}
-void IN_LeftDown(void) {IN_KeyDown(&in_left);}
-void IN_LeftUp(void) {IN_KeyUp(&in_left);}
-void IN_RightDown(void) {IN_KeyDown(&in_right);}
-void IN_RightUp(void) {IN_KeyUp(&in_right);}
-void IN_ForwardDown(void) {IN_KeyDown(&in_forward);}
-void IN_ForwardUp(void) {IN_KeyUp(&in_forward);}
-void IN_BackDown(void) {IN_KeyDown(&in_back);}
-void IN_BackUp(void) {IN_KeyUp(&in_back);}
-void IN_LookupDown(void) {IN_KeyDown(&in_lookup);}
-void IN_LookupUp(void) {IN_KeyUp(&in_lookup);}
-void IN_LookdownDown(void) {IN_KeyDown(&in_lookdown);}
-void IN_LookdownUp(void) {IN_KeyUp(&in_lookdown);}
-void IN_MoveleftDown(void) {IN_KeyDown(&in_moveleft);}
-void IN_MoveleftUp(void) {IN_KeyUp(&in_moveleft);}
-void IN_MoverightDown(void) {IN_KeyDown(&in_moveright);}
-void IN_MoverightUp(void) {IN_KeyUp(&in_moveright);}
+void IN_UpDown() {IN_KeyDown(&in_up);}
+void IN_UpUp() {IN_KeyUp(&in_up);}
+void IN_DownDown() {IN_KeyDown(&in_down);}
+void IN_DownUp() {IN_KeyUp(&in_down);}
+void IN_LeftDown() {IN_KeyDown(&in_left);}
+void IN_LeftUp() {IN_KeyUp(&in_left);}
+void IN_RightDown() {IN_KeyDown(&in_right);}
+void IN_RightUp() {IN_KeyUp(&in_right);}
+void IN_ForwardDown() {IN_KeyDown(&in_forward);}
+void IN_ForwardUp() {IN_KeyUp(&in_forward);}
+void IN_BackDown() {IN_KeyDown(&in_back);}
+void IN_BackUp() {IN_KeyUp(&in_back);}
+void IN_LookupDown() {IN_KeyDown(&in_lookup);}
+void IN_LookupUp() {IN_KeyUp(&in_lookup);}
+void IN_LookdownDown() {IN_KeyDown(&in_lookdown);}
+void IN_LookdownUp() {IN_KeyUp(&in_lookdown);}
+void IN_MoveleftDown() {IN_KeyDown(&in_moveleft);}
+void IN_MoveleftUp() {IN_KeyUp(&in_moveleft);}
+void IN_MoverightDown() {IN_KeyDown(&in_moveright);}
+void IN_MoverightUp() {IN_KeyUp(&in_moveright);}
 
-void IN_SpeedDown(void) {IN_KeyDown(&in_speed);}
-void IN_SpeedUp(void) {IN_KeyUp(&in_speed);}
-void IN_StrafeDown(void) {IN_KeyDown(&in_strafe);}
-void IN_StrafeUp(void) {IN_KeyUp(&in_strafe);}
+void IN_SpeedDown() {IN_KeyDown(&in_speed);}
+void IN_SpeedUp() {IN_KeyUp(&in_speed);}
+void IN_StrafeDown() {IN_KeyDown(&in_strafe);}
+void IN_StrafeUp() {IN_KeyUp(&in_strafe);}
 
 #ifdef USE_VOIP
-void IN_VoipRecordDown(void)
+void IN_VoipRecordDown()
 {
 	IN_KeyDown(&in_voiprecord);
 	Cvar_Set("cl_voipSend", "1");
 }
 
-void IN_VoipRecordUp(void)
+void IN_VoipRecordUp()
 {
 	IN_KeyUp(&in_voiprecord);
 	Cvar_Set("cl_voipSend", "0");
 }
 #endif
 
-void IN_Button0Down(void) {IN_KeyDown(&in_buttons[0]);}
-void IN_Button0Up(void) {IN_KeyUp(&in_buttons[0]);}
-void IN_Button1Down(void) {IN_KeyDown(&in_buttons[1]);}
-void IN_Button1Up(void) {IN_KeyUp(&in_buttons[1]);}
-void IN_Button2Down(void) {IN_KeyDown(&in_buttons[2]);}
-void IN_Button2Up(void) {IN_KeyUp(&in_buttons[2]);}
-void IN_Button3Down(void) {IN_KeyDown(&in_buttons[3]);}
-void IN_Button3Up(void) {IN_KeyUp(&in_buttons[3]);}
-void IN_Button4Down(void) {IN_KeyDown(&in_buttons[4]);}
-void IN_Button4Up(void) {IN_KeyUp(&in_buttons[4]);}
-void IN_Button5Down(void) {IN_KeyDown(&in_buttons[5]);}
-void IN_Button5Up(void) {IN_KeyUp(&in_buttons[5]);}
-void IN_Button6Down(void) {IN_KeyDown(&in_buttons[6]);}
-void IN_Button6Up(void) {IN_KeyUp(&in_buttons[6]);}
-void IN_Button7Down(void) {IN_KeyDown(&in_buttons[7]);}
-void IN_Button7Up(void) {IN_KeyUp(&in_buttons[7]);}
-void IN_Button8Down(void) {IN_KeyDown(&in_buttons[8]);}
-void IN_Button8Up(void) {IN_KeyUp(&in_buttons[8]);}
-void IN_Button9Down(void) {IN_KeyDown(&in_buttons[9]);}
-void IN_Button9Up(void) {IN_KeyUp(&in_buttons[9]);}
-void IN_Button10Down(void) {IN_KeyDown(&in_buttons[10]);}
-void IN_Button10Up(void) {IN_KeyUp(&in_buttons[10]);}
-void IN_Button11Down(void) {IN_KeyDown(&in_buttons[11]);}
-void IN_Button11Up(void) {IN_KeyUp(&in_buttons[11]);}
-void IN_Button12Down(void) {IN_KeyDown(&in_buttons[12]);}
-void IN_Button12Up(void) {IN_KeyUp(&in_buttons[12]);}
-void IN_Button13Down(void) {IN_KeyDown(&in_buttons[13]);}
-void IN_Button13Up(void) {IN_KeyUp(&in_buttons[13]);}
-void IN_Button14Down(void) {IN_KeyDown(&in_buttons[14]);}
-void IN_Button14Up(void) {IN_KeyUp(&in_buttons[14]);}
-void IN_Button15Down(void) {IN_KeyDown(&in_buttons[15]);}
-void IN_Button15Up(void) {IN_KeyUp(&in_buttons[15]);}
+void IN_Button0Down() {IN_KeyDown(&in_buttons[0]);}
+void IN_Button0Up() {IN_KeyUp(&in_buttons[0]);}
+void IN_Button1Down() {IN_KeyDown(&in_buttons[1]);}
+void IN_Button1Up() {IN_KeyUp(&in_buttons[1]);}
+void IN_Button2Down() {IN_KeyDown(&in_buttons[2]);}
+void IN_Button2Up() {IN_KeyUp(&in_buttons[2]);}
+void IN_Button3Down() {IN_KeyDown(&in_buttons[3]);}
+void IN_Button3Up() {IN_KeyUp(&in_buttons[3]);}
+void IN_Button4Down() {IN_KeyDown(&in_buttons[4]);}
+void IN_Button4Up() {IN_KeyUp(&in_buttons[4]);}
+void IN_Button5Down() {IN_KeyDown(&in_buttons[5]);}
+void IN_Button5Up() {IN_KeyUp(&in_buttons[5]);}
+void IN_Button6Down() {IN_KeyDown(&in_buttons[6]);}
+void IN_Button6Up() {IN_KeyUp(&in_buttons[6]);}
+void IN_Button7Down() {IN_KeyDown(&in_buttons[7]);}
+void IN_Button7Up() {IN_KeyUp(&in_buttons[7]);}
+void IN_Button8Down() {IN_KeyDown(&in_buttons[8]);}
+void IN_Button8Up() {IN_KeyUp(&in_buttons[8]);}
+void IN_Button9Down() {IN_KeyDown(&in_buttons[9]);}
+void IN_Button9Up() {IN_KeyUp(&in_buttons[9]);}
+void IN_Button10Down() {IN_KeyDown(&in_buttons[10]);}
+void IN_Button10Up() {IN_KeyUp(&in_buttons[10]);}
+void IN_Button11Down() {IN_KeyDown(&in_buttons[11]);}
+void IN_Button11Up() {IN_KeyUp(&in_buttons[11]);}
+void IN_Button12Down() {IN_KeyDown(&in_buttons[12]);}
+void IN_Button12Up() {IN_KeyUp(&in_buttons[12]);}
+void IN_Button13Down() {IN_KeyDown(&in_buttons[13]);}
+void IN_Button13Up() {IN_KeyUp(&in_buttons[13]);}
+void IN_Button14Down() {IN_KeyDown(&in_buttons[14]);}
+void IN_Button14Up() {IN_KeyUp(&in_buttons[14]);}
+void IN_Button15Down() {IN_KeyDown(&in_buttons[15]);}
+void IN_Button15Up() {IN_KeyUp(&in_buttons[15]);}
 
-void IN_CenterView (void) {
+void IN_CenterView () {
 	cl.viewangles[PITCH] = -SHORT2ANGLE(cl.snap.ps.delta_angles[PITCH]);
 }
 
@@ -291,7 +291,7 @@ CL_AdjustAngles
 Moves the local angle positions
 ================
 */
-void CL_AdjustAngles( void ) {
+void CL_AdjustAngles( ) {
 	float	speed;
 	
 	if ( in_speed.active ) {
@@ -577,7 +577,7 @@ void CL_FinishMove( usercmd_t *cmd ) {
 CL_CreateCmd
 =================
 */
-usercmd_t CL_CreateCmd( void ) {
+usercmd_t CL_CreateCmd( ) {
 	usercmd_t	cmd;
 	vec3_t		oldAngles;
 
@@ -630,7 +630,7 @@ CL_CreateNewCommands
 Create a new usercmd_t structure for this frame
 =================
 */
-void CL_CreateNewCommands( void ) {
+void CL_CreateNewCommands( ) {
 	int			cmdNum;
 
 	// no need to create usercmds until we have a gamestate
@@ -671,7 +671,7 @@ delivered in the next packet, but saving a header and
 getting more delta compression will reduce total bandwidth.
 =================
 */
-bool CL_ReadyToSendPacket( void ) {
+bool CL_ReadyToSendPacket( ) {
 	int		oldPacketNum;
 	int		delta;
 
@@ -742,7 +742,7 @@ During normal gameplay, a client packet will contain something like:
 
 ===================
 */
-void CL_WritePacket( void ) {
+void CL_WritePacket( ) {
 	msg_t		buf;
 	byte		data[MAX_MSGLEN];
 	int			i, j;
@@ -906,7 +906,7 @@ CL_SendCmd
 Called every frame to builds and sends a command packet to the server.
 =================
 */
-void CL_SendCmd( void ) {
+void CL_SendCmd( ) {
 	// don't send any message if not connected
 	if ( clc.state < CA_CONNECTED ) {
 		return;
@@ -936,7 +936,7 @@ void CL_SendCmd( void ) {
 CL_InitInput
 ============
 */
-void CL_InitInput( void ) {
+void CL_InitInput( ) {
 	Cmd_AddCommand ("centerview",IN_CenterView);
 
 	Cmd_AddCommand ("+moveup",IN_UpDown);
@@ -1012,7 +1012,7 @@ void CL_InitInput( void ) {
 CL_ShutdownInput
 ============
 */
-void CL_ShutdownInput(void)
+void CL_ShutdownInput()
 {
 	Cmd_RemoveCommand("centerview");
 

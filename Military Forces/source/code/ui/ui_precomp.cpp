@@ -12,83 +12,83 @@ void FS_FCloseFile( fileHandle_t f );
 UI_PrecompilerTools::Punctuation UI_PrecompilerTools::default_punctuations[] =
 {
 	//binary operators
-	{">>=",P_RSHIFT_ASSIGN, NULL},
-	{"<<=",P_LSHIFT_ASSIGN, NULL},
+	{">>=",P_RSHIFT_ASSIGN, nullptr},
+	{"<<=",P_LSHIFT_ASSIGN, nullptr},
 	//
-	{"...",P_PARMS, NULL},
+	{"...",P_PARMS, nullptr},
 	//define merge operator
-	{"##",P_PRECOMPMERGE, NULL},
+	{"##",P_PRECOMPMERGE, nullptr},
 	//logic operators
-	{"&&",P_LOGIC_AND, NULL},
-	{"||",P_LOGIC_OR, NULL},
-	{">=",P_LOGIC_GEQ, NULL},
-	{"<=",P_LOGIC_LEQ, NULL},
-	{"==",P_LOGIC_EQ, NULL},
-	{"!=",P_LOGIC_UNEQ, NULL},
+	{"&&",P_LOGIC_AND, nullptr},
+	{"||",P_LOGIC_OR, nullptr},
+	{">=",P_LOGIC_GEQ, nullptr},
+	{"<=",P_LOGIC_LEQ, nullptr},
+	{"==",P_LOGIC_EQ, nullptr},
+	{"!=",P_LOGIC_UNEQ, nullptr},
 	//arithmatic operators
-	{"*=",P_MUL_ASSIGN, NULL},
-	{"/=",P_DIV_ASSIGN, NULL},
-	{"%=",P_MOD_ASSIGN, NULL},
-	{"+=",P_ADD_ASSIGN, NULL},
-	{"-=",P_SUB_ASSIGN, NULL},
-	{"++",P_INC, NULL},
-	{"--",P_DEC, NULL},
+	{"*=",P_MUL_ASSIGN, nullptr},
+	{"/=",P_DIV_ASSIGN, nullptr},
+	{"%=",P_MOD_ASSIGN, nullptr},
+	{"+=",P_ADD_ASSIGN, nullptr},
+	{"-=",P_SUB_ASSIGN, nullptr},
+	{"++",P_INC, nullptr},
+	{"--",P_DEC, nullptr},
 	//binary operators
-	{"&=",P_BIN_AND_ASSIGN, NULL},
-	{"|=",P_BIN_OR_ASSIGN, NULL},
-	{"^=",P_BIN_XOR_ASSIGN, NULL},
-	{">>",P_RSHIFT, NULL},
-	{"<<",P_LSHIFT, NULL},
+	{"&=",P_BIN_AND_ASSIGN, nullptr},
+	{"|=",P_BIN_OR_ASSIGN, nullptr},
+	{"^=",P_BIN_XOR_ASSIGN, nullptr},
+	{">>",P_RSHIFT, nullptr},
+	{"<<",P_LSHIFT, nullptr},
 	//reference operators
-	{"->",P_POINTERREF, NULL},
+	{"->",P_POINTERREF, nullptr},
 	//C++
-	{"::",P_CPP1, NULL},
-	{".*",P_CPP2, NULL},
+	{"::",P_CPP1, nullptr},
+	{".*",P_CPP2, nullptr},
 	//arithmatic operators
-	{"*",P_MUL, NULL},
-	{"/",P_DIV, NULL},
-	{"%",P_MOD, NULL},
-	{"+",P_ADD, NULL},
-	{"-",P_SUB, NULL},
-	{"=",P_ASSIGN, NULL},
+	{"*",P_MUL, nullptr},
+	{"/",P_DIV, nullptr},
+	{"%",P_MOD, nullptr},
+	{"+",P_ADD, nullptr},
+	{"-",P_SUB, nullptr},
+	{"=",P_ASSIGN, nullptr},
 	//binary operators
-	{"&",P_BIN_AND, NULL},
-	{"|",P_BIN_OR, NULL},
-	{"^",P_BIN_XOR, NULL},
-	{"~",P_BIN_NOT, NULL},
+	{"&",P_BIN_AND, nullptr},
+	{"|",P_BIN_OR, nullptr},
+	{"^",P_BIN_XOR, nullptr},
+	{"~",P_BIN_NOT, nullptr},
 	//logic operators
-	{"!",P_LOGIC_NOT, NULL},
-	{">",P_LOGIC_GREATER, NULL},
-	{"<",P_LOGIC_LESS, NULL},
+	{"!",P_LOGIC_NOT, nullptr},
+	{">",P_LOGIC_GREATER, nullptr},
+	{"<",P_LOGIC_LESS, nullptr},
 	//reference operator
-	{".",P_REF, NULL},
+	{".",P_REF, nullptr},
 	//seperators
-	{",",P_COMMA, NULL},
-	{";",P_SEMICOLON, NULL},
+	{",",P_COMMA, nullptr},
+	{";",P_SEMICOLON, nullptr},
 	//label indication
-	{":",P_COLON, NULL},
+	{":",P_COLON, nullptr},
 	//if statement
-	{"?",P_QUESTIONMARK, NULL},
+	{"?",P_QUESTIONMARK, nullptr},
 	//embracements
-	{"(",P_PARENTHESESOPEN, NULL},
-	{")",P_PARENTHESESCLOSE, NULL},
-	{"{",P_BRACEOPEN, NULL},
-	{"}",P_BRACECLOSE, NULL},
-	{"[",P_SQBRACKETOPEN, NULL},
-	{"]",P_SQBRACKETCLOSE, NULL},
+	{"(",P_PARENTHESESOPEN, nullptr},
+	{")",P_PARENTHESESCLOSE, nullptr},
+	{"{",P_BRACEOPEN, nullptr},
+	{"}",P_BRACECLOSE, nullptr},
+	{"[",P_SQBRACKETOPEN, nullptr},
+	{"]",P_SQBRACKETCLOSE, nullptr},
 	//
-	{"\\",P_BACKSLASH, NULL},
+	{"\\",P_BACKSLASH, nullptr},
 	//precompiler operator
-	{"#",P_PRECOMP, NULL},
+	{"#",P_PRECOMP, nullptr},
 #ifdef DOLLAR
 	{"$",P_DOLLAR, NULL},
 #endif //DOLLAR
-	{NULL, 0}
+	{nullptr, 0}
 };
 
 UI_PrecompilerTools::UI_PrecompilerTools() :
 	basefolder_(""),
-	globalDefines_(0),
+	globalDefines_(nullptr),
 	numTokens_(0)
 {
 	Directive::tools_ = this;
@@ -112,7 +112,7 @@ UI_PrecompilerTools::UI_PrecompilerTools() :
 
 	for( size_t i = 0; i < k_MAX_SOURCEFILES; ++i )
 	{
-		sourceFiles_[i] = 0;
+		sourceFiles_[i] = nullptr;
 	}
 }
 
@@ -121,14 +121,14 @@ UI_PrecompilerTools::~UI_PrecompilerTools()
 	for( size_t i = 0; i < directives_.size(); ++i )
 	{
 		delete directives_[i];
-		directives_[i] = 0;
+		directives_[i] = nullptr;
 	}
 	directives_.clear();
 
 	for( size_t i = 0; i < dollarDirectives_.size(); ++i )
 	{
 		delete dollarDirectives_[i];
-		dollarDirectives_[i] = 0;
+		dollarDirectives_[i] = nullptr;
 	}
 	dollarDirectives_.clear();
 }
@@ -163,7 +163,7 @@ UI_PrecompilerTools::freeSourceHandle( int handle )
 		return false;
 
 	freeSourceFile(sourceFiles_[handle]);
-	sourceFiles_[handle] = 0;
+	sourceFiles_[handle] = nullptr;
 	return true;
 }
 
@@ -175,18 +175,18 @@ UI_PrecompilerTools::loadSourceFile( const char *filename )
 
 	script = loadScriptFile(filename);
 	if (!script) 
-		return NULL;
+		return nullptr;
 
-	script->next_ = NULL;
+	script->next_ = nullptr;
 
 	source = reinterpret_cast<SourceFile*>(UI_Memtools::getMemory(sizeof(SourceFile)));
 	memset(source, 0, sizeof(SourceFile));
 
 	strncpy(source->filename_, filename, MAX_QPATH);
 	source->scriptstack_ = script;
-	source->tokens_ = NULL;
-	source->defines_ = NULL;
-	source->indentstack_ = NULL;
+	source->tokens_ = nullptr;
+	source->defines_ = nullptr;
+	source->indentstack_ = nullptr;
 	source->skip_ = 0;
 	source->definehash_ = reinterpret_cast<Define**>(UI_Memtools::getClearedMemory(k_DEFINEHASHSIZE * sizeof(Define*)));
 
@@ -277,7 +277,7 @@ UI_PrecompilerTools::loadScriptFile( const char *filename )
 	else
 		Com_sprintf(pathname, sizeof(pathname), "%s", filename);
 	length = FS_FOpenFileByMode( pathname, &fp, FS_READ );
-	if (!fp) return NULL;
+	if (!fp) return nullptr;
 
 	buffer = UI_Memtools::getClearedMemory(sizeof(Script) + length + 1);
 	script = (Script *) buffer;
@@ -298,7 +298,7 @@ UI_PrecompilerTools::loadScriptFile( const char *filename )
 	script->line_ = 1;
 	script->lastline_ = 1;
 	//
-	setScriptPunctuations(script, NULL);
+	setScriptPunctuations(script, nullptr);
 	//
 	FS_Read(script->buffer_, length, fp);
 	FS_FCloseFile(fp);
@@ -369,7 +369,7 @@ UI_PrecompilerTools::createPunctuationTable( Script* script, Punctuation* punctu
 	for (i = 0; punctuations[i].p_; i++)
 	{
 		newp = &punctuations[i];
-		lastp = NULL;
+		lastp = nullptr;
 		//sort the punctuations in this table entry on length (longer punctuations first)
 		for (p = script->punctuationtable_[(unsigned int) newp->p_[0]]; p; p = p->next_)
 		{
@@ -386,7 +386,7 @@ UI_PrecompilerTools::createPunctuationTable( Script* script, Punctuation* punctu
 		}
 		if (!p)
 		{
-			newp->next_ = NULL;
+			newp->next_ = nullptr;
 			if (lastp) 
 				lastp->next_ = newp;
 			else 
@@ -425,14 +425,14 @@ UI_PrecompilerTools::copyDefine( SourceFile* source, Define* define )
 	newdefine->builtin_ = define->builtin_;
 	newdefine->numparms_ = define->numparms_;
 	//the define is not linked
-	newdefine->next_ = 0;
-	newdefine->hashnext_ = 0;
+	newdefine->next_ = nullptr;
+	newdefine->hashnext_ = nullptr;
 	//copy the define tokens
-	newdefine->tokens_ = 0;
-	for (lasttoken = 0, token = define->tokens_; token; token = token->next_)
+	newdefine->tokens_ = nullptr;
+	for (lasttoken = nullptr, token = define->tokens_; token; token = token->next_)
 	{
 		newtoken = copyToken(token);
-		newtoken->next_ = 0;
+		newtoken->next_ = nullptr;
 		if (lasttoken) 
 			lasttoken->next_ = newtoken;
 		else 
@@ -440,11 +440,11 @@ UI_PrecompilerTools::copyDefine( SourceFile* source, Define* define )
 		lasttoken = newtoken;
 	} //end for
 	//copy the define parameters
-	newdefine->parms_ = 0;
-	for (lasttoken = 0, token = define->parms_; token; token = token->next_)
+	newdefine->parms_ = nullptr;
+	for (lasttoken = nullptr, token = define->parms_; token; token = token->next_)
 	{
 		newtoken = copyToken(token);
-		newtoken->next_ = 0;
+		newtoken->next_ = nullptr;
 		if (lasttoken) 
 			lasttoken->next_ = newtoken;
 		else 
@@ -497,7 +497,7 @@ UI_PrecompilerTools::findHashedDefine( Define** definehash, char *name )
 		if (!strcmp(d->name_, name)) 
 			return d;
 	}
-	return NULL;
+	return nullptr;
 }
 
 int 
@@ -537,8 +537,8 @@ UI_PrecompilerTools::expandDefine( SourceFile* source, Token* deftoken, Define* 
 			return false;
 	} //end if
 	//empty list at first
-	first = NULL;
-	last = NULL;
+	first = nullptr;
+	last = nullptr;
 	//create a list with tokens of the expanded define
 	for (dt = define->tokens_; dt; dt = dt->next_)
 	{
@@ -555,7 +555,7 @@ UI_PrecompilerTools::expandDefine( SourceFile* source, Token* deftoken, Define* 
 			{
 				t = copyToken(pt);
 				//add the token to the list
-				t->next_ = NULL;
+				t->next_ = nullptr;
 				if (last) 
 					last->next_ = t;
 				else 
@@ -597,7 +597,7 @@ UI_PrecompilerTools::expandDefine( SourceFile* source, Token* deftoken, Define* 
 				t = copyToken(dt);
 			} //end else
 			//add the token to the list
-			t->next_ = NULL;
+			t->next_ = nullptr;
 			if (last) 
 				last->next_ = t;
 			else
@@ -682,7 +682,7 @@ UI_PrecompilerTools::expandBuiltinDefine( SourceFile* source, Token* deftoken, D
 		} //end case
 		case BUILTIN_DATE:
 		{
-			t = time(NULL);
+			t = time(nullptr);
 			curtime = ctime(&t);
 			strcpy(token->string_, "\"");
 			strncat(token->string_, curtime+4, 7);
@@ -697,7 +697,7 @@ UI_PrecompilerTools::expandBuiltinDefine( SourceFile* source, Token* deftoken, D
 		} //end case
 		case BUILTIN_TIME:
 		{
-			t = time(NULL);
+			t = time(nullptr);
 			curtime = ctime(&t);
 			strcpy(token->string_, "\"");
 			strncat(token->string_, curtime+11, 8);
@@ -712,8 +712,8 @@ UI_PrecompilerTools::expandBuiltinDefine( SourceFile* source, Token* deftoken, D
 		case BUILTIN_STDC:
 		default:
 		{
-			*firsttoken = NULL;
-			*lasttoken = NULL;
+			*firsttoken = nullptr;
+			*lasttoken = nullptr;
 			break;
 		} //end case
 	} //end switch
@@ -738,7 +738,7 @@ UI_PrecompilerTools::readDefineParms( SourceFile* source, Define* define, Token*
 		return false;
 	} //end if
 	//
-	for (i = 0; i < define->numparms_; i++) parms[i] = NULL;
+	for (i = 0; i < define->numparms_; i++) parms[i] = nullptr;
 	//if no leading "("
 	if (strcmp(token.string_, "("))
 	{
@@ -759,9 +759,9 @@ UI_PrecompilerTools::readDefineParms( SourceFile* source, Define* define, Token*
 			Com_Printf(S_COLOR_YELLOW "WARNING: define %s has too many parms", define->name_);
 			return false;
 		} //end if
-		parms[numparms] = NULL;
+		parms[numparms] = nullptr;
 		lastcomma = 1;
-		last = NULL;
+		last = nullptr;
 		while(!done)
 		{
 			//
@@ -805,7 +805,7 @@ UI_PrecompilerTools::readDefineParms( SourceFile* source, Define* define, Token*
 			{
 				//
 				t = copyToken(&token);
-				t->next_ = NULL;
+				t->next_ = nullptr;
 				if (last) 
 					last->next_ = t;
 				else 
@@ -934,7 +934,7 @@ UI_PrecompilerTools::scriptReadToken( Script* script, Token* token )
 int 
 UI_PrecompilerTools::scriptReadWhiteSpace( Script* script )
 {
-	while(1)
+	while(true)
 	{
 		//skip white space
 		while(*script->script_p_ <= ' ')
@@ -1007,7 +1007,7 @@ UI_PrecompilerTools::scriptReadString( Script* script, Token* token, int quote )
 	//leading quote
 	token->string_[len++] = *script->script_p_++;
 	//
-	while(1)
+	while(true)
 	{
 		//minus 2 because trailing double quote and zero have to be appended
 		if (len >= k_MAX_TOKEN - 2)
@@ -1139,7 +1139,7 @@ UI_PrecompilerTools::scriptReadNumber( Script* script, Token* token )
 		octal = false;
 		dot = false;
 		if (*script->script_p_ == '0') octal = true;
-		while(1)
+		while(true)
 		{
 			c = *script->script_p_;
 			if (c == '.') 
@@ -1480,7 +1480,7 @@ UI_PrecompilerTools::readToken( SourceFile* source, Token* token )
 {
 	Define* define;
 
-	while(1)
+	while(true)
 	{
 		if (!readSourceToken(source, token)) 
 			return false;
@@ -1557,10 +1557,10 @@ UI_PrecompilerTools::copyToken( Token* token )
 	if (!t)
 	{
 		Com_Error(ERR_FATAL, "out of token space\n");
-		return NULL;
+		return nullptr;
 	}
 	Com_Memcpy(t, token, sizeof(Token));
-	t->next_ = 0;
+	t->next_ = nullptr;
 	numTokens_++;
 	return t;
 }
@@ -1578,8 +1578,8 @@ UI_PrecompilerTools::stringizeTokens( Token* tokens, Token* token )
 	Token *t;
 
 	token->type_ = TT_STRING;
-	token->whitespace_p_ = NULL;
-	token->endwhitespace_p_ = NULL;
+	token->whitespace_p_ = nullptr;
+	token->endwhitespace_p_ = nullptr;
 	token->string_[0] = '\0';
 	strcat(token->string_, "\"");
 	for (t = tokens; t; t = t->next_)
@@ -1668,8 +1668,8 @@ UI_PrecompilerTools::evaluate( SourceFile *source, signed long int *intvalue,
 		Com_Printf(S_COLOR_RED "ERROR: no value after #if/#elif");
 		return false;
 	} //end if
-	firsttoken = NULL;
-	lasttoken = NULL;
+	firsttoken = nullptr;
+	lasttoken = nullptr;
 	do
 	{
 		//if the token is a name
@@ -1679,7 +1679,7 @@ UI_PrecompilerTools::evaluate( SourceFile *source, signed long int *intvalue,
 			{
 				defined = false;
 				t = copyToken(&token);
-				t->next_ = NULL;
+				t->next_ = nullptr;
 				if (lasttoken) 
 					lasttoken->next_ = t;
 				else 
@@ -1690,7 +1690,7 @@ UI_PrecompilerTools::evaluate( SourceFile *source, signed long int *intvalue,
 			{
 				defined = true;
 				t = copyToken(&token);
-				t->next_ = NULL;
+				t->next_ = nullptr;
 				if (lasttoken) 
 					lasttoken->next_ = t;
 				else 
@@ -1714,7 +1714,7 @@ UI_PrecompilerTools::evaluate( SourceFile *source, signed long int *intvalue,
 		else if (token.type_ == TT_NUMBER || token.type_ == TT_PUNCTUATION)
 		{
 			t = copyToken(&token);
-			t->next_ = NULL;
+			t->next_ = nullptr;
 			if (lasttoken) 
 				lasttoken->next_ = t;
 			else 
@@ -1762,8 +1762,8 @@ UI_PrecompilerTools::evaluateTokens( SourceFile* source, Token* tokens, signed l
 	Value value_heap[k_MAX_VALUES];
 	int numvalues = 0;
 
-	firstoperator = lastoperator = NULL;
-	firstvalue = lastvalue = NULL;
+	firstoperator = lastoperator = nullptr;
+	firstvalue = lastvalue = nullptr;
 	if (intvalue) 
 		*intvalue = 0;
 	if (floatvalue) 
@@ -1820,7 +1820,7 @@ UI_PrecompilerTools::evaluateTokens( SourceFile* source, Token* tokens, signed l
 					v->floatvalue_ = 0;
 				} //end else
 				v->parentheses_ = parentheses;
-				v->next_ = NULL;
+				v->next_ = nullptr;
 				v->prev_ = lastvalue;
 				if (lastvalue) 
 					lastvalue->next_ = v;
@@ -1872,7 +1872,7 @@ UI_PrecompilerTools::evaluateTokens( SourceFile* source, Token* tokens, signed l
 					v->floatvalue_ = t->floatvalue_;
 				} //end else
 				v->parentheses_ = parentheses;
-				v->next_ = NULL;
+				v->next_ = nullptr;
 				v->prev_ = lastvalue;
 				if (lastvalue) 
 					lastvalue->next_ = v;
@@ -2006,7 +2006,7 @@ UI_PrecompilerTools::evaluateTokens( SourceFile* source, Token* tokens, signed l
 					o->operator_ = t->subtype_;
 					o->priority_ = operatorPriority(t->subtype_);
 					o->parentheses_ = parentheses;
-					o->next_ = NULL;
+					o->next_ = nullptr;
 					o->prev_ = lastoperator;
 					if (lastoperator) 
 						lastoperator->next_ = o;
@@ -2444,8 +2444,8 @@ UI_PrecompilerTools::dollarEvaluate( SourceFile* source, signed long int *intval
 		return false;
 	} //end if
 	indent = 1;
-	firsttoken = NULL;
-	lasttoken = NULL;
+	firsttoken = nullptr;
+	lasttoken = nullptr;
 	do
 	{
 		//if the token is a name
@@ -2455,7 +2455,7 @@ UI_PrecompilerTools::dollarEvaluate( SourceFile* source, signed long int *intval
 			{
 				defined = false;
 				t = copyToken(&token);
-				t->next_ = NULL;
+				t->next_ = nullptr;
 				if (lasttoken) 
 					lasttoken->next_ = t;
 				else 
@@ -2466,7 +2466,7 @@ UI_PrecompilerTools::dollarEvaluate( SourceFile* source, signed long int *intval
 			{
 				defined = true;
 				t = copyToken(&token);
-				t->next_ = NULL;
+				t->next_ = nullptr;
 				if (lasttoken) 
 					lasttoken->next_ = t;
 				else 
@@ -2496,7 +2496,7 @@ UI_PrecompilerTools::dollarEvaluate( SourceFile* source, signed long int *intval
 			if (indent <= 0) 
 				break;
 			t = copyToken(&token);
-			t->next_ = NULL;
+			t->next_ = nullptr;
 			if (lasttoken) 
 				lasttoken->next_ = t;
 			else 
@@ -2545,7 +2545,7 @@ UI_PrecompilerTools::directive_undef( SourceFile* source )
 	} //end if
 
 	hash = nameHash(token.string_);
-	for (lastdefine = NULL, define = source->definehash_[hash]; define; define = define->hashnext_)
+	for (lastdefine = nullptr, define = source->definehash_[hash]; define; define = define->hashnext_)
 	{
 		if (!strcmp(define->name_, token.string_))
 		{
@@ -2586,8 +2586,8 @@ UI_PrecompilerTools::checkTokenString( SourceFile* source, char *string )
 void 
 UI_PrecompilerTools::clearTokenWhiteSpace( Token* token )
 {
-	token->whitespace_p_ = 0;
-	token->endwhitespace_p_ = 0;
+	token->whitespace_p_ = nullptr;
+	token->endwhitespace_p_ = nullptr;
 	token->linescrossed_ = 0;
 }
 
@@ -2609,7 +2609,7 @@ UI_PrecompilerTools::sourceFileAndLine( int handle, char *filename, int *line )
 
 // ------------------------------------
 
-UI_PrecompilerTools* UI_PrecompilerTools::Directive::tools_ = 0;
+UI_PrecompilerTools* UI_PrecompilerTools::Directive::tools_ = nullptr;
 
 int
 UI_PrecompilerTools::Directive::if_def( SourceFile* source, int type )
@@ -2631,7 +2631,7 @@ UI_PrecompilerTools::Directive::if_def( SourceFile* source, int type )
 	} //end if
 	d = tools_->findHashedDefine(source->definehash_, token.string_);
 
-	skip = (type == INDENT_IFDEF) == (d == NULL);
+	skip = (type == INDENT_IFDEF) == (d == nullptr);
 	tools_->pushIndent(source, type, skip);
 	return true;
 }
@@ -2642,7 +2642,7 @@ UI_PrecompilerTools::Directive_if::func( SourceFile* source )
 	signed long int value;
 	int skip;
 
-	if (!tools_->evaluate(source, &value, NULL, true)) 
+	if (!tools_->evaluate(source, &value, nullptr, true)) 
 		return false;
 	skip = (value == 0);
 	tools_->pushIndent(source, INDENT_IF, skip);
@@ -2673,7 +2673,7 @@ UI_PrecompilerTools::Directive_elif::func( SourceFile* source )
 		Com_Printf(S_COLOR_RED "ERROR: misplaced #elif");
 		return false;
 	} //end if
-	if (!tools_->evaluate(source, &value, NULL, true)) 
+	if (!tools_->evaluate(source, &value, nullptr, true)) 
 		return false;
 	skip = (value == 0);
 	tools_->pushIndent(source, INDENT_ELIF, skip);
@@ -2838,10 +2838,10 @@ UI_PrecompilerTools::Directive_define::func( SourceFile* source )
 	if (!tools_->whiteSpaceBeforeToken(&token) && !strcmp(token.string_, "("))
 	{
 		//read the define parameters
-		last = NULL;
+		last = nullptr;
 		if (!tools_->checkTokenString(source, ")"))
 		{
-			while(1)
+			while(true)
 			{
 				if (!tools_->readLine(source, &token))
 				{
@@ -2863,7 +2863,7 @@ UI_PrecompilerTools::Directive_define::func( SourceFile* source )
 				//add the define parm
 				t = tools_->copyToken(&token);
 				tools_->clearTokenWhiteSpace(t);
-				t->next_ = NULL;
+				t->next_ = nullptr;
 				if (last) last->next_ = t;
 				else define->parms_ = t;
 				last = t;
@@ -2888,7 +2888,7 @@ UI_PrecompilerTools::Directive_define::func( SourceFile* source )
 		if (!tools_->readLine(source, &token)) return true;
 	} //end if
 	//read the defined stuff
-	last = NULL;
+	last = nullptr;
 	do
 	{
 		t = tools_->copyToken(&token);
@@ -2898,7 +2898,7 @@ UI_PrecompilerTools::Directive_define::func( SourceFile* source )
 			continue;
 		} //end if
 		tools_->clearTokenWhiteSpace(t);
-		t->next_ = NULL;
+		t->next_ = nullptr;
 		if (last) 
 			last->next_ = t;
 		else 
@@ -2942,7 +2942,7 @@ UI_PrecompilerTools::Directive_undef::func( SourceFile* source )
 	} //end if
 
 	hash = tools_->nameHash(token.string_);
-	for (lastdefine = NULL, define = source->definehash_[hash]; define; define = define->hashnext_)
+	for (lastdefine = nullptr, define = source->definehash_[hash]; define; define = define->hashnext_)
 	{
 		if (!strcmp(define->name_, token.string_))
 		{
@@ -3000,7 +3000,7 @@ UI_PrecompilerTools::Directive_eval::func( SourceFile* source )
 	signed long int value;
 	Token token;
 
-	if (!tools_->evaluate(source, &value, NULL, true)) return false;
+	if (!tools_->evaluate(source, &value, nullptr, true)) return false;
 	//
 	token.line_ = source->scriptstack_->line_;
 	token.whitespace_p_ = source->scriptstack_->script_p_;
@@ -3021,7 +3021,7 @@ UI_PrecompilerTools::Directive_evalfloat::func( SourceFile* source )
 	double value;
 	Token token;
 
-	if (!tools_->evaluate(source, NULL, &value, false)) return false;
+	if (!tools_->evaluate(source, nullptr, &value, false)) return false;
 	token.line_ = source->scriptstack_->line_;
 	token.whitespace_p_ = source->scriptstack_->script_p_;
 	token.endwhitespace_p_ = source->scriptstack_->script_p_;
@@ -3041,7 +3041,7 @@ UI_PrecompilerTools::DollarDirective_evalint::func( SourceFile* source )
 	signed long int value;
 	Token token;
 
-	if (!tools_->dollarEvaluate(source, &value, NULL, true)) 
+	if (!tools_->dollarEvaluate(source, &value, nullptr, true)) 
 		return false;
 	//
 	token.line_ = source->scriptstack_->line_;
@@ -3065,7 +3065,7 @@ UI_PrecompilerTools::DollarDirective_evalfloat::func( SourceFile* source )
 	double value;
 	Token token;
 
-	if (!tools_->dollarEvaluate(source, NULL, &value, false)) 
+	if (!tools_->dollarEvaluate(source, nullptr, &value, false)) 
 		return false;
 	token.line_ = source->scriptstack_->line_;
 	token.whitespace_p_ = source->scriptstack_->script_p_;

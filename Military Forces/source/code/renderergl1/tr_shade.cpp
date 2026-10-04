@@ -404,7 +404,7 @@ ProjectDlightTexture
 Perform dynamic lighting with another rendering pass
 ===================
 */
-static void ProjectDlightTexture_scalar( void ) {
+static void ProjectDlightTexture_scalar( ) {
 	int		i, l;
 	vec3_t	origin;
 	float	*texCoords;
@@ -556,7 +556,7 @@ static void ProjectDlightTexture_scalar( void ) {
 	}
 }
 
-static void ProjectDlightTexture( void ) {
+static void ProjectDlightTexture( ) {
 #if idppc_altivec
 	if (com_altivec->integer) {
 		// must be in a separate translation unit or G3 systems will crash.
@@ -575,7 +575,7 @@ RB_FogPass
 Blends a fog texture on top of everything else
 ===================
 */
-static void RB_FogPass( void ) {
+static void RB_FogPass( ) {
 	fog_t		*fog;
 	int			i;
 
@@ -950,7 +950,7 @@ static void RB_IterateStagesGeneric( shaderCommands_t *input )
 		//
 		// do multitexture
 		//
-		if ( pStage->bundle[1].image[0] != 0 )
+		if ( pStage->bundle[1].image[0] != nullptr )
 		{
 			DrawMultitextured( input, stage );
 		}
@@ -985,7 +985,7 @@ static void RB_IterateStagesGeneric( shaderCommands_t *input )
 /*
 ** RB_StageIteratorGeneric
 */
-void RB_StageIteratorGeneric( void )
+void RB_StageIteratorGeneric( )
 {
 	shaderCommands_t *input;
 	shader_t		*shader;
@@ -1101,7 +1101,7 @@ void RB_StageIteratorGeneric( void )
 /*
 ** RB_StageIteratorVertexLitTexture
 */
-void RB_StageIteratorVertexLitTexture( void )
+void RB_StageIteratorVertexLitTexture( )
 {
 	shaderCommands_t *input;
 	shader_t		*shader;
@@ -1178,7 +1178,7 @@ void RB_StageIteratorVertexLitTexture( void )
 
 //define	REPLACE_MODE
 
-void RB_StageIteratorLightmappedMultitexture( void ) {
+void RB_StageIteratorLightmappedMultitexture( ) {
 	shaderCommands_t *input;
 	shader_t		*shader;
 
@@ -1285,7 +1285,7 @@ void RB_StageIteratorLightmappedMultitexture( void ) {
 /*
 ** RB_EndSurface
 */
-void RB_EndSurface( void ) {
+void RB_EndSurface( ) {
 	shaderCommands_t *input;
 
 	input = &tess;

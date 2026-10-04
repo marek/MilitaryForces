@@ -42,7 +42,7 @@ R_InitNextFrame
 
 ====================
 */
-void R_InitNextFrame( void ) {
+void R_InitNextFrame( ) {
 	backEndData->commands.used = 0;
 
 	r_firstSceneDrawSurf = 0;
@@ -66,7 +66,7 @@ RE_ClearScene
 
 ====================
 */
-void RE_ClearScene( void ) {
+void RE_ClearScene( ) {
 	r_firstSceneDlight = r_numdlights;
 	r_firstSceneEntity = r_numentities;
 	r_firstScenePoly = r_numpolys;
@@ -87,7 +87,7 @@ R_AddPolygonSurfaces
 Adds all the scene's polys into this view's drawsurf list
 =====================
 */
-void R_AddPolygonSurfaces( void ) {
+void R_AddPolygonSurfaces( ) {
 	int			i;
 	shader_t	*sh;
 	srfPoly_t	*poly;
@@ -154,7 +154,7 @@ void RE_AddPolyToScene( qhandle_t hShader, int numVerts, const polyVert_t *verts
 		r_numpolyverts += numVerts;
 
 		// if no world is loaded
-		if ( tr.world == NULL ) {
+		if ( tr.world == nullptr ) {
 			fogIndex = 0;
 		}
 		// see if it is in a fog volume

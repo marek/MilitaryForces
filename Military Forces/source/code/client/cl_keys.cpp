@@ -325,7 +325,7 @@ keyname_t keynames[] =
 	{"PAD0_PADDLE4", K_PAD0_PADDLE4 },
 	{"PAD0_TOUCHPAD", K_PAD0_TOUCHPAD },
 
-	{NULL,0}
+	{nullptr,0}
 };
 
 /*
@@ -796,7 +796,7 @@ void Message_Key( int key ) {
 //============================================================================
 
 
-bool Key_GetOverstrikeMode( void ) {
+bool Key_GetOverstrikeMode( ) {
 	return key_overstrikeMode;
 }
 
@@ -968,7 +968,7 @@ int Key_GetKey(const char *binding) {
 Key_Unbind_f
 ===================
 */
-void Key_Unbind_f (void)
+void Key_Unbind_f ()
 {
 	int		b;
 
@@ -993,7 +993,7 @@ void Key_Unbind_f (void)
 Key_Unbindall_f
 ===================
 */
-void Key_Unbindall_f (void)
+void Key_Unbindall_f ()
 {
 	int		i;
 	
@@ -1008,7 +1008,7 @@ void Key_Unbindall_f (void)
 Key_Bind_f
 ===================
 */
-void Key_Bind_f (void)
+void Key_Bind_f ()
 {
 	int			i, c, b;
 	char		cmd[1024];
@@ -1076,7 +1076,7 @@ Key_Bindlist_f
 
 ============
 */
-void Key_Bindlist_f( void ) {
+void Key_Bindlist_f( ) {
 	int		i;
 
 	for ( i = 0 ; i < MAX_KEYS ; i++ ) {
@@ -1094,7 +1094,7 @@ Key_KeynameCompletion
 void Key_KeynameCompletion( void(*callback)(const char *s) ) {
 	int		i;
 
-	for( i = 0; keynames[ i ].name != NULL; i++ )
+	for( i = 0; keynames[ i ].name != nullptr; i++ )
 		callback( keynames[ i ].name );
 }
 
@@ -1147,7 +1147,7 @@ static void Key_CompleteBind( char *args, int argNum )
 CL_InitKeyCommands
 ===================
 */
-void CL_InitKeyCommands( void ) {
+void CL_InitKeyCommands( ) {
 	// register our functions
 	Cmd_AddCommand ("bind",Key_Bind_f);
 	Cmd_SetCommandCompletionFunc( "bind", Key_CompleteBind );
@@ -1200,7 +1200,7 @@ void CL_ParseBinding( int key, bool down, unsigned time )
 	// allow button up commands if in game even if key catcher is set
 	allowUpCmds = ( clc.state != CA_DISCONNECTED );
 
-	while( 1 )
+	while( true )
 	{
 		while( isspace( *p ) )
 			p++;
@@ -1419,7 +1419,7 @@ void CL_CharEvent( int key ) {
 Key_ClearStates
 ===================
 */
-void Key_ClearStates (void)
+void Key_ClearStates ()
 {
 	int		i;
 
@@ -1430,7 +1430,7 @@ void Key_ClearStates (void)
 			CL_KeyEvent( i, false, 0 );
 
 		}
-		keys[i].down = 0;
+		keys[i].down = false;
 		keys[i].repeats = 0;
 	}
 }
@@ -1442,7 +1442,7 @@ static int keyCatchers = 0;
 Key_GetCatcher
 ====================
 */
-int Key_GetCatcher( void ) {
+int Key_GetCatcher( ) {
 	return keyCatchers;
 }
 
@@ -1472,7 +1472,7 @@ CL_LoadConsoleHistory
 Load the console history from CONSOLE_HISTORY_FILE
 ================
 */
-void CL_LoadConsoleHistory( void )
+void CL_LoadConsoleHistory( )
 {
 	char					*token, *text_p;
 	int						i, numChars, numLines = 0;
@@ -1542,7 +1542,7 @@ Save the console history into CONSOLE_HISTORY_FILE
 so that it persists across invocations of q3
 ================
 */
-void CL_SaveConsoleHistory( void )
+void CL_SaveConsoleHistory( )
 {
 	int						i;
 	int						lineLength, saveBufferLength, additionalLength;

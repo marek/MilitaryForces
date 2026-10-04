@@ -53,9 +53,9 @@ static vec3_t		debugBlockPoints[4];
 CM_ClearLevelPatches
 =================
 */
-void CM_ClearLevelPatches( void ) {
-	debugPatchCollide = NULL;
-	debugFacet = NULL;
+void CM_ClearLevelPatches( ) {
+	debugPatchCollide = nullptr;
+	debugFacet = nullptr;
 }
 
 /*
@@ -839,7 +839,7 @@ void CM_AddFacetBevels( facet_t *facet ) {
 					continue;
 				}
 				facet->borderPlanes[facet->numBorders] = CM_FindPlane2(plane, &flipped);
-				facet->borderNoAdjust[facet->numBorders] = 0;
+				facet->borderNoAdjust[facet->numBorders] = false;
 				facet->borderInward[facet->numBorders] = flipped;
 				facet->numBorders++;
 			}
@@ -910,7 +910,7 @@ void CM_AddFacetBevels( facet_t *facet ) {
 							facet->borderPlanes[k]) Com_Printf("WARNING: bevel plane already used\n");
 					}
 
-					facet->borderNoAdjust[facet->numBorders] = 0;
+					facet->borderNoAdjust[facet->numBorders] = false;
 					facet->borderInward[facet->numBorders] = flipped;
 					//
 					w2 = CopyWinding(w);
@@ -945,7 +945,7 @@ void CM_AddFacetBevels( facet_t *facet ) {
 		return;
 	}
 	facet->borderPlanes[facet->numBorders] = facet->surfacePlane;
-	facet->borderNoAdjust[facet->numBorders] = 0;
+	facet->borderNoAdjust[facet->numBorders] = false;
 	facet->borderInward[facet->numBorders] = true;
 	facet->numBorders++;
 #endif //BSPC

@@ -161,7 +161,7 @@ S_AL_BufferFindFree
 Find a free handle
 =================
 */
-static sfxHandle_t S_AL_BufferFindFree( void )
+static sfxHandle_t S_AL_BufferFindFree( )
 {
 	int i;
 
@@ -283,7 +283,7 @@ static void S_AL_BufferUnload(sfxHandle_t sfx)
 S_AL_BufferEvict
 =================
 */
-static bool S_AL_BufferEvict( void )
+static bool S_AL_BufferEvict( )
 {
 	int	i, oldestBuffer = -1;
 	int	oldestTime = Sys_Milliseconds( );
@@ -471,7 +471,7 @@ S_AL_BufferInit
 =================
 */
 static
-bool S_AL_BufferInit( void )
+bool S_AL_BufferInit( )
 {
 	if(alBuffersInitialised)
 		return true;
@@ -496,7 +496,7 @@ S_AL_BufferShutdown
 =================
 */
 static
-void S_AL_BufferShutdown( void )
+void S_AL_BufferShutdown( )
 {
 	int i;
 
@@ -718,7 +718,7 @@ S_AL_SrcInit
 =================
 */
 static
-bool S_AL_SrcInit( void )
+bool S_AL_SrcInit( )
 {
 	int i;
 	int limit;
@@ -757,7 +757,7 @@ S_AL_SrcShutdown
 =================
 */
 static
-void S_AL_SrcShutdown( void )
+void S_AL_SrcShutdown( )
 {
 	int i;
 	src_t *curSource;
@@ -879,7 +879,7 @@ Remove given source as loop master if it is the master and hand off master statu
 static void S_AL_NewLoopMaster(src_t *rmSource, bool iskilled)
 {
 	int index;
-	src_t *curSource = NULL;
+	src_t *curSource = nullptr;
 	alSfx_t *curSfx;
 	
 	curSfx = &knownSfx[rmSource->sfx];
@@ -1440,7 +1440,7 @@ Update state (move things around, manage sources, and so on)
 =================
 */
 static
-void S_AL_SrcUpdate( void )
+void S_AL_SrcUpdate( )
 {
 	int i;
 	int entityNum;
@@ -1639,7 +1639,7 @@ S_AL_SrcShutup
 =================
 */
 static
-void S_AL_SrcShutup( void )
+void S_AL_SrcShutup( )
 {
 	int i;
 	for(i = 0; i < srcCount; i++)
@@ -1928,7 +1928,7 @@ static byte decode_buffer[MUSIC_BUFFER_SIZE];
 S_AL_MusicSourceGet
 =================
 */
-static void S_AL_MusicSourceGet( void )
+static void S_AL_MusicSourceGet( )
 {
 	// Allocate a musicSource at high priority
 	musicSourceHandle = S_AL_SrcAlloc(SRCPRI_STREAM, -2, 0);
@@ -1956,7 +1956,7 @@ static void S_AL_MusicSourceGet( void )
 S_AL_MusicSourceFree
 =================
 */
-static void S_AL_MusicSourceFree( void )
+static void S_AL_MusicSourceFree( )
 {
 	// Release the output musicSource
 	S_AL_SrcUnlock(musicSourceHandle);
@@ -1970,18 +1970,18 @@ static void S_AL_MusicSourceFree( void )
 S_AL_CloseMusicFiles
 =================
 */
-static void S_AL_CloseMusicFiles(void)
+static void S_AL_CloseMusicFiles()
 {
 	if(intro_stream)
 	{
 		S_CodecCloseStream(intro_stream);
-		intro_stream = NULL;
+		intro_stream = nullptr;
 	}
 	
 	if(mus_stream)
 	{
 		S_CodecCloseStream(mus_stream);
-		mus_stream = NULL;
+		mus_stream = nullptr;
 	}
 }
 
@@ -1991,7 +1991,7 @@ S_AL_StopBackgroundTrack
 =================
 */
 static
-void S_AL_StopBackgroundTrack( void )
+void S_AL_StopBackgroundTrack( )
 {
 	if(!musicPlaying)
 		return;
@@ -2047,7 +2047,7 @@ void S_AL_MusicProcess(ALuint b)
 		// the intro stream just finished playing so we don't need to reopen
 		// the music stream.
 		if(intro_stream)
-			intro_stream = NULL;
+			intro_stream = nullptr;
 		else
 			mus_stream = S_CodecOpenStream(s_backgroundLoop);
 		
@@ -2125,7 +2125,7 @@ void S_AL_StartBackgroundTrack( const char *intro, const char *loop )
 		intro_stream = S_CodecOpenStream(intro);
 	}
 	else
-		intro_stream = NULL;
+		intro_stream = nullptr;
 
 	mus_stream = S_CodecOpenStream(s_backgroundLoop);
 	if(!mus_stream)
@@ -2162,7 +2162,7 @@ S_AL_MusicUpdate
 =================
 */
 static
-void S_AL_MusicUpdate( void )
+void S_AL_MusicUpdate( )
 {
 	int		numBuffers;
 	ALint	state;
@@ -2225,7 +2225,7 @@ S_AL_StopAllSounds
 =================
 */
 static
-void S_AL_StopAllSounds( void )
+void S_AL_StopAllSounds( )
 {
 	int i;
 	S_AL_SrcShutup();
@@ -2270,7 +2270,7 @@ S_AL_Update
 =================
 */
 static
-void S_AL_Update( void )
+void S_AL_Update( )
 {
 	int i;
 
@@ -2330,7 +2330,7 @@ S_AL_DisableSounds
 =================
 */
 static
-void S_AL_DisableSounds( void )
+void S_AL_DisableSounds( )
 {
 	S_AL_StopAllSounds();
 }
@@ -2341,7 +2341,7 @@ S_AL_BeginRegistration
 =================
 */
 static
-void S_AL_BeginRegistration( void )
+void S_AL_BeginRegistration( )
 {
 	if(!numSfx)
 		S_AL_BufferInit();
@@ -2353,7 +2353,7 @@ S_AL_ClearSoundBuffer
 =================
 */
 static
-void S_AL_ClearSoundBuffer( void )
+void S_AL_ClearSoundBuffer( )
 {
 }
 
@@ -2363,7 +2363,7 @@ S_AL_SoundList
 =================
 */
 static
-void S_AL_SoundList( void )
+void S_AL_SoundList( )
 {
 	int		i;
 	alSfx_t	*sfx;
@@ -2381,17 +2381,17 @@ void S_AL_SoundList( void )
 
 #ifdef USE_VOIP
 static
-void S_AL_StartCapture( void )
+void S_AL_StartCapture( )
 {
-	if (alCaptureDevice != NULL)
+	if (alCaptureDevice != nullptr)
 		qalcCaptureStart(alCaptureDevice);
 }
 
 static
-int S_AL_AvailableCaptureSamples( void )
+int S_AL_AvailableCaptureSamples( )
 {
 	int retval = 0;
-	if (alCaptureDevice != NULL)
+	if (alCaptureDevice != nullptr)
 	{
 		ALint samples = 0;
 		qalcGetIntegerv(alCaptureDevice, ALC_CAPTURE_SAMPLES, sizeof (samples), &samples);
@@ -2403,13 +2403,13 @@ int S_AL_AvailableCaptureSamples( void )
 static
 void S_AL_Capture( int samples, byte *data )
 {
-	if (alCaptureDevice != NULL)
+	if (alCaptureDevice != nullptr)
 		qalcCaptureSamples(alCaptureDevice, data, samples);
 }
 
-void S_AL_StopCapture( void )
+void S_AL_StopCapture( )
 {
-	if (alCaptureDevice != NULL)
+	if (alCaptureDevice != nullptr)
 		qalcCaptureStop(alCaptureDevice);
 }
 
@@ -2425,7 +2425,7 @@ void S_AL_MasterGain( float gain )
 S_AL_SoundInfo
 =================
 */
-static void S_AL_SoundInfo(void)
+static void S_AL_SoundInfo()
 {
 	Com_Printf( "OpenAL info:\n" );
 	Com_Printf( "  Vendor:         %s\n", qalGetString( AL_VENDOR ) );
@@ -2459,7 +2459,7 @@ S_AL_Shutdown
 =================
 */
 static
-void S_AL_Shutdown( void )
+void S_AL_Shutdown( )
 {
 	// Shut down everything
 	int i;
@@ -2473,10 +2473,10 @@ void S_AL_Shutdown( void )
 	qalcCloseDevice(alDevice);
 
 #ifdef USE_VOIP
-	if (alCaptureDevice != NULL) {
+	if (alCaptureDevice != nullptr) {
 		qalcCaptureStop(alCaptureDevice);
 		qalcCaptureCloseDevice(alCaptureDevice);
-		alCaptureDevice = NULL;
+		alCaptureDevice = nullptr;
 		Com_Printf( "OpenAL capture device closed.\n" );
 	}
 #endif
@@ -2500,8 +2500,8 @@ S_AL_Init
 bool S_AL_Init( soundInterface_t *si )
 {
 #ifdef USE_OPENAL
-	const char* device = NULL;
-	const char* inputdevice = NULL;
+	const char* device = nullptr;
+	const char* inputdevice = nullptr;
 	int i;
 
 	if( !si ) {
@@ -2543,16 +2543,16 @@ bool S_AL_Init( soundInterface_t *si )
 
 	device = s_alDevice->string;
 	if(device && !*device)
-		device = NULL;
+		device = nullptr;
 
 	inputdevice = s_alInputDevice->string;
 	if(inputdevice && !*inputdevice)
-		inputdevice = NULL;
+		inputdevice = nullptr;
 
 
 	// Device enumeration support
-	enumeration_all_ext = qalcIsExtensionPresent(NULL, "ALC_ENUMERATE_ALL_EXT");
-	enumeration_ext = qalcIsExtensionPresent(NULL, "ALC_ENUMERATION_EXT");
+	enumeration_all_ext = qalcIsExtensionPresent(nullptr, "ALC_ENUMERATE_ALL_EXT");
+	enumeration_ext = qalcIsExtensionPresent(nullptr, "ALC_ENUMERATION_EXT");
 
 	if(enumeration_ext || enumeration_all_ext)
 	{
@@ -2566,7 +2566,7 @@ bool S_AL_Init( soundInterface_t *si )
 		// get all available devices + the default device name.
 		if(enumeration_all_ext)
 		{
-			devicelist = qalcGetString(NULL, ALC_ALL_DEVICES_SPECIFIER);
+			devicelist = qalcGetString(nullptr, ALC_ALL_DEVICES_SPECIFIER);
 #ifdef _WIN32
 			defaultdevice = qalcGetString(NULL, ALC_DEFAULT_ALL_DEVICES_SPECIFIER);
 #endif
@@ -2574,7 +2574,7 @@ bool S_AL_Init( soundInterface_t *si )
 		else
 		{
 			// We don't have ALC_ENUMERATE_ALL_EXT but normal enumeration.
-			devicelist = qalcGetString(NULL, ALC_DEVICE_SPECIFIER);
+			devicelist = qalcGetString(nullptr, ALC_DEVICE_SPECIFIER);
 #ifdef _WIN32
 			defaultdevice = qalcGetString(NULL, ALC_DEFAULT_DEVICE_SPECIFIER);
 #endif
@@ -2610,7 +2610,7 @@ bool S_AL_Init( soundInterface_t *si )
 	if( !alDevice && device )
 	{
 		Com_Printf( "Failed to open OpenAL device '%s', trying default.\n", device );
-		alDevice = qalcOpenDevice(NULL);
+		alDevice = qalcOpenDevice(nullptr);
 	}
 
 	if( !alDevice )
@@ -2621,7 +2621,7 @@ bool S_AL_Init( soundInterface_t *si )
 	}
 
 	// Create OpenAL context
-	alContext = qalcCreateContext( alDevice, NULL );
+	alContext = qalcCreateContext( alDevice, nullptr );
 	if( !alContext )
 	{
 		QAL_Shutdown( );
@@ -2663,7 +2663,7 @@ bool S_AL_Init( soundInterface_t *si )
 		// !!! FIXME:  extension string. We need to check the version string,
 		// !!! FIXME:  then the extension string, but that's too much trouble,
 		// !!! FIXME:  so we'll just check the function pointer for now.
-		if (qalcCaptureOpenDevice == NULL)
+		if (qalcCaptureOpenDevice == nullptr)
 #else
 		if (!qalcIsExtensionPresent(NULL, "ALC_EXT_capture"))
 #endif
@@ -2680,8 +2680,8 @@ bool S_AL_Init( soundInterface_t *si )
 			capture_ext = true;
 
 			// get all available input devices + the default input device name.
-			inputdevicelist = qalcGetString(NULL, ALC_CAPTURE_DEVICE_SPECIFIER);
-			defaultinputdevice = qalcGetString(NULL, ALC_CAPTURE_DEFAULT_DEVICE_SPECIFIER);
+			inputdevicelist = qalcGetString(nullptr, ALC_CAPTURE_DEVICE_SPECIFIER);
+			defaultinputdevice = qalcGetString(nullptr, ALC_CAPTURE_DEFAULT_DEVICE_SPECIFIER);
 
 			// dump a list of available devices to a cvar for the user to see.
 			if (inputdevicelist)
@@ -2701,10 +2701,10 @@ bool S_AL_Init( soundInterface_t *si )
 			if( !alCaptureDevice && inputdevice )
 			{
 				Com_Printf( "Failed to open OpenAL Input device '%s', trying default.\n", inputdevice );
-				alCaptureDevice = qalcCaptureOpenDevice(NULL, 48000, AL_FORMAT_MONO16, VOIP_MAX_PACKET_SAMPLES*4);
+				alCaptureDevice = qalcCaptureOpenDevice(nullptr, 48000, AL_FORMAT_MONO16, VOIP_MAX_PACKET_SAMPLES*4);
 			}
 			Com_Printf( "OpenAL capture device %s.\n",
-				    (alCaptureDevice == NULL) ? "failed to open" : "opened");
+				    (alCaptureDevice == nullptr) ? "failed to open" : "opened");
 		}
 	}
 #endif

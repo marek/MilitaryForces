@@ -42,13 +42,13 @@ memory management
 ===============================================================================
 */
 
-static	sndBuffer	*buffer = NULL;
-static	sndBuffer	*freelist = NULL;
+static	sndBuffer	*buffer = nullptr;
+static	sndBuffer	*freelist = nullptr;
 static	int inUse = 0;
 static	int totalInUse = 0;
 
-short *sfxScratchBuffer = NULL;
-sfx_t *sfxScratchPointer = NULL;
+short *sfxScratchBuffer = nullptr;
+sfx_t *sfxScratchPointer = nullptr;
 int	   sfxScratchIndex = 0;
 
 void	SND_free(sndBuffer *v) {
@@ -57,10 +57,10 @@ void	SND_free(sndBuffer *v) {
 	inUse += sizeof(sndBuffer);
 }
 
-sndBuffer*	SND_malloc(void) {
+sndBuffer*	SND_malloc() {
 	sndBuffer *v;
 redo:
-	if (freelist == NULL) {
+	if (freelist == nullptr) {
 		S_FreeOldestSound();
 		goto redo;
 	}
@@ -70,11 +70,11 @@ redo:
 
 	v = freelist;
 	freelist = *(sndBuffer **)freelist;
-	v->next = NULL;
+	v->next = nullptr;
 	return v;
 }
 
-void SND_setup(void) {
+void SND_setup() {
 	sndBuffer *p, *q;
 	cvar_t	*cv;
 	int scs;
@@ -86,7 +86,7 @@ void SND_setup(void) {
 	buffer = (sndBuffer *)malloc(scs*sizeof(sndBuffer) );
 	// allocate the stack based hunk allocator
 	sfxScratchBuffer = (short *)malloc(SND_CHUNK_SIZE * sizeof(short) * 4);	//Hunk_Alloc(SND_CHUNK_SIZE * sizeof(short) * 4);
-	sfxScratchPointer = NULL;
+	sfxScratchPointer = nullptr;
 
 	inUse = scs*sizeof(sndBuffer);
 	p = buffer;;
@@ -94,13 +94,13 @@ void SND_setup(void) {
 	while (--q > p)
 		*(sndBuffer **)q = q-1;
 	
-	*(sndBuffer **)q = NULL;
+	*(sndBuffer **)q = nullptr;
 	freelist = p + scs - 1;
 
 	Com_Printf("Sound memory manager started\n");
 }
 
-void SND_shutdown(void)
+void SND_shutdown()
 {
 		free(sfxScratchBuffer);
 		free(buffer);
@@ -147,7 +147,7 @@ static int ResampleSfx( sfx_t *sfx, int channels, int inrate, int inwidth, int s
 			if (part == 0) {
 				sndBuffer	*newchunk;
 				newchunk = SND_malloc();
-				if (chunk == NULL) {
+				if (chunk == nullptr) {
 					sfx->soundData = newchunk;
 				} else {
 					chunk->next = newchunk;
@@ -244,7 +244,7 @@ bool S_LoadSound( sfx_t *sfx )
 
 	if( info.channels == 1 && sfx->soundCompressed == true) {
 		sfx->soundCompressionMethod = 1;
-		sfx->soundData = NULL;
+		sfx->soundData = nullptr;
 		sfx->soundLength = ResampleSfxRaw( samples, info.channels, info.rate, info.width, info.samples, data + info.dataofs );
 		S_AdpcmEncodeSound(sfx, samples);
 #if 0
@@ -261,7 +261,7 @@ bool S_LoadSound( sfx_t *sfx )
 #endif
 	} else {
 		sfx->soundCompressionMethod = 0;
-		sfx->soundData = NULL;
+		sfx->soundData = nullptr;
 		sfx->soundLength = ResampleSfx( sfx, info.channels, info.rate, info.width, info.samples, data + info.dataofs, false );
 	}
 
@@ -273,6 +273,6 @@ bool S_LoadSound( sfx_t *sfx )
 	return true;
 }
 
-void S_DisplayFreeMemory(void) {
+void S_DisplayFreeMemory() {
 	Com_Printf("%d bytes free sound buffer memory, %d total used\n", inUse, totalInUse);
 }

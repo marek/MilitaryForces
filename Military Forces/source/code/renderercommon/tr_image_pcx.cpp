@@ -69,7 +69,7 @@ void R_LoadPCX ( const char *filename, byte **pic, int *width, int *height)
 		*width = 0;
 	if (height)
 		*height = 0;
-	*pic = NULL;
+	*pic = nullptr;
 
 	//
 	// load the file

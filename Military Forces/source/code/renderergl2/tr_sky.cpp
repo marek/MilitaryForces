@@ -255,7 +255,7 @@ static void ClipSkyPolygon (int nump, vec3_t vecs, int stage)
 ClearSkyBox
 ==============
 */
-static void ClearSkyBox (void) {
+static void ClearSkyBox () {
 	int		i;
 
 	for (i=0 ; i<6 ; i++) {
@@ -621,7 +621,7 @@ static void FillCloudBox( const shader_t *shader, int stage )
 		int s, t;
 		float MIN_T;
 
-		if ( 1 ) // FIXME? shader->sky.fullClouds )
+		if ( true ) // FIXME? shader->sky.fullClouds )
 		{
 			MIN_T = -HALF_SKY_SUBDIVISIONS;
 
@@ -693,7 +693,7 @@ static void FillCloudBox( const shader_t *shader, int stage )
 				MakeSkyVec( ( s - HALF_SKY_SUBDIVISIONS ) / ( float ) HALF_SKY_SUBDIVISIONS, 
 							( t - HALF_SKY_SUBDIVISIONS ) / ( float ) HALF_SKY_SUBDIVISIONS, 
 							i, 
-							NULL,
+							nullptr,
 							s_skyPoints[t][s] );
 
 				s_skyTexCoords[t][s][0] = s_cloudTexCoords[i][t][s][0];
@@ -766,7 +766,7 @@ void R_InitSkyTexCoords( float heightCloud )
 				MakeSkyVec( ( s - HALF_SKY_SUBDIVISIONS ) / ( float ) HALF_SKY_SUBDIVISIONS, 
 							( t - HALF_SKY_SUBDIVISIONS ) / ( float ) HALF_SKY_SUBDIVISIONS, 
 							i, 
-							NULL,
+							nullptr,
 							skyVec );
 
 				// compute parametric value 'p' that intersects with cloud layer
@@ -859,7 +859,7 @@ All of the visible sky triangles are in tess
 Other things could be stuck in here, like birds in the sky, etc
 ================
 */
-void RB_StageIteratorSky( void ) {
+void RB_StageIteratorSky( ) {
 	if ( r_fastsky->integer ) {
 		return;
 	}

@@ -187,7 +187,7 @@ snd_codec_t wav_codec =
 	S_WAV_CodecOpenStream,
 	S_WAV_CodecReadStream,
 	S_WAV_CodecCloseStream,
-	NULL
+	nullptr
 };
 
 /*
@@ -204,7 +204,7 @@ void *S_WAV_CodecLoad(const char *filename, snd_info_t *info)
 	FS_FOpenFileRead(filename, &file, true);
 	if(!file)
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	// Read the RIFF header
@@ -213,7 +213,7 @@ void *S_WAV_CodecLoad(const char *filename, snd_info_t *info)
 		FS_FCloseFile(file);
 		Com_Printf( S_COLOR_RED "ERROR: Incorrect/unsupported format in \"%s\"\n",
 				filename);
-		return NULL;
+		return nullptr;
 	}
 
 	// Allocate some memory
@@ -223,7 +223,7 @@ void *S_WAV_CodecLoad(const char *filename, snd_info_t *info)
 		FS_FCloseFile(file);
 		Com_Printf( S_COLOR_RED "ERROR: Out of memory reading \"%s\"\n",
 				filename);
-		return NULL;
+		return nullptr;
 	}
 
 	// Read, byteswap
@@ -247,13 +247,13 @@ snd_stream_t *S_WAV_CodecOpenStream(const char *filename)
 	// Open
 	rv = S_CodecUtilOpen(filename, &wav_codec);
 	if(!rv)
-		return NULL;
+		return nullptr;
 
 	// Read the RIFF header
 	if(!S_ReadRIFFHeader(rv->file, &rv->info))
 	{
 		S_CodecUtilClose(&rv);
-		return NULL;
+		return nullptr;
 	}
 
 	return rv;

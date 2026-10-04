@@ -31,7 +31,7 @@ float UI_ClampCvar( float min, float max, float value )
 UI_StartDemoLoop
 =================
 */
-void UI_StartDemoLoop( void ) {
+void UI_StartDemoLoop( ) {
 	Cbuf_ExecuteText( EXEC_APPEND, "d1\n" );
 }
 
@@ -394,7 +394,7 @@ bool UI_ConsoleCommand( int realTime ) {
 UI_Shutdown
 =================
 */
-void UI_Shutdown( void ) {
+void UI_Shutdown( ) {
 }
 
 /*
@@ -475,7 +475,7 @@ void UI_FillRect( float x, float y, float width, float height, const float *colo
 	UI_AdjustFrom640( &x, &y, &width, &height );
 	refExport.DrawStretchPic( x, y, width, height, 0, 0, 0, 0, uiInfo.uiUtils.dc_->whiteShader_ );
 
-	refExport.SetColor( NULL );
+	refExport.SetColor( nullptr );
 }
 
 void UI_DrawSides(float x, float y, float w, float h) 
@@ -504,7 +504,7 @@ void UI_DrawRect( float x, float y, float width, float height, const float *colo
   UI_DrawTopBottom(x, y, width, height);
   UI_DrawSides(x, y, width, height);
 
-	refExport.SetColor( NULL );
+	refExport.SetColor( nullptr );
 }
 
 void UI_SetColor( const float *rgba ) 
@@ -512,7 +512,7 @@ void UI_SetColor( const float *rgba )
 	refExport.SetColor( rgba );
 }
 
-void UI_UpdateScreen( void ) 
+void UI_UpdateScreen( ) 
 {
 	SCR_UpdateScreen();
 }

@@ -37,7 +37,7 @@ struct GameEntity : public EntityBase
 	struct EntityFunc_Free;	// derived from think to call free()
 
 					GameEntity();
-	virtual			~GameEntity() {}
+	~GameEntity() override {}
 
 	void			cleanAll();				// cleans up and sets to 0
 	void			init(int num);			// initialize this ent
@@ -199,7 +199,7 @@ struct GameEntity : public EntityBase
 
 struct GameEntity::EntityFunc_Think
 {
-	EntityFunc_Think() : self_(0) {}
+	EntityFunc_Think() : self_(nullptr) {}
 	virtual ~EntityFunc_Think() {}
 
 	virtual void	execute() = 0;
@@ -209,7 +209,7 @@ struct GameEntity::EntityFunc_Think
 
 struct GameEntity::EntityFunc_Free : public GameEntity::EntityFunc_Think
 {
-	virtual void	execute() 
+	void	execute() override 
 	{ 
 		self_->freeUp(); 
 	}
@@ -217,7 +217,7 @@ struct GameEntity::EntityFunc_Free : public GameEntity::EntityFunc_Think
 
 struct GameEntity::EntityFunc_Reached
 {
-	EntityFunc_Reached() : self_(0) {}
+	EntityFunc_Reached() : self_(nullptr) {}
 	virtual ~EntityFunc_Reached() {}
 
 	virtual void	execute() = 0;
@@ -227,7 +227,7 @@ struct GameEntity::EntityFunc_Reached
 
 struct GameEntity::EntityFunc_Blocked
 {
-	EntityFunc_Blocked() : self_(0) {}
+	EntityFunc_Blocked() : self_(nullptr) {}
 	virtual ~EntityFunc_Blocked() {}
 
 	virtual void	execute( GameEntity* other ) = 0;
@@ -237,7 +237,7 @@ struct GameEntity::EntityFunc_Blocked
 
 struct GameEntity::EntityFunc_Touch
 {
-	EntityFunc_Touch() : self_(0) {}
+	EntityFunc_Touch() : self_(nullptr) {}
 	virtual ~EntityFunc_Touch() {}
 
 	virtual void	execute( GameEntity* other, trace_t *trace ) = 0;
@@ -247,7 +247,7 @@ struct GameEntity::EntityFunc_Touch
 
 struct GameEntity::EntityFunc_Use
 {
-	EntityFunc_Use() : self_(0) {}
+	EntityFunc_Use() : self_(nullptr) {}
 	virtual ~EntityFunc_Use() {}
 
 	virtual void	execute( GameEntity* other, GameEntity* activator ) = 0;
@@ -257,7 +257,7 @@ struct GameEntity::EntityFunc_Use
 
 struct GameEntity::EntityFunc_Pain
 {
-	EntityFunc_Pain() : self_(0) {}
+	EntityFunc_Pain() : self_(nullptr) {}
 	virtual ~EntityFunc_Pain() {}
 
 	virtual void	execute( GameEntity* attacker, int damage ) = 0;
@@ -267,7 +267,7 @@ struct GameEntity::EntityFunc_Pain
 
 struct GameEntity::EntityFunc_Die
 {
-	EntityFunc_Die() : self_(0) {}
+	EntityFunc_Die() : self_(nullptr) {}
 	virtual ~EntityFunc_Die() {}
 
 	virtual void	execute( GameEntity* inflictor, GameEntity* attacker, int damage, int mod ) = 0;

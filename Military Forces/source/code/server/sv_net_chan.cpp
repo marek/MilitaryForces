@@ -40,7 +40,7 @@ void SV_Netchan_FreeQueue(SV_Client *client)
 		Z_Free(netbuf);
 	}
 	
-	client->netchan_start_queue_ = NULL;
+	client->netchan_start_queue_ = nullptr;
 	client->netchan_end_queue_ = &client->netchan_start_queue_;
 }
 
@@ -119,7 +119,7 @@ void SV_Netchan_Transmit( SV_Client *client, msg_t *msg)
 		netbuf = (SV_Client::Netchan_Buffer *) Z_Malloc(sizeof(SV_Client::Netchan_Buffer));
 		// store the msg, we can't store it encoded, as the encoding depends on stuff we still have to finish sending
 		MSG_Copy(&netbuf->msg_, netbuf->msgBuffer_, sizeof( netbuf->msgBuffer_ ), msg);
-		netbuf->next_ = NULL;
+		netbuf->next_ = nullptr;
 		// insert it in the queue, the message will be encoded and sent later
 		*client->netchan_end_queue_ = netbuf;
 		client->netchan_end_queue_ = &(*client->netchan_end_queue_)->next_;

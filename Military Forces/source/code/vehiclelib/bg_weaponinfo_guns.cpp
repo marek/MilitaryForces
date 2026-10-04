@@ -10,7 +10,7 @@
 void						
 WeaponInfo::createAllGuns(WeaponList& weapons)
 {
-	WeaponInfo* wep = 0;
+	WeaponInfo* wep = nullptr;
 
 	// machinegun: WW1, cal .303, 2 barrels
 	wep = createWeapon();

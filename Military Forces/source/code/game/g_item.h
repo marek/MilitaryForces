@@ -8,11 +8,11 @@
 struct GameItem : public GameEntity
 {
 					GameItem() {}
-	virtual			~GameItem() {}
+	~GameItem() override {}
 
 	struct Think_FinishSpawningItem : public GameEntity::EntityFunc_Think
 	{
-		virtual void execute();
+		void execute() override;
 	};
 };
 

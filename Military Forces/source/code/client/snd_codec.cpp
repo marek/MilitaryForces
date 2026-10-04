@@ -37,12 +37,12 @@ then tries all supported codecs.
 static void *S_CodecGetSound(const char *filename, snd_info_t *info)
 {
 	snd_codec_t *codec;
-	snd_codec_t *orgCodec = NULL;
+	snd_codec_t *orgCodec = nullptr;
 	bool	orgNameFailed = false;
 	char		localName[ MAX_QPATH ];
 	const char	*ext;
 	char		altName[ MAX_QPATH ];
-	void		*rtn = NULL;
+	void		*rtn = nullptr;
 
 	Q_strncpyz(localName, filename, MAX_QPATH);
 
@@ -112,7 +112,7 @@ static void *S_CodecGetSound(const char *filename, snd_info_t *info)
 
 	Com_Printf(S_COLOR_YELLOW "WARNING: Failed to %s sound %s!\n", info ? "load" : "open", filename);
 
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -120,9 +120,9 @@ static void *S_CodecGetSound(const char *filename, snd_info_t *info)
 S_CodecInit
 =================
 */
-void S_CodecInit(void)
+void S_CodecInit()
 {
-	codecs = NULL;
+	codecs = nullptr;
 
 #ifdef USE_CODEC_OPUS
 	S_CodecRegister(&opus_codec);
@@ -141,9 +141,9 @@ void S_CodecInit(void)
 S_CodecShutdown
 =================
 */
-void S_CodecShutdown(void)
+void S_CodecShutdown()
 {
-	codecs = NULL;
+	codecs = nullptr;
 }
 
 /*
@@ -174,7 +174,7 @@ S_CodecOpenStream
 */
 snd_stream_t *S_CodecOpenStream(const char *filename)
 {
-	return (snd_stream_t *)S_CodecGetSound(filename, NULL);
+	return (snd_stream_t *)S_CodecGetSound(filename, nullptr);
 }
 
 void S_CodecCloseStream(snd_stream_t *stream)
@@ -206,7 +206,7 @@ snd_stream_t *S_CodecUtilOpen(const char *filename, snd_codec_t *codec)
 	if(!hnd)
 	{
 		Com_DPrintf("Can't read sound file %s\n", filename);
-		return NULL;
+		return nullptr;
 	}
 
 	// Allocate a stream
@@ -214,7 +214,7 @@ snd_stream_t *S_CodecUtilOpen(const char *filename, snd_codec_t *codec)
 	if(!stream)
 	{
 		FS_FCloseFile(hnd);
-		return NULL;
+		return nullptr;
 	}
 
 	// Copy over, return
@@ -233,5 +233,5 @@ void S_CodecUtilClose(snd_stream_t **stream)
 {
 	FS_FCloseFile((*stream)->file);
 	Z_Free(*stream);
-	*stream = NULL;
+	*stream = nullptr;
 }

@@ -30,7 +30,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "tr_local.h"
 #include "tr_dsa.h"
 
-void GLimp_InitExtraExtensions(void)
+void GLimp_InitExtraExtensions()
 {
 	char *extension;
 	const char* result[3] = { "...ignoring %s\n", "...using %s\n", "...%s not found\n" };
@@ -350,7 +350,7 @@ void GLimp_InitExtraExtensions(void)
 done:
 
 	// Determine GLSL version
-	if (1)
+	if (true)
 	{
 		char version[256], *version_p;
 

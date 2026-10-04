@@ -126,31 +126,31 @@ typedef struct {
 // Interface between Q3 sound "api" and the sound backend
 typedef struct
 {
-	void (*Shutdown)(void);
+	void (*Shutdown)();
 	void (*StartSound)( vec3_t origin, int entnum, int entchannel, sfxHandle_t sfx );
 	void (*StartLocalSound)( sfxHandle_t sfx, int channelNum );
 	void (*StartBackgroundTrack)( const char *intro, const char *loop );
-	void (*StopBackgroundTrack)( void );
+	void (*StopBackgroundTrack)( );
 	void (*RawSamples)(int stream, int samples, int rate, int width, int channels, const byte *data, float volume, int entityNum);
-	void (*StopAllSounds)( void );
+	void (*StopAllSounds)( );
 	void (*ClearLoopingSounds)( bool killall );
 	void (*AddLoopingSound)( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfx );
 	void (*AddRealLoopingSound)( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfx );
 	void (*StopLoopingSound)(int entityNum );
 	void (*Respatialize)( int entityNum, const vec3_t origin, vec3_t axis[3], int inwater );
 	void (*UpdateEntityPosition)( int entityNum, const vec3_t origin );
-	void (*Update)( void );
-	void (*DisableSounds)( void );
-	void (*BeginRegistration)( void );
+	void (*Update)( );
+	void (*DisableSounds)( );
+	void (*BeginRegistration)( );
 	sfxHandle_t (*RegisterSound)( const char *sample, bool compressed );
-	void (*ClearSoundBuffer)( void );
-	void (*SoundInfo)( void );
-	void (*SoundList)( void );
+	void (*ClearSoundBuffer)( );
+	void (*SoundInfo)( );
+	void (*SoundList)( );
 #ifdef USE_VOIP
-	void (*StartCapture)( void );
-	int (*AvailableCaptureSamples)( void );
+	void (*StartCapture)( );
+	int (*AvailableCaptureSamples)( );
 	void (*Capture)( int samples, byte *data );
-	void (*StopCapture)( void );
+	void (*StopCapture)( );
 	void (*MasterGain)( float gain );
 #endif
 } soundInterface_t;
@@ -165,23 +165,23 @@ typedef struct
 */
 
 // initializes cycling through a DMA buffer and returns information on it
-bool SNDDMA_Init(void);
+bool SNDDMA_Init();
 
 // gets the current DMA position
-int		SNDDMA_GetDMAPos(void);
+int		SNDDMA_GetDMAPos();
 
 // shutdown the DMA xfer.
-void	SNDDMA_Shutdown(void);
+void	SNDDMA_Shutdown();
 
-void	SNDDMA_BeginPainting (void);
+void	SNDDMA_BeginPainting ();
 
-void	SNDDMA_Submit(void);
+void	SNDDMA_Submit();
 
 #ifdef USE_VOIP
-void SNDDMA_StartCapture(void);
-int SNDDMA_AvailableCaptureSamples(void);
+void SNDDMA_StartCapture();
+int SNDDMA_AvailableCaptureSamples();
 void SNDDMA_Capture(int samples, byte *data);
-void SNDDMA_StopCapture(void);
+void SNDDMA_StopCapture();
 void SNDDMA_MasterGain(float val);
 #endif
 
@@ -215,9 +215,9 @@ extern cvar_t *s_testsound;
 bool S_LoadSound( sfx_t *sfx );
 
 void		SND_free(sndBuffer *v);
-sndBuffer*	SND_malloc( void );
-void		SND_setup( void );
-void		SND_shutdown(void);
+sndBuffer*	SND_malloc( );
+void		SND_setup( );
+void		SND_shutdown();
 
 void S_PaintChannels(int endtime);
 
@@ -236,7 +236,7 @@ void S_AdpcmGetSamples(sndBuffer *chunk, short *to);
 #define SENTINEL_MULAW_ZERO_RUN 127
 #define SENTINEL_MULAW_FOUR_BIT_RUN 126
 
-void S_FreeOldestSound( void );
+void S_FreeOldestSound( );
 
 #define	NXStream byte
 

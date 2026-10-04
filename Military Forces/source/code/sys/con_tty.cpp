@@ -84,7 +84,7 @@ send "\b \b"
 (FIXME there may be a way to find out if '\b' alone would work though)
 ==================
 */
-static void CON_Back( void )
+static void CON_Back( )
 {
 	char key;
 	size_t Q_UNUSED_VAR size;
@@ -105,7 +105,7 @@ Clear the display of the line currently edited
 bring cursor back to beginning of line
 ==================
 */
-static void CON_Hide( void )
+static void CON_Hide( )
 {
 	if( ttycon_on )
 	{
@@ -138,7 +138,7 @@ Show the current line
 FIXME need to position the cursor if needed?
 ==================
 */
-static void CON_Show( void )
+static void CON_Show( )
 {
 	if( ttycon_on )
 	{
@@ -168,7 +168,7 @@ CON_Shutdown
 Never exit without calling this, or your terminal will be left in a pretty bad state
 ==================
 */
-void CON_Shutdown( void )
+void CON_Shutdown( )
 {
 	if (ttycon_on)
 	{
@@ -215,7 +215,7 @@ void Hist_Add(field_t *field)
 Hist_Prev
 ==================
 */
-field_t *Hist_Prev( void )
+field_t *Hist_Prev( )
 {
 	int hist_prev;
 	assert(hist_count <= CON_HISTORY);
@@ -225,7 +225,7 @@ field_t *Hist_Prev( void )
 	hist_prev = hist_current + 1;
 	if (hist_prev >= hist_count)
 	{
-		return NULL;
+		return nullptr;
 	}
 	hist_current++;
 	return &(ttyEditLines[hist_current]);
@@ -236,7 +236,7 @@ field_t *Hist_Prev( void )
 Hist_Next
 ==================
 */
-field_t *Hist_Next( void )
+field_t *Hist_Next( )
 {
 	assert(hist_count <= CON_HISTORY);
 	assert(hist_count >= 0);
@@ -248,7 +248,7 @@ field_t *Hist_Next( void )
 	}
 	if (hist_current == -1)
 	{
-		return NULL;
+		return nullptr;
 	}
 	return &(ttyEditLines[hist_current]);
 }
@@ -273,7 +273,7 @@ CON_Init
 Initialize the console input (tty mode if possible)
 ==================
 */
-void CON_Init( void )
+void CON_Init( )
 {
 	struct termios tc;
 
@@ -330,7 +330,7 @@ void CON_Init( void )
 CON_Input
 ==================
 */
-char *CON_Input( void )
+char *CON_Input( )
 {
 	// we use this when sending back commands
 	static char text[MAX_EDIT_LINE];
@@ -355,7 +355,7 @@ char *CON_Input( void )
 					TTY_con.buffer[TTY_con.cursor] = '\0';
 					CON_Back();
 				}
-				return NULL;
+				return nullptr;
 			}
 			// check if this is a control char
 			if ((key) && (key) < ' ')
@@ -406,7 +406,7 @@ char *CON_Input( void )
 					CON_Hide();
 					Field_AutoComplete( &TTY_con );
 					CON_Show();
-					return NULL;
+					return nullptr;
 				}
 				avail = read(STDIN_FILENO, &key, 1);
 				if (avail != -1)
@@ -428,7 +428,7 @@ char *CON_Input( void )
 										CON_Show();
 									}
 									tcflush(STDIN_FILENO, TCIFLUSH);
-									return NULL;
+									return nullptr;
 									break;
 								case 'B':
 									history = Hist_Next();
@@ -442,22 +442,22 @@ char *CON_Input( void )
 									}
 									CON_Show();
 									tcflush(STDIN_FILENO, TCIFLUSH);
-									return NULL;
+									return nullptr;
 									break;
 								case 'C':
-									return NULL;
+									return nullptr;
 								case 'D':
-									return NULL;
+									return nullptr;
 							}
 						}
 					}
 				}
 				Com_DPrintf("droping ISCTL sequence: %d, TTY_erase: %d\n", key, TTY_erase);
 				tcflush(STDIN_FILENO, TCIFLUSH);
-				return NULL;
+				return nullptr;
 			}
 			if (TTY_con.cursor >= sizeof(text) - 1)
-				return NULL;
+				return nullptr;
 			// push regular character
 			TTY_con.buffer[TTY_con.cursor] = key;
 			TTY_con.cursor++; // next char will always be '\0'
@@ -465,7 +465,7 @@ char *CON_Input( void )
 			size = write(STDOUT_FILENO, &key, 1);
 		}
 
-		return NULL;
+		return nullptr;
 	}
 	else if (stdin_active)
 	{
@@ -477,23 +477,23 @@ char *CON_Input( void )
 		FD_SET(STDIN_FILENO, &fdset); // stdin
 		timeout.tv_sec = 0;
 		timeout.tv_usec = 0;
-		if(select (STDIN_FILENO + 1, &fdset, NULL, NULL, &timeout) == -1 || !FD_ISSET(STDIN_FILENO, &fdset))
-			return NULL;
+		if(select (STDIN_FILENO + 1, &fdset, nullptr, nullptr, &timeout) == -1 || !FD_ISSET(STDIN_FILENO, &fdset))
+			return nullptr;
 
 		len = read(STDIN_FILENO, text, sizeof(text));
 		if (len == 0)
 		{ // eof!
 			stdin_active = false;
-			return NULL;
+			return nullptr;
 		}
 
 		if (len < 1)
-			return NULL;
+			return nullptr;
 		text[len-1] = 0;    // rip off the /n and terminate
 
 		return text;
 	}
-	return NULL;
+	return nullptr;
 }
 
 /*

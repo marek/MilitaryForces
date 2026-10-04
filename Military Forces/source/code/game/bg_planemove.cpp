@@ -219,7 +219,7 @@ PM_PlaneMove
 */
 bool	PM_SlideMove_Plane();
 
-void PM_PlaneMove( void ) 
+void PM_PlaneMove( ) 
 {
     vec3_t	viewdir;
     vec3_t	vehdir;
@@ -340,7 +340,7 @@ void PM_PlaneMove( void )
 		if( pm->ps->vehicleAngles[PITCH] < 70 ) {
 			pm->ps->vehicleAngles[PITCH] += 40 * pml.frametime; // nose drops at 60 deg/sec
 		}
-		AngleVectors( pm->ps->vehicleAngles, pm->ps->velocity, NULL, NULL );
+		AngleVectors( pm->ps->vehicleAngles, pm->ps->velocity, nullptr, nullptr );
 		VectorScale( pm->ps->velocity, (float)pm->ps->speed/10, pm->ps->velocity );
 		// dirty trick to remember bankangle
 		if( pm->ps->vehicleAngles[2] <= 0 ) {
@@ -492,13 +492,13 @@ void PM_PlaneMove( void )
 
 	// speed
 	if( pm->ps->ONOFF & OO_LANDED ) vehdir[0] = 0;
-	AngleVectors( vehdir, pm->ps->velocity, NULL, NULL );
+	AngleVectors( vehdir, pm->ps->velocity, nullptr, nullptr );
 	VectorScale( pm->ps->velocity, (float)pm->ps->speed/10, pm->ps->velocity );
 
 	PM_SlideMove_Plane();
 }
 
-void PM_PlaneMoveAdvanced( void ) 
+void PM_PlaneMoveAdvanced( ) 
 {
     vec3_t	viewdir;
     vec3_t	vehdir;
@@ -620,7 +620,7 @@ void PM_PlaneMoveAdvanced( void )
 		if( pm->ps->vehicleAngles[PITCH] < 70 ) {
 			pm->ps->vehicleAngles[PITCH] += 40 * pml.frametime; // nose drops at 60 deg/sec
 		}
-		AngleVectors( pm->ps->vehicleAngles, pm->ps->velocity, NULL, NULL );
+		AngleVectors( pm->ps->vehicleAngles, pm->ps->velocity, nullptr, nullptr );
 		VectorScale( pm->ps->velocity, (float)pm->ps->speed/10, pm->ps->velocity );
 		// dirty trick to remember bankangle
 		if( pm->ps->vehicleAngles[2] <= 0 ) {
@@ -761,7 +761,7 @@ void PM_PlaneMoveAdvanced( void )
 
 	// speed
 	if( pm->ps->ONOFF & OO_LANDED ) vehdir[0] = 0;
-	AngleVectors( vehdir, pm->ps->velocity, NULL, NULL );
+	AngleVectors( vehdir, pm->ps->velocity, nullptr, nullptr );
 	VectorScale( pm->ps->velocity, (float)pm->ps->speed/10, pm->ps->velocity );
 
 	PM_SlideMove_Plane();
@@ -861,8 +861,8 @@ bool	PM_SlideMove_Plane() {
 
 			pm->trace ( &trace, 
 					pm->ps->origin, 
-					0, 
-					0, 
+					nullptr, 
+					nullptr, 
 					end, 
 					pm->ps->clientNum, 
 					pm->tracemask,

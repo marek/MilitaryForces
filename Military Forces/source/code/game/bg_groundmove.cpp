@@ -161,7 +161,7 @@ PM_AdjustToTerrain
 
 ===================
 */
-static void PM_AdjustToTerrain( void ) 
+static void PM_AdjustToTerrain( ) 
 {
 	trace_t		tr;
 	vec3_t		dir, forward, right;
@@ -182,8 +182,8 @@ static void PM_AdjustToTerrain( void )
 	VectorSet( end[0], pm->ps->origin[0], pm->ps->origin[1], pm->ps->origin[2] + pm->mins[2] - 2 );
 	pm->trace ( &tr, 
 				start[0], 
-				0,//availableVehicles[pm->vehicle].mins, 
-				0,//availableVehicles[pm->vehicle].maxs, 
+				nullptr,//availableVehicles[pm->vehicle].mins, 
+				nullptr,//availableVehicles[pm->vehicle].maxs, 
 				end[0], 
 				pm->ps->clientNum, 
 				MASK_SOLID,
@@ -194,7 +194,7 @@ static void PM_AdjustToTerrain( void )
 
 		// set up start and endpoints for full and close distance
 		VectorSet( dir, 0, pm->ps->vehicleAngles[1], 0 );
-		AngleVectors( dir, forward, right, 0 );
+		AngleVectors( dir, forward, right, nullptr );
 		VectorMA( pm->ps->origin, availableVehicles[pm->vehicle].maxs[0], forward, start[PFRONT] );
 		VectorMA( pm->ps->origin, availableVehicles[pm->vehicle].mins[0], forward, start[PBACK] );
 		VectorMA( pm->ps->origin, availableVehicles[pm->vehicle].maxs[1], right, start[PRIGHT] );
@@ -312,7 +312,7 @@ PM_GroundVehicleMove
 */
 bool	PM_SlideMove_GV();
 
-void PM_GroundVehicleMove( void ) 
+void PM_GroundVehicleMove( ) 
 {
 	// like in the q3tank mod and airq2 the left/right keys turn the hull of the tank
 	// while the mouse turns the turret/gunbarrel; and also like in airq2 we will later
@@ -353,10 +353,10 @@ void PM_GroundVehicleMove( void )
 	// speed
 	speed = (float)pm->ps->speed/10;
 	if( pm->ps->ONOFF & OO_STALLED ) {
-		AngleVectors( pm->ps->vehicleAngles, forward, NULL, NULL );
+		AngleVectors( pm->ps->vehicleAngles, forward, nullptr, nullptr );
 		VectorNegate( forward, forward );
 	} else {
-		AngleVectors( pm->ps->vehicleAngles, forward, NULL, NULL );
+		AngleVectors( pm->ps->vehicleAngles, forward, nullptr, nullptr );
 	}
 	VectorNormalize( pm->ps->velocity );
 	VectorAdd( forward, pm->ps->velocity, forward );
@@ -368,7 +368,7 @@ void PM_GroundVehicleMove( void )
 	PM_AdjustToTerrain();
 
 	// get the actual turret angles
-	AngleVectors( pm->ps->vehicleAngles, forward, 0, up );
+	AngleVectors( pm->ps->vehicleAngles, forward, nullptr, up );
 	RotatePointAroundVector( temp, up, forward, turret_yaw );
 	vectoangles( temp, turretdir );
 	turretdir[PITCH] += gun_pitch;
@@ -564,8 +564,8 @@ bool	PM_SlideMove_GV() {
 
 			pm->trace ( &trace, 
 					pm->ps->origin, 
-					0, 
-					0, 
+					nullptr, 
+					nullptr, 
 					end, 
 					pm->ps->clientNum, 
 					pm->tracemask,

@@ -111,7 +111,7 @@ PM_BoatMove
 */
 bool	PM_SlideMove_Boat();
 
-void PM_BoatMove( void ) 
+void PM_BoatMove( ) 
 {
     vec3_t		viewdir;
     vec3_t		vehdir;
@@ -137,11 +137,11 @@ void PM_BoatMove( void )
 	VectorCopy( pm->ps->vehicleAngles, vehdir );
 	vehdir[0] = 0;
 	if( pm->ps->ONOFF & OO_STALLED ) {
-		AngleVectors( vehdir, forward, NULL, NULL );
+		AngleVectors( vehdir, forward, nullptr, nullptr );
 		VectorNegate( forward, forward );
 		reverse = true;
 	} else {
-		AngleVectors( vehdir, forward, NULL, NULL );
+		AngleVectors( vehdir, forward, nullptr, nullptr );
 	}
 	VectorNormalize( pm->ps->velocity );
 	VectorAdd( forward, pm->ps->velocity, forward );
@@ -179,7 +179,7 @@ void PM_BoatMove( void )
 	}
 
 	// get the actual turret angles
-	AngleVectors( pm->ps->vehicleAngles, forward, 0, up );
+	AngleVectors( pm->ps->vehicleAngles, forward, nullptr, up );
 	RotatePointAroundVector( temp, up, forward, turret_yaw );
 	vectoangles( temp, turretdir );
 	turretdir[PITCH] += gun_pitch;
@@ -326,8 +326,8 @@ bool PM_SlideMove_Boat() {
 	down[2] -= 10;
 	pm->trace( &trace,
 			   up,
-			   0,
-			   0,
+			   nullptr,
+			   nullptr,
 			   down,
 			   pm->ps->clientNum,
 			   MASK_ALL,
@@ -351,8 +351,8 @@ bool PM_SlideMove_Boat() {
 
 		pm->trace ( &trace, 
 					pm->ps->origin, 
-					0, 
-					0, 
+					nullptr, 
+					nullptr, 
 					end, 
 					pm->ps->clientNum, 
 					pm->tracemask,

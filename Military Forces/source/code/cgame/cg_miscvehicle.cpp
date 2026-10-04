@@ -121,7 +121,7 @@ static void CG_Misc_Plane( centity_t *cent )
 
 	// smoke
 	if( cent->currentState.generic1 ) {
-		AngleVectors( cent->lerpAngles, forward, NULL, NULL );
+		AngleVectors( cent->lerpAngles, forward, nullptr, nullptr );
 		VectorMA( cent->lerpOrigin, availableVehicles[cent->currentState.modelindex].mins[0], forward, smokePosition );
 		CG_Generic_Smoke( cent, smokePosition, 10 );
 	}
@@ -208,7 +208,7 @@ static void CG_Misc_GV( centity_t *cent )
 		float dist = drawInfo.basicInfo.speed * timediff / 1000;
 		vec3_t v1, v2;
 		float dot;
-		AngleVectors( cent->currentState.angles, v1, 0, 0 );
+		AngleVectors( cent->currentState.angles, v1, nullptr, nullptr );
 		VectorCopy( cent->currentState.pos.trDelta, v2 );
 		VectorNormalize( v2 );
 		dot = DotProduct( v1, v2 );
@@ -241,7 +241,7 @@ static void CG_Misc_GV( centity_t *cent )
 		vec3_t			pos;
 		vec3_t			forward;
 
-		AngleVectors( cent->lerpAngles, forward, NULL, NULL );
+		AngleVectors( cent->lerpAngles, forward, nullptr, nullptr );
 		VectorCopy( cent->lerpOrigin, pos );
 		pos[2] += 12;
 
@@ -313,7 +313,7 @@ static void CG_Misc_Helo( centity_t *cent )
 		vec3_t			pos;
 		vec3_t			forward;
 
-		AngleVectors( cent->lerpAngles, forward, NULL, NULL );
+		AngleVectors( cent->lerpAngles, forward, nullptr, nullptr );
 		VectorCopy( cent->lerpOrigin, pos );
 		pos[2] += 12;
 
@@ -395,7 +395,7 @@ static void CG_Misc_Boat( centity_t *cent )
 		vec3_t			pos;
 		vec3_t			forward;
 
-		AngleVectors( cent->lerpAngles, forward, NULL, NULL );
+		AngleVectors( cent->lerpAngles, forward, nullptr, nullptr );
 		VectorCopy( cent->lerpOrigin, pos );
 		pos[2] += 12;
 
@@ -453,7 +453,7 @@ static void CG_Misc_GI( centity_t *cent )
 		vec3_t			pos;
 		vec3_t			forward;
 
-		AngleVectors( cent->lerpAngles, forward, NULL, NULL );
+		AngleVectors( cent->lerpAngles, forward, nullptr, nullptr );
 		VectorCopy( cent->lerpOrigin, pos );
 		pos[2] += 12;
 

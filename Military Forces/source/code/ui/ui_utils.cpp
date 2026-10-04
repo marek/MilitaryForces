@@ -15,15 +15,15 @@ UI_Utils::UI_Utils() :
 	menuCount_(0),
 	openMenuCount_(0),
 	editingField_(false),
-	bindItem_(0),
-	editItem_(0),
-	itemCapture_(0),
+	bindItem_(nullptr),
+	editItem_(nullptr),
+	itemCapture_(nullptr),
 	waitingForKey_(false),
 	lastListBoxClickTime_(0),
-	captureTool_(0),
+	captureTool_(nullptr),
 	debugMode_(false),
 	allocPoint_(0),
-	outOfMemory_(0),
+	outOfMemory_(false),
 	strPoolIndex_(0),
 	strHandleCount_(0)
 {
@@ -96,7 +96,7 @@ UI_Utils::window_Paint( Window *w, float fadeAmount, float fadeClamp, float fade
 	vec4_t color;
 	rectDef_t fillRect;
 
-	if ( w == NULL ) {
+	if ( w == nullptr ) {
 		return;
 	}
 
@@ -127,7 +127,7 @@ UI_Utils::window_Paint( Window *w, float fadeAmount, float fadeClamp, float fade
 			fade(&w->flags, &w->backColor[3], fadeClamp, &w->nextTime, fadeCycle, true, fadeAmount);
 			dc_->setColor(w->backColor);
 			dc_->drawHandlePic(fillRect.x, fillRect.y, fillRect.w, fillRect.h, w->background);
-			dc_->setColor(NULL);
+			dc_->setColor(nullptr);
 		} 
 		else 
 		{
@@ -145,7 +145,7 @@ UI_Utils::window_Paint( Window *w, float fadeAmount, float fadeClamp, float fade
 			dc_->setColor(w->foreColor);
 		
 		dc_->drawHandlePic(fillRect.x, fillRect.y, fillRect.w, fillRect.h, w->background);
-		dc_->setColor(NULL);
+		dc_->setColor(nullptr);
 	} 
 	else if (w->style == WINDOW_STYLE_CINEMATIC) 
 	{
@@ -171,14 +171,14 @@ UI_Utils::window_Paint( Window *w, float fadeAmount, float fadeClamp, float fade
 		// top/bottom
 		dc_->setColor(w->borderColor);
 		dc_->drawTopBottom(w->rect.x, w->rect.y, w->rect.w, w->rect.h, w->borderSize);
-  		dc_->setColor( NULL );
+  		dc_->setColor( nullptr );
 	} 
 	else if (w->border == WINDOW_BORDER_VERT) 
 	{
 		// left right
 		dc_->setColor(w->borderColor);
 		dc_->drawSides(w->rect.x, w->rect.y, w->rect.w, w->rect.h, w->borderSize);
-  		dc_->setColor( NULL );
+  		dc_->setColor( nullptr );
 	} 
 	else if (w->border == WINDOW_BORDER_KCGRADIENT) 
 	{
@@ -220,7 +220,7 @@ UI_Utils::gradientBar_Paint( rectDef_t *rect, vec4_t color )
 	// gradient bar takes two paints
 	dc_->setColor( color );
 	dc_->drawHandlePic(rect->x, rect->y, rect->w, rect->h, dc_->assets_.gradientBar);
-	dc_->setColor( NULL );
+	dc_->setColor( nullptr );
 }
 
 void 
@@ -273,7 +273,7 @@ UI_Utils::item_EnableShowViaCvar(itemDef_t *item, int flag)
 
 		Q_strcat(script, 1024, item->enableCvar);
 		p = script;
-		while (1) 
+		while (true) 
 		{
 			const char *val;
 			// expect value then ; or NULL, NULL ends list
@@ -318,7 +318,7 @@ UI_Utils::item_SetFocus(itemDef_t *item, float x, float y)
 	menuDef_t *parent; // bk001206: = (menuDef_t*)item->parent;
 
 	// sanity check, non-null, not a decoration and does not already have the focus
-	if ( item == NULL || (item->window.flags & WINDOW_DECORATION) || (item->window.flags & WINDOW_HASFOCUS) ||
+	if ( item == nullptr || (item->window.flags & WINDOW_DECORATION) || (item->window.flags & WINDOW_HASFOCUS) ||
 		!(item->window.flags & WINDOW_VISIBLE)) 
 	{
 		return false;
@@ -396,7 +396,7 @@ UI_Utils::item_RunScript(itemDef_t *item, const char *s)
 	{
 		Q_strcat(script, 1024, s);
 		p = script;
-		while (1) 
+		while (true) 
 		{
 			const char *command;
 			// expect command then arguments, ; ends command, NULL ends script
@@ -438,7 +438,7 @@ UI_Utils::item_UpdatePosition( itemDef_t *item )
 	float x, y;
 	menuDef_t *menu;
   
-	if (item == NULL || item->parent == NULL) 
+	if (item == nullptr || item->parent == nullptr) 
 	    return;
 
 	menu = reinterpret_cast<menuDef_t*>(item->parent);
@@ -459,7 +459,7 @@ UI_Utils::item_UpdatePosition( itemDef_t *item )
 void 
 UI_Utils::item_SetScreenCoords( itemDef_t *item, float x, float y )
 {
-	if (item == NULL) 
+	if (item == nullptr) 
 		return;
 
 	if (item->window.border != 0) 
@@ -506,7 +506,7 @@ UI_Utils::item_Parse( int handle, itemDef_t *item )
 	if (*token.string_ != '{')
 		return false;
 
-	while ( 1 ) 
+	while ( true ) 
 	{
 		if (!precomp_.readTokenHandle(handle, &token)) 
 		{
@@ -535,7 +535,7 @@ UI_Utils::item_Parse( int handle, itemDef_t *item )
 void 
 UI_Utils::item_InitControls( itemDef_t *item ) 
 {
-	if (item == NULL) {
+	if (item == nullptr) {
 		return;
 	}
 	if (item->type == ITEM_TYPE_LISTBOX) {
@@ -593,7 +593,7 @@ UI_Utils::item_Paint(itemDef_t *item)
 	red[0] = red[3] = 1;
 	red[1] = red[2] = 0;
 
-	if (item == NULL) 
+	if (item == nullptr) 
 		return;
  
 	if (item->window.flags & WINDOW_ORBITING) 
@@ -826,7 +826,7 @@ UI_Utils::item_OwnerDraw_Paint( itemDef_t *item )
 {
 	 menuDef_t *parent;
 
-	if (item == NULL) 
+	if (item == nullptr) 
 		return;
 	
 	parent = (menuDef_t*)item->parent;
@@ -923,9 +923,9 @@ UI_Utils::item_Text_Paint(itemDef_t *item)
 		return;
 	}
 
-	if (item->text == NULL) 
+	if (item->text == nullptr) 
 	{
-		if (item->cvar == NULL)
+		if (item->cvar == nullptr)
 		{
 			return;
 		}
@@ -965,11 +965,11 @@ UI_Utils::item_Text_AutoWrapped_Paint( itemDef_t *item )
 	vec4_t color;
 
 	textWidth = 0;
-	newLinePtr = NULL;
+	newLinePtr = nullptr;
 
-	if (item->text == NULL) 
+	if (item->text == nullptr) 
 	{
-		if (item->cvar == NULL) 
+		if (item->cvar == nullptr) 
 			return;
 		else 
 		{
@@ -1280,7 +1280,7 @@ UI_Utils::item_Model_Paint( itemDef_t *item )
 	vec3_t			angles;
 	modelDef_t *modelPtr = (modelDef_t*)item->typeData;
 
-	if (modelPtr == NULL) 
+	if (modelPtr == nullptr) 
 		return;
 
 	// setup the refdef
@@ -1531,9 +1531,9 @@ UI_Utils::item_Text_Wrapped_Paint( itemDef_t *item )
 	// now paint the text and/or any optional images
 	// default to left
 
-	if (item->text == NULL) 
+	if (item->text == nullptr) 
 	{
-		if (item->cvar == NULL) 
+		if (item->cvar == nullptr) 
 			return;
 		else 
 		{
@@ -1576,7 +1576,7 @@ UI_Utils::item_SetTextExtents( itemDef_t *item, int *width, int *height, const c
 {
 	const char *textPtr = (text) ? text : item->text;
 
-	if (textPtr == NULL ) 
+	if (textPtr == nullptr ) 
 		return;
 
 	*width = item->textRect.w;
@@ -2012,7 +2012,7 @@ UI_Utils::item_Bind_HandleKey( itemDef_t *item, int key, int down )
 	}
 	else
 	{
-		if (!waitingForKey_ || bindItem_ == NULL) 
+		if (!waitingForKey_ || bindItem_ == nullptr) 
 			return true;
 
 		if (key & K_CHAR_FLAG) 
@@ -2033,7 +2033,7 @@ UI_Utils::item_Bind_HandleKey( itemDef_t *item, int key, int down )
 				}
 				controlUtils_->setConfig(true);
 				waitingForKey_ = false;
-				bindItem_ = NULL;
+				bindItem_ = nullptr;
 				return true;
 
 			case '`':
@@ -2104,7 +2104,7 @@ UI_Utils::item_TextField_HandleKey( itemDef_t *item, int key )
 {
 	char buff[1024];
 	int len;
-	itemDef_t *newItem = NULL;
+	itemDef_t *newItem = nullptr;
 	editFieldDef_t *editPtr = static_cast<editFieldDef_t*>(item->typeData);
 
 	if (item->cvar) 
@@ -2266,9 +2266,9 @@ UI_Utils::item_HandleKey( itemDef_t *item, int key, int down )
 	if (itemCapture_) 
 	{
 		item_StopCapture(itemCapture_);
-		itemCapture_ = 0;
+		itemCapture_ = nullptr;
 		delete captureTool_;
-		captureTool_ = 0;
+		captureTool_ = nullptr;
 	} 
 	else 
 	{
@@ -2737,7 +2737,7 @@ int
 UI_Utils::item_Multi_CountSettings( itemDef_t *item ) 
 {
 	multiDef_t *multiPtr = (multiDef_t*)item->typeData;
-	if (multiPtr == NULL) 
+	if (multiPtr == nullptr) 
 	{
 		return 0;
 	}
@@ -2801,7 +2801,7 @@ UI_Utils::item_Slider_OverSlider( itemDef_t *item, float x, float y )
 void
 UI_Utils::item_Image_Paint( itemDef_t *item ) 
 {
-	if (item == NULL) 
+	if (item == nullptr) 
 		return;
 
 	dc_->drawHandlePic(item->window.rect.x+1, item->window.rect.y+1, item->window.rect.w-2, 
@@ -2820,8 +2820,8 @@ itemDef_t*
 UI_Utils::menu_FindItemByName( menuDef_t *menu, const char *p )
 {
 	int i;
-	if (menu == NULL || p == NULL) 
-		return NULL;
+	if (menu == nullptr || p == nullptr) 
+		return nullptr;
   
 	for (i = 0; i < menu->itemCount; i++) 
 	{
@@ -2831,17 +2831,17 @@ UI_Utils::menu_FindItemByName( menuDef_t *menu, const char *p )
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 itemDef_t*
 UI_Utils::menu_ClearFocus(menuDef_t *menu) 
 {
 	int i;
-	itemDef_t *ret = NULL;
+	itemDef_t *ret = nullptr;
 
-	if (menu == NULL)
-		return NULL;
+	if (menu == nullptr)
+		return nullptr;
  
 	for( i = 0; i < menu->itemCount; i++ ) 
 	{
@@ -2864,7 +2864,7 @@ UI_Utils::menu_FadeItemByName( menuDef_t *menu, const char *p, bool fadeOut )
 	for (i = 0; i < count; i++) 
 	{
 		item = menu_GetMatchingItemByNumber(menu, i, p);
-		if (item != NULL) 
+		if (item != nullptr) 
 		{
 			if (fadeOut) 
 			{
@@ -2889,7 +2889,7 @@ UI_Utils::menu_ShowItemByName(menuDef_t *menu, const char *p, bool bShow)
 	for (i = 0; i < count; i++) 
 	{
 		item = menu_GetMatchingItemByNumber(menu, i, p);
-		if (item != NULL) 
+		if (item != nullptr) 
 		{
 			if (bShow) 
 			{
@@ -2926,7 +2926,7 @@ UI_Utils::menu_GetMatchingItemByNumber(menuDef_t *menu, int index, const char *n
 			count++;
 		} 
 	}
-	return NULL;
+	return nullptr;
 }
 
 void 
@@ -2939,7 +2939,7 @@ void
 UI_Utils::menu_CloseByName(const char *p) 
 {
 	menuDef_t *menu = menu_FindByName(p);
-	if (menu != NULL) 
+	if (menu != nullptr) 
 	{
 		menu_RunCloseScript(menu);
 		menu->window.flags &= ~(WINDOW_VISIBLE | WINDOW_HASFOCUS);
@@ -2983,7 +2983,7 @@ UI_Utils::menu_TransitionItemByName(menuDef_t *menu, const char *p, rectDef_t re
 	for (i = 0; i < count; i++) 
 	{
 		item = menu_GetMatchingItemByNumber(menu, i, p);
-		if (item != NULL) 
+		if (item != nullptr) 
 		{
 			item->window.flags |= (WINDOW_INTRANSITION | WINDOW_VISIBLE);
 			item->window.offsetTime = time;
@@ -3007,7 +3007,7 @@ UI_Utils::menu_OrbitItemByName(menuDef_t *menu, const char *p, float x, float y,
 	for (i = 0; i < count; i++) 
 	{
 		item = menu_GetMatchingItemByNumber(menu, i, p);
-		if (item != NULL) 
+		if (item != nullptr) 
 		{
 			item->window.flags |= (WINDOW_ORBITING | WINDOW_VISIBLE);
 			item->window.offsetTime = time;
@@ -3027,7 +3027,7 @@ UI_Utils::menu_UpdatePosition( menuDef_t *menu )
 	int i;
 	float x, y;
 
-	if (menu == NULL)
+	if (menu == nullptr)
 		return;
 	  
 	x = menu->window.rect.x;
@@ -3047,7 +3047,7 @@ UI_Utils::menu_UpdatePosition( menuDef_t *menu )
 void 
 UI_Utils::menu_PostParse( menuDef_t *menu) 
 {
-	if (menu == NULL) 
+	if (menu == nullptr) 
 		return;
 
 	if (menu->fullScreen) 
@@ -3083,7 +3083,7 @@ UI_Utils::menu_FindByName( const char *p )
 			return &menus_[i];
 		} 
 	}
-	return NULL;
+	return nullptr;
 }
 
 void 
@@ -3199,7 +3199,7 @@ UI_Utils::menu_GetFocused()
 		return &menus_[i];
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 bool
@@ -3220,7 +3220,7 @@ menuDef_t*
 UI_Utils::menu_ActivateByName( const char *p )
 {
 	int i;
-	menuDef_t *m = NULL;
+	menuDef_t *m = nullptr;
 	menuDef_t *focus = menu_GetFocused();
 	for (i = 0; i < menuCount_; i++) 
 	{
@@ -3228,7 +3228,7 @@ UI_Utils::menu_ActivateByName( const char *p )
 		{
 			m = &menus_[i];
 			menu_Activate(m);
-			if (openMenuCount_ < MAX_OPEN_MENUS && focus != NULL) 
+			if (openMenuCount_ < MAX_OPEN_MENUS && focus != nullptr) 
 			{
 				menuStack_[openMenuCount_++] = focus;
 			}
@@ -3300,7 +3300,7 @@ UI_Utils::menu_Parse( int handle, menuDef_t *menu )
 	if (*token.string_ != '{')
 		return false;
     
-	while ( 1 ) 
+	while ( true ) 
 	{
 		memset(&token, 0, sizeof(UI_PrecompilerTools::PC_Token ));
 		if (!precomp_.readTokenHandle(handle, &token)) 
@@ -3334,7 +3334,7 @@ UI_Utils::menu_Paint( menuDef_t *menu, bool forcePaint )
 {
 	int i;
 
-	if (menu == NULL) 
+	if (menu == nullptr) 
 		return;
 
 	if (!(menu->window.flags & WINDOW_VISIBLE) &&  !forcePaint) 
@@ -3401,7 +3401,7 @@ UI_Utils::menu_CacheContents( menuDef_t *menu )
 void 
 UI_Utils::menu_HandleMouseMove( menuDef_t *menu, float x, float y ) 
 {
-	if (menu == NULL) 
+	if (menu == nullptr) 
 		return;
 	
 	if (!(menu->window.flags & (WINDOW_VISIBLE | WINDOW_FORCED)))
@@ -3482,7 +3482,7 @@ void
 UI_Utils::menu_HandleKey( menuDef_t *menu, int key, int down ) 
 {
 	int i;
-	itemDef_t *item = NULL;
+	itemDef_t *item = nullptr;
 	bool inHandler = false;
 
 	if (inHandler) 
@@ -3501,15 +3501,15 @@ UI_Utils::menu_HandleKey( menuDef_t *menu, int key, int down )
 		if (!item_TextField_HandleKey(editItem_, key)) 
 		{
 			editingField_ = false;
-			editItem_ = NULL;
+			editItem_ = nullptr;
 			inHandler = false;
 			return;
 		} 
 		else if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_MOUSE3) 
 		{
 			editingField_ = false;
-			editItem_ = NULL;
-			display_MouseMove(NULL, dc_->cursorX_, dc_->cursorY_);
+			editItem_ = nullptr;
+			display_MouseMove(nullptr, dc_->cursorX_, dc_->cursorY_);
 		} 
 		else if (key == K_TAB || key == K_UPARROW || key == K_DOWNARROW) 
 		{
@@ -3517,7 +3517,7 @@ UI_Utils::menu_HandleKey( menuDef_t *menu, int key, int down )
 		}
 	}
 
-	if (menu == NULL) 
+	if (menu == nullptr) 
 	{
 		inHandler = false;
 		return;
@@ -3547,7 +3547,7 @@ UI_Utils::menu_HandleKey( menuDef_t *menu, int key, int down )
 		}
 	}
 
-	if (item != NULL) 
+	if (item != nullptr) 
 	{
 		if (item_HandleKey(item, key, down)) 
 		{
@@ -3697,7 +3697,7 @@ UI_Utils::menu_SetNextCursorItem( menuDef_t *menu )
 		}
 	}
 	menu->cursorItem = oldCursor;
-	return NULL;
+	return nullptr;
 }
 
 
@@ -3730,7 +3730,7 @@ UI_Utils::menu_SetPrevCursorItem( menuDef_t *menu )
 		}
 	}
 	menu->cursorItem = oldCursor;
-	return NULL;
+	return nullptr;
 }
 
 int
@@ -3780,7 +3780,7 @@ UI_Utils::menu_GetFocusedItem( menuDef_t *menu )
 			}
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 void 
@@ -3803,9 +3803,9 @@ UI_Utils::menu_ScrollFeeder( menuDef_t *menu, int feeder, int down )
 void 
 UI_Utils::menu_SetFeederSelection( menuDef_t *menu, int feeder, int index, const char *name ) 
 {
-	if (menu == NULL) 
+	if (menu == nullptr) 
 	{
-		if (name == NULL) 
+		if (name == nullptr) 
 		{
 			menu = menu_GetFocused();
 		} 
@@ -3844,7 +3844,7 @@ UI_Utils::menu_HitTest( menuDef_t *menu, float x, float y )
 	    if (rect_ContainsPoint(&menu->items[i]->window.rect, x, y)) 
 			return menu->items[i];
 	}
-	return NULL;
+	return nullptr;
 }
 
 void 
@@ -3886,7 +3886,7 @@ void
 UI_Utils::display_HandleKey( int key, bool down, int x, int y ) 
 {
 	menuDef_t *menu = reinterpret_cast<menuDef_t*>(display_CaptureItem(x, y));
-	if (menu == NULL)  
+	if (menu == nullptr)  
 		menu = menu_GetFocused();
 
 	if (menu) 
@@ -3905,7 +3905,7 @@ UI_Utils::display_CaptureItem( int x, int y )
 		if (rect_ContainsPoint(&menus_[i].window.rect, x, y)) 
 			return &menus_[i];
 	}
-	return NULL;
+	return nullptr;
 }
 
 UI_DisplayContext* 
@@ -3937,7 +3937,7 @@ UI_Utils::display_MouseMove( void *p, int x, int y )
 	int i;
 	menuDef_t *menu = reinterpret_cast<menuDef_t*>(p);
 
-	if (menu == NULL) 
+	if (menu == nullptr) 
 	{
 		menu = menu_GetFocused();
 		if (menu) 
@@ -4098,7 +4098,7 @@ UI_Utils::pc_Script_Parse(int handle, const char **out)
 	    return false;
 	}
 
-	while ( 1 ) {
+	while ( true ) {
 		if (!precomp_.readTokenHandle(handle, &token))
 			return false;
 
@@ -4352,14 +4352,14 @@ UI_Utils::verticalGradient_Paint(rectDef_t *rect, vec4_t color)
 	// vertical gradient takes two paints
 	dc_->setColor( color );
 	dc_->drawHandlePic( rect->x, rect->y, rect->w, rect->h, dc_->assets_.verticalGradient );
-	dc_->setColor( 0 );
+	dc_->setColor( nullptr );
 }
 
 void 
 UI_Utils::drawStringNewAlpha( int x, int y, const char * pText, float alpha, textJustify_t formatting )
 {
 	// just use default extra parameters
-	drawStringNew( x, y, 0.5f, *createColourVector(1,1,1,alpha,NULL), pText, 0, 0, 3, formatting );
+	drawStringNew( x, y, 0.5f, *createColourVector(1,1,1,alpha,nullptr), pText, 0, 0, 3, formatting );
 }
 
 void 
@@ -4373,7 +4373,7 @@ void
 UI_Utils::drawStringNewBasic( int x, int y, float scale, const char * pText )
 {
 	// fill in a few parameters for us
-	drawStringNew( x, y, scale, *createColourVector(1,1,1,1,NULL), pText, 0, 0, ITEM_TEXTSTYLE_SHADOWED, LEFT_JUSTIFY );
+	drawStringNew( x, y, scale, *createColourVector(1,1,1,1,nullptr), pText, 0, 0, ITEM_TEXTSTYLE_SHADOWED, LEFT_JUSTIFY );
 }
 
 
@@ -4425,7 +4425,7 @@ UI_Utils::alloc( int size )
 	{
 		outOfMemory_ = true;
 		Com_Printf("UI_Alloc: Failure. Out of memory!\n");
-		return NULL;
+		return nullptr;
 	}
 
 	p = &memoryPool_[allocPoint_];
@@ -4453,7 +4453,7 @@ UI_Utils::string_Init()
 {
 	int i;
 	for( i = 0; i < HASH_TABLE_SIZE; i++ ) 
-		strHandle_[i] = 0;
+		strHandle_[i] = nullptr;
 
 	strHandleCount_ = 0;
 	strPoolIndex_ = 0;
@@ -4474,8 +4474,8 @@ UI_Utils::string_Alloc( const char *p )
 	StringDef *str, *last;
 	static const char *staticNULL = "";
 
-	if (p == NULL) 
-		return NULL;
+	if (p == nullptr) 
+		return nullptr;
 
 	if (*p == 0) 
 		return staticNULL;
@@ -4508,9 +4508,9 @@ UI_Utils::string_Alloc( const char *p )
 
 		str  = reinterpret_cast<StringDef*>(alloc(sizeof(StringDef)));
 		if (!str) {
-			return NULL;
+			return nullptr;
 		}
-		str->next = NULL;
+		str->next = nullptr;
 		str->str = &strPool_[ph];
 		if (last) 
 			last->next = str;
@@ -4519,7 +4519,7 @@ UI_Utils::string_Alloc( const char *p )
 		
 		return &strPool_[ph];
 	}
-	return NULL;
+	return nullptr;
 }
 
 void 

@@ -131,7 +131,7 @@ char *MF_ClientConnect( int clientNum, bool firstTime, bool isBot )
 	// count current clients and rank for scoreboard
 	CalculateRanks();
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -212,7 +212,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 	GameClient::ClientPersistant saved;
 	GameClient::ClientSession savedSess;
 	int		persistant[MAX_PERSISTANT];
-	GameEntity	*spawnPoint = 0;
+	GameEntity	*spawnPoint = nullptr;
 	int		flags;
 	int		savedPing;
 //	char	*savedAreaBits;
@@ -345,7 +345,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 				
 				break;
 
-			} while ( 1 );
+			} while ( true );
 		}
 	}
 
@@ -357,7 +357,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 		vec3_t	endpos;
 		VectorCopy( spawn_origin, endpos );
 		endpos[2] -= 512;
-		SV_Trace (&trace, spawn_origin, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_WATER, false );
+		SV_Trace (&trace, spawn_origin, nullptr, nullptr, endpos, ENTITYNUM_NONE, MASK_WATER, false );
 		if( trace.fraction == 1.0f ) 
 		{ 
 			// Check for water if respawning in current location
@@ -453,7 +453,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 			GameEntity *test;
 			VectorCopy( spawn_origin, endpos );
 			endpos[2] -= 128;
-			SV_Trace (&trace, spawn_origin, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_SOLID, false );
+			SV_Trace (&trace, spawn_origin, nullptr, nullptr, endpos, ENTITYNUM_NONE, MASK_SOLID, false );
 			if( trace.entityNum != ENTITYNUM_NONE ) 
 			{
 				test = theLevel.getEntity(trace.entityNum);//&g_entities[trace.entityNum];
@@ -474,7 +474,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 			VectorCopy( spawn_origin, endpos );
 			endpos[2] -= 512;
 
-			SV_Trace (&trace, spawn_origin, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_SOLID, false );
+			SV_Trace (&trace, spawn_origin, nullptr, nullptr, endpos, ENTITYNUM_NONE, MASK_SOLID, false );
 			if( trace.entityNum != ENTITYNUM_NONE ) 
 			{
 				test = theLevel.getEntity(trace.entityNum);// &g_entities[trace.entityNum];
@@ -494,7 +494,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 			VectorCopy( spawn_origin, endpos );
 			endpos[2] -= 512;
 
-			SV_Trace(&trace, spawn_origin, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_PLAYERSOLID, false );
+			SV_Trace(&trace, spawn_origin, nullptr, nullptr, endpos, ENTITYNUM_NONE, MASK_PLAYERSOLID, false );
 			if( trace.entityNum != ENTITYNUM_NONE ) 
 			{
 				test = theLevel.getEntity(trace.entityNum);// &g_entities[trace.entityNum];
@@ -509,7 +509,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 			GameEntity *test;
 			VectorCopy( spawn_origin, endpos );
 			endpos[2] -= 512;
-			SV_Trace(&trace, spawn_origin, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_ALL, false );
+			SV_Trace(&trace, spawn_origin, nullptr, nullptr, endpos, ENTITYNUM_NONE, MASK_ALL, false );
 			if( trace.entityNum != ENTITYNUM_NONE ) 
 			{
 				test = theLevel.getEntity(trace.entityNum);// &g_entities[trace.entityNum];

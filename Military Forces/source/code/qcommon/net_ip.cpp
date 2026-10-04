@@ -161,7 +161,7 @@ static int numIP;
 NET_ErrorString
 ====================
 */
-char *NET_ErrorString( void ) {
+char *NET_ErrorString( ) {
 #ifdef _WIN32
 	//FIXME: replace with FormatMessage?
 	switch( socketError ) {
@@ -268,7 +268,7 @@ static struct addrinfo *SearchAddrInfo(struct addrinfo *hints, sa_family_t famil
 		hints = hints->ai_next;
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -279,8 +279,8 @@ Sys_StringToSockaddr
 static bool Sys_StringToSockaddr(const char *s, struct sockaddr *sadr, int sadr_len, sa_family_t family)
 {
 	struct addrinfo hints;
-	struct addrinfo *res = NULL;
-	struct addrinfo *search = NULL;
+	struct addrinfo *res = nullptr;
+	struct addrinfo *search = nullptr;
 	struct addrinfo *hintsp;
 	int retval;
 	
@@ -291,7 +291,7 @@ static bool Sys_StringToSockaddr(const char *s, struct sockaddr *sadr, int sadr_
 	hintsp->ai_family = family;
 	hintsp->ai_socktype = SOCK_DGRAM;
 	
-	retval = getaddrinfo(s, NULL, hintsp, &res);
+	retval = getaddrinfo(s, nullptr, hintsp, &res);
 
 	if(!retval)
 	{
@@ -354,7 +354,7 @@ static void Sys_SockaddrToString(char *dest, int destlen, struct sockaddr *input
 	else
 		inputlen = sizeof(struct sockaddr_in);
 
-	if(getnameinfo(input, inputlen, dest, destlen, NULL, 0, NI_NUMERICHOST) && destlen > 0)
+	if(getnameinfo(input, inputlen, dest, destlen, nullptr, 0, NI_NUMERICHOST) && destlen > 0)
 		*dest = '\0';
 }
 
@@ -793,7 +793,7 @@ bool Sys_IsLANAddress( netadr_t adr ) {
 Sys_ShowIP
 ==================
 */
-void Sys_ShowIP(void) {
+void Sys_ShowIP() {
 	int i;
 	char addrbuf[NET_ADDRSTRMAXLEN];
 
@@ -969,7 +969,7 @@ NET_SetMulticast
 Set the current multicast group
 ====================
 */
-void NET_SetMulticast6(void)
+void NET_SetMulticast6()
 {
 	struct sockaddr_in6 addr;
 
@@ -1003,7 +1003,7 @@ NET_JoinMulticast
 Join an ipv6 multicast group
 ====================
 */
-void NET_JoinMulticast6(void)
+void NET_JoinMulticast6()
 {
 	int err;
 	
@@ -1017,7 +1017,7 @@ void NET_JoinMulticast6(void)
 	}
 	else
 	{
-		if((multicast6_socket = NET_IP6Socket(net_mcast6addr->string, ntohs(boundto.sin6_port), NULL, &err)) == INVALID_SOCKET)
+		if((multicast6_socket = NET_IP6Socket(net_mcast6addr->string, ntohs(boundto.sin6_port), nullptr, &err)) == INVALID_SOCKET)
 		{
 			// If the OS does not support binding to multicast addresses, like WinXP, at least try with the normal file descriptor.
 			multicast6_socket = ip6_socket;
@@ -1053,7 +1053,7 @@ void NET_JoinMulticast6(void)
 	}
 }
 
-void NET_LeaveMulticast6(void)
+void NET_LeaveMulticast6()
 {
 	if(multicast6_socket != INVALID_SOCKET)
 	{
@@ -1088,7 +1088,7 @@ void NET_OpenSocks( int port ) {
 	}
 
 	h = gethostbyname( net_socksServer->string );
-	if ( h == NULL ) {
+	if ( h == nullptr ) {
 		Com_Printf( "WARNING: NET_OpenSocks: gethostbyname: %s\n", NET_ErrorString() );
 		return;
 	}
@@ -1276,7 +1276,7 @@ static void NET_AddLocalAddress(char *ifname, struct sockaddr *addr, struct sock
 }
 
 #if defined(__linux__) || defined(__APPLE__) || defined(__BSD__)
-static void NET_GetLocalAddress(void)
+static void NET_GetLocalAddress()
 {
 	struct ifaddrs *ifap, *search;
 
@@ -1354,7 +1354,7 @@ static void NET_GetLocalAddress( void ) {
 NET_OpenIP
 ====================
 */
-void NET_OpenIP( void ) {
+void NET_OpenIP( ) {
 	int		i;
 	int		err;
 	int		port;
@@ -1422,7 +1422,7 @@ void NET_OpenIP( void ) {
 NET_GetCvars
 ====================
 */
-static bool NET_GetCvars( void ) {
+static bool NET_GetCvars( ) {
 	int modified;
 
 #ifdef DEDICATED
@@ -1505,7 +1505,7 @@ void NET_Config( bool enableNetworking ) {
 	modified = NET_GetCvars();
 
 	if( !net_enabled->integer ) {
-		enableNetworking = 0;
+		enableNetworking = false;
 	}
 
 	// if enable state is the same and no cvars were modified, we have nothing to do
@@ -1577,7 +1577,7 @@ void NET_Config( bool enableNetworking ) {
 NET_Init
 ====================
 */
-void NET_Init( void ) {
+void NET_Init( ) {
 #ifdef _WIN32
 	int		r;
 
@@ -1602,7 +1602,7 @@ void NET_Init( void ) {
 NET_Shutdown
 ====================
 */
-void NET_Shutdown( void ) {
+void NET_Shutdown( ) {
 	if ( !networkingEnabled ) {
 		return;
 	}
@@ -1629,7 +1629,7 @@ void NET_Event(fd_set *fdr)
 	netadr_t from = {NA_BAD};
 	msg_t netmsg;
 	
-	while(1)
+	while(true)
 	{
 		MSG_Init(&netmsg, bufData, sizeof(bufData));
 
@@ -1697,7 +1697,7 @@ void NET_Sleep(int msec)
 	timeout.tv_sec = msec/1000;
 	timeout.tv_usec = (msec%1000)*1000;
 
-	retval = select(highestfd + 1, &fdr, NULL, NULL, &timeout);
+	retval = select(highestfd + 1, &fdr, nullptr, nullptr, &timeout);
 
 	if(retval == SOCKET_ERROR)
 		Com_Printf("Warning: select() syscall failed: %s\n", NET_ErrorString());
@@ -1710,7 +1710,7 @@ void NET_Sleep(int msec)
 NET_Restart_f
 ====================
 */
-void NET_Restart_f(void)
+void NET_Restart_f()
 {
 	NET_Config(true);
 }

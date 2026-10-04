@@ -110,15 +110,15 @@ static int uitogamecode[] = {4,6,2,3,1,5,7};
 
 
 static void UI_StartServerRefresh(bool full);
-static void UI_StopServerRefresh( void );
-static void UI_DoServerRefresh( void );
+static void UI_StopServerRefresh( );
+static void UI_DoServerRefresh( );
 void UI_FeederSelection(float feederID, int index);
 static void UI_BuildServerDisplayList(int force);
 static void UI_BuildServerStatus(bool force);
 static void UI_BuildFindPlayerList(bool force);
 static int QDECL UI_ServersQsortCompare( const void *arg1, const void *arg2 );
 static int UI_MapCountByGameType(bool singlePlayer);
-static int UI_HeadCountByTeam( void );
+static int UI_HeadCountByTeam( );
 static void UI_ParseGameInfo(const char *teamFile);
 static void UI_ParseTeamInfo(const char *teamFile);
 static const char *UI_SelectedMap(int index, int *actual);
@@ -127,7 +127,7 @@ static int UI_GetIndexFromSelection(int actual);
 
 int ProcessNewUI( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6 );
 
-void UI_CustomChatInit( void );
+void UI_CustomChatInit( );
 
 
 vmCvar_t  ui_new;
@@ -136,11 +136,11 @@ vmCvar_t  ui_initialized;
 vmCvar_t  ui_teamArenaFirstRun;
 
 void _UI_Init( int );
-void _UI_Shutdown( void );
+void _UI_Shutdown( );
 void _UI_KeyEvent( int key, int down );
 void _UI_MouseEvent( int dx, int dy );
 void _UI_Refresh( int realtime );
-bool _UI_IsFullscreen( void );
+bool _UI_IsFullscreen( );
 
 
 
@@ -203,7 +203,7 @@ void _UI_DrawRect( float x, float y, float width, float height, float size, cons
 	_UI_DrawTopBottom(x, y, width, height, size);
 	_UI_DrawSides(x, y, width, height, size);
 
-	refExport.SetColor( NULL );
+	refExport.SetColor( nullptr );
 }
 
 
@@ -392,7 +392,7 @@ void Text_Paint(float x, float y, float scale, const vec4_t color, const char *t
 				count++;
 			}
 		}
-		refExport.SetColor( NULL );
+		refExport.SetColor( nullptr );
 	}
 }
 
@@ -503,7 +503,7 @@ void Text_PaintWithCursor(float x, float y, float scale, const vec4_t color, con
                           glyph2->glyph);
 
 		}
-		refExport.SetColor( NULL );
+		refExport.SetColor( nullptr );
 	}
 }
 
@@ -572,7 +572,7 @@ static void Text_Paint_Limit(float *maxX, float x, float y, float scale, const v
 				s++;
 			}
 		}
-		refExport.SetColor( NULL );
+		refExport.SetColor( nullptr );
 	}
 }
 
@@ -601,7 +601,7 @@ void UI_DrawCenteredPic(qhandle_t image, int w, int h) {
 UI_DrawMouse
 =================
 */
-void UI_DrawMouse( void )
+void UI_DrawMouse( )
 {
 	// server info structure
 	uiClientState_t	cstate;
@@ -613,7 +613,7 @@ void UI_DrawMouse( void )
 	// get client information
 	GetClientState( &cstate );
 
-	UI_SetColor( NULL );
+	UI_SetColor( nullptr );
 
 	// select cursor to draw
 	switch( uiInfo.uiUtils.dc_->cursorEnum_ )
@@ -716,7 +716,7 @@ void _UI_Shutdown()
 	LAN_SaveServersToCache();
 }
 
-char *defaultMenu = NULL;
+char *defaultMenu = nullptr;
 
 char *GetMenuBuffer(const char *filename) {
 	int	len;
@@ -753,7 +753,7 @@ bool Asset_Parse(int handle)
 		return false;
 	}
     
-	while ( 1 ) {
+	while ( true ) {
 
 		memset(&token, 0, sizeof(UI_PrecompilerTools::PC_Token ));
 
@@ -932,7 +932,7 @@ void UI_ParseMenu(const char *menuFile)
 		return;
 	}
 
-	while ( 1 ) {
+	while ( true ) {
 		memset(&token, 0, sizeof(UI_PrecompilerTools::PC_Token ));
 		if (!uiInfo.uiUtils.getPrecompilerTools()->readTokenHandle( handle, &token )) {
 			break;
@@ -978,7 +978,7 @@ bool Load_Menu(int handle)
 		return false;
 	}
 
-	while ( 1 ) {
+	while ( true ) {
 
 		if (!uiInfo.uiUtils.getPrecompilerTools()->readTokenHandle(handle, &token))
 			return false;
@@ -1019,7 +1019,7 @@ void UI_LoadMenus(const char *menuFile, bool reset)
 		uiInfo.uiUtils.menu_Reset();
 	}
 
-	while ( 1 ) {
+	while ( true ) {
 		if (!uiInfo.uiUtils.getPrecompilerTools()->readTokenHandle(handle, &token))
 			break;
 		if( token.string_[0] == 0 || token.string_[0] == '}') {
@@ -1053,7 +1053,7 @@ void UI_Load()
 	if (menu && menu->window.name) {
 		Q_strncpyz(lastName, menu->window.name, sizeof(lastName));
 	}
-	if (menuSet == NULL || menuSet[0] == '\0') {
+	if (menuSet == nullptr || menuSet[0] == '\0') {
 		menuSet = "ui/menus.txt";
 	}
 
@@ -1068,7 +1068,7 @@ void UI_Load()
 
 }
 
-static const char *handicapValues[] = {"None","95","90","85","80","75","70","65","60","55","50","45","40","35","30","25","20","15","10","5",NULL};
+static const char *handicapValues[] = {"None","95","90","85","80","75","70","65","60","55","50","45","40","35","30","25","20","15","10","5",nullptr};
 
 static void UI_DrawHandicap(rectDef_t *rect, float scale, const vec4_t color, int textStyle) {
   int i, h;
@@ -1153,7 +1153,7 @@ static void UI_DrawClanLogo(rectDef_t *rect, float scale, const vec4_t color) {
 		}
 
   	UI_DrawHandlePic( rect->x, rect->y, rect->w, rect->h, uiInfo.teamList[i].teamIcon);
-    refExport.SetColor(NULL);
+    refExport.SetColor(nullptr);
   }
 }
 
@@ -1173,13 +1173,13 @@ static void UI_DrawClanCinematic(rectDef_t *rect, float scale, const vec4_t colo
 			} else {
 			  	refExport.SetColor( color );
 				UI_DrawHandlePic( rect->x, rect->y, rect->w, rect->h, uiInfo.teamList[i].teamIcon_Metal);
-				refExport.SetColor(NULL);
+				refExport.SetColor(nullptr);
 				uiInfo.teamList[i].cinematic = -2;
 			}
 		} else {
 	  	refExport.SetColor( color );
 			UI_DrawHandlePic( rect->x, rect->y, rect->w, rect->h, uiInfo.teamList[i].teamIcon);
-			refExport.SetColor(NULL);
+			refExport.SetColor(nullptr);
 		}
 	}
 
@@ -1528,7 +1528,7 @@ static void	UI_DrawPlayerLogo(rectDef_t *rect, const vec3_t color) {
 
  	refExport.SetColor( color );
 	UI_DrawHandlePic( rect->x, rect->y, rect->w, rect->h, uiInfo.teamList[i].teamIcon );
- 	refExport.SetColor( NULL );
+ 	refExport.SetColor( nullptr );
 }
 
 static void	UI_DrawPlayerLogoMetal(rectDef_t *rect, const vec3_t color) {
@@ -1541,7 +1541,7 @@ static void	UI_DrawPlayerLogoMetal(rectDef_t *rect, const vec3_t color) {
 
  	refExport.SetColor( color );
 	UI_DrawHandlePic( rect->x, rect->y, rect->w, rect->h, uiInfo.teamList[i].teamIcon_Metal );
- 	refExport.SetColor( NULL );
+ 	refExport.SetColor( nullptr );
 }
 
 static void	UI_DrawPlayerLogoName(rectDef_t *rect, const vec3_t color) {
@@ -1554,7 +1554,7 @@ static void	UI_DrawPlayerLogoName(rectDef_t *rect, const vec3_t color) {
 
  	refExport.SetColor( color );
 	UI_DrawHandlePic( rect->x, rect->y, rect->w, rect->h, uiInfo.teamList[i].teamIcon_Name );
- 	refExport.SetColor( NULL );
+ 	refExport.SetColor( nullptr );
 }
 
 static void	UI_DrawOpponentLogo(rectDef_t *rect, const vec3_t color) {
@@ -1567,7 +1567,7 @@ static void	UI_DrawOpponentLogo(rectDef_t *rect, const vec3_t color) {
 
  	refExport.SetColor( color );
 	UI_DrawHandlePic( rect->x, rect->y, rect->w, rect->h, uiInfo.teamList[i].teamIcon );
- 	refExport.SetColor( NULL );
+ 	refExport.SetColor( nullptr );
 }
 
 static void	UI_DrawOpponentLogoMetal(rectDef_t *rect, const vec3_t color) {
@@ -1580,7 +1580,7 @@ static void	UI_DrawOpponentLogoMetal(rectDef_t *rect, const vec3_t color) {
 
  	refExport.SetColor( color );
 	UI_DrawHandlePic( rect->x, rect->y, rect->w, rect->h, uiInfo.teamList[i].teamIcon_Metal );
- 	refExport.SetColor( NULL );
+ 	refExport.SetColor( nullptr );
 }
 
 static void	UI_DrawOpponentLogoName(rectDef_t *rect, const vec3_t color) {
@@ -1593,7 +1593,7 @@ static void	UI_DrawOpponentLogoName(rectDef_t *rect, const vec3_t color) {
 
  	refExport.SetColor( color );
 	UI_DrawHandlePic( rect->x, rect->y, rect->w, rect->h, uiInfo.teamList[i].teamIcon_Name );
- 	refExport.SetColor( NULL );
+ 	refExport.SetColor( nullptr );
 }
 
 static void UI_DrawAllMapsSelection(rectDef_t *rect, float scale, const vec4_t color, int textStyle, bool net) {
@@ -1612,7 +1612,7 @@ int UI_OwnerDrawWidth(int ownerDraw, float scale)
 {
 	int i, h, value;
 	const char *text;
-	const char *s = NULL;
+	const char *s = nullptr;
 
   switch (ownerDraw) {
     case UI_HANDICAP:
@@ -1765,7 +1765,7 @@ static void UI_DrawCrosshair(rectDef_t *rect, float scale, const vec4_t color) {
 		uiInfo.currentCrosshair = 0;
 	}
 	UI_DrawHandlePic( rect->x, rect->y - rect->h, rect->w, rect->h, uiInfo.uiUtils.dc_->assets_.crosshairShader[uiInfo.currentCrosshair]);
- 	refExport.SetColor( NULL );
+ 	refExport.SetColor( nullptr );
 }
 
 /*
@@ -2049,7 +2049,7 @@ static void UI_DrawVehiclePreview( rectDef_t *rect, float scale, const vec4_t co
 	int vehicle = -1;
 	int vehicleCat = -1;
 //	char * dir = NULL;
-	char * pIconString = NULL;
+	char * pIconString = nullptr;
 	static qhandle_t pictureHandle = -1;
 	static int lastVehicle = -1;
 
@@ -2585,7 +2585,7 @@ static bool UI_GameType_HandleKey(int flags, float *special, int key, bool reset
 		if (resetMap && oldCount != UI_MapCountByGameType(true)) 
 		{
 	  		Cvar_Set( "ui_currentMap", "0");
-			uiInfo.uiUtils.menu_SetFeederSelection(NULL, FEEDER_MAPS, 0, NULL);
+			uiInfo.uiUtils.menu_SetFeederSelection(nullptr, FEEDER_MAPS, 0, nullptr);
 		}
     return true;
   }
@@ -2611,7 +2611,7 @@ static bool UI_NetGameType_HandleKey(int flags, float *special, int key) {
   	Cvar_Set( "ui_actualnetGameType", va("%d", uiInfo.gameTypes[ui_netGameType.integer].gtEnum));
   	Cvar_Set( "ui_currentNetMap", "0");
 	UI_MapCountByGameType(false);
-	uiInfo.uiUtils.menu_SetFeederSelection(NULL, FEEDER_ALLMAPS, 0, NULL);
+	uiInfo.uiUtils.menu_SetFeederSelection(nullptr, FEEDER_ALLMAPS, 0, nullptr);
     return true;
   }
   return false;
@@ -3223,7 +3223,7 @@ static bool UI_SetNextMap(int actual, int index)
 	{
 		if (uiInfo.mapList[i].active) 
 		{
-			uiInfo.uiUtils.menu_SetFeederSelection(NULL, FEEDER_MAPS, index + 1, "skirmish");
+			uiInfo.uiUtils.menu_SetFeederSelection(nullptr, FEEDER_MAPS, index + 1, "skirmish");
 			return true;
 		}
 	}
@@ -3248,9 +3248,9 @@ static void UI_StartSkirmish(bool next)
 		} 
 		else 
 		{
-			UI_GameType_HandleKey(0, 0, K_MOUSE1, false);
+			UI_GameType_HandleKey(0, nullptr, K_MOUSE1, false);
 			UI_MapCountByGameType(true);
-			uiInfo.uiUtils.menu_SetFeederSelection(NULL, FEEDER_MAPS, 0, "skirmish");
+			uiInfo.uiUtils.menu_SetFeederSelection(nullptr, FEEDER_MAPS, 0, "skirmish");
 		}
 	}
 
@@ -3449,7 +3449,7 @@ UI_InitialiseUI
 ===============
 */
 
-static void UI_InitialiseUI( void )
+static void UI_InitialiseUI( )
 {
 	fileHandle_t creditsFile;
 	int fileSize = 0;
@@ -3457,15 +3457,15 @@ static void UI_InitialiseUI( void )
 	// parse our credits text file on main menu run
 	memset( uiInfo.pCredits, 0, sizeof( uiInfo.pCredits ) );
 	uiInfo.creditLines = 0;
-	uiInfo.pCreditsData = NULL;
+	uiInfo.pCreditsData = nullptr;
 
 	// open file
 	fileSize = FS_FOpenFileByMode( "ui\\credits.txt", &creditsFile, FS_READ );	
 	if( fileSize )
 	{
 //		int index = 0;
-		char * pCredits = NULL;
-		char * pLineEnd = NULL;
+		char * pCredits = nullptr;
+		char * pLineEnd = nullptr;
 
 		// read in the entire credits file
 		uiInfo.pCreditsData = uiInfo.uiUtils.alloc( fileSize );
@@ -3513,9 +3513,9 @@ static void UI_RefreshVehicleSelect( int change_vehicle )
 	int gameset = -1;
 	int gametype = -1;
 	int team = -1;
-	const char * pCat = NULL;
-	const char * pClass = NULL;
-	const char * pVehicle = NULL;
+	const char * pCat = nullptr;
+	const char * pClass = nullptr;
+	const char * pVehicle = nullptr;
 	int levelCats = 0;
 	char info[MAX_INFO_STRING];
 	bool allowNukes;
@@ -3684,7 +3684,7 @@ static void UI_CycleVehicleSelect( int cycleIdx )
 {
 	int idx = -1;
 	int operation = 0;
-	const char * pVar = NULL;
+	const char * pVar = nullptr;
 
 	// switch on what was asked to cycle
 	switch( cycleIdx )
@@ -3735,7 +3735,7 @@ static void UI_CycleVehicleSelect( int cycleIdx )
 UI_SelectVehicle
 ===============
 */
-static void UI_SelectVehicle( void )
+static void UI_SelectVehicle( )
 {
 	int vehicleCat;
 	int idx = -1;
@@ -3814,9 +3814,9 @@ void UI_RunMenuScript(char **args)
 			UI_MapCountByGameType(true);
 			ui_mapIndex.integer = UI_GetIndexFromSelection(ui_currentMap.integer);
 			Cvar_Set("ui_mapIndex", va("%d", ui_mapIndex.integer));
-			uiInfo.uiUtils.menu_SetFeederSelection(NULL, FEEDER_MAPS, ui_mapIndex.integer, "skirmish");
-			UI_GameType_HandleKey(0, 0, K_MOUSE1, false);
-			UI_GameType_HandleKey(0, 0, K_MOUSE2, false);
+			uiInfo.uiUtils.menu_SetFeederSelection(nullptr, FEEDER_MAPS, ui_mapIndex.integer, "skirmish");
+			UI_GameType_HandleKey(0, nullptr, K_MOUSE1, false);
+			UI_GameType_HandleKey(0, nullptr, K_MOUSE2, false);
 		} 
 		else if (Q_stricmp(name, "resetDefaults") == 0) 
 		{
@@ -3868,7 +3868,7 @@ void UI_RunMenuScript(char **args)
 		{
 			UI_LoadArenas();
 			UI_MapCountByGameType(false);
-			uiInfo.uiUtils.menu_SetFeederSelection(NULL, FEEDER_ALLMAPS, 0, "createserver");
+			uiInfo.uiUtils.menu_SetFeederSelection(nullptr, FEEDER_ALLMAPS, 0, "createserver");
 		} 
 		else if (Q_stricmp(name, "saveControls") == 0) 
 		{
@@ -3973,14 +3973,14 @@ void UI_RunMenuScript(char **args)
 		{
 			Q_strncpyz(uiInfo.serverStatusAddress, uiInfo.foundPlayerServerAddresses[uiInfo.currentFoundPlayerServer], sizeof(uiInfo.serverStatusAddress));
 			UI_BuildServerStatus(true);
-			uiInfo.uiUtils.menu_SetFeederSelection(NULL, FEEDER_FINDPLAYER, 0, NULL);
+			uiInfo.uiUtils.menu_SetFeederSelection(nullptr, FEEDER_FINDPLAYER, 0, nullptr);
 		} 
 		else if (Q_stricmp(name, "FindPlayer") == 0)
 		{
 			UI_BuildFindPlayerList(true);
 			// clear the displayed server status info
 			uiInfo.serverStatusInfo.numLines = 0;
-			uiInfo.uiUtils.menu_SetFeederSelection(NULL, FEEDER_FINDPLAYER, 0, NULL);
+			uiInfo.uiUtils.menu_SetFeederSelection(nullptr, FEEDER_FINDPLAYER, 0, nullptr);
 		} 
 		else if (Q_stricmp(name, "JoinServer") == 0) 
 		{
@@ -4311,12 +4311,12 @@ bool UI_hasSkinForBase(const char *base, const char *team) {
 	
 	Com_sprintf( test, sizeof( test ), "models/players/%s/%s/lower_default.skin", base, team );
 
-	if (FS_FOpenFileByMode(test, 0, FS_READ)) {
+	if (FS_FOpenFileByMode(test, nullptr, FS_READ)) {
 		return true;
 	}
 	Com_sprintf( test, sizeof( test ), "models/players/characters/%s/%s/lower_default.skin", base, team );
 
-	if (FS_FOpenFileByMode(test, 0, FS_READ)) {
+	if (FS_FOpenFileByMode(test, nullptr, FS_READ)) {
 		return true;
 	}
 	return false;
@@ -4350,7 +4350,7 @@ static int UI_HeadCountByTeam() {
 	for (i = 0; i < uiInfo.characterCount; i++) {
 		uiInfo.characterList[i].active = false;
 		for(j = 0; j < TEAM_MEMBERS; j++) {
-			if (uiInfo.teamList[tIndex].teamMembers[j] != NULL) {
+			if (uiInfo.teamList[tIndex].teamMembers[j] != nullptr) {
 				if (uiInfo.characterList[i].reference&(1<<tIndex)) {// && Q_stricmp(uiInfo.teamList[tIndex].teamMembers[j], uiInfo.characterList[i].name)==0) {
 					uiInfo.characterList[i].active = true;
 					c++;
@@ -4363,7 +4363,7 @@ static int UI_HeadCountByTeam() {
 	// and then aliases
 	for(j = 0; j < TEAM_MEMBERS; j++) {
 		for(k = 0; k < uiInfo.aliasCount; k++) {
-			if (uiInfo.aliasList[k].name != NULL) {
+			if (uiInfo.aliasList[k].name != nullptr) {
 				if (Q_stricmp(uiInfo.teamList[tIndex].teamMembers[j], uiInfo.aliasList[k].name)==0) {
 					for (i = 0; i < uiInfo.characterCount; i++) {
 						if (uiInfo.characterList[i].headImage != -1 && uiInfo.characterList[i].reference&(1<<tIndex) && Q_stricmp(uiInfo.aliasList[k].ai, uiInfo.characterList[i].name)==0) {
@@ -4503,7 +4503,7 @@ static void UI_BuildServerDisplayList(int force)
 		uiInfo.serverStatus.numDisplayServers = 0;
 		uiInfo.serverStatus.numPlayersOnServers = 0;
 		// set list box index to zero
-		uiInfo.uiUtils.menu_SetFeederSelection(NULL, FEEDER_SERVERS, 0, NULL);
+		uiInfo.uiUtils.menu_SetFeederSelection(nullptr, FEEDER_SERVERS, 0, nullptr);
 		// mark all servers as visible so we store ping updates for them
 		LAN_MarkServerVisible(ui_netSource.integer, -1, true);
 	}
@@ -4620,7 +4620,7 @@ serverStatusCvar_t serverStatusCvars[] = {
 	{"timelimit", "Time Limit"},
 	{"fraglimit", "Frag Limit"},
 	{"capturelimit", "Capture Limit"},
-	{NULL, NULL}
+	{nullptr, nullptr}
 };
 
 /*
@@ -4666,7 +4666,7 @@ static int UI_GetServerStatusInfo( const char *serverAddress, serverStatusInfo_t
 	int i, len;
 
 	if (!info) {
-		LAN_GetServerStatus( serverAddress, NULL, 0);
+		LAN_GetServerStatus( serverAddress, nullptr, 0);
 		return false;
 	}
 	memset(info, 0, sizeof(*info));
@@ -4769,7 +4769,7 @@ static char *stristr(char *str, char *charset) {
 		if (!charset[i]) return str;
 		str++;
 	}
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -4807,7 +4807,7 @@ static void UI_BuildFindPlayerList(bool force) {
 		}
 		Cvar_Set("cl_serverStatusResendTime", va("%d", resend));
 		// reset all server status requests
-		LAN_GetServerStatus( NULL, NULL, 0);
+		LAN_GetServerStatus( nullptr, nullptr, 0);
 		//
 		uiInfo.numFoundPlayerServers = 1;
 		Com_sprintf(uiInfo.foundPlayerServerNames[uiInfo.numFoundPlayerServers-1],
@@ -4865,7 +4865,7 @@ static void UI_BuildFindPlayerList(bool force) {
 				numTimeOuts++;
 			}
 			// reset server status request for this address
-			UI_GetServerStatusInfo( uiInfo.pendingServerStatus.server[i].adrstr, NULL );
+			UI_GetServerStatusInfo( uiInfo.pendingServerStatus.server[i].adrstr, nullptr );
 			// reuse pending slot
 			uiInfo.pendingServerStatus.server[i].valid = false;
 			// if we didn't try to get the status of all servers in the main browser yet
@@ -4917,7 +4917,7 @@ static void UI_BuildServerStatus(bool force)
 {
 	uiClientState_t	cstate;	// server info structure
 
-	static char * pAddressName = NULL;	// server address
+	static char * pAddressName = nullptr;	// server address
 	static bool pending = false;	// pending flag
 
 	if( uiInfo.nextFindPlayerRefresh )
@@ -4937,11 +4937,11 @@ static void UI_BuildServerStatus(bool force)
 	else
 	{
 		// set feeder
-		uiInfo.uiUtils.menu_SetFeederSelection(NULL, FEEDER_SERVERSTATUS, 0, NULL);
+		uiInfo.uiUtils.menu_SetFeederSelection(nullptr, FEEDER_SERVERSTATUS, 0, nullptr);
 		uiInfo.serverStatusInfo.numLines = 0;
 		
 		// reset all server status requests
-		LAN_GetServerStatus( NULL, NULL, 0);
+		LAN_GetServerStatus( nullptr, nullptr, 0);
 	}
 
 	// normal case
@@ -4995,7 +4995,7 @@ static void UI_BuildServerStatus(bool force)
 
 		// ready so do
 		uiInfo.nextServerStatusRefresh = 0;
-		UI_GetServerStatusInfo( uiInfo.serverStatusAddress, NULL );
+		UI_GetServerStatusInfo( uiInfo.serverStatusAddress, nullptr );
 	}
 	else
 	{
@@ -5108,7 +5108,7 @@ UI_CreateGameCodes
 static char * UI_CreateGameCodes( char * pInfo )
 {
 	char exInfo[ 1024 ];
-	char * pGameset = NULL, * pAddress = NULL;
+	char * pGameset = nullptr, * pAddress = nullptr;
 	int gameType, gameset;
 
 	// get enums
@@ -5139,7 +5139,7 @@ static char * UI_CreateGameCodes( char * pInfo )
 		else
 		{
 			// reset info requests
-			LAN_GetServerStatus( pAddress, NULL, 0 );
+			LAN_GetServerStatus( pAddress, nullptr, 0 );
 	
 			// pending...
 			return "...";
@@ -5354,7 +5354,7 @@ void UI_FeederSelection(float feederID, int index)
 		}
 
   } else if (feederID == FEEDER_SERVERS) {
-		const char *mapName = NULL;
+		const char *mapName = nullptr;
 		uiInfo.serverStatus.currentServer = index;
 		LAN_GetServerInfo(ui_netSource.integer, uiInfo.serverStatus.displayServers[index], info, MAX_STRING_CHARS);
 		uiInfo.serverStatus.currentServerPreview = refExport.RegisterShaderNoMip(va("levelshots/%s", Info_ValueForKey(info, "mapname")));
@@ -5374,7 +5374,7 @@ void UI_FeederSelection(float feederID, int index)
 	  if ( index < uiInfo.numFoundPlayerServers-1) {
 			// build a New server status for this server
 			Q_strncpyz(uiInfo.serverStatusAddress, uiInfo.foundPlayerServerAddresses[uiInfo.currentFoundPlayerServer], sizeof(uiInfo.serverStatusAddress));
-			uiInfo.uiUtils.menu_SetFeederSelection(NULL, FEEDER_SERVERSTATUS, 0, NULL);
+			uiInfo.uiUtils.menu_SetFeederSelection(nullptr, FEEDER_SERVERSTATUS, 0, nullptr);
 			UI_BuildServerStatus(true);
 	  }
   } else if (feederID == FEEDER_PLAYER_LIST) {
@@ -5405,7 +5405,7 @@ static bool Team_Parse(char **p) {
     return false;
   }
 
-  while ( 1 ) {
+  while ( true ) {
 
     token = COM_ParseExt(p, true);
     
@@ -5438,7 +5438,7 @@ static bool Team_Parse(char **p) {
 			uiInfo.teamList[uiInfo.teamCount].cinematic = -1;
 
 			for (i = 0; i < TEAM_MEMBERS; i++) {
-				uiInfo.teamList[uiInfo.teamCount].teamMembers[i] = NULL;
+				uiInfo.teamList[uiInfo.teamCount].teamMembers[i] = nullptr;
 				if (!uiInfo.uiUtils.string_Parse(p, &uiInfo.teamList[uiInfo.teamCount].teamMembers[i])) {
 					return false;
 				}
@@ -5468,7 +5468,7 @@ static bool Character_Parse(char **p) {
   }
 
 
-  while ( 1 ) {
+  while ( true ) {
     token = COM_ParseExt(p, true);
 
     if (Q_stricmp(token, "}") == 0) {
@@ -5527,7 +5527,7 @@ static bool Alias_Parse(char **p) {
     return false;
   }
 
-  while ( 1 ) {
+  while ( true ) {
     token = COM_ParseExt(p, true);
 
     if (Q_stricmp(token, "}") == 0) {
@@ -5574,7 +5574,7 @@ static bool Alias_Parse(char **p) {
 static void UI_ParseTeamInfo(const char *teamFile) {
 	char	*token;
   char *p;
-  char *buff = NULL;
+  char *buff = nullptr;
   //static int mode = 0; TTimo: unused
 
   buff = GetMenuBuffer(teamFile);
@@ -5584,7 +5584,7 @@ static void UI_ParseTeamInfo(const char *teamFile) {
 
   p = buff;
 
-	while ( 1 ) {
+	while ( true ) {
 		token = COM_ParseExt( &p, true );
 		if( !token || token[0] == 0 || token[0] == '}') {
 			break;
@@ -5631,7 +5631,7 @@ static bool GameType_Parse(char **p, bool join) {
 		uiInfo.numGameTypes = 0;
 	}
 
-	while ( 1 ) {
+	while ( true ) {
 		token = COM_ParseExt(p, true);
 
 		if (Q_stricmp(token, "}") == 0) {
@@ -5690,7 +5690,7 @@ static bool MapList_Parse(char **p) {
 
 	uiInfo.mapCount = 0;
 
-	while ( 1 ) {
+	while ( true ) {
 		token = COM_ParseExt(p, true);
 
 		if (Q_stricmp(token, "}") == 0) {
@@ -5714,7 +5714,7 @@ static bool MapList_Parse(char **p) {
 
 			uiInfo.mapList[uiInfo.mapCount].typeBits = 0;
 
-			while (1) {
+			while (true) {
 				token = COM_ParseExt(p, true);
 				if (token[0] >= '0' && token[0] <= '9') {
 					uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << (token[0] - 0x030));
@@ -5747,7 +5747,7 @@ static bool MapList_Parse(char **p) {
 static void UI_ParseGameInfo(const char *teamFile) {
 	char	*token;
 	char *p;
-	char *buff = NULL;
+	char *buff = nullptr;
 	//int mode = 0; TTimo: unused
 
 	buff = GetMenuBuffer(teamFile);
@@ -5757,7 +5757,7 @@ static void UI_ParseGameInfo(const char *teamFile) {
 
 	p = buff;
 
-	while ( 1 ) {
+	while ( true ) {
 		token = COM_ParseExt( &p, true );
 		if( !token || token[0] == 0 || token[0] == '}') {
 			break;
@@ -5865,7 +5865,7 @@ UI_CustomChatInit
 =================
 */
 
-void UI_CustomChatInit( void )
+void UI_CustomChatInit( )
 {
 	// clear memory
 	memset( &uiInfo.customChat, 0, sizeof( chat_t ) );
@@ -5920,7 +5920,7 @@ void _UI_Init( bool inGameLoad )
 	UI_ParseGameInfo("gameinfo.txt");
 
 	menuSet = UI_Cvar_VariableString("ui_menuFiles");
-	if (menuSet == NULL || menuSet[0] == '\0') {
+	if (menuSet == nullptr || menuSet[0] == '\0') {
 		menuSet = "ui/menus.txt";
 	}
 
@@ -5955,7 +5955,7 @@ void _UI_Init( bool inGameLoad )
 		Cvar_Set("ui_TeamArenaFirstRun", "1");
 	}
 
-	Cvar_Register(NULL, "debug_protocol", "", 0 );
+	Cvar_Register(nullptr, "debug_protocol", "", 0 );
 
 	Cvar_Set("ui_actualNetGameType", va("%d", ui_netGameType.integer));
 
@@ -6035,14 +6035,14 @@ void _UI_MouseEvent( int dx, int dy )
   if (uiInfo.uiUtils.menu_Count() > 0) {
     //menuDef_t *menu = Menu_GetFocused();
     //Menu_HandleMouseMove(menu, uiInfo.uiDC.cursorx, uiInfo.uiDC.cursory);
-		uiInfo.uiUtils.display_MouseMove(NULL, uiInfo.uiUtils.dc_->cursorX_, uiInfo.uiUtils.dc_->cursorY_);
+		uiInfo.uiUtils.display_MouseMove(nullptr, uiInfo.uiUtils.dc_->cursorX_, uiInfo.uiUtils.dc_->cursorY_);
   }
 
 }
 
 void UI_LoadNonIngame() {
 	const char *menuSet = UI_Cvar_VariableString("ui_menuFiles");
-	if (menuSet == NULL || menuSet[0] == '\0') {
+	if (menuSet == nullptr || menuSet[0] == '\0') {
 		menuSet = "ui/menus.txt";
 	}
 	UI_LoadMenus(menuSet, false);
@@ -6113,7 +6113,7 @@ void _UI_SetActiveMenu( UserInterface::MenuCommand menu ) {
   }
 }
 
-bool _UI_IsFullscreen( void ) 
+bool _UI_IsFullscreen( ) 
 {
 	return uiInfo.uiUtils.menu_AnyFullScreenVisible();
 }
@@ -6258,14 +6258,14 @@ to prevent it from blinking away too rapidly on local or lan games.
 void UI_DrawConnectScreen( bool overlay )
 {
 	uiClientState_t	cstate;
-	char * s = NULL;
+	char * s = nullptr;
 	char info[MAX_INFO_VALUE];
 	char text[256];
 	char exInfo[1024];
-	char * pGameset = NULL;
+	char * pGameset = nullptr;
 	float centerPoint, yStart, scale;
 	int gameset = 0;
-	menuDef_t * menu = NULL;
+	menuDef_t * menu = nullptr;
 
 	static bool resetRequest = false;
 	static bool giveUpLoadingGfx = false;
@@ -6335,7 +6335,7 @@ void UI_DrawConnectScreen( bool overlay )
 				// reset info requests
 				if( !resetRequest )
 				{
-					LAN_GetServerStatus( cstate.servername, NULL, 0 );
+					LAN_GetServerStatus( cstate.servername, nullptr, 0 );
 					resetRequest = true;
 				}
 			}
@@ -6726,7 +6726,7 @@ static int		cvarTableSize = sizeof(cvarTable) / sizeof(cvarTable[0]);
 UI_RegisterCvars
 =================
 */
-void UI_RegisterCvars( void ) {
+void UI_RegisterCvars( ) {
 	int			i;
 	cvarTable_t	*cv;
 
@@ -6740,7 +6740,7 @@ void UI_RegisterCvars( void ) {
 UI_UpdateCvars
 =================
 */
-void UI_UpdateCvars( void ) {
+void UI_UpdateCvars( ) {
 	int			i;
 	cvarTable_t	*cv;
 
@@ -6755,7 +6755,7 @@ void UI_UpdateCvars( void ) {
 ArenaServers_StopRefresh
 =================
 */
-static void UI_StopServerRefresh( void )
+static void UI_StopServerRefresh( )
 {
 	int count;
 
@@ -6782,7 +6782,7 @@ static void UI_StopServerRefresh( void )
 UI_DoServerRefresh
 =================
 */
-static void UI_DoServerRefresh( void )
+static void UI_DoServerRefresh( )
 {
 	bool wait = false;
 

@@ -327,12 +327,12 @@ int SV_RateMsec(SV_Client *client);
 void QDECL SV_SendServerCommand( SV_Client *cl, const char *fmt, ...) Q_PRINTF_FUNC(2, 3);
 
 
-void SV_AddOperatorCommands (void);
-void SV_RemoveOperatorCommands (void);
+void SV_AddOperatorCommands ();
+void SV_RemoveOperatorCommands ();
 
 
 //void SV_MasterHeartbeat (void);
-void SV_MasterShutdown (void);
+void SV_MasterShutdown ();
 
 bool SV_GetEntityToken( char *buffer, int bufferSize );
 
@@ -348,7 +348,7 @@ void SV_GetConfigstring( int index, char *buffer, int bufferSize );
 void SV_SetUserinfo( int index, const char *val );
 void SV_GetUserinfo( int index, char *buffer, int bufferSize );
 
-void SV_ChangeMaxClients( void );
+void SV_ChangeMaxClients( );
 void SV_SpawnServer( char *server, bool killBots );
 
 
@@ -383,13 +383,13 @@ void SV_ExecuteClientCommand( SV_Client *cl, const char *s, bool clientOK );
 void SV_ClientThink (SV_Client *cl, usercmd_t *cmd);
 
 int SV_WriteDownloadToClient(SV_Client *cl, msg_t *msg);
-int SV_SendQueuedMessages(void);
-int SV_SendDownloadMessages(void);
+int SV_SendQueuedMessages();
+int SV_SendDownloadMessages();
 
 //
 // sv_ccmds.c
 //
-void SV_Heartbeat_f( void );
+void SV_Heartbeat_f( );
 
 //
 // sv_snapshot.c
@@ -405,7 +405,7 @@ void SV_AddServerCommand( SV_Client *client, const char *cmd );
 void SV_UpdateServerCommandsToClient( SV_Client *client, msg_t *msg );
 void SV_WriteFrameToClient (SV_Client *client, msg_t *msg);
 void SV_SendMessageToClient( msg_t *msg, SV_Client *client );
-void SV_SendClientMessages( void );
+void SV_SendClientMessages( );
 void SV_SendClientSnapshot( SV_Client *client );
 
 //
@@ -416,8 +416,8 @@ void SV_SendClientSnapshot( SV_Client *client );
 //playerState_t *SV_GameClientNum( int num );
 //svEntity_t	*SV_SvEntityForGentity( const entityState_t* s, const entityShared_t* r);
 //sharedEntity_t *SV_GEntityForSvEntity( svEntity_t *svEnt );
-void SV_ShutdownGameProgs ( void );
-void SV_RestartGameProgs( void );
+void SV_ShutdownGameProgs ( );
+void SV_RestartGameProgs( );
 bool SV_inPVS (const vec3_t p1, const vec3_t p2);
 void SV_GetUsercmd( int clientNum, usercmd_t *cmd );
 bool SV_EntityContact( const vec3_t mins, const vec3_t maxs, EntityBase* gameEnt, bool capsule );
@@ -437,7 +437,7 @@ void SV_LocateGameData( std::vector<EntityBase*>* gameEntities,
 // high level object sorting to reduce interaction tests
 //
 
-void SV_ClearWorld (void);
+void SV_ClearWorld ();
 // called after the world model has been loaded, before linking any entities
 
 //void SV_UnlinkEntity( entityState_t* s, entityShared_t* r );

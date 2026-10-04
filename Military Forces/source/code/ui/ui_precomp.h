@@ -389,97 +389,97 @@ struct UI_PrecompilerTools::Directive
 struct UI_PrecompilerTools::Directive_if : public UI_PrecompilerTools::Directive
 {
 				Directive_if() : Directive("if") {}
-	virtual int	func( SourceFile* source );
+	int	func( SourceFile* source ) override;
 };
 
 struct UI_PrecompilerTools::Directive_ifdef : public UI_PrecompilerTools::Directive
 {
 				Directive_ifdef() : Directive("ifdef") {}
-	virtual int	func( SourceFile* source );
+	int	func( SourceFile* source ) override;
 };
 
 struct UI_PrecompilerTools::Directive_ifndef : public UI_PrecompilerTools::Directive
 {
 				Directive_ifndef() : Directive("ifndef") {}
-	virtual int	func( SourceFile* source );
+	int	func( SourceFile* source ) override;
 };
 
 struct UI_PrecompilerTools::Directive_elif : public UI_PrecompilerTools::Directive
 {
 				Directive_elif() : Directive("elif") {}
-	virtual int	func( SourceFile* source );
+	int	func( SourceFile* source ) override;
 };
 
 struct UI_PrecompilerTools::Directive_else : public UI_PrecompilerTools::Directive
 {
 				Directive_else() : Directive("else") {}
-	virtual int	func( SourceFile* source );
+	int	func( SourceFile* source ) override;
 };
 
 struct UI_PrecompilerTools::Directive_endif : public UI_PrecompilerTools::Directive
 {
 				Directive_endif() : Directive("endif") {}
-	virtual int	func( SourceFile* source );
+	int	func( SourceFile* source ) override;
 };
 
 struct UI_PrecompilerTools::Directive_include : public UI_PrecompilerTools::Directive
 {
 				Directive_include() : Directive("include") {}
-	virtual int	func( SourceFile* source );
+	int	func( SourceFile* source ) override;
 };
 
 struct UI_PrecompilerTools::Directive_define : public UI_PrecompilerTools::Directive
 {
 				Directive_define() : Directive("define") {}
-	virtual int	func( SourceFile* source );
+	int	func( SourceFile* source ) override;
 };
 
 struct UI_PrecompilerTools::Directive_undef : public UI_PrecompilerTools::Directive
 {
 				Directive_undef() : Directive("undef") {}
-	virtual int	func( SourceFile* source );
+	int	func( SourceFile* source ) override;
 };
 
 struct UI_PrecompilerTools::Directive_line : public UI_PrecompilerTools::Directive
 {
 				Directive_line() : Directive("line") {}
-	virtual int	func( SourceFile* source );
+	int	func( SourceFile* source ) override;
 };
 
 struct UI_PrecompilerTools::Directive_error : public UI_PrecompilerTools::Directive
 {
 				Directive_error() : Directive("error") {}
-	virtual int	func( SourceFile* source );
+	int	func( SourceFile* source ) override;
 };
 
 struct UI_PrecompilerTools::Directive_pragma : public UI_PrecompilerTools::Directive
 {
 				Directive_pragma() : Directive("pragma") {}
-	virtual int	func( SourceFile* source );
+	int	func( SourceFile* source ) override;
 };
 
 struct UI_PrecompilerTools::Directive_eval : public UI_PrecompilerTools::Directive
 {
 				Directive_eval() : Directive("eval") {}
-	virtual int	func( SourceFile* source );
+	int	func( SourceFile* source ) override;
 };
 
 struct UI_PrecompilerTools::Directive_evalfloat : public UI_PrecompilerTools::Directive
 {
 				Directive_evalfloat() : Directive("evalfloat") {}
-	virtual int	func( SourceFile* source );
+	int	func( SourceFile* source ) override;
 };
 
 struct UI_PrecompilerTools::DollarDirective_evalint : public UI_PrecompilerTools::Directive
 {
 				DollarDirective_evalint() : Directive("evalint") {}
-	virtual int	func( SourceFile* source );
+	int	func( SourceFile* source ) override;
 };
 
 struct UI_PrecompilerTools::DollarDirective_evalfloat : public UI_PrecompilerTools::Directive
 {
 				DollarDirective_evalfloat() : Directive("evalfloat") {}
-	virtual int	func( SourceFile* source );
+	int	func( SourceFile* source ) override;
 };
 
 

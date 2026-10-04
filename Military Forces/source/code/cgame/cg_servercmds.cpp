@@ -24,7 +24,7 @@ CG_ParseScores
 
 #define	SCORE_BLOCK	15	// this value must be exactly how many parameters we expect per client score
 
-static void CG_ParseScores( void )
+static void CG_ParseScores( )
 {
 	int	i, objectives;
 
@@ -75,7 +75,7 @@ CG_ParseTeamInfo
 
 =================
 */
-static void CG_ParseTeamInfo( void ) {
+static void CG_ParseTeamInfo( ) {
 	int		i;
 	int		client;
 
@@ -113,7 +113,7 @@ This is called explicitly when the gamestate is first received,
 and whenever the server updates any serverinfo flagged cvars
 ================
 */
-void CG_ParseServerinfo( void ) {
+void CG_ParseServerinfo( ) {
 	const char	*info;
 	char	*mapname;
 	char	gs[32];
@@ -157,7 +157,7 @@ void CG_ParseServerinfo( void ) {
 CG_ParseWarmup
 ==================
 */
-static void CG_ParseWarmup( void ) {
+static void CG_ParseWarmup( ) {
 	const char	*info;
 	int			warmup;
 
@@ -184,7 +184,7 @@ CG_SetConfigValues
 Called on load to set the initial values from configure strings
 ================
 */
-void CG_SetConfigValues( void ) {
+void CG_SetConfigValues( ) {
 	const char *s;
 
 	cgs.scores1 = atoi( CG_ConfigString( CS_SCORES1 ) );
@@ -203,7 +203,7 @@ void CG_SetConfigValues( void ) {
 CG_ShaderStateChanged
 =====================
 */
-void CG_ShaderStateChanged(void) {
+void CG_ShaderStateChanged() {
 	char originalShader[MAX_QPATH];
 	char newShader[MAX_QPATH];
 	char timeOffset[16];
@@ -254,7 +254,7 @@ CG_ConfigStringModified
 
 ================
 */
-static void CG_ConfigStringModified( void ) {
+static void CG_ConfigStringModified( ) {
 	const char	*str;
 	int		num;
 
@@ -358,7 +358,7 @@ static void CG_AddToTeamChat( const char *str ) {
 
 	lastcolor = '7';
 
-	ls = NULL;
+	ls = nullptr;
 	while (*str) {
 		if (len > TEAMCHAT_WIDTH - 1) {
 			if (ls) {
@@ -376,7 +376,7 @@ static void CG_AddToTeamChat( const char *str ) {
 			*p++ = Q_COLOR_ESCAPE;
 			*p++ = lastcolor;
 			len = 0;
-			ls = NULL;
+			ls = nullptr;
 		}
 
 		if ( Q_IsColorString( str ) ) {
@@ -413,7 +413,7 @@ A tournement restart will clear everything, but doesn't
 require a reload of all the media
 ===============
 */
-static void CG_MapRestart( void ) {
+static void CG_MapRestart( ) {
 
 	if ( cg_showmiss.integer ) {
 		CG_Printf( "CG_MapRestart\n" );
@@ -480,7 +480,7 @@ static void CG_RemoveChatEscapeChar( char *text ) {
 CG_PrintExtractExtra
 =================
 */
-static void CG_PrintExtractExtra( void )
+static void CG_PrintExtractExtra( )
 {
 	const char	*extraCmd = CG_Argv(2);
 
@@ -506,7 +506,7 @@ The string has been tokenized and can be retrieved with
 Cmd_Argc() / Cmd_Argv()
 =================
 */
-static void CG_ServerCommand( void ) {
+static void CG_ServerCommand( ) {
 	const char	*cmd;
 	char		text[MAX_SAY_TEXT];
 

@@ -288,7 +288,7 @@ RB_Hyperspace
 A player has predicted a teleport, but hasn't arrived yet
 ================
 */
-static void RB_Hyperspace( void ) {
+static void RB_Hyperspace( ) {
 	float		c;
 
 	if ( !backEnd.isHyperspace ) {
@@ -304,7 +304,7 @@ static void RB_Hyperspace( void ) {
 }
 
 
-static void SetViewportAndScissor( void ) {
+static void SetViewportAndScissor( ) {
 	GL_SetProjectionMatrix( backEnd.viewParms.projectionMatrix );
 
 	// set the window clipping
@@ -322,7 +322,7 @@ Any mirrored or portaled views have already been drawn, so prepare
 to actually render the visible surfaces for this view
 =================
 */
-void RB_BeginDrawingView (void) {
+void RB_BeginDrawingView () {
 	int clearBits = 0;
 
 	// sync with gl if needed
@@ -342,7 +342,7 @@ void RB_BeginDrawingView (void) {
 	{
 		FBO_t *fbo = backEnd.viewParms.targetFbo;
 
-		if (fbo == NULL)
+		if (fbo == nullptr)
 			fbo = tr.renderFbo;
 
 		if (tr.renderCubeFbo && fbo == tr.renderCubeFbo)
@@ -424,7 +424,7 @@ RB_RenderDrawSurfList
 ==================
 */
 void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
-	shader_t		*shader = NULL, *oldShader;
+	shader_t		*shader = nullptr, *oldShader;
 	int				fogNum, oldFogNum;
 	int				entityNum, oldEntityNum;
 	int				dlighted, oldDlighted;
@@ -435,7 +435,7 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	drawSurf_t		*drawSurf;
 	uint64_t		oldSort;
 	double			originalTime;
-	FBO_t*			fbo = NULL;
+	FBO_t*			fbo = nullptr;
 
 	// save original time for entity shader offsets
 	originalTime = backEnd.refdef.floatTime;
@@ -445,7 +445,7 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	// draw everything
 	oldEntityNum = -1;
 	backEnd.currentEntity = &tr.worldEntity;
-	oldShader = NULL;
+	oldShader = nullptr;
 	oldFogNum = -1;
 	oldDepthRange = false;
 	wasCrosshair = false;
@@ -473,9 +473,9 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 		// change the tess parameters if needed
 		// a "entityMergable" shader is a shader that can have surfaces from separate
 		// entities merged into a single batch, like smoke and blood puff sprites
-		if ( shader != NULL && ( shader != oldShader || fogNum != oldFogNum || dlighted != oldDlighted || pshadowed != oldPshadowed || cubemapIndex != oldCubemapIndex
+		if ( shader != nullptr && ( shader != oldShader || fogNum != oldFogNum || dlighted != oldDlighted || pshadowed != oldPshadowed || cubemapIndex != oldCubemapIndex
 			|| ( entityNum != oldEntityNum && !shader->entityMergable ) ) ) {
-			if (oldShader != NULL) {
+			if (oldShader != nullptr) {
 				RB_EndSurface();
 			}
 			RB_BeginSurface( shader, fogNum, cubemapIndex );
@@ -589,7 +589,7 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	backEnd.refdef.floatTime = originalTime;
 
 	// draw the contents of the last shader batch
-	if (oldShader != NULL) {
+	if (oldShader != nullptr) {
 		RB_EndSurface();
 	}
 
@@ -618,7 +618,7 @@ RB_SetGL2D
 
 ================
 */
-void	RB_SetGL2D (void) {
+void	RB_SetGL2D () {
 	mat4_t matrix;
 	int width, height;
 
@@ -935,9 +935,9 @@ const void	*RB_DrawSurfs( const void *data ) {
 			if (tr.msaaResolveFbo)
 			{
 				// If we're using multisampling, resolve the depth first
-				FBO_FastBlit(tr.renderFbo, NULL, tr.msaaResolveFbo, NULL, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+				FBO_FastBlit(tr.renderFbo, nullptr, tr.msaaResolveFbo, nullptr, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 			}
-			else if (tr.renderFbo == NULL && tr.renderDepthImage)
+			else if (tr.renderFbo == nullptr && tr.renderDepthImage)
 			{
 				// If we're rendering directly to the screen, copy the depth to a texture
 				// This is incredibly slow on Intel Graphics, so just skip it on there
@@ -952,7 +952,7 @@ const void	*RB_DrawSurfs( const void *data ) {
 
 				VectorSet4(srcTexCoords, 0.0f, 0.0f, 1.0f, 1.0f);
 
-				FBO_BlitFromTexture(tr.renderDepthImage, srcTexCoords, NULL, tr.hdrDepthFbo, NULL, NULL, NULL, 0);
+				FBO_BlitFromTexture(tr.renderDepthImage, srcTexCoords, nullptr, tr.hdrDepthFbo, nullptr, nullptr, nullptr, 0);
 			}
 
 			if (r_sunlightMode->integer && backEnd.viewParms.flags & VPF_USESUNLIGHT)
@@ -1188,7 +1188,7 @@ const void	*RB_DrawSurfs( const void *data ) {
 	{
 		cubemap_t *cubemap = &tr.cubemaps[backEnd.viewParms.targetFboCubemapIndex];
 
-		FBO_Bind(NULL);
+		FBO_Bind(nullptr);
 		if (cubemap && cubemap->image)
 			qglGenerateTextureMipmapEXT(cubemap->image->texnum, GL_TEXTURE_CUBE_MAP);
 	}
@@ -1220,7 +1220,7 @@ const void	*RB_DrawBuffer( const void *data ) {
 		RB_EndSurface();
 
 	if (glRefConfig.framebufferObject)
-		FBO_Bind(NULL);
+		FBO_Bind(nullptr);
 
 	qglDrawBuffer( cmd->buffer );
 
@@ -1247,7 +1247,7 @@ was there.  This is used to test for texture thrashing.
 Also called by RE_EndRegistration
 ===============
 */
-void RB_ShowImages( void ) {
+void RB_ShowImages( ) {
 	int		i;
 	image_t	*image;
 	float	x, y, w, h;
@@ -1371,7 +1371,7 @@ static void RB_DrawGreyscale(const FBO_t *src)
 	if (!src || !src->colorImage[0])
 		return;
 
-	FBO_Bind(NULL);
+	FBO_Bind(nullptr);
 	qglViewport(0, 0, glConfig.vidWidth, glConfig.vidHeight);
 	qglScissor(0, 0, glConfig.vidWidth, glConfig.vidHeight);
 	GL_State(GLS_DEPTHTEST_DISABLE | GLS_SRCBLEND_ONE | GLS_DSTBLEND_ZERO);
@@ -1399,12 +1399,12 @@ RB_PresentToScreen
 
 =============
 */
-static void RB_PresentToScreen(void)
+static void RB_PresentToScreen()
 {
 	if (!glRefConfig.framebufferObject)
 		return;
 
-	const FBO_t *src = NULL;
+	const FBO_t *src = nullptr;
 
 	if (tr.renderFbo && tr.renderFbo->colorImage[0])
 	{
@@ -1414,7 +1414,7 @@ static void RB_PresentToScreen(void)
 	else if (tr.msaaResolveFbo && r_hdr->integer)
 	{
 		// Resolving an RGB16F MSAA FBO to the screen messes with the brightness, so resolve to an RGB16F FBO first
-		FBO_FastBlit(tr.renderFbo, NULL, tr.msaaResolveFbo, NULL, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+		FBO_FastBlit(tr.renderFbo, nullptr, tr.msaaResolveFbo, nullptr, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 		src = tr.msaaResolveFbo;
 	}
 
@@ -1426,14 +1426,14 @@ static void RB_PresentToScreen(void)
 		}
 		else
 		{
-			FBO_FastBlit(src, NULL, NULL, NULL, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+			FBO_FastBlit(src, nullptr, nullptr, nullptr, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 		}
 		return;
 	}
 
 	if (tr.renderFbo)
 	{
-		FBO_FastBlit(tr.renderFbo, NULL, NULL, NULL, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+		FBO_FastBlit(tr.renderFbo, nullptr, nullptr, nullptr, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 	}
 }
 
@@ -1565,7 +1565,7 @@ const void *RB_PostProcess(const void *data)
 	{
 		// Resolve the MSAA before anything else
 		// Can't resolve just part of the MSAA FBO, so multiple views will suffer a performance hit here
-		FBO_FastBlit(tr.renderFbo, NULL, tr.msaaResolveFbo, NULL, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+		FBO_FastBlit(tr.renderFbo, nullptr, tr.msaaResolveFbo, nullptr, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 		srcFbo = tr.msaaResolveFbo;
 	}
 
@@ -1581,7 +1581,7 @@ const void *RB_PostProcess(const void *data)
 		srcBox[2] = backEnd.viewParms.viewportWidth  * tr.screenSsaoImage->width  / (float)glConfig.vidWidth;
 		srcBox[3] = backEnd.viewParms.viewportHeight * tr.screenSsaoImage->height / (float)glConfig.vidHeight;
 
-		FBO_Blit(tr.screenSsaoFbo, srcBox, NULL, srcFbo, dstBox, NULL, NULL, GLS_SRCBLEND_DST_COLOR | GLS_DSTBLEND_ZERO);
+		FBO_Blit(tr.screenSsaoFbo, srcBox, nullptr, srcFbo, dstBox, nullptr, nullptr, GLS_SRCBLEND_DST_COLOR | GLS_DSTBLEND_ZERO);
 	}
 
 	srcBox[0] = backEnd.viewParms.viewportX;
@@ -1609,14 +1609,14 @@ const void *RB_PostProcess(const void *data)
 			color[2] = pow(2, r_cameraExposure->value); //exp2(r_cameraExposure->value);
 			color[3] = 1.0f;
 
-			FBO_BlitFromTexture(tr.whiteImage, NULL, NULL, srcFbo, srcBox, NULL, color, GLS_SRCBLEND_DST_COLOR | GLS_DSTBLEND_ZERO);
+			FBO_BlitFromTexture(tr.whiteImage, nullptr, nullptr, srcFbo, srcBox, nullptr, color, GLS_SRCBLEND_DST_COLOR | GLS_DSTBLEND_ZERO);
 		}
 	}
 
 	if (r_drawSunRays->integer)
 		RB_SunRays(srcFbo, srcBox, srcFbo, srcBox);
 
-	if (1)
+	if (true)
 		RB_BokehBlur(srcFbo, srcBox, srcFbo, srcBox, backEnd.refdef.blurFactor);
 	else
 		RB_GaussianBlur(srcFbo, srcFbo, backEnd.refdef.blurFactor);
@@ -1689,46 +1689,46 @@ const void *RB_PostProcess(const void *data)
 	}
 #endif
 
-	if (0 && r_sunlightMode->integer)
+	if (false && r_sunlightMode->integer)
 	{
 		ivec4_t dstBox2;
 		VectorSet4(dstBox2, 0, glConfig.vidHeight - 128, 128, 128);
-		FBO_BlitFromTexture(tr.sunShadowDepthImage[0], NULL, NULL, dstFbo, dstBox2, NULL, NULL, 0);
+		FBO_BlitFromTexture(tr.sunShadowDepthImage[0], nullptr, nullptr, dstFbo, dstBox2, nullptr, nullptr, 0);
 		VectorSet4(dstBox2, 128, glConfig.vidHeight - 128, 128, 128);
-		FBO_BlitFromTexture(tr.sunShadowDepthImage[1], NULL, NULL, dstFbo, dstBox2, NULL, NULL, 0);
+		FBO_BlitFromTexture(tr.sunShadowDepthImage[1], nullptr, nullptr, dstFbo, dstBox2, nullptr, nullptr, 0);
 		VectorSet4(dstBox2, 256, glConfig.vidHeight - 128, 128, 128);
-		FBO_BlitFromTexture(tr.sunShadowDepthImage[2], NULL, NULL, dstFbo, dstBox2, NULL, NULL, 0);
+		FBO_BlitFromTexture(tr.sunShadowDepthImage[2], nullptr, nullptr, dstFbo, dstBox2, nullptr, nullptr, 0);
 		VectorSet4(dstBox2, 384, glConfig.vidHeight - 128, 128, 128);
-		FBO_BlitFromTexture(tr.sunShadowDepthImage[3], NULL, NULL, dstFbo, dstBox2, NULL, NULL, 0);
+		FBO_BlitFromTexture(tr.sunShadowDepthImage[3], nullptr, nullptr, dstFbo, dstBox2, nullptr, nullptr, 0);
 	}
 
-	if (0 && r_shadows->integer == 4)
+	if (false && r_shadows->integer == 4)
 	{
 		ivec4_t dstBox2;
 		VectorSet4(dstBox2, 512 + 0, glConfig.vidHeight - 128, 128, 128);
-		FBO_BlitFromTexture(tr.pshadowMaps[0], NULL, NULL, dstFbo, dstBox2, NULL, NULL, 0);
+		FBO_BlitFromTexture(tr.pshadowMaps[0], nullptr, nullptr, dstFbo, dstBox2, nullptr, nullptr, 0);
 		VectorSet4(dstBox2, 512 + 128, glConfig.vidHeight - 128, 128, 128);
-		FBO_BlitFromTexture(tr.pshadowMaps[1], NULL, NULL, dstFbo, dstBox2, NULL, NULL, 0);
+		FBO_BlitFromTexture(tr.pshadowMaps[1], nullptr, nullptr, dstFbo, dstBox2, nullptr, nullptr, 0);
 		VectorSet4(dstBox2, 512 + 256, glConfig.vidHeight - 128, 128, 128);
-		FBO_BlitFromTexture(tr.pshadowMaps[2], NULL, NULL, dstFbo, dstBox2, NULL, NULL, 0);
+		FBO_BlitFromTexture(tr.pshadowMaps[2], nullptr, nullptr, dstFbo, dstBox2, nullptr, nullptr, 0);
 		VectorSet4(dstBox2, 512 + 384, glConfig.vidHeight - 128, 128, 128);
-		FBO_BlitFromTexture(tr.pshadowMaps[3], NULL, NULL, dstFbo, dstBox2, NULL, NULL, 0);
+		FBO_BlitFromTexture(tr.pshadowMaps[3], nullptr, nullptr, dstFbo, dstBox2, nullptr, nullptr, 0);
 	}
 
-	if (0)
+	if (false)
 	{
 		ivec4_t dstBox2;
 		VectorSet4(dstBox2, 256, glConfig.vidHeight - 256, 256, 256);
-		FBO_BlitFromTexture(tr.renderDepthImage, NULL, NULL, dstFbo, dstBox2, NULL, NULL, 0);
+		FBO_BlitFromTexture(tr.renderDepthImage, nullptr, nullptr, dstFbo, dstBox2, nullptr, nullptr, 0);
 		VectorSet4(dstBox2, 512, glConfig.vidHeight - 256, 256, 256);
-		FBO_BlitFromTexture(tr.screenShadowImage, NULL, NULL, dstFbo, dstBox2, NULL, NULL, 0);
+		FBO_BlitFromTexture(tr.screenShadowImage, nullptr, nullptr, dstFbo, dstBox2, nullptr, nullptr, 0);
 	}
 
-	if (0)
+	if (false)
 	{
 		ivec4_t dstBox2;
 		VectorSet4(dstBox2, 256, glConfig.vidHeight - 256, 256, 256);
-		FBO_BlitFromTexture(tr.sunRaysImage, NULL, NULL, dstFbo, dstBox2, NULL, NULL, 0);
+		FBO_BlitFromTexture(tr.sunRaysImage, nullptr, nullptr, dstFbo, dstBox2, nullptr, nullptr, 0);
 	}
 
 #if 0
@@ -1828,7 +1828,7 @@ void RB_ExecuteRenderCommands( const void *data ) {
 
 	t1 = ri.Milliseconds ();
 
-	while ( 1 ) {
+	while ( true ) {
 		data = PADP(data, sizeof(void *));
 
 		switch ( *(const int *)data ) {

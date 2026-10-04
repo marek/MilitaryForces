@@ -46,7 +46,7 @@ snd_codec_t opus_codec =
 	S_OggOpus_CodecOpenStream,
 	S_OggOpus_CodecReadStream,
 	S_OggOpus_CodecCloseStream,
-	NULL
+	nullptr
 };
 
 // callbacks for opusfile
@@ -230,23 +230,23 @@ snd_stream_t *S_OggOpus_CodecOpenStream(const char *filename)
 	// check if input is valid
 	if(!filename)
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	// Open the stream
 	stream = S_CodecUtilOpen(filename, &opus_codec);
 	if(!stream)
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	// open the codec with our callbacks and stream as the generic pointer
-	of = op_open_callbacks(stream, &S_OggOpus_Callbacks, NULL, 0, NULL );
+	of = op_open_callbacks(stream, &S_OggOpus_Callbacks, nullptr, 0, nullptr );
 	if (!of)
 	{
 		S_CodecUtilClose(&stream);
 
-		return NULL;
+		return nullptr;
 	}
 
 	// the stream must be seekable
@@ -256,7 +256,7 @@ snd_stream_t *S_OggOpus_CodecOpenStream(const char *filename)
 
 		S_CodecUtilClose(&stream);
 
-		return NULL;
+		return nullptr;
 	}
 
 	// get the info about channels and rate
@@ -267,7 +267,7 @@ snd_stream_t *S_OggOpus_CodecOpenStream(const char *filename)
 
 		S_CodecUtilClose(&stream);
 
-		return NULL;
+		return nullptr;
 	}
 
 	if(opusInfo->stream_count != 1)
@@ -277,7 +277,7 @@ snd_stream_t *S_OggOpus_CodecOpenStream(const char *filename)
 		S_CodecUtilClose(&stream);
 
 		Com_Printf("Only Ogg Opus files with one stream are support\n");
-		return NULL;
+		return nullptr;
 	}
 
 	if(opusInfo->channel_count != 1 && opusInfo->channel_count != 2)
@@ -287,7 +287,7 @@ snd_stream_t *S_OggOpus_CodecOpenStream(const char *filename)
 		S_CodecUtilClose(&stream);
 
 		Com_Printf("Only mono and stereo Ogg Opus files are supported\n");
-		return NULL;
+		return nullptr;
 	}
 
 	// get the number of sample-frames in the file
@@ -365,7 +365,7 @@ int S_OggOpus_CodecReadStream(snd_stream_t *stream, int bytes, void *buffer)
 	while(-1)
 	{
 		// read some samples from the opus codec
-		c = op_read((OggOpusFile *) stream->ptr, bufPtr + samplesRead * stream->info.channels, samplesLeft * stream->info.channels, NULL);
+		c = op_read((OggOpusFile *) stream->ptr, bufPtr + samplesRead * stream->info.channels, samplesLeft * stream->info.channels, nullptr);
 		
 		// no more samples are left
 		if(c <= 0)
@@ -403,14 +403,14 @@ void *S_OggOpus_CodecLoad(const char *filename, snd_info_t *info)
 	// check if input is valid
 	if(!(filename && info))
 	{
-		return NULL;
+		return nullptr;
 	}
 	
 	// open the file as a stream
 	stream = S_OggOpus_CodecOpenStream(filename);
 	if(!stream)
 	{
-		return NULL;
+		return nullptr;
 	}
 	
 	// copy over the info
@@ -428,7 +428,7 @@ void *S_OggOpus_CodecLoad(const char *filename, snd_info_t *info)
 	{
 		S_OggOpus_CodecCloseStream(stream);
 	
-		return NULL;	
+		return nullptr;	
 	}
 
 	// fill the buffer
@@ -440,7 +440,7 @@ void *S_OggOpus_CodecLoad(const char *filename, snd_info_t *info)
 		Hunk_FreeTempMemory(buffer);
 		S_OggOpus_CodecCloseStream(stream);
 
-		return NULL;	
+		return nullptr;	
 	}
 
 	S_OggOpus_CodecCloseStream(stream);

@@ -103,7 +103,7 @@ PM_Friction
 Handles both ground friction and water friction
 ==================
 */
-static void PM_Friction( void ) {
+static void PM_Friction( ) {
 	vec3_t	vec;
 	float	*vel;
 	float	speed, newspeed, control;
@@ -246,7 +246,7 @@ PM_FlyMove
 Only with the flight powerup
 ===================
 */
-static void PM_FlyMove( void ) {
+static void PM_FlyMove( ) {
 	int		i;
 	vec3_t	wishvel;
 	float	wishspeed;
@@ -297,7 +297,7 @@ static void PM_FlyMove( void ) {
 PM_NoclipMove
 ===============
 */
-static void PM_NoclipMove( void ) {
+static void PM_NoclipMove( ) {
 	float	speed, drop, friction, control, newspeed;
 	int			i;
 	vec3_t		wishvel;
@@ -359,7 +359,7 @@ static void PM_NoclipMove( void ) {
 PM_SetWaterLevel	FIXME: avoid this twice?  certainly if not moving
 =============
 */
-static void PM_SetWaterLevel( void ) {
+static void PM_SetWaterLevel( ) {
 	vec3_t		point, start, end;
 	int			cont;
 //	int			sample1;
@@ -433,8 +433,8 @@ static void PM_SetWaterLevel( void ) {
 					end[2] -= 10;
 					pm->trace ( &tr, 
 								start, 
-								0, 
-								0, 
+								nullptr, 
+								nullptr, 
 								end, 
 								pm->ps->clientNum, 
 								MASK_WATER,
@@ -461,7 +461,7 @@ PM_WaterEvents
 Generate sound events for entering and leaving water
 ==============
 */
-static void PM_WaterEvents( void ) {		// FIXME?
+static void PM_WaterEvents( ) {		// FIXME?
 
 //    if( pm->ps->pm_type == PM_VEHICLE ) {
 //		return;
@@ -504,7 +504,7 @@ PM_Flare
 Generates flare events and modifes the flare counter
 ==============
 */
-static void PM_Flare( void ) {
+static void PM_Flare( ) {
 
 	if( pm->ps->pm_flags & PMF_RESPAWNED ) {
 		return;
@@ -548,7 +548,7 @@ PM_Weapon
 Generates weapon events and modifes the weapon counter
 ==============
 */
-static void PM_Weapon( void ) {
+static void PM_Weapon( ) {
 	bool	canShoot = true,
 				canShootMG = true;
 
@@ -673,7 +673,7 @@ static void PM_Weapon( void ) {
 PM_DropTimers
 ================
 */
-static void PM_DropTimers( void ) {
+static void PM_DropTimers( ) {
 	// drop misc timing counter
 	if ( pm->ps->pm_time ) {
 		if ( pml.msec >= pm->ps->pm_time ) {
@@ -739,7 +739,7 @@ PM_VehicleBoundingBox
 Sets mins, maxs, and pm->ps->viewheight
 ==============
 */
-static void PM_VehicleBoundingBox (void)
+static void PM_VehicleBoundingBox ()
 {
 /*    vec3_t	mins, maxs;
 	float	diff1, diff2;
@@ -841,7 +841,7 @@ PM_VehicleMove
 
 ===================
 */
-static void PM_VehicleMove( void ) 
+static void PM_VehicleMove( ) 
 {
 	if( availableVehicles[pm->vehicle].cat & CAT_PLANE ) 
 	{

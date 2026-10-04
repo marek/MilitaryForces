@@ -50,7 +50,7 @@ void GetClientState( uiClientState_t *state )
 LAN_LoadCachedServers
 ====================
 */
-void LAN_LoadCachedServers( void ) {
+void LAN_LoadCachedServers( ) {
 	int size;
 	fileHandle_t fileIn;
 	cls.numglobalservers = cls.numfavoriteservers = 0;
@@ -75,7 +75,7 @@ void LAN_LoadCachedServers( void ) {
 LAN_SaveServersToCache
 ====================
 */
-void LAN_SaveServersToCache( void ) {
+void LAN_SaveServersToCache( ) {
 	int size;
 	fileHandle_t fileOut = FS_BaseDir_FOpenFileWrite_HomeState("servercache.dat");
 	FS_Write(&cls.numglobalservers, sizeof(int), fileOut);
@@ -95,7 +95,7 @@ LAN_ResetPings
 */
 void LAN_ResetPings(int source) {
 	int count,i;
-	serverInfo_t *servers = NULL;
+	serverInfo_t *servers = nullptr;
 	count = 0;
 
 	switch (source) {
@@ -128,9 +128,9 @@ LAN_AddServer
 int LAN_AddServer(int source, const char *name, const char *address) {
 	int max, *count, i;
 	netadr_t adr;
-	serverInfo_t *servers = NULL;
+	serverInfo_t *servers = nullptr;
 	max = MAX_OTHER_SERVERS;
-	count = NULL;
+	count = nullptr;
 
 	switch (source) {
 		case AS_LOCAL :
@@ -174,8 +174,8 @@ LAN_RemoveServer
 */
 void LAN_RemoveServer(int source, const char *addr) {
 	int *count, i;
-	serverInfo_t *servers = NULL;
-	count = NULL;
+	serverInfo_t *servers = nullptr;
+	count = nullptr;
 	switch (source) {
 		case AS_LOCAL :
 			count = &cls.numlocalservers;
@@ -267,7 +267,7 @@ LAN_GetServerInfo
 */
 void LAN_GetServerInfo( int source, int n, char *buf, int buflen ) {
 	char info[MAX_STRING_CHARS];
-	serverInfo_t *server = NULL;
+	serverInfo_t *server = nullptr;
 	info[0] = '\0';
 	switch (source) {
 		case AS_LOCAL :
@@ -317,7 +317,7 @@ LAN_GetServerPing
 ====================
 */
 int LAN_GetServerPing( int source, int n ) {
-	serverInfo_t *server = NULL;
+	serverInfo_t *server = nullptr;
 	switch (source) {
 		case AS_LOCAL :
 			if (n >= 0 && n < MAX_OTHER_SERVERS) {
@@ -366,7 +366,7 @@ serverInfo_t *LAN_GetServerPtr( int source, int n ) {
 			}
 			break;
 	}
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -453,7 +453,7 @@ int LAN_CompareServers( int source, int sortKey, int sortDir, int s1, int s2 ) {
 LAN_GetPingQueueCount
 ====================
 */
-int LAN_GetPingQueueCount( void ) {
+int LAN_GetPingQueueCount( ) {
 	return (CL_GetPingQueueCount());
 }
 
@@ -492,7 +492,7 @@ LAN_MarkServerVisible
 void LAN_MarkServerVisible(int source, int n, bool visible ) {
 	if (n == -1) {
 		int count = MAX_OTHER_SERVERS;
-		serverInfo_t *server = NULL;
+		serverInfo_t *server = nullptr;
 		switch (source) {
 			case AS_LOCAL :
 				server = &cls.localServers[0];
@@ -709,7 +709,7 @@ int GetConfigString(int index, char *buf, int size)
 CL_ShutdownUI
 ====================
 */
-void CL_ShutdownUI( void ) {
+void CL_ShutdownUI( ) {
 	Key_SetCatcher( Key_GetCatcher( ) & ~KEYCATCH_UI );
 	cls.uiStarted = false;
 	if ( !theUI.isInitialized() ) {
@@ -723,7 +723,7 @@ void CL_ShutdownUI( void ) {
 CL_InitUI
 ====================
 */
-void CL_InitUI( void ) {
+void CL_InitUI( ) {
 	// init for this gamestate
 	theUI.init( (clc.state >= CA_AUTHORIZING && clc.state < CA_ACTIVE) );
 }
@@ -743,7 +743,7 @@ UI_GameCommand
 See if the current console command is claimed by the ui
 ====================
 */
-bool UI_GameCommand( void ) 
+bool UI_GameCommand( ) 
 {
 	if( !theUI.isInitialized() )
 		return false;

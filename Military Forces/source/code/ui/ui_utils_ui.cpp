@@ -137,7 +137,7 @@ UI_UtilsUI::customChatUpdate( int key, int keyDown )
 void 
 UI_UtilsUI::customChatEnd( bool sendText )
 {
-	char * pMode = NULL;
+	char * pMode = nullptr;
 
 	// work out which say
 	switch( uiInfo.customChat.mode )
@@ -174,7 +174,7 @@ void
 UI_UtilsUI::customChatDraw()
 {
 	int spacer1 = 0, spacer2 = 0;
-	char * pMode = NULL;
+	char * pMode = nullptr;
 	int x = k_CHAT_X, y = k_CHAT_Y;
 	float alpha = 1.0f; 
 	float fx = 1.0f;
@@ -204,8 +204,8 @@ UI_UtilsUI::customChatDraw()
 	}
 
 	// draw the chat background
-	dc_->fillRect( x, y, k_CHAT_WIDTH, k_CHAT_HEIGHT, *createColourVector( 0,0.4f,0,0.75f * alpha,NULL ) );
-	dc_->drawRect( x, y, k_CHAT_WIDTH, k_CHAT_HEIGHT, 1, *createColourVector( 0,0,0,0.75f * alpha,NULL ) );
+	dc_->fillRect( x, y, k_CHAT_WIDTH, k_CHAT_HEIGHT, *createColourVector( 0,0.4f,0,0.75f * alpha,nullptr ) );
+	dc_->drawRect( x, y, k_CHAT_WIDTH, k_CHAT_HEIGHT, 1, *createColourVector( 0,0,0,0.75f * alpha,nullptr ) );
 
 	spacer1 = dc_->textWidth( pMode, CHAT_TEXT_SCALE, 0 );
 
@@ -216,8 +216,8 @@ UI_UtilsUI::customChatDraw()
 	}
 
 	// draw the current text line
-	drawStringNew( x+k_CHAT_OX, y+k_CHAT_OY, CHAT_TEXT_SCALE, *createColourVector(1,1,0,1 * alpha,NULL), pMode, 0, 0, ITEM_TEXTSTYLE_SHADOWED, LEFT_JUSTIFY );
-	drawStringNew( x+k_CHAT_OX+spacer1, y+k_CHAT_OY+k_CHAT_AY-textYAdjust, CHAT_TEXT_SCALE, *createColourVector(1,1,1,1 * alpha,NULL), uiInfo.customChat.text, 0, 0, ITEM_TEXTSTYLE_SHADOWED, LEFT_JUSTIFY );
+	drawStringNew( x+k_CHAT_OX, y+k_CHAT_OY, CHAT_TEXT_SCALE, *createColourVector(1,1,0,1 * alpha,nullptr), pMode, 0, 0, ITEM_TEXTSTYLE_SHADOWED, LEFT_JUSTIFY );
+	drawStringNew( x+k_CHAT_OX+spacer1, y+k_CHAT_OY+k_CHAT_AY-textYAdjust, CHAT_TEXT_SCALE, *createColourVector(1,1,1,1 * alpha,nullptr), uiInfo.customChat.text, 0, 0, ITEM_TEXTSTYLE_SHADOWED, LEFT_JUSTIFY );
 
 	spacer2 = dc_->textWidth( uiInfo.customChat.text, CHAT_TEXT_SCALE, 0 );
 
@@ -252,7 +252,7 @@ UI_UtilsUI::customChatDraw()
 
 	// draw the cursor
 	dc_->fillRect( x+spacer1+spacer2+k_CURSOR_OX+4, y+k_CURSOR_OY, k_CURSOR_W, k_CURSOR_H, 
-		*createColourVector( 1,fx,fx,uiInfo.customChat.cursorAlpha * alpha,NULL ) );
+		*createColourVector( 1,fx,fx,uiInfo.customChat.cursorAlpha * alpha,nullptr ) );
 }
 
 

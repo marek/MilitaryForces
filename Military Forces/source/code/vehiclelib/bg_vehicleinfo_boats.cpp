@@ -6,7 +6,7 @@
 
 
 GameObjectInfo_Boat::GameObjectInfo_Boat() :
-	sonarInfo_(0)
+	sonarInfo_(nullptr)
 {
 
 }
@@ -14,7 +14,7 @@ GameObjectInfo_Boat::GameObjectInfo_Boat() :
 GameObjectInfo_Boat::~GameObjectInfo_Boat()
 {
 	delete sonarInfo_;
-	sonarInfo_ = 0;
+	sonarInfo_ = nullptr;
 }
 
 
@@ -23,7 +23,7 @@ GameObjectInfo_Boat::~GameObjectInfo_Boat()
 void
 GameObjectInfo_Boat::createAllBoats( GameObjectList& gameObjects )
 {
-	GameObjectInfo_Boat* veh = 0;
+	GameObjectInfo_Boat* veh = nullptr;
 
 	// Patrolboat
 	veh = dynamic_cast<GameObjectInfo_Boat*>(createVehicle(GameObjectInfo::GO_CAT_BOAT));

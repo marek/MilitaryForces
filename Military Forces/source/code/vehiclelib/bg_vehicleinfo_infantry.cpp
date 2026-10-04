@@ -6,14 +6,14 @@
 #include "../game/bg_public.h"
 
 GameObjectInfo_Infantry::GameObjectInfo_Infantry() :
-	animations_(0)
+	animations_(nullptr)
 {
 }
 
 GameObjectInfo_Infantry::~GameObjectInfo_Infantry()
 {
 	delete animations_;
-	animations_ = 0;
+	animations_ = nullptr;
 }
 
 bool
@@ -53,7 +53,7 @@ GameObjectInfo_Infantry::setupBoundingBox()
 void
 GameObjectInfo_Infantry::createAllInfantry( GameObjectList& gameObjects )
 {
-	GameObjectInfo_Infantry* veh = 0;
+	GameObjectInfo_Infantry* veh = nullptr;
 
 	// Male
 	veh = dynamic_cast<GameObjectInfo_Infantry*>(createVehicle(GameObjectInfo::GO_CAT_INF));
@@ -74,7 +74,7 @@ GameObjectInfo_Infantry::createAllInfantry( GameObjectList& gameObjects )
 	Vector4Set( veh->shadowCoords_, 4, 0, 34, 24 );	
 	Vector4Set( veh->shadowAdjusts_, 0, 0, 0, 0 );	
     veh->maxSpeed_ = 50;		
-	veh->animations_ = 0;	
+	veh->animations_ = nullptr;	
 	gameObjects.push_back(veh);
 
 	// Female
@@ -96,7 +96,7 @@ GameObjectInfo_Infantry::createAllInfantry( GameObjectList& gameObjects )
 	Vector4Set( veh->shadowCoords_, 4, 0, 34, 24 );	
 	Vector4Set( veh->shadowAdjusts_, 0, 0, 0, 0 );	
     veh->maxSpeed_ = 50;		
-	veh->animations_ = 0;	
+	veh->animations_ = nullptr;	
 	gameObjects.push_back(veh);
 }
 

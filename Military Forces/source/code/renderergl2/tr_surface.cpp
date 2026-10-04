@@ -239,7 +239,7 @@ void RB_InstantQuad(vec4_t quadVerts[4])
 RB_SurfaceSprite
 ==============
 */
-static void RB_SurfaceSprite( void ) {
+static void RB_SurfaceSprite( ) {
 	vec3_t		left, up;
 	float		radius;
 	float			colors[4];
@@ -474,7 +474,7 @@ static void RB_SurfaceTriangles( srfBspSurface_t *srf ) {
 RB_SurfaceBeam
 ==============
 */
-static void RB_SurfaceBeam( void )
+static void RB_SurfaceBeam( )
 {
 #define NUM_BEAM_SEGS 6
 	refEntity_t *e;
@@ -679,7 +679,7 @@ static void DoRailDiscs( int numSegs, const vec3_t start, const vec3_t dir, cons
 /*
 ** RB_SurfaceRailRinges
 */
-static void RB_SurfaceRailRings( void ) {
+static void RB_SurfaceRailRings( ) {
 	refEntity_t *e;
 	int			numSegs;
 	int			len;
@@ -709,7 +709,7 @@ static void RB_SurfaceRailRings( void ) {
 /*
 ** RB_SurfaceRailCore
 */
-static void RB_SurfaceRailCore( void ) {
+static void RB_SurfaceRailCore( ) {
 	refEntity_t *e;
 	int			len;
 	vec3_t		right;
@@ -739,7 +739,7 @@ static void RB_SurfaceRailCore( void ) {
 /*
 ** RB_SurfaceLightningBolt
 */
-static void RB_SurfaceLightningBolt( void ) {
+static void RB_SurfaceLightningBolt( ) {
 	refEntity_t *e;
 	int			len;
 	vec3_t		right;
@@ -1019,7 +1019,7 @@ static void RB_SurfaceGrid( srfBspSurface_t *srf ) {
 			} else {
 				break;
 			}
-		} while ( 1 );
+		} while ( true );
 		
 		rows = irows;
 		if ( vrows < irows + 1 ) {
@@ -1146,7 +1146,7 @@ RB_SurfaceAxis
 Draws x/y/z lines from the origin for orientation debugging
 ===================
 */
-static void RB_SurfaceAxis( void ) {
+static void RB_SurfaceAxis( ) {
 	// FIXME: implement this
 #if 0
 	GL_BindToTMU( tr.whiteImage, TB_COLORMAP );

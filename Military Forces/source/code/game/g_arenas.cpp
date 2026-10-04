@@ -21,7 +21,7 @@ UpdateTournamentInfo
 void UpdateTournamentInfo() 
 {
 	int			i;
-	GameEntity* player = 0;
+	GameEntity* player = nullptr;
 	int			playerClientNum;
 	int			n, accuracy, perfect,	msglen;
 //	bool won;

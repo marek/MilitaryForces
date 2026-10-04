@@ -26,7 +26,7 @@ void *G_Alloc( int size ) {
 
 	if ( allocPoint + size > POOLSIZE ) {
 		Com_Error( ERR_DROP, "G_Alloc: failed on allocation of %u bytes\n", size );
-		return NULL;
+		return nullptr;
 	}
 
 	p = &memoryPool[allocPoint];
@@ -36,10 +36,10 @@ void *G_Alloc( int size ) {
 	return p;
 }
 
-void G_InitMemory( void ) {
+void G_InitMemory( ) {
 	allocPoint = 0;
 }
 
-void Svcmd_GameMem_f( void ) {
+void Svcmd_GameMem_f( ) {
 	Com_Printf( "Game memory status: %i out of %i bytes allocated\n", allocPoint, POOLSIZE );
 }

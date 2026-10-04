@@ -23,7 +23,7 @@ CG_InitLocalEntities
 This is called at startup and for tournement restarts
 ===================
 */
-void	CG_InitLocalEntities( void ) {
+void	CG_InitLocalEntities( ) {
 	int		i;
 
 	memset( cg_localEntities, 0, sizeof( cg_localEntities ) );
@@ -65,7 +65,7 @@ CG_AllocLocalEntity
 Will allways succeed, even if it requires freeing an old active entity
 ===================
 */
-localEntity_t	*CG_AllocLocalEntity( void ) {
+localEntity_t	*CG_AllocLocalEntity( ) {
 	localEntity_t	*le;
 
 	if ( !cg_freeLocalEntities ) {
@@ -186,7 +186,7 @@ void CG_AddFragment( localEntity_t *le ) {
 	BG_EvaluateTrajectory( &le->pos, cg.time, newOrigin );
 
 	// trace a line from previous position to New position
-	CG_Trace( &trace, le->refEntity.origin, NULL, NULL, newOrigin, -1, CONTENTS_SOLID );
+	CG_Trace( &trace, le->refEntity.origin, nullptr, nullptr, newOrigin, -1, CONTENTS_SOLID );
 	if ( trace.fraction == 1.0 ) {
 		// still in free fall
 		VectorCopy( newOrigin, le->refEntity.origin );
@@ -591,7 +591,7 @@ CG_AddLocalEntities
 
 ===================
 */
-void CG_AddLocalEntities( void ) {
+void CG_AddLocalEntities( ) {
 	localEntity_t	*le, *next;
 
 	// walk the list backwards, so any New local entities generated

@@ -7,7 +7,7 @@
 struct EntityWorld : public GameEntity
 {
 					EntityWorld();
-					~EntityWorld();
+					~EntityWorld() override;
 
 	void			init();
 

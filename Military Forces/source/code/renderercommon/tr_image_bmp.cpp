@@ -58,7 +58,7 @@ void R_LoadBMP( const char *name, byte **pic, int *width, int *height )
 	BMPHeader_t bmpHeader;
 	byte		*bmpRGBA;
 
-	*pic = NULL;
+	*pic = nullptr;
 
 	if(width)
 		*width = 0;

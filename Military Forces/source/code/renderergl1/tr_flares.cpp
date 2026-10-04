@@ -91,7 +91,7 @@ int flareCoeff;
 R_SetFlareCoeff
 ==================
 */
-static void R_SetFlareCoeff( void ) {
+static void R_SetFlareCoeff( ) {
 
 	if(r_flareCoeff->value == 0.0f)
 		flareCoeff = atof(FLARE_STDCOEFF);
@@ -104,12 +104,12 @@ static void R_SetFlareCoeff( void ) {
 R_ClearFlares
 ==================
 */
-void R_ClearFlares( void ) {
+void R_ClearFlares( ) {
 	int		i;
 
 	Com_Memset( r_flareStructs, 0, sizeof( r_flareStructs ) );
-	r_activeFlares = NULL;
-	r_inactiveFlares = NULL;
+	r_activeFlares = nullptr;
+	r_inactiveFlares = nullptr;
 
 	for ( i = 0 ; i < MAX_FLARES ; i++ ) {
 		r_flareStructs[i].next = r_inactiveFlares;
@@ -218,10 +218,10 @@ void RB_AddFlare( void *surface, int fogNum, vec3_t point, vec3_t color, vec3_t 
 RB_AddDlightFlares
 ==================
 */
-void RB_AddDlightFlares( void ) {
+void RB_AddDlightFlares( ) {
 	dlight_t		*l;
 	int				i, j, k;
-	fog_t			*fog = NULL;
+	fog_t			*fog = nullptr;
 
 	if ( !r_flares->integer ) {
 		return;
@@ -255,7 +255,7 @@ void RB_AddDlightFlares( void ) {
 		else
 			j = 0;
 
-		RB_AddFlare( (void *)l, j, l->origin, l->color, NULL );
+		RB_AddFlare( (void *)l, j, l->origin, l->color, nullptr );
 	}
 }
 
@@ -454,7 +454,7 @@ when occluded by something in the main view, and portal flares that should
 extend past the portal edge will be overwritten.
 ==================
 */
-void RB_RenderFlares (void) {
+void RB_RenderFlares () {
 	flare_t		*f;
 	flare_t		**prev;
 	bool	draw;
@@ -479,7 +479,7 @@ void RB_RenderFlares (void) {
 	// perform z buffer readback on each flare in this view
 	draw = false;
 	prev = &r_activeFlares;
-	while ( ( f = *prev ) != NULL ) {
+	while ( ( f = *prev ) != nullptr ) {
 		// throw out any flares that weren't added last frame
 		if ( f->addedFrame < backEnd.viewParms.frameCount - 1 ) {
 			*prev = f->next;

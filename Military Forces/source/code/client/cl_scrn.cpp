@@ -99,7 +99,7 @@ void SCR_FillRect( float x, float y, float width, float height, const float *col
 	SCR_AdjustFrom640( &x, &y, &width, &height );
 	refExport.DrawStretchPic( x, y, width, height, 0, 0, 0, 0, cls.whiteShader );
 
-	refExport.SetColor( NULL );
+	refExport.SetColor( nullptr );
 }
 
 
@@ -241,7 +241,7 @@ void SCR_DrawStringExt( int x, int y, float size, const char *string, float *set
 		xx += size;
 		s++;
 	}
-	refExport.SetColor( NULL );
+	refExport.SetColor( nullptr );
 }
 
 
@@ -292,7 +292,7 @@ void SCR_DrawSmallStringExt( int x, int y, const char *string, float *setColor, 
 		xx += g_smallchar_width;
 		s++;
 	}
-	refExport.SetColor( NULL );
+	refExport.SetColor( nullptr );
 }
 
 
@@ -331,7 +331,7 @@ int	SCR_GetBigStringWidth( const char *str ) {
 SCR_DrawDemoRecording
 =================
 */
-void SCR_DrawDemoRecording( void ) {
+void SCR_DrawDemoRecording( ) {
 	char	string[1024];
 	int		pos;
 
@@ -355,7 +355,7 @@ void SCR_DrawDemoRecording( void ) {
 SCR_DrawVoipMeter
 =================
 */
-void SCR_DrawVoipMeter( void ) {
+void SCR_DrawVoipMeter( ) {
 	char	buffer[16];
 	char	string[256];
 	int limit, i;
@@ -418,7 +418,7 @@ void SCR_DebugGraph (float value)
 SCR_DrawDebugGraph
 ==============
 */
-void SCR_DrawDebugGraph (void)
+void SCR_DrawDebugGraph ()
 {
 	int		a, x, y, w, i, h;
 	float	v;
@@ -432,7 +432,7 @@ void SCR_DrawDebugGraph (void)
 	refExport.SetColor( g_color_table[0] );
 	refExport.DrawStretchPic(x, y - cl_graphheight->integer, 
 		w, cl_graphheight->integer, 0, 0, 0, 0, cls.whiteShader );
-	refExport.SetColor( NULL );
+	refExport.SetColor( nullptr );
 
 	for (a=0 ; a<w ; a++)
 	{
@@ -454,7 +454,7 @@ void SCR_DrawDebugGraph (void)
 SCR_Init
 ==================
 */
-void SCR_Init( void ) {
+void SCR_Init( ) {
 	cl_timegraph = Cvar_Get ("timegraph", "0", CVAR_CHEAT);
 	cl_debuggraph = Cvar_Get ("debuggraph", "0", CVAR_CHEAT);
 	cl_graphheight = Cvar_Get ("graphheight", "32", CVAR_CHEAT);
@@ -487,7 +487,7 @@ void SCR_DrawScreenField( stereoFrame_t stereoFrame ) {
 		if ( cls.glconfig.vidWidth * 480 > cls.glconfig.vidHeight * 640 ) {
 			refExport.SetColor( g_color_table[0] );
 			refExport.DrawStretchPic( 0, 0, cls.glconfig.vidWidth, cls.glconfig.vidHeight, 0, 0, 0, 0, cls.whiteShader );
-			refExport.SetColor( NULL );
+			refExport.SetColor( nullptr );
 		}
 	}
 
@@ -558,7 +558,7 @@ This is called every frame, and can also be called explicitly to flush
 text to the screen.
 ==================
 */
-void SCR_UpdateScreen( void ) {
+void SCR_UpdateScreen( ) {
 	static int	recursive;
 
 	if ( !scr_initialized ) {
@@ -587,7 +587,7 @@ void SCR_UpdateScreen( void ) {
 		if ( com_speeds->integer ) {
 			refExport.EndFrame( &time_frontend, &time_backend );
 		} else {
-			refExport.EndFrame( NULL, NULL );
+			refExport.EndFrame( nullptr, nullptr );
 		}
 	}
 	

@@ -69,7 +69,7 @@ void Sys_SetBinaryPath(const char *path)
 Sys_BinaryPath
 =================
 */
-char *Sys_BinaryPath(void)
+char *Sys_BinaryPath()
 {
 	return binaryPath;
 }
@@ -89,7 +89,7 @@ void Sys_SetDefaultInstallPath(const char *path)
 Sys_DefaultInstallPath
 =================
 */
-char *Sys_DefaultInstallPath(void)
+char *Sys_DefaultInstallPath()
 {
 	if (*installPath)
 		return installPath;
@@ -102,7 +102,7 @@ char *Sys_DefaultInstallPath(void)
 Sys_DefaultAppPath
 =================
 */
-char *Sys_DefaultAppPath(void)
+char *Sys_DefaultAppPath()
 {
 	return Sys_BinaryPath();
 }
@@ -114,7 +114,7 @@ Sys_In_Restart_f
 Restart the input subsystem
 =================
 */
-void Sys_In_Restart_f( void )
+void Sys_In_Restart_f( )
 {
 #ifndef DEDICATED
 	if( !SDL_WasInit( SDL_INIT_VIDEO ) )
@@ -134,7 +134,7 @@ Sys_ConsoleInput
 Handle new console input
 =================
 */
-char *Sys_ConsoleInput(void)
+char *Sys_ConsoleInput()
 {
 	return CON_Input( );
 }
@@ -144,15 +144,15 @@ char *Sys_ConsoleInput(void)
 Sys_GetClipboardData
 ==================
 */
-char *Sys_GetClipboardData(void)
+char *Sys_GetClipboardData()
 {
 #ifdef DEDICATED
 	return NULL;
 #else
-	char *data = NULL;
+	char *data = nullptr;
 	char *cliptext;
 
-	if ( ( cliptext = SDL_GetClipboardText() ) != NULL ) {
+	if ( ( cliptext = SDL_GetClipboardText() ) != nullptr ) {
 		if ( cliptext[0] != '\0' ) {
 			size_t bufsize = strlen( cliptext ) + 1;
 
@@ -186,7 +186,7 @@ static char *Sys_PIDFileName( const char *gamedir )
 	if( *homeStatePath != '\0' )
 		return va( "%s/%s/%s", homeStatePath, gamedir, PID_FILENAME );
 
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -198,7 +198,7 @@ void Sys_RemovePIDFile( const char *gamedir )
 {
 	char *pidFile = Sys_PIDFileName( gamedir );
 
-	if( pidFile != NULL )
+	if( pidFile != nullptr )
 		remove( pidFile );
 }
 
@@ -215,11 +215,11 @@ static bool Sys_WritePIDFile( const char *gamedir )
 	FILE      *f;
 	bool  stale = false;
 
-	if( pidFile == NULL )
+	if( pidFile == nullptr )
 		return false;
 
 	// First, check if the pid file is already there
-	if( ( f = fopen( pidFile, "r" ) ) != NULL )
+	if( ( f = fopen( pidFile, "r" ) ) != nullptr )
 	{
 		char  pidBuffer[ 64 ] = { 0 };
 		int   pid;
@@ -238,10 +238,10 @@ static bool Sys_WritePIDFile( const char *gamedir )
 	}
 
 	if( FS_CreatePath( pidFile ) ) {
-		return 0;
+		return false;
 	}
 
-	if( ( f = fopen( pidFile, "w" ) ) != NULL )
+	if( ( f = fopen( pidFile, "w" ) ) != nullptr )
 	{
 		fprintf( f, "%d", Sys_PID( ) );
 		fclose( f );
@@ -326,7 +326,7 @@ static Q_NO_RETURN void Sys_Exit( int exitCode )
 Sys_Quit
 =================
 */
-void Sys_Quit( void )
+void Sys_Quit( )
 {
 	Sys_Exit( 0 );
 }
@@ -336,7 +336,7 @@ void Sys_Quit( void )
 Sys_GetProcessorFeatures
 =================
 */
-cpuFeatures_t Sys_GetProcessorFeatures( void )
+cpuFeatures_t Sys_GetProcessorFeatures( )
 {
 	cpuFeatures_t features = (cpuFeatures_t)0;
 
@@ -357,7 +357,7 @@ cpuFeatures_t Sys_GetProcessorFeatures( void )
 Sys_Init
 =================
 */
-void Sys_Init(void)
+void Sys_Init()
 {
 	Cmd_AddCommand( "in_restart", Sys_In_Restart_f );
 	Cvar_Set( "arch", OS_STRING " " ARCH_STRING );
@@ -511,12 +511,12 @@ from executable path, then fs_basepath.
 
 void *Sys_LoadDll(const char *name, bool useSystemLib)
 {
-	void *dllhandle = NULL;
+	void *dllhandle = nullptr;
 
 	if(!Sys_DllExtension(name))
 	{
 		Com_Printf("Refusing to attempt to load library \"%s\": Extension not allowed.\n", name);
-		return NULL;
+		return nullptr;
 	}
 
 	if(useSystemLib)
@@ -792,7 +792,7 @@ int main( int argc, char **argv )
 			break;
 		}
 
-		containsSpaces = strchr(argv[i], ' ') != NULL;
+		containsSpaces = strchr(argv[i], ' ') != nullptr;
 		if (containsSpaces)
 			Q_strcat( commandLine, sizeof( commandLine ), "\"" );
 
@@ -826,7 +826,7 @@ int main( int argc, char **argv )
 #ifdef __EMSCRIPTEN__
 	emscripten_set_main_loop( Com_Frame, 0, 1 );
 #else
-	while( 1 )
+	while( true )
 	{
 		Com_Frame( );
 	}

@@ -368,7 +368,7 @@ typedef struct shader_s {
 	int			numUnfoggedPasses;
 	shaderStage_t	*stages[MAX_SHADER_STAGES];		
 
-	void		(*optimalStageIteratorFunc)( void );
+	void		(*optimalStageIteratorFunc)( );
 
   double clampTime;                                  // time this shader is clamped to
   double timeOffset;                                 // current time offset for this shader
@@ -772,13 +772,13 @@ typedef struct model_s {
 
 #define	MAX_MOD_KNOWN	1024
 
-void		R_ModelInit (void);
+void		R_ModelInit ();
 model_t		*R_GetModelByHandle( qhandle_t hModel );
 int			R_LerpTag( orientation_t *tag, qhandle_t handle, int startFrame, int endFrame, 
 					 float frac, const char *tagName );
 void		R_ModelBounds( qhandle_t handle, vec3_t mins, vec3_t maxs );
 
-void		R_Modellist_f (void);
+void		R_Modellist_f ();
 
 //====================================================
 
@@ -1092,7 +1092,7 @@ void R_AddBeamSurfaces( trRefEntity_t *e );
 void R_AddRailSurfaces( trRefEntity_t *e, bool isUnderwater );
 void R_AddLightningBoltSurfaces( trRefEntity_t *e );
 
-void R_AddPolygonSurfaces( void );
+void R_AddPolygonSurfaces( );
 
 void R_DecomposeSort( uint64_t sort, int *entityNum, shader_t **shader, 
 					 int *fogNum, int *dlightMap );
@@ -1116,10 +1116,10 @@ void R_RotateForEntity( const trRefEntity_t *ent, const viewParms_t *viewParms, 
 ** GL wrapper/helper functions
 */
 void	GL_Bind( image_t *image );
-void	GL_SetDefaultState (void);
+void	GL_SetDefaultState ();
 void	GL_SelectTexture( int unit );
 void	GL_TextureMode( const char *string );
-void	GL_CheckErrors( void );
+void	GL_CheckErrors( );
 void	GL_State( unsigned long stateVector );
 void	GL_TexEnv( int env );
 void	GL_Cull( int cullType );
@@ -1172,25 +1172,25 @@ void		RE_Shutdown( bool destroyWindow );
 
 bool	R_GetEntityToken( char *buffer, int size );
 
-model_t		*R_AllocModel( void );
+model_t		*R_AllocModel( );
 
-void    	R_Init( void );
+void    	R_Init( );
 
-void		R_SetColorMappings( void );
+void		R_SetColorMappings( );
 void		R_GammaCorrect( byte *buffer, int bufSize );
 
-void	R_ImageList_f( void );
-void	R_SkinList_f( void );
+void	R_ImageList_f( );
+void	R_SkinList_f( );
 // https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=516
 const void *RB_TakeScreenshotCmd( const void *data );
-void	R_ScreenShot_f( void );
+void	R_ScreenShot_f( );
 
-void	R_InitFogTable( void );
+void	R_InitFogTable( );
 float	R_FogFactor( float s, float t );
-void	R_InitImages( void );
-void	R_DeleteTextures( void );
-int		R_SumOfUsedImages( void );
-void	R_InitSkins( void );
+void	R_InitImages( );
+void	R_DeleteTextures( );
+int		R_SumOfUsedImages( );
+void	R_InitSkins( );
 skin_t	*R_GetSkinByHandle( qhandle_t hSkin );
 
 int R_ComputeLOD( trRefEntity_t *ent );
@@ -1204,8 +1204,8 @@ shader_t	*R_FindShader( const char *name, int lightmapIndex, bool mipRawImage );
 shader_t	*R_GetShaderByHandle( qhandle_t hShader );
 shader_t	*R_GetShaderByState( int index, long *cycleTime );
 shader_t *R_FindShaderByName( const char *name );
-void		R_InitShaders( void );
-void		R_ShaderList_f( void );
+void		R_InitShaders( );
+void		R_ShaderList_f( );
 void    R_RemapShader(const char *oldShader, const char *newShader, const char *timeOffset);
 
 /*
@@ -1248,26 +1248,26 @@ typedef struct shaderCommands_s
 
 	// info extracted from current shader
 	int			numPasses;
-	void		(*currentStageIteratorFunc)( void );
+	void		(*currentStageIteratorFunc)( );
 	shaderStage_t	**xstages;
 } shaderCommands_t;
 
 extern	shaderCommands_t	tess;
 
 void RB_BeginSurface(shader_t *shader, int fogNum );
-void RB_EndSurface(void);
+void RB_EndSurface();
 void RB_CheckOverflow( int verts, int indexes );
 #define RB_CHECKOVERFLOW(v,i) if (tess.numVertexes + (v) >= SHADER_MAX_VERTEXES || tess.numIndexes + (i) >= SHADER_MAX_INDEXES ) {RB_CheckOverflow(v,i);}
 
-void RB_StageIteratorGeneric( void );
-void RB_StageIteratorSky( void );
-void RB_StageIteratorVertexLitTexture( void );
-void RB_StageIteratorLightmappedMultitexture( void );
+void RB_StageIteratorGeneric( );
+void RB_StageIteratorSky( );
+void RB_StageIteratorVertexLitTexture( );
+void RB_StageIteratorLightmappedMultitexture( );
 
 void RB_AddQuadStamp( vec3_t origin, vec3_t left, vec3_t up, byte *color );
 void RB_AddQuadStampExt( vec3_t origin, vec3_t left, vec3_t up, byte *color, float s1, float t1, float s2, float t2 );
 
-void RB_ShowImages( void );
+void RB_ShowImages( );
 
 
 /*
@@ -1279,7 +1279,7 @@ WORLD MAP
 */
 
 void R_AddBrushModelSurfaces( trRefEntity_t *e );
-void R_AddWorldSurfaces( void );
+void R_AddWorldSurfaces( );
 bool R_inPVS( const vec3_t p1, const vec3_t p2 );
 
 
@@ -1291,11 +1291,11 @@ FLARES
 ============================================================
 */
 
-void R_ClearFlares( void );
+void R_ClearFlares( );
 
 void RB_AddFlare( void *surface, int fogNum, vec3_t point, vec3_t color, vec3_t normal );
-void RB_AddDlightFlares( void );
-void RB_RenderFlares (void);
+void RB_AddDlightFlares( );
+void RB_RenderFlares ();
 
 /*
 ============================================================
@@ -1319,9 +1319,9 @@ SHADOWS
 ============================================================
 */
 
-void RB_ShadowTessEnd( void );
-void RB_ShadowFinish( void );
-void RB_ProjectionShadowDeform( void );
+void RB_ShadowTessEnd( );
+void RB_ShadowFinish( );
+void RB_ProjectionShadowDeform( );
 
 /*
 ============================================================
@@ -1373,9 +1373,9 @@ SCENE GENERATION
 ============================================================
 */
 
-void R_InitNextFrame( void );
+void R_InitNextFrame( );
 
-void RE_ClearScene( void );
+void RE_ClearScene( );
 void RE_AddRefEntityToScene( const refEntity_t *ent );
 void RE_AddPolyToScene( qhandle_t hShader , int numVerts, const polyVert_t *verts, int num );
 void RE_AddLightToScene( const vec3_t org, float intensity, float r, float g, float b );
@@ -1426,7 +1426,7 @@ void	R_TransformModelToClip( const vec3_t src, const float *modelMatrix, const f
 							vec4_t eye, vec4_t dst );
 void	R_TransformClipToWindow( const vec4_t clip, const viewParms_t *view, vec4_t normalized, vec4_t window );
 
-void	RB_DeformTessGeometry( void );
+void	RB_DeformTessGeometry( );
 
 void	RB_CalcEnvironmentTexCoords( float *dstTexCoords );
 void	RB_CalcFogTexCoords( float *dstTexCoords );
@@ -1588,7 +1588,7 @@ extern	backEndData_t	*backEndData;	// the second one may not be allocated
 void *R_GetCommandBuffer( int bytes );
 void RB_ExecuteRenderCommands( const void *data );
 
-void R_IssuePendingRenderCommands( void );
+void R_IssuePendingRenderCommands( );
 
 void R_AddDrawSurfCmd( drawSurf_t *drawSurfs, int numDrawSurfs );
 
@@ -1609,7 +1609,7 @@ void VectorArrayNormalize( vec4_t *normals, unsigned int count );
 
 #ifdef idppc_altivec
 void LerpMeshVertexes_altivec( md3Surface_t *surf, float backlerp );
-void ProjectDlightTexture_altivec( void );
+void ProjectDlightTexture_altivec( );
 void RB_CalcDiffuseColor_altivec( unsigned char *colors );
 #endif
 

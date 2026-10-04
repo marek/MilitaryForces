@@ -54,7 +54,7 @@ static int execArgc;
 Sys_ClearExecBuffer
 ==============
 */
-static void Sys_ClearExecBuffer( void )
+static void Sys_ClearExecBuffer( )
 {
 	execBufferPointer = execBuffer;
 	Com_Memset( execArgv, 0, sizeof( execArgv ) );
@@ -85,7 +85,7 @@ static void Sys_AppendToExecBuffer( const char *text )
 Sys_Exec
 ==============
 */
-static int Sys_Exec( void )
+static int Sys_Exec( )
 {
 	pid_t pid = fork( );
 
@@ -120,14 +120,14 @@ static int Sys_Exec( void )
 Sys_DefaultHomePath
 ==================
 */
-static char *Sys_DefaultHomePath(void)
+static char *Sys_DefaultHomePath()
 {
 	static char homePath[ MAX_OSPATH ] = { 0 };
 	char *p;
 
 	if( !*homePath )
 	{
-		if( ( p = getenv( "HOME" ) ) != NULL )
+		if( ( p = getenv( "HOME" ) ) != nullptr )
 		{
 			Com_sprintf( homePath, sizeof(homePath), "%s%c%s",
 				p, PATH_SEP, "Library/Application Support/" );
@@ -142,9 +142,9 @@ static char *Sys_DefaultHomePath(void)
 	return homePath;
 }
 
-char *Sys_DefaultHomeConfigPath(void) { return Sys_DefaultHomePath(); }
-char *Sys_DefaultHomeDataPath(void)   { return Sys_DefaultHomePath(); }
-char *Sys_DefaultHomeStatePath(void)  { return Sys_DefaultHomePath(); }
+char *Sys_DefaultHomeConfigPath() { return Sys_DefaultHomePath(); }
+char *Sys_DefaultHomeDataPath()   { return Sys_DefaultHomePath(); }
+char *Sys_DefaultHomeStatePath()  { return Sys_DefaultHomePath(); }
 
 #else // __APPLE__
 
@@ -483,7 +483,7 @@ char *Sys_DefaultHomeStatePath(void)
 Sys_SteamPath
 ================
 */
-char *Sys_SteamPath( void )
+char *Sys_SteamPath( )
 {
 	// Steam doesn't let you install Quake 3 on Mac/Linux
 	return "";
@@ -494,7 +494,7 @@ char *Sys_SteamPath( void )
 Sys_GogPath
 ================
 */
-char *Sys_GogPath( void )
+char *Sys_GogPath( )
 {
 	// GOG doesn't let you install Quake 3 on Mac/Linux
 	return "";
@@ -505,7 +505,7 @@ char *Sys_GogPath( void )
 Sys_MicrosoftStorePath
 ================
 */
-char* Sys_MicrosoftStorePath(void)
+char* Sys_MicrosoftStorePath()
 {
 	// Microsoft Store doesn't exist on Mac/Linux
 	return "";
@@ -527,11 +527,11 @@ unsigned long sys_timeBase = 0;
    although timeval:tv_usec is an int, I'm not sure wether it is actually used as an unsigned int
      (which would affect the wrap period) */
 int curtime;
-int Sys_Milliseconds (void)
+int Sys_Milliseconds ()
 {
 	struct timeval tp;
 
-	gettimeofday(&tp, NULL);
+	gettimeofday(&tp, nullptr);
 
 	if (!sys_timeBase)
 	{
@@ -557,7 +557,7 @@ bool Sys_RandomBytes( byte *string, int len )
 	if( !fp )
 		return false;
 
-	setvbuf( fp, NULL, _IONBF, 0 ); // don't buffer reads from /dev/urandom
+	setvbuf( fp, nullptr, _IONBF, 0 ); // don't buffer reads from /dev/urandom
 
 	if( fread( string, sizeof( byte ), len, fp ) != len )
 	{
@@ -574,11 +574,11 @@ bool Sys_RandomBytes( byte *string, int len )
 Sys_GetCurrentUser
 ==================
 */
-char *Sys_GetCurrentUser( void )
+char *Sys_GetCurrentUser( )
 {
 	struct passwd *p;
 
-	if ( (p = getpwuid( getuid() )) == NULL ) {
+	if ( (p = getpwuid( getuid() )) == nullptr ) {
 		return "player";
 	}
 	return p->pw_name;
@@ -593,7 +593,7 @@ Sys_LowPhysicalMemory
 TODO
 ==================
 */
-bool Sys_LowPhysicalMemory( void )
+bool Sys_LowPhysicalMemory( )
 {
 	return false;
 }
@@ -628,7 +628,7 @@ FILE *Sys_FOpen( const char *ospath, const char *mode ) {
 
 	// check if path exists and is a directory
 	if ( !stat( ospath, &buf ) && S_ISDIR( buf.st_mode ) )
-		return NULL;
+		return nullptr;
 
 	return fopen( ospath, mode );
 }
@@ -666,7 +666,7 @@ FILE *Sys_Mkfifo( const char *ospath )
 
 	result = mkfifo( ospath, 0600 );
 	if( result != 0 )
-		return NULL;
+		return nullptr;
 
 	fifo = fopen( ospath, "w+" );
 	if( fifo )
@@ -683,13 +683,13 @@ FILE *Sys_Mkfifo( const char *ospath )
 Sys_Cwd
 ==================
 */
-char *Sys_Cwd( void )
+char *Sys_Cwd( )
 {
 	static char cwd[MAX_OSPATH];
 
 	char *result = getcwd( cwd, sizeof( cwd ) - 1 );
 	if( result != cwd )
-		return NULL;
+		return nullptr;
 
 	cwd[MAX_OSPATH-1] = 0;
 
@@ -709,7 +709,7 @@ char *Sys_BinaryPathRelative(const char *relative)
 	snprintf(combined, sizeof(combined), "%s/%s", Sys_BinaryPath(), relative);
 
 	if (!realpath(combined, resolved))
-		return NULL;
+		return nullptr;
 
 	return resolved;
 }
@@ -752,11 +752,11 @@ void Sys_ListFilteredFiles( const char *basedir, char *subdirs, char *filter, ch
 		Com_sprintf( search, sizeof(search), "%s", basedir );
 	}
 
-	if ((fdir = opendir(search)) == NULL) {
+	if ((fdir = opendir(search)) == nullptr) {
 		return;
 	}
 
-	while ((d = readdir(fdir)) != NULL) {
+	while ((d = readdir(fdir)) != nullptr) {
 		Com_sprintf(filename, sizeof(filename), "%s/%s", search, d->d_name);
 		if (stat(filename, &st) == -1)
 			continue;
@@ -809,24 +809,24 @@ char **Sys_ListFiles( const char *directory, const char *extension, char *filter
 		nfiles = 0;
 		Sys_ListFilteredFiles( directory, "", filter, list, &nfiles );
 
-		list[ nfiles ] = NULL;
+		list[ nfiles ] = nullptr;
 		*numfiles = nfiles;
 
 		if (!nfiles)
-			return NULL;
+			return nullptr;
 
 		listCopy = (char **)Z_Malloc( ( nfiles + 1 ) * sizeof( *listCopy ) );
 		for ( i = 0 ; i < nfiles ; i++ ) {
 			listCopy[i] = list[i];
 		}
-		listCopy[i] = NULL;
+		listCopy[i] = nullptr;
 
 		return listCopy;
 	}
 
 	if ( directory[0] == '\0' ) {
 		*numfiles = 0;
-		return NULL;
+		return nullptr;
 	}
 
 	if ( !extension)
@@ -842,12 +842,12 @@ char **Sys_ListFiles( const char *directory, const char *extension, char *filter
 	// search
 	nfiles = 0;
 
-	if ((fdir = opendir(directory)) == NULL) {
+	if ((fdir = opendir(directory)) == nullptr) {
 		*numfiles = 0;
-		return NULL;
+		return nullptr;
 	}
 
-	while ((d = readdir(fdir)) != NULL) {
+	while ((d = readdir(fdir)) != nullptr) {
 		Com_sprintf(search, sizeof(search), "%s/%s", directory, d->d_name);
 		if (stat(search, &st) == -1)
 			continue;
@@ -870,7 +870,7 @@ char **Sys_ListFiles( const char *directory, const char *extension, char *filter
 		nfiles++;
 	}
 
-	list[ nfiles ] = NULL;
+	list[ nfiles ] = nullptr;
 
 	closedir(fdir);
 
@@ -878,14 +878,14 @@ char **Sys_ListFiles( const char *directory, const char *extension, char *filter
 	*numfiles = nfiles;
 
 	if ( !nfiles ) {
-		return NULL;
+		return nullptr;
 	}
 
 	listCopy = (char **)Z_Malloc( ( nfiles + 1 ) * sizeof( *listCopy ) );
 	for ( i = 0 ; i < nfiles ; i++ ) {
 		listCopy[i] = list[i];
 	}
-	listCopy[i] = NULL;
+	listCopy[i] = nullptr;
 
 	return listCopy;
 }
@@ -930,7 +930,7 @@ void Sys_Sleep( int msec )
 		FD_SET(STDIN_FILENO, &fdset);
 		if( msec < 0 )
 		{
-			select(STDIN_FILENO + 1, &fdset, NULL, NULL, NULL);
+			select(STDIN_FILENO + 1, &fdset, nullptr, nullptr, nullptr);
 		}
 		else
 		{
@@ -938,7 +938,7 @@ void Sys_Sleep( int msec )
 
 			timeout.tv_sec = msec/1000;
 			timeout.tv_usec = (msec%1000)*1000;
-			select(STDIN_FILENO + 1, &fdset, NULL, NULL, &timeout);
+			select(STDIN_FILENO + 1, &fdset, nullptr, nullptr, &timeout);
 		}
 	}
 	else
@@ -951,7 +951,7 @@ void Sys_Sleep( int msec )
 
 		req.tv_sec = msec/1000;
 		req.tv_nsec = (msec%1000)*1000000;
-		nanosleep(&req, NULL);
+		nanosleep(&req, nullptr);
 	}
 }
 
@@ -1166,7 +1166,7 @@ Sys_GLimpSafeInit
 Unix specific "safe" GL implementation initialisation
 ==============
 */
-void Sys_GLimpSafeInit( void )
+void Sys_GLimpSafeInit( )
 {
 	// NOP
 }
@@ -1178,12 +1178,12 @@ Sys_GLimpInit
 Unix specific GL implementation initialisation
 ==============
 */
-void Sys_GLimpInit( void )
+void Sys_GLimpInit( )
 {
 	// NOP
 }
 
-void Sys_SetFloatEnv(void)
+void Sys_SetFloatEnv()
 {
 	// rounding toward nearest
 	fesetround(FE_TONEAREST);
@@ -1196,7 +1196,7 @@ Sys_PlatformInit
 Unix specific initialisation
 ==============
 */
-void Sys_PlatformInit( void )
+void Sys_PlatformInit( )
 {
 	const char* term = getenv( "TERM" );
 
@@ -1219,7 +1219,7 @@ Sys_PlatformExit
 Unix specific deinitialisation
 ==============
 */
-void Sys_PlatformExit( void )
+void Sys_PlatformExit( )
 {
 }
 
@@ -1244,7 +1244,7 @@ void Sys_SetEnv(const char *name, const char *value)
 Sys_PID
 ==============
 */
-int Sys_PID( void )
+int Sys_PID( )
 {
 	return getpid( );
 }
@@ -1333,7 +1333,7 @@ bool Sys_OpenFolderInPlatformFileManager( const char *path )
 Sys_SetMaxFileLimit
 =================
 */
-bool Sys_SetMaxFileLimit( void )
+bool Sys_SetMaxFileLimit( )
 {
 #ifdef RLIMIT_NOFILE
 	struct rlimit limit;

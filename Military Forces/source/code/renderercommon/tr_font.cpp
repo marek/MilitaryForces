@@ -83,7 +83,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define _CEIL(x)   (((x)+63) & -64)
 #define _TRUNC(x)  ((x) >> 6)
 
-FT_Library ftLibrary = NULL;  
+FT_Library ftLibrary = nullptr;  
 #endif
 
 #define MAX_FONTS 6
@@ -137,7 +137,7 @@ FT_Bitmap *R_RenderGlyph(FT_GlyphSlot glyph, glyphInfo_t* glyphOut) {
 	} else {
 		ri.Printf(PRINT_ALL, "Non-outline fonts are not supported\n");
 	}
-	return NULL;
+	return nullptr;
 }
 
 void WriteTGA (char *filename, byte *data, int width, int height) {
@@ -193,11 +193,11 @@ static glyphInfo_t *RE_ConstructGlyphInfo(unsigned char *imageOut, int *xOut, in
 	static glyphInfo_t glyph;
 	unsigned char *src, *dst;
 	float scaled_width, scaled_height;
-	FT_Bitmap *bitmap = NULL;
+	FT_Bitmap *bitmap = nullptr;
 
 	Com_Memset(&glyph, 0, sizeof(glyphInfo_t));
 	// make sure everything is here
-	if (face != NULL) {
+	if (face != nullptr) {
 		FT_Load_Glyph(face, FT_Get_Char_Index( face, c), FT_LOAD_DEFAULT );
 		bitmap = R_RenderGlyph(face->glyph, &glyph);
 		if (bitmap) {
@@ -302,7 +302,7 @@ static glyphInfo_t *RE_ConstructGlyphInfo(unsigned char *imageOut, int *xOut, in
 static int fdOffset;
 static byte	*fdFile;
 
-int readInt( void ) {
+int readInt( ) {
 	int i = ((unsigned int)fdFile[fdOffset] | ((unsigned int)fdFile[fdOffset+1]<<8) | ((unsigned int)fdFile[fdOffset+2]<<16) | ((unsigned int)fdFile[fdOffset+3]<<24));
 	fdOffset += 4;
 	return i;
@@ -313,7 +313,7 @@ typedef union {
 	float	ffred;
 } poor;
 
-float readFloat( void ) {
+float readFloat( ) {
 	poor	me;
 #if defined Q3_BIG_ENDIAN
 	me.fred[0] = fdFile[fdOffset+3];
@@ -371,7 +371,7 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
 		}
 	}
 
-	len = ri.FS_ReadFile(name, NULL);
+	len = ri.FS_ReadFile(name, nullptr);
 	if (len == sizeof(fontInfo_t)) {
 		ri.FS_ReadFile(name, &faceData);
 		fdOffset = 0;
@@ -408,7 +408,7 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
 #ifndef BUILD_FREETYPE
 	ri.Printf(PRINT_WARNING, "RE_RegisterFont: FreeType code not available\n");
 #else
-	if (ftLibrary == NULL) {
+	if (ftLibrary == nullptr) {
 		ri.Printf(PRINT_WARNING, "RE_RegisterFont: FreeType not initialized.\n");
 		return;
 	}
@@ -437,7 +437,7 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
 	// until all glyphs are rendered
 
 	out = (unsigned char *)ri.Malloc(256*256);
-	if (out == NULL) {
+	if (out == nullptr) {
 		ri.Printf(PRINT_WARNING, "RE_RegisterFont: ri.Malloc failure during output image creation.\n");
 		return;
 	}
@@ -539,7 +539,7 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
 
 
 
-void R_InitFreeType(void) {
+void R_InitFreeType() {
 #ifdef BUILD_FREETYPE
 	if (FT_Init_FreeType( &ftLibrary )) {
 		ri.Printf(PRINT_WARNING, "R_InitFreeType: Unable to initialize FreeType.\n");
@@ -549,11 +549,11 @@ void R_InitFreeType(void) {
 }
 
 
-void R_DoneFreeType(void) {
+void R_DoneFreeType() {
 #ifdef BUILD_FREETYPE
 	if (ftLibrary) {
 		FT_Done_FreeType( ftLibrary );
-		ftLibrary = NULL;
+		ftLibrary = nullptr;
 	}
 #endif
 	registeredFontCount = 0;

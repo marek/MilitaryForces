@@ -72,7 +72,7 @@ cvar_t		*con_scale;
 Con_ToggleConsole_f
 ================
 */
-void Con_ToggleConsole_f (void) {
+void Con_ToggleConsole_f () {
 	// Can't toggle the console when it's the only thing available
 	if ( clc.state == CA_DISCONNECTED && Key_GetCatcher( ) == KEYCATCH_CONSOLE ) {
 		return;
@@ -93,7 +93,7 @@ void Con_ToggleConsole_f (void) {
 Con_ToggleMenu_f
 ===================
 */
-void Con_ToggleMenu_f( void ) {
+void Con_ToggleMenu_f( ) {
 	CL_KeyEvent( K_ESCAPE, true, Sys_Milliseconds() );
 	CL_KeyEvent( K_ESCAPE, false, Sys_Milliseconds() );
 }
@@ -103,7 +103,7 @@ void Con_ToggleMenu_f( void ) {
 Con_MessageMode_f
 ================
 */
-void Con_MessageMode_f (void) {
+void Con_MessageMode_f () {
 	chat_playerNum = -1;
 	chat_team = false;
 	Field_Clear( &chatField );
@@ -117,7 +117,7 @@ void Con_MessageMode_f (void) {
 Con_MessageMode2_f
 ================
 */
-void Con_MessageMode2_f (void) {
+void Con_MessageMode2_f () {
 	chat_playerNum = -1;
 	chat_team = true;
 	Field_Clear( &chatField );
@@ -130,7 +130,7 @@ void Con_MessageMode2_f (void) {
 Con_MessageMode3_f
 ================
 */
-void Con_MessageMode3_f (void) {
+void Con_MessageMode3_f () {
 	chat_playerNum = theCG.crosshairPlayer();
 	if ( chat_playerNum < 0 || chat_playerNum >= MAX_CLIENTS ) {
 		chat_playerNum = -1;
@@ -147,7 +147,7 @@ void Con_MessageMode3_f (void) {
 Con_MessageMode4_f
 ================
 */
-void Con_MessageMode4_f (void) {
+void Con_MessageMode4_f () {
 	chat_playerNum = theCG.lastAttacker();
 	if ( chat_playerNum < 0 || chat_playerNum >= MAX_CLIENTS ) {
 		chat_playerNum = -1;
@@ -164,7 +164,7 @@ void Con_MessageMode4_f (void) {
 Con_Clear_f
 ================
 */
-void Con_Clear_f (void) {
+void Con_Clear_f () {
 	int		i;
 
 	for ( i = 0 ; i < CON_TEXTSIZE ; i++ ) {
@@ -182,7 +182,7 @@ Con_Dump_f
 Save the console contents out to a file
 ================
 */
-void Con_Dump_f (void)
+void Con_Dump_f ()
 {
 	int		l, x, i;
 	short	*line;
@@ -266,7 +266,7 @@ void Con_Dump_f (void)
 Con_ClearNotify
 ================
 */
-void Con_ClearNotify( void ) {
+void Con_ClearNotify( ) {
 	int		i;
 	
 	for ( i = 0 ; i < NUM_CON_TIMES ; i++ ) {
@@ -283,12 +283,12 @@ Con_CheckResize
 If the line width has changed, reformat the buffer.
 ================
 */
-void Con_CheckResize (void)
+void Con_CheckResize ()
 {
 	int		i, j, width, oldwidth, oldtotallines, numlines, numchars;
 	short	tbuf[CON_TEXTSIZE];
 
-	if (con_scale != NULL)
+	if (con_scale != nullptr)
 	{
 		g_smallchar_width = (int)((float)SMALLCHAR_WIDTH * con_scale->value);
 		g_smallchar_height = (int)((float)SMALLCHAR_HEIGHT * con_scale->value);
@@ -354,7 +354,7 @@ Cmd_CompleteTxtName
 */
 void Cmd_CompleteTxtName( char *args, int argNum ) {
 	if( argNum == 2 ) {
-		Field_CompleteFilename( "", "txt", NULL, false, true );
+		Field_CompleteFilename( "", "txt", nullptr, false, true );
 	}
 }
 
@@ -364,7 +364,7 @@ void Cmd_CompleteTxtName( char *args, int argNum ) {
 Con_Init
 ================
 */
-void Con_Init (void) {
+void Con_Init () {
 	int		i;
 
 	con_notifytime = Cvar_Get ("con_notifytime", "3", CVAR_ARCHIVE);
@@ -399,7 +399,7 @@ void Con_Init (void) {
 Con_Shutdown
 ================
 */
-void Con_Shutdown(void)
+void Con_Shutdown()
 {
 	Cmd_RemoveCommand("toggleconsole");
 	Cmd_RemoveCommand("togglemenu");
@@ -551,7 +551,7 @@ Con_DrawInput
 Draw the editline after a ] prompt
 ================
 */
-void Con_DrawInput (void) {
+void Con_DrawInput () {
 	int		y;
 
 	if ( clc.state != CA_DISCONNECTED && !(Key_GetCatcher( ) & KEYCATCH_CONSOLE ) ) {
@@ -576,7 +576,7 @@ Con_DrawNotify
 Draws the last few lines of output transparently over the game top
 ================
 */
-void Con_DrawNotify (void)
+void Con_DrawNotify ()
 {
 	int		x, v;
 	short	*text;
@@ -628,7 +628,7 @@ void Con_DrawNotify (void)
 	v *= 480.0f / cls.glconfig.vidHeight;
 	v += 8;
 
-	refExport.SetColor( NULL );
+	refExport.SetColor( nullptr );
 
 	if (Key_GetCatcher( ) & (KEYCATCH_UI | KEYCATCH_CGAME) ) {
 		return;
@@ -680,7 +680,7 @@ void Con_DrawSolidConsole( float frac ) {
 
 	// on wide screens, we will center the text
 	con.xadjust = 0;
-	SCR_AdjustFrom640( &con.xadjust, NULL, NULL, NULL );
+	SCR_AdjustFrom640( &con.xadjust, nullptr, nullptr, nullptr );
 
 	// draw the background
 	y = frac * SCREEN_HEIGHT;
@@ -763,7 +763,7 @@ void Con_DrawSolidConsole( float frac ) {
 	// draw the input prompt, user text, and cursor if desired
 	Con_DrawInput ();
 
-	refExport.SetColor( NULL );
+	refExport.SetColor( nullptr );
 }
 
 
@@ -773,7 +773,7 @@ void Con_DrawSolidConsole( float frac ) {
 Con_DrawConsole
 ==================
 */
-void Con_DrawConsole( void ) {
+void Con_DrawConsole( ) {
 	// check for console width changes from a vid mode change
 	Con_CheckResize ();
 
@@ -804,7 +804,7 @@ Con_RunConsole
 Scroll it up or down
 ==================
 */
-void Con_RunConsole (void) {
+void Con_RunConsole () {
 	// decide on the destination height of the console
 	if ( Key_GetCatcher( ) & KEYCATCH_CONSOLE )
 		con.finalFrac = 0.5;		// half screen
@@ -829,33 +829,33 @@ void Con_RunConsole (void) {
 }
 
 
-void Con_PageUp( void ) {
+void Con_PageUp( ) {
 	con.display -= 2;
 	if ( con.current - con.display >= con.totallines ) {
 		con.display = con.current - con.totallines + 1;
 	}
 }
 
-void Con_PageDown( void ) {
+void Con_PageDown( ) {
 	con.display += 2;
 	if (con.display > con.current) {
 		con.display = con.current;
 	}
 }
 
-void Con_Top( void ) {
+void Con_Top( ) {
 	con.display = con.totallines;
 	if ( con.current - con.display >= con.totallines ) {
 		con.display = con.current - con.totallines + 1;
 	}
 }
 
-void Con_Bottom( void ) {
+void Con_Bottom( ) {
 	con.display = con.current;
 }
 
 
-void Con_Close( void ) {
+void Con_Close( ) {
 	if ( !com_cl_running->integer ) {
 		return;
 	}

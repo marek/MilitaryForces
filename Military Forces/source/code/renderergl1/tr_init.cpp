@@ -31,7 +31,7 @@ bool    haveClampToEdge = false;
 
 glstate_t	glState;
 
-static void GfxInfo_f( void );
+static void GfxInfo_f( );
 
 #ifdef USE_RENDERER_DLOPEN
 cvar_t  *com_altivec;
@@ -177,7 +177,7 @@ int		max_polyverts;
 ** setting variables, checking GL constants, and reporting the gfx system config
 ** to the user.
 */
-static void InitOpenGL( void )
+static void InitOpenGL( )
 {
 	//
 	// initialize OS specific portions of the renderer
@@ -216,7 +216,7 @@ static void InitOpenGL( void )
 GL_CheckErrors
 ==================
 */
-void GL_CheckErrors( void ) {
+void GL_CheckErrors( ) {
 	int		err;
 	char	s[64];
 
@@ -329,7 +329,7 @@ bool R_GetModeInfo( int *width, int *height, float *windowAspect, int mode ) {
 /*
 ** R_ModeList_f
 */
-static void R_ModeList_f( void )
+static void R_ModeList_f( )
 {
 	int i;
 
@@ -585,7 +585,7 @@ levelshots are specialized 128*128 thumbnails for
 the menu system, sampled down from full screen distorted images
 ====================
 */
-void R_LevelShot( void ) {
+void R_LevelShot( ) {
 	char		checkname[MAX_OSPATH];
 	byte		*buffer;
 	byte		*source, *allsource;
@@ -656,7 +656,7 @@ screenshot [filename]
 Doesn't print the pacifier message if there is a second arg
 ================== 
 */  
-void R_ScreenShot_f (void) {
+void R_ScreenShot_f () {
 	char	checkname[MAX_OSPATH];
 	static	int	lastNumber = -1;
 	bool	silent;
@@ -709,7 +709,7 @@ void R_ScreenShot_f (void) {
 	}
 } 
 
-void R_ScreenShotJPEG_f (void) {
+void R_ScreenShotJPEG_f () {
 	char		checkname[MAX_OSPATH];
 	static	int	lastNumber = -1;
 	bool	silent;
@@ -846,7 +846,7 @@ const void *RB_TakeVideoFrameCmd( const void *data )
 /*
 ** GL_SetDefaultState
 */
-void GL_SetDefaultState( void )
+void GL_SetDefaultState( )
 {
 	qglClearDepth( 1.0f );
 
@@ -915,7 +915,7 @@ void R_PrintLongString(const char *string) {
 GfxInfo_f
 ================
 */
-void GfxInfo_f( void ) 
+void GfxInfo_f( ) 
 {
 	const char *enablestrings[] =
 	{
@@ -998,8 +998,8 @@ void GfxInfo_f( void )
 	ri.Printf( PRINT_ALL, "texturemode: %s\n", r_textureMode->string );
 	ri.Printf( PRINT_ALL, "picmip: %d\n", r_picmip->integer );
 	ri.Printf( PRINT_ALL, "texture bits: %d\n", r_texturebits->integer );
-	ri.Printf( PRINT_ALL, "multitexture: %s\n", enablestrings[qglActiveTextureARB != 0] );
-	ri.Printf( PRINT_ALL, "compiled vertex arrays: %s\n", enablestrings[qglLockArraysEXT != 0 ] );
+	ri.Printf( PRINT_ALL, "multitexture: %s\n", enablestrings[qglActiveTextureARB != nullptr] );
+	ri.Printf( PRINT_ALL, "compiled vertex arrays: %s\n", enablestrings[qglLockArraysEXT != nullptr ] );
 	ri.Printf( PRINT_ALL, "texenv add: %s\n", enablestrings[glConfig.textureEnvAddAvailable != 0] );
 	ri.Printf( PRINT_ALL, "compressed textures: %s\n", enablestrings[glConfig.textureCompression!=TC_NONE] );
 	if ( r_vertexLight->integer || glConfig.hardwareType == GLHW_PERMEDIA2 )
@@ -1024,7 +1024,7 @@ void GfxInfo_f( void )
 R_Register
 ===============
 */
-void R_Register( void ) 
+void R_Register( ) 
 {
 	#ifdef USE_RENDERER_DLOPEN
 	com_altivec = ri.Cvar_Get("com_altivec", "1", CVAR_ARCHIVE);
@@ -1186,7 +1186,7 @@ void R_Register( void )
 R_Init
 ===============
 */
-void R_Init( void ) {	
+void R_Init( ) {	
 	int	err;
 	int i;
 	byte *ptr;
@@ -1325,7 +1325,7 @@ RE_EndRegistration
 Touch all images to make sure they are resident
 =============
 */
-void RE_EndRegistration( void ) {
+void RE_EndRegistration( ) {
 	R_IssuePendingRenderCommands();
 	if (!ri.Sys_LowPhysicalMemory()) {
 		RB_ShowImages();
@@ -1354,7 +1354,7 @@ refexport_t *GetRefAPI ( int apiVersion, refimport_t *rimp ) {
 	if ( apiVersion != REF_API_VERSION ) {
 		ri.Printf(PRINT_ALL, "Mismatched REF_API_VERSION: expected %i, got %i\n", 
 			REF_API_VERSION, apiVersion );
-		return NULL;
+		return nullptr;
 	}
 
 	// the RE_ functions are Renderer Entry points

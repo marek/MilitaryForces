@@ -4,7 +4,7 @@
 
 
 
-UI_Utils* UI_CaptureBase::utils_ = 0;
+UI_Utils* UI_CaptureBase::utils_ = nullptr;
 
 UI_CaptureBase::UI_CaptureBase( UI_ScrollInfo* si ) :
 	scrollInfo_(si)

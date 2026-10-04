@@ -55,7 +55,7 @@ GameEntity* G_TestEntityPosition( GameEntity *ent )
 	if (tr.startsolid)
 		return theLevel.getEntity(tr.entityNum);// &g_entities[ tr.entityNum ];
 		
-	return NULL;
+	return nullptr;
 }
 
 
@@ -211,7 +211,7 @@ bool G_MoverPush( GameEntity *pusher, vec3_t move, vec3_t amove, GameEntity **ob
 	int			listedEntities;
 	vec3_t		totalMins, totalMaxs;
 
-	*obstacle = NULL;
+	*obstacle = nullptr;
 
 
 	// mins/maxs are the bounds at the destination
@@ -295,7 +295,7 @@ bool G_MoverPush( GameEntity *pusher, vec3_t move, vec3_t amove, GameEntity **ob
 		// bobbing entities are instant-kill and never get blocked
 		if ( pusher->s.pos.trType == TR_SINE || pusher->s.apos.trType == TR_SINE )
 		{
-			G_Damage( check, pusher, pusher, NULL, NULL, 99999, 0, MOD_CRUSH, CAT_ANY );
+			G_Damage( check, pusher, pusher, nullptr, nullptr, 99999, 0, MOD_CRUSH, CAT_ANY );
 			continue;
 		}
 
@@ -335,7 +335,7 @@ void G_MoverTeam( GameEntity *ent )
 	GameEntity	*part, *obstacle;
 	vec3_t		origin, angles;
 
-	obstacle = NULL;
+	obstacle = nullptr;
 
 	// make sure all team slaves can move before commiting
 	// any moves or calling any think functions
@@ -484,7 +484,7 @@ ReturnToPos1
 */
 struct Think_ReturnToPos1 : public GameEntity::EntityFunc_Think
 {
-	virtual void execute()
+	void execute() override
 	{
 		MatchTeam( self_, GameEntity::MOVER_2TO1, theLevel.time_ );
 
@@ -504,7 +504,7 @@ Reached_BinaryMover
 */
 struct Reached_BinaryMover : public GameEntity::EntityFunc_Reached
 {
-	virtual void execute()
+	void execute() override
 	{
 		GameEntity*	self = self_;  // Since we may delete our current think()
 
@@ -627,7 +627,7 @@ void Use_BinaryMoverImpl( GameEntity *ent, GameEntity *other, GameEntity *activa
 
 struct Use_BinaryMover : public GameEntity::EntityFunc_Use
 {
-	virtual void execute( GameEntity *other, GameEntity *activator )
+	void execute( GameEntity *other, GameEntity *activator ) override
 	{
 		Use_BinaryMoverImpl( self_, other, activator );
 	}
@@ -730,7 +730,7 @@ Blocked_Door
 */
 struct Blocked_DoorBlocked : public GameEntity::EntityFunc_Blocked
 {
-	void execute( GameEntity *other )
+	void execute( GameEntity *other ) override
 	{
 		// remove anything other than a client
 		if ( !other->client_ ) 
@@ -747,7 +747,7 @@ struct Blocked_DoorBlocked : public GameEntity::EntityFunc_Blocked
 		}
 
 		if ( self_->damage_ ) 
-			G_Damage( other, self_, self_, NULL, NULL, self_->damage_
+			G_Damage( other, self_, self_, nullptr, nullptr, self_->damage_
 			, 0, MOD_CRUSH, CAT_ANY );
 
 		if ( self_->spawnflags_ & 4 ) 
@@ -765,7 +765,7 @@ Touch_DoorTrigger
 */
 struct Touch_DoorTrigger : public GameEntity::EntityFunc_Touch
 {
-	virtual void execute( GameEntity *other, trace_t *trace )
+	void execute( GameEntity *other, trace_t *trace ) override
 	{
 		if ( self_->parent_->moverState_ != GameEntity::MOVER_1TO2 ) 
 			Use_BinaryMoverImpl( self_->parent_, self_, other );
@@ -782,7 +782,7 @@ a trigger that encloses all of them
 */
 struct Think_SpawnNewDoorTrigger : public GameEntity::EntityFunc_Think
 {
-	virtual void execute()
+	void execute() override
 	{
 		GameEntity		*other;
 		vec3_t		mins, maxs;
@@ -830,7 +830,7 @@ struct Think_SpawnNewDoorTrigger : public GameEntity::EntityFunc_Think
 
 struct Think_MatchTeam : public GameEntity::EntityFunc_Think
 {
-	virtual void execute()
+	void execute() override
 	{
 		MatchTeam( self_, self_->moverState_, theLevel.time_ );
 	}
@@ -945,7 +945,7 @@ Don't allow decent if a living player is on it
 */
 struct Touch_Plat : public GameEntity::EntityFunc_Touch
 {
-	virtual void execute( GameEntity *other, trace_t *trace ) 
+	void execute( GameEntity *other, trace_t *trace ) override 
 	{
 		if( !other->client_ || other->client_->ps_.stats[STAT_HEALTH] <= 0 ) 
 			return;
@@ -965,7 +965,7 @@ If the plat is at the bottom position, start it going up
 */
 struct Touch_PlatCenterTrigger : public GameEntity::EntityFunc_Touch
 {
-	virtual void execute( GameEntity *other, trace_t *trace ) 
+	void execute( GameEntity *other, trace_t *trace ) override 
 	{
 		if( !other->client_ ) 
 			return;
@@ -1095,7 +1095,7 @@ Touch_Button
 */
 struct Touch_Button : public GameEntity::EntityFunc_Touch
 {
-	virtual void execute( GameEntity *other, trace_t *trace )
+	void execute( GameEntity *other, trace_t *trace ) override
 	{
 		if( !other->client_ ) 
 			return;
@@ -1186,7 +1186,7 @@ The wait time at a corner has completed, so start moving again
 */
 struct Think_BeginMoving : public GameEntity::EntityFunc_Think
 {
-	virtual void execute()
+	void execute() override
 	{
 		self_->s.pos.trTime = theLevel.time_;
 		self_->s.pos.trType = TR_LINEAR_STOP;
@@ -1211,7 +1211,7 @@ void Reached_TrainImpl( GameEntity *ent )
 		return;		// just stop
 
 	// fire all other targets
-	G_UseTargets( next, NULL );
+	G_UseTargets( next, nullptr );
 
 	// set the New trajectory
 	ent->nextTrain_ = next->nextTrain_;
@@ -1260,11 +1260,11 @@ Link all the corners together
 */
 struct Think_SetupTrainTargets : public GameEntity::EntityFunc_Think
 {
-	virtual void execute() 
+	void execute() override 
 	{
 		GameEntity		*path, *next;
 
-		self_->nextTrain_ = G_Find( NULL, FOFS(targetname_), self_->target_ );
+		self_->nextTrain_ = G_Find( nullptr, FOFS(targetname_), self_->target_ );
 		if( !self_->nextTrain_ ) 
 		{
 			Com_Printf( "func_train at %s with an unfound target\n",
@@ -1272,7 +1272,7 @@ struct Think_SetupTrainTargets : public GameEntity::EntityFunc_Think
 			return;
 		}
 
-		GameEntity* start = 0;
+		GameEntity* start = nullptr;
 		for( path = self_->nextTrain_ ; path != start ; path = next ) 
 		{
 			if( !start ) 
@@ -1288,7 +1288,7 @@ struct Think_SetupTrainTargets : public GameEntity::EntityFunc_Think
 			// find a path_corner among the targets
 			// there may also be other targets that get fired when the corner
 			// is reached
-			next = 0;
+			next = nullptr;
 			do {
 				next = G_Find( next, FOFS(targetname_), path->target_ );
 				if( !next ) 
@@ -1309,7 +1309,7 @@ struct Think_SetupTrainTargets : public GameEntity::EntityFunc_Think
 
 struct Reached_Train : public GameEntity::EntityFunc_Reached
 {
-	virtual void execute()
+	void execute() override
 	{
 		Reached_TrainImpl( self_ );
 	}
@@ -1475,12 +1475,12 @@ Normally bobs on the Z axis
 */
 struct Touch_FuncBobbing : public GameEntity::EntityFunc_Touch
 {
-	virtual void execute( GameEntity *other, trace_t *trace )
+	void execute( GameEntity *other, trace_t *trace ) override
 	{
 		if( !other->client_ ) 
 			return;
 
-		G_Damage( other, NULL, other, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
+		G_Damage( other, nullptr, other, nullptr, nullptr, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 
 	}
 };

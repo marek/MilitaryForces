@@ -179,7 +179,7 @@ GameEntity* G_Find( GameEntity *from, int fieldofs, const char *match )
 		}
 	}
 
-	return 0;
+	return nullptr;
 }
 
 
@@ -194,17 +194,17 @@ Selects a random entity from among the targets
 
 GameEntity* G_PickTarget( char *targetname )
 {
-	GameEntity*	ent = 0;
+	GameEntity*	ent = nullptr;
 	int			num_choices = 0;
 	GameEntity*	choice[MAXCHOICES];
 
 	if (!targetname)
 	{
 		Com_Printf("G_PickTarget called with NULL targetname\n");
-		return NULL;
+		return nullptr;
 	}
 
-	while(1)
+	while(true)
 	{
 		ent = G_Find (ent, FOFS(targetname_), targetname);
 		if (!ent)
@@ -217,7 +217,7 @@ GameEntity* G_PickTarget( char *targetname )
 	if (!num_choices)
 	{
 		Com_Printf("G_PickTarget: target %s not found\n", targetname);
-		return NULL;
+		return nullptr;
 	}
 
 	return choice[rand() % num_choices];
@@ -252,8 +252,8 @@ void G_UseTargets( GameEntity *ent, GameEntity *activator )
 	if ( !ent->target_ ) 
 		return;
 
-	t = NULL;
-	while ( (t = G_Find (t, FOFS(targetname_), ent->target_)) != NULL ) 
+	t = nullptr;
+	while ( (t = G_Find (t, FOFS(targetname_), ent->target_)) != nullptr ) 
 	{
 		if ( t == ent )
 		{
@@ -351,7 +351,7 @@ void G_SetMovedir( vec3_t angles, vec3_t movedir )
 	} 
 	else 
 	{
-		AngleVectors (angles, movedir, NULL, NULL);
+		AngleVectors (angles, movedir, nullptr, nullptr);
 	}
 	VectorClear( angles );
 }
@@ -556,7 +556,7 @@ void G_KillBox( GameEntity *ent )
 			continue;
 
 		// nail it
-		G_Damage ( hit, ent, ent, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_TELEFRAG, CAT_ANY );
+		G_Damage ( hit, ent, ent, nullptr, nullptr, 100000, DAMAGE_NO_PROTECTION, MOD_TELEFRAG, CAT_ANY );
 	}
 }
 

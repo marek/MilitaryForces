@@ -383,7 +383,7 @@ void SV_DirectConnect( netadr_t from )
 	}
 
 	//MAC_STATIC SV_Client temp;
-	SV_Client	*newcl = 0;//&temp;
+	SV_Client	*newcl = nullptr;//&temp;
 	//Com_Memset( newcl, 0, sizeof(SV_Client) );
 
 	// if there is already a slot for this ip, reuse it
@@ -436,7 +436,7 @@ void SV_DirectConnect( netadr_t from )
 		startIndex = sv_privateClients->integer + 1;
 	}
 
-	newcl = 0;
+	newcl = nullptr;
 	for( int i = startIndex; i <= sv_maxclients->integer ; i++ ) 
 	{
 		cl = theSVS.svClients_.at(i);
@@ -636,7 +636,7 @@ void SV_DropClient( SV_Client *drop, const char *reason )
 	drop->gamestateMessageNum_ = -1;
 
 	// tell everyone why they got dropped
-	SV_SendServerCommand( NULL, "print \"%s" S_COLOR_WHITE " %s\n\"", drop->name_, reason );
+	SV_SendServerCommand( nullptr, "print \"%s" S_COLOR_WHITE " %s\n\"", drop->name_, reason );
 
 	// call the prog function for removing a client
 	// this will remove the body, among other things
@@ -822,7 +822,7 @@ static void SV_CloseDownload( SV_Client *cl )
 		if (cl->downloadBlocks_[i]) 
 		{
 			Z_Free( cl->downloadBlocks_[i] );
-			cl->downloadBlocks_[i] = NULL;
+			cl->downloadBlocks_[i] = nullptr;
 		}
 	}
 
@@ -1125,7 +1125,7 @@ Return the shortest time interval for sending next packet to client
 ==================
 */
 
-int SV_SendQueuedMessages(void)
+int SV_SendQueuedMessages()
 {
 	int i, retval = -1, nextFragT;
 	SV_Client *cl;
@@ -1158,7 +1158,7 @@ Send one round of download messages to all clients
 ==================
 */
 
-int SV_SendDownloadMessages(void)
+int SV_SendDownloadMessages()
 {
 	int i, numDLs = 0, retval;
 	SV_Client *cl;
@@ -1562,7 +1562,7 @@ static ucmd_t ucmds[] = {
 	{"voip", SV_Voip_f},
 #endif
 
-	{NULL, NULL}
+	{nullptr, nullptr}
 };
 
 /*
@@ -1836,8 +1836,8 @@ void SV_UserVoip(SV_Client *cl, msg_t *msg, bool ignoreData)
 	uint8_t recips[(MAX_CLIENTS + 7) / 8];
 	int flags;
 	byte encoded[sizeof(cl->voipPacket_[0]->data)];
-	SV_Client *client = NULL;
-	voipServerPacket_t *packet = NULL;
+	SV_Client *client = nullptr;
+	voipServerPacket_t *packet = nullptr;
 	int i;
 
 	sender = cl->clientNum_;
@@ -2016,7 +2016,7 @@ void SV_ExecuteClientMessage( SV_Client *cl, msg_t *msg )
 		if (cl->state_ == SV_Client::CS_ZOMBIE) 
 			return;	// disconnect command
 
-	} while ( 1 );
+	} while ( true );
 
 	// skip legacy speex voip data
 	if ( c == clc_voipSpeex ) {
@@ -2060,7 +2060,7 @@ SV_Client::ClientSnapshot::ClientSnapshot() :
 }
 
 SV_Client::Netchan_Buffer::Netchan_Buffer() :
-	next_(0)
+	next_(nullptr)
 {
 	memset( &msg_, 0, sizeof(msg_) );
 	memset( msgBuffer_, 0, sizeof(msgBuffer_) );
@@ -2099,8 +2099,8 @@ SV_Client::SV_Client() :
 	snapshotMsec_(0),
 	pureAuthentic_(0),
 	gotCP_(false),
-	netchan_start_queue_(0),
-	netchan_end_queue_(0),
+	netchan_start_queue_(nullptr),
+	netchan_end_queue_(nullptr),
 	oldServerTime_(0)
 {
 	memset( csUpdated_, 0, sizeof( csUpdated_ ) );
@@ -2113,7 +2113,7 @@ SV_Client::SV_Client() :
 	memset( downloadBlocks_, 0, sizeof(downloadBlocks_) );
 	memset( downloadBlockSize_, 0, sizeof(downloadBlockSize_) );
 	memset( frames_, 0, sizeof(frames_) );
-	entityTable_ = 0;
+	entityTable_ = nullptr;
 	entityReset_ = true;
 	entityResetDone_ = false;
 	entityAck_ = 0;
@@ -2169,8 +2169,8 @@ SV_Client::clear()
 	snapshotMsec_ = 0;
 	pureAuthentic_ = 0;
 	gotCP_ = false;
-	netchan_start_queue_ = 0;
-	netchan_end_queue_ = 0;
+	netchan_start_queue_ = nullptr;
+	netchan_end_queue_ = nullptr;
 	oldServerTime_ = 0;
 
 	memset( csUpdated_, 0, sizeof( csUpdated_ ) );

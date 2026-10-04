@@ -3,8 +3,8 @@
 
 
 SV_Entity::SV_Entity() :
-	worldSector_(0),
-	nextEntityInWorldSector_(0),
+	worldSector_(nullptr),
+	nextEntityInWorldSector_(nullptr),
 	numClusters_(0),
 	lastCluster_(0),
 	areanum_(0),

@@ -546,7 +546,7 @@ bool	G_SpawnString( const char *key, const char *defaultString, char **out );
 bool	G_SpawnFloat( const char *key, const char *defaultString, float *out );
 bool	G_SpawnInt( const char *key, const char *defaultString, int *out );
 bool	G_SpawnVector( const char *key, const char *defaultString, float *out );
-void		G_SpawnEntitiesFromString( void );
+void		G_SpawnEntitiesFromString( );
 char *G_NewString( const char *string );
 
 //
@@ -561,7 +561,7 @@ void Cmd_FollowCycle_f( GameEntity *ent, int dir );
 //
 // g_items.c
 //
-void G_CheckTeamItems( void );
+void G_CheckTeamItems( );
 void G_RunItem( GameEntity *ent );
 void RespawnItem( GameEntity *ent );
 
@@ -574,9 +574,9 @@ void SetRespawn (GameEntity *ent, float delay);
 void Think_Weapon (GameEntity *ent);
 //void Touch_Item (GameEntity *ent, GameEntity *other, trace_t *trace);
 
-void ClearRegisteredItems( void );
+void ClearRegisteredItems( );
 void RegisterItem( gitem_t *item );
-void SaveRegisteredItems( void );
+void SaveRegisteredItems( );
 
 //
 // g_utils.c
@@ -752,12 +752,12 @@ void respawn (GameEntity *ent);
 void switch_vehicle (GameEntity *ent);
 void Rider_Leave( GameEntity *ent, bool forced );
 void Rider_KillAll( GameEntity *vehicle, GameEntity *attacker );
-void BeginIntermission (void);
+void BeginIntermission ();
 void InitClientPersistant (GameClient *client);
 void InitClientResp (GameClient *client);
 void ClientSpawn( GameEntity *ent );
 void AddScore( GameEntity *ent, vec3_t origin, int score );
-void CalculateRanks( void );
+void CalculateRanks( );
 bool SpotWouldTelefrag( GameEntity *spot );
 
 // mfq3
@@ -792,7 +792,7 @@ void MF_Spawn_Boat(GameEntity *ent, int idx);
 // g_svcmds.c
 //
 bool ConsoleCommand();
-void G_ProcessIPBans(void);
+void G_ProcessIPBans();
 bool G_FilterPacket (char *from);
 
 //
@@ -819,12 +819,12 @@ void DeathmatchScoreboardMessage (GameEntity *client);
 //
 // g_main.c
 //
-void FindIntermissionPoint( void );
+void FindIntermissionPoint( );
 void SetLeader(int team, int client);
 void CheckTeamLeader( int team );
 void G_RunThink (GameEntity *ent);
 void QDECL G_LogPrintf( const char *fmt, ... );
-void SendScoreboardMessageToAllClients( void );
+void SendScoreboardMessageToAllClients( );
 void QDECL Com_Printf( const char *fmt, ... );
 //void QDECL G_Error( const char *fmt, ... );
 
@@ -853,8 +853,8 @@ bool CheckObeliskAttack( GameEntity *obelisk, GameEntity *attacker );
 // g_mem.c
 //
 void *G_Alloc( int size );
-void G_InitMemory( void );
-void Svcmd_GameMem_f( void );
+void G_InitMemory( );
+void Svcmd_GameMem_f( );
 
 //
 // g_session.c
@@ -868,7 +868,7 @@ void G_WriteSessionData();
 //
 // g_arenas.c
 //
-void UpdateTournamentInfo( void );
+void UpdateTournamentInfo( );
 
 #define MAX_FILEPATH			144
 

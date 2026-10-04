@@ -29,7 +29,7 @@ CG_InitMarkPolys
 This is called at startup and for tournement restarts
 ===================
 */
-void	CG_InitMarkPolys( void ) {
+void	CG_InitMarkPolys( ) {
 	int		i;
 
 	memset( cg_markPolys, 0, sizeof(cg_markPolys) );
@@ -69,7 +69,7 @@ CG_AllocMark
 Will allways succeed, even if it requires freeing an old active mark
 ===================
 */
-markPoly_t	*CG_AllocMark( void ) {
+markPoly_t	*CG_AllocMark( ) {
 	markPoly_t	*le;
 	int time;
 
@@ -255,7 +255,7 @@ CG_AddMarks
 #define	MARK_TOTAL_TIME		10000
 #define	MARK_FADE_TIME		1000
 
-void CG_AddMarks( void ) {
+void CG_AddMarks( ) {
 	int			j;
 	markPoly_t	*mp, *next;
 	int			t;

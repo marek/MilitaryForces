@@ -494,7 +494,7 @@ void CM_TraceThroughBrush( traceWork_t *tw, cbrush_t *brush ) {
 
 	enterFrac = -1.0;
 	leaveFrac = 1.0;
-	clipplane = NULL;
+	clipplane = nullptr;
 
 	if ( !brush->numsides ) {
 		return;
@@ -505,7 +505,7 @@ void CM_TraceThroughBrush( traceWork_t *tw, cbrush_t *brush ) {
 	getout = false;
 	startout = false;
 
-	leadside = NULL;
+	leadside = nullptr;
 
 	if ( tw->sphere.use ) {
 		//
@@ -650,10 +650,10 @@ void CM_TraceThroughBrush( traceWork_t *tw, cbrush_t *brush ) {
 				enterFrac = 0;
 			}
 			tw->trace.fraction = enterFrac;
-			if (clipplane != NULL) {
+			if (clipplane != nullptr) {
 				tw->trace.plane = *clipplane;
 			}
-			if (leadside != NULL) {
+			if (leadside != nullptr) {
 				tw->trace.surfaceFlags = leadside->surfaceFlags;
 			}
 			tw->trace.contents = brush->contents;
@@ -1366,7 +1366,7 @@ CM_BoxTrace
 void CM_BoxTrace( trace_t *results, const vec3_t start, const vec3_t end,
 						  vec3_t mins, vec3_t maxs,
 						  clipHandle_t model, int brushmask, int capsule ) {
-	CM_Trace( results, start, end, mins, maxs, model, vec3_origin, brushmask, capsule, NULL );
+	CM_Trace( results, start, end, mins, maxs, model, vec3_origin, brushmask, capsule, nullptr );
 }
 
 /*

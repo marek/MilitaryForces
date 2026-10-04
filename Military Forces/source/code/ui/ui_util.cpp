@@ -15,7 +15,7 @@ MF_UI_GetTeam
 ===============
 */
 // uses the client info data to extract a MFQ3 team type
-unsigned int MF_UI_GetTeam( void )
+unsigned int MF_UI_GetTeam( )
 {
 	char info[ MAX_INFO_STRING ];	// info text buffer
 	uiClientState_t	cs;				// client state struct
@@ -53,7 +53,7 @@ MF_UI_GetGameset
 // gets the mf_gameset variable into the correct a MF_GAMESET_x return
 unsigned long MF_UI_GetGameset( bool asEnum )
 {
-	char * pGameSet = NULL;
+	char * pGameSet = nullptr;
 	char info[MAX_INFO_STRING];
 //	char * pInfo = NULL;
 //	unsigned long returnValue = MF_GAMESET_MODERN;

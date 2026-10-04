@@ -11,12 +11,12 @@ struct Entity_Plane : public VehicleBase
 {
 	struct Entity_Plane_Touch : public EntityFunc_Touch
 	{
-		virtual void	execute( GameEntity* other, trace_t *trace );
+		void	execute( GameEntity* other, trace_t *trace ) override;
 	};
 
 	struct Entity_Plane_Pain : public EntityFunc_Pain
 	{
-		virtual void	execute( GameEntity* attacker, int damage );
+		void	execute( GameEntity* attacker, int damage ) override;
 	};
 
 	void				checkForTakeoffOrLanding();

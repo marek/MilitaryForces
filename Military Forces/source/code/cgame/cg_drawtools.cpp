@@ -32,7 +32,7 @@ void CG_DrawProgressBar( rectDef_t *rect, vec4_t color, vec4_t textcolor, float 
 	CG_DrawPic( rimWidth + rect->x + doneWidth, rect->y, leftWidth, rimWidth, cgs.media.whiteShader );
 	CG_DrawPic( rimWidth + rect->x + doneWidth, rect->y + rect->h - rimWidth, leftWidth, rimWidth, cgs.media.whiteShader );
 	CG_DrawPic( rect->x + rect->w - rimWidth, rect->y, rimWidth, rect->h, cgs.media.whiteShader );
-	refExport.SetColor( NULL );
+	refExport.SetColor( nullptr );
   
 	//draw text
 	if( scale > 0.0 )
@@ -58,7 +58,7 @@ void CG_SetScreenPlacement( screenPlacement_e placement ) {
 	cg_screenPlacement = placement;
 }
 
-screenPlacement_e CG_GetScreenPlacement( void ) {
+screenPlacement_e CG_GetScreenPlacement( ) {
 	return cg_screenPlacement;
 }
 
@@ -104,7 +104,7 @@ void CG_FillRect( float x, float y, float width, float height, const float *colo
 	CG_AdjustFrom640( &x, &y, &width, &height );
 	refExport.DrawStretchPic( x, y, width, height, 0, 0, 0, 0, cgs.media.whiteShader );
 
-	refExport.SetColor( NULL );
+	refExport.SetColor( nullptr );
 }
 
 /*
@@ -140,7 +140,7 @@ void CG_DrawRect( float x, float y, float width, float height, float size, const
   CG_DrawTopBottom(x, y, width, height, size);
   CG_DrawSides(x, y + size, width, height - size * 2, size);
 
-	refExport.SetColor( NULL );
+	refExport.SetColor( nullptr );
 }
 
 
@@ -258,7 +258,7 @@ void CG_DrawStringExt( int x, int y, const char *string, const float *setColor,
 		cnt++;
 		s++;
 	}
-	refExport.SetColor( NULL );
+	refExport.SetColor( nullptr );
 }
 
 void CG_DrawBigString( int x, int y, const char *s, float alpha ) {
@@ -335,7 +335,7 @@ CG_TileClear
 Clear around a sized down screen
 ==============
 */
-void CG_TileClear( void ) {
+void CG_TileClear( ) {
 	int		top, bottom, left, right;
 	int		w, h;
 
@@ -377,13 +377,13 @@ float *CG_FadeColor( int startMsec, int totalMsec ) {
 	int			t;
 
 	if ( startMsec == 0 ) {
-		return NULL;
+		return nullptr;
 	}
 
 	t = cg.time - startMsec;
 
 	if ( t >= totalMsec ) {
-		return NULL;
+		return nullptr;
 	}
 
 	// fade out
@@ -619,7 +619,7 @@ static void UI_DrawBannerString2( int x, int y, const char* str, vec4_t color )
 		s++;
 	}
 
-	refExport.SetColor( NULL );
+	refExport.SetColor( nullptr );
 }
 
 void UI_DrawBannerString( int x, int y, const char* str, int style, vec4_t color ) {
@@ -732,7 +732,7 @@ static void UI_DrawProportionalString2( int x, int y, const char* str, vec4_t co
 		s++;
 	}
 
-	refExport.SetColor( NULL );
+	refExport.SetColor( nullptr );
 }
 
 /*
@@ -1098,7 +1098,7 @@ Calls to reset reticle handling
 ===============
 */
 
-void CG_ResetReticles( void )
+void CG_ResetReticles( )
 {
 	// reset when starting main scene
 	if( !cg.drawingMFD )
@@ -1267,11 +1267,11 @@ Parses and draws (if appropriate) reticle labels
 
 void CG_Parse_Reticle_Target( reticle_t * pR )
 {
-	char * pText = NULL;
+	char * pText = nullptr;
 	int client = 0;
 
 	// if no target pointer do nothing
-	if( pR->pTarget == NULL )
+	if( pR->pTarget == nullptr )
 	{
 		return;
 	}
@@ -1316,7 +1316,7 @@ CG_Draw_Reticles
 Draws all pending 2D reticles
 ================
 */
-void CG_Draw_Reticles( void )
+void CG_Draw_Reticles( )
 {
 	int i = 0;
 
@@ -1349,7 +1349,7 @@ Draws generic smoke puffs (vehicles on fire)
 */
 localEntity_t * CG_Generic_Smoke( centity_t * cent, vec3_t smokePosition, int density )
 {
-	localEntity_t * smoke = NULL;
+	localEntity_t * smoke = nullptr;
 
 	// valid state to add a smoke puff local entity?
 	if( cg_smoke.integer && cent->miscTime < cg.time )

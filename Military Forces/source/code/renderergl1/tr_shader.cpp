@@ -72,22 +72,22 @@ void R_RemapShader(const char *shaderName, const char *newShaderName, const char
 	qhandle_t	h;
 
 	sh = R_FindShaderByName( shaderName );
-	if (sh == NULL || sh == tr.defaultShader) {
+	if (sh == nullptr || sh == tr.defaultShader) {
 		h = RE_RegisterShaderLightMap(shaderName, 0);
 		sh = R_GetShaderByHandle(h);
 	}
-	if (sh == NULL || sh == tr.defaultShader) {
+	if (sh == nullptr || sh == tr.defaultShader) {
 		ri.Printf( PRINT_WARNING, "WARNING: R_RemapShader: shader %s not found\n", shaderName );
 		return;
 	}
 
 	sh2 = R_FindShaderByName( newShaderName );
-	if (sh2 == NULL || sh2 == tr.defaultShader) {
+	if (sh2 == nullptr || sh2 == tr.defaultShader) {
 		h = RE_RegisterShaderLightMap(newShaderName, 0);
 		sh2 = R_GetShaderByHandle(h);
 	}
 
-	if (sh2 == NULL || sh2 == tr.defaultShader) {
+	if (sh2 == nullptr || sh2 == tr.defaultShader) {
 		ri.Printf( PRINT_WARNING, "WARNING: R_RemapShader: new shader %s not found\n", newShaderName );
 		return;
 	}
@@ -101,7 +101,7 @@ void R_RemapShader(const char *shaderName, const char *newShaderName, const char
 			if (sh != sh2) {
 				sh->remappedShader = sh2;
 			} else {
-				sh->remappedShader = NULL;
+				sh->remappedShader = nullptr;
 			}
 		}
 	}
@@ -594,7 +594,7 @@ static bool ParseStage( shaderStage_t *stage, char **text )
 
 	stage->active = true;
 
-	while ( 1 )
+	while ( true )
 	{
 		token = COM_ParseExt( text, true );
 		if ( !token[0] )
@@ -698,7 +698,7 @@ static bool ParseStage( shaderStage_t *stage, char **text )
 			stage->bundle[0].imageAnimationSpeed = atof( token );
 
 			// parse up to MAX_IMAGE_ANIMATIONS animations
-			while ( 1 ) {
+			while ( true ) {
 				int		num;
 
 				token = COM_ParseExt( text, false );
@@ -1017,7 +1017,7 @@ static bool ParseStage( shaderStage_t *stage, char **text )
 		{
 			char buffer[1024] = "";
 
-			while ( 1 )
+			while ( true )
 			{
 				token = COM_ParseExt( text, false );
 				if ( token[0] == 0 )
@@ -1451,7 +1451,7 @@ static bool ParseShader( char **text )
 		return false;
 	}
 
-	while ( 1 )
+	while ( true )
 	{
 		token = COM_ParseExt( text, true );
 		if ( !token[0] )
@@ -1690,7 +1690,7 @@ See if we can use on of the simple fastpath stage functions,
 otherwise set to the generic stage function
 ===================
 */
-static void ComputeStageIteratorFunc( void )
+static void ComputeStageIteratorFunc( )
 {
 	shader.optimalStageIteratorFunc = RB_StageIteratorGeneric;
 
@@ -1807,7 +1807,7 @@ Attempt to combine two stages into a single multitexture stage
 FIXME: I think modulated add + modulated add collapses incorrectly
 =================
 */
-static bool CollapseMultitexture( void ) {
+static bool CollapseMultitexture( ) {
 	int abits, bbits;
 	int i;
 	textureBundle_t tmpBundle;
@@ -1933,7 +1933,7 @@ static void FixRenderCommandList( int newShader ) {
 	if( cmdList ) {
 		const void *curCmd = cmdList->cmds;
 
-		while ( 1 ) {
+		while ( true ) {
 			curCmd = PADP(curCmd, sizeof(void *));
 
 			switch ( *(const int *)curCmd ) {
@@ -2002,7 +2002,7 @@ shaders.
 Sets shader->sortedIndex
 ==============
 */
-static void SortNewShader( void ) {
+static void SortNewShader( ) {
 	int		i;
 	float	sort;
 	shader_t	*newShader;
@@ -2032,7 +2032,7 @@ static void SortNewShader( void ) {
 GeneratePermanentShader
 ====================
 */
-static shader_t *GeneratePermanentShader( void ) {
+static shader_t *GeneratePermanentShader( ) {
 	shader_t	*newShader;
 	int			i, b;
 	int			size, hash;
@@ -2092,7 +2092,7 @@ pass, trying to guess which is the correct one to best approximate
 what it is supposed to look like.
 =================
 */
-static void VertexLightingCollapse( void ) {
+static void VertexLightingCollapse( ) {
 	int		stage;
 	shaderStage_t	*bestStage;
 	int		bestImageRank;
@@ -2200,7 +2200,7 @@ Returns a freshly allocated shader with all the needed info
 from the current global working shader
 =========================
 */
-static shader_t *FinishShader( void ) {
+static shader_t *FinishShader( ) {
 	int stage;
 	bool		hasLightmapStage;
 	bool		vertexLightmap;
@@ -2419,11 +2419,11 @@ static char *FindShaderInShaderText( const char *shadername ) {
 	p = s_shaderText;
 
 	if ( !p ) {
-		return NULL;
+		return nullptr;
 	}
 
 	// look for label
-	while ( 1 ) {
+	while ( true ) {
 		token = COM_ParseExt( &p, true );
 		if ( token[0] == 0 ) {
 			break;
@@ -2438,7 +2438,7 @@ static char *FindShaderInShaderText( const char *shadername ) {
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -2455,7 +2455,7 @@ shader_t *R_FindShaderByName( const char *name ) {
 	int			hash;
 	shader_t	*sh;
 
-	if ( (name==NULL) || (name[0] == 0) ) {
+	if ( (name==nullptr) || (name[0] == 0) ) {
 		return tr.defaultShader;
 	}
 
@@ -2876,7 +2876,7 @@ Dump information on all valid shaders to the console
 A second parameter will cause it to print in sorted order
 ===============
 */
-void	R_ShaderList_f (void) {
+void	R_ShaderList_f () {
 	int			i;
 	int			count;
 	shader_t	*pShader;
@@ -2945,10 +2945,10 @@ a single large text block that can be scanned for shader names
 =====================
 */
 #define	MAX_SHADER_FILES	4096
-static void ScanAndLoadShaderFiles( void )
+static void ScanAndLoadShaderFiles( )
 {
 	char **shaderFiles;
-	char *buffers[MAX_SHADER_FILES] = {0};
+	char *buffers[MAX_SHADER_FILES] = {nullptr};
 	char *p;
 	int numShaderFiles;
 	int i;
@@ -2986,7 +2986,7 @@ static void ScanAndLoadShaderFiles( void )
 		// Do a simple check on the shader structure in that file to make sure one bad shader file cannot fuck up all other shaders.
 		p = buffers[i];
 		COM_BeginParseSession(filename);
-		while(1)
+		while(true)
 		{
 			token = COM_ParseExt(&p, true);
 			
@@ -3007,7 +3007,7 @@ static void ScanAndLoadShaderFiles( void )
 				}
 				ri.Printf(PRINT_WARNING, ".\n");
 				ri.FS_FreeFile(buffers[i]);
-				buffers[i] = NULL;
+				buffers[i] = nullptr;
 				break;
 			}
 
@@ -3016,7 +3016,7 @@ static void ScanAndLoadShaderFiles( void )
 				ri.Printf(PRINT_WARNING, "WARNING: Ignoring shader file %s. Shader \"%s\" on line %d missing closing brace.\n",
 							filename, shaderName, shaderLine);
 				ri.FS_FreeFile(buffers[i]);
-				buffers[i] = NULL;
+				buffers[i] = nullptr;
 				break;
 			}
 		}
@@ -3053,7 +3053,7 @@ static void ScanAndLoadShaderFiles( void )
 
 	p = s_shaderText;
 	// look for shader names
-	while ( 1 ) {
+	while ( true ) {
 		token = COM_ParseExt( &p, true );
 		if ( token[0] == 0 ) {
 			break;
@@ -3078,7 +3078,7 @@ static void ScanAndLoadShaderFiles( void )
 
 	p = s_shaderText;
 	// look for shader names
-	while ( 1 ) {
+	while ( true ) {
 		oldp = p;
 		token = COM_ParseExt( &p, true );
 		if ( token[0] == 0 ) {
@@ -3101,7 +3101,7 @@ static void ScanAndLoadShaderFiles( void )
 CreateInternalShaders
 ====================
 */
-static void CreateInternalShaders( void ) {
+static void CreateInternalShaders( ) {
 	tr.numShaders = 0;
 
 	// init the default shader
@@ -3117,7 +3117,7 @@ static void CreateInternalShaders( void ) {
 	tr.shadowShader = FinishShader();
 }
 
-static void CreateExternalShaders( void ) {
+static void CreateExternalShaders( ) {
 	tr.projectionShadowShader = R_FindShader( "projectionShadow", LIGHTMAP_NONE, true );
 	tr.flareShader = R_FindShader( "flareShader", LIGHTMAP_NONE, true );
 
@@ -3142,7 +3142,7 @@ static void CreateExternalShaders( void ) {
 R_InitShaders
 ==================
 */
-void R_InitShaders( void ) {
+void R_InitShaders( ) {
 	ri.Printf( PRINT_ALL, "Initializing Shaders\n" );
 
 	Com_Memset(hashTable, 0, sizeof(hashTable));

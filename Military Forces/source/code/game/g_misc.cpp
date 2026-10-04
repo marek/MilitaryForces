@@ -71,7 +71,7 @@ void SP_misc_model( GameEntity *ent )
 
 struct Think_LocateCamera : public GameEntity::EntityFunc_Think
 {
-	virtual void execute() 
+	void execute() override 
 	{
 		vec3_t		dir;
 		GameEntity*	target;

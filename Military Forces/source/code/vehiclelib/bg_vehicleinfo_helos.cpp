@@ -29,7 +29,7 @@ GameObjectInfo_Helicopter::setupBoundingBox()
 void
 GameObjectInfo_Helicopter::createAllHelicopters( GameObjectList& gameObjects )
 {
-	GameObjectInfo_Helicopter* veh = 0;
+	GameObjectInfo_Helicopter* veh = nullptr;
 
 	// UH-1
 	veh = dynamic_cast<GameObjectInfo_Helicopter*>(createVehicle(GameObjectInfo::GO_CAT_HELO));
@@ -58,8 +58,8 @@ GameObjectInfo_Helicopter::createAllHelicopters( GameObjectList& gameObjects )
 	veh->acceleration_ = 100;
 	veh->maxFuel_ = 160;
 	veh->engines_ = 1;		
-	veh->bayAnim_ = 0;		
-	veh->gearAnim_ = 0;		
+	veh->bayAnim_ = nullptr;		
+	veh->gearAnim_ = nullptr;		
 	veh->tailAngle_ = 0;		
 	veh->abEffectModel_ = 0;	
     veh->maxSpeed_ = 250;		

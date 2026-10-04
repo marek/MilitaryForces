@@ -70,8 +70,8 @@ cbrush_t	*box_brush;
 
 
 
-void	CM_InitBoxHull (void);
-void	CM_FloodAreaConnections (void);
+void	CM_InitBoxHull ();
+void	CM_FloodAreaConnections ();
 
 
 /*
@@ -665,7 +665,7 @@ void CM_LoadMap( const char *name, bool clientload, int *checksum ) {
 CM_ClearMap
 ==================
 */
-void CM_ClearMap( void ) {
+void CM_ClearMap( ) {
 	Com_Memset( &cm, 0, sizeof( cm ) );
 	CM_ClearLevelPatches();
 }
@@ -691,7 +691,7 @@ cmodel_t	*CM_ClipHandleToModel( clipHandle_t handle ) {
 	}
 	Com_Error( ERR_DROP, "CM_ClipHandleToModel: bad handle %i", handle + MAX_SUBMODELS );
 
-	return NULL;
+	return nullptr;
 
 }
 
@@ -707,15 +707,15 @@ clipHandle_t	CM_InlineModel( int index ) {
 	return index;
 }
 
-int		CM_NumClusters( void ) {
+int		CM_NumClusters( ) {
 	return cm.numClusters;
 }
 
-int		CM_NumInlineModels( void ) {
+int		CM_NumInlineModels( ) {
 	return cm.numSubModels;
 }
 
-char	*CM_EntityString( void ) {
+char	*CM_EntityString( ) {
 	return cm.entityString;
 }
 
@@ -744,7 +744,7 @@ Set up the planes and nodes so that the six floats of a bounding box
 can just be stored out and get a proper clipping hull structure.
 ===================
 */
-void CM_InitBoxHull (void)
+void CM_InitBoxHull ()
 {
 	int			i;
 	int			side;

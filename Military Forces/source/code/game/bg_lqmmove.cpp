@@ -26,7 +26,7 @@ bool	PM_SlideMove_LQM();
 void	PM_StepSlideMove_LQM();
 
 
-void PM_LQMGroundTrace( void )
+void PM_LQMGroundTrace( )
 {
 	trace_t		trace;
 	vec3_t		end;
@@ -77,7 +77,7 @@ void PM_LQMGroundTrace( void )
 	pm->ps->groundEntityNum = trace.entityNum;
 }
 
-void PM_LQMMove( void ) 
+void PM_LQMMove( ) 
 {
     vec3_t	viewdir;
     bool	dead = (pm->ps->stats[STAT_HEALTH] <= 0);
@@ -147,7 +147,7 @@ void PM_LQMMove( void )
 			// Forward speed
 			VectorCopy(viewdir, forwardvel);
 			forwardvel[PITCH] = forwardvel[ROLL] = 0;				// Don't let vehicle angels effect verticle acceleration
-			AngleVectors(forwardvel, forwardvel, NULL, NULL );
+			AngleVectors(forwardvel, forwardvel, nullptr, nullptr );
 			if(pm->cmd.forwardmove > 0) {
 				anim |= A_LQM_FORWARD;
 				anim &= ~A_LQM_BACKWARD;
@@ -166,7 +166,7 @@ void PM_LQMMove( void )
 			// Right speed
 			VectorCopy(viewdir,  rightvel);
 			rightvel[PITCH] = rightvel[ROLL] = 0;
-			AngleVectors( rightvel,  NULL, rightvel, NULL );
+			AngleVectors( rightvel,  nullptr, rightvel, nullptr );
 			if(pm->cmd.rightmove > 0) {
 				anim |= A_LQM_RIGHT;
 				anim &= ~A_LQM_LEFT;
@@ -304,8 +304,8 @@ bool	PM_SlideMove_LQM() {
 
 			pm->trace ( &trace, 
 					pm->ps->origin, 
-					0, 
-					0, 
+					nullptr, 
+					nullptr, 
 					end, 
 					pm->ps->clientNum, 
 					pm->tracemask,
@@ -440,7 +440,7 @@ bool	PM_SlideMove_LQM() {
 	}
 
 	return ( bumpcount != 0 );
-	return 0;
+	return false;
 }
 
 void PM_StepSlideMove_LQM() {

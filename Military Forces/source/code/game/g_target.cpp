@@ -17,7 +17,7 @@
 */
 struct Think_TargetDelay : public GameEntity::EntityFunc_Think
 {
-	virtual void execute() 
+	void execute() override 
 	{
 		G_UseTargets( self_, self_->activator_ );
 	}
@@ -25,7 +25,7 @@ struct Think_TargetDelay : public GameEntity::EntityFunc_Think
 
 struct Use_TargetDelay : public GameEntity::EntityFunc_Use
 {
-	virtual void execute( GameEntity *other, GameEntity *activator )
+	void execute( GameEntity *other, GameEntity *activator ) override
 	{
 		GameEntity*	self = self_;  // Since we may delete our current think()
 
@@ -57,7 +57,7 @@ The activator is given this many points.
 */
 struct Use_TargetScore : public GameEntity::EntityFunc_Use
 {
-	virtual void execute( GameEntity *other, GameEntity *activator) 
+	void execute( GameEntity *other, GameEntity *activator) override 
 	{
 		AddScore( activator, self_->r.currentOrigin, self_->count_ );
 	}
@@ -80,7 +80,7 @@ If "private", only the activator gets the message.  If no checks, all clients ge
 */
 struct Use_TargetPrint : public GameEntity::EntityFunc_Use
 {
-	virtual void execute( GameEntity *other, GameEntity *activator ) 
+	void execute( GameEntity *other, GameEntity *activator ) override 
 	{
 		if( activator->client_ && ( self_->spawnflags_ & 4 ) ) 
 		{
@@ -124,7 +124,7 @@ Multiple identical looping sounds will just increase volume without any speed co
 */
 struct Use_TargetSpeaker : public GameEntity::EntityFunc_Use
 {
-	virtual void execute( GameEntity *other, GameEntity *activator ) 
+	void execute( GameEntity *other, GameEntity *activator ) override 
 	{
 		if( self_->spawnflags_ & 3 ) 
 		{	
@@ -205,7 +205,7 @@ if RANDOM is checked, only one of the targets will be fired, not all of them
 
 struct Use_TargetRelay : public GameEntity::EntityFunc_Use
 {
-	virtual void execute( GameEntity *other, GameEntity *activator ) 
+	void execute( GameEntity *other, GameEntity *activator ) override 
 	{
 		if( ( self_->spawnflags_ & 1 ) && activator->client_ 
 			&& activator->client_->sess_.sessionTeam_ != ClientBase::TEAM_RED ) 
@@ -241,9 +241,9 @@ Kills the activator.
 */
 struct Use_TargetKill : public GameEntity::EntityFunc_Use
 {
-	virtual void execute( GameEntity *other, GameEntity *activator ) 
+	void execute( GameEntity *other, GameEntity *activator ) override 
 	{
-		G_Damage ( activator, NULL, NULL, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_TELEFRAG, CAT_ANY);
+		G_Damage ( activator, nullptr, nullptr, nullptr, nullptr, 100000, DAMAGE_NO_PROTECTION, MOD_TELEFRAG, CAT_ANY);
 	}
 };
 
@@ -262,14 +262,14 @@ void SP_target_position( GameEntity *self )
 
 struct Think_TargetLocationLinkup : public GameEntity::EntityFunc_Think
 {
-	virtual void execute()
+	void execute() override
 	{
 		if (theLevel.locationLinked_) 
 			return;
 
 		theLevel.locationLinked_ = true;
 
-		theLevel.locationHead_ = 0;
+		theLevel.locationHead_ = nullptr;
 
 		SV_SetConfigstring( CS_LOCATIONS, "unknown" );
 

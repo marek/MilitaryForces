@@ -686,7 +686,7 @@ This function assumes that all patches in one group are nicely stitched together
 If this is not the case this function will still do its job but won't fix the highest LoD cracks.
 =================
 */
-void R_FixSharedVertexLodError( void ) {
+void R_FixSharedVertexLodError( ) {
 	int i;
 	srfGridMesh_t *grid1;
 
@@ -1158,7 +1158,7 @@ int R_TryStitchingPatch( int grid1num ) {
 R_StitchAllPatches
 ===============
 */
-void R_StitchAllPatches( void ) {
+void R_StitchAllPatches( ) {
 	int i, stitched, numstitches;
 	srfGridMesh_t *grid1;
 
@@ -1191,7 +1191,7 @@ void R_StitchAllPatches( void ) {
 R_MovePatchSurfacesToHunk
 ===============
 */
-void R_MovePatchSurfacesToHunk(void) {
+void R_MovePatchSurfacesToHunk() {
 	int i, size;
 	srfGridMesh_t *grid, *hunkgrid;
 
@@ -1316,8 +1316,8 @@ static	void R_LoadSubmodels( lump_t *l ) {
 
 		model = R_AllocModel();
 
-		assert( model != NULL );			// this should never happen
-		if ( model == NULL ) {
+		assert( model != nullptr );			// this should never happen
+		if ( model == nullptr ) {
 			ri.Error(ERR_DROP, "R_LoadSubmodels: R_AllocModel() failed");
 		}
 
@@ -1426,7 +1426,7 @@ static	void R_LoadNodesAndLeafs (lump_t *nodeLump, lump_t *leafLump) {
 	}	
 
 	// chain descendants
-	R_SetParent (s_worldData.nodes, NULL);
+	R_SetParent (s_worldData.nodes, nullptr);
 }
 
 //=============================================================================
@@ -1669,7 +1669,7 @@ void R_LoadLightGrid( lump_t *l ) {
 
 	if ( l->filelen != numGridPoints * 8 ) {
 		ri.Printf( PRINT_WARNING, "WARNING: light grid mismatch\n" );
-		w->lightGridData = NULL;
+		w->lightGridData = nullptr;
 		return;
 	}
 
@@ -1712,7 +1712,7 @@ void R_LoadEntities( lump_t *l ) {
 	}
 
 	// only parse the world spawn
-	while ( 1 ) {	
+	while ( true ) {	
 		// parse key
 		token = COM_ParseExt( &p, true );
 
@@ -1819,7 +1819,7 @@ void RE_LoadWorldMap( const char *name ) {
 
 	// clear tr.world so if the level fails to load, the next
 	// try will not look at the partially loaded version
-	tr.world = NULL;
+	tr.world = nullptr;
 
 	Com_Memset( &s_worldData, 0, sizeof( s_worldData ) );
 	Q_strncpyz( s_worldData.name, name, sizeof( s_worldData.name ) );

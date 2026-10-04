@@ -23,97 +23,97 @@ protected:
 
 struct UI_Utils::Command_SetFocus : public Command
 {
-	virtual void			handler( itemDef_t *item, char** args );
+	void			handler( itemDef_t *item, char** args ) override;
 };
 
 struct UI_Utils::Command_FadeIn : public Command
 {
-	virtual void			handler( itemDef_t *item, char** args );
+	void			handler( itemDef_t *item, char** args ) override;
 };
 
 struct UI_Utils::Command_FadeOut : public Command
 {
-	virtual void			handler( itemDef_t *item, char** args );
+	void			handler( itemDef_t *item, char** args ) override;
 };
 
 struct UI_Utils::Command_Show : public Command
 {
-	virtual void			handler( itemDef_t *item, char** args );
+	void			handler( itemDef_t *item, char** args ) override;
 };
 
 struct UI_Utils::Command_Hide : public Command
 {
-	virtual void			handler( itemDef_t *item, char** args );
+	void			handler( itemDef_t *item, char** args ) override;
 };
 
 struct UI_Utils::Command_SetColor : public Command
 {
-	virtual void			handler( itemDef_t *item, char** args );
+	void			handler( itemDef_t *item, char** args ) override;
 };
 
 struct UI_Utils::Command_Open : public Command
 {
-	virtual void			handler( itemDef_t *item, char** args );
+	void			handler( itemDef_t *item, char** args ) override;
 };
 
 struct UI_Utils::Command_Close : public Command
 {
-	virtual void			handler( itemDef_t *item, char** args );
+	void			handler( itemDef_t *item, char** args ) override;
 };
 
 struct UI_Utils::Command_SetAsset : public Command
 {
-	virtual void			handler( itemDef_t *item, char** args );
+	void			handler( itemDef_t *item, char** args ) override;
 };
 
 struct UI_Utils::Command_SetBackground : public Command
 {
-	virtual void			handler( itemDef_t *item, char** args );
+	void			handler( itemDef_t *item, char** args ) override;
 };
 
 struct UI_Utils::Command_SetItemColor : public Command
 {
-	virtual void			handler( itemDef_t *item, char** args );
+	void			handler( itemDef_t *item, char** args ) override;
 };
 
 struct UI_Utils::Command_SetPlayerModel : public Command
 {
-	virtual void			handler( itemDef_t *item, char** args );
+	void			handler( itemDef_t *item, char** args ) override;
 };
 
 struct UI_Utils::Command_SetPlayerHead : public Command
 {
-	virtual void			handler( itemDef_t *item, char** args );
+	void			handler( itemDef_t *item, char** args ) override;
 };
 
 struct UI_Utils::Command_Transition : public Command
 {
-	virtual void			handler( itemDef_t *item, char** args );
+	void			handler( itemDef_t *item, char** args ) override;
 };
 
 struct UI_Utils::Command_SetCvar : public Command
 {
-	virtual void			handler( itemDef_t *item, char** args );
+	void			handler( itemDef_t *item, char** args ) override;
 };
 
 struct UI_Utils::Command_Exec : public Command
 {
-	virtual void			handler( itemDef_t *item, char** args );
+	void			handler( itemDef_t *item, char** args ) override;
 };
 
 struct UI_Utils::Command_Play : public Command
 {
-	virtual void			handler( itemDef_t *item, char** args );
+	void			handler( itemDef_t *item, char** args ) override;
 };
 
 struct UI_Utils::Command_PlayLooped : public Command
 {
-	virtual void			handler( itemDef_t *item, char** args );
+	void			handler( itemDef_t *item, char** args ) override;
 };
 
 struct UI_Utils::Command_Orbit : public Command
 {
-	virtual void			handler( itemDef_t *item, char** args );
+	void			handler( itemDef_t *item, char** args ) override;
 };
 
 #endif // __UI_COMMANDDEF_H__

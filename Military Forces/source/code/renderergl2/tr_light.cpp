@@ -356,7 +356,7 @@ void R_SetupEntityLighting( const trRefdef_t *refdef, trRefEntity_t *ent ) {
 	}
 
 	// bonus items and view weapons have a fixed minimum add
-	if ( 1 /* ent->e.renderfx & RF_MINLIGHT */ ) {
+	if ( true /* ent->e.renderfx & RF_MINLIGHT */ ) {
 		// give everything a minimum light add
 		ent->ambientLight[0] += tr.identityLight * 32;
 		ent->ambientLight[1] += tr.identityLight * 32;
@@ -448,7 +448,7 @@ int R_LightForPoint( vec3_t point, vec3_t ambientLight, vec3_t directedLight, ve
 {
 	trRefEntity_t ent;
 	
-	if ( tr.world->lightGridData == NULL )
+	if ( tr.world->lightGridData == nullptr )
 	  return false;
 
 	Com_Memset(&ent, 0, sizeof(ent));
@@ -466,7 +466,7 @@ int R_LightDirForPoint( vec3_t point, vec3_t lightDir, vec3_t normal, world_t *w
 {
 	trRefEntity_t ent;
 	
-	if ( world->lightGridData == NULL )
+	if ( world->lightGridData == nullptr )
 	  return false;
 
 	Com_Memset(&ent, 0, sizeof(ent));

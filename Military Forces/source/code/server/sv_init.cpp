@@ -643,7 +643,7 @@ Only called at main exe startup, not for each game
 ===============
 */
 
-void SV_Init (void) {
+void SV_Init () {
 	SV_AddOperatorCommands ();
 
 	// serverinfo vars

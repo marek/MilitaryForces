@@ -151,7 +151,7 @@ void RespawnItem( GameEntity *ent )
 
 struct Think_RespawnItem : public GameEntity::EntityFunc_Think
 {
-	virtual void execute()
+	void execute() override
 	{
 		RespawnItem(self_);
 	}
@@ -165,7 +165,7 @@ Touch_Item
 
 struct Touch_ItemTouch : public GameEntity::EntityFunc_Touch
 {
-	virtual void execute( GameEntity *other, trace_t *trace ) 
+	void execute( GameEntity *other, trace_t *trace ) override 
 	{
 		int		respawn;
 		bool	predict;
@@ -279,7 +279,7 @@ struct Touch_ItemTouch : public GameEntity::EntityFunc_Touch
 		if( respawn <= 0 ) 
 		{
 			self->nextthink_ = 0;
-			self->setThink(0);
+			self->setThink(nullptr);
 		} 
 		else 
 		{
@@ -294,7 +294,7 @@ struct Touch_ItemTouch : public GameEntity::EntityFunc_Touch
 
 struct Think_Team_DroppedFlagThink : public GameEntity::EntityFunc_Think
 {
-	virtual void execute()
+	void execute() override
 	{
 		Team_DroppedFlagThink(self_);
 	}
@@ -369,7 +369,7 @@ GameEntity *Drop_Item( GameEntity *ent, gitem_t *item, float angle )
 	angles[YAW] += angle;
 	angles[PITCH] = 0;	// always forward
 
-	AngleVectors( angles, velocity, NULL, NULL );
+	AngleVectors( angles, velocity, nullptr, nullptr );
 	VectorScale( velocity, 150, velocity );
 	velocity[2] += 200 + crandom() * 50;
 	
@@ -386,7 +386,7 @@ Respawn the item
 */
 struct Use_ItemUse : public GameEntity::EntityFunc_Use
 {
-	virtual void execute( GameEntity *other, GameEntity *activator )
+	void execute( GameEntity *other, GameEntity *activator ) override
 	{
 		RespawnItem( self_ );
 	}

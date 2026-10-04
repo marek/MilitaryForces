@@ -8,7 +8,7 @@
 struct UI_UtilsUI : public UI_Utils
 {
 								UI_UtilsUI();
-								~UI_UtilsUI();
+								~UI_UtilsUI() override;
 
 	// ui specific
 	bool						customChatUpdate( int key, int keyDown );

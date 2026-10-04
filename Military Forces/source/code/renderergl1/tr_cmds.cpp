@@ -26,7 +26,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 R_PerformanceCounters
 =====================
 */
-void R_PerformanceCounters( void ) {
+void R_PerformanceCounters( ) {
 	if ( !r_speeds->integer ) {
 		// clear the counters even if we aren't printing
 		Com_Memset( &tr.pc, 0, sizeof( tr.pc ) );
@@ -105,7 +105,7 @@ R_IssuePendingRenderCommands
 Issue any pending commands and wait for them to complete.
 ====================
 */
-void R_IssuePendingRenderCommands( void ) {
+void R_IssuePendingRenderCommands( ) {
 	if ( !tr.registered ) {
 		return;
 	}
@@ -132,7 +132,7 @@ void *R_GetCommandBufferReserved( int bytes, int reservedBytes ) {
 		}
 		// if we run out of room, just start dropping commands
 		ri.Printf( PRINT_WARNING, "Failed to allocate render command of size %d\n", bytes );
-		return NULL;
+		return nullptr;
 	}
 
 	cmdList->used += bytes;
@@ -287,8 +287,8 @@ for each RE_EndFrame
 ====================
 */
 void RE_BeginFrame( stereoFrame_t stereoFrame ) {
-	drawBufferCommand_t	*cmd = NULL;
-	colorMaskCommand_t *colcmd = NULL;
+	drawBufferCommand_t	*cmd = nullptr;
+	colorMaskCommand_t *colcmd = nullptr;
 
 	if ( !tr.registered ) {
 		return;

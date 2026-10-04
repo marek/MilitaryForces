@@ -354,14 +354,14 @@ GameClient* ClientForString( const char *s )
 		if ( idnum < 1 || idnum > theLevel.maxclients_ ) 
 		{
 			Com_Printf( "Bad client slot: %i\n", idnum );
-			return NULL;
+			return nullptr;
 		}
 
 		cl = theLevel.getClient(idnum);// &level.clients[idnum];
 		if( cl && cl->pers_.connected_ == GameClient::ClientPersistant::CON_DISCONNECTED ) 
 		{
 			Com_Printf( "Client %i is not connected\n", idnum );
-			return NULL;
+			return nullptr;
 		}
 		return cl;
 	}
@@ -379,7 +379,7 @@ GameClient* ClientForString( const char *s )
 
 	Com_Printf( "User %s is not on the server\n", s );
 
-	return NULL;
+	return nullptr;
 }
 
 /*

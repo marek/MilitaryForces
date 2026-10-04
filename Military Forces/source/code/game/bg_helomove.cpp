@@ -303,7 +303,7 @@ PM_HeloMove
 */
 bool	PM_SlideMove_Helo();
 
-void PM_HeloMove( void ) 
+void PM_HeloMove( ) 
 {
     vec3_t	viewdir;
     vec3_t	vehdir;
@@ -406,7 +406,7 @@ void PM_HeloMove( void )
 	}
 
 	// get the actual turret angles
-	AngleVectors( pm->ps->vehicleAngles, forward, 0, up );
+	AngleVectors( pm->ps->vehicleAngles, forward, nullptr, up );
 	RotatePointAroundVector( temp, up, forward, turret_yaw );
 	vectoangles( temp, turretdir );
 	turretdir[PITCH] += gun_pitch;
@@ -426,19 +426,19 @@ void PM_HeloMove( void )
 			// Forward speed
 			VectorCopy(vehdir, forwardvel);
 			forwardvel[PITCH] = 0;				// Don't let vehicle angels effect verticle acceleration
-			AngleVectors(forwardvel, forwardvel, NULL, NULL );
+			AngleVectors(forwardvel, forwardvel, nullptr, nullptr );
 			VectorScale(forwardvel, curforwardspeed, forwardvel);
 
 			// Sideways speed
 			VectorCopy(vehdir,  rightvel);
 			rightvel[PITCH] = rightvel[ROLL] = 0;
-			AngleVectors( rightvel,  NULL, rightvel, NULL );
+			AngleVectors( rightvel,  nullptr, rightvel, nullptr );
 			VectorScale( rightvel, currightspeed*2.5, rightvel );
 
 			// Lift Speed
 			VectorCopy(vehdir,  liftvel);
 			liftvel[PITCH] = liftvel[YAW] = 0;
-			AngleVectors( liftvel, NULL , NULL, liftvel );
+			AngleVectors( liftvel, nullptr , nullptr, liftvel );
 			VectorScale( liftvel, curliftspeed, liftvel );
 
 			// delta vel
@@ -498,13 +498,13 @@ void PM_HeloMove( void )
 			if(pm->cmd.forwardmove > 0) {
 					VectorCopy(vehdir, forwardvel);
 					forwardvel[PITCH] = forwardvel[ROLL] = 0;
-					AngleVectors(forwardvel, forwardvel, NULL, NULL );
+					AngleVectors(forwardvel, forwardvel, nullptr, nullptr );
 					pm->ps->speed = availableVehicles[pm->vehicle].turnspeed[PITCH];
 					VectorScale(forwardvel, availableVehicles[pm->vehicle].turnspeed[PITCH], forwardvel);
 			} else if (pm->cmd.forwardmove < 0) {
 					VectorCopy(vehdir, forwardvel);
 					forwardvel[PITCH] = forwardvel[ROLL] = 0;
-					AngleVectors(forwardvel, forwardvel, NULL, NULL );
+					AngleVectors(forwardvel, forwardvel, nullptr, nullptr );
 					pm->ps->speed = availableVehicles[pm->vehicle].turnspeed[PITCH]*10;
 					VectorScale(forwardvel, -availableVehicles[pm->vehicle].turnspeed[PITCH], forwardvel);
 			}
@@ -724,8 +724,8 @@ bool	PM_SlideMove_Helo() {
 
 			pm->trace ( &trace, 
 					pm->ps->origin, 
-					0, 
-					0, 
+					nullptr, 
+					nullptr, 
 					end, 
 					pm->ps->clientNum, 
 					pm->tracemask,
@@ -860,7 +860,7 @@ bool	PM_SlideMove_Helo() {
 	}
 
 	return ( bumpcount != 0 );
-	return 0;
+	return false;
 }
 
 

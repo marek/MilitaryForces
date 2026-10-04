@@ -92,8 +92,8 @@ bool	PM_SlideMove( bool gravity ) {
 
 			pm->trace ( &trace, 
 					pm->ps->origin, 
-					0, 
-					0, 
+					nullptr, 
+					nullptr, 
 					end, 
 					pm->ps->clientNum, 
 					pm->tracemask,

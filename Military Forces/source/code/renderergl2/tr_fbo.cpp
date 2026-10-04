@@ -248,7 +248,7 @@ void FBO_Bind(FBO_t * fbo)
 FBO_Init
 ============
 */
-void FBO_Init(void)
+void FBO_Init()
 {
 	int             i;
 	int             hdrFormat, multisample = 0;
@@ -417,7 +417,7 @@ void FBO_Init(void)
 	GL_CheckErrors();
 
 	GL_BindFramebuffer(GL_FRAMEBUFFER, 0);
-	glState.currentFBO = NULL;
+	glState.currentFBO = nullptr;
 }
 
 /*
@@ -425,7 +425,7 @@ void FBO_Init(void)
 FBO_Shutdown
 ============
 */
-void FBO_Shutdown(void)
+void FBO_Shutdown()
 {
 	int             i, j;
 	FBO_t          *fbo;
@@ -435,7 +435,7 @@ void FBO_Shutdown(void)
 	if(!glRefConfig.framebufferObject)
 		return;
 
-	FBO_Bind(NULL);
+	FBO_Bind(nullptr);
 
 	for(i = 0; i < tr.numFBOs; i++)
 	{
@@ -463,7 +463,7 @@ void FBO_Shutdown(void)
 R_FBOList_f
 ============
 */
-void R_FBOList_f(void)
+void R_FBOList_f()
 {
 	int             i;
 	FBO_t          *fbo;
@@ -624,7 +624,7 @@ void FBO_FastBlit(const FBO_t *src, ivec4_t srcBox, FBO_t *dst, ivec4_t dstBox, 
 
 	if (!glRefConfig.framebufferBlit)
 	{
-		FBO_Blit(src, srcBox, NULL, dst, dstBox, NULL, NULL, 0);
+		FBO_Blit(src, srcBox, nullptr, dst, dstBox, nullptr, nullptr, 0);
 		return;
 	}
 
@@ -682,5 +682,5 @@ void FBO_FastBlit(const FBO_t *src, ivec4_t srcBox, FBO_t *dst, ivec4_t dstBox, 
 						  buffers, filter);
 
 	GL_BindFramebuffer(GL_FRAMEBUFFER, 0);
-	glState.currentFBO = NULL;
+	glState.currentFBO = nullptr;
 }

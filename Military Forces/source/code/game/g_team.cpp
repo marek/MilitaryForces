@@ -27,7 +27,7 @@ GameEntity *neutralObelisk;
 
 void Team_SetFlagStatus( int team, flagStatus_t status );
 
-void Team_InitGame( void ) 
+void Team_InitGame( ) 
 {
 	memset(&teamgame, 0, sizeof teamgame);
 
@@ -99,10 +99,10 @@ void QDECL PrintMsg( GameEntity *ent, const char *fmt, ... )
 	va_end (argptr);
 
 	// double quotes are bad
-	while ((p = strchr(msg, '"')) != NULL)
+	while ((p = strchr(msg, '"')) != nullptr)
 		*p = '\'';
 
-	SV_GameSendServerCommand ( ( (ent == NULL) ? -1 : ent->s.number ), va("print \"%s\"", msg ));	// s.number ok ?
+	SV_GameSendServerCommand ( ( (ent == nullptr) ? -1 : ent->s.number ), va("print \"%s\"", msg ));	// s.number ok ?
 //	SV_GameSendServerCommand ( ( (ent == NULL) ? -1 : ent-g_entities ), va("print \"%s\"", msg ));
 }
 
@@ -257,7 +257,7 @@ void Team_FragBonuses( GameEntity *targ, GameEntity *inflictor, GameEntity *atta
 	int flag_pw, enemy_flag_pw;
 	int otherteam;
 	int tokens;
-	GameEntity *flag, *carrier = 0;
+	GameEntity *flag, *carrier = nullptr;
 	char *c;
 	int team;
 
@@ -289,7 +289,7 @@ void Team_FragBonuses( GameEntity *targ, GameEntity *inflictor, GameEntity *atta
 		attacker->client_->pers_.teamState_.lastfraggedcarrier_ = theLevel.time_;
 		AddScore(attacker, targ->r.currentOrigin, CTF_FRAG_CARRIER_BONUS);
 		attacker->client_->pers_.teamState_.fragcarrier_++;
-		PrintMsg(NULL, "%s" S_COLOR_WHITE " fragged %s's flag carrier!\n",
+		PrintMsg(nullptr, "%s" S_COLOR_WHITE " fragged %s's flag carrier!\n",
 			attacker->client_->pers_.netname_, TeamName(team));
 
 		// the target had the flag, clear the hurt carrier
@@ -325,10 +325,10 @@ void Team_FragBonuses( GameEntity *targ, GameEntity *inflictor, GameEntity *atta
 		carrier = theLevel.getEntity(i);// g_entities + i;
 		if( carrier && carrier->inuse_ && (carrier->client_->ps_.objectives & flag_pw))
 			break;
-		carrier = NULL;
+		carrier = nullptr;
 	}
-	flag = NULL;
-	while ((flag = G_Find (flag, FOFS(classname_), c)) != NULL) 
+	flag = nullptr;
+	while ((flag = G_Find (flag, FOFS(classname_), c)) != nullptr) 
 	{
 		if (!(flag->flags_ & FL_DROPPED_ITEM))
 			break;
@@ -339,7 +339,7 @@ void Team_FragBonuses( GameEntity *targ, GameEntity *inflictor, GameEntity *atta
 GameEntity* Team_ResetFlag( int team ) 
 {
 	char *c;
-	GameEntity *ent, *rent = 0;
+	GameEntity *ent, *rent = nullptr;
 
 	switch (team) 
 	{
@@ -353,11 +353,11 @@ GameEntity* Team_ResetFlag( int team )
 		c = "team_CTF_neutralflag";
 		break;
 	default:
-		return NULL;
+		return nullptr;
 	}
 
-	ent = NULL;
-	while ((ent = G_Find (ent, FOFS(classname_), c)) != NULL) 
+	ent = nullptr;
+	while ((ent = G_Find (ent, FOFS(classname_), c)) != nullptr) 
 	{
 		if (ent->flags_ & FL_DROPPED_ITEM)
 			ent->freeUp();
@@ -386,7 +386,7 @@ void Team_ReturnFlagSound( GameEntity *ent, int team )
 {
 	GameEntity	*te;
 
-	if (ent == NULL)
+	if (ent == nullptr)
 	{
 		Com_Printf ("Warning:  NULL passed to Team_ReturnFlagSound\n");
 		return;
@@ -405,7 +405,7 @@ void Team_TakeFlagSound( GameEntity *ent, int team )
 {
 	GameEntity	*te;
 
-	if (ent == NULL) 
+	if (ent == nullptr) 
 	{
 		Com_Printf ("Warning:  NULL passed to Team_TakeFlagSound\n");
 		return;
@@ -447,7 +447,7 @@ void Team_CaptureFlagSound( GameEntity *ent, int team )
 {
 	GameEntity	*te;
 
-	if (ent == NULL) 
+	if (ent == nullptr) 
 	{
 		Com_Printf ("Warning:  NULL passed to Team_CaptureFlagSound\n");
 		return;
@@ -466,9 +466,9 @@ void Team_ReturnFlag( int team )
 {
 	Team_ReturnFlagSound(Team_ResetFlag(team), team);
 	if( team == ClientBase::TEAM_FREE ) 
-		PrintMsg(NULL, "The flag has returned!\n" );
+		PrintMsg(nullptr, "The flag has returned!\n" );
 	else 
-		PrintMsg(NULL, "The %s flag has returned!\n", TeamName(team));
+		PrintMsg(nullptr, "The %s flag has returned!\n", TeamName(team));
 }
 
 void Team_FreeEntity( GameEntity *ent ) 
@@ -520,7 +520,7 @@ int Team_TouchOurFlag( GameEntity *ent, GameEntity *other, int team )
 	if ( ent->flags_ & FL_DROPPED_ITEM ) 
 	{
 		// hey, its not home.  return it by teleporting it back
-		PrintMsg( NULL, "%s" S_COLOR_WHITE " returned the %s flag!\n", 
+		PrintMsg( nullptr, "%s" S_COLOR_WHITE " returned the %s flag!\n", 
 			cl->pers_.netname_, TeamName(team));
 		AddScore(other, ent->r.currentOrigin, CTF_RECOVERY_BONUS);
 		other->client_->pers_.teamState_.flagrecovery_++;
@@ -534,7 +534,7 @@ int Team_TouchOurFlag( GameEntity *ent, GameEntity *other, int team )
 	// flag, he's just won!
 	if (!(cl->ps_.objectives & enemy_flag))
 		return 0; // We don't have the flag
-	PrintMsg( NULL, "%s" S_COLOR_WHITE " captured the %s flag!\n", cl->pers_.netname_, TeamName(OtherTeam(team)));
+	PrintMsg( nullptr, "%s" S_COLOR_WHITE " captured the %s flag!\n", cl->pers_.netname_, TeamName(OtherTeam(team)));
 
 	cl->ps_.objectives &= ~enemy_flag;
 
@@ -564,7 +564,7 @@ int Team_TouchEnemyFlag( GameEntity *ent, GameEntity *other, int team )
 {
 	GameClient *cl = other->client_;
 
-		PrintMsg (NULL, "%s" S_COLOR_WHITE " got the %s flag!\n",
+		PrintMsg (nullptr, "%s" S_COLOR_WHITE " got the %s flag!\n",
 			other->client_->pers_.netname_, TeamName(team));
 
 		if (team == ClientBase::TEAM_RED)
@@ -616,7 +616,7 @@ GameEntity *Team_GetLocation(GameEntity *ent)
 	float			bestlen, len;
 	vec3_t			origin;
 
-	best = NULL;
+	best = nullptr;
 	bestlen = 3*8192.0*8192.0;
 
 	VectorCopy( ent->r.currentOrigin, origin );
@@ -697,7 +697,7 @@ GameEntity *SelectRandomTeamSpawnPoint( int teamstate, ClientBase::eTeam team, i
 		else if (team == ClientBase::TEAM_BLUE)
 			classname = "team_CTF_blueplayer";
 		else
-			return NULL;
+			return nullptr;
 	} 
 	else
 	{
@@ -706,13 +706,13 @@ GameEntity *SelectRandomTeamSpawnPoint( int teamstate, ClientBase::eTeam team, i
 		else if (team == ClientBase::TEAM_BLUE)
 			classname = "team_CTF_bluespawn";
 		else
-			return NULL;
+			return nullptr;
 	}
 	count = 0;
 
-	spot = NULL;
+	spot = nullptr;
 
-	while ((spot = G_Find (spot, FOFS(classname_), classname)) != NULL) 
+	while ((spot = G_Find (spot, FOFS(classname_), classname)) != nullptr) 
 	{
 		if ( SpotWouldTelefrag( spot ) ) 
 			continue;
@@ -727,7 +727,7 @@ GameEntity *SelectRandomTeamSpawnPoint( int teamstate, ClientBase::eTeam team, i
 	}
 
 	if ( !count ) 	// no spots that won't telefrag
-		return G_Find( NULL, FOFS(classname_), classname);
+		return G_Find( nullptr, FOFS(classname_), classname);
 
 	selection = rand() % count;
 	return spots[ selection ];

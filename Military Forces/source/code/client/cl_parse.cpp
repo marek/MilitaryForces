@@ -104,7 +104,7 @@ void CL_ParsePacketEntities( msg_t *msg, clSnapshot_t *oldframe, clSnapshot_t *n
 
 	// delta from the entities present in oldframe
 	oldindex = 0;
-	oldstate = NULL;
+	oldstate = nullptr;
 	if (!oldframe) {
 		oldnum = 99999;
 	} else {
@@ -117,7 +117,7 @@ void CL_ParsePacketEntities( msg_t *msg, clSnapshot_t *oldframe, clSnapshot_t *n
 		}
 	}
 
-	while ( 1 ) {
+	while ( true ) {
 		// read the entity index number
 		newnum = MSG_ReadBits( msg, GENTITYNUM_BITS );
 
@@ -232,7 +232,7 @@ void CL_ParseSnapshot( msg_t *msg ) {
 
 	// if we were just unpaused, we can only *now* really let the
 	// change come into effect or the client hangs.
-	cl_paused->modified = 0;
+	cl_paused->modified = false;
 
 	newSnap.messageNum = clc.serverMessageSequence;
 
@@ -250,7 +250,7 @@ void CL_ParseSnapshot( msg_t *msg ) {
 	// message 
 	if ( newSnap.deltaNum <= 0 ) {
 		newSnap.valid = true;		// uncompressed frame
-		old = NULL;
+		old = nullptr;
 		if ( newSnap.snapFlags & SNAPFLAG_ENTITY_RESET ) {
 			clc.demowaiting = false;	// we can start recording now
 		}
@@ -284,13 +284,13 @@ void CL_ParseSnapshot( msg_t *msg ) {
 	if ( old ) {
 		MSG_ReadDeltaPlayerstate( msg, &old->ps, &newSnap.ps );
 	} else {
-		MSG_ReadDeltaPlayerstate( msg, NULL, &newSnap.ps );
+		MSG_ReadDeltaPlayerstate( msg, nullptr, &newSnap.ps );
 	}
 
 	// read packet entities
 	SHOWNET( msg, "packet entities" );
 	if ( ( newSnap.snapFlags & SNAPFLAG_ENTITY_RESET ) || !cl.snap.valid ) {
-		CL_ParsePacketEntities( msg, NULL, &newSnap );
+		CL_ParsePacketEntities( msg, nullptr, &newSnap );
 	} else {
 		CL_ParsePacketEntities( msg, &cl.snap, &newSnap );
 	}
@@ -362,7 +362,7 @@ new information out of it.  This will happen at every
 gamestate, and possibly during gameplay.
 ==================
 */
-void CL_SystemInfoChanged( void ) {
+void CL_SystemInfoChanged( ) {
 	char			*systemInfo;
 	const char		*s, *t;
 	char			key[BIG_INFO_KEY];
@@ -463,7 +463,7 @@ void CL_SystemInfoChanged( void ) {
 CL_ParseServerInfo
 ==================
 */
-static void CL_ParseServerInfo(void)
+static void CL_ParseServerInfo()
 {
 	const char *serverInfo;
 
@@ -503,7 +503,7 @@ void CL_ParseGamestate( msg_t *msg ) {
 
 	// parse all the configstrings and baselines
 	cl.gameState.dataCount = 1;	// leave a 0 at the beginning for uninitialized configstrings
-	while ( 1 ) {
+	while ( true ) {
 		cmd = MSG_ReadByte( msg );
 
 		if ( cmd == svc_EOF ) {
@@ -808,7 +808,7 @@ void CL_ParseVoip ( msg_t *msg, bool ignoreData ) {
 		// tell opus that we're missing frames...
 		for (i = 0; i < seqdiff; i++) {
 			assert((written + VOIP_MAX_PACKET_SAMPLES) * 2 < sizeof (decoded));
-			numSamples = opus_decode(clc.opusDecoder[sender], NULL, 0, decoded + written, VOIP_MAX_PACKET_SAMPLES, 0);
+			numSamples = opus_decode(clc.opusDecoder[sender], nullptr, 0, decoded + written, VOIP_MAX_PACKET_SAMPLES, 0);
 			if ( numSamples <= 0 ) {
 				Com_DPrintf("VoIP: Error decoding frame %d from client #%d\n", i, sender);
 				continue;
@@ -899,7 +899,7 @@ void CL_ParseServerMessage( msg_t *msg ) {
 	//
 	// parse the message
 	//
-	while ( 1 ) {
+	while ( true ) {
 		if ( msg->readcount > msg->cursize ) {
 			Com_Error (ERR_DROP,"CL_ParseServerMessage: read past end of server message");
 			break;

@@ -4,7 +4,7 @@
 
 
 
-UI_Utils* KeywordHash::utils_ = 0;
+UI_Utils* KeywordHash::utils_ = nullptr;
 
 KeywordHash::KeywordHash( std::string const& keyword ) : 
 	keyword_(keyword) 
@@ -773,7 +773,7 @@ ItemKeyword_CvarStrList::func( itemDef_t *item, int handle )
 		return false;
 
 	pass = 0;
-	while ( 1 ) 
+	while ( true ) 
 	{
 		if (!utils_->getPrecompilerTools()->readTokenHandle(handle, &token)) 
 		{
@@ -825,7 +825,7 @@ ItemKeyword_CvarFloatList::func( itemDef_t *item, int handle )
 	if (*token.string_ != '{')
 		return false;
 
-	while ( 1 ) 
+	while ( true ) 
 	{
 		if (!utils_->getPrecompilerTools()->readTokenHandle(handle, &token)) 
 		{

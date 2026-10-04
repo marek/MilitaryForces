@@ -54,7 +54,7 @@ Creates an entity in front of the current position, which
 can then be moved around
 =================
 */
-void CG_TestModel_f (void) {
+void CG_TestModel_f () {
 	vec3_t		angles;
 
 	memset( &cg.testModelEntity, 0, sizeof(cg.testModelEntity) );
@@ -92,19 +92,19 @@ CG_TestGun_f
 Replaces the current view weapon with the given model
 =================
 */
-void CG_TestGun_f (void) {
+void CG_TestGun_f () {
 	CG_TestModel_f();
 	cg.testGun = true;
 	cg.testModelEntity.renderfx = RF_MINLIGHT | RF_DEPTHHACK | RF_FIRST_PERSON;
 }
 
 
-void CG_TestModelNextFrame_f (void) {
+void CG_TestModelNextFrame_f () {
 	cg.testModelEntity.frame++;
 	CG_Printf( "frame %i\n", cg.testModelEntity.frame );
 }
 
-void CG_TestModelPrevFrame_f (void) {
+void CG_TestModelPrevFrame_f () {
 	cg.testModelEntity.frame--;
 	if ( cg.testModelEntity.frame < 0 ) {
 		cg.testModelEntity.frame = 0;
@@ -112,12 +112,12 @@ void CG_TestModelPrevFrame_f (void) {
 	CG_Printf( "frame %i\n", cg.testModelEntity.frame );
 }
 
-void CG_TestModelNextSkin_f (void) {
+void CG_TestModelNextSkin_f () {
 	cg.testModelEntity.skinNum++;
 	CG_Printf( "skin %i\n", cg.testModelEntity.skinNum );
 }
 
-void CG_TestModelPrevSkin_f (void) {
+void CG_TestModelPrevSkin_f () {
 	cg.testModelEntity.skinNum--;
 	if ( cg.testModelEntity.skinNum < 0 ) {
 		cg.testModelEntity.skinNum = 0;
@@ -125,7 +125,7 @@ void CG_TestModelPrevSkin_f (void) {
 	CG_Printf( "skin %i\n", cg.testModelEntity.skinNum );
 }
 
-void CG_AddTestModel (void) {
+void CG_AddTestModel () {
 	int		i;
 
 	// re-register the model, because the level may have changed
@@ -245,7 +245,7 @@ static void registerTestVehicle()
 	}
 }
 
-void CG_AddTestVehicle (void) {
+void CG_AddTestVehicle () {
 	int		i;
 
 	// re-register the model, because the level may have changed
@@ -358,7 +358,7 @@ void CG_TestVehicle (long cat) {
 
 
 
-void CG_TestPlaneCmd_f (void) {
+void CG_TestPlaneCmd_f () {
 	char		cmd[128];
 	
 	if( cg.testVehicleCat != CAT_PLANE ) {
@@ -421,7 +421,7 @@ void CG_TestPlaneCmd_f (void) {
 
 }
 
-void CG_TestGVCmd_f (void) {
+void CG_TestGVCmd_f () {
 	char		cmd[128];
 
 	return; // if there is anything to do finish this func

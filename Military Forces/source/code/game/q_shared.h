@@ -769,7 +769,7 @@ bool COM_CompareExtension(const char *in, const char *ext);
 void	COM_DefaultExtension( char *path, int maxSize, const char *extension );
 
 void	COM_BeginParseSession( const char *name );
-int		COM_GetCurrentParseLine( void );
+int		COM_GetCurrentParseLine( );
 char	*COM_Parse( char **data_p );
 char	*COM_ParseExt( char **data_p, bool allowLineBreak );
 int		COM_Compress( char *data_p );

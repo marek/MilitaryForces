@@ -49,8 +49,8 @@ void Die_ExplosiveDie::execute( GameEntity *inflictor, GameEntity *attacker, int
 
 	if( ent->target_ ) 
 	{
-		GameEntity* t = NULL;
-		while( (t = G_Find (t, FOFS(targetname_), ent->target_)) != NULL ) 
+		GameEntity* t = nullptr;
+		while( (t = G_Find (t, FOFS(targetname_), ent->target_)) != nullptr ) 
 		{
 			if ( t == ent ) 
 			{
@@ -282,7 +282,7 @@ void Touch_RadioTower::execute( GameEntity *other, trace_t *trace )
 
 void Think_RadioComply::execute()
 {
-	G_UseTargets( self_, NULL );
+	G_UseTargets( self_, nullptr );
 }
 
 

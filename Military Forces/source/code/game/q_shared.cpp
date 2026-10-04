@@ -321,7 +321,7 @@ void COM_BeginParseSession( const char *name )
 	Com_sprintf(com_parsename, sizeof(com_parsename), "%s", name);
 }
 
-int COM_GetCurrentParseLine( void )
+int COM_GetCurrentParseLine( )
 {
 	if ( com_tokenline )
 	{
@@ -377,7 +377,7 @@ static char *SkipWhitespace( char *data, bool *hasNewLines ) {
 
 	while( (c = *data) <= ' ') {
 		if( !c ) {
-			return NULL;
+			return nullptr;
 		}
 		if( c == '\n' ) {
 			com_lines++;
@@ -432,7 +432,7 @@ int COM_Compress( char *data_p ) {
 				if (c == '"') {
 					*out++ = c;
 					in++;
-					while (1) {
+					while (true) {
 						c = *in;
 						if (c && c != '"') {
 							*out++ = c;
@@ -472,17 +472,17 @@ char *COM_ParseExt( char **data_p, bool allowLineBreaks )
 	// make sure incoming data is valid
 	if ( !data )
 	{
-		*data_p = NULL;
+		*data_p = nullptr;
 		return com_token;
 	}
 
-	while ( 1 )
+	while ( true )
 	{
 		// skip whitespace
 		data = SkipWhitespace( data, &hasNewLines );
 		if ( !data )
 		{
-			*data_p = NULL;
+			*data_p = nullptr;
 			return com_token;
 		}
 		if ( hasNewLines && !allowLineBreaks )
@@ -531,7 +531,7 @@ char *COM_ParseExt( char **data_p, bool allowLineBreaks )
 	if (c == '\"')
 	{
 		data++;
-		while (1)
+		while (true)
 		{
 			c = *data++;
 			if (c=='\"' || !c)
@@ -827,13 +827,13 @@ void Q_strncpyz( char *dest, const char *src, int destsize ) {
 int Q_stricmpn (const char *s1, const char *s2, int n) {
 	int		c1, c2;
 
-        if ( s1 == NULL ) {
-           if ( s2 == NULL )
+        if ( s1 == nullptr ) {
+           if ( s2 == nullptr )
              return 0;
            else
              return -1;
         }
-        else if ( s2==NULL )
+        else if ( s2==nullptr )
           return 1;
 
 
@@ -940,7 +940,7 @@ const char *Q_stristr( const char *s, const char *find)
       do
       {
         if ((sc = *s++) == 0)
-          return NULL;
+          return nullptr;
         if (sc >= 'a' && sc <= 'z')
         {
           sc -= ('a' - 'A');
@@ -1105,7 +1105,7 @@ char *Info_ValueForKey( const char *s, const char *key ) {
 	valueindex ^= 1;
 	if (*s == '\\')
 		s++;
-	while (1)
+	while (true)
 	{
 		o = pkey;
 		while (*s != '\\')
@@ -1197,7 +1197,7 @@ void Info_RemoveKey( char *s, const char *key ) {
 		return;
 	}
 
-	while (1)
+	while (true)
 	{
 		start = s;
 		if (*s == '\\')
@@ -1253,7 +1253,7 @@ void Info_RemoveKey_Big( char *s, const char *key ) {
 		return;
 	}
 
-	while (1)
+	while (true)
 	{
 		start = s;
 		if (*s == '\\')
@@ -1496,7 +1496,7 @@ int ahextoi( const char* string ) {
 			c = (c - 'a') + 10;
 		} else break;
 		value = value * 16 + c;
-	} while ( 1 );
+	} while ( true );
 
 	return value;
 }

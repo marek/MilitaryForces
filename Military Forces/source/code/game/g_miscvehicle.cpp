@@ -49,7 +49,7 @@ static void MiscVehicle_DropToGround( GameEntity *ent, float above, float below 
 	startpos[2] += above;
 	VectorCopy( ent->s.origin, endpos );
 	endpos[2] -= below;
-	SV_Trace( &trace, startpos, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_SOLID, false );
+	SV_Trace( &trace, startpos, nullptr, nullptr, endpos, ENTITYNUM_NONE, MASK_SOLID, false );
 	if( trace.fraction < 1.0f ) {
 		ent->s.origin[2] = trace.endpos[2] - availableVehicles[vehIndex].mins[2] + 1;
 	}
@@ -65,7 +65,7 @@ static void SP_misc_plane( GameEntity *ent )
 	startpos[2] += 64;
 	VectorCopy( ent->s.origin, endpos );
 	endpos[2] -= 256;
-	SV_Trace( &trace, startpos, NULL, NULL, endpos, ENTITYNUM_NONE, MASK_SOLID, false );
+	SV_Trace( &trace, startpos, nullptr, nullptr, endpos, ENTITYNUM_NONE, MASK_SOLID, false );
 	if( trace.fraction < 1.0f ) {
 		GameEntity *test = theLevel.getEntity(trace.entityNum);
 		if( test && canLandOnIt(test) ) {
@@ -182,7 +182,7 @@ void Drone_Think::execute()
 		SV_Trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, origin, ent->s.number, MASK_SOLID, false );
 		if( tr.startsolid || tr.fraction < 1.0f )
 		{
-			G_Damage( ent, 0, ent, 0, 0, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
+			G_Damage( ent, nullptr, ent, nullptr, nullptr, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 			return;
 		}
 	}
@@ -212,7 +212,7 @@ void Drone_Think::execute()
 		VectorCopy( origin, to );
 		from[2] += 64;
 		to[2] -= 512;
-		SV_Trace( &tr, from, 0, 0, to, ent->s.number, (cat & CAT_BOAT) ? (MASK_SOLID|MASK_WATER) : MASK_SOLID, false );
+		SV_Trace( &tr, from, nullptr, nullptr, to, ent->s.number, (cat & CAT_BOAT) ? (MASK_SOLID|MASK_WATER) : MASK_SOLID, false );
 		if( tr.fraction < 1.0f )
 			origin[2] = tr.endpos[2] - ent->r.mins[2] + 1;
 	}
@@ -259,7 +259,7 @@ void Drone_Think::execute()
 		else roll = targroll;
 		angles[ROLL] = roll;
 
-		AngleVectors( angles, vel, 0, 0 );
+		AngleVectors( angles, vel, nullptr, nullptr );
 	}
 	else
 	{
@@ -270,7 +270,7 @@ void Drone_Think::execute()
 		}
 		else
 		{
-			AngleVectors( angles, vel, 0, 0 );
+			AngleVectors( angles, vel, nullptr, nullptr );
 		}
 	}
 	VectorScale( vel, speed_, vel );
@@ -356,7 +356,7 @@ void Abandoned_Think::execute()
 		if( tr.fraction < 1.0f )
 			VectorCopy( tr.endpos, ent->r.currentOrigin );
 		ent->takedamage_ = true;
-		G_Damage( ent, 0, ent, 0, 0, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
+		G_Damage( ent, nullptr, ent, nullptr, nullptr, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
 		return;
 	}
 	VectorCopy( origin, ent->r.currentOrigin );
@@ -480,7 +480,7 @@ void Deck_Think::execute()
 		}
 	}
 
-	AngleVectors( angles, forward, 0, 0 );
+	AngleVectors( angles, forward, nullptr, nullptr );
 	VectorMA( origin, along_, forward, pos );
 
 	deck->s.pos.trType = TR_LINEAR;
@@ -594,7 +594,7 @@ GameEntity* SP_misc_vehicle( GameEntity *sp_ent )
 	{
 		Com_Printf ("%s (%s) cannot be spawned - index out of range\n", sp_ent->classname_, sp_ent->model_);
 		sp_ent->freeUp();
-		return 0;
+		return nullptr;
 	}
 
 	GameEntity* ent = theLevel.spawnEntity();

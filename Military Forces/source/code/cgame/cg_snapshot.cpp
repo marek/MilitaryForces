@@ -114,7 +114,7 @@ CG_TransitionSnapshot
 The transition point from snap to nextSnap has passed
 ===================
 */
-static void CG_TransitionSnapshot( void ) {
+static void CG_TransitionSnapshot( ) {
 	centity_t			*cent;
 	snapshot_t			*oldFrame;
 	int					i;
@@ -154,7 +154,7 @@ static void CG_TransitionSnapshot( void ) {
 		cent->snapShotTime = cg.snap->serverTime;
 	}
 
-	cg.nextSnap = NULL;
+	cg.nextSnap = nullptr;
 
 	// check for playerstate transition events
 	if ( oldFrame ) {
@@ -259,7 +259,7 @@ times if the client system fails to return a
 valid snapshot.
 ========================
 */
-static snapshot_t *CG_ReadNextSnapshot( void ) {
+static snapshot_t *CG_ReadNextSnapshot( ) {
 	int	r;
 	snapshot_t	*dest;
 
@@ -297,14 +297,14 @@ static snapshot_t *CG_ReadNextSnapshot( void ) {
 		// buffer in the client system.
 
 		// record as a dropped packet
-		CG_AddLagometerSnapshotInfo( NULL );
+		CG_AddLagometerSnapshotInfo( nullptr );
 
 		// If there are additional snapshots, continue trying to
 		// read them.
 	}
 
 	// nothing left to read
-	return NULL;
+	return nullptr;
 }
 
 
@@ -327,7 +327,7 @@ of an interpolating one)
 
 ============
 */
-void CG_ProcessSnapshots( void ) {
+void CG_ProcessSnapshots( ) {
 	snapshot_t		*snap;
 	int				n;
 
@@ -388,17 +388,17 @@ void CG_ProcessSnapshots( void ) {
 
 		// we have passed the transition from nextFrame to frame
 		CG_TransitionSnapshot();
-	} while ( 1 );
+	} while ( true );
 
 	// assert our valid conditions upon exiting
-	if ( cg.snap == NULL ) {
+	if ( cg.snap == nullptr ) {
 		Com_Error( ERR_DROP, "CG_ProcessSnapshots: cg.snap == NULL" );
 	}
 	if ( cg.time < cg.snap->serverTime ) {
 		// this can happen right after a vid_restart
 		cg.time = cg.snap->serverTime;
 	}
-	if ( cg.nextSnap != NULL && cg.nextSnap->serverTime <= cg.time ) {
+	if ( cg.nextSnap != nullptr && cg.nextSnap->serverTime <= cg.time ) {
 		Com_Error( ERR_DROP, "CG_ProcessSnapshots: cg.nextSnap->serverTime <= cg.time" );
 	}
 

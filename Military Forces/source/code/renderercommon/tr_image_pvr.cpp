@@ -201,7 +201,7 @@ static byte *decode(pvr_t *pvr, int offset, bool detwiddle, pvr_pixel_func_t pix
 			if (ofs < 0)
 			{
 				ri.Free(ret);
-				return NULL;
+				return nullptr;
 			}
 
 			color = *(unsigned short *)(((byte *)(pvr + 1)) + ofs);
@@ -242,7 +242,7 @@ static byte *decode_vq(pvr_t *pvr, int offset, bool detwiddle, pvr_pixel_func_t 
 			if (idx < 0)
 			{
 				ri.Free(ret);
-				return NULL;
+				return nullptr;
 			}
 
 			colors = &codebook[indices[idx] * 4];
@@ -270,9 +270,9 @@ void R_LoadPVR(const char *name, byte **pic, int *width, int *height)
 	pvr_t *pvr;
 	int pixel_type, image_type;
 	pvr_pixel_func_t pixel_func;
-	byte *ret = NULL;
+	byte *ret = nullptr;
 
-	*pic = NULL;
+	*pic = nullptr;
 	if (width)
 		*width = 0;
 	if (height)

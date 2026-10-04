@@ -26,7 +26,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 R_PerformanceCounters
 =====================
 */
-void R_PerformanceCounters( void ) {
+void R_PerformanceCounters( ) {
 	if ( !r_speeds->integer ) {
 		// clear the counters even if we aren't printing
 		Com_Memset( &tr.pc, 0, sizeof( tr.pc ) );
@@ -112,7 +112,7 @@ R_IssuePendingRenderCommands
 Issue any pending commands and wait for them to complete.
 ====================
 */
-void R_IssuePendingRenderCommands( void ) {
+void R_IssuePendingRenderCommands( ) {
 	if ( !tr.registered ) {
 		return;
 	}
@@ -139,7 +139,7 @@ void *R_GetCommandBufferReserved( int bytes, int reservedBytes ) {
 		}
 		// if we run out of room, just start dropping commands
 		ri.Printf( PRINT_WARNING, "Failed to allocate render command of size %d\n", bytes );
-		return NULL;
+		return nullptr;
 	}
 
 	cmdList->used += bytes;
@@ -208,7 +208,7 @@ R_AddPostProcessCmd
 
 =============
 */
-void	R_AddPostProcessCmd( void ) {
+void	R_AddPostProcessCmd( ) {
 	postProcessCommand_t	*cmd;
 
 	cmd = (postProcessCommand_t *)R_GetCommandBuffer( sizeof( *cmd ) );
@@ -333,8 +333,8 @@ for each RE_EndFrame
 ====================
 */
 void RE_BeginFrame( stereoFrame_t stereoFrame ) {
-	drawBufferCommand_t	*cmd = NULL;
-	colorMaskCommand_t *colcmd = NULL;
+	drawBufferCommand_t	*cmd = nullptr;
+	colorMaskCommand_t *colcmd = nullptr;
 
 	if ( !tr.registered ) {
 		return;
@@ -466,7 +466,7 @@ void RE_BeginFrame( stereoFrame_t stereoFrame ) {
 						qglClear(GL_COLOR_BUFFER_BIT);
 					}
 
-					FBO_Bind(NULL);
+					FBO_Bind(nullptr);
 				}
 
 				qglDrawBuffer(GL_FRONT);
@@ -519,10 +519,10 @@ void RE_BeginFrame( stereoFrame_t stereoFrame ) {
 			if(r_anaglyphMode->modified)
 			{
 				qglColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-				backEnd.colorMask[0] = 0;
-				backEnd.colorMask[1] = 0;
-				backEnd.colorMask[2] = 0;
-				backEnd.colorMask[3] = 0;
+				backEnd.colorMask[0] = false;
+				backEnd.colorMask[1] = false;
+				backEnd.colorMask[2] = false;
+				backEnd.colorMask[3] = false;
 				r_anaglyphMode->modified = false;
 			}
 

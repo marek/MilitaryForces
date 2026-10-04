@@ -8,12 +8,12 @@ struct VehicleBase : public GameEntity
 {
 	struct VehicleDeath : public GameEntity::EntityFunc_Die
 	{
-		virtual void	execute( GameEntity* inflictor, GameEntity* attacker, int damage, int mod );
+		void	execute( GameEntity* inflictor, GameEntity* attacker, int damage, int mod ) override;
 	};
 
 	struct VehicleDie : public GameEntity::EntityFunc_Die
 	{
-		virtual void	execute( GameEntity* inflictor, GameEntity* attacker, int damage, int mod );
+		void	execute( GameEntity* inflictor, GameEntity* attacker, int damage, int mod ) override;
 	};
 };
 

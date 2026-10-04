@@ -98,7 +98,7 @@ void SV_GameSendServerCommand( int clientNum, const char *text )
 {
 	if ( clientNum == -1 ) 
 	{
-		SV_SendServerCommand( NULL, "%s", text );
+		SV_SendServerCommand( nullptr, "%s", text );
 	} 
 	else 
 	{
@@ -356,7 +356,7 @@ SV_RestartGameProgs
 Called on a map_restart, but not on a normal map change
 ===================
 */
-void SV_RestartGameProgs( void ) 
+void SV_RestartGameProgs( ) 
 {
 	if( !theSG.isInitialized() )
 		return;

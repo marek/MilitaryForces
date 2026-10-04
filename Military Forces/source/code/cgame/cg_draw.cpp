@@ -19,8 +19,8 @@
 //extern UI_DisplayContextCG cgUtils.dc_;
 extern UI_UtilsCG cgUtils;
 
-menuDef_t *menuScoreboard = NULL;
-menuDef_t *menuSpectator = NULL;
+menuDef_t *menuScoreboard = nullptr;
+menuDef_t *menuSpectator = nullptr;
 
 /*
 ===============================================================================
@@ -308,7 +308,7 @@ void CG_Text_Paint(float x, float y, float scale, const vec4_t color, const char
 			}
     }
 	 
-	refExport.SetColor( NULL );
+	refExport.SetColor( nullptr );
 	}
 }
 
@@ -499,7 +499,7 @@ void CG_DrawTeamBackground( int x, int y, int w, int h, float alpha, int team )
 	}
 	refExport.SetColor( hcolor );
 	CG_DrawPic( x, y, w, h, cgs.media.teamStatusBar );
-	refExport.SetColor( NULL );
+	refExport.SetColor( nullptr );
 }
 
 
@@ -586,7 +586,7 @@ static float CG_DrawFPS( float y ) {
 		w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 
 
-		cgUtils.drawStringNew( 635, y + 2, 0.5f, *cgUtils.createColourVector(1,1,1,1,NULL), s, 0, 0, 3, RIGHT_JUSTIFY );
+		cgUtils.drawStringNew( 635, y + 2, 0.5f, *cgUtils.createColourVector(1,1,1,1,nullptr), s, 0, 0, 3, RIGHT_JUSTIFY );
 
 	}
 
@@ -600,7 +600,7 @@ static float CG_DrawParticleStats( float y ) {
 	s = va( "# Particles: %i", pw.numParticles );
 	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 
-	cgUtils.drawStringNew( 635, y + 2, 0.5f, *cgUtils.createColourVector(1,1,1,1,NULL), s, 0, 0, 3, RIGHT_JUSTIFY );
+	cgUtils.drawStringNew( 635, y + 2, 0.5f, *cgUtils.createColourVector(1,1,1,1,nullptr), s, 0, 0, 3, RIGHT_JUSTIFY );
 	
 	return y + BIGCHAR_HEIGHT + 4;
 }
@@ -773,7 +773,7 @@ CG_DrawDisconnect
 Should we draw something differnet for long lag vs no packets?
 ==============
 */
-static void CG_DrawDisconnect( void ) {
+static void CG_DrawDisconnect( ) {
 	float		x, y;
 	int			cmdNum;
 	usercmd_t	cmd;
@@ -844,7 +844,7 @@ static void CG_DrawLagometer( float y )
 		y += 2;
 	}
 
-	refExport.SetColor( NULL );
+	refExport.SetColor( nullptr );
 	CG_DrawPic( x, y, 48, 48, cgs.media.lagometerShader );
 
 	ax = x;
@@ -919,7 +919,7 @@ static void CG_DrawLagometer( float y )
 		}
 	}
 
-	refExport.SetColor( NULL );
+	refExport.SetColor( nullptr );
 
 	if ( cg_nopredict.integer || cg_synchronousClients.integer ) {
 		CG_DrawBigString( ax, ay, "snc", 1.0 );
@@ -938,7 +938,7 @@ Is the New HUD actually being draw?
 =====================
 */
 
-bool CG_NewHUDActive( void )
+bool CG_NewHUDActive( )
 {
 	// definatley not active?
 	if ( cg.snap->ps.pm_type == PM_DEAD ||
@@ -962,7 +962,7 @@ CG_DrawCustomConsole
 
 #define LINE_HEIGHT	14
 
-static void CG_DrawCustomConsole( void )
+static void CG_DrawCustomConsole( )
 {
 	float alpha = 0.0f;
 	int drawIdx = 0;
@@ -999,7 +999,7 @@ static void CG_DrawCustomConsole( void )
 
 			// draw line
 			// NOTE: use *CG_CreateColour(1,1,1,alpha) to fade out whilst scrolling up
-			cgUtils.drawStringNew( cox, coy, 0.25f, *cgUtils.createColourVector(1,1,1,alpha,NULL), 
+			cgUtils.drawStringNew( cox, coy, 0.25f, *cgUtils.createColourVector(1,1,1,alpha,nullptr), 
 				consoleLine[drawIdx].text, 0, 0, cg_consoleTextStyle.integer, LEFT_JUSTIFY );
 
 			// reduce life based upon time
@@ -1042,7 +1042,7 @@ CG_DrawUpperLeft
 =====================
 */
 
-static void CG_DrawUpperLeft( void )
+static void CG_DrawUpperLeft( )
 {
 	rectDef_t fillRect;
 	
@@ -1469,7 +1469,7 @@ CG_AddLagometerFrameInfo
 Adds the current interpolate / extrapolate bar for this frame
 ==============
 */
-void CG_AddLagometerFrameInfo( void ) {
+void CG_AddLagometerFrameInfo( ) {
 	int			offset;
 
 	offset = cg.time - cg.latestSnapshotTime;
@@ -1543,7 +1543,7 @@ void CG_CenterPrint( const char *str, int y, int charWidth ) {
 CG_DrawCenterString
 ===================
 */
-static void CG_DrawCenterString( void ) {
+static void CG_DrawCenterString( ) {
 	char	*start;
 	int		l;
 	int		x, y, w;//, h;
@@ -1564,7 +1564,7 @@ static void CG_DrawCenterString( void ) {
 
 	y = cg.centerPrintY - cg.centerPrintLines * BIGCHAR_HEIGHT / 2;
 
-	while ( 1 ) {
+	while ( true ) {
 		char linebuffer[1024];
 
 		for ( l = 0; l < 50; l++ ) {
@@ -1592,7 +1592,7 @@ static void CG_DrawCenterString( void ) {
 		start++;
 	}
 
-	refExport.SetColor( NULL );
+	refExport.SetColor( nullptr );
 }
 
 
@@ -1698,7 +1698,7 @@ static void CG_ScanForCrosshairEntity( void ) {
 CG_DrawCrosshairNames
 =====================
 */
-static void CG_DrawCrosshairNames( void ) {
+static void CG_DrawCrosshairNames( ) {
 	float		*color;
 	char		*name;
 	float		w;
@@ -1720,7 +1720,7 @@ static void CG_DrawCrosshairNames( void ) {
 	color = CG_FadeColor( cg.crosshairClientTime, 1000 );
 	if ( !color )
 	{
-		refExport.SetColor( NULL );
+		refExport.SetColor( nullptr );
 		return;
 	}
 
@@ -1730,7 +1730,7 @@ static void CG_DrawCrosshairNames( void ) {
 
 	cgUtils.drawStringNew( 320, 170, 0.5f, color, name, 0, 0, ITEM_TEXTSTYLE_OUTLINED, CENTRE_JUSTIFY );
 
-	refExport.SetColor( NULL );
+	refExport.SetColor( nullptr );
 }
 
 
@@ -1741,10 +1741,10 @@ static void CG_DrawCrosshairNames( void ) {
 CG_DrawSpectator
 =================
 */
-static void CG_DrawSpectator(void) {
+static void CG_DrawSpectator() {
 
 	// this is where we load the spectator menu script
-	if( menuSpectator == NULL)
+	if( menuSpectator == nullptr)
 	{
 		menuSpectator = cgUtils.menu_FindByName("spectator_menu");
 	}
@@ -1809,7 +1809,7 @@ static void CG_DrawSpectator(void) {
 CG_DrawVote
 =================
 */
-static void CG_DrawVote(void) {
+static void CG_DrawVote() {
 	char	*s;
 	int		sec;
 
@@ -1836,7 +1836,7 @@ static void CG_DrawVote(void) {
 CG_DrawTeamVote
 =================
 */
-static void CG_DrawTeamVote(void) {
+static void CG_DrawTeamVote() {
 	char	*s;
 	int		sec, cs_offset;
 
@@ -1930,7 +1930,7 @@ static bool CG_DrawScoreboard()
 	}																					  
 
 	// this is where we load the correct scoreboard script
-	if (menuScoreboard == NULL)
+	if (menuScoreboard == nullptr)
 	{
 		if ( cgs.gametype >= GT_TEAM )
 		{
@@ -1968,7 +1968,7 @@ static bool CG_DrawScoreboard()
 CG_DrawIntermission
 =================
 */
-static void CG_DrawIntermission( void )
+static void CG_DrawIntermission( )
 {
 	if( cgs.gametype == GT_SINGLE_PLAYER )
 	{
@@ -1985,12 +1985,12 @@ static void CG_DrawIntermission( void )
 CG_DrawFollow
 =================
 */
-static bool CG_DrawFollow( void )
+static bool CG_DrawFollow( )
 {
 //	float		x = 0;
-	vec4_t		*pColor = NULL;
+	vec4_t		*pColor = nullptr;
 //	vec4_t		color = {0,0,0,0};
-	const char	*name = NULL;
+	const char	*name = nullptr;
 
 	// are we NOT following?
 	if( !(cg.snap->ps.pm_flags & PMF_FOLLOW) )
@@ -2004,16 +2004,16 @@ static bool CG_DrawFollow( void )
 	cgUtils.drawStringNewAlpha( 320, 48, "following ", 1.0f, RIGHT_JUSTIFY );
 
 	// default colour
-	pColor = cgUtils.createColourVector( 0.0f, 0.75f, 0.0f, 1.0f, NULL );	// default: green
+	pColor = cgUtils.createColourVector( 0.0f, 0.75f, 0.0f, 1.0f, nullptr );	// default: green
 
 	// team colour?
 	if( cgs.clientinfo[ cg.snap->ps.clientNum ].team == 1 )
 	{
-		pColor = cgUtils.createColourVector( 0.75f, 0.0f, 0.0f, 1.0f, NULL );	// team: red
+		pColor = cgUtils.createColourVector( 0.75f, 0.0f, 0.0f, 1.0f, nullptr );	// team: red
 	}
 	else if( cgs.clientinfo[ cg.snap->ps.clientNum ].team == 2 )
 	{
-		pColor = cgUtils.createColourVector( 0.0f, 0.0f, 0.75f, 1.0f, NULL );	// team: blue
+		pColor = cgUtils.createColourVector( 0.0f, 0.0f, 0.75f, 1.0f, nullptr );	// team: blue
 	}
 
 	// get name of player being followed
@@ -2030,7 +2030,7 @@ static bool CG_DrawFollow( void )
 CG_DrawWarmup
 =================
 */
-static void CG_DrawWarmup( void ) {
+static void CG_DrawWarmup( ) {
 	int			w;
 	int			sec;
 	int			i;
@@ -2049,15 +2049,15 @@ static void CG_DrawWarmup( void ) {
 		w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 		cg.warmupCount = 0;
 
-		cgUtils.drawStringNew( 320, 64, 0.5f, *cgUtils.createColourVector(1,1,1,1,NULL), s, 0, 0, 3, CENTRE_JUSTIFY );
+		cgUtils.drawStringNew( 320, 64, 0.5f, *cgUtils.createColourVector(1,1,1,1,nullptr), s, 0, 0, 3, CENTRE_JUSTIFY );
 
 		return;
 	}
 
 	if (cgs.gametype == GT_TOURNAMENT) {
 		// find the two active players
-		ci1 = NULL;
-		ci2 = NULL;
+		ci1 = nullptr;
+		ci2 = nullptr;
 		for ( i = 0 ; i < cgs.maxclients ; i++ ) {
 			if ( cgs.clientinfo[i].infoValid && cgs.clientinfo[i].team == ClientBase::TEAM_FREE ) {
 				if ( !ci1 ) {
@@ -2166,7 +2166,7 @@ to keep it in case we have to look something up later
 - old version shall be deleted later though!
 =================
 */
-static void CG_Draw2D_MFQ3( void ) {
+static void CG_Draw2D_MFQ3( ) {
 
 	// if we are taking a levelshot for the menu, don't draw anything
 	if ( cg.levelShot )
@@ -2306,9 +2306,9 @@ CG_GetGameStatusText
 const char *CG_GetGameStatusText()
 {
 	const char * s = "";
-	char * pFormatStringDraw = NULL;
-	char * pFormatStringRedWin = NULL;
-	char * pFormatStringBlueWin = NULL;
+	char * pFormatStringDraw = nullptr;
+	char * pFormatStringRedWin = nullptr;
+	char * pFormatStringBlueWin = nullptr;
 	
 	// which gametype?
 	if ( cgs.gametype == GT_FFA )
@@ -2378,8 +2378,8 @@ CG_GameTypeString
 */
 const char *CG_GameTypeString()
 {
-	const char * pGameType = NULL;
-	const char * pGameSet = NULL;
+	const char * pGameType = nullptr;
+	const char * pGameSet = nullptr;
 
 	// get game type
 	if ( cgs.gametype == GT_FFA ) {

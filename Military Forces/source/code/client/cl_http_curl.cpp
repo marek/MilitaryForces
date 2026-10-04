@@ -41,9 +41,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 cvar_t *cl_cURLLib;
 
-char* (*qcurl_version)(void);
+char* (*qcurl_version)();
 
-CURL* (*qcurl_easy_init)(void);
+CURL* (*qcurl_easy_init)();
 CURLcode (*qcurl_easy_setopt)(CURL *curl, CURLoption option, ...);
 CURLcode (*qcurl_easy_perform)(CURL *curl);
 void (*qcurl_easy_cleanup)(CURL *curl);
@@ -52,7 +52,7 @@ CURL* (*qcurl_easy_duphandle)(CURL *curl);
 void (*qcurl_easy_reset)(CURL *curl);
 const char *(*qcurl_easy_strerror)(CURLcode);
 
-CURLM* (*qcurl_multi_init)(void);
+CURLM* (*qcurl_multi_init)();
 CURLMcode (*qcurl_multi_add_handle)(CURLM *multi_handle,
                                                 CURL *curl_handle);
 CURLMcode (*qcurl_multi_remove_handle)(CURLM *multi_handle,
@@ -69,11 +69,11 @@ CURLMsg *(*qcurl_multi_info_read)(CURLM *multi_handle,
                                                 int *msgs_in_queue);
 const char *(*qcurl_multi_strerror)(CURLMcode);
 
-static void *cURLLib = NULL;
+static void *cURLLib = nullptr;
 static bool cURLSymbolLoadFailed = false;
 
-static CURL *downloadCURL = NULL;
-static CURLM *downloadCURLM = NULL;
+static CURL *downloadCURL = nullptr;
+static CURLM *downloadCURLM = nullptr;
 
 /*
 =================
@@ -89,7 +89,7 @@ static void *GPA(char *str)
 	{
 		Com_Printf("Can't load symbol %s\n", str);
 		cURLSymbolLoadFailed = true;
-		return NULL;
+		return nullptr;
 	}
 	else
 	{
@@ -103,7 +103,7 @@ static void *GPA(char *str)
 CL_HTTP_Init
 =================
 */
-bool CL_HTTP_Init(void)
+bool CL_HTTP_Init()
 {
 	if(cURLLib)
 		return true;
@@ -158,12 +158,12 @@ bool CL_HTTP_Init(void)
 CL_HTTP_Available
 =================
 */
-bool CL_HTTP_Available(void)
+bool CL_HTTP_Available()
 {
-	return cURLLib != NULL;
+	return cURLLib != nullptr;
 }
 
-static void CL_cURL_Cleanup(void)
+static void CL_cURL_Cleanup()
 {
 	if(downloadCURLM) {
 		CURLMcode result;
@@ -180,12 +180,12 @@ static void CL_cURL_Cleanup(void)
 		if(result != CURLM_OK) {
 			Com_DPrintf("CL_cURL_Cleanup: qcurl_multi_cleanup failed: %s\n", qcurl_multi_strerror(result));
 		}
-		downloadCURLM = NULL;
-		downloadCURL = NULL;
+		downloadCURLM = nullptr;
+		downloadCURL = nullptr;
 	}
 	else if(downloadCURL) {
 		qcurl_easy_cleanup(downloadCURL);
-		downloadCURL = NULL;
+		downloadCURL = nullptr;
 	}
 }
 
@@ -194,31 +194,31 @@ static void CL_cURL_Cleanup(void)
 CL_HTTP_Shutdown
 =================
 */
-void CL_HTTP_Shutdown( void )
+void CL_HTTP_Shutdown( )
 {
 	CL_cURL_Cleanup();
 
 	if(cURLLib)
 	{
 		Sys_UnloadLibrary(cURLLib);
-		cURLLib = NULL;
+		cURLLib = nullptr;
 	}
-	qcurl_easy_init = NULL;
-	qcurl_easy_setopt = NULL;
-	qcurl_easy_perform = NULL;
-	qcurl_easy_cleanup = NULL;
-	qcurl_easy_getinfo = NULL;
-	qcurl_easy_duphandle = NULL;
-	qcurl_easy_reset = NULL;
+	qcurl_easy_init = nullptr;
+	qcurl_easy_setopt = nullptr;
+	qcurl_easy_perform = nullptr;
+	qcurl_easy_cleanup = nullptr;
+	qcurl_easy_getinfo = nullptr;
+	qcurl_easy_duphandle = nullptr;
+	qcurl_easy_reset = nullptr;
 
-	qcurl_multi_init = NULL;
-	qcurl_multi_add_handle = NULL;
-	qcurl_multi_remove_handle = NULL;
-	qcurl_multi_fdset = NULL;
-	qcurl_multi_perform = NULL;
-	qcurl_multi_cleanup = NULL;
-	qcurl_multi_info_read = NULL;
-	qcurl_multi_strerror = NULL;
+	qcurl_multi_init = nullptr;
+	qcurl_multi_add_handle = nullptr;
+	qcurl_multi_remove_handle = nullptr;
+	qcurl_multi_fdset = nullptr;
+	qcurl_multi_perform = nullptr;
+	qcurl_multi_cleanup = nullptr;
+	qcurl_multi_info_read = nullptr;
+	qcurl_multi_strerror = nullptr;
 }
 
 static int CL_cURL_CallbackProgress(void *clientp, curl_off_t dltotal, curl_off_t dlnow,
@@ -304,7 +304,7 @@ void CL_HTTP_BeginDownload( const char *remoteURL )
 	downloadCURLM = qcurl_multi_init();
 	if(!downloadCURLM) {
 		qcurl_easy_cleanup(downloadCURL);
-		downloadCURL = NULL;
+		downloadCURL = nullptr;
 		Com_Error(ERR_DROP, "CL_HTTP_BeginDownload: qcurl_multi_init() "
 			"failed");
 		return;
@@ -312,13 +312,13 @@ void CL_HTTP_BeginDownload( const char *remoteURL )
 	result = qcurl_multi_add_handle(downloadCURLM, downloadCURL);
 	if(result != CURLM_OK) {
 		qcurl_easy_cleanup(downloadCURL);
-		downloadCURL = NULL;
+		downloadCURL = nullptr;
 		Com_Error(ERR_DROP,"CL_HTTP_BeginDownload: qcurl_multi_add_handle() failed: %s", qcurl_multi_strerror(result));
 		return;
 	}
 }
 
-bool CL_HTTP_PerformDownload(void)
+bool CL_HTTP_PerformDownload()
 {
 	CURLMcode res;
 	CURLMsg *msg;
@@ -333,7 +333,7 @@ bool CL_HTTP_PerformDownload(void)
 	if(res == CURLM_CALL_MULTI_PERFORM)
 		return false;
 	msg = qcurl_multi_info_read(downloadCURLM, &c);
-	if(msg == NULL) {
+	if(msg == nullptr) {
 		return false;
 	}
 	if(msg->msg != CURLMSG_DONE || msg->data.result != CURLE_OK) {

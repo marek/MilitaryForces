@@ -76,10 +76,10 @@ cvarTable_t		gameCvarTable[] = {
 	{ &g_cheats, "sv_cheats", "", 0, 0, false },
 
 	// noset vars
-	{ NULL, "gamename", GAME_IDENTIFIER , CVAR_SERVERINFO | CVAR_ROM, 0, false  },
-	{ NULL, "gamedate", __DATE__ , CVAR_ROM, 0, false  },
+	{ nullptr, "gamename", GAME_IDENTIFIER , CVAR_SERVERINFO | CVAR_ROM, 0, false  },
+	{ nullptr, "gamedate", __DATE__ , CVAR_ROM, 0, false  },
 	{ &g_restarted, "g_restarted", "0", CVAR_ROM, 0, false  },
-	{ NULL, "sv_mapname", "", CVAR_SERVERINFO | CVAR_ROM, 0, false  },
+	{ nullptr, "sv_mapname", "", CVAR_SERVERINFO | CVAR_ROM, 0, false  },
 
 	// latched vars
 	{ &g_gametype, "g_gametype", "0", CVAR_SERVERINFO | CVAR_LATCH, 0, false  },
@@ -211,7 +211,7 @@ void G_FindTeams()
 				if ( e2->targetname_ ) 
 				{
 					e->targetname_ = e2->targetname_;
-					e2->targetname_ = NULL;
+					e2->targetname_ = nullptr;
 				}
 			}
 		}
@@ -477,8 +477,8 @@ void AddTournamentPlayer()
 	if ( theLevel.intermissiontime_ ) 
 		return;
 
-	GameClient *nextInLine = 0;
-	GameClient	*client = 0;
+	GameClient *nextInLine = nullptr;
+	GameClient	*client = nullptr;
 	for ( int i = 1 ; i <= theLevel.maxclients_ ; i++ ) 
 	{
 		client = theLevel.getClient(i);
@@ -829,7 +829,7 @@ This is also used for spectator spawns
 void FindIntermissionPoint() 
 {
 	// find the intermission spot
-	GameEntity *ent = G_Find (NULL, FOFS(classname_), "info_player_intermission");
+	GameEntity *ent = G_Find (nullptr, FOFS(classname_), "info_player_intermission");
 	if ( !ent ) 
 	{	
 		// the map creator forgot to put in an intermission point...
@@ -916,14 +916,14 @@ void ExitLevel()
 			RemoveTournamentLoser();
 			Cbuf_ExecuteText( EXEC_APPEND, "map_restart 0\n" );
 			theLevel.restarted_ = true;
-			theLevel.changemap_ = 0;
+			theLevel.changemap_ = nullptr;
 			theLevel.intermissiontime_ = 0;
 		}
 		return;	
 	}
 
 	Cbuf_ExecuteText( EXEC_APPEND, "vstr nextmap\n" );
-	theLevel.changemap_ = 0;
+	theLevel.changemap_ = nullptr;
 	theLevel.intermissiontime_ = 0;
 
 	// reset all the scores so we don't enter the intermission again
@@ -1601,7 +1601,7 @@ void CheckTeamVote( int team )
 CheckCvars
 ==================
 */
-void CheckCvars( void ) {
+void CheckCvars( ) {
 	static int lastMod = -1;
 
 	if ( g_password.modificationCount != lastMod ) {
@@ -1665,7 +1665,7 @@ void G_RunFrame( int levelTime )
 	// go through all allocated objects
 	//
 	int start = Sys_Milliseconds();
-	GameEntity* ent = 0;//&g_entities[0];
+	GameEntity* ent = nullptr;//&g_entities[0];
 	for( i=0 ; i<theLevel.num_entities_ ; i++ )
 	{
 		ent = theLevel.getEntity(i);

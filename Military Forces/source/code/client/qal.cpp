@@ -107,7 +107,7 @@ LPALCCAPTURESTART qalcCaptureStart;
 LPALCCAPTURESTOP qalcCaptureStop;
 LPALCCAPTURESAMPLES qalcCaptureSamples;
 
-static void *OpenALLib = NULL;
+static void *OpenALLib = nullptr;
 
 static bool alinit_fail = false;
 
@@ -125,7 +125,7 @@ static void *GPA(char *str)
 	{
 		Com_Printf( " Can't load symbol %s\n", str);
 		alinit_fail = true;
-		return NULL;
+		return nullptr;
 	}
 	else
 	{
@@ -240,89 +240,89 @@ bool QAL_Init(const char *libname)
 QAL_Shutdown
 =================
 */
-void QAL_Shutdown( void )
+void QAL_Shutdown( )
 {
 	if(OpenALLib)
 	{
 		Sys_UnloadLibrary(OpenALLib);
-		OpenALLib = NULL;
+		OpenALLib = nullptr;
 	}
 
-	qalEnable = NULL;
-	qalDisable = NULL;
-	qalIsEnabled = NULL;
-	qalGetString = NULL;
-	qalGetBooleanv = NULL;
-	qalGetIntegerv = NULL;
-	qalGetFloatv = NULL;
-	qalGetDoublev = NULL;
-	qalGetBoolean = NULL;
-	qalGetInteger = NULL;
-	qalGetFloat = NULL;
-	qalGetDouble = NULL;
-	qalGetError = NULL;
-	qalIsExtensionPresent = NULL;
-	qalGetProcAddress = NULL;
-	qalGetEnumValue = NULL;
-	qalListenerf = NULL;
-	qalListener3f = NULL;
-	qalListenerfv = NULL;
-	qalListeneri = NULL;
-	qalGetListenerf = NULL;
-	qalGetListener3f = NULL;
-	qalGetListenerfv = NULL;
-	qalGetListeneri = NULL;
-	qalGenSources = NULL;
-	qalDeleteSources = NULL;
-	qalIsSource = NULL;
-	qalSourcef = NULL;
-	qalSource3f = NULL;
-	qalSourcefv = NULL;
-	qalSourcei = NULL;
-	qalGetSourcef = NULL;
-	qalGetSource3f = NULL;
-	qalGetSourcefv = NULL;
-	qalGetSourcei = NULL;
-	qalSourcePlayv = NULL;
-	qalSourceStopv = NULL;
-	qalSourceRewindv = NULL;
-	qalSourcePausev = NULL;
-	qalSourcePlay = NULL;
-	qalSourceStop = NULL;
-	qalSourceRewind = NULL;
-	qalSourcePause = NULL;
-	qalSourceQueueBuffers = NULL;
-	qalSourceUnqueueBuffers = NULL;
-	qalGenBuffers = NULL;
-	qalDeleteBuffers = NULL;
-	qalIsBuffer = NULL;
-	qalBufferData = NULL;
-	qalGetBufferf = NULL;
-	qalGetBufferi = NULL;
-	qalDopplerFactor = NULL;
-	qalSpeedOfSound = NULL;
-	qalDistanceModel = NULL;
+	qalEnable = nullptr;
+	qalDisable = nullptr;
+	qalIsEnabled = nullptr;
+	qalGetString = nullptr;
+	qalGetBooleanv = nullptr;
+	qalGetIntegerv = nullptr;
+	qalGetFloatv = nullptr;
+	qalGetDoublev = nullptr;
+	qalGetBoolean = nullptr;
+	qalGetInteger = nullptr;
+	qalGetFloat = nullptr;
+	qalGetDouble = nullptr;
+	qalGetError = nullptr;
+	qalIsExtensionPresent = nullptr;
+	qalGetProcAddress = nullptr;
+	qalGetEnumValue = nullptr;
+	qalListenerf = nullptr;
+	qalListener3f = nullptr;
+	qalListenerfv = nullptr;
+	qalListeneri = nullptr;
+	qalGetListenerf = nullptr;
+	qalGetListener3f = nullptr;
+	qalGetListenerfv = nullptr;
+	qalGetListeneri = nullptr;
+	qalGenSources = nullptr;
+	qalDeleteSources = nullptr;
+	qalIsSource = nullptr;
+	qalSourcef = nullptr;
+	qalSource3f = nullptr;
+	qalSourcefv = nullptr;
+	qalSourcei = nullptr;
+	qalGetSourcef = nullptr;
+	qalGetSource3f = nullptr;
+	qalGetSourcefv = nullptr;
+	qalGetSourcei = nullptr;
+	qalSourcePlayv = nullptr;
+	qalSourceStopv = nullptr;
+	qalSourceRewindv = nullptr;
+	qalSourcePausev = nullptr;
+	qalSourcePlay = nullptr;
+	qalSourceStop = nullptr;
+	qalSourceRewind = nullptr;
+	qalSourcePause = nullptr;
+	qalSourceQueueBuffers = nullptr;
+	qalSourceUnqueueBuffers = nullptr;
+	qalGenBuffers = nullptr;
+	qalDeleteBuffers = nullptr;
+	qalIsBuffer = nullptr;
+	qalBufferData = nullptr;
+	qalGetBufferf = nullptr;
+	qalGetBufferi = nullptr;
+	qalDopplerFactor = nullptr;
+	qalSpeedOfSound = nullptr;
+	qalDistanceModel = nullptr;
 
-	qalcCreateContext = NULL;
-	qalcMakeContextCurrent = NULL;
-	qalcProcessContext = NULL;
-	qalcSuspendContext = NULL;
-	qalcDestroyContext = NULL;
-	qalcGetCurrentContext = NULL;
-	qalcGetContextsDevice = NULL;
-	qalcOpenDevice = NULL;
-	qalcCloseDevice = NULL;
-	qalcGetError = NULL;
-	qalcIsExtensionPresent = NULL;
-	qalcGetProcAddress = NULL;
-	qalcGetEnumValue = NULL;
-	qalcGetString = NULL;
-	qalcGetIntegerv = NULL;
-	qalcCaptureOpenDevice = NULL;
-	qalcCaptureCloseDevice = NULL;
-	qalcCaptureStart = NULL;
-	qalcCaptureStop = NULL;
-	qalcCaptureSamples = NULL;
+	qalcCreateContext = nullptr;
+	qalcMakeContextCurrent = nullptr;
+	qalcProcessContext = nullptr;
+	qalcSuspendContext = nullptr;
+	qalcDestroyContext = nullptr;
+	qalcGetCurrentContext = nullptr;
+	qalcGetContextsDevice = nullptr;
+	qalcOpenDevice = nullptr;
+	qalcCloseDevice = nullptr;
+	qalcGetError = nullptr;
+	qalcIsExtensionPresent = nullptr;
+	qalcGetProcAddress = nullptr;
+	qalcGetEnumValue = nullptr;
+	qalcGetString = nullptr;
+	qalcGetIntegerv = nullptr;
+	qalcCaptureOpenDevice = nullptr;
+	qalcCaptureCloseDevice = nullptr;
+	qalcCaptureStart = nullptr;
+	qalcCaptureStop = nullptr;
+	qalcCaptureSamples = nullptr;
 }
 #else
 bool QAL_Init(const char *libname)

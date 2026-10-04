@@ -186,7 +186,7 @@ int R_ComputeLOD( trRefEntity_t *ent ) {
 		{
 			int frameSize;
 			mdr = (mdrHeader_t *) tr.currentModel->modelData;
-			frameSize = (size_t) (&((mdrFrame_t *)0)->bones[mdr->numBones]);
+			frameSize = (size_t) (&((mdrFrame_t *)nullptr)->bones[mdr->numBones]);
 			
 			mdrframe = (mdrFrame_t *) ((byte *) mdr + mdr->ofsFrames + frameSize * ent->e.frame);
 			
@@ -281,10 +281,10 @@ R_AddMD3Surfaces
 */
 void R_AddMD3Surfaces( trRefEntity_t *ent ) {
 	int				i;
-	md3Header_t		*header = NULL;
-	md3Surface_t	*surface = NULL;
-	md3Shader_t		*md3Shader = NULL;
-	shader_t		*shader = NULL;
+	md3Header_t		*header = nullptr;
+	md3Surface_t	*surface = nullptr;
+	md3Shader_t		*md3Shader = nullptr;
+	shader_t		*shader = nullptr;
 	int				cull;
 	int				lod;
 	int				fogNum;

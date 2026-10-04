@@ -11,7 +11,7 @@ struct Entity_Boat : public VehicleBase
 {
 	struct Entity_Boat_Pain : public EntityFunc_Pain
 	{
-		virtual void	execute( GameEntity* attacker, int damage );
+		void	execute( GameEntity* attacker, int damage ) override;
 	};
 };
 

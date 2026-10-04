@@ -478,7 +478,7 @@ char *MSG_ReadString( msg_t *msg ) {
 			break;
 		}
 		string[l++] = c;
-	} while (1);
+	} while (true);
 	
 	string[l] = '\0';
 	
@@ -508,7 +508,7 @@ char *MSG_ReadBigString( msg_t *msg ) {
 			break;
 		}
 		string[l++] = c;
-	} while (1);
+	} while (true);
 	
 	string[l] = '\0';
 	
@@ -538,7 +538,7 @@ char *MSG_ReadStringLine( msg_t *msg ) {
 			break;
 		}
 		string[l++] = c;
-	} while (1);
+	} while (true);
 	
 	string[l] = '\0';
 	
@@ -743,7 +743,7 @@ MSG_ReportChangeVectors_f
 Prints out a table from the current statistics for copying to code
 =================
 */
-void MSG_ReportChangeVectors_f( void ) {
+void MSG_ReportChangeVectors_f( ) {
 	int i;
 	for(i=0;i<256;i++) {
 		if (pcount[i]) {
@@ -901,8 +901,8 @@ static bool MSG_WriteEntity( msg_t *msg, struct entityState_s *from, struct enti
 	assert( numFields + 1 == sizeof( *from )/4 );
 
 	// a NULL to is a delta remove message
-	if ( to == NULL ) {
-		if ( from == NULL ) {
+	if ( to == nullptr ) {
+		if ( from == nullptr ) {
 			return false;
 		}
 		MSG_WriteBits( msg, from->number, GENTITYNUM_BITS );
@@ -1015,7 +1015,7 @@ static bool MSG_WriteEntity( msg_t *msg, struct entityState_s *from, struct enti
 
 void MSG_WriteDeltaEntity( msg_t *msg, struct entityState_s *from, struct entityState_s *to, 
 						   bool force ) {
-	MSG_WriteEntity( msg, from, to, force, -1, 0, NULL );
+	MSG_WriteEntity( msg, from, to, force, -1, 0, nullptr );
 }
 
 /*
@@ -1856,7 +1856,7 @@ MSG_HuffStats_f
 Writes the byte counts gathered with msg_huffstats 1 as a msg_hData table
 ==================
 */
-void MSG_HuffStats_f( void ) {
+void MSG_HuffStats_f( ) {
 	char	out[256 * 32];
 	int		i;
 
@@ -1868,7 +1868,7 @@ void MSG_HuffStats_f( void ) {
 	Com_Printf( "wrote huffstats.txt\n" );
 }
 
-void MSG_InitHuffStats( void ) {
+void MSG_InitHuffStats( ) {
 	msg_huffstats = Cvar_Get( "msg_huffstats", "0", CVAR_TEMP );
 	Cmd_AddCommand( "huffstats", MSG_HuffStats_f );
 }

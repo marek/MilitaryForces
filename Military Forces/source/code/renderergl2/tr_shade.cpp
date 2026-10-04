@@ -258,7 +258,7 @@ static void DrawNormals (shaderCommands_t *input) {
 
 	// position at location 0 in this backend
 	qglEnableVertexAttribArray(ATTR_INDEX_POSITION);
-	qglVertexAttribPointer(ATTR_INDEX_POSITION, 3, GL_FLOAT, GL_FALSE, 0, (const void*)0);
+	qglVertexAttribPointer(ATTR_INDEX_POSITION, 3, GL_FLOAT, GL_FALSE, 0, (const void*)nullptr);
 
 	qglDrawArrays(GL_LINES, 0, numVerts);
 
@@ -488,7 +488,7 @@ static void ComputeDeformValues(int *deformGen, vec5_t deformParams)
 }
 
 
-static void ProjectDlightTexture( void ) {
+static void ProjectDlightTexture( ) {
 	int		l;
 	vec3_t	origin;
 	float	scale;
@@ -794,7 +794,7 @@ static void ComputeFogColorMask( shaderStage_t *pStage, vec4_t fogColorMask )
 }
 
 
-static void ForwardDlight( void ) {
+static void ForwardDlight( ) {
 	int		l;
 	//vec3_t	origin;
 	//float	scale;
@@ -972,7 +972,7 @@ static void ForwardDlight( void ) {
 }
 
 
-static void ProjectPshadowVBOGLSL( void ) {
+static void ProjectPshadowVBOGLSL( ) {
 	int		l;
 	vec3_t	origin;
 	float	radius;
@@ -1049,7 +1049,7 @@ RB_FogPass
 Blends a fog texture on top of everything else
 ===================
 */
-static void RB_FogPass( void ) {
+static void RB_FogPass( ) {
 	fog_t		*fog;
 	vec4_t  color;
 	vec4_t	fogDistanceVector, fogDepthVector = {0, 0, 0, 0};
@@ -1409,7 +1409,7 @@ static void RB_IterateStagesGeneric( shaderCommands_t *input )
 		{
 			if (!(pStage->stateBits & GLS_ATEST_BITS))
 				GL_BindToTMU( tr.whiteImage, TB_COLORMAP );
-			else if ( pStage->bundle[TB_COLORMAP].image[0] != 0 )
+			else if ( pStage->bundle[TB_COLORMAP].image[0] != nullptr )
 				R_BindAnimatedImageToTMU( &pStage->bundle[TB_COLORMAP], TB_COLORMAP );
 		}
 		else if ( pStage->glslShaderGroup == tr.lightallShader )
@@ -1512,7 +1512,7 @@ static void RB_IterateStagesGeneric( shaderCommands_t *input )
 
 			GLSL_SetUniformVec4(sp, UNIFORM_ENABLETEXTURES, enableTextures);
 		}
-		else if ( pStage->bundle[1].image[0] != 0 )
+		else if ( pStage->bundle[1].image[0] != nullptr )
 		{
 			R_BindAnimatedImageToTMU( &pStage->bundle[0], 0 );
 			R_BindAnimatedImageToTMU( &pStage->bundle[1], 1 );
@@ -1630,7 +1630,7 @@ static void RB_RenderShadowmap( shaderCommands_t *input )
 /*
 ** RB_StageIteratorGeneric
 */
-void RB_StageIteratorGeneric( void )
+void RB_StageIteratorGeneric( )
 {
 	shaderCommands_t *input;
 	unsigned int vertexAttribs = 0;
@@ -1788,7 +1788,7 @@ void RB_StageIteratorGeneric( void )
 /*
 ** RB_EndSurface
 */
-void RB_EndSurface( void ) {
+void RB_EndSurface( ) {
 	shaderCommands_t *input;
 
 	input = &tess;

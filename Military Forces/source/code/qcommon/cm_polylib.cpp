@@ -340,7 +340,7 @@ void	ClipWindingEpsilon (winding_t *in, vec3_t normal, vec_t dist,
 	sides[i] = sides[0];
 	dists[i] = dists[0];
 	
-	*front = *back = NULL;
+	*front = *back = nullptr;
 
 	if (!counts[0])
 	{
@@ -456,7 +456,7 @@ void ChopWindingInPlace (winding_t **inout, vec3_t normal, vec_t dist, vec_t eps
 	if (!counts[0])
 	{
 		FreeWinding (in);
-		*inout = NULL;
+		*inout = nullptr;
 		return;
 	}
 	if (!counts[1])

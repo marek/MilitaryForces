@@ -512,7 +512,7 @@ WEAPON SELECTION
 CG_NextWeapon_f
 ===============
 */
-void CG_NextWeapon_f( void ) {
+void CG_NextWeapon_f( ) {
 	int start = cg.weaponSelect;
 	if ( !cg.snap ) {
 		return;
@@ -521,7 +521,7 @@ void CG_NextWeapon_f( void ) {
 		return;
 	}
 	
-	while( 1 ) {
+	while( true ) {
 		cg.weaponSelect++;
 		if( cg.weaponSelect > WP_WEAPON6 ) cg.weaponSelect = WP_MACHINEGUN;
 		if( cg.snap->ps.ammo[cg.weaponSelect+8] ) break;
@@ -534,7 +534,7 @@ void CG_NextWeapon_f( void ) {
 CG_PrevWeapon_f
 ===============
 */
-void CG_PrevWeapon_f( void ) {
+void CG_PrevWeapon_f( ) {
 	int start = cg.weaponSelect;
 	if ( !cg.snap ) {
 		return;
@@ -543,7 +543,7 @@ void CG_PrevWeapon_f( void ) {
 		return;
 	}
 	
-	while( 1 ) {
+	while( true ) {
 		cg.weaponSelect--;
 		if( cg.weaponSelect < WP_MACHINEGUN ) cg.weaponSelect = WP_WEAPON6;
 		if( cg.snap->ps.ammo[cg.weaponSelect+8] ) break;
@@ -556,7 +556,7 @@ void CG_PrevWeapon_f( void ) {
 CG_Weapon_f
 ===============
 */
-void CG_Weapon_f( void ) {
+void CG_Weapon_f( ) {
 	int		num;
 
 	if ( !cg.snap ) {
@@ -649,7 +649,7 @@ void CG_FireMachinegun( centity_t *cent, bool main )
 		if ( weap->flashSound[c] )
 		{
 			// play
-			S_StartSound( NULL, ent->number, CHAN_WEAPON, weap->flashSound[c] );
+			S_StartSound( nullptr, ent->number, CHAN_WEAPON, weap->flashSound[c] );
 		}
 	}
 }
@@ -674,7 +674,7 @@ void CG_FireWeapon( centity_t *cent ) {
 	completeLoadout_t* loadout = CG_EntityLoadout( cent );
 	if( loadout && availableWeapons[ent->weaponIndex].type == WT_FUELTANK ) {
 		while( MF_findWeaponsOfType( ent->weaponIndex, loadout ) )
-			MF_removeWeaponFromLoadout( ent->weaponIndex, loadout, 0, 0, 0, 0 );
+			MF_removeWeaponFromLoadout( ent->weaponIndex, loadout, nullptr, nullptr, nullptr, 0 );
 		return;
 	}
 
@@ -695,11 +695,11 @@ void CG_FireWeapon( centity_t *cent ) {
 		c = rand() % c;
 		if ( weap->flashSound[c] )
 		{
-			S_StartSound( NULL, ent->number, CHAN_WEAPON, weap->flashSound[c] );
+			S_StartSound( nullptr, ent->number, CHAN_WEAPON, weap->flashSound[c] );
 		}
 	}
 	if( loadout )
-		MF_removeWeaponFromLoadout( ent->weaponIndex, loadout, 0, 0, 0, 0 );
+		MF_removeWeaponFromLoadout( ent->weaponIndex, loadout, nullptr, nullptr, nullptr, 0 );
 }
 
 
@@ -901,7 +901,7 @@ CG_GenericExplosion
 */
 void CG_GenericExplosion( vec3_t origin, int type )
 {
-	localEntity_t	* le = NULL;
+	localEntity_t	* le = nullptr;
 	vec3_t			up = {0, 0, 1};
 	vec3_t			adjust = {0, 0, 0};
 	int				soundIdx = -1;
@@ -978,7 +978,7 @@ void CG_GenericExplosion( vec3_t origin, int type )
 	// and also smoke for gib/building explosion
 	if( type > 0 )
 	{
-		localEntity_t * smoke = NULL;
+		localEntity_t * smoke = nullptr;
 
 		for( i = 1; i<=density; i++ )
 		{
@@ -1044,7 +1044,7 @@ CG_VehicleHit
 void CG_VehicleHit( vec3_t origin, int damage )
 {
 	vec3_t			up = {0, 0, 1};
-	localEntity_t	*smoke = NULL;
+	localEntity_t	*smoke = nullptr;
 
 	// make smoke
 	smoke = CG_SmokePuff( origin, up, 

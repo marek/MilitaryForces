@@ -124,20 +124,20 @@ extern	cvar_t	*r_saveFontData;
 bool	R_GetModeInfo( int *width, int *height, float *windowAspect, int mode );
 
 float R_NoiseGet4f( float x, float y, float z, double t );
-void  R_NoiseInit( void );
+void  R_NoiseInit( );
 
 image_t     *R_FindImageFile( const char *name, imgType_t type, imgFlags_t flags );
 image_t *R_CreateImage( const char *name, byte *pic, int width, int height, imgType_t type, imgFlags_t flags, int internalFormat );
 
-void R_IssuePendingRenderCommands( void );
+void R_IssuePendingRenderCommands( );
 qhandle_t		 RE_RegisterShaderLightMap( const char *name, int lightmapIndex );
 qhandle_t		 RE_RegisterShader( const char *name );
 qhandle_t		 RE_RegisterShaderNoMip( const char *name );
 qhandle_t RE_RegisterShaderFromImage(const char *name, int lightmapIndex, image_t *image, bool mipRawImage);
 
 // font stuff
-void R_InitFreeType( void );
-void R_DoneFreeType( void );
+void R_InitFreeType( );
+void R_DoneFreeType( );
 void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font);
 
 /*
@@ -164,11 +164,11 @@ IMPLEMENTATION SPECIFIC FUNCTIONS
 */
 
 void		GLimp_Init( bool fixedFunction );
-void		GLimp_Shutdown( void );
-void		GLimp_EndFrame( void );
+void		GLimp_Shutdown( );
+void		GLimp_EndFrame( );
 
 void		GLimp_LogComment( char *comment );
-void		GLimp_Minimize(void);
+void		GLimp_Minimize();
 
 void		GLimp_SetGamma( unsigned char red[256],
 		unsigned char green[256],

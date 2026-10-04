@@ -101,7 +101,7 @@ void CG_LQM( centity_t *cent, clientInfo_t *ci )
 	drawInfo.basicInfo.throttle = cent->currentState.frame;
 
 	// loadout
-	drawInfo.basicInfo.usedLoadout = 0;//&cg_loadouts[cent->currentState.number];
+	drawInfo.basicInfo.usedLoadout = nullptr;//&cg_loadouts[cent->currentState.number];
 
 	// muzzleflash
 	if( cg.time - cent->muzzleFlashTime <= MUZZLE_FLASH_TIME ) {
@@ -153,7 +153,7 @@ void CG_LQM( centity_t *cent, clientInfo_t *ci )
 		vectoangles( forward, ang );
 		ang[2] = 0;
 		AnglesToAxis( ang, reticle.axis );
-		CG_Trace( &tr, start, 0, 0, end, cg.snap->ps.clientNum, MASK_SOLID ); 
+		CG_Trace( &tr, start, nullptr, nullptr, end, cg.snap->ps.clientNum, MASK_SOLID ); 
 
 		if( tr.entityNum > ENTITYNUM_WORLD && tr.entityNum < MAX_CLIENTS )
 		{
@@ -162,7 +162,7 @@ void CG_LQM( centity_t *cent, clientInfo_t *ci )
 		}
 
 		VectorCopy( tr.endpos, end );
-		CG_Trace( &tr, cg.refdef.vieworg, 0, 0, end, cg.snap->ps.clientNum, MASK_SOLID ); 
+		CG_Trace( &tr, cg.refdef.vieworg, nullptr, nullptr, end, cg.snap->ps.clientNum, MASK_SOLID ); 
 		VectorSubtract( tr.endpos, cg.refdef.vieworg, forward );
 		len = VectorNormalize(forward);
 		
@@ -178,7 +178,7 @@ void CG_LQM( centity_t *cent, clientInfo_t *ci )
 		VectorCopy( reticle.origin, reticle.lightingOrigin );
 		reticle.renderfx = RF_LIGHTING_ORIGIN|RF_SHADOW_PLANE;
 		
-		CG_AddReticleEntityToScene( &reticle, NULL );
+		CG_AddReticleEntityToScene( &reticle, nullptr );
 	}
 }
 
@@ -209,7 +209,7 @@ void CG_LQMObituary( entityState_t *ent, clientInfo_t *ci )
 
     if ( attacker < 0 || attacker >= MAX_CLIENTS ) {
 	    attacker = ENTITYNUM_WORLD;
-	    attackerInfo = NULL;
+	    attackerInfo = nullptr;
     } else {
 	    attackerInfo = CG_ConfigString( CS_PLAYERS + attacker );
     }
@@ -219,7 +219,7 @@ void CG_LQMObituary( entityState_t *ent, clientInfo_t *ci )
 	    return;
     }
 #pragma message("remove the problem checking here!")
-	if( Info_ValueForKey( targetInfo, "n" ) != 0 ) {
+	if( Info_ValueForKey( targetInfo, "n" ) != nullptr ) {
 		Q_strncpyz( targetName, Info_ValueForKey( targetInfo, "n" ), sizeof(targetName) - 2);
 	}
 	else {
@@ -251,7 +251,7 @@ void CG_LQMObituary( entityState_t *ent, clientInfo_t *ci )
 	    message = "does a back flip into the lava";
 	    break;
     default:
-	    message = NULL;
+	    message = nullptr;
 	    break;
     }
 
@@ -298,7 +298,7 @@ void CG_LQMObituary( entityState_t *ent, clientInfo_t *ci )
 	    attacker = ENTITYNUM_WORLD;
 	    strcpy( attackerName, "noname" );
     } else {
-		if( Info_ValueForKey( attackerInfo, "n" ) != 0 ) {
+		if( Info_ValueForKey( attackerInfo, "n" ) != nullptr ) {
 			Q_strncpyz( attackerName, Info_ValueForKey( attackerInfo, "n" ), sizeof(attackerName) - 2);
 		}
 		else {
@@ -307,7 +307,7 @@ void CG_LQMObituary( entityState_t *ent, clientInfo_t *ci )
 	    strcat( attackerName, S_COLOR_WHITE );
 	    // check for kill messages about the current clientNum
 	    if ( target == cg.snap->ps.clientNum ) {
-			if( attackerName != 0 ) {
+			if( attackerName != nullptr ) {
 				Q_strncpyz( cg.killerName, attackerName, sizeof( cg.killerName ) );
 			}
 			else {

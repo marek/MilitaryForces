@@ -51,7 +51,7 @@ Explode a missile without an impact
 */
 struct Think_ExplodeMissile : public GameEntity::EntityFunc_Think
 {
-	virtual void execute()
+	void execute() override
 	{
 		vec3_t		dir;
 		vec3_t		origin;
@@ -99,7 +99,7 @@ Explode a flak at destination
 */
 struct Think_ExplodeFlak : public GameEntity::EntityFunc_Think
 {
-	virtual void execute()
+	void execute() override
 	{
 		vec3_t		dir;
 		vec3_t		origin;
@@ -139,7 +139,7 @@ spawns other flares
 */
 struct Think_ExplodeCFlare : public GameEntity::EntityFunc_Think
 {
-	virtual void execute()
+	void execute() override
 	{
 		vec3_t		dir;
 		vec3_t		origin;
@@ -248,12 +248,12 @@ static void NukeRadiusDamage( vec3_t origin, GameEntity *attacker, float damage,
 		if( strcmp(ent->classname_, "player") == 0 )
 		{
 			// Try a trace
-			SV_Trace (&trace, origin, NULL, NULL,  ent->r.currentOrigin, ent->s.number, MASK_SOLID, false);
+			SV_Trace (&trace, origin, nullptr, nullptr,  ent->r.currentOrigin, ent->s.number, MASK_SOLID, false);
 		
 			// Also don't let them get away to easily so check slightly above the origin, and see if it reaches) It may have to be a big hill.
 			VectorCopy(origin, temp);
 			temp[2] += radius / 2;
-			SV_Trace (&trace2, temp, NULL, NULL, ent->r.currentOrigin, ent->s.number, MASK_SOLID, false);
+			SV_Trace (&trace2, temp, nullptr, nullptr, ent->r.currentOrigin, ent->s.number, MASK_SOLID, false);
 		}
 		else
 		{
@@ -269,7 +269,7 @@ static void NukeRadiusDamage( vec3_t origin, GameEntity *attacker, float damage,
 			dir[2] += 24;
 			//G_Damage( ent, NULL, attacker, dir, origin, damage, DAMAGE_RADIUS|DAMAGE_NO_TEAM_PROTECTION, MOD_NUKE, CAT_ANY );
 			
-			G_Damage( ent, NULL, attacker, dir, origin, damage, DAMAGE_RADIUS, MOD_NUKE, CAT_ANY );
+			G_Damage( ent, nullptr, attacker, dir, origin, damage, DAMAGE_RADIUS, MOD_NUKE, CAT_ANY );
 			ent->nukeTime_ = theLevel.time_ + 3000;
 		}
 	}
@@ -329,7 +329,7 @@ static void NukeShockWave( vec3_t origin, GameEntity *attacker, float damage, fl
 			VectorSubtract (ent->r.currentOrigin, origin, dir);
 			dir[2] += 24;
 		//	G_Damage( ent, NULL, attacker, dir, origin, damage, DAMAGE_RADIUS|DAMAGE_NO_TEAM_PROTECTION, MOD_NUKE, CAT_ANY );
-			G_Damage( ent, NULL, attacker, dir, origin, damage, DAMAGE_RADIUS, MOD_NUKE, CAT_ANY );
+			G_Damage( ent, nullptr, attacker, dir, origin, damage, DAMAGE_RADIUS, MOD_NUKE, CAT_ANY );
 			//
 			dir[2] = 0;
 			VectorNormalize(dir);
@@ -351,7 +351,7 @@ NukeDamage
 */
 struct Think_NukeDamage : public GameEntity::EntityFunc_Think
 {
-	virtual void execute()
+	void execute() override
 	{
 		int i;
 		float t;
@@ -530,7 +530,7 @@ G_ExplodeNuke
 */
 struct Think_ExplodeNuke : public GameEntity::EntityFunc_Think
 {
-	virtual void execute()
+	void execute() override
 	{
 		GameEntity	*explosion;
 		GameEntity	*te;
@@ -763,7 +763,7 @@ G_CrateThink
 */
 struct Think_Crate : public GameEntity::EntityFunc_Think
 {
-	virtual void execute()
+	void execute() override
 	{
 		vec3_t angles, pos, dir;
 		int i;
@@ -779,7 +779,7 @@ struct Think_Crate : public GameEntity::EntityFunc_Think
 
 		// Create forces based on angles
 		VectorCopy(angles,  dir);
-		AngleVectors( dir, dir, NULL, NULL );
+		AngleVectors( dir, dir, nullptr, nullptr );
 		VectorScale( dir, (float)self_->speed_/5, dir );
 		dir[2] -= self_->speed_;
 			
@@ -807,7 +807,7 @@ struct Think_Crate : public GameEntity::EntityFunc_Think
 
 struct Think_No_Fuel_Flight : public GameEntity::EntityFunc_Think
 {
-	virtual void execute()
+	void execute() override
 	{
 		GameEntity*	self = self_;  // Since we may delete our current think()
 
@@ -827,7 +827,7 @@ static void on_target_lost( GameEntity *missile )
 	if( missile->tracktarget_ && missile->tracktarget_->client_ ) 
 		missile->tracktarget_->client_->ps_.stats[STAT_LOCKINFO] &= ~LI_BEING_LAUNCHED;
 
-	missile->tracktarget_ = 0;
+	missile->tracktarget_ = nullptr;
 	missile->setThink(new Think_No_Fuel_Flight);//think = no_fuel_flight;
 	missile->nextthink_ = missile->wait_ + 50;
 }
@@ -839,7 +839,7 @@ follow your target
 */
 struct Think_FollowTarget : public GameEntity::EntityFunc_Think
 {
-	virtual void execute()
+	void execute() override
 	{
 		vec3_t	dir, targdir, mid, mins, maxs;
 		float	dist, dot;
@@ -939,7 +939,7 @@ struct Think_FollowTarget : public GameEntity::EntityFunc_Think
 		}
 
 		// LOS
-		SV_Trace( &tr, self->r.currentOrigin, 0, 0, mid, self->tracktarget_->s.number, MASK_SOLID, false );
+		SV_Trace( &tr, self->r.currentOrigin, nullptr, nullptr, mid, self->tracktarget_->s.number, MASK_SOLID, false );
 		if( tr.fraction < 1.0f ) 
 		{
 			on_target_lost(self);
@@ -974,7 +974,7 @@ struct Think_FollowTarget : public GameEntity::EntityFunc_Think
 
 struct Think_DropToNormalTransition : public GameEntity::EntityFunc_Think
 {
-	virtual void execute()
+	void execute() override
 	{
 		GameEntity*	self = self_;  // Since we may delete our current think()
 
@@ -1088,7 +1088,7 @@ void fire_antiair (GameEntity *self)
 	bolt->methodOfDeath_ = MOD_FFAR;
 	bolt->splashMethodOfDeath_ = MOD_FFAR_SPLASH;
 	bolt->clipmask_ = MASK_SHOT|MASK_WATER;
-	bolt->target_ent_ = NULL;
+	bolt->target_ent_ = nullptr;
 	bolt->basicECMVulnerability_ = availableWeapons[self->client_->ps_.weaponIndex].basicECMVulnerability;
 
 	bolt->s.pos.trTime = theLevel.time_;// - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
@@ -1126,7 +1126,7 @@ void fire_antiground( GameEntity *self )
 	else 
 	{
 		self->left_ = (self->left_ ? false : true);
-		MF_removeWeaponFromLoadout(self->client_->ps_.weaponIndex, &self->loadout_, &self->client_->ps_, 0, offset, 0 );
+		MF_removeWeaponFromLoadout(self->client_->ps_.weaponIndex, &self->loadout_, &self->client_->ps_, nullptr, offset, 0 );
 		AngleVectors( self->client_->ps_.vehicleAngles, dir, right, up );
 		VectorInverse( right );
 	}
@@ -1192,7 +1192,7 @@ void fire_antiground( GameEntity *self )
 	bolt->methodOfDeath_ = MOD_FFAR;
 	bolt->splashMethodOfDeath_ = MOD_FFAR_SPLASH;
 	bolt->clipmask_ = MASK_SHOT|MASK_WATER;
-	bolt->target_ent_ = NULL;
+	bolt->target_ent_ = nullptr;
 	bolt->basicECMVulnerability_ = availableWeapons[self->client_->ps_.weaponIndex].basicECMVulnerability;
 
 	bolt->s.pos.trTime = theLevel.time_;// - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
@@ -1219,7 +1219,7 @@ void fire_ffar (GameEntity *self)
 	if( self->left_ >= availableVehicles[self->client_->vehicle_].ammo[self->client_->ps_.weaponNum] ) 
 		self->left_ = 0;
 
-	MF_removeWeaponFromLoadout(self->client_->ps_.weaponIndex, &self->loadout_, &self->client_->ps_, 0, offset, self->left_ );
+	MF_removeWeaponFromLoadout(self->client_->ps_.weaponIndex, &self->loadout_, &self->client_->ps_, nullptr, offset, self->left_ );
 	AngleVectors( self->client_->ps_.vehicleAngles, dir, right, up );
 	VectorInverse( right );
 	VectorMA( start, offset[0], dir, start );
@@ -1243,7 +1243,7 @@ void fire_ffar (GameEntity *self)
 	bolt->methodOfDeath_ = MOD_FFAR;
 	bolt->splashMethodOfDeath_ = MOD_FFAR_SPLASH;
 	bolt->clipmask_ = MASK_SHOT|MASK_WATER;
-	bolt->target_ent_ = NULL;
+	bolt->target_ent_ = nullptr;
 
 	bolt->s.pos.trType = TR_LINEAR;
 	bolt->s.pos.trTime = theLevel.time_;// - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
@@ -1265,7 +1265,7 @@ void fire_ironbomb( GameEntity *self )
 	vec3_t		start;
 
 //	self->left = (self->left ? false : true);
-	MF_removeWeaponFromLoadout(self->client_->ps_.weaponIndex, &self->loadout_, &self->client_->ps_, 0, offset, 0 );
+	MF_removeWeaponFromLoadout(self->client_->ps_.weaponIndex, &self->loadout_, &self->client_->ps_, nullptr, offset, 0 );
 	AngleVectors( self->client_->ps_.vehicleAngles, dir, right, up );
 	VectorInverse( right );
 	VectorCopy( self->s.pos.trBase, start );
@@ -1290,7 +1290,7 @@ void fire_ironbomb( GameEntity *self )
 	bolt->methodOfDeath_ = MOD_IRONBOMB;
 	bolt->splashMethodOfDeath_ = MOD_IRONBOMB_SPLASH;
 	bolt->clipmask_= MASK_SHOT|MASK_WATER;
-	bolt->target_ent_ = NULL;
+	bolt->target_ent_ = nullptr;
 
 	bolt->s.pos.trType = TR_GRAVITY;
 	bolt->s.pos.trTime = theLevel.time_;// - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
@@ -1375,7 +1375,7 @@ void fire_autocannon( GameEntity *self, bool main )
 	bolt->catmodifier_ = availableWeapons[weapIdx].noncatmod;
 	bolt->methodOfDeath_ = MOD_AUTOCANNON;
 	bolt->clipmask_ = MASK_SHOT;
-	bolt->target_ent_ = NULL;
+	bolt->target_ent_ = nullptr;
 	bolt->s.pos.trType = TR_LINEAR;
 	bolt->s.pos.trTime = theLevel.time_ - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
 	//tracer
@@ -1426,7 +1426,7 @@ void fire_autocannon_GI (GameEntity *self)
 	bolt->catmodifier_ = availableWeapons[weapIdx].noncatmod;
 	bolt->methodOfDeath_ = MOD_AUTOCANNON;
 	bolt->clipmask_ = MASK_SHOT;
-	bolt->target_ent_ = NULL;
+	bolt->target_ent_ = nullptr;
 	bolt->s.pos.trType = TR_LINEAR;
 	bolt->s.pos.trTime = theLevel.time_ - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
 	//tracer
@@ -1480,7 +1480,7 @@ void fire_maingun( GameEntity *self )
 	bolt->methodOfDeath_ = MOD_MAINGUN;
 	bolt->splashMethodOfDeath_ = MOD_MAINGUN;
 	bolt->clipmask_ = MASK_SHOT;
-	bolt->target_ent_ = NULL;
+	bolt->target_ent_ = nullptr;
 
 	bolt->s.pos.trType = TR_GRAVITY;
 	bolt->s.pos.trTime = theLevel.time_;// - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
@@ -1637,7 +1637,7 @@ void drop_fueltank ( GameEntity *self )
 	vec3_t		start;
 
 //	self->left = (self->left ? false : true);
-	MF_removeWeaponFromLoadout(self->client_->ps_.weaponIndex, &self->loadout_, &self->client_->ps_, 0, offset, 0 );
+	MF_removeWeaponFromLoadout(self->client_->ps_.weaponIndex, &self->loadout_, &self->client_->ps_, nullptr, offset, 0 );
 	AngleVectors( self->client_->ps_.vehicleAngles, dir, right, up );
 	VectorInverse( right );
 	VectorCopy( self->s.pos.trBase, start );
@@ -1662,7 +1662,7 @@ void drop_fueltank ( GameEntity *self )
 	bolt->methodOfDeath_ = MOD_IRONBOMB;
 	bolt->splashMethodOfDeath_ = MOD_IRONBOMB_SPLASH;
 	bolt->clipmask_ = MASK_SHOT|MASK_WATER;
-	bolt->target_ent_ = NULL;
+	bolt->target_ent_ = nullptr;
 
 	bolt->s.pos.trType = TR_GRAVITY;
 	bolt->s.pos.trTime = theLevel.time_;// - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
@@ -1679,7 +1679,7 @@ G_CrateDie
 */
 struct Die_CrateDie : public GameEntity::EntityFunc_Die
 {
-	virtual void execute( GameEntity *inflictor, GameEntity *attacker, int damage, int mod )
+	void execute( GameEntity *inflictor, GameEntity *attacker, int damage, int mod ) override
 	{
 		GameEntity*	self = self_;  // Since we may delete our current think()
 
@@ -1701,7 +1701,7 @@ void drop_crate( GameEntity *self )
 	GameEntity	*bolt;
 	vec3_t		start;
 
-	MF_removeWeaponFromLoadout(self->client_->ps_.weaponIndex, &self->loadout_, &self->client_->ps_, 0, 0, 0 );
+	MF_removeWeaponFromLoadout(self->client_->ps_.weaponIndex, &self->loadout_, &self->client_->ps_, nullptr, nullptr, 0 );
 
 	VectorCopy( self->s.pos.trBase, start );
 	//start[2] -= availableVehicles[self->client->vehicle].maxs[2] - availableVehicles[self->client->vehicle].mins[2];
@@ -1720,7 +1720,7 @@ void drop_crate( GameEntity *self )
 	bolt->parent_ = self;
 	bolt->catmodifier_ = availableWeapons[self->client_->ps_.weaponIndex].noncatmod;
 	bolt->clipmask_ = MASK_SHOT|MASK_WATER;
-	bolt->target_ent_ = NULL;
+	bolt->target_ent_ = nullptr;
 	bolt->speed_ = bolt->speed_ = availableWeapons[self->client_->ps_.weaponIndex].muzzleVelocity;
 
 	bolt->s.pos.trType = TR_LINEAR;
@@ -1754,7 +1754,7 @@ void fire_nukebomb ( GameEntity *self )
 	vec3_t		start;
 
 //	self->left = (self->left ? false : true);
-	MF_removeWeaponFromLoadout(self->client_->ps_.weaponIndex, &self->loadout_, &self->client_->ps_, 0, offset, 0 );
+	MF_removeWeaponFromLoadout(self->client_->ps_.weaponIndex, &self->loadout_, &self->client_->ps_, nullptr, offset, 0 );
 	AngleVectors( self->client_->ps_.vehicleAngles, dir, right, up );
 	VectorInverse( right );
 	VectorCopy( self->s.pos.trBase, start );
@@ -1781,7 +1781,7 @@ void fire_nukebomb ( GameEntity *self )
 	bolt->methodOfDeath_ = MOD_NUKE;
 	bolt->splashMethodOfDeath_ = MOD_NUKE;
 	bolt->clipmask_ = MASK_SHOT|MASK_WATER;
-	bolt->target_ent_ = NULL;
+	bolt->target_ent_ = nullptr;
 
 	bolt->s.pos.trType = TR_GRAVITY;
 	bolt->s.pos.trTime = theLevel.time_;// - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
@@ -1818,7 +1818,7 @@ void fire_nukemissile (GameEntity *self)
 	else
 	{
 		self->left_ = (self->left_ ? false : true);
-		MF_removeWeaponFromLoadout(self->client_->ps_.weaponIndex, &self->loadout_, &self->client_->ps_, 0, offset, 0 );
+		MF_removeWeaponFromLoadout(self->client_->ps_.weaponIndex, &self->loadout_, &self->client_->ps_, nullptr, offset, 0 );
 		AngleVectors( self->client_->ps_.vehicleAngles, dir, right, up );
 		VectorInverse( right );
 	}
@@ -1856,7 +1856,7 @@ void fire_nukemissile (GameEntity *self)
 	bolt->methodOfDeath_ = MOD_NUKE;
 	bolt->splashMethodOfDeath_ = MOD_NUKE;
 	bolt->clipmask_ = MASK_SHOT|MASK_WATER;
-	bolt->target_ent_ = NULL;
+	bolt->target_ent_ = nullptr;
 	bolt->basicECMVulnerability_ = availableWeapons[self->client_->ps_.weaponIndex].basicECMVulnerability;
 
 	bolt->s.pos.trTime = theLevel.time_;// - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
@@ -1920,7 +1920,7 @@ void LaunchMissile_GI( GameEntity* ent )
 	bolt->methodOfDeath_ = MOD_FFAR;
 	bolt->splashMethodOfDeath_ = MOD_FFAR_SPLASH;
 	bolt->clipmask_ = MASK_SHOT|MASK_WATER;
-	bolt->target_ent_ = NULL;
+	bolt->target_ent_ = nullptr;
 	bolt->basicECMVulnerability_ = availableWeapons[ent->s.weaponIndex].basicECMVulnerability;
 
 	bolt->s.pos.trTime = theLevel.time_;// - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
@@ -1986,7 +1986,7 @@ void fire_flak_GI (GameEntity *self)
 	bolt->methodOfDeath_ = MOD_FFAR;
 	bolt->splashMethodOfDeath_ = MOD_FFAR_SPLASH;
 	bolt->clipmask_ = MASK_SHOT|MASK_WATER;
-	bolt->target_ent_ = NULL;
+	bolt->target_ent_ = nullptr;
 	bolt->basicECMVulnerability_ = availableWeapons[self->s.weaponIndex].basicECMVulnerability;
 
 	bolt->s.pos.trTime = theLevel.time_;// - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame

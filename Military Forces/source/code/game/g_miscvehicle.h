@@ -5,22 +5,22 @@
 
 struct MiscVehicle_Die : public GameEntity::EntityFunc_Die
 {
-	virtual void	execute( GameEntity* inflictor, GameEntity* attacker, int damage, int meansOfDeath );
+	void	execute( GameEntity* inflictor, GameEntity* attacker, int damage, int meansOfDeath ) override;
 };
 
 struct GroundInstallation_Die : public GameEntity::EntityFunc_Die
 {
-	virtual void	execute( GameEntity* inflictor, GameEntity* attacker, int damage, int meansOfDeath );
+	void	execute( GameEntity* inflictor, GameEntity* attacker, int damage, int meansOfDeath ) override;
 };
 
 struct GroundInstallation_Think : public GameEntity::EntityFunc_Think
 {
-	virtual void	execute();
+	void	execute() override;
 };
 
 struct Drone_Think : public GameEntity::EntityFunc_Think
 {
-	virtual void	execute();
+	void	execute() override;
 
 	vec3_t			route_[IGME_MAX_WAYPOINTS];
 	int				count_;
@@ -33,13 +33,13 @@ struct Drone_Think : public GameEntity::EntityFunc_Think
 
 struct Deck_Think : public GameEntity::EntityFunc_Think
 {
-	Deck_Think() : parentNum_(0), parentPtr_(0), along_(0), first_(false), hasLast_(false), lastTime_(0)
+	Deck_Think() : parentNum_(0), parentPtr_(nullptr), along_(0), first_(false), hasLast_(false), lastTime_(0)
 	{
 		VectorClear( lastOrigin_ );
 		VectorClear( lastAngles_ );
 	}
 
-	virtual void	execute();
+	void	execute() override;
 
 	int				parentNum_;
 	GameEntity*		parentPtr_;
@@ -59,7 +59,7 @@ struct Abandoned_Think : public GameEntity::EntityFunc_Think
 		memset( mounts_, 0, sizeof(mounts_) );
 	}
 
-	virtual void	execute();
+	void	execute() override;
 
 	int				expire_;
 	bool			enterable_;

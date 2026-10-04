@@ -46,7 +46,7 @@ static float *TableForFunc( genFunc_t func )
 	}
 
 	ri.Error( ERR_DROP, "TableForFunc called with invalid function '%d' in shader '%s'", func, tess.shader->name );
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -346,7 +346,7 @@ Assuming all the triangles for this shader are independent
 quads, rebuild them as forward facing sprites
 =====================
 */
-static void AutospriteDeform( void ) {
+static void AutospriteDeform( ) {
 	int		i;
 	int		oldVerts;
 	float	*xyz;
@@ -426,7 +426,7 @@ glIndex_t edgeVerts[6][2] = {
 	{ 2, 3 }
 };
 
-static void Autosprite2Deform( void ) {
+static void Autosprite2Deform( ) {
 	int		i, j, k;
 	int		indexes;
 	float	*xyz;
@@ -535,7 +535,7 @@ RB_DeformTessGeometry
 
 =====================
 */
-void RB_DeformTessGeometry( void ) {
+void RB_DeformTessGeometry( ) {
 	int		i;
 	deformStage_t	*ds;
 

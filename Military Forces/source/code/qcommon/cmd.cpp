@@ -49,7 +49,7 @@ next frame.  This allows commands like:
 bind g "cmd use rocket ; +attack ; wait ; -attack ; cmd use blaster"
 ============
 */
-void Cmd_Wait_f( void ) {
+void Cmd_Wait_f( ) {
 	if ( Cmd_Argc() == 2 ) {
 		cmd_wait = atoi( Cmd_Argv( 1 ) );
 		if ( cmd_wait < 0 )
@@ -73,7 +73,7 @@ void Cmd_Wait_f( void ) {
 Cbuf_Init
 ============
 */
-void Cbuf_Init (void)
+void Cbuf_Init ()
 {
 	cmd_text.data = cmd_text_buf;
 	cmd_text.maxsize = MAX_CMD_BUFFER;
@@ -169,7 +169,7 @@ void Cbuf_ExecuteText (int exec_when, const char *text)
 Cbuf_Execute
 ============
 */
-void Cbuf_Execute (void)
+void Cbuf_Execute ()
 {
 	int		i;
 	char	*text;
@@ -264,7 +264,7 @@ void Cbuf_Execute (void)
 Cmd_Exec_f
 ===============
 */
-void Cmd_Exec_f( void ) {
+void Cmd_Exec_f( ) {
 	bool quiet;
 	union {
 		char	*c;
@@ -303,7 +303,7 @@ Cmd_Vstr_f
 Inserts the current value of a variable as command text
 ===============
 */
-void Cmd_Vstr_f( void ) {
+void Cmd_Vstr_f( ) {
 	char	*v;
 
 	if (Cmd_Argc () != 2) {
@@ -323,7 +323,7 @@ Cmd_Echo_f
 Just prints the rest of the line to the console
 ===============
 */
-void Cmd_Echo_f (void)
+void Cmd_Echo_f ()
 {
 	Com_Printf ("%s\n", Cmd_Args());
 }
@@ -358,7 +358,7 @@ static	cmd_function_t	*cmd_functions;		// possible commands to execute
 Cmd_Argc
 ============
 */
-int		Cmd_Argc( void ) {
+int		Cmd_Argc( ) {
 	return cmd_argc;
 }
 
@@ -394,7 +394,7 @@ Cmd_Args
 Returns a single string containing argv(1) to argv(argc()-1)
 ============
 */
-char	*Cmd_Args( void ) {
+char	*Cmd_Args( ) {
 	static	char		cmd_args[MAX_STRING_CHARS];
 	int		i;
 
@@ -454,7 +454,7 @@ For rcon use when you want to transmit without altering quoting
 https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=543
 ============
 */
-char *Cmd_Cmd(void)
+char *Cmd_Cmd()
 {
 	return cmd_cmd;
 }
@@ -466,7 +466,7 @@ char *Cmd_Cmd(void)
    https://bugzilla.icculus.org/show_bug.cgi?id=4769
 */
 
-void Cmd_Args_Sanitize(void)
+void Cmd_Args_Sanitize()
 {
 	int i;
 
@@ -517,12 +517,12 @@ static void Cmd_TokenizeString2( const char *text_in, bool ignoreQuotes ) {
 	text = text_in;
 	textOut = cmd_tokenized;
 
-	while ( 1 ) {
+	while ( true ) {
 		if ( cmd_argc == MAX_STRING_TOKENS ) {
 			return;			// this is usually something malicious
 		}
 
-		while ( 1 ) {
+		while ( true ) {
 			// skip whitespace
 			while ( *text && *text <= ' ' ) {
 				text++;
@@ -627,7 +627,7 @@ cmd_function_t *Cmd_FindCommand( const char *cmd_name )
 	for( cmd = cmd_functions; cmd; cmd = cmd->next )
 		if( !Q_stricmp( cmd_name, cmd->name ) )
 			return cmd;
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -642,7 +642,7 @@ void	Cmd_AddCommand( const char *cmd_name, xcommand_t function ) {
 	if( Cmd_FindCommand( cmd_name ) )
 	{
 		// allow completion-only commands to be silently doubled
-		if( function != NULL )
+		if( function != nullptr )
 			Com_Printf( "Cmd_AddCommand: %s already defined\n", cmd_name );
 		return;
 	}
@@ -651,7 +651,7 @@ void	Cmd_AddCommand( const char *cmd_name, xcommand_t function ) {
 	cmd = (cmd_function_t *)S_Malloc (sizeof(cmd_function_t));
 	cmd->name = CopyString( cmd_name );
 	cmd->function = function;
-	cmd->complete = NULL;
+	cmd->complete = nullptr;
 	cmd->next = cmd_functions;
 	cmd_functions = cmd;
 }
@@ -681,7 +681,7 @@ void	Cmd_RemoveCommand( const char *cmd_name ) {
 	cmd_function_t	*cmd, **back;
 
 	back = &cmd_functions;
-	while( 1 ) {
+	while( true ) {
 		cmd = *back;
 		if ( !cmd ) {
 			// command wasn't active
@@ -819,7 +819,7 @@ void	Cmd_ExecuteString( const char *text ) {
 Cmd_List_f
 ============
 */
-void Cmd_List_f (void)
+void Cmd_List_f ()
 {
 	cmd_function_t	*cmd;
 	int				i;
@@ -828,7 +828,7 @@ void Cmd_List_f (void)
 	if ( Cmd_Argc() > 1 ) {
 		match = Cmd_Argv( 1 );
 	} else {
-		match = NULL;
+		match = nullptr;
 	}
 
 	i = 0;
@@ -848,7 +848,7 @@ Cmd_CompleteCfgName
 */
 void Cmd_CompleteCfgName( char *args, int argNum ) {
 	if( argNum == 2 ) {
-		Field_CompleteFilename( "", "cfg", NULL, false, true );
+		Field_CompleteFilename( "", "cfg", nullptr, false, true );
 	}
 }
 
@@ -857,7 +857,7 @@ void Cmd_CompleteCfgName( char *args, int argNum ) {
 Cmd_Init
 ============
 */
-void Cmd_Init (void) {
+void Cmd_Init () {
 	Cmd_AddCommand ("cmdlist",Cmd_List_f);
 	Cmd_AddCommand ("exec",Cmd_Exec_f);
 	Cmd_AddCommand ("execq",Cmd_Exec_f);

@@ -14,8 +14,8 @@ void FS_FCloseFile( fileHandle_t f );
 
 GameObjectInfo_Aircraft::GameObjectInfo_Aircraft() :
 	engines_(0),
-	bayAnim_(0),
-	gearAnim_(0),
+	bayAnim_(nullptr),
+	gearAnim_(nullptr),
 	tailAngle_(0.0f),
 	gearHeight_(0),
 	abEffectModel_(0)
@@ -26,9 +26,9 @@ GameObjectInfo_Aircraft::GameObjectInfo_Aircraft() :
 GameObjectInfo_Aircraft::~GameObjectInfo_Aircraft()
 {
 	delete bayAnim_;
-	bayAnim_ = 0;
+	bayAnim_ = nullptr;
 	delete gearAnim_;
-	gearAnim_ = 0;
+	gearAnim_ = nullptr;
 }
 
 bool
@@ -142,7 +142,7 @@ GameObjectInfo_Plane::setupBoundingBox()
 void
 GameObjectInfo_Plane::createAllPlanes( GameObjectList& gameObjects )
 {
-	GameObjectInfo_Plane* veh = 0;
+	GameObjectInfo_Plane* veh = nullptr;
 	Loadout loadout;
 
 	// --- MODERN ---
@@ -175,7 +175,7 @@ GameObjectInfo_Plane::createAllPlanes( GameObjectList& gameObjects )
 	veh->acceleration_ = 260;
 	veh->maxFuel_ = 60;
 	veh->engines_ = 1;		
-	veh->bayAnim_ = 0;		
+	veh->bayAnim_ = nullptr;		
 	veh->gearAnim_ = new VehiclePartAnimInfo(1400);		
 	veh->tailAngle_ = 0;		
 	veh->abEffectModel_ = AB_BALL;	
@@ -224,7 +224,7 @@ GameObjectInfo_Plane::createAllPlanes( GameObjectList& gameObjects )
 	veh->acceleration_ = 250;
 	veh->maxFuel_ = 60;
 	veh->engines_ = 1;		
-	veh->bayAnim_ = 0;		
+	veh->bayAnim_ = nullptr;		
 	veh->gearAnim_ = new VehiclePartAnimInfo(1400);		
 	veh->tailAngle_ = 0;		
 	veh->abEffectModel_ = AB_BALL;	
@@ -260,7 +260,7 @@ GameObjectInfo_Plane::createAllPlanes( GameObjectList& gameObjects )
 	veh->acceleration_ = 270;
 	veh->maxFuel_ = 80;
 	veh->engines_ = 2;		
-	veh->bayAnim_ = 0;		
+	veh->bayAnim_ = nullptr;		
 	veh->gearAnim_ = new VehiclePartAnimInfo(1400);		
 	veh->tailAngle_ = 0;		
 	veh->abEffectModel_ = AB_BALL;	
@@ -296,7 +296,7 @@ GameObjectInfo_Plane::createAllPlanes( GameObjectList& gameObjects )
 	veh->acceleration_ = 270;
 	veh->maxFuel_ = 80;
 	veh->engines_ = 2;		
-	veh->bayAnim_ = 0;		
+	veh->bayAnim_ = nullptr;		
 	veh->gearAnim_ = new VehiclePartAnimInfo(1400);		
 	veh->tailAngle_ = 0;		
 	veh->abEffectModel_ = AB_RED_SMALL;	
@@ -332,7 +332,7 @@ GameObjectInfo_Plane::createAllPlanes( GameObjectList& gameObjects )
 	veh->acceleration_ = 260;
 	veh->maxFuel_ = 80;
 	veh->engines_ = 2;		
-	veh->bayAnim_ = 0;		
+	veh->bayAnim_ = nullptr;		
 	veh->gearAnim_ = new VehiclePartAnimInfo(1400);		
 	veh->tailAngle_ = 0;		
 	veh->abEffectModel_ = AB_RED;	
@@ -368,7 +368,7 @@ GameObjectInfo_Plane::createAllPlanes( GameObjectList& gameObjects )
 	veh->acceleration_ = 260;
 	veh->maxFuel_ = 70;
 	veh->engines_ = 2;		
-	veh->bayAnim_ = 0;		
+	veh->bayAnim_ = nullptr;		
 	veh->gearAnim_ = new VehiclePartAnimInfo(1400);		
 	veh->tailAngle_ = 0;		
 	veh->abEffectModel_ = AB_RED;	
@@ -404,7 +404,7 @@ GameObjectInfo_Plane::createAllPlanes( GameObjectList& gameObjects )
 	veh->acceleration_ = 260;
 	veh->maxFuel_ = 60;
 	veh->engines_ = 2;		
-	veh->bayAnim_ = 0;		
+	veh->bayAnim_ = nullptr;		
 	veh->gearAnim_ = new VehiclePartAnimInfo(1400);		
 	veh->tailAngle_ = 0;		
 	veh->abEffectModel_ = AB_BALL;	
@@ -475,14 +475,14 @@ GameObjectInfo_Plane::createAllPlanes( GameObjectList& gameObjects )
 	Vector4Set( veh->shadowAdjusts_, 0, 0, 0, 0 );	
 	VectorSet( veh->gunoffset_, 3.5f, -9.2f, 0.136f );		
 	VectorSet( veh->cockpitview_, -4, 0, 8 );	
-	veh->airRadar_ = 0;		
-	veh->groundRadar_ = 0;			
+	veh->airRadar_ = nullptr;		
+	veh->groundRadar_ = nullptr;			
 	veh->minThrottle_ = 0;
 	veh->maxThrottle_ = 10;
 	veh->acceleration_ = 220;
 	veh->maxFuel_ = 60;
 	veh->engines_ = 1;		
-	veh->bayAnim_ = 0;		
+	veh->bayAnim_ = nullptr;		
 	veh->gearAnim_ = new VehiclePartAnimInfo(1400);		
 	veh->tailAngle_ = -14.0f;		
 	veh->abEffectModel_ = 0;	
@@ -511,14 +511,14 @@ GameObjectInfo_Plane::createAllPlanes( GameObjectList& gameObjects )
 	Vector4Set( veh->shadowAdjusts_, 0, 0, 0, 0 );	
 	VectorSet( veh->gunoffset_, 2.518f, -7.371f, -0.155f );		
 	VectorSet( veh->cockpitview_, -4, 0, 6 );	
-	veh->airRadar_ = 0;		
-	veh->groundRadar_ = 0;			
+	veh->airRadar_ = nullptr;		
+	veh->groundRadar_ = nullptr;			
 	veh->minThrottle_ = 0;
 	veh->maxThrottle_ = 10;
 	veh->acceleration_ = 220;
 	veh->maxFuel_ = 60;
 	veh->engines_ = 1;		
-	veh->bayAnim_ = 0;		
+	veh->bayAnim_ = nullptr;		
 	veh->gearAnim_ = new VehiclePartAnimInfo(1400);		
 	veh->tailAngle_ = -14.0f;		
 	veh->abEffectModel_ = 0;	
@@ -547,14 +547,14 @@ GameObjectInfo_Plane::createAllPlanes( GameObjectList& gameObjects )
 	Vector4Set( veh->shadowAdjusts_, 0, 0, 0, 0 );	
 	VectorSet( veh->gunoffset_, 2.518f, -7.371f, -0.155f );		
 	VectorSet( veh->cockpitview_, -4, 0, 6 );	
-	veh->airRadar_ = 0;		
-	veh->groundRadar_ = 0;			
+	veh->airRadar_ = nullptr;		
+	veh->groundRadar_ = nullptr;			
 	veh->minThrottle_ = 0;
 	veh->maxThrottle_ = 10;
 	veh->acceleration_ = 220;
 	veh->maxFuel_ = 60;
 	veh->engines_ = 1;		
-	veh->bayAnim_ = 0;		
+	veh->bayAnim_ = nullptr;		
 	veh->gearAnim_ = new VehiclePartAnimInfo(1400);		
 	veh->tailAngle_ = -14.0f;		
 	veh->abEffectModel_ = 0;	
@@ -583,14 +583,14 @@ GameObjectInfo_Plane::createAllPlanes( GameObjectList& gameObjects )
 	Vector4Set( veh->shadowAdjusts_, 0, 0, 0, 0 );	
 	VectorSet( veh->gunoffset_, 2.518f, -7.371f, -0.155f );		
 	VectorSet( veh->cockpitview_, -4, 0, 6 );	
-	veh->airRadar_ = 0;		
-	veh->groundRadar_ = 0;			
+	veh->airRadar_ = nullptr;		
+	veh->groundRadar_ = nullptr;			
 	veh->minThrottle_ = 0;
 	veh->maxThrottle_ = 10;
 	veh->acceleration_ = 220;
 	veh->maxFuel_ = 60;
 	veh->engines_ = 1;		
-	veh->bayAnim_ = 0;		
+	veh->bayAnim_ = nullptr;		
 	veh->gearAnim_ = new VehiclePartAnimInfo(1400);		
 	veh->tailAngle_ = -14.0f;		
 	veh->abEffectModel_ = 0;	
@@ -619,8 +619,8 @@ GameObjectInfo_Plane::createAllPlanes( GameObjectList& gameObjects )
 	Vector4Set( veh->shadowAdjusts_, 0, 0, 0, 0 );	
 	VectorSet( veh->gunoffset_, 2.518f, -7.371f, -0.155f );		
 	VectorSet( veh->cockpitview_, -4, 0, 6 );	
-	veh->airRadar_ = 0;		
-	veh->groundRadar_ = 0;			
+	veh->airRadar_ = nullptr;		
+	veh->groundRadar_ = nullptr;			
 	veh->minThrottle_ = 0;
 	veh->maxThrottle_ = 10;
 	veh->acceleration_ = 220;
@@ -661,15 +661,15 @@ GameObjectInfo_Plane::createAllPlanes( GameObjectList& gameObjects )
 	Vector4Set( veh->shadowAdjusts_, 0, 0, 0, 0 );	
 	VectorSet( veh->gunoffset_, 2.518f, -1.371f, -0.155f );		
 	VectorSet( veh->cockpitview_, -4, 0, 6 );	
-	veh->airRadar_ = 0;		
-	veh->groundRadar_ = 0;			
+	veh->airRadar_ = nullptr;		
+	veh->groundRadar_ = nullptr;			
 	veh->minThrottle_ = 0;
 	veh->maxThrottle_ = 10;
 	veh->acceleration_ = 200;
 	veh->maxFuel_ = 60;
 	veh->engines_ = 1;		
-	veh->bayAnim_ = 0;		
-	veh->gearAnim_ = 0;		
+	veh->bayAnim_ = nullptr;		
+	veh->gearAnim_ = nullptr;		
 	veh->tailAngle_ = -14.0f;		
 	veh->abEffectModel_ = 0;	
     veh->stallSpeed_ = 50;	
@@ -697,15 +697,15 @@ GameObjectInfo_Plane::createAllPlanes( GameObjectList& gameObjects )
 	Vector4Set( veh->shadowAdjusts_, 0, 0, 0, 0 );	
 	VectorSet( veh->gunoffset_, 2.518f, -1.371f, -0.155f );		
 	VectorSet( veh->cockpitview_, -4, 0, 6 );	
-	veh->airRadar_ = 0;		
-	veh->groundRadar_ = 0;			
+	veh->airRadar_ = nullptr;		
+	veh->groundRadar_ = nullptr;			
 	veh->minThrottle_ = 0;
 	veh->maxThrottle_ = 10;
 	veh->acceleration_ = 200;
 	veh->maxFuel_ = 60;
 	veh->engines_ = 1;		
-	veh->bayAnim_ = 0;		
-	veh->gearAnim_ = 0;		
+	veh->bayAnim_ = nullptr;		
+	veh->gearAnim_ = nullptr;		
 	veh->tailAngle_ = -14.0f;		
 	veh->abEffectModel_ = 0;	
     veh->stallSpeed_ = 55;	

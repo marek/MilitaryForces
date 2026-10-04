@@ -60,7 +60,7 @@ static int SV_EntityUpdateBits( entityState_t *from, entityState_t *to, bool cre
 
 	MSG_Init( &msg, buf, sizeof( buf ) );
 	msg_huffstatsHold++;
-	MSG_WriteEntityUpdate( &msg, from, to, create, forced, NULL );
+	MSG_WriteEntityUpdate( &msg, from, to, create, forced, nullptr );
 	msg_huffstatsHold--;
 	return msg.bit;
 }
@@ -281,7 +281,7 @@ static void SV_EmitPacketEntities( SV_Client *client, SV_Client::ClientSnapshot 
 
 	remaining = sv_snapshotBudget->integer * 8 - msg->bit - GENTITYNUM_BITS - 8;
 
-	AngleVectors( frame->ps_.viewangles, forward, NULL, NULL );
+	AngleVectors( frame->ps_.viewangles, forward, nullptr, nullptr );
 
 	numCandidates = 0;
 	for ( i = 0 ; i < frame->num_entities_ ; i++ ) {
@@ -306,7 +306,7 @@ static void SV_EmitPacketEntities( SV_Client *client, SV_Client::ClientSnapshot 
 		}
 
 		table->priority[num] += SV_SnapshotEntityWeight( &frame->ps_, forward, state, 
-			( table->flags[num] & ENTITY_KNOWN ) ? &table->sent[num] : NULL );
+			( table->flags[num] & ENTITY_KNOWN ) ? &table->sent[num] : nullptr );
 		candidates[numCandidates].number = num;
 		candidates[numCandidates].bits = bits;
 		candidates[numCandidates].priority = table->priority[num];
@@ -356,13 +356,13 @@ static void SV_EmitPacketEntities( SV_Client *client, SV_Client::ClientSnapshot 
 			table->sent[num] = *state;
 			break;
 		case SENT_CREATE:
-			MSG_WriteEntityUpdate( msg, &theSV.serverEntities_[num].baseline_, state, true, 0, NULL );
+			MSG_WriteEntityUpdate( msg, &theSV.serverEntities_[num].baseline_, state, true, 0, nullptr );
 			table->sent[num] = *state;
 			table->flags[num] = ENTITY_KNOWN;
 			break;
 		case SENT_REMOVE:
 			removed.number = num;
-			MSG_WriteEntityUpdate( msg, &removed, NULL, false, 0, NULL );
+			MSG_WriteEntityUpdate( msg, &removed, nullptr, false, 0, nullptr );
 			table->flags[num] = 0;
 			break;
 		}
@@ -382,7 +382,7 @@ static void SV_EmitPacketEntities( SV_Client *client, SV_Client::ClientSnapshot 
 
 	for ( i = 0 ; i < frame->num_entities_ ; i++ ) {
 		state = &theSVS.snapshotEntities_[(frame->first_entity_+i) % theSVS.numSnapshotEntities_];
-		states[state->number] = NULL;
+		states[state->number] = nullptr;
 	}
 
 	MSG_WriteBits( msg, ENTITYNUM_WIRE_END, GENTITYNUM_BITS );	// end of packetentities
@@ -408,7 +408,7 @@ static void SV_WriteSnapshotToClient( SV_Client *client, msg_t *msg )
 	if ( client->deltaMessage_ <= 0 || client->state_ != SV_Client::CS_ACTIVE ) 
 	{
 		// client is asking for a retransmit
-		oldframe = NULL;
+		oldframe = nullptr;
 		lastframe = 0;
 	} 
 	else if ( client->netchan_.outgoingSequence - client->deltaMessage_ 
@@ -416,7 +416,7 @@ static void SV_WriteSnapshotToClient( SV_Client *client, msg_t *msg )
 	{
 		// client hasn't gotten a good message through in a long time
 		Com_DPrintf ("%s: Delta request from out of date packet.\n", client->name_);
-		oldframe = NULL;
+		oldframe = nullptr;
 		lastframe = 0;
 	} 
 	else 
@@ -476,7 +476,7 @@ static void SV_WriteSnapshotToClient( SV_Client *client, msg_t *msg )
 	if ( oldframe ) {
 		MSG_WriteDeltaPlayerstate( msg, &oldframe->ps_, &frame->ps_ );
 	} else {
-		MSG_WriteDeltaPlayerstate( msg, NULL, &frame->ps_ );
+		MSG_WriteDeltaPlayerstate( msg, nullptr, &frame->ps_ );
 	}
 
 	// delta encode the entities
@@ -940,7 +940,7 @@ void SV_SendClientSnapshot( SV_Client *client )
 SV_SendClientMessages
 =======================
 */
-void SV_SendClientMessages(void)
+void SV_SendClientMessages()
 {
 	// send a message to each connected client
 	for( int i = 1; i <= sv_maxclients->integer; i++ ) 

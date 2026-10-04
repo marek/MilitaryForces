@@ -35,7 +35,7 @@ void ME_MouseEvent(int x, int y)
 
 void ME_CopySelection()
 {
-	IGME_vehicle_t* veh = 0;
+	IGME_vehicle_t* veh = nullptr;
 	int				i;
 
 	if( cgs.IGME.numSelections > 1 ) {
@@ -81,7 +81,7 @@ void ME_CopySelection()
 
 void ME_PasteSelection()
 {
-	IGME_vehicle_t* veh = 0;
+	IGME_vehicle_t* veh = nullptr;
 	int				i;
 
 	if( cgs.IGME.waypointmode ) {
@@ -128,7 +128,7 @@ void ME_PasteSelection()
 
 void ME_ToggleWaypointMode()
 {
-	IGME_vehicle_t* veh = 0;
+	IGME_vehicle_t* veh = nullptr;
 
 	if( cgs.IGME.numSelections != 1 ) {
 		CG_Printf( "You have to select a single vehicle to enter WAYPOINTMODE\n" );
@@ -211,7 +211,7 @@ void CG_Draw_IGME()
 void ME_MoveWptsBackInLine(IGME_vehicle_t* veh, int start)
 {
 	int i;
-	IGME_waypoint_t*	wpt = 0;
+	IGME_waypoint_t*	wpt = nullptr;
 
 	if( !veh || start < 0 ) return;
 
@@ -232,7 +232,7 @@ void ME_MoveWptsBackInLine(IGME_vehicle_t* veh, int start)
 void ME_MoveWptsAheadInLine(IGME_vehicle_t* veh, int start)
 {
 	int i;
-	IGME_waypoint_t*	wpt = 0;
+	IGME_waypoint_t*	wpt = nullptr;
 
 	if( !veh || start < 0 ) return;
 
@@ -256,7 +256,7 @@ void ME_DeleteSelection()
 
 	if( cgs.IGME.waypointmode ) {
 		IGME_vehicle_t*		selveh = ME_GetSelectedVehicle();
-		IGME_waypoint_t*	wpt = 0;
+		IGME_waypoint_t*	wpt = nullptr;
 		if( !selveh ) return;
 		if( !cgs.IGME.numWptSelections ) return;
 		for( i = 0; i < IGME_MAX_WAYPOINTS; ++i ) {
@@ -271,8 +271,8 @@ void ME_DeleteSelection()
 			}
 		}
 	} else {
-		IGME_vehicle_t*		veh = 0;
-		IGME_waypoint_t*	wpt = 0;
+		IGME_vehicle_t*		veh = nullptr;
+		IGME_waypoint_t*	wpt = nullptr;
 		int					j;
 		if( !cgs.IGME.numSelections ) return;
 		for( i = 0; i < IGME_MAX_VEHICLES; ++i ) {
@@ -372,14 +372,14 @@ IGME_vehicle_t* ME_GetVehicleUnderCrosshair()
 {
 	vec3_t			mins, maxs, dir;
 	float			dist, closestDist = MAX_SELECTION_DISTANCE;
-	IGME_vehicle_t* selveh = 0;
-	IGME_vehicle_t*	veh = 0;
+	IGME_vehicle_t* selveh = nullptr;
+	IGME_vehicle_t*	veh = nullptr;
 	box3_t			bbox;
 	ray3_t			ray;
 	int				i;
 
 	VectorCopy( cg.predictedPlayerState.origin, ray.start );
-	AngleVectors( cg.predictedPlayerState.viewangles, ray.dir, 0, 0 );
+	AngleVectors( cg.predictedPlayerState.viewangles, ray.dir, nullptr, nullptr );
 	VectorScale( ray.dir, MAX_SELECTION_DISTANCE, ray.dir );
 
 	for( i = 0; i < IGME_MAX_VEHICLES; ++i ) {
@@ -410,8 +410,8 @@ IGME_waypoint_t* ME_GetWaypointUnderCrosshair()
 {
 	vec3_t			mins, maxs, dir;
 	float			dist, closestDist = MAX_SELECTION_DISTANCE;
-	IGME_waypoint_t* selwpt = 0;
-	IGME_waypoint_t* wpt = 0;
+	IGME_waypoint_t* selwpt = nullptr;
+	IGME_waypoint_t* wpt = nullptr;
 	box3_t			bbox;
 	ray3_t			ray;
 	int				i;
@@ -419,10 +419,10 @@ IGME_waypoint_t* ME_GetWaypointUnderCrosshair()
 	vec3_t			wmins = { -25, -25, -25 },
 					wmaxs = { 25, 25, 25 };
 
-	if( !selveh ) return 0;
+	if( !selveh ) return nullptr;
 
 	VectorCopy( cg.predictedPlayerState.origin, ray.start );
-	AngleVectors( cg.predictedPlayerState.viewangles, ray.dir, 0, 0 );
+	AngleVectors( cg.predictedPlayerState.viewangles, ray.dir, nullptr, nullptr );
 	VectorScale( ray.dir, MAX_SELECTION_DISTANCE, ray.dir );
 
 	for( i = 0; i < IGME_MAX_WAYPOINTS; ++i ) {
@@ -457,7 +457,7 @@ void ME_CheckForSelection()
 IGME_vehicle_t* ME_GetSelectedVehicle()
 {
 	int				i;
-	IGME_vehicle_t* veh = 0;
+	IGME_vehicle_t* veh = nullptr;
 
 	for( i = 0; i < IGME_MAX_VEHICLES; ++i ) {
 		if( cgs.IGME.vehicles[i].selected ) {
@@ -522,7 +522,7 @@ void ME_RotateSelection( int delta )
 		angles[1] += delta;
 		AngleMod( angles[1] );
 		// move object
-		AngleVectors(angles, dir, 0, 0);
+		AngleVectors(angles, dir, nullptr, nullptr);
 		VectorScale(dir, dist, dir);
 		VectorAdd(center, dir, veh->origin);
 	}
@@ -551,7 +551,7 @@ void ME_DragSelection( int x, int y )
 	} else {
 		// move horizontally
 		VectorSet( angles, 0, cg.predictedPlayerState.viewangles[1], 0 );
-		AngleVectors(  angles, forward, right, 0 );
+		AngleVectors(  angles, forward, right, nullptr );
 		VectorScale( forward, -y, forward );
 		VectorScale( right, x, right );
 		VectorAdd( forward, right, forward );
@@ -628,12 +628,12 @@ void ME_SpawnWaypoint()
 
 static IGME_vehicle_t* ME_SpawnVehicleAt( int vehidx, vec3_t pos, vec3_t angles ) 
 {
-	IGME_vehicle_t*	 veh = 0;
+	IGME_vehicle_t*	 veh = nullptr;
 	int i;
 
 	if( cgs.IGME.waypointmode ) {
 		CG_Printf( "You are in waypoint mode, spawning vehicles not allowed now!\n" );
-		return 0;
+		return nullptr;
 	}
 
 	for( i = 0; i < IGME_MAX_VEHICLES; ++i ) {
@@ -644,7 +644,7 @@ static IGME_vehicle_t* ME_SpawnVehicleAt( int vehidx, vec3_t pos, vec3_t angles 
 	}
 	if( !veh ) {
 		CG_Printf( "Too many vehicles spawned! Please delete one first!\n" );
-		return 0;
+		return nullptr;
 	}
 
 	VectorCopy( pos, veh->origin );
@@ -674,12 +674,12 @@ IGME_vehicle_t* ME_SpawnVehicle( int vehidx )
 
 static IGME_vehicle_t* ME_SpawnGroundInstallationAt( int idx, vec3_t pos, vec3_t angles )
 {
-	IGME_vehicle_t*	 veh = 0;
+	IGME_vehicle_t*	 veh = nullptr;
 	int i;
 
 	if( cgs.IGME.waypointmode ) {
 		CG_Printf( "You are in waypoint mode, spawning ground installations not allowed now!\n" );
-		return 0;
+		return nullptr;
 	}
 
 	for( i = 0; i < IGME_MAX_VEHICLES; ++i ) {
@@ -690,7 +690,7 @@ static IGME_vehicle_t* ME_SpawnGroundInstallationAt( int idx, vec3_t pos, vec3_t
 	}
 	if( !veh ) {
 		CG_Printf( "Too many vehicles spawned! Please delete one first!\n" );
-		return 0;
+		return nullptr;
 	}
 
 	VectorCopy( pos, veh->origin );

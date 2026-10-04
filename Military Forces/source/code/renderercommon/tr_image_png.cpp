@@ -226,7 +226,7 @@ static struct BufferedFile *ReadBufferedFile(const char *name)
 
 	if(!name)
 	{
-		return(NULL);
+		return(nullptr);
 	}
 
 	/*
@@ -236,7 +236,7 @@ static struct BufferedFile *ReadBufferedFile(const char *name)
 	BF = (struct BufferedFile *)ri.Malloc(sizeof(struct BufferedFile));
 	if(!BF)
 	{
-		return(NULL);
+		return(nullptr);
 	}
 
 	/*
@@ -244,8 +244,8 @@ static struct BufferedFile *ReadBufferedFile(const char *name)
 	 */
 
 	BF->Length    = 0;
-	BF->Buffer    = NULL;
-	BF->Ptr       = NULL;
+	BF->Buffer    = nullptr;
+	BF->Ptr       = nullptr;
 	BF->BytesLeft = 0;
 
 	/*
@@ -263,7 +263,7 @@ static struct BufferedFile *ReadBufferedFile(const char *name)
 	{
 		ri.Free(BF);
 
-		return(NULL);
+		return(nullptr);
 	}
 
 	/*
@@ -307,7 +307,7 @@ static void *BufferedFileRead(struct BufferedFile *BF, unsigned Length)
 
 	if(!(BF && Length))
 	{
-		return(NULL);
+		return(nullptr);
 	}
 
 	/*
@@ -316,7 +316,7 @@ static void *BufferedFileRead(struct BufferedFile *BF, unsigned Length)
 
 	if(Length > BF->BytesLeft)
 	{
-		return(NULL);
+		return(nullptr);
 	}
 
 	/*
@@ -539,10 +539,10 @@ static uint32_t DecompressIDATs(struct BufferedFile *BF, uint8_t **Buffer)
 	 *  some zeroing
 	 */
 
-	DecompressedData = NULL;
+	DecompressedData = nullptr;
 	*Buffer = DecompressedData;
 
-	CompressedData = NULL;
+	CompressedData = nullptr;
 	CompressedDataLength = 0;
 
 	BytesToRewind = 0;
@@ -699,7 +699,7 @@ static uint32_t DecompressIDATs(struct BufferedFile *BF, uint8_t **Buffer)
 	 *  Let puff() calculate the decompressed data length.
 	 */
 
-	puffDest    = NULL;
+	puffDest    = nullptr;
 	puffDestLen = 0;
 
 	/*
@@ -1943,7 +1943,7 @@ void R_LoadPNG(const char *name, byte **pic, int *width, int *height)
 	 *  Zero out return values.
 	 */
 
-	*pic = NULL;
+	*pic = nullptr;
 
 	if(width)
 	{

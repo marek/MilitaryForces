@@ -8,7 +8,7 @@
 struct UI_UtilsCG : public UI_Utils
 {
 								UI_UtilsCG();
-								~UI_UtilsCG();
+								~UI_UtilsCG() override;
 
 	// cg specific
 	float						drawTimer( float y );	

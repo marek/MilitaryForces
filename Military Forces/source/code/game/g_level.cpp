@@ -66,13 +66,13 @@ LevelLocals::resetAll()
 	ent_category_ = 0;
 	intermissionQueued_ = 0;
 	intermissiontime_ = 0;
-	changemap_ = 0;
+	changemap_ = nullptr;
 	readyToExit_ = false;
 	exitTime_ = 0;
 	VectorClear( intermission_origin_ );
 	VectorClear( intermission_angle_ );
 	locationLinked_ = false;
-	locationHead_ = 0;
+	locationHead_ = nullptr;
 }
 
 void
@@ -86,7 +86,7 @@ LevelLocals::resetClientsAndEntities()
 	clients_.resize(MAX_CLIENTS+1);	// first one is empty (world)
 	for( size_t i = 0; i <= MAX_CLIENTS; ++i )
 	{
-		clients_.at(i) = 0;
+		clients_.at(i) = nullptr;
 	}
 
 	for( size_t i = 0; i < gameEntities_.size(); ++i )
@@ -144,7 +144,7 @@ LevelLocals::removeEntity(GameEntity* entToRemove)
 	{
 		int num = entToRemove->s.number;
 		delete gameEntities_.at(num);
-		gameEntities_.at(num) = 0;
+		gameEntities_.at(num) = nullptr;
 		//delete clients_.at(num);
 		//clients_.at(num) = 0;
 	}
@@ -332,7 +332,7 @@ LevelLocals::spawnEntity()
 		addEntity(ent);
 		return ent;
 	}
-	return 0;
+	return nullptr;
 }
 
 

@@ -12,14 +12,14 @@ GameEntity::Event::Event() :
 }
 
 GameEntity::GameEntity() :
-	client_(0),
+	client_(nullptr),
 	inuse_(false),
-	classname_(0),
+	classname_(nullptr),
 	spawnflags_(0),
 	//neverFree_(false),
 	flags_(0),
-	model_(0),
-	model2_(0),
+	model_(nullptr),
+	model2_(nullptr),
 	freetime_(0),
 	eventTime_(0),
 	freeAfterEvent_(false),
@@ -33,18 +33,18 @@ GameEntity::GameEntity() :
 	sound2to1_(0),
 	soundPos2_(0),
 	soundLoop_(0),
-	parent_(0),
-	nextTrain_(0),
-	prevTrain_(0),
-	message_(0),
+	parent_(nullptr),
+	nextTrain_(nullptr),
+	prevTrain_(nullptr),
+	message_(nullptr),
 	timestamp_(0),
 	angle_(0.0f),
-	target_(0),
-	targetname_(0),
-	team_(0),
-	targetShaderName_(0),
-	targetShaderNewName_(0),
-	target_ent_(0),
+	target_(nullptr),
+	targetname_(nullptr),
+	team_(nullptr),
+	targetShaderName_(nullptr),
+	targetShaderNewName_(nullptr),
+	target_ent_(nullptr),
 	speed_(0.0f),
 	nextthink_(0),
 	pain_debounce_time_(0),
@@ -58,30 +58,30 @@ GameEntity::GameEntity() :
 	methodOfDeath_(0),
 	splashMethodOfDeath_(0),
 	count_(0),
-	chain_(0),
-	enemy_(0),
-	activator_(0),
-	teamchain_(0),
-	teammaster_(0),
+	chain_(nullptr),
+	enemy_(nullptr),
+	activator_(nullptr),
+	teamchain_(nullptr),
+	teammaster_(nullptr),
 	watertype_(0),
 	waterlevel_(0),
 	noise_index_(0),
 	wait_(0.0f),
 	random_(0.0f),
-	item_(0),
+	item_(nullptr),
 	ONOFF_(0),
 	left_(0),
 	bulletpos_(0),
 	gearheight_(0.0f),
 	rechargetime_(0),
-	radio_target_(0),
+	radio_target_(nullptr),
 	ent_category_(0),
 	radartime_(0),
 	score_(0),
 	tracerindex_(0),
 	idxScriptBegin_(0),
 	idxScriptEnd_(0),
-	tracktarget_(0),
+	tracktarget_(nullptr),
 	locktime_(0),
 	targetcat_(0.0f),
 	catmodifier_(0.0f),
@@ -99,13 +99,13 @@ GameEntity::GameEntity() :
 	basicECMVulnerability_(0),
 	nukeTime_(0),
 	nukeShockTime_(0),
-	thinkFunc_(0),
-	reachedFunc_(0),
-	blockedFunc_(0),
-	touchFunc_(0),
-	useFunc_(0),
-	painFunc_(0),
-	dieFunc_(0)
+	thinkFunc_(nullptr),
+	reachedFunc_(nullptr),
+	blockedFunc_(nullptr),
+	touchFunc_(nullptr),
+	useFunc_(nullptr),
+	painFunc_(nullptr),
+	dieFunc_(nullptr)
 {
 	VectorClear(pos1_);
 	VectorClear(pos2_);
@@ -116,17 +116,17 @@ GameEntity::GameEntity() :
 void
 GameEntity::cleanAll()
 {
-	client_ = 0;
+	client_ = nullptr;
 	inuse_ = false;
-	classname_ = 0;
+	classname_ = nullptr;
 	spawnflags_ = 0;
 	//neverFree_ = false;
 	flags_ = 0;
-	model_ = 0;
-	model2_ = 0;
+	model_ = nullptr;
+	model2_ = nullptr;
 	freetime_ = 0;
 	eventTime_ = 0;
-	freeAfterEvent_ = 0;
+	freeAfterEvent_ = false;
 	unlinkAfterEvent_ = false;
 	physicsObject_ = false;
 	physicsBounce_ = 0.0f;
@@ -137,18 +137,18 @@ GameEntity::cleanAll()
 	sound2to1_ = 0;
 	soundPos2_ = 0;
 	soundLoop_ = 0;
-	parent_ = 0;
-	nextTrain_ = 0;
-	prevTrain_ = 0;
-	message_ = 0;
+	parent_ = nullptr;
+	nextTrain_ = nullptr;
+	prevTrain_ = nullptr;
+	message_ = nullptr;
 	timestamp_ = 0;
 	angle_ = 0.0f;
-	target_ = 0;
-	targetname_ = 0;
-	team_ = 0;
-	targetShaderName_ = 0;
-	targetShaderNewName_ = 0;
-	target_ent_ = 0;
+	target_ = nullptr;
+	targetname_ = nullptr;
+	team_ = nullptr;
+	targetShaderName_ = nullptr;
+	targetShaderNewName_ = nullptr;
+	target_ent_ = nullptr;
 	speed_ = 0.0f;
 	nextthink_ = 0;
 	pain_debounce_time_ = 0;
@@ -162,30 +162,30 @@ GameEntity::cleanAll()
 	methodOfDeath_ = 0;
 	splashMethodOfDeath_ = 0;
 	count_ = 0;
-	chain_ = 0;
-	enemy_ = 0;
-	activator_ = 0;
-	teamchain_ = 0;
-	teammaster_ = 0;
+	chain_ = nullptr;
+	enemy_ = nullptr;
+	activator_ = nullptr;
+	teamchain_ = nullptr;
+	teammaster_ = nullptr;
 	watertype_ = 0;
 	waterlevel_ = 0;
 	noise_index_ = 0;
 	wait_ = 0.0f;
 	random_ = 0.0f;
-	item_ = 0;
+	item_ = nullptr;
 	ONOFF_ = 0;
 	left_ = 0;
 	bulletpos_ = 0;
 	gearheight_ = 0.0f;
 	rechargetime_ = 0;
-	radio_target_ = 0;
+	radio_target_ = nullptr;
 	ent_category_ = 0;
 	radartime_ = 0;
 	score_ = 0;
 	tracerindex_ = 0;
 	idxScriptBegin_ = 0;
 	idxScriptEnd_ = 0;
-	tracktarget_ = 0;
+	tracktarget_ = nullptr;
 	locktime_ = 0;
 	targetcat_ = 0.0f;
 	catmodifier_ = 0.0f;
@@ -206,13 +206,13 @@ GameEntity::cleanAll()
 	VectorClear(pos1_);
 	VectorClear(pos2_);
 	VectorClear(movedir_);
-	thinkFunc_ = 0;
-	reachedFunc_ = 0;
-	blockedFunc_ = 0;
-	touchFunc_ = 0;
-	useFunc_ = 0;
-	painFunc_ = 0;
-	dieFunc_ = 0;
+	thinkFunc_ = nullptr;
+	reachedFunc_ = nullptr;
+	blockedFunc_ = nullptr;
+	touchFunc_ = nullptr;
+	useFunc_ = nullptr;
+	painFunc_ = nullptr;
+	dieFunc_ = nullptr;
 }
 
 void

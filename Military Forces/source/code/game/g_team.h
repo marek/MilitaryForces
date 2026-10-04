@@ -25,14 +25,14 @@ void AddTeamScore(vec3_t origin, int team, int score);
 
 void Team_DroppedFlagThink(GameEntity *ent);
 void Team_FragBonuses(GameEntity *targ, GameEntity *inflictor, GameEntity *attacker);
-void Team_InitGame(void);
+void Team_InitGame();
 void Team_ReturnFlag(int team);
 void Team_FreeEntity(GameEntity *ent);
 GameEntity *SelectCTFSpawnPoint ( ClientBase::eTeam team, int teamstate, vec3_t origin, vec3_t angles, int idx );
 GameEntity *Team_GetLocation(GameEntity *ent);
 bool Team_GetLocationMsg(GameEntity *ent, char *loc, int loclen);
 void TeamplayInfoMessage( GameEntity *ent );
-void CheckTeamStatus(void);
+void CheckTeamStatus();
 
 int Pickup_Team( GameEntity *ent, GameEntity *other );
 

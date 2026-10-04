@@ -15,7 +15,7 @@ static void loselock( GameEntity* ent )
 		ent->tracktarget_->client_->ps_.stats[STAT_LOCKINFO] &= ~LI_BEING_LOCKED;
 	}
 	ent->locktime_ = 0;
-	ent->tracktarget_ = 0;
+	ent->tracktarget_ = nullptr;
 	ent->s.tracktarget = ENTITYNUM_NONE;
 	ent->gi_nextScanTime_ = theLevel.time_ + 1500;
 	ent->gi_reloadTime_ = theLevel.time_ + availableGroundInstallations[ent->s.modelindex2].reloadTime;
@@ -53,7 +53,7 @@ static void Update_GI_Targets( GameEntity* ent )
 	vec3_t			mins, maxs, rangevec, dir;
 	float			range = availableGroundInstallations[ent->s.modelindex2].radarRange;
 	int				i, num, touch[MAX_GENTITIES];
-	GameEntity		*hit, *best = 0;
+	GameEntity		*hit, *best = nullptr;
 	float			dist, closest = 999999;
 	unsigned long	cat;
 	trace_t			tr;
@@ -101,7 +101,7 @@ static void Update_GI_Targets( GameEntity* ent )
 						if( team == ent->s.generic1 ) continue;
 					}
 					// check LOS
-					SV_Trace( &tr, ent->r.currentOrigin, 0, 0, hit->r.currentOrigin, ent->s.number, MASK_PLAYERSOLID, false );
+					SV_Trace( &tr, ent->r.currentOrigin, nullptr, nullptr, hit->r.currentOrigin, ent->s.number, MASK_PLAYERSOLID, false );
 					if( tr.fraction < 1 && tr.entityNum != hit->s.number ) continue;
 					// check dist
 					VectorSubtract(hit->r.currentOrigin, ent->r.currentOrigin, dir);
@@ -123,7 +123,7 @@ static void Update_GI_Targets( GameEntity* ent )
 						ent->tracktarget_->client_->ps_.stats[STAT_LOCKINFO] |= LI_BEING_LOCKED;
 				}
 				else
-					ent->tracktarget_ = 0;
+					ent->tracktarget_ = nullptr;
 			}
 		}
 		// fight current target
@@ -150,7 +150,7 @@ static void Update_GI_Targets( GameEntity* ent )
 				return;
 			}
 			// check LOS
-			SV_Trace( &tr, ent->r.currentOrigin, 0, 0, ent->tracktarget_->r.currentOrigin, ent->s.number, MASK_PLAYERSOLID, false );
+			SV_Trace( &tr, ent->r.currentOrigin, nullptr, nullptr, ent->tracktarget_->r.currentOrigin, ent->s.number, MASK_PLAYERSOLID, false );
 			if( tr.fraction < 1 && tr.entityNum != ent->tracktarget_->s.number )
 			{
 				loselock(ent);

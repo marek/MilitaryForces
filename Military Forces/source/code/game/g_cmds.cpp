@@ -468,7 +468,7 @@ Let everyone know about a team change
 */
 void BroadcastTeamChange( GameClient *client, int oldTeam )
 {
-	const char * pTeam = NULL;
+	const char * pTeam = nullptr;
 
 	// work out what to shout
 	switch( client->sess_.sessionTeam_ )
@@ -517,7 +517,7 @@ void SetTeam( GameEntity *ent, char *s )
 	char				userinfo[MAX_INFO_STRING];
 	bool				dontBalance = false;
 	int					balanceNum = 0;
-	const char *		pTeam = NULL;
+	const char *		pTeam = nullptr;
 
 	// only spect int mission editor
 	if( g_gametype.integer == GT_MISSION_EDITOR )
@@ -1023,7 +1023,7 @@ static void Cmd_Say_f( GameEntity *ent, int mode, bool arg0 )
 	else
 		p = ConcatArgs( 1 );
 
-	G_Say( ent, NULL, mode, p );
+	G_Say( ent, nullptr, mode, p );
 }
 
 /*
@@ -1563,7 +1563,7 @@ void Rider_Leave( GameEntity *ent, bool forced )
 		vec3_t forward, right, yawOnly, origin;
 		int vehicle = pilot->vehicle_;
 		VectorSet( yawOnly, 0, pilot->ps_.vehicleAngles[YAW], 0 );
-		AngleVectors( yawOnly, forward, right, 0 );
+		AngleVectors( yawOnly, forward, right, nullptr );
 		VectorCopy( pilot->ps_.origin, origin );
 		if( vehicle >= 0 && availableVehicles[vehicle].hasDeck && (availableVehicles[vehicle].cat & CAT_LQM) == 0 ) 
 		{
@@ -1608,7 +1608,7 @@ void Rider_KillAll( GameEntity *vehicle, GameEntity *attacker )
 		switch_vehicle( theLevel.getEntity( i ) );
 		GameEntity* body = theLevel.getEntity( i );
 		if( body && body->health_ > 0 ) 
-			G_Damage( body, vehicle, attacker, 0, 0, 100000, DAMAGE_NO_PROTECTION, MOD_VEHICLEEXPLOSION, CAT_ANY );
+			G_Damage( body, vehicle, attacker, nullptr, nullptr, 100000, DAMAGE_NO_PROTECTION, MOD_VEHICLEEXPLOSION, CAT_ANY );
 	}
 }
 
@@ -1683,8 +1683,8 @@ static void Cmd_Enter( GameEntity *ent )
 	}
 	int num = SV_AreaEntities( mins, maxs, touch, MAX_GENTITIES );
 
-	GameEntity* best = 0;
-	Abandoned_Think* bestThink = 0;
+	GameEntity* best = nullptr;
+	Abandoned_Think* bestThink = nullptr;
 	float bestDist = 0;
 	for( int i = 0; i < num; i++ ) 
 	{
@@ -1787,7 +1787,7 @@ void Cmd_Eject_f( GameEntity *ent )
 	{
 		vec3_t forward, right, yawOnly;
 		VectorSet( yawOnly, 0, client->ps_.vehicleAngles[YAW], 0 );
-		AngleVectors( yawOnly, forward, right, 0 );
+		AngleVectors( yawOnly, forward, right, nullptr );
 		VectorMA( client->ps_.origin, availableVehicles[vehicle].deckPos[0], forward, client->ps_.origin );
 		VectorMA( client->ps_.origin, -availableVehicles[vehicle].deckPos[1], right, client->ps_.origin );
 		client->ps_.origin[2] += availableVehicles[vehicle].deckPos[2];
@@ -1795,7 +1795,7 @@ void Cmd_Eject_f( GameEntity *ent )
 	else if( parked ) 
 	{
 		vec3_t right;
-		AngleVectors( client->ps_.vehicleAngles, 0, right, 0 );
+		AngleVectors( client->ps_.vehicleAngles, nullptr, right, nullptr );
 		VectorMA( client->ps_.origin, availableVehicles[vehicle].maxs[1] + 10, right, client->ps_.origin );
 	}
 

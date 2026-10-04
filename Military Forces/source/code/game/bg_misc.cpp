@@ -30,13 +30,13 @@ An item fires all of its targets when it is picked up.  If the toucher can't car
 gitem_t	bg_itemlist[] = 
 {
 	{
-		NULL,
-		NULL,
-		{ NULL,
-		NULL,
-		0, 0} ,
-/* icon */		NULL,
-/* pickup */	NULL,
+		nullptr,
+		nullptr,
+		{ nullptr,
+		nullptr,
+		nullptr, nullptr} ,
+/* icon */		nullptr,
+/* pickup */	nullptr,
 		0,
 		static_cast<itemType_t>(0),
 		0,
@@ -54,7 +54,7 @@ gitem_t	bg_itemlist[] =
 		"sound/items/s_health.wav",
         { "models/powerups/health/small_cross.md3", 
 		"models/powerups/health/small_sphere.md3", 
-		0, 0 },
+		nullptr, nullptr },
 /* icon */		"icons/iconh_green",
 /* pickup */	"5 Health",
 		5,
@@ -71,7 +71,7 @@ gitem_t	bg_itemlist[] =
 		"sound/items/n_health.wav",
         { "models/powerups/health/medium_cross.md3", 
 		"models/powerups/health/medium_sphere.md3", 
-		0, 0 },
+		nullptr, nullptr },
 /* icon */		"icons/iconh_yellow",
 /* pickup */	"25 Health",
 		25,
@@ -88,7 +88,7 @@ gitem_t	bg_itemlist[] =
 		"sound/items/l_health.wav",
         { "models/powerups/health/large_cross.md3", 
 		"models/powerups/health/large_sphere.md3", 
-		0, 0 },
+		nullptr, nullptr },
 /* icon */		"icons/iconh_red",
 /* pickup */	"50 Health",
 		50,
@@ -105,7 +105,7 @@ gitem_t	bg_itemlist[] =
 		"sound/items/m_health.wav",
         { "models/powerups/health/mega_cross.md3", 
 		"models/powerups/health/mega_sphere.md3", 
-		0, 0 },
+		nullptr, nullptr },
 /* icon */		"icons/iconh_mega",
 /* pickup */	"Mega Health",
 		100,
@@ -119,8 +119,8 @@ gitem_t	bg_itemlist[] =
 		"item_fuel_some",
 		"sound/items/m_health.wav",
         { "models/powerups/fuel_canister/fuel_canister.md3", 
-		0, 
-		0, 0 },
+		nullptr, 
+		nullptr, nullptr },
 /* icon */		"icons/iconf_some",
 /* pickup */	"Some Fuel",
 		250,
@@ -134,8 +134,8 @@ gitem_t	bg_itemlist[] =
 		"item_fuel_more",
 		"sound/items/m_health.wav",
         { "models/powerups/fuel_refueller/fuel_refueller.md3", 
-		0, 
-		0, 0 },
+		nullptr, 
+		nullptr, nullptr },
 /* icon */		"icons/iconf_more",
 /* pickup */	"more Fuel",
 		2000,
@@ -155,7 +155,7 @@ gitem_t	bg_itemlist[] =
 		"ammo_shells",
 		"sound/misc/am_pkup.wav",
         { "models/powerups/ammo/shotgunam.md3", 
-		0, 0, 0},
+		nullptr, nullptr, nullptr},
 /* icon */		"icons/icona_shotgun",
 /* pickup */	"Shells",
 		10,
@@ -171,7 +171,7 @@ gitem_t	bg_itemlist[] =
 		"ammo_bullets",
 		"sound/misc/am_pkup.wav",
         { "models/powerups/ammo/machinegunam.md3", 
-		0, 0, 0},
+		nullptr, nullptr, nullptr},
 /* icon */		"icons/icona_machinegun",
 /* pickup */	"Bullets",
 		50,
@@ -187,7 +187,7 @@ gitem_t	bg_itemlist[] =
 		"ammo_rockets",
 		"sound/misc/am_pkup.wav",
         { "models/powerups/ammo/rocketam.md3", 
-		0, 0, 0},
+		nullptr, nullptr, nullptr},
 /* icon */		"icons/icona_rocket",
 /* pickup */	"Rockets",
 		8,
@@ -203,7 +203,7 @@ gitem_t	bg_itemlist[] =
 		"ammo_slugs",
 		"sound/misc/am_pkup.wav",
         { "models/powerups/ammo/railgunam.md3", 
-		0, 0, 0},
+		nullptr, nullptr, nullptr},
 /* icon */		"icons/icona_railgun",
 /* pickup */	"Slugs",
 		4,
@@ -219,9 +219,9 @@ Only in CTF games
 */
 	{
 		"team_CTF_redflag",
-		NULL,
+		nullptr,
         { "models/flags/r_flag.md3",
-		0, 0, 0 },
+		nullptr, nullptr, nullptr },
 /* icon */		"icons/iconf_red1",
 /* pickup */	"Red Flag",
 		0,
@@ -236,9 +236,9 @@ Only in CTF games
 */
 	{
 		"team_CTF_blueflag",
-		NULL,
+		nullptr,
         { "models/flags/b_flag.md3",
-		0, 0, 0 },
+		nullptr, nullptr, nullptr },
 /* icon */		"icons/iconf_blu1",
 /* pickup */	"Blue Flag",
 		0,
@@ -249,7 +249,7 @@ Only in CTF games
 	},
 
 	// end of list marker
-	{NULL}
+	{nullptr}
 };
 
 int		bg_numItems = sizeof(bg_itemlist) / sizeof(bg_itemlist[0]) - 1;
@@ -269,7 +269,7 @@ gitem_t	*BG_FindItemForPowerup( objective_t pw ) {
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -287,7 +287,7 @@ gitem_t	*BG_FindItem( const char *pickupName ) {
 			return it;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /*

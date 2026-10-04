@@ -196,6 +196,6 @@ bool CM_BoundsIntersectPoint( const vec3_t mins, const vec3_t maxs, const vec3_t
 struct patchCollide_s	*CM_GeneratePatchCollide( int width, int height, vec3_t *points );
 void CM_TraceThroughPatchCollide( traceWork_t *tw, const struct patchCollide_s *pc );
 bool CM_PositionTestInPatchCollide( traceWork_t *tw, const struct patchCollide_s *pc );
-void CM_ClearLevelPatches( void );
+void CM_ClearLevelPatches( );
 
 #endif // __CM_LOCAL_H__

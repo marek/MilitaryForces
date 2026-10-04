@@ -464,33 +464,33 @@ extern	cvar_t	*cl_voip;
 // cl_main
 //
 
-void CL_Init (void);
+void CL_Init ();
 void CL_AddReliableCommand(const char *cmd, bool isDisconnectCmd = false);
 
 void CL_StartHunkUsers( bool rendererOnly );
 
-void CL_Disconnect_f (void);
-void CL_GetChallengePacket (void);
-void CL_Vid_Restart_f( void );
-void CL_Snd_Restart_f (void);
-void CL_StartDemoLoop( void );
-void CL_NextDemo( void );
-void CL_ReadDemoMessage( void );
-void CL_StopRecord_f(void);
+void CL_Disconnect_f ();
+void CL_GetChallengePacket ();
+void CL_Vid_Restart_f( );
+void CL_Snd_Restart_f ();
+void CL_StartDemoLoop( );
+void CL_NextDemo( );
+void CL_ReadDemoMessage( );
+void CL_StopRecord_f();
 
-void CL_InitDownloads(void);
-void CL_NextDownload(void);
+void CL_InitDownloads();
+void CL_NextDownload();
 
 void CL_GetPing( int n, char *buf, int buflen, int *pingtime );
 void CL_GetPingInfo( int n, char *buf, int buflen );
 void CL_ClearPing( int n );
-int CL_GetPingQueueCount( void );
+int CL_GetPingQueueCount( );
 
-void CL_ShutdownRef( void );
-void CL_InitRef( void );
+void CL_ShutdownRef( );
+void CL_InitRef( );
 int CL_ServerStatus( const char *serverAddress, char *serverStatusString, int maxLen );
 
-bool CL_CheckPaused(void);
+bool CL_CheckPaused();
 
 //
 // cl_input
@@ -503,16 +503,16 @@ typedef struct {
 	bool	wasPressed;		// set when down, not cleared when up
 } kbutton_t;
 
-void CL_InitInput(void);
-void CL_ShutdownInput(void);
-void CL_SendCmd (void);
-void CL_ClearState (void);
-void CL_ReadPackets (void);
+void CL_InitInput();
+void CL_ShutdownInput();
+void CL_SendCmd ();
+void CL_ClearState ();
+void CL_ReadPackets ();
 
-void CL_WritePacket( void );
-void IN_CenterView (void);
+void CL_WritePacket( );
+void IN_CenterView ();
 
-void CL_VerifyCode( void );
+void CL_VerifyCode( );
 
 float CL_KeyState (kbutton_t *key);
 int Key_StringToKeynum( char *str );
@@ -525,19 +525,19 @@ extern int cl_connectedToPureServer;
 extern int cl_connectedToCheatServer;
 
 #ifdef USE_VOIP
-void CL_Voip_f( void );
+void CL_Voip_f( );
 #endif
 
-void CL_SystemInfoChanged( void );
+void CL_SystemInfoChanged( );
 void CL_ParseServerMessage( msg_t *msg );
 
 //====================================================================
 
 void	CL_ServerInfoPacket( netadr_t from, msg_t *msg );
-void	CL_LocalServers_f( void );
-void	CL_GlobalServers_f( void );
-void	CL_FavoriteServers_f( void );
-void	CL_Ping_f( void );
+void	CL_LocalServers_f( );
+void	CL_GlobalServers_f( );
+void	CL_FavoriteServers_f( );
+void	CL_Ping_f( );
 bool CL_UpdateVisiblePings_f( int source );
 
 
@@ -549,29 +549,29 @@ extern int g_smallchar_height;
 
 void Con_DrawCharacter (int cx, int line, int num);
 
-void Con_CheckResize (void);
-void Con_Init(void);
-void Con_Shutdown(void);
-void Con_Clear_f (void);
-void Con_ToggleConsole_f (void);
-void Con_DrawNotify (void);
-void Con_ClearNotify (void);
-void Con_RunConsole (void);
-void Con_DrawConsole (void);
-void Con_PageUp( void );
-void Con_PageDown( void );
-void Con_Top( void );
-void Con_Bottom( void );
-void Con_Close( void );
+void Con_CheckResize ();
+void Con_Init();
+void Con_Shutdown();
+void Con_Clear_f ();
+void Con_ToggleConsole_f ();
+void Con_DrawNotify ();
+void Con_ClearNotify ();
+void Con_RunConsole ();
+void Con_DrawConsole ();
+void Con_PageUp( );
+void Con_PageDown( );
+void Con_Top( );
+void Con_Bottom( );
+void Con_Close( );
 
-void CL_LoadConsoleHistory( void );
-void CL_SaveConsoleHistory( void );
+void CL_LoadConsoleHistory( );
+void CL_SaveConsoleHistory( );
 
 //
 // cl_scrn.c
 //
-void	SCR_Init (void);
-void	SCR_UpdateScreen (void);
+void	SCR_Init ();
+void	SCR_UpdateScreen ();
 
 void	SCR_DebugGraph (float value);
 
@@ -593,10 +593,10 @@ void	SCR_DrawSmallChar( int x, int y, int ch );
 // cl_cin.c
 //
 
-void CL_PlayCinematic_f( void );
-void SCR_DrawCinematic (void);
-void SCR_RunCinematic (void);
-void SCR_StopCinematic (void);
+void CL_PlayCinematic_f( );
+void SCR_DrawCinematic ();
+void SCR_RunCinematic ();
+void SCR_StopCinematic ();
 int CIN_PlayCinematic( const char *arg0, int xpos, int ypos, int width, int height, int bits);
 e_status CIN_StopCinematic(int handle);
 e_status CIN_RunCinematic (int handle);
@@ -604,28 +604,28 @@ void CIN_DrawCinematic (int handle);
 void CIN_SetExtents (int handle, int x, int y, int w, int h);
 void CIN_SetLooping (int handle, bool loop);
 void CIN_UploadCinematic(int handle);
-void CIN_CloseAllVideos(void);
+void CIN_CloseAllVideos();
 
 //
 // cl_cgame.c
 //
-void CL_InitCGame( void );
-void CL_ShutdownCGame( void );
-bool CL_GameCommand( void );
+void CL_InitCGame( );
+void CL_ShutdownCGame( );
+bool CL_GameCommand( );
 void CL_CGameRendering( stereoFrame_t stereo );
-void CL_SetCGameTime( void );
-void CL_FirstSnapshot( void );
-void CL_ShaderStateChanged(void);
+void CL_SetCGameTime( );
+void CL_FirstSnapshot( );
+void CL_ShaderStateChanged();
 
 //
 // cl_ui.c
 //
-void CL_InitUI( void );
-void CL_ShutdownUI( void );
-int Key_GetCatcher( void );
+void CL_InitUI( );
+void CL_ShutdownUI( );
+int Key_GetCatcher( );
 void Key_SetCatcher( int catcher );
-void LAN_LoadCachedServers( void );
-void LAN_SaveServersToCache( void );
+void LAN_LoadCachedServers( );
+void LAN_SaveServersToCache( );
 
 
 //
@@ -638,11 +638,11 @@ bool CL_Netchan_Process( netchan_t *chan, msg_t *msg );
 // cl_avi.c
 //
 bool CL_OpenAVIForWriting( const char *filename );
-void CL_TakeVideoFrame( void );
+void CL_TakeVideoFrame( );
 void CL_WriteAVIVideoFrame( const byte *imageBuffer, int size );
 void CL_WriteAVIAudioFrame( const byte *pcmBuffer, int size );
-bool CL_CloseAVI( void );
-bool CL_VideoRecording( void );
+bool CL_CloseAVI( );
+bool CL_VideoRecording( );
 
 //
 // cl_main.c

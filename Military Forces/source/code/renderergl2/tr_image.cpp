@@ -127,7 +127,7 @@ void GL_TextureMode( const char *string ) {
 R_SumOfUsedImages
 ===============
 */
-int R_SumOfUsedImages( void ) {
+int R_SumOfUsedImages( ) {
 	int	total;
 	int i;
 
@@ -146,7 +146,7 @@ int R_SumOfUsedImages( void ) {
 R_ImageList_f
 ===============
 */
-void R_ImageList_f( void ) {
+void R_ImageList_f( ) {
 	int i;
 	int estTotalSize = 0;
 
@@ -2029,7 +2029,7 @@ static void RawImage_UploadTexture(GLuint texture, byte *data, int x, int y, int
 	bool mipmap = !!(flags & IMGFLAG_MIPMAP);
 	int size, miplevel;
 	bool lastMip = false;
-	byte *formatBuffer = NULL;
+	byte *formatBuffer = nullptr;
 
 	if (qglesMajorVersion && rgba8 && (dataFormat != GL_RGBA || dataType != GL_UNSIGNED_BYTE))
 	{
@@ -2092,7 +2092,7 @@ static void RawImage_UploadTexture(GLuint texture, byte *data, int x, int y, int
 	}
 	while (!lastMip);
 
-	if (formatBuffer != NULL)
+	if (formatBuffer != nullptr)
 		ri.Hunk_FreeTempMemory(formatBuffer);
 }
 
@@ -2162,7 +2162,7 @@ This is the only way any image_t are created
 ================
 */
 image_t *R_CreateImage2( const char *name, byte *pic, int width, int height, GLenum picFormat, int numMips, imgType_t type, imgFlags_t flags, int internalFormat ) {
-	byte       *resampledBuffer = NULL;
+	byte       *resampledBuffer = nullptr;
 	image_t    *image;
 	bool    isLightmap = false, scaled = false;
 	long        hash;
@@ -2287,11 +2287,11 @@ image_t *R_CreateImage2( const char *name, byte *pic, int width, int height, GLe
 			int i;
 
 			for (i = 0; i < 6; i++)
-				qglTextureImage2DEXT(image->texnum, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, miplevel, internalFormat, mipWidth, mipHeight, 0, dataFormat, dataType, NULL);
+				qglTextureImage2DEXT(image->texnum, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, miplevel, internalFormat, mipWidth, mipHeight, 0, dataFormat, dataType, nullptr);
 		}
 		else
 		{
-			qglTextureImage2DEXT(image->texnum, GL_TEXTURE_2D, miplevel, internalFormat, mipWidth, mipHeight, 0, dataFormat, dataType, NULL);
+			qglTextureImage2DEXT(image->texnum, GL_TEXTURE_2D, miplevel, internalFormat, mipWidth, mipHeight, 0, dataFormat, dataType, nullptr);
 		}
 
 		mipWidth  = MAX(1, mipWidth >> 1);
@@ -2304,7 +2304,7 @@ image_t *R_CreateImage2( const char *name, byte *pic, int width, int height, GLe
 	if (pic)
 		Upload32(pic, 0, 0, width, height, picFormat, dataFormat, dataType, numMips, image, scaled);
 
-	if (resampledBuffer != NULL)
+	if (resampledBuffer != nullptr)
 		ri.Hunk_FreeTempMemory(resampledBuffer);
 
 	// Set all necessary texture parameters.
@@ -2417,7 +2417,7 @@ void R_LoadImage( const char *name, byte **pic, int *width, int *height, GLenum 
 	const char *ext;
 	char *altName;
 
-	*pic = NULL;
+	*pic = nullptr;
 	*width = 0;
 	*height = 0;
 	*picFormat = GL_RGBA8;
@@ -2522,7 +2522,7 @@ image_t	*R_FindImageFile( const char *name, imgType_t type, imgFlags_t flags )
 	imgFlags_t checkFlagsTrue, checkFlagsFalse;
 
 	if (!name) {
-		return NULL;
+		return nullptr;
 	}
 
 	hash = generateHashValue(name);
@@ -2546,8 +2546,8 @@ image_t	*R_FindImageFile( const char *name, imgType_t type, imgFlags_t flags )
 	// load the pic from disk
 	//
 	R_LoadImage( name, &pic, &width, &height, &picFormat, &picNumMips );
-	if ( pic == NULL ) {
-		return NULL;
+	if ( pic == nullptr ) {
+		return nullptr;
 	}
 
 	checkFlagsTrue = IMGFLAG_PICMIP | IMGFLAG_MIPMAP | IMGFLAG_GENNORMALMAP;
@@ -2569,7 +2569,7 @@ image_t	*R_FindImageFile( const char *name, imgType_t type, imgFlags_t flags )
 		normalImage = R_FindImageFile(normalName, IMGTYPE_NORMAL, normalFlags);
 
 		// if not, generate it
-		if (normalImage == NULL)
+		if (normalImage == nullptr)
 		{
 			byte *normalPic;
 			int x, y;
@@ -2682,7 +2682,7 @@ R_CreateDlightImage
 ================
 */
 #define	DLIGHT_SIZE	16
-static void R_CreateDlightImage( void ) {
+static void R_CreateDlightImage( ) {
 	int		x,y;
 	byte	data[DLIGHT_SIZE][DLIGHT_SIZE][4];
 	int		b;
@@ -2715,7 +2715,7 @@ static void R_CreateDlightImage( void ) {
 R_InitFogTable
 =================
 */
-void R_InitFogTable( void ) {
+void R_InitFogTable( ) {
 	int		i;
 	float	d;
 	float	exp;
@@ -2771,7 +2771,7 @@ R_CreateFogImage
 */
 #define	FOG_S	256
 #define	FOG_T	32
-static void R_CreateFogImage( void ) {
+static void R_CreateFogImage( ) {
 	int		x,y;
 	byte	*data;
 	float	d;
@@ -2799,7 +2799,7 @@ R_CreateDefaultImage
 ==================
 */
 #define	DEFAULT_SIZE	16
-static void R_CreateDefaultImage( void ) {
+static void R_CreateDefaultImage( ) {
 	int		x;
 	byte	data[DEFAULT_SIZE][DEFAULT_SIZE][4];
 
@@ -2834,7 +2834,7 @@ static void R_CreateDefaultImage( void ) {
 R_CreateBuiltinImages
 ==================
 */
-void R_CreateBuiltinImages( void ) {
+void R_CreateBuiltinImages( ) {
 	int		x,y;
 	byte	data[DEFAULT_SIZE][DEFAULT_SIZE][4];
 
@@ -2848,7 +2848,7 @@ void R_CreateBuiltinImages( void ) {
 	{
 		for( x = 0; x < MAX_DLIGHTS; x++)
 		{
-			tr.shadowCubemaps[x] = R_CreateImage(va("*shadowcubemap%i", x), NULL, PSHADOW_MAP_SIZE, PSHADOW_MAP_SIZE, IMGTYPE_COLORALPHA, IMGFLAG_CLAMPTOEDGE | IMGFLAG_CUBEMAP, 0);
+			tr.shadowCubemaps[x] = R_CreateImage(va("*shadowcubemap%i", x), nullptr, PSHADOW_MAP_SIZE, PSHADOW_MAP_SIZE, IMGTYPE_COLORALPHA, IMGFLAG_CLAMPTOEDGE | IMGFLAG_CUBEMAP, 0);
 		}
 	}
 
@@ -2887,19 +2887,19 @@ void R_CreateBuiltinImages( void ) {
 
 		rgbFormat = GL_RGBA8;
 
-		tr.renderImage = R_CreateImage("_render", NULL, width, height, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, hdrFormat);
+		tr.renderImage = R_CreateImage("_render", nullptr, width, height, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, hdrFormat);
 
 		if (r_shadowBlur->integer || r_hdr->integer)
-			tr.screenScratchImage = R_CreateImage("screenScratch", NULL, width, height, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, rgbFormat);
+			tr.screenScratchImage = R_CreateImage("screenScratch", nullptr, width, height, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, rgbFormat);
 
 		if (r_shadowBlur->integer || r_ssao->integer)
-			tr.hdrDepthImage = R_CreateImage("*hdrDepth", NULL, width, height, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, GL_R32F);
+			tr.hdrDepthImage = R_CreateImage("*hdrDepth", nullptr, width, height, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, GL_R32F);
 
 		if (r_drawSunRays->integer)
-			tr.sunRaysImage = R_CreateImage("*sunRays", NULL, width, height, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, rgbFormat);
+			tr.sunRaysImage = R_CreateImage("*sunRays", nullptr, width, height, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, rgbFormat);
 
-		tr.renderDepthImage  = R_CreateImage("*renderdepth",  NULL, width, height, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, GL_DEPTH_COMPONENT24);
-		tr.textureDepthImage = R_CreateImage("*texturedepth", NULL, PSHADOW_MAP_SIZE, PSHADOW_MAP_SIZE, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, GL_DEPTH_COMPONENT24);
+		tr.renderDepthImage  = R_CreateImage("*renderdepth",  nullptr, width, height, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, GL_DEPTH_COMPONENT24);
+		tr.textureDepthImage = R_CreateImage("*texturedepth", nullptr, PSHADOW_MAP_SIZE, PSHADOW_MAP_SIZE, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, GL_DEPTH_COMPONENT24);
 
 		{
 			void *p;
@@ -2917,21 +2917,21 @@ void R_CreateBuiltinImages( void ) {
 
 		for (x = 0; x < 2; x++)
 		{
-			tr.textureScratchImage[x] = R_CreateImage(va("*textureScratch%d", x), NULL, 256, 256, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, GL_RGBA8);
+			tr.textureScratchImage[x] = R_CreateImage(va("*textureScratch%d", x), nullptr, 256, 256, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, GL_RGBA8);
 		}
 		for (x = 0; x < 2; x++)
 		{
-			tr.quarterImage[x] = R_CreateImage(va("*quarter%d", x), NULL, width / 2, height / 2, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, GL_RGBA8);
+			tr.quarterImage[x] = R_CreateImage(va("*quarter%d", x), nullptr, width / 2, height / 2, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, GL_RGBA8);
 		}
 
 		if (r_ssao->integer)
 		{
-			tr.screenSsaoImage = R_CreateImage("*screenSsao", NULL, width / 2, height / 2, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, GL_RGBA8);
+			tr.screenSsaoImage = R_CreateImage("*screenSsao", nullptr, width / 2, height / 2, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, GL_RGBA8);
 		}
 
 		for( x = 0; x < MAX_DRAWN_PSHADOWS; x++)
 		{
-			tr.pshadowMaps[x] = R_CreateImage(va("*shadowmap%i", x), NULL, PSHADOW_MAP_SIZE, PSHADOW_MAP_SIZE, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, GL_DEPTH_COMPONENT24);
+			tr.pshadowMaps[x] = R_CreateImage(va("*shadowmap%i", x), nullptr, PSHADOW_MAP_SIZE, PSHADOW_MAP_SIZE, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, GL_DEPTH_COMPONENT24);
 			//qglTextureParameterfEXT(tr.pshadowMaps[x]->texnum, GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
 			//qglTextureParameterfEXT(tr.pshadowMaps[x]->texnum, GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 		}
@@ -2940,17 +2940,17 @@ void R_CreateBuiltinImages( void ) {
 		{
 			for ( x = 0; x < 4; x++)
 			{
-				tr.sunShadowDepthImage[x] = R_CreateImage(va("*sunshadowdepth%i", x), NULL, r_shadowMapSize->integer, r_shadowMapSize->integer, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, GL_DEPTH_COMPONENT24);
+				tr.sunShadowDepthImage[x] = R_CreateImage(va("*sunshadowdepth%i", x), nullptr, r_shadowMapSize->integer, r_shadowMapSize->integer, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, GL_DEPTH_COMPONENT24);
 				qglTextureParameterfEXT(tr.sunShadowDepthImage[x]->texnum, GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
 				qglTextureParameterfEXT(tr.sunShadowDepthImage[x]->texnum, GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 			}
 
-			tr.screenShadowImage = R_CreateImage("*screenShadow", NULL, width, height, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, GL_RGBA8);
+			tr.screenShadowImage = R_CreateImage("*screenShadow", nullptr, width, height, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, GL_RGBA8);
 		}
 
 		if (r_cubeMapping->integer)
 		{
-			tr.renderCubeImage = R_CreateImage("*renderCube", NULL, r_cubemapSize->integer, r_cubemapSize->integer, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE | IMGFLAG_MIPMAP | IMGFLAG_CUBEMAP, rgbFormat);
+			tr.renderCubeImage = R_CreateImage("*renderCube", nullptr, r_cubemapSize->integer, r_cubemapSize->integer, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE | IMGFLAG_MIPMAP | IMGFLAG_CUBEMAP, rgbFormat);
 		}
 	}
 }
@@ -2961,7 +2961,7 @@ void R_CreateBuiltinImages( void ) {
 R_SetColorMappings
 ===============
 */
-void R_SetColorMappings( void ) {
+void R_SetColorMappings( ) {
 	int		i, j;
 	float	g;
 	int		inf;
@@ -3032,7 +3032,7 @@ void R_SetColorMappings( void ) {
 R_InitImages
 ===============
 */
-void	R_InitImages( void ) {
+void	R_InitImages( ) {
 	Com_Memset(hashTable, 0, sizeof(hashTable));
 	// build brightness translation tables
 	R_SetColorMappings();
@@ -3046,7 +3046,7 @@ void	R_InitImages( void ) {
 R_DeleteTextures
 ===============
 */
-void R_DeleteTextures( void ) {
+void R_DeleteTextures( ) {
 	int		i;
 
 	for ( i=0; i<tr.numImages ; i++ ) {
@@ -3086,11 +3086,11 @@ static char *CommaParse( char **data_p ) {
 
 	// make sure incoming data is valid
 	if ( !data ) {
-		*data_p = NULL;
+		*data_p = nullptr;
 		return com_token;
 	}
 
-	while ( 1 ) {
+	while ( true ) {
 		// skip whitespace
 		while( (c = *data) <= ' ') {
 			if( !c ) {
@@ -3137,7 +3137,7 @@ static char *CommaParse( char **data_p ) {
 	if (c == '\"')
 	{
 		data++;
-		while (1)
+		while (true)
 		{
 			c = *data++;
 			if (c=='\"' || !c)
@@ -3301,7 +3301,7 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 R_InitSkins
 ===============
 */
-void	R_InitSkins( void ) {
+void	R_InitSkins( ) {
 	skin_t		*skin;
 
 	tr.numSkins = 1;
@@ -3331,7 +3331,7 @@ skin_t	*R_GetSkinByHandle( qhandle_t hSkin ) {
 R_SkinList_f
 ===============
 */
-void	R_SkinList_f( void ) {
+void	R_SkinList_f( ) {
 	int			i, j;
 	skin_t		*skin;
 

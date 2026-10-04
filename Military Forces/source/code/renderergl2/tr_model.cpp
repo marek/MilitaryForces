@@ -223,11 +223,11 @@ model_t	*R_GetModelByHandle( qhandle_t index ) {
 /*
 ** R_AllocModel
 */
-model_t *R_AllocModel( void ) {
+model_t *R_AllocModel( ) {
 	model_t		*mod;
 
 	if ( tr.numModels == MAX_MOD_KNOWN ) {
-		return NULL;
+		return nullptr;
 	}
 
 	mod = (model_t *)ri.Hunk_Alloc( sizeof( *tr.models[tr.numModels] ), h_low );
@@ -285,7 +285,7 @@ qhandle_t RE_RegisterModel( const char *name ) {
 
 	// allocate a new model_t
 
-	if ( ( mod = R_AllocModel() ) == NULL ) {
+	if ( ( mod = R_AllocModel() ) == nullptr ) {
 		ri.Printf( PRINT_WARNING, "RE_RegisterModel: R_AllocModel() failed for '%s'\n", name);
 		return 0;
 	}
@@ -650,7 +650,7 @@ static bool R_LoadMD3(model_t * mod, int lod, void *buffer, int bufferSize, cons
 
 				R_VaoUnpackNormal(normal, v->normal);
 
-				tangent[3] = R_CalcTangentSpace(tangent, NULL, normal, sdirs[j], tdirs[j]);
+				tangent[3] = R_CalcTangentSpace(tangent, nullptr, normal, sdirs[j], tdirs[j]);
 
 				R_VaoPackTangent(v->tangent, tangent);
 			}
@@ -667,7 +667,7 @@ static bool R_LoadMD3(model_t * mod, int lod, void *buffer, int bufferSize, cons
 	if (mdvModel->numFrames > 1 && !glRefConfig.gpuVertexAnimation)
 	{
 		mdvModel->numVaoSurfaces = 0;
-		mdvModel->vaoSurfaces = NULL;
+		mdvModel->vaoSurfaces = nullptr;
 	}
 	else
 	{
@@ -1197,7 +1197,7 @@ void RE_BeginRegistration( glconfig_t *glconfigOut ) {
 R_ModelInit
 ===============
 */
-void R_ModelInit( void ) {
+void R_ModelInit( ) {
 	model_t		*mod;
 
 	// leave a space for NULL model
@@ -1213,7 +1213,7 @@ void R_ModelInit( void ) {
 R_Modellist_f
 ================
 */
-void R_Modellist_f( void ) {
+void R_Modellist_f( ) {
 	int		i, j;
 	model_t	*mod;
 	int		total;
@@ -1269,7 +1269,7 @@ static mdvTag_t *R_GetTag( mdvModel_t *mod, int frame, const char *_tagName ) {
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 mdvTag_t *R_GetAnimTag( mdrHeader_t *mod, int framenum, const char *tagName, mdvTag_t * dest)
@@ -1292,7 +1292,7 @@ mdvTag_t *R_GetAnimTag( mdrHeader_t *mod, int framenum, const char *tagName, mdv
 		{
 			// uncompressed model...
 			//
-			frameSize = (intptr_t)( &((mdrFrame_t *)0)->bones[ mod->numBones ] );
+			frameSize = (intptr_t)( &((mdrFrame_t *)nullptr)->bones[ mod->numBones ] );
 			frame = (mdrFrame_t *)((byte *)mod + mod->ofsFrames + framenum * frameSize );
 
 			for (j = 0; j < 3; j++)
@@ -1309,7 +1309,7 @@ mdvTag_t *R_GetAnimTag( mdrHeader_t *mod, int framenum, const char *tagName, mdv
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -1338,7 +1338,7 @@ int R_LerpTag( orientation_t *tag, qhandle_t handle, int startFrame, int endFram
 					startFrame, endFrame,
 					frac, tagName );
 		} else {
-			start = end = NULL;
+			start = end = nullptr;
 		}
 	}
 	else

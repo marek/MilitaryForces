@@ -37,12 +37,12 @@ static animation_t * CG_ParseLQMAnimationFile( const char *filename ) {
 	// load the file
 	len = FS_FOpenFileByMode( filename, &f, FS_READ );
 	if ( len <= 0 ) {
-		return NULL;
+		return nullptr;
 	}
 	if ( len >= sizeof( text ) - 1 ) {
 		CG_Printf( "File %s too long\n", filename );
 		FS_FCloseFile( f );
-		return NULL;
+		return nullptr;
 	}
 	FS_Read( text, len, f );
 	text[len] = 0;
@@ -53,7 +53,7 @@ static animation_t * CG_ParseLQMAnimationFile( const char *filename ) {
 	skip = 0;	// quite the compiler warning
 
 	// read optional parameters
-	while ( 1 ) {
+	while ( true ) {
 		prev = text_p;	// so we can unget
 		token = COM_Parse( &text_p );
 		if ( !token[0] ) {
@@ -146,7 +146,7 @@ static animation_t * CG_ParseLQMAnimationFile( const char *filename ) {
 
 	if ( i != MAX_ANIMATIONS ) {
 		CG_Printf( "Error parsing animation file: %s", filename );
-		return NULL;
+		return nullptr;
 	}
 
 	// crouch backward animation
@@ -581,7 +581,7 @@ Initialise all the shadow parameters for each vehicle
 ===============
 */
 
-void CG_InitShadows( void )
+void CG_InitShadows( )
 {
 	qhandle_t customShadowShader = -1;
 	float xRad = 0, yRad = 0;
@@ -729,13 +729,13 @@ completeLoadout_t* CG_EntityLoadout( centity_t* cent )
 {
 	int idx = CG_LoadoutVehicle( cent );
 	if( idx < 0 || idx >= bg_numberOfVehicles ) 
-		return 0;
+		return nullptr;
 
 	int n = cent->currentState.number;
 	int key = ((idx + 1) << 1) | ((cent->currentState.eFlags & EF_TELEPORT_BIT) ? 1 : 0);
 	if( cg_loadoutKeys[n] != key ) 
 	{
-		MF_getDefaultLoadoutForVehicle( idx, &cg_loadouts[n], 0 );
+		MF_getDefaultLoadoutForVehicle( idx, &cg_loadouts[n], nullptr );
 		cg_loadoutKeys[n] = key;
 	}
 	return &cg_loadouts[n];

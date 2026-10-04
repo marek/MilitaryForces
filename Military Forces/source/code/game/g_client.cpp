@@ -111,10 +111,10 @@ GameEntity *SelectNearestDeathmatchSpawnPoint( vec3_t from )
 	GameEntity	*nearestSpot;
 
 	nearestDist = 999999;
-	nearestSpot = NULL;
-	spot = NULL;
+	nearestSpot = nullptr;
+	spot = nullptr;
 
-	while( (spot = G_Find (spot, FOFS(classname_), "info_player_deathmatch") ) != NULL )
+	while( (spot = G_Find (spot, FOFS(classname_), "info_player_deathmatch") ) != nullptr )
 	{
 		VectorSubtract( spot->s.origin, from, delta );
 		dist = VectorLength( delta );
@@ -144,9 +144,9 @@ GameEntity *SelectRandomDeathmatchSpawnPoint()
 	GameEntity	*spots[MAX_SPAWN_POINTS];
 
 	count = 0;
-	spot = NULL;
+	spot = nullptr;
 
-	while( (spot = G_Find (spot, FOFS(classname_), "info_player_deathmatch")) != NULL )
+	while( (spot = G_Find (spot, FOFS(classname_), "info_player_deathmatch")) != nullptr )
 	{
 		if( SpotWouldTelefrag( spot ) ) 
 			continue;
@@ -157,7 +157,7 @@ GameEntity *SelectRandomDeathmatchSpawnPoint()
 	if( !count ) 
 	{
 		// no spots that won't telefrag
-		return G_Find( NULL, FOFS(classname_), "info_player_deathmatch");
+		return G_Find( nullptr, FOFS(classname_), "info_player_deathmatch");
 	}
 
 	selection = rand() % count;
@@ -181,9 +181,9 @@ GameEntity *SelectRandomFurthestSpawnPoint( vec3_t avoidPoint, vec3_t origin, ve
 	int			numSpots, rnd, i, j;
 
 	numSpots = 0;
-	spot = NULL;
+	spot = nullptr;
 
-	while( (spot = G_Find (spot, FOFS(classname_), "info_player_deathmatch")) != NULL )
+	while( (spot = G_Find (spot, FOFS(classname_), "info_player_deathmatch")) != nullptr )
 	{
 		if( SpotWouldTelefrag( spot ) ) 
 			continue;
@@ -220,7 +220,7 @@ GameEntity *SelectRandomFurthestSpawnPoint( vec3_t avoidPoint, vec3_t origin, ve
 	}
 	if( !numSpots )
 	{
-		spot = G_Find( NULL, FOFS(classname_), "info_player_deathmatch");
+		spot = G_Find( nullptr, FOFS(classname_), "info_player_deathmatch");
 		if( !spot )
 			Com_Error( ERR_DROP, "Couldn't find a spawn point" );
 		VectorCopy( spot->s.origin, origin );
@@ -291,8 +291,8 @@ GameEntity *SelectInitialSpawnPoint( vec3_t origin, vec3_t angles )
 {
 	GameEntity	*spot;
 
-	spot = NULL;
-	while( (spot = G_Find (spot, FOFS(classname_), "info_player_deathmatch")) != NULL )
+	spot = nullptr;
+	while( (spot = G_Find (spot, FOFS(classname_), "info_player_deathmatch")) != nullptr )
 	{
 		if( spot->spawnflags_ & 1 ) 
 			break;
@@ -321,7 +321,7 @@ GameEntity *SelectSpectatorSpawnPoint( vec3_t origin, vec3_t angles )
 	VectorCopy( theLevel.intermission_origin_, origin );
 	VectorCopy( theLevel.intermission_angle_, angles );
 
-	return NULL;
+	return nullptr;
 }
 
 //======================================================================
@@ -509,7 +509,7 @@ static void ClientCleanName( const char *in, char *out, int outSize ) {
 	*p = 0;
 	spaces = 0;
 
-	while( 1 ) {
+	while( true ) {
 		ch = *in++;
 		if( !ch ) {
 			break;
@@ -888,7 +888,7 @@ GameClient::GameClient() :
 	lastKillTime_(0),
 	switchTeamTime_(0),
 	timeResidual_(0),
-	areabits_(0),
+	areabits_(nullptr),
 	vehicle_(0),
 	nextVehicle_(0),
 	advancedControls_(0)
@@ -926,7 +926,7 @@ GameClient::clear()
 	lastKillTime_ = 0;
 	switchTeamTime_ = 0;
 	timeResidual_ = 0;
-	areabits_ = 0;
+	areabits_ = nullptr;
 	vehicle_ = 0;
 	nextVehicle_ = 0;	
 	advancedControls_ = 0;
