@@ -424,6 +424,7 @@ struct HeloTasks
 
 		// how hard to push in the wanted direction, as forward tilt in degrees (negative backs away)
 		float push = 0;
+		bool orbit = false;
 		if( c.sense.height > 60 )
 		{
 			switch( c.mode )
@@ -445,8 +446,8 @@ struct HeloTasks
 			default:
 				if( c.dist > c.standoff + 300 )
 					push = c.sense.height > 300 ? 14.0f : 9.0f;
-				else if( c.sense.enemy && c.dist < c.standoff )
-					push = -6.0f;
+				else if( c.sense.enemy )
+					orbit = true;
 				break;
 			}
 		}
@@ -454,41 +455,64 @@ struct HeloTasks
 		const float maxSpeed = static_cast<float>( c.veh.maxspeed );
 		const float sideSpeed = std::max( 1.0f, c.veh.turnspeed[YAW] * 2.5f );
 		float travelYaw = c.view[YAW] + (push < 0 ? 180.0f : 0.0f);
+		if( orbit )
+		{
+			// at fighting distance: keep moving across the enemy's view instead of hanging still, changing
+			// direction now and then, and opening the range when too close
+			constexpr int orbitPeriod = 6000;
+			const float side = (((theLevel.time_ / orbitPeriod) + c.ent->s.number) & 1) ? 1.0f : -1.0f;
+			travelYaw = c.view[YAW] + side * (c.dist < c.standoff ? 125.0f : 90.0f);
+			push = 9.0f;
+		}
 		float speed = fabs( push ) / maxPitch * maxSpeed;
 		c.blocked = false;
+		constexpr float climbSlope = 0.4f;
 		if( speed > 1.0f )
 		{
-			// the wanted direction first, then either side of it, then back the way it came; hover if nothing is open
+			// the wanted direction first, then either side of it, then back the way it came; hover if nothing is open.
+			// Rising ground is not an obstacle: where the level line is blocked but a climbing one is clear, go on and climb
 			const float reach = 200.0f + speed * 2.0f;
 			bool found = false;
 			for( float offset : { 0.0f, 45.0f, -45.0f, 90.0f, -90.0f, 135.0f, -135.0f, 180.0f } )
 			{
-				vec3_t angles = { 0, travelYaw + offset, 0 }, dir;
+				vec3_t angles = { 0, travelYaw + offset, 0 }, dir, rising;
 				AngleVectors( angles, dir, nullptr, nullptr );
-				if( clearAlong( c, dir, reach ) < reach )
-				{
-					if( offset == 0.0f )
-						c.blocked = true;
+				VectorCopy( dir, rising );
+				rising[2] = climbSlope;
+				const bool level = clearAlong( c, dir, reach ) >= reach;
+				if( !level && offset == 0.0f )
+					c.blocked = true;
+				if( !level && clearAlong( c, rising, reach ) < reach )
 					continue;
-				}
 				travelYaw += offset;
 				if( offset != 0.0f )
 					speed *= 0.7f;
+				if( !level )
+				{
+					speed *= 0.6f;
+					c.wantHeight = std::max( c.wantHeight, std::min( c.sense.height + reach * climbSlope, 1500.0f ) );
+				}
 				found = true;
 				break;
 			}
 			if( !found )
+			{
 				speed = 0;
-			// something in the way of the direct line: go over it if there is room above
-			if( c.blocked )
 				c.wantHeight = std::max( c.wantHeight, std::min( c.sense.height + 300.0f, 1500.0f ) );
+			}
 		}
 
 		// the tilt is coarse, so the real motion can differ from the wanted one: stop if it leads into something
+		// that cannot be climbed over in time
 		vec3_t moving = { c.ps.velocity[0], c.ps.velocity[1], 0 };
 		const float drift = VectorNormalize( moving );
-		if( drift > 15.0f && clearAlong( c, moving, 120.0f + drift * 1.5f ) < 120.0f + drift * 1.5f )
-			speed = 0;
+		if( drift > 15.0f )
+		{
+			const float stopping = 80.0f + drift * 0.8f;
+			vec3_t rising = { moving[0], moving[1], climbSlope };
+			if( clearAlong( c, moving, stopping ) < stopping && clearAlong( c, rising, stopping ) < stopping )
+				speed = 0;
+		}
 
 		// slow or hovering next to something: ease away from it
 		if( speed < 20.0f )
