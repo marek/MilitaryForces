@@ -51,6 +51,11 @@ struct GoalScoring
 	{
 		if( !s.sense.enemy )
 			return 0.0f;
+#ifdef MF_BOT_DEBUG
+		// test switch: bots see each other but do not fight
+		if( g_botPeaceful.integer )
+			return 0.0f;
+#endif
 		float score = s.who.aggression * (0.4f + 0.6f * s.sense.health);
 		if( s.sense.role == Role::Bomber && !hasGroundWeapons( s ) )
 			score *= 0.5f;

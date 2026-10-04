@@ -39,6 +39,7 @@ vmCvar_t	g_botSkill;
 vmCvar_t	g_ruseReset;
 #ifdef MF_BOT_DEBUG
 vmCvar_t	g_botDebug;
+vmCvar_t	g_botPeaceful;
 #endif
 vmCvar_t	g_botLanding;
 vmCvar_t	g_botVehicles;
@@ -139,6 +140,7 @@ cvarTable_t		gameCvarTable[] = {
 	{ &g_ruseReset, "g_ruseReset", "30", 0, 0, true  },
 #ifdef MF_BOT_DEBUG
 	{ &g_botDebug, "g_botDebug", "0", 0, 0, false  },
+	{ &g_botPeaceful, "g_botPeaceful", "0", 0, 0, false  },
 #endif
 	{ &g_botLanding, "g_botLanding", "1", 0, 0, false  },
 	{ &g_botVehicles, "g_botVehicles", "", 0, 0, false  },

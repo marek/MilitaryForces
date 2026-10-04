@@ -152,6 +152,10 @@ void Bots::fireWeapons( GameEntity* ent, State& bot, const Sense& sense, usercmd
 
 	const int type = availableWeapons[veh.weapons[slot]].type;
 	const float range = type == WT_BALLISTICGUN ? 6000.0f : 3000.0f;
+	// rockets and shells splash: hold them when a team mate is next to the target
+	const float splash = static_cast<float>( availableWeapons[veh.weapons[slot]].damageRadius );
+	if( splash > 0 && friendlyNear( ent, sense.enemy->r.currentOrigin, splash + 60.0f ) )
+		return;
 	if( aimError < (type == WT_ROCKET ? 4.0f : 2.0f) && sense.enemyDist < range )
 		cmd.buttons |= BUTTON_ATTACK_MAIN;
 }
@@ -169,6 +173,22 @@ void Bots::flares( GameEntity* ent, State& bot, const Sense& sense, usercmd_t& c
 	}
 	cmd.buttons |= BUTTON_FLARE;
 	bot.flareTime = theLevel.time_ + 700;
+}
+
+// a team mate's vehicle inside the given distance of a point
+bool Bots::friendlyNear( GameEntity* ent, const vec3_t point, float radius )
+{
+	if( g_gametype.integer < GT_TEAM )
+		return false;
+	for( int i = 1; i <= theLevel.maxclients_; i++ )
+	{
+		GameEntity* other = theLevel.getEntity( i );
+		if( other == ent || !alive( other ) || !OnSameTeam( ent, other ) )
+			continue;
+		if( Distance( other->r.currentOrigin, point ) < radius )
+			return true;
+	}
+	return false;
 }
 
 void Bots::bomb( GameEntity* ent, State& bot, const vec3_t target, usercmd_t& cmd, vec3_t view )
@@ -203,7 +223,10 @@ void Bots::bomb( GameEntity* ent, State& bot, const vec3_t target, usercmd_t& cm
 	const float speed = sqrt( ps.velocity[0] * ps.velocity[0] + ps.velocity[1] * ps.velocity[1] );
 	const float lead = speed * fall;
 	const float yawError = fabs( AngleSubtract( angles[YAW], ps.vehicleAngles[YAW] ) );
-	if( yawError < 8 && fabs( dist - lead ) < 250.0f + 400.0f * (1.0f - skill( bot )) )
+	// no release with team mates inside the blast; careless characters allow themselves less margin
+	const float blast = static_cast<float>( availableWeapons[veh.weapons[slot]].damageRadius );
+	const float safety = blast * (1.0f + 0.6f * character( bot ).caution) + 150.0f;
+	if( yawError < 8 && fabs( dist - lead ) < 250.0f + 400.0f * (1.0f - skill( bot )) && !friendlyNear( ent, target, safety ) )
 	{
 		cmd.buttons |= BUTTON_ATTACK_MAIN;
 		bot.bombTime = theLevel.time_;

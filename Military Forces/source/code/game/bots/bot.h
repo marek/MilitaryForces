@@ -215,6 +215,7 @@ private:
 	static bool replenished( GameEntity* ent );
 	static void finishRearm( GameEntity* ent, State& bot );
 	static bool runwayBusy( int padIndex, GameEntity* self );
+	static bool friendlyNear( GameEntity* ent, const vec3_t point, float radius );
 	static bool turnClear( GameEntity* ent, float radius, float degrees, float climb = 0 );
 	static void sense( GameEntity* ent, State& bot, Sense& out );
 	static void logDeath( GameEntity* self, GameEntity* attacker, int meansOfDeath );

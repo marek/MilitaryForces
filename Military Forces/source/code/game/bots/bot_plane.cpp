@@ -100,7 +100,7 @@ struct PlaneTasks
 	}
 	static bool wantsWingman( Mind& c )
 	{
-		return g_gametype.integer >= GT_TEAM && c.sense.role == Role::Fighter && !c.sense.enemy && c.who().teamwork > 0.5f;
+		return g_gametype.integer >= GT_TEAM && c.sense.role == Role::Fighter && !c.sense.enemy && c.who().teamwork > 0.25f;
 	}
 	static constexpr float rotateSpeed = 1.12f;
 
@@ -316,7 +316,9 @@ struct PlaneTasks
 				c.forcedWeapon = slot;
 				vec3_t nose;
 				AngleVectors( c.ps.vehicleAngles, nose, nullptr, nullptr );
-				if( c.ps.weaponNum == slot && DotProduct( nose, c.sense.enemyDir ) > 0.99f && c.sense.enemyDist < 1800 )
+				const float blast = static_cast<float>( availableWeapons[weapon].damageRadius );
+				if( c.ps.weaponNum == slot && DotProduct( nose, c.sense.enemyDir ) > 0.99f && c.sense.enemyDist < 1800 &&
+					!Bots::friendlyNear( c.ent, c.sense.enemy->r.currentOrigin, blast * 1.3f + 150.0f ) )
 					c.cmd.buttons |= BUTTON_ATTACK_MAIN;
 				break;
 			}
@@ -422,18 +424,25 @@ struct PlaneTasks
 
 	static Status wingman( Mind& c )
 	{
+		// a real player is the preferred leader; another bot leads only for team-minded characters, the lower number leading
+		constexpr float humanPreference = 0.3f;
+		const bool followsBots = c.who().teamwork > 0.5f;
 		GameEntity* leader = nullptr;
 		float leaderDist = 0;
-		for( int i = 1; i < c.ent->s.number; i++ )
+		for( int i = 1; i <= theLevel.maxclients_; i++ )
 		{
 			GameEntity* other = theLevel.getEntity( i );
-			if( !alive( other ) || !OnSameTeam( c.ent, other ) || Bots::roleOf( other->client_->vehicle_ ) != Role::Fighter || (other->client_->ps_.ONOFF & OO_LANDED) )
+			if( other == c.ent || !alive( other ) || !OnSameTeam( c.ent, other ) || !(availableVehicles[other->client_->vehicle_].cat & CAT_PLANE) || (other->client_->ps_.ONOFF & OO_LANDED) )
+				continue;
+			const bool human = !Bots::isBot( i );
+			if( !human && (!followsBots || i > c.ent->s.number || Bots::roleOf( other->client_->vehicle_ ) != Role::Fighter) )
 				continue;
 			const float dist = Distance( c.ent->r.currentOrigin, other->r.currentOrigin );
-			if( dist < 9000 && (!leader || dist < leaderDist) )
+			const float weighted = human ? dist * humanPreference : dist;
+			if( dist < 9000 && (!leader || weighted < leaderDist) )
 			{
 				leader = other;
-				leaderDist = dist;
+				leaderDist = weighted;
 			}
 		}
 		c.bot.leader = leader ? leader->s.number : -1;
@@ -529,8 +538,11 @@ struct PlaneTasks
 
 	static Status midChannel( Mind& c )
 	{
+		// in a corridor, traffic one way flies above the middle and traffic the other way below it
+		constexpr float laneOffset = 0.17f;
+		const float lane = cos( c.ps.vehicleAngles[YAW] * static_cast<float>( M_PI ) / 180.0f ) >= 0.0f ? 0.5f + laneOffset : 0.5f - laneOffset;
 		if( c.room < c.cruise * 2.0f && !(c.attacking && c.sense.enemyAir) && !onApproach( c ) )
-			c.view[PITCH] = std::clamp( (c.sense.height - c.room * 0.5f) / 20.0f, -25.0f, 20.0f );
+			c.view[PITCH] = std::clamp( (c.sense.height - c.room * lane) / 20.0f, -25.0f, 20.0f );
 		return Status::Success;
 	}
 
