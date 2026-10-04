@@ -9,6 +9,7 @@
 
 #include "g_local.h"
 #include "g_level.h"
+#include "g_bot.h"
 
 /*
 ==============================================================================
@@ -437,17 +438,24 @@ bool ConsoleCommand()
 		Svcmd_GameMem_f();
 		return true;
 	}
-/*
-	if (Q_stricmp (cmd, "addbot") == 0) {
-		Svcmd_AddBot_f();
+	if( Q_stricmp( cmd, "addbot" ) == 0 ) 
+	{
+		Bots::addCommand();
 		return true;
 	}
 
-	if (Q_stricmp (cmd, "botlist") == 0) {
-		Svcmd_BotList_f();
+	if( Q_stricmp( cmd, "kickbots" ) == 0 ) 
+	{
+		Bots::kickCommand();
 		return true;
 	}
-*/
+
+	if( Q_stricmp( cmd, "botlist" ) == 0 ) 
+	{
+		Bots::listCommand();
+		return true;
+	}
+
 	if (Q_stricmp (cmd, "addip") == 0) 
 	{
 		Svcmd_AddIP_f();

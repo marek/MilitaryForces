@@ -2,6 +2,7 @@
 #include "g_miscvehicle.h"
 #include "../vehiclelib/bg_datamanager.h"
 #include "g_level.h"
+#include "g_bot.h"
 
 //level_locals_t	level;
 LevelLocals& theLevel = LevelLocals::getInstance();
@@ -33,6 +34,8 @@ vmCvar_t	g_dedicated;
 vmCvar_t	g_speed;
 vmCvar_t	g_gravity;
 vmCvar_t	g_stealthPenalty;
+vmCvar_t	g_botMinPlayers;
+vmCvar_t	g_botSkill;
 vmCvar_t	g_abandonTime;
 vmCvar_t	g_enterRange;
 vmCvar_t	g_cheats;
@@ -125,6 +128,8 @@ cvarTable_t		gameCvarTable[] = {
 	{ &g_speed, "g_speed", "320", 0, 0, true  },
 	{ &g_gravity, "g_gravity", "800", 0, 0, true  },
 	{ &g_stealthPenalty, "g_stealthPenalty", "30", 0, 0, true  },
+	{ &g_botMinPlayers, "g_botMinPlayers", "0", CVAR_ARCHIVE, 0, false  },
+	{ &g_botSkill, "g_botSkill", "3", CVAR_ARCHIVE, 0, false  },
 	{ &g_abandonTime, "g_abandonTime", "300", 0, 0, true  },
 	{ &g_enterRange, "g_enterRange", "45", 0, 0, true  },
 	{ &g_knockback, "g_knockback", "1000", 0, 0, true  },
@@ -304,6 +309,7 @@ G_InitGame
 void G_InitGame( int levelTime, int randomSeed ) 
 {
 	Common::printf ("------- Game Initialization -------\n");
+	Bots::reset();
 	Common::printf ("gamename: %s\n", GAME_IDENTIFIER);
 	Common::printf ("gamedate: %s\n",  __DATE__ );
 	Common::printf ("mf version: %s\n", MF_VERSION );
@@ -1660,6 +1666,8 @@ void G_RunFrame( int levelTime )
 
 	// get any cvar changes
 	G_UpdateCvars();
+
+	Bots::runFrame();
 
 	//
 	// go through all allocated objects

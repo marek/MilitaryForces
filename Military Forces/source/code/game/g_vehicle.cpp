@@ -64,59 +64,62 @@ VehicleDeathImpl( GameEntity* self, GameEntity* inflictor, GameEntity* attacker,
 	else 
 		obit = modNames[ meansOfDeath ];
 
-	Game::logPrintf( "Kill: %i %i %i: %s killed %s by %s\n", killer, self->s.number, meansOfDeath, killerName, 
-				 self->client_->pers_.netname_, obit );
-
-	// broadcast the death event to everyone
-	ent = Game::tempEntity( self->r.currentOrigin, EV_OBITUARY );
-	ent->s.eventParm = meansOfDeath;
-	ent->s.otherEntityNum = self->s.number;
-	ent->s.otherEntityNum2 = killer;
-	ent->r.svFlags = SVF_BROADCAST;	// send to everyone
-
-	self->enemy_ = attacker;
-
-	self->client_->ps_.persistant[PERS_KILLED]++;
-	
-	if( attacker && attacker->client_ )
+	if( self->r.contents != CONTENTS_CORPSE )
 	{
-		attacker->client_->lastkilled_client_ = self->s.number;
+		Game::logPrintf( "Kill: %i %i %i: %s killed %s by %s\n", killer, self->s.number, meansOfDeath, killerName, 
+					 self->client_->pers_.netname_, obit );
 
-		if ( attacker == self || OnSameTeam (self, attacker ) )
+		// broadcast the death event to everyone
+		ent = Game::tempEntity( self->r.currentOrigin, EV_OBITUARY );
+		ent->s.eventParm = meansOfDeath;
+		ent->s.otherEntityNum = self->s.number;
+		ent->s.otherEntityNum2 = killer;
+		ent->r.svFlags = SVF_BROADCAST;	// send to everyone
+
+		self->enemy_ = attacker;
+
+		self->client_->ps_.persistant[PERS_KILLED]++;
+	
+		if( attacker && attacker->client_ )
 		{
-			AddScore( attacker, self->r.currentOrigin, -1 );
-		}
-		else
-		{
-			if( attacker->r.svFlags & SVF_BOT )
+			attacker->client_->lastkilled_client_ = self->s.number;
+
+			if ( attacker == self || OnSameTeam (self, attacker ) )
 			{
-				AddScore( attacker, self->r.currentOrigin, 1 );
+				AddScore( attacker, self->r.currentOrigin, -1 );
 			}
 			else
 			{
-				if( meansOfDeath != MOD_VEHICLEEXPLOSION && 
-					meansOfDeath != MOD_CRASH )
+				if( attacker->r.svFlags & SVF_BOT )
 				{
 					AddScore( attacker, self->r.currentOrigin, 1 );
 				}
-				// Easy way to prevent enemy from lossing score in collision as well cause he kills "himself"
 				else
 				{
-					AddScore( attacker, self->r.currentOrigin, 1 );
+					if( meansOfDeath != MOD_VEHICLEEXPLOSION && 
+						meansOfDeath != MOD_CRASH )
+					{
+						AddScore( attacker, self->r.currentOrigin, 1 );
+					}
+					// Easy way to prevent enemy from lossing score in collision as well cause he kills "himself"
+					else
+					{
+						AddScore( attacker, self->r.currentOrigin, 1 );
+					}
+
 				}
 
+				attacker->client_->lastKillTime_ = theLevel.time_;
 			}
-
-			attacker->client_->lastKillTime_ = theLevel.time_;
 		}
-	}
-	else
-	{
-		AddScore( self, self->r.currentOrigin, -1 );
-	}
+		else
+		{
+			AddScore( self, self->r.currentOrigin, -1 );
+		}
 
-	// add team bonuses
-	Team_FragBonuses(self, inflictor, attacker);
+		// add team bonuses
+		Team_FragBonuses(self, inflictor, attacker);
+	}
 
 	// if I committed suicide, the flag does not fall, it returns.
 	if (meansOfDeath == MOD_SUICIDE) 

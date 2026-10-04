@@ -725,8 +725,7 @@ void SetTeam( GameEntity *ent, char *s )
 	}
 	else
 	{
-		if( !(ent->r.svFlags & SVF_BOT) )// MFQ3
-			client->ps_.pm_flags |= PMF_VEHICLESELECT;// MFQ3
+		client->ps_.pm_flags |= PMF_VEHICLESELECT;// MFQ3
 	}
 	// init vehicle
 	SV_GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );

@@ -4,6 +4,7 @@
 
 #include "g_local.h"
 #include "g_level.h"
+#include "g_bot.h"
 #include "g_entity.h"
 #include "g_vehicle.h"
 #include "g_plane.h"
@@ -35,9 +36,6 @@ restarts.
 */
 char *MF_ClientConnect( int clientNum, bool firstTime, bool isBot ) 
 {
-	if( isBot ) 
-		return "MFQ3 doesn't have bots yet";
-
 	if( g_gametype.integer == GT_MISSION_EDITOR && theLevel.numConnectedClients_ >= 1 ) 
 		return "MFQ3 IGME in use. Connecting not allowed.";
 
@@ -46,12 +44,12 @@ char *MF_ClientConnect( int clientNum, bool firstTime, bool isBot )
 
 	// check to see if they are on the banned IP list
 	char* value = Info::valueForKey (userinfo, "ip");
-	if ( Game::filterPacket( value ) ) 
+	if ( !isBot && Game::filterPacket( value ) ) 
 		return "Banned.";
 
 	// check for a password
 	value = Info::valueForKey( userinfo, "password" );
-	if( g_password.string[0] && Q_stricmp( g_password.string, "none" ) &&
+	if( !isBot && g_password.string[0] && Q_stricmp( g_password.string, "none" ) &&
 		strcmp( g_password.string, value) != 0)
 	{
 		return "Invalid password";
@@ -99,15 +97,11 @@ char *MF_ClientConnect( int clientNum, bool firstTime, bool isBot )
 
 	Game::readSessionData( client );
 
-	// for later
-//	if( isBot ) 
-//	{
-//		ent->r.svFlags |= SVF_BOT;
-//		ent->inuse_ = true;
-////		if( !G_BotConnect( clientNum, !firstTime ) ) {
-//			return "BotConnectfailed";
-////		}
-//	}
+	if( isBot ) 
+	{
+		ent->r.svFlags |= SVF_BOT;
+		Bots::onConnect( clientNum );
+	}
 
 	// init vehicle
 	Info::setValueForKey( userinfo, "cg_vehicle", "-1" );

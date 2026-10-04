@@ -935,6 +935,8 @@ extern	vmCvar_t	g_password;
 extern	vmCvar_t	g_needpass;
 extern	vmCvar_t	g_gravity;
 extern	vmCvar_t	g_stealthPenalty;
+extern	vmCvar_t	g_botMinPlayers;
+extern	vmCvar_t	g_botSkill;
 extern	vmCvar_t	g_abandonTime;
 extern	vmCvar_t	g_enterRange;
 extern	vmCvar_t	g_speed;
@@ -991,6 +993,9 @@ void SV_GetConfigstring( int index, char *buffer, int bufferSize );
 void SV_SetConfigstring (int index, const char *val);
 void SV_GameSendServerCommand( int clientNum, const char *text );
 void SV_GameDropClient( int clientNum, const char *reason );
+int SV_BotAllocateClient();
+void SV_BotFreeClient( int clientNum );
+void SV_BotUserCommand( int clientNum, usercmd_t *cmd );
 void SV_AdjustAreaPortalState( EntityBase* gameEnt, int open );
 void SV_SetBrushModel( EntityBase* gameEnt, const char *name );
 //void SV_LocateGameData( void* gEnts, int numGEntities, int sizeofGEntity_t,

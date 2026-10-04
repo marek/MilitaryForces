@@ -9,7 +9,7 @@ list(TRANSFORM VEHICLELIB_SOURCES PREPEND "${SOURCE_DIR}/vehiclelib/")
 set(GAME_SOURCES
     bg_boatmove.cpp bg_groundmove.cpp bg_helomove.cpp bg_loadouts.cpp bg_lqmmove.cpp bg_md3util.cpp
     bg_mfq3util.cpp bg_misc.cpp bg_planemove.cpp bg_pmove.cpp bg_slidemove.cpp bg_vehicledata.cpp
-    bg_weapondata.cpp g_active.cpp g_arenas.cpp g_boat.cpp g_client.cpp g_cmds.cpp
+    bg_weapondata.cpp g_active.cpp g_arenas.cpp g_boat.cpp g_bot.cpp g_client.cpp g_cmds.cpp
     g_combat.cpp g_entity.cpp g_groundinstallation.cpp g_groundvehicle.cpp g_helo.cpp g_items.cpp
     g_level.cpp g_lqm.cpp g_main.cpp g_mem.cpp g_mfq3ents.cpp g_mfq3util.cpp g_misc.cpp
     g_miscvehicle.cpp g_missile.cpp g_missions.cpp g_mover.cpp g_plane.cpp g_scripts.cpp g_session.cpp

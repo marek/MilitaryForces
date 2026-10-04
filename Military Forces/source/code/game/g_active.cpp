@@ -797,7 +797,7 @@ void ClientThink_real( GameEntity *ent )
 	}
 
 	// MFQ3 finish selection
-	if( !(ent->r.svFlags & SVF_BOT) && client->vehicle_ < 0 )
+	if( client->vehicle_ < 0 )
 	{
 		NotSelectedThink( ent, ucmd );
 		return;
