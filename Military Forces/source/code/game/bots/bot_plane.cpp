@@ -498,7 +498,7 @@ void Bots::thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_
 			if( blocked || bot.confined )
 			{
 				constexpr std::array<float, 11> offsets = { 0.0f, 15.0f, -15.0f, 30.0f, -30.0f, 50.0f, -50.0f, 80.0f, -80.0f, 120.0f, -120.0f };
-				constexpr std::array<float, 3> pitches = { 0.0f, -25.0f, 12.0f };
+				constexpr std::array<float, 4> pitches = { 0.0f, -25.0f, 12.0f, -45.0f };
 				const float base = bot.confined ? ps.vehicleAngles[YAW] : view[YAW];
 				const float reach = bot.confined ? 3000.0f : look * 2.0f;
 				float best = -99999.0f;
@@ -506,14 +506,23 @@ void Bots::thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_
 				{
 					for( float pitch : pitches )
 					{
-						if( bot.confined && pitch != 0.0f )
-							continue;
 						vec3_t probe = { pitch, base + offset, 0 }, dir;
 						trace_t pt;
 						AngleVectors( probe, dir, nullptr, nullptr );
-						pathBlocked( ent->r.currentOrigin, dir, reach, ent->s.number, pt );
+						pathBlocked( ent->r.currentOrigin, dir, reach, ent->s.number, pt, bot.confined ? 60.0f : 0.0f );
+						if( pt.startsolid )
+							pathBlocked( ent->r.currentOrigin, dir, reach, ent->s.number, pt );
 						const float turn = fabs( AngleSubtract( probe[YAW], ps.vehicleAngles[YAW] ) );
-						const float score = pt.fraction * reach - turn * 6.0f - fabs( AngleSubtract( probe[YAW], view[YAW] ) ) * (bot.confined ? 1.0f : 3.0f) - fabs( pitch ) * 4.0f;
+						float score = pt.fraction * reach - turn * 6.0f - fabs( AngleSubtract( probe[YAW], view[YAW] ) ) * (bot.confined ? 1.0f : 3.0f) - fabs( pitch ) * 4.0f;
+						if( turn > 30.0f )
+						{
+							const float turnRadius = std::max( airspeed, 1.0f ) / (std::max( 10.0f, veh.turnspeed[YAW] ) * static_cast<float>( M_PI ) / 180.0f);
+							vec3_t mid = { pitch, ps.vehicleAngles[YAW] + AngleSubtract( probe[YAW], ps.vehicleAngles[YAW] ) * 0.5f, 0 }, midDir;
+							trace_t mt;
+							AngleVectors( mid, midDir, nullptr, nullptr );
+							if( pathBlocked( ent->r.currentOrigin, midDir, turnRadius * 1.4f, ent->s.number, mt ) )
+								score -= 2500.0f * (1.0f - mt.fraction);
+						}
 						if( score > best )
 						{
 							best = score;
@@ -525,7 +534,8 @@ void Bots::thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_
 				if( bot.confined )
 				{
 					bot.avoidYaw += std::clamp( (leftClear - rightClear) / 25.0f, -12.0f, 12.0f );
-					bot.avoidPitch = std::clamp( (sense.height - room * 0.5f) / 15.0f, -20.0f, 15.0f );
+					if( bot.avoidPitch == 0.0f )
+						bot.avoidPitch = std::clamp( (sense.height - room * 0.5f) / 15.0f, -20.0f, 15.0f );
 				}
 				bot.avoidTime = theLevel.time_ + (bot.confined ? 300 : 800);
 			}
@@ -537,7 +547,7 @@ void Bots::thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_
 		}
 		if( bot.confined )
 		{
-			const float slow = veh.stallspeed * 1.7f;
+			const float slow = veh.stallspeed * 1.25f;
 			if( speed > slow )
 				cmd.forwardmove = -moveFull;
 			if( (speed > slow * 1.3f) != ((ps.ONOFF & OO_SPEEDBRAKE) != 0) && (veh.caps & HC_SPEEDBRAKE) )
@@ -585,7 +595,7 @@ void Bots::thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_
 			view[PITCH] = std::max( view[PITCH], sense.height > minHeight + 150 ? 12.0f : 0.0f );
 	}
 
-	if( speed < veh.stallspeed * 1.3f && sense.height > minHeight * 2 )
+	if( speed < veh.stallspeed * (bot.confined ? 1.08f : 1.3f) && sense.height > minHeight * 2 )
 		view[PITCH] = std::max( view[PITCH], 5.0f );
 	else if( speed < veh.stallspeed * 1.7f )
 		view[PITCH] = std::max( view[PITCH], -10.0f );

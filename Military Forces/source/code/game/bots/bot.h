@@ -197,7 +197,7 @@ private:
 	static bool outOfAmmo( int vehicle, const playerState_t& ps );
 	static void setRadar( GameEntity* ent, State& bot, bool air );
 	static float heightAboveGround( const vec3_t origin, int passEntity );
-	static bool pathBlocked( const vec3_t origin, const vec3_t dir, float dist, int passEntity, trace_t& tr );
+	static bool pathBlocked( const vec3_t origin, const vec3_t dir, float dist, int passEntity, trace_t& tr, float halfWidth = 0 );
 	static int pickVehicle( int teamFlag, bool allowInfantry = true, const Character* who = nullptr );
 	static unsigned int spawnCategories();
 	static void fill();
@@ -207,6 +207,9 @@ private:
 	static int fillTime_;
 	static std::vector<Pad> pads_;
 	static bool padsBuilt_;
+	static std::array<int, 5> kindLives_;
+	static std::array<int, 5> kindCrashes_;
+	static int kindOf( int vehicle );
 	static std::vector<Vec3> roamPoints_;
 	static std::vector<Character> characters_;
 };

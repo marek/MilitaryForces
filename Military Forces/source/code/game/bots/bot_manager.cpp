@@ -9,6 +9,8 @@ std::array<Bots::State, MAX_CLIENTS + 1> Bots::states_;
 int Bots::fillTime_ = 0;
 std::vector<Bots::Pad> Bots::pads_;
 bool Bots::padsBuilt_ = false;
+std::array<int, 5> Bots::kindLives_ = {};
+std::array<int, 5> Bots::kindCrashes_ = {};
 std::vector<Vec3> Bots::roamPoints_;
 std::vector<Bots::Character> Bots::characters_;
 
@@ -20,6 +22,8 @@ void Bots::reset()
 	padsBuilt_ = false;
 	roamPoints_.clear();
 	characters_.clear();
+	kindLives_.fill( 0 );
+	kindCrashes_.fill( 0 );
 }
 
 bool Bots::isBot( int clientNum )
@@ -32,12 +36,29 @@ int Bots::count()
 	return static_cast<int>( std::count_if( states_.begin(), states_.end(), []( const State& s ) { return s.active; } ) );
 }
 
+int Bots::kindOf( int vehicle )
+{
+	const unsigned int cat = availableVehicles[vehicle].cat;
+	if( cat & CAT_PLANE ) return 0;
+	if( cat & CAT_HELO ) return 1;
+	if( cat & CAT_GROUND ) return 2;
+	if( cat & CAT_BOAT ) return 3;
+	return 4;
+}
+
 void Bots::onDeath( GameEntity* self, GameEntity* attacker, int meansOfDeath )
 {
-	if( !g_botDebug.integer || !self || !self->client_ || !isBot( self->s.number ) || self->client_->vehicle_ < 0 )
+	if( !self || !self->client_ || !isBot( self->s.number ) || self->client_->vehicle_ < 0 )
 		return;
 
 	const State& bot = states_[self->s.number];
+	const int kind = kindOf( self->client_->vehicle_ );
+	kindLives_[kind]++;
+	if( (meansOfDeath == MOD_CRASH || meansOfDeath == MOD_WATER) && theLevel.time_ - bot.spawnTime < 20000 )
+		kindCrashes_[kind]++;
+	if( !g_botDebug.integer )
+		return;
+
 	const playerState_t& ps = self->client_->ps_;
 	vec3_t forward, start;
 	trace_t ahead;
@@ -157,6 +178,8 @@ int Bots::pickVehicle( int teamFlag, bool allowInfantry, const Character* who )
 			weight = static_cast<int>( weight * 10 * std::max( 0.0f, who->prefer[kind] ) );
 		if( !groundTargets && (veh.cat & CAT_PLANE) && (veh.cls & CLASS_PLANE_BOMBER) )
 			weight = weight * 12 / 100;
+		if( kindLives_[kind] >= 12 && kindCrashes_[kind] * 10 > kindLives_[kind] * 5 )
+			weight = std::max( 1, weight / 12 );
 		if( weight <= 0 )
 			continue;
 		if( !weight )

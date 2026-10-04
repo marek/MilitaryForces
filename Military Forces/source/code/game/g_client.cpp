@@ -116,7 +116,8 @@ bool SpotWouldTelefrag( GameEntity *spot, int vehicle )
 		mins[i] -= 24;
 		maxs[i] += 24;
 	}
-	maxs[2] += 60;
+	mins[2] -= 300;
+	maxs[2] += 700;
 	int num = SV_AreaEntities( mins, maxs, touch, MAX_GENTITIES );
 
 	for( int i=0 ; i<num ; i++ )

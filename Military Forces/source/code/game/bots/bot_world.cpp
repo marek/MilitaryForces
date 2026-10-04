@@ -15,10 +15,16 @@ float Bots::heightAboveGround( const vec3_t origin, int passEntity )
 	return tr.fraction * 16000.0f;
 }
 
-bool Bots::pathBlocked( const vec3_t origin, const vec3_t dir, float dist, int passEntity, trace_t& tr )
+bool Bots::pathBlocked( const vec3_t origin, const vec3_t dir, float dist, int passEntity, trace_t& tr, float halfWidth )
 {
 	vec3_t end;
 	VectorMA( origin, dist, dir, end );
+	if( halfWidth > 0 )
+	{
+		vec3_t mins = { -halfWidth, -halfWidth, -halfWidth * 0.4f }, maxs = { halfWidth, halfWidth, halfWidth * 0.4f };
+		SV_Trace( &tr, origin, mins, maxs, end, passEntity, MASK_PLAYERSOLID|CONTENTS_BOTCLIP, false );
+		return tr.fraction < 1.0f;
+	}
 	SV_Trace( &tr, origin, nullptr, nullptr, end, passEntity, MASK_PLAYERSOLID|CONTENTS_BOTCLIP, false );
 	return tr.fraction < 1.0f;
 }
