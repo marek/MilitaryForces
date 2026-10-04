@@ -2383,8 +2383,8 @@ void S_AL_SoundList( )
 }
 
 #ifdef USE_VOIP
-// The microphone is opened the first time voice chat records, not when the game starts: opening it is
-// what makes the system ask for permission, and that should happen when the player uses it.
+// The microphone is opened when the game starts, so the system asks for permission then and not in the
+// middle of a game. The system remembers the answer for a given build of the program.
 static bool alCaptureDeferred = false;
 static char alCaptureDeviceName[256] = "";
 
@@ -2722,9 +2722,8 @@ bool S_AL_Init( soundInterface_t *si )
 			s_alAvailableInputDevices = CvarSystem::get("s_alAvailableInputDevices", inputdevicenames, CVAR_ROM | CVAR_NORESTART);
 
 			Common::printf("OpenAL default capture device is '%s'\n", defaultinputdevice ? defaultinputdevice : "none");
-			// opened on first use, see S_AL_StartCapture
 			Q_strncpyz( alCaptureDeviceName, inputdevice ? inputdevice : "", sizeof( alCaptureDeviceName ) );
-			alCaptureDeferred = true;
+			S_AL_OpenCapture();
 		}
 	}
 #endif

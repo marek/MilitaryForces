@@ -179,6 +179,25 @@ static void SNDDMA_PrintAudiospec(const char *str, const SDL_AudioSpec *spec)
 	Common::printf( "  Channels: %d\n", static_cast<int>(spec->channels) );
 }
 
+#ifdef USE_SDL_AUDIO_CAPTURE
+static void SNDDMA_OpenCapture()
+{
+	if (sdlCaptureDevice || !sdlCaptureDeferred)
+		return;
+	/* !!! FIXME: list available devices and let cvar specify one, like OpenAL does */
+	sdlCaptureDeferred = false;
+	SDL_AudioSpec spec;
+	SDL_zero(spec);
+	spec.freq = 48000;
+	spec.format = AUDIO_S16SYS;
+	spec.channels = 1;
+	spec.samples = VOIP_MAX_PACKET_SAMPLES * 4;
+	sdlCaptureDevice = SDL_OpenAudioDevice(nullptr, SDL_TRUE, &spec, nullptr, 0);
+	Common::printf( "SDL capture device %s.\n",
+			    (sdlCaptureDevice == 0) ? "failed to open" : "opened");
+}
+#endif
+
 /*
 ===============
 SNDDMA_Init
@@ -294,9 +313,9 @@ bool SNDDMA_Init()
 #endif
 	else
 	{
-		// opened the first time voice chat records, see SNDDMA_StartCapture: opening the microphone is
-		// what makes the system ask for permission, and that should happen when the player uses it
+		// opened at start, so the system asks for microphone permission then and not in the middle of a game
 		sdlCaptureDeferred = true;
+		SNDDMA_OpenCapture();
 	}
 
 	sdlMasterGain = 1.0f;
@@ -381,20 +400,7 @@ void SNDDMA_BeginPainting ()
 void SNDDMA_StartCapture()
 {
 #ifdef USE_SDL_AUDIO_CAPTURE
-	if (!sdlCaptureDevice && sdlCaptureDeferred)
-	{
-		/* !!! FIXME: list available devices and let cvar specify one, like OpenAL does */
-		sdlCaptureDeferred = false;
-		SDL_AudioSpec spec;
-		SDL_zero(spec);
-		spec.freq = 48000;
-		spec.format = AUDIO_S16SYS;
-		spec.channels = 1;
-		spec.samples = VOIP_MAX_PACKET_SAMPLES * 4;
-		sdlCaptureDevice = SDL_OpenAudioDevice(nullptr, SDL_TRUE, &spec, nullptr, 0);
-		Common::printf( "SDL capture device %s.\n",
-				    (sdlCaptureDevice == 0) ? "failed to open" : "opened");
-	}
+	SNDDMA_OpenCapture();
 	if (sdlCaptureDevice)
 	{
 		SDL_ClearQueuedAudio(sdlCaptureDevice);
