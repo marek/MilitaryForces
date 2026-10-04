@@ -268,7 +268,8 @@ bool Bots::landPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_t
 	under[2] = pad.z;
 	const bool overRunway = runwayAt( under );
 	const float touch = fabs( veh.mins[2] ) + veh.gearheight;
-	const float wantAbove = overRunway ? touch : std::clamp( before * bot.landSlope, 120.0f, 800.0f );
+	const bool shortField = pad.halfLength < 500;
+	const float wantAbove = overRunway ? touch : std::clamp( before * bot.landSlope, shortField ? touch + 22.0f : 120.0f, 800.0f );
 	view[PITCH] = std::clamp( (above - wantAbove) / 6.0f, -10.0f, 14.0f );
 	if( overRunway )
 		view[PITCH] = above > touch + 30 ? std::clamp( (above - touch) / 6.0f, 2.0f, 10.0f ) : 1.5f;
@@ -277,11 +278,11 @@ bool Bots::landPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_t
 		vec3_t nose;
 		trace_t tr;
 		AngleVectors( ps.vehicleAngles, nose, nullptr, nullptr );
-		if( sense.height < 60 || (pathBlocked( ent->r.currentOrigin, nose, 500, ent->s.number, tr ) && tr.entityNum == ENTITYNUM_WORLD) )
+		if( sense.height < (shortField ? 14.0f + touch : 60.0f) || (pathBlocked( ent->r.currentOrigin, nose, shortField ? 250.0f : 500.0f, ent->s.number, tr ) && tr.entityNum == ENTITYNUM_WORLD) )
 			view[PITCH] = -12.0f;
 	}
 
-	const float wantSpeed = stall * (overRunway ? 1.15f : before > 1200 ? 1.7f : 1.45f);
+	const float wantSpeed = stall * (overRunway ? 1.15f : before > 1200 ? 1.7f : shortField ? 1.2f : 1.45f);
 	cmd.forwardmove = speed < wantSpeed ? moveFull : -moveFull;
 	const bool wantBrake = speed > wantSpeed * 1.25f;
 	if( wantBrake != ((ps.ONOFF & OO_SPEEDBRAKE) != 0) )
