@@ -61,7 +61,7 @@ ItemKeyword_Asset_Model::func( itemDef_t *item, int handle )
 	const char *temp;
 	modelDef_t *modelPtr;
 	utils_->item_ValidateTypeData(item);
-	modelPtr = (modelDef_t*)item->typeData;
+	modelPtr = static_cast<modelDef_t*>(item->typeData);
 
 	if (!utils_->pc_String_Parse(handle, &temp)) 
 		return false;
@@ -94,7 +94,7 @@ ItemKeyword_Model_Origin::func( itemDef_t *item, int handle )
 {
 	modelDef_t *modelPtr;
 	utils_->item_ValidateTypeData(item);
-	modelPtr = (modelDef_t*)item->typeData;
+	modelPtr = static_cast<modelDef_t*>(item->typeData);
 
 	if (utils_->pc_Float_Parse(handle, &modelPtr->origin[0])) 
 	{
@@ -115,7 +115,7 @@ ItemKeyword_Model_fovX::func( itemDef_t *item, int handle )
 {
 	modelDef_t *modelPtr;
 	utils_->item_ValidateTypeData(item);
-	modelPtr = (modelDef_t*)item->typeData;
+	modelPtr = static_cast<modelDef_t*>(item->typeData);
 
 	if (!utils_->pc_Float_Parse(handle, &modelPtr->fov_x)) 
 		return false;
@@ -130,7 +130,7 @@ ItemKeyword_Model_fovY::func( itemDef_t *item, int handle )
 {
 	modelDef_t *modelPtr;
 	utils_->item_ValidateTypeData(item);
-	modelPtr = (modelDef_t*)item->typeData;
+	modelPtr = static_cast<modelDef_t*>(item->typeData);
 
 	if (!utils_->pc_Float_Parse(handle, &modelPtr->fov_y)) 
 		return false;
@@ -145,7 +145,7 @@ ItemKeyword_Model_Rotation::func( itemDef_t *item, int handle )
 {
 	modelDef_t *modelPtr;
 	utils_->item_ValidateTypeData(item);
-	modelPtr = (modelDef_t*)item->typeData;
+	modelPtr = static_cast<modelDef_t*>(item->typeData);
 
 	if (!utils_->pc_Int_Parse(handle, &modelPtr->rotationSpeed)) 
 		return false;
@@ -160,7 +160,7 @@ ItemKeyword_Model_Angle::func( itemDef_t *item, int handle )
 {
 	modelDef_t *modelPtr;
 	utils_->item_ValidateTypeData(item);
-	modelPtr = (modelDef_t*)item->typeData;
+	modelPtr = static_cast<modelDef_t*>(item->typeData);
 
 	if (!utils_->pc_Int_Parse(handle, &modelPtr->angle)) 
 		return false;
@@ -211,7 +211,7 @@ ItemKeyword_NotSelectable::func( itemDef_t *item, int handle )
 {
 	listBoxDef_t *listPtr;
 	utils_->item_ValidateTypeData(item);
-	listPtr = (listBoxDef_t*)item->typeData;
+	listPtr = static_cast<listBoxDef_t*>(item->typeData);
 	if (item->type == ITEM_TYPE_LISTBOX && listPtr) 
 		listPtr->notselectable = true;
 	return true;
@@ -268,7 +268,7 @@ ItemKeyword_ElementWidth::func( itemDef_t *item, int handle )
 	listBoxDef_t *listPtr;
 
 	utils_->item_ValidateTypeData(item);
-	listPtr = (listBoxDef_t*)item->typeData;
+	listPtr = static_cast<listBoxDef_t*>(item->typeData);
 	if (!utils_->pc_Float_Parse(handle, &listPtr->elementWidth))
 		return false;
 	return true;
@@ -283,7 +283,7 @@ ItemKeyword_ElementHeight::func( itemDef_t *item, int handle )
 	listBoxDef_t *listPtr;
 
 	utils_->item_ValidateTypeData(item);
-	listPtr = (listBoxDef_t*)item->typeData;
+	listPtr = static_cast<listBoxDef_t*>(item->typeData);
 	if (!utils_->pc_Float_Parse(handle, &listPtr->elementHeight)) 
 		return false;
 	return true;
@@ -312,7 +312,7 @@ ItemKeyword_ElementType::func( itemDef_t *item, int handle )
 	if (!item->typeData)
 		return false;
 
-	listPtr = (listBoxDef_t*)item->typeData;
+	listPtr = static_cast<listBoxDef_t*>(item->typeData);
 	if (!utils_->pc_Int_Parse(handle, &listPtr->elementStyle)) 
 		return false;
 
@@ -331,7 +331,7 @@ ItemKeyword_Columns::func( itemDef_t *item, int handle )
 	utils_->item_ValidateTypeData(item);
 	if (!item->typeData)
 		return false;
-	listPtr = (listBoxDef_t*)item->typeData;
+	listPtr = static_cast<listBoxDef_t*>(item->typeData);
 	if (utils_->pc_Int_Parse(handle, &num)) 
 	{
 		if (num > MAX_LB_COLUMNS) 
@@ -664,7 +664,7 @@ ItemKeyword_Cvar::func( itemDef_t *item, int handle )
 
 	if (item->typeData) 
 	{
-		editPtr = (editFieldDef_t*)item->typeData;
+		editPtr = static_cast<editFieldDef_t*>(item->typeData);
 		editPtr->minVal = -1;
 		editPtr->maxVal = -1;
 		editPtr->defVal = -1;
@@ -688,7 +688,7 @@ ItemKeyword_MaxChars::func( itemDef_t *item, int handle )
 	if (!utils_->pc_Int_Parse(handle, &maxChars)) {
 		return false;
 	}
-	editPtr = (editFieldDef_t*)item->typeData;
+	editPtr = static_cast<editFieldDef_t*>(item->typeData);
 	editPtr->maxChars = maxChars;
 	return true;
 }
@@ -709,7 +709,7 @@ ItemKeyword_MaxPaintChars::func( itemDef_t *item, int handle )
 	if (!utils_->pc_Int_Parse(handle, &maxChars)) 
 		return false;
 
-	editPtr = (editFieldDef_t*)item->typeData;
+	editPtr = static_cast<editFieldDef_t*>(item->typeData);
 	editPtr->maxPaintChars = maxChars;
 	return true;
 }
@@ -739,7 +739,7 @@ ItemKeyword_CvarFloat::func( itemDef_t *item, int handle )
 	utils_->item_ValidateTypeData(item);
 	if (!item->typeData)
 		return false;
-	editPtr = (editFieldDef_t*)item->typeData;
+	editPtr = static_cast<editFieldDef_t*>(item->typeData);
 	if (utils_->pc_String_Parse(handle, &item->cvar) &&
 		utils_->pc_Float_Parse(handle, &editPtr->defVal) &&
 		utils_->pc_Float_Parse(handle, &editPtr->minVal) &&
@@ -763,7 +763,7 @@ ItemKeyword_CvarStrList::func( itemDef_t *item, int handle )
 	utils_->item_ValidateTypeData(item);
 	if (!item->typeData)
 		return false;
-	multiPtr = (multiDef_t*)item->typeData;
+	multiPtr = static_cast<multiDef_t*>(item->typeData);
 	multiPtr->count = 0;
 	multiPtr->strDef = true;
 
@@ -816,7 +816,7 @@ ItemKeyword_CvarFloatList::func( itemDef_t *item, int handle )
 	utils_->item_ValidateTypeData(item);
 	if (!item->typeData)
 		return false;
-	multiPtr = (multiDef_t*)item->typeData;
+	multiPtr = static_cast<multiDef_t*>(item->typeData);
 	multiPtr->count = 0;
 	multiPtr->strDef = false;
 
@@ -981,7 +981,7 @@ ItemKeyword_DoubleClick::func( itemDef_t *item, int handle )
 		return false;
 	}
 
-	listPtr = (listBoxDef_t*)item->typeData;
+	listPtr = static_cast<listBoxDef_t*>(item->typeData);
 
 	if (!utils_->pc_Script_Parse(handle, &listPtr->doubleClick)) 
 	{
@@ -1030,7 +1030,7 @@ bool
 MenuKeyword_Fullscreen::func( itemDef_t *item, int handle )
 {
 	menuDef_t *menu = reinterpret_cast<menuDef_t*>(item);
-	if (!utils_->pc_Int_Parse(handle, (int*) &menu->fullScreen))  // bk001206 - cast bool
+	if (!utils_->pc_Int_Parse(handle, reinterpret_cast<int*>(&menu->fullScreen)))  // bk001206 - cast bool
 		return false;
 	
 	return true;

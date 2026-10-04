@@ -883,7 +883,7 @@ void ME_ExportToScript( const char* scriptname )
 	Com_sprintf( outstring, sizeof(outstring), "Overview\n{\n\tmap\t%s\n", mapname );
 	FS_Write( outstring, strlen(outstring), f );
 
-	Com_sprintf( outstring, sizeof(outstring), "\tgameset\t%d\n", (int)cgs.gameset );
+	Com_sprintf( outstring, sizeof(outstring), "\tgameset\t%d\n", static_cast<int>(cgs.gameset) );
 	FS_Write( outstring, strlen(outstring), f );
 
 	Com_sprintf( outstring, sizeof(outstring), "\tgametype\t%d\n", cgs.gametype );

@@ -181,7 +181,7 @@ float	LittleFloat (const float *l) {return _LittleFloat(l);}
 
 void CopyShortSwap(void *dest, void *src)
 {
-	byte *to = (byte *)dest, *from = (byte *)src;
+	byte *to = static_cast<byte *>(dest), *from = static_cast<byte *>(src);
 
 	to[0] = from[1];
 	to[1] = from[0];
@@ -189,7 +189,7 @@ void CopyShortSwap(void *dest, void *src)
 
 void CopyLongSwap(void *dest, void *src)
 {
-	byte *to = (byte *)dest, *from = (byte *)src;
+	byte *to = static_cast<byte *>(dest), *from = static_cast<byte *>(src);
 
 	to[0] = from[3];
 	to[1] = from[2];
@@ -221,7 +221,7 @@ int    LongSwap (int l)
 	b3 = (l>>16)&255;
 	b4 = (l>>24)&255;
 
-	return ((int)b1<<24) + ((int)b2<<16) + ((int)b3<<8) + b4;
+	return (static_cast<int>(b1)<<24) + (static_cast<int>(b2)<<16) + (static_cast<int>(b3)<<8) + b4;
 }
 
 int	LongNoSwap (int l)
@@ -537,7 +537,7 @@ char *COM_ParseExt( char **data_p, bool allowLineBreaks )
 			if (c=='\"' || !c)
 			{
 				com_token[len] = 0;
-				*data_p = ( char * ) data;
+				*data_p = data;
 				return com_token;
 			}
 			if ( c == '\n' )
@@ -566,7 +566,7 @@ char *COM_ParseExt( char **data_p, bool allowLineBreaks )
 
 	com_token[len] = 0;
 
-	*data_p = ( char * ) data;
+	*data_p = data;
 	return com_token;
 }
 
@@ -765,7 +765,7 @@ bool Q_isanumber( const char *s )
 
 bool Q_isintegral( float f )
 {
-	return (int)f == f;
+	return static_cast<int>(f) == f;
 }
 
 #ifdef _WIN32

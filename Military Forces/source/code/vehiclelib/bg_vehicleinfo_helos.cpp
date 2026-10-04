@@ -7,14 +7,10 @@
 
 
 GameObjectInfo_Helicopter::GameObjectInfo_Helicopter()
-{
-
-}
+= default;
 
 GameObjectInfo_Helicopter::~GameObjectInfo_Helicopter()
-{
-
-}
+= default;
 
 bool
 GameObjectInfo_Helicopter::setupBoundingBox()

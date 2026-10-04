@@ -18,8 +18,7 @@ GameObjectInfo_GroundVehicle::GameObjectInfo_GroundVehicle() :
 }
 
 GameObjectInfo_GroundVehicle::~GameObjectInfo_GroundVehicle()
-{
-}
+= default;
 
 bool
 GameObjectInfo_GroundVehicle::setupBoundingBox()

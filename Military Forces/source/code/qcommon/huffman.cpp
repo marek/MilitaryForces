@@ -81,13 +81,13 @@ static node_t **get_ppnode(huff_t* huff) {
 		return &(huff->nodePtrs[huff->blocPtrs++]);
 	} else {
 		tppnode = huff->freelist;
-		huff->freelist = (node_t **)*tppnode;
+		huff->freelist = reinterpret_cast<node_t **>(*tppnode);
 		return tppnode;
 	}
 }
 
 static void free_ppnode(huff_t* huff, node_t **ppnode) {
-	*ppnode = (node_t *)huff->freelist;
+	*ppnode = reinterpret_cast<node_t *>(huff->freelist);
 	huff->freelist = ppnode;
 }
 
@@ -327,7 +327,7 @@ void Huff_transmit (huff_t *huff, int ch, byte *fout, int maxoffset) {
 		/* node_t hasn't been transmitted, send a NYT, then the symbol */
 		Huff_transmit(huff, NYT, fout, maxoffset);
 		for (i = 7; i >= 0; i--) {
-			add_bit((char)((ch >> i) & 0x1), fout);
+			add_bit(static_cast<char>((ch >> i) & 0x1), fout);
 		}
 	} else {
 		send(huff->loc[ch], nullptr, fout, maxoffset);
@@ -386,7 +386,7 @@ void Huff_Decompress(Message *mbuf, int offset) {
     
 		seq[j] = ch;									/* Write symbol */
 
-		Huff_addRef(&huff, (byte)ch);								/* Increment node */
+		Huff_addRef(&huff, static_cast<byte>(ch));								/* Increment node */
 	}
 	mbuf->cursize = cch + offset;
 	Com_Memcpy(mbuf->data + offset, seq, cch);
@@ -423,7 +423,7 @@ void Huff_Compress(Message *mbuf, int offset) {
 	for (i=0; i<size; i++ ) {
 		ch = buffer[i];
 		Huff_transmit(&huff, ch, seq, size<<3);						/* Transmit symbol */
-		Huff_addRef(&huff, (byte)ch);								/* Do update */
+		Huff_addRef(&huff, static_cast<byte>(ch));								/* Do update */
 	}
 
 	bloc += 8;												// next byte

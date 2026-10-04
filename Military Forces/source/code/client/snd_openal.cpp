@@ -1009,7 +1009,7 @@ static void S_AL_SrcKill(srcHandle_t src)
 
 	curSource->sfx = 0;
 	curSource->lastUsedTime = 0;
-	curSource->priority = (alSrcPriority_t)0;
+	curSource->priority = static_cast<alSrcPriority_t>(0);
 	curSource->entity = -1;
 	curSource->channel = -1;
 	if(curSource->isActive)
@@ -1559,7 +1559,7 @@ void S_AL_SrcUpdate( )
 							if(master->lastTimePos >= 0)
 							{
 								secofs = master->lastTimePos + (Sys_Milliseconds() - master->lastSampleTime) / 1000.0f;
-								secofs = fmodf(secofs, (float) curSfx->info.samples / curSfx->info.rate);
+								secofs = fmodf(secofs, static_cast<float>(curSfx->info.samples) / curSfx->info.rate);
 						
 								qalSourcef(curSource->alSource, AL_SEC_OFFSET, secofs);
 							}
@@ -1577,7 +1577,7 @@ void S_AL_SrcUpdate( )
 						// For unsynced loops (SRCPRI_ENTITY) just carry on playing as if the sound was never stopped
 						
 						secofs = curSource->lastTimePos + (Sys_Milliseconds() - curSource->lastSampleTime) / 1000.0f;
-						secofs = fmodf(secofs, (float) curSfx->info.samples / curSfx->info.rate);
+						secofs = fmodf(secofs, static_cast<float>(curSfx->info.samples) / curSfx->info.rate);
 						qalSourcef(curSource->alSource, AL_SEC_OFFSET, secofs);
 					}
 						
@@ -1824,7 +1824,7 @@ void S_AL_RawSamples(int stream, int samples, int rate, int width, int channels,
 	streamBufIndex[stream] = (streamBufIndex[stream] + 1) % streamNumBuffers[stream];
 
 	// Fill buffer
-	qalBufferData(buffer, format, (ALvoid *)data, (samples * width * channels), rate);
+	qalBufferData(buffer, format, const_cast<ALvoid *>(static_cast<const ALvoid *>(data)), (samples * width * channels), rate);
 
 	// Shove the data onto the streamSource
 	qalSourceQueueBuffers(streamSources[stream], 1, &buffer);
@@ -2398,7 +2398,7 @@ int S_AL_AvailableCaptureSamples( )
 	{
 		ALint samples = 0;
 		qalcGetIntegerv(alCaptureDevice, ALC_CAPTURE_SAMPLES, sizeof (samples), &samples);
-		retval = (int) samples;
+		retval = static_cast<int>(samples);
 	}
 	return retval;
 }

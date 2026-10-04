@@ -50,8 +50,8 @@ static int R_MDRCullModel( mdrHeader_t *header, trRefEntity_t *ent ) {
 	frameSize = (size_t)( &((mdrFrame_t *)nullptr)->bones[ header->numBones ] );
 	
 	// compute frame pointers
-	newFrame = ( mdrFrame_t * ) ( ( byte * ) header + header->ofsFrames + frameSize * ent->e.frame);
-	oldFrame = ( mdrFrame_t * ) ( ( byte * ) header + header->ofsFrames + frameSize * ent->e.oldframe);
+	newFrame = reinterpret_cast< mdrFrame_t *>( reinterpret_cast< byte *>(header) + header->ofsFrames + frameSize * ent->e.frame);
+	oldFrame = reinterpret_cast< mdrFrame_t *>( reinterpret_cast< byte *>(header) + header->ofsFrames + frameSize * ent->e.oldframe);
 
 	// cull bounding sphere ONLY if this is not an upscaled entity
 	if ( !ent->e.nonNormalizedAxes )
@@ -149,7 +149,7 @@ int R_MDRComputeFogNum( mdrHeader_t *header, trRefEntity_t *ent ) {
 	frameSize = (size_t)( &((mdrFrame_t *)nullptr)->bones[ header->numBones ] );
 
 	// FIXME: non-normalized axis issues
-	mdrFrame = ( mdrFrame_t * ) ( ( byte * ) header + header->ofsFrames + frameSize * ent->e.frame);
+	mdrFrame = reinterpret_cast< mdrFrame_t *>( reinterpret_cast< byte *>(header) + header->ofsFrames + frameSize * ent->e.frame);
 	VectorAdd( ent->e.origin, mdrFrame->localOrigin, localOrigin );
 	for ( i = 1 ; i < tr.world->numfogs ; i++ ) {
 		fog = &tr.world->fogs[i];
@@ -191,7 +191,7 @@ void R_MDRAddAnimSurfaces( trRefEntity_t *ent ) {
 	int             cubemapIndex;
 	bool	personalModel;
 
-	header = (mdrHeader_t *) tr.currentModel->modelData;
+	header = static_cast<mdrHeader_t *>(tr.currentModel->modelData);
 	
 	personalModel = (ent->e.renderfx & RF_THIRD_PERSON) && !(tr.viewParms.isPortal 
 	                 || (tr.viewParms.flags & (VPF_SHADOWMAP | VPF_DEPTHSHADOW)));
@@ -236,10 +236,10 @@ void R_MDRAddAnimSurfaces( trRefEntity_t *ent ) {
 	if(header->numLODs <= lodnum)
 		lodnum = header->numLODs - 1;
 
-	lod = (mdrLOD_t *)( (byte *)header + header->ofsLODs);
+	lod = reinterpret_cast<mdrLOD_t *>( reinterpret_cast<byte *>(header) + header->ofsLODs);
 	for(i = 0; i < lodnum; i++)
 	{
-		lod = (mdrLOD_t *) ((byte *) lod + lod->ofsEnd);
+		lod = reinterpret_cast<mdrLOD_t *>(reinterpret_cast<byte *>(lod) + lod->ofsEnd);
 	}
 	
 	// set up lighting
@@ -253,7 +253,7 @@ void R_MDRAddAnimSurfaces( trRefEntity_t *ent ) {
 
 	cubemapIndex = R_CubemapForPoint(ent->e.origin);
 
-	surface = (mdrSurface_t *)( (byte *)lod + lod->ofsSurfaces );
+	surface = reinterpret_cast<mdrSurface_t *>( reinterpret_cast<byte *>(lod) + lod->ofsSurfaces );
 
 	for ( i = 0 ; i < lod->numSurfaces ; i++ )
 	{
@@ -288,7 +288,7 @@ void R_MDRAddAnimSurfaces( trRefEntity_t *ent ) {
 			&& !(ent->e.renderfx & ( RF_NOSHADOW | RF_DEPTHHACK ) )
 			&& shader->sort == SS_OPAQUE )
 		{
-			R_AddDrawSurf( (surfaceType_t *)surface, tr.shadowShader, 0, false, false, 0 );
+			R_AddDrawSurf( reinterpret_cast<surfaceType_t *>(surface), tr.shadowShader, 0, false, false, 0 );
 		}
 
 		// projection shadows work fine with personal models
@@ -297,13 +297,13 @@ void R_MDRAddAnimSurfaces( trRefEntity_t *ent ) {
 			&& (ent->e.renderfx & RF_SHADOW_PLANE )
 			&& shader->sort == SS_OPAQUE )
 		{
-			R_AddDrawSurf( (surfaceType_t *)surface, tr.projectionShadowShader, 0, false, false, 0 );
+			R_AddDrawSurf( reinterpret_cast<surfaceType_t *>(surface), tr.projectionShadowShader, 0, false, false, 0 );
 		}
 
 		if (!personalModel)
-			R_AddDrawSurf( (surfaceType_t *)surface, shader, fogNum, false, false, cubemapIndex );
+			R_AddDrawSurf( reinterpret_cast<surfaceType_t *>(surface), shader, fogNum, false, false, cubemapIndex );
 
-		surface = (mdrSurface_t *)( (byte *)surface + surface->ofsEnd );
+		surface = reinterpret_cast<mdrSurface_t *>( reinterpret_cast<byte *>(surface) + surface->ofsEnd );
 	}
 }
 
@@ -341,18 +341,18 @@ void RB_MDRSurfaceAnim( mdrSurface_t *surface )
 		frontlerp	= 1.0f - backlerp;
 	}
 
-	header = (mdrHeader_t *)((byte *)surface + surface->ofsHeader);
+	header = reinterpret_cast<mdrHeader_t *>(reinterpret_cast<byte *>(surface) + surface->ofsHeader);
 
 	frameSize = (size_t)( &((mdrFrame_t *)nullptr)->bones[ header->numBones ] );
 
-	frame = (mdrFrame_t *)((byte *)header + header->ofsFrames +
+	frame = reinterpret_cast<mdrFrame_t *>(reinterpret_cast<byte *>(header) + header->ofsFrames +
 		backEnd.currentEntity->e.frame * frameSize );
-	oldFrame = (mdrFrame_t *)((byte *)header + header->ofsFrames +
+	oldFrame = reinterpret_cast<mdrFrame_t *>(reinterpret_cast<byte *>(header) + header->ofsFrames +
 		backEnd.currentEntity->e.oldframe * frameSize );
 
 	RB_CHECKOVERFLOW( surface->numVerts, surface->numTriangles * 3 );
 
-	triangles	= (int *) ((byte *)surface + surface->ofsTriangles);
+	triangles	= reinterpret_cast<int *>(reinterpret_cast<byte *>(surface) + surface->ofsTriangles);
 	indexes		= surface->numTriangles * 3;
 	baseIndex	= tess.numIndexes;
 	baseVertex	= tess.numVertexes;
@@ -378,7 +378,7 @@ void RB_MDRSurfaceAnim( mdrSurface_t *surface )
 		
 		for ( i = 0 ; i < header->numBones*12 ; i++ ) 
 		{
-			((float *)bonePtr)[i] = frontlerp * ((float *)frame->bones)[i] + backlerp * ((float *)oldFrame->bones)[i];
+			(reinterpret_cast<float *>(bonePtr))[i] = frontlerp * (reinterpret_cast<float *>(frame->bones))[i] + backlerp * (reinterpret_cast<float *>(oldFrame->bones))[i];
 		}
 	}
 
@@ -386,7 +386,7 @@ void RB_MDRSurfaceAnim( mdrSurface_t *surface )
 	// deform the vertexes by the lerped bones
 	//
 	numVerts = surface->numVerts;
-	v = (mdrVertex_t *) ((byte *)surface + surface->ofsVerts);
+	v = reinterpret_cast<mdrVertex_t *>(reinterpret_cast<byte *>(surface) + surface->ofsVerts);
 	for ( j = 0; j < numVerts; j++ ) 
 	{
 		vec3_t	tempVert, tempNormal;
@@ -417,7 +417,7 @@ void RB_MDRSurfaceAnim( mdrSurface_t *surface )
 		tess.texCoords[baseVertex + j][0] = v->texCoords[0];
 		tess.texCoords[baseVertex + j][1] = v->texCoords[1];
 
-		v = (mdrVertex_t *)&v->weights[v->numWeights];
+		v = reinterpret_cast<mdrVertex_t *>(&v->weights[v->numWeights]);
 	}
 
 	tess.numVertexes += surface->numVerts;
@@ -471,53 +471,53 @@ void MC_UnCompress(float mat[3][4],const unsigned char * comp)
 {
 	int val;
 
-	val=(int)((unsigned short *)(comp))[0];
+	val=static_cast<int>(((unsigned short *)(comp))[0]);
 	val-=1<<(MC_BITS_X-1);
-	mat[0][3]=((float)(val))*MC_SCALE_X;
+	mat[0][3]=(static_cast<float>(val))*MC_SCALE_X;
 
-	val=(int)((unsigned short *)(comp))[1];
+	val=static_cast<int>(((unsigned short *)(comp))[1]);
 	val-=1<<(MC_BITS_Y-1);
-	mat[1][3]=((float)(val))*MC_SCALE_Y;
+	mat[1][3]=(static_cast<float>(val))*MC_SCALE_Y;
 
-	val=(int)((unsigned short *)(comp))[2];
+	val=static_cast<int>(((unsigned short *)(comp))[2]);
 	val-=1<<(MC_BITS_Z-1);
-	mat[2][3]=((float)(val))*MC_SCALE_Z;
+	mat[2][3]=(static_cast<float>(val))*MC_SCALE_Z;
 
-	val=(int)((unsigned short *)(comp))[3];
+	val=static_cast<int>(((unsigned short *)(comp))[3]);
 	val-=1<<(MC_BITS_VECT-1);
-	mat[0][0]=((float)(val))*MC_SCALE_VECT;
+	mat[0][0]=(static_cast<float>(val))*MC_SCALE_VECT;
 
-	val=(int)((unsigned short *)(comp))[4];
+	val=static_cast<int>(((unsigned short *)(comp))[4]);
 	val-=1<<(MC_BITS_VECT-1);
-	mat[0][1]=((float)(val))*MC_SCALE_VECT;
+	mat[0][1]=(static_cast<float>(val))*MC_SCALE_VECT;
 
-	val=(int)((unsigned short *)(comp))[5];
+	val=static_cast<int>(((unsigned short *)(comp))[5]);
 	val-=1<<(MC_BITS_VECT-1);
-	mat[0][2]=((float)(val))*MC_SCALE_VECT;
+	mat[0][2]=(static_cast<float>(val))*MC_SCALE_VECT;
 
 
-	val=(int)((unsigned short *)(comp))[6];
+	val=static_cast<int>(((unsigned short *)(comp))[6]);
 	val-=1<<(MC_BITS_VECT-1);
-	mat[1][0]=((float)(val))*MC_SCALE_VECT;
+	mat[1][0]=(static_cast<float>(val))*MC_SCALE_VECT;
 
-	val=(int)((unsigned short *)(comp))[7];
+	val=static_cast<int>(((unsigned short *)(comp))[7]);
 	val-=1<<(MC_BITS_VECT-1);
-	mat[1][1]=((float)(val))*MC_SCALE_VECT;
+	mat[1][1]=(static_cast<float>(val))*MC_SCALE_VECT;
 
-	val=(int)((unsigned short *)(comp))[8];
+	val=static_cast<int>(((unsigned short *)(comp))[8]);
 	val-=1<<(MC_BITS_VECT-1);
-	mat[1][2]=((float)(val))*MC_SCALE_VECT;
+	mat[1][2]=(static_cast<float>(val))*MC_SCALE_VECT;
 
 
-	val=(int)((unsigned short *)(comp))[9];
+	val=static_cast<int>(((unsigned short *)(comp))[9]);
 	val-=1<<(MC_BITS_VECT-1);
-	mat[2][0]=((float)(val))*MC_SCALE_VECT;
+	mat[2][0]=(static_cast<float>(val))*MC_SCALE_VECT;
 
-	val=(int)((unsigned short *)(comp))[10];
+	val=static_cast<int>(((unsigned short *)(comp))[10]);
 	val-=1<<(MC_BITS_VECT-1);
-	mat[2][1]=((float)(val))*MC_SCALE_VECT;
+	mat[2][1]=(static_cast<float>(val))*MC_SCALE_VECT;
 
-	val=(int)((unsigned short *)(comp))[11];
+	val=static_cast<int>(((unsigned short *)(comp))[11]);
 	val-=1<<(MC_BITS_VECT-1);
-	mat[2][2]=((float)(val))*MC_SCALE_VECT;
+	mat[2][2]=(static_cast<float>(val))*MC_SCALE_VECT;
 }

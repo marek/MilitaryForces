@@ -169,7 +169,7 @@ GameEntity* G_Find( GameEntity *from, int fieldofs, const char *match )
 		if( !search || !search->inuse_ )
 			continue;
 
-		char *s = *(char **) ((byte *)search + fieldofs);
+		char *s = *reinterpret_cast<char **>(reinterpret_cast<byte *>(search) + fieldofs);
 		if (!s)
 			continue;
 		if (!Q_stricmp (s, match))
@@ -318,7 +318,7 @@ char	*vtos( const vec3_t v )
 	s = str[index];
 	index = (index + 1)&7;
 
-	Com_sprintf (s, 32, "(%i %i %i)", (int)v[0], (int)v[1], (int)v[2]);
+	Com_sprintf (s, 32, "(%i %i %i)", static_cast<int>(v[0]), static_cast<int>(v[1]), static_cast<int>(v[2]));
 
 	return s;
 }

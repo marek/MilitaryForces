@@ -20,8 +20,7 @@ Armament::Armament() :
 }
 
 Armament::~Armament()
-{
-}
+= default;
 
 VehicleMountInfo::VehicleMountInfo() :
 	position_(-1),

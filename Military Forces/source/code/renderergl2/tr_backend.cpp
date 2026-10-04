@@ -452,7 +452,7 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	oldDlighted = false;
 	oldPshadowed = false;
 	oldCubemapIndex = -1;
-	oldSort = ~(uint64_t)0;
+	oldSort = ~static_cast<uint64_t>(0);
 
 	backEnd.pc.c_surfaces += numDrawSurfs;
 
@@ -500,7 +500,7 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 				backEnd.currentEntity = &backEnd.refdef.entities[entityNum];
 
 				// FIXME: e.shaderTime must be passed as int to avoid fp-precision loss issues
-				backEnd.refdef.floatTime = originalTime - (double)backEnd.currentEntity->e.shaderTime;
+				backEnd.refdef.floatTime = originalTime - static_cast<double>(backEnd.currentEntity->e.shaderTime);
 
 				// we have to reset the shaderTime as well otherwise image animations start
 				// from the wrong frame
@@ -752,7 +752,7 @@ void RE_UploadCinematic (int w, int h, int cols, int rows, const byte *data, int
 		tr.scratchImage[client]->height = tr.scratchImage[client]->uploadHeight = rows;
 
 		if ( qglesMajorVersion >= 1 ) {
-			buffer = (byte *)ri.Hunk_AllocateTempMemory( 3 * cols * rows );
+			buffer = static_cast<byte *>(ri.Hunk_AllocateTempMemory( 3 * cols * rows ));
 
 			R_ConvertTextureFormat( data, cols, rows, GL_RGB, GL_UNSIGNED_BYTE, buffer );
 			qglTextureImage2DEXT(texture, GL_TEXTURE_2D, 0, GL_RGB, cols, rows, 0, GL_RGB, GL_UNSIGNED_BYTE, buffer);
@@ -771,7 +771,7 @@ void RE_UploadCinematic (int w, int h, int cols, int rows, const byte *data, int
 			// otherwise, just subimage upload it so that drivers can tell we are going to be changing
 			// it and don't try and do a texture compression
 			if ( qglesMajorVersion >= 1 ) {
-				buffer = (byte *)ri.Hunk_AllocateTempMemory( 3 * cols * rows );
+				buffer = static_cast<byte *>(ri.Hunk_AllocateTempMemory( 3 * cols * rows ));
 
 				R_ConvertTextureFormat( data, cols, rows, GL_RGB, GL_UNSIGNED_BYTE, buffer );
 				qglTextureSubImage2DEXT(texture, GL_TEXTURE_2D, 0, 0, 0, cols, rows, GL_RGB, GL_UNSIGNED_BYTE, buffer);
@@ -794,14 +794,14 @@ RB_SetColor
 const void	*RB_SetColor( const void *data ) {
 	const setColorCommand_t	*cmd;
 
-	cmd = (const setColorCommand_t *)data;
+	cmd = static_cast<const setColorCommand_t *>(data);
 
 	backEnd.color2D[0] = cmd->color[0] * 255;
 	backEnd.color2D[1] = cmd->color[1] * 255;
 	backEnd.color2D[2] = cmd->color[2] * 255;
 	backEnd.color2D[3] = cmd->color[3] * 255;
 
-	return (const void *)(cmd + 1);
+	return reinterpret_cast<const void *>(cmd + 1);
 }
 
 /*
@@ -814,7 +814,7 @@ const void *RB_StretchPic ( const void *data ) {
 	shader_t *shader;
 	int		numVerts, numIndexes;
 
-	cmd = (const stretchPicCommand_t *)data;
+	cmd = static_cast<const stretchPicCommand_t *>(data);
 
 	if (glRefConfig.framebufferObject)
 		FBO_Bind(tr.renderFbo);
@@ -883,7 +883,7 @@ const void *RB_StretchPic ( const void *data ) {
 	tess.texCoords[ numVerts + 3 ][0] = cmd->s1;
 	tess.texCoords[ numVerts + 3 ][1] = cmd->t2;
 
-	return (const void *)(cmd + 1);
+	return reinterpret_cast<const void *>(cmd + 1);
 }
 
 
@@ -902,7 +902,7 @@ const void	*RB_DrawSurfs( const void *data ) {
 		RB_EndSurface();
 	}
 
-	cmd = (const drawSurfsCommand_t *)data;
+	cmd = static_cast<const drawSurfsCommand_t *>(data);
 
 	backEnd.refdef = cmd->refdef;
 	backEnd.viewParms = cmd->viewParms;
@@ -963,18 +963,18 @@ const void	*RB_DrawSurfs( const void *data ) {
 
 				FBO_Bind(tr.screenShadowFbo);
 
-				box[0] = backEnd.viewParms.viewportX      * tr.screenShadowFbo->width / (float)glConfig.vidWidth;
-				box[1] = backEnd.viewParms.viewportY      * tr.screenShadowFbo->height / (float)glConfig.vidHeight;
-				box[2] = backEnd.viewParms.viewportWidth  * tr.screenShadowFbo->width / (float)glConfig.vidWidth;
-				box[3] = backEnd.viewParms.viewportHeight * tr.screenShadowFbo->height / (float)glConfig.vidHeight;
+				box[0] = backEnd.viewParms.viewportX      * tr.screenShadowFbo->width / static_cast<float>(glConfig.vidWidth);
+				box[1] = backEnd.viewParms.viewportY      * tr.screenShadowFbo->height / static_cast<float>(glConfig.vidHeight);
+				box[2] = backEnd.viewParms.viewportWidth  * tr.screenShadowFbo->width / static_cast<float>(glConfig.vidWidth);
+				box[3] = backEnd.viewParms.viewportHeight * tr.screenShadowFbo->height / static_cast<float>(glConfig.vidHeight);
 
 				qglViewport(box[0], box[1], box[2], box[3]);
 				qglScissor(box[0], box[1], box[2], box[3]);
 
-				box[0] = backEnd.viewParms.viewportX / (float)glConfig.vidWidth;
-				box[1] = backEnd.viewParms.viewportY / (float)glConfig.vidHeight;
-				box[2] = box[0] + backEnd.viewParms.viewportWidth / (float)glConfig.vidWidth;
-				box[3] = box[1] + backEnd.viewParms.viewportHeight / (float)glConfig.vidHeight;
+				box[0] = backEnd.viewParms.viewportX / static_cast<float>(glConfig.vidWidth);
+				box[1] = backEnd.viewParms.viewportY / static_cast<float>(glConfig.vidHeight);
+				box[2] = box[0] + backEnd.viewParms.viewportWidth / static_cast<float>(glConfig.vidWidth);
+				box[3] = box[1] + backEnd.viewParms.viewportHeight / static_cast<float>(glConfig.vidHeight);
 
 				texCoords[0][0] = box[0]; texCoords[0][1] = box[3];
 				texCoords[1][0] = box[2]; texCoords[1][1] = box[3];
@@ -1037,8 +1037,8 @@ const void	*RB_DrawSurfs( const void *data ) {
 
 				if (r_shadowBlur->integer)
 				{
-					viewInfo[2] = 1.0f / (float)(tr.screenScratchFbo->width);
-					viewInfo[3] = 1.0f / (float)(tr.screenScratchFbo->height);
+					viewInfo[2] = 1.0f / static_cast<float>(tr.screenScratchFbo->width);
+					viewInfo[3] = 1.0f / static_cast<float>(tr.screenScratchFbo->height);
 
 					FBO_Bind(tr.screenScratchFbo);
 
@@ -1069,9 +1069,9 @@ const void	*RB_DrawSurfs( const void *data ) {
 				vec4_t quadVerts[4];
 				vec2_t texCoords[4];
 
-				viewInfo[2] = 1.0f / ((float)(tr.quarterImage[0]->width)  * tan(backEnd.viewParms.fovX * M_PI / 360.0f) * 2.0f);
-				viewInfo[3] = 1.0f / ((float)(tr.quarterImage[0]->height) * tan(backEnd.viewParms.fovY * M_PI / 360.0f) * 2.0f);
-				viewInfo[3] *= (float)backEnd.viewParms.viewportHeight / (float)backEnd.viewParms.viewportWidth;
+				viewInfo[2] = 1.0f / (static_cast<float>(tr.quarterImage[0]->width)  * tan(backEnd.viewParms.fovX * M_PI / 360.0f) * 2.0f);
+				viewInfo[3] = 1.0f / (static_cast<float>(tr.quarterImage[0]->height) * tan(backEnd.viewParms.fovY * M_PI / 360.0f) * 2.0f);
+				viewInfo[3] *= static_cast<float>(backEnd.viewParms.viewportHeight) / static_cast<float>(backEnd.viewParms.viewportWidth);
 
 				FBO_Bind(tr.quarterFbo[0]);
 
@@ -1099,8 +1099,8 @@ const void	*RB_DrawSurfs( const void *data ) {
 				RB_InstantQuad2(quadVerts, texCoords); //, color, shaderProgram, invTexRes);
 
 
-				viewInfo[2] = 1.0f / (float)(tr.quarterImage[0]->width);
-				viewInfo[3] = 1.0f / (float)(tr.quarterImage[0]->height);
+				viewInfo[2] = 1.0f / static_cast<float>(tr.quarterImage[0]->width);
+				viewInfo[3] = 1.0f / static_cast<float>(tr.quarterImage[0]->height);
 
 				FBO_Bind(tr.quarterFbo[1]);
 
@@ -1198,9 +1198,9 @@ const void	*RB_DrawSurfs( const void *data ) {
 	// and sets isMirror = true. Clear it here to prevent it from leaking
 	// to 2D drawing and causing the loading screen to be culled.
 	backEnd.viewParms.isMirror = false;
-	backEnd.viewParms.flags = (viewParmFlags_t)0;
+	backEnd.viewParms.flags = static_cast<viewParmFlags_t>(0);
 
-	return (const void *)(cmd + 1);
+	return reinterpret_cast<const void *>(cmd + 1);
 }
 
 
@@ -1213,7 +1213,7 @@ RB_DrawBuffer
 const void	*RB_DrawBuffer( const void *data ) {
 	const drawBufferCommand_t	*cmd;
 
-	cmd = (const drawBufferCommand_t *)data;
+	cmd = static_cast<const drawBufferCommand_t *>(data);
 
 	// finish any 2D drawing if needed
 	if(tess.numIndexes)
@@ -1234,7 +1234,7 @@ const void	*RB_DrawBuffer( const void *data ) {
 		qglClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	}
 
-	return (const void *)(cmd + 1);
+	return reinterpret_cast<const void *>(cmd + 1);
 }
 
 /*
@@ -1304,7 +1304,7 @@ RB_ColorMask
 */
 const void *RB_ColorMask(const void *data)
 {
-	const colorMaskCommand_t *cmd = (const colorMaskCommand_t *)data;
+	const colorMaskCommand_t *cmd = static_cast<const colorMaskCommand_t *>(data);
 
 	// finish any 2D drawing if needed
 	if(tess.numIndexes)
@@ -1321,7 +1321,7 @@ const void *RB_ColorMask(const void *data)
 
 	qglColorMask(cmd->rgba[0], cmd->rgba[1], cmd->rgba[2], cmd->rgba[3]);
 	
-	return (const void *)(cmd + 1);
+	return reinterpret_cast<const void *>(cmd + 1);
 }
 
 /*
@@ -1332,7 +1332,7 @@ RB_ClearDepth
 */
 const void *RB_ClearDepth(const void *data)
 {
-	const clearDepthCommand_t *cmd = (const clearDepthCommand_t *)data;
+	const clearDepthCommand_t *cmd = static_cast<const clearDepthCommand_t *>(data);
 	
 	// finish any 2D drawing if needed
 	if(tess.numIndexes)
@@ -1357,7 +1357,7 @@ const void *RB_ClearDepth(const void *data)
 	}
 
 	
-	return (const void *)(cmd + 1);
+	return reinterpret_cast<const void *>(cmd + 1);
 }
 
 /*
@@ -1383,9 +1383,9 @@ static void RB_DrawGreyscale(const FBO_t *src)
 
 	vec4_t quadVerts[4] = {
 		{ 0.0f,                      0.0f,                       0.0f, 1.0f },
-		{ (float)glConfig.vidWidth,  0.0f,                       0.0f, 1.0f },
-		{ (float)glConfig.vidWidth,  (float)glConfig.vidHeight,  0.0f, 1.0f },
-		{ 0.0f,                      (float)glConfig.vidHeight,  0.0f, 1.0f },
+		{ static_cast<float>(glConfig.vidWidth),  0.0f,                       0.0f, 1.0f },
+		{ static_cast<float>(glConfig.vidWidth),  static_cast<float>(glConfig.vidHeight),  0.0f, 1.0f },
+		{ 0.0f,                      static_cast<float>(glConfig.vidHeight),  0.0f, 1.0f },
 	};
 
 	vec2_t texCoords[4] = { {0.0f, 1.0f}, {1.0f, 1.0f}, {1.0f, 0.0f}, {0.0f, 0.0f} };
@@ -1458,7 +1458,7 @@ const void	*RB_SwapBuffers( const void *data ) {
 		RB_ShowImages();
 	}
 
-	cmd = (const swapBuffersCommand_t *)data;
+	cmd = static_cast<const swapBuffersCommand_t *>(data);
 
 	// we measure overdraw by reading back the stencil buffer and
 	// counting up the number of increments that have happened
@@ -1467,7 +1467,7 @@ const void	*RB_SwapBuffers( const void *data ) {
 		long sum = 0;
 		unsigned char *stencilReadback;
 
-		stencilReadback = (unsigned char *)ri.Hunk_AllocateTempMemory( glConfig.vidWidth * glConfig.vidHeight );
+		stencilReadback = static_cast<unsigned char *>(ri.Hunk_AllocateTempMemory( glConfig.vidWidth * glConfig.vidHeight ));
 		qglReadPixels( 0, 0, glConfig.vidWidth, glConfig.vidHeight, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, stencilReadback );
 
 		for ( i = 0; i < glConfig.vidWidth * glConfig.vidHeight; i++ ) {
@@ -1490,7 +1490,7 @@ const void	*RB_SwapBuffers( const void *data ) {
 
 	backEnd.projection2D = false;
 
-	return (const void *)(cmd + 1);
+	return reinterpret_cast<const void *>(cmd + 1);
 }
 
 /*
@@ -1501,7 +1501,7 @@ RB_CapShadowMap
 */
 const void *RB_CapShadowMap(const void *data)
 {
-	const capShadowmapCommand_t *cmd = (const capShadowmapCommand_t *)data;
+	const capShadowmapCommand_t *cmd = static_cast<const capShadowmapCommand_t *>(data);
 
 	// finish any 2D drawing if needed
 	if(tess.numIndexes)
@@ -1525,7 +1525,7 @@ const void *RB_CapShadowMap(const void *data)
 		}
 	}
 
-	return (const void *)(cmd + 1);
+	return reinterpret_cast<const void *>(cmd + 1);
 }
 
 
@@ -1537,7 +1537,7 @@ RB_PostProcess
 */
 const void *RB_PostProcess(const void *data)
 {
-	const postProcessCommand_t *cmd = (const postProcessCommand_t *)data;
+	const postProcessCommand_t *cmd = static_cast<const postProcessCommand_t *>(data);
 	FBO_t *srcFbo, *dstFbo;
 	ivec4_t srcBox, dstBox;
 	bool autoExposure;
@@ -1549,7 +1549,7 @@ const void *RB_PostProcess(const void *data)
 	if (!glRefConfig.framebufferObject || !r_postProcess->integer)
 	{
 		// do nothing
-		return (const void *)(cmd + 1);
+		return reinterpret_cast<const void *>(cmd + 1);
 	}
 
 	if (cmd)
@@ -1576,10 +1576,10 @@ const void *RB_PostProcess(const void *data)
 
 	if (r_ssao->integer)
 	{
-		srcBox[0] = backEnd.viewParms.viewportX      * tr.screenSsaoImage->width  / (float)glConfig.vidWidth;
-		srcBox[1] = backEnd.viewParms.viewportY      * tr.screenSsaoImage->height / (float)glConfig.vidHeight;
-		srcBox[2] = backEnd.viewParms.viewportWidth  * tr.screenSsaoImage->width  / (float)glConfig.vidWidth;
-		srcBox[3] = backEnd.viewParms.viewportHeight * tr.screenSsaoImage->height / (float)glConfig.vidHeight;
+		srcBox[0] = backEnd.viewParms.viewportX      * tr.screenSsaoImage->width  / static_cast<float>(glConfig.vidWidth);
+		srcBox[1] = backEnd.viewParms.viewportY      * tr.screenSsaoImage->height / static_cast<float>(glConfig.vidHeight);
+		srcBox[2] = backEnd.viewParms.viewportWidth  * tr.screenSsaoImage->width  / static_cast<float>(glConfig.vidWidth);
+		srcBox[3] = backEnd.viewParms.viewportHeight * tr.screenSsaoImage->height / static_cast<float>(glConfig.vidHeight);
 
 		FBO_Blit(tr.screenSsaoFbo, srcBox, nullptr, srcFbo, dstBox, nullptr, nullptr, GLS_SRCBLEND_DST_COLOR | GLS_DSTBLEND_ZERO);
 	}
@@ -1746,7 +1746,7 @@ const void *RB_PostProcess(const void *data)
 	}
 #endif
 
-	return (const void *)(cmd + 1);
+	return reinterpret_cast<const void *>(cmd + 1);
 }
 
 // FIXME: put this function declaration elsewhere
@@ -1760,7 +1760,7 @@ RB_ExportCubemaps
 */
 const void *RB_ExportCubemaps(const void *data)
 {
-	const exportCubemapsCommand_t *cmd = (const exportCubemapsCommand_t *)data;
+	const exportCubemapsCommand_t *cmd = static_cast<const exportCubemapsCommand_t *>(data);
 
 	// finish any 2D drawing if needed
 	if (tess.numIndexes)
@@ -1770,14 +1770,14 @@ const void *RB_ExportCubemaps(const void *data)
 	{
 		// do nothing
 		ri.Printf(PRINT_ALL, "Nothing to export!\n");
-		return (const void *)(cmd + 1);
+		return reinterpret_cast<const void *>(cmd + 1);
 	}
 
 	if (cmd)
 	{
 		FBO_t *oldFbo = glState.currentFBO;
 		int sideSize = r_cubemapSize->integer * r_cubemapSize->integer * 4;
-		byte *cubemapPixels = (byte *)ri.Malloc(sideSize * 6);
+		byte *cubemapPixels = static_cast<byte *>(ri.Malloc(sideSize * 6));
 		int i, j;
 
 		FBO_Bind(tr.renderCubeFbo);
@@ -1814,7 +1814,7 @@ const void *RB_ExportCubemaps(const void *data)
 		ri.Free(cubemapPixels);
 	}
 
-	return (const void *)(cmd + 1);
+	return reinterpret_cast<const void *>(cmd + 1);
 }
 
 
@@ -1831,7 +1831,7 @@ void RB_ExecuteRenderCommands( const void *data ) {
 	while ( true ) {
 		data = PADP(data, sizeof(void *));
 
-		switch ( *(const int *)data ) {
+		switch ( *static_cast<const int *>(data) ) {
 		case RC_SET_COLOR:
 			data = RB_SetColor( data );
 			break;

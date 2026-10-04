@@ -61,10 +61,10 @@ UI_Utils::UI_Utils() :
 
 UI_Utils::~UI_Utils() 
 {
-	for( CommandMapIter it = commands_.begin(); it != commands_.end(); ++it )
+	for(auto & command : commands_)
 	{
-		delete ((*it).second);
-		(*it).second = 0;
+		delete (command.second);
+		command.second = 0;
 	}
 	commands_.clear();
 
@@ -227,7 +227,7 @@ void
 UI_Utils::item_TextColor(itemDef_t *item, vec4_t *newColor) 
 {
 	vec4_t lowLight;
-	menuDef_t *parent = (menuDef_t*)item->parent;
+	menuDef_t *parent = static_cast<menuDef_t*>(item->parent);
 
 	fade( &item->window.flags, &item->window.foreColor[3], parent->fadeClamp, &item->window.nextTime, 
 		  parent->fadeCycle, true, parent->fadeAmount );
@@ -325,7 +325,7 @@ UI_Utils::item_SetFocus(itemDef_t *item, float x, float y)
 	}
 
 	// bk001206 - this can be NULL.
-	parent = (menuDef_t*)item->parent; 
+	parent = static_cast<menuDef_t*>(item->parent); 
       
 	// items can be enabled and disabled based on cvars
 	if (item->cvarFlags & (CVAR_ENABLE | CVAR_DISABLE) && !item_EnableShowViaCvar(item, CVAR_ENABLE))
@@ -539,7 +539,7 @@ UI_Utils::item_InitControls( itemDef_t *item )
 		return;
 	}
 	if (item->type == ITEM_TYPE_LISTBOX) {
-		listBoxDef_t *listPtr = (listBoxDef_t*)item->typeData;
+		listBoxDef_t *listPtr = static_cast<listBoxDef_t*>(item->typeData);
 		item->cursorPos = 0;
 		if (listPtr) {
 			listPtr->cursorPos = 0;
@@ -568,9 +568,9 @@ void UI_Utils::item_ValidateTypeData(itemDef_t *item)
 		memset(item->typeData, 0, sizeof(editFieldDef_t));
 		if( item->type == ITEM_TYPE_EDITFIELD ) 
 		{
-			if (!((editFieldDef_t *) item->typeData)->maxPaintChars) 
+			if (!(static_cast<editFieldDef_t *>(item->typeData))->maxPaintChars) 
 			{
-				((editFieldDef_t *) item->typeData)->maxPaintChars = MAX_EDITFIELD;
+				(static_cast<editFieldDef_t *>(item->typeData))->maxPaintChars = MAX_EDITFIELD;
 			}
 		}
 	} 
@@ -589,7 +589,7 @@ void
 UI_Utils::item_Paint(itemDef_t *item) 
 {
 	vec4_t red;
-	menuDef_t *parent = (menuDef_t*)item->parent;
+	menuDef_t *parent = static_cast<menuDef_t*>(item->parent);
 	red[0] = red[3] = 1;
 	red[1] = red[2] = 0;
 
@@ -829,7 +829,7 @@ UI_Utils::item_OwnerDraw_Paint( itemDef_t *item )
 	if (item == nullptr) 
 		return;
 	
-	parent = (menuDef_t*)item->parent;
+	parent = static_cast<menuDef_t*>(item->parent);
 
 	//if (gDC->ownerDrawItem) 
 	//{
@@ -1041,8 +1041,8 @@ UI_Utils::item_TextField_Paint( itemDef_t *item )
 	char buff[1024];
 	vec4_t newColor, lowLight;
 	int offset;
-	menuDef_t *parent = (menuDef_t*)item->parent;
-	editFieldDef_t *editPtr = (editFieldDef_t*)item->typeData;
+	menuDef_t *parent = static_cast<menuDef_t*>(item->parent);
+	editFieldDef_t *editPtr = static_cast<editFieldDef_t*>(item->typeData);
 
 	item_Text_Paint(item);
 
@@ -1053,7 +1053,7 @@ UI_Utils::item_TextField_Paint( itemDef_t *item )
 		dc_->getCVarString(item->cvar, buff, sizeof(buff));
 	} 
 
-	parent = (menuDef_t*)item->parent;
+	parent = static_cast<menuDef_t*>(item->parent);
 
 	if (item->window.flags & WINDOW_HASFOCUS) 
 	{
@@ -1090,7 +1090,7 @@ UI_Utils::item_ListBox_Paint( itemDef_t *item )
 	float x, y, size, count, i, thumb;
 	qhandle_t image;
 	qhandle_t optionalImage;
-	listBoxDef_t *listPtr = (listBoxDef_t*)item->typeData;
+	listBoxDef_t *listPtr = static_cast<listBoxDef_t*>(item->typeData);
 
 	// the listbox is horizontal or vertical and has a fixed size scroll bar going either direction
 	// elements are enumerated from the DC and either text or image handles are acquired from the DC as well
@@ -1278,7 +1278,7 @@ UI_Utils::item_Model_Paint( itemDef_t *item )
 	refEntity_t		ent;
 	vec3_t			mins, maxs, origin;
 	vec3_t			angles;
-	modelDef_t *modelPtr = (modelDef_t*)item->typeData;
+	modelDef_t *modelPtr = static_cast<modelDef_t*>(item->typeData);
 
 	if (modelPtr == nullptr) 
 		return;
@@ -1339,7 +1339,7 @@ UI_Utils::item_Model_Paint( itemDef_t *item )
 		if (dc_->realTime_ > item->window.nextTime) 
 		{
 			item->window.nextTime = dc_->realTime_ + modelPtr->rotationSpeed;
-			modelPtr->angle = (int)(modelPtr->angle + 1) % 360;
+			modelPtr->angle = (modelPtr->angle + 1) % 360;
 		}
 	}
 	VectorSet( angles, 0, modelPtr->angle, 0 );
@@ -1361,7 +1361,7 @@ UI_Utils::item_YesNo_Paint( itemDef_t *item )
 {
 	vec4_t newColor, lowLight;
 	float value;
-	menuDef_t *parent = (menuDef_t*)item->parent;
+	menuDef_t *parent = static_cast<menuDef_t*>(item->parent);
 
 	value = (item->cvar) ? dc_->getCVarValue(item->cvar) : 0;
 
@@ -1397,7 +1397,7 @@ UI_Utils::item_Multi_Paint( itemDef_t *item )
 {
 	vec4_t newColor, lowLight;
 	const char *text = "";
-	menuDef_t *parent = (menuDef_t*)item->parent;
+	menuDef_t *parent = static_cast<menuDef_t*>(item->parent);
 
 	if (item->window.flags & WINDOW_HASFOCUS) 
 	{
@@ -1432,8 +1432,8 @@ UI_Utils::item_Bind_Paint( itemDef_t *item )
 	vec4_t newColor, lowLight;
 	float value;
 	int maxChars = 0;
-	menuDef_t *parent = (menuDef_t*)item->parent;
-	editFieldDef_t *editPtr = (editFieldDef_t*)item->typeData;
+	menuDef_t *parent = static_cast<menuDef_t*>(item->parent);
+	editFieldDef_t *editPtr = static_cast<editFieldDef_t*>(item->typeData);
 	if (editPtr) 
 		maxChars = editPtr->maxPaintChars;
 
@@ -1481,7 +1481,7 @@ UI_Utils::item_Slider_Paint(itemDef_t *item)
 {
 	vec4_t newColor, lowLight;
 	float x, y, value;
-	menuDef_t *parent = (menuDef_t*)item->parent;
+	menuDef_t *parent = static_cast<menuDef_t*>(item->parent);
 
 	value = (item->cvar) ? dc_->getCVarValue(item->cvar) : 0;
 
@@ -1663,13 +1663,13 @@ int
 UI_Utils::item_ListBox_ThumbPosition( itemDef_t *item ) 
 {
 	float max, pos, size;
-	listBoxDef_t *listPtr = (listBoxDef_t*)item->typeData;
+	listBoxDef_t *listPtr = static_cast<listBoxDef_t*>(item->typeData);
 
 	max = item_ListBox_MaxScroll(item);
 	if (item->window.flags & WINDOW_HORIZONTAL) {
 		size = item->window.rect.w - (SCROLLBAR_SIZE * 2) - 2;
 		if (max > 0) {
-			pos = (size-SCROLLBAR_SIZE) / (float) max;
+			pos = (size-SCROLLBAR_SIZE) / max;
 		} else {
 			pos = 0;
 		}
@@ -1679,7 +1679,7 @@ UI_Utils::item_ListBox_ThumbPosition( itemDef_t *item )
 	else {
 		size = item->window.rect.h - (SCROLLBAR_SIZE * 2) - 2;
 		if (max > 0) {
-			pos = (size-SCROLLBAR_SIZE) / (float) max;
+			pos = (size-SCROLLBAR_SIZE) / max;
 		} else {
 			pos = 0;
 		}
@@ -1694,7 +1694,7 @@ UI_Utils::item_Multi_Setting( itemDef_t *item )
 	char buff[1024];
 	float value = 0;
 	int i;
-	multiDef_t *multiPtr = (multiDef_t*)item->typeData;
+	multiDef_t *multiPtr = static_cast<multiDef_t*>(item->typeData);
 	if (multiPtr) 
 	{
 		if (multiPtr->strDef) 
@@ -1763,7 +1763,7 @@ UI_Utils::item_Slider_ThumbPosition( itemDef_t *item )
 int 
 UI_Utils::item_ListBox_MaxScroll( itemDef_t *item ) 
 {
-	listBoxDef_t *listPtr = (listBoxDef_t*)item->typeData;
+	listBoxDef_t *listPtr = static_cast<listBoxDef_t*>(item->typeData);
 	int count = dc_->feederCount(item->special);
 	int max;
 
@@ -1867,7 +1867,7 @@ void
 UI_Utils::item_ListBox_MouseEnter(itemDef_t *item, float x, float y) 
 {
 	rectDef_t r;
-	listBoxDef_t *listPtr = (listBoxDef_t*)item->typeData;
+	listBoxDef_t *listPtr = static_cast<listBoxDef_t*>(item->typeData);
         
 	item->window.flags &= ~(WINDOW_LB_LEFTARROW | WINDOW_LB_RIGHTARROW | WINDOW_LB_THUMB | WINDOW_LB_PGUP | WINDOW_LB_PGDN);
 	item->window.flags |= item_ListBox_OverLB(item, x, y);
@@ -1885,7 +1885,7 @@ UI_Utils::item_ListBox_MouseEnter(itemDef_t *item, float x, float y)
 				r.w = item->window.rect.w - listPtr->drawPadding;
 				if (rect_ContainsPoint(&r, x, y)) 
 				{
-					listPtr->cursorPos =  (int)((x - r.x) / listPtr->elementWidth)  + listPtr->startPos;
+					listPtr->cursorPos =  static_cast<int>((x - r.x) / listPtr->elementWidth)  + listPtr->startPos;
 					if (listPtr->cursorPos >= listPtr->endPos) 
 						listPtr->cursorPos = listPtr->endPos;
 				}
@@ -1904,7 +1904,7 @@ UI_Utils::item_ListBox_MouseEnter(itemDef_t *item, float x, float y)
 		r.h = item->window.rect.h - listPtr->drawPadding;
 		if (rect_ContainsPoint(&r, x, y)) 
 		{
-			listPtr->cursorPos =  (int)((y - 2 - r.y) / listPtr->elementHeight)  + listPtr->startPos;
+			listPtr->cursorPos =  static_cast<int>((y - 2 - r.y) / listPtr->elementHeight)  + listPtr->startPos;
 			if (listPtr->cursorPos > listPtr->endPos) 
 				listPtr->cursorPos = listPtr->endPos;
 		}
@@ -1920,7 +1920,7 @@ UI_Utils::item_ListBox_OverLB( itemDef_t *item, float x, float y )
 	int count;
 
 	count = dc_->feederCount(item->special);
-	listPtr = (listBoxDef_t*)item->typeData;
+	listPtr = static_cast<listBoxDef_t*>(item->typeData);
 	if (item->window.flags & WINDOW_HORIZONTAL) 
 	{
 		// check if on left arrow
@@ -2396,7 +2396,7 @@ UI_Utils::item_OwnerDraw_HandleKey( itemDef_t *item, int key )
 bool 
 UI_Utils::item_ListBox_HandleKey( itemDef_t *item, int key, int down, bool force ) 
 {
-	listBoxDef_t *listPtr = (listBoxDef_t*)item->typeData;
+	listBoxDef_t *listPtr = static_cast<listBoxDef_t*>(item->typeData);
 	int count = dc_->feederCount(item->special);
 	int max, viewmax;
 
@@ -2653,7 +2653,7 @@ UI_Utils::item_YesNo_HandleKey( itemDef_t *item, int key )
 bool 
 UI_Utils::item_Multi_HandleKey( itemDef_t *item, int key ) 
 {
-	multiDef_t *multiPtr = (multiDef_t*)item->typeData;
+	multiDef_t *multiPtr = static_cast<multiDef_t*>(item->typeData);
 	if (multiPtr) 
 	{
 	  if (rect_ContainsPoint(&item->window.rect, dc_->cursorX_, dc_->cursorY_) && 
@@ -2671,9 +2671,9 @@ UI_Utils::item_Multi_HandleKey( itemDef_t *item, int key )
 				else 
 				{
 					float value = multiPtr->cvarValue[current];
-					if (((float)((int) value)) == value) 
+					if ((static_cast<float>(static_cast<int>(value))) == value) 
 					{
-						dc_->setCVar(item->cvar, va("%i", (int) value ));
+						dc_->setCVar(item->cvar, va("%i", static_cast<int>(value) ));
 					}
 					else 
 					{
@@ -2710,10 +2710,10 @@ UI_Utils::item_Slider_HandleKey( itemDef_t *item, int key, int down )
 
 				testRect = item->window.rect;
 				testRect.x = x;
-				value = (float)SLIDER_THUMB_WIDTH / 2;
+				value = static_cast<float>(SLIDER_THUMB_WIDTH) / 2;
 				testRect.x -= value;
 				//DC->Print("slider x: %f\n", testRect.x);
-				testRect.w = (SLIDER_WIDTH + (float)SLIDER_THUMB_WIDTH / 2);
+				testRect.w = (SLIDER_WIDTH + static_cast<float>(SLIDER_THUMB_WIDTH) / 2);
 				//DC->Print("slider w: %f\n", testRect.w);
 				if (rect_ContainsPoint(&testRect, dc_->cursorX_, dc_->cursorY_)) 
 				{
@@ -2736,7 +2736,7 @@ UI_Utils::item_Slider_HandleKey( itemDef_t *item, int key, int down )
 int 
 UI_Utils::item_Multi_CountSettings( itemDef_t *item ) 
 {
-	multiDef_t *multiPtr = (multiDef_t*)item->typeData;
+	multiDef_t *multiPtr = static_cast<multiDef_t*>(item->typeData);
 	if (multiPtr == nullptr) 
 	{
 		return 0;
@@ -2750,7 +2750,7 @@ UI_Utils::item_Multi_FindCvarByValue( itemDef_t *item )
 	char buff[1024];
 	float value = 0;
 	int i;
-	multiDef_t *multiPtr = (multiDef_t*)item->typeData;
+	multiDef_t *multiPtr = static_cast<multiDef_t*>(item->typeData);
 	if (multiPtr) 
 	{
 		if (multiPtr->strDef) 
@@ -3319,7 +3319,7 @@ UI_Utils::menu_Parse( int handle, menuDef_t *menu )
 			pc_SourceError(handle, "unknown menu keyword %s", token.string_);
 			continue;
 		}
-		if ( !key->func((itemDef_t*)menu, handle) ) 
+		if ( !key->func(reinterpret_cast<itemDef_t*>(menu), handle) ) 
 		{
 			pc_SourceError(handle, "couldn't parse menu keyword %s", token.string_);
 			return false;
@@ -3823,7 +3823,7 @@ UI_Utils::menu_SetFeederSelection( menuDef_t *menu, int feeder, int index, const
 			{
 				if (index == 0) 
 				{
-					listBoxDef_t *listPtr = (listBoxDef_t*)menu->items[i]->typeData;
+					listBoxDef_t *listPtr = static_cast<listBoxDef_t*>(menu->items[i]->typeData);
 					listPtr->cursorPos = 0;
 					listPtr->startPos = 0;
 				}
@@ -4549,7 +4549,7 @@ UI_Utils::hashForString( const char *str )
 	i = 0;
 	while (str[i] != '\0') {
 		letter = tolower(str[i]);
-		hash+=(long)(letter)*(i+119);
+		hash+=static_cast<long>(letter)*(i+119);
 		i++;
 	}
 	hash &= (HASH_TABLE_SIZE-1);

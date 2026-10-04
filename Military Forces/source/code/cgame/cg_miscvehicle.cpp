@@ -216,7 +216,7 @@ static void CG_Misc_GV( centity_t *cent )
 		cent->gearAnim += (dot > 0 ? dist : -dist);
 		cent->gearAnim = AngleMod( cent->gearAnim );
 		cent->gearAnimStartTime = cg.time;
-		drawInfo.wheelAngle = (float)cent->gearAnim;
+		drawInfo.wheelAngle = static_cast<float>(cent->gearAnim);
 	}
 
 	// muzzleflash

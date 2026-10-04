@@ -99,7 +99,7 @@ void R_AddPolygonSurfaces( ) {
 
 	for ( i = 0, poly = tr.refdef.polys; i < tr.refdef.numPolys ; i++, poly++ ) {
 		sh = R_GetShaderByHandle( poly->hShader );
-		R_AddDrawSurf( ( surfaceType_t * )poly, sh, poly->fogIndex & fogMask, false, false, 0 /*cubeMap*/  );
+		R_AddDrawSurf( reinterpret_cast< surfaceType_t *>(poly), sh, poly->fogIndex & fogMask, false, false, 0 /*cubeMap*/  );
 	}
 }
 
@@ -224,7 +224,7 @@ void RE_AddRefEntityToScene( const refEntity_t *ent ) {
 		}
 		return;
 	}
-	if ( (int)ent->reType < 0 || ent->reType >= RT_MAX_REF_ENTITY_TYPE ) {
+	if ( static_cast<int>(ent->reType) < 0 || ent->reType >= RT_MAX_REF_ENTITY_TYPE ) {
 		ri.Error( ERR_DROP, "RE_AddRefEntityToScene: bad reType %i", ent->reType );
 	}
 
@@ -319,8 +319,8 @@ void RE_BeginScene(const refdef_t *fd)
 		// compare the area bits
 		areaDiff = 0;
 		for (i = 0 ; i < MAX_MAP_AREA_BYTES/4 ; i++) {
-			areaDiff |= ((int *)tr.refdef.areamask)[i] ^ ((int *)fd->areamask)[i];
-			((int *)tr.refdef.areamask)[i] = ((int *)fd->areamask)[i];
+			areaDiff |= (reinterpret_cast<int *>(tr.refdef.areamask))[i] ^ (reinterpret_cast<const int *>(fd->areamask))[i];
+			(reinterpret_cast<int *>(tr.refdef.areamask))[i] = (reinterpret_cast<const int *>(fd->areamask))[i];
 		}
 
 		if ( areaDiff ) {
@@ -388,7 +388,7 @@ void RE_BeginScene(const refdef_t *fd)
 
 	// Makro - copy exta info if present
 	if (fd->rdflags & RDF_EXTRA) {
-		const refdefex_t* extra = (const refdefex_t*) (fd+1);
+		const refdefex_t* extra = reinterpret_cast<const refdefex_t*>(fd+1);
 
 		tr.refdef.blurFactor = extra->blurFactor;
 

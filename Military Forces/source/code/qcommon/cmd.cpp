@@ -191,7 +191,7 @@ void Cbuf_Execute ()
 		}
 
 		// find a \n or ; line break or comment: // or /* */
-		text = (char *)cmd_text.data;
+		text = reinterpret_cast<char *>(cmd_text.data);
 
 		quotes = 0;
 		for (i=0 ; i< cmd_text.cursize ; i++)
@@ -369,7 +369,7 @@ Cmd_Argv
 ============
 */
 char	*Cmd_Argv( int arg ) {
-	if ( (unsigned)arg >= cmd_argc ) {
+	if ( static_cast<unsigned>(arg) >= cmd_argc ) {
 		return "";
 	}
 	return cmd_argv[arg];	
@@ -649,7 +649,7 @@ void	Cmd_AddCommand( const char *cmd_name, xcommand_t function ) {
 	}
 
 	// use a small malloc to avoid zone fragmentation
-	cmd = (cmd_function_t *)S_Malloc (sizeof(cmd_function_t));
+	cmd = static_cast<cmd_function_t *>(S_Malloc (sizeof(cmd_function_t)));
 	cmd->name = CopyString( cmd_name );
 	cmd->function = function;
 	cmd->complete = nullptr;

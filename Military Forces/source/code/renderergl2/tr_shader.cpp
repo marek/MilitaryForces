@@ -58,7 +58,7 @@ static long generateHashValue( const char *fname, const int size ) {
 		if (letter =='.') break;				// don't include extension
 		if (letter =='\\') letter = '/';		// damn path names
 		if (letter == PATH_SEP) letter = '/';		// damn path names
-		hash+=(long)(letter)*(i+119);
+		hash+=static_cast<long>(letter)*(i+119);
 		i++;
 	}
 	hash = (hash ^ (hash >> 10) ^ (hash >> 20));
@@ -1458,7 +1458,7 @@ static void ParseDeform( char **text ) {
 		if ( n < 0 || n > 7 ) {
 			n = 0;
 		}
-		ds->deformation = (deform_t)(DEFORM_TEXT0 + n);
+		ds->deformation = static_cast<deform_t>(DEFORM_TEXT0 + n);
 		return;
 	}
 
@@ -2669,17 +2669,17 @@ static void FixRenderCommandList( int newShader ) {
 		while ( true ) {
 			curCmd = PADP(curCmd, sizeof(void *));
 
-			switch ( *(const int *)curCmd ) {
+			switch ( *static_cast<const int *>(curCmd) ) {
 			case RC_SET_COLOR:
 				{
-				const setColorCommand_t *sc_cmd = (const setColorCommand_t *)curCmd;
-				curCmd = (const void *)(sc_cmd + 1);
+				const setColorCommand_t *sc_cmd = static_cast<const setColorCommand_t *>(curCmd);
+				curCmd = reinterpret_cast<const void *>(sc_cmd + 1);
 				break;
 				}
 			case RC_STRETCH_PIC:
 				{
-				const stretchPicCommand_t *sp_cmd = (const stretchPicCommand_t *)curCmd;
-				curCmd = (const void *)(sp_cmd + 1);
+				const stretchPicCommand_t *sp_cmd = static_cast<const stretchPicCommand_t *>(curCmd);
+				curCmd = reinterpret_cast<const void *>(sp_cmd + 1);
 				break;
 				}
 			case RC_DRAW_SURFS:
@@ -2692,29 +2692,29 @@ static void FixRenderCommandList( int newShader ) {
 				int			dlightMap;
 				int         pshadowMap;
 				int			sortedIndex;
-				const drawSurfsCommand_t *ds_cmd =  (const drawSurfsCommand_t *)curCmd;
+				const drawSurfsCommand_t *ds_cmd =  static_cast<const drawSurfsCommand_t *>(curCmd);
 
 				for( i = 0, drawSurf = ds_cmd->drawSurfs; i < ds_cmd->numDrawSurfs; i++, drawSurf++ ) {
 					R_DecomposeSort( drawSurf->sort, &entityNum, &pShader, &fogNum, &dlightMap, &pshadowMap );
                     sortedIndex = (( drawSurf->sort >> QSORT_SHADERNUM_SHIFT ) & (MAX_SHADERS-1));
 					if( sortedIndex >= newShader ) {
 						sortedIndex++;
-						drawSurf->sort += (uint64_t)1 << QSORT_SHADERNUM_SHIFT;
+						drawSurf->sort += static_cast<uint64_t>(1) << QSORT_SHADERNUM_SHIFT;
 					}
 				}
-				curCmd = (const void *)(ds_cmd + 1);
+				curCmd = reinterpret_cast<const void *>(ds_cmd + 1);
 				break;
 				}
 			case RC_DRAW_BUFFER:
 				{
-				const drawBufferCommand_t *db_cmd = (const drawBufferCommand_t *)curCmd;
-				curCmd = (const void *)(db_cmd + 1);
+				const drawBufferCommand_t *db_cmd = static_cast<const drawBufferCommand_t *>(curCmd);
+				curCmd = reinterpret_cast<const void *>(db_cmd + 1);
 				break;
 				}
 			case RC_SWAP_BUFFERS:
 				{
-				const swapBuffersCommand_t *sb_cmd = (const swapBuffersCommand_t *)curCmd;
-				curCmd = (const void *)(sb_cmd + 1);
+				const swapBuffersCommand_t *sb_cmd = static_cast<const swapBuffersCommand_t *>(curCmd);
+				curCmd = reinterpret_cast<const void *>(sb_cmd + 1);
 				break;
 				}
 			case RC_END_OF_LIST:
@@ -2776,7 +2776,7 @@ static shader_t *GeneratePermanentShader( ) {
 		return tr.defaultShader;
 	}
 
-	newShader = (shader_t *)ri.Hunk_Alloc( sizeof( shader_t ), h_low );
+	newShader = static_cast<shader_t *>(ri.Hunk_Alloc( sizeof( shader_t ), h_low ));
 
 	*newShader = shader;
 
@@ -2798,12 +2798,12 @@ static shader_t *GeneratePermanentShader( ) {
 		if ( !stages[i].active ) {
 			break;
 		}
-		newShader->stages[i] = (shaderStage_t *)ri.Hunk_Alloc( sizeof( stages[i] ), h_low );
+		newShader->stages[i] = static_cast<shaderStage_t *>(ri.Hunk_Alloc( sizeof( stages[i] ), h_low ));
 		*newShader->stages[i] = stages[i];
 
 		for ( b = 0 ; b < NUM_TEXTURE_BUNDLES ; b++ ) {
 			size = newShader->stages[i]->bundle[b].numTexMods * sizeof( texModInfo_t );
-			newShader->stages[i]->bundle[b].texMods = (texModInfo_t *)ri.Hunk_Alloc( size, h_low );
+			newShader->stages[i]->bundle[b].texMods = static_cast<texModInfo_t *>(ri.Hunk_Alloc( size, h_low ));
 			Com_Memcpy( newShader->stages[i]->bundle[b].texMods, stages[i].bundle[b].texMods, size );
 		}
 	}
@@ -2951,8 +2951,8 @@ static void FixFatLightmapTexCoords()
 					tmi = &pStage->bundle[0].texMods[i];
 
 					if ( tmi->type == TMOD_TRANSFORM ) {
-						tmi->translate[0] /= (float)tr.fatLightmapCols;
-						tmi->translate[1] /= (float)tr.fatLightmapRows;
+						tmi->translate[0] /= static_cast<float>(tr.fatLightmapCols);
+						tmi->translate[1] /= static_cast<float>(tr.fatLightmapRows);
 					}
 				}
 			}
@@ -2971,8 +2971,8 @@ static void FixFatLightmapTexCoords()
 					tmi->matrix[1][0] = 0;
 					tmi->matrix[1][1] = 1.0f / tr.fatLightmapRows;
 
-					tmi->translate[0] = ( lightmapnum % tr.fatLightmapCols ) / (float)tr.fatLightmapCols;
-					tmi->translate[1] = ( lightmapnum / tr.fatLightmapCols ) / (float)tr.fatLightmapRows;
+					tmi->translate[0] = ( lightmapnum % tr.fatLightmapCols ) / static_cast<float>(tr.fatLightmapCols);
+					tmi->translate[1] = ( lightmapnum / tr.fatLightmapCols ) / static_cast<float>(tr.fatLightmapRows);
 
 					tmi->type = TMOD_TRANSFORM;
 				}
@@ -3830,7 +3830,7 @@ static void ScanAndLoadShaderFiles( )
 		}
 		
 		ri.Printf( PRINT_DEVELOPER, "...loading '%s'\n", filename );
-		summand = ri.FS_ReadFile( filename, (void **)&buffers[i] );
+		summand = ri.FS_ReadFile( filename, reinterpret_cast<void **>(&buffers[i]) );
 		
 		if ( !buffers[i] )
 			ri.Error( ERR_DROP, "Couldn't load %s", filename );
@@ -3879,7 +3879,7 @@ static void ScanAndLoadShaderFiles( )
 	}
 
 	// build single large buffer
-	s_shaderText = (char *)ri.Hunk_Alloc( sum + numShaderFiles*2, h_low );
+	s_shaderText = static_cast<char *>(ri.Hunk_Alloc( sum + numShaderFiles*2, h_low ));
 	s_shaderText[ 0 ] = '\0';
 	textEnd = s_shaderText;
  
@@ -3919,11 +3919,11 @@ static void ScanAndLoadShaderFiles( )
 
 	size += MAX_SHADERTEXT_HASH;
 
-	hashMem = (char *)ri.Hunk_Alloc( size * sizeof(char *), h_low );
+	hashMem = static_cast<char *>(ri.Hunk_Alloc( size * sizeof(char *), h_low ));
 
 	for (i = 0; i < MAX_SHADERTEXT_HASH; i++) {
-		shaderTextHashTable[i] = (char **) hashMem;
-		hashMem = ((char *) hashMem) + ((shaderTextHashTableSizes[i] + 1) * sizeof(char *));
+		shaderTextHashTable[i] = reinterpret_cast<char **>(hashMem);
+		hashMem = (hashMem) + ((shaderTextHashTableSizes[i] + 1) * sizeof(char *));
 	}
 
 	Com_Memset(shaderTextHashTableSizes, 0, sizeof(shaderTextHashTableSizes));

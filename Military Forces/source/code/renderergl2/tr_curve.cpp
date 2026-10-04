@@ -54,10 +54,10 @@ static void LerpDrawVert( srfVert_t *a, srfVert_t *b, srfVert_t *out ) {
 	out->lightmap[0] = 0.5f * (a->lightmap[0] + b->lightmap[0]);
 	out->lightmap[1] = 0.5f * (a->lightmap[1] + b->lightmap[1]);
 
-	out->color[0] = ((int)a->color[0] + (int)b->color[0]) >> 1;
-	out->color[1] = ((int)a->color[1] + (int)b->color[1]) >> 1;
-	out->color[2] = ((int)a->color[2] + (int)b->color[2]) >> 1;
-	out->color[3] = ((int)a->color[3] + (int)b->color[3]) >> 1;
+	out->color[0] = (static_cast<int>(a->color[0]) + static_cast<int>(b->color[0])) >> 1;
+	out->color[1] = (static_cast<int>(a->color[1]) + static_cast<int>(b->color[1])) >> 1;
+	out->color[2] = (static_cast<int>(a->color[2]) + static_cast<int>(b->color[2])) >> 1;
+	out->color[3] = (static_cast<int>(a->color[3]) + static_cast<int>(b->color[3])) >> 1;
 }
 
 /*
@@ -372,18 +372,18 @@ void R_CreateSurfaceGridMesh(srfBspSurface_t *grid, int width, int height,
 	Com_Memset(grid, 0, sizeof(*grid));
 
 #ifdef PATCH_STITCHING
-	grid->widthLodError = /*ri.Hunk_Alloc*/ (float *)ri.Malloc( width * 4 );
+	grid->widthLodError = /*ri.Hunk_Alloc*/ static_cast<float *>(ri.Malloc( width * 4 ));
 	Com_Memcpy( grid->widthLodError, errorTable[0], width * 4 );
 
-	grid->heightLodError = /*ri.Hunk_Alloc*/ (float *)ri.Malloc( height * 4 );
+	grid->heightLodError = /*ri.Hunk_Alloc*/ static_cast<float *>(ri.Malloc( height * 4 ));
 	Com_Memcpy( grid->heightLodError, errorTable[1], height * 4 );
 
 	grid->numIndexes = numIndexes;
-	grid->indexes = (glIndex_t *)ri.Malloc(grid->numIndexes * sizeof(glIndex_t));
+	grid->indexes = static_cast<glIndex_t *>(ri.Malloc(grid->numIndexes * sizeof(glIndex_t)));
 	Com_Memcpy(grid->indexes, indexes, numIndexes * sizeof(glIndex_t));
 
 	grid->numVerts = (width * height);
-	grid->verts = (srfVert_t *)ri.Malloc(grid->numVerts * sizeof(srfVert_t));
+	grid->verts = static_cast<srfVert_t *>(ri.Malloc(grid->numVerts * sizeof(srfVert_t)));
 #else
 	grid->widthLodError = ri.Hunk_Alloc( width * 4, h_low );
 	Com_Memcpy( grid->widthLodError, errorTable[0], width * 4 );

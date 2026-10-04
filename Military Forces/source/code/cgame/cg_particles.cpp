@@ -276,26 +276,26 @@ void CG_ParticleThink(particleWorld_t * w, particle_t * p)
 	if((p->lastAttractionThink + 300 < cg.time) && (p->attractionEmitter != 0 || p->attractionSystem != 0 || p->attractionWorld != 0))
 	{
 		VectorClear(p->trAttraction);
-		for(int i = 0; i < sizeof(w->particles)/sizeof(w->particles[0]); i++)
+		for(auto & particle : w->particles)
 		{
-			if(!w->particles[i].dead)
+			if(!particle.dead)
 			{
 				if(	p->attractionEmitter != 0 && 
-					w->particles[i].parentEmitter == p->parentEmitter)
+					particle.parentEmitter == p->parentEmitter)
 				{
-						CG_AttractParticles(p, &w->particles[i]);
+						CG_AttractParticles(p, &particle);
 				}
 				if(	p->attractionSystem != 0 && 
-					w->emitters[w->particles[i].parentEmitter].parentSytem == w->emitters[p->parentEmitter].parentSytem && 
-					w->particles[i].parentEmitter != p->parentEmitter)
+					w->emitters[particle.parentEmitter].parentSytem == w->emitters[p->parentEmitter].parentSytem && 
+					particle.parentEmitter != p->parentEmitter)
 				{
-					CG_AttractParticles(p, &w->particles[i]);
+					CG_AttractParticles(p, &particle);
 				}
 				if( p->attractionWorld != 0 &&
-					w->emitters[w->particles[i].parentEmitter].parentSytem != w->emitters[p->parentEmitter].parentSytem && 
-					w->particles[i].parentEmitter != p->parentEmitter)
+					w->emitters[particle.parentEmitter].parentSytem != w->emitters[p->parentEmitter].parentSytem && 
+					particle.parentEmitter != p->parentEmitter)
 				{
-					CG_AttractParticles(p, &w->particles[i]);
+					CG_AttractParticles(p, &particle);
 				}
 			}
 		}
@@ -392,19 +392,19 @@ void CG_RenderParticle(particle_t * p)
 	{
 		refExport.LightForPoint( p->trBase, alight, dlight, lightdir );
 		for( i = 0; i < 3; i++ )
-			shaderRGBA[ i ] = (int)alight[ i ];
+			shaderRGBA[ i ] = static_cast<int>(alight[ i ]);
 	}
 	
 	// shader animation
 	if(p->shaderFPS == 0) {
 		// sync animation time to lifeTime of particle
-		index = (int)(t *(p->numShaders + 1));
+		index = static_cast<int>(t *(p->numShaders + 1));
 		
 		if( index >= p->numShaders )
 			index = p->numShaders - 1;
 	} else {
 		// looping animation
-		index = (int)(p->shaderFPS * t * 0.001) % p->numShaders;
+		index = static_cast<int>(p->shaderFPS * t * 0.001) % p->numShaders;
 	}
 	
 	VectorAdd(p->trAttraction, p->trDelta, origin);

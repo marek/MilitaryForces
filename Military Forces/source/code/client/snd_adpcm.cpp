@@ -67,7 +67,7 @@ void S_AdpcmEncode( short indata[], char outdata[], int len, struct adpcm_state 
     int outputbuffer;		/* place to keep previous 4-bit value */
     int bufferstep;		/* toggle between outputbuffer/output */
 
-    outp = (signed char *)outdata;
+    outp = reinterpret_cast<signed char *>(outdata);
     inp = indata;
 
     valpred = state->sample;
@@ -242,7 +242,7 @@ int S_AdpcmMemoryNeeded( const wavinfo_t *info ) {
 	int		headerMemory;
 
 	// determine scale to convert from input sampling rate to desired sampling rate
-	scale = (float)info->rate / dma.speed;
+	scale = static_cast<float>(info->rate) / dma.speed;
 
 	// calc number of samples at playback sampling rate
 	scaledSampleCount = info->samples / scale;
@@ -276,9 +276,9 @@ void S_AdpcmGetSamples(sndBuffer *chunk, short *to) {
 	state.index = chunk->adpcm.index;
 	state.sample = chunk->adpcm.sample;
 
-	out = (byte *)chunk->sndChunk;
+	out = reinterpret_cast<byte *>(chunk->sndChunk);
 	// get samples
-	S_AdpcmDecode((char *) out, to, SND_CHUNK_SIZE_BYTE*2, &state );
+	S_AdpcmDecode(reinterpret_cast<char *>(out), to, SND_CHUNK_SIZE_BYTE*2, &state );
 }
 
 
@@ -319,10 +319,10 @@ void S_AdpcmEncodeSound( sfx_t *sfx, short *samples ) {
 		chunk->adpcm.index  = state.index;
 		chunk->adpcm.sample = state.sample;
 
-		out = (byte *)chunk->sndChunk;
+		out = reinterpret_cast<byte *>(chunk->sndChunk);
 
 		// encode the samples
-		S_AdpcmEncode( samples + inOffset, (char *) out, n, &state );
+		S_AdpcmEncode( samples + inOffset, reinterpret_cast<char *>(out), n, &state );
 
 		inOffset += n;
 		count -= n;

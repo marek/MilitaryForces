@@ -101,7 +101,7 @@ FBO_t          *FBO_Create(const char *name, int width, int height)
 		ri.Error(ERR_DROP, "FBO_Create: MAX_FBOS hit");
 	}
 
-	fbo = tr.fbos[tr.numFBOs] = (FBO_t *)ri.Hunk_Alloc(sizeof(*fbo), h_low);
+	fbo = tr.fbos[tr.numFBOs] = static_cast<FBO_t *>(ri.Hunk_Alloc(sizeof(*fbo), h_low));
 	Q_strncpyz(fbo->name, name, sizeof(fbo->name));
 	fbo->index = tr.numFBOs++;
 	fbo->width = width;
@@ -278,7 +278,7 @@ void FBO_Init()
 		multisample = 0;
 
 	if (multisample != r_ext_framebuffer_multisample->integer)
-		ri.Cvar_SetValue("r_ext_framebuffer_multisample", (float)multisample);
+		ri.Cvar_SetValue("r_ext_framebuffer_multisample", static_cast<float>(multisample));
 	
 	// only create a render FBO if we need to resolve MSAA or do HDR
 	// otherwise just render straight to the screen (tr.renderFbo = NULL)
@@ -604,10 +604,10 @@ void FBO_Blit(const FBO_t *src, ivec4_t inSrcBox, vec2_t srcTexScale, FBO_t *dst
 
 	if (inSrcBox)
 	{
-		srcTexCorners[0] =  inSrcBox[0]                / (float)src->width;
-		srcTexCorners[1] = (inSrcBox[1] + inSrcBox[3]) / (float)src->height;
-		srcTexCorners[2] = (inSrcBox[0] + inSrcBox[2]) / (float)src->width;
-		srcTexCorners[3] =  inSrcBox[1]                / (float)src->height;
+		srcTexCorners[0] =  inSrcBox[0]                / static_cast<float>(src->width);
+		srcTexCorners[1] = (inSrcBox[1] + inSrcBox[3]) / static_cast<float>(src->height);
+		srcTexCorners[2] = (inSrcBox[0] + inSrcBox[2]) / static_cast<float>(src->width);
+		srcTexCorners[3] =  inSrcBox[1]                / static_cast<float>(src->height);
 	}
 	else
 	{

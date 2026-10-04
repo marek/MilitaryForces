@@ -232,7 +232,7 @@ void Con_Dump_f ()
 	bufferlen = con.linewidth + 2 * sizeof ( char );
 #endif
 
-	buffer = (char *)Hunk_AllocateTempMemory( bufferlen );
+	buffer = static_cast<char *>(Hunk_AllocateTempMemory( bufferlen ));
 
 	// write the remaining lines
 	buffer[bufferlen-1] = 0;
@@ -290,8 +290,8 @@ void Con_CheckResize ()
 
 	if (con_scale != nullptr)
 	{
-		g_smallchar_width = (int)((float)SMALLCHAR_WIDTH * con_scale->value);
-		g_smallchar_height = (int)((float)SMALLCHAR_HEIGHT * con_scale->value);
+		g_smallchar_width = static_cast<int>(static_cast<float>(SMALLCHAR_WIDTH) * con_scale->value);
+		g_smallchar_height = static_cast<int>(static_cast<float>(SMALLCHAR_HEIGHT) * con_scale->value);
 	}
 
 	width = (cls.glconfig.vidWidth / g_smallchar_width) - 2;
@@ -477,7 +477,7 @@ void CL_ConsolePrint( char *txt ) {
 
 	color = ColorIndex(COLOR_WHITE);
 
-	while ( (c = *((unsigned char *) txt)) != 0 ) {
+	while ( (c = *(reinterpret_cast<unsigned char *>(txt))) != 0 ) {
 		if ( Q_IsColorString( txt ) ) {
 			color = ColorIndex( *(txt+1) );
 			txt += 2;

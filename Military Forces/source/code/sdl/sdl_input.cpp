@@ -26,9 +26,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #	include <SDL.h>
 #endif
 
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdarg>
+#include <cstdio>
+#include <cstdlib>
 
 #include "../client/client.h"
 #include "../sys/sys_local.h"
@@ -212,7 +212,7 @@ static int IN_TranslateSDLToQ3Key( SDL_Keysym *keysym, bool down )
 	else if( keysym->sym >= SDLK_SPACE && keysym->sym < SDLK_DELETE )
 	{
 		// These happen to match the ASCII chars
-		key = (int)keysym->sym;
+		key = static_cast<int>(keysym->sym);
 	}
 	else
 	{
@@ -304,7 +304,7 @@ static int IN_TranslateSDLToQ3Key( SDL_Keysym *keysym, bool down )
 					// Maybe create a map of scancode to quake key at start up and on
 					// key map change; allocate world key numbers as needed similar
 					// to SDL 1.2.
-					key = K_WORLD_0 + (int)keysym->scancode;
+					key = K_WORLD_0 + static_cast<int>(keysym->scancode);
 				}
 				break;
 		}
@@ -703,7 +703,7 @@ static void IN_GamepadMove( )
 	// check buttons
 	for (i = 0; i < SDL_CONTROLLER_BUTTON_MAX; i++)
 	{
-		SDL_GameControllerButton sdlButton = (SDL_GameControllerButton)(SDL_CONTROLLER_BUTTON_A + i);
+		SDL_GameControllerButton sdlButton = static_cast<SDL_GameControllerButton>(SDL_CONTROLLER_BUTTON_A + i);
 		bool pressed = SDL_GameControllerGetButton(gamepad, sdlButton);
 		if (pressed != stick_state.buttons[i])
 		{
@@ -726,16 +726,16 @@ static void IN_GamepadMove( )
 	// check axes
 	for (i = 0; i < SDL_CONTROLLER_AXIS_MAX; i++)
 	{
-		int axis = SDL_GameControllerGetAxis(gamepad, (SDL_GameControllerAxis)(SDL_CONTROLLER_AXIS_LEFTX + i));
+		int axis = SDL_GameControllerGetAxis(gamepad, static_cast<SDL_GameControllerAxis>(SDL_CONTROLLER_AXIS_LEFTX + i));
 		int oldAxis = stick_state.oldaaxes[i];
 
 		// Smoothly ramp from dead zone to maximum value
-		float f = ((float)abs(axis) / 32767.0f - in_joystickThreshold->value) / (1.0f - in_joystickThreshold->value);
+		float f = (static_cast<float>(abs(axis)) / 32767.0f - in_joystickThreshold->value) / (1.0f - in_joystickThreshold->value);
 
 		if (f < 0.0f)
 			f = 0.0f;
 
-		axis = (int)(32767 * ((axis < 0) ? -f : f));
+		axis = static_cast<int>(32767 * ((axis < 0) ? -f : f));
 
 		if (axis != oldAxis)
 		{
@@ -890,7 +890,7 @@ static void IN_JoyMove( )
 		if (total > 4) total = 4;
 		for (i = 0; i < total; i++)
 		{
-			((Uint8 *)&hats)[i] = SDL_JoystickGetHat(stick, i);
+			(reinterpret_cast<Uint8 *>(&hats))[i] = SDL_JoystickGetHat(stick, i);
 		}
 	}
 
@@ -898,9 +898,9 @@ static void IN_JoyMove( )
 	if (hats != stick_state.oldhats)
 	{
 		for( i = 0; i < 4; i++ ) {
-			if( ((Uint8 *)&hats)[i] != ((Uint8 *)&stick_state.oldhats)[i] ) {
+			if( (reinterpret_cast<Uint8 *>(&hats))[i] != (reinterpret_cast<Uint8 *>(&stick_state.oldhats))[i] ) {
 				// release event
-				switch( ((Uint8 *)&stick_state.oldhats)[i] ) {
+				switch( (reinterpret_cast<Uint8 *>(&stick_state.oldhats))[i] ) {
 					case SDL_HAT_UP:
 						Com_QueueEvent( in_eventTime, SE_KEY, hat_keys[4*i + 0], false, 0, nullptr );
 						break;
@@ -933,7 +933,7 @@ static void IN_JoyMove( )
 						break;
 				}
 				// press event
-				switch( ((Uint8 *)&hats)[i] ) {
+				switch( (reinterpret_cast<Uint8 *>(&hats))[i] ) {
 					case SDL_HAT_UP:
 						Com_QueueEvent( in_eventTime, SE_KEY, hat_keys[4*i + 0], true, 0, nullptr );
 						break;
@@ -982,7 +982,7 @@ static void IN_JoyMove( )
 			for (i = 0; i < total; i++)
 			{
 				Sint16 axis = SDL_JoystickGetAxis(stick, i);
-				float f = ( (float) abs(axis) ) / 32767.0f;
+				float f = ( static_cast<float>(abs(axis)) ) / 32767.0f;
 
 				if( f < in_joystickThreshold->value ) axis = 0;
 
@@ -999,7 +999,7 @@ static void IN_JoyMove( )
 			for (i = 0; i < total; i++)
 			{
 				Sint16 axis = SDL_JoystickGetAxis(stick, i);
-				float f = ( (float) axis ) / 32767.0f;
+				float f = ( static_cast<float>(axis) ) / 32767.0f;
 				if( f < -in_joystickThreshold->value ) {
 					axes |= ( 1 << ( i * 2 ) );
 				} else if( f > in_joystickThreshold->value ) {
@@ -1099,7 +1099,7 @@ static void IN_ProcessEvents( )
 						}
 						else
 						{
-							Com_DPrintf( "Unrecognised UTF-8 lead byte: 0x%x\n", (unsigned int)*c );
+							Com_DPrintf( "Unrecognised UTF-8 lead byte: 0x%x\n", static_cast<unsigned int>(*c) );
 							c++;
 						}
 
@@ -1307,7 +1307,7 @@ void IN_Init( void *windowData )
 		return;
 	}
 
-	SDL_window = (SDL_Window *)windowData;
+	SDL_window = static_cast<SDL_Window *>(windowData);
 
 	Com_DPrintf( "\n------- Input Initialization -------\n" );
 

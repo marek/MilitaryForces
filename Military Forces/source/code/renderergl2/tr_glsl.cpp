@@ -203,7 +203,7 @@ static void GLSL_PrintLog(GLuint programOrShader, glslPrintLog_t type, bool deve
 	if (maxLength < 1023)
 		msg = msgPart;
 	else
-		msg = (char *)ri.Malloc(maxLength);
+		msg = static_cast<char *>(ri.Malloc(maxLength));
 
 	switch (type)
 	{
@@ -381,8 +381,8 @@ static void GLSL_GetShaderHeader( GLenum shaderType, const GLchar *extra, char *
 								AGEN_LIGHTING_SPECULAR,
 								AGEN_PORTAL));
 
-	fbufWidthScale = 1.0f / ((float)glConfig.vidWidth);
-	fbufHeightScale = 1.0f / ((float)glConfig.vidHeight);
+	fbufWidthScale = 1.0f / (static_cast<float>(glConfig.vidWidth));
+	fbufHeightScale = 1.0f / (static_cast<float>(glConfig.vidHeight));
 	Q_strcat(dest, size,
 			 va("#ifndef r_FBufScale\n#define r_FBufScale vec2(%f, %f)\n#endif\n", fbufWidthScale, fbufHeightScale));
 
@@ -415,7 +415,7 @@ static int GLSL_CompileGPUShader(GLuint program, GLuint *prevShader, const GLcha
 
 	shader = qglCreateShader(shaderType);
 
-	qglShaderSource(shader, 1, (const GLchar **)&buffer, &size);
+	qglShaderSource(shader, 1, &buffer, &size);
 
 	// compile shader
 	qglCompileShader(shader);
@@ -463,7 +463,7 @@ static int GLSL_LoadGPUShaderText(const char *name, const char *fallback,
 	}
 
 	if ( r_externalGLSL->integer ) {
-		size = ri.FS_ReadFile(filename, (void **)&buffer);
+		size = ri.FS_ReadFile(filename, reinterpret_cast<void **>(&buffer));
 	} else {
 		size = 0;
 		buffer = nullptr;
@@ -719,7 +719,7 @@ void GLSL_InitUniforms(shaderProgram_t *program)
 		}
 	}
 
-	program->uniformBuffer = (char *)ri.Malloc(size);
+	program->uniformBuffer = static_cast<char *>(ri.Malloc(size));
 }
 
 void GLSL_FinishGPUShader(shaderProgram_t *program)
@@ -731,7 +731,7 @@ void GLSL_FinishGPUShader(shaderProgram_t *program)
 void GLSL_SetUniformInt(shaderProgram_t *program, int uniformNum, GLint value)
 {
 	GLint *uniforms = program->uniforms;
-	GLint *compare = (GLint *)(program->uniformBuffer + program->uniformBufferOffsets[uniformNum]);
+	GLint *compare = reinterpret_cast<GLint *>(program->uniformBuffer + program->uniformBufferOffsets[uniformNum]);
 
 	if (uniforms[uniformNum] == -1)
 		return;
@@ -755,7 +755,7 @@ void GLSL_SetUniformInt(shaderProgram_t *program, int uniformNum, GLint value)
 void GLSL_SetUniformFloat(shaderProgram_t *program, int uniformNum, GLfloat value)
 {
 	GLint *uniforms = program->uniforms;
-	GLfloat *compare = (GLfloat *)(program->uniformBuffer + program->uniformBufferOffsets[uniformNum]);
+	GLfloat *compare = reinterpret_cast<GLfloat *>(program->uniformBuffer + program->uniformBufferOffsets[uniformNum]);
 
 	if (uniforms[uniformNum] == -1)
 		return;
@@ -779,7 +779,7 @@ void GLSL_SetUniformFloat(shaderProgram_t *program, int uniformNum, GLfloat valu
 void GLSL_SetUniformVec2(shaderProgram_t *program, int uniformNum, const vec2_t v)
 {
 	GLint *uniforms = program->uniforms;
-	vec_t *compare = (float *)(program->uniformBuffer + program->uniformBufferOffsets[uniformNum]);
+	vec_t *compare = reinterpret_cast<float *>(program->uniformBuffer + program->uniformBufferOffsets[uniformNum]);
 
 	if (uniforms[uniformNum] == -1)
 		return;
@@ -804,7 +804,7 @@ void GLSL_SetUniformVec2(shaderProgram_t *program, int uniformNum, const vec2_t 
 void GLSL_SetUniformVec3(shaderProgram_t *program, int uniformNum, const vec3_t v)
 {
 	GLint *uniforms = program->uniforms;
-	vec_t *compare = (float *)(program->uniformBuffer + program->uniformBufferOffsets[uniformNum]);
+	vec_t *compare = reinterpret_cast<float *>(program->uniformBuffer + program->uniformBufferOffsets[uniformNum]);
 
 	if (uniforms[uniformNum] == -1)
 		return;
@@ -828,7 +828,7 @@ void GLSL_SetUniformVec3(shaderProgram_t *program, int uniformNum, const vec3_t 
 void GLSL_SetUniformVec4(shaderProgram_t *program, int uniformNum, const vec4_t v)
 {
 	GLint *uniforms = program->uniforms;
-	vec_t *compare = (float *)(program->uniformBuffer + program->uniformBufferOffsets[uniformNum]);
+	vec_t *compare = reinterpret_cast<float *>(program->uniformBuffer + program->uniformBufferOffsets[uniformNum]);
 
 	if (uniforms[uniformNum] == -1)
 		return;
@@ -852,7 +852,7 @@ void GLSL_SetUniformVec4(shaderProgram_t *program, int uniformNum, const vec4_t 
 void GLSL_SetUniformFloat5(shaderProgram_t *program, int uniformNum, const vec5_t v)
 {
 	GLint *uniforms = program->uniforms;
-	vec_t *compare = (float *)(program->uniformBuffer + program->uniformBufferOffsets[uniformNum]);
+	vec_t *compare = reinterpret_cast<float *>(program->uniformBuffer + program->uniformBufferOffsets[uniformNum]);
 
 	if (uniforms[uniformNum] == -1)
 		return;
@@ -876,7 +876,7 @@ void GLSL_SetUniformFloat5(shaderProgram_t *program, int uniformNum, const vec5_
 void GLSL_SetUniformMat4(shaderProgram_t *program, int uniformNum, const mat4_t matrix)
 {
 	GLint *uniforms = program->uniforms;
-	vec_t *compare = (float *)(program->uniformBuffer + program->uniformBufferOffsets[uniformNum]);
+	vec_t *compare = reinterpret_cast<float *>(program->uniformBuffer + program->uniformBufferOffsets[uniformNum]);
 
 	if (uniforms[uniformNum] == -1)
 		return;
@@ -900,7 +900,7 @@ void GLSL_SetUniformMat4(shaderProgram_t *program, int uniformNum, const mat4_t 
 void GLSL_SetUniformMat4BoneMatrix(shaderProgram_t *program, int uniformNum, /*const*/ mat4_t *matrix, int numMatricies)
 {
 	GLint *uniforms = program->uniforms;
-	vec_t *compare = (float *)(program->uniformBuffer + program->uniformBufferOffsets[uniformNum]);
+	vec_t *compare = reinterpret_cast<float *>(program->uniformBuffer + program->uniformBufferOffsets[uniformNum]);
 
 	if (uniforms[uniformNum] == -1) {
 		return;

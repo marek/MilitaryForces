@@ -105,10 +105,10 @@ WRITE_4BYTES
 */
 static ID_INLINE void WRITE_4BYTES( int x )
 {
-  buffer[ bufIndex + 0 ] = (byte)( ( x >>  0 ) & 0xFF );
-  buffer[ bufIndex + 1 ] = (byte)( ( x >>  8 ) & 0xFF );
-  buffer[ bufIndex + 2 ] = (byte)( ( x >> 16 ) & 0xFF );
-  buffer[ bufIndex + 3 ] = (byte)( ( x >> 24 ) & 0xFF );
+  buffer[ bufIndex + 0 ] = static_cast<byte>( ( x >>  0 ) & 0xFF );
+  buffer[ bufIndex + 1 ] = static_cast<byte>( ( x >>  8 ) & 0xFF );
+  buffer[ bufIndex + 2 ] = static_cast<byte>( ( x >> 16 ) & 0xFF );
+  buffer[ bufIndex + 3 ] = static_cast<byte>( ( x >> 24 ) & 0xFF );
   bufIndex += 4;
 }
 
@@ -119,8 +119,8 @@ WRITE_2BYTES
 */
 static ID_INLINE void WRITE_2BYTES( int x )
 {
-  buffer[ bufIndex + 0 ] = (byte)( ( x >>  0 ) & 0xFF );
-  buffer[ bufIndex + 1 ] = (byte)( ( x >>  8 ) & 0xFF );
+  buffer[ bufIndex + 0 ] = static_cast<byte>( ( x >>  0 ) & 0xFF );
+  buffer[ bufIndex + 1 ] = static_cast<byte>( ( x >>  8 ) & 0xFF );
   bufIndex += 2;
 }
 
@@ -350,7 +350,7 @@ bool CL_OpenAVIForWriting( const char *fileName )
   Q_strncpyz( afd.fileName, fileName, MAX_QPATH );
 
   afd.frameRate = cl_aviFrameRate->integer;
-  afd.framePeriod = (int)( 1000000.0f / afd.frameRate );
+  afd.framePeriod = static_cast<int>( 1000000.0f / afd.frameRate );
   afd.width = cls.glconfig.vidWidth;
   afd.height = cls.glconfig.vidHeight;
 
@@ -364,9 +364,9 @@ bool CL_OpenAVIForWriting( const char *fileName )
   // Allocate a bit more space for the capture buffer to account for possible
   // padding at the end of pixel lines, and padding for alignment
   #define MAX_PACK_LEN 16
-  afd.cBuffer = (byte *)Z_Malloc((afd.width * 4 + MAX_PACK_LEN - 1) * afd.height + MAX_PACK_LEN - 1);
+  afd.cBuffer = static_cast<byte *>(Z_Malloc((afd.width * 4 + MAX_PACK_LEN - 1) * afd.height + MAX_PACK_LEN - 1));
   // raw avi files have pixel lines start on 4-byte boundaries
-  afd.eBuffer = (byte *)Z_Malloc(PAD(afd.width * 3, AVI_LINE_PADDING) * afd.height);
+  afd.eBuffer = static_cast<byte *>(Z_Malloc(PAD(afd.width * 3, AVI_LINE_PADDING) * afd.height));
 
   afd.a.rate = dma.speed;
   afd.a.format = WAV_FORMAT_PCM;
@@ -536,7 +536,7 @@ void CL_WriteAVIAudioFrame( const byte *pcmBuffer, int size )
   bytesInBuffer += size;
 
   // Only write if we have a frame's worth of audio
-  if( bytesInBuffer >= (int)ceil( (float)afd.a.rate / (float)afd.frameRate ) *
+  if( bytesInBuffer >= static_cast<int>(ceil( static_cast<float>(afd.a.rate) / static_cast<float>(afd.frameRate) )) *
         afd.a.sampleSize )
   {
     int   chunkOffset = afd.fileSize - afd.moviOffset - 8;

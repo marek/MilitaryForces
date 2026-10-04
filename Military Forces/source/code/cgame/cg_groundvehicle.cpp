@@ -109,7 +109,7 @@ void CG_GroundVehicle( centity_t *cent, clientInfo_t *ci )
 		cent->gearAnim += (dot > 0 ? dist : -dist);
 		cent->gearAnim = AngleMod( cent->gearAnim );
 		cent->gearAnimStartTime = cg.time;
-		drawInfo.wheelAngle = (float)cent->gearAnim;
+		drawInfo.wheelAngle = static_cast<float>(cent->gearAnim);
 	
 		drawInfo.wheelDirection = cent->currentState.vehicleAnim;
 	}

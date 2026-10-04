@@ -44,8 +44,8 @@ void R_NoiseInit( )
 
 	for ( i = 0; i < NOISE_SIZE; i++ )
 	{
-		s_noise_table[i] = ( float ) ( ( ( rand() / ( float ) RAND_MAX ) * 2.0 - 1.0 ) );
-		s_noise_perm[i] = ( unsigned char ) ( rand() / ( float ) RAND_MAX * 255 );
+		s_noise_table[i] = static_cast< float>( ( ( rand() / static_cast< float>(RAND_MAX) ) * 2.0 - 1.0 ) );
+		s_noise_perm[i] = static_cast< unsigned char>( rand() / static_cast< float>(RAND_MAX) * 255 );
 	}
 }
 
@@ -58,13 +58,13 @@ float R_NoiseGet4f( float x, float y, float z, double t )
 	float back[4];
 	float fvalue, bvalue, value[2], finalvalue;
 
-	ix = ( int ) floor( x );
+	ix = static_cast< int>(floor( x ));
 	fx = x - ix;
-	iy = ( int ) floor( y );
+	iy = static_cast< int>(floor( y ));
 	fy = y - iy;
-	iz = ( int ) floor( z );
+	iz = static_cast< int>(floor( z ));
 	fz = z - iz;
-	it = ( int ) floor( t );
+	it = static_cast< int>(floor( t ));
 	ft = t - it;
 
 	for ( i = 0; i < 2; i++ )

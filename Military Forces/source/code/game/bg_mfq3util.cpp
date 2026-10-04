@@ -564,8 +564,8 @@ void MF_LoadAllVehicleData()
 			VectorSet( availableVehicles[i].maxs, 15, 15, 32 );
 			// Scale LQMs
 			for(j = 0; j < 3; j++) {
-				availableVehicles[i].maxs[j] *= (float)LQM_SCALE;
-				availableVehicles[i].mins[j] *= (float)LQM_SCALE;
+				availableVehicles[i].maxs[j] *= LQM_SCALE;
+				availableVehicles[i].mins[j] *= LQM_SCALE;
 			}
 		}
 	}
@@ -1112,7 +1112,7 @@ static void MF_findDeck( const char *name, completeVehicleData_t *veh )
 	if( FS_ReadFile( name, &buf ) <= 0 || !buf ) 
 		return;
 
-	md3Header_t *header = (md3Header_t*)buf;
+	md3Header_t *header = static_cast<md3Header_t*>(buf);
 	float sx = veh->maxs[0] - veh->mins[0];
 	float sy = veh->maxs[1] - veh->mins[1];
 	if( header->ident != MD3_IDENT || sx <= 0 || sy <= 0 ) {
@@ -1121,10 +1121,10 @@ static void MF_findDeck( const char *name, completeVehicleData_t *veh )
 	}
 	memset( used, 0, sizeof(used) );
 
-	md3Surface_t *surf = (md3Surface_t*)((byte*)header + header->ofsSurfaces);
+	md3Surface_t *surf = reinterpret_cast<md3Surface_t*>(reinterpret_cast<byte*>(header) + header->ofsSurfaces);
 	for( int i = 0; i < header->numSurfaces; i++ ) {
-		md3Triangle_t *tri = (md3Triangle_t*)((byte*)surf + surf->ofsTriangles);
-		md3XyzNormal_t *xyz = (md3XyzNormal_t*)((byte*)surf + surf->ofsXyzNormals);
+		md3Triangle_t *tri = reinterpret_cast<md3Triangle_t*>(reinterpret_cast<byte*>(surf) + surf->ofsTriangles);
+		md3XyzNormal_t *xyz = reinterpret_cast<md3XyzNormal_t*>(reinterpret_cast<byte*>(surf) + surf->ofsXyzNormals);
 		for( int j = 0; j < surf->numTriangles; j++, tri++ ) {
 			vec3_t v[3], e1, e2, normal;
 			for( int k = 0; k < 3; k++ ) {
@@ -1143,8 +1143,8 @@ static void MF_findDeck( const char *name, completeVehicleData_t *veh )
 					float x = v[0][0]*wa + v[1][0]*wb + v[2][0]*wc;
 					float y = v[0][1]*wa + v[1][1]*wb + v[2][1]*wc;
 					float z = v[0][2]*wa + v[1][2]*wb + v[2][2]*wc;
-					int cx = (int)( (x - veh->mins[0]) / sx * DECK_GRID );
-					int cy = (int)( (y - veh->mins[1]) / sy * DECK_GRID );
+					int cx = static_cast<int>( (x - veh->mins[0]) / sx * DECK_GRID );
+					int cy = static_cast<int>( (y - veh->mins[1]) / sy * DECK_GRID );
 					if( cx < 0 || cy < 0 || cx >= DECK_GRID || cy >= DECK_GRID ) 
 						continue;
 					if( !used[cx][cy] || z > cell[cx][cy] ) {
@@ -1154,7 +1154,7 @@ static void MF_findDeck( const char *name, completeVehicleData_t *veh )
 				}
 			}
 		}
-		surf = (md3Surface_t*)((byte*)surf + surf->ofsEnd);
+		surf = reinterpret_cast<md3Surface_t*>(reinterpret_cast<byte*>(surf) + surf->ofsEnd);
 	}
 	FS_FreeFile( buf );
 
@@ -1209,9 +1209,9 @@ bool MF_VehicleHasTurret( int vehicle )
 {
 	if( vehicle < 0 || vehicle >= bg_numberOfVehicles ) 
 		return false;
-	for( int i = 0; i < MAX_WEAPONS_PER_VEHICLE; i++ ) 
+	for(unsigned int weapon : availableVehicles[vehicle].weapons) 
 	{
-		if( availableVehicles[vehicle].weapons[i] && availableWeapons[availableVehicles[vehicle].weapons[i]].turret ) 
+		if( weapon && availableWeapons[weapon].turret ) 
 			return true;
 	}
 	return false;

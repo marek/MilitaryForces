@@ -174,7 +174,7 @@ S_CodecOpenStream
 */
 snd_stream_t *S_CodecOpenStream(const char *filename)
 {
-	return (snd_stream_t *)S_CodecGetSound(filename, nullptr);
+	return static_cast<snd_stream_t *>(S_CodecGetSound(filename, nullptr));
 }
 
 void S_CodecCloseStream(snd_stream_t *stream)
@@ -210,7 +210,7 @@ snd_stream_t *S_CodecUtilOpen(const char *filename, snd_codec_t *codec)
 	}
 
 	// Allocate a stream
-	stream = (snd_stream_t *)Z_Malloc(sizeof(snd_stream_t));
+	stream = static_cast<snd_stream_t *>(Z_Malloc(sizeof(snd_stream_t)));
 	if(!stream)
 	{
 		FS_FCloseFile(hnd);

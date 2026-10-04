@@ -26,9 +26,7 @@ ServerGame::ServerGame() :
 }
 
 ServerGame::~ServerGame()
-{
-
-}
+= default;
 
 ServerGame&
 ServerGame::getInstance()

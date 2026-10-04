@@ -157,9 +157,9 @@ static void DrawNormals (shaderCommands_t *input) {
 	const float       lineLength = 6.0f;
 
 	// xyz is vec4_t (x,y,z,1)
-	const float*      positionsXYZW   = (const float*)input->xyz;
-	const int16_t*    packedNormals   = (const int16_t*)input->normal;
-	const float*      floatNormals    = (const float*)input->normal;
+	const float*      positionsXYZW   = reinterpret_cast<const float*>(input->xyz);
+	const int16_t*    packedNormals   = reinterpret_cast<const int16_t*>(input->normal);
+	const float*      floatNormals    = reinterpret_cast<const float*>(input->normal);
 
 	const vao_t*      boundVao        = glState.currentVao;
 	bool          usePacked       = false;
@@ -182,10 +182,10 @@ static void DrawNormals (shaderCommands_t *input) {
 	}
 
 	const GLsizeiptr floatsPerVertex = 6;
-	const GLsizeiptr maxFloatCount = floatsPerVertex * (GLsizeiptr)vertexCount;
-	const GLsizeiptr maxByteCount = (GLsizeiptr)sizeof(float) * maxFloatCount;
+	const GLsizeiptr maxFloatCount = floatsPerVertex * static_cast<GLsizeiptr>(vertexCount);
+	const GLsizeiptr maxByteCount = static_cast<GLsizeiptr>(sizeof(float)) * maxFloatCount;
 
-	float* lineVertices = (float*)ri.Hunk_AllocateTempMemory((int)maxByteCount);
+	float* lineVertices = static_cast<float*>(ri.Hunk_AllocateTempMemory(static_cast<int>(maxByteCount)));
 	float* writePtr = lineVertices;
 
 	// Build the line list
@@ -193,7 +193,7 @@ static void DrawNormals (shaderCommands_t *input) {
 		vec3_t n;
 
 		if (usePacked) {
-			R_VaoUnpackNormal(n, (int16_t*)packedNormals);
+			R_VaoUnpackNormal(n, const_cast<int16_t*>(packedNormals));
 			packedNormals += 4;
 		}
 		else {
@@ -218,7 +218,7 @@ static void DrawNormals (shaderCommands_t *input) {
 		*writePtr++ = endX;   *writePtr++ = endY;   *writePtr++ = endZ;
 	}
 
-	const GLsizei numVerts = (GLsizei)((writePtr - lineVertices) / 3);
+	const GLsizei numVerts = static_cast<GLsizei>((writePtr - lineVertices) / 3);
 	if (numVerts == 0) {
 		ri.Hunk_FreeTempMemory(lineVertices);
 		return;
@@ -271,7 +271,7 @@ static void DrawNormals (shaderCommands_t *input) {
 	qglDeleteBuffers(1, &vbo);
 	qglDeleteVertexArrays(1, &vao);
 
-	if (prevProg) qglUseProgram((GLuint)prevProg);
+	if (prevProg) qglUseProgram(static_cast<GLuint>(prevProg));
 	else          qglUseProgram(0);
 
 	ri.Hunk_FreeTempMemory(lineVertices);
@@ -507,7 +507,7 @@ static void ProjectDlightTexture( ) {
 		shaderProgram_t *sp;
 		vec4_t vector;
 
-		if ( !( tess.dlightBits & ( (uint64_t)1 << l ) ) ) {
+		if ( !( tess.dlightBits & ( static_cast<uint64_t>(1) << l ) ) ) {
 			continue;	// this surface definitely doesn't have any of this light
 		}
 
@@ -576,7 +576,7 @@ static void ComputeShaderColors( shaderStage_t *pStage, vec4_t baseColor, vec4_t
 
 	bool is2DDraw = backEnd.currentEntity == &backEnd.entity2D;
 
-	float overbright = (isBlend || is2DDraw) ? 1.0f : (float)(1 << tr.overbrightBits);
+	float overbright = (isBlend || is2DDraw) ? 1.0f : static_cast<float>(1 << tr.overbrightBits);
 
 	fog_t *fog;
 
@@ -637,10 +637,10 @@ static void ComputeShaderColors( shaderStage_t *pStage, vec4_t baseColor, vec4_t
 		case CGEN_FOG:
 			fog = tr.world->fogs + tess.fogNum;
 
-			baseColor[0] = ((unsigned char *)(&fog->colorInt))[0] / 255.0f;
-			baseColor[1] = ((unsigned char *)(&fog->colorInt))[1] / 255.0f;
-			baseColor[2] = ((unsigned char *)(&fog->colorInt))[2] / 255.0f;
-			baseColor[3] = ((unsigned char *)(&fog->colorInt))[3] / 255.0f;
+			baseColor[0] = (reinterpret_cast<unsigned char *>(&fog->colorInt))[0] / 255.0f;
+			baseColor[1] = (reinterpret_cast<unsigned char *>(&fog->colorInt))[1] / 255.0f;
+			baseColor[2] = (reinterpret_cast<unsigned char *>(&fog->colorInt))[2] / 255.0f;
+			baseColor[3] = (reinterpret_cast<unsigned char *>(&fog->colorInt))[3] / 255.0f;
 			break;
 		case CGEN_WAVEFORM:
 			baseColor[0] = 
@@ -823,7 +823,7 @@ static void ForwardDlight( ) {
 		vec4_t vector;
 		vec4_t texMatrix[8];
 
-		if ( !( tess.dlightBits & ( (uint64_t)1 << l ) ) ) {
+		if ( !( tess.dlightBits & ( static_cast<uint64_t>(1) << l ) ) ) {
 			continue;	// this surface definitely doesn't have any of this light
 		}
 
@@ -1097,10 +1097,10 @@ static void RB_FogPass( ) {
 		GLSL_SetUniformFloat(sp, UNIFORM_TIME, tess.shaderTime);
 	}
 
-	color[0] = ((unsigned char *)(&fog->colorInt))[0] / 255.0f;
-	color[1] = ((unsigned char *)(&fog->colorInt))[1] / 255.0f;
-	color[2] = ((unsigned char *)(&fog->colorInt))[2] / 255.0f;
-	color[3] = ((unsigned char *)(&fog->colorInt))[3] / 255.0f;
+	color[0] = (reinterpret_cast<unsigned char *>(&fog->colorInt))[0] / 255.0f;
+	color[1] = (reinterpret_cast<unsigned char *>(&fog->colorInt))[1] / 255.0f;
+	color[2] = (reinterpret_cast<unsigned char *>(&fog->colorInt))[2] / 255.0f;
+	color[3] = (reinterpret_cast<unsigned char *>(&fog->colorInt))[3] / 255.0f;
 	GLSL_SetUniformVec4(sp, UNIFORM_COLOR, color);
 
 	ComputeFogValues(fogDistanceVector, fogDepthVector, &eyeT);

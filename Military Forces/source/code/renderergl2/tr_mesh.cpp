@@ -185,10 +185,10 @@ int R_ComputeLOD( trRefEntity_t *ent ) {
 		if(tr.currentModel->type == MOD_MDR)
 		{
 			int frameSize;
-			mdr = (mdrHeader_t *) tr.currentModel->modelData;
+			mdr = static_cast<mdrHeader_t *>(tr.currentModel->modelData);
 			frameSize = (size_t) (&((mdrFrame_t *)nullptr)->bones[mdr->numBones]);
 			
-			mdrframe = (mdrFrame_t *) ((byte *) mdr + mdr->ofsFrames + frameSize * ent->e.frame);
+			mdrframe = reinterpret_cast<mdrFrame_t *>(reinterpret_cast<byte *>(mdr) + mdr->ofsFrames + frameSize * ent->e.frame);
 			
 			radius = RadiusFromBounds(mdrframe->bounds[0], mdrframe->bounds[1]);
 		}
@@ -397,7 +397,7 @@ void R_AddMD3Surfaces( trRefEntity_t *ent ) {
 			&& fogNum == 0
 			&& !(ent->e.renderfx & ( RF_NOSHADOW | RF_DEPTHHACK ) ) 
 			&& shader->sort == SS_OPAQUE ) {
-			R_AddDrawSurf( (surfaceType_t *)drawSurf, tr.shadowShader, 0, false, false, 0 );
+			R_AddDrawSurf( static_cast<surfaceType_t *>(drawSurf), tr.shadowShader, 0, false, false, 0 );
 		}
 
 		// projection shadows work fine with personal models
@@ -405,12 +405,12 @@ void R_AddMD3Surfaces( trRefEntity_t *ent ) {
 			&& fogNum == 0
 			&& (ent->e.renderfx & RF_SHADOW_PLANE )
 			&& shader->sort == SS_OPAQUE ) {
-			R_AddDrawSurf( (surfaceType_t *)drawSurf, tr.projectionShadowShader, 0, false, false, 0 );
+			R_AddDrawSurf( static_cast<surfaceType_t *>(drawSurf), tr.projectionShadowShader, 0, false, false, 0 );
 		}
 
 		// don't add third_person objects if not viewing through a portal
 		if ( !personalModel ) {
-			R_AddDrawSurf( (surfaceType_t *)drawSurf, shader, fogNum, false, false, cubemapIndex );
+			R_AddDrawSurf( static_cast<surfaceType_t *>(drawSurf), shader, fogNum, false, false, cubemapIndex );
 		}
 
 		surface++;

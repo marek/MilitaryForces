@@ -396,7 +396,7 @@ Keybinding command
 =================
 */
 static void CG_SizeUp_f () {
-	Cvar_Set("cg_viewsize", va("%i",(int)(cg_viewsize.integer+10)));
+	Cvar_Set("cg_viewsize", va("%i",(cg_viewsize.integer+10)));
 }
 
 
@@ -408,7 +408,7 @@ Keybinding command
 =================
 */
 static void CG_SizeDown_f () {
-	Cvar_Set("cg_viewsize", va("%i",(int)(cg_viewsize.integer-10)));
+	Cvar_Set("cg_viewsize", va("%i",(cg_viewsize.integer-10)));
 }
 
 
@@ -420,9 +420,9 @@ Debugging command to print the current position
 =============
 */
 static void CG_Viewpos_f () {
-	CG_Printf ("(%i %i %i) : %i\n", (int)cg.refdef.vieworg[0],
-		(int)cg.refdef.vieworg[1], (int)cg.refdef.vieworg[2], 
-		(int)cg.refdefViewAngles[YAW]);
+	CG_Printf ("(%i %i %i) : %i\n", static_cast<int>(cg.refdef.vieworg[0]),
+		static_cast<int>(cg.refdef.vieworg[1]), static_cast<int>(cg.refdef.vieworg[2]), 
+		static_cast<int>(cg.refdefViewAngles[YAW]));
 }
 
 

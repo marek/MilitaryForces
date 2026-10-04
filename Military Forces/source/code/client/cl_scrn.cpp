@@ -373,7 +373,7 @@ void SCR_DrawVoipMeter( ) {
 	else if (!cl_voip->integer)
 		return;  // client has VoIP support disabled.
 
-	limit = (int) (clc.voipPower * 10.0f);
+	limit = static_cast<int>(clc.voipPower * 10.0f);
 	if (limit > 10)
 		limit = 10;
 
@@ -441,8 +441,8 @@ void SCR_DrawDebugGraph ()
 		v = v * cl_graphscale->integer + cl_graphshift->integer;
 		
 		if (v < 0)
-			v += cl_graphheight->integer * (1+(int)(-v / cl_graphheight->integer));
-		h = (int)v % cl_graphheight->integer;
+			v += cl_graphheight->integer * (1+static_cast<int>(-v / cl_graphheight->integer));
+		h = static_cast<int>(v) % cl_graphheight->integer;
 		refExport.DrawStretchPic( x+w-1-a, y - h, 1, h, 0, 0, 0, 0, cls.whiteShader );
 	}
 }

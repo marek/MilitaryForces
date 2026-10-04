@@ -68,8 +68,8 @@ GameObjectInfo_Vehicle::verifyLoadouts()
 	renderFlags_ |= MFR_VWEP;
 
 	// go through all reported loadouts and verify that they actually fit on the vehicle
-	for( LoadoutMapIter it = defaultLoadouts_.begin(); it != defaultLoadouts_.end(); ++it )
-		correctArmament((*it).second, (*it).first);
+	for(auto & defaultLoadout : defaultLoadouts_)
+		correctArmament(defaultLoadout.second, defaultLoadout.first);
 
 	return true;
 }
@@ -124,42 +124,42 @@ GameObjectInfo_Vehicle::correctArmament(Loadout& loadout, std::string const& loa
 
 	// create a work copy of the loadout
 	Loadout workCopy;
-	for( size_t i = 0; i < loadout.size(); ++i  )
+	for(auto & i : loadout)
 	{
 		// dont add weapons not fitting this category of vehicle
-		if( category_ & allWeapons[loadout[i].weaponIndex_]->fitsCategory_ )
-			workCopy.push_back(loadout[i]);
+		if( category_ & allWeapons[i.weaponIndex_]->fitsCategory_ )
+			workCopy.push_back(i);
 	}
 	loadout.clear();
 
 	// create a copy of the mount list, with evaluation class
 	std::vector<VehicleMountInfoEvaluator> mountList;
-	for( size_t i = 0; i < mounts_.size(); ++i )
-		mountList.push_back(mounts_[i]);
+	for(const auto & mount : mounts_)
+		mountList.push_back(mount);
 	// go through all weapons and fit them on mounts
-	for( size_t i = 0; i < workCopy.size(); ++i )
+	for(auto & i : workCopy)
 	{
 		// weapons which cant be fitted on mounts arent evaluated
-		if( allWeapons[workCopy[i].weaponIndex_]->fitsPylon_ == WeaponInfo::PF_NOT_AP )
+		if( allWeapons[i.weaponIndex_]->fitsPylon_ == WeaponInfo::PF_NOT_AP )
 			continue;
 		// go through all mounts
-		for( size_t j = 0; j < mountList.size(); ++j )
+		for(auto & j : mountList)
 		{
 			// if mount is emtpy and weapon fits, then "put it on"
-			if( mountList[j].weaponIndex_ < 0 &&
-				(mountList[j].flags_ & allWeapons[workCopy[i].weaponIndex_]->fitsPylon_) )
+			if( j.weaponIndex_ < 0 &&
+				(j.flags_ & allWeapons[i.weaponIndex_]->fitsPylon_) )
 			{
-				mountList[j].weaponIndex_ = workCopy[i].weaponIndex_;
-				mountList[j].num_ = 1;
-				workCopy[i].maxAmmo_--;
+				j.weaponIndex_ = i.weaponIndex_;
+				j.num_ = 1;
+				i.maxAmmo_--;
 			}
-			if( !workCopy[i].maxAmmo_ )
+			if( !i.maxAmmo_ )
 				break;
 		}
 	}
 	// put loadout back together from workCopy
-	for( size_t i = 0; i < workCopy.size(); ++i )
-		loadout.push_back(workCopy[i]);
+	for(const auto & i : workCopy)
+		loadout.push_back(i);
 
 	// remove extraneous weapons from default loadout
 	int numProblems = 0;

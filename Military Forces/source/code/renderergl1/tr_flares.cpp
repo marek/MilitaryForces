@@ -256,7 +256,7 @@ void RB_AddDlightFlares( ) {
 		else
 			j = 0;
 
-		RB_AddFlare( (void *)l, j, l->origin, l->color, nullptr );
+		RB_AddFlare( reinterpret_cast<void *>(l), j, l->origin, l->color, nullptr );
 	}
 }
 

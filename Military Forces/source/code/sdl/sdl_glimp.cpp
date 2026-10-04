@@ -26,10 +26,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #	include <SDL.h>
 #endif
 
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
+#include <cstdarg>
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
 
 #ifdef __APPLE__
 #include <CoreGraphics/CoreGraphics.h>
@@ -139,8 +139,8 @@ static int GLimp_CompareModes( const void *a, const void *b )
 	const float ASPECT_EPSILON = 0.001f;
 	SDL_Rect *modeA = (SDL_Rect *)a;
 	SDL_Rect *modeB = (SDL_Rect *)b;
-	float aspectA = (float)modeA->w / (float)modeA->h;
-	float aspectB = (float)modeB->w / (float)modeB->h;
+	float aspectA = static_cast<float>(modeA->w) / static_cast<float>(modeA->h);
+	float aspectB = static_cast<float>(modeB->w) / static_cast<float>(modeB->h);
 	int areaA = modeA->w * modeA->h;
 	int areaB = modeB->w * modeB->h;
 	float aspectDiffA = fabs( aspectA - displayAspect );
@@ -184,7 +184,7 @@ static void GLimp_DetectAvailableModes()
 		return;
 	}
 
-	modes = (SDL_Rect *)SDL_calloc( (size_t)numSDLModes, sizeof( SDL_Rect ) );
+	modes = static_cast<SDL_Rect *>(SDL_calloc( static_cast<size_t>(numSDLModes), sizeof( SDL_Rect ) ));
 	if ( !modes )
 	{
 		ri.Error( ERR_FATAL, "Out of memory" );
@@ -230,7 +230,7 @@ static void GLimp_DetectAvailableModes()
 	{
 		const char *newModeString = va( "%ux%u ", modes[ i ].w, modes[ i ].h );
 
-		if( strlen( newModeString ) < (int)sizeof( buf ) - strlen( buf ) )
+		if( strlen( newModeString ) < static_cast<int>(sizeof( buf )) - strlen( buf ) )
 			Q_strcat( buf, sizeof( buf ), newModeString );
 		else
 			ri.Printf( PRINT_WARNING, "Skipping mode %ux%u, buffer too small\n", modes[ i ].w, modes[ i ].h );
@@ -294,7 +294,7 @@ static bool GLimp_GetProcAddresses( bool fixedFunction ) {
 		Com_Error( ERR_FATAL, "glGetString is NULL" );
 	}
 
-	version = (const char *)qglGetString( GL_VERSION );
+	version = reinterpret_cast<const char *>(qglGetString( GL_VERSION ));
 
 	if ( !version ) {
 		Com_Error( ERR_FATAL, "GL_VERSION is NULL" );
@@ -458,7 +458,7 @@ static int GLimp_SetMode(int mode, bool fullscreen, bool noborder, bool fixedFun
 
 	if( SDL_GetDesktopDisplayMode( display, &desktopMode ) == 0 )
 	{
-		displayAspect = (float)desktopMode.w / (float)desktopMode.h;
+		displayAspect = static_cast<float>(desktopMode.w) / static_cast<float>(desktopMode.h);
 
 		ri.Printf( PRINT_ALL, "Display aspect: %.3f\n", displayAspect );
 	}
@@ -488,7 +488,7 @@ static int GLimp_SetMode(int mode, bool fullscreen, bool noborder, bool fixedFun
 					"Cannot determine display resolution, assuming 640x480\n" );
 		}
 
-		glConfig.windowAspect = (float)glConfig.vidWidth / (float)glConfig.vidHeight;
+		glConfig.windowAspect = static_cast<float>(glConfig.vidWidth) / static_cast<float>(glConfig.vidHeight);
 	}
 	else if ( !R_GetModeInfo( &glConfig.vidWidth, &glConfig.vidHeight, &glConfig.windowAspect, mode ) )
 	{
@@ -758,7 +758,7 @@ static int GLimp_SetMode(int mode, bool fullscreen, bool noborder, bool fixedFun
 			if ( contexts[type].profileMask == SDL_GL_CONTEXT_PROFILE_CORE ) {
 				const char *renderer;
 
-				renderer = (const char *)qglGetString( GL_RENDERER );
+				renderer = reinterpret_cast<const char *>(qglGetString( GL_RENDERER ));
 
 				if ( !renderer || strstr( renderer, "Software Renderer" ) || strstr( renderer, "Software Rasterizer" ) )
 				{
@@ -844,7 +844,7 @@ static int GLimp_SetMode(int mode, bool fullscreen, bool noborder, bool fixedFun
 	SDL_ShowWindow( SDL_window );
 
 	SDL_GL_GetDrawableSize( SDL_window, &glConfig.vidWidth, &glConfig.vidHeight );
-	glConfig.windowAspect = (float)glConfig.vidWidth / (float)glConfig.vidHeight;
+	glConfig.windowAspect = static_cast<float>(glConfig.vidWidth) / static_cast<float>(glConfig.vidHeight);
 	ri.Printf( PRINT_ALL, "Drawable size: %d x %d\n", glConfig.vidWidth, glConfig.vidHeight );
 
 	GLimp_DetectAvailableModes();
@@ -891,7 +891,7 @@ static bool GLimp_StartDriverAndSetMode(int mode, bool fullscreen, bool noborder
 		fullscreen = false;
 	}
 	
-	err = (rserr_t)GLimp_SetMode(mode, fullscreen, noborder, gl3Core);
+	err = static_cast<rserr_t>(GLimp_SetMode(mode, fullscreen, noborder, gl3Core));
 
 	switch ( err )
 	{
@@ -955,7 +955,7 @@ static void GLimp_InitDebugOutput( )
 		return;
 	}
 
-	( ( GLimp_DebugMessageCallbackProc )proc )( GLimp_DebugCallback, nullptr );
+	( reinterpret_cast< GLimp_DebugMessageCallbackProc>(proc) )( GLimp_DebugCallback, nullptr );
 	qglEnable( GLIMP_DEBUG_OUTPUT_SYNCHRONOUS );
 	if( khr )
 		qglEnable( GLIMP_DEBUG_OUTPUT );
@@ -1046,15 +1046,15 @@ static void GLimp_InitExtensions( bool fixedFunction )
 		{
 			if ( r_ext_multitexture->value )
 			{
-				qglMultiTexCoord2fARB = (decltype(qglMultiTexCoord2fARB))SDL_GL_GetProcAddress( "glMultiTexCoord2fARB" );
-				qglActiveTextureARB = (decltype(qglActiveTextureARB))SDL_GL_GetProcAddress( "glActiveTextureARB" );
-				qglClientActiveTextureARB = (decltype(qglClientActiveTextureARB))SDL_GL_GetProcAddress( "glClientActiveTextureARB" );
+				qglMultiTexCoord2fARB = reinterpret_cast<decltype(qglMultiTexCoord2fARB)>(SDL_GL_GetProcAddress( "glMultiTexCoord2fARB" ));
+				qglActiveTextureARB = reinterpret_cast<decltype(qglActiveTextureARB)>(SDL_GL_GetProcAddress( "glActiveTextureARB" ));
+				qglClientActiveTextureARB = reinterpret_cast<decltype(qglClientActiveTextureARB)>(SDL_GL_GetProcAddress( "glClientActiveTextureARB" ));
 
 				if ( qglActiveTextureARB )
 				{
 					GLint glint = 0;
 					qglGetIntegerv( GL_MAX_TEXTURE_UNITS_ARB, &glint );
-					glConfig.numTextureUnits = (int) glint;
+					glConfig.numTextureUnits = static_cast<int>(glint);
 					if ( glConfig.numTextureUnits > 1 )
 					{
 						ri.Printf( PRINT_ALL, "...using GL_ARB_multitexture\n" );
@@ -1084,8 +1084,8 @@ static void GLimp_InitExtensions( bool fixedFunction )
 			if ( r_ext_compiled_vertex_array->value )
 			{
 				ri.Printf( PRINT_ALL, "...using GL_EXT_compiled_vertex_array\n" );
-				qglLockArraysEXT = ( void ( APIENTRY * )( GLint, GLint ) ) SDL_GL_GetProcAddress( "glLockArraysEXT" );
-				qglUnlockArraysEXT = ( void ( APIENTRY * )( ) ) SDL_GL_GetProcAddress( "glUnlockArraysEXT" );
+				qglLockArraysEXT = reinterpret_cast< void ( APIENTRY * )( GLint, GLint )>(SDL_GL_GetProcAddress( "glLockArraysEXT" ));
+				qglUnlockArraysEXT = reinterpret_cast< void ( APIENTRY * )( )>(SDL_GL_GetProcAddress( "glUnlockArraysEXT" ));
 				if (!qglLockArraysEXT || !qglUnlockArraysEXT)
 				{
 					ri.Error (ERR_FATAL, "bad getprocaddress");
@@ -1106,7 +1106,7 @@ static void GLimp_InitExtensions( bool fixedFunction )
 	if ( SDL_GL_ExtensionSupported( "GL_EXT_texture_filter_anisotropic" ) )
 	{
 		if ( r_ext_texture_filter_anisotropic->integer ) {
-			qglGetIntegerv( GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, (GLint *)&maxAnisotropy );
+			qglGetIntegerv( GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, static_cast<GLint *>(&maxAnisotropy) );
 			if ( maxAnisotropy <= 0 ) {
 				ri.Printf( PRINT_ALL, "...GL_EXT_texture_filter_anisotropic not properly supported!\n" );
 				maxAnisotropy = 0;

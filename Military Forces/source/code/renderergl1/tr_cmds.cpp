@@ -38,7 +38,7 @@ void R_PerformanceCounters( ) {
 		ri.Printf (PRINT_ALL, "%i/%i shaders/surfs %i leafs %i verts %i/%i tris %.2f mtex %.2f dc\n",
 			backEnd.pc.c_shaders, backEnd.pc.c_surfaces, tr.pc.c_leafs, backEnd.pc.c_vertexes, 
 			backEnd.pc.c_indexes/3, backEnd.pc.c_totalIndexes/3, 
-			R_SumOfUsedImages()/(1000000.0f), backEnd.pc.c_overDraw / (float)(glConfig.vidWidth * glConfig.vidHeight) ); 
+			R_SumOfUsedImages()/(1000000.0f), backEnd.pc.c_overDraw / static_cast<float>(glConfig.vidWidth * glConfig.vidHeight) ); 
 	} else if (r_speeds->integer == 2) {
 		ri.Printf (PRINT_ALL, "(patch) %i sin %i sclip  %i sout %i bin %i bclip %i bout\n",
 			tr.pc.c_sphere_cull_patch_in, tr.pc.c_sphere_cull_patch_clip, tr.pc.c_sphere_cull_patch_out, 
@@ -81,7 +81,7 @@ void R_IssueRenderCommands( bool runPerformanceCounters ) {
 	cmdList = &backEndData->commands;
 	assert(cmdList);
 	// add an end-of-list command
-	*(int *)(cmdList->cmds + cmdList->used) = RC_END_OF_LIST;
+	*reinterpret_cast<int *>(cmdList->cmds + cmdList->used) = RC_END_OF_LIST;
 
 	// clear it out, in case this is a sync and not a buffer flip
 	cmdList->used = 0;
@@ -161,7 +161,7 @@ R_AddDrawSurfCmd
 void	R_AddDrawSurfCmd( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	drawSurfsCommand_t	*cmd;
 
-	cmd = (drawSurfsCommand_t *)R_GetCommandBuffer( sizeof( *cmd ) );
+	cmd = static_cast<drawSurfsCommand_t *>(R_GetCommandBuffer( sizeof( *cmd ) ));
 	if ( !cmd ) {
 		return;
 	}
@@ -188,7 +188,7 @@ void	RE_SetColor( const float *rgba ) {
   if ( !tr.registered ) {
     return;
   }
-	cmd = (setColorCommand_t *)R_GetCommandBuffer( sizeof( *cmd ) );
+	cmd = static_cast<setColorCommand_t *>(R_GetCommandBuffer( sizeof( *cmd ) ));
 	if ( !cmd ) {
 		return;
 	}
@@ -218,7 +218,7 @@ void RE_StretchPic ( float x, float y, float w, float h,
   if (!tr.registered) {
     return;
   }
-	cmd = (stretchPicCommand_t *)R_GetCommandBuffer( sizeof( *cmd ) );
+	cmd = static_cast<stretchPicCommand_t *>(R_GetCommandBuffer( sizeof( *cmd ) ));
 	if ( !cmd ) {
 		return;
 	}
@@ -366,15 +366,15 @@ void RE_BeginFrame( stereoFrame_t stereoFrame ) {
 	}
 
 	if (glConfig.stereoEnabled) {
-		if( !(cmd = (drawBufferCommand_t *)R_GetCommandBuffer(sizeof(*cmd))) )
+		if( !(cmd = static_cast<drawBufferCommand_t *>(R_GetCommandBuffer(sizeof(*cmd)))) )
 			return;
 			
 		cmd->commandId = RC_DRAW_BUFFER;
 		
 		if ( stereoFrame == STEREO_LEFT ) {
-			cmd->buffer = (int)GL_BACK_LEFT;
+			cmd->buffer = GL_BACK_LEFT;
 		} else if ( stereoFrame == STEREO_RIGHT ) {
-			cmd->buffer = (int)GL_BACK_RIGHT;
+			cmd->buffer = GL_BACK_RIGHT;
 		} else {
 			ri.Error( ERR_FATAL, "RE_BeginFrame: Stereo is enabled, but stereoFrame was %i", stereoFrame );
 		}
@@ -399,22 +399,22 @@ void RE_BeginFrame( stereoFrame_t stereoFrame ) {
 			
 			if(stereoFrame == STEREO_LEFT)
 			{
-				if( !(cmd = (drawBufferCommand_t *)R_GetCommandBuffer(sizeof(*cmd))) )
+				if( !(cmd = static_cast<drawBufferCommand_t *>(R_GetCommandBuffer(sizeof(*cmd)))) )
 					return;
 				
-				if( !(colcmd = (colorMaskCommand_t *)R_GetCommandBuffer(sizeof(*colcmd))) )
+				if( !(colcmd = static_cast<colorMaskCommand_t *>(R_GetCommandBuffer(sizeof(*colcmd)))) )
 					return;
 			}
 			else if(stereoFrame == STEREO_RIGHT)
 			{
 				clearDepthCommand_t *cldcmd;
 				
-				if( !(cldcmd = (clearDepthCommand_t *)R_GetCommandBuffer(sizeof(*cldcmd))) )
+				if( !(cldcmd = static_cast<clearDepthCommand_t *>(R_GetCommandBuffer(sizeof(*cldcmd)))) )
 					return;
 
 				cldcmd->commandId = RC_CLEARDEPTH;
 
-				if( !(colcmd = (colorMaskCommand_t *)R_GetCommandBuffer(sizeof(*colcmd))) )
+				if( !(colcmd = static_cast<colorMaskCommand_t *>(R_GetCommandBuffer(sizeof(*colcmd)))) )
 					return;
 			}
 			else
@@ -428,7 +428,7 @@ void RE_BeginFrame( stereoFrame_t stereoFrame ) {
 			if(stereoFrame != STEREO_CENTER)
 				ri.Error( ERR_FATAL, "RE_BeginFrame: Stereo is disabled, but stereoFrame was %i", stereoFrame );
 
-			if( !(cmd = (drawBufferCommand_t *)R_GetCommandBuffer(sizeof(*cmd))) )
+			if( !(cmd = static_cast<drawBufferCommand_t *>(R_GetCommandBuffer(sizeof(*cmd)))) )
 				return;
 		}
 
@@ -443,9 +443,9 @@ void RE_BeginFrame( stereoFrame_t stereoFrame ) {
 			}
 
 			if (!Q_stricmp(r_drawBuffer->string, "GL_FRONT"))
-				cmd->buffer = (int)GL_FRONT;
+				cmd->buffer = GL_FRONT;
 			else
-				cmd->buffer = (int)GL_BACK;
+				cmd->buffer = GL_BACK;
 		}
 	}
 	
@@ -466,7 +466,7 @@ void RE_EndFrame( int *frontEndMsec, int *backEndMsec ) {
 	if ( !tr.registered ) {
 		return;
 	}
-	cmd = (swapBuffersCommand_t *)R_GetCommandBufferReserved( sizeof( *cmd ), 0 );
+	cmd = static_cast<swapBuffersCommand_t *>(R_GetCommandBufferReserved( sizeof( *cmd ), 0 ));
 	if ( !cmd ) {
 		return;
 	}
@@ -500,7 +500,7 @@ void RE_TakeVideoFrame( int width, int height,
 		return;
 	}
 
-	cmd = (videoFrameCommand_t *)R_GetCommandBuffer( sizeof( *cmd ) );
+	cmd = static_cast<videoFrameCommand_t *>(R_GetCommandBuffer( sizeof( *cmd ) ));
 	if( !cmd ) {
 		return;
 	}

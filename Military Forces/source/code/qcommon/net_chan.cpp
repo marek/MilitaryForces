@@ -385,7 +385,7 @@ bool NetChannel::process( Message *msg ) {
 		// copy the full message over the partial fragment
 
 		// make sure the sequence number is still there
-		*(int *)msg->data = LittleLong( sequence );
+		*reinterpret_cast<int *>(msg->data) = LittleLong( sequence );
 
 		Com_Memcpy( msg->data + 4, this->fragmentBuffer, this->fragmentLength );
 		msg->cursize = this->fragmentLength + 4;
@@ -497,12 +497,12 @@ static void NET_QueuePacket( int length, const void *data, netadr_t to,
 	if(offset > 999)
 		offset = 999;
 
-	newPacket = (packetQueue_t *)S_Malloc(sizeof(packetQueue_t));
-	newPacket->data = (byte *)S_Malloc(length);
+	newPacket = static_cast<packetQueue_t *>(S_Malloc(sizeof(packetQueue_t)));
+	newPacket->data = static_cast<byte *>(S_Malloc(length));
 	Com_Memcpy(newPacket->data, data, length);
 	newPacket->length = length;
 	newPacket->to = to;
-	newPacket->release = Sys_Milliseconds() + (int)((float)offset / com_timescale->value);	
+	newPacket->release = Sys_Milliseconds() + static_cast<int>(static_cast<float>(offset) / com_timescale->value);	
 	newPacket->next = nullptr;
 
 	if(!packetQueue) {

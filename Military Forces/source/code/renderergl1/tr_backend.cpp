@@ -525,7 +525,7 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	oldDepthRange = false;
 	wasCrosshair = false;
 	oldDlighted = false;
-	oldSort = ~(uint64_t)0;
+	oldSort = ~static_cast<uint64_t>(0);
 	depthRange = false;
 
 	backEnd.pc.c_surfaces += numDrawSurfs;
@@ -564,7 +564,7 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 				backEnd.currentEntity = &backEnd.refdef.entities[entityNum];
 
 				// FIXME: e.shaderTime must be passed as int to avoid fp-precision loss issues
-				backEnd.refdef.floatTime = originalTime - (double)backEnd.currentEntity->e.shaderTime;
+				backEnd.refdef.floatTime = originalTime - static_cast<double>(backEnd.currentEntity->e.shaderTime);
 
 				// we have to reset the shaderTime as well otherwise image animations start
 				// from the wrong frame
@@ -815,14 +815,14 @@ RB_SetColor
 const void	*RB_SetColor( const void *data ) {
 	const setColorCommand_t	*cmd;
 
-	cmd = (const setColorCommand_t *)data;
+	cmd = static_cast<const setColorCommand_t *>(data);
 
 	backEnd.color2D[0] = cmd->color[0] * 255;
 	backEnd.color2D[1] = cmd->color[1] * 255;
 	backEnd.color2D[2] = cmd->color[2] * 255;
 	backEnd.color2D[3] = cmd->color[3] * 255;
 
-	return (const void *)(cmd + 1);
+	return reinterpret_cast<const void *>(cmd + 1);
 }
 
 /*
@@ -835,7 +835,7 @@ const void *RB_StretchPic ( const void *data ) {
 	shader_t *shader;
 	int		numVerts, numIndexes;
 
-	cmd = (const stretchPicCommand_t *)data;
+	cmd = static_cast<const stretchPicCommand_t *>(data);
 
 	if ( !backEnd.projection2D ) {
 		RB_SetGL2D();
@@ -864,10 +864,10 @@ const void *RB_StretchPic ( const void *data ) {
 	tess.indexes[ numIndexes + 4 ] = numVerts + 0;
 	tess.indexes[ numIndexes + 5 ] = numVerts + 1;
 
-	*(int *)tess.vertexColors[ numVerts ] =
-		*(int *)tess.vertexColors[ numVerts + 1 ] =
-		*(int *)tess.vertexColors[ numVerts + 2 ] =
-		*(int *)tess.vertexColors[ numVerts + 3 ] = *(int *)backEnd.color2D;
+	*reinterpret_cast<int *>(tess.vertexColors[ numVerts ]) =
+		*reinterpret_cast<int *>(tess.vertexColors[ numVerts + 1 ]) =
+		*reinterpret_cast<int *>(tess.vertexColors[ numVerts + 2 ]) =
+		*reinterpret_cast<int *>(tess.vertexColors[ numVerts + 3 ]) = *reinterpret_cast<int *>(backEnd.color2D);
 
 	tess.xyz[ numVerts ][0] = cmd->x;
 	tess.xyz[ numVerts ][1] = cmd->y;
@@ -897,7 +897,7 @@ const void *RB_StretchPic ( const void *data ) {
 	tess.texCoords[ numVerts + 3 ][0][0] = cmd->s1;
 	tess.texCoords[ numVerts + 3 ][0][1] = cmd->t2;
 
-	return (const void *)(cmd + 1);
+	return reinterpret_cast<const void *>(cmd + 1);
 }
 
 
@@ -915,14 +915,14 @@ const void	*RB_DrawSurfs( const void *data ) {
 		RB_EndSurface();
 	}
 
-	cmd = (const drawSurfsCommand_t *)data;
+	cmd = static_cast<const drawSurfsCommand_t *>(data);
 
 	backEnd.refdef = cmd->refdef;
 	backEnd.viewParms = cmd->viewParms;
 
 	RB_RenderDrawSurfList( cmd->drawSurfs, cmd->numDrawSurfs );
 
-	return (const void *)(cmd + 1);
+	return reinterpret_cast<const void *>(cmd + 1);
 }
 
 
@@ -935,7 +935,7 @@ RB_DrawBuffer
 const void	*RB_DrawBuffer( const void *data ) {
 	const drawBufferCommand_t	*cmd;
 
-	cmd = (const drawBufferCommand_t *)data;
+	cmd = static_cast<const drawBufferCommand_t *>(data);
 
 	qglDrawBuffer( cmd->buffer );
 
@@ -945,7 +945,7 @@ const void	*RB_DrawBuffer( const void *data ) {
 		qglClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	}
 
-	return (const void *)(cmd + 1);
+	return reinterpret_cast<const void *>(cmd + 1);
 }
 
 /*
@@ -1016,11 +1016,11 @@ RB_ColorMask
 */
 const void *RB_ColorMask(const void *data)
 {
-	const colorMaskCommand_t *cmd = (const colorMaskCommand_t *)data;
+	const colorMaskCommand_t *cmd = static_cast<const colorMaskCommand_t *>(data);
 	
 	qglColorMask(cmd->rgba[0], cmd->rgba[1], cmd->rgba[2], cmd->rgba[3]);
 	
-	return (const void *)(cmd + 1);
+	return reinterpret_cast<const void *>(cmd + 1);
 }
 
 /*
@@ -1031,7 +1031,7 @@ RB_ClearDepth
 */
 const void *RB_ClearDepth(const void *data)
 {
-	const clearDepthCommand_t *cmd = (const clearDepthCommand_t *)data;
+	const clearDepthCommand_t *cmd = static_cast<const clearDepthCommand_t *>(data);
 	
 	if(tess.numIndexes)
 		RB_EndSurface();
@@ -1042,7 +1042,7 @@ const void *RB_ClearDepth(const void *data)
 
 	qglClear(GL_DEPTH_BUFFER_BIT);
 	
-	return (const void *)(cmd + 1);
+	return reinterpret_cast<const void *>(cmd + 1);
 }
 
 /*
@@ -1064,7 +1064,7 @@ const void	*RB_SwapBuffers( const void *data ) {
 		RB_ShowImages();
 	}
 
-	cmd = (const swapBuffersCommand_t *)data;
+	cmd = static_cast<const swapBuffersCommand_t *>(data);
 
 	// we measure overdraw by reading back the stencil buffer and
 	// counting up the number of increments that have happened
@@ -1073,7 +1073,7 @@ const void	*RB_SwapBuffers( const void *data ) {
 		long sum = 0;
 		unsigned char *stencilReadback;
 
-		stencilReadback = (unsigned char *)ri.Hunk_AllocateTempMemory( glConfig.vidWidth * glConfig.vidHeight );
+		stencilReadback = static_cast<unsigned char *>(ri.Hunk_AllocateTempMemory( glConfig.vidWidth * glConfig.vidHeight ));
 		qglReadPixels( 0, 0, glConfig.vidWidth, glConfig.vidHeight, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, stencilReadback );
 
 		for ( i = 0; i < glConfig.vidWidth * glConfig.vidHeight; i++ ) {
@@ -1095,7 +1095,7 @@ const void	*RB_SwapBuffers( const void *data ) {
 
 	backEnd.projection2D = false;
 
-	return (const void *)(cmd + 1);
+	return reinterpret_cast<const void *>(cmd + 1);
 }
 
 /*
@@ -1111,7 +1111,7 @@ void RB_ExecuteRenderCommands( const void *data ) {
 	while ( true ) {
 		data = PADP(data, sizeof(void *));
 
-		switch ( *(const int *)data ) {
+		switch ( *static_cast<const int *>(data) ) {
 		case RC_SET_COLOR:
 			data = RB_SetColor( data );
 			break;

@@ -78,9 +78,9 @@ LevelLocals::resetAll()
 void
 LevelLocals::resetClientsAndEntities()
 {
-	for( size_t i = 0; i < clients_.size(); ++i )
+	for(auto & client : clients_)
 	{
-		delete clients_.at(i);
+		delete client;
 	}
 	clients_.clear();
 	clients_.resize(MAX_CLIENTS+1);	// first one is empty (world)
@@ -89,9 +89,9 @@ LevelLocals::resetClientsAndEntities()
 		clients_.at(i) = nullptr;
 	}
 
-	for( size_t i = 0; i < gameEntities_.size(); ++i )
+	for(auto & gameEntitie : gameEntities_)
 	{
-		delete gameEntities_.at(i);
+		delete gameEntitie;
 	}
 	gameEntities_.clear();
 	gameEntities_.resize(MAX_CLIENTS+1);// 0 = world, after that the clients 1 -> MAX_CLIENTS + 1
@@ -320,7 +320,7 @@ LevelLocals::spawnEntity()
 		{
 			GameEntity* currEnt = getEntity(i);
 			if( currEnt )
-				Com_Printf("%4i: %s\n", (int)i, currEnt->classname_);
+				Com_Printf("%4i: %s\n", static_cast<int>(i), currEnt->classname_);
 		}
 		Com_Error( ERR_DROP, "LevelLocals::spawnEntity: no free entities" );
 	}

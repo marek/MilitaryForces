@@ -58,16 +58,16 @@ winding_t	*AllocWinding (int points)
 		c_peak_windings = c_active_windings;
 
 	s = sizeof(vec_t)*3*points + sizeof(int);
-	w = (winding_t *)Z_Malloc (s);
+	w = static_cast<winding_t *>(Z_Malloc (s));
 	Com_Memset (w, 0, s); 
 	return w;
 }
 
 void FreeWinding (winding_t *w)
 {
-	if (*(unsigned *)w == 0xdeaddead)
+	if (*reinterpret_cast<unsigned *>(w) == 0xdeaddead)
 		Com_Error (ERR_FATAL, "FreeWinding: freed a freed winding");
-	*(unsigned *)w = 0xdeaddead;
+	*reinterpret_cast<unsigned *>(w) = 0xdeaddead;
 
 	c_active_windings--;
 	Z_Free (w);

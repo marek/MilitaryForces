@@ -54,7 +54,7 @@ UI_Capture_ListBoxThumb::capture()
 	rectDef_t r;
 	int pos, max;
 
-	listBoxDef_t *listPtr = (listBoxDef_t*)scrollInfo_->item_->typeData;
+	listBoxDef_t *listPtr = static_cast<listBoxDef_t*>(scrollInfo_->item_->typeData);
 	if (scrollInfo_->item_->window.flags & WINDOW_HORIZONTAL) 
 	{
 		if (utils_->dc_->cursorX_ == scrollInfo_->xStart_) 

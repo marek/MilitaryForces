@@ -418,7 +418,7 @@ bool R_GetModeInfo( int *width, int *height, float *windowAspect, int mode ) {
 		pixelAspect = vm->pixelAspect;
 	}
 
-	*windowAspect = (float)*width / ( *height * pixelAspect );
+	*windowAspect = static_cast<float>(*width) / ( *height * pixelAspect );
 
 	return true;
 }
@@ -497,9 +497,9 @@ byte *RB_ReadPixels(int x, int y, int width, int height, size_t *offset, int *pa
 	padwidth = PAD(linelen, packAlign);
 
 	// Allocate a few more bytes so that we can choose an alignment we like
-	buffer = (byte *)ri.Hunk_AllocateTempMemory(padwidth * height + *offset + packAlign - 1);
+	buffer = static_cast<byte *>(ri.Hunk_AllocateTempMemory(padwidth * height + *offset + packAlign - 1));
 
-	bufstart = (byte *)PADP((intptr_t) buffer + *offset, packAlign);
+	bufstart = static_cast<byte *>PADP((intptr_t) buffer + *offset, packAlign);
 	qglReadPixels(x, y, width, height, format, GL_UNSIGNED_BYTE, bufstart);
 
 	linelen = width * 3;
@@ -613,7 +613,7 @@ RB_TakeScreenshotCmd
 const void *RB_TakeScreenshotCmd( const void *data ) {
 	const screenshotCommand_t	*cmd;
 	
-	cmd = (const screenshotCommand_t *)data;
+	cmd = static_cast<const screenshotCommand_t *>(data);
 
 	// finish any 2D drawing if needed
 	if(tess.numIndexes)
@@ -624,7 +624,7 @@ const void *RB_TakeScreenshotCmd( const void *data ) {
 	else
 		RB_TakeScreenshot( cmd->x, cmd->y, cmd->width, cmd->height, cmd->fileName);
 	
-	return (const void *)(cmd + 1);	
+	return reinterpret_cast<const void *>(cmd + 1);	
 }
 
 /*
@@ -636,7 +636,7 @@ void R_TakeScreenshot( int x, int y, int width, int height, char *name, bool jpe
 	static char	fileName[MAX_OSPATH]; // bad things if two screenshots per frame?
 	screenshotCommand_t	*cmd;
 
-	cmd = (screenshotCommand_t *)R_GetCommandBuffer( sizeof( *cmd ) );
+	cmd = static_cast<screenshotCommand_t *>(R_GetCommandBuffer( sizeof( *cmd ) ));
 	if ( !cmd ) {
 		return;
 	}
@@ -726,7 +726,7 @@ void R_LevelShot( ) {
 	allsource = RB_ReadPixels(0, 0, glConfig.vidWidth, glConfig.vidHeight, &offset, &padlen);
 	source = allsource + offset;
 
-	buffer = (byte *)ri.Hunk_AllocateTempMemory(128 * 128*3 + 18);
+	buffer = static_cast<byte *>(ri.Hunk_AllocateTempMemory(128 * 128*3 + 18));
 	Com_Memset (buffer, 0, 18);
 	buffer[2] = 2;		// uncompressed type
 	buffer[12] = 128;
@@ -741,8 +741,8 @@ void R_LevelShot( ) {
 			r = g = b = 0;
 			for ( yy = 0 ; yy < 3 ; yy++ ) {
 				for ( xx = 0 ; xx < 4 ; xx++ ) {
-					src = source + (3 * glConfig.vidWidth + padlen) * (int)((y*3 + yy) * yScale) +
-						3 * (int) ((x*4 + xx) * xScale);
+					src = source + (3 * glConfig.vidWidth + padlen) * static_cast<int>((y*3 + yy) * yScale) +
+						3 * static_cast<int>((x*4 + xx) * xScale);
 					r += src[0];
 					g += src[1];
 					b += src[2];
@@ -897,7 +897,7 @@ void R_ExportCubemaps()
 {
 	exportCubemapsCommand_t	*cmd;
 
-	cmd = (exportCubemapsCommand_t *)R_GetCommandBuffer(sizeof(*cmd));
+	cmd = static_cast<exportCubemapsCommand_t *>(R_GetCommandBuffer(sizeof(*cmd)));
 	if (!cmd) {
 		return;
 	}
@@ -935,7 +935,7 @@ const void *RB_TakeVideoFrameCmd( const void *data )
 	if(tess.numIndexes)
 		RB_EndSurface();
 
-	cmd = (const videoFrameCommand_t *)data;
+	cmd = static_cast<const videoFrameCommand_t *>(data);
 	
 	// OpenGL ES is only required to support reading GL_RGBA
 	if (qglesMajorVersion >= 1) {
@@ -960,7 +960,7 @@ const void *RB_TakeVideoFrameCmd( const void *data )
 	avipadwidth = PAD(avilinelen, AVI_LINE_PADDING);
 	avipadlen = avipadwidth - avilinelen;
 
-	cBuf = (byte *)PADP(cmd->captureBuffer, packAlign);
+	cBuf = static_cast<byte *>PADP(cmd->captureBuffer, packAlign);
 		
 	qglReadPixels(0, 0, cmd->width, cmd->height, format,
 		GL_UNSIGNED_BYTE, cBuf);
@@ -1022,7 +1022,7 @@ const void *RB_TakeVideoFrameCmd( const void *data )
 		ri.CL_WriteAVIVideoFrame(cmd->encodeBuffer, avipadwidth * cmd->height);
 	}
 
-	return (const void *)(cmd + 1);	
+	return reinterpret_cast<const void *>(cmd + 1);	
 }
 
 //============================================================================
@@ -1524,14 +1524,14 @@ void R_Init( ) {
 	{
 		tr.sinTable[i]		= sin( DEG2RAD( i * 360.0f / ( ( float ) ( FUNCTABLE_SIZE - 1 ) ) ) );
 		tr.squareTable[i]	= ( i < FUNCTABLE_SIZE/2 ) ? 1.0f : -1.0f;
-		tr.sawToothTable[i] = (float)i / FUNCTABLE_SIZE;
+		tr.sawToothTable[i] = static_cast<float>(i) / FUNCTABLE_SIZE;
 		tr.inverseSawToothTable[i] = 1.0f - tr.sawToothTable[i];
 
 		if ( i < FUNCTABLE_SIZE / 2 )
 		{
 			if ( i < FUNCTABLE_SIZE / 4 )
 			{
-				tr.triangleTable[i] = ( float ) i / ( FUNCTABLE_SIZE / 4 );
+				tr.triangleTable[i] = static_cast< float>(i) / ( FUNCTABLE_SIZE / 4 );
 			}
 			else
 			{
@@ -1558,10 +1558,10 @@ void R_Init( ) {
 	if (max_polyverts < MAX_POLYVERTS)
 		max_polyverts = MAX_POLYVERTS;
 
-	ptr = (byte *)ri.Hunk_Alloc( sizeof( *backEndData ) + sizeof(srfPoly_t) * max_polys + sizeof(polyVert_t) * max_polyverts, h_low);
-	backEndData = (backEndData_t *) ptr;
-	backEndData->polys = (srfPoly_t *) ((char *) ptr + sizeof( *backEndData ));
-	backEndData->polyVerts = (polyVert_t *) ((char *) ptr + sizeof( *backEndData ) + sizeof(srfPoly_t) * max_polys);
+	ptr = static_cast<byte *>(ri.Hunk_Alloc( sizeof( *backEndData ) + sizeof(srfPoly_t) * max_polys + sizeof(polyVert_t) * max_polyverts, h_low));
+	backEndData = reinterpret_cast<backEndData_t *>(ptr);
+	backEndData->polys = reinterpret_cast<srfPoly_t *>(reinterpret_cast<char *>(ptr) + sizeof( *backEndData ));
+	backEndData->polyVerts = reinterpret_cast<polyVert_t *>(reinterpret_cast<char *>(ptr) + sizeof( *backEndData ) + sizeof(srfPoly_t) * max_polys);
 	R_InitNextFrame();
 
 	InitOpenGL();

@@ -162,14 +162,14 @@ static uint64_t R_DlightSurface( msurface_t *surf, uint64_t dlightBits ) {
 	if ( surf->cullinfo.type & CULLINFO_PLANE )
 	{
 		for ( i = 0 ; i < tr.refdef.num_dlights ; i++ ) {
-			if ( ! ( dlightBits & ( (uint64_t)1 << i ) ) ) {
+			if ( ! ( dlightBits & ( static_cast<uint64_t>(1) << i ) ) ) {
 				continue;
 			}
 			dl = &tr.refdef.dlights[i];
 			d = DotProduct( dl->origin, surf->cullinfo.plane.normal ) - surf->cullinfo.plane.dist;
 			if ( d < -dl->radius || d > dl->radius ) {
 				// dlight doesn't reach the plane
-				dlightBits &= ~( (uint64_t)1 << i );
+				dlightBits &= ~( static_cast<uint64_t>(1) << i );
 			}
 		}
 	}
@@ -177,7 +177,7 @@ static uint64_t R_DlightSurface( msurface_t *surf, uint64_t dlightBits ) {
 	if ( surf->cullinfo.type & CULLINFO_BOX )
 	{
 		for ( i = 0 ; i < tr.refdef.num_dlights ; i++ ) {
-			if ( ! ( dlightBits & ( (uint64_t)1 << i ) ) ) {
+			if ( ! ( dlightBits & ( static_cast<uint64_t>(1) << i ) ) ) {
 				continue;
 			}
 			dl = &tr.refdef.dlights[i];
@@ -188,7 +188,7 @@ static uint64_t R_DlightSurface( msurface_t *surf, uint64_t dlightBits ) {
 				|| dl->origin[2] - dl->radius > surf->cullinfo.bounds[1][2]
 				|| dl->origin[2] + dl->radius < surf->cullinfo.bounds[0][2] ) {
 				// dlight doesn't reach the bounds
-				dlightBits &= ~( (uint64_t)1 << i );
+				dlightBits &= ~( static_cast<uint64_t>(1) << i );
 			}
 		}
 	}
@@ -196,14 +196,14 @@ static uint64_t R_DlightSurface( msurface_t *surf, uint64_t dlightBits ) {
 	if ( surf->cullinfo.type & CULLINFO_SPHERE )
 	{
 		for ( i = 0 ; i < tr.refdef.num_dlights ; i++ ) {
-			if ( ! ( dlightBits & ( (uint64_t)1 << i ) ) ) {
+			if ( ! ( dlightBits & ( static_cast<uint64_t>(1) << i ) ) ) {
 				continue;
 			}
 			dl = &tr.refdef.dlights[i];
 			if (!SpheresIntersect(dl->origin, dl->radius, surf->cullinfo.localOrigin, surf->cullinfo.radius))
 			{
 				// dlight doesn't reach the bounds
-				dlightBits &= ~( (uint64_t)1 << i );
+				dlightBits &= ~( static_cast<uint64_t>(1) << i );
 			}
 		}
 	}
@@ -213,7 +213,7 @@ static uint64_t R_DlightSurface( msurface_t *surf, uint64_t dlightBits ) {
 		case SF_FACE:
 		case SF_GRID:
 		case SF_TRIANGLES:
-			((srfBspSurface_t *)surf->data)->dlightBits = dlightBits;
+			(reinterpret_cast<srfBspSurface_t *>(surf->data))->dlightBits = dlightBits;
 			break;
 
 		default:
@@ -298,7 +298,7 @@ static int R_PshadowSurface( msurface_t *surf, int pshadowBits ) {
 		case SF_FACE:
 		case SF_GRID:
 		case SF_TRIANGLES:
-			((srfBspSurface_t *)surf->data)->pshadowBits = pshadowBits;
+			(reinterpret_cast<srfBspSurface_t *>(surf->data))->pshadowBits = pshadowBits;
 			break;
 
 		default:
@@ -485,15 +485,15 @@ static void R_RecursiveWorldNode( mnode_t *node, uint32_t planeBits, uint64_t dl
 				dlight_t	*dl;
 				float		dist;
 
-				if ( dlightBits & ( (uint64_t)1 << i ) ) {
+				if ( dlightBits & ( static_cast<uint64_t>(1) << i ) ) {
 					dl = &tr.refdef.dlights[i];
 					dist = DotProduct( dl->origin, node->plane->normal ) - node->plane->dist;
 					
 					if ( dist > -dl->radius ) {
-						newDlights[0] |= ( (uint64_t)1 << i );
+						newDlights[0] |= ( static_cast<uint64_t>(1) << i );
 					}
 					if ( dist < dl->radius ) {
-						newDlights[1] |= ( (uint64_t)1 << i );
+						newDlights[1] |= ( static_cast<uint64_t>(1) << i );
 					}
 				}
 			}
@@ -778,12 +778,12 @@ void R_AddWorldSurfaces () {
 	}
 	else if ( !(tr.viewParms.flags & VPF_SHADOWMAP) )
 	{
-		dlightBits = tr.refdef.num_dlights >= 64 ? ~(uint64_t)0 : ( (uint64_t)1 << tr.refdef.num_dlights ) - 1;
+		dlightBits = tr.refdef.num_dlights >= 64 ? ~static_cast<uint64_t>(0) : ( static_cast<uint64_t>(1) << tr.refdef.num_dlights ) - 1;
 		pshadowBits = ( 1ULL << tr.refdef.num_pshadows ) - 1;
 	}
 	else
 	{
-		dlightBits = tr.refdef.num_dlights >= 64 ? ~(uint64_t)0 : ( (uint64_t)1 << tr.refdef.num_dlights ) - 1;
+		dlightBits = tr.refdef.num_dlights >= 64 ? ~static_cast<uint64_t>(0) : ( static_cast<uint64_t>(1) << tr.refdef.num_dlights ) - 1;
 		pshadowBits = 0;
 	}
 

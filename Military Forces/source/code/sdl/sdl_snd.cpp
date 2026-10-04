@@ -20,8 +20,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 
 #ifdef USE_INTERNAL_SDL_HEADERS
 #	include "SDL.h"
@@ -102,7 +102,7 @@ static void SNDDMA_AudioCallback(void *userdata, Uint8 *stream, int len)
 		int i;
 		if (dma.isfloat && (dma.samplebits == 32))
 		{
-			float *ptr = (float *) stream;
+			float *ptr = reinterpret_cast<float *>(stream);
 			len /= sizeof (*ptr);
 			for (i = 0; i < len; i++, ptr++)
 			{
@@ -111,20 +111,20 @@ static void SNDDMA_AudioCallback(void *userdata, Uint8 *stream, int len)
 		}
 		else if (dma.samplebits == 16)
 		{
-			Sint16 *ptr = (Sint16 *) stream;
+			Sint16 *ptr = reinterpret_cast<Sint16 *>(stream);
 			len /= sizeof (*ptr);
 			for (i = 0; i < len; i++, ptr++)
 			{
-				*ptr = (Sint16) (((float) *ptr) * sdlMasterGain);
+				*ptr = static_cast<Sint16>((static_cast<float>(*ptr)) * sdlMasterGain);
 			}
 		}
 		else if (dma.samplebits == 8)
 		{
-			Uint8 *ptr = (Uint8 *) stream;
+			Uint8 *ptr = stream;
 			len /= sizeof (*ptr);
 			for (i = 0; i < len; i++, ptr++)
 			{
-				*ptr = (Uint8) (((float) *ptr) * sdlMasterGain);
+				*ptr = static_cast<Uint8>((static_cast<float>(*ptr)) * sdlMasterGain);
 			}
 		}
 	}
@@ -173,9 +173,9 @@ static void SNDDMA_PrintAudiospec(const char *str, const SDL_AudioSpec *spec)
 		Com_Printf( "  Format:   " S_COLOR_RED "UNKNOWN\n");
 	}
 
-	Com_Printf( "  Freq:     %d\n", (int) spec->freq );
-	Com_Printf( "  Samples:  %d\n", (int) spec->samples );
-	Com_Printf( "  Channels: %d\n", (int) spec->channels );
+	Com_Printf( "  Freq:     %d\n", spec->freq );
+	Com_Printf( "  Samples:  %d\n", static_cast<int>(spec->samples) );
+	Com_Printf( "  Channels: %d\n", static_cast<int>(spec->channels) );
 }
 
 /*
@@ -215,11 +215,11 @@ bool SNDDMA_Init()
 	memset(&desired, '\0', sizeof (desired));
 	memset(&obtained, '\0', sizeof (obtained));
 
-	tmp = ((int) s_sdlBits->value);
+	tmp = (static_cast<int>(s_sdlBits->value));
 	if ((tmp != 16) && (tmp != 8))
 		tmp = 16;
 
-	desired.freq = (int) s_sdlSpeed->value;
+	desired.freq = static_cast<int>(s_sdlSpeed->value);
 	if(!desired.freq) desired.freq = 22050;
 	desired.format = ((tmp == 16) ? AUDIO_S16SYS : AUDIO_U8);
 
@@ -240,7 +240,7 @@ bool SNDDMA_Init()
 			desired.samples = 2048;  // (*shrug*)
 	}
 
-	desired.channels = (int) s_sdlChannels->value;
+	desired.channels = static_cast<int>(s_sdlChannels->value);
 	desired.callback = SNDDMA_AudioCallback;
 
 	sdlPlaybackDevice = SDL_OpenAudioDevice(nullptr, SDL_FALSE, &desired, &obtained, SDL_AUDIO_ALLOW_ANY_CHANGE);
@@ -276,7 +276,7 @@ bool SNDDMA_Init()
 	dma.submission_chunk = 1;
 	dma.speed = obtained.freq;
 	dmasize = (dma.samples * (dma.samplebits/8));
-	dma.buffer = (byte *)calloc(1, dmasize);
+	dma.buffer = static_cast<byte *>(calloc(1, dmasize));
 
 #ifdef USE_SDL_AUDIO_CAPTURE
 	// !!! FIXME: some of these SDL_OpenAudioDevice() values should be cvars.

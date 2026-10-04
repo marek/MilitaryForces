@@ -250,7 +250,7 @@ int Message::readBits( int bits ) {
 			for(i=0;i<bits;i+=8) {
 				Huff_offsetReceive (msgHuff.decompressor.tree, &get, this->data, &this->bit, this->cursize<<3);
 //				fwrite(&get, 1, 1, fp);
-				value = (unsigned int)value | ((unsigned int)get<<(i+nbits));
+				value = static_cast<unsigned int>(value) | (static_cast<unsigned int>(get)<<(i+nbits));
 
 				if (this->bit > this->cursize<<3) {
 					this->readcount = this->cursize + 1;
@@ -339,7 +339,7 @@ void Message::writeString( const char *s ) {
 
 		// get rid of 0x80+ and '%' chars, because old clients don't like them
 		for ( i = 0 ; i < l ; i++ ) {
-			if ( ((byte *)string)[i] > 127 || string[i] == '%' ) {
+			if ( (reinterpret_cast<byte *>(string))[i] > 127 || string[i] == '%' ) {
 				string[i] = '.';
 			}
 		}
@@ -365,7 +365,7 @@ void Message::writeBigString( const char *s ) {
 
 		// get rid of 0x80+ and '%' chars, because old clients don't like them
 		for ( i = 0 ; i < l ; i++ ) {
-			if ( ((byte *)string)[i] > 127 || string[i] == '%' ) {
+			if ( (reinterpret_cast<byte *>(string))[i] > 127 || string[i] == '%' ) {
 				string[i] = '.';
 			}
 		}
@@ -375,7 +375,7 @@ void Message::writeBigString( const char *s ) {
 }
 
 void Message::writeAngle( float f ) {
-	this->writeByte( (int)(f*256/360) & 255);
+	this->writeByte( static_cast<int>(f*256/360) & 255);
 }
 
 void Message::writeAngle16( float f ) {
@@ -393,7 +393,7 @@ void Message::writeAngle16( float f ) {
 int Message::readChar() {
 	int	c;
 	
-	c = (signed char)this->readBits( 8 );
+	c = static_cast<signed char>(this->readBits( 8 ));
 	if ( this->readcount > this->cursize ) {
 		c = -1;
 	}	
@@ -404,7 +404,7 @@ int Message::readChar() {
 int Message::readByte() {
 	int	c;
 	
-	c = (unsigned char)this->readBits( 8 );
+	c = static_cast<unsigned char>(this->readBits( 8 ));
 	if ( this->readcount > this->cursize ) {
 		c = -1;
 	}	
@@ -425,7 +425,7 @@ int Message::lookaheadByte() {
 int Message::readShort() {
 	int	c;
 	
-	c = (short)this->readBits( 16 );
+	c = static_cast<short>(this->readBits( 16 ));
 	if ( this->readcount > this->cursize ) {
 		c = -1;
 	}	
@@ -553,7 +553,7 @@ void Message::readData( void *data, int len ) {
 	int		i;
 
 	for (i=0 ; i<len ; i++) {
-		((byte *)data)[i] = this->readByte();
+		(static_cast<byte *>(data))[i] = this->readByte();
 	}
 }
 
@@ -777,7 +777,7 @@ static bool MSG_QuantizeFloat( int kind, float f, int *q ) {
 	if ( !( v > -( 1 << ( bits - 1 ) ) + 1 && v < ( 1 << ( bits - 1 ) ) - 1 ) ) {
 		return false;
 	}
-	*q = (int)floorf( v + 0.5f );
+	*q = static_cast<int>(floorf( v + 0.5f ));
 	return true;
 }
 
@@ -790,8 +790,8 @@ static bool MSG_FieldSame( const netField_t *field, const int *fromF, const int 
 	if ( field->bits < NETF_POS ) {
 		return false;
 	}
-	return MSG_QuantizeFloat( field->bits, *(const float *)fromF, &a )
-		&& MSG_QuantizeFloat( field->bits, *(const float *)toF, &b ) && a == b;
+	return MSG_QuantizeFloat( field->bits, *reinterpret_cast<const float *>(fromF), &a )
+		&& MSG_QuantizeFloat( field->bits, *reinterpret_cast<const float *>(toF), &b ) && a == b;
 }
 
 // using the stringizing operator to save typing...
@@ -919,8 +919,8 @@ bool Message::writeEntity( struct entityState_s *from, struct entityState_s *to,
 	lc = 0;
 	// build the change vector as bytes so it is endien independent
 	for ( i = 0, field = entityStateFields ; i < numFields ; i++, field++ ) {
-		fromF = (int *)( (byte *)from + field->offset );
-		toF = (int *)( (byte *)to + field->offset );
+		fromF = reinterpret_cast<int *>( reinterpret_cast<byte *>(from) + field->offset );
+		toF = reinterpret_cast<int *>( reinterpret_cast<byte *>(to) + field->offset );
 		if ( ( ( forced >> i ) & 1 ) || !MSG_FieldSame( field, fromF, toF ) ) {
 			lc = i+1;
 		}
@@ -954,8 +954,8 @@ bool Message::writeEntity( struct entityState_s *from, struct entityState_s *to,
 	mask = 0;
 
 	for ( i = 0, field = entityStateFields ; i < lc ; i++, field++ ) {
-		fromF = (int *)( (byte *)from + field->offset );
-		toF = (int *)( (byte *)to + field->offset );
+		fromF = reinterpret_cast<int *>( reinterpret_cast<byte *>(from) + field->offset );
+		toF = reinterpret_cast<int *>( reinterpret_cast<byte *>(to) + field->offset );
 
 		if ( !( ( forced >> i ) & 1 ) && MSG_FieldSame( field, fromF, toF ) ) {
 			this->writeBits( 0, 1 );	// no change
@@ -963,14 +963,14 @@ bool Message::writeEntity( struct entityState_s *from, struct entityState_s *to,
 		}
 
 		this->writeBits( 1, 1 );	// changed
-		mask |= (uint64_t)1 << i;
+		mask |= static_cast<uint64_t>(1) << i;
 
 		if ( field->bits == 0 || field->bits >= NETF_POS ) {
 			// float
 			int		quantized;
 
-			fullFloat = *(float *)toF;
-			trunc = (int)fullFloat;
+			fullFloat = *reinterpret_cast<float *>(toF);
+			trunc = static_cast<int>(fullFloat);
 
 			if (fullFloat == 0.0f) {
 					this->writeBits( 0, 1 );
@@ -1102,8 +1102,8 @@ void Message::readDeltaEntity( entityState_t *from, entityState_t *to, int numbe
 	to->number = number;
 
 	for ( i = 0, field = entityStateFields ; i < lc ; i++, field++ ) {
-		fromF = (int *)( (byte *)from + field->offset );
-		toF = (int *)( (byte *)to + field->offset );
+		fromF = reinterpret_cast<int *>( reinterpret_cast<byte *>(from) + field->offset );
+		toF = reinterpret_cast<int *>( reinterpret_cast<byte *>(to) + field->offset );
 
 		if ( ! this->readBits( 1 ) ) {
 			// no change
@@ -1112,24 +1112,24 @@ void Message::readDeltaEntity( entityState_t *from, entityState_t *to, int numbe
 			if ( field->bits == 0 || field->bits >= NETF_POS ) {
 				// float
 				if ( this->readBits( 1 ) == 0 ) {
-						*(float *)toF = 0.0f; 
+						*reinterpret_cast<float *>(toF) = 0.0f; 
 				} else {
 					if ( this->readBits( 1 ) == 0 ) {
 						if ( field->bits >= NETF_POS && this->readBits( 1 ) == 1 ) {
 							if ( field->bits == NETF_POS ) {
-								*(float *)toF = this->readBits( -NETF_POS_BITS ) / 8.0f;
+								*reinterpret_cast<float *>(toF) = this->readBits( -NETF_POS_BITS ) / 8.0f;
 							} else {
-								*(float *)toF = this->readBits( -NETF_ANG_BITS ) / 64.0f;
+								*reinterpret_cast<float *>(toF) = this->readBits( -NETF_ANG_BITS ) / 64.0f;
 							}
 							if ( print ) {
-								Com_Printf( "%s:%f ", field->name, *(float *)toF );
+								Com_Printf( "%s:%f ", field->name, *reinterpret_cast<float *>(toF) );
 							}
 						} else {
 							// integral float
 							trunc = this->readBits( FLOAT_INT_BITS );
 							// bias to allow equal parts positive and negative
 							trunc -= FLOAT_INT_BIAS;
-							*(float *)toF = trunc; 
+							*reinterpret_cast<float *>(toF) = trunc; 
 							if ( print ) {
 								Com_Printf( "%s:%i ", field->name, trunc );
 							}
@@ -1138,7 +1138,7 @@ void Message::readDeltaEntity( entityState_t *from, entityState_t *to, int numbe
 						// full floating point value
 						*toF = this->readBits( 32 );
 						if ( print ) {
-							Com_Printf( "%s:%f ", field->name, *(float *)toF );
+							Com_Printf( "%s:%f ", field->name, *reinterpret_cast<float *>(toF) );
 						}
 					}
 				}
@@ -1157,8 +1157,8 @@ void Message::readDeltaEntity( entityState_t *from, entityState_t *to, int numbe
 		}
 	}
 	for ( i = lc, field = &entityStateFields[lc] ; i < numFields ; i++, field++ ) {
-		fromF = (int *)( (byte *)from + field->offset );
-		toF = (int *)( (byte *)to + field->offset );
+		fromF = reinterpret_cast<int *>( reinterpret_cast<byte *>(from) + field->offset );
+		toF = reinterpret_cast<int *>( reinterpret_cast<byte *>(to) + field->offset );
 		// no change
 		*toF = *fromF;
 	}
@@ -1272,8 +1272,8 @@ void Message::writeDeltaPlayerstate( struct playerState_s *from, struct playerSt
 
 	lc = 0;
 	for ( i = 0, field = playerStateFields ; i < numFields ; i++, field++ ) {
-		fromF = (int *)( (byte *)from + field->offset );
-		toF = (int *)( (byte *)to + field->offset );
+		fromF = reinterpret_cast<int *>( reinterpret_cast<byte *>(from) + field->offset );
+		toF = reinterpret_cast<int *>( reinterpret_cast<byte *>(to) + field->offset );
 		if ( *fromF != *toF ) {
 			lc = i+1;
 		}
@@ -1284,8 +1284,8 @@ void Message::writeDeltaPlayerstate( struct playerState_s *from, struct playerSt
 	oldsize += numFields - lc;
 
 	for ( i = 0, field = playerStateFields ; i < lc ; i++, field++ ) {
-		fromF = (int *)( (byte *)from + field->offset );
-		toF = (int *)( (byte *)to + field->offset );
+		fromF = reinterpret_cast<int *>( reinterpret_cast<byte *>(from) + field->offset );
+		toF = reinterpret_cast<int *>( reinterpret_cast<byte *>(to) + field->offset );
 
 		if ( *fromF == *toF ) {
 			this->writeBits( 0, 1 );	// no change
@@ -1297,8 +1297,8 @@ void Message::writeDeltaPlayerstate( struct playerState_s *from, struct playerSt
 
 		if ( field->bits == 0 ) {
 			// float
-			fullFloat = *(float *)toF;
-			trunc = (int)fullFloat;
+			fullFloat = *reinterpret_cast<float *>(toF);
+			trunc = static_cast<int>(fullFloat);
 
 			if ( trunc == fullFloat && trunc + FLOAT_INT_BIAS >= 0 && 
 				trunc + FLOAT_INT_BIAS < ( 1 << FLOAT_INT_BITS ) ) {
@@ -1462,8 +1462,8 @@ void Message::readDeltaPlayerstate( playerState_t *from, playerState_t *to ) {
 	}
 
 	for ( i = 0, field = playerStateFields ; i < lc ; i++, field++ ) {
-		fromF = (int *)( (byte *)from + field->offset );
-		toF = (int *)( (byte *)to + field->offset );
+		fromF = reinterpret_cast<int *>( reinterpret_cast<byte *>(from) + field->offset );
+		toF = reinterpret_cast<int *>( reinterpret_cast<byte *>(to) + field->offset );
 
 		if ( ! this->readBits( 1 ) ) {
 			// no change
@@ -1476,7 +1476,7 @@ void Message::readDeltaPlayerstate( playerState_t *from, playerState_t *to ) {
 					trunc = this->readBits( FLOAT_INT_BITS );
 					// bias to allow equal parts positive and negative
 					trunc -= FLOAT_INT_BIAS;
-					*(float *)toF = trunc; 
+					*reinterpret_cast<float *>(toF) = trunc; 
 					if ( print ) {
 						Com_Printf( "%s:%i ", field->name, trunc );
 					}
@@ -1484,7 +1484,7 @@ void Message::readDeltaPlayerstate( playerState_t *from, playerState_t *to ) {
 					// full floating point value
 					*toF = this->readBits( 32 );
 					if ( print ) {
-						Com_Printf( "%s:%f ", field->name, *(float *)toF );
+						Com_Printf( "%s:%f ", field->name, *reinterpret_cast<float *>(toF) );
 					}
 				}
 			} else {
@@ -1497,8 +1497,8 @@ void Message::readDeltaPlayerstate( playerState_t *from, playerState_t *to ) {
 		}
 	}
 	for ( i=lc,field = &playerStateFields[lc];i<numFields; i++, field++) {
-		fromF = (int *)( (byte *)from + field->offset );
-		toF = (int *)( (byte *)to + field->offset );
+		fromF = reinterpret_cast<int *>( reinterpret_cast<byte *>(from) + field->offset );
+		toF = reinterpret_cast<int *>( reinterpret_cast<byte *>(to) + field->offset );
 		// no change
 		*toF = *fromF;
 	}
@@ -1839,8 +1839,8 @@ void MSG_initHuffman() {
 	Huff_Init(&msgHuff);
 	for(i=0;i<256;i++) {
 		for (j=0;j<msg_hData[i];j++) {
-			Huff_addRef(&msgHuff.compressor,	(byte)i);			// Do update
-			Huff_addRef(&msgHuff.decompressor,	(byte)i);			// Do update
+			Huff_addRef(&msgHuff.compressor,	static_cast<byte>(i));			// Do update
+			Huff_addRef(&msgHuff.decompressor,	static_cast<byte>(i));			// Do update
 		}
 	}
 }

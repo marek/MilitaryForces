@@ -2078,7 +2078,7 @@ static void CG_DrawWarmup( ) {
 				cw = GIANT_WIDTH;
 			}
 			CG_DrawStringExt( 320 - w * cw/2, 20,s, colorWhite, 
-					false, true, cw, (int)(cw * 1.5f), 0 );
+					false, true, cw, static_cast<int>(cw * 1.5f), 0 );
 		}
 	} else {
 		if ( cgs.gametype == GT_FFA ) {
@@ -2100,7 +2100,7 @@ static void CG_DrawWarmup( ) {
 			cw = GIANT_WIDTH;
 		}
 		CG_DrawStringExt( 320 - w * cw/2, 25,s, colorWhite, 
-				false, true, cw, (int)(cw * 1.1), 0 );
+				false, true, cw, static_cast<int>(cw * 1.1), 0 );
 	}
 
 	sec = ( sec - cg.time ) / 1000;
@@ -2149,7 +2149,7 @@ static void CG_DrawWarmup( ) {
 
 	w = CG_DrawStrlen( s );
 	CG_DrawStringExt( 320 - w * cw/2, 70, s, colorWhite, 
-			false, true, cw, (int)(cw * 1.5), 0 );
+			false, true, cw, static_cast<int>(cw * 1.5), 0 );
 }
 
 //==================================================================================

@@ -234,7 +234,7 @@ static float PM_CmdScale( usercmd_t *cmd ) {
 
 	total = sqrtf( cmd->forwardmove * cmd->forwardmove
 		+ cmd->rightmove * cmd->rightmove + cmd->upmove * cmd->upmove );
-	scale = (float)pm->ps->speed * max / ( 127.0 * total );
+	scale = static_cast<float>(pm->ps->speed) * max / ( 127.0 * total );
 
 	return scale;
 }

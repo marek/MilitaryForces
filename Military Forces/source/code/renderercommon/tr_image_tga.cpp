@@ -64,7 +64,7 @@ void R_LoadTGA ( const char *name, byte **pic, int *width, int *height)
 	//
 	// load the file
 	//
-	length = ri.FS_ReadFile ( ( char * ) name, &buffer.v);
+	length = ri.FS_ReadFile ( const_cast< char *>(name), &buffer.v);
 	if (!buffer.b || length < 0) {
 		return;
 	}
@@ -127,7 +127,7 @@ void R_LoadTGA ( const char *name, byte **pic, int *width, int *height)
 	}
 
 
-	targa_rgba = (byte *)ri.Malloc (numPixels);
+	targa_rgba = static_cast<byte *>(ri.Malloc (numPixels));
 
 	if (targa_header.id_length != 0)
 	{
@@ -228,7 +228,7 @@ void R_LoadTGA ( const char *name, byte **pic, int *width, int *height)
 						*pixbuf++=blue;
 						*pixbuf++=alphabyte;
 						column++;
-						if (column==(int)columns) { // run spans across rows
+						if (column==static_cast<int>(columns)) { // run spans across rows
 							column=0;
 							if (row>0)
 								row--;
@@ -268,7 +268,7 @@ void R_LoadTGA ( const char *name, byte **pic, int *width, int *height)
 								break;
 						}
 						column++;
-						if (column==(int)columns) { // pixel packet run spans across rows
+						if (column==static_cast<int>(columns)) { // pixel packet run spans across rows
 							column=0;
 							if (row>0)
 								row--;

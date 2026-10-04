@@ -839,7 +839,7 @@ void CL_ParseVoip ( Message *msg, bool ignoreData ) {
 	            written * 2, written, frames);
 
 	if(written > 0)
-		CL_PlayVoip(sender, written, (const byte *) decoded, flags);
+		CL_PlayVoip(sender, written, reinterpret_cast<const byte *>(decoded), flags);
 
 	clc.voipIncomingSequence[sender] = sequence + frames;
 }

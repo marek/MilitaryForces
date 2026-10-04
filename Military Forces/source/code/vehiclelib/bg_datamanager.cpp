@@ -15,24 +15,23 @@ DataManager::getInstance()
 }
 
 DataManager::DataManager()
-{
-}
+= default;
 
 DataManager::~DataManager()
 {
 	// empty the vehicle list, dont forget to delete the vehicles
-	for( size_t i = 0; i < allGameObjects_.size(); ++i )
+	for(auto & allGameObject : allGameObjects_)
 	{
-		delete allGameObjects_[i];
-		allGameObjects_[i] = nullptr;
+		delete allGameObject;
+		allGameObject = nullptr;
 	}
 	allGameObjects_.clear();
 
 	// empty the weapon list, dont forget to delete the weapon
-	for( size_t i = 0; i < allWeapons_.size(); ++i )
+	for(auto & allWeapon : allWeapons_)
 	{
-		delete allWeapons_[i];
-		allWeapons_[i] = nullptr;
+		delete allWeapon;
+		allWeapon = nullptr;
 	}
 	allWeapons_.clear();
 
@@ -91,8 +90,8 @@ DataManager::findWeaponByVehicleNum(const int vehicleNum)
 void
 DataManager::setupAllVehicles()
 {
-	for( size_t i = 0; i < allGameObjects_.size(); ++i )
-		allGameObjects_[i]->setupGameObject();
+	for(auto & allGameObject : allGameObjects_)
+		allGameObject->setupGameObject();
 }
 
 void

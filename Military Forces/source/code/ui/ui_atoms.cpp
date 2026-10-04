@@ -105,7 +105,7 @@ void UI_LoadBestScores(const char *map, int game) {
 	}
 	UI_SetBestScores(&newInfo, false);
 
-	Com_sprintf(fileName, MAX_QPATH, "demos/%s_%d.dm_%d", map, game, (int)Cvar_VariableValue("protocol"));
+	Com_sprintf(fileName, MAX_QPATH, "demos/%s_%d.dm_%d", map, game, static_cast<int>(Cvar_VariableValue("protocol")));
 	uiInfo.demoAvailable = false;
 	if (FS_FOpenFileByMode(fileName, &f, FS_READ) >= 0) {
 		uiInfo.demoAvailable = true;

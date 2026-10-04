@@ -107,10 +107,10 @@ static void copy64(uint32_t *M, byte *in)
 
 	for (i=0;i<16;i++)
 		M[i] =
-			((uint32_t)in[i*4+3] << 24) |
-			((uint32_t)in[i*4+2] << 16) |
-			((uint32_t)in[i*4+1] <<	 8) |
-			((uint32_t)in[i*4+0] <<	 0) ;
+			(static_cast<uint32_t>(in[i*4+3]) << 24) |
+			(static_cast<uint32_t>(in[i*4+2]) << 16) |
+			(static_cast<uint32_t>(in[i*4+1]) <<	 8) |
+			(static_cast<uint32_t>(in[i*4+0]) <<	 0) ;
 }
 
 static void copy4(byte *out,uint32_t x)
@@ -201,7 +201,7 @@ unsigned Com_BlockChecksum (const void *buffer, int length)
 	int				digest[4];
 	unsigned	val;
 
-	mdfour( (byte *)digest, (byte *)buffer, length );
+	mdfour( reinterpret_cast<byte *>(digest), (byte *)buffer, length );
 	
 	val = digest[0] ^ digest[1] ^ digest[2] ^ digest[3];
 

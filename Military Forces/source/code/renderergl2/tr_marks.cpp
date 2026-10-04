@@ -327,7 +327,7 @@ int R_MarkFragments( int numPoints, const vec3_t *points, const vec3_t projectio
 
 		if (*surfaces[i] == SF_GRID) {
 
-			cv = (srfBspSurface_t *) surfaces[i];
+			cv = reinterpret_cast<srfBspSurface_t *>(surfaces[i]);
 			for ( m = 0 ; m < cv->height - 1 ; m++ ) {
 				for ( n = 0 ; n < cv->width - 1 ; n++ ) {
 					// We triangulate the grid and chop all triangles within
@@ -414,7 +414,7 @@ int R_MarkFragments( int numPoints, const vec3_t *points, const vec3_t projectio
 		}
 		else if (*surfaces[i] == SF_FACE) {
 
-			srfBspSurface_t *surf = ( srfBspSurface_t * ) surfaces[i];
+			srfBspSurface_t *surf = reinterpret_cast< srfBspSurface_t *>(surfaces[i]);
 
 			// check the normal of this face
 			if (DotProduct(surf->cullPlane.normal, projectionDir) > -0.5) {
@@ -442,7 +442,7 @@ int R_MarkFragments( int numPoints, const vec3_t *points, const vec3_t projectio
 		}
 		else if(*surfaces[i] == SF_TRIANGLES && r_marksOnTriangleMeshes->integer) {
 
-			srfBspSurface_t *surf = (srfBspSurface_t *) surfaces[i];
+			srfBspSurface_t *surf = reinterpret_cast<srfBspSurface_t *>(surfaces[i]);
 
 			for(k = 0, tri = surf->indexes; k < surf->numIndexes; k += 3, tri += 3)
 			{

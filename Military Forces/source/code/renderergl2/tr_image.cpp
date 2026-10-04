@@ -74,7 +74,7 @@ static long generateHashValue( const char *fname ) {
 		letter = tolower(fname[i]);
 		if (letter =='.') break;				// don't include extension
 		if (letter =='\\') letter = '/';		// damn path names
-		hash+=(long)(letter)*(i+119);
+		hash+=static_cast<long>(letter)*(i+119);
 		i++;
 	}
 	hash &= (FILE_HASH_SIZE-1);
@@ -354,8 +354,8 @@ static void ResampleTexture( byte *in, int inwidth, int inheight, byte *out,
 	}
 
 	for (i=0 ; i<outheight ; i++) {
-		inrow = in + 4*inwidth*(int)((i+0.25)*inheight/outheight);
-		inrow2 = in + 4*inwidth*(int)((i+0.75)*inheight/outheight);
+		inrow = in + 4*inwidth*static_cast<int>((i+0.25)*inheight/outheight);
+		inrow2 = in + 4*inwidth*static_cast<int>((i+0.75)*inheight/outheight);
 		for (j=0 ; j<outwidth ; j++) {
 			pix1 = inrow + p1[j];
 			pix2 = inrow + p2[j];
@@ -1110,7 +1110,7 @@ static void FillInNormalizedZ(const byte *in, byte *out, int width, int height)
 			fny = OffsetByteToFloat(ny);
 			fll = 1.0f - fnx * fnx - fny * fny;
 			if (fll >= 0.0f)
-				fnz = (float)sqrt(fll);
+				fnz = sqrt(fll);
 			else
 				fnz = 0.0f;
 
@@ -1334,7 +1334,7 @@ static void R_MipMapsRGB( byte *in, int inWidth, int inHeight)
 			for (c = 3; c; c--, in++) {
 				total  = (downmipSrgbLookup[*(in)] + downmipSrgbLookup[*(in + 4)]) * 2.0f;
 
-				*out++ = (byte)(powf(total, 1.0f / 2.2f) * 255.0f);
+				*out++ = static_cast<byte>(powf(total, 1.0f / 2.2f) * 255.0f);
 			}
 			*out++ = (*(in) + *(in + 4)) >> 1; in += 5;
 		}
@@ -1352,7 +1352,7 @@ static void R_MipMapsRGB( byte *in, int inWidth, int inHeight)
 				total = downmipSrgbLookup[*(in)]  + downmipSrgbLookup[*(in + 4)]
 				      + downmipSrgbLookup[*(in2)] + downmipSrgbLookup[*(in2 + 4)];
 
-				*out++ = (byte)(powf(total, 1.0f / 2.2f) * 255.0f);
+				*out++ = static_cast<byte>(powf(total, 1.0f / 2.2f) * 255.0f);
 			}
 
 			*out++ = (*(in) + *(in + 4) + *(in2) + *(in2 + 4)) >> 2; in += 5, in2 += 5;
@@ -1524,9 +1524,9 @@ void R_ConvertTextureFormat( const byte *in, int width, int height, GLenum forma
 		{
 			for ( x = 0; x < width; x++, in += 4, out += 2 )
 			{
-				*((unsigned short*)out) = ( (unsigned short)( in[0] >> 3 ) << 11 )
-					    | ( (unsigned short)( in[1] >> 2 ) << 5 )
-					    | ( (unsigned short)( in[2] >> 3 ) << 0 );
+				*(reinterpret_cast<unsigned short*>(out)) = ( static_cast<unsigned short>( in[0] >> 3 ) << 11 )
+					    | ( static_cast<unsigned short>( in[1] >> 2 ) << 5 )
+					    | ( static_cast<unsigned short>( in[2] >> 3 ) << 0 );
 			}
 
 			out += rowPadding;
@@ -1540,10 +1540,10 @@ void R_ConvertTextureFormat( const byte *in, int width, int height, GLenum forma
 		{
 			for ( x = 0; x < width; x++, in += 4, out += 2 )
 			{
-				*((unsigned short*)out) = ( (unsigned short)( in[0] >> 4 ) << 12 )
-					    | ( (unsigned short)( in[1] >> 4 ) << 8 )
-					    | ( (unsigned short)( in[2] >> 4 ) << 4 )
-					    | ( (unsigned short)( in[3] >> 4 ) << 0 );
+				*(reinterpret_cast<unsigned short*>(out)) = ( static_cast<unsigned short>( in[0] >> 4 ) << 12 )
+					    | ( static_cast<unsigned short>( in[1] >> 4 ) << 8 )
+					    | ( static_cast<unsigned short>( in[2] >> 4 ) << 4 )
+					    | ( static_cast<unsigned short>( in[3] >> 4 ) << 0 );
 			}
 
 			out += rowPadding;
@@ -1629,7 +1629,7 @@ static bool RawImage_ScaleToPower2( byte **data, int *inout_width, int *inout_he
 			finalheight >>= 1;
 		}
 
-		*resampledBuffer = (byte *)ri.Hunk_AllocateTempMemory( finalwidth * finalheight * 4 );
+		*resampledBuffer = static_cast<byte *>(ri.Hunk_AllocateTempMemory( finalwidth * finalheight * 4 ));
 
 		if (scaled_width != width || scaled_height != height)
 			ResampleTexture (*data, width, height, *resampledBuffer, scaled_width, scaled_height);
@@ -1662,7 +1662,7 @@ static bool RawImage_ScaleToPower2( byte **data, int *inout_width, int *inout_he
 	{
 		if (data && resampledBuffer)
 		{
-			*resampledBuffer = (byte *)ri.Hunk_AllocateTempMemory( scaled_width * scaled_height * 4 );
+			*resampledBuffer = static_cast<byte *>(ri.Hunk_AllocateTempMemory( scaled_width * scaled_height * 4 ));
 			ResampleTexture (*data, width, height, *resampledBuffer, scaled_width, scaled_height);
 			*data = *resampledBuffer;
 		}
@@ -1926,7 +1926,7 @@ static void RawImage_UploadToRgtc2Texture(GLuint texture, int miplevel, int x, i
 	hBlocks = (height + 3) / 4;
 	size = wBlocks * hBlocks * 16;
 
-	p = compressedData = (byte *)ri.Hunk_AllocateTempMemory(size);
+	p = compressedData = static_cast<byte *>(ri.Hunk_AllocateTempMemory(size));
 	for (iy = 0; iy < height; iy += 4)
 	{
 		int oh = MIN(4, height - iy);
@@ -2033,7 +2033,7 @@ static void RawImage_UploadTexture(GLuint texture, byte *data, int x, int y, int
 
 	if (qglesMajorVersion && rgba8 && (dataFormat != GL_RGBA || dataType != GL_UNSIGNED_BYTE))
 	{
-		formatBuffer = (byte *)ri.Hunk_AllocateTempMemory(4 * width * height);
+		formatBuffer = static_cast<byte *>(ri.Hunk_AllocateTempMemory(4 * width * height));
 	}
 
 	miplevel = 0;
@@ -2049,7 +2049,7 @@ static void RawImage_UploadTexture(GLuint texture, byte *data, int x, int y, int
 		else
 		{
 			if (rgba8 && miplevel != 0 && r_colorMipLevels->integer)
-				R_BlendOverTexture((byte *)data, width * height, mipBlendColors[miplevel]);
+				R_BlendOverTexture(data, width * height, mipBlendColors[miplevel]);
 
 			if (rgba8 && rgtc)
 				RawImage_UploadToRgtc2Texture(texture, miplevel, x, y, width, height, data);
@@ -2186,7 +2186,7 @@ image_t *R_CreateImage2( const char *name, byte *pic, int width, int height, GLe
 		ri.Error( ERR_DROP, "R_CreateImage: MAX_DRAWIMAGES hit");
 	}
 
-	image = tr.images[tr.numImages] = (image_t *)ri.Hunk_Alloc( sizeof( image_t ), h_low );
+	image = tr.images[tr.numImages] = static_cast<image_t *>(ri.Hunk_Alloc( sizeof( image_t ), h_low ));
 	qglGenTextures(1, &image->texnum);
 	tr.numImages++;
 
@@ -2316,7 +2316,7 @@ image_t *R_CreateImage2( const char *name, byte *pic, int width, int height, GLe
 
 	if (textureFilterAnisotropic && !cubemap)
 		qglTextureParameteriEXT(image->texnum, textureTarget, GL_TEXTURE_MAX_ANISOTROPY_EXT,
-			mipmap ? (GLint)Com_Clamp(1, maxAnisotropy, r_ext_max_anisotropy->integer) : 1);
+			mipmap ? static_cast<GLint>(Com_Clamp(1, maxAnisotropy, r_ext_max_anisotropy->integer)) : 1);
 
 	switch(internalFormat)
 	{
@@ -2576,7 +2576,7 @@ image_t	*R_FindImageFile( const char *name, imgType_t type, imgFlags_t flags )
 
 			normalWidth = width;
 			normalHeight = height;
-			normalPic = (byte *)ri.Malloc(width * height * 4);
+			normalPic = static_cast<byte *>(ri.Malloc(width * height * 4));
 			RGBAtoNormal(pic, normalPic, width, height, flags & IMGFLAG_CLAMPTOEDGE);
 
 #if 1
@@ -2670,7 +2670,7 @@ image_t	*R_FindImageFile( const char *name, imgType_t type, imgFlags_t flags )
 			flags &= ~IMGFLAG_MIPMAP;
 	}
 
-	image = R_CreateImage2( ( char * ) name, pic, width, height, picFormat, picNumMips, type, flags, 0 );
+	image = R_CreateImage2( const_cast< char *>(name), pic, width, height, picFormat, picNumMips, type, flags, 0 );
 	ri.Free( pic );
 	return image;
 }
@@ -2706,7 +2706,7 @@ static void R_CreateDlightImage( ) {
 			data[y][x][3] = 255;			
 		}
 	}
-	tr.dlightImage = R_CreateImage("*dlight", (byte *)data, DLIGHT_SIZE, DLIGHT_SIZE, IMGTYPE_COLORALPHA, IMGFLAG_CLAMPTOEDGE, 0 );
+	tr.dlightImage = R_CreateImage("*dlight", reinterpret_cast<byte *>(data), DLIGHT_SIZE, DLIGHT_SIZE, IMGTYPE_COLORALPHA, IMGFLAG_CLAMPTOEDGE, 0 );
 }
 
 
@@ -2723,7 +2723,7 @@ void R_InitFogTable( ) {
 	exp = 0.5;
 
 	for ( i = 0 ; i < FOG_TABLE_SIZE ; i++ ) {
-		d = pow ( (float)i/(FOG_TABLE_SIZE-1), exp );
+		d = pow ( static_cast<float>(i)/(FOG_TABLE_SIZE-1), exp );
 
 		tr.fogTable[i] = d;
 	}
@@ -2759,7 +2759,7 @@ float	R_FogFactor( float s, float t ) {
 		s = 1.0;
 	}
 
-	d = tr.fogTable[ (int)(s * (FOG_TABLE_SIZE-1)) ];
+	d = tr.fogTable[ static_cast<int>(s * (FOG_TABLE_SIZE-1)) ];
 
 	return d;
 }
@@ -2776,7 +2776,7 @@ static void R_CreateFogImage( ) {
 	byte	*data;
 	float	d;
 
-	data = (byte *)ri.Hunk_AllocateTempMemory( FOG_S * FOG_T * 4 );
+	data = static_cast<byte *>(ri.Hunk_AllocateTempMemory( FOG_S * FOG_T * 4 ));
 
 	// S is distance, T is depth
 	for (x=0 ; x<FOG_S ; x++) {
@@ -2789,7 +2789,7 @@ static void R_CreateFogImage( ) {
 			data[(y*FOG_S+x)*4+3] = 255*d;
 		}
 	}
-	tr.fogImage = R_CreateImage("*fog", (byte *)data, FOG_S, FOG_T, IMGTYPE_COLORALPHA, IMGFLAG_CLAMPTOEDGE, 0 );
+	tr.fogImage = R_CreateImage("*fog", data, FOG_S, FOG_T, IMGTYPE_COLORALPHA, IMGFLAG_CLAMPTOEDGE, 0 );
 	ri.Hunk_FreeTempMemory( data );
 }
 
@@ -2826,7 +2826,7 @@ static void R_CreateDefaultImage( ) {
 		data[x][DEFAULT_SIZE-1][2] =
 		data[x][DEFAULT_SIZE-1][3] = 255;
 	}
-	tr.defaultImage = R_CreateImage("*default", (byte *)data, DEFAULT_SIZE, DEFAULT_SIZE, IMGTYPE_COLORALPHA, IMGFLAG_MIPMAP, 0);
+	tr.defaultImage = R_CreateImage("*default", reinterpret_cast<byte *>(data), DEFAULT_SIZE, DEFAULT_SIZE, IMGTYPE_COLORALPHA, IMGFLAG_MIPMAP, 0);
 }
 
 /*
@@ -2842,7 +2842,7 @@ void R_CreateBuiltinImages( ) {
 
 	// we use a solid white image instead of disabling texturing
 	Com_Memset( data, 255, sizeof( data ) );
-	tr.whiteImage = R_CreateImage("*white", (byte *)data, 8, 8, IMGTYPE_COLORALPHA, IMGFLAG_NONE, 0);
+	tr.whiteImage = R_CreateImage("*white", reinterpret_cast<byte *>(data), 8, 8, IMGTYPE_COLORALPHA, IMGFLAG_NONE, 0);
 
 	if (r_dlightMode->integer >= 2)
 	{
@@ -2863,12 +2863,12 @@ void R_CreateBuiltinImages( ) {
 		}
 	}
 
-	tr.identityLightImage = R_CreateImage("*identityLight", (byte *)data, 8, 8, IMGTYPE_COLORALPHA, IMGFLAG_NONE, 0);
+	tr.identityLightImage = R_CreateImage("*identityLight", reinterpret_cast<byte *>(data), 8, 8, IMGTYPE_COLORALPHA, IMGFLAG_NONE, 0);
 
 
 	for(x=0;x<32;x++) {
 		// scratchimage is usually used for cinematic drawing
-		tr.scratchImage[x] = R_CreateImage("*scratch", (byte *)data, DEFAULT_SIZE, DEFAULT_SIZE, IMGTYPE_COLORALPHA, IMGFLAG_PICMIP | IMGFLAG_CLAMPTOEDGE, 0);
+		tr.scratchImage[x] = R_CreateImage("*scratch", reinterpret_cast<byte *>(data), DEFAULT_SIZE, DEFAULT_SIZE, IMGTYPE_COLORALPHA, IMGFLAG_PICMIP | IMGFLAG_CLAMPTOEDGE, 0);
 	}
 
 	R_CreateDlightImage();
@@ -2910,9 +2910,9 @@ void R_CreateBuiltinImages( ) {
 			data[0][0][3] = 255;
 			p = data;
 
-			tr.calcLevelsImage =   R_CreateImage("*calcLevels",    (byte *)p, 1, 1, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, hdrFormat);
-			tr.targetLevelsImage = R_CreateImage("*targetLevels",  (byte *)p, 1, 1, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, hdrFormat);
-			tr.fixedLevelsImage =  R_CreateImage("*fixedLevels",   (byte *)p, 1, 1, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, hdrFormat);
+			tr.calcLevelsImage =   R_CreateImage("*calcLevels",    static_cast<byte *>(p), 1, 1, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, hdrFormat);
+			tr.targetLevelsImage = R_CreateImage("*targetLevels",  static_cast<byte *>(p), 1, 1, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, hdrFormat);
+			tr.fixedLevelsImage =  R_CreateImage("*fixedLevels",   static_cast<byte *>(p), 1, 1, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, hdrFormat);
 		}
 
 		for (x = 0; x < 2; x++)
@@ -3143,7 +3143,7 @@ static char *CommaParse( char **data_p ) {
 			if (c=='\"' || !c)
 			{
 				com_token[len] = 0;
-				*data_p = ( char * ) data;
+				*data_p = data;
 				return com_token;
 			}
 			if (len < MAX_TOKEN_CHARS - 1)
@@ -3168,7 +3168,7 @@ static char *CommaParse( char **data_p ) {
 
 	com_token[len] = 0;
 
-	*data_p = ( char * ) data;
+	*data_p = data;
 	return com_token;
 }
 
@@ -3221,7 +3221,7 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 		return 0;
 	}
 	tr.numSkins++;
-	skin = (skin_t *)ri.Hunk_Alloc( sizeof( skin_t ), h_low );
+	skin = static_cast<skin_t *>(ri.Hunk_Alloc( sizeof( skin_t ), h_low ));
 	tr.skins[hSkin] = skin;
 	Q_strncpyz( skin->name, name, sizeof( skin->name ) );
 	skin->numSurfaces = 0;
@@ -3231,7 +3231,7 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 	// If not a .skin file, load as a single shader
 	if ( strcmp( name + strlen( name ) - 5, ".skin" ) ) {
 		skin->numSurfaces = 1;
-		skin->surfaces = (skinSurface_t *)ri.Hunk_Alloc( sizeof( skinSurface_t ), h_low );
+		skin->surfaces = static_cast<skinSurface_t *>(ri.Hunk_Alloc( sizeof( skinSurface_t ), h_low ));
 		skin->surfaces[0].shader = R_FindShader( name, LIGHTMAP_NONE, true );
 		return hSkin;
 	}
@@ -3289,7 +3289,7 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 	}
 
 	// copy surfaces to skin
-	skin->surfaces = (skinSurface_t *)ri.Hunk_Alloc( skin->numSurfaces * sizeof( skinSurface_t ), h_low );
+	skin->surfaces = static_cast<skinSurface_t *>(ri.Hunk_Alloc( skin->numSurfaces * sizeof( skinSurface_t ), h_low ));
 	memcpy( skin->surfaces, parseSurfaces, skin->numSurfaces * sizeof( skinSurface_t ) );
 
 	return hSkin;
@@ -3307,10 +3307,10 @@ void	R_InitSkins( ) {
 	tr.numSkins = 1;
 
 	// make the default skin have all default shaders
-	skin = tr.skins[0] = (skin_t *)ri.Hunk_Alloc( sizeof( skin_t ), h_low );
+	skin = tr.skins[0] = static_cast<skin_t *>(ri.Hunk_Alloc( sizeof( skin_t ), h_low ));
 	Q_strncpyz( skin->name, "<default skin>", sizeof( skin->name )  );
 	skin->numSurfaces = 1;
-	skin->surfaces = (skinSurface_t *)ri.Hunk_Alloc( sizeof( skinSurface_t ), h_low );
+	skin->surfaces = static_cast<skinSurface_t *>(ri.Hunk_Alloc( sizeof( skinSurface_t ), h_low ));
 	skin->surfaces[0].shader = tr.defaultShader;
 }
 

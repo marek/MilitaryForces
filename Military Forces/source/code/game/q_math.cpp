@@ -158,7 +158,7 @@ int		Q_rand( int *seed ) {
 }
 
 float	Q_random( int *seed ) {
-	return ( Q_rand( seed ) & 0xffff ) / (float)0x10000;
+	return ( Q_rand( seed ) & 0xffff ) / static_cast<float>(0x10000);
 }
 
 float	Q_crandom( int *seed ) {
@@ -224,9 +224,9 @@ void ByteToDir( int b, vec3_t dir ) {
 unsigned ColorBytes3 (float r, float g, float b) {
 	unsigned	i;
 
-	( (byte *)&i )[0] = r * 255;
-	( (byte *)&i )[1] = g * 255;
-	( (byte *)&i )[2] = b * 255;
+	( reinterpret_cast<byte *>(&i) )[0] = r * 255;
+	( reinterpret_cast<byte *>(&i) )[1] = g * 255;
+	( reinterpret_cast<byte *>(&i) )[2] = b * 255;
 
 	return i;
 }
@@ -234,10 +234,10 @@ unsigned ColorBytes3 (float r, float g, float b) {
 unsigned ColorBytes4 (float r, float g, float b, float a) {
 	unsigned	i;
 
-	( (byte *)&i )[0] = r * 255;
-	( (byte *)&i )[1] = g * 255;
-	( (byte *)&i )[2] = b * 255;
-	( (byte *)&i )[3] = a * 255;
+	( reinterpret_cast<byte *>(&i) )[0] = r * 255;
+	( reinterpret_cast<byte *>(&i) )[1] = g * 255;
+	( reinterpret_cast<byte *>(&i) )[2] = b * 255;
+	( reinterpret_cast<byte *>(&i) )[3] = a * 255;
 
 	return i;
 }
@@ -701,7 +701,7 @@ void AnglesSubtract( vec3_t v1, vec3_t v2, vec3_t v3 ) {
 
 
 float	AngleMod(float a) {
-	a = (360.0/65536) * ((int)(a*(65536/360.0)) & 65535);
+	a = (360.0/65536) * (static_cast<int>(a*(65536/360.0)) & 65535);
 	return a;
 }
 
@@ -714,7 +714,7 @@ returns angle normalized to the range [0 <= angle < 360]
 =================
 */
 float AngleNormalize360 ( float angle ) {
-	return (360.0 / 65536) * ((int)(angle * (65536 / 360.0)) & 65535);
+	return (360.0 / 65536) * (static_cast<int>(angle * (65536 / 360.0)) & 65535);
 }
 
 
@@ -916,7 +916,7 @@ vec_t VectorNormalize( vec3_t v ) {
 
 	if ( length ) {
 		/* writing it this way allows gcc to recognize that rsqrt can be used */
-		ilength = 1/(float)sqrt (length);
+		ilength = 1/sqrt (length);
 		/* sqrt(length) = length * (1 / sqrt(length)) */
 		length *= ilength;
 		v[0] *= ilength;
@@ -935,7 +935,7 @@ vec_t VectorNormalize2( const vec3_t v, vec3_t out) {
 	if (length)
 	{
 		/* writing it this way allows gcc to recognize that rsqrt can be used */
-		ilength = 1/(float)sqrt (length);
+		ilength = 1/sqrt (length);
 		/* sqrt(length) = length * (1 / sqrt(length)) */
 		length *= ilength;
 		out[0] = v[0]*ilength;
@@ -1135,7 +1135,7 @@ int Q_isnan( float x )
 	fi.ui &= 0x7FFFFFFF;
 	fi.ui = 0x7F800000 - fi.ui;
 
-	return (int)( (unsigned int)fi.ui >> 31 );
+	return static_cast<int>( fi.ui >> 31 );
 }
 //------------------------------------------------------------------------
 
@@ -1158,10 +1158,10 @@ float Q_acos(float c) {
 	angle = acos(c);
 
 	if (angle > M_PI) {
-		return (float)M_PI;
+		return static_cast<float>(M_PI);
 	}
 	if (angle < -M_PI) {
-		return (float)M_PI;
+		return static_cast<float>(M_PI);
 	}
 	return angle;
 }
@@ -1271,11 +1271,11 @@ Create a random integer
 int RandomInt( int min, int max )
 {
 	// create a fp modifier
-	float modifier = (float)rand()/((float)RAND_MAX+1.0f);
+	float modifier = static_cast<float>(rand())/(static_cast<float>(RAND_MAX)+1.0f);
 	
 	// spread the modifier over the integer range
 	int range = (max - min) + 1;
-	int result = min + (int)(range * modifier);
+	int result = min + static_cast<int>(range * modifier);
 
 	return result;
 }
@@ -1291,11 +1291,11 @@ Create a random float
 float RandomFloat( float min, float max )
 {
 	// create a fp modifier
-	float modifier = (float)rand()/RAND_MAX;
+	float modifier = static_cast<float>(rand())/RAND_MAX;
 
 	// spread the modifier over the integer range
 	float range = (max - min);
-	float result = min + (float)(range * modifier);
+	float result = min + (range * modifier);
 
 	return result;
 }

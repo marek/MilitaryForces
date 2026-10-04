@@ -95,8 +95,8 @@ static bool StringToFilter (char *s, ipFilter_t *f)
 		s++;
 	}
 	
-	f->mask = *(unsigned *)m;
-	f->compare = *(unsigned *)b;
+	f->mask = *reinterpret_cast<unsigned *>(m);
+	f->compare = *reinterpret_cast<unsigned *>(b);
 	
 	return true;
 }
@@ -118,7 +118,7 @@ static void UpdateIPBans ()
 		if (ipFilters[i].compare == 0xffffffff)
 			continue;
 
-		*(unsigned *)b = ipFilters[i].compare;
+		*reinterpret_cast<unsigned *>(b) = ipFilters[i].compare;
 		Com_sprintf( iplist + strlen(iplist), sizeof(iplist) - strlen(iplist), 
 			"%i.%i.%i.%i ", b[0], b[1], b[2], b[3]);
 	}
@@ -151,7 +151,7 @@ bool G_FilterPacket (char *from)
 		i++, p++;
 	}
 	
-	in = *(unsigned *)m;
+	in = *reinterpret_cast<unsigned *>(m);
 
 	for (i=0 ; i<numIPFilters ; i++)
 		if ( (in & ipFilters[i].mask) == ipFilters[i].compare)

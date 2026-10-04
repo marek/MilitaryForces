@@ -89,7 +89,7 @@ byte MuLawEncode(short s) {
 	sign = (s<0)?0:0x80;
 
 	if (s<0) s=-s;
-	adjusted = (long)s << (16-sizeof(short)*8);
+	adjusted = static_cast<long>(s) << (16-sizeof(short)*8);
 	adjusted += 128L + 4L;
 	if (adjusted > 32767) adjusted = 32767;
 	exponent = numBits[(adjusted>>7)&0xff] - 1;
@@ -127,7 +127,7 @@ void encodeWavelet( sfx_t *sfx, short *packets) {
 
 	if (!madeTable) {
 		for (i=0;i<256;i++) {
-			mulawToShort[i] = (float)MuLawDecode((byte)i);
+			mulawToShort[i] = static_cast<float>(MuLawDecode(static_cast<byte>(i)));
 		}
 		madeTable = true;
 	}
@@ -156,12 +156,12 @@ void encodeWavelet( sfx_t *sfx, short *packets) {
 			packets++;
 		}
 		wt1(wksp, size, 1);
-		out = (byte *)chunk->sndChunk;
+		out = reinterpret_cast<byte *>(chunk->sndChunk);
 
 		for(i=0;i<size;i++) {
 			temp = wksp[i];
 			if (temp > 32767) temp = 32767; else if (temp<-32768) temp = -32768;
-			out[i] = MuLawEncode((short)temp);
+			out[i] = MuLawEncode(static_cast<short>(temp));
 		}
 
 		chunk->size = size;
@@ -176,7 +176,7 @@ void decodeWavelet(sndBuffer *chunk, short *to) {
 
 	int size = chunk->size;
 	
-	out = (byte *)chunk->sndChunk;
+	out = reinterpret_cast<byte *>(chunk->sndChunk);
 	for(i=0;i<size;i++) {
 		wksp[i] = mulawToShort[out[i]];
 	}
@@ -198,7 +198,7 @@ void encodeMuLaw( sfx_t *sfx, short *packets) {
 
 	if (!madeTable) {
 		for (i=0;i<256;i++) {
-			mulawToShort[i] = (float)MuLawDecode((byte)i);
+			mulawToShort[i] = static_cast<float>(MuLawDecode(static_cast<byte>(i)));
 		}
 		madeTable = true;
 	}
@@ -220,7 +220,7 @@ void encodeMuLaw( sfx_t *sfx, short *packets) {
 			chunk->next = newchunk;
 		}
 		chunk = newchunk;
-		out = (byte *)chunk->sndChunk;
+		out = reinterpret_cast<byte *>(chunk->sndChunk);
 		for(i=0; i<size; i++) {
 			poop = packets[0]+grade;
 			if (poop>32767) {
@@ -228,7 +228,7 @@ void encodeMuLaw( sfx_t *sfx, short *packets) {
 			} else if (poop<-32768) {
 				poop = -32768;
 			}
-			out[i] = MuLawEncode((short)poop);
+			out[i] = MuLawEncode(static_cast<short>(poop));
 			grade = poop - mulawToShort[out[i]];
 			packets++;
 		}
@@ -243,7 +243,7 @@ void decodeMuLaw(sndBuffer *chunk, short *to) {
 
 	int size = chunk->size;
 	
-	out = (byte *)chunk->sndChunk;
+	out = reinterpret_cast<byte *>(chunk->sndChunk);
 	for(i=0;i<size;i++) {
 		to[i] = mulawToShort[out[i]];
 	}

@@ -74,12 +74,12 @@ void R_LoadPCX ( const char *filename, byte **pic, int *width, int *height)
 	//
 	// load the file
 	//
-	len = ri.FS_ReadFile( ( char * ) filename, &raw.v);
+	len = ri.FS_ReadFile( const_cast< char *>(filename), &raw.v);
 	if (!raw.b || len < 0) {
 		return;
 	}
 
-	if((unsigned)len < sizeof(pcx_t))
+	if(static_cast<unsigned>(len) < sizeof(pcx_t))
 	{
 		ri.Printf (PRINT_ALL, "PCX truncated: %s\n", filename);
 		ri.FS_FreeFile (raw.v);
@@ -89,7 +89,7 @@ void R_LoadPCX ( const char *filename, byte **pic, int *width, int *height)
 	//
 	// parse the PCX file
 	//
-	pcx = (pcx_t *)raw.b;
+	pcx = reinterpret_cast<pcx_t *>(raw.b);
 	end = raw.b+len;
 
 	w = LittleShort(pcx->xmax)+1;
@@ -108,7 +108,7 @@ void R_LoadPCX ( const char *filename, byte **pic, int *width, int *height)
 		return;
 	}
 
-	pix = pic8 = (byte *)ri.Malloc ( size );
+	pix = pic8 = static_cast<byte *>(ri.Malloc ( size ));
 
 	raw.b = pcx->data;
 	// FIXME: should use bytes_per_line but original q3 didn't do that either
@@ -142,7 +142,7 @@ void R_LoadPCX ( const char *filename, byte **pic, int *width, int *height)
 		ri.Free (pic8);
 	}
 
-	if (raw.b-(byte*)pcx >= end - (byte*)769 || end[-769] != 0x0c)
+	if (raw.b-reinterpret_cast<byte*>(pcx) >= end - (byte*)769 || end[-769] != 0x0c)
 	{
 		ri.Printf (PRINT_ALL, "PCX missing palette: %s\n", filename);
 		ri.FS_FreeFile (pcx);
@@ -152,7 +152,7 @@ void R_LoadPCX ( const char *filename, byte **pic, int *width, int *height)
 
 	palette = end-768;
 
-	pix = out = (byte *)ri.Malloc(4 * size );
+	pix = out = static_cast<byte *>(ri.Malloc(4 * size ));
 	for (i = 0 ; i < size ; i++)
 	{
 		unsigned char p = pic8[i];

@@ -102,17 +102,17 @@ UI_HashUtils::UI_HashUtils()
 
 UI_HashUtils::~UI_HashUtils()
 {
-	for( KeywordMapIter it = itemKeywords_.begin(); it != itemKeywords_.end(); ++it )
+	for(auto & itemKeyword : itemKeywords_)
 	{
-		delete ((*it).second);
-		(*it).second = 0;
+		delete (itemKeyword.second);
+		itemKeyword.second = 0;
 	}
 	itemKeywords_.clear();
 
-	for( KeywordMapIter it = menuKeywords_.begin(); it != menuKeywords_.end(); ++it )
+	for(auto & menuKeyword : menuKeywords_)
 	{
-		delete ((*it).second);
-		(*it).second = 0;
+		delete (menuKeyword.second);
+		menuKeyword.second = 0;
 	}
 	menuKeywords_.clear();
 }

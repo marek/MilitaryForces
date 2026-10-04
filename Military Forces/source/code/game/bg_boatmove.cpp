@@ -45,7 +45,7 @@ PM_BoatAccelerate
 static void PM_BoatAccelerate()
 {
     float	topspeed = availableVehicles[pm->vehicle].maxspeed;
-    float	currspeed = (float)pm->ps->speed/10;
+    float	currspeed = static_cast<float>(pm->ps->speed)/10;
 	float	maxthrottle = availableVehicles[pm->vehicle].maxthrottle;
 	float	minthrottle = availableVehicles[pm->vehicle].minthrottle;
     float	throttle = pm->ps->fixed_throttle;
@@ -133,7 +133,7 @@ void PM_BoatMove( )
 	PM_BoatAccelerate();
 
 	// speed
-	speed = (float)pm->ps->speed/10;
+	speed = static_cast<float>(pm->ps->speed)/10;
 	VectorCopy( pm->ps->vehicleAngles, vehdir );
 	vehdir[0] = 0;
 	if( pm->ps->ONOFF & OO_STALLED ) {
@@ -156,13 +156,13 @@ void PM_BoatMove( )
 
 	// set the hull angle dependent on speed
 	if( !reverse ) {
-		pm->ps->vehicleAngles[0] = (speed/(float)availableVehicles[pm->vehicle].maxspeed) *
+		pm->ps->vehicleAngles[0] = (speed/static_cast<float>(availableVehicles[pm->vehicle].maxspeed)) *
 				availableVehicles[pm->vehicle].tailangle;
 		if( smove > 0 ) {
-			lean = (speed/(float)availableVehicles[pm->vehicle].maxspeed) *
+			lean = (speed/static_cast<float>(availableVehicles[pm->vehicle].maxspeed)) *
 				availableVehicles[pm->vehicle].gearheight;
 		} else if( smove < 0 ) {
-			lean = -(speed/(float)availableVehicles[pm->vehicle].maxspeed) *
+			lean = -(speed/static_cast<float>(availableVehicles[pm->vehicle].maxspeed)) *
 				availableVehicles[pm->vehicle].gearheight;
 		}
 

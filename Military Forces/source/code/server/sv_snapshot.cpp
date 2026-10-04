@@ -67,8 +67,8 @@ static int SV_EntityUpdateBits( entityState_t *from, entityState_t *to, bool cre
 
 static int QDECL SV_QsortSnapshotCandidates( const void *a, const void *b ) 
 {
-	const snapshotCandidate_t	*ca = (const snapshotCandidate_t *)a;
-	const snapshotCandidate_t	*cb = (const snapshotCandidate_t *)b;
+	const snapshotCandidate_t	*ca = static_cast<const snapshotCandidate_t *>(a);
+	const snapshotCandidate_t	*cb = static_cast<const snapshotCandidate_t *>(b);
 
 	if ( ca->priority > cb->priority ) {
 		return -1;
@@ -713,7 +713,7 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin,
 			{
 				vec3_t dir;
 				VectorSubtract(ent->s.origin, origin, dir);
-				if ( VectorLengthSquared(dir) > (float) ent->s.generic1 * ent->s.generic1 ) 
+				if ( VectorLengthSquared(dir) > static_cast<float>(ent->s.generic1) * ent->s.generic1 ) 
 					continue;
 			}
 			SV_AddEntitiesVisibleFromPoint( ent->s.origin2, frame, eNums, true );
@@ -798,7 +798,7 @@ static void SV_BuildClientSnapshot( SV_Client *client )
 	// all of them to make it a mask vector, which is what the renderer wants
 	for ( i = 0 ; i < MAX_MAP_AREA_BYTES/4 ; i++ ) 
 	{
-		((int *)frame->areabits_)[i] = ((int *)frame->areabits_)[i] ^ -1;
+		(reinterpret_cast<int *>(frame->areabits_))[i] = (reinterpret_cast<int *>(frame->areabits_))[i] ^ -1;
 	}
 
 	// copy the entity states out
@@ -847,7 +847,7 @@ static void SV_WriteVoipToClient(SV_Client *cl, Message *msg)
 
         			msg->writeByte( svc_voipOpus);
         			msg->writeShort( packet->sender);
-	        		msg->writeByte( (byte) packet->generation);
+	        		msg->writeByte( static_cast<byte>(packet->generation));
 		        	msg->writeLong( packet->sequence);
 		        	msg->writeByte( packet->frames);
         			msg->writeShort( packet->len);

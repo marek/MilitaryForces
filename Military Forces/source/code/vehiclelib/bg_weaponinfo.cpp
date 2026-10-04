@@ -44,8 +44,7 @@ WeaponInfo::WeaponInfo() :
 }
 
 WeaponInfo::~WeaponInfo()
-{
-}
+= default;
 
 WeaponInfo*
 WeaponInfo::createWeapon()

@@ -130,7 +130,7 @@ vao_t *R_CreateVao(const char *name, byte *vertexes, int vertexesSize, byte *ind
 
 	R_IssuePendingRenderCommands();
 
-	vao = tr.vaos[tr.numVaos] = (vao_t *)ri.Hunk_Alloc(sizeof(*vao), h_low);
+	vao = tr.vaos[tr.numVaos] = static_cast<vao_t *>(ri.Hunk_Alloc(sizeof(*vao), h_low));
 	tr.numVaos++;
 
 	memset(vao, 0, sizeof(*vao));
@@ -198,7 +198,7 @@ vao_t *R_CreateVao2(const char *name, int numVertexes, srfVert_t *verts, int num
 
 	R_IssuePendingRenderCommands();
 
-	vao = tr.vaos[tr.numVaos] = (vao_t *)ri.Hunk_Alloc(sizeof(*vao), h_low);
+	vao = tr.vaos[tr.numVaos] = static_cast<vao_t *>(ri.Hunk_Alloc(sizeof(*vao), h_low));
 	tr.numVaos++;
 
 	memset(vao, 0, sizeof(*vao));
@@ -264,7 +264,7 @@ vao_t *R_CreateVao2(const char *name, int numVertexes, srfVert_t *verts, int num
 
 	// create VBO
 	dataSize *= numVertexes;
-	data = (byte *)ri.Hunk_AllocateTempMemory(dataSize);
+	data = static_cast<byte *>(ri.Hunk_AllocateTempMemory(dataSize));
 	dataOfs = 0;
 
 	for (i = 0; i < numVertexes; i++)
@@ -755,7 +755,7 @@ void VaoCache_Commit()
 	{
 		srfVert_t *dstVertex = vcq.vertexes;
 		vaoCacheGlIndex_t *dstIndex = vcq.indexes;
-		unsigned short *dstIndexUshort = (unsigned short *)vcq.indexes;
+		unsigned short *dstIndexUshort = reinterpret_cast<unsigned short *>(vcq.indexes);
 
 		batchLength = vc.batchLengths + vc.numBatches;
 		*batchLength = vcq.numSurfaces;

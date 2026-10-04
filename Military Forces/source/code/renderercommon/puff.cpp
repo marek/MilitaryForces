@@ -69,7 +69,7 @@
  * 1.8   9 Jan 2004     - Added some comments on no distance codes case
  */
 
-#include <setjmp.h>             /* for setjmp(), longjmp(), and jmp_buf */
+#include <csetjmp>             /* for setjmp(), longjmp(), and jmp_buf */
 #include "puff.h"		/* prototype for puff() */
 
 #define local static            /* for local function definitions */
@@ -121,16 +121,16 @@ local int32_t bits(struct state *s, int32_t need)
     val = s->bitbuf;
     while (s->bitcnt < need) {
         if (s->incnt == s->inlen) longjmp(s->env, 1);   /* out of input */
-        val |= (int32_t)(s->in[s->incnt++]) << s->bitcnt;  /* load eight bits */
+        val |= static_cast<int32_t>(s->in[s->incnt++]) << s->bitcnt;  /* load eight bits */
         s->bitcnt += 8;
     }
 
     /* drop need bits and update buffer, always zero to seven bits left */
-    s->bitbuf = (int32_t)(val >> need);
+    s->bitbuf = (val >> need);
     s->bitcnt -= need;
 
     /* return need bits, zeroing the bits above that */
-    return (int32_t)(val & ((1L << need) - 1));
+    return static_cast<int32_t>(val & ((1L << need) - 1));
 }
 
 /*

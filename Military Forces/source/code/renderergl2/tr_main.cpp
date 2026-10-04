@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "tr_local.h"
 
-#include <string.h> // memcpy
+#include <cstring> // memcpy
 
 trGlobals_t		tr;
 
@@ -461,8 +461,8 @@ void R_TransformClipToWindow( const vec4_t clip, const viewParms_t *view, vec4_t
 	window[1] = 0.5f * ( 1.0f + normalized[1] ) * view->viewportHeight;
 	window[2] = normalized[2];
 
-	window[0] = (int) ( window[0] + 0.5 );
-	window[1] = (int) ( window[1] + 0.5 );
+	window[0] = static_cast<int>( window[0] + 0.5 );
+	window[1] = static_cast<int>( window[1] + 0.5 );
 }
 
 
@@ -982,10 +982,10 @@ void R_PlaneForSurface (surfaceType_t *surfType, cplane_t *plane) {
 	}
 	switch (*surfType) {
 	case SF_FACE:
-		*plane = ((srfBspSurface_t *)surfType)->cullPlane;
+		*plane = (reinterpret_cast<srfBspSurface_t *>(surfType))->cullPlane;
 		return;
 	case SF_TRIANGLES:
-		tri = (srfBspSurface_t *)surfType;
+		tri = reinterpret_cast<srfBspSurface_t *>(surfType);
 		v1 = tri->verts + tri->indexes[0];
 		v2 = tri->verts + tri->indexes[1];
 		v3 = tri->verts + tri->indexes[2];
@@ -994,7 +994,7 @@ void R_PlaneForSurface (surfaceType_t *surfType, cplane_t *plane) {
 		plane->dist = plane4[3];
 		return;
 	case SF_POLY:
-		poly = (srfPoly_t *)surfType;
+		poly = reinterpret_cast<srfPoly_t *>(surfType);
 		PlaneFromPoints( plane4, poly->verts[0].xyz, poly->verts[1].xyz, poly->verts[2].xyz );
 		VectorCopy( plane4, plane->normal ); 
 		plane->dist = plane4[3];
@@ -1206,7 +1206,7 @@ static bool SurfIsOffscreen( const drawSurf_t *drawSurf, vec4_t clipDest[128] ) 
 	int pshadowed;
 	vec4_t clip, eye;
 	int i;
-	unsigned int pointAnd = (unsigned int)~0;
+	unsigned int pointAnd = static_cast<unsigned int>(~0);
 
 	R_RotateForViewer();
 
@@ -1411,7 +1411,7 @@ static ID_INLINE void R_Radix( int offset, int size, drawSurf_t *source, drawSur
   unsigned char *sortKey = nullptr;
   unsigned char *end = nullptr;
 
-  sortKey = ( (unsigned char *)&source[ 0 ].sort ) + offset;
+  sortKey = ( reinterpret_cast<unsigned char *>(&source[ 0 ].sort) ) + offset;
   end = sortKey + ( size * sizeof( drawSurf_t ) );
   for( ; sortKey < end; sortKey += sizeof( drawSurf_t ) )
     ++count[ *sortKey ];
@@ -1421,7 +1421,7 @@ static ID_INLINE void R_Radix( int offset, int size, drawSurf_t *source, drawSur
   for( i = 1; i < 256; ++i )
     index[ i ] = index[ i - 1 ] + count[ i - 1 ];
 
-  sortKey = ( (unsigned char *)&source[ 0 ].sort ) + offset;
+  sortKey = ( reinterpret_cast<unsigned char *>(&source[ 0 ].sort) ) + offset;
   for( i = 0; i < size; ++i, sortKey += sizeof( drawSurf_t ) )
     dest[ index[ *sortKey ]++ ] = source[ i ];
 }
@@ -1469,9 +1469,9 @@ void R_AddDrawSurf( surfaceType_t *surface, shader_t *shader,
 	index = tr.refdef.numDrawSurfs & DRAWSURF_MASK;
 	// the sort data is packed into a single 64 bit value so it can be
 	// compared quickly during the qsorting process
-	tr.refdef.drawSurfs[index].sort = ((uint64_t)shader->sortedIndex << QSORT_SHADERNUM_SHIFT) 
+	tr.refdef.drawSurfs[index].sort = (static_cast<uint64_t>(shader->sortedIndex) << QSORT_SHADERNUM_SHIFT) 
 		| tr.shiftedEntityNum | ( fogIndex << QSORT_FOGNUM_SHIFT ) 
-		| ((int)pshadowMap << QSORT_PSHADOW_SHIFT) | (int)dlightMap;
+		| (pshadowMap << QSORT_PSHADOW_SHIFT) | dlightMap;
 	tr.refdef.drawSurfs[index].cubemapIndex = cubemap;
 	tr.refdef.drawSurfs[index].surface = surface;
 	tr.refdef.numDrawSurfs++;
@@ -1790,7 +1790,7 @@ void R_RenderDlightCubemaps(const refdef_t *fd)
 		int j;
 
 		// use previous frame to determine visible dlights
-		if (((uint64_t)1 << i) & tr.refdef.dlightMask)
+		if ((static_cast<uint64_t>(1) << i) & tr.refdef.dlightMask)
 			continue;
 
 		Com_Memset( &shadowParms, 0, sizeof( shadowParms ) );
@@ -1905,9 +1905,9 @@ void R_RenderPshadowMaps(const refdef_t *fd)
 				case MOD_MDR:
 				{
 					// FIXME: never actually tested this
-					mdrHeader_t *header = (mdrHeader_t *)model->modelData;
+					mdrHeader_t *header = static_cast<mdrHeader_t *>(model->modelData);
 					int frameSize = (size_t)( &((mdrFrame_t *)nullptr)->bones[ header->numBones ] );
-					mdrFrame_t *frame = ( mdrFrame_t * ) ( ( byte * ) header + header->ofsFrames + frameSize * ent->e.frame);
+					mdrFrame_t *frame = reinterpret_cast< mdrFrame_t *>( reinterpret_cast< byte *>(header) + header->ofsFrames + frameSize * ent->e.frame);
 
 					radius = frame->radius;
 				}
@@ -1915,7 +1915,7 @@ void R_RenderPshadowMaps(const refdef_t *fd)
 				case MOD_IQM:
 				{
 					// FIXME: never actually tested this
-					iqmData_t *data = (iqmData_t *)model->modelData;
+					iqmData_t *data = static_cast<iqmData_t *>(model->modelData);
 					vec3_t diag;
 					float *framebounds;
 
@@ -2218,7 +2218,7 @@ void R_RenderSunShadowMaps(const refdef_t *fd, int level)
 	if (r_forceSun->integer == 2)
 	{
 		int scale = 32768;
-		float angle = (fd->time % scale) / (float)scale * M_PI;
+		float angle = (fd->time % scale) / static_cast<float>(scale) * M_PI;
 		lightDir[0] = cos(angle);
 		lightDir[1] = sin(35.0f * M_PI / 180.0f);
 		lightDir[2] = sin(angle) * cos(35.0f * M_PI / 180.0f);

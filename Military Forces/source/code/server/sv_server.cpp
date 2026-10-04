@@ -21,17 +21,16 @@ Server::Server() :
 	restartTime_(0),
 	time_(0)
 {
-	for( int i = 0; i < MAX_MODELS; ++i )
-		models_[i] = nullptr;
+	for(auto & model : models_)
+		model = nullptr;
 
-	for( int i = 0; i < MAX_CONFIGSTRINGS; ++i )
-		configstrings_[i] = nullptr;
+	for(auto & configstring : configstrings_)
+		configstring = nullptr;
 
 }
 
 Server::~Server()
-{
-}
+= default;
 
 void
 Server::clear()
@@ -130,8 +129,7 @@ ServerStatic::ServerStatic() :
 }
 
 ServerStatic::~ServerStatic()
-{
-}
+= default;
 
 ServerStatic&
 ServerStatic::getInstance()
@@ -163,12 +161,12 @@ ServerStatic::clear()
 void
 ServerStatic::clearClients()
 {
-	for( size_t i = 0; i < svClients_.size(); ++i )
+	for(auto & svClient : svClients_)
 	{
-		if( svClients_.at(i) )
-			SV_FreeClient( svClients_.at(i) );
-		delete svClients_.at(i);
-		svClients_.at(i) = nullptr;
+		if( svClient )
+			SV_FreeClient( svClient );
+		delete svClient;
+		svClient = nullptr;
 	}
 	svClients_.clear();
 }
@@ -180,9 +178,9 @@ ServerStatic::initClients( int numClients )
 		clearClients();
 
 	svClients_.resize( numClients + 1 );
-	for( size_t i = 0; i < svClients_.size(); ++i )
+	for(auto & svClient : svClients_)
 	{
-		svClients_.at(i) = nullptr;
+		svClient = nullptr;
 	}
 }
 

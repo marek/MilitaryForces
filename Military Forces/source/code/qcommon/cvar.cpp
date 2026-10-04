@@ -49,7 +49,7 @@ static long generateHashValue( const char *fname ) {
 	i = 0;
 	while (fname[i] != '\0') {
 		letter = tolower(fname[i]);
-		hash+=(long)(letter)*(i+119);
+		hash+=static_cast<long>(letter)*(i+119);
 		i++;
 	}
 	hash &= (FILE_HASH_SIZE-1);
@@ -224,7 +224,7 @@ static const char *Cvar_Validate( cvar_t *var,
 				if( warn )
 					Com_Printf( "WARNING: cvar '%s' must be integral", var->name );
 
-				valuef = (int)valuef;
+				valuef = static_cast<int>(valuef);
 				changed = true;
 			}
 		}
@@ -248,7 +248,7 @@ static const char *Cvar_Validate( cvar_t *var,
 				Com_Printf( "WARNING: cvar '%s'", var->name );
 
 			if( Q_isintegral( var->min ) )
-				Com_Printf( " out of range (min %d)", (int)var->min );
+				Com_Printf( " out of range (min %d)", static_cast<int>(var->min) );
 			else
 				Com_Printf( " out of range (min %f)", var->min );
 		}
@@ -266,7 +266,7 @@ static const char *Cvar_Validate( cvar_t *var,
 				Com_Printf( "WARNING: cvar '%s'", var->name );
 
 			if( Q_isintegral( var->max ) )
-				Com_Printf( " out of range (max %d)", (int)var->max );
+				Com_Printf( " out of range (max %d)", static_cast<int>(var->max) );
 			else
 				Com_Printf( " out of range (max %f)", var->max );
 		}
@@ -279,10 +279,10 @@ static const char *Cvar_Validate( cvar_t *var,
 	{
 		if( Q_isintegral( valuef ) )
 		{
-			Com_sprintf( s, sizeof( s ), "%d", (int)valuef );
+			Com_sprintf( s, sizeof( s ), "%d", static_cast<int>(valuef) );
 
 			if( warn )
-				Com_Printf( ", setting to %d\n", (int)valuef );
+				Com_Printf( ", setting to %d\n", static_cast<int>(valuef) );
 		}
 		else
 		{
@@ -668,8 +668,8 @@ Cvar_SetValue
 void Cvar_SetValue( const char *var_name, float value) {
 	char	val[32];
 
-	if ( value == (int)value ) {
-		Com_sprintf (val, sizeof(val), "%i",(int)value);
+	if ( value == static_cast<int>(value) ) {
+		Com_sprintf (val, sizeof(val), "%i",static_cast<int>(value));
 	} else {
 		Com_sprintf (val, sizeof(val), "%f",value);
 	}
@@ -686,7 +686,7 @@ void Cvar_SetValueSafe( const char *var_name, float value )
 	char val[32];
 
 	if( Q_isintegral( value ) )
-		Com_sprintf( val, sizeof(val), "%i", (int)value );
+		Com_sprintf( val, sizeof(val), "%i", static_cast<int>(value) );
 	else
 		Com_sprintf( val, sizeof(val), "%f", value );
 	Cvar_SetSafe( var_name, val );
@@ -1388,7 +1388,7 @@ void	Cvar_Update( vmCvar_t *vmCvar ) {
 	cvar_t	*cv = nullptr;
 	assert(vmCvar);
 
-	if ( (unsigned)vmCvar->handle >= cvar_numIndexes ) {
+	if ( static_cast<unsigned>(vmCvar->handle) >= cvar_numIndexes ) {
 		Com_Error( ERR_DROP, "Cvar_Update: handle out of range" );
 	}
 
@@ -1404,7 +1404,7 @@ void	Cvar_Update( vmCvar_t *vmCvar ) {
 	if ( strlen(cv->string)+1 > MAX_CVAR_VALUE_STRING ) 
 	  Com_Error( ERR_DROP, "Cvar_Update: src %s length %u exceeds MAX_CVAR_VALUE_STRING",
 		     cv->string, 
-		     (unsigned int) strlen(cv->string));
+		     static_cast<unsigned int>(strlen(cv->string)));
 	Q_strncpyz( vmCvar->string, cv->string,  MAX_CVAR_VALUE_STRING ); 
 
 	vmCvar->value = cv->value;

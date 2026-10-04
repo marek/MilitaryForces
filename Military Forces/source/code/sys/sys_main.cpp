@@ -20,16 +20,16 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-#include <signal.h>
-#include <stdlib.h>
-#include <limits.h>
+#include <csignal>
+#include <cstdlib>
+#include <climits>
 #include <sys/types.h>
-#include <stdarg.h>
-#include <stdio.h>
+#include <cstdarg>
+#include <cstdio>
 #include <sys/stat.h>
-#include <string.h>
-#include <ctype.h>
-#include <errno.h>
+#include <cstring>
+#include <cctype>
+#include <cerrno>
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten/emscripten.h>
@@ -156,7 +156,7 @@ char *Sys_GetClipboardData()
 		if ( cliptext[0] != '\0' ) {
 			size_t bufsize = strlen( cliptext ) + 1;
 
-			data = (char *)Z_Malloc( bufsize );
+			data = static_cast<char *>(Z_Malloc( bufsize ));
 			Q_strncpyz( data, cliptext, bufsize );
 
 			// find first listed char and set to '\0'
@@ -338,7 +338,7 @@ Sys_GetProcessorFeatures
 */
 cpuFeatures_t Sys_GetProcessorFeatures( )
 {
-	cpuFeatures_t features = (cpuFeatures_t)0;
+	cpuFeatures_t features = static_cast<cpuFeatures_t>(0);
 
 #ifndef DEDICATED
 	if( SDL_HasRDTSC( ) )      features |= CF_RDTSC;

@@ -22,9 +22,7 @@ ClientGame::ClientGame() :
 }
 
 ClientGame::~ClientGame()
-{
-
-}
+= default;
 
 ClientGame&
 ClientGame::getInstance()

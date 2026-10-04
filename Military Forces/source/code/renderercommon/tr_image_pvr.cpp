@@ -186,8 +186,8 @@ static byte *decode(pvr_t *pvr, int offset, bool detwiddle, pvr_pixel_func_t pix
 	unsigned int *rgba32;
 	byte *ret;
 
-	ret = (byte *)ri.Malloc(pvr->width * pvr->height * sizeof(unsigned int));
-	rgba32 = (unsigned int *)ret;
+	ret = static_cast<byte *>(ri.Malloc(pvr->width * pvr->height * sizeof(unsigned int)));
+	rgba32 = reinterpret_cast<unsigned int *>(ret);
 
 	for (y = 0; y < pvr->height; y++)
 	{
@@ -206,7 +206,7 @@ static byte *decode(pvr_t *pvr, int offset, bool detwiddle, pvr_pixel_func_t pix
 				return nullptr;
 			}
 
-			color = *(unsigned short *)(((byte *)(pvr + 1)) + ofs);
+			color = *reinterpret_cast<unsigned short *>((reinterpret_cast<byte *>(pvr + 1)) + ofs);
 
 			rgba32[y * pvr->width + x] = pixel_func(color);
 		}
@@ -223,11 +223,11 @@ static byte *decode_vq(pvr_t *pvr, int offset, bool detwiddle, pvr_pixel_func_t 
 	unsigned char *indices;
 	byte *ret;
 
-	ret = (byte *)ri.Malloc(pvr->width * pvr->height * (pixel_func ? sizeof(unsigned int) : sizeof(unsigned short)));
-	rgba32 = (unsigned int *)ret;
+	ret = static_cast<byte *>(ri.Malloc(pvr->width * pvr->height * (pixel_func ? sizeof(unsigned int) : sizeof(unsigned short))));
+	rgba32 = reinterpret_cast<unsigned int *>(ret);
 
-	codebook = (unsigned short *)(pvr + 1);
-	indices = ((unsigned char *)(codebook + 1024)) + offset;
+	codebook = reinterpret_cast<unsigned short *>(pvr + 1);
+	indices = (reinterpret_cast<unsigned char *>(codebook + 1024)) + offset;
 
 	for (y = 0; y < pvr->height / 2; y++)
 	{
@@ -281,16 +281,16 @@ void R_LoadPVR(const char *name, byte **pic, int *width, int *height)
 		*height = 0;
 
 	// load the file
-	length = ri.FS_ReadFile((char *)name, &buffer);
+	length = ri.FS_ReadFile(const_cast<char *>(name), &buffer);
 	if (!buffer || length < 0)
 		return;
 
-	ptr = (byte *)buffer;
+	ptr = static_cast<byte *>(buffer);
 
 	// skip global index
 	if (memcmp(ptr, "GBIX", 4) == 0)
 	{
-		gbix_t *gbix = (gbix_t *)ptr;
+		gbix_t *gbix = reinterpret_cast<gbix_t *>(ptr);
 		ptr += sizeof(gbix_t) + LittleLong(gbix->len);
 	}
 
@@ -299,7 +299,7 @@ void R_LoadPVR(const char *name, byte **pic, int *width, int *height)
 		ri.Error(ERR_DROP, "LoadPVR: magic identifier does not match expected (%s)", name);
 
 	// fix up header
-	pvr = (pvr_t *)ptr;
+	pvr = reinterpret_cast<pvr_t *>(ptr);
 	pvr->len_file = LittleLong(pvr->len_file);
 	pvr->type = LittleLong(pvr->type);
 	pvr->width = LittleShort(pvr->width);

@@ -546,8 +546,8 @@ static void DrawSkyBox( shader_t *shader )
 		{
 			for ( s = sky_mins_subd[0]+HALF_SKY_SUBDIVISIONS; s <= sky_maxs_subd[0]+HALF_SKY_SUBDIVISIONS; s++ )
 			{
-				MakeSkyVec( ( s - HALF_SKY_SUBDIVISIONS ) / ( float ) HALF_SKY_SUBDIVISIONS, 
-							( t - HALF_SKY_SUBDIVISIONS ) / ( float ) HALF_SKY_SUBDIVISIONS, 
+				MakeSkyVec( ( s - HALF_SKY_SUBDIVISIONS ) / static_cast< float>HALF_SKY_SUBDIVISIONS, 
+							( t - HALF_SKY_SUBDIVISIONS ) / static_cast< float>HALF_SKY_SUBDIVISIONS, 
 							i, 
 							s_skyTexCoords[t][s], 
 							s_skyPoints[t][s] );
@@ -690,8 +690,8 @@ static void FillCloudBox( const shader_t *shader, int stage )
 		{
 			for ( s = sky_mins_subd[0]+HALF_SKY_SUBDIVISIONS; s <= sky_maxs_subd[0]+HALF_SKY_SUBDIVISIONS; s++ )
 			{
-				MakeSkyVec( ( s - HALF_SKY_SUBDIVISIONS ) / ( float ) HALF_SKY_SUBDIVISIONS, 
-							( t - HALF_SKY_SUBDIVISIONS ) / ( float ) HALF_SKY_SUBDIVISIONS, 
+				MakeSkyVec( ( s - HALF_SKY_SUBDIVISIONS ) / static_cast< float>HALF_SKY_SUBDIVISIONS, 
+							( t - HALF_SKY_SUBDIVISIONS ) / static_cast< float>HALF_SKY_SUBDIVISIONS, 
 							i, 
 							nullptr,
 							s_skyPoints[t][s] );
@@ -763,8 +763,8 @@ void R_InitSkyTexCoords( float heightCloud )
 			for ( s = 0; s <= SKY_SUBDIVISIONS; s++ )
 			{
 				// compute vector from view origin to sky side integral point
-				MakeSkyVec( ( s - HALF_SKY_SUBDIVISIONS ) / ( float ) HALF_SKY_SUBDIVISIONS, 
-							( t - HALF_SKY_SUBDIVISIONS ) / ( float ) HALF_SKY_SUBDIVISIONS, 
+				MakeSkyVec( ( s - HALF_SKY_SUBDIVISIONS ) / static_cast< float>HALF_SKY_SUBDIVISIONS, 
+							( t - HALF_SKY_SUBDIVISIONS ) / static_cast< float>HALF_SKY_SUBDIVISIONS, 
 							i, 
 							nullptr,
 							skyVec );

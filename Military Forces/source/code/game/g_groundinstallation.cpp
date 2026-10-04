@@ -114,7 +114,7 @@ static void Update_GI_Targets( GameEntity* ent )
 				}
 				if( best )
 				{
-					ent->gi_lockangle_ = acos((double)availableWeapons[ent->s.weaponIndex].lockcone);
+					ent->gi_lockangle_ = acos(static_cast<double>(availableWeapons[ent->s.weaponIndex].lockcone));
 					ent->gi_lockangle_ = RAD2DEG(ent->gi_lockangle_);
 					ent->tracktarget_ = best;
 					ent->locktime_ = theLevel.time_;

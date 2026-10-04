@@ -35,10 +35,10 @@ constexpr long _POSIX_C_SOURCE = 199309L;
 #endif
 
 #include <fcntl.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
+#include <cstdint>
+#include <cstdlib>
+#include <cstring>
+#include <cstdio>
 
 #include "libmumblelink.h"
 
@@ -106,7 +106,7 @@ int mumble_link(const char* name)
 		return -1;
 	}
 
-	lm = (LinkedMem *) (mmap(nullptr, sizeof(LinkedMem), PROT_READ | PROT_WRITE, MAP_SHARED, shmfd,0));
+	lm = static_cast<LinkedMem *>(mmap(nullptr, sizeof(LinkedMem), PROT_READ | PROT_WRITE, MAP_SHARED, shmfd,0));
 	if (lm == (void *) (-1)) {
 		lm = nullptr;
 		close(shmfd);

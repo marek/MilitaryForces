@@ -34,7 +34,7 @@ void MF_Spawn_Plane(GameEntity *ent, int idx, bool landed)
 	
 	// gearheight
 	if( availableVehicles[idx].caps & HC_GEAR ) 
-		ent->gearheight_ = (float)availableVehicles[idx].gearheight;
+		ent->gearheight_ = availableVehicles[idx].gearheight;
 	else 
 		ent->client_->ps_.ONOFF |= OO_GEAR;
 
@@ -81,7 +81,7 @@ void MF_Spawn_Helo(GameEntity *ent, int idx, bool landed)
 
 	// gearheight
 	if( availableVehicles[idx].caps & HC_GEAR ) 
-		ent->gearheight_ = (float)availableVehicles[idx].gearheight;
+		ent->gearheight_ = availableVehicles[idx].gearheight;
 
 	ent->client_->ps_.ONOFF |= OO_GEAR;
 

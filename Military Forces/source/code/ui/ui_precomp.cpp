@@ -110,25 +110,25 @@ UI_PrecompilerTools::UI_PrecompilerTools() :
 	dollarDirectives_.push_back(new DollarDirective_evalint);
 	dollarDirectives_.push_back(new DollarDirective_evalfloat);
 
-	for( size_t i = 0; i < k_MAX_SOURCEFILES; ++i )
+	for(auto & sourceFile : sourceFiles_)
 	{
-		sourceFiles_[i] = nullptr;
+		sourceFile = nullptr;
 	}
 }
 
 UI_PrecompilerTools::~UI_PrecompilerTools()
 {
-	for( size_t i = 0; i < directives_.size(); ++i )
+	for(auto & directive : directives_)
 	{
-		delete directives_[i];
-		directives_[i] = nullptr;
+		delete directive;
+		directive = nullptr;
 	}
 	directives_.clear();
 
-	for( size_t i = 0; i < dollarDirectives_.size(); ++i )
+	for(auto & dollarDirective : dollarDirectives_)
 	{
-		delete dollarDirectives_[i];
-		dollarDirectives_[i] = nullptr;
+		delete dollarDirective;
+		dollarDirective = nullptr;
 	}
 	dollarDirectives_.clear();
 }
@@ -280,10 +280,10 @@ UI_PrecompilerTools::loadScriptFile( const char *filename )
 	if (!fp) return nullptr;
 
 	buffer = UI_Memtools::getClearedMemory(sizeof(Script) + length + 1);
-	script = (Script *) buffer;
+	script = static_cast<Script *>(buffer);
 	Com_Memset(script, 0, sizeof(Script));
 	strcpy(script->filename_, filename);
-	script->buffer_ = (char *) buffer + sizeof(Script);
+	script->buffer_ = static_cast<char *>(buffer) + sizeof(Script);
 	script->buffer_[length] = 0;
 	script->length_ = length;
 	//pointer in script buffer
@@ -371,7 +371,7 @@ UI_PrecompilerTools::createPunctuationTable( Script* script, Punctuation* punctu
 		newp = &punctuations[i];
 		lastp = nullptr;
 		//sort the punctuations in this table entry on length (longer punctuations first)
-		for (p = script->punctuationtable_[(unsigned int) newp->p_[0]]; p; p = p->next_)
+		for (p = script->punctuationtable_[static_cast<unsigned int>(newp->p_[0])]; p; p = p->next_)
 		{
 			if (strlen(p->p_) < strlen(newp->p_))
 			{
@@ -379,7 +379,7 @@ UI_PrecompilerTools::createPunctuationTable( Script* script, Punctuation* punctu
 				if (lastp) 
 					lastp->next_ = newp;
 				else 
-					script->punctuationtable_[(unsigned int) newp->p_[0]] = newp;
+					script->punctuationtable_[static_cast<unsigned int>(newp->p_[0])] = newp;
 				break;
 			}
 			lastp = p;
@@ -390,7 +390,7 @@ UI_PrecompilerTools::createPunctuationTable( Script* script, Punctuation* punctu
 			if (lastp) 
 				lastp->next_ = newp;
 			else 
-				script->punctuationtable_[(unsigned int) newp->p_[0]] = newp;
+				script->punctuationtable_[static_cast<unsigned int>(newp->p_[0])] = newp;
 		}
 	}
 }
@@ -419,7 +419,7 @@ UI_PrecompilerTools::copyDefine( SourceFile* source, Define* define )
 
 	newdefine = reinterpret_cast<Define*>(UI_Memtools::getMemory(sizeof(Define) + strlen(define->name_) + 1));
 	//copy the define name
-	newdefine->name_ = (char *) newdefine + sizeof(Define);
+	newdefine->name_ = reinterpret_cast<char *>(newdefine) + sizeof(Define);
 	strcpy(newdefine->name_, define->name_);
 	newdefine->flags_ = define->flags_;
 	newdefine->builtin_ = define->builtin_;
@@ -1242,7 +1242,7 @@ UI_PrecompilerTools::scriptReadPunctuation( Script* script, Token* token )
 	char *p;
 	Punctuation* punc;
 
-	for (punc = script->punctuationtable_[(unsigned int)*script->script_p_]; punc; punc = punc->next_)
+	for (punc = script->punctuationtable_[static_cast<unsigned int>(*script->script_p_)]; punc; punc = punc->next_)
 	{
 		p = punc->p_;
 		len = strlen(p);
@@ -1863,7 +1863,7 @@ UI_PrecompilerTools::evaluateTokens( SourceFile* source, Token* tokens, signed l
 
 				if (negativevalue)
 				{
-					v->intvalue_ = - (signed int) t->intvalue_;
+					v->intvalue_ = - static_cast<signed int>(t->intvalue_);
 					v->floatvalue_ = - t->floatvalue_;
 				} //end if
 				else
@@ -2289,16 +2289,16 @@ UI_PrecompilerTools::numberValue( char *string, int subtype, unsigned long int *
 			} 
 			if (dotfound)
 			{
-				*floatvalue = *floatvalue + (double) (*string - '0') /	(double) dotfound;
+				*floatvalue = *floatvalue + static_cast<double>(*string - '0') /	static_cast<double>(dotfound);
 				dotfound *= 10;
 			}
 			else
 			{
-				*floatvalue = *floatvalue * 10.0 + (double) (*string - '0');
+				*floatvalue = *floatvalue * 10.0 + static_cast<double>(*string - '0');
 			}
 			string++;
 		} 
-		*intvalue = (unsigned long) *floatvalue;
+		*intvalue = static_cast<unsigned long>(*floatvalue);
 	}
 	else if (subtype & TT_DECIMAL)
 	{
@@ -2826,7 +2826,7 @@ UI_PrecompilerTools::Directive_define::func( SourceFile* source )
 	//allocate define
 	define = reinterpret_cast<Define*>(UI_Memtools::getMemory(sizeof(Define) + strlen(token.string_) + 1));
 	Com_Memset(define, 0, sizeof(Define));
-	define->name_ = (char *) define + sizeof(Define);
+	define->name_ = reinterpret_cast<char *>(define) + sizeof(Define);
 	strcpy(define->name_, token.string_);
 	//add the define to the source
 	tools_->addDefineToHash(define, source->definehash_);
@@ -3074,7 +3074,7 @@ UI_PrecompilerTools::DollarDirective_evalfloat::func( SourceFile* source )
 	sprintf(token.string_, "%1.2f", fabs(value));
 	token.type_ = TT_NUMBER;
 	token.subtype_ = TT_FLOAT|TT_LONG|TT_DECIMAL;
-	token.intvalue_ = (unsigned long) value;
+	token.intvalue_ = static_cast<unsigned long>(value);
 	token.floatvalue_ = value;
 	tools_->unreadSourceToken(source, &token);
 	if (value < 0) 

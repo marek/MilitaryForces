@@ -122,25 +122,25 @@ bool CL_HTTP_Init()
 
 	cURLSymbolLoadFailed = false;
 
-	qcurl_version = (decltype(qcurl_version))GPA("curl_version");
+	qcurl_version = reinterpret_cast<decltype(qcurl_version)>(GPA("curl_version"));
 
-	qcurl_easy_init = (decltype(qcurl_easy_init))GPA("curl_easy_init");
-	qcurl_easy_setopt = (decltype(qcurl_easy_setopt))GPA("curl_easy_setopt");
-	qcurl_easy_perform = (decltype(qcurl_easy_perform))GPA("curl_easy_perform");
-	qcurl_easy_cleanup = (decltype(qcurl_easy_cleanup))GPA("curl_easy_cleanup");
-	qcurl_easy_getinfo = (decltype(qcurl_easy_getinfo))GPA("curl_easy_getinfo");
-	qcurl_easy_duphandle = (decltype(qcurl_easy_duphandle))GPA("curl_easy_duphandle");
-	qcurl_easy_reset = (decltype(qcurl_easy_reset))GPA("curl_easy_reset");
-	qcurl_easy_strerror = (decltype(qcurl_easy_strerror))GPA("curl_easy_strerror");
+	qcurl_easy_init = reinterpret_cast<decltype(qcurl_easy_init)>(GPA("curl_easy_init"));
+	qcurl_easy_setopt = reinterpret_cast<decltype(qcurl_easy_setopt)>(GPA("curl_easy_setopt"));
+	qcurl_easy_perform = reinterpret_cast<decltype(qcurl_easy_perform)>(GPA("curl_easy_perform"));
+	qcurl_easy_cleanup = reinterpret_cast<decltype(qcurl_easy_cleanup)>(GPA("curl_easy_cleanup"));
+	qcurl_easy_getinfo = reinterpret_cast<decltype(qcurl_easy_getinfo)>(GPA("curl_easy_getinfo"));
+	qcurl_easy_duphandle = reinterpret_cast<decltype(qcurl_easy_duphandle)>(GPA("curl_easy_duphandle"));
+	qcurl_easy_reset = reinterpret_cast<decltype(qcurl_easy_reset)>(GPA("curl_easy_reset"));
+	qcurl_easy_strerror = reinterpret_cast<decltype(qcurl_easy_strerror)>(GPA("curl_easy_strerror"));
 	
-	qcurl_multi_init = (decltype(qcurl_multi_init))GPA("curl_multi_init");
-	qcurl_multi_add_handle = (decltype(qcurl_multi_add_handle))GPA("curl_multi_add_handle");
-	qcurl_multi_remove_handle = (decltype(qcurl_multi_remove_handle))GPA("curl_multi_remove_handle");
-	qcurl_multi_fdset = (decltype(qcurl_multi_fdset))GPA("curl_multi_fdset");
-	qcurl_multi_perform = (decltype(qcurl_multi_perform))GPA("curl_multi_perform");
-	qcurl_multi_cleanup = (decltype(qcurl_multi_cleanup))GPA("curl_multi_cleanup");
-	qcurl_multi_info_read = (decltype(qcurl_multi_info_read))GPA("curl_multi_info_read");
-	qcurl_multi_strerror = (decltype(qcurl_multi_strerror))GPA("curl_multi_strerror");
+	qcurl_multi_init = reinterpret_cast<decltype(qcurl_multi_init)>(GPA("curl_multi_init"));
+	qcurl_multi_add_handle = reinterpret_cast<decltype(qcurl_multi_add_handle)>(GPA("curl_multi_add_handle"));
+	qcurl_multi_remove_handle = reinterpret_cast<decltype(qcurl_multi_remove_handle)>(GPA("curl_multi_remove_handle"));
+	qcurl_multi_fdset = reinterpret_cast<decltype(qcurl_multi_fdset)>(GPA("curl_multi_fdset"));
+	qcurl_multi_perform = reinterpret_cast<decltype(qcurl_multi_perform)>(GPA("curl_multi_perform"));
+	qcurl_multi_cleanup = reinterpret_cast<decltype(qcurl_multi_cleanup)>(GPA("curl_multi_cleanup"));
+	qcurl_multi_info_read = reinterpret_cast<decltype(qcurl_multi_info_read)>(GPA("curl_multi_info_read"));
+	qcurl_multi_strerror = reinterpret_cast<decltype(qcurl_multi_strerror)>(GPA("curl_multi_strerror"));
 
 	if(cURLSymbolLoadFailed)
 	{
@@ -224,9 +224,9 @@ void CL_HTTP_Shutdown( )
 static int CL_cURL_CallbackProgress(void *clientp, curl_off_t dltotal, curl_off_t dlnow,
     curl_off_t ultotal, curl_off_t ulnow)
 {
-	clc.downloadSize = (int)dltotal;
+	clc.downloadSize = static_cast<int>(dltotal);
 	Cvar_SetValue( "cl_downloadSize", clc.downloadSize );
-	clc.downloadCount = (int)dlnow;
+	clc.downloadCount = static_cast<int>(dlnow);
 	Cvar_SetValue( "cl_downloadCount", clc.downloadCount );
 	return 0;
 }
@@ -234,7 +234,7 @@ static int CL_cURL_CallbackProgress(void *clientp, curl_off_t dltotal, curl_off_
 static size_t CL_cURL_CallbackWrite(void *buffer, size_t size, size_t nmemb,
 	void *stream)
 {
-	FS_Write( buffer, size*nmemb, ((fileHandle_t*)stream)[0] );
+	FS_Write( buffer, size*nmemb, (static_cast<fileHandle_t*>(stream))[0] );
 	return size*nmemb;
 }
 

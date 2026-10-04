@@ -228,7 +228,7 @@ void *S_WAV_CodecLoad(const char *filename, snd_info_t *info)
 
 	// Read, byteswap
 	FS_Read(buffer, info->size, file);
-	S_ByteSwapRawSamples(info->samples, info->width, info->channels, (byte *)buffer);
+	S_ByteSwapRawSamples(info->samples, info->width, info->channels, static_cast<byte *>(buffer));
 
 	// Close and return
 	FS_FCloseFile(file);
@@ -286,6 +286,6 @@ int S_WAV_CodecReadStream(snd_stream_t *stream, int bytes, void *buffer)
 	stream->pos += bytes;
 	samples = (bytes / stream->info.width) / stream->info.channels;
 	FS_Read(buffer, bytes, stream->file);
-	S_ByteSwapRawSamples(samples, stream->info.width, stream->info.channels, (byte *)buffer);
+	S_ByteSwapRawSamples(samples, stream->info.width, stream->info.channels, static_cast<byte *>(buffer));
 	return bytes;
 }

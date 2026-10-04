@@ -112,7 +112,7 @@ void RB_CalcDeformVertexes( deformStage_t *ds )
 	int i;
 	vec3_t	offset;
 	float	scale;
-	float	*xyz = ( float * ) tess.xyz;
+	float	*xyz = reinterpret_cast< float *>(tess.xyz);
 	int16_t	*normal = tess.normal[0];
 	float	*table;
 
@@ -161,7 +161,7 @@ Wiggle the normals for wavy environment mapping
 void RB_CalcDeformNormals( deformStage_t *ds ) {
 	int i;
 	float	scale;
-	float	*xyz = ( float * ) tess.xyz;
+	float	*xyz = reinterpret_cast< float *>(tess.xyz);
 	int16_t *normal = tess.normal[0];
 
 	for ( i = 0; i < tess.numVertexes; i++, xyz += 4, normal += 4 ) {
@@ -199,7 +199,7 @@ RB_CalcBulgeVertexes
 void RB_CalcBulgeVertexes( deformStage_t *ds ) {
 	int i;
 	const float *st = ( const float * ) tess.texCoords[0];
-	float		*xyz = ( float * ) tess.xyz;
+	float		*xyz = reinterpret_cast< float *>(tess.xyz);
 	int16_t	*normal = tess.normal[0];
 	double		now;
 
@@ -212,7 +212,7 @@ void RB_CalcBulgeVertexes( deformStage_t *ds ) {
 
 		R_VaoUnpackNormal(fNormal, normal);
 
-		off = (float)( FUNCTABLE_SIZE / (M_PI*2) ) * ( st[0] * ds->bulgeWidth + now );
+		off = static_cast<float>( FUNCTABLE_SIZE / (M_PI*2) ) * ( st[0] * ds->bulgeWidth + now );
 
 		scale = tr.sinTable[ off & FUNCTABLE_MASK ] * ds->bulgeHeight;
 			
@@ -246,7 +246,7 @@ void RB_CalcMoveVertexes( deformStage_t *ds ) {
 
 	VectorScale( ds->moveVector, scale, offset );
 
-	xyz = ( float * ) tess.xyz;
+	xyz = reinterpret_cast< float *>(tess.xyz);
 	for ( i = 0; i < tess.numVertexes; i++, xyz += 4 ) {
 		VectorAdd( xyz, offset, xyz );
 	}

@@ -80,7 +80,7 @@ PM_GroundVehicleAccelerate
 static void PM_GroundVehicleAccelerate()
 {
     float	topspeed = availableVehicles[pm->vehicle].maxspeed;
-    float	currspeed = (float)pm->ps->speed/10;
+    float	currspeed = static_cast<float>(pm->ps->speed)/10;
 	float	maxthrottle = availableVehicles[pm->vehicle].maxthrottle;
 	float	minthrottle = availableVehicles[pm->vehicle].minthrottle;
     float	throttle = pm->ps->fixed_throttle;
@@ -351,7 +351,7 @@ void PM_GroundVehicleMove( )
 	PM_GroundVehicleAccelerate();
 
 	// speed
-	speed = (float)pm->ps->speed/10;
+	speed = static_cast<float>(pm->ps->speed)/10;
 	if( pm->ps->ONOFF & OO_STALLED ) {
 		AngleVectors( pm->ps->vehicleAngles, forward, nullptr, nullptr );
 		VectorNegate( forward, forward );
@@ -407,7 +407,7 @@ void PM_GroundVehicleMove( )
 	{
 		// create a turning modifier for normal wheeled vehicles
 		topSpeed = availableVehicles[pm->vehicle].maxspeed;
-		currSpeed = (float)pm->ps->speed/10;
+		currSpeed = static_cast<float>(pm->ps->speed)/10;
 
 		// maxium turn is allowed at a percentage of the top speed (0.5f behind 50% of top speed)
 		turnModifier = currSpeed/(topSpeed * 0.2f);

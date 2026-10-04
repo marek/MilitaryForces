@@ -25,9 +25,9 @@ UI_Memtools::getMemory( unsigned long size )
 	ptr = BotImport_GetMemory(size + sizeof(intptr_t));
 	if (!ptr) 
 		return nullptr;
-	memid = (intptr_t *) ptr;
+	memid = static_cast<intptr_t *>(ptr);
 	*memid = MEM_ID;
-	return (intptr_t *) ((char *) ptr + sizeof(intptr_t));
+	return reinterpret_cast<intptr_t *>(static_cast<char *>(ptr) + sizeof(intptr_t));
 } 
 
 void*
@@ -47,9 +47,9 @@ UI_Memtools::getHunkMemory( unsigned long size )
 
 	ptr = BotImport_HunkAlloc(size + sizeof(intptr_t));
 	if (!ptr) return nullptr;
-	memid = (intptr_t *) ptr;
+	memid = static_cast<intptr_t *>(ptr);
 	*memid = HUNK_ID;
-	return (intptr_t *) ((char *) ptr + sizeof(intptr_t));
+	return reinterpret_cast<intptr_t *>(static_cast<char *>(ptr) + sizeof(intptr_t));
 } 
 
 void*
@@ -66,7 +66,7 @@ UI_Memtools::freeMemory( void *ptr )
 {
 	intptr_t *memid;
 
-	memid = (intptr_t *) ((char *) ptr - sizeof(intptr_t));
+	memid = reinterpret_cast<intptr_t *>(static_cast<char *>(ptr) - sizeof(intptr_t));
 
 	if (*memid == MEM_ID)
 		BotImport_FreeMemory(memid);

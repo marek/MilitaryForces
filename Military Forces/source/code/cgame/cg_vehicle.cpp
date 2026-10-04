@@ -33,7 +33,7 @@ static animation_t * CG_ParseLQMAnimationFile( const char *filename ) {
 	fileHandle_t	f;
 	animation_t *animations;
 
-	animations = (animation_t *)&availableLQMAnimations.anim[availableLQMAnimations.numAnimations];
+	animations = reinterpret_cast<animation_t *>(&availableLQMAnimations.anim[availableLQMAnimations.numAnimations]);
 
 	// load the file
 	len = FS_FOpenFileByMode( filename, &f, FS_READ );

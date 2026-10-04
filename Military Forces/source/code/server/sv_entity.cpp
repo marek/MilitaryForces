@@ -12,11 +12,10 @@ SV_Entity::SV_Entity() :
 	snapshotCounter_(0)
 {
 	memset(&baseline_, 0, sizeof(baseline_));
-	for( int i = 0; i < k_MAX_ENT_CLUSTERS; ++i )
-		clusternums_[i] = 0;
+	for(int & clusternum : clusternums_)
+		clusternum = 0;
 }
 
 SV_Entity::~SV_Entity()
-{
-}
+= default;
 

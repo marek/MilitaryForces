@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "client.h"
 #include "../ui/ui.h"
 #include "../cgame/cg.h"
-#include <limits.h>
+#include <climits>
 
 #include "../sys/sys_local.h"
 #include "../sys/sys_loadlib.h"
@@ -512,14 +512,14 @@ void CL_CaptureVoip()
 			}
 			voipFrames = samples / VOIP_MAX_FRAME_SAMPLES;
 
-			S_Capture(samples, (byte *) sampbuffer);  // grab from audio card.
+			S_Capture(samples, reinterpret_cast<byte *>(sampbuffer));  // grab from audio card.
 
 			// check the "power" of this packet...
 			for (i = 0; i < samples; i++) {
-				const float flsamp = (float) sampbuffer[i];
+				const float flsamp = static_cast<float>(sampbuffer[i]);
 				const float s = fabs(flsamp);
 				voipPower += s * s;
-				sampbuffer[i] = (int16_t) ((flsamp) * audioMult);
+				sampbuffer[i] = static_cast<int16_t>((flsamp) * audioMult);
 			}
 
 			// encode raw audio samples into Opus data...
@@ -532,7 +532,7 @@ void CL_CaptureVoip()
 			}
 
 			clc.voipPower = (voipPower / (32768.0f * 32768.0f *
-			                 ((float) samples))) * 100.0f;
+			                 (static_cast<float>(samples)))) * 100.0f;
 
 			if ((useVad) && (clc.voipPower < cl_voipVADThreshold->value)) {
 				CL_VoipNewGeneration();  // no "talk" for at least 1/4 second.
@@ -894,7 +894,7 @@ void CL_DemoCompleted( )
 					time/1000.0,
 					clc.timeDemoFrames*1000.0 / time,
 					clc.timeDemoMinDuration,
-					time / (float)clc.timeDemoFrames,
+					time / static_cast<float>(clc.timeDemoFrames),
 					clc.timeDemoMaxDuration,
 					CL_DemoFrameDurationSDev( ) );
 			Com_Printf( "%s", buffer );
@@ -1773,7 +1773,7 @@ void CL_Connect_f( ) {
 		clc.state = CA_CONNECTING;
 		
 		// Set a client challenge number that ideally is mirrored back by the server.
-		clc.challenge = (((unsigned int)rand() << 16) ^ (unsigned int)rand()) ^ Com_Milliseconds();
+		clc.challenge = ((static_cast<unsigned int>(rand()) << 16) ^ static_cast<unsigned int>(rand())) ^ Com_Milliseconds();
 	}
 
 	Key_SetCatcher( 0 );
@@ -2433,7 +2433,7 @@ void CL_CheckForResend( ) {
 		Info_SetValueForKey( info, "challenge", va("%i", clc.challenge ) );
 		
 		Com_sprintf( data, sizeof(data), "connect \"%s\"", info );
-		NET_OutOfBandData( NS_CLIENT, clc.serverAddress, (byte *) data, strlen ( data ) );
+		NET_OutOfBandData( NS_CLIENT, clc.serverAddress, reinterpret_cast<byte *>(data), strlen ( data ) );
 		// the most current userinfo has been sent, so watch for any
 		// newer changes to userinfo variables
 		cvar_modifiedFlags &= ~CVAR_USERINFO;
@@ -2848,7 +2848,7 @@ void CL_PacketEvent( netadr_t from, Message *msg ) {
 
 	clc.lastPacketTime = cls.realtime;
 
-	if ( msg->cursize >= 4 && *(int *)msg->data == -1 ) {
+	if ( msg->cursize >= 4 && *reinterpret_cast<int *>(msg->data) == -1 ) {
 		CL_ConnectionlessPacket( from, msg );
 		return;
 	}
@@ -2882,7 +2882,7 @@ void CL_PacketEvent( netadr_t from, Message *msg ) {
 	// track the last message received so it can be returned in 
 	// client messages, allowing the server to detect a dropped
 	// gamestate
-	clc.serverMessageSequence = LittleLong( *(int *)msg->data );
+	clc.serverMessageSequence = LittleLong( *reinterpret_cast<int *>(msg->data) );
 
 	clc.lastPacketTime = cls.realtime;
 	CL_ParseServerMessage( msg );
@@ -3024,7 +3024,7 @@ void CL_Frame ( int msec ) {
 
 			CL_TakeVideoFrame( );
 
-			msec = (int)frameDuration;
+			msec = static_cast<int>(frameDuration);
 			clc.aviVideoFrameRemainder = frameDuration - msec;
 		}
 	}
@@ -3279,7 +3279,7 @@ void CL_InitRef( ) {
 		Com_Error(ERR_FATAL, "Failed to load renderer");
 	}
 
-	GetRefAPI = (GetRefAPI_t)Sys_LoadFunction(rendererLib, "GetRefAPI");
+	GetRefAPI = reinterpret_cast<GetRefAPI_t>(Sys_LoadFunction(rendererLib, "GetRefAPI"));
 	if(!GetRefAPI)
 	{
 		Com_Error(ERR_FATAL, "Can't load symbol GetRefAPI: '%s'",  Sys_LibraryError());

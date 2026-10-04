@@ -23,8 +23,7 @@ UserInterface::UserInterface() :
 }
 
 UserInterface::~UserInterface()
-{
-}
+= default;
 
 UserInterface& 
 UserInterface::getInstance()

@@ -17,7 +17,7 @@ bool G_SpawnString( const char *key, const char *defaultString, char **out )
 
 	if ( !theLevel.spawning_ ) 
 	{
-		*out = (char *)defaultString;
+		*out = const_cast<char *>(defaultString);
 //		G_Error( "G_SpawnString() called while not spawning" );
 	}
 
@@ -30,7 +30,7 @@ bool G_SpawnString( const char *key, const char *defaultString, char **out )
 		}
 	}
 
-	*out = (char *)defaultString;
+	*out = const_cast<char *>(defaultString);
 	return false;
 }
 
@@ -402,30 +402,30 @@ void G_ParseField( const char *key, const char *value, SpawnFieldHolder *ent )
 		if ( !Q_stricmp(f->name, key) ) 
 		{
 			// found it
-			b = (byte *)ent;
+			b = reinterpret_cast<byte *>(ent);
 
 			switch( f->type ) 
 			{
 			case F_LSTRING:
-				*(char **)(b+f->ofs) = G_NewString (value);
+				*reinterpret_cast<char **>(b+f->ofs) = G_NewString (value);
 				break;
 			case F_VECTOR:
 				sscanf (value, "%f %f %f", &vec[0], &vec[1], &vec[2]);
-				((float *)(b+f->ofs))[0] = vec[0];
-				((float *)(b+f->ofs))[1] = vec[1];
-				((float *)(b+f->ofs))[2] = vec[2];
+				(reinterpret_cast<float *>(b+f->ofs))[0] = vec[0];
+				(reinterpret_cast<float *>(b+f->ofs))[1] = vec[1];
+				(reinterpret_cast<float *>(b+f->ofs))[2] = vec[2];
 				break;
 			case F_INT:
-				*(int *)(b+f->ofs) = atoi(value);
+				*reinterpret_cast<int *>(b+f->ofs) = atoi(value);
 				break;
 			case F_FLOAT:
-				*(float *)(b+f->ofs) = atof(value);
+				*reinterpret_cast<float *>(b+f->ofs) = atof(value);
 				break;
 			case F_ANGLEHACK:
 				v = atof(value);
-				((float *)(b+f->ofs))[0] = 0;
-				((float *)(b+f->ofs))[1] = v;
-				((float *)(b+f->ofs))[2] = 0;
+				(reinterpret_cast<float *>(b+f->ofs))[0] = 0;
+				(reinterpret_cast<float *>(b+f->ofs))[1] = v;
+				(reinterpret_cast<float *>(b+f->ofs))[2] = 0;
 				break;
 			default:
 			case F_IGNORE:

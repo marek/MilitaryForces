@@ -69,7 +69,7 @@ void R_LoadBMP( const char *name, byte **pic, int *width, int *height )
 	//
 	// load the file
 	//
-	length = ri.FS_ReadFile( ( char * ) name, &buffer.v);
+	length = ri.FS_ReadFile( const_cast< char *>(name), &buffer.v);
 	if (!buffer.b || length < 0) {
 		return;
 	}
@@ -84,33 +84,33 @@ void R_LoadBMP( const char *name, byte **pic, int *width, int *height )
 
 	bmpHeader.id[0] = *buf_p++;
 	bmpHeader.id[1] = *buf_p++;
-	bmpHeader.fileSize = LittleLong( * ( int * ) buf_p );
+	bmpHeader.fileSize = LittleLong( * reinterpret_cast< int *>(buf_p) );
 	buf_p += 4;
-	bmpHeader.reserved0 = LittleLong( * ( int * ) buf_p );
+	bmpHeader.reserved0 = LittleLong( * reinterpret_cast< int *>(buf_p) );
 	buf_p += 4;
-	bmpHeader.bitmapDataOffset = LittleLong( * ( int * ) buf_p );
+	bmpHeader.bitmapDataOffset = LittleLong( * reinterpret_cast< int *>(buf_p) );
 	buf_p += 4;
-	bmpHeader.bitmapHeaderSize = LittleLong( * ( int * ) buf_p );
+	bmpHeader.bitmapHeaderSize = LittleLong( * reinterpret_cast< int *>(buf_p) );
 	buf_p += 4;
-	bmpHeader.width = LittleLong( * ( int * ) buf_p );
+	bmpHeader.width = LittleLong( * reinterpret_cast< int *>(buf_p) );
 	buf_p += 4;
-	bmpHeader.height = LittleLong( * ( int * ) buf_p );
+	bmpHeader.height = LittleLong( * reinterpret_cast< int *>(buf_p) );
 	buf_p += 4;
-	bmpHeader.planes = LittleShort( * ( short * ) buf_p );
+	bmpHeader.planes = LittleShort( * reinterpret_cast< short *>(buf_p) );
 	buf_p += 2;
-	bmpHeader.bitsPerPixel = LittleShort( * ( short * ) buf_p );
+	bmpHeader.bitsPerPixel = LittleShort( * reinterpret_cast< short *>(buf_p) );
 	buf_p += 2;
-	bmpHeader.compression = LittleLong( * ( int * ) buf_p );
+	bmpHeader.compression = LittleLong( * reinterpret_cast< int *>(buf_p) );
 	buf_p += 4;
-	bmpHeader.bitmapDataSize = LittleLong( * ( int * ) buf_p );
+	bmpHeader.bitmapDataSize = LittleLong( * reinterpret_cast< int *>(buf_p) );
 	buf_p += 4;
-	bmpHeader.hRes = LittleLong( * ( int * ) buf_p );
+	bmpHeader.hRes = LittleLong( * reinterpret_cast< int *>(buf_p) );
 	buf_p += 4;
-	bmpHeader.vRes = LittleLong( * ( int * ) buf_p );
+	bmpHeader.vRes = LittleLong( * reinterpret_cast< int *>(buf_p) );
 	buf_p += 4;
-	bmpHeader.colors = LittleLong( * ( int * ) buf_p );
+	bmpHeader.colors = LittleLong( * reinterpret_cast< int *>(buf_p) );
 	buf_p += 4;
-	bmpHeader.importantColors = LittleLong( * ( int * ) buf_p );
+	bmpHeader.importantColors = LittleLong( * reinterpret_cast< int *>(buf_p) );
 	buf_p += 4;
 
 	if ( bmpHeader.bitsPerPixel == 8 )
@@ -164,7 +164,7 @@ void R_LoadBMP( const char *name, byte **pic, int *width, int *height )
 	numPixels = columns * rows;
 
 	if(columns <= 0 || !rows || numPixels > 0x1FFFFFFF // 4*1FFFFFFF == 0x7FFFFFFC < 0x7FFFFFFF
-	    || (((int)numPixels * 4) / columns) / 4 != rows)
+	    || ((static_cast<int>(numPixels) * 4) / columns) / 4 != rows)
 	{
 	  ri.Error (ERR_DROP, "LoadBMP: %s has an invalid image size", name);
 	}
@@ -178,7 +178,7 @@ void R_LoadBMP( const char *name, byte **pic, int *width, int *height )
 	if ( height )
 		*height = rows;
 
-	bmpRGBA = (byte *)ri.Malloc( numPixels * 4 );
+	bmpRGBA = static_cast<byte *>(ri.Malloc( numPixels * 4 ));
 	*pic = bmpRGBA;
 
 
@@ -202,7 +202,7 @@ void R_LoadBMP( const char *name, byte **pic, int *width, int *height )
 				*pixbuf++ = 0xff;
 				break;
 			case 16:
-				shortPixel = * ( unsigned short * ) pixbuf;
+				shortPixel = * reinterpret_cast< unsigned short *>(pixbuf);
 				pixbuf += 2;
 				*pixbuf++ = ( shortPixel & ( 31 << 10 ) ) >> 7;
 				*pixbuf++ = ( shortPixel & ( 31 << 5 ) ) >> 2;

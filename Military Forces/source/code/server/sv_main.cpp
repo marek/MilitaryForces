@@ -199,27 +199,27 @@ void QDECL SV_SendServerCommand( SV_Client *cl, const char *fmt, ... )
 	byte		message[MAX_MSGLEN];
 	
 	va_start (argptr,fmt);
-	Q_vsnprintf ((char *)message, sizeof(message), fmt,argptr);
+	Q_vsnprintf (reinterpret_cast<char *>(message), sizeof(message), fmt,argptr);
 	va_end (argptr);
 
 	// Fix to http://aluigi.altervista.org/adv/q3msgboom-adv.txt
 	// The actual cause of the bug is probably further downstream
 	// and should maybe be addressed later, but this certainly
 	// fixes the problem for now
-	if ( strlen ((char *)message) > 1022 ) {
+	if ( strlen (reinterpret_cast<char *>(message)) > 1022 ) {
 		return;
 	}
 
 	if( cl != nullptr ) 
 	{
-		SV_AddServerCommand( cl, (char *)message );
+		SV_AddServerCommand( cl, reinterpret_cast<char *>(message) );
 		return;
 	}
 
 	// hack to echo broadcast prints to console
-	if( com_dedicated->integer && !strncmp( (char *)message, "print", 5) ) 
+	if( com_dedicated->integer && !strncmp( reinterpret_cast<char *>(message), "print", 5) ) 
 	{
-		Com_Printf ("broadcast: %s\n", SV_ExpandNewlines((char *)message) );
+		Com_Printf ("broadcast: %s\n", SV_ExpandNewlines(reinterpret_cast<char *>(message)) );
 	}
 
 	// send the data to all relevent clients
@@ -230,7 +230,7 @@ void QDECL SV_SendServerCommand( SV_Client *cl, const char *fmt, ... )
 		if( !client ) 
 			continue;
 
-		SV_AddServerCommand( client, (char *)message );
+		SV_AddServerCommand( client, reinterpret_cast<char *>(message) );
 	}
 }
 
@@ -399,7 +399,7 @@ static long SVC_HashForAddress( netadr_t address ) {
 	}
 
 	for ( i = 0; i < size; i++ ) {
-		hash += (long)( ip[ i ] ) * ( i + 119 );
+		hash += static_cast<long>( ip[ i ] ) * ( i + 119 );
 	}
 
 	hash = ( hash ^ ( hash >> 10 ) ^ ( hash >> 20 ) );
@@ -844,7 +844,7 @@ SV_ReadPackets
 void SV_PacketEvent( netadr_t from, Message *msg ) 
 {
 	// check for connectionless packet (0xffffffff) first
-	if( msg->cursize >= 4 && *(int *)msg->data == -1) 
+	if( msg->cursize >= 4 && *reinterpret_cast<int *>(msg->data) == -1) 
 	{
 		SV_ConnectionlessPacket( from, msg );
 		return;
@@ -937,12 +937,12 @@ void SV_CalcPings()
 
 		total = 0;
 		count = 0;
-		for( int j = 0 ; j < PACKET_BACKUP ; j++ ) 
+		for(auto & frame : cl->frames_) 
 		{
-			if ( cl->frames_[j].messageAcked_ <= 0 ) 
+			if ( frame.messageAcked_ <= 0 ) 
 				continue;
 
-			delta = cl->frames_[j].messageAcked_ - cl->frames_[j].messageSent_;
+			delta = frame.messageAcked_ - frame.messageSent_;
 			count++;
 			total += delta;
 		}
@@ -1234,7 +1234,7 @@ int SV_RateMsec(SV_Client *client)
 	else
 		messageSize += UDPIP_HEADER_SIZE;
 		
-	rateMsec = messageSize * 1000 / ((int) (rate * com_timescale->value));
+	rateMsec = messageSize * 1000 / (static_cast<int>(rate * com_timescale->value));
 	rate = Sys_Milliseconds() - client->netchan_.lastSentTime;
 	
 	if(rate > rateMsec)

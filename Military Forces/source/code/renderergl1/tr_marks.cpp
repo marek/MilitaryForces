@@ -165,7 +165,7 @@ void R_BoxSurfaces_r(mnode_t *node, vec3_t mins, vec3_t maxs, surfaceType_t **li
 		// extra check for surfaces to avoid list overflows
 		else if (*(surf->data) == SF_FACE) {
 			// the face plane should go through the box
-			s = BoxOnPlaneSide( mins, maxs, &(( srfSurfaceFace_t * ) surf->data)->plane );
+			s = BoxOnPlaneSide( mins, maxs, &(reinterpret_cast< srfSurfaceFace_t *>(surf->data))->plane );
 			if (s == 1 || s == 2) {
 				surf->viewCount = tr.viewCount;
 			} else if (DotProduct((( srfSurfaceFace_t * ) surf->data)->plane.normal, dir) > -0.5) {
@@ -173,14 +173,14 @@ void R_BoxSurfaces_r(mnode_t *node, vec3_t mins, vec3_t maxs, surfaceType_t **li
 				surf->viewCount = tr.viewCount;
 			}
 		}
-		else if (*(surfaceType_t *) (surf->data) != SF_GRID &&
-			 *(surfaceType_t *) (surf->data) != SF_TRIANGLES)
+		else if (*(surf->data) != SF_GRID &&
+			 *(surf->data) != SF_TRIANGLES)
 			surf->viewCount = tr.viewCount;
 		// check the viewCount because the surface may have
 		// already been added if it spans multiple leafs
 		if (surf->viewCount != tr.viewCount) {
 			surf->viewCount = tr.viewCount;
-			list[*listlength] = (surfaceType_t *) surf->data;
+			list[*listlength] = surf->data;
 			(*listlength)++;
 		}
 		mark++;
@@ -324,7 +324,7 @@ int R_MarkFragments( int numPoints, const vec3_t *points, const vec3_t projectio
 
 		if (*surfaces[i] == SF_GRID) {
 
-			cv = (srfGridMesh_t *) surfaces[i];
+			cv = reinterpret_cast<srfGridMesh_t *>(surfaces[i]);
 			for ( m = 0 ; m < cv->height - 1 ; m++ ) {
 				for ( n = 0 ; n < cv->width - 1 ; n++ ) {
 					// We triangulate the grid and chop all triangles within
@@ -404,14 +404,14 @@ int R_MarkFragments( int numPoints, const vec3_t *points, const vec3_t projectio
 		}
 		else if (*surfaces[i] == SF_FACE) {
 
-			srfSurfaceFace_t *surf = ( srfSurfaceFace_t * ) surfaces[i];
+			srfSurfaceFace_t *surf = reinterpret_cast< srfSurfaceFace_t *>(surfaces[i]);
 
 			// check the normal of this face
 			if (DotProduct(surf->plane.normal, projectionDir) > -0.5) {
 				continue;
 			}
 
-			indexes = (int *)( (byte *)surf + surf->ofsIndices );
+			indexes = reinterpret_cast<int *>( reinterpret_cast<byte *>(surf) + surf->ofsIndices );
 			for ( k = 0 ; k < surf->numIndices ; k += 3 ) {
 				for ( j = 0 ; j < 3 ; j++ ) {
 					v = &surf->points[0][0] + VERTEXSIZE * indexes[k+j];
@@ -431,7 +431,7 @@ int R_MarkFragments( int numPoints, const vec3_t *points, const vec3_t projectio
 		}
 		else if(*surfaces[i] == SF_TRIANGLES && r_marksOnTriangleMeshes->integer) {
 
-			srfTriangles_t *surf = (srfTriangles_t *) surfaces[i];
+			srfTriangles_t *surf = reinterpret_cast<srfTriangles_t *>(surfaces[i]);
 
 			for (k = 0; k < surf->numIndexes; k += 3)
 			{

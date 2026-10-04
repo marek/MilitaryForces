@@ -85,7 +85,7 @@ void R_DlightBmodel( bmodel_t *bmodel ) {
 		}
 
 		// we need to check this light
-		mask |= (uint64_t)1 << i;
+		mask |= static_cast<uint64_t>(1) << i;
 	}
 
 	tr.currentEntity->needDlights = (mask != 0);
@@ -95,11 +95,11 @@ void R_DlightBmodel( bmodel_t *bmodel ) {
 		surf = bmodel->firstSurface + i;
 
 		if ( *surf->data == SF_FACE ) {
-			((srfSurfaceFace_t *)surf->data)->dlightBits = mask;
+			(reinterpret_cast<srfSurfaceFace_t *>(surf->data))->dlightBits = mask;
 		} else if ( *surf->data == SF_GRID ) {
-			((srfGridMesh_t *)surf->data)->dlightBits = mask;
+			(reinterpret_cast<srfGridMesh_t *>(surf->data))->dlightBits = mask;
 		} else if ( *surf->data == SF_TRIANGLES ) {
-			((srfTriangles_t *)surf->data)->dlightBits = mask;
+			(reinterpret_cast<srfTriangles_t *>(surf->data))->dlightBits = mask;
 		}
 	}
 }
@@ -365,10 +365,10 @@ void R_SetupEntityLighting( const trRefdef_t *refdef, trRefEntity_t *ent ) {
 	}
 
 	// save out the byte packet version
-	((byte *)&ent->ambientLightInt)[0] = ri.ftol(ent->ambientLight[0]);
-	((byte *)&ent->ambientLightInt)[1] = ri.ftol(ent->ambientLight[1]);
-	((byte *)&ent->ambientLightInt)[2] = ri.ftol(ent->ambientLight[2]);
-	((byte *)&ent->ambientLightInt)[3] = 0xff;
+	(reinterpret_cast<byte *>(&ent->ambientLightInt))[0] = ri.ftol(ent->ambientLight[0]);
+	(reinterpret_cast<byte *>(&ent->ambientLightInt))[1] = ri.ftol(ent->ambientLight[1]);
+	(reinterpret_cast<byte *>(&ent->ambientLightInt))[2] = ri.ftol(ent->ambientLight[2]);
+	(reinterpret_cast<byte *>(&ent->ambientLightInt))[3] = 0xff;
 	
 	// transform the direction to local space
 	VectorNormalize( lightDir );

@@ -426,7 +426,7 @@ static void ProjectDlightTexture_scalar( ) {
 	for ( l = 0 ; l < backEnd.refdef.num_dlights ; l++ ) {
 		dlight_t	*dl;
 
-		if ( !( tess.dlightBits & ( (uint64_t)1 << l ) ) ) {
+		if ( !( tess.dlightBits & ( static_cast<uint64_t>(1) << l ) ) ) {
 			continue;	// this surface definitely doesn't have any of this light
 		}
 		texCoords = texCoordsArray[0];
@@ -588,10 +588,10 @@ static void RB_FogPass( ) {
 	fog = tr.world->fogs + tess.fogNum;
 
 	for ( i = 0; i < tess.numVertexes; i++ ) {
-		* ( int * )&tess.svars.colors[i] = fog->colorInt;
+		* reinterpret_cast< int *>(&tess.svars.colors[i]) = fog->colorInt;
 	}
 
-	RB_CalcFogTexCoords( ( float * ) tess.svars.texcoords[0] );
+	RB_CalcFogTexCoords( reinterpret_cast< float *>(tess.svars.texcoords[0]) );
 
 	GL_Bind( tr.fogImage );
 
@@ -626,14 +626,14 @@ static void ComputeColors( shaderStage_t *pStage )
 			Com_Memset( tess.svars.colors, tr.identityLightByte, tess.numVertexes * 4 );
 			break;
 		case CGEN_LIGHTING_DIFFUSE:
-			RB_CalcDiffuseColor( ( unsigned char * ) tess.svars.colors );
+			RB_CalcDiffuseColor( reinterpret_cast< unsigned char *>(tess.svars.colors) );
 			break;
 		case CGEN_EXACT_VERTEX:
 			Com_Memcpy( tess.svars.colors, tess.vertexColors, tess.numVertexes * sizeof( tess.vertexColors[0] ) );
 			break;
 		case CGEN_CONST:
 			for ( i = 0; i < tess.numVertexes; i++ ) {
-				*(int *)tess.svars.colors[i] = *(int *)pStage->constantColor;
+				*reinterpret_cast<int *>(tess.svars.colors[i]) = *reinterpret_cast<int *>(pStage->constantColor);
 			}
 			break;
 		case CGEN_VERTEX:
@@ -679,18 +679,18 @@ static void ComputeColors( shaderStage_t *pStage )
 				fog = tr.world->fogs + tess.fogNum;
 
 				for ( i = 0; i < tess.numVertexes; i++ ) {
-					* ( int * )&tess.svars.colors[i] = fog->colorInt;
+					* reinterpret_cast< int *>(&tess.svars.colors[i]) = fog->colorInt;
 				}
 			}
 			break;
 		case CGEN_WAVEFORM:
-			RB_CalcWaveColor( &pStage->rgbWave, ( unsigned char * ) tess.svars.colors );
+			RB_CalcWaveColor( &pStage->rgbWave, reinterpret_cast< unsigned char *>(tess.svars.colors) );
 			break;
 		case CGEN_ENTITY:
-			RB_CalcColorFromEntity( ( unsigned char * ) tess.svars.colors );
+			RB_CalcColorFromEntity( reinterpret_cast< unsigned char *>(tess.svars.colors) );
 			break;
 		case CGEN_ONE_MINUS_ENTITY:
-			RB_CalcColorFromOneMinusEntity( ( unsigned char * ) tess.svars.colors );
+			RB_CalcColorFromOneMinusEntity( reinterpret_cast< unsigned char *>(tess.svars.colors) );
 			break;
 	}
 
@@ -719,16 +719,16 @@ static void ComputeColors( shaderStage_t *pStage )
 		}
 		break;
 	case AGEN_WAVEFORM:
-		RB_CalcWaveAlpha( &pStage->alphaWave, ( unsigned char * ) tess.svars.colors );
+		RB_CalcWaveAlpha( &pStage->alphaWave, reinterpret_cast< unsigned char *>(tess.svars.colors) );
 		break;
 	case AGEN_LIGHTING_SPECULAR:
-		RB_CalcSpecularAlpha( ( unsigned char * ) tess.svars.colors );
+		RB_CalcSpecularAlpha( reinterpret_cast< unsigned char *>(tess.svars.colors) );
 		break;
 	case AGEN_ENTITY:
-		RB_CalcAlphaFromEntity( ( unsigned char * ) tess.svars.colors );
+		RB_CalcAlphaFromEntity( reinterpret_cast< unsigned char *>(tess.svars.colors) );
 		break;
 	case AGEN_ONE_MINUS_ENTITY:
-		RB_CalcAlphaFromOneMinusEntity( ( unsigned char * ) tess.svars.colors );
+		RB_CalcAlphaFromOneMinusEntity( reinterpret_cast< unsigned char *>(tess.svars.colors) );
 		break;
     case AGEN_VERTEX:
 		if ( pStage->rgbGen != CGEN_VERTEX ) {
@@ -784,13 +784,13 @@ static void ComputeColors( shaderStage_t *pStage )
 		switch ( pStage->adjustColorsForFog )
 		{
 		case ACFF_MODULATE_RGB:
-			RB_CalcModulateColorsByFog( ( unsigned char * ) tess.svars.colors );
+			RB_CalcModulateColorsByFog( reinterpret_cast< unsigned char *>(tess.svars.colors) );
 			break;
 		case ACFF_MODULATE_ALPHA:
-			RB_CalcModulateAlphasByFog( ( unsigned char * ) tess.svars.colors );
+			RB_CalcModulateAlphasByFog( reinterpret_cast< unsigned char *>(tess.svars.colors) );
 			break;
 		case ACFF_MODULATE_RGBA:
-			RB_CalcModulateRGBAsByFog( ( unsigned char * ) tess.svars.colors );
+			RB_CalcModulateRGBAsByFog( reinterpret_cast< unsigned char *>(tess.svars.colors) );
 			break;
 		case ACFF_NONE:
 			break;
@@ -860,10 +860,10 @@ static void ComputeTexCoords( shaderStage_t *pStage ) {
 			}
 			break;
 		case TCGEN_FOG:
-			RB_CalcFogTexCoords( ( float * ) tess.svars.texcoords[b] );
+			RB_CalcFogTexCoords( reinterpret_cast< float *>(tess.svars.texcoords[b]) );
 			break;
 		case TCGEN_ENVIRONMENT_MAPPED:
-			RB_CalcEnvironmentTexCoords( ( float * ) tess.svars.texcoords[b] );
+			RB_CalcEnvironmentTexCoords( reinterpret_cast< float *>(tess.svars.texcoords[b]) );
 			break;
 		case TCGEN_BAD:
 			return;
@@ -881,37 +881,37 @@ static void ComputeTexCoords( shaderStage_t *pStage ) {
 
 			case TMOD_TURBULENT:
 				RB_CalcTurbulentTexCoords( &pStage->bundle[b].texMods[tm].wave, 
-						                 ( float * ) tess.svars.texcoords[b] );
+						                 reinterpret_cast< float *>(tess.svars.texcoords[b]) );
 				break;
 
 			case TMOD_ENTITY_TRANSLATE:
 				RB_CalcScrollTexCoords( backEnd.currentEntity->e.shaderTexCoord,
-									 ( float * ) tess.svars.texcoords[b] );
+									 reinterpret_cast< float *>(tess.svars.texcoords[b]) );
 				break;
 
 			case TMOD_SCROLL:
 				RB_CalcScrollTexCoords( pStage->bundle[b].texMods[tm].scroll,
-										 ( float * ) tess.svars.texcoords[b] );
+										 reinterpret_cast< float *>(tess.svars.texcoords[b]) );
 				break;
 
 			case TMOD_SCALE:
 				RB_CalcScaleTexCoords( pStage->bundle[b].texMods[tm].scale,
-									 ( float * ) tess.svars.texcoords[b] );
+									 reinterpret_cast< float *>(tess.svars.texcoords[b]) );
 				break;
 			
 			case TMOD_STRETCH:
 				RB_CalcStretchTexCoords( &pStage->bundle[b].texMods[tm].wave, 
-						               ( float * ) tess.svars.texcoords[b] );
+						               reinterpret_cast< float *>(tess.svars.texcoords[b]) );
 				break;
 
 			case TMOD_TRANSFORM:
 				RB_CalcTransformTexCoords( &pStage->bundle[b].texMods[tm],
-						                 ( float * ) tess.svars.texcoords[b] );
+						                 reinterpret_cast< float *>(tess.svars.texcoords[b]) );
 				break;
 
 			case TMOD_ROTATE:
 				RB_CalcRotateTexCoords( pStage->bundle[b].texMods[tm].rotateSpeed,
-										( float * ) tess.svars.texcoords[b] );
+										reinterpret_cast< float *>(tess.svars.texcoords[b]) );
 				break;
 
 			default:
@@ -1112,7 +1112,7 @@ void RB_StageIteratorVertexLitTexture( )
 	//
 	// compute colors
 	//
-	RB_CalcDiffuseColor( ( unsigned char * ) tess.svars.colors );
+	RB_CalcDiffuseColor( reinterpret_cast< unsigned char *>(tess.svars.colors) );
 
 	//
 	// log this call

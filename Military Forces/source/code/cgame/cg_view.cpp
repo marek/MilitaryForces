@@ -683,8 +683,8 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, bool demoPlay
 		CG_AddLocalEntities();
 
 
-		pw.systems[0].pos[0] = sin((float)cg.time/100)*10;
-		pw.systems[0].pos[1] = cos((float)cg.time/100)*10;
+		pw.systems[0].pos[0] = sin(static_cast<float>(cg.time)/100)*10;
+		pw.systems[0].pos[1] = cos(static_cast<float>(cg.time)/100)*10;
 
 		// Add Particles
 		/*
@@ -724,12 +724,12 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, bool demoPlay
 	}
 	if (cg_timescale.value != cg_timescaleFadeEnd.value) {
 		if (cg_timescale.value < cg_timescaleFadeEnd.value) {
-			cg_timescale.value += cg_timescaleFadeSpeed.value * ((float)cg.frametime) / 1000;
+			cg_timescale.value += cg_timescaleFadeSpeed.value * (static_cast<float>(cg.frametime)) / 1000;
 			if (cg_timescale.value > cg_timescaleFadeEnd.value)
 				cg_timescale.value = cg_timescaleFadeEnd.value;
 		}
 		else {
-			cg_timescale.value -= cg_timescaleFadeSpeed.value * ((float)cg.frametime) / 1000;
+			cg_timescale.value -= cg_timescaleFadeSpeed.value * (static_cast<float>(cg.frametime)) / 1000;
 			if (cg_timescale.value < cg_timescaleFadeEnd.value)
 				cg_timescale.value = cg_timescaleFadeEnd.value;
 		}
@@ -811,8 +811,8 @@ bool CG_WorldToScreenCoords( vec3_t worldPoint, int * pX, int * pY, bool virtual
 	   }
 
 	   // convert 
-	   *pX = (int)p[0];
-	   *pY = (int)p[1];
+	   *pX = static_cast<int>(p[0]);
+	   *pY = static_cast<int>(p[1]);
 
 	   // on-screen
 	   return true;

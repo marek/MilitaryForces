@@ -288,7 +288,7 @@ void RB_ProjectionShadowDeform( ) {
 	float	d;
 	vec3_t	lightDir;
 
-	xyz = ( float * ) tess.xyz;
+	xyz = reinterpret_cast< float *>(tess.xyz);
 
 	ground[0] = backEnd.or.axis[0][2];
 	ground[1] = backEnd.or.axis[1][2];

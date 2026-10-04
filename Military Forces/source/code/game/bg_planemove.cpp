@@ -148,8 +148,8 @@ static void PM_PlaneAccelerate()
     float	topspeed = availableVehicles[pm->vehicle].maxspeed;
     int		maxthrottle = availableVehicles[pm->vehicle].maxthrottle;
 	int		minthrottle = availableVehicles[pm->vehicle].minthrottle;
-    float	currspeed = (float)pm->ps->speed/10;
-    float	stallspeed = (float)availableVehicles[pm->vehicle].stallspeed;
+    float	currspeed = static_cast<float>(pm->ps->speed)/10;
+    float	stallspeed = static_cast<float>(availableVehicles[pm->vehicle].stallspeed);
     float	accel = availableVehicles[pm->vehicle].accel * pml.frametime/3;
     float	decel = accel;
 
@@ -361,15 +361,15 @@ void PM_PlaneMove( )
 
 	// ground movement
 	if( pm->ps->ONOFF & OO_LANDED ) {
-		float speed = (float)pm->ps->speed/10;
+		float speed = static_cast<float>(pm->ps->speed)/10;
 		if( (availableVehicles[pm->vehicle].caps & HC_TAILDRAGGER) ) {
 			if( speed > availableVehicles[pm->vehicle].stallspeed/2 ) {
 				vehdir[0] = 0;
-			} else if( speed > ((float)availableVehicles[pm->vehicle].stallspeed/2 + 
-							(float)availableVehicles[pm->vehicle].tailangle) ) {
-				vehdir[0] = -((float)availableVehicles[pm->vehicle].stallspeed/2 - speed);
+			} else if( speed > (static_cast<float>(availableVehicles[pm->vehicle].stallspeed)/2 + 
+							availableVehicles[pm->vehicle].tailangle) ) {
+				vehdir[0] = -(static_cast<float>(availableVehicles[pm->vehicle].stallspeed)/2 - speed);
 			} else {
-				vehdir[0] = (float)availableVehicles[pm->vehicle].tailangle;
+				vehdir[0] = availableVehicles[pm->vehicle].tailangle;
 			}
 		} else {
 			vehdir[0] = 0;
@@ -641,15 +641,15 @@ void PM_PlaneMoveAdvanced( )
 
 	// ground movement
 	if( pm->ps->ONOFF & OO_LANDED ) {
-		float speed = (float)pm->ps->speed/10;
+		float speed = static_cast<float>(pm->ps->speed)/10;
 		if( (availableVehicles[pm->vehicle].caps & HC_TAILDRAGGER) ) {
 			if( speed > availableVehicles[pm->vehicle].stallspeed/2 ) {
 				vehdir[0] = 0;
-			} else if( speed > ((float)availableVehicles[pm->vehicle].stallspeed/2 + 
-							(float)availableVehicles[pm->vehicle].tailangle) ) {
-				vehdir[0] = -((float)availableVehicles[pm->vehicle].stallspeed/2 - speed);
+			} else if( speed > (static_cast<float>(availableVehicles[pm->vehicle].stallspeed)/2 + 
+							availableVehicles[pm->vehicle].tailangle) ) {
+				vehdir[0] = -(static_cast<float>(availableVehicles[pm->vehicle].stallspeed)/2 - speed);
 			} else {
-				vehdir[0] = (float)availableVehicles[pm->vehicle].tailangle;
+				vehdir[0] = availableVehicles[pm->vehicle].tailangle;
 			}
 		} else {
 			vehdir[0] = 0;
@@ -692,9 +692,9 @@ void PM_PlaneMoveAdvanced( )
 		{
 //			Com_Printf("moves: %d %d %d\n", pm->cmd.forwardmove, pm->cmd.rightmove, pm->cmd.upmove );
 
-			ratepitch = (float)pm->cmd.forwardmove/127;
-			rateyaw = (float)pm->cmd.upmove/127;
-			rateroll = (float)pm->cmd.rightmove/127;
+			ratepitch = static_cast<float>(pm->cmd.forwardmove)/127;
+			rateyaw = static_cast<float>(pm->cmd.upmove)/127;
+			rateroll = static_cast<float>(pm->cmd.rightmove)/127;
 
 			AngleVectors( vehdir, forward, temp, up );
 			// see anglestoaxis funcion for explanation:

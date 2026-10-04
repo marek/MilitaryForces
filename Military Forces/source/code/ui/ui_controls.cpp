@@ -134,10 +134,10 @@ ControlUtils::ControlUtils()
 
 ControlUtils::~ControlUtils()
 {
-	for( size_t i = 0; i < bindings_.size(); ++i )
+	for(auto & binding : bindings_)
 	{	
-		delete bindings_[i];
-		bindings_[i] = nullptr;
+		delete binding;
+		binding = nullptr;
 	}
 	bindings_.clear();
 }
@@ -292,6 +292,5 @@ ControlUtils::Binding::Binding( const char* command,
 }
 
 ControlUtils::Binding::~Binding()
-{
-}
+= default;
 

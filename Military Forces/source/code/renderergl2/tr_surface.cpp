@@ -293,10 +293,10 @@ static void RB_SurfacePolychain( srfPoly_t *p ) {
 		VectorCopy( p->verts[i].xyz, tess.xyz[numv] );
 		tess.texCoords[numv][0] = p->verts[i].st[0];
 		tess.texCoords[numv][1] = p->verts[i].st[1];
-		tess.color[numv][0] = (int)p->verts[i].modulate[0] * 257;
-		tess.color[numv][1] = (int)p->verts[i].modulate[1] * 257;
-		tess.color[numv][2] = (int)p->verts[i].modulate[2] * 257;
-		tess.color[numv][3] = (int)p->verts[i].modulate[3] * 257;
+		tess.color[numv][0] = static_cast<int>(p->verts[i].modulate[0]) * 257;
+		tess.color[numv][1] = static_cast<int>(p->verts[i].modulate[1]) * 257;
+		tess.color[numv][2] = static_cast<int>(p->verts[i].modulate[2]) * 257;
+		tess.color[numv][3] = static_cast<int>(p->verts[i].modulate[3]) * 257;
 
 		numv++;
 	}
@@ -820,14 +820,14 @@ static void LerpMeshVertexes(mdvSurface_t *surf, float backlerp)
 		{
 			VectorLerp(newVerts->xyz,    oldVerts->xyz,    backlerp, outXyz);
 
-			outNormal[0] = (int16_t)(newVerts->normal[0] * (1.0f - backlerp) + oldVerts->normal[0] * backlerp);
-			outNormal[1] = (int16_t)(newVerts->normal[1] * (1.0f - backlerp) + oldVerts->normal[1] * backlerp);
-			outNormal[2] = (int16_t)(newVerts->normal[2] * (1.0f - backlerp) + oldVerts->normal[2] * backlerp);
+			outNormal[0] = static_cast<int16_t>(newVerts->normal[0] * (1.0f - backlerp) + oldVerts->normal[0] * backlerp);
+			outNormal[1] = static_cast<int16_t>(newVerts->normal[1] * (1.0f - backlerp) + oldVerts->normal[1] * backlerp);
+			outNormal[2] = static_cast<int16_t>(newVerts->normal[2] * (1.0f - backlerp) + oldVerts->normal[2] * backlerp);
 			outNormal[3] = 0;
 
-			outTangent[0] = (int16_t)(newVerts->tangent[0] * (1.0f - backlerp) + oldVerts->tangent[0] * backlerp);
-			outTangent[1] = (int16_t)(newVerts->tangent[1] * (1.0f - backlerp) + oldVerts->tangent[1] * backlerp);
-			outTangent[2] = (int16_t)(newVerts->tangent[2] * (1.0f - backlerp) + oldVerts->tangent[2] * backlerp);
+			outTangent[0] = static_cast<int16_t>(newVerts->tangent[0] * (1.0f - backlerp) + oldVerts->tangent[0] * backlerp);
+			outTangent[1] = static_cast<int16_t>(newVerts->tangent[1] * (1.0f - backlerp) + oldVerts->tangent[1] * backlerp);
+			outTangent[2] = static_cast<int16_t>(newVerts->tangent[2] * (1.0f - backlerp) + oldVerts->tangent[2] * backlerp);
 			outTangent[3] = newVerts->tangent[3];
 
 			newVerts++;
@@ -1304,17 +1304,17 @@ static void RB_SurfaceSkip( void *surf ) {
 
 
 void (*rb_surfaceTable[SF_NUM_SURFACE_TYPES])( void *) = {
-	(void(*)(void*))RB_SurfaceBad,			// SF_BAD, 
-	(void(*)(void*))RB_SurfaceSkip,			// SF_SKIP, 
-	(void(*)(void*))RB_SurfaceFace,			// SF_FACE,
-	(void(*)(void*))RB_SurfaceGrid,			// SF_GRID,
-	(void(*)(void*))RB_SurfaceTriangles,		// SF_TRIANGLES,
-	(void(*)(void*))RB_SurfacePolychain,		// SF_POLY,
-	(void(*)(void*))RB_SurfaceMesh,			// SF_MDV,
-	(void(*)(void*))RB_MDRSurfaceAnim,		// SF_MDR,
-	(void(*)(void*))RB_IQMSurfaceAnim,		// SF_IQM,
-	(void(*)(void*))RB_SurfaceFlare,		// SF_FLARE,
-	(void(*)(void*))RB_SurfaceEntity,		// SF_ENTITY
-	(void(*)(void*))RB_SurfaceVaoMdvMesh,   // SF_VAO_MDVMESH
-	(void(*)(void*))RB_IQMSurfaceAnimVao,   // SF_VAO_IQM
+	reinterpret_cast<void(*)(void*)>(RB_SurfaceBad),			// SF_BAD, 
+	static_cast<void(*)(void*)>(RB_SurfaceSkip),			// SF_SKIP, 
+	reinterpret_cast<void(*)(void*)>(RB_SurfaceFace),			// SF_FACE,
+	reinterpret_cast<void(*)(void*)>(RB_SurfaceGrid),			// SF_GRID,
+	reinterpret_cast<void(*)(void*)>(RB_SurfaceTriangles),		// SF_TRIANGLES,
+	reinterpret_cast<void(*)(void*)>(RB_SurfacePolychain),		// SF_POLY,
+	reinterpret_cast<void(*)(void*)>(RB_SurfaceMesh),			// SF_MDV,
+	reinterpret_cast<void(*)(void*)>(RB_MDRSurfaceAnim),		// SF_MDR,
+	reinterpret_cast<void(*)(void*)>(RB_IQMSurfaceAnim),		// SF_IQM,
+	reinterpret_cast<void(*)(void*)>(RB_SurfaceFlare),		// SF_FLARE,
+	reinterpret_cast<void(*)(void*)>(RB_SurfaceEntity),		// SF_ENTITY
+	reinterpret_cast<void(*)(void*)>(RB_SurfaceVaoMdvMesh),   // SF_VAO_MDVMESH
+	reinterpret_cast<void(*)(void*)>(RB_IQMSurfaceAnimVao),   // SF_VAO_IQM
 };

@@ -133,7 +133,7 @@ void SV_GetChallenge(netadr_t from)
 	}
 
 	// always generate a new challenge number, so the client cannot circumvent sv_maxping
-	challenge->challenge_ = ( ((unsigned int)rand() << 16) ^ (unsigned int)rand() ) ^ theSVS.time_;
+	challenge->challenge_ = ( (static_cast<unsigned int>(rand()) << 16) ^ static_cast<unsigned int>(rand()) ) ^ theSVS.time_;
 	challenge->wasrefused_ = false;
 	challenge->time_ = theSVS.time_;
 
@@ -1049,7 +1049,7 @@ int SV_WriteDownloadToClient(SV_Client *cl, Message *msg)
 		curindex = (cl->downloadCurrentBlock_ % MAX_DOWNLOAD_WINDOW);
 
 		if (!cl->downloadBlocks_[curindex])
-			cl->downloadBlocks_[curindex] = (unsigned char *)Z_Malloc(MAX_DOWNLOAD_BLKSIZE);
+			cl->downloadBlocks_[curindex] = static_cast<unsigned char *>(Z_Malloc(MAX_DOWNLOAD_BLKSIZE));
 
 		cl->downloadBlockSize_[curindex] = FS_Read( cl->downloadBlocks_[curindex], MAX_DOWNLOAD_BLKSIZE, cl->download_ );
 
@@ -1479,7 +1479,7 @@ void SV_UserinfoChanged( SV_Client *cl ) {
 	if( NET_IsLocalAddress(cl->netchan_.remoteAddress) )
 		ip = "localhost";
 	else
-		ip = (char*)NET_AdrToString( cl->netchan_.remoteAddress );
+		ip = const_cast<char*>(NET_AdrToString( cl->netchan_.remoteAddress ));
 
 	val = Info_ValueForKey( cl->userinfo_, "ip" );
 	if( val[0] )
@@ -1905,7 +1905,7 @@ void SV_UserVoip(SV_Client *cl, Message *msg, bool ignoreData)
 			continue;  // no room for another packet right now.
 		}
 
-		packet = (voipServerPacket_t *)Z_Malloc(sizeof(*packet));
+		packet = static_cast<voipServerPacket_t *>(Z_Malloc(sizeof(*packet)));
 		packet->sender = sender;
 		packet->frames = frames;
 		packet->len = packetsize;

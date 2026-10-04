@@ -490,7 +490,7 @@ bool G_RadiusDamage ( vec3_t origin, GameEntity* attacker, float damage, float r
 			// push the center of mass higher than the origin so players
 			// get knocked into the air more
 			dir[2] += 24;
-			G_Damage (ent, nullptr, attacker, dir, origin, (int)points, DAMAGE_RADIUS, mod, cat);
+			G_Damage (ent, nullptr, attacker, dir, origin, static_cast<int>(points), DAMAGE_RADIUS, mod, cat);
 		}
 	}
 

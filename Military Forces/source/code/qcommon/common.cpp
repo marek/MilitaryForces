@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "../game/q_shared.h"
 #include "qcommon.h"
-#include <setjmp.h>
+#include <csetjmp>
 #ifndef _WIN32
 #include <netinet/in.h>
 #include <sys/stat.h> // umask
@@ -800,7 +800,7 @@ static void Z_ClearZone( memzone_t *zone, int size ) {
 	// set the entire zone to one free block
 
 	zone->blocklist.next = zone->blocklist.prev = block =
-		(memblock_t *)( (byte *)zone + sizeof(memzone_t) );
+		reinterpret_cast<memblock_t *>( reinterpret_cast<byte *>(zone) + sizeof(memzone_t) );
 	zone->blocklist.tag = 1;	// in use block
 	zone->blocklist.id = 0;
 	zone->blocklist.size = 0;
@@ -845,7 +845,7 @@ void Z_Free( void *ptr ) {
 		Com_Error( ERR_DROP, "Z_Free: NULL pointer" );
 	}
 
-	block = (memblock_t *) ( (byte *)ptr - sizeof(memblock_t));
+	block = reinterpret_cast<memblock_t *>( static_cast<byte *>(ptr) - sizeof(memblock_t));
 	if (block->id != ZONEID) {
 		Com_Error( ERR_FATAL, "Z_Free: freed a pointer without ZONEID" );
 	}
@@ -858,7 +858,7 @@ void Z_Free( void *ptr ) {
 	}
 
 	// check the memory trash tester
-	if ( *(int *)((byte *)block + block->size - 4 ) != ZONEID ) {
+	if ( *reinterpret_cast<int *>(reinterpret_cast<byte *>(block) + block->size - 4 ) != ZONEID ) {
 		Com_Error( ERR_FATAL, "Z_Free: memory block wrote past end" );
 	}
 
@@ -919,7 +919,7 @@ void Z_FreeTags( int tag ) {
 	zone->rover = zone->blocklist.next;
 	do {
 		if ( zone->rover->tag == tag ) {
-			Z_Free( (void *)(zone->rover + 1) );
+			Z_Free( reinterpret_cast<void *>(zone->rover + 1) );
 			continue;
 		}
 		zone->rover = zone->rover->next;
@@ -994,7 +994,7 @@ void *Z_TagMalloc( int size, int tag ) {
 	extra = base->size - size;
 	if (extra > MINFRAGMENT) {
 		// there will be a free fragment after the allocated block
-		newblock = (memblock_t *) ((byte *)base + size );
+		newblock = reinterpret_cast<memblock_t *>(reinterpret_cast<byte *>(base) + size );
 		newblock->size = extra;
 		newblock->tag = 0;			// free block
 		newblock->prev = base;
@@ -1020,9 +1020,9 @@ void *Z_TagMalloc( int size, int tag ) {
 #endif
 
 	// marker for memory trash testing
-	*(int *)((byte *)base + base->size - 4) = ZONEID;
+	*reinterpret_cast<int *>(reinterpret_cast<byte *>(base) + base->size - 4) = ZONEID;
 
-	return (void *) ((byte *)base + sizeof(memblock_t));
+	return reinterpret_cast<void *>(reinterpret_cast<byte *>(base) + sizeof(memblock_t));
 }
 
 /*
@@ -1071,7 +1071,7 @@ static void Z_CheckHeap( ) {
 		if (block->next == &mainzone->blocklist) {
 			break;			// all blocks have been hit
 		}
-		if ( (byte *)block + block->size != (byte *)block->next)
+		if ( reinterpret_cast<byte *>(block) + block->size != reinterpret_cast<byte *>(block->next))
 			Com_Error( ERR_FATAL, "Z_CheckHeap: block size does not touch the next block" );
 		if ( block->next->prev != block) {
 			Com_Error( ERR_FATAL, "Z_CheckHeap: next block doesn't have proper back link" );
@@ -1107,7 +1107,7 @@ void Z_LogZoneHeap( memzone_t *zone, char *name ) {
 	for (block = zone->blocklist.next ; block->next != &zone->blocklist; block = block->next) {
 		if (block->tag) {
 #ifdef ZONE_DEBUG
-			ptr = ((char *) block) + sizeof(memblock_t);
+			ptr = (reinterpret_cast<char *>(block)) + sizeof(memblock_t);
 			j = 0;
 			for (i = 0; i < 20 && i < block->d.allocSize; i++) {
 				if (ptr[i] >= 32 && ptr[i] < 127) {
@@ -1182,14 +1182,14 @@ char *CopyString( const char *in ) {
 	char	*out;
 
 	if (!in[0]) {
-		return ((char *)&emptystring) + sizeof(memblock_t);
+		return (reinterpret_cast<char *>(&emptystring)) + sizeof(memblock_t);
 	}
 	else if (!in[1]) {
 		if (in[0] >= '0' && in[0] <= '9') {
-			return ((char *)&numberstring[in[0]-'0']) + sizeof(memblock_t);
+			return (reinterpret_cast<char *>(&numberstring[in[0]-'0'])) + sizeof(memblock_t);
 		}
 	}
-	out = (char *)S_Malloc (strlen(in)+1);
+	out = static_cast<char *>(S_Malloc (strlen(in)+1));
 	strcpy (out, in);
 	return out;
 }
@@ -1285,7 +1285,7 @@ void Com_Meminfo_f( ) {
 	for (block = mainzone->blocklist.next ; ; block = block->next) {
 		if ( Cmd_Argc() != 1 ) {
 			Com_Printf ("block:%p    size:%7i    tag:%3i\n",
-				(void *)block, block->size, block->tag);
+				reinterpret_cast<void *>(block), block->size, block->tag);
 		}
 		if ( block->tag ) {
 			zoneBytes += block->size;
@@ -1300,7 +1300,7 @@ void Com_Meminfo_f( ) {
 		if (block->next == &mainzone->blocklist) {
 			break;			// all blocks have been hit	
 		}
-		if ( (byte *)block + block->size != (byte *)block->next) {
+		if ( reinterpret_cast<byte *>(block) + block->size != reinterpret_cast<byte *>(block->next)) {
 			Com_Printf ("ERROR: block size does not touch the next block\n");
 		}
 		if ( block->next->prev != block) {
@@ -1377,20 +1377,20 @@ void Com_TouchMemory( ) {
 
 	j = hunk_low.permanent >> 2;
 	for ( i = 0 ; i < j ; i+=64 ) {			// only need to touch each page
-		sum += ((int *)s_hunkData)[i];
+		sum += (reinterpret_cast<int *>(s_hunkData))[i];
 	}
 
 	i = ( s_hunkTotal - hunk_high.permanent ) >> 2;
 	j = hunk_high.permanent >> 2;
 	for (  ; i < j ; i+=64 ) {			// only need to touch each page
-		sum += ((int *)s_hunkData)[i];
+		sum += (reinterpret_cast<int *>(s_hunkData))[i];
 	}
 
 	for (block = mainzone->blocklist.next ; ; block = block->next) {
 		if ( block->tag ) {
 			j = block->size >> 2;
 			for ( i = 0 ; i < j ; i+=64 ) {				// only need to touch each page
-				sum += ((int *)block)[i];
+				sum += (reinterpret_cast<int *>(block))[i];
 			}
 		}
 		if ( block->next == &mainzone->blocklist ) {
@@ -1414,9 +1414,9 @@ Com_InitZoneMemory
 */
 void Com_InitSmallZoneMemory( ) {
 	s_smallZoneTotal = 512 * 1024;
-	smallzone = (memzone_t *)calloc( s_smallZoneTotal, 1 );
+	smallzone = static_cast<memzone_t *>(calloc( s_smallZoneTotal, 1 ));
 	if ( !smallzone ) {
-		Com_Error( ERR_FATAL, "Small zone data failed to allocate %1.1f megs", (float)s_smallZoneTotal / (1024*1024) );
+		Com_Error( ERR_FATAL, "Small zone data failed to allocate %1.1f megs", static_cast<float>(s_smallZoneTotal) / (1024*1024) );
 	}
 	Z_ClearZone( smallzone, s_smallZoneTotal );
 }
@@ -1439,7 +1439,7 @@ void Com_InitZoneMemory( ) {
 		s_zoneTotal = cv->integer * 1024 * 1024;
 	}
 
-	mainzone = (memzone_t *)calloc( s_zoneTotal, 1 );
+	mainzone = static_cast<memzone_t *>(calloc( s_zoneTotal, 1 ));
 	if ( !mainzone ) {
 		Com_Error( ERR_FATAL, "Zone data failed to allocate %i megs", s_zoneTotal / (1024*1024) );
 	}
@@ -1568,7 +1568,7 @@ void Com_InitHunkMemory( ) {
 		s_hunkTotal = cv->integer * 1024 * 1024;
 	}
 
-	s_hunkData = (byte *)calloc( s_hunkTotal + 31, 1 );
+	s_hunkData = static_cast<byte *>(calloc( s_hunkTotal + 31, 1 ));
 	if ( !s_hunkData ) {
 		Com_Error( ERR_FATAL, "Hunk data failed to allocate %i megs", s_hunkTotal / (1024*1024) );
 	}
@@ -1743,11 +1743,11 @@ void *Hunk_Alloc( int size, ha_pref preference ) {
 	}
 
 	if ( hunk_permanent == &hunk_low ) {
-		buf = (void *)(s_hunkData + hunk_permanent->permanent);
+		buf = reinterpret_cast<void *>(s_hunkData + hunk_permanent->permanent);
 		hunk_permanent->permanent += size;
 	} else {
 		hunk_permanent->permanent += size;
-		buf = (void *)(s_hunkData + s_hunkTotal - hunk_permanent->permanent );
+		buf = reinterpret_cast<void *>(s_hunkData + s_hunkTotal - hunk_permanent->permanent );
 	}
 
 	hunk_permanent->temp = hunk_permanent->permanent;
@@ -1758,14 +1758,14 @@ void *Hunk_Alloc( int size, ha_pref preference ) {
 	{
 		hunkblock_t *block;
 
-		block = (hunkblock_t *) buf;
+		block = static_cast<hunkblock_t *>(buf);
 		block->size = size - sizeof(hunkblock_t);
 		block->file = file;
 		block->label = label;
 		block->line = line;
 		block->next = hunkblocks;
 		hunkblocks = block;
-		buf = ((byte *) buf) + sizeof(hunkblock_t);
+		buf = (static_cast<byte *>(buf)) + sizeof(hunkblock_t);
 	}
 #endif
 	return buf;
@@ -1802,19 +1802,19 @@ void *Hunk_AllocateTempMemory( int size ) {
 	}
 
 	if ( hunk_temp == &hunk_low ) {
-		buf = (void *)(s_hunkData + hunk_temp->temp);
+		buf = reinterpret_cast<void *>(s_hunkData + hunk_temp->temp);
 		hunk_temp->temp += size;
 	} else {
 		hunk_temp->temp += size;
-		buf = (void *)(s_hunkData + s_hunkTotal - hunk_temp->temp );
+		buf = reinterpret_cast<void *>(s_hunkData + s_hunkTotal - hunk_temp->temp );
 	}
 
 	if ( hunk_temp->temp > hunk_temp->tempHighwater ) {
 		hunk_temp->tempHighwater = hunk_temp->temp;
 	}
 
-	hdr = (hunkHeader_t *)buf;
-	buf = (void *)(hdr+1);
+	hdr = static_cast<hunkHeader_t *>(buf);
+	buf = reinterpret_cast<void *>(hdr+1);
 
 	hdr->magic = HUNK_MAGIC;
 	hdr->size = size;
@@ -1843,7 +1843,7 @@ void Hunk_FreeTempMemory( void *buf ) {
 	}
 
 
-	hdr = ( (hunkHeader_t *)buf ) - 1;
+	hdr = ( static_cast<hunkHeader_t *>(buf) ) - 1;
 	if ( hdr->magic != HUNK_MAGIC ) {
 		Com_Error( ERR_FATAL, "Hunk_FreeTempMemory: bad magic" );
 	}
@@ -1853,13 +1853,13 @@ void Hunk_FreeTempMemory( void *buf ) {
 	// this only works if the files are freed in stack order,
 	// otherwise the memory will stay around until Hunk_ClearTempMemory
 	if ( hunk_temp == &hunk_low ) {
-		if ( hdr == (void *)(s_hunkData + hunk_temp->temp - hdr->size ) ) {
+		if ( hdr == reinterpret_cast<void *>(s_hunkData + hunk_temp->temp - hdr->size ) ) {
 			hunk_temp->temp -= hdr->size;
 		} else {
 			Com_Printf( "Hunk_FreeTempMemory: not the final block\n" );
 		}
 	} else {
-		if ( hdr == (void *)(s_hunkData + s_hunkTotal - hunk_temp->temp ) ) {
+		if ( hdr == reinterpret_cast<void *>(s_hunkData + s_hunkTotal - hunk_temp->temp ) ) {
 			hunk_temp->temp -= hdr->size;
 		} else {
 			Com_Printf( "Hunk_FreeTempMemory: not the final block\n" );
@@ -2023,7 +2023,7 @@ sysEvent_t Com_GetSystemEvent( )
 		int   len;
 
 		len = strlen( s ) + 1;
-		b = (char *)Z_Malloc( len );
+		b = static_cast<char *>(Z_Malloc( len ));
 		strcpy( b, s );
 		Com_QueueEvent( 0, SE_CONSOLE, 0, 0, len, b );
 	}
@@ -2222,7 +2222,7 @@ int Com_EventLoop( ) {
 				CL_JoystickEvent( ev.evValue, ev.evValue2, ev.evTime );
 			break;
 			case SE_CONSOLE:
-				Cbuf_AddText( (char *)ev.evPtr );
+				Cbuf_AddText( static_cast<char *>(ev.evPtr) );
 				Cbuf_AddText( "\n" );
 			break;
 			default:
@@ -2638,7 +2638,7 @@ static void Com_InitRand()
 {
 	unsigned int seed;
 
-	if(Sys_RandomBytes((byte *) &seed, sizeof(seed)))
+	if(Sys_RandomBytes(reinterpret_cast<byte *>(&seed), sizeof(seed)))
 		srand(seed);
 	else
 		srand(time(nullptr));
@@ -2801,7 +2801,7 @@ void Com_Init( char *commandLine ) {
 	Sys_InitPIDFile( FS_GetCurrentGameDir() );
 
 	// Pick a random port value
-	Com_RandomBytes( (byte*)&qport, sizeof(int) );
+	Com_RandomBytes( reinterpret_cast<byte*>(&qport), sizeof(int) );
 	Netchan_Init( qport & 0xffff );
 
 	SV_Init();
@@ -3578,7 +3578,7 @@ void Com_RandomBytes( byte *string, int len )
 
 	Com_Printf( "Com_RandomBytes: using weak randomization\n" );
 	for( i = 0; i < len; i++ )
-		string[i] = (unsigned char)( rand() % 256 );
+		string[i] = static_cast<unsigned char>( rand() % 256 );
 }
 
 
@@ -3781,7 +3781,7 @@ void Field_CompletePlayerName( const char **names, int nameCount )
 
 int QDECL Com_strCompare( const void *a, const void *b )
 {
-    const char **pa = (const char **)a;
-    const char **pb = (const char **)b;
+    const char * const *pa = static_cast<const char * const *>(a);
+    const char * const *pb = static_cast<const char * const *>(b);
     return strcmp( *pa, *pb );
 }

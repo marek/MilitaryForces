@@ -125,11 +125,11 @@ void RB_AddQuadStampExt( vec3_t origin, vec3_t left, vec3_t up, byte *color, flo
 
 	// constant color all the way around
 	// should this be identity and let the shader specify from entity?
-	* ( unsigned int * ) &tess.vertexColors[ndx] = 
-	* ( unsigned int * ) &tess.vertexColors[ndx+1] = 
-	* ( unsigned int * ) &tess.vertexColors[ndx+2] = 
-	* ( unsigned int * ) &tess.vertexColors[ndx+3] = 
-		* ( unsigned int * )color;
+	* reinterpret_cast< unsigned int *>(&tess.vertexColors[ndx]) = 
+	* reinterpret_cast< unsigned int *>(&tess.vertexColors[ndx+1]) = 
+	* reinterpret_cast< unsigned int *>(&tess.vertexColors[ndx+2]) = 
+	* reinterpret_cast< unsigned int *>(&tess.vertexColors[ndx+3]) = 
+		* reinterpret_cast< unsigned int *>(color);
 
 
 	tess.numVertexes += 4;
@@ -198,7 +198,7 @@ static void RB_SurfacePolychain( srfPoly_t *p ) {
 		VectorCopy( p->verts[i].xyz, tess.xyz[numv] );
 		tess.texCoords[numv][0][0] = p->verts[i].st[0];
 		tess.texCoords[numv][0][1] = p->verts[i].st[1];
-		*(int *)&tess.vertexColors[numv] = *(int *)p->verts[ i ].modulate;
+		*reinterpret_cast<int *>(&tess.vertexColors[numv]) = *reinterpret_cast<int *>(p->verts[ i ].modulate);
 
 		numv++;
 	}
@@ -264,7 +264,7 @@ static void RB_SurfaceTriangles( srfTriangles_t *srf ) {
 		texCoords[2] = dv->lightmap[0];
 		texCoords[3] = dv->lightmap[1];
 
-		*(int *)color = *(int *)dv->color;
+		*reinterpret_cast<int *>(color) = *reinterpret_cast<int *>(dv->color);
 	}
 
 	for ( i = 0 ; i < srf->numVerts ; i++ ) {
@@ -622,7 +622,7 @@ static void LerpMeshVertexes_scalar(md3Surface_t *surf, float backlerp)
 	outXyz = tess.xyz[tess.numVertexes];
 	outNormal = tess.normal[tess.numVertexes];
 
-	newXyz = (short *)((byte *)surf + surf->ofsXyzNormals)
+	newXyz = reinterpret_cast<short *>(reinterpret_cast<byte *>(surf) + surf->ofsXyzNormals)
 		+ (backEnd.currentEntity->e.frame * surf->numVerts * 4);
 	newNormals = newXyz + 3;
 
@@ -661,7 +661,7 @@ static void LerpMeshVertexes_scalar(md3Surface_t *surf, float backlerp)
 		//
 		// interpolate and copy the vertex and normal
 		//
-		oldXyz = (short *)((byte *)surf + surf->ofsXyzNormals)
+		oldXyz = reinterpret_cast<short *>(reinterpret_cast<byte *>(surf) + surf->ofsXyzNormals)
 			+ (backEnd.currentEntity->e.oldframe * surf->numVerts * 4);
 		oldNormals = oldXyz + 3;
 
@@ -703,7 +703,7 @@ static void LerpMeshVertexes_scalar(md3Surface_t *surf, float backlerp)
 
 //			VectorNormalize (outNormal);
 		}
-    	VectorArrayNormalize((vec4_t *)tess.normal[tess.numVertexes], numVerts);
+    	VectorArrayNormalize(reinterpret_cast<vec4_t *>(tess.normal[tess.numVertexes]), numVerts);
    	}
 }
 
@@ -744,7 +744,7 @@ static void RB_SurfaceMesh(md3Surface_t *surface) {
 
 	LerpMeshVertexes (surface, backlerp);
 
-	triangles = (int *) ((byte *)surface + surface->ofsTriangles);
+	triangles = reinterpret_cast<int *>(reinterpret_cast<byte *>(surface) + surface->ofsTriangles);
 	indexes = surface->numTriangles * 3;
 	Bob = tess.numIndexes;
 	Doug = tess.numVertexes;
@@ -753,7 +753,7 @@ static void RB_SurfaceMesh(md3Surface_t *surface) {
 	}
 	tess.numIndexes += indexes;
 
-	texCoords = (float *) ((byte *)surface + surface->ofsSt);
+	texCoords = reinterpret_cast<float *>(reinterpret_cast<byte *>(surface) + surface->ofsSt);
 
 	numVerts = surface->numVerts;
 	for ( j = 0; j < numVerts; j++ ) {
@@ -788,7 +788,7 @@ static void RB_SurfaceFace( srfSurfaceFace_t *surf ) {
 	dlightBits = surf->dlightBits;
 	tess.dlightBits |= dlightBits;
 
-	indices = ( unsigned * ) ( ( ( char  * ) surf ) + surf->ofsIndices );
+	indices = reinterpret_cast< unsigned *>( ( reinterpret_cast< char  *>(surf) ) + surf->ofsIndices );
 
 	Bob = tess.numVertexes;
 	tessIndexes = tess.indexes + tess.numIndexes;
@@ -813,7 +813,7 @@ static void RB_SurfaceFace( srfSurfaceFace_t *surf ) {
 		tess.texCoords[ndx][0][1] = v[4];
 		tess.texCoords[ndx][1][0] = v[5];
 		tess.texCoords[ndx][1][1] = v[6];
-		* ( unsigned int * ) &tess.vertexColors[ndx] = * ( unsigned int * ) &v[7];
+		* reinterpret_cast< unsigned int *>(&tess.vertexColors[ndx]) = * reinterpret_cast< unsigned int *>(&v[7]);
 		tess.vertexDlightBits[ndx] = dlightBits;
 	}
 
@@ -940,7 +940,7 @@ static void RB_SurfaceGrid( srfGridMesh_t *cv ) {
 		xyz = tess.xyz[numVertexes];
 		normal = tess.normal[numVertexes];
 		texCoords = tess.texCoords[numVertexes][0];
-		color = ( unsigned char * ) &tess.vertexColors[numVertexes];
+		color = reinterpret_cast< unsigned char *>(&tess.vertexColors[numVertexes]);
 		vDlightBits = &tess.vertexDlightBits[numVertexes];
 		needsNormal = tess.shader->needsNormal;
 
@@ -961,7 +961,7 @@ static void RB_SurfaceGrid( srfGridMesh_t *cv ) {
 					normal[1] = dv->normal[1];
 					normal[2] = dv->normal[2];
 				}
-				* ( unsigned int * ) color = * ( unsigned int * ) dv->color;
+				* reinterpret_cast< unsigned int *>(color) = * reinterpret_cast< unsigned int *>(dv->color);
 				*vDlightBits++ = dlightBits;
 				xyz += 4;
 				normal += 4;
@@ -1090,15 +1090,15 @@ static void RB_SurfaceSkip( void *surf ) {
 
 
 void (*rb_surfaceTable[SF_NUM_SURFACE_TYPES])( void *) = {
-	(void(*)(void*))RB_SurfaceBad,			// SF_BAD, 
-	(void(*)(void*))RB_SurfaceSkip,			// SF_SKIP, 
-	(void(*)(void*))RB_SurfaceFace,			// SF_FACE,
-	(void(*)(void*))RB_SurfaceGrid,			// SF_GRID,
-	(void(*)(void*))RB_SurfaceTriangles,		// SF_TRIANGLES,
-	(void(*)(void*))RB_SurfacePolychain,		// SF_POLY,
-	(void(*)(void*))RB_SurfaceMesh,			// SF_MD3,
-	(void(*)(void*))RB_MDRSurfaceAnim,		// SF_MDR,
-	(void(*)(void*))RB_IQMSurfaceAnim,		// SF_IQM,
-	(void(*)(void*))RB_SurfaceFlare,		// SF_FLARE,
-	(void(*)(void*))RB_SurfaceEntity		// SF_ENTITY
+	reinterpret_cast<void(*)(void*)>(RB_SurfaceBad),			// SF_BAD, 
+	static_cast<void(*)(void*)>(RB_SurfaceSkip),			// SF_SKIP, 
+	reinterpret_cast<void(*)(void*)>(RB_SurfaceFace),			// SF_FACE,
+	reinterpret_cast<void(*)(void*)>(RB_SurfaceGrid),			// SF_GRID,
+	reinterpret_cast<void(*)(void*)>(RB_SurfaceTriangles),		// SF_TRIANGLES,
+	reinterpret_cast<void(*)(void*)>(RB_SurfacePolychain),		// SF_POLY,
+	reinterpret_cast<void(*)(void*)>(RB_SurfaceMesh),			// SF_MD3,
+	reinterpret_cast<void(*)(void*)>(RB_MDRSurfaceAnim),		// SF_MDR,
+	reinterpret_cast<void(*)(void*)>(RB_IQMSurfaceAnim),		// SF_IQM,
+	reinterpret_cast<void(*)(void*)>(RB_SurfaceFlare),		// SF_FLARE,
+	reinterpret_cast<void(*)(void*)>(RB_SurfaceEntity)		// SF_ENTITY
 };

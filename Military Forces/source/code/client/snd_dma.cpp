@@ -182,8 +182,8 @@ void S_Base_SoundList( ) {
 
 void S_ChannelFree(channel_t *v) {
 	v->thesfx = nullptr;
-	*(channel_t **)v = freelist;
-	freelist = (channel_t*)v;
+	*reinterpret_cast<channel_t **>(v) = freelist;
+	freelist = v;
 }
 
 channel_t*	S_ChannelMalloc( ) {
@@ -192,7 +192,7 @@ channel_t*	S_ChannelMalloc( ) {
 		return nullptr;
 	}
 	v = freelist;
-	freelist = *(channel_t **)freelist;
+	freelist = *reinterpret_cast<channel_t **>(freelist);
 	v->allocTime = Com_Milliseconds();
 	return v;
 }
@@ -206,10 +206,10 @@ void S_ChannelSetup( ) {
 	p = s_channels;;
 	q = p + MAX_CHANNELS;
 	while (--q > p) {
-		*(channel_t **)q = q-1;
+		*reinterpret_cast<channel_t **>(q) = q-1;
 	}
 	
-	*(channel_t **)q = nullptr;
+	*reinterpret_cast<channel_t **>(q) = nullptr;
 	freelist = p + MAX_CHANNELS - 1;
 	Com_DPrintf("Channel memory manager started\n");
 }
@@ -236,7 +236,7 @@ static long S_HashSFXName(const char *name) {
 		letter = tolower(name[i]);
 		if (letter =='.') break;				// don't include extension
 		if (letter =='\\') letter = '/';		// damn path names
-		hash+=(long)(letter)*(i+119);
+		hash+=static_cast<long>(letter)*(i+119);
 		i++;
 	}
 	hash &= (LOOP_HASH-1);
@@ -1015,7 +1015,7 @@ void S_Base_RawSamples( int stream, int samples, int rate, int width, int numCha
 		s_rawend[stream] = s_soundtime;
 	}
 
-	scale = (float)rate / dma.speed;
+	scale = static_cast<float>(rate) / dma.speed;
 
 //Com_Printf ("%i < %i < %i\n", s_soundtime, s_paintedtime, s_rawend[stream]);
 	if (numChannels == 2 && width == 2)
@@ -1085,8 +1085,8 @@ void S_Base_RawSamples( int stream, int samples, int rate, int width, int numCha
 				break;
 			dst = s_rawend[stream]&(MAX_RAW_SAMPLES-1);
 			s_rawend[stream]++;
-			rawsamples[dst].left = (((byte *)data)[src]-128) * intVolumeLeft;
-			rawsamples[dst].right = (((byte *)data)[src]-128) * intVolumeRight;
+			rawsamples[dst].left = ((const_cast<byte *>(data))[src]-128) * intVolumeLeft;
+			rawsamples[dst].right = ((const_cast<byte *>(data))[src]-128) * intVolumeRight;
 		}
 	}
 
@@ -1248,7 +1248,7 @@ void S_GetSoundtime()
 		float fps = MIN(cl_aviFrameRate->value, 1000.0f);
 		float frameDuration = MAX(dma.speed / fps, 1.0f) + clc.aviSoundFrameRemainder;
 
-		int msec = (int)frameDuration;
+		int msec = static_cast<int>(frameDuration);
 		s_soundtime += msec;
 		clc.aviSoundFrameRemainder = frameDuration - msec;
 

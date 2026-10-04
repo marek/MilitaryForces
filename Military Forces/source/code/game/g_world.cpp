@@ -12,8 +12,7 @@ EntityWorld::EntityWorld() :
 }
 
 EntityWorld::~EntityWorld()
-{
-}
+= default;
 
 void
 EntityWorld::init()

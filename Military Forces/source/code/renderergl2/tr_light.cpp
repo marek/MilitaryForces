@@ -85,7 +85,7 @@ void R_DlightBmodel( bmodel_t *bmodel ) {
 		}
 
 		// we need to check this light
-		mask |= (uint64_t)1 << i;
+		mask |= static_cast<uint64_t>(1) << i;
 	}
 
 	tr.currentEntity->needDlights = (mask != 0);
@@ -99,7 +99,7 @@ void R_DlightBmodel( bmodel_t *bmodel ) {
 			case SF_FACE:
 			case SF_GRID:
 			case SF_TRIANGLES:
-				((srfBspSurface_t *)surf->data)->dlightBits = mask;
+				(reinterpret_cast<srfBspSurface_t *>(surf->data))->dlightBits = mask;
 				break;
 
 			default:
@@ -202,7 +202,7 @@ static void R_SetupEntityLightingGrid( trRefEntity_t *ent, world_t *world ) {
 
 		if (world->lightGrid16)
 		{
-			uint16_t *data16 = world->lightGrid16 + (int)(data - world->lightGridData) / 8 * 6;
+			uint16_t *data16 = world->lightGrid16 + static_cast<int>(data - world->lightGridData) / 8 * 6;
 			if (!(data16[0]+data16[1]+data16[2]+data16[3]+data16[4]+data16[5])) {
 				continue;	// ignore samples in walls
 			}
@@ -229,7 +229,7 @@ static void R_SetupEntityLightingGrid( trRefEntity_t *ent, world_t *world ) {
 		if (world->lightGrid16)
 		{
 			// FIXME: this is hideous
-			uint16_t *data16 = world->lightGrid16 + (int)(data - world->lightGridData) / 8 * 6;
+			uint16_t *data16 = world->lightGrid16 + static_cast<int>(data - world->lightGridData) / 8 * 6;
 
 			ent->ambientLight[0] += factor * data16[0] / 257.0f;
 			ent->ambientLight[1] += factor * data16[1] / 257.0f;
@@ -425,10 +425,10 @@ void R_SetupEntityLighting( const trRefdef_t *refdef, trRefEntity_t *ent ) {
 	}
 
 	// save out the byte packet version
-	((byte *)&ent->ambientLightInt)[0] = ri.ftol(ent->ambientLight[0]);
-	((byte *)&ent->ambientLightInt)[1] = ri.ftol(ent->ambientLight[1]);
-	((byte *)&ent->ambientLightInt)[2] = ri.ftol(ent->ambientLight[2]);
-	((byte *)&ent->ambientLightInt)[3] = 0xff;
+	(reinterpret_cast<byte *>(&ent->ambientLightInt))[0] = ri.ftol(ent->ambientLight[0]);
+	(reinterpret_cast<byte *>(&ent->ambientLightInt))[1] = ri.ftol(ent->ambientLight[1]);
+	(reinterpret_cast<byte *>(&ent->ambientLightInt))[2] = ri.ftol(ent->ambientLight[2]);
+	(reinterpret_cast<byte *>(&ent->ambientLightInt))[3] = 0xff;
 	
 	// transform the direction to local space
 	VectorNormalize( lightDir );
@@ -489,7 +489,7 @@ int R_CubemapForPoint( vec3_t point )
 	if (r_cubeMapping->integer && tr.numCubemaps)
 	{
 		int i;
-		vec_t shortest = (float)WORLD_SIZE * (float)WORLD_SIZE;
+		vec_t shortest = static_cast<float>WORLD_SIZE * static_cast<float>WORLD_SIZE;
 
 		for (i = 0; i < tr.numCubemaps; i++)
 		{

@@ -97,7 +97,7 @@ void R_AddPolygonSurfaces( ) {
 
 	for ( i = 0, poly = tr.refdef.polys; i < tr.refdef.numPolys ; i++, poly++ ) {
 		sh = R_GetShaderByHandle( poly->hShader );
-		R_AddDrawSurf( ( surfaceType_t * )poly, sh, poly->fogIndex, false );
+		R_AddDrawSurf( reinterpret_cast< surfaceType_t *>(poly), sh, poly->fogIndex, false );
 	}
 }
 
@@ -218,7 +218,7 @@ void RE_AddRefEntityToScene( const refEntity_t *ent ) {
 		}
 		return;
 	}
-	if ( (int)ent->reType < 0 || ent->reType >= RT_MAX_REF_ENTITY_TYPE ) {
+	if ( static_cast<int>(ent->reType) < 0 || ent->reType >= RT_MAX_REF_ENTITY_TYPE ) {
 		ri.Error( ERR_DROP, "RE_AddRefEntityToScene: bad reType %i", ent->reType );
 	}
 
@@ -337,8 +337,8 @@ void RE_RenderScene( const refdef_t *fd ) {
 		// compare the area bits
 		areaDiff = 0;
 		for (i = 0 ; i < MAX_MAP_AREA_BYTES/4 ; i++) {
-			areaDiff |= ((int *)tr.refdef.areamask)[i] ^ ((int *)fd->areamask)[i];
-			((int *)tr.refdef.areamask)[i] = ((int *)fd->areamask)[i];
+			areaDiff |= (reinterpret_cast<int *>(tr.refdef.areamask))[i] ^ (reinterpret_cast<const int *>(fd->areamask))[i];
+			(reinterpret_cast<int *>(tr.refdef.areamask))[i] = (reinterpret_cast<const int *>(fd->areamask))[i];
 		}
 
 		if ( areaDiff ) {

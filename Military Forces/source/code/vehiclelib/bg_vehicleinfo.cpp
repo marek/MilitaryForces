@@ -39,8 +39,7 @@ GameObjectInfo::GameObjectInfo() :
 }
 
 GameObjectInfo::~GameObjectInfo()
-{
-}
+= default;
 
 GameObjectInfo*
 GameObjectInfo::createVehicle(unsigned int category)

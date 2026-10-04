@@ -117,7 +117,7 @@ void CM_StoreBrushes( leafList_t *ll, int nodenum ) {
 			ll->overflowed = true;
 			return;
 		}
-		((cbrush_t **)ll->list)[ ll->count++ ] = b;
+		(reinterpret_cast<cbrush_t **>(ll->list))[ ll->count++ ] = b;
 	}
 #if 0
 	// store patches?
@@ -203,7 +203,7 @@ int CM_BoxBrushes( const vec3_t mins, const vec3_t maxs, cbrush_t **list, int li
 	VectorCopy( maxs, ll.bounds[1] );
 	ll.count = 0;
 	ll.maxcount = listsize;
-	ll.list = (int *)(void *)list;
+	ll.list = static_cast<int *>((void *)list);
 	ll.storeLeafs = CM_StoreBrushes;
 	ll.lastLeaf = 0;
 	ll.overflowed = false;

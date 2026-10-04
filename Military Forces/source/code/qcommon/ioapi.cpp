@@ -6,9 +6,9 @@
    Copyright (C) 1998-2005 Gilles Vollant
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 #ifdef USE_INTERNAL_ZLIB
 #include "zlib.h"
@@ -92,7 +92,7 @@ voidpf ZCALLBACK fopen_file_func (voidpf opaque, const char* filename, int mode)
 uLong ZCALLBACK fread_file_func (voidpf opaque, voidpf stream, void* buf, uLong size)
 {
     uLong ret;
-    ret = (uLong)fread(buf, 1, (size_t)size, (FILE *)stream);
+    ret = static_cast<uLong>(fread(buf, 1, static_cast<size_t>(size), static_cast<FILE *>(stream)));
     return ret;
 }
 
@@ -100,14 +100,14 @@ uLong ZCALLBACK fread_file_func (voidpf opaque, voidpf stream, void* buf, uLong 
 uLong ZCALLBACK fwrite_file_func (voidpf opaque, voidpf stream, const void* buf, uLong size)
 {
     uLong ret;
-    ret = (uLong)fwrite(buf, 1, (size_t)size, (FILE *)stream);
+    ret = static_cast<uLong>(fwrite(buf, 1, static_cast<size_t>(size), static_cast<FILE *>(stream)));
     return ret;
 }
 
 long ZCALLBACK ftell_file_func (voidpf opaque, voidpf stream)
 {
     long ret;
-    ret = ftell((FILE *)stream);
+    ret = ftell(static_cast<FILE *>(stream));
     return ret;
 }
 
@@ -129,21 +129,21 @@ long ZCALLBACK fseek_file_func (voidpf opaque, voidpf stream, uLong offset, int 
     default: return -1;
     }
     ret = 0;
-    fseek((FILE *)stream, offset, fseek_origin);
+    fseek(static_cast<FILE *>(stream), offset, fseek_origin);
     return ret;
 }
 
 int ZCALLBACK fclose_file_func (voidpf opaque, voidpf stream)
 {
     int ret;
-    ret = fclose((FILE *)stream);
+    ret = fclose(static_cast<FILE *>(stream));
     return ret;
 }
 
 int ZCALLBACK ferror_file_func (voidpf opaque, voidpf stream)
 {
     int ret;
-    ret = ferror((FILE *)stream);
+    ret = ferror(static_cast<FILE *>(stream));
     return ret;
 }
 

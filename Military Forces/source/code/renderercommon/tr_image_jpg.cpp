@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-#include <setjmp.h>
+#include <csetjmp>
 
 #include "tr_common.h"
 
@@ -58,7 +58,7 @@ static void R_JPGErrorExit(j_common_ptr cinfo)
   char buffer[JMSG_LENGTH_MAX];
 
   /* cinfo->err really points to a q_jpeg_error_mgr_s struct, so coerce pointer */
-  q_jpeg_error_mgr_t *jerr = (q_jpeg_error_mgr_t *)cinfo->err;
+  q_jpeg_error_mgr_t *jerr = reinterpret_cast<q_jpeg_error_mgr_t *>(cinfo->err);
   
   (*cinfo->err->format_message) (cinfo, buffer);
 
@@ -117,7 +117,7 @@ void R_LoadJPG(const char *filename, unsigned char **pic, int *width, int *heigh
    * requires it in order to read binary files.
    */
 
-  len = ri.FS_ReadFile ( ( char * ) filename, &fbuffer.v);
+  len = ri.FS_ReadFile ( const_cast< char *>(filename), &fbuffer.v);
   if (!fbuffer.b || len < 0) {
 	return;
   }
@@ -204,7 +204,7 @@ void R_LoadJPG(const char *filename, unsigned char **pic, int *width, int *heigh
   memcount = pixelcount * 4;
   row_stride = cinfo.output_width * cinfo.output_components;
 
-  out = (byte *)ri.Malloc(memcount);
+  out = static_cast<byte *>(ri.Malloc(memcount));
 
   *width = cinfo.output_width;
   *height = cinfo.output_height;
@@ -288,7 +288,7 @@ typedef my_destination_mgr * my_dest_ptr;
 static void
 init_destination (j_compress_ptr cinfo)
 {
-  my_dest_ptr dest = (my_dest_ptr) cinfo->dest;
+  my_dest_ptr dest = reinterpret_cast<my_dest_ptr>(cinfo->dest);
 
   dest->pub.next_output_byte = dest->outfile;
   dest->pub.free_in_buffer = dest->size;
@@ -321,7 +321,7 @@ init_destination (j_compress_ptr cinfo)
 static boolean
 empty_output_buffer (j_compress_ptr cinfo)
 {
-  my_dest_ptr dest = (my_dest_ptr) cinfo->dest;
+  my_dest_ptr dest = reinterpret_cast<my_dest_ptr>(cinfo->dest);
   
   jpeg_destroy_compress(cinfo);
   
@@ -364,12 +364,11 @@ jpegDest (j_compress_ptr cinfo, byte* outfile, int size)
    * sizes may be different.  Caveat programmer.
    */
   if (cinfo->dest == nullptr) {	/* first time for this JPEG object? */
-    cinfo->dest = (struct jpeg_destination_mgr *)
-      (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_PERMANENT,
-				  sizeof(my_destination_mgr));
+    cinfo->dest = static_cast<struct jpeg_destination_mgr *>((*cinfo->mem->alloc_small) (reinterpret_cast<j_common_ptr>(cinfo), JPOOL_PERMANENT,
+				  sizeof(my_destination_mgr)));
   }
 
-  dest = (my_dest_ptr) cinfo->dest;
+  dest = reinterpret_cast<my_dest_ptr>(cinfo->dest);
   dest->pub.init_destination = init_destination;
   dest->pub.empty_output_buffer = empty_output_buffer;
   dest->pub.term_destination = term_destination;
@@ -452,7 +451,7 @@ size_t RE_SaveJPGToBuffer(byte *buffer, size_t bufSize, int quality,
   /* Step 6: Finish compression */
   jpeg_finish_compress(&cinfo);
   
-  dest = (my_dest_ptr) cinfo.dest;
+  dest = reinterpret_cast<my_dest_ptr>(cinfo.dest);
   outcount = dest->size - dest->pub.free_in_buffer;
  
   /* Step 7: release JPEG compression object */
@@ -468,7 +467,7 @@ void RE_SaveJPG(char * filename, int quality, int image_width, int image_height,
   size_t bufSize;
 
   bufSize = image_width * image_height * 3;
-  out = (byte *)ri.Hunk_AllocateTempMemory(bufSize);
+  out = static_cast<byte *>(ri.Hunk_AllocateTempMemory(bufSize));
 
   bufSize = RE_SaveJPGToBuffer(out, bufSize, quality, image_width, image_height, image_buffer, padding);
   ri.FS_WriteFile(filename, out, bufSize);

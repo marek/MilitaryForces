@@ -24,12 +24,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../qcommon/qcommon.h"
 #include "sys_local.h"
 
-#include <signal.h>
+#include <csignal>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cerrno>
+#include <cstdio>
+#include <cstdlib>
 #include <dirent.h>
 #include <unistd.h>
 #include <sys/mman.h>
@@ -37,9 +37,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <pwd.h>
 #include <libgen.h>
 #include <fcntl.h>
-#include <fenv.h>
+#include <cfenv>
 #include <sys/wait.h>
-#include <time.h>
+#include <ctime>
 #include <sys/resource.h>
 
 bool stdinIsATTY;
@@ -815,7 +815,7 @@ char **Sys_ListFiles( const char *directory, const char *extension, char *filter
 		if (!nfiles)
 			return nullptr;
 
-		listCopy = (char **)Z_Malloc( ( nfiles + 1 ) * sizeof( *listCopy ) );
+		listCopy = static_cast<char **>(Z_Malloc( ( nfiles + 1 ) * sizeof( *listCopy ) ));
 		for ( i = 0 ; i < nfiles ; i++ ) {
 			listCopy[i] = list[i];
 		}
@@ -881,7 +881,7 @@ char **Sys_ListFiles( const char *directory, const char *extension, char *filter
 		return nullptr;
 	}
 
-	listCopy = (char **)Z_Malloc( ( nfiles + 1 ) * sizeof( *listCopy ) );
+	listCopy = static_cast<char **>(Z_Malloc( ( nfiles + 1 ) * sizeof( *listCopy ) ));
 	for ( i = 0 ; i < nfiles ; i++ ) {
 		listCopy[i] = list[i];
 	}

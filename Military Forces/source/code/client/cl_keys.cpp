@@ -395,7 +395,7 @@ static void Field_VariableSizeDraw( field_t *edit, int x, int y, int width, int 
 
 	// draw the cursor
 	if ( showCursor ) {
-		if ( (int)( cls.realtime >> 8 ) & 1 ) {
+		if ( ( cls.realtime >> 8 ) & 1 ) {
 			return;		// off blink
 		}
 

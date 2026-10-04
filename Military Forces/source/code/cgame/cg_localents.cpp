@@ -172,7 +172,7 @@ void CG_AddFragment( localEntity_t *le ) {
 			VectorCopy( le->refEntity.origin, le->refEntity.lightingOrigin );
 			le->refEntity.renderfx |= RF_LIGHTING_ORIGIN;
 			oldZ = le->refEntity.origin[2];
-			le->refEntity.origin[2] -= 16 * ( 1.0 - (float)t / SINK_TIME );
+			le->refEntity.origin[2] -= 16 * ( 1.0 - static_cast<float>(t) / SINK_TIME );
 			refExport.AddRefEntityToScene( &le->refEntity );
 			le->refEntity.origin[2] = oldZ;
 		} else {
@@ -266,7 +266,7 @@ static void CG_AddMoveScaleFade( localEntity_t *le ) {
 
 	if ( le->fadeInTime > le->startTime && cg.time < le->fadeInTime ) {
 		// fade / grow time
-		c = 1.0 - (float) ( le->fadeInTime - cg.time ) / ( le->fadeInTime - le->startTime );
+		c = 1.0 - static_cast<float>( le->fadeInTime - cg.time ) / ( le->fadeInTime - le->startTime );
 	}
 	else {
 		// fade / grow time
@@ -348,7 +348,7 @@ static void CG_AddExplosion( localEntity_t *ex ) {
 	if ( ex->light ) {
 		float		light;
 
-		light = (float)( cg.time - ex->startTime ) / ( ex->endTime - ex->startTime );
+		light = static_cast<float>( cg.time - ex->startTime ) / ( ex->endTime - ex->startTime );
 		if ( light < 0.5 ) {
 			light = 1.0;
 		} else {
@@ -377,7 +377,7 @@ static void CG_AddSpriteExplosion( localEntity_t *le ) {
 		return;
 	}
 
-	c = ( le->endTime - cg.time ) / ( float ) ( le->endTime - le->startTime );
+	c = ( le->endTime - cg.time ) / static_cast< float>( le->endTime - le->startTime );
 	if ( c > 1 ) {
 		c = 1.0;	// can happen during connection problems
 	}
@@ -402,7 +402,7 @@ static void CG_AddSpriteExplosion( localEntity_t *le ) {
 	if ( le->light ) {
 		float		light;
 
-		light = (float)( cg.time - le->startTime ) / ( le->endTime - le->startTime );
+		light = static_cast<float>( cg.time - le->startTime ) / ( le->endTime - le->startTime );
 		if ( light < 0.5 ) {
 			light = 1.0;
 		} else {
@@ -456,14 +456,14 @@ void CG_AddNuke( localEntity_t *le ) {
 		shockwave.shaderTime = re->shaderTime;
 		VectorCopy(re->origin, shockwave.origin);
 
-		c = (float)(t - NUKE_SHOCKWAVE_STARTTIME) / (float)(NUKE_SHOCKWAVE_ENDTIME - NUKE_SHOCKWAVE_STARTTIME);
+		c = static_cast<float>(t - NUKE_SHOCKWAVE_STARTTIME) / static_cast<float>(NUKE_SHOCKWAVE_ENDTIME - NUKE_SHOCKWAVE_STARTTIME);
 		VectorScale( axis[0], c * rad + 100 / NUKE_SHOCKWAVEMODEL_RADIUS, shockwave.axis[0] );
 		VectorScale( axis[1], c * rad + 100 / NUKE_SHOCKWAVEMODEL_RADIUS, shockwave.axis[1] );
 		VectorScale( axis[2], c * rad + 100 / NUKE_SHOCKWAVEMODEL_RADIUS, shockwave.axis[2] );
 		shockwave.nonNormalizedAxes = true;
 
 		if (t > NUKE_SHOCKWAVEFADE_STARTTIME) {
-			c = (float)(t - NUKE_SHOCKWAVEFADE_STARTTIME) / (float)(NUKE_SHOCKWAVE_ENDTIME - NUKE_SHOCKWAVEFADE_STARTTIME);
+			c = static_cast<float>(t - NUKE_SHOCKWAVEFADE_STARTTIME) / static_cast<float>(NUKE_SHOCKWAVE_ENDTIME - NUKE_SHOCKWAVEFADE_STARTTIME);
 		}
 		else {
 			c = 0;
@@ -487,7 +487,7 @@ void CG_AddNuke( localEntity_t *le ) {
 		re->shaderRGBA[3] = le->color[3] * c;
 
 		if( t < NUKE_IMPLODE_STARTTIME ) {
-			c = (float)(t - NUKE_EXPLODE_STARTTIME) / (float)(NUKE_IMPLODE_STARTTIME - NUKE_EXPLODE_STARTTIME);
+			c = static_cast<float>(t - NUKE_EXPLODE_STARTTIME) / static_cast<float>(NUKE_IMPLODE_STARTTIME - NUKE_EXPLODE_STARTTIME);
 		}
 		else {
 			if (!(le->leFlags & LEF_SOUND2)) {
@@ -495,7 +495,7 @@ void CG_AddNuke( localEntity_t *le ) {
 				S_StartLocalSound(cgs.media.nukeImplodeSound, CHAN_AUTO);
 				le->leFlags |= LEF_SOUND2;
 			}
-			c = (float)(NUKE_IMPLODE_ENDTIME - t) / (float) (NUKE_IMPLODE_ENDTIME - NUKE_IMPLODE_STARTTIME);
+			c = static_cast<float>(NUKE_IMPLODE_ENDTIME - t) / static_cast<float>(NUKE_IMPLODE_ENDTIME - NUKE_IMPLODE_STARTTIME);
 		}
 		VectorScale( axis[0], c * rad / NUKE_BOOMSPHEREMODEL_RADIUS, re->axis[0] );
 		VectorScale( axis[1], c * rad / NUKE_BOOMSPHEREMODEL_RADIUS, re->axis[1] );
@@ -530,14 +530,14 @@ void CG_AddNuke( localEntity_t *le ) {
 		test[2] = le->angles.trBase[2];
 		AnglesToAxis( test, axis );
 
-		c = (float)(t - NUKE_SHOCKWAVE2_STARTTIME) / (float)(NUKE_SHOCKWAVE2_ENDTIME - NUKE_SHOCKWAVE2_STARTTIME);
+		c = static_cast<float>(t - NUKE_SHOCKWAVE2_STARTTIME) / static_cast<float>(NUKE_SHOCKWAVE2_ENDTIME - NUKE_SHOCKWAVE2_STARTTIME);
 		VectorScale( axis[0], c * rad + 100 / NUKE_SHOCKWAVEMODEL_RADIUS, shockwave.axis[0] );
 		VectorScale( axis[1], c * rad + 100 / NUKE_SHOCKWAVEMODEL_RADIUS, shockwave.axis[1] );
 		VectorScale( axis[2], c * rad + 100 / NUKE_SHOCKWAVEMODEL_RADIUS, shockwave.axis[2] );
 		shockwave.nonNormalizedAxes = true;
 
 		if (t > NUKE_SHOCKWAVE2FADE_STARTTIME) {
-			c = (float)(t - NUKE_SHOCKWAVE2FADE_STARTTIME) / (float)(NUKE_SHOCKWAVE2_ENDTIME - NUKE_SHOCKWAVE2FADE_STARTTIME);
+			c = static_cast<float>(t - NUKE_SHOCKWAVE2FADE_STARTTIME) / static_cast<float>(NUKE_SHOCKWAVE2_ENDTIME - NUKE_SHOCKWAVE2FADE_STARTTIME);
 		}
 		else {
 			c = 0;
@@ -561,14 +561,14 @@ void CG_AddNuke( localEntity_t *le ) {
 		VectorCopy(re->origin, cloud.origin);
 		cloud.renderfx = RF_LIGHTING_ORIGIN|RF_SHADOW_PLANE;
 		
-		c = (float)(t - NUKE_CLOUD_STARTTIME) / (float)(NUKE_CLOUD_FADETIME - NUKE_CLOUD_STARTTIME);
-		cloud.customShader = cgs.media.nukeCloud[std::min((int)(c*100),100)];
+		c = static_cast<float>(t - NUKE_CLOUD_STARTTIME) / static_cast<float>(NUKE_CLOUD_FADETIME - NUKE_CLOUD_STARTTIME);
+		cloud.customShader = cgs.media.nukeCloud[std::min(static_cast<int>(c*100),100)];
 		for(i = 0; i<3;i++)
 			VectorScale(axis[i],(c + 1) * rad * 0.01f,cloud.axis[i]);
 		shockwave.nonNormalizedAxes = true;
 
 		if (t > NUKE_CLOUD_FADETIME) {
-			c = (float)(t - NUKE_CLOUD_FADETIME) / (float)(NUKE_CLOUD_ENDTIME - NUKE_CLOUD_FADETIME);
+			c = static_cast<float>(t - NUKE_CLOUD_FADETIME) / static_cast<float>(NUKE_CLOUD_ENDTIME - NUKE_CLOUD_FADETIME);
 		}
 		else {
 			c = 0;

@@ -111,7 +111,7 @@ void S_TransferStereo16 (unsigned long *pbuf, int endtime)
 	int		lpos;
 	int		ls_paintedtime;
 	
-	snd_p = (int *) paintbuffer;
+	snd_p = reinterpret_cast<int *>(paintbuffer);
 	ls_paintedtime = s_paintedtime;
 
 	while (ls_paintedtime < endtime)
@@ -119,7 +119,7 @@ void S_TransferStereo16 (unsigned long *pbuf, int endtime)
 	// handle recirculating buffer issues
 		lpos = ls_paintedtime % dma.fullsamples;
 
-		snd_out = (short *) pbuf + (lpos<<1); // lpos * dma.channels
+		snd_out = reinterpret_cast<short *>(pbuf) + (lpos<<1); // lpos * dma.channels
 
 		snd_linear_count = dma.fullsamples - lpos;
 		if (ls_paintedtime + snd_linear_count > endtime)
@@ -134,7 +134,7 @@ void S_TransferStereo16 (unsigned long *pbuf, int endtime)
 		ls_paintedtime += (snd_linear_count>>1); // snd_linear_count / dma.channels
 
 		if( CL_VideoRecording( ) )
-			CL_WriteAVIAudioFrame( (byte *)snd_out, snd_linear_count << 1 ); // snd_linear_count * (dma.samplebits/8)
+			CL_WriteAVIAudioFrame( reinterpret_cast<byte *>(snd_out), snd_linear_count << 1 ); // snd_linear_count * (dma.samplebits/8)
 	}
 }
 
@@ -154,7 +154,7 @@ void S_TransferPaintBuffer(int endtime)
 	int		i;
 	unsigned long *pbuf;
 
-	pbuf = (unsigned long *)dma.buffer;
+	pbuf = reinterpret_cast<unsigned long *>(dma.buffer);
 
 
 	if ( s_testsound->integer ) {
@@ -171,14 +171,14 @@ void S_TransferPaintBuffer(int endtime)
 	}
 	else
 	{	// general case
-		p = (int *) paintbuffer;
+		p = reinterpret_cast<int *>(paintbuffer);
 		count = (endtime - s_paintedtime) * dma.channels;
-		out_idx = ((unsigned int)s_paintedtime * dma.channels) % dma.samples;
+		out_idx = (static_cast<unsigned int>(s_paintedtime) * dma.channels) % dma.samples;
 		step = 3 - MIN(dma.channels, 2);
 
 		if ((dma.isfloat) && (dma.samplebits == 32))
 		{
-			float *out = (float *) pbuf;
+			float *out = reinterpret_cast<float *>(pbuf);
 			for (i=0 ; i<count ; i++)
 			{
 				if ((i % dma.channels) >= 2)
@@ -194,13 +194,13 @@ void S_TransferPaintBuffer(int endtime)
 					val = 0x7fff;
 				else if (val < -32767)  /* clamp to one less than max to make division max out at -1.0f. */
 					val = -32767;
-				out[out_idx] = ((float) val) / 32767.0f;
+				out[out_idx] = (static_cast<float>(val)) / 32767.0f;
 				out_idx = (out_idx + 1) % dma.samples;
 			}
 		}
 		else if (dma.samplebits == 16)
 		{
-			short *out = (short *) pbuf;
+			short *out = reinterpret_cast<short *>(pbuf);
 			for (i=0 ; i<count ; i++)
 			{
 				if ((i % dma.channels) >= 2)
@@ -222,7 +222,7 @@ void S_TransferPaintBuffer(int endtime)
 		}
 		else if (dma.samplebits == 8)
 		{
-			unsigned char *out = (unsigned char *) pbuf;
+			unsigned char *out = reinterpret_cast<unsigned char *>(pbuf);
 			for (i=0 ; i<count ; i++)
 			{
 				if ((i % dma.channels) >= 2)
@@ -472,22 +472,22 @@ void S_PaintChannelFromMuLaw( channel_t *ch, sfx_t *sc, int count, int sampleOff
 	}
 
 	if (!ch->doppler) {
-		samples = (byte *)chunk->sndChunk + sampleOffset;
+		samples = reinterpret_cast<byte *>(chunk->sndChunk) + sampleOffset;
 		for ( i=0 ; i<count ; i++ ) {
 			data  = mulawToShort[*samples];
 			samp[i].left += (data * leftvol)>>8;
 			samp[i].right += (data * rightvol)>>8;
 			samples++;
-			if (chunk != nullptr && samples == (byte *)chunk->sndChunk+(SND_CHUNK_SIZE*2)) {
+			if (chunk != nullptr && samples == reinterpret_cast<byte *>(chunk->sndChunk)+(SND_CHUNK_SIZE*2)) {
 				chunk = chunk->next;
-				samples = (byte *)chunk->sndChunk;
+				samples = reinterpret_cast<byte *>(chunk->sndChunk);
 			}
 		}
 	} else {
 		ooff = sampleOffset;
-		samples = (byte *)chunk->sndChunk;
+		samples = reinterpret_cast<byte *>(chunk->sndChunk);
 		for ( i=0 ; i<count ; i++ ) {
-			data  = mulawToShort[samples[(int)(ooff)]];
+			data  = mulawToShort[samples[static_cast<int>(ooff)]];
 			ooff = ooff + ch->dopplerScale;
 			samp[i].left += (data * leftvol)>>8;
 			samp[i].right += (data * rightvol)>>8;
@@ -496,7 +496,7 @@ void S_PaintChannelFromMuLaw( channel_t *ch, sfx_t *sc, int count, int sampleOff
 				if (!chunk) {
 					chunk = sc->soundData;
 				}
-				samples = (byte *)chunk->sndChunk;
+				samples = reinterpret_cast<byte *>(chunk->sndChunk);
 				ooff = 0.0;
 			}
 		}

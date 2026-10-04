@@ -120,8 +120,8 @@ void RB_CalcDeformVertexes( deformStage_t *ds )
 	int i;
 	vec3_t	offset;
 	float	scale;
-	float	*xyz = ( float * ) tess.xyz;
-	float	*normal = ( float * ) tess.normal;
+	float	*xyz = reinterpret_cast< float *>(tess.xyz);
+	float	*normal = reinterpret_cast< float *>(tess.normal);
 	float	*table;
 
 	if ( ds->deformationWave.frequency == 0 )
@@ -169,8 +169,8 @@ Wiggle the normals for wavy environment mapping
 void RB_CalcDeformNormals( deformStage_t *ds ) {
 	int i;
 	float	scale;
-	float	*xyz = ( float * ) tess.xyz;
-	float	*normal = ( float * ) tess.normal;
+	float	*xyz = reinterpret_cast< float *>(tess.xyz);
+	float	*normal = reinterpret_cast< float *>(tess.normal);
 
 	for ( i = 0; i < tess.numVertexes; i++, xyz += 4, normal += 4 ) {
 		scale = 0.98f;
@@ -200,9 +200,9 @@ RB_CalcBulgeVertexes
 */
 void RB_CalcBulgeVertexes( deformStage_t *ds ) {
 	int i;
-	const float *st = ( const float * ) tess.texCoords[0];
-	float		*xyz = ( float * ) tess.xyz;
-	float		*normal = ( float * ) tess.normal;
+	const float *st = reinterpret_cast< const float *>(tess.texCoords[0]);
+	float		*xyz = reinterpret_cast< float *>(tess.xyz);
+	float		*normal = reinterpret_cast< float *>(tess.normal);
 	double		now;
 
 	now = backEnd.refdef.time * 0.001 * ds->bulgeSpeed;
@@ -211,7 +211,7 @@ void RB_CalcBulgeVertexes( deformStage_t *ds ) {
 		int64_t off;
 		float scale;
 
-		off = (float)( FUNCTABLE_SIZE / (M_PI*2) ) * ( st[0] * ds->bulgeWidth + now );
+		off = static_cast<float>( FUNCTABLE_SIZE / (M_PI*2) ) * ( st[0] * ds->bulgeWidth + now );
 
 		scale = tr.sinTable[ off & FUNCTABLE_MASK ] * ds->bulgeHeight;
 			
@@ -245,7 +245,7 @@ void RB_CalcMoveVertexes( deformStage_t *ds ) {
 
 	VectorScale( ds->moveVector, scale, offset );
 
-	xyz = ( float * ) tess.xyz;
+	xyz = reinterpret_cast< float *>(tess.xyz);
 	for ( i = 0; i < tess.numVertexes; i++, xyz += 4 ) {
 		VectorAdd( xyz, offset, xyz );
 	}
@@ -595,13 +595,13 @@ COLORS
 void RB_CalcColorFromEntity( unsigned char *dstColors )
 {
 	int	i;
-	int *pColors = ( int * ) dstColors;
+	int *pColors = reinterpret_cast< int *>(dstColors);
 	int c;
 
 	if ( !backEnd.currentEntity )
 		return;
 
-	c = * ( int * ) backEnd.currentEntity->e.shaderRGBA;
+	c = * reinterpret_cast< int *>(backEnd.currentEntity->e.shaderRGBA);
 
 	for ( i = 0; i < tess.numVertexes; i++, pColors++ )
 	{
@@ -615,7 +615,7 @@ void RB_CalcColorFromEntity( unsigned char *dstColors )
 void RB_CalcColorFromOneMinusEntity( unsigned char *dstColors )
 {
 	int	i;
-	int *pColors = ( int * ) dstColors;
+	int *pColors = reinterpret_cast< int *>(dstColors);
 	unsigned char invModulate[4];
 	int c;
 
@@ -627,7 +627,7 @@ void RB_CalcColorFromOneMinusEntity( unsigned char *dstColors )
 	invModulate[2] = 255 - backEnd.currentEntity->e.shaderRGBA[2];
 	invModulate[3] = 255 - backEnd.currentEntity->e.shaderRGBA[3];	// this trashes alpha, but the AGEN block fixes it
 
-	c = * ( int * ) invModulate;
+	c = * reinterpret_cast< int *>(invModulate);
 
 	for ( i = 0; i < tess.numVertexes; i++, pColors++ )
 	{
@@ -679,7 +679,7 @@ void RB_CalcWaveColor( const waveForm_t *wf, unsigned char *dstColors )
 	int i;
 	int v;
 	float glow;
-	int *colors = ( int * ) dstColors;
+	int *colors = reinterpret_cast< int *>(dstColors);
 	byte	color[4];
 
 
@@ -699,7 +699,7 @@ void RB_CalcWaveColor( const waveForm_t *wf, unsigned char *dstColors )
 	v = ri.ftol(255 * glow);
 	color[0] = color[1] = color[2] = v;
 	color[3] = 255;
-	v = *(int *)color;
+	v = *reinterpret_cast<int *>(color);
 	
 	for ( i = 0; i < tess.numVertexes; i++, colors++ ) {
 		*colors = v;
@@ -926,8 +926,8 @@ void RB_CalcTurbulentTexCoords( const waveForm_t *wf, float *st )
 		float s = st[0];
 		float t = st[1];
 
-		st[0] = s + tr.sinTable[ ( ( int64_t ) ( ( ( tess.xyz[i][0] + tess.xyz[i][2] )* 1.0/128 * 0.125 + now ) * FUNCTABLE_SIZE ) ) & ( FUNCTABLE_MASK ) ] * wf->amplitude;
-		st[1] = t + tr.sinTable[ ( ( int64_t ) ( ( tess.xyz[i][1] * 1.0/128 * 0.125 + now ) * FUNCTABLE_SIZE ) ) & ( FUNCTABLE_MASK ) ] * wf->amplitude;
+		st[0] = s + tr.sinTable[ ( static_cast< int64_t>( ( ( tess.xyz[i][0] + tess.xyz[i][2] )* 1.0/128 * 0.125 + now ) * FUNCTABLE_SIZE ) ) & ( FUNCTABLE_MASK ) ] * wf->amplitude;
+		st[1] = t + tr.sinTable[ ( static_cast< int64_t>( ( tess.xyz[i][1] * 1.0/128 * 0.125 + now ) * FUNCTABLE_SIZE ) ) & ( FUNCTABLE_MASK ) ] * wf->amplitude;
 	}
 }
 
@@ -1103,7 +1103,7 @@ static void RB_CalcDiffuseColor_scalar( unsigned char *colors )
 	for (i = 0 ; i < numVertexes ; i++, v += 4, normal += 4) {
 		incoming = DotProduct (normal, lightDir);
 		if ( incoming <= 0 ) {
-			*(int *)&colors[i*4] = ambientLightInt;
+			*reinterpret_cast<int *>(&colors[i*4]) = ambientLightInt;
 			continue;
 		} 
 		j = ri.ftol(ambientLight[0] + incoming * directedLight[0]);

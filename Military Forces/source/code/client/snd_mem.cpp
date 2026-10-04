@@ -52,8 +52,8 @@ sfx_t *sfxScratchPointer = nullptr;
 int	   sfxScratchIndex = 0;
 
 void	SND_free(sndBuffer *v) {
-	*(sndBuffer **)v = freelist;
-	freelist = (sndBuffer*)v;
+	*reinterpret_cast<sndBuffer **>(v) = freelist;
+	freelist = v;
 	inUse += sizeof(sndBuffer);
 }
 
@@ -69,7 +69,7 @@ redo:
 	totalInUse += sizeof(sndBuffer);
 
 	v = freelist;
-	freelist = *(sndBuffer **)freelist;
+	freelist = *reinterpret_cast<sndBuffer **>(freelist);
 	v->next = nullptr;
 	return v;
 }
@@ -83,18 +83,18 @@ void SND_setup() {
 
 	scs = (cv->integer*1536);
 
-	buffer = (sndBuffer *)malloc(scs*sizeof(sndBuffer) );
+	buffer = static_cast<sndBuffer *>(malloc(scs*sizeof(sndBuffer) ));
 	// allocate the stack based hunk allocator
-	sfxScratchBuffer = (short *)malloc(SND_CHUNK_SIZE * sizeof(short) * 4);	//Hunk_Alloc(SND_CHUNK_SIZE * sizeof(short) * 4);
+	sfxScratchBuffer = static_cast<short *>(malloc(SND_CHUNK_SIZE * sizeof(short) * 4));	//Hunk_Alloc(SND_CHUNK_SIZE * sizeof(short) * 4);
 	sfxScratchPointer = nullptr;
 
 	inUse = scs*sizeof(sndBuffer);
 	p = buffer;;
 	q = p + scs;
 	while (--q > p)
-		*(sndBuffer **)q = q-1;
+		*reinterpret_cast<sndBuffer **>(q) = q-1;
 	
-	*(sndBuffer **)q = nullptr;
+	*reinterpret_cast<sndBuffer **>(q) = nullptr;
 	freelist = p + scs - 1;
 
 	Com_Printf("Sound memory manager started\n");
@@ -122,7 +122,7 @@ static int ResampleSfx( sfx_t *sfx, int channels, int inrate, int inwidth, int s
 	int			part;
 	sndBuffer	*chunk;
 	
-	stepscale = (float)inrate / dma.speed;	// this is usually 0.5, 1, or 2
+	stepscale = static_cast<float>(inrate) / dma.speed;	// this is usually 0.5, 1, or 2
 
 	outcount = samples / stepscale;
 
@@ -139,9 +139,9 @@ static int ResampleSfx( sfx_t *sfx, int channels, int inrate, int inwidth, int s
 		for (j=0 ; j<channels ; j++)
 		{
 			if( inwidth == 2 ) {
-				sample = ( ((short *)data)[srcsample+j] );
+				sample = ( (reinterpret_cast<short *>(data))[srcsample+j] );
 			} else {
-				sample = (unsigned int)( (unsigned char)(data[srcsample+j]) - 128) << 8;
+				sample = static_cast<unsigned int>( static_cast<unsigned char>(data[srcsample+j]) - 128) << 8;
 			}
 			part = (i*channels+j)&(SND_CHUNK_SIZE-1);
 			if (part == 0) {
@@ -176,7 +176,7 @@ static int ResampleSfxRaw( short *sfx, int channels, int inrate, int inwidth, in
 	int			i, j;
 	int			sample, samplefrac, fracstep;
 	
-	stepscale = (float)inrate / dma.speed;	// this is usually 0.5, 1, or 2
+	stepscale = static_cast<float>(inrate) / dma.speed;	// this is usually 0.5, 1, or 2
 
 	outcount = samples / stepscale;
 
@@ -192,9 +192,9 @@ static int ResampleSfxRaw( short *sfx, int channels, int inrate, int inwidth, in
 		for (j=0 ; j<channels ; j++)
 		{
 			if( inwidth == 2 ) {
-				sample = LittleShort ( ((short *)data)[srcsample+j] );
+				sample = LittleShort ( (reinterpret_cast<short *>(data))[srcsample+j] );
 			} else {
-				sample = (int)( (unsigned char)(data[srcsample+j]) - 128) << 8;
+				sample = ( static_cast<unsigned char>(data[srcsample+j]) - 128) << 8;
 			}
 			sfx[i*channels+j] = sample;
 		}
@@ -220,7 +220,7 @@ bool S_LoadSound( sfx_t *sfx )
 //	int		size;
 
 	// load it in
-	data = (byte *)S_CodecLoad(sfx->soundName, &info);
+	data = static_cast<byte *>(S_CodecLoad(sfx->soundName, &info));
 	if(!data)
 		return false;
 
@@ -232,7 +232,7 @@ bool S_LoadSound( sfx_t *sfx )
 		Com_DPrintf(S_COLOR_YELLOW "WARNING: %s is not a 22kHz audio file\n", sfx->soundName);
 	}
 
-	samples = (short *)Hunk_AllocateTempMemory(info.channels * info.samples * sizeof(short) * 2);
+	samples = static_cast<short *>(Hunk_AllocateTempMemory(info.channels * info.samples * sizeof(short) * 2));
 
 	sfx->lastTimeUsed = Com_Milliseconds()+1;
 

@@ -83,7 +83,7 @@ static void SP_misc_plane( GameEntity *ent )
 
 	// gearheight
 	if( availableVehicles[vehIndex].caps & HC_GEAR ) {
-		ent->gearheight_ = (float)availableVehicles[vehIndex].gearheight;
+		ent->gearheight_ = availableVehicles[vehIndex].gearheight;
 	} else {
 		ent->s.ONOFF |= OO_GEAR;
 	}
@@ -135,7 +135,7 @@ static void SP_misc_helo( GameEntity *ent )
 
 	// gearheight
 	if( availableVehicles[vehIndex].caps & HC_GEAR ) {
-		ent->gearheight_ = (float)availableVehicles[vehIndex].gearheight;
+		ent->gearheight_ = availableVehicles[vehIndex].gearheight;
 	} else {
 		ent->s.ONOFF |= OO_GEAR;
 	}
@@ -521,7 +521,7 @@ void MiscVehicle_SpawnDecks( GameEntity *parent, int vehicle )
 	float centre = ( data->maxs[0] + data->mins[0] ) * 0.5f;
 	if( half > 120 ) half = 120;
 	if( half > halfLength ) half = halfLength;
-	int count = (int)ceil( halfLength / half );
+	int count = static_cast<int>(ceil( halfLength / half ));
 	if( count > MAX_VEHICLE_DECKS ) count = MAX_VEHICLE_DECKS;
 
 	for( int i = 0; i < count; i++ ) 

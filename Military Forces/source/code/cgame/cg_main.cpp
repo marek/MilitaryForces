@@ -1530,7 +1530,7 @@ CG_SetScoreSelection
 */
 
 void CG_SetScoreSelection(void *p) {
-	menuDef_t *menu = (menuDef_t*)p;
+	menuDef_t *menu = static_cast<menuDef_t*>(p);
 	playerState_t *ps = &cg.snap->ps;
 	int i, red, blue;
 	red = blue = 0;
@@ -1826,7 +1826,7 @@ void CG_StartMusic( ) {
 	char	parm1[MAX_QPATH], parm2[MAX_QPATH];
 
 	// start the background music
-	s = (char *)CG_ConfigString( CS_MUSIC );
+	s = const_cast<char *>(CG_ConfigString( CS_MUSIC ));
 	Q_strncpyz( parm1, COM_Parse( &s ), sizeof( parm1 ) );
 	Q_strncpyz( parm2, COM_Parse( &s ), sizeof( parm2 ) );
 

@@ -183,7 +183,7 @@ float CL_KeyState( kbutton_t *key ) {
 	}
 #endif
 
-	val = (float)msec / frame_msec;
+	val = static_cast<float>(msec) / frame_msec;
 	if ( val < 0 ) {
 		val = 0;
 	}
@@ -412,21 +412,21 @@ void CL_JoystickMove( usercmd_t *cmd ) {
 
 	if ( !in_strafe.active ) {
 		cl.viewangles[YAW] += anglespeed * yaw;
-		cmd->rightmove = ClampChar( cmd->rightmove + (int)right );
+		cmd->rightmove = ClampChar( cmd->rightmove + static_cast<int>(right) );
 	} else {
 		cl.viewangles[YAW] += anglespeed * right;
-		cmd->rightmove = ClampChar( cmd->rightmove + (int)yaw );
+		cmd->rightmove = ClampChar( cmd->rightmove + static_cast<int>(yaw) );
 	}
 
 	if ( in_mlooking ) {
 		cl.viewangles[PITCH] += anglespeed * forward;
-		cmd->forwardmove = ClampChar( cmd->forwardmove + (int)pitch );
+		cmd->forwardmove = ClampChar( cmd->forwardmove + static_cast<int>(pitch) );
 	} else {
 		cl.viewangles[PITCH] += anglespeed * pitch;
-		cmd->forwardmove = ClampChar( cmd->forwardmove + (int)forward );
+		cmd->forwardmove = ClampChar( cmd->forwardmove + static_cast<int>(forward) );
 	}
 
-	cmd->upmove = ClampChar( cmd->upmove + (int)up );
+	cmd->upmove = ClampChar( cmd->upmove + static_cast<int>(up) );
 }
 
 /*
@@ -465,7 +465,7 @@ void CL_MouseMove(usercmd_t *cmd)
 			float accelSensitivity;
 			float rate;
 			
-			rate = sqrt(mx * mx + my * my) / (float) frame_msec;
+			rate = sqrt(mx * mx + my * my) / static_cast<float>(frame_msec);
 
 			accelSensitivity = cl_sensitivity->value + rate * cl_mouseAccel->value;
 			mx *= accelSensitivity;
@@ -484,8 +484,8 @@ void CL_MouseMove(usercmd_t *cmd)
 			// cl_mouseAccelOffset is the rate for which the acceleration will have doubled the non accelerated amplification
 			// NOTE: decouple the config cvars for independent acceleration setup along X and Y?
 
-			rate[0] = fabs(mx) / (float) frame_msec;
-			rate[1] = fabs(my) / (float) frame_msec;
+			rate[0] = fabs(mx) / static_cast<float>(frame_msec);
+			rate[1] = fabs(my) / static_cast<float>(frame_msec);
 			power[0] = powf(rate[0] / cl_mouseAccelOffset->value, cl_mouseAccel->value);
 			power[1] = powf(rate[1] / cl_mouseAccelOffset->value, cl_mouseAccel->value);
 

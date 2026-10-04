@@ -239,7 +239,7 @@ float HalfToFloat(uint16_t in)
 
 	f16.ui = in;
 
-	f32.pack.exponent = (int)(f16.pack.exponent) + 112;
+	f32.pack.exponent = static_cast<int>(f16.pack.exponent) + 112;
 	f32.pack.fraction = f16.pack.fraction << 13;
 	f32.pack.sign = f16.pack.sign;
 

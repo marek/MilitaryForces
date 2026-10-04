@@ -424,7 +424,7 @@ void Text_PaintWithCursor(float x, float y, float scale, const vec4_t color, con
 			len = limit;
 		}
 		count = 0;
-		glyph2 = &font->glyphs[ (int) cursor]; // bk001206 - possible signed char
+		glyph2 = &font->glyphs[ static_cast<int>(cursor)]; // bk001206 - possible signed char
 		while (s && *s && count < len) 
 		{
 			glyph = &font->glyphs[*s & 255];
@@ -2178,7 +2178,7 @@ static void UI_DrawCredits( rectDef_t *rect, float scale, const vec4_t inColor, 
 			}
 
 			// alter alpha based upon distance from centre vertical
-			alpha = 1.0f - ((float)abs( centreY - drawY )/90) + 0.40f;
+			alpha = 1.0f - (static_cast<float>(abs( centreY - drawY ))/90) + 0.40f;
 			MF_LimitFloat( &alpha, 0.0f, 1.0f );
 			color[3] = alpha;
 
@@ -2187,7 +2187,7 @@ static void UI_DrawCredits( rectDef_t *rect, float scale, const vec4_t inColor, 
 	}
 	
 	// scroll
-	z -= (float)uiInfo.uiUtils.dc_->frameTime_/SPEED_DIVIDER;
+	z -= static_cast<float>(uiInfo.uiUtils.dc_->frameTime_)/SPEED_DIVIDER;
 }
 
 /*
@@ -3191,11 +3191,11 @@ static void UI_LoadDemos() {
 	char	*demoname;
 	int		i, len;
 
-	Com_sprintf(demoExt, sizeof(demoExt), "mfq3_dm_%d", (int)Cvar_VariableValue("protocol"));
+	Com_sprintf(demoExt, sizeof(demoExt), "mfq3_dm_%d", static_cast<int>(Cvar_VariableValue("protocol")));
 
 	uiInfo.demoCount = FS_GetFileList( "demos", demoExt, demolist, 4096 );
 
-	Com_sprintf(demoExt, sizeof(demoExt), ".mfq3_dm_%d", (int)Cvar_VariableValue("protocol"));
+	Com_sprintf(demoExt, sizeof(demoExt), ".mfq3_dm_%d", static_cast<int>(Cvar_VariableValue("protocol")));
 
 	if (uiInfo.demoCount) {
 		if (uiInfo.demoCount > MAX_DEMOS) {
@@ -3469,7 +3469,7 @@ static void UI_InitialiseUI( )
 
 		// read in the entire credits file
 		uiInfo.pCreditsData = uiInfo.uiUtils.alloc( fileSize );
-		pCredits = (char *)uiInfo.pCreditsData;
+		pCredits = static_cast<char *>(uiInfo.pCreditsData);
 		FS_Read( pCredits, fileSize, creditsFile );
 	
 		// assign line pointers
@@ -3489,7 +3489,7 @@ static void UI_InitialiseUI( )
 				pCredits = pLineEnd;
 			}
 		}
-		while( pLineEnd && pCredits < ((char *)uiInfo.pCreditsData+fileSize) );
+		while( pLineEnd && pCredits < (static_cast<char *>(uiInfo.pCreditsData)+fileSize) );
 
 		// close file
 		FS_FCloseFile( creditsFile );
@@ -5942,7 +5942,7 @@ void _UI_Init( bool inGameLoad )
 	//UI_LoadBots();
 
 	// sets defaults for ui temp cvars
-	uiInfo.effectsColor = gamecodetoui[(int)Cvar_VariableValue("color1")-1];
+	uiInfo.effectsColor = gamecodetoui[static_cast<int>(Cvar_VariableValue("color1"))-1];
 	uiInfo.currentCrosshair = Cvar_VariableValue("cg_drawCrosshair");
 	Cvar_Set("ui_mousePitch", (Cvar_VariableValue("m_pitch") >= 0) ? "0" : "1");
 
@@ -6771,7 +6771,7 @@ static void UI_StopServerRefresh( )
 	if (count - uiInfo.serverStatus.numDisplayServers > 0) {
 		Com_Printf("%d servers not listed due to packet loss or pings higher than %d\n",
 						count - uiInfo.serverStatus.numDisplayServers,
-						(int)Cvar_VariableValue("cl_maxPing"));
+						static_cast<int>(Cvar_VariableValue("cl_maxPing")));
 	}
 
 }
@@ -6862,7 +6862,7 @@ static void UI_StartServerRefresh(bool full)
 			Cbuf_ExecuteText( EXEC_NOW, va( "globalservers 0 %s full empty\n", ptr ) );
 		}
 		else {
-			Cbuf_ExecuteText( EXEC_NOW, va( "globalservers 0 %d full empty\n", (int)Cvar_VariableValue( "protocol" ) ) );
+			Cbuf_ExecuteText( EXEC_NOW, va( "globalservers 0 %d full empty\n", static_cast<int>(Cvar_VariableValue( "protocol" )) ) );
 		}
 	}
 }

@@ -84,7 +84,7 @@ void PM_LQMMove( )
 	bool	verydead = (pm->ps->stats[STAT_HEALTH] <= GIB_HEALTH);
 	int		anim = 0;
 	int		maxspeed = availableVehicles[pm->vehicle].maxspeed;
-	int		maxspeed2 = sqrt(((float)maxspeed*maxspeed/2));
+	int		maxspeed2 = sqrt((static_cast<float>(maxspeed)*maxspeed/2));
 	int		speedtemp;
 	vec3_t	liftvel, forwardvel, rightvel, deltavel;
 
@@ -127,15 +127,15 @@ void PM_LQMMove( )
 		if( pm->cmd.buttons & BUTTON_INCREASE ) {
 			anim &= ~A_LQM_CROUCH;
 			anim |= A_LQM_JUMP;
-			maxspeed *= (float)0.5;
-			maxspeed2 *= (float)0.5;
+			maxspeed *= static_cast<float>(0.5);
+			maxspeed2 *= static_cast<float>(0.5);
 			if(liftvel[2] == 0 && !(pm->ps->ONOFF & OO_STALLED))
 				liftvel[2] += JUMP_VELOCITY;
 		} else if( pm->cmd.buttons & BUTTON_DECREASE ) {
 			anim &= ~A_LQM_JUMP;
 			anim |= A_LQM_CROUCH;
-			maxspeed *= (float)0.5;
-			maxspeed2 *= (float)0.5;
+			maxspeed *= static_cast<float>(0.5);
+			maxspeed2 *= static_cast<float>(0.5);
 		} else {
 			if(!((anim & A_LQM_EJECT) && (anim & A_LQM_CROUCH)))
 				anim &= ~A_LQM_CROUCH;

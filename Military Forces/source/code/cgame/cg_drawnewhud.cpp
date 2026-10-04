@@ -1118,7 +1118,7 @@ static void CG_HUD_Camera(int mfdnum, int vehicle) {
 	// apply any zoom
 	if( cg.zoomed )
 	{
-		fov /= (float)cg.zoomAmount;
+		fov /= static_cast<float>(cg.zoomAmount);
 	}
 
 	// set final FOV
@@ -1409,7 +1409,7 @@ static void CG_Draw_MFD(int mfdnum, int vehicle, centity_t * cent, int targetran
 		CG_DrawString_MFQ3( x+4, y+88, "POS Y:", HUDColors[cg.MFDColor], 0);
 		CG_DrawString_MFQ3( x+4, y+102, "THROTTLE:", HUDColors[cg.MFDColor], 0);
 		CG_DrawString_MFQ3( x+4, y+112, "HEALTH:", HUDColors[cg.MFDColor], 0);
-		value = 360 - (int)ps->vehicleAngles[1];
+		value = 360 - static_cast<int>(ps->vehicleAngles[1]);
 		if( value <= 0 ) value += 360;
 			Com_sprintf(buffer, 5, "%d", value);
 			CG_DrawString_MFQ3_R( x+122, y+30, buffer, HUDColors[cg.MFDColor], 0);
@@ -1424,9 +1424,9 @@ static void CG_Draw_MFD(int mfdnum, int vehicle, centity_t * cent, int targetran
 		CG_DrawString_MFQ3_R( x+122, y+54, buffer, HUDColors[stallcolor], 0);
 		Com_sprintf(buffer, 7, "%d", altitude);
 		CG_DrawString_MFQ3_R( x+122, y+64, buffer, HUDColors[cg.MFDColor], 0);
-		Com_sprintf(buffer, 7, "%d", (int)ps->origin[0]);
+		Com_sprintf(buffer, 7, "%d", static_cast<int>(ps->origin[0]));
 		CG_DrawString_MFQ3_R( x+122, y+78, buffer, HUDColors[cg.MFDColor], 0);
-		Com_sprintf(buffer, 7, "%d", (int)ps->origin[1]);
+		Com_sprintf(buffer, 7, "%d", static_cast<int>(ps->origin[1]));
 		CG_DrawString_MFQ3_R( x+122, y+88, buffer, HUDColors[cg.MFDColor], 0);
 		value = (100*ps->stats[STAT_HEALTH]/ps->stats[STAT_MAX_HEALTH]);
 		if( value > 100 ) value = 100;	
@@ -1485,7 +1485,7 @@ static void CG_Draw_AltTape( int value ) {
 	CG_DrawString_MFQ3_R( 626, 32, buffer, HUDColors[cg.HUDColor], 0);
 	
 		// find visible alt numbers
-	visible3 = (int)((value+(scale/2))/scale);
+	visible3 = ((value+(scale/2))/scale);
 	visible3 *= scale;
 	visible2 = visible3 - scale;
 	visible1 = visible2 - scale;
@@ -1502,24 +1502,24 @@ static void CG_Draw_AltTape( int value ) {
 		top = bottom = false;
 	}
 		// draw visible alt numbers
-	Com_sprintf(buffer, 11, "%.1f", (float)visible3/100 );
+	Com_sprintf(buffer, 11, "%.1f", static_cast<float>(visible3)/100 );
 	CG_DrawString_MFQ3( 596, 171+(value2*64/scale), buffer, HUDColors[cg.HUDColor], 0);
 	if( visible2 >= 0 ) {
 		value2 = value - visible2;
-		Com_sprintf(buffer, 11, "%.1f", (float)visible2/100 );
+		Com_sprintf(buffer, 11, "%.1f", static_cast<float>(visible2)/100 );
 		CG_DrawString_MFQ3( 596, 171+(value2*64/scale), buffer, HUDColors[cg.HUDColor], 0);
 		if( bottom && visible1 >= 0 ) {
 			value2 = value - visible1;
-			Com_sprintf(buffer, 11, "%.1f", (float)visible1/100 );
+			Com_sprintf(buffer, 11, "%.1f", static_cast<float>(visible1)/100 );
 			CG_DrawString_MFQ3( 596, 171+(value2*64/scale), buffer, HUDColors[cg.HUDColor], 0);
 		}
 	}
 	value2 = value - visible4;
-	Com_sprintf(buffer, 11, "%.1f", (float)visible4/100 );
+	Com_sprintf(buffer, 11, "%.1f", static_cast<float>(visible4)/100 );
 	CG_DrawString_MFQ3( 596, 171+(value2*64/scale), buffer, HUDColors[cg.HUDColor], 0);
 	if( top ) {
 		value2 = value - visible5;
-		Com_sprintf(buffer, 11, "%.1f", (float)visible5/100 );
+		Com_sprintf(buffer, 11, "%.1f", static_cast<float>(visible5)/100 );
 		CG_DrawString_MFQ3( 596, 171+(value2*64/scale), buffer, HUDColors[cg.HUDColor], 0);
 	}
 }
@@ -1567,7 +1567,7 @@ static void CG_Draw_SpeedTape( int value, int stallspeed, int gearspeed, int sca
 	Com_sprintf(buffer, 7, "%d", value);
 	CG_DrawString_MFQ3_R( 45, 32, buffer, HUDColors[cg.HUDColor], 0);
 		// find visible speed numbers
-	visible3 = (int)((value+(scale/2))/scale);
+	visible3 = ((value+(scale/2))/scale);
 	visible3 *= scale;
 	visible2 = visible3 - scale;
 	visible1 = visible2 - scale;
@@ -1666,7 +1666,7 @@ static void CG_Draw_HeadingTape( int value, int targetheading ) {
 	Com_sprintf(buffer, 7, "%d", value);
 	CG_DrawString_MFQ3_R( 332, 32, buffer, HUDColors[cg.HUDColor], 0);
 		// find visible heading numbers
-	visible2 = ((int)((value+15)/10));
+	visible2 = (((value+15)/10));
 	if( (visible2%3) ) {
 		visible2--;
 		if( (visible2%3) ) {
@@ -1780,7 +1780,7 @@ void CG_DrawStatusBar_MFQ3_new( ) {
 
 	// heading
 	if( hud_heading.integer ) {
-		value = 360 - (int)ps->vehicleAngles[1];
+		value = 360 - static_cast<int>(ps->vehicleAngles[1]);
 		if( value <= 0 ) value += 360;
 		CG_Draw_HeadingTape( value, targetheading );
 	}
@@ -1810,7 +1810,7 @@ void CG_DrawStatusBar_MFQ3_new( ) {
 			VectorCopy( start, end );
 			end[2] -= 20000;
 			CG_Trace( &tr, start, vec3_origin, vec3_origin, end, cg.snap->ps.clientNum, MASK_SOLID|MASK_WATER );
-			altitude = (int)(tr.fraction * 20000);
+			altitude = static_cast<int>(tr.fraction * 20000);
 			CG_SetScreenPlacement( PLACE_RIGHT );
 			CG_Draw_AltTape(altitude);
 			CG_SetScreenPlacement( PLACE_CENTER );
@@ -1849,8 +1849,8 @@ void CG_DrawStatusBar_MFQ3_new( ) {
 
 		// GPS
 		if( cg.GPS ) {
-			value = (int)ps->origin[0];
-			value2 = (int)ps->origin[1];
+			value = static_cast<int>(ps->origin[0]);
+			value2 = static_cast<int>(ps->origin[1]);
 			CG_Draw_Coords( value, value2 );
 		}
 		
@@ -1859,7 +1859,7 @@ void CG_DrawStatusBar_MFQ3_new( ) {
 			!(cent->currentState.ONOFF & OO_LANDED) && ps->stats[STAT_HEALTH] > 0 && 
 			availableVehicles[vehicle].cat != CAT_HELO) {
 			float stallscale = 1.0f;
-			if( speed >= stallspeed && !(cent->currentState.ONOFF & OO_STALLED) ) stallscale = 2.0f - ((float)speed/(float)stallspeed);
+			if( speed >= stallspeed && !(cent->currentState.ONOFF & OO_STALLED) ) stallscale = 2.0f - (static_cast<float>(speed)/static_cast<float>(stallspeed));
 			cgUtils.drawStringNew( 320, 360, stallscale, HUDColors[stallcolor], "STALL!", 0, 0, 3, CENTRE_JUSTIFY );
 		}
 

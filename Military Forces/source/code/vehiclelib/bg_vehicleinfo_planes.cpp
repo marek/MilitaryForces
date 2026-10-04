@@ -130,8 +130,7 @@ GameObjectInfo_Plane::GameObjectInfo_Plane() :
 }
 
 GameObjectInfo_Plane::~GameObjectInfo_Plane()
-{
-}
+= default;
 
 bool
 GameObjectInfo_Plane::setupBoundingBox()

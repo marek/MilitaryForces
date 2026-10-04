@@ -389,7 +389,7 @@ static long FS_HashFileName( const char *fname, int hashSize ) {
 		if (letter =='.') break;				// don't include extension
 		if (letter =='\\') letter = '/';		// damn path names
 		if (letter == PATH_SEP) letter = '/';		// damn path names
-		hash+=(long)(letter)*(i+119);
+		hash+=static_cast<long>(letter)*(i+119);
 		i++;
 	}
 	hash = (hash ^ (hash >> 10) ^ (hash >> 20));
@@ -1404,7 +1404,7 @@ int FS_Read( void *buffer, int len, fileHandle_t f ) {
 		return 0;
 	}
 
-	buf = (byte *)buffer;
+	buf = static_cast<byte *>(buffer);
 	fs_readCount += len;
 
 	if (fsh[f].zipFile == false) {
@@ -1717,7 +1717,7 @@ long FS_ReadFileDir(const char *qpath, void *searchPath, bool unpure, void **buf
 				return len;
 			}
 
-			buf = (byte *)Hunk_AllocateTempMemory(len+1);
+			buf = static_cast<byte *>(Hunk_AllocateTempMemory(len+1));
 			*buffer = buf;
 
 			r = FS_Read( buf, len, com_journalDataFile );
@@ -1737,7 +1737,7 @@ long FS_ReadFileDir(const char *qpath, void *searchPath, bool unpure, void **buf
 		isConfig = false;
 	}
 
-	search = (searchpath_t *)searchPath;
+	search = static_cast<searchpath_t *>(searchPath);
 
 	if(search == nullptr)
 	{
@@ -1777,7 +1777,7 @@ long FS_ReadFileDir(const char *qpath, void *searchPath, bool unpure, void **buf
 	fs_loadCount++;
 	fs_loadStack++;
 
-	buf = (byte *)Hunk_AllocateTempMemory(len+1);
+	buf = static_cast<byte *>(Hunk_AllocateTempMemory(len+1));
 	*buffer = buf;
 
 	FS_Read (buf, len, h);
@@ -1913,9 +1913,9 @@ static pack_t *FS_LoadZipFile(const char *zipfile, const char *basename)
 		unzGoToNextFile(uf);
 	}
 
-	buildBuffer = (fileInPack_t *)Z_Malloc( (gi.number_entry * sizeof( fileInPack_t )) + len );
-	namePtr = ((char *) buildBuffer) + gi.number_entry * sizeof( fileInPack_t );
-	fs_headerLongs = (int *)Z_Malloc( ( gi.number_entry + 1 ) * sizeof(int) );
+	buildBuffer = static_cast<fileInPack_t *>(Z_Malloc( (gi.number_entry * sizeof( fileInPack_t )) + len ));
+	namePtr = (reinterpret_cast<char *>(buildBuffer)) + gi.number_entry * sizeof( fileInPack_t );
+	fs_headerLongs = static_cast<int *>(Z_Malloc( ( gi.number_entry + 1 ) * sizeof(int) ));
 	fs_headerLongs[ fs_numHeaderLongs++ ] = LittleLong( fs_checksumFeed );
 
 	// get the hash table size from the number of files in the zip
@@ -1926,9 +1926,9 @@ static pack_t *FS_LoadZipFile(const char *zipfile, const char *basename)
 		}
 	}
 
-	pack = (pack_t *)Z_Malloc( sizeof( pack_t ) + i * sizeof(fileInPack_t *) );
+	pack = static_cast<pack_t *>(Z_Malloc( sizeof( pack_t ) + i * sizeof(fileInPack_t *) ));
 	pack->hashSize = i;
-	pack->hashTable = (fileInPack_t **) (((char *) pack) + sizeof( pack_t ));
+	pack->hashTable = reinterpret_cast<fileInPack_t **>((reinterpret_cast<char *>(pack)) + sizeof( pack_t ));
 	for(i = 0; i < pack->hashSize; i++) {
 		pack->hashTable[i] = nullptr;
 	}
@@ -2212,7 +2212,7 @@ char **FS_ListFilteredFiles( const char *path, const char *extension,
 		return nullptr;
 	}
 
-	listCopy = (char **)Z_Malloc( ( nfiles + 1 ) * sizeof( *listCopy ) );
+	listCopy = static_cast<char **>(Z_Malloc( ( nfiles + 1 ) * sizeof( *listCopy ) ));
 	for ( i = 0 ; i < nfiles ; i++ ) {
 		listCopy[i] = list[i];
 	}
@@ -2326,7 +2326,7 @@ static char** Sys_ConcatenateFileLists( char **list0, char **list1 )
 	totalLength += Sys_CountFileList(list1);
 
 	/* Create new list. */
-	dst = cat = (char **)Z_Malloc( ( totalLength + 1 ) * sizeof( char* ) );
+	dst = cat = static_cast<char **>(Z_Malloc( ( totalLength + 1 ) * sizeof( char* ) ));
 
 	/* Copy over lists. */
 	if (list0)
@@ -2594,7 +2594,7 @@ void FS_SortFileList(char **filelist, int numfiles) {
 	int i, j, k, numsortedfiles;
 	char **sortedlist;
 
-	sortedlist = (char **)Z_Malloc( ( numfiles + 1 ) * sizeof( *sortedlist ) );
+	sortedlist = static_cast<char **>(Z_Malloc( ( numfiles + 1 ) * sizeof( *sortedlist ) ));
 	sortedlist[0] = nullptr;
 	numsortedfiles = 0;
 	for (i = 0; i < numfiles; i++) {
@@ -2708,7 +2708,7 @@ FS_Which
 
 bool FS_Which(const char *filename, void *searchPath)
 {
-	searchpath_t *search = (searchpath_t *)searchPath;
+	searchpath_t *search = static_cast<searchpath_t *>(searchPath);
 
 	if(FS_FOpenFileReadDir(filename, search, nullptr, false, false) > 0)
 	{
@@ -2765,8 +2765,8 @@ void FS_Which_f( ) {
 static int QDECL paksort( const void *a, const void *b ) {
 	char	*aa, *bb;
 
-	aa = *(char **)a;
-	bb = *(char **)b;
+	aa = *static_cast<char * const *>(a);
+	bb = *static_cast<char * const *>(b);
 
 	return FS_PathCmp( aa, bb );
 }
@@ -2862,7 +2862,7 @@ static void FS_AddGameDirectory( const char *path, const char *dir ) {
 
 			fs_packFiles += pak->numfiles;
 
-			search = (searchpath_t *)Z_Malloc(sizeof(searchpath_t));
+			search = static_cast<searchpath_t *>(Z_Malloc(sizeof(searchpath_t)));
 			search->pack = pak;
 			search->next = fs_searchpaths;
 			fs_searchpaths = search;
@@ -2882,8 +2882,8 @@ static void FS_AddGameDirectory( const char *path, const char *dir ) {
 			pakfile = FS_BuildOSPath(path, dir, pakdirs[pakdirsi]);
 
 			// add the directory to the search path
-			search = (searchpath_t *)Z_Malloc(sizeof(searchpath_t));
-			search->dir = (directory_t *)Z_Malloc(sizeof(*search->dir));
+			search = static_cast<searchpath_t *>(Z_Malloc(sizeof(searchpath_t)));
+			search->dir = static_cast<directory_t *>(Z_Malloc(sizeof(*search->dir)));
 
 			Q_strncpyz(search->dir->path, curpath, sizeof(search->dir->path));	// c:\quake3\baseq3
 			Q_strncpyz(search->dir->fullpath, pakfile, sizeof(search->dir->fullpath));	// c:\quake3\baseq3\mypak.pk3dir
@@ -2903,8 +2903,8 @@ static void FS_AddGameDirectory( const char *path, const char *dir ) {
 	//
 	// add the directory to the search path
 	//
-	search = (searchpath_t *)Z_Malloc (sizeof(searchpath_t));
-	search->dir = (directory_t *)Z_Malloc( sizeof( *search->dir ) );
+	search = static_cast<searchpath_t *>(Z_Malloc (sizeof(searchpath_t)));
+	search->dir = static_cast<directory_t *>(Z_Malloc( sizeof( *search->dir ) ));
 
 	Q_strncpyz(search->dir->path, path, sizeof(search->dir->path));
 	Q_strncpyz(search->dir->fullpath, curpath, sizeof(search->dir->fullpath));
@@ -3217,16 +3217,16 @@ static void FS_AddPathVar( cvar_t *pathVar ) {
 	}
 
 	// Check for duplicates
-	for( int i = 0; i < ARRAY_LEN( fs_pathVars ); i++ ) {
-		if ( fs_pathVars[i] && !Q_stricmp( fs_pathVars[i]->string, pathVar->string ) ) {
+	for(auto & fs_pathVar : fs_pathVars) {
+		if ( fs_pathVar && !Q_stricmp( fs_pathVar->string, pathVar->string ) ) {
 			return;
 		}
 	}
 
 	// Add to first empty slot
-	for( int i = 0; i < ARRAY_LEN( fs_pathVars ); i++ ) {
-		if ( !fs_pathVars[i] ) {
-			fs_pathVars[i] = pathVar;
+	for(auto & fs_pathVar : fs_pathVars) {
+		if ( !fs_pathVar ) {
+			fs_pathVar = pathVar;
 			return;
 		}
 	}

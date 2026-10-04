@@ -221,7 +221,7 @@ return;
 			v->st[1] = 0.5 + DotProduct( delta, axis[2] ) * xTexCoordScale;
 
 			// colour
-			*(int *)v->modulate = *(int *)colors;
+			*reinterpret_cast<int *>(v->modulate) = *reinterpret_cast<int *>(colors);
 		}
 
 		// if it is a temporary (shadow) mark, add it immediately and forget about it

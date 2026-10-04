@@ -33,7 +33,7 @@ void CG_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent,
 	}
 
 	// had to cast away the const to avoid compiler problems...
-	MatrixMultiply( lerped.axis, ((refEntity_t *)parent)->axis, entity->axis );
+	MatrixMultiply( lerped.axis, (const_cast<refEntity_t *>(parent))->axis, entity->axis );
 	entity->backlerp = parent->backlerp;
 }
 
@@ -65,7 +65,7 @@ void CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *pare
 
 	// had to cast away the const to avoid compiler problems...
 	MatrixMultiply( entity->axis, lerped.axis, tempAxis );
-	MatrixMultiply( tempAxis, ((refEntity_t *)parent)->axis, entity->axis );
+	MatrixMultiply( tempAxis, (const_cast<refEntity_t *>(parent))->axis, entity->axis );
 }
 
 
@@ -265,7 +265,7 @@ static void CG_Item( centity_t *cent ) {
 	// if just respawned, slowly scale up
 	msec = cg.time - cent->miscTime;
 	if ( msec >= 0 && msec < ITEM_SCALEUP_TIME ) {
-		frac = (float)msec / ITEM_SCALEUP_TIME;
+		frac = static_cast<float>(msec) / ITEM_SCALEUP_TIME;
 		VectorScale( ent.axis[0], frac, ent.axis[0] );
 		VectorScale( ent.axis[1], frac, ent.axis[1] );
 		VectorScale( ent.axis[2], frac, ent.axis[2] );
@@ -672,7 +672,7 @@ float CG_EntityAngleErrorFraction( const centity_t *cent ) {
 	if ( !cent->errorTime ) {
 		return 0;
 	}
-	f = 1.0f - ( cg.time - cent->errorTime ) / (float)ANGLE_ERROR_DECAY;
+	f = 1.0f - ( cg.time - cent->errorTime ) / static_cast<float>(ANGLE_ERROR_DECAY);
 	if ( f > 1.0f ) {
 		f = 1.0f;
 	}
@@ -904,7 +904,7 @@ void CG_AddPacketEntities( ) {
 		if ( delta == 0 ) {
 			cg.frameInterpolation = 0;
 		} else {
-			cg.frameInterpolation = (float)( cg.time - cg.snap->serverTime ) / delta;
+			cg.frameInterpolation = static_cast<float>( cg.time - cg.snap->serverTime ) / delta;
 		}
 	} else {
 		cg.frameInterpolation = 0;	// actually, it should never be used, because 

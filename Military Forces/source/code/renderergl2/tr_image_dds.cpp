@@ -244,7 +244,7 @@ void R_LoadDDS ( const char *filename, byte **pic, int *width, int *height, GLen
 	//
 	// load the file
 	//
-	len = ri.FS_ReadFile( ( char * ) filename, &buffer.v);
+	len = ri.FS_ReadFile( const_cast< char *>(filename), &buffer.v);
 	if (!buffer.b || len < 0) {
 		return;
 	}
@@ -262,7 +262,7 @@ void R_LoadDDS ( const char *filename, byte **pic, int *width, int *height, GLen
 	//
 	// reject files that don't start with "DDS "
 	//
-	if (*((ui32_t *)(buffer.b)) != EncodeFourCC("DDS "))
+	if (*(reinterpret_cast<ui32_t *>(buffer.b)) != EncodeFourCC("DDS "))
 	{
 		ri.Printf(PRINT_ALL, "File %s is not a DDS file.\n", filename);
 		ri.FS_FreeFile(buffer.v);
@@ -272,7 +272,7 @@ void R_LoadDDS ( const char *filename, byte **pic, int *width, int *height, GLen
 	//
 	// parse header and dx10 header if available
 	//
-	ddsHeader = (ddsHeader_t *)(buffer.b + 4);
+	ddsHeader = reinterpret_cast<ddsHeader_t *>(buffer.b + 4);
 	if ((ddsHeader->pixelFormatFlags & DDSPF_FOURCC) && ddsHeader->fourCC == EncodeFourCC("DX10"))
 	{
 		if (len < 4 + sizeof(*ddsHeader) + sizeof(*ddsHeaderDxt10))
@@ -282,7 +282,7 @@ void R_LoadDDS ( const char *filename, byte **pic, int *width, int *height, GLen
 			return;
 		}
 
-		ddsHeaderDxt10 = (ddsHeaderDxt10_t *)(buffer.b + 4 + sizeof(ddsHeader_t));
+		ddsHeaderDxt10 = reinterpret_cast<ddsHeaderDxt10_t *>(buffer.b + 4 + sizeof(ddsHeader_t));
 		data = buffer.b + 4 + sizeof(*ddsHeader) + sizeof(*ddsHeaderDxt10);
 		len -= 4 + sizeof(*ddsHeader) + sizeof(*ddsHeaderDxt10);
 	}
@@ -446,7 +446,7 @@ void R_LoadDDS ( const char *filename, byte **pic, int *width, int *height, GLen
 		}
 	}
 
-	*pic = (byte *)ri.Malloc(len);
+	*pic = static_cast<byte *>(ri.Malloc(len));
 	Com_Memcpy(*pic, data, len);
 
 	ri.FS_FreeFile(buffer.v);
@@ -463,14 +463,14 @@ void R_SaveDDS(const char *filename, byte *pic, int width, int height, int depth
 
 	picSize = width * height * depth * 4;
 	size = 4 + sizeof(*ddsHeader) + picSize;
-	data = (byte *)ri.Malloc(size);
+	data = static_cast<byte *>(ri.Malloc(size));
 
 	data[0] = 'D';
 	data[1] = 'D';
 	data[2] = 'S';
 	data[3] = ' ';
 
-	ddsHeader = (ddsHeader_t *)(data + 4);
+	ddsHeader = reinterpret_cast<ddsHeader_t *>(data + 4);
 	memset(ddsHeader, 0, sizeof(ddsHeader_t));
 
 	ddsHeader->headerSize = 0x7c;

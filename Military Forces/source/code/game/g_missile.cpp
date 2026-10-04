@@ -364,14 +364,14 @@ struct Think_NukeDamage : public GameEntity::EntityFunc_Think
 		{
 			// shockwave push back
 			t = self_->count_ - NUKE_SHOCKWAVE_STARTTIME;
-			NukeShockWave(self_->s.pos.trBase, self_->activator_, 25, 50,	(int) (float) t * self_->splashRadius_ / (NUKE_SHOCKWAVE_ENDTIME - NUKE_SHOCKWAVE_STARTTIME) );
+			NukeShockWave(self_->s.pos.trBase, self_->activator_, 25, 50,	static_cast<int>(t) * self_->splashRadius_ / (NUKE_SHOCKWAVE_ENDTIME - NUKE_SHOCKWAVE_STARTTIME) );
 		}
 		//
 		if( self_->count_ >= NUKE_EXPLODE_STARTTIME ) 
 		{
 			// do our damage
 			t = self_->count_ - NUKE_EXPLODE_STARTTIME;
-			NukeRadiusDamage( self_->s.pos.trBase, self_->activator_, 700,	(int) (float) t * self_->splashRadius_ / (NUKE_IMPLODE_STARTTIME - NUKE_EXPLODE_STARTTIME) );
+			NukeRadiusDamage( self_->s.pos.trBase, self_->activator_, 700,	static_cast<int>(t) * self_->splashRadius_ / (NUKE_IMPLODE_STARTTIME - NUKE_EXPLODE_STARTTIME) );
 		}
 
 		// either cycle or kill self
@@ -567,7 +567,7 @@ struct Think_ExplodeNuke : public GameEntity::EntityFunc_Think
 		self_->freeAfterEvent_ = true;
 
 		static int seed = 0x92;
-		if( (int)(35 * Q_random(&seed)) + 1 == 2 )
+		if( static_cast<int>(35 * Q_random(&seed)) + 1 == 2 )
 			G_burningManExplode( self_ );
 
 		// play global sound at all clients
@@ -1318,8 +1318,8 @@ void fire_autocannon( GameEntity *self, bool main )
 
 	// used for spread
 	VectorCopy( self->client_->ps_.vehicleAngles, spreadangle );
-	spreadX = ((rand() % (unsigned int)spreadX) - spreadX/2)/10;
-	spreadY = ((rand() % (unsigned int)spreadY) - spreadY/2)/10;
+	spreadX = ((rand() % static_cast<unsigned int>(spreadX)) - spreadX/2)/10;
+	spreadY = ((rand() % static_cast<unsigned int>(spreadY)) - spreadY/2)/10;
 	spreadangle[0] += spreadX;
 	spreadangle[1] += spreadY;
 //	Com_Printf( "spread %.1f %.1f\n", spreadX, spreadY );
@@ -1951,7 +1951,7 @@ void fire_flak_GI (GameEntity *self)
 	dis = Distance(self->r.currentOrigin,self->tracktarget_->r.currentOrigin);
 	if(dis < 1000)
 		return;	// Need to be above reasonably!
-	fuse = (float)dis/availableWeapons[self->s.weaponIndex].muzzleVelocity;
+	fuse = static_cast<float>(dis)/availableWeapons[self->s.weaponIndex].muzzleVelocity;
 
 
 	// Cheat using a random detonation position near player

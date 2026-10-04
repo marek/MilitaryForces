@@ -37,7 +37,7 @@ void CG_DrawProgressBar( rectDef_t *rect, vec4_t color, vec4_t textcolor, float 
 	//draw text
 	if( scale > 0.0 )
 	{
-		Com_sprintf( textBuffer, sizeof( textBuffer ), "%d%%", (int)( progress * 100 ) );
+		Com_sprintf( textBuffer, sizeof( textBuffer ), "%d%%", static_cast<int>( progress * 100 ) );
 		twa = scale * strlen(textBuffer);
 		tx = rect->x + ( rect->w / 2.0f ) - ( twa / 2.0f );
 		ty = rect->y + ( rect->h / 2.0f ) - ( scale / 2.0f );
@@ -603,18 +603,18 @@ static void UI_DrawBannerString2( int x, int y, const char* str, vec4_t color )
 	{
 		ch = *s & 127;
 		if ( ch == ' ' ) {
-			ax += ((float)PROPB_SPACE_WIDTH + (float)PROPB_GAP_WIDTH)* cgs.screenScale;
+			ax += (static_cast<float>(PROPB_SPACE_WIDTH) + static_cast<float>(PROPB_GAP_WIDTH))* cgs.screenScale;
 		}
 		else if ( ch >= 'A' && ch <= 'Z' ) {
 			ch -= 'A';
-			fcol = (float)propMapB[ch][0] / 256.0f;
-			frow = (float)propMapB[ch][1] / 256.0f;
-			fwidth = (float)propMapB[ch][2] / 256.0f;
-			fheight = (float)PROPB_HEIGHT / 256.0f;
-			aw = (float)propMapB[ch][2] * cgs.screenScale;
-			ah = (float)PROPB_HEIGHT * cgs.screenScale;
+			fcol = static_cast<float>(propMapB[ch][0]) / 256.0f;
+			frow = static_cast<float>(propMapB[ch][1]) / 256.0f;
+			fwidth = static_cast<float>(propMapB[ch][2]) / 256.0f;
+			fheight = static_cast<float>(PROPB_HEIGHT) / 256.0f;
+			aw = static_cast<float>(propMapB[ch][2]) * cgs.screenScale;
+			ah = static_cast<float>(PROPB_HEIGHT) * cgs.screenScale;
 			refExport.DrawStretchPic( ax, ay, aw, ah, fcol, frow, fcol+fwidth, frow+fheight, cgs.media.charsetPropB );
-			ax += (aw + (float)PROPB_GAP_WIDTH * cgs.screenScale);
+			ax += (aw + static_cast<float>(PROPB_GAP_WIDTH) * cgs.screenScale);
 		}
 		s++;
 	}
@@ -715,20 +715,20 @@ static void UI_DrawProportionalString2( int x, int y, const char* str, vec4_t co
 	{
 		ch = *s & 127;
 		if ( ch == ' ' ) {
-			aw = (float)PROP_SPACE_WIDTH * cgs.screenScale * sizeScale;
+			aw = static_cast<float>(PROP_SPACE_WIDTH) * cgs.screenScale * sizeScale;
 		} else if ( propMap[ch][2] != -1 ) {
-			fcol = (float)propMap[ch][0] / 256.0f;
-			frow = (float)propMap[ch][1] / 256.0f;
-			fwidth = (float)propMap[ch][2] / 256.0f;
-			fheight = (float)PROP_HEIGHT / 256.0f;
-			aw = (float)propMap[ch][2] * cgs.screenScale * sizeScale;
-			ah = (float)PROP_HEIGHT * cgs.screenScale * sizeScale;
+			fcol = static_cast<float>(propMap[ch][0]) / 256.0f;
+			frow = static_cast<float>(propMap[ch][1]) / 256.0f;
+			fwidth = static_cast<float>(propMap[ch][2]) / 256.0f;
+			fheight = static_cast<float>(PROP_HEIGHT) / 256.0f;
+			aw = static_cast<float>(propMap[ch][2]) * cgs.screenScale * sizeScale;
+			ah = static_cast<float>(PROP_HEIGHT) * cgs.screenScale * sizeScale;
 			refExport.DrawStretchPic( ax, ay, aw, ah, fcol, frow, fcol+fwidth, frow+fheight, charset );
 		} else {
 			aw = 0;
 		}
 
-		ax += (aw + (float)PROP_GAP_WIDTH * cgs.screenScale * sizeScale);
+		ax += (aw + static_cast<float>(PROP_GAP_WIDTH) * cgs.screenScale * sizeScale);
 		s++;
 	}
 
@@ -945,8 +945,8 @@ static bool CG_PolyMeshGeneratedShadow( BasicDrawInfo_t *drawInfo, float *shadow
 	{
 		for( x = 0; x<5; x++ )
 		{
-			u = (float)x/4;
-			v = (float)y/4;
+			u = static_cast<float>(x)/4;
+			v = static_cast<float>(y)/4;
 
 			// coords
 

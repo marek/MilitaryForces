@@ -532,8 +532,8 @@ void SV_ClipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, con
 		angles = vec3_origin;	// boxes don't rotate
 	}
 
-	CM_TransformedBoxTrace ( trace, (float *)start, (float *)end,
-		(float *)mins, (float *)maxs, clipHandle,  contentmask,
+	CM_TransformedBoxTrace ( trace, const_cast<float *>(start), const_cast<float *>(end),
+		const_cast<float *>(mins), const_cast<float *>(maxs), clipHandle,  contentmask,
 		origin, angles, capsule);
 
 	if ( trace->fraction < 1 ) {
@@ -605,8 +605,8 @@ void SV_ClipMoveToEntities( moveclip_t *clip )
 			angles = vec3_origin;	// boxes don't rotate
 		}
 
-		CM_TransformedBoxTrace ( &trace, (float *)clip->start, (float *)clip->end,
-			(float *)clip->mins, (float *)clip->maxs, clipHandle,  clip->contentmask,
+		CM_TransformedBoxTrace ( &trace, const_cast<float *>(clip->start), (float *)clip->end,
+			const_cast<float *>(clip->mins), const_cast<float *>(clip->maxs), clipHandle,  clip->contentmask,
 			origin, angles, clip->capsule);
 
 		if ( trace.allsolid ) {
@@ -654,7 +654,7 @@ void SV_Trace( trace_t *results, const vec3_t start, const vec3_t mins, const ve
 	Com_Memset ( &clip, 0, sizeof ( moveclip_t ) );
 
 	// clip to world
-	CM_BoxTrace( &clip.trace, start, end, (float *)mins, (float *)maxs, 0, contentmask, capsule );
+	CM_BoxTrace( &clip.trace, start, end, const_cast<float *>(mins), const_cast<float *>(maxs), 0, contentmask, capsule );
 	clip.trace.entityNum = clip.trace.fraction != 1.0 ? ENTITYNUM_WORLD : ENTITYNUM_NONE;
 	if ( clip.trace.fraction == 0 ) {
 		*results = clip.trace;

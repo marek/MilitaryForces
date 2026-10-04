@@ -112,14 +112,14 @@ FT_Bitmap *R_RenderGlyph(FT_GlyphSlot glyph, glyphInfo_t* glyphOut) {
 	if ( glyph->format == ft_glyph_format_outline ) {
 		size   = pitch*height; 
 
-		bit2 = (FT_Bitmap *)ri.Malloc(sizeof(FT_Bitmap));
+		bit2 = static_cast<FT_Bitmap *>(ri.Malloc(sizeof(FT_Bitmap)));
 
 		bit2->width      = width;
 		bit2->rows       = height;
 		bit2->pitch      = pitch;
 		bit2->pixel_mode = ft_pixel_mode_grays;
 		//bit2->pixel_mode = ft_pixel_mode_mono;
-		bit2->buffer     = (unsigned char *)ri.Malloc(pitch*height);
+		bit2->buffer     = static_cast<unsigned char *>(ri.Malloc(pitch*height));
 		bit2->num_grays = 256;
 
 		Com_Memset( bit2->buffer, 0, size );
@@ -147,7 +147,7 @@ void WriteTGA (char *filename, byte *data, int width, int height) {
 	unsigned char  *flip;
 	unsigned char  *src, *dst;
 
-	buffer = (byte *)ri.Malloc(width*height*4 + 18);
+	buffer = static_cast<byte *>(ri.Malloc(width*height*4 + 18));
 	Com_Memset (buffer, 0, 18);
 	buffer[2] = 2;		// uncompressed type
 	buffer[12] = width&255;
@@ -167,7 +167,7 @@ void WriteTGA (char *filename, byte *data, int width, int height) {
 	}
 
 	// flip upside down
-	flip = (unsigned char *)ri.Malloc(width*4);
+	flip = static_cast<unsigned char *>(ri.Malloc(width*4));
 	for(row = 0; row < height/2; row++)
 	{
 		src = buffer + 18 + row * 4 * width;
@@ -284,10 +284,10 @@ static glyphInfo_t *RE_ConstructGlyphInfo(unsigned char *imageOut, int *xOut, in
 
 		glyph.imageHeight = scaled_height;
 		glyph.imageWidth = scaled_width;
-		glyph.s = (float)*xOut / 256;
-		glyph.t = (float)*yOut / 256;
-		glyph.s2 = glyph.s + (float)scaled_width / 256;
-		glyph.t2 = glyph.t + (float)scaled_height / 256;
+		glyph.s = static_cast<float>(*xOut) / 256;
+		glyph.t = static_cast<float>(*yOut) / 256;
+		glyph.s2 = glyph.s + scaled_width / 256;
+		glyph.t2 = glyph.t + scaled_height / 256;
 
 		*xOut += scaled_width + 1;
 
@@ -303,7 +303,7 @@ static int fdOffset;
 static byte	*fdFile;
 
 int readInt( ) {
-	int i = ((unsigned int)fdFile[fdOffset] | ((unsigned int)fdFile[fdOffset+1]<<8) | ((unsigned int)fdFile[fdOffset+2]<<16) | ((unsigned int)fdFile[fdOffset+3]<<24));
+	int i = (static_cast<unsigned int>(fdFile[fdOffset]) | (static_cast<unsigned int>(fdFile[fdOffset+1])<<8) | (static_cast<unsigned int>(fdFile[fdOffset+2])<<16) | (static_cast<unsigned int>(fdFile[fdOffset+3])<<24));
 	fdOffset += 4;
 	return i;
 }
@@ -375,7 +375,7 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
 	if (len == sizeof(fontInfo_t)) {
 		ri.FS_ReadFile(name, &faceData);
 		fdOffset = 0;
-		fdFile = (byte *)faceData;
+		fdFile = static_cast<byte *>(faceData);
 		for(i=0; i<GLYPHS_PER_FONT; i++) {
 			font->glyphs[i].height		= readInt();
 			font->glyphs[i].top			= readInt();
@@ -389,7 +389,7 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
 			font->glyphs[i].s2			= readFloat();
 			font->glyphs[i].t2			= readFloat();
 			font->glyphs[i].glyph		= readInt();
-			Q_strncpyz(font->glyphs[i].shaderName, (const char *)&fdFile[fdOffset], sizeof(font->glyphs[i].shaderName));
+			Q_strncpyz(font->glyphs[i].shaderName, reinterpret_cast<const char *>(&fdFile[fdOffset]), sizeof(font->glyphs[i].shaderName));
 			fdOffset += sizeof(font->glyphs[i].shaderName);
 		}
 		font->glyphScale = readFloat();
@@ -420,7 +420,7 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
 	}
 
 	// allocate on the stack first in case we fail
-	if (FT_New_Memory_Face( ftLibrary, (const FT_Byte *)faceData, len, 0, &face )) {
+	if (FT_New_Memory_Face( ftLibrary, static_cast<const FT_Byte *>(faceData), len, 0, &face )) {
 		ri.Printf(PRINT_WARNING, "RE_RegisterFont: FreeType, unable to allocate new face.\n");
 		return;
 	}
@@ -436,7 +436,7 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
 	// make a 256x256 image buffer, once it is full, register it, clean it and keep going 
 	// until all glyphs are rendered
 
-	out = (unsigned char *)ri.Malloc(256*256);
+	out = static_cast<unsigned char *>(ri.Malloc(256*256));
 	if (out == nullptr) {
 		ri.Printf(PRINT_WARNING, "RE_RegisterFont: ri.Malloc failure during output image creation.\n");
 		return;
@@ -446,7 +446,7 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
 	maxHeight = 0;
 
 	for (i = GLYPH_START; i <= GLYPH_END; i++) {
-		RE_ConstructGlyphInfo(out, &xOut, &yOut, &maxHeight, face, (unsigned char)i, true);
+		RE_ConstructGlyphInfo(out, &xOut, &yOut, &maxHeight, face, static_cast<unsigned char>(i), true);
 	}
 
 	xOut = 0;
@@ -461,7 +461,7 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
 			// upload/save current image buffer
 			xOut = yOut = -1;
 		} else {
-			glyph = RE_ConstructGlyphInfo(out, &xOut, &yOut, &maxHeight, face, (unsigned char)i, false);
+			glyph = RE_ConstructGlyphInfo(out, &xOut, &yOut, &maxHeight, face, static_cast<unsigned char>(i), false);
 		}
 
 		if (xOut == -1 || yOut == -1)  {
@@ -471,7 +471,7 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
 
 			scaledSize = 256*256;
 			newSize = scaledSize * 4;
-			imageBuff = (unsigned char *)ri.Malloc(newSize);
+			imageBuff = static_cast<unsigned char *>(ri.Malloc(newSize));
 			left = 0;
 			max = 0;
 			for ( k = 0; k < (scaledSize) ; k++ ) {
@@ -489,7 +489,7 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
 				imageBuff[left++] = 255;
 				imageBuff[left++] = 255;
 
-				imageBuff[left++] = ((float)out[k] * max);
+				imageBuff[left++] = (static_cast<float>(out[k]) * max);
 			}
 
 			Com_sprintf (name, sizeof(name), "fonts/fontImage_%i_%i.tga", imageNumber++, pointSize);
