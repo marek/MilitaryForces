@@ -438,6 +438,7 @@ void Bots::kickCommand()
 
 void Bots::listCommand()
 {
+	Common::printf( "BOTTIME %d\n", theLevel.time_ );
 	if( !padsBuilt_ )
 		buildPads();
 	for( const Pad& pad : pads_ )
