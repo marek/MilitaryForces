@@ -714,7 +714,7 @@ Shift down the remaining args
 Redirect all printfs
 ===============
 */
-void SVC_RemoteCommand( netadr_t from, msg_t *msg ) 
+void SVC_RemoteCommand( netadr_t from, Message *msg ) 
 {
 	bool	valid;
 	char		remaining[1024];
@@ -795,18 +795,18 @@ Clients that are in the game can still send
 connectionless packets.
 =================
 */
-void SV_ConnectionlessPacket( netadr_t from, msg_t *msg ) {
+void SV_ConnectionlessPacket( netadr_t from, Message *msg ) {
 	char	*s;
 	char	*c;
 
-	MSG_BeginReadingOOB( msg );
-	MSG_ReadLong( msg );		// skip the -1 marker
+	msg->beginReadingOOB();
+	msg->readLong();		// skip the -1 marker
 
 	if (!Q_strncmp("connect", reinterpret_cast<const char*>(&msg->data[4]), 7)) {
 		Huff_Decompress(msg, 12);
 	}
 
-	s = MSG_ReadStringLine( msg );
+	s = msg->readStringLine();
 	Cmd_TokenizeString( s );
 
 	c = Cmd_Argv(0);
@@ -841,7 +841,7 @@ void SV_ConnectionlessPacket( netadr_t from, msg_t *msg ) {
 SV_ReadPackets
 =================
 */
-void SV_PacketEvent( netadr_t from, msg_t *msg ) 
+void SV_PacketEvent( netadr_t from, Message *msg ) 
 {
 	// check for connectionless packet (0xffffffff) first
 	if( msg->cursize >= 4 && *(int *)msg->data == -1) 
@@ -852,9 +852,9 @@ void SV_PacketEvent( netadr_t from, msg_t *msg )
 
 	// read the qport out of the message so we can fix up
 	// stupid address translating routers
-	MSG_BeginReadingOOB( msg );
-	MSG_ReadLong( msg );				// sequence number
-	int qport = MSG_ReadShort( msg ) & 0xffff;
+	msg->beginReadingOOB();
+	msg->readLong();				// sequence number
+	int qport = msg->readShort() & 0xffff;
 
 	// find which client the message is from
 	for( int i = 1; i <= sv_maxclients->integer ; i++ ) 

@@ -56,11 +56,11 @@ typedef struct {
 static int SV_EntityUpdateBits( entityState_t *from, entityState_t *to, bool create, uint64_t forced ) 
 {
 	byte	buf[1024];
-	msg_t	msg;
+	Message	msg;
 
-	MSG_Init( &msg, buf, sizeof( buf ) );
+	msg.init( buf, sizeof( buf ) );
 	msg_huffstatsHold++;
-	MSG_WriteEntityUpdate( &msg, from, to, create, forced, nullptr );
+	msg.writeEntityUpdate( from, to, create, forced, nullptr );
 	msg_huffstatsHold--;
 	return msg.bit;
 }
@@ -257,7 +257,7 @@ sent again. Without the reset the snapshot is kept under sv_snapshotBudget
 bytes: updates that do not fit wait and gain priority.
 =============
 */
-static void SV_EmitPacketEntities( SV_Client *client, SV_Client::ClientSnapshot *frame, msg_t *msg, bool reset )
+static void SV_EmitPacketEntities( SV_Client *client, SV_Client::ClientSnapshot *frame, Message *msg, bool reset )
 {
 	static entityState_t		*states[MAX_GENTITIES];
 	static byte					action[MAX_GENTITIES];
@@ -352,17 +352,17 @@ static void SV_EmitPacketEntities( SV_Client *client, SV_Client::ClientSnapshot 
 
 		switch ( action[num] - 1 ) {
 		case SENT_UPDATE:
-			MSG_WriteEntityUpdate( msg, &table->sent[num], state, false, table->forced[num], &mask );
+			msg->writeEntityUpdate( &table->sent[num], state, false, table->forced[num], &mask );
 			table->sent[num] = *state;
 			break;
 		case SENT_CREATE:
-			MSG_WriteEntityUpdate( msg, &theSV.serverEntities_[num].baseline_, state, true, 0, nullptr );
+			msg->writeEntityUpdate( &theSV.serverEntities_[num].baseline_, state, true, 0, nullptr );
 			table->sent[num] = *state;
 			table->flags[num] = ENTITY_KNOWN;
 			break;
 		case SENT_REMOVE:
 			removed.number = num;
-			MSG_WriteEntityUpdate( msg, &removed, nullptr, false, 0, nullptr );
+			msg->writeEntityUpdate( &removed, nullptr, false, 0, nullptr );
 			table->flags[num] = 0;
 			break;
 		}
@@ -385,7 +385,7 @@ static void SV_EmitPacketEntities( SV_Client *client, SV_Client::ClientSnapshot 
 		states[state->number] = nullptr;
 	}
 
-	MSG_WriteBits( msg, ENTITYNUM_WIRE_END, GENTITYNUM_BITS );	// end of packetentities
+	msg->writeBits( ENTITYNUM_WIRE_END, GENTITYNUM_BITS );	// end of packetentities
 }
 
 /*
@@ -393,7 +393,7 @@ static void SV_EmitPacketEntities( SV_Client *client, SV_Client::ClientSnapshot 
 SV_WriteSnapshotToClient
 ==================
 */
-static void SV_WriteSnapshotToClient( SV_Client *client, msg_t *msg ) 
+static void SV_WriteSnapshotToClient( SV_Client *client, Message *msg ) 
 {
 	SV_Client::ClientSnapshot	*frame, *oldframe;
 	int					lastframe;
@@ -427,11 +427,11 @@ static void SV_WriteSnapshotToClient( SV_Client *client, msg_t *msg )
 
 	}
 
-	MSG_WriteByte (msg, svc_snapshot);
+	msg->writeByte( svc_snapshot);
 
 	// NOTE, MRE: now sent at the start of every message from server to client
 	// let the client know which reliable clientCommands we have received
-	//MSG_WriteLong( msg, client->lastClientCommand );
+	//msg->writeLong( client->lastClientCommand );
 
 	// send over the current server time so the client can drift
 	// its view of time to try to match
@@ -442,13 +442,13 @@ static void SV_WriteSnapshotToClient( SV_Client *client, msg_t *msg )
 		// the client's perspective this time is strictly speaking
 		// incorrect, but since it'll be busy loading a map at
 		// the time it doesn't really matter.
-		MSG_WriteLong (msg, theSV.time_ + client->oldServerTime_);
+		msg->writeLong( theSV.time_ + client->oldServerTime_);
 	} else {
-		MSG_WriteLong (msg, theSV.time_);
+		msg->writeLong( theSV.time_);
 	}
 
 	// what we are delta'ing from
-	MSG_WriteByte (msg, lastframe);
+	msg->writeByte( lastframe);
 
 	snapFlags = theSVS.snapFlagServerBit_;
 	if ( client->rateDelayed_ ) 
@@ -466,17 +466,17 @@ static void SV_WriteSnapshotToClient( SV_Client *client, msg_t *msg )
 		snapFlags |= SNAPFLAG_ENTITY_RESET;
 	}
 
-	MSG_WriteByte (msg, snapFlags);
+	msg->writeByte( snapFlags);
 
 	// send over the areabits
-	MSG_WriteByte (msg, frame->areabytes_);
-	MSG_WriteData (msg, frame->areabits_, frame->areabytes_);
+	msg->writeByte( frame->areabytes_);
+	msg->writeData( frame->areabits_, frame->areabytes_);
 
 	// delta encode the playerstate
 	if ( oldframe ) {
-		MSG_WriteDeltaPlayerstate( msg, &oldframe->ps_, &frame->ps_ );
+		msg->writeDeltaPlayerstate( &oldframe->ps_, &frame->ps_ );
 	} else {
-		MSG_WriteDeltaPlayerstate( msg, nullptr, &frame->ps_ );
+		msg->writeDeltaPlayerstate( nullptr, &frame->ps_ );
 	}
 
 	// delta encode the entities
@@ -487,7 +487,7 @@ static void SV_WriteSnapshotToClient( SV_Client *client, msg_t *msg )
 	{
 		for ( i = 0 ; i < sv_padPackets->integer ; i++ ) 
 		{
-			MSG_WriteByte (msg, svc_nop);
+			msg->writeByte( svc_nop);
 		}
 	}
 }
@@ -500,15 +500,15 @@ SV_UpdateServerCommandsToClient
 (re)send all server commands the client hasn't acknowledged yet
 ==================
 */
-void SV_UpdateServerCommandsToClient( SV_Client *client, msg_t *msg ) 
+void SV_UpdateServerCommandsToClient( SV_Client *client, Message *msg ) 
 {
 	int		i;
 
 	// write any unacknowledged serverCommands
 	for ( i = client->reliableAcknowledge_ + 1 ; i <= client->reliableSequence_ ; i++ ) {
-		MSG_WriteByte( msg, svc_serverCommand );
-		MSG_WriteLong( msg, i );
-		MSG_WriteString( msg, client->reliableCommands_[ i & (MAX_RELIABLE_COMMANDS-1) ] );
+		msg->writeByte( svc_serverCommand );
+		msg->writeLong( i );
+		msg->writeString( client->reliableCommands_[ i & (MAX_RELIABLE_COMMANDS-1) ] );
 	}
 	client->reliableSent_ = client->reliableSequence_;
 }
@@ -826,7 +826,7 @@ SV_WriteVoipToClient
 Check to see if there is any VoIP queued for a client, and send if there is.
 ==================
 */
-static void SV_WriteVoipToClient(SV_Client *cl, msg_t *msg)
+static void SV_WriteVoipToClient(SV_Client *cl, Message *msg)
 {
 	int totalbytes = 0;
 	int i;
@@ -845,14 +845,14 @@ static void SV_WriteVoipToClient(SV_Client *cl, msg_t *msg)
 	        		if (totalbytes > (msg->maxsize - msg->cursize) / 2)
 		        		break;
 
-        			MSG_WriteByte(msg, svc_voipOpus);
-        			MSG_WriteShort(msg, packet->sender);
-	        		MSG_WriteByte(msg, (byte) packet->generation);
-		        	MSG_WriteLong(msg, packet->sequence);
-		        	MSG_WriteByte(msg, packet->frames);
-        			MSG_WriteShort(msg, packet->len);
-        			MSG_WriteBits(msg, packet->flags, VOIP_FLAGCNT);
-	        		MSG_WriteData(msg, packet->data, packet->len);
+        			msg->writeByte( svc_voipOpus);
+        			msg->writeShort( packet->sender);
+	        		msg->writeByte( (byte) packet->generation);
+		        	msg->writeLong( packet->sequence);
+		        	msg->writeByte( packet->frames);
+        			msg->writeShort( packet->len);
+        			msg->writeBits( packet->flags, VOIP_FLAGCNT);
+	        		msg->writeData( packet->data, packet->len);
                         }
 
 			Z_Free(packet);
@@ -872,7 +872,7 @@ SV_SendMessageToClient
 Called by SV_SendClientSnapshot and SV_SendClientGameState
 =======================
 */
-void SV_SendMessageToClient(msg_t *msg, SV_Client *client)
+void SV_SendMessageToClient(Message *msg, SV_Client *client)
 {
 	// record information about the message
 	client->frames_[client->netchan_.outgoingSequence & PACKET_MASK].messageSize_ = msg->cursize;
@@ -895,7 +895,7 @@ Also called by SV_FinalMessage
 void SV_SendClientSnapshot( SV_Client *client ) 
 {
 	byte		msg_buf[MAX_MSGLEN];
-	msg_t		msg;
+	Message		msg;
 
 	// build the snapshot
 	SV_BuildClientSnapshot( client );
@@ -906,12 +906,12 @@ void SV_SendClientSnapshot( SV_Client *client )
 	if( gentity && gentity->r.svFlags & SVF_BOT ) 
 		return;
 
-	MSG_Init (&msg, msg_buf, sizeof(msg_buf));
+	msg.init( msg_buf, sizeof(msg_buf));
 	msg.allowoverflow = true;
 
 	// NOTE, MRE: all server->client messages now acknowledge
 	// let the client know which reliable clientCommands we have received
-	MSG_WriteLong( &msg, client->lastClientCommand_ );
+	msg.writeLong( client->lastClientCommand_ );
 
 	// (re)send any reliable server commands
 	SV_UpdateServerCommandsToClient( client, &msg );
@@ -928,7 +928,7 @@ void SV_SendClientSnapshot( SV_Client *client )
 	if ( msg.overflowed ) 
 	{
 		Com_Printf ("WARNING: msg overflowed for %s\n", client->name_);
-		MSG_Clear (&msg);
+		msg.clear();
 	}
 
 	SV_SendMessageToClient( &msg, client );

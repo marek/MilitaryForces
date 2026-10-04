@@ -90,7 +90,7 @@ struct SV_Client
 	{
 						Netchan_Buffer();
 
-		msg_t           msg_;
+		Message           msg_;
 		byte            msgBuffer_[MAX_MSGLEN];
 		Netchan_Buffer* next_;
 	};

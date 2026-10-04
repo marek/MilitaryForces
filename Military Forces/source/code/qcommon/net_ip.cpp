@@ -527,7 +527,7 @@ NET_GetPacket
 Receive one packet
 ==================
 */
-bool NET_GetPacket(netadr_t *net_from, msg_t *net_message, fd_set *fdr)
+bool NET_GetPacket(netadr_t *net_from, Message *net_message, fd_set *fdr)
 {
 	int 	ret;
 	struct sockaddr_storage from;
@@ -1627,11 +1627,11 @@ void NET_Event(fd_set *fdr)
 {
 	byte bufData[MAX_MSGLEN + 1];
 	netadr_t from = {NA_BAD};
-	msg_t netmsg;
+	Message netmsg;
 	
 	while(true)
 	{
-		MSG_Init(&netmsg, bufData, sizeof(bufData));
+		netmsg.init( bufData, sizeof(bufData));
 
 		if(NET_GetPacket(&from, &netmsg, fdr))
 		{

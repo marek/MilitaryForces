@@ -688,7 +688,7 @@ void SV_SendClientGameState( SV_Client *client )
 {
 	int				start;
 	entityState_t	*base, nullstate;
-	msg_t			msg;
+	Message			msg;
 	byte			msgBuffer[MAX_MSGLEN];
 
  	Com_DPrintf ("SV_SendClientGameState() for %s\n", client->name_);
@@ -704,11 +704,11 @@ void SV_SendClientGameState( SV_Client *client )
 	client->entityReset_ = true;
 	client->entityResetDone_ = false;
 
-	MSG_Init( &msg, msgBuffer, sizeof( msgBuffer ) );
+	msg.init( msgBuffer, sizeof( msgBuffer ) );
 
 	// NOTE, MRE: all server->client messages now acknowledge
 	// let the client know which reliable clientCommands we have received
-	MSG_WriteLong( &msg, client->lastClientCommand_ );
+	msg.writeLong( client->lastClientCommand_ );
 
 	// send any server commands waiting to be sent first.
 	// we have to do this cause we send the client->reliableSequence
@@ -717,17 +717,17 @@ void SV_SendClientGameState( SV_Client *client )
 	SV_UpdateServerCommandsToClient( client, &msg );
 
 	// send the gamestate
-	MSG_WriteByte( &msg, svc_gamestate );
-	MSG_WriteLong( &msg, client->reliableSequence_ );
+	msg.writeByte( svc_gamestate );
+	msg.writeLong( client->reliableSequence_ );
 
 	// write the configstrings
 	for ( start = 0 ; start < MAX_CONFIGSTRINGS ; start++ ) 
 	{
 		if (theSV.configstrings_[start][0]) 
 		{
-			MSG_WriteByte( &msg, svc_configstring );
-			MSG_WriteShort( &msg, start );
-			MSG_WriteBigString( &msg, theSV.configstrings_[start] );
+			msg.writeByte( svc_configstring );
+			msg.writeShort( start );
+			msg.writeBigString( theSV.configstrings_[start] );
 		}
 	}
 
@@ -739,16 +739,16 @@ void SV_SendClientGameState( SV_Client *client )
 		if ( !base->number ) 
 			continue;
 
-		MSG_WriteByte( &msg, svc_baseline );
-		MSG_WriteDeltaEntity( &msg, &nullstate, base, true );
+		msg.writeByte( svc_baseline );
+		msg.writeDeltaEntity( &nullstate, base, true );
 	}
 
-	MSG_WriteByte( &msg, svc_EOF );
+	msg.writeByte( svc_EOF );
 
-	MSG_WriteLong( &msg, client->clientNum_ );
+	msg.writeLong( client->clientNum_ );
 
 	// write the checksum feed
-	MSG_WriteLong( &msg, theSV.checksumFeed_);
+	msg.writeLong( theSV.checksumFeed_);
 
 	// deliver this to the client
 	SV_SendMessageToClient( &msg, client );
@@ -918,7 +918,7 @@ Check to see if the client wants a file, open it if needed and start pumping the
 Fill up msg with data, return number of download blocks added
 ==================
 */
-int SV_WriteDownloadToClient(SV_Client *cl, msg_t *msg)
+int SV_WriteDownloadToClient(SV_Client *cl, Message *msg)
 {
 	int curindex;
 	int unreferenced = 1;
@@ -1021,10 +1021,10 @@ int SV_WriteDownloadToClient(SV_Client *cl, msg_t *msg)
 				Com_Printf("clientDownload: %d : \"%s\" file not found on server\n", cl->clientNum_, cl->downloadName_);
 				Com_sprintf(errorMessage, sizeof(errorMessage), "File \"%s\" not found on server for autodownloading.\n", cl->downloadName_);
 			}
-			MSG_WriteByte( msg, svc_download );
-			MSG_WriteShort( msg, 0 ); // client is expecting block zero
-			MSG_WriteLong( msg, -1 ); // illegal file size
-			MSG_WriteString( msg, errorMessage );
+			msg->writeByte( svc_download );
+			msg->writeShort( 0 ); // client is expecting block zero
+			msg->writeLong( -1 ); // illegal file size
+			msg->writeString( errorMessage );
 
 			*cl->downloadName_ = 0;
 			
@@ -1093,18 +1093,18 @@ int SV_WriteDownloadToClient(SV_Client *cl, msg_t *msg)
 	// Send current block
 	curindex = (cl->downloadXmitBlock_ % MAX_DOWNLOAD_WINDOW);
 
-	MSG_WriteByte( msg, svc_download );
-	MSG_WriteShort( msg, cl->downloadXmitBlock_ );
+	msg->writeByte( svc_download );
+	msg->writeShort( cl->downloadXmitBlock_ );
 
 	// block zero is special, contains file size
 	if ( cl->downloadXmitBlock_ == 0 )
-		MSG_WriteLong( msg, cl->downloadSize_ );
+		msg->writeLong( cl->downloadSize_ );
 
-	MSG_WriteShort( msg, cl->downloadBlockSize_[curindex] );
+	msg->writeShort( cl->downloadBlockSize_[curindex] );
 
 	// Write the block
 	if(cl->downloadBlockSize_[curindex])
-		MSG_WriteData(msg, cl->downloadBlocks_[curindex], cl->downloadBlockSize_[curindex]);
+		msg->writeData( cl->downloadBlocks_[curindex], cl->downloadBlockSize_[curindex]);
 
 	Com_DPrintf( "clientDownload: %d : writing block %d\n", cl->clientNum_, cl->downloadXmitBlock_ );
 
@@ -1162,7 +1162,7 @@ int SV_SendDownloadMessages()
 {
 	int i, numDLs = 0, retval;
 	SV_Client *cl;
-	msg_t msg;
+	Message msg;
 	byte msgBuffer[MAX_MSGLEN];
 	
 	for(i=1; i <= sv_maxclients->integer; i++)
@@ -1171,14 +1171,14 @@ int SV_SendDownloadMessages()
 		
 		if(cl && cl->state_ && *cl->downloadName_)
 		{
-			MSG_Init(&msg, msgBuffer, sizeof(msgBuffer));
-			MSG_WriteLong(&msg, cl->lastClientCommand_);
+			msg.init( msgBuffer, sizeof(msgBuffer));
+			msg.writeLong( cl->lastClientCommand_);
 			
 			retval = SV_WriteDownloadToClient(cl, &msg);
 				
 			if(retval)
 			{
-				MSG_WriteByte(&msg, svc_EOF);
+				msg.writeByte( svc_EOF);
 				SV_Netchan_Transmit(cl, &msg);
 				numDLs += retval;
 			}
@@ -1609,14 +1609,14 @@ void SV_ExecuteClientCommand( SV_Client *cl, const char *s, bool clientOK )
 SV_ClientCommand
 ===============
 */
-static bool SV_ClientCommand( SV_Client *cl, msg_t *msg ) 
+static bool SV_ClientCommand( SV_Client *cl, Message *msg ) 
 {
 	int		seq;
 	const char	*s;
 	bool clientOk = true;
 
-	seq = MSG_ReadLong( msg );
-	s = MSG_ReadString( msg );
+	seq = msg->readLong();
+	s = msg->readString();
 
 	// see if we have already executed it
 	if ( cl->lastClientCommand_ >= seq ) 
@@ -1695,7 +1695,7 @@ On very fast clients, there may be multiple usercmd packed into
 each of the backup packets.
 ==================
 */
-static void SV_UserMove( SV_Client *cl, msg_t *msg, bool delta ) 
+static void SV_UserMove( SV_Client *cl, Message *msg, bool delta ) 
 {
 	int			i, key;
 	int			cmdCount;
@@ -1708,7 +1708,7 @@ static void SV_UserMove( SV_Client *cl, msg_t *msg, bool delta )
 	else 
 		cl->deltaMessage_ = -1;
 
-	cmdCount = MSG_ReadByte( msg );
+	cmdCount = msg->readByte();
 
 	if ( cmdCount < 1 )
 	{
@@ -1727,14 +1727,14 @@ static void SV_UserMove( SV_Client *cl, msg_t *msg, bool delta )
 	// also use the message acknowledge
 	key ^= cl->messageAcknowledge_;
 	// also use the last acknowledged server command in the key
-	key ^= MSG_HashKey(cl->reliableCommands_[ cl->reliableAcknowledge_ & (MAX_RELIABLE_COMMANDS-1) ], 32);
+	key ^= Message::hashKey(cl->reliableCommands_[ cl->reliableAcknowledge_ & (MAX_RELIABLE_COMMANDS-1) ], 32);
 
 	Com_Memset( &nullcmd, 0, sizeof(nullcmd) );
 	oldcmd = &nullcmd;
 	for ( i = 0 ; i < cmdCount ; i++ ) 
 	{
 		cmd = &cmds[i];
-		MSG_ReadDeltaUsercmdKey( msg, key, oldcmd, cmd );
+		msg->readDeltaUsercmdKey( key, oldcmd, cmd );
 		oldcmd = cmd;
 	}
 
@@ -1830,7 +1830,7 @@ static bool SV_ShouldIgnoreVoipSender(const SV_Client *cl)
 }
 
 static
-void SV_UserVoip(SV_Client *cl, msg_t *msg, bool ignoreData)
+void SV_UserVoip(SV_Client *cl, Message *msg, bool ignoreData)
 {
 	int sender, generation, sequence, frames, packetsize;
 	uint8_t recips[(MAX_CLIENTS + 7) / 8];
@@ -1841,12 +1841,12 @@ void SV_UserVoip(SV_Client *cl, msg_t *msg, bool ignoreData)
 	int i;
 
 	sender = cl->clientNum_;
-	generation = MSG_ReadByte(msg);
-	sequence = MSG_ReadLong(msg);
-	frames = MSG_ReadByte(msg);
-	MSG_ReadData(msg, recips, sizeof(recips));
-	flags = MSG_ReadByte(msg);
-	packetsize = MSG_ReadShort(msg);
+	generation = msg->readByte();
+	sequence = msg->readLong();
+	frames = msg->readByte();
+	msg->readData( recips, sizeof(recips));
+	flags = msg->readByte();
+	packetsize = msg->readShort();
 
 	if (msg->readcount > msg->cursize)
 		return;   // short/invalid packet, bail.
@@ -1857,13 +1857,13 @@ void SV_UserVoip(SV_Client *cl, msg_t *msg, bool ignoreData)
 			int br = bytesleft;
 			if (br > sizeof (encoded))
 				br = sizeof (encoded);
-			MSG_ReadData(msg, encoded, br);
+			msg->readData( encoded, br);
 			bytesleft -= br;
 		}
 		return;   // overlarge packet, bail.
 	}
 
-	MSG_ReadData(msg, encoded, packetsize);
+	msg->readData( encoded, packetsize);
 
 	if (ignoreData || SV_ShouldIgnoreVoipSender(cl))
 		return;   // Blacklisted, disabled, etc.
@@ -1927,15 +1927,15 @@ SV_ExecuteClientMessage
 Parse a client packet
 ===================
 */
-void SV_ExecuteClientMessage( SV_Client *cl, msg_t *msg ) 
+void SV_ExecuteClientMessage( SV_Client *cl, Message *msg ) 
 {
 	int			c;
 	int			serverId;
 
-	MSG_Bitstream(msg);
+	msg->bitstream();
 
-	serverId = MSG_ReadLong( msg );
-	cl->messageAcknowledge_ = MSG_ReadLong( msg );
+	serverId = msg->readLong();
+	cl->messageAcknowledge_ = msg->readLong();
 
 	if (cl->messageAcknowledge_ < 0) 
 	{
@@ -1947,9 +1947,9 @@ void SV_ExecuteClientMessage( SV_Client *cl, msg_t *msg )
 		return;
 	}
 
-	cl->reliableAcknowledge_ = MSG_ReadLong( msg );
-	cl->entityAck_ = MSG_ReadLong( msg );
-	cl->entityAckBits_ = MSG_ReadLong( msg );
+	cl->reliableAcknowledge_ = msg->readLong();
+	cl->entityAck_ = msg->readLong();
+	cl->entityAckBits_ = msg->readLong();
 
 	// NOTE: when the client message is fux0red the acknowledgement numbers
 	// can be out of range, this could cause the server to send thousands of server
@@ -2003,7 +2003,7 @@ void SV_ExecuteClientMessage( SV_Client *cl, msg_t *msg )
 	// read optional clientCommand strings
 	do 
 	{
-		c = MSG_ReadByte( msg );
+		c = msg->readByte();
 		if ( c == clc_EOF ) 
 			break;
 
@@ -2022,7 +2022,7 @@ void SV_ExecuteClientMessage( SV_Client *cl, msg_t *msg )
 	if ( c == clc_voipSpeex ) {
 #ifdef USE_VOIP
 		SV_UserVoip( cl, msg, true );
-		c = MSG_ReadByte( msg );
+		c = msg->readByte();
 #endif
 	}
 
@@ -2030,7 +2030,7 @@ void SV_ExecuteClientMessage( SV_Client *cl, msg_t *msg )
 	if ( c == clc_voipOpus ) {
 #ifdef USE_VOIP
 		SV_UserVoip( cl, msg, false );
-		c = MSG_ReadByte( msg );
+		c = msg->readByte();
 #endif
 	}
 

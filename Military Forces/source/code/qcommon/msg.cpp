@@ -45,56 +45,56 @@ int oldsize = 0;
 
 void MSG_initHuffman();
 
-void MSG_Init( msg_t *buf, byte *data, int length ) {
+void Message::init( byte *data, int length ) {
 	if (!msgInit) {
 		MSG_initHuffman();
 	}
-	Com_Memset (buf, 0, sizeof(*buf));
-	buf->data = data;
-	buf->maxsize = length;
+	Com_Memset (this, 0, sizeof(*this));
+	this->data = data;
+	this->maxsize = length;
 }
 
-void MSG_InitOOB( msg_t *buf, byte *data, int length ) {
+void Message::initOOB( byte *data, int length ) {
 	if (!msgInit) {
 		MSG_initHuffman();
 	}
-	Com_Memset (buf, 0, sizeof(*buf));
-	buf->data = data;
-	buf->maxsize = length;
-	buf->oob = true;
+	Com_Memset (this, 0, sizeof(*this));
+	this->data = data;
+	this->maxsize = length;
+	this->oob = true;
 }
 
-void MSG_Clear( msg_t *buf ) {
-	buf->cursize = 0;
-	buf->overflowed = false;
-	buf->bit = 0;					//<- in bits
+void Message::clear() {
+	this->cursize = 0;
+	this->overflowed = false;
+	this->bit = 0;					//<- in bits
 }
 
 
-void MSG_Bitstream( msg_t *buf ) {
-	buf->oob = false;
+void Message::bitstream() {
+	this->oob = false;
 }
 
-void MSG_BeginReading( msg_t *msg ) {
-	msg->readcount = 0;
-	msg->bit = 0;
-	msg->oob = false;
+void Message::beginReading() {
+	this->readcount = 0;
+	this->bit = 0;
+	this->oob = false;
 }
 
-void MSG_BeginReadingOOB( msg_t *msg ) {
-	msg->readcount = 0;
-	msg->bit = 0;
-	msg->oob = true;
+void Message::beginReadingOOB() {
+	this->readcount = 0;
+	this->bit = 0;
+	this->oob = true;
 }
 
-void MSG_Copy(msg_t *buf, byte *data, int length, msg_t *src)
+void Message::copy( byte *data, int length, Message *src )
 {
 	if (length<src->cursize) {
-		Com_Error( ERR_DROP, "MSG_Copy: can't copy into a smaller msg_t buffer");
+		Com_Error( ERR_DROP, "MSG_Copy: can't copy into a smaller Message buffer");
 	}
-	Com_Memcpy(buf, src, sizeof(msg_t));
-	buf->data = data;
-	Com_Memcpy(buf->data, src->data, src->cursize);
+	Com_Memcpy(this, src, sizeof(Message));
+	this->data = data;
+	Com_Memcpy(this->data, src->data, src->cursize);
 }
 
 /*
@@ -108,12 +108,12 @@ bit functions
 int	overflows;
 
 // negative bit values include signs
-void MSG_WriteBits( msg_t *msg, int value, int bits ) {
+void Message::writeBits( int value, int bits ) {
 	int	i;
 
 	oldsize += bits;
 
-	if ( msg->overflowed ) {
+	if ( this->overflowed ) {
 		return;
 	}
 
@@ -125,26 +125,26 @@ void MSG_WriteBits( msg_t *msg, int value, int bits ) {
 		bits = -bits;
 	}
 
-	if ( msg->oob ) {
-		if ( msg->cursize + ( bits >> 3 ) > msg->maxsize ) {
-			msg->overflowed = true;
+	if ( this->oob ) {
+		if ( this->cursize + ( bits >> 3 ) > this->maxsize ) {
+			this->overflowed = true;
 			return;
 		}
 
 		if ( bits == 8 ) {
-			msg->data[msg->cursize] = value;
-			msg->cursize += 1;
-			msg->bit += 8;
+			this->data[this->cursize] = value;
+			this->cursize += 1;
+			this->bit += 8;
 		} else if ( bits == 16 ) {
 			short temp = value;
 
-			CopyLittleShort( &msg->data[msg->cursize], &temp );
-			msg->cursize += 2;
-			msg->bit += 16;
+			CopyLittleShort( &this->data[this->cursize], &temp );
+			this->cursize += 2;
+			this->bit += 16;
 		} else if ( bits==32 ) {
-			CopyLittleLong( &msg->data[msg->cursize], &value );
-			msg->cursize += 4;
-			msg->bit += 32;
+			CopyLittleLong( &this->data[this->cursize], &value );
+			this->cursize += 4;
+			this->bit += 32;
 		} else {
 			Com_Error( ERR_DROP, "can't write %d bits", bits );
 		}
@@ -153,12 +153,12 @@ void MSG_WriteBits( msg_t *msg, int value, int bits ) {
 		if ( bits&7 ) {
 			int nbits;
 			nbits = bits&7;
-			if ( msg->bit + nbits >= msg->maxsize << 3 ) {
-				msg->overflowed = true;
+			if ( this->bit + nbits >= this->maxsize << 3 ) {
+				this->overflowed = true;
 				return;
 			}
 			for( i = 0; i < nbits; i++ ) {
-				Huff_putBit( (value & 1), msg->data, &msg->bit );
+				Huff_putBit( (value & 1), this->data, &this->bit );
 				value = (value >> 1);
 			}
 			bits = bits - nbits;
@@ -168,20 +168,20 @@ void MSG_WriteBits( msg_t *msg, int value, int bits ) {
 				if ( msg_huffstats && msg_huffstats->integer && !msg_huffstatsHold ) {
 					msg_huffCounts[value & 0xff]++;
 				}
-				Huff_offsetTransmit( &msgHuff.compressor, (value & 0xff), msg->data, &msg->bit, msg->maxsize << 3 );
+				Huff_offsetTransmit( &msgHuff.compressor, (value & 0xff), this->data, &this->bit, this->maxsize << 3 );
 				value = (value >> 8);
 
-				if ( msg->bit >= msg->maxsize << 3 ) {
-					msg->overflowed = true;
+				if ( this->bit >= this->maxsize << 3 ) {
+					this->overflowed = true;
 					return;
 				}
 			}
 		}
-		msg->cursize = (msg->bit >> 3) + 1;
+		this->cursize = (this->bit >> 3) + 1;
 	}
 }
 
-int MSG_ReadBits( msg_t *msg, int bits ) {
+int Message::readBits( int bits ) {
 	int			value;
 	int			get;
 	bool	sgn;
@@ -189,7 +189,7 @@ int MSG_ReadBits( msg_t *msg, int bits ) {
 	int			totalBits;
 //	FILE*	fp;
 
-	if ( msg->readcount > msg->cursize ) {
+	if ( this->readcount > this->cursize ) {
 		return 0;
 	}
 
@@ -203,32 +203,32 @@ int MSG_ReadBits( msg_t *msg, int bits ) {
 	}
 	totalBits = bits;
 
-	if (msg->oob) {
-		if (msg->readcount + (bits>>3) > msg->cursize) {
-			msg->readcount = msg->cursize + 1;
+	if (this->oob) {
+		if (this->readcount + (bits>>3) > this->cursize) {
+			this->readcount = this->cursize + 1;
 			return 0;
 		}
 
 		if(bits==8)
 		{
-			value = msg->data[msg->readcount];
-			msg->readcount += 1;
-			msg->bit += 8;
+			value = this->data[this->readcount];
+			this->readcount += 1;
+			this->bit += 8;
 		}
 		else if(bits==16)
 		{
 			short temp;
 			
-			CopyLittleShort(&temp, &msg->data[msg->readcount]);
+			CopyLittleShort(&temp, &this->data[this->readcount]);
 			value = temp;
-			msg->readcount += 2;
-			msg->bit += 16;
+			this->readcount += 2;
+			this->bit += 16;
 		}
 		else if(bits==32)
 		{
-			CopyLittleLong(&value, &msg->data[msg->readcount]);
-			msg->readcount += 4;
-			msg->bit += 32;
+			CopyLittleLong(&value, &this->data[this->readcount]);
+			this->readcount += 4;
+			this->bit += 32;
 		}
 		else
 			Com_Error(ERR_DROP, "can't read %d bits", bits);
@@ -236,30 +236,30 @@ int MSG_ReadBits( msg_t *msg, int bits ) {
 		nbits = 0;
 		if (bits&7) {
 			nbits = bits&7;
-			if (msg->bit + nbits > msg->cursize << 3) {
-				msg->readcount = msg->cursize + 1;
+			if (this->bit + nbits > this->cursize << 3) {
+				this->readcount = this->cursize + 1;
 				return 0;
 			}
 			for(i=0;i<nbits;i++) {
-				value |= (Huff_getBit(msg->data, &msg->bit)<<i);
+				value |= (Huff_getBit(this->data, &this->bit)<<i);
 			}
 			bits = bits - nbits;
 		}
 		if (bits) {
 //			fp = fopen("c:\\netchan.bin", "a");
 			for(i=0;i<bits;i+=8) {
-				Huff_offsetReceive (msgHuff.decompressor.tree, &get, msg->data, &msg->bit, msg->cursize<<3);
+				Huff_offsetReceive (msgHuff.decompressor.tree, &get, this->data, &this->bit, this->cursize<<3);
 //				fwrite(&get, 1, 1, fp);
 				value = (unsigned int)value | ((unsigned int)get<<(i+nbits));
 
-				if (msg->bit > msg->cursize<<3) {
-					msg->readcount = msg->cursize + 1;
+				if (this->bit > this->cursize<<3) {
+					this->readcount = this->cursize + 1;
 					return 0;
 				}
 			}
 //			fclose(fp);
 		}
-		msg->readcount = (msg->bit>>3)+1;
+		this->readcount = (this->bit>>3)+1;
 	}
 	if ( sgn && totalBits > 0 && totalBits < 32 ) {
 		if ( value & ( 1 << ( totalBits - 1 ) ) ) {
@@ -278,53 +278,53 @@ int MSG_ReadBits( msg_t *msg, int bits ) {
 // writing functions
 //
 
-void MSG_WriteChar( msg_t *sb, int c ) {
+void Message::writeChar( int c ) {
 #ifdef PARANOID
 	if (c < -128 || c > 127)
 		Com_Error (ERR_FATAL, "MSG_WriteChar: range error");
 #endif
 
-	MSG_WriteBits( sb, c, 8 );
+	this->writeBits( c, 8 );
 }
 
-void MSG_WriteByte( msg_t *sb, int c ) {
+void Message::writeByte( int c ) {
 #ifdef PARANOID
 	if (c < 0 || c > 255)
 		Com_Error (ERR_FATAL, "MSG_WriteByte: range error");
 #endif
 
-	MSG_WriteBits( sb, c, 8 );
+	this->writeBits( c, 8 );
 }
 
-void MSG_WriteData( msg_t *buf, const void *data, int length ) {
+void Message::writeData( const void *data, int length ) {
 	int i;
 	for(i=0;i<length;i++) {
-		MSG_WriteByte(buf, ((byte *)data)[i]);
+		this->writeByte( ((byte *)data)[i]);
 	}
 }
 
-void MSG_WriteShort( msg_t *sb, int c ) {
+void Message::writeShort( int c ) {
 #ifdef PARANOID
 	if (c < ((short)0x8000) || c > (short)0x7fff)
 		Com_Error (ERR_FATAL, "MSG_WriteShort: range error");
 #endif
 
-	MSG_WriteBits( sb, c, 16 );
+	this->writeBits( c, 16 );
 }
 
-void MSG_WriteLong( msg_t *sb, int c ) {
-	MSG_WriteBits( sb, c, 32 );
+void Message::writeLong( int c ) {
+	this->writeBits( c, 32 );
 }
 
-void MSG_WriteFloat( msg_t *sb, float f ) {
+void Message::writeFloat( float f ) {
 	floatint_t dat;
 	dat.f = f;
-	MSG_WriteBits( sb, dat.i, 32 );
+	this->writeBits( dat.i, 32 );
 }
 
-void MSG_WriteString( msg_t *sb, const char *s ) {
+void Message::writeString( const char *s ) {
 	if ( !s ) {
-		MSG_WriteData (sb, "", 1);
+		this->writeData( "", 1);
 	} else {
 		int		l,i;
 		char	string[MAX_STRING_CHARS];
@@ -332,7 +332,7 @@ void MSG_WriteString( msg_t *sb, const char *s ) {
 		l = strlen( s );
 		if ( l >= MAX_STRING_CHARS ) {
 			Com_Printf( "MSG_WriteString: MAX_STRING_CHARS" );
-			MSG_WriteData (sb, "", 1);
+			this->writeData( "", 1);
 			return;
 		}
 		Q_strncpyz( string, s, sizeof( string ) );
@@ -344,13 +344,13 @@ void MSG_WriteString( msg_t *sb, const char *s ) {
 			}
 		}
 
-		MSG_WriteData (sb, string, l+1);
+		this->writeData( string, l+1);
 	}
 }
 
-void MSG_WriteBigString( msg_t *sb, const char *s ) {
+void Message::writeBigString( const char *s ) {
 	if ( !s ) {
-		MSG_WriteData (sb, "", 1);
+		this->writeData( "", 1);
 	} else {
 		int		l,i;
 		char	string[BIG_INFO_STRING];
@@ -358,7 +358,7 @@ void MSG_WriteBigString( msg_t *sb, const char *s ) {
 		l = strlen( s );
 		if ( l >= BIG_INFO_STRING ) {
 			Com_Printf( "MSG_WriteString: BIG_INFO_STRING" );
-			MSG_WriteData (sb, "", 1);
+			this->writeData( "", 1);
 			return;
 		}
 		Q_strncpyz( string, s, sizeof( string ) );
@@ -370,16 +370,16 @@ void MSG_WriteBigString( msg_t *sb, const char *s ) {
 			}
 		}
 
-		MSG_WriteData (sb, string, l+1);
+		this->writeData( string, l+1);
 	}
 }
 
-void MSG_WriteAngle( msg_t *sb, float f ) {
-	MSG_WriteByte (sb, (int)(f*256/360) & 255);
+void Message::writeAngle( float f ) {
+	this->writeByte( (int)(f*256/360) & 255);
 }
 
-void MSG_WriteAngle16( msg_t *sb, float f ) {
-	MSG_WriteShort (sb, ANGLE2SHORT(f));
+void Message::writeAngle16( float f ) {
+	this->writeShort( ANGLE2SHORT(f));
 }
 
 
@@ -390,78 +390,78 @@ void MSG_WriteAngle16( msg_t *sb, float f ) {
 //
 
 // returns -1 if no more characters are available
-int MSG_ReadChar (msg_t *msg ) {
+int Message::readChar() {
 	int	c;
 	
-	c = (signed char)MSG_ReadBits( msg, 8 );
-	if ( msg->readcount > msg->cursize ) {
+	c = (signed char)this->readBits( 8 );
+	if ( this->readcount > this->cursize ) {
 		c = -1;
 	}	
 	
 	return c;
 }
 
-int MSG_ReadByte( msg_t *msg ) {
+int Message::readByte() {
 	int	c;
 	
-	c = (unsigned char)MSG_ReadBits( msg, 8 );
-	if ( msg->readcount > msg->cursize ) {
+	c = (unsigned char)this->readBits( 8 );
+	if ( this->readcount > this->cursize ) {
 		c = -1;
 	}	
 	return c;
 }
 
-int MSG_LookaheadByte( msg_t *msg ) {
+int Message::lookaheadByte() {
 	const int bloc = Huff_getBloc();
-	const int readcount = msg->readcount;
-	const int bit = msg->bit;
-	int c = MSG_ReadByte(msg);
+	const int readcount = this->readcount;
+	const int bit = this->bit;
+	int c = this->readByte();
 	Huff_setBloc(bloc);
-	msg->readcount = readcount;
-	msg->bit = bit;
+	this->readcount = readcount;
+	this->bit = bit;
 	return c;
 }
 
-int MSG_ReadShort( msg_t *msg ) {
+int Message::readShort() {
 	int	c;
 	
-	c = (short)MSG_ReadBits( msg, 16 );
-	if ( msg->readcount > msg->cursize ) {
+	c = (short)this->readBits( 16 );
+	if ( this->readcount > this->cursize ) {
 		c = -1;
 	}	
 
 	return c;
 }
 
-int MSG_ReadLong( msg_t *msg ) {
+int Message::readLong() {
 	int	c;
 	
-	c = MSG_ReadBits( msg, 32 );
-	if ( msg->readcount > msg->cursize ) {
+	c = this->readBits( 32 );
+	if ( this->readcount > this->cursize ) {
 		c = -1;
 	}	
 	
 	return c;
 }
 
-float MSG_ReadFloat( msg_t *msg ) {
+float Message::readFloat() {
 	floatint_t dat;
 	
-	dat.i = MSG_ReadBits( msg, 32 );
-	if ( msg->readcount > msg->cursize ) {
+	dat.i = this->readBits( 32 );
+	if ( this->readcount > this->cursize ) {
 		dat.f = -1;
 	}	
 	
 	return dat.f;	
 }
 
-char *MSG_ReadString( msg_t *msg ) {
+char * Message::readString() {
 	static char	string[MAX_STRING_CHARS];
 	int		l,c;
 	
 	l = 0;
 	do {
-		c = MSG_ReadByte(msg);		// use ReadByte so -1 is out of bounds
+		c = this->readByte();		// use ReadByte so -1 is out of bounds
 		if ( c == -1 || c == 0 ) {
 			break;
 		}
@@ -485,13 +485,13 @@ char *MSG_ReadString( msg_t *msg ) {
 	return string;
 }
 
-char *MSG_ReadBigString( msg_t *msg ) {
+char * Message::readBigString() {
 	static char	string[BIG_INFO_STRING];
 	int		l,c;
 	
 	l = 0;
 	do {
-		c = MSG_ReadByte(msg);		// use ReadByte so -1 is out of bounds
+		c = this->readByte();		// use ReadByte so -1 is out of bounds
 		if ( c == -1 || c == 0 ) {
 			break;
 		}
@@ -515,13 +515,13 @@ char *MSG_ReadBigString( msg_t *msg ) {
 	return string;
 }
 
-char *MSG_ReadStringLine( msg_t *msg ) {
+char * Message::readStringLine() {
 	static char	string[MAX_STRING_CHARS];
 	int		l,c;
 
 	l = 0;
 	do {
-		c = MSG_ReadByte(msg);		// use ReadByte so -1 is out of bounds
+		c = this->readByte();		// use ReadByte so -1 is out of bounds
 		if (c == -1 || c == 0 || c == '\n') {
 			break;
 		}
@@ -545,21 +545,21 @@ char *MSG_ReadStringLine( msg_t *msg ) {
 	return string;
 }
 
-float MSG_ReadAngle16( msg_t *msg ) {
-	return SHORT2ANGLE(MSG_ReadShort(msg));
+float Message::readAngle16() {
+	return SHORT2ANGLE(this->readShort());
 }
 
-void MSG_ReadData( msg_t *msg, void *data, int len ) {
+void Message::readData( void *data, int len ) {
 	int		i;
 
 	for (i=0 ; i<len ; i++) {
-		((byte *)data)[i] = MSG_ReadByte (msg);
+		((byte *)data)[i] = this->readByte();
 	}
 }
 
 // a string hasher which gives the same hash value even if the
 // string is later modified via the legacy MSG read/write code
-int MSG_HashKey(const char *string, int maxlen) {
+int Message::hashKey(const char *string, int maxlen) {
 	int hash, i;
 
 	hash = 0;
@@ -605,38 +605,38 @@ int kbitmask[32] = {
 	0x1FFFFFFF,	0x3FFFFFFF,	0x7FFFFFFF,	0xFFFFFFFF,
 };
 
-void MSG_WriteDeltaKey( msg_t *msg, int key, int oldV, int newV, int bits ) {
+void Message::writeDeltaKey( int key, int oldV, int newV, int bits ) {
 	if ( oldV == newV ) {
-		MSG_WriteBits( msg, 0, 1 );
+		this->writeBits( 0, 1 );
 		return;
 	}
-	MSG_WriteBits( msg, 1, 1 );
-	MSG_WriteBits( msg, newV ^ key, bits );
+	this->writeBits( 1, 1 );
+	this->writeBits( newV ^ key, bits );
 }
 
-int	MSG_ReadDeltaKey( msg_t *msg, int key, int oldV, int bits ) {
-	if ( MSG_ReadBits( msg, 1 ) ) {
-		return MSG_ReadBits( msg, bits ) ^ (key & kbitmask[ bits - 1 ]);
+int Message::readDeltaKey( int key, int oldV, int bits ) {
+	if ( this->readBits( 1 ) ) {
+		return this->readBits( bits ) ^ (key & kbitmask[ bits - 1 ]);
 	}
 	return oldV;
 }
 
-void MSG_WriteDeltaKeyFloat( msg_t *msg, int key, float oldV, float newV ) {
+void Message::writeDeltaKeyFloat( int key, float oldV, float newV ) {
 	floatint_t fi;
 	if ( oldV == newV ) {
-		MSG_WriteBits( msg, 0, 1 );
+		this->writeBits( 0, 1 );
 		return;
 	}
-	MSG_WriteBits( msg, 1, 1 );
+	this->writeBits( 1, 1 );
 	fi.f = newV;
-	MSG_WriteBits( msg, fi.i ^ key, 32 );
+	this->writeBits( fi.i ^ key, 32 );
 }
 
-float MSG_ReadDeltaKeyFloat( msg_t *msg, int key, float oldV ) {
-	if ( MSG_ReadBits( msg, 1 ) ) {
+float Message::readDeltaKeyFloat( int key, float oldV ) {
+	if ( this->readBits( 1 ) ) {
 		floatint_t fi;
 
-		fi.i = MSG_ReadBits( msg, 32 ) ^ key;
+		fi.i = this->readBits( 32 ) ^ key;
 		return fi.f;
 	}
 	return oldV;
@@ -656,13 +656,13 @@ usercmd_t communication
 MSG_WriteDeltaUsercmdKey
 =====================
 */
-void MSG_WriteDeltaUsercmdKey( msg_t *msg, int key, usercmd_t *from, usercmd_t *to ) {
+void Message::writeDeltaUsercmdKey( int key, usercmd_t *from, usercmd_t *to ) {
 	if ( to->serverTime - from->serverTime < 256 ) {
-		MSG_WriteBits( msg, 1, 1 );
-		MSG_WriteBits( msg, to->serverTime - from->serverTime, 8 );
+		this->writeBits( 1, 1 );
+		this->writeBits( to->serverTime - from->serverTime, 8 );
 	} else {
-		MSG_WriteBits( msg, 0, 1 );
-		MSG_WriteBits( msg, to->serverTime, 32 );
+		this->writeBits( 0, 1 );
+		this->writeBits( to->serverTime, 32 );
 	}
 	if (from->angles[0] == to->angles[0] &&
 		from->angles[1] == to->angles[1] &&
@@ -672,20 +672,20 @@ void MSG_WriteDeltaUsercmdKey( msg_t *msg, int key, usercmd_t *from, usercmd_t *
 		from->upmove == to->upmove &&
 		from->buttons == to->buttons &&
 		from->weapon == to->weapon) {
-			MSG_WriteBits( msg, 0, 1 );				// no change
+			this->writeBits( 0, 1 );				// no change
 			oldsize += 7;
 			return;
 	}
 	key ^= to->serverTime;
-	MSG_WriteBits( msg, 1, 1 );
-	MSG_WriteDeltaKey( msg, key, from->angles[0], to->angles[0], 16 );
-	MSG_WriteDeltaKey( msg, key, from->angles[1], to->angles[1], 16 );
-	MSG_WriteDeltaKey( msg, key, from->angles[2], to->angles[2], 16 );
-	MSG_WriteDeltaKey( msg, key, from->forwardmove, to->forwardmove, 8 );
-	MSG_WriteDeltaKey( msg, key, from->rightmove, to->rightmove, 8 );
-	MSG_WriteDeltaKey( msg, key, from->upmove, to->upmove, 8 );
-	MSG_WriteDeltaKey( msg, key, from->buttons, to->buttons, 16 );
-	MSG_WriteDeltaKey( msg, key, from->weapon, to->weapon, 8 );
+	this->writeBits( 1, 1 );
+	this->writeDeltaKey( key, from->angles[0], to->angles[0], 16 );
+	this->writeDeltaKey( key, from->angles[1], to->angles[1], 16 );
+	this->writeDeltaKey( key, from->angles[2], to->angles[2], 16 );
+	this->writeDeltaKey( key, from->forwardmove, to->forwardmove, 8 );
+	this->writeDeltaKey( key, from->rightmove, to->rightmove, 8 );
+	this->writeDeltaKey( key, from->upmove, to->upmove, 8 );
+	this->writeDeltaKey( key, from->buttons, to->buttons, 16 );
+	this->writeDeltaKey( key, from->weapon, to->weapon, 8 );
 }
 
 
@@ -694,28 +694,28 @@ void MSG_WriteDeltaUsercmdKey( msg_t *msg, int key, usercmd_t *from, usercmd_t *
 MSG_ReadDeltaUsercmdKey
 =====================
 */
-void MSG_ReadDeltaUsercmdKey( msg_t *msg, int key, usercmd_t *from, usercmd_t *to ) {
-	if ( MSG_ReadBits( msg, 1 ) ) {
-		to->serverTime = from->serverTime + MSG_ReadBits( msg, 8 );
+void Message::readDeltaUsercmdKey( int key, usercmd_t *from, usercmd_t *to ) {
+	if ( this->readBits( 1 ) ) {
+		to->serverTime = from->serverTime + this->readBits( 8 );
 	} else {
-		to->serverTime = MSG_ReadBits( msg, 32 );
+		to->serverTime = this->readBits( 32 );
 	}
-	if ( MSG_ReadBits( msg, 1 ) ) {
+	if ( this->readBits( 1 ) ) {
 		key ^= to->serverTime;
-		to->angles[0] = MSG_ReadDeltaKey( msg, key, from->angles[0], 16);
-		to->angles[1] = MSG_ReadDeltaKey( msg, key, from->angles[1], 16);
-		to->angles[2] = MSG_ReadDeltaKey( msg, key, from->angles[2], 16);
-		to->forwardmove = MSG_ReadDeltaKey( msg, key, from->forwardmove, 8);
+		to->angles[0] = this->readDeltaKey( key, from->angles[0], 16);
+		to->angles[1] = this->readDeltaKey( key, from->angles[1], 16);
+		to->angles[2] = this->readDeltaKey( key, from->angles[2], 16);
+		to->forwardmove = this->readDeltaKey( key, from->forwardmove, 8);
 		if( to->forwardmove == -128 )
 			to->forwardmove = -127;
-		to->rightmove = MSG_ReadDeltaKey( msg, key, from->rightmove, 8);
+		to->rightmove = this->readDeltaKey( key, from->rightmove, 8);
 		if( to->rightmove == -128 )
 			to->rightmove = -127;
-		to->upmove = MSG_ReadDeltaKey( msg, key, from->upmove, 8);
+		to->upmove = this->readDeltaKey( key, from->upmove, 8);
 		if( to->upmove == -128 )
 			to->upmove = -127;
-		to->buttons = MSG_ReadDeltaKey( msg, key, from->buttons, 16);
-		to->weapon = MSG_ReadDeltaKey( msg, key, from->weapon, 8);
+		to->buttons = this->readDeltaKey( key, from->buttons, 16);
+		to->weapon = this->readDeltaKey( key, from->weapon, 8);
 	} else {
 		to->angles[0] = from->angles[0];
 		to->angles[1] = from->angles[1];
@@ -882,8 +882,7 @@ If force is not set, then nothing at all will be generated if the entity is
 identical, under the assumption that the in-order delta code will catch it.
 ==================
 */
-static bool MSG_WriteEntity( msg_t *msg, struct entityState_s *from, struct entityState_s *to, 
-						   bool force, int create, uint64_t forced, uint64_t *written ) {
+bool Message::writeEntity( struct entityState_s *from, struct entityState_s *to, bool force, int create, uint64_t forced, uint64_t *written ) {
 	int			i, lc;
 	int			numFields;
 	netField_t	*field;
@@ -905,11 +904,11 @@ static bool MSG_WriteEntity( msg_t *msg, struct entityState_s *from, struct enti
 		if ( from == nullptr ) {
 			return false;
 		}
-		MSG_WriteBits( msg, from->number, GENTITYNUM_BITS );
+		this->writeBits( from->number, GENTITYNUM_BITS );
 		if ( create >= 0 ) {
-			MSG_WriteBits( msg, 0, 1 );
+			this->writeBits( 0, 1 );
 		}
-		MSG_WriteBits( msg, 1, 1 );
+		this->writeBits( 1, 1 );
 		return true;
 	}
 
@@ -933,23 +932,23 @@ static bool MSG_WriteEntity( msg_t *msg, struct entityState_s *from, struct enti
 			return false;		// nothing at all
 		}
 		// write two bits for no change
-		MSG_WriteBits( msg, to->number, GENTITYNUM_BITS );
+		this->writeBits( to->number, GENTITYNUM_BITS );
 		if ( create >= 0 ) {
-			MSG_WriteBits( msg, create, 1 );
+			this->writeBits( create, 1 );
 		}
-		MSG_WriteBits( msg, 0, 1 );		// not removed
-		MSG_WriteBits( msg, 0, 1 );		// no delta
+		this->writeBits( 0, 1 );		// not removed
+		this->writeBits( 0, 1 );		// no delta
 		return true;
 	}
 
-	MSG_WriteBits( msg, to->number, GENTITYNUM_BITS );
+	this->writeBits( to->number, GENTITYNUM_BITS );
 	if ( create >= 0 ) {
-		MSG_WriteBits( msg, create, 1 );
+		this->writeBits( create, 1 );
 	}
-	MSG_WriteBits( msg, 0, 1 );			// not removed
-	MSG_WriteBits( msg, 1, 1 );			// we have a delta
+	this->writeBits( 0, 1 );			// not removed
+	this->writeBits( 1, 1 );			// we have a delta
 
-	MSG_WriteByte( msg, lc );	// # of changes
+	this->writeByte( lc );	// # of changes
 
 	oldsize += numFields;
 	mask = 0;
@@ -959,11 +958,11 @@ static bool MSG_WriteEntity( msg_t *msg, struct entityState_s *from, struct enti
 		toF = (int *)( (byte *)to + field->offset );
 
 		if ( !( ( forced >> i ) & 1 ) && MSG_FieldSame( field, fromF, toF ) ) {
-			MSG_WriteBits( msg, 0, 1 );	// no change
+			this->writeBits( 0, 1 );	// no change
 			continue;
 		}
 
-		MSG_WriteBits( msg, 1, 1 );	// changed
+		this->writeBits( 1, 1 );	// changed
 		mask |= (uint64_t)1 << i;
 
 		if ( field->bits == 0 || field->bits >= NETF_POS ) {
@@ -974,35 +973,35 @@ static bool MSG_WriteEntity( msg_t *msg, struct entityState_s *from, struct enti
 			trunc = (int)fullFloat;
 
 			if (fullFloat == 0.0f) {
-					MSG_WriteBits( msg, 0, 1 );
+					this->writeBits( 0, 1 );
 					oldsize += FLOAT_INT_BITS;
 			} else {
-				MSG_WriteBits( msg, 1, 1 );
+				this->writeBits( 1, 1 );
 				if ( trunc == fullFloat && trunc + FLOAT_INT_BIAS >= 0 && 
 					trunc + FLOAT_INT_BIAS < ( 1 << FLOAT_INT_BITS ) ) {
 					// send as small integer
-					MSG_WriteBits( msg, 0, 1 );
+					this->writeBits( 0, 1 );
 					if ( field->bits >= NETF_POS ) {
-						MSG_WriteBits( msg, 0, 1 );
+						this->writeBits( 0, 1 );
 					}
-					MSG_WriteBits( msg, trunc + FLOAT_INT_BIAS, FLOAT_INT_BITS );
+					this->writeBits( trunc + FLOAT_INT_BIAS, FLOAT_INT_BITS );
 				} else if ( field->bits >= NETF_POS && MSG_QuantizeFloat( field->bits, fullFloat, &quantized ) ) {
-					MSG_WriteBits( msg, 0, 1 );
-					MSG_WriteBits( msg, 1, 1 );
-					MSG_WriteBits( msg, quantized, field->bits == NETF_POS ? -NETF_POS_BITS : -NETF_ANG_BITS );
+					this->writeBits( 0, 1 );
+					this->writeBits( 1, 1 );
+					this->writeBits( quantized, field->bits == NETF_POS ? -NETF_POS_BITS : -NETF_ANG_BITS );
 				} else {
 					// send as full floating point value
-					MSG_WriteBits( msg, 1, 1 );
-					MSG_WriteBits( msg, *toF, 32 );
+					this->writeBits( 1, 1 );
+					this->writeBits( *toF, 32 );
 				}
 			}
 		} else {
 			if (*toF == 0) {
-				MSG_WriteBits( msg, 0, 1 );
+				this->writeBits( 0, 1 );
 			} else {
-				MSG_WriteBits( msg, 1, 1 );
+				this->writeBits( 1, 1 );
 				// integer
-				MSG_WriteBits( msg, *toF, field->bits );
+				this->writeBits( *toF, field->bits );
 			}
 		}
 	}
@@ -1013,9 +1012,8 @@ static bool MSG_WriteEntity( msg_t *msg, struct entityState_s *from, struct enti
 	return true;
 }
 
-void MSG_WriteDeltaEntity( msg_t *msg, struct entityState_s *from, struct entityState_s *to, 
-						   bool force ) {
-	MSG_WriteEntity( msg, from, to, force, -1, 0, nullptr );
+void Message::writeDeltaEntity( struct entityState_s *from, struct entityState_s *to, bool force ) {
+	this->writeEntity( from, to, force, -1, 0, nullptr );
 }
 
 /*
@@ -1028,12 +1026,11 @@ If to is NULL, a remove entity update will be sent
 Returns false when nothing was written
 ==================
 */
-bool MSG_WriteEntityUpdate( msg_t *msg, struct entityState_s *from, struct entityState_s *to, 
-						   bool create, uint64_t forced, uint64_t *written ) {
+bool Message::writeEntityUpdate( struct entityState_s *from, struct entityState_s *to, bool create, uint64_t forced, uint64_t *written ) {
 	if ( written ) {
 		*written = 0;
 	}
-	return MSG_WriteEntity( msg, from, to, create, create ? 1 : 0, forced, written );
+	return this->writeEntity( from, to, create, create ? 1 : 0, forced, written );
 }
 
 /*
@@ -1050,8 +1047,7 @@ Can go from either a baseline or a previous packet_entity
 */
 extern	cvar_t	*cl_shownet;
 
-void MSG_ReadDeltaEntity( msg_t *msg, entityState_t *from, entityState_t *to, 
-						 int number) {
+void Message::readDeltaEntity( entityState_t *from, entityState_t *to, int number ) {
 	int			i, lc;
 	int			numFields;
 	netField_t	*field;
@@ -1064,31 +1060,31 @@ void MSG_ReadDeltaEntity( msg_t *msg, entityState_t *from, entityState_t *to,
 		Com_Error( ERR_DROP, "Bad delta entity number: %i", number );
 	}
 
-	if ( msg->bit == 0 ) {
-		startBit = msg->readcount * 8 - GENTITYNUM_BITS;
+	if ( this->bit == 0 ) {
+		startBit = this->readcount * 8 - GENTITYNUM_BITS;
 	} else {
-		startBit = ( msg->readcount - 1 ) * 8 + msg->bit - GENTITYNUM_BITS;
+		startBit = ( this->readcount - 1 ) * 8 + this->bit - GENTITYNUM_BITS;
 	}
 
 	// check for a remove
-	if ( MSG_ReadBits( msg, 1 ) == 1 ) {
+	if ( this->readBits( 1 ) == 1 ) {
 		Com_Memset( to, 0, sizeof( *to ) );	
 		to->number = ENTITYNUM_WIRE_END;
 		if ( cl_shownet && ( cl_shownet->integer >= 2 || cl_shownet->integer == -1 ) ) {
-			Com_Printf( "%3i: #%-3i remove\n", msg->readcount, number );
+			Com_Printf( "%3i: #%-3i remove\n", this->readcount, number );
 		}
 		return;
 	}
 
 	// check for no delta
-	if ( MSG_ReadBits( msg, 1 ) == 0 ) {
+	if ( this->readBits( 1 ) == 0 ) {
 		*to = *from;
 		to->number = number;
 		return;
 	}
 
 	numFields = sizeof(entityStateFields)/sizeof(entityStateFields[0]);
-	lc = MSG_ReadByte(msg);
+	lc = this->readByte();
 
 	if ( lc > numFields || lc < 0 ) {
 		Com_Error( ERR_DROP, "invalid entityState field count" );
@@ -1098,7 +1094,7 @@ void MSG_ReadDeltaEntity( msg_t *msg, entityState_t *from, entityState_t *to,
 	// just print the delta records`
 	if ( cl_shownet && ( cl_shownet->integer >= 2 || cl_shownet->integer == -1 ) ) {
 		print = 1;
-		Com_Printf( "%3i: #%-3i ", msg->readcount, to->number );
+		Com_Printf( "%3i: #%-3i ", this->readcount, to->number );
 	} else {
 		print = 0;
 	}
@@ -1109,28 +1105,28 @@ void MSG_ReadDeltaEntity( msg_t *msg, entityState_t *from, entityState_t *to,
 		fromF = (int *)( (byte *)from + field->offset );
 		toF = (int *)( (byte *)to + field->offset );
 
-		if ( ! MSG_ReadBits( msg, 1 ) ) {
+		if ( ! this->readBits( 1 ) ) {
 			// no change
 			*toF = *fromF;
 		} else {
 			if ( field->bits == 0 || field->bits >= NETF_POS ) {
 				// float
-				if ( MSG_ReadBits( msg, 1 ) == 0 ) {
+				if ( this->readBits( 1 ) == 0 ) {
 						*(float *)toF = 0.0f; 
 				} else {
-					if ( MSG_ReadBits( msg, 1 ) == 0 ) {
-						if ( field->bits >= NETF_POS && MSG_ReadBits( msg, 1 ) == 1 ) {
+					if ( this->readBits( 1 ) == 0 ) {
+						if ( field->bits >= NETF_POS && this->readBits( 1 ) == 1 ) {
 							if ( field->bits == NETF_POS ) {
-								*(float *)toF = MSG_ReadBits( msg, -NETF_POS_BITS ) / 8.0f;
+								*(float *)toF = this->readBits( -NETF_POS_BITS ) / 8.0f;
 							} else {
-								*(float *)toF = MSG_ReadBits( msg, -NETF_ANG_BITS ) / 64.0f;
+								*(float *)toF = this->readBits( -NETF_ANG_BITS ) / 64.0f;
 							}
 							if ( print ) {
 								Com_Printf( "%s:%f ", field->name, *(float *)toF );
 							}
 						} else {
 							// integral float
-							trunc = MSG_ReadBits( msg, FLOAT_INT_BITS );
+							trunc = this->readBits( FLOAT_INT_BITS );
 							// bias to allow equal parts positive and negative
 							trunc -= FLOAT_INT_BIAS;
 							*(float *)toF = trunc; 
@@ -1140,18 +1136,18 @@ void MSG_ReadDeltaEntity( msg_t *msg, entityState_t *from, entityState_t *to,
 						}
 					} else {
 						// full floating point value
-						*toF = MSG_ReadBits( msg, 32 );
+						*toF = this->readBits( 32 );
 						if ( print ) {
 							Com_Printf( "%s:%f ", field->name, *(float *)toF );
 						}
 					}
 				}
 			} else {
-				if ( MSG_ReadBits( msg, 1 ) == 0 ) {
+				if ( this->readBits( 1 ) == 0 ) {
 					*toF = 0;
 				} else {
 					// integer
-					*toF = MSG_ReadBits( msg, field->bits );
+					*toF = this->readBits( field->bits );
 					if ( print ) {
 						Com_Printf( "%s:%i ", field->name, *toF );
 					}
@@ -1169,10 +1165,10 @@ void MSG_ReadDeltaEntity( msg_t *msg, entityState_t *from, entityState_t *to,
 
 	// print ?
 	if ( print ) {
-		if ( msg->bit == 0 ) {
-			endBit = msg->readcount * 8 - GENTITYNUM_BITS;
+		if ( this->bit == 0 ) {
+			endBit = this->readcount * 8 - GENTITYNUM_BITS;
 		} else {
-			endBit = ( msg->readcount - 1 ) * 8 + msg->bit - GENTITYNUM_BITS;
+			endBit = ( this->readcount - 1 ) * 8 + this->bit - GENTITYNUM_BITS;
 		}
 		Com_Printf( " (%i bits)\n", endBit - startBit  );
 	}
@@ -1250,7 +1246,7 @@ MSG_WriteDeltaPlayerstate
 
 =============
 */
-void MSG_WriteDeltaPlayerstate( msg_t *msg, struct playerState_s *from, struct playerState_s *to ) {
+void Message::writeDeltaPlayerstate( struct playerState_s *from, struct playerState_s *to ) {
 	int				i;
 	playerState_t	dummy;
 	int				statsbits;
@@ -1270,7 +1266,7 @@ void MSG_WriteDeltaPlayerstate( msg_t *msg, struct playerState_s *from, struct p
 		Com_Memset (&dummy, 0, sizeof(dummy));
 	}
 
-	c = msg->cursize;
+	c = this->cursize;
 
 	numFields = sizeof( playerStateFields ) / sizeof( playerStateFields[0] );
 
@@ -1283,7 +1279,7 @@ void MSG_WriteDeltaPlayerstate( msg_t *msg, struct playerState_s *from, struct p
 		}
 	}
 
-	MSG_WriteByte( msg, lc );	// # of changes
+	this->writeByte( lc );	// # of changes
 
 	oldsize += numFields - lc;
 
@@ -1292,11 +1288,11 @@ void MSG_WriteDeltaPlayerstate( msg_t *msg, struct playerState_s *from, struct p
 		toF = (int *)( (byte *)to + field->offset );
 
 		if ( *fromF == *toF ) {
-			MSG_WriteBits( msg, 0, 1 );	// no change
+			this->writeBits( 0, 1 );	// no change
 			continue;
 		}
 
-		MSG_WriteBits( msg, 1, 1 );	// changed
+		this->writeBits( 1, 1 );	// changed
 //		pcount[i]++;
 
 		if ( field->bits == 0 ) {
@@ -1307,19 +1303,19 @@ void MSG_WriteDeltaPlayerstate( msg_t *msg, struct playerState_s *from, struct p
 			if ( trunc == fullFloat && trunc + FLOAT_INT_BIAS >= 0 && 
 				trunc + FLOAT_INT_BIAS < ( 1 << FLOAT_INT_BITS ) ) {
 				// send as small integer
-				MSG_WriteBits( msg, 0, 1 );
-				MSG_WriteBits( msg, trunc + FLOAT_INT_BIAS, FLOAT_INT_BITS );
+				this->writeBits( 0, 1 );
+				this->writeBits( trunc + FLOAT_INT_BIAS, FLOAT_INT_BITS );
 			} else {
 				// send as full floating point value
-				MSG_WriteBits( msg, 1, 1 );
-				MSG_WriteBits( msg, *toF, 32 );
+				this->writeBits( 1, 1 );
+				this->writeBits( *toF, 32 );
 			}
 		} else {
 			// integer
-			MSG_WriteBits( msg, *toF, field->bits );
+			this->writeBits( *toF, field->bits );
 		}
 	}
-	c = msg->cursize - c;
+	c = this->cursize - c;
 
 
 	//
@@ -1358,64 +1354,64 @@ void MSG_WriteDeltaPlayerstate( msg_t *msg, struct playerState_s *from, struct p
 	}
 
 	if (!statsbits && !persistantbits && !ammobits && !timerbits && !vwepBits) {
-		MSG_WriteBits( msg, 0, 1 );	// no change
+		this->writeBits( 0, 1 );	// no change
 		oldsize += 5;// 4 ?
 		return;
 	}
-	MSG_WriteBits( msg, 1, 1 );	// changed
+	this->writeBits( 1, 1 );	// changed
 
 	if ( statsbits ) {
-		MSG_WriteBits( msg, 1, 1 );	// changed
-		MSG_WriteShort( msg, statsbits );
+		this->writeBits( 1, 1 );	// changed
+		this->writeShort( statsbits );
 		for (i=0 ; i<16 ; i++)
 			if (statsbits & (1<<i) )
-				MSG_WriteShort (msg, to->stats[i]);
+				this->writeShort( to->stats[i]);
 	} else {
-		MSG_WriteBits( msg, 0, 1 );	// no change
+		this->writeBits( 0, 1 );	// no change
 	}
 
 
 	if ( persistantbits ) {
-		MSG_WriteBits( msg, 1, 1 );	// changed
-		MSG_WriteShort( msg, persistantbits );
+		this->writeBits( 1, 1 );	// changed
+		this->writeShort( persistantbits );
 		for (i=0 ; i<16 ; i++)
 			if (persistantbits & (1<<i) )
-				MSG_WriteShort (msg, to->persistant[i]);
+				this->writeShort( to->persistant[i]);
 	} else {
-		MSG_WriteBits( msg, 0, 1 );	// no change
+		this->writeBits( 0, 1 );	// no change
 	}
 
 
 	if ( ammobits ) {
-		MSG_WriteBits( msg, 1, 1 );	// changed
-		MSG_WriteShort( msg, ammobits );
+		this->writeBits( 1, 1 );	// changed
+		this->writeShort( ammobits );
 		for (i=0 ; i<16 ; i++)
 			if (ammobits & (1<<i) )
-				MSG_WriteShort (msg, to->ammo[i]);
+				this->writeShort( to->ammo[i]);
 	} else {
-		MSG_WriteBits( msg, 0, 1 );	// no change
+		this->writeBits( 0, 1 );	// no change
 	}
 
 
 	if ( timerbits ) {
-		MSG_WriteBits( msg, 1, 1 );	// changed
-		MSG_WriteShort( msg, timerbits );
+		this->writeBits( 1, 1 );	// changed
+		this->writeShort( timerbits );
 		for (i=0 ; i<16 ; i++)
 			if (timerbits & (1<<i) )
-				MSG_WriteLong( msg, to->timers[i] );
+				this->writeLong( to->timers[i] );
 	} else {
-		MSG_WriteBits( msg, 0, 1 );	// no change
+		this->writeBits( 0, 1 );	// no change
 	}
 
 	// numWeaponsOnMount array
 	if ( vwepBits ) {
-		MSG_WriteBits( msg, 1, 1 );	// changed
-		MSG_WriteLong( msg, vwepBits );
+		this->writeBits( 1, 1 );	// changed
+		this->writeLong( vwepBits );
 		for (i=0 ; i<32 ; i++)
 			if (vwepBits & (1<<i) )
-				MSG_WriteBits (msg, to->numWeaponsOnMount[i], 6);
+				this->writeBits( to->numWeaponsOnMount[i], 6);
 	} else {
-		MSG_WriteBits( msg, 0, 1 );	// no change
+		this->writeBits( 0, 1 );	// no change
 	}
 }
 
@@ -1425,7 +1421,7 @@ void MSG_WriteDeltaPlayerstate( msg_t *msg, struct playerState_s *from, struct p
 MSG_ReadDeltaPlayerstate
 ===================
 */
-void MSG_ReadDeltaPlayerstate (msg_t *msg, playerState_t *from, playerState_t *to ) {
+void Message::readDeltaPlayerstate( playerState_t *from, playerState_t *to ) {
 	int			i, lc;
 	int			bits;
 	netField_t	*field;
@@ -1443,23 +1439,23 @@ void MSG_ReadDeltaPlayerstate (msg_t *msg, playerState_t *from, playerState_t *t
 	}
 	*to = *from;
 
-	if ( msg->bit == 0 ) {
-		startBit = msg->readcount * 8 - GENTITYNUM_BITS;
+	if ( this->bit == 0 ) {
+		startBit = this->readcount * 8 - GENTITYNUM_BITS;
 	} else {
-		startBit = ( msg->readcount - 1 ) * 8 + msg->bit - GENTITYNUM_BITS;
+		startBit = ( this->readcount - 1 ) * 8 + this->bit - GENTITYNUM_BITS;
 	}
 
 	// shownet 2/3 will interleave with other printed info, -2 will
 	// just print the delta records
 	if ( cl_shownet && ( cl_shownet->integer >= 2 || cl_shownet->integer == -2 ) ) {
 		print = 1;
-		Com_Printf( "%3i: playerstate ", msg->readcount );
+		Com_Printf( "%3i: playerstate ", this->readcount );
 	} else {
 		print = 0;
 	}
 
 	numFields = sizeof( playerStateFields ) / sizeof( playerStateFields[0] );
-	lc = MSG_ReadByte(msg);
+	lc = this->readByte();
 
 	if ( lc > numFields || lc < 0 ) {
 		Com_Error( ERR_DROP, "invalid playerState field count" );
@@ -1469,15 +1465,15 @@ void MSG_ReadDeltaPlayerstate (msg_t *msg, playerState_t *from, playerState_t *t
 		fromF = (int *)( (byte *)from + field->offset );
 		toF = (int *)( (byte *)to + field->offset );
 
-		if ( ! MSG_ReadBits( msg, 1 ) ) {
+		if ( ! this->readBits( 1 ) ) {
 			// no change
 			*toF = *fromF;
 		} else {
 			if ( field->bits == 0 ) {
 				// float
-				if ( MSG_ReadBits( msg, 1 ) == 0 ) {
+				if ( this->readBits( 1 ) == 0 ) {
 					// integral float
-					trunc = MSG_ReadBits( msg, FLOAT_INT_BITS );
+					trunc = this->readBits( FLOAT_INT_BITS );
 					// bias to allow equal parts positive and negative
 					trunc -= FLOAT_INT_BIAS;
 					*(float *)toF = trunc; 
@@ -1486,14 +1482,14 @@ void MSG_ReadDeltaPlayerstate (msg_t *msg, playerState_t *from, playerState_t *t
 					}
 				} else {
 					// full floating point value
-					*toF = MSG_ReadBits( msg, 32 );
+					*toF = this->readBits( 32 );
 					if ( print ) {
 						Com_Printf( "%s:%f ", field->name, *(float *)toF );
 					}
 				}
 			} else {
 				// integer
-				*toF = MSG_ReadBits( msg, field->bits );
+				*toF = this->readBits( field->bits );
 				if ( print ) {
 					Com_Printf( "%s:%i ", field->name, *toF );
 				}
@@ -1509,58 +1505,58 @@ void MSG_ReadDeltaPlayerstate (msg_t *msg, playerState_t *from, playerState_t *t
 
 
 	// read the arrays
-	if (MSG_ReadBits( msg, 1 ) ) {
+	if (this->readBits( 1 ) ) {
 		// parse stats
-		if ( MSG_ReadBits( msg, 1 ) ) {
+		if ( this->readBits( 1 ) ) {
 			LOG("PS_STATS");
-			bits = MSG_ReadShort (msg);
+			bits = this->readShort();
 			for (i=0 ; i<16 ; i++) {
 				if (bits & (1<<i) ) {
-					to->stats[i] = MSG_ReadShort(msg);
+					to->stats[i] = this->readShort();
 				}
 			}
 		}
 
 		// parse persistant stats
-		if ( MSG_ReadBits( msg, 1 ) ) {
+		if ( this->readBits( 1 ) ) {
 			LOG("PS_PERSISTANT");
-			bits = MSG_ReadShort (msg);
+			bits = this->readShort();
 			for (i=0 ; i<16 ; i++) {
 				if (bits & (1<<i) ) {
-					to->persistant[i] = MSG_ReadShort(msg);
+					to->persistant[i] = this->readShort();
 				}
 			}
 		}
 
 		// parse ammo
-		if ( MSG_ReadBits( msg, 1 ) ) {
+		if ( this->readBits( 1 ) ) {
 			LOG("PS_AMMO");
-			bits = MSG_ReadShort (msg);
+			bits = this->readShort();
 			for (i=0 ; i<16 ; i++) {
 				if (bits & (1<<i) ) {
-					to->ammo[i] = MSG_ReadShort(msg);
+					to->ammo[i] = this->readShort();
 				}
 			}
 		}
 
 		// parse timers
-		if ( MSG_ReadBits( msg, 1 ) ) {
+		if ( this->readBits( 1 ) ) {
 			LOG("PS_TIMERS");
-			bits = MSG_ReadShort (msg);
+			bits = this->readShort();
 			for (i=0 ; i<16 ; i++) {
 				if (bits & (1<<i) ) {
-					to->timers[i] = MSG_ReadLong(msg);
+					to->timers[i] = this->readLong();
 				}
 			}
 		}
 
 		// parse vwep array
-		if ( MSG_ReadBits( msg, 1 ) ) {
+		if ( this->readBits( 1 ) ) {
 			LOG("PS_VWEP");
-			vwepBits = MSG_ReadLong (msg);
+			vwepBits = this->readLong();
 			for (i=0 ; i<32 ; i++) {
 				if (vwepBits & (1<<i) ) {
-					to->numWeaponsOnMount[i] = MSG_ReadBits(msg, 6);
+					to->numWeaponsOnMount[i] = this->readBits( 6);
 				}
 			}
 		}
@@ -1568,10 +1564,10 @@ void MSG_ReadDeltaPlayerstate (msg_t *msg, playerState_t *from, playerState_t *t
 	}
 
 	if ( print ) {
-		if ( msg->bit == 0 ) {
-			endBit = msg->readcount * 8 - GENTITYNUM_BITS;
+		if ( this->bit == 0 ) {
+			endBit = this->readcount * 8 - GENTITYNUM_BITS;
 		} else {
-			endBit = ( msg->readcount - 1 ) * 8 + msg->bit - GENTITYNUM_BITS;
+			endBit = ( this->readcount - 1 ) * 8 + this->bit - GENTITYNUM_BITS;
 		}
 		Com_Printf( " (%i bits)\n", endBit - startBit  );
 	}

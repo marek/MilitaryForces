@@ -108,9 +108,9 @@ then buffer them and make sure they get sent in correct order
 ================
 */
 
-void SV_Netchan_Transmit( SV_Client *client, msg_t *msg)
+void SV_Netchan_Transmit( SV_Client *client, Message *msg)
 {
-	MSG_WriteByte( msg, svc_EOF );
+	msg->writeByte( svc_EOF );
 
 	if(client->netchan_.unsentFragments || client->netchan_start_queue_)
 	{
@@ -118,7 +118,7 @@ void SV_Netchan_Transmit( SV_Client *client, msg_t *msg)
 		Com_DPrintf("#462 SV_Netchan_Transmit: unsent fragments, stacked\n");
 		netbuf = (SV_Client::Netchan_Buffer *) Z_Malloc(sizeof(SV_Client::Netchan_Buffer));
 		// store the msg, we can't store it encoded, as the encoding depends on stuff we still have to finish sending
-		MSG_Copy(&netbuf->msg_, netbuf->msgBuffer_, sizeof( netbuf->msgBuffer_ ), msg);
+		netbuf->msg_.copy( netbuf->msgBuffer_, sizeof( netbuf->msgBuffer_ ), msg);
 		netbuf->next_ = nullptr;
 		// insert it in the queue, the message will be encoded and sent later
 		*client->netchan_end_queue_ = netbuf;
@@ -135,7 +135,7 @@ void SV_Netchan_Transmit( SV_Client *client, msg_t *msg)
 Netchan_SV_Process
 =================
 */
-bool SV_Netchan_Process( SV_Client *client, msg_t *msg ) 
+bool SV_Netchan_Process( SV_Client *client, Message *msg ) 
 {
 	int ret;
 	ret = Netchan_Process( &client->netchan_, msg );

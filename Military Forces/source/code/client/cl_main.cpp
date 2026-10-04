@@ -164,7 +164,7 @@ extern void SV_BotFrame( int time );
 void CL_CheckForResend( );
 void CL_ShowIP_f();
 void CL_ServerStatus_f();
-void CL_ServerStatusResponse( netadr_t from, msg_t *msg );
+void CL_ServerStatusResponse( netadr_t from, Message *msg );
 
 /*
 ===============
@@ -617,7 +617,7 @@ Dumps the current net message, prefixed by the length
 ====================
 */
 
-void CL_WriteDemoMessage ( msg_t *msg, int headerBytes ) {
+void CL_WriteDemoMessage ( Message *msg, int headerBytes ) {
 	int		len, swlen;
 
 	// write the packet sequence
@@ -694,7 +694,7 @@ static char		demoName[MAX_QPATH];	// compiler bug workaround
 void CL_Record_f( ) {
 	char		name[MAX_OSPATH];
 	byte		bufData[MAX_MSGLEN];
-	msg_t	buf;
+	Message	buf;
 	int			i;
 	int			len;
 	entityState_t	*ent;
@@ -775,14 +775,14 @@ void CL_Record_f( ) {
 	clc.demowaiting = true;
 
 	// write out the gamestate message
-	MSG_Init (&buf, bufData, sizeof(bufData));
-	MSG_Bitstream(&buf);
+	buf.init( bufData, sizeof(bufData));
+	buf.bitstream();
 
 	// NOTE, MRE: all server->client messages now acknowledge
-	MSG_WriteLong( &buf, clc.reliableSequence );
+	buf.writeLong( clc.reliableSequence );
 
-	MSG_WriteByte (&buf, svc_gamestate);
-	MSG_WriteLong (&buf, clc.serverCommandSequence );
+	buf.writeByte( svc_gamestate);
+	buf.writeLong( clc.serverCommandSequence );
 
 	// configstrings
 	for ( i = 0 ; i < MAX_CONFIGSTRINGS ; i++ ) {
@@ -790,9 +790,9 @@ void CL_Record_f( ) {
 			continue;
 		}
 		s = cl.gameState.stringData + cl.gameState.stringOffsets[i];
-		MSG_WriteByte (&buf, svc_configstring);
-		MSG_WriteShort (&buf, i);
-		MSG_WriteBigString (&buf, s);
+		buf.writeByte( svc_configstring);
+		buf.writeShort( i);
+		buf.writeBigString( s);
 	}
 
 	// baselines
@@ -802,21 +802,21 @@ void CL_Record_f( ) {
 		if ( !ent->number ) {
 			continue;
 		}
-		MSG_WriteByte (&buf, svc_baseline);		
-		MSG_WriteDeltaEntity (&buf, &nullstate, ent, true );
+		buf.writeByte( svc_baseline);		
+		buf.writeDeltaEntity( &nullstate, ent, true );
 	}
 
-	MSG_WriteByte( &buf, svc_EOF );
+	buf.writeByte( svc_EOF );
 	
 	// finished writing the gamestate stuff
 
 	// write the client num
-	MSG_WriteLong(&buf, clc.clientNum);
+	buf.writeLong( clc.clientNum);
 	// write the checksum feed
-	MSG_WriteLong(&buf, clc.checksumFeed);
+	buf.writeLong( clc.checksumFeed);
 
 	// finished writing the client packet
-	MSG_WriteByte( &buf, svc_EOF );
+	buf.writeByte( svc_EOF );
 
 	// write it to the demo file
 	len = LittleLong( clc.serverMessageSequence - 1 );
@@ -941,7 +941,7 @@ CL_ReadDemoMessage
 */
 void CL_ReadDemoMessage( ) {
 	int			r;
-	msg_t		buf;
+	Message		buf;
 	byte		bufData[ MAX_MSGLEN ];
 	int			s;
 
@@ -959,7 +959,7 @@ void CL_ReadDemoMessage( ) {
 	clc.serverMessageSequence = LittleLong( s );
 
 	// init the message
-	MSG_Init( &buf, bufData, sizeof( bufData ) );
+	buf.init( bufData, sizeof( bufData ) );
 
 	// get the length
 	r = FS_Read (&buf.cursize, 4, clc.demofile);
@@ -2504,7 +2504,7 @@ void CL_InitServerInfo( serverInfo_t *server, netadr_t *address ) {
 CL_ServersResponsePacket
 ===================
 */
-void CL_ServersResponsePacket( const netadr_t* from, msg_t *msg, bool extended ) {
+void CL_ServersResponsePacket( const netadr_t* from, Message *msg, bool extended ) {
 	int				i, j, count, total;
 	netadr_t addresses[MAX_SERVERSPERPACKET];
 	int				numservers;
@@ -2627,15 +2627,15 @@ CL_ConnectionlessPacket
 Responses to broadcasts, etc
 =================
 */
-void CL_ConnectionlessPacket( netadr_t from, msg_t *msg ) {
+void CL_ConnectionlessPacket( netadr_t from, Message *msg ) {
 	char	*s;
 	char	*c;
 	int challenge = 0;
 
-	MSG_BeginReadingOOB( msg );
-	MSG_ReadLong( msg );	// skip the -1
+	msg->beginReadingOOB();
+	msg->readLong();	// skip the -1
 
-	s = MSG_ReadStringLine( msg );
+	s = msg->readStringLine();
 
 	Cmd_TokenizeString( s );
 
@@ -2813,7 +2813,7 @@ void CL_ConnectionlessPacket( netadr_t from, msg_t *msg ) {
 	if ( !Q_stricmp(c, "print") ) {
 		// NOTE: we may have to add exceptions for auth and update servers
 		if ( NET_CompareAdr( from, clc.serverAddress ) || NET_CompareAdr( from, cls.rconAddress ) ) {
-			s = MSG_ReadString( msg );
+			s = msg->readString();
 
 			Q_strncpyz( clc.serverMessage, s, sizeof( clc.serverMessage ) );
 			Com_Printf( "%s", s );
@@ -2844,7 +2844,7 @@ CL_PacketEvent
 A packet has arrived from the main event loop
 =================
 */
-void CL_PacketEvent( netadr_t from, msg_t *msg ) {
+void CL_PacketEvent( netadr_t from, Message *msg ) {
 	int		headerBytes;
 
 	clc.lastPacketTime = cls.realtime;
@@ -3884,7 +3884,7 @@ static void CL_SetServerInfoByAddress(netadr_t from, const char *info, int ping)
 CL_ServerInfoPacket
 ===================
 */
-void CL_ServerInfoPacket( netadr_t from, msg_t *msg ) {
+void CL_ServerInfoPacket( netadr_t from, Message *msg ) {
 	int		i, type;
 	char	info[MAX_INFO_STRING];
 	char	*infoString;
@@ -3892,7 +3892,7 @@ void CL_ServerInfoPacket( netadr_t from, msg_t *msg ) {
 	char	*gamename;
 	bool gameMismatch;
 
-	infoString = MSG_ReadString( msg );
+	infoString = msg->readString();
 
 	// if this isn't the correct gamename, ignore it
 	gamename = Info_ValueForKey( infoString, "gamename" );
@@ -3984,7 +3984,7 @@ void CL_ServerInfoPacket( netadr_t from, msg_t *msg ) {
 	cls.numlocalservers = i+1;
 	CL_InitServerInfo( &cls.localServers[i], &from );
 
-	Q_strncpyz( info, MSG_ReadString( msg ), MAX_INFO_STRING );
+	Q_strncpyz( info, msg->readString(), MAX_INFO_STRING );
 	if (strlen(info)) {
 		if (info[strlen(info)-1] != '\n') {
 			Q_strcat(info, sizeof(info), "\n");
@@ -4090,7 +4090,7 @@ int CL_ServerStatus( const char *serverAddress, char *serverStatusString, int ma
 CL_ServerStatusResponse
 ===================
 */
-void CL_ServerStatusResponse( netadr_t from, msg_t *msg ) {
+void CL_ServerStatusResponse( netadr_t from, Message *msg ) {
 	char	*s;
 	char	info[MAX_INFO_STRING];
 	int		i, l, score, ping;
@@ -4109,7 +4109,7 @@ void CL_ServerStatusResponse( netadr_t from, msg_t *msg ) {
 		return;
 	}
 
-	s = MSG_ReadStringLine( msg );
+	s = msg->readStringLine();
 
 	len = 0;
 	Com_sprintf(&serverStatus->string[len], sizeof(serverStatus->string)-len, "%s", s);
@@ -4149,7 +4149,7 @@ void CL_ServerStatusResponse( netadr_t from, msg_t *msg ) {
 		Com_Printf("\nPlayers:\n");
 		Com_Printf("num: score: ping: name:\n");
 	}
-	for (i = 0, s = MSG_ReadStringLine( msg ); *s; s = MSG_ReadStringLine( msg ), i++) {
+	for (i = 0, s = msg->readStringLine(); *s; s = msg->readStringLine(), i++) {
 
 		len = strlen(serverStatus->string);
 		Com_sprintf(&serverStatus->string[len], sizeof(serverStatus->string)-len, "\\%s", s);

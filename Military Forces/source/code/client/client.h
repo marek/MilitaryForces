@@ -529,11 +529,11 @@ void CL_Voip_f( );
 #endif
 
 void CL_SystemInfoChanged( );
-void CL_ParseServerMessage( msg_t *msg );
+void CL_ParseServerMessage( Message *msg );
 
 //====================================================================
 
-void	CL_ServerInfoPacket( netadr_t from, msg_t *msg );
+void	CL_ServerInfoPacket( netadr_t from, Message *msg );
 void	CL_LocalServers_f( );
 void	CL_GlobalServers_f( );
 void	CL_FavoriteServers_f( );
@@ -631,8 +631,8 @@ void LAN_SaveServersToCache( );
 //
 // cl_net_chan.c
 //
-void CL_Netchan_Transmit( netchan_t *chan, msg_t* msg);	//int length, const byte *data );
-bool CL_Netchan_Process( netchan_t *chan, msg_t *msg );
+void CL_Netchan_Transmit( netchan_t *chan, Message* msg);	//int length, const byte *data );
+bool CL_Netchan_Process( netchan_t *chan, Message *msg );
 
 //
 // cl_avi.c
@@ -647,6 +647,6 @@ bool CL_VideoRecording( );
 //
 // cl_main.c
 //
-void CL_WriteDemoMessage ( msg_t *msg, int headerBytes );
+void CL_WriteDemoMessage ( Message *msg, int headerBytes );
 
 #endif // __CLIENT_H__
