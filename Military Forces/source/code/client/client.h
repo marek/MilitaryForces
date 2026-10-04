@@ -269,7 +269,7 @@ typedef struct {
 #endif
 
 	// big stuff at end of structure so most offsets are 15 bits or less
-	netchan_t	netchan;
+	NetChannel	netchan;
 } clientConnection_t;
 
 extern	clientConnection_t clc;
@@ -631,8 +631,8 @@ void LAN_SaveServersToCache( );
 //
 // cl_net_chan.c
 //
-void CL_Netchan_Transmit( netchan_t *chan, Message* msg);	//int length, const byte *data );
-bool CL_Netchan_Process( netchan_t *chan, Message *msg );
+void CL_Netchan_Transmit( NetChannel *chan, Message* msg);	//int length, const byte *data );
+bool CL_Netchan_Process( NetChannel *chan, Message *msg );
 
 //
 // cl_avi.c

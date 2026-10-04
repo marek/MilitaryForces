@@ -152,7 +152,7 @@ struct SV_Client
 	int					snapshotMsec_;				// requests a snapshot every snapshotMsec unless rate choked
 	int					pureAuthentic_;
 	bool				gotCP_;						// TTimo - additional flag to distinguish between a bad pure checksum, and no cp command at all
-	netchan_t			netchan_;
+	NetChannel			netchan_;
 
 	// queuing outgoing fragmented messages to send them properly, without udp packet bursts
 	// in case large fragmented messages are stacking up

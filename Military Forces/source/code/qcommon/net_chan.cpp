@@ -84,19 +84,19 @@ Netchan_Setup
 called to open a channel to a remote system
 ==============
 */
-void Netchan_Setup(netsrc_t sock, netchan_t *chan, netadr_t adr, int qport, int challenge, bool compat)
+void NetChannel::setup( netsrc_t sock, netadr_t adr, int qport, int challenge, bool compat )
 {
-	Com_Memset (chan, 0, sizeof(*chan));
+	Com_Memset (this, 0, sizeof(*this));
 	
-	chan->sock = sock;
-	chan->remoteAddress = adr;
-	chan->qport = qport;
-	chan->incomingSequence = 0;
-	chan->outgoingSequence = 1;
-	chan->challenge = challenge;
+	this->sock = sock;
+	this->remoteAddress = adr;
+	this->qport = qport;
+	this->incomingSequence = 0;
+	this->outgoingSequence = 1;
+	this->challenge = challenge;
 
 #ifdef LEGACY_PROTOCOL
-	chan->compat = compat;
+	this->compat = compat;
 #endif
 }
 
@@ -107,7 +107,7 @@ Netchan_TransmitNextFragment
 Send one fragment of the current message
 =================
 */
-void Netchan_TransmitNextFragment( netchan_t *chan ) {
+void NetChannel::transmitNextFragment() {
 	Message		send;
 	byte		send_buf[MAX_PACKETLEN];
 	int			fragmentLength;
@@ -116,53 +116,53 @@ void Netchan_TransmitNextFragment( netchan_t *chan ) {
 	// write the packet header
 	send.initOOB( send_buf, sizeof(send_buf));				// <-- only do the oob here
 
-	outgoingSequence = chan->outgoingSequence | FRAGMENT_BIT;
+	outgoingSequence = this->outgoingSequence | FRAGMENT_BIT;
 	send.writeLong( outgoingSequence);
 
 	// send the qport if we are a client
-	if ( chan->sock == NS_CLIENT ) {
+	if ( this->sock == NS_CLIENT ) {
 		send.writeShort( net_qport->integer );
 	}
 
 #ifdef LEGACY_PROTOCOL
-	if(!chan->compat)
+	if(!this->compat)
 #endif
-		send.writeLong( NETCHAN_GENCHECKSUM(chan->challenge, chan->outgoingSequence));
+		send.writeLong( NETCHAN_GENCHECKSUM(this->challenge, this->outgoingSequence));
 
 	// copy the reliable message to the packet first
 	fragmentLength = FRAGMENT_SIZE;
-	if ( chan->unsentFragmentStart  + fragmentLength > chan->unsentLength ) {
-		fragmentLength = chan->unsentLength - chan->unsentFragmentStart;
+	if ( this->unsentFragmentStart  + fragmentLength > this->unsentLength ) {
+		fragmentLength = this->unsentLength - this->unsentFragmentStart;
 	}
 
-	send.writeLong( chan->unsentFragmentStart );
+	send.writeLong( this->unsentFragmentStart );
 	send.writeShort( fragmentLength );
-	send.writeData( chan->unsentBuffer + chan->unsentFragmentStart, fragmentLength );
+	send.writeData( this->unsentBuffer + this->unsentFragmentStart, fragmentLength );
 
 	// send the datagram
-	NET_SendPacket(chan->sock, send.cursize, send.data, chan->remoteAddress);
+	NET_SendPacket(this->sock, send.cursize, send.data, this->remoteAddress);
 	
 	// Store send time and size of this packet for rate control
-	chan->lastSentTime = Sys_Milliseconds();
-	chan->lastSentSize = send.cursize;
+	this->lastSentTime = Sys_Milliseconds();
+	this->lastSentSize = send.cursize;
 
 	if ( showpackets->integer ) {
 		Com_Printf ("%s send %4i : s=%i fragment=%i,%i\n"
-			, netsrcString[ chan->sock ]
+			, netsrcString[ this->sock ]
 			, send.cursize
-			, chan->outgoingSequence
-			, chan->unsentFragmentStart, fragmentLength);
+			, this->outgoingSequence
+			, this->unsentFragmentStart, fragmentLength);
 	}
 
-	chan->unsentFragmentStart += fragmentLength;
+	this->unsentFragmentStart += fragmentLength;
 
 	// this exit condition is a little tricky, because a packet
 	// that is exactly the fragment length still needs to send
 	// a second packet of zero length so that the other side
 	// can tell there aren't more to follow
-	if ( chan->unsentFragmentStart == chan->unsentLength && fragmentLength != FRAGMENT_SIZE ) {
-		chan->outgoingSequence++;
-		chan->unsentFragments = false;
+	if ( this->unsentFragmentStart == this->unsentLength && fragmentLength != FRAGMENT_SIZE ) {
+		this->outgoingSequence++;
+		this->unsentFragments = false;
 	}
 }
 
@@ -175,23 +175,23 @@ Sends a message to a connection, fragmenting if necessary
 A 0 length will still generate a packet.
 ================
 */
-void Netchan_Transmit( netchan_t *chan, int length, const byte *data ) {
+void NetChannel::transmit( int length, const byte *data ) {
 	Message		send;
 	byte		send_buf[MAX_PACKETLEN];
 
 	if ( length > MAX_MSGLEN ) {
 		Com_Error( ERR_DROP, "Netchan_Transmit: length = %i", length );
 	}
-	chan->unsentFragmentStart = 0;
+	this->unsentFragmentStart = 0;
 
 	// fragment large reliable messages
 	if ( length >= FRAGMENT_SIZE ) {
-		chan->unsentFragments = true;
-		chan->unsentLength = length;
-		Com_Memcpy( chan->unsentBuffer, data, length );
+		this->unsentFragments = true;
+		this->unsentLength = length;
+		Com_Memcpy( this->unsentBuffer, data, length );
 
 		// only send the first fragment now
-		Netchan_TransmitNextFragment( chan );
+		this->transmitNextFragment();
 
 		return;
 	}
@@ -199,34 +199,34 @@ void Netchan_Transmit( netchan_t *chan, int length, const byte *data ) {
 	// write the packet header
 	send.initOOB( send_buf, sizeof(send_buf));
 
-	send.writeLong( chan->outgoingSequence );
+	send.writeLong( this->outgoingSequence );
 
 	// send the qport if we are a client
-	if(chan->sock == NS_CLIENT)
+	if(this->sock == NS_CLIENT)
 		send.writeShort( net_qport->integer);
 
 #ifdef LEGACY_PROTOCOL
-	if(!chan->compat)
+	if(!this->compat)
 #endif
-		send.writeLong( NETCHAN_GENCHECKSUM(chan->challenge, chan->outgoingSequence));
+		send.writeLong( NETCHAN_GENCHECKSUM(this->challenge, this->outgoingSequence));
 
-	chan->outgoingSequence++;
+	this->outgoingSequence++;
 
 	send.writeData( data, length );
 
 	// send the datagram
-	NET_SendPacket( chan->sock, send.cursize, send.data, chan->remoteAddress );
+	NET_SendPacket( this->sock, send.cursize, send.data, this->remoteAddress );
 
 	// Store send time and size of this packet for rate control
-	chan->lastSentTime = Sys_Milliseconds();
-	chan->lastSentSize = send.cursize;
+	this->lastSentTime = Sys_Milliseconds();
+	this->lastSentSize = send.cursize;
 
 	if ( showpackets->integer ) {
 		Com_Printf( "%s send %4i : s=%i ack=%i\n"
-			, netsrcString[ chan->sock ]
+			, netsrcString[ this->sock ]
 			, send.cursize
-			, chan->outgoingSequence - 1
-			, chan->incomingSequence );
+			, this->outgoingSequence - 1
+			, this->incomingSequence );
 	}
 }
 
@@ -242,7 +242,7 @@ final fragment of a multi-part message, the entire thing will be
 copied out.
 =================
 */
-bool Netchan_Process( netchan_t *chan, Message *msg ) {
+bool NetChannel::process( Message *msg ) {
 	int			sequence;
 	int			fragmentStart, fragmentLength;
 	bool	fragmented;
@@ -263,18 +263,18 @@ bool Netchan_Process( netchan_t *chan, Message *msg ) {
 	}
 
 	// read the qport if we are a server
-	if ( chan->sock == NS_SERVER ) {
+	if ( this->sock == NS_SERVER ) {
 		msg->readShort();
 	}
 
 #ifdef LEGACY_PROTOCOL
-	if(!chan->compat)
+	if(!this->compat)
 #endif
 	{
 		int checksum = msg->readLong();
 
 		// UDP spoofing protection
-		if(NETCHAN_GENCHECKSUM(chan->challenge, sequence) != checksum)
+		if(NETCHAN_GENCHECKSUM(this->challenge, sequence) != checksum)
 			return false;
 	}
 
@@ -290,13 +290,13 @@ bool Netchan_Process( netchan_t *chan, Message *msg ) {
 	if ( showpackets->integer ) {
 		if ( fragmented ) {
 			Com_Printf( "%s recv %4i : s=%i fragment=%i,%i\n"
-				, netsrcString[ chan->sock ]
+				, netsrcString[ this->sock ]
 				, msg->cursize
 				, sequence
 				, fragmentStart, fragmentLength );
 		} else {
 			Com_Printf( "%s recv %4i : s=%i\n"
-				, netsrcString[ chan->sock ]
+				, netsrcString[ this->sock ]
 				, msg->cursize
 				, sequence );
 		}
@@ -305,12 +305,12 @@ bool Netchan_Process( netchan_t *chan, Message *msg ) {
 	//
 	// discard out of order or duplicated packets
 	//
-	if ( sequence <= chan->incomingSequence ) {
+	if ( sequence <= this->incomingSequence ) {
 		if ( showdrop->integer || showpackets->integer ) {
 			Com_Printf( "%s:Out of order packet %i at %i\n"
-				, NET_AdrToString( chan->remoteAddress )
+				, NET_AdrToString( this->remoteAddress )
 				,  sequence
-				, chan->incomingSequence );
+				, this->incomingSequence );
 		}
 		return false;
 	}
@@ -318,12 +318,12 @@ bool Netchan_Process( netchan_t *chan, Message *msg ) {
 	//
 	// dropped packets don't keep the message from being used
 	//
-	chan->dropped = sequence - (chan->incomingSequence+1);
-	if ( chan->dropped > 0 ) {
+	this->dropped = sequence - (this->incomingSequence+1);
+	if ( this->dropped > 0 ) {
 		if ( showdrop->integer || showpackets->integer ) {
 			Com_Printf( "%s:Dropped %i packets at %i\n"
-			, NET_AdrToString( chan->remoteAddress )
-			, chan->dropped
+			, NET_AdrToString( this->remoteAddress )
+			, this->dropped
 			, sequence );
 		}
 	}
@@ -339,46 +339,46 @@ bool Netchan_Process( netchan_t *chan, Message *msg ) {
 		// either a packet was dropped, or we received this one too soon
 		// we don't reconstruct the fragments. we will wait till this fragment gets to us again
 		// (NOTE: we could probably try to rebuild by out of order chunks if needed)
-		if ( sequence != chan->fragmentSequence ) {
-			chan->fragmentSequence = sequence;
-			chan->fragmentLength = 0;
+		if ( sequence != this->fragmentSequence ) {
+			this->fragmentSequence = sequence;
+			this->fragmentLength = 0;
 		}
 
 		// if we missed a fragment, dump the message
-		if ( fragmentStart != chan->fragmentLength ) {
+		if ( fragmentStart != this->fragmentLength ) {
 			if ( showdrop->integer || showpackets->integer ) {
 				Com_Printf( "%s:Dropped a message fragment\n"
-				, NET_AdrToString( chan->remoteAddress ));
+				, NET_AdrToString( this->remoteAddress ));
 			}
 			// we can still keep the part that we have so far,
-			// so we don't need to clear chan->fragmentLength
+			// so we don't need to clear this->fragmentLength
 			return false;
 		}
 
 		// copy the fragment to the fragment buffer
 		if ( fragmentLength < 0 || msg->readcount + fragmentLength > msg->cursize ||
-			chan->fragmentLength + fragmentLength > sizeof( chan->fragmentBuffer ) ) {
+			this->fragmentLength + fragmentLength > sizeof( this->fragmentBuffer ) ) {
 			if ( showdrop->integer || showpackets->integer ) {
 				Com_Printf ("%s:illegal fragment length\n"
-				, NET_AdrToString (chan->remoteAddress ) );
+				, NET_AdrToString (this->remoteAddress ) );
 			}
 			return false;
 		}
 
-		Com_Memcpy( chan->fragmentBuffer + chan->fragmentLength, 
+		Com_Memcpy( this->fragmentBuffer + this->fragmentLength, 
 			msg->data + msg->readcount, fragmentLength );
 
-		chan->fragmentLength += fragmentLength;
+		this->fragmentLength += fragmentLength;
 
 		// if this wasn't the last fragment, don't process anything
 		if ( fragmentLength == FRAGMENT_SIZE ) {
 			return false;
 		}
 
-		if ( chan->fragmentLength > msg->maxsize ) {
+		if ( this->fragmentLength > msg->maxsize ) {
 			Com_Printf( "%s:fragmentLength %i > msg->maxsize\n"
-				, NET_AdrToString (chan->remoteAddress ),
-				chan->fragmentLength );
+				, NET_AdrToString (this->remoteAddress ),
+				this->fragmentLength );
 			return false;
 		}
 
@@ -387,15 +387,15 @@ bool Netchan_Process( netchan_t *chan, Message *msg ) {
 		// make sure the sequence number is still there
 		*(int *)msg->data = LittleLong( sequence );
 
-		Com_Memcpy( msg->data + 4, chan->fragmentBuffer, chan->fragmentLength );
-		msg->cursize = chan->fragmentLength + 4;
-		chan->fragmentLength = 0;
+		Com_Memcpy( msg->data + 4, this->fragmentBuffer, this->fragmentLength );
+		msg->cursize = this->fragmentLength + 4;
+		this->fragmentLength = 0;
 		msg->readcount = 4;	// past the sequence number
 		msg->bit = 32;	// past the sequence number
 
 		// TTimo
 		// clients were not acking fragmented messages
-		chan->incomingSequence = sequence;
+		this->incomingSequence = sequence;
 		
 		return true;
 	}
@@ -403,7 +403,7 @@ bool Netchan_Process( netchan_t *chan, Message *msg ) {
 	//
 	// the message can now be read from the current message pointer
 	//
-	chan->incomingSequence = sequence;
+	this->incomingSequence = sequence;
 
 	return true;
 }

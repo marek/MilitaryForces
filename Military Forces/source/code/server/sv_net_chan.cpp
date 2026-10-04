@@ -56,7 +56,7 @@ void SV_Netchan_TransmitNextInQueue(SV_Client *client)
 	Com_DPrintf("#462 Netchan_TransmitNextFragment: popping a queued message for transmit\n");
 	netbuf = client->netchan_start_queue_;
 
-	Netchan_Transmit(&client->netchan_, netbuf->msg_.cursize, netbuf->msg_.data);
+	client->netchan_.transmit( netbuf->msg_.cursize, netbuf->msg_.data );
 
 	// pop from queue
 	client->netchan_start_queue_ = netbuf->next_;
@@ -84,7 +84,7 @@ int SV_Netchan_TransmitNextFragment(SV_Client *client)
 {
 	if(client->netchan_.unsentFragments)
 	{
-		Netchan_TransmitNextFragment(&client->netchan_);
+		client->netchan_.transmitNextFragment();
 		return SV_RateMsec(client);
 	}
 	else if(client->netchan_start_queue_)
@@ -126,7 +126,7 @@ void SV_Netchan_Transmit( SV_Client *client, Message *msg)
 	}
 	else
 	{
-		Netchan_Transmit( &client->netchan_, msg->cursize, msg->data );
+		client->netchan_.transmit( msg->cursize, msg->data );
 	}
 }
 
@@ -138,7 +138,7 @@ Netchan_SV_Process
 bool SV_Netchan_Process( SV_Client *client, Message *msg ) 
 {
 	int ret;
-	ret = Netchan_Process( &client->netchan_, msg );
+	ret = client->netchan_.process( msg );
 	if (!ret)
 		return false;
 

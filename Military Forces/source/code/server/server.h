@@ -168,7 +168,7 @@ struct worldSector_t;
 //	int				snapshotMsec;		// requests a snapshot every snapshotMsec unless rate choked
 //	int				pureAuthentic;
 //	bool  gotCP; // TTimo - additional flag to distinguish between a bad pure checksum, and no cp command at all
-//	netchan_t		netchan;
+//	NetChannel		netchan;
 //	// TTimo
 //	// queuing outgoing fragmented messages to send them properly, without udp packet bursts
 //	// in case large fragmented messages are stacking up

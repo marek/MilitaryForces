@@ -2764,11 +2764,9 @@ void CL_ConnectionlessPacket( netadr_t from, Message *msg ) {
 		}
 
 #ifdef LEGACY_PROTOCOL
-		Netchan_Setup(NS_CLIENT, &clc.netchan, from, Cvar_VariableValue("net_qport"),
-			      clc.challenge, clc.compat);
+		clc.netchan.setup( NS_CLIENT, from, Cvar_VariableValue("net_qport"), clc.challenge, clc.compat );
 #else
-		Netchan_Setup(NS_CLIENT, &clc.netchan, from, Cvar_VariableValue("net_qport"),
-			      clc.challenge, false);
+		clc.netchan.setup( NS_CLIENT, from, Cvar_VariableValue("net_qport"), clc.challenge, false );
 #endif
 
 		clc.state = CA_CONNECTED;

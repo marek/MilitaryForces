@@ -193,7 +193,14 @@ void		NET_Sleep(int msec);
 Netchan handles packet fragmentation and out of order / duplicate suppression
 */
 
-typedef struct {
+class NetChannel
+{
+public:
+	void setup( netsrc_t sock, netadr_t adr, int qport, int challenge, bool compat );
+	void transmit( int length, const byte *data );
+	void transmitNextFragment();
+	bool process( Message *msg );
+
 	netsrc_t	sock;
 
 	int			dropped;			// between last packet and previous
@@ -224,15 +231,12 @@ typedef struct {
 #ifdef LEGACY_PROTOCOL
 	bool	compat;
 #endif
-} netchan_t;
+};
+
 
 void Netchan_Init( int qport );
-void Netchan_Setup(netsrc_t sock, netchan_t *chan, netadr_t adr, int qport, int challenge, bool compat);
 
-void Netchan_Transmit( netchan_t *chan, int length, const byte *data );
-void Netchan_TransmitNextFragment( netchan_t *chan );
 
-bool Netchan_Process( netchan_t *chan, Message *msg );
 
 
 /*

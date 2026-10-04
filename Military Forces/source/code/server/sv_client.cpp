@@ -510,7 +510,7 @@ gotnewcl:
 	newcl->challenge_ = challenge;
 
 	// save the address
-	Netchan_Setup(NS_SERVER, &newcl->netchan_, from, qport, challenge, false);
+	newcl->netchan_.setup( NS_SERVER, from, qport, challenge, false );
 	// init the netchan queue
 	newcl->netchan_end_queue_ = &newcl->netchan_start_queue_;
 

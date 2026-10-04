@@ -133,11 +133,11 @@ static void CL_Netchan_Decode( Message *msg ) {
 CL_Netchan_TransmitNextFragment
 =================
 */
-bool CL_Netchan_TransmitNextFragment(netchan_t *chan)
+bool CL_Netchan_TransmitNextFragment(NetChannel *chan)
 {
 	if(chan->unsentFragments)
 	{
-		Netchan_TransmitNextFragment(chan);
+		chan->transmitNextFragment();
 		return true;
 	}
 	
@@ -149,7 +149,7 @@ bool CL_Netchan_TransmitNextFragment(netchan_t *chan)
 CL_Netchan_Transmit
 ================
 */
-void CL_Netchan_Transmit( netchan_t *chan, Message* msg ) {
+void CL_Netchan_Transmit( NetChannel *chan, Message* msg ) {
 	msg->writeByte( clc_EOF );
 
 #ifdef LEGACY_PROTOCOL
@@ -157,7 +157,7 @@ void CL_Netchan_Transmit( netchan_t *chan, Message* msg ) {
 		CL_Netchan_Encode(msg);
 #endif
 
-	Netchan_Transmit(chan, msg->cursize, msg->data);
+	chan->transmit( msg->cursize, msg->data );
 	
 	// Transmit all fragments without delay
 	while(CL_Netchan_TransmitNextFragment(chan))
@@ -171,10 +171,10 @@ void CL_Netchan_Transmit( netchan_t *chan, Message* msg ) {
 CL_Netchan_Process
 =================
 */
-bool CL_Netchan_Process( netchan_t *chan, Message *msg ) {
+bool CL_Netchan_Process( NetChannel *chan, Message *msg ) {
 	int ret;
 
-	ret = Netchan_Process( chan, msg );
+	ret = chan->process( msg );
 	if (!ret)
 		return false;
 
