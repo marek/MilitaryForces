@@ -278,9 +278,9 @@ snapshot_t * CGame::readNextSnapshot( ) {
 
 		// try to read the snapshot from the client system
 		cgs.processedSnapshotNum++;
-		r = CL_GetSnapshot( cgs.processedSnapshotNum, dest );
+		r = ClientHost::getSnapshot( cgs.processedSnapshotNum, dest );
 
-		// FIXME: why would CL_GetSnapshot return a snapshot with the same server time
+		// FIXME: why would ClientHost::getSnapshot return a snapshot with the same server time
 		if ( cg.snap && r && dest->serverTime == cg.snap->serverTime ) {
 			//continue;
 		}
@@ -332,7 +332,7 @@ void CGame::processSnapshots( ) {
 	int				n;
 
 	// see what the latest snapshot the client system has is
-	CL_GetCurrentSnapshotNumber( &n, &cg.latestSnapshotTime );
+	ClientHost::getCurrentSnapshotNumber( &n, &cg.latestSnapshotTime );
 	if ( n != cg.latestSnapshotNum ) {
 		if ( n < cg.latestSnapshotNum ) {
 			// this should never happen

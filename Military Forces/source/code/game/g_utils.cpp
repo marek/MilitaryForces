@@ -77,7 +77,7 @@ int G_FindConfigstringIndex( char *name, int start, int max, bool create )
 
 	for ( i=1 ; i<max ; i++ ) 
 	{
-		SV_GetConfigstring( start + i, s, sizeof( s ) );
+		GameHost::getConfigstring( start + i, s, sizeof( s ) );
 		if ( !s[0] ) 
 			break;
 
@@ -91,7 +91,7 @@ int G_FindConfigstringIndex( char *name, int start, int max, bool create )
 	if ( i == max ) 
 		Common::error( ERR_DROP, "G_FindConfigstringIndex: overflow" );
 
-	SV_SetConfigstring( start + i, name );
+	GameHost::setConfigstring( start + i, name );
 
 	return i;
 }
@@ -128,7 +128,7 @@ void Game::teamCommand( ClientBase::eTeam team, char *cmd )
 		if( client && client->pers_.connected_ == GameClient::ClientPersistant::CON_CONNECTED ) 
 		{
 			if ( client->sess_.sessionTeam_ == team )
-				SV_GameSendServerCommand( i, va("%s", cmd ));
+				GameHost::sendServerCommand( i, va("%s", cmd ));
 		}
 	}
 }
@@ -246,7 +246,7 @@ void Game::useTargets( GameEntity *ent, GameEntity *activator )
 	{
 		float f = theLevel.time_ * 0.001;
 		AddRemap(ent->targetShaderName_, ent->targetShaderNewName_, f);
-		SV_SetConfigstring(CS_SHADERSTATE, BuildShaderStateConfig());
+		GameHost::setConfigstring(CS_SHADERSTATE, BuildShaderStateConfig());
 	}
 
 	if ( !ent->target_ ) 
@@ -440,8 +440,8 @@ float vectoyaw( const vec3_t vec )
 //
 //	// let the server system know that there are more entities
 //#pragma message("shouldnt need to call SV_LocateGameData here anymore..")
-//	//SV_LocateGameData( &theLevel.gameEntities_, &theLevel.clients_ );
-//	//SV_LocateGameData( (void*)level.gentities, level.num_entities, sizeof( gentity_t ), 
+//	//GameHost::locateGameData( &theLevel.gameEntities_, &theLevel.clients_ );
+//	//GameHost::locateGameData( (void*)level.gentities, level.num_entities, sizeof( gentity_t ), 
 //	//	&level.clients[0].ps, sizeof( level.clients[0] ) );
 //
 //	e->init(-1);
@@ -477,7 +477,7 @@ bool Game::entitiesFree()
 //*/
 //void G_FreeEntity( GameEntity *ed ) 
 //{
-//	SV_UnlinkEntity( ed );		// unlink from world
+//	GameHost::unlinkEntity( ed );		// unlink from world
 //
 //	if( ed->neverFree_ ) 
 //		return;
@@ -515,7 +515,7 @@ GameEntity *Game::tempEntity( vec3_t origin, int event )
 	Game::setOrigin( e, snapped );
 
 	// find cluster for PVS
-	SV_LinkEntity( e );
+	GameHost::linkEntity( e );
 
 	return e;
 }
@@ -547,7 +547,7 @@ void Game::killBox( GameEntity *ent )
 
 	VectorAdd( ent->client_->ps_.origin, ent->r.mins, mins );
 	VectorAdd( ent->client_->ps_.origin, ent->r.maxs, maxs );
-	num = SV_AreaEntities( mins, maxs, touch, MAX_GENTITIES );
+	num = GameHost::areaEntities( mins, maxs, touch, MAX_GENTITIES );
 
 	for( i=0 ; i<num ; i++ )
 	{

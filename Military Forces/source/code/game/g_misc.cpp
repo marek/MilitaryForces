@@ -124,7 +124,7 @@ void SP_misc_portal_surface( GameEntity *ent )
 {
 	VectorClear( ent->r.mins );
 	VectorClear( ent->r.maxs );
-	SV_LinkEntity( ent );
+	GameHost::linkEntity( ent );
 
 	ent->r.svFlags = SVF_PORTAL;
 	ent->s.eType = ET_PORTAL;
@@ -150,7 +150,7 @@ void SP_misc_portal_camera( GameEntity* ent )
 
 	VectorClear( ent->r.mins );
 	VectorClear( ent->r.maxs );
-	SV_LinkEntity( ent );
+	GameHost::linkEntity( ent );
 
 	Game::spawnFloat( "roll", "0", &roll );
 

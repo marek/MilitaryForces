@@ -103,8 +103,8 @@ void QDECL PrintMsg( GameEntity *ent, const char *fmt, ... )
 	while ((p = strchr(msg, '"')) != nullptr)
 		*p = '\'';
 
-	SV_GameSendServerCommand ( ( (ent == nullptr) ? -1 : ent->s.number ), va("print \"%s\"", msg ));	// s.number ok ?
-//	SV_GameSendServerCommand ( ( (ent == NULL) ? -1 : ent-g_entities ), va("print \"%s\"", msg ));
+	GameHost::sendServerCommand ( ( (ent == nullptr) ? -1 : ent->s.number ), va("print \"%s\"", msg ));	// s.number ok ?
+//	GameHost::sendServerCommand ( ( (ent == NULL) ? -1 : ent-g_entities ), va("print \"%s\"", msg ));
 }
 
 /*
@@ -230,7 +230,7 @@ void Team_SetFlagStatus( int team, flagStatus_t status )
 			st[1] = 0;
 		}
 
-		SV_SetConfigstring( CS_FLAGSTATUS, st );
+		GameHost::setConfigstring( CS_FLAGSTATUS, st );
 	}
 }
 
@@ -634,7 +634,7 @@ GameEntity *Team_GetLocation(GameEntity *ent)
 		if ( len > bestlen ) 
 			continue;
 
-		if ( !SV_inPVS( origin, eloc->r.currentOrigin ) ) 
+		if ( !GameHost::inPVS( origin, eloc->r.currentOrigin ) ) 
 			continue;
 
 		bestlen = len;
@@ -836,8 +836,8 @@ void TeamplayInfoMessage( GameEntity *ent )
 		}
 	}
 
-	SV_GameSendServerCommand( ent->s.number, va("tinfo %i %s", cnt, string) );
-	//SV_GameSendServerCommand( ent-g_entities, va("tinfo %i %s", cnt, string) );
+	GameHost::sendServerCommand( ent->s.number, va("tinfo %i %s", cnt, string) );
+	//GameHost::sendServerCommand( ent-g_entities, va("tinfo %i %s", cnt, string) );
 }
 
 void CheckTeamStatus() 

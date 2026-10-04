@@ -8,6 +8,7 @@
 #include "../game/q_shared.h"
 #include "../cgame/tr_types.h"
 #include "ui_public.h"
+#include "../qcommon/client_host.h"
 #include "keycodes.h"
 #include "../qcommon/qfiles.h"
 #include "../game/bg_public.h"
@@ -922,7 +923,6 @@ void Key_KeynumToStringBuf( int keynum, char *buf, int buflen );
 void Key_GetBindingBuf( int keynum, char *buf, int buflen );
 int Key_GetCatcher();
 void Key_SetCatcher( int catcher );
-void CL_GetGlconfig( glconfig_t *glconfig );
 int GetConfigString(int index, char *buf, int size);
 int LAN_GetServerCount( int source );
 void LAN_GetServerAddressString( int source, int n, char *buf, int buflen );

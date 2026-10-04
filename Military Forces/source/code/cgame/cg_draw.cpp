@@ -781,8 +781,8 @@ void CGame::drawDisconnect( ) {
 	int			w;
 
 	// draw the phone jack if we are completely past our buffers
-	cmdNum = CL_GetCurrentCmdNumber() - CMD_BACKUP + 1;
-	CL_GetUserCmd( cmdNum, &cmd );
+	cmdNum = ClientHost::getCurrentCmdNumber() - CMD_BACKUP + 1;
+	ClientHost::getUserCmd( cmdNum, &cmd );
 	if ( cmd.serverTime <= cg.snap->ps.commandTime
 		|| cmd.serverTime > cg.time ) {	// special check for map_restart
 		return;

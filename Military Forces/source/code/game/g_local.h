@@ -14,6 +14,7 @@
 #include "bg_public.h"
 //#include "bg_vehicleinfo.h"
 #include "g_public.h"
+#include "../qcommon/game_host.h"
 #include "g_client.h"
 #include <vector>
 
@@ -997,31 +998,8 @@ extern	vmCvar_t	mf_allowNukes;
 
 
 // system calls
-void SV_GetUsercmd( int clientNum, usercmd_t *cmd );
-bool SV_GetEntityToken( char *buffer, int bufferSize );
-bool SV_EntityContact( const vec3_t mins, const vec3_t maxs, EntityBase* gameEnt, bool capsule );
-int SV_AreaEntities( const vec3_t mins, const vec3_t maxs, int *entityList, int maxcount );
-void SV_LinkEntity( EntityBase* ent );
-void SV_UnlinkEntity( EntityBase* ent );
-bool SV_inPVS (const vec3_t p1, const vec3_t p2);
-int SV_PointContents( const vec3_t p, int passEntityNum );
-void SV_Trace( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentmask, bool capsule );
-void SV_GetServerinfo( char *buffer, int bufferSize );
-void SV_SetUserinfo( int index, const char *val );
-void SV_GetUserinfo( int index, char *buffer, int bufferSize );
-void SV_GetConfigstring( int index, char *buffer, int bufferSize );
-void SV_SetConfigstring (int index, const char *val);
-void SV_GameSendServerCommand( int clientNum, const char *text );
-void SV_GameDropClient( int clientNum, const char *reason );
-int SV_BotAllocateClient();
-void SV_BotFreeClient( int clientNum );
-void SV_BotUserCommand( int clientNum, usercmd_t *cmd );
-void SV_AdjustAreaPortalState( EntityBase* gameEnt, int open );
-void SV_SetBrushModel( EntityBase* gameEnt, const char *name );
-//void SV_LocateGameData( void* gEnts, int numGEntities, int sizeofGEntity_t,
+//void GameHost::locateGameData( void* gEnts, int numGEntities, int sizeofGEntity_t,
 //					   playerState_t *clients, int sizeofGameClient );
-void SV_LocateGameData( std::vector<EntityBase*>* gameEntities, 
-					    std::vector<ClientBase*>* gameClients );
 
 
 

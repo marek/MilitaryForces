@@ -45,7 +45,7 @@ void GroundInstallation_Die::execute( GameEntity *inflictor, GameEntity *attacke
 
 	Game::radiusDamage( self_->r.currentOrigin, self_, 150, 150, self_, MOD_VEHICLEEXPLOSION, CAT_ANY );
 
-	SV_LinkEntity( self_ );
+	GameHost::linkEntity( self_ );
 }
 
 void Game::update_GI_Targets( GameEntity* ent )
@@ -76,7 +76,7 @@ void Game::update_GI_Targets( GameEntity* ent )
 				VectorSet( rangevec, range, range, range );
 				VectorSubtract( ent->r.currentOrigin, rangevec, mins );
 				VectorAdd( ent->r.currentOrigin, rangevec, maxs );
-				num = SV_AreaEntities( mins, maxs, touch, MAX_GENTITIES );
+				num = GameHost::areaEntities( mins, maxs, touch, MAX_GENTITIES );
 
 				for ( i=0 ; i<num ; i++ )
 				{
@@ -101,7 +101,7 @@ void Game::update_GI_Targets( GameEntity* ent )
 						if( team == ent->s.generic1 ) continue;
 					}
 					// check LOS
-					SV_Trace( &tr, ent->r.currentOrigin, nullptr, nullptr, hit->r.currentOrigin, ent->s.number, MASK_PLAYERSOLID, false );
+					GameHost::trace( &tr, ent->r.currentOrigin, nullptr, nullptr, hit->r.currentOrigin, ent->s.number, MASK_PLAYERSOLID, false );
 					if( tr.fraction < 1 && tr.entityNum != hit->s.number ) continue;
 					// check dist
 					VectorSubtract(hit->r.currentOrigin, ent->r.currentOrigin, dir);
@@ -159,7 +159,7 @@ void Game::update_GI_Targets( GameEntity* ent )
 				return;
 			}
 			// check LOS
-			SV_Trace( &tr, ent->r.currentOrigin, nullptr, nullptr, ent->tracktarget_->r.currentOrigin, ent->s.number, MASK_PLAYERSOLID, false );
+			GameHost::trace( &tr, ent->r.currentOrigin, nullptr, nullptr, ent->tracktarget_->r.currentOrigin, ent->s.number, MASK_PLAYERSOLID, false );
 			if( tr.fraction < 1 && tr.entityNum != ent->tracktarget_->s.number )
 			{
 				Game::loselock(ent);
@@ -250,5 +250,5 @@ void GroundInstallation_Think::execute()
 
 	ent->nextthink_ = theLevel.time_ + 50;
 	ent->s.pos.trTime = theLevel.time_;
-	SV_LinkEntity (ent);
+	GameHost::linkEntity (ent);
 }

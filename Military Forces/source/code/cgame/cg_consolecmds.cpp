@@ -432,7 +432,7 @@ void CGame::scoresDown_f( ) {
 		// the scores are more than two seconds out of data,
 		// so request New ones
 		cg.scoresRequestTime = cg.time;
-		CL_AddReliableCommand( "score" );
+		ClientHost::addReliableCommand( "score" );
 
 		// leave the current scores up if they were already
 		// displayed, but if this is the first hit, clear them out
@@ -466,7 +466,7 @@ void CGame::tellTarget_f( ) {
 
 	CommandSystem::argsBuffer( message, 128 );
 	Com_sprintf( command, 128, "tell %i %s", clientNum, message );
-	CL_AddReliableCommand( command );
+	ClientHost::addReliableCommand( command );
 }
 
 void CGame::tellAttacker_f( ) {
@@ -481,7 +481,7 @@ void CGame::tellAttacker_f( ) {
 
 	CommandSystem::argsBuffer( message, 128 );
 	Com_sprintf( command, 128, "tell %i %s", clientNum, message );
-	CL_AddReliableCommand( command );
+	ClientHost::addReliableCommand( command );
 }
 
 void CGame::testPlane_f( ) {
@@ -741,40 +741,40 @@ void CGame::initConsoleCommands( ) {
 	int		i;
 
 	for ( i = 0 ; i < sizeof( commands ) / sizeof( commands[0] ) ; i++ ) {
-		CL_AddCgameCommand( commands[i].cmd );
+		ClientHost::addCgameCommand( commands[i].cmd );
 	}
 
 	//
 	// the game server will interpret these commands, which will be automatically
 	// forwarded to the server after they are not recognized locally
 	//
-	CL_AddCgameCommand ("kill");
-	CL_AddCgameCommand ("say");
-	CL_AddCgameCommand ("say_team");
-	CL_AddCgameCommand ("tell");
-	CL_AddCgameCommand ("vsay");
-	CL_AddCgameCommand ("vsay_team");
-	CL_AddCgameCommand ("vtell");
-	CL_AddCgameCommand ("vtaunt");
-	CL_AddCgameCommand ("vosay");
-	CL_AddCgameCommand ("vosay_team");
-	CL_AddCgameCommand ("votell");
-	CL_AddCgameCommand ("noclip");
-	CL_AddCgameCommand ("team");
-	CL_AddCgameCommand ("follow");
-	CL_AddCgameCommand ("levelshot");
-	CL_AddCgameCommand ("addbot");
-	CL_AddCgameCommand ("setviewpos");
-	CL_AddCgameCommand ("callvote");
-	CL_AddCgameCommand ("vote");
-	CL_AddCgameCommand ("callteamvote");
-	CL_AddCgameCommand ("teamvote");
-	CL_AddCgameCommand ("stats");
-	CL_AddCgameCommand ("teamtask");
-	CL_AddCgameCommand ("loaddefered");	// spelled wrong, but not changing for demo
-	CL_AddCgameCommand ("contact_tower");
-	CL_AddCgameCommand ("radar");
-	CL_AddCgameCommand ("dev_place");
-	CL_AddCgameCommand ("unlock");
+	ClientHost::addCgameCommand ("kill");
+	ClientHost::addCgameCommand ("say");
+	ClientHost::addCgameCommand ("say_team");
+	ClientHost::addCgameCommand ("tell");
+	ClientHost::addCgameCommand ("vsay");
+	ClientHost::addCgameCommand ("vsay_team");
+	ClientHost::addCgameCommand ("vtell");
+	ClientHost::addCgameCommand ("vtaunt");
+	ClientHost::addCgameCommand ("vosay");
+	ClientHost::addCgameCommand ("vosay_team");
+	ClientHost::addCgameCommand ("votell");
+	ClientHost::addCgameCommand ("noclip");
+	ClientHost::addCgameCommand ("team");
+	ClientHost::addCgameCommand ("follow");
+	ClientHost::addCgameCommand ("levelshot");
+	ClientHost::addCgameCommand ("addbot");
+	ClientHost::addCgameCommand ("setviewpos");
+	ClientHost::addCgameCommand ("callvote");
+	ClientHost::addCgameCommand ("vote");
+	ClientHost::addCgameCommand ("callteamvote");
+	ClientHost::addCgameCommand ("teamvote");
+	ClientHost::addCgameCommand ("stats");
+	ClientHost::addCgameCommand ("teamtask");
+	ClientHost::addCgameCommand ("loaddefered");	// spelled wrong, but not changing for demo
+	ClientHost::addCgameCommand ("contact_tower");
+	ClientHost::addCgameCommand ("radar");
+	ClientHost::addCgameCommand ("dev_place");
+	ClientHost::addCgameCommand ("unlock");
 
 }

@@ -103,9 +103,9 @@ struct InfantryTasks
 		c.bot.vehicle = vehicle;
 		c.direct = true;
 		char userinfo[MAX_INFO_STRING];
-		SV_GetUserinfo( c.ent->s.number, userinfo, sizeof( userinfo ) );
+		GameHost::getUserinfo( c.ent->s.number, userinfo, sizeof( userinfo ) );
 		Info::setValueForKey( userinfo, "cg_nextVehicle", va( "%d", vehicle ) );
-		SV_SetUserinfo( c.ent->s.number, userinfo );
+		GameHost::setUserinfo( c.ent->s.number, userinfo );
 		ClientUserinfoChanged( c.ent->s.number );
 		Cmd_Kill_f( c.ent );
 		return Status::Success;

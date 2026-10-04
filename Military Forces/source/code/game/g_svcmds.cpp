@@ -480,11 +480,11 @@ bool ConsoleCommand()
 	{
 		if (Q_stricmp (cmd, "say") == 0) 
 		{
-			SV_GameSendServerCommand( -1, va("print \"^3Server:^7 %s\"", ConcatArgs(1) ) );
+			GameHost::sendServerCommand( -1, va("print \"^3Server:^7 %s\"", ConcatArgs(1) ) );
 			return true;
 		}
 		// everything else will also be printed as a say command
-		SV_GameSendServerCommand( -1, va("print \"^3Server:^7 %s\"", ConcatArgs(0) ) );
+		GameHost::sendServerCommand( -1, va("print \"^3Server:^7 %s\"", ConcatArgs(0) ) );
 		return true;
 	}
 

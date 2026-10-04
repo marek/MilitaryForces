@@ -263,7 +263,7 @@ void CGame::configStringModified( ) {
 
 	// get the gamestate from the client system, which will have the
 	// New configstring already integrated
-	CL_GetGameState( &cgs.gameState );
+	ClientHost::getGameState( &cgs.gameState );
 
 	// look up the individual string that was modified
 	str = CGame::configString( num );
@@ -613,7 +613,7 @@ void CGame::executeNewServerCommands( int latestSequence )
 {
 	while ( cgs.serverCommandSequence < latestSequence ) 
 	{
-		if ( CL_GetServerCommand( ++cgs.serverCommandSequence ) ) 
+		if ( ClientHost::getServerCommand( ++cgs.serverCommandSequence ) ) 
 			CGame::serverCommand();
 	}
 }

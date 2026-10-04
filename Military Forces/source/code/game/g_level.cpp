@@ -137,7 +137,7 @@ LevelLocals::removeEntity(GameEntity* entToRemove)
 {
 	// unlink if necessary
 	if ( entToRemove->r.linked ) 
-		SV_UnlinkEntity( entToRemove );
+		GameHost::unlinkEntity( entToRemove );
 
 	// player ents stay there, but empty
 	if( entToRemove->client_ )
@@ -287,7 +287,7 @@ LevelLocals::setEntityFromSpawnFields( GameEntity* ent, SpawnFieldHolder* sfh )
 void
 LevelLocals::setServerGameData()
 {
-	SV_LocateGameData( &gameEntities_, &clients_ );
+	GameHost::locateGameData( &gameEntities_, &clients_ );
 }
 
 GameEntity*

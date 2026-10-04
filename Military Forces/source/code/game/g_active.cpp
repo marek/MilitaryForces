@@ -238,7 +238,7 @@ void	Game::touchTriggers( GameEntity *ent )
 	VectorAdd( ent->client_->ps_.origin, range, maxs );
 
 	int	touch[MAX_GENTITIES];
-	int num = SV_AreaEntities( mins, maxs, touch, MAX_GENTITIES );
+	int num = GameHost::areaEntities( mins, maxs, touch, MAX_GENTITIES );
 
 	// can't use ent->absmin, because that has a one unit pad
 	VectorAdd( ent->client_->ps_.origin, ent->r.mins, mins );
@@ -263,7 +263,7 @@ void	Game::touchTriggers( GameEntity *ent )
 		} 
 		else 
 		{
-			if( !SV_EntityContact( mins, maxs, hit, false ) ) 
+			if( !GameHost::entityContact( mins, maxs, hit, false ) ) 
 				continue;
 		}
 
@@ -297,8 +297,8 @@ void NotSelectedThink( GameEntity *ent, usercmd_t *ucmd )
 	pm.ps = &client->ps_;
 	pm.cmd = *ucmd;
 	pm.tracemask = MASK_PLAYERSOLID & ~CONTENTS_BODY;	// spectators can fly through bodies
-	pm.trace = SV_Trace;
-	pm.pointcontents = SV_PointContents;
+	pm.trace = GameHost::trace;
+	pm.pointcontents = GameHost::pointContents;
 
 	// perform a pmove
 	Pmove (&pm);
@@ -306,7 +306,7 @@ void NotSelectedThink( GameEntity *ent, usercmd_t *ucmd )
 //	VectorCopy( client->ps.origin, ent->s.origin );
 
 	Game::touchTriggers( ent );
-	SV_UnlinkEntity( ent );
+	GameHost::unlinkEntity( ent );
 
 	client->oldbuttons_ = client->buttons_;
 	client->buttons_ = ucmd->buttons;
@@ -338,8 +338,8 @@ void SpectatorThink( GameEntity *ent, usercmd_t *ucmd )
 		pm.ps = &client->ps_;
 		pm.cmd = *ucmd;
 		pm.tracemask = MASK_PLAYERSOLID & ~CONTENTS_BODY;	// spectators can fly through bodies
-		pm.trace = SV_Trace;
-		pm.pointcontents = SV_PointContents;
+		pm.trace = GameHost::trace;
+		pm.pointcontents = GameHost::pointContents;
 
 		// perform a pmove
 		pm.vehicle = -1;
@@ -348,7 +348,7 @@ void SpectatorThink( GameEntity *ent, usercmd_t *ucmd )
 		VectorCopy( client->ps_.origin, ent->s.origin );
 
 		Game::touchTriggers( ent );
-		SV_UnlinkEntity( ent );
+		GameHost::unlinkEntity( ent );
 	}
 
 	client->oldbuttons_ = client->buttons_;
@@ -382,8 +382,8 @@ void MissionEditorThink( GameEntity *ent, usercmd_t *ucmd )
 		pm.ps = &client->ps_;
 		pm.cmd = *ucmd;
 		pm.tracemask = MASK_PLAYERSOLID & ~CONTENTS_BODY;	// spectators can fly through bodies
-		pm.trace = SV_Trace;
-		pm.pointcontents = SV_PointContents;
+		pm.trace = GameHost::trace;
+		pm.pointcontents = GameHost::pointContents;
 
 		// perform a pmove
 		pm.vehicle = -1;
@@ -392,7 +392,7 @@ void MissionEditorThink( GameEntity *ent, usercmd_t *ucmd )
 		VectorCopy( client->ps_.origin, ent->s.origin );
 
 		Game::touchTriggers( ent );
-		SV_UnlinkEntity( ent );
+		GameHost::unlinkEntity( ent );
 	}
 
 	client->oldbuttons_ = client->buttons_;
@@ -427,14 +427,14 @@ bool ClientInactivityTimer( GameClient *client )
 	{
 		if( theLevel.time_ > client->inactivityTime_ )
 		{
-			SV_GameDropClient( client->ps_.clientNum,// client - theLevel.clients_, 
+			GameHost::dropClient( client->ps_.clientNum,// client - theLevel.clients_, 
 							   "Dropped due to inactivity" );
 			return false;
 		}
 		if( theLevel.time_ > client->inactivityTime_ - 10000 && !client->inactivityWarning_ ) 
 		{
 			client->inactivityWarning_ = true;
-			SV_GameSendServerCommand( client->ps_.clientNum,//client - level.clients, 
+			GameHost::sendServerCommand( client->ps_.clientNum,//client - level.clients, 
 									  "cp \"Ten seconds until inactivity drop!\n\"" );
 		}
 	}
@@ -684,7 +684,7 @@ void Game::riderEndFrame( GameEntity *ent )
 	ent->s.seat = client->sess_.seat_;
 	ent->r.contents = 0;
 	ent->takedamage_ = false;
-	SV_UnlinkEntity( ent );
+	GameHost::unlinkEntity( ent );
 }
 
 /*
@@ -883,8 +883,8 @@ void ClientThink_real( GameEntity *ent )
 	else 
 		pm.tracemask = MASK_PLAYERSOLID;
 
-	pm.trace = SV_Trace;
-	pm.pointcontents = SV_PointContents;
+	pm.trace = GameHost::trace;
+	pm.pointcontents = GameHost::pointContents;
 	pm.debugLevel = g_debugMove.integer;
 
 	pm.pmove_fixed = (pmove_fixed.integer!=0) | client->pers_.pmoveFixed_;
@@ -1001,7 +1001,7 @@ void ClientThink_real( GameEntity *ent )
 	ClientEvents( ent, oldEventSequence );
 
 	// link entity now, after any personal teleporters have been used
-	SV_LinkEntity( ent );
+	GameHost::linkEntity( ent );
 	if( !ent->client_->noclip_ ) 
 		Game::touchTriggers( ent );
 
@@ -1055,7 +1055,7 @@ A New command has arrived from the client
 void ClientThink( int clientNum ) 
 {
 	GameEntity *ent = theLevel.getEntity(clientNum);
-	SV_GetUsercmd( clientNum, &ent->client_->pers_.cmd_ );
+	GameHost::getUsercmd( clientNum, &ent->client_->pers_.cmd_ );
 
 	// mark the time we got info, so we can display the
 	// phone jack if they don't get any for a while

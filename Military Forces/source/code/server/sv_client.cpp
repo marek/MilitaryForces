@@ -655,7 +655,7 @@ void SV_Client::drop( const char *reason )
 	}
 
 	// nuke user info
-	SV_SetUserinfo( this->clientNum_, "" );
+	GameHost::setUserinfo( this->clientNum_, "" );
 
 	// if this was the last client on the server, send a heartbeat
 	// to the master so it is known the server is empty

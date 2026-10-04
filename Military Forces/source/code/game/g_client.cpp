@@ -89,7 +89,7 @@ bool SpotWouldTelefrag( GameEntity *spot )
 		mins[i] -= 100;
 		maxs[i] += 100;
 	}
-	int num = SV_AreaEntities( mins, maxs, touch, MAX_GENTITIES );
+	int num = GameHost::areaEntities( mins, maxs, touch, MAX_GENTITIES );
 
 	for( int i=0 ; i<num ; i++ )
 	{
@@ -120,7 +120,7 @@ bool SpotWouldTelefrag( GameEntity *spot, int vehicle, bool *freshOccupant )
 	}
 	mins[2] -= 300;
 	maxs[2] += 700;
-	int num = SV_AreaEntities( mins, maxs, touch, MAX_GENTITIES );
+	int num = GameHost::areaEntities( mins, maxs, touch, MAX_GENTITIES );
 
 	for( int i=0 ; i<num ; i++ )
 	{
@@ -655,7 +655,7 @@ void ClientUserinfoChanged( int clientNum )
 	GameClient* client = theLevel.getClient(clientNum);
 
 	char	userinfo[MAX_INFO_STRING];
-	SV_GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
+	GameHost::getUserinfo( clientNum, userinfo, sizeof( userinfo ) );
 
 	// check for malformed or illegal info strings
 	if( !Info::validate(userinfo) ) 
@@ -689,7 +689,7 @@ void ClientUserinfoChanged( int clientNum )
 	{
 		if( strcmp( oldname, client->pers_.netname_ ) ) 
 		{
-			SV_GameSendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " renamed to %s\n\"", oldname, 
+			GameHost::sendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " renamed to %s\n\"", oldname, 
 				client->pers_.netname_) );
 		}
 	}
@@ -815,7 +815,7 @@ void ClientUserinfoChanged( int clientNum )
 			vehicle, nextVehicle, client->advancedControls_ , client->sess_.paintTeam_, client->ruseBlown_ ? 1 : 0 ); // MFQ3: send current/next vehicle indexes
 	//}
 
-	SV_SetConfigstring( CS_PLAYERS+clientNum, s );
+	GameHost::setConfigstring( CS_PLAYERS+clientNum, s );
 
 	Game::logPrintf( "ClientUserinfoChanged: %i %s\n", clientNum, s );
 }
@@ -828,7 +828,7 @@ Called when a player drops from the server.
 Will not be called between levels.
 
 This should NOT be called directly by any game logic,
-call SV_GameDropClient(), which will call this and do
+call GameHost::dropClient(), which will call this and do
 server system housekeeping.
 ============
 */
@@ -873,7 +873,7 @@ void ClientDisconnect( int clientNum )
 		ClientUserinfoChanged( theLevel.sortedClients_[0] );
 	}
 
-	SV_UnlinkEntity( ent );
+	GameHost::unlinkEntity( ent );
 	ent->s.modelindex = 0;
 	ent->inuse_ = false;
 	ent->classname_ = "disconnected";
@@ -881,7 +881,7 @@ void ClientDisconnect( int clientNum )
 	ent->client_->ps_.persistant[PERS_TEAM] = ClientBase::TEAM_FREE;
 	ent->client_->sess_.sessionTeam_ = ClientBase::TEAM_FREE;
 
-	SV_SetConfigstring( CS_PLAYERS + clientNum, "");
+	GameHost::setConfigstring( CS_PLAYERS + clientNum, "");
 
 	CalculateRanks();
 

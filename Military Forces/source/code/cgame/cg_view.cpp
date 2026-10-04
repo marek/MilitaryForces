@@ -674,7 +674,7 @@ void CGame::drawActiveFrame( int serverTime, stereoFrame_t stereoView, bool demo
 	}
 
 	// let the client system know what our weapon and zoom settings are
-	CL_SetUserCmdValue( cg.weaponSelect, cg.zoomSensitivity );
+	ClientHost::setUserCmdValue( cg.weaponSelect, cg.zoomSensitivity );
 
 	// this counter will be bumped for every valid scene we generate
 	cg.clientFrame++;

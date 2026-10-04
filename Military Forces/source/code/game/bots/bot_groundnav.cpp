@@ -101,7 +101,7 @@ GroundNav::Kind GroundNav::evaluate( int cell, float referenceHeight )
 	vec3_t top = { mins_.x() + (x + 0.5f) * cellSize_, mins_.y() + (y + 0.5f) * cellSize_, referenceHeight + 260.0f };
 	vec3_t bottom = { top[0], top[1], referenceHeight - 700.0f };
 	trace_t tr;
-	SV_Trace( &tr, top, nullptr, nullptr, bottom, ENTITYNUM_NONE, MASK_SOLID|MASK_WATER, false );
+	GameHost::trace( &tr, top, nullptr, nullptr, bottom, ENTITYNUM_NONE, MASK_SOLID|MASK_WATER, false );
 	if( tr.startsolid || tr.fraction >= 1.0f )
 	{
 		kind_[cell] = Blocked;
@@ -129,7 +129,7 @@ bool GroundNav::passable( int from, int to, Kind wanted )
 		a[2] += 30;
 		b[2] += 30;
 		trace_t tr;
-		SV_Trace( &tr, a, boxMins, boxMaxs, b, ENTITYNUM_NONE, MASK_SOLID, false );
+		GameHost::trace( &tr, a, boxMins, boxMaxs, b, ENTITYNUM_NONE, MASK_SOLID, false );
 		edgeKnown[from] |= bit;
 		if( tr.startsolid || tr.fraction >= 1.0f )
 			edgeOpen[from] |= bit;
@@ -165,7 +165,7 @@ bool GroundNav::lineOpen( const Vec3& a, const Vec3& b, Kind wanted )
 	from[2] += 30;
 	to[2] += 30;
 	trace_t tr;
-	SV_Trace( &tr, from, boxMins, boxMaxs, to, ENTITYNUM_NONE, MASK_SOLID, false );
+	GameHost::trace( &tr, from, boxMins, boxMaxs, to, ENTITYNUM_NONE, MASK_SOLID, false );
 	return tr.startsolid || tr.fraction >= 1.0f;
 }
 

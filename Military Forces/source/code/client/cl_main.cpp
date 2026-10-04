@@ -222,7 +222,7 @@ void Client::updateVoipIgnore(const char *idstr, bool ignore)
 		const int id = atoi(idstr);
 		if ((id >= 0) && (id < MAX_CLIENTS)) {
 			clc.voipIgnore[id] = ignore;
-			CL_AddReliableCommand(va("voip %s %d",
+			ClientHost::addReliableCommand(va("voip %s %d",
 			                         ignore ? "ignore" : "unignore", id), false);
 			Common::printf("VoIP: %s ignoring player #%d\n",
 			            ignore ? "Now" : "No longer", id);
@@ -284,11 +284,11 @@ void Client::voip_f( )
 		}
 	} else if (strcmp(cmd, "muteall") == 0) {
 		Common::printf("VoIP: muting incoming voice\n");
-		CL_AddReliableCommand("voip muteall", false);
+		ClientHost::addReliableCommand("voip muteall", false);
 		clc.voipMuteAll = true;
 	} else if (strcmp(cmd, "unmuteall") == 0) {
 		Common::printf("VoIP: unmuting incoming voice\n");
-		CL_AddReliableCommand("voip unmuteall", false);
+		ClientHost::addReliableCommand("voip unmuteall", false);
 		clc.voipMuteAll = false;
 	} else {
 		Common::printf("usage: voip [un]ignore <playerID#>\n"
@@ -570,13 +570,13 @@ CLIENT RELIABLE COMMAND COMMUNICATION
 
 /*
 ======================
-CL_AddReliableCommand
+ClientHost::addReliableCommand
 
 The given command will be transmitted to the server, and is guaranteed to
 not have future usercmd_t executed before it is executed
 ======================
 */
-void CL_AddReliableCommand(const char *cmd, bool isDisconnectCmd)
+void ClientHost::addReliableCommand(const char *cmd, bool isDisconnectCmd)
 {
 	int unacknowledged = clc.reliableSequence - clc.reliableAcknowledge;
 	
@@ -1439,7 +1439,7 @@ void CL_Disconnect( bool showMainMenu ) {
 	// send a disconnect message to the server
 	// send it a few times in case one is dropped
 	if ( clc.state >= CA_CONNECTED ) {
-		CL_AddReliableCommand("disconnect", true);
+		ClientHost::addReliableCommand("disconnect", true);
 		Client::writePacket();
 		Client::writePacket();
 		Client::writePacket();
@@ -1508,9 +1508,9 @@ void CL_ForwardCommandToServer( const char *string ) {
 	}
 
 	if ( CommandSystem::argc() > 1 ) {
-		CL_AddReliableCommand(string, false);
+		ClientHost::addReliableCommand(string, false);
 	} else {
-		CL_AddReliableCommand(cmd, false);
+		ClientHost::addReliableCommand(cmd, false);
 	}
 }
 
@@ -1654,7 +1654,7 @@ void CL_ForwardToServer_f( ) {
 	
 	// don't forward the first argument
 	if ( CommandSystem::argc() > 1 ) {
-		CL_AddReliableCommand(CommandSystem::args(), false);
+		ClientHost::addReliableCommand(CommandSystem::args(), false);
 	}
 }
 
@@ -1906,7 +1906,7 @@ void CL_SendPureChecksums( ) {
 	// if we are pure we need to send back a command with our referenced pk3 checksums
 	Com_sprintf(cMsg, sizeof(cMsg), "cp %d %s", cl.serverId, FileSystem::referencedPakPureChecksums());
 
-	CL_AddReliableCommand(cMsg, false);
+	ClientHost::addReliableCommand(cMsg, false);
 }
 
 /*
@@ -1915,7 +1915,7 @@ CL_ResetPureClientAtServer
 =================
 */
 void CL_ResetPureClientAtServer( ) {
-	CL_AddReliableCommand("vdr", false);
+	ClientHost::addReliableCommand("vdr", false);
 }
 
 /*
@@ -2112,7 +2112,7 @@ void CL_DownloadsComplete( ) {
 		FileSystem::restart(clc.checksumFeed); // We possibly downloaded a pak, restart the file system to load it
 
 		// inform the server so we get new gamestate info
-		CL_AddReliableCommand("donedl", false);
+		ClientHost::addReliableCommand("donedl", false);
 
 		// by sending the donedl command we request a new gamestate
 		// so we don't want to load stuff yet
@@ -2180,7 +2180,7 @@ game directory.
 =================
 */
 void Client::beginDownload( const char *remoteName ) {
-	CL_AddReliableCommand(va("download %s", remoteName), false);
+	ClientHost::addReliableCommand(va("download %s", remoteName), false);
 }
 
 #ifdef USE_HTTP
@@ -2210,7 +2210,7 @@ void Client::beginHttpDownload( const char *remoteURL ) {
 	if(!(clc.sv_allowDownload & DLF_NO_DISCONNECT) &&
 		!clc.disconnectedForHttpDownload) {
 
-		CL_AddReliableCommand("disconnect", true);
+		ClientHost::addReliableCommand("disconnect", true);
 		Client::writePacket();
 		Client::writePacket();
 		Client::writePacket();
@@ -2953,7 +2953,7 @@ void CL_CheckUserinfo( ) {
 	if(CvarSystem::modifiedFlags & CVAR_USERINFO)
 	{
 		CvarSystem::modifiedFlags &= ~CVAR_USERINFO;
-		CL_AddReliableCommand(va("userinfo \"%s\"", CvarSystem::infoString( CVAR_USERINFO ) ), false);
+		ClientHost::addReliableCommand(va("userinfo \"%s\"", CvarSystem::infoString( CVAR_USERINFO ) ), false);
 	}
 }
 
@@ -3528,7 +3528,7 @@ void CL_Sayto_f( ) {
 		p[strlen(p)-1] = 0;
 	}
 
-	CL_AddReliableCommand(va("tell %i \"%s\"", clientNum, p ), false);
+	ClientHost::addReliableCommand(va("tell %i \"%s\"", clientNum, p ), false);
 }
 
 /*

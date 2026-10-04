@@ -84,7 +84,7 @@ struct Use_TargetPrint : public GameEntity::EntityFunc_Use
 	{
 		if( activator->client_ && ( self_->spawnflags_ & 4 ) ) 
 		{
-			SV_GameSendServerCommand( activator->s.number, va("cp \"%s\"", self_->message_ ));
+			GameHost::sendServerCommand( activator->s.number, va("cp \"%s\"", self_->message_ ));
 			return;
 		}
 
@@ -97,7 +97,7 @@ struct Use_TargetPrint : public GameEntity::EntityFunc_Use
 			return;
 		}
 
-		SV_GameSendServerCommand( -1, va("cp \"%s\"", self_->message_ ));
+		GameHost::sendServerCommand( -1, va("cp \"%s\"", self_->message_ ));
 	}
 };
 
@@ -190,7 +190,7 @@ void SP_target_speaker( GameEntity *ent )
 
 	// must link the entity so we get areas and clusters so
 	// the server can determine who to send updates to
-	SV_LinkEntity( ent );
+	GameHost::linkEntity( ent );
 }
 
 
@@ -271,7 +271,7 @@ struct Think_TargetLocationLinkup : public GameEntity::EntityFunc_Think
 
 		theLevel.locationHead_ = nullptr;
 
-		SV_SetConfigstring( CS_LOCATIONS, "unknown" );
+		GameHost::setConfigstring( CS_LOCATIONS, "unknown" );
 
 		for( int i = 1, n = 1; i <= theLevel.num_entities_; i++ ) 
 		{
@@ -280,7 +280,7 @@ struct Think_TargetLocationLinkup : public GameEntity::EntityFunc_Think
 			{
 				// lets overload some variables!
 				self_->health_ = n; // use for location marking
-				SV_SetConfigstring( CS_LOCATIONS + n, self_->message_ );
+				GameHost::setConfigstring( CS_LOCATIONS + n, self_->message_ );
 				n++;
 				self_->nextTrain_ = theLevel.locationHead_;
 				theLevel.locationHead_ = self_;

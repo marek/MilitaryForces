@@ -11,7 +11,7 @@ float Bots::heightAboveGround( const vec3_t origin, int passEntity )
 	vec3_t end;
 	VectorCopy( origin, end );
 	end[2] -= 16000;
-	SV_Trace( &tr, origin, nullptr, nullptr, end, passEntity, MASK_SOLID|MASK_WATER, false );
+	GameHost::trace( &tr, origin, nullptr, nullptr, end, passEntity, MASK_SOLID|MASK_WATER, false );
 	return tr.fraction * 16000.0f;
 }
 
@@ -22,10 +22,10 @@ bool Bots::pathBlocked( const vec3_t origin, const vec3_t dir, float dist, int p
 	if( halfWidth > 0 )
 	{
 		vec3_t mins = { -halfWidth, -halfWidth, -halfWidth * 0.4f }, maxs = { halfWidth, halfWidth, halfWidth * 0.4f };
-		SV_Trace( &tr, origin, mins, maxs, end, passEntity, MASK_PLAYERSOLID|CONTENTS_BOTCLIP, false );
+		GameHost::trace( &tr, origin, mins, maxs, end, passEntity, MASK_PLAYERSOLID|CONTENTS_BOTCLIP, false );
 		return tr.fraction < 1.0f;
 	}
-	SV_Trace( &tr, origin, nullptr, nullptr, end, passEntity, MASK_PLAYERSOLID|CONTENTS_BOTCLIP, false );
+	GameHost::trace( &tr, origin, nullptr, nullptr, end, passEntity, MASK_PLAYERSOLID|CONTENTS_BOTCLIP, false );
 	return tr.fraction < 1.0f;
 }
 
@@ -35,14 +35,14 @@ float Bots::ceilingAbove( const vec3_t origin, int passEntity )
 	vec3_t end;
 	VectorCopy( origin, end );
 	end[2] += 8000;
-	SV_Trace( &tr, origin, nullptr, nullptr, end, passEntity, MASK_PLAYERSOLID|CONTENTS_BOTCLIP, false );
+	GameHost::trace( &tr, origin, nullptr, nullptr, end, passEntity, MASK_PLAYERSOLID|CONTENTS_BOTCLIP, false );
 	return tr.fraction * 8000.0f;
 }
 
 bool Bots::visible( GameEntity* ent, const vec3_t from, GameEntity* target )
 {
 	trace_t tr;
-	SV_Trace( &tr, from, nullptr, nullptr, target->r.currentOrigin, ent->s.number, MASK_SOLID, false );
+	GameHost::trace( &tr, from, nullptr, nullptr, target->r.currentOrigin, ent->s.number, MASK_SOLID, false );
 	return tr.fraction >= 1.0f || tr.entityNum == target->s.number;
 }
 
@@ -134,7 +134,7 @@ bool Bots::runwayAt( const vec3_t point, float* surface )
 	VectorCopy( point, end );
 	end[2] -= 140;
 	trace_t tr;
-	SV_Trace( &tr, start, nullptr, nullptr, end, ENTITYNUM_NONE, MASK_SOLID, false );
+	GameHost::trace( &tr, start, nullptr, nullptr, end, ENTITYNUM_NONE, MASK_SOLID, false );
 	if( tr.fraction >= 1.0f || tr.entityNum <= ENTITYNUM_WORLD )
 		return false;
 	GameEntity* ground = theLevel.getEntity( tr.entityNum );
@@ -204,7 +204,7 @@ void Bots::buildPads()
 		VectorCopy( start, end );
 		end[2] -= 600;
 		trace_t tr;
-		SV_Trace( &tr, start, nullptr, nullptr, end, ENTITYNUM_NONE, MASK_SOLID, false );
+		GameHost::trace( &tr, start, nullptr, nullptr, end, ENTITYNUM_NONE, MASK_SOLID, false );
 		if( tr.fraction < 1.0f )
 		{
 			pad.z = tr.endpos[2];
@@ -281,7 +281,7 @@ bool Bots::findHidePoint( GameEntity* ent, State& bot, GameEntity* threat, bool 
 			VectorCopy( point, down );
 			down[2] -= 2000;
 			trace_t tr;
-			SV_Trace( &tr, point, nullptr, nullptr, down, ent->s.number, MASK_SOLID|MASK_WATER, false );
+			GameHost::trace( &tr, point, nullptr, nullptr, down, ent->s.number, MASK_SOLID|MASK_WATER, false );
 			if( tr.startsolid || tr.fraction >= 1.0f || (tr.contents & MASK_WATER) )
 				continue;
 			VectorCopy( tr.endpos, point );
@@ -441,7 +441,7 @@ void Bots::pickGoal( GameEntity* ent, State& bot, float radius )
 				vec3_t probe;
 				VectorCopy( bot.goal, probe );
 				probe[2] = ent->r.currentOrigin[2] - 6;
-				if( SV_PointContents( probe, ent->s.number ) & MASK_WATER )
+				if( GameHost::pointContents( probe, ent->s.number ) & MASK_WATER )
 					break;
 				const float a = random() * 2.0f * std::numbers::pi_v<float>;
 				const float d = radius * (0.2f + 0.8f * random());

@@ -104,11 +104,11 @@ void SV_Client::updateConfigstrings()
 
 /*
 ===============
-SV_SetConfigstring
+GameHost::setConfigstring
 
 ===============
 */
-void SV_SetConfigstring( int index, const char *val ) 
+void GameHost::setConfigstring( int index, const char *val ) 
 {
 	if( index < 0 || index >= MAX_CONFIGSTRINGS ) 
 		Common::error (ERR_DROP, "SV_SetConfigstring: bad index %i\n", index);
@@ -156,11 +156,11 @@ void SV_SetConfigstring( int index, const char *val )
 
 /*
 ===============
-SV_GetConfigstring
+GameHost::getConfigstring
 
 ===============
 */
-void SV_GetConfigstring( int index, char *buffer, int bufferSize ) 
+void GameHost::getConfigstring( int index, char *buffer, int bufferSize ) 
 {
 	if ( bufferSize < 1 )
 	{
@@ -182,11 +182,11 @@ void SV_GetConfigstring( int index, char *buffer, int bufferSize )
 
 /*
 ===============
-SV_SetUserinfo
+GameHost::setUserinfo
 
 ===============
 */
-void SV_SetUserinfo( int index, const char *val ) 
+void GameHost::setUserinfo( int index, const char *val ) 
 {
 	if( index < 1 || index > sv_maxclients->integer ) 
 	{
@@ -206,11 +206,11 @@ void SV_SetUserinfo( int index, const char *val )
 
 /*
 ===============
-SV_GetUserinfo
+GameHost::getUserinfo
 
 ===============
 */
-void SV_GetUserinfo( int index, char *buffer, int bufferSize ) 
+void GameHost::getUserinfo( int index, char *buffer, int bufferSize ) 
 {
 	if( bufferSize < 1 ) 
 		Common::error( ERR_DROP, "SV_GetUserinfo: bufferSize == %i", bufferSize );
@@ -609,9 +609,9 @@ void ServerMain::spawnServer( char *server, bool killBots )
 	// save systeminfo and serverinfo strings
 	Q_strncpyz( systemInfo, CvarSystem::infoString_Big( CVAR_SYSTEMINFO ), sizeof( systemInfo ) );
 	CvarSystem::modifiedFlags &= ~CVAR_SYSTEMINFO;
-	SV_SetConfigstring( CS_SYSTEMINFO, systemInfo );
+	GameHost::setConfigstring( CS_SYSTEMINFO, systemInfo );
 
-	SV_SetConfigstring( CS_SERVERINFO, CvarSystem::infoString( CVAR_SERVERINFO ) );
+	GameHost::setConfigstring( CS_SERVERINFO, CvarSystem::infoString( CVAR_SERVERINFO ) );
 	CvarSystem::modifiedFlags &= ~CVAR_SERVERINFO;
 
 	// any media configstring setting now should issue a warning

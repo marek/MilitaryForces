@@ -89,12 +89,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /*
 ===============
-SV_GameSendServerCommand
+GameHost::sendServerCommand
 
 Sends a command string to a client
 ===============
 */
-void SV_GameSendServerCommand( int clientNum, const char *text ) 
+void GameHost::sendServerCommand( int clientNum, const char *text ) 
 {
 	if ( clientNum == -1 ) 
 	{
@@ -112,12 +112,12 @@ void SV_GameSendServerCommand( int clientNum, const char *text )
 
 /*
 ===============
-SV_GameDropClient
+GameHost::dropClient
 
 Disconnects the client with a message
 ===============
 */
-void SV_GameDropClient( int clientNum, const char *reason ) 
+void GameHost::dropClient( int clientNum, const char *reason ) 
 {
 	if ( clientNum < 1 || clientNum > sv_maxclients->integer || !theSVS.svClients_.at(clientNum) ) 
 		return;
@@ -128,12 +128,12 @@ void SV_GameDropClient( int clientNum, const char *reason )
 
 /*
 =================
-SV_SetBrushModel
+GameHost::setBrushModel
 
 sets mins and maxs for inline bmodels
 =================
 */
-void SV_SetBrushModel( EntityBase* gameEnt, const char *name ) 
+void GameHost::setBrushModel( EntityBase* gameEnt, const char *name ) 
 {
 	clipHandle_t	h;
 	vec3_t			mins, maxs;
@@ -154,19 +154,19 @@ void SV_SetBrushModel( EntityBase* gameEnt, const char *name )
 
 	gameEnt->r.contents = -1;		// we don't know exactly what is in the brushes
 
-	SV_LinkEntity( gameEnt );		// FIXME: remove
+	GameHost::linkEntity( gameEnt );		// FIXME: remove
 }
 
 
 
 /*
 =================
-SV_inPVS
+GameHost::inPVS
 
 Also checks portalareas so that doors block sight
 =================
 */
-bool SV_inPVS (const vec3_t p1, const vec3_t p2)
+bool GameHost::inPVS (const vec3_t p1, const vec3_t p2)
 {
 	int		leafnum;
 	int		cluster;
@@ -221,10 +221,10 @@ bool ServerMain::inPVSIgnorePortals( const vec3_t p1, const vec3_t p2)
 
 /*
 ========================
-SV_AdjustAreaPortalState
+GameHost::adjustAreaPortalState
 ========================
 */
-void SV_AdjustAreaPortalState( EntityBase* gameEnt, int open ) 
+void GameHost::adjustAreaPortalState( EntityBase* gameEnt, int open ) 
 {
 	SV_Entity	*svEnt;
 
@@ -241,7 +241,7 @@ void SV_AdjustAreaPortalState( EntityBase* gameEnt, int open )
 SV_GameAreaEntities
 ==================
 */
-bool SV_EntityContact( const vec3_t mins, const vec3_t maxs, EntityBase* gameEnt, bool capsule ) 
+bool GameHost::entityContact( const vec3_t mins, const vec3_t maxs, EntityBase* gameEnt, bool capsule ) 
 {
 	const float		*origin, *angles;
 	clipHandle_t	ch;
@@ -261,11 +261,11 @@ bool SV_EntityContact( const vec3_t mins, const vec3_t maxs, EntityBase* gameEnt
 
 /*
 ===============
-SV_GetServerinfo
+GameHost::getServerinfo
 
 ===============
 */
-void SV_GetServerinfo( char *buffer, int bufferSize ) 
+void GameHost::getServerinfo( char *buffer, int bufferSize ) 
 {
 	if ( bufferSize < 1 ) {
 		Common::error( ERR_DROP, "SV_GetServerinfo: bufferSize == %i", bufferSize );
@@ -275,13 +275,13 @@ void SV_GetServerinfo( char *buffer, int bufferSize )
 
 /*
 ===============
-SV_LocateGameData
+GameHost::locateGameData
 
 ===============
 */
-void SV_LocateGameData( std::vector<EntityBase*>* gameEntities, 
+void GameHost::locateGameData( std::vector<EntityBase*>* gameEntities, 
 					    std::vector<ClientBase*>* gameClients )
-//void SV_LocateGameData( void* gEnts, int numGEntities, int sizeofGEntity_t,
+//void GameHost::locateGameData( void* gEnts, int numGEntities, int sizeofGEntity_t,
 //					   playerState_t *clients, int sizeofGameClient ) 
 {
 	theSV.setGameData( gameEntities, gameClients );
@@ -292,11 +292,11 @@ void SV_LocateGameData( std::vector<EntityBase*>* gameEntities,
 
 /*
 ===============
-SV_GetUsercmd
+GameHost::getUsercmd
 
 ===============
 */
-void SV_GetUsercmd( int clientNum, usercmd_t *cmd ) 
+void GameHost::getUsercmd( int clientNum, usercmd_t *cmd ) 
 {
 	if ( clientNum < 1 || clientNum > sv_maxclients->integer || !theSVS.svClients_.at(clientNum) ) 
 	{

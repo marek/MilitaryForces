@@ -241,7 +241,7 @@ void CGame::drawOldTourneyScoreboard( ) {
 	// request more scores regularly
 	if ( cg.scoresRequestTime + 2000 < cg.time ) {
 		cg.scoresRequestTime = cg.time;
-		CL_AddReliableCommand( "score" );
+		ClientHost::addReliableCommand( "score" );
 	}
 
 	color[0] = 1;

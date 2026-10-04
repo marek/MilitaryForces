@@ -261,7 +261,7 @@ void ServerMain::mapRestart_f()
 	if( delay && !CvarSystem::variableValue("g_doWarmup") ) 
 	{
 		theSV.restartTime_ = theSV.time_ + delay * 1000;
-		SV_SetConfigstring( CS_WARMUP, va("%i", theSV.restartTime_) );
+		GameHost::setConfigstring( CS_WARMUP, va("%i", theSV.restartTime_) );
 		return;
 	}
 

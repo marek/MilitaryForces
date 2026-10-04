@@ -44,7 +44,7 @@ void Bots::logDeath( GameEntity* self, GameEntity* attacker, int meansOfDeath )
 		static_cast<int>( bot.desire ), theLevel.time_ - bot.spawnTime, self->health_, self->r.currentOrigin[0], self->r.currentOrigin[1], self->r.currentOrigin[2],
 		ps.velocity[0], ps.velocity[1], ps.velocity[2], ps.speed, ps.vehicleAngles[PITCH], ps.vehicleAngles[ROLL], ps.vehicleAngles[YAW],
 		heightAboveGround( self->r.currentOrigin, self->s.number ), ceilingAbove( self->r.currentOrigin, self->s.number ),
-		(SV_PointContents( below, self->s.number ) & MASK_WATER) != 0, ps.ONOFF, ps.fixed_throttle, ps.stats[STAT_FUEL],
+		(GameHost::pointContents( below, self->s.number ) & MASK_WATER) != 0, ps.ONOFF, ps.fixed_throttle, ps.stats[STAT_FUEL],
 		bot.enemy, enemy ? Distance( enemy->r.currentOrigin, self->r.currentOrigin ) : -1.0f, theLevel.time_ < bot.avoidTime, theLevel.time_ < bot.egressTime,
 		bot.landPhase, bot.pad, ahead.fraction * 600.0f - 100.0f, ahead.fraction < 1.0f ? ahead.entityNum : -1, hit && hit->classname_ ? hit->classname_ : "-",
 		ahead.plane.normal[2], nearestNum, nearest );

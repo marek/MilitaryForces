@@ -28,6 +28,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../qcommon/qcommon.h"
 #include "../renderercommon/tr_public.h"
 #include "../ui/ui_public.h"
+#include "../qcommon/client_host.h"
 #include "keys.h"
 #include "snd_public.h"
 #include "../cgame/cg_public.h"
@@ -196,7 +197,7 @@ struct clientConnection_t {
 
 	// reliable messages received from server
 	int			serverCommandSequence;
-	int			lastExecutedServerCommand;		// last server command grabbed or executed with CL_GetServerCommand
+	int			lastExecutedServerCommand;		// last server command grabbed or executed with ClientHost::getServerCommand
 	char		serverCommands[MAX_RELIABLE_COMMANDS][MAX_STRING_CHARS];
 
 	// file transfer from server
@@ -465,7 +466,6 @@ inline constexpr int VOIP_MAX_PACKET_FRAMES = 3;
 //
 
 void CL_Init ();
-void CL_AddReliableCommand(const char *cmd, bool isDisconnectCmd = false);
 
 void CL_StartHunkUsers( bool rendererOnly );
 

@@ -112,7 +112,7 @@ void updateTargetTracking( GameEntity *ent )
 	if( !ent->tracktarget_ ) 
 	{
 		VectorMA( ent->r.currentOrigin, radarrange, forward, endpos );
-		SV_Trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, endpos, ent->s.number, MASK_ALL, false );
+		GameHost::trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, endpos, ent->s.number, MASK_ALL, false );
 		// nothing found
 		if( tr.entityNum == ENTITYNUM_NONE ) 
 			return;
@@ -219,7 +219,7 @@ void updateTargetTracking( GameEntity *ent )
 			
 		// check LOS
 		VectorMA( ent->r.currentOrigin, dist, diff, endpos );
-		SV_Trace( &tr, ent->r.currentOrigin, nullptr, nullptr, endpos, ent->s.number, MASK_PLAYERSOLID, false );
+		GameHost::trace( &tr, ent->r.currentOrigin, nullptr, nullptr, endpos, ent->s.number, MASK_PLAYERSOLID, false );
 		if( tr.fraction < 1 && tr.entityNum != ent->s.tracktarget ) 
 		{
 			untrack(ent);

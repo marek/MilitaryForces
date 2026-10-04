@@ -13,8 +13,8 @@ void InitTrigger( GameEntity *self )
 	if( !VectorCompare(self->s.angles, vec3_origin) )
 		Game::setMovedir (self->s.angles, self->movedir_);
 
-	SV_SetBrushModel( self, self->model_ );
-	self->r.contents = CONTENTS_TRIGGER;		// replaces the -1 from SV_SetBrushModel
+	GameHost::setBrushModel( self, self->model_ );
+	self->r.contents = CONTENTS_TRIGGER;		// replaces the -1 from GameHost::setBrushModel
 	self->r.svFlags = SVF_NOCLIENT;
 }
 
@@ -109,7 +109,7 @@ void SP_trigger_multiple( GameEntity *ent )
 	ent->setUse( std::make_unique<Use_MultiUse>());
 
 	InitTrigger( ent );
-	SV_LinkEntity( ent );
+	GameHost::linkEntity( ent );
 }
 
 

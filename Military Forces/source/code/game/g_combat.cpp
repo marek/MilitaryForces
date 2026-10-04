@@ -406,7 +406,7 @@ bool CanDamage( GameEntity* targ, vec3_t origin )
 	VectorScale (midpoint, 0.5, midpoint);
 
 	VectorCopy (midpoint, dest);
-	SV_Trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID, false);
+	GameHost::trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID, false);
 	if (tr.fraction == 1.0 || tr.entityNum == targ->s.number)
 		return true;
 
@@ -415,28 +415,28 @@ bool CanDamage( GameEntity* targ, vec3_t origin )
 	VectorCopy (midpoint, dest);
 	dest[0] += 15.0;
 	dest[1] += 15.0;
-	SV_Trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID, false);
+	GameHost::trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID, false);
 	if (tr.fraction == 1.0)
 		return true;
 
 	VectorCopy (midpoint, dest);
 	dest[0] += 15.0;
 	dest[1] -= 15.0;
-	SV_Trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID, false);
+	GameHost::trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID, false);
 	if (tr.fraction == 1.0)
 		return true;
 
 	VectorCopy (midpoint, dest);
 	dest[0] -= 15.0;
 	dest[1] += 15.0;
-	SV_Trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID, false);
+	GameHost::trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID, false);
 	if (tr.fraction == 1.0)
 		return true;
 
 	VectorCopy (midpoint, dest);
 	dest[0] -= 15.0;
 	dest[1] -= 15.0;
-	SV_Trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID, false);
+	GameHost::trace ( &tr, origin, vec3_origin, vec3_origin, dest, ENTITYNUM_NONE, MASK_SOLID, false);
 	if (tr.fraction == 1.0)
 		return true;
 
@@ -471,7 +471,7 @@ bool Game::radiusDamage ( vec3_t origin, GameEntity* attacker, float damage, flo
 		maxs[i] = origin[i] + radius;
 	}
 
-	numListedEntities = SV_AreaEntities( mins, maxs, entityList, MAX_GENTITIES );
+	numListedEntities = GameHost::areaEntities( mins, maxs, entityList, MAX_GENTITIES );
 
 	for ( e = 0 ; e < numListedEntities ; e++ ) 
 	{

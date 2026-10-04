@@ -407,9 +407,9 @@ struct HeloTasks
 		}
 		VectorMA( c.ent->r.currentOrigin, reach, dir, end );
 		trace_t tr;
-		SV_Trace( &tr, c.ent->r.currentOrigin, mins, maxs, end, c.ent->s.number, MASK_PLAYERSOLID|CONTENTS_BOTCLIP, false );
+		GameHost::trace( &tr, c.ent->r.currentOrigin, mins, maxs, end, c.ent->s.number, MASK_PLAYERSOLID|CONTENTS_BOTCLIP, false );
 		if( tr.startsolid )
-			SV_Trace( &tr, c.ent->r.currentOrigin, c.veh.mins, c.veh.maxs, end, c.ent->s.number, MASK_PLAYERSOLID|CONTENTS_BOTCLIP, false );
+			GameHost::trace( &tr, c.ent->r.currentOrigin, c.veh.mins, c.veh.maxs, end, c.ent->s.number, MASK_PLAYERSOLID|CONTENTS_BOTCLIP, false );
 		return tr.startsolid ? 0.0f : tr.fraction * reach;
 	}
 

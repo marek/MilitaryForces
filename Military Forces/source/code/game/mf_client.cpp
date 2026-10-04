@@ -45,7 +45,7 @@ char *MF_ClientConnect( int clientNum, bool firstTime, bool isBot )
 		return "MFQ3 IGME in use. Connecting not allowed.";
 
 	char userinfo[MAX_INFO_STRING];
-	SV_GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
+	GameHost::getUserinfo( clientNum, userinfo, sizeof( userinfo ) );
 
 	// check to see if they are on the banned IP list
 	char* value = Info::valueForKey (userinfo, "ip");
@@ -111,7 +111,7 @@ char *MF_ClientConnect( int clientNum, bool firstTime, bool isBot )
 	// init vehicle
 	Info::setValueForKey( userinfo, "cg_vehicle", "-1" );
 	Info::setValueForKey( userinfo, "cg_nextVehicle", "-1" );
-	SV_SetUserinfo( clientNum, userinfo );
+	GameHost::setUserinfo( clientNum, userinfo );
 
 	// get and distribute relevent paramters
 	Game::logPrintf( "MF_ClientConnect: %i\n", clientNum );
@@ -119,7 +119,7 @@ char *MF_ClientConnect( int clientNum, bool firstTime, bool isBot )
 
 	// don't do the "xxx connected" messages if they were caried over from previous level
 	if ( firstTime ) 
-		SV_GameSendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " connected\n\"", client->pers_.netname_) );
+		GameHost::sendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " connected\n\"", client->pers_.netname_) );
 
 	if ( g_gametype.integer >= GT_TEAM &&
 		client->sess_.sessionTeam_ != ClientBase::TEAM_SPECTATOR ) 
@@ -153,7 +153,7 @@ void MF_ClientBegin( int clientNum )
 	//ent = theLevel.getEntity(clientNum);// g_entities + clientNum;
 
 	//if ( ent->r.linked ) 
-	//	SV_UnlinkEntity( ent );
+	//	GameHost::unlinkEntity( ent );
 
 	//ent->init(-1);
 	//ent->client_ = client;
@@ -181,7 +181,7 @@ void MF_ClientBegin( int clientNum )
 	{
 		if ( g_gametype.integer != GT_TOURNAMENT  ) 
 		{
-			SV_GameSendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " entered the game\n\"", client->pers_.netname_) );
+			GameHost::sendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " entered the game\n\"", client->pers_.netname_) );
 		}
 	}
 	Game::logPrintf( "ClientBegin: %i\n", clientNum );
@@ -226,7 +226,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 	//client = ent->client_;
 
 	char userinfo[MAX_INFO_STRING];
-	SV_GetUserinfo( clientNum, userinfo, sizeof(userinfo) );
+	GameHost::getUserinfo( clientNum, userinfo, sizeof(userinfo) );
 
 	// vehicle index for next spawning
 	int vehIndex = atoi( Info::valueForKey( userinfo, "cg_nextVehicle" ) );
@@ -383,7 +383,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 		vec3_t	endpos;
 		VectorCopy( spawn_origin, endpos );
 		endpos[2] -= 512;
-		SV_Trace (&trace, spawn_origin, nullptr, nullptr, endpos, ENTITYNUM_NONE, MASK_WATER, false );
+		GameHost::trace (&trace, spawn_origin, nullptr, nullptr, endpos, ENTITYNUM_NONE, MASK_WATER, false );
 		if( trace.fraction == 1.0f ) 
 		{ 
 			// Check for water if respawning in current location
@@ -466,7 +466,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 		VehicleData::getDefaultLoadoutForVehicle( vehIndex, &ent->loadout_, &ent->client_->ps_ );
 
 		Info::setValueForKey( userinfo, "cg_vehicle", va( "%d", vehIndex ) );
-		SV_SetUserinfo( clientNum, userinfo );
+		GameHost::setUserinfo( clientNum, userinfo );
 		ClientUserinfoChanged( clientNum );
 
 		// cat specific stuff
@@ -479,7 +479,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 			GameEntity *test;
 			VectorCopy( spawn_origin, endpos );
 			endpos[2] -= 128;
-			SV_Trace (&trace, spawn_origin, nullptr, nullptr, endpos, ENTITYNUM_NONE, MASK_SOLID, false );
+			GameHost::trace (&trace, spawn_origin, nullptr, nullptr, endpos, ENTITYNUM_NONE, MASK_SOLID, false );
 			if( trace.entityNum != ENTITYNUM_NONE ) 
 			{
 				test = theLevel.getEntity(trace.entityNum);//&g_entities[trace.entityNum];
@@ -500,7 +500,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 			VectorCopy( spawn_origin, endpos );
 			endpos[2] -= 512;
 
-			SV_Trace (&trace, spawn_origin, nullptr, nullptr, endpos, ENTITYNUM_NONE, MASK_SOLID, false );
+			GameHost::trace (&trace, spawn_origin, nullptr, nullptr, endpos, ENTITYNUM_NONE, MASK_SOLID, false );
 			if( trace.entityNum != ENTITYNUM_NONE ) 
 			{
 				test = theLevel.getEntity(trace.entityNum);// &g_entities[trace.entityNum];
@@ -520,7 +520,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 			VectorCopy( spawn_origin, endpos );
 			endpos[2] -= 512;
 
-			SV_Trace(&trace, spawn_origin, nullptr, nullptr, endpos, ENTITYNUM_NONE, MASK_PLAYERSOLID, false );
+			GameHost::trace(&trace, spawn_origin, nullptr, nullptr, endpos, ENTITYNUM_NONE, MASK_PLAYERSOLID, false );
 			if( trace.entityNum != ENTITYNUM_NONE ) 
 			{
 				test = theLevel.getEntity(trace.entityNum);// &g_entities[trace.entityNum];
@@ -535,7 +535,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 			GameEntity *test;
 			VectorCopy( spawn_origin, endpos );
 			endpos[2] -= 512;
-			SV_Trace(&trace, spawn_origin, nullptr, nullptr, endpos, ENTITYNUM_NONE, MASK_ALL, false );
+			GameHost::trace(&trace, spawn_origin, nullptr, nullptr, endpos, ENTITYNUM_NONE, MASK_ALL, false );
 			if( trace.entityNum != ENTITYNUM_NONE ) 
 			{
 				test = theLevel.getEntity(trace.entityNum);// &g_entities[trace.entityNum];
@@ -626,8 +626,8 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 	// the respawned flag will be cleared after the attack and jump keys come up
 	client->ps_.pm_flags |= PMF_RESPAWNED;
 
-	//SV_GetUsercmd( client - level.clients, &ent->client->pers.cmd );
-	SV_GetUsercmd( client->ps_.clientNum, &ent->client_->pers_.cmd_ );
+	//GameHost::getUsercmd( client - level.clients, &ent->client->pers.cmd );
+	GameHost::getUsercmd( client->ps_.clientNum, &ent->client_->pers_.cmd_ );
 	SetClientViewAngle( ent, spawn_angles );
 
 	if ( ent->client_->sess_.sessionTeam_ == ClientBase::TEAM_SPECTATOR ) 
@@ -646,7 +646,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 		}
 		else if(!(cs_flags & CS_NOKILL))
 			Game::killBox( ent );
-		SV_LinkEntity (ent);
+		GameHost::linkEntity (ent);
 	}
 
 	// reset radar
@@ -689,7 +689,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 	{
 		GameShared::playerStateToEntityState( &client->ps_, &ent->s, true );
 		VectorCopy( ent->client_->ps_.origin, ent->r.currentOrigin );
-		SV_LinkEntity( ent );
+		GameHost::linkEntity( ent );
 	}
 
 	// run the presend to set anything else

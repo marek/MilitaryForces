@@ -142,7 +142,7 @@ VehicleDeathImpl( GameEntity* self, GameEntity* inflictor, GameEntity* attacker,
 	}
 
 	// if client is in a nodrop area, don't drop anything (but return CTF flags!)
-	contents = SV_PointContents( self->r.currentOrigin, -1 );
+	contents = GameHost::pointContents( self->r.currentOrigin, -1 );
 	if ( !( contents & CONTENTS_NODROP )) 
 	{
 		if( g_gametype.integer == GT_CTF ) 
@@ -238,7 +238,7 @@ VehicleDeathImpl( GameEntity* self, GameEntity* inflictor, GameEntity* attacker,
 		self->client_->respawnTime_ = theLevel.time_ + 30000;
 	}
 
-	SV_LinkEntity( self );
+	GameHost::linkEntity( self );
 }
 
 void 

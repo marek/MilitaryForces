@@ -74,10 +74,10 @@ void *BotImport_HunkAlloc( int size )
 
 /*
 ==================
-SV_BotAllocateClient
+GameHost::botAllocateClient
 ==================
 */
-int SV_BotAllocateClient()
+int GameHost::botAllocateClient()
 {
 	int			i;
 	SV_Client	*cl = nullptr;
@@ -110,10 +110,10 @@ int SV_BotAllocateClient()
 
 /*
 ==================
-SV_BotFreeClient
+GameHost::botFreeClient
 ==================
 */
-void SV_BotFreeClient( int clientNum ) 
+void GameHost::botFreeClient( int clientNum ) 
 {
 	if( clientNum < 1 || clientNum > sv_maxclients->integer || !theSVS.svClients_.at(clientNum) ) 
 		Common::error( ERR_DROP, "SV_BotFreeClient: bad clientNum: %i", clientNum );
@@ -125,10 +125,10 @@ void SV_BotFreeClient( int clientNum )
 
 /*
 ==================
-SV_BotUserCommand
+GameHost::botUserCommand
 ==================
 */
-void SV_BotUserCommand( int clientNum, usercmd_t *cmd ) 
+void GameHost::botUserCommand( int clientNum, usercmd_t *cmd ) 
 {
 	if( clientNum < 1 || clientNum > sv_maxclients->integer || !theSVS.svClients_.at(clientNum) ) 
 		return;

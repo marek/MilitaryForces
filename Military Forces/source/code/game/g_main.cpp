@@ -305,7 +305,7 @@ void G_UpdateCvars()
 
 				if( cv->trackChange ) 
 				{
-					SV_GameSendServerCommand( -1, va("print \"Server: %s changed to %s\n\"", 
+					GameHost::sendServerCommand( -1, va("print \"Server: %s changed to %s\n\"", 
 						cv->cvarName, cv->vmCvar->string ) );
 				}
 
@@ -370,7 +370,7 @@ void G_InitGame( int levelTime, int randomSeed )
 		{
 			char serverinfo[MAX_INFO_STRING];
 
-			SV_GetServerinfo( serverinfo, sizeof( serverinfo ) );
+			GameHost::getServerinfo( serverinfo, sizeof( serverinfo ) );
 
 			Game::logPrintf("------------------------------------------------------------\n" );
 			Game::logPrintf("InitGame: %s\n", serverinfo );
@@ -404,9 +404,9 @@ void G_InitGame( int levelTime, int randomSeed )
 	//theLevel.num_entities_ = 0;//MAX_CLIENTS;
 
 	// let the server system know where the entites are
-//	SV_LocateGameData( (void*)level.gentities, level.num_entities, sizeof( gentity_t ), 
+//	GameHost::locateGameData( (void*)level.gentities, level.num_entities, sizeof( gentity_t ), 
 //		&level.clients[0].ps, sizeof( level.clients[0] ) );
-	theLevel.setServerGameData();//	SV_LocateGameData( &theLevel.gameEntities_, &theLevel.clients_ );
+	theLevel.setServerGameData();//	GameHost::locateGameData( &theLevel.gameEntities_, &theLevel.clients_ );
 
 	ClearRegisteredItems();
 
@@ -445,7 +445,7 @@ void G_InitGame( int levelTime, int randomSeed )
 		DroneInit();
 	}
 
-	SV_SetConfigstring( CS_INTERMISSION, "" );
+	GameHost::setConfigstring( CS_INTERMISSION, "" );
 }
 
 
@@ -751,25 +751,25 @@ void CalculateRanks()
 	// set the CS_SCORES1/2 configstrings, which will be visible to everyone
 	if( g_gametype.integer >= GT_TEAM ) 
 	{
-		SV_SetConfigstring( CS_SCORES1, va("%i", theLevel.teamScores_[ClientBase::TEAM_RED] ) );
-		SV_SetConfigstring( CS_SCORES2, va("%i", theLevel.teamScores_[ClientBase::TEAM_BLUE] ) );
+		GameHost::setConfigstring( CS_SCORES1, va("%i", theLevel.teamScores_[ClientBase::TEAM_RED] ) );
+		GameHost::setConfigstring( CS_SCORES2, va("%i", theLevel.teamScores_[ClientBase::TEAM_BLUE] ) );
 	} 
 	else
 	{
 		if( theLevel.numConnectedClients_ == 0 ) 
 		{
-			SV_SetConfigstring( CS_SCORES1, va("%i", SCORE_NOT_PRESENT) );
-			SV_SetConfigstring( CS_SCORES2, va("%i", SCORE_NOT_PRESENT) );
+			GameHost::setConfigstring( CS_SCORES1, va("%i", SCORE_NOT_PRESENT) );
+			GameHost::setConfigstring( CS_SCORES2, va("%i", SCORE_NOT_PRESENT) );
 		}
 		else if( theLevel.numConnectedClients_ == 1 ) 
 		{
-			SV_SetConfigstring( CS_SCORES1, va("%i", theLevel.getClient(theLevel.sortedClients_[0])->ps_.persistant[PERS_SCORE] ) );
-			SV_SetConfigstring( CS_SCORES2, va("%i", SCORE_NOT_PRESENT) );
+			GameHost::setConfigstring( CS_SCORES1, va("%i", theLevel.getClient(theLevel.sortedClients_[0])->ps_.persistant[PERS_SCORE] ) );
+			GameHost::setConfigstring( CS_SCORES2, va("%i", SCORE_NOT_PRESENT) );
 		} 
 		else
 		{
-			SV_SetConfigstring( CS_SCORES1, va("%i", theLevel.getClient(theLevel.sortedClients_[0])->ps_.persistant[PERS_SCORE] ) );
-			SV_SetConfigstring( CS_SCORES2, va("%i", theLevel.getClient(theLevel.sortedClients_[1])->ps_.persistant[PERS_SCORE] ) );
+			GameHost::setConfigstring( CS_SCORES1, va("%i", theLevel.getClient(theLevel.sortedClients_[0])->ps_.persistant[PERS_SCORE] ) );
+			GameHost::setConfigstring( CS_SCORES2, va("%i", theLevel.getClient(theLevel.sortedClients_[1])->ps_.persistant[PERS_SCORE] ) );
 		}
 	}
 
@@ -1026,7 +1026,7 @@ void LogExit( const char *string )
 
 	// this will keep the clients from playing any voice sounds
 	// that will get cut off when the queued intermission starts
-	SV_SetConfigstring( CS_INTERMISSION, "1" );
+	GameHost::setConfigstring( CS_INTERMISSION, "1" );
 
 	// don't send more than 32 scores (FIXME?)
 	int numSorted = theLevel.numConnectedClients_;
@@ -1209,7 +1209,7 @@ void CheckExitRules()
 	{
 		if( theLevel.time_ - theLevel.startTime_ >= g_timelimit.integer*60000 ) 
 		{
-			SV_GameSendServerCommand( -1, "print \"Timelimit hit.\n\" \"<scoreboard>\"");
+			GameHost::sendServerCommand( -1, "print \"Timelimit hit.\n\" \"<scoreboard>\"");
 			LogExit( "Timelimit hit." );
 			return;
 		}
@@ -1228,14 +1228,14 @@ void CheckExitRules()
 	{
 		if( theLevel.teamScores_[ClientBase::TEAM_RED] >= g_fraglimit.integer ) 
 		{
-			SV_GameSendServerCommand( -1, "print \"Red hit the fraglimit.\n\" \"<scoreboard>\"" );
+			GameHost::sendServerCommand( -1, "print \"Red hit the fraglimit.\n\" \"<scoreboard>\"" );
 			LogExit( "Fraglimit hit." );
 			return;
 		}
 
 		if( theLevel.teamScores_[ClientBase::TEAM_BLUE] >= g_fraglimit.integer ) 
 		{
-			SV_GameSendServerCommand( -1, "print \"Blue hit the fraglimit.\n\" \"<scoreboard>\"" );
+			GameHost::sendServerCommand( -1, "print \"Blue hit the fraglimit.\n\" \"<scoreboard>\"" );
 			LogExit( "Fraglimit hit." );
 			return;
 		}
@@ -1252,7 +1252,7 @@ void CheckExitRules()
 			if( cl->ps_.persistant[PERS_SCORE] >= g_fraglimit.integer )
 			{
 				LogExit( "Fraglimit hit." );
-				SV_GameSendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " hit the fraglimit.\n\" \"<scoreboard>\"",
+				GameHost::sendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " hit the fraglimit.\n\" \"<scoreboard>\"",
 					cl->pers_.netname_ ) );
 				return;
 			}
@@ -1270,14 +1270,14 @@ void CheckExitRules()
 
 		if( theLevel.teamScores_[ClientBase::TEAM_RED] >= g_capturelimit.integer )
 		{
-			SV_GameSendServerCommand( -1, "print \"Red hit the capturelimit.\n\" \"<scoreboard>\"" );
+			GameHost::sendServerCommand( -1, "print \"Red hit the capturelimit.\n\" \"<scoreboard>\"" );
 			LogExit( "Capturelimit hit." );
 			return;
 		}
 
 		if( theLevel.teamScores_[ClientBase::TEAM_BLUE] >= g_capturelimit.integer )
 		{
-			SV_GameSendServerCommand( -1, "print \"Blue hit the capturelimit.\n\" \"<scoreboard>\"" );
+			GameHost::sendServerCommand( -1, "print \"Blue hit the capturelimit.\n\" \"<scoreboard>\"" );
 			LogExit( "Capturelimit hit." );
 			return;
 		}
@@ -1321,7 +1321,7 @@ void CheckTournament()
 			if( theLevel.warmupTime_ != -1 ) 
 			{
 				theLevel.warmupTime_ = -1;
-				SV_SetConfigstring( CS_WARMUP, va("%i", theLevel.warmupTime_) );
+				GameHost::setConfigstring( CS_WARMUP, va("%i", theLevel.warmupTime_) );
 				Game::logPrintf( "Warmup:\n" );
 			}
 			return;
@@ -1349,7 +1349,7 @@ void CheckTournament()
 					theLevel.warmupTime_ = 0;
 				}
 
-				SV_SetConfigstring( CS_WARMUP, va("%i", theLevel.warmupTime_) );
+				GameHost::setConfigstring( CS_WARMUP, va("%i", theLevel.warmupTime_) );
 			}
 			return;
 		}
@@ -1386,7 +1386,7 @@ void CheckTournament()
 			if( theLevel.warmupTime_ != -1 ) 
 			{
 				theLevel.warmupTime_ = -1;
-				SV_SetConfigstring( CS_WARMUP, va("%i", theLevel.warmupTime_) );
+				GameHost::setConfigstring( CS_WARMUP, va("%i", theLevel.warmupTime_) );
 				Game::logPrintf( "Warmup:\n" );
 			}
 			return; // still waiting for team members
@@ -1412,7 +1412,7 @@ void CheckTournament()
 				theLevel.warmupTime_ = 0;
 			}
 
-			SV_SetConfigstring( CS_WARMUP, va("%i", theLevel.warmupTime_) );
+			GameHost::setConfigstring( CS_WARMUP, va("%i", theLevel.warmupTime_) );
 			return;
 		}
 
@@ -1448,20 +1448,20 @@ void CheckVote()
 
 	if( theLevel.time_ - theLevel.voteTime_ >= VOTE_TIME ) 
 	{
-		SV_GameSendServerCommand( -1, "print \"Vote failed.\n\"" );
+		GameHost::sendServerCommand( -1, "print \"Vote failed.\n\"" );
 	}
 	else 
 	{
 		if( theLevel.voteYes_ > theLevel.numVotingClients_/2 ) 
 		{
 			// execute the command, then remove the vote
-			SV_GameSendServerCommand( -1, "print \"Vote passed.\n\"" );
+			GameHost::sendServerCommand( -1, "print \"Vote passed.\n\"" );
 			theLevel.voteExecuteTime_ = theLevel.time_ + 3000;
 		}
 		else if( theLevel.voteNo_ >= theLevel.numVotingClients_/2 ) 
 		{
 			// same behavior as a timeout
-			SV_GameSendServerCommand( -1, "print \"Vote failed.\n\"" );
+			GameHost::sendServerCommand( -1, "print \"Vote failed.\n\"" );
 		}
 		else 
 		{
@@ -1470,7 +1470,7 @@ void CheckVote()
 		}
 	}
 	theLevel.voteTime_ = 0;
-	SV_SetConfigstring( CS_VOTE_TIME, "" );
+	GameHost::setConfigstring( CS_VOTE_TIME, "" );
 
 }
 
@@ -1486,7 +1486,7 @@ void PrintTeam( int team, char *message )
 		GameClient* cl = theLevel.getClient(i);
 		if( !cl || cl->sess_.sessionTeam_ != team )
 			continue;
-		SV_GameSendServerCommand( i, message );
+		GameHost::sendServerCommand( i, message );
 	}
 }
 
@@ -1586,14 +1586,14 @@ void CheckTeamVote( int team )
 
 	if( theLevel.time_ - theLevel.teamVoteTime_[cs_offset] >= VOTE_TIME ) 
 	{
-		SV_GameSendServerCommand( -1, "print \"Team vote failed.\n\"" );
+		GameHost::sendServerCommand( -1, "print \"Team vote failed.\n\"" );
 	}
 	else
 	{
 		if( theLevel.teamVoteYes_[cs_offset] > theLevel.numteamVotingClients_[cs_offset]/2 ) 
 		{
 			// execute the command, then remove the vote
-			SV_GameSendServerCommand( -1, "print \"Team vote passed.\n\"" );
+			GameHost::sendServerCommand( -1, "print \"Team vote passed.\n\"" );
 			//
 			if( !Q_strncmp( "leader", theLevel.teamVoteString_[cs_offset], 6) ) 
 			{
@@ -1606,7 +1606,7 @@ void CheckTeamVote( int team )
 		else if( theLevel.teamVoteNo_[cs_offset] >= theLevel.numteamVotingClients_[cs_offset]/2 ) 
 		{
 			// same behavior as a timeout
-			SV_GameSendServerCommand( -1, "print \"Team vote failed.\n\"" );
+			GameHost::sendServerCommand( -1, "print \"Team vote failed.\n\"" );
 		}
 		else 
 		{
@@ -1615,7 +1615,7 @@ void CheckTeamVote( int team )
 		}
 	}
 	theLevel.teamVoteTime_[cs_offset] = 0;
-	SV_SetConfigstring( CS_TEAMVOTE_TIME + cs_offset, "" );
+	GameHost::setConfigstring( CS_TEAMVOTE_TIME + cs_offset, "" );
 }
 
 
@@ -1722,7 +1722,7 @@ void G_RunFrame( int levelTime )
 			{
 				// items that will respawn will hide themselves after their pickup event
 				ent->unlinkAfterEvent_ = false;
-				SV_UnlinkEntity( ent );
+				GameHost::unlinkEntity( ent );
 			}
 		}
 		// temporary entities don't think

@@ -29,7 +29,7 @@ struct SurfaceTasks
 		ahead[2] += 120;
 		VectorCopy( ahead, below );
 		below[2] -= 500;
-		SV_Trace( &water, ahead, nullptr, nullptr, below, c.ent->s.number, MASK_SOLID|MASK_WATER, false );
+		GameHost::trace( &water, ahead, nullptr, nullptr, below, c.ent->s.number, MASK_SOLID|MASK_WATER, false );
 		drop = water.fraction >= 1.0f || c.ent->r.currentOrigin[2] - water.endpos[2] > fabs( reach ) * 0.65f;
 		return water.fraction < 1.0f && (water.contents & MASK_WATER);
 	}
@@ -266,7 +266,7 @@ struct SurfaceTasks
 			vec3_t ahead;
 			VectorMA( c.ent->r.currentOrigin, 500, forward, ahead );
 			ahead[2] = c.ent->r.currentOrigin[2] - 6;
-			if( !(SV_PointContents( ahead, c.ent->s.number ) & MASK_WATER) )
+			if( !(GameHost::pointContents( ahead, c.ent->s.number ) & MASK_WATER) )
 				c.blocked = true;
 		}
 		if( theLevel.time_ > bot.stuckCheckTime )

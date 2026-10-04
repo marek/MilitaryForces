@@ -572,7 +572,7 @@ bool G_ParseSpawnVars()
 	theLevel.numSpawnVarChars_ = 0;
 
 	// parse the opening brace
-	if ( !SV_GetEntityToken( com_token, sizeof( com_token ) ) ) 
+	if ( !GameHost::getEntityToken( com_token, sizeof( com_token ) ) ) 
 	{
 		// end of spawn string
 		return false;
@@ -584,14 +584,14 @@ bool G_ParseSpawnVars()
 	while ( true )
 	{	
 		// parse key
-		if ( !SV_GetEntityToken( keyname, sizeof( keyname ) ) ) 
+		if ( !GameHost::getEntityToken( keyname, sizeof( keyname ) ) ) 
 			Common::error( ERR_DROP, "G_ParseSpawnVars: EOF without closing brace" );
 
 		if ( keyname[0] == '}' ) 
 			break;
 		
 		// parse value	
-		if ( !SV_GetEntityToken( com_token, sizeof( com_token ) ) ) 
+		if ( !GameHost::getEntityToken( com_token, sizeof( com_token ) ) ) 
 			Common::error( ERR_DROP, "G_ParseSpawnVars: EOF without closing brace" );
 
 		if ( com_token[0] == '}' ) 
@@ -625,17 +625,17 @@ void SP_worldspawn()
 		Common::error( ERR_DROP, "SP_worldspawn: The first entity isn't 'worldspawn'" );
 
 	// make some data visible to connecting client
-	SV_SetConfigstring( CS_GAME_VERSION, MF_VERSION );
+	GameHost::setConfigstring( CS_GAME_VERSION, MF_VERSION );
 
-	SV_SetConfigstring( CS_LEVEL_START_TIME, va("%i", theLevel.startTime_ ) );
+	GameHost::setConfigstring( CS_LEVEL_START_TIME, va("%i", theLevel.startTime_ ) );
 
 	Game::spawnString( "music", "", &s );
-	SV_SetConfigstring( CS_MUSIC, s );
+	GameHost::setConfigstring( CS_MUSIC, s );
 
 	Game::spawnString( "message", "", &s );
-	SV_SetConfigstring( CS_MESSAGE, s );				// map specific message
+	GameHost::setConfigstring( CS_MESSAGE, s );				// map specific message
 
-	SV_SetConfigstring( CS_MOTD, g_motd.string );		// message of the day
+	GameHost::setConfigstring( CS_MOTD, g_motd.string );		// message of the day
 
 	Game::spawnString( "gravity", "800", &s );
 	CvarSystem::set( "g_gravity", s );
@@ -655,7 +655,7 @@ void SP_worldspawn()
 	theLevel.addWorld(world);
 
 	// see if we want a warmup time
-	SV_SetConfigstring( CS_WARMUP, "" );
+	GameHost::setConfigstring( CS_WARMUP, "" );
 	if ( g_restarted.integer ) 
 	{
 		CvarSystem::set( "g_restarted", "0" );
@@ -665,7 +665,7 @@ void SP_worldspawn()
 	{ 
 		// Turn it on
 		theLevel.warmupTime_ = -1;
-		SV_SetConfigstring( CS_WARMUP, va("%i", theLevel.warmupTime_) );
+		GameHost::setConfigstring( CS_WARMUP, va("%i", theLevel.warmupTime_) );
 		Game::logPrintf( "Warmup:\n" );
 	}
 

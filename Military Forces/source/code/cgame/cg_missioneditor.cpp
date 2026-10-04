@@ -164,8 +164,8 @@ void CGame::draw_IGME()
 	IGME_vehicle_t* veh;
 
 	// check for selections
-	cmdNum = CL_GetCurrentCmdNumber();
-	CL_GetUserCmd( cmdNum, &cmd );
+	cmdNum = ClientHost::getCurrentCmdNumber();
+	ClientHost::getUserCmd( cmdNum, &cmd );
 	if( Keys::isDown(K_MOUSE1) && !Key_GetCatcher() ) {
 		if( (cgs.IGME.waypointmode && cgs.IGME.numWptSelections) ||
 			(!cgs.IGME.waypointmode && cgs.IGME.numSelections) ) {

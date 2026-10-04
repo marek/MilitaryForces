@@ -36,7 +36,7 @@ void MiscVehicle_Die::execute( GameEntity *inflictor, GameEntity *attacker, int 
 
 	Game::radiusDamage( self_->r.currentOrigin, self_, 150, 150, self_, MOD_VEHICLEEXPLOSION, CAT_ANY );
 
-	SV_LinkEntity( self_ );
+	GameHost::linkEntity( self_ );
 }
 
 void Game::miscVehicle_DropToGround( GameEntity *ent, float above, float below )
@@ -49,7 +49,7 @@ void Game::miscVehicle_DropToGround( GameEntity *ent, float above, float below )
 	startpos[2] += above;
 	VectorCopy( ent->s.origin, endpos );
 	endpos[2] -= below;
-	SV_Trace( &trace, startpos, nullptr, nullptr, endpos, ENTITYNUM_NONE, MASK_SOLID, false );
+	GameHost::trace( &trace, startpos, nullptr, nullptr, endpos, ENTITYNUM_NONE, MASK_SOLID, false );
 	if( trace.fraction < 1.0f ) {
 		ent->s.origin[2] = trace.endpos[2] - availableVehicles[vehIndex].mins[2] + 1;
 	}
@@ -65,7 +65,7 @@ void Game::sP_misc_plane( GameEntity *ent )
 	startpos[2] += 64;
 	VectorCopy( ent->s.origin, endpos );
 	endpos[2] -= 256;
-	SV_Trace( &trace, startpos, nullptr, nullptr, endpos, ENTITYNUM_NONE, MASK_SOLID, false );
+	GameHost::trace( &trace, startpos, nullptr, nullptr, endpos, ENTITYNUM_NONE, MASK_SOLID, false );
 	if( trace.fraction < 1.0f ) {
 		GameEntity *test = theLevel.getEntity(trace.entityNum);
 		if( test && canLandOnIt(test) ) {
@@ -105,7 +105,7 @@ void Game::sP_misc_plane( GameEntity *ent )
 	ent->updateBay_ = true;
 
 	ent->s.pos.trTime = theLevel.time_;
-	SV_LinkEntity (ent);
+	GameHost::linkEntity (ent);
 }
 
 void Game::sP_misc_gv( GameEntity *ent )
@@ -121,7 +121,7 @@ void Game::sP_misc_gv( GameEntity *ent )
 	VectorCopy( ent->s.origin, ent->s.pos.trBase );
 	VectorCopy( ent->s.origin, ent->r.currentOrigin );
 
-	SV_LinkEntity (ent);
+	GameHost::linkEntity (ent);
 }
 
 void Game::sP_misc_helo( GameEntity *ent )
@@ -146,7 +146,7 @@ void Game::sP_misc_helo( GameEntity *ent )
 	VectorCopy( ent->s.origin, ent->s.pos.trBase );
 	VectorCopy( ent->s.origin, ent->r.currentOrigin );
 
-	SV_LinkEntity (ent);
+	GameHost::linkEntity (ent);
 }
 
 void Game::sP_misc_boat( GameEntity *ent )
@@ -162,7 +162,7 @@ void Game::sP_misc_boat( GameEntity *ent )
 	VectorCopy( ent->s.origin, ent->s.pos.trBase );
 	VectorCopy( ent->s.origin, ent->r.currentOrigin );
 
-	SV_LinkEntity (ent);
+	GameHost::linkEntity (ent);
 }
 
 void Drone_Think::execute()
@@ -179,7 +179,7 @@ void Drone_Think::execute()
 
 	if( flying )
 	{
-		SV_Trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, origin, ent->s.number, MASK_SOLID, false );
+		GameHost::trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, origin, ent->s.number, MASK_SOLID, false );
 		if( tr.startsolid || tr.fraction < 1.0f )
 		{
 			Game::damage( ent, nullptr, ent, nullptr, nullptr, 100000, DAMAGE_NO_PROTECTION, MOD_CRASH, CAT_ANY );
@@ -194,7 +194,7 @@ void Drone_Think::execute()
 		float raise = (ent->r.maxs[2] - ent->r.mins[2]) * 0.5f;
 		from[2] += raise;
 		to[2] += raise;
-		SV_Trace( &tr, from, ent->r.mins, ent->r.maxs, to, ent->s.number, MASK_SOLID, false );
+		GameHost::trace( &tr, from, ent->r.mins, ent->r.maxs, to, ent->s.number, MASK_SOLID, false );
 		if( !tr.startsolid && tr.fraction < 1.0f )
 		{
 			VectorCopy( ent->r.currentOrigin, origin );
@@ -212,7 +212,7 @@ void Drone_Think::execute()
 		VectorCopy( origin, to );
 		from[2] += 64;
 		to[2] -= 512;
-		SV_Trace( &tr, from, nullptr, nullptr, to, ent->s.number, (cat & CAT_BOAT) ? (MASK_SOLID|MASK_WATER) : MASK_SOLID, false );
+		GameHost::trace( &tr, from, nullptr, nullptr, to, ent->s.number, (cat & CAT_BOAT) ? (MASK_SOLID|MASK_WATER) : MASK_SOLID, false );
 		if( tr.fraction < 1.0f )
 			origin[2] = tr.endpos[2] - ent->r.mins[2] + 1;
 	}
@@ -287,7 +287,7 @@ void Drone_Think::execute()
 	ent->s.pos.trTime = theLevel.time_;
 
 	ent->nextthink_ = theLevel.time_ + 50;
-	SV_LinkEntity( ent );
+	GameHost::linkEntity( ent );
 }
 
 void MiscVehicle_SetRoute( GameEntity *ent, const mission_waypoint_t *wps )
@@ -350,7 +350,7 @@ void Abandoned_Think::execute()
 	}
 
 	GameShared::evaluateTrajectory( &ent->s.pos, theLevel.time_, origin );
-	SV_Trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, origin, ent->s.number, MASK_SOLID, false );
+	GameHost::trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, origin, ent->s.number, MASK_SOLID, false );
 	if( tr.startsolid || tr.fraction < 1.0f || theLevel.time_ > expire_ )
 	{
 		if( tr.fraction < 1.0f )
@@ -361,7 +361,7 @@ void Abandoned_Think::execute()
 	}
 	VectorCopy( origin, ent->r.currentOrigin );
 	ent->nextthink_ = theLevel.time_ + 50;
-	SV_LinkEntity( ent );
+	GameHost::linkEntity( ent );
 }
 
 void MiscVehicle_Abandon( GameEntity *ent )
@@ -414,7 +414,7 @@ void MiscVehicle_Abandon( GameEntity *ent )
 	client->sess_.paintTeam_ = 0;
 	veh->nextthink_ = theLevel.time_ + 50;
 
-	SV_LinkEntity( veh );
+	GameHost::linkEntity( veh );
 
 	if( landed && availableVehicles[vehicle].hasDeck ) 
 		MiscVehicle_SpawnDecks( veh, vehicle );
@@ -477,7 +477,7 @@ void Deck_Think::execute()
 			moved.copyTo( ent->r.currentOrigin );
 			moved.copyTo( ent->s.pos.trBase );
 			cl->ps_.delta_angles[YAW] += ANGLE2SHORT( AngleSubtract( angles[YAW], lastAngles_[YAW] ) );
-			SV_LinkEntity( ent );
+			GameHost::linkEntity( ent );
 		}
 	}
 
@@ -510,7 +510,7 @@ void Deck_Think::execute()
 	lastTime_ = theLevel.time_;
 	hasLast_ = true;
 
-	SV_LinkEntity( deck );
+	GameHost::linkEntity( deck );
 	deck->nextthink_ = theLevel.time_ + 1;
 }
 
@@ -634,7 +634,7 @@ GameEntity* SP_misc_vehicle( GameEntity *sp_ent )
 
 	ent->idxScriptBegin_ = ent->idxScriptEnd_ = -1;
 
-	SV_LinkEntity (ent);
+	GameHost::linkEntity (ent);
 
 	sp_ent->freeUp();
 
@@ -698,7 +698,7 @@ void SP_misc_groundinstallation( GameEntity *sp_ent )
 
 	ent->s.ONOFF = OO_RADAR;
 
-	SV_LinkEntity (ent);
+	GameHost::linkEntity (ent);
 
 	sp_ent->freeUp();
 }

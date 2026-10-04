@@ -5888,7 +5888,7 @@ void _UI_Init( bool inGameLoad )
 	uiInfo.uiUtils.initMemory();
 
 	// cache redundant calulations
-	CL_GetGlconfig( &uiInfo.uiUtils.dc_->glConfig_ );
+	ClientHost::getGlconfig( &uiInfo.uiUtils.dc_->glConfig_ );
 
 	// for 640x480 virtualized screen
 	uiInfo.uiUtils.dc_->yScale_ = uiInfo.uiUtils.dc_->glConfig_.vidHeight * (1.0/480.0);

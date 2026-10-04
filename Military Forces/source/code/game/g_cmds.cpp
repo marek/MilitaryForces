@@ -75,7 +75,7 @@ void DeathmatchScoreboardMessage( GameEntity *ent )
 		stringlength += j;
 	}
 
-	SV_GameSendServerCommand( ent->s.number,// ok ? before: ent-g_entities, 
+	GameHost::sendServerCommand( ent->s.number,// ok ? before: ent-g_entities, 
 							  va("scores %i %i %i%s", 
 							  i, 
 							  theLevel.teamScores_[ClientBase::TEAM_RED], 
@@ -107,20 +107,20 @@ bool CheatsOk( GameEntity *ent )
 {
 	if ( !g_cheats.integer ) 
 	{
-		SV_GameSendServerCommand( ent->s.number,//ent-g_entities, 
+		GameHost::sendServerCommand( ent->s.number,//ent-g_entities, 
 								  va("print \"Cheats are not enabled on this server.\n\""));
 		return false;
 	}
 	if ( ent->health_ <= 0 ) 
 	{
-		SV_GameSendServerCommand( ent->s.number,//ent-g_entities, 
+		GameHost::sendServerCommand( ent->s.number,//ent-g_entities, 
 								  va("print \"You must be alive to use this command.\n\""));
 		return false;
 	}
 	// ensiform fix
 	if ( ent->client_->sess_.sessionTeam_ == ClientBase::TEAM_SPECTATOR ) 
 	{
-		SV_GameSendServerCommand( ent->s.number,//ent-g_entities, 
+		GameHost::sendServerCommand( ent->s.number,//ent-g_entities, 
 								  va("print \"Spectators can't use this command.\n\""));
 		return false;
 	}
@@ -211,7 +211,7 @@ int ClientNumberFromString( GameEntity *to, char *s )
 		idnum = atoi( s );
 		if( idnum < 1 || idnum > theLevel.maxclients_ ) 
 		{
-			SV_GameSendServerCommand( to->s.number,//to-g_entities, 
+			GameHost::sendServerCommand( to->s.number,//to-g_entities, 
 									  va("print \"Bad client slot: %i\n\"", 
 									  idnum));
 			return -1;
@@ -220,7 +220,7 @@ int ClientNumberFromString( GameEntity *to, char *s )
 		cl = theLevel.getClient(idnum);//&level.clients[idnum];
 		if( cl->pers_.connected_ != GameClient::ClientPersistant::CON_CONNECTED ) 
 		{
-			SV_GameSendServerCommand( to->s.number,//to-g_entities, 
+			GameHost::sendServerCommand( to->s.number,//to-g_entities, 
 									  va("print \"Client %i is not active\n\"", 
 									  idnum));
 			return -1;
@@ -242,7 +242,7 @@ int ClientNumberFromString( GameEntity *to, char *s )
 		}
 	}
 
-	SV_GameSendServerCommand( to->s.number,//to-g_entities, 
+	GameHost::sendServerCommand( to->s.number,//to-g_entities, 
 							  va("print \"User %s is not on the server\n\"", 
 							  s));
 	return -1;
@@ -270,7 +270,7 @@ void Cmd_Noclip_f( GameEntity *ent )
 	
 	ent->client_->noclip_ = !ent->client_->noclip_;
 
-	SV_GameSendServerCommand( ent->s.number,//ent-g_entities, 
+	GameHost::sendServerCommand( ent->s.number,//ent-g_entities, 
 							  va("print \"%s\"", 
 							  msg));
 }
@@ -294,20 +294,20 @@ void Cmd_LevelShot_f( GameEntity *ent )
 	// doesn't work in single player
 	if( g_gametype.integer != 0 ) 
 	{
-		SV_GameSendServerCommand( ent->s.number,// ent-g_entities, 
+		GameHost::sendServerCommand( ent->s.number,// ent-g_entities, 
 			"print \"Must be in g_gametype 0 for levelshot\n\"" );
 		return;
 	}
 
 	if(!ent->client_->pers_.localClient_)
 	{
-		SV_GameSendServerCommand( ent->s.number,
+		GameHost::sendServerCommand( ent->s.number,
 		"print \"The levelshot command must be executed by a local client\n\"");
 		return;
 	}
 
 	BeginIntermission();
-	SV_GameSendServerCommand( ent->s.number,//ent-g_entities, 
+	GameHost::sendServerCommand( ent->s.number,//ent-g_entities, 
 							  "clientLevelShot" );
 }
 
@@ -360,9 +360,9 @@ void Cmd_TeamTask_f( GameEntity *ent )
 	CommandSystem::argvBuffer( 1, arg, sizeof( arg ) );
 	task = atoi( arg );
 
-	SV_GetUserinfo(client, userinfo, sizeof(userinfo));
+	GameHost::getUserinfo(client, userinfo, sizeof(userinfo));
 	Info::setValueForKey(userinfo, "teamtask", va("%d", task));
-	SV_SetUserinfo(client, userinfo);
+	GameHost::setUserinfo(client, userinfo);
 	ClientUserinfoChanged(client);
 }
 
@@ -418,13 +418,13 @@ void Cmd_Tower_f( GameEntity *ent )
 
 	if( !ent->radio_target_->message_ ) 
 	{
-		SV_GameSendServerCommand( ent->s.number,//ent-g_entities, 
+		GameHost::sendServerCommand( ent->s.number,//ent-g_entities, 
 								  va("print \"Tower, request operation of %s\n\"",
 								  ent->radio_target_->classname_) );
 	} 
 	else 
 	{
-		SV_GameSendServerCommand( ent->s.number,//ent-g_entities, 
+		GameHost::sendServerCommand( ent->s.number,//ent-g_entities, 
 								  va("print \"Tower, %s\n\"", 
 								  ent->radio_target_->message_) );
 	}
@@ -521,8 +521,8 @@ void BroadcastTeamChange( GameClient *client, int oldTeam )
 	// send centre print and console trace
 	if( pTeam )
 	{
-		SV_GameSendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE " joined the %s\n\"", client->pers_.netname_, pTeam) );
-		SV_GameSendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " joined the %s\n\"", client->pers_.netname_, pTeam) );
+		GameHost::sendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE " joined the %s\n\"", client->pers_.netname_, pTeam) );
+		GameHost::sendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " joined the %s\n\"", client->pers_.netname_, pTeam) );
 	}
 }
 
@@ -603,7 +603,7 @@ void SetTeam( GameEntity *ent, char *s )
 			if( oldTeam == ClientBase::TEAM_RED || 
 				oldTeam == ClientBase::TEAM_BLUE )
 			{
-				SV_GameSendServerCommand( ent->client_->ps_.clientNum, "cp \"Can't auto-join, you are already on a team!\n\"" );
+				GameHost::sendServerCommand( ent->client_->ps_.clientNum, "cp \"Can't auto-join, you are already on a team!\n\"" );
 				
 				return; // ignore the request
 			}
@@ -633,7 +633,7 @@ void SetTeam( GameEntity *ent, char *s )
 			if( team == ClientBase::TEAM_RED && counts[ClientBase::TEAM_RED] - 
 					counts[ClientBase::TEAM_BLUE] > balanceNum )
 			{
-				SV_GameSendServerCommand( ent->client_->ps_.clientNum,"cp \"Red team has too many players.\n\"" );
+				GameHost::sendServerCommand( ent->client_->ps_.clientNum,"cp \"Red team has too many players.\n\"" );
 
 				return; // ignore the request
 			}
@@ -642,7 +642,7 @@ void SetTeam( GameEntity *ent, char *s )
 				counts[ClientBase::TEAM_BLUE] - 
 					counts[ClientBase::TEAM_RED] > balanceNum )
 			{
-				SV_GameSendServerCommand( ent->client_->ps_.clientNum, "cp \"Red team has too many players.\n\"" );
+				GameHost::sendServerCommand( ent->client_->ps_.clientNum, "cp \"Red team has too many players.\n\"" );
 				return; // ignore the request
 			}
 
@@ -692,7 +692,7 @@ void SetTeam( GameEntity *ent, char *s )
 		// say something?
 		if( pTeam )
 		{
-			SV_GameSendServerCommand( ent->client_->ps_.clientNum, va( "cp \"You are already %s\n\"", pTeam ) );
+			GameHost::sendServerCommand( ent->client_->ps_.clientNum, va( "cp \"You are already %s\n\"", pTeam ) );
 		}
 		return; // ignore the request
 	}
@@ -728,10 +728,10 @@ void SetTeam( GameEntity *ent, char *s )
 		client->ps_.pm_flags |= PMF_VEHICLESELECT;// MFQ3
 	}
 	// init vehicle
-	SV_GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
+	GameHost::getUserinfo( clientNum, userinfo, sizeof( userinfo ) );
 	Info::setValueForKey( userinfo, "cg_vehicle", "-1" );
 	Info::setValueForKey( userinfo, "cg_nextVehicle", "-1" );
-	SV_SetUserinfo( clientNum, userinfo );
+	GameHost::setUserinfo( clientNum, userinfo );
 
 	client->sess_.sessionTeam_ = team; //static_cast<team_t>(team);
 	client->sess_.spectatorState_ = specState;
@@ -799,16 +799,16 @@ void Cmd_Team_f( GameEntity *ent )
 		switch ( oldTeam )
 		{
 		case ClientBase::TEAM_BLUE:
-			SV_GameSendServerCommand( ent->s.number, "print \"Blue team\n\"" );
+			GameHost::sendServerCommand( ent->s.number, "print \"Blue team\n\"" );
 			break;
 		case ClientBase::TEAM_RED:
-			SV_GameSendServerCommand( ent->s.number, "print \"Red team\n\"" );
+			GameHost::sendServerCommand( ent->s.number, "print \"Red team\n\"" );
 			break;
 		case ClientBase::TEAM_FREE:
-			SV_GameSendServerCommand( ent->s.number, "print \"Free team\n\"" );
+			GameHost::sendServerCommand( ent->s.number, "print \"Free team\n\"" );
 			break;
 		case ClientBase::TEAM_SPECTATOR:
-			SV_GameSendServerCommand( ent->s.number, "print \"Spectator team\n\"" );
+			GameHost::sendServerCommand( ent->s.number, "print \"Spectator team\n\"" );
 			break;
 		}		
 		
@@ -818,7 +818,7 @@ void Cmd_Team_f( GameEntity *ent )
 	// stop people changing teams too much
 	if( ent->client_->switchTeamTime_ > theLevel.time_ )
 	{
-		SV_GameSendServerCommand( ent->s.number, "print \"May not request to switch teams more than once per 5 seconds.\n\"" );
+		GameHost::sendServerCommand( ent->s.number, "print \"May not request to switch teams more than once per 5 seconds.\n\"" );
 		return;
 	}
 
@@ -960,7 +960,7 @@ void Game::sayTo( GameEntity *ent, GameEntity *other, int mode, int color, const
 		return;
 	}
 
-	SV_GameSendServerCommand( other->s.number,// other-g_entities, 
+	GameHost::sendServerCommand( other->s.number,// other-g_entities, 
 							  va("%s \"%s%c%c%s\"", 
 							  mode == SAY_TEAM ? "tchat" : "chat",
 							  name, Q_COLOR_ESCAPE, color, message));
@@ -1117,7 +1117,7 @@ Cmd_Where_f
 */
 void Cmd_Where_f( GameEntity *ent )
 {
-	SV_GameSendServerCommand( ent->s.number, va("print \"%s\n\"", vtos( ent->s.origin ) ) );
+	GameHost::sendServerCommand( ent->s.number, va("print \"%s\n\"", vtos( ent->s.origin ) ) );
 }
 
 static const char *gameNames[] = {
@@ -1141,23 +1141,23 @@ void Cmd_CallVote_f( GameEntity *ent )
 {
 	if( !g_allowVote.integer )
 	{
-		SV_GameSendServerCommand( ent->s.number, "print \"Voting not allowed here.\n\"" );
+		GameHost::sendServerCommand( ent->s.number, "print \"Voting not allowed here.\n\"" );
 		return;
 	}
 
 	if( theLevel.voteTime_ ) 
 	{
-		SV_GameSendServerCommand( ent->s.number, "print \"A vote is already in progress.\n\"" );
+		GameHost::sendServerCommand( ent->s.number, "print \"A vote is already in progress.\n\"" );
 		return;
 	}
 	if( ent->client_->pers_.voteCount_ >= MAX_VOTE_COUNT ) 
 	{
-		SV_GameSendServerCommand( ent->s.number, "print \"You have called the maximum number of votes.\n\"" );
+		GameHost::sendServerCommand( ent->s.number, "print \"You have called the maximum number of votes.\n\"" );
 		return;
 	}
 	if( ent->client_->sess_.sessionTeam_ == ClientBase::TEAM_SPECTATOR ) 
 	{
-		SV_GameSendServerCommand( ent->s.number, "print \"Not allowed to call a vote as spectator.\n\"" );
+		GameHost::sendServerCommand( ent->s.number, "print \"Not allowed to call a vote as spectator.\n\"" );
 		return;
 	}
 
@@ -1174,7 +1174,7 @@ void Cmd_CallVote_f( GameEntity *ent )
 			case '\n':
 			case '\r':
 			case ';':
-				SV_GameSendServerCommand( ent->s.number, "print \"Invalid vote string.\n\"" );
+				GameHost::sendServerCommand( ent->s.number, "print \"Invalid vote string.\n\"" );
 				return;
 			break;
 		}
@@ -1212,8 +1212,8 @@ void Cmd_CallVote_f( GameEntity *ent )
 	} 
 	else 
 	{
-		SV_GameSendServerCommand( ent->s.number, "print \"Invalid vote string.\n\"" );
-		SV_GameSendServerCommand( ent->s.number, "print \"Vote commands are: map_restart, nextmap, map <mapname>, g_gametype <n>, kick <player>, clientkick <clientnum>, g_doWarmup, timelimit <time>, fraglimit <frags>, mf_gameset <set>.\n\"" );
+		GameHost::sendServerCommand( ent->s.number, "print \"Invalid vote string.\n\"" );
+		GameHost::sendServerCommand( ent->s.number, "print \"Vote commands are: map_restart, nextmap, map <mapname>, g_gametype <n>, kick <player>, clientkick <clientnum>, g_doWarmup, timelimit <time>, fraglimit <frags>, mf_gameset <set>.\n\"" );
 		return;
 	}
 
@@ -1231,7 +1231,7 @@ void Cmd_CallVote_f( GameEntity *ent )
 		i = atoi( arg2 );
 		if( i == GT_SINGLE_PLAYER || i == GT_MISSION_EDITOR || i < GT_FFA || i >= GT_MAX_GAME_TYPE ) 
 		{
-			SV_GameSendServerCommand( ent->s.number, "print \"Invalid gametype.\n\"" );
+			GameHost::sendServerCommand( ent->s.number, "print \"Invalid gametype.\n\"" );
 			return;
 		}
 
@@ -1267,7 +1267,7 @@ void Cmd_CallVote_f( GameEntity *ent )
 		CvarSystem::variableStringBuffer( "nextmap", s, sizeof(s) );
 		if( !*s )
 		{
-			SV_GameSendServerCommand( ent->s.number, "print \"nextmap not set.\n\"" );
+			GameHost::sendServerCommand( ent->s.number, "print \"nextmap not set.\n\"" );
 			return;
 		}
 		Com_sprintf( theLevel.voteString_, sizeof( theLevel.voteString_ ), "vstr nextmap");
@@ -1279,7 +1279,7 @@ void Cmd_CallVote_f( GameEntity *ent )
 		Com_sprintf( theLevel.voteDisplayString_, sizeof( theLevel.voteDisplayString_ ), "%s", theLevel.voteString_ );
 	}
 
-	SV_GameSendServerCommand( -1, va("print \"%s called a vote.\n\"", ent->client_->pers_.netname_ ) );
+	GameHost::sendServerCommand( -1, va("print \"%s called a vote.\n\"", ent->client_->pers_.netname_ ) );
 
 	// start the voting, the caller autoamtically votes yes
 	theLevel.voteTime_ = theLevel.time_;
@@ -1292,10 +1292,10 @@ void Cmd_CallVote_f( GameEntity *ent )
 	}
 	ent->client_->ps_.eFlags |= EF_VOTED;
 
-	SV_SetConfigstring( CS_VOTE_TIME, va("%i", theLevel.voteTime_ ) );
-	SV_SetConfigstring( CS_VOTE_STRING, theLevel.voteDisplayString_ );	
-	SV_SetConfigstring( CS_VOTE_YES, va("%i", theLevel.voteYes_ ) );
-	SV_SetConfigstring( CS_VOTE_NO, va("%i", theLevel.voteNo_ ) );	
+	GameHost::setConfigstring( CS_VOTE_TIME, va("%i", theLevel.voteTime_ ) );
+	GameHost::setConfigstring( CS_VOTE_STRING, theLevel.voteDisplayString_ );	
+	GameHost::setConfigstring( CS_VOTE_YES, va("%i", theLevel.voteYes_ ) );
+	GameHost::setConfigstring( CS_VOTE_NO, va("%i", theLevel.voteNo_ ) );	
 }
 
 /*
@@ -1309,21 +1309,21 @@ void Cmd_Vote_f( GameEntity *ent )
 
 	if( !theLevel.voteTime_ ) 
 	{
-		SV_GameSendServerCommand( ent->s.number, "print \"No vote in progress.\n\"" );
+		GameHost::sendServerCommand( ent->s.number, "print \"No vote in progress.\n\"" );
 		return;
 	}
 	if( ent->client_->ps_.eFlags & EF_VOTED ) 
 	{
-		SV_GameSendServerCommand( ent->s.number, "print \"Vote already cast.\n\"" );
+		GameHost::sendServerCommand( ent->s.number, "print \"Vote already cast.\n\"" );
 		return;
 	}
 	if( ent->client_->sess_.sessionTeam_ == ClientBase::TEAM_SPECTATOR ) 
 	{
-		SV_GameSendServerCommand( ent->s.number, "print \"Not allowed to vote as spectator.\n\"" );
+		GameHost::sendServerCommand( ent->s.number, "print \"Not allowed to vote as spectator.\n\"" );
 		return;
 	}
 
-	SV_GameSendServerCommand( ent->s.number, "print \"Vote cast.\n\"" );
+	GameHost::sendServerCommand( ent->s.number, "print \"Vote cast.\n\"" );
 
 	ent->client_->ps_.eFlags |= EF_VOTED;
 
@@ -1332,12 +1332,12 @@ void Cmd_Vote_f( GameEntity *ent )
 	if( tolower( msg[0] ) == 'y' || msg[0] == '1' )
 	{
 		theLevel.voteYes_++;
-		SV_SetConfigstring( CS_VOTE_YES, va("%i", theLevel.voteYes_ ) );
+		GameHost::setConfigstring( CS_VOTE_YES, va("%i", theLevel.voteYes_ ) );
 	} 
 	else 
 	{
 		theLevel.voteNo_++;
-		SV_SetConfigstring( CS_VOTE_NO, va("%i", theLevel.voteNo_ ) );	
+		GameHost::setConfigstring( CS_VOTE_NO, va("%i", theLevel.voteNo_ ) );	
 	}
 
 	// a majority will be determined in CheckVote, which will also account
@@ -1363,23 +1363,23 @@ void Cmd_CallTeamVote_f( GameEntity *ent )
 
 	if( !g_allowVote.integer ) 
 	{
-		SV_GameSendServerCommand( ent->s.number, "print \"Voting not allowed here.\n\"" );
+		GameHost::sendServerCommand( ent->s.number, "print \"Voting not allowed here.\n\"" );
 		return;
 	}
 
 	if( theLevel.teamVoteTime_[cs_offset] ) 
 	{
-		SV_GameSendServerCommand( ent->s.number, "print \"A team vote is already in progress.\n\"" );
+		GameHost::sendServerCommand( ent->s.number, "print \"A team vote is already in progress.\n\"" );
 		return;
 	}
 	if( ent->client_->pers_.teamVoteCount_ >= MAX_VOTE_COUNT ) 
 	{
-		SV_GameSendServerCommand( ent->s.number, "print \"You have called the maximum number of team votes.\n\"" );
+		GameHost::sendServerCommand( ent->s.number, "print \"You have called the maximum number of team votes.\n\"" );
 		return;
 	}
 	if( ent->client_->sess_.sessionTeam_ == ClientBase::TEAM_SPECTATOR ) 
 	{
-		SV_GameSendServerCommand( ent->s.number, "print \"Not allowed to call a vote as spectator.\n\"" );
+		GameHost::sendServerCommand( ent->s.number, "print \"Not allowed to call a vote as spectator.\n\"" );
 		return;
 	}
 
@@ -1403,7 +1403,7 @@ void Cmd_CallTeamVote_f( GameEntity *ent )
 			case '\n':
 			case '\r':
 			case ';':
-				SV_GameSendServerCommand( ent->s.number, "print \"Invalid vote string.\n\"" );
+				GameHost::sendServerCommand( ent->s.number, "print \"Invalid vote string.\n\"" );
 				return;
 			break;
 		}
@@ -1428,13 +1428,13 @@ void Cmd_CallTeamVote_f( GameEntity *ent )
 				i = atoi( arg2 );
 				if( i < 1 || i > theLevel.maxclients_ ) 
 				{
-					SV_GameSendServerCommand( ent->s.number, va("print \"Bad client slot: %i\n\"", i) );
+					GameHost::sendServerCommand( ent->s.number, va("print \"Bad client slot: %i\n\"", i) );
 					return;
 				}
 
 				if( !theLevel.getEntity(i) || !theLevel.getEntity(i)->inuse_ ) 
 				{
-					SV_GameSendServerCommand( ent->s.number, va("print \"Client %i is not active\n\"", i) );
+					GameHost::sendServerCommand( ent->s.number, va("print \"Client %i is not active\n\"", i) );
 					return;
 				}
 			}
@@ -1456,7 +1456,7 @@ void Cmd_CallTeamVote_f( GameEntity *ent )
 				}
 				if ( i > theLevel.maxclients_ ) 
 				{
-					SV_GameSendServerCommand( ent->s.number, va("print \"%s is not a valid player on your team.\n\"", arg2) );
+					GameHost::sendServerCommand( ent->s.number, va("print \"%s is not a valid player on your team.\n\"", arg2) );
 					return;
 				}
 			}
@@ -1465,8 +1465,8 @@ void Cmd_CallTeamVote_f( GameEntity *ent )
 	} 
 	else 
 	{
-		SV_GameSendServerCommand( ent->s.number, "print \"Invalid vote string.\n\"" );
-		SV_GameSendServerCommand( ent->s.number, "print \"Team vote commands are: leader <player>.\n\"" );
+		GameHost::sendServerCommand( ent->s.number, "print \"Invalid vote string.\n\"" );
+		GameHost::sendServerCommand( ent->s.number, "print \"Team vote commands are: leader <player>.\n\"" );
 		return;
 	}
 
@@ -1478,7 +1478,7 @@ void Cmd_CallTeamVote_f( GameEntity *ent )
 		if( !currCl || currCl->pers_.connected_ == GameClient::ClientPersistant::CON_DISCONNECTED )
 			continue;
 		if( currCl->sess_.sessionTeam_ == team )
-			SV_GameSendServerCommand( i, va("print \"%s called a team vote.\n\"", ent->client_->pers_.netname_ ) );
+			GameHost::sendServerCommand( i, va("print \"%s called a team vote.\n\"", ent->client_->pers_.netname_ ) );
 	}
 
 	// start the voting, the caller autoamtically votes yes
@@ -1494,10 +1494,10 @@ void Cmd_CallTeamVote_f( GameEntity *ent )
 	}
 	ent->client_->ps_.eFlags |= EF_TEAMVOTED;
 
-	SV_SetConfigstring( CS_TEAMVOTE_TIME + cs_offset, va("%i", theLevel.teamVoteTime_[cs_offset] ) );
-	SV_SetConfigstring( CS_TEAMVOTE_STRING + cs_offset, theLevel.teamVoteString_[cs_offset] );
-	SV_SetConfigstring( CS_TEAMVOTE_YES + cs_offset, va("%i", theLevel.teamVoteYes_[cs_offset] ) );
-	SV_SetConfigstring( CS_TEAMVOTE_NO + cs_offset, va("%i", theLevel.teamVoteNo_[cs_offset] ) );
+	GameHost::setConfigstring( CS_TEAMVOTE_TIME + cs_offset, va("%i", theLevel.teamVoteTime_[cs_offset] ) );
+	GameHost::setConfigstring( CS_TEAMVOTE_STRING + cs_offset, theLevel.teamVoteString_[cs_offset] );
+	GameHost::setConfigstring( CS_TEAMVOTE_YES + cs_offset, va("%i", theLevel.teamVoteYes_[cs_offset] ) );
+	GameHost::setConfigstring( CS_TEAMVOTE_NO + cs_offset, va("%i", theLevel.teamVoteNo_[cs_offset] ) );
 }
 
 /*
@@ -1520,21 +1520,21 @@ void Cmd_TeamVote_f( GameEntity *ent )
 
 	if( !theLevel.teamVoteTime_[cs_offset] ) 
 	{
-		SV_GameSendServerCommand( ent->s.number, "print \"No team vote in progress.\n\"" );
+		GameHost::sendServerCommand( ent->s.number, "print \"No team vote in progress.\n\"" );
 		return;
 	}
 	if( ent->client_->ps_.eFlags & EF_TEAMVOTED ) 
 	{
-		SV_GameSendServerCommand( ent->s.number, "print \"Team vote already cast.\n\"" );
+		GameHost::sendServerCommand( ent->s.number, "print \"Team vote already cast.\n\"" );
 		return;
 	}
 	if( ent->client_->sess_.sessionTeam_ == ClientBase::TEAM_SPECTATOR ) 
 	{
-		SV_GameSendServerCommand( ent->s.number, "print \"Not allowed to vote as spectator.\n\"" );
+		GameHost::sendServerCommand( ent->s.number, "print \"Not allowed to vote as spectator.\n\"" );
 		return;
 	}
 
-	SV_GameSendServerCommand( ent->s.number, "print \"Team vote cast.\n\"" );
+	GameHost::sendServerCommand( ent->s.number, "print \"Team vote cast.\n\"" );
 
 	ent->client_->ps_.eFlags |= EF_TEAMVOTED;
 
@@ -1543,12 +1543,12 @@ void Cmd_TeamVote_f( GameEntity *ent )
 	if( tolower( msg[0] ) == 'y' || msg[0] == '1' ) 
 	{
 		theLevel.teamVoteYes_[cs_offset]++;
-		SV_SetConfigstring( CS_TEAMVOTE_YES + cs_offset, va("%i", theLevel.teamVoteYes_[cs_offset] ) );
+		GameHost::setConfigstring( CS_TEAMVOTE_YES + cs_offset, va("%i", theLevel.teamVoteYes_[cs_offset] ) );
 	} 
 	else 
 	{
 		theLevel.teamVoteNo_[cs_offset]++;
-		SV_SetConfigstring( CS_TEAMVOTE_NO + cs_offset, va("%i", theLevel.teamVoteNo_[cs_offset] ) );	
+		GameHost::setConfigstring( CS_TEAMVOTE_NO + cs_offset, va("%i", theLevel.teamVoteNo_[cs_offset] ) );	
 	}
 
 	// a majority will be determined in TeamCheckVote, which will also account
@@ -1559,10 +1559,10 @@ void Cmd_TeamVote_f( GameEntity *ent )
 void Game::rider_SetVehicle( int clientNum, int vehicle )
 {
 	char userinfo[MAX_INFO_STRING];
-	SV_GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
+	GameHost::getUserinfo( clientNum, userinfo, sizeof( userinfo ) );
 	Info::setValueForKey( userinfo, "cg_vehicle", va( "%d", vehicle ) );
 	Info::setValueForKey( userinfo, "cg_nextVehicle", va( "%d", vehicle ) );
-	SV_SetUserinfo( clientNum, userinfo );
+	GameHost::setUserinfo( clientNum, userinfo );
 	ClientUserinfoChanged( clientNum );
 }
 
@@ -1621,7 +1621,7 @@ void Rider_Leave( GameEntity *ent, bool forced )
 	client->sess_.ridingClient_ = -1;
 	client->sess_.seat_ = 0;
 	if( pilot && pilot->pers_.connected_ == GameClient::ClientPersistant::CON_CONNECTED ) 
-		SV_GameSendServerCommand( pilotNum, va( "print \"%s^7 left your vehicle\n\"", client->pers_.netname_ ) );
+		GameHost::sendServerCommand( pilotNum, va( "print \"%s^7 left your vehicle\n\"", client->pers_.netname_ ) );
 	Game::rider_SetVehicle( ent->s.number, client->vehicle_ );
 	switch_vehicle( ent );
 }
@@ -1705,9 +1705,9 @@ bool Game::rider_Board( GameEntity *ent )
 				Game::logPrintf( "Lift: %i rescued %i\n", i, ent->s.number );
 			}
 			bool gunner = seat == 1 && VehicleData::vehicleHasTurret( pilot->vehicle_ );
-			SV_GameSendServerCommand( ent->s.number, va( "print \"You are %s in %s^7's %s\n\"", gunner ? "the gunner" : "a passenger",
+			GameHost::sendServerCommand( ent->s.number, va( "print \"You are %s in %s^7's %s\n\"", gunner ? "the gunner" : "a passenger",
 				pilot->pers_.netname_, availableVehicles[pilot->vehicle_].descriptiveName ) );
-			SV_GameSendServerCommand( i, va( "print \"%s^7 boarded as %s\n\"", client->pers_.netname_, gunner ? "gunner" : "passenger" ) );
+			GameHost::sendServerCommand( i, va( "print \"%s^7 boarded as %s\n\"", client->pers_.netname_, gunner ? "gunner" : "passenger" ) );
 			return true;
 		}
 	}
@@ -1730,7 +1730,7 @@ void Game::cmd_Enter( GameEntity *ent )
 		mins[i] = client->ps_.origin[i] - g_enterRange.value;
 		maxs[i] = client->ps_.origin[i] + g_enterRange.value;
 	}
-	int num = SV_AreaEntities( mins, maxs, touch, MAX_GENTITIES );
+	int num = GameHost::areaEntities( mins, maxs, touch, MAX_GENTITIES );
 
 	GameEntity* best = nullptr;
 	Abandoned_Think* bestThink = nullptr;
@@ -1773,10 +1773,10 @@ void Game::cmd_Enter( GameEntity *ent )
 
 	int clientNum = ent->s.number;
 	char userinfo[MAX_INFO_STRING];
-	SV_GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
+	GameHost::getUserinfo( clientNum, userinfo, sizeof( userinfo ) );
 	Info::setValueForKey( userinfo, "cg_vehicle", va( "%d", vehicle ) );
 	Info::setValueForKey( userinfo, "cg_nextVehicle", va( "%d", vehicle ) );
-	SV_SetUserinfo( clientNum, userinfo );
+	GameHost::setUserinfo( clientNum, userinfo );
 	ClientUserinfoChanged( clientNum );
 
 	switch_vehicle( ent );
@@ -1859,10 +1859,10 @@ void Cmd_Eject_f( GameEntity *ent )
 
 	int clientNum = ent->s.number;
 	char userinfo[MAX_INFO_STRING];
-	SV_GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
+	GameHost::getUserinfo( clientNum, userinfo, sizeof( userinfo ) );
 	Info::setValueForKey( userinfo, "cg_vehicle", va( "%d", infantry ) );
 	Info::setValueForKey( userinfo, "cg_nextVehicle", va( "%d", infantry ) );
-	SV_SetUserinfo( clientNum, userinfo );
+	GameHost::setUserinfo( clientNum, userinfo );
 	ClientUserinfoChanged( clientNum );
 
 	switch_vehicle( ent );
@@ -1886,7 +1886,7 @@ void Cmd_ME_Spawn_f( GameEntity *ent )
 	if( idx < 0 || idx >= bg_numberOfVehicles ) 
 		return;
 
-	SV_GameSendServerCommand( -1, va("me_spawnvehicle %d\n", idx) );
+	GameHost::sendServerCommand( -1, va("me_spawnvehicle %d\n", idx) );
 }
 
 /*
@@ -1906,7 +1906,7 @@ void Cmd_ME_SpawnGI_f( GameEntity *ent )
 	if( idx < 0 || idx >= bg_numberOfGroundInstallations ) 
 		return;
 
-	SV_GameSendServerCommand( -1, va("me_spawnvehiclegi %d\n", idx) );
+	GameHost::sendServerCommand( -1, va("me_spawnvehiclegi %d\n", idx) );
 }
 
 /*
@@ -1997,5 +1997,5 @@ void ClientCommand( int clientNum )
 		Cmd_DevPlace_f( ent );
 
 	else
-		SV_GameSendServerCommand( clientNum, va("print \"unknown cmd %s\n\"", cmd ) );
+		GameHost::sendServerCommand( clientNum, va("print \"unknown cmd %s\n\"", cmd ) );
 }

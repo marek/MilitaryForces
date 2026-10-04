@@ -145,7 +145,7 @@ void RespawnItem( GameEntity *ent )
 	ent->r.contents = CONTENTS_TRIGGER;
 	ent->s.eFlags &= ~EF_NODRAW;
 	ent->r.svFlags &= ~SVF_NOCLIENT;
-	SV_LinkEntity(ent);
+	GameHost::linkEntity(ent);
 
 	// play the normal respawn sound only to nearby clients
 	Game::addEvent( ent, EV_ITEM_RESPAWN, 0, true );
@@ -299,7 +299,7 @@ struct Touch_ItemTouch : public GameEntity::EntityFunc_Touch
 			self->nextthink_ = theLevel.time_ + respawn * 1000;
 			self->setThink( std::make_unique<Think_RespawnItem>());
 		}
-		SV_LinkEntity( self );
+		GameHost::linkEntity( self );
 	}
 };
 
@@ -361,7 +361,7 @@ GameEntity *LaunchItem( gitem_t *item, vec3_t origin, vec3_t velocity )
 
 	dropped->flags_ = FL_DROPPED_ITEM;
 
-	SV_LinkEntity( dropped );
+	GameHost::linkEntity( dropped );
 
 	return dropped;
 }
@@ -442,7 +442,7 @@ void GameItem::Think_FinishSpawningItem::execute()
 	{
 		// drop to floor
 		VectorSet( dest, self_->s.origin[0], self_->s.origin[1], self_->s.origin[2] - 4096 );
-		SV_Trace( &tr, self_->s.origin, self_->r.mins, self_->r.maxs, dest, self_->s.number, MASK_SOLID, false );
+		GameHost::trace( &tr, self_->s.origin, self_->r.mins, self_->r.maxs, dest, self_->s.number, MASK_SOLID, false );
 		if( tr.startsolid ) 
 		{
 			Common::printf ("FinishSpawningItem: %s startsolid at %s\n", self_->classname_, vtos(self_->s.origin));
@@ -465,7 +465,7 @@ void GameItem::Think_FinishSpawningItem::execute()
 		return;
 	}
 
-	SV_LinkEntity( self_ );
+	GameHost::linkEntity( self_ );
 }
 
 bool	itemRegistered[MAX_ITEMS];
@@ -563,7 +563,7 @@ void SaveRegisteredItems()
 	string[ bg_numItems ] = 0;
 
 	Common::printf( "%i items registered\n", count );
-	SV_SetConfigstring(CS_ITEMS, string);
+	GameHost::setConfigstring(CS_ITEMS, string);
 }
 
 ///*
@@ -671,7 +671,7 @@ void Game::runItem( GameEntity *ent )
 	else 
 		mask = MASK_PLAYERSOLID & ~CONTENTS_BODY;//MASK_SOLID;
 
-	SV_Trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, origin, 
+	GameHost::trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, origin, 
 		ent->r.ownerNum, mask, false );
 
 	VectorCopy( tr.endpos, ent->r.currentOrigin );
@@ -679,7 +679,7 @@ void Game::runItem( GameEntity *ent )
 	if ( tr.startsolid ) 
 		tr.fraction = 0;
 
-	SV_LinkEntity( ent );	// FIXME: avoid this for stationary?
+	GameHost::linkEntity( ent );	// FIXME: avoid this for stationary?
 
 	// check think function
 	Game::runThink( ent );
@@ -688,7 +688,7 @@ void Game::runItem( GameEntity *ent )
 		return;
 
 	// if it is in a nodrop volume, remove it
-	contents = SV_PointContents( ent->r.currentOrigin, -1 );
+	contents = GameHost::pointContents( ent->r.currentOrigin, -1 );
 	if ( contents & CONTENTS_NODROP ) 
 	{
 		if (ent->item_ && ent->item_->giType == IT_TEAM) 

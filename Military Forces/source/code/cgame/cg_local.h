@@ -12,6 +12,7 @@
 #include "tr_types.h"
 #include "../game/bg_public.h"
 #include "cg_public.h"
+#include "../qcommon/client_host.h"
 #include "../ui/ui_shared.h"
 #include "../renderercommon/tr_public.h"
 #include "../vehiclelib/bg_datamanager.h"
@@ -1504,19 +1505,8 @@ void ME_Init_MissionEditor();
 //===============================================
 
 // system calls
-void CL_AddCgameCommand( const char *cmdName );
-void CL_AddReliableCommand(const char *cmd, bool isDisconnectCmd = false);
-void CL_CM_LoadMap( const char *mapname );
 int Key_GetCatcher();
 void Key_SetCatcher( int catcher );
-void CL_GetGlconfig( glconfig_t *glconfig );
-void CL_GetGameState( gameState_t *gs );
-void CL_GetCurrentSnapshotNumber( int *snapshotNumber, int *serverTime );
-bool CL_GetSnapshot( int snapshotNumber, snapshot_t *snapshot );
-bool CL_GetServerCommand( int serverCommandNumber );
-int CL_GetCurrentCmdNumber();
-bool CL_GetUserCmd( int cmdNumber, usercmd_t *ucmd );
-void CL_SetUserCmdValue( int userCmdValue, float sensitivityScale );
 
 
 

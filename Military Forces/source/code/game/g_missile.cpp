@@ -84,7 +84,7 @@ struct Think_ExplodeMissile : public GameEntity::EntityFunc_Think
 			}
 		}
 
-		SV_LinkEntity( self_ );
+		GameHost::linkEntity( self_ );
 	}
 };
 
@@ -127,7 +127,7 @@ struct Think_ExplodeFlak : public GameEntity::EntityFunc_Think
 				theLevel.getEntity(self_->r.ownerNum)->client_->accuracy_hits_++;
 			}
 		}
-		SV_LinkEntity( self_ );
+		GameHost::linkEntity( self_ );
 	}
 };
 
@@ -185,7 +185,7 @@ struct Think_ExplodeCFlare : public GameEntity::EntityFunc_Think
 		VectorSet(dir, 0 + 5 * Q_random(&seed),	0 + 5 * Q_random(&seed),	120 * Q_random(&seed));
 		fire_flare2(self_->parent_, self_->r.currentOrigin, dir, 2000 + 1000 * Q_random(&seed) );
 
-		SV_LinkEntity( self_ );
+		GameHost::linkEntity( self_ );
 	}
 };
 
@@ -216,7 +216,7 @@ void Game::nukeRadiusDamage( vec3_t origin, GameEntity *attacker, float damage, 
 		maxs[i] = origin[i] + radius;
 	}
 
-	numListedEntities = SV_AreaEntities( mins, maxs, entityList, MAX_GENTITIES );
+	numListedEntities = GameHost::areaEntities( mins, maxs, entityList, MAX_GENTITIES );
 
 	for ( e = 0 ; e < numListedEntities ; e++ ) 
 	{
@@ -248,12 +248,12 @@ void Game::nukeRadiusDamage( vec3_t origin, GameEntity *attacker, float damage, 
 		if( strcmp(ent->classname_, "player") == 0 )
 		{
 			// Try a trace
-			SV_Trace (&trace, origin, nullptr, nullptr,  ent->r.currentOrigin, ent->s.number, MASK_SOLID, false);
+			GameHost::trace (&trace, origin, nullptr, nullptr,  ent->r.currentOrigin, ent->s.number, MASK_SOLID, false);
 		
 			// Also don't let them get away to easily so check slightly above the origin, and see if it reaches) It may have to be a big hill.
 			VectorCopy(origin, temp);
 			temp[2] += radius / 2;
-			SV_Trace (&trace2, temp, nullptr, nullptr, ent->r.currentOrigin, ent->s.number, MASK_SOLID, false);
+			GameHost::trace (&trace2, temp, nullptr, nullptr, ent->r.currentOrigin, ent->s.number, MASK_SOLID, false);
 		}
 		else
 		{
@@ -300,7 +300,7 @@ void Game::nukeShockWave( vec3_t origin, GameEntity *attacker, float damage, flo
 		maxs[i] = origin[i] + radius;
 	}
 
-	numListedEntities = SV_AreaEntities( mins, maxs, entityList, MAX_GENTITIES );
+	numListedEntities = GameHost::areaEntities( mins, maxs, entityList, MAX_GENTITIES );
 
 	for ( e = 0 ; e < numListedEntities ; e++ ) 
 	{
@@ -522,7 +522,7 @@ void Game::burningManExplode( GameEntity *ent )
 		VectorScale( dir, 15, bolt->s.pos.trDelta );
 		SnapVector( bolt->s.pos.trDelta );
 		VectorCopy( start, bolt->r.currentOrigin );
-		SV_LinkEntity( bolt );
+		GameHost::linkEntity( bolt );
 	}
 }
 
@@ -563,7 +563,7 @@ struct Think_ExplodeNuke : public GameEntity::EntityFunc_Think
 
 		VectorClear(explosion->movedir_);
 
-		SV_LinkEntity( explosion );
+		GameHost::linkEntity( explosion );
 
 		explosion->activator_ = self_->parent_;		// Activator is the owner of the bomb/missile 
 
@@ -699,7 +699,7 @@ void G_MissileImpact( GameEntity *ent, trace_t *trace )
 		}
 	}
 
-	SV_LinkEntity( ent );
+	GameHost::linkEntity( ent );
 }
 
 /*
@@ -724,18 +724,18 @@ void Game::runMissile( GameEntity *ent )
 		passent = ent->r.ownerNum;
 
 	// trace a line from the previous position to the current position
-	SV_Trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, origin, passent, ent->clipmask_, false );
+	GameHost::trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, origin, passent, ent->clipmask_, false );
 
 	if ( tr.startsolid || tr.allsolid ) 
 	{
 		// make sure the tr.entityNum is set to the entity we're stuck in
-		SV_Trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, ent->r.currentOrigin, passent, ent->clipmask_, false );
+		GameHost::trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, ent->r.currentOrigin, passent, ent->clipmask_, false );
 		tr.fraction = 0;
 	}
 	else 
 		VectorCopy( tr.endpos, ent->r.currentOrigin );
 
-	SV_LinkEntity( ent );
+	GameHost::linkEntity( ent );
 
 	if ( tr.fraction != 1)
 	{
@@ -802,7 +802,7 @@ struct Think_Crate : public GameEntity::EntityFunc_Think
 		self_->nextthink_ = theLevel.time_ + 5;
 		self_->lastDist_ = VectorNormalize(dir);
 
-		SV_LinkEntity( self_ );
+		GameHost::linkEntity( self_ );
 	}
 };
 
@@ -901,7 +901,7 @@ struct Think_FollowTarget : public GameEntity::EntityFunc_Think
 		// check for flares
 		VectorSubtract( self->r.currentOrigin, range, mins );
 		VectorAdd( self->r.currentOrigin, range, maxs );
-		num = SV_AreaEntities( mins, maxs, touch, MAX_GENTITIES );
+		num = GameHost::areaEntities( mins, maxs, touch, MAX_GENTITIES );
 
 		for ( i=0 ; i<num ; i++ ) 
 		{
@@ -950,7 +950,7 @@ struct Think_FollowTarget : public GameEntity::EntityFunc_Think
 		}
 
 		// LOS
-		SV_Trace( &tr, self->r.currentOrigin, nullptr, nullptr, mid, self->tracktarget_->s.number, MASK_SOLID, false );
+		GameHost::trace( &tr, self->r.currentOrigin, nullptr, nullptr, mid, self->tracktarget_->s.number, MASK_SOLID, false );
 		if( tr.fraction < 1.0f ) 
 		{
 			Game::on_target_lost(self);
@@ -979,7 +979,7 @@ struct Think_FollowTarget : public GameEntity::EntityFunc_Think
 		if( self->tracktarget_->client_ ) 
 			self->tracktarget_->client_->ps_.stats[STAT_LOCKINFO] |= LI_BEING_LAUNCHED;
 
-		SV_LinkEntity( self );
+		GameHost::linkEntity( self );
 	}
 };
 

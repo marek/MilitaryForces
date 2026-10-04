@@ -214,8 +214,8 @@ void CGame::interpolatePlayerState( bool grabAngles ) {
 		usercmd_t	cmd;
 		int			cmdNum;
 
-		cmdNum = CL_GetCurrentCmdNumber();
-		CL_GetUserCmd( cmdNum, &cmd );
+		cmdNum = ClientHost::getCurrentCmdNumber();
+		ClientHost::getUserCmd( cmdNum, &cmd );
 
 		PM_UpdateViewAngles( out, &cmd );
 	}
@@ -439,13 +439,13 @@ void CGame::predictPlayerState( ) {
 	// save the state before the pmove so we can detect transitions
 	oldPlayerState = cg.predictedPlayerState;
 
-	current = CL_GetCurrentCmdNumber();
+	current = ClientHost::getCurrentCmdNumber();
 
 	// if we don't have the commands right after the snapshot, we
 	// can't accurately predict a current position, so just freeze at
 	// the last good position we had
 	cmdNum = current - CMD_BACKUP + 1;
-	CL_GetUserCmd( cmdNum, &oldestCmd );
+	ClientHost::getUserCmd( cmdNum, &oldestCmd );
 	if ( oldestCmd.serverTime > cg.snap->ps.commandTime 
 		&& oldestCmd.serverTime < cg.time ) {	// special check for map_restart
 		if ( cg_showmiss.integer ) {
@@ -455,7 +455,7 @@ void CGame::predictPlayerState( ) {
 	}
 
 	// get the latest command so we can know which commands are from previous map_restarts
-	CL_GetUserCmd( current, &latestCmd );
+	ClientHost::getUserCmd( current, &latestCmd );
 
 	// get the most recent information we have, even if
 	// the server time is beyond our current cg.time,
@@ -485,7 +485,7 @@ void CGame::predictPlayerState( ) {
 	moved = false;
 	for ( cmdNum = current - CMD_BACKUP + 1 ; cmdNum <= current ; cmdNum++ ) {
 		// get the command
-		CL_GetUserCmd( cmdNum, &cg_pmove.cmd );
+		ClientHost::getUserCmd( cmdNum, &cg_pmove.cmd );
 
 		if ( cg_pmove.pmove_fixed ) {
 			PM_UpdateViewAngles( cg_pmove.ps, &cg_pmove.cmd );

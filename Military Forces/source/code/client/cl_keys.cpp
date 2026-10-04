@@ -782,7 +782,7 @@ void Message_Key( int key ) {
 
 
 
-			CL_AddReliableCommand(buffer, false);
+			ClientHost::addReliableCommand(buffer, false);
 		}
 		Key_SetCatcher( Key_GetCatcher( ) & ~KEYCATCH_MESSAGE );
 		chatField.clear();

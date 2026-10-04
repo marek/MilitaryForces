@@ -592,7 +592,7 @@ void CL_ParseDownload ( Message *msg ) {
 
 	if (!*clc.downloadTempName) {
 		Common::printf("Server sending download, but no download was requested\n");
-		CL_AddReliableCommand("stopdl", false);
+		ClientHost::addReliableCommand("stopdl", false);
 		return;
 	}
 
@@ -635,7 +635,7 @@ void CL_ParseDownload ( Message *msg ) {
 
 		if (!clc.download) {
 			Common::printf( "Could not create %s\n", clc.downloadTempName );
-			CL_AddReliableCommand("stopdl", false);
+			ClientHost::addReliableCommand("stopdl", false);
 			Client::nextDownload();
 			return;
 		}
@@ -644,7 +644,7 @@ void CL_ParseDownload ( Message *msg ) {
 	if (size)
 		FileSystem::write( data, size, clc.download );
 
-	CL_AddReliableCommand(va("nextdl %d", clc.downloadBlock), false);
+	ClientHost::addReliableCommand(va("nextdl %d", clc.downloadBlock), false);
 	clc.downloadBlock++;
 
 	clc.downloadCount += size;

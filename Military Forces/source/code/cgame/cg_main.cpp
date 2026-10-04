@@ -1972,7 +1972,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	// old servers
 
 	// get the rendering configuration from the client system
-	CL_GetGlconfig( &cgs.glconfig );
+	ClientHost::getGlconfig( &cgs.glconfig );
 	cgs.screenXScale = cgs.glconfig.vidWidth / 640.0;
 	cgs.screenYScale = cgs.glconfig.vidHeight / 480.0;
 	cgs.screenScale = cgs.screenXScale < cgs.screenYScale ? cgs.screenXScale : cgs.screenYScale;
@@ -1983,7 +1983,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	cgUtils.dc_->yScale_ = cgs.screenYScale;
 
 	// get the gamestate from the client system
-	CL_GetGameState( &cgs.gameState );
+	ClientHost::getGameState( &cgs.gameState );
 
 	// check version
 	s = CGame::configString( CS_GAME_VERSION );
@@ -2033,7 +2033,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	// load the New map
 	CGame::loadingStage( "collision map", 0.0f, 0.1f );
 
-	CL_CM_LoadMap( cgs.mapname );
+	ClientHost::loadMap( cgs.mapname );
 
 	cgUtils.string_Init();
 

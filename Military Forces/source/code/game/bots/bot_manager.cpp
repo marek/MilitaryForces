@@ -207,7 +207,7 @@ int Bots::pickVehicle( int teamFlag, bool allowInfantry, const Character* who, c
 
 int Bots::add( int vehicle, const char* team, const char* name )
 {
-	const int clientNum = SV_BotAllocateClient();
+	const int clientNum = GameHost::botAllocateClient();
 	if( clientNum < 0 )
 	{
 		Common::printf( "No free client slot for a bot\n" );
@@ -222,11 +222,11 @@ int Bots::add( int vehicle, const char* team, const char* name )
 	Info::setValueForKey( userinfo, "snaps", "20" );
 	Info::setValueForKey( userinfo, "handicap", "100" );
 	Info::setValueForKey( userinfo, "team", team && team[0] ? team : "auto" );
-	SV_SetUserinfo( clientNum, userinfo );
+	GameHost::setUserinfo( clientNum, userinfo );
 
 	if( MF_ClientConnect( clientNum, true, true ) )
 	{
-		SV_BotFreeClient( clientNum );
+		GameHost::botFreeClient( clientNum );
 		return -1;
 	}
 	states_[clientNum].vehicle = vehicle;
@@ -238,7 +238,7 @@ void Bots::remove( int clientNum )
 {
 	if( !isBot( clientNum ) )
 		return;
-	SV_GameDropClient( clientNum, "was removed" );
+	GameHost::dropClient( clientNum, "was removed" );
 	states_[clientNum] = State{};
 }
 
@@ -303,9 +303,9 @@ void Bots::select( GameEntity* ent, State& bot )
 		return;
 
 	char userinfo[MAX_INFO_STRING];
-	SV_GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
+	GameHost::getUserinfo( clientNum, userinfo, sizeof( userinfo ) );
 	Info::setValueForKey( userinfo, "cg_nextVehicle", va( "%d", bot.vehicle ) );
-	SV_SetUserinfo( clientNum, userinfo );
+	GameHost::setUserinfo( clientNum, userinfo );
 	ClientUserinfoChanged( clientNum );
 }
 
@@ -361,9 +361,9 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 					bot.vehicle = vehicle;
 					bot.badLives = 0;
 					char userinfo[MAX_INFO_STRING];
-					SV_GetUserinfo( ent->s.number, userinfo, sizeof( userinfo ) );
+					GameHost::getUserinfo( ent->s.number, userinfo, sizeof( userinfo ) );
 					Info::setValueForKey( userinfo, "cg_nextVehicle", va( "%d", vehicle ) );
-					SV_SetUserinfo( ent->s.number, userinfo );
+					GameHost::setUserinfo( ent->s.number, userinfo );
 					bot.wasAlive = false;
 					ClientUserinfoChanged( ent->s.number );
 					return;
@@ -526,7 +526,7 @@ void Bots::runFrame()
 		memset( &cmd, 0, sizeof( cmd ) );
 		cmd.serverTime = theLevel.time_;
 		think( ent, bot, cmd );
-		SV_BotUserCommand( i, &cmd );
+		GameHost::botUserCommand( i, &cmd );
 	}
 }
 

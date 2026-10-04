@@ -69,7 +69,7 @@ void Die_ExplosiveDie::execute( GameEntity *inflictor, GameEntity *attacker, int
 		}
 	}
 
-	SV_UnlinkEntity( self_ );
+	GameHost::unlinkEntity( self_ );
 	
 }
 
@@ -79,7 +79,7 @@ A bmodel that just sits there, doing nothing, for planes to land on
 */
 void SP_func_runway( GameEntity *ent ) 
 {
-	SV_SetBrushModel( ent, ent->model_ );
+	GameHost::setBrushModel( ent, ent->model_ );
 	ent->r.svFlags = SVF_USE_CURRENT_ORIGIN;
 	ent->s.eType = ET_EXPLOSIVE;
 	ent->s.pos.trType = TR_STATIONARY;
@@ -105,7 +105,7 @@ void SP_func_runway( GameEntity *ent )
 //	Common::printf( "runway: %d, %.1f %.1f %.1f - %.1f %.1f %.1f\n", ent->health, ent->r.mins[0],
 //		ent->r.mins[1], ent->r.mins[2], ent->r.maxs[0], ent->r.maxs[1], ent->r.maxs[2] );
 
-	SV_LinkEntity( ent );
+	GameHost::linkEntity( ent );
 }
 
 
@@ -124,7 +124,7 @@ health = well, health :-)
 */
 void SP_func_explosive( GameEntity *ent ) 
 {
-	SV_SetBrushModel( ent, ent->model_ );
+	GameHost::setBrushModel( ent, ent->model_ );
 	ent->r.svFlags = SVF_USE_CURRENT_ORIGIN;
 	ent->s.eType = ET_EXPLOSIVE;
 	ent->s.pos.trType = TR_STATIONARY;
@@ -145,7 +145,7 @@ void SP_func_explosive( GameEntity *ent )
 		else if ( Q_stricmp( ent->team_, "blue" ) == 0 ) 
 			ent->s.generic1 = ClientBase::TEAM_BLUE;	
 	}
-	SV_LinkEntity( ent );
+	GameHost::linkEntity( ent );
 }
 
 
@@ -242,7 +242,7 @@ void SP_trigger_recharge( GameEntity *self )
 		self->ent_category_ = CAT_ANY;
 //	else self->ent_category <<= 8;
 
-	SV_SetBrushModel( self, self->model_ );
+	GameHost::setBrushModel( self, self->model_ );
 	self->clipmask_ = self->r.contents = CONTENTS_TRIGGER;
 	self->r.svFlags = SVF_NOCLIENT;
 	self->setTouch( std::make_unique<Touch_RechargeTouch>());
@@ -257,7 +257,7 @@ void SP_trigger_recharge( GameEntity *self )
 	} else {
 		self->s.generic1 = ClientBase::TEAM_FREE;
 	}
-	SV_LinkEntity( self );
+	GameHost::linkEntity( self );
 }
 
 
@@ -304,7 +304,7 @@ message - the message to be displayed (radio comm)
 */
 void SP_trigger_radio( GameEntity *self ) 
 {
-	SV_SetBrushModel( self, self->model_ );
+	GameHost::setBrushModel( self, self->model_ );
 	self->clipmask_ = self->r.contents = CONTENTS_TRIGGER;
 	self->r.svFlags = SVF_NOCLIENT;
 	self->setTouch( std::make_unique<Touch_RadioTower>());
@@ -319,7 +319,7 @@ void SP_trigger_radio( GameEntity *self )
 	} else {
 		self->s.generic1 = ClientBase::TEAM_FREE;
 	}
-	SV_LinkEntity( self );
+	GameHost::linkEntity( self );
 }
 
 

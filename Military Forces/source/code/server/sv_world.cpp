@@ -172,11 +172,11 @@ void ServerMain::clearWorld( ) {
 
 /*
 ===============
-SV_UnlinkEntity
+GameHost::unlinkEntity
 
 ===============
 */
-void SV_UnlinkEntity( EntityBase* gameEnt ) 
+void GameHost::unlinkEntity( EntityBase* gameEnt ) 
 {
 //	svEntity_t		*ent;
 //	svEntity_t		*scan;
@@ -213,12 +213,12 @@ void SV_UnlinkEntity( EntityBase* gameEnt )
 
 /*
 ===============
-SV_LinkEntity
+GameHost::linkEntity
 
 ===============
 */
 constexpr int MAX_TOTAL_ENT_LEAFS = 128;
-void SV_LinkEntity( EntityBase* gameEnt ) 
+void GameHost::linkEntity( EntityBase* gameEnt ) 
 {
 	worldSector_t	*node;
 	int				leafs[MAX_TOTAL_ENT_LEAFS];
@@ -235,7 +235,7 @@ void SV_LinkEntity( EntityBase* gameEnt )
 
 	if ( ent->worldSector_ ) 
 	{
-		SV_UnlinkEntity( gameEnt );	// unlink from old position
+		GameHost::unlinkEntity( gameEnt );	// unlink from old position
 	}
 
 	// encode the size into the entityState_t for client prediction
@@ -462,10 +462,10 @@ void SV_AreaEntities_r( worldSector_t *node, areaParms_t *ap )
 
 /*
 ================
-SV_AreaEntities
+GameHost::areaEntities
 ================
 */
-int SV_AreaEntities( const vec3_t mins, const vec3_t maxs, int *entityList, int maxcount ) 
+int GameHost::areaEntities( const vec3_t mins, const vec3_t maxs, int *entityList, int maxcount ) 
 {
 	areaParms_t		ap;
 
@@ -558,7 +558,7 @@ void SV_ClipMoveToEntities( moveclip_t *clip )
 	clipHandle_t clipHandle;
 	float		*origin, *angles;
 
-	num = SV_AreaEntities( clip->boxmins, clip->boxmaxs, touchlist, MAX_GENTITIES);
+	num = GameHost::areaEntities( clip->boxmins, clip->boxmaxs, touchlist, MAX_GENTITIES);
 
 	if ( clip->passEntityNum != ENTITYNUM_NONE ) {
 		passOwnerNum = ( theSV.getEntityByNum( clip->passEntityNum ) )->r.ownerNum;
@@ -630,13 +630,13 @@ void SV_ClipMoveToEntities( moveclip_t *clip )
 
 /*
 ==================
-SV_Trace
+GameHost::trace
 
 Moves the given mins/maxs volume through the world from start to end.
 passEntityNum and entities owned by passEntityNum are explicitly not checked.
 ==================
 */
-void SV_Trace( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentmask, bool capsule ) 
+void GameHost::trace( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentmask, bool capsule ) 
 {
 	moveclip_t	clip;
 	int			i;
@@ -691,10 +691,10 @@ void SV_Trace( trace_t *results, const vec3_t start, const vec3_t mins, const ve
 
 /*
 =============
-SV_PointContents
+GameHost::pointContents
 =============
 */
-int SV_PointContents( const vec3_t p, int passEntityNum ) 
+int GameHost::pointContents( const vec3_t p, int passEntityNum ) 
 {
 	int			touch[MAX_GENTITIES];
 	EntityBase*	hit;
@@ -707,7 +707,7 @@ int SV_PointContents( const vec3_t p, int passEntityNum )
 	contents = CollisionModel::pointContents( p, 0 );
 
 	// or in contents from all the other entities
-	num = SV_AreaEntities( p, p, touch, MAX_GENTITIES );
+	num = GameHost::areaEntities( p, p, touch, MAX_GENTITIES );
 
 	for ( i=0 ; i<num ; i++ ) {
 		if ( touch[i] == passEntityNum ) {

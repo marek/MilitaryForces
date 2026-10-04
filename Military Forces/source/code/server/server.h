@@ -27,6 +27,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../game/q_shared.h"
 #include "../qcommon/qcommon.h"
 #include "../game/g_public.h"
+#include "../qcommon/game_host.h"
 #include "../game/bg_public.h"
 #include <vector>
 
@@ -329,19 +330,14 @@ int SV_RateMsec(SV_Client *client);
 
 //void SV_MasterHeartbeat (void);
 
-bool SV_GetEntityToken( char *buffer, int bufferSize );
 
 
 
 //
 // sv_init.c
 //
-void SV_SetConfigstring( int index, const char *val );
 void SV_UpdateConfigstrings( SV_Client *client );
-void SV_GetConfigstring( int index, char *buffer, int bufferSize );
 
-void SV_SetUserinfo( int index, const char *val );
-void SV_GetUserinfo( int index, char *buffer, int bufferSize );
 
 
 
@@ -404,18 +400,8 @@ void SV_SendClientSnapshot( SV_Client *client );
 //svEntity_t	*SV_SvEntityForGentity( const entityState_t* s, const entityShared_t* r);
 //sharedEntity_t *SV_GEntityForSvEntity( svEntity_t *svEnt );
 void SV_ShutdownGameProgs ( );
-bool SV_inPVS (const vec3_t p1, const vec3_t p2);
-void SV_GetUsercmd( int clientNum, usercmd_t *cmd );
-bool SV_EntityContact( const vec3_t mins, const vec3_t maxs, EntityBase* gameEnt, bool capsule );
-void SV_GetServerinfo( char *buffer, int bufferSize );
-void SV_GameSendServerCommand( int clientNum, const char *text );
-void SV_GameDropClient( int clientNum, const char *reason );
-void SV_AdjustAreaPortalState( EntityBase* gameEnt, int open );
-void SV_SetBrushModel( EntityBase* gameEnt, const char *name );
-//void SV_LocateGameData( void* gEnts, int numGEntities, int sizeofGEntity_t,
+//void GameHost::locateGameData( void* gEnts, int numGEntities, int sizeofGEntity_t,
 //					   playerState_t *clients, int sizeofGameClient );
-void SV_LocateGameData( std::vector<EntityBase*>* gameEntities, 
-					    std::vector<ClientBase*>* gameClients );
 
 //============================================================
 //
@@ -424,13 +410,11 @@ void SV_LocateGameData( std::vector<EntityBase*>* gameEntities,
 
 // called after the world model has been loaded, before linking any entities
 
-//void SV_UnlinkEntity( entityState_t* s, entityShared_t* r );
-void SV_UnlinkEntity( EntityBase* gameEnt );
+//void GameHost::unlinkEntity( entityState_t* s, entityShared_t* r );
 // call before removing an entity, and before trying to move one,
 // so it doesn't clip against itself
 
-//void SV_LinkEntity( entityState_t* s, entityShared_t* r );
-void SV_LinkEntity( EntityBase* gameEnt );
+//void GameHost::linkEntity( entityState_t* s, entityShared_t* r );
 // Needs to be called any time an entity changes origin, mins, maxs,
 // or solid.  Automatically unlinks if needed.
 // sets ent->v.absmin and ent->v.absmax
@@ -442,7 +426,6 @@ void SV_LinkEntity( EntityBase* gameEnt );
 
 
 
-int SV_AreaEntities( const vec3_t mins, const vec3_t maxs, int *entityList, int maxcount );
 // fills in a table of entity numbers with entities that have bounding boxes
 // that intersect the given area.  It is possible for a non-axial bmodel
 // to be returned that doesn't actually intersect the area on an exact
@@ -451,11 +434,9 @@ int SV_AreaEntities( const vec3_t mins, const vec3_t maxs, int *entityList, int 
 // The world entity is never returned in this list.
 
 
-int SV_PointContents( const vec3_t p, int passEntityNum );
 // returns the CONTENTS_* value from the world and all entities at the given point.
 
 
-void SV_Trace( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentmask, bool capsule );
 // mins and maxs are relative
 
 // if the entire move stays in a solid volume, trace.allsolid will be set,

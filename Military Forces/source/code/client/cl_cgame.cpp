@@ -37,20 +37,20 @@ extern bool getCameraInfo(int time, vec3_t *origin, vec3_t *angles);
 
 /*
 ====================
-CL_GetGameState
+ClientHost::getGameState
 ====================
 */
-void CL_GetGameState( gameState_t *gs ) 
+void ClientHost::getGameState( gameState_t *gs ) 
 {
 	*gs = cl.gameState;
 }
 
 /*
 ====================
-CL_GetGlconfig
+ClientHost::getGlconfig
 ====================
 */
-void CL_GetGlconfig( glconfig_t *glconfig ) 
+void ClientHost::getGlconfig( glconfig_t *glconfig ) 
 {
 	*glconfig = cls.glconfig;
 }
@@ -58,10 +58,10 @@ void CL_GetGlconfig( glconfig_t *glconfig )
 
 /*
 ====================
-CL_GetUserCmd
+ClientHost::getUserCmd
 ====================
 */
-bool CL_GetUserCmd( int cmdNumber, usercmd_t *ucmd ) 
+bool ClientHost::getUserCmd( int cmdNumber, usercmd_t *ucmd ) 
 {
 	// cmds[cmdNumber] is the last properly generated command
 
@@ -81,7 +81,7 @@ bool CL_GetUserCmd( int cmdNumber, usercmd_t *ucmd )
 	return true;
 }
 
-int CL_GetCurrentCmdNumber() 
+int ClientHost::getCurrentCmdNumber() 
 {
 	return cl.cmdNumber;
 }
@@ -110,10 +110,10 @@ bool	CL_GetParseEntityState( int parseEntityNumber, entityState_t *state ) {
 
 /*
 ====================
-CL_GetCurrentSnapshotNumber
+ClientHost::getCurrentSnapshotNumber
 ====================
 */
-void CL_GetCurrentSnapshotNumber( int *snapshotNumber, int *serverTime ) 
+void ClientHost::getCurrentSnapshotNumber( int *snapshotNumber, int *serverTime ) 
 {
 	*snapshotNumber = cl.snap.messageNum;
 	*serverTime = cl.snap.serverTime;
@@ -121,10 +121,10 @@ void CL_GetCurrentSnapshotNumber( int *snapshotNumber, int *serverTime )
 
 /*
 ====================
-CL_GetSnapshot
+ClientHost::getSnapshot
 ====================
 */
-bool	CL_GetSnapshot( int snapshotNumber, snapshot_t *snapshot ) 
+bool	ClientHost::getSnapshot( int snapshotNumber, snapshot_t *snapshot ) 
 {
 	clSnapshot_t	*clSnap;
 	int				i, count;
@@ -175,10 +175,10 @@ bool	CL_GetSnapshot( int snapshotNumber, snapshot_t *snapshot )
 
 /*
 =====================
-CL_SetUserCmdValue
+ClientHost::setUserCmdValue
 =====================
 */
-void CL_SetUserCmdValue( int userCmdValue, float sensitivityScale ) 
+void ClientHost::setUserCmdValue( int userCmdValue, float sensitivityScale ) 
 {
 	cl.cgameUserCmdValue = userCmdValue;
 	cl.cgameSensitivity = sensitivityScale;
@@ -186,10 +186,10 @@ void CL_SetUserCmdValue( int userCmdValue, float sensitivityScale )
 
 /*
 =====================
-CL_AddCgameCommand
+ClientHost::addCgameCommand
 =====================
 */
-void CL_AddCgameCommand( const char *cmdName ) 
+void ClientHost::addCgameCommand( const char *cmdName ) 
 {
 	CommandSystem::addCommand( cmdName, nullptr );
 }
@@ -268,12 +268,12 @@ void CL_ConfigstringModified( ) {
 
 /*
 ===================
-CL_GetServerCommand
+ClientHost::getServerCommand
 
 Set up argc/argv for the given command
 ===================
 */
-bool CL_GetServerCommand( int serverCommandNumber ) {
+bool ClientHost::getServerCommand( int serverCommandNumber ) {
 	char	*s;
 	char	*cmd;
 	static char bigConfigString[BIG_INFO_STRING];
@@ -383,12 +383,12 @@ rescan:
 
 /*
 ====================
-CL_CM_LoadMap
+ClientHost::loadMap
 
 Just adds default parameters that cgame doesn't need to know about
 ====================
 */
-void CL_CM_LoadMap( const char *mapname ) 
+void ClientHost::loadMap( const char *mapname ) 
 {
 	int		checksum;
 

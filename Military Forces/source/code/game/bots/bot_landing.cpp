@@ -99,7 +99,7 @@ Status LandingSteps::survey( Bots::Mind& c )
 			from[2] = pad.z + 600;
 			VectorCopy( from, to );
 			to[2] -= 4000;
-			SV_Trace( &tr, from, boxMins, boxMaxs, to, ENTITYNUM_NONE, MASK_PLAYERSOLID|CONTENTS_BOTCLIP, false );
+			GameHost::trace( &tr, from, boxMins, boxMaxs, to, ENTITYNUM_NONE, MASK_PLAYERSOLID|CONTENTS_BOTCLIP, false );
 			const float rise = tr.startsolid ? 600.0f : tr.endpos[2] - pad.z;
 			slope[k] = std::max( slope[k], (rise + 60.0f) / (d + 300.0f) );
 		}

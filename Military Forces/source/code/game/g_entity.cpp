@@ -353,7 +353,7 @@ GameEntity::init(int num)
 void
 GameEntity::freeUp()
 {
-	SV_UnlinkEntity( this );		// unlink from world
+	GameHost::unlinkEntity( this );		// unlink from world
 
 	//if( neverFree_ ) 
 	//	return;

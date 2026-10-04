@@ -25,7 +25,7 @@ Entity_Helicopter::checkForTakeoffOrLanding()
 	endpos[2] -= height;
 	vec3_t	wheelMins = { -6, -6, 0 };
 	vec3_t	wheelMaxs = { 6, 6, 0 };
-	SV_Trace (&trace, startpos, wheelMins, wheelMaxs, endpos, s.number, MASK_PLAYERSOLID, false );
+	GameHost::trace (&trace, startpos, wheelMins, wheelMaxs, endpos, s.number, MASK_PLAYERSOLID, false );
 
 	// check for takeoff
 	if((client_->ps_.ONOFF & OO_LANDEDTERRAIN) && throttle) 

@@ -122,7 +122,7 @@ void Bots::fireWeapons( GameEntity* ent, State& bot, const Sense& sense, usercmd
 		return;
 
 	trace_t tr;
-	SV_Trace( &tr, ent->r.currentOrigin, nullptr, nullptr, sense.enemy->r.currentOrigin, ent->s.number, MASK_SOLID, false );
+	GameHost::trace( &tr, ent->r.currentOrigin, nullptr, nullptr, sense.enemy->r.currentOrigin, ent->s.number, MASK_SOLID, false );
 	const bool clear = tr.fraction >= 1.0f || tr.entityNum == sense.enemy->s.number;
 
 	bool guided = false;

@@ -48,9 +48,9 @@ GameEntity* G_TestEntityPosition( GameEntity *ent )
 		mask = MASK_SOLID;
 
 	if ( ent->client_ ) 
-		SV_Trace( &tr, ent->client_->ps_.origin, ent->r.mins, ent->r.maxs, ent->client_->ps_.origin, ent->s.number, mask, false );
+		GameHost::trace( &tr, ent->client_->ps_.origin, ent->r.mins, ent->r.maxs, ent->client_->ps_.origin, ent->s.number, mask, false );
 	else 
-		SV_Trace( &tr, ent->s.pos.trBase, ent->r.mins, ent->r.maxs, ent->s.pos.trBase, ent->s.number, mask, false );
+		GameHost::trace( &tr, ent->s.pos.trBase, ent->r.mins, ent->r.maxs, ent->s.pos.trBase, ent->s.number, mask, false );
 	
 	if (tr.startsolid)
 		return theLevel.getEntity(tr.entityNum);// &g_entities[ tr.entityNum ];
@@ -168,7 +168,7 @@ bool G_TryPushingEntity( GameEntity *check, GameEntity *pusher, vec3_t move, vec
 			VectorCopy( check->client_->ps_.origin, check->r.currentOrigin );
 		else 
 			VectorCopy( check->s.pos.trBase, check->r.currentOrigin );
-		SV_LinkEntity( check );
+		GameHost::linkEntity( check );
 		return true;
 	}
 
@@ -250,14 +250,14 @@ bool G_MoverPush( GameEntity *pusher, vec3_t move, vec3_t amove, GameEntity **ob
 	}
 
 	// unlink the pusher so we don't get it in the entityList
-	SV_UnlinkEntity( pusher );
+	GameHost::unlinkEntity( pusher );
 
-	listedEntities = SV_AreaEntities( totalMins, totalMaxs, entityList, MAX_GENTITIES );
+	listedEntities = GameHost::areaEntities( totalMins, totalMaxs, entityList, MAX_GENTITIES );
 
 	// move the pusher to it's final position
 	VectorAdd( pusher->r.currentOrigin, move, pusher->r.currentOrigin );
 	VectorAdd( pusher->r.currentAngles, amove, pusher->r.currentAngles );
-	SV_LinkEntity( pusher );
+	GameHost::linkEntity( pusher );
 
 	// see if any solid entities are inside the final position
 	for ( e = 0 ; e < listedEntities ; e++ ) 
@@ -315,7 +315,7 @@ bool G_MoverPush( GameEntity *pusher, vec3_t move, vec3_t amove, GameEntity **ob
 				p->ent->client_->ps_.delta_angles[YAW] = p->deltayaw;
 				VectorCopy (p->origin, p->ent->client_->ps_.origin);
 			}
-			SV_LinkEntity( p->ent );
+			GameHost::linkEntity( p->ent );
 		}
 		return false;
 	}
@@ -361,7 +361,7 @@ void G_MoverTeam( GameEntity *ent )
 			part->s.apos.trTime += theLevel.time_ - theLevel.previousTime_;
 			GameShared::evaluateTrajectory( &part->s.pos, theLevel.time_, part->r.currentOrigin );
 			GameShared::evaluateTrajectory( &part->s.apos, theLevel.time_, part->r.currentAngles );
-			SV_LinkEntity( part );
+			GameHost::linkEntity( part );
 		}
 
 		// if the pusher has a "blocked" function, call it
@@ -454,7 +454,7 @@ void SetMoverState( GameEntity *ent, GameEntity::eMoverState moverState, int tim
 		break;
 	}
 	GameShared::evaluateTrajectory( &ent->s.pos, theLevel.time_, ent->r.currentOrigin );	
-	SV_LinkEntity( ent );
+	GameHost::linkEntity( ent );
 }
 
 /*
@@ -541,7 +541,7 @@ struct Reached_BinaryMover : public GameEntity::EntityFunc_Reached
 
 			// close areaportals
 			if ( self->teammaster_ == self || !self->teammaster_ ) 
-				SV_AdjustAreaPortalState( self, false );
+				GameHost::adjustAreaPortalState( self, false );
 
 		} 
 		else 
@@ -582,7 +582,7 @@ void Use_BinaryMoverImpl( GameEntity *ent, GameEntity *other, GameEntity *activa
 
 		// open areaportal
 		if ( ent->teammaster_ == ent || !ent->teammaster_ ) 
-			SV_AdjustAreaPortalState( ent, true );
+			GameHost::adjustAreaPortalState( ent, true );
 		return;
 	}
 
@@ -694,7 +694,7 @@ void InitMover( GameEntity *ent )
 	ent->r.svFlags = SVF_USE_CURRENT_ORIGIN;
 	ent->s.eType = ET_MOVER;
 	VectorCopy (ent->pos1_, ent->r.currentOrigin);
-	SV_LinkEntity( ent );
+	GameHost::linkEntity( ent );
 
 	ent->s.pos.trType = TR_STATIONARY;
 	VectorCopy( ent->pos1_, ent->s.pos.trBase );
@@ -822,7 +822,7 @@ struct Think_SpawnNewDoorTrigger : public GameEntity::EntityFunc_Think
 		other->setTouch( std::make_unique<Touch_DoorTrigger>());
 		// remember the thinnest axis
 		other->count_ = best;
-		SV_LinkEntity( other );
+		GameHost::linkEntity( other );
 
 		MatchTeam( self_, self_->moverState_, theLevel.time_ );
 	}
@@ -884,7 +884,7 @@ void SP_func_door (GameEntity *ent)
 	VectorCopy( ent->s.origin, ent->pos1_ );
 
 	// calculate second position
-	SV_SetBrushModel( ent, ent->model_ );
+	GameHost::setBrushModel( ent, ent->model_ );
 	Game::setMovedir( ent->s.angles, ent->movedir_ );
 	abs_movedir[0] = fabs(ent->movedir_[0]);
 	abs_movedir[1] = fabs(ent->movedir_[1]);
@@ -1018,7 +1018,7 @@ void SpawnPlatTrigger( GameEntity *ent )
 	VectorCopy( tmin, trigger->r.mins );
 	VectorCopy( tmax, trigger->r.maxs );
 
-	SV_LinkEntity( trigger );
+	GameHost::linkEntity( trigger );
 }
 
 
@@ -1052,7 +1052,7 @@ void SP_func_plat (GameEntity *ent)
 		ent->speed_ = 20;
 
 	// create second position
-	SV_SetBrushModel( ent, ent->model_ );
+	GameHost::setBrushModel( ent, ent->model_ );
 
 	float height;
 	if( !Game::spawnFloat( "height", "0", &height ) ) 
@@ -1133,7 +1133,7 @@ void SP_func_button( GameEntity *ent )
 	VectorCopy( ent->s.origin, ent->pos1_ );
 
 	// calculate second position
-	SV_SetBrushModel( ent, ent->model_ );
+	GameHost::setBrushModel( ent, ent->model_ );
 
 	float lip;
 	Game::spawnFloat( "lip", "4", &lip );
@@ -1370,7 +1370,7 @@ void SP_func_train (GameEntity *self)
 		return;
 	}
 
-	SV_SetBrushModel( self, self->model_ );
+	GameHost::setBrushModel( self, self->model_ );
 	InitMover( self );
 
 	self->setReached( std::make_unique<Reached_Train>());
@@ -1398,7 +1398,7 @@ A bmodel that just sits there, doing nothing.  Can be used for conditional walls
 */
 void SP_func_static( GameEntity *ent )
 {
-	SV_SetBrushModel( ent, ent->model_ );
+	GameHost::setBrushModel( ent, ent->model_ );
 	InitMover( ent );
 	VectorCopy( ent->s.origin, ent->s.pos.trBase );
 	VectorCopy( ent->s.origin, ent->r.currentOrigin );
@@ -1443,14 +1443,14 @@ void SP_func_rotating (GameEntity *ent)
 	if( !ent->damage_ ) 
 		ent->damage_ = 2;
 
-	SV_SetBrushModel( ent, ent->model_ );
+	GameHost::setBrushModel( ent, ent->model_ );
 	InitMover( ent );
 
 	VectorCopy( ent->s.origin, ent->s.pos.trBase );
 	VectorCopy( ent->s.pos.trBase, ent->r.currentOrigin );
 	VectorCopy( ent->s.apos.trBase, ent->r.currentAngles );
 
-	SV_LinkEntity( ent );
+	GameHost::linkEntity( ent );
 }
 
 
@@ -1495,7 +1495,7 @@ void SP_func_bobbing (GameEntity *ent)
 	Game::spawnInt( "dmg", "2", &ent->damage_ );
 	Game::spawnFloat( "phase", "0", &phase );
 
-	SV_SetBrushModel( ent, ent->model_ );
+	GameHost::setBrushModel( ent, ent->model_ );
 	InitMover( ent );
 
 	VectorCopy( ent->s.origin, ent->s.pos.trBase );
@@ -1546,7 +1546,7 @@ void SP_func_pendulum(GameEntity *ent)
 	Game::spawnInt( "dmg", "2", &ent->damage_ );
 	Game::spawnFloat( "phase", "0", &phase );
 
-	SV_SetBrushModel( ent, ent->model_ );
+	GameHost::setBrushModel( ent, ent->model_ );
 
 	// find pendulum length
 	float length = fabs( ent->r.mins[2] );

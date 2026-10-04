@@ -585,7 +585,7 @@ int LAN_GetServerStatus( const char *serverAddress, char *serverStatus, int maxL
 CL_GetGlConfig
 ====================
 */
-//void CL_GetGlconfig( glconfig_t *config ) {
+//void ClientHost::getGlconfig( glconfig_t *config ) {
 //	*config = cls.glconfig;
 //}
 
