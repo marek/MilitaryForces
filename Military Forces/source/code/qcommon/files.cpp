@@ -3259,7 +3259,7 @@ FS_Startup
 */
 static void FS_Startup( const char *gameName )
 {
-	cvar_t *fs_homepath = Cvar_Get("fs_homepath", "", CVAR_INIT|CVAR_PROTECTED);
+	cvar_t *fs_homepath = CvarSystem::get("fs_homepath", "", CVAR_INIT|CVAR_PROTECTED);
 	const char *configPath = Sys_DefaultHomeConfigPath();
 	const char *dataPath = Sys_DefaultHomeDataPath();
 	const char *statePath = Sys_DefaultHomeStatePath();
@@ -3276,32 +3276,32 @@ static void FS_Startup( const char *gameName )
 
 	fs_packFiles = 0;
 
-	fs_debug = Cvar_Get( "fs_debug", "0", 0 );
-	fs_basepath = Cvar_Get ("fs_basepath", Sys_DefaultInstallPath(), CVAR_INIT|CVAR_PROTECTED );
-	fs_basegame = Cvar_Get ("fs_basegame", "", CVAR_INIT );
-	fs_homeconfigpath = Cvar_Get ("fs_homeconfigpath", configPath, CVAR_INIT|CVAR_PROTECTED );
-	fs_homedatapath = Cvar_Get ("fs_homedatapath", dataPath, CVAR_INIT|CVAR_PROTECTED );
-	fs_homestatepath = Cvar_Get ("fs_homestatepath", statePath, CVAR_INIT|CVAR_PROTECTED );
-	fs_gamedirvar = Cvar_Get ("fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
-	fs_steampath = Cvar_Get ("fs_steampath", Sys_SteamPath(), CVAR_INIT|CVAR_PROTECTED );
-	fs_gogpath = Cvar_Get ("fs_gogpath", Sys_GogPath(), CVAR_INIT|CVAR_PROTECTED );
-	fs_microsoftstorepath = Cvar_Get ("fs_microsoftstorepath", Sys_MicrosoftStorePath(), CVAR_INIT|CVAR_PROTECTED );
+	fs_debug = CvarSystem::get( "fs_debug", "0", 0 );
+	fs_basepath = CvarSystem::get ("fs_basepath", Sys_DefaultInstallPath(), CVAR_INIT|CVAR_PROTECTED );
+	fs_basegame = CvarSystem::get ("fs_basegame", "", CVAR_INIT );
+	fs_homeconfigpath = CvarSystem::get ("fs_homeconfigpath", configPath, CVAR_INIT|CVAR_PROTECTED );
+	fs_homedatapath = CvarSystem::get ("fs_homedatapath", dataPath, CVAR_INIT|CVAR_PROTECTED );
+	fs_homestatepath = CvarSystem::get ("fs_homestatepath", statePath, CVAR_INIT|CVAR_PROTECTED );
+	fs_gamedirvar = CvarSystem::get ("fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
+	fs_steampath = CvarSystem::get ("fs_steampath", Sys_SteamPath(), CVAR_INIT|CVAR_PROTECTED );
+	fs_gogpath = CvarSystem::get ("fs_gogpath", Sys_GogPath(), CVAR_INIT|CVAR_PROTECTED );
+	fs_microsoftstorepath = CvarSystem::get ("fs_microsoftstorepath", Sys_MicrosoftStorePath(), CVAR_INIT|CVAR_PROTECTED );
 
 #ifdef __APPLE__
-	fs_apppath = Cvar_Get ("fs_apppath", Sys_DefaultAppPath(), CVAR_INIT|CVAR_PROTECTED );
+	fs_apppath = CvarSystem::get ("fs_apppath", Sys_DefaultAppPath(), CVAR_INIT|CVAR_PROTECTED );
 #endif
 
 	FS_InitPathVars( );
 
 	if (!gameName[0]) {
-		Cvar_ForceReset( "com_basegame" );
+		CvarSystem::forceReset( "com_basegame" );
 	}
 
 	if (!FS_FilenameCompare(fs_gamedirvar->string, gameName)) {
 		// This is the standard base game. Servers and clients should
 		// use "" and not the standard basegame name because this messes
 		// up pak file negotiation and lots of other stuff
-		Cvar_ForceReset( "fs_game" );
+		CvarSystem::forceReset( "fs_game" );
 	}
 
 	if (FS_InvalidGameDir(gameName)) {
@@ -3551,10 +3551,10 @@ static void FS_CheckPak0( void )
 
 	if(!foundPak && !foundTA && Q_stricmp(com_basegame->string, BASEGAME))
 	{
-		Cvar_Set("com_standalone", "1");
+		CvarSystem::set("com_standalone", "1");
 	}
 	else
-		Cvar_Set("com_standalone", "0");
+		CvarSystem::set("com_standalone", "0");
 
 	if(!com_standalone->integer)
 	{
@@ -4020,8 +4020,8 @@ void FS_InitFilesystem( ) {
 	Com_StartupVariable("fs_homestatepath");
 	Com_StartupVariable("fs_game");
 
-	if(!FS_FilenameCompare(Cvar_VariableString("fs_game"), com_basegame->string))
-		Cvar_Set("fs_game", "");
+	if(!FS_FilenameCompare(CvarSystem::variableString("fs_game"), com_basegame->string))
+		CvarSystem::set("fs_game", "");
 
 	// try to start up normally
 	FS_Startup(com_basegame->string);
@@ -4076,10 +4076,10 @@ void FS_Restart( int checksumFeed ) {
 		// (for instance a TA demo server)
 		if (lastValidBase[0]) {
 			FS_PureServerSetLoadedPaks("", "");
-			Cvar_Set("fs_basepath", lastValidBase);
-			Cvar_Set("com_basegame", lastValidComBaseGame);
-			Cvar_Set("fs_basegame", lastValidFsBaseGame);
-			Cvar_Set("fs_game", lastValidGame);
+			CvarSystem::set("fs_basepath", lastValidBase);
+			CvarSystem::set("com_basegame", lastValidComBaseGame);
+			CvarSystem::set("fs_basegame", lastValidFsBaseGame);
+			CvarSystem::set("fs_game", lastValidGame);
 			lastValidBase[0] = '\0';
 			lastValidComBaseGame[0] = '\0';
 			lastValidFsBaseGame[0] = '\0';

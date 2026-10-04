@@ -81,15 +81,15 @@ static void CG_Set_MFD_Mode( int num ) {
 		if( cg.Mode_MFD[num] >= MFD_MAX ) cg.Mode_MFD[num] = MFD_OFF;
 		value = cg.Mode_MFD[num];
 		if( num ) value += MFD_MAX;
-		Cvar_VariableStringBuffer( cycleCvars[value], buffer, 32 );
+		CvarSystem::variableStringBuffer( cycleCvars[value], buffer, 32 );
 		value = atoi(buffer);
 		if( value ) found = true;
 	}
 
 	if( num == MFD_1 )
-		Cvar_Set( "mfd1_defaultpage", va("%d", cg.Mode_MFD[num]) );
+		CvarSystem::set( "mfd1_defaultpage", va("%d", cg.Mode_MFD[num]) );
 	else if( num == MFD_2 )
-		Cvar_Set( "mfd2_defaultpage", va("%d", cg.Mode_MFD[num]) );
+		CvarSystem::set( "mfd2_defaultpage", va("%d", cg.Mode_MFD[num]) );
 }
 
 static void CG_Set_MFD1_Mode_f( ) {
@@ -132,9 +132,9 @@ static void CG_Set_MFD_Page( int num ) {
 	cg.Mode_MFD[num] = page;
 
 	if( num == MFD_1 )
-		Cvar_Set( "mfd1_defaultpage", va("%d", page) );
+		CvarSystem::set( "mfd1_defaultpage", va("%d", page) );
 	else if( num == MFD_2 )
-		Cvar_Set( "mfd2_defaultpage", va("%d", page) );
+		CvarSystem::set( "mfd2_defaultpage", va("%d", page) );
 
 }
 
@@ -183,7 +183,7 @@ static void CG_Cycle_HUD_Color_f( ) {
 	if( cg.HUDColor >= HUD_MAX || cg.HUDColor < 0 ) {
 		cg.HUDColor = 0;
 	}
-	Cvar_Set( "hud_color", va("%d", cg.HUDColor) );
+	CvarSystem::set( "hud_color", va("%d", cg.HUDColor) );
 
 	cg.HUDColorTime = cg.time + 100;
 }
@@ -210,7 +210,7 @@ static void CG_Toggle_MFD1_f( ) {
 	int mfd1 = hud_mfd.integer;
 
 	mfd1 = mfd1 ? 0 : 1;
-	Cvar_Set( "hud_mfd", va("%d", mfd1) );
+	CvarSystem::set( "hud_mfd", va("%d", mfd1) );
 	
 }
 
@@ -218,7 +218,7 @@ static void CG_Toggle_MFD2_f( ) {
 	int mfd2 = hud_mfd2.integer;
 
 	mfd2 = mfd2 ? 0 : 1;
-	Cvar_Set( "hud_mfd2", va("%d", mfd2) );
+	CvarSystem::set( "hud_mfd2", va("%d", mfd2) );
 
 }
 
@@ -238,7 +238,7 @@ static void CG_Cycle_MFD_Color_f( ) {
 	if( cg.MFDColor >= HUD_MAX || cg.MFDColor < 0 ) {
 		cg.MFDColor = 0;
 	}
-	Cvar_Set( "mfd_color", va("%d", cg.MFDColor) );
+	CvarSystem::set( "mfd_color", va("%d", cg.MFDColor) );
 
 	cg.MFDColorTime = cg.time + 100;
 }
@@ -337,9 +337,9 @@ static void CG_ToggleView_f( ) {
 	}
 
 	if( !cg_thirdPerson.integer ) {
-    	Cvar_Set("cg_thirdPerson", va("%i",1));
+    	CvarSystem::set("cg_thirdPerson", va("%i",1));
 	} else {
-    	Cvar_Set("cg_thirdPerson", va("%i",0));
+    	CvarSystem::set("cg_thirdPerson", va("%i",0));
 	}
 	cg.toggleViewTime = cg.time + 500;
 }
@@ -396,7 +396,7 @@ Keybinding command
 =================
 */
 static void CG_SizeUp_f () {
-	Cvar_Set("cg_viewsize", va("%i",(cg_viewsize.integer+10)));
+	CvarSystem::set("cg_viewsize", va("%i",(cg_viewsize.integer+10)));
 }
 
 
@@ -408,7 +408,7 @@ Keybinding command
 =================
 */
 static void CG_SizeDown_f () {
-	Cvar_Set("cg_viewsize", va("%i",(cg_viewsize.integer-10)));
+	CvarSystem::set("cg_viewsize", va("%i",(cg_viewsize.integer-10)));
 }
 
 

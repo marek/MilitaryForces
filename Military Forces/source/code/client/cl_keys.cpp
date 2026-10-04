@@ -1253,8 +1253,8 @@ void CL_KeyDownEvent( int key, unsigned time )
 			return;
 		}
 
-		Cvar_SetValue( "r_fullscreen",
-			!Cvar_VariableIntegerValue( "r_fullscreen" ) );
+		CvarSystem::setValue( "r_fullscreen",
+			!CvarSystem::variableIntegerValue( "r_fullscreen" ) );
 		return;
 	}
 
@@ -1271,8 +1271,8 @@ void CL_KeyDownEvent( int key, unsigned time )
 	if ( ( key < 128 || key == K_MOUSE1 ) &&
 		( clc.demoplaying || clc.state == CA_CINEMATIC ) && Key_GetCatcher( ) == 0 ) {
 
-		if (Cvar_VariableValue ("com_cameraMode") == 0) {
-			Cvar_Set ("nextdemo","");
+		if (CvarSystem::variableValue ("com_cameraMode") == 0) {
+			CvarSystem::set ("nextdemo","");
 			key = K_ESCAPE;
 		}
 	}

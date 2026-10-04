@@ -193,11 +193,11 @@ bool SNDDMA_Init()
 		return true;
 
 	if (!s_sdlBits) {
-		s_sdlBits = Cvar_Get("s_sdlBits", "16", CVAR_ARCHIVE);
-		s_sdlSpeed = Cvar_Get("s_sdlSpeed", "0", CVAR_ARCHIVE);
-		s_sdlChannels = Cvar_Get("s_sdlChannels", "2", CVAR_ARCHIVE);
-		s_sdlDevSamps = Cvar_Get("s_sdlDevSamps", "0", CVAR_ARCHIVE);
-		s_sdlMixSamps = Cvar_Get("s_sdlMixSamps", "0", CVAR_ARCHIVE);
+		s_sdlBits = CvarSystem::get("s_sdlBits", "16", CVAR_ARCHIVE);
+		s_sdlSpeed = CvarSystem::get("s_sdlSpeed", "0", CVAR_ARCHIVE);
+		s_sdlChannels = CvarSystem::get("s_sdlChannels", "2", CVAR_ARCHIVE);
+		s_sdlDevSamps = CvarSystem::get("s_sdlDevSamps", "0", CVAR_ARCHIVE);
+		s_sdlMixSamps = CvarSystem::get("s_sdlMixSamps", "0", CVAR_ARCHIVE);
 	}
 
 	Com_Printf( "SDL_Init( SDL_INIT_AUDIO )... " );
@@ -280,7 +280,7 @@ bool SNDDMA_Init()
 
 #ifdef USE_SDL_AUDIO_CAPTURE
 	// !!! FIXME: some of these SDL_OpenAudioDevice() values should be cvars.
-	s_sdlCapture = Cvar_Get( "s_sdlCapture", "1", CVAR_ARCHIVE | CVAR_LATCH );
+	s_sdlCapture = CvarSystem::get( "s_sdlCapture", "1", CVAR_ARCHIVE | CVAR_LATCH );
 	if (!s_sdlCapture->integer)
 	{
 		Com_Printf("SDL audio capture support disabled by user ('+set s_sdlCapture 1' to enable)\n");

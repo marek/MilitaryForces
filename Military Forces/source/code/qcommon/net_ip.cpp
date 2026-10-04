@@ -978,7 +978,7 @@ void NET_SetMulticast6()
 		Com_Printf("WARNING: NET_JoinMulticast6: Incorrect multicast address given, "
 			   "please set cvar %s to a sane value.\n", net_mcast6addr->name);
 		
-		Cvar_SetValue(net_enabled->name, net_enabled->integer | NET_DISABLEMCAST);
+		CvarSystem::setValue(net_enabled->name, net_enabled->integer | NET_DISABLEMCAST);
 		
 		return;
 	}
@@ -1376,7 +1376,7 @@ void NET_OpenIP( ) {
 			ip6_socket = NET_IP6Socket(net_ip6->string, port6 + i, &boundto, &err);
 			if (ip6_socket != INVALID_SOCKET)
 			{
-				Cvar_SetValue( "net_port6", port6 + i );
+				CvarSystem::setValue( "net_port6", port6 + i );
 				break;
 			}
 			else
@@ -1394,7 +1394,7 @@ void NET_OpenIP( ) {
 		for( i = 0 ; i < 10 ; i++ ) {
 			ip_socket = NET_IPSocket( net_ip->string, port + i, &err );
 			if (ip_socket != INVALID_SOCKET) {
-				Cvar_SetValue( "net_port", port + i );
+				CvarSystem::setValue( "net_port", port + i );
 
 				if (net_socksEnabled->integer)
 					NET_OpenSocks( port + i );
@@ -1427,65 +1427,65 @@ static bool NET_GetCvars( ) {
 
 #ifdef DEDICATED
 	// I want server owners to explicitly turn on ipv6 support.
-	net_enabled = Cvar_Get( "net_enabled", "1", CVAR_LATCH | CVAR_ARCHIVE );
+	net_enabled = CvarSystem::get( "net_enabled", "1", CVAR_LATCH | CVAR_ARCHIVE );
 #else
 	/* End users have it enabled so they can connect to ipv6-only hosts, but ipv4 will be
 	 * used if available due to ping */
-	net_enabled = Cvar_Get( "net_enabled", "3", CVAR_LATCH | CVAR_ARCHIVE );
+	net_enabled = CvarSystem::get( "net_enabled", "3", CVAR_LATCH | CVAR_ARCHIVE );
 #endif
 	modified = net_enabled->modified;
 	net_enabled->modified = false;
 
-	net_ip = Cvar_Get( "net_ip", "0.0.0.0", CVAR_LATCH );
+	net_ip = CvarSystem::get( "net_ip", "0.0.0.0", CVAR_LATCH );
 	modified += net_ip->modified;
 	net_ip->modified = false;
 	
-	net_ip6 = Cvar_Get( "net_ip6", "::", CVAR_LATCH );
+	net_ip6 = CvarSystem::get( "net_ip6", "::", CVAR_LATCH );
 	modified += net_ip6->modified;
 	net_ip6->modified = false;
 	
-	net_port = Cvar_Get( "net_port", va( "%i", PORT_SERVER ), CVAR_LATCH );
+	net_port = CvarSystem::get( "net_port", va( "%i", PORT_SERVER ), CVAR_LATCH );
 	modified += net_port->modified;
 	net_port->modified = false;
 	
-	net_port6 = Cvar_Get( "net_port6", va( "%i", PORT_SERVER ), CVAR_LATCH );
+	net_port6 = CvarSystem::get( "net_port6", va( "%i", PORT_SERVER ), CVAR_LATCH );
 	modified += net_port6->modified;
 	net_port6->modified = false;
 
 	// Some cvars for configuring multicast options which facilitates scanning for servers on local subnets.
-	net_mcast6addr = Cvar_Get( "net_mcast6addr", NET_MULTICAST_IP6, CVAR_LATCH | CVAR_ARCHIVE );
+	net_mcast6addr = CvarSystem::get( "net_mcast6addr", NET_MULTICAST_IP6, CVAR_LATCH | CVAR_ARCHIVE );
 	modified += net_mcast6addr->modified;
 	net_mcast6addr->modified = false;
 
 #ifdef _WIN32
-	net_mcast6iface = Cvar_Get( "net_mcast6iface", "0", CVAR_LATCH | CVAR_ARCHIVE );
+	net_mcast6iface = CvarSystem::get( "net_mcast6iface", "0", CVAR_LATCH | CVAR_ARCHIVE );
 #else
-	net_mcast6iface = Cvar_Get( "net_mcast6iface", "", CVAR_LATCH | CVAR_ARCHIVE );
+	net_mcast6iface = CvarSystem::get( "net_mcast6iface", "", CVAR_LATCH | CVAR_ARCHIVE );
 #endif
 	modified += net_mcast6iface->modified;
 	net_mcast6iface->modified = false;
 
-	net_socksEnabled = Cvar_Get( "net_socksEnabled", "0", CVAR_LATCH | CVAR_ARCHIVE );
+	net_socksEnabled = CvarSystem::get( "net_socksEnabled", "0", CVAR_LATCH | CVAR_ARCHIVE );
 	modified += net_socksEnabled->modified;
 	net_socksEnabled->modified = false;
 
-	net_socksServer = Cvar_Get( "net_socksServer", "", CVAR_LATCH | CVAR_ARCHIVE );
+	net_socksServer = CvarSystem::get( "net_socksServer", "", CVAR_LATCH | CVAR_ARCHIVE );
 	modified += net_socksServer->modified;
 	net_socksServer->modified = false;
 
-	net_socksPort = Cvar_Get( "net_socksPort", "1080", CVAR_LATCH | CVAR_ARCHIVE );
+	net_socksPort = CvarSystem::get( "net_socksPort", "1080", CVAR_LATCH | CVAR_ARCHIVE );
 	modified += net_socksPort->modified;
 	net_socksPort->modified = false;
 
-	net_socksUsername = Cvar_Get( "net_socksUsername", "", CVAR_LATCH | CVAR_ARCHIVE );
+	net_socksUsername = CvarSystem::get( "net_socksUsername", "", CVAR_LATCH | CVAR_ARCHIVE );
 	modified += net_socksUsername->modified;
 	net_socksUsername->modified = false;
 
-	net_socksPassword = Cvar_Get( "net_socksPassword", "", CVAR_LATCH | CVAR_ARCHIVE );
+	net_socksPassword = CvarSystem::get( "net_socksPassword", "", CVAR_LATCH | CVAR_ARCHIVE );
 	modified += net_socksPassword->modified;
 	net_socksPassword->modified = false;
 
-	net_dropsim = Cvar_Get("net_dropsim", "", CVAR_TEMP);
+	net_dropsim = CvarSystem::get("net_dropsim", "", CVAR_TEMP);
 
 	return modified ? true : false;
 }

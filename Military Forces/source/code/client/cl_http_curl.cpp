@@ -108,7 +108,7 @@ bool CL_HTTP_Init()
 	if(cURLLib)
 		return true;
 
-	cl_cURLLib = Cvar_Get("cl_cURLLib", DEFAULT_CURL_LIB, CVAR_ARCHIVE | CVAR_PROTECTED);
+	cl_cURLLib = CvarSystem::get("cl_cURLLib", DEFAULT_CURL_LIB, CVAR_ARCHIVE | CVAR_PROTECTED);
 
 	Com_Printf("Loading \"%s\"...", cl_cURLLib->string);
 	if(!(cURLLib = Sys_LoadDll(cl_cURLLib->string, true)))
@@ -225,9 +225,9 @@ static int CL_cURL_CallbackProgress(void *clientp, curl_off_t dltotal, curl_off_
     curl_off_t ultotal, curl_off_t ulnow)
 {
 	clc.downloadSize = static_cast<int>(dltotal);
-	Cvar_SetValue( "cl_downloadSize", clc.downloadSize );
+	CvarSystem::setValue( "cl_downloadSize", clc.downloadSize );
 	clc.downloadCount = static_cast<int>(dlnow);
-	Cvar_SetValue( "cl_downloadCount", clc.downloadCount );
+	CvarSystem::setValue( "cl_downloadCount", clc.downloadCount );
 	return 0;
 }
 

@@ -122,7 +122,7 @@ UI_DisplayContextUI::runScript( char **p )
 float
 UI_DisplayContextUI::getCVarValue( const char *cvar )
 {
-	return Cvar_VariableValue( cvar );
+	return CvarSystem::variableValue( cvar );
 }
 
 void

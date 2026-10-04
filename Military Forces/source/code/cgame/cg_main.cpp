@@ -355,12 +355,12 @@ void CG_RegisterCvars( ) {
 	char		var[MAX_TOKEN_CHARS];
 
 	for ( i = 0, cv = cvarTable ; i < cvarTableSize ; i++, cv++ ) {
-		Cvar_Register( cv->vmCvar, cv->cvarName,
+		CvarSystem::register_( cv->vmCvar, cv->cvarName,
 			cv->defaultString, cv->cvarFlags );
 	}
 
 	// see if we are also running the server on this machine
-	Cvar_VariableStringBuffer( "sv_running", var, sizeof( var ) );
+	CvarSystem::variableStringBuffer( "sv_running", var, sizeof( var ) );
 	cgs.localServer = atoi( var );
 
 	forceModelModificationCount = cg_forceModel.modificationCount;
@@ -397,7 +397,7 @@ void CG_UpdateCvars( )
 	cvarTable_t	*cv;
 
 	for ( i = 0, cv = cvarTable ; i < cvarTableSize ; i++, cv++ ) {
-		Cvar_Update( cv->vmCvar );
+		CvarSystem::update( cv->vmCvar );
 	}
 
 	// check for modications here
@@ -410,14 +410,14 @@ void CG_UpdateCvars( )
 
 		if ( cg_drawTeamOverlay.integer > 0 ) 
 		{
-			Cvar_Set( "teamoverlay", "1" );
+			CvarSystem::set( "teamoverlay", "1" );
 		} 
 		else 
 		{
-			Cvar_Set( "teamoverlay", "0" );
+			CvarSystem::set( "teamoverlay", "0" );
 		}
 		// FIXME E3 HACK
-		Cvar_Set( "teamoverlay", "1" );
+		CvarSystem::set( "teamoverlay", "1" );
 	}
 
 	// if force model changed
@@ -1875,7 +1875,7 @@ void CG_LoadHudMenu() {
 
 	cgUtils.menu_Reset();
 	
-	Cvar_VariableStringBuffer("cg_hudFiles", buff, sizeof(buff));
+	CvarSystem::variableStringBuffer("cg_hudFiles", buff, sizeof(buff));
 	hudSet = buff;
 	if (hudSet[0] == '\0') {
 		hudSet = "ui/hud.txt";
@@ -1959,7 +1959,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	// this has the effect of stopping the usual Q3 console text being displayed (because
 	// we want to custom handle this textual display - but still retain the history that
 	// gets written to the "drop-down" console)
-	Cvar_Set( "con_notifytime", "-1" );
+	CvarSystem::set( "con_notifytime", "-1" );
 
 	cg.weaponSelect = WP_WEAPON1;
 
@@ -1992,36 +1992,36 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 
 	// MFQ3: vehicle needs to be reset
 	if( cg_vehicle.integer != -1 ) {
-		Cvar_Set( "cg_vehicle", "-1" );
+		CvarSystem::set( "cg_vehicle", "-1" );
 	}
 	if( cg_nextVehicle.integer != -1 ) {
-		Cvar_Set( "cg_nextVehicle", "-1" );
+		CvarSystem::set( "cg_nextVehicle", "-1" );
 	}
 
 	// MFQ3: HUD color
 	cg.HUDColor = hud_color.integer;
 	if( cg.HUDColor >= HUD_MAX || cg.HUDColor < 0 ) {
 		cg.HUDColor = 0;
-		Cvar_Set( "hud_color", va("%d", cg.HUDColor) );
+		CvarSystem::set( "hud_color", va("%d", cg.HUDColor) );
 	}
 
 	// MFQ3: MFD color
 	cg.MFDColor = mfd_color.integer;
 	if( cg.MFDColor >= HUD_MAX || cg.MFDColor < 0 ) {
 		cg.MFDColor = 0;
-		Cvar_Set( "mfd_color", va("%d", cg.MFDColor) );
+		CvarSystem::set( "mfd_color", va("%d", cg.MFDColor) );
 	}
 
 	// MFQ3: MFD pages
 	cg.Mode_MFD[MFD_1] = mfd1_defaultpage.integer;
 	if( cg.Mode_MFD[MFD_1] >= MFD_MAX ) {
 		cg.Mode_MFD[MFD_1] = MFD_OFF;
-		Cvar_Set( "mfd1_defaultpage", va("%d", cg.Mode_MFD[MFD_1]) );
+		CvarSystem::set( "mfd1_defaultpage", va("%d", cg.Mode_MFD[MFD_1]) );
 	}
 	cg.Mode_MFD[MFD_2] = mfd2_defaultpage.integer;
 	if( cg.Mode_MFD[MFD_2] >= MFD_MAX ) {
 		cg.Mode_MFD[MFD_2] = MFD_OFF;
-		Cvar_Set( "mfd2_defaultpage", va("%d", cg.Mode_MFD[MFD_2]) );
+		CvarSystem::set( "mfd2_defaultpage", va("%d", cg.Mode_MFD[MFD_2]) );
 	}
 
 	CG_ParseServerinfo();

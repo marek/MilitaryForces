@@ -181,7 +181,7 @@ Sys_PIDFileName
 */
 static char *Sys_PIDFileName( const char *gamedir )
 {
-	const char *homeStatePath = Cvar_VariableString( "fs_homestatepath" );
+	const char *homeStatePath = CvarSystem::variableString( "fs_homestatepath" );
 
 	if( *homeStatePath != '\0' )
 		return va( "%s/%s/%s", homeStatePath, gamedir, PID_FILENAME );
@@ -271,7 +271,7 @@ void Sys_InitPIDFile( const char *gamedir ) {
 			"settings. Would you like to start with \"safe\" video settings?", modName );
 
 		if( Sys_Dialog( DT_YES_NO, message, "Abnormal Exit" ) == DR_YES ) {
-			Cvar_Set( "com_abnormalExit", "1" );
+			CvarSystem::set( "com_abnormalExit", "1" );
 		}
 #endif
 	}
@@ -360,8 +360,8 @@ Sys_Init
 void Sys_Init()
 {
 	Cmd_AddCommand( "in_restart", Sys_In_Restart_f );
-	Cvar_Set( "arch", OS_STRING " " ARCH_STRING );
-	Cvar_Set( "username", Sys_GetCurrentUser( ) );
+	CvarSystem::set( "arch", OS_STRING " " ARCH_STRING );
+	CvarSystem::set( "username", Sys_GetCurrentUser( ) );
 }
 
 /*
@@ -549,7 +549,7 @@ void *Sys_LoadDll(const char *name, bool useSystemLib)
 
 		if(!dllhandle)
 		{
-			const char *basePath = Cvar_VariableString("fs_basepath");
+			const char *basePath = CvarSystem::variableString("fs_basepath");
 			
 			if(!basePath || !*basePath)
 				basePath = ".";

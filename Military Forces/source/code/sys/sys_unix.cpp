@@ -391,7 +391,7 @@ static bool Sys_ShouldUseLegacyHomePath(void)
 	}
 
 	if( ( com_homepath && com_homepath->string[0] ) ||
-		Cvar_VariableString( "fs_homepath" )[0] )
+		CvarSystem::variableString( "fs_homepath" )[0] )
 	{
 		// If a custom homepath has been explicity set then
 		// that strongly implies that migration isn't desired
@@ -967,8 +967,8 @@ void Sys_ErrorDialog( const char *error )
 	char buffer[ 1024 ];
 	unsigned int size;
 	int f = -1;
-	const char *homedatapath = Cvar_VariableString( "fs_homedatapath" );
-	const char *gamedir = Cvar_VariableString( "fs_game" );
+	const char *homedatapath = CvarSystem::variableString( "fs_homedatapath" );
+	const char *gamedir = CvarSystem::variableString( "fs_game" );
 	const char *fileName = "crashlog.txt";
 	char *ospath = FS_BuildOSPath( homedatapath, gamedir, fileName );
 

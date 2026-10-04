@@ -919,12 +919,6 @@ void UI_SPSkillMenu_Cache( );
 
 // system calls
 int Sys_Milliseconds ();
-void Cvar_Register( vmCvar_t *vmCvar, const char *varName, const char *defaultValue, int flags );
-void Cvar_Update( vmCvar_t *vmCvar );
-void Cvar_Set( const char *var_name, const char *value );
-float Cvar_VariableValue( const char *var_name );
-void Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize );
-void Cvar_SetValue( const char *var_name, float value);
 int	Cmd_Argc();
 void Cmd_ArgvBuffer( int arg, char *buffer, int bufferLength );
 void Cbuf_ExecuteText (int exec_when, const char *text);

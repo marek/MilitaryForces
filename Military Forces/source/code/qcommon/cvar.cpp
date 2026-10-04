@@ -99,10 +99,10 @@ static cvar_t *Cvar_FindVar( const char *var_name ) {
 
 /*
 ============
-Cvar_VariableValue
+CvarSystem::variableValue
 ============
 */
-float Cvar_VariableValue( const char *var_name ) {
+float CvarSystem::variableValue( const char *var_name ) {
 	cvar_t	*var;
 	
 	var = Cvar_FindVar (var_name);
@@ -114,10 +114,10 @@ float Cvar_VariableValue( const char *var_name ) {
 
 /*
 ============
-Cvar_VariableIntegerValue
+CvarSystem::variableIntegerValue
 ============
 */
-int Cvar_VariableIntegerValue( const char *var_name ) {
+int CvarSystem::variableIntegerValue( const char *var_name ) {
 	cvar_t	*var;
 	
 	var = Cvar_FindVar (var_name);
@@ -129,10 +129,10 @@ int Cvar_VariableIntegerValue( const char *var_name ) {
 
 /*
 ============
-Cvar_VariableString
+CvarSystem::variableString
 ============
 */
-char *Cvar_VariableString( const char *var_name ) {
+char *CvarSystem::variableString( const char *var_name ) {
 	cvar_t *var;
 	
 	var = Cvar_FindVar (var_name);
@@ -144,10 +144,10 @@ char *Cvar_VariableString( const char *var_name ) {
 
 /*
 ============
-Cvar_VariableStringBuffer
+CvarSystem::variableStringBuffer
 ============
 */
-void Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize ) {
+void CvarSystem::variableStringBuffer( const char *var_name, char *buffer, int bufsize ) {
 	cvar_t *var;
 	
 	var = Cvar_FindVar (var_name);
@@ -161,10 +161,10 @@ void Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize 
 
 /*
 ============
-Cvar_Flags
+CvarSystem::flags
 ============
 */
-int Cvar_Flags(const char *var_name)
+int CvarSystem::flags(const char *var_name)
 {
 	cvar_t *var;
 	
@@ -181,10 +181,10 @@ int Cvar_Flags(const char *var_name)
 
 /*
 ============
-Cvar_CommandCompletion
+CvarSystem::commandCompletion
 ============
 */
-void Cvar_CommandCompletion(void (*callback)(const char *s))
+void CvarSystem::commandCompletion(void (*callback)(const char *s))
 {
 	cvar_t		*cvar;
 	
@@ -301,19 +301,19 @@ static const char *Cvar_Validate( cvar_t *var,
 
 /*
 ============
-Cvar_Get
+CvarSystem::get
 
 If the variable already exists, the value will not be set unless CVAR_ROM
 The flags will be or'ed in if the variable exists.
 ============
 */
-cvar_t *Cvar_Get( const char *var_name, const char *var_value, int flags ) {
+cvar_t *CvarSystem::get( const char *var_name, const char *var_value, int flags ) {
 	cvar_t	*var;
 	long	hash;
 	int	index;
 
 	if ( !var_name || ! var_value ) {
-		Com_Error( ERR_FATAL, "Cvar_Get: NULL parameter" );
+		Com_Error( ERR_FATAL, "CvarSystem::get: NULL parameter" );
 	}
 
 	if ( !Cvar_ValidateString( var_name ) ) {
@@ -395,7 +395,7 @@ cvar_t *Cvar_Get( const char *var_name, const char *var_value, int flags ) {
 
 			s = var->latchedString;
 			var->latchedString = nullptr;	// otherwise cvar_set2 would free it
-			Cvar_Set2( var_name, s, true );
+			CvarSystem::set2( var_name, s, true );
 			Z_Free( s );
 		}
 
@@ -467,12 +467,12 @@ cvar_t *Cvar_Get( const char *var_name, const char *var_value, int flags ) {
 
 /*
 ============
-Cvar_Print
+CvarSystem::print
 
 Prints the value, default, and latched string of the given variable
 ============
 */
-void Cvar_Print( cvar_t *v ) {
+void CvarSystem::print( cvar_t *v ) {
 	Com_Printf ("\"%s\" is:\"%s" S_COLOR_WHITE "\"",
 			v->name, v->string );
 
@@ -498,13 +498,13 @@ void Cvar_Print( cvar_t *v ) {
 
 /*
 ============
-Cvar_Set2
+CvarSystem::set2
 ============
 */
-cvar_t *Cvar_Set2( const char *var_name, const char *value, bool force ) {
+cvar_t *CvarSystem::set2( const char *var_name, const char *value, bool force ) {
 	cvar_t	*var;
 
-//	Com_DPrintf( "Cvar_Set2: %s %s\n", var_name, value );
+//	Com_DPrintf( "CvarSystem::set2: %s %s\n", var_name, value );
 
 	if ( !Cvar_ValidateString( var_name ) ) {
 		Com_Printf("invalid cvar name string: %s\n", var_name );
@@ -525,9 +525,9 @@ cvar_t *Cvar_Set2( const char *var_name, const char *value, bool force ) {
 		}
 		// create it
 		if ( !force ) {
-			return Cvar_Get( var_name, value, CVAR_USER_CREATED );
+			return CvarSystem::get( var_name, value, CVAR_USER_CREATED );
 		} else {
-			return Cvar_Get (var_name, value, 0);
+			return CvarSystem::get (var_name, value, 0);
 		}
 	}
 
@@ -622,21 +622,21 @@ cvar_t *Cvar_Set2( const char *var_name, const char *value, bool force ) {
 
 /*
 ============
-Cvar_Set
+CvarSystem::set
 ============
 */
-void Cvar_Set( const char *var_name, const char *value) {
-	Cvar_Set2 (var_name, value, true);
+void CvarSystem::set( const char *var_name, const char *value) {
+	CvarSystem::set2 (var_name, value, true);
 }
 
 /*
 ============
-Cvar_SetSafe
+CvarSystem::setSafe
 ============
 */
-void Cvar_SetSafe( const char *var_name, const char *value )
+void CvarSystem::setSafe( const char *var_name, const char *value )
 {
-	int flags = Cvar_Flags( var_name );
+	int flags = CvarSystem::flags( var_name );
 
 	if((flags != CVAR_NONEXISTENT) && (flags & CVAR_PROTECTED))
 	{
@@ -648,24 +648,24 @@ void Cvar_SetSafe( const char *var_name, const char *value )
 				"modify \"%s\"", var_name );
 		return;
 	}
-	Cvar_Set( var_name, value );
+	CvarSystem::set( var_name, value );
 }
 
 /*
 ============
-Cvar_SetLatched
+CvarSystem::setLatched
 ============
 */
-void Cvar_SetLatched( const char *var_name, const char *value) {
-	Cvar_Set2 (var_name, value, false);
+void CvarSystem::setLatched( const char *var_name, const char *value) {
+	CvarSystem::set2 (var_name, value, false);
 }
 
 /*
 ============
-Cvar_SetValue
+CvarSystem::setValue
 ============
 */
-void Cvar_SetValue( const char *var_name, float value) {
+void CvarSystem::setValue( const char *var_name, float value) {
 	char	val[32];
 
 	if ( value == static_cast<int>(value) ) {
@@ -673,15 +673,15 @@ void Cvar_SetValue( const char *var_name, float value) {
 	} else {
 		Com_sprintf (val, sizeof(val), "%f",value);
 	}
-	Cvar_Set (var_name, val);
+	CvarSystem::set (var_name, val);
 }
 
 /*
 ============
-Cvar_SetValueSafe
+CvarSystem::setValueSafe
 ============
 */
-void Cvar_SetValueSafe( const char *var_name, float value )
+void CvarSystem::setValueSafe( const char *var_name, float value )
 {
 	char val[32];
 
@@ -689,36 +689,36 @@ void Cvar_SetValueSafe( const char *var_name, float value )
 		Com_sprintf( val, sizeof(val), "%i", static_cast<int>(value) );
 	else
 		Com_sprintf( val, sizeof(val), "%f", value );
-	Cvar_SetSafe( var_name, val );
+	CvarSystem::setSafe( var_name, val );
 }
 
 /*
 ============
-Cvar_Reset
+CvarSystem::reset
 ============
 */
-void Cvar_Reset( const char *var_name ) {
-	Cvar_Set2( var_name, nullptr, false );
+void CvarSystem::reset( const char *var_name ) {
+	CvarSystem::set2( var_name, nullptr, false );
 }
 
 /*
 ============
-Cvar_ForceReset
+CvarSystem::forceReset
 ============
 */
-void Cvar_ForceReset(const char *var_name)
+void CvarSystem::forceReset(const char *var_name)
 {
-	Cvar_Set2(var_name, nullptr, true);
+	CvarSystem::set2(var_name, nullptr, true);
 }
 
 /*
 ============
-Cvar_SetCheatState
+CvarSystem::setCheatState
 
 Any testing variables will be reset to the safe values
 ============
 */
-void Cvar_SetCheatState()
+void CvarSystem::setCheatState()
 {
 	cvar_t	*var;
 
@@ -735,19 +735,19 @@ void Cvar_SetCheatState()
 				var->latchedString = nullptr;
 			}
 			if (strcmp(var->resetString,var->string))
-				Cvar_Set(var->name, var->resetString);
+				CvarSystem::set(var->name, var->resetString);
 		}
 	}
 }
 
 /*
 ============
-Cvar_Command
+CvarSystem::command
 
 Handles variable inspection and changing from the console
 ============
 */
-bool Cvar_Command( ) {
+bool CvarSystem::command( ) {
 	cvar_t	*v;
 
 	// check variables
@@ -758,25 +758,25 @@ bool Cvar_Command( ) {
 
 	// perform a variable print or set
 	if ( Cmd_Argc() == 1 ) {
-		Cvar_Print( v );
+		CvarSystem::print( v );
 		return true;
 	}
 
 	// set the value if forcing isn't required
-	Cvar_Set2 (v->name, Cmd_Args(), false);
+	CvarSystem::set2 (v->name, Cmd_Args(), false);
 	return true;
 }
 
 
 /*
 ============
-Cvar_Print_f
+CvarSystem::print_f
 
 Prints the contents of a cvar 
-(preferred over Cvar_Command where cvar names and commands conflict)
+(preferred over CvarSystem::command where cvar names and commands conflict)
 ============
 */
-void Cvar_Print_f()
+void CvarSystem::print_f()
 {
 	char *name;
 	cvar_t *cv;
@@ -792,20 +792,20 @@ void Cvar_Print_f()
 	cv = Cvar_FindVar(name);
 	
 	if(cv)
-		Cvar_Print(cv);
+		CvarSystem::print(cv);
 	else
 		Com_Printf ("Cvar %s does not exist.\n", name);
 }
 
 /*
 ============
-Cvar_Toggle_f
+CvarSystem::toggle_f
 
 Toggles a cvar for easy single key binding, optionally through a list of
 given values
 ============
 */
-void Cvar_Toggle_f( ) {
+void CvarSystem::toggle_f( ) {
 	int		i, c = Cmd_Argc();
 	char		*curval;
 
@@ -815,8 +815,8 @@ void Cvar_Toggle_f( ) {
 	}
 
 	if(c == 2) {
-		Cvar_Set2(Cmd_Argv(1), va("%d", 
-			!Cvar_VariableValue(Cmd_Argv(1))), 
+		CvarSystem::set2(Cmd_Argv(1), va("%d", 
+			!CvarSystem::variableValue(Cmd_Argv(1))), 
 			false);
 		return;
 	}
@@ -826,30 +826,30 @@ void Cvar_Toggle_f( ) {
 		return;
 	}
 
-	curval = Cvar_VariableString(Cmd_Argv(1));
+	curval = CvarSystem::variableString(Cmd_Argv(1));
 
 	// don't bother checking the last arg for a match since the desired
 	// behaviour is the same as no match (set to the first argument)
 	for(i = 2; i + 1 < c; i++) {
 		if(strcmp(curval, Cmd_Argv(i)) == 0) {
-			Cvar_Set2(Cmd_Argv(1), Cmd_Argv(i + 1), false);
+			CvarSystem::set2(Cmd_Argv(1), Cmd_Argv(i + 1), false);
 			return;
 		}
 	}
 
 	// fallback
-	Cvar_Set2(Cmd_Argv(1), Cmd_Argv(2), false);
+	CvarSystem::set2(Cmd_Argv(1), Cmd_Argv(2), false);
 }
 
 /*
 ============
-Cvar_Set_f
+CvarSystem::set_f
 
 Allows setting and defining of arbitrary cvars from console, even if they
 weren't declared in C code.
 ============
 */
-void Cvar_Set_f( ) {
+void CvarSystem::set_f( ) {
 	int		c;
 	char	*cmd;
 	cvar_t	*v;
@@ -862,11 +862,11 @@ void Cvar_Set_f( ) {
 		return;
 	}
 	if ( c == 2 ) {
-		Cvar_Print_f();
+		CvarSystem::print_f();
 		return;
 	}
 
-	v = Cvar_Set2 (Cmd_Argv(1), Cmd_ArgsFrom(2), false);
+	v = CvarSystem::set2 (Cmd_Argv(1), Cmd_ArgsFrom(2), false);
 	if( !v ) {
 		return;
 	}
@@ -894,26 +894,26 @@ void Cvar_Set_f( ) {
 
 /*
 ============
-Cvar_Reset_f
+CvarSystem::reset_f
 ============
 */
-void Cvar_Reset_f( ) {
+void CvarSystem::reset_f( ) {
 	if ( Cmd_Argc() != 2 ) {
 		Com_Printf ("usage: reset <variable>\n");
 		return;
 	}
-	Cvar_Reset( Cmd_Argv( 1 ) );
+	CvarSystem::reset( Cmd_Argv( 1 ) );
 }
 
 /*
 ============
-Cvar_WriteVariables
+CvarSystem::writeVariables
 
 Appends lines containing "set variable value" for all variables
 with the archive flag set to true.
 ============
 */
-void Cvar_WriteVariables(fileHandle_t f)
+void CvarSystem::writeVariables(fileHandle_t f)
 {
 	cvar_t	*var;
 	char	buffer[1024];
@@ -947,10 +947,10 @@ void Cvar_WriteVariables(fileHandle_t f)
 
 /*
 ============
-Cvar_List_f
+CvarSystem::list_f
 ============
 */
-void Cvar_List_f( ) {
+void CvarSystem::list_f( ) {
 	cvar_t	*var;
 	int		i;
 	char	*match;
@@ -1022,10 +1022,10 @@ void Cvar_List_f( ) {
 
 /*
 ============
-Cvar_ListModified_f
+CvarSystem::listModified_f
 ============
 */
-void Cvar_ListModified_f( ) {
+void CvarSystem::listModified_f( ) {
 	cvar_t	*var;
 	int		totalModified;
 	char	*value;
@@ -1106,13 +1106,13 @@ void Cvar_ListModified_f( ) {
 
 /*
 ============
-Cvar_Unset
+CvarSystem::unset
 
 Unsets a cvar
 ============
 */
 
-cvar_t *Cvar_Unset(cvar_t *cv)
+cvar_t *CvarSystem::unset(cvar_t *cv)
 {
 	cvar_t *next = cv->next;
 
@@ -1151,13 +1151,13 @@ cvar_t *Cvar_Unset(cvar_t *cv)
 
 /*
 ============
-Cvar_Unset_f
+CvarSystem::unset_f
 
 Unsets a userdefined cvar
 ============
 */
 
-void Cvar_Unset_f()
+void CvarSystem::unset_f()
 {
 	cvar_t *cv;
 	
@@ -1173,7 +1173,7 @@ void Cvar_Unset_f()
 		return;
 	
 	if(cv->flags & CVAR_USER_CREATED)
-		Cvar_Unset(cv);
+		CvarSystem::unset(cv);
 	else
 		Com_Printf("Error: %s: Variable %s is not user created.\n", Cmd_Argv(0), cv->name);
 }
@@ -1182,14 +1182,14 @@ void Cvar_Unset_f()
 
 /*
 ============
-Cvar_Restart
+CvarSystem::restart
 
 Resets all cvars to their hardcoded values and removes userdefined variables
 and variables added via the VMs if requested.
 ============
 */
 
-void Cvar_Restart(bool unsetVM)
+void CvarSystem::restart(bool unsetVM)
 {
 	cvar_t	*curvar;
 
@@ -1201,14 +1201,14 @@ void Cvar_Restart(bool unsetVM)
 			(unsetVM && (curvar->flags & CVAR_VM_CREATED)))
 		{
 			// throw out any variables the user/vm created
-			curvar = Cvar_Unset(curvar);
+			curvar = CvarSystem::unset(curvar);
 			continue;
 		}
 		
 		if(!(curvar->flags & (CVAR_ROM | CVAR_INIT | CVAR_NORESTART)))
 		{
 			// Just reset the rest to their default values.
-			Cvar_Set2(curvar->name, curvar->resetString, false);
+			CvarSystem::set2(curvar->name, curvar->resetString, false);
 		}
 		
 		curvar = curvar->next;
@@ -1218,22 +1218,22 @@ void Cvar_Restart(bool unsetVM)
 
 /*
 ============
-Cvar_Restart_f
+CvarSystem::restart_f
 
 Resets all cvars to their hardcoded values
 ============
 */
-void Cvar_Restart_f()
+void CvarSystem::restart_f()
 {
-	Cvar_Restart(false);
+	CvarSystem::restart(false);
 }
 
 /*
 =====================
-Cvar_InfoString
+CvarSystem::infoString
 =====================
 */
-char *Cvar_InfoString(int bit)
+char *CvarSystem::infoString(int bit)
 {
 	static char	info[MAX_INFO_STRING];
 	cvar_t	*var;
@@ -1251,12 +1251,12 @@ char *Cvar_InfoString(int bit)
 
 /*
 =====================
-Cvar_InfoString_Big
+CvarSystem::infoString_Big
 
   handles large info strings ( CS_SYSTEMINFO )
 =====================
 */
-char *Cvar_InfoString_Big(int bit)
+char *CvarSystem::infoString_Big(int bit)
 {
 	static char	info[BIG_INFO_STRING];
 	cvar_t	*var;
@@ -1275,19 +1275,19 @@ char *Cvar_InfoString_Big(int bit)
 
 /*
 =====================
-Cvar_InfoStringBuffer
+CvarSystem::infoStringBuffer
 =====================
 */
-void Cvar_InfoStringBuffer( int bit, char* buff, int buffsize ) {
-	Q_strncpyz(buff,Cvar_InfoString(bit),buffsize);
+void CvarSystem::infoStringBuffer( int bit, char* buff, int buffsize ) {
+	Q_strncpyz(buff,CvarSystem::infoString(bit),buffsize);
 }
 
 /*
 =====================
-Cvar_CheckRange
+CvarSystem::checkRange
 =====================
 */
-void Cvar_CheckRange( cvar_t *var, float min, float max, bool integral )
+void CvarSystem::checkRange( cvar_t *var, float min, float max, bool integral )
 {
 	var->validate = true;
 	var->min = min;
@@ -1295,15 +1295,15 @@ void Cvar_CheckRange( cvar_t *var, float min, float max, bool integral )
 	var->integral = integral;
 
 	// Force an initial range check
-	Cvar_Set( var->name, var->string );
+	CvarSystem::set( var->name, var->string );
 }
 
 /*
 =====================
-Cvar_SetDescription
+CvarSystem::setDescription
 =====================
 */
-void Cvar_SetDescription( cvar_t *var, const char *var_description )
+void CvarSystem::setDescription( cvar_t *var, const char *var_description )
 {
 	if( var_description && var_description[0] != '\0' )
 	{
@@ -1317,16 +1317,16 @@ void Cvar_SetDescription( cvar_t *var, const char *var_description )
 
 /*
 =====================
-Cvar_Register
+CvarSystem::register_
 
-basically a slightly modified Cvar_Get for the interpreted modules
+basically a slightly modified CvarSystem::get for the interpreted modules
 =====================
 */
-void Cvar_Register(vmCvar_t *vmCvar, const char *varName, const char *defaultValue, int flags)
+void CvarSystem::register_(vmCvar_t *vmCvar, const char *varName, const char *defaultValue, int flags)
 {
 	cvar_t	*cv;
 
-	// There is code in Cvar_Get to prevent CVAR_ROM cvars being changed by the
+	// There is code in CvarSystem::get to prevent CVAR_ROM cvars being changed by the
 	// user. In other words CVAR_ARCHIVE and CVAR_ROM are mutually exclusive
 	// flags. Unfortunately some historical game code (including single player
 	// baseq3) sets both flags. We unset CVAR_ROM for such cvars.
@@ -1365,7 +1365,7 @@ void Cvar_Register(vmCvar_t *vmCvar, const char *varName, const char *defaultVal
 		Com_DPrintf( S_COLOR_YELLOW "WARNING: VM tried to register protected cvar '%s' with value '%s'%s\n",
 			varName, defaultValue, ( flags & ~cv->flags ) != 0 ? " and new flags" : "" );
 	} else {
-		cv = Cvar_Get(varName, defaultValue, flags | CVAR_VM_CREATED);
+		cv = CvarSystem::get(varName, defaultValue, flags | CVAR_VM_CREATED);
 	}
 
 	if (!vmCvar)
@@ -1373,23 +1373,23 @@ void Cvar_Register(vmCvar_t *vmCvar, const char *varName, const char *defaultVal
 
 	vmCvar->handle = cv - cvar_indexes;
 	vmCvar->modificationCount = -1;
-	Cvar_Update( vmCvar );
+	CvarSystem::update( vmCvar );
 }
 
 
 /*
 =====================
-Cvar_Update
+CvarSystem::update
 
 updates an interpreted modules' version of a cvar
 =====================
 */
-void	Cvar_Update( vmCvar_t *vmCvar ) {
+void	CvarSystem::update( vmCvar_t *vmCvar ) {
 	cvar_t	*cv = nullptr;
 	assert(vmCvar);
 
 	if ( static_cast<unsigned>(vmCvar->handle) >= cvar_numIndexes ) {
-		Com_Error( ERR_DROP, "Cvar_Update: handle out of range" );
+		Com_Error( ERR_DROP, "CvarSystem::update: handle out of range" );
 	}
 
 	cv = cvar_indexes + vmCvar->handle;
@@ -1402,7 +1402,7 @@ void	Cvar_Update( vmCvar_t *vmCvar ) {
 	}
 	vmCvar->modificationCount = cv->modificationCount;
 	if ( strlen(cv->string)+1 > MAX_CVAR_VALUE_STRING ) 
-	  Com_Error( ERR_DROP, "Cvar_Update: src %s length %u exceeds MAX_CVAR_VALUE_STRING",
+	  Com_Error( ERR_DROP, "CvarSystem::update: src %s length %u exceeds MAX_CVAR_VALUE_STRING",
 		     cv->string, 
 		     static_cast<unsigned int>(strlen(cv->string)));
 	Q_strncpyz( vmCvar->string, cv->string,  MAX_CVAR_VALUE_STRING ); 
@@ -1413,10 +1413,10 @@ void	Cvar_Update( vmCvar_t *vmCvar ) {
 
 /*
 ==================
-Cvar_CompleteCvarName
+CvarSystem::completeCvarName
 ==================
 */
-void Cvar_CompleteCvarName( char *args, int argNum )
+void CvarSystem::completeCvarName( char *args, int argNum )
 {
 	if( argNum == 2 )
 	{
@@ -1430,35 +1430,35 @@ void Cvar_CompleteCvarName( char *args, int argNum )
 
 /*
 ============
-Cvar_Init
+CvarSystem::init
 
 Reads in all archived cvars
 ============
 */
-void Cvar_Init ()
+void CvarSystem::init ()
 {
 	Com_Memset(cvar_indexes, '\0', sizeof(cvar_indexes));
 	Com_Memset(hashTable, '\0', sizeof(hashTable));
 
-	cvar_cheats = Cvar_Get("sv_cheats", "1", CVAR_ROM | CVAR_SYSTEMINFO );
+	cvar_cheats = CvarSystem::get("sv_cheats", "1", CVAR_ROM | CVAR_SYSTEMINFO );
 
-	Cmd_AddCommand ("print", Cvar_Print_f);
-	Cmd_AddCommand ("toggle", Cvar_Toggle_f);
-	Cmd_SetCommandCompletionFunc( "toggle", Cvar_CompleteCvarName );
-	Cmd_AddCommand ("set", Cvar_Set_f);
-	Cmd_SetCommandCompletionFunc( "set", Cvar_CompleteCvarName );
-	Cmd_AddCommand ("sets", Cvar_Set_f);
-	Cmd_SetCommandCompletionFunc( "sets", Cvar_CompleteCvarName );
-	Cmd_AddCommand ("setu", Cvar_Set_f);
-	Cmd_SetCommandCompletionFunc( "setu", Cvar_CompleteCvarName );
-	Cmd_AddCommand ("seta", Cvar_Set_f);
-	Cmd_SetCommandCompletionFunc( "seta", Cvar_CompleteCvarName );
-	Cmd_AddCommand ("reset", Cvar_Reset_f);
-	Cmd_SetCommandCompletionFunc( "reset", Cvar_CompleteCvarName );
-	Cmd_AddCommand ("unset", Cvar_Unset_f);
-	Cmd_SetCommandCompletionFunc("unset", Cvar_CompleteCvarName);
+	Cmd_AddCommand ("print", CvarSystem::print_f);
+	Cmd_AddCommand ("toggle", CvarSystem::toggle_f);
+	Cmd_SetCommandCompletionFunc( "toggle", CvarSystem::completeCvarName );
+	Cmd_AddCommand ("set", CvarSystem::set_f);
+	Cmd_SetCommandCompletionFunc( "set", CvarSystem::completeCvarName );
+	Cmd_AddCommand ("sets", CvarSystem::set_f);
+	Cmd_SetCommandCompletionFunc( "sets", CvarSystem::completeCvarName );
+	Cmd_AddCommand ("setu", CvarSystem::set_f);
+	Cmd_SetCommandCompletionFunc( "setu", CvarSystem::completeCvarName );
+	Cmd_AddCommand ("seta", CvarSystem::set_f);
+	Cmd_SetCommandCompletionFunc( "seta", CvarSystem::completeCvarName );
+	Cmd_AddCommand ("reset", CvarSystem::reset_f);
+	Cmd_SetCommandCompletionFunc( "reset", CvarSystem::completeCvarName );
+	Cmd_AddCommand ("unset", CvarSystem::unset_f);
+	Cmd_SetCommandCompletionFunc("unset", CvarSystem::completeCvarName);
 
-	Cmd_AddCommand ("cvarlist", Cvar_List_f);
-	Cmd_AddCommand ("cvar_modified", Cvar_ListModified_f);
-	Cmd_AddCommand ("cvar_restart", Cvar_Restart_f);
+	Cmd_AddCommand ("cvarlist", CvarSystem::list_f);
+	Cmd_AddCommand ("cvar_modified", CvarSystem::listModified_f);
+	Cmd_AddCommand ("cvar_restart", CvarSystem::restart_f);
 }

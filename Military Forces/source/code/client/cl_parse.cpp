@@ -396,7 +396,7 @@ void CL_SystemInfoChanged( ) {
 	s = Info_ValueForKey( systemInfo, "sv_cheats" );
 	cl_connectedToCheatServer = atoi( s );
 	if ( !cl_connectedToCheatServer ) {
-		Cvar_SetCheatState();
+		CvarSystem::setCheatState();
 	}
 
 	// check pure server string
@@ -431,8 +431,8 @@ void CL_SystemInfoChanged( ) {
 			gameSet = true;
 		}
 
-		if((cvar_flags = Cvar_Flags(key)) == CVAR_NONEXISTENT)
-			Cvar_Get(key, value, CVAR_SERVER_CREATED | CVAR_ROM);
+		if((cvar_flags = CvarSystem::flags(key)) == CVAR_NONEXISTENT)
+			CvarSystem::get(key, value, CVAR_SERVER_CREATED | CVAR_ROM);
 		else
 		{
 			// If this cvar may not be modified by a server discard the value.
@@ -448,14 +448,14 @@ void CL_SystemInfoChanged( ) {
 				}
 			}
 
-			Cvar_SetSafe(key, value);
+			CvarSystem::setSafe(key, value);
 		}
 	}
 	// if game folder should not be set and it is set at the client side
-	if ( !gameSet && *Cvar_VariableString("fs_game") ) {
-		Cvar_Set( "fs_game", "" );
+	if ( !gameSet && *CvarSystem::variableString("fs_game") ) {
+		CvarSystem::set( "fs_game", "" );
 	}
-	cl_connectedToPureServer = Cvar_VariableValue( "sv_pure" );
+	cl_connectedToPureServer = CvarSystem::variableValue( "sv_pure" );
 }
 
 /*
@@ -546,7 +546,7 @@ void CL_ParseGamestate( Message *msg ) {
 	clc.checksumFeed = msg->readLong();
 
 	// save old gamedir
-	Cvar_VariableStringBuffer("fs_game", oldGame, sizeof(oldGame));
+	CvarSystem::variableStringBuffer("fs_game", oldGame, sizeof(oldGame));
 
 	// parse useful values out of CS_SERVERINFO
 	CL_ParseServerInfo();
@@ -559,7 +559,7 @@ void CL_ParseGamestate( Message *msg ) {
 		CL_StopRecord_f();
 	
 	// reinitialize the filesystem if the game directory has changed
-	if(!cl_oldGameSet && (Cvar_Flags("fs_game") & CVAR_MODIFIED))
+	if(!cl_oldGameSet && (CvarSystem::flags("fs_game") & CVAR_MODIFIED))
 	{
 		cl_oldGameSet = true;
 		Q_strncpyz(cl_oldGame, oldGame, sizeof(cl_oldGame));
@@ -572,7 +572,7 @@ void CL_ParseGamestate( Message *msg ) {
 	CL_InitDownloads();
 
 	// make sure the game starts
-	Cvar_Set( "cl_paused", "0" );
+	CvarSystem::set( "cl_paused", "0" );
 }
 
 
@@ -604,7 +604,7 @@ void CL_ParseDownload ( Message *msg ) {
 		// block zero is special, contains file size
 		clc.downloadSize = msg->readLong();
 
-		Cvar_SetValue( "cl_downloadSize", clc.downloadSize );
+		CvarSystem::setValue( "cl_downloadSize", clc.downloadSize );
 
 		if (clc.downloadSize < 0)
 		{
@@ -650,7 +650,7 @@ void CL_ParseDownload ( Message *msg ) {
 	clc.downloadCount += size;
 
 	// So UI gets access to it
-	Cvar_SetValue( "cl_downloadCount", clc.downloadCount );
+	CvarSystem::setValue( "cl_downloadCount", clc.downloadCount );
 
 	if (!size) { // A zero length block means EOF
 		if (clc.download) {

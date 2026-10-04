@@ -107,7 +107,7 @@ void G_LoadMissionScripts()
 		return;
 	}
 
-	Cvar_VariableStringBuffer("mapname", buffer, 32);
+	CvarSystem::variableStringBuffer("mapname", buffer, 32);
 	Com_sprintf( filename, MAX_FILEPATH, "missions/%s/%s.mis", buffer, missionname );
 
 	if( !G_LoadOverviewAndEntities(filename, &overview, vehicles, installations) )

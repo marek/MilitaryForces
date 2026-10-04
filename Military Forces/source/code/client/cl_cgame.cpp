@@ -443,7 +443,7 @@ void CL_InitCGame()
 
 	// reset any CVAR_CHEAT cvars registered by cgame
 	if ( !clc.demoplaying && !cl_connectedToCheatServer )
-		Cvar_SetCheatState();
+		CvarSystem::setCheatState();
 
 	// we will send a usercmd this frame, which
 	// will cause the server to send us the first snapshot
@@ -592,7 +592,7 @@ void CL_FirstSnapshot( ) {
 	// after loading
 	if ( cl_activeAction->string[0] ) {
 		Cbuf_AddText( cl_activeAction->string );
-		Cvar_Set( "activeAction", "" );
+		CvarSystem::set( "activeAction", "" );
 	}
 
 #ifdef USE_MUMBLE
@@ -626,7 +626,7 @@ void CL_FirstSnapshot( ) {
 		clc.voipCodecInitialized = true;
 		clc.voipMuteAll = false;
 		Cmd_AddCommand ("voip", CL_Voip_f);
-		Cvar_Set("cl_voipSendTarget", "spatial");
+		CvarSystem::set("cl_voipSendTarget", "spatial");
 		Com_Memset(clc.voipTargets, ~0, sizeof(clc.voipTargets));
 	}
 #endif

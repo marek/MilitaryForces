@@ -28,10 +28,10 @@ static void CG_CalcVrect () {
 	} else {
 		// bound normal viewsize
 		if (cg_viewsize.integer < 30) {
-			Cvar_Set ("cg_viewsize","30");
+			CvarSystem::set ("cg_viewsize","30");
 			size = 30;
 		} else if (cg_viewsize.integer > 100) {
-			Cvar_Set ("cg_viewsize","100");
+			CvarSystem::set ("cg_viewsize","100");
 			size = 100;
 		} else {
 			size = cg_viewsize.integer;
@@ -734,7 +734,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, bool demoPlay
 				cg_timescale.value = cg_timescaleFadeEnd.value;
 		}
 		if (cg_timescaleFadeSpeed.value) {
-			Cvar_Set("timescale", va("%f", cg_timescale.value));
+			CvarSystem::set("timescale", va("%f", cg_timescale.value));
 		}
 	}
 

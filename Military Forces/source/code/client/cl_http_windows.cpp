@@ -125,7 +125,7 @@ void CL_HTTP_BeginDownload(const char *remoteURL)
     DropIf(!success, "Get HTTP_QUERY_CONTENT_LENGTH failed %lu", GetLastError());
 
     clc.downloadSize = (int)contentLength;
-    Cvar_SetValue("cl_downloadSize", clc.downloadSize);
+    CvarSystem::setValue("cl_downloadSize", clc.downloadSize);
 }
 
 /*
@@ -147,7 +147,7 @@ bool CL_HTTP_PerformDownload(void)
     if (bytesRead > 0)
     {
         clc.downloadCount += bytesRead;
-        Cvar_SetValue("cl_downloadCount", clc.downloadCount);
+        CvarSystem::setValue("cl_downloadCount", clc.downloadCount);
 
         DWORD bytesWritten = (DWORD)FS_Write(readBuffer, bytesRead, clc.download);
         DropIf(bytesWritten != bytesRead, "bytesWritten != bytesRead");

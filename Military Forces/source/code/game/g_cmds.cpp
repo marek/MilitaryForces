@@ -1228,7 +1228,7 @@ void Cmd_CallVote_f( GameEntity *ent )
 		// this allows a player to change maps, but not upset the map rotation
 		char	s[MAX_STRING_CHARS];
 
-		Cvar_VariableStringBuffer( "nextmap", s, sizeof(s) );
+		CvarSystem::variableStringBuffer( "nextmap", s, sizeof(s) );
 		if( *s )
 			Com_sprintf( theLevel.voteString_, sizeof( theLevel.voteString_ ), "%s %s; set nextmap \"%s\"", arg1, arg2, s );
 		else
@@ -1239,7 +1239,7 @@ void Cmd_CallVote_f( GameEntity *ent )
 	{
 		char	s[MAX_STRING_CHARS];
 
-		Cvar_VariableStringBuffer( "nextmap", s, sizeof(s) );
+		CvarSystem::variableStringBuffer( "nextmap", s, sizeof(s) );
 		if( !*s )
 		{
 			SV_GameSendServerCommand( ent->s.number, "print \"nextmap not set.\n\"" );

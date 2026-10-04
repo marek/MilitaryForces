@@ -259,7 +259,7 @@ void CL_Voip_f( )
 		reason = "Voip codec not initialized";
 	else if (!clc.voipEnabled)
 		reason = "Server doesn't support VoIP";
-	else if (!clc.demoplaying && (Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER || Cvar_VariableValue("ui_singlePlayerActive")))
+	else if (!clc.demoplaying && (CvarSystem::variableValue( "g_gametype" ) == GT_SINGLE_PLAYER || CvarSystem::variableValue("ui_singlePlayerActive")))
 		reason = "running in single-player mode";
 
 	if (reason != nullptr) {
@@ -429,9 +429,9 @@ void CL_CaptureVoip()
 			Com_Printf(S_COLOR_YELLOW "Your network rate is too slow for VoIP.\n");
 			Com_Printf("Set 'Data Rate' to 'LAN/Cable/xDSL' in 'Setup/System/Network'.\n");
 			Com_Printf("Until then, VoIP is disabled.\n");
-			Cvar_Set("cl_voip", "0");
+			CvarSystem::set("cl_voip", "0");
 		}
-		Cvar_Set("cl_voipProtocol", cl_voip->integer ? "opus" : "");
+		CvarSystem::set("cl_voipProtocol", cl_voip->integer ? "opus" : "");
 		cl_voip->modified = false;
 		cl_rate->modified = false;
 	}
@@ -443,12 +443,12 @@ void CL_CaptureVoip()
 		return;  // packet is pending transmission, don't record more yet.
 
 	if (cl_voipUseVAD->modified) {
-		Cvar_Set("cl_voipSend", (useVad) ? "1" : "0");
+		CvarSystem::set("cl_voipSend", (useVad) ? "1" : "0");
 		cl_voipUseVAD->modified = false;
 	}
 
 	if ((useVad) && (!cl_voipSend->integer))
-		Cvar_Set("cl_voipSend", "1");  // lots of things reset this.
+		CvarSystem::set("cl_voipSend", "1");  // lots of things reset this.
 
 	if (cl_voipSend->modified) {
 		bool dontCapture = false;
@@ -467,7 +467,7 @@ void CL_CaptureVoip()
 
 		if(dontCapture)
 		{
-			Cvar_Set("cl_voipSend", "0");
+			CvarSystem::set("cl_voipSend", "0");
 			return;
 		}
 
@@ -721,7 +721,7 @@ void CL_Record_f( ) {
 
   // sync 0 doesn't prevent recording, so not forcing it off .. everyone does g_sync 1 ; record ; g_sync 0 ..
 	if ( NET_IsLocalAddress( clc.serverAddress ) &&
-		!Cvar_VariableValue( "g_synchronousClients" ) &&
+		!CvarSystem::variableValue( "g_synchronousClients" ) &&
 		// Don't nag if we're simply recording everything automatically.
 		!cl_autoRecordDemo->integer )
 	{
@@ -764,7 +764,7 @@ void CL_Record_f( ) {
 		return;
 	}
 	clc.demorecording = true;
-	if (Cvar_VariableValue("ui_recordSPDemo")) {
+	if (CvarSystem::variableValue("ui_recordSPDemo")) {
 	  clc.spDemoRecording = true;
 	} else {
 	  clc.spDemoRecording = false;
@@ -1089,7 +1089,7 @@ void CL_PlayDemo_f( ) {
 
 	// make sure a local server is killed
 	// 2 means don't force disconnect of local client
-	Cvar_Set( "sv_killserver", "2" );
+	CvarSystem::set( "sv_killserver", "2" );
 
 	// open the demo file
 	Q_strncpyz( arg, Cmd_Argv(1), sizeof( arg ) );
@@ -1189,14 +1189,14 @@ If the "nextdemo" cvar is set, that command will be issued
 void CL_NextDemo( ) {
 	char	v[MAX_STRING_CHARS];
 
-	Q_strncpyz( v, Cvar_VariableString ("nextdemo"), sizeof(v) );
+	Q_strncpyz( v, CvarSystem::variableString ("nextdemo"), sizeof(v) );
 	v[MAX_STRING_CHARS-1] = 0;
 	Com_DPrintf("CL_NextDemo: %s\n", v );
 	if (!v[0]) {
 		return;
 	}
 
-	Cvar_Set ("nextdemo","");
+	CvarSystem::set ("nextdemo","");
 	Cbuf_AddText (v);
 	Cbuf_AddText ("\n");
 	Cbuf_Execute();
@@ -1310,7 +1310,7 @@ void CL_MapLoading( ) {
 		SCR_UpdateScreen();
 	} else {
 		// clear nextmap so the cinematic shutdown doesn't execute it
-		Cvar_Set( "nextmap", "" );
+		CvarSystem::set( "nextmap", "" );
 		CL_Disconnect( true );
 		Q_strncpyz( clc.servername, "localhost", sizeof(clc.servername) );
 		clc.state = CA_CHALLENGING;		// so the connect screen is drawn
@@ -1354,9 +1354,9 @@ static void CL_UpdateGUID( const char *prefix, int prefix_len )
 	FS_FCloseFile( f );
 
 	if( len != QKEY_SIZE ) 
-		Cvar_Set( "cl_guid", "" );
+		CvarSystem::set( "cl_guid", "" );
 	else
-		Cvar_Set( "cl_guid", Com_MD5File( QKEY_FILE, QKEY_SIZE,
+		CvarSystem::set( "cl_guid", Com_MD5File( QKEY_FILE, QKEY_SIZE,
 			prefix, prefix_len ) );
 }
 
@@ -1366,7 +1366,7 @@ static void CL_OldGame()
 	{
 		// change back to previous fs_game
 		cl_oldGameSet = false;
-		Cvar_Set2("fs_game", cl_oldGame, true);
+		CvarSystem::set2("fs_game", cl_oldGame, true);
 		FS_ConditionalRestart(clc.checksumFeed, false);
 	}
 }
@@ -1387,7 +1387,7 @@ void CL_Disconnect( bool showMainMenu ) {
 	}
 
 	// shutting down the client so enter full screen ui mode
-	Cvar_Set("r_uiFullScreen", "1");
+	CvarSystem::set("r_uiFullScreen", "1");
 
 	if ( clc.demorecording ) {
 		CL_StopRecord_f ();
@@ -1398,7 +1398,7 @@ void CL_Disconnect( bool showMainMenu ) {
 		clc.download = 0;
 	}
 	*clc.downloadTempName = *clc.downloadName = 0;
-	Cvar_Set( "cl_downloadName", "" );
+	CvarSystem::set( "cl_downloadName", "" );
 
 #ifdef USE_MUMBLE
 	if (cl_useMumble->integer && mumble_islinked()) {
@@ -1412,7 +1412,7 @@ void CL_Disconnect( bool showMainMenu ) {
 		int tmp = cl_voipUseVAD->integer;
 		cl_voipUseVAD->integer = 0;  // disable this for a moment.
 		clc.voipOutgoingDataSize = 0;  // dump any pending VoIP transmission.
-		Cvar_Set("cl_voipSend", "0");
+		CvarSystem::set("cl_voipSend", "0");
 		CL_CaptureVoip();  // clean up any state...
 		cl_voipUseVAD->integer = tmp;
 	}
@@ -1461,7 +1461,7 @@ void CL_Disconnect( bool showMainMenu ) {
 	clc.state = CA_DISCONNECTED;
 
 	// allow cheats locally
-	Cvar_Set( "sv_cheats", "1" );
+	CvarSystem::set( "sv_cheats", "1" );
 
 	// not connected to a pure server anymore
 	cl_connectedToPureServer = false;
@@ -1632,7 +1632,7 @@ void CL_RequestAuthorization( void ) {
 	}
 	nums[j] = 0;
 
-	fs = Cvar_Get ("cl_anonymous", "0", CVAR_INIT|CVAR_SYSTEMINFO );
+	fs = CvarSystem::get ("cl_anonymous", "0", CVAR_INIT|CVAR_SYSTEMINFO );
 
 	NET_OutOfBandPrint(NS_CLIENT, cls.authorizeServer, "getKeyAuthorize %i %s", fs->integer, nums );
 }
@@ -1669,7 +1669,7 @@ CL_Disconnect_f
 */
 void CL_Disconnect_f( ) {
 	SCR_StopCinematic();
-	Cvar_Set("ui_singlePlayerActive", "0");
+	CvarSystem::set("ui_singlePlayerActive", "0");
 	if ( clc.state != CA_DISCONNECTED && clc.state != CA_CINEMATIC ) {
 		Com_Error (ERR_DISCONNECT, "Disconnected from server");
 	}
@@ -1685,7 +1685,7 @@ CL_Reconnect_f
 void CL_Reconnect_f( ) {
 	if ( !strlen( cl_reconnectArgs ) )
 		return;
-	Cvar_Set("ui_singlePlayerActive", "0");
+	CvarSystem::set("ui_singlePlayerActive", "0");
 	Cbuf_AddText( va("connect %s\n", cl_reconnectArgs ) );
 }
 
@@ -1723,7 +1723,7 @@ void CL_Connect_f( ) {
 	// save arguments for reconnect
 	Q_strncpyz( cl_reconnectArgs, Cmd_Args(), sizeof( cl_reconnectArgs ) );
 
-	Cvar_Set("ui_singlePlayerActive", "0");
+	CvarSystem::set("ui_singlePlayerActive", "0");
 
 	// fire a message off to the motd server
 	CL_RequestMotd();
@@ -1737,7 +1737,7 @@ void CL_Connect_f( ) {
 	}
 
 	// make sure a local server is killed
-	Cvar_Set( "sv_killserver", "1" );
+	CvarSystem::set( "sv_killserver", "1" );
 	SV_Frame( 0 );
 
 	noGameRestart = true;
@@ -1781,7 +1781,7 @@ void CL_Connect_f( ) {
 	clc.connectPacketCount = 0;
 
 	// server connection string
-	Cvar_Set( "cl_currentServerAddress", server );
+	CvarSystem::set( "cl_currentServerAddress", server );
 }
 
 constexpr int MAX_RCON_MESSAGE = 1024;
@@ -1977,7 +1977,7 @@ void CL_Vid_Restart_f( ) {
 		cls.soundRegistered = false;
 
 		// unpause so the cgame definitely gets a snapshot and renders a frame
-		Cvar_Set("cl_paused", "0");
+		CvarSystem::set("cl_paused", "0");
 
 		// initialize the renderer interface
 		CL_InitRef();
@@ -2077,7 +2077,7 @@ void CL_Clientinfo_f( ) {
 	Com_Printf( "state: %i\n", clc.state );
 	Com_Printf( "Server: %s\n", clc.servername );
 	Com_Printf ("User info settings:\n");
-	Info_Print( Cvar_InfoString( CVAR_USERINFO ) );
+	Info_Print( CvarSystem::infoString( CVAR_USERINFO ) );
 	Com_Printf( "--------------------------------------\n" );
 }
 
@@ -2136,7 +2136,7 @@ void CL_DownloadsComplete( ) {
 	}
 
 	// starting to load a map so we get out of full screen ui mode
-	Cvar_Set("r_uiFullScreen", "0");
+	CvarSystem::set("r_uiFullScreen", "0");
 
 	// flush client memory and start loading stuff
 	// this will also (re)load the UI
@@ -2166,10 +2166,10 @@ static void CL_InitDownload( const char *localName ) {
 	Com_sprintf( clc.downloadTempName, sizeof(clc.downloadTempName), "%s.tmp", localName );
 
 	// Set so UI gets access to it
-	Cvar_Set( "cl_downloadName", localName );
-	Cvar_Set( "cl_downloadSize", "0" );
-	Cvar_Set( "cl_downloadCount", "0" );
-	Cvar_SetValue( "cl_downloadTime", cls.realtime );
+	CvarSystem::set( "cl_downloadName", localName );
+	CvarSystem::set( "cl_downloadSize", "0" );
+	CvarSystem::set( "cl_downloadCount", "0" );
+	CvarSystem::setValue( "cl_downloadTime", cls.realtime );
 
 	clc.downloadBlock = 0; // Starting new file
 	clc.downloadCount = 0;
@@ -2241,14 +2241,14 @@ void CL_NextDownload()
 	// A download has finished, check whether this matches a referenced checksum
 	if(*clc.downloadName)
 	{
-		char *zippath = FS_BaseDir_BuildOSPath(Cvar_VariableString("fs_homedatapath"), clc.downloadName);
+		char *zippath = FS_BaseDir_BuildOSPath(CvarSystem::variableString("fs_homedatapath"), clc.downloadName);
 
 		if(!FS_CompareZipChecksum(zippath))
 			Com_Error(ERR_DROP, "Incorrect checksum for file: %s", clc.downloadName);
 	}
 
 	*clc.downloadTempName = *clc.downloadName = 0;
-	Cvar_Set("cl_downloadName", "");
+	CvarSystem::set("cl_downloadName", "");
 
 	// We are looking to start a download here
 	if (*clc.downloadList) {
@@ -2357,7 +2357,7 @@ void CL_InitDownloads() {
 			clc.state = CA_CONNECTED;
 
 			*clc.downloadTempName = *clc.downloadName = 0;
-			Cvar_Set( "cl_downloadName", "" );
+			CvarSystem::set( "cl_downloadName", "" );
 
 			CL_NextDownload();
 			return;
@@ -2416,9 +2416,9 @@ void CL_CheckForResend( ) {
 		
 	case CA_CHALLENGING:
 		// sending back the challenge
-		port = Cvar_VariableValue ("net_qport");
+		port = CvarSystem::variableValue ("net_qport");
 
-		Q_strncpyz( info, Cvar_InfoString( CVAR_USERINFO ), sizeof( info ) );
+		Q_strncpyz( info, CvarSystem::infoString( CVAR_USERINFO ), sizeof( info ) );
 		
 #ifdef LEGACY_PROTOCOL
 		if(com_legacyprotocol->integer == com_protocol->integer)
@@ -2472,7 +2472,7 @@ void CL_MotdPacket( netadr_t from ) {
 	challenge = Info_ValueForKey( info, "motd" );
 
 	Q_strncpyz( cls.updateInfoString, info, sizeof( cls.updateInfoString ) );
-	Cvar_Set( "cl_motdString", challenge );
+	CvarSystem::set( "cl_motdString", challenge );
 #endif
 }
 
@@ -2765,9 +2765,9 @@ void CL_ConnectionlessPacket( netadr_t from, Message *msg ) {
 		}
 
 #ifdef LEGACY_PROTOCOL
-		clc.netchan.setup( NS_CLIENT, from, Cvar_VariableValue("net_qport"), clc.challenge, clc.compat );
+		clc.netchan.setup( NS_CLIENT, from, CvarSystem::variableValue("net_qport"), clc.challenge, clc.compat );
 #else
-		clc.netchan.setup( NS_CLIENT, from, Cvar_VariableValue("net_qport"), clc.challenge, false );
+		clc.netchan.setup( NS_CLIENT, from, CvarSystem::variableValue("net_qport"), clc.challenge, false );
 #endif
 
 		clc.state = CA_CONNECTED;
@@ -2957,7 +2957,7 @@ void CL_CheckUserinfo( ) {
 	if(cvar_modifiedFlags & CVAR_USERINFO)
 	{
 		cvar_modifiedFlags &= ~CVAR_USERINFO;
-		CL_AddReliableCommand(va("userinfo \"%s\"", Cvar_InfoString( CVAR_USERINFO ) ), false);
+		CL_AddReliableCommand(va("userinfo \"%s\"", CvarSystem::infoString( CVAR_USERINFO ) ), false);
 	}
 }
 
@@ -3260,14 +3260,14 @@ void CL_InitRef( ) {
 	Com_Printf( "----- Initializing Renderer ----\n" );
 
 #ifdef USE_RENDERER_DLOPEN
-	cl_renderer = Cvar_Get("cl_renderer", "opengl2", CVAR_ARCHIVE | CVAR_LATCH);
+	cl_renderer = CvarSystem::get("cl_renderer", "opengl2", CVAR_ARCHIVE | CVAR_LATCH);
 
 	Com_sprintf(dllName, sizeof(dllName), "renderer_%s" DLL_EXT, cl_renderer->string);
 
 	if(!(rendererLib = Sys_LoadDll(dllName, false)) && strcmp(cl_renderer->string, cl_renderer->resetString))
 	{
 		Com_Printf("failed:\n\"%s\"\n", Sys_LibraryError());
-		Cvar_ForceReset("cl_renderer");
+		CvarSystem::forceReset("cl_renderer");
 
 		Com_sprintf(dllName, sizeof(dllName), "renderer_%s" DLL_EXT, cl_renderer->resetString);
 		rendererLib = Sys_LoadDll(dllName, false);
@@ -3314,12 +3314,12 @@ void CL_InitRef( ) {
 	ri.FS_ListFiles = FS_ListFiles;
 	ri.FS_FileIsInPAK = FS_FileIsInPAK;
 	ri.FS_FileExists = FS_FileExists_HomeData;
-	ri.Cvar_Get = Cvar_Get;
-	ri.Cvar_Set = Cvar_Set;
-	ri.Cvar_SetValue = Cvar_SetValue;
-	ri.Cvar_CheckRange = Cvar_CheckRange;
-	ri.Cvar_SetDescription = Cvar_SetDescription;
-	ri.Cvar_VariableIntegerValue = Cvar_VariableIntegerValue;
+	ri.Cvar_Get = CvarSystem::get;
+	ri.Cvar_Set = CvarSystem::set;
+	ri.Cvar_SetValue = CvarSystem::setValue;
+	ri.Cvar_CheckRange = CvarSystem::checkRange;
+	ri.Cvar_SetDescription = CvarSystem::setDescription;
+	ri.Cvar_VariableIntegerValue = CvarSystem::variableIntegerValue;
 
 	// cinematic stuff
 
@@ -3355,7 +3355,7 @@ void CL_InitRef( ) {
 	refExport = *ret;
 
 	// unpause so the cgame definitely gets a snapshot and renders a frame
-	Cvar_Set( "cl_paused", "0" );
+	CvarSystem::set( "cl_paused", "0" );
 }
 
 
@@ -3368,10 +3368,10 @@ void CL_SetModel_f( ) {
 
 	arg = Cmd_Argv( 1 );
 	if (arg[0]) {
-		Cvar_Set( "model", arg );
-		Cvar_Set( "headmodel", arg );
+		CvarSystem::set( "model", arg );
+		CvarSystem::set( "headmodel", arg );
 	} else {
-		Cvar_VariableStringBuffer( "model", name, sizeof(name) );
+		CvarSystem::variableStringBuffer( "model", name, sizeof(name) );
 		Com_Printf("model is set to %s\n", name);
 	}
 }
@@ -3563,145 +3563,145 @@ void CL_Init( ) {
 	//
 	// register our variables
 	//
-	cl_noprint = Cvar_Get( "cl_noprint", "0", 0 );
+	cl_noprint = CvarSystem::get( "cl_noprint", "0", 0 );
 #ifdef UPDATE_SERVER_NAME
-	cl_motd = Cvar_Get ("cl_motd", "1", 0);
+	cl_motd = CvarSystem::get ("cl_motd", "1", 0);
 #endif
 
-	cl_timeout = Cvar_Get ("cl_timeout", "200", 0);
+	cl_timeout = CvarSystem::get ("cl_timeout", "200", 0);
 
-	cl_timeNudge = Cvar_Get ("cl_timeNudge", "0", CVAR_TEMP );
-	cl_shownet = Cvar_Get ("cl_shownet", "0", CVAR_TEMP );
-	cl_showSend = Cvar_Get ("cl_showSend", "0", CVAR_TEMP );
-	cl_showTimeDelta = Cvar_Get ("cl_showTimeDelta", "0", CVAR_TEMP );
-	cl_freezeDemo = Cvar_Get ("cl_freezeDemo", "0", CVAR_TEMP );
-	rcon_client_password = Cvar_Get ("rconPassword", "", CVAR_TEMP );
-	cl_activeAction = Cvar_Get( "activeAction", "", CVAR_TEMP );
+	cl_timeNudge = CvarSystem::get ("cl_timeNudge", "0", CVAR_TEMP );
+	cl_shownet = CvarSystem::get ("cl_shownet", "0", CVAR_TEMP );
+	cl_showSend = CvarSystem::get ("cl_showSend", "0", CVAR_TEMP );
+	cl_showTimeDelta = CvarSystem::get ("cl_showTimeDelta", "0", CVAR_TEMP );
+	cl_freezeDemo = CvarSystem::get ("cl_freezeDemo", "0", CVAR_TEMP );
+	rcon_client_password = CvarSystem::get ("rconPassword", "", CVAR_TEMP );
+	cl_activeAction = CvarSystem::get( "activeAction", "", CVAR_TEMP );
 
-	cl_timedemo = Cvar_Get ("timedemo", "0", 0);
-	cl_timedemoLog = Cvar_Get ("cl_timedemoLog", "", CVAR_ARCHIVE);
-	cl_autoRecordDemo = Cvar_Get ("cl_autoRecordDemo", "0", CVAR_ARCHIVE);
-	cl_aviFrameRate = Cvar_Get ("cl_aviFrameRate", "25", CVAR_ARCHIVE);
-	cl_aviMotionJpeg = Cvar_Get ("cl_aviMotionJpeg", "1", CVAR_ARCHIVE);
-	cl_forceavidemo = Cvar_Get ("cl_forceavidemo", "0", 0);
+	cl_timedemo = CvarSystem::get ("timedemo", "0", 0);
+	cl_timedemoLog = CvarSystem::get ("cl_timedemoLog", "", CVAR_ARCHIVE);
+	cl_autoRecordDemo = CvarSystem::get ("cl_autoRecordDemo", "0", CVAR_ARCHIVE);
+	cl_aviFrameRate = CvarSystem::get ("cl_aviFrameRate", "25", CVAR_ARCHIVE);
+	cl_aviMotionJpeg = CvarSystem::get ("cl_aviMotionJpeg", "1", CVAR_ARCHIVE);
+	cl_forceavidemo = CvarSystem::get ("cl_forceavidemo", "0", 0);
 
-	rconAddress = Cvar_Get ("rconAddress", "", 0);
+	rconAddress = CvarSystem::get ("rconAddress", "", 0);
 
-	cl_yawspeed = Cvar_Get ("cl_yawspeed", "140", CVAR_ARCHIVE);
-	cl_pitchspeed = Cvar_Get ("cl_pitchspeed", "140", CVAR_ARCHIVE);
-	cl_anglespeedkey = Cvar_Get ("cl_anglespeedkey", "1.5", 0);
+	cl_yawspeed = CvarSystem::get ("cl_yawspeed", "140", CVAR_ARCHIVE);
+	cl_pitchspeed = CvarSystem::get ("cl_pitchspeed", "140", CVAR_ARCHIVE);
+	cl_anglespeedkey = CvarSystem::get ("cl_anglespeedkey", "1.5", 0);
 
-	cl_maxpackets = Cvar_Get ("cl_maxpackets", "30", CVAR_ARCHIVE );
-	cl_packetdup = Cvar_Get ("cl_packetdup", "1", CVAR_ARCHIVE );
+	cl_maxpackets = CvarSystem::get ("cl_maxpackets", "30", CVAR_ARCHIVE );
+	cl_packetdup = CvarSystem::get ("cl_packetdup", "1", CVAR_ARCHIVE );
 
-	cl_run = Cvar_Get ("cl_run", "1", CVAR_ARCHIVE);
-	cl_sensitivity = Cvar_Get ("sensitivity", "5", CVAR_ARCHIVE);
-	cl_mouseAccel = Cvar_Get ("cl_mouseAccel", "0", CVAR_ARCHIVE);
-	cl_freelook = Cvar_Get( "cl_freelook", "1", CVAR_ARCHIVE );
+	cl_run = CvarSystem::get ("cl_run", "1", CVAR_ARCHIVE);
+	cl_sensitivity = CvarSystem::get ("sensitivity", "5", CVAR_ARCHIVE);
+	cl_mouseAccel = CvarSystem::get ("cl_mouseAccel", "0", CVAR_ARCHIVE);
+	cl_freelook = CvarSystem::get( "cl_freelook", "1", CVAR_ARCHIVE );
 
 	// 0: legacy mouse acceleration
 	// 1: new implementation
-	cl_mouseAccelStyle = Cvar_Get( "cl_mouseAccelStyle", "0", CVAR_ARCHIVE );
+	cl_mouseAccelStyle = CvarSystem::get( "cl_mouseAccelStyle", "0", CVAR_ARCHIVE );
 	// offset for the power function (for style 1, ignored otherwise)
 	// this should be set to the max rate value
-	cl_mouseAccelOffset = Cvar_Get( "cl_mouseAccelOffset", "5", CVAR_ARCHIVE );
-	Cvar_CheckRange(cl_mouseAccelOffset, 0.001f, 50000.0f, false);
+	cl_mouseAccelOffset = CvarSystem::get( "cl_mouseAccelOffset", "5", CVAR_ARCHIVE );
+	CvarSystem::checkRange(cl_mouseAccelOffset, 0.001f, 50000.0f, false);
 
-	cl_showMouseRate = Cvar_Get ("cl_showmouserate", "0", 0);
+	cl_showMouseRate = CvarSystem::get ("cl_showmouserate", "0", 0);
 
-	cl_allowDownload = Cvar_Get ("cl_allowDownload", "0", CVAR_ARCHIVE);
+	cl_allowDownload = CvarSystem::get ("cl_allowDownload", "0", CVAR_ARCHIVE);
 
-	cl_conXOffset = Cvar_Get ("cl_conXOffset", "0", 0);
+	cl_conXOffset = CvarSystem::get ("cl_conXOffset", "0", 0);
 #ifdef __APPLE__
 	// In game video is REALLY slow in Mac OS X right now due to driver slowness
-	cl_inGameVideo = Cvar_Get ("r_inGameVideo", "0", CVAR_ARCHIVE);
+	cl_inGameVideo = CvarSystem::get ("r_inGameVideo", "0", CVAR_ARCHIVE);
 #else
-	cl_inGameVideo = Cvar_Get ("r_inGameVideo", "1", CVAR_ARCHIVE);
+	cl_inGameVideo = CvarSystem::get ("r_inGameVideo", "1", CVAR_ARCHIVE);
 #endif
 
-	cl_serverStatusResendTime = Cvar_Get ("cl_serverStatusResendTime", "750", 0);
+	cl_serverStatusResendTime = CvarSystem::get ("cl_serverStatusResendTime", "750", 0);
 
 	// init autoswitch so the ui will have it correctly even
 	// if the cgame hasn't been started
-	Cvar_Get ("cg_autoswitch", "1", CVAR_ARCHIVE);
+	CvarSystem::get ("cg_autoswitch", "1", CVAR_ARCHIVE);
 
-	m_pitch = Cvar_Get ("m_pitch", "0.022", CVAR_ARCHIVE);
-	m_yaw = Cvar_Get ("m_yaw", "0.022", CVAR_ARCHIVE);
-	m_forward = Cvar_Get ("m_forward", "0.25", CVAR_ARCHIVE);
-	m_side = Cvar_Get ("m_side", "0.25", CVAR_ARCHIVE);
+	m_pitch = CvarSystem::get ("m_pitch", "0.022", CVAR_ARCHIVE);
+	m_yaw = CvarSystem::get ("m_yaw", "0.022", CVAR_ARCHIVE);
+	m_forward = CvarSystem::get ("m_forward", "0.25", CVAR_ARCHIVE);
+	m_side = CvarSystem::get ("m_side", "0.25", CVAR_ARCHIVE);
 #ifdef __APPLE__
 	// Input is jittery on OS X w/o this
-	m_filter = Cvar_Get ("m_filter", "1", CVAR_ARCHIVE);
+	m_filter = CvarSystem::get ("m_filter", "1", CVAR_ARCHIVE);
 #else
-	m_filter = Cvar_Get ("m_filter", "0", CVAR_ARCHIVE);
+	m_filter = CvarSystem::get ("m_filter", "0", CVAR_ARCHIVE);
 #endif
 
-	j_pitch =        Cvar_Get ("j_pitch",        "0.022", CVAR_ARCHIVE);
-	j_yaw =          Cvar_Get ("j_yaw",          "-0.022", CVAR_ARCHIVE);
-	j_forward =      Cvar_Get ("j_forward",      "-0.25", CVAR_ARCHIVE);
-	j_side =         Cvar_Get ("j_side",         "0.25", CVAR_ARCHIVE);
-	j_up =           Cvar_Get ("j_up",           "0", CVAR_ARCHIVE);
+	j_pitch =        CvarSystem::get ("j_pitch",        "0.022", CVAR_ARCHIVE);
+	j_yaw =          CvarSystem::get ("j_yaw",          "-0.022", CVAR_ARCHIVE);
+	j_forward =      CvarSystem::get ("j_forward",      "-0.25", CVAR_ARCHIVE);
+	j_side =         CvarSystem::get ("j_side",         "0.25", CVAR_ARCHIVE);
+	j_up =           CvarSystem::get ("j_up",           "0", CVAR_ARCHIVE);
 
-	j_pitch_axis =   Cvar_Get ("j_pitch_axis",   "3", CVAR_ARCHIVE);
-	j_yaw_axis =     Cvar_Get ("j_yaw_axis",     "2", CVAR_ARCHIVE);
-	j_forward_axis = Cvar_Get ("j_forward_axis", "1", CVAR_ARCHIVE);
-	j_side_axis =    Cvar_Get ("j_side_axis",    "0", CVAR_ARCHIVE);
-	j_up_axis =      Cvar_Get ("j_up_axis",      "4", CVAR_ARCHIVE);
+	j_pitch_axis =   CvarSystem::get ("j_pitch_axis",   "3", CVAR_ARCHIVE);
+	j_yaw_axis =     CvarSystem::get ("j_yaw_axis",     "2", CVAR_ARCHIVE);
+	j_forward_axis = CvarSystem::get ("j_forward_axis", "1", CVAR_ARCHIVE);
+	j_side_axis =    CvarSystem::get ("j_side_axis",    "0", CVAR_ARCHIVE);
+	j_up_axis =      CvarSystem::get ("j_up_axis",      "4", CVAR_ARCHIVE);
 
-	Cvar_CheckRange(j_pitch_axis, 0, MAX_JOYSTICK_AXIS-1, true);
-	Cvar_CheckRange(j_yaw_axis, 0, MAX_JOYSTICK_AXIS-1, true);
-	Cvar_CheckRange(j_forward_axis, 0, MAX_JOYSTICK_AXIS-1, true);
-	Cvar_CheckRange(j_side_axis, 0, MAX_JOYSTICK_AXIS-1, true);
-	Cvar_CheckRange(j_up_axis, 0, MAX_JOYSTICK_AXIS-1, true);
+	CvarSystem::checkRange(j_pitch_axis, 0, MAX_JOYSTICK_AXIS-1, true);
+	CvarSystem::checkRange(j_yaw_axis, 0, MAX_JOYSTICK_AXIS-1, true);
+	CvarSystem::checkRange(j_forward_axis, 0, MAX_JOYSTICK_AXIS-1, true);
+	CvarSystem::checkRange(j_side_axis, 0, MAX_JOYSTICK_AXIS-1, true);
+	CvarSystem::checkRange(j_up_axis, 0, MAX_JOYSTICK_AXIS-1, true);
 
-	cl_motdString = Cvar_Get( "cl_motdString", "", CVAR_ROM );
+	cl_motdString = CvarSystem::get( "cl_motdString", "", CVAR_ROM );
 
-	Cvar_Get( "cl_maxPing", "800", CVAR_ARCHIVE );
+	CvarSystem::get( "cl_maxPing", "800", CVAR_ARCHIVE );
 
-	cl_lanForcePackets = Cvar_Get ("cl_lanForcePackets", "1", CVAR_ARCHIVE);
+	cl_lanForcePackets = CvarSystem::get ("cl_lanForcePackets", "1", CVAR_ARCHIVE);
 
-	cl_guidServerUniq = Cvar_Get ("cl_guidServerUniq", "1", CVAR_ARCHIVE);
+	cl_guidServerUniq = CvarSystem::get ("cl_guidServerUniq", "1", CVAR_ARCHIVE);
 
 	// ~ and `, as keys and characters
-	cl_consoleKeys = Cvar_Get( "cl_consoleKeys", "~ ` 0x7e 0x60", CVAR_ARCHIVE);
+	cl_consoleKeys = CvarSystem::get( "cl_consoleKeys", "~ ` 0x7e 0x60", CVAR_ARCHIVE);
 
 	// userinfo
-	Cvar_Get ("name", "UnnamedPlayer", CVAR_USERINFO | CVAR_ARCHIVE );
-	cl_rate = Cvar_Get ("rate", "100000", CVAR_USERINFO | CVAR_ARCHIVE );
-	Cvar_Get ("snaps", "40", CVAR_USERINFO | CVAR_ARCHIVE );
-	Cvar_Get ("model", "sarge", CVAR_USERINFO | CVAR_ARCHIVE );
-	Cvar_Get ("headmodel", "sarge", CVAR_USERINFO | CVAR_ARCHIVE );
-	Cvar_Get ("team_model", "james", CVAR_USERINFO | CVAR_ARCHIVE );
-	Cvar_Get ("team_headmodel", "*james", CVAR_USERINFO | CVAR_ARCHIVE );
-	Cvar_Get ("g_redTeam", "Stroggs", CVAR_SERVERINFO | CVAR_ARCHIVE);
-	Cvar_Get ("g_blueTeam", "Pagans", CVAR_SERVERINFO | CVAR_ARCHIVE);
-	Cvar_Get ("color1",  "4", CVAR_USERINFO | CVAR_ARCHIVE );
-	Cvar_Get ("color2", "5", CVAR_USERINFO | CVAR_ARCHIVE );
-	Cvar_Get ("handicap", "100", CVAR_USERINFO | CVAR_ARCHIVE );
-	Cvar_Get ("teamtask", "0", CVAR_USERINFO );
-	Cvar_Get ("sex", "male", CVAR_USERINFO | CVAR_ARCHIVE );
-	Cvar_Get ("cl_anonymous", "0", CVAR_USERINFO | CVAR_ARCHIVE );
+	CvarSystem::get ("name", "UnnamedPlayer", CVAR_USERINFO | CVAR_ARCHIVE );
+	cl_rate = CvarSystem::get ("rate", "100000", CVAR_USERINFO | CVAR_ARCHIVE );
+	CvarSystem::get ("snaps", "40", CVAR_USERINFO | CVAR_ARCHIVE );
+	CvarSystem::get ("model", "sarge", CVAR_USERINFO | CVAR_ARCHIVE );
+	CvarSystem::get ("headmodel", "sarge", CVAR_USERINFO | CVAR_ARCHIVE );
+	CvarSystem::get ("team_model", "james", CVAR_USERINFO | CVAR_ARCHIVE );
+	CvarSystem::get ("team_headmodel", "*james", CVAR_USERINFO | CVAR_ARCHIVE );
+	CvarSystem::get ("g_redTeam", "Stroggs", CVAR_SERVERINFO | CVAR_ARCHIVE);
+	CvarSystem::get ("g_blueTeam", "Pagans", CVAR_SERVERINFO | CVAR_ARCHIVE);
+	CvarSystem::get ("color1",  "4", CVAR_USERINFO | CVAR_ARCHIVE );
+	CvarSystem::get ("color2", "5", CVAR_USERINFO | CVAR_ARCHIVE );
+	CvarSystem::get ("handicap", "100", CVAR_USERINFO | CVAR_ARCHIVE );
+	CvarSystem::get ("teamtask", "0", CVAR_USERINFO );
+	CvarSystem::get ("sex", "male", CVAR_USERINFO | CVAR_ARCHIVE );
+	CvarSystem::get ("cl_anonymous", "0", CVAR_USERINFO | CVAR_ARCHIVE );
 
-	Cvar_Get ("password", "", CVAR_USERINFO);
-	Cvar_Get ("cg_predictItems", "1", CVAR_USERINFO | CVAR_ARCHIVE );
+	CvarSystem::get ("password", "", CVAR_USERINFO);
+	CvarSystem::get ("cg_predictItems", "1", CVAR_USERINFO | CVAR_ARCHIVE );
 
 #ifdef USE_MUMBLE
-	cl_useMumble = Cvar_Get ("cl_useMumble", "0", CVAR_ARCHIVE | CVAR_LATCH);
-	cl_mumbleScale = Cvar_Get ("cl_mumbleScale", "0.0254", CVAR_ARCHIVE);
+	cl_useMumble = CvarSystem::get ("cl_useMumble", "0", CVAR_ARCHIVE | CVAR_LATCH);
+	cl_mumbleScale = CvarSystem::get ("cl_mumbleScale", "0.0254", CVAR_ARCHIVE);
 #endif
 
 #ifdef USE_VOIP
-	cl_voipSend = Cvar_Get ("cl_voipSend", "0", 0);
-	cl_voipSendTarget = Cvar_Get ("cl_voipSendTarget", "spatial", 0);
-	cl_voipGainDuringCapture = Cvar_Get ("cl_voipGainDuringCapture", "0.2", CVAR_ARCHIVE);
-	cl_voipCaptureMult = Cvar_Get ("cl_voipCaptureMult", "2.0", CVAR_ARCHIVE);
-	cl_voipUseVAD = Cvar_Get ("cl_voipUseVAD", "0", CVAR_ARCHIVE);
-	cl_voipVADThreshold = Cvar_Get ("cl_voipVADThreshold", "0.25", CVAR_ARCHIVE);
-	cl_voipShowMeter = Cvar_Get ("cl_voipShowMeter", "1", CVAR_ARCHIVE);
+	cl_voipSend = CvarSystem::get ("cl_voipSend", "0", 0);
+	cl_voipSendTarget = CvarSystem::get ("cl_voipSendTarget", "spatial", 0);
+	cl_voipGainDuringCapture = CvarSystem::get ("cl_voipGainDuringCapture", "0.2", CVAR_ARCHIVE);
+	cl_voipCaptureMult = CvarSystem::get ("cl_voipCaptureMult", "2.0", CVAR_ARCHIVE);
+	cl_voipUseVAD = CvarSystem::get ("cl_voipUseVAD", "0", CVAR_ARCHIVE);
+	cl_voipVADThreshold = CvarSystem::get ("cl_voipVADThreshold", "0.25", CVAR_ARCHIVE);
+	cl_voipShowMeter = CvarSystem::get ("cl_voipShowMeter", "1", CVAR_ARCHIVE);
 
-	cl_voip = Cvar_Get ("cl_voip", "1", CVAR_ARCHIVE);
-	Cvar_CheckRange( cl_voip, 0, 1, true );
-	cl_voipProtocol = Cvar_Get ("cl_voipProtocol", cl_voip->integer ? "opus" : "", CVAR_USERINFO | CVAR_ROM);
+	cl_voip = CvarSystem::get ("cl_voip", "1", CVAR_ARCHIVE);
+	CvarSystem::checkRange( cl_voip, 0, 1, true );
+	cl_voipProtocol = CvarSystem::get ("cl_voipProtocol", cl_voip->integer ? "opus" : "", CVAR_USERINFO | CVAR_ROM);
 #endif
 
 #ifdef USE_HTTP
@@ -3711,9 +3711,9 @@ void CL_Init( ) {
 #endif
 
 	// cgame might not be initialized before menu is used
-	Cvar_Get ("cg_viewsize", "100", CVAR_ARCHIVE );
+	CvarSystem::get ("cg_viewsize", "100", CVAR_ARCHIVE );
 	// Make sure cg_stereoSeparation is zero as that variable is deprecated and should not be used anymore.
-	Cvar_Get ("cg_stereoSeparation", "0", CVAR_ROM);
+	CvarSystem::get ("cg_stereoSeparation", "0", CVAR_ROM);
 
 	//
 	// register our commands
@@ -3753,10 +3753,10 @@ void CL_Init( ) {
 
 //	Cbuf_Execute ();
 
-	Cvar_Set( "cl_running", "1" );
+	CvarSystem::set( "cl_running", "1" );
 
 	CL_GenerateQKey();
-	Cvar_Get( "cl_guid", "", CVAR_USERINFO | CVAR_ROM );
+	CvarSystem::get( "cl_guid", "", CVAR_USERINFO | CVAR_ROM );
 	CL_UpdateGUID( nullptr, 0 );
 
 	Com_Printf( "----- Client Initialization Complete -----\n" );
@@ -3824,7 +3824,7 @@ void CL_Shutdown(const char *finalmsg, bool disconnect, bool quit)
 	CL_ShutdownInput();
 	Con_Shutdown();
 
-	Cvar_Set( "cl_running", "0" );
+	CvarSystem::set( "cl_running", "0" );
 
 	recursive = false;
 
@@ -4247,7 +4247,7 @@ void CL_GlobalServers_f( ) {
 
 		for ( i = 1; i <= MAX_MASTER_SERVERS; i++ ) {
 			sprintf(command, "sv_master%d", i);
-			masteraddress = Cvar_VariableString(command);
+			masteraddress = CvarSystem::variableString(command);
 
 			if(!*masteraddress)
 				continue;
@@ -4265,7 +4265,7 @@ void CL_GlobalServers_f( ) {
 	}
 
 	sprintf(command, "sv_master%d", masterNum);
-	masteraddress = Cvar_VariableString(command);
+	masteraddress = CvarSystem::variableString(command);
 	
 	if(!*masteraddress)
 	{
@@ -4294,7 +4294,7 @@ void CL_GlobalServers_f( ) {
 	// Use the extended query for IPv6 masters
 	if (to.type == NA_IP6 || to.type == NA_MULTICAST6)
 	{
-		int v4enabled = Cvar_VariableIntegerValue("net_enabled") & NET_ENABLEV4;
+		int v4enabled = CvarSystem::variableIntegerValue("net_enabled") & NET_ENABLEV4;
 		
 		if(v4enabled)
 		{
@@ -4351,7 +4351,7 @@ void CL_GetPing( int n, char *buf, int buflen, int *pingtime )
 	{
 		// check for timeout
 		time = Sys_Milliseconds() - cl_pinglist[n].start;
-		maxPing = Cvar_VariableIntegerValue( "cl_maxPing" );
+		maxPing = CvarSystem::variableIntegerValue( "cl_maxPing" );
 		if( maxPing < 100 ) {
 			maxPing = 100;
 		}

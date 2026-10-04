@@ -47,7 +47,7 @@ char *UI_Argv( int arg ) {
 char *UI_Cvar_VariableString( const char *var_name ) {
 	static char	buffer[MAX_STRING_CHARS];
 
-	Cvar_VariableStringBuffer( var_name, buffer, sizeof( buffer ) );
+	CvarSystem::variableStringBuffer( var_name, buffer, sizeof( buffer ) );
 
 	return buffer;
 }
@@ -55,37 +55,37 @@ char *UI_Cvar_VariableString( const char *var_name ) {
 
 
 void UI_SetBestScores(postGameInfo_t *newInfo, bool postGame) {
-	Cvar_Set("ui_scoreAccuracy",     va("%i%%", newInfo->accuracy));
-	Cvar_Set("ui_scoreImpressives",	va("%i", newInfo->impressives));
-	Cvar_Set("ui_scoreExcellents", 	va("%i", newInfo->excellents));
-	Cvar_Set("ui_scoreDefends", 			va("%i", newInfo->defends));
-	Cvar_Set("ui_scoreAssists", 			va("%i", newInfo->assists));
-	Cvar_Set("ui_scoreGauntlets", 		va("%i", newInfo->gauntlets));
-	Cvar_Set("ui_scoreScore", 				va("%i", newInfo->score));
-	Cvar_Set("ui_scorePerfect",	 		va("%i", newInfo->perfects));
-	Cvar_Set("ui_scoreTeam",					va("%i to %i", newInfo->redScore, newInfo->blueScore));
-	Cvar_Set("ui_scoreBase",					va("%i", newInfo->baseScore));
-	Cvar_Set("ui_scoreTimeBonus",		va("%i", newInfo->timeBonus));
-	Cvar_Set("ui_scoreSkillBonus",		va("%i", newInfo->skillBonus));
-	Cvar_Set("ui_scoreShutoutBonus",	va("%i", newInfo->shutoutBonus));
-	Cvar_Set("ui_scoreTime",					va("%02i:%02i", newInfo->time / 60, newInfo->time % 60));
-	Cvar_Set("ui_scoreCaptures",		va("%i", newInfo->captures));
+	CvarSystem::set("ui_scoreAccuracy",     va("%i%%", newInfo->accuracy));
+	CvarSystem::set("ui_scoreImpressives",	va("%i", newInfo->impressives));
+	CvarSystem::set("ui_scoreExcellents", 	va("%i", newInfo->excellents));
+	CvarSystem::set("ui_scoreDefends", 			va("%i", newInfo->defends));
+	CvarSystem::set("ui_scoreAssists", 			va("%i", newInfo->assists));
+	CvarSystem::set("ui_scoreGauntlets", 		va("%i", newInfo->gauntlets));
+	CvarSystem::set("ui_scoreScore", 				va("%i", newInfo->score));
+	CvarSystem::set("ui_scorePerfect",	 		va("%i", newInfo->perfects));
+	CvarSystem::set("ui_scoreTeam",					va("%i to %i", newInfo->redScore, newInfo->blueScore));
+	CvarSystem::set("ui_scoreBase",					va("%i", newInfo->baseScore));
+	CvarSystem::set("ui_scoreTimeBonus",		va("%i", newInfo->timeBonus));
+	CvarSystem::set("ui_scoreSkillBonus",		va("%i", newInfo->skillBonus));
+	CvarSystem::set("ui_scoreShutoutBonus",	va("%i", newInfo->shutoutBonus));
+	CvarSystem::set("ui_scoreTime",					va("%02i:%02i", newInfo->time / 60, newInfo->time % 60));
+	CvarSystem::set("ui_scoreCaptures",		va("%i", newInfo->captures));
   if (postGame) {
-		Cvar_Set("ui_scoreAccuracy2",     va("%i%%", newInfo->accuracy));
-		Cvar_Set("ui_scoreImpressives2",	va("%i", newInfo->impressives));
-		Cvar_Set("ui_scoreExcellents2", 	va("%i", newInfo->excellents));
-		Cvar_Set("ui_scoreDefends2", 			va("%i", newInfo->defends));
-		Cvar_Set("ui_scoreAssists2", 			va("%i", newInfo->assists));
-		Cvar_Set("ui_scoreGauntlets2", 		va("%i", newInfo->gauntlets));
-		Cvar_Set("ui_scoreScore2", 				va("%i", newInfo->score));
-		Cvar_Set("ui_scorePerfect2",	 		va("%i", newInfo->perfects));
-		Cvar_Set("ui_scoreTeam2",					va("%i to %i", newInfo->redScore, newInfo->blueScore));
-		Cvar_Set("ui_scoreBase2",					va("%i", newInfo->baseScore));
-		Cvar_Set("ui_scoreTimeBonus2",		va("%i", newInfo->timeBonus));
-		Cvar_Set("ui_scoreSkillBonus2",		va("%i", newInfo->skillBonus));
-		Cvar_Set("ui_scoreShutoutBonus2",	va("%i", newInfo->shutoutBonus));
-		Cvar_Set("ui_scoreTime2",					va("%02i:%02i", newInfo->time / 60, newInfo->time % 60));
-		Cvar_Set("ui_scoreCaptures2",		va("%i", newInfo->captures));
+		CvarSystem::set("ui_scoreAccuracy2",     va("%i%%", newInfo->accuracy));
+		CvarSystem::set("ui_scoreImpressives2",	va("%i", newInfo->impressives));
+		CvarSystem::set("ui_scoreExcellents2", 	va("%i", newInfo->excellents));
+		CvarSystem::set("ui_scoreDefends2", 			va("%i", newInfo->defends));
+		CvarSystem::set("ui_scoreAssists2", 			va("%i", newInfo->assists));
+		CvarSystem::set("ui_scoreGauntlets2", 		va("%i", newInfo->gauntlets));
+		CvarSystem::set("ui_scoreScore2", 				va("%i", newInfo->score));
+		CvarSystem::set("ui_scorePerfect2",	 		va("%i", newInfo->perfects));
+		CvarSystem::set("ui_scoreTeam2",					va("%i to %i", newInfo->redScore, newInfo->blueScore));
+		CvarSystem::set("ui_scoreBase2",					va("%i", newInfo->baseScore));
+		CvarSystem::set("ui_scoreTimeBonus2",		va("%i", newInfo->timeBonus));
+		CvarSystem::set("ui_scoreSkillBonus2",		va("%i", newInfo->skillBonus));
+		CvarSystem::set("ui_scoreShutoutBonus2",	va("%i", newInfo->shutoutBonus));
+		CvarSystem::set("ui_scoreTime2",					va("%02i:%02i", newInfo->time / 60, newInfo->time % 60));
+		CvarSystem::set("ui_scoreCaptures2",		va("%i", newInfo->captures));
 	}
 }
 
@@ -105,7 +105,7 @@ void UI_LoadBestScores(const char *map, int game) {
 	}
 	UI_SetBestScores(&newInfo, false);
 
-	Com_sprintf(fileName, MAX_QPATH, "demos/%s_%d.dm_%d", map, game, static_cast<int>(Cvar_VariableValue("protocol")));
+	Com_sprintf(fileName, MAX_QPATH, "demos/%s_%d.dm_%d", map, game, static_cast<int>(CvarSystem::variableValue("protocol")));
 	uiInfo.demoAvailable = false;
 	if (FS_FOpenFileByMode(fileName, &f, FS_READ) >= 0) {
 		uiInfo.demoAvailable = true;
@@ -200,7 +200,7 @@ static void UI_CalcPostGameStats() {
 	time = atoi(UI_Argv(13));
 	newInfo.captures = atoi(UI_Argv(14));
 
-	newInfo.time = (time - Cvar_VariableValue("ui_matchStartTime")) / 1000;
+	newInfo.time = (time - CvarSystem::variableValue("ui_matchStartTime")) / 1000;
 	adjustedTime = uiInfo.mapList[ui_currentMap.integer].timeToBeat[game];
 	if (newInfo.time < adjustedTime) { 
 		newInfo.timeBonus = (adjustedTime - newInfo.time) * 10;
@@ -214,7 +214,7 @@ static void UI_CalcPostGameStats() {
 		newInfo.shutoutBonus = 0;
 	}
 
-	newInfo.skillBonus = Cvar_VariableValue("g_spSkill");
+	newInfo.skillBonus = CvarSystem::variableValue("g_spSkill");
 	if (newInfo.skillBonus <= 0) {
 		newInfo.skillBonus = 1;
 	}
@@ -240,13 +240,13 @@ static void UI_CalcPostGameStats() {
 	}
  
 	// put back all the ui overrides
-	Cvar_Set("capturelimit", UI_Cvar_VariableString("ui_saveCaptureLimit"));
-	Cvar_Set("fraglimit", UI_Cvar_VariableString("ui_saveFragLimit"));
-	Cvar_Set("cg_drawTimer", UI_Cvar_VariableString("ui_drawTimer"));
-	Cvar_Set("g_doWarmup", UI_Cvar_VariableString("ui_doWarmup"));
-	Cvar_Set("g_Warmup", UI_Cvar_VariableString("ui_Warmup"));
-	Cvar_Set("sv_pure", UI_Cvar_VariableString("ui_pure"));
-	Cvar_Set("g_friendlyFire", UI_Cvar_VariableString("ui_friendlyFire"));
+	CvarSystem::set("capturelimit", UI_Cvar_VariableString("ui_saveCaptureLimit"));
+	CvarSystem::set("fraglimit", UI_Cvar_VariableString("ui_saveFragLimit"));
+	CvarSystem::set("cg_drawTimer", UI_Cvar_VariableString("ui_drawTimer"));
+	CvarSystem::set("g_doWarmup", UI_Cvar_VariableString("ui_doWarmup"));
+	CvarSystem::set("g_Warmup", UI_Cvar_VariableString("ui_Warmup"));
+	CvarSystem::set("sv_pure", UI_Cvar_VariableString("ui_pure"));
+	CvarSystem::set("g_friendlyFire", UI_Cvar_VariableString("ui_friendlyFire"));
 
 	UI_SetBestScores(&newInfo, true);
 	UI_ShowPostGame(newHigh);
@@ -334,7 +334,7 @@ bool UI_ConsoleCommand( int realTime ) {
 	// MFQ3: bring up the 'team selection' dialog (i.e. bind command to key)
 	if( Q_stricmp (cmd, "teamselect") == 0 ) 
 	{
-		Cvar_Set( "cl_paused", "1" );
+		CvarSystem::set( "cl_paused", "1" );
 		Key_SetCatcher( ( KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
 		uiInfo.uiUtils.menu_CloseAll();
 
@@ -346,7 +346,7 @@ bool UI_ConsoleCommand( int realTime ) {
 	// MFQ3: bring up the 'vehicle selection' dialog (i.e. bind command to key)
 	if( Q_stricmp (cmd, "vehicleselect") == 0 ) 
 	{
-		Cvar_Set( "cl_paused", "1" );
+		CvarSystem::set( "cl_paused", "1" );
 		Key_SetCatcher( ( KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
 		uiInfo.uiUtils.menu_CloseAll();
 

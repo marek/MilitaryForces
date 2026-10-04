@@ -178,15 +178,15 @@ static void SV_Map_f()
 	}
 
 	// force latched values to get set
-	Cvar_Get ("g_gametype", "0", CVAR_SERVERINFO | CVAR_USERINFO | CVAR_LATCH );
+	CvarSystem::get ("g_gametype", "0", CVAR_SERVERINFO | CVAR_USERINFO | CVAR_LATCH );
 
 	cmd = Cmd_Argv(0);
 	if( Q_stricmpn( cmd, "sp", 2 ) == 0 ) 
 	{
-		Cvar_SetValue( "g_gametype", GT_SINGLE_PLAYER );
-		Cvar_SetValue( "g_doWarmup", 0 );
+		CvarSystem::setValue( "g_gametype", GT_SINGLE_PLAYER );
+		CvarSystem::setValue( "g_doWarmup", 0 );
 		// may not set sv_maxclients directly, always set latched
-		Cvar_SetLatched( "sv_maxclients", "8" );
+		CvarSystem::setLatched( "sv_maxclients", "8" );
 		cmd += 2;
 		if (!Q_stricmp( cmd, "devmap" ) ) {
 			cheat = true;
@@ -208,7 +208,7 @@ static void SV_Map_f()
 			killBots = false;
 		}
 		if( sv_gametype->integer == GT_SINGLE_PLAYER )
-			Cvar_SetValue( "g_gametype", GT_FFA );
+			CvarSystem::setValue( "g_gametype", GT_FFA );
 	}
 
 	// save the map name here cause on a map restart we reload the mfconfig.cfg
@@ -223,9 +223,9 @@ static void SV_Map_f()
 	// cheats will not be allowed.  If started with "devmap <levelname>"
 	// then cheats will be allowed
 	if ( cheat ) 
-		Cvar_Set( "sv_cheats", "1" );
+		CvarSystem::set( "sv_cheats", "1" );
 	else
-		Cvar_Set( "sv_cheats", "0" );
+		CvarSystem::set( "sv_cheats", "0" );
 }
 
 /*
@@ -258,7 +258,7 @@ static void SV_MapRestart_f()
 	else 
 		delay = 5;
 
-	if( delay && !Cvar_VariableValue("g_doWarmup") ) 
+	if( delay && !CvarSystem::variableValue("g_doWarmup") ) 
 	{
 		theSV.restartTime_ = theSV.time_ + delay * 1000;
 		SV_SetConfigstring( CS_WARMUP, va("%i", theSV.restartTime_) );
@@ -273,7 +273,7 @@ static void SV_MapRestart_f()
 
 		Com_Printf( "variable change -- restarting.\n" );
 		// restart the map the slow way
-		Q_strncpyz( mapname, Cvar_VariableString( "mapname" ), sizeof( mapname ) );
+		Q_strncpyz( mapname, CvarSystem::variableString( "mapname" ), sizeof( mapname ) );
 
 		SV_SpawnServer( mapname, false );
 		return;
@@ -286,7 +286,7 @@ static void SV_MapRestart_f()
 	// generate a New serverid	
 	// TTimo - don't update restartedserverId there, otherwise we won't deal correctly with multiple map_restart
 	theSV.serverId_ = com_frameTime;
-	Cvar_Set( "sv_serverid", va("%i", theSV.serverId_ ) );
+	CvarSystem::set( "sv_serverid", va("%i", theSV.serverId_ ) );
 
 	// if a map_restart occurs while a client is changing maps, we need
 	// to give them the correct time so that when they finish loading
@@ -1421,7 +1421,7 @@ static void SV_Serverinfo_f( ) {
 	}
 
 	Com_Printf ("Server info settings:\n");
-	Info_Print ( Cvar_InfoString( CVAR_SERVERINFO ) );
+	Info_Print ( CvarSystem::infoString( CVAR_SERVERINFO ) );
 }
 
 
@@ -1440,7 +1440,7 @@ static void SV_Systeminfo_f( ) {
 	}
 
 	Com_Printf ("System info settings:\n");
-	Info_Print ( Cvar_InfoString_Big( CVAR_SYSTEMINFO ) );
+	Info_Print ( CvarSystem::infoString_Big( CVAR_SYSTEMINFO ) );
 }
 
 

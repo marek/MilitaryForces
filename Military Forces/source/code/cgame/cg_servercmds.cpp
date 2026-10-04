@@ -121,7 +121,7 @@ void CG_ParseServerinfo( ) {
 
 	info = CG_ConfigString( CS_SERVERINFO );
 	cgs.gametype = static_cast<gametype_t>(atoi( Info_ValueForKey( info, "g_gametype" ) ));
-	Cvar_Set("g_gametype", va("%i", cgs.gametype));
+	CvarSystem::set("g_gametype", va("%i", cgs.gametype));
 	cgs.dmflags = atoi( Info_ValueForKey( info, "dmflags" ) );
 	cgs.teamflags = atoi( Info_ValueForKey( info, "teamflags" ) );
 	cgs.fraglimit = atoi( Info_ValueForKey( info, "fraglimit" ) );
@@ -131,9 +131,9 @@ void CG_ParseServerinfo( ) {
 	mapname = Info_ValueForKey( info, "mapname" );
 	Com_sprintf( cgs.mapname, sizeof( cgs.mapname ), "maps/%s.bsp", mapname );
 	Q_strncpyz( cgs.redTeam, Info_ValueForKey( info, "g_redTeam" ), sizeof(cgs.redTeam) );
-	Cvar_Set("g_redTeam", cgs.redTeam);
+	CvarSystem::set("g_redTeam", cgs.redTeam);
 	Q_strncpyz( cgs.blueTeam, Info_ValueForKey( info, "g_blueTeam" ), sizeof(cgs.blueTeam) );
-	Cvar_Set("g_blueTeam", cgs.blueTeam);
+	CvarSystem::set("g_blueTeam", cgs.blueTeam);
 	
 	// mfq3
 	Q_strncpyz( gs, Info_ValueForKey( info, "mf_gameset" ), sizeof(gs) );
@@ -441,10 +441,10 @@ static void CG_MapRestart( ) {
 
 	// MFQ3 vehicle needs to be reset
 	if( cg_vehicle.integer != -1 ) {
-		Cvar_Set( "cg_vehicle", "-1" );
+		CvarSystem::set( "cg_vehicle", "-1" );
 	}
 	if( cg_nextVehicle.integer != -1 ) {
-		Cvar_Set( "cg_nextVehicle", "-1" );
+		CvarSystem::set( "cg_nextVehicle", "-1" );
 	}
 
 	// we really should clear more parts of cg here and stop sounds

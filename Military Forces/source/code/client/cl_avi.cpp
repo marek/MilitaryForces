@@ -388,11 +388,11 @@ bool CL_OpenAVIForWriting( const char *fileName )
         "of the audio rate, suggest %d\n", suggestRate );
   }
 
-  if( !Cvar_VariableIntegerValue( "s_initsound" ) )
+  if( !CvarSystem::variableIntegerValue( "s_initsound" ) )
   {
     afd.audio = false;
   }
-  else if( Q_stricmp( Cvar_VariableString( "s_backend" ), "OpenAL" ) )
+  else if( Q_stricmp( CvarSystem::variableString( "s_backend" ), "OpenAL" ) )
   {
     if( afd.a.bits != 16 || afd.a.channels != 2 )
     {

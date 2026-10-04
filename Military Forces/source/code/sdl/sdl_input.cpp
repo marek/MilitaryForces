@@ -508,10 +508,10 @@ static void IN_InitJoystick( )
 		Q_strcat(buf, sizeof(buf), "\n");
 	}
 
-	Cvar_Get( "in_availableJoysticks", "", CVAR_ROM );
+	CvarSystem::get( "in_availableJoysticks", "", CVAR_ROM );
 
 	// Update cvar on in_restart or controller add/remove.
-	Cvar_Set( "in_availableJoysticks", buf );
+	CvarSystem::set( "in_availableJoysticks", buf );
 
 	if( !in_joystick->integer ) {
 		Com_DPrintf( "Joystick is not active.\n" );
@@ -519,11 +519,11 @@ static void IN_InitJoystick( )
 		return;
 	}
 
-	in_joystickNo = Cvar_Get( "in_joystickNo", "0", CVAR_ARCHIVE );
+	in_joystickNo = CvarSystem::get( "in_joystickNo", "0", CVAR_ARCHIVE );
 	if( in_joystickNo->integer < 0 || in_joystickNo->integer >= total )
-		Cvar_Set( "in_joystickNo", "0" );
+		CvarSystem::set( "in_joystickNo", "0" );
 
-	in_joystickUseAnalog = Cvar_Get( "in_joystickUseAnalog", "0", CVAR_ARCHIVE );
+	in_joystickUseAnalog = CvarSystem::get( "in_joystickUseAnalog", "0", CVAR_ARCHIVE );
 
 	stick = SDL_JoystickOpen( in_joystickNo->integer );
 
@@ -1197,9 +1197,9 @@ static void IN_ProcessEvents( )
 								}
 							}
 
-							Cvar_SetValue( "r_customwidth", width );
-							Cvar_SetValue( "r_customheight", height );
-							Cvar_Set( "r_mode", "-1" );
+							CvarSystem::setValue( "r_customwidth", width );
+							CvarSystem::setValue( "r_customheight", height );
+							CvarSystem::set( "r_mode", "-1" );
 
 							// Wait until user stops dragging for 1 second, so
 							// we aren't constantly recreating the GL context while
@@ -1208,11 +1208,11 @@ static void IN_ProcessEvents( )
 						}
 						break;
 
-					case SDL_WINDOWEVENT_MINIMIZED:    Cvar_SetValue( "com_minimized", 1 ); break;
+					case SDL_WINDOWEVENT_MINIMIZED:    CvarSystem::setValue( "com_minimized", 1 ); break;
 					case SDL_WINDOWEVENT_RESTORED:
-					case SDL_WINDOWEVENT_MAXIMIZED:    Cvar_SetValue( "com_minimized", 0 ); break;
-					case SDL_WINDOWEVENT_FOCUS_LOST:   Cvar_SetValue( "com_unfocused", 1 ); break;
-					case SDL_WINDOWEVENT_FOCUS_GAINED: Cvar_SetValue( "com_unfocused", 0 ); break;
+					case SDL_WINDOWEVENT_MAXIMIZED:    CvarSystem::setValue( "com_minimized", 0 ); break;
+					case SDL_WINDOWEVENT_FOCUS_LOST:   CvarSystem::setValue( "com_unfocused", 1 ); break;
+					case SDL_WINDOWEVENT_FOCUS_GAINED: CvarSystem::setValue( "com_unfocused", 0 ); break;
 				}
 				break;
 
@@ -1259,7 +1259,7 @@ void IN_Frame( )
 	loading = ( clc.state != CA_DISCONNECTED && clc.state != CA_ACTIVE );
 
 	// update isFullscreen since it might of changed since the last vid_restart
-	cls.glconfig.isFullscreen = Cvar_VariableIntegerValue( "r_fullscreen" ) != 0;
+	cls.glconfig.isFullscreen = CvarSystem::variableIntegerValue( "r_fullscreen" ) != 0;
 
 	if( !cls.glconfig.isFullscreen && ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) )
 	{
@@ -1311,14 +1311,14 @@ void IN_Init( void *windowData )
 
 	Com_DPrintf( "\n------- Input Initialization -------\n" );
 
-	in_keyboardDebug = Cvar_Get( "in_keyboardDebug", "0", CVAR_ARCHIVE );
+	in_keyboardDebug = CvarSystem::get( "in_keyboardDebug", "0", CVAR_ARCHIVE );
 
 	// mouse variables
-	in_mouse = Cvar_Get( "in_mouse", "1", CVAR_ARCHIVE );
-	in_nograb = Cvar_Get( "in_nograb", "0", CVAR_ARCHIVE );
+	in_mouse = CvarSystem::get( "in_mouse", "1", CVAR_ARCHIVE );
+	in_nograb = CvarSystem::get( "in_nograb", "0", CVAR_ARCHIVE );
 
-	in_joystick = Cvar_Get( "in_joystick", "0", CVAR_ARCHIVE|CVAR_LATCH );
-	in_joystickThreshold = Cvar_Get( "joy_threshold", "0.15", CVAR_ARCHIVE );
+	in_joystick = CvarSystem::get( "in_joystick", "0", CVAR_ARCHIVE|CVAR_LATCH );
+	in_joystickThreshold = CvarSystem::get( "joy_threshold", "0.15", CVAR_ARCHIVE );
 
 #if defined(PROTOCOL_HANDLER) && defined(__APPLE__)
 	SDL_EventState( SDL_DROPFILE, SDL_ENABLE );
@@ -1327,11 +1327,11 @@ void IN_Init( void *windowData )
 	SDL_StartTextInput( );
 
 	mouseAvailable = ( in_mouse->value != 0 );
-	IN_DeactivateMouse( Cvar_VariableIntegerValue( "r_fullscreen" ) != 0 );
+	IN_DeactivateMouse( CvarSystem::variableIntegerValue( "r_fullscreen" ) != 0 );
 
 	appState = SDL_GetWindowFlags( SDL_window );
-	Cvar_SetValue( "com_unfocused",	!( appState & SDL_WINDOW_INPUT_FOCUS ) );
-	Cvar_SetValue( "com_minimized", appState & SDL_WINDOW_MINIMIZED );
+	CvarSystem::setValue( "com_unfocused",	!( appState & SDL_WINDOW_INPUT_FOCUS ) );
+	CvarSystem::setValue( "com_minimized", appState & SDL_WINDOW_MINIMIZED );
 
 	IN_InitJoystick( );
 	Com_DPrintf( "------------------------------------\n" );
@@ -1346,7 +1346,7 @@ void IN_Shutdown( )
 {
 	SDL_StopTextInput( );
 
-	IN_DeactivateMouse( Cvar_VariableIntegerValue( "r_fullscreen" ) != 0 );
+	IN_DeactivateMouse( CvarSystem::variableIntegerValue( "r_fullscreen" ) != 0 );
 	mouseAvailable = false;
 
 	IN_ShutdownJoystick( );

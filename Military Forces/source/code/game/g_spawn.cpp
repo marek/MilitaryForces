@@ -293,7 +293,7 @@ int G_ItemDisabled( gitem_t *item )
 	char name[128];
 
 	Com_sprintf(name, sizeof(name), "disable_%s", item->classname);
-	return Cvar_VariableIntegerValue( name );
+	return CvarSystem::variableIntegerValue( name );
 }
 
 /*
@@ -638,13 +638,13 @@ void SP_worldspawn()
 	SV_SetConfigstring( CS_MOTD, g_motd.string );		// message of the day
 
 	G_SpawnString( "gravity", "800", &s );
-	Cvar_Set( "g_gravity", s );
+	CvarSystem::set( "g_gravity", s );
 
 	G_SpawnString( "enableDust", "0", &s );
-	Cvar_Set( "g_enableDust", s );
+	CvarSystem::set( "g_enableDust", s );
 
 	G_SpawnString( "enableBreath", "0", &s );
-	Cvar_Set( "g_enableBreath", s );
+	CvarSystem::set( "g_enableBreath", s );
 
 	// the following is now handled in g_world.cpp
 	//theLevel.gameEntities_.at(ENTITYNUM_WORLD)->s.number = ENTITYNUM_WORLD;// g_entities[ENTITYNUM_WORLD].s.number = ENTITYNUM_WORLD;
@@ -658,7 +658,7 @@ void SP_worldspawn()
 	SV_SetConfigstring( CS_WARMUP, "" );
 	if ( g_restarted.integer ) 
 	{
-		Cvar_Set( "g_restarted", "0" );
+		CvarSystem::set( "g_restarted", "0" );
 		theLevel.warmupTime_ = 0;
 	} 
 	else if ( g_doWarmup.integer ) 

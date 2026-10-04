@@ -226,13 +226,13 @@ void IN_StrafeUp() {IN_KeyUp(&in_strafe);}
 void IN_VoipRecordDown()
 {
 	IN_KeyDown(&in_voiprecord);
-	Cvar_Set("cl_voipSend", "1");
+	CvarSystem::set("cl_voipSend", "1");
 }
 
 void IN_VoipRecordUp()
 {
 	IN_KeyUp(&in_voiprecord);
-	Cvar_Set("cl_voipSend", "0");
+	CvarSystem::set("cl_voipSend", "0");
 }
 #endif
 
@@ -707,9 +707,9 @@ bool CL_ReadyToSendPacket( ) {
 
 	// check for exceeding cl_maxpackets
 	if ( cl_maxpackets->integer < 15 ) {
-		Cvar_Set( "cl_maxpackets", "15" );
+		CvarSystem::set( "cl_maxpackets", "15" );
 	} else if ( cl_maxpackets->integer > 125 ) {
-		Cvar_Set( "cl_maxpackets", "125" );
+		CvarSystem::set( "cl_maxpackets", "125" );
 	}
 	oldPacketNum = (clc.netchan.outgoingSequence - 1) & PACKET_MASK;
 	delta = cls.realtime -  cl.outPackets[ oldPacketNum ].p_realtime;
@@ -789,9 +789,9 @@ void CL_WritePacket( ) {
 	// few packet, so even if a couple packets are dropped in a row,
 	// all the cmds will make it to the server
 	if ( cl_packetdup->integer < 0 ) {
-		Cvar_Set( "cl_packetdup", "0" );
+		CvarSystem::set( "cl_packetdup", "0" );
 	} else if ( cl_packetdup->integer > 5 ) {
-		Cvar_Set( "cl_packetdup", "5" );
+		CvarSystem::set( "cl_packetdup", "5" );
 	}
 	oldPacketNum = (clc.netchan.outgoingSequence - 1 - cl_packetdup->integer) & PACKET_MASK;
 	count = cl.cmdNumber - cl.outPackets[ oldPacketNum ].p_cmdNumber;
@@ -1003,8 +1003,8 @@ void CL_InitInput( ) {
 	Cmd_AddCommand ("-voiprecord", IN_VoipRecordUp);
 #endif
 
-	cl_nodelta = Cvar_Get ("cl_nodelta", "0", 0);
-	cl_debugMove = Cvar_Get ("cl_debugMove", "0", 0);
+	cl_nodelta = CvarSystem::get ("cl_nodelta", "0", 0);
+	cl_debugMove = CvarSystem::get ("cl_debugMove", "0", 0);
 }
 
 /*

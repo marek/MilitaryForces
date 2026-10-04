@@ -194,7 +194,7 @@ void CG_DrawInformation( ) {
 	y = 348;
 
 	// server information (OPTIONAL - if not a local game)
-	Cvar_VariableStringBuffer( "sv_running", buf, sizeof( buf ) );
+	CvarSystem::variableStringBuffer( "sv_running", buf, sizeof( buf ) );
 	if( !atoi( buf ) )
 	{		
 		// pure?

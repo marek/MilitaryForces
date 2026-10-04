@@ -18,7 +18,7 @@ float CG_Cvar_Get( const char * cvar )
 	memset( buff, 0, sizeof(buff) );
 
 	// get variable as string
-	Cvar_VariableStringBuffer( cvar, buff, sizeof(buff) );
+	CvarSystem::variableStringBuffer( cvar, buff, sizeof(buff) );
 
 	// return converted value as float
 	return atof( buff );

@@ -311,7 +311,7 @@ void Cmd_Vstr_f( ) {
 		return;
 	}
 
-	v = Cvar_VariableString( Cmd_Argv( 1 ) );
+	v = CvarSystem::variableString( Cmd_Argv( 1 ) );
 	Cbuf_InsertText( va("%s\n", v ) );
 }
 
@@ -791,7 +791,7 @@ void	Cmd_ExecuteString( const char *text ) {
 	}
 	
 	// check cvars
-	if ( Cvar_Command() ) {
+	if ( CvarSystem::command() ) {
 		return;
 	}
 
@@ -865,7 +865,7 @@ void Cmd_Init () {
 	Cmd_SetCommandCompletionFunc( "exec", Cmd_CompleteCfgName );
 	Cmd_SetCommandCompletionFunc( "execq", Cmd_CompleteCfgName );
 	Cmd_AddCommand ("vstr",Cmd_Vstr_f);
-	Cmd_SetCommandCompletionFunc( "vstr", Cvar_CompleteCvarName );
+	Cmd_SetCommandCompletionFunc( "vstr", CvarSystem::completeCvarName );
 	Cmd_AddCommand ("echo",Cmd_Echo_f);
 	Cmd_AddCommand ("wait", Cmd_Wait_f);
 }

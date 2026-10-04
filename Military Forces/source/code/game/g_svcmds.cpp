@@ -123,7 +123,7 @@ static void UpdateIPBans ()
 			"%i.%i.%i.%i ", b[0], b[1], b[2], b[3]);
 	}
 
-	Cvar_Set( "g_banIPs", iplist );
+	CvarSystem::set( "g_banIPs", iplist );
 }
 
 /*

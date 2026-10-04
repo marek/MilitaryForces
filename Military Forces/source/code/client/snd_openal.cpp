@@ -2520,20 +2520,20 @@ bool S_AL_Init( soundInterface_t *si )
 	}
 
 	// New console variables
-	s_alPrecache = Cvar_Get( "s_alPrecache", "1", CVAR_ARCHIVE );
-	s_alGain = Cvar_Get( "s_alGain", "1.0", CVAR_ARCHIVE );
-	s_alSources = Cvar_Get( "s_alSources", "96", CVAR_ARCHIVE );
-	s_alDopplerFactor = Cvar_Get( "s_alDopplerFactor", "1.0", CVAR_ARCHIVE );
-	s_alDopplerSpeed = Cvar_Get( "s_alDopplerSpeed", "9000", CVAR_ARCHIVE );
-	s_alMinDistance = Cvar_Get( "s_alMinDistance", "120", CVAR_CHEAT );
-	s_alMaxDistance = Cvar_Get("s_alMaxDistance", "1024", CVAR_CHEAT);
-	s_alRolloff = Cvar_Get( "s_alRolloff", "2", CVAR_CHEAT);
-	s_alGraceDistance = Cvar_Get("s_alGraceDistance", "512", CVAR_CHEAT);
+	s_alPrecache = CvarSystem::get( "s_alPrecache", "1", CVAR_ARCHIVE );
+	s_alGain = CvarSystem::get( "s_alGain", "1.0", CVAR_ARCHIVE );
+	s_alSources = CvarSystem::get( "s_alSources", "96", CVAR_ARCHIVE );
+	s_alDopplerFactor = CvarSystem::get( "s_alDopplerFactor", "1.0", CVAR_ARCHIVE );
+	s_alDopplerSpeed = CvarSystem::get( "s_alDopplerSpeed", "9000", CVAR_ARCHIVE );
+	s_alMinDistance = CvarSystem::get( "s_alMinDistance", "120", CVAR_CHEAT );
+	s_alMaxDistance = CvarSystem::get("s_alMaxDistance", "1024", CVAR_CHEAT);
+	s_alRolloff = CvarSystem::get( "s_alRolloff", "2", CVAR_CHEAT);
+	s_alGraceDistance = CvarSystem::get("s_alGraceDistance", "512", CVAR_CHEAT);
 
-	s_alDriver = Cvar_Get( "s_alDriver", ALDRIVER_DEFAULT, CVAR_ARCHIVE | CVAR_LATCH | CVAR_PROTECTED );
+	s_alDriver = CvarSystem::get( "s_alDriver", ALDRIVER_DEFAULT, CVAR_ARCHIVE | CVAR_LATCH | CVAR_PROTECTED );
 
-	s_alInputDevice = Cvar_Get( "s_alInputDevice", "", CVAR_ARCHIVE | CVAR_LATCH );
-	s_alDevice = Cvar_Get("s_alDevice", "", CVAR_ARCHIVE | CVAR_LATCH);
+	s_alInputDevice = CvarSystem::get( "s_alInputDevice", "", CVAR_ARCHIVE | CVAR_LATCH );
+	s_alDevice = CvarSystem::get("s_alDevice", "", CVAR_ARCHIVE | CVAR_LATCH);
 
 	// Load QAL
 	if( !QAL_Init( s_alDriver->string ) )
@@ -2606,7 +2606,7 @@ bool S_AL_Init( soundInterface_t *si )
 			}
 		}
 
-		s_alAvailableDevices = Cvar_Get("s_alAvailableDevices", devicenames, CVAR_ROM | CVAR_NORESTART);
+		s_alAvailableDevices = CvarSystem::get("s_alAvailableDevices", devicenames, CVAR_ROM | CVAR_NORESTART);
 	}
 
 	alDevice = qalcOpenDevice(device);
@@ -2647,7 +2647,7 @@ bool S_AL_Init( soundInterface_t *si )
 	// !!! FIXME: some of these alcCaptureOpenDevice() values should be cvars.
 	// !!! FIXME: add support for capture device enumeration.
 	// !!! FIXME: add some better error reporting.
-	s_alCapture = Cvar_Get( "s_alCapture", "1", CVAR_ARCHIVE | CVAR_LATCH );
+	s_alCapture = CvarSystem::get( "s_alCapture", "1", CVAR_ARCHIVE | CVAR_LATCH );
 	if (!s_alCapture->integer)
 	{
 		Com_Printf("OpenAL capture support disabled by user ('+set s_alCapture 1' to enable)\n");
@@ -2697,7 +2697,7 @@ bool S_AL_Init( soundInterface_t *si )
 				}
 			}
 
-			s_alAvailableInputDevices = Cvar_Get("s_alAvailableInputDevices", inputdevicenames, CVAR_ROM | CVAR_NORESTART);
+			s_alAvailableInputDevices = CvarSystem::get("s_alAvailableInputDevices", inputdevicenames, CVAR_ROM | CVAR_NORESTART);
 
 			Com_Printf("OpenAL default capture device is '%s'\n", defaultinputdevice ? defaultinputdevice : "none");
 			alCaptureDevice = qalcCaptureOpenDevice(inputdevice, 48000, AL_FORMAT_MONO16, VOIP_MAX_PACKET_SAMPLES*4);

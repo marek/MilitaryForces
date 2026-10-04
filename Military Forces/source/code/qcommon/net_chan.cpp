@@ -71,9 +71,9 @@ Netchan_Init
 */
 void Netchan_Init( int port ) {
 	port &= 0xffff;
-	showpackets = Cvar_Get ("showpackets", "0", CVAR_TEMP );
-	showdrop = Cvar_Get ("showdrop", "0", CVAR_TEMP );
-	net_qport = Cvar_Get ("net_qport", va("%i", port), CVAR_INIT );
+	showpackets = CvarSystem::get ("showpackets", "0", CVAR_TEMP );
+	showdrop = CvarSystem::get ("showdrop", "0", CVAR_TEMP );
+	net_qport = CvarSystem::get ("net_qport", va("%i", port), CVAR_INIT );
 	MSG_InitHuffStats();
 }
 

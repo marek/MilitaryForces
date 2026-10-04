@@ -1659,11 +1659,6 @@ void ME_Init_MissionEditor();
 
 // system calls
 int Sys_Milliseconds ();
-void Cvar_Register( vmCvar_t *vmCvar, const char *varName, const char *defaultValue, int flags );
-void Cvar_Update( vmCvar_t *vmCvar );
-void Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize );
-void Cvar_Set( const char *var_name, const char *value );
-void Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize );
 int	Cmd_Argc();
 void Cmd_ArgvBuffer( int arg, char *buffer, int bufferLength );
 void Cmd_ArgsBuffer( char *buffer, int bufferLength );

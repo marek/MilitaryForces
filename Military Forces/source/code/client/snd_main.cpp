@@ -476,15 +476,15 @@ void S_Init( )
 
 	Com_Printf( "------ Initializing Sound ------\n" );
 
-	s_volume = Cvar_Get( "s_volume", "0.8", CVAR_ARCHIVE );
-	s_musicVolume = Cvar_Get( "s_musicvolume", "0.25", CVAR_ARCHIVE );
-	s_muted = Cvar_Get("s_muted", "0", CVAR_ROM);
-	s_doppler = Cvar_Get( "s_doppler", "1", CVAR_ARCHIVE );
-	s_backend = Cvar_Get( "s_backend", "", CVAR_ROM );
-	s_muteWhenMinimized = Cvar_Get( "s_muteWhenMinimized", "0", CVAR_ARCHIVE );
-	s_muteWhenUnfocused = Cvar_Get( "s_muteWhenUnfocused", "0", CVAR_ARCHIVE );
+	s_volume = CvarSystem::get( "s_volume", "0.8", CVAR_ARCHIVE );
+	s_musicVolume = CvarSystem::get( "s_musicvolume", "0.25", CVAR_ARCHIVE );
+	s_muted = CvarSystem::get("s_muted", "0", CVAR_ROM);
+	s_doppler = CvarSystem::get( "s_doppler", "1", CVAR_ARCHIVE );
+	s_backend = CvarSystem::get( "s_backend", "", CVAR_ROM );
+	s_muteWhenMinimized = CvarSystem::get( "s_muteWhenMinimized", "0", CVAR_ARCHIVE );
+	s_muteWhenUnfocused = CvarSystem::get( "s_muteWhenUnfocused", "0", CVAR_ARCHIVE );
 
-	cv = Cvar_Get( "s_initsound", "1", 0 );
+	cv = CvarSystem::get( "s_initsound", "1", 0 );
 	if( !cv->integer ) {
 		Com_Printf( "Sound disabled.\n" );
 	} else {
@@ -498,16 +498,16 @@ void S_Init( )
 		Cmd_AddCommand( "s_stop", S_StopAllSounds );
 		Cmd_AddCommand( "s_info", S_SoundInfo );
 
-		cv = Cvar_Get( "s_useOpenAL", "1", CVAR_ARCHIVE | CVAR_LATCH );
+		cv = CvarSystem::get( "s_useOpenAL", "1", CVAR_ARCHIVE | CVAR_LATCH );
 		if( cv->integer ) {
 			//OpenAL
 			started = S_AL_Init( &si );
-			Cvar_Set( "s_backend", "OpenAL" );
+			CvarSystem::set( "s_backend", "OpenAL" );
 		}
 
 		if( !started ) {
 			started = S_Base_Init( &si );
-			Cvar_Set( "s_backend", "base" );
+			CvarSystem::set( "s_backend", "base" );
 		}
 
 		if( started ) {

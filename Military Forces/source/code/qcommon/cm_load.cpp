@@ -581,9 +581,9 @@ void CM_LoadMap( const char *name, bool clientload, int *checksum ) {
 	}
 
 #ifndef BSPC
-	cm_noAreas = Cvar_Get ("cm_noAreas", "0", CVAR_CHEAT);
-	cm_noCurves = Cvar_Get ("cm_noCurves", "0", CVAR_CHEAT);
-	cm_playerCurveClip = Cvar_Get ("cm_playerCurveClip", "1", CVAR_ARCHIVE|CVAR_CHEAT );
+	cm_noAreas = CvarSystem::get ("cm_noAreas", "0", CVAR_CHEAT);
+	cm_noCurves = CvarSystem::get ("cm_noCurves", "0", CVAR_CHEAT);
+	cm_playerCurveClip = CvarSystem::get ("cm_playerCurveClip", "1", CVAR_ARCHIVE|CVAR_CHEAT );
 #endif
 	Com_DPrintf( "CM_LoadMap( %s, %i )\n", name, clientload );
 

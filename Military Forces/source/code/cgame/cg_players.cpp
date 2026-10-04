@@ -138,8 +138,8 @@ void CG_NewClientInfo( int clientNum ) {
 		// MFQ3: team changed so reset the vehicle trigger
 		// Make sure it only happens to the player changing teams, otherwise all vehicle's reset 
 		// (UserInfoChanged on g will reset all players)
-		Cvar_Set( "cg_vehicle", "-1" );
-		Cvar_Set( "cg_nextVehicle", va( "%d", -1 ) );
+		CvarSystem::set( "cg_vehicle", "-1" );
+		CvarSystem::set( "cg_nextVehicle", va( "%d", -1 ) );
 	}
 
 	// team task
@@ -161,22 +161,22 @@ void CG_NewClientInfo( int clientNum ) {
 	newInfo.advancedControls = atoi(v);
 	if( newInfo.advancedControls )
 		Cbuf_AddText( "+strafe" );
-//		Cvar_Set( "cl_freelook", "0" );
+//		CvarSystem::set( "cl_freelook", "0" );
 	else
 		Cbuf_AddText( "-strafe" );
-//		Cvar_Set( "cl_freelook", "1" );
+//		CvarSystem::set( "cl_freelook", "1" );
 
 	// MFQ3: vehicle
 	v = Info_ValueForKey( configstring, "v" );
 	newInfo.vehicle = atoi( v );
 	if( newInfo.vehicle >= 0 && clientNum == cg.predictedPlayerEntity.currentState.clientNum )
 	{
-		Cvar_Set( "cg_vehicle", va( "%d", newInfo.vehicle ) );
+		CvarSystem::set( "cg_vehicle", va( "%d", newInfo.vehicle ) );
 		// only set "cg_nextvehicle" to the same as "cg_vehicle" when we currently don't have
 		// a vehicle index in it.
 		if( CG_Cvar_Get( "cg_nextVehicle" ) == -1 )
 		{
-			Cvar_Set( "cg_nextVehicle", va( "%d", newInfo.vehicle ) );
+			CvarSystem::set( "cg_nextVehicle", va( "%d", newInfo.vehicle ) );
 		}
 	}
 

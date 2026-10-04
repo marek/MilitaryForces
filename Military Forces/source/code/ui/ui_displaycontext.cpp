@@ -67,13 +67,13 @@ UI_DisplayContext::registerFont( const char *pFontname, int pointSize, fontInfo_
 void
 UI_DisplayContext::getCVarString( const char *cvar, char *buffer, int bufsize )
 {
-	Cvar_VariableStringBuffer( cvar, buffer, bufsize );
+	CvarSystem::variableStringBuffer( cvar, buffer, bufsize );
 }
 
 void
 UI_DisplayContext::setCVar( const char *cvar, const char *value )
 {
-	Cvar_Set( cvar, value );
+	CvarSystem::set( cvar, value );
 }
 
 void

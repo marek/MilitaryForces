@@ -142,7 +142,7 @@ void UI_LoadArenas( ) {
 	ui_numArenas = 0;
 	uiInfo.mapCount = 0;
 
-	Cvar_Register( &arenasFile, "g_arenasFile", "", CVAR_INIT|CVAR_ROM );
+	CvarSystem::register_( &arenasFile, "g_arenasFile", "", CVAR_INIT|CVAR_ROM );
 	if( *arenasFile.string ) {
 		UI_LoadArenasFromFile(arenasFile.string);
 	}

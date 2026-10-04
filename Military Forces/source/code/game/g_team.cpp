@@ -891,7 +891,7 @@ void UpdateLevelCategories( GameEntity *ent )
 	// update level information
 	theLevel.ent_category_ |= ent->ent_category_;
 
-	Cvar_Set( "mf_lvcat", va("%i", theLevel.ent_category_) );
+	CvarSystem::set( "mf_lvcat", va("%i", theLevel.ent_category_) );
 }
 
 /*QUAKED team_CTF_redplayer (1 0 0) (-16 -16 -16) (16 16 32)

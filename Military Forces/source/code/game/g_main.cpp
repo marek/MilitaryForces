@@ -238,7 +238,7 @@ void G_RegisterCvars()
 
 	for ( i = 0, cv = gameCvarTable ; i < gameCvarTableSize ; i++, cv++ ) 
 	{
-		Cvar_Register( cv->vmCvar, cv->cvarName,
+		CvarSystem::register_( cv->vmCvar, cv->cvarName,
 			cv->defaultString, cv->cvarFlags );
 		if ( cv->vmCvar )
 			cv->modificationCount = cv->vmCvar->modificationCount;
@@ -254,7 +254,7 @@ void G_RegisterCvars()
 	if ( g_gametype.integer < 0 || g_gametype.integer >= GT_MAX_GAME_TYPE ) 
 	{
 		Com_Printf( "g_gametype %i is out of range, defaulting to 0\n", g_gametype.integer );
-		Cvar_Set( "g_gametype", "0" );
+		CvarSystem::set( "g_gametype", "0" );
 	}
 	theLevel.warmupModificationCount_ = g_warmup.modificationCount;
 }
@@ -274,7 +274,7 @@ void G_UpdateCvars()
 	{
 		if( cv->vmCvar ) 
 		{
-			Cvar_Update( cv->vmCvar );
+			CvarSystem::update( cv->vmCvar );
 
 			if( cv->modificationCount != cv->vmCvar->modificationCount )
 			{
@@ -317,12 +317,12 @@ void G_InitGame( int levelTime, int randomSeed )
 	G_InitMemory();
 
 	// MFQ3: set the game version into a server var (that can be viewed as server-info)
-	Cvar_Set( "mf_version", MF_VERSION );
+	CvarSystem::set( "mf_version", MF_VERSION );
 
 	// MFQ3: (for now) always set the 'g_synchronousClients' var to 0, as setting to 1
 	// causes glitching/flickering with the models
 #pragma message( "g_synchronousClients is always being set to 0 in G_InitGame()" )
-	Cvar_Set( "g_synchronousClients", "0" );
+	CvarSystem::set( "g_synchronousClients", "0" );
 
 	// set some level globals
 	//memset( &level, 0, sizeof( level ) );
@@ -404,7 +404,7 @@ void G_InitGame( int levelTime, int randomSeed )
 
 	Com_Printf ("-----------------------------------\n");
 
-	if( g_gametype.integer == GT_SINGLE_PLAYER || Cvar_VariableIntegerValue( "com_buildScript" ) ) 
+	if( g_gametype.integer == GT_SINGLE_PLAYER || CvarSystem::variableIntegerValue( "com_buildScript" ) ) 
 	{
 		G_SoundIndex( "sound/player/gurp1.wav" );
 		G_SoundIndex( "sound/player/gurp2.wav" );
@@ -1178,8 +1178,8 @@ void CheckExitRules()
 
 	if ( g_timelimit.integer < 0 || g_timelimit.integer > INT_MAX / 60000 ) {
 		Com_Printf( "timelimit %i is out of range, defaulting to 0\n", g_timelimit.integer );
-		Cvar_Set( "timelimit", "0" );
-		Cvar_Update( &g_timelimit );
+		CvarSystem::set( "timelimit", "0" );
+		CvarSystem::update( &g_timelimit );
 	}
 
 	if( g_timelimit.integer && !theLevel.warmupTime_ ) 
@@ -1197,8 +1197,8 @@ void CheckExitRules()
 
 	if ( g_fraglimit.integer < 0 ) {
 		Com_Printf( "fraglimit %i is out of range, defaulting to 0\n", g_fraglimit.integer );
-		Cvar_Set( "fraglimit", "0" );
-		Cvar_Update( &g_fraglimit );
+		CvarSystem::set( "fraglimit", "0" );
+		CvarSystem::update( &g_fraglimit );
 	}
 
 	if( g_gametype.integer < GT_CTF && g_fraglimit.integer ) 
@@ -1238,8 +1238,8 @@ void CheckExitRules()
 
 	if ( g_capturelimit.integer < 0 ) {
 		Com_Printf( "capturelimit %i is out of range, defaulting to 0\n", g_capturelimit.integer );
-		Cvar_Set( "capturelimit", "0" );
-		Cvar_Update( &g_capturelimit );
+		CvarSystem::set( "capturelimit", "0" );
+		CvarSystem::update( &g_capturelimit );
 	}
 
 	if( g_gametype.integer >= GT_CTF && g_capturelimit.integer )
@@ -1335,7 +1335,7 @@ void CheckTournament()
 		if( theLevel.time_ > theLevel.warmupTime_ ) 
 		{
 			theLevel.warmupTime_ += 10000;
-			Cvar_Set( "g_restarted", "1" );
+			CvarSystem::set( "g_restarted", "1" );
 			Cbuf_ExecuteText( EXEC_APPEND, "map_restart 0\n" );
 			theLevel.restarted_ = true;
 			return;
@@ -1397,7 +1397,7 @@ void CheckTournament()
 		if( theLevel.time_ > theLevel.warmupTime_ ) 
 		{
 			theLevel.warmupTime_ += 10000;
-			Cvar_Set( "g_restarted", "1" );
+			CvarSystem::set( "g_restarted", "1" );
 			Cbuf_ExecuteText( EXEC_APPEND, "map_restart 0\n" );
 			theLevel.restarted_ = true;
 			return;
@@ -1607,9 +1607,9 @@ void CheckCvars( ) {
 	if ( g_password.modificationCount != lastMod ) {
 		lastMod = g_password.modificationCount;
 		if ( *g_password.string && Q_stricmp( g_password.string, "none" ) ) {
-			Cvar_Set( "g_needpass", "1" );
+			CvarSystem::set( "g_needpass", "1" );
 		} else {
-			Cvar_Set( "g_needpass", "0" );
+			CvarSystem::set( "g_needpass", "0" );
 		}
 	}
 }
@@ -1767,6 +1767,6 @@ void G_RunFrame( int levelTime )
 			if( ent )
 				Com_Printf("%4i: %s\n", i, ent->classname_);
 		}
-		Cvar_Set("g_listEntity", "0");
+		CvarSystem::set("g_listEntity", "0");
 	}
 }

@@ -587,14 +587,13 @@ Handles the sequence numbers
 ===============
 */
 
-void	Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize );
 
 void BG_AddPredictableEventToPlayerstate( int newEvent, int eventParm, playerState_t *ps ) {
 
 #ifdef _DEBUG
 	{
 		char buf[256];
-		Cvar_VariableStringBuffer("showevents", buf, sizeof(buf));
+		CvarSystem::variableStringBuffer("showevents", buf, sizeof(buf));
 		if ( atof(buf) != 0 ) {
 		}
 	}

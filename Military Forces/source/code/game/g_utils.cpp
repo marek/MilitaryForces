@@ -713,7 +713,7 @@ unsigned long G_GetGameset()
 {
 	char buffer[33];
 
-	Cvar_VariableStringBuffer("mf_gameset", buffer, 32);
+	CvarSystem::variableStringBuffer("mf_gameset", buffer, 32);
 
 	if( strcmp( buffer, "modern" ) == 0 ) 
 		return MF_GAMESET_MODERN;
@@ -725,7 +725,7 @@ unsigned long G_GetGameset()
 	{	
 		// default gameset
 		Com_Printf( "mf_gameset is not valid, defaulting 'modern'\n" );
-		Cvar_Set("mf_gameset", "modern");
+		CvarSystem::set("mf_gameset", "modern");
 		return MF_GAMESET_MODERN;
 	}
 }

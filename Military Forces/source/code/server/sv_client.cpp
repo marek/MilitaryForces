@@ -62,7 +62,7 @@ void SV_GetChallenge(netadr_t from)
 	bool gameMismatch;
 
 	// ignore if we are in single player
-	if ( Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER || Cvar_VariableValue("ui_singlePlayerActive")) {
+	if ( CvarSystem::variableValue( "g_gametype" ) == GT_SINGLE_PLAYER || CvarSystem::variableValue("ui_singlePlayerActive")) {
 		return;
 	}
 
@@ -183,7 +183,7 @@ void SV_GetChallenge(netadr_t from)
 //	r = Cmd_Argv( 3 );			// reason
 //
 //	//if ( !Q_stricmp( s, "demo" ) ) {
-//	//	if ( Cvar_VariableValue( "fs_restrict" ) ) {
+//	//	if ( CvarSystem::variableValue( "fs_restrict" ) ) {
 //	//		// a demo client connecting to a demo server
 //	//		NET_OutOfBandPrint( NS_SERVER, svs.challenges[i].adr, 
 //	//			"challengeResponse %i", svs.challenges[i].challenge );

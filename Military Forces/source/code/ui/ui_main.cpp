@@ -578,8 +578,8 @@ static void Text_Paint_Limit(float *maxX, float x, float y, float scale, const v
 
 
 void UI_ShowPostGame(bool newHigh) {
-	Cvar_Set ("cg_cameraOrbit", "0");
-	Cvar_Set("cg_thirdPerson", "0");
+	CvarSystem::set ("cg_cameraOrbit", "0");
+	CvarSystem::set("cg_thirdPerson", "0");
 	uiInfo.soundHighScore = newHigh;
 	_UI_SetActiveMenu(UserInterface::MenuCommand::UIMENU_POSTGAME);
 }
@@ -1073,7 +1073,7 @@ static const char *handicapValues[] = {"None","95","90","85","80","75","70","65"
 static void UI_DrawHandicap(rectDef_t *rect, float scale, const vec4_t color, int textStyle) {
   int i, h;
 
-  h = Com_Clamp( 5, 100, Cvar_VariableValue("handicap") );
+  h = Com_Clamp( 5, 100, CvarSystem::variableValue("handicap") );
   i = 20 - h / 5;
 
   Text_Paint(rect->x, rect->y, scale, color, handicapValues[i], 0, 0, textStyle);
@@ -1089,11 +1089,11 @@ static void UI_SetCapFragLimits(bool uiVars) {
 	int frag = 10;
 
 	if (uiVars) {
-		Cvar_Set("ui_captureLimit", va("%d", cap));
-		Cvar_Set("ui_fragLimit", va("%d", frag));
+		CvarSystem::set("ui_captureLimit", va("%d", cap));
+		CvarSystem::set("ui_fragLimit", va("%d", frag));
 	} else {
-		Cvar_Set("capturelimit", va("%d", cap));
-		Cvar_Set("fraglimit", va("%d", frag));
+		CvarSystem::set("capturelimit", va("%d", cap));
+		CvarSystem::set("fraglimit", va("%d", frag));
 	}
 }
 // ui_gameType assumes gametype 0 is -1 ALL and will not show
@@ -1103,22 +1103,22 @@ static void UI_DrawGameType(rectDef_t *rect, float scale, const vec4_t color, in
 
 static void UI_DrawNetGameType(rectDef_t *rect, float scale, const vec4_t color, int textStyle) {
 	if (ui_netGameType.integer < 0 || ui_netGameType.integer > uiInfo.numGameTypes) {
-		Cvar_Set("ui_netGameType", "0");
-		Cvar_Set("ui_actualNetGameType", "0");
+		CvarSystem::set("ui_netGameType", "0");
+		CvarSystem::set("ui_actualNetGameType", "0");
 	}
   Text_Paint(rect->x, rect->y, scale, color, uiInfo.gameTypes[ui_netGameType.integer].gameType , 0, 0, textStyle);
 }
 
 //static void UI_DrawNetGameset(rectDef_t *rect, float scale, vec4_t color, int textStyle) {
 //	if (ui_netGameset.integer < 0 || ui_netGameset.integer > numGamesets) {
-//		Cvar_Set("ui_netGameset", "0");
+//		CvarSystem::set("ui_netGameset", "0");
 //	}
 //  Text_Paint(rect->x, rect->y, scale, color, gameset_items[ui_netGameset.integer] , 0, 0, textStyle);
 //}
 
 static void UI_DrawJoinGameType(rectDef_t *rect, float scale, const vec4_t color, int textStyle) {
 	if (ui_joinGameType.integer < 0 || ui_joinGameType.integer > uiInfo.numJoinGameTypes) {
-		Cvar_Set("ui_joinGameType", "0");
+		CvarSystem::set("ui_joinGameType", "0");
 	}
   Text_Paint(rect->x, rect->y, scale, color, uiInfo.joinGameTypes[ui_joinGameType.integer].gameType , 0, 0, textStyle);
 }
@@ -1203,7 +1203,7 @@ static void UI_DrawPreviewCinematic(rectDef_t *rect, float scale, const vec4_t c
 
 static void UI_DrawSkill(rectDef_t *rect, float scale, const vec4_t color, int textStyle) {
   int i;
-	i = Cvar_VariableValue( "g_spSkill" );
+	i = CvarSystem::variableValue( "g_spSkill" );
   if (i < 1 || i > numSkillLevels) {
     i = 1;
   }
@@ -1223,7 +1223,7 @@ static void UI_DrawTeamMember(rectDef_t *rect, float scale, const vec4_t color, 
 	// 0 - None
 	// 1 - Human
 	// 2..NumCharacters - Bot
-	int value = Cvar_VariableValue(va(blue ? "ui_blueteam%i" : "ui_redteam%i", num));
+	int value = CvarSystem::variableValue(va(blue ? "ui_blueteam%i" : "ui_redteam%i", num));
 	const char *text;
 	if (value <= 0) 
 	{
@@ -1272,12 +1272,12 @@ static void UI_DrawMapPreview(rectDef_t *rect, float scale, const vec4_t color, 
 		if (net) 
 		{
 			ui_currentNetMap.integer = 0;
-			Cvar_Set("ui_currentNetMap", "0");
+			CvarSystem::set("ui_currentNetMap", "0");
 		} 
 		else 
 		{
 			ui_currentMap.integer = 0;
-			Cvar_Set("ui_currentMap", "0");
+			CvarSystem::set("ui_currentMap", "0");
 		}
 		map = 0;
 	}
@@ -1302,7 +1302,7 @@ static void UI_DrawMapTimeToBeat(rectDef_t *rect, float scale, const vec4_t colo
 	int minutes, seconds, time;
 	if (ui_currentMap.integer < 0 || ui_currentMap.integer > uiInfo.mapCount) {
 		ui_currentMap.integer = 0;
-		Cvar_Set("ui_currentMap", "0");
+		CvarSystem::set("ui_currentMap", "0");
 	}
 
 	time = uiInfo.mapList[ui_currentMap.integer].timeToBeat[uiInfo.gameTypes[ui_gameType.integer].gtEnum];
@@ -1323,12 +1323,12 @@ static void UI_DrawMapCinematic(rectDef_t *rect, float scale, const vec4_t color
 		if (net)
 		{
 			ui_currentNetMap.integer = 0;
-			Cvar_Set("ui_currentNetMap", "0");
+			CvarSystem::set("ui_currentNetMap", "0");
 		}
 		else
 		{
 			ui_currentMap.integer = 0;
-			Cvar_Set("ui_currentMap", "0");
+			CvarSystem::set("ui_currentMap", "0");
 		}
 		map = 0;
 	}
@@ -1386,7 +1386,7 @@ static void UI_DrawNetMapPreview(rectDef_t *rect, float scale, const vec4_t colo
 static void UI_DrawNetMapCinematic(rectDef_t *rect, float scale, const vec4_t color) {
 	if (ui_currentNetMap.integer < 0 || ui_currentNetMap.integer > uiInfo.mapCount) {
 		ui_currentNetMap.integer = 0;
-		Cvar_Set("ui_currentNetMap", "0");
+		CvarSystem::set("ui_currentNetMap", "0");
 	}
 
 	if (uiInfo.serverStatus.currentServerCinematic >= 0) {
@@ -1410,7 +1410,7 @@ static void UI_DrawNetFilter(rectDef_t *rect, float scale, const vec4_t color, i
 
 static void UI_DrawTier(rectDef_t *rect, float scale, const vec4_t color, int textStyle) {
   int i;
-	i = Cvar_VariableValue( "ui_currentTier" );
+	i = CvarSystem::variableValue( "ui_currentTier" );
   if (i < 0 || i >= uiInfo.tierCount) {
     i = 0;
   }
@@ -1419,7 +1419,7 @@ static void UI_DrawTier(rectDef_t *rect, float scale, const vec4_t color, int te
 
 static void UI_DrawTierMap(rectDef_t *rect, int index) {
   int i;
-	i = Cvar_VariableValue( "ui_currentTier" );
+	i = CvarSystem::variableValue( "ui_currentTier" );
   if (i < 0 || i >= uiInfo.tierCount) {
     i = 0;
   }
@@ -1443,11 +1443,11 @@ static const char *UI_EnglishMapName(const char *map) {
 
 static void UI_DrawTierMapName(rectDef_t *rect, float scale, const vec4_t color, int textStyle) {
   int i, j;
-	i = Cvar_VariableValue( "ui_currentTier" );
+	i = CvarSystem::variableValue( "ui_currentTier" );
   if (i < 0 || i >= uiInfo.tierCount) {
     i = 0;
   }
-	j = Cvar_VariableValue("ui_currentMap");
+	j = CvarSystem::variableValue("ui_currentMap");
 	if (j < 0 || j >= MAPS_PER_TIER) {
 		j = 0;
 	}
@@ -1457,11 +1457,11 @@ static void UI_DrawTierMapName(rectDef_t *rect, float scale, const vec4_t color,
 
 static void UI_DrawTierGameType(rectDef_t *rect, float scale, const vec4_t color, int textStyle) {
   int i, j;
-	i = Cvar_VariableValue( "ui_currentTier" );
+	i = CvarSystem::variableValue( "ui_currentTier" );
   if (i < 0 || i >= uiInfo.tierCount) {
     i = 0;
   }
-	j = Cvar_VariableValue("ui_currentMap");
+	j = CvarSystem::variableValue("ui_currentMap");
 	if (j < 0 || j >= MAPS_PER_TIER) {
 		j = 0;
 	}
@@ -1498,7 +1498,7 @@ static void UI_NextOpponent() {
 			i = 0;
 		}
 	}
- 	Cvar_Set( "ui_opponentName", uiInfo.teamList[i].teamName );
+ 	CvarSystem::set( "ui_opponentName", uiInfo.teamList[i].teamName );
 }
 
 static void UI_PriorOpponent() {
@@ -1514,7 +1514,7 @@ static void UI_PriorOpponent() {
 			i = uiInfo.teamCount - 1;
 		}
 	}
- 	Cvar_Set( "ui_opponentName", uiInfo.teamList[i].teamName );
+ 	CvarSystem::set( "ui_opponentName", uiInfo.teamList[i].teamName );
 }
 
 static void	UI_DrawPlayerLogo(rectDef_t *rect, const vec3_t color) {
@@ -1616,7 +1616,7 @@ int UI_OwnerDrawWidth(int ownerDraw, float scale)
 
   switch (ownerDraw) {
     case UI_HANDICAP:
-			  h = Com_Clamp( 5, 100, Cvar_VariableValue("handicap") );
+			  h = Com_Clamp( 5, 100, CvarSystem::variableValue("handicap") );
 				i = 20 - h / 5;
 				s = handicapValues[i];
       break;
@@ -1627,7 +1627,7 @@ int UI_OwnerDrawWidth(int ownerDraw, float scale)
 				s = uiInfo.gameTypes[ui_gameType.integer].gameType;
       break;
     case UI_SKILL:
-				i = Cvar_VariableValue( "g_spSkill" );
+				i = CvarSystem::variableValue( "g_spSkill" );
 				if (i < 1 || i > numSkillLevels) {
 					i = 1;
 				}
@@ -1650,7 +1650,7 @@ int UI_OwnerDrawWidth(int ownerDraw, float scale)
 		case UI_BLUETEAM3:
 		case UI_BLUETEAM4:
 		case UI_BLUETEAM5:
-			value = Cvar_VariableValue(va("ui_blueteam%i", ownerDraw-UI_BLUETEAM1 + 1));
+			value = CvarSystem::variableValue(va("ui_blueteam%i", ownerDraw-UI_BLUETEAM1 + 1));
 			if (value <= 0) {
 				text = "Closed";
 			} else if (value == 1) {
@@ -1669,7 +1669,7 @@ int UI_OwnerDrawWidth(int ownerDraw, float scale)
 		case UI_REDTEAM3:
 		case UI_REDTEAM4:
 		case UI_REDTEAM5:
-			value = Cvar_VariableValue(va("ui_redteam%i", ownerDraw-UI_REDTEAM1 + 1));
+			value = CvarSystem::variableValue(va("ui_redteam%i", ownerDraw-UI_REDTEAM1 + 1));
 			if (value <= 0) {
 				text = "Closed";
 			} else if (value == 1) {
@@ -1728,7 +1728,7 @@ int UI_OwnerDrawWidth(int ownerDraw, float scale)
 //static void UI_DrawBotName(rectDef_t *rect, float scale, vec4_t color, int textStyle) 
 //{
 //	int value = uiInfo.botIndex;
-//	int game = Cvar_VariableValue("g_gametype");
+//	int game = CvarSystem::variableValue("g_gametype");
 //	const char *text = "";
 //	if (game >= GT_TEAM) 
 //	{
@@ -1812,13 +1812,13 @@ static void UI_BuildPlayerList()
 	}
 
 	if (!uiInfo.teamLeader) 
-		Cvar_Set("cg_selectedPlayer", va("%d", playerTeamNumber));
+		CvarSystem::set("cg_selectedPlayer", va("%d", playerTeamNumber));
 
-	n = Cvar_VariableValue("cg_selectedPlayer");
+	n = CvarSystem::variableValue("cg_selectedPlayer");
 	if (n < 0 || n > uiInfo.myTeamCount) 
 		n = 0;
 	if (n < uiInfo.myTeamCount) 
-		Cvar_Set("cg_selectedPlayerName", uiInfo.teamNames[n]);
+		CvarSystem::set("cg_selectedPlayerName", uiInfo.teamNames[n]);
 }
 
 
@@ -2054,8 +2054,8 @@ static void UI_DrawVehiclePreview( rectDef_t *rect, float scale, const vec4_t co
 	static int lastVehicle = -1;
 
 	// find out the current UI vehicle index
-	vehicle = Cvar_VariableValue("ui_vehicle");
-	vehicleCat = Cvar_VariableValue("ui_vehicleCat");
+	vehicle = CvarSystem::variableValue("ui_vehicle");
+	vehicleCat = CvarSystem::variableValue("ui_vehicleCat");
 
 	// valid?
 	if( vehicle >= 0 )
@@ -2378,14 +2378,14 @@ bool UI_OwnerDrawVisible(int flags)
 	while (flags) {
 
 		if (flags & UI_SHOW_FFA) {
-			if (Cvar_VariableValue("g_gametype") != GT_FFA) {
+			if (CvarSystem::variableValue("g_gametype") != GT_FFA) {
 				vis = false;
 			}
 			flags &= ~UI_SHOW_FFA;
 		}
 
 		if (flags & UI_SHOW_NOTFFA) {
-			if (Cvar_VariableValue("g_gametype") == GT_FFA) {
+			if (CvarSystem::variableValue("g_gametype") == GT_FFA) {
 				vis = false;
 			}
 			flags &= ~UI_SHOW_NOTFFA;
@@ -2457,7 +2457,7 @@ bool UI_OwnerDrawVisible(int flags)
 				vis = false;
 			} else {
 				if (uiInfo.soundHighScore) {
-					if (Cvar_VariableValue("sv_killserver") == 0) {
+					if (CvarSystem::variableValue("sv_killserver") == 0) {
 						// wait on server to go down before playing sound
 						S_StartLocalSound(uiInfo.newHighScoreSound, CHAN_ANNOUNCER);
 						uiInfo.soundHighScore = false;
@@ -2487,7 +2487,7 @@ bool UI_OwnerDrawVisible(int flags)
 static bool UI_Handicap_HandleKey(int flags, float *special, int key) {
   if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_ENTER || key == K_KP_ENTER) {
     int h;
-    h = Com_Clamp( 5, 100, Cvar_VariableValue("handicap") );
+    h = Com_Clamp( 5, 100, CvarSystem::variableValue("handicap") );
 		if (key == K_MOUSE2) {
 	    h -= 5;
 		} else {
@@ -2498,7 +2498,7 @@ static bool UI_Handicap_HandleKey(int flags, float *special, int key) {
     } else if (h < 5) {
 			h = 100;
 		}
-  	Cvar_Set( "handicap", va( "%i", h) );
+  	CvarSystem::set( "handicap", va( "%i", h) );
     return true;
   }
   return false;
@@ -2519,7 +2519,7 @@ static bool UI_Effects_HandleKey(int flags, float *special, int key) {
 	  	uiInfo.effectsColor = 6;
 		}
 
-	  Cvar_SetValue( "color1", uitogamecode[uiInfo.effectsColor] );
+	  CvarSystem::setValue( "color1", uitogamecode[uiInfo.effectsColor] );
     return true;
   }
   return false;
@@ -2543,7 +2543,7 @@ static bool UI_ClanName_HandleKey(int flags, float *special, int key) {
     } else if (i < 0) {
 			i = uiInfo.teamCount - 1;
 		}
-  	Cvar_Set( "ui_teamName", uiInfo.teamList[i].teamName);
+  	CvarSystem::set( "ui_teamName", uiInfo.teamList[i].teamName);
 	UI_HeadCountByTeam();
 	UI_FeederSelection(FEEDER_HEADS, 0);
 	updateModel = true;
@@ -2574,17 +2574,17 @@ static bool UI_GameType_HandleKey(int flags, float *special, int key, bool reset
 		}
     
 		if (uiInfo.gameTypes[ui_gameType.integer].gtEnum == GT_TOURNAMENT) {
-			Cvar_Set("ui_Q3Model", "1");
+			CvarSystem::set("ui_Q3Model", "1");
 		} else {
-			Cvar_Set("ui_Q3Model", "0");
+			CvarSystem::set("ui_Q3Model", "0");
 		}
 
-		Cvar_Set("ui_gameType", va("%d", ui_gameType.integer));
+		CvarSystem::set("ui_gameType", va("%d", ui_gameType.integer));
 		UI_SetCapFragLimits(true);
 		UI_LoadBestScores(uiInfo.mapList[ui_currentMap.integer].mapLoadName, uiInfo.gameTypes[ui_gameType.integer].gtEnum);
 		if (resetMap && oldCount != UI_MapCountByGameType(true)) 
 		{
-	  		Cvar_Set( "ui_currentMap", "0");
+	  		CvarSystem::set( "ui_currentMap", "0");
 			uiInfo.uiUtils.menu_SetFeederSelection(nullptr, FEEDER_MAPS, 0, nullptr);
 		}
     return true;
@@ -2607,9 +2607,9 @@ static bool UI_NetGameType_HandleKey(int flags, float *special, int key) {
       ui_netGameType.integer = 0;
     } 
 
-  	Cvar_Set( "ui_netGameType", va("%d", ui_netGameType.integer));
-  	Cvar_Set( "ui_actualnetGameType", va("%d", uiInfo.gameTypes[ui_netGameType.integer].gtEnum));
-  	Cvar_Set( "ui_currentNetMap", "0");
+  	CvarSystem::set( "ui_netGameType", va("%d", ui_netGameType.integer));
+  	CvarSystem::set( "ui_actualnetGameType", va("%d", uiInfo.gameTypes[ui_netGameType.integer].gtEnum));
+  	CvarSystem::set( "ui_currentNetMap", "0");
 	UI_MapCountByGameType(false);
 	uiInfo.uiUtils.menu_SetFeederSelection(nullptr, FEEDER_ALLMAPS, 0, nullptr);
     return true;
@@ -2643,7 +2643,7 @@ static bool UI_NetGameType_HandleKey(int flags, float *special, int key) {
 //		} 
 //
 //		// re-set the value into cvar
-//		Cvar_Set( "ui_netGameset", va("%d", ui_netGameset.integer));
+//		CvarSystem::set( "ui_netGameset", va("%d", ui_netGameset.integer));
 //
 //		return true;
 //	}
@@ -2666,7 +2666,7 @@ static bool UI_JoinGameType_HandleKey(int flags, float *special, int key) {
 			ui_joinGameType.integer = 0;
 		}
 
-		Cvar_Set( "ui_joinGameType", va("%d", ui_joinGameType.integer));
+		CvarSystem::set( "ui_joinGameType", va("%d", ui_joinGameType.integer));
 		UI_BuildServerDisplayList(1);
 		return true;
 	}
@@ -2677,7 +2677,7 @@ static bool UI_JoinGameType_HandleKey(int flags, float *special, int key) {
 
 static bool UI_Skill_HandleKey(int flags, float *special, int key) {
   if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_ENTER || key == K_KP_ENTER) {
-  	int i = Cvar_VariableValue( "g_spSkill" );
+  	int i = CvarSystem::variableValue( "g_spSkill" );
 
 		if (key == K_MOUSE2) {
 	    i--;
@@ -2691,7 +2691,7 @@ static bool UI_Skill_HandleKey(int flags, float *special, int key) {
       i = 1;
     }
 
-    Cvar_Set("g_spSkill", va("%i", i));
+    CvarSystem::set("g_spSkill", va("%i", i));
     return true;
   }
   return false;
@@ -2714,7 +2714,7 @@ static bool UI_TeamName_HandleKey(int flags, float *special, int key, bool blue)
 			i = uiInfo.teamCount - 1;
 		}
 
-    Cvar_Set( (blue) ? "ui_blueTeam" : "ui_redTeam", uiInfo.teamList[i].teamName);
+    CvarSystem::set( (blue) ? "ui_blueTeam" : "ui_redTeam", uiInfo.teamList[i].teamName);
 
     return true;
   }
@@ -2729,7 +2729,7 @@ static bool UI_TeamMember_HandleKey(int flags, float *special, int key, bool blu
 		// 1 - Human
 		// 2..NumCharacters - Bot
 		char *cvar = va(blue ? "ui_blueteam%i" : "ui_redteam%i", num);
-		int value = Cvar_VariableValue(cvar);
+		int value = CvarSystem::variableValue(cvar);
 
 		if (key == K_MOUSE2) 
 		{
@@ -2763,7 +2763,7 @@ static bool UI_TeamMember_HandleKey(int flags, float *special, int key, bool blu
 		//	}
 		//}
 
-		Cvar_Set(cvar, va("%i", value));
+		CvarSystem::set(cvar, va("%i", value));
 		return true;
 	}
 	return false;
@@ -2788,7 +2788,7 @@ static bool UI_NetSource_HandleKey(int flags, float *special, int key) {
 		if (ui_netSource.integer != AS_GLOBAL) {
 			UI_StartServerRefresh(true);
 		}
-  	Cvar_Set( "ui_netSource", va("%d", ui_netSource.integer));
+  	CvarSystem::set( "ui_netSource", va("%d", ui_netSource.integer));
     return true;
   }
   return false;
@@ -2828,7 +2828,7 @@ static bool UI_OpponentName_HandleKey(int flags, float *special, int key) {
 
 //static bool UI_BotName_HandleKey(int flags, float *special, int key) {
 //  if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_ENTER || key == K_KP_ENTER) {
-//		int game = Cvar_VariableValue("g_gametype");
+//		int game = CvarSystem::variableValue("g_gametype");
 //		int value = uiInfo.botIndex;
 //
 //		if (key == K_MOUSE2) {
@@ -2894,7 +2894,7 @@ static bool UI_Crosshair_HandleKey(int flags, float *special, int key) {
 		} else if (uiInfo.currentCrosshair < 0) {
 			uiInfo.currentCrosshair = NUM_CROSSHAIRS - 1;
 		}
-		Cvar_Set("cg_drawCrosshair", va("%d", uiInfo.currentCrosshair)); 
+		CvarSystem::set("cg_drawCrosshair", va("%d", uiInfo.currentCrosshair)); 
 		return true;
 	}
 	return false;
@@ -2910,7 +2910,7 @@ static bool UI_SelectedPlayer_HandleKey(int flags, float *special, int key) {
 		if (!uiInfo.teamLeader) {
 			return false;
 		}
-		selected = Cvar_VariableValue("cg_selectedPlayer");
+		selected = CvarSystem::variableValue("cg_selectedPlayer");
 		
 		if (key == K_MOUSE2) {
 			selected--;
@@ -2925,11 +2925,11 @@ static bool UI_SelectedPlayer_HandleKey(int flags, float *special, int key) {
 		}
 
 		if (selected == uiInfo.myTeamCount) {
-		 	Cvar_Set( "cg_selectedPlayerName", "Everyone");
+		 	CvarSystem::set( "cg_selectedPlayerName", "Everyone");
 		} else {
-		 	Cvar_Set( "cg_selectedPlayerName", uiInfo.teamNames[selected]);
+		 	CvarSystem::set( "cg_selectedPlayerName", uiInfo.teamNames[selected]);
 		}
-	 	Cvar_Set( "cg_selectedPlayer", va("%d", selected));
+	 	CvarSystem::set( "cg_selectedPlayer", va("%d", selected));
 	}
 	return false;
 }
@@ -3054,19 +3054,19 @@ void UI_ServersSort(int column, bool force) {
 static void UI_StartSinglePlayer() {
 	int i,j, k, skill;
 	char buff[1024];
-	i = Cvar_VariableValue( "ui_currentTier" );
+	i = CvarSystem::variableValue( "ui_currentTier" );
   if (i < 0 || i >= tierCount) {
     i = 0;
   }
-	j = Cvar_VariableValue("ui_currentMap");
+	j = CvarSystem::variableValue("ui_currentMap");
 	if (j < 0 || j >= MAPS_PER_TIER) {
 		j = 0;
 	}
 
- 	Cvar_SetValue( "singleplayer", 1 );
- 	Cvar_SetValue( "g_gametype", Com_Clamp( 0, 7, tierList[i].gameTypes[j] ) );
+ 	CvarSystem::setValue( "singleplayer", 1 );
+ 	CvarSystem::setValue( "g_gametype", Com_Clamp( 0, 7, tierList[i].gameTypes[j] ) );
 	Cbuf_ExecuteText( EXEC_APPEND, va( "wait ; wait ; map %s\n", tierList[i].maps[j] ) );
-	skill = Cvar_VariableValue( "g_spSkill" );
+	skill = CvarSystem::variableValue( "g_spSkill" );
 
 	if (j == MAPS_PER_TIER-1) {
 		k = UI_TeamIndexFromName(UI_Cvar_VariableString("ui_opponentName"));
@@ -3191,11 +3191,11 @@ static void UI_LoadDemos() {
 	char	*demoname;
 	int		i, len;
 
-	Com_sprintf(demoExt, sizeof(demoExt), "mfq3_dm_%d", static_cast<int>(Cvar_VariableValue("protocol")));
+	Com_sprintf(demoExt, sizeof(demoExt), "mfq3_dm_%d", static_cast<int>(CvarSystem::variableValue("protocol")));
 
 	uiInfo.demoCount = FS_GetFileList( "demos", demoExt, demolist, 4096 );
 
-	Com_sprintf(demoExt, sizeof(demoExt), ".mfq3_dm_%d", static_cast<int>(Cvar_VariableValue("protocol")));
+	Com_sprintf(demoExt, sizeof(demoExt), ".mfq3_dm_%d", static_cast<int>(CvarSystem::variableValue("protocol")));
 
 	if (uiInfo.demoCount) {
 		if (uiInfo.demoCount > MAX_DEMOS) {
@@ -3240,7 +3240,7 @@ static void UI_StartSkirmish(bool next)
 	if (next) 
 	{
 		int actual;
-		int index = Cvar_VariableValue("ui_mapIndex");
+		int index = CvarSystem::variableValue("ui_mapIndex");
 	 	UI_MapCountByGameType(true);
 		UI_SelectedMap(index, &actual);
 		if (UI_SetNextMap(actual, index)) 
@@ -3255,60 +3255,60 @@ static void UI_StartSkirmish(bool next)
 	}
 
 	g = uiInfo.gameTypes[ui_gameType.integer].gtEnum;
-	Cvar_SetValue( "g_gametype", g );
+	CvarSystem::setValue( "g_gametype", g );
 	Cbuf_ExecuteText( EXEC_APPEND, va( "wait ; wait ; map %s\n", uiInfo.mapList[ui_currentMap.integer].mapLoadName) );
-	skill = Cvar_VariableValue( "g_spSkill" );
-	Cvar_Set("ui_scoreMap", uiInfo.mapList[ui_currentMap.integer].mapName);
+	skill = CvarSystem::variableValue( "g_spSkill" );
+	CvarSystem::set("ui_scoreMap", uiInfo.mapList[ui_currentMap.integer].mapName);
 
 	k = UI_TeamIndexFromName(UI_Cvar_VariableString("ui_opponentName"));
 
-	Cvar_Set("ui_singlePlayerActive", "1");
+	CvarSystem::set("ui_singlePlayerActive", "1");
 
 	// set up sp overrides, will be replaced on postgame
-	temp = Cvar_VariableValue( "capturelimit" );
-	Cvar_Set("ui_saveCaptureLimit", va("%i", temp));
-	temp = Cvar_VariableValue( "fraglimit" );
-	Cvar_Set("ui_saveFragLimit", va("%i", temp));
+	temp = CvarSystem::variableValue( "capturelimit" );
+	CvarSystem::set("ui_saveCaptureLimit", va("%i", temp));
+	temp = CvarSystem::variableValue( "fraglimit" );
+	CvarSystem::set("ui_saveFragLimit", va("%i", temp));
 
 	UI_SetCapFragLimits(false);
 
-	temp = Cvar_VariableValue( "cg_drawTimer" );
-	Cvar_Set("ui_drawTimer", va("%i", temp));
-	temp = Cvar_VariableValue( "g_doWarmup" );
-	Cvar_Set("ui_doWarmup", va("%i", temp));
-	temp = Cvar_VariableValue( "g_friendlyFire" );
-	Cvar_Set("ui_friendlyFire", va("%i", temp));
-	temp = Cvar_VariableValue( "sv_maxClients" );
-	Cvar_Set("ui_maxClients", va("%i", temp));
-	temp = Cvar_VariableValue( "g_warmup" );
-	Cvar_Set("ui_Warmup", va("%i", temp));
-	temp = Cvar_VariableValue( "sv_pure" );
-	Cvar_Set("ui_pure", va("%i", temp));
+	temp = CvarSystem::variableValue( "cg_drawTimer" );
+	CvarSystem::set("ui_drawTimer", va("%i", temp));
+	temp = CvarSystem::variableValue( "g_doWarmup" );
+	CvarSystem::set("ui_doWarmup", va("%i", temp));
+	temp = CvarSystem::variableValue( "g_friendlyFire" );
+	CvarSystem::set("ui_friendlyFire", va("%i", temp));
+	temp = CvarSystem::variableValue( "sv_maxClients" );
+	CvarSystem::set("ui_maxClients", va("%i", temp));
+	temp = CvarSystem::variableValue( "g_warmup" );
+	CvarSystem::set("ui_Warmup", va("%i", temp));
+	temp = CvarSystem::variableValue( "sv_pure" );
+	CvarSystem::set("ui_pure", va("%i", temp));
 
-	Cvar_Set("cg_cameraOrbit", "0");
-//	Cvar_Set("cg_thirdPerson", "0"); - removed MFQ3
-	Cvar_Set("cg_drawTimer", "1");
-	Cvar_Set("g_doWarmup", "1");
-	Cvar_Set("g_warmup", "15");
-	Cvar_Set("sv_pure", "0");
-	Cvar_Set("g_friendlyFire", "0");
-	Cvar_Set("g_redTeam", UI_Cvar_VariableString("ui_teamName"));
-	Cvar_Set("g_blueTeam", UI_Cvar_VariableString("ui_opponentName"));
+	CvarSystem::set("cg_cameraOrbit", "0");
+//	CvarSystem::set("cg_thirdPerson", "0"); - removed MFQ3
+	CvarSystem::set("cg_drawTimer", "1");
+	CvarSystem::set("g_doWarmup", "1");
+	CvarSystem::set("g_warmup", "15");
+	CvarSystem::set("sv_pure", "0");
+	CvarSystem::set("g_friendlyFire", "0");
+	CvarSystem::set("g_redTeam", UI_Cvar_VariableString("ui_teamName"));
+	CvarSystem::set("g_blueTeam", UI_Cvar_VariableString("ui_opponentName"));
 
-	if (Cvar_VariableValue("ui_recordSPDemo")) {
+	if (CvarSystem::variableValue("ui_recordSPDemo")) {
 		Com_sprintf(buff, MAX_STRING_CHARS, "%s_%i", uiInfo.mapList[ui_currentMap.integer].mapLoadName, g);
-		Cvar_Set("ui_recordSPDemoName", buff);
+		CvarSystem::set("ui_recordSPDemoName", buff);
 	}
 
 	delay = 500;
 
 	if (g == GT_TOURNAMENT) {
-		Cvar_Set("sv_maxClients", "2");
+		CvarSystem::set("sv_maxClients", "2");
 		Com_sprintf( buff, sizeof(buff), "wait ; addbot %s %f "", %i \n", uiInfo.mapList[ui_currentMap.integer].opponentName, skill, delay);
 		Cbuf_ExecuteText( EXEC_APPEND, buff );
 	} else {
 		temp = uiInfo.mapList[ui_currentMap.integer].teamMembers * 2;
-		Cvar_Set("sv_maxClients", va("%d", temp));
+		CvarSystem::set("sv_maxClients", va("%d", temp));
 		for (i =0; i < uiInfo.mapList[ui_currentMap.integer].teamMembers; i++) {
 			Com_sprintf( buff, sizeof(buff), "addbot %s %f %s %i %s\n", UI_AIFromName(uiInfo.teamList[k].teamMembers[i]), skill, (g == GT_FFA) ? "" : "Blue", delay, uiInfo.teamList[k].teamMembers[i]);
 			Cbuf_ExecuteText( EXEC_APPEND, buff );
@@ -3327,118 +3327,118 @@ static void UI_StartSkirmish(bool next)
 }
 
 static void UI_Update(const char *name) {
-	int	val = Cvar_VariableValue(name);
+	int	val = CvarSystem::variableValue(name);
 
  	if (Q_stricmp(name, "ui_SetName") == 0) {
-		Cvar_Set( "name", UI_Cvar_VariableString("ui_Name"));
+		CvarSystem::set( "name", UI_Cvar_VariableString("ui_Name"));
  	} else if (Q_stricmp(name, "ui_setRate") == 0) {
-		float rate = Cvar_VariableValue("rate");
+		float rate = CvarSystem::variableValue("rate");
 		if (rate >= 5000) {
-			Cvar_Set("cl_maxpackets", "30");
-			Cvar_Set("cl_packetdup", "1");
+			CvarSystem::set("cl_maxpackets", "30");
+			CvarSystem::set("cl_packetdup", "1");
 		} else if (rate >= 4000) {
-			Cvar_Set("cl_maxpackets", "15");
-			Cvar_Set("cl_packetdup", "2");		// favor less prediction errors when there's packet loss
+			CvarSystem::set("cl_maxpackets", "15");
+			CvarSystem::set("cl_packetdup", "2");		// favor less prediction errors when there's packet loss
 		} else {
-			Cvar_Set("cl_maxpackets", "15");
-			Cvar_Set("cl_packetdup", "1");		// favor lower bandwidth
+			CvarSystem::set("cl_maxpackets", "15");
+			CvarSystem::set("cl_packetdup", "1");		// favor lower bandwidth
 		}
  	} else if (Q_stricmp(name, "ui_GetName") == 0) {
-		Cvar_Set( "ui_Name", UI_Cvar_VariableString("name"));
+		CvarSystem::set( "ui_Name", UI_Cvar_VariableString("name"));
  	} else if (Q_stricmp(name, "r_colorbits") == 0) {
 		switch (val) {
 			case 0:
-				Cvar_SetValue( "r_depthbits", 0 );
-				Cvar_SetValue( "r_stencilbits", 0 );
+				CvarSystem::setValue( "r_depthbits", 0 );
+				CvarSystem::setValue( "r_stencilbits", 0 );
 			break;
 			case 16:
-				Cvar_SetValue( "r_depthbits", 16 );
-				Cvar_SetValue( "r_stencilbits", 0 );
+				CvarSystem::setValue( "r_depthbits", 16 );
+				CvarSystem::setValue( "r_stencilbits", 0 );
 			break;
 			case 32:
-				Cvar_SetValue( "r_depthbits", 24 );
+				CvarSystem::setValue( "r_depthbits", 24 );
 			break;
 		}
 	} else if (Q_stricmp(name, "r_lodbias") == 0) {
 		switch (val) {
 			case 0:
-				Cvar_SetValue( "r_subdivisions", 4 );
+				CvarSystem::setValue( "r_subdivisions", 4 );
 			break;
 			case 1:
-				Cvar_SetValue( "r_subdivisions", 12 );
+				CvarSystem::setValue( "r_subdivisions", 12 );
 			break;
 			case 2:
-				Cvar_SetValue( "r_subdivisions", 20 );
+				CvarSystem::setValue( "r_subdivisions", 20 );
 			break;
 		}
 	} else if (Q_stricmp(name, "ui_glCustom") == 0) {
 		switch (val) {
 			case 0:	// high quality
-				Cvar_SetValue( "r_fullScreen", 1 );
-				Cvar_SetValue( "r_subdivisions", 4 );
-				Cvar_SetValue( "r_vertexlight", 0 );
-				Cvar_SetValue( "r_lodbias", 0 );
-				Cvar_SetValue( "r_colorbits", 32 );
-				Cvar_SetValue( "r_depthbits", 24 );
-				Cvar_SetValue( "r_picmip", 0 );
-				Cvar_SetValue( "r_texturebits", 32 );
-				Cvar_SetValue( "r_fastSky", 0 );
-				Cvar_SetValue( "r_inGameVideo", 1 );
-				Cvar_SetValue( "cg_shadows", 1 );
-				Cvar_SetValue( "cg_brassTime", 2500 );
-				Cvar_Set( "r_texturemode", "GL_LINEAR_MIPMAP_LINEAR" );
+				CvarSystem::setValue( "r_fullScreen", 1 );
+				CvarSystem::setValue( "r_subdivisions", 4 );
+				CvarSystem::setValue( "r_vertexlight", 0 );
+				CvarSystem::setValue( "r_lodbias", 0 );
+				CvarSystem::setValue( "r_colorbits", 32 );
+				CvarSystem::setValue( "r_depthbits", 24 );
+				CvarSystem::setValue( "r_picmip", 0 );
+				CvarSystem::setValue( "r_texturebits", 32 );
+				CvarSystem::setValue( "r_fastSky", 0 );
+				CvarSystem::setValue( "r_inGameVideo", 1 );
+				CvarSystem::setValue( "cg_shadows", 1 );
+				CvarSystem::setValue( "cg_brassTime", 2500 );
+				CvarSystem::set( "r_texturemode", "GL_LINEAR_MIPMAP_LINEAR" );
 			break;
 			case 1: // normal 
-				Cvar_SetValue( "r_fullScreen", 1 );
-				Cvar_SetValue( "r_subdivisions", 12 );
-				Cvar_SetValue( "r_vertexlight", 0 );
-				Cvar_SetValue( "r_lodbias", 0 );
-				Cvar_SetValue( "r_colorbits", 0 );
-				Cvar_SetValue( "r_depthbits", 24 );
-				Cvar_SetValue( "r_picmip", 1 );
-				Cvar_SetValue( "r_texturebits", 0 );
-				Cvar_SetValue( "r_fastSky", 0 );
-				Cvar_SetValue( "r_inGameVideo", 1 );
-				Cvar_SetValue( "cg_brassTime", 2500 );
-				Cvar_Set( "r_texturemode", "GL_LINEAR_MIPMAP_LINEAR" );
-				Cvar_SetValue( "cg_shadows", 0 );
+				CvarSystem::setValue( "r_fullScreen", 1 );
+				CvarSystem::setValue( "r_subdivisions", 12 );
+				CvarSystem::setValue( "r_vertexlight", 0 );
+				CvarSystem::setValue( "r_lodbias", 0 );
+				CvarSystem::setValue( "r_colorbits", 0 );
+				CvarSystem::setValue( "r_depthbits", 24 );
+				CvarSystem::setValue( "r_picmip", 1 );
+				CvarSystem::setValue( "r_texturebits", 0 );
+				CvarSystem::setValue( "r_fastSky", 0 );
+				CvarSystem::setValue( "r_inGameVideo", 1 );
+				CvarSystem::setValue( "cg_brassTime", 2500 );
+				CvarSystem::set( "r_texturemode", "GL_LINEAR_MIPMAP_LINEAR" );
+				CvarSystem::setValue( "cg_shadows", 0 );
 			break;
 			case 2: // fast
-				Cvar_SetValue( "r_fullScreen", 1 );
-				Cvar_SetValue( "r_subdivisions", 8 );
-				Cvar_SetValue( "r_vertexlight", 0 );
-				Cvar_SetValue( "r_lodbias", 1 );
-				Cvar_SetValue( "r_colorbits", 0 );
-				Cvar_SetValue( "r_depthbits", 0 );
-				Cvar_SetValue( "r_picmip", 1 );
-				Cvar_SetValue( "r_texturebits", 0 );
-				Cvar_SetValue( "cg_shadows", 0 );
-				Cvar_SetValue( "r_fastSky", 1 );
-				Cvar_SetValue( "r_inGameVideo", 0 );
-				Cvar_SetValue( "cg_brassTime", 0 );
-				Cvar_Set( "r_texturemode", "GL_LINEAR_MIPMAP_NEAREST" );
+				CvarSystem::setValue( "r_fullScreen", 1 );
+				CvarSystem::setValue( "r_subdivisions", 8 );
+				CvarSystem::setValue( "r_vertexlight", 0 );
+				CvarSystem::setValue( "r_lodbias", 1 );
+				CvarSystem::setValue( "r_colorbits", 0 );
+				CvarSystem::setValue( "r_depthbits", 0 );
+				CvarSystem::setValue( "r_picmip", 1 );
+				CvarSystem::setValue( "r_texturebits", 0 );
+				CvarSystem::setValue( "cg_shadows", 0 );
+				CvarSystem::setValue( "r_fastSky", 1 );
+				CvarSystem::setValue( "r_inGameVideo", 0 );
+				CvarSystem::setValue( "cg_brassTime", 0 );
+				CvarSystem::set( "r_texturemode", "GL_LINEAR_MIPMAP_NEAREST" );
 			break;
 			case 3: // fastest
-				Cvar_SetValue( "r_fullScreen", 1 );
-				Cvar_SetValue( "r_subdivisions", 20 );
-				Cvar_SetValue( "r_vertexlight", 1 );
-				Cvar_SetValue( "r_lodbias", 2 );
-				Cvar_SetValue( "r_colorbits", 16 );
-				Cvar_SetValue( "r_depthbits", 16 );
-				Cvar_SetValue( "r_picmip", 2 );
-				Cvar_SetValue( "r_texturebits", 16 );
-				Cvar_SetValue( "cg_shadows", 0 );
-				Cvar_SetValue( "cg_brassTime", 0 );
-				Cvar_SetValue( "r_fastSky", 1 );
-				Cvar_SetValue( "r_inGameVideo", 0 );
-				Cvar_Set( "r_texturemode", "GL_LINEAR_MIPMAP_NEAREST" );
+				CvarSystem::setValue( "r_fullScreen", 1 );
+				CvarSystem::setValue( "r_subdivisions", 20 );
+				CvarSystem::setValue( "r_vertexlight", 1 );
+				CvarSystem::setValue( "r_lodbias", 2 );
+				CvarSystem::setValue( "r_colorbits", 16 );
+				CvarSystem::setValue( "r_depthbits", 16 );
+				CvarSystem::setValue( "r_picmip", 2 );
+				CvarSystem::setValue( "r_texturebits", 16 );
+				CvarSystem::setValue( "cg_shadows", 0 );
+				CvarSystem::setValue( "cg_brassTime", 0 );
+				CvarSystem::setValue( "r_fastSky", 1 );
+				CvarSystem::setValue( "r_inGameVideo", 0 );
+				CvarSystem::set( "r_texturemode", "GL_LINEAR_MIPMAP_NEAREST" );
 			break;
 		}
 	} else if (Q_stricmp(name, "ui_mousePitch") == 0) {
 		if (val == 0) {
-			Cvar_SetValue( "m_pitch", 0.022f );
+			CvarSystem::setValue( "m_pitch", 0.022f );
 		} else {
-			Cvar_SetValue( "m_pitch", -0.022f );
+			CvarSystem::setValue( "m_pitch", -0.022f );
 		}
 	}
 }
@@ -3531,30 +3531,30 @@ static void UI_RefreshVehicleSelect( int change_vehicle )
 	// get gameset & team (as MF_GAMESET_x and MF_TEAM_x)
 	gameset = MF_UI_GetGameset( false );
 	team = MF_UI_GetTeam();
-	gametype = Cvar_VariableValue("g_gametype");
+	gametype = CvarSystem::variableValue("g_gametype");
 	// ----------> AVAILABLE VEHICLES <-----------
 
 	switch( team )
 	{
 	default:
 	case MF_TEAM_ANY:
-		Cvar_Set( "ui_availableVehicleTxt", "ALL" );
+		CvarSystem::set( "ui_availableVehicleTxt", "ALL" );
 		break;
 	case MF_TEAM_1:
-		Cvar_Set( "ui_availableVehicleTxt", "RED TEAM" );
+		CvarSystem::set( "ui_availableVehicleTxt", "RED TEAM" );
 		break;
 	case MF_TEAM_2:
-		Cvar_Set( "ui_availableVehicleTxt", "BLUE TEAM" );
+		CvarSystem::set( "ui_availableVehicleTxt", "BLUE TEAM" );
 		break;
 	}
 
 	// ----------> CATAGORY <-----------
 
 	// find out the current UI vehicle (based upon the known catagory+class)
-	vehicle = Cvar_VariableValue("ui_vehicle");
+	vehicle = CvarSystem::variableValue("ui_vehicle");
 
 	// find out the current UI catagory
-	vehicleCat = Cvar_VariableValue("ui_vehicleCat");
+	vehicleCat = CvarSystem::variableValue("ui_vehicleCat");
 
 tryCatAgain:
 
@@ -3574,7 +3574,7 @@ tryCatAgain:
 	if( pCat && vehicle >= 0 && (levelCats & (1 << vehicleCat)) ) 
 	{
 		// update the text in the dialog for the UI catagory
-		Cvar_Set( "ui_vehicleCatTxt", pCat );
+		CvarSystem::set( "ui_vehicleCatTxt", pCat );
 	} 
 	else 
 	{
@@ -3587,12 +3587,12 @@ tryCatAgain:
 
 		goto tryCatAgain;
 	}
-	Cvar_Set( "ui_vehicleCat", va( "%d", vehicleCat ) );
+	CvarSystem::set( "ui_vehicleCat", va( "%d", vehicleCat ) );
 
 	// ----------> CLASS <-----------
 
 	// find out the current UI class (based upon the known catagory)
-	vehicleClass = Cvar_VariableValue("ui_vehicleClass");
+	vehicleClass = CvarSystem::variableValue("ui_vehicleClass");
 
 tryClassAgain:
 
@@ -3605,7 +3605,7 @@ tryClassAgain:
 	if( pClass && vehicle >= 0 ) 
 	{
 		// update the text in the dialog for the UI class
-		Cvar_Set( "ui_vehicleClassTxt", pClass );
+		CvarSystem::set( "ui_vehicleClassTxt", pClass );
 	} 
 	else
 	{
@@ -3618,7 +3618,7 @@ tryClassAgain:
 
 		goto tryClassAgain;
 	}
-	Cvar_Set( "ui_vehicleClass", va( "%d", vehicleClass ) );
+	CvarSystem::set( "ui_vehicleClass", va( "%d", vehicleClass ) );
 
 	// ----------> VEHICLE <-----------
 		
@@ -3631,10 +3631,10 @@ tryClassAgain:
 	if( vehicle == -1 )
 	{
 		// prevent change & say so
-		Cvar_Set( "ui_vehicle", "-1" );
-		Cvar_Set( "ui_vehicleTxt", "<Nothing Available>" );
-		Cvar_Set( "ui_vehicleLoadout", "-1" );
-		Cvar_Set( "ui_vehicleLoadoutTxt", "<Nothing Available>" );
+		CvarSystem::set( "ui_vehicle", "-1" );
+		CvarSystem::set( "ui_vehicleTxt", "<Nothing Available>" );
+		CvarSystem::set( "ui_vehicleLoadout", "-1" );
+		CvarSystem::set( "ui_vehicleLoadoutTxt", "<Nothing Available>" );
 		return;
 	}
 
@@ -3644,19 +3644,19 @@ tryClassAgain:
 	if( pVehicle ) 
 	{
 		// update the text in the dialog for the UI vehicle
-		Cvar_Set( "ui_vehicleTxt", pVehicle );
+		CvarSystem::set( "ui_vehicleTxt", pVehicle );
 		// If it wasnt rejected in the first place its safe to update vehicleType
 		vehicleType = vehicle;
 	} 
 	else 
 	{
 		// the 'ui_vehicle' must be invalid, reset
-		Cvar_Set( "ui_vehicle", "0" );
+		CvarSystem::set( "ui_vehicle", "0" );
 		vehicle = 0;
 	}
 
 	// always set back the vehicle index
-	Cvar_Set( "ui_vehicle", va( "%d", vehicle ));
+	CvarSystem::set( "ui_vehicle", va( "%d", vehicle ));
 	
 	// get the text
 	pVehicle = availableVehicles[ vehicle ].descriptiveName;
@@ -3664,12 +3664,12 @@ tryClassAgain:
 	if( pVehicle ) 
 	{
 		// update the text in the dialog for the UI vehicle
-		Cvar_Set( "ui_vehicleLoadoutTxt", pVehicle );
+		CvarSystem::set( "ui_vehicleLoadoutTxt", pVehicle );
 	} 
 	else 
 	{
 		// the 'ui_vehicleLoadout' must be invalid, reset
-		Cvar_Set( "ui_vehicleLoadout", "0" );
+		CvarSystem::set( "ui_vehicleLoadout", "0" );
 		vehicle = 0;
 	}
 		
@@ -3694,7 +3694,7 @@ static void UI_CycleVehicleSelect( int cycleIdx )
 		pVar = "ui_vehicleCat";
 
 		// reset dependent
-		Cvar_Set( "ui_vehicleClass", "0" );
+		CvarSystem::set( "ui_vehicleClass", "0" );
 
 		break;
 
@@ -3721,9 +3721,9 @@ static void UI_CycleVehicleSelect( int cycleIdx )
 
 	if(cycleIdx != 2) {
 		// cycle numeric var
-		idx = Cvar_VariableValue( pVar );
+		idx = CvarSystem::variableValue( pVar );
 		idx++;
-		Cvar_Set( pVar, va( "%d", idx ));
+		CvarSystem::set( pVar, va( "%d", idx ));
 	}
 	// update the dialog
 	UI_RefreshVehicleSelect(operation);
@@ -3741,17 +3741,17 @@ static void UI_SelectVehicle( )
 	int idx = -1;
 
 	// get the UI vehicle index
-	idx = Cvar_VariableValue( "ui_vehicle" );
-	vehicleCat = Cvar_VariableValue("ui_vehicleCat");
+	idx = CvarSystem::variableValue( "ui_vehicle" );
+	vehicleCat = CvarSystem::variableValue("ui_vehicleCat");
 
-	if( Cvar_VariableValue("g_gametype") == GT_MISSION_EDITOR ) {
+	if( CvarSystem::variableValue("g_gametype") == GT_MISSION_EDITOR ) {
 		if(UI_CAT_GI == vehicleCat)
 			Cbuf_ExecuteText( EXEC_APPEND, va( "me_spawngi %d\n", idx ) );
 		else
 			Cbuf_ExecuteText( EXEC_APPEND, va( "me_spawn %d\n", idx ) );
 	} else {
 		// set into the trigger index
-		Cvar_Set( "cg_nextVehicle", va( "%d", idx ));	
+		CvarSystem::set( "cg_nextVehicle", va( "%d", idx ));	
 	}
 }
 
@@ -3771,26 +3771,26 @@ void UI_RunMenuScript(char **args)
 		{
 			int i, clients, oldclients;
 			float skill;
-			// Cvar_Set("cg_thirdPerson", "0"); - removed MFQ3
-			Cvar_Set("cg_cameraOrbit", "0");
-			Cvar_Set("ui_singlePlayerActive", "0");
-			Cvar_SetValue( "dedicated", Com_Clamp( 0, 2, ui_dedicated.integer ) );
-			Cvar_SetValue( "g_gametype", Com_Clamp( 0, 8, uiInfo.gameTypes[ui_netGameType.integer].gtEnum ) );
-			Cvar_Set("g_redTeam", UI_Cvar_VariableString("ui_teamName"));
-			Cvar_Set("g_blueTeam", UI_Cvar_VariableString("ui_opponentName"));
+			// CvarSystem::set("cg_thirdPerson", "0"); - removed MFQ3
+			CvarSystem::set("cg_cameraOrbit", "0");
+			CvarSystem::set("ui_singlePlayerActive", "0");
+			CvarSystem::setValue( "dedicated", Com_Clamp( 0, 2, ui_dedicated.integer ) );
+			CvarSystem::setValue( "g_gametype", Com_Clamp( 0, 8, uiInfo.gameTypes[ui_netGameType.integer].gtEnum ) );
+			CvarSystem::set("g_redTeam", UI_Cvar_VariableString("ui_teamName"));
+			CvarSystem::set("g_blueTeam", UI_Cvar_VariableString("ui_opponentName"));
 			Cbuf_ExecuteText( EXEC_APPEND, va( "wait ; wait ; map %s\n", uiInfo.mapList[ui_currentNetMap.integer].mapLoadName ) );
-			skill = Cvar_VariableValue( "g_spSkill" );
+			skill = CvarSystem::variableValue( "g_spSkill" );
 			// set max clients based on spots
-			oldclients = Cvar_VariableValue( "sv_maxClients" );
+			oldclients = CvarSystem::variableValue( "sv_maxClients" );
 			clients = 0;
 			for (i = 0; i < PLAYERS_PER_TEAM; i++) 
 			{
-				int bot = Cvar_VariableValue( va("ui_blueteam%i", i+1));
+				int bot = CvarSystem::variableValue( va("ui_blueteam%i", i+1));
 				if (bot >= 0) 
 				{
 					clients++;
 				}
-				bot = Cvar_VariableValue( va("ui_redteam%i", i+1));
+				bot = CvarSystem::variableValue( va("ui_redteam%i", i+1));
 				if (bot >= 0) 
 				{
 					clients++;
@@ -3806,14 +3806,14 @@ void UI_RunMenuScript(char **args)
 				clients = oldclients;
 			}
 
-			Cvar_Set("sv_maxClients", va("%d",clients));
+			CvarSystem::set("sv_maxClients", va("%d",clients));
 		} 
 		else if (Q_stricmp(name, "updateSPMenu") == 0) 
 		{
 			UI_SetCapFragLimits(true);
 			UI_MapCountByGameType(true);
 			ui_mapIndex.integer = UI_GetIndexFromSelection(ui_currentMap.integer);
-			Cvar_Set("ui_mapIndex", va("%d", ui_mapIndex.integer));
+			CvarSystem::set("ui_mapIndex", va("%d", ui_mapIndex.integer));
 			uiInfo.uiUtils.menu_SetFeederSelection(nullptr, FEEDER_MAPS, ui_mapIndex.integer, "skirmish");
 			UI_GameType_HandleKey(0, nullptr, K_MOUSE1, false);
 			UI_GameType_HandleKey(0, nullptr, K_MOUSE2, false);
@@ -3823,26 +3823,26 @@ void UI_RunMenuScript(char **args)
 			Cbuf_ExecuteText( EXEC_APPEND, "exec default.cfg\n");
 			Cbuf_ExecuteText( EXEC_APPEND, "cvar_restart\n");
 			uiInfo.uiUtils.getControlUtils()->setDefaults();
-			Cvar_Set("com_introPlayed", "1" );
+			CvarSystem::set("com_introPlayed", "1" );
 			Cbuf_ExecuteText( EXEC_APPEND, "vid_restart\n" );
 		} 
 		else if (Q_stricmp(name, "getCDKey") == 0) 
 		{
 			//char out[17];
 			//CLUI_GetCDKey(buff, 17);
-			//Cvar_Set("cdkey1", "");
-			//Cvar_Set("cdkey2", "");
-			//Cvar_Set("cdkey3", "");
-			//Cvar_Set("cdkey4", "");
+			//CvarSystem::set("cdkey1", "");
+			//CvarSystem::set("cdkey2", "");
+			//CvarSystem::set("cdkey3", "");
+			//CvarSystem::set("cdkey4", "");
 			//if (strlen(buff) == CDKEY_LEN) {
 			//	Q_strncpyz(out, buff, 5);
-			//	Cvar_Set("cdkey1", out);
+			//	CvarSystem::set("cdkey1", out);
 			//	Q_strncpyz(out, buff + 4, 5);
-			//	Cvar_Set("cdkey2", out);
+			//	CvarSystem::set("cdkey2", out);
 			//	Q_strncpyz(out, buff + 8, 5);
-			//	Cvar_Set("cdkey3", out);
+			//	CvarSystem::set("cdkey3", out);
 			//	Q_strncpyz(out, buff + 12, 5);
-			//	Cvar_Set("cdkey4", out);
+			//	CvarSystem::set("cdkey4", out);
 			//}
 
 		} 
@@ -3853,15 +3853,15 @@ void UI_RunMenuScript(char **args)
 			//Q_strcat(buff, 1024, UI_Cvar_VariableString("cdkey2")); 
 			//Q_strcat(buff, 1024, UI_Cvar_VariableString("cdkey3")); 
 			//Q_strcat(buff, 1024, UI_Cvar_VariableString("cdkey4")); 
-			//Cvar_Set("cdkey", buff);
+			//CvarSystem::set("cdkey", buff);
 			//if (CL_CDKeyValidate(buff, UI_Cvar_VariableString("cdkeychecksum"))) 
 			//{
-			//	Cvar_Set("ui_cdkeyvalid", "CD Key Appears to be valid.");
+			//	CvarSystem::set("ui_cdkeyvalid", "CD Key Appears to be valid.");
 			//	CLUI_SetCDKey(buff);
 			//} 
 			//else 
 			//{
-			//	Cvar_Set("ui_cdkeyvalid", "CD Key does not appear to be valid.");
+			//	CvarSystem::set("ui_cdkeyvalid", "CD Key does not appear to be valid.");
 			//}
 		} 
 		else if (Q_stricmp(name, "loadArenas") == 0) 
@@ -3880,7 +3880,7 @@ void UI_RunMenuScript(char **args)
 		} 
 		else if (Q_stricmp(name, "clearError") == 0) 
 		{
-			Cvar_Set("com_errorMessage", "");
+			CvarSystem::set("com_errorMessage", "");
 		} 
 		else if (Q_stricmp(name, "loadGameInfo") == 0)
 		{
@@ -3984,9 +3984,9 @@ void UI_RunMenuScript(char **args)
 		} 
 		else if (Q_stricmp(name, "JoinServer") == 0) 
 		{
-			// Cvar_Set("cg_thirdPerson", "0"); - removed MFQ3
-			Cvar_Set("cg_cameraOrbit", "0");
-			Cvar_Set("ui_singlePlayerActive", "0");
+			// CvarSystem::set("cg_thirdPerson", "0"); - removed MFQ3
+			CvarSystem::set("cg_cameraOrbit", "0");
+			CvarSystem::set("ui_singlePlayerActive", "0");
 			if (uiInfo.serverStatus.currentServer >= 0 && uiInfo.serverStatus.currentServer < uiInfo.serverStatus.numDisplayServers) {
 				LAN_GetServerAddressString(ui_netSource.integer, uiInfo.serverStatus.displayServers[uiInfo.serverStatus.currentServer], buff, 1024);
 				Cbuf_ExecuteText( EXEC_APPEND, va( "connect %s\n", buff ) );
@@ -3994,19 +3994,19 @@ void UI_RunMenuScript(char **args)
 		} 
 		else if (Q_stricmp(name, "FoundPlayerJoinServer") == 0)
 		{
-			Cvar_Set("ui_singlePlayerActive", "0");
+			CvarSystem::set("ui_singlePlayerActive", "0");
 			if (uiInfo.currentFoundPlayerServer >= 0 && uiInfo.currentFoundPlayerServer < uiInfo.numFoundPlayerServers) {
 				Cbuf_ExecuteText( EXEC_APPEND, va( "connect %s\n", uiInfo.foundPlayerServerAddresses[uiInfo.currentFoundPlayerServer] ) );
 			}
 		} 
 		else if (Q_stricmp(name, "Quit") == 0) 
 		{
-			Cvar_Set("ui_singlePlayerActive", "0");
+			CvarSystem::set("ui_singlePlayerActive", "0");
 			Cbuf_ExecuteText( EXEC_INSERT, "quit");
 		}
 		else if (Q_stricmp(name, "Controls") == 0)
 		{
-		  Cvar_Set( "cl_paused", "1" );
+		  CvarSystem::set( "cl_paused", "1" );
 			Key_SetCatcher( ( KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
 			uiInfo.uiUtils.menu_CloseAll();
 			uiInfo.uiUtils.menu_ActivateByName("setup_menu2");
@@ -4044,7 +4044,7 @@ void UI_RunMenuScript(char **args)
 		{
 			Key_SetCatcher( ( Key_GetCatcher() & ~KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
 			Key_ClearStates();
-			Cvar_Set( "cl_paused", "0" );
+			CvarSystem::set( "cl_paused", "0" );
 			uiInfo.uiUtils.menu_CloseAll();
 		} 
 		else if (Q_stricmp(name, "voteMap") == 0) 
@@ -4162,7 +4162,7 @@ void UI_RunMenuScript(char **args)
 			const char *orders;
 			if (uiInfo.uiUtils.string_Parse(args, &orders)) 
 			{
-				int selectedPlayer = Cvar_VariableValue("cg_selectedPlayer");
+				int selectedPlayer = CvarSystem::variableValue("cg_selectedPlayer");
 				if (selectedPlayer < uiInfo.myTeamCount) 
 				{
 					Com_sprintf( buff, sizeof( buff ), orders, uiInfo.teamClientNums[selectedPlayer] );
@@ -4185,7 +4185,7 @@ void UI_RunMenuScript(char **args)
 				}
 				Key_SetCatcher( ( Key_GetCatcher() & ~KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
 				Key_ClearStates();
-				Cvar_Set( "cl_paused", "0" );
+				CvarSystem::set( "cl_paused", "0" );
 				uiInfo.uiUtils.menu_CloseAll();
 			}
 		} 
@@ -4194,14 +4194,14 @@ void UI_RunMenuScript(char **args)
 			const char *orders;
 			if (uiInfo.uiUtils.string_Parse(args, &orders)) 
 			{
-				int selectedPlayer = Cvar_VariableValue("cg_selectedPlayer");
+				int selectedPlayer = CvarSystem::variableValue("cg_selectedPlayer");
 				if (selectedPlayer == uiInfo.myTeamCount) {
 					Cbuf_ExecuteText( EXEC_APPEND, orders );
 					Cbuf_ExecuteText( EXEC_APPEND, "\n" );
 				}
 				Key_SetCatcher( ( Key_GetCatcher() & ~KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
 				Key_ClearStates();
-				Cvar_Set( "cl_paused", "0" );
+				CvarSystem::set( "cl_paused", "0" );
 				uiInfo.uiUtils.menu_CloseAll();
 			}
 		} 
@@ -4210,7 +4210,7 @@ void UI_RunMenuScript(char **args)
 			const char *orders;
 			if (uiInfo.uiUtils.string_Parse(args, &orders))
 			{
-				int selectedPlayer = Cvar_VariableValue("cg_selectedPlayer");
+				int selectedPlayer = CvarSystem::variableValue("cg_selectedPlayer");
 				if (selectedPlayer < uiInfo.myTeamCount)
 				{
 					Com_sprintf( buff, sizeof( buff ), orders, uiInfo.teamClientNums[selectedPlayer] );
@@ -4219,13 +4219,13 @@ void UI_RunMenuScript(char **args)
 				}
 				Key_SetCatcher( ( Key_GetCatcher() & ~KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
 				Key_ClearStates();
-				Cvar_Set( "cl_paused", "0" );
+				CvarSystem::set( "cl_paused", "0" );
 				uiInfo.uiUtils.menu_CloseAll();
 			}
 		} 
 		else if (Q_stricmp(name, "glCustom") == 0) 
 		{
-			Cvar_Set("ui_glCustom", "4");
+			CvarSystem::set("ui_glCustom", "4");
 		} 
 		else if (Q_stricmp(name, "update") == 0) 
 		{
@@ -4483,7 +4483,7 @@ static void UI_BuildServerDisplayList(int force)
 		force = 0;
 
 	// do motd updates here too
-	Cvar_VariableStringBuffer( "cl_motdString", uiInfo.serverStatus.motd, sizeof(uiInfo.serverStatus.motd) );
+	CvarSystem::variableStringBuffer( "cl_motdString", uiInfo.serverStatus.motd, sizeof(uiInfo.serverStatus.motd) );
 	len = strlen(uiInfo.serverStatus.motd);
 	if (len == 0) 
 	{
@@ -4793,7 +4793,7 @@ static void UI_BuildFindPlayerList(bool force) {
 		memset(&uiInfo.pendingServerStatus, 0, sizeof(uiInfo.pendingServerStatus));
 		uiInfo.numFoundPlayerServers = 0;
 		uiInfo.currentFoundPlayerServer = 0;
-		Cvar_VariableStringBuffer( "ui_findPlayer", uiInfo.findPlayerName, sizeof(uiInfo.findPlayerName));
+		CvarSystem::variableStringBuffer( "ui_findPlayer", uiInfo.findPlayerName, sizeof(uiInfo.findPlayerName));
 		Q_CleanStr(uiInfo.findPlayerName);
 		// should have a string of some length
 		if (!strlen(uiInfo.findPlayerName)) {
@@ -4805,7 +4805,7 @@ static void UI_BuildFindPlayerList(bool force) {
 		if (resend < 50) {
 			resend = 50;
 		}
-		Cvar_Set("cl_serverStatusResendTime", va("%d", resend));
+		CvarSystem::set("cl_serverStatusResendTime", va("%d", resend));
 		// reset all server status requests
 		LAN_GetServerStatus( nullptr, nullptr, 0);
 		//
@@ -4955,7 +4955,7 @@ static void UI_BuildServerStatus(bool force)
 	{
 		// if the variable cl_paused == 1, then we assume that the feeder is for the
 		// current server (that the client is connected to) and the request is of in-game origin
-		if( Cvar_VariableValue( "cl_paused" ) == 1 )
+		if( CvarSystem::variableValue( "cl_paused" ) == 1 )
 		{
 			// special case: in game popup
 
@@ -5319,14 +5319,14 @@ void UI_FeederSelection(float feederID, int index)
 	UI_SelectedHead(index, &actual);
 	index = actual;
     if (index >= 0 && index < uiInfo.characterCount) {
-		Cvar_Set( "team_model", va("%s", uiInfo.characterList[index].base));
-		Cvar_Set( "team_headmodel", va("*%s", uiInfo.characterList[index].name)); 
+		CvarSystem::set( "team_model", va("%s", uiInfo.characterList[index].base));
+		CvarSystem::set( "team_headmodel", va("*%s", uiInfo.characterList[index].name)); 
 		updateModel = true;
     }
   } else if (feederID == FEEDER_Q3HEADS) {
     if (index >= 0 && index < uiInfo.q3HeadCount) {
-      Cvar_Set( "model", uiInfo.q3HeadNames[index]);
-      Cvar_Set( "headmodel", uiInfo.q3HeadNames[index]);
+      CvarSystem::set( "model", uiInfo.q3HeadNames[index]);
+      CvarSystem::set( "headmodel", uiInfo.q3HeadNames[index]);
 			updateModel = true;
 		}
   } else if (feederID == FEEDER_MAPS || feederID == FEEDER_ALLMAPS) {
@@ -5337,19 +5337,19 @@ void UI_FeederSelection(float feederID, int index)
 		  uiInfo.mapList[map].cinematic = -1;
 		}
 		UI_SelectedMap(index, &actual);
-		Cvar_Set("ui_mapIndex", va("%d", index));
+		CvarSystem::set("ui_mapIndex", va("%d", index));
 		ui_mapIndex.integer = index;
 
 		if (feederID == FEEDER_MAPS) {
 			ui_currentMap.integer = actual;
-			Cvar_Set("ui_currentMap", va("%d", actual));
+			CvarSystem::set("ui_currentMap", va("%d", actual));
 	  	uiInfo.mapList[ui_currentMap.integer].cinematic = CIN_PlayCinematic(va("%s.roq", uiInfo.mapList[ui_currentMap.integer].mapLoadName), 0, 0, 0, 0, (CIN_loop | CIN_silent) );
 			UI_LoadBestScores(uiInfo.mapList[ui_currentMap.integer].mapLoadName, uiInfo.gameTypes[ui_gameType.integer].gtEnum);
-			Cvar_Set("ui_opponentModel", uiInfo.mapList[ui_currentMap.integer].opponentName);
+			CvarSystem::set("ui_opponentModel", uiInfo.mapList[ui_currentMap.integer].opponentName);
 			updateOpponentModel = true;
 		} else {
 			ui_currentNetMap.integer = actual;
-			Cvar_Set("ui_currentNetMap", va("%d", actual));
+			CvarSystem::set("ui_currentNetMap", va("%d", actual));
 	  	uiInfo.mapList[ui_currentNetMap.integer].cinematic = CIN_PlayCinematic(va("%s.roq", uiInfo.mapList[ui_currentNetMap.integer].mapLoadName), 0, 0, 0, 0, (CIN_loop | CIN_silent) );
 		}
 
@@ -5797,13 +5797,13 @@ void UI_Pause(bool b)
 {
 	if (b) {
 		// pause the game and set the ui keycatcher
-	  Cvar_Set( "cl_paused", "1" );
+	  CvarSystem::set( "cl_paused", "1" );
 		Key_SetCatcher( ( KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
 	} else {
 		// unpause the game and clear the ui keycatcher
 		Key_SetCatcher( ( Key_GetCatcher() & ~KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
 		Key_ClearStates();
-		Cvar_Set( "cl_paused", "0" );
+		CvarSystem::set( "cl_paused", "0" );
 	}
 }
 
@@ -5942,25 +5942,25 @@ void _UI_Init( bool inGameLoad )
 	//UI_LoadBots();
 
 	// sets defaults for ui temp cvars
-	uiInfo.effectsColor = gamecodetoui[static_cast<int>(Cvar_VariableValue("color1"))-1];
-	uiInfo.currentCrosshair = Cvar_VariableValue("cg_drawCrosshair");
-	Cvar_Set("ui_mousePitch", (Cvar_VariableValue("m_pitch") >= 0) ? "0" : "1");
+	uiInfo.effectsColor = gamecodetoui[static_cast<int>(CvarSystem::variableValue("color1"))-1];
+	uiInfo.currentCrosshair = CvarSystem::variableValue("cg_drawCrosshair");
+	CvarSystem::set("ui_mousePitch", (CvarSystem::variableValue("m_pitch") >= 0) ? "0" : "1");
 
 	uiInfo.serverStatus.currentServerCinematic = -1;
 	uiInfo.previewMovie = -1;
 
-	if (Cvar_VariableValue("ui_TeamArenaFirstRun") == 0) {
-		Cvar_Set("s_volume", "0.8");
-		Cvar_Set("s_musicvolume", "0.5");
-		Cvar_Set("ui_TeamArenaFirstRun", "1");
+	if (CvarSystem::variableValue("ui_TeamArenaFirstRun") == 0) {
+		CvarSystem::set("s_volume", "0.8");
+		CvarSystem::set("s_musicvolume", "0.5");
+		CvarSystem::set("ui_TeamArenaFirstRun", "1");
 	}
 
-	Cvar_Register(nullptr, "debug_protocol", "", 0 );
+	CvarSystem::register_(nullptr, "debug_protocol", "", 0 );
 
-	Cvar_Set("ui_actualNetGameType", va("%d", ui_netGameType.integer));
+	CvarSystem::set("ui_actualNetGameType", va("%d", ui_netGameType.integer));
 
 	// set the MFQ3 version string
-	Cvar_Set( "ui_mfq3Version", MF_VERSION );
+	CvarSystem::set( "ui_mfq3Version", MF_VERSION );
 
 	// MFQ3 data
 	MF_LoadAllVehicleData();
@@ -6001,7 +6001,7 @@ void _UI_KeyEvent( int key, bool down )
 		{
 			Key_SetCatcher( ( Key_GetCatcher() & ~KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
 			Key_ClearStates();
-			Cvar_Set( "cl_paused", "0" );
+			CvarSystem::set( "cl_paused", "0" );
 		}
 	}
 /*
@@ -6061,12 +6061,12 @@ void _UI_SetActiveMenu( UserInterface::MenuCommand menu ) {
 	  case UserInterface::MenuCommand::UIMENU_NONE:
 			Key_SetCatcher( ( Key_GetCatcher() & ~KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
 			Key_ClearStates();
-			Cvar_Set( "cl_paused", "0" );
+			CvarSystem::set( "cl_paused", "0" );
 			uiInfo.uiUtils.menu_CloseAll();
 
 		  return;
 	  case UserInterface::MenuCommand::UIMENU_MAIN:
-			//Cvar_Set( "sv_killserver", "1" );
+			//CvarSystem::set( "sv_killserver", "1" );
 			Key_SetCatcher( ( KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
 			//S_StartLocalSound( S_RegisterSound("sound/misc/menu_background.wav", false) , CHAN_LOCAL_SOUND );
 			//S_StartBackgroundTrack("sound/misc/menu_background.wav", NULL);
@@ -6075,12 +6075,12 @@ void _UI_SetActiveMenu( UserInterface::MenuCommand menu ) {
 			}
 			uiInfo.uiUtils.menu_CloseAll();
 			uiInfo.uiUtils.menu_ActivateByName("main");
-			Cvar_VariableStringBuffer("com_errorMessage", buf, sizeof(buf));
+			CvarSystem::variableStringBuffer("com_errorMessage", buf, sizeof(buf));
 			if (strlen(buf)) {
 				if (!ui_singlePlayerActive.integer) {
 					uiInfo.uiUtils.menu_ActivateByName("error_popmenu");
 				} else {
-					Cvar_Set("com_errorMessage", "");
+					CvarSystem::set("com_errorMessage", "");
 				}
 			}
 		  return;
@@ -6093,7 +6093,7 @@ void _UI_SetActiveMenu( UserInterface::MenuCommand menu ) {
 	  case UserInterface::MenuCommand::UIMENU_BAD_CD_KEY:
 		  return;
 	  case UserInterface::MenuCommand::UIMENU_POSTGAME:
-			//Cvar_Set( "sv_killserver", "1" );
+			//CvarSystem::set( "sv_killserver", "1" );
 			Key_SetCatcher( ( KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
 			if (uiInfo.inGameLoad) {
 				UI_LoadNonIngame();
@@ -6103,7 +6103,7 @@ void _UI_SetActiveMenu( UserInterface::MenuCommand menu ) {
 		  //UI_ConfirmMenu( "Bad CD Key", NULL, NeedCDKeyAction );
 		  return;
 	  case UserInterface::MenuCommand::UIMENU_INGAME:
-		  Cvar_Set( "cl_paused", "1" );
+		  CvarSystem::set( "cl_paused", "1" );
 			Key_SetCatcher( ( KEYCATCH_UI ) | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
 			UI_BuildPlayerList();
 			uiInfo.uiUtils.menu_CloseAll();
@@ -6178,9 +6178,9 @@ static void UI_DisplayDownloadInfo( const char *downloadName, float centerPoint,
 	scale = 0.30f;
 	yStart += 48.0f;
 
-	downloadSize = Cvar_VariableValue( "cl_downloadSize" );
-	downloadCount = Cvar_VariableValue( "cl_downloadCount" );
-	downloadTime = Cvar_VariableValue( "cl_downloadTime" );
+	downloadSize = CvarSystem::variableValue( "cl_downloadSize" );
+	downloadCount = CvarSystem::variableValue( "cl_downloadCount" );
+	downloadTime = CvarSystem::variableValue( "cl_downloadTime" );
 
 	leftWidth = 320;
 
@@ -6394,7 +6394,7 @@ void UI_DrawConnectScreen( bool overlay )
 		{
 		char downloadName[MAX_INFO_VALUE];
 
-			Cvar_VariableStringBuffer( "cl_downloadName", downloadName, sizeof(downloadName) );
+			CvarSystem::variableStringBuffer( "cl_downloadName", downloadName, sizeof(downloadName) );
 			if( *downloadName )
 			{
 				UI_DisplayDownloadInfo( downloadName, centerPoint, yStart, scale );
@@ -6731,7 +6731,7 @@ void UI_RegisterCvars( ) {
 	cvarTable_t	*cv;
 
 	for ( i = 0, cv = cvarTable ; i < cvarTableSize ; i++, cv++ ) {
-		Cvar_Register( cv->vmCvar, cv->cvarName, cv->defaultString, cv->cvarFlags );
+		CvarSystem::register_( cv->vmCvar, cv->cvarName, cv->defaultString, cv->cvarFlags );
 	}
 }
 
@@ -6745,7 +6745,7 @@ void UI_UpdateCvars( ) {
 	cvarTable_t	*cv;
 
 	for ( i = 0, cv = cvarTable ; i < cvarTableSize ; i++, cv++ ) {
-		Cvar_Update( cv->vmCvar );
+		CvarSystem::update( cv->vmCvar );
 	}
 }
 
@@ -6771,7 +6771,7 @@ static void UI_StopServerRefresh( )
 	if (count - uiInfo.serverStatus.numDisplayServers > 0) {
 		Com_Printf("%d servers not listed due to packet loss or pings higher than %d\n",
 						count - uiInfo.serverStatus.numDisplayServers,
-						static_cast<int>(Cvar_VariableValue("cl_maxPing")));
+						static_cast<int>(CvarSystem::variableValue("cl_maxPing")));
 	}
 
 }
@@ -6832,7 +6832,7 @@ static void UI_StartServerRefresh(bool full)
 
 	qtime_t q;
 	Com_RealTime(&q);
- 	Cvar_Set( va("ui_lastServerRefresh_%i", ui_netSource.integer), va("%s-%i, %i at %i:%i", MonthAbbrev[q.tm_mon],q.tm_mday, 1900+q.tm_year,q.tm_hour,q.tm_min));
+ 	CvarSystem::set( va("ui_lastServerRefresh_%i", ui_netSource.integer), va("%s-%i, %i at %i:%i", MonthAbbrev[q.tm_mon],q.tm_mday, 1900+q.tm_year,q.tm_hour,q.tm_min));
 
 	if (!full) {
 		UI_UpdatePendingPings();
@@ -6862,7 +6862,7 @@ static void UI_StartServerRefresh(bool full)
 			Cbuf_ExecuteText( EXEC_NOW, va( "globalservers 0 %s full empty\n", ptr ) );
 		}
 		else {
-			Cbuf_ExecuteText( EXEC_NOW, va( "globalservers 0 %d full empty\n", static_cast<int>(Cvar_VariableValue( "protocol" )) ) );
+			Cbuf_ExecuteText( EXEC_NOW, va( "globalservers 0 %d full empty\n", static_cast<int>(CvarSystem::variableValue( "protocol" )) ) );
 		}
 	}
 }

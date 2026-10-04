@@ -33,7 +33,7 @@ void SP_info_player_deathmatch( GameEntity *ent )
 	// update level information
 	theLevel.ent_category_ |= ent->ent_category_;
 
-	Cvar_Set( "mf_lvcat", va("%i", theLevel.ent_category_) );
+	CvarSystem::set( "mf_lvcat", va("%i", theLevel.ent_category_) );
 
 	G_SpawnInt( "nobots", "0", &i);
 	if( i ) 

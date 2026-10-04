@@ -367,13 +367,13 @@ Con_Init
 void Con_Init () {
 	int		i;
 
-	con_notifytime = Cvar_Get ("con_notifytime", "3", CVAR_ARCHIVE);
-	con_notifylines = Cvar_Get ("con_notifylines", "3", CVAR_ARCHIVE);
-	Cvar_CheckRange(con_notifylines, 1, NUM_CON_TIMES - 1, true);
-	con_conspeed = Cvar_Get ("scr_conspeed", "3", CVAR_ARCHIVE);
-	con_autoclear = Cvar_Get("con_autoclear", "1", CVAR_ARCHIVE);
-	con_scale = Cvar_Get("con_scale", "1", CVAR_ARCHIVE);
-	Cvar_CheckRange(con_scale, 1.0f, 4.0f, false);
+	con_notifytime = CvarSystem::get ("con_notifytime", "3", CVAR_ARCHIVE);
+	con_notifylines = CvarSystem::get ("con_notifylines", "3", CVAR_ARCHIVE);
+	CvarSystem::checkRange(con_notifylines, 1, NUM_CON_TIMES - 1, true);
+	con_conspeed = CvarSystem::get ("scr_conspeed", "3", CVAR_ARCHIVE);
+	con_autoclear = CvarSystem::get("con_autoclear", "1", CVAR_ARCHIVE);
+	con_scale = CvarSystem::get("con_scale", "1", CVAR_ARCHIVE);
+	CvarSystem::checkRange(con_scale, 1.0f, 4.0f, false);
 
 	g_consoleField.clear();
 	g_consoleField.widthInChars = g_console_field_width;

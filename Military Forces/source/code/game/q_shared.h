@@ -958,7 +958,7 @@ inline constexpr int CVAR_SYSTEMINFO = 0x0008; // these cvars will be duplicated
 inline constexpr int CVAR_INIT = 0x0010; // don't allow change from console at all,
 					// but can be set from the command line
 inline constexpr int CVAR_LATCH = 0x0020; // will only change when C code next does
-					// a Cvar_Get(), so it can't be changed
+					// a CvarSystem::get(), so it can't be changed
 					// without proper initialization.  modified
 					// will be set, even though the value hasn't
 					// changed yet
@@ -971,7 +971,7 @@ inline constexpr int CVAR_NORESTART = 0x0400; // do not clear when a cvar_restar
 inline constexpr int CVAR_SERVER_CREATED = 0x0800; // cvar was created by a server the client connected to.
 inline constexpr int CVAR_VM_CREATED = 0x1000; // cvar was created exclusively in one of the VMs.
 inline constexpr int CVAR_PROTECTED = 0x2000; // prevent modifying this var from VMs or the server
-// These flags are only returned by the Cvar_Flags() function
+// These flags are only returned by the CvarSystem::flags() function
 inline constexpr int CVAR_MODIFIED = 0x40000000; // Cvar was modified
 inline constexpr unsigned int CVAR_NONEXISTENT = 0x80000000; // Cvar doesn't exist.
 
@@ -1014,6 +1014,8 @@ struct vmCvar_t {
 	int			integer;
 	char		string[MAX_CVAR_VALUE_STRING];
 };
+
+#include "../qcommon/cvar_system.h"
 
 
 /*

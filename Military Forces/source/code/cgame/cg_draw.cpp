@@ -1758,27 +1758,27 @@ static void CG_DrawSpectator() {
 		if( cg.snap->ps.persistant[PERS_TEAM] == ClientBase::TEAM_SPECTATOR )
 		{
 			if( cgs.gametype != GT_MISSION_EDITOR ) {
-				Cvar_Set( "ui_spectatorTitleTxt", "Spectator" );
-				Cvar_Set( "ui_spectatorLine1Txt", "Press FIRE to switch view." );
+				CvarSystem::set( "ui_spectatorTitleTxt", "Spectator" );
+				CvarSystem::set( "ui_spectatorLine1Txt", "Press FIRE to switch view." );
 				
 				// team game?
 				if ( cgs.gametype >= GT_TEAM )
-					Cvar_Set( "ui_spectatorLine2Txt", "Choose a team from the 'Team' dialog to play." );
+					CvarSystem::set( "ui_spectatorLine2Txt", "Choose a team from the 'Team' dialog to play." );
 				else
-					Cvar_Set( "ui_spectatorLine2Txt", "Select 'Join' from the 'Team' dialog to play." );
+					CvarSystem::set( "ui_spectatorLine2Txt", "Select 'Join' from the 'Team' dialog to play." );
 			} else {
-				Cvar_Set( "ui_spectatorTitleTxt", "Mission Editor" );
-				Cvar_Set( "ui_spectatorLine1Txt", "Use Vehicle Selection to spawn a vehicle" );
-				Cvar_Set( "ui_spectatorLine2Txt", "Press FIRE2 to select what you are looking at" );
+				CvarSystem::set( "ui_spectatorTitleTxt", "Mission Editor" );
+				CvarSystem::set( "ui_spectatorLine1Txt", "Use Vehicle Selection to spawn a vehicle" );
+				CvarSystem::set( "ui_spectatorLine2Txt", "Press FIRE2 to select what you are looking at" );
 
 			}
 		}
 		else
 		{
 			// we have a team (or don't need one) but no vehicle
-			Cvar_Set( "ui_spectatorTitleTxt", "Limbo" );
-			Cvar_Set( "ui_spectatorLine1Txt", "Choose a vehicle to join in the game or" );
-			Cvar_Set( "ui_spectatorLine2Txt", "select 'Specator' from the 'Team' dialog." );
+			CvarSystem::set( "ui_spectatorTitleTxt", "Limbo" );
+			CvarSystem::set( "ui_spectatorLine1Txt", "Choose a vehicle to join in the game or" );
+			CvarSystem::set( "ui_spectatorLine2Txt", "select 'Specator' from the 'Team' dialog." );
 		}
 
 		// draw
