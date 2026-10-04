@@ -178,6 +178,15 @@ VehicleDeathImpl( GameEntity* self, GameEntity* inflictor, GameEntity* attacker,
 			Cmd_Score_f( theLevel.getEntity(i) );// g_entities + i );
 	}
 
+	// dying ends any lift this player was owed a delivery for
+	if( self->client_ )
+	{
+		self->client_->liftPilot_ = -1;
+		self->client_->downedUnderFire_ = false;
+		self->client_->downedByEnemy_ = false;
+		self->client_->ejectedTime_ = 0;
+	}
+
 	Rider_KillAll( self, attacker );
 
 	self->takedamage_ = true;	// can still be gibbed

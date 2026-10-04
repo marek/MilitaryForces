@@ -1565,6 +1565,15 @@ void Game::rider_SetVehicle( int clientNum, int vehicle )
 	ClientUserinfoChanged( clientNum );
 }
 
+namespace
+{
+	constexpr int liftScore = 2;
+	constexpr int liftScoreInterval = 60000;
+	constexpr int underFireTime = 15000;
+	constexpr int downedTime = 60000;
+	constexpr float liftJourney = 1500.0f;
+}
+
 /*
 =================
 Rider_Leave
@@ -1583,6 +1592,10 @@ void Rider_Leave( GameEntity *ent, bool forced )
 		bool parked = (pilot->ps_.ONOFF & OO_LANDED) != 0 || VectorLength( pilot->ps_.velocity ) < 60;
 		if( !forced && !parked ) 
 			return;
+
+		// a passenger set down after a real journey: if they go on to take a vehicle alive, the pilot scores again
+		// (only for someone the enemy forced out of their vehicle, so it cannot be farmed between friends)
+		client->liftPilot_ = !forced && client->downedByEnemy_ && Distance( pilot->ps_.origin, client->boardOrigin_ ) > liftJourney ? pilotNum : -1;
 
 		vec3_t forward, right, yawOnly, origin;
 		int vehicle = pilot->vehicle_;
@@ -1681,6 +1694,15 @@ bool Game::rider_Board( GameEntity *ent )
 			client->sess_.seat_ = seat;
 			client->riderAmmo_ = client->ps_.ammo[WP_MACHINEGUN];
 			client->riderFireTime_ = 0;
+			// rescuing a team mate who bailed out under fire is worth points to the pilot
+			VectorCopy( client->ps_.origin, client->boardOrigin_ );
+			if( client->downedUnderFire_ && theLevel.time_ >= client->liftScoreTime_ )
+			{
+				client->downedUnderFire_ = false;
+				client->liftScoreTime_ = theLevel.time_ + liftScoreInterval;
+				AddScore( veh, veh->r.currentOrigin, liftScore );
+				Game::logPrintf( "Lift: %i rescued %i\n", i, ent->s.number );
+			}
 			bool gunner = seat == 1 && VehicleData::vehicleHasTurret( pilot->vehicle_ );
 			SV_GameSendServerCommand( ent->s.number, va( "print \"You are %s in %s^7's %s\n\"", gunner ? "the gunner" : "a passenger",
 				pilot->pers_.netname_, availableVehicles[pilot->vehicle_].descriptiveName ) );
@@ -1810,6 +1832,11 @@ void Cmd_Eject_f( GameEntity *ent )
 	int infantry = VehicleData::getIndexOfVehicle( -1, availableVehicles[vehicle].gameset, availableVehicles[vehicle].team, CAT_LQM, 0, -1, 0, true );
 	if( infantry < 0 ) 
 		return;
+
+	// bailing out with the enemy on you makes whoever picks you up a rescuer
+	client->ejectedTime_ = theLevel.time_;
+	client->downedUnderFire_ = client->lastEnemyHitTime_ && theLevel.time_ - client->lastEnemyHitTime_ < underFireTime;
+	client->downedByEnemy_ = client->lastEnemyHitTime_ && theLevel.time_ - client->lastEnemyHitTime_ < downedTime;
 
 	MiscVehicle_Abandon( ent );
 

@@ -591,6 +591,25 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 	}
 
 	// health will count down towards max_health
+	// someone who was given a lift and now takes a vehicle without having died: the lift did its job
+	constexpr int deliveryScore = 2;
+	if( client->liftPilot_ >= 0 && vehIndex >= 0 && !(availableVehicles[vehIndex].cat & CAT_LQM) )
+	{
+		GameEntity* pilot = theLevel.getEntity( client->liftPilot_ );
+		if( pilot && pilot != ent && pilot->inuse_ && pilot->client_ && pilot->client_->pers_.connected_ == GameClient::ClientPersistant::CON_CONNECTED )
+		{
+			AddScore( pilot, pilot->r.currentOrigin, deliveryScore );
+			Game::logPrintf( "Lift: %i delivered %i\n", client->liftPilot_, ent->s.number );
+		}
+		client->liftPilot_ = -1;
+	}
+	if( vehIndex >= 0 && !(availableVehicles[vehIndex].cat & CAT_LQM) )
+	{
+		client->downedUnderFire_ = false;
+		client->downedByEnemy_ = false;
+		client->ejectedTime_ = 0;
+	}
+
 	// vehicles start with a little extra that counts down; a soldier starts at a soldier's maximum
 	const bool soldier = vehIndex >= 0 && (availableVehicles[vehIndex].cat & CAT_LQM) != 0;
 	ent->health_ = client->ps_.stats[STAT_HEALTH] = client->ps_.stats[STAT_MAX_HEALTH] + (soldier ? 0 : 25);

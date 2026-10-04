@@ -141,6 +141,13 @@ struct GameClient : public ClientBase
 	int					lasthurt_mod_;		// type of damage the client did
 
 	// timers
+	vec3_t				boardOrigin_ = { 0, 0, 0 };	// where this rider got aboard, for the lift scores
+	int					ejectedTime_ = 0;		// when this player last bailed out of a vehicle, 0 if on foot from the start
+	int					lastEnemyHitTime_ = 0;	// when an enemy last damaged this player
+	bool				downedByEnemy_ = false;	// bailed out of a vehicle the enemy had been hitting: a lift for them can score
+	bool				downedUnderFire_ = false;	// ejected while under attack: picking them up is a rescue
+	int					liftPilot_ = -1;		// who last gave this player a lift, until they die or take a vehicle
+	int					liftScoreTime_ = 0;	// no lift score for this rider again before this time
 	int					spawnedTime_ = 0;		// when this client last spawned at a spawn point
 	int					spawnHoldTime_ = 0;	// when this client started waiting for an occupied spawn point
 	int					respawnTime_;		// can respawn when time > this, force after g_forcerespwan

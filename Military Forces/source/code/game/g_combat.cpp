@@ -341,6 +341,13 @@ void Game::damage( GameEntity *targ, GameEntity *inflictor, GameEntity* attacker
 		// set the last client who damaged the target
 		targ->client_->lasthurt_client_ = attacker->s.number;
 		targ->client_->lasthurt_mod_ = mod;
+		if( attacker != targ && attacker->client_ && !OnSameTeam( targ, attacker ) )
+		{
+			targ->client_->lastEnemyHitTime_ = theLevel.time_;
+			// attacked again on foot after bailing out still counts as under fire
+			if( targ->client_->vehicle_ >= 0 && (availableVehicles[targ->client_->vehicle_].cat & CAT_LQM) && targ->client_->ejectedTime_ )
+				targ->client_->downedUnderFire_ = true;
+		}
 		if( attacker->client_ && attacker != targ && attacker->client_->sess_.paintTeam_ && 
 			attacker->client_->sess_.paintTeam_ == targ->client_->sess_.sessionTeam_ ) 
 		{
