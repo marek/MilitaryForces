@@ -364,31 +364,34 @@ void CGame::drawGV(DrawInfo_GV_t* drawInfo)
     VectorCopy (part[BP_GV_BODY].origin, part[BP_GV_BODY].oldorigin);
     CGame::addVehiclePart( &part[BP_GV_BODY] );
 
-    //
-    // turret
-    //
-    part[BP_GV_TURRET].hModel = veh->handle[BP_GV_TURRET];
-    VectorCopy( drawInfo->basicInfo.origin, part[BP_GV_TURRET].lightingOrigin );
-	AxisCopy( axisDefault, part[BP_GV_TURRET].axis );
-	RotateAroundYaw( part[BP_GV_TURRET].axis, drawInfo->turretAngle );
-	CGame::positionRotatedEntityOnTag( &part[BP_GV_TURRET], &part[BP_GV_BODY], veh->handle[BP_GV_BODY], gv_tags[BP_GV_TURRET] );
-	part[BP_GV_TURRET].shadowPlane = shadowPlane;
-    part[BP_GV_TURRET].renderfx = renderfx;
-    VectorCopy (part[BP_GV_TURRET].origin, part[BP_GV_TURRET].oldorigin);
-    CGame::addVehiclePart( &part[BP_GV_TURRET] );
+	if( !drawInfo->turretGone )
+	{
+	    //
+	    // turret
+	    //
+	    part[BP_GV_TURRET].hModel = veh->handle[BP_GV_TURRET];
+	    VectorCopy( drawInfo->basicInfo.origin, part[BP_GV_TURRET].lightingOrigin );
+		AxisCopy( axisDefault, part[BP_GV_TURRET].axis );
+		RotateAroundYaw( part[BP_GV_TURRET].axis, drawInfo->turretAngle );
+		CGame::positionRotatedEntityOnTag( &part[BP_GV_TURRET], &part[BP_GV_BODY], veh->handle[BP_GV_BODY], gv_tags[BP_GV_TURRET] );
+		part[BP_GV_TURRET].shadowPlane = shadowPlane;
+	    part[BP_GV_TURRET].renderfx = renderfx;
+	    VectorCopy (part[BP_GV_TURRET].origin, part[BP_GV_TURRET].oldorigin);
+	    CGame::addVehiclePart( &part[BP_GV_TURRET] );
 
-    //
-    // gun
-    //
-    part[BP_GV_GUNBARREL].hModel = veh->handle[BP_GV_GUNBARREL];
-    VectorCopy( drawInfo->basicInfo.origin, part[BP_GV_GUNBARREL].lightingOrigin );
-	AxisCopy( axisDefault, part[BP_GV_GUNBARREL].axis );
-	RotateAroundPitch( part[BP_GV_GUNBARREL].axis, drawInfo->gunAngle );
-	CGame::positionRotatedEntityOnTag( &part[BP_GV_GUNBARREL], &part[BP_GV_TURRET], veh->handle[BP_GV_TURRET], gv_tags[BP_GV_GUNBARREL] );
-	part[BP_GV_GUNBARREL].shadowPlane = shadowPlane;
-    part[BP_GV_GUNBARREL].renderfx = renderfx;
-    VectorCopy (part[BP_GV_GUNBARREL].origin, part[BP_GV_GUNBARREL].oldorigin);
-    CGame::addVehiclePart( &part[BP_GV_GUNBARREL] );
+	    //
+	    // gun
+	    //
+	    part[BP_GV_GUNBARREL].hModel = veh->handle[BP_GV_GUNBARREL];
+	    VectorCopy( drawInfo->basicInfo.origin, part[BP_GV_GUNBARREL].lightingOrigin );
+		AxisCopy( axisDefault, part[BP_GV_GUNBARREL].axis );
+		RotateAroundPitch( part[BP_GV_GUNBARREL].axis, drawInfo->gunAngle );
+		CGame::positionRotatedEntityOnTag( &part[BP_GV_GUNBARREL], &part[BP_GV_TURRET], veh->handle[BP_GV_TURRET], gv_tags[BP_GV_GUNBARREL] );
+		part[BP_GV_GUNBARREL].shadowPlane = shadowPlane;
+	    part[BP_GV_GUNBARREL].renderfx = renderfx;
+	    VectorCopy (part[BP_GV_GUNBARREL].origin, part[BP_GV_GUNBARREL].oldorigin);
+	    CGame::addVehiclePart( &part[BP_GV_GUNBARREL] );
+	}
 
 	//
 	// wheels

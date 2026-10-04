@@ -49,7 +49,8 @@ Explode our vehicle
 void ExplodeVehicle( GameEntity* self )
 {
 	// create the client vehicle explosion event
-	Game::addEvent( self, EV_VEHICLE_GIB, 0, true );
+	Game::addEvent( self, EV_VEHICLE_GIB, self->client_ && self->client_->vehicle_ >= 0 && self->r.contents != CONTENTS_CORPSE &&
+		(availableVehicles[self->client_->vehicle_].flags & VF_COOKOFF) ? 1 : 0, true );
 
 	self->takedamage_ = false;
 	self->s.eType = ET_INVISIBLE;

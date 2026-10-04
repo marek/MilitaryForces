@@ -877,6 +877,8 @@ GameClient::GameClient() :
 	readyToExit_(false),
 	noclip_(false),
 	devHold_(false),
+	riderAmmo_(0),
+	riderFireTime_(0),
 	lastCmdTime_(0),
 	buttons_(0),
 	oldbuttons_(0),
@@ -914,6 +916,8 @@ GameClient::clear()
 	readyToExit_ = false;
 	noclip_ = false;
 	devHold_ = false;
+	riderAmmo_ = 0;
+	riderFireTime_ = 0;
 	lastCmdTime_ = 0;
 	buttons_ = 0;
 	oldbuttons_ = 0;

@@ -1679,6 +1679,8 @@ bool Game::rider_Board( GameEntity *ent )
 				continue;
 			client->sess_.ridingClient_ = i;
 			client->sess_.seat_ = seat;
+			client->riderAmmo_ = client->ps_.ammo[WP_MACHINEGUN];
+			client->riderFireTime_ = 0;
 			bool gunner = seat == 1 && VehicleData::vehicleHasTurret( pilot->vehicle_ );
 			SV_GameSendServerCommand( ent->s.number, va( "print \"You are %s in %s^7's %s\n\"", gunner ? "the gunner" : "a passenger",
 				pilot->pers_.netname_, availableVehicles[pilot->vehicle_].descriptiveName ) );

@@ -745,6 +745,7 @@ void fire_nukemissile (GameEntity *self);
 void LaunchMissile_GI( GameEntity* ent );
 void fire_flak_GI (GameEntity *self);
 void fire_autocannon_GI (GameEntity *self);
+void fire_riderGun( GameEntity *rider, GameEntity *vehicle, const vec3_t angles );
 
 //
 // g_mover.c

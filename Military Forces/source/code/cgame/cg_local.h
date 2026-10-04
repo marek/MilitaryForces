@@ -1040,6 +1040,7 @@ struct DrawInfo_GV_t {
 	float				gunAngle;
 	float				wheelAngle;
 	float				wheelDirection;
+	bool				turretGone = false;
 };
 
 struct DrawInfo_Boat_t {
@@ -1759,6 +1760,7 @@ public:
 	static void registerItemVisuals( int itemNum );
 	static void missileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType );
 	static void genericExplosion( vec3_t origin, int type );
+	static void cookOff( vec3_t origin, int vehicle );
 	static void vehicleHit( vec3_t origin, int damage );
 	static void initMarkPolys( );
 	static void addMarks( );

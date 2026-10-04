@@ -1757,6 +1757,7 @@ completeVehicleData_t availableVehicles[] =
 		.team = MF_TEAM_ANY,
 		.cat = CAT_GROUND,
 		.cls = CLASS_GROUND_MBT,
+		.flags = VF_COOKOFF,
 		.turnspeed = {50, 100, 100},
 		.cam_dist = {0, 100, 36},
 		.cam_height = {0, 100, 18},

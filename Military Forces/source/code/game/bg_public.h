@@ -668,6 +668,7 @@ extern const char *class_items[MF_MAX_CATEGORIES][MF_MAX_CLASSES+1];
 // Vehicle flags
 inline constexpr int VF_NOTSELECTABLE = 1; // cannot be selected (turrets, etc)
 inline constexpr int VF_STEALTH = 2;
+inline constexpr int VF_COOKOFF = 4;
 
 inline constexpr int SEATMASK_PILOT = 0x0001;
 inline constexpr int SEATMASK_ENTERABLE = 0x8000;

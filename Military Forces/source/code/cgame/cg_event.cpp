@@ -286,6 +286,8 @@ void ClientEntity::entityEvent( vec3_t position )
 	case EV_VEHICLE_DIE:
 		DEBUGNAME("EV_VEHICLE_DIE");
 		CGame::genericExplosion( position, EXPLODE_VEHICLE_DIE );
+		if( es->eventParm )
+			CGame::cookOff( position, cgs.clientinfo[ this->currentState.clientNum ].vehicle );
 		break;
 
 	case EV_VEHICLE_GIB:
@@ -294,6 +296,8 @@ void ClientEntity::entityEvent( vec3_t position )
 			CGame::gibPlayer(position);
 		else
 			CGame::genericExplosion( position, EXPLODE_VEHICLE_GIB );
+		if( es->eventParm )
+			CGame::cookOff( position, cgs.clientinfo[ this->currentState.clientNum ].vehicle );
 		break;
 
 	case EV_BUILDING_EXPLODE:

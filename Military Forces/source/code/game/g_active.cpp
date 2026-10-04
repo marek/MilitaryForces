@@ -632,8 +632,28 @@ void Game::riderThink( GameEntity *ent )
 	int pilotNum = client->sess_.ridingClient_;
 
 	client->ps_.commandTime = client->pers_.cmd_.serverTime;
-	if( !Game::riderVehicleValid( theLevel.getClient( pilotNum ), theLevel.getEntity( pilotNum ) ) ) 
+	GameClient* pilot = theLevel.getClient( pilotNum );
+	GameEntity* vehicle = theLevel.getEntity( pilotNum );
+	if( !Game::riderVehicleValid( pilot, vehicle ) ) 
+	{
 		Rider_Leave( ent, true );
+		return;
+	}
+
+	const bool gunner = client->sess_.seat_ == 1 && VehicleData::vehicleHasTurret( pilot->vehicle_ );
+	if( !gunner && (availableVehicles[pilot->vehicle_].cat & (CAT_HELO|CAT_BOAT)) && (client->pers_.cmd_.buttons & BUTTON_ATTACK) &&
+		client->riderAmmo_ > 0 && theLevel.time_ >= client->riderFireTime_ && client->vehicle_ >= 0 ) 
+	{
+		const int weapon = availableVehicles[client->vehicle_].weapons[WP_MACHINEGUN];
+		if( weapon ) 
+		{
+			vec3_t angles;
+			Game::riderAngles( client, pilot, angles );
+			fire_riderGun( ent, vehicle, angles );
+			client->riderAmmo_--;
+			client->riderFireTime_ = theLevel.time_ + availableWeapons[weapon].fireInterval;
+		}
+	}
 }
 
 void Game::riderEndFrame( GameEntity *ent )
@@ -653,6 +673,11 @@ void Game::riderEndFrame( GameEntity *ent )
 	client->ps_.commandTime = commandTime;
 	if( client->sess_.seat_ == 1 && VehicleData::vehicleHasTurret( pilot->vehicle_ ) ) 
 		Game::riderAngles( client, pilot, client->ps_.viewangles );
+	else if( availableVehicles[pilot->vehicle_].cat & (CAT_HELO|CAT_BOAT) ) 
+	{
+		Game::riderAngles( client, pilot, client->ps_.viewangles );
+		client->ps_.ammo[WP_MACHINEGUN] = client->riderAmmo_;
+	}
 
 	ent->s.eType = ET_INVISIBLE;
 	ent->s.vehicleEnt = pilotNum;

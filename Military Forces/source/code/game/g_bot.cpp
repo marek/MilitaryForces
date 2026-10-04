@@ -464,6 +464,8 @@ GameEntity* Bots::findEnemy( GameEntity* ent, State& bot, Role role )
 		}
 		if( i == bot.enemy )
 			score *= 0.7f;
+		if( g_gametype.integer == GT_CTF && (oc->ps_.objectives & (client->sess_.sessionTeam_ == ClientBase::TEAM_RED ? OB_REDFLAG : OB_BLUEFLAG)) )
+			score *= 0.15f;
 		if( !best || score < bestScore )
 		{
 			best = other;
@@ -2065,8 +2067,10 @@ void Bots::thinkRider( GameEntity* ent, State& bot, usercmd_t& cmd, vec3_t view 
 
 	VectorCopy( pilot->client_->ps_.vehicleAngles, view );
 	view[ROLL] = 0;
-	if( client->sess_.seat_ != 1 || !VehicleData::vehicleHasTurret( pilot->client_->vehicle_ ) )
+	const bool gunner = client->sess_.seat_ == 1 && VehicleData::vehicleHasTurret( pilot->client_->vehicle_ );
+	if( !gunner && !(availableVehicles[pilot->client_->vehicle_].cat & (CAT_HELO|CAT_BOAT)) )
 		return;
+	const float reach = gunner ? 3500.0f : 1500.0f;
 
 	if( theLevel.time_ >= bot.enemyTime )
 	{
@@ -2080,7 +2084,7 @@ void Bots::thinkRider( GameEntity* ent, State& bot, usercmd_t& cmd, vec3_t view 
 			if( g_gametype.integer >= GT_TEAM && OnSameTeam( ent, other ) )
 				continue;
 			const float dist = Distance( pilot->r.currentOrigin, other->r.currentOrigin );
-			if( dist < 3500 && (!enemy || dist < best) )
+			if( dist < reach && (!enemy || dist < best) )
 			{
 				enemy = other;
 				best = dist;
@@ -2098,7 +2102,9 @@ void Bots::thinkRider( GameEntity* ent, State& bot, usercmd_t& cmd, vec3_t view 
 	vectoangles( dir, angles );
 	view[YAW] = angles[YAW];
 	view[PITCH] = std::clamp( AngleSubtract( angles[PITCH], 0 ), -60.0f, 60.0f );
-	cmd.buttons |= BUTTON_ATTACK_MAIN;
+	if( !visible( pilot, pilot->r.currentOrigin, enemy ) )
+		return;
+	cmd.buttons |= gunner ? BUTTON_ATTACK_MAIN : BUTTON_ATTACK;
 }
 
 void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
@@ -2179,6 +2185,29 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 	}
 
 	cmd.weapon = ps.weaponNum;
+
+	if( g_gametype.integer == GT_CTF && bot.desire != Goal::Rearm && !(ps.objectives & (OB_REDFLAG|OB_BLUEFLAG)) )
+	{
+		const int own = client->sess_.sessionTeam_;
+		const int ownFlag = own == ClientBase::TEAM_RED ? OB_REDFLAG : OB_BLUEFLAG;
+		for( int i = 1; i <= theLevel.maxclients_; i++ )
+		{
+			GameEntity* other = theLevel.getEntity( i );
+			if( other == ent || !alive( other ) || !(other->client_->ps_.objectives & ownFlag) )
+				continue;
+			vec3_t intercept;
+			const Seen& seen = bot.seen[i];
+			if( seen.time && theLevel.time_ < seen.time + memoryTime( bot ) )
+				VectorCopy( seen.position, intercept );
+			else if( !flagPosition( own == ClientBase::TEAM_RED ? ClientBase::TEAM_BLUE : ClientBase::TEAM_RED, intercept ) )
+				break;
+			VectorCopy( intercept, bot.goal );
+			bot.goalTime = theLevel.time_ + 3000;
+			if( bot.desire == Goal::Capture )
+				bot.desire = Goal::Roam;
+			break;
+		}
+	}
 
 	if( bot.desire == Goal::Capture )
 	{

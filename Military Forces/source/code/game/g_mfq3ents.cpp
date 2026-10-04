@@ -208,6 +208,16 @@ void Touch_RechargeTouch::execute( GameEntity *other, trace_t *trace )
 		if( other->client_->ps_.stats[STAT_FUEL] > other->client_->ps_.stats[STAT_MAX_FUEL] ) 
 			other->client_->ps_.stats[STAT_FUEL] = other->client_->ps_.stats[STAT_MAX_FUEL];
 	}
+	for( int i = 1; i <= theLevel.maxclients_; i++ ) 
+	{
+		GameClient* rider = theLevel.getClient( i );
+		if( !rider || rider->pers_.connected_ != GameClient::ClientPersistant::CON_CONNECTED || rider->sess_.ridingClient_ != other->s.number || rider->vehicle_ < 0 ) 
+			continue;
+		const int weapon = availableVehicles[rider->vehicle_].weapons[WP_MACHINEGUN];
+		if( weapon ) 
+			rider->riderAmmo_ = availableVehicles[rider->vehicle_].ammo[WP_MACHINEGUN] * availableWeapons[weapon].numberPerPackage;
+	}
+
 	// reload weapons
 	for( int i : allWeaponSlots ) 
 	{

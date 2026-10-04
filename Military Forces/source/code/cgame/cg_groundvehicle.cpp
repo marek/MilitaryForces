@@ -94,6 +94,7 @@ void ClientEntity::groundVehicle( clientInfo_t *ci )
 	// turret/gun angle
 	drawInfo.gunAngle = this->lerpAngles2[PITCH];
 	drawInfo.turretAngle = this->lerpAngles2[ROLL];
+	drawInfo.turretGone = (availableVehicles[drawInfo.basicInfo.vehicleIndex].flags & VF_COOKOFF) && (this->currentState.eFlags & EF_DEAD);
 
 	// wheels
 	if( (availableVehicles[ci->vehicle].caps & HC_WHEELS) ) {

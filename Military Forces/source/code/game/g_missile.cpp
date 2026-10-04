@@ -1459,6 +1459,48 @@ void fire_autocannon_GI (GameEntity *self)
 
 /*
 =================
+fire_riderGun
+=================
+*/
+void fire_riderGun( GameEntity *rider, GameEntity *vehicle, const vec3_t angles ) 
+{
+	const int weapIdx = availableVehicles[rider->client_->vehicle_].weapons[WP_MACHINEGUN];
+	vec3_t dir, right, start;
+
+	AngleVectors( angles, dir, right, nullptr );
+	VectorCopy( vehicle->r.currentOrigin, start );
+	VectorMA( start, (rider->client_->sess_.seat_ & 1) ? 6.0f : -6.0f, right, start );
+	SnapVector( start );
+
+	GameEntity* bolt = theLevel.spawnEntity();
+	bolt->classname_ = "bullet";
+	bolt->nextthink_ = theLevel.time_ + 4000;
+	bolt->setThink( std::make_unique<GameEntity::EntityFunc_Free>());
+	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
+	bolt->s.weaponIndex = weapIdx;
+	bolt->r.ownerNum = vehicle->s.number;
+	bolt->parent_ = vehicle;
+	bolt->damage_ = availableWeapons[weapIdx].damage;
+	bolt->targetcat_ = availableWeapons[weapIdx].category;
+	bolt->catmodifier_ = availableWeapons[weapIdx].noncatmod;
+	bolt->methodOfDeath_ = MOD_AUTOCANNON;
+	bolt->clipmask_ = MASK_SHOT;
+	bolt->target_ent_ = nullptr;
+	bolt->s.pos.trType = TR_LINEAR;
+	bolt->s.pos.trTime = theLevel.time_ - MISSILE_PRESTEP_TIME;
+	vehicle->tracerindex_--;
+	if( vehicle->tracerindex_ < 0 ) 
+		vehicle->tracerindex_ = 255;
+	bolt->s.eType = ET_BULLET;
+	bolt->s.generic1 = vehicle->tracerindex_;
+	VectorCopy( start, bolt->s.pos.trBase );
+	VectorScale( dir, availableWeapons[weapIdx].muzzleVelocity, bolt->s.pos.trDelta );
+	SnapVector( bolt->s.pos.trDelta );
+	VectorCopy( start, bolt->r.currentOrigin );
+}
+
+/*
+=================
 fire_maingun MFQ3
 =================
 */

@@ -106,6 +106,8 @@ struct GameClient : public ClientBase
 
 	bool				noclip_;
 	bool				devHold_;
+	int					riderAmmo_;
+	int					riderFireTime_;
 	vec3_t				devHoldOrigin_;
 	vec3_t				devHoldAngles_;
 

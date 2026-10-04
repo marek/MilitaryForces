@@ -899,6 +899,51 @@ void CGame::missileHitWall( int weaponIndex, int clientNum, vec3_t origin, vec3_
 CGame::genericExplosion
 =================
 */
+void CGame::cookOff( vec3_t origin, int vehicle )
+{
+	vec3_t up = { 0, 0, 1 };
+
+	if( vehicle < 0 || vehicle >= bg_numberOfVehicles )
+		return;
+
+	for( int i = 0; i < 14; i++ )
+	{
+		vec3_t point;
+		VectorCopy( origin, point );
+		point[0] += crandom() * (1.0f + i * 0.5f);
+		point[1] += crandom() * (1.0f + i * 0.5f);
+		point[2] += 4.0f + i * 7.0f;
+		LocalEntity* flame = CGame::makeExplosion( point, up, cgs.media.dishFlashModel, cgs.media.rocketExplosionShader[ i & 1 ],
+			i * 160, 700 + i * 60, true );
+		flame->radius = 0.35f + i * 0.09f;
+	}
+
+	const qhandle_t turret = availableVehicles[vehicle].handle[BP_GV_TURRET];
+	if( !turret )
+		return;
+
+	LocalEntity* le = CGame::allocLocalEntity();
+	refEntity_t* re = &le->refEntity;
+	le->leType = LE_FRAGMENT;
+	le->startTime = cg.time;
+	le->endTime = le->startTime + 9000;
+	VectorCopy( origin, re->origin );
+	re->origin[2] += 6;
+	AxisCopy( axisDefault, re->axis );
+	re->hModel = turret;
+	le->pos.trType = TR_GRAVITY;
+	VectorCopy( re->origin, le->pos.trBase );
+	VectorSet( le->pos.trDelta, crandom() * 70.0f, crandom() * 70.0f, 520.0f + random() * 180.0f );
+	le->pos.trTime = cg.time;
+	le->angles.trType = TR_LINEAR;
+	le->angles.trTime = cg.time;
+	VectorSet( le->angles.trDelta, 200.0f + random() * 200.0f, crandom() * 120.0f, crandom() * 90.0f );
+	le->leFlags = LEF_TUMBLE;
+	le->bounceFactor = 0.25f;
+	le->leBounceSoundType = LEBS_NONE;
+	le->leMarkType = LEMT_BURN;
+}
+
 void CGame::genericExplosion( vec3_t origin, int type )
 {
 	LocalEntity	* le = nullptr;

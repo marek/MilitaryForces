@@ -217,7 +217,7 @@ VehicleDeathImpl( GameEntity* self, GameEntity* inflictor, GameEntity* attacker,
 	else
 	{
 		// create a smaller vehicle explosion
-		Game::addEvent( self, EV_VEHICLE_DIE, 0, true );
+		Game::addEvent( self, EV_VEHICLE_DIE, (availableVehicles[self->client_->vehicle_].flags & VF_COOKOFF) ? 1 : 0, true );
 
 		// wreck can be blown up (i.e on crash into ground)
 		self->setDie( std::make_unique<VehicleBase::VehicleDie>());
