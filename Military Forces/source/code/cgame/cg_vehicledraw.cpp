@@ -569,7 +569,10 @@ refEntity_t	    part[BP_HELO_MAX_PARTS];
     VectorCopy (part[BP_HELO_BODY].origin, part[BP_HELO_BODY].oldorigin);
     CGame::addVehiclePart( &part[BP_HELO_BODY] );
 
-
+	// a helicopter with pilot seats in its model gets its crew drawn, like the planes
+	orientation_t seat;
+	if( refExport.LerpTag( &seat, veh->handle[BP_HELO_BODY], 0, 0, 1.0f, "tag_pilot1" ) )
+		CGame::planePilot( &part[BP_HELO_BODY], veh->handle[BP_HELO_BODY], drawInfo->basicInfo.vehicleIndex );
 
 	// rotors
 	for( i = BP_HELO_MAINROTOR; i <= BP_HELO_TAILROTOR; i++ ) {
