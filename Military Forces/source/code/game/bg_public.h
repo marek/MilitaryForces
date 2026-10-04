@@ -12,6 +12,7 @@
 #ifndef __BG_PUBLIC_H__
 #define __BG_PUBLIC_H__
 
+#include <ranges>
 #include "../qcommon/qfiles.h"
 
 
@@ -258,6 +259,9 @@ enum weapon_t {
 	WP_WEAPON6,
 	WP_FLARE
 };
+
+inline constexpr auto secondaryWeaponSlots = std::views::iota( static_cast<int>( WP_WEAPON1 ), static_cast<int>( WP_FLARE ) );
+inline constexpr auto allWeaponSlots = std::views::iota( static_cast<int>( WP_MACHINEGUN ), static_cast<int>( WP_FLARE ) + 1 );
 
 // entityState_t->event values
 // entity events are for effects that take place reletive

@@ -26,11 +26,11 @@ public:
 	static void listCommand();
 
 	enum class Role { Fighter, Bomber, AttackHelo, TransportHelo, Tank, AirDefence, Boat, Infantry };
-	enum class Goal { Roam, Attack, Evade, Climb, Hide, Rearm };
+	enum class Goal { Roam, Attack, Evade, Climb, Hide, Rearm, Capture };
 
 	struct Character
 	{
-		const char*	name;
+		char		name[32];
 		float		aggression;
 		float		caution;
 		float		patience;
@@ -38,9 +38,16 @@ public:
 		float		aim;
 		float		honour;
 		float		cunning;
+		float		prefer[5];
 	};
 
 private:
+	struct Seen
+	{
+		vec3_t	position = { 0, 0, 0 };
+		int		time = 0;
+	};
+
 	struct State
 	{
 		bool	active = false;
@@ -71,6 +78,12 @@ private:
 		float	breakYaw = 0;
 		int		structure = -1;
 		int		structureTime = 0;
+		int		lifeScore = 0;
+		int		badLives = 0;
+		int		goalsReached = 0;
+		int		goalsExpired = 0;
+		int		leader = -1;
+		std::array<Seen, MAX_CLIENTS + 1> seen;
 		vec3_t	hidePoint = { 0, 0, 0 };
 		int		hideTime = 0;
 		bool	hasHide = false;
@@ -131,14 +144,17 @@ private:
 	static Goal chooseGoal( GameEntity* ent, State& bot, const Sense& sense );
 	static const Character& character( const State& bot );
 	static float skill( const State& bot );
+	static int memoryTime( const State& bot );
 	static bool visible( GameEntity* ent, const vec3_t from, GameEntity* target );
 	static bool hasWeaponType( int vehicle, const playerState_t& ps, int type );
-	static bool findHidePoint( GameEntity* ent, State& bot, GameEntity* threat );
+	static bool findHidePoint( GameEntity* ent, State& bot, GameEntity* threat, bool hullDown = false );
 	static void bomb( GameEntity* ent, State& bot, const vec3_t target, usercmd_t& cmd, vec3_t view );
 	static GameEntity* findStructure( GameEntity* ent, State& bot );
 	static void flares( GameEntity* ent, State& bot, const Sense& sense, usercmd_t& cmd );
 	static float ceilingAbove( const vec3_t origin, int passEntity );
 	static void buildPads();
+	static bool flagPosition( int team, vec3_t out );
+	static void loadCharacters();
 	static void buildRoamPoints();
 	static bool steerAround( GameEntity* ent, float wantYaw, float travel, float& yaw );
 	static bool runwayAt( const vec3_t point );
@@ -151,11 +167,12 @@ private:
 	static void sense( GameEntity* ent, State& bot, Sense& out );
 	static void pickGoal( GameEntity* ent, State& bot, float radius );
 	static void fireWeapons( GameEntity* ent, State& bot, const Sense& sense, usercmd_t& cmd, float aimError );
-	static int findWeaponSlot( int vehicle, const playerState_t& ps, bool air, bool& guided );
+	static int findWeaponSlot( int vehicle, const playerState_t& ps, bool air, float dist, bool& guided );
+	static bool outOfAmmo( int vehicle, const playerState_t& ps );
 	static void setRadar( GameEntity* ent, State& bot, bool air );
 	static float heightAboveGround( const vec3_t origin, int passEntity );
 	static bool pathBlocked( const vec3_t origin, const vec3_t dir, float dist, int passEntity, trace_t& tr );
-	static int pickVehicle( int teamFlag, bool allowInfantry = true );
+	static int pickVehicle( int teamFlag, bool allowInfantry = true, const Character* who = nullptr );
 	static unsigned int spawnCategories();
 	static void fill();
 	static void select( GameEntity* ent, State& bot );
@@ -165,6 +182,7 @@ private:
 	static std::vector<Pad> pads_;
 	static bool padsBuilt_;
 	static std::vector<Vec3> roamPoints_;
+	static std::vector<Character> characters_;
 };
 
 #endif

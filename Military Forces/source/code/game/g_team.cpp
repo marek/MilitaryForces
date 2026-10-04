@@ -34,8 +34,9 @@ void Team_InitGame( )
 	switch( g_gametype.integer ) 
 	{
 	case GT_CTF:
-		teamgame.redStatus = teamgame.blueStatus = static_cast<flagStatus_t>(-1); // Invalid to force update
+		teamgame.redStatus = static_cast<flagStatus_t>(-1); // Invalid to force update
 		Team_SetFlagStatus( ClientBase::TEAM_RED, FLAG_ATBASE );
+		teamgame.blueStatus = static_cast<flagStatus_t>(-1); // Invalid to force update
 		Team_SetFlagStatus( ClientBase::TEAM_BLUE, FLAG_ATBASE );
 		break;
 	default:

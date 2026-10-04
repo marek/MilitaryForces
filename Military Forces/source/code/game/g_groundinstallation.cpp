@@ -106,6 +106,9 @@ void Game::update_GI_Targets( GameEntity* ent )
 					// check dist
 					VectorSubtract(hit->r.currentOrigin, ent->r.currentOrigin, dir);
 					dist = VectorNormalize(dir);
+					if( hit->client_ && (hit->client_->sess_.ridingClient_ >= 0 ||
+						VehicleData::stealthHidden( hit->client_->vehicle_, hit->client_->ps_.timers[TIMER_REVEAL], theLevel.time_, dist, range )) )
+						continue;
 					if( !best || dist < closest )
 					{
 						best = hit;
@@ -145,6 +148,12 @@ void Game::update_GI_Targets( GameEntity* ent )
 			// check distance
 			VectorSubtract(ent->tracktarget_->r.currentOrigin, ent->r.currentOrigin, dir);
 			if( VectorLength(dir) > range )
+			{
+				Game::loselock(ent);
+				return;
+			}
+			if( ent->tracktarget_->client_ && VehicleData::stealthHidden( ent->tracktarget_->client_->vehicle_,
+				ent->tracktarget_->client_->ps_.timers[TIMER_REVEAL], theLevel.time_, VectorLength(dir), range ) )
 			{
 				Game::loselock(ent);
 				return;
