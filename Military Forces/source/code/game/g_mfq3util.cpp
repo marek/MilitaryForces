@@ -262,6 +262,16 @@ void updateTargetTracking( GameEntity *ent )
 			unlock(ent);
 			return;			
 		}
+		// a lock needs the target inside the selected weapon's own reach, not only the radar's:
+		// a missile launched at something beyond it loses the target at once
+		const float weaponRange = static_cast<float>( availableWeapons[ent->s.weaponIndex].range );
+		if( weaponRange > 0 && dist > weaponRange )
+		{
+			if( ent->client_->ps_.stats[STAT_LOCKINFO] & LI_LOCKING )
+				unlock(ent);
+			ent->locktime_ = theLevel.time_;
+			return;
+		}
 		// check time
 		if( theLevel.time_ > ent->locktime_ + availableWeapons[ent->s.weaponIndex].lockdelay )
 		{
