@@ -38,6 +38,22 @@ void PM_LQMGroundTrace( )
 	pm->trace (&trace, pm->ps->origin, pm->mins, pm->maxs, end, pm->ps->clientNum, pm->tracemask, false);
 	pml.groundTrace = trace;
 
+	// touching something from below or from inside (the sky after ejecting at the top of the map) is not
+	// standing on it: only a surface that faces up is ground
+	if ( trace.fraction < 1.0 ) {
+		// stuck into something overhead: solid above the head, open below the feet
+		vec3_t above, below;
+		VectorSet( above, pm->ps->origin[0], pm->ps->origin[1], pm->ps->origin[2] + pm->maxs[2] + 2 );
+		VectorSet( below, pm->ps->origin[0], pm->ps->origin[1], pm->ps->origin[2] + pm->mins[2] - 4 );
+		const bool overhead = trace.startsolid && ( pm->pointcontents( above, pm->ps->clientNum ) & pm->tracemask ) &&
+			!( pm->pointcontents( below, pm->ps->clientNum ) & pm->tracemask );
+		if ( overhead || ( !trace.startsolid && trace.plane.normal[2] <= 0 ) ) {
+			trace.fraction = 1.0;
+			if ( overhead )
+				pm->ps->origin[2] -= 2;
+		}
+	}
+
 	// if the trace didn't hit anything, we are in free fall
 	if ( trace.fraction == 1.0 ) {
 		// go into jump animation

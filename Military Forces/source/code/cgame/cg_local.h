@@ -1057,6 +1057,7 @@ struct DrawInfo_Helo_t {
     BasicDrawInfo_t		basicInfo;
 	float				turretAngle[4];
 	float				gunAngle[4];
+	float				doorGunAim = 0;	// where the door guns are being aimed, before each gun's own stops
 	int					gearFrame;
 	int					bayFrame;
 };

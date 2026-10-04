@@ -19,6 +19,10 @@ void MF_Spawn_Plane(GameEntity *ent, int idx, bool landed)
 	// set flags
 	ent->client_->ps_.ONOFF = OO_NOTHING_ON;
 
+	// the throttle of the last life must not carry over: an air spawn starts in a hover
+	ent->client_->ps_.fixed_throttle = 0;
+	ent->client_->ps_.throttle = 0;
+
 	// speed, throttle depend on landed/airborne 
 	if( landed ) 
 	{

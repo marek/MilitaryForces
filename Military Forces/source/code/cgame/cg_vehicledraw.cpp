@@ -670,8 +670,17 @@ refEntity_t	    part[BP_HELO_MAX_PARTS];
 
 	// muzzleflash
 	if( drawInfo->basicInfo.drawMuzzleFlash ) {
-		CGame::vehicleMuzzleFlash( drawInfo->basicInfo.flashWeaponIndex, &part[BP_HELO_GUNBARREL], 
-							   veh->handle[BP_HELO_GUNBARREL], drawInfo->basicInfo.vehicleIndex );
+		if( veh->flags & VF_DOORGUNS ) {
+			// only the door gun that bears on the aim is firing
+			for( int gun = 0; gun < 2; ++gun ) {
+				if( doorGunBears( gun == 1, drawInfo->doorGunAim ) && part[BP_HELO_GUNBARREL + 2 * gun].hModel )
+					CGame::vehicleMuzzleFlash( drawInfo->basicInfo.flashWeaponIndex, &part[BP_HELO_GUNBARREL + 2 * gun],
+										   veh->handle[BP_HELO_GUNBARREL + 2 * gun], drawInfo->basicInfo.vehicleIndex );
+			}
+		} else {
+			CGame::vehicleMuzzleFlash( drawInfo->basicInfo.flashWeaponIndex, &part[BP_HELO_GUNBARREL], 
+								   veh->handle[BP_HELO_GUNBARREL], drawInfo->basicInfo.vehicleIndex );
+		}
 	}
 
 }

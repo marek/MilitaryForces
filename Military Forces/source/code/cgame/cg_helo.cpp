@@ -209,6 +209,7 @@ void ClientEntity::helo( clientInfo_t *ci )
 		if( (availableVehicles[ci->vehicle].flags & VF_DOORGUNS) && i < 2 ) {
 			yaw = this->lerpAngles2[ROLL];
 			if( yaw > 180 ) yaw -= 360;
+			drawInfo.doorGunAim = yaw;
 			yaw = doorGunYaw( i == 1, yaw );
 			pitch = this->lerpAngles2[PITCH];
 			if( pitch > 180 ) pitch -= 360;
