@@ -396,14 +396,15 @@ void VehicleData::loadAllVehicleData()
 		availableVehicles[i].mins[2] += 1;// to look better ?
 		if( availableVehicles[i].cat & CAT_BOAT ) 
 			VehicleData::findDeck( name, &availableVehicles[i] );
-		if( availableVehicles[i].cat & (CAT_HELO|CAT_BOAT) ) 
+		// boats and transport helicopters carry a crew; attack helicopters take nobody aboard
+		if( availableVehicles[i].cat & CAT_HELO ) 
+			availableVehicles[i].seats = (availableVehicles[i].cls & CLASS_HELO_ATTACK) ? 0 : 4;
+		else if( availableVehicles[i].cat & CAT_BOAT ) 
 			availableVehicles[i].seats = 4;
 		else if( availableVehicles[i].cat & CAT_GROUND ) 
 			availableVehicles[i].seats = (availableVehicles[i].caps & HC_WHEELS) ? 3 : 1;
 		else 
 			availableVehicles[i].seats = 0;
-		if( !Q_stricmp( availableVehicles[i].modelName, "comanche" ) ) 
-			availableVehicles[i].seats = 1;
 
 		// helo/plane specific
 		if(availableVehicles[i].cat & CAT_PLANE) 

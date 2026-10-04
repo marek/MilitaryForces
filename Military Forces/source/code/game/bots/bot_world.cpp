@@ -385,8 +385,8 @@ void Bots::pickGoal( GameEntity* ent, State& bot, float radius )
 		buildRoamPoints();
 	const unsigned int cat = ent->client_->vehicle_ >= 0 ? availableVehicles[ent->client_->vehicle_].cat : 0;
 
-	// Everyone has a rough idea where the enemy is. Part of the time a bot goes looking for a real player on the
-	// other side, the aggressive ones more often, so the fight comes to the people playing.
+	// Everyone has a rough idea where the enemy is. Part of the time a bot goes looking for the nearest opponent
+	// it could fight, the aggressive ones more often, so nobody is left alone for long.
 	GameEntity* quarry = nullptr;
 	if( !(cat & CAT_LQM) && random() < 0.3f + 0.4f * character( bot ).aggression )
 	{
@@ -394,7 +394,7 @@ void Bots::pickGoal( GameEntity* ent, State& bot, float radius )
 		for( int i = 1; i <= theLevel.maxclients_; i++ )
 		{
 			GameEntity* other = theLevel.getEntity( i );
-			if( other == ent || isBot( i ) || !alive( other ) || other->client_->sess_.ridingClient_ >= 0 )
+			if( other == ent || !alive( other ) || other->client_->sess_.ridingClient_ >= 0 )
 				continue;
 			if( g_gametype.integer >= GT_TEAM && OnSameTeam( ent, other ) )
 				continue;

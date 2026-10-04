@@ -52,6 +52,7 @@ static SDL_AudioDeviceID sdlPlaybackDevice;
 
 static SDL_AudioDeviceID sdlCaptureDevice;
 static cvar_t *s_sdlCapture;
+static bool sdlCaptureDeferred = false;
 static float sdlMasterGain = 1.0f;
 #endif
 
@@ -281,10 +282,9 @@ bool SNDDMA_Init()
 #ifdef USE_SDL_AUDIO_CAPTURE
 	// !!! FIXME: some of these SDL_OpenAudioDevice() values should be cvars.
 	s_sdlCapture = CvarSystem::get( "s_sdlCapture", "1", CVAR_ARCHIVE | CVAR_LATCH );
-	// the microphone is only opened when voice chat is wanted: opening it makes the system ask for permission
-	if (!s_sdlCapture->integer || !CvarSystem::get( "s_microphone", "0", CVAR_ARCHIVE | CVAR_LATCH )->integer)
+	if (!s_sdlCapture->integer)
 	{
-		Common::printf("Microphone not opened ('+set s_microphone 1' turns voice capture on)\n");
+		Common::printf("SDL audio capture support disabled by user ('+set s_sdlCapture 1' to enable)\n");
 	}
 #if USE_MUMBLE
 	else if (cl_useMumble->integer)
@@ -294,16 +294,9 @@ bool SNDDMA_Init()
 #endif
 	else
 	{
-		/* !!! FIXME: list available devices and let cvar specify one, like OpenAL does */
-		SDL_AudioSpec spec;
-		SDL_zero(spec);
-		spec.freq = 48000;
-		spec.format = AUDIO_S16SYS;
-		spec.channels = 1;
-		spec.samples = VOIP_MAX_PACKET_SAMPLES * 4;
-		sdlCaptureDevice = SDL_OpenAudioDevice(nullptr, SDL_TRUE, &spec, nullptr, 0);
-		Common::printf( "SDL capture device %s.\n",
-				    (sdlCaptureDevice == 0) ? "failed to open" : "opened");
+		// opened the first time voice chat records, see SNDDMA_StartCapture: opening the microphone is
+		// what makes the system ask for permission, and that should happen when the player uses it
+		sdlCaptureDeferred = true;
 	}
 
 	sdlMasterGain = 1.0f;
@@ -388,6 +381,20 @@ void SNDDMA_BeginPainting ()
 void SNDDMA_StartCapture()
 {
 #ifdef USE_SDL_AUDIO_CAPTURE
+	if (!sdlCaptureDevice && sdlCaptureDeferred)
+	{
+		/* !!! FIXME: list available devices and let cvar specify one, like OpenAL does */
+		sdlCaptureDeferred = false;
+		SDL_AudioSpec spec;
+		SDL_zero(spec);
+		spec.freq = 48000;
+		spec.format = AUDIO_S16SYS;
+		spec.channels = 1;
+		spec.samples = VOIP_MAX_PACKET_SAMPLES * 4;
+		sdlCaptureDevice = SDL_OpenAudioDevice(nullptr, SDL_TRUE, &spec, nullptr, 0);
+		Common::printf( "SDL capture device %s.\n",
+				    (sdlCaptureDevice == 0) ? "failed to open" : "opened");
+	}
 	if (sdlCaptureDevice)
 	{
 		SDL_ClearQueuedAudio(sdlCaptureDevice);
