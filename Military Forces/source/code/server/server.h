@@ -497,6 +497,7 @@ public:
 	static void mapRestart_f();
 	static void kick_f();
 	static void kickBots_f();
+	static void traceBench_f();
 	static void kickAll_f();
 	static void kickNum_f();
 	static void ban_f( void );

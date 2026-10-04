@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // cmodel.c -- model loading
 
 #include "cm_local.h"
+#include "cm_simd.h"
 
 #ifdef BSPC
 
@@ -61,6 +62,7 @@ byte		*cmod_base;
 #ifndef BSPC
 cvar_t		*cm_noAreas;
 cvar_t		*cm_noCurves;
+cvar_t		*cm_wideNodeOffset;
 cvar_t		*cm_playerCurveClip;
 #endif
 
@@ -257,6 +259,24 @@ void CMod_LoadBrushes( lump_t *l ) {
 		out->contents = cm.shaders[out->shaderNum].contentFlags;
 
 		CM_BoundBrush( out );
+
+		// pack the side planes four to a block; unused slots hold a plane nothing can cross
+		const int blocks = ( out->numsides + 3 ) / 4;
+		out->planeBlocks = blocks ? static_cast<float *>(Hunk_Alloc( blocks * cmPlaneBlockFloats * sizeof( float ), h_high )) : nullptr;
+		for ( int side = 0 ; side < blocks * 4 ; side++ ) {
+			float *block = out->planeBlocks + ( side / 4 ) * cmPlaneBlockFloats;
+			const int lane = side & 3;
+			if ( side < out->numsides ) {
+				const cplane_t *plane = out->sides[side].plane;
+				block[lane] = plane->normal[0];
+				block[4 + lane] = plane->normal[1];
+				block[8 + lane] = plane->normal[2];
+				block[12 + lane] = plane->dist;
+			} else {
+				block[lane] = block[4 + lane] = block[8 + lane] = 0.0f;
+				block[12 + lane] = 1.0e30f;
+			}
+		}
 	}
 
 }
@@ -583,6 +603,7 @@ void CollisionModel::loadMap( const char *name, bool clientload, int *checksum )
 #ifndef BSPC
 	cm_noAreas = CvarSystem::get ("cm_noAreas", "0", CVAR_CHEAT);
 	cm_noCurves = CvarSystem::get ("cm_noCurves", "0", CVAR_CHEAT);
+	cm_wideNodeOffset = CvarSystem::get ("cm_wideNodeOffset", "0", CVAR_CHEAT);
 	cm_playerCurveClip = CvarSystem::get ("cm_playerCurveClip", "1", CVAR_ARCHIVE|CVAR_CHEAT );
 #endif
 	Common::dPrintf( "CollisionModel::loadMap( %s, %i )\n", name, clientload );

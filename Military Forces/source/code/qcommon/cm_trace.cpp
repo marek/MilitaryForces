@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 #include "cm_local.h"
+#include "cm_simd.h"
 
 // always use bbox vs. bbox collision and never capsule vs. bbox or vice versa
 //#define ALWAYS_BBOX_VS_BBOX
@@ -580,8 +581,36 @@ void CM_TraceThroughBrush( traceWork_t *tw, cbrush_t *brush ) {
 		// find the latest time the trace crosses a plane towards the interior
 		// and the earliest time the trace crosses a plane towards the exterior
 		//
+#if CM_SIMD
+		// distances of start and end to four side planes at a time, in the same order of operations as the plain code
+		float distStart[4], distEnd[4];
+		const bool packed = brush->planeBlocks != nullptr;
+		const Float4 startX = Float4::splat( tw->start[0] ), startY = Float4::splat( tw->start[1] ), startZ = Float4::splat( tw->start[2] );
+		const Float4 endX = Float4::splat( tw->end[0] ), endY = Float4::splat( tw->end[1] ), endZ = Float4::splat( tw->end[2] );
+		const Float4 lowX = Float4::splat( tw->size[0][0] ), lowY = Float4::splat( tw->size[0][1] ), lowZ = Float4::splat( tw->size[0][2] );
+		const Float4 highX = Float4::splat( tw->size[1][0] ), highY = Float4::splat( tw->size[1][1] ), highZ = Float4::splat( tw->size[1][2] );
+#endif
 		for (i = 0; i < brush->numsides; i++) {
 			side = brush->sides + i;
+#if CM_SIMD
+			if ( packed ) {
+				if ( !( i & 3 ) ) {
+					const float *block = brush->planeBlocks + ( i >> 2 ) * cmPlaneBlockFloats;
+					const Float4 nx = Float4::load( block ), ny = Float4::load( block + 4 ), nz = Float4::load( block + 8 );
+					// the box corner nearest the plane: the high side where the normal is negative, the low side otherwise
+					const Float4 cornerX = Float4::selectNegative( nx, highX, lowX );
+					const Float4 cornerY = Float4::selectNegative( ny, highY, lowY );
+					const Float4 cornerZ = Float4::selectNegative( nz, highZ, lowZ );
+					const Float4 planeDist = Float4::load( block + 12 ) - ( cornerX * nx + cornerY * ny + cornerZ * nz );
+					( ( startX * nx + startY * ny + startZ * nz ) - planeDist ).store( distStart );
+					( ( endX * nx + endY * ny + endZ * nz ) - planeDist ).store( distEnd );
+				}
+				d1 = distStart[i & 3];
+				d2 = distEnd[i & 3];
+				plane = side->plane;
+			} else
+#endif
+			{
 			plane = side->plane;
 
 			// adjust the plane distance appropriately for mins/maxs
@@ -589,6 +618,7 @@ void CM_TraceThroughBrush( traceWork_t *tw, cbrush_t *brush ) {
 
 			d1 = DotProduct( tw->start, plane->normal ) - dist;
 			d2 = DotProduct( tw->end, plane->normal ) - dist;
+			}
 
 			if (d2 > 0) {
 				getout = true;	// endpoint is not in solid
@@ -672,6 +702,14 @@ void CM_TraceThroughLeaf( traceWork_t *tw, cLeaf_t *leaf ) {
 	cbrush_t	*b;
 	cPatch_t	*patch;
 
+#if CM_SIMD
+	// the trace bounds grown by the clip epsilon once, compared with each brush's bounds three axes at a time
+	const float traceLow[4] = { tw->bounds[0][0], tw->bounds[0][1], tw->bounds[0][2], 0.0f };
+	const float traceHigh[4] = { tw->bounds[1][0], tw->bounds[1][1], tw->bounds[1][2], 0.0f };
+	const Float4 traceMins = Float4::load( traceLow ), traceMaxs = Float4::load( traceHigh );
+	const Float4 epsilon = Float4::splat( SURFACE_CLIP_EPSILON );
+#endif
+
 	// trace line against all brushes in the leaf
 	for ( k = 0 ; k < leaf->numLeafBrushes ; k++ ) {
 		brushnum = cm.leafbrushes[leaf->firstLeafBrush+k];
@@ -686,10 +724,18 @@ void CM_TraceThroughLeaf( traceWork_t *tw, cLeaf_t *leaf ) {
 			continue;
 		}
 
+#if CM_SIMD
+		// bounds[0] and bounds[1] are six floats in a row; the fourth lane of each load is ignored
+		const Float4 brushMins = Float4::load( b->bounds[0] ), brushMaxs = Float4::load( b->bounds[1] );
+		if ( ( Float4::lessMask( traceMaxs, brushMins - epsilon ) | Float4::lessMask( brushMaxs + epsilon, traceMins ) ) & 7 ) {
+			continue;
+		}
+#else
 		if ( !CM_BoundsIntersect( tw->bounds[0], tw->bounds[1],
 					b->bounds[0], b->bounds[1] ) ) {
 			continue;
 		}
+#endif
 
 		CM_TraceThroughBrush( tw, b );
 		if ( !tw->trace.fraction ) {
@@ -1070,8 +1116,13 @@ void CM_TraceThroughTree( traceWork_t *tw, int num, float p1f, float p2f, vec3_t
 		if ( tw->isPoint ) {
 			offset = 0;
 		} else {
-			// this is silly
-			offset = 2048;
+			// the box's real reach along the plane normal (was a flat 2048, which walked both sides of every angled split)
+			offset = fabs( tw->extents[0] * plane->normal[0] ) +
+				fabs( tw->extents[1] * plane->normal[1] ) +
+				fabs( tw->extents[2] * plane->normal[2] );
+			if ( cm_wideNodeOffset->integer ) {
+				offset = 2048;
+			}
 		}
 	}
 

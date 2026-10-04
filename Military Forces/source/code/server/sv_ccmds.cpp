@@ -436,6 +436,59 @@ void ServerMain::kick_f( ) {
 
 /*
 ==================
+ServerMain::traceBench_f
+
+times a fixed set of world traces and prints a checksum of the results,
+so trace optimisations can be measured and checked for identical output
+==================
+*/
+void ServerMain::traceBench_f()
+{
+	if( !com_sv_running->integer )
+	{
+		Common::printf( "No map loaded.\n" );
+		return;
+	}
+	const int count = CommandSystem::argc() > 1 ? atoi( CommandSystem::argv( 1 ) ) : 20000;
+	vec3_t worldMins, worldMaxs;
+	CollisionModel::modelBounds( 0, worldMins, worldMaxs );
+	unsigned int seed = 12345;
+	const auto next = [&seed]() { seed = seed * 1664525u + 1013904223u; return (seed >> 8) / 16777216.0f; };
+	struct Kind { const char* name; float halfWidth; float length; };
+	const Kind kinds[] = { { "point 900", 0.0f, 900.0f }, { "box60 900", 60.0f, 900.0f }, { "box28 160", 28.0f, 160.0f }, { "box60 place", 60.0f, 0.0f } };
+	for( const Kind& kind : kinds )
+	{
+		double checksum = 0, distances = 0;
+		int solid = 0;
+		int hits = 0;
+		const int startTime = System::milliseconds();
+		for( int i = 0; i < count; i++ )
+		{
+			vec3_t start, end, dir;
+			for( int k = 0; k < 3; k++ )
+			{
+				start[k] = worldMins[k] + next() * (worldMaxs[k] - worldMins[k]);
+				dir[k] = next() * 2.0f - 1.0f;
+			}
+			VectorNormalize( dir );
+			VectorMA( start, kind.length, dir, end );
+			vec3_t mins = { -kind.halfWidth, -kind.halfWidth, -kind.halfWidth * 0.4f }, maxs = { kind.halfWidth, kind.halfWidth, kind.halfWidth * 0.4f };
+			trace_t tr;
+			CollisionModel::boxTrace( &tr, start, end, mins, maxs, 0, MASK_PLAYERSOLID, false );
+			checksum += tr.fraction + (tr.startsolid ? 2.0 : 0.0) + tr.plane.normal[2] * 0.25;
+			distances += tr.fraction;
+			if( tr.startsolid )
+				solid++;
+			if( tr.fraction < 1.0f )
+				hits++;
+		}
+		const int elapsed = System::milliseconds() - startTime;
+		Common::printf( "TRACEBENCH %s: %d traces %d ms (%.2f us each) hits %d startsolid %d fractions %.6f checksum %.6f\n", kind.name, count, elapsed, elapsed * 1000.0 / count, hits, solid, distances, checksum );
+	}
+}
+
+/*
+==================
 ServerMain::kickBots_f
 
 Kick all bots off of the server
@@ -1561,6 +1614,7 @@ void ServerMain::addOperatorCommands( ) {
 	}
 #endif
 	CommandSystem::addCommand ("kickbots", ServerMain::kickBots_f);
+	CommandSystem::addCommand ("tracebench", ServerMain::traceBench_f);
 	CommandSystem::addCommand ("kickall", ServerMain::kickAll_f);
 	CommandSystem::addCommand ("kicknum", ServerMain::kickNum_f);
 	CommandSystem::addCommand ("clientkick", ServerMain::kickNum_f); // Legacy command

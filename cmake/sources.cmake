@@ -76,3 +76,10 @@ set(SDL_SOURCES
 set(SDL_RENDERER_SOURCES
     ${SOURCE_DIR}/sdl/sdl_glimp.cpp
     ${SOURCE_DIR}/sdl/sdl_gamma.cpp)
+
+# the collision code is always built optimised: every trace in the game goes through it, and its SIMD paths need inlining
+if(NOT MSVC)
+    set_source_files_properties(
+        ${SOURCE_DIR}/qcommon/cm_trace.cpp ${SOURCE_DIR}/qcommon/cm_test.cpp ${SOURCE_DIR}/qcommon/cm_patch.cpp
+        PROPERTIES COMPILE_OPTIONS "-O2")
+endif()
