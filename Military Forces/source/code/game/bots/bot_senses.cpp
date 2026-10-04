@@ -205,6 +205,9 @@ GameEntity* Bots::findEnemy( GameEntity* ent, State& bot, Role role )
 				continue;
 			if( air )
 				score *= 1.5f;
+			// an aircraft sitting on a runway is the best target a tank gun can have
+			else if( ov.cat & (CAT_PLANE|CAT_HELO) )
+				score *= 0.5f;
 			break;
 		case Role::AirDefence:
 			if( !air )

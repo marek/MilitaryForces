@@ -98,6 +98,20 @@ struct GoalScoring
 		return score;
 	}
 
+	// a supply helicopter with no crates left has nothing to give until it restocks
+	static bool suppliesGone( const Situation& s )
+	{
+		if( !Bots::carriesSupplies( s.vehicle ) )
+			return false;
+		for( int slot : allWeaponSlots )
+		{
+			const int type = availableWeapons[availableVehicles[s.vehicle].weapons[slot]].type;
+			if( (type == WT_FUELCRATE || type == WT_AMMOCRATE || type == WT_HEALTHCRATE) && s.ps.ammo[slot] > 0 )
+				return false;
+		}
+		return true;
+	}
+
 	static float rearm( const Situation& s )
 	{
 		if( s.sense.role == Role::Infantry )
@@ -109,7 +123,7 @@ struct GoalScoring
 			need = 1.0f;
 		else if( s.sense.health < 0.45f )
 			need = 0.2f + 0.8f * s.who.caution;
-		else if( Bots::outOfAmmo( s.vehicle, s.ps ) )
+		else if( Bots::outOfAmmo( s.vehicle, s.ps ) || suppliesGone( s ) )
 			need = 0.7f;
 		else if( availableVehicles[s.vehicle].ammo[WP_FLARE] > 0 && s.ps.ammo[WP_FLARE] <= 0 && s.sense.role != Role::Tank )
 			need = 0.3f * s.who.caution;

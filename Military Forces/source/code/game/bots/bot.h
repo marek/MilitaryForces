@@ -227,6 +227,7 @@ private:
 	static GameEntity* walkerNear( GameEntity* ent, State& bot, float range );
 	static int ridersOf( GameEntity* ent );
 	static bool carriesSupplies( int vehicle );
+	static bool teamHasSupplier( int team, GameEntity* except = nullptr );
 	static bool turnClear( GameEntity* ent, float radius, float degrees, float climb = 0 );
 	static void sense( GameEntity* ent, State& bot, Sense& out );
 	static void logDeath( GameEntity* self, GameEntity* attacker, int meansOfDeath );

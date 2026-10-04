@@ -95,6 +95,27 @@ struct SurfaceTasks
 		return Status::Running;
 	}
 
+	// an aircraft on the ground within gun range: no need to drive up to it
+	static bool canShellAirfield( Mind& c )
+	{
+		constexpr float nearest = 1200.0f;
+		constexpr float farthest = 6000.0f;
+		if( c.boat || !c.sense.enemy || c.sense.enemyAir || c.bot.desire == Goal::Capture || c.bot.desire == Goal::Evade )
+			return false;
+		if( !(availableVehicles[c.sense.enemy->client_->vehicle_].cat & (CAT_PLANE|CAT_HELO)) )
+			return false;
+		return c.sense.enemyDist > nearest && c.sense.enemyDist < farthest && Bots::hasWeaponType( c.client->vehicle_, c.ps, WT_BALLISTICGUN );
+	}
+
+	// stop and lob shells at it from where we are, at the place it was last seen if it is out of sight
+	static Status shellAirfield( Mind& c )
+	{
+		c.bot.hasHide = false;
+		VectorCopy( c.sense.enemyDir, c.course );
+		c.hold = true;
+		return Status::Running;
+	}
+
 	static Status withdraw( Mind& c )
 	{
 		c.bot.hasHide = false;
@@ -334,6 +355,7 @@ struct SurfaceTasks
 			t.action( "drive to supplies", driveToSupplies ),
 			t.when( "wants to rearm", rearming, t.action( "drive to pad", driveToPad ) ),
 			t.when( "evading", evading, t.action( "withdraw", withdraw ) ),
+			t.when( "aircraft on the ground in range", canShellAirfield, t.action( "shell airfield", shellAirfield ) ),
 			t.when( "ground enemy", engaging, t.action( "engage", engage ) ),
 			t.when( "has a leader", hasLeader, t.action( "convoy", convoy ) ),
 			t.action( "drive to goal", driveToGoal ) } );

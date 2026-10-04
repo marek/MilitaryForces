@@ -112,6 +112,18 @@ float Bots::switchDesire( const State& bot, int kind )
 	return std::clamp( failureRate * failureSensitivity( character( bot ) ) * (0.4f + 0.2f * bot.badLives), 0.0f, 0.9f );
 }
 
+bool Bots::teamHasSupplier( int team, GameEntity* except )
+{
+	for( int i = 1; i <= theLevel.maxclients_; i++ )
+	{
+		GameEntity* other = theLevel.getEntity( i );
+		if( other && other != except && other->inuse_ && other->client_ && other->client_->sess_.sessionTeam_ == team && other->client_->vehicle_ >= 0 &&
+			carriesSupplies( other->client_->vehicle_ ) )
+			return true;
+	}
+	return false;
+}
+
 int Bots::pickVehicle( int teamFlag, bool allowInfantry, const Character* who, const State* memory )
 {
 	unsigned int cats = spawnCategories();
@@ -129,15 +141,7 @@ int Bots::pickVehicle( int teamFlag, bool allowInfantry, const Character* who, c
 	const bool groundTargets = (cats & (CAT_GROUND|CAT_BOAT)) != 0;
 	const unsigned long gameset = Game::getGameset();
 	// a team with nobody flying supplies: team-minded characters consider taking the supply helicopter
-	bool teamHasSupplier = g_gametype.integer < GT_TEAM;
-	const int ownTeam = teamFlag == MF_TEAM_1 ? ClientBase::TEAM_RED : ClientBase::TEAM_BLUE;
-	for( int i = 1; i <= theLevel.maxclients_ && !teamHasSupplier; i++ )
-	{
-		GameEntity* other = theLevel.getEntity( i );
-		if( other && other->inuse_ && other->client_ && other->client_->sess_.sessionTeam_ == ownTeam && other->client_->vehicle_ >= 0 &&
-			carriesSupplies( other->client_->vehicle_ ) )
-			teamHasSupplier = true;
-	}
+	const bool teamHasSupplier = g_gametype.integer < GT_TEAM || Bots::teamHasSupplier( teamFlag == MF_TEAM_1 ? ClientBase::TEAM_RED : ClientBase::TEAM_BLUE );
 	std::array<int, 256> candidates;
 	std::array<int, 256> weights;
 	int num = 0, total = 0;
@@ -330,12 +334,25 @@ void Bots::think( GameEntity* ent, State& bot, usercmd_t& cmd )
 			bot.ownLives[kind]++;
 			if( failed )
 				bot.ownFailures[kind]++;
-			if( random() < switchDesire( bot, kind ) )
+			bool reconsider = random() < switchDesire( bot, kind );
+			// a supply pilot whose supplies nobody used in a long life gets bored, the impatient first;
+			// one who scored with them stays (a scoring life is not a failed one)
+			constexpr int longLife = 120000;
+			const bool supplier = carriesSupplies( client->vehicle_ );
+			if( supplier && failed && theLevel.time_ - bot.spawnTime > longLife && random() < 0.6f * (1.0f - character( bot ).patience) )
+				reconsider = true;
+			// every death is a chance to notice that the team has nobody flying supplies
+			const bool teamGame = g_gametype.integer >= GT_TEAM;
+			const bool fillSupply = teamGame && !supplier && !reconsider && !teamHasSupplier( client->sess_.sessionTeam_, ent ) &&
+				random() < 0.35f * character( bot ).teamwork;
+			if( reconsider || fillSupply )
 			{
 				int teamFlag = MF_TEAM_ANY;
 				if( g_gametype.integer >= GT_TEAM )
 					teamFlag = client->sess_.sessionTeam_ == ClientBase::TEAM_RED ? MF_TEAM_1 : MF_TEAM_2;
-				const int vehicle = pickVehicle( teamFlag, false, &character( bot ), &bot );
+				int vehicle = pickVehicle( teamFlag, false, &character( bot ), &bot );
+				if( fillSupply && vehicle >= 0 && !carriesSupplies( vehicle ) )
+					vehicle = -1;
 				if( vehicle >= 0 )
 				{
 					bot.vehicle = vehicle;
