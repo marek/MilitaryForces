@@ -476,7 +476,7 @@ static void CG_CacheBoat(int index)
 			// temp
 //			{
 //				md3Tag_t tag;
-//				if( MF_findTag(name, "tag_turret", &tag) ) {
+//				if( VehicleData::findTag(name, "tag_turret", &tag) ) {
 //					CG_Printf( "found tag_turret in %s: %.1f %.1f %.1f\n", name,
 //						tag.origin[0], tag.origin[1], tag.origin[2] );
 //				}
@@ -517,7 +517,7 @@ static void CG_CacheBoat(int index)
 
 			Com_sprintf( body, sizeof(body), "%s.md3", basename );
 			availableVehicles[index].handle[i] = CG_RegisterVehiclePart( name, 
-				availableVehicles[index].handle[BP_BOAT_BODY] && MF_findTag( body, turretTags[i/2], &tag ) );
+				availableVehicles[index].handle[BP_BOAT_BODY] && VehicleData::findTag( body, turretTags[i/2], &tag ) );
 		} else {
 			availableVehicles[index].handle[i] = CG_RegisterVehiclePart( name, availableVehicles[index].handle[i-1] != 0 );
 		}
@@ -736,7 +736,7 @@ completeLoadout_t* ClientEntity::entityLoadout()
 	int key = ((idx + 1) << 1) | ((this->currentState.eFlags & EF_TELEPORT_BIT) ? 1 : 0);
 	if( cg_loadoutKeys[n] != key ) 
 	{
-		MF_getDefaultLoadoutForVehicle( idx, &cg_loadouts[n], nullptr );
+		VehicleData::getDefaultLoadoutForVehicle( idx, &cg_loadouts[n], nullptr );
 		cg_loadoutKeys[n] = key;
 	}
 	return &cg_loadouts[n];

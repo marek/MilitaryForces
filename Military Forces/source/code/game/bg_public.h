@@ -871,8 +871,6 @@ struct completeVehicleData_t
 
 extern completeVehicleData_t availableVehicles[];
 
-bool MF_StealthHidden( int vehicle, int revealTime, int time, float dist, float radarRange );
-bool MF_VehicleHasTurret( int vehicle );
 
 // number of available vehicles
 extern int bg_numberOfVehicles;
@@ -1108,33 +1106,37 @@ struct mission_vehicle_t {
 
 
 
-void MF_ParseMissionScripts( char *buf, mission_overview_t* overview, 
-		mission_vehicle_t* vehs, mission_groundInstallation_t* gis);
-void MF_CheckMissionScriptOverviewValid( mission_overview_t* overview, bool updateFormat );
-void MF_SetMissionScriptOverviewDefaults( mission_overview_t* overview );
-int MF_getIndexOfVehicle( int start, int gameset, int team, int cat, int cls, int vehicleType, int change_vehicle, bool allowNukes );
-int MF_getIndexOfVehicleEx( int start, int gameset, int team, int cat, int cls, int vehicleType, int change_vehicle, bool allowNukes );
-int MF_getIndexOfGI( int start, int gameset, int GIType, int mode);
-int MF_getItemIndexFromHex(int hexValue);
-int MF_getNumberOfItems(const char **itemlist);
-char * MF_CreateModelPathname( int vehicle, char * pFormatString );
-char * MF_CreateGIPathname( int vehicle, char * pFormatString );
-void MF_LimitFloat( float * value, float min, float max );
-void MF_LimitInt( int * value, int min, int max );
-int MF_ExtractEnumFromId( int vehicle, unsigned int op );
-bool MF_findTag(const char* fileName, const char* tagname, md3Tag_t* tag);
-bool MF_distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout );
-void MF_calculateAllDefaultLoadouts();
-void MF_getDefaultLoadoutForVehicle( int idx, completeLoadout_t* loadout, playerState_t* ps );
-bool MF_removeWeaponFromLoadout( int weaponIndex, completeLoadout_t* loadout, playerState_t* ps,
-									 bool* wingtip, vec3_t pos, int launchPos );
-int MF_addWeaponToLoadout( int weaponIndex, completeLoadout_t* loadout, playerState_t* ps );
-bool MF_getNumberOfFrames(const char* fileName, int* number);
-bool MF_getNumberOfTags(const char* fileName, int* number);
-int MF_getTagsContaining(const char* fileName, const char* str, md3Tag_t* tags, int num);
-bool MF_getDimensions(const char* fileName, int frame, vec3_t* maxs, vec3_t* mins);
-void MF_LoadAllVehicleData();
-int MF_findWeaponsOfType( int weaponIndex, completeLoadout_t* loadout );
+class VehicleData
+{
+public:
+	static bool stealthHidden( int vehicle, int revealTime, int time, float dist, float radarRange );
+	static bool vehicleHasTurret( int vehicle );
+	static void parseMissionScripts( char *buf, mission_overview_t* overview, mission_vehicle_t* vehs, mission_groundInstallation_t* gis);
+	static void checkMissionScriptOverviewValid( mission_overview_t* overview, bool updateFormat );
+	static void setMissionScriptOverviewDefaults( mission_overview_t* overview );
+	static int getIndexOfVehicle( int start, int gameset, int team, int cat, int cls, int vehicleType, int change_vehicle, bool allowNukes );
+	static int getIndexOfVehicleEx( int start, int gameset, int team, int cat, int cls, int vehicleType, int change_vehicle, bool allowNukes );
+	static int getIndexOfGI( int start, int gameset, int GIType, int mode);
+	static int getItemIndexFromHex(int hexValue);
+	static int getNumberOfItems(const char **itemlist);
+	static char * createModelPathname( int vehicle, char * pFormatString );
+	static char * createGIPathname( int vehicle, char * pFormatString );
+	static void limitFloat( float * value, float min, float max );
+	static void limitInt( int * value, int min, int max );
+	static int extractEnumFromId( int vehicle, unsigned int op );
+	static bool findTag(const char* fileName, const char* tagname, md3Tag_t* tag);
+	static bool distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout );
+	static void calculateAllDefaultLoadouts();
+	static void getDefaultLoadoutForVehicle( int idx, completeLoadout_t* loadout, playerState_t* ps );
+	static bool removeWeaponFromLoadout( int weaponIndex, completeLoadout_t* loadout, playerState_t* ps, bool* wingtip, vec3_t pos, int launchPos );
+	static int addWeaponToLoadout( int weaponIndex, completeLoadout_t* loadout, playerState_t* ps );
+	static bool getNumberOfFrames(const char* fileName, int* number);
+	static bool getNumberOfTags(const char* fileName, int* number);
+	static int getTagsContaining(const char* fileName, const char* str, md3Tag_t* tags, int num);
+	static bool getDimensions(const char* fileName, int frame, vec3_t* maxs, vec3_t* mins);
+	static void loadAllVehicleData();
+	static int findWeaponsOfType( int weaponIndex, completeLoadout_t* loadout );
+};
 
 inline constexpr int MF_THROTTLE_REVERSE = -5;
 inline constexpr int MF_THROTTLE_IDLE = 0;

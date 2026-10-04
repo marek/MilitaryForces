@@ -11,7 +11,7 @@
 
 /*
 =================
-MF_distributeWeaponsOnPylons
+VehicleData::distributeWeaponsOnPylons
 
 weapon mount info
 =================
@@ -26,7 +26,7 @@ static int QDECL MF_posCompare( const void* a, const void* b )
 	} else return p1-p2;
 }
 
-bool MF_distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout )
+bool VehicleData::distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout )
 {
 	char* modelname;
 	int num = 0, i, j, k;
@@ -35,17 +35,17 @@ bool MF_distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout )
 	if( idx < 0 ) return false;
 	if( availableVehicles[idx].cat & CAT_LQM ) return false;
 
-	modelname = MF_CreateModelPathname( idx, "models/vehicles/%s/%s/%s.md3" );
+	modelname = VehicleData::createModelPathname( idx, "models/vehicles/%s/%s/%s.md3" );
 
 //#ifdef _DEBUG
 //	Common::printf( "Calculating weapon stations for %s\n", availableVehicles[idx].tinyName );
 //#endif
 
 	loadout->mountsOnBay = false;
-	num = MF_getTagsContaining(modelname, "tag_P", tags, MAX_MOUNTS_PER_VEHICLE );
+	num = VehicleData::getTagsContaining(modelname, "tag_P", tags, MAX_MOUNTS_PER_VEHICLE );
 	if( !num && (availableVehicles[idx].cat & CAT_HELO) ) {
-		modelname = MF_CreateModelPathname( idx, "models/vehicles/%s/%s/%s_bay.md3" );
-		num = MF_getTagsContaining(modelname, "tag_P", tags, MAX_MOUNTS_PER_VEHICLE );
+		modelname = VehicleData::createModelPathname( idx, "models/vehicles/%s/%s/%s_bay.md3" );
+		num = VehicleData::getTagsContaining(modelname, "tag_P", tags, MAX_MOUNTS_PER_VEHICLE );
 		loadout->mountsOnBay = num > 0;
 	}
 	if( !num ) return false;
@@ -102,18 +102,18 @@ bool MF_distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout )
 
 /*
 =================
-MF_calculateAllDefaultLoadouts
+VehicleData::calculateAllDefaultLoadouts
 
 weapon mount info
 =================
 */
 
-void MF_calculateAllDefaultLoadouts()
+void VehicleData::calculateAllDefaultLoadouts()
 {
 	int i;
 
 	for( i = 0; i < bg_numberOfVehicles; ++i ) {
-		if( !MF_distributeWeaponsOnPylons( i, &availableLoadouts[i] ) ) {
+		if( !VehicleData::distributeWeaponsOnPylons( i, &availableLoadouts[i] ) ) {
 			memset( &availableLoadouts[i], 0, sizeof(completeLoadout_t) );
 		} else {
 			availableVehicles[i].renderFlags |= MFR_VWEP;
@@ -123,13 +123,13 @@ void MF_calculateAllDefaultLoadouts()
 
 /*
 =================
-MF_getDefaultLoadoutForVehicle
+VehicleData::getDefaultLoadoutForVehicle
 
 weapon mount info
 =================
 */
 
-void MF_getDefaultLoadoutForVehicle( int idx, completeLoadout_t* loadout, playerState_t* ps )
+void VehicleData::getDefaultLoadoutForVehicle( int idx, completeLoadout_t* loadout, playerState_t* ps )
 {
 //	char where[10];
 	int i;
@@ -147,13 +147,13 @@ void MF_getDefaultLoadoutForVehicle( int idx, completeLoadout_t* loadout, player
 
 /*
 =================
-MF_removeWeaponFromLoadout
+VehicleData::removeWeaponFromLoadout
 
 firing
 =================
 */
 
-bool MF_removeWeaponFromLoadout( int weaponIndex, completeLoadout_t* loadout, playerState_t* ps, 
+bool VehicleData::removeWeaponFromLoadout( int weaponIndex, completeLoadout_t* loadout, playerState_t* ps, 
 									 bool* wingtip, vec3_t pos, int launchPos )
 {
 	int i;
@@ -188,13 +188,13 @@ bool MF_removeWeaponFromLoadout( int weaponIndex, completeLoadout_t* loadout, pl
 
 /*
 =================
-MF_addWeaponToLoadout
+VehicleData::addWeaponToLoadout
 
 reloading - all of that type
 =================
 */
 
-int MF_addWeaponToLoadout( int weaponIndex, completeLoadout_t* loadout, playerState_t* ps )
+int VehicleData::addWeaponToLoadout( int weaponIndex, completeLoadout_t* loadout, playerState_t* ps )
 {
 	int i, added = 0;
 
@@ -222,13 +222,13 @@ int MF_addWeaponToLoadout( int weaponIndex, completeLoadout_t* loadout, playerSt
 
 /*
 =================
-MF_findWeaponsOfType
+VehicleData::findWeaponsOfType
 
 how many of those are loaded ?
 =================
 */
 
-int MF_findWeaponsOfType( int weaponIndex, completeLoadout_t* loadout )
+int VehicleData::findWeaponsOfType( int weaponIndex, completeLoadout_t* loadout )
 {
 	int i, num = 0;
 

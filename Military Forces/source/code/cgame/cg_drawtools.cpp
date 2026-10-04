@@ -838,7 +838,7 @@ int CG_GetVehicleShadowShader( int vehicle )
 	else
 	{
 		// use the generic shadow for the vehicle catagory
-		shaderIndex = MF_ExtractEnumFromId( vehicle, CAT_ANY ) - 1;
+		shaderIndex = VehicleData::extractEnumFromId( vehicle, CAT_ANY ) - 1;
 		if( shaderIndex >= 0 && shaderIndex < MF_MAX_CATEGORIES )
 		{
 			shaderHandle = cgs.media.shadowMarkShader[ shaderIndex ];
@@ -899,8 +899,8 @@ static bool CG_PolyMeshGeneratedShadow( BasicDrawInfo_t *drawInfo, float *shadow
 		// adjust
 		xAlter = fabs( drawInfo->angles[PITCH] / pitchMax );
 		yAlter = fabs( drawInfo->angles[ROLL] / rollMax );
-		MF_LimitFloat( &xAlter, 0.0f, 1.0f );
-		MF_LimitFloat( &yAlter, 0.0f, 1.0f );
+		VehicleData::limitFloat( &xAlter, 0.0f, 1.0f );
+		VehicleData::limitFloat( &yAlter, 0.0f, 1.0f );
 
 		// only apply any adjustment when airborne
 		if( !(drawInfo->ONOFF & OO_LANDED) )
@@ -1016,7 +1016,7 @@ static bool CG_PolyMeshGeneratedShadow( BasicDrawInfo_t *drawInfo, float *shadow
 
 			// calc mod
 			mod = 1.0f - trace.fraction;
-			MF_LimitFloat( &mod, 0.0f, 1.0f );
+			VehicleData::limitFloat( &mod, 0.0f, 1.0f );
 
 			// apply surface modifiers
 			if( vertInWater )

@@ -654,7 +654,7 @@ static void RiderEndFrame( GameEntity *ent )
 	client->ps_.pm_flags |= PMF_FOLLOW;
 	client->ps_.eFlags = flags;
 	client->ps_.commandTime = commandTime;
-	if( client->sess_.seat_ == 1 && MF_VehicleHasTurret( pilot->vehicle_ ) ) 
+	if( client->sess_.seat_ == 1 && VehicleData::vehicleHasTurret( pilot->vehicle_ ) ) 
 		RiderAngles( client, pilot, client->ps_.viewangles );
 
 	ent->s.eType = ET_INVISIBLE;
@@ -877,7 +877,7 @@ void ClientThink_real( GameEntity *ent )
 	pm.updateBay = ent->updateBay_;
 
 	static vec3_t gunnerAngles;
-	if( client->vehicle_ >= 0 && MF_VehicleHasTurret( client->vehicle_ ) ) 
+	if( client->vehicle_ >= 0 && VehicleData::vehicleHasTurret( client->vehicle_ ) ) 
 	{
 		for( int r = 1; r <= theLevel.maxclients_; r++ ) 
 		{

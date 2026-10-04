@@ -14,14 +14,14 @@
 
 /*
 =================
-MF_findTag
+VehicleData::findTag
 
 providing the file and tagname this functions returns the taginfo
 =================
 */
 
 
-bool MF_findTag(const char* fileName, const char* tagname, md3Tag_t* tag)
+bool VehicleData::findTag(const char* fileName, const char* tagname, md3Tag_t* tag)
 {
 	fileHandle_t	f;
 	bool		found = false;
@@ -53,13 +53,13 @@ bool MF_findTag(const char* fileName, const char* tagname, md3Tag_t* tag)
 
 /*
 =================
-MF_getNumberOfTags
+VehicleData::getNumberOfTags
 
 providing the file this functions returns the number of tags
 =================
 */
 
-bool MF_getNumberOfTags(const char* fileName, int* number)
+bool VehicleData::getNumberOfTags(const char* fileName, int* number)
 {
 	fileHandle_t	f;
 	bool		found = false;
@@ -81,14 +81,14 @@ bool MF_getNumberOfTags(const char* fileName, int* number)
 
 /*
 =================
-MF_getTagsContaining
+VehicleData::getTagsContaining
 
 providing the file this functions returns the tags containing str in their name
 num is the number of tags provided in tags
 =================
 */
 
-int MF_getTagsContaining(const char* fileName, const char* str, md3Tag_t* tags, int num)
+int VehicleData::getTagsContaining(const char* fileName, const char* str, md3Tag_t* tags, int num)
 {
 	fileHandle_t	f;
 	int				i, number = 0, total, len;
@@ -126,13 +126,13 @@ int MF_getTagsContaining(const char* fileName, const char* str, md3Tag_t* tags, 
 
 /*
 =================
-MF_getNumberOfFrames
+VehicleData::getNumberOfFrames
 
 providing the file this functions returns the number of frames
 =================
 */
 
-bool MF_getNumberOfFrames(const char* fileName, int* number)
+bool VehicleData::getNumberOfFrames(const char* fileName, int* number)
 {
 	fileHandle_t	f;
 	bool		found = false;
@@ -154,13 +154,13 @@ bool MF_getNumberOfFrames(const char* fileName, int* number)
 
 /*
 =================
-MF_getDimensions
+VehicleData::getDimensions
 
 providing the file and the framenumber this functions returns the dimensions of the model
 =================
 */
 
-bool MF_getDimensions(const char* fileName, int frame, vec3_t* maxs, vec3_t* mins)
+bool VehicleData::getDimensions(const char* fileName, int frame, vec3_t* maxs, vec3_t* mins)
 {
 	fileHandle_t	f;
 	bool		found = false;

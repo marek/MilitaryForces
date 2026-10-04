@@ -698,7 +698,7 @@ static void CG_PrecacheVehiclePreview( )
 	for( i = 0; i < bg_numberOfVehicles; i++ )
 	{
 		// create filename string
-		pIconString = MF_CreateModelPathname( i, "models/vehicles/%s/%s/%s_icon" );
+		pIconString = VehicleData::createModelPathname( i, "models/vehicles/%s/%s/%s_icon" );
 
 		// precache
 		h = refExport.RegisterShaderNoMip( pIconString );
@@ -2070,7 +2070,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	SoundSystem::clearLoopingSounds( true );
 
 	// MFQ3 vehicles
-	MF_LoadAllVehicleData();
+	VehicleData::loadAllVehicleData();
 
 	// init all the vehicle's shadow system
 	CG_InitShadows();

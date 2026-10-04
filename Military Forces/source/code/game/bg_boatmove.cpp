@@ -214,7 +214,7 @@ void PlayerMove::boatMove( )
 
 		// maxium turn is allowed at a percentage of the top speed (0.5f behind 50% of top speed)
 		float turnModifier = speed/(topSpeed * 0.2f);
-		MF_LimitFloat( &turnModifier, 0.0f, 1.0f );
+		VehicleData::limitFloat( &turnModifier, 0.0f, 1.0f );
 
 		if( smove > 0 ) {
 			vehdir[YAW] -= (turnspeed[HULL_YAW] * turnModifier);

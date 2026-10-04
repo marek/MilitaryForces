@@ -89,12 +89,12 @@ static void CG_OffsetVehicleView( bool spectator )
 	height = cg_thirdPersonHeight.value;
 
 	// clamp distance
-	MF_LimitFloat( &dist,
+	VehicleData::limitFloat( &dist,
 					availableVehicles[cg_vehicle.integer].cam_dist[ CAMERA_V_MIN ],
 					availableVehicles[cg_vehicle.integer].cam_dist[ CAMERA_V_MAX ] );
 
 	// clamp height
-	MF_LimitFloat( &height,
+	VehicleData::limitFloat( &height,
 					availableVehicles[cg_vehicle.integer].cam_height[ CAMERA_V_MIN ],
 					availableVehicles[cg_vehicle.integer].cam_height[ CAMERA_V_MAX ] );
 
@@ -182,12 +182,12 @@ static void CG_OffsetVehicleViewCFV( bool spectator )
 	height = cg_thirdPersonHeight.value;
 
 	// clamp distance
-	MF_LimitFloat( &dist,
+	VehicleData::limitFloat( &dist,
 					availableVehicles[cg_vehicle.integer].cam_dist[ CAMERA_V_MIN ],
 					availableVehicles[cg_vehicle.integer].cam_dist[ CAMERA_V_MAX ] );
 
 	// clamp height
-	MF_LimitFloat( &height,
+	VehicleData::limitFloat( &height,
 					availableVehicles[cg_vehicle.integer].cam_height[ CAMERA_V_MIN ],
 					availableVehicles[cg_vehicle.integer].cam_height[ CAMERA_V_MAX ] );
 

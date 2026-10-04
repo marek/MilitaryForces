@@ -2070,7 +2070,7 @@ static void UI_DrawVehiclePreview( rectDef_t *rect, float scale, const vec4_t co
 			// register different shader? (only do this on change)
 			if( pictureHandle == -1 || lastVehicle != vehicle) {
 				// create filename string
-				pIconString = MF_CreateModelPathname( vehicle, "models/vehicles/%s/%s/%s_icon" );
+				pIconString = VehicleData::createModelPathname( vehicle, "models/vehicles/%s/%s/%s_icon" );
 				pictureHandle = refExport.RegisterShaderNoMip( pIconString );
 			}
 		}
@@ -2179,7 +2179,7 @@ static void UI_DrawCredits( rectDef_t *rect, float scale, const vec4_t inColor, 
 
 			// alter alpha based upon distance from centre vertical
 			alpha = 1.0f - (static_cast<float>(abs( centreY - drawY ))/90) + 0.40f;
-			MF_LimitFloat( &alpha, 0.0f, 1.0f );
+			VehicleData::limitFloat( &alpha, 0.0f, 1.0f );
 			color[3] = alpha;
 
 			Text_Paint( bx, drawY, tScale, color, pLine, 0, 0, textStyle );
@@ -3561,7 +3561,7 @@ tryCatAgain:
 	// is this catagory valid for the current gameset+team+catagory?
 
 	pCat = cat_items[ vehicleCat ];	// get the text
-	vehicle = MF_getIndexOfVehicleEx( (vehicle-1), gameset, team, vehicleCat, -1, -1, 0, allowNukes);
+	vehicle = VehicleData::getIndexOfVehicleEx( (vehicle-1), gameset, team, vehicleCat, -1, -1, 0, allowNukes);
 
 	// ----------> LEVEL SPAWNS <-----------
 
@@ -3600,7 +3600,7 @@ tryClassAgain:
 	pClass = class_items[ vehicleCat ][ vehicleClass ];
 
 	// check
-	vehicle = MF_getIndexOfVehicleEx( (vehicle-1), gameset, team, vehicleCat, vehicleClass, -1, 0, allowNukes);
+	vehicle = VehicleData::getIndexOfVehicleEx( (vehicle-1), gameset, team, vehicleCat, vehicleClass, -1, 0, allowNukes);
 		
 	if( pClass && vehicle >= 0 ) 
 	{
@@ -3625,7 +3625,7 @@ tryClassAgain:
 	// is the vehicle valid for the current gameset+team+catagory+class?
 
 	// Use proper selector for vehicle/GI
-	vehicle = MF_getIndexOfVehicleEx( (vehicle-1), gameset, team, vehicleCat, vehicleClass, vehicleType, change_vehicle, allowNukes);
+	vehicle = VehicleData::getIndexOfVehicleEx( (vehicle-1), gameset, team, vehicleCat, vehicleClass, vehicleType, change_vehicle, allowNukes);
 
 	// -1 means this is not a suitable combination
 	if( vehicle == -1 )
@@ -5963,7 +5963,7 @@ void _UI_Init( bool inGameLoad )
 	CvarSystem::set( "ui_mfq3Version", MF_VERSION );
 
 	// MFQ3 data
-	MF_LoadAllVehicleData();
+	VehicleData::loadAllVehicleData();
 
 	// setup the custom chat interface
 	UI_CustomChatInit();

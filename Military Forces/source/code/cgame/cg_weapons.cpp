@@ -673,8 +673,8 @@ void ClientEntity::fireWeapon() {
 
 	completeLoadout_t* loadout = this->entityLoadout();
 	if( loadout && availableWeapons[ent->weaponIndex].type == WT_FUELTANK ) {
-		while( MF_findWeaponsOfType( ent->weaponIndex, loadout ) )
-			MF_removeWeaponFromLoadout( ent->weaponIndex, loadout, nullptr, nullptr, nullptr, 0 );
+		while( VehicleData::findWeaponsOfType( ent->weaponIndex, loadout ) )
+			VehicleData::removeWeaponFromLoadout( ent->weaponIndex, loadout, nullptr, nullptr, nullptr, 0 );
 		return;
 	}
 
@@ -699,7 +699,7 @@ void ClientEntity::fireWeapon() {
 		}
 	}
 	if( loadout )
-		MF_removeWeaponFromLoadout( ent->weaponIndex, loadout, nullptr, nullptr, nullptr, 0 );
+		VehicleData::removeWeaponFromLoadout( ent->weaponIndex, loadout, nullptr, nullptr, nullptr, 0 );
 }
 
 

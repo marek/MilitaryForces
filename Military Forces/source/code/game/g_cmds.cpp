@@ -1655,7 +1655,7 @@ static bool Rider_Board( GameEntity *ent )
 				continue;
 			client->sess_.ridingClient_ = i;
 			client->sess_.seat_ = seat;
-			bool gunner = seat == 1 && MF_VehicleHasTurret( pilot->vehicle_ );
+			bool gunner = seat == 1 && VehicleData::vehicleHasTurret( pilot->vehicle_ );
 			SV_GameSendServerCommand( ent->s.number, va( "print \"You are %s in %s^7's %s\n\"", gunner ? "the gunner" : "a passenger",
 				pilot->pers_.netname_, availableVehicles[pilot->vehicle_].descriptiveName ) );
 			SV_GameSendServerCommand( i, va( "print \"%s^7 boarded as %s\n\"", client->pers_.netname_, gunner ? "gunner" : "passenger" ) );
@@ -1777,7 +1777,7 @@ void Cmd_Eject_f( GameEntity *ent )
 		return;
 	bool parked = onGround || (client->ps_.ONOFF & OO_LANDED) != 0;
 
-	int infantry = MF_getIndexOfVehicle( -1, availableVehicles[vehicle].gameset, availableVehicles[vehicle].team, CAT_LQM, 0, -1, 0, true );
+	int infantry = VehicleData::getIndexOfVehicle( -1, availableVehicles[vehicle].gameset, availableVehicles[vehicle].team, CAT_LQM, 0, -1, 0, true );
 	if( infantry < 0 ) 
 		return;
 

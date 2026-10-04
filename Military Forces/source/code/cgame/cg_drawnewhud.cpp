@@ -497,7 +497,7 @@ static void CG_DrawRadarSymbols_AIR_new( int vehicle, float range, int x, int y 
 		if( dist > range ) 
 			continue;
 		if( cg.radarEnts[i]->currentState.eType == ET_VEHICLE &&
-			MF_StealthHidden( otherveh, cg.radarEnts[i]->currentState.revealTime, cg.snap->serverTime, dist, fullRange ) ) 
+			VehicleData::stealthHidden( otherveh, cg.radarEnts[i]->currentState.revealTime, cg.snap->serverTime, dist, fullRange ) ) 
 			continue;
 		// scale dist to radar screen
 		dist /= scale;
@@ -626,7 +626,7 @@ static void CG_DrawRadarSymbols_GROUND_new( int vehicle, float range, int x, int
 			if( dist > range ) 
 				continue;
 			if( cg.radarEnts[i]->currentState.eType == ET_VEHICLE &&
-				MF_StealthHidden( otherveh, cg.radarEnts[i]->currentState.revealTime, cg.snap->serverTime, dist, fullRange ) ) 
+				VehicleData::stealthHidden( otherveh, cg.radarEnts[i]->currentState.revealTime, cg.snap->serverTime, dist, fullRange ) ) 
 				continue;
 			// scale dist to radar screen
 			dist /= scale;

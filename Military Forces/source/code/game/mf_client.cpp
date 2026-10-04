@@ -437,7 +437,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 	if( vehIndex >= 0 && vehIndex < bg_numberOfVehicles )
 	{
 		// distribute the weapons
-		MF_getDefaultLoadoutForVehicle( vehIndex, &ent->loadout_, &ent->client_->ps_ );
+		VehicleData::getDefaultLoadoutForVehicle( vehIndex, &ent->loadout_, &ent->client_->ps_ );
 
 		Info::setValueForKey( userinfo, "cg_vehicle", va( "%d", vehIndex ) );
 		SV_SetUserinfo( clientNum, userinfo );

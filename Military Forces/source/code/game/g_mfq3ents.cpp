@@ -215,7 +215,7 @@ void Touch_RechargeTouch::execute( GameEntity *other, trace_t *trace )
 		{
 //			int diff = other->client->ps.ammo[i+8] - other->client->ps.ammo[i];
 			other->client_->ps_.ammo[i] = other->client_->ps_.ammo[i+8];
-			MF_addWeaponToLoadout( availableVehicles[other->client_->vehicle_].weapons[i], &other->loadout_, &other->client_->ps_ );
+			VehicleData::addWeaponToLoadout( availableVehicles[other->client_->vehicle_].weapons[i], &other->loadout_, &other->client_->ps_ );
 			break;
 		}
 	}

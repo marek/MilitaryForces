@@ -1063,7 +1063,7 @@ static bool ME_LoadOverviewAndEntities( char *filename,
 
 	Common::printf( S_COLOR_GREEN "Successfully opened mission script: %s\n", filename );
 
-	MF_ParseMissionScripts(inbuffer, overview, vehs, gis);
+	VehicleData::parseMissionScripts(inbuffer, overview, vehs, gis);
 
 	return true;
 }

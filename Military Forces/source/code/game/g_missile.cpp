@@ -1027,7 +1027,7 @@ void fire_antiair (GameEntity *self)
 	else 
 	{
 		self->left_ = (self->left_ ? false : true);
-		MF_removeWeaponFromLoadout(self->client_->ps_.weaponIndex, &self->loadout_, &self->client_->ps_, &wingtip, offset, 0 );
+		VehicleData::removeWeaponFromLoadout(self->client_->ps_.weaponIndex, &self->loadout_, &self->client_->ps_, &wingtip, offset, 0 );
 		AngleVectors( self->client_->ps_.vehicleAngles, dir, right, up );
 		VectorInverse( right );
 	}
@@ -1126,7 +1126,7 @@ void fire_antiground( GameEntity *self )
 	else 
 	{
 		self->left_ = (self->left_ ? false : true);
-		MF_removeWeaponFromLoadout(self->client_->ps_.weaponIndex, &self->loadout_, &self->client_->ps_, nullptr, offset, 0 );
+		VehicleData::removeWeaponFromLoadout(self->client_->ps_.weaponIndex, &self->loadout_, &self->client_->ps_, nullptr, offset, 0 );
 		AngleVectors( self->client_->ps_.vehicleAngles, dir, right, up );
 		VectorInverse( right );
 	}
@@ -1219,7 +1219,7 @@ void fire_ffar (GameEntity *self)
 	if( self->left_ >= availableVehicles[self->client_->vehicle_].ammo[self->client_->ps_.weaponNum] ) 
 		self->left_ = 0;
 
-	MF_removeWeaponFromLoadout(self->client_->ps_.weaponIndex, &self->loadout_, &self->client_->ps_, nullptr, offset, self->left_ );
+	VehicleData::removeWeaponFromLoadout(self->client_->ps_.weaponIndex, &self->loadout_, &self->client_->ps_, nullptr, offset, self->left_ );
 	AngleVectors( self->client_->ps_.vehicleAngles, dir, right, up );
 	VectorInverse( right );
 	VectorMA( start, offset[0], dir, start );
@@ -1265,7 +1265,7 @@ void fire_ironbomb( GameEntity *self )
 	vec3_t		start;
 
 //	self->left = (self->left ? false : true);
-	MF_removeWeaponFromLoadout(self->client_->ps_.weaponIndex, &self->loadout_, &self->client_->ps_, nullptr, offset, 0 );
+	VehicleData::removeWeaponFromLoadout(self->client_->ps_.weaponIndex, &self->loadout_, &self->client_->ps_, nullptr, offset, 0 );
 	AngleVectors( self->client_->ps_.vehicleAngles, dir, right, up );
 	VectorInverse( right );
 	VectorCopy( self->s.pos.trBase, start );
@@ -1637,7 +1637,7 @@ void drop_fueltank ( GameEntity *self )
 	vec3_t		start;
 
 //	self->left = (self->left ? false : true);
-	MF_removeWeaponFromLoadout(self->client_->ps_.weaponIndex, &self->loadout_, &self->client_->ps_, nullptr, offset, 0 );
+	VehicleData::removeWeaponFromLoadout(self->client_->ps_.weaponIndex, &self->loadout_, &self->client_->ps_, nullptr, offset, 0 );
 	AngleVectors( self->client_->ps_.vehicleAngles, dir, right, up );
 	VectorInverse( right );
 	VectorCopy( self->s.pos.trBase, start );
@@ -1701,7 +1701,7 @@ void drop_crate( GameEntity *self )
 	GameEntity	*bolt;
 	vec3_t		start;
 
-	MF_removeWeaponFromLoadout(self->client_->ps_.weaponIndex, &self->loadout_, &self->client_->ps_, nullptr, nullptr, 0 );
+	VehicleData::removeWeaponFromLoadout(self->client_->ps_.weaponIndex, &self->loadout_, &self->client_->ps_, nullptr, nullptr, 0 );
 
 	VectorCopy( self->s.pos.trBase, start );
 	//start[2] -= availableVehicles[self->client->vehicle].maxs[2] - availableVehicles[self->client->vehicle].mins[2];
@@ -1754,7 +1754,7 @@ void fire_nukebomb ( GameEntity *self )
 	vec3_t		start;
 
 //	self->left = (self->left ? false : true);
-	MF_removeWeaponFromLoadout(self->client_->ps_.weaponIndex, &self->loadout_, &self->client_->ps_, nullptr, offset, 0 );
+	VehicleData::removeWeaponFromLoadout(self->client_->ps_.weaponIndex, &self->loadout_, &self->client_->ps_, nullptr, offset, 0 );
 	AngleVectors( self->client_->ps_.vehicleAngles, dir, right, up );
 	VectorInverse( right );
 	VectorCopy( self->s.pos.trBase, start );
@@ -1818,7 +1818,7 @@ void fire_nukemissile (GameEntity *self)
 	else
 	{
 		self->left_ = (self->left_ ? false : true);
-		MF_removeWeaponFromLoadout(self->client_->ps_.weaponIndex, &self->loadout_, &self->client_->ps_, nullptr, offset, 0 );
+		VehicleData::removeWeaponFromLoadout(self->client_->ps_.weaponIndex, &self->loadout_, &self->client_->ps_, nullptr, offset, 0 );
 		AngleVectors( self->client_->ps_.vehicleAngles, dir, right, up );
 		VectorInverse( right );
 	}
@@ -1963,7 +1963,7 @@ void fire_flak_GI (GameEntity *self)
 				Q_random( &seed ) + (FLAK_DEVIATION_HEIGHT * -1);
 
 	// Remove one weapon to fire
-	MF_removeWeaponFromLoadout(self->s.weaponIndex, &self->loadout_, &self->client_->ps_, &wingtip, offset, 0 );
+	VehicleData::removeWeaponFromLoadout(self->s.weaponIndex, &self->loadout_, &self->client_->ps_, &wingtip, offset, 0 );
 	
 	bolt = theLevel.spawnEntity();
 	bolt->classname_ = "flak";

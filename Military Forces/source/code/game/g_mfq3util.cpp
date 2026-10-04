@@ -120,7 +120,7 @@ void updateTargetTracking( GameEntity *ent )
 		if( test->s.eType == ET_VEHICLE && test->client_ && 
 			(availableVehicles[test->client_->vehicle_].cat & targetcat) ) 
 		{
-			if( MF_StealthHidden( test->client_->vehicle_, test->client_->ps_.timers[TIMER_REVEAL], theLevel.time_,
+			if( VehicleData::stealthHidden( test->client_->vehicle_, test->client_->ps_.timers[TIMER_REVEAL], theLevel.time_,
 					Distance( ent->r.currentOrigin, test->r.currentOrigin ), radarrange ) ) 
 				return;
 			track(ent, test);
@@ -191,7 +191,7 @@ void updateTargetTracking( GameEntity *ent )
 			return;
 		}
 		if( ent->tracktarget_->s.eType == ET_VEHICLE && ent->tracktarget_->client_ &&
-			MF_StealthHidden( ent->tracktarget_->client_->vehicle_, ent->tracktarget_->client_->ps_.timers[TIMER_REVEAL],
+			VehicleData::stealthHidden( ent->tracktarget_->client_->vehicle_, ent->tracktarget_->client_->ps_.timers[TIMER_REVEAL],
 				theLevel.time_, dist, radarrange ) ) 
 		{
 			untrack(ent);

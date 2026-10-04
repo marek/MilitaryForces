@@ -989,7 +989,7 @@ static void CG_DrawCustomConsole( )
 		{
 			// sort out alpha
 			alpha = consoleLine[drawIdx].life;
-			MF_LimitFloat( &alpha, 0.0f, 1.0f );
+			VehicleData::limitFloat( &alpha, 0.0f, 1.0f );
 
 			// use the top line's life as the negative offset
 			if( line == 0 )

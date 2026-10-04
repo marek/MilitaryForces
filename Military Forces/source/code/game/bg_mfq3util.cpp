@@ -11,11 +11,11 @@
 
 /*
 =================
-MF_getIndexOfVehicleEx
+VehicleData::getIndexOfVehicleEx
 =================
 */
 
-void MF_SetMissionScriptOverviewDefaults( mission_overview_t* overview )
+void VehicleData::setMissionScriptOverviewDefaults( mission_overview_t* overview )
 {
 	overview->gameset = -1;
 	overview->gametype = -1;
@@ -27,7 +27,7 @@ void MF_SetMissionScriptOverviewDefaults( mission_overview_t* overview )
 
 // updateFormat should only be set to true to be backwards compatible after a format change
 // so that incomplete values can be filled in
-void MF_CheckMissionScriptOverviewValid( mission_overview_t* overview, bool updateFormat )
+void VehicleData::checkMissionScriptOverviewValid( mission_overview_t* overview, bool updateFormat )
 {
 	if( overview->gameset >= 0 &&
 		overview->gametype >= 0 &&
@@ -57,11 +57,11 @@ void MF_CheckMissionScriptOverviewValid( mission_overview_t* overview, bool upda
 
 /*
 =================
-MF_getIndexOfVehicleEx
+VehicleData::getIndexOfVehicleEx
 =================
 */
 
-int MF_getIndexOfVehicleEx( int start,
+int VehicleData::getIndexOfVehicleEx( int start,
 							int gameset,
 							int team,
 							int cat,
@@ -87,15 +87,15 @@ int MF_getIndexOfVehicleEx( int start,
 		cls = 1 << cls;		// (convert from int enum to flag enum)
 	}
 
-	return MF_getIndexOfVehicle( start, gameset, team, cat, cls, vehicleType, change_vehicle, allowNukes );
+	return VehicleData::getIndexOfVehicle( start, gameset, team, cat, cls, vehicleType, change_vehicle, allowNukes );
 }
 
 /*
 =================
-MF_getIndexOfVehicle
+VehicleData::getIndexOfVehicle
 =================
 */
-int MF_getIndexOfVehicle( int start,			// where to start in list
+int VehicleData::getIndexOfVehicle( int start,			// where to start in list
 						  int gameset,
 						  int team,
 						  int cat,
@@ -179,10 +179,10 @@ int MF_getIndexOfVehicle( int start,			// where to start in list
 
 /*
 =================
-MF_getIndexOfGI
+VehicleData::getIndexOfGI
 =================
 */
-int MF_getIndexOfGI( int start, int gameset, int GIType, int mode)
+int VehicleData::getIndexOfGI( int start, int gameset, int GIType, int mode)
 {
     int				i;
 	int				gi_pt = -1;
@@ -221,12 +221,12 @@ int MF_getIndexOfGI( int start, int gameset, int GIType, int mode)
 
 /*
 =================
-MF_getNumberOfItems
+VehicleData::getNumberOfItems
 =================
 */
 
 // returns the number of items in a stringlist
-int MF_getNumberOfItems(const char **itemlist)
+int VehicleData::getNumberOfItems(const char **itemlist)
 {
 	int i;
 	for( i = 0; itemlist[i] != nullptr; i++ );
@@ -235,13 +235,13 @@ int MF_getNumberOfItems(const char **itemlist)
 
 /*
 =================
-MF_getItemIndexFromHex
+VehicleData::getItemIndexFromHex
 =================
 */
 
 // takes an already properly right-shifted hex value (with only 1 bit set!)
 // and returns the item index for it
-int MF_getItemIndexFromHex(int hexValue)
+int VehicleData::getItemIndexFromHex(int hexValue)
 {
 	int i;
 	for( i = -1; hexValue; i++ ) hexValue>>=1;
@@ -250,12 +250,12 @@ int MF_getItemIndexFromHex(int hexValue)
 
 /*
 =================
-MF_CreateModelPathname
+VehicleData::createModelPathname
 =================
 */
 
 // creates a model pathname (e.g. pFormatString = "models/vehicles/%s/%s/%s_icon")
-char * MF_CreateModelPathname( int vehicle, char * pFormatString )
+char * VehicleData::createModelPathname( int vehicle, char * pFormatString )
 {
 	char * pReturnString = nullptr;
 	char catDir[ 32 ];
@@ -290,7 +290,7 @@ char * MF_CreateModelPathname( int vehicle, char * pFormatString )
 }
 
 // same for groundinstallations
-char * MF_CreateGIPathname( int vehicle, char * pFormatString )
+char * VehicleData::createGIPathname( int vehicle, char * pFormatString )
 {
 	char * pReturnString = nullptr;
 	char catDir[ 32 ];
@@ -308,12 +308,12 @@ char * MF_CreateGIPathname( int vehicle, char * pFormatString )
 
 /*
 =================
-MF_LimitFloat
+VehicleData::limitFloat
 =================
 */
 
 // generic float limiting
-void MF_LimitFloat( float * value, float min, float max )
+void VehicleData::limitFloat( float * value, float min, float max )
 {
 	// min & max
 	if( *value < min ) *value = min;
@@ -321,7 +321,7 @@ void MF_LimitFloat( float * value, float min, float max )
 }
 
 // generic int limiting
-void MF_LimitInt( int * value, int min, int max )
+void VehicleData::limitInt( int * value, int min, int max )
 {
 	// min & max
 	if( *value < min ) *value = min;
@@ -330,13 +330,13 @@ void MF_LimitInt( int * value, int min, int max )
 
 /*
 =================
-MF_ExtractEnumFromId
+VehicleData::extractEnumFromId
 
 Get the catagory/class enum from the vehicle index (use CAT_ANY & CLASS_ANY to decide operation done)
 =================
 */
 
-int MF_ExtractEnumFromId( int vehicle, unsigned int op )
+int VehicleData::extractEnumFromId( int vehicle, unsigned int op )
 {
 	int daEnum = -1;
 
@@ -359,7 +359,7 @@ int MF_ExtractEnumFromId( int vehicle, unsigned int op )
 
 /*
 =================
-MF_ExtractEnumFromId
+VehicleData::extractEnumFromId
 
 Get the catagory/class enum from the vehicle index (use CAT_ANY & CLASS_ANY to decide operation done)
 =================
@@ -367,7 +367,7 @@ Get the catagory/class enum from the vehicle index (use CAT_ANY & CLASS_ANY to d
 
 static void MF_findDeck( const char *name, completeVehicleData_t *veh );
 
-void MF_LoadAllVehicleData()
+void VehicleData::loadAllVehicleData()
 {
 	int i, j, num;
 	char* modelbasename = nullptr;
@@ -378,7 +378,7 @@ void MF_LoadAllVehicleData()
 	vec3_t max, min;
 
 	// MFQ3 loadouts
-	MF_calculateAllDefaultLoadouts();
+	VehicleData::calculateAllDefaultLoadouts();
 
 	for( i = 0; i < bg_numberOfVehicles; ++i ) 
 	{
@@ -388,11 +388,11 @@ void MF_LoadAllVehicleData()
 			if( !(availableVehicles[i].cat & availableWeapons[availableVehicles[i].weapons[j]].fitsCategory) )
 				availableVehicles[i].ammo[j] = 0;
 		}
-		modelbasename = MF_CreateModelPathname( i, "models/vehicles/%s/%s/%s" );	
+		modelbasename = VehicleData::createModelPathname( i, "models/vehicles/%s/%s/%s" );	
 		// boundingbox
 		Com_sprintf( name, sizeof(name), "%s.md3", modelbasename );
 		if( !(availableVehicles[i].cat & CAT_LQM) )
-			MF_getDimensions( name, 0, &availableVehicles[i].maxs, &availableVehicles[i].mins );
+			VehicleData::getDimensions( name, 0, &availableVehicles[i].maxs, &availableVehicles[i].mins );
 		availableVehicles[i].mins[2] += 1;// to look better ?
 		if( availableVehicles[i].cat & CAT_BOAT ) 
 			MF_findDeck( name, &availableVehicles[i] );
@@ -409,7 +409,7 @@ void MF_LoadAllVehicleData()
 		if(availableVehicles[i].cat & CAT_PLANE) 
 		{
 			// Find gear tag offset from  min
-			MF_findTag(name, "tag_gear", &tag);
+			VehicleData::findTag(name, "tag_gear", &tag);
 			diff = tag.origin[2] - availableVehicles[i].mins[2];
 			if(diff < 0) diff = 0;
 
@@ -418,7 +418,7 @@ void MF_LoadAllVehicleData()
 
 			FileSystem::fOpenFileByMode(name, &f, FS_READ);
 
-			if(f &&  MF_getNumberOfFrames( name, &num ) ) 
+			if(f &&  VehicleData::getNumberOfFrames( name, &num ) ) 
 			{
 				vec3_t min1, min2;
 
@@ -427,8 +427,8 @@ void MF_LoadAllVehicleData()
 				
 				if(!availableVehicles[i].gearheight)
 				{
-					if( MF_getDimensions( name, 0, nullptr, &min1 ) &&
-						MF_getDimensions( name, num-1, nullptr, &min2 ) ) 
+					if( VehicleData::getDimensions( name, 0, nullptr, &min1 ) &&
+						VehicleData::getDimensions( name, num-1, nullptr, &min2 ) ) 
 					{
 						availableVehicles[i].gearheight = min1[2] - min2[2] - 1.5;// for coll. detection
 						if( availableVehicles[i].gearheight < 0 ) 
@@ -436,8 +436,8 @@ void MF_LoadAllVehicleData()
 					}
 				}
 				/*
-				MF_findTag(name, "tag_gear", &tag);
-				MF_getDimensions(name, num-1, &max,&min);
+				VehicleData::findTag(name, "tag_gear", &tag);
+				VehicleData::getDimensions(name, num-1, &max,&min);
 				availableVehicles[i].gearheight = (tag.origin[2] - min[2]) - diff;
 				if( availableVehicles[i].gearheight < 0 ) availableVehicles[i].gearheight = 0;
 				*/
@@ -452,7 +452,7 @@ void MF_LoadAllVehicleData()
 
 			FileSystem::fOpenFileByMode(name, &f, FS_READ);
 
-			if(f && MF_getNumberOfFrames( name, &num ) ) 
+			if(f && VehicleData::getNumberOfFrames( name, &num ) ) 
 			{
 				FileSystem::fCloseFile(f);
 				availableVehicles[i].maxBayFrame = num - 1;
@@ -464,13 +464,13 @@ void MF_LoadAllVehicleData()
 			for( j = WP_WEAPON1; j < WP_FLARE; ++j ) {
 				if( availableVehicles[i].weapons[j] ) {
 					availableVehicles[i].ammo[j] = 
-						MF_findWeaponsOfType( availableVehicles[i].weapons[j], &availableLoadouts[i] );
+						VehicleData::findWeaponsOfType( availableVehicles[i].weapons[j], &availableLoadouts[i] );
 				}
 			}
 		} else if(availableVehicles[i].cat & CAT_HELO) {
 
 			// Find gear tag offset from  min
-			MF_findTag(name, "tag_gear", &tag);
+			VehicleData::findTag(name, "tag_gear", &tag);
 			diff = tag.origin[2] - availableVehicles[i].mins[2];
 			if(diff < 0) diff = 0;
 
@@ -480,7 +480,7 @@ void MF_LoadAllVehicleData()
 
 			FileSystem::fOpenFileByMode(name, &f, FS_READ);
 
-			if(f &&  MF_getNumberOfFrames( name, &num ) ) {
+			if(f &&  VehicleData::getNumberOfFrames( name, &num ) ) {
 				vec3_t min1, min2;
 
 				FileSystem::fCloseFile(f);
@@ -489,8 +489,8 @@ void MF_LoadAllVehicleData()
 				
 				if(!availableVehicles[i].gearheight){
 
-					if( MF_getDimensions( name, 0, nullptr, &min1 ) &&
-						MF_getDimensions( name, num-1, nullptr, &min2 ) ) {
+					if( VehicleData::getDimensions( name, 0, nullptr, &min1 ) &&
+						VehicleData::getDimensions( name, num-1, nullptr, &min2 ) ) {
 						availableVehicles[i].gearheight = min1[2] - min2[2] - 1.5;// for coll. detection
 						if( availableVehicles[i].gearheight < 0 ) availableVehicles[i].gearheight = 0;
 					}
@@ -505,7 +505,7 @@ void MF_LoadAllVehicleData()
 
 			FileSystem::fOpenFileByMode(name, &f, FS_READ);
 
-			if(f && MF_getNumberOfFrames( name, &num ) ) 
+			if(f && VehicleData::getNumberOfFrames( name, &num ) ) 
 			{
 				FileSystem::fCloseFile(f);
 				availableVehicles[i].maxBayFrame = num - 1;
@@ -519,7 +519,7 @@ void MF_LoadAllVehicleData()
 					if( availableVehicles[i].weapons[j] &&
 						availableWeapons[availableVehicles[i].weapons[j]].type != WT_MACHINEGUN ) {
 						availableVehicles[i].ammo[j] = 
-							MF_findWeaponsOfType( availableVehicles[i].weapons[j], &availableLoadouts[i] );
+							VehicleData::findWeaponsOfType( availableVehicles[i].weapons[j], &availableLoadouts[i] );
 					}
 				}
 			}
@@ -528,7 +528,7 @@ void MF_LoadAllVehicleData()
 
 			// increaes bounding box by turret height
 			Com_sprintf( name, sizeof(name), "%s_tur.md3", modelbasename );
-			MF_getDimensions( name, 0, &max, &min );
+			VehicleData::getDimensions( name, 0, &max, &min );
 			diff = max[2] - min[2];
 			availableVehicles[i].maxs[2] += diff;
 		//	availableVehicles[i].mins[2] -= 2;	
@@ -546,8 +546,8 @@ void MF_LoadAllVehicleData()
 				{
 					FileSystem::fCloseFile(f);
 		
-					MF_findTag(name, "tag_wheel", &tag);
-					MF_getDimensions( name, 0, &max, &min );
+					VehicleData::findTag(name, "tag_wheel", &tag);
+					VehicleData::getDimensions( name, 0, &max, &min );
 					diff = max[2] - min[2];
 					availableVehicles[i].mins[2] = tag.origin[2] - (diff / 2);
 				}
@@ -567,10 +567,10 @@ void MF_LoadAllVehicleData()
 		}
 	}
 	for( i = 0; i < bg_numberOfGroundInstallations; ++i ) {
-		modelbasename = MF_CreateGIPathname( i, "models/vehicles/%s/%s/%s" );	
+		modelbasename = VehicleData::createGIPathname( i, "models/vehicles/%s/%s/%s" );	
 		// boundingbox
 		Com_sprintf( name, sizeof(name), "%s.md3", modelbasename );
-		MF_getDimensions( name, 0, &availableGroundInstallations[i].maxs, 
+		VehicleData::getDimensions( name, 0, &availableGroundInstallations[i].maxs, 
 				&availableGroundInstallations[i].mins );
 		availableGroundInstallations[i].maxs[2] += (15 + 7 * availableGroundInstallations[i].upgrades);
 	}
@@ -674,7 +674,7 @@ static void MF_ParseOverview( char **buf, mission_overview_t* overview )
 			}
 		}
 	}
-	MF_CheckMissionScriptOverviewValid(overview, false);// set to true after format change
+	VehicleData::checkMissionScriptOverviewValid(overview, false);// set to true after format change
 }
 
 
@@ -1057,14 +1057,14 @@ static void MF_ParseEntities( char **buf,
 
 }
 
-void MF_ParseMissionScripts( char *buf,
+void VehicleData::parseMissionScripts( char *buf,
 							 mission_overview_t* overview,
 							 mission_vehicle_t* vehs, 
 							 mission_groundInstallation_t* gis) 
 {
 	char *token;
 
-	MF_SetMissionScriptOverviewDefaults(overview);
+	VehicleData::setMissionScriptOverviewDefaults(overview);
 
 	while( true )
 	{
@@ -1189,7 +1189,7 @@ static void MF_findDeck( const char *name, completeVehicleData_t *veh )
 	veh->hasDeck = true;
 }
 
-bool MF_StealthHidden( int vehicle, int revealTime, int time, float dist, float radarRange )
+bool VehicleData::stealthHidden( int vehicle, int revealTime, int time, float dist, float radarRange )
 {
 	if( vehicle < 0 || vehicle >= bg_numberOfVehicles ) 
 		return false;
@@ -1200,7 +1200,7 @@ bool MF_StealthHidden( int vehicle, int revealTime, int time, float dist, float 
 	return dist > radarRange * STEALTH_RANGE_FACTOR;
 }
 
-bool MF_VehicleHasTurret( int vehicle )
+bool VehicleData::vehicleHasTurret( int vehicle )
 {
 	if( vehicle < 0 || vehicle >= bg_numberOfVehicles ) 
 		return false;
