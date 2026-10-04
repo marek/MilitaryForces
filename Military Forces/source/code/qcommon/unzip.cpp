@@ -83,15 +83,16 @@ const char unz_copyright[] =
    " unzip 1.01 Copyright 1998-2004 Gilles Vollant - http://www.winimage.com/zLibDll";
 
 /* unz_file_info_interntal contain internal info about a file in zipfile*/
-typedef struct unz_file_info_internal_s
+struct unz_file_info_internal_s
 {
     uLong offset_curfile;/* relative offset of local header 4 bytes */
-} unz_file_info_internal;
+};
+using unz_file_info_internal = unz_file_info_internal_s;
 
 
 /* file_in_zip_read_info_s contain internal information about a file in zipfile,
     when reading and decompress it */
-typedef struct
+struct file_in_zip_read_info_s
 {
     char  *read_buffer;         /* internal buffer for compressed data */
     z_stream stream;            /* zLib stream structure for inflate */
@@ -112,12 +113,12 @@ typedef struct
     uLong compression_method;   /* compression method (0==store) */
     uLong byte_before_the_zipfile;/* byte before the zipfile, (>0 for sfx)*/
     int   raw;
-} file_in_zip_read_info_s;
+};
 
 
 /* unz_s contain internal information about the zipfile
 */
-typedef struct
+struct unz_s
 {
     zlib_filefunc_def z_filefunc;
     voidpf filestream;        /* io structore of the zipfile */
@@ -141,7 +142,7 @@ typedef struct
     unsigned long keys[3];     /* keys defining the pseudo-random sequence */
     const unsigned long* pcrc_32_tab;
 #    endif
-} unz_s;
+};
 
 
 #ifndef NOUNCRYPT

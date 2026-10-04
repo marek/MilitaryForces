@@ -17,11 +17,12 @@
 #include "../game/q_shared.h"
 #include "qcommon.h"
 
-typedef struct MD5Context {
+struct MD5Context {
 	uint32_t buf[4];
 	uint32_t bits[2];
 	unsigned char in[64];
-} MD5_CTX;
+};
+using MD5_CTX = MD5Context;
 
 #ifndef Q3_BIG_ENDIAN
 	#define byteReverse(buf, len)	/* Nothing */

@@ -32,24 +32,26 @@ inline constexpr int SND_CHUNK_SIZE = 1024; // samples
 #define SND_CHUNK_SIZE_FLOAT	(SND_CHUNK_SIZE/2)		// floats
 #define SND_CHUNK_SIZE_BYTE		(SND_CHUNK_SIZE*2)		// floats
 
-typedef struct {
+struct portable_samplepair_t {
 	int			left;	// the final values will be clamped to +/- 0x00ffff00 and shifted down
 	int			right;
-} portable_samplepair_t;
+};
 
-typedef struct adpcm_state {
+struct adpcm_state {
     short	sample;		/* Previous output value */
     char	index;		/* Index into stepsize table */
-} adpcm_state_t;
+};
+using adpcm_state_t = adpcm_state;
 
-typedef	struct sndBuffer_s {
+struct sndBuffer_s {
 	short					sndChunk[SND_CHUNK_SIZE];
 	struct sndBuffer_s		*next;
     int						size;
 	adpcm_state_t			adpcm;
-} sndBuffer;
+};
+using sndBuffer = sndBuffer_s;
 
-typedef struct sfx_s {
+struct sfx_s {
 	sndBuffer		*soundData;
 	bool		defaultSound;			// couldn't be loaded, so use buzz
 	bool		inMemory;				// not in Memory
@@ -60,9 +62,10 @@ typedef struct sfx_s {
 	char 			soundName[MAX_QPATH];
 	int				lastTimeUsed;
 	struct sfx_s	*next;
-} sfx_t;
+};
+using sfx_t = sfx_s;
 
-typedef struct {
+struct dma_t {
 	int			channels;
 	int			samples;				// mono samples in buffer
 	int			fullsamples;			// samples with all channels in buffer (samples divided by channels)
@@ -71,7 +74,7 @@ typedef struct {
 	int			isfloat;
 	int			speed;
 	byte		*buffer;
-} dma_t;
+};
 
 inline constexpr int START_SAMPLE_IMMEDIATE = 0x7fffffff;
 
@@ -79,7 +82,7 @@ inline constexpr float MAX_DOPPLER_SCALE = 50.0f; //arbitrary
 
 inline constexpr float THIRD_PERSON_THRESHOLD_SQ = (48.0f*48.0f);
 
-typedef struct loopSound_s {
+struct loopSound_s {
 	vec3_t		origin;
 	vec3_t		velocity;
 	sfx_t		*sfx;
@@ -90,9 +93,10 @@ typedef struct loopSound_s {
 	float		dopplerScale;
 	float		oldDopplerScale;
 	int			framenum;
-} loopSound_t;
+};
+using loopSound_t = loopSound_s;
 
-typedef struct
+struct channel_t
 {
 	int			allocTime;
 	int			startSample;	// START_SAMPLE_IMMEDIATE = set immediately on next mix
@@ -108,23 +112,23 @@ typedef struct
 	sfx_t		*thesfx;		// sfx structure
 	bool	doppler;
 	bool	fullVolume;
-} channel_t;
+};
 
 
 inline constexpr int WAV_FORMAT_PCM = 1;
 
 
-typedef struct {
+struct wavinfo_t {
 	int			format;
 	int			rate;
 	int			width;
 	int			channels;
 	int			samples;
 	int			dataofs;		// chunk starts this many bytes from file start
-} wavinfo_t;
+};
 
 // Interface between Q3 sound "api" and the sound backend
-typedef struct
+struct soundInterface_t
 {
 	void (*Shutdown)();
 	void (*StartSound)( vec3_t origin, int entnum, int entchannel, sfxHandle_t sfx );
@@ -153,7 +157,7 @@ typedef struct
 	void (*StopCapture)( );
 	void (*MasterGain)( float gain );
 #endif
-} soundInterface_t;
+};
 
 
 /*
@@ -253,14 +257,14 @@ extern int	   sfxScratchIndex;
 bool S_Base_Init( soundInterface_t *si );
 
 // OpenAL stuff
-typedef enum
+enum alSrcPriority_t
 {
 	SRCPRI_AMBIENT = 0,	// Ambient sound effects
 	SRCPRI_ENTITY,			// Entity sound effects
 	SRCPRI_ONESHOT,			// One-shot sounds
 	SRCPRI_LOCAL,				// Local sounds
 	SRCPRI_STREAM				// Streams (music, cutscenes)
-} alSrcPriority_t;
+};
 
 typedef int srcHandle_t;
 

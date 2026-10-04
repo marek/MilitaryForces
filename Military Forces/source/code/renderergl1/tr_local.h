@@ -51,19 +51,20 @@ typedef unsigned int glIndex_t;
 
 
 
-typedef struct dlight_s {
+struct dlight_s {
 	vec3_t	origin;
 	vec3_t	color;				// range from 0.0 to 1.0, should be color normalized
 	float	radius;
 
 	vec3_t	transformed;		// origin in local coordinate system
 	int		additive;			// texture detail is lost tho when the lightmap is dark
-} dlight_t;
+};
+using dlight_t = dlight_s;
 
 
 // a trRefEntity_t has all the information passed in by
 // the client game, as well as some locally derived info
-typedef struct {
+struct trRefEntity_t {
 	refEntity_t	e;
 
 	float		axisLength;		// compensate for non-normalized axis
@@ -74,19 +75,19 @@ typedef struct {
 	vec3_t		ambientLight;	// color normalized to 0-255
 	int			ambientLightInt;	// 32 bit rgba packed
 	vec3_t		directedLight;
-} trRefEntity_t;
+};
 
 
-typedef struct {
+struct orientationr_t {
 	vec3_t		origin;			// in world coordinates
 	vec3_t		axis[3];		// orientation in world
 	vec3_t		viewOrigin;		// viewParms->or.origin in local coordinates
 	float		modelMatrix[16];
-} orientationr_t;
+};
 
 //===============================================================================
 
-typedef enum {
+enum shaderSort_t {
 	SS_BAD,
 	SS_PORTAL,			// mirrors, portals, viewscreens
 	SS_ENVIRONMENT,		// sky box
@@ -111,12 +112,12 @@ typedef enum {
 	SS_ALMOST_NEAREST,	// gun smoke puffs
 
 	SS_NEAREST			// blood blobs
-} shaderSort_t;
+};
 
 
 #define MAX_SHADER_STAGES 8
 
-typedef enum {
+enum genFunc_t {
 	GF_NONE,
 
 	GF_SIN,
@@ -127,10 +128,10 @@ typedef enum {
 
 	GF_NOISE
 
-} genFunc_t;
+};
 
 
-typedef enum {
+enum deform_t {
 	DEFORM_NONE,
 	DEFORM_WAVE,
 	DEFORM_NORMALS,
@@ -147,9 +148,9 @@ typedef enum {
 	DEFORM_TEXT5,
 	DEFORM_TEXT6,
 	DEFORM_TEXT7
-} deform_t;
+};
 
-typedef enum {
+enum alphaGen_t {
 	AGEN_IDENTITY,
 	AGEN_SKIP,
 	AGEN_ENTITY,
@@ -160,9 +161,9 @@ typedef enum {
 	AGEN_WAVEFORM,
 	AGEN_PORTAL,
 	AGEN_CONST
-} alphaGen_t;
+};
 
-typedef enum {
+enum colorGen_t {
 	CGEN_BAD,
 	CGEN_IDENTITY_LIGHTING,	// tr.identityLight
 	CGEN_IDENTITY,			// always (1,1,1,1)
@@ -175,9 +176,9 @@ typedef enum {
 	CGEN_LIGHTING_DIFFUSE,
 	CGEN_FOG,				// standard fog
 	CGEN_CONST				// fixed color
-} colorGen_t;
+};
 
-typedef enum {
+enum texCoordGen_t {
 	TCGEN_BAD,
 	TCGEN_IDENTITY,			// clear to 0,0
 	TCGEN_LIGHTMAP,
@@ -185,27 +186,27 @@ typedef enum {
 	TCGEN_ENVIRONMENT_MAPPED,
 	TCGEN_FOG,
 	TCGEN_VECTOR			// S and T from world coordinates
-} texCoordGen_t;
+};
 
-typedef enum {
+enum acff_t {
 	ACFF_NONE,
 	ACFF_MODULATE_RGB,
 	ACFF_MODULATE_RGBA,
 	ACFF_MODULATE_ALPHA
-} acff_t;
+};
 
-typedef struct {
+struct waveForm_t {
 	genFunc_t	func;
 
 	float base;
 	float amplitude;
 	float phase;
 	float frequency;
-} waveForm_t;
+};
 
 #define TR_MAX_TEXMODS 4
 
-typedef enum {
+enum texMod_t {
 	TMOD_NONE,
 	TMOD_TRANSFORM,
 	TMOD_TURBULENT,
@@ -214,10 +215,10 @@ typedef enum {
 	TMOD_STRETCH,
 	TMOD_ROTATE,
 	TMOD_ENTITY_TRANSLATE
-} texMod_t;
+};
 
 #define	MAX_SHADER_DEFORMS	3
-typedef struct {
+struct deformStage_t {
 	deform_t	deformation;			// vertex coordinate modification type
 
 	vec3_t		moveVector;
@@ -227,10 +228,10 @@ typedef struct {
 	float		bulgeWidth;
 	float		bulgeHeight;
 	float		bulgeSpeed;
-} deformStage_t;
+};
 
 
-typedef struct {
+struct texModInfo_t {
 	texMod_t		type;
 
 	// used for TMOD_TURBULENT and TMOD_STRETCH
@@ -252,12 +253,12 @@ typedef struct {
 	// - = counterclockwise
 	float			rotateSpeed;
 
-} texModInfo_t;
+};
 
 
 #define	MAX_IMAGE_ANIMATIONS	8
 
-typedef struct {
+struct textureBundle_t {
 	image_t			*image[MAX_IMAGE_ANIMATIONS];
 	int				numImageAnimations;
 	float			imageAnimationSpeed;
@@ -271,11 +272,11 @@ typedef struct {
 	int				videoMapHandle;
 	bool		isLightmap;
 	bool		isVideoMap;
-} textureBundle_t;
+};
 
 inline constexpr int NUM_TEXTURE_BUNDLES = 2;
 
-typedef struct {
+struct shaderStage_t {
 	bool		active;
 	
 	textureBundle_t	bundle[NUM_TEXTURE_BUNDLES];
@@ -293,34 +294,34 @@ typedef struct {
 	acff_t			adjustColorsForFog;
 
 	bool		isDetail;
-} shaderStage_t;
+};
 
 struct shaderCommands_s;
 
-typedef enum {
+enum cullType_t {
 	CT_FRONT_SIDED,
 	CT_BACK_SIDED,
 	CT_TWO_SIDED
-} cullType_t;
+};
 
-typedef enum {
+enum fogPass_t {
 	FP_NONE,		// surface is translucent and will just be adjusted properly
 	FP_EQUAL,		// surface is opaque but possibly alpha tested
 	FP_LE			// surface is trnaslucent, but still needs a fog pass (fog surface)
-} fogPass_t;
+};
 
-typedef struct {
+struct skyParms_t {
 	float		cloudHeight;
 	image_t		*outerbox[6], *innerbox[6];
-} skyParms_t;
+};
 
-typedef struct {
+struct fogParms_t {
 	vec3_t	color;
 	float	depthForOpaque;
-} fogParms_t;
+};
 
 
-typedef struct shader_s {
+struct shader_s {
 	char		name[MAX_QPATH];		// game path, including extension
 	int			lightmapIndex;			// for a shader to match, both name and lightmapIndex must match
 
@@ -376,12 +377,13 @@ typedef struct shader_s {
   struct shader_s *remappedShader;                  // current shader this one is remapped too
 
 	struct	shader_s	*next;
-} shader_t;
+};
+using shader_t = shader_s;
 
 
 // trRefdef_t holds everything that comes in refdef_t,
 // as well as the locally generated scene information
-typedef struct {
+struct trRefdef_t {
 	int			x, y, width, height;
 	float		fov_x, fov_y;
 	vec3_t		vieworg;
@@ -414,7 +416,7 @@ typedef struct {
 	struct drawSurf_s	*drawSurfs;
 
 
-} trRefdef_t;
+};
 
 
 //=================================================================================
@@ -426,19 +428,20 @@ typedef struct {
 #define MAX_SKIN_SURFACES	256
 
 // skins allow models to be retextured without modifying the model file
-typedef struct {
+struct skinSurface_t {
 	char		name[MAX_QPATH];
 	shader_t	*shader;
-} skinSurface_t;
+};
 
-typedef struct skin_s {
+struct skin_s {
 	char		name[MAX_QPATH];		// game path, including extension
 	int			numSurfaces;
 	skinSurface_t	*surfaces;			// dynamically allocated array of surfaces
-} skin_t;
+};
+using skin_t = skin_s;
 
 
-typedef struct {
+struct fog_t {
 	int			originalBrushNumber;
 	vec3_t		bounds[2];
 
@@ -449,9 +452,9 @@ typedef struct {
 	// for clipping distance in fog when outside
 	bool	hasSurface;
 	float		surface[4];
-} fog_t;
+};
 
-typedef struct {
+struct viewParms_t {
 	orientationr_t	or;
 	orientationr_t	world;
 	vec3_t		pvsOrigin;			// may be different than or.origin for portals
@@ -467,7 +470,7 @@ typedef struct {
 	vec3_t		visBounds[2];
 	float		zFar;
 	stereoFrame_t	stereoFrame;
-} viewParms_t;
+};
 
 
 /*
@@ -479,7 +482,7 @@ SURFACES
 */
 
 // any changes in surfaceType must be mirrored in rb_surfaceTable[]
-typedef enum {
+enum surfaceType_t {
 	SF_BAD,
 	SF_SKIP,				// ignore
 	SF_FACE,
@@ -494,12 +497,13 @@ typedef enum {
 
 	SF_NUM_SURFACE_TYPES,
 	SF_MAX = 0x7fffffff			// ensures that sizeof( surfaceType_t ) == sizeof( int )
-} surfaceType_t;
+};
 
-typedef struct drawSurf_s {
+struct drawSurf_s {
 	uint64_t			sort;			// bit combination for fast compares
 	surfaceType_t		*surface;		// any of surface*_t
-} drawSurf_t;
+};
+using drawSurf_t = drawSurf_s;
 
 #define	MAX_FACE_POINTS		64
 
@@ -508,23 +512,25 @@ typedef struct drawSurf_s {
 
 // when cgame directly specifies a polygon, it becomes a srfPoly_t
 // as soon as it is called
-typedef struct srfPoly_s {
+struct srfPoly_s {
 	surfaceType_t	surfaceType;
 	qhandle_t		hShader;
 	int				fogIndex;
 	int				numVerts;
 	polyVert_t		*verts;
-} srfPoly_t;
+};
+using srfPoly_t = srfPoly_s;
 
 
-typedef struct srfFlare_s {
+struct srfFlare_s {
 	surfaceType_t	surfaceType;
 	vec3_t			origin;
 	vec3_t			normal;
 	vec3_t			color;
-} srfFlare_t;
+};
+using srfFlare_t = srfFlare_s;
 
-typedef struct srfGridMesh_s {
+struct srfGridMesh_s {
 	surfaceType_t	surfaceType;
 
 	// dynamic lighting information
@@ -548,12 +554,13 @@ typedef struct srfGridMesh_s {
 	float			*widthLodError;
 	float			*heightLodError;
 	drawVert_t		verts[1];		// variable sized
-} srfGridMesh_t;
+};
+using srfGridMesh_t = srfGridMesh_s;
 
 
 
 inline constexpr int VERTEXSIZE = 8;
-typedef struct {
+struct srfSurfaceFace_t {
 	surfaceType_t	surfaceType;
 	cplane_t	plane;
 
@@ -566,11 +573,11 @@ typedef struct {
 	int			ofsIndices;
 	float		points[1][VERTEXSIZE];	// variable sized
 										// there is a variable length list of indices here also
-} srfSurfaceFace_t;
+};
 
 
 // misc_models in maps are turned into direct geometry by q3map
-typedef struct {
+struct srfTriangles_t {
 	surfaceType_t	surfaceType;
 
 	// dynamic lighting information
@@ -587,16 +594,16 @@ typedef struct {
 
 	int				numVerts;
 	drawVert_t		*verts;
-} srfTriangles_t;
+};
 
-typedef struct {
+struct iqmTransform_t {
 	vec3_t translate;
 	quat_t rotate;
 	vec3_t scale;
-} iqmTransform_t;
+};
 
 // inter-quake-model
-typedef struct {
+struct iqmData_t {
 	int		num_vertexes;
 	int		num_triangles;
 	int		num_frames;
@@ -633,10 +640,10 @@ typedef struct {
 	float		*invBindJoints; // [num_joints * 12]
 	iqmTransform_t	*poses; // [num_frames * num_poses]
 	float		*bounds;
-} iqmData_t;
+};
 
 // inter-quake-model surface
-typedef struct srfIQModel_s {
+struct srfIQModel_s {
 	surfaceType_t	surfaceType;
 	char		name[MAX_QPATH];
 	shader_t	*shader;
@@ -644,7 +651,8 @@ typedef struct srfIQModel_s {
 	int		first_vertex, num_vertexes;
 	int		first_triangle, num_triangles;
 	int		first_influence, num_influences;
-} srfIQModel_t;
+};
+using srfIQModel_t = srfIQModel_s;
 
 
 extern	void (*rb_surfaceTable[SF_NUM_SURFACE_TYPES])(void *);
@@ -666,18 +674,19 @@ BRUSH MODELS
 #define	SIDE_BACK	1
 #define	SIDE_ON		2
 
-typedef struct msurface_s {
+struct msurface_s {
 	int					viewCount;		// if == tr.viewCount, already added
 	struct shader_s		*shader;
 	int					fogIndex;
 
 	surfaceType_t		*data;			// any of srf*_t
-} msurface_t;
+};
+using msurface_t = msurface_s;
 
 
 
 #define	CONTENTS_NODE		-1
-typedef struct mnode_s {
+struct mnode_s {
 	// common with leaf and node
 	int			contents;		// -1 for nodes, to differentiate from leafs
 	int			visframe;		// node needs to be traversed if current
@@ -694,15 +703,16 @@ typedef struct mnode_s {
 
 	msurface_t	**firstmarksurface;
 	int			nummarksurfaces;
-} mnode_t;
+};
+using mnode_t = mnode_s;
 
-typedef struct {
+struct bmodel_t {
 	vec3_t		bounds[2];		// for culling
 	msurface_t	*firstSurface;
 	int			numSurfaces;
-} bmodel_t;
+};
 
-typedef struct {
+struct world_t {
 	char		name[MAX_QPATH];		// ie: maps/tim_dm2.bsp
 	char		baseName[MAX_QPATH];	// ie: tim_dm2
 
@@ -744,19 +754,19 @@ typedef struct {
 
 	char		*entityString;
 	char		*entityParsePoint;
-} world_t;
+};
 
 //======================================================================
 
-typedef enum {
+enum modtype_t {
 	MOD_BAD,
 	MOD_BRUSH,
 	MOD_MESH,
 	MOD_MDR,
 	MOD_IQM
-} modtype_t;
+};
 
-typedef struct model_s {
+struct model_s {
 	char		name[MAX_QPATH];
 	modtype_t	type;
 	int			index;		// model = tr.models[model->index]
@@ -767,7 +777,8 @@ typedef struct model_s {
 	void	*modelData;			// only if type == (MOD_MDR | MOD_IQM)
 
 	int			 numLods;
-} model_t;
+};
+using model_t = model_s;
 
 
 #define	MAX_MOD_KNOWN	1024
@@ -820,7 +831,7 @@ extern	int			gl_filter_min, gl_filter_max;
 /*
 ** performanceCounters_t
 */
-typedef struct {
+struct frontEndCounters_t {
 	int		c_sphere_cull_patch_in, c_sphere_cull_patch_clip, c_sphere_cull_patch_out;
 	int		c_box_cull_patch_in, c_box_cull_patch_clip, c_box_cull_patch_out;
 	int		c_sphere_cull_md3_in, c_sphere_cull_md3_clip, c_sphere_cull_md3_out;
@@ -829,7 +840,7 @@ typedef struct {
 	int		c_leafs;
 	int		c_dlightSurfaces;
 	int		c_dlightSurfacesCulled;
-} frontEndCounters_t;
+};
 
 #define	FOG_TABLE_SIZE		256
 #define FUNCTABLE_SIZE		1024
@@ -838,16 +849,16 @@ typedef struct {
 
 
 // the renderer front end should never modify glstate_t
-typedef struct {
+struct glstate_t {
 	int			currenttextures[2];
 	int			currenttmu;
 	bool	finishCalled;
 	int			texEnv[2];
 	int			faceCulling;
 	unsigned long	glStateBits;
-} glstate_t;
+};
 
-typedef struct {
+struct backEndCounters_t {
 	int		c_surfaces, c_shaders, c_vertexes, c_indexes, c_totalIndexes;
 	float	c_overDraw;
 	
@@ -859,11 +870,11 @@ typedef struct {
 	int		c_flareRenders;
 
 	int		msec;			// total msec for backend run
-} backEndCounters_t;
+};
 
 // all state modified by the back end is separated
 // from the front end state
-typedef struct {
+struct backEndState_t {
 	trRefdef_t	refdef;
 	viewParms_t	viewParms;
 	orientationr_t	or;
@@ -876,7 +887,7 @@ typedef struct {
 	byte		color2D[4];
 	bool	vertexes2D;		// shader needs to be finished
 	trRefEntity_t	entity2D;	// currentEntity will point at this when doing 2D rendering
-} backEndState_t;
+};
 
 /*
 ** trGlobals_t 
@@ -886,7 +897,7 @@ typedef struct {
 ** but may read fields that aren't dynamically modified
 ** by the frontend.
 */
-typedef struct {
+struct trGlobals_t {
 	bool				registered;		// cleared at shutdown, set at beginRegistration
 
 	int						visCount;		// incremented every time a new vis cluster is entered
@@ -970,7 +981,7 @@ typedef struct {
 	float					sawToothTable[FUNCTABLE_SIZE];
 	float					inverseSawToothTable[FUNCTABLE_SIZE];
 	float					fogTable[FOG_TABLE_SIZE];
-} trGlobals_t;
+};
 
 extern backEndState_t	backEnd;
 extern trGlobals_t	tr;
@@ -1217,14 +1228,15 @@ TESSELATOR/SHADER DECLARATIONS
 */
 typedef byte color4ub_t[4];
 
-typedef struct stageVars
+struct stageVars
 {
 	color4ub_t	colors[SHADER_MAX_VERTEXES];
 	vec2_t		texcoords[NUM_TEXTURE_BUNDLES][SHADER_MAX_VERTEXES];
-} stageVars_t;
+};
+using stageVars_t = stageVars;
 
 
-typedef struct shaderCommands_s 
+struct shaderCommands_s 
 {
 	glIndex_t	indexes[SHADER_MAX_INDEXES] Q_ALIGN(16);
 	vec4_t		xyz[SHADER_MAX_VERTEXES] Q_ALIGN(16);
@@ -1250,7 +1262,8 @@ typedef struct shaderCommands_s
 	int			numPasses;
 	void		(*currentStageIteratorFunc)( );
 	shaderStage_t	**xstages;
-} shaderCommands_t;
+};
+using shaderCommands_t = shaderCommands_s;
 
 extern	shaderCommands_t	tess;
 
@@ -1468,56 +1481,56 @@ RENDERER BACK END COMMAND QUEUE
 
 #define	MAX_RENDER_COMMANDS	0x40000
 
-typedef struct {
+struct renderCommandList_t {
 	byte	cmds[MAX_RENDER_COMMANDS];
 	int		used;
-} renderCommandList_t;
+};
 
-typedef struct {
+struct setColorCommand_t {
 	int		commandId;
 	float	color[4];
-} setColorCommand_t;
+};
 
-typedef struct {
+struct drawBufferCommand_t {
 	int		commandId;
 	int		buffer;
-} drawBufferCommand_t;
+};
 
-typedef struct {
+struct subImageCommand_t {
 	int		commandId;
 	image_t	*image;
 	int		width;
 	int		height;
 	void	*data;
-} subImageCommand_t;
+};
 
-typedef struct {
+struct swapBuffersCommand_t {
 	int		commandId;
-} swapBuffersCommand_t;
+};
 
-typedef struct {
+struct endFrameCommand_t {
 	int		commandId;
 	int		buffer;
-} endFrameCommand_t;
+};
 
-typedef struct {
+struct stretchPicCommand_t {
 	int		commandId;
 	shader_t	*shader;
 	float	x, y;
 	float	w, h;
 	float	s1, t1;
 	float	s2, t2;
-} stretchPicCommand_t;
+};
 
-typedef struct {
+struct drawSurfsCommand_t {
 	int		commandId;
 	trRefdef_t	refdef;
 	viewParms_t	viewParms;
 	drawSurf_t *drawSurfs;
 	int		numDrawSurfs;
-} drawSurfsCommand_t;
+};
 
-typedef struct {
+struct screenshotCommand_t {
 	int commandId;
 	int x;
 	int y;
@@ -1525,30 +1538,30 @@ typedef struct {
 	int height;
 	char *fileName;
 	bool jpeg;
-} screenshotCommand_t;
+};
 
-typedef struct {
+struct videoFrameCommand_t {
 	int						commandId;
 	int						width;
 	int						height;
 	byte					*captureBuffer;
 	byte					*encodeBuffer;
 	bool			motionJpeg;
-} videoFrameCommand_t;
+};
 
-typedef struct
+struct colorMaskCommand_t
 {
 	int commandId;
 
 	GLboolean rgba[4];
-} colorMaskCommand_t;
+};
 
-typedef struct
+struct clearDepthCommand_t
 {
 	int commandId;
-} clearDepthCommand_t;
+};
 
-typedef enum {
+enum renderCommand_t {
 	RC_END_OF_LIST,
 	RC_SET_COLOR,
 	RC_STRETCH_PIC,
@@ -1559,7 +1572,7 @@ typedef enum {
 	RC_VIDEOFRAME,
 	RC_COLORMASK,
 	RC_CLEARDEPTH
-} renderCommand_t;
+};
 
 
 // these are sort of arbitrary limits.
@@ -1570,14 +1583,14 @@ typedef enum {
 
 // all of the information needed by the back end must be
 // contained in a backEndData_t
-typedef struct {
+struct backEndData_t {
 	drawSurf_t	drawSurfs[MAX_DRAWSURFS];
 	dlight_t	dlights[MAX_DLIGHTS];
 	trRefEntity_t	entities[MAX_REFENTITIES];
 	srfPoly_t	*polys;//[MAX_POLYS];
 	polyVert_t	*polyVerts;//[MAX_POLYVERTS];
 	renderCommandList_t	commands;
-} backEndData_t;
+};
 
 extern	int		max_polys;
 extern	int		max_polyverts;

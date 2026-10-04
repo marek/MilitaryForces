@@ -66,37 +66,38 @@ properly.
 #define	MAX_FACETS			1024
 #define	MAX_PATCH_PLANES	4096
 
-typedef struct {
+struct patchPlane_t {
 	float	plane[4];
 	int		signbits;		// signx + (signy<<1) + (signz<<2), used as lookup during collision
-} patchPlane_t;
+};
 
-typedef struct {
+struct facet_t {
 	int			surfacePlane;
 	int			numBorders;		// 3 or four + 6 axial bevels + 4 or 3 * 4 edge bevels
 	int			borderPlanes[4+6+16];
 	int			borderInward[4+6+16];
 	bool	borderNoAdjust[4+6+16];
-} facet_t;
+};
 
-typedef struct patchCollide_s {
+struct patchCollide_s {
 	vec3_t	bounds[2];
 	int		numPlanes;			// surface planes plus edge planes
 	patchPlane_t	*planes;
 	int		numFacets;
 	facet_t	*facets;
-} patchCollide_t;
+};
+using patchCollide_t = patchCollide_s;
 
 
 #define	MAX_GRID_SIZE	129
 
-typedef struct {
+struct cGrid_t {
 	int			width;
 	int			height;
 	bool	wrapWidth;
 	bool	wrapHeight;
 	vec3_t	points[MAX_GRID_SIZE][MAX_GRID_SIZE];	// [width][height]
-} cGrid_t;
+};
 
 inline constexpr int SUBDIVIDE_DISTANCE = 16; //4	// never more than this units away from curve
 inline constexpr double PLANE_TRI_EPSILON = 0.1;

@@ -21,13 +21,13 @@ PUSHMOVE
 
 void MatchTeam( GameEntity *teamLeader, int moverState, int time );
 
-typedef struct 
+struct pushed_t 
 {
 	GameEntity	*ent;
 	vec3_t	origin;
 	vec3_t	angles;
 	float	deltayaw;
-} pushed_t;
+};
 pushed_t	pushed[MAX_GENTITIES], *pushed_p;
 
 

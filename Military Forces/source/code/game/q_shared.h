@@ -188,11 +188,11 @@ typedef int intptr_t;
 typedef unsigned char 		byte;
 
 
-typedef union {
+union floatint_t {
 	float f;
 	int i;
 	unsigned int ui;
-} floatint_t;
+};
 
 typedef int		qhandle_t;
 typedef int		sfxHandle_t;
@@ -251,12 +251,12 @@ inline constexpr int MAX_HOSTNAME_LENGTH = 80; // max length of a host name
 inline constexpr int MAX_SAY_TEXT = 150;
 
 // parameters for command buffer stuffing
-typedef enum {
+enum cbufExec_t {
 	EXEC_NOW,			// don't return until completed, a VM should NEVER use this,
 						// because some commands might cause the VM to be unloaded...
 	EXEC_INSERT,		// insert at current position, but don't run yet
 	EXEC_APPEND			// add to end of the command buffer (normal case)
-} cbufExec_t;
+};
 
 
 //
@@ -266,12 +266,12 @@ typedef enum {
 
 
 // print levels from renderer (FIXME: set up for game / cgame?)
-typedef enum {
+enum printParm_t {
 	PRINT_ALL,
 	PRINT_DEVELOPER,		// only print when "developer 1"
 	PRINT_WARNING,
 	PRINT_ERROR
-} printParm_t;
+};
 
 
 #ifdef ERR_FATAL
@@ -279,13 +279,13 @@ typedef enum {
 #endif
 
 // parameters to the main Error routine
-typedef enum {
+enum errorParm_t {
 	ERR_FATAL,					// exit the entire game with a popup window
 	ERR_DROP,					// print to console and disconnect from game
 	ERR_SERVERDISCONNECT,		// don't kill server
 	ERR_DISCONNECT,				// client disconnected from the server
 	ERR_NEED_CD					// pop up the need-cd dialog
-} errorParm_t;
+};
 
 
 // font rendering values used by ui and cgame
@@ -314,11 +314,11 @@ inline constexpr int UI_PULSE = 0x00004000;
 	#define HUNK_DEBUG
 #endif
 
-typedef enum {
+enum ha_pref {
 	h_high,
 	h_low,
 	h_dontcare
-} ha_pref;
+};
 
 #ifdef HUNK_DEBUG
 #define Hunk_Alloc( size, preference )				Hunk_AllocDebug(size, preference, #size, __FILE__, __LINE__)
@@ -543,9 +543,9 @@ void ByteToDir( int b, vec3_t dir );
 #ifdef VectorCopy
 #undef VectorCopy
 // this is a little hack to get more efficient copies in our interpreter
-typedef struct {
+struct vec3struct_t {
 	float	v[3];
-} vec3struct_t;
+};
 #define VectorCopy(a,b)	(*(vec3struct_t *)b=*(vec3struct_t *)a)
 #endif
 #endif
@@ -719,30 +719,30 @@ inline constexpr int BOX3_MAX = 2;
 inline constexpr int BOX3_MIN = 4;
 
 // complex box for intersection method
-typedef struct {
+struct box3_t {
 	vec3_t		edgePoints[8];	// 8 edge-points
 	
 	vec3_t		center;		// center of the box
 	vec3_t		axis[3];		// columns are the x,y,z axis
 	vec3_t		extents;		// extents along axis	
-} box3_t;
+};
 
 void MakeBoxFromExtents( box3_t* box, const vec3_t mins, const vec3_t maxs, const vec3_t angles );
 
 // simple box
-typedef struct {
+struct sbox3_t {
     vec3_t		mins;
 	vec3_t		maxs;
-} sbox3_t;
+};
 
 // expand box to contain this point
 void AddToBox( sbox3_t* box, const vec3_t point );
 void BoxCenter( sbox3_t* box, vec3_t* center );
 
-typedef struct {
+struct ray3_t {
 	vec3_t		start;
 	vec3_t		dir;
-} ray3_t;
+};
 
 void MakeRay( ray3_t* ray, const vec3_t start, const vec3_t dir );
 
@@ -800,18 +800,18 @@ char *Com_SkipCharset( char *s, char *sep );
 void Com_RandomBytes( byte *string, int len );
 
 // mode parm for FS_FOpenFile
-typedef enum {
+enum fsMode_t {
 	FS_READ,
 	FS_WRITE,
 	FS_APPEND,
 	FS_APPEND_SYNC
-} fsMode_t;
+};
 
-typedef enum {
+enum fsOrigin_t {
 	FS_SEEK_CUR,
 	FS_SEEK_END,
 	FS_SEEK_SET
-} fsOrigin_t;
+};
 
 //=============================================
 
@@ -845,7 +845,7 @@ int Q_CountChar(const char *string, char tocount);
 
 // 64-bit integers for global rankings interface
 // implemented as a struct for qvm compatibility
-typedef struct
+struct qint64
 {
 	byte	b0;
 	byte	b1;
@@ -855,7 +855,7 @@ typedef struct
 	byte	b5;
 	byte	b6;
 	byte	b7;
-} qint64;
+};
 
 //=============================================
 /*
@@ -962,13 +962,13 @@ typedef int	cvarHandle_t;
 
 // the modules that run in the virtual machine can't access the cvar_t directly,
 // so they must ask for structured updates
-typedef struct {
+struct vmCvar_t {
 	cvarHandle_t	handle;
 	int			modificationCount;
 	float		value;
 	int			integer;
 	char		string[MAX_CVAR_VALUE_STRING];
-} vmCvar_t;
+};
 
 
 /*
@@ -1015,17 +1015,18 @@ PlaneTypeForNormal
 
 // plane_t structure
 // !!! if this is changed, it must be changed in asm code too !!!
-typedef struct cplane_s {
+struct cplane_s {
 	vec3_t	normal;
 	float	dist;
 	byte	type;			// for fast side tests: 0,1,2 = axial, 3 = nonaxial
 	byte	signbits;		// signx + (signy<<1) + (signz<<2), used as lookup during collision
 	byte	pad[2];
-} cplane_t;
+};
+using cplane_t = cplane_s;
 
 
 // a trace is returned when a box is swept through the world
-typedef struct {
+struct trace_t {
 	bool	allsolid;	// if true, plane is not valid
 	bool	startsolid;	// if true, the initial point was in a solid area
 	float		fraction;	// time completed, 1.0 = didn't hit anything
@@ -1034,24 +1035,24 @@ typedef struct {
 	int			surfaceFlags;	// surface hit
 	int			contents;	// contents on other side of surface hit
 	int			entityNum;	// entity the contacted sirface is a part of
-} trace_t;
+};
 
 // trace->entityNum can also be 0 to (MAX_GENTITIES-1)
 // or ENTITYNUM_NONE, ENTITYNUM_WORLD
 
 
 // markfragments are returned by R_MarkFragments()
-typedef struct {
+struct markFragment_t {
 	int		firstPoint;
 	int		numPoints;
-} markFragment_t;
+};
 
 
 
-typedef struct {
+struct orientation_t {
 	vec3_t		origin;
 	vec3_t		axis[3];
-} orientation_t;
+};
 
 //=====================================================================
 
@@ -1067,7 +1068,7 @@ inline constexpr int KEYCATCH_CGAME = 0x0008;
 // sound channels
 // channel 0 never willingly overrides
 // other channels will allways override a playing sound on that channel
-typedef enum {
+enum soundChannel_t {
 	CHAN_AUTO,
 	CHAN_LOCAL,		// menu sounds, etc
 	CHAN_WEAPON,
@@ -1076,7 +1077,7 @@ typedef enum {
 	CHAN_BODY,
 	CHAN_LOCAL_SOUND,	// chat messages, etc
 	CHAN_ANNOUNCER		// announcer voices, etc
-} soundChannel_t;
+};
 
 
 /*
@@ -1127,11 +1128,11 @@ inline constexpr int CS_SYSTEMINFO = 1; // an info string for server system to c
 inline constexpr int RESERVED_CONFIGSTRINGS = 2; // game can't modify below this, only the system can
 
 inline constexpr int MAX_GAMESTATE_CHARS = 16000;
-typedef struct {
+struct gameState_t {
 	int			stringOffsets[MAX_CONFIGSTRINGS];
 	char		stringData[MAX_GAMESTATE_CHARS];
 	int			dataCount;
-} gameState_t;
+};
 
 //=========================================================
 
@@ -1165,7 +1166,7 @@ inline constexpr int MAX_WEAPONS_PER_VEHICLE = 8;
 // playerState_t is a full superset of entityState_t as it is used by players,
 // so if a playerState_t is transmitted, the entityState_t can be fully derived
 // from it.
-typedef struct playerState_s {
+struct playerState_s {
 	int			commandTime;	// cmd->serverTime of last executed command
 	int			pm_type;
 	int			throttle;		// MFQ3 actual throttle (ie maybe overridden fixed_throttle)
@@ -1234,7 +1235,8 @@ typedef struct playerState_s {
 	int			pmove_framecount;	// FIXME: don't transmit over the network
 	int			jumppad_frame;
 	int			entityEventSequence;
-} playerState_t;
+};
+using playerState_t = playerState_s;
 
 struct PlayerState
 {
@@ -1374,20 +1376,21 @@ inline constexpr int MOVE_RUN = 120; // if forwardmove or rightmove are >= MOVE_
 										// then BUTTON_WALKING should be set
 
 // usercmd_t is sent to the server each client frame
-typedef struct usercmd_s {
+struct usercmd_s {
 	int				serverTime;
 	int				angles[3];
 	int 			buttons;
 	byte			weapon;           // weapon 
 	signed char	forwardmove, rightmove, upmove;
-} usercmd_t;
+};
+using usercmd_t = usercmd_s;
 
 //===================================================================
 
 // if entityState->solid == SOLID_BMODEL, modelindex is an inline model number
 inline constexpr int SOLID_BMODEL = 0xffffff;
 
-typedef enum {
+enum trType_t {
 	TR_STATIONARY,
 	TR_INTERPOLATE,				// non-parametric, but interpolate between snapshots
 	TR_LINEAR,
@@ -1396,15 +1399,15 @@ typedef enum {
 	TR_GRAVITY,
 	TR_GRAVITY_10,
 	TR_ACCEL
-} trType_t;
+};
 
-typedef struct {
+struct trajectory_t {
 	trType_t	trType;
 	int		trTime;
 	int		trDuration;			// if non 0, trTime + trDuration = stop time
 	vec3_t	trBase;
 	vec3_t	trDelta;			// velocity, etc
-} trajectory_t;
+};
 
 // entityState_t is the information conveyed from the server
 // in an update message about entities that the client will
@@ -1415,7 +1418,7 @@ typedef struct {
 
 inline constexpr int MAX_VEHICLE_TURRETS = 4;
 
-typedef struct entityState_s {
+struct entityState_s {
 	int		number;			// entity index
 	int		eType;			// entityType_t
 	int		eFlags;
@@ -1465,9 +1468,10 @@ typedef struct entityState_s {
 	int		revealTime;
 	float	turretYaw[MAX_VEHICLE_TURRETS];
 	float	gunPitch[MAX_VEHICLE_TURRETS];
-} entityState_t;
+};
+using entityState_t = entityState_s;
 
-typedef enum {
+enum connstate_t {
 	CA_UNINITIALIZED,
 	CA_DISCONNECTED, 	// not talking to a server
 	CA_AUTHORIZING,		// not used any more, was checking cd key 
@@ -1478,7 +1482,7 @@ typedef enum {
 	CA_PRIMED,			// got gamestate, waiting for first frame
 	CA_ACTIVE,			// game views should be displayed
 	CA_CINEMATIC		// playing a cinematic or a static pic, not connected to a server
-} connstate_t;
+};
 
 // font support 
 
@@ -1487,7 +1491,7 @@ inline constexpr int GLYPH_END = 255;
 inline constexpr int GLYPH_CHARSTART = 32;
 inline constexpr int GLYPH_CHAREND = 127;
 #define GLYPHS_PER_FONT GLYPH_END - GLYPH_START + 1
-typedef struct {
+struct glyphInfo_t {
   int height;       // number of scan lines
   int top;          // top of glyph in buffer
   int bottom;       // bottom of glyph in buffer
@@ -1501,13 +1505,13 @@ typedef struct {
   float t2;
   qhandle_t glyph;  // handle to the shader with the glyph
   char shaderName[32];
-} glyphInfo_t;
+};
 
-typedef struct {
+struct fontInfo_t {
   glyphInfo_t glyphs [GLYPHS_PER_FONT];
   float glyphScale;
   char name[MAX_QPATH];
-} fontInfo_t;
+};
 
 #define Square(x) ((x)*(x))
 
@@ -1515,7 +1519,7 @@ typedef struct {
 //=============================================
 
 
-typedef struct qtime_s {
+struct qtime_s {
 	int tm_sec;     /* seconds after the minute - [0,59] */
 	int tm_min;     /* minutes after the hour - [0,59] */
 	int tm_hour;    /* hours since midnight - [0,23] */
@@ -1525,7 +1529,8 @@ typedef struct qtime_s {
 	int tm_wday;    /* days since Sunday - [0,6] */
 	int tm_yday;    /* days since January 1 - [0,365] */
 	int tm_isdst;   /* daylight savings time flag */
-} qtime_t;
+};
+using qtime_t = qtime_s;
 
 
 // server browser sources
@@ -1537,7 +1542,7 @@ inline constexpr int AS_FAVORITES = 3;
 
 
 // cinematic states
-typedef enum {
+enum e_status {
 	FMV_IDLE,
 	FMV_PLAY,		// play
 	FMV_EOF,		// all other conditions, i.e. stop/EOF/abort
@@ -1545,15 +1550,16 @@ typedef enum {
 	FMV_ID_IDLE,
 	FMV_LOOPED,
 	FMV_ID_WAIT
-} e_status;
+};
 
-typedef enum _flag_status {
+enum _flag_status {
 	FLAG_ATBASE = 0,
 	FLAG_TAKEN,			// CTF
 	FLAG_TAKEN_RED,		// One Flag CTF
 	FLAG_TAKEN_BLUE,	// One Flag CTF
 	FLAG_DROPPED
-} flagStatus_t;
+};
+using flagStatus_t = _flag_status;
 
 
 

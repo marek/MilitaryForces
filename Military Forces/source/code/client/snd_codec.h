@@ -27,7 +27,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../game/q_shared.h"
 #include "../qcommon/qcommon.h"
 
-typedef struct snd_info_s
+struct snd_info_s
 {
 	int rate;
 	int width;
@@ -35,11 +35,12 @@ typedef struct snd_info_s
 	int samples;
 	int size;
 	int dataofs;
-} snd_info_t;
+};
+using snd_info_t = snd_info_s;
 
 typedef struct snd_codec_s snd_codec_t;
 
-typedef struct snd_stream_s
+struct snd_stream_s
 {
 	snd_codec_t *codec;
 	fileHandle_t file;
@@ -47,7 +48,8 @@ typedef struct snd_stream_s
 	int length;
 	int pos;
 	void *ptr;
-} snd_stream_t;
+};
+using snd_stream_t = snd_stream_s;
 
 // Codec functions
 typedef void *(*CODEC_LOAD)(const char *filename, snd_info_t *info);

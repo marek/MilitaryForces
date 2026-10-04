@@ -26,7 +26,7 @@ inline constexpr int IQM_VERSION = 2;
 
 inline constexpr int IQM_MAX_JOINTS = 128;
 
-typedef struct iqmheader
+struct iqmheader
 {
     char magic[16];
     unsigned int version;
@@ -42,15 +42,17 @@ typedef struct iqmheader
     unsigned int num_frames, num_framechannels, ofs_frames, ofs_bounds;
     unsigned int num_comment, ofs_comment;
     unsigned int num_extensions, ofs_extensions;
-} iqmHeader_t;
+};
+using iqmHeader_t = iqmheader;
 
-typedef struct iqmmesh
+struct iqmmesh
 {
     unsigned int name;
     unsigned int material;
     unsigned int first_vertex, num_vertexes;
     unsigned int first_triangle, num_triangles;
-} iqmMesh_t;
+};
+using iqmMesh_t = iqmmesh;
 
 enum
 {
@@ -77,53 +79,59 @@ enum
     IQM_DOUBLE = 8,
 };
 
-typedef struct iqmtriangle
+struct iqmtriangle
 {
     unsigned int vertex[3];
-} iqmTriangle_t;
+};
+using iqmTriangle_t = iqmtriangle;
 
-typedef struct iqmjoint
+struct iqmjoint
 {
     unsigned int name;
     int parent;
     float translate[3], rotate[4], scale[3];
-} iqmJoint_t;
+};
+using iqmJoint_t = iqmjoint;
 
-typedef struct iqmpose
+struct iqmpose
 {
     int parent;
     unsigned int mask;
     float channeloffset[10];
     float channelscale[10];
-} iqmPose_t;
+};
+using iqmPose_t = iqmpose;
 
-typedef struct iqmanim
+struct iqmanim
 {
     unsigned int name;
     unsigned int first_frame, num_frames;
     float framerate;
     unsigned int flags;
-} iqmAnim_t;
+};
+using iqmAnim_t = iqmanim;
 
 enum
 {
     IQM_LOOP = 1<<0
 };
 
-typedef struct iqmvertexarray
+struct iqmvertexarray
 {
     unsigned int type;
     unsigned int flags;
     unsigned int format;
     unsigned int size;
     unsigned int offset;
-} iqmVertexArray_t;
+};
+using iqmVertexArray_t = iqmvertexarray;
 
-typedef struct iqmbounds
+struct iqmbounds
 {
     float bbmin[3], bbmax[3];
     float xyradius, radius;
-} iqmBounds_t;
+};
+using iqmBounds_t = iqmbounds;
 
 #endif
 

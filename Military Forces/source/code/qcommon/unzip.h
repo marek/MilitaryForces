@@ -61,7 +61,8 @@ extern "C" {
 #if defined(STRICTUNZIP) || defined(STRICTZIPUNZIP)
 /* like the STRICT of WIN32, we define a pointer that cannot be converted
     from (void*) without cast */
-typedef struct TagunzFile__ { int unused; } unzFile__;
+struct TagunzFile__ { int unused; };
+using unzFile__ = TagunzFile__;
 typedef unzFile__ *unzFile;
 #else
 typedef voidp unzFile;
@@ -78,7 +79,7 @@ typedef voidp unzFile;
 #define UNZ_CRCERROR                    (-105)
 
 /* tm_unz contain date/time info */
-typedef struct tm_unz_s
+struct tm_unz_s
 {
     uInt tm_sec;            /* seconds after the minute - [0,59] */
     uInt tm_min;            /* minutes after the hour - [0,59] */
@@ -86,20 +87,22 @@ typedef struct tm_unz_s
     uInt tm_mday;           /* day of the month - [1,31] */
     uInt tm_mon;            /* months since January - [0,11] */
     uInt tm_year;           /* years - [1980..2044] */
-} tm_unz;
+};
+using tm_unz = tm_unz_s;
 
 /* unz_global_info structure contain global data about the ZIPfile
    These data comes from the end of central dir */
-typedef struct unz_global_info_s
+struct unz_global_info_s
 {
     uLong number_entry;         /* total number of entries in
                        the central dir on this disk */
     uLong size_comment;         /* size of the global comment of the zipfile */
-} unz_global_info;
+};
+using unz_global_info = unz_global_info_s;
 
 
 /* unz_file_info contain information about a file in the zipfile */
-typedef struct unz_file_info_s
+struct unz_file_info_s
 {
     uLong version;              /* version made by                 2 bytes */
     uLong version_needed;       /* version needed to extract       2 bytes */
@@ -118,7 +121,8 @@ typedef struct unz_file_info_s
     uLong external_fa;          /* external file attributes        4 bytes */
 
     tm_unz tmu_date;
-} unz_file_info;
+};
+using unz_file_info = unz_file_info_s;
 
 extern int ZEXPORT unzStringFileNameCompare OF ((const char* fileName1,
                                                  const char* fileName2,
@@ -208,11 +212,12 @@ extern int ZEXPORT unzLocateFile OF((unzFile file,
 /* ****************************************** */
 /* Ryan supplied functions */
 /* unz_file_info contain information about a file in the zipfile */
-typedef struct unz_file_pos_s
+struct unz_file_pos_s
 {
     uLong pos_in_zip_directory;   /* offset in zip file directory */
     uLong num_of_file;            /* # of file */
-} unz_file_pos;
+};
+using unz_file_pos = unz_file_pos_s;
 
 extern int ZEXPORT unzGetFilePos(
     unzFile file,

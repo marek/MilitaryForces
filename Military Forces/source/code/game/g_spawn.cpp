@@ -69,7 +69,7 @@ bool G_SpawnVector( const char *key, const char *defaultString, float *out )
 //
 // fields are needed for spawning from the entity string
 //
-typedef enum 
+enum fieldtype_t 
 {
 	F_INT, 
 	F_FLOAT,
@@ -81,15 +81,15 @@ typedef enum
 	F_ITEM,				// index on disk, pointer in memory
 	F_CLIENT,			// index on disk, pointer in memory
 	F_IGNORE
-} fieldtype_t;
+};
 
-typedef struct
+struct field_t
 {
 	char	*name;
 	int		ofs;
 	fieldtype_t	type;
 	int		flags;
-} field_t;
+};
 
 //field_t fields[] = {
 //	{"classname", FOFS(classname_), F_LSTRING},

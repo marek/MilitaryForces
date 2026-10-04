@@ -55,12 +55,12 @@ extern const char *fallbackShader_tonemap_fp;
 extern const char* fallbackShader_greyscale_vp;
 extern const char* fallbackShader_greyscale_fp;
 
-typedef struct uniformInfo_s
+struct uniformInfo_s
 {
 	char *name;
 	int type;
-}
-uniformInfo_t;
+};
+using uniformInfo_t = uniformInfo_s;
 
 // These must be in the same order as in uniform_t in tr_local.h.
 static uniformInfo_t uniformsInfo[] =
@@ -161,13 +161,12 @@ static uniformInfo_t uniformsInfo[] =
 	{ "u_Greyscale", GLSL_FLOAT }
 };
 
-typedef enum
+enum glslPrintLog_t
 {
 	GLSL_PRINTLOG_PROGRAM_INFO,
 	GLSL_PRINTLOG_SHADER_INFO,
 	GLSL_PRINTLOG_SHADER_SOURCE
-}
-glslPrintLog_t;
+};
 
 static void GLSL_PrintLog(GLuint programOrShader, glslPrintLog_t type, bool developerOnly)
 {

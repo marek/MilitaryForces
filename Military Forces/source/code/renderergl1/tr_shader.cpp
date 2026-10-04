@@ -1352,10 +1352,10 @@ void ParseSort( char **text ) {
 
 // this table is also present in q3map
 
-typedef struct {
+struct infoParm_t {
 	char	*name;
 	int		clearSolid, surfaceFlags, contents;
-} infoParm_t;
+};
 
 infoParm_t	infoParms[] = {
 	// server relevant contents
@@ -1760,13 +1760,13 @@ static void ComputeStageIteratorFunc( )
 	}
 }
 
-typedef struct {
+struct collapse_t {
 	int		blendA;
 	int		blendB;
 
 	int		multitextureEnv;
 	int		multitextureBlend;
-} collapse_t;
+};
 
 static collapse_t	collapse[] = {
 	{ 0, GLS_DSTBLEND_SRC_COLOR | GLS_SRCBLEND_ZERO,	

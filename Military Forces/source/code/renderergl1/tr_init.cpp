@@ -258,12 +258,13 @@ void GL_CheckErrors( ) {
 /*
 ** R_GetModeInfo
 */
-typedef struct vidmode_s
+struct vidmode_s
 {
 	const char *description;
 	int width, height;
 	float pixelAspect;		// pixel width / height
-} vidmode_t;
+};
+using vidmode_t = vidmode_s;
 
 vidmode_t r_vidModes[] =
 {

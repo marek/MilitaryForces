@@ -12,7 +12,7 @@ struct EntityBase;
 #ifdef USE_VOIP
 inline constexpr int VOIP_QUEUE_LENGTH = 64;
 
-typedef struct voipServerPacket_s
+struct voipServerPacket_s
 {
 	int generation;
 	int sequence;
@@ -21,7 +21,8 @@ typedef struct voipServerPacket_s
 	int sender;
 	int flags;
 	byte data[4000];
-} voipServerPacket_t;
+};
+using voipServerPacket_t = voipServerPacket_s;
 #endif
 
 inline constexpr int MAX_SENT_ENTITIES = 512;

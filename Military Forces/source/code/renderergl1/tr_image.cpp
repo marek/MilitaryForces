@@ -42,10 +42,10 @@ void R_GammaCorrect( byte *buffer, int bufSize ) {
 	}
 }
 
-typedef struct {
+struct textureMode_t {
 	char *name;
 	int	minimize, maximize;
-} textureMode_t;
+};
 
 textureMode_t modes[] = {
 	{"GL_NEAREST", GL_NEAREST, GL_NEAREST},
@@ -911,11 +911,11 @@ image_t *R_CreateImage( const char *name, byte *pic, int width, int height,
 
 //===================================================================
 
-typedef struct
+struct imageExtToLoaderMap_t
 {
 	char *ext;
 	void (*ImageLoader)( const char *, unsigned char **, int *, int * );
-} imageExtToLoaderMap_t;
+};
 
 // Note that the ordering indicates the order of preference used
 // when there are multiple images of different formats available

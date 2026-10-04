@@ -10,11 +10,11 @@
 #include "g_level.h"
 
 
-typedef struct {
+struct shaderRemap_t {
   char oldShader[MAX_QPATH];
   char newShader[MAX_QPATH];
   float timeOffset;
-} shaderRemap_t;
+};
 
 constexpr int MAX_SHADER_REMAPS = 128;
 

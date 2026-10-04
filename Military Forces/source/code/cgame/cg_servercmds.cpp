@@ -10,10 +10,10 @@
 
 #include "cg_local.h"
 
-typedef struct {
+struct orderTask_t {
 	const char *order;
 	int taskNum;
-} orderTask_t;
+};
 
 /*
 =================

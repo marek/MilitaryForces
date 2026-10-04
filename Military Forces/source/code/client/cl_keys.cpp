@@ -48,10 +48,10 @@ int				anykeydown;
 qkey_t		keys[MAX_KEYS];
 
 
-typedef struct {
+struct keyname_t {
 	char	*name;
 	int		keynum;
-} keyname_t;
+};
 
 
 // names not in this list can either be lowercase ascii, or '0xnn' hex sequences

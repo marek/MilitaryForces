@@ -21,11 +21,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include "../ui/keycodes.h"
 
-typedef struct {
+struct qkey_t {
 	bool	down;
 	int			repeats;		// if > 1, it is autorepeating
 	char		*binding;
-} qkey_t;
+};
 
 extern	bool	key_overstrikeMode;
 extern	qkey_t		keys[MAX_KEYS];

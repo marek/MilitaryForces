@@ -44,10 +44,10 @@ void R_GammaCorrect( byte *buffer, int bufSize ) {
 	}
 }
 
-typedef struct {
+struct textureMode_t {
 	char *name;
 	int	minimize, maximize;
-} textureMode_t;
+};
 
 textureMode_t modes[] = {
 	{"GL_NEAREST", GL_NEAREST, GL_NEAREST},
@@ -2377,11 +2377,11 @@ void R_UpdateSubImage( image_t *image, byte *pic, int x, int y, int width, int h
 // Prototype for dds loader function which isn't common to both renderers
 void R_LoadDDS(const char *filename, byte **pic, int *width, int *height, GLenum *picFormat, int *numMips);
 
-typedef struct
+struct imageExtToLoaderMap_t
 {
 	char *ext;
 	void (*ImageLoader)( const char *, unsigned char **, int *, int * );
-} imageExtToLoaderMap_t;
+};
 
 // Note that the ordering indicates the order of preference used
 // when there are multiple images of different formats available

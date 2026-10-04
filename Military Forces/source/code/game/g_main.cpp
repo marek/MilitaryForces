@@ -6,7 +6,7 @@
 //level_locals_t	level;
 LevelLocals& theLevel = LevelLocals::getInstance();
 
-typedef struct {
+struct cvarTable_t {
 	vmCvar_t	*vmCvar;
 	char		*cvarName;
 	char		*defaultString;
@@ -14,7 +14,7 @@ typedef struct {
 	int			modificationCount;  // for tracking changes
 	bool	trackChange;	    // track this variable, and announce if changed
   bool teamShader;        // track and if changed, update shader state
-} cvarTable_t;
+};
 
 //gentity_t		g_entities[MAX_GENTITIES];
 //gclient_t		g_clients[MAX_CLIENTS];

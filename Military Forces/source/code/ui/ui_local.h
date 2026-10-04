@@ -179,7 +179,7 @@ inline constexpr int QM_GOTFOCUS = 1;
 inline constexpr int QM_LOSTFOCUS = 2;
 inline constexpr int QM_ACTIVATED = 3;
 
-typedef struct _tag_menuframework
+struct _tag_menuframework
 {
 	int	cursor;
 	int cursor_prev;
@@ -193,9 +193,10 @@ typedef struct _tag_menuframework
 	bool	wrapAround;
 	bool	fullscreen;
 	bool	showlogo;
-} menuframework_s;
+};
+using menuframework_s = _tag_menuframework;
 
-typedef struct
+struct menucommon_s
 {
 	int type;
 	const char *name;
@@ -212,23 +213,23 @@ typedef struct
 	void (*callback)( void *self, int event );
 	void (*statusbar)( void *self );
 	void (*ownerdraw)( void *self );
-} menucommon_s;
+};
 
-typedef struct {
+struct mfield_t {
 	int		cursor;
 	int		scroll;
 	int		widthInChars;
 	char	buffer[MAX_EDIT_LINE];
 	int		maxchars;
-} mfield_t;
+};
 
-typedef struct
+struct menufield_s
 {
 	menucommon_s	generic;
 	mfield_t		field;
-} menufield_s;
+};
 
-typedef struct 
+struct menuslider_s 
 {
 	menucommon_s generic;
 
@@ -237,9 +238,9 @@ typedef struct
 	float curvalue;
 
 	float range;
-} menuslider_s;
+};
 
-typedef struct
+struct menulist_s
 {
 	menucommon_s generic;
 
@@ -254,20 +255,20 @@ typedef struct
 	int height;
 	int	columns;
 	int	seperation;
-} menulist_s;
+};
 
-typedef struct
+struct menuaction_s
 {
 	menucommon_s generic;
-} menuaction_s;
+};
 
-typedef struct
+struct menuradiobutton_s
 {
 	menucommon_s generic;
 	int curvalue;
-} menuradiobutton_s;
+};
 
-typedef struct
+struct menubitmap_s
 {
 	menucommon_s	generic;
 	char*			focuspic;	
@@ -277,15 +278,15 @@ typedef struct
 	int				width;
 	int				height;
 	float*			focuscolor;
-} menubitmap_s;
+};
 
-typedef struct
+struct menutext_s
 {
 	menucommon_s	generic;
 	char*			string;
 	int				style;
 	float*			color;
-} menutext_s;
+};
 
 extern void			Menu_Cache( );
 extern void			Menu_Focus( menucommon_s *m );
@@ -494,7 +495,7 @@ extern void DriverInfo_Cache( );
 //
 
 //FIXME ripped from cg_local.h
-typedef struct {
+struct lerpFrame_t {
 	int			oldFrame;
 	int			oldFrameTime;		// time when ->oldFrame was exactly on
 
@@ -510,9 +511,9 @@ typedef struct {
 
 	int			animationNumber;	// may include ANIM_TOGGLEBIT
 	int			animationTime;		// time when the first frame of the animation will be exact
-} lerpFrame_t;
+};
 
-typedef struct {
+struct playerInfo_t {
 	// model info
 	qhandle_t		legsModel;
 	qhandle_t		legsSkin;
@@ -557,7 +558,7 @@ typedef struct {
 	int				barrelTime;
 
 	int				realWeapon;
-} playerInfo_t;
+};
 
 void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int time );
 void UI_PlayerInfo_SetModel( playerInfo_t *pi, const char *model, const char *headmodel, char *teamName );
@@ -568,7 +569,7 @@ bool UI_RegisterClientModelname( playerInfo_t *pi, const char *modelSkinName , c
 // ui_atoms.c
 //
 // this is only used in the old ui, the New ui has it's own version
-typedef struct {
+struct uiStatic_t {
 	int					frametime;
 	int					realtime;
 	int					cursorx;
@@ -590,7 +591,7 @@ typedef struct {
 	float				bias;
 	bool		demoversion;
 	bool		firstdraw;
-} uiStatic_t;
+};
 
 
 // New ui stuff
@@ -627,22 +628,22 @@ inline constexpr int MAX_MOVIES = 256;
 inline constexpr int MAX_PLAYERMODELS = 256;
 
 
-typedef struct {
+struct characterInfo {
   const char *name;
 	const char *imageName;
   qhandle_t headImage;
 	const char *base;
 	bool active;
 	int reference;
-} characterInfo;
+};
 
-typedef struct {
+struct aliasInfo {
 	const char *name;
 	const char *ai;
 	const char *action;
-} aliasInfo;
+};
 
-typedef struct {
+struct teamInfo {
   const char *teamName;
 	const char *imageName;
 	const char *teamMembers[TEAM_MEMBERS];
@@ -650,14 +651,14 @@ typedef struct {
   qhandle_t teamIcon_Metal;
   qhandle_t teamIcon_Name;
 	int cinematic;
-} teamInfo;
+};
 
-typedef struct {
+struct gameTypeInfo {
   const char *gameType;
   int gtEnum;
-} gameTypeInfo;
+};
 
-typedef struct {
+struct mapInfo {
   const char *mapName;
   const char *mapLoadName;
 	const char *imageName;
@@ -668,27 +669,28 @@ typedef struct {
 	int timeToBeat[MAX_GAMETYPES];
 	qhandle_t levelShot;
 	bool active;
-} mapInfo;
+};
 
-typedef struct {
+struct tierInfo {
 	const char *tierName;
 	const char *maps[MAPS_PER_TIER];
 	int gameTypes[MAPS_PER_TIER];
 	qhandle_t mapHandles[MAPS_PER_TIER];
-} tierInfo;
+};
 
-typedef struct serverFilter_s {
+struct serverFilter_s {
 	const char *description;
 	const char *basedir;
-} serverFilter_t;
+};
+using serverFilter_t = serverFilter_s;
 
-typedef struct {
+struct pinglist_t {
 	char	adrstr[MAX_ADDRESSLENGTH];
 	int		start;
-} pinglist_t;
+};
 
 
-typedef struct serverStatus_s {
+struct serverStatus_s {
 	pinglist_t pingList[MAX_PINGREQUESTS];
 	int		numqueriedservers;
 	int		currentping;
@@ -715,16 +717,17 @@ typedef struct serverStatus_s {
 	int		motdOffset;
 	int		motdTime;
 	char	motd[MAX_STRING_CHARS];
-} serverStatus_t;
+};
+using serverStatus_t = serverStatus_s;
 
 
-typedef struct {
+struct pendingServer_t {
 	char		adrstr[MAX_ADDRESSLENGTH];
 	char		name[MAX_ADDRESSLENGTH];
 	int			startTime;
 	int			serverNum;
 	bool	valid;
-} pendingServer_t;
+};
 
 struct pendingServerStatus_t
 {
@@ -1023,14 +1026,14 @@ void UI_NetworkOptionsMenu( );
 //
 // ui_gameinfo.c
 //
-typedef enum {
+enum awardType_t {
 	AWARD_ACCURACY,
 	AWARD_IMPRESSIVE,
 	AWARD_EXCELLENT,
 	AWARD_GAUNTLET,
 	AWARD_FRAGS,
 	AWARD_PERFECT
-} awardType_t;
+};
 
 const char *UI_GetArenaInfoByNumber( int num );
 const char *UI_GetArenaInfoByMap( const char *map );
@@ -1084,7 +1087,7 @@ void UI_RankStatusMenu( );
 #define ASSET_BACKGROUND "uiBackground"
 
 // for tracking sp game info in Team Arena
-typedef struct postGameInfo_s {
+struct postGameInfo_s {
 	int score;
 	int redScore;
 	int blueScore;
@@ -1101,7 +1104,8 @@ typedef struct postGameInfo_s {
 	int shutoutBonus;
 	int skillBonus;
 	int baseScore;
-} postGameInfo_t;
+};
+using postGameInfo_t = postGameInfo_s;
 
 // MFQ3 util
 

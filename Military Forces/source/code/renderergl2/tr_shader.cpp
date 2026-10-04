@@ -1665,10 +1665,10 @@ void ParseSort( char **text ) {
 
 // this table is also present in q3map
 
-typedef struct {
+struct infoParm_t {
 	char	*name;
 	int		clearSolid, surfaceFlags, contents;
-} infoParm_t;
+};
 
 infoParm_t	infoParms[] = {
 	// server relevant contents

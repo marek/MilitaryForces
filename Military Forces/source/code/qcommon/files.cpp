@@ -209,14 +209,15 @@ constexpr int MAX_ZPATH = 256;
 constexpr int MAX_SEARCH_PATHS = 4096;
 constexpr int MAX_FILEHASH_SIZE = 1024;
 
-typedef struct fileInPack_s {
+struct fileInPack_s {
 	char					*name;		// name of the file
 	unsigned long			pos;		// file info position in zip
 	unsigned long			len;		// uncompress file size
 	struct	fileInPack_s*	next;		// next file in the hash
-} fileInPack_t;
+};
+using fileInPack_t = fileInPack_s;
 
-typedef struct {
+struct pack_t {
 	char			pakPathname[MAX_OSPATH];	// c:\quake3\baseq3
 	char			pakFilename[MAX_OSPATH];	// c:\quake3\baseq3\pak0.pk3
 	char			pakBasename[MAX_OSPATH];	// pak0
@@ -229,20 +230,21 @@ typedef struct {
 	int				hashSize;					// hash table size (power of 2)
 	fileInPack_t*	*hashTable;					// hash table
 	fileInPack_t*	buildBuffer;				// buffer with the filenames etc.
-} pack_t;
+};
 
-typedef struct {
+struct directory_t {
 	char		path[MAX_OSPATH];		// c:\quake3
 	char		fullpath[MAX_OSPATH];		// c:\quake3\baseq3
 	char		gamedir[MAX_OSPATH];	// baseq3
-} directory_t;
+};
 
-typedef struct searchpath_s {
+struct searchpath_s {
 	struct searchpath_s *next;
 
 	pack_t		*pack;		// only one of pack / dir will be non NULL
 	directory_t	*dir;
-} searchpath_t;
+};
+using searchpath_t = searchpath_s;
 
 static	char		fs_gamedir[MAX_OSPATH];	// this will be a single file name with no separators
 static	cvar_t		*fs_debug;
@@ -268,17 +270,19 @@ static cvar_t *fs_pathVars[16];
 
 static int fs_checksumFeed;
 
-typedef union qfile_gus {
+union qfile_gus {
 	FILE*		o;
 	unzFile		z;
-} qfile_gut;
+};
+using qfile_gut = qfile_gus;
 
-typedef struct qfile_us {
+struct qfile_us {
 	qfile_gut	file;
 	bool	unique;
-} qfile_ut;
+};
+using qfile_ut = qfile_us;
 
-typedef struct {
+struct fileHandleData_t {
 	qfile_ut	handleFiles;
 	bool	handleSync;
 	int			fileSize;
@@ -286,7 +290,7 @@ typedef struct {
 	int			zipFileLen;
 	bool	zipFile;
 	char		name[MAX_ZPATH];
-} fileHandleData_t;
+};
 
 static fileHandleData_t	fsh[MAX_FILE_HANDLES];
 

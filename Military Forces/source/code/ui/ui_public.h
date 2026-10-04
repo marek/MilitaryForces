@@ -6,14 +6,14 @@
 
 //#define UI_API_VERSION	6
 
-typedef struct {
+struct uiClientState_t {
 	connstate_t		connState;
 	int				connectPacketCount;
 	int				clientNum;
 	char			servername[MAX_STRING_CHARS];
 	char			updateInfoString[MAX_STRING_CHARS];
 	char			messageString[MAX_STRING_CHARS];
-} uiClientState_t;
+};
 
 //typedef enum {
 //	UI_ERROR,
@@ -133,7 +133,7 @@ inline constexpr int SORT_CLIENTS = 2;
 inline constexpr int SORT_GAME = 3;
 inline constexpr int SORT_PING = 4;
 
-typedef enum {
+enum uiExport_t {
 //	UI_GETAPIVERSION = 0,	// system reserved
 
 //	UI_INIT,
@@ -166,6 +166,6 @@ typedef enum {
 // if !overlay, the background will be drawn, otherwise it will be
 // overlayed over whatever the cgame has drawn.
 // a GetClientState syscall will be made to get the current strings
-} uiExport_t;
+};
 
 #endif	// __UI_PUBLIC_H__

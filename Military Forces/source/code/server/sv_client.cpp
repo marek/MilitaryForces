@@ -1542,11 +1542,11 @@ static void SV_Voip_f( SV_Client *cl ) {
 #endif
 
 
-typedef struct 
+struct ucmd_t 
 {
 	char	*name;
 	void	(*func)( SV_Client *cl );
-} ucmd_t;
+};
 
 static ucmd_t ucmds[] = {
 	{"userinfo", SV_UpdateUserinfo_f},

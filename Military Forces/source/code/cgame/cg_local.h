@@ -23,17 +23,17 @@
 
 // global client enumerations
 
-typedef enum {
+enum explosion_t {
 	EXPLODE_VEHICLE_DIE,
 	EXPLODE_VEHICLE_GIB,
 	EXPLODE_BUILDING
-} explosion_t;
+};
 
-typedef enum {
+enum quality_t {
 	LOW_QUALITY,
 	MEDIUM_QUALITY,
 	HIGH_QUALITY
-} quality_t;
+};
 
 // The entire cgame module is unloaded and reloaded on each level change,
 // so there is NO persistant data between levels on the client side.
@@ -97,11 +97,11 @@ inline constexpr int TEAM_OVERLAY_MAXLOCATION_WIDTH = 16;
 #define DEFAULT_REDTEAM_NAME		"Warsaw Pact"
 #define DEFAULT_BLUETEAM_NAME		"NATO"
 
-typedef enum {
+enum impactSound_t {
 	IMPACTSOUND_DEFAULT,
 	IMPACTSOUND_METAL,
 	IMPACTSOUND_FLESH
-} impactSound_t;
+};
 
 // radar
 inline constexpr int RD_GROUND_ENEMY = 0;
@@ -124,7 +124,7 @@ inline constexpr int RD_MAX_ICONS = 15;
 inline constexpr int MAX_RADAR_TARGETS = 32;
 
 // MFD
-typedef enum {
+enum MFD_Modes {
 	MFD_OFF,
 	MFD_RWR,
 	MFD_STATUS,
@@ -132,20 +132,20 @@ typedef enum {
 	MFD_CAMERA,
 	MFD_INFO,
 	MFD_MAX					
-} MFD_Modes;
+};
 
 inline constexpr int MFD_1 = 0;
 inline constexpr int MFD_2 = 1;
 inline constexpr int NUM_MFDS_IN_COCKPIT = 2;
 
 // cameramode
-typedef enum {
+enum Camera_Modes {
 	CAMERA_TARGET,
 	CAMERA_BACK,
 	CAMERA_DOWN,
 	CAMERA_BOMB,
 	CAMERA_MAX		
-} Camera_Modes;
+};
 
 #define MAX_CONSOLE_LINES 8
 
@@ -164,11 +164,11 @@ struct strConsoleLine {
 // because corpses after respawn are outside the normal
 // client numbering range
 
-typedef struct {
+struct playerEntity_t {
 	int				painTime;
 	int				painDirection;	// flip from 0 to 1
 
-} playerEntity_t;
+};
 
 //=================================================
 
@@ -178,7 +178,7 @@ typedef struct {
 // only the entityState_t is directly communicated to the cgame
 inline constexpr int ANGLE_ERROR_DECAY = 150;
 
-typedef struct centity_s {
+struct centity_s {
 	entityState_t	currentState;	// from cg.frame
 	entityState_t	nextState;		// from cg.nextFrame, if available
 	bool		interpolate;	// true if next is valid to interpolate to
@@ -226,7 +226,8 @@ typedef struct centity_s {
 	int				bayAnimStartTime;
 
 	int				muzzleFlashWeapon;
-} centity_t;
+};
+using centity_t = centity_s;
 
 
 //======================================================================
@@ -234,7 +235,7 @@ typedef struct centity_s {
 // local entities are created as a result of events or predicted actions,
 // and live independantly from all server transmitted entities
 
-typedef struct markPoly_s {
+struct markPoly_s {
 	struct markPoly_s	*prevMark, *nextMark;
 	int			time;
 	qhandle_t	markShader;
@@ -242,10 +243,11 @@ typedef struct markPoly_s {
 	float		color[4];
 	poly_t		poly;
 	polyVert_t	verts[MAX_VERTS_ON_POLY];
-} markPoly_t;
+};
+using markPoly_t = markPoly_s;
 
 
-typedef enum {
+enum leType_t {
 	LE_MARK,
 	LE_EXPLOSION,
 	LE_SPRITE_EXPLOSION,
@@ -254,29 +256,29 @@ typedef enum {
 	LE_FADE_RGB,
 	LE_SCALE_FADE,
 	LE_NUKE
-} leType_t;
+};
 
-typedef enum {
+enum leFlag_t {
 	LEF_PUFF_DONT_SCALE  = 0x0001,			// do not scale size over time
 	LEF_TUMBLE			 = 0x0002,			// tumble over time, used for ejecting shells
 	LEF_NO_RADIUS_KILL	 = 0x0004,			// don't CG_FreeLocalEntity() just because the camera is 'inside' the radius of a sprite (e.g. smoke puffs)
 	LEF_SOUND1			 = 0x0004,			// sound 1 for nuke
 	LEF_SOUND2			 = 0x0008			// sound 2 for nuke
-} leFlag_t;
+};
 
-typedef enum {
+enum leMarkType_t {
 	LEMT_NONE,
 	LEMT_BURN,
 	LEMT_BLOOD
-} leMarkType_t;			// fragment local entities can leave marks on walls
+};			// fragment local entities can leave marks on walls
 
-typedef enum {
+enum leBounceSoundType_t {
 	LEBS_NONE,
 	LEBS_BRASS,
 	LEBS_BLOOD
-} leBounceSoundType_t;	// fragment local entities can make sounds on impacts
+};	// fragment local entities can make sounds on impacts
 
-typedef struct localEntity_s {
+struct localEntity_s {
 	struct localEntity_s	*prev, *next;
 	leType_t		leType;
 	int				leFlags;
@@ -303,12 +305,13 @@ typedef struct localEntity_s {
 	leBounceSoundType_t	leBounceSoundType;
 
 	refEntity_t		refEntity;		
-} localEntity_t;
+};
+using localEntity_t = localEntity_s;
 
 //======================================================================
 
 
-typedef struct {
+struct score_t {
 	int				client;
 	int				score;
 	int				ping;
@@ -325,7 +328,7 @@ typedef struct {
 	int				deaths;
 	int				perfect;
 	int				team;
-} score_t;
+};
 
 // each client has an associated clientInfo_t
 // that contains media references necessary to present the
@@ -334,7 +337,7 @@ typedef struct {
 // usually as a result of a userinfo (name, model, etc) change
 inline constexpr int MAX_CUSTOM_SOUNDS = 32;
 
-typedef struct {
+struct clientInfo_t {
 	bool		infoValid;
 
 	char			name[MAX_QPATH];
@@ -372,12 +375,12 @@ typedef struct {
 	int				deaths;
 	qhandle_t		parts[BP_MAX_PARTS];
 	int				advancedControls;
-} clientInfo_t;
+};
 
 // each WP_* weapon enum has an associated weaponInfo_t
 // that contains media references necessary to present the
 // weapon and its effects
-typedef struct weaponInfo_s {
+struct weaponInfo_s {
 	bool		registered;
 
 	float			flashDlight;
@@ -398,25 +401,26 @@ typedef struct weaponInfo_s {
 
 	sfxHandle_t		readySound;
 	sfxHandle_t		firingSound;
-} weaponInfo_t;
+};
+using weaponInfo_t = weaponInfo_s;
 
 
 // each IT_* item has an associated itemInfo_t
 // that constains media references necessary to present the
 // item and its effects
-typedef struct {
+struct itemInfo_t {
 	bool		registered;
 	qhandle_t		models[MAX_ITEM_MODELS];
 	qhandle_t		icon;
-} itemInfo_t;
+};
 
 
-typedef struct {
+struct powerupInfo_t {
 	int				itemNum;
-} powerupInfo_t;
+};
 
 // reticle structure passed to the HUD code for rendering
-typedef struct {
+struct reticle_t {
 	int ox;	// real x & y
 	int oy;
 	int x;	// draw x & y
@@ -425,7 +429,7 @@ typedef struct {
 	int h;
 	qhandle_t shader;		// shader index (gfx)
 	centity_t * pTarget;	// target entity pointer (can be NULL)
-} reticle_t;
+};
 
 inline constexpr int MAX_REWARDSTACK = 10;
 inline constexpr int MAX_SOUNDBUFFER = 20;
@@ -436,7 +440,7 @@ inline constexpr int MAX_SOUNDBUFFER = 20;
 
 inline constexpr int MAX_PREDICTED_EVENTS = 16;
  
-typedef struct {
+struct cg_t {
 	int			clientFrame;		// incremented each frame
 
 	int			clientNum;
@@ -624,10 +628,10 @@ typedef struct {
 	reticle_t		HUDReticle[ MAX_RETICLES ];
 	int				reticleIdx;
 	chat_t			*pCustomChat;	// custom chat data block
-} cg_t;
+};
 
 
-typedef enum {
+enum HUDColors_t {
 	HUD_GREEN,
 	HUD_DARK_GREEN,
 	HUD_WHITE,
@@ -641,9 +645,9 @@ typedef enum {
 	HUD_CYAN,
 	HUD_ORANGE,
 	HUD_MAX
-} HUDColors_t;
+};
 
-typedef enum {
+enum HUDReticles_t {
 	HR_GUIDED_WHITE,
 	HR_TRACKING_FRIEND,
 	HR_TRACKING_ENEMY,
@@ -655,7 +659,7 @@ typedef enum {
 	HR_TARGET_FRIEND,
 	HR_TARGET_ENEMY,
 	HR_MAX
-} HUDReticles_t;
+};
 
 // colors
 extern vec4_t		HUDColors[HUD_MAX];
@@ -664,7 +668,7 @@ extern vec4_t		HUDColors[HUD_MAX];
 // loaded at gamestate time are stored in cgMedia_t
 // Other media that can be tied to clients, weapons, or items are
 // stored in the clientInfo_t, itemInfo_t, weaponInfo_t, and powerupInfo_t
-typedef struct {
+struct cgMedia_t {
 	qhandle_t	charsetShader;
 	qhandle_t	charsetProp;
 	qhandle_t	charsetPropGlow;
@@ -877,7 +881,7 @@ typedef struct {
 	sfxHandle_t engineTank[NUM_TANKSOUNDS];
 	sfxHandle_t	engineHelo;
 
-} cgMedia_t;
+};
 
 
 enum CameraAdjust {
@@ -894,13 +898,13 @@ enum IGME_OBJECT_TYPES {
 	IGMEO_WAYPOINT
 };
 
-typedef struct {
+struct IGME_waypoint_t {
 	bool		active;
 	bool		selected;
 	vec3_t			origin;
-} IGME_waypoint_t;
+};
 
-typedef struct {
+struct IGME_vehicle_t {
 	bool		active;
 	bool		selected;
 	bool		groundInstallation;
@@ -910,9 +914,9 @@ typedef struct {
 	vec3_t			origin;
 	vec3_t			selectorScale;
 	IGME_waypoint_t waypoints[IGME_MAX_WAYPOINTS];
-} IGME_vehicle_t;
+};
 
-typedef struct {
+struct IGME_data_t {
 	IGME_vehicle_t	vehicles[IGME_MAX_VEHICLES];
 	int				selectionTime;
 	int				numSelections;
@@ -924,12 +928,12 @@ typedef struct {
 	bool		copyBufferVehicleUsed;
 	IGME_waypoint_t	copyBufferRoute[IGME_MAX_WAYPOINTS];
 	bool		copyBufferRouteUsed;
-} IGME_data_t;
+};
 
 // end IGME
 
 // MFQ3 vehicle drawing
-typedef struct {
+struct BasicDrawInfo_t {
     int					vehicleIndex;
 	float				speed;
 	vec3_t				axis[3];
@@ -943,9 +947,9 @@ typedef struct {
 	int					flashWeaponIndex;
 	int					team;
 	bool			drawMuzzleFlash;
-} BasicDrawInfo_t;
+};
 
-typedef struct {
+struct DrawInfo_Plane_t {
     BasicDrawInfo_t		basicInfo;
 	int					controlFrame;
 	int					gearFrame;
@@ -954,31 +958,31 @@ typedef struct {
 	int					cockpitFrame;
 	int					bodyFrame;
 	float				swingAngle;
-} DrawInfo_Plane_t;
+};
 
-typedef struct {
+struct DrawInfo_GV_t {
     BasicDrawInfo_t		basicInfo;
 	float				turretAngle;
 	float				gunAngle;
 	float				wheelAngle;
 	float				wheelDirection;
-} DrawInfo_GV_t;
+};
 
-typedef struct {
+struct DrawInfo_Boat_t {
     BasicDrawInfo_t		basicInfo;
 	float				turretAngle[4];
 	float				gunAngle[4];
-} DrawInfo_Boat_t;
+};
 
-typedef struct {
+struct DrawInfo_Helo_t {
     BasicDrawInfo_t		basicInfo;
 	float				turretAngle[4];
 	float				gunAngle[4];
 	int					gearFrame;
 	int					bayFrame;
-} DrawInfo_Helo_t;
+};
 
-typedef struct {
+struct DrawInfo_LQM_t {
     BasicDrawInfo_t		basicInfo;
 	int					anim;
 	int					torsoFrame;
@@ -988,14 +992,14 @@ typedef struct {
 	int					lastLegsAngle;
 	int					lastTorsoAngle;
 	int					weaponIndex;
-} DrawInfo_LQM_t;
+};
 
-typedef struct {
+struct DrawInfo_GI_t {
 	BasicDrawInfo_t		basicInfo;
 	int					upgrades;
 	float				turretAngle;
 	float				gunAngle;
-} DrawInfo_GI_t;
+};
 
 // end MFQ3 vehicle drawing
 
@@ -1003,7 +1007,7 @@ typedef struct {
 // loaded or calculated from the gamestate.  It will NOT
 // be cleared when a tournement restart is done, allowing
 // all clients to begin playing instantly
-typedef struct {
+struct cgs_t {
 	gameState_t		gameState;			// gamestate from server
 	glconfig_t		glconfig;			// rendering configuration
 	float			screenXScale;		// derived from glconfig
@@ -1093,7 +1097,7 @@ typedef struct {
 	// IGME
 	IGME_data_t		IGME;
 
-} cgs_t;
+};
 
 //==============================================================================
 
@@ -1288,12 +1292,12 @@ bool CG_WorldToScreenCoords( vec3_t worldPoint, int * pX, int * pY, bool virtual
 // cg_drawtools.c
 //
 void CG_DrawProgressBar( rectDef_t *rect, vec4_t color, vec4_t textcolor, float scale, int textStyle, float progress );
-typedef enum {
+enum screenPlacement_e {
 	PLACE_CENTER,
 	PLACE_LEFT,
 	PLACE_RIGHT,
 	PLACE_STRETCH
-} screenPlacement_e;
+};
 
 void CG_SetScreenPlacement( screenPlacement_e placement );
 screenPlacement_e CG_GetScreenPlacement( );
@@ -1680,7 +1684,7 @@ inline constexpr int MAX_PARTICLE_SHADERS = 100;
 
 
 // Particle systems are nothing more than a collection of emitters
-typedef struct particleSystem_s
+struct particleSystem_s
 {
 	centity_t	* cent;
 
@@ -1691,10 +1695,11 @@ typedef struct particleSystem_s
 	long		lifetime;
 	long		lastthink;
 
-} particleSystem_t;
+};
+using particleSystem_t = particleSystem_s;
 
 
-typedef struct particle_s
+struct particle_s
 {
 	int	parentEmitter;
 	
@@ -1739,10 +1744,11 @@ typedef struct particle_s
 	long				alphaDecayEndTime;
 	float				alphaDecayStartValue;
 	float				alphaDecayEndValue;
-} particle_t;
+};
+using particle_t = particle_s;
 
 // Particle emitters spawn New particles in a certain way
-typedef struct particleEmitter_s
+struct particleEmitter_s
 {
 	bool					dead;
 
@@ -1770,17 +1776,19 @@ typedef struct particleEmitter_s
 	long					numEjectPerInterval;
 	long					ejectInterval;
 	long					lastEjectTime;
-} particleEmitter_t;
+};
+using particleEmitter_t = particleEmitter_s;
 
 
 // Particle worlds are nothing more than a collection of systems
-typedef struct particleWorld_s					// Usualy only one world;
+struct particleWorld_s					                         
 {
 	particle_t			particles[MAX_WORLD_PARTICLES];
 	particleSystem_t	systems[MAX_WORLD_SYSTEMS];
 	particleEmitter_t	emitters[MAX_WORLD_EMITTERS];
 	int					numParticles;
-} particleWorld_t;
+};
+using particleWorld_t = particleWorld_s;
 
 void CG_ParticleWorldRender(particleWorld_t * w);
 void CG_ParticleWorldThink(particleWorld_t * w);

@@ -27,11 +27,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 constexpr int MAX_CMD_BUFFER = 128*1024;
 constexpr int MAX_CMD_LINE = 1024;
 
-typedef struct {
+struct cmd_t {
 	byte	*data;
 	int		maxsize;
 	int		cursize;
-} cmd_t;
+};
 
 int			cmd_wait;
 cmd_t		cmd_text;
@@ -337,13 +337,14 @@ void Cmd_Echo_f ()
 =============================================================================
 */
 
-typedef struct cmd_function_s
+struct cmd_function_s
 {
 	struct cmd_function_s	*next;
 	char					*name;
 	xcommand_t				function;
 	completionFunc_t	complete;
-} cmd_function_t;
+};
+using cmd_function_t = cmd_function_s;
 
 
 static	int			cmd_argc;

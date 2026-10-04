@@ -29,7 +29,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // normal keys should be passed as lowercased ascii
 
-typedef enum {
+enum keyNum_t {
 	K_TAB = 9,
 	K_ENTER = 13,
 	K_ESCAPE = 27,
@@ -299,7 +299,7 @@ typedef enum {
 	K_CONSOLE,
 
 	MAX_KEYS
-} keyNum_t;
+};
 
 // MAX_KEYS replaces K_LAST_KEY, however some mods may have used K_LAST_KEY
 // in detecting binds, so we leave it defined to the old hardcoded value

@@ -29,7 +29,7 @@ inline constexpr int REF_API_VERSION = 8;
 //
 // these are the functions exported by the refresh module
 //
-typedef struct {
+struct refexport_t {
 	// called before the library is unloaded
 	// if the system is just reconfiguring, pass destroyWindow = false,
 	// which will keep the screen from flashing to the desktop.
@@ -99,12 +99,12 @@ typedef struct {
 	bool (*inPVS)( const vec3_t p1, const vec3_t p2 );
 
 	void (*TakeVideoFrame)( int h, int w, byte* captureBuffer, byte *encodeBuffer, bool motionJpeg );
-} refexport_t;
+};
 
 //
 // these are the functions imported by the refresh module
 //
-typedef struct {
+struct refimport_t {
 	// print message on the local console
 	void	(QDECL *Printf)( int printLevel, const char *fmt, ...) Q_PRINTF_FUNC(2, 3);
 
@@ -180,7 +180,7 @@ typedef struct {
 	void	(*Sys_GLimpSafeInit)( );
 	void	(*Sys_GLimpInit)( );
 	bool (*Sys_LowPhysicalMemory)( );
-} refimport_t;
+};
 
 
 // this is the only function actually exported at the linker level

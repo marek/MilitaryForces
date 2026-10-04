@@ -755,14 +755,15 @@ all big things are allocated on the hunk.
 #define	ZONEID	0x1d4a11
 #define MINFRAGMENT	64
 
-typedef struct zonedebug_s {
+struct zonedebug_s {
 	char *label;
 	char *file;
 	int line;
 	int allocSize;
-} zonedebug_t;
+};
+using zonedebug_t = zonedebug_s;
 
-typedef struct memblock_s {
+struct memblock_s {
 	int		size;           // including the header and possibly tiny fragments
 	int     tag;            // a tag of 0 is a free block
 	struct memblock_s       *next, *prev;
@@ -770,14 +771,15 @@ typedef struct memblock_s {
 #ifdef ZONE_DEBUG
 	zonedebug_t d;
 #endif
-} memblock_t;
+};
+using memblock_t = memblock_s;
 
-typedef struct {
+struct memzone_t {
 	int		size;			// total bytes malloced, including header
 	int		used;			// total bytes used
 	memblock_t	blocklist;	// start / end cap for linked list
 	memblock_t	*rover;
-} memzone_t;
+};
 
 // main zone for all "dynamic" memory allocation
 static memzone_t	*mainzone;
@@ -1147,10 +1149,11 @@ void Z_LogHeap( ) {
 }
 
 // static mem blocks to reduce a lot of small zone overhead
-typedef struct memstatic_s {
+struct memstatic_s {
 	memblock_t b;
 	byte mem[2];
-} memstatic_t;
+};
+using memstatic_t = memstatic_s;
 
 memstatic_t emptystring =
 	{ {(sizeof(memblock_t)+2 + 3) & ~3, TAG_STATIC, nullptr, nullptr, ZONEID}, {'\0', '\0'} };
@@ -1229,26 +1232,27 @@ Goals:
 #define	HUNK_MAGIC	0x89537892
 #define	HUNK_FREE_MAGIC	0x89537893
 
-typedef struct {
+struct hunkHeader_t {
 	int		magic;
 	int		size;
-} hunkHeader_t;
+};
 
-typedef struct {
+struct hunkUsed_t {
 	int		mark;
 	int		permanent;
 	int		temp;
 	int		tempHighwater;
-} hunkUsed_t;
+};
 
-typedef struct hunkblock_s {
+struct hunkblock_s {
 	int size;
 	byte printed;
 	struct hunkblock_s *next;
 	char *label;
 	char *file;
 	int line;
-} hunkblock_t;
+};
+using hunkblock_t = hunkblock_s;
 
 static	hunkblock_t *hunkblocks;
 

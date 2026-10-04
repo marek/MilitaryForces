@@ -46,7 +46,7 @@ constexpr long _POSIX_C_SOURCE = 199309L;
 #define MIN(a, b) ((a)<(b)?(a):(b))
 #endif
 
-typedef struct
+struct LinkedMem
 {
 	uint32_t uiVersion;
 	uint32_t uiTick;
@@ -62,7 +62,7 @@ typedef struct
 	uint32_t context_len;
 	unsigned char context[256];
 	wchar_t description[2048];
-} LinkedMem;
+};
 
 static LinkedMem *lm = nullptr;
 

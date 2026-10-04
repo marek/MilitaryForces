@@ -131,7 +131,7 @@ inline constexpr int PORT_ANY = -1;
 
 inline constexpr int MAX_RELIABLE_COMMANDS = 64; // max string commands buffered for restransmit
 
-typedef enum {
+enum netadrtype_t {
 	NA_BAD = 0,					// an address lookup failed
 	NA_BOT,
 	NA_LOOPBACK,
@@ -140,15 +140,15 @@ typedef enum {
 	NA_IP6,
 	NA_MULTICAST6,
 	NA_UNSPEC
-} netadrtype_t;
+};
 
-typedef enum {
+enum netsrc_t {
 	NS_CLIENT,
 	NS_SERVER
-} netsrc_t;
+};
 
 inline constexpr int NET_ADDRSTRMAXLEN = 48; // maximum length of an IPv6 address string including trailing '\0'
-typedef struct {
+struct netadr_t {
 	netadrtype_t	type;
 
 	byte	ip[4];
@@ -156,7 +156,7 @@ typedef struct {
 
 	unsigned short	port;
 	unsigned long	scope_id;	// Needed for IPv6 link-local addresses
-} netadr_t;
+};
 
 void		NET_Init( );
 void		NET_Shutdown( );
@@ -684,12 +684,12 @@ Edit fields and command line history/completion
 */
 
 #define	MAX_EDIT_LINE	256
-typedef struct {
+struct field_t {
 	int		cursor;
 	int		scroll;
 	int		widthInChars;
 	char	buffer[MAX_EDIT_LINE];
-} field_t;
+};
 
 void Field_Clear( field_t *edit );
 void Field_AutoComplete( field_t *edit );
@@ -733,7 +733,7 @@ inline cpuFeatures_t &operator|=( cpuFeatures_t &a, cpuFeatures_t b ) { a = a | 
 inline constexpr int MAXPRINTMSG = 4096;
 
 
-typedef enum {
+enum sysEventType_t {
 	// SE_NONE must be zero
 	SE_NONE = 0,		// evTime is still valid
 	SE_KEY,			// evValue is a key code, evValue2 is the down flag
@@ -741,15 +741,15 @@ typedef enum {
 	SE_MOUSE,		// evValue and evValue2 are relative signed x / y moves
 	SE_JOYSTICK_AXIS,	// evValue is an axis number and evValue2 is the current state (-127 to 127)
 	SE_CONSOLE		// evPtr is a char*
-} sysEventType_t;
+};
 
-typedef struct {
+struct sysEvent_t {
 	int				evTime;
 	sysEventType_t	evType;
 	int				evValue, evValue2;
 	int				evPtrLength;	// bytes of data pointed to by evPtr, for journaling
 	void			*evPtr;			// this must be manually freed if not NULL
-} sysEvent_t;
+};
 
 void		Com_QueueEvent( int time, sysEventType_t type, int value, int value2, int ptrLength, void *ptr );
 int			Com_EventLoop( );
@@ -837,14 +837,14 @@ extern	bool	com_fullyInitialized;
 extern	fileHandle_t	com_journalFile;
 extern	fileHandle_t	com_journalDataFile;
 
-typedef enum {
+enum memtag_t {
 	TAG_FREE,
 	TAG_GENERAL,
 	TAG_BOTLIB,
 	TAG_RENDERER,
 	TAG_SMALL,
 	TAG_STATIC
-} memtag_t;
+};
 
 /*
 
@@ -1077,22 +1077,22 @@ bool Sys_LowPhysicalMemory( );
 
 void Sys_SetEnv(const char *name, const char *value);
 
-typedef enum
+enum dialogResult_t
 {
 	DR_YES = 0,
 	DR_NO = 1,
 	DR_OK = 0,
 	DR_CANCEL = 1
-} dialogResult_t;
+};
 
-typedef enum
+enum dialogType_t
 {
 	DT_INFO,
 	DT_WARNING,
 	DT_ERROR,
 	DT_YES_NO,
 	DT_OK_CANCEL
-} dialogType_t;
+};
 
 dialogResult_t Sys_Dialog( dialogType_t type, const char *message, const char *title );
 bool Sys_OpenFolderInFileManager( const char *path, bool create );
@@ -1107,17 +1107,18 @@ void Sys_InitPIDFile( const char *gamedir );
 #define NYT HMAX					/* NYT = Not Yet Transmitted */
 #define INTERNAL_NODE (HMAX+1)
 
-typedef struct nodetype {
+struct nodetype {
 	struct	nodetype *left, *right, *parent; /* tree structure */ 
 	struct	nodetype *next, *prev; /* doubly-linked list */
 	struct	nodetype **head; /* highest ranked node in block */
 	int		weight;
 	int		symbol;
-} node_t;
+};
+using node_t = nodetype;
 
 inline constexpr int HMAX = 256; /* Maximum symbol */
 
-typedef struct {
+struct huff_t {
 	int			blocNode;
 	int			blocPtrs;
 
@@ -1129,12 +1130,12 @@ typedef struct {
 
 	node_t		nodeList[768];
 	node_t*		nodePtrs[768];
-} huff_t;
+};
 
-typedef struct {
+struct huffman_t {
 	huff_t		compressor;
 	huff_t		decompressor;
-} huffman_t;
+};
 
 void	Huff_Compress(Message *buf, int offset);
 void	Huff_Decompress(Message *buf, int offset);

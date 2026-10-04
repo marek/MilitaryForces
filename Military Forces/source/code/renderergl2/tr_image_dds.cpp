@@ -25,7 +25,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 typedef unsigned int   ui32_t;
 
-typedef struct ddsHeader_s
+struct ddsHeader_s
 {
 	ui32_t headerSize;
 	ui32_t flags;
@@ -48,8 +48,8 @@ typedef struct ddsHeader_s
 	ui32_t caps3;
 	ui32_t caps4;
 	ui32_t reserved2;
-}
-ddsHeader_t;
+};
+using ddsHeader_t = ddsHeader_s;
 
 // flags:
 constexpr int _DDSFLAGS_REQUIRED = 0x001007;
@@ -75,19 +75,19 @@ constexpr int DDSCAPS_REQUIRED = 0x1000;
 constexpr int DDSCAPS2_CUBEMAP = 0xFE00;
 constexpr int DDSCAPS2_VOLUME = 0x200000;
 
-typedef struct ddsHeaderDxt10_s
+struct ddsHeaderDxt10_s
 {
 	ui32_t dxgiFormat;
 	ui32_t dimensions;
 	ui32_t miscFlags;
 	ui32_t arraySize;
 	ui32_t miscFlags2;
-}
-ddsHeaderDxt10_t;
+};
+using ddsHeaderDxt10_t = ddsHeaderDxt10_s;
 
 // dxgiFormat
 // from http://msdn.microsoft.com/en-us/library/windows/desktop/bb173059%28v=vs.85%29.aspx
-typedef enum DXGI_FORMAT {
+enum DXGI_FORMAT {
 	DXGI_FORMAT_UNKNOWN = 0,
 	DXGI_FORMAT_R32G32B32A32_TYPELESS = 1,
 	DXGI_FORMAT_R32G32B32A32_FLOAT = 2,
@@ -205,7 +205,7 @@ typedef enum DXGI_FORMAT {
 	DXGI_FORMAT_A8P8 = 114,
 	DXGI_FORMAT_B4G4R4A4_UNORM = 115,
 	DXGI_FORMAT_FORCE_UINT = 0xffffffffUL
-} DXGI_FORMAT;
+};
 
 #define EncodeFourCC(x) ((((ui32_t)((x)[0]))      ) | \
                          (((ui32_t)((x)[1])) << 8 ) | \

@@ -32,12 +32,12 @@ inline constexpr int BOX_MODEL_HANDLE = 255;
 inline constexpr int CAPSULE_MODEL_HANDLE = 254;
 
 
-typedef struct {
+struct cNode_t {
 	cplane_t	*plane;
 	int			children[2];		// negative numbers are leafs
-} cNode_t;
+};
 
-typedef struct {
+struct cLeaf_t {
 	int			cluster;
 	int			area;
 
@@ -46,43 +46,44 @@ typedef struct {
 
 	int			firstLeafSurface;
 	int			numLeafSurfaces;
-} cLeaf_t;
+};
 
-typedef struct cmodel_s {
+struct cmodel_s {
 	vec3_t		mins, maxs;
 	cLeaf_t		leaf;			// submodels don't reference the main tree
-} cmodel_t;
+};
+using cmodel_t = cmodel_s;
 
-typedef struct {
+struct cbrushside_t {
 	cplane_t	*plane;
 	int			surfaceFlags;
 	int			shaderNum;
-} cbrushside_t;
+};
 
-typedef struct {
+struct cbrush_t {
 	int			shaderNum;		// the shader that determined the contents
 	int			contents;
 	vec3_t		bounds[2];
 	int			numsides;
 	cbrushside_t	*sides;
 	int			checkcount;		// to avoid repeated testings
-} cbrush_t;
+};
 
 
-typedef struct {
+struct cPatch_t {
 	int			checkcount;				// to avoid repeated testings
 	int			surfaceFlags;
 	int			contents;
 	struct patchCollide_s	*pc;
-} cPatch_t;
+};
 
 
-typedef struct {
+struct cArea_t {
 	int			floodnum;
 	int			floodvalid;
-} cArea_t;
+};
 
-typedef struct {
+struct clipMap_t {
 	char		name[MAX_QPATH];
 
 	int			numShaders;
@@ -129,7 +130,7 @@ typedef struct {
 
 	int			floodvalid;
 	int			checkcount;					// incremented on each trace
-} clipMap_t;
+};
 
 
 // keep 1/8 unit away to keep the position valid before network snapping
@@ -146,15 +147,15 @@ extern	cvar_t		*cm_playerCurveClip;
 // cm_test.c
 
 // Used for oriented capsule collision detection
-typedef struct
+struct sphere_t
 {
 	bool	use;
 	float		radius;
 	float		halfheight;
 	vec3_t		offset;
-} sphere_t;
+};
 
-typedef struct {
+struct traceWork_t {
 	vec3_t		start;
 	vec3_t		end;
 	vec3_t		size[2];	// size of the box being swept through the model
@@ -167,9 +168,9 @@ typedef struct {
 	bool	isPoint;	// optimized case
 	trace_t		trace;		// returned from trace call
 	sphere_t	sphere;		// sphere for oriendted capsule collision
-} traceWork_t;
+};
 
-typedef struct leafList_s {
+struct leafList_s {
 	int		count;
 	int		maxcount;
 	bool	overflowed;
@@ -177,7 +178,8 @@ typedef struct leafList_s {
 	vec3_t	bounds[2];
 	int		lastLeaf;		// for overflows where each leaf can't be stored individually
 	void	(*storeLeafs)( struct leafList_s *ll, int nodenum );
-} leafList_t;
+};
+using leafList_t = leafList_s;
 
 
 int CM_BoxBrushes( const vec3_t mins, const vec3_t maxs, cbrush_t **list, int listsize );

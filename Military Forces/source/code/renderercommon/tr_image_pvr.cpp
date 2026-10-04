@@ -22,18 +22,20 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "tr_common.h"
 
-typedef struct gbix {
+struct gbix {
 	unsigned int magic;
 	unsigned int len;
-} gbix_t;
+};
+using gbix_t = gbix;
 
-typedef struct pvr {
+struct pvr {
 	unsigned int magic;
 	unsigned int len_file;
 	unsigned int type;
 	unsigned short width;
 	unsigned short height;
-} pvr_t;
+};
+using pvr_t = pvr;
 
 typedef unsigned int (*pvr_pixel_func_t)(unsigned short color);
 typedef byte *(*pvr_image_func_t)(pvr_t *pvr, int offset, bool detwiddle, pvr_pixel_func_t pixel_func);

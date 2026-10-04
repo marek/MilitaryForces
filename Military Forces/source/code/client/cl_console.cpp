@@ -34,7 +34,7 @@ int g_smallchar_height = SMALLCHAR_HEIGHT;
 constexpr int NUM_CON_TIMES = 17;
 
 constexpr int CON_TEXTSIZE = 32768;
-typedef struct {
+struct console_t {
 	bool	initialized;
 
 	short	text[CON_TEXTSIZE];
@@ -55,7 +55,7 @@ typedef struct {
 	int		times[NUM_CON_TIMES];	// cls.realtime time the line was generated
 								// for transparent notify lines
 	vec4_t	color;
-} console_t;
+};
 
 console_t	con;
 

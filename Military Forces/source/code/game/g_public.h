@@ -37,7 +37,7 @@ inline constexpr int SVF_DECK = 0x00001000; // box that rotates with r.currentAn
 //===============================================================
 
 
-typedef struct 
+struct entityShared_t 
 {
 	entityState_t	s;				// communicated by server to clients
 
@@ -68,7 +68,7 @@ typedef struct
 	// ent->s.ownerNum = passEntityNum	(don't interact with your own missiles)
 	// entity[ent->s.ownerNum].ownerNum = passEntityNum	(don't interact with other missiles from owner)
 	int			ownerNum;
-} entityShared_t;
+};
 
 
 

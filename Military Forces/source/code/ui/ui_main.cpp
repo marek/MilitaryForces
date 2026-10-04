@@ -4602,10 +4602,10 @@ static void UI_BuildServerDisplayList(int force)
 	//}
 }
 
-typedef struct
+struct serverStatusCvar_t
 {
 	char *name, *altName;
-} serverStatusCvar_t;
+};
 
 serverStatusCvar_t serverStatusCvars[] = {
 	{"sv_hostname", "Name"},
@@ -6430,12 +6430,12 @@ cvars
 ================
 */
 
-typedef struct {
+struct cvarTable_t {
 	vmCvar_t	*vmCvar;
 	char		*cvarName;
 	char		*defaultString;
 	int			cvarFlags;
-} cvarTable_t;
+};
 
 vmCvar_t	ui_ffa_fraglimit;
 vmCvar_t	ui_ffa_timelimit;

@@ -128,7 +128,7 @@ static void S_AL_ClearError( bool quiet )
 //===========================================================================
 
 
-typedef struct alSfx_s
+struct alSfx_s
 {
 	char			filename[MAX_QPATH];
 	ALuint		buffer;					// OpenAL buffer
@@ -143,7 +143,8 @@ typedef struct alSfx_s
 	int				loopCnt;		// number of loops using this sfx
 	int				loopActiveCnt;		// number of playing loops using this sfx
 	int				masterLoopSrc;		// All other sources looping this buffer are synced to this master src
-} alSfx_t;
+};
+using alSfx_t = alSfx_s;
 
 static bool alBuffersInitialised = false;
 
@@ -555,7 +556,7 @@ ALuint S_AL_BufferGet(sfxHandle_t sfx)
 //===========================================================================
 
 
-typedef struct src_s
+struct src_s
 {
 	ALuint		alSource;		// OpenAL source object
 	sfxHandle_t	sfx;			// Sound effect in use
@@ -580,7 +581,8 @@ typedef struct src_s
 	vec3_t		loopSpeakerPos;		// Origin of the loop speaker
 	
 	bool	local;			// Is this local (relative to the cam)
-} src_t;
+};
+using src_t = src_s;
 
 #ifdef __APPLE__
 	#define MAX_SRC 64
@@ -594,7 +596,7 @@ static bool alSourcesInitialised = false;
 static int lastListenerNumber = -1;
 static vec3_t lastListenerOrigin = { 0.0f, 0.0f, 0.0f };
 
-typedef struct sentity_s
+struct sentity_s
 {
 	vec3_t					origin;
 
@@ -605,7 +607,8 @@ typedef struct sentity_s
 	alSrcPriority_t	loopPriority;
 	sfxHandle_t			loopSfx;
 	bool				startLoopingSound;
-} sentity_t;
+};
+using sentity_t = sentity_s;
 
 static sentity_t entityList[MAX_GENTITIES];
 

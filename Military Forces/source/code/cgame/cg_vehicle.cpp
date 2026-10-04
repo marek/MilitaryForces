@@ -5,11 +5,12 @@
 #include "cg_local.h"
 
 constexpr int MAX_LQM_MODELS = 32;
-typedef struct LQMAnimations_s
+struct LQMAnimations_s
 {
 	int			numAnimations;
 	animation_t	anim[MAX_LQM_MODELS][MAX_ANIMATIONS];
-} LQMAnimations_t;
+};
+using LQMAnimations_t = LQMAnimations_s;
 LQMAnimations_t availableLQMAnimations;
 
 

@@ -12,18 +12,18 @@
 #include "menudef.h"
 
 // custom chat system
-typedef enum {
+enum CustomChatMode {
 	CCHAT_ALL,
 	CCHAT_TEAM,
 	CCHAT_TARGET,
 	CCHAT_ATTACK,
 	MAX_CCHAT
-} CustomChatMode;
+};
 
 inline constexpr int MAX_CHAT_LEN = 256;
 inline constexpr float CHAT_TEXT_SCALE = 0.25f;
 
-typedef struct {
+struct chat_t {
 	bool active;			// active?
 	CustomChatMode mode;		// e.g. global chat, team chat, ...
 	char text[ MAX_CHAT_LEN ];	// TODO: possibly make this dynamic to save memory
@@ -31,7 +31,7 @@ typedef struct {
 	float cursorAlpha;			// gfx
 	bool cursorDir;			// gfx
 	bool lockEntry;			// set to true to prevent more characters being typed
-} chat_t;
+};
 
 // cursor gfx
 enum CursorEnum 
@@ -41,11 +41,11 @@ enum CursorEnum
 	MAX_CURSORS
 };
 
-typedef enum {
+enum textJustify_t {
 	LEFT_JUSTIFY,
 	CENTRE_JUSTIFY,
 	RIGHT_JUSTIFY
-} textJustify_t;
+};
 
 // simple timing macros
 //#define CG_FRAME_SECOND_FRACTION (cg.frametime/1000.0f)
@@ -130,10 +130,10 @@ inline constexpr double SLIDER_THUMB_WIDTH = 12.0;
 inline constexpr double SLIDER_THUMB_HEIGHT = 20.0;
 inline constexpr int NUM_CROSSHAIRS = 1;
 
-typedef struct {
+struct scriptDef_t {
   const char *command;
   const char *args[MAX_SCRIPT_ARGS];
-} scriptDef_t;
+};
 
 
 struct rectDef_t
@@ -147,7 +147,7 @@ struct rectDef_t
 typedef rectDef_t Rectangle;
 
 // FIXME: do something to separate text vs window stuff
-typedef struct {
+struct windowDef_t {
   Rectangle rect;                 // client coord rectangle
   Rectangle rectClient;           // screen coord rectangle
   const char *name;               //
@@ -169,15 +169,15 @@ typedef struct {
   vec4_t borderColor;             // border color
   vec4_t outlineColor;            // border color
   qhandle_t background;           // background asset  
-} windowDef_t;
+};
 
 typedef windowDef_t Window;
 
-typedef struct {
+struct colorRangeDef_t {
 	vec4_t	color;
 	float		low;
 	float		high;
-} colorRangeDef_t;
+};
 
 // FIXME: combine flags into bitfields to save space
 // FIXME: consolidate all of the common stuff in one structure for menus and items
@@ -191,13 +191,14 @@ typedef struct {
 // 
 inline constexpr int MAX_LB_COLUMNS = 16;
 
-typedef struct columnInfo_s {
+struct columnInfo_s {
 	int pos;
 	int width;
 	int maxChars;
-} columnInfo_t;
+};
+using columnInfo_t = columnInfo_s;
 
-typedef struct listBoxDef_s {
+struct listBoxDef_s {
 	int startPos;
 	int endPos;
 	int drawPadding;
@@ -209,9 +210,10 @@ typedef struct listBoxDef_s {
 	columnInfo_t columnInfo[MAX_LB_COLUMNS];
 	const char *doubleClick;
 	bool notselectable;
-} listBoxDef_t;
+};
+using listBoxDef_t = listBoxDef_s;
 
-typedef struct editFieldDef_s {
+struct editFieldDef_s {
   float minVal;                  //	edit field limits
   float maxVal;                  //
   float defVal;                  //
@@ -219,25 +221,28 @@ typedef struct editFieldDef_s {
   int maxChars;                  // for edit fields
   int maxPaintChars;             // for edit fields
 	int paintOffset;							 // 
-} editFieldDef_t;
+};
+using editFieldDef_t = editFieldDef_s;
 
 inline constexpr int MAX_MULTI_CVARS = 32;
 
-typedef struct multiDef_s {
+struct multiDef_s {
 	const char *cvarList[MAX_MULTI_CVARS];
 	const char *cvarStr[MAX_MULTI_CVARS];
 	float cvarValue[MAX_MULTI_CVARS];
 	int count;
 	bool strDef;
-} multiDef_t;
+};
+using multiDef_t = multiDef_s;
 
-typedef struct modelDef_s {
+struct modelDef_s {
 	int angle;
 	vec3_t origin;
 	float fov_x;
 	float fov_y;
 	int rotationSpeed;
-} modelDef_t;
+};
+using modelDef_t = modelDef_s;
 
 inline constexpr int CVAR_ENABLE = 0x00000001;
 inline constexpr int CVAR_DISABLE = 0x00000002;
@@ -277,7 +282,7 @@ struct itemDef_t
 	void *typeData;								 // type specific data ptr's	
 };
 
-typedef struct {
+struct menuDef_t {
   Window window;
   const char  *font;								// font
   bool fullScreen;							// covers entire screen 
@@ -295,7 +300,7 @@ typedef struct {
   vec4_t focusColor;								// focus color for items
   vec4_t disableColor;							// focus color for items
   itemDef_t *items[MAX_MENUITEMS];	// items this menu contains   
-} menuDef_t;
+};
 
 struct cachedAssets_t
 {

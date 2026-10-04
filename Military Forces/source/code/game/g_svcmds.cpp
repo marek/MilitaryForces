@@ -42,11 +42,12 @@ If 0, then only addresses matching the list will be allowed.  This lets you easi
 // extern	vmCvar_t	g_filterBan;
 
 
-typedef struct ipFilter_s
+struct ipFilter_s
 {
 	unsigned	mask;
 	unsigned	compare;
-} ipFilter_t;
+};
+using ipFilter_t = ipFilter_s;
 
 constexpr int MAX_IPFILTERS = 1024;
 

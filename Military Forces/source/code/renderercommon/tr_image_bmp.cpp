@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "tr_common.h"
 
-typedef struct
+struct BMPHeader_t
 {
 	char id[2];
 	unsigned fileSize;
@@ -40,7 +40,7 @@ typedef struct
 	unsigned colors;
 	unsigned importantColors;
 	unsigned char palette[256][4];
-} BMPHeader_t;
+};
 
 void R_LoadBMP( const char *name, byte **pic, int *width, int *height )
 {

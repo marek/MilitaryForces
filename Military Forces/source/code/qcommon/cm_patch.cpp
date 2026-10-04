@@ -952,12 +952,12 @@ void CM_AddFacetBevels( facet_t *facet ) {
 
 }
 
-typedef enum {
+enum edgeName_t {
 	EN_TOP,
 	EN_RIGHT,
 	EN_BOTTOM,
 	EN_LEFT
-} edgeName_t;
+};
 
 /*
 ==================

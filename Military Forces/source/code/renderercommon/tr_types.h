@@ -59,19 +59,20 @@ inline constexpr int RF_WRAP_FRAMES = 0x0200; // mod the model frames by the max
 inline constexpr int RDF_NOWORLDMODEL = 0x0001; // used for player configuration screen
 inline constexpr int RDF_HYPERSPACE = 0x0004; // teleportation effect
 
-typedef struct {
+struct polyVert_t {
 	vec3_t		xyz;
 	float		st[2];
 	byte		modulate[4];
-} polyVert_t;
+};
 
-typedef struct poly_s {
+struct poly_s {
 	qhandle_t			hShader;
 	int					numVerts;
 	polyVert_t			*verts;
-} poly_t;
+};
+using poly_t = poly_s;
 
-typedef enum {
+enum refEntityType_t {
 	RT_MODEL,
 	RT_POLY,
 	RT_SPRITE,
@@ -82,9 +83,9 @@ typedef enum {
 	RT_PORTALSURFACE,		// doesn't draw anything, just info for portals
 
 	RT_MAX_REF_ENTITY_TYPE
-} refEntityType_t;
+};
 
-typedef struct {
+struct refEntity_t {
 	refEntityType_t	reType;
 	int			renderfx;
 
@@ -117,13 +118,13 @@ typedef struct {
 	// extra sprite information
 	float		radius;
 	float		rotation;
-} refEntity_t;
+};
 
 
 inline constexpr int MAX_RENDER_STRINGS = 8;
 inline constexpr int MAX_RENDER_STRING_LENGTH = 32;
 
-typedef struct {
+struct refdef_t {
 	int			x, y, width, height;
 	float		fov_x, fov_y;
 	vec3_t		vieworg;
@@ -139,7 +140,7 @@ typedef struct {
 
 	// text messages for deform text shaders
 	char		text[MAX_RENDER_STRINGS][MAX_RENDER_STRING_LENGTH];
-} refdef_t;
+};
 
 
 enum stereoFrame_t : int {
@@ -156,13 +157,13 @@ enum stereoFrame_t : int {
 ** being run right now.  These are constant once the OpenGL
 ** subsystem is initialized.
 */
-typedef enum {
+enum textureCompression_t {
 	TC_NONE,
 	TC_S3TC,  // this is for the GL_S3_s3tc extension.
 	TC_S3TC_ARB  // this is for the GL_EXT_texture_compression_s3tc extension.
-} textureCompression_t;
+};
 
-typedef enum {
+enum glDriverType_t {
 	GLDRV_ICD,					// driver is integrated with window system
 								// WARNING: there are tests that check for
 								// > GLDRV_ICD for minidriverness, so this
@@ -170,9 +171,9 @@ typedef enum {
 								// enum set
 	GLDRV_STANDALONE,			// driver is a non-3Dfx standalone driver
 	GLDRV_VOODOO				// driver is a 3Dfx standalone driver
-} glDriverType_t;
+};
 
-typedef enum {
+enum glHardwareType_t {
 	GLHW_GENERIC,			// where everything works the way it should
 	GLHW_3DFX_2D3D,			// Voodoo Banshee or Voodoo3, relevant since if this is
 							// the hardware type then there can NOT exist a secondary
@@ -180,9 +181,9 @@ typedef enum {
 	GLHW_RIVA128,			// where you can't interpolate alpha
 	GLHW_RAGEPRO,			// where you can't modulate alpha on alpha textures
 	GLHW_PERMEDIA2			// where you don't have src*dst
-} glHardwareType_t;
+};
 
-typedef struct {
+struct glconfig_t {
 	char					renderer_string[MAX_STRING_CHARS];
 	char					vendor_string[MAX_STRING_CHARS];
 	char					version_string[MAX_STRING_CHARS];
@@ -214,6 +215,6 @@ typedef struct {
 	bool				isFullscreen;
 	bool				stereoEnabled;
 	bool				smpActive;		// UNUSED, present for compatibility
-} glconfig_t;
+};
 
 #endif	// __TR_TYPES_H

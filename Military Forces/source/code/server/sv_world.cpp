@@ -398,12 +398,12 @@ bounds.  This does NOT mean that they actually touch in the case of bmodels.
 ============================================================================
 */
 
-typedef struct {
+struct areaParms_t {
 	const float	*mins;
 	const float	*maxs;
 	int			*list;
 	int			count, maxcount;
-} areaParms_t;
+};
 
 
 /*
@@ -485,7 +485,7 @@ int SV_AreaEntities( const vec3_t mins, const vec3_t maxs, int *entityList, int 
 //===========================================================================
 
 
-typedef struct {
+struct moveclip_t {
 	vec3_t		boxmins, boxmaxs;// enclose the test object along entire move
 	const float	*mins;
 	const float *maxs;	// size of the moving object
@@ -495,7 +495,7 @@ typedef struct {
 	int			passEntityNum;
 	int			contentmask;
 	bool		capsule;
-} moveclip_t;
+};
 
 
 /*

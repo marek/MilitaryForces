@@ -139,7 +139,7 @@ static struct sockaddr_in6 boundto;
 
 constexpr int MAX_IPS = 32;
 
-typedef struct
+struct nip_localaddr_t
 {
 	char ifname[IF_NAMESIZE];
 	
@@ -147,7 +147,7 @@ typedef struct
 	sa_family_t family;
 	struct sockaddr_storage addr;
 	struct sockaddr_storage netmask;
-} nip_localaddr_t;
+};
 
 static nip_localaddr_t localIP[MAX_IPS];
 static int numIP;

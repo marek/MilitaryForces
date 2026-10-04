@@ -1095,14 +1095,14 @@ Display a *nix dialog box
 */
 dialogResult_t Sys_Dialog( dialogType_t type, const char *message, const char *title )
 {
-	typedef enum
+	enum dialogCommandType_t
 	{
 		NONE = 0,
 		ZENITY,
 		KDIALOG,
 		XMESSAGE,
 		NUM_DIALOG_PROGRAMS
-	} dialogCommandType_t;
+	};
 	typedef void (*dialogCommandBuilder_t)( dialogType_t, const char *, const char * );
 
 	const char              *session = getenv( "DESKTOP_SESSION" );

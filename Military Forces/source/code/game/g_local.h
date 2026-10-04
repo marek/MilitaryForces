@@ -355,15 +355,15 @@ inline constexpr int MAX_VOTE_COUNT = 3;
 
 
 // task types
-typedef enum {
+enum taskTypes_t {
 	ST_ON_WAYPOINT
-} taskTypes_t;
+};
 
 // action types
-typedef enum {
+enum actionTypes_t {
 	AT_SET_STATE,
 	AT_NEXT_WAYPOINT
-} actionTypes_t;
+};
 
 struct GameEntity;
 

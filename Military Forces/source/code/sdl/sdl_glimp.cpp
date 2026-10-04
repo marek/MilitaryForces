@@ -39,7 +39,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../sys/sys_local.h"
 #include "sdl_icon.h"
 
-typedef enum
+enum rserr_t
 {
 	RSERR_OK,
 
@@ -47,7 +47,7 @@ typedef enum
 	RSERR_INVALID_MODE,
 
 	RSERR_UNKNOWN
-} rserr_t;
+};
 
 SDL_Window *SDL_window = nullptr;
 static SDL_GLContext SDL_glContext = nullptr;

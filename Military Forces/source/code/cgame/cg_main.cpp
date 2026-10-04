@@ -195,12 +195,12 @@ vmCvar_t	cg_consoleTextStyle;
 // MFQ3: development cVars
 vmCvar_t	cg_shadowDebug;
 
-typedef struct {
+struct cvarTable_t {
 	vmCvar_t	*vmCvar;
 	char		*cvarName;
 	char		*defaultString;
 	int			cvarFlags;
-} cvarTable_t;
+};
 
 cvarTable_t		cvarTable[] = {
 //	{ &cg_pmove_fixed, "cg_pmove_fixed", "1", CVAR_USERINFO | CVAR_ARCHIVE },

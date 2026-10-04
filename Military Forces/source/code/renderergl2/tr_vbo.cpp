@@ -659,14 +659,14 @@ constexpr int VAOCACHE_QUEUE_MAX_SURFACES = (1 << 10);
 constexpr int VAOCACHE_QUEUE_MAX_VERTEXES = (1 << 16);
 #define VAOCACHE_QUEUE_MAX_INDEXES (VAOCACHE_QUEUE_MAX_VERTEXES * 4)
 
-typedef struct queuedSurface_s
+struct queuedSurface_s
 {
 	srfVert_t *vertexes;
 	int numVerts;
 	glIndex_t *indexes;
 	int numIndexes;
-}
-queuedSurface_t;
+};
+using queuedSurface_t = queuedSurface_s;
 
 static struct
 {
@@ -690,13 +690,13 @@ constexpr int VAOCACHE_MAX_BATCHES = (1 << 10);
 constexpr int VAOCACHE_VERTEX_BUFFER_SIZE = (16 * 1024 * 1024);
 constexpr int VAOCACHE_INDEX_BUFFER_SIZE = (5 * 1024 * 1024);
 
-typedef struct buffered_s
+struct buffered_s
 {
 	glIndex_t *indexes;
 	int numIndexes;
 	int bufferOffset;
-}
-buffered_t;
+};
+using buffered_t = buffered_s;
 
 static struct
 {

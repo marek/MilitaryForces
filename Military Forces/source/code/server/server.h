@@ -242,14 +242,14 @@ struct SV_Client;
 
 inline constexpr int SERVER_MAXBANS = 1024;
 // Structure for managing bans
-typedef struct
+struct serverBan_t
 {
 	netadr_t ip;
 	// For a CIDR-Notation type suffix
 	int subnet;
 	
 	bool isexception;
-} serverBan_t;
+};
 
 
 extern	cvar_t	*sv_fps;

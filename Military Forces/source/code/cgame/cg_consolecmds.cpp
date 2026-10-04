@@ -606,10 +606,10 @@ bool CG_ExtractDeveloper( )
 	return false;
 }
 
-typedef struct {
+struct consoleCommand_t {
 	char	*cmd;
 	void	(*function)();
-} consoleCommand_t;
+};
 
 static consoleCommand_t	commands[] = {
 	{ "testgun", CG_TestGun_f },

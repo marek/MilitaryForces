@@ -34,10 +34,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 */
 
-typedef struct {
+struct edgeDef_t {
 	int		i2;
 	int		facing;
-} edgeDef_t;
+};
 
 #define	MAX_EDGE_DEFS	32
 

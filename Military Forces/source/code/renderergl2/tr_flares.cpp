@@ -57,7 +57,7 @@ up to five or more times in a frame with 3D status bar icons).
 
 // flare states maintain visibility over multiple frames for fading
 // layers: view, mirror, menu
-typedef struct flare_s {
+struct flare_s {
 	struct		flare_s	*next;		// for active chain
 
 	int			addedFrame;
@@ -77,7 +77,8 @@ typedef struct flare_s {
 
 	vec3_t		origin;
 	vec3_t		color;
-} flare_t;
+};
+using flare_t = flare_s;
 
 #define		MAX_FLARES		256
 

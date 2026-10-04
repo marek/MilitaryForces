@@ -74,7 +74,7 @@ inline constexpr int CS_MODELS = 32;
 #error overflow: (CS_MAX) > MAX_CONFIGSTRINGS
 #endif
 
-typedef enum {
+enum gametype_t {
 	GT_FFA,				// free for all
 	GT_TOURNAMENT,		// one on one tournament
 	GT_SINGLE_PLAYER,	// single player ffa
@@ -85,9 +85,9 @@ typedef enum {
 	GT_TEAM,			// team deathmatch
 	GT_CTF,				// capture the flag
 	GT_MAX_GAME_TYPE
-} gametype_t;
+};
 
-typedef enum { GENDER_MALE, GENDER_FEMALE, GENDER_NEUTER } gender_t;
+enum gender_t { GENDER_MALE, GENDER_FEMALE, GENDER_NEUTER };
 
 /*
 ===================================================================================
@@ -100,7 +100,7 @@ movement on the server game.
 ===================================================================================
 */
 
-typedef enum {
+enum pmtype_t {
 	PM_NORMAL,		// can accelerate and turn
 	PM_VEHICLE,		// MFQ3
 	PM_NOCLIP,		// noclip movement
@@ -108,7 +108,7 @@ typedef enum {
 	PM_DEAD,		// no acceleration or turning, but free falling
 	PM_FREEZE,		// stuck in place with no control
 	PM_INTERMISSION	// no movement or status bar
-} pmtype_t;
+};
 
 // pmove->pm_flags
 inline constexpr int PMF_MFQ3_FREE1 = 1;
@@ -130,7 +130,7 @@ inline constexpr int PMF_VEHICLESELECT = 16384; // selecting vehicle
 #define	PMF_ALL_TIMES	(PMF_TIME_KNOCKBACK)
 
 inline constexpr int MAXTOUCH = 32;
-typedef struct {
+struct pmove_t {
 	// state (in / out)
 	playerState_t	*ps;
 
@@ -165,7 +165,7 @@ typedef struct {
 	// these will be different functions during game and cgame
 	void		(*trace)( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentMask, bool capsule );
 	int			(*pointcontents)( const vec3_t point, int passEntityNum );
-} pmove_t;
+};
 
 // if a full pmove isn't done on the client, you can just update the angles
 void PM_UpdateViewAngles( playerState_t *ps, const usercmd_t *cmd );
@@ -183,16 +183,16 @@ typedef enum {
 
 // player_state->stats[] indexes
 // NOTE: may not have more than 16
-typedef enum {
+enum statIndex_t {
 	STAT_HEALTH,
 	STAT_CLIENTS_READY,				// bit mask of clients wishing to exit the intermission (FIXME: configstring?)
 	STAT_MAX_HEALTH,				// health limit, changable by handicap
 	STAT_FUEL,
 	STAT_MAX_FUEL,
 	STAT_LOCKINFO,
-} statIndex_t;
+};
 
-typedef enum {
+enum timerIndex_t {
 	TIMER_FUEL,
 	TIMER_THROTTLE,
 	TIMER_GEAR,
@@ -205,13 +205,13 @@ typedef enum {
 	TIMER_BAYCLOSE,
 	TIMER_FLARE,
 	TIMER_REVEAL
-} timerIndex_t;
+};
 
 // player_state->persistant[] indexes
 // these fields are the only part of player_state that isn't
 // cleared on respawn
 // NOTE: may not have more than 16
-typedef enum {
+enum persEnum_t {
 	PERS_SCORE,						// !!! MUST NOT CHANGE, SERVER AND GAME BOTH REFERENCE !!!
 	PERS_HITS,						// total points damage inflicted so damage beeps can sound on change
 	PERS_RANK,						// player rank or team rank
@@ -222,7 +222,7 @@ typedef enum {
 	PERS_KILLED,					// count of the number of times you died
 	PERS_CAPTURES,					// captures
 	PERS_DEATHS						// deaths
-} persEnum_t;
+};
 
 
 // entityState_t->eFlags
@@ -241,14 +241,14 @@ inline constexpr int EF_VOTED = 0x00004000; // already cast a vote
 inline constexpr int EF_TEAMVOTED = 0x00080000; // already cast a team vote
 
 // NOTE: may not have more than 16
-typedef enum {	// NOTE: these are BITS to set and not a normal enum!!
+enum objective_t {	// NOTE: these are BITS to set and not a normal enum!!
 	OB_REDFLAG = 1,
 	OB_BLUEFLAG = 2
 
-} objective_t;
+};
 
 
-typedef enum {
+enum weapon_t {
 	WP_MACHINEGUN,
 	WP_WEAPON1,
 	WP_WEAPON2,
@@ -257,7 +257,7 @@ typedef enum {
 	WP_WEAPON5,
 	WP_WEAPON6,
 	WP_FLARE
-} weapon_t;
+};
 
 // entityState_t->event values
 // entity events are for effects that take place reletive
@@ -274,7 +274,7 @@ inline constexpr int EV_EVENT_BIT2 = 0x00000200;
 
 #define	EVENT_VALID_MSEC	300
 
-typedef enum {
+enum entity_event_t {
 	EV_NONE,
 
 	EV_WATER_TOUCH,	// foot touches
@@ -332,10 +332,10 @@ typedef enum {
 
 	EV_DEBUG_LINE
 
-} entity_event_t;
+};
 
 
-typedef enum {
+enum global_team_sound_t {
 	GTS_RED_CAPTURE,
 	GTS_BLUE_CAPTURE,
 	GTS_RED_RETURN,
@@ -348,11 +348,11 @@ typedef enum {
 	GTS_BLUETEAM_TOOK_LEAD,
 	GTS_TEAMS_ARE_TIED,
 	GTS_NUKE				// come on a nuke just has to be a global sound
-} global_team_sound_t;
+};
 
 
 // animations
-typedef enum {
+enum LQManimNumber_t {
 	BOTH_DEATH1,
 	BOTH_DEAD1,
 	BOTH_DEATH2,
@@ -404,10 +404,10 @@ typedef enum {
 	FLAG_STAND2RUN,
 
 	MAX_TOTALANIMATIONS
-} LQManimNumber_t;
+};
 
 
-typedef struct animation_s {
+struct animation_s {
 	int		firstFrame;
 	int		numFrames;
 	int		loopFrames;			// 0 to numFrames
@@ -415,7 +415,8 @@ typedef struct animation_s {
 	int		initialLerp;		// msec to get to first frame
 	int		reversed;			// true if animation is reversed
 	int		flipflop;			// true if animation should flipflop back to base
-} animation_t;
+};
+using animation_t = animation_s;
 
 //typedef enum {
 //	TEAM_FREE,
@@ -433,7 +434,7 @@ inline constexpr int TEAM_LOCATION_UPDATE_TIME = 1000;
 inline constexpr int TEAM_MAXOVERLAY = 32;
 
 //team task
-typedef enum {
+enum teamtask_t {
 	TEAMTASK_NONE,
 	TEAMTASK_OFFENSE, 
 	TEAMTASK_DEFENSE,
@@ -442,10 +443,10 @@ typedef enum {
 	TEAMTASK_RETRIEVE,
 	TEAMTASK_ESCORT,
 	TEAMTASK_CAMP
-} teamtask_t;
+};
 
 // means of death
-typedef enum {
+enum meansOfDeath_t {
 	MOD_UNKNOWN,
 	MOD_WATER,
 	MOD_SLIME,
@@ -464,23 +465,23 @@ typedef enum {
 	MOD_VEHICLEEXPLOSION,
 	MOD_CRASH,
 	MOD_NUKE
-} meansOfDeath_t;
+};
 
 
 //---------------------------------------------------------
 
 // gitem_t->type
-typedef enum {
+enum itemType_t {
 	IT_BAD,
 	IT_AMMO,				// EFX: rotate
 	IT_HEALTH,				// EFX: static external sphere + rotating internal
 	IT_FUEL,
 	IT_TEAM
-} itemType_t;
+};
 
 inline constexpr int MAX_ITEM_MODELS = 4;
 
-typedef struct gitem_s {
+struct gitem_s {
 	char		*classname;	// spawning name
 	char		*pickup_sound;
 	char		*world_model[MAX_ITEM_MODELS];
@@ -495,7 +496,8 @@ typedef struct gitem_s {
 
 	char		*precaches;		// string of all models and images this item will use
 	char		*sounds;		// string of all sounds this item will use
-} gitem_t;
+};
+using gitem_t = gitem_s;
 
 // included in both the game dll and the client
 extern	gitem_t	bg_itemlist[];
@@ -526,7 +528,7 @@ inline constexpr int MASK_ALL = (-1);
 //
 // entityState_t->eType
 //
-typedef enum {
+enum entityType_t {
 	ET_GENERAL,
 	ET_PLAYER,
 	ET_ITEM,
@@ -545,7 +547,7 @@ typedef enum {
 	ET_EVENTS				// any of the EV_* events can be added freestanding
 							// by setting eType to ET_EVENTS + eventNum
 							// this avoids having to set eFlags and eventNum
-} entityType_t;
+};
 
 
 
@@ -1191,7 +1193,7 @@ inline constexpr int MAX_MUZZLEFLASHES = 8;
 inline constexpr int MAX_PILOTS = 2;
 
 // crosshairs
-typedef enum {
+enum CrossHairs_t {
 	CH_DEFAULT,
 	CH_GUNMODE,
 	CH_BOMBMODE,
@@ -1200,7 +1202,7 @@ typedef enum {
 	CH_MISSILEMODETRACK,
 	CH_MISSILEMODELOCK,
 	CH_NUMCROSSHAIRS
-} CrossHairs_t;
+};
 
 // lock flags
 inline constexpr int LI_NOLOCK = 0;

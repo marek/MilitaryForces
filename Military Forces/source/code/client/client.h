@@ -48,7 +48,7 @@ inline constexpr int QKEY_SIZE = 2048;
 inline constexpr int RETRANSMIT_TIMEOUT = 3000; // time between connection packet retransmits
 
 // snapshots are a view of the server at a given time
-typedef struct {
+struct clSnapshot_t {
 	bool		valid;			// cleared if delta parsing was invalid
 	int				snapFlags;		// rate delayed and dropped commands
 
@@ -67,7 +67,7 @@ typedef struct {
 
 	int				serverCommandNum;		// execute all commands up to this before
 											// making the snapshot current
-} clSnapshot_t;
+};
 
 
 
@@ -80,11 +80,11 @@ new gamestate_t, potentially several times during an established connection
 =============================================================================
 */
 
-typedef struct {
+struct outPacket_t {
 	int		p_cmdNumber;		// cl.cmdNumber when packet was sent
 	int		p_serverTime;		// usercmd->serverTime when packet was sent
 	int		p_realtime;			// cls.realtime when packet was sent
-} outPacket_t;
+};
 
 // the parseEntities array must be large enough to hold PACKET_BACKUP frames of
 // entities, so that when a delta compressed message arives from the server
@@ -93,7 +93,7 @@ typedef struct {
 
 extern int g_console_field_width;
 
-typedef struct {
+struct clientActive_t {
 	int			timeoutcount;		// it requres several frames in a timeout condition
 									// to disconnect, preventing debugging breaks from
 									// causing immediate disconnects on continue
@@ -146,7 +146,7 @@ typedef struct {
 	entityState_t	parseEntities[MAX_PARSE_ENTITIES];
 
 	int			entityAckBits;
-} clientActive_t;
+};
 
 extern	clientActive_t		cl;
 
@@ -164,7 +164,7 @@ demo through a file.
 
 inline constexpr int MAX_TIMEDEMO_DURATIONS = 4096;
 
-typedef struct {
+struct clientConnection_t {
 
 	connstate_t	state;				// connection status
 
@@ -270,7 +270,7 @@ typedef struct {
 
 	// big stuff at end of structure so most offsets are 15 bits or less
 	NetChannel	netchan;
-} clientConnection_t;
+};
 
 extern	clientConnection_t clc;
 
@@ -284,14 +284,14 @@ no client connection is active at all
 ==================================================================
 */
 
-typedef struct {
+struct ping_t {
 	netadr_t	adr;
 	int			start;
 	int			time;
 	char		info[MAX_INFO_STRING];
-} ping_t;
+};
 
-typedef struct {
+struct serverInfo_t {
 	netadr_t	adr;
 	char	  	hostName[MAX_HOSTNAME_LENGTH];
 	char	  	mapName[MAX_NAME_LENGTH];
@@ -307,9 +307,9 @@ typedef struct {
 	int			punkbuster;
 	int			g_humanplayers;
 	int			g_needpass;
-} serverInfo_t;
+};
 
-typedef struct {
+struct clientStatic_t {
 	bool	cddialog;			// bring up the cd needed dialog next frame
 
 	// when the server clears the hunk, all of these must be restarted
@@ -353,7 +353,7 @@ typedef struct {
 	qhandle_t	charSetShader;
 	qhandle_t	whiteShader;
 	qhandle_t	consoleShader;
-} clientStatic_t;
+};
 
 extern	clientStatic_t		cls;
 
@@ -495,13 +495,13 @@ bool CL_CheckPaused();
 //
 // cl_input
 //
-typedef struct {
+struct kbutton_t {
 	int			down[2];		// key nums holding it down
 	unsigned	downtime;		// msec timestamp
 	unsigned	msec;			// msec down this frame if both a down and up happened
 	bool	active;			// current state
 	bool	wasPressed;		// set when down, not cleared when up
-} kbutton_t;
+};
 
 void CL_InitInput();
 void CL_ShutdownInput();

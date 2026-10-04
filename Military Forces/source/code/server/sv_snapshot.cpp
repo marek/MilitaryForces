@@ -47,11 +47,11 @@ A normal server packet will look like:
 =============================================================================
 */
 
-typedef struct {
+struct snapshotCandidate_t {
 	int		number;
 	int		bits;
 	float	priority;
-} snapshotCandidate_t;
+};
 
 static int SV_EntityUpdateBits( entityState_t *from, entityState_t *to, bool create, uint64_t forced ) 
 {
@@ -521,10 +521,10 @@ Build a client snapshot structure
 =============================================================================
 */
 
-typedef struct {
+struct snapshotEntityNumbers_t {
 	int		numSnapshotEntities;
 	int		snapshotEntities[MAX_SNAPSHOT_ENTITIES];	
-} snapshotEntityNumbers_t;
+};
 
 /*
 =======================

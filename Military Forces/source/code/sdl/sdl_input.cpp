@@ -105,7 +105,7 @@ TODO: If the SDL_Scancode situation improves, use it instead of
 */
 static bool IN_IsConsoleKey( int key, int character )
 {
-	typedef struct consoleKey_s
+	struct consoleKey_s
 	{
 		enum
 		{
@@ -118,7 +118,8 @@ static bool IN_IsConsoleKey( int key, int character )
 			int key;
 			int character;
 		} u;
-	} consoleKey_t;
+	};
+using consoleKey_t = consoleKey_s;
 
 	static consoleKey_t consoleKeys[ MAX_CONSOLE_KEYS ];
 	static int numConsoleKeys = 0;

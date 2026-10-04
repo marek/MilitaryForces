@@ -43,7 +43,7 @@ typedef long   (ZCALLBACK *seek_file_func) OF((voidpf opaque, voidpf stream, uLo
 typedef int    (ZCALLBACK *close_file_func) OF((voidpf opaque, voidpf stream));
 typedef int    (ZCALLBACK *testerror_file_func) OF((voidpf opaque, voidpf stream));
 
-typedef struct zlib_filefunc_def_s
+struct zlib_filefunc_def_s
 {
     open_file_func      zopen_file;
     read_file_func      zread_file;
@@ -53,7 +53,8 @@ typedef struct zlib_filefunc_def_s
     close_file_func     zclose_file;
     testerror_file_func zerror_file;
     voidpf              opaque;
-} zlib_filefunc_def;
+};
+using zlib_filefunc_def = zlib_filefunc_def_s;
 
 
 

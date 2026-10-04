@@ -424,15 +424,15 @@ LOOPBACK BUFFERS FOR LOCAL PLAYER
 // gamestate of maximum size
 constexpr int MAX_LOOPBACK = 16;
 
-typedef struct {
+struct loopmsg_t {
 	byte	data[MAX_PACKETLEN];
 	int		datalen;
-} loopmsg_t;
+};
 
-typedef struct {
+struct loopback_t {
 	loopmsg_t	msgs[MAX_LOOPBACK];
 	int			get, send;
-} loopback_t;
+};
 
 loopback_t	loopbacks[2];
 
@@ -478,13 +478,14 @@ void NET_SendLoopPacket (netsrc_t sock, int length, const void *data, netadr_t t
 
 //=============================================================================
 
-typedef struct packetQueue_s {
+struct packetQueue_s {
         struct packetQueue_s *next;
         int length;
         byte *data;
         netadr_t to;
         int release;
-} packetQueue_t;
+};
+using packetQueue_t = packetQueue_s;
 
 packetQueue_t *packetQueue = nullptr;
 

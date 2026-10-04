@@ -27,7 +27,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 struct image_s;
 struct shaderProgram_s;
 
-typedef struct FBO_s
+struct FBO_s
 {
 	char            name[MAX_QPATH];
 
@@ -50,7 +50,8 @@ typedef struct FBO_s
 
 	int             width;
 	int             height;
-} FBO_t;
+};
+using FBO_t = FBO_s;
 
 void FBO_AttachImage(FBO_t *fbo, image_t *image, GLenum attachment, GLuint cubemapside);
 void FBO_Bind(FBO_t *fbo);

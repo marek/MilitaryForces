@@ -45,12 +45,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #endif
 
 /* Catching errors, as done in libjpeg's example.c */
-typedef struct q_jpeg_error_mgr_s
+struct q_jpeg_error_mgr_s
 {
   struct jpeg_error_mgr pub;  /* "public" fields */
 
   jmp_buf setjmp_buffer;  /* for return to caller */
-} q_jpeg_error_mgr_t;
+};
+using q_jpeg_error_mgr_t = q_jpeg_error_mgr_s;
 
 static void R_JPGErrorExit(j_common_ptr cinfo)
 {
@@ -269,12 +270,12 @@ void R_LoadJPG(const char *filename, unsigned char **pic, int *width, int *heigh
 
 /* Expanded data destination object for stdio output */
 
-typedef struct {
+struct my_destination_mgr {
   struct jpeg_destination_mgr pub; /* public fields */
 
   byte* outfile;		/* target stream */
   int	size;
-} my_destination_mgr;
+};
 
 typedef my_destination_mgr * my_dest_ptr;
 

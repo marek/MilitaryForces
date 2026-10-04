@@ -26,13 +26,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../renderercommon/tr_public.h"
 #include "qgl.h"
 
-typedef enum
+enum imgType_t
 {
 	IMGTYPE_COLORALPHA, // for color, lightmap, diffuse, and specular
 	IMGTYPE_NORMAL,
 	IMGTYPE_NORMALHEIGHT,
 	IMGTYPE_DELUXE, // normals are swizzled, deluxe are not
-} imgType_t;
+};
 
 typedef enum : int
 {
@@ -52,7 +52,7 @@ inline imgFlags_t operator~( imgFlags_t a ) { return (imgFlags_t)( ~(int)a ); }
 inline imgFlags_t &operator|=( imgFlags_t &a, imgFlags_t b ) { a = a | b; return a; }
 inline imgFlags_t &operator&=( imgFlags_t &a, imgFlags_t b ) { a = a & b; return a; }
 
-typedef struct image_s {
+struct image_s {
 	char		imgName[MAX_QPATH];		// game path, including extension
 	int			width, height;				// source image
 	int			uploadWidth, uploadHeight;	// after power of two and picmip but not including clamp to MAX_TEXTURE_SIZE
@@ -67,7 +67,8 @@ typedef struct image_s {
 	imgFlags_t  flags;
 
 	struct image_s*	next;
-} image_t;
+};
+using image_t = image_s;
 
 // any change in the LIGHTMAP_* defines here MUST be reflected in
 // R_FindShader() in tr_bsp.c
