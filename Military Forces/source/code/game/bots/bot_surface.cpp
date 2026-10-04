@@ -102,6 +102,8 @@ void Bots::thinkSurface( GameEntity* ent, State& bot, const Sense& sense, usercm
 			SV_Trace( &water, ahead, nullptr, nullptr, below, ent->s.number, MASK_SOLID|MASK_WATER, false );
 			if( water.fraction < 1.0f && (water.contents & MASK_WATER) )
 				blocked = true;
+			if( water.fraction >= 1.0f || ent->r.currentOrigin[2] - water.endpos[2] > reach * 0.65f )
+				blocked = true;
 		}
 	}
 	if( boat && !blocked )
@@ -128,9 +130,26 @@ void Bots::thinkSurface( GameEntity* ent, State& bot, const Sense& sense, usercm
 		pickGoal( ent, bot, boat ? 6000 : 4000 );
 	}
 
-	if( theLevel.time_ < bot.reverseTime )
+	bool waterBehind = false;
+	if( !boat && theLevel.time_ < bot.reverseTime )
+	{
+		vec3_t behind, below;
+		trace_t water;
+		VectorMA( ent->r.currentOrigin, -200.0f, forward, behind );
+		behind[2] += 120;
+		VectorCopy( behind, below );
+		below[2] -= 500;
+		SV_Trace( &water, behind, nullptr, nullptr, below, ent->s.number, MASK_SOLID|MASK_WATER, false );
+		waterBehind = water.fraction < 1.0f && (water.contents & MASK_WATER);
+	}
+	if( theLevel.time_ < bot.reverseTime && !waterBehind )
 	{
 		cmd.forwardmove = -moveFull;
+		cmd.rightmove = bot.reverseTurn;
+	}
+	else if( waterBehind )
+	{
+		cmd.forwardmove = blocked ? moveNone : moveFull;
 		cmd.rightmove = bot.reverseTurn;
 	}
 	else
