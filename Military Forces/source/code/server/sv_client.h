@@ -59,8 +59,10 @@ struct SnapshotEntityTable
 	SentFrame			frames[PACKET_BACKUP];
 };
 
-struct SV_Client
+class SV_Client
 {
+public:
+
 	enum eClientState
 	{
 		CS_FREE,									// can be reused for a New connection
@@ -172,6 +174,43 @@ struct SV_Client
 
 	int					oldServerTime_;
 	bool				csUpdated_[MAX_CONFIGSTRINGS];
+
+	void free();
+	void drop( const char *reason );
+	void sendClientGameState();
+	void enterWorld( usercmd_t *cmd );
+	int writeDownloadToClient( Message *msg );
+	void userinfoChanged();
+	void executeClientCommand( const char *s, bool clientOK );
+	void think( usercmd_t *cmd );
+	void executeClientMessage( Message *msg );
+	void updateConfigstrings();
+	int replacePendingServerCommands( const char *cmd );
+	void addServerCommand( const char *cmd );
+	int rateMsec();
+	void netchanFreeQueue();
+	void netchanTransmitNextInQueue();
+	int netchanTransmitNextFragment();
+	void netchanTransmit( Message *msg );
+	bool netchanProcess( Message *msg );
+	void updateServerCommandsToClient( Message *msg );
+	void sendMessageToClient( Message *msg );
+	void sendClientSnapshot();
+	void closeDownload();
+	void updateVoipIgnore( const char *idstr, bool ignore );
+	bool clientCommand( Message *msg );
+	void userMove( Message *msg, bool delta );
+	bool shouldIgnoreVoipSender();
+	void userVoip( Message *msg, bool ignoreData );
+	void sendConfigstring( int index );
+	SnapshotEntityTable * entityTable();
+	void snapshotFrameLost( SnapshotEntityTable::SentFrame *sent );
+	void snapshotAcks();
+	bool snapshotEntityReset( bool requested );
+	void emitPacketEntities( SV_Client::ClientSnapshot *frame, Message *msg, bool reset );
+	void writeSnapshotToClient( Message *msg );
+	void buildClientSnapshot();
+	void writeVoipToClient( Message *msg );
 };
 
 

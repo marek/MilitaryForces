@@ -122,7 +122,7 @@ void SV_GameDropClient( int clientNum, const char *reason )
 	if ( clientNum < 1 || clientNum > sv_maxclients->integer || !theSVS.svClients_.at(clientNum) ) 
 		return;
 
-	SV_DropClient( theSVS.svClients_.at(clientNum), reason );	
+	(theSVS.svClients_.at(clientNum))->drop( reason );	
 }
 
 

@@ -1118,7 +1118,13 @@ using node_t = nodetype;
 
 inline constexpr int HMAX = 256; /* Maximum symbol */
 
-struct huff_t {
+class HuffmanTree
+{
+public:
+	void addRef( byte ch );
+	void transmit( int ch, byte *fout, int maxoffset );
+	void offsetTransmit( int ch, byte *fout, int *offset, int maxoffset );
+
 	int			blocNode;
 	int			blocPtrs;
 
@@ -1130,21 +1136,24 @@ struct huff_t {
 
 	node_t		nodeList[768];
 	node_t*		nodePtrs[768];
+
+private:
+	node_t **get_ppnode();
+	void free_ppnode( node_t **ppnode );
+	void swap( node_t *node1, node_t *node2 );
+	void increment( node_t *node );
 };
 
 struct huffman_t {
-	huff_t		compressor;
-	huff_t		decompressor;
+	HuffmanTree		compressor;
+	HuffmanTree		decompressor;
 };
 
 void	Huff_Compress(Message *buf, int offset);
 void	Huff_Decompress(Message *buf, int offset);
 void	Huff_Init(huffman_t *huff);
-void	Huff_addRef(huff_t* huff, byte ch);
 int		Huff_Receive (node_t *node, int *ch, byte *fin);
-void	Huff_transmit (huff_t *huff, int ch, byte *fout, int maxoffset);
 void	Huff_offsetReceive (node_t *node, int *ch, byte *fin, int *offset, int maxoffset);
-void	Huff_offsetTransmit (huff_t *huff, int ch, byte *fout, int *offset, int maxoffset);
 void	Huff_putBit( int bit, byte *fout, int *offset);
 int		Huff_getBit( byte *fout, int *offset);
 

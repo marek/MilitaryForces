@@ -164,7 +164,7 @@ ServerStatic::clearClients()
 	for(auto & svClient : svClients_)
 	{
 		if( svClient )
-			SV_FreeClient( svClient );
+			svClient->free();
 		delete svClient;
 		svClient = nullptr;
 	}

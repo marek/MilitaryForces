@@ -115,20 +115,20 @@ SV_ReplacePendingServerCommands
   This is ugly
 ======================
 */
-int SV_ReplacePendingServerCommands( SV_Client *client, const char *cmd ) {
+int SV_Client::replacePendingServerCommands( const char *cmd ) {
 	int i, index, csnum1, csnum2;
 
-	for ( i = client->reliableSent_+1; i <= client->reliableSequence_; i++ ) {
+	for ( i = this->reliableSent_+1; i <= this->reliableSequence_; i++ ) {
 		index = i & ( MAX_RELIABLE_COMMANDS - 1 );
 		//
-		if ( !Q_strncmp(cmd, client->reliableCommands_[ index ], strlen("cs")) ) {
+		if ( !Q_strncmp(cmd, this->reliableCommands_[ index ], strlen("cs")) ) {
 			sscanf(cmd, "cs %i", &csnum1);
-			sscanf(client->reliableCommands_[ index ], "cs %i", &csnum2);
+			sscanf(this->reliableCommands_[ index ], "cs %i", &csnum2);
 			if ( csnum1 == csnum2 ) {
-				Q_strncpyz( client->reliableCommands_[ index ], cmd, sizeof( client->reliableCommands_[ index ] ) );
+				Q_strncpyz( this->reliableCommands_[ index ], cmd, sizeof( this->reliableCommands_[ index ] ) );
 				/*
-				if ( client->netchan_.remoteAddress.type != NA_BOT ) {
-					Com_Printf( "WARNING: client %i removed double pending config string %i: %s\n", client->clientNum_, csnum1, cmd );
+				if ( this->netchan_.remoteAddress.type != NA_BOT ) {
+					Com_Printf( "WARNING: this %i removed double pending config string %i: %s\n", this->clientNum_, csnum1, cmd );
 				}
 				*/
 				return true;
@@ -146,41 +146,41 @@ The given command will be transmitted to the client, and is guaranteed to
 not have future snapshot_t executed before it is executed
 ======================
 */
-void SV_AddServerCommand( SV_Client *client, const char *cmd ) {
+void SV_Client::addServerCommand( const char *cmd ) {
 	int		index, i;
 
 	// this is very ugly but it's also a waste to for instance send multiple config string updates
 	// for the same config string index in one snapshot
-//	if ( SV_ReplacePendingServerCommands( client, cmd ) ) {
+//	if ( this->replacePendingServerCommands( cmd ) ) {
 //		return;
 //	}
 
 	// do not send commands until the gamestate has been sent
-	if( client->state_ < SV_Client::CS_PRIMED )
+	if( this->state_ < SV_Client::CS_PRIMED )
 		return;
 
-	client->reliableSequence_++;
+	this->reliableSequence_++;
 	// if we would be losing an old command that hasn't been acknowledged,
 	// we must drop the connection
-	// we check == instead of >= so a broadcast print added by SV_DropClient()
-	// doesn't cause a recursive drop client
-	if ( client->reliableSequence_ - client->reliableAcknowledge_ == MAX_RELIABLE_COMMANDS + 1 ) {
-		if ( client->gamestateMessageNum_ == -1 )  {
+	// we check == instead of >= so a broadcast print added by ()->drop()
+	// doesn't cause a recursive drop this
+	if ( this->reliableSequence_ - this->reliableAcknowledge_ == MAX_RELIABLE_COMMANDS + 1 ) {
+		if ( this->gamestateMessageNum_ == -1 )  {
 			// invalid game state message 
-			// this can occur in SV_DropClient() to avoid calling it more than once
+			// this can occur in ()->drop() to avoid calling it more than once
 			return;
 		}
 
 		Com_Printf( "===== pending server commands =====\n" );
-		for ( i = client->reliableAcknowledge_ + 1 ; i <= client->reliableSequence_ ; i++ ) {
-			Com_Printf( "cmd %5d: %s\n", i, client->reliableCommands_[ i & (MAX_RELIABLE_COMMANDS-1) ] );
+		for ( i = this->reliableAcknowledge_ + 1 ; i <= this->reliableSequence_ ; i++ ) {
+			Com_Printf( "cmd %5d: %s\n", i, this->reliableCommands_[ i & (MAX_RELIABLE_COMMANDS-1) ] );
 		}
 		Com_Printf( "cmd %5d: %s\n", i, cmd );
-		SV_DropClient( client, "Server command overflow" );
+		this->drop( "Server command overflow" );
 		return;
 	}
-	index = client->reliableSequence_ & ( MAX_RELIABLE_COMMANDS - 1 );
-	Q_strncpyz( client->reliableCommands_[ index ], cmd, sizeof( client->reliableCommands_[ index ] ) );
+	index = this->reliableSequence_ & ( MAX_RELIABLE_COMMANDS - 1 );
+	Q_strncpyz( this->reliableCommands_[ index ], cmd, sizeof( this->reliableCommands_[ index ] ) );
 }
 
 
@@ -212,7 +212,7 @@ void QDECL SV_SendServerCommand( SV_Client *cl, const char *fmt, ... )
 
 	if( cl != nullptr ) 
 	{
-		SV_AddServerCommand( cl, reinterpret_cast<char *>(message) );
+		cl->addServerCommand( reinterpret_cast<char *>(message) );
 		return;
 	}
 
@@ -230,7 +230,7 @@ void QDECL SV_SendServerCommand( SV_Client *cl, const char *fmt, ... )
 		if( !client ) 
 			continue;
 
-		SV_AddServerCommand( client, reinterpret_cast<char *>(message) );
+		client->addServerCommand( reinterpret_cast<char *>(message) );
 	}
 }
 
@@ -883,7 +883,7 @@ void SV_PacketEvent( netadr_t from, Message *msg )
 		}
 
 		// make sure it is a valid, in sequence packet
-		if( SV_Netchan_Process(cl, msg) ) 
+		if( cl->netchanProcess( msg ) ) 
 		{
 			// zombie clients still need to do the Netchan_Process
 			// to make sure they don't need to retransmit the final
@@ -891,7 +891,7 @@ void SV_PacketEvent( netadr_t from, Message *msg )
 			if( cl->state_ != SV_Client::CS_ZOMBIE )
 			{
 				cl->lastPacketTime_ = theSVS.time_;	// don't timeout
-				SV_ExecuteClientMessage( cl, msg );
+				cl->executeClientMessage( msg );
 			}
 		}
 		return;
@@ -1007,7 +1007,7 @@ void SV_CheckTimeouts()
 			// cause a timeout
 			if( ++cl->timeoutCount_ > 5 ) 
 			{
-				SV_DropClient (cl, "timed out"); 
+				cl->drop( "timed out" ); 
 				cl->state_ = SV_Client::CS_FREE;	// don't bother with zombie state
 			}
 		}
@@ -1205,13 +1205,13 @@ a client based on its rate settings
 constexpr int UDPIP_HEADER_SIZE = 28;
 constexpr int UDPIP6_HEADER_SIZE = 48;
 
-int SV_RateMsec(SV_Client *client)
+int SV_Client::rateMsec()
 {
 	int rate, rateMsec;
 	int messageSize;
 	
-	messageSize = client->netchan_.lastSentSize;
-	rate = client->rate_;
+	messageSize = this->netchan_.lastSentSize;
+	rate = this->rate_;
 
 	if(sv_maxRate->integer)
 	{
@@ -1229,13 +1229,13 @@ int SV_RateMsec(SV_Client *client)
 			rate = sv_minRate->integer;
 	}
 
-	if(client->netchan_.remoteAddress.type == NA_IP6)
+	if(this->netchan_.remoteAddress.type == NA_IP6)
 		messageSize += UDPIP6_HEADER_SIZE;
 	else
 		messageSize += UDPIP_HEADER_SIZE;
 		
 	rateMsec = messageSize * 1000 / (static_cast<int>(rate * com_timescale->value));
-	rate = Sys_Milliseconds() - client->netchan_.lastSentTime;
+	rate = Sys_Milliseconds() - this->netchan_.lastSentTime;
 	
 	if(rate > rateMsec)
 		return 0;

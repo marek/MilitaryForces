@@ -30,18 +30,18 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 SV_Netchan_FreeQueue
 =================
 */
-void SV_Netchan_FreeQueue(SV_Client *client)
+void SV_Client::netchanFreeQueue()
 {
 	SV_Client::Netchan_Buffer *netbuf, *next;
 	
-	for(netbuf = client->netchan_start_queue_; netbuf; netbuf = next)
+	for(netbuf = this->netchan_start_queue_; netbuf; netbuf = next)
 	{
 		next = netbuf->next_;
 		Z_Free(netbuf);
 	}
 	
-	client->netchan_start_queue_ = nullptr;
-	client->netchan_end_queue_ = &client->netchan_start_queue_;
+	this->netchan_start_queue_ = nullptr;
+	this->netchan_end_queue_ = &this->netchan_start_queue_;
 }
 
 /*
@@ -49,21 +49,21 @@ void SV_Netchan_FreeQueue(SV_Client *client)
 SV_Netchan_TransmitNextInQueue
 =================
 */
-void SV_Netchan_TransmitNextInQueue(SV_Client *client)
+void SV_Client::netchanTransmitNextInQueue()
 {
 	SV_Client::Netchan_Buffer *netbuf;
 		
 	Com_DPrintf("#462 Netchan_TransmitNextFragment: popping a queued message for transmit\n");
-	netbuf = client->netchan_start_queue_;
+	netbuf = this->netchan_start_queue_;
 
-	client->netchan_.transmit( netbuf->msg_.cursize, netbuf->msg_.data );
+	this->netchan_.transmit( netbuf->msg_.cursize, netbuf->msg_.data );
 
 	// pop from queue
-	client->netchan_start_queue_ = netbuf->next_;
-	if(!client->netchan_start_queue_)
+	this->netchan_start_queue_ = netbuf->next_;
+	if(!this->netchan_start_queue_)
 	{
 		Com_DPrintf("#462 Netchan_TransmitNextFragment: emptied queue\n");
-		client->netchan_end_queue_ = &client->netchan_start_queue_;
+		this->netchan_end_queue_ = &this->netchan_start_queue_;
 	}
 	else
 		Com_DPrintf("#462 Netchan_TransmitNextFragment: remaining queued message\n");
@@ -80,17 +80,17 @@ Return number of ms until next message can be sent based on throughput given by 
 =================
 */
 
-int SV_Netchan_TransmitNextFragment(SV_Client *client)
+int SV_Client::netchanTransmitNextFragment()
 {
-	if(client->netchan_.unsentFragments)
+	if(this->netchan_.unsentFragments)
 	{
-		client->netchan_.transmitNextFragment();
-		return SV_RateMsec(client);
+		this->netchan_.transmitNextFragment();
+		return this->rateMsec();
 	}
-	else if(client->netchan_start_queue_)
+	else if(this->netchan_start_queue_)
 	{
-		SV_Netchan_TransmitNextInQueue(client);
-		return SV_RateMsec(client);
+		this->netchanTransmitNextInQueue();
+		return this->rateMsec();
 	}
 	
 	return -1;
@@ -108,11 +108,11 @@ then buffer them and make sure they get sent in correct order
 ================
 */
 
-void SV_Netchan_Transmit( SV_Client *client, Message *msg)
+void SV_Client::netchanTransmit( Message *msg )
 {
 	msg->writeByte( svc_EOF );
 
-	if(client->netchan_.unsentFragments || client->netchan_start_queue_)
+	if(this->netchan_.unsentFragments || this->netchan_start_queue_)
 	{
 		SV_Client::Netchan_Buffer *netbuf;
 		Com_DPrintf("#462 SV_Netchan_Transmit: unsent fragments, stacked\n");
@@ -121,12 +121,12 @@ void SV_Netchan_Transmit( SV_Client *client, Message *msg)
 		netbuf->msg_.copy( netbuf->msgBuffer_, sizeof( netbuf->msgBuffer_ ), msg);
 		netbuf->next_ = nullptr;
 		// insert it in the queue, the message will be encoded and sent later
-		*client->netchan_end_queue_ = netbuf;
-		client->netchan_end_queue_ = &(*client->netchan_end_queue_)->next_;
+		*this->netchan_end_queue_ = netbuf;
+		this->netchan_end_queue_ = &(*this->netchan_end_queue_)->next_;
 	}
 	else
 	{
-		client->netchan_.transmit( msg->cursize, msg->data );
+		this->netchan_.transmit( msg->cursize, msg->data );
 	}
 }
 
@@ -135,10 +135,10 @@ void SV_Netchan_Transmit( SV_Client *client, Message *msg)
 Netchan_SV_Process
 =================
 */
-bool SV_Netchan_Process( SV_Client *client, Message *msg ) 
+bool SV_Client::netchanProcess( Message *msg ) 
 {
 	int ret;
-	ret = client->netchan_.process( msg );
+	ret = this->netchan_.process( msg );
 	if (!ret)
 		return false;
 

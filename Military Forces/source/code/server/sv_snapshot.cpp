@@ -129,13 +129,13 @@ static float SV_SnapshotEntityWeight( const playerState_t *ps, const vec3_t forw
 	return weight;
 }
 
-static SnapshotEntityTable *SV_ClientEntityTable( SV_Client *client ) 
+SnapshotEntityTable * SV_Client::entityTable() 
 {
-	if ( !client->entityTable_ ) {
-		client->entityTable_ = new SnapshotEntityTable;
-		Com_Memset( client->entityTable_, 0, sizeof( *client->entityTable_ ) );
+	if ( !this->entityTable_ ) {
+		this->entityTable_ = new SnapshotEntityTable;
+		Com_Memset( this->entityTable_, 0, sizeof( *this->entityTable_ ) );
 	}
-	return client->entityTable_;
+	return this->entityTable_;
 }
 
 /*
@@ -145,16 +145,16 @@ SV_SnapshotFrameLost
 The client never applied this snapshot, so what it carried is sent again
 =============
 */
-static void SV_SnapshotFrameLost( SV_Client *client, SnapshotEntityTable::SentFrame *sent ) 
+void SV_Client::snapshotFrameLost( SnapshotEntityTable::SentFrame *sent ) 
 {
-	SnapshotEntityTable				*table = client->entityTable_;
+	SnapshotEntityTable				*table = this->entityTable_;
 	SnapshotEntityTable::SentEntity	*ent;
 	int								i;
 
 	sent->pending = false;
 
 	if ( sent->overflow ) {
-		client->entityReset_ = true;
+		this->entityReset_ = true;
 		return;
 	}
 
@@ -184,14 +184,14 @@ Sorts the snapshots sent so far into applied and lost ones from the
 client's last report
 =============
 */
-static void SV_SnapshotAcks( SV_Client *client ) 
+void SV_Client::snapshotAcks() 
 {
-	SnapshotEntityTable				*table = client->entityTable_;
+	SnapshotEntityTable				*table = this->entityTable_;
 	SnapshotEntityTable::SentFrame	*sent;
 	int								i, behind;
 
-	if ( client->entityAck_ <= client->gamestateMessageNum_ 
-		|| client->entityAck_ >= client->netchan_.outgoingSequence ) {
+	if ( this->entityAck_ <= this->gamestateMessageNum_ 
+		|| this->entityAck_ >= this->netchan_.outgoingSequence ) {
 		return;
 	}
 
@@ -199,14 +199,14 @@ static void SV_SnapshotAcks( SV_Client *client )
 		if ( !sent->pending ) {
 			continue;
 		}
-		behind = client->entityAck_ - sent->sequence;
+		behind = this->entityAck_ - sent->sequence;
 		if ( behind < 0 ) {
 			continue;
 		}
-		if ( behind == 0 || ( behind <= 32 && ( ( client->entityAckBits_ >> ( behind - 1 ) ) & 1 ) ) ) {
+		if ( behind == 0 || ( behind <= 32 && ( ( this->entityAckBits_ >> ( behind - 1 ) ) & 1 ) ) ) {
 			sent->pending = false;
 		} else {
-			SV_SnapshotFrameLost( client, sent );
+			this->snapshotFrameLost( sent );
 		}
 	}
 }
@@ -218,25 +218,25 @@ SV_SnapshotEntityReset
 Returns true if this snapshot has to carry every entity
 =============
 */
-static bool SV_SnapshotEntityReset( SV_Client *client, bool requested ) 
+bool SV_Client::snapshotEntityReset( bool requested ) 
 {
-	SnapshotEntityTable	*table = SV_ClientEntityTable( client );
+	SnapshotEntityTable	*table = this->entityTable();
 	int					i;
 
-	SV_SnapshotAcks( client );
+	this->snapshotAcks();
 
 	if ( !requested ) {
-		client->entityResetDone_ = false;
-	} else if ( !client->entityResetDone_ ) {
-		client->entityReset_ = true;
+		this->entityResetDone_ = false;
+	} else if ( !this->entityResetDone_ ) {
+		this->entityReset_ = true;
 	}
 
-	if ( !client->entityReset_ ) {
+	if ( !this->entityReset_ ) {
 		return false;
 	}
 
-	client->entityReset_ = false;
-	client->entityResetDone_ = requested;
+	this->entityReset_ = false;
+	this->entityResetDone_ = requested;
 
 	Com_Memset( table->flags, 0, sizeof( table->flags ) );
 	Com_Memset( table->forced, 0, sizeof( table->forced ) );
@@ -257,12 +257,12 @@ sent again. Without the reset the snapshot is kept under sv_snapshotBudget
 bytes: updates that do not fit wait and gain priority.
 =============
 */
-static void SV_EmitPacketEntities( SV_Client *client, SV_Client::ClientSnapshot *frame, Message *msg, bool reset )
+void SV_Client::emitPacketEntities( SV_Client::ClientSnapshot *frame, Message *msg, bool reset )
 {
 	static entityState_t		*states[MAX_GENTITIES];
 	static byte					action[MAX_GENTITIES];
 	static snapshotCandidate_t	candidates[MAX_SNAPSHOT_ENTITIES];
-	SnapshotEntityTable			*table = client->entityTable_;
+	SnapshotEntityTable			*table = this->entityTable_;
 	SnapshotEntityTable::SentFrame	*sent;
 	entityState_t				*state;
 	entityState_t				removed;
@@ -276,8 +276,8 @@ static void SV_EmitPacketEntities( SV_Client *client, SV_Client::ClientSnapshot 
 	int							i;
 
 	unlimited = reset || sv_snapshotBudget->integer <= 0 
-		|| client->netchan_.remoteAddress.type == NA_LOOPBACK 
-		|| ( sv_lanForceRate->integer && Sys_IsLANAddress( client->netchan_.remoteAddress ) );
+		|| this->netchan_.remoteAddress.type == NA_LOOPBACK 
+		|| ( sv_lanForceRate->integer && Sys_IsLANAddress( this->netchan_.remoteAddress ) );
 
 	remaining = sv_snapshotBudget->integer * 8 - msg->bit - GENTITYNUM_BITS - 8;
 
@@ -334,11 +334,11 @@ static void SV_EmitPacketEntities( SV_Client *client, SV_Client::ClientSnapshot 
 		}
 	}
 
-	sent = &table->frames[ client->netchan_.outgoingSequence & PACKET_MASK ];
+	sent = &table->frames[ this->netchan_.outgoingSequence & PACKET_MASK ];
 	if ( sent->pending ) {
-		SV_SnapshotFrameLost( client, sent );
+		this->snapshotFrameLost( sent );
 	}
-	sent->sequence = client->netchan_.outgoingSequence;
+	sent->sequence = this->netchan_.outgoingSequence;
 	sent->pending = true;
 	sent->overflow = reset;
 	sent->count = 0;
@@ -393,7 +393,7 @@ static void SV_EmitPacketEntities( SV_Client *client, SV_Client::ClientSnapshot 
 SV_WriteSnapshotToClient
 ==================
 */
-static void SV_WriteSnapshotToClient( SV_Client *client, Message *msg ) 
+void SV_Client::writeSnapshotToClient( Message *msg ) 
 {
 	SV_Client::ClientSnapshot	*frame, *oldframe;
 	int					lastframe;
@@ -402,47 +402,47 @@ static void SV_WriteSnapshotToClient( SV_Client *client, Message *msg )
 	bool				reset;
 
 	// this is the snapshot we are creating
-	frame = &client->frames_[ client->netchan_.outgoingSequence & PACKET_MASK ];
+	frame = &this->frames_[ this->netchan_.outgoingSequence & PACKET_MASK ];
 
 	// try to use a previous frame as the source for delta compressing the snapshot
-	if ( client->deltaMessage_ <= 0 || client->state_ != SV_Client::CS_ACTIVE ) 
+	if ( this->deltaMessage_ <= 0 || this->state_ != SV_Client::CS_ACTIVE ) 
 	{
-		// client is asking for a retransmit
+		// this is asking for a retransmit
 		oldframe = nullptr;
 		lastframe = 0;
 	} 
-	else if ( client->netchan_.outgoingSequence - client->deltaMessage_ 
+	else if ( this->netchan_.outgoingSequence - this->deltaMessage_ 
 		>= (PACKET_BACKUP - 3) ) 
 	{
-		// client hasn't gotten a good message through in a long time
-		Com_DPrintf ("%s: Delta request from out of date packet.\n", client->name_);
+		// this hasn't gotten a good message through in a long time
+		Com_DPrintf ("%s: Delta request from out of date packet.\n", this->name_);
 		oldframe = nullptr;
 		lastframe = 0;
 	} 
 	else 
 	{
 		// we have a valid snapshot to delta from
-		oldframe = &client->frames_[ client->deltaMessage_ & PACKET_MASK ];
-		lastframe = client->netchan_.outgoingSequence - client->deltaMessage_;
+		oldframe = &this->frames_[ this->deltaMessage_ & PACKET_MASK ];
+		lastframe = this->netchan_.outgoingSequence - this->deltaMessage_;
 
 	}
 
 	msg->writeByte( svc_snapshot);
 
-	// NOTE, MRE: now sent at the start of every message from server to client
-	// let the client know which reliable clientCommands we have received
-	//msg->writeLong( client->lastClientCommand );
+	// NOTE, MRE: now sent at the start of every message from server to this
+	// let the this know which reliable clientCommands we have received
+	//msg->writeLong( this->lastClientCommand );
 
-	// send over the current server time so the client can drift
+	// send over the current server time so the this can drift
 	// its view of time to try to match
-	if( client->oldServerTime_ ) {
+	if( this->oldServerTime_ ) {
 		// The server has not yet got an acknowledgement of the
-		// new gamestate from this client, so continue to send it
+		// new gamestate from this this, so continue to send it
 		// a time as if the server has not restarted. Note from
-		// the client's perspective this time is strictly speaking
+		// the this's perspective this time is strictly speaking
 		// incorrect, but since it'll be busy loading a map at
 		// the time it doesn't really matter.
-		msg->writeLong( theSV.time_ + client->oldServerTime_);
+		msg->writeLong( theSV.time_ + this->oldServerTime_);
 	} else {
 		msg->writeLong( theSV.time_);
 	}
@@ -451,16 +451,16 @@ static void SV_WriteSnapshotToClient( SV_Client *client, Message *msg )
 	msg->writeByte( lastframe);
 
 	snapFlags = theSVS.snapFlagServerBit_;
-	if ( client->rateDelayed_ ) 
+	if ( this->rateDelayed_ ) 
 	{
 		snapFlags |= SNAPFLAG_RATE_DELAYED;
 	}
-	if ( client->state_ != SV_Client::CS_ACTIVE ) 
+	if ( this->state_ != SV_Client::CS_ACTIVE ) 
 	{
 		snapFlags |= SNAPFLAG_NOT_ACTIVE;
 	}
 
-	reset = SV_SnapshotEntityReset( client, client->deltaMessage_ <= 0 || client->state_ != SV_Client::CS_ACTIVE );
+	reset = this->snapshotEntityReset( this->deltaMessage_ <= 0 || this->state_ != SV_Client::CS_ACTIVE );
 	if ( reset ) 
 	{
 		snapFlags |= SNAPFLAG_ENTITY_RESET;
@@ -480,7 +480,7 @@ static void SV_WriteSnapshotToClient( SV_Client *client, Message *msg )
 	}
 
 	// delta encode the entities
-	SV_EmitPacketEntities( client, frame, msg, reset );
+	this->emitPacketEntities( frame, msg, reset );
 
 	// padding for rate debugging
 	if ( sv_padPackets->integer ) 
@@ -495,22 +495,20 @@ static void SV_WriteSnapshotToClient( SV_Client *client, Message *msg )
 
 /*
 ==================
-SV_UpdateServerCommandsToClient
-
-(re)send all server commands the client hasn't acknowledged yet
+re->updateServerCommandsToClient()send all server commands the client hasn't acknowledged yet
 ==================
 */
-void SV_UpdateServerCommandsToClient( SV_Client *client, Message *msg ) 
+void SV_Client::updateServerCommandsToClient( Message *msg ) 
 {
 	int		i;
 
 	// write any unacknowledged serverCommands
-	for ( i = client->reliableAcknowledge_ + 1 ; i <= client->reliableSequence_ ; i++ ) {
+	for ( i = this->reliableAcknowledge_ + 1 ; i <= this->reliableSequence_ ; i++ ) {
 		msg->writeByte( svc_serverCommand );
 		msg->writeLong( i );
-		msg->writeString( client->reliableCommands_[ i & (MAX_RELIABLE_COMMANDS-1) ] );
+		msg->writeString( this->reliableCommands_[ i & (MAX_RELIABLE_COMMANDS-1) ] );
 	}
-	client->reliableSent_ = client->reliableSequence_;
+	this->reliableSent_ = this->reliableSequence_;
 }
 
 /*
@@ -735,7 +733,7 @@ currently doesn't.
 For viewing through other player's eyes, clent can be something other than client->gentity
 =============
 */
-static void SV_BuildClientSnapshot( SV_Client *client ) 
+void SV_Client::buildClientSnapshot() 
 {
 	vec3_t						org;
 	SV_Client::ClientSnapshot	*frame;
@@ -752,7 +750,7 @@ static void SV_BuildClientSnapshot( SV_Client *client )
 	theSV.snapshotCounter_++;
 
 	// this is the frame we are creating
-	frame = &client->frames_[ client->netchan_.outgoingSequence & PACKET_MASK ];
+	frame = &this->frames_[ this->netchan_.outgoingSequence & PACKET_MASK ];
 
 	// clear everything in this snapshot
 	entityNumbers.numSnapshotEntities = 0;
@@ -760,26 +758,26 @@ static void SV_BuildClientSnapshot( SV_Client *client )
 
 	frame->num_entities_ = 0;
 	
-	clent = theSV.getEntityByNum(client->clientNum_);//client->gentity_;
-	if ( !clent || client->state_ == SV_Client::CS_ZOMBIE ) 
+	clent = theSV.getEntityByNum(this->clientNum_);//this->gentity_;
+	if ( !clent || this->state_ == SV_Client::CS_ZOMBIE ) 
 		return;
 
 	// grab the current playerState_t
-	ps = &theSV.getClientByNum( client->clientNum_ )->ps_;
+	ps = &theSV.getClientByNum( this->clientNum_ )->ps_;
 	frame->ps_ = *ps;
 
-	// never send client's own entity, because it can
+	// never send this's own entity, because it can
 	// be regenerated from the playerstate
 	clientNum = frame->ps_.clientNum;
 	if ( clientNum < 1 || clientNum >= MAX_GENTITIES ) 
 	{
-		Com_Error( ERR_DROP, "SV_BuildClientSnapshot: bad client" );
+		Com_Error( ERR_DROP, "SV_BuildClientSnapshot: bad this" );
 	}
 	svEnt = &theSV.serverEntities_[ clientNum ];
 
 	svEnt->snapshotCounter_ = theSV.snapshotCounter_;
 
-	// find the client's viewpoint
+	// find the this's viewpoint
 	VectorCopy( ps->origin, org );
 	org[2] += ps->viewheight;
 
@@ -826,20 +824,20 @@ SV_WriteVoipToClient
 Check to see if there is any VoIP queued for a client, and send if there is.
 ==================
 */
-static void SV_WriteVoipToClient(SV_Client *cl, Message *msg)
+void SV_Client::writeVoipToClient( Message *msg )
 {
 	int totalbytes = 0;
 	int i;
 	voipServerPacket_t *packet;
 
-	if(cl->queuedVoipPackets_)
+	if(this->queuedVoipPackets_)
 	{
 		// Write as many VoIP packets as we reasonably can...
-		for(i = 0; i < cl->queuedVoipPackets_; i++)
+		for(i = 0; i < this->queuedVoipPackets_; i++)
 		{
-			packet = cl->voipPacket_[(i + cl->queuedVoipIndex_) % ARRAY_LEN(cl->voipPacket_)];
+			packet = this->voipPacket_[(i + this->queuedVoipIndex_) % ARRAY_LEN(this->voipPacket_)];
 
-			if(!*cl->downloadName_)
+			if(!*this->downloadName_)
 			{
         			totalbytes += packet->len;
 	        		if (totalbytes > (msg->maxsize - msg->cursize) / 2)
@@ -858,9 +856,9 @@ static void SV_WriteVoipToClient(SV_Client *cl, Message *msg)
 			Z_Free(packet);
 		}
 
-		cl->queuedVoipPackets_ -= i;
-		cl->queuedVoipIndex_ += i;
-		cl->queuedVoipIndex_ %= ARRAY_LEN(cl->voipPacket_);
+		this->queuedVoipPackets_ -= i;
+		this->queuedVoipIndex_ += i;
+		this->queuedVoipIndex_ %= ARRAY_LEN(this->voipPacket_);
 	}
 }
 #endif
@@ -872,15 +870,15 @@ SV_SendMessageToClient
 Called by SV_SendClientSnapshot and SV_SendClientGameState
 =======================
 */
-void SV_SendMessageToClient(Message *msg, SV_Client *client)
+void SV_Client::sendMessageToClient( Message *msg )
 {
 	// record information about the message
-	client->frames_[client->netchan_.outgoingSequence & PACKET_MASK].messageSize_ = msg->cursize;
-	client->frames_[client->netchan_.outgoingSequence & PACKET_MASK].messageSent_ = theSVS.time_;
-	client->frames_[client->netchan_.outgoingSequence & PACKET_MASK].messageAcked_ = -1;
+	this->frames_[this->netchan_.outgoingSequence & PACKET_MASK].messageSize_ = msg->cursize;
+	this->frames_[this->netchan_.outgoingSequence & PACKET_MASK].messageSent_ = theSVS.time_;
+	this->frames_[this->netchan_.outgoingSequence & PACKET_MASK].messageAcked_ = -1;
 
 	// send the datagram
-	SV_Netchan_Transmit(client, msg);
+	this->netchanTransmit( msg );
 }
 
 
@@ -892,17 +890,17 @@ Also called by SV_FinalMessage
 
 =======================
 */
-void SV_SendClientSnapshot( SV_Client *client ) 
+void SV_Client::sendClientSnapshot() 
 {
 	byte		msg_buf[MAX_MSGLEN];
 	Message		msg;
 
 	// build the snapshot
-	SV_BuildClientSnapshot( client );
+	this->buildClientSnapshot();
 
 	// bots need to have their snapshots build, but
 	// the query them directly without needing to be sent
-	EntityBase* gentity = theSV.getEntityByNum(client->clientNum_);
+	EntityBase* gentity = theSV.getEntityByNum(this->clientNum_);
 	if( gentity && gentity->r.svFlags & SVF_BOT ) 
 		return;
 
@@ -910,28 +908,28 @@ void SV_SendClientSnapshot( SV_Client *client )
 	msg.allowoverflow = true;
 
 	// NOTE, MRE: all server->client messages now acknowledge
-	// let the client know which reliable clientCommands we have received
-	msg.writeLong( client->lastClientCommand_ );
+	// let the this know which reliable clientCommands we have received
+	msg.writeLong( this->lastClientCommand_ );
 
 	// (re)send any reliable server commands
-	SV_UpdateServerCommandsToClient( client, &msg );
+	this->updateServerCommandsToClient( &msg );
 
 	// send over all the relevant entityState_t
 	// and the playerState_t
-	SV_WriteSnapshotToClient( client, &msg );
+	this->writeSnapshotToClient( &msg );
 
 #ifdef USE_VOIP
-	SV_WriteVoipToClient( client, &msg );
+	this->writeVoipToClient( &msg );
 #endif
 
 	// check for overflow
 	if ( msg.overflowed ) 
 	{
-		Com_Printf ("WARNING: msg overflowed for %s\n", client->name_);
+		Com_Printf ("WARNING: msg overflowed for %s\n", this->name_);
 		msg.clear();
 	}
 
-	SV_SendMessageToClient( &msg, client );
+	this->sendMessageToClient( &msg );
 }
 
 
@@ -966,7 +964,7 @@ void SV_SendClientMessages()
 		     (sv_lanForceRate->integer && Sys_IsLANAddress(c->netchan_.remoteAddress))))
 		{
 			// rate control for clients not on LAN 
-			if(SV_RateMsec(c) > 0)
+			if(c->rateMsec() > 0)
 			{
 				// Not enough time since last packet passed through the line
 				c->rateDelayed_ = true;
@@ -975,7 +973,7 @@ void SV_SendClientMessages()
 		}
 
 		// generate and send a new message
-		SV_SendClientSnapshot(c);
+		c->sendClientSnapshot();
 		c->lastSnapshotTime_ = theSVS.time_;
 		c->rateDelayed_ = false;
 	}

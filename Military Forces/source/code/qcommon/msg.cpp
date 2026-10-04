@@ -168,7 +168,7 @@ void Message::writeBits( int value, int bits ) {
 				if ( msg_huffstats && msg_huffstats->integer && !msg_huffstatsHold ) {
 					msg_huffCounts[value & 0xff]++;
 				}
-				Huff_offsetTransmit( &msgHuff.compressor, (value & 0xff), this->data, &this->bit, this->maxsize << 3 );
+				msgHuff.compressor.offsetTransmit( (value & 0xff), this->data, &this->bit, this->maxsize << 3 );
 				value = (value >> 8);
 
 				if ( this->bit >= this->maxsize << 3 ) {
@@ -1839,8 +1839,8 @@ void MSG_initHuffman() {
 	Huff_Init(&msgHuff);
 	for(i=0;i<256;i++) {
 		for (j=0;j<msg_hData[i];j++) {
-			Huff_addRef(&msgHuff.compressor,	static_cast<byte>(i));			// Do update
-			Huff_addRef(&msgHuff.decompressor,	static_cast<byte>(i));			// Do update
+			msgHuff.compressor.addRef( static_cast<byte>(i) );			// Do update
+			msgHuff.decompressor.addRef( static_cast<byte>(i) );			// Do update
 		}
 	}
 }

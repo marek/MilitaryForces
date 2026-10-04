@@ -35,7 +35,7 @@ Creates and sends the server command necessary to update the CS index for the
 given client
 ===============
 */
-static void SV_SendConfigstring(SV_Client *client, int index)
+void SV_Client::sendConfigstring( int index )
 {
 	int maxChunkSize = MAX_STRING_CHARS - 24;
 	int len;
@@ -61,7 +61,7 @@ static void SV_SendConfigstring(SV_Client *client, int index)
 			Q_strncpyz( buf, &theSV.configstrings_[index][sent],
 				maxChunkSize );
 
-			SV_SendServerCommand( client, "%s %i \"%s\"\n", cmd,
+			SV_SendServerCommand( this, "%s %i \"%s\"\n", cmd,
 				index, buf );
 
 			sent += (maxChunkSize - 1);
@@ -69,7 +69,7 @@ static void SV_SendConfigstring(SV_Client *client, int index)
 		}
 	} else {
 		// standard cs, just send it
-		SV_SendServerCommand( client, "cs %i \"%s\"\n", index,
+		SV_SendServerCommand( this, "cs %i \"%s\"\n", index,
 			theSV.configstrings_[index] );
 	}
 }
@@ -82,23 +82,23 @@ Called when a client goes from CS_PRIMED to CS_ACTIVE.  Updates all
 Configstring indexes that have changed while the client was in CS_PRIMED
 ===============
 */
-void SV_UpdateConfigstrings(SV_Client *client)
+void SV_Client::updateConfigstrings()
 {
 	int index;
 
 	for( index = 0; index < MAX_CONFIGSTRINGS; index++ ) {
 		// if the CS hasn't changed since we went to CS_PRIMED, ignore
-		if(!client->csUpdated_[index])
+		if(!this->csUpdated_[index])
 			continue;
 
 		// do not always send server info to all clients
-		EntityBase* gentity = theSV.getEntityByNum(client->clientNum_);
+		EntityBase* gentity = theSV.getEntityByNum(this->clientNum_);
 		if ( index == CS_SERVERINFO && gentity &&
 			(gentity->r.svFlags & SVF_NOSERVERINFO) ) {
 			continue;
 		}
-		SV_SendConfigstring(client, index);
-		client->csUpdated_[index] = false;
+		this->sendConfigstring( index );
+		this->csUpdated_[index] = false;
 	}
 }
 
@@ -147,7 +147,7 @@ void SV_SetConfigstring( int index, const char *val )
 			if( index == CS_SERVERINFO && gentity && (gentity->r.svFlags & SVF_NOSERVERINFO) ) 
 				continue;
 
-			SV_SendConfigstring(client, index);
+			client->sendConfigstring( index );
 		}
 	}
 }
@@ -523,7 +523,7 @@ void SV_SpawnServer( char *server, bool killBots )
 			{
 				if( killBots ) 
 				{
-					SV_DropClient( cl, "" );
+					cl->drop( "" );
 					continue;
 				}
 				isBot = true;
@@ -540,7 +540,7 @@ void SV_SpawnServer( char *server, bool killBots )
 			{
 				// this generally shouldn't happen, because the client
 				// was connected before the level change
-				SV_DropClient( cl, denied );
+				cl->drop( denied );
 			} 
 			else
 			{
@@ -740,7 +740,7 @@ void SV_FinalMessage( const char *message )
 				}
 				// force a snapshot to be sent
 				cl->lastSnapshotTime_ = 0;
-				SV_SendClientSnapshot( cl );
+				cl->sendClientSnapshot();
 			}
 		}
 	}

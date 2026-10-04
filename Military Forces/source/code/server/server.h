@@ -362,16 +362,16 @@ void SV_DirectConnect( netadr_t from );
 
 //void SV_AuthorizeIpPacket( netadr_t from );
 
-//void SV_ExecuteClientMessage( client_t *cl, Message *msg );
-//void SV_UserinfoChanged( client_t *cl );
+//void (client_t *cl)->executeClientMessage( Message *msg );
+//void (client_t *cl)->userinfoChanged();
 //
-//void SV_ClientEnterWorld( client_t *client, usercmd_t *cmd );
-//void SV_DropClient( client_t *drop, const char *reason );
+//void (client_t *client)->enterWorld( usercmd_t *cmd );
+//void (client_t *drop)->drop( const char *reason );
 //
-//void SV_ExecuteClientCommand( client_t *cl, const char *s, bool clientOK );
-//void SV_ClientThink (client_t *cl, usercmd_t *cmd);
+//void (client_t *cl)->executeClientCommand( const char *s, bool clientOK );
+//void (client_t *cl)->think( usercmd_t *cmd );
 //
-//void SV_WriteDownloadToClient( client_t *cl , Message *msg );
+//void (client_t *cl)->writeDownloadToClient( Message *msg );
 
 void SV_ExecuteClientMessage( SV_Client *cl, Message *msg );
 void SV_UserinfoChanged( SV_Client *cl );
@@ -394,12 +394,12 @@ void SV_Heartbeat_f( );
 //
 // sv_snapshot.c
 //
-//void SV_AddServerCommand( client_t *client, const char *cmd );
-//void SV_UpdateServerCommandsToClient( client_t *client, Message *msg );
+//void (client_t *client)->addServerCommand( const char *cmd );
+//void (client_t *client)->updateServerCommandsToClient( Message *msg );
 //void SV_WriteFrameToClient (client_t *client, Message *msg);
-//void SV_SendMessageToClient( Message *msg, client_t *client );
+//void (client_t *client)->sendMessageToClient( Message *msg );
 //void SV_SendClientMessages( void );
-//void SV_SendClientSnapshot( client_t *client );
+//void (client_t *client)->sendClientSnapshot();
 
 void SV_AddServerCommand( SV_Client *client, const char *cmd );
 void SV_UpdateServerCommandsToClient( SV_Client *client, Message *msg );
@@ -492,9 +492,9 @@ void SV_ClipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, con
 //
 // sv_net_chan.c
 //
-//void SV_Netchan_Transmit( client_t *client, Message *msg);
-//void SV_Netchan_TransmitNextFragment( client_t *client );
-//bool SV_Netchan_Process( client_t *client, Message *msg );
+//void (client_t *client)->netchanTransmit( Message *msg );
+//void (client_t *client)->netchanTransmitNextFragment();
+//bool (client_t *client)->netchanProcess( Message *msg );
 
 void SV_Netchan_Transmit( SV_Client *client, Message *msg);
 int SV_Netchan_TransmitNextFragment(SV_Client *client);
