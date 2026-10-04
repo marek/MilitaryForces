@@ -309,7 +309,7 @@ void CM_TestCapsuleInCapsule( traceWork_t *tw, clipHandle_t model ) {
 	vec3_t offset, symetricSize[2];
 	float radius, halfwidth, halfheight, offs, r;
 
-	CM_ModelBounds(model, mins, maxs);
+	CollisionModel::modelBounds(model, mins, maxs);
 
 	VectorAdd(tw->start, tw->sphere.offset, top);
 	VectorSubtract(tw->start, tw->sphere.offset, bottom);
@@ -377,7 +377,7 @@ void CM_TestBoundingBoxInCapsule( traceWork_t *tw, clipHandle_t model ) {
 	int i;
 
 	// mins maxs of the capsule
-	CM_ModelBounds(model, mins, maxs);
+	CollisionModel::modelBounds(model, mins, maxs);
 
 	// offset for capsule center
 	for ( i = 0 ; i < 3 ; i++ ) {
@@ -395,7 +395,7 @@ void CM_TestBoundingBoxInCapsule( traceWork_t *tw, clipHandle_t model ) {
 	VectorSet( tw->sphere.offset, 0, 0, size[1][2] - tw->sphere.radius );
 
 	// replace the capsule with the bounding box
-	h = CM_TempBoxModel(tw->size[0], tw->size[1], false);
+	h = CollisionModel::tempBoxModel(tw->size[0], tw->size[1], false);
 	// calculate collision
 	cmod = CM_ClipHandleToModel( h );
 	CM_TestInLeaf( tw, &cmod->leaf );
@@ -934,7 +934,7 @@ void CM_TraceCapsuleThroughCapsule( traceWork_t *tw, clipHandle_t model ) {
 	vec3_t offset, symetricSize[2];
 	float radius, halfwidth, halfheight, offs, h;
 
-	CM_ModelBounds(model, mins, maxs);
+	CollisionModel::modelBounds(model, mins, maxs);
 	// test trace bounds vs. capsule bounds
 	if ( tw->bounds[0][0] > maxs[0] + RADIUS_EPSILON
 		|| tw->bounds[0][1] > maxs[1] + RADIUS_EPSILON
@@ -996,7 +996,7 @@ void CM_TraceBoundingBoxThroughCapsule( traceWork_t *tw, clipHandle_t model ) {
 	int i;
 
 	// mins maxs of the capsule
-	CM_ModelBounds(model, mins, maxs);
+	CollisionModel::modelBounds(model, mins, maxs);
 
 	// offset for capsule center
 	for ( i = 0 ; i < 3 ; i++ ) {
@@ -1014,7 +1014,7 @@ void CM_TraceBoundingBoxThroughCapsule( traceWork_t *tw, clipHandle_t model ) {
 	VectorSet( tw->sphere.offset, 0, 0, size[1][2] - tw->sphere.radius );
 
 	// replace the capsule with the bounding box
-	h = CM_TempBoxModel(tw->size[0], tw->size[1], false);
+	h = CollisionModel::tempBoxModel(tw->size[0], tw->size[1], false);
 	// calculate collision
 	cmod = CM_ClipHandleToModel( h );
 	CM_TraceThroughLeaf( tw, &cmod->leaf );
@@ -1360,10 +1360,10 @@ void CM_Trace( trace_t *results, const vec3_t start, const vec3_t end, vec3_t mi
 
 /*
 ==================
-CM_BoxTrace
+CollisionModel::boxTrace
 ==================
 */
-void CM_BoxTrace( trace_t *results, const vec3_t start, const vec3_t end,
+void CollisionModel::boxTrace( trace_t *results, const vec3_t start, const vec3_t end,
 						  vec3_t mins, vec3_t maxs,
 						  clipHandle_t model, int brushmask, int capsule ) {
 	CM_Trace( results, start, end, mins, maxs, model, vec3_origin, brushmask, capsule, nullptr );
@@ -1371,13 +1371,13 @@ void CM_BoxTrace( trace_t *results, const vec3_t start, const vec3_t end,
 
 /*
 ==================
-CM_TransformedBoxTrace
+CollisionModel::transformedBoxTrace
 
 Handles offseting and rotation of the end points for moving and
 rotating entities
 ==================
 */
-void CM_TransformedBoxTrace( trace_t *results, const vec3_t start, const vec3_t end,
+void CollisionModel::transformedBoxTrace( trace_t *results, const vec3_t start, const vec3_t end,
 						  vec3_t mins, vec3_t maxs,
 						  clipHandle_t model, int brushmask,
 						  const vec3_t origin, const vec3_t angles, int capsule ) {

@@ -40,16 +40,16 @@ clipHandle_t SV_ClipHandleForEntity( EntityBase* gameEnt )
 	if ( gameEnt->r.bmodel ) 
 	{
 		// explicit hulls in the BSP model
-		return CM_InlineModel( gameEnt->s.modelindex );
+		return CollisionModel::inlineModel( gameEnt->s.modelindex );
 	}
 	if ( gameEnt->r.svFlags & SVF_CAPSULE ) 
 	{
 		// create a temp capsule from bounding box sizes
-		return CM_TempBoxModel( gameEnt->r.mins, gameEnt->r.maxs, true );
+		return CollisionModel::tempBoxModel( gameEnt->r.mins, gameEnt->r.maxs, true );
 	}
 
 	// create a temp tree from bounding box sizes
-	return CM_TempBoxModel( gameEnt->r.mins, gameEnt->r.maxs, false );
+	return CollisionModel::tempBoxModel( gameEnt->r.mins, gameEnt->r.maxs, false );
 }
 
 
@@ -164,8 +164,8 @@ void SV_ClearWorld( ) {
 	sv_numworldSectors = 0;
 
 	// get world map bounds
-	h = CM_InlineModel( 0 );
-	CM_ModelBounds( h, mins, maxs );
+	h = CollisionModel::inlineModel( 0 );
+	CollisionModel::modelBounds( h, mins, maxs );
 	SV_CreateworldSector( 0, mins, maxs );
 }
 
@@ -314,7 +314,7 @@ void SV_LinkEntity( EntityBase* gameEnt )
 	ent->areanum2_ = -1;
 
 	//get all leafs, including solids
-	num_leafs = CM_BoxLeafnums( gameEnt->r.absmin, gameEnt->r.absmax,
+	num_leafs = CollisionModel::boxLeafnums( gameEnt->r.absmin, gameEnt->r.absmax,
 		leafs, MAX_TOTAL_ENT_LEAFS, &lastLeaf );
 
 	// if none of the leafs were inside the map, the
@@ -325,7 +325,7 @@ void SV_LinkEntity( EntityBase* gameEnt )
 	// set areas, even from clusters that don't fit in the entity array
 	for (i=0 ; i<num_leafs ; i++) 
 	{
-		area = CM_LeafArea (leafs[i]);
+		area = CollisionModel::leafArea (leafs[i]);
 		if (area != -1) 
 		{
 			// doors may legally straggle two areas,
@@ -351,7 +351,7 @@ void SV_LinkEntity( EntityBase* gameEnt )
 	ent->numClusters_ = 0;
 	for (i=0 ; i < num_leafs ; i++) 
 	{
-		cluster = CM_LeafCluster( leafs[i] );
+		cluster = CollisionModel::leafCluster( leafs[i] );
 		if ( cluster != -1 ) 
 		{
 			ent->clusternums_[ent->numClusters_++] = cluster;
@@ -362,7 +362,7 @@ void SV_LinkEntity( EntityBase* gameEnt )
 
 	// store off a last cluster if we need to
 	if ( i != num_leafs ) 
-		ent->lastCluster_ = CM_LeafCluster( lastLeaf );
+		ent->lastCluster_ = CollisionModel::leafCluster( lastLeaf );
 
 	gameEnt->r.linkcount++;
 
@@ -532,7 +532,7 @@ void SV_ClipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, con
 		angles = vec3_origin;	// boxes don't rotate
 	}
 
-	CM_TransformedBoxTrace ( trace, const_cast<float *>(start), const_cast<float *>(end),
+	CollisionModel::transformedBoxTrace ( trace, const_cast<float *>(start), const_cast<float *>(end),
 		const_cast<float *>(mins), const_cast<float *>(maxs), clipHandle,  contentmask,
 		origin, angles, capsule);
 
@@ -605,7 +605,7 @@ void SV_ClipMoveToEntities( moveclip_t *clip )
 			angles = vec3_origin;	// boxes don't rotate
 		}
 
-		CM_TransformedBoxTrace ( &trace, const_cast<float *>(clip->start), (float *)clip->end,
+		CollisionModel::transformedBoxTrace ( &trace, const_cast<float *>(clip->start), (float *)clip->end,
 			const_cast<float *>(clip->mins), const_cast<float *>(clip->maxs), clipHandle,  clip->contentmask,
 			origin, angles, clip->capsule);
 
@@ -654,7 +654,7 @@ void SV_Trace( trace_t *results, const vec3_t start, const vec3_t mins, const ve
 	Com_Memset ( &clip, 0, sizeof ( moveclip_t ) );
 
 	// clip to world
-	CM_BoxTrace( &clip.trace, start, end, const_cast<float *>(mins), const_cast<float *>(maxs), 0, contentmask, capsule );
+	CollisionModel::boxTrace( &clip.trace, start, end, const_cast<float *>(mins), const_cast<float *>(maxs), 0, contentmask, capsule );
 	clip.trace.entityNum = clip.trace.fraction != 1.0 ? ENTITYNUM_WORLD : ENTITYNUM_NONE;
 	if ( clip.trace.fraction == 0 ) {
 		*results = clip.trace;
@@ -707,7 +707,7 @@ int SV_PointContents( const vec3_t p, int passEntityNum )
 	float		*angles;
 
 	// get base contents from world
-	contents = CM_PointContents( p, 0 );
+	contents = CollisionModel::pointContents( p, 0 );
 
 	// or in contents from all the other entities
 	num = SV_AreaEntities( p, p, touch, MAX_GENTITIES );
@@ -724,7 +724,7 @@ int SV_PointContents( const vec3_t p, int passEntityNum )
 			angles = vec3_origin;	// boxes don't rotate
 		}
 
-		c2 = CM_TransformedPointContents (p, clipHandle, hit->r.currentOrigin, angles);
+		c2 = CollisionModel::transformedPointContents (p, clipHandle, hit->r.currentOrigin, angles);
 
 		contents |= c2;
 	}

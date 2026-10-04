@@ -561,12 +561,12 @@ unsigned CM_Checksum(dheader_t *header) {
 
 /*
 ==================
-CM_LoadMap
+CollisionModel::loadMap
 
 Loads in the map and all submodels
 ==================
 */
-void CM_LoadMap( const char *name, bool clientload, int *checksum ) {
+void CollisionModel::loadMap( const char *name, bool clientload, int *checksum ) {
 	union {
 		int				*i;
 		void			*v;
@@ -577,7 +577,7 @@ void CM_LoadMap( const char *name, bool clientload, int *checksum ) {
 	static unsigned	last_checksum;
 
 	if ( !name || !name[0] ) {
-		Com_Error( ERR_DROP, "CM_LoadMap: NULL name" );
+		Com_Error( ERR_DROP, "CollisionModel::loadMap: NULL name" );
 	}
 
 #ifndef BSPC
@@ -585,7 +585,7 @@ void CM_LoadMap( const char *name, bool clientload, int *checksum ) {
 	cm_noCurves = CvarSystem::get ("cm_noCurves", "0", CVAR_CHEAT);
 	cm_playerCurveClip = CvarSystem::get ("cm_playerCurveClip", "1", CVAR_ARCHIVE|CVAR_CHEAT );
 #endif
-	Com_DPrintf( "CM_LoadMap( %s, %i )\n", name, clientload );
+	Com_DPrintf( "CollisionModel::loadMap( %s, %i )\n", name, clientload );
 
 	if ( !strcmp( cm.name, name ) && clientload ) {
 		*checksum = last_checksum;
@@ -627,7 +627,7 @@ void CM_LoadMap( const char *name, bool clientload, int *checksum ) {
 	}
 
 	if ( header.version != BSP_VERSION ) {
-		Com_Error (ERR_DROP, "CM_LoadMap: %s has wrong version number (%i should be %i)"
+		Com_Error (ERR_DROP, "CollisionModel::loadMap: %s has wrong version number (%i should be %i)"
 		, name, header.version, BSP_VERSION );
 	}
 
@@ -662,10 +662,10 @@ void CM_LoadMap( const char *name, bool clientload, int *checksum ) {
 
 /*
 ==================
-CM_ClearMap
+CollisionModel::clearMap
 ==================
 */
-void CM_ClearMap( ) {
+void CollisionModel::clearMap( ) {
 	Com_Memset( &cm, 0, sizeof( cm ) );
 	CM_ClearLevelPatches();
 }
@@ -697,38 +697,38 @@ cmodel_t	*CM_ClipHandleToModel( clipHandle_t handle ) {
 
 /*
 ==================
-CM_InlineModel
+CollisionModel::inlineModel
 ==================
 */
-clipHandle_t	CM_InlineModel( int index ) {
+clipHandle_t	CollisionModel::inlineModel( int index ) {
 	if ( index < 0 || index >= cm.numSubModels ) {
-		Com_Error (ERR_DROP, "CM_InlineModel: bad number");
+		Com_Error (ERR_DROP, "CollisionModel::inlineModel: bad number");
 	}
 	return index;
 }
 
-int		CM_NumClusters( ) {
+int		CollisionModel::numClusters( ) {
 	return cm.numClusters;
 }
 
-int		CM_NumInlineModels( ) {
+int		CollisionModel::numInlineModels( ) {
 	return cm.numSubModels;
 }
 
-char	*CM_EntityString( ) {
+char	*CollisionModel::entityString( ) {
 	return cm.entityString;
 }
 
-int		CM_LeafCluster( int leafnum ) {
+int		CollisionModel::leafCluster( int leafnum ) {
 	if (leafnum < 0 || leafnum >= cm.numLeafs) {
-		Com_Error (ERR_DROP, "CM_LeafCluster: bad number");
+		Com_Error (ERR_DROP, "CollisionModel::leafCluster: bad number");
 	}
 	return cm.leafs[leafnum].cluster;
 }
 
-int		CM_LeafArea( int leafnum ) {
+int		CollisionModel::leafArea( int leafnum ) {
 	if ( leafnum < 0 || leafnum >= cm.numLeafs ) {
-		Com_Error (ERR_DROP, "CM_LeafArea: bad number");
+		Com_Error (ERR_DROP, "CollisionModel::leafArea: bad number");
 	}
 	return cm.leafs[leafnum].area;
 }
@@ -791,14 +791,14 @@ void CM_InitBoxHull ()
 
 /*
 ===================
-CM_TempBoxModel
+CollisionModel::tempBoxModel
 
 To keep everything totally uniform, bounding boxes are turned into small
 BSP trees instead of being compared directly.
 Capsules are handled differently though.
 ===================
 */
-clipHandle_t CM_TempBoxModel( const vec3_t mins, const vec3_t maxs, int capsule ) {
+clipHandle_t CollisionModel::tempBoxModel( const vec3_t mins, const vec3_t maxs, int capsule ) {
 
 	VectorCopy( mins, box_model.mins );
 	VectorCopy( maxs, box_model.maxs );
@@ -828,10 +828,10 @@ clipHandle_t CM_TempBoxModel( const vec3_t mins, const vec3_t maxs, int capsule 
 
 /*
 ===================
-CM_ModelBounds
+CollisionModel::modelBounds
 ===================
 */
-void CM_ModelBounds( clipHandle_t model, vec3_t mins, vec3_t maxs ) {
+void CollisionModel::modelBounds( clipHandle_t model, vec3_t mins, vec3_t maxs ) {
 	cmodel_t	*cmod;
 
 	cmod = CM_ClipHandleToModel( model );

@@ -146,8 +146,8 @@ void SV_SetBrushModel( EntityBase* gameEnt, const char *name )
 
 	gameEnt->s.modelindex = atoi( name + 1 );
 
-	h = CM_InlineModel( gameEnt->s.modelindex );
-	CM_ModelBounds( h, mins, maxs );
+	h = CollisionModel::inlineModel( gameEnt->s.modelindex );
+	CollisionModel::modelBounds( h, mins, maxs );
 	VectorCopy (mins, gameEnt->r.mins);
 	VectorCopy (maxs, gameEnt->r.maxs);
 	gameEnt->r.bmodel = true;
@@ -173,17 +173,17 @@ bool SV_inPVS (const vec3_t p1, const vec3_t p2)
 	int		area1, area2;
 	byte	*mask;
 
-	leafnum = CM_PointLeafnum (p1);
-	cluster = CM_LeafCluster (leafnum);
-	area1 = CM_LeafArea (leafnum);
-	mask = CM_ClusterPVS (cluster);
+	leafnum = CollisionModel::pointLeafnum (p1);
+	cluster = CollisionModel::leafCluster (leafnum);
+	area1 = CollisionModel::leafArea (leafnum);
+	mask = CollisionModel::clusterPVS (cluster);
 
-	leafnum = CM_PointLeafnum (p2);
-	cluster = CM_LeafCluster (leafnum);
-	area2 = CM_LeafArea (leafnum);
+	leafnum = CollisionModel::pointLeafnum (p2);
+	cluster = CollisionModel::leafCluster (leafnum);
+	area2 = CollisionModel::leafArea (leafnum);
 	if ( mask && (!(mask[cluster>>3] & (1<<(cluster&7)) ) ) )
 		return false;
-	if (!CM_AreasConnected (area1, area2))
+	if (!CollisionModel::areasConnected (area1, area2))
 		return false;		// a door blocks sight
 	return true;
 }
@@ -203,14 +203,14 @@ bool SV_inPVSIgnorePortals( const vec3_t p1, const vec3_t p2)
 	int		area1, area2;
 	byte	*mask;
 
-	leafnum = CM_PointLeafnum (p1);
-	cluster = CM_LeafCluster (leafnum);
-	area1 = CM_LeafArea (leafnum);
-	mask = CM_ClusterPVS (cluster);
+	leafnum = CollisionModel::pointLeafnum (p1);
+	cluster = CollisionModel::leafCluster (leafnum);
+	area1 = CollisionModel::leafArea (leafnum);
+	mask = CollisionModel::clusterPVS (cluster);
 
-	leafnum = CM_PointLeafnum (p2);
-	cluster = CM_LeafCluster (leafnum);
-	area2 = CM_LeafArea (leafnum);
+	leafnum = CollisionModel::pointLeafnum (p2);
+	cluster = CollisionModel::leafCluster (leafnum);
+	area2 = CollisionModel::leafArea (leafnum);
 
 	if ( mask && (!(mask[cluster>>3] & (1<<(cluster&7)) ) ) )
 		return false;
@@ -232,7 +232,7 @@ void SV_AdjustAreaPortalState( EntityBase* gameEnt, int open )
 	if ( svEnt->areanum2_ == -1 ) 
 		return;
 
-	CM_AdjustAreaPortalState( svEnt->areanum_, svEnt->areanum2_, open );
+	CollisionModel::adjustAreaPortalState( svEnt->areanum_, svEnt->areanum2_, open );
 }
 
 
@@ -252,7 +252,7 @@ bool SV_EntityContact( const vec3_t mins, const vec3_t maxs, EntityBase* gameEnt
 	angles = gameEnt->r.currentAngles;
 
 	ch = SV_ClipHandleForEntity( gameEnt );
-	CM_TransformedBoxTrace ( &trace, vec3_origin, vec3_origin, const_cast<float *>(mins), const_cast<float *>(maxs),
+	CollisionModel::transformedBoxTrace ( &trace, vec3_origin, vec3_origin, const_cast<float *>(mins), const_cast<float *>(maxs),
 		ch, -1, origin, angles, capsule );
 
 	return trace.startsolid;
@@ -333,7 +333,7 @@ Called for both a full init and a restart
 void SV_InitGame() 
 {
 	// start the entity parsing at the beginning
-	theSV.entityParsePoint_ = CM_EntityString();
+	theSV.entityParsePoint_ = CollisionModel::entityString();
 
 	// clear all gentity pointers that might still be set from
 	// a previous level

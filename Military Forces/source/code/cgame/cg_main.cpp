@@ -1064,7 +1064,7 @@ static void CG_RegisterGraphics( ) {
 	}
 
 	// register the inline models
-	cgs.numInlineModels = CM_NumInlineModels();
+	cgs.numInlineModels = CollisionModel::numInlineModels();
 	for ( i = 1 ; i < cgs.numInlineModels ; i++ ) {
 		char name[10];
 		vec3_t mins, maxs;

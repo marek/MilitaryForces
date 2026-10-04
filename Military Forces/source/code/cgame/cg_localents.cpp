@@ -206,7 +206,7 @@ void LocalEntity::addFragment() {
 	// if it is in a nodrop zone, remove it
 	// this keeps gibs from waiting at the bottom of pits of death
 	// and floating levels
-	if ( CM_PointContents( trace.endpos, 0 ) & CONTENTS_NODROP ) {
+	if ( CollisionModel::pointContents( trace.endpos, 0 ) & CONTENTS_NODROP ) {
 		this->freeLocalEntity();
 		return;
 	}

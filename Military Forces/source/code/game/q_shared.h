@@ -1637,4 +1637,6 @@ int ahextoi( const char* string );
 
 #include "../qcommon/file_system.h"
 
+#include "../qcommon/collision_model.h"
+
 #endif	// __Q_SHARED_H

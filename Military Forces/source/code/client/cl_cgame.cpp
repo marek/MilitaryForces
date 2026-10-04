@@ -392,7 +392,7 @@ void CL_CM_LoadMap( const char *mapname )
 {
 	int		checksum;
 
-	CM_LoadMap( mapname, true, &checksum );
+	CollisionModel::loadMap( mapname, true, &checksum );
 }
 
 /*

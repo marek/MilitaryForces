@@ -31,7 +31,7 @@ void CM_ClearLevelPatches( void );
 struct patchCollide_s	*CM_GeneratePatchCollide( int width, int height, const vec3_t *points );
 void CM_TraceThroughPatchCollide( traceWork_t *tw, const struct patchCollide_s *pc );
 bool CM_PositionTestInPatchCollide( traceWork_t *tw, const struct patchCollide_s *pc );
-void CM_DrawDebugSurface( void (*drawPoly)(int color, int numPoints, flaot *points) );
+void CollisionModel::drawDebugSurface( void (*drawPoly)(int color, int numPoints, flaot *points) );
 
 
 WARNING: this may misbehave with meshes that have rows or columns that only
@@ -1596,13 +1596,13 @@ DEBUGGING
 
 /*
 ==================
-CM_DrawDebugSurface
+CollisionModel::drawDebugSurface
 
 Called from the renderer
 ==================
 */
 
-void CM_DrawDebugSurface( void (*drawPoly)(int color, int numPoints, float *points) ) {
+void CollisionModel::drawDebugSurface( void (*drawPoly)(int color, int numPoints, float *points) ) {
 	static cvar_t	*cv;
 #ifndef BSPC
 	static cvar_t	*cv2;

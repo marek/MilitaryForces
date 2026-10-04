@@ -1254,7 +1254,7 @@ void CL_ClearMemory(bool shutdownRef)
 		// clear the whole hunk
 		Hunk_Clear();
 		// clear collision map data
-		CM_ClearMap();
+		CollisionModel::clearMap();
 	}
 	else {
 		// clear all the client data on the hunk
@@ -3304,8 +3304,8 @@ void CL_InitRef( ) {
 	ri.Hunk_AllocateTempMemory = Hunk_AllocateTempMemory;
 	ri.Hunk_FreeTempMemory = Hunk_FreeTempMemory;
 
-	ri.CM_ClusterPVS = CM_ClusterPVS;
-	ri.CM_DrawDebugSurface = CM_DrawDebugSurface;
+	ri.CM_ClusterPVS = CollisionModel::clusterPVS;
+	ri.CM_DrawDebugSurface = CollisionModel::drawDebugSurface;
 
 	ri.FS_ReadFile = FileSystem::readFile;
 	ri.FS_FreeFile = FileSystem::freeFile;

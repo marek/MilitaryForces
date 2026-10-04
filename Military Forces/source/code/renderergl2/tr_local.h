@@ -1231,7 +1231,7 @@ struct world_t {
 
 	int			numClusters;
 	int			clusterBytes;
-	const byte	*vis;			// may be passed in by CM_LoadMap to save space
+	const byte	*vis;			// may be passed in by CollisionModel::loadMap to save space
 
 	char		*entityString;
 	char		*entityParsePoint;

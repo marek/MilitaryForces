@@ -92,7 +92,7 @@ static void CG_ClipMoveToEntities ( const vec3_t start, const vec3_t mins, const
 
 		if ( ent->solid == SOLID_BMODEL ) {
 			// special value for bmodel
-			cmodel = CM_InlineModel( ent->modelindex );
+			cmodel = CollisionModel::inlineModel( ent->modelindex );
 			VectorCopy( cent->lerpAngles, angles );
 			BG_EvaluateTrajectory( &cent->currentState.pos, cg.physicsTime, origin );
 		} else {
@@ -106,7 +106,7 @@ static void CG_ClipMoveToEntities ( const vec3_t start, const vec3_t mins, const
 			bmins[2] = -zd;
 			bmaxs[2] = zu;
 
-			cmodel = CM_TempBoxModel( bmins, bmaxs, false );
+			cmodel = CollisionModel::tempBoxModel( bmins, bmaxs, false );
 			if ( ent->seatMask & SEATMASK_DECK ) {
 				BG_EvaluateTrajectory( &cent->currentState.apos, cg.physicsTime, angles );
 				BG_EvaluateTrajectory( &cent->currentState.pos, cg.physicsTime, origin );
@@ -117,7 +117,7 @@ static void CG_ClipMoveToEntities ( const vec3_t start, const vec3_t mins, const
 		}
 
 
-		CM_TransformedBoxTrace ( &trace, start, end,
+		CollisionModel::transformedBoxTrace ( &trace, start, end,
 			const_cast<float *>(mins), const_cast<float *>(maxs), cmodel,  mask, origin, angles, false);
 
 		if (trace.allsolid || trace.fraction < tr->fraction) {
@@ -142,7 +142,7 @@ void	CG_Trace( trace_t *result, const vec3_t start, const vec3_t mins, const vec
 {
 	trace_t	t;
 
-	CM_BoxTrace ( &t, start, end, const_cast<float *>(mins), const_cast<float *>(maxs), 0, mask, capsule);
+	CollisionModel::boxTrace ( &t, start, end, const_cast<float *>(mins), const_cast<float *>(maxs), 0, mask, capsule);
 	t.entityNum = t.fraction != 1.0 ? ENTITYNUM_WORLD : ENTITYNUM_NONE;
 	// check all other solid models
 	CG_ClipMoveToEntities (start, mins, maxs, end, skipNumber, mask, &t);
@@ -162,7 +162,7 @@ int		CG_PointContents( const vec3_t point, int passEntityNum ) {
 	clipHandle_t cmodel;
 	int			contents;
 
-	contents = CM_PointContents (point, 0);
+	contents = CollisionModel::pointContents (point, 0);
 
 	for ( i = 0 ; i < cg_numSolidEntities ; i++ ) {
 		cent = cg_solidEntities[ i ];
@@ -177,12 +177,12 @@ int		CG_PointContents( const vec3_t point, int passEntityNum ) {
 			continue;
 		}
 
-		cmodel = CM_InlineModel( ent->modelindex );
+		cmodel = CollisionModel::inlineModel( ent->modelindex );
 		if ( !cmodel ) {
 			continue;
 		}
 
-		contents |= CM_TransformedPointContents( point, cmodel, ent->origin, ent->angles );
+		contents |= CollisionModel::transformedPointContents( point, cmodel, ent->origin, ent->angles );
 	}
 
 	return contents;
@@ -346,12 +346,12 @@ static void CG_TouchTriggerPrediction( ) {
 			continue;
 		}
 
-		cmodel = CM_InlineModel( ent->modelindex );
+		cmodel = CollisionModel::inlineModel( ent->modelindex );
 		if ( !cmodel ) {
 			continue;
 		}
 
-		CM_BoxTrace( &trace, cg.predictedPlayerState.origin, cg.predictedPlayerState.origin, 
+		CollisionModel::boxTrace( &trace, cg.predictedPlayerState.origin, cg.predictedPlayerState.origin, 
 			cg_pmove.mins, cg_pmove.maxs, cmodel, -1, false );
 
 		if ( !trace.startsolid ) {

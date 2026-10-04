@@ -418,7 +418,7 @@ void SV_SpawnServer( char *server, bool killBots )
 	Hunk_Clear();
 
 	// clear collision map data
-	CM_ClearMap();
+	CollisionModel::clearMap();
 
 	// init client structures and svs.numSnapshotEntities 
 	if ( !CvarSystem::variableValue("sv_running") ) {
@@ -468,7 +468,7 @@ void SV_SpawnServer( char *server, bool killBots )
 	theSV.checksumFeed_ = ( (static_cast<unsigned int>(rand()) << 16) ^ static_cast<unsigned int>(rand()) ) ^ Com_Milliseconds();
 	FileSystem::restart( theSV.checksumFeed_ );
 
-	CM_LoadMap( va("maps/%s.bsp", server), false, &checksum );
+	CollisionModel::loadMap( va("maps/%s.bsp", server), false, &checksum );
 
 	// set serverinfo visible name
 	CvarSystem::set( "mapname", server );

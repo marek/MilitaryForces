@@ -595,14 +595,14 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin,
 	if ( !theSV.state_ ) 
 		return;
 
-	leafnum = CM_PointLeafnum (origin);
-	clientarea = CM_LeafArea (leafnum);
-	clientcluster = CM_LeafCluster (leafnum);
+	leafnum = CollisionModel::pointLeafnum (origin);
+	clientarea = CollisionModel::leafArea (leafnum);
+	clientcluster = CollisionModel::leafCluster (leafnum);
 
 	// calculate the visible areas
-	frame->areabytes_ = CM_WriteAreaBits( frame->areabits_, clientarea );
+	frame->areabytes_ = CollisionModel::writeAreaBits( frame->areabits_, clientarea );
 
-	clientpvs = CM_ClusterPVS (clientcluster);
+	clientpvs = CollisionModel::clusterPVS (clientcluster);
 
 	c_fullsend = 0;
 
@@ -661,11 +661,11 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin,
 
 		// ignore if not touching a PV leaf
 		// check area
-		if ( !CM_AreasConnected( clientarea, svEnt->areanum_ ) ) 
+		if ( !CollisionModel::areasConnected( clientarea, svEnt->areanum_ ) ) 
 		{
 			// doors can legally straddle two areas, so
 			// we may need to check another one
-			if ( !CM_AreasConnected( clientarea, svEnt->areanum2_ ) ) 
+			if ( !CollisionModel::areasConnected( clientarea, svEnt->areanum2_ ) ) 
 				continue;		// blocked by a door
 		}
 
