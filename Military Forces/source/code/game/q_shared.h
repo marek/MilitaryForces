@@ -168,6 +168,7 @@ typedef int intptr_t;
 #include <time.h>
 #include <ctype.h>
 #include <limits.h>
+#include <algorithm>
 #include <stdint.h>
 
 #ifdef _WIN32
@@ -395,6 +396,13 @@ constexpr Vec3 operator*( float s, const Vec3& a ) { return a * s; }
 constexpr Vec3 lerp( const Vec3& a, const Vec3& b, float t ) { return a + ( b - a ) * t; }
 
 static_assert( sizeof( Vec3 ) == sizeof( vec3_t ), "Vec3 must have the layout of vec3_t" );
+
+template<class T, class Compare>
+inline void SortArray( T *base, size_t count, Compare compare )
+{
+	std::sort( base, base + count, [compare]( const T& a, const T& b ) { return compare( &a, &b ) < 0; } );
+}
+
 
 typedef vec_t quat_t[4];
 

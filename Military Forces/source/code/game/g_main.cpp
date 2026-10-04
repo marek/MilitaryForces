@@ -681,8 +681,7 @@ void CalculateRanks()
 		}
 	}
 
-	qsort( theLevel.sortedClients_, theLevel.numConnectedClients_, 
-		sizeof(theLevel.sortedClients_[0]), SortRanks );
+	SortArray( theLevel.sortedClients_, theLevel.numConnectedClients_, SortRanks );
 
 	// set the rank value for all clients that are connected and not spectators
 	if( g_gametype.integer >= GT_TEAM ) 

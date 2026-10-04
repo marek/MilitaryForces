@@ -214,7 +214,7 @@ void UI_LoadArenas( ) {
 	}
 
 	// perform an alphabetic sort on the map names
-	qsort( &uiInfo.mapList[0], uiInfo.mapCount, sizeof( mapInfo ), UI_AlphabeticMapNameQsortCompare );
+	SortArray( &uiInfo.mapList[0], uiInfo.mapCount, UI_AlphabeticMapNameQsortCompare );
 }
 
 

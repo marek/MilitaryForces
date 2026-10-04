@@ -3044,7 +3044,7 @@ void UI_ServersSort(int column, bool force) {
 	}
 
 	uiInfo.serverStatus.sortKey = column;
-	qsort( &uiInfo.serverStatus.displayServers[0], uiInfo.serverStatus.numDisplayServers, sizeof(int), UI_ServersQsortCompare);
+	SortArray( &uiInfo.serverStatus.displayServers[0], uiInfo.serverStatus.numDisplayServers, UI_ServersQsortCompare );
 
 	// update displayed levelshot
 	UI_FeederSelection( FEEDER_SERVERS, uiInfo.serverStatus.currentServer );

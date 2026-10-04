@@ -2812,7 +2812,7 @@ void FileSystem::addGameDirectory( const char *path, const char *dir ) {
 	pakfiles = System::listFiles(curpath, ".pk3", nullptr, &numfiles, false);
 
 	if ( pakfiles ) {
-		qsort( pakfiles, numfiles, sizeof(char*), FileSystem::paksort );
+		SortArray( pakfiles, numfiles, FileSystem::paksort );
 	}
 
 	if ( fs_numServerPaks ) {
@@ -2822,7 +2822,7 @@ void FileSystem::addGameDirectory( const char *path, const char *dir ) {
 		// Get top level directories (we'll filter them later since the System::listFiles filtering is terrible)
 		pakdirs = System::listFiles(curpath, "/", nullptr, &numdirs, false);
 
-		qsort( pakdirs, numdirs, sizeof(char *), FileSystem::paksort );
+		SortArray( pakdirs, numdirs, FileSystem::paksort );
 	}
 
 	pakfilesi = 0;

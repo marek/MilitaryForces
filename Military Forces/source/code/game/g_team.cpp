@@ -802,7 +802,7 @@ void TeamplayInfoMessage( GameEntity *ent )
 	}
 
 	// We have the top eight players, sort them by clientNum
-	qsort( clients, cnt, sizeof( clients[0] ), Game::sortClients );
+	SortArray( clients, cnt, Game::sortClients );
 
 	// send the latest information on all clients
 	string[0] = 0;

@@ -324,7 +324,7 @@ void SV_Client::emitPacketEntities( SV_Client::ClientSnapshot *frame, Message *m
 		remaining = 200 * 8;
 	}
 
-	qsort( candidates, numCandidates, sizeof( candidates[0] ), ServerMain::qsortSnapshotCandidates );
+	SortArray( candidates, numCandidates, ServerMain::qsortSnapshotCandidates );
 
 	for ( i = 0 ; i < numCandidates ; i++ ) {
 		if ( candidates[i].bits <= remaining ) {
@@ -789,8 +789,7 @@ void SV_Client::buildClientSnapshot()
 	// in the list which will need to be resorted for the delta compression
 	// to work correctly.  This also catches the error condition
 	// of an entity being included twice.
-	qsort( entityNumbers.snapshotEntities, entityNumbers.numSnapshotEntities, 
-		sizeof( entityNumbers.snapshotEntities[0] ), ServerMain::qsortEntityNumbers );
+	SortArray( entityNumbers.snapshotEntities, entityNumbers.numSnapshotEntities, ServerMain::qsortEntityNumbers );
 
 	// now that all viewpoint's areabits have been OR'd together, invert
 	// all of them to make it a mask vector, which is what the renderer wants

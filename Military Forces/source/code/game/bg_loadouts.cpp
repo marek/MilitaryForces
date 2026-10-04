@@ -71,7 +71,7 @@ bool VehicleData::distributeWeaponsOnPylons( int idx, completeLoadout_t* loadout
 	}
 
 	// sort
-	qsort(&loadout->mounts[0], num, sizeof(loadout->mounts[0]), VehicleData::posCompare );
+	SortArray( &loadout->mounts[0], num, VehicleData::posCompare );
 
 	// fill
 	for( i = WP_WEAPON1; i < WP_FLARE; ++i ) {

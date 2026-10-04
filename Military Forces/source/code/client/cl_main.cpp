@@ -1836,7 +1836,7 @@ void Client::completePlayerName( char *args, int argNum )
 			namesPtr[nameCount] = names[nameCount];
 			nameCount++;
 		}
-		qsort( (void*)namesPtr, nameCount, sizeof( namesPtr[0] ), Common::strCompare );
+		SortArray( namesPtr, nameCount, Common::strCompare );
 
 		Field_CompletePlayerName( namesPtr, nameCount );
 	}
