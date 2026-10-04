@@ -12,12 +12,12 @@ void Bots::thinkSurface( GameEntity* ent, State& bot, const Sense& sense, usercm
 	const completeVehicleData_t& veh = availableVehicles[client->vehicle_];
 	const bool boat = (veh.cat & CAT_BOAT) != 0;
 
-	if( theLevel.time_ > bot.goalTime || Distance( ent->r.currentOrigin, bot.goal ) < 400 )
+	if( bot.desire != Goal::Capture && (theLevel.time_ > bot.goalTime || Distance( ent->r.currentOrigin, bot.goal ) < 400 ) )
 		pickGoal( ent, bot, boat ? 6000 : 4000 );
 
 	vec3_t dir, angles;
 	bool hold = false;
-	if( sense.enemy && !sense.enemyAir )
+	if( sense.enemy && !sense.enemyAir && bot.desire != Goal::Capture )
 	{
 		VectorCopy( sense.enemyDir, dir );
 		hold = sense.enemyDist < 1500;

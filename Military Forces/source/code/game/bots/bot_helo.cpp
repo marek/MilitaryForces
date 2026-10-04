@@ -11,7 +11,7 @@ void Bots::thinkHelo( GameEntity* ent, State& bot, const Sense& sense, usercmd_t
 	const playerState_t& ps = client->ps_;
 	const completeVehicleData_t& veh = availableVehicles[client->vehicle_];
 
-	if( theLevel.time_ > bot.goalTime || Distance( ent->r.currentOrigin, bot.goal ) < 800 )
+	if( bot.desire != Goal::Capture && (theLevel.time_ > bot.goalTime || Distance( ent->r.currentOrigin, bot.goal ) < 800 ) )
 		pickGoal( ent, bot, 5000 );
 
 	bool wait = false;
@@ -31,7 +31,7 @@ void Bots::thinkHelo( GameEntity* ent, State& bot, const Sense& sense, usercmd_t
 
 	vec3_t dir, angles;
 	float dist;
-	if( sense.enemy )
+	if( sense.enemy && bot.desire != Goal::Capture )
 	{
 		VectorCopy( sense.enemyAngles, angles );
 		dist = sense.enemyDist;
