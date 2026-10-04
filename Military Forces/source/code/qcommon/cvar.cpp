@@ -24,23 +24,21 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../game/q_shared.h"
 #include "qcommon.h"
 
-cvar_t		*cvar_vars = nullptr;
-cvar_t		*cvar_cheats;
-int			cvar_modifiedFlags;
+cvar_t		*CvarSystem::vars_ = nullptr;
+cvar_t		*CvarSystem::cheats_;
+int			CvarSystem::modifiedFlags;
 
-constexpr int MAX_CVARS = 2048;
-cvar_t		cvar_indexes[MAX_CVARS];
-int			cvar_numIndexes;
+cvar_t		CvarSystem::indexes_[CvarSystem::MAX_CVARS];
+int			CvarSystem::numIndexes_;
 
-#define FILE_HASH_SIZE		256
-static	cvar_t	*hashTable[FILE_HASH_SIZE];
+cvar_t		*CvarSystem::hashTable_[CvarSystem::FILE_HASH_SIZE];
 
 /*
 ================
 return a hash value for the filename
 ================
 */
-static long generateHashValue( const char *fname ) {
+long CvarSystem::generateHashValue( const char *fname ) {
 	int		i;
 	long	hash;
 	char	letter;
@@ -61,7 +59,7 @@ static long generateHashValue( const char *fname ) {
 Cvar_ValidateString
 ============
 */
-static bool Cvar_ValidateString( const char *s ) {
+bool CvarSystem::validateString( const char *s ) {
 	if ( !s ) {
 		return false;
 	}
@@ -82,13 +80,13 @@ static bool Cvar_ValidateString( const char *s ) {
 Cvar_FindVar
 ============
 */
-static cvar_t *Cvar_FindVar( const char *var_name ) {
+cvar_t * CvarSystem::findVar( const char *var_name ) {
 	cvar_t	*var;
 	long hash;
 
 	hash = generateHashValue(var_name);
 	
-	for (var=hashTable[hash] ; var ; var=var->hashNext) {
+	for (var=hashTable_[hash] ; var ; var=var->hashNext) {
 		if (!Q_stricmp(var_name, var->name)) {
 			return var;
 		}
@@ -105,7 +103,7 @@ CvarSystem::variableValue
 float CvarSystem::variableValue( const char *var_name ) {
 	cvar_t	*var;
 	
-	var = Cvar_FindVar (var_name);
+	var = findVar (var_name);
 	if (!var)
 		return 0;
 	return var->value;
@@ -120,7 +118,7 @@ CvarSystem::variableIntegerValue
 int CvarSystem::variableIntegerValue( const char *var_name ) {
 	cvar_t	*var;
 	
-	var = Cvar_FindVar (var_name);
+	var = findVar (var_name);
 	if (!var)
 		return 0;
 	return var->integer;
@@ -135,7 +133,7 @@ CvarSystem::variableString
 char *CvarSystem::variableString( const char *var_name ) {
 	cvar_t *var;
 	
-	var = Cvar_FindVar (var_name);
+	var = findVar (var_name);
 	if (!var)
 		return "";
 	return var->string;
@@ -150,7 +148,7 @@ CvarSystem::variableStringBuffer
 void CvarSystem::variableStringBuffer( const char *var_name, char *buffer, int bufsize ) {
 	cvar_t *var;
 	
-	var = Cvar_FindVar (var_name);
+	var = findVar (var_name);
 	if (!var) {
 		*buffer = 0;
 	}
@@ -168,7 +166,7 @@ int CvarSystem::flags(const char *var_name)
 {
 	cvar_t *var;
 	
-	if(!(var = Cvar_FindVar(var_name)))
+	if(!(var = findVar(var_name)))
 		return CVAR_NONEXISTENT;
 	else
 	{
@@ -188,7 +186,7 @@ void CvarSystem::commandCompletion(void (*callback)(const char *s))
 {
 	cvar_t		*cvar;
 	
-	for(cvar = cvar_vars; cvar; cvar = cvar->next)
+	for(cvar = vars_; cvar; cvar = cvar->next)
 	{
 		if(cvar->name)
 			callback(cvar->name);
@@ -200,7 +198,7 @@ void CvarSystem::commandCompletion(void (*callback)(const char *s))
 Cvar_Validate
 ============
 */
-static const char *Cvar_Validate( cvar_t *var,
+const char * CvarSystem::validate( cvar_t *var,
     const char *value, bool warn )
 {
 	static char s[ MAX_CVAR_VALUE_STRING ];
@@ -316,23 +314,23 @@ cvar_t *CvarSystem::get( const char *var_name, const char *var_value, int flags 
 		Common::error( ERR_FATAL, "CvarSystem::get: NULL parameter" );
 	}
 
-	if ( !Cvar_ValidateString( var_name ) ) {
+	if ( !validateString( var_name ) ) {
 		Common::printf("invalid cvar name string: %s\n", var_name );
 		var_name = "BADNAME";
 	}
 
 #if 0		// FIXME: values with backslash happen
-	if ( !Cvar_ValidateString( var_value ) ) {
+	if ( !validateString( var_value ) ) {
 		Common::printf("invalid cvar value string: %s\n", var_value );
 		var_value = "BADVALUE";
 	}
 #endif
 
-	var = Cvar_FindVar (var_name);
+	var = findVar (var_name);
 	
 	if(var)
 	{
-		var_value = Cvar_Validate(var, var_value, false);
+		var_value = validate(var, var_value, false);
 
 		// Make sure the game code cannot mark engine-added variables as gamecode vars
 		if(var->flags & CVAR_VM_CREATED)
@@ -401,7 +399,7 @@ cvar_t *CvarSystem::get( const char *var_name, const char *var_value, int flags 
 
 		// ZOID--needs to be set so that cvars the game sets as 
 		// SERVERINFO get sent to clients
-		cvar_modifiedFlags |= flags;
+		modifiedFlags |= flags;
 
 		return var;
 	}
@@ -413,7 +411,7 @@ cvar_t *CvarSystem::get( const char *var_name, const char *var_value, int flags 
 	// find a free cvar
 	for(index = 0; index < MAX_CVARS; index++)
 	{
-		if(!cvar_indexes[index].name)
+		if(!indexes_[index].name)
 			break;
 	}
 
@@ -425,10 +423,10 @@ cvar_t *CvarSystem::get( const char *var_name, const char *var_value, int flags 
 		return nullptr;
 	}
 	
-	var = &cvar_indexes[index];
+	var = &indexes_[index];
 	
-	if(index >= cvar_numIndexes)
-		cvar_numIndexes = index + 1;
+	if(index >= numIndexes_)
+		numIndexes_ = index + 1;
 		
 	var->name = CopyString (var_name);
 	var->string = CopyString (var_value);
@@ -441,26 +439,26 @@ cvar_t *CvarSystem::get( const char *var_name, const char *var_value, int flags 
 	var->description = nullptr;
 
 	// link the variable in
-	var->next = cvar_vars;
-	if(cvar_vars)
-		cvar_vars->prev = var;
+	var->next = vars_;
+	if(vars_)
+		vars_->prev = var;
 
 	var->prev = nullptr;
-	cvar_vars = var;
+	vars_ = var;
 
 	var->flags = flags;
 	// note what types of cvars have been modified (userinfo, archive, serverinfo, systeminfo)
-	cvar_modifiedFlags |= var->flags;
+	modifiedFlags |= var->flags;
 
 	hash = generateHashValue(var_name);
 	var->hashIndex = hash;
 
-	var->hashNext = hashTable[hash];
-	if(hashTable[hash])
-		hashTable[hash]->hashPrev = var;
+	var->hashNext = hashTable_[hash];
+	if(hashTable_[hash])
+		hashTable_[hash]->hashPrev = var;
 
 	var->hashPrev = nullptr;
-	hashTable[hash] = var;
+	hashTable_[hash] = var;
 
 	return var;
 }
@@ -506,19 +504,19 @@ cvar_t *CvarSystem::set2( const char *var_name, const char *value, bool force ) 
 
 //	Common::dPrintf( "CvarSystem::set2: %s %s\n", var_name, value );
 
-	if ( !Cvar_ValidateString( var_name ) ) {
+	if ( !validateString( var_name ) ) {
 		Common::printf("invalid cvar name string: %s\n", var_name );
 		var_name = "BADNAME";
 	}
 
 #if 0	// FIXME
-	if ( value && !Cvar_ValidateString( value ) ) {
+	if ( value && !validateString( value ) ) {
 		Common::printf("invalid cvar value string: %s\n", value );
 		var_value = "BADVALUE";
 	}
 #endif
 
-	var = Cvar_FindVar (var_name);
+	var = findVar (var_name);
 	if (!var) {
 		if ( !value ) {
 			return nullptr;
@@ -535,7 +533,7 @@ cvar_t *CvarSystem::set2( const char *var_name, const char *value, bool force ) 
 		value = var->resetString;
 	}
 
-	value = Cvar_Validate(var, value, true);
+	value = validate(var, value, true);
 
 	if((var->flags & CVAR_LATCH) && var->latchedString)
 	{
@@ -553,7 +551,7 @@ cvar_t *CvarSystem::set2( const char *var_name, const char *value, bool force ) 
 		return var;
 
 	// note what types of cvars have been modified (userinfo, archive, serverinfo, systeminfo)
-	cvar_modifiedFlags |= var->flags;
+	modifiedFlags |= var->flags;
 
 	if (!force)
 	{
@@ -569,7 +567,7 @@ cvar_t *CvarSystem::set2( const char *var_name, const char *value, bool force ) 
 			return var;
 		}
 
-		if ((var->flags & CVAR_CHEAT) && !cvar_cheats->integer)
+		if ((var->flags & CVAR_CHEAT) && !cheats_->integer)
 		{
 			Common::printf ("%s is cheat protected.\n", var_name);
 			return var;
@@ -723,7 +721,7 @@ void CvarSystem::setCheatState()
 	cvar_t	*var;
 
 	// set all default vars to the safe value
-	for(var = cvar_vars; var ; var = var->next)
+	for(var = vars_; var ; var = var->next)
 	{
 		if(var->flags & CVAR_CHEAT)
 		{
@@ -751,7 +749,7 @@ bool CvarSystem::command( ) {
 	cvar_t	*v;
 
 	// check variables
-	v = Cvar_FindVar (CommandSystem::argv(0));
+	v = findVar (CommandSystem::argv(0));
 	if (!v) {
 		return false;
 	}
@@ -789,7 +787,7 @@ void CvarSystem::print_f()
 
 	name = CommandSystem::argv(1);
 
-	cv = Cvar_FindVar(name);
+	cv = findVar(name);
 	
 	if(cv)
 		CvarSystem::print(cv);
@@ -874,19 +872,19 @@ void CvarSystem::set_f( ) {
 		case 'a':
 			if( !( v->flags & CVAR_ARCHIVE ) ) {
 				v->flags |= CVAR_ARCHIVE;
-				cvar_modifiedFlags |= CVAR_ARCHIVE;
+				modifiedFlags |= CVAR_ARCHIVE;
 			}
 			break;
 		case 'u':
 			if( !( v->flags & CVAR_USERINFO ) ) {
 				v->flags |= CVAR_USERINFO;
-				cvar_modifiedFlags |= CVAR_USERINFO;
+				modifiedFlags |= CVAR_USERINFO;
 			}
 			break;
 		case 's':
 			if( !( v->flags & CVAR_SERVERINFO ) ) {
 				v->flags |= CVAR_SERVERINFO;
-				cvar_modifiedFlags |= CVAR_SERVERINFO;
+				modifiedFlags |= CVAR_SERVERINFO;
 			}
 			break;
 	}
@@ -918,7 +916,7 @@ void CvarSystem::writeVariables(fileHandle_t f)
 	cvar_t	*var;
 	char	buffer[1024];
 
-	for (var = cvar_vars; var; var = var->next)
+	for (var = vars_; var; var = var->next)
 	{
 		if(!var->name || Q_stricmp( var->name, "cl_cdkey" ) == 0)
 			continue;
@@ -962,7 +960,7 @@ void CvarSystem::list_f( ) {
 	}
 
 	i = 0;
-	for (var = cvar_vars ; var ; var = var->next, i++)
+	for (var = vars_ ; var ; var = var->next, i++)
 	{
 		if(!var->name || (match && !Common::filter(match, var->name, false)))
 			continue;
@@ -1017,7 +1015,7 @@ void CvarSystem::list_f( ) {
 	}
 
 	Common::printf ("\n%i total cvars\n", i);
-	Common::printf ("%i cvar indexes\n", cvar_numIndexes);
+	Common::printf ("%i cvar indexes\n", numIndexes_);
 }
 
 /*
@@ -1038,7 +1036,7 @@ void CvarSystem::listModified_f( ) {
 	}
 
 	totalModified = 0;
-	for (var = cvar_vars ; var ; var = var->next)
+	for (var = vars_ ; var ; var = var->next)
 	{
 		if ( !var->name || !var->modificationCount )
 			continue;
@@ -1117,7 +1115,7 @@ cvar_t *CvarSystem::unset(cvar_t *cv)
 	cvar_t *next = cv->next;
 
 	// note what types of cvars have been modified (userinfo, archive, serverinfo, systeminfo)
-	cvar_modifiedFlags |= cv->flags;
+	modifiedFlags |= cv->flags;
 
 	if(cv->name)
 		Z_Free(cv->name);
@@ -1133,14 +1131,14 @@ cvar_t *CvarSystem::unset(cvar_t *cv)
 	if(cv->prev)
 		cv->prev->next = cv->next;
 	else
-		cvar_vars = cv->next;
+		vars_ = cv->next;
 	if(cv->next)
 		cv->next->prev = cv->prev;
 
 	if(cv->hashPrev)
 		cv->hashPrev->hashNext = cv->hashNext;
 	else
-		hashTable[cv->hashIndex] = cv->hashNext;
+		hashTable_[cv->hashIndex] = cv->hashNext;
 	if(cv->hashNext)
 		cv->hashNext->hashPrev = cv->hashPrev;
 
@@ -1167,7 +1165,7 @@ void CvarSystem::unset_f()
 		return;
 	}
 	
-	cv = Cvar_FindVar(CommandSystem::argv(1));
+	cv = findVar(CommandSystem::argv(1));
 
 	if(!cv)
 		return;
@@ -1193,7 +1191,7 @@ void CvarSystem::restart(bool unsetVM)
 {
 	cvar_t	*curvar;
 
-	curvar = cvar_vars;
+	curvar = vars_;
 
 	while(curvar)
 	{
@@ -1240,7 +1238,7 @@ char *CvarSystem::infoString(int bit)
 
 	info[0] = 0;
 
-	for(var = cvar_vars; var; var = var->next)
+	for(var = vars_; var; var = var->next)
 	{
 		if(var->name && (var->flags & bit))
 			Info::setValueForKey (info, var->name, var->string);
@@ -1263,7 +1261,7 @@ char *CvarSystem::infoString_Big(int bit)
 
 	info[0] = 0;
 
-	for (var = cvar_vars; var; var = var->next)
+	for (var = vars_; var; var = var->next)
 	{
 		if(var->name && (var->flags & bit))
 			Info::setValueForKey_Big (info, var->name, var->string);
@@ -1358,7 +1356,7 @@ void CvarSystem::register_(vmCvar_t *vmCvar, const char *varName, const char *de
 		flags &= ~CVAR_NONEXISTENT;
 	}
 
-	cv = Cvar_FindVar(varName);
+	cv = findVar(varName);
 
 	// Don't modify cvar if it's protected.
 	if ( cv && ( cv->flags & CVAR_PROTECTED ) ) {
@@ -1371,7 +1369,7 @@ void CvarSystem::register_(vmCvar_t *vmCvar, const char *varName, const char *de
 	if (!vmCvar)
 		return;
 
-	vmCvar->handle = cv - cvar_indexes;
+	vmCvar->handle = cv - indexes_;
 	vmCvar->modificationCount = -1;
 	CvarSystem::update( vmCvar );
 }
@@ -1388,11 +1386,11 @@ void	CvarSystem::update( vmCvar_t *vmCvar ) {
 	cvar_t	*cv = nullptr;
 	assert(vmCvar);
 
-	if ( static_cast<unsigned>(vmCvar->handle) >= cvar_numIndexes ) {
+	if ( static_cast<unsigned>(vmCvar->handle) >= numIndexes_ ) {
 		Common::error( ERR_DROP, "CvarSystem::update: handle out of range" );
 	}
 
-	cv = cvar_indexes + vmCvar->handle;
+	cv = indexes_ + vmCvar->handle;
 
 	if ( cv->modificationCount == vmCvar->modificationCount ) {
 		return;
@@ -1437,10 +1435,10 @@ Reads in all archived cvars
 */
 void CvarSystem::init ()
 {
-	Com_Memset(cvar_indexes, '\0', sizeof(cvar_indexes));
-	Com_Memset(hashTable, '\0', sizeof(hashTable));
+	Com_Memset(indexes_, '\0', sizeof(indexes_));
+	Com_Memset(hashTable_, '\0', sizeof(hashTable_));
 
-	cvar_cheats = CvarSystem::get("sv_cheats", "1", CVAR_ROM | CVAR_SYSTEMINFO );
+	cheats_ = CvarSystem::get("sv_cheats", "1", CVAR_ROM | CVAR_SYSTEMINFO );
 
 	CommandSystem::addCommand ("print", CvarSystem::print_f);
 	CommandSystem::addCommand ("toggle", CvarSystem::toggle_f);

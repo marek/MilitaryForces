@@ -1145,15 +1145,15 @@ void SV_Frame( int msec )
 	}
 
 	// update infostrings if anything has been changed
-	if ( cvar_modifiedFlags & CVAR_SERVERINFO ) 
+	if ( CvarSystem::modifiedFlags & CVAR_SERVERINFO ) 
 	{
 		SV_SetConfigstring( CS_SERVERINFO, CvarSystem::infoString( CVAR_SERVERINFO ) );
-		cvar_modifiedFlags &= ~CVAR_SERVERINFO;
+		CvarSystem::modifiedFlags &= ~CVAR_SERVERINFO;
 	}
-	if ( cvar_modifiedFlags & CVAR_SYSTEMINFO ) 
+	if ( CvarSystem::modifiedFlags & CVAR_SYSTEMINFO ) 
 	{
 		SV_SetConfigstring( CS_SYSTEMINFO, CvarSystem::infoString_Big( CVAR_SYSTEMINFO ) );
-		cvar_modifiedFlags &= ~CVAR_SYSTEMINFO;
+		CvarSystem::modifiedFlags &= ~CVAR_SYSTEMINFO;
 	}
 
 	if ( com_speeds->integer ) 

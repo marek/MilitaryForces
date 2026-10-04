@@ -35,6 +35,9 @@ public:
 	static void echo_f ();
 	static cmd_function_t *findCommand( const char *cmd_name );
 	static void list_f ();
+
+private:
+	static void tokenizeString2( const char *text_in, bool ignoreQuotes );
 };
 
 #endif

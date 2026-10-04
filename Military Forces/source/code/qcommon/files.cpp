@@ -86,7 +86,7 @@ automatically restricts where game media can come from to prevent add-ons from w
 
 File search order: when FileSystem::fOpenFileRead gets called it will go through the fs_searchpaths
 structure and stop on the first successful hit. fs_searchpaths is built with successive
-calls to FS_AddGameDirectory
+calls to FileSystem::addGameDirectory
 
 Additionally, we search in several subdirectories:
 current game is the current mode
@@ -377,7 +377,7 @@ int FileSystem::loadStack( )
 return a hash value for the filename
 ================
 */
-static long FS_HashFileName( const char *fname, int hashSize ) {
+long FileSystem::hashFileName( const char *fname, int hashSize ) {
 	int		i;
 	long	hash;
 	char	letter;
@@ -397,7 +397,7 @@ static long FS_HashFileName( const char *fname, int hashSize ) {
 	return hash;
 }
 
-static fileHandle_t	FS_HandleForFile() {
+fileHandle_t FileSystem::handleForFile() {
 	int		i;
 
 	for ( i = 1 ; i < MAX_FILE_HANDLES ; i++ ) {
@@ -409,7 +409,7 @@ static fileHandle_t	FS_HandleForFile() {
 	return 0;
 }
 
-static FILE	*FS_FileForHandle( fileHandle_t f ) {
+FILE * FileSystem::fileForHandle( fileHandle_t f ) {
 	if ( f < 1 || f >= MAX_FILE_HANDLES ) {
 		Common::error( ERR_DROP, "FS_FileForHandle: out of range" );
 	}
@@ -426,7 +426,7 @@ static FILE	*FS_FileForHandle( fileHandle_t f ) {
 void	FileSystem::forceFlush( fileHandle_t f ) {
 	FILE *file;
 
-	file = FS_FileForHandle(f);
+	file = FileSystem::fileForHandle(f);
 	setvbuf( file, nullptr, _IONBF, 0 );
 }
 
@@ -462,7 +462,7 @@ long FileSystem::filelength(fileHandle_t f)
 {
 	FILE	*h;
 
-	h = FS_FileForHandle(f);
+	h = FileSystem::fileForHandle(f);
 	
 	if(h == nullptr)
 		return -1;
@@ -472,12 +472,12 @@ long FileSystem::filelength(fileHandle_t f)
 
 /*
 ====================
-FS_ReplaceSeparators
+FileSystem::replaceSeparators
 
 Fix things up differently for win/unix/mac
 ====================
 */
-static void FS_ReplaceSeparators( char *path ) {
+void FileSystem::replaceSeparators( char *path ) {
 	char	*s;
 	bool lastCharWasSep = false;
 
@@ -514,7 +514,7 @@ char *FileSystem::buildOSPath( const char *base, const char *game, const char *q
 	}
 
 	Com_sprintf( temp, sizeof(temp), "/%s/%s", game, qpath );
-	FS_ReplaceSeparators( temp );
+	FileSystem::replaceSeparators( temp );
 	Com_sprintf( ospath[toggle], sizeof( ospath[0] ), "%s%s", base, temp );
 	
 	return ospath[toggle];
@@ -558,7 +558,7 @@ bool FileSystem::createPath (const char *OSPath) {
 	}
 
 	Q_strncpyz( path, OSPath, sizeof( path ) );
-	FS_ReplaceSeparators( path );
+	FileSystem::replaceSeparators( path );
 
 	// Skip creation of the root directory as it will always be there
 	ofs = strchr( path, PATH_SEP );
@@ -583,12 +583,12 @@ bool FileSystem::createPath (const char *OSPath) {
 
 /*
 =================
-FS_CheckFilenameIsMutable
+FileSystem::checkFilenameIsMutable
 
 ERR_FATAL if trying to maniuplate a file with the platform library, QVM, or pk3 extension
 =================
  */
-static void FS_CheckFilenameIsMutable( const char *filename,
+void FileSystem::checkFilenameIsMutable( const char *filename,
 		const char *function )
 {
 	// Check if the filename ends with the library, QVM, or pk3 extension
@@ -608,7 +608,7 @@ FileSystem::remove
 ===========
 */
 void FileSystem::remove( const char *osPath ) {
-	FS_CheckFilenameIsMutable( osPath, __func__ );
+	FileSystem::checkFilenameIsMutable( osPath, __func__ );
 
 	remove( osPath );
 }
@@ -620,7 +620,7 @@ FileSystem::remove_HomeData
 ===========
 */
 void FileSystem::remove_HomeData( const char *homePath ) {
-	FS_CheckFilenameIsMutable( homePath, __func__ );
+	FileSystem::checkFilenameIsMutable( homePath, __func__ );
 
 	remove( FileSystem::buildOSPath( fs_homedatapath->string,
 			fs_gamedir, homePath ) );
@@ -665,12 +665,12 @@ bool FileSystem::fileExists_HomeData(const char *file)
 
 /*
 ================
-FS_BaseDir_FileExists_HomeData
+FileSystem::baseDir_FileExists_HomeData
 
 Tests if the file exists 
 ================
 */
-static bool FS_BaseDir_FileExists_HomeData( const char *file )
+bool FileSystem::baseDir_FileExists_HomeData( const char *file )
 {
 	return FS_FileInPathExists(FileSystem::baseDir_BuildOSPath(fs_homedatapath->string, file));
 }
@@ -678,24 +678,24 @@ static bool FS_BaseDir_FileExists_HomeData( const char *file )
 
 /*
 ===========
-FS_OSPath_FOpenFileWrite
+FileSystem::oSPath_FOpenFileWrite
 ===========
 */
-static fileHandle_t FS_OSPath_FOpenFileWrite( const char *ospath, const char *filename ) {
+fileHandle_t FileSystem::oSPath_FOpenFileWrite( const char *ospath, const char *filename ) {
 	fileHandle_t	f;
 
 	if ( !fs_searchpaths ) {
 		Common::error( ERR_FATAL, "Filesystem call made without initialization" );
 	}
 
-	f = FS_HandleForFile();
+	f = FileSystem::handleForFile();
 	fsh[f].zipFile = false;
 
 	if ( fs_debug->integer ) {
 		Common::printf( "FS_OSPath_FOpenFileWrite: %s\n", ospath );
 	}
 
-	FS_CheckFilenameIsMutable( ospath, __func__ );
+	FileSystem::checkFilenameIsMutable( ospath, __func__ );
 
 	if( FileSystem::createPath( ospath ) ) {
 		return 0;
@@ -718,7 +718,7 @@ FileSystem::baseDir_FOpenFileWrite_HomeConfig
 ===========
 */
 fileHandle_t FileSystem::baseDir_FOpenFileWrite_HomeConfig( const char *filename ) {
-	return FS_OSPath_FOpenFileWrite(
+	return FileSystem::oSPath_FOpenFileWrite(
 		FileSystem::baseDir_BuildOSPath(fs_homeconfigpath->string, filename), filename);
 }
 
@@ -728,7 +728,7 @@ FileSystem::baseDir_FOpenFileWrite_HomeData
 ===========
 */
 fileHandle_t FileSystem::baseDir_FOpenFileWrite_HomeData( const char *filename ) {
-	return FS_OSPath_FOpenFileWrite(
+	return FileSystem::oSPath_FOpenFileWrite(
 		FileSystem::baseDir_BuildOSPath(fs_homedatapath->string, filename), filename);
 }
 
@@ -738,7 +738,7 @@ FileSystem::baseDir_FOpenFileWrite_HomeState
 ===========
 */
 fileHandle_t FileSystem::baseDir_FOpenFileWrite_HomeState( const char *filename ) {
-	return FS_OSPath_FOpenFileWrite(
+	return FileSystem::oSPath_FOpenFileWrite(
 		FileSystem::baseDir_BuildOSPath(fs_homestatepath->string, filename), filename);
 }
 
@@ -759,7 +759,7 @@ long FileSystem::baseDir_FOpenFileRead(const char *filename, fileHandle_t *fp)
 		Common::error( ERR_FATAL, "Filesystem call made without initialization" );
 	}
 
-	f = FS_HandleForFile();
+	f = FileSystem::handleForFile();
 	fsh[f].zipFile = false;
 
 	Q_strncpyz( fsh[f].name, filename, sizeof( fsh[f].name ) );
@@ -823,7 +823,7 @@ void FileSystem::baseDir_Rename_HomeData( const char *from, const char *to, bool
 	}
 
 	if ( safe ) {
-		FS_CheckFilenameIsMutable( to_ospath, __func__ );
+		FileSystem::checkFilenameIsMutable( to_ospath, __func__ );
 	}
 
 	rename(from_ospath, to_ospath);
@@ -866,7 +866,7 @@ FileSystem::fOpenFileWrite_HomeConfig
 ===========
 */
 fileHandle_t FileSystem::fOpenFileWrite_HomeConfig( const char *filename ) {
-	return FS_OSPath_FOpenFileWrite(
+	return FileSystem::oSPath_FOpenFileWrite(
 		FileSystem::buildOSPath(fs_homeconfigpath->string, fs_gamedir, filename), filename);
 }
 
@@ -876,7 +876,7 @@ FileSystem::fOpenFileWrite_HomeData
 ===========
 */
 fileHandle_t FileSystem::fOpenFileWrite_HomeData( const char *filename ) {
-	return FS_OSPath_FOpenFileWrite(
+	return FileSystem::oSPath_FOpenFileWrite(
 		FileSystem::buildOSPath(fs_homedatapath->string, fs_gamedir, filename), filename);
 }
 
@@ -886,7 +886,7 @@ FileSystem::fOpenFileWrite_HomeState
 ===========
 */
 fileHandle_t FileSystem::fOpenFileWrite_HomeState( const char *filename ) {
-	return FS_OSPath_FOpenFileWrite(
+	return FileSystem::oSPath_FOpenFileWrite(
 		FileSystem::buildOSPath(fs_homestatepath->string, fs_gamedir, filename), filename);
 }
 
@@ -904,7 +904,7 @@ fileHandle_t FileSystem::fOpenFileAppend_HomeData( const char *filename ) {
 		Common::error( ERR_FATAL, "Filesystem call made without initialization" );
 	}
 
-	f = FS_HandleForFile();
+	f = FileSystem::handleForFile();
 	fsh[f].zipFile = false;
 
 	Q_strncpyz( fsh[f].name, filename, sizeof( fsh[f].name ) );
@@ -918,7 +918,7 @@ fileHandle_t FileSystem::fOpenFileAppend_HomeData( const char *filename ) {
 		Common::printf( "FileSystem::fOpenFileAppend_HomeData: %s\n", ospath );
 	}
 
-	FS_CheckFilenameIsMutable( ospath, __func__ );
+	FileSystem::checkFilenameIsMutable( ospath, __func__ );
 
 	if( FileSystem::createPath( ospath ) ) {
 		return 0;
@@ -947,7 +947,7 @@ fileHandle_t FileSystem::fCreateOpenPipeFile( const char *filename ) {
 		Common::error( ERR_FATAL, "Filesystem call made without initialization" );
 	}
 
-	f = FS_HandleForFile();
+	f = FileSystem::handleForFile();
 	fsh[f].zipFile = false;
 
 	Q_strncpyz( fsh[f].name, filename, sizeof( fsh[f].name ) );
@@ -961,7 +961,7 @@ fileHandle_t FileSystem::fCreateOpenPipeFile( const char *filename ) {
 		Common::printf( "FileSystem::fCreateOpenPipeFile: %s\n", ospath );
 	}
 
-	FS_CheckFilenameIsMutable( ospath, __func__ );
+	FileSystem::checkFilenameIsMutable( ospath, __func__ );
 
 	fifo = System::makeFifo( ospath );
 	if( fifo ) {
@@ -1129,7 +1129,7 @@ long FS_FOpenFileReadDir(const char *filename, searchpath_t *search, fileHandle_
 		// is the element a pak file?
 		if(search->pack)
 		{
-			hash = FS_HashFileName(filename, search->pack->hashSize);
+			hash = FileSystem::hashFileName(filename, search->pack->hashSize);
 
 			if(search->pack->hashTable[hash])
 			{
@@ -1180,13 +1180,13 @@ long FS_FOpenFileReadDir(const char *filename, searchpath_t *search, fileHandle_
 		return 0;
 	}
 
-	*file = FS_HandleForFile();
+	*file = FileSystem::handleForFile();
 	fsh[*file].handleFiles.unique = uniqueFILE;
 
 	// is the element a pak file?
 	if(search->pack)
 	{
-		hash = FS_HashFileName(filename, search->pack->hashSize);
+		hash = FileSystem::hashFileName(filename, search->pack->hashSize);
 
 		if(search->pack->hashTable[hash])
 		{
@@ -1458,7 +1458,7 @@ int FileSystem::write( const void *buffer, int len, fileHandle_t h ) {
 		return 0;
 	}
 
-	f = FS_FileForHandle(h);
+	f = FileSystem::fileForHandle(h);
 	buf = (byte *)buffer;
 
 	remaining = len;
@@ -1575,7 +1575,7 @@ int FileSystem::seek( fileHandle_t f, long offset, int origin ) {
 		}
 	} else {
 		FILE *file;
-		file = FS_FileForHandle(f);
+		file = FileSystem::fileForHandle(f);
 		int _origin = SEEK_SET;
 		switch( origin ) {
 		case FS_SEEK_CUR:
@@ -1638,7 +1638,7 @@ int	FileSystem::fileIsInPAK(const char *filename, int *pChecksum ) {
 	for ( search = fs_searchpaths ; search ; search = search->next ) {
 		//
 		if (search->pack) {
-			hash = FS_HashFileName(filename, search->pack->hashSize);
+			hash = FileSystem::hashFileName(filename, search->pack->hashSize);
 		}
 		// is the element a pak file?
 		if ( search->pack && search->pack->hashTable[hash] ) {
@@ -1955,7 +1955,7 @@ static pack_t *FS_LoadZipFile(const char *zipfile, const char *basename)
 			fs_headerLongs[fs_numHeaderLongs++] = LittleLong(file_info.crc);
 		}
 		Q_strlwr( filename_inzip );
-		hash = FS_HashFileName(filename_inzip, pack->hashSize);
+		hash = FileSystem::hashFileName(filename_inzip, pack->hashSize);
 		buildBuffer[i].name = namePtr;
 		strcpy( buildBuffer[i].name, filename_inzip );
 		namePtr += strlen(filename_inzip) + 1;
@@ -2033,7 +2033,7 @@ DIRECTORY SCANNING FUNCTIONS
 
 #define	MAX_FOUND_FILES	0x1000
 
-static int FS_ReturnPath( const char *zname, char *zpath, int *depth ) {
+int FileSystem::returnPath( const char *zname, char *zpath, int *depth ) {
 	int len, at, newdep;
 
 	newdep = 0;
@@ -2119,7 +2119,7 @@ char **FS_ListFilteredFiles( const char *path, const char *extension,
 	}
 	extensionLength = strlen( extension );
 	nfiles = 0;
-	FS_ReturnPath(path, zpath, &pathDepth);
+	FileSystem::returnPath(path, zpath, &pathDepth);
 
 	//
 	// search through the path, one element at a time, adding to list
@@ -2163,7 +2163,7 @@ char **FS_ListFilteredFiles( const char *path, const char *extension,
 				}
 				else {
 
-					zpathLen = FS_ReturnPath(name, zpath, &depth);
+					zpathLen = FileSystem::returnPath(name, zpath, &depth);
 
 					if ( (depth-pathDepth)>2 || pathLength > zpathLen || Q_stricmpn( name, path, pathLength ) ) {
 						continue;
@@ -2293,7 +2293,7 @@ int	FileSystem::getFileList(  const char *path, const char *extension, char *lis
 
 /*
 =======================
-Sys_ConcatenateFileLists
+FileSystem::sys_ConcatenateFileLists
 
 mkv: Naive implementation. Concatenates three lists into a
      new list, and frees the old lists from the heap.
@@ -2302,7 +2302,7 @@ bk001129 - from cvs1.17 (mkv)
 FIXME TTimo those two should move to common.c next to System::listFiles
 =======================
  */
-static unsigned int Sys_CountFileList(char **list)
+unsigned int FileSystem::sys_CountFileList(char **list)
 {
 	int i = 0;
 
@@ -2317,13 +2317,13 @@ static unsigned int Sys_CountFileList(char **list)
 	return i;
 }
 
-static char** Sys_ConcatenateFileLists( char **list0, char **list1 )
+char** FileSystem::sys_ConcatenateFileLists( char **list0, char **list1 )
 {
 	int totalLength = 0;
 	char** cat = nullptr, **dst, **src;
 
-	totalLength += Sys_CountFileList(list0);
-	totalLength += Sys_CountFileList(list1);
+	totalLength += FileSystem::sys_CountFileList(list0);
+	totalLength += FileSystem::sys_CountFileList(list1);
 
 	/* Create new list. */
 	dst = cat = static_cast<char **>(Z_Malloc( ( totalLength + 1 ) * sizeof( char* ) ));
@@ -2366,7 +2366,7 @@ void FileSystem::getModDescription( const char *modDir, char *description, int d
 	nDescLen = FileSystem::baseDir_FOpenFileRead( descPath, &descHandle );
 
 	if ( nDescLen > 0 ) {
-		file = FS_FileForHandle(descHandle);
+		file = FileSystem::fileForHandle(descHandle);
 		Com_Memset( description, 0, descriptionLen );
 		nDescLen = fread(description, 1, descriptionLen, file);
 		if (nDescLen >= 0) {
@@ -2413,11 +2413,11 @@ int	FileSystem::getModList( char *listbuf, int bufsize ) {
 		}
 
 		pFiles0 = System::listFiles(pathVar->string, nullptr, nullptr, &dummy, true);
-		// Sys_ConcatenateFileLists frees the lists so System::freeFileList isn't required
-		pFiles = Sys_ConcatenateFileLists(pFiles, pFiles0);
+		// FileSystem::sys_ConcatenateFileLists frees the lists so System::freeFileList isn't required
+		pFiles = FileSystem::sys_ConcatenateFileLists(pFiles, pFiles0);
 	}
 
-	nPotential = Sys_CountFileList(pFiles);
+	nPotential = FileSystem::sys_CountFileList(pFiles);
 
 	for (i = 0; i < nPotential; i++) {
 		name = pFiles[i];
@@ -2762,7 +2762,7 @@ void FS_Which_f( ) {
 //===========================================================================
 
 
-static int QDECL paksort( const void *a, const void *b ) {
+int QDECL FileSystem::paksort( const void *a, const void *b ) {
 	char	*aa, *bb;
 
 	aa = *static_cast<char * const *>(a);
@@ -2773,13 +2773,13 @@ static int QDECL paksort( const void *a, const void *b ) {
 
 /*
 ================
-FS_AddGameDirectory
+FileSystem::addGameDirectory
 
 Sets fs_gamedir, adds the directory to the head of the path,
 then loads the zip headers
 ================
 */
-static void FS_AddGameDirectory( const char *path, const char *dir ) {
+void FileSystem::addGameDirectory( const char *path, const char *dir ) {
 	searchpath_t	*sp;
 	searchpath_t	*search;
 	pack_t			*pak;
@@ -2812,7 +2812,7 @@ static void FS_AddGameDirectory( const char *path, const char *dir ) {
 	pakfiles = System::listFiles(curpath, ".pk3", nullptr, &numfiles, false);
 
 	if ( pakfiles ) {
-		qsort( pakfiles, numfiles, sizeof(char*), paksort );
+		qsort( pakfiles, numfiles, sizeof(char*), FileSystem::paksort );
 	}
 
 	if ( fs_numServerPaks ) {
@@ -2822,7 +2822,7 @@ static void FS_AddGameDirectory( const char *path, const char *dir ) {
 		// Get top level directories (we'll filter them later since the System::listFiles filtering is terrible)
 		pakdirs = System::listFiles(curpath, "/", nullptr, &numdirs, false);
 
-		qsort( pakdirs, numdirs, sizeof(char *), paksort );
+		qsort( pakdirs, numdirs, sizeof(char *), FileSystem::paksort );
 	}
 
 	pakfilesi = 0;
@@ -2841,10 +2841,10 @@ static void FS_AddGameDirectory( const char *path, const char *dir ) {
 		}
 		else {
 			// Could be either, compare to see which name comes first
-			// Need tmp variables for appropriate indirection for paksort()
+			// Need tmp variables for appropriate indirection for FileSystem::paksort()
 			pakfilestmp = &pakfiles[pakfilesi];
 			pakdirstmp = &pakdirs[pakdirsi];
-			pakwhich = (paksort(pakfilestmp, pakdirstmp) < 0);
+			pakwhich = (FileSystem::paksort(pakfilestmp, pakdirstmp) < 0);
 		}
 
 		if (pakwhich) {
@@ -2916,10 +2916,10 @@ static void FS_AddGameDirectory( const char *path, const char *dir ) {
 
 /*
 ================
-FS_AddGameDirectories
+FileSystem::addGameDirectories
 ================
 */
-static void FS_AddGameDirectories(const char *dir)
+void FileSystem::addGameDirectories(const char *dir)
 {
 	// add search path elements in reverse priority order
 	for(int i = ARRAY_LEN(fs_pathVars) - 1; i >= 0; i--) {
@@ -2929,7 +2929,7 @@ static void FS_AddGameDirectories(const char *dir)
 			continue;
 		}
 
-		FS_AddGameDirectory(pathVar->string, dir);
+		FileSystem::addGameDirectory(pathVar->string, dir);
 	}
 }
 
@@ -3072,7 +3072,7 @@ bool FileSystem::comparePaks( char *neededpaks, int len, bool dlstring ) {
 				// Local name
 				Q_strcat( neededpaks, len, "@");
 				// Do we have one with the same name?
-				if ( FS_BaseDir_FileExists_HomeData( va( "%s.pk3", fs_serverReferencedPakNames[i] ) ) )
+				if ( FileSystem::baseDir_FileExists_HomeData( va( "%s.pk3", fs_serverReferencedPakNames[i] ) ) )
 				{
 					char st[MAX_ZPATH];
 					// We already have one called this, we need to download it to another name
@@ -3099,7 +3099,7 @@ bool FileSystem::comparePaks( char *neededpaks, int len, bool dlstring ) {
 				Q_strcat( neededpaks, len, fs_serverReferencedPakNames[i] );
 				Q_strcat( neededpaks, len, ".pk3" );
 				// Do we have one with the same name?
-				if ( FS_BaseDir_FileExists_HomeData( va( "%s.pk3", fs_serverReferencedPakNames[i] ) ) )
+				if ( FileSystem::baseDir_FileExists_HomeData( va( "%s.pk3", fs_serverReferencedPakNames[i] ) ) )
 				{
 					Q_strcat( neededpaks, len, " (local file exists with wrong checksum)");
 				}
@@ -3168,12 +3168,12 @@ void Com_ReadCDKey( const char *filename );
 
 /*
 ================
-FS_ReorderPurePaks
+FileSystem::reorderPurePaks
 NOTE TTimo: the reordering that happens here is not reflected in the cvars (\cvarlist *pak*)
   this can lead to misleading situations, see https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=540
 ================
 */
-static void FS_ReorderPurePaks( )
+void FileSystem::reorderPurePaks( )
 {
 	searchpath_t *s;
 	int i;
@@ -3208,10 +3208,10 @@ static void FS_ReorderPurePaks( )
 
 /*
 ================
-FS_AddPathVar
+FileSystem::addPathVar
 ================
 */
-static void FS_AddPathVar( cvar_t *pathVar ) {
+void FileSystem::addPathVar( cvar_t *pathVar ) {
 	if( !pathVar || !*pathVar->string ) {
 		return;
 	}
@@ -3236,28 +3236,28 @@ static void FS_AddPathVar( cvar_t *pathVar ) {
 
 /*
 ================
-FS_InitPathVars
+FileSystem::initPathVars
 ================
 */
-static void FS_InitPathVars( ) {
+void FileSystem::initPathVars( ) {
 	memset( fs_pathVars, 0, sizeof( fs_pathVars ) );
 
-	FS_AddPathVar( fs_homeconfigpath );
-	FS_AddPathVar( fs_homedatapath );
-	FS_AddPathVar( fs_homestatepath );
-	FS_AddPathVar( fs_basepath );
-	FS_AddPathVar( fs_apppath );
-	FS_AddPathVar( fs_steampath );
-	FS_AddPathVar( fs_gogpath );
-	FS_AddPathVar( fs_microsoftstorepath );
+	FileSystem::addPathVar( fs_homeconfigpath );
+	FileSystem::addPathVar( fs_homedatapath );
+	FileSystem::addPathVar( fs_homestatepath );
+	FileSystem::addPathVar( fs_basepath );
+	FileSystem::addPathVar( fs_apppath );
+	FileSystem::addPathVar( fs_steampath );
+	FileSystem::addPathVar( fs_gogpath );
+	FileSystem::addPathVar( fs_microsoftstorepath );
 }
 
 /*
 ================
-FS_Startup
+FileSystem::startup
 ================
 */
-static void FS_Startup( const char *gameName )
+void FileSystem::startup( const char *gameName )
 {
 	cvar_t *fs_homepath = CvarSystem::get("fs_homepath", "", CVAR_INIT|CVAR_PROTECTED);
 	const char *configPath = System::defaultHomeConfigPath();
@@ -3291,7 +3291,7 @@ static void FS_Startup( const char *gameName )
 	fs_apppath = CvarSystem::get ("fs_apppath", System::defaultAppPath(), CVAR_INIT|CVAR_PROTECTED );
 #endif
 
-	FS_InitPathVars( );
+	FileSystem::initPathVars( );
 
 	if (!gameName[0]) {
 		CvarSystem::forceReset( "com_basegame" );
@@ -3318,16 +3318,16 @@ static void FS_Startup( const char *gameName )
 	FileSystem::createPath(fs_homedatapath->string);
 	FileSystem::createPath(fs_homestatepath->string);
 
-	FS_AddGameDirectories(gameName);
+	FileSystem::addGameDirectories(gameName);
 
 	// check for additional base game so mods can be based upon other mods
 	if ( fs_basegame->string[0] && Q_stricmp( fs_basegame->string, gameName ) ) {
-		FS_AddGameDirectories(fs_basegame->string);
+		FileSystem::addGameDirectories(fs_basegame->string);
 	}
 
 	// check for additional game folder for mods
 	if ( fs_gamedirvar->string[0] && Q_stricmp( fs_gamedirvar->string, gameName ) ) {
-		FS_AddGameDirectories(fs_gamedirvar->string);
+		FileSystem::addGameDirectories(fs_gamedirvar->string);
 	}
 
 #ifndef STANDALONE
@@ -3348,7 +3348,7 @@ static void FS_Startup( const char *gameName )
 
 	// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=506
 	// reorder the pure pk3 files according to server order
-	FS_ReorderPurePaks();
+	FileSystem::reorderPurePaks();
 
 	// print the current search paths
 	FS_Path_f();
@@ -3368,10 +3368,10 @@ static void FS_Startup( const char *gameName )
 #ifndef STANDALONE
 /*
 ===================
-FS_AppendUserFriendlyPakList
+FileSystem::appendUserFriendlyPakList
 ===================
 */
-static void FS_AppendUserFriendlyPakList( char *buf, size_t bufsize, int foundPakFiles, int numPakFiles )
+void FileSystem::appendUserFriendlyPakList( char *buf, size_t bufsize, int foundPakFiles, int numPakFiles )
 {
 	int missingCount = 0;
 	int missingIndex = 0;
@@ -3426,7 +3426,7 @@ static void FS_AppendUserFriendlyPakList( char *buf, size_t bufsize, int foundPa
 
 /*
 ===================
-FS_CheckPak0
+FileSystem::checkPak0
 
 Check whether any of the original id pak files is present,
 and start up in standalone mode, if there are none and a
@@ -3436,7 +3436,7 @@ Q3 media pak0.pk3, you'll want to remove this by defining
 STANDALONE in q_shared.h
 ===================
 */
-static void FS_CheckPak0( void )
+void FileSystem::checkPak0( void )
 {
 	searchpath_t	*path;
 	pack_t		*curpack;
@@ -3605,7 +3605,7 @@ static void FS_CheckPak0( void )
 		Q_strcat(errorText, sizeof(errorText),
 				"Quake 3 data files are missing. Please copy");
 
-		FS_AppendUserFriendlyPakList(errorText, sizeof(errorText), foundPak, NUM_ID_PAKS);
+		FileSystem::appendUserFriendlyPakList(errorText, sizeof(errorText), foundPak, NUM_ID_PAKS);
 
 		Q_strcat(errorText, sizeof(errorText),
 				va(" from the \"%s\" directory in your Quake 3 install or CD-ROM to:\n\n"
@@ -3647,7 +3647,7 @@ static void FS_CheckPak0( void )
 		Q_strcat(errorText, sizeof(errorText),
 				"Quake 3 Team Arena data files are missing. Please copy");
 
-		FS_AppendUserFriendlyPakList(errorText, sizeof(errorText), foundTA, NUM_TA_PAKS);
+		FileSystem::appendUserFriendlyPakList(errorText, sizeof(errorText), foundTA, NUM_TA_PAKS);
 
 		Q_strcat(errorText, sizeof(errorText),
 				va(" from the \"%s\" directory in your Quake 3 Team Arena install or CD-ROM to:\n\n"
@@ -4024,10 +4024,10 @@ void FileSystem::initFilesystem( ) {
 		CvarSystem::set("fs_game", "");
 
 	// try to start up normally
-	FS_Startup(com_basegame->string);
+	FileSystem::startup(com_basegame->string);
 
 #ifndef STANDALONE
-	FS_CheckPak0( );
+	FileSystem::checkPak0( );
 #endif
 
 	// if we can't find default.cfg, assume that the paths are
@@ -4062,10 +4062,10 @@ void FileSystem::restart( int checksumFeed ) {
 	FileSystem::clearPakReferences(0);
 
 	// try to start up normally
-	FS_Startup(com_basegame->string);
+	FileSystem::startup(com_basegame->string);
 
 #ifndef STANDALONE
-	FS_CheckPak0( );
+	FileSystem::checkPak0( );
 #endif
 
 	// if we can't find default.cfg, assume that the paths are
@@ -4136,7 +4136,7 @@ bool FileSystem::conditionalRestart(int checksumFeed, bool disconnect)
 	if(checksumFeed != fs_checksumFeed)
 		FileSystem::restart(checksumFeed);
 	else if(fs_numServerPaks && !fs_reordered)
-		FS_ReorderPurePaks();
+		FileSystem::reorderPurePaks();
 
 	return false;
 }

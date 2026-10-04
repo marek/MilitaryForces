@@ -65,6 +65,27 @@ public:
 	static void filenameCompletion( const char *dir, const char *ext, char *filter, bool stripExt, void(*callback)(const char *s), bool allowNonPureFilesOnDisk );
 	static const char *getCurrentGameDir();
 	static bool which(const char *filename, void *searchPath);
+
+public:
+	static long hashFileName( const char *fname, int hashSize );
+	static fileHandle_t handleForFile();
+	static FILE * fileForHandle( fileHandle_t f );
+	static void replaceSeparators( char *path );
+	static void checkFilenameIsMutable( const char *filename, const char *function );
+	static bool baseDir_FileExists_HomeData( const char *file );
+	static fileHandle_t oSPath_FOpenFileWrite( const char *ospath, const char *filename );
+	static int returnPath( const char *zname, char *zpath, int *depth );
+	static unsigned int sys_CountFileList( char **list );
+	static char** sys_ConcatenateFileLists( char **list0, char **list1 );
+	static int QDECL paksort( const void *a, const void *b );
+	static void addGameDirectory( const char *path, const char *dir );
+	static void addGameDirectories( const char *dir );
+	static void reorderPurePaks();
+	static void addPathVar( cvar_t *pathVar );
+	static void initPathVars();
+	static void startup( const char *gameName );
+	static void appendUserFriendlyPakList( char *buf, size_t bufsize, int foundPakFiles, int numPakFiles );
+	static void checkPak0( void );
 };
 
 #endif

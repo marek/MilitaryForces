@@ -489,7 +489,7 @@ using packetQueue_t = packetQueue_s;
 
 packetQueue_t *packetQueue = nullptr;
 
-static void NET_QueuePacket( int length, const void *data, netadr_t to,
+void Network::queuePacket( int length, const void *data, netadr_t to,
 	int offset )
 {
 	packetQueue_t *newPacket, *next = packetQueue;
@@ -555,10 +555,10 @@ void Network::sendPacket( netsrc_t sock, int length, const void *data, netadr_t 
 	}
 
 	if ( sock == NS_CLIENT && cl_packetdelay->integer > 0 ) {
-		NET_QueuePacket( length, data, to, cl_packetdelay->integer );
+		Network::queuePacket( length, data, to, cl_packetdelay->integer );
 	}
 	else if ( sock == NS_SERVER && sv_packetdelay->integer > 0 ) {
-		NET_QueuePacket( length, data, to, sv_packetdelay->integer );
+		Network::queuePacket( length, data, to, sv_packetdelay->integer );
 	}
 	else {
 		Sys_SendPacket( length, data, to );

@@ -23,6 +23,16 @@ public:
 	static void joinMulticast6();
 	static void leaveMulticast6();
 	static void sleep(int msec);
+
+public:
+	static void netadrToSockadr( netadr_t *a, struct sockaddr *s );
+	static void sockadrToNetadr( struct sockaddr *s, netadr_t *a );
+	static void sys_SockaddrToString( char *dest, int destlen, struct sockaddr *input );
+	static void addLocalAddress( char *ifname, struct sockaddr *addr, struct sockaddr *netmask );
+	static void getLocalAddress();
+	static void NET_GetLocalAddress( void );
+	static bool getCvars();
+	static void queuePacket( int length, const void *data, netadr_t to, int offset );
 };
 
 #endif

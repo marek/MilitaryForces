@@ -216,7 +216,7 @@ char *NET_ErrorString( ) {
 #endif
 }
 
-static void NetadrToSockadr( netadr_t *a, struct sockaddr *s ) {
+void Network::netadrToSockadr( netadr_t *a, struct sockaddr *s ) {
 	if( a->type == NA_BROADCAST ) {
 		(reinterpret_cast<struct sockaddr_in *>(s))->sin_family = AF_INET;
 		(reinterpret_cast<struct sockaddr_in *>(s))->sin_port = a->port;
@@ -242,7 +242,7 @@ static void NetadrToSockadr( netadr_t *a, struct sockaddr *s ) {
 }
 
 
-static void SockadrToNetadr( struct sockaddr *s, netadr_t *a ) {
+void Network::sockadrToNetadr( struct sockaddr *s, netadr_t *a ) {
 	if (s->sa_family == AF_INET) {
 		a->type = NA_IP;
 		*reinterpret_cast<int *>(&a->ip) = (reinterpret_cast<struct sockaddr_in *>(s))->sin_addr.s_addr;
@@ -342,10 +342,10 @@ static bool Sys_StringToSockaddr(const char *s, struct sockaddr *sadr, int sadr_
 
 /*
 =============
-Sys_SockaddrToString
+Network::sys_SockaddrToString
 =============
 */
-static void Sys_SockaddrToString(char *dest, int destlen, struct sockaddr *input)
+void Network::sys_SockaddrToString(char *dest, int destlen, struct sockaddr *input)
 {
 	socklen_t inputlen;
 
@@ -383,7 +383,7 @@ bool Sys_StringToAdr( const char *s, netadr_t *a, netadrtype_t family ) {
 		return false;
 	}
 	
-	SockadrToNetadr( reinterpret_cast<struct sockaddr *>(&sadr), a );
+	Network::sockadrToNetadr( reinterpret_cast<struct sockaddr *>(&sadr), a );
 	return true;
 }
 
@@ -473,8 +473,8 @@ const char	*Network::adrToString (netadr_t a)
 		struct sockaddr_storage sadr;
 	
 		memset(&sadr, 0, sizeof(sadr));
-		NetadrToSockadr(&a, reinterpret_cast<struct sockaddr *>(&sadr));
-		Sys_SockaddrToString(s, sizeof(s), reinterpret_cast<struct sockaddr *>(&sadr));
+		Network::netadrToSockadr(&a, reinterpret_cast<struct sockaddr *>(&sadr));
+		Network::sys_SockaddrToString(s, sizeof(s), reinterpret_cast<struct sockaddr *>(&sadr));
 	}
 
 	return s;
@@ -564,7 +564,7 @@ bool NET_GetPacket(netadr_t *net_from, Message *net_message, fd_set *fdr)
 				net_message->readcount = 10;
 			}
 			else {
-				SockadrToNetadr( reinterpret_cast<struct sockaddr *>(&from), net_from );
+				Network::sockadrToNetadr( reinterpret_cast<struct sockaddr *>(&from), net_from );
 				net_message->readcount = 0;
 			}
 		
@@ -592,7 +592,7 @@ bool NET_GetPacket(netadr_t *net_from, Message *net_message, fd_set *fdr)
 		}
 		else
 		{
-			SockadrToNetadr(reinterpret_cast<struct sockaddr *>(&from), net_from);
+			Network::sockadrToNetadr(reinterpret_cast<struct sockaddr *>(&from), net_from);
 			net_message->readcount = 0;
 		
 			if(ret >= net_message->maxsize)
@@ -620,7 +620,7 @@ bool NET_GetPacket(netadr_t *net_from, Message *net_message, fd_set *fdr)
 		}
 		else
 		{
-			SockadrToNetadr(reinterpret_cast<struct sockaddr *>(&from), net_from);
+			Network::sockadrToNetadr(reinterpret_cast<struct sockaddr *>(&from), net_from);
 			net_message->readcount = 0;
 		
 			if(ret >= net_message->maxsize)
@@ -667,7 +667,7 @@ void Sys_SendPacket( int length, const void *data, netadr_t to ) {
 		return;
 
 	memset(&addr, 0, sizeof(addr));
-	NetadrToSockadr( &to, reinterpret_cast<struct sockaddr *>(&addr) );
+	Network::netadrToSockadr( &to, reinterpret_cast<struct sockaddr *>(&addr) );
 
 	if( usingSocks && to.type == NA_IP ) {
 		socksBuf[0] = 0;	// reserved
@@ -799,7 +799,7 @@ void Sys_ShowIP() {
 
 	for(i = 0; i < numIP; i++)
 	{
-		Sys_SockaddrToString(addrbuf, sizeof(addrbuf), reinterpret_cast<struct sockaddr *>(&localIP[i].addr));
+		Network::sys_SockaddrToString(addrbuf, sizeof(addrbuf), reinterpret_cast<struct sockaddr *>(&localIP[i].addr));
 
 		if(localIP[i].type == NA_IP)
 			Common::printf( "IP: %s\n", addrbuf);
@@ -1235,10 +1235,10 @@ void NET_OpenSocks( int port ) {
 
 /*
 =====================
-NET_AddLocalAddress
+Network::addLocalAddress
 =====================
 */
-static void NET_AddLocalAddress(char *ifname, struct sockaddr *addr, struct sockaddr *netmask)
+void Network::addLocalAddress(char *ifname, struct sockaddr *addr, struct sockaddr *netmask)
 {
 	int addrlen;
 	sa_family_t family;
@@ -1276,7 +1276,7 @@ static void NET_AddLocalAddress(char *ifname, struct sockaddr *addr, struct sock
 }
 
 #if defined(__linux__) || defined(__APPLE__) || defined(__BSD__)
-static void NET_GetLocalAddress()
+void Network::getLocalAddress()
 {
 	struct ifaddrs *ifap, *search;
 
@@ -1290,7 +1290,7 @@ static void NET_GetLocalAddress()
 		{
 			// Only add interfaces that are up.
 			if(ifap->ifa_flags & IFF_UP)
-				NET_AddLocalAddress(search->ifa_name, search->ifa_addr, search->ifa_netmask);
+				Network::addLocalAddress(search->ifa_name, search->ifa_addr, search->ifa_netmask);
 		}
 	
 		freeifaddrs(ifap);
@@ -1299,7 +1299,7 @@ static void NET_GetLocalAddress()
 	}
 }
 #else
-static void NET_GetLocalAddress( void ) {
+void Network::NET_GetLocalAddress( void ) {
 	char				hostname[256];
 	struct addrinfo	hint;
 	struct addrinfo	*res = NULL;
@@ -1336,9 +1336,9 @@ static void NET_GetLocalAddress( void ) {
 		for(search = res; search; search = search->ai_next)
 		{
 			if(search->ai_family == AF_INET)
-				NET_AddLocalAddress("", search->ai_addr, (struct sockaddr *) &mask4);
+				Network::addLocalAddress("", search->ai_addr, (struct sockaddr *) &mask4);
 			else if(search->ai_family == AF_INET6)
-				NET_AddLocalAddress("", search->ai_addr, (struct sockaddr *) &mask6);
+				Network::addLocalAddress("", search->ai_addr, (struct sockaddr *) &mask6);
 		}
 	
 		Sys_ShowIP();
@@ -1363,7 +1363,7 @@ void NET_OpenIP( ) {
 	port = net_port->integer;
 	port6 = net_port6->integer;
 
-	NET_GetLocalAddress();
+	Network::getLocalAddress();
 
 	// automatically scan for a valid port, so multiple
 	// dedicated servers can be started without requiring
@@ -1419,10 +1419,10 @@ void NET_OpenIP( ) {
 
 /*
 ====================
-NET_GetCvars
+Network::getCvars
 ====================
 */
-static bool NET_GetCvars( ) {
+bool Network::getCvars( ) {
 	int modified;
 
 #ifdef DEDICATED
@@ -1502,7 +1502,7 @@ void Network::config( bool enableNetworking ) {
 	bool	start;
 
 	// get any latched changes to cvars
-	modified = NET_GetCvars();
+	modified = Network::getCvars();
 
 	if( !net_enabled->integer ) {
 		enableNetworking = false;

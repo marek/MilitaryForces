@@ -497,7 +497,7 @@ will point into this temporary buffer.
 */
 // NOTE TTimo define that to track tokenization issues
 //#define TKN_DBG
-static void Cmd_TokenizeString2( const char *text_in, bool ignoreQuotes ) {
+void CommandSystem::tokenizeString2( const char *text_in, bool ignoreQuotes ) {
 	const char	*text;
 	char	*textOut;
 
@@ -605,7 +605,7 @@ CommandSystem::tokenizeString
 ============
 */
 void CommandSystem::tokenizeString( const char *text_in ) {
-	Cmd_TokenizeString2( text_in, false );
+	tokenizeString2( text_in, false );
 }
 
 /*
@@ -614,7 +614,7 @@ CommandSystem::tokenizeStringIgnoreQuotes
 ============
 */
 void CommandSystem::tokenizeStringIgnoreQuotes( const char *text_in ) {
-	Cmd_TokenizeString2( text_in, true );
+	tokenizeString2( text_in, true );
 }
 
 /*

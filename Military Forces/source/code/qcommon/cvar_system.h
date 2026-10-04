@@ -42,6 +42,23 @@ public:
 	static void listModified_f( );
 	static cvar_t *unset(cvar_t *cv);
 	static void unset_f();
+
+	static int modifiedFlags;
+
+private:
+	static constexpr int MAX_CVARS = 2048;
+	static constexpr int FILE_HASH_SIZE = 256;
+
+	static long generateHashValue( const char *fname );
+	static bool validateString( const char *s );
+	static cvar_t * findVar( const char *var_name );
+	static const char * validate( cvar_t *var, const char *value, bool warn );
+
+	static cvar_t *vars_;
+	static cvar_t *cheats_;
+	static cvar_t indexes_[MAX_CVARS];
+	static int numIndexes_;
+	static cvar_t *hashTable_[FILE_HASH_SIZE];
 };
 
 #endif

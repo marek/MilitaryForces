@@ -2436,7 +2436,7 @@ void CL_CheckForResend( ) {
 		Network::outOfBandData( NS_CLIENT, clc.serverAddress, reinterpret_cast<byte *>(data), strlen ( data ) );
 		// the most current userinfo has been sent, so watch for any
 		// newer changes to userinfo variables
-		cvar_modifiedFlags &= ~CVAR_USERINFO;
+		CvarSystem::modifiedFlags &= ~CVAR_USERINFO;
 		break;
 
 	default:
@@ -2954,9 +2954,9 @@ void CL_CheckUserinfo( ) {
 		return;
 
 	// send a reliable userinfo update if needed
-	if(cvar_modifiedFlags & CVAR_USERINFO)
+	if(CvarSystem::modifiedFlags & CVAR_USERINFO)
 	{
-		cvar_modifiedFlags &= ~CVAR_USERINFO;
+		CvarSystem::modifiedFlags &= ~CVAR_USERINFO;
 		CL_AddReliableCommand(va("userinfo \"%s\"", CvarSystem::infoString( CVAR_USERINFO ) ), false);
 	}
 }
