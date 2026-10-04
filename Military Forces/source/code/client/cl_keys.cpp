@@ -436,7 +436,7 @@ void EditField::paste() {
 	char	*cbd;
 	int		pasteLen, i;
 
-	cbd = Sys_GetClipboardData();
+	cbd = System::getClipboardData();
 
 	if ( !cbd ) {
 		return;

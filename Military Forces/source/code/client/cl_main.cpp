@@ -883,7 +883,7 @@ void CL_DemoCompleted( )
 	{
 		int	time;
 		
-		time = Sys_Milliseconds() - clc.timeDemoStart;
+		time = System::milliseconds() - clc.timeDemoStart;
 		if( time > 0 )
 		{
 			// Millisecond times are frame durations:
@@ -3241,7 +3241,7 @@ void *CL_RefMalloc( int size ) {
 }
 
 int CL_ScaledMilliseconds() {
-	return Sys_Milliseconds()*com_timescale->value;
+	return System::milliseconds()*com_timescale->value;
 }
 
 /*
@@ -3335,10 +3335,10 @@ void CL_InitRef( ) {
 
 	ri.ftol = Q_ftol;
 
-	ri.Sys_SetEnv = Sys_SetEnv;
+	ri.Sys_SetEnv = System::setEnv;
 	ri.Sys_GLimpSafeInit = Sys_GLimpSafeInit;
 	ri.Sys_GLimpInit = Sys_GLimpInit;
-	ri.Sys_LowPhysicalMemory = Sys_LowPhysicalMemory;
+	ri.Sys_LowPhysicalMemory = System::lowPhysicalMemory;
 
 	ret = GetRefAPI( REF_API_VERSION, &ri );
 
@@ -3929,7 +3929,7 @@ void CL_ServerInfoPacket( netadr_t from, Message *msg ) {
 		if ( cl_pinglist[i].adr.port && !cl_pinglist[i].time && Network::compareAdr( from, cl_pinglist[i].adr ) )
 		{
 			// calc ping time
-			cl_pinglist[i].time = Sys_Milliseconds() - cl_pinglist[i].start;
+			cl_pinglist[i].time = System::milliseconds() - cl_pinglist[i].start;
 			Com_DPrintf( "ping time %dms from %s\n", cl_pinglist[i].time, Network::adrToString( from ) );
 
 			// save of info
@@ -4350,7 +4350,7 @@ void CL_GetPing( int n, char *buf, int buflen, int *pingtime )
 	if (!time)
 	{
 		// check for timeout
-		time = Sys_Milliseconds() - cl_pinglist[n].start;
+		time = System::milliseconds() - cl_pinglist[n].start;
 		maxPing = CvarSystem::variableIntegerValue( "cl_maxPing" );
 		if( maxPing < 100 ) {
 			maxPing = 100;
@@ -4442,7 +4442,7 @@ ping_t* CL_GetFreePing( )
 		{
 			if (!pingptr->time)
 			{
-				if (Sys_Milliseconds() - pingptr->start < 500)
+				if (System::milliseconds() - pingptr->start < 500)
 				{
 					// still waiting for response
 					continue;
@@ -4467,7 +4467,7 @@ ping_t* CL_GetFreePing( )
 	for (i=0; i<MAX_PINGREQUESTS; i++, pingptr++ )
 	{
 		// scan for oldest
-		time = Sys_Milliseconds() - pingptr->start;
+		time = System::milliseconds() - pingptr->start;
 		if (time > oldest)
 		{
 			oldest = time;
@@ -4520,7 +4520,7 @@ void CL_Ping_f( ) {
 	pingptr = CL_GetFreePing();
 
 	memcpy( &pingptr->adr, &to, sizeof (netadr_t) );
-	pingptr->start = Sys_Milliseconds();
+	pingptr->start = System::milliseconds();
 	pingptr->time  = 0;
 
 	CL_SetServerInfoByAddress(pingptr->adr, nullptr, 0);
@@ -4591,7 +4591,7 @@ bool CL_UpdateVisiblePings_f(int source) {
 							}
 						}
 						memcpy(&cl_pinglist[j].adr, &server[i].adr, sizeof(netadr_t));
-						cl_pinglist[j].start = Sys_Milliseconds();
+						cl_pinglist[j].start = System::milliseconds();
 						cl_pinglist[j].time = 0;
 						Network::outOfBandPrint( NS_CLIENT, cl_pinglist[j].adr, "getinfo xxx" );
 						slots++;

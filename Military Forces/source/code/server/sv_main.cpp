@@ -419,7 +419,7 @@ static leakyBucket_t *SVC_BucketForAddress( netadr_t address, int burst, int per
 	leakyBucket_t	*bucket = nullptr;
 	int						i;
 	long					hash = SVC_HashForAddress( address );
-	int						now = Sys_Milliseconds();
+	int						now = System::milliseconds();
 
 	for ( bucket = bucketHashes[ hash ]; bucket; bucket = bucket->next ) {
 		switch ( bucket->type ) {
@@ -498,7 +498,7 @@ SVC_RateLimit
 */
 bool SVC_RateLimit( leakyBucket_t *bucket, int burst, int period ) {
 	if ( bucket != nullptr ) {
-		int now = Sys_Milliseconds();
+		int now = System::milliseconds();
 		int interval = now - bucket->lastTime;
 		int expired = interval / period;
 		int expiredRemainder = interval % period;
@@ -1158,7 +1158,7 @@ void SV_Frame( int msec )
 
 	if ( com_speeds->integer ) 
 	{
-		startTime = Sys_Milliseconds ();
+		startTime = System::milliseconds ();
 	}
 	else 
 	{
@@ -1181,7 +1181,7 @@ void SV_Frame( int msec )
 	}
 
 	if ( com_speeds->integer ) 
-		time_game = Sys_Milliseconds () - startTime;
+		time_game = System::milliseconds () - startTime;
 
 	// check timeouts
 	SV_CheckTimeouts();
@@ -1235,7 +1235,7 @@ int SV_Client::rateMsec()
 		messageSize += UDPIP_HEADER_SIZE;
 		
 	rateMsec = messageSize * 1000 / (static_cast<int>(rate * com_timescale->value));
-	rate = Sys_Milliseconds() - this->netchan_.lastSentTime;
+	rate = System::milliseconds() - this->netchan_.lastSentTime;
 	
 	if(rate > rateMsec)
 		return 0;
@@ -1269,7 +1269,7 @@ int SV_SendQueuedPackets()
 	{
 		// Rate limiting. This is very imprecise for high
 		// download rates due to millisecond timedelta resolution
-		dlStart = Sys_Milliseconds();
+		dlStart = System::milliseconds();
 		deltaT = dlNextRound - dlStart;
 
 		if(deltaT > 0)
@@ -1284,7 +1284,7 @@ int SV_SendQueuedPackets()
 			if(numBlocks)
 			{
 				// There are active downloads
-				deltaT = Sys_Milliseconds() - dlStart;
+				deltaT = System::milliseconds() - dlStart;
 
 				delayT = 1000 * numBlocks * MAX_DOWNLOAD_BLKSIZE;
 				delayT /= sv_dlRate->integer * 1024;

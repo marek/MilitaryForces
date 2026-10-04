@@ -589,21 +589,7 @@ MISC
 // https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=470
 extern char cl_cdkey[34];
 
-// returned by Sys_GetProcessorFeatures
-typedef enum : int
-{
-  CF_RDTSC      = 1 << 0,
-  CF_MMX        = 1 << 1,
-  CF_MMX_EXT    = 1 << 2,
-  CF_3DNOW      = 1 << 3,
-  CF_3DNOW_EXT  = 1 << 4,
-  CF_SSE        = 1 << 5,
-  CF_SSE2       = 1 << 6,
-  CF_ALTIVEC    = 1 << 7
-} cpuFeatures_t;
-
-inline cpuFeatures_t operator|( cpuFeatures_t a, cpuFeatures_t b ) { return (cpuFeatures_t)( (int)a | (int)b ); }
-inline cpuFeatures_t &operator|=( cpuFeatures_t &a, cpuFeatures_t b ) { a = a | b; return a; }
+// returned by System::getProcessorFeatures
 
 // centralized and cleaned, that's the max string you can send to a Com_Printf / Com_DPrintf (above gets truncated)
 inline constexpr int MAXPRINTMSG = 4096;
@@ -888,28 +874,18 @@ NON-PORTABLE SYSTEM SERVICES
 
 inline constexpr int MAX_JOYSTICK_AXIS = 16;
 
-void	Sys_Init ();
 
-bool Sys_DllExtension( const char *name );
 
-char	*Sys_GetCurrentUser( );
 
-void	QDECL Sys_Error( const char *error, ...) Q_NO_RETURN Q_PRINTF_FUNC(1, 2);
-void	Sys_Quit () Q_NO_RETURN;
-char	*Sys_GetClipboardData( );	// note that this isn't journaled...
 
-void	Sys_Print( const char *msg );
 
-// Sys_Milliseconds should only be used for profiling purposes,
+// System::milliseconds should only be used for profiling purposes,
 // any game related timing information should come from event timestamps
-int		Sys_Milliseconds ();
 
-bool Sys_RandomBytes( byte *string, int len );
 
 // the system console is shown when a dedicated server is running
 void	Sys_DisplaySystemConsole( bool show );
 
-cpuFeatures_t Sys_GetProcessorFeatures( );
 
 void	Sys_SetErrorText( const char *text );
 
@@ -921,57 +897,17 @@ bool	Sys_StringToAdr( const char *s, netadr_t *a, netadrtype_t family );
 bool	Sys_IsLANAddress (netadr_t adr);
 void		Sys_ShowIP();
 
-FILE	*Sys_FOpen( const char *ospath, const char *mode );
-bool Sys_Mkdir( const char *path );
-FILE	*Sys_Mkfifo( const char *ospath );
-char	*Sys_Cwd( );
-void	Sys_SetDefaultInstallPath(const char *path);
-char	*Sys_DefaultInstallPath();
-char	*Sys_SteamPath();
-char	*Sys_GogPath();
-char	*Sys_MicrosoftStorePath();
 
 #ifdef __APPLE__
-char    *Sys_DefaultAppPath();
 #endif
 
-char	*Sys_DefaultHomeConfigPath();
-char	*Sys_DefaultHomeDataPath();
-char	*Sys_DefaultHomeStatePath();
-const char *Sys_Dirname( char *path );
-const char *Sys_Basename( char *path );
-char *Sys_ConsoleInput();
 
-char **Sys_ListFiles( const char *directory, const char *extension, char *filter, int *numfiles, bool wantsubs );
-void	Sys_FreeFileList( char **list );
-void	Sys_Sleep(int msec);
 
-bool Sys_LowPhysicalMemory( );
 
-void Sys_SetEnv(const char *name, const char *value);
 
-enum dialogResult_t
-{
-	DR_YES = 0,
-	DR_NO = 1,
-	DR_OK = 0,
-	DR_CANCEL = 1
-};
 
-enum dialogType_t
-{
-	DT_INFO,
-	DT_WARNING,
-	DT_ERROR,
-	DT_YES_NO,
-	DT_OK_CANCEL
-};
 
-dialogResult_t Sys_Dialog( dialogType_t type, const char *message, const char *title );
-bool Sys_OpenFolderInFileManager( const char *path, bool create );
 
-void Sys_RemovePIDFile( const char *gamedir );
-void Sys_InitPIDFile( const char *gamedir );
 
 /* This is based on the Adaptive Huffman algorithm described in Sayood's Data
  * Compression book.  The ranks are not actually stored, but implicitly defined

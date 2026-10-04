@@ -143,7 +143,7 @@ void NetChannel::transmitNextFragment() {
 	Network::sendPacket(this->sock, send.cursize, send.data, this->remoteAddress);
 	
 	// Store send time and size of this packet for rate control
-	this->lastSentTime = Sys_Milliseconds();
+	this->lastSentTime = System::milliseconds();
 	this->lastSentSize = send.cursize;
 
 	if ( showpackets->integer ) {
@@ -218,7 +218,7 @@ void NetChannel::transmit( int length, const byte *data ) {
 	Network::sendPacket( this->sock, send.cursize, send.data, this->remoteAddress );
 
 	// Store send time and size of this packet for rate control
-	this->lastSentTime = Sys_Milliseconds();
+	this->lastSentTime = System::milliseconds();
 	this->lastSentSize = send.cursize;
 
 	if ( showpackets->integer ) {
@@ -502,7 +502,7 @@ static void NET_QueuePacket( int length, const void *data, netadr_t to,
 	Com_Memcpy(newPacket->data, data, length);
 	newPacket->length = length;
 	newPacket->to = to;
-	newPacket->release = Sys_Milliseconds() + static_cast<int>(static_cast<float>(offset) / com_timescale->value);	
+	newPacket->release = System::milliseconds() + static_cast<int>(static_cast<float>(offset) / com_timescale->value);	
 	newPacket->next = nullptr;
 
 	if(!packetQueue) {
@@ -524,7 +524,7 @@ void Network::flushPacketQueue()
 	int now;
 
 	while(packetQueue) {
-		now = Sys_Milliseconds();
+		now = System::milliseconds();
 		if(packetQueue->release >= now)
 			break;
 		Sys_SendPacket(packetQueue->length, packetQueue->data,

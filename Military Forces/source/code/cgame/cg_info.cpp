@@ -43,7 +43,7 @@ CG_LoadingString
 */
 static void CG_LoadingRefresh( bool force ) {
 	int hz = cgs.glconfig.displayFrequency > 0 ? cgs.glconfig.displayFrequency : 60;
-	int now = Sys_Milliseconds();
+	int now = System::milliseconds();
 
 	if ( !force && now - cg.infoLoadRefreshTime < 1000 / hz ) {
 		return;

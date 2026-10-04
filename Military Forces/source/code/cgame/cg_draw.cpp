@@ -551,7 +551,7 @@ static float CG_DrawFPS( float y ) {
 
 	// don't use serverTime, because that will be drifting to
 	// correct for internet lag changes, timescales, timedemos, etc
-	t = Sys_Milliseconds();
+	t = System::milliseconds();
 	frameTime = t - previous;
 	previous = t;
 

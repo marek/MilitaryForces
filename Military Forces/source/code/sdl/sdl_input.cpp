@@ -1204,7 +1204,7 @@ static void IN_ProcessEvents( )
 							// Wait until user stops dragging for 1 second, so
 							// we aren't constantly recreating the GL context while
 							// he tries to drag...
-							vidRestartTime = Sys_Milliseconds( ) + 1000;
+							vidRestartTime = System::milliseconds( ) + 1000;
 						}
 						break;
 
@@ -1282,10 +1282,10 @@ void IN_Frame( )
 	IN_ProcessEvents( );
 
 	// Set event time for next frame to earliest possible time an event could happen
-	in_eventTime = Sys_Milliseconds( );
+	in_eventTime = System::milliseconds( );
 
 	// In case we had to delay actual restart of video system
-	if( ( vidRestartTime != 0 ) && ( vidRestartTime < Sys_Milliseconds( ) ) )
+	if( ( vidRestartTime != 0 ) && ( vidRestartTime < System::milliseconds( ) ) )
 	{
 		vidRestartTime = 0;
 		CommandBuffer::addText( "vid_restart\n" );

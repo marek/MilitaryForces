@@ -1649,4 +1649,6 @@ int ahextoi( const char* string );
 
 #include "../qcommon/screen.h"
 
+#include "../qcommon/system.h"
+
 #endif	// __Q_SHARED_H

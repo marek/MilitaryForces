@@ -94,8 +94,8 @@ Con_ToggleMenu_f
 ===================
 */
 void Con_ToggleMenu_f( ) {
-	CL_KeyEvent( K_ESCAPE, true, Sys_Milliseconds() );
-	CL_KeyEvent( K_ESCAPE, false, Sys_Milliseconds() );
+	CL_KeyEvent( K_ESCAPE, true, System::milliseconds() );
+	CL_KeyEvent( K_ESCAPE, false, System::milliseconds() );
 }
 
 /*

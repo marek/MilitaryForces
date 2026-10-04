@@ -287,7 +287,7 @@ S_AL_BufferEvict
 static bool S_AL_BufferEvict( )
 {
 	int	i, oldestBuffer = -1;
-	int	oldestTime = Sys_Milliseconds( );
+	int	oldestTime = System::milliseconds( );
 
 	for( i = 0; i < numSfx; i++ )
 	{
@@ -463,7 +463,7 @@ void S_AL_BufferUse(sfxHandle_t sfx)
 
 	if((!knownSfx[sfx].inMemory) && (!knownSfx[sfx].isDefault))
 		S_AL_BufferLoad(sfx, true);
-	knownSfx[sfx].lastUsedTime = Sys_Milliseconds();
+	knownSfx[sfx].lastUsedTime = System::milliseconds();
 }
 
 /*
@@ -801,7 +801,7 @@ static void S_AL_SrcSetup(srcHandle_t src, sfxHandle_t sfx, alSrcPriority_t prio
 	// Set up src struct
 	curSource = &srcList[src];
 	
-	curSource->lastUsedTime = Sys_Milliseconds();
+	curSource->lastUsedTime = System::milliseconds();
 	curSource->sfx = sfx;
 	curSource->priority = priority;
 	curSource->entity = entity;
@@ -869,7 +869,7 @@ static void S_AL_SaveLoopPos(src_t *dest, ALuint alSource)
 		dest->lastTimePos = -1;
 	}
 	else
-		dest->lastSampleTime = Sys_Milliseconds();
+		dest->lastSampleTime = System::milliseconds();
 }
 
 /*
@@ -1033,7 +1033,7 @@ srcHandle_t S_AL_SrcAlloc( alSrcPriority_t priority, int entnum, int channel )
 	int i;
 	int empty = -1;
 	int weakest = -1;
-	int weakest_time = Sys_Milliseconds();
+	int weakest_time = System::milliseconds();
 	int weakest_pri = 999;
 	float weakest_gain = 1000.0;
 	bool weakest_isplaying = true;
@@ -1344,7 +1344,7 @@ static void S_AL_SrcLoop( alSrcPriority_t priority, sfxHandle_t sfx,
 		sent->startLoopingSound = true;
 
 		curSource->lastTimePos = -1.0;
-		curSource->lastSampleTime = Sys_Milliseconds();
+		curSource->lastSampleTime = System::milliseconds();
 	}
 	else
 	{
@@ -1558,7 +1558,7 @@ void S_AL_SrcUpdate( )
 						
 							if(master->lastTimePos >= 0)
 							{
-								secofs = master->lastTimePos + (Sys_Milliseconds() - master->lastSampleTime) / 1000.0f;
+								secofs = master->lastTimePos + (System::milliseconds() - master->lastSampleTime) / 1000.0f;
 								secofs = fmodf(secofs, static_cast<float>(curSfx->info.samples) / curSfx->info.rate);
 						
 								qalSourcef(curSource->alSource, AL_SEC_OFFSET, secofs);
@@ -1576,7 +1576,7 @@ void S_AL_SrcUpdate( )
 						
 						// For unsynced loops (SRCPRI_ENTITY) just carry on playing as if the sound was never stopped
 						
-						secofs = curSource->lastTimePos + (Sys_Milliseconds() - curSource->lastSampleTime) / 1000.0f;
+						secofs = curSource->lastTimePos + (System::milliseconds() - curSource->lastSampleTime) / 1000.0f;
 						secofs = fmodf(secofs, static_cast<float>(curSfx->info.samples) / curSfx->info.rate);
 						qalSourcef(curSource->alSource, AL_SEC_OFFSET, secofs);
 					}

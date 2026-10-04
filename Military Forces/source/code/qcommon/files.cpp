@@ -570,7 +570,7 @@ bool FileSystem::createPath (const char *OSPath) {
 		if (*ofs == PATH_SEP) {
 			// create the directory
 			*ofs = 0;
-			if (!Sys_Mkdir (path)) {
+			if (!System::makeDir (path)) {
 				Com_Error( ERR_FATAL, "FileSystem::createPath: failed to create path \"%s\"",
 					path );
 			}
@@ -592,7 +592,7 @@ static void FS_CheckFilenameIsMutable( const char *filename,
 		const char *function )
 {
 	// Check if the filename ends with the library, QVM, or pk3 extension
-	if( Sys_DllExtension( filename )
+	if( System::dllExtension( filename )
 		|| COM_CompareExtension( filename, ".qvm" )
 		|| COM_CompareExtension( filename, ".pk3" ) )
 	{
@@ -637,7 +637,7 @@ bool FS_FileInPathExists(const char *testpath)
 {
 	FILE *filep;
 
-	filep = Sys_FOpen(testpath, "rb");
+	filep = System::fileOpen(testpath, "rb");
 	
 	if(filep)
 	{
@@ -701,7 +701,7 @@ static fileHandle_t FS_OSPath_FOpenFileWrite( const char *ospath, const char *fi
 		return 0;
 	}
 
-	fsh[f].handleFiles.file.o = Sys_FOpen( ospath, "wb" );
+	fsh[f].handleFiles.file.o = System::fileOpen( ospath, "wb" );
 
 	Q_strncpyz( fsh[f].name, filename, sizeof( fsh[f].name ) );
 
@@ -781,7 +781,7 @@ long FileSystem::baseDir_FOpenFileRead(const char *filename, fileHandle_t *fp)
 			Com_Printf( "FileSystem::baseDir_FOpenFileRead (%s): %s\n", pathVar->name, ospath );
 		}
 
-		fsh[f].handleFiles.file.o = Sys_FOpen( ospath, "rb" );
+		fsh[f].handleFiles.file.o = System::fileOpen( ospath, "rb" );
 		fsh[f].handleSync = false;
 	}
 
@@ -924,7 +924,7 @@ fileHandle_t FileSystem::fOpenFileAppend_HomeData( const char *filename ) {
 		return 0;
 	}
 
-	fsh[f].handleFiles.file.o = Sys_FOpen( ospath, "ab" );
+	fsh[f].handleFiles.file.o = System::fileOpen( ospath, "ab" );
 	fsh[f].handleSync = false;
 	if (!fsh[f].handleFiles.file.o) {
 		f = 0;
@@ -963,7 +963,7 @@ fileHandle_t FileSystem::fCreateOpenPipeFile( const char *filename ) {
 
 	FS_CheckFilenameIsMutable( ospath, __func__ );
 
-	fifo = Sys_Mkfifo( ospath );
+	fifo = System::makeFifo( ospath );
 	if( fifo ) {
 		fsh[f].handleFiles.file.o = fifo;
 		fsh[f].handleSync = false;
@@ -1163,7 +1163,7 @@ long FS_FOpenFileReadDir(const char *filename, searchpath_t *search, fileHandle_
 			dir = search->dir;
 
 			netpath = FileSystem::buildOSPath(dir->path, dir->gamedir, filename);
-			filep = Sys_FOpen(netpath, "rb");
+			filep = System::fileOpen(netpath, "rb");
 
 			if(filep)
 			{
@@ -1298,7 +1298,7 @@ long FS_FOpenFileReadDir(const char *filename, searchpath_t *search, fileHandle_
 		dir = search->dir;
 
 		netpath = FileSystem::buildOSPath(dir->path, dir->gamedir, filename);
-		filep = Sys_FOpen(netpath, "rb");
+		filep = System::fileOpen(netpath, "rb");
 
 		if (filep == nullptr)
 		{
@@ -2194,13 +2194,13 @@ char **FS_ListFilteredFiles( const char *path, const char *extension,
 				continue;
 			} else {
 				netpath = FileSystem::buildOSPath( search->dir->path, search->dir->gamedir, path );
-				sysFiles = Sys_ListFiles( netpath, extension, filter, &numSysFiles, false );
+				sysFiles = System::listFiles( netpath, extension, filter, &numSysFiles, false );
 				for ( i = 0 ; i < numSysFiles ; i++ ) {
 					// unique the match
 					name = sysFiles[i];
 					nfiles = FS_AddFileToList( name, list, nfiles );
 				}
-				Sys_FreeFileList( sysFiles );
+				System::freeFileList( sysFiles );
 			}
 		}
 	}
@@ -2299,7 +2299,7 @@ mkv: Naive implementation. Concatenates three lists into a
      new list, and frees the old lists from the heap.
 bk001129 - from cvs1.17 (mkv)
 
-FIXME TTimo those two should move to common.c next to Sys_ListFiles
+FIXME TTimo those two should move to common.c next to System::listFiles
 =======================
  */
 static unsigned int Sys_CountFileList(char **list)
@@ -2412,8 +2412,8 @@ int	FileSystem::getModList( char *listbuf, int bufsize ) {
 			continue;
 		}
 
-		pFiles0 = Sys_ListFiles(pathVar->string, nullptr, nullptr, &dummy, true);
-		// Sys_ConcatenateFileLists frees the lists so Sys_FreeFileList isn't required
+		pFiles0 = System::listFiles(pathVar->string, nullptr, nullptr, &dummy, true);
+		// Sys_ConcatenateFileLists frees the lists so System::freeFileList isn't required
 		pFiles = Sys_ConcatenateFileLists(pFiles, pFiles0);
 	}
 
@@ -2450,17 +2450,17 @@ int	FileSystem::getModList( char *listbuf, int bufsize ) {
 
 			path = FileSystem::baseDir_BuildOSPath(pathVar->string, name);
 			nPaks = nDirs = nPakDirs = 0;
-			pPaks = Sys_ListFiles(path, ".pk3", nullptr, &nPaks, false);
-			pDirs = Sys_ListFiles(path, "/", nullptr, &nDirs, false);
+			pPaks = System::listFiles(path, ".pk3", nullptr, &nPaks, false);
+			pDirs = System::listFiles(path, "/", nullptr, &nDirs, false);
 			for (k = 0; k < nDirs; k++) {
 				// we only want to count directories ending with ".pk3dir"
 				if (FS_IsExt(pDirs[k], ".pk3dir", strlen(pDirs[k]))) {
 					nPakDirs++;
 				}
 			}
-			// we only use Sys_ListFiles to check whether files are present
-			Sys_FreeFileList(pPaks);
-			Sys_FreeFileList(pDirs);
+			// we only use System::listFiles to check whether files are present
+			System::freeFileList(pPaks);
+			System::freeFileList(pDirs);
 
 			if (nPaks > 0 || nPakDirs > 0) {
 				break;
@@ -2486,7 +2486,7 @@ int	FileSystem::getModList( char *listbuf, int bufsize ) {
 			}
 		}
 	}
-	Sys_FreeFileList( pFiles );
+	System::freeFileList( pFiles );
 
 	return nMods;
 }
@@ -2809,7 +2809,7 @@ static void FS_AddGameDirectory( const char *path, const char *dir ) {
 	Q_strncpyz(curpath, FileSystem::baseDir_BuildOSPath(path, dir), sizeof(curpath));
 
 	// Get .pk3 files
-	pakfiles = Sys_ListFiles(curpath, ".pk3", nullptr, &numfiles, false);
+	pakfiles = System::listFiles(curpath, ".pk3", nullptr, &numfiles, false);
 
 	if ( pakfiles ) {
 		qsort( pakfiles, numfiles, sizeof(char*), paksort );
@@ -2819,8 +2819,8 @@ static void FS_AddGameDirectory( const char *path, const char *dir ) {
 		numdirs = 0;
 		pakdirs = nullptr;
 	} else {
-		// Get top level directories (we'll filter them later since the Sys_ListFiles filtering is terrible)
-		pakdirs = Sys_ListFiles(curpath, "/", nullptr, &numdirs, false);
+		// Get top level directories (we'll filter them later since the System::listFiles filtering is terrible)
+		pakdirs = System::listFiles(curpath, "/", nullptr, &numdirs, false);
 
 		qsort( pakdirs, numdirs, sizeof(char *), paksort );
 	}
@@ -2897,8 +2897,8 @@ static void FS_AddGameDirectory( const char *path, const char *dir ) {
 	}
 
 	// done
-	Sys_FreeFileList( pakfiles );
-	Sys_FreeFileList( pakdirs );
+	System::freeFileList( pakfiles );
+	System::freeFileList( pakdirs );
 
 	//
 	// add the directory to the search path
@@ -3260,16 +3260,16 @@ FS_Startup
 static void FS_Startup( const char *gameName )
 {
 	cvar_t *fs_homepath = CvarSystem::get("fs_homepath", "", CVAR_INIT|CVAR_PROTECTED);
-	const char *configPath = Sys_DefaultHomeConfigPath();
-	const char *dataPath = Sys_DefaultHomeDataPath();
-	const char *statePath = Sys_DefaultHomeStatePath();
+	const char *configPath = System::defaultHomeConfigPath();
+	const char *dataPath = System::defaultHomeDataPath();
+	const char *statePath = System::defaultHomeStatePath();
 
 	if(*(fs_homepath)->string) {
 		// Setting fs_homepath manually overrides everything else
 		configPath = dataPath = statePath = fs_homepath->string;
 	} else if(!*configPath || !*dataPath || !*statePath) {
 		// #shouldneverhappen; just a sensible fallback
-		configPath = dataPath = statePath = Sys_DefaultInstallPath();
+		configPath = dataPath = statePath = System::defaultInstallPath();
 	}
 
 	Com_Printf( "----- FS_Startup -----\n" );
@@ -3277,18 +3277,18 @@ static void FS_Startup( const char *gameName )
 	fs_packFiles = 0;
 
 	fs_debug = CvarSystem::get( "fs_debug", "0", 0 );
-	fs_basepath = CvarSystem::get ("fs_basepath", Sys_DefaultInstallPath(), CVAR_INIT|CVAR_PROTECTED );
+	fs_basepath = CvarSystem::get ("fs_basepath", System::defaultInstallPath(), CVAR_INIT|CVAR_PROTECTED );
 	fs_basegame = CvarSystem::get ("fs_basegame", "", CVAR_INIT );
 	fs_homeconfigpath = CvarSystem::get ("fs_homeconfigpath", configPath, CVAR_INIT|CVAR_PROTECTED );
 	fs_homedatapath = CvarSystem::get ("fs_homedatapath", dataPath, CVAR_INIT|CVAR_PROTECTED );
 	fs_homestatepath = CvarSystem::get ("fs_homestatepath", statePath, CVAR_INIT|CVAR_PROTECTED );
 	fs_gamedirvar = CvarSystem::get ("fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
-	fs_steampath = CvarSystem::get ("fs_steampath", Sys_SteamPath(), CVAR_INIT|CVAR_PROTECTED );
-	fs_gogpath = CvarSystem::get ("fs_gogpath", Sys_GogPath(), CVAR_INIT|CVAR_PROTECTED );
-	fs_microsoftstorepath = CvarSystem::get ("fs_microsoftstorepath", Sys_MicrosoftStorePath(), CVAR_INIT|CVAR_PROTECTED );
+	fs_steampath = CvarSystem::get ("fs_steampath", System::steamPath(), CVAR_INIT|CVAR_PROTECTED );
+	fs_gogpath = CvarSystem::get ("fs_gogpath", System::gogPath(), CVAR_INIT|CVAR_PROTECTED );
+	fs_microsoftstorepath = CvarSystem::get ("fs_microsoftstorepath", System::microsoftStorePath(), CVAR_INIT|CVAR_PROTECTED );
 
 #ifdef __APPLE__
-	fs_apppath = CvarSystem::get ("fs_apppath", Sys_DefaultAppPath(), CVAR_INIT|CVAR_PROTECTED );
+	fs_apppath = CvarSystem::get ("fs_apppath", System::defaultAppPath(), CVAR_INIT|CVAR_PROTECTED );
 #endif
 
 	FS_InitPathVars( );
@@ -3359,7 +3359,7 @@ static void FS_Startup( const char *gameName )
 
 #ifdef FS_MISSING
 	if (missingFiles == NULL) {
-		missingFiles = Sys_FOpen( "\\missing.txt", "ab" );
+		missingFiles = System::fileOpen( "\\missing.txt", "ab" );
 	}
 #endif
 	Com_Printf( "%d files in pk3 files\n", fs_packFiles );
@@ -3631,7 +3631,7 @@ static void FS_CheckPak0( void )
 						"in the \"%s\" directory is present and readable", BASEGAME));
 		}
 
-		Sys_OpenFolderInFileManager(gamePath, true);
+		System::openFolderInFileManager(gamePath, true);
 		Com_Error(ERR_FATAL, "%s", errorText);
 	}
 
@@ -3673,7 +3673,7 @@ static void FS_CheckPak0( void )
 						"in the \"%s\" directory is present and readable", BASETA));
 		}
 
-		Sys_OpenFolderInFileManager(gamePath, true);
+		System::openFolderInFileManager(gamePath, true);
 		Com_Error(ERR_FATAL, "%s", errorText);
 	}
 }
@@ -4094,8 +4094,8 @@ void FileSystem::restart( int checksumFeed ) {
 	lastGameDir = ( lastValidGame[0] ) ? lastValidGame : lastValidComBaseGame;
 
 	if ( Q_stricmp( FileSystem::getCurrentGameDir(), lastGameDir ) ) {
-		Sys_RemovePIDFile( lastGameDir );
-		Sys_InitPIDFile( FileSystem::getCurrentGameDir() );
+		System::removePIDFile( lastGameDir );
+		System::initPIDFile( FileSystem::getCurrentGameDir() );
 
 		// skip the q3config.cfg if "safe" is on the command line
 		if ( !Com_SafeMode() ) {

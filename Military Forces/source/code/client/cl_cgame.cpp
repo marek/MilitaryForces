@@ -424,7 +424,7 @@ void CL_InitCGame()
 	int					t1, t2;
 //	vmInterpret_t		interpret;
 
-	t1 = Sys_Milliseconds();
+	t1 = System::milliseconds();
 
 	// put away the console
 	Console::close();
@@ -449,7 +449,7 @@ void CL_InitCGame()
 	// will cause the server to send us the first snapshot
 	clc.state = CA_PRIMED;
 
-	t2 = Sys_Milliseconds();
+	t2 = System::milliseconds();
 
 	Com_Printf( "CL_InitCGame: %5.2f seconds\n", (t2-t1)/1000.0 );
 
@@ -458,7 +458,7 @@ void CL_InitCGame()
 	refExport.EndRegistration();
 
 	// make sure everything is paged in
-	if (!Sys_LowPhysicalMemory()) {
+	if (!System::lowPhysicalMemory()) {
 		Com_TouchMemory();
 	}
 
@@ -732,7 +732,7 @@ void CL_SetCGameTime( ) {
 	// while a normal demo may have different time samples
 	// each time it is played back
 	if ( cl_timedemo->integer ) {
-		int now = Sys_Milliseconds( );
+		int now = System::milliseconds( );
 		int frameDuration;
 
 		if (!clc.timeDemoStart) {

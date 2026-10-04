@@ -1404,7 +1404,7 @@ void CG_LoadMenus(const char *menuFile) {
 	fileHandle_t	f;
 	static char buf[MAX_MENUDEFFILE];
 
-	start = Sys_Milliseconds();
+	start = System::milliseconds();
 
 	len = FileSystem::fOpenFileByMode( menuFile, &f, FS_READ );
 	if ( !f ) {

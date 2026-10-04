@@ -187,7 +187,7 @@ void QDECL Com_Printf( const char *fmt, ... ) {
 #endif
 
 	// echo to dedicated console and early console
-	Sys_Print( msg );
+	System::print( msg );
 
 	// logfile
 	if ( com_logfile && com_logfile->integer ) {
@@ -268,7 +268,7 @@ void QDECL Com_Error( int code, const char *fmt, ... ) {
 	bool	restartClient;
 
 	if(com_errorEntered)
-		Sys_Error("recursive error after: %s", com_errorMessage);
+		System::error("recursive error after: %s", com_errorMessage);
 
 	com_errorEntered = true;
 
@@ -281,7 +281,7 @@ void QDECL Com_Error( int code, const char *fmt, ... ) {
 	}
 
 	// if we are getting a solid stream of ERR_DROP, do an ERR_FATAL
-	currentTime = Sys_Milliseconds();
+	currentTime = System::milliseconds();
 	if ( currentTime - lastErrorTime < 100 ) {
 		if ( ++errorCount > 3 ) {
 			code = ERR_FATAL;
@@ -349,7 +349,7 @@ void QDECL Com_Error( int code, const char *fmt, ... ) {
 
 	Com_Shutdown ();
 
-	Sys_Error ("%s", com_errorMessage);
+	System::error ("%s", com_errorMessage);
 }
 
 
@@ -367,14 +367,14 @@ void Com_Quit_f( ) {
 	if ( !com_errorEntered ) {
 		// Some VMs might execute "quit" command directly,
 		// which would trigger an unload of active VM error.
-		// Sys_Quit will kill this process anyways, so
+		// System::quit will kill this process anyways, so
 		// a corrupt call stack makes no difference
 		SV_Shutdown(p[0] ? p : "Server quit");
 		CL_Shutdown(p[0] ? p : "Client quit", true, true);
 		Com_Shutdown ();
 		FileSystem::shutdown(true);
 	}
-	Sys_Quit ();
+	System::quit ();
 }
 
 
@@ -1371,7 +1371,7 @@ void Com_TouchMemory( ) {
 
 	Z_CheckHeap();
 
-	start = Sys_Milliseconds();
+	start = System::milliseconds();
 
 	sum = 0;
 
@@ -1398,7 +1398,7 @@ void Com_TouchMemory( ) {
 		}
 	}
 
-	end = Sys_Milliseconds();
+	end = System::milliseconds();
 
 	(void)sum; // Suppress warning
 
@@ -1986,7 +1986,7 @@ void Com_QueueEvent( int time, sysEventType_t type, int value, int value2, int p
 
 	if ( time == 0 )
 	{
-		time = Sys_Milliseconds();
+		time = System::milliseconds();
 	}
 
 	ev->evTime = time;
@@ -2016,7 +2016,7 @@ sysEvent_t Com_GetSystemEvent( )
 	}
 
 	// check for console commands
-	s = Sys_ConsoleInput();
+	s = System::consoleInput();
 	if ( s )
 	{
 		char  *b;
@@ -2037,7 +2037,7 @@ sysEvent_t Com_GetSystemEvent( )
 
 	// create an empty event to return
 	memset( &ev, 0, sizeof( ev ) );
-	ev.evTime = Sys_Milliseconds();
+	ev.evTime = System::milliseconds();
 
 	return ev;
 }
@@ -2157,13 +2157,13 @@ void Com_RunAndTimeServerPacket( netadr_t *evFrom, Message *buf ) {
 	t1 = 0;
 
 	if ( com_speeds->integer ) {
-		t1 = Sys_Milliseconds ();
+		t1 = System::milliseconds ();
 	}
 
 	SV_PacketEvent( *evFrom, buf );
 
 	if ( com_speeds->integer ) {
-		t2 = Sys_Milliseconds ();
+		t2 = System::milliseconds ();
 		msec = t2 - t1;
 		if ( com_speeds->integer == 3 ) {
 			Com_Printf( "SV_PacketEvent time: %i\n", msec );
@@ -2335,7 +2335,7 @@ void Com_Setenv_f()
 	{
 		char *arg2 = CommandSystem::argsFrom(2);
 		
-		Sys_SetEnv(arg1, arg2);
+		System::setEnv(arg1, arg2);
 	}
 	else if(argc == 2)
 	{
@@ -2573,7 +2573,7 @@ static void Com_DetectAltivec()
 		static bool altivec = false;
 		static bool detected = false;
 		if (!detected) {
-			altivec = !!( Sys_GetProcessorFeatures( ) & CF_ALTIVEC );
+			altivec = !!( System::getProcessorFeatures( ) & CF_ALTIVEC );
 			detected = true;
 		}
 
@@ -2597,7 +2597,7 @@ static void Com_DetectSSE()
 #if !idx64
 	cpuFeatures_t feat;
 	
-	feat = Sys_GetProcessorFeatures();
+	feat = System::getProcessorFeatures();
 
 	if(feat & CF_SSE)
 	{
@@ -2638,7 +2638,7 @@ static void Com_InitRand()
 {
 	unsigned int seed;
 
-	if(Sys_RandomBytes(reinterpret_cast<byte *>(&seed), sizeof(seed)))
+	if(System::randomBytes(reinterpret_cast<byte *>(&seed), sizeof(seed)))
 		srand(seed);
 	else
 		srand(time(nullptr));
@@ -2656,7 +2656,7 @@ void Com_Init( char *commandLine ) {
 	Com_Printf( "%s %s %s\n", Q3_VERSION, PLATFORM_STRING, PRODUCT_DATE );
 
 	if ( setjmp (abortframe) ) {
-		Sys_Error ("Error during initialization");
+		System::error ("Error during initialization");
 	}
 
 	// Clear queues
@@ -2796,9 +2796,9 @@ void Com_Init( char *commandLine ) {
 	con_autochat = CvarSystem::get("con_autochat", "1", CVAR_ARCHIVE);
 #endif
 
-	Sys_Init();
+	System::init();
 
-	Sys_InitPIDFile( FileSystem::getCurrentGameDir() );
+	System::initPIDFile( FileSystem::getCurrentGameDir() );
 
 	// Pick a random port value
 	Com_RandomBytes( reinterpret_cast<byte*>(&qport), sizeof(int) );
@@ -3052,7 +3052,7 @@ int Com_TimeVal(int minMsec)
 {
 	int timeVal;
 
-	timeVal = Sys_Milliseconds() - com_frameTime;
+	timeVal = System::milliseconds() - com_frameTime;
 
 	if(timeVal >= minMsec)
 		timeVal = 0;
@@ -3097,7 +3097,7 @@ void Com_Frame( ) {
 	// main event loop
 	//
 	if ( com_speeds->integer ) {
-		timeBeforeFirstEvents = Sys_Milliseconds ();
+		timeBeforeFirstEvents = System::milliseconds ();
 	}
 
 	// Figure out how much time we have
@@ -3172,7 +3172,7 @@ void Com_Frame( ) {
 	// server side
 	//
 	if ( com_speeds->integer ) {
-		timeBeforeServer = Sys_Milliseconds ();
+		timeBeforeServer = System::milliseconds ();
 	}
 
 	SV_Frame( msec );
@@ -3200,7 +3200,7 @@ void Com_Frame( ) {
 	// without a frame of latency
 	//
 	if ( com_speeds->integer ) {
-		timeBeforeEvents = Sys_Milliseconds ();
+		timeBeforeEvents = System::milliseconds ();
 	}
 	Com_EventLoop();
 	CommandBuffer::execute ();
@@ -3210,17 +3210,17 @@ void Com_Frame( ) {
 	// client side
 	//
 	if ( com_speeds->integer ) {
-		timeBeforeClient = Sys_Milliseconds ();
+		timeBeforeClient = System::milliseconds ();
 	}
 
 	CL_Frame( msec );
 
 	if ( com_speeds->integer ) {
-		timeAfter = Sys_Milliseconds ();
+		timeAfter = System::milliseconds ();
 	}
 #else
 	if ( com_speeds->integer ) {
-		timeAfter = Sys_Milliseconds ();
+		timeAfter = System::milliseconds ();
 		timeBeforeEvents = timeAfter;
 		timeBeforeClient = timeAfter;
 	}
@@ -3573,7 +3573,7 @@ void Com_RandomBytes( byte *string, int len )
 {
 	int i;
 
-	if( Sys_RandomBytes( string, len ) )
+	if( System::randomBytes( string, len ) )
 		return;
 
 	Com_Printf( "Com_RandomBytes: using weak randomization\n" );

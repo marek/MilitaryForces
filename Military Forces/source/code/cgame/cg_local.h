@@ -1658,7 +1658,6 @@ void ME_Init_MissionEditor();
 //===============================================
 
 // system calls
-int Sys_Milliseconds ();
 void CL_AddCgameCommand( const char *cmdName );
 void CL_AddReliableCommand(const char *cmd, bool isDisconnectCmd = false);
 void CL_CM_LoadMap( const char *mapname );

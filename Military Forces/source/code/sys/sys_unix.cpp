@@ -142,9 +142,9 @@ static char *Sys_DefaultHomePath()
 	return homePath;
 }
 
-char *Sys_DefaultHomeConfigPath() { return Sys_DefaultHomePath(); }
-char *Sys_DefaultHomeDataPath()   { return Sys_DefaultHomePath(); }
-char *Sys_DefaultHomeStatePath()  { return Sys_DefaultHomePath(); }
+char *System::defaultHomeConfigPath() { return Sys_DefaultHomePath(); }
+char *System::defaultHomeDataPath()   { return Sys_DefaultHomePath(); }
+char *System::defaultHomeStatePath()  { return Sys_DefaultHomePath(); }
 
 #else // __APPLE__
 
@@ -413,7 +413,7 @@ static bool Sys_ShouldUseLegacyHomePath(void)
 	// If the user hasn't already refused, ask if they want to migrate
 	if( access( migrationRefusedPath, F_OK ) != 0 )
 	{
-		dialogResult_t result = Sys_Dialog( DT_YES_NO, va(
+		dialogResult_t result = System::dialog( DT_YES_NO, va(
 			"Modern games and applications store files in "
 			"directories according to the Free Desktop standard. "
 			"Here's what that would look like for %s:\n\n"
@@ -439,10 +439,10 @@ static bool Sys_ShouldUseLegacyHomePath(void)
 
 /*
 ==================
-Sys_DefaultHomeConfigPath
+System::defaultHomeConfigPath
 ==================
 */
-char *Sys_DefaultHomeConfigPath(void)
+char *System::defaultHomeConfigPath(void)
 {
 	if( Sys_ShouldUseLegacyHomePath( ) )
 		return Sys_LegacyHomePath( );
@@ -452,10 +452,10 @@ char *Sys_DefaultHomeConfigPath(void)
 
 /*
 ==================
-Sys_DefaultHomeDataPath
+System::defaultHomeDataPath
 ==================
 */
-char *Sys_DefaultHomeDataPath(void)
+char *System::defaultHomeDataPath(void)
 {
 	if( Sys_ShouldUseLegacyHomePath( ) )
 		return Sys_LegacyHomePath( );
@@ -465,10 +465,10 @@ char *Sys_DefaultHomeDataPath(void)
 
 /*
 ==================
-Sys_DefaultHomeStatePath
+System::defaultHomeStatePath
 ==================
 */
-char *Sys_DefaultHomeStatePath(void)
+char *System::defaultHomeStatePath(void)
 {
 	if( Sys_ShouldUseLegacyHomePath( ) )
 		return Sys_LegacyHomePath( );
@@ -480,10 +480,10 @@ char *Sys_DefaultHomeStatePath(void)
 
 /*
 ================
-Sys_SteamPath
+System::steamPath
 ================
 */
-char *Sys_SteamPath( )
+char *System::steamPath( )
 {
 	// Steam doesn't let you install Quake 3 on Mac/Linux
 	return "";
@@ -491,10 +491,10 @@ char *Sys_SteamPath( )
 
 /*
 ================
-Sys_GogPath
+System::gogPath
 ================
 */
-char *Sys_GogPath( )
+char *System::gogPath( )
 {
 	// GOG doesn't let you install Quake 3 on Mac/Linux
 	return "";
@@ -502,10 +502,10 @@ char *Sys_GogPath( )
 
 /*
 ================
-Sys_MicrosoftStorePath
+System::microsoftStorePath
 ================
 */
-char* Sys_MicrosoftStorePath()
+char* System::microsoftStorePath()
 {
 	// Microsoft Store doesn't exist on Mac/Linux
 	return "";
@@ -514,7 +514,7 @@ char* Sys_MicrosoftStorePath()
 
 /*
 ================
-Sys_Milliseconds
+System::milliseconds
 ================
 */
 /* base time in seconds, that's our origin
@@ -527,7 +527,7 @@ unsigned long sys_timeBase = 0;
    although timeval:tv_usec is an int, I'm not sure wether it is actually used as an unsigned int
      (which would affect the wrap period) */
 int curtime;
-int Sys_Milliseconds ()
+int System::milliseconds ()
 {
 	struct timeval tp;
 
@@ -546,10 +546,10 @@ int Sys_Milliseconds ()
 
 /*
 ==================
-Sys_RandomBytes
+System::randomBytes
 ==================
 */
-bool Sys_RandomBytes( byte *string, int len )
+bool System::randomBytes( byte *string, int len )
 {
 	FILE *fp;
 
@@ -571,10 +571,10 @@ bool Sys_RandomBytes( byte *string, int len )
 
 /*
 ==================
-Sys_GetCurrentUser
+System::getCurrentUser
 ==================
 */
-char *Sys_GetCurrentUser( )
+char *System::getCurrentUser( )
 {
 	struct passwd *p;
 
@@ -588,42 +588,42 @@ char *Sys_GetCurrentUser( )
 
 /*
 ==================
-Sys_LowPhysicalMemory
+System::lowPhysicalMemory
 
 TODO
 ==================
 */
-bool Sys_LowPhysicalMemory( )
+bool System::lowPhysicalMemory( )
 {
 	return false;
 }
 
 /*
 ==================
-Sys_Basename
+System::baseName
 ==================
 */
-const char *Sys_Basename( char *path )
+const char *System::baseName( char *path )
 {
 	return basename( path );
 }
 
 /*
 ==================
-Sys_Dirname
+System::dirName
 ==================
 */
-const char *Sys_Dirname( char *path )
+const char *System::dirName( char *path )
 {
 	return dirname( path );
 }
 
 /*
 ==============
-Sys_FOpen
+System::fileOpen
 ==============
 */
-FILE *Sys_FOpen( const char *ospath, const char *mode ) {
+FILE *System::fileOpen( const char *ospath, const char *mode ) {
 	struct stat buf;
 
 	// check if path exists and is a directory
@@ -635,10 +635,10 @@ FILE *Sys_FOpen( const char *ospath, const char *mode ) {
 
 /*
 ==================
-Sys_Mkdir
+System::makeDir
 ==================
 */
-bool Sys_Mkdir( const char *path )
+bool System::makeDir( const char *path )
 {
 	int result = mkdir( path, 0750 );
 
@@ -650,10 +650,10 @@ bool Sys_Mkdir( const char *path )
 
 /*
 ==================
-Sys_Mkfifo
+System::makeFifo
 ==================
 */
-FILE *Sys_Mkfifo( const char *ospath )
+FILE *System::makeFifo( const char *ospath )
 {
 	FILE	*fifo;
 	int	result;
@@ -680,10 +680,10 @@ FILE *Sys_Mkfifo( const char *ospath )
 
 /*
 ==================
-Sys_Cwd
+System::cwd
 ==================
 */
-char *Sys_Cwd( )
+char *System::cwd( )
 {
 	static char cwd[MAX_OSPATH];
 
@@ -787,10 +787,10 @@ void Sys_ListFilteredFiles( const char *basedir, char *subdirs, char *filter, ch
 
 /*
 ==================
-Sys_ListFiles
+System::listFiles
 ==================
 */
-char **Sys_ListFiles( const char *directory, const char *extension, char *filter, int *numfiles, bool wantsubs )
+char **System::listFiles( const char *directory, const char *extension, char *filter, int *numfiles, bool wantsubs )
 {
 	struct dirent *d;
 	DIR           *fdir;
@@ -892,10 +892,10 @@ char **Sys_ListFiles( const char *directory, const char *extension, char *filter
 
 /*
 ==================
-Sys_FreeFileList
+System::freeFileList
 ==================
 */
-void Sys_FreeFileList( char **list )
+void System::freeFileList( char **list )
 {
 	int i;
 
@@ -912,12 +912,12 @@ void Sys_FreeFileList( char **list )
 
 /*
 ==================
-Sys_Sleep
+System::sleepMsec
 
 Block execution for msec or until input is received.
 ==================
 */
-void Sys_Sleep( int msec )
+void System::sleepMsec( int msec )
 {
 	if( msec == 0 )
 		return;
@@ -972,10 +972,10 @@ void Sys_ErrorDialog( const char *error )
 	const char *fileName = "crashlog.txt";
 	char *ospath = FileSystem::buildOSPath( homedatapath, gamedir, fileName );
 
-	Sys_Print( va( "%s\n", error ) );
+	System::print( va( "%s\n", error ) );
 
 #ifndef DEDICATED
-	Sys_Dialog( DT_ERROR, va( "%s. See \"%s\" for details.", error, ospath ), "Error" );
+	System::dialog( DT_ERROR, va( "%s. See \"%s\" for details.", error, ospath ), "Error" );
 #endif
 
 	// Make sure the write path for the crashlog exists...
@@ -1088,12 +1088,12 @@ static void Sys_XmessageCommand( dialogType_t type, const char *message, const c
 
 /*
 ==============
-Sys_Dialog
+System::dialog
 
 Display a *nix dialog box
 ==============
 */
-dialogResult_t Sys_Dialog( dialogType_t type, const char *message, const char *title )
+dialogResult_t System::dialog( dialogType_t type, const char *message, const char *title )
 {
 	enum dialogCommandType_t
 	{
@@ -1225,13 +1225,13 @@ void Sys_PlatformExit( )
 
 /*
 ==============
-Sys_SetEnv
+System::setEnv
 
 set/unset environment variables (empty value removes it)
 ==============
 */
 
-void Sys_SetEnv(const char *name, const char *value)
+void System::setEnv(const char *name, const char *value)
 {
 	if(value && *value)
 		setenv(name, value, 1);
@@ -1261,12 +1261,12 @@ bool Sys_PIDIsRunning( int pid )
 
 /*
 =================
-Sys_DllExtension
+System::dllExtension
 
 Check if filename should be allowed to be loaded as a DLL.
 =================
 */
-bool Sys_DllExtension( const char *name ) {
+bool System::dllExtension( const char *name ) {
 	const char *p;
 	char c = 0;
 

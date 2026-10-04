@@ -918,7 +918,6 @@ void UI_SPSkillMenu( const char *arenaInfo );
 void UI_SPSkillMenu_Cache( );
 
 // system calls
-int Sys_Milliseconds ();
 void Key_KeynumToStringBuf( int keynum, char *buf, int buflen );
 void Key_GetBindingBuf( int keynum, char *buf, int buflen );
 int Key_GetCatcher();

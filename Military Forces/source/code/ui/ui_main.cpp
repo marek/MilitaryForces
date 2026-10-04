@@ -1002,7 +1002,7 @@ void UI_LoadMenus(const char *menuFile, bool reset)
 	int handle;
 	int start;
 
-	start = Sys_Milliseconds();
+	start = System::milliseconds();
 
 	handle = uiInfo.uiUtils.getPrecompilerTools()->loadSourceHandle( menuFile );
 	if (!handle) {
@@ -5909,7 +5909,7 @@ void _UI_Init( bool inGameLoad )
 
 	AssetCache();
 
-	start = Sys_Milliseconds();
+	start = System::milliseconds();
 
 	uiInfo.teamCount = 0;
 	uiInfo.characterCount = 0;

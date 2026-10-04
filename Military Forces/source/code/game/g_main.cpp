@@ -1665,7 +1665,7 @@ void G_RunFrame( int levelTime )
 	//
 	// go through all allocated objects
 	//
-	int start = Sys_Milliseconds();
+	int start = System::milliseconds();
 	GameEntity* ent = nullptr;//&g_entities[0];
 	for( i=0 ; i<theLevel.num_entities_ ; i++ )
 	{
@@ -1727,9 +1727,9 @@ void G_RunFrame( int levelTime )
 		}
 		G_RunThink( ent );
 	}
-	int end = Sys_Milliseconds();
+	int end = System::milliseconds();
 
-	start = Sys_Milliseconds();
+	start = System::milliseconds();
 	// perform final fixups on the players
 	//ent = &g_entities[0];
 	for( i=1 ; i <= theLevel.maxclients_ ; i++ ) 
@@ -1738,7 +1738,7 @@ void G_RunFrame( int levelTime )
 		if( ent && ent->inuse_ ) 
 			ClientEndFrame( ent );
 	}
-	end = Sys_Milliseconds();
+	end = System::milliseconds();
 
 	// see if it is time to do a tournement restart
 	CheckTournament();

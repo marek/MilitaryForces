@@ -597,7 +597,7 @@ GetClipboardData
 void GetClipboardData( char *buf, int buflen ) {
 	char	*cbd;
 
-	cbd = Sys_GetClipboardData();
+	cbd = System::getClipboardData();
 
 	if ( !cbd ) {
 		*buf = 0;

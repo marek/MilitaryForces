@@ -36,12 +36,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /*
 ==============
-Sys_Dialog
+System::dialog
 
 Display an OS X dialog box
 ==============
 */
-dialogResult_t Sys_Dialog( dialogType_t type, const char *message, const char *title )
+dialogResult_t System::dialog( dialogType_t type, const char *message, const char *title )
 {
 	dialogResult_t result = DR_OK;
 	NSAlert *alert = [NSAlert new];
@@ -104,14 +104,14 @@ char *Sys_StripAppBundle( char *dir )
 	static char cwd[MAX_OSPATH];
 
 	Q_strncpyz(cwd, dir, sizeof(cwd));
-	if(strcmp(Sys_Basename(cwd), "MacOS"))
+	if(strcmp(System::baseName(cwd), "MacOS"))
 		return dir;
-	Q_strncpyz(cwd, Sys_Dirname(cwd), sizeof(cwd));
-	if(strcmp(Sys_Basename(cwd), "Contents"))
+	Q_strncpyz(cwd, System::dirName(cwd), sizeof(cwd));
+	if(strcmp(System::baseName(cwd), "Contents"))
 		return dir;
-	Q_strncpyz(cwd, Sys_Dirname(cwd), sizeof(cwd));
-	if(!strstr(Sys_Basename(cwd), ".app"))
+	Q_strncpyz(cwd, System::dirName(cwd), sizeof(cwd));
+	if(!strstr(System::baseName(cwd), ".app"))
 		return dir;
-	Q_strncpyz(cwd, Sys_Dirname(cwd), sizeof(cwd));
+	Q_strncpyz(cwd, System::dirName(cwd), sizeof(cwd));
 	return cwd;
 }

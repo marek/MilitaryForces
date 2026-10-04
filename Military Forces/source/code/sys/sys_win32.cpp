@@ -114,16 +114,16 @@ static char *Sys_DefaultHomePath( void )
 	return homePath;
 }
 
-char *Sys_DefaultHomeConfigPath(void) { return Sys_DefaultHomePath(); }
-char *Sys_DefaultHomeDataPath(void)   { return Sys_DefaultHomePath(); }
-char *Sys_DefaultHomeStatePath(void)  { return Sys_DefaultHomePath(); }
+char *System::defaultHomeConfigPath(void) { return Sys_DefaultHomePath(); }
+char *System::defaultHomeDataPath(void)   { return Sys_DefaultHomePath(); }
+char *System::defaultHomeStatePath(void)  { return Sys_DefaultHomePath(); }
 
 /*
 ================
-Sys_SteamPath
+System::steamPath
 ================
 */
-char *Sys_SteamPath( void )
+char *System::steamPath( void )
 {
 #ifndef STANDALONE
 
@@ -179,10 +179,10 @@ char *Sys_SteamPath( void )
 
 /*
 ================
-Sys_GogPath
+System::gogPath
 ================
 */
-char *Sys_GogPath( void )
+char *System::gogPath( void )
 {
 #ifndef STANDALONE
 
@@ -218,10 +218,10 @@ char *Sys_GogPath( void )
 
 /*
 ================
-Sys_MicrosoftStorePath
+System::microsoftStorePath
 ================
 */
-char* Sys_MicrosoftStorePath(void)
+char* System::microsoftStorePath(void)
 {
 #ifndef STANDALONE
 
@@ -252,11 +252,11 @@ char* Sys_MicrosoftStorePath(void)
 
 /*
 ================
-Sys_Milliseconds
+System::milliseconds
 ================
 */
 int sys_timeBase;
-int Sys_Milliseconds (void)
+int System::milliseconds (void)
 {
 	int             sys_curtime;
 	static bool initialized = false;
@@ -272,10 +272,10 @@ int Sys_Milliseconds (void)
 
 /*
 ================
-Sys_RandomBytes
+System::randomBytes
 ================
 */
-bool Sys_RandomBytes( byte *string, int len )
+bool System::randomBytes( byte *string, int len )
 {
 	HCRYPTPROV  prov;
 
@@ -295,10 +295,10 @@ bool Sys_RandomBytes( byte *string, int len )
 
 /*
 ================
-Sys_GetCurrentUser
+System::getCurrentUser
 ================
 */
-char *Sys_GetCurrentUser( void )
+char *System::getCurrentUser( void )
 {
 	static char s_userName[1024];
 	unsigned long size = sizeof( s_userName );
@@ -318,10 +318,10 @@ char *Sys_GetCurrentUser( void )
 
 /*
 ==================
-Sys_LowPhysicalMemory
+System::lowPhysicalMemory
 ==================
 */
-bool Sys_LowPhysicalMemory( void )
+bool System::lowPhysicalMemory( void )
 {
 	MEMORYSTATUS stat;
 	GlobalMemoryStatus (&stat);
@@ -330,10 +330,10 @@ bool Sys_LowPhysicalMemory( void )
 
 /*
 ==============
-Sys_Basename
+System::baseName
 ==============
 */
-const char *Sys_Basename( char *path )
+const char *System::baseName( char *path )
 {
 	static char base[ MAX_OSPATH ] = { 0 };
 	int length;
@@ -360,10 +360,10 @@ const char *Sys_Basename( char *path )
 
 /*
 ==============
-Sys_Dirname
+System::dirName
 ==============
 */
-const char *Sys_Dirname( char *path )
+const char *System::dirName( char *path )
 {
 	static char dir[ MAX_OSPATH ] = { 0 };
 	int length;
@@ -381,10 +381,10 @@ const char *Sys_Dirname( char *path )
 
 /*
 ==============
-Sys_FOpen
+System::fileOpen
 ==============
 */
-FILE *Sys_FOpen( const char *ospath, const char *mode ) {
+FILE *System::fileOpen( const char *ospath, const char *mode ) {
 	size_t length;
 
 	// Windows API ignores all trailing spaces and periods which can get around Quake 3 file system restrictions.
@@ -398,10 +398,10 @@ FILE *Sys_FOpen( const char *ospath, const char *mode ) {
 
 /*
 ==============
-Sys_Mkdir
+System::makeDir
 ==============
 */
-bool Sys_Mkdir( const char *path )
+bool System::makeDir( const char *path )
 {
 	if( !CreateDirectory( path, NULL ) )
 	{
@@ -414,21 +414,21 @@ bool Sys_Mkdir( const char *path )
 
 /*
 ==================
-Sys_Mkfifo
+System::makeFifo
 Noop on windows because named pipes do not function the same way
 ==================
 */
-FILE *Sys_Mkfifo( const char *ospath )
+FILE *System::makeFifo( const char *ospath )
 {
 	return NULL;
 }
 
 /*
 ==============
-Sys_Cwd
+System::cwd
 ==============
 */
-char *Sys_Cwd( void ) {
+char *System::cwd( void ) {
 	static char cwd[MAX_OSPATH];
 
 	_getcwd( cwd, sizeof( cwd ) - 1 );
@@ -552,10 +552,10 @@ static bool strgtr(const char *s0, const char *s1)
 
 /*
 ==============
-Sys_ListFiles
+System::listFiles
 ==============
 */
-char **Sys_ListFiles( const char *directory, const char *extension, char *filter, int *numfiles, bool wantsubs )
+char **System::listFiles( const char *directory, const char *extension, char *filter, int *numfiles, bool wantsubs )
 {
 	char		search[MAX_OSPATH];
 	int			nfiles;
@@ -669,10 +669,10 @@ char **Sys_ListFiles( const char *directory, const char *extension, char *filter
 
 /*
 ==============
-Sys_FreeFileList
+System::freeFileList
 ==============
 */
-void Sys_FreeFileList( char **list )
+void System::freeFileList( char **list )
 {
 	int i;
 
@@ -690,12 +690,12 @@ void Sys_FreeFileList( char **list )
 
 /*
 ==============
-Sys_Sleep
+System::sleepMsec
 
 Block execution for msec or until input is received.
 ==============
 */
-void Sys_Sleep( int msec )
+void System::sleepMsec( int msec )
 {
 	if( msec == 0 )
 		return;
@@ -706,7 +706,7 @@ void Sys_Sleep( int msec )
 	else
 		WaitForSingleObject( GetStdHandle( STD_INPUT_HANDLE ), msec );
 #else
-	// Client Sys_Sleep doesn't support waiting on stdin
+	// Client System::sleepMsec doesn't support waiting on stdin
 	if( msec < 0 )
 		return;
 
@@ -723,9 +723,9 @@ Display an error message
 */
 void Sys_ErrorDialog( const char *error )
 {
-	Sys_Print( va( "%s\n", error ) );
+	System::print( va( "%s\n", error ) );
 
-	if( Sys_Dialog( DT_YES_NO, va( "%s. Copy console log to clipboard?", error ),
+	if( System::dialog( DT_YES_NO, va( "%s. Copy console log to clipboard?", error ),
 			"Error" ) == DR_YES )
 	{
 		HGLOBAL memoryHandle;
@@ -759,12 +759,12 @@ void Sys_ErrorDialog( const char *error )
 
 /*
 ==============
-Sys_Dialog
+System::dialog
 
 Display a win32 dialog box
 ==============
 */
-dialogResult_t Sys_Dialog( dialogType_t type, const char *message, const char *title )
+dialogResult_t System::dialog( dialogType_t type, const char *message, const char *title )
 {
 	UINT uType;
 
@@ -860,12 +860,12 @@ void Sys_PlatformExit( void )
 
 /*
 ==============
-Sys_SetEnv
+System::setEnv
 
 set/unset environment variables (empty value removes it)
 ==============
 */
-void Sys_SetEnv(const char *name, const char *value)
+void System::setEnv(const char *name, const char *value)
 {
 	if(value)
 		_putenv(va("%s=%s", name, value));
@@ -911,12 +911,12 @@ bool Sys_PIDIsRunning( int pid )
 
 /*
 =================
-Sys_DllExtension
+System::dllExtension
 
 Check if filename should be allowed to be loaded as a DLL.
 =================
 */
-bool Sys_DllExtension( const char *name ) {
+bool System::dllExtension( const char *name ) {
 	return COM_CompareExtension( name, DLL_EXT );
 }
 

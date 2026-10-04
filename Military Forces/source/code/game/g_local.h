@@ -940,7 +940,6 @@ extern	vmCvar_t	mf_allowNukes;
 
 
 // system calls
-int Sys_Milliseconds ();
 void SV_GetUsercmd( int clientNum, usercmd_t *cmd );
 bool SV_GetEntityToken( char *buffer, int bufferSize );
 bool SV_EntityContact( const vec3_t mins, const vec3_t maxs, EntityBase* gameEnt, bool capsule );

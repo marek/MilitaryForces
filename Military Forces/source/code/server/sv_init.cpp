@@ -752,7 +752,7 @@ void SV_FinalMessage( const char *message )
 SV_Shutdown
 
 Called when each game quits,
-before Sys_Quit or Sys_Error
+before System::quit or System::error
 ================
 */
 void SV_Shutdown( const char *finalmsg ) 

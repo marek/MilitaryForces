@@ -76,33 +76,33 @@ char *Sys_BinaryPath()
 
 /*
 =================
-Sys_SetDefaultInstallPath
+System::setDefaultInstallPath
 =================
 */
-void Sys_SetDefaultInstallPath(const char *path)
+void System::setDefaultInstallPath(const char *path)
 {
 	Q_strncpyz(installPath, path, sizeof(installPath));
 }
 
 /*
 =================
-Sys_DefaultInstallPath
+System::defaultInstallPath
 =================
 */
-char *Sys_DefaultInstallPath()
+char *System::defaultInstallPath()
 {
 	if (*installPath)
 		return installPath;
 	else
-		return Sys_Cwd();
+		return System::cwd();
 }
 
 /*
 =================
-Sys_DefaultAppPath
+System::defaultAppPath
 =================
 */
-char *Sys_DefaultAppPath()
+char *System::defaultAppPath()
 {
 	return Sys_BinaryPath();
 }
@@ -129,22 +129,22 @@ void Sys_In_Restart_f( )
 
 /*
 =================
-Sys_ConsoleInput
+System::consoleInput
 
 Handle new console input
 =================
 */
-char *Sys_ConsoleInput()
+char *System::consoleInput()
 {
 	return CON_Input( );
 }
 
 /*
 ==================
-Sys_GetClipboardData
+System::getClipboardData
 ==================
 */
-char *Sys_GetClipboardData()
+char *System::getClipboardData()
 {
 #ifdef DEDICATED
 	return NULL;
@@ -191,10 +191,10 @@ static char *Sys_PIDFileName( const char *gamedir )
 
 /*
 =================
-Sys_RemovePIDFile
+System::removePIDFile
 =================
 */
-void Sys_RemovePIDFile( const char *gamedir )
+void System::removePIDFile( const char *gamedir )
 {
 	char *pidFile = Sys_PIDFileName( gamedir );
 
@@ -254,10 +254,10 @@ static bool Sys_WritePIDFile( const char *gamedir )
 
 /*
 =================
-Sys_InitPIDFile
+System::initPIDFile
 =================
 */
-void Sys_InitPIDFile( const char *gamedir ) {
+void System::initPIDFile( const char *gamedir ) {
 	if( Sys_WritePIDFile( gamedir ) ) {
 #ifndef DEDICATED
 		char message[1024];
@@ -270,7 +270,7 @@ void Sys_InitPIDFile( const char *gamedir ) {
 			"it didn't exit properly. This may be due to inappropriate video "
 			"settings. Would you like to start with \"safe\" video settings?", modName );
 
-		if( Sys_Dialog( DT_YES_NO, message, "Abnormal Exit" ) == DR_YES ) {
+		if( System::dialog( DT_YES_NO, message, "Abnormal Exit" ) == DR_YES ) {
 			CvarSystem::set( "com_abnormalExit", "1" );
 		}
 #endif
@@ -279,10 +279,10 @@ void Sys_InitPIDFile( const char *gamedir ) {
 
 /*
 =================
-Sys_OpenFolderInFileManager
+System::openFolderInFileManager
 =================
 */
-bool Sys_OpenFolderInFileManager( const char *path, bool create )
+bool System::openFolderInFileManager( const char *path, bool create )
 {
 	if( create )
 	{
@@ -311,7 +311,7 @@ static Q_NO_RETURN void Sys_Exit( int exitCode )
 	if( exitCode < 2 && com_fullyInitialized )
 	{
 		// Normal exit
-		Sys_RemovePIDFile( FileSystem::getCurrentGameDir() );
+		System::removePIDFile( FileSystem::getCurrentGameDir() );
 	}
 
 	Network::shutdown( );
@@ -323,20 +323,20 @@ static Q_NO_RETURN void Sys_Exit( int exitCode )
 
 /*
 =================
-Sys_Quit
+System::quit
 =================
 */
-void Sys_Quit( )
+void System::quit( )
 {
 	Sys_Exit( 0 );
 }
 
 /*
 =================
-Sys_GetProcessorFeatures
+System::getProcessorFeatures
 =================
 */
-cpuFeatures_t Sys_GetProcessorFeatures( )
+cpuFeatures_t System::getProcessorFeatures( )
 {
 	cpuFeatures_t features = static_cast<cpuFeatures_t>(0);
 
@@ -354,14 +354,14 @@ cpuFeatures_t Sys_GetProcessorFeatures( )
 
 /*
 =================
-Sys_Init
+System::init
 =================
 */
-void Sys_Init()
+void System::init()
 {
 	CommandSystem::addCommand( "in_restart", Sys_In_Restart_f );
 	CvarSystem::set( "arch", OS_STRING " " ARCH_STRING );
-	CvarSystem::set( "username", Sys_GetCurrentUser( ) );
+	CvarSystem::set( "username", System::getCurrentUser( ) );
 }
 
 /*
@@ -435,10 +435,10 @@ void Sys_AnsiColorPrint( const char *msg )
 
 /*
 =================
-Sys_Print
+System::print
 =================
 */
-void Sys_Print( const char *msg )
+void System::print( const char *msg )
 {
 	CON_LogWrite( msg );
 	CON_Print( msg );
@@ -446,10 +446,10 @@ void Sys_Print( const char *msg )
 
 /*
 =================
-Sys_Error
+System::error
 =================
 */
-void Sys_Error( const char *error, ... )
+void System::error( const char *error, ... )
 {
 	va_list argptr;
 	char    string[1024];
@@ -513,7 +513,7 @@ void *Sys_LoadDll(const char *name, bool useSystemLib)
 {
 	void *dllhandle = nullptr;
 
-	if(!Sys_DllExtension(name))
+	if(!System::dllExtension(name))
 	{
 		Com_Printf("Refusing to attempt to load library \"%s\": Extension not allowed.\n", name);
 		return nullptr;
@@ -750,7 +750,7 @@ int main( int argc, char **argv )
 	if( SDL_VERSIONNUM( ver.major, ver.minor, ver.patch ) <
 			SDL_VERSIONNUM( MINSDL_MAJOR, MINSDL_MINOR, MINSDL_PATCH ) )
 	{
-		Sys_Dialog( DT_ERROR, va( "SDL version " MINSDL_VERSION " or greater is required, "
+		System::dialog( DT_ERROR, va( "SDL version " MINSDL_VERSION " or greater is required, "
 			"but only version %d.%d.%d was found. You may be able to obtain a more recent copy "
 			"from https://www.libsdl.org/.", ver.major, ver.minor, ver.patch ), "SDL Library Too Old" );
 
@@ -762,7 +762,7 @@ int main( int argc, char **argv )
 	Sys_SetMaxFileLimit( );
 
 	// Set the initial time base
-	Sys_Milliseconds( );
+	System::milliseconds( );
 
 #ifdef __APPLE__
 	// This is passed if we are launched by double-clicking
@@ -771,8 +771,8 @@ int main( int argc, char **argv )
 #endif
 
 	Sys_ParseArgs( argc, argv );
-	Sys_SetBinaryPath( Sys_Dirname( argv[ 0 ] ) );
-	Sys_SetDefaultInstallPath( DEFAULT_BASEDIR );
+	Sys_SetBinaryPath( System::dirName( argv[ 0 ] ) );
+	System::setDefaultInstallPath( DEFAULT_BASEDIR );
 
 	// Concatenate the command line for passing to Com_Init
 	for( i = 1; i < argc; i++ )
