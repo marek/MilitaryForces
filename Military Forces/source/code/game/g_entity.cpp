@@ -206,84 +206,104 @@ GameEntity::cleanAll()
 	VectorClear(pos1_);
 	VectorClear(pos2_);
 	VectorClear(movedir_);
-	thinkFunc_ = nullptr;
-	reachedFunc_ = nullptr;
-	blockedFunc_ = nullptr;
-	touchFunc_ = nullptr;
-	useFunc_ = nullptr;
-	painFunc_ = nullptr;
-	dieFunc_ = nullptr;
+	retireAll();
+}
+
+static std::vector<std::unique_ptr<GameEntity::EntityFunc_Base>> retiredFuncs;
+
+template<class T>
+static void retire( std::unique_ptr<T>& func )
+{
+	if( func )
+		retiredFuncs.push_back( std::move( func ) );
 }
 
 void
-GameEntity::setThink( EntityFunc_Think* newThink )
+GameEntity::releaseRetired()
 {
+	retiredFuncs.clear();
+}
+
+void
+GameEntity::retireAll()
+{
+	retire( thinkFunc_ );
+	retire( reachedFunc_ );
+	retire( blockedFunc_ );
+	retire( touchFunc_ );
+	retire( useFunc_ );
+	retire( painFunc_ );
+	retire( dieFunc_ );
+}
+
+GameEntity::~GameEntity()
+{
+	retireAll();
+}
+
+void
+GameEntity::setThink( std::unique_ptr<EntityFunc_Think> newThink )
+{
+	retire( thinkFunc_ );
+	thinkFunc_ = std::move( newThink );
 	if( thinkFunc_ )
-		delete thinkFunc_;
-	thinkFunc_ = newThink;
-	if( newThink )
 		thinkFunc_->self_ = this;
 }
 
 void
-GameEntity::setReached( EntityFunc_Reached* newReached )
+GameEntity::setReached( std::unique_ptr<EntityFunc_Reached> newReached )
 {
+	retire( reachedFunc_ );
+	reachedFunc_ = std::move( newReached );
 	if( reachedFunc_ )
-		delete reachedFunc_;
-	reachedFunc_ = newReached;
-	if( newReached )
 		reachedFunc_->self_ = this;
 }
 
 void
-GameEntity::setBlocked( EntityFunc_Blocked* newBlocked )
+GameEntity::setBlocked( std::unique_ptr<EntityFunc_Blocked> newBlocked )
 {
+	retire( blockedFunc_ );
+	blockedFunc_ = std::move( newBlocked );
 	if( blockedFunc_ )
-		delete blockedFunc_;
-	blockedFunc_ = newBlocked;
-	if( newBlocked )
 		blockedFunc_->self_ = this;
 }
 
 void
-GameEntity::setTouch( EntityFunc_Touch* newTouch )
+GameEntity::setTouch( std::unique_ptr<EntityFunc_Touch> newTouch )
 {
+	retire( touchFunc_ );
+	touchFunc_ = std::move( newTouch );
 	if( touchFunc_ )
-		delete touchFunc_;
-	touchFunc_ = newTouch;
-	if( newTouch )
 		touchFunc_->self_ = this;
 }
 
 void
-GameEntity::setUse( EntityFunc_Use* newUse )
+GameEntity::setUse( std::unique_ptr<EntityFunc_Use> newUse )
 {
+	retire( useFunc_ );
+	useFunc_ = std::move( newUse );
 	if( useFunc_ )
-		delete useFunc_;
-	useFunc_ = newUse;
-	if( newUse )
 		useFunc_->self_ = this;
 }
 
 void
-GameEntity::setPain( EntityFunc_Pain* newPain )
+GameEntity::setPain( std::unique_ptr<EntityFunc_Pain> newPain )
 {
+	retire( painFunc_ );
+	painFunc_ = std::move( newPain );
 	if( painFunc_ )
-		delete painFunc_;
-	painFunc_ = newPain;
-	if( newPain )
 		painFunc_->self_ = this;
 }
 
 void
-GameEntity::setDie( EntityFunc_Die* newDie )
+GameEntity::setDie( std::unique_ptr<EntityFunc_Die> newDie )
 {
+	retire( dieFunc_ );
+	dieFunc_ = std::move( newDie );
 	if( dieFunc_ )
-		delete dieFunc_;
-	dieFunc_ = newDie;
-	if( newDie )
 		dieFunc_->self_ = this;
 }
+
 
 void
 GameEntity::init(int num)

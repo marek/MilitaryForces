@@ -505,7 +505,7 @@ static void G_burningManExplode( GameEntity *ent )
 
 		GameEntity* bolt = theLevel.spawnEntity();
 		bolt->classname_ = "burningman";
-		bolt->setThink( new Think_ExplodeMissile );
+		bolt->setThink( std::make_unique<Think_ExplodeMissile>());
 		bolt->nextthink_ = theLevel.time_ + 10000 + 4000 * Q_random(&seed);
 		bolt->s.eType = ET_MISSILE;
 		bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
@@ -552,7 +552,7 @@ struct Think_ExplodeNuke : public GameEntity::EntityFunc_Think
 
 		explosion->nukeTime_ = theLevel.time_;
 
-		explosion->setThink(new Think_NukeDamage);//think = NukeDamage;
+		explosion->setThink( std::make_unique<Think_NukeDamage>());//think = NukeDamage;
 		explosion->nextthink_ = theLevel.time_ + 100;
 		explosion->count_ = 0;
 		explosion->s.weaponIndex = self_->s.weaponIndex;
@@ -816,7 +816,7 @@ struct Think_No_Fuel_Flight : public GameEntity::EntityFunc_Think
 			self->tracktarget_->client_->ps_.stats[STAT_LOCKINFO] &= ~LI_BEING_LAUNCHED;
 
 		self->s.pos.trType = TR_GRAVITY;
-		self->setThink(new Think_ExplodeMissile);//think = G_ExplodeMissile;
+		self->setThink( std::make_unique<Think_ExplodeMissile>());//think = G_ExplodeMissile;
 		self->nextthink_ = theLevel.time_ + 5000;
 	}
 };
@@ -828,7 +828,7 @@ static void on_target_lost( GameEntity *missile )
 		missile->tracktarget_->client_->ps_.stats[STAT_LOCKINFO] &= ~LI_BEING_LAUNCHED;
 
 	missile->tracktarget_ = nullptr;
-	missile->setThink(new Think_No_Fuel_Flight);//think = no_fuel_flight;
+	missile->setThink( std::make_unique<Think_No_Fuel_Flight>());//think = no_fuel_flight;
 	missile->nextthink_ = missile->wait_ + 50;
 }
 
@@ -924,7 +924,7 @@ struct Think_FollowTarget : public GameEntity::EntityFunc_Think
 		if( self->lastDist_ && dist > self->lastDist_ && dist < self->splashRadius_ ) 
 		{
 			self->nextthink_ = theLevel.time_ + 10;
-			self->setThink(new Think_ExplodeMissile);//think = G_ExplodeMissile;
+			self->setThink( std::make_unique<Think_ExplodeMissile>());//think = G_ExplodeMissile;
 		}
 
 		// out of seeker cone
@@ -988,10 +988,10 @@ struct Think_DropToNormalTransition : public GameEntity::EntityFunc_Think
 		if( self->tracktarget_ )
 		{
 			self->wait_ = theLevel.time_ + availableWeapons[self->s.weaponIndex].fuelrange;
-			self->setThink(new Think_FollowTarget);
+			self->setThink( std::make_unique<Think_FollowTarget>());
 			self->nextthink_ = theLevel.time_ + 50;
 		} else {
-			self->setThink(new Think_ExplodeMissile);//think = G_ExplodeMissile;
+			self->setThink( std::make_unique<Think_ExplodeMissile>());//think = G_ExplodeMissile;
 			self->nextthink_ = theLevel.time_ + availableWeapons[self->s.weaponIndex].fuelrange;
 		}
 	}
@@ -1052,12 +1052,12 @@ void fire_antiair (GameEntity *self)
 		if( active ) 
 		{
 			bolt->wait_ = theLevel.time_ + availableWeapons[self->client_->ps_.weaponIndex].fuelrange;
-			bolt->setThink(new Think_FollowTarget);
+			bolt->setThink( std::make_unique<Think_FollowTarget>());
 			bolt->nextthink_ = theLevel.time_ + 50;
 		} 
 		else 
 		{
-			bolt->setThink(new Think_ExplodeMissile);//think = G_ExplodeMissile;
+			bolt->setThink( std::make_unique<Think_ExplodeMissile>());//think = G_ExplodeMissile;
 			bolt->nextthink_ = theLevel.time_ + availableWeapons[self->client_->ps_.weaponIndex].fuelrange;
 		}
 		bolt->s.pos.trType = TR_LINEAR;
@@ -1070,7 +1070,7 @@ void fire_antiair (GameEntity *self)
 	} 
 	else 
 	{
-		bolt->setThink(new Think_DropToNormalTransition);
+		bolt->setThink( std::make_unique<Think_DropToNormalTransition>());
 		bolt->nextthink_ = theLevel.time_ + 400;
 		bolt->s.pos.trType = TR_GRAVITY;
 		VectorScale( dir, self->client_->ps_.speed/10, bolt->s.pos.trDelta );
@@ -1150,7 +1150,7 @@ void fire_antiground( GameEntity *self )
 		}
 		bolt->followcone_ = availableWeapons[self->client_->ps_.weaponIndex].followcone;
 //	} else {
-//		bolt->setThink(new Think_ExplodeMissile(bolt));//think = G_ExplodeMissile;
+//		bolt->setThink( std::make_unique<Think_ExplodeMissile>(bolt));//think = G_ExplodeMissile;
 //		bolt->nextthink = level.time + availableWeapons[self->client->ps.weaponIndex].fuelrange;
 	}
 
@@ -1160,12 +1160,12 @@ void fire_antiground( GameEntity *self )
 		if( active ) 
 		{
 			bolt->wait_ = theLevel.time_ + availableWeapons[self->client_->ps_.weaponIndex].fuelrange;
-			bolt->setThink(new Think_FollowTarget);
+			bolt->setThink( std::make_unique<Think_FollowTarget>());
 			bolt->nextthink_ = theLevel.time_ + 50;
 		} 
 		else 
 		{
-			bolt->setThink(new Think_ExplodeMissile);//think = G_ExplodeMissile;
+			bolt->setThink( std::make_unique<Think_ExplodeMissile>());//think = G_ExplodeMissile;
 			bolt->nextthink_ = theLevel.time_ + availableWeapons[self->client_->ps_.weaponIndex].fuelrange;
 		}
 		bolt->s.pos.trType = TR_LINEAR;
@@ -1173,7 +1173,7 @@ void fire_antiground( GameEntity *self )
 	} 
 	else 
 	{
-		bolt->setThink(new Think_DropToNormalTransition);
+		bolt->setThink( std::make_unique<Think_DropToNormalTransition>());
 		bolt->nextthink_ = theLevel.time_ + 400;
 		bolt->s.pos.trType = TR_GRAVITY;
 		VectorScale( dir, self->client_->ps_.speed/10, bolt->s.pos.trDelta );
@@ -1230,7 +1230,7 @@ void fire_ffar (GameEntity *self)
 	bolt = theLevel.spawnEntity();
 	bolt->classname_ = "ffar";
 	bolt->nextthink_ = theLevel.time_ + availableWeapons[self->client_->ps_.weaponIndex].fuelrange;
-	bolt->setThink(new Think_ExplodeMissile);//think = G_ExplodeMissile;
+	bolt->setThink( std::make_unique<Think_ExplodeMissile>());//think = G_ExplodeMissile;
 	bolt->s.eType = ET_MISSILE;
 	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
 	bolt->s.weaponIndex = self->client_->ps_.weaponIndex;
@@ -1277,7 +1277,7 @@ void fire_ironbomb( GameEntity *self )
 	bolt = theLevel.spawnEntity();
 	bolt->classname_ = "ironbomb";
 	bolt->nextthink_ = theLevel.time_ + 10000;
-	bolt->setThink(new Think_ExplodeMissile);//think = G_ExplodeMissile;
+	bolt->setThink( std::make_unique<Think_ExplodeMissile>());//think = G_ExplodeMissile;
 	bolt->s.eType = ET_MISSILE;
 	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
 	bolt->s.weaponIndex = self->client_->ps_.weaponIndex;
@@ -1363,7 +1363,7 @@ void fire_autocannon( GameEntity *self, bool main )
 	bolt = theLevel.spawnEntity();
 	bolt->classname_ = "bullet";
 	bolt->nextthink_ = theLevel.time_ + 4000;
-	bolt->setThink(new GameEntity::EntityFunc_Free);
+	bolt->setThink( std::make_unique<GameEntity::EntityFunc_Free>());
 	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
 	bolt->s.weaponIndex = weapIdx;
 	//availableVehicles[self->client->vehicle].weapons[WP_MACHINEGUN];
@@ -1416,7 +1416,7 @@ void fire_autocannon_GI (GameEntity *self)
 	bolt = theLevel.spawnEntity();
 	bolt->classname_ = "bullet";
 	bolt->nextthink_ = theLevel.time_ + 4000;
-	bolt->setThink(new GameEntity::EntityFunc_Free);
+	bolt->setThink( std::make_unique<GameEntity::EntityFunc_Free>());
 	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
 	bolt->s.weaponIndex = weapIdx;
 	bolt->r.ownerNum = self->s.number;
@@ -1467,7 +1467,7 @@ void fire_maingun( GameEntity *self )
 	bolt = theLevel.spawnEntity();
 	bolt->classname_ = "shell";
 	bolt->nextthink_ = theLevel.time_ + 15000;
-	bolt->setThink(new Think_ExplodeMissile);//think = G_ExplodeMissile;
+	bolt->setThink( std::make_unique<Think_ExplodeMissile>());//think = G_ExplodeMissile;
 	bolt->s.eType = ET_MISSILE;
 	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
 	bolt->s.weaponIndex = self->client_->ps_.weaponIndex;
@@ -1515,7 +1515,7 @@ void fire_flare( GameEntity *self )
 	bolt = theLevel.spawnEntity();
 	bolt->classname_ = "flare";
 	bolt->nextthink_ = theLevel.time_ + 1600;
-	bolt->setThink(new Think_ExplodeMissile);//think = G_ExplodeMissile;
+	bolt->setThink( std::make_unique<Think_ExplodeMissile>());//think = G_ExplodeMissile;
 	bolt->s.eType = ET_MISSILE;
 	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
 	bolt->s.weaponIndex = WI_FLARE;
@@ -1552,7 +1552,7 @@ void fire_flare2( GameEntity *self, vec3_t start, vec3_t up, int age )
 	bolt = theLevel.spawnEntity();
 	bolt->classname_ = "flare";
 	bolt->nextthink_ = theLevel.time_ + age;
-	bolt->setThink(new Think_ExplodeMissile);//think = G_ExplodeMissile;
+	bolt->setThink( std::make_unique<Think_ExplodeMissile>());//think = G_ExplodeMissile;
 	bolt->s.eType = ET_MISSILE;
 	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
 	bolt->s.weaponIndex = WI_FLARE;
@@ -1604,7 +1604,7 @@ void fire_cflare( GameEntity *self)
 	bolt = theLevel.spawnEntity();
 	bolt->classname_ = "cflare";
 	bolt->nextthink_ = theLevel.time_ + age;
-	bolt->setThink(new Think_ExplodeCFlare);
+	bolt->setThink( std::make_unique<Think_ExplodeCFlare>());
 	bolt->s.eType = ET_MISSILE;
 	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
 	bolt->s.weaponIndex = WI_CFLARE;
@@ -1649,7 +1649,7 @@ void drop_fueltank ( GameEntity *self )
 	bolt = theLevel.spawnEntity();
 	bolt->classname_ = "droptank";
 	bolt->nextthink_ = theLevel.time_ + 10000;
-	bolt->setThink(new Think_ExplodeMissile);//think = G_ExplodeMissile;
+	bolt->setThink( std::make_unique<Think_ExplodeMissile>());//think = G_ExplodeMissile;
 	bolt->s.eType = ET_MISSILE;
 	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
 	bolt->s.weaponIndex = self->client_->ps_.weaponIndex;
@@ -1686,7 +1686,7 @@ struct Die_CrateDie : public GameEntity::EntityFunc_Die
 		if (inflictor == self)
 				return;
 		self->takedamage_ = false;
-		self->setThink(new Think_ExplodeMissile);//think = G_ExplodeMissile;
+		self->setThink( std::make_unique<Think_ExplodeMissile>());//think = G_ExplodeMissile;
 		self->nextthink_ = theLevel.time_ + 10;
 	}
 };
@@ -1711,8 +1711,8 @@ void drop_crate( GameEntity *self )
 	bolt->classname_ = "crate";
 	bolt->nextthink_ = theLevel.time_ + 100;
 	//bolt->nextthink = level.time + 10000;
-	bolt->setThink(new Think_Crate);
-	//bolt->setThink(new Think_ExplodeMissile(bolt));//think = G_ExplodeMissile;
+	bolt->setThink( std::make_unique<Think_Crate>());
+	//bolt->setThink( std::make_unique<Think_ExplodeMissile>(bolt));//think = G_ExplodeMissile;
 	bolt->s.eType = ET_MISSILE;
 	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
 	bolt->s.weaponIndex = self->client_->ps_.weaponIndex;
@@ -1729,7 +1729,7 @@ void drop_crate( GameEntity *self )
 
 	bolt->health_ = 5;
 	bolt->takedamage_ = true;
-	bolt->setDie(new Die_CrateDie);
+	bolt->setDie( std::make_unique<Die_CrateDie>());
 	bolt->r.contents = CONTENTS_BODY;
 
 	VectorSet(bolt->r.mins, -10, -3, 0);
@@ -1766,7 +1766,7 @@ void fire_nukebomb ( GameEntity *self )
 	bolt = theLevel.spawnEntity();
 	bolt->classname_ = "nukebomb";
 	bolt->nextthink_ = theLevel.time_ + 10000;
-	bolt->setThink(new Think_ExplodeNuke);
+	bolt->setThink( std::make_unique<Think_ExplodeNuke>());
 	bolt->s.eType = ET_MISSILE;
 	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
 	bolt->s.weaponIndex = self->client_->ps_.weaponIndex;
@@ -1832,7 +1832,7 @@ void fire_nukemissile (GameEntity *self)
 
 	bolt->speed_ = availableWeapons[self->client_->ps_.weaponIndex].muzzleVelocity;
 
-	bolt->setThink(new Think_ExplodeNuke);
+	bolt->setThink( std::make_unique<Think_ExplodeNuke>());
 	bolt->nextthink_ = theLevel.time_ + availableWeapons[self->client_->ps_.weaponIndex].fuelrange;
 
 	bolt->s.pos.trType = TR_LINEAR;
@@ -1903,7 +1903,7 @@ void LaunchMissile_GI( GameEntity* ent )
 	bolt->followcone_ = availableWeapons[ent->s.weaponIndex].followcone;
 	bolt->speed_ = availableWeapons[ent->s.weaponIndex].muzzleVelocity;
 	bolt->wait_ = theLevel.time_ + availableWeapons[ent->s.weaponIndex].fuelrange;
-	bolt->setThink(new Think_FollowTarget);
+	bolt->setThink( std::make_unique<Think_FollowTarget>());
 	bolt->nextthink_ = theLevel.time_ + 50;
 	bolt->s.pos.trType = TR_LINEAR;
 	VectorScale( dir, bolt->speed_, bolt->s.pos.trDelta );
@@ -1969,7 +1969,7 @@ void fire_flak_GI (GameEntity *self)
 	bolt->classname_ = "flak";
 
 	bolt->speed_ = availableWeapons[self->s.weaponIndex].muzzleVelocity;
-	bolt->setThink(new Think_ExplodeFlak);
+	bolt->setThink( std::make_unique<Think_ExplodeFlak>());
 	bolt->nextthink_ = theLevel.time_ + fuse;
 	bolt->s.pos.trType = TR_LINEAR;
 

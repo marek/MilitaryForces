@@ -89,7 +89,7 @@ void SP_func_runway( GameEntity *ent )
 	if (ent->health_ > 0) 
 	{
 		ent->takedamage_ = true;
-		ent->setDie(new Die_ExplosiveDie);
+		ent->setDie( std::make_unique<Die_ExplosiveDie>());
 //		ent->s.ONOFF = OO_RADAR_GROUND;
 	}
 	if( !ent->count_ ) 
@@ -131,7 +131,7 @@ void SP_func_explosive( GameEntity *ent )
 	ent->clipmask_ = MASK_SOLID;
 	VectorCopy( ent->s.origin, ent->s.pos.trBase );
 	VectorCopy( ent->s.origin, ent->r.currentOrigin );
-	ent->setDie(new Die_ExplosiveDie);
+	ent->setDie( std::make_unique<Die_ExplosiveDie>());
 	ent->takedamage_ = true;
 	ent->s.ONOFF = OO_RADAR_GROUND;
 	if( ent->health_ <= 0 ) 
@@ -235,7 +235,7 @@ void SP_trigger_recharge( GameEntity *self )
 	SV_SetBrushModel( self, self->model_ );
 	self->clipmask_ = self->r.contents = CONTENTS_TRIGGER;
 	self->r.svFlags = SVF_NOCLIENT;
-	self->setTouch(new Touch_RechargeTouch);
+	self->setTouch( std::make_unique<Touch_RechargeTouch>());
 	if( self->team_ ) 
 	{
 		if ( Q_stricmp( self->team_, "red" ) == 0 ) 
@@ -297,7 +297,7 @@ void SP_trigger_radio( GameEntity *self )
 	SV_SetBrushModel( self, self->model_ );
 	self->clipmask_ = self->r.contents = CONTENTS_TRIGGER;
 	self->r.svFlags = SVF_NOCLIENT;
-	self->setTouch(new Touch_RadioTower);
+	self->setTouch( std::make_unique<Touch_RadioTower>());
 	if( self->team_ ) 
 	{
 		if ( Q_stricmp( self->team_, "red" ) == 0 ) 

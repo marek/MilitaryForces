@@ -521,7 +521,7 @@ struct Reached_BinaryMover : public GameEntity::EntityFunc_Reached
 				G_AddEvent( self, EV_GENERAL_SOUND, self->soundPos2_, true );
 
 			// return to pos1 after a delay
-			self->setThink(new Think_ReturnToPos1);
+			self->setThink( std::make_unique<Think_ReturnToPos1>());
 			self->nextthink_ = theLevel.time_ + self->wait_;
 
 			// fire targets
@@ -687,8 +687,8 @@ void InitMover( GameEntity *ent )
 	}
 
 
-	ent->setUse(new Use_BinaryMover);
-	ent->setReached(new Reached_BinaryMover);
+	ent->setUse( std::make_unique<Use_BinaryMover>());
+	ent->setReached( std::make_unique<Reached_BinaryMover>());
 
 	ent->moverState_ = GameEntity::MOVER_POS1;
 	ent->r.svFlags = SVF_USE_CURRENT_ORIGIN;
@@ -819,7 +819,7 @@ struct Think_SpawnNewDoorTrigger : public GameEntity::EntityFunc_Think
 		VectorCopy (maxs, other->r.maxs);
 		other->parent_ = self_;
 		other->r.contents = CONTENTS_TRIGGER;
-		other->setTouch(new Touch_DoorTrigger);
+		other->setTouch( std::make_unique<Touch_DoorTrigger>());
 		// remember the thinnest axis
 		other->count_ = best;
 		SV_LinkEntity( other );
@@ -863,7 +863,7 @@ void SP_func_door (GameEntity *ent)
 	ent->sound1to2_ = ent->sound2to1_ = G_SoundIndex("sound/movers/doors/dr1_strt.wav");
 	ent->soundPos1_ = ent->soundPos2_ = G_SoundIndex("sound/movers/doors/dr1_end.wav");
 
-	ent->setBlocked(new Blocked_DoorBlocked);
+	ent->setBlocked( std::make_unique<Blocked_DoorBlocked>());
 
 	// default speed of 400
 	if( !ent->speed_ || ent->speed_ > 20 ) 
@@ -917,11 +917,11 @@ void SP_func_door (GameEntity *ent)
 		if ( ent->targetname_ || health ) 
 		{
 			// non touch/shoot doors
-			ent->setThink(new Think_MatchTeam);
+			ent->setThink( std::make_unique<Think_MatchTeam>());
 		} 
 		else 
 		{
-			ent->setThink(new Think_SpawnNewDoorTrigger);
+			ent->setThink( std::make_unique<Think_SpawnNewDoorTrigger>());
 		}
 	}
 
@@ -991,7 +991,7 @@ void SpawnPlatTrigger( GameEntity *ent )
 	// above the starting position
 	GameEntity* trigger = theLevel.spawnEntity();
 	trigger->classname_ = "plat_trigger";
-	trigger->setTouch(new Touch_PlatCenterTrigger);
+	trigger->setTouch( std::make_unique<Touch_PlatCenterTrigger>());
 	trigger->r.contents = CONTENTS_TRIGGER;
 	trigger->parent_ = ent;
 
@@ -1067,9 +1067,9 @@ void SP_func_plat (GameEntity *ent)
 
 	// touch function keeps the plat from returning while
 	// a live player is standing on it
-	ent->setTouch(new Touch_Plat);
+	ent->setTouch( std::make_unique<Touch_Plat>());
 
-	ent->setBlocked(new Blocked_DoorBlocked);
+	ent->setBlocked( std::make_unique<Blocked_DoorBlocked>());
 
 	ent->parent_ = ent;	// so it can be treated as a door
 
@@ -1156,7 +1156,7 @@ void SP_func_button( GameEntity *ent )
 	else 
 	{
 		// touchable button
-		ent->setTouch(new Touch_Button);
+		ent->setTouch( std::make_unique<Touch_Button>());
 	}
 
 	InitMover( ent );
@@ -1245,7 +1245,7 @@ void Reached_TrainImpl( GameEntity *ent )
 	if( next->wait_ )
 	{
 		ent->nextthink_ = theLevel.time_ + next->wait_ * 1000;
-		ent->setThink(new Think_BeginMoving);
+		ent->setThink( std::make_unique<Think_BeginMoving>());
 		ent->s.pos.trType = TR_STATIONARY;
 	}
 }
@@ -1373,12 +1373,12 @@ void SP_func_train (GameEntity *self)
 	SV_SetBrushModel( self, self->model_ );
 	InitMover( self );
 
-	self->setReached(new Reached_Train);
+	self->setReached( std::make_unique<Reached_Train>());
 
 	// start trains on the second frame, to make sure their targets have had
 	// a chance to spawn
 	self->nextthink_ = theLevel.time_ + FRAMETIME;
-	self->setThink(new Think_SetupTrainTargets);
+	self->setThink( std::make_unique<Think_SetupTrainTargets>());
 }
 
 /*
@@ -1514,7 +1514,7 @@ void SP_func_bobbing (GameEntity *ent)
 		ent->s.pos.trDelta[2] = height;
 
 	// MFQ3
-	ent->setTouch(new Touch_FuncBobbing);
+	ent->setTouch( std::make_unique<Touch_FuncBobbing>());
 }
 
 /*

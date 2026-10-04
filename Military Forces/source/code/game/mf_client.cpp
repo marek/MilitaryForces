@@ -424,7 +424,7 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 	ent->classname_ = "player";
 	ent->r.contents = CONTENTS_BODY;
 	ent->clipmask_ = MASK_PLAYERSOLID;
-	ent->setDie(new VehicleBase::VehicleDeath);
+	ent->setDie( std::make_unique<VehicleBase::VehicleDeath>());
 	ent->waterlevel_ = 0;
 	ent->watertype_ = 0;
 	ent->flags_ = 0;

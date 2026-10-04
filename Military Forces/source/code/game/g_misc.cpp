@@ -135,7 +135,7 @@ void SP_misc_portal_surface( GameEntity *ent )
 	} 
 	else 
 	{
-		ent->setThink(new Think_LocateCamera);
+		ent->setThink( std::make_unique<Think_LocateCamera>());
 		ent->nextthink_ = theLevel.time_ + 100;
 	}
 }

@@ -39,8 +39,8 @@ void MF_Spawn_Plane(GameEntity *ent, int idx, bool landed)
 		ent->client_->ps_.ONOFF |= OO_GEAR;
 
 	// set functions
-	ent->setTouch(new Entity_Plane::Entity_Plane_Touch);
-	ent->setPain(new Entity_Plane::Entity_Plane_Pain);
+	ent->setTouch( std::make_unique<Entity_Plane::Entity_Plane_Touch>());
+	ent->setPain( std::make_unique<Entity_Plane::Entity_Plane_Pain>());
 
 	// update gear anim
 	ent->updateGear_ = true;
@@ -61,7 +61,7 @@ void MF_Spawn_GroundVehicle(GameEntity *ent, int idx)
 	ent->client_->ps_.fixed_throttle = 0;
 
 	// set functions
-	ent->setPain(new Entity_GroundVehicle::Entity_GroundVehicle_Pain);
+	ent->setPain( std::make_unique<Entity_GroundVehicle::Entity_GroundVehicle_Pain>());
 }
 
 // ground vehicles
@@ -89,8 +89,8 @@ void MF_Spawn_Helo(GameEntity *ent, int idx, bool landed)
 	ent->updateGear_ = true;
 
 	// set functions
-	ent->setTouch(new Entity_Helicopter::Entity_Helicopter_Touch);
-	ent->setPain(new Entity_Helicopter::Entity_Helicopter_Pain);
+	ent->setTouch( std::make_unique<Entity_Helicopter::Entity_Helicopter_Touch>());
+	ent->setPain( std::make_unique<Entity_Helicopter::Entity_Helicopter_Pain>());
 
 }
 
@@ -98,8 +98,8 @@ void MF_Spawn_Helo(GameEntity *ent, int idx, bool landed)
 void MF_Spawn_LQM(GameEntity *ent, int idx) 
 {
 	// set functions
-	ent->setTouch(new Entity_Infantry::Entity_Infantry_Touch);
-	ent->setPain(new Entity_Infantry::Entity_Infantry_Pain);
+	ent->setTouch( std::make_unique<Entity_Infantry::Entity_Infantry_Touch>());
+	ent->setPain( std::make_unique<Entity_Infantry::Entity_Infantry_Pain>());
 
 }
 
@@ -115,7 +115,7 @@ void MF_Spawn_Boat(GameEntity *ent, int idx)
 	ent->client_->ps_.fixed_throttle = 0;
 
 	// set functions
-	ent->setPain(new Entity_Boat::Entity_Boat_Pain);
+	ent->setPain( std::make_unique<Entity_Boat::Entity_Boat_Pain>());
 
 	if( availableVehicles[idx].hasDeck ) 
 	{

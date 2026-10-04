@@ -208,7 +208,7 @@ VehicleDeathImpl( GameEntity* self, GameEntity* inflictor, GameEntity* attacker,
 	}
 	else if ( availableVehicles[self->client_->vehicle_].cat & CAT_LQM ) 
 	{
-		self->setDie(new VehicleBase::VehicleDie);
+		self->setDie( std::make_unique<VehicleBase::VehicleDie>());
 		self->client_->respawnTime_ = theLevel.time_ + 3000;
 	}
 	else
@@ -217,7 +217,7 @@ VehicleDeathImpl( GameEntity* self, GameEntity* inflictor, GameEntity* attacker,
 		G_AddEvent( self, EV_VEHICLE_DIE, 0, true );
 
 		// wreck can be blown up (i.e on crash into ground)
-		self->setDie(new VehicleBase::VehicleDie);
+		self->setDie( std::make_unique<VehicleBase::VehicleDie>());
 
 		// prevent early respawning during death anim (allows 30 seconds)
 		self->client_->respawnTime_ = theLevel.time_ + 30000;

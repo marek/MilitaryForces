@@ -284,7 +284,7 @@ struct Touch_ItemTouch : public GameEntity::EntityFunc_Touch
 		else 
 		{
 			self->nextthink_ = theLevel.time_ + respawn * 1000;
-			self->setThink(new Think_RespawnItem);
+			self->setThink( std::make_unique<Think_RespawnItem>());
 		}
 		SV_LinkEntity( self );
 	}
@@ -323,7 +323,7 @@ GameEntity *LaunchItem( gitem_t *item, vec3_t origin, vec3_t velocity )
 	VectorSet( dropped->r.maxs, ITEM_RADIUS, ITEM_RADIUS, ITEM_RADIUS );
 	dropped->r.contents = CONTENTS_TRIGGER;
 
-	dropped->setTouch(new Touch_ItemTouch);
+	dropped->setTouch( std::make_unique<Touch_ItemTouch>());
 
 	G_SetOrigin( dropped, origin );
 	dropped->s.pos.trType = TR_GRAVITY;
@@ -335,14 +335,14 @@ GameEntity *LaunchItem( gitem_t *item, vec3_t origin, vec3_t velocity )
 	if( g_gametype.integer == GT_CTF && item->giType == IT_TEAM) 
 	{ 
 		// Special case for CTF flags
-		dropped->setThink(new Think_Team_DroppedFlagThink);
+		dropped->setThink( std::make_unique<Think_Team_DroppedFlagThink>());
 		dropped->nextthink_ = theLevel.time_ + 180000;
 		Team_CheckDroppedItem( dropped );
 	} 
 	else
 	{
 		// auto-remove after 30 seconds
-		dropped->setThink(new GameEntity::EntityFunc_Free);
+		dropped->setThink( std::make_unique<GameEntity::EntityFunc_Free>());
 		dropped->nextthink_ = theLevel.time_ + 30000;
 	}
 
@@ -415,10 +415,10 @@ void GameItem::Think_FinishSpawningItem::execute()
 	self_->s.modelindex2 = 0; // zero indicates this isn't a dropped item
 
 	self_->r.contents = CONTENTS_TRIGGER;
-	self_->setTouch(new Touch_ItemTouch);
+	self_->setTouch( std::make_unique<Touch_ItemTouch>());
 
 	// useing an item causes it to respawn
-	self_->setUse(new Use_ItemUse);
+	self_->setUse( std::make_unique<Use_ItemUse>());
 
 	if( self_->spawnflags_ & 1 ) 
 	{
@@ -576,7 +576,7 @@ void SaveRegisteredItems()
 //	// some movers spawn on the second frame, so delay item
 //	// spawns until the third frame so they can ride trains
 //	ent->nextthink_ = theLevel.time_ + FRAMETIME * 2;
-//	ent->setThink(new Think_FinishSpawningItem);
+//	ent->setThink( std::make_unique<Think_FinishSpawningItem>());
 //
 //	ent->physicsBounce_ = 0.50;		// items are bouncy
 //}

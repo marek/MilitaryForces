@@ -6,6 +6,9 @@
 #include "g_public.h"
 #include "bg_public.h"
 
+#include <memory>
+#include <vector>
+
 
 struct GameEntity : public EntityBase
 {
@@ -34,23 +37,26 @@ struct GameEntity : public EntityBase
 	struct EntityFunc_Pain;
 	struct EntityFunc_Die;
 
+	struct EntityFunc_Base;
 	struct EntityFunc_Free;	// derived from think to call free()
 
 					GameEntity();
-	~GameEntity() override {}
+	~GameEntity() override;
+
+	static void		releaseRetired();
 
 	void			cleanAll();				// cleans up and sets to 0
 	void			init(int num);			// initialize this ent
 	void			freeUp();				// frees this entity
 
 	// command setters (could be made into template)
-	void			setThink( EntityFunc_Think* newThink );
-	void			setReached( EntityFunc_Reached* newReached );
-	void			setBlocked( EntityFunc_Blocked* newBlocked );
-	void			setTouch( EntityFunc_Touch* newTouch );
-	void			setUse( EntityFunc_Use* newUse );
-	void			setPain( EntityFunc_Pain* newPain );
-	void			setDie( EntityFunc_Die* newDie );
+	void			setThink( std::unique_ptr<EntityFunc_Think> newThink );
+	void			setReached( std::unique_ptr<EntityFunc_Reached> newReached );
+	void			setBlocked( std::unique_ptr<EntityFunc_Blocked> newBlocked );
+	void			setTouch( std::unique_ptr<EntityFunc_Touch> newTouch );
+	void			setUse( std::unique_ptr<EntityFunc_Use> newUse );
+	void			setPain( std::unique_ptr<EntityFunc_Pain> newPain );
+	void			setDie( std::unique_ptr<EntityFunc_Die> newDie );
 
 	// data
 	const static int k_MAX_EVENT_QUEUE_SIZE	= 20;
@@ -188,23 +194,27 @@ struct GameEntity : public EntityBase
 	//virtual void	pain( GameEntity* attacker, int damage ) = 0;
 	//virtual void	die( GameEntity* inflictor, GameEntity* attacker, int damage, int mod ) = 0;
 
-	EntityFunc_Think* thinkFunc_;
-	EntityFunc_Reached* reachedFunc_;
-	EntityFunc_Blocked* blockedFunc_;
-	EntityFunc_Touch* touchFunc_;
-	EntityFunc_Use* useFunc_;
-	EntityFunc_Pain* painFunc_;
-	EntityFunc_Die* dieFunc_;
+	void			retireAll();
+
+	std::unique_ptr<EntityFunc_Think> thinkFunc_;
+	std::unique_ptr<EntityFunc_Reached> reachedFunc_;
+	std::unique_ptr<EntityFunc_Blocked> blockedFunc_;
+	std::unique_ptr<EntityFunc_Touch> touchFunc_;
+	std::unique_ptr<EntityFunc_Use> useFunc_;
+	std::unique_ptr<EntityFunc_Pain> painFunc_;
+	std::unique_ptr<EntityFunc_Die> dieFunc_;
 };
 
-struct GameEntity::EntityFunc_Think
+struct GameEntity::EntityFunc_Base
 {
-	EntityFunc_Think() : self_(nullptr) {}
-	virtual ~EntityFunc_Think() {}
+	virtual ~EntityFunc_Base() {}
 
+	GameEntity*	self_ = nullptr;
+};
+
+struct GameEntity::EntityFunc_Think : public GameEntity::EntityFunc_Base
+{
 	virtual void	execute() = 0;
-
-	GameEntity*	self_;
 };
 
 struct GameEntity::EntityFunc_Free : public GameEntity::EntityFunc_Think
@@ -215,64 +225,34 @@ struct GameEntity::EntityFunc_Free : public GameEntity::EntityFunc_Think
 	}
 };
 
-struct GameEntity::EntityFunc_Reached
+struct GameEntity::EntityFunc_Reached : public GameEntity::EntityFunc_Base
 {
-	EntityFunc_Reached() : self_(nullptr) {}
-	virtual ~EntityFunc_Reached() {}
-
 	virtual void	execute() = 0;
-
-	GameEntity*	self_;
 };
 
-struct GameEntity::EntityFunc_Blocked
+struct GameEntity::EntityFunc_Blocked : public GameEntity::EntityFunc_Base
 {
-	EntityFunc_Blocked() : self_(nullptr) {}
-	virtual ~EntityFunc_Blocked() {}
-
 	virtual void	execute( GameEntity* other ) = 0;
-
-	GameEntity*	self_;
 };
 
-struct GameEntity::EntityFunc_Touch
+struct GameEntity::EntityFunc_Touch : public GameEntity::EntityFunc_Base
 {
-	EntityFunc_Touch() : self_(nullptr) {}
-	virtual ~EntityFunc_Touch() {}
-
 	virtual void	execute( GameEntity* other, trace_t *trace ) = 0;
-
-	GameEntity*	self_;
 };
 
-struct GameEntity::EntityFunc_Use
+struct GameEntity::EntityFunc_Use : public GameEntity::EntityFunc_Base
 {
-	EntityFunc_Use() : self_(nullptr) {}
-	virtual ~EntityFunc_Use() {}
-
 	virtual void	execute( GameEntity* other, GameEntity* activator ) = 0;
-
-	GameEntity*	self_;
 };
 
-struct GameEntity::EntityFunc_Pain
+struct GameEntity::EntityFunc_Pain : public GameEntity::EntityFunc_Base
 {
-	EntityFunc_Pain() : self_(nullptr) {}
-	virtual ~EntityFunc_Pain() {}
-
 	virtual void	execute( GameEntity* attacker, int damage ) = 0;
-
-	GameEntity*	self_;
 };
 
-struct GameEntity::EntityFunc_Die
+struct GameEntity::EntityFunc_Die : public GameEntity::EntityFunc_Base
 {
-	EntityFunc_Die() : self_(nullptr) {}
-	virtual ~EntityFunc_Die() {}
-
 	virtual void	execute( GameEntity* inflictor, GameEntity* attacker, int damage, int mod ) = 0;
-
-	GameEntity*	self_;
 };
 
 #endif // __G_ENTITY_H__

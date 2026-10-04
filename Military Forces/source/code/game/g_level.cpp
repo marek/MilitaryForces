@@ -249,7 +249,7 @@ LevelLocals::createItemFromSpawnFields( SpawnFieldHolder* sfh, gitem_t* item )
 	ent->item_ = item;
 
 	ent->nextthink_ = theLevel.time_ + FRAMETIME * 2;
-	ent->setThink(new GameItem::Think_FinishSpawningItem);
+	ent->setThink( std::make_unique<GameItem::Think_FinishSpawningItem>());
 
 	ent->physicsBounce_ = 0.50;	
 

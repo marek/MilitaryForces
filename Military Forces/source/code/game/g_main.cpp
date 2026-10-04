@@ -1649,6 +1649,7 @@ Advances the non-player objects in the world
 void G_RunFrame( int levelTime ) 
 {
 	int i;
+	GameEntity::releaseRetired();
 	// if we are waiting for the level to restart, do nothing
 	if( theLevel.restarted_ )
 		return;

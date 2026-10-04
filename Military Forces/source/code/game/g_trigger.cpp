@@ -55,7 +55,7 @@ void multi_trigger( GameEntity *ent, GameEntity *activator )
 
 	if( ent->wait_ > 0 ) 
 	{
-		ent->setThink(new Think_MultiWait);
+		ent->setThink( std::make_unique<Think_MultiWait>());
 		ent->nextthink_ = theLevel.time_ + ( ent->wait_ + ent->random_ * crandom() ) * 1000;
 	} 
 	else 
@@ -64,7 +64,7 @@ void multi_trigger( GameEntity *ent, GameEntity *activator )
 		// called while looping through area links...
 		ent->setTouch(nullptr);
 		ent->nextthink_ = theLevel.time_ + FRAMETIME;
-		ent->setThink(new GameEntity::EntityFunc_Free);
+		ent->setThink( std::make_unique<GameEntity::EntityFunc_Free>());
 	}
 }
 
@@ -105,8 +105,8 @@ void SP_trigger_multiple( GameEntity *ent )
 		Com_Printf( "trigger_multiple has random >= wait\n" );
 	}
 
-	ent->setTouch(new Touch_MultiTouch);
-	ent->setUse(new Use_MultiUse);
+	ent->setTouch( std::make_unique<Touch_MultiTouch>());
+	ent->setUse( std::make_unique<Use_MultiUse>());
 
 	InitTrigger( ent );
 	SV_LinkEntity( ent );
@@ -138,7 +138,7 @@ void SP_trigger_always( GameEntity *ent )
 {
 	// we must have some delay to make sure our use targets are present
 	ent->nextthink_ = theLevel.time_ + 300;
-	ent->setThink(new Think_TriggerAlwaysThink);
+	ent->setThink( std::make_unique<Think_TriggerAlwaysThink>());
 }
 
 
@@ -197,8 +197,8 @@ void SP_func_timer( GameEntity *self )
 	G_SpawnFloat( "random", "1", &self->random_);
 	G_SpawnFloat( "wait", "1", &self->wait_ );
 
-	self->setUse(new Use_FuncTimer);
-	self->setThink(new Think_FuncTimer);
+	self->setUse( std::make_unique<Use_FuncTimer>());
+	self->setThink( std::make_unique<Think_FuncTimer>());
 
 	if( self->random_ >= self->wait_ ) 
 	{

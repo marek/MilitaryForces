@@ -30,7 +30,7 @@ struct Use_TargetDelay : public GameEntity::EntityFunc_Use
 		GameEntity*	self = self_;  // Since we may delete our current think()
 
 		self->nextthink_ = theLevel.time_ + ( self->wait_ + self->random_ * crandom() ) * 1000;
-		self->setThink(new Think_TargetDelay);
+		self->setThink( std::make_unique<Think_TargetDelay>());
 		self->activator_ = activator;
 	}
 };
@@ -44,7 +44,7 @@ void SP_target_delay( GameEntity *ent )
 	if ( !ent->wait_ ) 
 		ent->wait_ = 1;
 
-	ent->setUse(new Use_TargetDelay);
+	ent->setUse( std::make_unique<Use_TargetDelay>());
 }
 
 
@@ -68,7 +68,7 @@ void SP_target_score( GameEntity *ent )
 	if( !ent->count_ ) 
 		ent->count_ = 1;
 
-	ent->setUse(new Use_TargetScore);
+	ent->setUse( std::make_unique<Use_TargetScore>());
 }
 
 
@@ -103,7 +103,7 @@ struct Use_TargetPrint : public GameEntity::EntityFunc_Use
 
 void SP_target_print( GameEntity *ent ) 
 {
-	ent->setUse(new Use_TargetPrint);
+	ent->setUse( std::make_unique<Use_TargetPrint>());
 }
 
 
@@ -181,7 +181,7 @@ void SP_target_speaker( GameEntity *ent )
 	if( ent->spawnflags_ & 1 ) 
 		ent->s.loopSound = ent->noise_index_;
 
-	ent->setUse(new Use_TargetSpeaker);
+	ent->setUse( std::make_unique<Use_TargetSpeaker>());
 
 	if( ent->spawnflags_ & 4 ) 
 		ent->r.svFlags |= SVF_BROADCAST;
@@ -230,7 +230,7 @@ struct Use_TargetRelay : public GameEntity::EntityFunc_Use
 
 void SP_target_relay (GameEntity *self)
 {
-	self->setUse(new Use_TargetRelay);
+	self->setUse( std::make_unique<Use_TargetRelay>());
 }
 
 
@@ -249,7 +249,7 @@ struct Use_TargetKill : public GameEntity::EntityFunc_Use
 
 void SP_target_kill( GameEntity *self ) 
 {
-	self->setUse(new Use_TargetKill);
+	self->setUse( std::make_unique<Use_TargetKill>());
 }
 
 /*QUAKED target_position (0 0.5 0) (-4 -4 -4) (4 4 4)
@@ -301,7 +301,7 @@ in site, closest in distance
 */
 void SP_target_location( GameEntity *self )
 {
-	self->setThink(new Think_TargetLocationLinkup);
+	self->setThink( std::make_unique<Think_TargetLocationLinkup>());
 	self->nextthink_ = theLevel.time_ + 200;  // Let them all spawn first
 
 	G_SetOrigin( self, self->s.origin );

@@ -385,7 +385,7 @@ void Cmd_Tower_f( GameEntity *ent )
 
 	if( ent->radio_target_->wait_ > 0 )
 	{
-		ent->radio_target_->setThink(new Think_RadioComply);
+		ent->radio_target_->setThink( std::make_unique<Think_RadioComply>());
 		ent->radio_target_->nextthink_ = theLevel.time_ + 1000 * ent->radio_target_->wait_;
 	} 
 	else 
@@ -1691,7 +1691,7 @@ static void Cmd_Enter( GameEntity *ent )
 		GameEntity* hit = theLevel.getEntity( touch[i] );
 		if( !hit || !hit->inuse_ || hit->s.eType != ET_MISC_VEHICLE || hit->health_ <= 0 ) 
 			continue;
-		Abandoned_Think* think = dynamic_cast<Abandoned_Think*>( hit->thinkFunc_ );
+		Abandoned_Think* think = dynamic_cast<Abandoned_Think*>( hit->thinkFunc_.get() );
 		if( !think || !think->enterable_ ) 
 			continue;
 		float dist = Distance( hit->r.currentOrigin, client->ps_.origin );

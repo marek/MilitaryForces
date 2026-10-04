@@ -299,7 +299,7 @@ void MiscVehicle_SetRoute( GameEntity *ent, const mission_waypoint_t *wps )
 	unsigned int vehIndex = ent->s.modelindex;
 	unsigned long cat = availableVehicles[vehIndex].cat;
 
-	Drone_Think* think = new Drone_Think;
+	auto think = std::make_unique<Drone_Think>();
 	for( int i = 0; i < count; ++i )
 		VectorCopy( wps[i].origin, think->route_[i] );
 	think->count_ = count;
@@ -330,7 +330,7 @@ void MiscVehicle_SetRoute( GameEntity *ent, const mission_waypoint_t *wps )
 	ent->s.pos.trType = TR_LINEAR;
 	VectorClear( ent->s.pos.trDelta );
 	ent->s.pos.trTime = theLevel.time_;
-	ent->setThink( think );
+	ent->setThink( std::move( think ) );
 	ent->nextthink_ = theLevel.time_ + 1000;
 }
 
@@ -392,9 +392,9 @@ void MiscVehicle_Abandon( GameEntity *ent )
 	veh->r.contents = 0;
 	veh->health_ = 1;
 	veh->score_ = 0;
-	veh->setDie( new MiscVehicle_Die );
+	veh->setDie( std::make_unique<MiscVehicle_Die>());
 
-	Abandoned_Think* think = new Abandoned_Think;
+	auto think = std::make_unique<Abandoned_Think>();
 	think->expire_ = theLevel.time_ + (landed ? g_abandonTime.integer * 1000 : 10000);
 	if( landed )
 	{
@@ -410,7 +410,7 @@ void MiscVehicle_Abandon( GameEntity *ent )
 		veh->s.mountMask = ent->s.mountMask;
 		veh->s.generic1 = client->sess_.sessionTeam_;
 	}
-	veh->setThink( think );
+	veh->setThink( std::move( think ) );
 	veh->nextthink_ = theLevel.time_ + 50;
 
 	SV_LinkEntity( veh );
@@ -539,14 +539,14 @@ void MiscVehicle_SpawnDecks( GameEntity *parent, int vehicle )
 		deck->takedamage_ = true;
 		deck->health_ = 1;
 
-		Deck_Think* think = new Deck_Think;
+		auto think = std::make_unique<Deck_Think>();
 		think->parentNum_ = parent->s.number;
 		think->parentPtr_ = parent;
 		think->along_ = count > 1 ? centre - (halfLength - half) + i * 2 * (halfLength - half) / (count - 1) : centre;
 		think->first_ = i == 0;
-		deck->setThink( think );
+		deck->setThink( std::move( think ) );
 		G_SetOrigin( deck, parent->r.currentOrigin );
-		think->execute();
+		deck->thinkFunc_->execute();
 	}
 }
 
@@ -625,7 +625,7 @@ GameEntity* SP_misc_vehicle( GameEntity *sp_ent )
 	if( ent->health_ <= 0 ) ent->health_ = availableVehicles[i].maxhealth;
 	ent->takedamage_ = true;
 	ent->inuse_ = true;
-	ent->setDie( new MiscVehicle_Die );
+	ent->setDie( std::make_unique<MiscVehicle_Die>());
 	if( !ent->score_ ) ent->score_ = 1;
 	ent->classname_ = "misc_vehicle";
 	ent->r.contents = CONTENTS_SOLID;
@@ -680,7 +680,7 @@ void SP_misc_groundinstallation( GameEntity *sp_ent )
 	if( ent->health_ <= 0 ) ent->health_ = availableGroundInstallations[i].maxhealth;
 	ent->takedamage_ = true;
 	ent->inuse_ = true;
-	ent->setDie( new GroundInstallation_Die );
+	ent->setDie( std::make_unique<GroundInstallation_Die>());
 	if( !ent->score_ ) ent->score_ = 1;
 	ent->classname_ = "misc_vehicle";
 	ent->r.contents = CONTENTS_SOLID;
@@ -692,7 +692,7 @@ void SP_misc_groundinstallation( GameEntity *sp_ent )
 	ent->count_ = availableGroundInstallations[i].ammo;
 
 	ent->s.eFlags |= EF_PILOT_ONBOARD;
-	ent->setThink( new GroundInstallation_Think );
+	ent->setThink( std::make_unique<GroundInstallation_Think>());
 	ent->nextthink_ = theLevel.time_ + 1000;
 
 	ent->s.ONOFF = OO_RADAR;
