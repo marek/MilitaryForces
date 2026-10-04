@@ -50,6 +50,10 @@ endif()
 
 foreach(RENDERER IN LISTS MF_RENDERERS)
     add_dependencies(${CLIENT_NAME} ${RENDERER})
+    # copied next to the client when the renderer itself is rebuilt, not only when the client relinks
+    add_custom_command(TARGET ${RENDERER} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory $<TARGET_FILE_DIR:${CLIENT_NAME}>
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${RENDERER}> $<TARGET_FILE_DIR:${CLIENT_NAME}>)
     add_custom_command(TARGET ${CLIENT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${RENDERER}> $<TARGET_FILE_DIR:${CLIENT_NAME}>)
 endforeach()

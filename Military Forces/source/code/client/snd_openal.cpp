@@ -2648,9 +2648,10 @@ bool S_AL_Init( soundInterface_t *si )
 	// !!! FIXME: add support for capture device enumeration.
 	// !!! FIXME: add some better error reporting.
 	s_alCapture = CvarSystem::get( "s_alCapture", "1", CVAR_ARCHIVE | CVAR_LATCH );
-	if (!s_alCapture->integer)
+	// the microphone is only opened when voice chat is wanted: opening it makes the system ask for permission
+	if (!s_alCapture->integer || !CvarSystem::get( "s_microphone", "0", CVAR_ARCHIVE | CVAR_LATCH )->integer)
 	{
-		Common::printf("OpenAL capture support disabled by user ('+set s_alCapture 1' to enable)\n");
+		Common::printf("Microphone not opened ('+set s_microphone 1' turns voice capture on)\n");
 	}
 #if USE_MUMBLE
 	else if (cl_useMumble->integer)

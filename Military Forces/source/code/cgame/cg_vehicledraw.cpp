@@ -652,7 +652,9 @@ refEntity_t	    part[BP_HELO_MAX_PARTS];
 		VectorCopy( drawInfo->basicInfo.origin, part[BP_HELO_GUNBARREL+j].lightingOrigin );
 		AxisCopy( axisDefault, part[BP_HELO_GUNBARREL+j].axis );
 		RotateAroundPitch( part[BP_HELO_GUNBARREL+j].axis, drawInfo->gunAngle[i] );
-		CGame::positionRotatedEntityOnTag( &part[BP_HELO_GUNBARREL+j], &part[BP_HELO_TURRET+j], veh->handle[BP_HELO_TURRET+j], helo_tags[BP_HELO_GUNBARREL+j] );
+		// door guns are the same gun model on both mounts, so the second barrel sits on the same tag as the first
+		CGame::positionRotatedEntityOnTag( &part[BP_HELO_GUNBARREL+j], &part[BP_HELO_TURRET+j], veh->handle[BP_HELO_TURRET+j],
+			helo_tags[BP_HELO_GUNBARREL + ( (veh->flags & VF_DOORGUNS) ? 0 : j )] );
 		part[BP_HELO_GUNBARREL+j].shadowPlane = shadowPlane;
 		part[BP_HELO_GUNBARREL+j].renderfx = renderfx;
 		VectorCopy (part[BP_HELO_GUNBARREL+j].origin, part[BP_HELO_GUNBARREL+j].oldorigin);

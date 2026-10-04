@@ -86,7 +86,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 FT_Library ftLibrary = nullptr;  
 #endif
 
-constexpr int MAX_FONTS = 6;
+constexpr int MAX_FONTS = 16;
 static int registeredFontCount = 0;
 static fontInfo_t registeredFont[MAX_FONTS];
 
@@ -358,24 +358,32 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
 
 	R_IssuePendingRenderCommands();
 
-	if (registeredFontCount >= MAX_FONTS) {
-		ri.Printf(PRINT_WARNING, "RE_RegisterFont: Too many fonts registered already.\n");
-		return;
-	}
-
-	Com_sprintf(name, sizeof(name), "fonts/fontImage_%i.dat",pointSize);
-	for (i = 0; i < registeredFontCount; i++) {
-		if (Q_stricmp(name, registeredFont[i].name) == 0) {
-			Com_Memcpy(font, &registeredFont[i], sizeof(fontInfo_t));
-			return;
-		}
-	}
-
 	// a font named as a TrueType or OpenType file is rendered with FreeType; the pre-rendered
 	// images are used for the old names, when the file is missing, or with r_fontFiles 0
 	const char *extension = strrchr( fontName, '.' );
 	const bool fontFile = extension && ( !Q_stricmp( extension, ".ttf" ) || !Q_stricmp( extension, ".otf" ) ) &&
 		ri.Cvar_VariableIntegerValue( "r_fontFiles" ) && ri.FS_ReadFile( fontName, nullptr ) > 0;
+
+	// each font is registered once and found again under this name: the file and size for a font file,
+	// the pre-rendered data file otherwise
+	char cacheName[MAX_QPATH];
+	Com_sprintf(name, sizeof(name), "fonts/fontImage_%i.dat",pointSize);
+	if ( fontFile )
+		Com_sprintf( cacheName, sizeof(cacheName), "%s_%i", fontName, pointSize );
+	else
+		Q_strncpyz( cacheName, name, sizeof(cacheName) );
+	for (i = 0; i < registeredFontCount; i++) {
+		if (Q_stricmp(cacheName, registeredFont[i].name) == 0) {
+			Com_Memcpy(font, &registeredFont[i], sizeof(fontInfo_t));
+			return;
+		}
+	}
+
+	// a font already registered is found above even when the table is full
+	if (registeredFontCount >= MAX_FONTS) {
+		ri.Printf(PRINT_WARNING, "RE_RegisterFont: Too many fonts registered already.\n");
+		return;
+	}
 
 	len = fontFile ? 0 : ri.FS_ReadFile(name, nullptr);
 	if (len == sizeof(fontInfo_t)) {
@@ -531,6 +539,7 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
 
 	registeredFont[registeredFontCount].glyphScale = glyphScale;
 	font->glyphScale = glyphScale;
+	Q_strncpyz(font->name, cacheName, sizeof(font->name));
 	Com_Memcpy(&registeredFont[registeredFontCount++], font, sizeof(fontInfo_t));
 
 	if (r_saveFontData->integer) {
@@ -546,8 +555,9 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
 
 
 void R_InitFreeType() {
-	// 1: fonts named as .ttf or .otf files are drawn with FreeType; 0: always the pre-rendered font images
-	ri.Cvar_Get( "r_fontFiles", "1", CVAR_ARCHIVE | CVAR_LATCH );
+	// 1: fonts named as .ttf or .otf files are drawn with FreeType; 0: always the pre-rendered font images.
+	// Off until the menu and HUD layouts are adjusted to the new font's metrics
+	ri.Cvar_Get( "r_fontFiles", "0", CVAR_ARCHIVE | CVAR_LATCH );
 #ifdef BUILD_FREETYPE
 	if (FT_Init_FreeType( &ftLibrary )) {
 		ri.Printf(PRINT_WARNING, "R_InitFreeType: Unable to initialize FreeType.\n");
