@@ -40,6 +40,7 @@ public:
 		float		honour;
 		float		cunning;
 		float		prefer[5];
+		float		reaction;
 	};
 
 private:
@@ -104,6 +105,8 @@ private:
 		bool	landOutbound = false;
 		float	landCeiling = 800;
 		int		badPad = -1;
+		int		reactTime = 0;
+		int		reactEnemy = -1;
 		float	breakSide = 1;
 		int		badPadTime = 0;
 		float	landOffset = 45;

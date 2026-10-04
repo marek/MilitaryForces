@@ -113,6 +113,14 @@ void Bots::fireWeapons( GameEntity* ent, State& bot, const Sense& sense, usercmd
 	if( !sense.enemy )
 		return;
 
+	if( bot.reactEnemy != sense.enemy->s.number )
+	{
+		bot.reactEnemy = sense.enemy->s.number;
+		bot.reactTime = theLevel.time_ + static_cast<int>( character( bot ).reaction * 1000.0f * (1.6f - skill( bot )) );
+	}
+	if( theLevel.time_ < bot.reactTime )
+		return;
+
 	trace_t tr;
 	SV_Trace( &tr, ent->r.currentOrigin, nullptr, nullptr, sense.enemy->r.currentOrigin, ent->s.number, MASK_SOLID, false );
 	const bool clear = tr.fraction >= 1.0f || tr.entityNum == sense.enemy->s.number;

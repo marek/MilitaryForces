@@ -8,22 +8,22 @@
 namespace
 {
 	constexpr std::array<Bots::Character, 16> builtinCharacters = { {
-		{ "Alpha", 0.9f, 0.3f, 0.4f, 0.5f, 0.9f, 0.3f, 0.2f, { 1, 1, 1, 1, 1 } },
-		{ "Bravo", 0.6f, 0.6f, 0.7f, 0.8f, 0.7f, 0.6f, 0.5f, { 1, 1, 1, 1, 1 } },
-		{ "Charlie", 0.4f, 0.9f, 0.9f, 0.6f, 0.8f, 0.4f, 0.9f, { 1, 1, 1, 1, 1 } },
-		{ "Delta", 1.0f, 0.2f, 0.2f, 0.3f, 0.6f, 0.9f, 0.1f, { 1, 1, 1, 1, 1 } },
-		{ "Echo", 0.7f, 0.5f, 0.6f, 0.9f, 0.85f, 0.7f, 0.6f, { 1, 1, 1, 1, 1 } },
-		{ "Foxtrot", 0.5f, 0.7f, 0.5f, 0.4f, 0.5f, 0.2f, 0.4f, { 1, 1, 1, 1, 1 } },
-		{ "Golf", 0.8f, 0.4f, 0.8f, 0.7f, 0.95f, 0.8f, 0.8f, { 1, 1, 1, 1, 1 } },
-		{ "Hotel", 0.3f, 0.8f, 0.6f, 0.9f, 0.6f, 0.5f, 0.3f, { 1, 1, 1, 1, 1 } },
-		{ "India", 0.9f, 0.5f, 0.3f, 0.2f, 0.75f, 0.6f, 0.2f, { 1, 1, 1, 1, 1 } },
-		{ "Juliet", 0.6f, 0.4f, 0.9f, 0.6f, 0.9f, 0.3f, 0.9f, { 1, 1, 1, 1, 1 } },
-		{ "Kilo", 0.75f, 0.75f, 0.5f, 0.5f, 0.65f, 0.5f, 0.5f, { 1, 1, 1, 1, 1 } },
-		{ "Lima", 0.5f, 0.3f, 0.3f, 0.8f, 0.55f, 0.7f, 0.1f, { 1, 1, 1, 1, 1 } },
-		{ "Mike", 0.85f, 0.6f, 0.7f, 0.4f, 0.8f, 0.9f, 0.7f, { 1, 1, 1, 1, 1 } },
-		{ "November", 0.4f, 0.6f, 0.8f, 0.7f, 0.7f, 0.4f, 0.6f, { 1, 1, 1, 1, 1 } },
-		{ "Oscar", 0.95f, 0.35f, 0.5f, 0.6f, 1.0f, 1.0f, 0.4f, { 1, 1, 1, 1, 1 } },
-		{ "Papa", 0.65f, 0.85f, 0.4f, 0.5f, 0.6f, 0.1f, 0.8f, { 1, 1, 1, 1, 1 } }
+		{ "Alpha", 0.9f, 0.3f, 0.4f, 0.5f, 0.9f, 0.3f, 0.2f, { 1, 1, 1, 1, 1 }, 0.4f },
+		{ "Bravo", 0.6f, 0.6f, 0.7f, 0.8f, 0.7f, 0.6f, 0.5f, { 1, 1, 1, 1, 1 }, 0.4f },
+		{ "Charlie", 0.4f, 0.9f, 0.9f, 0.6f, 0.8f, 0.4f, 0.9f, { 1, 1, 1, 1, 1 }, 0.4f },
+		{ "Delta", 1.0f, 0.2f, 0.2f, 0.3f, 0.6f, 0.9f, 0.1f, { 1, 1, 1, 1, 1 }, 0.4f },
+		{ "Echo", 0.7f, 0.5f, 0.6f, 0.9f, 0.85f, 0.7f, 0.6f, { 1, 1, 1, 1, 1 }, 0.4f },
+		{ "Foxtrot", 0.5f, 0.7f, 0.5f, 0.4f, 0.5f, 0.2f, 0.4f, { 1, 1, 1, 1, 1 }, 0.4f },
+		{ "Golf", 0.8f, 0.4f, 0.8f, 0.7f, 0.95f, 0.8f, 0.8f, { 1, 1, 1, 1, 1 }, 0.4f },
+		{ "Hotel", 0.3f, 0.8f, 0.6f, 0.9f, 0.6f, 0.5f, 0.3f, { 1, 1, 1, 1, 1 }, 0.4f },
+		{ "India", 0.9f, 0.5f, 0.3f, 0.2f, 0.75f, 0.6f, 0.2f, { 1, 1, 1, 1, 1 }, 0.4f },
+		{ "Juliet", 0.6f, 0.4f, 0.9f, 0.6f, 0.9f, 0.3f, 0.9f, { 1, 1, 1, 1, 1 }, 0.4f },
+		{ "Kilo", 0.75f, 0.75f, 0.5f, 0.5f, 0.65f, 0.5f, 0.5f, { 1, 1, 1, 1, 1 }, 0.4f },
+		{ "Lima", 0.5f, 0.3f, 0.3f, 0.8f, 0.55f, 0.7f, 0.1f, { 1, 1, 1, 1, 1 }, 0.4f },
+		{ "Mike", 0.85f, 0.6f, 0.7f, 0.4f, 0.8f, 0.9f, 0.7f, { 1, 1, 1, 1, 1 }, 0.4f },
+		{ "November", 0.4f, 0.6f, 0.8f, 0.7f, 0.7f, 0.4f, 0.6f, { 1, 1, 1, 1, 1 }, 0.4f },
+		{ "Oscar", 0.95f, 0.35f, 0.5f, 0.6f, 1.0f, 1.0f, 0.4f, { 1, 1, 1, 1, 1 }, 0.4f },
+		{ "Papa", 0.65f, 0.85f, 0.4f, 0.5f, 0.6f, 0.1f, 0.8f, { 1, 1, 1, 1, 1 }, 0.4f }
 	} };
 }
 
@@ -46,8 +46,9 @@ void Bots::loadCharacters()
 			Character who = {};
 			for( float& weight : who.prefer )
 				weight = 1.0f;
-			const int got = sscanf( line, "%31s %f %f %f %f %f %f %f %f %f %f %f %f", who.name, &who.aggression, &who.caution, &who.patience,
-				&who.teamwork, &who.aim, &who.honour, &who.cunning, &who.prefer[0], &who.prefer[1], &who.prefer[2], &who.prefer[3], &who.prefer[4] );
+			who.reaction = 0.4f;
+			const int got = sscanf( line, "%31s %f %f %f %f %f %f %f %f %f %f %f %f %f", who.name, &who.aggression, &who.caution, &who.patience,
+				&who.teamwork, &who.aim, &who.honour, &who.cunning, &who.prefer[0], &who.prefer[1], &who.prefer[2], &who.prefer[3], &who.prefer[4], &who.reaction );
 			if( got >= 8 && who.name[0] != '#' && who.name[0] != '/' )
 				characters_.push_back( who );
 			line = next;
