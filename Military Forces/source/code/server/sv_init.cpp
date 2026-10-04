@@ -308,7 +308,7 @@ void SV_Startup()
 	CvarSystem::set( "sv_running", "1" );
 	
 	// Join the ipv6 multicast group now that a map is running so clients can scan for us on the local network.
-	NET_JoinMulticast6();
+	Network::joinMulticast6();
 }
 
 
@@ -762,7 +762,7 @@ void SV_Shutdown( const char *finalmsg )
 
 	Com_Printf( "----- Server Shutdown (%s) -----\n", finalmsg );
 
-	NET_LeaveMulticast6();
+	Network::leaveMulticast6();
 
 	if( theSVS.svClients_.size() && !com_errorEntered ) {
 		SV_FinalMessage( finalmsg );

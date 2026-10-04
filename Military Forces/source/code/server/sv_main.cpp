@@ -294,7 +294,7 @@ void SV_MasterHeartbeat(const char *message)
 			if(netenabled & NET_ENABLEV4)
 			{
 				Com_Printf("Resolving %s (IPv4)\n", sv_master[i]->string);
-				res = NET_StringToAdr(sv_master[i]->string, &adr[i][0], NA_IP);
+				res = Network::stringToAdr(sv_master[i]->string, &adr[i][0], NA_IP);
 
 				if(res == 2)
 				{
@@ -303,7 +303,7 @@ void SV_MasterHeartbeat(const char *message)
 				}
 				
 				if(res)
-					Com_Printf( "%s resolved to %s\n", sv_master[i]->string, NET_AdrToStringwPort(adr[i][0]));
+					Com_Printf( "%s resolved to %s\n", sv_master[i]->string, Network::adrToStringwPort(adr[i][0]));
 				else
 					Com_Printf( "%s has no IPv4 address.\n", sv_master[i]->string);
 			}
@@ -311,7 +311,7 @@ void SV_MasterHeartbeat(const char *message)
 			if(netenabled & NET_ENABLEV6)
 			{
 				Com_Printf("Resolving %s (IPv6)\n", sv_master[i]->string);
-				res = NET_StringToAdr(sv_master[i]->string, &adr[i][1], NA_IP6);
+				res = Network::stringToAdr(sv_master[i]->string, &adr[i][1], NA_IP6);
 
 				if(res == 2)
 				{
@@ -320,7 +320,7 @@ void SV_MasterHeartbeat(const char *message)
 				}
 				
 				if(res)
-					Com_Printf( "%s resolved to %s\n", sv_master[i]->string, NET_AdrToStringwPort(adr[i][1]));
+					Com_Printf( "%s resolved to %s\n", sv_master[i]->string, Network::adrToStringwPort(adr[i][1]));
 				else
 					Com_Printf( "%s has no IPv6 address.\n", sv_master[i]->string);
 			}
@@ -338,9 +338,9 @@ void SV_MasterHeartbeat(const char *message)
 		// ever incompatably changes
 
 		if(adr[i][0].type != NA_BAD)
-			NET_OutOfBandPrint( NS_SERVER, adr[i][0], "heartbeat %s\n", message);
+			Network::outOfBandPrint( NS_SERVER, adr[i][0], "heartbeat %s\n", message);
 		if(adr[i][1].type != NA_BAD)
-			NET_OutOfBandPrint( NS_SERVER, adr[i][1], "heartbeat %s\n", message);
+			Network::outOfBandPrint( NS_SERVER, adr[i][1], "heartbeat %s\n", message);
 	}
 }
 
@@ -552,7 +552,7 @@ void SVC_Status( netadr_t from )
 	// Prevent using getstatus as an amplifier
 	if ( SVC_RateLimitAddress( from, 10, 1000 ) ) {
 		Com_DPrintf( "SVC_Status: rate limit from %s exceeded, dropping request\n",
-			NET_AdrToString( from ) );
+			Network::adrToString( from ) );
 		return;
 	}
 
@@ -607,7 +607,7 @@ void SVC_Status( netadr_t from )
 		}
 	}
 
-	NET_OutOfBandPrint( NS_SERVER, from, "statusResponse\n%s\n%s", infostring, status );
+	Network::outOfBandPrint( NS_SERVER, from, "statusResponse\n%s\n%s", infostring, status );
 }
 
 /*
@@ -627,7 +627,7 @@ void SVC_Info( netadr_t from )
 	// Prevent using getinfo as an amplifier
 	if ( SVC_RateLimitAddress( from, 10, 1000 ) ) {
 		Com_DPrintf( "SVC_Info: rate limit from %s exceeded, dropping request\n",
-			NET_AdrToString( from ) );
+			Network::adrToString( from ) );
 		return;
 	}
 
@@ -691,7 +691,7 @@ void SVC_Info( netadr_t from )
 	if( *gamedir ) 
 		Info_SetValueForKey( infostring, "game", gamedir );
 
-	NET_OutOfBandPrint( NS_SERVER, from, "infoResponse\n%s", infostring );
+	Network::outOfBandPrint( NS_SERVER, from, "infoResponse\n%s", infostring );
 }
 
 /*
@@ -702,7 +702,7 @@ SVC_FlushRedirect
 */
 void SV_FlushRedirect( char *outputbuf ) 
 {
-	NET_OutOfBandPrint( NS_SERVER, theSVS.redirectAddress_, "print\n%s", outputbuf );
+	Network::outOfBandPrint( NS_SERVER, theSVS.redirectAddress_, "print\n%s", outputbuf );
 }
 
 /*
@@ -727,7 +727,7 @@ void SVC_RemoteCommand( netadr_t from, Message *msg )
 	// Prevent using rcon as an amplifier and make dictionary attacks impractical
 	if ( SVC_RateLimitAddress( from, 10, 1000 ) ) {
 		Com_DPrintf( "SVC_RemoteCommand: rate limit from %s exceeded, dropping request\n",
-			NET_AdrToString( from ) );
+			Network::adrToString( from ) );
 		return;
 	}
 
@@ -742,10 +742,10 @@ void SVC_RemoteCommand( netadr_t from, Message *msg )
 		}
 
 		valid = false;
-		Com_Printf ("Bad rcon from %s: %s\n", NET_AdrToString (from), CommandSystem::argsFrom(2) );
+		Com_Printf ("Bad rcon from %s: %s\n", Network::adrToString (from), CommandSystem::argsFrom(2) );
 	} else {
 		valid = true;
-		Com_Printf ("Rcon from %s: %s\n", NET_AdrToString (from), CommandSystem::argsFrom(2) );
+		Com_Printf ("Rcon from %s: %s\n", Network::adrToString (from), CommandSystem::argsFrom(2) );
 	}
 
 	// start redirecting all print outputs to the packet
@@ -810,7 +810,7 @@ void SV_ConnectionlessPacket( netadr_t from, Message *msg ) {
 	CommandSystem::tokenizeString( s );
 
 	c = CommandSystem::argv(0);
-	Com_DPrintf ("SV packet %s : %s\n", NET_AdrToString(from), c);
+	Com_DPrintf ("SV packet %s : %s\n", Network::adrToString(from), c);
 
 	if (!Q_stricmp(c, "getstatus")) {
 		SVC_Status( from  );
@@ -830,7 +830,7 @@ void SV_ConnectionlessPacket( netadr_t from, Message *msg ) {
 		// sequenced messages to the old client
 	} else {
 		Com_DPrintf ("bad connectionless packet from %s:\n%s\n"
-		, NET_AdrToString (from), s);
+		, Network::adrToString (from), s);
 	}
 }
 
@@ -864,7 +864,7 @@ void SV_PacketEvent( netadr_t from, Message *msg )
 		if( !cl || cl->state_ == SV_Client::CS_FREE ) 
 			continue;
 		
-		if( !NET_CompareBaseAdr( from, cl->netchan_.remoteAddress ) ) 
+		if( !Network::compareBaseAdr( from, cl->netchan_.remoteAddress ) ) 
 			continue;
 		
 		// it is possible to have multiple clients from a single IP

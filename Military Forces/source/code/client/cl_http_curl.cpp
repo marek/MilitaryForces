@@ -282,7 +282,7 @@ void CL_HTTP_BeginDownload( const char *remoteURL )
 	qcurl_easy_setopt_warn(downloadCURL, CURLOPT_URL, remoteURL);
 	qcurl_easy_setopt_warn(downloadCURL, CURLOPT_TRANSFERTEXT, 0);
 	qcurl_easy_setopt_warn(downloadCURL, CURLOPT_REFERER, va("ioQ3://%s",
-		NET_AdrToString(clc.serverAddress)));
+		Network::adrToString(clc.serverAddress)));
 	qcurl_easy_setopt_warn(downloadCURL, CURLOPT_USERAGENT, va("%s %s",
 		Q3_VERSION, qcurl_version()));
 	qcurl_easy_setopt_warn(downloadCURL, CURLOPT_WRITEFUNCTION,

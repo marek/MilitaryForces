@@ -104,7 +104,7 @@ void CL_HTTP_BeginDownload(const char *remoteURL)
     BOOL success;
 
     hUrl = InternetOpenUrlA(hInternet, remoteURL,
-                            va("Referer: ioQ3://%s\r\n", NET_AdrToString(clc.serverAddress)), (DWORD)-1,
+                            va("Referer: ioQ3://%s\r\n", Network::adrToString(clc.serverAddress)), (DWORD)-1,
                             INTERNET_FLAG_HYPERLINK |
                                 INTERNET_FLAG_NO_CACHE_WRITE |
                                 INTERNET_FLAG_NO_COOKIES |

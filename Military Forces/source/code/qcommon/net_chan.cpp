@@ -140,7 +140,7 @@ void NetChannel::transmitNextFragment() {
 	send.writeData( this->unsentBuffer + this->unsentFragmentStart, fragmentLength );
 
 	// send the datagram
-	NET_SendPacket(this->sock, send.cursize, send.data, this->remoteAddress);
+	Network::sendPacket(this->sock, send.cursize, send.data, this->remoteAddress);
 	
 	// Store send time and size of this packet for rate control
 	this->lastSentTime = Sys_Milliseconds();
@@ -215,7 +215,7 @@ void NetChannel::transmit( int length, const byte *data ) {
 	send.writeData( data, length );
 
 	// send the datagram
-	NET_SendPacket( this->sock, send.cursize, send.data, this->remoteAddress );
+	Network::sendPacket( this->sock, send.cursize, send.data, this->remoteAddress );
 
 	// Store send time and size of this packet for rate control
 	this->lastSentTime = Sys_Milliseconds();
@@ -308,7 +308,7 @@ bool NetChannel::process( Message *msg ) {
 	if ( sequence <= this->incomingSequence ) {
 		if ( showdrop->integer || showpackets->integer ) {
 			Com_Printf( "%s:Out of order packet %i at %i\n"
-				, NET_AdrToString( this->remoteAddress )
+				, Network::adrToString( this->remoteAddress )
 				,  sequence
 				, this->incomingSequence );
 		}
@@ -322,7 +322,7 @@ bool NetChannel::process( Message *msg ) {
 	if ( this->dropped > 0 ) {
 		if ( showdrop->integer || showpackets->integer ) {
 			Com_Printf( "%s:Dropped %i packets at %i\n"
-			, NET_AdrToString( this->remoteAddress )
+			, Network::adrToString( this->remoteAddress )
 			, this->dropped
 			, sequence );
 		}
@@ -348,7 +348,7 @@ bool NetChannel::process( Message *msg ) {
 		if ( fragmentStart != this->fragmentLength ) {
 			if ( showdrop->integer || showpackets->integer ) {
 				Com_Printf( "%s:Dropped a message fragment\n"
-				, NET_AdrToString( this->remoteAddress ));
+				, Network::adrToString( this->remoteAddress ));
 			}
 			// we can still keep the part that we have so far,
 			// so we don't need to clear this->fragmentLength
@@ -360,7 +360,7 @@ bool NetChannel::process( Message *msg ) {
 			this->fragmentLength + fragmentLength > sizeof( this->fragmentBuffer ) ) {
 			if ( showdrop->integer || showpackets->integer ) {
 				Com_Printf ("%s:illegal fragment length\n"
-				, NET_AdrToString (this->remoteAddress ) );
+				, Network::adrToString (this->remoteAddress ) );
 			}
 			return false;
 		}
@@ -377,7 +377,7 @@ bool NetChannel::process( Message *msg ) {
 
 		if ( this->fragmentLength > msg->maxsize ) {
 			Com_Printf( "%s:fragmentLength %i > msg->maxsize\n"
-				, NET_AdrToString (this->remoteAddress ),
+				, Network::adrToString (this->remoteAddress ),
 				this->fragmentLength );
 			return false;
 		}
@@ -437,7 +437,7 @@ struct loopback_t {
 loopback_t	loopbacks[2];
 
 
-bool	NET_GetLoopPacket (netsrc_t sock, netadr_t *net_from, Message *net_message)
+bool	Network::getLoopPacket (netsrc_t sock, netadr_t *net_from, Message *net_message)
 {
 	int		i;
 	loopback_t	*loop;
@@ -518,7 +518,7 @@ static void NET_QueuePacket( int length, const void *data, netadr_t to,
 	}
 }
 
-void NET_FlushPacketQueue()
+void Network::flushPacketQueue()
 {
 	packetQueue_t *last;
 	int now;
@@ -536,7 +536,7 @@ void NET_FlushPacketQueue()
 	}
 }
 
-void NET_SendPacket( netsrc_t sock, int length, const void *data, netadr_t to ) {
+void Network::sendPacket( netsrc_t sock, int length, const void *data, netadr_t to ) {
 
 	// sequenced packets are shown in netchan, so just show oob
 	if ( showpackets->integer && *(int *)data == -1 )	{
@@ -567,12 +567,12 @@ void NET_SendPacket( netsrc_t sock, int length, const void *data, netadr_t to ) 
 
 /*
 ===============
-NET_OutOfBandPrint
+Network::outOfBandPrint
 
 Sends a text message in an out-of-band datagram
 ================
 */
-void QDECL NET_OutOfBandPrint( netsrc_t sock, netadr_t adr, const char *format, ... ) {
+void QDECL Network::outOfBandPrint( netsrc_t sock, netadr_t adr, const char *format, ... ) {
 	va_list		argptr;
 	static char	string[MAX_MSGLEN];
 
@@ -588,17 +588,17 @@ void QDECL NET_OutOfBandPrint( netsrc_t sock, netadr_t adr, const char *format, 
 	va_end( argptr );
 
 	// send the datagram
-	NET_SendPacket( sock, strlen( string ), string, adr );
+	Network::sendPacket( sock, strlen( string ), string, adr );
 }
 
 /*
 ===============
-NET_OutOfBandPrint
+Network::outOfBandPrint
 
 Sends a data message in an out-of-band datagram (only used for "connect")
 ================
 */
-void QDECL NET_OutOfBandData( netsrc_t sock, netadr_t adr, byte *format, int len ) {
+void QDECL Network::outOfBandData( netsrc_t sock, netadr_t adr, byte *format, int len ) {
 	static byte	string[MAX_MSGLEN*2];
 	int			i;
 	Message		mbuf;
@@ -617,18 +617,18 @@ void QDECL NET_OutOfBandData( netsrc_t sock, netadr_t adr, byte *format, int len
 	mbuf.cursize = len+4;
 	Huff_Compress( &mbuf, 12);
 	// send the datagram
-	NET_SendPacket( sock, mbuf.cursize, mbuf.data, adr );
+	Network::sendPacket( sock, mbuf.cursize, mbuf.data, adr );
 }
 
 /*
 =============
-NET_StringToAdr
+Network::stringToAdr
 
 Traps "localhost" for loopback, passes everything else to system
 return 0 on address not found, 1 on address found with port, 2 on address found without port.
 =============
 */
-int NET_StringToAdr( const char *s, netadr_t *a, netadrtype_t family )
+int Network::stringToAdr( const char *s, netadr_t *a, netadrtype_t family )
 {
 	char	base[MAX_STRING_CHARS], *search;
 	char	*port = nullptr;

@@ -158,26 +158,7 @@ struct netadr_t {
 	unsigned long	scope_id;	// Needed for IPv6 link-local addresses
 };
 
-void		NET_Init( );
-void		NET_Shutdown( );
-void		NET_Restart_f( );
-void		NET_Config( bool enableNetworking );
-void		NET_FlushPacketQueue();
-void		NET_SendPacket (netsrc_t sock, int length, const void *data, netadr_t to);
-void		QDECL NET_OutOfBandPrint( netsrc_t net_socket, netadr_t adr, const char *format, ...) Q_PRINTF_FUNC(3, 4);
-void		QDECL NET_OutOfBandData( netsrc_t sock, netadr_t adr, byte *format, int len );
 
-bool	NET_CompareAdr (netadr_t a, netadr_t b);
-bool	NET_CompareBaseAdrMask(netadr_t a, netadr_t b, int netmask);
-bool	NET_CompareBaseAdr (netadr_t a, netadr_t b);
-bool	NET_IsLocalAddress (netadr_t adr);
-const char	*NET_AdrToString (netadr_t a);
-const char	*NET_AdrToStringwPort (netadr_t a);
-int		NET_StringToAdr ( const char *s, netadr_t *a, netadrtype_t family);
-bool	NET_GetLoopPacket (netsrc_t sock, netadr_t *net_from, Message *net_message);
-void		NET_JoinMulticast6();
-void		NET_LeaveMulticast6();
-void		NET_Sleep(int msec);
 
 
 inline constexpr int MAX_MSGLEN = 0x20000; // max length of a message, which may
@@ -1131,5 +1112,7 @@ inline constexpr int DLF_ENABLE = 1;
 inline constexpr int DLF_NO_REDIRECT = 2;
 inline constexpr int DLF_NO_UDP = 4;
 inline constexpr int DLF_NO_DISCONNECT = 8;
+
+#include "../qcommon/network.h"
 
 #endif // _QCOMMON_H_

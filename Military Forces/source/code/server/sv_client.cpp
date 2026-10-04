@@ -69,7 +69,7 @@ void SV_GetChallenge(netadr_t from)
 	// Prevent using getchallenge as an amplifier
 	if ( SVC_RateLimitAddress( from, 10, 1000 ) ) {
 		Com_DPrintf( "SV_GetChallenge: rate limit from %s exceeded, dropping request\n",
-			NET_AdrToString( from ) );
+			Network::adrToString( from ) );
 		return;
 	}
 
@@ -87,7 +87,7 @@ void SV_GetChallenge(netadr_t from)
 	// reject client if the gamename string sent by the client doesn't match ours
 	if (gameMismatch)
 	{
-		NET_OutOfBandPrint(NS_SERVER, from, "print\nGame mismatch: This is a %s server\n",
+		Network::outOfBandPrint(NS_SERVER, from, "print\nGame mismatch: This is a %s server\n",
 			com_gamename->string);
 		return;
 	}
@@ -101,7 +101,7 @@ void SV_GetChallenge(netadr_t from)
 
 	for(i = 0 ; i < ServerStatic::k_MAX_CHALLENGES ; i++, challenge++)
 	{
-		if(!challenge->connected_ && NET_CompareAdr(from, challenge->adr_))
+		if(!challenge->connected_ && Network::compareAdr(from, challenge->adr_))
 		{
 			wasfound = true;
 			
@@ -138,7 +138,7 @@ void SV_GetChallenge(netadr_t from)
 	challenge->time_ = theSVS.time_;
 
 	challenge->pingTime_ = theSVS.time_;
-	NET_OutOfBandPrint(NS_SERVER, challenge->adr_, "challengeResponse %d %d %d",
+	Network::outOfBandPrint(NS_SERVER, challenge->adr_, "challengeResponse %d %d %d",
 			   challenge->challenge_, clientChallenge, com_protocol->integer);
 }
 
@@ -159,7 +159,7 @@ void SV_GetChallenge(netadr_t from)
 //	char	*r;
 //	char	ret[1024];
 //
-//	if ( !NET_CompareBaseAdr( from, theSVS.authorizeAddress_ ) ) 
+//	if ( !Network::compareBaseAdr( from, theSVS.authorizeAddress_ ) ) 
 //	{
 //		Com_Printf( "SV_AuthorizeIpPacket: not from authorize server\n" );
 //		return;
@@ -185,27 +185,27 @@ void SV_GetChallenge(netadr_t from)
 //	//if ( !Q_stricmp( s, "demo" ) ) {
 //	//	if ( CvarSystem::variableValue( "fs_restrict" ) ) {
 //	//		// a demo client connecting to a demo server
-//	//		NET_OutOfBandPrint( NS_SERVER, svs.challenges[i].adr, 
+//	//		Network::outOfBandPrint( NS_SERVER, svs.challenges[i].adr, 
 //	//			"challengeResponse %i", svs.challenges[i].challenge );
 //	//		return;
 //	//	}
 //	//	// they are a demo client trying to connect to a real server
-//	//	NET_OutOfBandPrint( NS_SERVER, svs.challenges[i].adr, "print\nServer is not a demo server\n" );
+//	//	Network::outOfBandPrint( NS_SERVER, svs.challenges[i].adr, "print\nServer is not a demo server\n" );
 //	//	// clear the challenge record so it won't timeout and let them through
 //	//	Com_Memset( &svs.challenges[i], 0, sizeof( svs.challenges[i] ) );
 //	//	return;
 //	//}
 //	if ( !Q_stricmp( s, "accept" ) ) {
-//		NET_OutOfBandPrint( NS_SERVER, svs.challenges[i].adr, 
+//		Network::outOfBandPrint( NS_SERVER, svs.challenges[i].adr, 
 //			"challengeResponse %i", svs.challenges[i].challenge );
 //		return;
 //	}
 //	if ( !Q_stricmp( s, "unknown" ) ) {
 //		if (!r) {
-//			NET_OutOfBandPrint( NS_SERVER, svs.challenges[i].adr, "print\nAwaiting CD key authorization\n" );
+//			Network::outOfBandPrint( NS_SERVER, svs.challenges[i].adr, "print\nAwaiting CD key authorization\n" );
 //		} else {
 //			sprintf(ret, "print\n%s\n", r);
-//			NET_OutOfBandPrint( NS_SERVER, svs.challenges[i].adr, ret );
+//			Network::outOfBandPrint( NS_SERVER, svs.challenges[i].adr, ret );
 //		}
 //		// clear the challenge record so it won't timeout and let them through
 //		Com_Memset( &svs.challenges[i], 0, sizeof( svs.challenges[i] ) );
@@ -214,10 +214,10 @@ void SV_GetChallenge(netadr_t from)
 //
 //	// authorization failed
 //	if (!r) {
-//		NET_OutOfBandPrint( NS_SERVER, svs.challenges[i].adr, "print\nSomeone is using this CD Key\n" );
+//		Network::outOfBandPrint( NS_SERVER, svs.challenges[i].adr, "print\nSomeone is using this CD Key\n" );
 //	} else {
 //		sprintf(ret, "print\n%s\n", r);
-//		NET_OutOfBandPrint( NS_SERVER, svs.challenges[i].adr, ret );
+//		Network::outOfBandPrint( NS_SERVER, svs.challenges[i].adr, ret );
 //	}
 //
 //	// clear the challenge record so it won't timeout and let them through
@@ -250,7 +250,7 @@ static bool SV_IsBanned(netadr_t *from, bool isexception)
 		
 		if(curban->isexception == isexception)
 		{
-			if(NET_CompareBaseAdrMask(curban->ip, *from, curban->subnet))
+			if(Network::compareBaseAdrMask(curban->ip, *from, curban->subnet))
 				return true;
 		}
 	}
@@ -273,7 +273,7 @@ void SV_DirectConnect( netadr_t from )
 	// Check whether this client is banned.
 	if(SV_IsBanned(&from, false))
 	{
-		NET_OutOfBandPrint(NS_SERVER, from, "print\nYou are banned from this server.\n");
+		Network::outOfBandPrint(NS_SERVER, from, "print\nYou are banned from this server.\n");
 		return;
 	}
 
@@ -283,7 +283,7 @@ void SV_DirectConnect( netadr_t from )
 	int version = atoi( Info_ValueForKey( userinfo, "protocol" ) );
 	if(version != com_protocol->integer)
 	{
-		NET_OutOfBandPrint(NS_SERVER, from, "print\nServer uses protocol version %i "
+		Network::outOfBandPrint(NS_SERVER, from, "print\nServer uses protocol version %i "
 				   "(yours is %i).\n", com_protocol->integer, version);
 		Com_DPrintf("    rejected connect from version %i\n", version);
 		return;
@@ -301,14 +301,14 @@ void SV_DirectConnect( netadr_t from )
 		if( !cl || cl->state_ == SV_Client::CS_FREE ) 
 			continue;
 
-		if( NET_CompareBaseAdr( from, cl->netchan_.remoteAddress )
+		if( Network::compareBaseAdr( from, cl->netchan_.remoteAddress )
 			&& ( cl->netchan_.qport == qport 
 			|| from.port == cl->netchan_.remoteAddress.port ) ) 
 		{
 			if (( theSVS.time_ - cl->lastConnectTime_) 
 				< (sv_reconnectlimit->integer * 1000)) 
 			{
-				Com_DPrintf ("%s:reconnect rejected : too soon\n", NET_AdrToString (from));
+				Com_DPrintf ("%s:reconnect rejected : too soon\n", Network::adrToString (from));
 				return;
 			}
 			break;
@@ -317,12 +317,12 @@ void SV_DirectConnect( netadr_t from )
 	
 	// don't let "ip" overflow userinfo string
 	const char *ip;
-	if ( NET_IsLocalAddress (from) )
+	if ( Network::isLocalAddress (from) )
 		ip = "localhost";
 	else
-		ip = NET_AdrToString( from );
+		ip = Network::adrToString( from );
 	if( ( strlen( ip ) + strlen( userinfo ) + 4 ) >= MAX_INFO_STRING ) {
-		NET_OutOfBandPrint( NS_SERVER, from,
+		Network::outOfBandPrint( NS_SERVER, from,
 			"print\nUserinfo string length exceeded.  "
 			"Try removing setu cvars from your config.\n" );
 		return;
@@ -330,14 +330,14 @@ void SV_DirectConnect( netadr_t from )
 	Info_SetValueForKey( userinfo, "ip", ip );
 
 	// see if the challenge is valid (LAN clients don't need to challenge)
-	if( !NET_IsLocalAddress (from) ) 
+	if( !Network::isLocalAddress (from) ) 
 	{
 		int		ping;
 		int		i;
 
 		for(i = 0; i < ServerStatic::k_MAX_CHALLENGES ; i++ ) 
 		{
-			if( NET_CompareAdr(from, theSVS.challenges_[i].adr_) ) 
+			if( Network::compareAdr(from, theSVS.challenges_[i].adr_) ) 
 			{
 				if ( challenge == theSVS.challenges_[i].challenge_ ) 
 					break;		// good
@@ -345,7 +345,7 @@ void SV_DirectConnect( netadr_t from )
 		}
 		if( i == ServerStatic::k_MAX_CHALLENGES ) 
 		{
-			NET_OutOfBandPrint( NS_SERVER, from, "print\nNo or bad challenge for your address.\n" );
+			Network::outOfBandPrint( NS_SERVER, from, "print\nNo or bad challenge for your address.\n" );
 			return;
 		}
 
@@ -364,14 +364,14 @@ void SV_DirectConnect( netadr_t from )
 		{
 			if ( sv_minPing->value && ping < sv_minPing->value ) 
 			{
-				NET_OutOfBandPrint( NS_SERVER, from, "print\nServer is for high pings only\n" );
+				Network::outOfBandPrint( NS_SERVER, from, "print\nServer is for high pings only\n" );
 				Com_DPrintf ("Client %i rejected on a too low ping\n", i);
 				challengeptr->wasrefused_ = true;
 				return;
 			}
 			if ( sv_maxPing->value && ping > sv_maxPing->value ) 
 			{
-				NET_OutOfBandPrint( NS_SERVER, from, "print\nServer is for low pings only\n" );
+				Network::outOfBandPrint( NS_SERVER, from, "print\nServer is for low pings only\n" );
 				Com_DPrintf ("Client %i rejected on a too high ping\n", i);
 				challengeptr->wasrefused_ = true;
 				return;
@@ -394,11 +394,11 @@ void SV_DirectConnect( netadr_t from )
 		if( !cl || cl->state_ == SV_Client::CS_FREE ) 
 			continue;
 
-		if( NET_CompareBaseAdr( from, cl->netchan_.remoteAddress )
+		if( Network::compareBaseAdr( from, cl->netchan_.remoteAddress )
 			&& ( cl->netchan_.qport == qport 
 			|| from.port == cl->netchan_.remoteAddress.port ) ) 
 		{
-			Com_Printf ("%s:reconnect\n", NET_AdrToString (from));
+			Com_Printf ("%s:reconnect\n", Network::adrToString (from));
 			newcl = cl;
 			newcl->clientNum_ = i;
 
@@ -457,7 +457,7 @@ void SV_DirectConnect( netadr_t from )
 	int	count;
 	if( !newcl )
 	{
-		if( NET_IsLocalAddress( from ) ) 
+		if( Network::isLocalAddress( from ) ) 
 		{
 			count = 0;
 			int i;
@@ -482,7 +482,7 @@ void SV_DirectConnect( netadr_t from )
 		}
 		else 
 		{
-			NET_OutOfBandPrint( NS_SERVER, from, "print\nServer is full.\n" );
+			Network::outOfBandPrint( NS_SERVER, from, "print\nServer is full.\n" );
 			Com_DPrintf ("Rejected a connection.\n");
 			return;
 		}
@@ -525,7 +525,7 @@ gotnewcl:
 		// we can't just use VM_ArgPtr, because that is only valid inside a VM_Call
 		//denied = reinterpret_cast<char*>(VM_ExplicitArgPtr( gvm, (int)denied ));
 
-		NET_OutOfBandPrint( NS_SERVER, from, "print\n%s\n", denied );
+		Network::outOfBandPrint( NS_SERVER, from, "print\n%s\n", denied );
 		Com_DPrintf ("Game rejected a connection: %s.\n", denied);
 		return;
 	}
@@ -533,7 +533,7 @@ gotnewcl:
 	newcl->userinfoChanged();
 
 	// send the connect packet to the client
-	NET_OutOfBandPrint(NS_SERVER, from, "connectResponse %d", challenge);
+	Network::outOfBandPrint(NS_SERVER, from, "connectResponse %d", challenge);
 
 	Com_DPrintf( "Going from CS_FREE to CS_CONNECTED for %s\n", newcl->name_ );
 
@@ -614,7 +614,7 @@ void SV_Client::drop( const char *reason )
 
 		for (i = 0 ; i < ServerStatic::k_MAX_CHALLENGES ; i++, challenge++)
 		{
-			if(NET_CompareAdr(this->netchan_.remoteAddress, challenge->adr_))
+			if(Network::compareAdr(this->netchan_.remoteAddress, challenge->adr_))
 			{
 				Com_Memset(challenge, 0, sizeof(*challenge));
 				break;
@@ -1476,10 +1476,10 @@ void SV_Client::userinfoChanged() {
 	// TTimo
 	// maintain the IP information
 	// the banning code relies on this being consistently present
-	if( NET_IsLocalAddress(this->netchan_.remoteAddress) )
+	if( Network::isLocalAddress(this->netchan_.remoteAddress) )
 		ip = "localhost";
 	else
-		ip = const_cast<char*>(NET_AdrToString( this->netchan_.remoteAddress ));
+		ip = const_cast<char*>(Network::adrToString( this->netchan_.remoteAddress ));
 
 	val = Info_ValueForKey( this->userinfo_, "ip" );
 	if( val[0] )

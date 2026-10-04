@@ -720,7 +720,7 @@ void CL_Record_f( ) {
 	}
 
   // sync 0 doesn't prevent recording, so not forcing it off .. everyone does g_sync 1 ; record ; g_sync 0 ..
-	if ( NET_IsLocalAddress( clc.serverAddress ) &&
+	if ( Network::isLocalAddress( clc.serverAddress ) &&
 		!CvarSystem::variableValue( "g_synchronousClients" ) &&
 		// Don't nag if we're simply recording everything automatically.
 		!cl_autoRecordDemo->integer )
@@ -1317,7 +1317,7 @@ void CL_MapLoading( ) {
 		Key_SetCatcher( 0 );
 		SCR_UpdateScreen();
 		clc.connectTime = -RETRANSMIT_TIMEOUT;
-		NET_StringToAdr( clc.servername, &clc.serverAddress, NA_UNSPEC);
+		Network::stringToAdr( clc.servername, &clc.serverAddress, NA_UNSPEC);
 		// we don't need a challenge on the localhost
 
 		CL_CheckForResend();
@@ -1532,7 +1532,7 @@ void CL_RequestMotd( ) {
 		return;
 	}
 	Com_Printf( "Resolving %s\n", UPDATE_SERVER_NAME );
-	if ( !NET_StringToAdr( UPDATE_SERVER_NAME, &cls.updateServer, NA_IP ) ) {
+	if ( !Network::stringToAdr( UPDATE_SERVER_NAME, &cls.updateServer, NA_IP ) ) {
 		Com_Printf( "Couldn't resolve address\n" );
 		return;
 	}
@@ -1550,7 +1550,7 @@ void CL_RequestMotd( ) {
 	Info_SetValueForKey( info, "renderer", cls.glconfig.renderer_string );
 	Info_SetValueForKey( info, "version", com_version->string );
 
-	NET_OutOfBandPrint( NS_CLIENT, cls.updateServer, "getmotd \"%s\"\n", info );
+	Network::outOfBandPrint( NS_CLIENT, cls.updateServer, "getmotd \"%s\"\n", info );
 #endif
 }
 
@@ -1600,7 +1600,7 @@ void CL_RequestAuthorization( void ) {
 
 	if ( !cls.authorizeServer.port ) {
 		Com_Printf( "Resolving %s\n", AUTHORIZE_SERVER_NAME );
-		if ( !NET_StringToAdr( AUTHORIZE_SERVER_NAME, &cls.authorizeServer, NA_IP ) ) {
+		if ( !Network::stringToAdr( AUTHORIZE_SERVER_NAME, &cls.authorizeServer, NA_IP ) ) {
 			Com_Printf( "Couldn't resolve address\n" );
 			return;
 		}
@@ -1634,7 +1634,7 @@ void CL_RequestAuthorization( void ) {
 
 	fs = CvarSystem::get ("cl_anonymous", "0", CVAR_INIT|CVAR_SYSTEMINFO );
 
-	NET_OutOfBandPrint(NS_CLIENT, cls.authorizeServer, "getKeyAuthorize %i %s", fs->integer, nums );
+	Network::outOfBandPrint(NS_CLIENT, cls.authorizeServer, "getKeyAuthorize %i %s", fs->integer, nums );
 }
 #endif
 /*
@@ -1746,7 +1746,7 @@ void CL_Connect_f( ) {
 
 	Q_strncpyz( clc.servername, server, sizeof(clc.servername) );
 
-	if (!NET_StringToAdr(clc.servername, &clc.serverAddress, family) ) {
+	if (!Network::stringToAdr(clc.servername, &clc.serverAddress, family) ) {
 		Com_Printf ("Bad server address\n");
 		clc.state = CA_DISCONNECTED;
 		return;
@@ -1755,7 +1755,7 @@ void CL_Connect_f( ) {
 		clc.serverAddress.port = BigShort( PORT_SERVER );
 	}
 
-	serverString = NET_AdrToStringwPort(clc.serverAddress);
+	serverString = Network::adrToStringwPort(clc.serverAddress);
 
 	Com_Printf( "%s resolved to %s\n", clc.servername, serverString);
 
@@ -1766,7 +1766,7 @@ void CL_Connect_f( ) {
 
 	// if we aren't playing on a lan, we need to authenticate
 	// with the cd key
-	if(NET_IsLocalAddress(clc.serverAddress))
+	if(Network::isLocalAddress(clc.serverAddress))
 		clc.state = CA_CHALLENGING;
 	else
 	{
@@ -1889,13 +1889,13 @@ void CL_Rcon_f( ) {
 
 			return;
 		}
-		NET_StringToAdr (rconAddress->string, &to, NA_UNSPEC);
+		Network::stringToAdr (rconAddress->string, &to, NA_UNSPEC);
 		if (to.port == 0) {
 			to.port = BigShort (PORT_SERVER);
 		}
 	}
 	
-	NET_SendPacket (NS_CLIENT, strlen(message)+1, message, to);
+	Network::sendPacket (NS_CLIENT, strlen(message)+1, message, to);
 	cls.rconAddress = to;
 }
 
@@ -2411,7 +2411,7 @@ void CL_CheckForResend( ) {
 		// with a meaningful message
 		Com_sprintf(data, sizeof(data), "getchallenge %d %s", clc.challenge, com_gamename->string);
 
-		NET_OutOfBandPrint(NS_CLIENT, clc.serverAddress, "%s", data);
+		Network::outOfBandPrint(NS_CLIENT, clc.serverAddress, "%s", data);
 		break;
 		
 	case CA_CHALLENGING:
@@ -2433,7 +2433,7 @@ void CL_CheckForResend( ) {
 		Info_SetValueForKey( info, "challenge", va("%i", clc.challenge ) );
 		
 		Com_sprintf( data, sizeof(data), "connect \"%s\"", info );
-		NET_OutOfBandData( NS_CLIENT, clc.serverAddress, reinterpret_cast<byte *>(data), strlen ( data ) );
+		Network::outOfBandData( NS_CLIENT, clc.serverAddress, reinterpret_cast<byte *>(data), strlen ( data ) );
 		// the most current userinfo has been sent, so watch for any
 		// newer changes to userinfo variables
 		cvar_modifiedFlags &= ~CVAR_USERINFO;
@@ -2457,7 +2457,7 @@ void CL_MotdPacket( netadr_t from ) {
 	char	*info;
 
 	// if not from our server, ignore it
-	if ( !NET_CompareAdr( from, cls.updateServer ) ) {
+	if ( !Network::compareAdr( from, cls.updateServer ) ) {
 		return;
 	}
 
@@ -2512,7 +2512,7 @@ void CL_ServersResponsePacket( const netadr_t* from, Message *msg, bool extended
 	byte*			buffptr;
 	byte*			buffend;
 	
-	Com_Printf("CL_ServersResponsePacket from %s\n", NET_AdrToStringwPort(*from));
+	Com_Printf("CL_ServersResponsePacket from %s\n", Network::adrToStringwPort(*from));
 
 	if (cls.numglobalservers == -1) {
 		// state to detect lack of servers or lack of response
@@ -2592,7 +2592,7 @@ void CL_ServersResponsePacket( const netadr_t* from, Message *msg, bool extended
 		// We just avoid to add a server if it is still in the global servers list.
 		for (j = 0; j < count; j++)
 		{
-			if (NET_CompareAdr(cls.globalServers[j].adr, addresses[i]))
+			if (Network::compareAdr(cls.globalServers[j].adr, addresses[i]))
 				break;
 		}
 
@@ -2642,7 +2642,7 @@ void CL_ConnectionlessPacket( netadr_t from, Message *msg ) {
 
 	c = CommandSystem::argv(0);
 
-	Com_DPrintf ("CL packet %s: %s\n", NET_AdrToStringwPort(from), c);
+	Com_DPrintf ("CL packet %s: %s\n", Network::adrToStringwPort(from), c);
 
 	// challenge from the server we are connecting to
 	if (!Q_stricmp(c, "challengeResponse"))
@@ -2692,7 +2692,7 @@ void CL_ConnectionlessPacket( netadr_t from, Message *msg ) {
 		
 		if(clc.compat)
 		{
-			if(!NET_CompareAdr(from, clc.serverAddress))
+			if(!Network::compareAdr(from, clc.serverAddress))
 			{
 				// This challenge response is not coming from the expected address.
 				// Check whether we have a matching client challenge to prevent
@@ -2738,7 +2738,7 @@ void CL_ConnectionlessPacket( netadr_t from, Message *msg ) {
 			Com_Printf ("connectResponse packet while not connecting. Ignored.\n");
 			return;
 		}
-		if ( !NET_CompareAdr( from, clc.serverAddress ) ) {
+		if ( !Network::compareAdr( from, clc.serverAddress ) ) {
 			Com_Printf( "connectResponse from wrong address. Ignored.\n" );
 			return;
 		}
@@ -2790,8 +2790,8 @@ void CL_ConnectionlessPacket( netadr_t from, Message *msg ) {
 	// echo request from server
 	if ( !Q_stricmp(c, "echo") ) {
 		// NOTE: we may have to add exceptions for auth and update servers
-		if ( NET_CompareAdr( from, clc.serverAddress ) || NET_CompareAdr( from, cls.rconAddress ) ) {
-			NET_OutOfBandPrint( NS_CLIENT, from, "%s", CommandSystem::argv(1) );
+		if ( Network::compareAdr( from, clc.serverAddress ) || Network::compareAdr( from, cls.rconAddress ) ) {
+			Network::outOfBandPrint( NS_CLIENT, from, "%s", CommandSystem::argv(1) );
 		}
 		return;
 	}
@@ -2811,7 +2811,7 @@ void CL_ConnectionlessPacket( netadr_t from, Message *msg ) {
 	// echo request from server
 	if ( !Q_stricmp(c, "print") ) {
 		// NOTE: we may have to add exceptions for auth and update servers
-		if ( NET_CompareAdr( from, clc.serverAddress ) || NET_CompareAdr( from, cls.rconAddress ) ) {
+		if ( Network::compareAdr( from, clc.serverAddress ) || Network::compareAdr( from, cls.rconAddress ) ) {
 			s = msg->readString();
 
 			Q_strncpyz( clc.serverMessage, s, sizeof( clc.serverMessage ) );
@@ -2858,16 +2858,16 @@ void CL_PacketEvent( netadr_t from, Message *msg ) {
 	}
 
 	if ( msg->cursize < 4 ) {
-		Com_Printf ("%s: Runt packet\n", NET_AdrToStringwPort( from ));
+		Com_Printf ("%s: Runt packet\n", Network::adrToStringwPort( from ));
 		return;
 	}
 
 	//
 	// packet from server
 	//
-	if ( !NET_CompareAdr( from, clc.netchan.remoteAddress ) ) {
+	if ( !Network::compareAdr( from, clc.netchan.remoteAddress ) ) {
 		Com_DPrintf ("%s:sequenced packet without connection\n"
-			, NET_AdrToStringwPort( from ) );
+			, Network::adrToStringwPort( from ) );
 		// FIXME: send a client disconnect?
 		return;
 	}
@@ -3859,19 +3859,19 @@ static void CL_SetServerInfoByAddress(netadr_t from, const char *info, int ping)
 	int i;
 
 	for (i = 0; i < MAX_OTHER_SERVERS; i++) {
-		if (NET_CompareAdr(from, cls.localServers[i].adr)) {
+		if (Network::compareAdr(from, cls.localServers[i].adr)) {
 			CL_SetServerInfo(&cls.localServers[i], info, ping);
 		}
 	}
 
 	for (i = 0; i < MAX_GLOBAL_SERVERS; i++) {
-		if (NET_CompareAdr(from, cls.globalServers[i].adr)) {
+		if (Network::compareAdr(from, cls.globalServers[i].adr)) {
 			CL_SetServerInfo(&cls.globalServers[i], info, ping);
 		}
 	}
 
 	for (i = 0; i < MAX_OTHER_SERVERS; i++) {
-		if (NET_CompareAdr(from, cls.favoriteServers[i].adr)) {
+		if (Network::compareAdr(from, cls.favoriteServers[i].adr)) {
 			CL_SetServerInfo(&cls.favoriteServers[i], info, ping);
 		}
 	}
@@ -3926,11 +3926,11 @@ void CL_ServerInfoPacket( netadr_t from, Message *msg ) {
 	// iterate servers waiting for ping response
 	for (i=0; i<MAX_PINGREQUESTS; i++)
 	{
-		if ( cl_pinglist[i].adr.port && !cl_pinglist[i].time && NET_CompareAdr( from, cl_pinglist[i].adr ) )
+		if ( cl_pinglist[i].adr.port && !cl_pinglist[i].time && Network::compareAdr( from, cl_pinglist[i].adr ) )
 		{
 			// calc ping time
 			cl_pinglist[i].time = Sys_Milliseconds() - cl_pinglist[i].start;
-			Com_DPrintf( "ping time %dms from %s\n", cl_pinglist[i].time, NET_AdrToString( from ) );
+			Com_DPrintf( "ping time %dms from %s\n", cl_pinglist[i].time, Network::adrToString( from ) );
 
 			// save of info
 			Q_strncpyz( cl_pinglist[i].info, infoString, sizeof( cl_pinglist[i].info ) );
@@ -3969,7 +3969,7 @@ void CL_ServerInfoPacket( netadr_t from, Message *msg ) {
 		}
 
 		// avoid duplicate
-		if ( NET_CompareAdr( from, cls.localServers[i].adr ) ) {
+		if ( Network::compareAdr( from, cls.localServers[i].adr ) ) {
 			return;
 		}
 	}
@@ -3988,7 +3988,7 @@ void CL_ServerInfoPacket( netadr_t from, Message *msg ) {
 		if (info[strlen(info)-1] != '\n') {
 			Q_strcat(info, sizeof(info), "\n");
 		}
-		Com_Printf( "%s: %s", NET_AdrToStringwPort( from ), info );
+		Com_Printf( "%s: %s", Network::adrToStringwPort( from ), info );
 	}
 }
 
@@ -4001,7 +4001,7 @@ serverStatus_t *CL_GetServerStatus( netadr_t from ) {
 	int i, oldest, oldestTime;
 
 	for (i = 0; i < MAX_SERVERSTATUSREQUESTS; i++) {
-		if ( NET_CompareAdr( from, cl_serverStatusList[i].address ) ) {
+		if ( Network::compareAdr( from, cl_serverStatusList[i].address ) ) {
 			return &cl_serverStatusList[i];
 		}
 	}
@@ -4040,7 +4040,7 @@ int CL_ServerStatus( const char *serverAddress, char *serverStatusString, int ma
 		return false;
 	}
 	// get the address
-	if ( !NET_StringToAdr( serverAddress, &to, NA_UNSPEC) ) {
+	if ( !Network::stringToAdr( serverAddress, &to, NA_UNSPEC) ) {
 		return false;
 	}
 	serverStatus = CL_GetServerStatus( to );
@@ -4051,7 +4051,7 @@ int CL_ServerStatus( const char *serverAddress, char *serverStatusString, int ma
 	}
 
 	// if this server status request has the same address
-	if ( NET_CompareAdr( to, serverStatus->address) ) {
+	if ( Network::compareAdr( to, serverStatus->address) ) {
 		// if we received a response for this server status request
 		if (!serverStatus->pending) {
 			Q_strncpyz(serverStatusString, serverStatus->string, maxLen);
@@ -4066,7 +4066,7 @@ int CL_ServerStatus( const char *serverAddress, char *serverStatusString, int ma
 			serverStatus->retrieved = false;
 			serverStatus->time = 0;
 			serverStatus->startTime = Com_Milliseconds();
-			NET_OutOfBandPrint( NS_CLIENT, to, "getstatus" );
+			Network::outOfBandPrint( NS_CLIENT, to, "getstatus" );
 			return false;
 		}
 	}
@@ -4078,7 +4078,7 @@ int CL_ServerStatus( const char *serverAddress, char *serverStatusString, int ma
 		serverStatus->retrieved = false;
 		serverStatus->startTime = Com_Milliseconds();
 		serverStatus->time = 0;
-		NET_OutOfBandPrint( NS_CLIENT, to, "getstatus" );
+		Network::outOfBandPrint( NS_CLIENT, to, "getstatus" );
 		return false;
 	}
 	return false;
@@ -4098,7 +4098,7 @@ void CL_ServerStatusResponse( netadr_t from, Message *msg ) {
 
 	serverStatus = nullptr;
 	for (i = 0; i < MAX_SERVERSTATUSREQUESTS; i++) {
-		if ( NET_CompareAdr( from, cl_serverStatusList[i].address ) ) {
+		if ( Network::compareAdr( from, cl_serverStatusList[i].address ) ) {
 			serverStatus = &cl_serverStatusList[i];
 			break;
 		}
@@ -4214,9 +4214,9 @@ void CL_LocalServers_f( ) {
 			to.port = BigShort( (short)(PORT_SERVER + j) );
 
 			to.type = NA_BROADCAST;
-			NET_SendPacket( NS_CLIENT, strlen( message ), message, to );
+			Network::sendPacket( NS_CLIENT, strlen( message ), message, to );
 			to.type = NA_MULTICAST6;
-			NET_SendPacket( NS_CLIENT, strlen( message ), message, to );
+			Network::sendPacket( NS_CLIENT, strlen( message ), message, to );
 		}
 	}
 }
@@ -4276,7 +4276,7 @@ void CL_GlobalServers_f( ) {
 	// reset the list, waiting for response
 	// -1 is used to distinguish a "no response"
 
-	i = NET_StringToAdr(masteraddress, &to, NA_UNSPEC);
+	i = Network::stringToAdr(masteraddress, &to, NA_UNSPEC);
 	
 	if(!i)
 	{
@@ -4286,7 +4286,7 @@ void CL_GlobalServers_f( ) {
 	else if(i == 2)
 		to.port = BigShort(PORT_MASTER);
 
-	Com_Printf("Requesting servers from %s (%s)...\n", masteraddress, NET_AdrToStringwPort(to));
+	Com_Printf("Requesting servers from %s (%s)...\n", masteraddress, Network::adrToStringwPort(to));
 
 	cls.numglobalservers = -1;
 	cls.pingUpdateSource = AS_GLOBAL;
@@ -4320,7 +4320,7 @@ void CL_GlobalServers_f( ) {
 		Q_strcat(command, sizeof(command), CommandSystem::argv(i));
 	}
 
-	NET_OutOfBandPrint( NS_SERVER, to, "%s", command );
+	Network::outOfBandPrint( NS_SERVER, to, "%s", command );
 }
 
 
@@ -4343,7 +4343,7 @@ void CL_GetPing( int n, char *buf, int buflen, int *pingtime )
 		return;
 	}
 
-	str = NET_AdrToStringwPort( cl_pinglist[n].adr );
+	str = Network::adrToStringwPort( cl_pinglist[n].adr );
 	Q_strncpyz( buf, str, buflen );
 
 	time = cl_pinglist[n].time;
@@ -4513,7 +4513,7 @@ void CL_Ping_f( ) {
 
 	Com_Memset( &to, 0, sizeof(netadr_t) );
 
-	if ( !NET_StringToAdr( server, &to, family ) ) {
+	if ( !Network::stringToAdr( server, &to, family ) ) {
 		return;
 	}
 
@@ -4525,7 +4525,7 @@ void CL_Ping_f( ) {
 
 	CL_SetServerInfoByAddress(pingptr->adr, nullptr, 0);
 		
-	NET_OutOfBandPrint( NS_CLIENT, to, "getinfo xxx" );
+	Network::outOfBandPrint( NS_CLIENT, to, "getinfo xxx" );
 }
 
 /*
@@ -4578,7 +4578,7 @@ bool CL_UpdateVisiblePings_f(int source) {
 						if (!cl_pinglist[j].adr.port) {
 							continue;
 						}
-						if (NET_CompareAdr( cl_pinglist[j].adr, server[i].adr)) {
+						if (Network::compareAdr( cl_pinglist[j].adr, server[i].adr)) {
 							// already on the list
 							break;
 						}
@@ -4593,7 +4593,7 @@ bool CL_UpdateVisiblePings_f(int source) {
 						memcpy(&cl_pinglist[j].adr, &server[i].adr, sizeof(netadr_t));
 						cl_pinglist[j].start = Sys_Milliseconds();
 						cl_pinglist[j].time = 0;
-						NET_OutOfBandPrint( NS_CLIENT, cl_pinglist[j].adr, "getinfo xxx" );
+						Network::outOfBandPrint( NS_CLIENT, cl_pinglist[j].adr, "getinfo xxx" );
 						slots++;
 					}
 				}
@@ -4677,11 +4677,11 @@ void CL_ServerStatus_f() {
 		}
 
 		toptr = &to;
-		if ( !NET_StringToAdr( server, toptr, family ) )
+		if ( !Network::stringToAdr( server, toptr, family ) )
 			return;
 	}
 
-	NET_OutOfBandPrint( NS_CLIENT, *toptr, "getstatus" );
+	Network::outOfBandPrint( NS_CLIENT, *toptr, "getstatus" );
 
 	serverStatus = CL_GetServerStatus( *toptr );
 	serverStatus->address = *toptr;

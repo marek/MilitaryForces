@@ -2192,11 +2192,11 @@ int Com_EventLoop( ) {
 		// if no more events are available
 		if ( ev.evType == SE_NONE ) {
 			// manually send packet events for the loopback channel
-			while ( NET_GetLoopPacket( NS_CLIENT, &evFrom, &buf ) ) {
+			while ( Network::getLoopPacket( NS_CLIENT, &evFrom, &buf ) ) {
 				CL_PacketEvent( evFrom, &buf );
 			}
 
-			while ( NET_GetLoopPacket( NS_SERVER, &evFrom, &buf ) ) {
+			while ( Network::getLoopPacket( NS_SERVER, &evFrom, &buf ) ) {
 				// if the server just shut down, flush the events
 				if ( com_sv_running->integer ) {
 					Com_RunAndTimeServerPacket( &evFrom, &buf );
@@ -2410,7 +2410,7 @@ void Com_GameRestart(int checksumFeed, bool disconnect)
 			// We don't want to change any network settings if gamedir
 			// change was triggered by a connect to server because the
 			// new network settings might make the connection fail.
-			NET_Restart_f();
+			Network::restart_f();
 		}
 
 		if(com_gameClientRestarting)
@@ -3145,9 +3145,9 @@ void Com_Frame( ) {
 			timeVal = Com_TimeVal(minMsec);
 		
 		if(com_busyWait->integer || timeVal < 1)
-			NET_Sleep(0);
+			Network::sleep(0);
 		else
-			NET_Sleep(timeVal - 1);
+			Network::sleep(timeVal - 1);
 	} while(Com_TimeVal(minMsec));
 	
 	IN_Frame();
@@ -3227,7 +3227,7 @@ void Com_Frame( ) {
 #endif
 
 
-	NET_FlushPacketQueue();
+	Network::flushPacketQueue();
 
 	//
 	// report timing information

@@ -389,12 +389,12 @@ bool Sys_StringToAdr( const char *s, netadr_t *a, netadrtype_t family ) {
 
 /*
 ===================
-NET_CompareBaseAdrMask
+Network::compareBaseAdrMask
 
 Compare without port, and up to the bit number given in netmask.
 ===================
 */
-bool NET_CompareBaseAdrMask(netadr_t a, netadr_t b, int netmask)
+bool Network::compareBaseAdrMask(netadr_t a, netadr_t b, int netmask)
 {
 	byte cmpmask, *addra, *addrb;
 	int curbyte;
@@ -423,7 +423,7 @@ bool NET_CompareBaseAdrMask(netadr_t a, netadr_t b, int netmask)
 	}
 	else
 	{
-		Com_Printf ("NET_CompareBaseAdr: bad address type\n");
+		Com_Printf ("Network::compareBaseAdr: bad address type\n");
 		return false;
 	}
 
@@ -450,17 +450,17 @@ bool NET_CompareBaseAdrMask(netadr_t a, netadr_t b, int netmask)
 
 /*
 ===================
-NET_CompareBaseAdr
+Network::compareBaseAdr
 
 Compares without the port
 ===================
 */
-bool NET_CompareBaseAdr (netadr_t a, netadr_t b)
+bool Network::compareBaseAdr (netadr_t a, netadr_t b)
 {
-	return NET_CompareBaseAdrMask(a, b, -1);
+	return Network::compareBaseAdrMask(a, b, -1);
 }
 
-const char	*NET_AdrToString (netadr_t a)
+const char	*Network::adrToString (netadr_t a)
 {
 	static	char	s[NET_ADDRSTRMAXLEN];
 
@@ -480,7 +480,7 @@ const char	*NET_AdrToString (netadr_t a)
 	return s;
 }
 
-const char	*NET_AdrToStringwPort (netadr_t a)
+const char	*Network::adrToStringwPort (netadr_t a)
 {
 	static	char	s[NET_ADDRSTRMAXLEN];
 
@@ -489,17 +489,17 @@ const char	*NET_AdrToStringwPort (netadr_t a)
 	else if (a.type == NA_BOT)
 		Com_sprintf (s, sizeof(s), "bot");
 	else if(a.type == NA_IP)
-		Com_sprintf(s, sizeof(s), "%s:%hu", NET_AdrToString(a), ntohs(a.port));
+		Com_sprintf(s, sizeof(s), "%s:%hu", Network::adrToString(a), ntohs(a.port));
 	else if(a.type == NA_IP6)
-		Com_sprintf(s, sizeof(s), "[%s]:%hu", NET_AdrToString(a), ntohs(a.port));
+		Com_sprintf(s, sizeof(s), "[%s]:%hu", Network::adrToString(a), ntohs(a.port));
 
 	return s;
 }
 
 
-bool	NET_CompareAdr (netadr_t a, netadr_t b)
+bool	Network::compareAdr (netadr_t a, netadr_t b)
 {
-	if(!NET_CompareBaseAdr(a, b))
+	if(!Network::compareBaseAdr(a, b))
 		return false;
 	
 	if (a.type == NA_IP || a.type == NA_IP6)
@@ -514,7 +514,7 @@ bool	NET_CompareAdr (netadr_t a, netadr_t b)
 }
 
 
-bool	NET_IsLocalAddress( netadr_t adr ) {
+bool	Network::isLocalAddress( netadr_t adr ) {
 	return adr.type == NA_LOOPBACK;
 }
 
@@ -569,7 +569,7 @@ bool NET_GetPacket(netadr_t *net_from, Message *net_message, fd_set *fdr)
 			}
 		
 			if( ret >= net_message->maxsize ) {
-				Com_Printf( "Oversize packet from %s\n", NET_AdrToString (*net_from) );
+				Com_Printf( "Oversize packet from %s\n", Network::adrToString (*net_from) );
 				return false;
 			}
 			
@@ -597,7 +597,7 @@ bool NET_GetPacket(netadr_t *net_from, Message *net_message, fd_set *fdr)
 		
 			if(ret >= net_message->maxsize)
 			{
-				Com_Printf( "Oversize packet from %s\n", NET_AdrToString (*net_from) );
+				Com_Printf( "Oversize packet from %s\n", Network::adrToString (*net_from) );
 				return false;
 			}
 			
@@ -625,7 +625,7 @@ bool NET_GetPacket(netadr_t *net_from, Message *net_message, fd_set *fdr)
 		
 			if(ret >= net_message->maxsize)
 			{
-				Com_Printf( "Oversize packet from %s\n", NET_AdrToString (*net_from) );
+				Com_Printf( "Oversize packet from %s\n", Network::adrToString (*net_from) );
 				return false;
 			}
 			
@@ -975,7 +975,7 @@ void NET_SetMulticast6()
 
 	if(!*net_mcast6addr->string || !Sys_StringToSockaddr(net_mcast6addr->string, reinterpret_cast<struct sockaddr *>(&addr), sizeof(addr), AF_INET6))
 	{
-		Com_Printf("WARNING: NET_JoinMulticast6: Incorrect multicast address given, "
+		Com_Printf("WARNING: Network::joinMulticast6: Incorrect multicast address given, "
 			   "please set cvar %s to a sane value.\n", net_mcast6addr->name);
 		
 		CvarSystem::setValue(net_enabled->name, net_enabled->integer | NET_DISABLEMCAST);
@@ -1003,7 +1003,7 @@ NET_JoinMulticast
 Join an ipv6 multicast group
 ====================
 */
-void NET_JoinMulticast6()
+void Network::joinMulticast6()
 {
 	int err;
 	
@@ -1029,7 +1029,7 @@ void NET_JoinMulticast6()
 		if (setsockopt(multicast6_socket, IPPROTO_IPV6, IPV6_MULTICAST_IF,
 					reinterpret_cast<char *>(&curgroup.ipv6mr_interface), sizeof(curgroup.ipv6mr_interface)) < 0)
 		{
-			Com_Printf("NET_JoinMulticast6: Couldn't set scope on multicast socket: %s\n", NET_ErrorString());
+			Com_Printf("Network::joinMulticast6: Couldn't set scope on multicast socket: %s\n", NET_ErrorString());
 
 			if(multicast6_socket != ip6_socket)
 			{
@@ -1042,7 +1042,7 @@ void NET_JoinMulticast6()
 
 	if (setsockopt(multicast6_socket, IPPROTO_IPV6, IPV6_JOIN_GROUP, reinterpret_cast<char *>(&curgroup), sizeof(curgroup)))
 	{
-		Com_Printf("NET_JoinMulticast6: Couldn't join multicast group: %s\n", NET_ErrorString());
+		Com_Printf("Network::joinMulticast6: Couldn't join multicast group: %s\n", NET_ErrorString());
 
 		if(multicast6_socket != ip6_socket)
 		{
@@ -1053,7 +1053,7 @@ void NET_JoinMulticast6()
 	}
 }
 
-void NET_LeaveMulticast6()
+void Network::leaveMulticast6()
 {
 	if(multicast6_socket != INVALID_SOCKET)
 	{
@@ -1493,10 +1493,10 @@ static bool NET_GetCvars( ) {
 
 /*
 ====================
-NET_Config
+Network::config
 ====================
 */
-void NET_Config( bool enableNetworking ) {
+void Network::config( bool enableNetworking ) {
 	bool	modified;
 	bool	stop;
 	bool	start;
@@ -1574,10 +1574,10 @@ void NET_Config( bool enableNetworking ) {
 
 /*
 ====================
-NET_Init
+Network::init
 ====================
 */
-void NET_Init( ) {
+void Network::init( ) {
 #ifdef _WIN32
 	int		r;
 
@@ -1591,23 +1591,23 @@ void NET_Init( ) {
 	Com_Printf( "Winsock Initialized\n" );
 #endif
 
-	NET_Config( true );
+	Network::config( true );
 	
-	CommandSystem::addCommand ("net_restart", NET_Restart_f);
+	CommandSystem::addCommand ("net_restart", Network::restart_f);
 }
 
 
 /*
 ====================
-NET_Shutdown
+Network::shutdown
 ====================
 */
-void NET_Shutdown( ) {
+void Network::shutdown( ) {
 	if ( !networkingEnabled ) {
 		return;
 	}
 
-	NET_Config( false );
+	Network::config( false );
 
 #ifdef _WIN32
 	WSACleanup();
@@ -1619,7 +1619,7 @@ void NET_Shutdown( ) {
 ====================
 NET_Event
 
-Called from NET_Sleep which uses select() to determine which sockets have seen action.
+Called from Network::sleep which uses select() to determine which sockets have seen action.
 ====================
 */
 
@@ -1654,12 +1654,12 @@ void NET_Event(fd_set *fdr)
 
 /*
 ====================
-NET_Sleep
+Network::sleep
 
 Sleeps msec or until something happens on the network
 ====================
 */
-void NET_Sleep(int msec)
+void Network::sleep(int msec)
 {
 	struct timeval timeout;
 	fd_set fdr;
@@ -1707,10 +1707,10 @@ void NET_Sleep(int msec)
 
 /*
 ====================
-NET_Restart_f
+Network::restart_f
 ====================
 */
-void NET_Restart_f()
+void Network::restart_f()
 {
-	NET_Config(true);
+	Network::config(true);
 }
