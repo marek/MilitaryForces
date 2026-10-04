@@ -92,7 +92,7 @@ char *lqm_tags[BP_LQM_MAX_PARTS] =
 ClientGame::planePilot
 =============
 */
-static int cg_drawTeam;
+int ClientGame::cg_drawTeam;
 
 void ClientGame::addVehiclePart( refEntity_t *re )
 {

@@ -20,7 +20,7 @@ MARK POLYS
 markPoly_t	cg_activeMarkPolys;			// double linked list
 markPoly_t	*cg_freeMarkPolys;			// single linked list
 markPoly_t	cg_markPolys[MAX_MARK_POLYS];
-static		int	markTotal;
+int ClientGame::markTotal;
 
 /*
 ===================

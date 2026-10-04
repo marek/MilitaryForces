@@ -1931,6 +1931,19 @@ public:
 	static void missileTrail( ClientEntity * cent, const weaponInfo_t *wi );
 	static void flareTrail( ClientEntity * cent, const weaponInfo_t *wi );
 	static void missileTrail2( ClientEntity * cent, const weaponInfo_t *wi );
+
+private:
+	static int number_spaces[16];
+	static int alphabet_spaces[33];
+	static screenPlacement_e cg_screenPlacement;
+	static int markTotal;
+	static ClientEntity *cg_triggerEntities[MAX_ENTITIES_IN_SNAPSHOT];
+	static int cg_numTriggerEntities;
+	static ClientEntity *cg_solidEntities[MAX_ENTITIES_IN_SNAPSHOT];
+	static int cg_numSolidEntities;
+	static pmove_t cg_pmove;
+	static bool localClient;
+	static int cg_drawTeam;
 };
 extern particleWorld_t pw;
 extern refexport_t	refExport;

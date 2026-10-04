@@ -246,27 +246,27 @@ struct searchpath_s {
 };
 using searchpath_t = searchpath_s;
 
-static	char		fs_gamedir[MAX_OSPATH];	// this will be a single file name with no separators
+char FileSystem::fs_gamedir[MAX_OSPATH];	// this will be a single file name with no separators
 static	cvar_t		*fs_debug;
-static	cvar_t		*fs_homeconfigpath;
-static	cvar_t		*fs_homedatapath;
-static	cvar_t		*fs_homestatepath;
+cvar_t *FileSystem::fs_homeconfigpath;
+cvar_t *FileSystem::fs_homedatapath;
+cvar_t *FileSystem::fs_homestatepath;
 
-static	cvar_t		*fs_apppath;
-static	cvar_t		*fs_steampath;
-static	cvar_t		*fs_gogpath;
-static	cvar_t		*fs_microsoftstorepath;
+cvar_t *FileSystem::fs_apppath;
+cvar_t *FileSystem::fs_steampath;
+cvar_t *FileSystem::fs_gogpath;
+cvar_t *FileSystem::fs_microsoftstorepath;
 
-static	cvar_t		*fs_basepath;
-static	cvar_t		*fs_basegame;
-static	cvar_t		*fs_gamedirvar;
+cvar_t *FileSystem::fs_basepath;
+cvar_t *FileSystem::fs_basegame;
+cvar_t *FileSystem::fs_gamedirvar;
 static	searchpath_t	*fs_searchpaths;
-static	int			fs_readCount;			// total bytes read
-static	int			fs_loadCount;			// total files read
-static	int			fs_loadStack;			// total files in memory
-static	int			fs_packFiles = 0;		// total number of files in packs
+int FileSystem::fs_readCount;			// total bytes read
+int FileSystem::fs_loadCount;			// total files read
+int FileSystem::fs_loadStack;			// total files in memory
+int FileSystem::fs_packFiles = 0;		// total number of files in packs
 
-static cvar_t *fs_pathVars[16];
+cvar_t *FileSystem::fs_pathVars[16];
 
 static int fs_checksumFeed;
 
@@ -296,7 +296,7 @@ static fileHandleData_t	fsh[MAX_FILE_HANDLES];
 
 // TTimo - https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=540
 // wether we did a reorder on the current search path when joining the server
-static bool fs_reordered;
+bool FileSystem::fs_reordered;
 
 // never load anything from pk3 files that are not present at the server when pure
 static int			fs_numServerPaks = 0;
@@ -305,7 +305,7 @@ static char			*fs_serverPakNames[MAX_SEARCH_PATHS];			// pk3 names
 
 // only used for autodownload, to make sure the client has at least
 // all the pk3 files that are referenced at the server side
-static int			fs_numServerReferencedPaks;
+int FileSystem::fs_numServerReferencedPaks;
 static unsigned int	fs_serverReferencedPaks[MAX_SEARCH_PATHS];			// checksums
 static char			*fs_serverReferencedPakNames[MAX_SEARCH_PATHS];		// pk3 names
 

@@ -86,6 +86,26 @@ public:
 	static void startup( const char *gameName );
 	static void appendUserFriendlyPakList( char *buf, size_t bufsize, int foundPakFiles, int numPakFiles );
 	static void checkPak0( void );
+
+private:
+	static int fs_numServerReferencedPaks;
+	static bool fs_reordered;
+	static cvar_t *fs_pathVars[16];
+	static int fs_packFiles;
+	static int fs_loadStack;
+	static int fs_loadCount;
+	static int fs_readCount;
+	static cvar_t *fs_gamedirvar;
+	static cvar_t *fs_basegame;
+	static cvar_t *fs_basepath;
+	static cvar_t *fs_microsoftstorepath;
+	static cvar_t *fs_gogpath;
+	static cvar_t *fs_steampath;
+	static cvar_t *fs_apppath;
+	static cvar_t *fs_homestatepath;
+	static cvar_t *fs_homedatapath;
+	static cvar_t *fs_homeconfigpath;
+	static char fs_gamedir[MAX_OSPATH];
 };
 
 #endif

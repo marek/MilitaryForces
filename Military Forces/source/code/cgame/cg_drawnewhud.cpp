@@ -11,7 +11,7 @@ extern UI_UtilsCG cgUtils;
 // there are a couple of duplicate functions here
 // this should be cleaned up and factorized when there is some time left..
 
-static int alphabet_spaces[33] =
+int ClientGame::alphabet_spaces[33] =
 {
 	8,	// A=8
 	7,	// B=7
@@ -48,7 +48,7 @@ static int alphabet_spaces[33] =
 	7	// ==7	
 };
 
-static int number_spaces[16] =
+int ClientGame::number_spaces[16] =
 {
 	8,	// 0=8
 	8,	// 1=8

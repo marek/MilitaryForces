@@ -52,7 +52,7 @@ ClientGame::adjustFrom640
 Adjusted for resolution and screen aspect ratio
 ================
 */
-static screenPlacement_e cg_screenPlacement = PLACE_CENTER;
+screenPlacement_e ClientGame::cg_screenPlacement = PLACE_CENTER;
 
 void ClientGame::setScreenPlacement( screenPlacement_e placement ) {
 	cg_screenPlacement = placement;

@@ -54,7 +54,7 @@ constexpr int SB_SCORELINE_X = 112;
 //  
 //  wins/losses are drawn on bot icon now
 
-static bool localClient; // true if local client has been displayed
+bool ClientGame::localClient; // true if local client has been displayed
 
 
 							 /*
