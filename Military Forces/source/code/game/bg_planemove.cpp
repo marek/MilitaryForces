@@ -11,11 +11,11 @@
 
 /*
 ===================
-PM_Plane_Brakes
+plane_Brakes
 
 ===================
 */
-static void PM_Plane_Brakes()
+void PlayerMove::plane_Brakes()
 {
 	if( !(pm->ps->ONOFF & OO_LANDED) &&
 		!(availableVehicles[pm->vehicle].caps & HC_SPEEDBRAKE) ) {
@@ -42,7 +42,7 @@ PM_Toggle_Gear
 
 ===================
 */
-static void PM_Toggle_PlaneGear()
+void PlayerMove::toggle_PlaneGear()
 {
 	if( !(availableVehicles[pm->vehicle].caps & HC_GEAR) ) {
 		return;
@@ -215,7 +215,6 @@ PlayerMove::planeMove
 
 ===================
 */
-bool	PM_SlideMove_Plane();
 
 void PlayerMove::planeMove( ) 
 {
@@ -236,7 +235,7 @@ void PlayerMove::planeMove( )
 
 	// gear
 	if( !dead && (pm->cmd.buttons & BUTTON_GEAR) ) {
-		PM_Toggle_PlaneGear();
+		toggle_PlaneGear();
 	}
 
 	// gearanim
@@ -298,7 +297,7 @@ void PlayerMove::planeMove( )
 
 	// brake
 	if( !dead && (pm->cmd.buttons & BUTTON_BRAKE) ) {
-		PM_Plane_Brakes();
+		plane_Brakes();
 	}
 
     // local vectors
@@ -349,7 +348,7 @@ void PlayerMove::planeMove( )
 			pm->ps->vehicleAngles[2] += availableVehicles[pm->vehicle].turnspeed[2]/2 * pml.frametime;
 			if( pm->ps->vehicleAngles[2] > 360 ) pm->ps->vehicleAngles[2] -= 360;
 		}
-		PM_SlideMove_Plane();
+		slideMove_Plane();
 		return;
     }
 
@@ -493,7 +492,7 @@ void PlayerMove::planeMove( )
 	AngleVectors( vehdir, pm->ps->velocity, nullptr, nullptr );
 	VectorScale( pm->ps->velocity, (float)pm->ps->speed/10, pm->ps->velocity );
 
-	PM_SlideMove_Plane();
+	slideMove_Plane();
 }
 
 void PlayerMove::planeMoveAdvanced( ) 
@@ -516,7 +515,7 @@ void PlayerMove::planeMoveAdvanced( )
 
 	// gear
 	if( !dead && (pm->cmd.buttons & BUTTON_GEAR) ) {
-		PM_Toggle_PlaneGear();
+		toggle_PlaneGear();
 	}
 
 	// gearanim
@@ -578,7 +577,7 @@ void PlayerMove::planeMoveAdvanced( )
 
 	// brake
 	if( !dead && (pm->cmd.buttons & BUTTON_BRAKE) ) {
-		PM_Plane_Brakes();
+		plane_Brakes();
 	}
 
     // local vectors
@@ -629,7 +628,7 @@ void PlayerMove::planeMoveAdvanced( )
 			pm->ps->vehicleAngles[2] += availableVehicles[pm->vehicle].turnspeed[2]/2 * pml.frametime;
 			if( pm->ps->vehicleAngles[2] > 360 ) pm->ps->vehicleAngles[2] -= 360;
 		}
-		PM_SlideMove_Plane();
+		slideMove_Plane();
 		return;
     }
 
@@ -762,7 +761,7 @@ void PlayerMove::planeMoveAdvanced( )
 	AngleVectors( vehdir, pm->ps->velocity, nullptr, nullptr );
 	VectorScale( pm->ps->velocity, (float)pm->ps->speed/10, pm->ps->velocity );
 
-	PM_SlideMove_Plane();
+	slideMove_Plane();
 }
 
 
@@ -800,13 +799,13 @@ void PlayerMove::addTouchEnt_Plane( int entityNum ) {
 
 /*
 ==================
-PM_SlideMove_Plane
+slideMove_Plane
 
 Returns true if the velocity was clipped in some way
 ==================
 */
 constexpr int MAX_CLIP_PLANES = 5;
-bool	PM_SlideMove_Plane() {
+bool PlayerMove::slideMove_Plane() {
 	int			bumpcount, numbumps;
 	vec3_t		dir;
 	float		d;

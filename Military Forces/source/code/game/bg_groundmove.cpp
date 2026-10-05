@@ -22,12 +22,12 @@ constexpr int PMAX = 8;
 
 /*
 ===================
-PM_GroundVehicle_Brakes
+groundVehicle_Brakes
 
 ===================
 */
 
-static void PM_GroundVehicle_Brakes()
+void PlayerMove::groundVehicle_Brakes()
 {
 	if( pm->cmd.serverTime < pm->ps->timers[TIMER_BRAKE] ) return;
 
@@ -310,18 +310,17 @@ PlayerMove::groundVehicleMove
 
 ===================
 */
-static bool	PM_SlideMove_GV();
 
 /*
 ===================
-PM_StepSlideMove_GV
+stepSlideMove_GV
 
 A ground vehicle that is stopped by an edge in the terrain tries again from a little higher up, so it
 climbs onto ground it could drive on instead of sliding along the edge. The step is only taken when it
 ends on ground that is not too steep and gets the vehicle further than sliding did.
 ===================
 */
-static void PM_StepSlideMove_GV()
+void PlayerMove::stepSlideMove_GV()
 {
 	constexpr float drivableNormal = 0.6f;
 	vec3_t	startOrigin, startVelocity, slideOrigin, slideVelocity, up, down, mins;
@@ -329,7 +328,7 @@ static void PM_StepSlideMove_GV()
 
 	VectorCopy( pm->ps->origin, startOrigin );
 	VectorCopy( pm->ps->velocity, startVelocity );
-	if( !PM_SlideMove_GV() )
+	if( !slideMove_GV() )
 		return;		// nothing in the way
 
 	VectorCopy( pm->ps->origin, slideOrigin );
@@ -350,7 +349,7 @@ static void PM_StepSlideMove_GV()
 	// the same move from up there
 	VectorCopy( trace.endpos, pm->ps->origin );
 	VectorCopy( startVelocity, pm->ps->velocity );
-	PM_SlideMove_GV();
+	slideMove_GV();
 
 	// and back down onto whatever is underneath
 	VectorCopy( pm->ps->origin, down );
@@ -401,7 +400,7 @@ void PlayerMove::groundVehicleMove( )
 
 	// brake
 	if( pm->cmd.buttons & BUTTON_BRAKE ) {
-		PM_GroundVehicle_Brakes();
+		groundVehicle_Brakes();
 	}
 
 	// set speed
@@ -419,7 +418,7 @@ void PlayerMove::groundVehicleMove( )
 	VectorAdd( forward, pm->ps->velocity, forward );
 	VectorScale( forward, speed, pm->ps->velocity );
 
-	PM_StepSlideMove_GV();
+	stepSlideMove_GV();
 
 	// put the vehicle into the landscape with proper angles
 	PlayerMove::adjustToTerrain();
@@ -558,13 +557,13 @@ void PlayerMove::addTouchEnt_GV( int entityNum ) {
 
 /*
 ==================
-PM_SlideMove_GV
+slideMove_GV
 
 Returns true if the velocity was clipped in some way
 ==================
 */
 constexpr int MAX_CLIP_PLANES = 5;
-static bool	PM_SlideMove_GV() {
+bool PlayerMove::slideMove_GV() {
 	int			bumpcount, numbumps;
 	vec3_t		dir;
 	float		d;

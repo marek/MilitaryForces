@@ -20,11 +20,9 @@ PlayerMove::lQMMove
 
 ===================
 */
-static bool	PM_SlideMove_LQM();
-static void	PM_StepSlideMove_LQM();
 
 
-static void PM_LQMGroundTrace( )
+void PlayerMove::lqmGroundTrace( )
 {
 	trace_t		trace;
 	vec3_t		end;
@@ -125,7 +123,7 @@ void PlayerMove::lQMMove( )
     if( dead ) {
 		pm->ps->vehicleAnim = A_LQM_DIE;
 		VectorClear(pm->ps->velocity);
-		PM_SlideMove_LQM();
+		slideMove_LQM();
 		return;
     }
 
@@ -232,7 +230,7 @@ void PlayerMove::lQMMove( )
 	pm->ps->speed = VectorLength(pm->ps->velocity);
 
 	// Move the lqm
-	PM_LQMGroundTrace();
+	lqmGroundTrace();
 	if(pml.walking) {
 		pm->ps->velocity[2] = 0;
 		pm->ps->ONOFF &= ~OO_STALLED;	// Done landing
@@ -240,7 +238,7 @@ void PlayerMove::lQMMove( )
 		if((anim & A_LQM_CROUCH) && (anim & A_LQM_EJECT)) 
 			pm->ps->vehicleAnim &= ~A_LQM_JUMP;
 	}
-	PM_StepSlideMove_LQM();
+	stepSlideMove_LQM();
 }
 
 /*
@@ -274,13 +272,13 @@ void PlayerMove::addTouchEnt_LQM( int entityNum ) {
 
 /*
 ==================
-PM_SlideMove_Plane
+slideMove_Plane
 
 Returns true if the velocity was clipped in some way
 ==================
 */
 constexpr int MAX_CLIP_PLANES = 5;
-static bool	PM_SlideMove_LQM() {
+bool PlayerMove::slideMove_LQM() {
 	int			bumpcount, numbumps;
 	vec3_t		dir;
 	float		d;
@@ -472,7 +470,7 @@ static bool	PM_SlideMove_LQM() {
 	return false;
 }
 
-static void PM_StepSlideMove_LQM() {
+void PlayerMove::stepSlideMove_LQM() {
 	vec3_t		start_o, start_v;
 	trace_t		trace;
 	vec3_t		up, down;
@@ -481,7 +479,7 @@ static void PM_StepSlideMove_LQM() {
 	VectorCopy (pm->ps->origin, start_o);
 	VectorCopy (pm->ps->velocity, start_v);
 
-	if ( PM_SlideMove_LQM() == 0 )
+	if ( slideMove_LQM() == 0 )
 		return;		// we got exactly where we wanted to go first try	
 
 	VectorCopy(start_o, down);
@@ -505,7 +503,7 @@ static void PM_StepSlideMove_LQM() {
 	VectorCopy (trace.endpos, pm->ps->origin);
 	VectorCopy (start_v, pm->ps->velocity);
 
-	PM_SlideMove_LQM();
+	slideMove_LQM();
 
 	// push down the final amount
 	VectorCopy (pm->ps->origin, down);

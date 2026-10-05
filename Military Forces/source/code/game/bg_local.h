@@ -31,8 +31,6 @@ struct pml_t {
 	int			previous_waterlevel;
 };
 
-extern	pmove_t		*pm;
-extern	pml_t		pml;
 
 // movement parameters
 
@@ -42,45 +40,67 @@ extern	pml_t		pml;
 class PlayerMove
 {
 public:
-	static void clipVelocity( vec3_t in, vec3_t normal, vec3_t out, float overbounce );
-	static void addTouchEnt( int entityNum );
-	static void addEvent( int newEvent );
-	static void planeMove( );
-	static void planeMoveAdvanced( );
-	static void toggle_Bay();
-	static void groundVehicleMove( );
-	static void heloMove( );
-	static void lQMMove( );
-	static void boatMove( );
-	static bool slideMove( bool gravity );
+	void clipVelocity( vec3_t in, vec3_t normal, vec3_t out, float overbounce );
+	void addTouchEnt( int entityNum );
+	void addEvent( int newEvent );
+	void planeMove( );
+	void planeMoveAdvanced( );
+	void toggle_Bay();
+	void groundVehicleMove( );
+	void heloMove( );
+	void lQMMove( );
+	void boatMove( );
+	bool slideMove( bool gravity );
 
 public:
-	static void boat_FuelFlow( int throttle );
-	static void boatAccelerate();
-	static void addTouchEnt_Boat( int entityNum );
-	static void groundVehicle_FuelFlow( int throttle );
-	static void groundVehicleAccelerate();
-	static void adjustToTerrain();
-	static void addTouchEnt_GV( int entityNum );
-	static void helo_FuelFlow( int throttle );
-	static void heloAccelerate();
-	static void addTouchEnt_Helo( int entityNum );
-	static void addTouchEnt_LQM( int entityNum );
-	static void plane_FuelFlow( int throttle );
-	static void planeAccelerate();
-	static void addTouchEnt_Plane( int entityNum );
-	static void friction();
-	static void accelerate( vec3_t wishdir, float wishspeed, float accel );
-	static float cmdScale( usercmd_t *cmd );
-	static void flyMove();
-	static void noclipMove();
-	static void setWaterLevel();
-	static void waterEvents();
-	static void flare();
-	static void weapon();
-	static void dropTimers();
-	static void vehicleBoundingBox();
-	static void vehicleMove();
+	void boat_FuelFlow( int throttle );
+	void boatAccelerate();
+	void addTouchEnt_Boat( int entityNum );
+	void groundVehicle_FuelFlow( int throttle );
+	void groundVehicleAccelerate();
+	void adjustToTerrain();
+	void addTouchEnt_GV( int entityNum );
+	void helo_FuelFlow( int throttle );
+	void heloAccelerate();
+	void addTouchEnt_Helo( int entityNum );
+	void addTouchEnt_LQM( int entityNum );
+	void plane_FuelFlow( int throttle );
+	void planeAccelerate();
+	void addTouchEnt_Plane( int entityNum );
+	void friction();
+	void accelerate( vec3_t wishdir, float wishspeed, float accel );
+	float cmdScale( usercmd_t *cmd );
+	void flyMove();
+	void noclipMove();
+	void setWaterLevel();
+	void waterEvents();
+	void flare();
+	void weapon();
+	void dropTimers();
+	void vehicleBoundingBox();
+	void vehicleMove();
+
+	// one move of one player: the entry point is Pmove(), which runs single() for each time slice
+	void single( pmove_t *pmove );
+
+	void groundVehicle_Brakes();
+	void helo_Brakes();
+	void lqmGroundTrace();
+	void plane_Brakes();
+	bool slideMove_Boat();
+	bool slideMove_GV();
+	bool slideMove_Helo();
+	bool slideMove_LQM();
+	bool slideMove_Plane();
+	void stepSlideMove_GV();
+	void stepSlideMove_LQM();
+	void throttle_Down();
+	void throttle_Up();
+	void toggle_HeloGear();
+	void toggle_PlaneGear();
+
+	pmove_t	*pm = nullptr;
+	pml_t	pml = {};
 
 private:
 	static float pm_spectatorfriction;
@@ -93,7 +113,6 @@ private:
 
 // MFQ3
 
-void		PM_StepSlideMove( bool gravity );
 
 
 #endif // __BG_LOCAL_H__

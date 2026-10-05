@@ -13,8 +13,6 @@
 #include "bg_local.h"
 #include "g_client.h"
 
-pmove_t		*pm;
-pml_t		pml;
 
 // movement parameters
 float PlayerMove::pm_stopspeed = 100.0f;
@@ -777,7 +775,7 @@ void PlayerMove::vehicleBoundingBox()
 
 }
 
-static void PM_Throttle_Up()
+void PlayerMove::throttle_Up()
 {
 	if( pm->cmd.serverTime < pm->ps->timers[TIMER_THROTTLE] ) {
 		return;
@@ -805,7 +803,7 @@ static void PM_Throttle_Up()
 	pm->ps->timers[TIMER_THROTTLE] = pm->cmd.serverTime + 250;
 }
 
-static void PM_Throttle_Down()
+void PlayerMove::throttle_Down()
 {
 	if( pm->cmd.serverTime < pm->ps->timers[TIMER_THROTTLE] ) {
 		return;
@@ -871,11 +869,11 @@ void PlayerMove::vehicleMove( )
 
 /*
 ================
-PmoveSingle
+single
 
 ================
 */
-static void PmoveSingle (pmove_t *pmove) {
+void PlayerMove::single(pmove_t *pmove) {
 	pm = pmove;
 
 	// this counter lets us debug movement problems with a journal
@@ -963,9 +961,9 @@ static void PmoveSingle (pmove_t *pmove) {
 
 	// throttle
 	if( pm->cmd.buttons & BUTTON_INCREASE ) {
-		PM_Throttle_Up();
+		throttle_Up();
 	} else if( pm->cmd.buttons & BUTTON_DECREASE ) {
-		PM_Throttle_Down();
+		throttle_Down();
 	}
 
 	// set watertype, and waterlevel
@@ -1006,6 +1004,7 @@ Can be called by either the server or the client
 */
 void Pmove (pmove_t *pmove) {
 	int			finalTime;
+	PlayerMove	move;
 
 	finalTime = pmove->cmd.serverTime;
 
@@ -1038,7 +1037,7 @@ void Pmove (pmove_t *pmove) {
 		}
 			
 		pmove->cmd.serverTime = pmove->ps->commandTime + msec;
-		PmoveSingle( pmove );
+		move.single( pmove );
 
 	}
 

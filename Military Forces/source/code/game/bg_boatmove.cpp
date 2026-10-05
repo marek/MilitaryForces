@@ -107,7 +107,6 @@ PlayerMove::boatMove
 
 ===================
 */
-static bool	PM_SlideMove_Boat();
 
 void PlayerMove::boatMove( ) 
 {
@@ -145,7 +144,7 @@ void PlayerMove::boatMove( )
 	VectorAdd( forward, pm->ps->velocity, forward );
 	VectorScale( forward, speed, pm->ps->velocity );
 
-	PM_SlideMove_Boat();
+	slideMove_Boat();
 
 	// get the turnspeeds
 	for( i = HULL_YAW; i <= GUN_PITCH; i++ ) {
@@ -301,13 +300,13 @@ void PlayerMove::addTouchEnt_Boat( int entityNum ) {
 
 /*
 ==================
-PM_SlideMove_Boat
+slideMove_Boat
 
 Returns true if the velocity was clipped in some way
 ==================
 */
 
-static bool PM_SlideMove_Boat() {
+bool PlayerMove::slideMove_Boat() {
 	float		time_left;
 	vec3_t		end;
 	vec3_t		up, down;
@@ -393,7 +392,7 @@ static bool PM_SlideMove_Boat() {
 
 /*
 constexpr int MAX_CLIP_PLANES = 5;
-static bool	PM_SlideMove_Boat() {
+bool PlayerMove::slideMove_Boat() {
 	int			bumpcount, numbumps;
 	vec3_t		dir;
 	float		d;

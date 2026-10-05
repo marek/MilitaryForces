@@ -190,7 +190,7 @@ PM_Toggle_Gear
 
 ===================
 */
-static void PM_Toggle_HeloGear()
+void PlayerMove::toggle_HeloGear()
 {
 	if( !(availableVehicles[pm->vehicle].caps & HC_GEAR) ) {
 		return;
@@ -222,7 +222,7 @@ static void PM_Toggle_HeloGear()
 	pm->ps->timers[TIMER_GEAR] = pm->cmd.serverTime + availableVehicles[pm->vehicle].gearTime + 100;
 }
 
-static void PM_Helo_Brakes()
+void PlayerMove::helo_Brakes()
 {
 	if( pm->cmd.serverTime < pm->ps->timers[TIMER_BRAKE] ) return;
 
@@ -299,7 +299,6 @@ PlayerMove::heloMove
 
 ===================
 */
-static bool	PM_SlideMove_Helo();
 
 void PlayerMove::heloMove( ) 
 {
@@ -341,7 +340,7 @@ void PlayerMove::heloMove( )
 
 	// gear
 	if( !dead && (pm->cmd.buttons & BUTTON_GEAR) ) {
-		PM_Toggle_HeloGear();
+		toggle_HeloGear();
 	}
 
 	// gearanim
@@ -445,7 +444,7 @@ void PlayerMove::heloMove( )
 
 	// brake
 	if( pm->cmd.buttons & BUTTON_BRAKE ) {
-		PM_Helo_Brakes();
+		helo_Brakes();
 	}
 	
 	// freelook - plane keeps current heading
@@ -482,7 +481,7 @@ void PlayerMove::heloMove( )
 			pm->ps->vehicleAngles[1] += availableVehicles[pm->vehicle].turnspeed[1]*1.3 * pml.frametime;
 			if( pm->ps->vehicleAngles[1] > 360 ) pm->ps->vehicleAngles[1] -= 360;
 		}
-		PM_SlideMove_Helo();
+		slideMove_Helo();
 		return;
     }
 
@@ -631,7 +630,7 @@ void PlayerMove::heloMove( )
 	// Copy final vel
 	VectorCopy(deltavel, pm->ps->velocity);
 
-	PM_SlideMove_Helo();
+	slideMove_Helo();
 }
 
 /*
@@ -665,13 +664,13 @@ void PlayerMove::addTouchEnt_Helo( int entityNum ) {
 
 /*
 ==================
-PM_SlideMove_Plane
+slideMove_Plane
 
 Returns true if the velocity was clipped in some way
 ==================
 */
 constexpr int MAX_CLIP_PLANES = 5;
-static bool	PM_SlideMove_Helo() {
+bool PlayerMove::slideMove_Helo() {
 	int			bumpcount, numbumps;
 	vec3_t		dir;
 	float		d;
