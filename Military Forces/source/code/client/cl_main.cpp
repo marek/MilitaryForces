@@ -2198,7 +2198,7 @@ void Client::beginHttpDownload( const char *remoteURL ) {
 
 	Common::printf("URL: %s\n", remoteURL);
 
-	CL_HTTP_BeginDownload(remoteURL);
+	HttpDownload::beginDownload(remoteURL);
 	Q_strncpyz(clc.downloadURL, remoteURL, sizeof(clc.downloadURL));
 
 	clc.download = FileSystem::baseDir_FOpenFileWrite_HomeData(clc.downloadTempName);
@@ -2281,7 +2281,7 @@ void Client::nextDownload()
 					"download redirection, but does not "
 					"have sv_dlURL set\n");
 			}
-			else if(CL_HTTP_Available()) {
+			else if(HttpDownload::available()) {
 				Client::initDownload(localName);
 				Client::beginHttpDownload(va("%s/%s",
 					clc.sv_dlURL, remoteName));
@@ -2971,7 +2971,7 @@ void ClientLoop::frame ( int msec ) {
 
 #ifdef USE_HTTP
 	if(clc.httpUsed) {
-		bool finished = CL_HTTP_PerformDownload();
+		bool finished = HttpDownload::performDownload();
 
 		if(finished) {
 			if(clc.download) {
@@ -3697,7 +3697,7 @@ void ClientLoop::init( ) {
 #endif
 
 #ifdef USE_HTTP
-	if(!CL_HTTP_Init()) {
+	if(!HttpDownload::init()) {
 		Common::printf("WARNING: couldn't initialize HTTP download support\n");
 	}
 #endif
@@ -3786,7 +3786,7 @@ void ClientLoop::shutdown(const char *finalmsg, bool disconnect, bool quit)
 	ClientLoop::shutdownSound();
 
 #ifdef USE_HTTP
-	CL_HTTP_Shutdown();
+	HttpDownload::shutdown();
 #endif
 
 	CommandSystem::removeCommand ("cmd");

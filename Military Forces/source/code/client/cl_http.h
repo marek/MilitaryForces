@@ -25,10 +25,14 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "../game/q_shared.h"
 
-bool CL_HTTP_Init( );
-bool CL_HTTP_Available( );
-void CL_HTTP_Shutdown( );
-void CL_HTTP_BeginDownload( const char *remoteURL );
-bool CL_HTTP_PerformDownload( );
+class HttpDownload
+{
+public:
+	static bool init( );
+	static bool available( );
+	static void shutdown( );
+	static void beginDownload( const char *remoteURL );
+	static bool performDownload( );
+};
 
 #endif	// __CL_HTTP_H__

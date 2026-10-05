@@ -47,10 +47,10 @@ static Q_PRINTF_FUNC(2, 3) void DropIf(bool condition, const char *fmt, ...)
 
 /*
 =================
-CL_HTTP_Init
+HttpDownload::init
 =================
 */
-bool CL_HTTP_Init()
+bool HttpDownload::init()
 {
     OSVERSIONINFO osvi = {sizeof(OSVERSIONINFO)};
     const char *windowsVersion = GetVersionEx(&osvi) ? va("Windows %lu.%lu (build %lu)",
@@ -68,20 +68,20 @@ bool CL_HTTP_Init()
 
 /*
 =================
-CL_HTTP_Available
+HttpDownload::available
 =================
 */
-bool CL_HTTP_Available()
+bool HttpDownload::available()
 {
     return hInternet != NULL;
 }
 
 /*
 =================
-CL_HTTP_Shutdown
+HttpDownload::shutdown
 =================
 */
-void CL_HTTP_Shutdown(void)
+void HttpDownload::shutdown(void)
 {
     if (hInternet)
     {
@@ -92,10 +92,10 @@ void CL_HTTP_Shutdown(void)
 
 /*
 =================
-CL_HTTP_BeginDownload
+HttpDownload::beginDownload
 =================
 */
-void CL_HTTP_BeginDownload(const char *remoteURL)
+void HttpDownload::beginDownload(const char *remoteURL)
 {
     DWORD httpCode = 0;
     DWORD contentLength = 0;
@@ -130,10 +130,10 @@ void CL_HTTP_BeginDownload(const char *remoteURL)
 
 /*
 =================
-CL_HTTP_PerformDownload
+HttpDownload::performDownload
 =================
 */
-bool CL_HTTP_PerformDownload(void)
+bool HttpDownload::performDownload(void)
 {
     static BYTE readBuffer[256 * 1024];
     DWORD bytesRead = 0;

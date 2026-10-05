@@ -100,10 +100,10 @@ static void *GPA(char *str)
 
 /*
 =================
-CL_HTTP_Init
+HttpDownload::init
 =================
 */
-bool CL_HTTP_Init()
+bool HttpDownload::init()
 {
 	if(cURLLib)
 		return true;
@@ -144,7 +144,7 @@ bool CL_HTTP_Init()
 
 	if(cURLSymbolLoadFailed)
 	{
-		CL_HTTP_Shutdown();
+		HttpDownload::shutdown();
 		Common::printf("FAIL One or more symbols not found\n");
 		return false;
 	}
@@ -155,10 +155,10 @@ bool CL_HTTP_Init()
 
 /*
 =================
-CL_HTTP_Available
+HttpDownload::available
 =================
 */
-bool CL_HTTP_Available()
+bool HttpDownload::available()
 {
 	return cURLLib != nullptr;
 }
@@ -191,10 +191,10 @@ static void CL_cURL_Cleanup()
 
 /*
 =================
-CL_HTTP_Shutdown
+HttpDownload::shutdown
 =================
 */
-void CL_HTTP_Shutdown( )
+void HttpDownload::shutdown( )
 {
 	CL_cURL_Cleanup();
 
@@ -264,7 +264,7 @@ CURLcode qcurl_easy_setopt_warn(CURL *curl, CURLoption option, ...)
 	return result;
 }
 
-void CL_HTTP_BeginDownload( const char *remoteURL )
+void HttpDownload::beginDownload( const char *remoteURL )
 {
 	CURLMcode result;
 
@@ -318,7 +318,7 @@ void CL_HTTP_BeginDownload( const char *remoteURL )
 	}
 }
 
-bool CL_HTTP_PerformDownload()
+bool HttpDownload::performDownload()
 {
 	CURLMcode res;
 	CURLMsg *msg;
