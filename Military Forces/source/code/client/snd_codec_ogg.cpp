@@ -252,7 +252,7 @@ SoundStream *S_OGG_CodecOpenStream(const char *filename)
 	}
 
 	// alloctate the OggVorbis_File
-	vf = static_cast<OggVorbis_File *>(Zone::malloc(sizeof(OggVorbis_File)));
+	vf = Zone::make<OggVorbis_File>();
 	if(!vf)
 	{
 		S_CodecUtilClose(&stream);

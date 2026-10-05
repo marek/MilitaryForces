@@ -116,7 +116,7 @@ void SV_Client::netchanTransmit( Message *msg )
 	{
 		SV_Client::Netchan_Buffer *netbuf;
 		Common::dPrintf("#462 SV_Netchan_Transmit: unsent fragments, stacked\n");
-		netbuf = static_cast<SV_Client::Netchan_Buffer *>(Zone::malloc(sizeof(SV_Client::Netchan_Buffer)));
+		netbuf = Zone::make<SV_Client::Netchan_Buffer>();
 		// store the msg, we can't store it encoded, as the encoding depends on stuff we still have to finish sending
 		netbuf->msg_.copy( netbuf->msgBuffer_, sizeof( netbuf->msgBuffer_ ), msg);
 		netbuf->next_ = nullptr;

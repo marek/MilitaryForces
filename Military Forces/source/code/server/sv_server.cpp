@@ -212,7 +212,7 @@ ServerStatic::changeMaxNumClients( int newNumClients, int newClientsBeginAt )
 	//Zone::free( theSVS.clients_ );
 
 	//// allocate New clients
-	//theSVS.clients_ = reinterpret_cast<SV_Client*>(Zone::malloc ( sv_maxclients->asInt() * sizeof(SV_Client) ));
+	//theSVS.clients_ = Zone::make<SV_Client>( sv_maxclients->asInt() );
 	//Com_Memset( theSVS.clients_, 0, sv_maxclients->asInt() * sizeof(SV_Client) );
 
 	//// copy the clients over

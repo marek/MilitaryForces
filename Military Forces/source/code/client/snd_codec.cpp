@@ -210,7 +210,7 @@ SoundStream *S_CodecUtilOpen(const char *filename, snd_codec_t *codec)
 	}
 
 	// Allocate a stream
-	stream = static_cast<SoundStream *>(Zone::malloc(sizeof(SoundStream)));
+	stream = Zone::make<SoundStream>();
 	if(!stream)
 	{
 		FileSystem::fCloseFile(hnd);

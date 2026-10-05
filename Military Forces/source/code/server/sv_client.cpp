@@ -1902,7 +1902,7 @@ void SV_Client::userVoip( Message *msg, bool ignoreData )
 			continue;  // no room for another packet right now.
 		}
 
-		packet = static_cast<voipServerPacket_t *>(Zone::malloc(sizeof(*packet)));
+		packet = Zone::make<voipServerPacket_t>();
 		packet->sender = sender;
 		packet->frames = frames;
 		packet->len = packetsize;

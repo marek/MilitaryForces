@@ -823,7 +823,7 @@ char **System::listFiles( const char *directory, const char *extension, char *fi
 		if (!nfiles)
 			return nullptr;
 
-		listCopy = static_cast<char **>(Zone::malloc( ( nfiles + 1 ) * sizeof( *listCopy ) ));
+		listCopy = Zone::make<char *>( ( nfiles + 1 ) );
 		for ( i = 0 ; i < nfiles ; i++ ) {
 			listCopy[i] = list[i];
 		}
@@ -889,7 +889,7 @@ char **System::listFiles( const char *directory, const char *extension, char *fi
 		return nullptr;
 	}
 
-	listCopy = static_cast<char **>(Zone::malloc( ( nfiles + 1 ) * sizeof( *listCopy ) ));
+	listCopy = Zone::make<char *>( ( nfiles + 1 ) );
 	for ( i = 0 ; i < nfiles ; i++ ) {
 		listCopy[i] = list[i];
 	}

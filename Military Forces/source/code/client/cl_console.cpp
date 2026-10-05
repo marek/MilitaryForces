@@ -232,7 +232,8 @@ static void Con_Dump_f ()
 	bufferlen = con.linewidth + 2 * sizeof ( char );
 #endif
 
-	buffer = static_cast<char *>(Hunk::allocateTempMemory( bufferlen ));
+	const TempMemory scratch( bufferlen );
+	buffer = scratch.as<char>();
 
 	// write the remaining lines
 	buffer[bufferlen-1] = 0;
@@ -256,7 +257,6 @@ static void Con_Dump_f ()
 		FileSystem::write(buffer, strlen(buffer), f);
 	}
 
-	Hunk::freeTempMemory( buffer );
 	FileSystem::fCloseFile( f );
 }
 

@@ -497,7 +497,7 @@ void Network::queuePacket( int length, const void *data, netadr_t to,
 	if(offset > 999)
 		offset = 999;
 
-	newPacket = static_cast<packetQueue_t *>(Zone::smallMalloc(sizeof(packetQueue_t)));
+	newPacket = Zone::makeSmall<packetQueue_t>();
 	newPacket->data = static_cast<byte *>(Zone::smallMalloc(length));
 	Com_Memcpy(newPacket->data, data, length);
 	newPacket->length = length;

@@ -1915,7 +1915,7 @@ static pack_t *FS_LoadZipFile(const char *zipfile, const char *basename)
 
 	buildBuffer = static_cast<fileInPack_t *>(Zone::malloc( (gi.number_entry * sizeof( fileInPack_t )) + len ));
 	namePtr = (reinterpret_cast<char *>(buildBuffer)) + gi.number_entry * sizeof( fileInPack_t );
-	fs_headerLongs = static_cast<int *>(Zone::malloc( ( gi.number_entry + 1 ) * sizeof(int) ));
+	fs_headerLongs = Zone::make<int>( ( gi.number_entry + 1 ) );
 	fs_headerLongs[ fs_numHeaderLongs++ ] = LittleLong( fs_checksumFeed );
 
 	// get the hash table size from the number of files in the zip
@@ -2212,7 +2212,7 @@ static char **FS_ListFilteredFiles( const char *path, const char *extension,
 		return nullptr;
 	}
 
-	listCopy = static_cast<char **>(Zone::malloc( ( nfiles + 1 ) * sizeof( *listCopy ) ));
+	listCopy = Zone::make<char *>( ( nfiles + 1 ) );
 	for ( i = 0 ; i < nfiles ; i++ ) {
 		listCopy[i] = list[i];
 	}
@@ -2594,7 +2594,7 @@ static void FS_SortFileList(char **filelist, int numfiles) {
 	int i, j, k, numsortedfiles;
 	char **sortedlist;
 
-	sortedlist = static_cast<char **>(Zone::malloc( ( numfiles + 1 ) * sizeof( *sortedlist ) ));
+	sortedlist = Zone::make<char *>( ( numfiles + 1 ) );
 	sortedlist[0] = nullptr;
 	numsortedfiles = 0;
 	for (i = 0; i < numfiles; i++) {
@@ -2862,7 +2862,7 @@ void FileSystem::addGameDirectory( const char *path, const char *dir ) {
 
 			fs_packFiles += pak->numfiles;
 
-			search = static_cast<searchpath_t *>(Zone::malloc(sizeof(searchpath_t)));
+			search = Zone::make<searchpath_t>();
 			search->pack = pak;
 			search->next = fs_searchpaths;
 			fs_searchpaths = search;
@@ -2882,8 +2882,8 @@ void FileSystem::addGameDirectory( const char *path, const char *dir ) {
 			pakfile = FileSystem::buildOSPath(path, dir, pakdirs[pakdirsi]);
 
 			// add the directory to the search path
-			search = static_cast<searchpath_t *>(Zone::malloc(sizeof(searchpath_t)));
-			search->dir = static_cast<directory_t *>(Zone::malloc(sizeof(*search->dir)));
+			search = Zone::make<searchpath_t>();
+			search->dir = Zone::make<directory_t>();
 
 			Q_strncpyz(search->dir->path, curpath, sizeof(search->dir->path));	// c:\quake3\baseq3
 			Q_strncpyz(search->dir->fullpath, pakfile, sizeof(search->dir->fullpath));	// c:\quake3\baseq3\mypak.pk3dir
@@ -2903,8 +2903,8 @@ void FileSystem::addGameDirectory( const char *path, const char *dir ) {
 	//
 	// add the directory to the search path
 	//
-	search = static_cast<searchpath_t *>(Zone::malloc (sizeof(searchpath_t)));
-	search->dir = static_cast<directory_t *>(Zone::malloc( sizeof( *search->dir ) ));
+	search = Zone::make<searchpath_t>();
+	search->dir = Zone::make<directory_t>();
 
 	Q_strncpyz(search->dir->path, path, sizeof(search->dir->path));
 	Q_strncpyz(search->dir->fullpath, curpath, sizeof(search->dir->fullpath));

@@ -637,7 +637,7 @@ void	CommandSystem::addCommand( const char *cmd_name, xcommand_t function ) {
 	}
 
 	// use a small malloc to avoid zone fragmentation
-	cmd = static_cast<cmd_function_t *>(Zone::smallMalloc(sizeof(cmd_function_t)));
+	cmd = Zone::makeSmall<cmd_function_t>();
 	cmd->name = CopyString( cmd_name );
 	cmd->function = function;
 	cmd->complete = nullptr;

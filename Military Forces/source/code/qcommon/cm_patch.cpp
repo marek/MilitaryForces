@@ -1113,9 +1113,9 @@ static void CM_PatchCollideFromGrid( cGrid_t *grid, patchCollide_t *pf ) {
 	// copy the results out
 	pf->numPlanes = numPlanes;
 	pf->numFacets = numFacets;
-	pf->facets = static_cast<facet_t *>(Hunk::alloc( numFacets * sizeof( *pf->facets ), h_high ));
+	pf->facets = Hunk::make<facet_t>( numFacets, h_high );
 	Com_Memcpy( pf->facets, facets, numFacets * sizeof( *pf->facets ) );
-	pf->planes = static_cast<patchPlane_t *>(Hunk::alloc( numPlanes * sizeof( *pf->planes ), h_high ));
+	pf->planes = Hunk::make<patchPlane_t>( numPlanes, h_high );
 	Com_Memcpy( pf->planes, planes, numPlanes * sizeof( *pf->planes ) );
 }
 
@@ -1173,7 +1173,7 @@ struct patchCollide_s	*CollisionWork::generatePatchCollide( int width, int heigh
 	// we now have a grid of points exactly on the curve
 	// the approximate surface defined by these points will be
 	// collided against
-	pf = static_cast<patchCollide_t *>(Hunk::alloc( sizeof( *pf ), h_high ));
+	pf = Hunk::make<patchCollide_t>( 1, h_high );
 	ClearBounds( pf->bounds[0], pf->bounds[1] );
 	for ( i = 0 ; i < grid.width ; i++ ) {
 		for ( j = 0 ; j < grid.height ; j++ ) {
