@@ -93,21 +93,21 @@ void Menus::loadBestScores(const char *map, int game) {
 	postGameInfo_t newInfo;
 	memset(&newInfo, 0, sizeof(postGameInfo_t));
 	Com_sprintf(fileName, MAX_QPATH, "games/%s_%i.game", map, game);
-	if (FileSystem::fOpenFileByMode(fileName, &f, FS_READ) >= 0) {
+	if( const OpenFile file( fileName, FS_READ ); file ) {
+		f = file.handle();
 		int size = 0;
 		FileSystem::read(&size, sizeof(int), f);
 		if (size == sizeof(postGameInfo_t)) {
 			FileSystem::read(&newInfo, sizeof(postGameInfo_t), f);
 		}
-		FileSystem::fCloseFile(f);
 	}
 	Menus::setBestScores(&newInfo, false);
 
 	Com_sprintf(fileName, MAX_QPATH, "demos/%s_%d.dm_%d", map, game, static_cast<int>(CvarSystem::variableValue("protocol")));
 	uiInfo.demoAvailable = false;
-	if (FileSystem::fOpenFileByMode(fileName, &f, FS_READ) >= 0) {
+	if( const OpenFile file( fileName, FS_READ ); file ) {
+		f = file.handle();
 		uiInfo.demoAvailable = true;
-		FileSystem::fCloseFile(f);
 	} 
 }
 
@@ -175,14 +175,14 @@ static void UI_CalcPostGameStats() {
 	Com_sprintf(fileName, MAX_QPATH, "games/%s_%i.game", map, game);
 	// see if we have one already
 	memset(&oldInfo, 0, sizeof(postGameInfo_t));
-	if (FileSystem::fOpenFileByMode(fileName, &f, FS_READ) >= 0) {
+	if( const OpenFile file( fileName, FS_READ ); file ) {
+	f = file.handle();
 	// if so load it
 		size = 0;
 		FileSystem::read(&size, sizeof(int), f);
 		if (size == sizeof(postGameInfo_t)) {
 			FileSystem::read(&oldInfo, sizeof(postGameInfo_t), f);
 		}
-		FileSystem::fCloseFile(f);
 	}					 
 
 	newInfo.accuracy = atoi(Menus::argv(3));
@@ -225,11 +225,11 @@ static void UI_CalcPostGameStats() {
 	if  (newHigh) {
 		// if so write out the New one
 		uiInfo.newHighScoreTime = uiInfo.uiUtils.dc_->realTime_ + 20000;
-		if (FileSystem::fOpenFileByMode(fileName, &f, FS_WRITE) >= 0) {
+		if( const OpenFile file( fileName, FS_WRITE ); file ) {
+			f = file.handle();
 			size = sizeof(postGameInfo_t);
 			FileSystem::write(&size, sizeof(int), f);
 			FileSystem::write(&newInfo, sizeof(postGameInfo_t), f);
-			FileSystem::fCloseFile(f);
 		}
 	}
 

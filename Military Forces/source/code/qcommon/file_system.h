@@ -114,6 +114,24 @@ private:
 	static char lastValidBase[MAX_OSPATH];
 };
 
+// an open file, closed when the object goes out of scope
+class OpenFile
+{
+public:
+	OpenFile( const char *qpath, fsMode_t mode ) { length_ = FileSystem::fOpenFileByMode( qpath, &handle_, mode ); }
+	~OpenFile() { if( handle_ ) FileSystem::fCloseFile( handle_ ); }
+	OpenFile( const OpenFile& ) = delete;
+	OpenFile& operator=( const OpenFile& ) = delete;
+
+	explicit operator bool() const { return length_ >= 0 && handle_ != 0; }
+	fileHandle_t handle() const { return handle_; }
+	int length() const { return length_; }
+
+private:
+	fileHandle_t	handle_ = 0;
+	int				length_ = -1;
+};
+
 // a whole file read into memory; the buffer is given back when the object goes out of scope
 class FileData
 {

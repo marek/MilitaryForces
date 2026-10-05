@@ -204,8 +204,8 @@ qhandle_t CGame::registerVehiclePart( const char *name, bool expected )
 		for( int t = 0; t < 2; ++t ) {
 			Com_sprintf( skin, sizeof(skin), "%s_team%d.skin", base, t + 1 );
 			cg_teamSkins[t][model] = 0;
-			if( FileSystem::fOpenFileByMode( skin, &f, FS_READ ) >= 0 ) {
-				FileSystem::fCloseFile( f );
+			if( const OpenFile file( skin, FS_READ ); file ) {
+				f = file.handle();
 				cg_teamSkins[t][model] = refExport.RegisterSkin( skin );
 			}
 		}

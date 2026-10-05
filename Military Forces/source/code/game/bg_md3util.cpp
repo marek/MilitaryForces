@@ -26,7 +26,8 @@ bool VehicleData::findTag(const char* fileName, const char* tagname, md3Tag_t* t
 	fileHandle_t	f;
 	bool		found = false;
 
-	if( FileSystem::fOpenFileByMode(fileName, &f, FS_READ) >= 0 ) {
+	if( const OpenFile file( fileName, FS_READ ); file ) {
+		f = file.handle();
 		md3Header_t head;
 		md3Frame_t	frame;
 		int			i;	
@@ -44,7 +45,6 @@ bool VehicleData::findTag(const char* fileName, const char* tagname, md3Tag_t* t
 //			CGame::printf("tag %i: %s\n", i, tag.name );
 //			CGame::printf("tag %i: %.1f %.1f %.1f\n", i, tag.origin[0], tag.origin[1], tag.origin[2] );
 		}
-		FileSystem::fCloseFile(f);
 	} else {
 		Common::printf( "Unable to read tag from %s\n", fileName );
 	}
@@ -66,12 +66,12 @@ bool VehicleData::getNumberOfTags(const char* fileName, int* number)
 
 	if( !number ) return found;
 
-	if( FileSystem::fOpenFileByMode(fileName, &f, FS_READ) >= 0 ) {
+	if( const OpenFile file( fileName, FS_READ ); file ) {
+		f = file.handle();
 		md3Header_t head;
 		FileSystem::read(&head, sizeof(head), f);
 		*number = head.numTags;
 		found = true;
-		FileSystem::fCloseFile(f);
 	} else {
 		Common::printf( "Unable to open file %s\n", fileName );
 	}
@@ -98,7 +98,8 @@ int VehicleData::getTagsContaining(const char* fileName, const char* str, md3Tag
 	len = strlen(str);
 	if( !len ) return 0;
 
-	if( FileSystem::fOpenFileByMode(fileName, &f, FS_READ) >= 0 ) {
+	if( const OpenFile file( fileName, FS_READ ); file ) {
+		f = file.handle();
 		md3Header_t head;
 		md3Frame_t	frame;
 		md3Tag_t	tag;
@@ -115,7 +116,6 @@ int VehicleData::getTagsContaining(const char* fileName, const char* str, md3Tag
 				number++;
 			}
 		}
-		FileSystem::fCloseFile(f);
 	} else {
 		Common::printf( "Unable to open file %s\n", fileName );
 	}
@@ -139,12 +139,12 @@ bool VehicleData::getNumberOfFrames(const char* fileName, int* number)
 
 	if( !number ) return found;
 
-	if( FileSystem::fOpenFileByMode(fileName, &f, FS_READ) >= 0 ) {
+	if( const OpenFile file( fileName, FS_READ ); file ) {
+		f = file.handle();
 		md3Header_t head;
 		FileSystem::read(&head, sizeof(head), f);
 		*number = head.numFrames;
 		found = true;
-		FileSystem::fCloseFile(f);
 	} else {
 		Common::printf( "Unable to open file %s\n", fileName );
 	}
@@ -166,7 +166,8 @@ bool VehicleData::getDimensions(const char* fileName, int frame, vec3_t* maxs, v
 	bool		found = false;
 	int				i, number;
 
-	if( FileSystem::fOpenFileByMode(fileName, &f, FS_READ) >= 0 ) {
+	if( const OpenFile file( fileName, FS_READ ); file ) {
+		f = file.handle();
 		md3Header_t head;
 		md3Frame_t frames;
 		
@@ -182,7 +183,6 @@ bool VehicleData::getDimensions(const char* fileName, int frame, vec3_t* maxs, v
 				VectorCopy( frames.bounds[1], *maxs );
 			found = true;
 		}
-		FileSystem::fCloseFile(f);
 	} else {
 		Common::printf( "Unable to open file %s\n", fileName );
 	}
