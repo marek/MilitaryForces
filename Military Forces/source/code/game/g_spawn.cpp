@@ -69,8 +69,7 @@ bool Game::spawnVector( const char *key, const char *defaultString, float *out )
 //
 // fields are needed for spawning from the entity string
 //
-enum fieldtype_t 
-{
+enum class fieldtype_t {
 	F_INT, 
 	F_FLOAT,
 	F_LSTRING,			// string on disk, pointer in memory, TAG_LEVEL
@@ -82,6 +81,7 @@ enum fieldtype_t
 	F_CLIENT,			// index on disk, pointer in memory
 	F_IGNORE
 };
+using enum fieldtype_t;
 
 struct SpawnField
 {

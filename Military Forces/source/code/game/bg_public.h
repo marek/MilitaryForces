@@ -88,7 +88,9 @@ enum gametype_t {
 	GT_MAX_GAME_TYPE
 };
 
-enum gender_t { GENDER_MALE, GENDER_FEMALE, GENDER_NEUTER };
+enum class gender_t { GENDER_MALE, GENDER_FEMALE, GENDER_NEUTER };
+
+using enum gender_t;
 
 /*
 ===================================================================================
@@ -438,7 +440,7 @@ inline constexpr int TEAM_LOCATION_UPDATE_TIME = 1000;
 inline constexpr int TEAM_MAXOVERLAY = 32;
 
 //team task
-enum teamtask_t {
+enum class teamtask_t {
 	TEAMTASK_NONE,
 	TEAMTASK_OFFENSE, 
 	TEAMTASK_DEFENSE,
@@ -448,6 +450,7 @@ enum teamtask_t {
 	TEAMTASK_ESCORT,
 	TEAMTASK_CAMP
 };
+using enum teamtask_t;
 
 // means of death
 enum meansOfDeath_t {

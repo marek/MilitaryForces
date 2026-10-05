@@ -99,11 +99,13 @@ inline constexpr int TEAM_OVERLAY_MAXLOCATION_WIDTH = 16;
 #define DEFAULT_REDTEAM_NAME		"Warsaw Pact"
 #define DEFAULT_BLUETEAM_NAME		"NATO"
 
-enum impactSound_t {
+enum class impactSound_t {
 	IMPACTSOUND_DEFAULT,
 	IMPACTSOUND_METAL,
 	IMPACTSOUND_FLESH
 };
+
+using enum impactSound_t;
 
 // radar
 inline constexpr int RD_GROUND_ENEMY = 0;
@@ -305,7 +307,7 @@ struct markPoly_s {
 using markPoly_t = markPoly_s;
 
 
-enum leType_t {
+enum class leType_t {
 	LE_MARK,
 	LE_EXPLOSION,
 	LE_SPRITE_EXPLOSION,
@@ -316,6 +318,9 @@ enum leType_t {
 	LE_NUKE
 };
 
+
+using enum leType_t;
+
 enum leFlag_t {
 	LEF_PUFF_DONT_SCALE  = 0x0001,			// do not scale size over time
 	LEF_TUMBLE			 = 0x0002,			// tumble over time, used for ejecting shells
@@ -324,17 +329,21 @@ enum leFlag_t {
 	LEF_SOUND2			 = 0x0008			// sound 2 for nuke
 };
 
-enum leMarkType_t {
+enum class leMarkType_t {
 	LEMT_NONE,
 	LEMT_BURN,
 	LEMT_BLOOD
-};			// fragment local entities can leave marks on walls
+};
 
-enum leBounceSoundType_t {
+using enum leMarkType_t;			// fragment local entities can leave marks on walls
+
+enum class leBounceSoundType_t {
 	LEBS_NONE,
 	LEBS_BRASS,
 	LEBS_BLOOD
-};	// fragment local entities can make sounds on impacts
+};
+
+using enum leBounceSoundType_t;	// fragment local entities can make sounds on impacts
 
 class LocalEntity
 {
@@ -939,10 +948,12 @@ enum CameraAdjust {
 
 // IGME
 
-enum IGME_OBJECT_TYPES {
+enum class IGME_OBJECT_TYPES {
 	IGMEO_VEHICLE,
 	IGMEO_WAYPOINT
 };
+
+using enum IGME_OBJECT_TYPES;
 
 struct IGME_waypoint_t {
 	bool		active;
@@ -1276,12 +1287,13 @@ unsigned long MF_CG_GetGameset( bool asEnum );
 //
 // cg_drawtools.c
 //
-enum screenPlacement_e {
+enum class screenPlacement_e {
 	PLACE_CENTER,
 	PLACE_LEFT,
 	PLACE_RIGHT,
 	PLACE_STRETCH
 };
+using enum screenPlacement_e;
 
 void CG_DrawString( float x, float y, const char *string, 
 				   float charWidth, float charHeight, const float *modulate );

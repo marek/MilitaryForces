@@ -320,11 +320,13 @@ inline constexpr int UI_PULSE = 0x00004000;
 	#define HUNK_DEBUG
 #endif
 
-enum ha_pref {
+enum class ha_pref {
 	h_high,
 	h_low,
 	h_dontcare
 };
+
+using enum ha_pref;
 
 
 #define Com_Memset memset
@@ -840,12 +842,13 @@ char *Com_SkipCharset( char *s, char *sep );
 void Com_RandomBytes( byte *string, int len );
 
 // mode parm for FS_FOpenFile
-enum fsMode_t {
+enum class fsMode_t {
 	FS_READ,
 	FS_WRITE,
 	FS_APPEND,
 	FS_APPEND_SYNC
 };
+using enum fsMode_t;
 
 enum fsOrigin_t {
 	FS_SEEK_CUR,
@@ -1454,7 +1457,7 @@ using usercmd_t = usercmd_s;
 // if entityState->solid == SOLID_BMODEL, modelindex is an inline model number
 inline constexpr int SOLID_BMODEL = 0xffffff;
 
-enum trType_t {
+enum class trType_t {
 	TR_STATIONARY,
 	TR_INTERPOLATE,				// non-parametric, but interpolate between snapshots
 	TR_LINEAR,
@@ -1464,6 +1467,8 @@ enum trType_t {
 	TR_GRAVITY_10,
 	TR_ACCEL
 };
+
+using enum trType_t;
 
 struct trajectory_t {
 	trType_t	trType;
@@ -1535,7 +1540,7 @@ struct entityState_s {
 };
 using entityState_t = entityState_s;
 
-enum connstate_t {
+enum class connstate_t {
 	CA_UNINITIALIZED,
 	CA_DISCONNECTED, 	// not talking to a server
 	CA_AUTHORIZING,		// not used any more, was checking cd key 
@@ -1547,6 +1552,8 @@ enum connstate_t {
 	CA_ACTIVE,			// game views should be displayed
 	CA_CINEMATIC		// playing a cinematic or a static pic, not connected to a server
 };
+
+using enum connstate_t;
 
 // font support 
 

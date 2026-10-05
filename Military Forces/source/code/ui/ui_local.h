@@ -882,7 +882,7 @@ void UI_NetworkOptionsMenu( );
 //
 // ui_gameinfo.c
 //
-enum awardType_t {
+enum class awardType_t {
 	AWARD_ACCURACY,
 	AWARD_IMPRESSIVE,
 	AWARD_EXCELLENT,
@@ -890,6 +890,7 @@ enum awardType_t {
 	AWARD_FRAGS,
 	AWARD_PERFECT
 };
+using enum awardType_t;
 
 const char *UI_GetArenaInfoByNumber( int num );
 const char *UI_GetArenaInfoByMap( const char *map );
