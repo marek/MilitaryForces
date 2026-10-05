@@ -898,22 +898,10 @@ static bool Asset_Parse(int handle)
 	return false;
 }
 
-static void Font_Report() 
-{
-	int i;
-	Common::printf("Font Info\n");
-	Common::printf("=========\n");
-	for ( i = 32; i < 96; i++) 
-	{
-		Common::printf("Glyph handle %i: %i\n", i, uiInfo.uiUtils.dc_->assets_.textFont.glyphs[i].glyph);
-	}
-}
 
 void Menus::report() 
 {
 	uiInfo.uiUtils.string_Report();
-	//Font_Report();
-
 }
 
 void Menus::parseMenu(const char *menuFile) 
@@ -2851,22 +2839,6 @@ static bool UI_OpponentName_HandleKey(int flags, float *special, int key) {
 //  return false;
 //}
 
-static bool UI_BotSkill_HandleKey(int flags, float *special, int key) {
-  if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_ENTER || key == K_KP_ENTER) {
-		if (key == K_MOUSE2) {
-			uiInfo.skillIndex--;
-		} else {
-			uiInfo.skillIndex++;
-		}
-		if (uiInfo.skillIndex >= numSkillLevels) {
-			uiInfo.skillIndex = 0;
-		} else if (uiInfo.skillIndex < 0) {
-			uiInfo.skillIndex = numSkillLevels-1;
-		}
-    return true;
-  }
-	return false;
-}
 
 static bool UI_RedBlue_HandleKey(int flags, float *special, int key) {
   if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_ENTER || key == K_KP_ENTER) {
@@ -2988,9 +2960,6 @@ bool Menus::ownerDrawHandleKey(int ownerDraw, int flags, float *special, int key
 			break;
 		//case UI_BOTNAME:
 		//	return UI_BotName_HandleKey(flags, special, key);
-		//	break;
-		//case UI_BOTSKILL:
-		//	return UI_BotSkill_HandleKey(flags, special, key);
 		//	break;
 		case UI_REDBLUE:
 			UI_RedBlue_HandleKey(flags, special, key);

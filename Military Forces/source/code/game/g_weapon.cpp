@@ -17,19 +17,6 @@ G_BounceProjectile
 ================
 */
 // might later be of use for MFQ3
-static void G_BounceProjectile( vec3_t start, vec3_t impact, vec3_t dir, vec3_t endout ) 
-{
-	vec3_t v, newv;
-	float dot;
-
-	VectorSubtract( impact, start, v );
-	dot = DotProduct( v, dir );
-	VectorMA( v, -2*dot, dir, newv );
-
-	VectorNormalize(newv);
-	VectorMA(impact, 8192, newv, endout);
-}
-
 
 /*
 ======================

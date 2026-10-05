@@ -170,30 +170,6 @@ Find the spot that we DON'T want to use
 ================
 */
 constexpr int MAX_SPAWN_POINTS = 128;
-static GameEntity *SelectNearestDeathmatchSpawnPoint( vec3_t from ) 
-{
-	GameEntity	*spot;
-	vec3_t		delta;
-	float		dist, nearestDist;
-	GameEntity	*nearestSpot;
-
-	nearestDist = 999999;
-	nearestSpot = nullptr;
-	spot = nullptr;
-
-	while( (spot = Game::find (spot, FOFS(classname_), "info_player_deathmatch") ) != nullptr )
-	{
-		VectorSubtract( spot->s.origin, from, delta );
-		dist = VectorLength( delta );
-		if( dist < nearestDist ) 
-		{
-			nearestDist = dist;
-			nearestSpot = spot;
-		}
-	}
-	return nearestSpot;
-}
-
 
 /*
 ================
@@ -315,34 +291,6 @@ Chooses a player start, deathmatch start, etc
 GameEntity *SelectSpawnPoint( vec3_t avoidPoint, vec3_t origin, vec3_t angles, int category ) 
 {
 	return SelectRandomFurthestSpawnPoint( avoidPoint, origin, angles, category );
-
-	/*
-	gentity_t	*spot;
-	gentity_t	*nearestSpot;
-
-	nearestSpot = SelectNearestDeathmatchSpawnPoint( avoidPoint );
-
-	spot = SelectRandomDeathmatchSpawnPoint ( );
-	if ( spot == nearestSpot ) {
-		// roll again if it would be real close to point of death
-		spot = SelectRandomDeathmatchSpawnPoint ( );
-		if ( spot == nearestSpot ) {
-			// last try
-			spot = SelectRandomDeathmatchSpawnPoint ( );
-		}		
-	}
-
-	// find a single player start spot
-	if (!spot) {
-		G_Error( "Couldn't find a spawn point" );
-	}
-
-	VectorCopy (spot->s.origin, origin);
-	origin[2] += 9;
-	VectorCopy (spot->s.angles, angles);
-
-	return spot;
-	*/
 }
 
 /*
