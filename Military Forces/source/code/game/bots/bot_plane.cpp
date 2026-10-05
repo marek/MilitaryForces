@@ -975,6 +975,31 @@ struct PlaneTasks
 		return Status::Success;
 	}
 
+	// the afterburner drinks fuel: it is for staying alive, for getting off the ground and for trips that cannot wait
+	static bool wantsAfterburner( Mind& c )
+	{
+		if( c.defending || c.sense.missile || c.sense.launched || c.bot.desire == Goal::Evade )
+			return true;
+		if( c.speed < c.veh.stallspeed * 1.7f || (c.ps.ONOFF & OO_STALLED) )
+			return true;
+		// tight ground, a hard pull up or a wall ahead need all the thrust there is
+		if( c.bot.confined || c.bot.desire == Goal::Climb || c.sense.height < c.minHeight * 1.5f || theLevel.time_ < c.bot.avoidTime || c.view[PITCH] < -12.0f )
+			return true;
+		if( c.ps.stats[STAT_FUEL] < static_cast<int>( c.veh.maxfuel ) * 3 / 10 )
+			return false;
+		if( c.sense.underFire || c.sense.blindsided || c.sense.locked )
+			return true;
+		// carrying a flag, going for one or chasing its carrier
+		if( c.ps.objectives || c.bot.desire == Goal::Capture )
+			return true;
+		// a wingman left behind catches up with the leader
+		constexpr float farBehind = 4000.0f, farFromFight = 5000.0f;
+		if( const GameEntity* leader = Bots::leaderOf( c.bot ); leader && Distance( leader->r.currentOrigin, c.ent->r.currentOrigin ) > farBehind )
+			return true;
+		// back into the fight after a respawn or a long chase
+		return c.sense.enemy && c.sense.enemyDist > farFromFight;
+	}
+
 	static Status fire( Mind& c )
 	{
 		if( !c.attacking && !c.snapShot && !c.weaponsFree )
@@ -1075,4 +1100,22 @@ void Bots::thinkPlane( GameEntity* ent, State& bot, const Sense& sense, usercmd_
 	mind.holdAltitude();
 
 	runTree( tree, mind, "plane" );
+
+	// full power is asked for all over the tree; in the air it means military power unless the afterburner is earned
+	constexpr int militaryPower = 10;
+	const float throttle = signedThrottle( ps, client->vehicle_ );
+	if( mind.veh.maxthrottle > militaryPower && (ps.ONOFF & OO_LANDED) )
+	{
+		// the cruise setting must not push a landed aircraft along
+		if( cmd.forwardmove != moveFull && throttle > 0 )
+			cmd.buttons |= BUTTON_DECREASE;
+	}
+	else if( mind.veh.maxthrottle > militaryPower && cmd.forwardmove == moveFull && !PlaneTasks::wantsAfterburner( mind ) )
+	{
+		cmd.forwardmove = moveNone;
+		if( throttle < militaryPower )
+			cmd.buttons |= BUTTON_INCREASE;
+		else if( throttle > militaryPower )
+			cmd.buttons |= BUTTON_DECREASE;
+	}
 }
