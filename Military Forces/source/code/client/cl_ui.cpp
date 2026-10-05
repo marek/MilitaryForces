@@ -706,10 +706,10 @@ int GetConfigString(int index, char *buf, int size)
 
 /*
 ====================
-CL_ShutdownUI
+ClientLoop::shutdownUI
 ====================
 */
-void CL_ShutdownUI( ) {
+void ClientLoop::shutdownUI( ) {
 	Key_SetCatcher( Key_GetCatcher( ) & ~KEYCATCH_UI );
 	cls.uiStarted = false;
 	if ( !theUI.isInitialized() ) {

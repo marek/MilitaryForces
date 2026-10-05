@@ -1624,10 +1624,6 @@ bool Hunk::checkMark( ) {
 	return false;
 }
 
-void CL_ShutdownCGame( );
-void CL_ShutdownUI( );
-void SV_ShutdownGameProgs( );
-
 /*
 =================
 Hunk::clear
@@ -1638,10 +1634,10 @@ The server calls this before shutting down or loading a new map
 void Hunk::clear( ) {
 
 #ifndef DEDICATED
-	CL_ShutdownCGame();
-	CL_ShutdownUI();
+	ClientLoop::shutdownCGame();
+	ClientLoop::shutdownUI();
 #endif
-	SV_ShutdownGameProgs();
+	ServerLoop::shutdownGameProgs();
 #ifndef DEDICATED
 	CIN_CloseAllVideos();
 #endif
@@ -2444,7 +2440,6 @@ char	cl_cdkey[34] = "123456789";
 Com_ReadCDKey
 =================
 */
-bool CL_CDKeyValidate( const char *key, const char *checksum );
 void Com_ReadCDKey( const char *filename ) {
 	fileHandle_t	f;
 	char			buffer[33];
@@ -2465,7 +2460,7 @@ void Com_ReadCDKey( const char *filename ) {
 
 	Q_strlwr(buffer);
 
-	if (CL_CDKeyValidate(buffer, NULL)) {
+	if (ClientLoop::cdKeyValidate(buffer, NULL)) {
 		Q_strncpyz( cl_cdkey, buffer, 17 );
 	} else {
 		Com_Memset( cl_cdkey, '\0', 17 );
@@ -2495,7 +2490,7 @@ void Com_AppendCDKey( const char *filename ) {
 	FileSystem::read( buffer, 16, f );
 	FileSystem::fCloseFile( f );
 
-	if (CL_CDKeyValidate(buffer, NULL)) {
+	if (ClientLoop::cdKeyValidate(buffer, NULL)) {
 		strcat( &cl_cdkey[16], buffer );
 	} else {
 		Com_Memset( &cl_cdkey[16], '\0', 17 );
@@ -2522,7 +2517,7 @@ static void Com_WriteCDKey( const char *filename, const char *ikey ) {
 
 	Q_strncpyz( key, ikey, 17 );
 
-	if(!CL_CDKeyValidate(key, NULL) ) {
+	if(!ClientLoop::cdKeyValidate(key, NULL) ) {
 		return;
 	}
 

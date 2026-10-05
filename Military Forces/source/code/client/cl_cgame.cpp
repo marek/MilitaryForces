@@ -401,7 +401,7 @@ CL_ShutdonwCGame
 
 ====================
 */
-void CL_ShutdownCGame( ) {
+void ClientLoop::shutdownCGame( ) {
 	Key_SetCatcher( Key_GetCatcher( ) & ~KEYCATCH_CGAME );
 	cls.cgameStarted = false;
 	if ( !theCG.isInitialized() ) {

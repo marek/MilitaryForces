@@ -460,10 +460,10 @@ bool Client::checkFileSize( int bytesToAdd )
 
 /*
 ===============
-CL_WriteAVIVideoFrame
+Client::writeAVIVideoFrame
 ===============
 */
-void CL_WriteAVIVideoFrame( const byte *imageBuffer, int size )
+void Client::writeAVIVideoFrame( const byte *imageBuffer, int size )
 {
   int   chunkOffset = afd.fileSize - afd.moviOffset - 8;
   int   chunkSize = 8 + size;

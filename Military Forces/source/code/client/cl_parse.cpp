@@ -479,10 +479,10 @@ void Client::parseServerInfo()
 
 /*
 ==================
-CL_ParseGamestate
+Client::parseGamestate
 ==================
 */
-void CL_ParseGamestate( Message *msg ) {
+void Client::parseGamestate( Message *msg ) {
 	int				i;
 	entityState_t	*es;
 	int				newnum;
@@ -537,7 +537,7 @@ void CL_ParseGamestate( Message *msg ) {
 			es = &cl.entityBaselines[ newnum ];
 			msg->readDeltaEntity( &nullstate, es, newnum );
 		} else {
-			Common::error( ERR_DROP, "CL_ParseGamestate: bad command byte" );
+			Common::error( ERR_DROP, "Client::parseGamestate: bad command byte" );
 		}
 	}
 
@@ -929,7 +929,7 @@ void Client::parseServerMessage( Message *msg ) {
 			CL_ParseCommandString( msg );
 			break;
 		case svc_gamestate:
-			CL_ParseGamestate( msg );
+			Client::parseGamestate( msg );
 			break;
 		case svc_snapshot:
 			CL_ParseSnapshot( msg );

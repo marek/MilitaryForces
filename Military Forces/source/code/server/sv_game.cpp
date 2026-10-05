@@ -310,12 +310,12 @@ void GameHost::getUsercmd( int clientNum, usercmd_t *cmd )
 
 /*
 ===============
-SV_ShutdownGameProgs
+ServerLoop::shutdownGameProgs
 
 Called every time a map changes
 ===============
 */
-void SV_ShutdownGameProgs() 
+void ServerLoop::shutdownGameProgs() 
 {
 	if( !theSG.isInitialized() )
 		return;
@@ -325,12 +325,12 @@ void SV_ShutdownGameProgs()
 
 /*
 ==================
-SV_InitGame
+ServerMain::initGame
 
 Called for both a full init and a restart
 ==================
 */
-void SV_InitGame() 
+void ServerMain::initGame() 
 {
 	// start the entity parsing at the beginning
 	theSV.entityParsePoint_ = CollisionModel::entityString();
@@ -363,7 +363,7 @@ void ServerMain::restartGameProgs( )
 
 	theSG.shutdown();
 
-	SV_InitGame();
+	ServerMain::initGame();
 }
 
 /*

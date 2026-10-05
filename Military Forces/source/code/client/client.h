@@ -561,13 +561,11 @@ void CIN_CloseAllVideos();
 //
 // cl_cgame.c
 //
-void CL_ShutdownCGame( );
 void CL_ShaderStateChanged();
 
 //
 // cl_ui.c
 //
-void CL_ShutdownUI( );
 int Key_GetCatcher( );
 void Key_SetCatcher( int catcher );
 void LAN_LoadCachedServers( );
@@ -579,16 +577,14 @@ void LAN_SaveServersToCache( );
 //
 
 //
-// cl_avi.c
-//
-void CL_WriteAVIVideoFrame( const byte *imageBuffer, int size );
-
-//
 // cl_main.c
 //
 class Client
 {
 public:
+	static void parseGamestate( Message *msg );
+	static void writeAVIVideoFrame( const byte *imageBuffer, int size );
+	static int scaledMilliseconds();
 	static void disconnect_f ();
 	static void vid_Restart_f( );
 	static void snd_Restart_f ();

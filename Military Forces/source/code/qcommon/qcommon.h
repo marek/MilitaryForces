@@ -774,6 +774,9 @@ public:
 	static void initRenderer();
 	static void startHunkUsers( bool rendererOnly );
 	static void shutdownSound();
+	static void shutdownCGame( );
+	static void shutdownUI( );
+	static bool cdKeyValidate( const char *key, const char *checksum );
 };
 // the keyboard binding interface must be setup before execing
 // config files, but the rest of client startup will happen later
@@ -830,6 +833,7 @@ public:
 	static int frameMsec();
 	static bool gameCommand( );
 	static int sendQueuedPackets();
+	static void shutdownGameProgs( );
 };
 
 //

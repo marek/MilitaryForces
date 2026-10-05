@@ -99,7 +99,7 @@ void ClientLoop::shutdownSound()
 {
 }
 
-bool CL_CDKeyValidate( const char *key, const char *checksum ) { return true; }
+bool ClientLoop::cdKeyValidate( const char *key, const char *checksum ) { return true; }
 
 void SoundSystem::clearSoundBuffer() {
 }

@@ -25,8 +25,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "sv_server.h"
 #include "sv_client.h"
 
-void SV_InitGame();
-
 /*
 ===============
 SV_SendConfigstring
@@ -402,7 +400,7 @@ void ServerMain::spawnServer( char *server, bool killBots )
 	const char	*p;
 
 	// shut down the existing game if it is running
-	SV_ShutdownGameProgs();
+	ServerLoop::shutdownGameProgs();
 
 	Common::printf ("------ Server Initialization ------\n");
 	Common::printf ("Server: %s\n",server);
@@ -490,7 +488,7 @@ void ServerMain::spawnServer( char *server, bool killBots )
 	theSV.state_ = Server::SS_LOADING;
 
 	// load and spawn all other entities
-	SV_InitGame();
+	ServerMain::initGame();
 
 	// don't allow a map_restart if game is modified
 	sv_gametype->modified = false;
@@ -770,7 +768,7 @@ void ServerLoop::shutdown( const char *finalmsg )
 
 	ServerMain::removeOperatorCommands();
 	ServerMain::masterShutdown();
-	SV_ShutdownGameProgs();
+	ServerLoop::shutdownGameProgs();
 
 	// free current level
 	SV_ClearServer();

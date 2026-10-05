@@ -161,7 +161,6 @@ serverStatus_t cl_serverStatusList[MAX_SERVERSTATUSREQUESTS];
 
 static int noGameRestart = false;
 
-extern void SV_BotFrame( int time );
 static void CL_CheckForResend( );
 static void CL_ShowIP_f();
 static void CL_ServerStatus_f();
@@ -1217,9 +1216,9 @@ void ClientLoop::shutdownAll(bool shutdownRef)
 	// clear sounds
 	SoundSystem::disableSounds();
 	// shutdown CGame
-	CL_ShutdownCGame();
+	ClientLoop::shutdownCGame();
 	// shutdown UI
-	CL_ShutdownUI();
+	ClientLoop::shutdownUI();
 
 	// shutdown the renderer
 	if(shutdownRef)
@@ -1262,7 +1261,7 @@ static void CL_ClearMemory(bool shutdownRef)
 =================
 ClientLoop::flushMemory
 
-Called by ClientLoop::mapLoading, CL_Connect_f, CL_PlayDemo_f, and CL_ParseGamestate the only
+Called by ClientLoop::mapLoading, CL_Connect_f, CL_PlayDemo_f, and Client::parseGamestate the only
 ways a client gets into a game
 Also called by Common::error
 =================
@@ -1956,9 +1955,9 @@ void Client::vid_Restart_f( ) {
 		}
 	
 		// shutdown the UI
-		CL_ShutdownUI();
+		ClientLoop::shutdownUI();
 		// shutdown the CGame
-		CL_ShutdownCGame();
+		ClientLoop::shutdownCGame();
 		// shutdown the renderer and clear the renderer interface
 		Client::shutdownRef();
 		// client is no longer pure until new checksums are sent
@@ -3236,7 +3235,7 @@ static void *CL_RefMalloc( int size ) {
 	return Zone::tagMalloc( size, TAG_RENDERER );
 }
 
-int CL_ScaledMilliseconds() {
+int Client::scaledMilliseconds() {
 	return System::milliseconds()*com_timescale->value;
 }
 
@@ -3289,7 +3288,7 @@ void ClientLoop::initRenderer( ) {
 	ri.Cmd_ExecuteText = CommandBuffer::executeText;
 	ri.Printf = CL_RefPrintf;
 	ri.Error = Common::error;
-	ri.Milliseconds = CL_ScaledMilliseconds;
+	ri.Milliseconds = Client::scaledMilliseconds;
 	ri.Malloc = CL_RefMalloc;
 	ri.Free = Zone::free;
 	ri.hunkAllocAt = Hunk::alloc;
@@ -3319,7 +3318,7 @@ void ClientLoop::initRenderer( ) {
 	ri.CIN_PlayCinematic = CIN_PlayCinematic;
 	ri.CIN_RunCinematic = CIN_RunCinematic;
   
-	ri.CL_WriteAVIVideoFrame = CL_WriteAVIVideoFrame;
+	ri.CL_WriteAVIVideoFrame = Client::writeAVIVideoFrame;
 
 	ri.IN_Init = IN_Init;
 	ri.IN_Shutdown = IN_Shutdown;
@@ -4692,10 +4691,10 @@ static void CL_ShowIP_f() {
 
 /*
 =================
-CL_CDKeyValidate
+ClientLoop::cdKeyValidate
 =================
 */
-bool CL_CDKeyValidate( const char *key, const char *checksum ) {
+bool ClientLoop::cdKeyValidate( const char *key, const char *checksum ) {
 #ifdef STANDALONE
 	return true;
 #else

@@ -399,7 +399,6 @@ void SV_SendClientSnapshot( SV_Client *client );
 //playerState_t *SV_GameClientNum( int num );
 //svEntity_t	*SV_SvEntityForGentity( const entityState_t* s, const entityShared_t* r);
 //sharedEntity_t *SV_GEntityForSvEntity( svEntity_t *svEnt );
-void SV_ShutdownGameProgs ( );
 //void GameHost::locateGameData( void* gEnts, int numGEntities, int sizeofGEntity_t,
 //					   playerState_t *clients, int sizeofGameClient );
 
@@ -451,6 +450,7 @@ void SV_ShutdownGameProgs ( );
 class ServerMain
 {
 public:
+	static void initGame();
 	static void finalMessage (const char *message);
 	static void QDECL sendServerCommand( SV_Client *cl, const char *fmt, ...) Q_PRINTF_FUNC(2, 3);
 	static void addOperatorCommands ();
