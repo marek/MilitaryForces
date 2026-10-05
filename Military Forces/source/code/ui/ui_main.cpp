@@ -3555,36 +3555,26 @@ static void UI_RefreshVehicleSelect( int change_vehicle )
 	// find out the current UI catagory
 	vehicleCat = CvarSystem::variableValue("ui_vehicleCat");
 
-tryCatAgain:
-
-	// is this catagory valid for the current gameset+team+catagory?
-
-	pCat = cat_items[ vehicleCat ];	// get the text
-	vehicle = VehicleData::getIndexOfVehicleEx( (vehicle-1), gameset, team, vehicleCat, -1, -1, 0, allowNukes);
-
-	// ----------> LEVEL SPAWNS <-----------
-
 	// level check (don't allow selection of vehicles that can't spawn on the current level)
-//	if(atoi(Info::valueForKey( info, "sv_cheats" )) == 1)
-//		levelCats = CAT_ANY;
-	//else
-		levelCats = atoi( Info::valueForKey( info, "mf_lvcat" ) );
+	levelCats = atoi( Info::valueForKey( info, "mf_lvcat" ) );
 
-	if( pCat && vehicle >= 0 && (levelCats & (1 << vehicleCat)) ) 
+	// step through the categories until one is valid for the current gameset, team and level; every category is
+	// tried once, so a level with nothing to offer cannot hang the menu
+	for( int tries = 0; tries <= MF_MAX_CATEGORIES; ++tries )
 	{
-		// update the text in the dialog for the UI catagory
-		CvarSystem::set( "ui_vehicleCatTxt", pCat );
-	} 
-	else 
-	{
+		pCat = cat_items[ vehicleCat ];	// get the text
+		vehicle = VehicleData::getIndexOfVehicleEx( (vehicle-1), gameset, team, vehicleCat, -1, -1, 0, allowNukes);
+
+		if( pCat && vehicle >= 0 && (levelCats & (1 << vehicleCat)) ) 
+		{
+			// update the text in the dialog for the UI catagory
+			CvarSystem::set( "ui_vehicleCatTxt", pCat );
+			break;
+		} 
 		// the 'ui_vehicleCat' must be invalid try the next one
 		vehicleCat++;
-		
-		// wrap?
 		if( vehicleCat >= MF_MAX_CATEGORIES ) 
 			vehicleCat = 0;
-
-		goto tryCatAgain;
 	}
 	CvarSystem::set( "ui_vehicleCat", va( "%d", vehicleCat ) );
 
@@ -3593,29 +3583,22 @@ tryCatAgain:
 	// find out the current UI class (based upon the known catagory)
 	vehicleClass = CvarSystem::variableValue("ui_vehicleClass");
 
-tryClassAgain:
-
-	// get the text
-	pClass = class_items[ vehicleCat ][ vehicleClass ];
-
-	// check
-	vehicle = VehicleData::getIndexOfVehicleEx( (vehicle-1), gameset, team, vehicleCat, vehicleClass, -1, 0, allowNukes);
-		
-	if( pClass && vehicle >= 0 ) 
+	// the same for the class within that category
+	for( int tries = 0; tries <= MF_MAX_CLASSES; ++tries )
 	{
-		// update the text in the dialog for the UI class
-		CvarSystem::set( "ui_vehicleClassTxt", pClass );
-	} 
-	else
-	{
-		// the 'ui_vehicleCat' must be invalid try the next one
+		pClass = class_items[ vehicleCat ][ vehicleClass ];
+
+		vehicle = VehicleData::getIndexOfVehicleEx( (vehicle-1), gameset, team, vehicleCat, vehicleClass, -1, 0, allowNukes);
+			
+		if( pClass && vehicle >= 0 ) 
+		{
+			// update the text in the dialog for the UI class
+			CvarSystem::set( "ui_vehicleClassTxt", pClass );
+			break;
+		} 
 		vehicleClass++;
-
-		// wrap?
 		if( vehicleClass >= MF_MAX_CLASSES )
 			vehicleClass = 0;
-
-		goto tryClassAgain;
 	}
 	CvarSystem::set( "ui_vehicleClass", va( "%d", vehicleClass ) );
 
