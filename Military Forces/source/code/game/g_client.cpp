@@ -839,11 +839,8 @@ GameClient::ClientPersistant::PlayerTeamState::PlayerTeamState() :
 	state_(TEAM_BEGIN),
 	location_(0),
 	captures_(0),
-	basedefense_(0),
-	carrierdefense_(0),
 	flagrecovery_(0),
 	fragcarrier_(0),
-	assists_(0),
 	lasthurtcarrier_(0.0f),
 	lastreturnedflag_(0.0f),
 	flagsince_(0.0f),
@@ -896,7 +893,6 @@ GameClient::GameClient() :
 	damage_done_(0),
 	damage_knockback_(0),
 	damage_fromWorld_(false),
-	accurateCount_(0),
 	accuracy_shots_(0),
 	accuracy_hits_(0),
 	lastkilled_client_(0),
@@ -939,7 +935,6 @@ GameClient::clear()
 	damage_knockback_ = 0;
 	VectorClear(damage_from_);
 	damage_fromWorld_ = false;
-	accurateCount_ = 0;
 	accuracy_shots_ = 0;
 	accuracy_hits_ = 0;
 	lastkilled_client_ = 0;

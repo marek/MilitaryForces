@@ -97,15 +97,12 @@ struct GameEntity : public EntityBase
 	int				soundLoop_;
 	GameEntity*		parent_;
 	GameEntity*		nextTrain_;
-	GameEntity*		prevTrain_;
 	vec3_t			pos1_;
 	vec3_t			pos2_;
 
 	char*			message_;
 
-	int				timestamp_;			// body queue sinking, etc
 
-	float			angle_;				// set in editor, -1 = up, -2 = down
 	char*			target_;
 	char*			targetname_;
 	char*			team_;
@@ -119,8 +116,6 @@ struct GameEntity : public EntityBase
 	int				nextthink_;
 
 	int				pain_debounce_time_;
-	int				fly_sound_debounce_time_;	// wind tunnel
-	int				last_move_time_;
 
 	int				health_;
 
@@ -134,7 +129,6 @@ struct GameEntity : public EntityBase
 
 	int				count_;
 
-	GameEntity*		chain_;
 	GameEntity*		enemy_;
 	GameEntity*		activator_;
 	GameEntity*		teamchain_;			// next entity in team

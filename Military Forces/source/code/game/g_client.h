@@ -31,11 +31,8 @@ struct GameClient : public ClientBase
 			int					location_;
 
 			int					captures_;
-			int					basedefense_;
-			int					carrierdefense_;
 			int					flagrecovery_;
 			int					fragcarrier_;
-			int					assists_;
 
 			float				lasthurtcarrier_;
 			float				lastreturnedflag_;
@@ -130,7 +127,6 @@ struct GameClient : public ClientBase
 	vec3_t				damage_from_;		// origin for vector calculation
 	bool				damage_fromWorld_;	// if true, don't use the damage_from vector
 
-	int					accurateCount_;		// for "impressive" reward sound
 
 	int					accuracy_shots_;	// total number of shots
 	int					accuracy_hits_;		// total number of hits

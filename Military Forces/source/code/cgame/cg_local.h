@@ -251,10 +251,8 @@ public:
 
 	int				muzzleFlashTime;	// move to playerEntity?
 	int				previousEvent;
-	int				teleportFlag;
 
 	int				trailTime;		// so missile trails can handle dropped initial packets
-	int				dustTrailTime;
 	int				miscTime;
 	int				TimeSinceLastTrail;	// Time since last trail was drawn
 
@@ -265,15 +263,11 @@ public:
 
 	int				errorTime;		// decay the error from this time
 	int				errorSnapTime;
-	vec3_t			errorOrigin;
 	vec3_t			errorAngles;
 	vec3_t			errorAngles2;
 	
 	bool		extrapolated;	// false if origin / angles is an interpolation
-	vec3_t			rawOrigin;
-	vec3_t			rawAngles;
 
-	vec3_t			beamEnd;
 	vec3_t			lastDrawnTrailPos;		// Position of last drawn trail
 	// exact interpolated position of entity on this frame
 	vec3_t			lerpOrigin;
@@ -438,8 +432,6 @@ struct clientInfo_t {
 
 	int				objectives;		// so can display flag status
 
-	int				invulnerabilityStartTime;
-	int				invulnerabilityStopTime;
 
 	char			redTeam[MAX_TEAMNAME];
 	char			blueTeam[MAX_TEAMNAME];
@@ -664,8 +656,6 @@ struct cg_t {
 	float		v_dmg_pitch;
 	float		v_dmg_roll;
 
-	vec3_t		kick_angles;	// weapon kicks
-	vec3_t		kick_origin;
 
 	// development tool
 	refEntity_t		testModelEntity;
@@ -705,7 +695,6 @@ struct cg_t {
 	bool		drawingMFD;
 	reticle_t		HUDReticle[ MAX_RETICLES ];
 	int				reticleIdx;
-	chat_t			*pCustomChat;	// custom chat data block
 };
 
 
@@ -871,7 +860,6 @@ struct cgMedia_t {
 	sfxHandle_t nukeFarSound;
 
 	// gib explosions
-	sfxHandle_t	gibSound;
 	qhandle_t	gibAbdomen;
 	qhandle_t	gibArm;
 	qhandle_t	gibChest;
@@ -891,7 +879,6 @@ struct cgMedia_t {
 
 	sfxHandle_t	respawnSound;
 	sfxHandle_t talkSound;
-	sfxHandle_t fallSound;
 
 	sfxHandle_t oneMinuteSound;
 	sfxHandle_t fiveMinuteSound;
@@ -939,7 +926,6 @@ struct cgMedia_t {
 	sfxHandle_t yourTeamTookEnemyFlagSound;
 	sfxHandle_t yourTeamTookTheFlagSound;
 	sfxHandle_t	youHaveFlagSound;
-	sfxHandle_t yourBaseIsUnderAttackSound;
 	sfxHandle_t holyShitSound;
 
 	// tournament sounds
@@ -1094,7 +1080,6 @@ struct cgs_t {
 	glconfig_t		glconfig;			// rendering configuration
 	float			screenXScale;		// derived from glconfig
 	float			screenYScale;
-	float			screenXBias;
 	float			screenScale;
 	float			screenXOffset;
 	float			screenYOffset;
@@ -1134,7 +1119,6 @@ struct cgs_t {
 	int				redflag, blueflag;		// flag status from configstrings
 	int				flagStatus;
 
-	bool  newHud;
 
 	// mfq3
 	unsigned long	gameset;
@@ -1157,21 +1141,9 @@ struct cgs_t {
 	int				teamChatPos;
 	int				teamLastChatPos;
 
-	int cursorX;
-	int cursorY;
 	bool eventHandling;
-	bool mouseCaptured;
-	bool sizingHud;
-	void *capturedItem;
-	qhandle_t activeCursor;
 
 	// orders
-	int currentOrder;
-	bool orderPending;
-	int orderTime;
-	int acceptOrderTime;
-	int acceptTask;
-	int acceptLeader;
 
 	// media
 	cgMedia_t		media;

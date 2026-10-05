@@ -35,10 +35,7 @@ GameEntity::GameEntity() :
 	soundLoop_(0),
 	parent_(nullptr),
 	nextTrain_(nullptr),
-	prevTrain_(nullptr),
 	message_(nullptr),
-	timestamp_(0),
-	angle_(0.0f),
 	target_(nullptr),
 	targetname_(nullptr),
 	team_(nullptr),
@@ -48,8 +45,6 @@ GameEntity::GameEntity() :
 	speed_(0.0f),
 	nextthink_(0),
 	pain_debounce_time_(0),
-	fly_sound_debounce_time_(0),
-	last_move_time_(0),
 	health_(0),
 	takedamage_(false),
 	damage_(0),
@@ -58,7 +53,6 @@ GameEntity::GameEntity() :
 	methodOfDeath_(0),
 	splashMethodOfDeath_(0),
 	count_(0),
-	chain_(nullptr),
 	enemy_(nullptr),
 	activator_(nullptr),
 	teamchain_(nullptr),
@@ -139,10 +133,7 @@ GameEntity::cleanAll()
 	soundLoop_ = 0;
 	parent_ = nullptr;
 	nextTrain_ = nullptr;
-	prevTrain_ = nullptr;
 	message_ = nullptr;
-	timestamp_ = 0;
-	angle_ = 0.0f;
 	target_ = nullptr;
 	targetname_ = nullptr;
 	team_ = nullptr;
@@ -152,8 +143,6 @@ GameEntity::cleanAll()
 	speed_ = 0.0f;
 	nextthink_ = 0;
 	pain_debounce_time_ = 0;
-	fly_sound_debounce_time_ = 0;
-	last_move_time_ = 0;
 	health_ = 0;
 	takedamage_ = false;
 	damage_ = 0;
@@ -162,7 +151,6 @@ GameEntity::cleanAll()
 	methodOfDeath_ = 0;
 	splashMethodOfDeath_ = 0;
 	count_ = 0;
-	chain_ = nullptr;
 	enemy_ = nullptr;
 	activator_ = nullptr;
 	teamchain_ = nullptr;

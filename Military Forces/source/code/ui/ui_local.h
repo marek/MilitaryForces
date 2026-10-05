@@ -495,20 +495,13 @@ struct uiStatic_t {
 	glconfig_t 	glconfig;
 	bool		debug;
 	qhandle_t		whiteShader;
-	qhandle_t		menuBackShader;
-	qhandle_t		menuBackShader2;
-	qhandle_t		menuBackNoLogoShader;
 	qhandle_t		charset;
 	qhandle_t		charsetProp;
 	qhandle_t		charsetPropGlow;
 	qhandle_t		charsetPropB;
 	qhandle_t		cursor;
-	qhandle_t		rb_on;
-	qhandle_t		rb_off;
 	float				scale;
 	float				bias;
-	bool		demoversion;
-	bool		firstdraw;
 };
 
 
@@ -677,8 +670,6 @@ struct uiInfo_t
 	UI_UtilsUI uiUtils;
 	int newHighScoreTime;
 	int newBestTime;
-	int showPostGameTime;
-	bool newHighScore;
 	bool demoAvailable;
 	bool soundHighScore;
 	
@@ -748,13 +739,11 @@ struct uiInfo_t
 	int nextFindPlayerRefresh;
 
 	int currentCrosshair;
-	int startPostGameTime;
 	sfxHandle_t newHighScoreSound;
 
 	int q3HeadCount;
 	char q3HeadNames[MAX_PLAYERMODELS][64];
 	qhandle_t q3HeadIcons[MAX_PLAYERMODELS];
-	int q3SelectedHead;
 
 	int effectsColor;
 
