@@ -521,7 +521,7 @@ int Q_isnan(float x);
 // if your system does not have lrintf() and round() you can try this block. Please also open a bug report at bugzilla.icculus.org
 // or write a mail to the ioq3 mailing list.
 #else
-  #define Q_ftol(v) ((long) (v))
+  #define Q_ftol(v) (static_cast<long>(v))
   #define Q_round(v) do { if((v) < 0) (v) -= 0.5f; else (v) += 0.5f; (v) = Q_ftol((v)); } while(0)
   #define Q_SnapVector(vec) \
 	do\
@@ -614,7 +614,7 @@ struct vec3struct_t {
 
 #define QuatCopy(a,b)			((b)[0]=(a)[0],(b)[1]=(a)[1],(b)[2]=(a)[2],(b)[3]=(a)[3])
 
-#define	SnapVector(v) {v[0]=((int)(v[0]));v[1]=((int)(v[1]));v[2]=((int)(v[2]));}
+#define	SnapVector(v) {v[0]=static_cast<int>(v[0]);v[1]=static_cast<int>(v[1]);v[2]=static_cast<int>(v[2]);}
 // just in case you don't want to use the macros
 vec_t _DotProduct( const vec3_t v1, const vec3_t v2 );
 void _VectorSubtract( const vec3_t veca, const vec3_t vecb, vec3_t out );
@@ -641,7 +641,7 @@ static ID_INLINE int VectorCompare( const vec3_t v1, const vec3_t v2 ) {
 }
 
 static ID_INLINE vec_t VectorLength( const vec3_t v ) {
-	return (vec_t)sqrt (v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
+	return static_cast<vec_t>(sqrt (v[0]*v[0] + v[1]*v[1] + v[2]*v[2]));
 }
 
 static ID_INLINE vec_t VectorLengthSquared( const vec3_t v ) {
@@ -1170,7 +1170,7 @@ enum soundChannel_t {
 ========================================================================
 */
 
-#define	ANGLE2SHORT(x)	((int)((x)*65536/360) & 65535)
+#define	ANGLE2SHORT(x)	(static_cast<int>((x)*65536/360) & 65535)
 #define	SHORT2ANGLE(x)	((x)*(360.0/65536))
 
 inline constexpr int SNAPFLAG_RATE_DELAYED = 1;

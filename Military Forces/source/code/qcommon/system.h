@@ -13,7 +13,7 @@ enum cpuFeatures_t : int
   CF_ALTIVEC    = 1 << 7
 };
 
-inline cpuFeatures_t operator|( cpuFeatures_t a, cpuFeatures_t b ) { return (cpuFeatures_t)( (int)a | (int)b ); }
+inline cpuFeatures_t operator|( cpuFeatures_t a, cpuFeatures_t b ) { return static_cast<cpuFeatures_t>( static_cast<int>(a) | static_cast<int>(b) ); }
 inline cpuFeatures_t &operator|=( cpuFeatures_t &a, cpuFeatures_t b ) { a = a | b; return a; }
 
 enum dialogResult_t

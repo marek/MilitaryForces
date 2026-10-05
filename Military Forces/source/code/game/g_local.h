@@ -921,8 +921,8 @@ extern LevelLocals& theLevel;
 
 //extern	gentity_t		g_entities[MAX_GENTITIES];
 
-#define	FOFS(x) ((int)offsetof(GameEntity, x))
-#define	FOFS2(x) ((int)offsetof(SpawnFieldHolder, x))
+#define	FOFS(x) (static_cast<int>(offsetof(GameEntity, x)))
+#define	FOFS2(x) (static_cast<int>(offsetof(SpawnFieldHolder, x)))
 
 extern	vmCvar_t	g_gametype;
 extern	vmCvar_t	g_dedicated;
