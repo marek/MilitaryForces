@@ -78,7 +78,7 @@ void Console::toggleConsole_f () {
 		return;
 	}
 
-	if ( con_autoclear->integer ) {
+	if ( con_autoclear->asInt() ) {
 		g_consoleField.clear();
 	}
 
@@ -290,8 +290,8 @@ void Console::checkResize ()
 
 	if (con_scale != nullptr)
 	{
-		g_smallchar_width = static_cast<int>(static_cast<float>(SMALLCHAR_WIDTH) * con_scale->value);
-		g_smallchar_height = static_cast<int>(static_cast<float>(SMALLCHAR_HEIGHT) * con_scale->value);
+		g_smallchar_width = static_cast<int>(static_cast<float>(SMALLCHAR_WIDTH) * con_scale->asFloat());
+		g_smallchar_height = static_cast<int>(static_cast<float>(SMALLCHAR_HEIGHT) * con_scale->asFloat());
 	}
 
 	width = (cls.glconfig.vidWidth / g_smallchar_width) - 2;
@@ -461,7 +461,7 @@ void ClientLoop::consolePrint( char *txt ) {
 	}
 	
 	// for some demos we don't want to ever show anything on the console
-	if ( cl_noprint && cl_noprint->integer ) {
+	if ( cl_noprint && cl_noprint->asInt() ) {
 		return;
 	}
 	
@@ -588,7 +588,7 @@ void Console::drawNotify ()
 	refExport.SetColor( g_color_table[currentColor] );
 
 	v = 0;
-	for (i= con.current-con_notifylines->integer ; i<=con.current ; i++)
+	for (i= con.current-con_notifylines->asInt() ; i<=con.current ; i++)
 	{
 		int linelength = 0;
 
@@ -598,7 +598,7 @@ void Console::drawNotify ()
 		if (time == 0)
 			continue;
 		time = cls.realtime - time;
-		if (time > con_notifytime->value*1000)
+		if (time > con_notifytime->asFloat()*1000)
 			continue;
 		text = con.text + (i % con.totallines)*con.linewidth;
 
@@ -614,7 +614,7 @@ void Console::drawNotify ()
 				currentColor = ColorIndexForNumber( text[x]>>8 );
 				refExport.SetColor( g_color_table[currentColor] );
 			}
-			Screen::drawSmallChar( cl_conXOffset->integer + con.xadjust + (x+1)*g_smallchar_width, v, text[x] & 0xff );
+			Screen::drawSmallChar( cl_conXOffset->asInt() + con.xadjust + (x+1)*g_smallchar_width, v, text[x] & 0xff );
 			linelength++;
 		}
 
@@ -812,14 +812,14 @@ void Console::runConsole () {
 	// scroll towards the destination height
 	if (con.finalFrac < con.displayFrac)
 	{
-		con.displayFrac -= con_conspeed->value*cls.realFrametime*0.001;
+		con.displayFrac -= con_conspeed->asFloat()*cls.realFrametime*0.001;
 		if (con.finalFrac > con.displayFrac)
 			con.displayFrac = con.finalFrac;
 
 	}
 	else if (con.finalFrac > con.displayFrac)
 	{
-		con.displayFrac += con_conspeed->value*cls.realFrametime*0.001;
+		con.displayFrac += con_conspeed->asFloat()*cls.realFrametime*0.001;
 		if (con.finalFrac < con.displayFrac)
 			con.displayFrac = con.finalFrac;
 	}
@@ -854,7 +854,7 @@ void Console::bottom( ) {
 
 
 void Console::close( ) {
-	if ( !com_cl_running->integer ) {
+	if ( !com_cl_running->asInt() ) {
 		return;
 	}
 	g_consoleField.clear();

@@ -41,7 +41,7 @@ char *svc_strings[256] = {
 };
 
 static void SHOWNET( Message *msg, char *s) {
-	if ( cl_shownet->integer >= 2) {
+	if ( cl_shownet->asInt() >= 2) {
 		Common::printf ("%3i:%s\n", msg->readCount()-1, s);
 	}
 }
@@ -133,7 +133,7 @@ static void CL_ParsePacketEntities( Message *msg, clSnapshot_t *oldframe, clSnap
 
 		while ( oldnum < newnum ) {
 			// one or more entities from the old packet are unchanged
-			if ( cl_shownet->integer == 3 ) {
+			if ( cl_shownet->asInt() == 3 ) {
 				Common::printf ("%3i:  unchanged: %i\n", msg->readCount(), oldnum);
 			}
 			CL_DeltaEntity( msg, newframe, oldnum, oldstate, true );
@@ -150,7 +150,7 @@ static void CL_ParsePacketEntities( Message *msg, clSnapshot_t *oldframe, clSnap
 		}
 		if (oldnum == newnum) {
 			// delta from previous state
-			if ( cl_shownet->integer == 3 ) {
+			if ( cl_shownet->asInt() == 3 ) {
 				Common::printf ("%3i:  delta: %i\n", msg->readCount(), newnum);
 			}
 			CL_DeltaEntity( msg, newframe, newnum, create ? &cl.entityBaselines[newnum] : oldstate, false );
@@ -169,7 +169,7 @@ static void CL_ParsePacketEntities( Message *msg, clSnapshot_t *oldframe, clSnap
 
 		if ( oldnum > newnum ) {
 			// delta from baseline
-			if ( cl_shownet->integer == 3 ) {
+			if ( cl_shownet->asInt() == 3 ) {
 				Common::printf ("%3i:  baseline: %i\n", msg->readCount(), newnum);
 			}
 			CL_DeltaEntity( msg, newframe, newnum, &cl.entityBaselines[newnum], false, !create );
@@ -181,7 +181,7 @@ static void CL_ParsePacketEntities( Message *msg, clSnapshot_t *oldframe, clSnap
 	// any remaining entities in the old frame are copied over
 	while ( oldnum != 99999 ) {
 		// one or more entities from the old packet are unchanged
-		if ( cl_shownet->integer == 3 ) {
+		if ( cl_shownet->asInt() == 3 ) {
 			Common::printf ("%3i:  unchanged: %i\n", msg->readCount(), oldnum);
 		}
 		CL_DeltaEntity( msg, newframe, oldnum, oldstate, true );
@@ -339,7 +339,7 @@ static void CL_ParseSnapshot( Message *msg ) {
 	// save the frame off in the backup array for later delta comparisons
 	cl.snapshots[cl.snap.messageNum & PACKET_MASK] = cl.snap;
 
-	if (cl_shownet->integer == 3) {
+	if (cl_shownet->asInt() == 3) {
 		Common::printf( "   snapshot:%i  delta:%i  ping:%i\n", cl.snap.messageNum,
 		cl.snap.deltaNum, cl.snap.ping );
 	}
@@ -555,7 +555,7 @@ void Client::parseGamestate( Message *msg ) {
 	Client::systemInfoChanged();
 
 	// stop recording now so the demo won't have an unnecessary level load at the end.
-	if(cl_autoRecordDemo->integer && clc.demorecording)
+	if(cl_autoRecordDemo->asInt() && clc.demorecording)
 		Client::stopRecord_f();
 	
 	// reinitialize the filesystem if the game directory has changed
@@ -677,7 +677,7 @@ static void CL_ParseDownload ( Message *msg ) {
 #ifdef USE_VOIP
 bool Client::shouldIgnoreVoipSender(int sender)
 {
-	if (!cl_voip->integer)
+	if (!cl_voip->asInt())
 		return true;  // VoIP is disabled.
 	else if ((sender == clc.clientNum) && (!clc.demoplaying))
 		return true;  // ignore own voice (unless playing back a demo).
@@ -879,9 +879,9 @@ Client::parseServerMessage
 void Client::parseServerMessage( Message *msg ) {
 	int			cmd;
 
-	if ( cl_shownet->integer == 1 ) {
+	if ( cl_shownet->asInt() == 1 ) {
 		Common::printf ("%i ",msg->size());
-	} else if ( cl_shownet->integer >= 2 ) {
+	} else if ( cl_shownet->asInt() >= 2 ) {
 		Common::printf ("------------------\n");
 	}
 
@@ -910,7 +910,7 @@ void Client::parseServerMessage( Message *msg ) {
 			break;
 		}
 
-		if ( cl_shownet->integer >= 2 ) {
+		if ( cl_shownet->asInt() >= 2 ) {
 			if ( (cmd < 0) || (!svc_strings[cmd]) ) {
 				Common::printf( "%3i:BAD CMD %i\n", msg->readCount()-1, cmd );
 			} else {

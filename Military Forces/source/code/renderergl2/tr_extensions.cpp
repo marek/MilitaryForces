@@ -69,7 +69,7 @@ void GLimp_InitExtraExtensions()
 	//
 	if (qglesMajorVersion)
 	{
-		if (!r_allowExtensions->integer)
+		if (!r_allowExtensions->asInt())
 			goto done;
 
 		extension = "GL_EXT_occlusion_query_boolean";
@@ -174,7 +174,7 @@ void GLimp_InitExtraExtensions()
 	glRefConfig.framebufferMultisample = false;
 	if (q_gl_version_at_least_3_0 || SDL_GL_ExtensionSupported(extension))
 	{
-		glRefConfig.framebufferObject = !!r_ext_framebuffer_object->integer;
+		glRefConfig.framebufferObject = !!r_ext_framebuffer_object->asInt();
 		glRefConfig.framebufferBlit = true;
 		glRefConfig.framebufferMultisample = true;
 
@@ -202,7 +202,7 @@ void GLimp_InitExtraExtensions()
 		}
 		else
 		{
-			glRefConfig.vertexArrayObject = !!r_arb_vertex_array_object->integer;
+			glRefConfig.vertexArrayObject = !!r_arb_vertex_array_object->asInt();
 		}
 
 		QGL_ARB_vertex_array_object_PROCS;
@@ -219,7 +219,7 @@ void GLimp_InitExtraExtensions()
 	glRefConfig.textureFloat = false;
 	if (q_gl_version_at_least_3_0 || SDL_GL_ExtensionSupported(extension))
 	{
-		glRefConfig.textureFloat = !!r_ext_texture_float->integer;
+		glRefConfig.textureFloat = !!r_ext_texture_float->asInt();
 
 		ri.Printf(PRINT_ALL, result[glRefConfig.textureFloat], extension);
 	}
@@ -247,7 +247,7 @@ void GLimp_InitExtraExtensions()
 	glRefConfig.seamlessCubeMap = false;
 	if (q_gl_version_at_least_3_2 || SDL_GL_ExtensionSupported(extension))
 	{
-		glRefConfig.seamlessCubeMap = !!r_arb_seamless_cube_map->integer;
+		glRefConfig.seamlessCubeMap = !!r_arb_seamless_cube_map->asInt();
 
 		ri.Printf(PRINT_ALL, result[glRefConfig.seamlessCubeMap], extension);
 	}
@@ -297,7 +297,7 @@ void GLimp_InitExtraExtensions()
 	extension = "GL_ARB_texture_compression_rgtc";
 	if (SDL_GL_ExtensionSupported(extension))
 	{
-		bool useRgtc = r_ext_compressed_textures->integer >= 1;
+		bool useRgtc = r_ext_compressed_textures->asInt() >= 1;
 
 		if (useRgtc)
 			glRefConfig.textureCompression |= TCR_RGTC;
@@ -309,13 +309,13 @@ void GLimp_InitExtraExtensions()
 		ri.Printf(PRINT_ALL, result[2], extension);
 	}
 
-	glRefConfig.swizzleNormalmap = r_ext_compressed_textures->integer && !(glRefConfig.textureCompression & TCR_RGTC);
+	glRefConfig.swizzleNormalmap = r_ext_compressed_textures->asInt() && !(glRefConfig.textureCompression & TCR_RGTC);
 
 	// GL_ARB_texture_compression_bptc
 	extension = "GL_ARB_texture_compression_bptc";
 	if (SDL_GL_ExtensionSupported(extension))
 	{
-		bool useBptc = r_ext_compressed_textures->integer >= 2;
+		bool useBptc = r_ext_compressed_textures->asInt() >= 2;
 
 		if (useBptc)
 			glRefConfig.textureCompression |= TCR_BPTC;
@@ -332,7 +332,7 @@ void GLimp_InitExtraExtensions()
 	glRefConfig.directStateAccess = false;
 	if (SDL_GL_ExtensionSupported(extension))
 	{
-		glRefConfig.directStateAccess = !!r_ext_direct_state_access->integer;
+		glRefConfig.directStateAccess = !!r_ext_direct_state_access->asInt();
 
 		// QGL_*_PROCS becomes several functions, do not remove {}
 		if (glRefConfig.directStateAccess)

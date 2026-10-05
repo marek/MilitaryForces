@@ -224,7 +224,7 @@ void GL_CheckErrors( ) {
 	if ( err == GL_NO_ERROR ) {
 		return;
 	}
-	if ( r_ignoreGLErrors->integer ) {
+	if ( r_ignoreGLErrors->asInt() ) {
 		return;
 	}
 	switch( err ) {
@@ -311,9 +311,9 @@ bool R_GetModeInfo( int *width, int *height, float *windowAspect, int mode ) {
 	}
 
 	if ( mode == -1 ) {
-		*width = r_customwidth->integer;
-		*height = r_customheight->integer;
-		pixelAspect = r_customPixelAspect->value;
+		*width = r_customwidth->asInt();
+		*height = r_customheight->asInt();
+		pixelAspect = r_customPixelAspect->asFloat();
 	} else {
 		vm = &r_vidModes[mode];
 
@@ -482,7 +482,7 @@ void RB_TakeScreenshotJPEG(int x, int y, int width, int height, char *fileName)
 	if(glConfig.deviceSupportsGamma)
 		R_GammaCorrect(buffer + offset, memcount);
 
-	RE_SaveJPG(fileName, r_screenshotJpegQuality->integer, width, height, buffer + offset, padlen);
+	RE_SaveJPG(fileName, r_screenshotJpegQuality->asInt(), width, height, buffer + offset, padlen);
 	ri.hunkFreeTempMemory(buffer);
 }
 
@@ -805,7 +805,7 @@ const void *RB_TakeVideoFrameCmd( const void *data )
 	if(cmd->motionJpeg)
 	{
 		memcount = RE_SaveJPGToBuffer(cmd->encodeBuffer, linelen * cmd->height,
-			r_aviMotionJpegQuality->integer,
+			r_aviMotionJpegQuality->asInt(),
 			cmd->width, cmd->height, cBuf, padlen);
 		ri.CL_WriteAVIVideoFrame(cmd->encodeBuffer, memcount);
 	}
@@ -859,14 +859,14 @@ void GL_SetDefaultState( )
 	// in a multitexture environment
 	if ( qglActiveTextureARB ) {
 		GL_SelectTexture( 1 );
-		GL_TextureMode( r_textureMode->string );
+		GL_TextureMode( r_textureMode->asString() );
 		GL_TexEnv( GL_MODULATE );
 		qglDisable( GL_TEXTURE_2D );
 		GL_SelectTexture( 0 );
 	}
 
 	qglEnable(GL_TEXTURE_2D);
-	GL_TextureMode( r_textureMode->string );
+	GL_TextureMode( r_textureMode->asString() );
 	GL_TexEnv( GL_MODULATE );
 
 	qglShadeModel( GL_SMOOTH );
@@ -953,7 +953,7 @@ void GfxInfo_f( )
 	ri.Printf( PRINT_ALL, "GL_MAX_TEXTURE_SIZE: %d\n", glConfig.maxTextureSize );
 	ri.Printf( PRINT_ALL, "GL_MAX_TEXTURE_UNITS_ARB: %d\n", glConfig.numTextureUnits );
 	ri.Printf( PRINT_ALL, "\nPIXELFORMAT: color(%d-bits) Z(%d-bit) stencil(%d-bits)\n", glConfig.colorBits, glConfig.depthBits, glConfig.stencilBits );
-	ri.Printf( PRINT_ALL, "MODE: %d, %d x %d %s hz:", r_mode->integer, glConfig.vidWidth, glConfig.vidHeight, fsstrings[r_fullscreen->integer == 1] );
+	ri.Printf( PRINT_ALL, "MODE: %d, %d x %d %s hz:", r_mode->asInt(), glConfig.vidWidth, glConfig.vidHeight, fsstrings[r_fullscreen->asInt() == 1] );
 	if ( glConfig.displayFrequency )
 	{
 		ri.Printf( PRINT_ALL, "%d\n", glConfig.displayFrequency );
@@ -977,7 +977,7 @@ void GfxInfo_f( )
 
 		// default is to use triangles if compiled vertex arrays are present
 		ri.Printf( PRINT_ALL, "rendering primitives: " );
-		primitives = r_primitives->integer;
+		primitives = r_primitives->asInt();
 		if ( primitives == 0 ) {
 			if ( qglLockArraysEXT ) {
 				primitives = 2;
@@ -996,14 +996,14 @@ void GfxInfo_f( )
 		}
 	}
 
-	ri.Printf( PRINT_ALL, "texturemode: %s\n", r_textureMode->string );
-	ri.Printf( PRINT_ALL, "picmip: %d\n", r_picmip->integer );
-	ri.Printf( PRINT_ALL, "texture bits: %d\n", r_texturebits->integer );
+	ri.Printf( PRINT_ALL, "texturemode: %s\n", r_textureMode->asString() );
+	ri.Printf( PRINT_ALL, "picmip: %d\n", r_picmip->asInt() );
+	ri.Printf( PRINT_ALL, "texture bits: %d\n", r_texturebits->asInt() );
 	ri.Printf( PRINT_ALL, "multitexture: %s\n", enablestrings[qglActiveTextureARB != nullptr] );
 	ri.Printf( PRINT_ALL, "compiled vertex arrays: %s\n", enablestrings[qglLockArraysEXT != nullptr ] );
 	ri.Printf( PRINT_ALL, "texenv add: %s\n", enablestrings[glConfig.textureEnvAddAvailable != 0] );
 	ri.Printf( PRINT_ALL, "compressed textures: %s\n", enablestrings[glConfig.textureCompression!=TC_NONE] );
-	if ( r_vertexLight->integer || glConfig.hardwareType == GLHW_PERMEDIA2 )
+	if ( r_vertexLight->asInt() || glConfig.hardwareType == GLHW_PERMEDIA2 )
 	{
 		ri.Printf( PRINT_ALL, "HACK: using vertex lightmap approximation\n" );
 	}
@@ -1015,7 +1015,7 @@ void GfxInfo_f( )
 	{
 		ri.Printf( PRINT_ALL, "HACK: riva128 approximations\n" );
 	}
-	if ( r_finish->integer ) {
+	if ( r_finish->asInt() ) {
 		ri.Printf( PRINT_ALL, "Forcing glFinish\n" );
 	}
 }
@@ -1240,11 +1240,11 @@ void R_Init( ) {
 
 	R_Register();
 
-	max_polys = r_maxpolys->integer;
+	max_polys = r_maxpolys->asInt();
 	if (max_polys < MAX_POLYS)
 		max_polys = MAX_POLYS;
 
-	max_polyverts = r_maxpolyverts->integer;
+	max_polyverts = r_maxpolyverts->asInt();
 	if (max_polyverts < MAX_POLYVERTS)
 		max_polyverts = MAX_POLYVERTS;
 

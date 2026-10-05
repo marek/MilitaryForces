@@ -59,7 +59,7 @@ int R_CullLocalBox (vec3_t bounds[2]) {
 	int			anyBack;
 	int			front, back;
 
-	if ( r_nocull->integer ) {
+	if ( r_nocull->asInt() ) {
 		return CULL_CLIP;
 	}
 
@@ -128,7 +128,7 @@ int R_CullPointAndRadius( vec3_t pt, float radius )
 	cplane_t	*frust;
 	bool mightBeClipped = false;
 
-	if ( r_nocull->integer ) {
+	if ( r_nocull->asInt() ) {
 		return CULL_CLIP;
 	}
 
@@ -513,7 +513,7 @@ R_SetupProjection
 void R_SetupProjection(viewParms_t *dest, float zProj, bool computeFrustum)
 {
 	float	xmin, xmax, ymin, ymax;
-	float	width, height, stereoSep = r_stereoSeparation->value;
+	float	width, height, stereoSep = r_stereoSeparation->asFloat();
 
 	/*
 	 * offset the view origin of the viewer for stereo rendering 
@@ -570,7 +570,7 @@ void R_SetupProjectionZ(viewParms_t *dest)
 {
 	float zNear, zFar, depth;
 	
-	zNear	= r_znear->value;
+	zNear	= r_znear->asFloat();
 	zFar	= dest->zFar;	
 	depth	= zFar - zNear;
 
@@ -956,7 +956,7 @@ bool R_MirrorViewBySurface (drawSurf_t *drawSurf, int entityNum) {
 		return false;
 	}
 
-	if ( r_noportals->integer || (r_fastsky->integer == 1) ) {
+	if ( r_noportals->asInt() || (r_fastsky->asInt() == 1) ) {
 		return false;
 	}
 
@@ -1168,7 +1168,7 @@ void R_SortDrawSurfs( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 		// if the mirror was completely clipped away, we may need to check another surface
 		if ( R_MirrorViewBySurface( (drawSurfs+i), entityNum) ) {
 			// this is a debug option to see exactly what is being mirrored
-			if ( r_portalOnly->integer ) {
+			if ( r_portalOnly->asInt() ) {
 				return;
 			}
 			break;		// only one mirror view at a time
@@ -1187,7 +1187,7 @@ void R_AddEntitySurfaces () {
 	trRefEntity_t	*ent;
 	shader_t		*shader;
 
-	if ( !r_drawentities->integer ) {
+	if ( !r_drawentities->asInt() ) {
 		return;
 	}
 
@@ -1337,7 +1337,7 @@ void R_DebugGraphics( ) {
 	if ( tr.refdef.rdflags & RDF_NOWORLDMODEL ) {
 		return;
 	}
-	if ( !r_debugSurface->integer ) {
+	if ( !r_debugSurface->asInt() ) {
 		return;
 	}
 
@@ -1378,7 +1378,7 @@ void R_RenderView (viewParms_t *parms) {
 	// set viewParms.world
 	R_RotateForViewer ();
 
-	R_SetupProjection(&tr.viewParms, r_zproj->value, true);
+	R_SetupProjection(&tr.viewParms, r_zproj->asFloat(), true);
 
 	R_GenerateDrawSurfs();
 

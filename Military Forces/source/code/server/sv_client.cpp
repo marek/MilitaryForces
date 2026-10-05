@@ -80,13 +80,13 @@ void ServerMain::getChallenge(netadr_t from)
 
 	gameName = CommandSystem::argv(2);
 
-	gameMismatch = !*gameName || strcmp(gameName, com_gamename->string) != 0;
+	gameMismatch = !*gameName || strcmp(gameName, com_gamename->asString()) != 0;
 
 	// reject client if the gamename string sent by the client doesn't match ours
 	if (gameMismatch)
 	{
 		Network::outOfBandPrint(NS_SERVER, from, "print\nGame mismatch: This is a %s server\n",
-			com_gamename->string);
+			com_gamename->asString());
 		return;
 	}
 
@@ -137,7 +137,7 @@ void ServerMain::getChallenge(netadr_t from)
 
 	challenge->pingTime_ = theSVS.time_;
 	Network::outOfBandPrint(NS_SERVER, challenge->adr_, "challengeResponse %d %d %d",
-			   challenge->challenge_, clientChallenge, com_protocol->integer);
+			   challenge->challenge_, clientChallenge, com_protocol->asInt());
 }
 
 ///*
@@ -279,10 +279,10 @@ void ServerMain::directConnect( netadr_t from )
 	Q_strncpyz( userinfo, CommandSystem::argv(1), sizeof(userinfo) );
 
 	int version = atoi( Info::valueForKey( userinfo, "protocol" ) );
-	if(version != com_protocol->integer)
+	if(version != com_protocol->asInt())
 	{
 		Network::outOfBandPrint(NS_SERVER, from, "print\nServer uses protocol version %i "
-				   "(yours is %i).\n", com_protocol->integer, version);
+				   "(yours is %i).\n", com_protocol->asInt(), version);
 		Common::dPrintf("    rejected connect from version %i\n", version);
 		return;
 	}
@@ -292,7 +292,7 @@ void ServerMain::directConnect( netadr_t from )
 
 	// quick reject
 	SV_Client* cl;
-	for( int i = 1; i <= sv_maxclients->integer ; i++ ) 
+	for( int i = 1; i <= sv_maxclients->asInt() ; i++ ) 
 	{
 		cl = theSVS.svClients_.at(i);
 
@@ -304,7 +304,7 @@ void ServerMain::directConnect( netadr_t from )
 			|| from.port == cl->netchan_.remoteAddress().port ) ) 
 		{
 			if (( theSVS.time_ - cl->lastConnectTime_) 
-				< (sv_reconnectlimit->integer * 1000)) 
+				< (sv_reconnectlimit->asInt() * 1000)) 
 			{
 				Common::dPrintf ("%s:reconnect rejected : too soon\n", Network::adrToString (from));
 				return;
@@ -360,14 +360,14 @@ void ServerMain::directConnect( netadr_t from )
 		// never reject a LAN client based on ping
 		if ( !Sys_IsLANAddress( from ) ) 
 		{
-			if ( sv_minPing->value && ping < sv_minPing->value ) 
+			if ( sv_minPing->asFloat() && ping < sv_minPing->asFloat() ) 
 			{
 				Network::outOfBandPrint( NS_SERVER, from, "print\nServer is for high pings only\n" );
 				Common::dPrintf ("Client %i rejected on a too low ping\n", i);
 				challengeptr->wasrefused_ = true;
 				return;
 			}
-			if ( sv_maxPing->value && ping > sv_maxPing->value ) 
+			if ( sv_maxPing->asFloat() && ping > sv_maxPing->asFloat() ) 
 			{
 				Network::outOfBandPrint( NS_SERVER, from, "print\nServer is for low pings only\n" );
 				Common::dPrintf ("Client %i rejected on a too high ping\n", i);
@@ -385,7 +385,7 @@ void ServerMain::directConnect( netadr_t from )
 	//Com_Memset( newcl, 0, sizeof(SV_Client) );
 
 	// if there is already a slot for this ip, reuse it
-	for( int i = 1; i <= sv_maxclients->integer; i++ )
+	for( int i = 1; i <= sv_maxclients->asInt(); i++ )
 	{
 		cl = theSVS.svClients_.at(i); 
 
@@ -424,18 +424,18 @@ void ServerMain::directConnect( netadr_t from )
 	int	startIndex;
 	char* password;
 	password = Info::valueForKey( userinfo, "password" );
-	if ( *password && !strcmp( password, sv_privatePassword->string ) ) 
+	if ( *password && !strcmp( password, sv_privatePassword->asString() ) ) 
 	{
 		startIndex = 1;
 	} 
 	else
 	{
 		// skip past the reserved slots
-		startIndex = sv_privateClients->integer + 1;
+		startIndex = sv_privateClients->asInt() + 1;
 	}
 
 	newcl = nullptr;
-	for( int i = startIndex; i <= sv_maxclients->integer ; i++ ) 
+	for( int i = startIndex; i <= sv_maxclients->asInt() ; i++ ) 
 	{
 		cl = theSVS.svClients_.at(i);
 		if( !cl )
@@ -459,17 +459,17 @@ void ServerMain::directConnect( netadr_t from )
 		{
 			count = 0;
 			int i;
-			for( i = startIndex; i <= sv_maxclients->integer ; i++ ) 
+			for( i = startIndex; i <= sv_maxclients->asInt() ; i++ ) 
 			{
 				cl = theSVS.svClients_.at(i);
 				if( cl && cl->netchan_.remoteAddress().type == NA_BOT ) 
 					count++;
 			}
 			// if they're all bots
-			if (count >= sv_maxclients->integer - startIndex) 
+			if (count >= sv_maxclients->asInt() - startIndex) 
 			{
-				(theSVS.svClients_.at(sv_maxclients->integer))->drop( "only bots on server" );
-				newcl = theSVS.svClients_.at(sv_maxclients->integer);
+				(theSVS.svClients_.at(sv_maxclients->asInt()))->drop( "only bots on server" );
+				newcl = theSVS.svClients_.at(sv_maxclients->asInt());
 				newcl->clientNum_ = i;
 			}
 			else 
@@ -548,7 +548,7 @@ gotnewcl:
 	// if this was the first client on the server, or the last client
 	// the server can hold, send a heartbeat to the master.
 	count = 0;
-	for( int i = 1; i <= sv_maxclients->integer; i++ ) 
+	for( int i = 1; i <= sv_maxclients->asInt(); i++ ) 
 	{
 		SV_Client* client = theSVS.svClients_.at(i);
 		if( !client )
@@ -556,7 +556,7 @@ gotnewcl:
 		if( client->state_ >= SV_Client::CS_CONNECTED )
 			count++;
 	}
-	if( count == 1 || count == sv_maxclients->integer )
+	if( count == 1 || count == sv_maxclients->asInt() )
 		ServerMain::heartbeat_f();
 }
 
@@ -659,7 +659,7 @@ void SV_Client::drop( const char *reason )
 	// to the master so it is known the server is empty
 	// send a heartbeat now so the master will get up to date info
 	// if there is already a slot for this ip, reuse it
-	for( i = 1; i <= sv_maxclients->integer; i++ ) 
+	for( i = 1; i <= sv_maxclients->asInt(); i++ ) 
 	{
 		SV_Client* cl = theSVS.svClients_.at(i);
 		if( !cl )
@@ -667,7 +667,7 @@ void SV_Client::drop( const char *reason )
 		if( cl->state_ >= SV_Client::CS_CONNECTED ) 
 			break;
 	}
-	if( i > sv_maxclients->integer ) 
+	if( i > sv_maxclients->asInt() ) 
 		ServerMain::heartbeat_f();
 }
 
@@ -975,8 +975,8 @@ int SV_Client::writeDownloadToClient( Message *msg )
 		this->download_ = 0;
 
 		// We open the file here
-		if ( !(sv_allowDownload->integer & DLF_ENABLE) ||
-			(sv_allowDownload->integer & DLF_NO_UDP) ||
+		if ( !(sv_allowDownload->asInt() & DLF_ENABLE) ||
+			(sv_allowDownload->asInt() & DLF_NO_UDP) ||
 			idPack || unreferenced ||
 			( this->downloadSize_ = FileSystem::baseDir_FOpenFileRead( this->downloadName_, &this->download_ ) ) < 0 ) {
 			// cannot auto-download file
@@ -999,11 +999,11 @@ int SV_Client::writeDownloadToClient( Message *msg )
 					Com_sprintf(errorMessage, sizeof(errorMessage), "Cannot autodownload id pk3 file \"%s\"", this->downloadName_);
 				}
 			}
-			else if ( !(sv_allowDownload->integer & DLF_ENABLE) ||
-				(sv_allowDownload->integer & DLF_NO_UDP) ) {
+			else if ( !(sv_allowDownload->asInt() & DLF_ENABLE) ||
+				(sv_allowDownload->asInt() & DLF_NO_UDP) ) {
 
 				Common::printf("clientDownload: %d : \"%s\" download disabled\n", this->clientNum_, this->downloadName_);
-				if (sv_pure->integer) {
+				if (sv_pure->asInt()) {
 					Com_sprintf(errorMessage, sizeof(errorMessage), "Could not download \"%s\" because autodownloading is disabled on the server.\n\n"
 										"You will need to get this file elsewhere before you "
 										"can connect to this pure server.\n", this->downloadName_);
@@ -1128,7 +1128,7 @@ int ServerMain::sendQueuedMessages()
 	int i, retval = -1, nextFragT;
 	SV_Client *cl;
 	
-	for(i=1; i <= sv_maxclients->integer; i++)
+	for(i=1; i <= sv_maxclients->asInt(); i++)
 	{
 		cl = theSVS.svClients_.at(i);
 		
@@ -1163,7 +1163,7 @@ int ServerMain::sendDownloadMessages()
 	Message msg;
 	byte msgBuffer[MAX_MSGLEN];
 	
-	for(i=1; i <= sv_maxclients->integer; i++)
+	for(i=1; i <= sv_maxclients->asInt(); i++)
 	{
 		cl = theSVS.svClients_.at(i);
 		
@@ -1224,7 +1224,7 @@ void SV_Client::verifyPaks_f()
 	// certain pk3 files, namely we want the client to have loaded the
 	// ui and cgame that we think should be loaded based on the pure setting
 	//
-	if ( sv_pure->integer != 0 ) 
+	if ( sv_pure->asInt() != 0 ) 
 	{
 
 		bGood = true;
@@ -1411,7 +1411,7 @@ void SV_Client::userinfoChanged() {
 
 	// if the client is on the same subnet as the server and we aren't running an
 	// internet public server, assume they don't need a rate choke
-	if ( Sys_IsLANAddress( this->netchan_.remoteAddress() ) && com_dedicated->integer != 2 && sv_lanForceRate->integer == 1) {
+	if ( Sys_IsLANAddress( this->netchan_.remoteAddress() ) && com_dedicated->asInt() != 2 && sv_lanForceRate->asInt() == 1) {
 		this->rate_ = 99999;	// lans should not rate limit
 	} else {
 		val = Info::valueForKey (this->userinfo_, "rate");
@@ -1444,8 +1444,8 @@ void SV_Client::userinfoChanged() {
 		
 		if(i < 1)
 			i = 1;
-		else if(i > sv_fps->integer)
-			i = sv_fps->integer;
+		else if(i > sv_fps->asInt())
+			i = sv_fps->asInt();
 
 		i = 1000 / i;
 	}
@@ -1638,9 +1638,9 @@ bool SV_Client::clientCommand( Message *msg )
 	// but not other people
 	// We don't do this when the client hasn't been active yet since its
 	// normal to spam a lot of commands when downloading
-	if ( !com_cl_running->integer && 
+	if ( !com_cl_running->asInt() && 
 		this->state_ >= SV_Client::CS_ACTIVE &&
-		sv_floodProtect->integer && 
+		sv_floodProtect->asInt() && 
 		theSVS.time_ < this->nextReliableTime_ ) 
 	{
 		// ignore any other text messages from this client but let them keep playing
@@ -1743,7 +1743,7 @@ void SV_Client::userMove( Message *msg, bool delta )
 	// catch the no-cp-yet situation before SV_ClientEnterWorld
 	// if CS_ACTIVE, then it's time to trigger a New gamestate emission
 	// if not, then we are getting remaining parasite usermove commands, which we should ignore
-	if (sv_pure->integer != 0 && this->pureAuthentic_ == 0 && !this->gotCP_) 
+	if (sv_pure->asInt() != 0 && this->pureAuthentic_ == 0 && !this->gotCP_) 
 	{
 		if (this->state_ == SV_Client::CS_ACTIVE)
 		{
@@ -1763,7 +1763,7 @@ void SV_Client::userMove( Message *msg, bool delta )
 	}
 	
 	// a bad cp command was sent, drop the client
-	if (sv_pure->integer != 0 && this->pureAuthentic_ == 0) 
+	if (sv_pure->asInt() != 0 && this->pureAuthentic_ == 0) 
 	{		
 		this->drop( "Cannot validate pure client!" );
 		return;
@@ -1817,7 +1817,7 @@ Blocking of voip packets based on source client
 
 bool SV_Client::shouldIgnoreVoipSender()
 {
-	if (!sv_voip->integer)
+	if (!sv_voip->asInt())
 		return true;  // VoIP disabled on this server.
 	else if (!this->hasVoip_)  // client doesn't have VoIP support?!
 		return true;
@@ -1871,7 +1871,7 @@ void SV_Client::userVoip( Message *msg, bool ignoreData )
 	// !!! FIXME: decide if this is bogus data?
 
 	// decide who needs this VoIP packet sent to them...
-	for (i = 1; i <= sv_maxclients->integer ; i++) {
+	for (i = 1; i <= sv_maxclients->asInt() ; i++) {
 		client = theSVS.svClients_.at(i);
 		if (!client)
 			continue;

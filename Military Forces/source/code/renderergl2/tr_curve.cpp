@@ -523,7 +523,7 @@ void R_SubdividePatchToGrid( srfBspSurface_t *grid, int width, int height,
 				break;	// can't subdivide any more
 			}
 
-			if ( maxLen <= r_subdivisions->value ) {
+			if ( maxLen <= r_subdivisions->asFloat() ) {
 				errorTable[dir][j+1] = 1.0f/maxLen;
 				// if we go over the whole grid twice without adding any columns, stop
 				if (++consecutiveComplete >= width)

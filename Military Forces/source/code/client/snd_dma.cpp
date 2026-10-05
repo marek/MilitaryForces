@@ -550,7 +550,7 @@ static void S_Base_StartSoundEx( vec3_t origin, int entityNum, int entchannel, s
 		sfx->memoryLoad();
 	}
 
-	if ( s_show->integer == 1 ) {
+	if ( s_show->asInt() == 1 ) {
 		Common::printf( "%i : %s\n", s_paintedtime, sfx->soundName );
 	}
 
@@ -796,7 +796,7 @@ static void S_Base_AddLoopingSound( int entityNum, const vec3_t origin, const ve
 	loopSounds[entityNum].dopplerScale = 1.0;
 	loopSounds[entityNum].sfx = sfx;
 
-	if (s_doppler->integer && VectorLengthSquared(velocity)>0.0) {
+	if (s_doppler->asInt() && VectorLengthSquared(velocity)>0.0) {
 		vec3_t	out;
 		float	lena, lenb;
 
@@ -994,7 +994,7 @@ static void S_Base_RawSamples( int stream, int samples, int rate, int width, int
 
 	rawsamples = s_rawsamples[stream];
 
-	if ( s_muted->integer ) {
+	if ( s_muted->asInt() ) {
 		intVolumeLeft = intVolumeRight = 0;
 	} else {
 		int leftvol, rightvol;
@@ -1006,8 +1006,8 @@ static void S_Base_RawSamples( int stream, int samples, int rate, int width, int
 			leftvol = rightvol = 256;
 		}
 
-		intVolumeLeft = leftvol * volume * s_volume->value;
-		intVolumeRight = rightvol * volume * s_volume->value;
+		intVolumeLeft = leftvol * volume * s_volume->asFloat();
+		intVolumeRight = rightvol * volume * s_volume->asFloat();
 	}
 
 	if ( s_rawend[stream] < s_soundtime ) {
@@ -1217,7 +1217,7 @@ static void S_Base_Update( ) {
 	//
 	// debugging output
 	//
-	if ( s_show->integer == 2 ) {
+	if ( s_show->asInt() == 2 ) {
 		total = 0;
 		ch = s_channels;
 		for (i=0 ; i<MAX_CHANNELS; i++, ch++) {
@@ -1245,7 +1245,7 @@ static void S_GetSoundtime()
 
 	if( Client::videoRecording( ) )
 	{
-		float fps = std::min(cl_aviFrameRate->value, 1000.0f);
+		float fps = std::min(cl_aviFrameRate->asFloat(), 1000.0f);
 		float frameDuration = std::max(dma.speed / fps, 1.0f) + clc.aviSoundFrameRemainder;
 
 		int msec = static_cast<int>(frameDuration);
@@ -1283,7 +1283,7 @@ static void S_GetSoundtime()
 #endif
 
 	if ( dma.submission_chunk < 256 ) {
-		s_paintedtime = s_soundtime + s_mixPreStep->value * dma.speed;
+		s_paintedtime = s_soundtime + s_mixPreStep->asFloat() * dma.speed;
 	} else {
 		s_paintedtime = s_soundtime + dma.submission_chunk;
 	}
@@ -1320,8 +1320,8 @@ static void S_Update_() {
 		sane = 11;			// 85hz
 	}
 
-	ma = s_mixahead->value * dma.speed;
-	op = s_mixPreStep->value + sane*dma.speed*0.01;
+	ma = s_mixahead->asFloat() * dma.speed;
+	op = s_mixPreStep->asFloat() + sane*dma.speed*0.01;
 
 	if (op < ma) {
 		ma = op;
@@ -1440,7 +1440,7 @@ void S_UpdateBackgroundTrack( ) {
 	}
 
 	// don't bother playing anything if musicvolume is 0
-	if ( s_musicVolume->value <= 0 ) {
+	if ( s_musicVolume->asFloat() <= 0 ) {
 		return;
 	}
 
@@ -1476,7 +1476,7 @@ void S_UpdateBackgroundTrack( ) {
 		{
 			// add to raw buffer
 			S_Base_RawSamples(0, fileSamples, s_backgroundStream->info.rate,
-				s_backgroundStream->info.width, s_backgroundStream->info.channels, raw, s_musicVolume->value, -1);
+				s_backgroundStream->info.width, s_backgroundStream->info.channels, raw, s_musicVolume->asFloat(), -1);
 		}
 		else
 		{

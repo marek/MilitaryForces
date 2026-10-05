@@ -326,11 +326,11 @@ void RB_BeginDrawingView () {
 	int clearBits = 0;
 
 	// sync with gl if needed
-	if ( r_finish->integer == 1 && !glState.finishCalled ) {
+	if ( r_finish->asInt() == 1 && !glState.finishCalled ) {
 		qglFinish ();
 		glState.finishCalled = true;
 	}
-	if ( r_finish->integer == 0 ) {
+	if ( r_finish->asInt() == 0 ) {
 		glState.finishCalled = true;
 	}
 
@@ -364,11 +364,11 @@ void RB_BeginDrawingView () {
 	// clear relevant buffers
 	clearBits = GL_DEPTH_BUFFER_BIT;
 
-	if ( r_measureOverdraw->integer || r_shadows->integer == 2 )
+	if ( r_measureOverdraw->asInt() || r_shadows->asInt() == 2 )
 	{
 		clearBits |= GL_STENCIL_BUFFER_BIT;
 	}
-	if ( r_fastsky->integer && !( backEnd.refdef.rdflags & RDF_NOWORLDMODEL ) )
+	if ( r_fastsky->asInt() && !( backEnd.refdef.rdflags & RDF_NOWORLDMODEL ) )
 	{
 		clearBits |= GL_COLOR_BUFFER_BIT;	// FIXME: only if sky shaders have been used
 	}
@@ -395,7 +395,7 @@ void RB_BeginDrawingView () {
 	backEnd.skyRenderedThisView = false;
 
 	// cache the clamped greyscale value
-	backEnd.greyscale = Com_Clamp(0.0f, 1.0f, r_greyscale->value);
+	backEnd.greyscale = Com_Clamp(0.0f, 1.0f, r_greyscale->asFloat());
 
 	// clip to the plane of the portal
 	if ( backEnd.viewParms.isPortal ) {
@@ -556,7 +556,7 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 						{
 							viewParms_t temp = backEnd.viewParms;
 
-							R_SetupProjection(&temp, r_znear->value, 0, false);
+							R_SetupProjection(&temp, r_znear->asFloat(), 0, false);
 
 							GL_SetProjectionMatrix( temp.projectionMatrix );
 						}
@@ -688,7 +688,7 @@ void RE_StretchRaw (int x, int y, int w, int h, int cols, int rows, const byte *
 	qglFinish();
 
 	start = 0;
-	if ( r_speeds->integer ) {
+	if ( r_speeds->asInt() ) {
 		start = ri.Milliseconds();
 	}
 
@@ -704,7 +704,7 @@ void RE_StretchRaw (int x, int y, int w, int h, int cols, int rows, const byte *
 	RE_UploadCinematic (w, h, cols, rows, data, client, dirty);
 	GL_BindToTMU(tr.scratchImage[client], TB_COLORMAP);
 
-	if ( r_speeds->integer ) {
+	if ( r_speeds->asInt() ) {
 		end = ri.Milliseconds();
 		ri.Printf( PRINT_ALL, "qglTexSubImage2D %i, %i: %i msec\n", cols, rows, end - start );
 	}
@@ -917,12 +917,12 @@ const void	*RB_DrawSurfs( const void *data ) {
 		qglEnable(GL_DEPTH_CLAMP);
 	}
 
-	if (glRefConfig.framebufferObject && !(backEnd.refdef.rdflags & RDF_NOWORLDMODEL) && (r_depthPrepass->integer || isShadowView))
+	if (glRefConfig.framebufferObject && !(backEnd.refdef.rdflags & RDF_NOWORLDMODEL) && (r_depthPrepass->asInt() || isShadowView))
 	{
 		Framebuffer *oldFbo = glState.currentFBO;
 		vec4_t viewInfo;
 
-		VectorSet4(viewInfo, backEnd.viewParms.zFar / r_znear->value, backEnd.viewParms.zFar, 0.0, 0.0);
+		VectorSet4(viewInfo, backEnd.viewParms.zFar / r_znear->asFloat(), backEnd.viewParms.zFar, 0.0, 0.0);
 
 		backEnd.depthFill = true;
 		qglColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
@@ -955,7 +955,7 @@ const void	*RB_DrawSurfs( const void *data ) {
 				tr.hdrDepthFbo->blitFromTexture( tr.renderDepthImage, srcTexCoords, nullptr, nullptr, nullptr, nullptr, 0 );
 			}
 
-			if (r_sunlightMode->integer && backEnd.viewParms.flags & VPF_USESUNLIGHT)
+			if (r_sunlightMode->asInt() && backEnd.viewParms.flags & VPF_USESUNLIGHT)
 			{
 				vec4_t quadVerts[4];
 				vec2_t texCoords[4];
@@ -997,7 +997,7 @@ const void	*RB_DrawSurfs( const void *data ) {
 
 				GL_BindToTMU(tr.renderDepthImage, TB_COLORMAP);
 
-				if (r_shadowCascadeZFar->integer != 0)
+				if (r_shadowCascadeZFar->asInt() != 0)
 				{
 					GL_BindToTMU(tr.sunShadowDepthImage[0], TB_SHADOWMAP);
 					GL_BindToTMU(tr.sunShadowDepthImage[1], TB_SHADOWMAP2);
@@ -1035,7 +1035,7 @@ const void	*RB_DrawSurfs( const void *data ) {
 
 				RB_InstantQuad2(quadVerts, texCoords); //, color, shaderProgram, invTexRes);
 
-				if (r_shadowBlur->integer)
+				if (r_shadowBlur->asInt())
 				{
 					viewInfo[2] = 1.0f / static_cast<float>(tr.screenScratchFbo->width);
 					viewInfo[3] = 1.0f / static_cast<float>(tr.screenScratchFbo->height);
@@ -1064,7 +1064,7 @@ const void	*RB_DrawSurfs( const void *data ) {
 				}
 			}
 
-			if (r_ssao->integer)
+			if (r_ssao->asInt())
 			{
 				vec4_t quadVerts[4];
 				vec2_t texCoords[4];
@@ -1148,12 +1148,12 @@ const void	*RB_DrawSurfs( const void *data ) {
 	{
 		RB_RenderDrawSurfList( cmd->drawSurfs, cmd->numDrawSurfs );
 
-		if (r_drawSun->integer)
+		if (r_drawSun->asInt())
 		{
 			RB_DrawSun(0.1f, tr.sunShader);
 		}
 
-		if (glRefConfig.framebufferObject && r_drawSunRays->integer)
+		if (glRefConfig.framebufferObject && r_drawSunRays->asInt())
 		{
 			Framebuffer *oldFbo = glState.currentFBO;
 			FBO_Bind(tr.sunRaysFbo);
@@ -1225,7 +1225,7 @@ const void	*RB_DrawBuffer( const void *data ) {
 	qglDrawBuffer( cmd->buffer );
 
 	// clear screen for debugging
-	if ( r_clear->integer ) {
+	if ( r_clear->asInt() ) {
 		if (glRefConfig.framebufferObject && tr.renderFbo) {
 			FBO_Bind(tr.renderFbo);
 		}
@@ -1270,7 +1270,7 @@ void RB_ShowImages( ) {
 		y = i / 20 * h;
 
 		// show in proportional size in mode 2
-		if ( r_showImages->integer == 2 ) {
+		if ( r_showImages->asInt() == 2 ) {
 			w *= image->uploadWidth / 512.0f;
 			h *= image->uploadHeight / 512.0f;
 		}
@@ -1339,7 +1339,7 @@ const void *RB_ClearDepth(const void *data)
 		RB_EndSurface();
 
 	// texture swapping test
-	if (r_showImages->integer)
+	if (r_showImages->asInt())
 		RB_ShowImages();
 
 	if (glRefConfig.framebufferObject)
@@ -1411,7 +1411,7 @@ static void RB_PresentToScreen()
 		// texture-backed render FBO
 		src = tr.renderFbo;
 	}
-	else if (tr.msaaResolveFbo && r_hdr->integer)
+	else if (tr.msaaResolveFbo && r_hdr->asInt())
 	{
 		// Resolving an RGB16F MSAA FBO to the screen messes with the brightness, so resolve to an RGB16F FBO first
 		tr.renderFbo->fastBlit( nullptr, tr.msaaResolveFbo, nullptr, GL_COLOR_BUFFER_BIT, GL_NEAREST );
@@ -1454,7 +1454,7 @@ const void	*RB_SwapBuffers( const void *data ) {
 	}
 
 	// texture swapping test
-	if ( r_showImages->integer ) {
+	if ( r_showImages->asInt() ) {
 		RB_ShowImages();
 	}
 
@@ -1462,7 +1462,7 @@ const void	*RB_SwapBuffers( const void *data ) {
 
 	// we measure overdraw by reading back the stencil buffer and
 	// counting up the number of increments that have happened
-	if ( r_measureOverdraw->integer ) {
+	if ( r_measureOverdraw->asInt() ) {
 		int i;
 		long sum = 0;
 		unsigned char *stencilReadback;
@@ -1546,7 +1546,7 @@ const void *RB_PostProcess(const void *data)
 	if(tess.numIndexes)
 		RB_EndSurface();
 
-	if (!glRefConfig.framebufferObject || !r_postProcess->integer)
+	if (!glRefConfig.framebufferObject || !r_postProcess->asInt())
 	{
 		// do nothing
 		return reinterpret_cast<const void *>(cmd + 1);
@@ -1574,7 +1574,7 @@ const void *RB_PostProcess(const void *data)
 	dstBox[2] = backEnd.viewParms.viewportWidth;
 	dstBox[3] = backEnd.viewParms.viewportHeight;
 
-	if (r_ssao->integer)
+	if (r_ssao->asInt())
 	{
 		srcBox[0] = backEnd.viewParms.viewportX      * tr.screenSsaoImage->width  / static_cast<float>(glConfig.vidWidth);
 		srcBox[1] = backEnd.viewParms.viewportY      * tr.screenSsaoImage->height / static_cast<float>(glConfig.vidHeight);
@@ -1591,29 +1591,29 @@ const void *RB_PostProcess(const void *data)
 
 	if (srcFbo)
 	{
-		if (r_hdr->integer && (r_toneMap->integer || r_forceToneMap->integer))
+		if (r_hdr->asInt() && (r_toneMap->asInt() || r_forceToneMap->asInt()))
 		{
-			autoExposure = r_autoExposure->integer || r_forceAutoExposure->integer;
+			autoExposure = r_autoExposure->asInt() || r_forceAutoExposure->asInt();
 
 			// Use an intermediate FBO because it can't blit to the same FBO directly
 			// and can't read from an MSAA dstFbo later.
 			RB_ToneMap(srcFbo, srcBox, tr.screenScratchFbo, srcBox, autoExposure);
 			tr.screenScratchFbo->fastBlit( srcBox, srcFbo, srcBox, GL_COLOR_BUFFER_BIT, GL_NEAREST );
 		}
-		else if (r_cameraExposure->value != 0.0f)
+		else if (r_cameraExposure->asFloat() != 0.0f)
 		{
 			vec4_t color;
 
 			color[0] =
 			color[1] =
-			color[2] = pow(2, r_cameraExposure->value); //exp2(r_cameraExposure->value);
+			color[2] = pow(2, r_cameraExposure->asFloat()); //exp2(r_cameraExposure->asFloat());
 			color[3] = 1.0f;
 
 			srcFbo->blitFromTexture( tr.whiteImage, nullptr, nullptr, srcBox, nullptr, color, GLS_SRCBLEND_DST_COLOR | GLS_DSTBLEND_ZERO );
 		}
 	}
 
-	if (r_drawSunRays->integer)
+	if (r_drawSunRays->asInt())
 		RB_SunRays(srcFbo, srcBox, srcFbo, srcBox);
 
 	if (true)
@@ -1665,7 +1665,7 @@ const void *RB_PostProcess(const void *data)
 		GL_State(GLS_DEPTHTEST_DISABLE);
 
 
-		VectorSet4(viewInfo, backEnd.viewParms.zFar / r_znear->value, backEnd.viewParms.zFar, 0.0, 0.0);
+		VectorSet4(viewInfo, backEnd.viewParms.zFar / r_znear->asFloat(), backEnd.viewParms.zFar, 0.0, 0.0);
 
 		viewInfo[2] = scale / (float)(tr.quarterImage[0]->width);
 		viewInfo[3] = scale / (float)(tr.quarterImage[0]->height);
@@ -1689,7 +1689,7 @@ const void *RB_PostProcess(const void *data)
 	}
 #endif
 
-	if (false && r_sunlightMode->integer)
+	if (false && r_sunlightMode->asInt())
 	{
 		ivec4_t dstBox2;
 		VectorSet4(dstBox2, 0, glConfig.vidHeight - 128, 128, 128);
@@ -1702,7 +1702,7 @@ const void *RB_PostProcess(const void *data)
 		dstFbo->blitFromTexture( tr.sunShadowDepthImage[3], nullptr, nullptr, dstBox2, nullptr, nullptr, 0 );
 	}
 
-	if (false && r_shadows->integer == 4)
+	if (false && r_shadows->asInt() == 4)
 	{
 		ivec4_t dstBox2;
 		VectorSet4(dstBox2, 512 + 0, glConfig.vidHeight - 128, 128, 128);
@@ -1732,7 +1732,7 @@ const void *RB_PostProcess(const void *data)
 	}
 
 #if 0
-	if (r_cubeMapping->integer && tr.numCubemaps)
+	if (r_cubeMapping->asInt() && tr.numCubemaps)
 	{
 		ivec4_t dstBox;
 		int cubemapIndex = R_CubemapForPoint( backEnd.viewParms.or.origin );
@@ -1776,7 +1776,7 @@ const void *RB_ExportCubemaps(const void *data)
 	if (cmd)
 	{
 		Framebuffer *oldFbo = glState.currentFBO;
-		int sideSize = r_cubemapSize->integer * r_cubemapSize->integer * 4;
+		int sideSize = r_cubemapSize->asInt() * r_cubemapSize->asInt() * 4;
 		byte *cubemapPixels = static_cast<byte *>(ri.Malloc(sideSize * 6));
 		int i, j;
 
@@ -1791,7 +1791,7 @@ const void *RB_ExportCubemaps(const void *data)
 			for (j = 0; j < 6; j++)
 			{
 				tr.renderCubeFbo->attachImage( cubemap->image, GL_COLOR_ATTACHMENT0_EXT, j );
-				qglReadPixels(0, 0, r_cubemapSize->integer, r_cubemapSize->integer, GL_RGBA, GL_UNSIGNED_BYTE, p);
+				qglReadPixels(0, 0, r_cubemapSize->asInt(), r_cubemapSize->asInt(), GL_RGBA, GL_UNSIGNED_BYTE, p);
 				p += sideSize;
 			}
 
@@ -1805,7 +1805,7 @@ const void *RB_ExportCubemaps(const void *data)
 				Com_sprintf(filename, MAX_QPATH, "cubemaps/%s/%03d.dds", tr.world->baseName, i);
 			}
 
-			R_SaveDDS(filename, cubemapPixels, r_cubemapSize->integer, r_cubemapSize->integer, 6);
+			R_SaveDDS(filename, cubemapPixels, r_cubemapSize->asInt(), r_cubemapSize->asInt(), 6);
 			ri.Printf(PRINT_ALL, "Saved cubemap %d as %s\n", i, filename);
 		}
 

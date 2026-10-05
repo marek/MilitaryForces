@@ -241,8 +241,8 @@ static void R_SetupEntityLightingGrid( trRefEntity_t *ent ) {
 		VectorScale( ent->directedLight, totalFactor, ent->directedLight );
 	}
 
-	VectorScale( ent->ambientLight, r_ambientScale->value, ent->ambientLight );
-	VectorScale( ent->directedLight, r_directedScale->value, ent->directedLight );
+	VectorScale( ent->ambientLight, r_ambientScale->asFloat(), ent->ambientLight );
+	VectorScale( ent->directedLight, r_directedScale->asFloat(), ent->directedLight );
 
 	VectorNormalize2( direction, ent->lightDir );
 }
@@ -360,7 +360,7 @@ void R_SetupEntityLighting( const trRefdef_t *refdef, trRefEntity_t *ent ) {
 		}
 	}
 
-	if ( r_debugLight->integer ) {
+	if ( r_debugLight->asInt() ) {
 		LogLight( ent );
 	}
 

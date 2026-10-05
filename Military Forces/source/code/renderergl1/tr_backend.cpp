@@ -48,7 +48,7 @@ void GL_Bind( image_t *image ) {
 		texnum = image->texnum;
 	}
 
-	if ( r_nobind->integer && tr.dlightImage ) {		// performance evaluation option
+	if ( r_nobind->asInt() && tr.dlightImage ) {		// performance evaluation option
 		texnum = tr.dlightImage->texnum;
 	}
 
@@ -101,7 +101,7 @@ void GL_BindMultitexture( image_t *image0, GLuint env0, image_t *image1, GLuint 
 	texnum0 = image0->texnum;
 	texnum1 = image1->texnum;
 
-	if ( r_nobind->integer && tr.dlightImage ) {		// performance evaluation option
+	if ( r_nobind->asInt() && tr.dlightImage ) {		// performance evaluation option
 		texnum0 = texnum1 = tr.dlightImage->texnum;
 	}
 
@@ -419,11 +419,11 @@ void RB_BeginDrawingView () {
 	int clearBits = 0;
 
 	// sync with gl if needed
-	if ( r_finish->integer == 1 && !glState.finishCalled ) {
+	if ( r_finish->asInt() == 1 && !glState.finishCalled ) {
 		qglFinish ();
 		glState.finishCalled = true;
 	}
-	if ( r_finish->integer == 0 ) {
+	if ( r_finish->asInt() == 0 ) {
 		glState.finishCalled = true;
 	}
 
@@ -441,11 +441,11 @@ void RB_BeginDrawingView () {
 	// clear relevant buffers
 	clearBits = GL_DEPTH_BUFFER_BIT;
 
-	if ( r_measureOverdraw->integer || r_shadows->integer == 2 )
+	if ( r_measureOverdraw->asInt() || r_shadows->asInt() == 2 )
 	{
 		clearBits |= GL_STENCIL_BUFFER_BIT;
 	}
-	if ( r_fastsky->integer && !( backEnd.refdef.rdflags & RDF_NOWORLDMODEL ) )
+	if ( r_fastsky->asInt() && !( backEnd.refdef.rdflags & RDF_NOWORLDMODEL ) )
 	{
 		clearBits |= GL_COLOR_BUFFER_BIT;	// FIXME: only if sky shaders have been used
 #ifdef _DEBUG
@@ -622,7 +622,7 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 						{
 							viewParms_t temp = backEnd.viewParms;
 
-							R_SetupProjection(&temp, r_znear->value, false);
+							R_SetupProjection(&temp, r_znear->asFloat(), false);
 
 							qglMatrixMode(GL_PROJECTION);
 							qglLoadMatrixf(temp.projectionMatrix);
@@ -669,7 +669,7 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 		qglDepthRange (0, 1);
 	}
 
-	if (r_drawSun->integer) {
+	if (r_drawSun->asInt()) {
 		RB_DrawSun(0.1f, tr.sunShader);
 	}
 
@@ -746,7 +746,7 @@ void RE_StretchRaw (int x, int y, int w, int h, int cols, int rows, const byte *
 	qglFinish();
 
 	start = 0;
-	if ( r_speeds->integer ) {
+	if ( r_speeds->asInt() ) {
 		start = ri.Milliseconds();
 	}
 
@@ -762,7 +762,7 @@ void RE_StretchRaw (int x, int y, int w, int h, int cols, int rows, const byte *
 	RE_UploadCinematic (w, h, cols, rows, data, client, dirty);
 	GL_Bind( tr.scratchImage[client] );
 
-	if ( r_speeds->integer ) {
+	if ( r_speeds->asInt() ) {
 		end = ri.Milliseconds();
 		ri.Printf( PRINT_ALL, "qglTexSubImage2D %i, %i: %i msec\n", cols, rows, end - start );
 	}
@@ -940,7 +940,7 @@ const void	*RB_DrawBuffer( const void *data ) {
 	qglDrawBuffer( cmd->buffer );
 
 	// clear screen for debugging
-	if ( r_clear->integer ) {
+	if ( r_clear->asInt() ) {
 		qglClearColor( 1, 0, 0.5, 1 );
 		qglClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	}
@@ -983,7 +983,7 @@ void RB_ShowImages( ) {
 		y = i / 20 * h;
 
 		// show in proportional size in mode 2
-		if ( r_showImages->integer == 2 ) {
+		if ( r_showImages->asInt() == 2 ) {
 			w *= image->uploadWidth / 512.0f;
 			h *= image->uploadHeight / 512.0f;
 		}
@@ -1037,7 +1037,7 @@ const void *RB_ClearDepth(const void *data)
 		RB_EndSurface();
 
 	// texture swapping test
-	if (r_showImages->integer)
+	if (r_showImages->asInt())
 		RB_ShowImages();
 
 	qglClear(GL_DEPTH_BUFFER_BIT);
@@ -1060,7 +1060,7 @@ const void	*RB_SwapBuffers( const void *data ) {
 	}
 
 	// texture swapping test
-	if ( r_showImages->integer ) {
+	if ( r_showImages->asInt() ) {
 		RB_ShowImages();
 	}
 
@@ -1068,7 +1068,7 @@ const void	*RB_SwapBuffers( const void *data ) {
 
 	// we measure overdraw by reading back the stencil buffer and
 	// counting up the number of increments that have happened
-	if ( r_measureOverdraw->integer ) {
+	if ( r_measureOverdraw->asInt() ) {
 		int i;
 		long sum = 0;
 		unsigned char *stencilReadback;

@@ -860,7 +860,7 @@ Other things could be stuck in here, like birds in the sky, etc
 ================
 */
 void RB_StageIteratorSky( ) {
-	if ( r_fastsky->integer ) {
+	if ( r_fastsky->asInt() ) {
 		return;
 	}
 
@@ -872,7 +872,7 @@ void RB_StageIteratorSky( ) {
 	// r_showsky will let all the sky blocks be drawn in
 	// front of everything to allow developers to see how
 	// much sky is getting sucked in
-	if ( r_showsky->integer ) {
+	if ( r_showsky->asInt() ) {
 		qglDepthRange( 0.0, 0.0 );
 	} else {
 		qglDepthRange( 1.0, 1.0 );

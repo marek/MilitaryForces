@@ -121,7 +121,7 @@ void NetChannel::transmitNextFragment() {
 
 	// send the qport if we are a client
 	if ( this->sock_ == NS_CLIENT ) {
-		send.writeShort( net_qport->integer );
+		send.writeShort( net_qport->asInt() );
 	}
 
 #ifdef LEGACY_PROTOCOL
@@ -146,7 +146,7 @@ void NetChannel::transmitNextFragment() {
 	this->lastSentTime_ = System::milliseconds();
 	this->lastSentSize_ = send.size();
 
-	if ( showpackets->integer ) {
+	if ( showpackets->asInt() ) {
 		Common::printf ("%s send %4i : s=%i fragment=%i,%i\n"
 			, netsrcString[ this->sock_ ]
 			, send.size()
@@ -203,7 +203,7 @@ void NetChannel::transmit( int length, const byte *data ) {
 
 	// send the qport if we are a client
 	if(this->sock_ == NS_CLIENT)
-		send.writeShort( net_qport->integer);
+		send.writeShort( net_qport->asInt());
 
 #ifdef LEGACY_PROTOCOL
 	if(!this->compat_)
@@ -221,7 +221,7 @@ void NetChannel::transmit( int length, const byte *data ) {
 	this->lastSentTime_ = System::milliseconds();
 	this->lastSentSize_ = send.size();
 
-	if ( showpackets->integer ) {
+	if ( showpackets->asInt() ) {
 		Common::printf( "%s send %4i : s=%i ack=%i\n"
 			, netsrcString[ this->sock_ ]
 			, send.size()
@@ -287,7 +287,7 @@ bool NetChannel::process( Message *msg ) {
 		fragmentLength = 0;
 	}
 
-	if ( showpackets->integer ) {
+	if ( showpackets->asInt() ) {
 		if ( fragmented ) {
 			Common::printf( "%s recv %4i : s=%i fragment=%i,%i\n"
 				, netsrcString[ this->sock_ ]
@@ -306,7 +306,7 @@ bool NetChannel::process( Message *msg ) {
 	// discard out of order or duplicated packets
 	//
 	if ( sequence <= this->incomingSequence_ ) {
-		if ( showdrop->integer || showpackets->integer ) {
+		if ( showdrop->asInt() || showpackets->asInt() ) {
 			Common::printf( "%s:Out of order packet %i at %i\n"
 				, Network::adrToString( this->remoteAddress_ )
 				,  sequence
@@ -320,7 +320,7 @@ bool NetChannel::process( Message *msg ) {
 	//
 	this->dropped_ = sequence - (this->incomingSequence_+1);
 	if ( this->dropped_ > 0 ) {
-		if ( showdrop->integer || showpackets->integer ) {
+		if ( showdrop->asInt() || showpackets->asInt() ) {
 			Common::printf( "%s:Dropped %i packets at %i\n"
 			, Network::adrToString( this->remoteAddress_ )
 			, this->dropped_
@@ -346,7 +346,7 @@ bool NetChannel::process( Message *msg ) {
 
 		// if we missed a fragment, dump the message
 		if ( fragmentStart != this->fragmentLength_ ) {
-			if ( showdrop->integer || showpackets->integer ) {
+			if ( showdrop->asInt() || showpackets->asInt() ) {
 				Common::printf( "%s:Dropped a message fragment\n"
 				, Network::adrToString( this->remoteAddress_ ));
 			}
@@ -358,7 +358,7 @@ bool NetChannel::process( Message *msg ) {
 		// copy the fragment to the fragment buffer
 		if ( fragmentLength < 0 || msg->readCount() + fragmentLength > msg->size() ||
 			this->fragmentLength_ + fragmentLength > sizeof( this->fragmentBuffer_ ) ) {
-			if ( showdrop->integer || showpackets->integer ) {
+			if ( showdrop->asInt() || showpackets->asInt() ) {
 				Common::printf ("%s:illegal fragment length\n"
 				, Network::adrToString (this->remoteAddress_ ) );
 			}
@@ -502,7 +502,7 @@ void Network::queuePacket( int length, const void *data, netadr_t to,
 	Com_Memcpy(newPacket->data, data, length);
 	newPacket->length = length;
 	newPacket->to = to;
-	newPacket->release = System::milliseconds() + static_cast<int>(static_cast<float>(offset) / com_timescale->value);	
+	newPacket->release = System::milliseconds() + static_cast<int>(static_cast<float>(offset) / com_timescale->asFloat());	
 	newPacket->next = nullptr;
 
 	if(!packetQueue) {
@@ -539,7 +539,7 @@ void Network::flushPacketQueue()
 void Network::sendPacket( netsrc_t sock, int length, const void *data, netadr_t to ) {
 
 	// sequenced packets are shown in netchan, so just show oob
-	if ( showpackets->integer && *(int *)data == -1 )	{
+	if ( showpackets->asInt() && *(int *)data == -1 )	{
 		Common::printf ("send packet %4i\n", length);
 	}
 
@@ -554,11 +554,11 @@ void Network::sendPacket( netsrc_t sock, int length, const void *data, netadr_t 
 		return;
 	}
 
-	if ( sock == NS_CLIENT && cl_packetdelay->integer > 0 ) {
-		Network::queuePacket( length, data, to, cl_packetdelay->integer );
+	if ( sock == NS_CLIENT && cl_packetdelay->asInt() > 0 ) {
+		Network::queuePacket( length, data, to, cl_packetdelay->asInt() );
 	}
-	else if ( sock == NS_SERVER && sv_packetdelay->integer > 0 ) {
-		Network::queuePacket( length, data, to, sv_packetdelay->integer );
+	else if ( sock == NS_SERVER && sv_packetdelay->asInt() > 0 ) {
+		Network::queuePacket( length, data, to, sv_packetdelay->asInt() );
 	}
 	else {
 		Sys_SendPacket( length, data, to );

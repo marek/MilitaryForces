@@ -272,8 +272,8 @@ static void R_SetupEntityLightingGrid( trRefEntity_t *ent, world_t *world ) {
 		VectorScale( ent->directedLight, totalFactor, ent->directedLight );
 	}
 
-	VectorScale( ent->ambientLight, r_ambientScale->value, ent->ambientLight );
-	VectorScale( ent->directedLight, r_directedScale->value, ent->directedLight );
+	VectorScale( ent->ambientLight, r_ambientScale->asFloat(), ent->ambientLight );
+	VectorScale( ent->directedLight, r_directedScale->asFloat(), ent->directedLight );
 
 	VectorNormalize2( direction, ent->lightDir );
 }
@@ -420,7 +420,7 @@ void R_SetupEntityLighting( const trRefdef_t *refdef, trRefEntity_t *ent ) {
 	}
 
 
-	if ( r_debugLight->integer ) {
+	if ( r_debugLight->asInt() ) {
 		LogLight( ent );
 	}
 
@@ -486,7 +486,7 @@ int R_CubemapForPoint( vec3_t point )
 {
 	int cubemapIndex = -1;
 
-	if (r_cubeMapping->integer && tr.numCubemaps)
+	if (r_cubeMapping->asInt() && tr.numCubemaps)
 	{
 		int i;
 		vec_t shortest = static_cast<float>WORLD_SIZE * static_cast<float>WORLD_SIZE;

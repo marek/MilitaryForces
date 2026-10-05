@@ -211,8 +211,8 @@ struct worldSector_t;
 //
 //	int			snapFlagServerBit;			// ^= SNAPFLAG_SERVERCOUNT every ServerMain::spawnServer()
 //
-//	client_t	*clients;					// [sv_maxclients->integer];
-//	int			numSnapshotEntities;		// sv_maxclients->integer*PACKET_BACKUP*MAX_PACKET_ENTITIES
+//	client_t	*clients;					// [sv_maxclients->asInt()];
+//	int			numSnapshotEntities;		// sv_maxclients->asInt()*PACKET_BACKUP*MAX_PACKET_ENTITIES
 //	int			nextSnapshotEntities;		// next snapshotEntities to use
 //	entityState_t	*snapshotEntities;		// [numSnapshotEntities]
 //	int			nextHeartbeatTime;

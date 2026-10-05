@@ -360,9 +360,9 @@ static void SCR_DrawVoipMeter( ) {
 	char	string[256];
 	int limit, i;
 
-	if (!cl_voipShowMeter->integer)
+	if (!cl_voipShowMeter->asInt())
 		return;  // player doesn't want to show meter at all.
-	else if (!cl_voipSend->integer)
+	else if (!cl_voipSend->asInt())
 		return;  // not recording at the moment.
 	else if (clc.state != CA_ACTIVE)
 		return;  // not connected to a server.
@@ -370,7 +370,7 @@ static void SCR_DrawVoipMeter( ) {
 		return;  // server doesn't support VoIP.
 	else if (clc.demoplaying)
 		return;  // playing back a demo.
-	else if (!cl_voip->integer)
+	else if (!cl_voip->asInt())
 		return;  // client has VoIP support disabled.
 
 	limit = static_cast<int>(clc.voipPower * 10.0f);
@@ -430,19 +430,19 @@ static void SCR_DrawDebugGraph ()
 	x = 0;
 	y = cls.glconfig.vidHeight;
 	refExport.SetColor( g_color_table[0] );
-	refExport.DrawStretchPic(x, y - cl_graphheight->integer, 
-		w, cl_graphheight->integer, 0, 0, 0, 0, cls.whiteShader );
+	refExport.DrawStretchPic(x, y - cl_graphheight->asInt(), 
+		w, cl_graphheight->asInt(), 0, 0, 0, 0, cls.whiteShader );
 	refExport.SetColor( nullptr );
 
 	for (a=0 ; a<w ; a++)
 	{
 		i = (ARRAY_LEN(values)+current-1-(a % ARRAY_LEN(values))) % ARRAY_LEN(values);
 		v = values[i];
-		v = v * cl_graphscale->integer + cl_graphshift->integer;
+		v = v * cl_graphscale->asInt() + cl_graphshift->asInt();
 		
 		if (v < 0)
-			v += cl_graphheight->integer * (1+static_cast<int>(-v / cl_graphheight->integer));
-		h = static_cast<int>(v) % cl_graphheight->integer;
+			v += cl_graphheight->asInt() * (1+static_cast<int>(-v / cl_graphheight->asInt()));
+		h = static_cast<int>(v) % cl_graphheight->asInt();
 		refExport.DrawStretchPic( x+w-1-a, y - h, 1, h, 0, 0, 0, 0, cls.whiteShader );
 	}
 }
@@ -545,7 +545,7 @@ static void SCR_DrawScreenField( stereoFrame_t stereoFrame ) {
 	Console::drawConsole ();
 
 	// debug graph can be drawn on top of anything
-	if ( cl_debuggraph->integer || cl_timegraph->integer || cl_debugMove->integer ) {
+	if ( cl_debuggraph->asInt() || cl_timegraph->asInt() || cl_debugMove->asInt() ) {
 		SCR_DrawDebugGraph ();
 	}
 }
@@ -572,7 +572,7 @@ void Screen::updateScreen( ) {
 
 	// If there is no VM, there are also no rendering commands issued. Stop the renderer in
 	// that case.
-	if( theUI.isInitialized() || com_dedicated->integer )
+	if( theUI.isInitialized() || com_dedicated->asInt() )
 	{
 		// XXX
 		int in_anaglyphMode = CvarSystem::variableIntegerValue("r_anaglyphMode");
@@ -584,7 +584,7 @@ void Screen::updateScreen( ) {
 			SCR_DrawScreenField( STEREO_CENTER );
 		}
 
-		if ( com_speeds->integer ) {
+		if ( com_speeds->asInt() ) {
 			refExport.EndFrame( &time_frontend, &time_backend );
 		} else {
 			refExport.EndFrame( nullptr, nullptr );

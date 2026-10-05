@@ -300,7 +300,7 @@ void RE_RenderScene( const refdef_t *fd ) {
 	}
 	GLimp_LogComment( "====== RE_RenderScene =====\n" );
 
-	if ( r_norefresh->integer ) {
+	if ( r_norefresh->asInt() ) {
 		return;
 	}
 
@@ -366,8 +366,8 @@ void RE_RenderScene( const refdef_t *fd ) {
 
 	// turn off dynamic lighting globally by clearing all the
 	// dlights if it needs to be disabled or if vertex lighting is enabled
-	if ( r_dynamiclight->integer == 0 ||
-		 r_vertexLight->integer == 1 ||
+	if ( r_dynamiclight->asInt() == 0 ||
+		 r_vertexLight->asInt() == 1 ||
 		 glConfig.hardwareType == GLHW_PERMEDIA2 ) {
 		tr.refdef.num_dlights = 0;
 	}

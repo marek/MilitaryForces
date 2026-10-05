@@ -622,7 +622,7 @@ FileSystem::remove_HomeData
 void FileSystem::remove_HomeData( const char *homePath ) {
 	FileSystem::checkFilenameIsMutable( homePath, __func__ );
 
-	remove( FileSystem::buildOSPath( fs_homedatapath->string,
+	remove( FileSystem::buildOSPath( fs_homedatapath->asString(),
 			fs_gamedir, homePath ) );
 }
 
@@ -660,7 +660,7 @@ NOTE TTimo: this goes with FS_FOpenFileWrite for opening the file afterwards
 */
 bool FileSystem::fileExists_HomeData(const char *file)
 {
-	return FS_FileInPathExists(FileSystem::buildOSPath(fs_homedatapath->string, fs_gamedir, file));
+	return FS_FileInPathExists(FileSystem::buildOSPath(fs_homedatapath->asString(), fs_gamedir, file));
 }
 
 /*
@@ -672,7 +672,7 @@ Tests if the file exists
 */
 bool FileSystem::baseDir_FileExists_HomeData( const char *file )
 {
-	return FS_FileInPathExists(FileSystem::baseDir_BuildOSPath(fs_homedatapath->string, file));
+	return FS_FileInPathExists(FileSystem::baseDir_BuildOSPath(fs_homedatapath->asString(), file));
 }
 
 
@@ -691,7 +691,7 @@ fileHandle_t FileSystem::oSPath_FOpenFileWrite( const char *ospath, const char *
 	f = FileSystem::handleForFile();
 	fsh[f].zipFile = false;
 
-	if ( fs_debug->integer ) {
+	if ( fs_debug->asInt() ) {
 		Common::printf( "FS_OSPath_FOpenFileWrite: %s\n", ospath );
 	}
 
@@ -719,7 +719,7 @@ FileSystem::baseDir_FOpenFileWrite_HomeConfig
 */
 fileHandle_t FileSystem::baseDir_FOpenFileWrite_HomeConfig( const char *filename ) {
 	return FileSystem::oSPath_FOpenFileWrite(
-		FileSystem::baseDir_BuildOSPath(fs_homeconfigpath->string, filename), filename);
+		FileSystem::baseDir_BuildOSPath(fs_homeconfigpath->asString(), filename), filename);
 }
 
 /*
@@ -729,7 +729,7 @@ FileSystem::baseDir_FOpenFileWrite_HomeData
 */
 fileHandle_t FileSystem::baseDir_FOpenFileWrite_HomeData( const char *filename ) {
 	return FileSystem::oSPath_FOpenFileWrite(
-		FileSystem::baseDir_BuildOSPath(fs_homedatapath->string, filename), filename);
+		FileSystem::baseDir_BuildOSPath(fs_homedatapath->asString(), filename), filename);
 }
 
 /*
@@ -739,7 +739,7 @@ FileSystem::baseDir_FOpenFileWrite_HomeState
 */
 fileHandle_t FileSystem::baseDir_FOpenFileWrite_HomeState( const char *filename ) {
 	return FileSystem::oSPath_FOpenFileWrite(
-		FileSystem::baseDir_BuildOSPath(fs_homestatepath->string, filename), filename);
+		FileSystem::baseDir_BuildOSPath(fs_homestatepath->asString(), filename), filename);
 }
 
 /*
@@ -770,13 +770,13 @@ long FileSystem::baseDir_FOpenFileRead(const char *filename, fileHandle_t *fp)
 	for(int i = 0; i < ARRAY_LEN( fs_pathVars ) && !fsh[f].handleFiles.file.o; i++) {
 		const cvar_t *pathVar = fs_pathVars[i];
 
-		if (!pathVar || !pathVar->string[0]) {
+		if (!pathVar || !pathVar->asString()[0]) {
 			continue;
 		}
 
-		ospath = FileSystem::baseDir_BuildOSPath( pathVar->string, filename );
+		ospath = FileSystem::baseDir_BuildOSPath( pathVar->asString(), filename );
 
-		if ( fs_debug->integer )
+		if ( fs_debug->asInt() )
 		{
 			Common::printf( "FileSystem::baseDir_FOpenFileRead (%s): %s\n", pathVar->name, ospath );
 		}
@@ -815,10 +815,10 @@ void FileSystem::baseDir_Rename_HomeData( const char *from, const char *to, bool
 	// don't let sound stutter
 	SoundSystem::clearSoundBuffer();
 
-	from_ospath = FileSystem::baseDir_BuildOSPath( fs_homedatapath->string, from );
-	to_ospath = FileSystem::baseDir_BuildOSPath( fs_homedatapath->string, to );
+	from_ospath = FileSystem::baseDir_BuildOSPath( fs_homedatapath->asString(), from );
+	to_ospath = FileSystem::baseDir_BuildOSPath( fs_homedatapath->asString(), to );
 
-	if ( fs_debug->integer ) {
+	if ( fs_debug->asInt() ) {
 		Common::printf( "FileSystem::baseDir_Rename_HomeData: %s --> %s\n", from_ospath, to_ospath );
 	}
 
@@ -867,7 +867,7 @@ FileSystem::fOpenFileWrite_HomeConfig
 */
 fileHandle_t FileSystem::fOpenFileWrite_HomeConfig( const char *filename ) {
 	return FileSystem::oSPath_FOpenFileWrite(
-		FileSystem::buildOSPath(fs_homeconfigpath->string, fs_gamedir, filename), filename);
+		FileSystem::buildOSPath(fs_homeconfigpath->asString(), fs_gamedir, filename), filename);
 }
 
 /*
@@ -877,7 +877,7 @@ FileSystem::fOpenFileWrite_HomeData
 */
 fileHandle_t FileSystem::fOpenFileWrite_HomeData( const char *filename ) {
 	return FileSystem::oSPath_FOpenFileWrite(
-		FileSystem::buildOSPath(fs_homedatapath->string, fs_gamedir, filename), filename);
+		FileSystem::buildOSPath(fs_homedatapath->asString(), fs_gamedir, filename), filename);
 }
 
 /*
@@ -887,7 +887,7 @@ FileSystem::fOpenFileWrite_HomeState
 */
 fileHandle_t FileSystem::fOpenFileWrite_HomeState( const char *filename ) {
 	return FileSystem::oSPath_FOpenFileWrite(
-		FileSystem::buildOSPath(fs_homestatepath->string, fs_gamedir, filename), filename);
+		FileSystem::buildOSPath(fs_homestatepath->asString(), fs_gamedir, filename), filename);
 }
 
 /*
@@ -912,9 +912,9 @@ fileHandle_t FileSystem::fOpenFileAppend_HomeData( const char *filename ) {
 	// don't let sound stutter
 	SoundSystem::clearSoundBuffer();
 
-	ospath = FileSystem::buildOSPath( fs_homedatapath->string, fs_gamedir, filename );
+	ospath = FileSystem::buildOSPath( fs_homedatapath->asString(), fs_gamedir, filename );
 
-	if ( fs_debug->integer ) {
+	if ( fs_debug->asInt() ) {
 		Common::printf( "FileSystem::fOpenFileAppend_HomeData: %s\n", ospath );
 	}
 
@@ -955,9 +955,9 @@ fileHandle_t FileSystem::fCreateOpenPipeFile( const char *filename ) {
 	// don't let sound stutter
 	SoundSystem::clearSoundBuffer();
 
-	ospath = FileSystem::buildOSPath( fs_homedatapath->string, fs_gamedir, filename );
+	ospath = FileSystem::buildOSPath( fs_homedatapath->asString(), fs_gamedir, filename );
 
-	if ( fs_debug->integer ) {
+	if ( fs_debug->asInt() ) {
 		Common::printf( "FileSystem::fCreateOpenPipeFile: %s\n", ospath );
 	}
 
@@ -1054,11 +1054,11 @@ static bool FS_IsDemoExt(const char *filename, int namelen)
 	{
 		protocol = atoi(ext_test + ARRAY_LEN(DEMOEXT));
 
-		if(protocol == com_protocol->integer)
+		if(protocol == com_protocol->asInt())
 			return true;
 
 #ifdef LEGACY_PROTOCOL
-		if(protocol == com_legacyprotocol->integer)
+		if(protocol == com_legacyprotocol->asInt())
 			return true;
 #endif
 
@@ -1257,7 +1257,7 @@ static long FS_FOpenFileReadDir(const char *filename, searchpath_t *search, file
 					fsh[*file].zipFilePos = pakFile->pos;
 					fsh[*file].zipFileLen = pakFile->len;
 
-					if(fs_debug->integer)
+					if(fs_debug->asInt())
 					{
 						Common::printf("FileSystem::fOpenFileRead: %s (found in '%s')\n", 
 								filename, pak->pakFilename);
@@ -1309,7 +1309,7 @@ static long FS_FOpenFileReadDir(const char *filename, searchpath_t *search, file
 		Q_strncpyz(fsh[*file].name, filename, sizeof(fsh[*file].name));
 		fsh[*file].zipFile = false;
 
-		if(fs_debug->integer)
+		if(fs_debug->asInt())
 		{
 			Common::printf("FileSystem::fOpenFileRead: %s (found in '%s%c%s')\n", filename,
 					dir->path, PATH_SEP, dir->gamedir);
@@ -1696,7 +1696,7 @@ long FileSystem::readFileDir(const char *qpath, void *searchPath, bool unpure, v
 	// it from the journal file
 	if ( strstr( qpath, ".cfg" ) ) {
 		isConfig = true;
-		if ( com_journal && com_journal->integer == 2 ) {
+		if ( com_journal && com_journal->asInt() == 2 ) {
 			int		r;
 
 			Common::dPrintf( "Loading %s from journal file.\n", qpath );
@@ -1755,7 +1755,7 @@ long FileSystem::readFileDir(const char *qpath, void *searchPath, bool unpure, v
 			*buffer = nullptr;
 		}
 		// if we are journalling and it is a config file, write a zero to the journal file
-		if ( isConfig && com_journal && com_journal->integer == 1 ) {
+		if ( isConfig && com_journal && com_journal->asInt() == 1 ) {
 			Common::dPrintf( "Writing zero for %s to journal file.\n", qpath );
 			len = 0;
 			FileSystem::write( &len, sizeof( len ), com_journalDataFile );
@@ -1765,7 +1765,7 @@ long FileSystem::readFileDir(const char *qpath, void *searchPath, bool unpure, v
 	}
 
 	if ( !buffer ) {
-		if ( isConfig && com_journal && com_journal->integer == 1 ) {
+		if ( isConfig && com_journal && com_journal->asInt() == 1 ) {
 			Common::dPrintf( "Writing len for %s to journal file.\n", qpath );
 			FileSystem::write( &len, sizeof( len ), com_journalDataFile );
 			FileSystem::flush( com_journalDataFile );
@@ -1787,7 +1787,7 @@ long FileSystem::readFileDir(const char *qpath, void *searchPath, bool unpure, v
 	FileSystem::fCloseFile( h );
 
 	// if we are journalling and it is a config file, write it to the journal file
-	if ( isConfig && com_journal && com_journal->integer == 1 ) {
+	if ( isConfig && com_journal && com_journal->asInt() == 1 ) {
 		Common::dPrintf( "Writing %s to journal file.\n", qpath );
 		FileSystem::write( &len, sizeof( len ), com_journalDataFile );
 		FileSystem::write( buf, len, com_journalDataFile );
@@ -2408,11 +2408,11 @@ int	FileSystem::getModList( char *listbuf, int bufsize ) {
 	for (i = 0; i < ARRAY_LEN(fs_pathVars); i++) {
 		const cvar_t *pathVar = fs_pathVars[i];
 
-		if (!pathVar || !pathVar->string[0]) {
+		if (!pathVar || !pathVar->asString()[0]) {
 			continue;
 		}
 
-		pFiles0 = System::listFiles(pathVar->string, nullptr, nullptr, &dummy, true);
+		pFiles0 = System::listFiles(pathVar->asString(), nullptr, nullptr, &dummy, true);
 		// FileSystem::sys_ConcatenateFileLists frees the lists so System::freeFileList isn't required
 		pFiles = FileSystem::sys_ConcatenateFileLists(pFiles, pFiles0);
 	}
@@ -2434,7 +2434,7 @@ int	FileSystem::getModList( char *listbuf, int bufsize ) {
 			}
 		}
 		// we also drop "baseq3" "." and ".."
-		if (bDrop || Q_stricmp(name, com_basegame->string) == 0 || Q_stricmpn(name, ".", 1) == 0) {
+		if (bDrop || Q_stricmp(name, com_basegame->asString()) == 0 || Q_stricmpn(name, ".", 1) == 0) {
 			continue;
 		}
 
@@ -2444,11 +2444,11 @@ int	FileSystem::getModList( char *listbuf, int bufsize ) {
 		for (j = 0; j < ARRAY_LEN(fs_pathVars); j++) {
 			const cvar_t *pathVar = fs_pathVars[j];
 
-			if (!pathVar || !pathVar->string[0]) {
+			if (!pathVar || !pathVar->asString()[0]) {
 				continue;
 			}
 
-			path = FileSystem::baseDir_BuildOSPath(pathVar->string, name);
+			path = FileSystem::baseDir_BuildOSPath(pathVar->asString(), name);
 			nPaks = nDirs = nPakDirs = 0;
 			pPaks = System::listFiles(path, ".pk3", nullptr, &nPaks, false);
 			pDirs = System::listFiles(path, "/", nullptr, &nDirs, false);
@@ -2925,11 +2925,11 @@ void FileSystem::addGameDirectories(const char *dir)
 	for(int i = ARRAY_LEN(fs_pathVars) - 1; i >= 0; i--) {
 		const cvar_t *pathVar = fs_pathVars[i];
 
-		if (!pathVar || !pathVar->string[0]) {
+		if (!pathVar || !pathVar->asString()[0]) {
 			continue;
 		}
 
-		FileSystem::addGameDirectory(pathVar->string, dir);
+		FileSystem::addGameDirectory(pathVar->asString(), dir);
 	}
 }
 
@@ -3212,13 +3212,13 @@ FileSystem::addPathVar
 ================
 */
 void FileSystem::addPathVar( cvar_t *pathVar ) {
-	if( !pathVar || !*pathVar->string ) {
+	if( !pathVar || !*pathVar->asString() ) {
 		return;
 	}
 
 	// Check for duplicates
 	for(auto & fs_pathVar : fs_pathVars) {
-		if ( fs_pathVar && !Q_stricmp( fs_pathVar->string, pathVar->string ) ) {
+		if ( fs_pathVar && !Q_stricmp( fs_pathVar->asString(), pathVar->asString() ) ) {
 			return;
 		}
 	}
@@ -3264,9 +3264,9 @@ void FileSystem::startup( const char *gameName )
 	const char *dataPath = System::defaultHomeDataPath();
 	const char *statePath = System::defaultHomeStatePath();
 
-	if(*(fs_homepath)->string) {
+	if(*(fs_homepath)->asString()) {
 		// Setting fs_homepath manually overrides everything else
-		configPath = dataPath = statePath = fs_homepath->string;
+		configPath = dataPath = statePath = fs_homepath->asString();
 	} else if(!*configPath || !*dataPath || !*statePath) {
 		// #shouldneverhappen; just a sensible fallback
 		configPath = dataPath = statePath = System::defaultInstallPath();
@@ -3297,7 +3297,7 @@ void FileSystem::startup( const char *gameName )
 		CvarSystem::forceReset( "com_basegame" );
 	}
 
-	if (!FileSystem::filenameCompare(fs_gamedirvar->string, gameName)) {
+	if (!FileSystem::filenameCompare(fs_gamedirvar->asString(), gameName)) {
 		// This is the standard base game. Servers and clients should
 		// use "" and not the standard basegame name because this messes
 		// up pak file negotiation and lots of other stuff
@@ -3307,34 +3307,34 @@ void FileSystem::startup( const char *gameName )
 	if (FileSystem::invalidGameDir(gameName)) {
 		Common::error( ERR_DROP, "Invalid com_basegame '%s'", gameName );
 	}
-	if (FileSystem::invalidGameDir(fs_basegame->string)) {
-		Common::error( ERR_DROP, "Invalid fs_basegame '%s'", fs_basegame->string );
+	if (FileSystem::invalidGameDir(fs_basegame->asString())) {
+		Common::error( ERR_DROP, "Invalid fs_basegame '%s'", fs_basegame->asString() );
 	}
-	if (FileSystem::invalidGameDir(fs_gamedirvar->string)) {
-		Common::error( ERR_DROP, "Invalid fs_game '%s'", fs_gamedirvar->string );
+	if (FileSystem::invalidGameDir(fs_gamedirvar->asString())) {
+		Common::error( ERR_DROP, "Invalid fs_game '%s'", fs_gamedirvar->asString() );
 	}
 
-	FileSystem::createPath(fs_homeconfigpath->string);
-	FileSystem::createPath(fs_homedatapath->string);
-	FileSystem::createPath(fs_homestatepath->string);
+	FileSystem::createPath(fs_homeconfigpath->asString());
+	FileSystem::createPath(fs_homedatapath->asString());
+	FileSystem::createPath(fs_homestatepath->asString());
 
 	FileSystem::addGameDirectories(gameName);
 
 	// check for additional base game so mods can be based upon other mods
-	if ( fs_basegame->string[0] && Q_stricmp( fs_basegame->string, gameName ) ) {
-		FileSystem::addGameDirectories(fs_basegame->string);
+	if ( fs_basegame->asString()[0] && Q_stricmp( fs_basegame->asString(), gameName ) ) {
+		FileSystem::addGameDirectories(fs_basegame->asString());
 	}
 
 	// check for additional game folder for mods
-	if ( fs_gamedirvar->string[0] && Q_stricmp( fs_gamedirvar->string, gameName ) ) {
-		FileSystem::addGameDirectories(fs_gamedirvar->string);
+	if ( fs_gamedirvar->asString()[0] && Q_stricmp( fs_gamedirvar->asString(), gameName ) ) {
+		FileSystem::addGameDirectories(fs_gamedirvar->asString());
 	}
 
 #ifndef STANDALONE
-	if (!com_standalone->integer) {
+	if (!com_standalone->asInt()) {
 		Com_ReadCDKey(BASEGAME);
-		if (fs_gamedirvar->string[0]) {
-			Com_AppendCDKey(fs_gamedirvar->string);
+		if (fs_gamedirvar->asString()[0]) {
+			Com_AppendCDKey(fs_gamedirvar->asString());
 		}
 	}
 #endif
@@ -3549,14 +3549,14 @@ void FileSystem::checkPak0( void )
 		}
 	}
 
-	if(!foundPak && !foundTA && Q_stricmp(com_basegame->string, BASEGAME))
+	if(!foundPak && !foundTA && Q_stricmp(com_basegame->asString(), BASEGAME))
 	{
 		CvarSystem::set("com_standalone", "1");
 	}
 	else
 		CvarSystem::set("com_standalone", "0");
 
-	if(!com_standalone->integer)
+	if(!com_standalone->asInt())
 	{
 		if(!(foundPak & 0x01))
 		{
@@ -3585,16 +3585,16 @@ void FileSystem::checkPak0( void )
 #elif defined(__APPLE__)
 	// If we're running from an .app, it makes more sense to recommend
 	// using fs_homepath as fs_basepath is likely not suitable
-	if( strstr( fs_apppath->string, "Contents/MacOS" ) )
+	if( strstr( fs_apppath->asString(), "Contents/MacOS" ) )
 		installHome = true;
 #endif
 
 	if(installHome)
-		installPath = fs_homedatapath->string;
+		installPath = fs_homedatapath->asString();
 	else
-		installPath = fs_basepath->string;
+		installPath = fs_basepath->asString();
 
-	if(!com_standalone->integer && (foundPak & ((1<<NUM_ID_PAKS)-1)) != ((1<<NUM_ID_PAKS)-1))
+	if(!com_standalone->asInt() && (foundPak & ((1<<NUM_ID_PAKS)-1)) != ((1<<NUM_ID_PAKS)-1))
 	{
 		char errorText[MAX_STRING_CHARS] = "";
 		char gamePath[MAX_OSPATH];
@@ -3635,8 +3635,8 @@ void FileSystem::checkPak0( void )
 		Common::error(ERR_FATAL, "%s", errorText);
 	}
 
-	if(!com_standalone->integer && (foundTA & ((1<<NUM_TA_PAKS)-1)) != ((1<<NUM_TA_PAKS)-1)
-			&& (!Q_stricmp(fs_gamedirvar->string, BASETA) || !Q_stricmp(fs_basegame->string, BASETA)))
+	if(!com_standalone->asInt() && (foundTA & ((1<<NUM_TA_PAKS)-1)) != ((1<<NUM_TA_PAKS)-1)
+			&& (!Q_stricmp(fs_gamedirvar->asString(), BASETA) || !Q_stricmp(fs_basegame->asString(), BASETA)))
 	{
 		char errorText[MAX_STRING_CHARS] = "";
 		char gamePath[MAX_OSPATH];
@@ -3779,7 +3779,7 @@ const char *FileSystem::referencedPakChecksums( ) {
 	for ( search = fs_searchpaths ; search ; search = search->next ) {
 		// is the element a pak file?
 		if ( search->pack ) {
-			if (search->pack->referenced || Q_stricmpn(search->pack->pakGamename, com_basegame->string, strlen(com_basegame->string))) {
+			if (search->pack->referenced || Q_stricmpn(search->pack->pakGamename, com_basegame->asString(), strlen(com_basegame->asString()))) {
 				Q_strcat( info, sizeof( info ), va("%i ", search->pack->checksum ) );
 			}
 		}
@@ -3854,7 +3854,7 @@ const char *FileSystem::referencedPakNames( ) {
 	for ( search = fs_searchpaths ; search ; search = search->next ) {
 		// is the element a pak file?
 		if ( search->pack ) {
-			if (search->pack->referenced || Q_stricmpn(search->pack->pakGamename, com_basegame->string, strlen(com_basegame->string))) {
+			if (search->pack->referenced || Q_stricmpn(search->pack->pakGamename, com_basegame->asString(), strlen(com_basegame->asString()))) {
 				if (*info) {
 					Q_strcat(info, sizeof( info ), " " );
 				}
@@ -4020,11 +4020,11 @@ void FileSystem::initFilesystem( ) {
 	Common::startupVariable("fs_homestatepath");
 	Common::startupVariable("fs_game");
 
-	if(!FileSystem::filenameCompare(CvarSystem::variableString("fs_game"), com_basegame->string))
+	if(!FileSystem::filenameCompare(CvarSystem::variableString("fs_game"), com_basegame->asString()))
 		CvarSystem::set("fs_game", "");
 
 	// try to start up normally
-	FileSystem::startup(com_basegame->string);
+	FileSystem::startup(com_basegame->asString());
 
 #ifndef STANDALONE
 	FileSystem::checkPak0( );
@@ -4037,10 +4037,10 @@ void FileSystem::initFilesystem( ) {
 		Common::error( ERR_FATAL, "Couldn't load default.cfg" );
 	}
 
-	Q_strncpyz(lastValidBase, fs_basepath->string, sizeof(lastValidBase));
-	Q_strncpyz(lastValidComBaseGame, com_basegame->string, sizeof(lastValidComBaseGame));
-	Q_strncpyz(lastValidFsBaseGame, fs_basegame->string, sizeof(lastValidFsBaseGame));
-	Q_strncpyz(lastValidGame, fs_gamedirvar->string, sizeof(lastValidGame));
+	Q_strncpyz(lastValidBase, fs_basepath->asString(), sizeof(lastValidBase));
+	Q_strncpyz(lastValidComBaseGame, com_basegame->asString(), sizeof(lastValidComBaseGame));
+	Q_strncpyz(lastValidFsBaseGame, fs_basegame->asString(), sizeof(lastValidFsBaseGame));
+	Q_strncpyz(lastValidGame, fs_gamedirvar->asString(), sizeof(lastValidGame));
 }
 
 
@@ -4062,7 +4062,7 @@ void FileSystem::restart( int checksumFeed ) {
 	FileSystem::clearPakReferences(0);
 
 	// try to start up normally
-	FileSystem::startup(com_basegame->string);
+	FileSystem::startup(com_basegame->asString());
 
 #ifndef STANDALONE
 	FileSystem::checkPak0( );
@@ -4103,10 +4103,10 @@ void FileSystem::restart( int checksumFeed ) {
 		}
 	}
 
-	Q_strncpyz(lastValidBase, fs_basepath->string, sizeof(lastValidBase));
-	Q_strncpyz(lastValidComBaseGame, com_basegame->string, sizeof(lastValidComBaseGame));
-	Q_strncpyz(lastValidFsBaseGame, fs_basegame->string, sizeof(lastValidFsBaseGame));
-	Q_strncpyz(lastValidGame, fs_gamedirvar->string, sizeof(lastValidGame));
+	Q_strncpyz(lastValidBase, fs_basepath->asString(), sizeof(lastValidBase));
+	Q_strncpyz(lastValidComBaseGame, com_basegame->asString(), sizeof(lastValidComBaseGame));
+	Q_strncpyz(lastValidFsBaseGame, fs_basegame->asString(), sizeof(lastValidFsBaseGame));
+	Q_strncpyz(lastValidGame, fs_gamedirvar->asString(), sizeof(lastValidGame));
 
 }
 
@@ -4122,9 +4122,9 @@ bool FileSystem::conditionalRestart(int checksumFeed, bool disconnect)
 {
 	if(fs_gamedirvar->modified)
 	{
-		if(FileSystem::filenameCompare(lastValidGame, fs_gamedirvar->string) &&
-				(*lastValidGame || FileSystem::filenameCompare(fs_gamedirvar->string, com_basegame->string)) &&
-				(*fs_gamedirvar->string || FileSystem::filenameCompare(lastValidGame, com_basegame->string)))
+		if(FileSystem::filenameCompare(lastValidGame, fs_gamedirvar->asString()) &&
+				(*lastValidGame || FileSystem::filenameCompare(fs_gamedirvar->asString(), com_basegame->asString())) &&
+				(*fs_gamedirvar->asString() || FileSystem::filenameCompare(lastValidGame, com_basegame->asString())))
 		{
 			Common::gameRestart(checksumFeed, disconnect);
 			return true;
@@ -4233,8 +4233,8 @@ void	FileSystem::filenameCompletion( const char *dir, const char *ext, char *fil
 
 const char *FileSystem::getCurrentGameDir()
 {
-	if(fs_gamedirvar->string[0])
-		return fs_gamedirvar->string;
+	if(fs_gamedirvar->asString()[0])
+		return fs_gamedirvar->asString();
 
-	return com_basegame->string;
+	return com_basegame->asString();
 }

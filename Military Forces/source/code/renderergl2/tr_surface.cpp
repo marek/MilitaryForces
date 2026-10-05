@@ -409,7 +409,7 @@ static bool RB_SurfaceVaoCached(int numVerts, srfVert_t *verts, int numIndexes, 
 	bool recycleIndexBuffer = false;
 	bool endSurface = false;
 
-	if (!r_vaoCache->integer)
+	if (!r_vaoCache->asInt())
 		return false;
 
 	if (!(!ShaderRequiresCPUDeforms(tess.shader) && !tess.shader->isSky && !tess.shader->isPortal))
@@ -619,7 +619,7 @@ static void DoRailDiscs( int numSegs, const vec3_t start, const vec3_t dir, cons
 	int i;
 	vec3_t	pos[4];
 	vec3_t	v;
-	int		spanWidth = r_railWidth->integer;
+	int		spanWidth = r_railWidth->asInt();
 	float c, s;
 	float		scale;
 
@@ -696,12 +696,12 @@ static void RB_SurfaceRailRings( ) {
 	VectorSubtract( end, start, vec );
 	len = VectorNormalize( vec );
 	MakeNormalVectors( vec, right, up );
-	numSegs = ( len ) / r_railSegmentLength->value;
+	numSegs = ( len ) / r_railSegmentLength->asFloat();
 	if ( numSegs <= 0 ) {
 		numSegs = 1;
 	}
 
-	VectorScale( vec, r_railSegmentLength->value, vec );
+	VectorScale( vec, r_railSegmentLength->asFloat(), vec );
 
 	DoRailDiscs( numSegs, start, vec, right, up );
 }
@@ -733,7 +733,7 @@ static void RB_SurfaceRailCore( ) {
 	CrossProduct( v1, v2, right );
 	VectorNormalize( right );
 
-	DoRailCore( start, end, right, len, r_railCoreWidth->integer );
+	DoRailCore( start, end, right, len, r_railCoreWidth->asInt() );
 }
 
 /*
@@ -908,7 +908,7 @@ static float	LodErrorForVolume( vec3_t local, float radius ) {
 	float		d;
 
 	// never let it go negative
-	if ( r_lodCurveError->value < 0 ) {
+	if ( r_lodCurveError->asFloat() < 0 ) {
 		return 0;
 	}
 
@@ -930,7 +930,7 @@ static float	LodErrorForVolume( vec3_t local, float radius ) {
 		d = 1;
 	}
 
-	return r_lodCurveError->value / d;
+	return r_lodCurveError->asFloat() / d;
 }
 
 /*
@@ -1205,7 +1205,7 @@ static void RB_SurfaceBad( surfaceType_t *surfType ) {
 
 static void RB_SurfaceFlare(srfFlare_t *surf)
 {
-	if (r_flares->integer)
+	if (r_flares->asInt())
 		RB_AddFlare(surf, tess.fogNum, surf->origin, surf->color, surf->normal);
 }
 

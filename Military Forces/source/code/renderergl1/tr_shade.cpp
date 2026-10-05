@@ -163,7 +163,7 @@ without compiled vertex arrays.
 void R_DrawElements( int numIndexes, const glIndex_t *indexes ) {
 	int		primitives;
 
-	primitives = r_primitives->integer;
+	primitives = r_primitives->asInt();
 
 	// default is to use triangles if compiled vertex arrays are present
 	if ( primitives == 0 ) {
@@ -374,7 +374,7 @@ static void DrawMultitextured( shaderCommands_t *input, int stage ) {
 	qglEnable( GL_TEXTURE_2D );
 	qglEnableClientState( GL_TEXTURE_COORD_ARRAY );
 
-	if ( r_lightmap->integer ) {
+	if ( r_lightmap->asInt() ) {
 		GL_TexEnv( GL_REPLACE );
 	} else {
 		GL_TexEnv( tess.shader->multitextureEnv );
@@ -437,21 +437,21 @@ static void ProjectDlightTexture_scalar( ) {
 		radius = dl->radius;
 		scale = 1.0f / radius;
 
-		if(r_greyscale->integer)
+		if(r_greyscale->asInt())
 		{
 			float luminance;
 
 			luminance = LUMA(dl->color[0], dl->color[1], dl->color[2]) * 255.0f;
 			floatColor[0] = floatColor[1] = floatColor[2] = luminance;
 		}
-		else if(r_greyscale->value)
+		else if(r_greyscale->asFloat())
 		{
 			float luminance;
 			
 			luminance = LUMA(dl->color[0], dl->color[1], dl->color[2]) * 255.0f;
-			floatColor[0] = LERP(dl->color[0] * 255.0f, luminance, r_greyscale->value);
-			floatColor[1] = LERP(dl->color[1] * 255.0f, luminance, r_greyscale->value);
-			floatColor[2] = LERP(dl->color[2] * 255.0f, luminance, r_greyscale->value);
+			floatColor[0] = LERP(dl->color[0] * 255.0f, luminance, r_greyscale->asFloat());
+			floatColor[1] = LERP(dl->color[1] * 255.0f, luminance, r_greyscale->asFloat());
+			floatColor[2] = LERP(dl->color[2] * 255.0f, luminance, r_greyscale->asFloat());
 		}
 		else
 		{
@@ -471,7 +471,7 @@ static void ProjectDlightTexture_scalar( ) {
 			texCoords[0] = 0.5f + dist[0] * scale;
 			texCoords[1] = 0.5f + dist[1] * scale;
 
-			if( !r_dlightBacks->integer &&
+			if( !r_dlightBacks->asInt() &&
 					// dist . tess.normal[i]
 					( dist[0] * tess.normal[i][0] +
 					dist[1] * tess.normal[i][1] +
@@ -558,7 +558,7 @@ static void ProjectDlightTexture_scalar( ) {
 
 static void ProjectDlightTexture( ) {
 #if idppc_altivec
-	if (com_altivec->integer) {
+	if (com_altivec->asInt()) {
 		// must be in a separate translation unit or G3 systems will crash.
 		ProjectDlightTexture_altivec();
 		return;
@@ -798,7 +798,7 @@ static void ComputeColors( shaderStage_t *pStage )
 	}
 	
 	// if in greyscale rendering mode turn all color values into greyscale.
-	if(r_greyscale->integer)
+	if(r_greyscale->asInt())
 	{
 		int scale;
 		for(i = 0; i < tess.numVertexes; i++)
@@ -807,16 +807,16 @@ static void ComputeColors( shaderStage_t *pStage )
  			tess.svars.colors[i][0] = tess.svars.colors[i][1] = tess.svars.colors[i][2] = scale;
 		}
 	}
-	else if(r_greyscale->value)
+	else if(r_greyscale->asFloat())
 	{
 		float scale;
 		
 		for(i = 0; i < tess.numVertexes; i++)
 		{
 			scale = LUMA(tess.svars.colors[i][0], tess.svars.colors[i][1], tess.svars.colors[i][2]);
-			tess.svars.colors[i][0] = LERP(tess.svars.colors[i][0], scale, r_greyscale->value);
-			tess.svars.colors[i][1] = LERP(tess.svars.colors[i][1], scale, r_greyscale->value);
-			tess.svars.colors[i][2] = LERP(tess.svars.colors[i][2], scale, r_greyscale->value);
+			tess.svars.colors[i][0] = LERP(tess.svars.colors[i][0], scale, r_greyscale->asFloat());
+			tess.svars.colors[i][1] = LERP(tess.svars.colors[i][1], scale, r_greyscale->asFloat());
+			tess.svars.colors[i][2] = LERP(tess.svars.colors[i][2], scale, r_greyscale->asFloat());
 		}
 	}
 }
@@ -974,7 +974,7 @@ static void RB_IterateStagesGeneric( shaderCommands_t *input )
 			R_DrawElements( input->numIndexes, input->indexes );
 		}
 		// allow skipping out to show just lightmaps during development
-		if ( r_lightmap->integer && ( pStage->bundle[0].isLightmap || pStage->bundle[1].isLightmap ) )
+		if ( r_lightmap->asInt() && ( pStage->bundle[0].isLightmap || pStage->bundle[1].isLightmap ) )
 		{
 			break;
 		}
@@ -998,7 +998,7 @@ void RB_StageIteratorGeneric( )
 	//
 	// log this call
 	//
-	if ( r_logFile->integer ) 
+	if ( r_logFile->asInt() ) 
 	{
 		// don't just call LogComment, or we will get
 		// a call to va() every frame!
@@ -1014,7 +1014,7 @@ void RB_StageIteratorGeneric( )
 	if ( shader->polygonOffset )
 	{
 		qglEnable( GL_POLYGON_OFFSET_FILL );
-		qglPolygonOffset( r_offsetFactor->value, r_offsetUnits->value );
+		qglPolygonOffset( r_offsetFactor->asFloat(), r_offsetUnits->asFloat() );
 	}
 
 	//
@@ -1117,7 +1117,7 @@ void RB_StageIteratorVertexLitTexture( )
 	//
 	// log this call
 	//
-	if ( r_logFile->integer ) 
+	if ( r_logFile->asInt() ) 
 	{
 		// don't just call LogComment, or we will get
 		// a call to va() every frame!
@@ -1188,7 +1188,7 @@ void RB_StageIteratorLightmappedMultitexture( ) {
 	//
 	// log this call
 	//
-	if ( r_logFile->integer ) {
+	if ( r_logFile->asInt() ) {
 		// don't just call LogComment, or we will get
 		// a call to va() every frame!
 		GLimp_LogComment( va("--- RB_StageIteratorLightmappedMultitexture( %s ) ---\n", tess.shader->name) );
@@ -1228,7 +1228,7 @@ void RB_StageIteratorLightmappedMultitexture( ) {
 	//
 	GL_SelectTexture( 1 );
 	qglEnable( GL_TEXTURE_2D );
-	if ( r_lightmap->integer ) {
+	if ( r_lightmap->asInt() ) {
 		GL_TexEnv( GL_REPLACE );
 	} else {
 		GL_TexEnv( GL_MODULATE );
@@ -1307,7 +1307,7 @@ void RB_EndSurface( ) {
 	}
 
 	// for debugging of sort order issues, stop rendering after a given sort value
-	if ( r_debugSort->integer && r_debugSort->integer < tess.shader->sort ) {
+	if ( r_debugSort->asInt() && r_debugSort->asInt() < tess.shader->sort ) {
 		return;
 	}
 
@@ -1327,10 +1327,10 @@ void RB_EndSurface( ) {
 	//
 	// draw debugging stuff
 	//
-	if ( r_showtris->integer ) {
+	if ( r_showtris->asInt() ) {
 		DrawTris (input);
 	}
-	if ( r_shownormals->integer ) {
+	if ( r_shownormals->asInt() ) {
 		DrawNormals (input);
 	}
 	// clear shader so we can tell we don't have any unclosed surfaces

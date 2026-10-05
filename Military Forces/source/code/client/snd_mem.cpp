@@ -81,7 +81,7 @@ void SND_setup() {
 
 	cv = CvarSystem::get( "com_soundMegs", DEF_COMSOUNDMEGS, CVAR_LATCH | CVAR_ARCHIVE );
 
-	scs = (cv->integer*1536);
+	scs = (cv->asInt()*1536);
 
 	buffer = static_cast<sndBuffer *>(malloc(scs*sizeof(sndBuffer) ));
 	// allocate the stack based hunk allocator

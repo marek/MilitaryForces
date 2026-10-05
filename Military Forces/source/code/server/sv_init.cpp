@@ -127,7 +127,7 @@ void GameHost::setConfigstring( int index, const char *val )
 	if( theSV.state_ == Server::SS_GAME || theSV.restarting_ ) 
 	{
 		// send the data to all relevant clients
-		for( int i = 1; i <= sv_maxclients->integer ; i++ ) 
+		for( int i = 1; i <= sv_maxclients->asInt() ; i++ ) 
 		{
 			SV_Client* client = theSVS.svClients_.at(i);
 
@@ -186,7 +186,7 @@ GameHost::setUserinfo
 */
 void GameHost::setUserinfo( int index, const char *val ) 
 {
-	if( index < 1 || index > sv_maxclients->integer ) 
+	if( index < 1 || index > sv_maxclients->asInt() ) 
 	{
 		Common::error (ERR_DROP, "SV_SetUserinfo: bad index %i\n", index);
 	}
@@ -213,7 +213,7 @@ void GameHost::getUserinfo( int index, char *buffer, int bufferSize )
 	if( bufferSize < 1 ) 
 		Common::error( ERR_DROP, "SV_GetUserinfo: bufferSize == %i", bufferSize );
 
-	if( index < 1 || index > sv_maxclients->integer ) 
+	if( index < 1 || index > sv_maxclients->asInt() ) 
 		Common::error (ERR_DROP, "SV_GetUserinfo: bad index %i\n", index);
 
 	SV_Client* cl = theSVS.svClients_.at(index);
@@ -265,11 +265,11 @@ static void SV_BoundMaxClients( int minimum )
 
 	sv_maxclients->modified = false;
 
-	if( sv_maxclients->integer < minimum ) 
+	if( sv_maxclients->asInt() < minimum ) 
 	{
 		CvarSystem::set( "sv_maxclients", va("%i", minimum) );
 	} 
-	else if( sv_maxclients->integer > MAX_CLIENTS - 1 )
+	else if( sv_maxclients->asInt() > MAX_CLIENTS - 1 )
 	{
 		CvarSystem::set( "sv_maxclients", va("%i", MAX_CLIENTS - 1) );
 	}
@@ -293,13 +293,13 @@ static void SV_Startup()
 
 	SV_BoundMaxClients( 1 );
 
-	//theSVS.clients_ = reinterpret_cast<SV_Client*>(Zone::malloc (sizeof(SV_Client) * sv_maxclients->integer ));
-	theSVS.initClients(sv_maxclients->integer);	// initializes clients to 0 (will be allocated once they join)
-	theSVS.numSnapshotEntities_ = sv_maxclients->integer * 2 * MAX_SNAPSHOT_ENTITIES;
+	//theSVS.clients_ = reinterpret_cast<SV_Client*>(Zone::malloc (sizeof(SV_Client) * sv_maxclients->asInt() ));
+	theSVS.initClients(sv_maxclients->asInt());	// initializes clients to 0 (will be allocated once they join)
+	theSVS.numSnapshotEntities_ = sv_maxclients->asInt() * 2 * MAX_SNAPSHOT_ENTITIES;
 	theSVS.initialized_ = true;
 
 	// Don't respect sv_killserver unless a server is actually running
-	if ( sv_killserver->integer ) {
+	if ( sv_killserver->asInt() ) {
 		CvarSystem::set( "sv_killserver", "0" );
 	}
 
@@ -319,7 +319,7 @@ void ServerMain::changeMaxClients()
 {
 	// get the highest client number in use
 	int count = 0;
-	for( int i = 1 ; i <= sv_maxclients->integer ; i++ ) 
+	for( int i = 1 ; i <= sv_maxclients->asInt() ; i++ ) 
 	{
 		SV_Client* cl = theSVS.svClients_.at(i);
 		if( !cl )
@@ -332,17 +332,17 @@ void ServerMain::changeMaxClients()
 	}
 	count++;
 
-	int oldMaxClients = sv_maxclients->integer;
+	int oldMaxClients = sv_maxclients->asInt();
 	// never go below the highest client number in use
 	SV_BoundMaxClients( count );
 	// if still the same
-	if( sv_maxclients->integer == oldMaxClients ) 
+	if( sv_maxclients->asInt() == oldMaxClients ) 
 		return;
 
-	theSVS.changeMaxNumClients( sv_maxclients->integer, count );
+	theSVS.changeMaxNumClients( sv_maxclients->asInt(), count );
 	
 	// allocate New snapshot entities
-	theSVS.numSnapshotEntities_ = sv_maxclients->integer * 2 * MAX_SNAPSHOT_ENTITIES;
+	theSVS.numSnapshotEntities_ = sv_maxclients->asInt() * 2 * MAX_SNAPSHOT_ENTITIES;
 }
 
 /*
@@ -445,7 +445,7 @@ void ServerMain::spawnServer( char *server, bool killBots )
 	CvarSystem::set( "nextmap", "map_restart 0");
 //	CvarSystem::set( "nextmap", va("map %s", server) );
 
-	for( int i = 1; i <= sv_maxclients->integer ; i++ ) 
+	for( int i = 1; i <= sv_maxclients->asInt() ; i++ ) 
 	{
 		// save when the server started for each client already connected
 		SV_Client* client = theSVS.svClients_.at(i);
@@ -505,7 +505,7 @@ void ServerMain::spawnServer( char *server, bool killBots )
 	// create a baseline for more efficient communications
 	SV_CreateBaseline ();
 
-	for( i = 1 ; i <= sv_maxclients->integer ; i++ ) 
+	for( i = 1 ; i <= sv_maxclients->asInt() ; i++ ) 
 	{
 		SV_Client* cl = theSVS.svClients_.at(i);
 
@@ -574,7 +574,7 @@ void ServerMain::spawnServer( char *server, bool killBots )
 	theSV.time_ += 100;
 	theSVS.time_ += 100;
 
-	if ( sv_pure->integer ) 
+	if ( sv_pure->asInt() ) 
 	{
 		// the server sends these to the clients so they will only
 		// load pk3s also loaded at the server
@@ -588,7 +588,7 @@ void ServerMain::spawnServer( char *server, bool killBots )
 
 		// if a dedicated pure server we need to touch the cgame because it could be in a
 		// seperate pk3 file and the client will need to load the latest cgame.qvm
-		//if ( com_dedicated->integer ) {
+		//if ( com_dedicated->asInt() ) {
 		//	SV_TouchCGame();
 		//}
 	}
@@ -623,7 +623,7 @@ void ServerMain::spawnServer( char *server, bool killBots )
 	Hunk::setMark();
 
 #ifndef DEDICATED
-	if ( com_dedicated->integer ) {
+	if ( com_dedicated->asInt() ) {
 		// restart renderer in order to show console for dedicated servers
 		// launched through the regular binary
 		ClientLoop::startHunkUsers( true );
@@ -670,7 +670,7 @@ void ServerLoop::init () {
 #ifdef USE_VOIP
 	sv_voip = CvarSystem::get("sv_voip", "1", CVAR_LATCH);
 	CvarSystem::checkRange(sv_voip, 0, 1, true);
-	sv_voipProtocol = CvarSystem::get("sv_voipProtocol", sv_voip->integer ? "opus" : "", CVAR_SYSTEMINFO | CVAR_ROM );
+	sv_voipProtocol = CvarSystem::get("sv_voipProtocol", sv_voip->asInt() ? "opus" : "", CVAR_SYSTEMINFO | CVAR_ROM );
 #endif
 	CvarSystem::get ("sv_paks", "", CVAR_SYSTEMINFO | CVAR_ROM );
 	CvarSystem::get ("sv_pakNames", "", CVAR_SYSTEMINFO | CVAR_ROM );
@@ -721,7 +721,7 @@ void ServerMain::finalMessage( const char *message )
 	// send it twice, ignoring rate
 	for( int j = 0 ; j < 2 ; j++ ) 
 	{
-		for( int i = 1; i <= sv_maxclients->integer ; i++ ) 
+		for( int i = 1; i <= sv_maxclients->asInt() ; i++ ) 
 		{
 			SV_Client	*cl = theSVS.svClients_.at(i);
 	
@@ -755,7 +755,7 @@ before System::quit or System::error
 */
 void ServerLoop::shutdown( const char *finalmsg ) 
 {
-	if ( !com_sv_running || !com_sv_running->integer ) 
+	if ( !com_sv_running || !com_sv_running->asInt() ) 
 		return;
 
 	Common::printf( "----- Server Shutdown (%s) -----\n", finalmsg );
@@ -787,7 +787,7 @@ void ServerLoop::shutdown( const char *finalmsg )
 	Common::printf( "---------------------------\n" );
 
 	// disconnect any local clients
-	if( sv_killserver->integer != 2 )
+	if( sv_killserver->asInt() != 2 )
 		ClientLoop::disconnect( false );
 }
 

@@ -233,7 +233,7 @@ void FBO_Bind(Framebuffer * fbo)
 	if (glState.currentFBO == fbo)
 		return;
 		
-	if (r_logFile->integer)
+	if (r_logFile->asInt())
 	{
 		// don't just call LogComment, or we will get a call to va() every frame!
 		GLimp_LogComment(va("--- FBO_Bind( %s ) ---\n", fbo ? fbo->name : "NULL"));
@@ -265,19 +265,19 @@ void FBO_Init()
 	R_IssuePendingRenderCommands();
 
 	hdrFormat = GL_RGBA8;
-	if (r_hdr->integer && glRefConfig.textureFloat)
+	if (r_hdr->asInt() && glRefConfig.textureFloat)
 		hdrFormat = GL_RGBA16F_ARB;
 
 	if (glRefConfig.framebufferMultisample)
 		qglGetIntegerv(GL_MAX_SAMPLES, &multisample);
 
-	if (r_ext_framebuffer_multisample->integer < multisample)
-		multisample = r_ext_framebuffer_multisample->integer;
+	if (r_ext_framebuffer_multisample->asInt() < multisample)
+		multisample = r_ext_framebuffer_multisample->asInt();
 
 	if (multisample < 2 || !glRefConfig.framebufferBlit)
 		multisample = 0;
 
-	if (multisample != r_ext_framebuffer_multisample->integer)
+	if (multisample != r_ext_framebuffer_multisample->asInt())
 		ri.Cvar_SetValue("r_ext_framebuffer_multisample", static_cast<float>(multisample));
 	
 	// only create a render FBO if we need to resolve MSAA or do HDR
@@ -294,7 +294,7 @@ void FBO_Init()
 		tr.msaaResolveFbo->attachImage( tr.renderDepthImage, GL_DEPTH_ATTACHMENT, 0 );
 		tr.msaaResolveFbo->r_CheckFBO();
 	}
-	else if (r_hdr->integer)
+	else if (r_hdr->asInt())
 	{
 		tr.renderFbo = FBO_Create("_render", tr.renderDepthImage->width, tr.renderDepthImage->height);
 		tr.renderFbo->attachImage( tr.renderImage, GL_COLOR_ATTACHMENT0, 0 );

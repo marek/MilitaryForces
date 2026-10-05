@@ -1196,7 +1196,7 @@ static void FCBIByBlock(byte *data, int width, int height, bool clampToEdge, boo
 
 			if (!normalized)
 			{
-				switch (r_imageUpsampleType->integer)
+				switch (r_imageUpsampleType->asInt())
 				{
 					case 0:
 						break;
@@ -1211,7 +1211,7 @@ static void FCBIByBlock(byte *data, int width, int height, bool clampToEdge, boo
 			}
 			else
 			{
-				switch (r_imageUpsampleType->integer)
+				switch (r_imageUpsampleType->asInt())
 				{
 					case 0:
 						break;
@@ -1601,24 +1601,24 @@ static bool RawImage_ScaleToPower2( byte **data, int *inout_width, int *inout_he
 		scaled_height = NextPowerOfTwo(height);
 	}
 
-	if ( r_roundImagesDown->integer && scaled_width > width )
+	if ( r_roundImagesDown->asInt() && scaled_width > width )
 		scaled_width >>= 1;
-	if ( r_roundImagesDown->integer && scaled_height > height )
+	if ( r_roundImagesDown->asInt() && scaled_height > height )
 		scaled_height >>= 1;
 
-	if ( picmip && data && resampledBuffer && r_imageUpsample->integer && 
-	     scaled_width < r_imageUpsampleMaxSize->integer && scaled_height < r_imageUpsampleMaxSize->integer)
+	if ( picmip && data && resampledBuffer && r_imageUpsample->asInt() && 
+	     scaled_width < r_imageUpsampleMaxSize->asInt() && scaled_height < r_imageUpsampleMaxSize->asInt())
 	{
 		int finalwidth, finalheight;
 		//int startTime, endTime;
 
 		//startTime = ri.Milliseconds();
 
-		finalwidth = scaled_width << r_imageUpsample->integer;
-		finalheight = scaled_height << r_imageUpsample->integer;
+		finalwidth = scaled_width << r_imageUpsample->asInt();
+		finalheight = scaled_height << r_imageUpsample->asInt();
 
-		while ( finalwidth > r_imageUpsampleMaxSize->integer
-			|| finalheight > r_imageUpsampleMaxSize->integer ) {
+		while ( finalwidth > r_imageUpsampleMaxSize->asInt()
+			|| finalheight > r_imageUpsampleMaxSize->asInt() ) {
 			finalwidth >>= 1;
 			finalheight >>= 1;
 		}
@@ -1675,8 +1675,8 @@ static bool RawImage_ScaleToPower2( byte **data, int *inout_width, int *inout_he
 	// perform optional picmip operation
 	//
 	if ( picmip ) {
-		scaled_width >>= r_picmip->integer;
-		scaled_height >>= r_picmip->integer;
+		scaled_width >>= r_picmip->asInt();
+		scaled_height >>= r_picmip->asInt();
 	}
 
 	//
@@ -1752,7 +1752,7 @@ static GLenum RawImage_GetFormat(const byte *data, int numPixels, GLenum picForm
 
 	if(normalmap)
 	{
-		if ((type == IMGTYPE_NORMALHEIGHT) && RawImage_HasAlpha(data, numPixels) && r_parallaxMapping->integer)
+		if ((type == IMGTYPE_NORMALHEIGHT) && RawImage_HasAlpha(data, numPixels) && r_parallaxMapping->asInt())
 		{
 			if (!forceNoCompression && glRefConfig.textureCompression & TCR_BPTC)
 			{
@@ -1762,11 +1762,11 @@ static GLenum RawImage_GetFormat(const byte *data, int numPixels, GLenum picForm
 			{
 				internalFormat = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
 			}
-			else if ( r_texturebits->integer == 16 )
+			else if ( r_texturebits->asInt() == 16 )
 			{
 				internalFormat = GL_RGBA4;
 			}
-			else if ( r_texturebits->integer == 32 )
+			else if ( r_texturebits->asInt() == 32 )
 			{
 				internalFormat = GL_RGBA8;
 			}
@@ -1789,11 +1789,11 @@ static GLenum RawImage_GetFormat(const byte *data, int numPixels, GLenum picForm
 			{
 				internalFormat = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
 			}
-			else if (r_texturebits->integer == 16)
+			else if (r_texturebits->asInt() == 16)
 			{
 				internalFormat = GL_RGB5;
 			}
-			else if (r_texturebits->integer == 32)
+			else if (r_texturebits->asInt() == 32)
 			{
 				internalFormat = GL_RGB8;
 			}
@@ -1831,11 +1831,11 @@ static GLenum RawImage_GetFormat(const byte *data, int numPixels, GLenum picForm
 			{
 					internalFormat = GL_RGB4_S3TC;
 			}
-			else if ( r_texturebits->integer == 16 )
+			else if ( r_texturebits->asInt() == 16 )
 			{
 					internalFormat = GL_RGB5;
 			}
-			else if ( r_texturebits->integer == 32 )
+			else if ( r_texturebits->asInt() == 32 )
 			{
 					internalFormat = GL_RGB8;
 			}
@@ -1854,11 +1854,11 @@ static GLenum RawImage_GetFormat(const byte *data, int numPixels, GLenum picForm
 			{
 					internalFormat = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
 			}
-			else if ( r_texturebits->integer == 16 )
+			else if ( r_texturebits->asInt() == 16 )
 			{
 					internalFormat = GL_RGBA4;
 			}
-			else if ( r_texturebits->integer == 32 )
+			else if ( r_texturebits->asInt() == 32 )
 			{
 					internalFormat = GL_RGBA8;
 			}
@@ -2048,7 +2048,7 @@ static void RawImage_UploadTexture(GLuint texture, byte *data, int x, int y, int
 		}
 		else
 		{
-			if (rgba8 && miplevel != 0 && r_colorMipLevels->integer)
+			if (rgba8 && miplevel != 0 && r_colorMipLevels->asInt())
 				R_BlendOverTexture(data, width * height, mipBlendColors[miplevel]);
 
 			if (rgba8 && rgtc)
@@ -2262,7 +2262,7 @@ image_t *R_CreateImage2( const char *name, byte *pic, int width, int height, GLe
 			scaled = RawImage_ScaleToPower2(&pic, &width, &height, type, flags, &resampledBuffer);
 		else if (pic && picmip)
 		{
-			for (miplevel = r_picmip->integer; miplevel > 0 && numMips > 1; miplevel--, numMips--)
+			for (miplevel = r_picmip->asInt(); miplevel > 0 && numMips > 1; miplevel--, numMips--)
 			{
 				int size = CalculateMipSize(width, height, picFormat);
 				width = std::max(1, width >> 1);
@@ -2316,7 +2316,7 @@ image_t *R_CreateImage2( const char *name, byte *pic, int width, int height, GLe
 
 	if (textureFilterAnisotropic && !cubemap)
 		qglTextureParameteriEXT(image->texnum, textureTarget, GL_TEXTURE_MAX_ANISOTROPY_EXT,
-			mipmap ? static_cast<GLint>(Com_Clamp(1, maxAnisotropy, r_ext_max_anisotropy->integer)) : 1);
+			mipmap ? static_cast<GLint>(Com_Clamp(1, maxAnisotropy, r_ext_max_anisotropy->asInt())) : 1);
 
 	switch(internalFormat)
 	{
@@ -2431,7 +2431,7 @@ void R_LoadImage( const char *name, byte **pic, int *width, int *height, GLenum 
 	Q_strncpyz(ddsName, base, sizeof(ddsName));
 	Q_strcat(ddsName, sizeof(ddsName), ".dds");
 
-	if (r_ext_compressed_textures->integer) {
+	if (r_ext_compressed_textures->asInt()) {
 		// Try DDS first
 		R_LoadDDS(ddsName, pic, width, height, picFormat, numMips);
 		if (*pic) return;
@@ -2552,7 +2552,7 @@ image_t	*R_FindImageFile( const char *name, imgType_t type, imgFlags_t flags )
 
 	checkFlagsTrue = IMGFLAG_PICMIP | IMGFLAG_MIPMAP | IMGFLAG_GENNORMALMAP;
 	checkFlagsFalse = IMGFLAG_CUBEMAP;
-	if (r_normalMapping->integer && (picFormat == GL_RGBA8) && (type == IMGTYPE_COLORALPHA) &&
+	if (r_normalMapping->asInt() && (picFormat == GL_RGBA8) && (type == IMGTYPE_COLORALPHA) &&
 		((flags & checkFlagsTrue) == checkFlagsTrue) && !(flags & checkFlagsFalse))
 	{
 		char normalName[MAX_QPATH];
@@ -2844,7 +2844,7 @@ void R_CreateBuiltinImages( ) {
 	Com_Memset( data, 255, sizeof( data ) );
 	tr.whiteImage = R_CreateImage("*white", reinterpret_cast<byte *>(data), 8, 8, IMGTYPE_COLORALPHA, IMGFLAG_NONE, 0);
 
-	if (r_dlightMode->integer >= 2)
+	if (r_dlightMode->asInt() >= 2)
 	{
 		for( x = 0; x < MAX_DLIGHTS; x++)
 		{
@@ -2882,20 +2882,20 @@ void R_CreateBuiltinImages( ) {
 		height = glConfig.vidHeight;
 
 		hdrFormat = GL_RGBA8;
-		if (r_hdr->integer && glRefConfig.textureFloat)
+		if (r_hdr->asInt() && glRefConfig.textureFloat)
 			hdrFormat = GL_RGBA16F_ARB;
 
 		rgbFormat = GL_RGBA8;
 
 		tr.renderImage = R_CreateImage("_render", nullptr, width, height, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, hdrFormat);
 
-		if (r_shadowBlur->integer || r_hdr->integer)
+		if (r_shadowBlur->asInt() || r_hdr->asInt())
 			tr.screenScratchImage = R_CreateImage("screenScratch", nullptr, width, height, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, rgbFormat);
 
-		if (r_shadowBlur->integer || r_ssao->integer)
+		if (r_shadowBlur->asInt() || r_ssao->asInt())
 			tr.hdrDepthImage = R_CreateImage("*hdrDepth", nullptr, width, height, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, GL_R32F);
 
-		if (r_drawSunRays->integer)
+		if (r_drawSunRays->asInt())
 			tr.sunRaysImage = R_CreateImage("*sunRays", nullptr, width, height, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, rgbFormat);
 
 		tr.renderDepthImage  = R_CreateImage("*renderdepth",  nullptr, width, height, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, GL_DEPTH_COMPONENT24);
@@ -2924,7 +2924,7 @@ void R_CreateBuiltinImages( ) {
 			tr.quarterImage[x] = R_CreateImage(va("*quarter%d", x), nullptr, width / 2, height / 2, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, GL_RGBA8);
 		}
 
-		if (r_ssao->integer)
+		if (r_ssao->asInt())
 		{
 			tr.screenSsaoImage = R_CreateImage("*screenSsao", nullptr, width / 2, height / 2, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, GL_RGBA8);
 		}
@@ -2936,11 +2936,11 @@ void R_CreateBuiltinImages( ) {
 			//qglTextureParameterfEXT(tr.pshadowMaps[x]->texnum, GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 		}
 
-		if (r_sunlightMode->integer)
+		if (r_sunlightMode->asInt())
 		{
 			for ( x = 0; x < 4; x++)
 			{
-				tr.sunShadowDepthImage[x] = R_CreateImage(va("*sunshadowdepth%i", x), nullptr, r_shadowMapSize->integer, r_shadowMapSize->integer, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, GL_DEPTH_COMPONENT24);
+				tr.sunShadowDepthImage[x] = R_CreateImage(va("*sunshadowdepth%i", x), nullptr, r_shadowMapSize->asInt(), r_shadowMapSize->asInt(), IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, GL_DEPTH_COMPONENT24);
 				qglTextureParameterfEXT(tr.sunShadowDepthImage[x]->texnum, GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
 				qglTextureParameterfEXT(tr.sunShadowDepthImage[x]->texnum, GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 			}
@@ -2948,9 +2948,9 @@ void R_CreateBuiltinImages( ) {
 			tr.screenShadowImage = R_CreateImage("*screenShadow", nullptr, width, height, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, GL_RGBA8);
 		}
 
-		if (r_cubeMapping->integer)
+		if (r_cubeMapping->asInt())
 		{
-			tr.renderCubeImage = R_CreateImage("*renderCube", nullptr, r_cubemapSize->integer, r_cubemapSize->integer, IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE | IMGFLAG_MIPMAP | IMGFLAG_CUBEMAP, rgbFormat);
+			tr.renderCubeImage = R_CreateImage("*renderCube", nullptr, r_cubemapSize->asInt(), r_cubemapSize->asInt(), IMGTYPE_COLORALPHA, IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE | IMGFLAG_MIPMAP | IMGFLAG_CUBEMAP, rgbFormat);
 		}
 	}
 }
@@ -2967,7 +2967,7 @@ void R_SetColorMappings( ) {
 	int		inf;
 
 	// setup the overbright lighting
-	tr.overbrightBits = r_overBrightBits->integer;
+	tr.overbrightBits = r_overBrightBits->asInt();
 
 	// allow 2 overbright bits
 	if ( tr.overbrightBits > 2 ) {
@@ -2977,25 +2977,25 @@ void R_SetColorMappings( ) {
 	}
 
 	// don't allow more overbright bits than map overbright bits
-	if ( tr.overbrightBits > r_mapOverBrightBits->integer ) {
-		tr.overbrightBits = r_mapOverBrightBits->integer;
+	if ( tr.overbrightBits > r_mapOverBrightBits->asInt() ) {
+		tr.overbrightBits = r_mapOverBrightBits->asInt();
 	}
 
 	tr.identityLight = 1.0f / ( 1 << tr.overbrightBits );
 	tr.identityLightByte = 255 * tr.identityLight;
 
 
-	if ( r_intensity->value <= 1 ) {
+	if ( r_intensity->asFloat() <= 1 ) {
 		ri.Cvar_Set( "r_intensity", "1" );
 	}
 
-	if ( r_gamma->value < 0.5f ) {
+	if ( r_gamma->asFloat() < 0.5f ) {
 		ri.Cvar_Set( "r_gamma", "0.5" );
-	} else if ( r_gamma->value > 3.0f ) {
+	} else if ( r_gamma->asFloat() > 3.0f ) {
 		ri.Cvar_Set( "r_gamma", "3.0" );
 	}
 
-	g = r_gamma->value;
+	g = r_gamma->asFloat();
 
 	for ( i = 0; i < 256; i++ ) {
 		if ( g == 1 ) {
@@ -3014,7 +3014,7 @@ void R_SetColorMappings( ) {
 	}
 
 	for (i=0 ; i<256 ; i++) {
-		j = i * r_intensity->value;
+		j = i * r_intensity->asFloat();
 		if (j > 255) {
 			j = 255;
 		}

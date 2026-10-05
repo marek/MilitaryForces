@@ -1227,7 +1227,7 @@ static void CM_TracePointThroughPatchCollide( traceWork_t *tw, const struct patc
 #endif //BSPC
 
 #ifndef BSPC
-	if ( !cm_playerCurveClip->integer || !tw->isPoint ) {
+	if ( !cm_playerCurveClip->asInt() || !tw->isPoint ) {
 		return;
 	}
 #endif
@@ -1285,7 +1285,7 @@ static void CM_TracePointThroughPatchCollide( traceWork_t *tw, const struct patc
 			if (!cv) {
 				cv = CvarSystem::get( "r_debugSurfaceUpdate", "1", 0 );
 			}
-			if (cv->integer) {
+			if (cv->asInt()) {
 				debugPatchCollide = pc;
 				debugFacet = facet;
 			}
@@ -1472,7 +1472,7 @@ void CollisionWork::traceThroughPatchCollide( traceWork_t *tw, const struct patc
 				if (!cv) {
 					cv = CvarSystem::get( "r_debugSurfaceUpdate", "1", 0 );
 				}
-				if (cv && cv->integer) {
+				if (cv && cv->asInt()) {
 					debugPatchCollide = pc;
 					debugFacet = facet;
 				}
@@ -1621,7 +1621,7 @@ void CollisionModel::drawDebugSurface( void (*drawPoly)(int color, int numPoints
 		cv2 = CvarSystem::get( "r_debugSurface", "0", 0 );
 	}
 
-	if (cv2->integer != 1)
+	if (cv2->asInt() != 1)
 	{
 		return;
 	}
@@ -1660,7 +1660,7 @@ void CollisionModel::drawDebugSurface( void (*drawPoly)(int color, int numPoints
 				plane[3] = -plane[3];
 			}
 
-			plane[3] += cv->value;
+			plane[3] += cv->asFloat();
 			//*
 			for (n = 0; n < 3; n++)
 			{
@@ -1692,7 +1692,7 @@ void CollisionModel::drawDebugSurface( void (*drawPoly)(int color, int numPoints
 					plane[3] = -plane[3];
 				}
 		//			if ( !facet->borderNoAdjust[j] ) {
-					plane[3] -= cv->value;
+					plane[3] -= cv->asFloat();
 		//			}
 				for (n = 0; n < 3; n++)
 				{

@@ -790,17 +790,17 @@ void	CommandSystem::executeString( const char *text ) {
 	}
 
 	// check client game commands
-	if ( com_cl_running && com_cl_running->integer && ClientLoop::gameCommand() ) {
+	if ( com_cl_running && com_cl_running->asInt() && ClientLoop::gameCommand() ) {
 		return;
 	}
 
 	// check server game commands
-	if ( com_sv_running && com_sv_running->integer && ServerLoop::gameCommand() ) {
+	if ( com_sv_running && com_sv_running->asInt() && ServerLoop::gameCommand() ) {
 		return;
 	}
 
 	// check ui commands
-	if ( com_cl_running && com_cl_running->integer && UI_GameCommand() ) {
+	if ( com_cl_running && com_cl_running->asInt() && UI_GameCommand() ) {
 		return;
 	}
 

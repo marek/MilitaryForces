@@ -427,7 +427,7 @@ static int GLimp_SetMode(int mode, bool fullscreen, bool noborder, bool fixedFun
 
 	ri.Printf( PRINT_ALL, "Initializing OpenGL display\n");
 
-	if ( r_allowResize->integer )
+	if ( r_allowResize->asInt() )
 		flags |= SDL_WINDOW_RESIZABLE;
 
 #ifdef USE_ICON
@@ -498,7 +498,7 @@ static int GLimp_SetMode(int mode, bool fullscreen, bool noborder, bool fixedFun
 	ri.Printf( PRINT_ALL, " %d %d\n", glConfig.vidWidth, glConfig.vidHeight);
 
 	// Center window
-	if( r_centerWindow->integer && !fullscreen )
+	if( r_centerWindow->asInt() && !fullscreen )
 	{
 		x = ( desktopMode.w / 2 ) - ( glConfig.vidWidth / 2 );
 		y = ( desktopMode.h / 2 ) - ( glConfig.vidHeight / 2 );
@@ -533,17 +533,17 @@ static int GLimp_SetMode(int mode, bool fullscreen, bool noborder, bool fixedFun
 		glConfig.isFullscreen = false;
 	}
 
-	colorBits = r_colorbits->value;
+	colorBits = r_colorbits->asFloat();
 	if ((!colorBits) || (colorBits >= 32))
 		colorBits = 24;
 
-	if (!r_depthbits->value)
+	if (!r_depthbits->asFloat())
 		depthBits = 24;
 	else
-		depthBits = r_depthbits->value;
+		depthBits = r_depthbits->asFloat();
 
-	stencilBits = r_stencilbits->value;
-	samples = r_ext_multisample->value;
+	stencilBits = r_stencilbits->asFloat();
+	samples = r_ext_multisample->asFloat();
 
 	numContexts = 0;
 
@@ -554,8 +554,8 @@ static int GLimp_SetMode(int mode, bool fullscreen, bool noborder, bool fixedFun
 		SDL_GL_ResetAttributes();
 		SDL_GL_GetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, &profileMask );
 
-		preferOpenGLES = ( r_preferOpenGLES->integer == 1 ||
-		                 ( r_preferOpenGLES->integer == -1 && profileMask == SDL_GL_CONTEXT_PROFILE_ES ) );
+		preferOpenGLES = ( r_preferOpenGLES->asInt() == 1 ||
+		                 ( r_preferOpenGLES->asInt() == -1 && profileMask == SDL_GL_CONTEXT_PROFILE_ES ) );
 
 		if ( preferOpenGLES ) {
 #ifdef __EMSCRIPTEN__
@@ -683,7 +683,7 @@ static int GLimp_SetMode(int mode, bool fullscreen, bool noborder, bool fixedFun
 		SDL_GL_SetAttribute( SDL_GL_MULTISAMPLEBUFFERS, samples ? 1 : 0 );
 		SDL_GL_SetAttribute( SDL_GL_MULTISAMPLESAMPLES, samples );
 
-		if(r_stereoEnabled->integer)
+		if(r_stereoEnabled->asInt())
 		{
 			glConfig.stereoEnabled = true;
 			SDL_GL_SetAttribute(SDL_GL_STEREO, 1);
@@ -698,7 +698,7 @@ static int GLimp_SetMode(int mode, bool fullscreen, bool noborder, bool fixedFun
 
 #if 0 // if multisampling is enabled on X11, this causes create window to fail.
 		// If not allowing software GL, demand accelerated
-		if( !r_allowSoftwareGL->integer )
+		if( !r_allowSoftwareGL->asInt() )
 			SDL_GL_SetAttribute( SDL_GL_ACCELERATED_VISUAL, 1 );
 #endif
 
@@ -732,7 +732,7 @@ static int GLimp_SetMode(int mode, bool fullscreen, bool noborder, bool fixedFun
 				break;
 			}
 
-			if( r_glDebug->integer )
+			if( r_glDebug->asInt() )
 				SDL_GL_SetAttribute( SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG );
 
 			SDL_glContext = SDL_GL_CreateContext( SDL_window );
@@ -815,7 +815,7 @@ static int GLimp_SetMode(int mode, bool fullscreen, bool noborder, bool fixedFun
 		qglClear( GL_COLOR_BUFFER_BIT );
 		SDL_GL_SwapWindow( SDL_window );
 
-		if( SDL_GL_SetSwapInterval( r_swapInterval->integer ) == -1 )
+		if( SDL_GL_SetSwapInterval( r_swapInterval->asInt() ) == -1 )
 		{
 			ri.Printf( PRINT_DEVELOPER, "SDL_GL_SetSwapInterval failed: %s\n", SDL_GetError( ) );
 		}
@@ -924,7 +924,7 @@ static void APIENTRY GLimp_DebugCallback( GLenum source, GLenum type, GLuint id,
 		case GLIMP_DEBUG_SEVERITY_MEDIUM:	level = "medium"; break;
 		case GLIMP_DEBUG_SEVERITY_LOW:		level = "low"; break;
 		default:
-			if( r_glDebug->integer < 2 )
+			if( r_glDebug->asInt() < 2 )
 				return;
 			level = "info";
 			break;
@@ -938,7 +938,7 @@ static void GLimp_InitDebugOutput( )
 	void *proc = nullptr;
 	bool khr = false;
 
-	if( !r_glDebug->integer )
+	if( !r_glDebug->asInt() )
 		return;
 
 	if( SDL_GL_ExtensionSupported( "GL_KHR_debug" ) )
@@ -965,7 +965,7 @@ static void GLimp_InitDebugOutput( )
 
 static void GLimp_InitExtensions( bool fixedFunction )
 {
-	if ( !r_allowExtensions->integer )
+	if ( !r_allowExtensions->asInt() )
 	{
 		ri.Printf( PRINT_ALL, "* IGNORING OPENGL EXTENSIONS *\n" );
 		return;
@@ -979,7 +979,7 @@ static void GLimp_InitExtensions( bool fixedFunction )
 	if ( ( QGLES_VERSION_ATLEAST( 2, 0 ) || SDL_GL_ExtensionSupported( "GL_ARB_texture_compression" ) ) &&
 	     SDL_GL_ExtensionSupported( "GL_EXT_texture_compression_s3tc" ) )
 	{
-		if ( r_ext_compressed_textures->value )
+		if ( r_ext_compressed_textures->asFloat() )
 		{
 			glConfig.textureCompression = TC_S3TC_ARB;
 			ri.Printf( PRINT_ALL, "...using GL_EXT_texture_compression_s3tc\n" );
@@ -999,7 +999,7 @@ static void GLimp_InitExtensions( bool fixedFunction )
 	{
 		if ( SDL_GL_ExtensionSupported( "GL_S3_s3tc" ) )
 		{
-			if ( r_ext_compressed_textures->value )
+			if ( r_ext_compressed_textures->asFloat() )
 			{
 				glConfig.textureCompression = TC_S3TC;
 				ri.Printf( PRINT_ALL, "...using GL_S3_s3tc\n" );
@@ -1022,7 +1022,7 @@ static void GLimp_InitExtensions( bool fixedFunction )
 		glConfig.textureEnvAddAvailable = false;
 		if ( SDL_GL_ExtensionSupported( "GL_EXT_texture_env_add" ) )
 		{
-			if ( r_ext_texture_env_add->integer )
+			if ( r_ext_texture_env_add->asInt() )
 			{
 				glConfig.textureEnvAddAvailable = true;
 				ri.Printf( PRINT_ALL, "...using GL_EXT_texture_env_add\n" );
@@ -1044,7 +1044,7 @@ static void GLimp_InitExtensions( bool fixedFunction )
 		qglClientActiveTextureARB = nullptr;
 		if ( SDL_GL_ExtensionSupported( "GL_ARB_multitexture" ) )
 		{
-			if ( r_ext_multitexture->value )
+			if ( r_ext_multitexture->asFloat() )
 			{
 				qglMultiTexCoord2fARB = reinterpret_cast<decltype(qglMultiTexCoord2fARB)>(SDL_GL_GetProcAddress( "glMultiTexCoord2fARB" ));
 				qglActiveTextureARB = reinterpret_cast<decltype(qglActiveTextureARB)>(SDL_GL_GetProcAddress( "glActiveTextureARB" ));
@@ -1081,7 +1081,7 @@ static void GLimp_InitExtensions( bool fixedFunction )
 		// GL_EXT_compiled_vertex_array
 		if ( SDL_GL_ExtensionSupported( "GL_EXT_compiled_vertex_array" ) )
 		{
-			if ( r_ext_compiled_vertex_array->value )
+			if ( r_ext_compiled_vertex_array->asFloat() )
 			{
 				ri.Printf( PRINT_ALL, "...using GL_EXT_compiled_vertex_array\n" );
 				qglLockArraysEXT = reinterpret_cast< void ( APIENTRY * )( GLint, GLint )>(SDL_GL_GetProcAddress( "glLockArraysEXT" ));
@@ -1105,7 +1105,7 @@ static void GLimp_InitExtensions( bool fixedFunction )
 	textureFilterAnisotropic = false;
 	if ( SDL_GL_ExtensionSupported( "GL_EXT_texture_filter_anisotropic" ) )
 	{
-		if ( r_ext_texture_filter_anisotropic->integer ) {
+		if ( r_ext_texture_filter_anisotropic->asInt() ) {
 			qglGetIntegerv( GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, static_cast<GLint *>(&maxAnisotropy) );
 			if ( maxAnisotropy <= 0 ) {
 				ri.Printf( PRINT_ALL, "...GL_EXT_texture_filter_anisotropic not properly supported!\n" );
@@ -1171,20 +1171,20 @@ void GLimp_Init( bool fixedFunction )
 	ri.Sys_GLimpInit( );
 
 	// Create the window and set up the context
-	if(GLimp_StartDriverAndSetMode(r_mode->integer, r_fullscreen->integer, r_noborder->integer, fixedFunction))
+	if(GLimp_StartDriverAndSetMode(r_mode->asInt(), r_fullscreen->asInt(), r_noborder->asInt(), fixedFunction))
 		goto success;
 
 	// Try again, this time in a platform specific "safe mode"
 	ri.Sys_GLimpSafeInit( );
 
-	if(GLimp_StartDriverAndSetMode(r_mode->integer, r_fullscreen->integer, false, fixedFunction))
+	if(GLimp_StartDriverAndSetMode(r_mode->asInt(), r_fullscreen->asInt(), false, fixedFunction))
 		goto success;
 
 	// Finally, try the default screen resolution
-	if( r_mode->integer != R_MODE_FALLBACK )
+	if( r_mode->asInt() != R_MODE_FALLBACK )
 	{
 		ri.Printf( PRINT_ALL, "Setting r_mode %d failed, falling back on r_mode %d\n",
-				r_mode->integer, R_MODE_FALLBACK );
+				r_mode->asInt(), R_MODE_FALLBACK );
 
 		if(GLimp_StartDriverAndSetMode(R_MODE_FALLBACK, false, false, fixedFunction))
 			goto success;
@@ -1199,7 +1199,7 @@ success:
 	glConfig.hardwareType = GLHW_GENERIC;
 
 	// Only using SDL_SetWindowBrightness to determine if hardware gamma is supported
-	glConfig.deviceSupportsGamma = !r_ignorehwgamma->integer &&
+	glConfig.deviceSupportsGamma = !r_ignorehwgamma->asInt() &&
 		SDL_SetWindowBrightness( SDL_window, 1.0f ) >= 0;
 
 	// get our config strings
@@ -1284,7 +1284,7 @@ static void GLimp_CheckDisplaySleep( )
 	int now = ri.Milliseconds( );
 	bool asleep;
 
-	if( !r_swapInterval->integer && !vsyncSuspended )
+	if( !r_swapInterval->asInt() && !vsyncSuspended )
 		return;
 
 	if( now < nextCheck && now > nextCheck - 1000 )
@@ -1295,7 +1295,7 @@ static void GLimp_CheckDisplaySleep( )
 
 	if( asleep != vsyncSuspended )
 	{
-		SDL_GL_SetSwapInterval( asleep ? 0 : r_swapInterval->integer );
+		SDL_GL_SetSwapInterval( asleep ? 0 : r_swapInterval->asInt() );
 		vsyncSuspended = asleep;
 	}
 }
@@ -1308,7 +1308,7 @@ void GLimp_EndFrame( )
 #endif
 
 	// don't flip if drawing to front buffer
-	if ( Q_stricmp( r_drawBuffer->string, "GL_FRONT" ) != 0 )
+	if ( Q_stricmp( r_drawBuffer->asString(), "GL_FRONT" ) != 0 )
 	{
 		SDL_GL_SwapWindow( SDL_window );
 	}
@@ -1322,7 +1322,7 @@ void GLimp_EndFrame( )
 		// Find out the current state
 		fullscreen = !!( SDL_GetWindowFlags( SDL_window ) & SDL_WINDOW_FULLSCREEN );
 
-		if( r_fullscreen->integer && ri.Cvar_VariableIntegerValue( "in_nograb" ) )
+		if( r_fullscreen->asInt() && ri.Cvar_VariableIntegerValue( "in_nograb" ) )
 		{
 			ri.Printf( PRINT_ALL, "Fullscreen not allowed with in_nograb 1\n");
 			ri.Cvar_Set( "r_fullscreen", "0" );
@@ -1330,11 +1330,11 @@ void GLimp_EndFrame( )
 		}
 
 		// Is the state we want different from the current state?
-		needToToggle = !!r_fullscreen->integer != fullscreen;
+		needToToggle = !!r_fullscreen->asInt() != fullscreen;
 
 		if( needToToggle )
 		{
-			sdlToggled = SDL_SetWindowFullscreen( SDL_window, r_fullscreen->integer ) >= 0;
+			sdlToggled = SDL_SetWindowFullscreen( SDL_window, r_fullscreen->asInt() ) >= 0;
 
 			// SDL_WM_ToggleFullScreen didn't work, so do it the slow way
 			if( !sdlToggled )

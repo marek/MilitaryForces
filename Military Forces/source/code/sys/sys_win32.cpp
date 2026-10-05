@@ -104,9 +104,9 @@ static char *Sys_DefaultHomePath( void )
 			return NULL;
 		}
 
-		if(com_homepath->string[0])
+		if(com_homepath->asString()[0])
 		{
-			Com_sprintf(homePath, sizeof(homePath), "%s%c%s", szPath, PATH_SEP, com_homepath->string);
+			Com_sprintf(homePath, sizeof(homePath), "%s%c%s", szPath, PATH_SEP, com_homepath->asString());
 			return homePath;
 		}
 

@@ -334,38 +334,38 @@ void RE_BeginScene(const refdef_t *fd)
 	tr.refdef.sunAmbCol[3] = 1.0f;
 
 	VectorCopy(tr.sunDirection, tr.refdef.sunDir);
-	if ( (tr.refdef.rdflags & RDF_NOWORLDMODEL) || !(r_depthPrepass->value) ){
+	if ( (tr.refdef.rdflags & RDF_NOWORLDMODEL) || !(r_depthPrepass->asFloat()) ){
 		VectorSet(tr.refdef.sunCol, 0, 0, 0);
 		VectorSet(tr.refdef.sunAmbCol, 0, 0, 0);
 	}
 	else
 	{
-		float scale = (1 << r_mapOverBrightBits->integer) / 255.0f;
+		float scale = (1 << r_mapOverBrightBits->asInt()) / 255.0f;
 
-		if (r_forceSun->integer)
-			VectorScale(tr.sunLight, scale * r_forceSunLightScale->value, tr.refdef.sunCol);
+		if (r_forceSun->asInt())
+			VectorScale(tr.sunLight, scale * r_forceSunLightScale->asFloat(), tr.refdef.sunCol);
 		else
 			VectorScale(tr.sunLight, scale, tr.refdef.sunCol);
 
-		if (r_sunlightMode->integer == 1)
+		if (r_sunlightMode->asInt() == 1)
 		{
 			tr.refdef.sunAmbCol[0] =
 			tr.refdef.sunAmbCol[1] =
-			tr.refdef.sunAmbCol[2] = r_forceSun->integer ? r_forceSunAmbientScale->value : tr.sunShadowScale;
+			tr.refdef.sunAmbCol[2] = r_forceSun->asInt() ? r_forceSunAmbientScale->asFloat() : tr.sunShadowScale;
 		}
 		else
 		{
-			if (r_forceSun->integer)
-				VectorScale(tr.sunLight, scale * r_forceSunAmbientScale->value, tr.refdef.sunAmbCol);
+			if (r_forceSun->asInt())
+				VectorScale(tr.sunLight, scale * r_forceSunAmbientScale->asFloat(), tr.refdef.sunAmbCol);
 			else
 				VectorScale(tr.sunLight, scale * tr.sunShadowScale, tr.refdef.sunAmbCol);
 		}
 	}
 
-	if (r_forceAutoExposure->integer)
+	if (r_forceAutoExposure->asInt())
 	{
-		tr.refdef.autoExposureMinMax[0] = r_forceAutoExposureMin->value;
-		tr.refdef.autoExposureMinMax[1] = r_forceAutoExposureMax->value;
+		tr.refdef.autoExposureMinMax[0] = r_forceAutoExposureMin->asFloat();
+		tr.refdef.autoExposureMinMax[1] = r_forceAutoExposureMax->asFloat();
 	}
 	else
 	{
@@ -373,11 +373,11 @@ void RE_BeginScene(const refdef_t *fd)
 		tr.refdef.autoExposureMinMax[1] = tr.autoExposureMinMax[1];
 	}
 
-	if (r_forceToneMap->integer)
+	if (r_forceToneMap->asInt())
 	{
-		tr.refdef.toneMinAvgMaxLinear[0] = pow(2, r_forceToneMapMin->value);
-		tr.refdef.toneMinAvgMaxLinear[1] = pow(2, r_forceToneMapAvg->value);
-		tr.refdef.toneMinAvgMaxLinear[2] = pow(2, r_forceToneMapMax->value);
+		tr.refdef.toneMinAvgMaxLinear[0] = pow(2, r_forceToneMapMin->asFloat());
+		tr.refdef.toneMinAvgMaxLinear[1] = pow(2, r_forceToneMapAvg->asFloat());
+		tr.refdef.toneMinAvgMaxLinear[2] = pow(2, r_forceToneMapMax->asFloat());
 	}
 	else
 	{
@@ -425,8 +425,8 @@ void RE_BeginScene(const refdef_t *fd)
 
 	// turn off dynamic lighting globally by clearing all the
 	// dlights if it needs to be disabled or if vertex lighting is enabled
-	if ( r_dynamiclight->integer == 0 ||
-		 r_vertexLight->integer == 1 ||
+	if ( r_dynamiclight->asInt() == 0 ||
+		 r_vertexLight->asInt() == 1 ||
 		 glConfig.hardwareType == GLHW_PERMEDIA2 ) {
 		tr.refdef.num_dlights = 0;
 	}
@@ -470,7 +470,7 @@ void RE_RenderScene( const refdef_t *fd ) {
 	}
 	GLimp_LogComment( "====== RE_RenderScene =====\n" );
 
-	if ( r_norefresh->integer ) {
+	if ( r_norefresh->asInt() ) {
 		return;
 	}
 
@@ -483,21 +483,21 @@ void RE_RenderScene( const refdef_t *fd ) {
 	RE_BeginScene(fd);
 
 	// SmileTheory: playing with shadow mapping
-	if (!( fd->rdflags & RDF_NOWORLDMODEL ) && tr.refdef.num_dlights && r_dlightMode->integer >= 2)
+	if (!( fd->rdflags & RDF_NOWORLDMODEL ) && tr.refdef.num_dlights && r_dlightMode->asInt() >= 2)
 	{
 		R_RenderDlightCubemaps(fd);
 	}
 
 	/* playing with more shadows */
-	if(glRefConfig.framebufferObject && !( fd->rdflags & RDF_NOWORLDMODEL ) && r_shadows->integer == 4)
+	if(glRefConfig.framebufferObject && !( fd->rdflags & RDF_NOWORLDMODEL ) && r_shadows->asInt() == 4)
 	{
 		R_RenderPshadowMaps(fd);
 	}
 
 	// playing with even more shadows
-	if(glRefConfig.framebufferObject && r_sunlightMode->integer && !( fd->rdflags & RDF_NOWORLDMODEL ) && (r_forceSun->integer || tr.sunShadows))
+	if(glRefConfig.framebufferObject && r_sunlightMode->asInt() && !( fd->rdflags & RDF_NOWORLDMODEL ) && (r_forceSun->asInt() || tr.sunShadows))
 	{
-		if (r_shadowCascadeZFar->integer != 0)
+		if (r_shadowCascadeZFar->asInt() != 0)
 		{
 			R_RenderSunShadowMaps(fd, 0);
 			R_RenderSunShadowMaps(fd, 1);
@@ -511,7 +511,7 @@ void RE_RenderScene( const refdef_t *fd ) {
 		}
 
 		// only rerender last cascade if sun has changed position
-		if (r_forceSun->integer == 2 || !VectorCompare(tr.refdef.sunDir, tr.lastCascadeSunDirection))
+		if (r_forceSun->asInt() == 2 || !VectorCompare(tr.refdef.sunDir, tr.lastCascadeSunDirection))
 		{
 			VectorCopy(tr.refdef.sunDir, tr.lastCascadeSunDirection);
 			R_RenderSunShadowMaps(fd, 3);
@@ -563,7 +563,7 @@ void RE_RenderScene( const refdef_t *fd ) {
 
 	VectorCopy( fd->vieworg, parms.pvsOrigin );
 
-	if(!( fd->rdflags & RDF_NOWORLDMODEL ) && r_depthPrepass->value && ((r_forceSun->integer) || tr.sunShadows))
+	if(!( fd->rdflags & RDF_NOWORLDMODEL ) && r_depthPrepass->asFloat() && ((r_forceSun->asInt()) || tr.sunShadows))
 	{
 		parms.flags = VPF_USESUNLIGHT;
 	}

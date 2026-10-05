@@ -971,19 +971,26 @@ inline constexpr int CVAR_PROTECTED = 0x2000; // prevent modifying this var from
 inline constexpr int CVAR_MODIFIED = 0x40000000; // Cvar was modified
 inline constexpr unsigned int CVAR_NONEXISTENT = 0x80000000; // Cvar doesn't exist.
 
-// nothing outside the Cvar_*() functions should modify these fields!
-using cvar_t = struct cvar_s;
+// a console variable. Its value is read through asInt(), asFloat(), asBool() and asString(); only the cvar system
+// writes it (the rest of the fields are still plain data).
+class Cvar;
+using cvar_t = Cvar;
 
-struct cvar_s {
+class Cvar {
+public:
+	int			asInt() const { return integer_; }			// atoi( string )
+	float		asFloat() const { return value_; }			// atof( string )
+	bool		asBool() const { return integer_ != 0; }
+	const char	*asString() const { return string_; }
+	// changes the number only, not the string, for code that masks a setting for a moment
+	void		overrideInt( int value ) { integer_ = value; }
+
 	char			*name;
-	char			*string;
 	char			*resetString;		// cvar_restart will reset to this value
 	char			*latchedString;		// for CVAR_LATCH vars
 	int				flags;
 	bool	modified;			// set each time the cvar is changed
 	int				modificationCount;	// incremented each time the cvar is changed
-	float			value;				// atof( string )
-	int				integer;			// atoi( string )
 	bool	validate;
 	bool	integral;
 	float			min;
@@ -995,6 +1002,12 @@ struct cvar_s {
 	cvar_t *hashNext;
 	cvar_t *hashPrev;
 	int			hashIndex;
+
+private:
+	friend class CvarSystem;
+	char			*string_;
+	float			value_;
+	int				integer_;
 };
 
 inline constexpr int MAX_CVAR_VALUE_STRING = 256;

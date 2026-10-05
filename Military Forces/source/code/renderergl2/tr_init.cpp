@@ -298,7 +298,7 @@ static void InitOpenGL( )
 	}
 
 	// check for GLSL function textureCubeLod()
-	if ( r_cubeMapping->integer && !QGL_VERSION_ATLEAST( 3, 0 ) ) {
+	if ( r_cubeMapping->asInt() && !QGL_VERSION_ATLEAST( 3, 0 ) ) {
 		ri.Printf( PRINT_WARNING, "WARNING: Disabled r_cubeMapping because it requires OpenGL 3.0\n" );
 		ri.Cvar_Set( "r_cubeMapping", "0" );
 	}
@@ -320,7 +320,7 @@ void GL_CheckErrs( char *file, int line ) {
 	if ( err == GL_NO_ERROR ) {
 		return;
 	}
-	if ( r_ignoreGLErrors->integer ) {
+	if ( r_ignoreGLErrors->asInt() ) {
 		return;
 	}
 	switch( err ) {
@@ -407,9 +407,9 @@ bool R_GetModeInfo( int *width, int *height, float *windowAspect, int mode ) {
 	}
 
 	if ( mode == -1 ) {
-		*width = r_customwidth->integer;
-		*height = r_customheight->integer;
-		pixelAspect = r_customPixelAspect->value;
+		*width = r_customwidth->asInt();
+		*height = r_customheight->asInt();
+		pixelAspect = r_customPixelAspect->asFloat();
 	} else {
 		vm = &r_vidModes[mode];
 
@@ -601,7 +601,7 @@ void RB_TakeScreenshotJPEG(int x, int y, int width, int height, char *fileName)
 	if(glConfig.deviceSupportsGamma)
 		R_GammaCorrect(buffer + offset, memcount);
 
-	RE_SaveJPG(fileName, r_screenshotJpegQuality->integer, width, height, buffer + offset, padlen);
+	RE_SaveJPG(fileName, r_screenshotJpegQuality->asInt(), width, height, buffer + offset, padlen);
 	ri.hunkFreeTempMemory(buffer);
 }
 
@@ -988,7 +988,7 @@ const void *RB_TakeVideoFrameCmd( const void *data )
 		}
 
 		memcount = RE_SaveJPGToBuffer(cmd->encodeBuffer, avilinelen * cmd->height,
-			r_aviMotionJpegQuality->integer,
+			r_aviMotionJpegQuality->asInt(),
 			cmd->width, cmd->height, cBuf, padlen);
 		ri.CL_WriteAVIVideoFrame(cmd->encodeBuffer, memcount);
 	}
@@ -1041,7 +1041,7 @@ void GL_SetDefaultState( )
 	if (glRefConfig.framebufferObject)
 		GL_BindNullFramebuffers();
 
-	GL_TextureMode( r_textureMode->string );
+	GL_TextureMode( r_textureMode->asString() );
 
 	//qglShadeModel( GL_SMOOTH );
 	qglDepthFunc( GL_LEQUAL );
@@ -1075,7 +1075,7 @@ void GL_SetDefaultState( )
 		qglEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
 	// GL_POLYGON_OFFSET_FILL will be glEnable()d when this is used
-	qglPolygonOffset( r_offsetFactor->value, r_offsetUnits->value );
+	qglPolygonOffset( r_offsetFactor->asFloat(), r_offsetUnits->asFloat() );
 
 	qglClearColor( 0.0f, 0.0f, 0.0f, 1.0f );	// FIXME: get color of sky
 }
@@ -1144,7 +1144,7 @@ void GfxInfo_f( )
 	ri.Printf( PRINT_ALL, "GL_MAX_TEXTURE_SIZE: %d\n", glConfig.maxTextureSize );
 	ri.Printf( PRINT_ALL, "GL_MAX_TEXTURE_IMAGE_UNITS: %d\n", glConfig.numTextureUnits );
 	ri.Printf( PRINT_ALL, "\nPIXELFORMAT: color(%d-bits) Z(%d-bit) stencil(%d-bits)\n", glConfig.colorBits, glConfig.depthBits, glConfig.stencilBits );
-	ri.Printf( PRINT_ALL, "MODE: %d, %d x %d %s hz:", r_mode->integer, glConfig.vidWidth, glConfig.vidHeight, fsstrings[r_fullscreen->integer == 1] );
+	ri.Printf( PRINT_ALL, "MODE: %d, %d x %d %s hz:", r_mode->asInt(), glConfig.vidWidth, glConfig.vidHeight, fsstrings[r_fullscreen->asInt() == 1] );
 	if ( glConfig.displayFrequency )
 	{
 		ri.Printf( PRINT_ALL, "%d\n", glConfig.displayFrequency );
@@ -1162,13 +1162,13 @@ void GfxInfo_f( )
 		ri.Printf( PRINT_ALL, "GAMMA: software w/ %d overbright bits\n", tr.overbrightBits );
 	}
 
-	ri.Printf( PRINT_ALL, "texturemode: %s\n", r_textureMode->string );
-	ri.Printf( PRINT_ALL, "picmip: %d\n", r_picmip->integer );
-	ri.Printf( PRINT_ALL, "texture bits: %d\n", r_texturebits->integer );
+	ri.Printf( PRINT_ALL, "texturemode: %s\n", r_textureMode->asString() );
+	ri.Printf( PRINT_ALL, "picmip: %d\n", r_picmip->asInt() );
+	ri.Printf( PRINT_ALL, "texture bits: %d\n", r_texturebits->asInt() );
 	ri.Printf( PRINT_ALL, "compiled vertex arrays: %s\n", enablestrings[qglLockArraysEXT != nullptr ] );
 	ri.Printf( PRINT_ALL, "texenv add: %s\n", enablestrings[glConfig.textureEnvAddAvailable != 0] );
 	ri.Printf( PRINT_ALL, "compressed textures: %s\n", enablestrings[glConfig.textureCompression!=TC_NONE] );
-	if ( r_vertexLight->integer || glConfig.hardwareType == GLHW_PERMEDIA2 )
+	if ( r_vertexLight->asInt() || glConfig.hardwareType == GLHW_PERMEDIA2 )
 	{
 		ri.Printf( PRINT_ALL, "HACK: using vertex lightmap approximation\n" );
 	}
@@ -1180,7 +1180,7 @@ void GfxInfo_f( )
 	{
 		ri.Printf( PRINT_ALL, "HACK: riva128 approximations\n" );
 	}
-	if ( r_finish->integer ) {
+	if ( r_finish->asInt() ) {
 		ri.Printf( PRINT_ALL, "Forcing glFinish\n" );
 	}
 }
@@ -1481,7 +1481,7 @@ void R_InitQueries()
 	if (!glRefConfig.occlusionQuery)
 		return;
 
-	if (r_drawSunRays->integer)
+	if (r_drawSunRays->asInt())
 		qglGenQueries(ARRAY_LEN(tr.sunFlareQuery), tr.sunFlareQuery);
 }
 
@@ -1490,7 +1490,7 @@ void R_ShutDownQueries()
 	if (!glRefConfig.occlusionQuery)
 		return;
 
-	if (r_drawSunRays->integer)
+	if (r_drawSunRays->asInt())
 		qglDeleteQueries(ARRAY_LEN(tr.sunFlareQuery), tr.sunFlareQuery);
 }
 
@@ -1551,11 +1551,11 @@ void R_Init( ) {
 
 	R_Register();
 
-	max_polys = r_maxpolys->integer;
+	max_polys = r_maxpolys->asInt();
 	if (max_polys < MAX_POLYS)
 		max_polys = MAX_POLYS;
 
-	max_polyverts = r_maxpolyverts->integer;
+	max_polyverts = r_maxpolyverts->asInt();
 	if (max_polyverts < MAX_POLYVERTS)
 		max_polyverts = MAX_POLYVERTS;
 

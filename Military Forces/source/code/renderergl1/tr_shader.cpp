@@ -1578,21 +1578,21 @@ static bool ParseShader( char **text )
 				return false;
 			}
 
-			if ( r_greyscale->integer )
+			if ( r_greyscale->asInt() )
 			{
 				float luminance;
 
 				luminance = LUMA( shader.fogParms.color[0], shader.fogParms.color[1], shader.fogParms.color[2] );
 				VectorSet( shader.fogParms.color, luminance, luminance, luminance );
 			}
-			else if ( r_greyscale->value )
+			else if ( r_greyscale->asFloat() )
 			{
 				float luminance;
 
 				luminance = LUMA( shader.fogParms.color[0], shader.fogParms.color[1], shader.fogParms.color[2] );
-				shader.fogParms.color[0] = LERP( shader.fogParms.color[0], luminance, r_greyscale->value );
-				shader.fogParms.color[1] = LERP( shader.fogParms.color[1], luminance, r_greyscale->value );
-				shader.fogParms.color[2] = LERP( shader.fogParms.color[2], luminance, r_greyscale->value );
+				shader.fogParms.color[0] = LERP( shader.fogParms.color[0], luminance, r_greyscale->asFloat() );
+				shader.fogParms.color[1] = LERP( shader.fogParms.color[1], luminance, r_greyscale->asFloat() );
+				shader.fogParms.color[2] = LERP( shader.fogParms.color[2], luminance, r_greyscale->asFloat() );
 			}
 
 			token = COM_ParseExt( text, false );
@@ -1703,7 +1703,7 @@ static void ComputeStageIteratorFunc( )
 		return;
 	}
 
-	if ( r_ignoreFastPath->integer )
+	if ( r_ignoreFastPath->asInt() )
 	{
 		return;
 	}
@@ -2243,7 +2243,7 @@ static shader_t *FinishShader( ) {
 		//
 		// ditch this stage if it's detail and detail textures are disabled
 		//
-		if ( pStage->isDetail && !r_detailTextures->integer )
+		if ( pStage->isDetail && !r_detailTextures->asInt() )
 		{
 			int index;
 			
@@ -2344,7 +2344,7 @@ static shader_t *FinishShader( ) {
 	//
 	// if we are in r_vertexLight mode, never use a lightmap texture
 	//
-	if ( stage > 1 && ( (r_vertexLight->integer && !r_uiFullScreen->integer) || glConfig.hardwareType == GLHW_PERMEDIA2 ) ) {
+	if ( stage > 1 && ( (r_vertexLight->asInt() && !r_uiFullScreen->asInt()) || glConfig.hardwareType == GLHW_PERMEDIA2 ) ) {
 		VertexLightingCollapse();
 		stage = 1;
 		hasLightmapStage = false;
@@ -2564,7 +2564,7 @@ shader_t *R_FindShader( const char *name, int lightmapIndex, bool mipRawImage ) 
 	if ( shaderText ) {
 		// enable this when building a pak file to get a global list
 		// of all explicit shaders
-		if ( r_printShaders->integer ) {
+		if ( r_printShaders->asInt() ) {
 			ri.Printf( PRINT_ALL, "*SHADER* %s\n", name );
 		}
 

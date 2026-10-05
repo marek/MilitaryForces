@@ -429,7 +429,7 @@ int R_MarkFragments( int numPoints, const vec3_t *points, const vec3_t projectio
 				}
 			}
 		}
-		else if(*surfaces[i] == SF_TRIANGLES && r_marksOnTriangleMeshes->integer) {
+		else if(*surfaces[i] == SF_TRIANGLES && r_marksOnTriangleMeshes->asInt()) {
 
 			srfTriangles_t *surf = reinterpret_cast<srfTriangles_t *>(surfaces[i]);
 

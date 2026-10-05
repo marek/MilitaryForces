@@ -229,21 +229,21 @@ SoundSystem::update
 */
 void SoundSystem::update( )
 {
-	if(s_muted->integer)
+	if(s_muted->asInt())
 	{
-		if(!(s_muteWhenMinimized->integer && com_minimized->integer) &&
-		   !(s_muteWhenUnfocused->integer && com_unfocused->integer))
+		if(!(s_muteWhenMinimized->asInt() && com_minimized->asInt()) &&
+		   !(s_muteWhenUnfocused->asInt() && com_unfocused->asInt()))
 		{
-			s_muted->integer = false;
+			s_muted->overrideInt( false );
 			s_muted->modified = true;
 		}
 	}
 	else
 	{
-		if((s_muteWhenMinimized->integer && com_minimized->integer) ||
-		   (s_muteWhenUnfocused->integer && com_unfocused->integer))
+		if((s_muteWhenMinimized->asInt() && com_minimized->asInt()) ||
+		   (s_muteWhenUnfocused->asInt() && com_unfocused->asInt()))
 		{
-			s_muted->integer = true;
+			s_muted->overrideInt( true );
 			s_muted->modified = true;
 		}
 	}
@@ -485,7 +485,7 @@ void SoundSystem::init( )
 	s_muteWhenUnfocused = CvarSystem::get( "s_muteWhenUnfocused", "0", CVAR_ARCHIVE );
 
 	cv = CvarSystem::get( "s_initsound", "1", 0 );
-	if( !cv->integer ) {
+	if( !cv->asInt() ) {
 		Common::printf( "Sound disabled.\n" );
 	} else {
 
@@ -499,7 +499,7 @@ void SoundSystem::init( )
 		CommandSystem::addCommand( "s_info", S_SoundInfo );
 
 		cv = CvarSystem::get( "s_useOpenAL", "1", CVAR_ARCHIVE | CVAR_LATCH );
-		if( cv->integer ) {
+		if( cv->asInt() ) {
 			//OpenAL
 			started = S_AL_Init( &si );
 			CvarSystem::set( "s_backend", "OpenAL" );

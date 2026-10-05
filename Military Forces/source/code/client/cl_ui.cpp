@@ -597,7 +597,7 @@ void Key_GetBindingBuf( int keynum, char *buf, int buflen )
 //{
 //	cvar_t	*fs;
 //	fs = CvarSystem::get ("fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
-//	if (UI_usesUniqueCDKey() && fs && fs->string[0] != 0) {
+//	if (UI_usesUniqueCDKey() && fs && fs->asString()[0] != 0) {
 //		Com_Memcpy( buf, &cl_cdkey[16], 16);
 //		buf[16] = 0;
 //	} else {
@@ -616,7 +616,7 @@ void Key_GetBindingBuf( int keynum, char *buf, int buflen )
 //{
 //	cvar_t	*fs;
 //	fs = CvarSystem::get ("fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
-//	if (UI_usesUniqueCDKey() && fs && fs->string[0] != 0) {
+//	if (UI_usesUniqueCDKey() && fs && fs->asString()[0] != 0) {
 //		Com_Memcpy( &cl_cdkey[16], buf, 16 );
 //		cl_cdkey[32] = 0;
 //		// set the flag so the fle will be written at the next opportunity

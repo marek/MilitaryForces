@@ -1131,7 +1131,7 @@ static void RB_CalcDiffuseColor_scalar( unsigned char *colors )
 void RB_CalcDiffuseColor( unsigned char *colors )
 {
 #if idppc_altivec
-	if (com_altivec->integer) {
+	if (com_altivec->asInt()) {
 		// must be in a separate translation unit or G3 systems will crash.
 		RB_CalcDiffuseColor_altivec( colors );
 		return;

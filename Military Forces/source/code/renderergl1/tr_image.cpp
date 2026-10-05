@@ -464,7 +464,7 @@ static void R_MipMap (byte *in, int width, int height) {
 	byte	*out;
 	int		row;
 
-	if ( !r_simpleMipMaps->integer ) {
+	if ( !r_simpleMipMaps->asInt() ) {
 		R_MipMap2( reinterpret_cast<unsigned *>(in), width, height );
 		return;
 	}
@@ -575,9 +575,9 @@ static void Upload32( unsigned *data,
 		;
 	for (scaled_height = 1 ; scaled_height < height ; scaled_height<<=1)
 		;
-	if ( r_roundImagesDown->integer && scaled_width > width )
+	if ( r_roundImagesDown->asInt() && scaled_width > width )
 		scaled_width >>= 1;
-	if ( r_roundImagesDown->integer && scaled_height > height )
+	if ( r_roundImagesDown->asInt() && scaled_height > height )
 		scaled_height >>= 1;
 
 	if ( scaled_width != width || scaled_height != height ) {
@@ -592,8 +592,8 @@ static void Upload32( unsigned *data,
 	// perform optional picmip operation
 	//
 	if ( picmip ) {
-		scaled_width >>= r_picmip->integer;
-		scaled_height >>= r_picmip->integer;
+		scaled_width >>= r_picmip->asInt();
+		scaled_height >>= r_picmip->asInt();
 	}
 
 	//
@@ -627,7 +627,7 @@ static void Upload32( unsigned *data,
 	scan = (reinterpret_cast<byte *>(data));
 	samples = 3;
 
-	if( r_greyscale->integer )
+	if( r_greyscale->asInt() )
 	{
 		for ( i = 0; i < c; i++ )
 		{
@@ -637,20 +637,20 @@ static void Upload32( unsigned *data,
 			scan[i*4 + 2] = luma;
 		}
 	}
-	else if( r_greyscale->value )
+	else if( r_greyscale->asFloat() )
 	{
 		for ( i = 0; i < c; i++ )
 		{
 			float luma = LUMA(scan[i*4], scan[i*4 + 1], scan[i*4 + 2]);
-			scan[i*4] = LERP(scan[i*4], luma, r_greyscale->value);
-			scan[i*4 + 1] = LERP(scan[i*4 + 1], luma, r_greyscale->value);
-			scan[i*4 + 2] = LERP(scan[i*4 + 2], luma, r_greyscale->value);
+			scan[i*4] = LERP(scan[i*4], luma, r_greyscale->asFloat());
+			scan[i*4 + 1] = LERP(scan[i*4 + 1], luma, r_greyscale->asFloat());
+			scan[i*4 + 2] = LERP(scan[i*4 + 2], luma, r_greyscale->asFloat());
 		}
 	}
 
 	if(lightMap)
 	{
-		if(r_greyscale->integer)
+		if(r_greyscale->asInt())
 			internalFormat = GL_LUMINANCE;
 		else
 			internalFormat = GL_RGB;
@@ -680,9 +680,9 @@ static void Upload32( unsigned *data,
 		// select proper internal format
 		if ( samples == 3 )
 		{
-			if(r_greyscale->integer)
+			if(r_greyscale->asInt())
 			{
-				if(r_texturebits->integer == 16 || r_texturebits->integer == 32)
+				if(r_texturebits->asInt() == 16 || r_texturebits->asInt() == 32)
 					internalFormat = GL_LUMINANCE8;
 				else
 					internalFormat = GL_LUMINANCE;
@@ -697,11 +697,11 @@ static void Upload32( unsigned *data,
 				{
 					internalFormat = GL_RGB4_S3TC;
 				}
-				else if ( r_texturebits->integer == 16 )
+				else if ( r_texturebits->asInt() == 16 )
 				{
 					internalFormat = GL_RGB5;
 				}
-				else if ( r_texturebits->integer == 32 )
+				else if ( r_texturebits->asInt() == 32 )
 				{
 					internalFormat = GL_RGB8;
 				}
@@ -713,20 +713,20 @@ static void Upload32( unsigned *data,
 		}
 		else if ( samples == 4 )
 		{
-			if(r_greyscale->integer)
+			if(r_greyscale->asInt())
 			{
-				if(r_texturebits->integer == 16 || r_texturebits->integer == 32)
+				if(r_texturebits->asInt() == 16 || r_texturebits->asInt() == 32)
 					internalFormat = GL_LUMINANCE8_ALPHA8;
 				else
 					internalFormat = GL_LUMINANCE_ALPHA;
 			}
 			else
 			{
-				if ( r_texturebits->integer == 16 )
+				if ( r_texturebits->asInt() == 16 )
 				{
 					internalFormat = GL_RGBA4;
 				}
-				else if ( r_texturebits->integer == 32 )
+				else if ( r_texturebits->asInt() == 32 )
 				{
 					internalFormat = GL_RGBA8;
 				}
@@ -793,7 +793,7 @@ static void Upload32( unsigned *data,
 				scaled_height = 1;
 			miplevel++;
 
-			if ( r_colorMipLevels->integer ) {
+			if ( r_colorMipLevels->asInt() ) {
 				R_BlendOverTexture( reinterpret_cast<byte *>(scaledBuffer), scaled_width * scaled_height, mipBlendColors[miplevel] );
 			}
 
@@ -806,7 +806,7 @@ done:
 	{
 		if ( textureFilterAnisotropic )
 			qglTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT,
-					static_cast<GLint>(Com_Clamp( 1, maxAnisotropy, r_ext_max_anisotropy->integer )) );
+					static_cast<GLint>(Com_Clamp( 1, maxAnisotropy, r_ext_max_anisotropy->asInt() )) );
 
 		qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, gl_filter_min);
 		qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, gl_filter_max);
@@ -1269,7 +1269,7 @@ void R_SetColorMappings( ) {
 	int		shift;
 
 	// setup the overbright lighting
-	tr.overbrightBits = r_overBrightBits->integer;
+	tr.overbrightBits = r_overBrightBits->asInt();
 	if ( !glConfig.deviceSupportsGamma ) {
 		tr.overbrightBits = 0;		// need hardware gamma for overbright
 	}
@@ -1298,17 +1298,17 @@ void R_SetColorMappings( ) {
 	tr.identityLightByte = 255 * tr.identityLight;
 
 
-	if ( r_intensity->value <= 1 ) {
+	if ( r_intensity->asFloat() <= 1 ) {
 		ri.Cvar_Set( "r_intensity", "1" );
 	}
 
-	if ( r_gamma->value < 0.5f ) {
+	if ( r_gamma->asFloat() < 0.5f ) {
 		ri.Cvar_Set( "r_gamma", "0.5" );
-	} else if ( r_gamma->value > 3.0f ) {
+	} else if ( r_gamma->asFloat() > 3.0f ) {
 		ri.Cvar_Set( "r_gamma", "3.0" );
 	}
 
-	g = r_gamma->value;
+	g = r_gamma->asFloat();
 
 	shift = tr.overbrightBits;
 
@@ -1329,7 +1329,7 @@ void R_SetColorMappings( ) {
 	}
 
 	for (i=0 ; i<256 ; i++) {
-		j = i * r_intensity->value;
+		j = i * r_intensity->asFloat();
 		if (j > 255) {
 			j = 255;
 		}

@@ -188,7 +188,7 @@ void QDECL Common::printf( const char *fmt, ... ) {
 	System::print( msg );
 
 	// logfile
-	if ( com_logfile && com_logfile->integer ) {
+	if ( com_logfile && com_logfile->asInt() ) {
     // TTimo: only open the qconsole.log if the filesystem is in an initialized state
     //   also, avoid recursing in the qconsole.log opening (i.e. if fs_debug is on)
 		if ( !logfile && FileSystem::initialized() && !opening_qconsole) {
@@ -206,7 +206,7 @@ void QDECL Common::printf( const char *fmt, ... ) {
 			{
 				Common::printf( "logfile opened on %s\n", asctime( newtime ) );
 			
-				if ( com_logfile->integer > 1 )
+				if ( com_logfile->asInt() > 1 )
 				{
 					// force it to not buffer so we get valid
 					// data even if we are crashing
@@ -239,7 +239,7 @@ void QDECL Common::dPrintf( const char *fmt, ...) {
 	va_list		argptr;
 	char		msg[MAXPRINTMSG];
 		
-	if ( !com_developer || !com_developer->integer ) {
+	if ( !com_developer || !com_developer->asInt() ) {
 		return;			// don't confuse non-developers with techie stuff...
 	}
 
@@ -274,7 +274,7 @@ void QDECL Common::error( int code, const char *fmt, ... ) {
 
 	// when we are running automated scripts, make sure we
 	// know if anything failed
-	if ( com_buildScript && com_buildScript->integer ) {
+	if ( com_buildScript && com_buildScript->asInt() ) {
 		code = ERR_FATAL;
 	}
 
@@ -296,7 +296,7 @@ void QDECL Common::error( int code, const char *fmt, ... ) {
 	if (code != ERR_DISCONNECT && code != ERR_NEED_CD)
 		CvarSystem::set("com_errorMessage", com_errorMessage);
 
-	restartClient = com_gameClientRestarting && !( com_cl_running && com_cl_running->integer );
+	restartClient = com_gameClientRestarting && !( com_cl_running && com_cl_running->asInt() );
 
 	com_gameRestarting = false;
 	com_gameClientRestarting = false;
@@ -328,7 +328,7 @@ void QDECL Common::error( int code, const char *fmt, ... ) {
 		if ( restartClient ) {
 			ClientLoop::init();
 		}
-		if ( com_cl_running && com_cl_running->integer ) {
+		if ( com_cl_running && com_cl_running->asInt() ) {
 			ClientLoop::disconnect( true );
 			ClientLoop::flushMemory( );
 			ClientLoop::cdDialog();
@@ -1419,10 +1419,10 @@ static void Com_InitZoneMemory( ) {
 	// allocate the random block zone
 	cv = CvarSystem::get( "com_zoneMegs", DEF_COMZONEMEGS_S, CVAR_LATCH | CVAR_ARCHIVE );
 
-	if ( cv->integer < DEF_COMZONEMEGS ) {
+	if ( cv->asInt() < DEF_COMZONEMEGS ) {
 		s_zoneTotal = 1024 * 1024 * DEF_COMZONEMEGS;
 	} else {
-		s_zoneTotal = cv->integer * 1024 * 1024;
+		s_zoneTotal = cv->asInt() * 1024 * 1024;
 	}
 
 	mainzone = static_cast<memzone_t *>(calloc( s_zoneTotal, 1 ));
@@ -1538,7 +1538,7 @@ static void Com_InitHunkMemory( ) {
 	CvarSystem::setDescription(cv, "The size of the hunk memory segment");
 
 	// if we are not dedicated min allocation is 56, otherwise min is 1
-	if (com_dedicated && com_dedicated->integer) {
+	if (com_dedicated && com_dedicated->asInt()) {
 		nMinAlloc = MIN_DEDICATED_COMHUNKMEGS;
 		pMsg = "Minimum com_hunkMegs for a dedicated server is %i, allocating %i megs.\n";
 	}
@@ -1547,11 +1547,11 @@ static void Com_InitHunkMemory( ) {
 		pMsg = "Minimum com_hunkMegs is %i, allocating %i megs.\n";
 	}
 
-	if ( cv->integer < nMinAlloc ) {
+	if ( cv->asInt() < nMinAlloc ) {
 		s_hunkTotal = 1024 * 1024 * nMinAlloc;
 	    Common::printf(pMsg, nMinAlloc, s_hunkTotal / (1024 * 1024));
 	} else {
-		s_hunkTotal = cv->integer * 1024 * 1024;
+		s_hunkTotal = cv->asInt() * 1024 * 1024;
 	}
 
 	s_hunkData = static_cast<byte *>(calloc( s_hunkTotal + 31, 1 ));
@@ -1889,15 +1889,15 @@ Com_InitJournaling
 static void Com_InitJournaling( ) {
 	Common::startupVariable( "journal" );
 	com_journal = CvarSystem::get ("journal", "0", CVAR_INIT);
-	if ( !com_journal->integer ) {
+	if ( !com_journal->asInt() ) {
 		return;
 	}
 
-	if ( com_journal->integer == 1 ) {
+	if ( com_journal->asInt() == 1 ) {
 		Common::printf( "Journaling events\n");
 		com_journalFile = FileSystem::fOpenFileWrite_HomeState( "journal.dat" );
 		com_journalDataFile = FileSystem::fOpenFileWrite_HomeState( "journaldata.dat" );
-	} else if ( com_journal->integer == 2 ) {
+	} else if ( com_journal->asInt() == 2 ) {
 		Common::printf( "Replaying journaled events\n");
 		FileSystem::fOpenFileRead( "journal.dat", &com_journalFile, true );
 		FileSystem::fOpenFileRead( "journaldata.dat", &com_journalDataFile, true );
@@ -2035,7 +2035,7 @@ static sysEvent_t	Com_GetRealEvent( ) {
 	sysEvent_t	ev;
 
 	// either get an event from the system or the journal file
-	if ( com_journal->integer == 2 ) {
+	if ( com_journal->asInt() == 2 ) {
 		r = FileSystem::read( &ev, sizeof(ev), com_journalFile );
 		if ( r != sizeof(ev) ) {
 			Common::error( ERR_FATAL, "Error reading from journal file" );
@@ -2051,7 +2051,7 @@ static sysEvent_t	Com_GetRealEvent( ) {
 		ev = Common::getSystemEvent();
 
 		// write the journal value out if needed
-		if ( com_journal->integer == 1 ) {
+		if ( com_journal->asInt() == 1 ) {
 			r = FileSystem::write( &ev, sizeof(ev), com_journalFile );
 			if ( r != sizeof(ev) ) {
 				Common::error( ERR_FATAL, "Error writing to journal file" );
@@ -2139,16 +2139,16 @@ void Common::runAndTimeServerPacket( netadr_t *evFrom, Message *buf ) {
 
 	t1 = 0;
 
-	if ( com_speeds->integer ) {
+	if ( com_speeds->asInt() ) {
 		t1 = System::milliseconds ();
 	}
 
 	ServerLoop::packetEvent( *evFrom, buf );
 
-	if ( com_speeds->integer ) {
+	if ( com_speeds->asInt() ) {
 		t2 = System::milliseconds ();
 		msec = t2 - t1;
-		if ( com_speeds->integer == 3 ) {
+		if ( com_speeds->asInt() == 3 ) {
 			Common::printf( "SV_PacketEvent time: %i\n", msec );
 		}
 	}
@@ -2181,7 +2181,7 @@ int Common::eventLoop( ) {
 
 			while ( Network::getLoopPacket( NS_SERVER, &evFrom, &buf ) ) {
 				// if the server just shut down, flush the events
-				if ( com_sv_running->integer ) {
+				if ( com_sv_running->asInt() ) {
 					Common::runAndTimeServerPacket( &evFrom, &buf );
 				}
 			}
@@ -2368,10 +2368,10 @@ void Common::gameRestart(int checksumFeed, bool disconnect)
 	if(!com_gameRestarting && com_fullyInitialized)
 	{
 		com_gameRestarting = true;
-		com_gameClientRestarting = com_cl_running->integer;
+		com_gameClientRestarting = com_cl_running->asInt();
 
 		// Kill server if we have one
-		if(com_sv_running->integer)
+		if(com_sv_running->asInt())
 			ServerLoop::shutdown("Game directory changed");
 
 		if(com_gameClientRestarting)
@@ -2551,7 +2551,7 @@ out:
 static void Com_DetectAltivec()
 {
 	// Only detect if user hasn't forcibly disabled it.
-	if (com_altivec->integer) {
+	if (com_altivec->asInt()) {
 		static bool altivec = false;
 		static bool detected = false;
 		if (!detected) {
@@ -2684,7 +2684,7 @@ void Common::init( char *commandLine ) {
 
 	// Add some commands here already so users can use them from config files
 	CommandSystem::addCommand ("setenv", Com_Setenv_f);
-	if (com_developer && com_developer->integer)
+	if (com_developer && com_developer->asInt())
 	{
 		CommandSystem::addCommand ("error", Com_Error_f);
 		CommandSystem::addCommand ("crash", Com_Crash_f);
@@ -2768,11 +2768,11 @@ void Common::init( char *commandLine ) {
 	com_legacyprotocol = CvarSystem::get("com_legacyprotocol", va("%i", PROTOCOL_LEGACY_VERSION), CVAR_INIT);
 
 	// Keep for compatibility with old mods / mods that haven't updated yet.
-	if(com_legacyprotocol->integer > 0)
-		CvarSystem::get("protocol", com_legacyprotocol->string, CVAR_ROM);
+	if(com_legacyprotocol->asInt() > 0)
+		CvarSystem::get("protocol", com_legacyprotocol->asString(), CVAR_ROM);
 	else
 #endif
-		CvarSystem::get("protocol", com_protocol->string, CVAR_ROM);
+		CvarSystem::get("protocol", com_protocol->asString(), CVAR_ROM);
 
 #ifndef DEDICATED
 	con_autochat = CvarSystem::get("con_autochat", "1", CVAR_ARCHIVE);
@@ -2801,12 +2801,12 @@ void Common::init( char *commandLine ) {
 	// add + commands from command line
 	if ( !Com_AddStartupCommands() ) {
 		// if the user didn't give any commands, run default action
-		if ( !com_dedicated->integer ) {
+		if ( !com_dedicated->asInt() ) {
 #ifdef CINEMATICS_LOGO
 			CommandBuffer::addText ("cinematic " CINEMATICS_LOGO "\n");
 #endif
 #ifdef CINEMATICS_INTRO
-			if( !com_introPlayed->integer ) {
+			if( !com_introPlayed->asInt() ) {
 				CvarSystem::set( com_introPlayed->name, "1" );
 				CvarSystem::set( "nextmap", "cinematic " CINEMATICS_INTRO );
 			}
@@ -2827,13 +2827,13 @@ void Common::init( char *commandLine ) {
 	// always set the cvar, but only print the info if it makes sense.
 	Com_DetectAltivec();
 #if idppc
-	Common::printf ("Altivec support is %s\n", com_altivec->integer ? "enabled" : "disabled");
+	Common::printf ("Altivec support is %s\n", com_altivec->asInt() ? "enabled" : "disabled");
 #endif
 
 	com_pipefile = CvarSystem::get( "com_pipefile", "", CVAR_ARCHIVE|CVAR_LATCH );
-	if( com_pipefile->string[0] )
+	if( com_pipefile->asString()[0] )
 	{
-		pipefile = FileSystem::fCreateOpenPipeFile( com_pipefile->string );
+		pipefile = FileSystem::fCreateOpenPipeFile( com_pipefile->asString() );
 	}
 
 	Common::printf ("--- Common Initialization Complete ---\n");
@@ -2931,7 +2931,7 @@ static void Com_WriteConfiguration( ) {
 
 	// not needed for dedicated or standalone
 #if !defined(DEDICATED) && !defined(STANDALONE)
-	if(!com_standalone->integer)
+	if(!com_standalone->asInt())
 	{
 		const char *gamedir;
 		gamedir = CvarSystem::variableString( "fs_game" );
@@ -2984,29 +2984,29 @@ static int Com_ModifyMsec( int msec ) {
 	//
 	// modify time for debugging values
 	//
-	if ( com_fixedtime->integer ) {
-		msec = com_fixedtime->integer;
-	} else if ( com_timescale->value ) {
-		msec *= com_timescale->value;
-	} else if (com_cameraMode->integer) {
-		msec *= com_timescale->value;
+	if ( com_fixedtime->asInt() ) {
+		msec = com_fixedtime->asInt();
+	} else if ( com_timescale->asFloat() ) {
+		msec *= com_timescale->asFloat();
+	} else if (com_cameraMode->asInt()) {
+		msec *= com_timescale->asFloat();
 	}
 	
 	// don't let it scale below 1 msec
-	if ( msec < 1 && com_timescale->value) {
+	if ( msec < 1 && com_timescale->asFloat()) {
 		msec = 1;
 	}
 
-	if ( com_dedicated->integer ) {
+	if ( com_dedicated->asInt() ) {
 		// dedicated servers don't want to clamp for a much longer
 		// period, because it would mess up all the client's views
 		// of time.
-		if (com_sv_running->integer && msec > 500)
+		if (com_sv_running->asInt() && msec > 500)
 			Common::printf( "Hitch warning: %i msec frame time\n", msec );
 
 		clampTime = 5000;
 	} else 
-	if ( !com_sv_running->integer ) {
+	if ( !com_sv_running->asInt() ) {
 		// clients of remote servers do not want to clamp time, because
 		// it would skew their view of the server's time temporarily
 		clampTime = 5000;
@@ -3078,23 +3078,23 @@ void Common::frame( ) {
 	//
 	// main event loop
 	//
-	if ( com_speeds->integer ) {
+	if ( com_speeds->asInt() ) {
 		timeBeforeFirstEvents = System::milliseconds ();
 	}
 
 	// Figure out how much time we have
-	if(!com_timedemo->integer)
+	if(!com_timedemo->asInt())
 	{
-		if(com_dedicated->integer)
+		if(com_dedicated->asInt())
 			minMsec = ServerLoop::frameMsec();
 		else
 		{
-			if(com_minimized->integer && com_maxfpsMinimized->integer > 0)
-				minMsec = 1000 / com_maxfpsMinimized->integer;
-			else if(com_unfocused->integer && com_maxfpsUnfocused->integer > 0)
-				minMsec = 1000 / com_maxfpsUnfocused->integer;
-			else if(com_maxfps->integer > 0)
-				minMsec = 1000 / com_maxfps->integer;
+			if(com_minimized->asInt() && com_maxfpsMinimized->asInt() > 0)
+				minMsec = 1000 / com_maxfpsMinimized->asInt();
+			else if(com_unfocused->asInt() && com_maxfpsUnfocused->asInt() > 0)
+				minMsec = 1000 / com_maxfpsUnfocused->asInt();
+			else if(com_maxfps->asInt() > 0)
+				minMsec = 1000 / com_maxfps->asInt();
 			else
 				minMsec = 1;
 			
@@ -3114,7 +3114,7 @@ void Common::frame( ) {
 
 	do
 	{
-		if(com_sv_running->integer)
+		if(com_sv_running->asInt())
 		{
 			timeValSV = ServerLoop::sendQueuedPackets();
 			
@@ -3126,7 +3126,7 @@ void Common::frame( ) {
 		else
 			timeVal = Com_TimeVal(minMsec);
 		
-		if(com_busyWait->integer || timeVal < 1)
+		if(com_busyWait->asInt() || timeVal < 1)
 			Network::sleep(0);
 		else
 			Network::sleep(timeVal - 1);
@@ -3153,7 +3153,7 @@ void Common::frame( ) {
 	//
 	// server side
 	//
-	if ( com_speeds->integer ) {
+	if ( com_speeds->asInt() ) {
 		timeBeforeServer = System::milliseconds ();
 	}
 
@@ -3167,7 +3167,7 @@ void Common::frame( ) {
 		// get the latched value
 		CvarSystem::get( "dedicated", "0", 0 );
 		com_dedicated->modified = false;
-		if ( !com_dedicated->integer ) {
+		if ( !com_dedicated->asInt() ) {
 			ServerLoop::shutdown( "dedicated set to 0" );
 			ClientLoop::flushMemory();
 		}
@@ -3181,7 +3181,7 @@ void Common::frame( ) {
 	// run event loop a second time to get server to client packets
 	// without a frame of latency
 	//
-	if ( com_speeds->integer ) {
+	if ( com_speeds->asInt() ) {
 		timeBeforeEvents = System::milliseconds ();
 	}
 	Common::eventLoop();
@@ -3191,17 +3191,17 @@ void Common::frame( ) {
 	//
 	// client side
 	//
-	if ( com_speeds->integer ) {
+	if ( com_speeds->asInt() ) {
 		timeBeforeClient = System::milliseconds ();
 	}
 
 	ClientLoop::frame( msec );
 
-	if ( com_speeds->integer ) {
+	if ( com_speeds->asInt() ) {
 		timeAfter = System::milliseconds ();
 	}
 #else
-	if ( com_speeds->integer ) {
+	if ( com_speeds->asInt() ) {
 		timeAfter = System::milliseconds ();
 		timeBeforeEvents = timeAfter;
 		timeBeforeClient = timeAfter;
@@ -3214,7 +3214,7 @@ void Common::frame( ) {
 	//
 	// report timing information
 	//
-	if ( com_speeds->integer ) {
+	if ( com_speeds->asInt() ) {
 		int			all, sv, ev, cl;
 
 		all = timeAfter - timeBeforeServer;
@@ -3231,7 +3231,7 @@ void Common::frame( ) {
 	//
 	// trace optimization tracking
 	//
-	if ( com_showtrace->integer ) {
+	if ( com_showtrace->asInt() ) {
 	
 		extern	int c_traces, c_brush_traces, c_patch_traces;
 		extern	int	c_pointcontents;
@@ -3267,7 +3267,7 @@ void Common::shutdown () {
 
 	if( pipefile ) {
 		FileSystem::fCloseFile( pipefile );
-		FileSystem::remove_HomeData( com_pipefile->string );
+		FileSystem::remove_HomeData( com_pipefile->asString() );
 	}
 
 }
@@ -3465,7 +3465,7 @@ void Field_CompleteCommand( char *cmd,
 
 #ifndef DEDICATED
 	// add a '\' to the start of the buffer if it might be sent as chat otherwise
-	if( con_autochat->integer && completionField->buffer[ 0 ] &&
+	if( con_autochat->asInt() && completionField->buffer[ 0 ] &&
 			completionField->buffer[ 0 ] != '\\' )
 	{
 		if( completionField->buffer[ 0 ] != '/' )

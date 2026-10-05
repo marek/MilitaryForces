@@ -103,10 +103,10 @@ struct ServerStatic
 
 	int				snapFlagServerBit_;			// ^= SNAPFLAG_SERVERCOUNT every ServerMain::spawnServer()
 
-//	SV_Client*		clients_;					// [sv_maxclients->integer];
+//	SV_Client*		clients_;					// [sv_maxclients->asInt()];
 	SVClientList	svClients_;					// replaces former clients_ member
 
-	int				numSnapshotEntities_;		// sv_maxclients->integer*PACKET_BACKUP*MAX_PACKET_ENTITIES
+	int				numSnapshotEntities_;		// sv_maxclients->asInt()*PACKET_BACKUP*MAX_PACKET_ENTITIES
 	int				nextSnapshotEntities_;		// next snapshotEntities to use
 	entityState_t*	snapshotEntities_;			// [numSnapshotEntities]
 	int				nextHeartbeatTime_;

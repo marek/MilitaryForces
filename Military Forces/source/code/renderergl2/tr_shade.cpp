@@ -927,14 +927,14 @@ static void ForwardDlight( ) {
 		{
 			R_BindAnimatedImageToTMU( &pStage->bundle[TB_NORMALMAP], TB_NORMALMAP);
 		}
-		else if (r_normalMapping->integer)
+		else if (r_normalMapping->asInt())
 			GL_BindToTMU( tr.whiteImage, TB_NORMALMAP );
 
 		if (pStage->bundle[TB_SPECULARMAP].image[0])
 		{
 			R_BindAnimatedImageToTMU( &pStage->bundle[TB_SPECULARMAP], TB_SPECULARMAP);
 		}
-		else if (r_specularMapping->integer)
+		else if (r_specularMapping->asInt())
 			GL_BindToTMU( tr.whiteImage, TB_SPECULARMAP );
 
 		{
@@ -944,7 +944,7 @@ static void ForwardDlight( ) {
 			sp->setUniformVec4( UNIFORM_ENABLETEXTURES, enableTextures );
 		}
 
-		if (r_dlightMode->integer >= 2)
+		if (r_dlightMode->asInt() >= 2)
 			GL_BindToTMU(tr.shadowCubemaps[l], TB_SHADOWMAP);
 
 		ComputeTexMods( pStage, TB_DIFFUSEMAP, texMatrix );
@@ -1231,12 +1231,12 @@ static void RB_IterateStagesGeneric( shaderCommands_t *input )
 				}
 			}
 
-			if (r_sunlightMode->integer && (backEnd.viewParms.flags & VPF_USESUNLIGHT) && (index & LIGHTDEF_LIGHTTYPE_MASK))
+			if (r_sunlightMode->asInt() && (backEnd.viewParms.flags & VPF_USESUNLIGHT) && (index & LIGHTDEF_LIGHTTYPE_MASK))
 			{
 				index |= LIGHTDEF_USE_SHADOWMAP;
 			}
 
-			if (r_lightmap->integer && ((index & LIGHTDEF_LIGHTTYPE_MASK) == LIGHTDEF_USE_LIGHTMAP))
+			if (r_lightmap->asInt() && ((index & LIGHTDEF_LIGHTTYPE_MASK) == LIGHTDEF_USE_LIGHTMAP))
 			{
 				index = LIGHTDEF_USE_TCGEN_AND_TCMOD;
 			}
@@ -1342,7 +1342,7 @@ static void RB_IterateStagesGeneric( shaderCommands_t *input )
 			sp->setUniformVec4( UNIFORM_FOGCOLORMASK, fogColorMask );
 		}
 
-		if (r_lightmap->integer)
+		if (r_lightmap->asInt())
 		{
 			vec4_t st[2];
 			VectorSet4(st[0], 1.0f, 0.0f, 0.0f, 0.0f);
@@ -1393,7 +1393,7 @@ static void RB_IterateStagesGeneric( shaderCommands_t *input )
 			if (renderToCubemap)
 			{
 				// force specular to nonmetal if rendering cubemaps
-				if (r_pbr->integer)
+				if (r_pbr->asInt())
 					specularScale[1] = 0.0f;
 			}
 
@@ -1417,13 +1417,13 @@ static void RB_IterateStagesGeneric( shaderCommands_t *input )
 			int i;
 			vec4_t enableTextures;
 
-			if (r_sunlightMode->integer && (backEnd.viewParms.flags & VPF_USESUNLIGHT) && (pStage->glslShaderIndex & LIGHTDEF_LIGHTTYPE_MASK))
+			if (r_sunlightMode->asInt() && (backEnd.viewParms.flags & VPF_USESUNLIGHT) && (pStage->glslShaderIndex & LIGHTDEF_LIGHTTYPE_MASK))
 			{
 				// FIXME: screenShadowImage is NULL if no framebuffers
 				if (tr.screenShadowImage)
 					GL_BindToTMU(tr.screenShadowImage, TB_SHADOWMAP);
 				sp->setUniformVec3( UNIFORM_PRIMARYLIGHTAMBIENT, backEnd.refdef.sunAmbCol );
-				if (r_pbr->integer)
+				if (r_pbr->asInt())
 				{
 					vec3_t color;
 
@@ -1440,7 +1440,7 @@ static void RB_IterateStagesGeneric( shaderCommands_t *input )
 			}
 
 			VectorSet4(enableTextures, 0, 0, 0, 0);
-			if ((r_lightmap->integer == 1 || r_lightmap->integer == 2) && pStage->bundle[TB_LIGHTMAP].image[0])
+			if ((r_lightmap->asInt() == 1 || r_lightmap->asInt() == 2) && pStage->bundle[TB_LIGHTMAP].image[0])
 			{
 				for (i = 0; i < NUM_TEXTURE_BUNDLES; i++)
 				{
@@ -1450,7 +1450,7 @@ static void RB_IterateStagesGeneric( shaderCommands_t *input )
 						GL_BindToTMU( tr.whiteImage, i );
 				}
 			}
-			else if (r_lightmap->integer == 3 && pStage->bundle[TB_DELUXEMAP].image[0])
+			else if (r_lightmap->asInt() == 3 && pStage->bundle[TB_DELUXEMAP].image[0])
 			{
 				for (i = 0; i < NUM_TEXTURE_BUNDLES; i++)
 				{
@@ -1463,7 +1463,7 @@ static void RB_IterateStagesGeneric( shaderCommands_t *input )
 			else
 			{
 				bool light = (pStage->glslShaderIndex & LIGHTDEF_LIGHTTYPE_MASK) != 0;
-				bool fastLight = !(r_normalMapping->integer || r_specularMapping->integer);
+				bool fastLight = !(r_normalMapping->asInt() || r_specularMapping->asInt());
 
 				if (pStage->bundle[TB_DIFFUSEMAP].image[0])
 					R_BindAnimatedImageToTMU( &pStage->bundle[TB_DIFFUSEMAP], TB_DIFFUSEMAP);
@@ -1487,7 +1487,7 @@ static void RB_IterateStagesGeneric( shaderCommands_t *input )
 						R_BindAnimatedImageToTMU( &pStage->bundle[TB_NORMALMAP], TB_NORMALMAP);
 						enableTextures[0] = 1.0f;
 					}
-					else if (r_normalMapping->integer)
+					else if (r_normalMapping->asInt())
 						GL_BindToTMU( tr.whiteImage, TB_NORMALMAP );
 
 					if (pStage->bundle[TB_DELUXEMAP].image[0])
@@ -1495,7 +1495,7 @@ static void RB_IterateStagesGeneric( shaderCommands_t *input )
 						R_BindAnimatedImageToTMU( &pStage->bundle[TB_DELUXEMAP], TB_DELUXEMAP);
 						enableTextures[1] = 1.0f;
 					}
-					else if (r_deluxeMapping->integer)
+					else if (r_deluxeMapping->asInt())
 						GL_BindToTMU( tr.whiteImage, TB_DELUXEMAP );
 
 					if (pStage->bundle[TB_SPECULARMAP].image[0])
@@ -1503,11 +1503,11 @@ static void RB_IterateStagesGeneric( shaderCommands_t *input )
 						R_BindAnimatedImageToTMU( &pStage->bundle[TB_SPECULARMAP], TB_SPECULARMAP);
 						enableTextures[2] = 1.0f;
 					}
-					else if (r_specularMapping->integer)
+					else if (r_specularMapping->asInt())
 						GL_BindToTMU( tr.whiteImage, TB_SPECULARMAP );
 				}
 
-				enableTextures[3] = (r_cubeMapping->integer && !(tr.viewParms.flags & VPF_NOCUBEMAPS) && input->cubemapIndex) ? 1.0f : 0.0f;
+				enableTextures[3] = (r_cubeMapping->asInt() && !(tr.viewParms.flags & VPF_NOCUBEMAPS) && input->cubemapIndex) ? 1.0f : 0.0f;
 			}
 
 			sp->setUniformVec4( UNIFORM_ENABLETEXTURES, enableTextures );
@@ -1528,7 +1528,7 @@ static void RB_IterateStagesGeneric( shaderCommands_t *input )
 		//
 		// testing cube map
 		//
-		if (!(tr.viewParms.flags & VPF_NOCUBEMAPS) && input->cubemapIndex && r_cubeMapping->integer)
+		if (!(tr.viewParms.flags & VPF_NOCUBEMAPS) && input->cubemapIndex && r_cubeMapping->asInt())
 		{
 			vec4_t vec;
 			cubemap_t *cubemap = &tr.cubemaps[input->cubemapIndex - 1];
@@ -1551,7 +1551,7 @@ static void RB_IterateStagesGeneric( shaderCommands_t *input )
 		R_DrawElements(input->numIndexes, input->firstIndex);
 
 		// allow skipping out to show just lightmaps during development
-		if ( r_lightmap->integer && ( pStage->bundle[0].isLightmap || pStage->bundle[1].isLightmap ) )
+		if ( r_lightmap->asInt() && ( pStage->bundle[0].isLightmap || pStage->bundle[1].isLightmap ) )
 		{
 			break;
 		}
@@ -1661,7 +1661,7 @@ void RB_StageIteratorGeneric( )
 	//
 	// log this call
 	//
-	if ( r_logFile->integer ) 
+	if ( r_logFile->asInt() ) 
 	{
 		// don't just call LogComment, or we will get
 		// a call to va() every frame!
@@ -1747,7 +1747,7 @@ void RB_StageIteratorGeneric( )
 	//
 	// pshadows!
 	//
-	if (glRefConfig.framebufferObject && r_shadows->integer == 4 && tess.pshadowBits
+	if (glRefConfig.framebufferObject && r_shadows->asInt() == 4 && tess.pshadowBits
 		&& tess.shader->sort <= SS_OPAQUE && !(tess.shader->surfaceFlags & (SURF_NODLIGHT | SURF_SKY) ) ) {
 		ProjectPshadowVBOGLSL();
 	}
@@ -1756,10 +1756,10 @@ void RB_StageIteratorGeneric( )
 	// 
 	// now do any dynamic lighting needed
 	//
-	if ( tess.dlightBits && tess.shader->sort <= SS_OPAQUE && r_lightmap->integer == 0
+	if ( tess.dlightBits && tess.shader->sort <= SS_OPAQUE && r_lightmap->asInt() == 0
 		&& !(tess.shader->surfaceFlags & (SURF_NODLIGHT | SURF_SKY) ) ) {
 		if (tess.shader->numUnfoggedPasses == 1 && tess.xstages[0]->glslShaderGroup == tr.lightallShader
-			&& (tess.xstages[0]->glslShaderIndex & LIGHTDEF_LIGHTTYPE_MASK) && r_dlightMode->integer)
+			&& (tess.xstages[0]->glslShaderIndex & LIGHTDEF_LIGHTTYPE_MASK) && r_dlightMode->asInt())
 		{
 			ForwardDlight();
 		}
@@ -1810,7 +1810,7 @@ void RB_EndSurface( ) {
 	}
 
 	// for debugging of sort order issues, stop rendering after a given sort value
-	if ( r_debugSort->integer && r_debugSort->integer < tess.shader->sort ) {
+	if ( r_debugSort->asInt() && r_debugSort->asInt() < tess.shader->sort ) {
 		return;
 	}
 
@@ -1836,10 +1836,10 @@ void RB_EndSurface( ) {
 	//
 	// draw debugging stuff
 	//
-	if ( r_showtris->integer ) {
+	if ( r_showtris->asInt() ) {
 		DrawTris (input);
 	}
-	if ( r_shownormals->integer ) {
+	if ( r_shownormals->asInt() ) {
 		DrawNormals (input);
 	}
 	// clear shader so we can tell we don't have any unclosed surfaces

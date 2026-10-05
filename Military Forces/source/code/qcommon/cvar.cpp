@@ -106,7 +106,7 @@ float CvarSystem::variableValue( const char *var_name ) {
 	var = findVar (var_name);
 	if (!var)
 		return 0;
-	return var->value;
+	return var->value_;
 }
 
 
@@ -121,7 +121,7 @@ int CvarSystem::variableIntegerValue( const char *var_name ) {
 	var = findVar (var_name);
 	if (!var)
 		return 0;
-	return var->integer;
+	return var->integer_;
 }
 
 
@@ -136,7 +136,7 @@ char *CvarSystem::variableString( const char *var_name ) {
 	var = findVar (var_name);
 	if (!var)
 		return "";
-	return var->string;
+	return var->string_;
 }
 
 
@@ -153,7 +153,7 @@ void CvarSystem::variableStringBuffer( const char *var_name, char *buffer, int b
 		*buffer = 0;
 	}
 	else {
-		Q_strncpyz( buffer, var->string, bufsize );
+		Q_strncpyz( buffer, var->string_, bufsize );
 	}
 }
 
@@ -429,11 +429,11 @@ cvar_t *CvarSystem::get( const char *var_name, const char *var_value, int flags 
 		numIndexes_ = index + 1;
 		
 	var->name = CopyString (var_name);
-	var->string = CopyString (var_value);
+	var->string_ = CopyString (var_value);
 	var->modified = true;
 	var->modificationCount = 1;
-	var->value = atof (var->string);
-	var->integer = atoi(var->string);
+	var->value_ = atof (var->string_);
+	var->integer_ = atoi(var->string_);
 	var->resetString = CopyString( var_value );
 	var->validate = false;
 	var->description = nullptr;
@@ -472,10 +472,10 @@ Prints the value, default, and latched string of the given variable
 */
 void CvarSystem::print( cvar_t *v ) {
 	Common::printf ("\"%s\" is:\"%s" S_COLOR_WHITE "\"",
-			v->name, v->string );
+			v->name, v->string_ );
 
 	if ( !( v->flags & CVAR_ROM ) ) {
-		if ( !Q_stricmp( v->string, v->resetString ) ) {
+		if ( !Q_stricmp( v->string_, v->resetString ) ) {
 			Common::printf (", the default" );
 		} else {
 			Common::printf (" default:\"%s" S_COLOR_WHITE "\"",
@@ -537,7 +537,7 @@ cvar_t *CvarSystem::set2( const char *var_name, const char *value, bool force ) 
 
 	if((var->flags & CVAR_LATCH) && var->latchedString)
 	{
-		if(!strcmp(value, var->string))
+		if(!strcmp(value, var->string_))
 		{
 			Zone::free(var->latchedString);
 			var->latchedString = nullptr;
@@ -547,7 +547,7 @@ cvar_t *CvarSystem::set2( const char *var_name, const char *value, bool force ) 
 		if(!strcmp(value, var->latchedString))
 			return var;
 	}
-	else if(!strcmp(value, var->string))
+	else if(!strcmp(value, var->string_))
 		return var;
 
 	// note what types of cvars have been modified (userinfo, archive, serverinfo, systeminfo)
@@ -567,7 +567,7 @@ cvar_t *CvarSystem::set2( const char *var_name, const char *value, bool force ) 
 			return var;
 		}
 
-		if ((var->flags & CVAR_CHEAT) && !cheats_->integer)
+		if ((var->flags & CVAR_CHEAT) && !cheats_->integer_)
 		{
 			Common::printf ("%s is cheat protected.\n", var_name);
 			return var;
@@ -583,7 +583,7 @@ cvar_t *CvarSystem::set2( const char *var_name, const char *value, bool force ) 
 			}
 			else
 			{
-				if (strcmp(value, var->string) == 0)
+				if (strcmp(value, var->string_) == 0)
 					return var;
 			}
 
@@ -603,17 +603,17 @@ cvar_t *CvarSystem::set2( const char *var_name, const char *value, bool force ) 
 		}
 	}
 
-	if (!strcmp(value, var->string))
+	if (!strcmp(value, var->string_))
 		return var;		// not changed
 
 	var->modified = true;
 	var->modificationCount++;
 	
-	Zone::free (var->string);	// free the old value string
+	Zone::free (var->string_);	// free the old value string
 	
-	var->string = CopyString(value);
-	var->value = atof (var->string);
-	var->integer = atoi (var->string);
+	var->string_ = CopyString(value);
+	var->value_ = atof (var->string_);
+	var->integer_ = atoi (var->string_);
 
 	return var;
 }
@@ -732,7 +732,7 @@ void CvarSystem::setCheatState()
 				Zone::free(var->latchedString);
 				var->latchedString = nullptr;
 			}
-			if (strcmp(var->resetString,var->string))
+			if (strcmp(var->resetString,var->string_))
 				CvarSystem::set(var->name, var->resetString);
 		}
 	}
@@ -931,12 +931,12 @@ void CvarSystem::writeVariables(fileHandle_t f)
 				}
 				Com_sprintf (buffer, sizeof(buffer), "seta %s \"%s\"\n", var->name, var->latchedString);
 			} else {
-				if( strlen( var->name ) + strlen( var->string ) + 10 > sizeof( buffer ) ) {
+				if( strlen( var->name ) + strlen( var->string_ ) + 10 > sizeof( buffer ) ) {
 					Common::printf( S_COLOR_YELLOW "WARNING: value of variable "
 							"\"%s\" too long to write to file\n", var->name );
 					continue;
 				}
-				Com_sprintf (buffer, sizeof(buffer), "seta %s \"%s\"\n", var->name, var->string);
+				Com_sprintf (buffer, sizeof(buffer), "seta %s \"%s\"\n", var->name, var->string_);
 			}
 			FileSystem::write( buffer, strlen( buffer ), f );
 		}
@@ -1011,7 +1011,7 @@ void CvarSystem::list_f( ) {
 			Common::printf(" ");
 		}
 
-		Common::printf (" %s \"%s\"\n", var->name, var->string);
+		Common::printf (" %s \"%s\"\n", var->name, var->string_);
 	}
 
 	Common::printf ("\n%i total cvars\n", i);
@@ -1041,7 +1041,7 @@ void CvarSystem::listModified_f( ) {
 		if ( !var->name || !var->modificationCount )
 			continue;
 
-		value = var->latchedString ? var->latchedString : var->string;
+		value = var->latchedString ? var->latchedString : var->string_;
 		if ( !strcmp( value, var->resetString ) )
 			continue;
 
@@ -1119,8 +1119,8 @@ cvar_t *CvarSystem::unset(cvar_t *cv)
 
 	if(cv->name)
 		Zone::free(cv->name);
-	if(cv->string)
-		Zone::free(cv->string);
+	if(cv->string_)
+		Zone::free(cv->string_);
 	if(cv->latchedString)
 		Zone::free(cv->latchedString);
 	if(cv->resetString)
@@ -1241,7 +1241,7 @@ char *CvarSystem::infoString(int bit)
 	for(var = vars_; var; var = var->next)
 	{
 		if(var->name && (var->flags & bit))
-			Info::setValueForKey (info, var->name, var->string);
+			Info::setValueForKey (info, var->name, var->string_);
 	}
 
 	return info;
@@ -1264,7 +1264,7 @@ char *CvarSystem::infoString_Big(int bit)
 	for (var = vars_; var; var = var->next)
 	{
 		if(var->name && (var->flags & bit))
-			Info::setValueForKey_Big (info, var->name, var->string);
+			Info::setValueForKey_Big (info, var->name, var->string_);
 	}
 	return info;
 }
@@ -1293,7 +1293,7 @@ void CvarSystem::checkRange( cvar_t *var, float min, float max, bool integral )
 	var->integral = integral;
 
 	// Force an initial range check
-	CvarSystem::set( var->name, var->string );
+	CvarSystem::set( var->name, var->string_ );
 }
 
 /*
@@ -1395,18 +1395,18 @@ void	CvarSystem::update( vmCvar_t *vmCvar ) {
 	if ( cv->modificationCount == vmCvar->modificationCount ) {
 		return;
 	}
-	if ( !cv->string ) {
+	if ( !cv->string_ ) {
 		return;		// variable might have been cleared by a cvar_restart
 	}
 	vmCvar->modificationCount = cv->modificationCount;
-	if ( strlen(cv->string)+1 > MAX_CVAR_VALUE_STRING ) 
+	if ( strlen(cv->string_)+1 > MAX_CVAR_VALUE_STRING ) 
 	  Common::error( ERR_DROP, "CvarSystem::update: src %s length %u exceeds MAX_CVAR_VALUE_STRING",
-		     cv->string, 
-		     static_cast<unsigned int>(strlen(cv->string)));
-	Q_strncpyz( vmCvar->string, cv->string,  MAX_CVAR_VALUE_STRING ); 
+		     cv->string_, 
+		     static_cast<unsigned int>(strlen(cv->string_)));
+	Q_strncpyz( vmCvar->string, cv->string_,  MAX_CVAR_VALUE_STRING ); 
 
-	vmCvar->value = cv->value;
-	vmCvar->integer = cv->integer;
+	vmCvar->value = cv->value_;
+	vmCvar->integer = cv->integer_;
 }
 
 /*

@@ -331,7 +331,7 @@ bool Client::openAVIForWriting( const char *fileName )
   Com_Memset( &afd, 0, sizeof( aviFileData_t ) );
 
   // Don't start if a framerate has not been chosen
-  if( cl_aviFrameRate->integer <= 0 )
+  if( cl_aviFrameRate->asInt() <= 0 )
   {
     Common::printf( S_COLOR_RED "cl_aviFrameRate must be >= 1\n" );
     return false;
@@ -349,12 +349,12 @@ bool Client::openAVIForWriting( const char *fileName )
 
   Q_strncpyz( afd.fileName, fileName, MAX_QPATH );
 
-  afd.frameRate = cl_aviFrameRate->integer;
+  afd.frameRate = cl_aviFrameRate->asInt();
   afd.framePeriod = static_cast<int>( 1000000.0f / afd.frameRate );
   afd.width = cls.glconfig.vidWidth;
   afd.height = cls.glconfig.vidHeight;
 
-  if( cl_aviMotionJpeg->integer )
+  if( cl_aviMotionJpeg->asInt() )
     afd.motionJpeg = true;
   else
     afd.motionJpeg = false;

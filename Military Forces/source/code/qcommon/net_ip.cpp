@@ -298,20 +298,20 @@ static bool Sys_StringToSockaddr(const char *s, struct sockaddr *sadr, int sadr_
 		if(family == AF_UNSPEC)
 		{
 			// Decide here and now which protocol family to use
-			if(net_enabled->integer & NET_PRIOV6)
+			if(net_enabled->asInt() & NET_PRIOV6)
 			{
-				if(net_enabled->integer & NET_ENABLEV6)
+				if(net_enabled->asInt() & NET_ENABLEV6)
 					search = SearchAddrInfo(res, AF_INET6);
 				
-				if(!search && (net_enabled->integer & NET_ENABLEV4))
+				if(!search && (net_enabled->asInt() & NET_ENABLEV4))
 					search = SearchAddrInfo(res, AF_INET);
 			}
 			else
 			{
-				if(net_enabled->integer & NET_ENABLEV4)
+				if(net_enabled->asInt() & NET_ENABLEV4)
 					search = SearchAddrInfo(res, AF_INET);
 				
-				if(!search && (net_enabled->integer & NET_ENABLEV6))
+				if(!search && (net_enabled->asInt() & NET_ENABLEV6))
 					search = SearchAddrInfo(res, AF_INET6);
 			}
 		}
@@ -663,7 +663,7 @@ void Sys_SendPacket( int length, const void *data, netadr_t to ) {
 		(ip6_socket == INVALID_SOCKET && to.type == NA_MULTICAST6) )
 		return;
 
-	if(to.type == NA_MULTICAST6 && (net_enabled->integer & NET_DISABLEMCAST))
+	if(to.type == NA_MULTICAST6 && (net_enabled->asInt() & NET_DISABLEMCAST))
 		return;
 
 	memset(&addr, 0, sizeof(addr));
@@ -817,7 +817,7 @@ void Sys_ShowIP() {
 NET_IPSocket
 ====================
 */
-static SOCKET NET_IPSocket( char *net_interface, int port, int *err ) {
+static SOCKET NET_IPSocket( const char *net_interface, int port, int *err ) {
 	SOCKET				newsocket;
 	struct sockaddr_in	address;
 	ioctlarg_t			_true = 1;
@@ -885,7 +885,7 @@ static SOCKET NET_IPSocket( char *net_interface, int port, int *err ) {
 NET_IP6Socket
 ====================
 */
-static SOCKET NET_IP6Socket( char *net_interface, int port, struct sockaddr_in6 *bindto, int *err ) {
+static SOCKET NET_IP6Socket( const char *net_interface, int port, struct sockaddr_in6 *bindto, int *err ) {
 	SOCKET				newsocket;
 	struct sockaddr_in6	address;
 	ioctlarg_t			_true = 1;
@@ -973,24 +973,24 @@ static void NET_SetMulticast6()
 {
 	struct sockaddr_in6 addr;
 
-	if(!*net_mcast6addr->string || !Sys_StringToSockaddr(net_mcast6addr->string, reinterpret_cast<struct sockaddr *>(&addr), sizeof(addr), AF_INET6))
+	if(!*net_mcast6addr->asString() || !Sys_StringToSockaddr(net_mcast6addr->asString(), reinterpret_cast<struct sockaddr *>(&addr), sizeof(addr), AF_INET6))
 	{
 		Common::printf("WARNING: Network::joinMulticast6: Incorrect multicast address given, "
 			   "please set cvar %s to a sane value.\n", net_mcast6addr->name);
 		
-		CvarSystem::setValue(net_enabled->name, net_enabled->integer | NET_DISABLEMCAST);
+		CvarSystem::setValue(net_enabled->name, net_enabled->asInt() | NET_DISABLEMCAST);
 		
 		return;
 	}
 	
 	memcpy(&curgroup.ipv6mr_multiaddr, &addr.sin6_addr, sizeof(curgroup.ipv6mr_multiaddr));
 
-	if(*net_mcast6iface->string)
+	if(*net_mcast6iface->asString())
 	{
 #ifdef _WIN32
-		curgroup.ipv6mr_interface = net_mcast6iface->integer;
+		curgroup.ipv6mr_interface = net_mcast6iface->asInt();
 #else
-		curgroup.ipv6mr_interface = if_nametoindex(net_mcast6iface->string);
+		curgroup.ipv6mr_interface = if_nametoindex(net_mcast6iface->asString());
 #endif
 	}
 	else
@@ -1007,7 +1007,7 @@ void Network::joinMulticast6()
 {
 	int err;
 	
-	if(ip6_socket == INVALID_SOCKET || multicast6_socket != INVALID_SOCKET || (net_enabled->integer & NET_DISABLEMCAST))
+	if(ip6_socket == INVALID_SOCKET || multicast6_socket != INVALID_SOCKET || (net_enabled->asInt() & NET_DISABLEMCAST))
 		return;
 	
 	if(IN6_IS_ADDR_MULTICAST(&boundto.sin6_addr) || IN6_IS_ADDR_UNSPECIFIED(&boundto.sin6_addr))
@@ -1017,7 +1017,7 @@ void Network::joinMulticast6()
 	}
 	else
 	{
-		if((multicast6_socket = NET_IP6Socket(net_mcast6addr->string, ntohs(boundto.sin6_port), nullptr, &err)) == INVALID_SOCKET)
+		if((multicast6_socket = NET_IP6Socket(net_mcast6addr->asString(), ntohs(boundto.sin6_port), nullptr, &err)) == INVALID_SOCKET)
 		{
 			// If the OS does not support binding to multicast addresses, like WinXP, at least try with the normal file descriptor.
 			multicast6_socket = ip6_socket;
@@ -1087,7 +1087,7 @@ static void NET_OpenSocks( int port ) {
 		return;
 	}
 
-	h = gethostbyname( net_socksServer->string );
+	h = gethostbyname( net_socksServer->asString() );
 	if ( h == nullptr ) {
 		Common::printf( "WARNING: NET_OpenSocks: gethostbyname: %s\n", NET_ErrorString() );
 		return;
@@ -1098,7 +1098,7 @@ static void NET_OpenSocks( int port ) {
 	}
 	address.sin_family = AF_INET;
 	address.sin_addr.s_addr = *reinterpret_cast<int *>(h->h_addr_list[0]);
-	address.sin_port = htons( (short)net_socksPort->integer );
+	address.sin_port = htons( (short)net_socksPort->asInt() );
 
 	if ( connect( socks_socket, reinterpret_cast<struct sockaddr *>(&address), sizeof( address ) ) == SOCKET_ERROR ) {
 		Common::printf( "NET_OpenSocks: connect: %s\n", NET_ErrorString() );
@@ -1106,7 +1106,7 @@ static void NET_OpenSocks( int port ) {
 	}
 
 	// send socks authentication handshake
-	if ( *net_socksUsername->string || *net_socksPassword->string ) {
+	if ( *net_socksUsername->asString() || *net_socksPassword->asString() ) {
 		rfc1929 = true;
 	}
 	else {
@@ -1158,17 +1158,17 @@ static void NET_OpenSocks( int port ) {
 		int		plen;
 
 		// build the request
-		ulen = strlen( net_socksUsername->string );
-		plen = strlen( net_socksPassword->string );
+		ulen = strlen( net_socksUsername->asString() );
+		plen = strlen( net_socksPassword->asString() );
 
 		buf[0] = 1;		// username/password authentication version
 		buf[1] = ulen;
 		if ( ulen ) {
-			memcpy( &buf[2], net_socksUsername->string, ulen );
+			memcpy( &buf[2], net_socksUsername->asString(), ulen );
 		}
 		buf[2 + ulen] = plen;
 		if ( plen ) {
-			memcpy( &buf[3 + ulen], net_socksPassword->string, plen );
+			memcpy( &buf[3 + ulen], net_socksPassword->asString(), plen );
 		}
 
 		// send it
@@ -1360,8 +1360,8 @@ static void NET_OpenIP( ) {
 	int		port;
 	int		port6;
 
-	port = net_port->integer;
-	port6 = net_port6->integer;
+	port = net_port->asInt();
+	port6 = net_port6->asInt();
 
 	Network::getLocalAddress();
 
@@ -1369,11 +1369,11 @@ static void NET_OpenIP( ) {
 	// dedicated servers can be started without requiring
 	// a different net_port for each one
 
-	if(net_enabled->integer & NET_ENABLEV6)
+	if(net_enabled->asInt() & NET_ENABLEV6)
 	{
 		for( i = 0 ; i < 10 ; i++ )
 		{
-			ip6_socket = NET_IP6Socket(net_ip6->string, port6 + i, &boundto, &err);
+			ip6_socket = NET_IP6Socket(net_ip6->asString(), port6 + i, &boundto, &err);
 			if (ip6_socket != INVALID_SOCKET)
 			{
 				CvarSystem::setValue( "net_port6", port6 + i );
@@ -1389,14 +1389,14 @@ static void NET_OpenIP( ) {
 			Common::printf( "WARNING: Couldn't bind to a v6 ip address.\n");
 	}
 
-	if(net_enabled->integer & NET_ENABLEV4)
+	if(net_enabled->asInt() & NET_ENABLEV4)
 	{
 		for( i = 0 ; i < 10 ; i++ ) {
-			ip_socket = NET_IPSocket( net_ip->string, port + i, &err );
+			ip_socket = NET_IPSocket( net_ip->asString(), port + i, &err );
 			if (ip_socket != INVALID_SOCKET) {
 				CvarSystem::setValue( "net_port", port + i );
 
-				if (net_socksEnabled->integer)
+				if (net_socksEnabled->asInt())
 					NET_OpenSocks( port + i );
 
 				break;
@@ -1504,7 +1504,7 @@ void Network::config( bool enableNetworking ) {
 	// get any latched changes to cvars
 	modified = Network::getCvars();
 
-	if( !net_enabled->integer ) {
+	if( !net_enabled->asInt() ) {
 		enableNetworking = false;
 	}
 
@@ -1563,7 +1563,7 @@ void Network::config( bool enableNetworking ) {
 
 	if( start )
 	{
-		if (net_enabled->integer)
+		if (net_enabled->asInt())
 		{
 			NET_OpenIP();
 			NET_SetMulticast6();
@@ -1635,14 +1635,14 @@ static void NET_Event(fd_set *fdr)
 
 		if(NET_GetPacket(&from, &netmsg, fdr))
 		{
-			if(net_dropsim->value > 0.0f && net_dropsim->value <= 100.0f)
+			if(net_dropsim->asFloat() > 0.0f && net_dropsim->asFloat() <= 100.0f)
 			{
 				// com_dropsim->value percent of incoming packets get dropped.
-				if(rand() < static_cast<int>((static_cast<double>(RAND_MAX)) / 100.0 * static_cast<double>(net_dropsim->value)))
+				if(rand() < static_cast<int>((static_cast<double>(RAND_MAX)) / 100.0 * static_cast<double>(net_dropsim->asFloat())))
 					continue;          // drop this packet
 			}
 
-			if(com_sv_running->integer)
+			if(com_sv_running->asInt())
 				Common::runAndTimeServerPacket(&from, &netmsg);
 			else
 				ClientLoop::packetEvent(from, &netmsg);

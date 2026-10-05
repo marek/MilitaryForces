@@ -54,7 +54,7 @@ static bool	R_CullGrid( srfGridMesh_t *cv ) {
 	int 	boxCull;
 	int 	sphereCull;
 
-	if ( r_nocurves->integer ) {
+	if ( r_nocurves->asInt() ) {
 		return true;
 	}
 
@@ -114,7 +114,7 @@ static bool	R_CullSurface( surfaceType_t *surface, shader_t *shader ) {
 	srfSurfaceFace_t *sface;
 	float			d;
 
-	if ( r_nocull->integer ) {
+	if ( r_nocull->asInt() ) {
 		return false;
 	}
 
@@ -135,7 +135,7 @@ static bool	R_CullSurface( surfaceType_t *surface, shader_t *shader ) {
 	}
 
 	// face culling
-	if ( !r_facePlaneCull->integer ) {
+	if ( !r_facePlaneCull->asInt() ) {
 		return false;
 	}
 
@@ -366,7 +366,7 @@ static void R_RecursiveWorldNode( mnode_t *node, unsigned int planeBits, uint64_
 		// if the bounding volume is outside the frustum, nothing
 		// inside can be visible OPTIMIZE: don't do this all the way to leafs?
 
-		if ( !r_nocull->integer ) {
+		if ( !r_nocull->asInt() ) {
 			int		r;
 
 			if ( planeBits & 1 ) {
@@ -572,7 +572,7 @@ static void R_MarkLeaves () {
 
 	// lockpvs lets designers walk around to determine the
 	// extent of the current pvs
-	if ( r_lockpvs->integer ) {
+	if ( r_lockpvs->asInt() ) {
 		return;
 	}
 
@@ -589,9 +589,9 @@ static void R_MarkLeaves () {
 		return;
 	}
 
-	if ( r_showcluster->modified || r_showcluster->integer ) {
+	if ( r_showcluster->modified || r_showcluster->asInt() ) {
 		r_showcluster->modified = false;
-		if ( r_showcluster->integer ) {
+		if ( r_showcluster->asInt() ) {
 			ri.Printf( PRINT_ALL, "cluster:%i  area:%i\n", cluster, leaf->area );
 		}
 	}
@@ -599,7 +599,7 @@ static void R_MarkLeaves () {
 	tr.visCount++;
 	tr.viewCluster = cluster;
 
-	if ( r_novis->integer || tr.viewCluster == -1 ) {
+	if ( r_novis->asInt() || tr.viewCluster == -1 ) {
 		for (i=0 ; i<tr.world->numnodes ; i++) {
 			if (tr.world->nodes[i].contents != CONTENTS_SOLID) {
 				tr.world->nodes[i].visframe = tr.visCount;
@@ -643,7 +643,7 @@ R_AddWorldSurfaces
 =============
 */
 void R_AddWorldSurfaces () {
-	if ( !r_drawworld->integer ) {
+	if ( !r_drawworld->asInt() ) {
 		return;
 	}
 

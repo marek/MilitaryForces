@@ -207,7 +207,7 @@ int R_CullLocalBox(vec3_t localBounds[2]) {
 	int			anyBack;
 	int			front, back;
 
-	if ( r_nocull->integer ) {
+	if ( r_nocull->asInt() ) {
 		return CULL_CLIP;
 	}
 
@@ -258,7 +258,7 @@ int R_CullLocalBox(vec3_t localBounds[2]) {
 	vec3_t          v;
 	vec3_t          worldBounds[2];
 
-	if(r_nocull->integer)
+	if(r_nocull->asInt())
 	{
 		return CULL_CLIP;
 	}
@@ -347,7 +347,7 @@ int R_CullPointAndRadiusEx( const vec3_t pt, float radius, const cplane_t* frust
 	const cplane_t	*frust;
 	bool mightBeClipped = false;
 
-	if ( r_nocull->integer ) {
+	if ( r_nocull->asInt() ) {
 		return CULL_CLIP;
 	}
 
@@ -753,7 +753,7 @@ R_SetupProjection
 void R_SetupProjection(viewParms_t *dest, float zProj, float zFar, bool computeFrustum)
 {
 	float	xmin, xmax, ymin, ymax;
-	float	width, height, stereoSep = r_stereoSeparation->value;
+	float	width, height, stereoSep = r_stereoSeparation->asFloat();
 
 	/*
 	 * offset the view origin of the viewer for stereo rendering 
@@ -810,7 +810,7 @@ void R_SetupProjectionZ(viewParms_t *dest)
 {
 	float zNear, zFar, depth;
 	
-	zNear = r_znear->value;
+	zNear = r_znear->asFloat();
 	zFar	= dest->zFar;
 
 	depth	= zFar - zNear;
@@ -1310,7 +1310,7 @@ bool R_MirrorViewBySurface (drawSurf_t *drawSurf, int entityNum) {
 		return false;
 	}
 
-	if ( r_noportals->integer || (r_fastsky->integer == 1) ) {
+	if ( r_noportals->asInt() || (r_fastsky->asInt() == 1) ) {
 		return false;
 	}
 
@@ -1540,7 +1540,7 @@ void R_SortDrawSurfs( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 		// if the mirror was completely clipped away, we may need to check another surface
 		if ( R_MirrorViewBySurface( (drawSurfs+i), entityNum) ) {
 			// this is a debug option to see exactly what is being mirrored
-			if ( r_portalOnly->integer ) {
+			if ( r_portalOnly->asInt() ) {
 				return;
 			}
 			break;		// only one mirror view at a time
@@ -1638,7 +1638,7 @@ R_AddEntitySurfaces
 void R_AddEntitySurfaces () {
 	int i;
 
-	if ( !r_drawentities->integer ) {
+	if ( !r_drawentities->asInt() ) {
 		return;
 	}
 
@@ -1720,7 +1720,7 @@ void R_DebugGraphics( ) {
 	if ( tr.refdef.rdflags & RDF_NOWORLDMODEL ) {
 		return;
 	}
-	if ( !r_debugSurface->integer ) {
+	if ( !r_debugSurface->asInt() ) {
 		return;
 	}
 
@@ -1761,7 +1761,7 @@ void R_RenderView (viewParms_t *parms) {
 	// set viewParms.world
 	R_RotateForViewer ();
 
-	R_SetupProjection(&tr.viewParms, r_zproj->value, tr.viewParms.zFar, true);
+	R_SetupProjection(&tr.viewParms, r_zproj->asFloat(), tr.viewParms.zFar, true);
 
 	R_GenerateDrawSurfs();
 
@@ -1934,7 +1934,7 @@ void R_RenderPshadowMaps(const refdef_t *fd)
 
 			// Cull entities that are behind the viewer by more than lightRadius
 			VectorSubtract(ent->e.origin, fd->vieworg, diff);
-			if (DotProduct(diff, fd->viewaxis[0]) < -r_pshadowDist->value)
+			if (DotProduct(diff, fd->viewaxis[0]) < -r_pshadowDist->asFloat())
 				continue;
 
 			memset(&shadow, 0, sizeof(shadow));
@@ -1942,7 +1942,7 @@ void R_RenderPshadowMaps(const refdef_t *fd)
 			shadow.numEntities = 1;
 			shadow.entityNums[0] = i;
 			shadow.viewRadius = radius;
-			shadow.lightRadius = r_pshadowDist->value;
+			shadow.lightRadius = r_pshadowDist->asFloat();
 			VectorCopy(ent->e.origin, shadow.viewOrigin);
 			shadow.sort = DotProduct(diff, diff) / (radius * radius);
 			VectorCopy(ent->e.origin, shadow.entityOrigins[0]);
@@ -2215,7 +2215,7 @@ void R_RenderSunShadowMaps(const refdef_t *fd, int level)
 	vec3_t lightviewBounds[2];
 	bool lightViewIndependentOfCameraView = false;
 
-	if (r_forceSun->integer == 2)
+	if (r_forceSun->asInt() == 2)
 	{
 		int scale = 32768;
 		float angle = (fd->time % scale) / static_cast<float>(scale) * std::numbers::pi_v<float>;
@@ -2248,15 +2248,15 @@ void R_RenderSunShadowMaps(const refdef_t *fd, int level)
 		VectorCopy4(tr.refdef.sunDir, lightDir);
 	}
 
-	viewZNear = r_shadowCascadeZNear->value;
-	viewZFar = r_shadowCascadeZFar->value;
-	splitBias = r_shadowCascadeZBias->value;
+	viewZNear = r_shadowCascadeZNear->asFloat();
+	viewZFar = r_shadowCascadeZFar->asFloat();
+	splitBias = r_shadowCascadeZBias->asFloat();
 
 	switch(level)
 	{
 		case 0:
 		default:
-			//splitZNear = r_znear->value;
+			//splitZNear = r_znear->asFloat();
 			//splitZFar  = 256;
 			splitZNear = viewZNear;
 			splitZFar = CalcSplit(viewZNear, viewZFar, 1, 3) + splitBias;
@@ -2615,7 +2615,7 @@ void R_RenderCubemapSide( int cubemapIndex, int cubemapSide, bool subscene )
 
 		// FIXME: sun shadows aren't rendered correctly in cubemaps
 		// fix involves changing r_FBufScale to fit smaller cubemap image size, or rendering cubemap to framebuffer first
-		if(false) //(glRefConfig.framebufferObject && r_sunlightMode->integer && (r_forceSun->integer || tr.sunShadows))
+		if(false) //(glRefConfig.framebufferObject && r_sunlightMode->asInt() && (r_forceSun->asInt() || tr.sunShadows))
 		{
 			R_RenderSunShadowMaps(&refdef, 0);
 			R_RenderSunShadowMaps(&refdef, 1);
@@ -2660,7 +2660,7 @@ void R_RenderCubemapSide( int cubemapIndex, int cubemapSide, bool subscene )
 
 	// FIXME: sun shadows aren't rendered correctly in cubemaps
 	// fix involves changing r_FBufScale to fit smaller cubemap image size, or rendering cubemap to framebuffer first
-	if (false) //(r_depthPrepass->value && ((r_forceSun->integer) || tr.sunShadows))
+	if (false) //(r_depthPrepass->asFloat() && ((r_forceSun->asInt()) || tr.sunShadows))
 	{
 		parms.flags = VPF_USESUNLIGHT;
 	}

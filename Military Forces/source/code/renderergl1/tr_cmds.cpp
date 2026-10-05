@@ -27,39 +27,39 @@ R_PerformanceCounters
 =====================
 */
 void R_PerformanceCounters( ) {
-	if ( !r_speeds->integer ) {
+	if ( !r_speeds->asInt() ) {
 		// clear the counters even if we aren't printing
 		Com_Memset( &tr.pc, 0, sizeof( tr.pc ) );
 		Com_Memset( &backEnd.pc, 0, sizeof( backEnd.pc ) );
 		return;
 	}
 
-	if (r_speeds->integer == 1) {
+	if (r_speeds->asInt() == 1) {
 		ri.Printf (PRINT_ALL, "%i/%i shaders/surfs %i leafs %i verts %i/%i tris %.2f mtex %.2f dc\n",
 			backEnd.pc.c_shaders, backEnd.pc.c_surfaces, tr.pc.c_leafs, backEnd.pc.c_vertexes, 
 			backEnd.pc.c_indexes/3, backEnd.pc.c_totalIndexes/3, 
 			R_SumOfUsedImages()/(1000000.0f), backEnd.pc.c_overDraw / static_cast<float>(glConfig.vidWidth * glConfig.vidHeight) ); 
-	} else if (r_speeds->integer == 2) {
+	} else if (r_speeds->asInt() == 2) {
 		ri.Printf (PRINT_ALL, "(patch) %i sin %i sclip  %i sout %i bin %i bclip %i bout\n",
 			tr.pc.c_sphere_cull_patch_in, tr.pc.c_sphere_cull_patch_clip, tr.pc.c_sphere_cull_patch_out, 
 			tr.pc.c_box_cull_patch_in, tr.pc.c_box_cull_patch_clip, tr.pc.c_box_cull_patch_out );
 		ri.Printf (PRINT_ALL, "(md3) %i sin %i sclip  %i sout %i bin %i bclip %i bout\n",
 			tr.pc.c_sphere_cull_md3_in, tr.pc.c_sphere_cull_md3_clip, tr.pc.c_sphere_cull_md3_out, 
 			tr.pc.c_box_cull_md3_in, tr.pc.c_box_cull_md3_clip, tr.pc.c_box_cull_md3_out );
-	} else if (r_speeds->integer == 3) {
+	} else if (r_speeds->asInt() == 3) {
 		ri.Printf (PRINT_ALL, "viewcluster: %i\n", tr.viewCluster );
-	} else if (r_speeds->integer == 4) {
+	} else if (r_speeds->asInt() == 4) {
 		if ( backEnd.pc.c_dlightVertexes ) {
 			ri.Printf (PRINT_ALL, "dlight srf:%i  culled:%i  verts:%i  tris:%i\n", 
 				tr.pc.c_dlightSurfaces, tr.pc.c_dlightSurfacesCulled,
 				backEnd.pc.c_dlightVertexes, backEnd.pc.c_dlightIndexes / 3 );
 		}
 	} 
-	else if (r_speeds->integer == 5 )
+	else if (r_speeds->asInt() == 5 )
 	{
 		ri.Printf( PRINT_ALL, "zFar: %.0f\n", tr.viewParms.zFar );
 	}
-	else if (r_speeds->integer == 6 )
+	else if (r_speeds->asInt() == 6 )
 	{
 		ri.Printf( PRINT_ALL, "flare adds:%i tests:%i renders:%i\n", 
 			backEnd.pc.c_flareAdds, backEnd.pc.c_flareTests, backEnd.pc.c_flareRenders );
@@ -91,7 +91,7 @@ void R_IssueRenderCommands( bool runPerformanceCounters ) {
 	}
 
 	// actually start the commands going
-	if ( !r_skipBackEnd->integer ) {
+	if ( !r_skipBackEnd->asInt() ) {
 		// let it start on the new batch
 		RB_ExecuteRenderCommands( cmdList->cmds );
 	}
@@ -301,7 +301,7 @@ void RE_BeginFrame( stereoFrame_t stereoFrame ) {
 	//
 	// do overdraw measurement
 	//
-	if ( r_measureOverdraw->integer )
+	if ( r_measureOverdraw->asInt() )
 	{
 		if ( glConfig.stencilBits < 4 )
 		{
@@ -309,7 +309,7 @@ void RE_BeginFrame( stereoFrame_t stereoFrame ) {
 			ri.Cvar_Set( "r_measureOverdraw", "0" );
 			r_measureOverdraw->modified = false;
 		}
-		else if ( r_shadows->integer == 2 )
+		else if ( r_shadows->asInt() == 2 )
 		{
 			ri.Printf( PRINT_ALL, "Warning: stencil shadows and overdraw measurement are mutually exclusive\n" );
 			ri.Cvar_Set( "r_measureOverdraw", "0" );
@@ -341,7 +341,7 @@ void RE_BeginFrame( stereoFrame_t stereoFrame ) {
 	//
 	if ( r_textureMode->modified ) {
 		R_IssuePendingRenderCommands();
-		GL_TextureMode( r_textureMode->string );
+		GL_TextureMode( r_textureMode->asString() );
 		r_textureMode->modified = false;
 	}
 
@@ -356,7 +356,7 @@ void RE_BeginFrame( stereoFrame_t stereoFrame ) {
 	}
 
 	// check for errors
-	if ( !r_ignoreGLErrors->integer )
+	if ( !r_ignoreGLErrors->asInt() )
 	{
 		int	err;
 
@@ -381,7 +381,7 @@ void RE_BeginFrame( stereoFrame_t stereoFrame ) {
 	}
 	else
 	{
-		if(r_anaglyphMode->integer)
+		if(r_anaglyphMode->asInt())
 		{
 			if(r_anaglyphMode->modified)
 			{
@@ -420,7 +420,7 @@ void RE_BeginFrame( stereoFrame_t stereoFrame ) {
 			else
 				ri.Error( ERR_FATAL, "RE_BeginFrame: Stereo is enabled, but stereoFrame was %i", stereoFrame );
 
-			R_SetColorMode(colcmd->rgba, stereoFrame, r_anaglyphMode->integer);
+			R_SetColorMode(colcmd->rgba, stereoFrame, r_anaglyphMode->asInt());
 			colcmd->commandId = RC_COLORMASK;
 		}
 		else
@@ -442,7 +442,7 @@ void RE_BeginFrame( stereoFrame_t stereoFrame ) {
 				r_anaglyphMode->modified = false;
 			}
 
-			if (!Q_stricmp(r_drawBuffer->string, "GL_FRONT"))
+			if (!Q_stricmp(r_drawBuffer->asString(), "GL_FRONT"))
 				cmd->buffer = GL_FRONT;
 			else
 				cmd->buffer = GL_BACK;

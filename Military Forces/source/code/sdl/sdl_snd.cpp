@@ -235,18 +235,18 @@ bool SNDDMA_Init()
 	memset(&desired, '\0', sizeof (desired));
 	memset(&obtained, '\0', sizeof (obtained));
 
-	tmp = (static_cast<int>(s_sdlBits->value));
+	tmp = (static_cast<int>(s_sdlBits->asFloat()));
 	if ((tmp != 16) && (tmp != 8))
 		tmp = 16;
 
-	desired.freq = static_cast<int>(s_sdlSpeed->value);
+	desired.freq = static_cast<int>(s_sdlSpeed->asFloat());
 	if(!desired.freq) desired.freq = 22050;
 	desired.format = ((tmp == 16) ? AUDIO_S16SYS : AUDIO_U8);
 
 	// I dunno if this is the best idea, but I'll give it a try...
 	//  should probably check a cvar for this...
-	if (s_sdlDevSamps->value)
-		desired.samples = s_sdlDevSamps->value;
+	if (s_sdlDevSamps->asFloat())
+		desired.samples = s_sdlDevSamps->asFloat();
 	else
 	{
 		// just pick a sane default.
@@ -260,7 +260,7 @@ bool SNDDMA_Init()
 			desired.samples = 2048;  // (*shrug*)
 	}
 
-	desired.channels = static_cast<int>(s_sdlChannels->value);
+	desired.channels = static_cast<int>(s_sdlChannels->asFloat());
 	desired.callback = SNDDMA_AudioCallback;
 
 	sdlPlaybackDevice = SDL_OpenAudioDevice(nullptr, SDL_FALSE, &desired, &obtained, SDL_AUDIO_ALLOW_ANY_CHANGE);
@@ -280,7 +280,7 @@ bool SNDDMA_Init()
 	// 32768 is what the OSS driver filled in here on my system. I don't
 	//  know if it's a good value overall, but at least we know it's
 	//  reasonable...this is why I let the user override.
-	tmp = s_sdlMixSamps->value;
+	tmp = s_sdlMixSamps->asFloat();
 	if (!tmp)
 		tmp = (obtained.samples * obtained.channels) * 10;
 
@@ -301,12 +301,12 @@ bool SNDDMA_Init()
 #ifdef USE_SDL_AUDIO_CAPTURE
 	// !!! FIXME: some of these SDL_OpenAudioDevice() values should be cvars.
 	s_sdlCapture = CvarSystem::get( "s_sdlCapture", "1", CVAR_ARCHIVE | CVAR_LATCH );
-	if (!s_sdlCapture->integer)
+	if (!s_sdlCapture->asInt())
 	{
 		Common::printf("SDL audio capture support disabled by user ('+set s_sdlCapture 1' to enable)\n");
 	}
 #if USE_MUMBLE
-	else if (cl_useMumble->integer)
+	else if (cl_useMumble->asInt())
 	{
 		Common::printf("SDL audio capture support disabled for Mumble support\n");
 	}

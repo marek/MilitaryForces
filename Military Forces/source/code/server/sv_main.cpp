@@ -216,13 +216,13 @@ void QDECL ServerMain::sendServerCommand( SV_Client *cl, const char *fmt, ... )
 	}
 
 	// hack to echo broadcast prints to console
-	if( com_dedicated->integer && !strncmp( reinterpret_cast<char *>(message), "print", 5) ) 
+	if( com_dedicated->asInt() && !strncmp( reinterpret_cast<char *>(message), "print", 5) ) 
 	{
 		Common::printf ("broadcast: %s\n", SV_ExpandNewlines(reinterpret_cast<char *>(message)) );
 	}
 
 	// send the data to all relevent clients
-	for( int j = 1; j <= sv_maxclients->integer; j++ )
+	for( int j = 1; j <= sv_maxclients->asInt(); j++ )
 	{
 		SV_Client* client = theSVS.svClients_.at(j);
 
@@ -265,14 +265,14 @@ static void SV_MasterHeartbeat(const char *message)
 	netenabled = CvarSystem::variableIntegerValue("net_enabled");
 
 	// "dedicated 1" is for lan play, "dedicated 2" is for inet public play
-	if (!com_dedicated || com_dedicated->integer != 2 || !(netenabled & (NET_ENABLEV4 | NET_ENABLEV6)))
+	if (!com_dedicated || com_dedicated->asInt() != 2 || !(netenabled & (NET_ENABLEV4 | NET_ENABLEV6)))
 		return;		// only dedicated servers send heartbeats
 
 	// if not time yet, don't send anything
 	if ( theSVS.time_ < theSVS.nextHeartbeatTime_ )
 		return;
 
-	if ( !Q_stricmp( com_gamename->string, LEGACY_MASTER_GAMENAME ) )
+	if ( !Q_stricmp( com_gamename->asString(), LEGACY_MASTER_GAMENAME ) )
 		message = LEGACY_HEARTBEAT_FOR_MASTER;
 
 	theSVS.nextHeartbeatTime_ = theSVS.time_ + HEARTBEAT_MSEC;
@@ -280,7 +280,7 @@ static void SV_MasterHeartbeat(const char *message)
 	// send to group masters
 	for (i = 0; i < MAX_MASTER_SERVERS; i++)
 	{
-		if(!sv_master[i]->string[0])
+		if(!sv_master[i]->asString()[0])
 			continue;
 
 		// see if we haven't already resolved the name or if it's been over 24 hours
@@ -292,8 +292,8 @@ static void SV_MasterHeartbeat(const char *message)
 			
 			if(netenabled & NET_ENABLEV4)
 			{
-				Common::printf("Resolving %s (IPv4)\n", sv_master[i]->string);
-				res = Network::stringToAdr(sv_master[i]->string, &adr[i][0], NA_IP);
+				Common::printf("Resolving %s (IPv4)\n", sv_master[i]->asString());
+				res = Network::stringToAdr(sv_master[i]->asString(), &adr[i][0], NA_IP);
 
 				if(res == 2)
 				{
@@ -302,15 +302,15 @@ static void SV_MasterHeartbeat(const char *message)
 				}
 				
 				if(res)
-					Common::printf( "%s resolved to %s\n", sv_master[i]->string, Network::adrToStringwPort(adr[i][0]));
+					Common::printf( "%s resolved to %s\n", sv_master[i]->asString(), Network::adrToStringwPort(adr[i][0]));
 				else
-					Common::printf( "%s has no IPv4 address.\n", sv_master[i]->string);
+					Common::printf( "%s has no IPv4 address.\n", sv_master[i]->asString());
 			}
 			
 			if(netenabled & NET_ENABLEV6)
 			{
-				Common::printf("Resolving %s (IPv6)\n", sv_master[i]->string);
-				res = Network::stringToAdr(sv_master[i]->string, &adr[i][1], NA_IP6);
+				Common::printf("Resolving %s (IPv6)\n", sv_master[i]->asString());
+				res = Network::stringToAdr(sv_master[i]->asString(), &adr[i][1], NA_IP6);
 
 				if(res == 2)
 				{
@@ -319,9 +319,9 @@ static void SV_MasterHeartbeat(const char *message)
 				}
 				
 				if(res)
-					Common::printf( "%s resolved to %s\n", sv_master[i]->string, Network::adrToStringwPort(adr[i][1]));
+					Common::printf( "%s resolved to %s\n", sv_master[i]->asString(), Network::adrToStringwPort(adr[i][1]));
 				else
-					Common::printf( "%s has no IPv6 address.\n", sv_master[i]->string);
+					Common::printf( "%s has no IPv6 address.\n", sv_master[i]->asString());
 			}
 		}
 
@@ -331,7 +331,7 @@ static void SV_MasterHeartbeat(const char *message)
 		}
 
 
-		Common::printf ("Sending heartbeat to %s\n", sv_master[i]->string );
+		Common::printf ("Sending heartbeat to %s\n", sv_master[i]->asString() );
 
 		// this command should be changed if the server info / status format
 		// ever incompatably changes
@@ -589,7 +589,7 @@ static void SVC_Status( netadr_t from )
 	char	player[1024];
 //	playerState_t	*ps;
 
-	for( int i = 1; i <= sv_maxclients->integer; i++ )
+	for( int i = 1; i <= sv_maxclients->asInt(); i++ )
 	{
 		SV_Client* cl = theSVS.svClients_.at(i);
 		if( cl && cl->state_ >= SV_Client::CS_CONNECTED ) 
@@ -648,7 +648,7 @@ static void SVC_Info( netadr_t from )
 
 	// don't count privateclients
 	int count = 0, humans = 0;
-	for( int i = sv_privateClients->integer + 1 ; i <= sv_maxclients->integer ; i++ ) 
+	for( int i = sv_privateClients->asInt() + 1 ; i <= sv_maxclients->asInt() ; i++ ) 
 	{
 		SV_Client* cl = theSVS.svClients_.at(i);
 		if( !cl )
@@ -668,23 +668,23 @@ static void SVC_Info( netadr_t from )
 	// to prevent timed spoofed reply packets that add ghost servers
 	Info::setValueForKey( infostring, "challenge", CommandSystem::argv(1) );
 
-	Info::setValueForKey( infostring, "gamename", com_gamename->string );
-	Info::setValueForKey(infostring, "protocol", va("%i", com_protocol->integer));
-	Info::setValueForKey( infostring, "hostname", sv_hostname->string );
-	Info::setValueForKey( infostring, "mapname", sv_mapname->string );
+	Info::setValueForKey( infostring, "gamename", com_gamename->asString() );
+	Info::setValueForKey(infostring, "protocol", va("%i", com_protocol->asInt()));
+	Info::setValueForKey( infostring, "hostname", sv_hostname->asString() );
+	Info::setValueForKey( infostring, "mapname", sv_mapname->asString() );
 	Info::setValueForKey( infostring, "clients", va("%i", count) );
 	Info::setValueForKey(infostring, "g_humanplayers", va("%i", humans));
 	Info::setValueForKey( infostring, "sv_maxclients", 
-		va("%i", sv_maxclients->integer - sv_privateClients->integer ) );
-	Info::setValueForKey( infostring, "gametype", va("%i", sv_gametype->integer ) );
-	Info::setValueForKey( infostring, "pure", va("%i", sv_pure->integer ) );
+		va("%i", sv_maxclients->asInt() - sv_privateClients->asInt() ) );
+	Info::setValueForKey( infostring, "gametype", va("%i", sv_gametype->asInt() ) );
+	Info::setValueForKey( infostring, "pure", va("%i", sv_pure->asInt() ) );
 	Info::setValueForKey(infostring, "g_needpass", va("%d", CvarSystem::variableIntegerValue("g_needpass")));
 
-	if( sv_minPing->integer ) 
-		Info::setValueForKey( infostring, "minPing", va("%i", sv_minPing->integer) );
+	if( sv_minPing->asInt() ) 
+		Info::setValueForKey( infostring, "minPing", va("%i", sv_minPing->asInt()) );
 
-	if( sv_maxPing->integer ) 
-		Info::setValueForKey( infostring, "maxPing", va("%i", sv_maxPing->integer) );
+	if( sv_maxPing->asInt() ) 
+		Info::setValueForKey( infostring, "maxPing", va("%i", sv_maxPing->asInt()) );
 
 	char* gamedir = CvarSystem::variableString( "fs_game" );
 	if( *gamedir ) 
@@ -730,8 +730,8 @@ static void SVC_RemoteCommand( netadr_t from, Message *msg )
 		return;
 	}
 
-	if ( !strlen( sv_rconPassword->string ) ||
-		strcmp (CommandSystem::argv(1), sv_rconPassword->string) ) {
+	if ( !strlen( sv_rconPassword->asString() ) ||
+		strcmp (CommandSystem::argv(1), sv_rconPassword->asString()) ) {
 		static leakyBucket_t bucket;
 
 		// Make DoS via rcon impractical
@@ -751,7 +751,7 @@ static void SVC_RemoteCommand( netadr_t from, Message *msg )
 	theSVS.redirectAddress_ = from;
 	Common::beginRedirect (sv_outputbuf, SV_OUTPUTBUF_LENGTH, SV_FlushRedirect);
 
-	if ( !strlen( sv_rconPassword->string ) ) 
+	if ( !strlen( sv_rconPassword->asString() ) ) 
 	{
 		Common::printf ("No rconpassword set on the server.\n");
 	} 
@@ -856,7 +856,7 @@ void ServerLoop::packetEvent( netadr_t from, Message *msg )
 	int qport = msg->readShort() & 0xffff;
 
 	// find which client the message is from
-	for( int i = 1; i <= sv_maxclients->integer ; i++ ) 
+	for( int i = 1; i <= sv_maxclients->asInt() ; i++ ) 
 	{
 		SV_Client *cl = theSVS.svClients_.at(i);
 
@@ -910,7 +910,7 @@ static void SV_CalcPings()
 	int			total, count;
 	int			delta;
 
-	for( int i = 1; i <= sv_maxclients->integer ; i++ ) 
+	for( int i = 1; i <= sv_maxclients->asInt() ; i++ ) 
 	{
 		SV_Client *cl = theSVS.svClients_.at(i);
 
@@ -979,10 +979,10 @@ if necessary
 */
 static void SV_CheckTimeouts() 
 {
-	int droppoint = theSVS.time_ - 1000 * sv_timeout->integer;
-	int zombiepoint = theSVS.time_ - 1000 * sv_zombietime->integer;
+	int droppoint = theSVS.time_ - 1000 * sv_timeout->asInt();
+	int zombiepoint = theSVS.time_ - 1000 * sv_zombietime->asInt();
 
-	for( int i = 1; i <= sv_maxclients->integer ; i++) 
+	for( int i = 1; i <= sv_maxclients->asInt() ; i++) 
 	{
 		SV_Client* cl = theSVS.svClients_.at(i);
 		if( !cl )
@@ -1025,12 +1025,12 @@ SV_CheckPaused
 */
 static bool SV_CheckPaused() 
 {
-	if ( !cl_paused->integer ) 
+	if ( !cl_paused->asInt() ) 
 		return false;
 
 	// only pause if there is just a single client connected
 	int count = 0;
-	for( int i = 1; i <= sv_maxclients->integer ; i++ ) 
+	for( int i = 1; i <= sv_maxclients->asInt() ; i++ ) 
 	{
 		SV_Client	*cl = theSVS.svClients_.at(i);
 		if( !cl )
@@ -1043,12 +1043,12 @@ static bool SV_CheckPaused()
 	if( count > 1 ) 
 	{
 		// don't pause
-		if (sv_paused->integer)
+		if (sv_paused->asInt())
 			CvarSystem::set("sv_paused", "0");
 		return false;
 	}
 
-	if (!sv_paused->integer)
+	if (!sv_paused->asInt())
 		CvarSystem::set("sv_paused", "1");
 	return true;
 }
@@ -1065,7 +1065,7 @@ int ServerLoop::frameMsec()
 	{
 		int frameMsec;
 		
-		frameMsec = 1000.0f / sv_fps->value;
+		frameMsec = 1000.0f / sv_fps->asFloat();
 		
 		if(frameMsec < theSV.timeResidual_)
 			return 0;
@@ -1090,14 +1090,14 @@ void ServerLoop::frame( int msec )
 	int		startTime;
 
 	// the menu kills the server with this cvar
-	if ( sv_killserver->integer ) 
+	if ( sv_killserver->asInt() ) 
 	{
 		ServerLoop::shutdown ("Server was killed");
 		CvarSystem::set( "sv_killserver", "0" );
 		return;
 	}
 
-	if ( !com_sv_running->integer ) 
+	if ( !com_sv_running->asInt() ) 
 		return;
 
 	// allow pause if only the local client is connected
@@ -1105,14 +1105,14 @@ void ServerLoop::frame( int msec )
 		return;
 
 	// if it isn't time for the next frame, do nothing
-	if ( sv_fps->integer < 1 ) 
+	if ( sv_fps->asInt() < 1 ) 
 		CvarSystem::set( "sv_fps", "10" );
 
-	frameMsec = 1000 / sv_fps->integer * com_timescale->value;
+	frameMsec = 1000 / sv_fps->asInt() * com_timescale->asFloat();
 	// don't let it scale below 1ms
 	if(frameMsec < 1)
 	{
-		CvarSystem::set("timescale", va("%f", sv_fps->integer / 1000.0f));
+		CvarSystem::set("timescale", va("%f", sv_fps->asInt() / 1000.0f));
 		frameMsec = 1;
 	}
 
@@ -1155,7 +1155,7 @@ void ServerLoop::frame( int msec )
 		CvarSystem::clearModified( CVAR_SYSTEMINFO );
 	}
 
-	if ( com_speeds->integer ) 
+	if ( com_speeds->asInt() ) 
 	{
 		startTime = System::milliseconds ();
 	}
@@ -1179,7 +1179,7 @@ void ServerLoop::frame( int msec )
 		theSG.gameRunFrame( theSV.time_ );
 	}
 
-	if ( com_speeds->integer ) 
+	if ( com_speeds->asInt() ) 
 		time_game = System::milliseconds () - startTime;
 
 	// check timeouts
@@ -1212,20 +1212,20 @@ int SV_Client::rateMsec()
 	messageSize = this->netchan_.lastSentSize();
 	rate = this->rate_;
 
-	if(sv_maxRate->integer)
+	if(sv_maxRate->asInt())
 	{
-		if(sv_maxRate->integer < 1000)
+		if(sv_maxRate->asInt() < 1000)
 			CvarSystem::set( "sv_MaxRate", "1000" );
-		if(sv_maxRate->integer < rate)
-			rate = sv_maxRate->integer;
+		if(sv_maxRate->asInt() < rate)
+			rate = sv_maxRate->asInt();
 	}
 
-	if(sv_minRate->integer)
+	if(sv_minRate->asInt())
 	{
-		if(sv_minRate->integer < 1000)
+		if(sv_minRate->asInt() < 1000)
 			CvarSystem::set("sv_minRate", "1000");
-		if(sv_minRate->integer > rate)
-			rate = sv_minRate->integer;
+		if(sv_minRate->asInt() > rate)
+			rate = sv_minRate->asInt();
 	}
 
 	if(this->netchan_.remoteAddress().type == NA_IP6)
@@ -1233,7 +1233,7 @@ int SV_Client::rateMsec()
 	else
 		messageSize += UDPIP_HEADER_SIZE;
 		
-	rateMsec = messageSize * 1000 / (static_cast<int>(rate * com_timescale->value));
+	rateMsec = messageSize * 1000 / (static_cast<int>(rate * com_timescale->asFloat()));
 	rate = System::milliseconds() - this->netchan_.lastSentTime();
 	
 	if(rate > rateMsec)
@@ -1264,7 +1264,7 @@ int ServerLoop::sendQueuedPackets()
 	if(delayT >= 0)
 		timeVal = delayT;
 
-	if(sv_dlRate->integer)
+	if(sv_dlRate->asInt())
 	{
 		// Rate limiting. This is very imprecise for high
 		// download rates due to millisecond timedelta resolution
@@ -1286,7 +1286,7 @@ int ServerLoop::sendQueuedPackets()
 				deltaT = System::milliseconds() - dlStart;
 
 				delayT = 1000 * numBlocks * MAX_DOWNLOAD_BLKSIZE;
-				delayT /= sv_dlRate->integer * 1024;
+				delayT /= sv_dlRate->asInt() * 1024;
 
 				if(delayT <= deltaT + 1)
 				{

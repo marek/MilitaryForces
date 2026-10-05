@@ -132,8 +132,8 @@ static char *Sys_DefaultHomePath()
 			Com_sprintf( homePath, sizeof(homePath), "%s%c%s",
 				p, PATH_SEP, "Library/Application Support/" );
 
-			if( com_homepath && com_homepath->string[0] )
-				Q_strcat(homePath, sizeof(homePath), com_homepath->string);
+			if( com_homepath && com_homepath->asString()[0] )
+				Q_strcat(homePath, sizeof(homePath), com_homepath->asString());
 			else
 			{
 				// settings from before the folder was renamed keep working where they are
@@ -175,8 +175,8 @@ static char *Sys_HomeConfigPath(void)
 
 		if( *homeConfigPath )
 		{
-			if( com_homepath && com_homepath->string[0] )
-				Q_strcat(homeConfigPath, sizeof(homeConfigPath), com_homepath->string);
+			if( com_homepath && com_homepath->asString()[0] )
+				Q_strcat(homeConfigPath, sizeof(homeConfigPath), com_homepath->asString());
 			else
 				Q_strcat(homeConfigPath, sizeof(homeConfigPath), HOMEPATH_NAME);
 		}
@@ -204,8 +204,8 @@ static char *Sys_HomeDataPath(void)
 
 		if( *homeDataPath )
 		{
-			if( com_homepath && com_homepath->string[0] )
-				Q_strcat(homeDataPath, sizeof(homeDataPath), com_homepath->string);
+			if( com_homepath && com_homepath->asString()[0] )
+				Q_strcat(homeDataPath, sizeof(homeDataPath), com_homepath->asString());
 			else
 				Q_strcat(homeDataPath, sizeof(homeDataPath), HOMEPATH_NAME);
 		}
@@ -233,8 +233,8 @@ static char *Sys_HomeStatePath(void)
 
 		if( *homeStatePath )
 		{
-			if( com_homepath && com_homepath->string[0] )
-				Q_strcat(homeStatePath, sizeof(homeStatePath), com_homepath->string);
+			if( com_homepath && com_homepath->asString()[0] )
+				Q_strcat(homeStatePath, sizeof(homeStatePath), com_homepath->asString());
 			else
 				Q_strcat(homeStatePath, sizeof(homeStatePath), HOMEPATH_NAME);
 		}
@@ -398,7 +398,7 @@ static bool Sys_ShouldUseLegacyHomePath(void)
 		return false;
 	}
 
-	if( ( com_homepath && com_homepath->string[0] ) ||
+	if( ( com_homepath && com_homepath->asString()[0] ) ||
 		CvarSystem::variableString( "fs_homepath" )[0] )
 	{
 		// If a custom homepath has been explicity set then

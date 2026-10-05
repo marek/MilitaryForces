@@ -1462,7 +1462,7 @@ int CIN_PlayCinematic( const char *arg, int x, int y, int w, int h, int systemBi
 			theUI.setActiveMenu( UserInterface::MenuCommand::UIMENU_NONE );
 		}
 	} else {
-		cinTable[currentHandle].playonwalls = cl_inGameVideo->integer;
+		cinTable[currentHandle].playonwalls = cl_inGameVideo->asInt();
 	}
 
 	initRoQ();
@@ -1695,10 +1695,10 @@ void CIN_UploadCinematic(int handle) {
 			cinTable[handle].dirty = false;
 		}
 
-		if (cl_inGameVideo->integer == 0 && cinTable[handle].playonwalls == 1) {
+		if (cl_inGameVideo->asInt() == 0 && cinTable[handle].playonwalls == 1) {
 			cinTable[handle].playonwalls--;
 		}
-		else if (cl_inGameVideo->integer != 0 && cinTable[handle].playonwalls != 1) {
+		else if (cl_inGameVideo->asInt() != 0 && cinTable[handle].playonwalls != 1) {
 			cinTable[handle].playonwalls = 1;
 		}
 	}

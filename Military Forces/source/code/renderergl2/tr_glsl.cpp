@@ -386,12 +386,12 @@ static void GLSL_GetShaderHeader( GLenum shaderType, const GLchar *extra, char *
 	Q_strcat(dest, size,
 			 va("#ifndef r_FBufScale\n#define r_FBufScale vec2(%f, %f)\n#endif\n", fbufWidthScale, fbufHeightScale));
 
-	if (r_pbr->integer)
+	if (r_pbr->asInt())
 		Q_strcat(dest, size, "#define USE_PBR\n");
 
-	if (r_cubeMapping->integer)
+	if (r_cubeMapping->asInt())
 	{
-		int cubeMipSize = r_cubemapSize->integer;
+		int cubeMipSize = r_cubemapSize->asInt();
 		int numRoughnessMips = 0;
 
 		while (cubeMipSize)
@@ -462,7 +462,7 @@ static int GLSL_LoadGPUShaderText(const char *name, const char *fallback,
 		Com_sprintf(filename, sizeof(filename), "glsl/%s_fp.glsl", name);
 	}
 
-	if ( r_externalGLSL->integer ) {
+	if ( r_externalGLSL->asInt() ) {
 		size = ri.FS_ReadFile(filename, reinterpret_cast<void **>(&buffer));
 	} else {
 		size = 0;
@@ -1116,13 +1116,13 @@ void GLSL_InitGPUShaders()
 	for (i = 0; i < LIGHTDEF_COUNT; i++)
 	{
 		int lightType = i & LIGHTDEF_LIGHTTYPE_MASK;
-		bool fastLight = !(r_normalMapping->integer || r_specularMapping->integer);
+		bool fastLight = !(r_normalMapping->asInt() || r_specularMapping->asInt());
 
 		// skip impossible combos
-		if ((i & LIGHTDEF_USE_PARALLAXMAP) && !r_parallaxMapping->integer)
+		if ((i & LIGHTDEF_USE_PARALLAXMAP) && !r_parallaxMapping->asInt())
 			continue;
 
-		if ((i & LIGHTDEF_USE_SHADOWMAP) && (!lightType || !r_sunlightMode->integer))
+		if ((i & LIGHTDEF_USE_SHADOWMAP) && (!lightType || !r_sunlightMode->asInt()))
 			continue;
 
 		if ((i & LIGHTDEF_ENTITY_VERTEX_ANIMATION) && (i & LIGHTDEF_ENTITY_BONE_ANIMATION))
@@ -1135,7 +1135,7 @@ void GLSL_InitGPUShaders()
 
 		extradefines[0] = '\0';
 
-		if (r_dlightMode->integer >= 2)
+		if (r_dlightMode->asInt() >= 2)
 			Q_strcat(extradefines, 1024, "#define USE_SHADOWMAP\n");
 
 		if (glRefConfig.swizzleNormalmap)
@@ -1152,7 +1152,7 @@ void GLSL_InitGPUShaders()
 			{
 				case LIGHTDEF_USE_LIGHTMAP:
 					Q_strcat(extradefines, 1024, "#define USE_LIGHTMAP\n");
-					if (r_deluxeMapping->integer && !fastLight)
+					if (r_deluxeMapping->asInt() && !fastLight)
 						Q_strcat(extradefines, 1024, "#define USE_DELUXEMAP\n");
 					attribs |= ATTR_LIGHTCOORD | ATTR_LIGHTDIRECTION;
 					break;
@@ -1167,40 +1167,40 @@ void GLSL_InitGPUShaders()
 					break;
 			}
 
-			if (r_normalMapping->integer)
+			if (r_normalMapping->asInt())
 			{
 				Q_strcat(extradefines, 1024, "#define USE_NORMALMAP\n");
 
 				attribs |= ATTR_TANGENT;
 
-				if ((i & LIGHTDEF_USE_PARALLAXMAP) && !(i & LIGHTDEF_ENTITY_VERTEX_ANIMATION) && !(i & LIGHTDEF_ENTITY_BONE_ANIMATION) && r_parallaxMapping->integer)
+				if ((i & LIGHTDEF_USE_PARALLAXMAP) && !(i & LIGHTDEF_ENTITY_VERTEX_ANIMATION) && !(i & LIGHTDEF_ENTITY_BONE_ANIMATION) && r_parallaxMapping->asInt())
 				{
 					Q_strcat(extradefines, 1024, "#define USE_PARALLAXMAP\n");
-					if (r_parallaxMapping->integer > 1)
+					if (r_parallaxMapping->asInt() > 1)
 						Q_strcat(extradefines, 1024, "#define USE_RELIEFMAP\n");
 
-					if (r_parallaxMapShadows->integer)
+					if (r_parallaxMapShadows->asInt())
 						Q_strcat(extradefines, 1024, "#define USE_PARALLAXMAP_SHADOWS\n");
 
-					Q_strcat(extradefines, 1024, va("#define r_parallaxMapOffset %f\n", r_parallaxMapOffset->value));
+					Q_strcat(extradefines, 1024, va("#define r_parallaxMapOffset %f\n", r_parallaxMapOffset->asFloat()));
 				}
 			}
 
-			if (r_specularMapping->integer)
+			if (r_specularMapping->asInt())
 				Q_strcat(extradefines, 1024, "#define USE_SPECULARMAP\n");
 
-			if (r_cubeMapping->integer)
+			if (r_cubeMapping->asInt())
 			{
 				Q_strcat(extradefines, 1024, "#define USE_CUBEMAP\n");
-				if (r_cubeMapping->integer == 2)
+				if (r_cubeMapping->asInt() == 2)
 					Q_strcat(extradefines, 1024, "#define USE_BOX_CUBEMAP_PARALLAX\n");
 			}
-			else if (r_deluxeSpecular->value > 0.000001f)
+			else if (r_deluxeSpecular->asFloat() > 0.000001f)
 			{
-				Q_strcat(extradefines, 1024, va("#define r_deluxeSpecular %f\n", r_deluxeSpecular->value));
+				Q_strcat(extradefines, 1024, va("#define r_deluxeSpecular %f\n", r_deluxeSpecular->asFloat()));
 			}
 
-			switch (r_glossType->integer)
+			switch (r_glossType->asInt())
 			{
 				case 0:
 				default:
@@ -1222,9 +1222,9 @@ void GLSL_InitGPUShaders()
 		{
 			Q_strcat(extradefines, 1024, "#define USE_SHADOWMAP\n");
 
-			if (r_sunlightMode->integer == 1)
+			if (r_sunlightMode->asInt() == 1)
 				Q_strcat(extradefines, 1024, "#define SHADOWMAP_MODULATE\n");
-			else if (r_sunlightMode->integer == 2)
+			else if (r_sunlightMode->asInt() == 2)
 				Q_strcat(extradefines, 1024, "#define USE_PRIMARY_LIGHT\n");
 		}
 
@@ -1243,7 +1243,7 @@ void GLSL_InitGPUShaders()
 				Q_strcat(extradefines, 1024, "#define USE_VERTEX_ANIMATION\n");
 				attribs |= ATTR_POSITION2 | ATTR_NORMAL2;
 
-				if (r_normalMapping->integer)
+				if (r_normalMapping->asInt())
 				{
 					attribs |= ATTR_TANGENT2;
 				}
@@ -1420,17 +1420,17 @@ void GLSL_InitGPUShaders()
 			Q_strcat(extradefines, 1024, "#extension GL_EXT_shadow_samplers : enable\n");
 		}
 
-		if (r_shadowFilter->integer >= 1)
+		if (r_shadowFilter->asInt() >= 1)
 			Q_strcat(extradefines, 1024, "#define USE_SHADOW_FILTER\n");
 
-		if (r_shadowFilter->integer >= 2)
+		if (r_shadowFilter->asInt() >= 2)
 			Q_strcat(extradefines, 1024, "#define USE_SHADOW_FILTER2\n");
 
-		if (r_shadowCascadeZFar->integer != 0)
+		if (r_shadowCascadeZFar->asInt() != 0)
 			Q_strcat(extradefines, 1024, "#define USE_SHADOW_CASCADE\n");
 
-		Q_strcat(extradefines, 1024, va("#define r_shadowMapSize %f\n", r_shadowMapSize->value));
-		Q_strcat(extradefines, 1024, va("#define r_shadowCascadeZFar %f\n", r_shadowCascadeZFar->value));
+		Q_strcat(extradefines, 1024, va("#define r_shadowMapSize %f\n", r_shadowMapSize->asFloat()));
+		Q_strcat(extradefines, 1024, va("#define r_shadowCascadeZFar %f\n", r_shadowCascadeZFar->asFloat()));
 
 		if (!tr.shadowmaskShader.initGPUShader( "shadowmask", attribs, true, extradefines, true, fallbackShader_shadowmask_vp, fallbackShader_shadowmask_fp ))
 		{
@@ -1598,7 +1598,7 @@ void ShaderProgram::bindProgram()
 	GLuint programObject = this ? this->program : 0;
 	const char *name = this ? this->name : "NULL";
 
-	if(r_logFile->integer)
+	if(r_logFile->asInt())
 	{
 		// don't just call LogComment, or we will get a call to va() every frame!
 		GLimp_LogComment(va("--- (%s)->bindProgram() ---\n", name));

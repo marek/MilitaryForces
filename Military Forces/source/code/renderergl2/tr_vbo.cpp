@@ -342,7 +342,7 @@ void R_BindVao(vao_t * vao)
 		return;
 	}
 
-	if(r_logFile->integer)
+	if(r_logFile->asInt())
 	{
 		// don't just call LogComment, or we will get a call to va() every frame!
 		GLimp_LogComment(va("--- R_BindVao( %s ) ---\n", vao->name));

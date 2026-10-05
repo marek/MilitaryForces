@@ -102,7 +102,7 @@ void GameHost::sendServerCommand( int clientNum, const char *text )
 	} 
 	else 
 	{
-		if ( clientNum < 1 || clientNum > sv_maxclients->integer || !theSVS.svClients_.at(clientNum) ) 
+		if ( clientNum < 1 || clientNum > sv_maxclients->asInt() || !theSVS.svClients_.at(clientNum) ) 
 			return;
 
 		ServerMain::sendServerCommand( theSVS.svClients_.at(clientNum), "%s", text );	
@@ -119,7 +119,7 @@ Disconnects the client with a message
 */
 void GameHost::dropClient( int clientNum, const char *reason ) 
 {
-	if ( clientNum < 1 || clientNum > sv_maxclients->integer || !theSVS.svClients_.at(clientNum) ) 
+	if ( clientNum < 1 || clientNum > sv_maxclients->asInt() || !theSVS.svClients_.at(clientNum) ) 
 		return;
 
 	(theSVS.svClients_.at(clientNum))->drop( reason );	
@@ -298,7 +298,7 @@ GameHost::getUsercmd
 */
 void GameHost::getUsercmd( int clientNum, usercmd_t *cmd ) 
 {
-	if ( clientNum < 1 || clientNum > sv_maxclients->integer || !theSVS.svClients_.at(clientNum) ) 
+	if ( clientNum < 1 || clientNum > sv_maxclients->asInt() || !theSVS.svClients_.at(clientNum) ) 
 	{
 		Common::error( ERR_DROP, "SV_GetUsercmd: bad clientNum:%i", clientNum );
 	}
@@ -338,7 +338,7 @@ void ServerMain::initGame()
 	// clear all gentity pointers that might still be set from
 	// a previous level
 	//   now done before GAME_INIT call
-	//for( int i = 1 ; i <= sv_maxclients->integer ; i++ ) 
+	//for( int i = 1 ; i <= sv_maxclients->asInt() ; i++ ) 
 	//	theSVS.svClients_.at(i)->gentity_ = 0;
 	
 	// use the current msec count for a random seed

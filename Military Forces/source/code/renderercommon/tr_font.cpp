@@ -507,7 +507,7 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
 			}
 
 			Com_sprintf (name, sizeof(name), "fonts/fontImage_%i_%i.tga", imageNumber++, pointSize);
-			if (r_saveFontData->integer) { 
+			if (r_saveFontData->asInt()) { 
 				WriteTGA(name, imageBuff, 256, 256);
 			}
 
@@ -542,7 +542,7 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
 	Q_strncpyz(font->name, cacheName, sizeof(font->name));
 	Com_Memcpy(&registeredFont[registeredFontCount++], font, sizeof(fontInfo_t));
 
-	if (r_saveFontData->integer) {
+	if (r_saveFontData->asInt()) {
 		ri.FS_WriteFile(va("fonts/fontImage_%i.dat", pointSize), font, sizeof(fontInfo_t));
 	}
 

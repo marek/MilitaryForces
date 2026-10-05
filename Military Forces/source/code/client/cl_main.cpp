@@ -181,10 +181,10 @@ void ClientLoop::cdDialog( ) {
 void Client::updateMumble()
 {
 	vec3_t pos, forward, up;
-	float scale = cl_mumbleScale->value;
+	float scale = cl_mumbleScale->asFloat();
 	float tmp;
 	
-	if(!cl_useMumble->integer)
+	if(!cl_useMumble->asInt())
 		return;
 
 	// !!! FIXME: not sure if this is even close to correct.
@@ -202,7 +202,7 @@ void Client::updateMumble()
 	up[1] = up[2];
 	up[2] = tmp;
 
-	if(cl_useMumble->integer > 1) {
+	if(cl_useMumble->asInt() > 1) {
 		fprintf(stderr, "%f %f %f, %f %f %f, %f %f %f\n",
 			pos[0], pos[1], pos[2],
 			forward[0], forward[1], forward[2],
@@ -321,7 +321,7 @@ so this is only called when the key is first pressed
 */
 static void CL_VoipParseTargets()
 {
-	const char *target = cl_voipSendTarget->string;
+	const char *target = cl_voipSendTarget->asString();
 	char *end;
 	int val;
 
@@ -402,14 +402,14 @@ Record more audio from the hardware if required and encode it into Opus
 */
 void Client::captureVoip()
 {
-	const float audioMult = cl_voipCaptureMult->value;
-	const bool useVad = (cl_voipUseVAD->integer != 0);
+	const float audioMult = cl_voipCaptureMult->asFloat();
+	const bool useVad = (cl_voipUseVAD->asInt() != 0);
 	bool initialFrame = false;
 	bool finalFrame = false;
 
 #if USE_MUMBLE
 	// if we're using Mumble, don't try to handle VoIP transmission ourselves.
-	if (cl_useMumble->integer)
+	if (cl_useMumble->asInt())
 		return;
 #endif
 
@@ -419,13 +419,13 @@ void Client::captureVoip()
 	//  just demand it. Who doesn't have at least a DSL line now, anyhow? If
 	//  you don't, you don't need VoIP.  :)
 	if (cl_voip->modified || cl_rate->modified) {
-		if ((cl_voip->integer) && (cl_rate->integer < 25000)) {
+		if ((cl_voip->asInt()) && (cl_rate->asInt() < 25000)) {
 			Common::printf(S_COLOR_YELLOW "Your network rate is too slow for VoIP.\n");
 			Common::printf("Set 'Data Rate' to 'LAN/Cable/xDSL' in 'Setup/System/Network'.\n");
 			Common::printf("Until then, VoIP is disabled.\n");
 			CvarSystem::set("cl_voip", "0");
 		}
-		CvarSystem::set("cl_voipProtocol", cl_voip->integer ? "opus" : "");
+		CvarSystem::set("cl_voipProtocol", cl_voip->asInt() ? "opus" : "");
 		cl_voip->modified = false;
 		cl_rate->modified = false;
 	}
@@ -441,7 +441,7 @@ void Client::captureVoip()
 		cl_voipUseVAD->modified = false;
 	}
 
-	if ((useVad) && (!cl_voipSend->integer))
+	if ((useVad) && (!cl_voipSend->asInt()))
 		CvarSystem::set("cl_voipSend", "1");  // lots of things reset this.
 
 	if (cl_voipSend->modified) {
@@ -452,7 +452,7 @@ void Client::captureVoip()
 			dontCapture = true;  // server doesn't support VoIP.
 		else if (clc.demoplaying)
 			dontCapture = true;  // playing back a demo.
-		else if ( cl_voip->integer == 0 )
+		else if ( cl_voip->asInt() == 0 )
 			dontCapture = true;  // client has VoIP support disabled.
 		else if ( audioMult == 0.0f )
 			dontCapture = true;  // basically silenced incoming audio.
@@ -465,7 +465,7 @@ void Client::captureVoip()
 			return;
 		}
 
-		if (cl_voipSend->integer) {
+		if (cl_voipSend->asInt()) {
 			initialFrame = true;
 		} else {
 			finalFrame = true;
@@ -475,13 +475,13 @@ void Client::captureVoip()
 	// try to get more audio data from the sound card...
 
 	if (initialFrame) {
-		SoundSystem::masterGain(Com_Clamp(0.0f, 1.0f, cl_voipGainDuringCapture->value));
+		SoundSystem::masterGain(Com_Clamp(0.0f, 1.0f, cl_voipGainDuringCapture->asFloat()));
 		SoundSystem::startCapture();
 		Client::voipNewGeneration();
 		CL_VoipParseTargets();
 	}
 
-	if ((cl_voipSend->integer) || (finalFrame)) { // user wants to capture audio?
+	if ((cl_voipSend->asInt()) || (finalFrame)) { // user wants to capture audio?
 		int samples = SoundSystem::availableCaptureSamples();
 		const int packetSamples = (finalFrame) ? VOIP_MAX_FRAME_SAMPLES : VOIP_MAX_PACKET_SAMPLES;
 
@@ -528,7 +528,7 @@ void Client::captureVoip()
 			clc.voipPower = (voipPower / (32768.0f * 32768.0f *
 			                 (static_cast<float>(samples)))) * 100.0f;
 
-			if ((useVad) && (clc.voipPower < cl_voipVADThreshold->value)) {
+			if ((useVad) && (clc.voipPower < cl_voipVADThreshold->asFloat())) {
 				Client::voipNewGeneration();  // no "talk" for at least 1/4 second.
 			} else {
 				clc.voipOutgoingDataSize = bytes;
@@ -717,7 +717,7 @@ static void CL_Record_f( ) {
 	if ( Network::isLocalAddress( clc.serverAddress ) &&
 		!CvarSystem::variableValue( "g_synchronousClients" ) &&
 		// Don't nag if we're simply recording everything automatically.
-		!cl_autoRecordDemo->integer )
+		!cl_autoRecordDemo->asInt() )
 	{
 		Common::printf (S_COLOR_YELLOW "WARNING: You should set 'g_synchronousClients 1' for smoother demo recording\n");
 	}
@@ -727,10 +727,10 @@ static void CL_Record_f( ) {
 		Q_strncpyz( demoName, s, sizeof( demoName ) );
 #ifdef LEGACY_PROTOCOL
 		if(clc.compat)
-			Com_sprintf(name, sizeof(name), "demos/%s.%s%d", demoName, DEMOEXT, com_legacyprotocol->integer);
+			Com_sprintf(name, sizeof(name), "demos/%s.%s%d", demoName, DEMOEXT, com_legacyprotocol->asInt());
 		else
 #endif
-			Com_sprintf(name, sizeof(name), "demos/%s.%s%d", demoName, DEMOEXT, com_protocol->integer);
+			Com_sprintf(name, sizeof(name), "demos/%s.%s%d", demoName, DEMOEXT, com_protocol->asInt());
 	} else {
 		int		number;
 
@@ -739,10 +739,10 @@ static void CL_Record_f( ) {
 			CL_DemoFilename( number, demoName, sizeof( demoName ) );
 #ifdef LEGACY_PROTOCOL
 			if(clc.compat)
-				Com_sprintf(name, sizeof(name), "demos/%s.%s%d", demoName, DEMOEXT, com_legacyprotocol->integer);
+				Com_sprintf(name, sizeof(name), "demos/%s.%s%d", demoName, DEMOEXT, com_legacyprotocol->asInt());
 			else
 #endif
-				Com_sprintf(name, sizeof(name), "demos/%s.%s%d", demoName, DEMOEXT, com_protocol->integer);
+				Com_sprintf(name, sizeof(name), "demos/%s.%s%d", demoName, DEMOEXT, com_protocol->asInt());
 
 			if (!FileSystem::fileExists_HomeData(name))
 				break;	// file doesn't exist
@@ -873,7 +873,7 @@ static void CL_DemoCompleted( )
 {
 	char buffer[ MAX_STRING_CHARS ];
 
-	if( cl_timedemo && cl_timedemo->integer )
+	if( cl_timedemo && cl_timedemo->asInt() )
 	{
 		int	time;
 		
@@ -894,7 +894,7 @@ static void CL_DemoCompleted( )
 			Common::printf( "%s", buffer );
 
 			// Write a log of all the frame durations
-			if( cl_timedemoLog && strlen( cl_timedemoLog->string ) > 0 )
+			if( cl_timedemoLog && strlen( cl_timedemoLog->asString() ) > 0 )
 			{
 				int i;
 				int numFrames;
@@ -905,7 +905,7 @@ static void CL_DemoCompleted( )
 				else
 					numFrames = clc.timeDemoFrames - 1;
 
-				f = FileSystem::fOpenFileWrite_HomeData( cl_timedemoLog->string );
+				f = FileSystem::fOpenFileWrite_HomeData( cl_timedemoLog->asString() );
 				if( f )
 				{
 					FileSystem::printf( f, "# %s", buffer );
@@ -914,12 +914,12 @@ static void CL_DemoCompleted( )
 						FileSystem::printf( f, "%d\n", clc.timeDemoDurations[ i ] );
 
 					FileSystem::fCloseFile( f );
-					Common::printf( "%s written\n", cl_timedemoLog->string );
+					Common::printf( "%s written\n", cl_timedemoLog->asString() );
 				}
 				else
 				{
 					Common::printf( "Couldn't open %s for writing\n",
-							cl_timedemoLog->string );
+							cl_timedemoLog->asString() );
 				}
 			}
 		}
@@ -994,28 +994,28 @@ int Client::walkDemoExt(char *arg, char *name, int *demofile)
 	*demofile = 0;
 
 #ifdef LEGACY_PROTOCOL
-	if(com_legacyprotocol->integer > 0)
+	if(com_legacyprotocol->asInt() > 0)
 	{
-		Com_sprintf(name, MAX_OSPATH, "demos/%s.%s%d", arg, DEMOEXT, com_legacyprotocol->integer);
+		Com_sprintf(name, MAX_OSPATH, "demos/%s.%s%d", arg, DEMOEXT, com_legacyprotocol->asInt());
 		FileSystem::fOpenFileRead(name, demofile, true);
 		
 		if (*demofile)
 		{
 			Common::printf("Demo file: %s\n", name);
-			return com_legacyprotocol->integer;
+			return com_legacyprotocol->asInt();
 		}
 	}
 	
-	if(com_protocol->integer != com_legacyprotocol->integer)
+	if(com_protocol->asInt() != com_legacyprotocol->asInt())
 #endif
 	{
-		Com_sprintf(name, MAX_OSPATH, "demos/%s.%s%d", arg, DEMOEXT, com_protocol->integer);
+		Com_sprintf(name, MAX_OSPATH, "demos/%s.%s%d", arg, DEMOEXT, com_protocol->asInt());
 		FileSystem::fOpenFileRead(name, demofile, true);
 
 		if (*demofile)
 		{
 			Common::printf("Demo file: %s\n", name);
-			return com_protocol->integer;
+			return com_protocol->asInt();
 		}
 	}
 
@@ -1024,10 +1024,10 @@ int Client::walkDemoExt(char *arg, char *name, int *demofile)
 	while(demo_protocols[i])
 	{
 #ifdef LEGACY_PROTOCOL
-		if(demo_protocols[i] == com_legacyprotocol->integer)
+		if(demo_protocols[i] == com_legacyprotocol->asInt())
 			continue;
 #endif
-		if(demo_protocols[i] == com_protocol->integer)
+		if(demo_protocols[i] == com_protocol->asInt())
 			continue;
 	
 		Com_sprintf (name, MAX_OSPATH, "demos/%s.%s%d", arg, DEMOEXT, demo_protocols[i]);
@@ -1104,9 +1104,9 @@ static void CL_PlayDemo_f( ) {
 				break;
 		}
 
-		if(demo_protocols[i] || protocol == com_protocol->integer
+		if(demo_protocols[i] || protocol == com_protocol->asInt()
 #ifdef LEGACY_PROTOCOL
-		   || protocol == com_legacyprotocol->integer
+		   || protocol == com_legacyprotocol->asInt()
 #endif
 		  )
 		{
@@ -1144,7 +1144,7 @@ static void CL_PlayDemo_f( ) {
 	Q_strncpyz( clc.servername, arg, sizeof( clc.servername ) );
 
 #ifdef LEGACY_PROTOCOL
-	if(protocol <= com_legacyprotocol->integer)
+	if(protocol <= com_legacyprotocol->asInt())
 		clc.compat = true;
 	else
 		clc.compat = false;
@@ -1245,7 +1245,7 @@ static void CL_ClearMemory(bool shutdownRef)
 	ClientLoop::shutdownAll(shutdownRef);
 
 	// if not running a server clear the whole hunk
-	if ( !com_sv_running || !com_sv_running->integer ) {
+	if ( !com_sv_running || !com_sv_running->asInt() ) {
 		// clear the whole hunk
 		Hunk::clear();
 		// clear collision map data
@@ -1282,13 +1282,13 @@ memory on the hunk from cgame, ui, and renderer
 =====================
 */
 void ClientLoop::mapLoading( ) {
-	if ( com_dedicated->integer ) {
+	if ( com_dedicated->asInt() ) {
 		clc.state = CA_DISCONNECTED;
 		Key_SetCatcher( KEYCATCH_CONSOLE );
 		return;
 	}
 
-	if ( !com_cl_running->integer ) {
+	if ( !com_cl_running->asInt() ) {
 		return;
 	}
 
@@ -1377,7 +1377,7 @@ This is also called on Common::error and Com_Quit, so it shouldn't cause any err
 =====================
 */
 void ClientLoop::disconnect( bool showMainMenu ) {
-	if ( !com_cl_running || !com_cl_running->integer ) {
+	if ( !com_cl_running || !com_cl_running->asInt() ) {
 		return;
 	}
 
@@ -1396,20 +1396,20 @@ void ClientLoop::disconnect( bool showMainMenu ) {
 	CvarSystem::set( "cl_downloadName", "" );
 
 #ifdef USE_MUMBLE
-	if (cl_useMumble->integer && mumble_islinked()) {
+	if (cl_useMumble->asInt() && mumble_islinked()) {
 		Common::printf("Mumble: Unlinking from Mumble application\n");
 		mumble_unlink();
 	}
 #endif
 
 #ifdef USE_VOIP
-	if (cl_voipSend->integer) {
-		int tmp = cl_voipUseVAD->integer;
-		cl_voipUseVAD->integer = 0;  // disable this for a moment.
+	if (cl_voipSend->asInt()) {
+		int tmp = cl_voipUseVAD->asInt();
+		cl_voipUseVAD->overrideInt( 0 );  // disable this for a moment.
 		clc.voipOutgoingDataSize = 0;  // dump any pending VoIP transmission.
 		CvarSystem::set("cl_voipSend", "0");
 		Client::captureVoip();  // clean up any state...
-		cl_voipUseVAD->integer = tmp;
+		cl_voipUseVAD->overrideInt( tmp );
 	}
 
 	if (clc.voipCodecInitialized) {
@@ -1523,7 +1523,7 @@ static void CL_RequestMotd( ) {
 #ifdef UPDATE_SERVER_NAME
 	char		info[MAX_INFO_STRING];
 
-	if ( !cl_motd->integer ) {
+	if ( !cl_motd->asInt() ) {
 		return;
 	}
 	Common::printf( "Resolving %s\n", UPDATE_SERVER_NAME );
@@ -1543,7 +1543,7 @@ static void CL_RequestMotd( ) {
 
 	Info::setValueForKey( info, "challenge", cls.updateChallenge );
 	Info::setValueForKey( info, "renderer", cls.glconfig.renderer_string );
-	Info::setValueForKey( info, "version", com_version->string );
+	Info::setValueForKey( info, "version", com_version->asString() );
 
 	Network::outOfBandPrint( NS_CLIENT, cls.updateServer, "getmotd \"%s\"\n", info );
 #endif
@@ -1629,7 +1629,7 @@ static void CL_RequestAuthorization( void ) {
 
 	fs = CvarSystem::get ("cl_anonymous", "0", CVAR_INIT|CVAR_SYSTEMINFO );
 
-	Network::outOfBandPrint(NS_CLIENT, cls.authorizeServer, "getKeyAuthorize %i %s", fs->integer, nums );
+	Network::outOfBandPrint(NS_CLIENT, cls.authorizeServer, "getKeyAuthorize %i %s", fs->asInt(), nums );
 }
 #endif
 /*
@@ -1726,7 +1726,7 @@ static void CL_Connect_f( ) {
 	// clear any previous "server full" type messages
 	clc.serverMessage[0] = 0;
 
-	if ( com_sv_running->integer && !strcmp( server, "localhost" ) ) {
+	if ( com_sv_running->asInt() && !strcmp( server, "localhost" ) ) {
 		// if running a local server, kill it
 		ServerLoop::shutdown( "Server quit" );
 	}
@@ -1754,7 +1754,7 @@ static void CL_Connect_f( ) {
 
 	Common::printf( "%s resolved to %s\n", clc.servername, serverString);
 
-	if( cl_guidServerUniq->integer )
+	if( cl_guidServerUniq->asInt() )
 		Client::updateGUID( serverString, strlen( serverString ) );
 	else
 		Client::updateGUID( nullptr, 0 );
@@ -1854,7 +1854,7 @@ static void CL_Rcon_f( ) {
 	char	message[MAX_RCON_MESSAGE];
 	netadr_t	to;
 
-	if ( !rcon_client_password->string[0] ) {
+	if ( !rcon_client_password->asString()[0] ) {
 		Common::printf ("You must set 'rconpassword' before\n"
 					"issuing an rcon command.\n");
 		return;
@@ -1868,7 +1868,7 @@ static void CL_Rcon_f( ) {
 
 	Q_strcat (message, MAX_RCON_MESSAGE, "rcon ");
 
-	Q_strcat (message, MAX_RCON_MESSAGE, rcon_client_password->string);
+	Q_strcat (message, MAX_RCON_MESSAGE, rcon_client_password->asString());
 	Q_strcat (message, MAX_RCON_MESSAGE, " ");
 
 	// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=543
@@ -1877,14 +1877,14 @@ static void CL_Rcon_f( ) {
 	if ( clc.state >= CA_CONNECTED ) {
 		to = clc.netchan.remoteAddress();
 	} else {
-		if (!strlen(rconAddress->string)) {
+		if (!strlen(rconAddress->asString())) {
 			Common::printf ("You must either be connected,\n"
 						"or set the 'rconAddress' cvar\n"
 						"to issue rcon commands\n");
 
 			return;
 		}
-		Network::stringToAdr (rconAddress->string, &to, NA_UNSPEC);
+		Network::stringToAdr (rconAddress->asString(), &to, NA_UNSPEC);
 		if (to.port == 0) {
 			to.port = BigShort (PORT_SERVER);
 		}
@@ -1943,7 +1943,7 @@ void Client::vid_Restart_f( ) {
 	if(!FileSystem::conditionalRestart(clc.checksumFeed, true))
 	{
 		// if not running a server clear the whole hunk
-		if(com_sv_running->integer)
+		if(com_sv_running->asInt())
 		{
 			// clear all the client data on the hunk
 			Hunk::clearToMark();
@@ -2268,7 +2268,7 @@ void Client::nextDownload()
 		else
 			s = localName + strlen(localName); // point at the nul byte
 #ifdef USE_HTTP
-		if(!(cl_allowDownload->integer & DLF_NO_REDIRECT)) {
+		if(!(cl_allowDownload->asInt() & DLF_NO_REDIRECT)) {
 			if(clc.sv_allowDownload & DLF_NO_REDIRECT) {
 				Common::printf("WARNING: server does not "
 					"allow download redirection "
@@ -2292,15 +2292,15 @@ void Client::nextDownload()
 			Common::printf("WARNING: server allows download "
 				"redirection, but it disabled by client "
 				"configuration (cl_allowDownload is %d)\n",
-				cl_allowDownload->integer);
+				cl_allowDownload->asInt());
 		}
 #endif /* USE_HTTP */
 		if(!usedHTTP) {
-			if((cl_allowDownload->integer & DLF_NO_UDP)) {
+			if((cl_allowDownload->asInt() & DLF_NO_UDP)) {
 				Common::error(ERR_DROP, "UDP Downloads are "
 					"disabled on your client. "
 					"(cl_allowDownload is %d)",
-					cl_allowDownload->integer);
+					cl_allowDownload->asInt());
 				return;	
 			}
 			else {
@@ -2330,7 +2330,7 @@ and determine if we need to download them
 void Client::initDownloads() {
   char missingfiles[1024];
 
-  if ( !(cl_allowDownload->integer & DLF_ENABLE) )
+  if ( !(cl_allowDownload->asInt() & DLF_ENABLE) )
   {
     // autodownload is disabled on the client
     // but it's possible that some referenced files on the server are missing
@@ -2397,14 +2397,14 @@ static void CL_CheckForResend( ) {
 	case CA_CONNECTING:
 		// requesting a challenge .. IPv6 users always get in as authorize server supports no ipv6.
 #ifndef STANDALONE
-		if (!com_standalone->integer && clc.serverAddress.type == NA_IP && !Sys_IsLANAddress( clc.serverAddress ) )
+		if (!com_standalone->asInt() && clc.serverAddress.type == NA_IP && !Sys_IsLANAddress( clc.serverAddress ) )
 			CL_RequestAuthorization();
 #endif
 
 		// The challenge request shall be followed by a client challenge so no malicious server can hijack this connection.
 		// Add the gamename so the server knows we're running the correct game or can reject the client
 		// with a meaningful message
-		Com_sprintf(data, sizeof(data), "getchallenge %d %s", clc.challenge, com_gamename->string);
+		Com_sprintf(data, sizeof(data), "getchallenge %d %s", clc.challenge, com_gamename->asString());
 
 		Network::outOfBandPrint(NS_CLIENT, clc.serverAddress, "%s", data);
 		break;
@@ -2416,14 +2416,14 @@ static void CL_CheckForResend( ) {
 		Q_strncpyz( info, CvarSystem::infoString( CVAR_USERINFO ), sizeof( info ) );
 		
 #ifdef LEGACY_PROTOCOL
-		if(com_legacyprotocol->integer == com_protocol->integer)
+		if(com_legacyprotocol->asInt() == com_protocol->asInt())
 			clc.compat = true;
 
 		if(clc.compat)
-			Info::setValueForKey(info, "protocol", va("%i", com_legacyprotocol->integer));
+			Info::setValueForKey(info, "protocol", va("%i", com_legacyprotocol->asInt()));
 		else
 #endif
-			Info::setValueForKey(info, "protocol", va("%i", com_protocol->integer));
+			Info::setValueForKey(info, "protocol", va("%i", com_protocol->asInt()));
 		Info::setValueForKey( info, "qport", va("%i", port ) );
 		Info::setValueForKey( info, "challenge", va("%i", clc.challenge ) );
 		
@@ -2660,10 +2660,10 @@ static void CL_ConnectionlessPacket( netadr_t from, Message *msg ) {
 		{
 			ver = atoi(strver);
 			
-			if(ver != com_protocol->integer)
+			if(ver != com_protocol->asInt())
 			{
 #ifdef LEGACY_PROTOCOL
-				if(com_legacyprotocol->integer > 0)
+				if(com_legacyprotocol->asInt() > 0)
 				{
 					// Server is ioq3 but has a different protocol than we do.
 					// Fall back to idq3 protocol.
@@ -2671,13 +2671,13 @@ static void CL_ConnectionlessPacket( netadr_t from, Message *msg ) {
 
 					Common::printf(S_COLOR_YELLOW "Warning: Server reports protocol version %d, "
 						   "we have %d. Trying legacy protocol %d.\n",
-						   ver, com_protocol->integer, com_legacyprotocol->integer);
+						   ver, com_protocol->asInt(), com_legacyprotocol->asInt());
 				}
 				else
 #endif
 				{
 					Common::printf(S_COLOR_YELLOW "Warning: Server reports protocol version %d, we have %d. "
-						   "Trying anyways.\n", ver, com_protocol->integer);
+						   "Trying anyways.\n", ver, com_protocol->asInt());
 				}
 			}
 		}
@@ -2901,9 +2901,9 @@ static void CL_CheckTimeout( ) {
 	//
 	// check timeout
 	//
-	if ( ( !Client::checkPaused() || !sv_paused->integer ) 
+	if ( ( !Client::checkPaused() || !sv_paused->asInt() ) 
 		&& clc.state >= CA_CONNECTED && clc.state != CA_CINEMATIC
-	    && cls.realtime - clc.lastPacketTime > cl_timeout->value*1000) {
+	    && cls.realtime - clc.lastPacketTime > cl_timeout->asFloat()*1000) {
 		if (++cl.timeoutcount > 5) {	// timeoutcount saves debugger
 			Common::printf ("\nServer connection timed out.\n");
 			ClientLoop::disconnect( true );
@@ -2925,7 +2925,7 @@ bool Client::checkPaused()
 	// if cl_paused->modified is set, the cvar has only been changed in
 	// this frame. Keep paused in this frame to ensure the server doesn't
 	// lag behind.
-	if(cl_paused->integer || cl_paused->modified)
+	if(cl_paused->asInt() || cl_paused->modified)
 		return true;
 	
 	return false;
@@ -2964,7 +2964,7 @@ ClientLoop::frame
 */
 void ClientLoop::frame ( int msec ) {
 
-	if ( !com_cl_running->integer ) {
+	if ( !com_cl_running->asInt() ) {
 		return;
 	}
 
@@ -3004,17 +3004,17 @@ void ClientLoop::frame ( int msec ) {
 		cls.cddialog = false;
 		theUI.setActiveMenu( UserInterface::MenuCommand::UIMENU_NEED_CD );
 	} else	if ( clc.state == CA_DISCONNECTED && !( Key_GetCatcher( ) & KEYCATCH_UI )
-		&& !com_sv_running->integer && theUI.isInitialized() ) {
+		&& !com_sv_running->asInt() && theUI.isInitialized() ) {
 		// if disconnected, bring up the menu
 		SoundSystem::stopAllSounds();
 		theUI.setActiveMenu( UserInterface::MenuCommand::UIMENU_MAIN );
 	}
 
 	// if recording an avi, lock to a fixed fps
-	if ( Client::videoRecording( ) && cl_aviFrameRate->integer && msec) {
+	if ( Client::videoRecording( ) && cl_aviFrameRate->asInt() && msec) {
 		// save the current screen
-		if ( clc.state == CA_ACTIVE || cl_forceavidemo->integer) {
-			float fps = std::min(cl_aviFrameRate->value * com_timescale->value, 1000.0f);
+		if ( clc.state == CA_ACTIVE || cl_forceavidemo->asInt()) {
+			float fps = std::min(cl_aviFrameRate->asFloat() * com_timescale->asFloat(), 1000.0f);
 			float frameDuration = std::max(1000.0f / fps, 1.0f) + clc.aviVideoFrameRemainder;
 
 			Client::takeVideoFrame( );
@@ -3024,7 +3024,7 @@ void ClientLoop::frame ( int msec ) {
 		}
 	}
 	
-	if( cl_autoRecordDemo->integer ) {
+	if( cl_autoRecordDemo->asInt() ) {
 		if( clc.state == CA_ACTIVE && !clc.demorecording && !clc.demoplaying ) {
 			// If not recording a demo, and we should be, start one
 			qtime_t	now;
@@ -3070,7 +3070,7 @@ void ClientLoop::frame ( int msec ) {
 
 	cls.realtime += cls.frametime;
 
-	if ( cl_timegraph->integer ) {
+	if ( cl_timegraph->asInt() ) {
 		Screen::debugGraph ( cls.realFrametime * 0.25 );
 	}
 
@@ -3193,7 +3193,7 @@ void ClientLoop::startHunkUsers( bool rendererOnly ) {
 		return;
 	}
 
-	if ( !com_cl_running->integer ) {
+	if ( !com_cl_running->asInt() ) {
 		return;
 	}
 
@@ -3216,7 +3216,7 @@ void ClientLoop::startHunkUsers( bool rendererOnly ) {
 		SoundSystem::beginRegistration();
 	}
 
-	if( com_dedicated->integer ) {
+	if( com_dedicated->asInt() ) {
 		return;
 	}
 
@@ -3236,7 +3236,7 @@ static void *CL_RefMalloc( int size ) {
 }
 
 int Client::scaledMilliseconds() {
-	return System::milliseconds()*com_timescale->value;
+	return System::milliseconds()*com_timescale->asFloat();
 }
 
 /*
@@ -3257,9 +3257,9 @@ void ClientLoop::initRenderer( ) {
 #ifdef USE_RENDERER_DLOPEN
 	cl_renderer = CvarSystem::get("cl_renderer", "opengl2", CVAR_ARCHIVE | CVAR_LATCH);
 
-	Com_sprintf(dllName, sizeof(dllName), "renderer_%s" DLL_EXT, cl_renderer->string);
+	Com_sprintf(dllName, sizeof(dllName), "renderer_%s" DLL_EXT, cl_renderer->asString());
 
-	if(!(rendererLib = Sys_LoadDll(dllName, false)) && strcmp(cl_renderer->string, cl_renderer->resetString))
+	if(!(rendererLib = Sys_LoadDll(dllName, false)) && strcmp(cl_renderer->asString(), cl_renderer->resetString))
 	{
 		Common::printf("failed:\n\"%s\"\n", Sys_LibraryError());
 		CvarSystem::forceReset("cl_renderer");
@@ -3692,7 +3692,7 @@ void ClientLoop::init( ) {
 
 	cl_voip = CvarSystem::get ("cl_voip", "1", CVAR_ARCHIVE);
 	CvarSystem::checkRange( cl_voip, 0, 1, true );
-	cl_voipProtocol = CvarSystem::get ("cl_voipProtocol", cl_voip->integer ? "opus" : "", CVAR_USERINFO | CVAR_ROM);
+	cl_voipProtocol = CvarSystem::get ("cl_voipProtocol", cl_voip->asInt() ? "opus" : "", CVAR_USERINFO | CVAR_ROM);
 #endif
 
 #ifdef USE_HTTP
@@ -3734,7 +3734,7 @@ void ClientLoop::init( ) {
 	CommandSystem::addCommand ("model", CL_SetModel_f );
 	CommandSystem::addCommand ("video", CL_Video_f );
 	CommandSystem::addCommand ("stopvideo", CL_StopVideo_f );
-	if( !com_dedicated->integer ) {
+	if( !com_dedicated->asInt() ) {
 		CommandSystem::addCommand ("sayto", CL_Sayto_f );
 		CommandSystem::setCommandCompletionFunc( "sayto", Client::completePlayerName );
 	}
@@ -3765,7 +3765,7 @@ void ClientLoop::shutdown(const char *finalmsg, bool disconnect, bool quit)
 	static bool recursive = false;
 	
 	// check whether the client is running at all.
-	if(!(com_cl_running && com_cl_running->integer))
+	if(!(com_cl_running && com_cl_running->asInt()))
 		return;
 	
 	Common::printf( "----- Client Shutdown (%s) -----\n", finalmsg );
@@ -3889,11 +3889,11 @@ void Client::serverInfoPacket( netadr_t from, Message *msg ) {
 
 #ifdef LEGACY_PROTOCOL
 	// gamename is optional for legacy protocol
-	if (com_legacyprotocol->integer && !*gamename)
+	if (com_legacyprotocol->asInt() && !*gamename)
 		gameMismatch = false;
 	else
 #endif
-		gameMismatch = !*gamename || strcmp(gamename, com_gamename->string) != 0;
+		gameMismatch = !*gamename || strcmp(gamename, com_gamename->asString()) != 0;
 
 	if (gameMismatch)
 	{
@@ -3904,9 +3904,9 @@ void Client::serverInfoPacket( netadr_t from, Message *msg ) {
 	// if this isn't the correct protocol version, ignore it
 	prot = atoi( Info::valueForKey( infoString, "protocol" ) );
 
-	if(prot != com_protocol->integer
+	if(prot != com_protocol->asInt()
 #ifdef LEGACY_PROTOCOL
-	   && prot != com_legacyprotocol->integer
+	   && prot != com_legacyprotocol->asInt()
 #endif
 	  )
 	{
@@ -4051,7 +4051,7 @@ int Client::serverStatus( const char *serverAddress, char *serverStatusString, i
 			return true;
 		}
 		// resend the request regularly
-		else if ( serverStatus->startTime < Common::milliseconds() - cl_serverStatusResendTime->integer ) {
+		else if ( serverStatus->startTime < Common::milliseconds() - cl_serverStatusResendTime->asInt() ) {
 			serverStatus->print = false;
 			serverStatus->pending = true;
 			serverStatus->retrieved = false;
@@ -4290,20 +4290,20 @@ void Client::globalServers_f( ) {
 		if(v4enabled)
 		{
 			Com_sprintf(command, sizeof(command), "getserversExt %s %s",
-				com_gamename->string, CommandSystem::argv(2));
+				com_gamename->asString(), CommandSystem::argv(2));
 		}
 		else
 		{
 			Com_sprintf(command, sizeof(command), "getserversExt %s %s ipv6",
-				com_gamename->string, CommandSystem::argv(2));
+				com_gamename->asString(), CommandSystem::argv(2));
 		}
 	}
-	else if ( !Q_stricmp( com_gamename->string, LEGACY_MASTER_GAMENAME ) )
+	else if ( !Q_stricmp( com_gamename->asString(), LEGACY_MASTER_GAMENAME ) )
 		Com_sprintf(command, sizeof(command), "getservers %s",
 			CommandSystem::argv(2));
 	else
 		Com_sprintf(command, sizeof(command), "getservers %s %s",
-			com_gamename->string, CommandSystem::argv(2));
+			com_gamename->asString(), CommandSystem::argv(2));
 
 	for (i=3; i < count; i++)
 	{

@@ -94,10 +94,10 @@ R_SetFlareCoeff
 */
 static void R_SetFlareCoeff( ) {
 
-	if(r_flareCoeff->value == 0.0f)
+	if(r_flareCoeff->asFloat() == 0.0f)
 		flareCoeff = atof(FLARE_STDCOEFF);
 	else
-		flareCoeff = r_flareCoeff->value;
+		flareCoeff = r_flareCoeff->asFloat();
 }
 
 /*
@@ -224,7 +224,7 @@ void RB_AddDlightFlares( ) {
 	int				i, j, k;
 	fog_t			*fog = nullptr;
 
-	if ( !r_flares->integer ) {
+	if ( !r_flares->asInt() ) {
 		return;
 	}
 
@@ -325,13 +325,13 @@ void RB_TestFlare( flare_t *f ) {
 			f->visible = true;
 			f->fadeTime = backEnd.refdef.time - 1;
 		}
-		fade = ( ( backEnd.refdef.time - f->fadeTime ) /1000.0f ) * r_flareFade->value;
+		fade = ( ( backEnd.refdef.time - f->fadeTime ) /1000.0f ) * r_flareFade->asFloat();
 	} else {
 		if ( f->visible ) {
 			f->visible = false;
 			f->fadeTime = backEnd.refdef.time - 1;
 		}
-		fade = 1.0f - ( ( backEnd.refdef.time - f->fadeTime ) / 1000.0f ) * r_flareFade->value;
+		fade = 1.0f - ( ( backEnd.refdef.time - f->fadeTime ) / 1000.0f ) * r_flareFade->asFloat();
 	}
 
 	if ( fade < 0 ) {
@@ -366,13 +366,13 @@ void RB_RenderFlare( flare_t *f ) {
 		distance = -f->eyeZ;
 
 	// calculate the flare size..
-	size = backEnd.viewParms.viewportWidth * ( r_flareSize->value/640.0f + 8 / distance );
+	size = backEnd.viewParms.viewportWidth * ( r_flareSize->asFloat()/640.0f + 8 / distance );
 
 /*
  * This is an alternative to intensity scaling. It changes the size of the flare on screen instead
  * with growing distance. See in the description at the top why this is not the way to go.
 	// size will change ~ 1/r.
-	size = backEnd.viewParms.viewportWidth * (r_flareSize->value / (distance * -2.0f));
+	size = backEnd.viewParms.viewportWidth * (r_flareSize->asFloat() / (distance * -2.0f));
 */
 
 /*
@@ -488,7 +488,7 @@ void RB_RenderFlares () {
 	bool	draw;
 	mat4_t    oldmodelview, oldprojection, matrix;
 
-	if ( !r_flares->integer ) {
+	if ( !r_flares->asInt() ) {
 		return;
 	}
 

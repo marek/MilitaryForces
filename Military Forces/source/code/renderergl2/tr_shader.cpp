@@ -204,14 +204,14 @@ static int NameToSrcBlendMode( const char *name )
 	}
 	else if ( !Q_stricmp( name, "GL_DST_ALPHA" ) )
 	{
-		if (r_ignoreDstAlpha->integer)
+		if (r_ignoreDstAlpha->asInt())
 			return GLS_SRCBLEND_ONE;
 
 		return GLS_SRCBLEND_DST_ALPHA;
 	}
 	else if ( !Q_stricmp( name, "GL_ONE_MINUS_DST_ALPHA" ) )
 	{
-		if (r_ignoreDstAlpha->integer)
+		if (r_ignoreDstAlpha->asInt())
 			return GLS_SRCBLEND_ZERO;
 
 		return GLS_SRCBLEND_ONE_MINUS_DST_ALPHA;
@@ -250,14 +250,14 @@ static int NameToDstBlendMode( const char *name )
 	}
 	else if ( !Q_stricmp( name, "GL_DST_ALPHA" ) )
 	{
-		if (r_ignoreDstAlpha->integer)
+		if (r_ignoreDstAlpha->asInt())
 			return GLS_DSTBLEND_ONE;
 
 		return GLS_DSTBLEND_DST_ALPHA;
 	}
 	else if ( !Q_stricmp( name, "GL_ONE_MINUS_DST_ALPHA" ) )
 	{
-		if (r_ignoreDstAlpha->integer)
+		if (r_ignoreDstAlpha->asInt())
 			return GLS_DSTBLEND_ZERO;
 
 		return GLS_DSTBLEND_ONE_MINUS_DST_ALPHA;
@@ -684,7 +684,7 @@ static bool ParseStage( shaderStage_t *stage, char **text )
 				}
 				else
 				{
-					if (r_genNormalMaps->integer)
+					if (r_genNormalMaps->asInt())
 						flags |= IMGFLAG_GENNORMALMAP;
 				}
 
@@ -728,7 +728,7 @@ static bool ParseStage( shaderStage_t *stage, char **text )
 			}
 			else
 			{
-				if (r_genNormalMaps->integer)
+				if (r_genNormalMaps->asInt())
 					flags |= IMGFLAG_GENNORMALMAP;
 			}
 
@@ -913,15 +913,15 @@ static bool ParseStage( shaderStage_t *stage, char **text )
 			else if(!Q_stricmp(token, "normalMap") || !Q_stricmp(token, "bumpMap"))
 			{
 				stage->type = ST_NORMALMAP;
-				VectorSet4(stage->normalScale, r_baseNormalX->value, r_baseNormalY->value, 1.0f, r_baseParallax->value);
+				VectorSet4(stage->normalScale, r_baseNormalX->asFloat(), r_baseNormalY->asFloat(), 1.0f, r_baseParallax->asFloat());
 			}
 			else if(!Q_stricmp(token, "normalParallaxMap") || !Q_stricmp(token, "bumpParallaxMap"))
 			{
-				if (r_parallaxMapping->integer)
+				if (r_parallaxMapping->asInt())
 					stage->type = ST_NORMALPARALLAXMAP;
 				else
 					stage->type = ST_NORMALMAP;
-				VectorSet4(stage->normalScale, r_baseNormalX->value, r_baseNormalY->value, 1.0f, r_baseParallax->value);
+				VectorSet4(stage->normalScale, r_baseNormalX->asFloat(), r_baseNormalY->asFloat(), 1.0f, r_baseParallax->asFloat());
 			}
 			else if(!Q_stricmp(token, "specularMap"))
 			{
@@ -946,7 +946,7 @@ static bool ParseStage( shaderStage_t *stage, char **text )
 				continue;
 			}
 
-			if (r_pbr->integer)
+			if (r_pbr->asInt())
 			{
 				// interpret specularReflectance < 0.5 as nonmetal
 				stage->specularScale[1] = (atof(token) < 0.5f) ? 0.0f : 1.0f;
@@ -974,7 +974,7 @@ static bool ParseStage( shaderStage_t *stage, char **text )
 
 			exponent = atof( token );
 
-			if (r_pbr->integer)
+			if (r_pbr->asInt())
 				stage->specularScale[0] = 1.0f - powf(2.0f / (exponent + 2.0), 0.25);
 			else
 			{
@@ -1000,7 +1000,7 @@ static bool ParseStage( shaderStage_t *stage, char **text )
 
 			gloss = atof(token);
 
-			if (r_pbr->integer)
+			if (r_pbr->asInt())
 				stage->specularScale[0] = 1.0f - exp2f(-3.0f * gloss);
 			else
 				stage->specularScale[3] = gloss;
@@ -1021,7 +1021,7 @@ static bool ParseStage( shaderStage_t *stage, char **text )
 
 			roughness = atof(token);
 
-			if (r_pbr->integer)
+			if (r_pbr->asInt())
 				stage->specularScale[0] = 1.0 - roughness;
 			else
 			{
@@ -1109,7 +1109,7 @@ static bool ParseStage( shaderStage_t *stage, char **text )
 			token = COM_ParseExt(text, false);
 			if ( token[0] == 0 )
 			{
-				if (r_pbr->integer)
+				if (r_pbr->asInt())
 				{
 					// two values, metallic then smoothness
 					float smoothness = stage->specularScale[1];
@@ -1805,7 +1805,7 @@ static bool ParseShader( char **text )
 			float	a, b;
 			bool isGL2Sun = false;
 
-			if (!Q_stricmp( token, "q3gl2_sun" ) && r_sunShadows->integer )
+			if (!Q_stricmp( token, "q3gl2_sun" ) && r_sunShadows->asInt() )
 			{
 				isGL2Sun = true;
 				tr.sunShadows = true;
@@ -1931,21 +1931,21 @@ static bool ParseShader( char **text )
 				return false;
 			}
 
-			if ( r_greyscale->integer )
+			if ( r_greyscale->asInt() )
 			{
 				float luminance;
 
 				luminance = LUMA( shader.fogParms.color[0], shader.fogParms.color[1], shader.fogParms.color[2] );
 				VectorSet( shader.fogParms.color, luminance, luminance, luminance );
 			}
-			else if ( r_greyscale->value )
+			else if ( r_greyscale->asFloat() )
 			{
 				float luminance;
 
 				luminance = LUMA( shader.fogParms.color[0], shader.fogParms.color[1], shader.fogParms.color[2] );
-				shader.fogParms.color[0] = LERP( shader.fogParms.color[0], luminance, r_greyscale->value );
-				shader.fogParms.color[1] = LERP( shader.fogParms.color[1], luminance, r_greyscale->value );
-				shader.fogParms.color[2] = LERP( shader.fogParms.color[2], luminance, r_greyscale->value );
+				shader.fogParms.color[0] = LERP( shader.fogParms.color[0], luminance, r_greyscale->asFloat() );
+				shader.fogParms.color[1] = LERP( shader.fogParms.color[1], luminance, r_greyscale->asFloat() );
+				shader.fogParms.color[2] = LERP( shader.fogParms.color[2], luminance, r_greyscale->asFloat() );
 			}
 
 			token = COM_ParseExt( text, false );
@@ -2137,7 +2137,7 @@ static void ComputeVertexAttribs()
 		{
 			shader.vertexAttribs |= ATTR_NORMAL;
 
-			if ((pStage->glslShaderIndex & LIGHTDEF_LIGHTTYPE_MASK) && !(r_normalMapping->integer == 0 && r_specularMapping->integer == 0))
+			if ((pStage->glslShaderIndex & LIGHTDEF_LIGHTTYPE_MASK) && !(r_normalMapping->asInt() == 0 && r_specularMapping->asInt() == 0))
 			{
 				shader.vertexAttribs |= ATTR_TANGENT;
 			}
@@ -2239,21 +2239,21 @@ static void CollapseStagesToLightall(shaderStage_t *diffuse,
 		defs |= LIGHTDEF_USE_LIGHT_VERTEX;
 	}
 
-	if (r_deluxeMapping->integer && tr.worldDeluxeMapping && lightmap && shader.lightmapIndex >= 0)
+	if (r_deluxeMapping->asInt() && tr.worldDeluxeMapping && lightmap && shader.lightmapIndex >= 0)
 	{
 		//ri.Printf(PRINT_ALL, ", deluxemap");
 		diffuse->bundle[TB_DELUXEMAP] = lightmap->bundle[0];
 		diffuse->bundle[TB_DELUXEMAP].image[0] = tr.deluxemaps[shader.lightmapIndex];
 	}
 
-	if (r_normalMapping->integer)
+	if (r_normalMapping->asInt())
 	{
 		image_t *diffuseImg;
 		if (normal)
 		{
 			//ri.Printf(PRINT_ALL, ", normalmap %s", normal->bundle[0].image[0]->imgName);
 			diffuse->bundle[TB_NORMALMAP] = normal->bundle[0];
-			if (parallax && r_parallaxMapping->integer)
+			if (parallax && r_parallaxMapping->asInt())
 				defs |= LIGHTDEF_USE_PARALLAXMAP;
 
 			VectorCopy4(normal->normalScale, diffuse->normalScale);
@@ -2287,15 +2287,15 @@ static void CollapseStagesToLightall(shaderStage_t *diffuse,
 				diffuse->bundle[TB_NORMALMAP].numImageAnimations = 0;
 				diffuse->bundle[TB_NORMALMAP].image[0] = normalImg;
 
-				if (parallax && r_parallaxMapping->integer)
+				if (parallax && r_parallaxMapping->asInt())
 					defs |= LIGHTDEF_USE_PARALLAXMAP;
 
-				VectorSet4(diffuse->normalScale, r_baseNormalX->value, r_baseNormalY->value, 1.0f, r_baseParallax->value);
+				VectorSet4(diffuse->normalScale, r_baseNormalX->asFloat(), r_baseNormalY->asFloat(), 1.0f, r_baseParallax->asFloat());
 			}
 		}
 	}
 
-	if (r_specularMapping->integer)
+	if (r_specularMapping->asInt())
 	{
 		image_t *diffuseImg;
 		if (specular)
@@ -2589,7 +2589,7 @@ static int CollapseStagesToGLSL()
 	// convert any remaining lightmap stages with no blending or blendfunc filter
 	// to a lighting pass with a white texture
 	// only do this with r_sunlightMode non-zero, as it's only for correct shadows.
-	if (r_sunlightMode->integer && shader.numDeforms == 0)
+	if (r_sunlightMode->asInt() && shader.numDeforms == 0)
 	{
 		for (i = 0; i < MAX_SHADER_STAGES; i++)
 		{
@@ -2921,7 +2921,7 @@ static void FixFatLightmapTexCoords()
 	int size;
 	int i;
 
-	if ( !r_mergeLightmaps->integer || tr.fatLightmapCols <= 0) {
+	if ( !r_mergeLightmaps->asInt() || tr.fatLightmapCols <= 0) {
 		return;
 	}
 
@@ -3027,16 +3027,16 @@ static void InitShaderEx( const char *name, int lightmapIndex, int realLightmapI
 
 		// default normal/specular
 		VectorSet4(stages[i].normalScale, 0.0f, 0.0f, 0.0f, 0.0f);
-		if (r_pbr->integer)
+		if (r_pbr->asInt())
 		{
-			stages[i].specularScale[0] = r_baseGloss->value;
+			stages[i].specularScale[0] = r_baseGloss->asFloat();
 		}
 		else
 		{
 			stages[i].specularScale[0] =
 			stages[i].specularScale[1] =
-			stages[i].specularScale[2] = r_baseSpecular->value;
-			stages[i].specularScale[3] = r_baseGloss->value;
+			stages[i].specularScale[2] = r_baseSpecular->asFloat();
+			stages[i].specularScale[3] = r_baseGloss->asFloat();
 		}
 	}
 }
@@ -3096,7 +3096,7 @@ static shader_t *FinishShader( ) {
 		//
 		// ditch this stage if it's detail and detail textures are disabled
 		//
-		if ( pStage->isDetail && !r_detailTextures->integer )
+		if ( pStage->isDetail && !r_detailTextures->asInt() )
 		{
 			int index;
 			
@@ -3197,7 +3197,7 @@ static shader_t *FinishShader( ) {
 	//
 	// if we are in r_vertexLight mode, never use a lightmap texture
 	//
-	if ( stage > 1 && ( (r_vertexLight->integer && !r_uiFullScreen->integer) || glConfig.hardwareType == GLHW_PERMEDIA2 ) ) {
+	if ( stage > 1 && ( (r_vertexLight->asInt() && !r_uiFullScreen->asInt()) || glConfig.hardwareType == GLHW_PERMEDIA2 ) ) {
 		VertexLightingCollapse();
 		hasLightmapStage = false;
 	}
@@ -3418,7 +3418,7 @@ shader_t *R_FindShaderEx( const char *name, int lightmapIndex, bool mipRawImage,
 	if ( shaderText ) {
 		// enable this when building a pak file to get a global list
 		// of all explicit shaders
-		if ( r_printShaders->integer ) {
+		if ( r_printShaders->asInt() ) {
 			ri.Printf( PRINT_ALL, "*SHADER* %s\n", name );
 		}
 
@@ -3444,7 +3444,7 @@ shader_t *R_FindShaderEx( const char *name, int lightmapIndex, bool mipRawImage,
 		{
 			flags |= IMGFLAG_MIPMAP | IMGFLAG_PICMIP;
 
-			if (r_genNormalMaps->integer)
+			if (r_genNormalMaps->asInt())
 				flags |= IMGFLAG_GENNORMALMAP;
 		}
 		else

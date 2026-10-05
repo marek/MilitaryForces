@@ -82,7 +82,7 @@ int GameHost::botAllocateClient()
 	SV_Client	*cl = nullptr;
 
 	// find a client slot
-	for( i = sv_privateClients->integer + 1; i <= sv_maxclients->integer; i++ ) 
+	for( i = sv_privateClients->asInt() + 1; i <= sv_maxclients->asInt(); i++ ) 
 	{
 		cl = theSVS.svClients_.at(i);
 		if( !cl )
@@ -93,7 +93,7 @@ int GameHost::botAllocateClient()
 		if( cl->state_ == SV_Client::CS_FREE ) 
 			break;
 	}
-	if( i > sv_maxclients->integer ) 
+	if( i > sv_maxclients->asInt() ) 
 		return -1;
 
 	cl->clear();
@@ -114,7 +114,7 @@ GameHost::botFreeClient
 */
 void GameHost::botFreeClient( int clientNum ) 
 {
-	if( clientNum < 1 || clientNum > sv_maxclients->integer || !theSVS.svClients_.at(clientNum) ) 
+	if( clientNum < 1 || clientNum > sv_maxclients->asInt() || !theSVS.svClients_.at(clientNum) ) 
 		Common::error( ERR_DROP, "SV_BotFreeClient: bad clientNum: %i", clientNum );
 
 	SV_Client* cl = theSVS.svClients_.at(clientNum);
@@ -129,7 +129,7 @@ GameHost::botUserCommand
 */
 void GameHost::botUserCommand( int clientNum, usercmd_t *cmd ) 
 {
-	if( clientNum < 1 || clientNum > sv_maxclients->integer || !theSVS.svClients_.at(clientNum) ) 
+	if( clientNum < 1 || clientNum > sv_maxclients->asInt() || !theSVS.svClients_.at(clientNum) ) 
 		return;
 
 	SV_Client* cl = theSVS.svClients_.at(clientNum);

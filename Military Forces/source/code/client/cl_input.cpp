@@ -70,7 +70,7 @@ static void IN_MLookDown( ) {
 
 static void IN_MLookUp( ) {
 	in_mlooking = false;
-	if ( !cl_freelook->integer ) {
+	if ( !cl_freelook->asInt() ) {
 		IN_CenterView ();
 	}
 }
@@ -294,18 +294,18 @@ static void CL_AdjustAngles( ) {
 	float	speed;
 	
 	if ( in_speed.active ) {
-		speed = 0.001 * cls.frametime * cl_anglespeedkey->value;
+		speed = 0.001 * cls.frametime * cl_anglespeedkey->asFloat();
 	} else {
 		speed = 0.001 * cls.frametime;
 	}
 
 	if ( !in_strafe.active ) {
-		cl.viewangles[YAW] -= speed*cl_yawspeed->value*Client::keyState (&in_right);
-		cl.viewangles[YAW] += speed*cl_yawspeed->value*Client::keyState (&in_left);
+		cl.viewangles[YAW] -= speed*cl_yawspeed->asFloat()*Client::keyState (&in_right);
+		cl.viewangles[YAW] += speed*cl_yawspeed->asFloat()*Client::keyState (&in_left);
 	}
 
-	cl.viewangles[PITCH] -= speed*cl_pitchspeed->value * Client::keyState (&in_lookup);
-	cl.viewangles[PITCH] += speed*cl_pitchspeed->value * Client::keyState (&in_lookdown);
+	cl.viewangles[PITCH] -= speed*cl_pitchspeed->asFloat() * Client::keyState (&in_lookup);
+	cl.viewangles[PITCH] += speed*cl_pitchspeed->asFloat() * Client::keyState (&in_lookdown);
 }
 
 /*
@@ -324,7 +324,7 @@ static void CL_KeyMove( usercmd_t *cmd ) {
 	// the walking flag is to keep animations consistent
 	// even during acceleration and develeration
 	//
-	if ( in_speed.active ^ cl_run->integer ) {
+	if ( in_speed.active ^ cl_run->asInt() ) {
 		movespeed = 127;
 		cmd->buttons &= ~BUTTON_XXX2;
 	} else {
@@ -393,18 +393,18 @@ CL_JoystickMove
 static void CL_JoystickMove( usercmd_t *cmd ) {
 	float	anglespeed;
 
-	float yaw     = j_yaw->value     * cl.joystickAxis[j_yaw_axis->integer];
-	float right   = j_side->value    * cl.joystickAxis[j_side_axis->integer];
-	float forward = j_forward->value * cl.joystickAxis[j_forward_axis->integer];
-	float pitch   = j_pitch->value   * cl.joystickAxis[j_pitch_axis->integer];
-	float up      = j_up->value      * cl.joystickAxis[j_up_axis->integer];
+	float yaw     = j_yaw->asFloat()     * cl.joystickAxis[j_yaw_axis->asInt()];
+	float right   = j_side->asFloat()    * cl.joystickAxis[j_side_axis->asInt()];
+	float forward = j_forward->asFloat() * cl.joystickAxis[j_forward_axis->asInt()];
+	float pitch   = j_pitch->asFloat()   * cl.joystickAxis[j_pitch_axis->asInt()];
+	float up      = j_up->asFloat()      * cl.joystickAxis[j_up_axis->asInt()];
 
-	if ( !(in_speed.active ^ cl_run->integer) ) {
+	if ( !(in_speed.active ^ cl_run->asInt()) ) {
 		cmd->buttons |= BUTTON_XXX2;
 	}
 
 	if ( in_speed.active ) {
-		anglespeed = 0.001 * cls.frametime * cl_anglespeedkey->value;
+		anglespeed = 0.001 * cls.frametime * cl_anglespeedkey->asFloat();
 	} else {
 		anglespeed = 0.001 * cls.frametime;
 	}
@@ -439,7 +439,7 @@ static void CL_MouseMove(usercmd_t *cmd)
 	float mx, my;
 
 	// allow mouse smoothing
-	if (m_filter->integer)
+	if (m_filter->asInt())
 	{
 		mx = (cl.mouseDx[0] + cl.mouseDx[1]) * 0.5f;
 		my = (cl.mouseDy[0] + cl.mouseDy[1]) * 0.5f;
@@ -457,20 +457,20 @@ static void CL_MouseMove(usercmd_t *cmd)
 	if (mx == 0.0f && my == 0.0f)
 		return;
 	
-	if (cl_mouseAccel->value != 0.0f)
+	if (cl_mouseAccel->asFloat() != 0.0f)
 	{
-		if(cl_mouseAccelStyle->integer == 0)
+		if(cl_mouseAccelStyle->asInt() == 0)
 		{
 			float accelSensitivity;
 			float rate;
 			
 			rate = sqrt(mx * mx + my * my) / static_cast<float>(frame_msec);
 
-			accelSensitivity = cl_sensitivity->value + rate * cl_mouseAccel->value;
+			accelSensitivity = cl_sensitivity->asFloat() + rate * cl_mouseAccel->asFloat();
 			mx *= accelSensitivity;
 			my *= accelSensitivity;
 			
-			if(cl_showMouseRate->integer)
+			if(cl_showMouseRate->asInt())
 				Common::printf("rate: %f, accelSensitivity: %f\n", rate, accelSensitivity);
 		}
 		else
@@ -485,20 +485,20 @@ static void CL_MouseMove(usercmd_t *cmd)
 
 			rate[0] = fabs(mx) / static_cast<float>(frame_msec);
 			rate[1] = fabs(my) / static_cast<float>(frame_msec);
-			power[0] = powf(rate[0] / cl_mouseAccelOffset->value, cl_mouseAccel->value);
-			power[1] = powf(rate[1] / cl_mouseAccelOffset->value, cl_mouseAccel->value);
+			power[0] = powf(rate[0] / cl_mouseAccelOffset->asFloat(), cl_mouseAccel->asFloat());
+			power[1] = powf(rate[1] / cl_mouseAccelOffset->asFloat(), cl_mouseAccel->asFloat());
 
-			mx = cl_sensitivity->value * (mx + ((mx < 0) ? -power[0] : power[0]) * cl_mouseAccelOffset->value);
-			my = cl_sensitivity->value * (my + ((my < 0) ? -power[1] : power[1]) * cl_mouseAccelOffset->value);
+			mx = cl_sensitivity->asFloat() * (mx + ((mx < 0) ? -power[0] : power[0]) * cl_mouseAccelOffset->asFloat());
+			my = cl_sensitivity->asFloat() * (my + ((my < 0) ? -power[1] : power[1]) * cl_mouseAccelOffset->asFloat());
 
-			if(cl_showMouseRate->integer)
+			if(cl_showMouseRate->asInt())
 				Common::printf("ratex: %f, ratey: %f, powx: %f, powy: %f\n", rate[0], rate[1], power[0], power[1]);
 		}
 	}
 	else
 	{
-		mx *= cl_sensitivity->value;
-		my *= cl_sensitivity->value;
+		mx *= cl_sensitivity->asFloat();
+		my *= cl_sensitivity->asFloat();
 	}
 
 	// ingame FOV
@@ -507,14 +507,14 @@ static void CL_MouseMove(usercmd_t *cmd)
 
 	// add mouse X/Y movement to cmd
 	if(in_strafe.active)
-		cmd->rightmove = ClampChar(cmd->rightmove + m_side->value * mx);
+		cmd->rightmove = ClampChar(cmd->rightmove + m_side->asFloat() * mx);
 	else
-		cl.viewangles[YAW] -= m_yaw->value * mx;
+		cl.viewangles[YAW] -= m_yaw->asFloat() * mx;
 
-	if ((in_mlooking || cl_freelook->integer) && !in_strafe.active)
-		cl.viewangles[PITCH] += m_pitch->value * my;
+	if ((in_mlooking || cl_freelook->asInt()) && !in_strafe.active)
+		cl.viewangles[PITCH] += m_pitch->asFloat() * my;
 	else
-		cmd->forwardmove = ClampChar(cmd->forwardmove - m_forward->value * my);
+		cmd->forwardmove = ClampChar(cmd->forwardmove - m_forward->asFloat() * my);
 }
 
 
@@ -609,11 +609,11 @@ static usercmd_t CL_CreateCmd( ) {
 	CL_FinishMove( &cmd );
 
 	// draw debug graphs of turning for mouse testing
-	if ( cl_debugMove->integer ) {
-		if ( cl_debugMove->integer == 1 ) {
+	if ( cl_debugMove->asInt() ) {
+		if ( cl_debugMove->asInt() == 1 ) {
 			Screen::debugGraph( fabs(cl.viewangles[YAW] - oldAngles[YAW]) );
 		}
-		if ( cl_debugMove->integer == 2 ) {
+		if ( cl_debugMove->asInt() == 2 ) {
 			Screen::debugGraph( fabs(cl.viewangles[PITCH] - oldAngles[PITCH]) );
 		}
 	}
@@ -700,19 +700,19 @@ static bool CL_ReadyToSendPacket( ) {
 	}
 
 	// send every frame for LAN
-	if ( cl_lanForcePackets->integer && Sys_IsLANAddress( clc.netchan.remoteAddress() ) ) {
+	if ( cl_lanForcePackets->asInt() && Sys_IsLANAddress( clc.netchan.remoteAddress() ) ) {
 		return true;
 	}
 
 	// check for exceeding cl_maxpackets
-	if ( cl_maxpackets->integer < 15 ) {
+	if ( cl_maxpackets->asInt() < 15 ) {
 		CvarSystem::set( "cl_maxpackets", "15" );
-	} else if ( cl_maxpackets->integer > 125 ) {
+	} else if ( cl_maxpackets->asInt() > 125 ) {
 		CvarSystem::set( "cl_maxpackets", "125" );
 	}
 	oldPacketNum = (clc.netchan.outgoingSequence() - 1) & PACKET_MASK;
 	delta = cls.realtime -  cl.outPackets[ oldPacketNum ].p_realtime;
-	if ( delta < 1000 / cl_maxpackets->integer ) {
+	if ( delta < 1000 / cl_maxpackets->asInt() ) {
 		// the accumulated commands will go out in the next packet
 		return false;
 	}
@@ -787,12 +787,12 @@ void Client::writePacket( ) {
 	// we want to send all the usercmds that were generated in the last
 	// few packet, so even if a couple packets are dropped in a row,
 	// all the cmds will make it to the server
-	if ( cl_packetdup->integer < 0 ) {
+	if ( cl_packetdup->asInt() < 0 ) {
 		CvarSystem::set( "cl_packetdup", "0" );
-	} else if ( cl_packetdup->integer > 5 ) {
+	} else if ( cl_packetdup->asInt() > 5 ) {
 		CvarSystem::set( "cl_packetdup", "5" );
 	}
-	oldPacketNum = (clc.netchan.outgoingSequence() - 1 - cl_packetdup->integer) & PACKET_MASK;
+	oldPacketNum = (clc.netchan.outgoingSequence() - 1 - cl_packetdup->asInt()) & PACKET_MASK;
 	count = cl.cmdNumber - cl.outPackets[ oldPacketNum ].p_cmdNumber;
 	if ( count > MAX_PACKET_USERCMDS ) {
 		count = MAX_PACKET_USERCMDS;
@@ -851,12 +851,12 @@ void Client::writePacket( ) {
 #endif
 
 	if ( count >= 1 ) {
-		if ( cl_showSend->integer ) {
+		if ( cl_showSend->asInt() ) {
 			Common::printf( "(%i)", count );
 		}
 
 		// begin a client move command
-		if ( cl_nodelta->integer || !cl.snap.valid || clc.demowaiting
+		if ( cl_nodelta->asInt() || !cl.snap.valid || clc.demowaiting
 			|| clc.serverMessageSequence != cl.snap.messageNum ) {
 			buf.writeByte( clc_moveNoDelta);
 		} else {
@@ -891,7 +891,7 @@ void Client::writePacket( ) {
 	cl.outPackets[ packetNum ].p_cmdNumber = cl.cmdNumber;
 	clc.lastPacketSentTime = cls.realtime;
 
-	if ( cl_showSend->integer ) {
+	if ( cl_showSend->asInt() ) {
 		Common::printf( "%i ", buf.size() );
 	}
 
@@ -912,7 +912,7 @@ void Client::sendCmd( ) {
 	}
 
 	// don't send commands if paused
-	if ( com_sv_running->integer && sv_paused->integer && cl_paused->integer ) {
+	if ( com_sv_running->asInt() && sv_paused->asInt() && cl_paused->asInt() ) {
 		return;
 	}
 
@@ -921,7 +921,7 @@ void Client::sendCmd( ) {
 
 	// don't send a packet if the last packet was sent too recently
 	if ( !CL_ReadyToSendPacket() ) {
-		if ( cl_showSend->integer ) {
+		if ( cl_showSend->asInt() ) {
 			Common::printf( ". " );
 		}
 		return;

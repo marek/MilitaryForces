@@ -131,7 +131,7 @@ using consoleKey_t = consoleKey_s;
 		char *text_p, *token;
 
 		cl_consoleKeys->modified = false;
-		text_p = cl_consoleKeys->string;
+		text_p = const_cast<char *>( cl_consoleKeys->asString() );	// the parser takes a non-const cursor but does not write
 		numConsoleKeys = 0;
 
 		while( numConsoleKeys < MAX_CONSOLE_KEYS )
@@ -310,7 +310,7 @@ static int IN_TranslateSDLToQ3Key( SDL_Keysym *keysym, bool down )
 		}
 	}
 
-	if( in_keyboardDebug->integer )
+	if( in_keyboardDebug->asInt() )
 		IN_PrintKey( keysym, key, down );
 
 	if( IN_IsConsoleKey( key, 0 ) )
@@ -364,7 +364,7 @@ static void IN_ActivateMouse( bool isFullscreen )
 	{
 		if( in_nograb->modified || !mouseActive )
 		{
-			if( in_nograb->integer ) {
+			if( in_nograb->asInt() ) {
 				SDL_SetRelativeMouseMode( SDL_FALSE );
 				SDL_SetWindowGrab( SDL_window, SDL_FALSE );
 			} else {
@@ -513,35 +513,35 @@ static void IN_InitJoystick( )
 	// Update cvar on in_restart or controller add/remove.
 	CvarSystem::set( "in_availableJoysticks", buf );
 
-	if( !in_joystick->integer ) {
+	if( !in_joystick->asInt() ) {
 		Common::dPrintf( "Joystick is not active.\n" );
 		SDL_QuitSubSystem(SDL_INIT_GAMECONTROLLER);
 		return;
 	}
 
 	in_joystickNo = CvarSystem::get( "in_joystickNo", "0", CVAR_ARCHIVE );
-	if( in_joystickNo->integer < 0 || in_joystickNo->integer >= total )
+	if( in_joystickNo->asInt() < 0 || in_joystickNo->asInt() >= total )
 		CvarSystem::set( "in_joystickNo", "0" );
 
 	in_joystickUseAnalog = CvarSystem::get( "in_joystickUseAnalog", "0", CVAR_ARCHIVE );
 
-	stick = SDL_JoystickOpen( in_joystickNo->integer );
+	stick = SDL_JoystickOpen( in_joystickNo->asInt() );
 
 	if (stick == nullptr) {
 		Common::dPrintf( "No joystick opened: %s\n", SDL_GetError() );
 		return;
 	}
 
-	if (SDL_IsGameController(in_joystickNo->integer))
-		gamepad = SDL_GameControllerOpen(in_joystickNo->integer);
+	if (SDL_IsGameController(in_joystickNo->asInt()))
+		gamepad = SDL_GameControllerOpen(in_joystickNo->asInt());
 
-	Common::dPrintf( "Joystick %d opened\n", in_joystickNo->integer );
-	Common::dPrintf( "Name:       %s\n", SDL_JoystickNameForIndex(in_joystickNo->integer) );
+	Common::dPrintf( "Joystick %d opened\n", in_joystickNo->asInt() );
+	Common::dPrintf( "Name:       %s\n", SDL_JoystickNameForIndex(in_joystickNo->asInt()) );
 	Common::dPrintf( "Axes:       %d\n", SDL_JoystickNumAxes(stick) );
 	Common::dPrintf( "Hats:       %d\n", SDL_JoystickNumHats(stick) );
 	Common::dPrintf( "Buttons:    %d\n", SDL_JoystickNumButtons(stick) );
 	Common::dPrintf( "Balls:      %d\n", SDL_JoystickNumBalls(stick) );
-	Common::dPrintf( "Use Analog: %s\n", in_joystickUseAnalog->integer ? "Yes" : "No" );
+	Common::dPrintf( "Use Analog: %s\n", in_joystickUseAnalog->asInt() ? "Yes" : "No" );
 	Common::dPrintf( "Is gamepad: %s\n", gamepad ? "Yes" : "No" );
 
 	SDL_JoystickEventState(SDL_QUERY);
@@ -594,53 +594,53 @@ static bool KeyToAxisAndSign(int keynum, int *outAxis, int *outSign)
 
 	if (Q_stricmp(bind, "+forward") == 0)
 	{
-		*outAxis = j_forward_axis->integer;
-		*outSign = j_forward->value > 0.0f ? 1 : -1;
+		*outAxis = j_forward_axis->asInt();
+		*outSign = j_forward->asFloat() > 0.0f ? 1 : -1;
 	}
 	else if (Q_stricmp(bind, "+back") == 0)
 	{
-		*outAxis = j_forward_axis->integer;
-		*outSign = j_forward->value > 0.0f ? -1 : 1;
+		*outAxis = j_forward_axis->asInt();
+		*outSign = j_forward->asFloat() > 0.0f ? -1 : 1;
 	}
 	else if (Q_stricmp(bind, "+moveleft") == 0)
 	{
-		*outAxis = j_side_axis->integer;
-		*outSign = j_side->value > 0.0f ? -1 : 1;
+		*outAxis = j_side_axis->asInt();
+		*outSign = j_side->asFloat() > 0.0f ? -1 : 1;
 	}
 	else if (Q_stricmp(bind, "+moveright") == 0)
 	{
-		*outAxis = j_side_axis->integer;
-		*outSign = j_side->value > 0.0f ? 1 : -1;
+		*outAxis = j_side_axis->asInt();
+		*outSign = j_side->asFloat() > 0.0f ? 1 : -1;
 	}
 	else if (Q_stricmp(bind, "+lookup") == 0)
 	{
-		*outAxis = j_pitch_axis->integer;
-		*outSign = j_pitch->value > 0.0f ? -1 : 1;
+		*outAxis = j_pitch_axis->asInt();
+		*outSign = j_pitch->asFloat() > 0.0f ? -1 : 1;
 	}
 	else if (Q_stricmp(bind, "+lookdown") == 0)
 	{
-		*outAxis = j_pitch_axis->integer;
-		*outSign = j_pitch->value > 0.0f ? 1 : -1;
+		*outAxis = j_pitch_axis->asInt();
+		*outSign = j_pitch->asFloat() > 0.0f ? 1 : -1;
 	}
 	else if (Q_stricmp(bind, "+left") == 0)
 	{
-		*outAxis = j_yaw_axis->integer;
-		*outSign = j_yaw->value > 0.0f ? 1 : -1;
+		*outAxis = j_yaw_axis->asInt();
+		*outSign = j_yaw->asFloat() > 0.0f ? 1 : -1;
 	}
 	else if (Q_stricmp(bind, "+right") == 0)
 	{
-		*outAxis = j_yaw_axis->integer;
-		*outSign = j_yaw->value > 0.0f ? -1 : 1;
+		*outAxis = j_yaw_axis->asInt();
+		*outSign = j_yaw->asFloat() > 0.0f ? -1 : 1;
 	}
 	else if (Q_stricmp(bind, "+moveup") == 0)
 	{
-		*outAxis = j_up_axis->integer;
-		*outSign = j_up->value > 0.0f ? 1 : -1;
+		*outAxis = j_up_axis->asInt();
+		*outSign = j_up->asFloat() > 0.0f ? 1 : -1;
 	}
 	else if (Q_stricmp(bind, "+movedown") == 0)
 	{
-		*outAxis = j_up_axis->integer;
-		*outSign = j_up->value > 0.0f ? -1 : 1;
+		*outAxis = j_up_axis->asInt();
+		*outSign = j_up->asFloat() > 0.0f ? -1 : 1;
 	}
 
 	return *outSign != 0;
@@ -714,7 +714,7 @@ static void IN_GamepadMove( )
 
 	// must defer translated axes until all real axes are processed
 	// must be done this way to prevent a later mapped axis from zeroing out a previous one
-	if (in_joystickUseAnalog->integer)
+	if (in_joystickUseAnalog->asInt())
 	{
 		for (i = 0; i < MAX_JOYSTICK_AXIS; i++)
 		{
@@ -730,7 +730,7 @@ static void IN_GamepadMove( )
 		int oldAxis = stick_state.oldaaxes[i];
 
 		// Smoothly ramp from dead zone to maximum value
-		float f = (static_cast<float>(abs(axis)) / 32767.0f - in_joystickThreshold->value) / (1.0f - in_joystickThreshold->value);
+		float f = (static_cast<float>(abs(axis)) / 32767.0f - in_joystickThreshold->asFloat()) / (1.0f - in_joystickThreshold->asFloat());
 
 		if (f < 0.0f)
 			f = 0.0f;
@@ -746,7 +746,7 @@ static void IN_GamepadMove( )
 			int negKey = negMap[i];
 			int posKey = posMap[i];
 
-			if (in_joystickUseAnalog->integer)
+			if (in_joystickUseAnalog->asInt())
 			{
 				int posAxis = 0, posSign = 0, negAxis = 0, negSign = 0;
 
@@ -806,7 +806,7 @@ static void IN_GamepadMove( )
 	}
 
 	// set translated axes
-	if (in_joystickUseAnalog->integer)
+	if (in_joystickUseAnalog->asInt())
 	{
 		for (i = 0; i < MAX_JOYSTICK_AXIS; i++)
 		{
@@ -976,7 +976,7 @@ static void IN_JoyMove( )
 	total = SDL_JoystickNumAxes(stick);
 	if (total > 0)
 	{
-		if (in_joystickUseAnalog->integer)
+		if (in_joystickUseAnalog->asInt())
 		{
 			if (total > MAX_JOYSTICK_AXIS) total = MAX_JOYSTICK_AXIS;
 			for (i = 0; i < total; i++)
@@ -984,7 +984,7 @@ static void IN_JoyMove( )
 				Sint16 axis = SDL_JoystickGetAxis(stick, i);
 				float f = ( static_cast<float>(abs(axis)) ) / 32767.0f;
 
-				if( f < in_joystickThreshold->value ) axis = 0;
+				if( f < in_joystickThreshold->asFloat() ) axis = 0;
 
 				if ( axis != stick_state.oldaaxes[i] )
 				{
@@ -1000,9 +1000,9 @@ static void IN_JoyMove( )
 			{
 				Sint16 axis = SDL_JoystickGetAxis(stick, i);
 				float f = ( static_cast<float>(axis) ) / 32767.0f;
-				if( f < -in_joystickThreshold->value ) {
+				if( f < -in_joystickThreshold->asFloat() ) {
 					axes |= ( 1 << ( i * 2 ) );
-				} else if( f > in_joystickThreshold->value ) {
+				} else if( f > in_joystickThreshold->asFloat() ) {
 					axes |= ( 1 << ( ( i * 2 ) + 1 ) );
 				}
 			}
@@ -1159,7 +1159,7 @@ static void IN_ProcessEvents( )
 
 			case SDL_CONTROLLERDEVICEADDED:
 			case SDL_CONTROLLERDEVICEREMOVED:
-				if (in_joystick->integer)
+				if (in_joystick->asInt())
 					IN_InitJoystick();
 				break;
 
@@ -1326,7 +1326,7 @@ void IN_Init( void *windowData )
 
 	SDL_StartTextInput( );
 
-	mouseAvailable = ( in_mouse->value != 0 );
+	mouseAvailable = ( in_mouse->asFloat() != 0 );
 	IN_DeactivateMouse( CvarSystem::variableIntegerValue( "r_fullscreen" ) != 0 );
 
 	appState = SDL_GetWindowFlags( SDL_window );

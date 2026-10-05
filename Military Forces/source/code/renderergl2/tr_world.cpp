@@ -32,11 +32,11 @@ added to the sorting list.
 ================
 */
 static bool	R_CullSurface( msurface_t *surf ) {
-	if ( r_nocull->integer || surf->cullinfo.type == CULLINFO_NONE) {
+	if ( r_nocull->asInt() || surf->cullinfo.type == CULLINFO_NONE) {
 		return false;
 	}
 
-	if ( r_nocurves->integer && *surf->data == SF_GRID ) {
+	if ( r_nocurves->asInt() && *surf->data == SF_GRID ) {
 		return true;
 	}
 
@@ -46,7 +46,7 @@ static bool	R_CullSurface( msurface_t *surf ) {
 		float			d;
 		cullType_t ct;
 
-		if ( !r_facePlaneCull->integer ) {
+		if ( !r_facePlaneCull->asInt() ) {
 			return false;
 		}
 
@@ -414,7 +414,7 @@ static void R_RecursiveWorldNode( mnode_t *node, uint32_t planeBits, uint64_t dl
 		// if the bounding volume is outside the frustum, nothing
 		// inside can be visible OPTIMIZE: don't do this all the way to leafs?
 
-		if ( !r_nocull->integer ) {
+		if ( !r_nocull->asInt() ) {
 			int		r;
 
 			if ( planeBits & 1 ) {
@@ -663,7 +663,7 @@ static void R_MarkLeaves () {
 
 	// lockpvs lets designers walk around to determine the
 	// extent of the current pvs
-	if ( r_lockpvs->integer ) {
+	if ( r_lockpvs->asInt() ) {
 		return;
 	}
 
@@ -684,7 +684,7 @@ static void R_MarkLeaves () {
 		}
 		else if(tr.visClusters[i] == cluster)
 		{
-			if(tr.visClusters[i] != tr.visClusters[tr.visIndex] && r_showcluster->integer)
+			if(tr.visClusters[i] != tr.visClusters[tr.visIndex] && r_showcluster->asInt())
 			{
 				ri.Printf(PRINT_ALL, "found cluster:%i  area:%i  index:%i\n", cluster, leaf->area, i);
 			}
@@ -697,9 +697,9 @@ static void R_MarkLeaves () {
 	tr.visCounts[tr.visIndex]++;
 	tr.visClusters[tr.visIndex] = cluster;
 
-	if ( r_showcluster->modified || r_showcluster->integer ) {
+	if ( r_showcluster->modified || r_showcluster->asInt() ) {
 		r_showcluster->modified = false;
-		if ( r_showcluster->integer ) {
+		if ( r_showcluster->asInt() ) {
 			ri.Printf( PRINT_ALL, "cluster:%i  area:%i\n", cluster, leaf->area );
 		}
 	}
@@ -742,7 +742,7 @@ void R_AddWorldSurfaces () {
 	uint32_t planeBits, pshadowBits;
 	uint64_t dlightBits;
 
-	if ( !r_drawworld->integer ) {
+	if ( !r_drawworld->asInt() ) {
 		return;
 	}
 

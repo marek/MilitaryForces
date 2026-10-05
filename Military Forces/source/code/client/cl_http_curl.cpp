@@ -110,8 +110,8 @@ bool HttpDownload::init()
 
 	cl_cURLLib = CvarSystem::get("cl_cURLLib", DEFAULT_CURL_LIB, CVAR_ARCHIVE | CVAR_PROTECTED);
 
-	Common::printf("Loading \"%s\"...", cl_cURLLib->string);
-	if(!(cURLLib = Sys_LoadDll(cl_cURLLib->string, true)))
+	Common::printf("Loading \"%s\"...", cl_cURLLib->asString());
+	if(!(cURLLib = Sys_LoadDll(cl_cURLLib->asString(), true)))
 	{
 #ifdef ALTERNATE_CURL_LIB
 		// On some linux distributions there is no libcurl.so.3, but only libcurl.so.4. That one works too.
@@ -277,7 +277,7 @@ void HttpDownload::beginDownload( const char *remoteURL )
 		return;
 	}
 
-	if(com_developer->integer)
+	if(com_developer->asInt())
 		qcurl_easy_setopt_warn(downloadCURL, CURLOPT_VERBOSE, 1);
 	qcurl_easy_setopt_warn(downloadCURL, CURLOPT_URL, remoteURL);
 	qcurl_easy_setopt_warn(downloadCURL, CURLOPT_TRANSFERTEXT, 0);

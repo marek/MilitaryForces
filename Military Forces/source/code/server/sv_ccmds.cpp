@@ -49,7 +49,7 @@ SV_Client * ServerMain::getPlayerByHandle( ) {
 	char		cleanName[64];
 
 	// make sure server is running
-	if ( !com_sv_running->integer ) {
+	if ( !com_sv_running->asInt() ) {
 		return nullptr;
 	}
 
@@ -68,7 +68,7 @@ SV_Client * ServerMain::getPlayerByHandle( ) {
 		int plid = atoi(s);
 
 		// Check for numeric playerid match
-		if(plid >= 1 && plid <= sv_maxclients->integer)
+		if(plid >= 1 && plid <= sv_maxclients->asInt())
 		{
 			cl = theSVS.svClients_.at(plid);
 			
@@ -78,7 +78,7 @@ SV_Client * ServerMain::getPlayerByHandle( ) {
 	}
 
 	// check for a name match
-	for ( i=1 ; i <= sv_maxclients->integer ; i++ ) {
+	for ( i=1 ; i <= sv_maxclients->asInt() ; i++ ) {
 		cl = theSVS.svClients_.at(i);
 		if ( !cl )
 			continue;
@@ -115,7 +115,7 @@ SV_Client * ServerMain::getPlayerByNum( ) {
 	char		*s;
 
 	// make sure server is running
-	if ( !com_sv_running->integer ) {
+	if ( !com_sv_running->asInt() ) {
 		return nullptr;
 	}
 
@@ -133,7 +133,7 @@ SV_Client * ServerMain::getPlayerByNum( ) {
 		}
 	}
 	idnum = atoi( s );
-	if ( idnum < 1 || idnum > sv_maxclients->integer ) {
+	if ( idnum < 1 || idnum > sv_maxclients->asInt() ) {
 		Common::printf( "Bad client slot: %i\n", idnum );
 		return nullptr;
 	}
@@ -207,7 +207,7 @@ void ServerMain::map_f()
 			cheat = false;
 			killBots = false;
 		}
-		if( sv_gametype->integer == GT_SINGLE_PLAYER )
+		if( sv_gametype->asInt() == GT_SINGLE_PLAYER )
 			CvarSystem::setValue( "g_gametype", GT_FFA );
 	}
 
@@ -243,7 +243,7 @@ void ServerMain::mapRestart_f()
 		return;
 
 	// make sure server is running
-	if( !com_sv_running->integer )
+	if( !com_sv_running->asInt() )
 	{
 		Common::printf( "Server is not running.\n" );
 		return;
@@ -291,7 +291,7 @@ void ServerMain::mapRestart_f()
 	// if a map_restart occurs while a client is changing maps, we need
 	// to give them the correct time so that when they finish loading
 	// they don't violate the backwards time check in cl_cgame.c
-	for( int i = 1; i <= sv_maxclients->integer ; i++ ) 
+	for( int i = 1; i <= sv_maxclients->asInt() ; i++ ) 
 	{
 		SV_Client* client = theSVS.svClients_.at(i);
 		if( client && client->state_ == SV_Client::CS_PRIMED ) 
@@ -321,7 +321,7 @@ void ServerMain::mapRestart_f()
 	char *denied;
 	bool isBot;
 	// connect and begin all the clients
-	for( int i = 1; i <= sv_maxclients->integer ; i++ ) 
+	for( int i = 1; i <= sv_maxclients->asInt() ; i++ ) 
 	{
 		SV_Client* client = theSVS.svClients_.at(i);
 
@@ -381,7 +381,7 @@ void ServerMain::kick_f( ) {
 	int			i;
 
 	// make sure server is running
-	if ( !com_sv_running->integer ) {
+	if ( !com_sv_running->asInt() ) {
 		Common::printf( "Server is not running.\n" );
 		return;
 	}
@@ -394,7 +394,7 @@ void ServerMain::kick_f( ) {
 	cl = ServerMain::getPlayerByHandle();
 	if ( !cl ) {
 		if ( !Q_stricmp(CommandSystem::argv(1), "all") ) {
-			for ( i=1 ; i <= sv_maxclients->integer ; i++ ) {
+			for ( i=1 ; i <= sv_maxclients->asInt() ; i++ ) {
 				cl = theSVS.svClients_.at(i);
 				if ( !cl )
 					continue;
@@ -409,7 +409,7 @@ void ServerMain::kick_f( ) {
 			}
 		}
 		else if ( !Q_stricmp(CommandSystem::argv(1), "allbots") ) {
-			for ( i=1 ; i <= sv_maxclients->integer ; i++ ) {
+			for ( i=1 ; i <= sv_maxclients->asInt() ; i++ ) {
 				cl = theSVS.svClients_.at(i);
 				if ( !cl )
 					continue;
@@ -444,7 +444,7 @@ so trace optimisations can be measured and checked for identical output
 */
 void ServerMain::traceBench_f()
 {
-	if( !com_sv_running->integer )
+	if( !com_sv_running->asInt() )
 	{
 		Common::printf( "No map loaded.\n" );
 		return;
@@ -499,12 +499,12 @@ void ServerMain::kickBots_f( ) {
 	int			i;
 
 	// make sure server is running
-	if( !com_sv_running->integer ) {
+	if( !com_sv_running->asInt() ) {
 		Common::printf("Server is not running.\n");
 		return;
 	}
 
-	for ( i=1 ; i <= sv_maxclients->integer ; i++ ) {
+	for ( i=1 ; i <= sv_maxclients->asInt() ; i++ ) {
 		cl = theSVS.svClients_.at(i);
 		if ( !cl )
 			continue;
@@ -532,12 +532,12 @@ void ServerMain::kickAll_f( ) {
 	int i;
 
 	// make sure server is running
-	if( !com_sv_running->integer ) {
+	if( !com_sv_running->asInt() ) {
 		Common::printf( "Server is not running.\n" );
 		return;
 	}
 
-	for ( i=1 ; i <= sv_maxclients->integer ; i++ ) {
+	for ( i=1 ; i <= sv_maxclients->asInt() ; i++ ) {
 		cl = theSVS.svClients_.at(i);
 		if ( !cl )
 			continue;
@@ -565,7 +565,7 @@ void ServerMain::kickNum_f( ) {
 	SV_Client	*cl;
 
 	// make sure server is running
-	if ( !com_sv_running->integer ) {
+	if ( !com_sv_running->asInt() ) {
 		Common::printf( "Server is not running.\n" );
 		return;
 	}
@@ -603,7 +603,7 @@ void ServerMain::ban_f( void ) {
 	SV_Client	*cl;
 
 	// make sure server is running
-	if ( !com_sv_running->integer ) {
+	if ( !com_sv_running->asInt() ) {
 		Common::printf( "Server is not running.\n" );
 		return;
 	}
@@ -659,7 +659,7 @@ void ServerMain::banNum_f( void ) {
 	SV_Client	*cl;
 
 	// make sure server is running
-	if ( !com_sv_running->integer ) {
+	if ( !com_sv_running->asInt() ) {
 		Common::printf( "Server is not running.\n" );
 		return;
 	}
@@ -718,10 +718,10 @@ void ServerMain::rehashBans_f()
 	
 	serverBansCount = 0;
 	
-	if(!sv_banFile->string || !*sv_banFile->string)
+	if(!sv_banFile->asString() || !*sv_banFile->asString())
 		return;
 
-	Com_sprintf(filepath, sizeof(filepath), "%s/%s", FileSystem::getCurrentGameDir(), sv_banFile->string);
+	Com_sprintf(filepath, sizeof(filepath), "%s/%s", FileSystem::getCurrentGameDir(), sv_banFile->asString());
 
 	if((filelen = FileSystem::baseDir_FOpenFileRead(filepath, &readfrom)) >= 0)
 	{
@@ -797,10 +797,10 @@ void ServerMain::writeBans()
 	fileHandle_t writeto;
 	char filepath[MAX_QPATH];
 	
-	if(!sv_banFile->string || !*sv_banFile->string)
+	if(!sv_banFile->asString() || !*sv_banFile->asString())
 		return;
 	
-	Com_sprintf(filepath, sizeof(filepath), "%s/%s", FileSystem::getCurrentGameDir(), sv_banFile->string);
+	Com_sprintf(filepath, sizeof(filepath), "%s/%s", FileSystem::getCurrentGameDir(), sv_banFile->asString());
 
 	if((writeto = FileSystem::baseDir_FOpenFileWrite_HomeState(filepath)))
 	{
@@ -905,7 +905,7 @@ void ServerMain::addBanToList(bool isexception)
 	serverBan_t *curban;
 
 	// make sure server is running
-	if ( !com_sv_running->integer ) {
+	if ( !com_sv_running->asInt() ) {
 		Common::printf( "Server is not running.\n" );
 		return;
 	}
@@ -1047,7 +1047,7 @@ void ServerMain::delBanFromList(bool isexception)
 	char *banstring;
 	
 	// make sure server is running
-	if ( !com_sv_running->integer ) {
+	if ( !com_sv_running->asInt() ) {
 		Common::printf( "Server is not running.\n" );
 		return;
 	}
@@ -1138,7 +1138,7 @@ void ServerMain::listBans_f()
 	serverBan_t *ban;
 
 	// make sure server is running
-	if ( !com_sv_running->integer ) {
+	if ( !com_sv_running->asInt() ) {
 		Common::printf( "Server is not running.\n" );
 		return;
 	}
@@ -1180,7 +1180,7 @@ Delete all bans and exceptions.
 void ServerMain::flushBans_f()
 {
 	// make sure server is running
-	if ( !com_sv_running->integer ) {
+	if ( !com_sv_running->asInt() ) {
 		Common::printf( "Server is not running.\n" );
 		return;
 	}
@@ -1245,16 +1245,16 @@ void ServerMain::status_f( ) {
 	int			ping;
 
 	// make sure server is running
-	if ( !com_sv_running->integer ) {
+	if ( !com_sv_running->asInt() ) {
 		Common::printf( "Server is not running.\n" );
 		return;
 	}
 
-	Common::printf ("map: %s\n", sv_mapname->string );
+	Common::printf ("map: %s\n", sv_mapname->asString() );
 
 	Common::printf ("cl score ping name            address                                 rate \n");
 	Common::printf ("-- ----- ---- --------------- --------------------------------------- -----\n");
-	for (i=1 ; i <= sv_maxclients->integer ; i++)
+	for (i=1 ; i <= sv_maxclients->asInt() ; i++)
 	{
 		cl = theSVS.svClients_.at(i);
 		if (!cl || !cl->state_)
@@ -1314,7 +1314,7 @@ void ServerMain::conSay_f() {
 	char	text[1024];
 
 	// make sure server is running
-	if ( !com_sv_running->integer ) {
+	if ( !com_sv_running->asInt() ) {
 		Common::printf( "Server is not running.\n" );
 		return;
 	}
@@ -1348,7 +1348,7 @@ void ServerMain::conTell_f() {
 	SV_Client	*cl;
 
 	// make sure server is running
-	if ( !com_sv_running->integer ) {
+	if ( !com_sv_running->asInt() ) {
 		Common::printf( "Server is not running.\n" );
 		return;
 	}
@@ -1394,7 +1394,7 @@ void ServerMain::conSayto_f() {
 	int			i;
 
 	// make sure server is running
-	if ( !com_sv_running->integer ) {
+	if ( !com_sv_running->asInt() ) {
 		Common::printf( "Server is not running.\n" );
 		return;
 	}
@@ -1411,7 +1411,7 @@ void ServerMain::conSayto_f() {
 	Common::fieldStringToPlayerName( name, MAX_NAME_LENGTH, rawname );
 
 	saytocl = nullptr;
-	for ( i=1 ; i <= sv_maxclients->integer ; i++ ) {
+	for ( i=1 ; i <= sv_maxclients->asInt() ; i++ ) {
 		cl = theSVS.svClients_.at(i);
 		if ( !cl )
 			continue;
@@ -1468,7 +1468,7 @@ Examine the serverinfo string
 */
 void ServerMain::serverinfo_f( ) {
 	// make sure server is running
-	if ( !com_sv_running->integer ) {
+	if ( !com_sv_running->asInt() ) {
 		Common::printf( "Server is not running.\n" );
 		return;
 	}
@@ -1487,7 +1487,7 @@ Examine the systeminfo string
 */
 void ServerMain::systeminfo_f( ) {
 	// make sure server is running
-	if ( !com_sv_running->integer ) {
+	if ( !com_sv_running->asInt() ) {
 		Common::printf( "Server is not running.\n" );
 		return;
 	}
@@ -1508,7 +1508,7 @@ void ServerMain::dumpUser_f( ) {
 	SV_Client	*cl;
 
 	// make sure server is running
-	if ( !com_sv_running->integer ) {
+	if ( !com_sv_running->asInt() ) {
 		Common::printf( "Server is not running.\n" );
 		return;
 	}
@@ -1566,7 +1566,7 @@ void ServerMain::completePlayerName( char *args, int argNum ) {
 		int			clientCount;
 
 		nameCount = 0;
-		clientCount = sv_maxclients->integer;
+		clientCount = sv_maxclients->asInt();
 
 		for ( i=1 ; i <= clientCount ; i++ ) {
 			cl = theSVS.svClients_.at(i);
@@ -1607,7 +1607,7 @@ void ServerMain::addOperatorCommands( ) {
 	CommandSystem::addCommand ("heartbeat", ServerMain::heartbeat_f);
 	CommandSystem::addCommand ("kick", ServerMain::kick_f);
 #ifndef STANDALONE
-	if(!com_standalone->integer)
+	if(!com_standalone->asInt())
 	{
 		CommandSystem::addCommand ("banUser", ServerMain::ban_f);
 		CommandSystem::addCommand ("banClient", ServerMain::banNum_f);
@@ -1635,7 +1635,7 @@ void ServerMain::addOperatorCommands( ) {
 	CommandSystem::setCommandCompletionFunc( "spdevmap", ServerMain::completeMapName );
 #endif
 	CommandSystem::addCommand ("killserver", ServerMain::killServer_f);
-	if( com_dedicated->integer ) {
+	if( com_dedicated->asInt() ) {
 		CommandSystem::addCommand ("say", ServerMain::conSay_f);
 		CommandSystem::addCommand ("tell", ServerMain::conTell_f);
 		CommandSystem::addCommand ("sayto", ServerMain::conSayto_f);

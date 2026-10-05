@@ -269,7 +269,7 @@ static void CM_TestInLeaf( traceWork_t *tw, cLeaf_t *leaf ) {
 #ifdef BSPC
 	if (1) {
 #else
-	if ( !cm_noCurves->integer ) {
+	if ( !cm_noCurves->asInt() ) {
 #endif //BSPC
 		for ( k = 0 ; k < leaf->numLeafSurfaces ; k++ ) {
 			patch = cm.surfaces[ cm.leafsurfaces[ leaf->firstLeafSurface + k ] ];
@@ -747,7 +747,7 @@ static void CM_TraceThroughLeaf( traceWork_t *tw, cLeaf_t *leaf ) {
 #ifdef BSPC
 	if (1) {
 #else
-	if ( !cm_noCurves->integer ) {
+	if ( !cm_noCurves->asInt() ) {
 #endif
 		for ( k = 0 ; k < leaf->numLeafSurfaces ; k++ ) {
 			patch = cm.surfaces[ cm.leafsurfaces[ leaf->firstLeafSurface + k ] ];
@@ -1120,7 +1120,7 @@ static void CM_TraceThroughTree( traceWork_t *tw, int num, float p1f, float p2f,
 			offset = fabs( tw->extents[0] * plane->normal[0] ) +
 				fabs( tw->extents[1] * plane->normal[1] ) +
 				fabs( tw->extents[2] * plane->normal[2] );
-			if ( cm_wideNodeOffset->integer ) {
+			if ( cm_wideNodeOffset->asInt() ) {
 				offset = 2048;
 			}
 		}

@@ -238,7 +238,7 @@ overlap and double darken.
 =================
 */
 void RB_ShadowFinish( ) {
-	if ( r_shadows->integer != 2 ) {
+	if ( r_shadows->asInt() != 2 ) {
 		return;
 	}
 	if ( glConfig.stencilBits < 4 ) {

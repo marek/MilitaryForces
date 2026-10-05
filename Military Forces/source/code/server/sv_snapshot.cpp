@@ -275,11 +275,11 @@ void SV_Client::emitPacketEntities( SV_Client::ClientSnapshot *frame, Message *m
 	int							num;
 	int							i;
 
-	unlimited = reset || sv_snapshotBudget->integer <= 0 
+	unlimited = reset || sv_snapshotBudget->asInt() <= 0 
 		|| this->netchan_.remoteAddress().type == NA_LOOPBACK 
-		|| ( sv_lanForceRate->integer && Sys_IsLANAddress( this->netchan_.remoteAddress() ) );
+		|| ( sv_lanForceRate->asInt() && Sys_IsLANAddress( this->netchan_.remoteAddress() ) );
 
-	remaining = sv_snapshotBudget->integer * 8 - msg->bit() - GENTITYNUM_BITS - 8;
+	remaining = sv_snapshotBudget->asInt() * 8 - msg->bit() - GENTITYNUM_BITS - 8;
 
 	AngleVectors( frame->ps_.viewangles, forward, nullptr, nullptr );
 
@@ -483,9 +483,9 @@ void SV_Client::writeSnapshotToClient( Message *msg )
 	this->emitPacketEntities( frame, msg, reset );
 
 	// padding for rate debugging
-	if ( sv_padPackets->integer ) 
+	if ( sv_padPackets->asInt() ) 
 	{
-		for ( i = 0 ; i < sv_padPackets->integer ; i++ ) 
+		for ( i = 0 ; i < sv_padPackets->asInt() ; i++ ) 
 		{
 			msg->writeByte( svc_nop);
 		}
@@ -940,14 +940,14 @@ ServerMain::sendClientMessages
 void ServerMain::sendClientMessages()
 {
 	// send a message to each connected client
-	for( int i = 1; i <= sv_maxclients->integer; i++ ) 
+	for( int i = 1; i <= sv_maxclients->asInt(); i++ ) 
 	{
 		SV_Client* c = theSVS.svClients_.at(i);
 		
 		if(!c || !c->state_)
 			continue;		// not connected
 
-		if(theSVS.time_ - c->lastSnapshotTime_ < c->snapshotMsec_ * com_timescale->value)
+		if(theSVS.time_ - c->lastSnapshotTime_ < c->snapshotMsec_ * com_timescale->asFloat())
 			continue;		// It's not time yet
 
 		if(*c->downloadName_)
@@ -960,7 +960,7 @@ void ServerMain::sendClientMessages()
 		}
 
 		if(!(c->netchan_.remoteAddress().type == NA_LOOPBACK ||
-		     (sv_lanForceRate->integer && Sys_IsLANAddress(c->netchan_.remoteAddress()))))
+		     (sv_lanForceRate->asInt() && Sys_IsLANAddress(c->netchan_.remoteAddress()))))
 		{
 			// rate control for clients not on LAN 
 			if(c->rateMsec() > 0)

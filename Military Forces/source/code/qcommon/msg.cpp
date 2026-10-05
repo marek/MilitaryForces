@@ -158,7 +158,7 @@ void Message::writeBits( int value, int bits ) {
 		}
 		if ( bits ) {
 			for( i = 0; i < bits; i += 8 ) {
-				if ( msg_huffstats && msg_huffstats->integer && !msg_huffstatsHold ) {
+				if ( msg_huffstats && msg_huffstats->asInt() && !msg_huffstatsHold ) {
 					msg_huffCounts[value & 0xff]++;
 				}
 				msgHuff.compressor.offsetTransmit( (value & 0xff), this->data_, &this->bit_, this->maxSize_ << 3 );
@@ -577,7 +577,7 @@ delta functions
 
 extern cvar_t *cl_shownet;
 
-#define	LOG(x) if( cl_shownet && cl_shownet->integer == 4 ) { Common::printf("%s ", x ); };
+#define	LOG(x) if( cl_shownet && cl_shownet->asInt() == 4 ) { Common::printf("%s ", x ); };
 
 /*
 =============================================================================
@@ -1063,7 +1063,7 @@ void Message::readDeltaEntity( entityState_t *from, entityState_t *to, int numbe
 	if ( this->readBits( 1 ) == 1 ) {
 		Com_Memset( to, 0, sizeof( *to ) );	
 		to->number = ENTITYNUM_WIRE_END;
-		if ( cl_shownet && ( cl_shownet->integer >= 2 || cl_shownet->integer == -1 ) ) {
+		if ( cl_shownet && ( cl_shownet->asInt() >= 2 || cl_shownet->asInt() == -1 ) ) {
 			Common::printf( "%3i: #%-3i remove\n", this->readCount_, number );
 		}
 		return;
@@ -1085,7 +1085,7 @@ void Message::readDeltaEntity( entityState_t *from, entityState_t *to, int numbe
 
 	// shownet 2/3 will interleave with other printed info, -1 will
 	// just print the delta records`
-	if ( cl_shownet && ( cl_shownet->integer >= 2 || cl_shownet->integer == -1 ) ) {
+	if ( cl_shownet && ( cl_shownet->asInt() >= 2 || cl_shownet->asInt() == -1 ) ) {
 		print = 1;
 		Common::printf( "%3i: #%-3i ", this->readCount_, to->number );
 	} else {
@@ -1440,7 +1440,7 @@ void Message::readDeltaPlayerstate( playerState_t *from, playerState_t *to ) {
 
 	// shownet 2/3 will interleave with other printed info, -2 will
 	// just print the delta records
-	if ( cl_shownet && ( cl_shownet->integer >= 2 || cl_shownet->integer == -2 ) ) {
+	if ( cl_shownet && ( cl_shownet->asInt() >= 2 || cl_shownet->asInt() == -2 ) ) {
 		print = 1;
 		Common::printf( "%3i: playerstate ", this->readCount_ );
 	} else {

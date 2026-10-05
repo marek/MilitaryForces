@@ -157,7 +157,7 @@ static void S_TransferPaintBuffer(int endtime)
 	pbuf = reinterpret_cast<unsigned long *>(dma.buffer);
 
 
-	if ( s_testsound->integer ) {
+	if ( s_testsound->asInt() ) {
 		// write a fixed sine wave
 		count = (endtime - s_paintedtime);
 		for (i=0 ; i<count ; i++)
@@ -351,7 +351,7 @@ static void S_PaintChannelFrom16_scalar( channel_t *ch, const SoundEffect *sc, i
 
 static void S_PaintChannelFrom16( channel_t *ch, const SoundEffect *sc, int count, int sampleOffset, int bufferOffset ) {
 #if idppc_altivec
-	if (com_altivec->integer) {
+	if (com_altivec->asInt()) {
 		// must be in a separate translation unit or G3 systems will crash.
 		S_PaintChannelFrom16_altivec( paintbuffer, snd_vol, ch, sc, count, sampleOffset, bufferOffset );
 		return;
@@ -517,10 +517,10 @@ void S_PaintChannels( int endtime ) {
 	int		ltime, count;
 	int		sampleOffset;
 
-	if(s_muted->integer)
+	if(s_muted->asInt())
 		snd_vol = 0;
 	else
-		snd_vol = s_volume->value*255;
+		snd_vol = s_volume->asFloat()*255;
 
 //Common::printf ("%i to %i\n", s_paintedtime, endtime);
 	while ( s_paintedtime < endtime ) {

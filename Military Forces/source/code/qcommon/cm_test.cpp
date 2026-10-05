@@ -417,7 +417,7 @@ CollisionModel::areasConnected
 */
 bool	CollisionModel::areasConnected( int area1, int area2 ) {
 #ifndef BSPC
-	if ( cm_noAreas->integer ) {
+	if ( cm_noAreas->asInt() ) {
 		return true;
 	}
 #endif
@@ -460,7 +460,7 @@ int CollisionModel::writeAreaBits (byte *buffer, int area)
 	bytes = (cm.numAreas+7)>>3;
 
 #ifndef BSPC
-	if (cm_noAreas->integer || area == -1)
+	if (cm_noAreas->asInt() || area == -1)
 #else
 	if ( area == -1)
 #endif

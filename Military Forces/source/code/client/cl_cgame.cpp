@@ -335,7 +335,7 @@ rescan:
 		// don't do it if we aren't running the server locally,
 		// otherwise malicious remote servers could overwrite
 		// the existing thumbnails
-		if ( !com_sv_running->integer ) {
+		if ( !com_sv_running->asInt() ) {
 			return false;
 		}
 		// close the console
@@ -507,12 +507,12 @@ static void CL_AdjustTimeDelta( ) {
 		cl.serverTimeDelta = newDelta;
 		cl.oldServerTime = cl.snap.serverTime;	// FIXME: is this a problem for cgame?
 		cl.serverTime = cl.snap.serverTime;
-		if ( cl_showTimeDelta->integer ) {
+		if ( cl_showTimeDelta->asInt() ) {
 			Common::printf( "<RESET> " );
 		}
 	} else if ( deltaDelta > 100 ) {
 		// fast adjust, cut the difference in half
-		if ( cl_showTimeDelta->integer ) {
+		if ( cl_showTimeDelta->asInt() ) {
 			Common::printf( "<FAST> " );
 		}
 		cl.serverTimeDelta = ( cl.serverTimeDelta + newDelta ) >> 1;
@@ -522,7 +522,7 @@ static void CL_AdjustTimeDelta( ) {
 		// if any of the frames between this and the previous snapshot
 		// had to be extrapolated, nudge our sense of time back a little
 		// the granularity of +1 / -2 is too high for timescale modified frametimes
-		if ( com_timescale->value == 0 || com_timescale->value == 1 ) {
+		if ( com_timescale->asFloat() == 0 || com_timescale->asFloat() == 1 ) {
 			if ( cl.extrapolatedSnapshot ) {
 				cl.extrapolatedSnapshot = false;
 				cl.serverTimeDelta -= 2;
@@ -533,7 +533,7 @@ static void CL_AdjustTimeDelta( ) {
 		}
 	}
 
-	if ( cl_showTimeDelta->integer ) {
+	if ( cl_showTimeDelta->asInt() ) {
 		Common::printf( "%i ", cl.serverTimeDelta );
 	}
 }
@@ -561,13 +561,13 @@ void Client::firstSnapshot( ) {
 	// execute the contents of activeAction now
 	// this is to allow scripting a timedemo to start right
 	// after loading
-	if ( cl_activeAction->string[0] ) {
-		CommandBuffer::addText( cl_activeAction->string );
+	if ( cl_activeAction->asString()[0] ) {
+		CommandBuffer::addText( cl_activeAction->asString() );
 		CvarSystem::set( "activeAction", "" );
 	}
 
 #ifdef USE_MUMBLE
-	if ((cl_useMumble->integer) && !mumble_islinked()) {
+	if ((cl_useMumble->asInt()) && !mumble_islinked()) {
 		int ret = mumble_link(CLIENT_WINDOW_TITLE);
 		Common::printf("Mumble: Linking to Mumble application %s\n", ret==0?"ok":"failed");
 	}
@@ -638,7 +638,7 @@ void Client::setCGameTime( ) {
 	}
 
 	// allow pause in single player
-	if ( sv_paused->integer && Client::checkPaused() && com_sv_running->integer ) {
+	if ( sv_paused->asInt() && Client::checkPaused() && com_sv_running->asInt() ) {
 		// paused
 		return;
 	}
@@ -651,7 +651,7 @@ void Client::setCGameTime( ) {
 
 	// get our current view of time
 
-	if ( clc.demoplaying && cl_freezeDemo->integer ) {
+	if ( clc.demoplaying && cl_freezeDemo->asInt() ) {
 		// cl_freezeDemo is used to lock a demo in place for single frame advances
 
 	} else {
@@ -660,7 +660,7 @@ void Client::setCGameTime( ) {
 		// smoothness or better responsiveness.
 		int tn;
 		
-		tn = cl_timeNudge->integer;
+		tn = cl_timeNudge->asInt();
 		if (tn<-30) {
 			tn = -30;
 		} else if (tn>30) {
@@ -702,7 +702,7 @@ void Client::setCGameTime( ) {
 	// no matter what speed machine it is run on,
 	// while a normal demo may have different time samples
 	// each time it is played back
-	if ( cl_timedemo->integer ) {
+	if ( cl_timedemo->asInt() ) {
 		int now = System::milliseconds( );
 		int frameDuration;
 

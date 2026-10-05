@@ -101,7 +101,7 @@ static	void R_ColorShiftLightingBytes( byte in[4], byte out[4] ) {
 	int		shift, r, g, b;
 
 	// shift the color data based on overbright range
-	shift = r_mapOverBrightBits->integer - tr.overbrightBits;
+	shift = r_mapOverBrightBits->asInt() - tr.overbrightBits;
 
 	// shift the data based on overbright range
 	r = in[0] << shift;
@@ -157,7 +157,7 @@ static	void R_LoadLightmaps( lump_t *l ) {
 	}
 
 	// if we are in r_vertexLight mode, we don't need the lightmaps at all
-	if ( r_vertexLight->integer || glConfig.hardwareType == GLHW_PERMEDIA2 ) {
+	if ( r_vertexLight->asInt() || glConfig.hardwareType == GLHW_PERMEDIA2 ) {
 		return;
 	}
 
@@ -166,7 +166,7 @@ static	void R_LoadLightmaps( lump_t *l ) {
 		// expand the 24 bit on-disk to 32 bit
 		buf_p = buf + i * LIGHTMAP_SIZE*LIGHTMAP_SIZE * 3;
 
-		if ( r_lightmap->integer == 2 )
+		if ( r_lightmap->asInt() == 2 )
 		{	// color code by intensity as development tool	(FIXME: check range)
 			for ( j = 0; j < LIGHTMAP_SIZE * LIGHTMAP_SIZE; j++ )
 			{
@@ -204,7 +204,7 @@ static	void R_LoadLightmaps( lump_t *l ) {
 			IMGFLAG_NOLIGHTSCALE | IMGFLAG_NO_COMPRESSION | IMGFLAG_CLAMPTOEDGE, 0 );
 	}
 
-	if ( r_lightmap->integer == 2 )	{
+	if ( r_lightmap->asInt() == 2 )	{
 		ri.Printf( PRINT_ALL, "Brightest lightmap value: %d\n", static_cast< int>( maxIntensity * 255 ) );
 	}
 }
@@ -276,11 +276,11 @@ static shader_t *ShaderForShaderNum( int shaderNum, int lightmapNum ) {
 	}
 	dsh = &s_worldData.shaders[ _shaderNum ];
 
-	if ( r_vertexLight->integer || glConfig.hardwareType == GLHW_PERMEDIA2 ) {
+	if ( r_vertexLight->asInt() || glConfig.hardwareType == GLHW_PERMEDIA2 ) {
 		lightmapNum = LIGHTMAP_BY_VERTEX;
 	}
 
-	if ( r_fullbright->integer ) {
+	if ( r_fullbright->asInt() ) {
 		lightmapNum = LIGHTMAP_WHITEIMAGE;
 	}
 
@@ -313,7 +313,7 @@ static void ParseFace( dsurface_t *ds, drawVert_t *verts, msurface_t *surf, int 
 
 	// get shader value
 	surf->shader = ShaderForShaderNum( ds->shaderNum, lightmapNum );
-	if ( r_singleShader->integer && !surf->shader->isSky ) {
+	if ( r_singleShader->asInt() && !surf->shader->isSky ) {
 		surf->shader = tr.defaultShader;
 	}
 
@@ -388,7 +388,7 @@ static void ParseMesh ( dsurface_t *ds, drawVert_t *verts, msurface_t *surf ) {
 
 	// get shader value
 	surf->shader = ShaderForShaderNum( ds->shaderNum, lightmapNum );
-	if ( r_singleShader->integer && !surf->shader->isSky ) {
+	if ( r_singleShader->asInt() && !surf->shader->isSky ) {
 		surf->shader = tr.defaultShader;
 	}
 
@@ -448,7 +448,7 @@ static void ParseTriSurf( dsurface_t *ds, drawVert_t *verts, msurface_t *surf, i
 
 	// get shader
 	surf->shader = ShaderForShaderNum( ds->shaderNum, LIGHTMAP_BY_VERTEX );
-	if ( r_singleShader->integer && !surf->shader->isSky ) {
+	if ( r_singleShader->asInt() && !surf->shader->isSky ) {
 		surf->shader = tr.defaultShader;
 	}
 
@@ -506,7 +506,7 @@ static void ParseFlare( dsurface_t *ds, drawVert_t *verts, msurface_t *surf, int
 
 	// get shader
 	surf->shader = ShaderForShaderNum( ds->shaderNum, LIGHTMAP_BY_VERTEX );
-	if ( r_singleShader->integer && !surf->shader->isSky ) {
+	if ( r_singleShader->asInt() && !surf->shader->isSky ) {
 		surf->shader = tr.defaultShader;
 	}
 
@@ -1738,7 +1738,7 @@ void R_LoadEntities( lump_t *l ) {
 				break;
 			}
 			*s++ = 0;
-			if (r_vertexLight->integer) {
+			if (r_vertexLight->asInt()) {
 				R_RemapShader(value, s, "0");
 			}
 			continue;

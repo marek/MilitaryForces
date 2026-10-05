@@ -105,7 +105,7 @@ static	void R_ColorShiftLightingBytes( byte in[4], byte out[4] ) {
 	int		shift, r, g, b;
 
 	// shift the color data based on overbright range
-	shift = r_mapOverBrightBits->integer - tr.overbrightBits;
+	shift = r_mapOverBrightBits->asInt() - tr.overbrightBits;
 
 	// shift the data based on overbright range
 	r = in[0] << shift;
@@ -139,7 +139,7 @@ R_ColorShiftLightingFloats
 static void R_ColorShiftLightingFloats(float in[4], float out[4])
 {
 	float	r, g, b;
-	float   scale = (1 << (r_mapOverBrightBits->integer - tr.overbrightBits)) / 255.0f;
+	float   scale = (1 << (r_mapOverBrightBits->asInt() - tr.overbrightBits)) / 255.0f;
 
 	r = in[0] * scale;
 	g = in[1] * scale;
@@ -246,7 +246,7 @@ static	void R_LoadLightmaps( lump_t *l, lump_t *surfs ) {
 		numLightmaps >>= 1;
 
 	// Use fat lightmaps of an appropriate size.
-	if (r_mergeLightmaps->integer)
+	if (r_mergeLightmaps->asInt())
 	{
 		int maxLightmapsPerAxis = glConfig.maxTextureSize / tr.lightmapSize;
 		int lightmapCols = 4, lightmapRows = 4;
@@ -275,7 +275,7 @@ static	void R_LoadLightmaps( lump_t *l, lump_t *surfs ) {
 		tr.deluxemaps = static_cast<image_t **>(ri.hunkAlloc( tr.numLightmaps * sizeof(image_t *), h_low ));
 
 	textureInternalFormat = GL_RGBA8;
-	if (r_hdr->integer && !qglesMajorVersion)
+	if (r_hdr->asInt() && !qglesMajorVersion)
 	{
 		// Check for the first hdr lightmap, if it exists, use GL_RGBA16 for textures.
 		char filename[MAX_QPATH];
@@ -285,7 +285,7 @@ static	void R_LoadLightmaps( lump_t *l, lump_t *surfs ) {
 			textureInternalFormat = GL_RGBA16;
 	}
 
-	if (r_mergeLightmaps->integer)
+	if (r_mergeLightmaps->asInt())
 	{
 		int width  = tr.fatLightmapCols * tr.lightmapSize;
 		int height = tr.fatLightmapRows * tr.lightmapSize;
@@ -305,7 +305,7 @@ static	void R_LoadLightmaps( lump_t *l, lump_t *surfs ) {
 		int lightmapnum = i;
 		// expand the 24 bit on-disk to 32 bit
 
-		if (r_mergeLightmaps->integer)
+		if (r_mergeLightmaps->asInt())
 		{
 			int lightmaponpage = i % numLightmapsPerPage;
 			xoff = (lightmaponpage % tr.fatLightmapCols) * tr.lightmapSize;
@@ -417,7 +417,7 @@ static	void R_LoadLightmaps( lump_t *l, lump_t *surfs ) {
 				}
 				else
 				{
-					if ( r_lightmap->integer == 2 )
+					if ( r_lightmap->asInt() == 2 )
 					{	// color code by intensity as development tool	(FIXME: check range)
 						float r = buf_p[j*3+0];
 						float g = buf_p[j*3+1];
@@ -450,7 +450,7 @@ static	void R_LoadLightmaps( lump_t *l, lump_t *surfs ) {
 				}
 			}
 
-			if (r_mergeLightmaps->integer)
+			if (r_mergeLightmaps->asInt())
 				R_UpdateSubImage(tr.lightmaps[lightmapnum], image, xoff, yoff, tr.lightmapSize, tr.lightmapSize, textureInternalFormat);
 			else
 				tr.lightmaps[i] = R_CreateImage(va("*lightmap%d", i), image, tr.lightmapSize, tr.lightmapSize, IMGTYPE_COLORALPHA, imgFlags, textureInternalFormat );
@@ -479,14 +479,14 @@ static	void R_LoadLightmaps( lump_t *l, lump_t *surfs ) {
 				image[j*4+3] = 255;
 			}
 
-			if (r_mergeLightmaps->integer)
+			if (r_mergeLightmaps->asInt())
 				R_UpdateSubImage(tr.deluxemaps[lightmapnum], image, xoff, yoff, tr.lightmapSize, tr.lightmapSize, GL_RGBA8 );
 			else
 				tr.deluxemaps[i] = R_CreateImage(va("*deluxemap%d", i), image, tr.lightmapSize, tr.lightmapSize, IMGTYPE_DELUXE, imgFlags, 0 );
 		}
 	}
 
-	if ( r_lightmap->integer == 2 )	{
+	if ( r_lightmap->asInt() == 2 )	{
 		ri.Printf( PRINT_ALL, "Brightest lightmap value: %d\n", static_cast< int>( maxIntensity * 255 ) );
 	}
 
@@ -606,11 +606,11 @@ static shader_t *ShaderForShaderNum( int shaderNum, int lightmapNum ) {
 	}
 	dsh = &s_worldData.shaders[ _shaderNum ];
 
-	if ( r_vertexLight->integer || glConfig.hardwareType == GLHW_PERMEDIA2 ) {
+	if ( r_vertexLight->asInt() || glConfig.hardwareType == GLHW_PERMEDIA2 ) {
 		lightmapNum = LIGHTMAP_BY_VERTEX;
 	}
 
-	if ( r_fullbright->integer ) {
+	if ( r_fullbright->asInt() ) {
 		lightmapNum = LIGHTMAP_WHITEIMAGE;
 	}
 
@@ -664,7 +664,7 @@ void LoadDrawVertToSrfVert(srfVert_t *s, drawVert_t *d, int realLightmapNum, flo
 	else
 	{
 		//hack: convert LDR vertex colors to HDR
-		if (r_hdr->integer)
+		if (r_hdr->asInt())
 		{
 			v[0] = std::max<float>(d->color[0], 0.499f);
 			v[1] = std::max<float>(d->color[1], 0.499f);
@@ -704,7 +704,7 @@ static void ParseFace( dsurface_t *ds, drawVert_t *verts, float *hdrVertColors, 
 
 	// get shader value
 	surf->shader = ShaderForShaderNum( ds->shaderNum, realLightmapNum );
-	if ( r_singleShader->integer && !surf->shader->isSky ) {
+	if ( r_singleShader->asInt() && !surf->shader->isSky ) {
 		surf->shader = tr.defaultShader;
 	}
 
@@ -811,7 +811,7 @@ static void ParseMesh ( dsurface_t *ds, drawVert_t *verts, float *hdrVertColors,
 
 	// get shader value
 	surf->shader = ShaderForShaderNum( ds->shaderNum, realLightmapNum );
-	if ( r_singleShader->integer && !surf->shader->isSky ) {
+	if ( r_singleShader->asInt() && !surf->shader->isSky ) {
 		surf->shader = tr.defaultShader;
 	}
 
@@ -871,7 +871,7 @@ static void ParseTriSurf( dsurface_t *ds, drawVert_t *verts, float *hdrVertColor
 
 	// get shader
 	surf->shader = ShaderForShaderNum( ds->shaderNum, LIGHTMAP_BY_VERTEX );
-	if ( r_singleShader->integer && !surf->shader->isSky ) {
+	if ( r_singleShader->asInt() && !surf->shader->isSky ) {
 		surf->shader = tr.defaultShader;
 	}
 
@@ -954,7 +954,7 @@ static void ParseFlare( dsurface_t *ds, drawVert_t *verts, msurface_t *surf, int
 
 	// get shader
 	surf->shader = ShaderForShaderNum( ds->shaderNum, LIGHTMAP_BY_VERTEX );
-	if ( r_singleShader->integer && !surf->shader->isSky ) {
+	if ( r_singleShader->asInt() && !surf->shader->isSky ) {
 		surf->shader = tr.defaultShader;
 	}
 
@@ -1719,7 +1719,7 @@ static	void R_LoadSurfaces( lump_t *surfs, lump_t *verts, lump_t *indexLump ) {
 	s_worldData.surfacesPshadowBits = static_cast<int *>(ri.hunkAlloc ( count * sizeof(*s_worldData.surfacesPshadowBits), h_low ));
 
 	// load hdr vertex colors
-	if (r_hdr->integer)
+	if (r_hdr->asInt())
 	{
 		char filename[MAX_QPATH];
 		int size;
@@ -2203,7 +2203,7 @@ void R_LoadLightGrid( lump_t *l ) {
 	}
 
 	// load hdr lightgrid
-	if (r_hdr->integer)
+	if (r_hdr->asInt())
 	{
 		char filename[MAX_QPATH];
 		float *hdrLightGrid;
@@ -2320,7 +2320,7 @@ void R_LoadEntities( lump_t *l ) {
 				break;
 			}
 			*s++ = 0;
-			if (r_vertexLight->integer) {
+			if (r_vertexLight->asInt()) {
 				R_RemapShader(value, s, "0");
 			}
 			continue;
@@ -2645,7 +2645,7 @@ void R_RenderMissingCubemaps()
 	{
 		if (!tr.cubemaps[i].image)
 		{
-			tr.cubemaps[i].image = R_CreateImage(va("*cubeMap%d", i), nullptr, r_cubemapSize->integer, r_cubemapSize->integer, IMGTYPE_COLORALPHA, flags, GL_RGBA8);
+			tr.cubemaps[i].image = R_CreateImage(va("*cubeMap%d", i), nullptr, r_cubemapSize->asInt(), r_cubemapSize->asInt(), IMGTYPE_COLORALPHA, flags, GL_RGBA8);
 
 			for (j = 0; j < 6; j++)
 			{
@@ -2974,7 +2974,7 @@ void RE_LoadWorldMap( const char *name ) {
 	}
 
 	// load cubemaps
-	if (r_cubeMapping->integer)
+	if (r_cubeMapping->asInt())
 	{
 		// Try loading an env.json file first
 		R_LoadEnvironmentJson(s_worldData.baseName);
@@ -3005,7 +3005,7 @@ void RE_LoadWorldMap( const char *name ) {
 	R_BindNullVao();
 
 	// Render or load all cubemaps
-	if (r_cubeMapping->integer && tr.numCubemaps && glRefConfig.framebufferObject)
+	if (r_cubeMapping->asInt() && tr.numCubemaps && glRefConfig.framebufferObject)
 	{
 		R_LoadCubemaps();
 		R_RenderMissingCubemaps();
