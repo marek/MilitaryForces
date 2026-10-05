@@ -288,6 +288,23 @@ void MF_ClientSpawn( int clientNum, long cs_flags )
 		// use current position as spawn point
 		VectorCopy(client->ps_.origin, spawn_origin);
 		spawn_origin[2] += 25;
+		// the lift must not carry the new body through a ceiling (the top of the sky is a thin brush) or into one
+		if( vehIndex >= 0 && vehIndex < bg_numberOfVehicles )
+		{
+			const completeVehicleData_t& body = availableVehicles[vehIndex];
+			trace_t tr;
+			GameHost::trace( &tr, client->ps_.origin, body.mins, body.maxs, spawn_origin, clientNum, MASK_PLAYERSOLID, false );
+			if( !tr.startsolid && tr.fraction < 1.0f )
+				VectorCopy( tr.endpos, spawn_origin );
+			constexpr float step = 8.0f, reach = 256.0f;
+			for( float lowered = 0; lowered <= reach; lowered += step )
+			{
+				GameHost::trace( &tr, spawn_origin, body.mins, body.maxs, spawn_origin, clientNum, MASK_PLAYERSOLID, false );
+				if( !tr.startsolid && !tr.allsolid )
+					break;
+				spawn_origin[2] -= step;
+			}
+		}
 		VectorCopy(client->ps_.vehicleAngles, spawn_angles);
 	} 
 	else 
