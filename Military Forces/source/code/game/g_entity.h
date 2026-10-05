@@ -97,8 +97,8 @@ struct GameEntity : public EntityBase
 	int				soundLoop_;
 	GameEntity*		parent_;
 	GameEntity*		nextTrain_;
-	vec3_t			pos1_;
-	vec3_t			pos2_;
+	Vec3			pos1_;
+	Vec3			pos2_;
 
 	char*			message_;
 
@@ -111,7 +111,7 @@ struct GameEntity : public EntityBase
 	GameEntity*		target_ent_;
 
 	float			speed_;
-	vec3_t			movedir_;
+	Vec3			movedir_;
 
 	int				nextthink_;
 

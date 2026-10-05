@@ -109,7 +109,7 @@ struct Bots::Mind
 	}
 	void headFor( const vec3_t point )
 	{
-		vec3_t dir, angles;
+		Vec3 dir, angles;
 		VectorSubtract( point, ent->r.currentOrigin, dir );
 		dir[2] = 0;
 		vectoangles( dir, angles );

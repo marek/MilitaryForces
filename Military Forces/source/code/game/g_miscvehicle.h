@@ -47,8 +47,8 @@ struct Deck_Think : public GameEntity::EntityFunc_Think
 	bool			first_;
 	bool			hasLast_;
 	int				lastTime_;
-	vec3_t			lastOrigin_;
-	vec3_t			lastAngles_;
+	Vec3			lastOrigin_;
+	Vec3			lastAngles_;
 };
 
 struct Abandoned_Think : public GameEntity::EntityFunc_Think

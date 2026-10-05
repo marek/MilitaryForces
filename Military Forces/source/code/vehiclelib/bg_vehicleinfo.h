@@ -38,8 +38,8 @@ struct GameObjectInfo
 	unsigned int			caps_;					// capabilities
 	unsigned int			renderFlags_;			// special stuff for rendering only
     vec3_t					turnSpeed_;				// how fast can it turn around the three axis
-	vec3_t					camDist_;				// how far away is the camera {min, max, defualt}
-	vec3_t					camHeight_;				// how high is the default {min, max, default}
+	Vec3					camDist_;				// how far away is the camera {min, max, defualt}
+	Vec3					camHeight_;				// how high is the default {min, max, default}
     unsigned int			maxHealth_;				// health
     HandleList				bodyParthandles_;		// handles for parts
 	qhandle_t				shadowShader_;			// the shadow shader (use SHADOW_DEFAULT to use the default shader or SHADOW_NONE for no shadow)
@@ -91,8 +91,8 @@ struct GameObjectInfo_Vehicle : public GameObjectInfo
 	bool			setupGameObject() override;
 
 	// general vehicle (non infantry)
-	vec3_t					gunoffset_;				// guntag
-	vec3_t					cockpitview_;			// to place the camera
+	Vec3					gunoffset_;				// guntag
+	Vec3					cockpitview_;			// to place the camera
 	std::unique_ptr<VehicleRadarInfo>		airRadar_;				// air radar
 	std::unique_ptr<VehicleRadarInfo>		groundRadar_;			// ground radar
 	int						minThrottle_;

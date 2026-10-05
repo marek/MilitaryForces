@@ -49,18 +49,18 @@ struct entityShared_t
 
 	bool	bmodel;					// if false, assume an explicit mins / maxs bounding box
 									// only set by SetBrushModel
-	vec3_t		mins, maxs;
+	Vec3		mins, maxs;
 	int			contents;			// CONTENTS_TRIGGER, CONTENTS_SOLID, CONTENTS_BODY, etc
 									// a non-solid entity should set to 0
 
-	vec3_t		absmin, absmax;		// derived from mins/maxs and origin + rotation
+	Vec3		absmin, absmax;		// derived from mins/maxs and origin + rotation
 
 	// currentOrigin will be used for all collision detection and world linking.
 	// it will not necessarily be the same as the trajectory evaluation for the current
 	// time, because each entity must be moved one at a time after time is advanced
 	// to avoid simultanious collision issues
-	vec3_t		currentOrigin;
-	vec3_t		currentAngles;
+	Vec3		currentOrigin;
+	Vec3		currentAngles;
 
 	// when a trace call is made and passEntityNum != ENTITYNUM_NONE,
 	// an ent will be excluded from testing if:

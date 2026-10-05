@@ -46,9 +46,9 @@ struct VehicleRadarInfo
 
 struct TurretInfo
 {
-	vec3_t			minAngles_;		// min angles of this turret (if applicable on these axis)
-	vec3_t			maxAngles_;		// max angles of this turret (if applicable on these axis)
-	vec3_t			turnSpeed_;		// how fast it can turn
+	Vec3			minAngles_;		// min angles of this turret (if applicable on these axis)
+	Vec3			maxAngles_;		// max angles of this turret (if applicable on these axis)
+	Vec3			turnSpeed_;		// how fast it can turn
 };
 
 struct VehicleMountInfo
@@ -91,8 +91,8 @@ struct Armament
 	unsigned int	selectionType_;	// primary/secondary/non-selectable
 	int				turret_;		// what turret this is on
 	bool			limitedAngles_;	// if angles somehow limited
-	vec3_t			minAngles_;		// min angles on this turret (if applicable on these axis)
-	vec3_t			maxAngles_;		// max angles on this turret (if applicable on these axis)
+	Vec3			minAngles_;		// min angles on this turret (if applicable on these axis)
+	Vec3			maxAngles_;		// max angles on this turret (if applicable on these axis)
 };
 
 struct AnimationInfo

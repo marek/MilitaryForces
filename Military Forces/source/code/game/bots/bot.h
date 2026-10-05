@@ -147,9 +147,9 @@ public:
 
 	struct Pad
 	{
-		vec3_t			center;
-		vec3_t			spot;
-		vec3_t			axis;
+		Vec3			center;
+		Vec3			spot;
+		Vec3			axis;
 		float			halfLength;
 		float			z;
 		bool			runway;

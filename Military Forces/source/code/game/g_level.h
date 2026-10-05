@@ -115,8 +115,8 @@ struct LevelLocals
 	char*			changemap_;
 	bool			readyToExit_;			// at least one client wants to exit
 	int				exitTime_;
-	vec3_t			intermission_origin_;	// also used for spectator spawns
-	vec3_t			intermission_angle_;
+	Vec3			intermission_origin_;	// also used for spectator spawns
+	Vec3			intermission_angle_;
 
 	bool			locationLinked_;			// target_locations get linked
 	GameEntity*		locationHead_;			// head of the location list

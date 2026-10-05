@@ -513,7 +513,7 @@ struct GameEntity;
 struct SpawnFieldHolder
 {
 	char*	classname_;
-	vec3_t	origin_;
+	Vec3	origin_;
 	char*	model_;
 	char*	model2_;
 	int		spawnflags_;
@@ -527,7 +527,7 @@ struct SpawnFieldHolder
 	int		count_;
 	int		health_;
 	int		damage_;
-	vec3_t	angles_;
+	Vec3	angles_;
 	char*	targetShaderName_;
 	char*	targetShaderNewName_;
 	int		ent_category_;

@@ -265,16 +265,16 @@ public:
 
 	int				errorTime;		// decay the error from this time
 	int				errorSnapTime;
-	vec3_t			errorAngles;
-	vec3_t			errorAngles2;
+	Vec3			errorAngles;
+	Vec3			errorAngles2;
 	
 	bool		extrapolated;	// false if origin / angles is an interpolation
 
-	vec3_t			lastDrawnTrailPos;		// Position of last drawn trail
+	Vec3			lastDrawnTrailPos;		// Position of last drawn trail
 	// exact interpolated position of entity on this frame
-	vec3_t			lerpOrigin;
-	vec3_t			lerpAngles;
-	vec3_t			lerpAngles2;
+	Vec3			lerpOrigin;
+	Vec3			lerpAngles;
+	Vec3			lerpAngles2;
 
 	bool		destroyableStructure;
 
@@ -382,7 +382,7 @@ public:
 	float			radius;
 
 	float			light;
-	vec3_t			lightColor;
+	Vec3			lightColor;
 
 	leMarkType_t		leMarkType;		// mark to leave on fragment impact
 	leBounceSoundType_t	leBounceSoundType;
@@ -429,7 +429,7 @@ struct clientInfo_t {
 
 	int				botSkill;		// 0 = not bot, 1-5 = bot
 
-	vec3_t			color;
+	Vec3			color;
 
 	int				score;			// updated by score servercmds
 	int				location;		// location index for team mode
@@ -466,7 +466,7 @@ struct weaponInfo_s {
 	bool		registered;
 
 	float			flashDlight;
-	vec3_t			flashDlightColor;
+	Vec3			flashDlightColor;
 	sfxHandle_t		flashSound[4];		// fast firing weapons randomly choose
 
 	qhandle_t		ammoModel;
@@ -475,7 +475,7 @@ struct weaponInfo_s {
 	sfxHandle_t		missileSound;
 	void			(*missileTrailFunc)( ClientEntity *, const struct weaponInfo_s *wi );
 	float			missileDlight;
-	vec3_t			missileDlightColor;
+	Vec3			missileDlightColor;
 	int				missileRenderfx;
 
 	float			trailRadius;
@@ -566,7 +566,7 @@ struct cg_t {
 	ClientEntity		predictedPlayerEntity;
 	bool	validPPS;				// clear until the first call to CGame::predictPlayerState
 	int			predictedErrorTime;
-	vec3_t		predictedError;
+	Vec3		predictedError;
 
 	int			eventSequence;
 	int			predictableEvents[MAX_PREDICTED_EVENTS];
@@ -575,14 +575,14 @@ struct cg_t {
 	int			weaponSelect;
 
 	// auto rotating items
-	vec3_t		autoAngles;
+	Vec3		autoAngles;
 	vec3_t		autoAxis[3];
-	vec3_t		autoAnglesFast;
+	Vec3		autoAnglesFast;
 	vec3_t		autoAxisFast[3];
 
 	// view rendering
 	refdef_t	refdef;
-	vec3_t		refdefViewAngles;		// will be converted to refdef.viewaxis
+	Vec3		refdefViewAngles;		// will be converted to refdef.viewaxis
 
 	// zoom key
 	bool	zoomed;					// are we applying any zoom?
@@ -961,7 +961,7 @@ using enum IGME_OBJECT_TYPES;
 struct IGME_waypoint_t {
 	bool		active;
 	bool		selected;
-	vec3_t			origin;
+	Vec3			origin;
 };
 
 struct IGME_vehicle_t {
@@ -970,9 +970,9 @@ struct IGME_vehicle_t {
 	bool		groundInstallation;
 	int				vehidx;
 	char			side[8];
-	vec3_t			angles;
-	vec3_t			origin;
-	vec3_t			selectorScale;
+	Vec3			angles;
+	Vec3			origin;
+	Vec3			selectorScale;
 	IGME_waypoint_t waypoints[IGME_MAX_WAYPOINTS];
 };
 
@@ -997,8 +997,8 @@ struct BasicDrawInfo_t {
     int					vehicleIndex;
 	float				speed;
 	vec3_t				axis[3];
-	vec3_t				origin;
-	vec3_t				angles;
+	Vec3				origin;
+	Vec3				angles;
 	int					ONOFF;
 	completeLoadout_t*	usedLoadout;
 	int					numWeaponsOnMount[32];
@@ -1485,7 +1485,7 @@ struct particleSystem_s
 {
 	ClientEntity	* cent;
 
-	vec3_t		pos;		// position of system  if cent != null
+	Vec3		pos;		// position of system  if cent != null
 	// age properties
 	bool		dead;
 	long		birthtime;
@@ -1514,9 +1514,9 @@ struct particle_s
 	float	growrate;			// how fast to grow
 	
 	// phsyics
-	vec3_t		trDelta;
-	vec3_t		trBase;
-	vec3_t		trAttraction;
+	Vec3		trDelta;
+	Vec3		trBase;
+	Vec3		trAttraction;
 	float		maxspeed;
 	float		accel;				// acceleration rate
 	float		acceltime;			// how long to accelerate for
@@ -1558,10 +1558,10 @@ struct particleEmitter_s
 
 	particle_t				particleTemplate;
 	
-	vec3_t					ejectVelocity;
+	Vec3					ejectVelocity;
 
-	vec3_t					accelVarianceMax;
-	vec3_t					accelVarianceMin;
+	Vec3					accelVarianceMax;
+	Vec3					accelVarianceMin;
 	float					rotationVariance;
 	float					velVariance;
 	float					maxspeedVariance;

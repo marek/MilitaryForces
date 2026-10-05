@@ -108,8 +108,8 @@ struct GameClient : public ClientBase
 	int					ruseSeenTime_;
 	int					riderAmmo_;
 	int					riderFireTime_;
-	vec3_t				devHoldOrigin_;
-	vec3_t				devHoldAngles_;
+	Vec3				devHoldOrigin_;
+	Vec3				devHoldAngles_;
 
 	int					lastCmdTime_;		// level.time of last usercmd_t, for EF_CONNECTION
 											// we can't just use pers.lastCommand.time, because
@@ -118,13 +118,13 @@ struct GameClient : public ClientBase
 	int					oldbuttons_;
 	int					latched_buttons_;
 
-	vec3_t				oldOrigin_;
+	Vec3				oldOrigin_;
 
 	// sum up damage over an entire frame, so
 	// shotgun blasts give a single big kick
 	int					damage_done_;		// damage taken out of health
 	int					damage_knockback_;	// impact damage
-	vec3_t				damage_from_;		// origin for vector calculation
+	Vec3				damage_from_;		// origin for vector calculation
 	bool				damage_fromWorld_;	// if true, don't use the damage_from vector
 
 
