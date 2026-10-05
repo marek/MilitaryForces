@@ -504,15 +504,12 @@ int Q_isnan(float x);
   // Q_ftol must expand to a function name so the pluggable renderer can take
   // its address
   #define Q_ftol lrintf
-  #define Q_SnapVector(vec)\
-	do\
-	{\
-		vec3_t *temp = (vec);\
-		\
-		(*temp)[0] = round((*temp)[0]);\
-		(*temp)[1] = round((*temp)[1]);\
-		(*temp)[2] = round((*temp)[2]);\
-	} while(0)
+  // processors without the x86 routines (Apple Silicon, for one) round with the standard library
+  inline void Q_SnapVector( float *vec ) {
+	vec[0] = round( vec[0] );
+	vec[1] = round( vec[1] );
+	vec[2] = round( vec[2] );
+  }
 #endif
 /*
 // if your system does not have lrintf() and round() you can try this block. Please also open a bug report at bugzilla.icculus.org
