@@ -796,7 +796,7 @@ void	CommandSystem::executeString( const char *text ) {
 	}
 
 	// check client game commands
-	if ( com_cl_running && com_cl_running->integer && CL_GameCommand() ) {
+	if ( com_cl_running && com_cl_running->integer && ClientLoop::gameCommand() ) {
 		return;
 	}
 
@@ -812,7 +812,7 @@ void	CommandSystem::executeString( const char *text ) {
 
 	// send it as a server command if we are connected
 	// this will usually result in a chat message
-	CL_ForwardCommandToServer ( text );
+	ClientLoop::forwardCommandToServer ( text );
 }
 
 /*

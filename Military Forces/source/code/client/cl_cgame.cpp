@@ -414,7 +414,7 @@ void CL_ShutdownCGame( ) {
 ====================
 Client::initCGame
 
-Should only be called by CL_StartHunkUsers
+Should only be called by ClientLoop::startHunkUsers
 ====================
 */
 void Client::initCGame()
@@ -469,12 +469,12 @@ void Client::initCGame()
 
 /*
 ====================
-CL_GameCommand
+ClientLoop::gameCommand
 
 See if the current console command is claimed by the cgame
 ====================
 */
-bool CL_GameCommand( ) 
+bool ClientLoop::gameCommand( ) 
 {
 
 	if( !theCG.isInitialized() )

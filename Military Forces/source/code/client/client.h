@@ -280,7 +280,7 @@ extern	clientConnection_t clc;
 
 the clientStatic_t structure is never wiped, and is used even when
 no client connection is active at all
-(except when CL_Shutdown is called)
+(except when ClientLoop::shutdown is called)
 
 ==================================================================
 */
@@ -465,15 +465,12 @@ inline constexpr int VOIP_MAX_PACKET_FRAMES = 3;
 // cl_main
 //
 
-void CL_Init ();
 
-void CL_StartHunkUsers( bool rendererOnly );
 
 void CL_GetChallengePacket ();
 
 
 
-void CL_InitRef( );
 
 
 //
@@ -565,7 +562,6 @@ void CIN_CloseAllVideos();
 // cl_cgame.c
 //
 void CL_ShutdownCGame( );
-bool CL_GameCommand( );
 void CL_ShaderStateChanged();
 
 //

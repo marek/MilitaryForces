@@ -751,55 +751,59 @@ CLIENT / SERVER SYSTEMS
 //
 // client interface
 //
-void CL_InitKeyCommands( );
+class ClientLoop
+{
+public:
+	static void initKeyCommands( );
+	static void init( );
+	static void disconnect( bool showMainMenu );
+	static void shutdown(const char *finalmsg, bool disconnect, bool quit);
+	static void frame( int msec );
+	static bool gameCommand( );
+	static void keyEvent (int key, bool down, unsigned time);
+	static void charEvent( int key );
+	static void mouseEvent( int dx, int dy, int time );
+	static void joystickEvent( int axis, int value, int time );
+	static void packetEvent( netadr_t from, Message *msg );
+	static void consolePrint( char *text );
+	static void mapLoading( );
+	static void forwardCommandToServer( const char *string );
+	static void cdDialog( );
+	static void flushMemory( );
+	static void shutdownAll(bool shutdownRef);
+	static void initRenderer();
+	static void startHunkUsers( bool rendererOnly );
+	static void shutdownSound();
+};
 // the keyboard binding interface must be setup before execing
 // config files, but the rest of client startup will happen later
 
-void CL_Init( );
-void CL_Disconnect( bool showMainMenu );
-void CL_Shutdown(const char *finalmsg, bool disconnect, bool quit);
-void CL_Frame( int msec );
-bool CL_GameCommand( );
-void CL_KeyEvent (int key, bool down, unsigned time);
 
-void CL_CharEvent( int key );
 // char events are for field typing, not game control
 
-void CL_MouseEvent( int dx, int dy, int time );
 
-void CL_JoystickEvent( int axis, int value, int time );
 
-void CL_PacketEvent( netadr_t from, Message *msg );
 
-void CL_ConsolePrint( char *text );
 
-void CL_MapLoading( );
 // do a screen update before starting to load a map
 // when the server is going to load a new map, the entire hunk
 // will be cleared, so the client must shutdown cgame, ui, and
 // the renderer
 
-void	CL_ForwardCommandToServer( const char *string );
 // adds the current command line as a clc_clientCommand to the client message.
 // things like godmode, noclip, etc, are commands directed to the server,
 // so when they are typed in at the console, they will need to be forwarded.
 
-void CL_CDDialog( );
 // bring up the "need a cd to play" dialog
 
-void CL_FlushMemory( );
 // dump all memory on an error
 
-void CL_ShutdownAll(bool shutdownRef);
 // shutdown client
 
-void CL_InitRef();
 // initialize renderer interface
 
-void CL_StartHunkUsers( bool rendererOnly );
 // start all the client stuff using the hunk
 
-void CL_Snd_Shutdown();
 // Restart sound subsystem
 
 void Key_KeynameCompletion( void(*callback)(const char *s) );

@@ -25,77 +25,77 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 cvar_t *cl_shownet;
 
-void CL_Shutdown(const char *finalmsg, bool disconnect, bool quit)
+void ClientLoop::shutdown(const char *finalmsg, bool disconnect, bool quit)
 {
 }
 
-void CL_Init() {
+void ClientLoop::init() {
 	cl_shownet = CvarSystem::get ("cl_shownet", "0", CVAR_TEMP );
 }
 
-void CL_MouseEvent( int dx, int dy, int time ) {
+void ClientLoop::mouseEvent( int dx, int dy, int time ) {
 }
 
 void Keys::writeBindings( fileHandle_t f ) {
 }
 
-void CL_Frame ( int msec ) {
+void ClientLoop::frame ( int msec ) {
 }
 
-void CL_PacketEvent( netadr_t from, Message *msg ) {
+void ClientLoop::packetEvent( netadr_t from, Message *msg ) {
 }
 
-void CL_CharEvent( int key ) {
+void ClientLoop::charEvent( int key ) {
 }
 
-void CL_Disconnect( bool showMainMenu ) {
+void ClientLoop::disconnect( bool showMainMenu ) {
 }
 
-void CL_MapLoading() {
+void ClientLoop::mapLoading() {
 }
 
-bool CL_GameCommand() {
+bool ClientLoop::gameCommand() {
   return false;
 }
 
-void CL_KeyEvent (int key, bool down, unsigned time) {
+void ClientLoop::keyEvent (int key, bool down, unsigned time) {
 }
 
 bool UI_GameCommand() {
 	return false;
 }
 
-void CL_ForwardCommandToServer( const char *string ) {
+void ClientLoop::forwardCommandToServer( const char *string ) {
 }
 
-void CL_ConsolePrint( char *txt ) {
+void ClientLoop::consolePrint( char *txt ) {
 }
 
-void CL_JoystickEvent( int axis, int value, int time ) {
+void ClientLoop::joystickEvent( int axis, int value, int time ) {
 }
 
-void CL_InitKeyCommands() {
+void ClientLoop::initKeyCommands() {
 }
 
-void CL_CDDialog() {
+void ClientLoop::cdDialog() {
 }
 
-void CL_FlushMemory()
+void ClientLoop::flushMemory()
 {
 }
 
-void CL_ShutdownAll(bool shutdownRef)
+void ClientLoop::shutdownAll(bool shutdownRef)
 {
 }
 
-void CL_StartHunkUsers( bool rendererOnly ) {
+void ClientLoop::startHunkUsers( bool rendererOnly ) {
 }
 
-void CL_InitRef()
+void ClientLoop::initRenderer()
 {
 }
 
-void CL_Snd_Shutdown()
+void ClientLoop::shutdownSound()
 {
 }
 

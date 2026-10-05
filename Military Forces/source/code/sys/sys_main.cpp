@@ -702,7 +702,7 @@ void Sys_SigHandler( int signal )
 	{
 		signalcaught = true;
 #ifndef DEDICATED
-		CL_Shutdown(va("Received signal %d", signal), true, true);
+		ClientLoop::shutdown(va("Received signal %d", signal), true, true);
 #endif
 		ServerLoop::shutdown(va("Received signal %d", signal) );
 	}

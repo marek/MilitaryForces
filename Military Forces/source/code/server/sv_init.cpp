@@ -407,12 +407,12 @@ void ServerMain::spawnServer( char *server, bool killBots )
 	Common::printf ("------ Server Initialization ------\n");
 	Common::printf ("Server: %s\n",server);
 
-	// if not running a dedicated server CL_MapLoading will connect the client to the server
+	// if not running a dedicated server ClientLoop::mapLoading will connect the client to the server
 	// also print some status stuff
-	CL_MapLoading();
+	ClientLoop::mapLoading();
 
 	// make sure all the client stuff is unloaded
-	CL_ShutdownAll(false);
+	ClientLoop::shutdownAll(false);
 
 	// clear the whole hunk because we're (re)loading the server
 	Hunk::clear();
@@ -628,7 +628,7 @@ void ServerMain::spawnServer( char *server, bool killBots )
 	if ( com_dedicated->integer ) {
 		// restart renderer in order to show console for dedicated servers
 		// launched through the regular binary
-		CL_StartHunkUsers( true );
+		ClientLoop::startHunkUsers( true );
 	}
 #endif
 
@@ -790,6 +790,6 @@ void ServerLoop::shutdown( const char *finalmsg )
 
 	// disconnect any local clients
 	if( sv_killserver->integer != 2 )
-		CL_Disconnect( false );
+		ClientLoop::disconnect( false );
 }
 

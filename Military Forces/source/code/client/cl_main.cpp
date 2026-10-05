@@ -169,12 +169,12 @@ void CL_ServerStatusResponse( netadr_t from, Message *msg );
 
 /*
 ===============
-CL_CDDialog
+ClientLoop::cdDialog
 
 Called by Common::error when a cd is needed
 ===============
 */
-void CL_CDDialog( ) {
+void ClientLoop::cdDialog( ) {
 	cls.cddialog = true;	// start it next frame
 }
 
@@ -926,7 +926,7 @@ void CL_DemoCompleted( )
 		}
 	}
 
-	CL_Disconnect( true );
+	ClientLoop::disconnect( true );
 	Client::nextDemo();
 }
 
@@ -1090,7 +1090,7 @@ void CL_PlayDemo_f( ) {
 	// open the demo file
 	Q_strncpyz( arg, CommandSystem::argv(1), sizeof( arg ) );
 	
-	CL_Disconnect( true );
+	ClientLoop::disconnect( true );
 
 	// check for an extension .DEMOEXT_?? (?? is protocol)
 	ext_test = strrchr(arg, '.');
@@ -1203,10 +1203,10 @@ void Client::nextDemo( ) {
 
 /*
 =====================
-CL_ShutdownAll
+ClientLoop::shutdownAll
 =====================
 */
-void CL_ShutdownAll(bool shutdownRef)
+void ClientLoop::shutdownAll(bool shutdownRef)
 {
 	if(Client::videoRecording())
 		Client::closeAVI();
@@ -1243,7 +1243,7 @@ Called by Common::gameRestart
 void CL_ClearMemory(bool shutdownRef)
 {
 	// shutdown all the client stuff
-	CL_ShutdownAll(shutdownRef);
+	ClientLoop::shutdownAll(shutdownRef);
 
 	// if not running a server clear the whole hunk
 	if ( !com_sv_running || !com_sv_running->integer ) {
@@ -1260,29 +1260,29 @@ void CL_ClearMemory(bool shutdownRef)
 
 /*
 =================
-CL_FlushMemory
+ClientLoop::flushMemory
 
-Called by CL_MapLoading, CL_Connect_f, CL_PlayDemo_f, and CL_ParseGamestate the only
+Called by ClientLoop::mapLoading, CL_Connect_f, CL_PlayDemo_f, and CL_ParseGamestate the only
 ways a client gets into a game
 Also called by Common::error
 =================
 */
-void CL_FlushMemory()
+void ClientLoop::flushMemory()
 {
 	CL_ClearMemory(false);
-	CL_StartHunkUsers(false);
+	ClientLoop::startHunkUsers(false);
 }
 
 /*
 =====================
-CL_MapLoading
+ClientLoop::mapLoading
 
 A local server is starting to load a map, so update the
 screen to let the user know about it, then dump all client
 memory on the hunk from cgame, ui, and renderer
 =====================
 */
-void CL_MapLoading( ) {
+void ClientLoop::mapLoading( ) {
 	if ( com_dedicated->integer ) {
 		clc.state = CA_DISCONNECTED;
 		Key_SetCatcher( KEYCATCH_CONSOLE );
@@ -1307,7 +1307,7 @@ void CL_MapLoading( ) {
 	} else {
 		// clear nextmap so the cinematic shutdown doesn't execute it
 		CvarSystem::set( "nextmap", "" );
-		CL_Disconnect( true );
+		ClientLoop::disconnect( true );
 		Q_strncpyz( clc.servername, "localhost", sizeof(clc.servername) );
 		clc.state = CA_CHALLENGING;		// so the connect screen is drawn
 		Key_SetCatcher( 0 );
@@ -1369,7 +1369,7 @@ void Client::oldGame()
 
 /*
 =====================
-CL_Disconnect
+ClientLoop::disconnect
 
 Called when a connection, demo, or cinematic is being terminated.
 Goes from a connected state to either a menu state or a console state
@@ -1377,7 +1377,7 @@ Sends a disconnect message to the server
 This is also called on Common::error and Com_Quit, so it shouldn't cause any errors
 =====================
 */
-void CL_Disconnect( bool showMainMenu ) {
+void ClientLoop::disconnect( bool showMainMenu ) {
 	if ( !com_cl_running || !com_cl_running->integer ) {
 		return;
 	}
@@ -1485,14 +1485,14 @@ void CL_Disconnect( bool showMainMenu ) {
 
 /*
 ===================
-CL_ForwardCommandToServer
+ClientLoop::forwardCommandToServer
 
 adds the current command line as a clientCommand
 things like godmode, noclip, etc, are commands directed to the server,
 so when they are typed in at the console, they will need to be forwarded.
 ===================
 */
-void CL_ForwardCommandToServer( const char *string ) {
+void ClientLoop::forwardCommandToServer( const char *string ) {
 	char	*cmd;
 
 	cmd = CommandSystem::argv(0);
@@ -1737,7 +1737,7 @@ void CL_Connect_f( ) {
 	ServerLoop::frame( 0 );
 
 	noGameRestart = true;
-	CL_Disconnect( true );
+	ClientLoop::disconnect( true );
 	Console::close();
 
 	Q_strncpyz( clc.servername, server, sizeof(clc.servername) );
@@ -1976,10 +1976,10 @@ void Client::vid_Restart_f( ) {
 		CvarSystem::set("cl_paused", "0");
 
 		// initialize the renderer interface
-		CL_InitRef();
+		ClientLoop::initRenderer();
 
 		// startup all the client stuff
-		CL_StartHunkUsers(false);
+		ClientLoop::startHunkUsers(false);
 
 		// start the cgame if connected
 		if(clc.state > CA_CONNECTED && clc.state != CA_CINEMATIC)
@@ -1999,7 +1999,7 @@ CL_Snd_Restart
 Restart the sound subsystem
 =================
 */
-void CL_Snd_Shutdown()
+void ClientLoop::shutdownSound()
 {
 	SoundSystem::shutdown();
 	cls.soundStarted = false;
@@ -2016,7 +2016,7 @@ handles will be invalid
 */
 void Client::snd_Restart_f()
 {
-	CL_Snd_Shutdown();
+	ClientLoop::shutdownSound();
 	// sound will be reinitialized by vid_restart
 	Client::vid_Restart_f();
 }
@@ -2138,7 +2138,7 @@ void CL_DownloadsComplete( ) {
 	// this will also (re)load the UI
 	// if this is a local client then only the client part of the hunk
 	// will be cleared, note that this is done after the hunk mark has been set
-	CL_FlushMemory();
+	ClientLoop::flushMemory();
 
 	// initialize the CGame
 	cls.cgameStarted = true;
@@ -2834,12 +2834,12 @@ void CL_ConnectionlessPacket( netadr_t from, Message *msg ) {
 
 /*
 =================
-CL_PacketEvent
+ClientLoop::packetEvent
 
 A packet has arrived from the main event loop
 =================
 */
-void CL_PacketEvent( netadr_t from, Message *msg ) {
+void ClientLoop::packetEvent( netadr_t from, Message *msg ) {
 	int		headerBytes;
 
 	clc.lastPacketTime = cls.realtime;
@@ -2907,7 +2907,7 @@ void CL_CheckTimeout( ) {
 	    && cls.realtime - clc.lastPacketTime > cl_timeout->value*1000) {
 		if (++cl.timeoutcount > 5) {	// timeoutcount saves debugger
 			Common::printf ("\nServer connection timed out.\n");
-			CL_Disconnect( true );
+			ClientLoop::disconnect( true );
 			return;
 		}
 	} else {
@@ -2959,11 +2959,11 @@ void CL_CheckUserinfo( ) {
 
 /*
 ==================
-CL_Frame
+ClientLoop::frame
 
 ==================
 */
-void CL_Frame ( int msec ) {
+void ClientLoop::frame ( int msec ) {
 
 	if ( !com_cl_running->integer ) {
 		return;
@@ -3183,13 +3183,13 @@ void CL_InitRenderer( ) {
 
 /*
 ============================
-CL_StartHunkUsers
+ClientLoop::startHunkUsers
 
 After the server has cleared the hunk, these will need to be restarted
 This is the only place that any of these functions are called from
 ============================
 */
-void CL_StartHunkUsers( bool rendererOnly ) {
+void ClientLoop::startHunkUsers( bool rendererOnly ) {
 	if (!com_cl_running) {
 		return;
 	}
@@ -3242,10 +3242,10 @@ int CL_ScaledMilliseconds() {
 
 /*
 ============
-CL_InitRef
+ClientLoop::initRenderer
 ============
 */
-void CL_InitRef( ) {
+void ClientLoop::initRenderer( ) {
 	refimport_t	ri;
 	refexport_t	*ret;
 #ifdef USE_RENDERER_DLOPEN
@@ -3533,10 +3533,10 @@ void CL_Sayto_f( ) {
 
 /*
 ====================
-CL_Init
+ClientLoop::init
 ====================
 */
-void CL_Init( ) {
+void ClientLoop::init( ) {
 	Common::printf( "----- Client Initialization -----\n" );
 
 	Console::init ();
@@ -3739,7 +3739,7 @@ void CL_Init( ) {
 		CommandSystem::addCommand ("sayto", CL_Sayto_f );
 		CommandSystem::setCommandCompletionFunc( "sayto", Client::completePlayerName );
 	}
-	CL_InitRef();
+	ClientLoop::initRenderer();
 
 	Screen::init ();
 
@@ -3757,11 +3757,11 @@ void CL_Init( ) {
 
 /*
 ===============
-CL_Shutdown
+ClientLoop::shutdown
 
 ===============
 */
-void CL_Shutdown(const char *finalmsg, bool disconnect, bool quit)
+void ClientLoop::shutdown(const char *finalmsg, bool disconnect, bool quit)
 {
 	static bool recursive = false;
 	
@@ -3780,10 +3780,10 @@ void CL_Shutdown(const char *finalmsg, bool disconnect, bool quit)
 	noGameRestart = quit;
 
 	if(disconnect)
-		CL_Disconnect(true);
+		ClientLoop::disconnect(true);
 	
 	CL_ClearMemory(true);
-	CL_Snd_Shutdown();
+	ClientLoop::shutdownSound();
 
 #ifdef USE_HTTP
 	CL_HTTP_Shutdown();

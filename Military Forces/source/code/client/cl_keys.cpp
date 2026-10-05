@@ -1143,10 +1143,10 @@ void Keys::completeBind( char *args, int argNum )
 
 /*
 ===================
-CL_InitKeyCommands
+ClientLoop::initKeyCommands
 ===================
 */
-void CL_InitKeyCommands( ) {
+void ClientLoop::initKeyCommands( ) {
 	// register our functions
 	CommandSystem::addCommand ("bind",Key_Bind_f);
 	CommandSystem::setCommandCompletionFunc( "bind", Keys::completeBind );
@@ -1236,7 +1236,7 @@ void CL_ParseBinding( int key, bool down, unsigned time )
 ===================
 CL_KeyDownEvent
 
-Called by CL_KeyEvent to handle a keypress
+Called by ClientLoop::keyEvent to handle a keypress
 ===================
 */
 void CL_KeyDownEvent( int key, unsigned time )
@@ -1333,7 +1333,7 @@ void CL_KeyDownEvent( int key, unsigned time )
 ===================
 CL_KeyUpEvent
 
-Called by CL_KeyEvent to handle a keyrelease
+Called by ClientLoop::keyEvent to handle a keyrelease
 ===================
 */
 void CL_KeyUpEvent( int key, unsigned time )
@@ -1367,12 +1367,12 @@ void CL_KeyUpEvent( int key, unsigned time )
 
 /*
 ===================
-CL_KeyEvent
+ClientLoop::keyEvent
 
 Called by the system for both key up and key down events
 ===================
 */
-void CL_KeyEvent (int key, bool down, unsigned time) {
+void ClientLoop::keyEvent (int key, bool down, unsigned time) {
 	if( down )
 		CL_KeyDownEvent( key, time );
 	else
@@ -1381,12 +1381,12 @@ void CL_KeyEvent (int key, bool down, unsigned time) {
 
 /*
 ===================
-CL_CharEvent
+ClientLoop::charEvent
 
 Normal keyboard characters, already shifted / capslocked / etc
 ===================
 */
-void CL_CharEvent( int key ) {
+void ClientLoop::charEvent( int key ) {
 	// delete is not a printable character and is
 	// otherwise handled by Field_KeyDownEvent
 	if ( key == 127 ) {
@@ -1426,7 +1426,7 @@ void Keys::clearStates ()
 
 	for ( i=0 ; i < MAX_KEYS ; i++ ) {
 		if ( keys[i].down ) {
-			CL_KeyEvent( i, false, 0 );
+			ClientLoop::keyEvent( i, false, 0 );
 
 		}
 		keys[i].down = false;

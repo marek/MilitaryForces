@@ -567,7 +567,7 @@ void CL_ParseGamestate( Message *msg ) {
 
 	FileSystem::conditionalRestart(clc.checksumFeed, false);
 
-	// This used to call CL_StartHunkUsers, but now we enter the download state before loading the
+	// This used to call ClientLoop::startHunkUsers, but now we enter the download state before loading the
 	// cgame
 	Client::initDownloads();
 

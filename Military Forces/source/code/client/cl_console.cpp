@@ -94,8 +94,8 @@ Con_ToggleMenu_f
 ===================
 */
 void Con_ToggleMenu_f( ) {
-	CL_KeyEvent( K_ESCAPE, true, System::milliseconds() );
-	CL_KeyEvent( K_ESCAPE, false, System::milliseconds() );
+	ClientLoop::keyEvent( K_ESCAPE, true, System::milliseconds() );
+	ClientLoop::keyEvent( K_ESCAPE, false, System::milliseconds() );
 }
 
 /*
@@ -439,14 +439,14 @@ void Con_Linefeed (bool skipnotify)
 
 /*
 ================
-CL_ConsolePrint
+ClientLoop::consolePrint
 
 Handles cursor positioning, line wrapping, etc
 All console printing must go through this in order to be logged to disk
 If no console is visible, the text will appear at the top of the game window
 ================
 */
-void CL_ConsolePrint( char *txt ) {
+void ClientLoop::consolePrint( char *txt ) {
 	int		y, l;
 	unsigned char	c;
 	unsigned short	color;

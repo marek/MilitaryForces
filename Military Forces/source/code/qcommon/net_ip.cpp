@@ -1645,7 +1645,7 @@ void NET_Event(fd_set *fdr)
 			if(com_sv_running->integer)
 				Common::runAndTimeServerPacket(&from, &netmsg);
 			else
-				CL_PacketEvent(from, &netmsg);
+				ClientLoop::packetEvent(from, &netmsg);
 		}
 		else
 			break;

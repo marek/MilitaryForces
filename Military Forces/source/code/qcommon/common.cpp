@@ -183,7 +183,7 @@ void QDECL Common::printf( const char *fmt, ... ) {
 	}
 
 #ifndef DEDICATED
-	CL_ConsolePrint( msg );
+	ClientLoop::consolePrint( msg );
 #endif
 
 	// echo to dedicated console and early console
@@ -306,10 +306,10 @@ void QDECL Common::error( int code, const char *fmt, ... ) {
 	if (code == ERR_DISCONNECT || code == ERR_SERVERDISCONNECT) {
 		ServerLoop::shutdown( "Server disconnected" );
 		if ( restartClient ) {
-			CL_Init();
+			ClientLoop::init();
 		}
-		CL_Disconnect( true );
-		CL_FlushMemory( );
+		ClientLoop::disconnect( true );
+		ClientLoop::flushMemory( );
 		// make sure we can get at our local stuff
 		FileSystem::pureServerSetLoadedPaks("", "");
 		com_errorEntered = false;
@@ -318,22 +318,22 @@ void QDECL Common::error( int code, const char *fmt, ... ) {
 		Common::printf ("********************\nERROR: %s\n********************\n", com_errorMessage);
 		ServerLoop::shutdown (va("Server crashed: %s",  com_errorMessage));
 		if ( restartClient ) {
-			CL_Init();
+			ClientLoop::init();
 		}
-		CL_Disconnect( true );
-		CL_FlushMemory( );
+		ClientLoop::disconnect( true );
+		ClientLoop::flushMemory( );
 		FileSystem::pureServerSetLoadedPaks("", "");
 		com_errorEntered = false;
 		longjmp (abortframe, -1);
 	} else if ( code == ERR_NEED_CD ) {
 		ServerLoop::shutdown( "Server didn't have CD" );
 		if ( restartClient ) {
-			CL_Init();
+			ClientLoop::init();
 		}
 		if ( com_cl_running && com_cl_running->integer ) {
-			CL_Disconnect( true );
-			CL_FlushMemory( );
-			CL_CDDialog();
+			ClientLoop::disconnect( true );
+			ClientLoop::flushMemory( );
+			ClientLoop::cdDialog();
 		} else {
 			Common::printf("Server didn't have CD\n" );
 		}
@@ -343,7 +343,7 @@ void QDECL Common::error( int code, const char *fmt, ... ) {
 		com_errorEntered = false;
 		longjmp (abortframe, -1);
 	} else {
-		CL_Shutdown(va("Client fatal crashed: %s", com_errorMessage), true, true);
+		ClientLoop::shutdown(va("Client fatal crashed: %s", com_errorMessage), true, true);
 		ServerLoop::shutdown(va("Server fatal crashed: %s", com_errorMessage));
 	}
 
@@ -370,7 +370,7 @@ void Common::quit_f( ) {
 		// System::quit will kill this process anyways, so
 		// a corrupt call stack makes no difference
 		ServerLoop::shutdown(p[0] ? p : "Server quit");
-		CL_Shutdown(p[0] ? p : "Client quit", true, true);
+		ClientLoop::shutdown(p[0] ? p : "Client quit", true, true);
 		Common::shutdown ();
 		FileSystem::shutdown(true);
 	}
@@ -2182,7 +2182,7 @@ int Common::eventLoop( ) {
 		if ( ev.evType == SE_NONE ) {
 			// manually send packet events for the loopback channel
 			while ( Network::getLoopPacket( NS_CLIENT, &evFrom, &buf ) ) {
-				CL_PacketEvent( evFrom, &buf );
+				ClientLoop::packetEvent( evFrom, &buf );
 			}
 
 			while ( Network::getLoopPacket( NS_SERVER, &evFrom, &buf ) ) {
@@ -2199,16 +2199,16 @@ int Common::eventLoop( ) {
 		switch(ev.evType)
 		{
 			case SE_KEY:
-				CL_KeyEvent( ev.evValue, ev.evValue2, ev.evTime );
+				ClientLoop::keyEvent( ev.evValue, ev.evValue2, ev.evTime );
 			break;
 			case SE_CHAR:
-				CL_CharEvent( ev.evValue );
+				ClientLoop::charEvent( ev.evValue );
 			break;
 			case SE_MOUSE:
-				CL_MouseEvent( ev.evValue, ev.evValue2, ev.evTime );
+				ClientLoop::mouseEvent( ev.evValue, ev.evValue2, ev.evTime );
 			break;
 			case SE_JOYSTICK_AXIS:
-				CL_JoystickEvent( ev.evValue, ev.evValue2, ev.evTime );
+				ClientLoop::joystickEvent( ev.evValue, ev.evValue2, ev.evTime );
 			break;
 			case SE_CONSOLE:
 				CommandBuffer::addText( static_cast<char *>(ev.evPtr) );
@@ -2383,9 +2383,9 @@ void Common::gameRestart(int checksumFeed, bool disconnect)
 		if(com_gameClientRestarting)
 		{
 			if(disconnect)
-				CL_Disconnect(false);
+				ClientLoop::disconnect(false);
 				
-			CL_Shutdown("Game directory changed", disconnect, false);
+			ClientLoop::shutdown("Game directory changed", disconnect, false);
 		}
 
 		FileSystem::restart(checksumFeed);
@@ -2404,8 +2404,8 @@ void Common::gameRestart(int checksumFeed, bool disconnect)
 
 		if(com_gameClientRestarting)
 		{
-			CL_Init();
-			CL_StartHunkUsers(false);
+			ClientLoop::init();
+			ClientLoop::startHunkUsers(false);
 		}
 		
 		com_gameRestarting = false;
@@ -2679,7 +2679,7 @@ void Common::init( char *commandLine ) {
 	com_developer = CvarSystem::get("developer", "0", CVAR_TEMP);
 
 	// done early so bind command exists
-	CL_InitKeyCommands();
+	ClientLoop::initKeyCommands();
 
 	com_standalone = CvarSystem::get("com_standalone", "0", CVAR_ROM);
 	com_basegame = CvarSystem::get("com_basegame", BASEGAME, CVAR_INIT);
@@ -2797,7 +2797,7 @@ void Common::init( char *commandLine ) {
 
 	com_dedicated->modified = false;
 #ifndef DEDICATED
-	CL_Init();
+	ClientLoop::init();
 #endif
 
 	// set com_frameTime so that if a map is started on the
@@ -2824,7 +2824,7 @@ void Common::init( char *commandLine ) {
 	// start in full screen ui mode
 	CvarSystem::set("r_uiFullScreen", "1");
 
-	CL_StartHunkUsers( false );
+	ClientLoop::startHunkUsers( false );
 
 	// make sure single player is off by default
 	CvarSystem::set("ui_singlePlayerActive", "0");
@@ -3176,7 +3176,7 @@ void Common::frame( ) {
 		com_dedicated->modified = false;
 		if ( !com_dedicated->integer ) {
 			ServerLoop::shutdown( "dedicated set to 0" );
-			CL_FlushMemory();
+			ClientLoop::flushMemory();
 		}
 	}
 
@@ -3202,7 +3202,7 @@ void Common::frame( ) {
 		timeBeforeClient = System::milliseconds ();
 	}
 
-	CL_Frame( msec );
+	ClientLoop::frame( msec );
 
 	if ( com_speeds->integer ) {
 		timeAfter = System::milliseconds ();

@@ -358,10 +358,10 @@ void CL_KeyMove( usercmd_t *cmd ) {
 
 /*
 =================
-CL_MouseEvent
+ClientLoop::mouseEvent
 =================
 */
-void CL_MouseEvent( int dx, int dy, int time ) {
+void ClientLoop::mouseEvent( int dx, int dy, int time ) {
 	if ( Key_GetCatcher( ) & KEYCATCH_UI ) {
 		theUI.mouseEvent( dx, dy );
 	} else if (Key_GetCatcher( ) & KEYCATCH_CGAME) {
@@ -374,12 +374,12 @@ void CL_MouseEvent( int dx, int dy, int time ) {
 
 /*
 =================
-CL_JoystickEvent
+ClientLoop::joystickEvent
 
 Joystick values stay set until changed
 =================
 */
-void CL_JoystickEvent( int axis, int value, int time ) {
+void ClientLoop::joystickEvent( int axis, int value, int time ) {
 	if ( axis < 0 || axis >= MAX_JOYSTICK_AXIS ) {
 		Common::error( ERR_DROP, "CL_JoystickEvent: bad axis %i", axis );
 	}
