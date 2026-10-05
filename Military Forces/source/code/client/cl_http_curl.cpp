@@ -39,7 +39,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "../sys/sys_loadlib.h"
 
-cvar_t *cl_cURLLib;
+static cvar_t *cl_cURLLib;
 
 char* (*qcurl_version)();
 

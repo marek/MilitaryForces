@@ -82,7 +82,7 @@ constexpr int AREA_DEPTH = 4;
 constexpr int AREA_NODES = 64;
 
 worldSector_t	sv_worldSectors[AREA_NODES];
-int			sv_numworldSectors;
+static int			sv_numworldSectors;
 
 
 /*

@@ -31,8 +31,8 @@ key up events are sent even if in console mode
 
 EditField	historyEditLines[COMMAND_HISTORY];
 
-int			nextHistoryLine;		// the last line in the history buffer, not masked
-int			historyLine;	// the line being displayed from history buffer
+static int			nextHistoryLine;		// the last line in the history buffer, not masked
+static int			historyLine;	// the line being displayed from history buffer
 							// will be <= nextHistoryLine
 
 EditField		g_consoleField;

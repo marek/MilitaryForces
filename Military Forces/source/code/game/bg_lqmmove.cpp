@@ -8,8 +8,6 @@
 #include "bg_local.h"
 #include <algorithm>
 
-extern pmove_t		*pm;
-extern pml_t		pml;
 
 
 constexpr float MIN_WALK_NORMAL = 0.4f;

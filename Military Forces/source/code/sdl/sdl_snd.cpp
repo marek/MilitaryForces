@@ -33,13 +33,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../client/snd_local.h"
 #include "../client/client.h"
 
-bool snd_inited = false;
+static bool snd_inited = false;
 
-cvar_t *s_sdlBits;
-cvar_t *s_sdlSpeed;
-cvar_t *s_sdlChannels;
-cvar_t *s_sdlDevSamps;
-cvar_t *s_sdlMixSamps;
+static cvar_t *s_sdlBits;
+static cvar_t *s_sdlSpeed;
+static cvar_t *s_sdlChannels;
+static cvar_t *s_sdlDevSamps;
+static cvar_t *s_sdlMixSamps;
 
 /* The audio callback. All the magic happens here. */
 static int dmapos = 0;

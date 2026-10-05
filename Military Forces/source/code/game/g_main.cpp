@@ -60,8 +60,8 @@ vmCvar_t	g_synchronousClients;
 vmCvar_t	g_warmup;
 vmCvar_t	g_doWarmup;
 vmCvar_t	g_restarted;
-vmCvar_t	g_log;
-vmCvar_t	g_logSync;
+static vmCvar_t	g_log;
+static vmCvar_t	g_logSync;
 vmCvar_t	g_allowVote;
 vmCvar_t	g_teamAutoJoin;
 vmCvar_t	g_teamForceBalance;
@@ -72,7 +72,7 @@ vmCvar_t	g_smoothClients;
 vmCvar_t	pmove_fixed;
 vmCvar_t	pmove_msec;
 vmCvar_t	g_rankings;
-vmCvar_t	g_listEntity;
+static vmCvar_t	g_listEntity;
 vmCvar_t	g_spectSpeed;
 
 // MFQ3
@@ -170,7 +170,7 @@ cvarTable_t		gameCvarTable[] = {
 
 };
 
-int		gameCvarTableSize = sizeof( gameCvarTable ) / sizeof( gameCvarTable[0] );
+static int		gameCvarTableSize = sizeof( gameCvarTable ) / sizeof( gameCvarTable[0] );
 
 
 void G_InitGame( int levelTime, int randomSeed );

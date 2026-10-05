@@ -31,8 +31,8 @@ cvar_t *s_muted;
 cvar_t *s_musicVolume;
 cvar_t *s_doppler;
 cvar_t *s_backend;
-cvar_t *s_muteWhenMinimized;
-cvar_t *s_muteWhenUnfocused;
+static cvar_t *s_muteWhenMinimized;
+static cvar_t *s_muteWhenUnfocused;
 
 static soundInterface_t si;
 

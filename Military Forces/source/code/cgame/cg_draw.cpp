@@ -43,7 +43,7 @@ CUSTOM CONSOLE
 */
 
 struct strConsoleLine consoleLine[ MAX_CONSOLE_LINES ];	// our custom console buffer
-int consoleIdx = 0;
+static int consoleIdx = 0;
 
 /*
 ===============================================================================

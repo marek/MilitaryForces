@@ -51,7 +51,7 @@ cvar_t	*cl_voip;
 #endif
 
 #ifdef USE_RENDERER_DLOPEN
-cvar_t	*cl_renderer;
+static cvar_t	*cl_renderer;
 #endif
 
 cvar_t	*cl_nodelta;
@@ -59,13 +59,13 @@ cvar_t	*cl_debugMove;
 
 cvar_t	*cl_noprint;
 #ifdef UPDATE_SERVER_NAME
-cvar_t	*cl_motd;
+static cvar_t	*cl_motd;
 #endif
 
-cvar_t	*rcon_client_password;
+static cvar_t	*rcon_client_password;
 cvar_t	*rconAddress;
 
-cvar_t	*cl_timeout;
+static cvar_t	*cl_timeout;
 cvar_t	*cl_maxpackets;
 cvar_t	*cl_packetdup;
 cvar_t	*cl_timeNudge;
@@ -75,11 +75,11 @@ cvar_t	*cl_freezeDemo;
 cvar_t	*cl_shownet;
 cvar_t	*cl_showSend;
 cvar_t	*cl_timedemo;
-cvar_t	*cl_timedemoLog;
+static cvar_t	*cl_timedemoLog;
 cvar_t	*cl_autoRecordDemo;
 cvar_t	*cl_aviFrameRate;
 cvar_t	*cl_aviMotionJpeg;
-cvar_t	*cl_forceavidemo;
+static cvar_t	*cl_forceavidemo;
 
 cvar_t	*cl_freelook;
 cvar_t	*cl_sensitivity;
@@ -118,17 +118,17 @@ cvar_t	*cl_serverStatusResendTime;
 
 cvar_t	*cl_lanForcePackets;
 
-cvar_t	*cl_guidServerUniq;
+static cvar_t	*cl_guidServerUniq;
 
 cvar_t	*cl_consoleKeys;
 
-cvar_t	*cl_rate;
+static cvar_t	*cl_rate;
 
 clientActive_t		cl;
 clientConnection_t	clc;
 clientStatic_t		cls;
 
-char				cl_reconnectArgs[MAX_OSPATH];
+static char				cl_reconnectArgs[MAX_OSPATH];
 char				cl_oldGame[MAX_QPATH];
 bool			cl_oldGameSet;
 

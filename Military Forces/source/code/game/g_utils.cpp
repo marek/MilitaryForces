@@ -18,7 +18,7 @@ struct shaderRemap_t {
 
 constexpr int MAX_SHADER_REMAPS = 128;
 
-int remapCount = 0;
+static int remapCount = 0;
 shaderRemap_t remappedShaders[MAX_SHADER_REMAPS];
 
 void AddRemap(const char *oldShader, const char *newShader, float timeOffset) {

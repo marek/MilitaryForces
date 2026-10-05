@@ -28,10 +28,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // counters are only bumped when running single threaded,
 // because they are an awful coherence problem
-int	c_active_windings;
-int	c_peak_windings;
-int	c_winding_allocs;
-int	c_winding_points;
+static int	c_active_windings;
+static int	c_peak_windings;
+static int	c_winding_allocs;
+static int	c_winding_points;
 
 void Winding::print(  ) {
 	int		i;
@@ -75,7 +75,7 @@ void Winding::free(  ) {
 RemoveColinearPoints
 ============
 */
-int	c_removed;
+static int	c_removed;
 
 void Winding::removeColinearPoints(  ) {
 	int		i, j, k;

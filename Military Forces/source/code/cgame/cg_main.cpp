@@ -19,7 +19,7 @@
 
 UI_UtilsCG cgUtils;
 
-int forceModelModificationCount = -1;
+static int forceModelModificationCount = -1;
 
 void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum );
 void CG_Shutdown( );
@@ -142,7 +142,7 @@ vmCvar_t	cg_hudFiles;
 vmCvar_t 	cg_smoothClients;
 //vmCvar_t	pmove_fixed;
 //vmCvar_t	pmove_msec;
-vmCvar_t	cg_pmove_msec;
+static vmCvar_t	cg_pmove_msec;
 vmCvar_t	cg_cameraMode;
 vmCvar_t	cg_timescaleFadeEnd;
 vmCvar_t	cg_timescaleFadeSpeed;

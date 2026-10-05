@@ -425,7 +425,7 @@ static void blitVQQuad32fs( byte **status, unsigned char *data )
 {
 unsigned short	newd, celdata, code;
 unsigned int	index, i;
-int		spl;
+static int		spl;
 
 	newd	= 0;
 	celdata = 0;

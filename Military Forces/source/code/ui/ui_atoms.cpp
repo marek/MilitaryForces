@@ -11,7 +11,7 @@
 
 bool		m_entersound;		// after a frame, so caching won't disrupt the sound
 
-bool newUI = false;
+static bool newUI = false;
 
 
 /*

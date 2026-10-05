@@ -1948,5 +1948,9 @@ private:
 extern particleWorld_t pw;
 extern refexport_t	refExport;
 
+// tag names of the vehicle parts, cg_vehicledraw.cpp
+extern char *plane_tags[BP_PLANE_MAX_PARTS];
+extern char *gv_tags[BP_GV_MAX_PARTS];
+
 
 #endif // __CG_LOCAL_H__

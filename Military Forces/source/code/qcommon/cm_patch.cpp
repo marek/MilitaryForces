@@ -39,9 +39,9 @@ degenerate a few triangles.  Completely degenerate rows and columns are handled
 properly.
 */
 
-int	c_totalPatchBlocks;
-int	c_totalPatchSurfaces;
-int	c_totalPatchEdges;
+static int	c_totalPatchBlocks;
+static int	c_totalPatchSurfaces;
+static int	c_totalPatchEdges;
 
 static const patchCollide_t	*debugPatchCollide;
 static const facet_t		*debugFacet;

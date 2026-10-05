@@ -8,8 +8,6 @@
 #include "bg_local.h"
 #include <algorithm>
 
-extern pmove_t		*pm;
-extern pml_t		pml;
 
 constexpr float MAX_HELO_PITCH = 30.0f;
 constexpr float MAX_HELO_ROLL = 40.0f;

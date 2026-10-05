@@ -54,8 +54,8 @@ constexpr int PACKET_HEADER = 10; // two ints and a short
 
 constexpr unsigned int FRAGMENT_BIT = (1U<<31);
 
-cvar_t		*showpackets;
-cvar_t		*showdrop;
+static cvar_t		*showpackets;
+static cvar_t		*showdrop;
 cvar_t		*net_qport;
 
 static char *netsrcString[2] = {

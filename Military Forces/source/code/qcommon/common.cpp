@@ -43,8 +43,8 @@ constexpr int MIN_DEDICATED_COMHUNKMEGS = 1;
 #define DEF_COMHUNKMEGS_S	XSTRING(DEF_COMHUNKMEGS)
 #define DEF_COMZONEMEGS_S	XSTRING(DEF_COMZONEMEGS)
 
-int		com_argc;
-char	*com_argv[MAX_NUM_ARGVS+1];
+static int		com_argc;
+static char	*com_argv[MAX_NUM_ARGVS+1];
 
 jmp_buf abortframe;		// an ERR_DROP occurred, exit the entire frame
 
@@ -59,16 +59,16 @@ cvar_t	*com_speeds;
 cvar_t	*com_developer;
 cvar_t	*com_dedicated;
 cvar_t	*com_timescale;
-cvar_t	*com_fixedtime;
+static cvar_t	*com_fixedtime;
 cvar_t	*com_journal;
 cvar_t	*com_maxfps;
 cvar_t	*com_altivec;
-cvar_t	*com_timedemo;
+static cvar_t	*com_timedemo;
 cvar_t	*com_sv_running;
 cvar_t	*com_cl_running;
-cvar_t	*com_logfile;		// 1 = buffer log, 2 = flush after each print
+static cvar_t	*com_logfile;		// 1 = buffer log, 2 = flush after each print
 cvar_t	*com_pipefile;
-cvar_t	*com_showtrace;
+static cvar_t	*com_showtrace;
 cvar_t	*com_version;
 cvar_t	*com_blood;
 cvar_t	*com_buildScript;	// for automated data building scripts
@@ -94,7 +94,7 @@ cvar_t	*com_legacyprotocol;
 #endif
 cvar_t	*com_basegame;
 cvar_t  *com_homepath;
-cvar_t	*com_busyWait;
+static cvar_t	*com_busyWait;
 #ifndef DEDICATED
 cvar_t  *con_autochat;
 #endif
@@ -110,12 +110,12 @@ int		time_frontend;		// renderer frontend time
 int		time_backend;		// renderer backend time
 
 int			com_frameTime;
-int			com_frameNumber;
+static int			com_frameNumber;
 
 bool	com_errorEntered = false;
 bool	com_fullyInitialized = false;
-bool	com_gameRestarting = false;
-bool	com_gameClientRestarting = false;
+static bool	com_gameRestarting = false;
+static bool	com_gameClientRestarting = false;
 
 char	com_errorMessage[MAXPRINTMSG];
 
@@ -397,8 +397,8 @@ quake3 set test blah + map test
 */
 
 #define	MAX_CONSOLE_LINES	32
-int		com_numConsoleLines;
-char	*com_consoleLines[MAX_CONSOLE_LINES];
+static int		com_numConsoleLines;
+static char	*com_consoleLines[MAX_CONSOLE_LINES];
 
 /*
 ==================

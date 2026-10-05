@@ -26,9 +26,9 @@ static huffman_t		msgHuff;
 
 static bool			msgInit = false;
 
-int pcount[256];
+static int pcount[256];
 
-cvar_t			*msg_huffstats;
+static cvar_t			*msg_huffstats;
 int				msg_huffstatsHold;
 static int		msg_huffCounts[256];
 

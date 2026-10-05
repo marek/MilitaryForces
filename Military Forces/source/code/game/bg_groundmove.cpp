@@ -7,8 +7,6 @@
 #include "bg_public.h"
 #include "bg_local.h"
 
-extern pmove_t		*pm;
-extern pml_t		pml;
 
 constexpr int PFRONT = 0;
 constexpr int PBACK = 1;

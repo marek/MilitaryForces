@@ -5,8 +5,6 @@
 #include "cg_local.h"
 
 
-extern char *plane_tags[BP_PLANE_MAX_PARTS];
-extern char *gv_tags[BP_GV_MAX_PARTS];
 
 /*
 ===============

@@ -30,20 +30,20 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "qal.h"
 
 // Console variables specific to OpenAL
-cvar_t *s_alPrecache;
-cvar_t *s_alGain;
-cvar_t *s_alSources;
-cvar_t *s_alDopplerFactor;
-cvar_t *s_alDopplerSpeed;
-cvar_t *s_alMinDistance;
-cvar_t *s_alMaxDistance;
-cvar_t *s_alRolloff;
-cvar_t *s_alGraceDistance;
-cvar_t *s_alDriver;
-cvar_t *s_alDevice;
-cvar_t *s_alInputDevice;
-cvar_t *s_alAvailableDevices;
-cvar_t *s_alAvailableInputDevices;
+static cvar_t *s_alPrecache;
+static cvar_t *s_alGain;
+static cvar_t *s_alSources;
+static cvar_t *s_alDopplerFactor;
+static cvar_t *s_alDopplerSpeed;
+static cvar_t *s_alMinDistance;
+static cvar_t *s_alMaxDistance;
+static cvar_t *s_alRolloff;
+static cvar_t *s_alGraceDistance;
+static cvar_t *s_alDriver;
+static cvar_t *s_alDevice;
+static cvar_t *s_alInputDevice;
+static cvar_t *s_alAvailableDevices;
+static cvar_t *s_alAvailableInputDevices;
 
 static bool enumeration_ext = false;
 static bool enumeration_all_ext = false;

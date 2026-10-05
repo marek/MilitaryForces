@@ -71,15 +71,15 @@ int   		s_paintedtime; 		// sample PAIRS
 // of custom player sounds
 #define		MAX_SFX			4096
 SoundEffect		s_knownSfx[MAX_SFX];
-int			s_numSfx = 0;
+static int			s_numSfx = 0;
 
 constexpr int LOOP_HASH = 128;
 static	SoundEffect		*sfxHash[LOOP_HASH];
 
 cvar_t		*s_testsound;
-cvar_t		*s_show;
-cvar_t		*s_mixahead;
-cvar_t		*s_mixPreStep;
+static cvar_t		*s_show;
+static cvar_t		*s_mixahead;
+static cvar_t		*s_mixPreStep;
 
 static loopSound_t		loopSounds[MAX_GENTITIES];
 static	channel_t		*freelist = nullptr;

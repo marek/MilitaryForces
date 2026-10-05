@@ -468,7 +468,7 @@ void GameItem::Think_FinishSpawningItem::execute()
 	GameHost::linkEntity( self_ );
 }
 
-bool	itemRegistered[MAX_ITEMS];
+static bool	itemRegistered[MAX_ITEMS];
 
 /*
 ==================

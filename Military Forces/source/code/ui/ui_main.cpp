@@ -128,10 +128,10 @@ int ProcessNewUI( int command, int arg0, int arg1, int arg2, int arg3, int arg4,
 
 
 
-vmCvar_t  ui_new;
-vmCvar_t  ui_debug;
-vmCvar_t  ui_initialized;
-vmCvar_t  ui_teamArenaFirstRun;
+static vmCvar_t  ui_new;
+static vmCvar_t  ui_debug;
+static vmCvar_t  ui_initialized;
+static vmCvar_t  ui_teamArenaFirstRun;
 
 void _UI_Init( int );
 void _UI_Shutdown( );
@@ -714,7 +714,7 @@ void _UI_Shutdown()
 	LAN_SaveServersToCache();
 }
 
-char *defaultMenu = nullptr;
+static char *defaultMenu = nullptr;
 
 char *GetMenuBuffer(const char *filename) {
 	int	len;
@@ -6476,19 +6476,19 @@ vmCvar_t	ui_server16;
 
 //vmCvar_t	ui_cdkeychecked;
 
-vmCvar_t	ui_redteam;
-vmCvar_t	ui_redteam1;
-vmCvar_t	ui_redteam2;
-vmCvar_t	ui_redteam3;
-vmCvar_t	ui_redteam4;
-vmCvar_t	ui_redteam5;
-vmCvar_t	ui_blueteam;
-vmCvar_t	ui_blueteam1;
-vmCvar_t	ui_blueteam2;
-vmCvar_t	ui_blueteam3;
-vmCvar_t	ui_blueteam4;
-vmCvar_t	ui_blueteam5;
-vmCvar_t	ui_teamName;
+static vmCvar_t	ui_redteam;
+static vmCvar_t	ui_redteam1;
+static vmCvar_t	ui_redteam2;
+static vmCvar_t	ui_redteam3;
+static vmCvar_t	ui_redteam4;
+static vmCvar_t	ui_redteam5;
+static vmCvar_t	ui_blueteam;
+static vmCvar_t	ui_blueteam1;
+static vmCvar_t	ui_blueteam2;
+static vmCvar_t	ui_blueteam3;
+static vmCvar_t	ui_blueteam4;
+static vmCvar_t	ui_blueteam5;
+static vmCvar_t	ui_teamName;
 vmCvar_t	ui_dedicated;
 vmCvar_t	ui_gameType;
 vmCvar_t	ui_netGameType;
@@ -6530,12 +6530,12 @@ vmCvar_t	ui_captureLimit;
 vmCvar_t	ui_fragLimit;
 vmCvar_t	ui_smallFont;
 vmCvar_t	ui_bigFont;
-vmCvar_t	ui_findPlayer;
-vmCvar_t	ui_Q3Model;
-vmCvar_t	ui_hudFiles;
+static vmCvar_t	ui_findPlayer;
+static vmCvar_t	ui_Q3Model;
+static vmCvar_t	ui_hudFiles;
 vmCvar_t	ui_recordSPDemo;
-vmCvar_t	ui_realCaptureLimit;
-vmCvar_t	ui_realWarmUp;
+static vmCvar_t	ui_realCaptureLimit;
+static vmCvar_t	ui_realWarmUp;
 vmCvar_t	ui_serverStatusTimeOut;
 
 // MFQ3
@@ -6543,18 +6543,18 @@ vmCvar_t	ui_serverStatusTimeOut;
 
 // (vehicle select dialog)
 vmCvar_t	ui_vehicleCat;			// vehicle catagory value
-vmCvar_t	ui_vehicleClass;		// vehicle class value
-vmCvar_t	ui_vehicleLoadout;		// vehicle loadout value
-vmCvar_t	ui_vehicle;				// vehicle value
+static vmCvar_t	ui_vehicleClass;		// vehicle class value
+static vmCvar_t	ui_vehicleLoadout;		// vehicle loadout value
+static vmCvar_t	ui_vehicle;				// vehicle value
 
-vmCvar_t	ui_vehicleCatTxt;		// vehicle catagory text
-vmCvar_t	ui_vehicleClassTxt;		// vehicle class text
-vmCvar_t	ui_vehicleLoadoutTxt;	// vehicle loadout text
-vmCvar_t	ui_vehicleTxt;			// vehicle text
+static vmCvar_t	ui_vehicleCatTxt;		// vehicle catagory text
+static vmCvar_t	ui_vehicleClassTxt;		// vehicle class text
+static vmCvar_t	ui_vehicleLoadoutTxt;	// vehicle loadout text
+static vmCvar_t	ui_vehicleTxt;			// vehicle text
 
-vmCvar_t	ui_availableVehiclesTxt;	// available vehicles text
+static vmCvar_t	ui_availableVehiclesTxt;	// available vehicles text
 
-vmCvar_t	ui_mfq3Version;		// version text
+static vmCvar_t	ui_mfq3Version;		// version text
 
 // bk001129 - made static to avoid aliasing
 static cvarTable_t		cvarTable[] = {

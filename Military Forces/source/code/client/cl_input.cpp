@@ -26,7 +26,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../cgame/cg.h"
 
 unsigned	frame_msec;
-int			old_com_frameTime;
+static int			old_com_frameTime;
 
 /*
 ===============================================================================
@@ -61,7 +61,7 @@ kbutton_t	in_voiprecord;
 kbutton_t	in_buttons[16];
 
 
-bool	in_mlooking;
+static bool	in_mlooking;
 
 
 void IN_MLookDown( ) {

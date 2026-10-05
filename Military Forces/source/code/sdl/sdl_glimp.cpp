@@ -52,11 +52,11 @@ enum rserr_t
 SDL_Window *SDL_window = nullptr;
 static SDL_GLContext SDL_glContext = nullptr;
 
-cvar_t *r_allowSoftwareGL; // Don't abort out if a hardware visual can't be obtained
-cvar_t *r_allowResize; // make window resizable
-cvar_t *r_centerWindow;
-cvar_t *r_sdlDriver;
-cvar_t *r_glDebug;
+static cvar_t *r_allowSoftwareGL; // Don't abort out if a hardware visual can't be obtained
+static cvar_t *r_allowResize; // make window resizable
+static cvar_t *r_centerWindow;
+static cvar_t *r_sdlDriver;
+static cvar_t *r_glDebug;
 
 constexpr int GLIMP_DEBUG_OUTPUT_SYNCHRONOUS = 0x8242;
 constexpr int GLIMP_DEBUG_OUTPUT = 0x92E0;
@@ -66,7 +66,7 @@ constexpr int GLIMP_DEBUG_SEVERITY_LOW = 0x9148;
 
 typedef void ( APIENTRY *GLimp_DebugProc )( GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const char *message, const void *userParam );
 typedef void ( APIENTRY *GLimp_DebugMessageCallbackProc )( GLimp_DebugProc callback, const void *userParam );
-cvar_t *r_preferOpenGLES;
+static cvar_t *r_preferOpenGLES;
 
 int qglMajorVersion, qglMinorVersion;
 int qglesMajorVersion, qglesMinorVersion;

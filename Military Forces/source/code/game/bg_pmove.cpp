@@ -27,7 +27,7 @@ float	pm_flyaccelerate = 8.0f;
 float	pm_friction = 6.0f;
 float	pm_waterfriction = 1.0f;
 float	pm_flightfriction = 3.0f;
-float	pm_spectatorfriction = 5.0f;
+static float	pm_spectatorfriction = 5.0f;
 
 int		c_pmove = 0;
 
