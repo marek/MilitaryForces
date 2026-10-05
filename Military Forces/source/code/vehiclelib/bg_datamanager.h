@@ -3,6 +3,7 @@
 
 
 #include <string>
+#include <string_view>
 #include <memory>
 #include <vector>
 #include "../game/q_shared.h"
@@ -25,7 +26,7 @@ struct DataManager
 	GameObjectList const&		getAllGameObjects() const;
 
 	// loadout helpers
-	int							findWeaponByName( std::string const& lookupName );
+	int							findWeaponByName( std::string_view lookupName );
 
 protected:
 	// vehicles/weapon creation util functions

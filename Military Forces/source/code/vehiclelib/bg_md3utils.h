@@ -2,6 +2,7 @@
 #define __BG_MD3UTILS_H__
 
 #include <string>
+#include <string_view>
 #include <vector>
 
 
@@ -33,20 +34,20 @@ struct Md3Utils
 
 	// find all tags containing string str (either from an already open file or by name)
 	static int				getTagsContaining( std::string const& filename, 
-											   std::string const& str,
+											   std::string_view str,
 											   std::vector<md3Tag_t>& tagList );
 
 	static int				getTagsContaining( fileHandle_t const& file, 
-											   std::string const& str,
+											   std::string_view str,
 											   std::vector<md3Tag_t>& tagList );
 
 	// get a single tag (either from an already open file or by name)
 	static bool				getTagInfo( std::string const& filename,
-										std::string const& tagname,
+										std::string_view tagname,
 										md3Tag_t& tag );
 
 	static bool				getTagInfo( fileHandle_t const& file,
-										std::string const& tagname,
+										std::string_view tagname,
 										md3Tag_t& tag );
 
 	// retrieve the number of frames (either from an already open file or by name)

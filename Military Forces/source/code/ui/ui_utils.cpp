@@ -408,7 +408,7 @@ UI_Utils::item_RunScript(itemDef_t *item, const char *s)
 //					break;
 //				}
 //			}
-			CommandMapIter it = commands_.find(command);
+			CommandMapIter it = commands_.find(std::string_view(command));
 			if( it != commands_.end() )
 			{
 				it->second->handler(item, &p);

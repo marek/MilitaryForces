@@ -44,7 +44,7 @@ DataManager::createAllWeapons()
 }
 
 int
-DataManager::findWeaponByName( std::string const& lookupName )
+DataManager::findWeaponByName( std::string_view lookupName )
 {
 	for( size_t i = 0; i < allWeapons_.size(); ++i )
 	{

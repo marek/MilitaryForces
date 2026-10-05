@@ -214,7 +214,7 @@ protected:
 								UI_Utils();
 	virtual						~UI_Utils();
 
-	typedef std::map<std::string,std::unique_ptr<Command>> CommandMap;
+	typedef std::map<std::string,std::unique_ptr<Command>,std::less<>> CommandMap;	// std::less<> lets a lookup use the text in place
 	typedef CommandMap::iterator CommandMapIter;
 
 	// data members

@@ -107,7 +107,7 @@ Md3Utils::getModelDimensions( fileHandle_t const& file,
 
 int
 Md3Utils::getTagsContaining( std::string const& filename, 
-							 std::string const& str,
+							 std::string_view str,
 							 std::vector<md3Tag_t>& tagList )
 {
 	int found = 0;
@@ -125,10 +125,10 @@ Md3Utils::getTagsContaining( std::string const& filename,
 
 int
 Md3Utils::getTagsContaining( fileHandle_t const& file, 
-							 std::string const& str,
+							 std::string_view str,
 							 std::vector<md3Tag_t>& tagList )
 {
-	if( str.empty() || str == "" ) 
+	if( str.empty() ) 
 		return 0;
 
 	if( !file )
@@ -158,9 +158,8 @@ Md3Utils::getTagsContaining( fileHandle_t const& file,
 	for( int i = 0; i < total; ++ i ) 
 	{
 		FileSystem::read(&tag, sizeof(tag), file);
-		std::string tagName(tag.name);
-		// if it contains the string at the first position, then add it
-		if( tagName.find(str) == 0 )
+		// a tag whose name starts with the string
+		if( std::string_view( tag.name ).starts_with( str ) )
 			tagList.push_back(tag);
 	}
 
@@ -169,7 +168,7 @@ Md3Utils::getTagsContaining( fileHandle_t const& file,
 
 bool
 Md3Utils::getTagInfo( std::string const& filename,
-					  std::string const& tagname,
+					  std::string_view tagname,
 					  md3Tag_t& tag )
 {
 	bool success = false;
@@ -187,7 +186,7 @@ Md3Utils::getTagInfo( std::string const& filename,
 
 bool
 Md3Utils::getTagInfo( fileHandle_t const& file,
-					  std::string const& tagname,
+					  std::string_view tagname,
 					  md3Tag_t& tag )
 {
 	if( !file )
@@ -215,7 +214,7 @@ Md3Utils::getTagInfo( fileHandle_t const& file,
 	for( int i = 0; i < head.numTags; ++i ) 
 	{
 		FileSystem::read(&tag, sizeof(md3Tag_t), file);
-		if( strcmp( tag.name, tagname.c_str() ) == 0 ) 
+		if( tagname == tag.name ) 
 		{
 			found = true;
 			break;
