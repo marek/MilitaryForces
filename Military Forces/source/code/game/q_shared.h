@@ -462,8 +462,8 @@ bool Q_IsColorString(const char *p);  // ^[0-9a-zA-Z]
 #define COLOR_CYAN	'5'
 #define COLOR_MAGENTA	'6'
 #define COLOR_WHITE	'7'
-#define ColorIndexForNumber(c) ((c) & 0x07)
-#define ColorIndex(c) (ColorIndexForNumber((c) - '0'))
+template<typename T> constexpr auto ColorIndexForNumber( T c ) { return c & 0x07; }
+template<typename T> constexpr auto ColorIndex( T c ) { return ColorIndexForNumber( c - '0' ); }
 
 #define S_COLOR_BLACK	"^0"
 #define S_COLOR_RED	"^1"
@@ -479,8 +479,8 @@ extern vec4_t	g_color_table[8];
 #define	MAKERGB( v, r, g, b ) v[0]=r;v[1]=g;v[2]=b
 #define	MAKERGBA( v, r, g, b, a ) v[0]=r;v[1]=g;v[2]=b;v[3]=a
 
-#define DEG2RAD( a ) ( ( (a) * std::numbers::pi_v<float> ) / 180.0F )
-#define RAD2DEG( a ) ( ( (a) * 180.0f ) / std::numbers::pi_v<float> )
+template<typename T> constexpr auto DEG2RAD( T a ) { return ( a * std::numbers::pi_v<float> ) / 180.0F; }
+template<typename T> constexpr auto RAD2DEG( T a ) { return ( a * 180.0f ) / std::numbers::pi_v<float>; }
 
 struct cplane_s;
 
@@ -1171,8 +1171,8 @@ enum soundChannel_t {
 ========================================================================
 */
 
-#define	ANGLE2SHORT(x)	(static_cast<int>((x)*65536/360) & 65535)
-#define	SHORT2ANGLE(x)	((x)*(360.0/65536))
+template<typename T> constexpr int ANGLE2SHORT( T x ) { return static_cast<int>( x * 65536 / 360 ) & 65535; }
+template<typename T> constexpr auto SHORT2ANGLE( T x ) { return x * ( 360.0 / 65536 ); }
 
 inline constexpr int SNAPFLAG_RATE_DELAYED = 1;
 inline constexpr int SNAPFLAG_NOT_ACTIVE = 2; // snapshot used during connection and for zombies
@@ -1600,7 +1600,7 @@ struct fontInfo_t {
   char name[MAX_QPATH];
 };
 
-#define Square(x) ((x)*(x))
+template<typename T> constexpr auto Square( T x ) { return x * x; }
 
 // real time
 //=============================================
@@ -1663,8 +1663,8 @@ inline constexpr int CDKEY_LEN = 16;
 inline constexpr int CDCHKSUM_LEN = 2;
 
 
-#define LERP( a, b, w ) ( ( a ) * ( 1.0f - ( w ) ) + ( b ) * ( w ) )
-#define LUMA( red, green, blue ) ( 0.2126f * ( red ) + 0.7152f * ( green ) + 0.0722f * ( blue ) )
+template<typename A, typename B, typename W> constexpr auto LERP( A a, B b, W w ) { return a * ( 1.0f - w ) + b * w; }
+template<typename R, typename G, typename B> constexpr auto LUMA( R red, G green, B blue ) { return 0.2126f * red + 0.7152f * green + 0.0722f * blue; }
 
 // generic random number functions (based upon calling Rand())
 int RandomInt( int min, int max );

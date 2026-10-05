@@ -523,7 +523,8 @@ public:
 	static void playerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s, int time, bool snap );
 	static bool playerTouchesItem( playerState_t *ps, entityState_t *item, int atTime );
 };
-#define	ITEM_INDEX(x) ((x)-bg_itemlist)
+// position of an item in the item list
+inline int ITEM_INDEX( const gitem_t *item ) { return static_cast<int>( item - bg_itemlist ); }
 
 
 

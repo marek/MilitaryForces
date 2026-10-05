@@ -689,7 +689,11 @@ refEntity_t	    part[BP_HELO_MAX_PARTS];
 }
 
 
-#define inframerange(a, b) (a >= veh->animations[b].firstFrame) ? ( a <= (veh->animations[b].firstFrame+veh->animations[b].numFrames-1) ? 1 : 0 ) : 0
+// whether a frame belongs to one of the soldier's animations
+static bool inFrameRange( const completeVehicleData_t* veh, int frame, int anim )
+{
+	return frame >= veh->animations[anim].firstFrame && frame <= veh->animations[anim].firstFrame + veh->animations[anim].numFrames - 1;
+}
 
 void CGame::drawLQM(DrawInfo_LQM_t* drawInfo)
 {
@@ -737,25 +741,25 @@ void CGame::drawLQM(DrawInfo_LQM_t* drawInfo)
 	if(drawInfo->legsTime < cg.time) 
 	{
 		drawInfo->legsFrame++;
-		if( inframerange(drawInfo->legsFrame, LEGS_WALKCR) ) 
+		if( inFrameRange( veh, drawInfo->legsFrame, LEGS_WALKCR) ) 
 			drawInfo->legsTime = cg.time + veh->animations[LEGS_WALKCR].frameLerp; 
-		else if(inframerange(drawInfo->legsFrame, LEGS_JUMP)) 
+		else if(inFrameRange( veh, drawInfo->legsFrame, LEGS_JUMP)) 
 			drawInfo->legsTime = cg.time + veh->animations[LEGS_JUMP].frameLerp; 
-		else if(inframerange(drawInfo->legsFrame, LEGS_JUMPB)) 
+		else if(inFrameRange( veh, drawInfo->legsFrame, LEGS_JUMPB)) 
 			drawInfo->legsTime = cg.time + veh->animations[LEGS_JUMPB].frameLerp; 
-		else if(inframerange(drawInfo->legsFrame, LEGS_RUN)) 
+		else if(inFrameRange( veh, drawInfo->legsFrame, LEGS_RUN)) 
 			drawInfo->legsTime = cg.time + veh->animations[LEGS_RUN].frameLerp; 
-		else if(inframerange(drawInfo->legsFrame, LEGS_BACK)) 
+		else if(inFrameRange( veh, drawInfo->legsFrame, LEGS_BACK)) 
 			drawInfo->legsTime = cg.time + veh->animations[LEGS_BACK].frameLerp; 
-		else if(inframerange(drawInfo->legsFrame, BOTH_DEATH1)) 
+		else if(inFrameRange( veh, drawInfo->legsFrame, BOTH_DEATH1)) 
 			drawInfo->legsTime = cg.time + veh->animations[BOTH_DEATH1].frameLerp; 
-		else if(inframerange(drawInfo->legsFrame, LEGS_IDLE)) 
+		else if(inFrameRange( veh, drawInfo->legsFrame, LEGS_IDLE)) 
 			drawInfo->legsTime = cg.time + veh->animations[LEGS_IDLE].frameLerp; 
-		else if(inframerange(drawInfo->legsFrame, LEGS_IDLECR)) 
+		else if(inFrameRange( veh, drawInfo->legsFrame, LEGS_IDLECR)) 
 			drawInfo->legsTime = cg.time + veh->animations[LEGS_IDLECR].frameLerp; 
-		else if(inframerange(drawInfo->legsFrame, LEGS_LAND)) 
+		else if(inFrameRange( veh, drawInfo->legsFrame, LEGS_LAND)) 
 			drawInfo->legsTime = cg.time + veh->animations[LEGS_LAND].frameLerp; 
-		else if(inframerange(drawInfo->legsFrame, LEGS_LANDB)) 
+		else if(inFrameRange( veh, drawInfo->legsFrame, LEGS_LANDB)) 
 			drawInfo->legsTime = cg.time + veh->animations[LEGS_LANDB].frameLerp; 
 		else 
 			drawInfo->legsTime = cg.time + veh->animations[LEGS_RUN].frameLerp; 
@@ -765,12 +769,12 @@ void CGame::drawLQM(DrawInfo_LQM_t* drawInfo)
 	// less variables to keep track, slightly more calculation, but just as doable
 	if(drawInfo->basicInfo.ONOFF & OO_STALLED) 
 	{
-		if(inframerange(lastLegsFrame, LEGS_JUMP))
+		if(inFrameRange( veh, lastLegsFrame, LEGS_JUMP))
 			drawInfo->legsFrame = veh->animations[LEGS_LAND].firstFrame;
-		if(inframerange(lastLegsFrame, LEGS_JUMPB))
+		if(inFrameRange( veh, lastLegsFrame, LEGS_JUMPB))
 			drawInfo->legsFrame = veh->animations[LEGS_LANDB].firstFrame;
 
-		if(inframerange(drawInfo->legsFrame, LEGS_LANDB)) 
+		if(inFrameRange( veh, drawInfo->legsFrame, LEGS_LANDB)) 
 		{
 			if(drawInfo->legsFrame > veh->animations[LEGS_LANDB].firstFrame+veh->animations[LEGS_LANDB].numFrames-1) 
 				drawInfo->legsFrame = veh->animations[LEGS_LANDB].firstFrame + veh->animations[LEGS_LANDB].numFrames-1;
