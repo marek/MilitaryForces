@@ -260,10 +260,6 @@ CommandSystem::exec_f
 */
 void CommandSystem::exec_f( ) {
 	bool quiet;
-	union {
-		char	*c;
-		void	*v;
-	} f;
 	char	filename[MAX_QPATH];
 
 	quiet = !Q_stricmp(CommandSystem::argv(0), "execq");
@@ -276,17 +272,15 @@ void CommandSystem::exec_f( ) {
 
 	Q_strncpyz( filename, CommandSystem::argv(1), sizeof( filename ) );
 	COM_DefaultExtension( filename, sizeof( filename ), ".cfg" );
-	FileSystem::readFile( filename, &f.v);
-	if (!f.c) {
+	const FileData file( filename );
+	if (!file) {
 		Common::printf ("couldn't exec %s\n", filename);
 		return;
 	}
 	if (!quiet)
 		Common::printf ("execing %s\n", filename);
 	
-	CommandBuffer::insertText (f.c);
-
-	FileSystem::freeFile (f.v);
+	CommandBuffer::insertText (file.as<char>());
 }
 
 

@@ -114,4 +114,23 @@ private:
 	static char lastValidBase[MAX_OSPATH];
 };
 
+// a whole file read into memory; the buffer is given back when the object goes out of scope
+class FileData
+{
+public:
+	explicit FileData( const char *qpath ) { length_ = FileSystem::readFile( qpath, &data_ ); }
+	~FileData() { if( data_ ) FileSystem::freeFile( data_ ); }
+	FileData( const FileData& ) = delete;
+	FileData& operator=( const FileData& ) = delete;
+
+	explicit operator bool() const { return data_ != nullptr; }
+	long length() const { return length_; }
+	void *data() const { return data_; }
+	template<typename T> T *as() const { return static_cast<T *>( data_ ); }
+
+private:
+	void	*data_ = nullptr;
+	long	length_ = 0;
+};
+
 #endif
