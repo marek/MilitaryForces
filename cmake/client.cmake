@@ -70,6 +70,20 @@ if(APPLE AND BUILD_MACOS_APP)
             COMMAND codesign --force --sign ${MF_SIGN_IDENTITY} $<TARGET_FILE_DIR:${CLIENT_NAME}>/$<TARGET_FILE_NAME:${RENDERER}>
             VERBATIM)
     endforeach()
+    # SDL2, FreeType and anything else that is not part of macOS is copied beside the executable
+    option(MF_BUNDLE_LIBS "Copy the dynamic libraries the game needs into the app" ON)
+    if(MF_BUNDLE_LIBS)
+        set(MF_BUNDLE_SEARCH "")
+        foreach(PREFIX IN LISTS CMAKE_PREFIX_PATH)
+            list(APPEND MF_BUNDLE_SEARCH "${PREFIX}/lib")
+        endforeach()
+        list(APPEND MF_BUNDLE_SEARCH /usr/local/lib /opt/homebrew/lib)
+        list(JOIN MF_BUNDLE_SEARCH "|" MF_BUNDLE_SEARCH)
+        add_custom_command(TARGET ${CLIENT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -DFOLDER=$<TARGET_FILE_DIR:${CLIENT_NAME}> -DSIGN=${MF_SIGN_IDENTITY} -DSEARCH=${MF_BUNDLE_SEARCH}
+                -P ${CMAKE_SOURCE_DIR}/cmake/utils/bundle_libs.cmake
+            VERBATIM)
+    endif()
     add_custom_command(TARGET ${CLIENT_NAME} POST_BUILD
         COMMAND codesign --force --deep --sign ${MF_SIGN_IDENTITY} $<TARGET_BUNDLE_DIR:${CLIENT_NAME}>
         VERBATIM)
