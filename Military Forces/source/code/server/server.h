@@ -282,7 +282,6 @@ extern	cvar_t	*sv_gameset;
 extern	cvar_t	*sv_pure;
 extern	cvar_t	*sv_floodProtect;
 extern	cvar_t	*sv_lanForceRate;
-extern	cvar_t	*sv_strictAuth;
 extern	cvar_t	*sv_banFile;
 extern	cvar_t	*sv_master[MAX_MASTER_SERVERS];
 

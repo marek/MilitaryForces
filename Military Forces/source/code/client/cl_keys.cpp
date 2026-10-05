@@ -42,7 +42,7 @@ bool	chat_team;
 int			chat_playerNum;
 
 
-bool	key_overstrikeMode;
+static bool	key_overstrikeMode;
 
 int				anykeydown;
 qkey_t		keys[MAX_KEYS];

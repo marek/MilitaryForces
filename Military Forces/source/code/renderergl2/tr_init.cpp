@@ -111,7 +111,7 @@ cvar_t  *r_cameraExposure;
 cvar_t  *r_externalGLSL;
 
 cvar_t  *r_hdr;
-cvar_t  *r_floatLightmap;
+static cvar_t  *r_floatLightmap;
 cvar_t  *r_postProcess;
 
 cvar_t  *r_toneMap;

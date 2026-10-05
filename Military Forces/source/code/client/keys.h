@@ -27,7 +27,6 @@ struct qkey_t {
 	char		*binding;
 };
 
-extern	bool	key_overstrikeMode;
 extern	qkey_t		keys[MAX_KEYS];
 
 // NOTE TTimo the declaration of EditField and Field_Clear is now in qcommon/qcommon.h

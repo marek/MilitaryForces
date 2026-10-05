@@ -35,18 +35,9 @@ extern	pmove_t		*pm;
 extern	pml_t		pml;
 
 // movement parameters
-extern	float	pm_stopspeed;
-extern	float	pm_wadeScale;
 
-extern	float	pm_accelerate;
-extern	float	pm_airaccelerate;
-extern	float	pm_flyaccelerate;
 
-extern	float	pm_friction;
-extern	float	pm_waterfriction;
-extern	float	pm_flightfriction;
 
-extern	int		c_pmove;
 
 class PlayerMove
 {

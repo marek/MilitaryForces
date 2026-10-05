@@ -1191,7 +1191,6 @@ extern	cg_t			cg;
 extern	ClientEntity		cg_entities[MAX_GENTITIES];
 extern	weaponInfo_t	cg_weapons[WI_MAX];
 extern	itemInfo_t		cg_items[MAX_ITEMS];
-extern	markPoly_t		cg_markPolys[MAX_MARK_POLYS];
 
 // MFQ3
 extern	completeLoadout_t cg_loadouts[MAX_GENTITIES];
@@ -1201,10 +1200,6 @@ extern	int cg_loadoutKeys[MAX_GENTITIES];
 extern	vmCvar_t		cg_centertime;
 extern	vmCvar_t		cg_runpitch;
 extern	vmCvar_t		cg_runroll;
-extern	vmCvar_t		cg_bobup;
-extern	vmCvar_t		cg_bobpitch;
-extern	vmCvar_t		cg_bobroll;
-extern	vmCvar_t		cg_swingSpeed;
 extern	vmCvar_t		cg_shadows;
 extern	vmCvar_t		cg_drawTimer;
 extern	vmCvar_t		cg_drawFPS;
@@ -1215,27 +1210,20 @@ extern	vmCvar_t		cg_drawIcons;
 extern	vmCvar_t		cg_drawCrosshairNames;
 extern	vmCvar_t		cg_drawRewards;
 extern	vmCvar_t		cg_drawTeamOverlay;
-extern	vmCvar_t		cg_teamOverlayUserinfo;
 extern	vmCvar_t		cg_crosshairX;
 extern	vmCvar_t		cg_crosshairY;
 extern	vmCvar_t		cg_crosshairSize;
 extern	vmCvar_t		cg_drawStatus;
 extern	vmCvar_t		cg_draw2D;
-extern	vmCvar_t		cg_debugPosition;
 extern	vmCvar_t		cg_debugEvents;
-extern	vmCvar_t		cg_missileEffect;	// 0 Default, 1 White puffs, 2 "Rail trail"
-extern	vmCvar_t		cg_railTrailTime;
 extern	vmCvar_t		cg_errorDecay;
 extern	vmCvar_t		cg_nopredict;
 extern	vmCvar_t		cg_showmiss;
 extern	vmCvar_t		cg_addMarks;
-extern	vmCvar_t		cg_gun_frame;
 extern	vmCvar_t		cg_gun_x;
 extern	vmCvar_t		cg_gun_y;
 extern	vmCvar_t		cg_gun_z;
-extern	vmCvar_t		cg_drawGun;
 extern	vmCvar_t		cg_viewsize;
-extern	vmCvar_t		cg_ignore;
 extern	vmCvar_t		cg_simpleItems;
 extern	vmCvar_t		cg_fov;
 extern	vmCvar_t		cg_zoomFov;
@@ -1248,13 +1236,9 @@ extern	vmCvar_t		cg_synchronousClients;
 extern	vmCvar_t		cg_teamChatTime;
 extern	vmCvar_t		cg_teamChatHeight;
 extern	vmCvar_t		cg_stats;
-extern	vmCvar_t 		cg_forceModel;
-extern	vmCvar_t 		cg_buildScript;
 extern	vmCvar_t		cg_paused;
-extern	vmCvar_t		cg_freelook;
 extern	vmCvar_t		cg_advanced;
 extern	vmCvar_t		cg_predictItems;
-extern	vmCvar_t		cg_drawFriend;
 extern	vmCvar_t		cg_teamChatsOnly;
 extern	vmCvar_t		cg_smoothClients;
 extern	vmCvar_t		pmove_fixed;
@@ -1262,17 +1246,14 @@ extern	vmCvar_t		pmove_msec;
 extern	vmCvar_t		cg_timescaleFadeEnd;
 extern	vmCvar_t		cg_timescaleFadeSpeed;
 extern	vmCvar_t		cg_timescale;
-extern	vmCvar_t		cg_cameraMode;
 extern  vmCvar_t		cg_smallFont;
 extern  vmCvar_t		cg_bigFont;
-extern	vmCvar_t		cg_noTaunt;
 
 // MFQ3+
 extern	vmCvar_t		cg_vehicle;
 extern	vmCvar_t		cg_nextVehicle;
 extern	vmCvar_t		cg_thirdPersonHeight;
 extern	vmCvar_t		cg_radarTargets;
-extern  vmCvar_t		cg_tracer;
 extern  vmCvar_t		cg_smoke;
 
 
@@ -1367,9 +1348,6 @@ void CG_DrawString( float x, float y, const char *string,
 extern	int sortedTeamPlayers[TEAM_MAXOVERLAY];
 extern	int	numSortedTeamPlayers;
 extern	int drawTeamOverlayModificationCount;
-extern  char systemChat[256];
-extern  char teamChat1[256];
-extern  char teamChat2[256];
 
 void CG_SelectPrevPlayer();
 void CG_SelectNextPlayer();

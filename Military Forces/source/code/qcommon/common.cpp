@@ -52,7 +52,7 @@ jmp_buf abortframe;		// an ERR_DROP occurred, exit the entire frame
 FILE *debuglogfile;
 static fileHandle_t pipefile;
 static fileHandle_t logfile;
-fileHandle_t	com_journalFile;			// events are written here
+static fileHandle_t	com_journalFile;			// events are written here
 fileHandle_t	com_journalDataFile;		// config files are written here
 
 cvar_t	*com_speeds;
@@ -70,7 +70,7 @@ static cvar_t	*com_logfile;		// 1 = buffer log, 2 = flush after each print
 cvar_t	*com_pipefile;
 static cvar_t	*com_showtrace;
 cvar_t	*com_version;
-cvar_t	*com_blood;
+static cvar_t	*com_blood;
 cvar_t	*com_buildScript;	// for automated data building scripts
 #ifdef CINEMATICS_INTRO
 cvar_t	*com_introPlayed;
@@ -82,9 +82,9 @@ cvar_t  *sv_packetdelay;
 cvar_t	*com_cameraMode;
 cvar_t	*com_ansiColor;
 cvar_t	*com_unfocused;
-cvar_t	*com_maxfpsUnfocused;
+static cvar_t	*com_maxfpsUnfocused;
 cvar_t	*com_minimized;
-cvar_t	*com_maxfpsMinimized;
+static cvar_t	*com_maxfpsMinimized;
 cvar_t	*com_abnormalExit;
 cvar_t	*com_standalone;
 cvar_t	*com_gamename;

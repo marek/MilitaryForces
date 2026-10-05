@@ -35,16 +35,16 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #ifdef USE_MUMBLE
 cvar_t	*cl_useMumble;
-cvar_t	*cl_mumbleScale;
+static cvar_t	*cl_mumbleScale;
 #endif
 
 #ifdef USE_VOIP
-cvar_t	*cl_voipUseVAD;
-cvar_t	*cl_voipVADThreshold;
+static cvar_t	*cl_voipUseVAD;
+static cvar_t	*cl_voipVADThreshold;
 cvar_t	*cl_voipSend;
 cvar_t	*cl_voipSendTarget;
-cvar_t	*cl_voipGainDuringCapture;
-cvar_t	*cl_voipCaptureMult;
+static cvar_t	*cl_voipGainDuringCapture;
+static cvar_t	*cl_voipCaptureMult;
 cvar_t	*cl_voipShowMeter;
 cvar_t	*cl_voipProtocol;
 cvar_t	*cl_voip;

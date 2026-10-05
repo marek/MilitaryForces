@@ -32,9 +32,9 @@ int drawTeamOverlayModificationCount = -1;
 int sortedTeamPlayers[TEAM_MAXOVERLAY];
 int	numSortedTeamPlayers;
 
-char systemChat[256];
-char teamChat1[256];
-char teamChat2[256];
+static char systemChat[256];
+static char teamChat1[256];
+static char teamChat2[256];
 
 /*
 ===============================================================================

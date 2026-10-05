@@ -6419,60 +6419,60 @@ struct cvarTable_t {
 	int			cvarFlags;
 };
 
-vmCvar_t	ui_ffa_fraglimit;
-vmCvar_t	ui_ffa_timelimit;
+static vmCvar_t	ui_ffa_fraglimit;
+static vmCvar_t	ui_ffa_timelimit;
 
-vmCvar_t	ui_tourney_fraglimit;
-vmCvar_t	ui_tourney_timelimit;
+static vmCvar_t	ui_tourney_fraglimit;
+static vmCvar_t	ui_tourney_timelimit;
 
-vmCvar_t	ui_team_fraglimit;
-vmCvar_t	ui_team_timelimit;
-vmCvar_t	ui_team_friendly;
+static vmCvar_t	ui_team_fraglimit;
+static vmCvar_t	ui_team_timelimit;
+static vmCvar_t	ui_team_friendly;
 
-vmCvar_t	ui_ctf_capturelimit;
-vmCvar_t	ui_ctf_timelimit;
-vmCvar_t	ui_ctf_friendly;
+static vmCvar_t	ui_ctf_capturelimit;
+static vmCvar_t	ui_ctf_timelimit;
+static vmCvar_t	ui_ctf_friendly;
 
-vmCvar_t	ui_arenasFile;
+static vmCvar_t	ui_arenasFile;
 //vmCvar_t	ui_botsFile;
-vmCvar_t	ui_spScores1;
-vmCvar_t	ui_spScores2;
-vmCvar_t	ui_spScores3;
-vmCvar_t	ui_spScores4;
-vmCvar_t	ui_spScores5;
-vmCvar_t	ui_spAwards;
-vmCvar_t	ui_spVideos;
+static vmCvar_t	ui_spScores1;
+static vmCvar_t	ui_spScores2;
+static vmCvar_t	ui_spScores3;
+static vmCvar_t	ui_spScores4;
+static vmCvar_t	ui_spScores5;
+static vmCvar_t	ui_spAwards;
+static vmCvar_t	ui_spVideos;
 vmCvar_t	ui_spSkill;
 
-vmCvar_t	ui_spSelection;
+static vmCvar_t	ui_spSelection;
 
-vmCvar_t	ui_browserMaster;
-vmCvar_t	ui_browserGameType;
-vmCvar_t	ui_browserSortKey;
+static vmCvar_t	ui_browserMaster;
+static vmCvar_t	ui_browserGameType;
+static vmCvar_t	ui_browserSortKey;
 vmCvar_t	ui_browserShowFull;
 vmCvar_t	ui_browserShowEmpty;
 
-vmCvar_t	ui_brassTime;
-vmCvar_t	ui_drawCrosshair;
-vmCvar_t	ui_drawCrosshairNames;
-vmCvar_t	ui_marks;
+static vmCvar_t	ui_brassTime;
+static vmCvar_t	ui_drawCrosshair;
+static vmCvar_t	ui_drawCrosshairNames;
+static vmCvar_t	ui_marks;
 
-vmCvar_t	ui_server1;
-vmCvar_t	ui_server2;
-vmCvar_t	ui_server3;
-vmCvar_t	ui_server4;
-vmCvar_t	ui_server5;
-vmCvar_t	ui_server6;
-vmCvar_t	ui_server7;
-vmCvar_t	ui_server8;
-vmCvar_t	ui_server9;
-vmCvar_t	ui_server10;
-vmCvar_t	ui_server11;
-vmCvar_t	ui_server12;
-vmCvar_t	ui_server13;
-vmCvar_t	ui_server14;
-vmCvar_t	ui_server15;
-vmCvar_t	ui_server16;
+static vmCvar_t	ui_server1;
+static vmCvar_t	ui_server2;
+static vmCvar_t	ui_server3;
+static vmCvar_t	ui_server4;
+static vmCvar_t	ui_server5;
+static vmCvar_t	ui_server6;
+static vmCvar_t	ui_server7;
+static vmCvar_t	ui_server8;
+static vmCvar_t	ui_server9;
+static vmCvar_t	ui_server10;
+static vmCvar_t	ui_server11;
+static vmCvar_t	ui_server12;
+static vmCvar_t	ui_server13;
+static vmCvar_t	ui_server14;
+static vmCvar_t	ui_server15;
+static vmCvar_t	ui_server16;
 
 //vmCvar_t	ui_cdkeychecked;
 
@@ -6503,13 +6503,13 @@ vmCvar_t	ui_currentTier;
 vmCvar_t	ui_currentMap;
 vmCvar_t	ui_currentNetMap;
 vmCvar_t	ui_mapIndex;
-vmCvar_t	ui_currentOpponent;
+static vmCvar_t	ui_currentOpponent;
 vmCvar_t	ui_selectedPlayer;
-vmCvar_t	ui_selectedPlayerName;
-vmCvar_t	ui_lastServerRefresh_0;
-vmCvar_t	ui_lastServerRefresh_1;
-vmCvar_t	ui_lastServerRefresh_2;
-vmCvar_t	ui_lastServerRefresh_3;
+static vmCvar_t	ui_selectedPlayerName;
+static vmCvar_t	ui_lastServerRefresh_0;
+static vmCvar_t	ui_lastServerRefresh_1;
+static vmCvar_t	ui_lastServerRefresh_2;
+static vmCvar_t	ui_lastServerRefresh_3;
 vmCvar_t	ui_singlePlayerActive;
 vmCvar_t	ui_scoreAccuracy;
 vmCvar_t	ui_scoreImpressives;

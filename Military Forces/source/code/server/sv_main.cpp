@@ -62,7 +62,7 @@ cvar_t	*sv_gameset;
 cvar_t	*sv_pure;
 cvar_t	*sv_floodProtect;
 cvar_t	*sv_lanForceRate; // dedicated 1 (LAN) server forces local client rates to 99999 (bug #491)
-cvar_t	*sv_strictAuth;
+static cvar_t	*sv_strictAuth;
 cvar_t	*sv_banFile;
 cvar_t	*sv_master[MAX_MASTER_SERVERS];	// master server ip address
 

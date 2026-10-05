@@ -29,60 +29,18 @@ struct UI_Utils;
 extern refexport_t	refExport;
 
 
-extern vmCvar_t	ui_ffa_fraglimit;
-extern vmCvar_t	ui_ffa_timelimit;
 
-extern vmCvar_t	ui_tourney_fraglimit;
-extern vmCvar_t	ui_tourney_timelimit;
 
-extern vmCvar_t	ui_team_fraglimit;
-extern vmCvar_t	ui_team_timelimit;
-extern vmCvar_t	ui_team_friendly;
 
-extern vmCvar_t	ui_ctf_capturelimit;
-extern vmCvar_t	ui_ctf_timelimit;
-extern vmCvar_t	ui_ctf_friendly;
 
-extern vmCvar_t	ui_arenasFile;
 //extern vmCvar_t	ui_botsFile;
-extern vmCvar_t	ui_spScores1;
-extern vmCvar_t	ui_spScores2;
-extern vmCvar_t	ui_spScores3;
-extern vmCvar_t	ui_spScores4;
-extern vmCvar_t	ui_spScores5;
-extern vmCvar_t	ui_spAwards;
-extern vmCvar_t	ui_spVideos;
 extern vmCvar_t	ui_spSkill;
 
-extern vmCvar_t	ui_spSelection;
 
-extern vmCvar_t	ui_browserMaster;
-extern vmCvar_t	ui_browserGameType;
-extern vmCvar_t	ui_browserSortKey;
 extern vmCvar_t	ui_browserShowFull;
 extern vmCvar_t	ui_browserShowEmpty;
 
-extern vmCvar_t	ui_brassTime;
-extern vmCvar_t	ui_drawCrosshair;
-extern vmCvar_t	ui_drawCrosshairNames;
-extern vmCvar_t	ui_marks;
 
-extern vmCvar_t	ui_server1;
-extern vmCvar_t	ui_server2;
-extern vmCvar_t	ui_server3;
-extern vmCvar_t	ui_server4;
-extern vmCvar_t	ui_server5;
-extern vmCvar_t	ui_server6;
-extern vmCvar_t	ui_server7;
-extern vmCvar_t	ui_server8;
-extern vmCvar_t	ui_server9;
-extern vmCvar_t	ui_server10;
-extern vmCvar_t	ui_server11;
-extern vmCvar_t	ui_server12;
-extern vmCvar_t	ui_server13;
-extern vmCvar_t	ui_server14;
-extern vmCvar_t	ui_server15;
-extern vmCvar_t	ui_server16;
 
 //extern vmCvar_t	ui_cdkey;
 //extern vmCvar_t	ui_cdkeychecked;
@@ -103,13 +61,7 @@ extern vmCvar_t	ui_currentTier;
 extern vmCvar_t	ui_currentMap;
 extern vmCvar_t	ui_currentNetMap;
 extern vmCvar_t	ui_mapIndex;
-extern vmCvar_t	ui_currentOpponent;
 extern vmCvar_t	ui_selectedPlayer;
-extern vmCvar_t	ui_selectedPlayerName;
-extern vmCvar_t	ui_lastServerRefresh_0;
-extern vmCvar_t	ui_lastServerRefresh_1;
-extern vmCvar_t	ui_lastServerRefresh_2;
-extern vmCvar_t	ui_lastServerRefresh_3;
 extern vmCvar_t	ui_singlePlayerActive;
 extern vmCvar_t	ui_scoreAccuracy;
 extern vmCvar_t	ui_scoreImpressives;
@@ -304,36 +256,9 @@ extern void			Bitmap_Init( menubitmap_s *b );
 extern void			Bitmap_Draw( menubitmap_s *b );
 extern void			ScrollList_Draw( menulist_s *l );
 extern sfxHandle_t	ScrollList_Key( menulist_s *l, int key );
-extern sfxHandle_t	menu_in_sound;
-extern sfxHandle_t	menu_move_sound;
-extern sfxHandle_t	menu_out_sound;
-extern sfxHandle_t	menu_buzz_sound;
 extern sfxHandle_t	menu_null_sound;
-extern sfxHandle_t	weaponChangeSound;
 extern vec4_t		menu_text_color;
-extern vec4_t		menu_grayed_color;
-extern vec4_t		menu_dark_color;
-extern vec4_t		menu_highlight_color;
-extern vec4_t		menu_red_color;
-extern vec4_t		menu_black_color;
-extern vec4_t		menu_dim_color;
-extern vec4_t		color_black;
-extern vec4_t		color_white;
-extern vec4_t		color_yellow;
-extern vec4_t		color_blue;
-extern vec4_t		color_orange;
-extern vec4_t		color_red;
-extern vec4_t		color_dim;
-extern vec4_t		name_color;
-extern vec4_t		list_color;
-extern vec4_t		listbar_color;
-extern vec4_t		text_color_disabled; 
-extern vec4_t		text_color_normal;
-extern vec4_t		text_color_highlight;
 
-extern char	*ui_medalNames[];
-extern char	*ui_medalPicNames[];
-extern char	*ui_medalSounds[];
 
 //
 // ui_mfield.c
@@ -860,7 +785,6 @@ extern void			UI_PopMenu ();
 extern void			UI_ForceMenuOff ();
 extern void			UI_Refresh( int time );
 extern void			UI_KeyEvent( int key );
-extern bool		m_entersound;
 extern uiStatic_t	uis;
 
 //
